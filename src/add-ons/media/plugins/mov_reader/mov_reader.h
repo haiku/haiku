@@ -34,29 +34,33 @@ public:
 				movReader();
 				~movReader();
 	
-	const char *Copyright();
+	virtual const char*		Copyright();
 	
-	status_t	Sniff(int32 *streamCount);
+	virtual status_t		Sniff(int32* streamCount);
 
-	void		GetFileFormatInfo(media_file_format *mff);
+	virtual void			GetFileFormatInfo(media_file_format* mff);
 
-	status_t	AllocateCookie(int32 streamNumber, void **cookie);
-	status_t	FreeCookie(void *cookie);
+	virtual status_t		AllocateCookie(int32 streamNumber, 
+								void** cookie);
+	virtual status_t		FreeCookie(void* cookie);
 	
-	status_t	GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-							  media_format *format, const void **infoBuffer, size_t *infoSize);
+	virtual status_t		GetStreamInfo(void* cookie, int64* frameCount, 
+								bigtime_t* duration, media_format* format, 
+								const void** infoBuffer, 
+								size_t* infoSize);
 
-	status_t	Seek(void *cookie,
-					 uint32 seekTo,
-					 int64 *frame, bigtime_t *time);
+	virtual status_t		Seek(void* cookie, uint32 seekTo, int64* frame, 
+								bigtime_t* time);
 
-	status_t	GetNextChunk(void *cookie,
-							 const void **chunkBuffer, size_t *chunkSize,
-							 media_header *mediaHeader);
+	virtual	status_t		FindKeyFrame(void* cookie, uint32 flags,
+								int64* frame, bigtime_t* time);
+
+	virtual status_t		GetNextChunk(void* cookie,
+								const void** chunkBuffer, size_t* chunkSize,
+								media_header* mediaHeader);
 private:
 	MOVFileReader *theFileReader;
 };
-
 
 class movReaderPlugin : public ReaderPlugin
 {

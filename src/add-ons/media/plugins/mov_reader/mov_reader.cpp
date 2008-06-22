@@ -57,7 +57,6 @@ struct mov_cookie
 
 	// audio only:
 	off_t		byte_pos;
-	uint32		chunk_pos;
 	uint32		bytes_per_sec_rate;
 	uint32		bytes_per_sec_scale;
 
@@ -181,7 +180,6 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		
 		cookie->audio = true;
 		cookie->byte_pos = 0;
-		cookie->chunk_pos = 1;
 
 		if (stream_header->scale && stream_header->rate) {
 			cookie->bytes_per_sec_rate = stream_header->rate * audio_format->SampleSize * audio_format->NoOfChannels / 8;
@@ -468,26 +466,22 @@ movReader::Seek(void *cookie,
 				uint32 seekTo,
 				int64 *frame, bigtime_t *time)
 {
-
-// We should seek to nearest keyframe requested
-// currently returning B_OK for audio streams causes many problems.
-
+	// Seek to the requested frame
+	
 	mov_cookie *movcookie = (mov_cookie *)cookie;
 
 	if (seekTo & B_MEDIA_SEEK_TO_TIME) {
 		// frame = (time * rate) / fps / 1000000LL
 		*frame = ((*time * movcookie->frames_per_sec_rate) / (int64)movcookie->frames_per_sec_scale) / 1000000LL;
+		movcookie->frame_pos = *frame;
 		TRACE("Time %Ld to Frame %Ld\n",*time, *frame);
-//		movcookie->frame_pos = *frame;
-//		return B_ERROR;
 	}
 	
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
 		// time = frame * 1000000LL * fps / rate
-		TRACE("Frame %Ld to Time %Ld\n", *frame, *time);
 		*time = (*frame * 1000000LL * (int64)movcookie->frames_per_sec_scale) / movcookie->frames_per_sec_rate;
-//		movcookie->frame_pos = *frame;
-//		return B_ERROR;
+		movcookie->frame_pos = *frame;
+		TRACE("Frame %Ld to Time %Ld\n", *frame, *time);
 	}
 
 	TRACE("movReader::Seek: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
@@ -497,9 +491,64 @@ movReader::Seek(void *cookie,
 		(seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
 		*time, *frame);
 
-	return B_ERROR;
+	return B_OK;
 }
 
+status_t
+movReader::FindKeyFrame(void* cookie, uint32 flags,
+							int64* frame, bigtime_t* time)
+{
+	// Find the nearest keyframe to the given time or frame.
+
+	mov_cookie *movcookie = (mov_cookie *)cookie;
+
+	bool keyframe = false;
+
+	if (flags & B_MEDIA_SEEK_TO_TIME) {
+		// convert time to frame as we seek by frame
+		// frame = (time * rate) / fps / 1000000LL
+		*frame = ((*time * movcookie->frames_per_sec_rate) / (int64)movcookie->frames_per_sec_scale) / 1000000LL;
+	}
+
+	TRACE("movReader::FindKeyFrame: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
+		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		*time, *frame);
+
+	if (movcookie->audio) {
+		// Audio does not have keyframes?  Or all audio frames are keyframes?
+		return B_OK;
+	} else {
+		while (*frame > 0 && *frame <= movcookie->frame_count) {
+			keyframe = theFileReader->IsKeyFrame(movcookie->stream, *frame);
+			
+			if (keyframe)
+				break;
+			
+			if (flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
+				(*frame)--;
+			} else {
+				(*frame)++;
+			}
+		}
+		
+		// We consider frame 0 to be a keyframe.
+		if (!keyframe && *frame > 0) {
+			TRACE("Did NOT find keyframe at frame %Ld\n",*frame);
+			return B_LAST_BUFFER_ERROR;
+		}
+	}
+
+	// convert frame found to time
+	// time = frame * 1000000LL * fps / rate
+	*time = (*frame * 1000000LL * (int64)movcookie->frames_per_sec_scale) / movcookie->frames_per_sec_rate;
+
+	TRACE("Found keyframe at frame %Ld time %Ld\n",*frame,*time);
+
+	return B_OK;
+}
 
 status_t
 movReader::GetNextChunk(void *_cookie,
@@ -510,13 +559,8 @@ movReader::GetNextChunk(void *_cookie,
 
 	int64 start; uint32 size; bool keyframe;
 
-	if (cookie->audio) {
-		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->chunk_pos, &start, &size, &keyframe))
-			return B_LAST_BUFFER_ERROR;
-	} else {
-		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos, &start, &size, &keyframe))
-			return B_LAST_BUFFER_ERROR;
-	}
+	if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos, &start, &size, &keyframe))
+		return B_LAST_BUFFER_ERROR;
 
 	if (cookie->buffer_size < size) {
 		delete [] cookie->buffer;
@@ -525,22 +569,20 @@ movReader::GetNextChunk(void *_cookie,
 	}
 	
 	if (cookie->audio) {
-		TRACE("Audio stream %d: chunk %ld expected start %lld Size %ld key %d\n",cookie->stream, cookie->chunk_pos, start, size, keyframe);
+		TRACE("Audio stream %d: chunk %ld expected start %lld Size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
 		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
 		mediaHeader->u.encoded_audio.buffer_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
 
 		// This will only work with raw audio I think.
 		mediaHeader->start_time = (cookie->byte_pos * 1000000LL * cookie->bytes_per_sec_scale) / cookie->bytes_per_sec_rate;
-		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using byte_pos\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->chunk_pos),mediaHeader->start_time);
+		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using byte_pos\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->frame_pos),mediaHeader->start_time);
 		
 		// We should find the current frame position (ie first frame in chunk) then compute using fps
-		cookie->frame_pos = theFileReader->getFirstFrameInChunk(cookie->stream,cookie->chunk_pos);
+		cookie->frame_pos = theFileReader->getFirstFrameInChunk(cookie->stream,cookie->frame_pos);
 		mediaHeader->start_time = (cookie->frame_pos * 1000000LL * (int64)cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
-		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using frame_no %ld\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->chunk_pos),mediaHeader->start_time, cookie->frame_pos);
+		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using frame_no %ld\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->frame_pos),mediaHeader->start_time, cookie->frame_pos);
 
 		cookie->byte_pos += size;
-		// frame_pos is chunk No for audio
-		cookie->chunk_pos++;
 	} else {
 		TRACE("Video stream %d: frame %ld start %lld Size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
 		mediaHeader->start_time = (cookie->frame_pos * 1000000LL * (int64)cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
@@ -548,10 +590,9 @@ movReader::GetNextChunk(void *_cookie,
 		mediaHeader->u.encoded_video.field_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
 		mediaHeader->u.encoded_video.first_active_line = 0;
 		mediaHeader->u.encoded_video.line_count = cookie->line_count;
-	
-		cookie->frame_pos++;
 	}
 	
+	cookie->frame_pos++;
 	TRACE("stream %d: start_time %.6f\n", cookie->stream, mediaHeader->start_time / 1000000.0);
 
 	*chunkBuffer = cookie->buffer;
