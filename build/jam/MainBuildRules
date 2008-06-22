@@ -323,7 +323,7 @@ rule CreateAsmStructOffsetsHeader header : source
 actions CreateAsmStructOffsetsHeader1
 {
  	$(C++) -S "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o - \
-		| grep "#define" | sed -e 's/\$//' > "$(1)"
+		| grep "#define" | sed -e 's/[\$\#]\([0-9]\)/\1/' > "$(1)"
 }
 
 rule MergeObjectFromObjects
