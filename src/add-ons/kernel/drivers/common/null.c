@@ -92,6 +92,13 @@ find_device(const char *name)
 		&null_ioctl,
 		&null_read,
 		&null_write,
+		/* Leave select/deselect/readv/writev undefined. The kernel will
+		 * use its own default implementation. The basic hooks above this
+		 * line MUST be defined, however. */
+		NULL,
+		NULL,
+		NULL,
+		NULL
 	};
 
 	if (!strcmp(name, DEVICE_NAME))
