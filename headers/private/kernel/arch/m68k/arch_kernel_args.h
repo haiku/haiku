@@ -18,7 +18,8 @@ typedef struct {
 	int			cpu_type; // decimal: 68030, ...
 	int			fpu_type; // decimal: 68030, ...
 	int			mmu_type; // decimal: 68030, ...
-	int			platform;
+	int			platform; // M68K_PLATFORM_*
+	int			machine;  // platform specific machine type
 	bool			has_lpstop; //XXX: use bit flags
 	// architecture specific
 	uint64		cpu_frequency;
