@@ -1229,7 +1229,16 @@ LegacyDevice::SetHooks(device_hooks* hooks)
 		// According to Be newsletter, vol II, issue 36,
 		// version 2 added readv/writev, which we don't support, but also
 		// select/deselect.
-		fDeviceModule->select = (status_t (*)(void*, uint8, selectsync*))~0;
+		if (hooks->select != NULL) {
+			// Note we set the module's select to a non-null value to indicate
+			// that we have select. HasSelect() will therefore return the
+			// correct answer. As Select() is virtual our compatibility
+			// version below is going to be called though, that redirects to
+			// the proper select hook, so it is ok to set it to an invalid
+			// address here.
+			fDeviceModule->select = (status_t (*)(void*, uint8, selectsync*))~0;
+		}
+
 		fDeviceModule->deselect = hooks->deselect;
 	}
 }
