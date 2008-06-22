@@ -36,6 +36,14 @@ dummy()
 	DEFINE_OFFSET_MACRO(THREAD, thread, fault_handler);
 
 	// struct iframe
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, fp);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, fpc);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, fpu);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, d);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, a);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, cpu);
+#if 0
+	// struct iframe
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, cs);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, eax);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, edx);
@@ -44,17 +52,13 @@ dummy()
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, eip);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, flags);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, user_esp);
+#endif
 
-	// struct vm86_iframe
-	DEFINE_SIZEOF_MACRO(VM86_IFRAME, vm86_iframe);
-	DEFINE_OFFSET_MACRO(VM86_IFRAME, vm86_iframe, flags);
+	DEFINE_SIZEOF_MACRO(FPU_STATE, mc680x0_fpu_state);
+	DEFINE_SIZEOF_MACRO(FPU_DATA_REG, mc680x0_fp_data_reg);
 
 	// struct syscall_info
 	DEFINE_SIZEOF_MACRO(SYSCALL_INFO, syscall_info);
 	DEFINE_OFFSET_MACRO(SYSCALL_INFO, syscall_info, function);
 	DEFINE_OFFSET_MACRO(SYSCALL_INFO, syscall_info, parameter_size);
-
-	// struct x86_optimized_functions
-	DEFINE_OFFSET_MACRO(X86_OPTIMIZED_FUNCTIONS, x86_optimized_functions,
-		memcpy);
 }

@@ -6,9 +6,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <arch/m68k/arch_cpu.h>
 
-#define MSR_EXCEPTIONS_ENABLED 15
+#define FUNCTION(x) .global x; .type x,@function; x
 
 .text
 

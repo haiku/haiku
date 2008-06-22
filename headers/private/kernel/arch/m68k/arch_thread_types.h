@@ -5,6 +5,8 @@
 #ifndef KERNEL_ARCH_M68K_THREAD_TYPES_H
 #define KERNEL_ARCH_M68K_THREAD_TYPES_H
 
+#include <kernel.h>
+
 #define	IFRAME_TRACE_DEPTH 4
 
 struct iframe_stack {

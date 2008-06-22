@@ -5,10 +5,17 @@
 #ifndef _KERNEL_ARCH_M68K_CPU_H
 #define _KERNEL_ARCH_M68K_CPU_H
 
+#ifndef _ASSEMBLER
 
 #include <arch/m68k/arch_thread_types.h>
 #include <kernel.h>
 
+#endif	// !_ASSEMBLER
+
+
+
+
+#ifndef _ASSEMBLER
 
 /* 68k has many different possible stack frames, differentiated by a 4 bit number, 
  * but they also depend on the cpu type.
@@ -195,11 +202,83 @@ struct mc680x0_frame {
 	};
 };
 
+struct mc680x0_null_fpu_state {
+	uint8 version; // 0
+	uint8 type; // undefined
+	uint16 dummy;
+};
+
+struct mc680x0_type_00_fpu_state {
+	uint8 version;
+	uint8 type; // 0
+	uint16 dummy;
+};
+
+struct mc680x0_type_28_fpu_state {
+	uint8 version;
+	uint8 type; // 0x28
+	uint16 dummy;
+	// XXX: replace dummies
+	uint32 dummies[0x28/4];
+};
+
+struct mc680x0_type_60_fpu_state {
+	uint8 version;
+	uint8 type; // 0x60
+	uint16 dummy;
+	// XXX: replace dummies
+	uint32 dummies[0x60/4];
+};
+
+//XXX: those are 040, add others
+// biggest known:
+struct mc68882_type_d4_fpu_state {
+	uint8 version;
+	uint8 type; // 0xd4
+	uint16 dummy;
+	// XXX: replace dummies
+	uint32 dummies[0xd4/4];
+};
+
+struct mc680x0_fpu_state {
+	union {
+		struct {
+			uint8 version;
+			uint8 type; // 0x60
+			uint16 dummy;
+		};
+		struct mc680x0_null_fpu_state null;
+		struct mc680x0_type_00_fpu_state type_00;
+		struct mc680x0_type_28_fpu_state type_28;
+		struct mc680x0_type_60_fpu_state type_60;
+		struct mc68882_type_d4_fpu_state type_d4;
+	};
+};
+
+// 96-bit format
+struct mc680x0_fp_data_reg {
+	uint8 data[12];
+};
+
+struct mc680x0_fp_control_regs {
+	uint32 fpcr;
+	uint32 fpsr;
+	uint32 fpiar;
+};
+
+
+
 #warning M68K: check for missing regs/movem
 struct iframe {
-	// XXX: fp_frame ?
+	/* fpu data registers */
+#warning M68K: sizeof(fp*)
+	struct mc680x0_fp_data_reg fp[8];
+	/* fpu control registers */
+	struct mc680x0_fp_control_regs fpc;
+	/* fpu state */
+	struct mc680x0_fpu_state fpu;
+	
 	/* data and address registers */
-	// XXX: order depends on movem
 	uint32 d[8];
 	uint32 a[7];
 	/* cpu exception frame, including sr, pc, format and vector */
@@ -437,5 +516,7 @@ extern int arch_platform;
 	SPRG2: current struct thread*
 	SPRG3: TLS base pointer (only for userland threads)
 */
+
+#endif	// !_ASSEMBLER
 
 #endif	/* _KERNEL_ARCH_PPC_CPU_H */

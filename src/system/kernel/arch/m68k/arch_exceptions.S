@@ -5,11 +5,25 @@
  * Copyright 2003, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
+#include "asm_offsets.h"
+
 #define FUNCTION(x) .global x; .type x,@function; x
 #define LOCAL_FUNCTION(x) .type x,@function; x
 
+
+
 /*	General exception handling concept:
 
+	Starting with 68020 the vector offset (=vector number * 4) is part 
+	of the all exception frame types, so we can easily have a common
+	asm stub for all of them, which calls m68k_exception_entry in 
+	arch_int.cpp.
+	Also, m68k doesn't disable the mmu on interrupt as ppc does, 
+	which makes things simpler.
+
+	----ppc
+	
 	The PPC architecture specifies entry point offsets for the various
 	exceptions in the first two physical pages. We put a short piece of code
 	(VEC_ENTRY()) into each exception vector. It calls exception_vector_common,
@@ -71,6 +85,51 @@
 
 
 /* exception vector definitions */
+
+/* this one just returns */
+FUNCTION(__m68k_exception_noop):
+	rte
+
+/* see arch_asm.S for ctx switch */
+
+FUNCTION(__m68k_exception_common):
+	/* save regs */
+	movem.l		%d0-%d7/%a0-%a7,-(%sp)	/* push the iframe address */
+	/* save fp */
+	sub.l		#FPU_STATE_sizeof,%sp
+	fsave		(%sp)
+	tst.b		(%sp)			/* check for a null state */
+	beq		null_sav_1		/* yes */
+	
+	fmovem		%fpcr/%fpsr/%fpiar,-(%sp)
+	fmovem		%fp0-%fp7,-(%sp)
+	bra		null_sav_2
+null_sav_1:
+	sub.l		#IFRAME_fpu-IFRAME_fp,%sp
+null_sav_2:	
+
+	bsr	m68k_exception_entry /* call C entry */
+
+	/* restore fp */
+	tst.b		IFRAME_fpu-IFRAME_fp(%sp) /* check for a null state */
+	beq		null_res_1		/* yes */
+	fmovem		(%sp)+,%fp0-%fp7
+	fmovem		(%sp)+,%fpcr/%fpsr/%fpiar
+	bra		null_res_2
+null_res_1:
+	add.l		#IFRAME_fpu-IFRAME_fp,%sp
+null_res_2:	
+	/* restore fp */
+	frestore	(%sp)
+	add.l		#FPU_STATE_sizeof,%sp
+	/* restore regs */
+	movem.l		(%sp)+,%d0-%d7/%a0-%a7
+	
+	rte
+	
+
+
+#if 0 /* PPC */
 
 /* code in each exception vector */
 #define VEC_ENTRY() \
@@ -437,3 +496,4 @@ __restore_regs_and_rfi:
 
 	/* return from interrupt */
 	rfi
+#endif /* PPC */

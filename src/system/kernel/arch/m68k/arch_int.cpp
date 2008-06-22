@@ -28,11 +28,26 @@
 #include <vm.h>
 #include <vm_address_space.h>
 #include <vm_priv.h>
-
 #include <string.h>
+
 #warning M68K: writeme!
 
+
+//#define TRACE_ARCH_INT
+#ifdef TRACE_ARCH_INT
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+typedef void (*m68k_exception_handler)(void);
+#define M68K_EXCEPTION_VECTOR_COUNT 256
+m68k_exception_handler gExceptionVectors[M68K_EXCEPTION_VECTOR_COUNT];
+
 // defined in arch_exceptions.S
+extern "C" void __m68k_exception_noop(void);
+extern "C" void __m68k_exception_common(void);
+
 extern int __irqvec_start;
 extern int __irqvec_end;
 
@@ -100,15 +115,16 @@ print_iframe(struct iframe *frame)
 }
 
 
-extern "C" void m68k_exception_entry(int vector, struct iframe *iframe);
+extern "C" void m68k_exception_entry(struct iframe *iframe);
 void 
-m68k_exception_entry(int vector, struct iframe *iframe)
+m68k_exception_entry(struct iframe *iframe)
 {
+	int vector = iframe->cpu.vector >> 2;
 	int ret = B_HANDLED_INTERRUPT;
 
-	if (vector != 0x900) {
+	if (vector != -1) {
 		dprintf("m68k_exception_entry: time %lld vector 0x%x, iframe %p, "
-			"srr0: %p\n", system_time(), vector, iframe, (void*)iframe->srr0);
+			"pc: %p\n", system_time(), vector, iframe, (void*)iframe->cpu.pc);
 	}
 
 	struct thread *thread = thread_get_current_thread();
@@ -120,14 +136,11 @@ m68k_exception_entry(int vector, struct iframe *iframe)
 		m68k_push_iframe(&gBootFrameStack, iframe);
 
 	switch (vector) {
-		case 0x100: // system reset
+		case 0: // system reset
 			panic("system reset exception\n");
 			break;
-		case 0x200: // machine check
-			panic("machine check exception\n");
-			break;
-		case 0x300: // DSI
-		case 0x400: // ISI
+		case 2: // bus error
+		case 3: // address error
 		{
 			bool kernelDebugger = debug_debugger_running();
 
@@ -174,7 +187,16 @@ m68k_exception_entry(int vector, struct iframe *iframe)
  			break;
 		}
 		
-		case 0x500: // external interrupt
+		case 24: // spurious interrupt
+			dprintf("spurious interrupt\n");
+			break;
+		case 25: // autovector interrupt
+		case 26: // autovector interrupt
+		case 27: // autovector interrupt
+		case 28: // autovector interrupt
+		case 29: // autovector interrupt
+		case 30: // autovector interrupt
+		case 31: // autovector interrupt
 		{
 			if (!sPIC) {
 				panic("m68k_exception_entry(): external interrupt although we "
@@ -193,50 +215,10 @@ dprintf("handling I/O interrupts done\n");
 			break;
 		}
 
-		case 0x600: // alignment exception
-			panic("alignment exception: unimplemented\n");
-			break;
-		case 0x700: // program exception
-			panic("program exception: unimplemented\n");
-			break;
-		case 0x800: // FP unavailable exception
-			panic("FP unavailable exception: unimplemented\n");
-			break;
-		case 0x900: // decrementer exception
-			ret = timer_interrupt();
-			break;
-		case 0xc00: // system call
-			panic("system call exception: unimplemented\n");
-			break;
-		case 0xd00: // trace exception
-			panic("trace exception: unimplemented\n");
-			break;
-		case 0xe00: // FP assist exception
-			panic("FP assist exception: unimplemented\n");
-			break;
-		case 0xf00: // performance monitor exception
-			panic("performance monitor exception: unimplemented\n");
-			break;
-		case 0xf20: // altivec unavailable exception
-			panic("alitivec unavailable exception: unimplemented\n");
-			break;
-		case 0x1000:
-		case 0x1100:
-		case 0x1200:
-			panic("TLB miss exception: unimplemented\n");
-			break;
-		case 0x1300: // instruction address exception
-			panic("instruction address exception: unimplemented\n");
-			break;
-		case 0x1400: // system management exception
-			panic("system management exception: unimplemented\n");
-			break;
-		case 0x1600: // altivec assist exception
-			panic("altivec assist exception: unimplemented\n");
-			break;
 		case 0x1700: // thermal management exception
 			panic("thermal management exception: unimplemented\n");
 			break;
+		case 9: // trace
 		default:
 			dprintf("unhandled exception type 0x%x\n", vector);
 			print_iframe(iframe);
