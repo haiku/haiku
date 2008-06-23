@@ -11,88 +11,56 @@ SECTIONS
 	.hash : { *(.hash) }
 	.dynsym : { *(.dynsym) }
 	.dynstr : { *(.dynstr) }
-	.gnu.version : { *(.gnu.version) }
-	.gnu.version_d : { *(.gnu.version_d) }
-	.gnu.version_r : { *(.gnu.version_r) }
-
-	.rel.dyn : {
-		*(.rel.init)
-		*(.rel.text .rel.text.* .rel.gnu.linkonce.t*)
-		*(.rel.fini)
-		*(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r*)
-		*(.rel.data.rel.ro*)
-		*(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
-		*(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
-		*(.rel.ctors)
-		*(.rel.dtors)
-		*(.rel.got)
-		*(.rel.sdata .rel.sdata.* .rel.gnu.linkonce.s.*)
-		*(.rel.sbss .rel.sbss.* .rel.gnu.linkonce.sb.*)
-		*(.rel.sdata2 .rel.sdata2.* .rel.gnu.linkonce.s2.*)
-		*(.rel.sbss2 .rel.sbss2.* .rel.gnu.linkonce.sb2.*)
-		*(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
-	}
-
-	.rela.dyn : {
-		*(.rela.init)
-		*(.rela.text .rela.text.* .rela.gnu.linkonce.t*)
-		*(.rela.fini)
-		*(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r*)
-		*(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
-		*(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
-		*(.rela.ctors)
-		*(.rela.dtors)
-		*(.rela.got)
-		*(.rela.got1)
-		*(.rela.got2)
-		*(.rela.sdata .rela.sdata.* .rela.gnu.linkonce.s.*)
-		*(.rela.sbss .rela.sbss.* .rela.gnu.linkonce.sb.*)
-		*(.rela.sdata2 .rela.sdata2.* .rela.gnu.linkonce.s2.*)
-		*(.rela.sbss2 .rela.sbss2.* .rela.gnu.linkonce.sb2.*)
-		*(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
-	}
-	.init : { *(.init) } =0x60000000
+	.rel.text : { *(.rel.text) *(.rel.gnu.linkonce.t*) }
+	.rela.text : { *(.rela.text) *(.rela.gnu.linkonce.t*) }
+	.rel.data : { *(.rel.data) *(.rel.gnu.linkonce.d*) }
+	.rela.data : { *(.rela.data) *(.rela.gnu.linkonce.d*) }
+	.rel.rodata : { *(.rel.rodata) *(.rel.gnu.linkonce.r*) }
+	.rela.rodata : { *(.rela.rodata) *(.rela.gnu.linkonce.r*) }
+	.rel.got : { *(.rel.got) }
+	.rela.got : { *(.rela.got) }
+	.rel.ctors : { *(.rel.ctors) }
+	.rela.ctors : { *(.rela.ctors) }
+	.rel.dtors : { *(.rel.dtors) }
+	.rela.dtors : { *(.rela.dtors) }
+	.rel.init : { *(.rel.init) }
+	.rela.init : { *(.rela.init) }
+	.rel.fini : { *(.rel.fini) }
+	.rela.fini : { *(.rela.fini) }
+	.rel.bss : { *(.rel.bss) }
+	.rela.bss : { *(.rela.bss) }
+	.rel.plt : { *(.rel.plt) }
+	.rela.plt : { *(.rela.plt) }
+	.init : { *(.init) } =0x9090
+	.plt : { *(.plt) }
 
 	/* text/read-only data */
-	.text :	{
-		*(.text .stub .text.* .gnu.linkonce.t.*)
-	} =0x60000000
+	.text :	{ *(.text .gnu.linkonce.t.*) } =0x9090
 
-	.rodata : { *(.rodata .rodata.* .gnu.linkonce.r.*) }
-	.rodata1 : { *(.rodata1) }
-	.sdata2 : { *(.sdata2 .sdata2.* .gnu.linkonce.s2.*) }
-	.sbss2 : { *(.sbss2 .sbss2.* .gnu.linkonce.sb2.*) }
+	.rodata : { *(.rodata) }
 
 	/* writable data  */
-	/* align to the same offset in the next page (for performance reasons
-	   (not that it really matters in the kernel)) */
-	. = ALIGN(0x1000) + 0x1000 + (. & (0x1000 - 1));
-
-	__ctor_list = .;
-	.ctors : { *(.ctors) }
-	__ctor_end = .;
-
-	.dynamic : { *(.dynamic) }
-
+	. = ALIGN(0x1000);
 	__data_start = .;
 	.data : { *(.data .gnu.linkonce.d.*) }
 
+	. = ALIGN(0x4);
+	__ctor_list = .;
+	.ctors : { *(.ctors) }
+	__ctor_end = .;
+	__dtor_list = .;
+	.dtors : { *(.dtors) }
+	__dtor_end = .;
 	.got : { *(.got.plt) *(.got) }
+	.dynamic : { *(.dynamic) }
 	
-	.sdata : { *(.sdata .sdata.* .gnu.linkonce.s.*) }
-
 	/* unintialized data (in same segment as writable data) */
 	__bss_start = .;
-	__bss_start = .;
-	.sbss : { *(.sbss .sbss.* .gnu.linkonce.sb.*) }
-	.bss : {
-		*(.bss .bss.* .gnu.linkonce.b.*)
-		. = ALIGN(0x1000);
-	}
+	.bss : { *(.bss) }
 
+	. = ALIGN(0x1000);
 	_end = . ;
 
-
 	/* Strip unnecessary stuff */
-	/DISCARD/ : { *(.comment .note .eh_frame .dtors .debug_*) }
+	/DISCARD/ : { *(.comment .note .eh_frame) }
 }
