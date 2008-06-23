@@ -37,7 +37,7 @@ KernelMergeObject kernel_arch_m68k.o :
 	arch_smp.c
 	arch_system_info.c
 	arch_thread.c
-	arch_timer.c
+	arch_timer.cpp
 	arch_user_debugger.cpp
 	arch_vm.cpp
 	arch_vm_translation_map.cpp

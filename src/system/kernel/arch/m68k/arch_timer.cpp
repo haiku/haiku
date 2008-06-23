@@ -16,28 +16,26 @@
 
 #include <timer.h>
 #include <arch/timer.h>
+#include <arch_platform.h>
 
 
 void 
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
-	if(timeout < 1000)
-		timeout = 1000;
-	
-	platform_timer_set_hardware_timer(timeout);
+	M68KPlatform::Default()->SetHardwareTimer(timeout);
 }
 
 
 void 
 arch_timer_clear_hardware_timer()
 {
-	platform_timer_set_hardware_timer(timeout);
+	M68KPlatform::Default()->ClearHardwareTimer();
 }
 
 
 int 
-arch_init_timer(kernel_args *ka)
+arch_init_timer(kernel_args *args)
 {
-	return platform_init_timer(ka);
+	return M68KPlatform::Default()->InitTimer(args);
 }
 

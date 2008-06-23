@@ -42,6 +42,7 @@
 
 typedef void (*m68k_exception_handler)(void);
 #define M68K_EXCEPTION_VECTOR_COUNT 256
+#warning M68K: align on 4 ?
 m68k_exception_handler gExceptionVectors[M68K_EXCEPTION_VECTOR_COUNT];
 
 // defined in arch_exceptions.S
@@ -53,6 +54,8 @@ extern int __irqvec_end;
 
 extern"C" void m68k_exception_tail(void);
 
+// current fault handler
+addr_t gFaultHandler;
 
 // An iframe stack used in the early boot process when we don't have
 // threads yet.
@@ -104,7 +107,7 @@ print_iframe(struct iframe *frame)
 			/*kprintf("   pc 0x%08lx   ccr 0x%02x\n",
 			  frame->pc, frame->ccr);*/
 			kprintf("   pc 0x%08lx        sr 0x%04x\n",
-				frame->pc, frame->sr);
+				frame->cpu.pc, frame->cpu.sr);
 #if 0
 	dprintf("r0-r3:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->d0, frame->d1, frame->d2, frame->d3);
 	dprintf("r4-r7:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->d4, frame->d5, frame->d6, frame->d7);
@@ -114,6 +117,46 @@ print_iframe(struct iframe *frame)
 #endif
 }
 
+static addr_t
+fault_address(struct iframe *iframe)
+{
+	switch (iframe->cpu.type) {
+		case 0x0:
+		case 0x1:
+			return 0;
+		case 0x2:
+			return iframe->cpu.type_2.instruction_address;
+		case 0x3:
+			return iframe->cpu.type_3.effective_address;
+		case 0x7:
+			return iframe->cpu.type_7.effective_address;
+		case 0x9:
+			return iframe->cpu.type_9.instruction_address;
+		case 0xa:
+			return iframe->cpu.type_a.fault_address;
+		case 0xb:
+			return iframe->cpu.type_b.fault_address;
+		default:
+			return 0;
+	}
+}
+
+static bool
+fault_was_write(struct iframe *iframe)
+{
+	switch (iframe->cpu.type) {
+		case 0x7:
+			return !iframe->cpu.type_7.ssw.rw;
+		case 0xa:
+			return !iframe->cpu.type_a.ssw.rw;
+		case 0xb:
+			return !iframe->cpu.type_b.ssw.rw;
+		default:
+			panic("can't determine r/w from iframe type %d\n",
+				iframe->cpu.type);
+			return false;
+	}
+}
 
 extern "C" void m68k_exception_entry(struct iframe *iframe);
 void 
@@ -147,42 +190,43 @@ m68k_exception_entry(struct iframe *iframe)
 			if (kernelDebugger) {
 				// if this thread has a fault handler, we're allowed to be here
 				struct thread *thread = thread_get_current_thread();
-				if (thread && thread->fault_handler != NULL) {
-					iframe->srr0 = thread->fault_handler;
+				if (thread && thread->fault_handler != 0) {
+					iframe->cpu.pc = thread->fault_handler;
 					break;
 				}
 
+				
 				// otherwise, not really
 				panic("page fault in debugger without fault handler! Touching "
-					"address %p from ip %p\n", (void *)iframe->dar,
-					(void *)iframe->srr0);
+					"address %p from ip %p\n", (void *)fault_address(iframe),
+					(void *)iframe->cpu.pc);
 				break;
-			} else if ((iframe->srr1 & MSR_EXCEPTIONS_ENABLED) == 0) {
+			} else if ((iframe->cpu.sr & SR_IP_MASK) != 0) {
 				// if the interrupts were disabled, and we are not running the
 				// kernel startup the page fault was not allowed to happen and
 				// we must panic
 				panic("page fault, but interrupts were disabled. Touching "
-					"address %p from ip %p\n", (void *)iframe->dar,
-					(void *)iframe->srr0);
+					"address %p from ip %p\n", (void *)fault_address(iframe),
+					(void *)iframe->cpu.pc);
 				break;
 			} else if (thread != NULL && thread->page_faults_allowed < 1) {
 				panic("page fault not allowed at this place. Touching address "
-					"%p from ip %p\n", (void *)iframe->dar,
-					(void *)iframe->srr0);
+					"%p from ip %p\n", (void *)fault_address(iframe),
+					(void *)iframe->cpu.pc);
 			}
 
 			enable_interrupts();
 
 			addr_t newip;
 
-			ret = vm_page_fault(iframe->dar, iframe->srr0,
-				iframe->dsisr & (1 << 25), // store or load
-				iframe->srr1 & (1 << 14), // was the system in user or supervisor
+			ret = vm_page_fault(fault_address(iframe), iframe->cpu.pc,
+				fault_was_write(iframe), // store or load
+				iframe->cpu.sr & SR_S, // was the system in user or supervisor
 				&newip);
 			if (newip != 0) {
 				// the page fault handler wants us to modify the iframe to set the
 				// IP the cpu will return to to be this ip
-				iframe->srr0 = newip;
+				iframe->cpu.pc = newip;
 			}
  			break;
 		}
@@ -241,9 +285,29 @@ dprintf("handling I/O interrupts done\n");
 }
 
 
+#warning M68K: WTF do I need that here ?
+extern status_t 
+arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical);
+
 status_t 
 arch_int_init(kernel_args *args)
 {
+	status_t err;
+	addr_t vbr;
+	int i;
+
+	/* fill in the vector table */
+	for (i = 0; i < M68K_EXCEPTION_VECTOR_COUNT; i++)
+		gExceptionVectors[i] = &__m68k_exception_common;
+	/* get the physical address */
+	err = arch_vm_translation_map_early_query(
+		(addr_t)gExceptionVectors, &vbr);
+	if (err < B_OK) {
+		panic("can't query phys for vbr");
+		return err;
+	}
+	/* point VBR to the new table */
+	asm volatile  ("movec %0,%%cacr" : : "r"(vbr):);
 	return B_OK;
 }
 
@@ -251,52 +315,11 @@ arch_int_init(kernel_args *args)
 status_t
 arch_int_init_post_vm(kernel_args *args)
 {
-	void *handlers = (void *)args->arch_args.exception_handlers.start;
-
-	// We may need to remap the exception handler area into the kernel address
-	// space.
-	if (!IS_KERNEL_ADDRESS(handlers)) {
-		addr_t address = (addr_t)handlers;
-		status_t error = m68k_remap_address_range(&address,
-			args->arch_args.exception_handlers.size, true);
-		if (error != B_OK) {
-			panic("arch_int_init_post_vm(): Failed to remap the exception "
-				"handler area!");
-			return error;
-		}
-		handlers = (void*)(address);
-	}
-
-	// create a region to map the irq vector code into (physical address 0x0)
-	area_id exceptionArea = create_area("exception_handlers",
-		&handlers, B_EXACT_ADDRESS, args->arch_args.exception_handlers.size, 
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (exceptionArea < B_OK)
-		panic("arch_int_init2: could not create exception handler region\n");
-
-	dprintf("exception handlers at %p\n", handlers);
-
-	// copy the handlers into this area
-	memcpy(handlers, &__irqvec_start, args->arch_args.exception_handlers.size);
-	arch_cpu_sync_icache(handlers, args->arch_args.exception_handlers.size);
-
-	// init the CPU exception contexts
-	int cpuCount = smp_get_num_cpus();
-	for (int i = 0; i < cpuCount; i++) {
-		m68k_cpu_exception_context *context = m68k_get_cpu_exception_context(i);
-		context->kernel_handle_exception = (void*)&m68k_exception_tail;
-		context->exception_context = context;
-		// kernel_stack is set when the current thread changes. At this point
-		// we don't have threads yet.
-	}
-
-	// set the exception context for this CPU
-	m68k_set_current_cpu_exception_context(m68k_get_cpu_exception_context(0));
-
 	return B_OK;
 }
 
 
+#if 0 /* PIC modules */
 template<typename ModuleInfo>
 struct Module : DoublyLinkedListLinkImpl<Module<ModuleInfo> > {
 	Module(ModuleInfo *module)
@@ -448,11 +471,13 @@ probe_pic_device(device_node_handle node, PICModuleList &picModules)
 
 	return false;
 }
-
+#endif /* PIC modules */
 
 status_t
 arch_int_init_post_device_manager(struct kernel_args *args)
 {
+#warning M68K: init PIC from M68KPlatform::
+#if 0 /* PIC modules */
 	// get the interrupt controller driver modules
 	PICModuleList picModules;
 	get_interrupt_controller_modules(picModules);
@@ -501,6 +526,8 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 		}
 	}
 
+#endif /* PIC modules */
+
 	// no PIC found
 	panic("arch_int_init_post_device_manager(): Found no supported PIC!");
 
@@ -508,6 +535,7 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 }
 
 
+#if 0
 // #pragma mark -
 
 struct m68k_cpu_exception_context *
@@ -534,3 +562,4 @@ m68k_set_current_cpu_exception_context(struct m68k_cpu_exception_context *contex
 	asm volatile("mtsprg0 %0" : : "r"(physicalPage + inPageOffset));
 }
 
+#endif

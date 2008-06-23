@@ -35,21 +35,18 @@ extern struct m68k_vm_ops m68030_vm_ops;
 
 static m68k_vm_ops *get_vm_ops()
 {
-	int cpu = arch_cpu_type;
-	cpu &= MMU_MASK;
-	switch (cpu) {
-		case MMU_NONE:
-			panic("Ugh, no mmu !?");
-			return NULL;
-		case MMU_68551:
+	int mmu = arch_mmu_type;
+
+	switch (mmu) {
+		case 68551:
 			panic("Unimplemented yet (mmu)");
 			//return &m68851_vm_ops;
 			return NULL;
-		case MMU_68030:
+		case 68030:
 			return &m68030_vm_ops;
-		case MMU_68040:
+		case 68040:
 			//return &m68040_vm_ops;
-		case MMU_68060:
+		case 68060:
 			//return &m68060_vm_ops;
 			panic("Unimplemented yet (mmu)");
 			return NULL;

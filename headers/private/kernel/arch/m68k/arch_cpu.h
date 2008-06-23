@@ -13,7 +13,8 @@
 #endif	// !_ASSEMBLER
 
 
-
+#define SR_IP_MASK 0x0700
+#define SR_S 0x2000
 
 #ifndef _ASSEMBLER
 
@@ -193,6 +194,7 @@ struct mc680x0_frame {
 		};
 		struct mc680x0_type_0_frame type_0;
 		struct mc680x0_type_1_frame type_1;
+		struct mc680x0_type_3_frame type_3;
 		struct mc680x0_type_2_frame type_2;
 		struct mc68040_type_7_frame type_7;
 		struct mc680x0_type_9_frame type_9;
