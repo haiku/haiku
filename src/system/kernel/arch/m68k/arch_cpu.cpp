@@ -132,8 +132,9 @@ arch_cpu_memory_write_barrier(void)
 void 
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
+	int32 num_pages = end / B_PAGE_SIZE - start / B_PAGE_SIZE;
 	cpu_ops.flush_insn_pipeline();
-	while (start < end) {
+	while (num_pages-- >= 0) {
 		cpu_ops.flush_atc_addr(start);
 		cpu_ops.flush_insn_pipeline();
 		start += B_PAGE_SIZE;

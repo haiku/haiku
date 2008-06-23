@@ -16,13 +16,13 @@
 
 struct m68k_vm_ops m68030_vm_ops = {
 	m68k_translation_map_get_pgdir,
-	arch_vm_translation_map_init_map,
-	arch_vm_translation_map_init_kernel_map_post_sem,
-	arch_vm_translation_map_init,
-	arch_vm_translation_map_init_post_area,
-	arch_vm_translation_map_init_post_sem,
-	arch_vm_translation_map_early_map,
-	arch_vm_translation_map_early_query,
+	m68k_vm_translation_map_init_map,
+	m68k_vm_translation_map_init_kernel_map_post_sem,
+	m68k_vm_translation_map_init,
+	m68k_vm_translation_map_init_post_area,
+	m68k_vm_translation_map_init_post_sem,
+	m68k_vm_translation_map_early_map,
+	/*m68k_vm_translation_map_*/early_query,
 #if 0
 	m68k_map_address_range,
 	m68k_unmap_address_range,

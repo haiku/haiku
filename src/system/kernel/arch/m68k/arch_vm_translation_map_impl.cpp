@@ -42,8 +42,10 @@
 
 #include <KernelExport.h>
 #include <kernel.h>
+#include <heap.h>
 #include <vm.h>
 #include <vm_address_space.h>
+#include <vm_page.h>
 #include <vm_priv.h>
 #include <int.h>
 #include <boot/kernel_args.h>
@@ -181,6 +183,23 @@ update_page_table_entry(page_table_entry *entry, page_table_entry *with)
 	// update page table entry atomically
 	// XXX: is it ?? (long desc?)
 	*(page_table_entry_scalar *)entry = *(page_table_entry_scalar *)with;
+}
+
+
+static inline void
+init_page_indirect_entry(page_indirect_entry *entry)
+{
+#warning M68K: is it correct ?
+	*(page_indirect_entry_scalar *)entry = DFL_PAGEENT_VAL;
+}
+
+
+static inline void
+update_page_indirect_entry(page_indirect_entry *entry, page_indirect_entry *with)
+{
+	// update page table entry atomically
+	// XXX: is it ?? (long desc?)
+	*(page_indirect_entry_scalar *)entry = *(page_indirect_entry_scalar *)with;
 }
 
 
@@ -425,7 +444,7 @@ put_page_indirect_entry_in_pgtable(page_indirect_entry *entry,
 	addr_t physicalAddress, uint32 attributes, bool globalPage)
 {
 	page_indirect_entry page;
-	init_page_table_entry(&page);
+	init_page_indirect_entry(&page);
 
 	page.addr = TA_TO_PIEA(physicalAddress);
 	page.type = DT_INDIRECT;
@@ -433,7 +452,7 @@ put_page_indirect_entry_in_pgtable(page_indirect_entry *entry,
 	// there are no protection bits in indirect descriptor usually.
 
 	// put it in the page table
-	update_page_table_entry(entry, &page);
+	update_page_indirect_entry(entry, &page);
 }
 
 
@@ -674,49 +693,49 @@ query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
 	page_indirect_entry *pi;
 	page_table_entry *pt;
 	addr_t physicalPageTable;
-	int32 cpu = smp_get_current_cpu();
 	int32 index;
 	status_t err = B_ERROR;	// no pagetable here
-	
+
 	if (sQueryPage == NULL)
 		return err; // not yet initialized !?
 
 	index = VADDR_TO_PRENT(va);
 	if (pr && pr[index].type == DT_ROOT) {
 		put_page_table_entry_in_pgtable(&sQueryDesc, PRE_TO_TA(pr[index]), B_KERNEL_READ_AREA, false);
-		invalidate_TLB(pt);
+		arch_cpu_invalidate_TLB_range((addr_t)pt, (addr_t)pt);
 		pd = (page_directory_entry *)sQueryPage;
 		index = VADDR_TO_PDENT(va);
 		
 		if (pd && pd[index].type == DT_DIR) {
 			put_page_table_entry_in_pgtable(&sQueryDesc, PDE_TO_TA(pd[index]), B_KERNEL_READ_AREA, false);
-			invalidate_TLB(pt);
+			arch_cpu_invalidate_TLB_range((addr_t)pt, (addr_t)pt);
 			pt = (page_table_entry *)sQueryPage;
 			index = VADDR_TO_PTENT(va);
 			
 			if (pt && pt[index].type == DT_INDIRECT) {
-				pi = pt;
+				pi = (page_indirect_entry *)pt;
 				put_page_table_entry_in_pgtable(&sQueryDesc, PIE_TO_TA(pi[index]), B_KERNEL_READ_AREA, false);
-				invalidate_TLB(pt);
+				arch_cpu_invalidate_TLB_range((addr_t)pt, (addr_t)pt);
 				pt = (page_table_entry *)sQueryPage;
 				index = 0; // single descriptor
 			}
-		
+			
 			if (pt /*&& pt[index].type == DT_PAGE*/) {
 				*_physical = PTE_TO_PA(pt[index]);
 				// we should only be passed page va, but just in case.
 				*_physical += va % B_PAGE_SIZE;
-				*_flags |= ((pt[index].write_protect ? 0 : B_KERNEL_WRITE_AREA : 0) | B_KERNEL_READ_AREA)
+				*_flags |= ((pt[index].write_protect ? 0 : B_KERNEL_WRITE_AREA) | B_KERNEL_READ_AREA)
 						| (pt[index].dirty ? PAGE_MODIFIED : 0)
 						| (pt[index].accessed ? PAGE_ACCESSED : 0)
 						| ((pt[index].type == DT_PAGE) ? PAGE_PRESENT : 0);
 				err = B_OK;
 			}
+		}
 	}
-
+	
 	// unmap the pg table from the indirect desc.
 	sQueryDesc.type = DT_INVALID;
-
+	
 	return err;
 }
 
@@ -751,7 +770,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 	pd += (index % NUM_DIRTBL_PER_PAGE) * NUM_DIRENT_PER_TBL;
 
 
-	index = VADDR_TO_PDENT(start);
+	index = VADDR_TO_PDENT(va);
 	if (pd[index].type != DT_DIR) {
 		// no pagetable here
 		put_physical_page_tmap(pd_pg);
@@ -770,7 +789,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 
 	// handle indirect descriptor
 	if (pt[index].type == DT_INDIRECT) {
-		pi = pt;
+		pi = (page_indirect_entry *)pt;
 		pi_pg = pt_pg;
 		do {
 			status = get_physical_page_tmap(PIE_TO_PA(pi[index]),
@@ -918,7 +937,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 	pd += (index % NUM_DIRTBL_PER_PAGE) * NUM_DIRENT_PER_TBL;
 
 
-	index = VADDR_TO_PDENT(start);
+	index = VADDR_TO_PDENT(va);
 	if (pd[index].type != DT_DIR) {
 		// no pagetable here
 		put_physical_page_tmap(pd_pg);
@@ -937,7 +956,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 
 	// handle indirect descriptor
 	if (pt[index].type == DT_INDIRECT) {
-		pi = pt;
+		pi = (page_indirect_entry *)pt;
 		pi_pg = pt_pg;
 		do {
 			status = get_physical_page_tmap(PIE_TO_PA(pi[index]),
@@ -991,12 +1010,8 @@ flush_tmap(vm_translation_map *map)
 
 		if (IS_KERNEL_MAP(map)) {
 			arch_cpu_global_TLB_invalidate();
-			smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0, NULL,
-				SMP_MSG_FLAG_SYNC);
 		} else {
 			arch_cpu_user_TLB_invalidate();
-			smp_send_broadcast_ici(SMP_MSG_USER_INVALIDATE_PAGES, 0, 0, 0, NULL,
-				SMP_MSG_FLAG_SYNC);
 		}
 	} else {
 		TRACE(("flush_tmap: %d pages to invalidate, invalidate list\n",
@@ -1004,10 +1019,6 @@ flush_tmap(vm_translation_map *map)
 
 		arch_cpu_invalidate_TLB_list(map->arch_data->pages_to_invalidate,
 			map->arch_data->num_invalidate_pages);
-		smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
-			(uint32)map->arch_data->pages_to_invalidate,
-			map->arch_data->num_invalidate_pages, 0, NULL,
-			SMP_MSG_FLAG_SYNC);
 	}
 	map->arch_data->num_invalidate_pages = 0;
 
@@ -1042,9 +1053,9 @@ map_iospace_chunk(addr_t va, addr_t pa)
 
 	state = disable_interrupts();
 	arch_cpu_invalidate_TLB_range(va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE));
-	smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_RANGE,
-		va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE), 0,
-		NULL, SMP_MSG_FLAG_SYNC);
+	//smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_RANGE,
+	//	va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE), 0,
+	//	NULL, SMP_MSG_FLAG_SYNC);
 	restore_interrupts(state);
 
 	return B_OK;
@@ -1088,7 +1099,7 @@ static vm_translation_map_ops tmap_ops = {
 
 
 static status_t
-arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
+m68k_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 {
 	if (map == NULL)
 		return B_BAD_VALUE;
@@ -1154,14 +1165,14 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 
 
 static status_t
-arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
+m68k_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
 {
 	return B_OK;
 }
 
 
 static status_t
-arch_vm_translation_map_init(kernel_args *args)
+m68k_vm_translation_map_init(kernel_args *args)
 {
 	status_t error;
 
@@ -1185,7 +1196,7 @@ arch_vm_translation_map_init(kernel_args *args)
 
 	// allocate some space to hold physical page mapping info
 	//XXX: check page count
-#error XXXXXXXXXXXX pt + pd? pd = memalign ?
+#warning M68K: XXXXXXXXXXXX pt + pd? pd = memalign ?
 	iospace_pgtables = (page_table_entry *)vm_allocate_early(args,
 		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * NUM_PAGEENT_PER_TBL * NUM_PAGETBL_PER_PAGE)), ~0L,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -1206,7 +1217,7 @@ arch_vm_translation_map_init(kernel_args *args)
 	// put the array of pgtables directly into the kernel pagedir
 	// these will be wired and kept mapped into virtual space to be easy to get to
 	{
-#error XXXXXXXXXXXX
+#warning M68K: XXXXXXXXXXXX
 		addr_t phys_pgtable;
 		addr_t virt_pgtable;
 		page_directory_entry *e;
@@ -1227,26 +1238,27 @@ arch_vm_translation_map_init(kernel_args *args)
 
 
 static status_t
-arch_vm_translation_map_init_post_sem(kernel_args *args)
+m68k_vm_translation_map_init_post_sem(kernel_args *args)
 {
 	return generic_vm_physical_page_mapper_init_post_sem(args);
 }
 
 
 static status_t
-arch_vm_translation_map_init_post_area(kernel_args *args)
+m68k_vm_translation_map_init_post_area(kernel_args *args)
 {
 	// now that the vm is initialized, create a region that represents
 	// the page hole
 	void *temp;
 	status_t error;
 	area_id area;
-	void *queryPage;
+	addr_t queryPage;
 
 	TRACE(("vm_translation_map_init_post_area: entry\n"));
 
 	// unmap the page hole hack we were using before
-	sKernelVirtualPageRoot[1023].present = 0;
+#warning M68K: FIXME
+	//sKernelVirtualPageRoot[1023].present = 0;
 	page_hole_pgdir = NULL;
 	page_hole = NULL;
 
@@ -1315,19 +1327,19 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 		
 		//sQueryPageTable = (page_indirect_entry *)(queryPage);
 
-		index = VADDR_TO_PRENT((addr_t)queryPage);
+		index = VADDR_TO_PRENT(queryPage);
 		physicalPageDir = PRE_TO_PA(sKernelVirtualPageRoot[index]);
 
 		get_physical_page_tmap(physicalPageDir,
 			(addr_t *)&pageDirEntry, PHYSICAL_PAGE_NO_WAIT);
 
-		index = VADDR_TO_PDENT((addr_t)queryPage);
+		index = VADDR_TO_PDENT(queryPage);
 		physicalPageTable = PDE_TO_PA(pageDirEntry[index]);
 
 		get_physical_page_tmap(physicalPageTable,
 			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_NO_WAIT);
 
-		index = VADDR_TO_PTENT((addr_t)queryPage);
+		index = VADDR_TO_PTENT(queryPage);
 		
 		put_page_indirect_entry_in_pgtable(&pageTableEntry[index], physicalIndirectDesc,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
@@ -1351,7 +1363,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 // into a 4 MB region. It's only used here, and is later unmapped.
 
 static status_t
-arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
+m68k_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
 {
 	int index;
@@ -1360,7 +1372,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 
 	// check to see if a page table exists for this range
 	index = VADDR_TO_PDENT(va);
-	if (page_hole_pgdir[index].present == 0) {
+	if (page_hole_pgdir[index].type == DT_PAGE) {
 		addr_t pgtable;
 		page_directory_entry *e;
 		// we need to allocate a pgtable
