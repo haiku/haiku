@@ -277,6 +277,17 @@ if $(HAIKU_ARCH) = ppc {
 	HAIKU_KERNEL_PIC_CCFLAGS = -fPIE ;
 	HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
 }
+if $(HAIKU_ARCH) = m68k {
+	# Build a position independent M68K kernel. We need to be able to relocate
+	# the kernel, since the virtual address space layout at boot time is not
+	# fixed.
+	#HAIKU_KERNEL_PIC_CCFLAGS = -mpcrel -Wa,--pcrel ;
+	#HAIKU_KERNEL_PIC_LINKFLAGS = -mpcrel ;
+	#HAIKU_KERNEL_PIC_CCFLAGS = -msep-data -Wa,--pcrel ;
+	#HAIKU_KERNEL_PIC_LINKFLAGS = -msep-data ;
+	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
+	HAIKU_KERNEL_PIC_LINKFLAGS = ;
+}
 
 # If the environment variable DEBUG_PRINTF is defined we define an equally
 # named macro to the variable value. Some components use the macro to allow
@@ -511,6 +522,13 @@ if $(HOST_ARCH) = ppc {
 	# fixed.
 	HOST_KERNEL_PIC_CCFLAGS = -fPIE ;
 	HOST_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
+}
+if $(HOST_ARCH) = m68k {
+	# Build a position independent M68K kernel. We need to be able to relocate
+	# the kernel, since the virtual address space layout at boot time is not
+	# fixed.
+	HOST_KERNEL_PIC_CCFLAGS = $(HAIKU_KERNEL_PIC_CCFLAGS) ;
+	HOST_KERNEL_PIC_LINKFLAGS = $(HAIKU_KERNEL_PIC_LINKFLAGS) ;
 }
 
 # warning flags
