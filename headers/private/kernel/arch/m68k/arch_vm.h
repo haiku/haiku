@@ -25,6 +25,7 @@ struct m68k_vm_ops {
 	status_t (*arch_vm_translation_map_early_map)(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, 
 		uint8 attributes, addr_t (*get_free_page)(kernel_args *));
 	status_t (*arch_vm_translation_map_early_query)(addr_t va, addr_t *out_physical);
+	void (*m68k_set_pgdir)(void *);
 #if 0 /* ppc stuff only ? */
 	status_t (*m68k_map_address_range)(addr_t virtualAddress, addr_t physicalAddress,
 		size_t size);
@@ -33,5 +34,17 @@ struct m68k_vm_ops {
 #endif
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern struct m68k_vm_ops *get_vm_ops();
+
+extern void *m68k_translation_map_get_pgdir(vm_translation_map *map);
+extern void m68k_set_pgdir(void *rt);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* ARCH_M68K_VM_H */

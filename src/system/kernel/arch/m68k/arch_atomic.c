@@ -19,6 +19,9 @@
  * Slow, using spinlocks...
  */
 
+#warning M68K: detect 060 here
+#if 0
+
 static spinlock atomic_lock = 0;
 
 int64
@@ -241,3 +244,4 @@ access_violation:
 	// XXX kill application
 	return -1;
 }
+#endif

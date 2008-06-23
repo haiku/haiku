@@ -42,6 +42,16 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 }
 
 
+status_t 
+arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
+{
+	//detect_cpu(curr_cpu);
+
+	// we only support one anyway...
+	return 0;
+}
+
+
 status_t
 arch_cpu_init(kernel_args *args)
 {

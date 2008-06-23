@@ -132,8 +132,9 @@ static status_t put_physical_page_tmap(addr_t va);
 static void flush_tmap(vm_translation_map *map);
 
 
+#warning M68K: RENAME
 static void *
-m68k_translation_map_get_pgdir(vm_translation_map *map)
+_m68k_translation_map_get_pgdir(vm_translation_map *map)
 {
 	return map->arch_data->rtdir_phys;
 }

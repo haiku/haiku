@@ -37,6 +37,12 @@ arch_destroy_thread_debug_info(struct arch_thread_debug_info *info)
 
 
 void
+arch_update_thread_single_step()
+{
+}
+
+
+void
 arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 {
 }
@@ -75,3 +81,8 @@ arch_clear_watchpoint(void *address)
 	return B_ERROR;
 }
 
+bool
+arch_has_breakpoints(struct arch_team_debug_info *info)
+{
+	return false;
+}

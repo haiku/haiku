@@ -13,6 +13,7 @@
 #include <arch/user_debugger.h>
 
 
+#warning M68K: WRITEME
 void
 arch_clear_team_debug_info(struct arch_team_debug_info *info)
 {
@@ -36,6 +37,28 @@ void
 arch_destroy_thread_debug_info(struct arch_thread_debug_info *info)
 {
 	arch_clear_thread_debug_info(info);
+}
+
+
+void
+arch_update_thread_single_step()
+{
+	if (struct iframe* frame = m68k_get_user_iframe()) {
+		struct thread* thread = thread_get_current_thread();
+	
+		// set/clear T1 in SR depending on if single stepping is desired
+		// T1 T0
+		// 0  0  no tracing
+		// 0  1  trace on flow
+		// 1  0  single step
+		// 1  1  undef
+		if (thread->debug_info.flags & B_THREAD_DEBUG_SINGLE_STEP) {
+			frame->cpu.sr &= ~(M68K_SR_T_MASK);
+			frame->cpu.sr |= (1 << M68K_SR_T1);
+		} else {
+			frame->cpu.sr &= ~(M68K_SR_T_MASK);
+		}
+	}
 }
 
 
@@ -78,3 +101,8 @@ arch_clear_watchpoint(void *address)
 	return B_ERROR;
 }
 
+bool
+arch_has_breakpoints(struct arch_team_debug_info *info)
+{
+	return false;
+}

@@ -33,7 +33,8 @@ extern struct m68k_vm_ops m68030_vm_ops;
 //extern struct m68k_vm_ops m68030_vm_ops;
 //extern struct m68k_vm_ops m68030_vm_ops;
 
-static m68k_vm_ops *get_vm_ops()
+#warning M68K: use a static!
+m68k_vm_ops *get_vm_ops()
 {
 	int mmu = arch_mmu_type;
 
@@ -126,6 +127,11 @@ arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
 
 
 // #pragma mark -
+void
+m68k_set_pgdir(void *rt)
+{
+	return get_vm_ops()->m68k_set_pgdir(rt);
+}
 #if 0
 
 status_t

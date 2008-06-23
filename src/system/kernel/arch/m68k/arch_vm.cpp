@@ -15,6 +15,7 @@
 #include <boot/kernel_args.h>
 
 #include <vm.h>
+#include <vm_types.h>
 #include <arch/vm.h>
 #include <arch_mmu.h>
 
@@ -103,6 +104,8 @@ arch_vm_init_post_modules(kernel_args *args)
 void 
 arch_vm_aspace_swap(vm_address_space *aspace)
 {
+	m68k_set_pgdir(m68k_translation_map_get_pgdir(
+		&aspace->translation_map));
 }
 
 

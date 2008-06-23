@@ -18,7 +18,9 @@
 #include <boot/stage2.h>
 #include <kernel.h>
 #include <thread.h>
+#include <vm_address_space.h>
 #include <vm_types.h>
+#include <arch_vm.h>
 //#include <arch/vm_translation_map.h>
 
 #include <string.h>
@@ -89,6 +91,28 @@ m68k_get_user_iframe(void)
 	return NULL;
 }
 
+
+void *
+m68k_next_page_directory(struct thread *from, struct thread *to)
+{
+	if (from->team->address_space != NULL && to->team->address_space != NULL) {
+		// they are both user space threads
+		if (from->team == to->team) {
+			// dont change the pgdir, same address space
+			return NULL;
+		}
+		// switching to a new address space
+		return m68k_translation_map_get_pgdir(&to->team->address_space->translation_map);
+	} else if (from->team->address_space == NULL && to->team->address_space == NULL) {
+		// they must both be kernel space threads
+		return NULL;
+	} else if (to->team->address_space == NULL) {
+		// the one we're switching to is kernel space
+		return m68k_translation_map_get_pgdir(&vm_kernel_address_space()->translation_map);
+	}
+	
+	return m68k_translation_map_get_pgdir(&to->team->address_space->translation_map);
+}
 
 // #pragma mark -
 
@@ -181,24 +205,17 @@ arch_thread_switch_kstack_and_call(struct thread *t, addr_t newKstack,
 
 
 void
-arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
+arch_thread_context_switch(struct thread *from, struct thread *to)
 {
-#warning M68K: WRITEME
-    // set the new kernel stack in the EAR register.
-	// this is used in the exception handler code to decide what kernel stack to 
-	// switch to if the exception had happened when the processor was in user mode  
-	//asm("mtear  %0" :: "g"(t_to->kernel_stack_base + KERNEL_STACK_SIZE - 8));
+	addr_t newPageDirectory;
 
-    // switch the asids if we need to
-	if (t_to->team->address_space != NULL) {
-		// the target thread has is user space
-		if (t_from->team != t_to->team) {
-			// switching to a new address space
-			m68k_translation_map_change_asid(&t_to->team->address_space->translation_map);
-		}
-	}
+	newPageDirectory = (addr_t)m68k_next_page_directory(from, to);
 
-	m68k_context_switch(&t_from->arch_info.sp, t_to->arch_info.sp);
+	if ((newPageDirectory % B_PAGE_SIZE) != 0)
+		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", newPageDirectory);
+#warning M68K: export from arch_vm.c
+	m68k_set_pgdir(newPageDirectory);
+	m68k_context_switch(&from->arch_info.sp, to->arch_info.sp);
 }
 
 

@@ -14,18 +14,12 @@
 #include <smp.h>
 
 
-// user syscall assembly stubs
-extern "C" void _user_syscall_int(void);
-extern unsigned int _user_syscall_int_end;
-extern "C" void _user_syscall_sysenter(void);
-extern unsigned int _user_syscall_sysenter_end;
-
 
 status_t
 arch_commpage_init(void)
 {
-	panic("WRITEME");
-	return B_NO_INIT;
+	/* no optimized memcpy or anything yet */
+	/* we don't use it for syscall yet either */
 	return B_OK;
 }
 
