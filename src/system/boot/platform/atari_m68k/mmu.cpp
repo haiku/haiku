@@ -568,6 +568,26 @@ extern "C" void
 mmu_init(void)
 {
 	TRACE(("mmu_init\n"));
+	switch (gKernelArgs.arch.mmu_type) {
+#if 0
+		case 68851:
+			gMMUOps = k851MMUOps;
+			break;
+#endif
+		case 68030:
+			gMMUOps = k030MMUOps;
+			break;
+		case 68040:
+			gMMUOps = k040MMUOps;
+			break;
+#if 0
+		case 68060:
+			gMMUOps = k060MMUOps;
+			break;
+#endif
+		default:
+			panic("unknown mmu type %d\n", gKernelArgs.arch.mmu_type);
+	}
 
 	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
 	gKernelArgs.physical_allocated_range[0].size = 0;

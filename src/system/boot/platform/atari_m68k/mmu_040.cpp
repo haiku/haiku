@@ -46,7 +46,38 @@ static status_t
 set_tt(int which, addr_t pa, size_t len, uint32 perms)
 {
 	TRACE(("mmu_040:set_tt(%d, 0x%lx, %ld, 0x%08lx)\n", which, pa, len, perms));
+	uint32 mask;
+	uint32 ttr = 0;
+	mask = 1;
+	if (len) {
+		while (len >>= 1)
+			mask <<= 1;
+		mask = (mask - 1);
+		// enable, super only, upa=0,
+		// cachable write-through, rw
+		ttr = 0x0a000;
+		ttr |= (pa & 0xff000000);
+		ttr |= ((mask & 0xff000000) >> 8);
+	}
+	TRACE(("mmu_040:set_tt: 0x%08lx\n", ttr));
 	
+
+	switch (which) {
+		case 0:
+			asm volatile(  \
+				"movec %0,%%dtt0\n"				\
+				"movec %0,%%itt0\n"				\
+				: : "d"(ttr));
+			break;
+		case 1:
+			asm volatile(  \
+				"movec %0,%%dtt1\n"				\
+				"movec %0,%%itt1\n"				\
+				: : "d"(ttr));
+			break;
+		default:
+			return EINVAL;
+	}
 	return B_OK;
 }
 
@@ -55,15 +86,19 @@ static status_t
 load_rp(addr_t pa)
 {
 	TRACE(("mmu_040:load_rp(0x%lx)\n", pa));
-	long_page_directory_entry entry;
-	*(uint64 *)&entry = DFL_PAGEENT_VAL;
-	entry.type = DT_ROOT;
-	entry.addr = TA_TO_PREA(((addr_t)pa));
-
-	asm volatile( \
-		"pmove (%0),%%srp\n" \
-		"pmove (%0),%%crp\n" \
-		: : "a"((uint64 *)&entry));
+	// sanity check
+	if (pa & ((1 << 9) - 1)) {
+		panic("mmu root pointer missaligned!");
+		return EINVAL;
+	}
+	/* mc68040 user's manual, 6-37 */
+	/* pflush before... why not after ? */
+	asm volatile(		   \
+		"pflusha\n"		   \
+		"movec %0,%%srp\n" \
+		"movec %0,%%urp\n" \
+		"pflusha\n"		   \
+		: : "d"(pa));
 	return B_OK;
 }
 
@@ -72,10 +107,12 @@ static status_t
 enable_paging(void)
 {
 	TRACE(("mmu_040:enable_paging\n"));
+	uint16 tcr = 0x80; // Enable, 4K page size
 	asm volatile( \
-		"pmove (%0),%%srp\n" \
-		"pmove (%0),%%crp\n" \
-		: : "a"((uint64 *)&entry));
+		"pflusha\n"		   \
+		"movec %0,%%tcr\n" \
+		"pflusha\n"		   \
+		: : "d"(tcr));
 	return B_OK;
 }
 

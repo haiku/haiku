@@ -77,6 +77,7 @@ KernelMergeObject boot_platform_atari_m68k.o :
 	boot_platform_atari_m68k_shell.o
 	boot_platform_atari_m68k_other.o
 	boot_arch_m68k_030.o
+	boot_arch_m68k_040.o
 ;
 
 # AUTO folder PRG target
