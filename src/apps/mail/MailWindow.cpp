@@ -121,6 +121,8 @@ static const char *kSpamMenuItemTextArray[] = {
 	"Mark as Genuine"						// M_TRAIN_GENUINE
 };
 
+static const uint32 kMsgQuitAndKeepAllStatus = 'Casm';
+
 static const char *kQueriesDirectory = "mail/queries";
 static const char *kAttrQueryInitialMode = "_trk/qryinitmode"; // taken from src/kits/tracker/Attributes.h
 static const char *kAttrQueryInitialString = "_trk/qryinitstr";
@@ -135,6 +137,8 @@ static const uint32 kByForumlaItem = 'Fbyq'; // taken from src/kits/tracker/Find
 // static list for tracking of Windows
 BList TMailWindow::sWindowList;
 BLocker TMailWindow::sWindowListLock;
+
+static bool sKeepStatusOnQuit;
 
 
 //	#pragma mark -
@@ -572,6 +576,8 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		SetTitleForMessage();
 
 	_UpdateSizeLimits();
+
+	AddShortcut('q', B_SHIFT_KEY, new BMessage(kMsgQuitAndKeepAllStatus));
 }
 
 
@@ -1137,30 +1143,31 @@ TMailWindow::MessageReceived(BMessage *msg)
 		}
 		case M_CLOSE_SAVED:
 		{
-			BMessage message(B_CLOSE_REQUESTED);
+			BMessage message(B_QUIT_REQUESTED);
 			message.AddString("status", "Saved");
 			PostMessage(&message);
 			break;
 		}
+		case kMsgQuitAndKeepAllStatus:
+			sKeepStatusOnQuit = true;
+			be_app->PostMessage(B_QUIT_REQUESTED);
+			break;
 		case M_CLOSE_SAME:
 		{
-			BMessage message(B_CLOSE_REQUESTED);
+			BMessage message(B_QUIT_REQUESTED);
 			message.AddString("status", "");
 			message.AddString("same", "");
 			PostMessage(&message);
 			break;
 		}
 		case M_CLOSE_CUSTOM:
-			if (msg->HasString("status"))
-			{
+			if (msg->HasString("status")) {
 				const char *str;
 				msg->FindString("status", (const char**) &str);
 				BMessage message(B_CLOSE_REQUESTED);
 				message.AddString("status", str);
 				PostMessage(&message);
-			}
-			else
-			{
+			} else {
 				BRect r = Frame();
 				r.left += ((r.Width() - STATUS_WIDTH) / 2);
 				r.right = r.left + STATUS_WIDTH;
@@ -1654,7 +1661,7 @@ TMailWindow::QuitRequested()
 				}
 			}
 		}
-	} else if (fRef) {
+	} else if (fRef && !sKeepStatusOnQuit) {
 		// ...Otherwise just set the message read
 		SetCurrentMessageRead();
 	}
