@@ -45,11 +45,13 @@ KernelMergeObject kernel_arch_m68k.o :
 
 	generic_vm_physical_page_mapper.cpp
 
+	:
+	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	:
 	arch_m68k_030.o
 #	arch_m68k_040.a
 #	arch_m68k_060.a
-	:
-	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+
 ;
 
 CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
