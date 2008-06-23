@@ -23,6 +23,11 @@ extern struct m68k_cpu_ops cpu_ops_060;
 
 struct m68k_cpu_ops cpu_ops;
 
+int arch_cpu_type;
+int arch_fpu_type;
+int arch_mmu_type;
+int arch_platform;
+
 status_t 
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
@@ -44,6 +49,7 @@ arch_cpu_init(kernel_args *args)
 	arch_fpu_type = args->arch_args.fpu_type;
 	arch_mmu_type = args->arch_args.mmu_type;
 	arch_platform = args->arch_args.platform;
+	arch_platform = args->arch_args.machine;
 	void (*flush_insn_pipeline)(void);
 	void (*flush_atc_all)(void);
 	void (*flush_atc_user)(void);

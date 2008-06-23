@@ -501,6 +501,7 @@ extern int arch_cpu_type;
 extern int arch_fpu_type;
 extern int arch_mmu_type;
 extern int arch_platform;
+extern int arch_machine;
 
 /*
 	Use of (some) special purpose registers.

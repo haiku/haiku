@@ -28,6 +28,8 @@
 // a new thread structure.
 static struct arch_thread sInitialState;
 
+struct thread *gCurrentThread;
+
 // Helper function for thread creation, defined in arch_asm.S.
 extern void m68k_kernel_thread_root();
 

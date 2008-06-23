@@ -25,6 +25,7 @@ KernelMergeObject arch_m68k_060.o :
 
 KernelMergeObject kernel_arch_m68k.o :
 	arch_atomic.c
+	arch_commpage.cpp
 	arch_cpu.cpp
 	arch_cpu_asm.S
 	arch_debug_console.cpp
