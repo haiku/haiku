@@ -1011,8 +1011,12 @@ page_writer(void* /*unused*/)
 			InterruptsSpinLocker locker(sPageLock);
 
 			// state might have change while we were locking the cache
-			if (page->state != PAGE_STATE_MODIFIED)
+			if (page->state != PAGE_STATE_MODIFIED) {
+				// release the cache reference first
+				if (cache->store->ops->release_ref != NULL)
+					cache->store->ops->release_ref(cache->store);
 				continue;
+			}
 
 			remove_page_from_queue(&sModifiedPageQueue, page);
 			page->state = PAGE_STATE_BUSY;
