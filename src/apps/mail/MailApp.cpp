@@ -268,16 +268,14 @@ void
 TMailApp::MessageReceived(BMessage *msg)
 {
 	TMailWindow	*window = NULL;
-	entry_ref	ref;
+	entry_ref ref;
 
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case M_NEW:
 		{
 			int32 type;
 			msg->FindInt32("type", &type);
-			switch (type)
-			{
+			switch (type) {
 				case M_NEW:
 					window = NewWindow();
 					break;
@@ -342,8 +340,7 @@ TMailApp::MessageReceived(BMessage *msg)
 		case M_PREFS:
 			if (fPrefsWindow)
 				fPrefsWindow->Activate(true);
-			else
-			{
+			else {
 				fPrefsWindow = new TPrefsWindow(BRect(fPrefsWindowPos.x,
 						fPrefsWindowPos.y, fPrefsWindowPos.x + PREF_WIDTH,
 						fPrefsWindowPos.y + PREF_HEIGHT),
@@ -391,8 +388,7 @@ TMailApp::MessageReceived(BMessage *msg)
 			break;
 
 		case REFS_RECEIVED:
-			if (msg->HasPointer("window"))
-			{
+			if (msg->HasPointer("window")) {
 				msg->FindPointer("window", (void **)&window);
 				BMessage message(*msg);
 				window->PostMessage(&message, window);
@@ -447,7 +443,7 @@ TMailApp::QuitRequested()
 
     fMailWindowFrame = fLastMailWindowFrame;
     	// Last closed window becomes standard window size.
-	
+
 	// Shut down the spam server if it's still running. If the user has trained it on a message, it will stay
 	// open. This is actually a good thing if there's quite a bit of spam -- no waiting for the thing to start
 	// up for each message, but it has no business staying that way if the user isn't doing anything with e-mail. :)
@@ -1071,31 +1067,44 @@ TMailApp::FontChange()
 }
 
 
-TMailWindow *
-TMailApp::NewWindow(const entry_ref *ref, const char *to, bool resend,
-	BMessenger *trackerMessenger)
+TMailWindow*
+TMailApp::NewWindow(const entry_ref* ref, const char* to, bool resend,
+	BMessenger* trackerMessenger)
 {
 	BScreen screen(B_MAIN_SCREEN_ID);
-	BRect screen_frame = screen.Frame();
+	BRect screenFrame = screen.Frame();
 
 	BRect r;
-	if ((fMailWindowFrame.Width() > 1) && (fMailWindowFrame.Height() > 1))
+	if (fMailWindowFrame.Width() < 64 || fMailWindowFrame.Height() < 20) {
+		// default size
+		r.Set(6, TITLE_BAR_HEIGHT, 6 + WIND_WIDTH,
+			TITLE_BAR_HEIGHT + WIND_HEIGHT);
+	} else
 		r = fMailWindowFrame;
+
+	// make sure the window is not larger than the screen space
+	if (r.Height() > screenFrame.Height())
+		r.bottom = r.top + screenFrame.Height();
+	if (r.Width() > screenFrame.Width())
+		r.bottom = r.top + screenFrame.Width();
+
+	// cascading windows
+	if (fWindowCount < 6)
+		r.OffsetBy(fWindowCount * 20, fWindowCount * 20);
 	else
-		r.Set(6, TITLE_BAR_HEIGHT, 6 + WIND_WIDTH, TITLE_BAR_HEIGHT + WIND_HEIGHT);
+		r.OffsetBy((fWindowCount % 10) * 10 - 50, (fWindowCount % 10) * 10 - 50);
 
-	r.OffsetBy(fWindowCount * 20, fWindowCount * 20);
+	// make sure the window is still on screen
+	if (r.left - 6 < screenFrame.left)
+		r.OffsetTo(screenFrame.left + 8, r.top);
 
-	if ((r.left - 6) < screen_frame.left)
-		r.OffsetTo(screen_frame.left + 8, r.top);
-
-	if ((r.left + 20) > screen_frame.right)
+	if (r.left + 20 > screenFrame.right)
 		r.OffsetTo(6, r.top);
 
-	if ((r.top - 26) < screen_frame.top)
-		r.OffsetTo(r.left, screen_frame.top + 26);
+	if (r.top - 26 < screenFrame.top)
+		r.OffsetTo(r.left, screenFrame.top + 26);
 
-	if ((r.top + 20) > screen_frame.bottom)
+	if (r.top + 20 > screenFrame.bottom)
 		r.OffsetTo(r.left, TITLE_BAR_HEIGHT);
 
 	if (r.Width() < WIND_WIDTH)
@@ -1105,19 +1114,19 @@ TMailApp::NewWindow(const entry_ref *ref, const char *to, bool resend,
 
 	BString title;
 	BFile file;
-	if (!resend && ref && file.SetTo(ref, O_RDONLY) == B_NO_ERROR) {
+	if (!resend && ref && file.SetTo(ref, O_RDONLY) == B_OK) {
 		BString name;
-		if (ReadAttrString(&file, B_MAIL_ATTR_NAME, &name) == B_NO_ERROR) {
+		if (ReadAttrString(&file, B_MAIL_ATTR_NAME, &name) == B_OK) {
 			title << name;
 			BString subject;
-			if (ReadAttrString(&file, B_MAIL_ATTR_SUBJECT, &subject) == B_NO_ERROR)
+			if (ReadAttrString(&file, B_MAIL_ATTR_SUBJECT, &subject) == B_OK)
 				title << " -> " << subject;
 		}
 	}
 	if (title == "")
 		title = "Mail";
 
-	TMailWindow *window = new TMailWindow(r, title.String(), this, ref, to,
+	TMailWindow* window = new TMailWindow(r, title.String(), this, ref, to,
 		&fContentFont, resend, trackerMessenger);
 	fWindowList.AddItem(window);
 

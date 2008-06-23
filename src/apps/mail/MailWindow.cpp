@@ -1639,11 +1639,11 @@ TMailWindow::QuitRequested()
 
 	BMessage message(WINDOW_CLOSED);
 	message.AddInt32("kind", MAIL_WINDOW);
-	message.AddPointer( "window", this );
+	message.AddPointer("window", this);
 	be_app->PostMessage(&message);
 
-	if ((CurrentMessage()) && (CurrentMessage()->HasString("status"))) {
-		//	User explicitly requests a status to set this message to.
+	if (CurrentMessage() && CurrentMessage()->HasString("status")) {
+		// User explicitly requests a status to set this message to.
 		if (!CurrentMessage()->HasString("same")) {
 			const char *status = CurrentMessage()->FindString("status");
 			if (status != NULL) {
@@ -1655,7 +1655,7 @@ TMailWindow::QuitRequested()
 			}
 		}
 	} else if (fRef) {
-		//	...Otherwise just set the message read
+		// ...Otherwise just set the message read
 		SetCurrentMessageRead();
 	}
 
