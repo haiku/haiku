@@ -6,5 +6,7 @@ UsePrivateHeaders kernel [ FDirName kernel arch m68k ] ;
 
 KernelStaticLibrary config_manager_arch : 
 	config_manager_arch.c
+	amiga_hardcoded.c
+	atari_hardcoded.c
 	;
 
