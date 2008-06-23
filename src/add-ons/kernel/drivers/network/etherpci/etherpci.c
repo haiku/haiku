@@ -161,18 +161,19 @@ typedef struct etherpci_private {
 } etherpci_private_t;
 
 
-#if __INTEL__
-#define ether_outb(device, offset, value)	(*gPCIModInfo->write_io_8)((device->reg_base + (offset)), (value))
-#define ether_outw(device, offset, value)	(*gPCIModInfo->write_io_16)((device->reg_base + (offset)), (value))
-#define ether_inb(device, offset)			((*gPCIModInfo->read_io_8)(device->reg_base + (offset)))
-#define ether_inw(device, offset)			((*gPCIModInfo->read_io_16)(device->reg_base + (offset)))
-
-#else /* PPC */
+#if __POWERPC__
 
 #define ether_inb(device, offset)  			(*((volatile uint8*)(device->reg_base + (offset)))); __eieio()
 #define ether_inw(device, offset)  			(*((volatile uint16*)(device->reg_base + (offset)))); __eieio()
 #define ether_outb(device, offset, value)  	(*((volatile uint8 *)(device->reg_base + (offset))) = (value)); __eieio()
 #define ether_outw(device, offset, value) 	(*((volatile uint16*)(device->reg_base + (offset))) = (value)); __eieio()
+
+#else /* !PPC */
+
+#define ether_outb(device, offset, value)	(*gPCIModInfo->write_io_8)((device->reg_base + (offset)), (value))
+#define ether_outw(device, offset, value)	(*gPCIModInfo->write_io_16)((device->reg_base + (offset)), (value))
+#define ether_inb(device, offset)			((*gPCIModInfo->read_io_8)(device->reg_base + (offset)))
+#define ether_inw(device, offset)			((*gPCIModInfo->read_io_16)(device->reg_base + (offset)))
 
 #endif
 
