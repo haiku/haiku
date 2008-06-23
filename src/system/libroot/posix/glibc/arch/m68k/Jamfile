@@ -69,6 +69,7 @@ local genericSources =
 	s_cos.c s_cosf.c
 	s_erf.c s_erff.c # s_erfl.c
 	s_expm1f.c s_expm1.c
+	s_fabs.c s_fabsf.c # s_fabsl.S
 	s_finite.c s_finitef.c # s_finitel.c
 	s_floor.c s_floorf.c # s_floorl.c
 	s_fpclassify.c s_fpclassifyf.c # s_fpclassifyl.c
