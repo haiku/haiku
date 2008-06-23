@@ -2,8 +2,8 @@
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
-#ifndef _KERNEL_ARCH_M68K_030_MMU_H
-#define _KERNEL_ARCH_M68K_030_MMU_H
+#ifndef _KERNEL_ARCH_M68K_040_MMU_H
+#define _KERNEL_ARCH_M68K_040_MMU_H
 
 
 #include <SupportDefs.h>
@@ -12,6 +12,7 @@
 #include <arch_mmu.h>
 
 // global pages only available on 040/060
+// check this
 //#define MMU_HAS_GLOBAL_PAGES
 
 /* This is the normal layout of the descriptors, as per documentation.
@@ -194,4 +195,4 @@ typedef uint64 page_indirect_entry_scalar;
 #define PIE_TO_PO(e) ((((uint32 *)(&(e)))[1]) & ((1<<12)-(1<<2)))
 #define TA_TO_PIEA(a) ((a) >> 2)
 
-#endif	/* _KERNEL_ARCH_M68K_030_MMU_H */
+#endif	/* _KERNEL_ARCH_M68K_040_MMU_H */

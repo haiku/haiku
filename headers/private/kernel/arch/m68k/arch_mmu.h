@@ -9,7 +9,6 @@
 #include <SupportDefs.h>
 #include <string.h>
 
-#include <arch_cpu.h>
 
 /*
  * cf.
