@@ -49,6 +49,7 @@ const static uint32 kNewTab = 'NTab';
 const static uint32 kCloseView = 'ClVw';
 const static uint32 kIncreaseFontSize = 'InFs';
 const static uint32 kDecreaseFontSize = 'DcFs';
+const static uint32 kSetActiveTab = 'STab';
 
 
 class CustomTermView : public TermView {
@@ -206,6 +207,13 @@ TermWindow::_InitWindow()
 
 	AddShortcut('+', B_COMMAND_KEY, new BMessage(kIncreaseFontSize));
 	AddShortcut('-', B_COMMAND_KEY, new BMessage(kDecreaseFontSize));
+
+	// shortcuts to switch tabs
+	for (int32 i = 0; i < 9; i++) {
+		BMessage* message = new BMessage(kSetActiveTab);
+		message->AddInt32("index", i);
+		AddShortcut('1' + i, B_COMMAND_KEY, message);
+	}
 	
 	BRect textFrame = Bounds();
 	textFrame.top = fMenubar->Bounds().bottom + 1.0;
@@ -535,6 +543,16 @@ TermWindow::MessageReceived(BMessage *message)
 					index += message->what == MSG_PREVIOUS_TAB ? -1 : 1;
 					fTabView->Select((index + count) % count);
 				}
+			}
+			break;
+		}
+
+		case kSetActiveTab:
+		{
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK
+					&& index >= 0 && index < fSessions.CountItems()) {
+				fTabView->Select(index);
 			}
 			break;
 		}
