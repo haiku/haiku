@@ -76,8 +76,6 @@ class TMailApp : public BApplication {
 				BString			Signature();
 				BString			ReplyPreamble();
 				bool			WrapMode();
-				void			SetShowHeader(bool show);
-				bool			ShowHeader();
 				bool			AttachAttributes();
 				bool			ColoredQuotes();
 				uint8			ShowButtonBar();
@@ -120,7 +118,6 @@ class TMailApp : public BApplication {
 				char*			fSignature;
 				char*			fReplyPreamble;
 				bool			fWrapMode;
-				bool			fShowHeader;
 				bool			fAttachAttributes;
 				bool			fColoredQuotes;
 				uint8			fShowButtonBar;

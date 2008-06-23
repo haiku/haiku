@@ -167,16 +167,15 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	if (messenger != NULL)
 		fTrackerMessenger = *messenger;
 
-	char		str[256];
-	char		status[272];
-	uint32		message;
-	float		height;
-	BMenu		*menu;
-	BMenu		*subMenu;
-	BMenuBar	*menu_bar;
-	BMenuItem	*item;
-	BMessage	*msg;
-	attr_info	info;
+	char str[256];
+	char status[272];
+	uint32 message;
+	float height;
+	BMenu* menu;
+	BMenu* subMenu;
+	BMenuItem* item;
+	BMessage* msg;
+	attr_info info;
 	BFile file(ref, B_READ_ONLY);
 
 	if (ref) {
@@ -190,13 +189,10 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	}
 
 	BRect r(0, 0, RIGHT_BOUNDARY, 15);
+	fMenuBar = new BMenuBar(r, "");
 
-	// Create real menu bar
-	fMenuBar = menu_bar = new BMenuBar(r, "");
+	// File Menu
 
-	//
-	//	File Menu
-	//
 	menu = new BMenu(MDR_DIALECT_CHOICE ("File","F) ファイル"));
 
 	msg = new BMessage(M_NEW);
@@ -225,13 +221,13 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		menu->AddItem(queryMenu);
 	}
 
-	if(!fIncoming || resending) {
+	if (!fIncoming || resending) {
 		menu->AddItem(fSendLater = new BMenuItem(
 			MDR_DIALECT_CHOICE ("Save as Draft", "S)ドラフトとして保存"),
 			new BMessage(M_SAVE_AS_DRAFT), 'S'));
 	}
 
-	if(!resending && fIncoming) {
+	if (!resending && fIncoming) {
 		menu->AddSeparatorItem();
 
 		subMenu = new BMenu(MDR_DIALECT_CHOICE ("Close and ","C) 閉じる"));
@@ -297,7 +293,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	menu->AddItem(fPrint = new BMenuItem(
 		MDR_DIALECT_CHOICE ("Print", "P) 印刷") B_UTF8_ELLIPSIS,
 		new BMessage(M_PRINT), 'P'));
-	menu_bar->AddItem(menu);
+	fMenuBar->AddItem(menu);
 
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
@@ -311,9 +307,8 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	item->SetTarget(be_app);
 
-	//
-	//	Edit Menu
-	//
+	// Edit Menu
+
 	menu = new BMenu(MDR_DIALECT_CHOICE ("Edit","E) 編集"));
 	menu->AddItem(fUndo = new BMenuItem(MDR_DIALECT_CHOICE ("Undo","Z) 元に戻す"), new BMessage(B_UNDO), 'Z', 0));
 	fUndo->SetTarget(NULL, this);
@@ -353,28 +348,23 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		MDR_DIALECT_CHOICE ("Preferences","P) Mailの設定") B_UTF8_ELLIPSIS,
 		new BMessage(M_PREFS),','));
 	item->SetTarget(be_app);
-	menu_bar->AddItem(menu);
+	fMenuBar->AddItem(menu);
 	menu->AddItem(item = new BMenuItem(
 		MDR_DIALECT_CHOICE ("Accounts","Accounts") B_UTF8_ELLIPSIS,
 		new BMessage(M_ACCOUNTS),'-'));
 	item->SetTarget(be_app);
 
-	//
 	// View Menu
-	//
 
 	if (!resending && fIncoming) {
 		menu = new BMenu("View");
 		menu->AddItem(fHeader = new BMenuItem(MDR_DIALECT_CHOICE ("Show Header","H) ヘッダーを表示"),	new BMessage(M_HEADER), 'H'));
-		if (fApp->ShowHeader())
-			fHeader->SetMarked(true);
 		menu->AddItem(fRaw = new BMenuItem(MDR_DIALECT_CHOICE ("Show Raw Message","   メッセージを生で表示"), new BMessage(M_RAW)));
-		menu_bar->AddItem(menu);
+		fMenuBar->AddItem(menu);
 	}
 
-	//
-	//	Message Menu
-	//
+	// Message Menu
+
 	menu = new BMenu(MDR_DIALECT_CHOICE ("Message", "M) メッセージ"));
 
 	if (!resending && fIncoming) {
@@ -438,30 +428,30 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		}
 
 		menu->AddItem(subMenu);
-		menu_bar->AddItem(menu);
+		fMenuBar->AddItem(menu);
 
 		// Spam Menu
 
 		if (fApp->ShowSpamGUI()) {
 			menu = new BMenu("Spam Filtering");
 			menu->AddItem(new BMenuItem("Mark as Spam and Move to Trash",
-										new BMessage(M_TRAIN_SPAM_AND_DELETE), 'K'));
+				new BMessage(M_TRAIN_SPAM_AND_DELETE), 'K'));
 			menu->AddItem(new BMenuItem("Mark as Spam",
-										new BMessage(M_TRAIN_SPAM), 'K', B_OPTION_KEY));
+				new BMessage(M_TRAIN_SPAM), 'K', B_OPTION_KEY));
 			menu->AddSeparatorItem();
 			menu->AddItem(new BMenuItem("Unmark this Message",
-										new BMessage(M_UNTRAIN)));
+				new BMessage(M_UNTRAIN)));
 			menu->AddSeparatorItem();
 			menu->AddItem(new BMenuItem("Mark as Genuine",
-										new BMessage(M_TRAIN_GENUINE), 'K', B_SHIFT_KEY));
-			menu_bar->AddItem(menu);
+				new BMessage(M_TRAIN_GENUINE), 'K', B_SHIFT_KEY));
+			fMenuBar->AddItem(menu);
 		}
 	} else {
 		menu->AddItem(fSendNow = new BMenuItem(
 			MDR_DIALECT_CHOICE ("Send Message", "M) メッセージを送信"),
 			new BMessage(M_SEND_NOW), 'M'));
 
-		if(!fIncoming) {
+		if (!fIncoming) {
 			menu->AddSeparatorItem();
 			fSignature = new TMenu(
 				MDR_DIALECT_CHOICE ("Add Signature", "D) 署名を追加"),
@@ -475,26 +465,23 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			menu->AddItem(fAdd = new BMenuItem(MDR_DIALECT_CHOICE ("Add Enclosure","E) 追加")B_UTF8_ELLIPSIS, new BMessage(M_ADD), 'E'));
 			menu->AddItem(fRemove = new BMenuItem(MDR_DIALECT_CHOICE ("Remove Enclosure","T) 削除"), new BMessage(M_REMOVE), 'T'));
 		}
-		menu_bar->AddItem(menu);
+		fMenuBar->AddItem(menu);
 	}
 
-	//
 	// Queries Menu
-	//
+
 	fQueryMenu = new BMenu(MDR_DIALECT_CHOICE("Queries","???"));
-	menu_bar->AddItem(fQueryMenu);
+	fMenuBar->AddItem(fQueryMenu);
 
 	_RebuildQueryMenu(true);
 
-	//
 	// Menu Bar
-	//
-	AddChild(menu_bar);
-	height = menu_bar->Bounds().bottom + 1;
 
-	//
+	AddChild(fMenuBar);
+	height = fMenuBar->Bounds().bottom + 1;
+
 	// Button Bar
-	//
+
 	float bbwidth = 0, bbheight = 0;
 
 	bool showButtonBar = fApp->ShowButtonBar();
@@ -522,7 +509,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	r.OffsetTo(0, 0);
 	r.top = fHeaderView->Frame().bottom - 1;
 	fContentView = new TContentView(r, fIncoming, fMail,
-		const_cast<BFont *>(font), fApp->ShowHeader(), fApp->ColoredQuotes());
+		const_cast<BFont *>(font), false, fApp->ColoredQuotes());
 		// TContentView needs to be properly const, for now cast away constness
 
 	AddChild(fHeaderView);
@@ -530,15 +517,12 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		AddChild(fEnclosuresView);
 	AddChild(fContentView);
 
-	if (to) {
+	if (to)
 		fHeaderView->fTo->SetText(to);
-	}
 
 	AddShortcut('n', B_COMMAND_KEY, new BMessage(M_NEW));
 
-	//
-	// 	If auto-signature, add signature to the text here.
-	//
+	// If auto-signature, add signature to the text here.
 
 	BString signature = fApp->Signature();
 
@@ -546,9 +530,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		if (strcmp(signature.String(), SIG_RANDOM) == 0)
 			PostMessage(M_RANDOM_SIG);
 		else {
-			//
-			//	Create a query to find this signature
-			//
+			// Create a query to find this signature
 			BVolume volume;
 			BVolumeRoster().GetBootVolume(&volume);
 
@@ -559,9 +541,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			query.PushOp(B_EQ);
 			query.Fetch();
 
-			//
-			//	If we find the named query, add it to the text.
-			//
+			// If we find the named query, add it to the text.
 			BEntry entry;
 			if (query.GetNextEntry(&entry) == B_NO_ERROR) {
 				off_t size;
@@ -713,13 +693,11 @@ bool
 TMailWindow::GetTrackerWindowFile(entry_ref *ref, bool next) const
 {
 	// Position was already saved
-	if (next && fNextTrackerPositionSaved)
-	{
+	if (next && fNextTrackerPositionSaved) {
 		*ref = fNextRef;
 		return true;
 	}
-	if (!next && fPrevTrackerPositionSaved)
-	{
+	if (!next && fPrevTrackerPositionSaved) {
 		*ref = fPrevRef;
 		return true;
 	}
@@ -727,15 +705,12 @@ TMailWindow::GetTrackerWindowFile(entry_ref *ref, bool next) const
 	if (!fTrackerMessenger.IsValid())
 		return false;
 
-	//
-	//	Ask the tracker what the next/prev file in the window is.
-	//	Continue asking for the next reference until a valid
-	//	email file is found (ignoring other types).
-	//
+	// Ask the tracker what the next/prev file in the window is.
+	// Continue asking for the next reference until a valid
+	// email file is found (ignoring other types).
 	entry_ref nextRef = *ref;
 	bool foundRef = false;
-	while (!foundRef)
-	{
+	while (!foundRef) {
 		BMessage request(B_GET_PROPERTY);
 		BMessage spc;
 		if (next)
@@ -808,12 +783,10 @@ void
 TMailWindow::SetCurrentMessageRead()
 {
 	BNode node(fRef);
-	if (node.InitCheck() == B_NO_ERROR)
-	{
+	if (node.InitCheck() == B_NO_ERROR) {
 		BString status;
 		if (ReadAttrString(&node, B_MAIL_ATTR_STATUS, &status) == B_NO_ERROR
-			&& !status.ICompare("New"))
-		{
+			&& !status.ICompare("New")) {
 			node.RemoveAttr(B_MAIL_ATTR_STATUS);
 			WriteAttrString(&node, B_MAIL_ATTR_STATUS, "Read");
 		}
@@ -831,10 +804,10 @@ TMailWindow::FrameResized(float width, float height)
 void
 TMailWindow::MenusBeginning()
 {
-	bool		enable;
-	int32		finish = 0;
-	int32		start = 0;
-	BTextView	*textView;
+	bool enable;
+	int32 finish = 0;
+	int32 start = 0;
+	BTextView *textView;
 
 	if (!fIncoming) {
 		bool gotToField = fHeaderView->fTo->Text()[0] != 0;
@@ -1217,7 +1190,6 @@ TMailWindow::MessageReceived(BMessage *msg)
 		case M_HEADER:
 		{
 			bool showHeader = !fHeader->IsMarked();
-			fApp->SetShowHeader(showHeader);
 			fHeader->SetMarked(showHeader);
 
 			BMessage message(M_HEADER);
@@ -1573,8 +1545,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 void
 TMailWindow::AddEnclosure(BMessage *msg)
 {
-	if (fEnclosuresView == NULL && !fIncoming)
-	{
+	if (fEnclosuresView == NULL && !fIncoming) {
 		BRect r;
 		r.left = 0;
 		r.top = fHeaderView->Frame().bottom - 1;
@@ -2975,10 +2946,9 @@ TMailWindow::_RebuildQueryMenu(bool firstTime)
 #endif
 	}
 
-	//	If we find the named query, add it to the menu.
+	// If we find the named query, add it to the menu.
 	BEntry entry;
 	while (queryDir.GetNextEntry(&entry) == B_OK) {
-
 		char name[B_FILE_NAME_LENGTH + 1];
 		entry.GetName(name);
 
@@ -3015,7 +2985,7 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 	}
 
 	BString queryString;
-	switch(mode) {
+	switch (mode) {
 		case kByForumlaItem:
 		{
 			BString buffer;
@@ -3036,7 +3006,7 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 		{
 			int32 count = 1;
 			if (node.ReadAttr(kAttrQueryInitialNumAttrs, B_INT32_TYPE, 0,
-				(int32 *)&mode, sizeof(int32)) <= 0) {
+					(int32 *)&mode, sizeof(int32)) <= 0) {
 				count = 1;
 			}
 
@@ -3049,17 +3019,16 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 
 			char *buffer = new char[info.size];
 			if (node.ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
-				buffer, (size_t)info.size) == info.size) {
+					buffer, (size_t)info.size) == info.size) {
 				BMessage message;
 				if (message.Unflatten(buffer) == B_OK) {
 					for (int32 index = 0; /*index < count*/; index++) {
-
 						const char *field;
 						const char *value;
-						if (message.FindString("menuSelection",
-							index, &field) != B_OK
-							|| message.FindString("attrViewText",
-							index, &value) != B_OK) {
+						if (message.FindString("menuSelection", index, &field)
+								!= B_OK
+							|| message.FindString("attrViewText", index, &value)
+								!= B_OK) {
 							break;
 						}
 

@@ -119,7 +119,6 @@ TMailApp::TMailApp()
 	fPrintHelpAndExit(false),
 
 	fWrapMode(true),
-	fShowHeader(false),
 	fAttachAttributes(true),
 	fColoredQuotes(true),
 	fShowButtonBar(true),
@@ -693,13 +692,13 @@ TMailApp::_CheckForSpamFilterExistence()
 	// Looks at the filter settings to see if the user is using a spam filter.
 	// If there is one there, set fShowSpamGUI to TRUE, otherwise to FALSE.
 
-	int32		addonNameIndex;
+	int32 addonNameIndex;
 	const char *addonNamePntr;
-	BDirectory	inChainDir;
-	BPath		path;
-	BEntry		settingsEntry;
-	BFile		settingsFile;
-	BMessage	settingsMessage;
+	BDirectory inChainDir;
+	BPath path;
+	BEntry settingsEntry;
+	BFile settingsFile;
+	BMessage settingsMessage;
 
 	fShowSpamGUI = false;
 
@@ -819,7 +818,7 @@ TMailApp::LoadOldSettings()
 		fContentFont.SetFamilyAndStyle(fontFamily, fontStyle);
 
 	file.Read(&fSignatureWindowFrame, sizeof(BRect));
-	file.Read(&fShowHeader, sizeof(bool));
+	file.Seek(1, SEEK_CUR);	// ignore (bool) show header
 	file.Read(&fWrapMode, sizeof(bool));
 	file.Read(&fPrefsWindowPos, sizeof(BPoint));
 
@@ -915,7 +914,6 @@ TMailApp::SaveSettings()
 	settings.AddFloat("FontSize", fContentFont.Size());
 
 	settings.AddRect("SignatureWindowSize", fSignatureWindowFrame);
-	settings.AddBool("ShowHeadersMode", fShowHeader);
 	settings.AddBool("WordWrapMode", fWrapMode);
 	settings.AddPoint("PreferencesWindowLocation", fPrefsWindowPos);
 	settings.AddString("SignatureText", fSignature);
@@ -999,9 +997,6 @@ TMailApp::LoadSettings()
 		fSignatureWindowFrame = rect;
 
 	bool boolValue;
-	if (settings.FindBool("ShowHeadersMode", &boolValue) == B_OK)
-		fShowHeader = boolValue;
-
 	if (settings.FindBool("WordWrapMode", &boolValue) == B_OK)
 		fWrapMode = boolValue;
 
@@ -1154,22 +1149,6 @@ TMailApp::WrapMode()
 {
 	BAutolock _(this);
 	return fWrapMode;
-}
-
-
-void
-TMailApp::SetShowHeader(bool show)
-{
-	BAutolock _(this);
-	fShowHeader = show;
-}
-
-
-bool
-TMailApp::ShowHeader()
-{
-	BAutolock _(this);
-	return fShowHeader;
 }
 
 
