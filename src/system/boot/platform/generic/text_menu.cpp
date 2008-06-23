@@ -203,7 +203,7 @@ draw_menu(Menu *menu)
 	print_centered(2, "Haiku Boot Loader");
 
 	console_set_color(kCopyrightColor, kBackgroundColor);
-	print_centered(4, "Copyright 2004-2007 Haiku Inc.");
+	print_centered(4, "Copyright 2004-2008 Haiku Inc.");
 
 	if (menu->Title()) {
 		console_set_cursor(kOffsetX, kFirstLine - 2);
