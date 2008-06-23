@@ -170,20 +170,19 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 
 			char *pos = strchr(buffer, '\n');
 			if (pos != NULL)
-				i = pos - buffer;
+				bytes = pos - buffer;
 			else if (bytes < length - i) {
 				// search for possible line breaks
 				pos = strrchr(buffer, ' ');
 				if (pos != NULL)
-					i = pos - buffer;
+					bytes = pos - buffer;
 				else {
 					// no wrapping possible
-					i += bytes;
 				}
-			} else
-				i += bytes;
+			}
 
-			buffer[i] = '\0';
+			i += bytes;
+			buffer[bytes] = '\0';
 			print_centered(console_height() - kHelpLines + row, buffer);
 			row++;
 		}
