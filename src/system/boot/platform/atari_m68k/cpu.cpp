@@ -105,8 +105,8 @@ extern "C" bigtime_t
 system_time(void)
 {
 	// _hz_200
-	return (*TOSVAR_hz_200) * 1000000LL / 200;
-	//return gSystemTimeCounter++;
+	//return (*TOSVAR_hz_200) * 1000000LL / 200;
+	return gSystemTimeCounter++;
 }
 
 
