@@ -23,6 +23,7 @@
 /* how we will use it */
 //#define ATARI_ZBEOS_STACK_BASE		0x00040000
 #define ATARI_ZBEOS_STACK_BASE		0x00060000
+#define ATARI_ZBEOS_STACK_END		0x00080000
 #define ATARI_ZBEOS_BASE			0x00080000 /* from .prg shell.S will copy itself there */
 
 #endif	/* ATARI_MEMORY_MAP_H */

@@ -79,6 +79,8 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 	// be nice to our audience and replace single "\n" with "\r\n"
 
 	for (i = 0; i < bufferSize; i++) {
+		if (string[i] == '\0')
+			break;
 		if (string[i] == '\n')
 			Bconout(fHandle, '\r');
 		Bconout(fHandle, string[i]);

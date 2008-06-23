@@ -84,7 +84,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 	struct elf_image_info *resolve_image, struct Elf32_Rel *rel, int rel_len)
 #endif
 {
-	// there are no rel entries in PPC elf
+	// there are no rel entries in M68K elf
 	return B_NO_ERROR;
 }
 

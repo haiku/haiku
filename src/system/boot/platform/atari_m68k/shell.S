@@ -131,7 +131,7 @@ floppy_done:
 	lea		h4,%a0
 	bsr		puts
 	// setup stack
-	move.l		#ATARI_ZBEOS_STACK_BASE,%sp
+	move.l		#ATARI_ZBEOS_STACK_END,%sp
 	lea		h5,%a0
 	bsr		puts
 	move.l		#0,%d0
@@ -226,6 +226,9 @@ prg_start:
 	// disable interrupts
 	//or.w		#0x0700,%sr
 	
+	// setup stack
+	move.l		#ATARI_ZBEOS_STACK_END,%sp
+
 	lea		h5,%a0
 	bsr		puts
 	lea		_bs_entry,%a0
