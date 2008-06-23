@@ -133,7 +133,10 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 
 	if (clearHelp) {
 		// clear help text area
-		for (int32 i = 0; i < console_width() * 2 - 1; i++)
+		for (int32 i = 0; i < console_width() - 1; i++)
+			putchar(' ');
+		putchar('\n');
+		for (int32 i = 0; i < console_width() - 1; i++)
 			putchar(' ');
 
 		console_set_cursor(0, console_height() - kHelpLines);
