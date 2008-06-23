@@ -7,6 +7,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelMergeObject kernel_arch_ppc.o :
 	arch_atomic.c
+	arch_commpage.cpp
 	arch_cpu.cpp
 	arch_cpu_asm.S
 	arch_debug_console.cpp
