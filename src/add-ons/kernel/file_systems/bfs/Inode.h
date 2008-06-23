@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -253,46 +253,73 @@ class NodeGetter : public CachedBlock {
 
 class Vnode {
 	public:
-		Vnode(Volume *volume, ino_t id)
+		Vnode(Volume* volume, ino_t id)
 			:
-			fVolume(volume),
-			fID(id)
+			fInode(NULL)
 		{
+			SetTo(volume, id);
 		}
 
-		Vnode(Volume *volume, block_run run)
+		Vnode(Volume* volume, block_run run)
 			:
-			fVolume(volume),
-			fID(volume->ToVnode(run))
+			fInode(NULL)
+		{
+			SetTo(volume, run);
+		}
+
+		Vnode()
+			:
+			fStatus(B_NO_INIT),
+			fInode(NULL)
 		{
 		}
 
 		~Vnode()
 		{
-			Put();
+			Unset();
 		}
 
-		status_t Get(Inode **_inode)
+		status_t InitCheck()
 		{
-			// should we check inode against NULL here? it should not be necessary
-			return get_vnode(fVolume->FSVolume(), fID, (void **)_inode);
+			return fStatus;
 		}
 
-		void Put()
+		void Unset()
 		{
-			if (fVolume)
-				put_vnode(fVolume->FSVolume(), fID);
-			fVolume = NULL;
+			if (fInode != NULL) {
+				put_vnode(fInode->GetVolume()->FSVolume(), fInode->ID());
+				fInode = NULL;
+				fStatus = B_NO_INIT;
+			}
+		}
+
+		status_t SetTo(Volume* volume, ino_t id)
+		{
+			Unset();
+
+			return fStatus = get_vnode(volume->FSVolume(), id, (void**)&fInode);
+		}
+
+		status_t SetTo(Volume* volume, block_run run)
+		{
+			return SetTo(volume, volume->ToVnode(run));
+		}
+
+		status_t Get(Inode** _inode)
+		{
+			if (fStatus == B_OK)
+				*_inode = fInode;
+			return fStatus;
 		}
 
 		void Keep()
 		{
-			fVolume = NULL;
+			fInode = NULL;
 		}
 
 	private:
-		Volume		*fVolume;
-		ino_t		fID;
+		status_t	fStatus;
+		Inode*		fInode;
 };
 
 
