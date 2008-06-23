@@ -10,6 +10,7 @@
 #include <bluetooth/HCI/btHCI_command.h>
 
 #include <malloc.h>
+#include <string.h>
 
 #include "CommandManager.h"
 
