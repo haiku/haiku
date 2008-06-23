@@ -79,17 +79,14 @@ platform_start_kernel(void)
 
 	dprintf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
 
-#if 0
-	asm("movl	%0, %%eax;	"			// move stack out of way
-		"movl	%%eax, %%esp; "
+	asm("move.l	%0, %%sp;	"			// move stack out of way
 		: : "m" (stackTop));
-	asm("pushl  $0x0; "					// we're the BSP cpu (0)
-		"pushl 	%0;	"					// kernel args
-		"pushl 	$0x0;"					// dummy retval for call to main
-		"pushl 	%1;	"					// this is the start address
-		"ret;		"					// jump.
+	asm("move.l  #0x0,-(%%sp); "		// we're the BSP cpu (0)
+		"move.l 	%0,-(%%sp);	"		// kernel args
+		"move.l 	#0x0,-(%%sp);"		// dummy retval for call to main
+		"move.l 	%1,-(%%sp);	"		// this is the start address
+		"rts;		"					// jump.
 		: : "g" (args), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
-#endif
 
 	panic("kernel returned!\n");
 }

@@ -92,9 +92,6 @@ static addr_t sNextPageTableAddress = 0x90000;
 static const uint32 kPageTableRegionEnd = 0x9e000;
 	// we need to reserve 2 pages for the SMP trampoline code XXX:no
 
-extern struct boot_mmu_ops k030MMUOps;
-extern struct boot_mmu_ops k040MMUOps;
-//extern struct boot_mmu_ops k060MMUOps;
 static struct boot_mmu_ops *gMMUOps;
 
 static addr_t
@@ -295,7 +292,7 @@ init_page_directory(void)
 {
 	TRACE(("init_page_directory\n"));
 
-	gMMUOps->load_rp();
+	gMMUOps->load_rp(NULL);
 	gMMUOps->enable_paging();
 #if 0
 	// allocate a new pgdir

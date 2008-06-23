@@ -23,13 +23,19 @@ extern void *mmu_allocate(void *virtualAddress, size_t size);
 extern void mmu_free(void *virtualAddress, size_t size);
 
 struct boot_mmu_ops {
+	void (*initialize)(void);
 		/* len=0 to disable */
 	status_t (*set_tt)(int which, addr_t pa, size_t len, uint32 perms);
 		/* load root pointers */
-	status_t (*load_rp)(void/*XXX*/);
+	status_t (*load_rp)(addr_t pa);
 	status_t (*enable_paging)(void);
 	
 };
+
+extern const struct boot_mmu_ops k030MMUOps;
+extern const struct boot_mmu_ops k040MMUOps;
+extern const struct boot_mmu_ops k060MMUOps;
+
 
 #ifdef __cplusplus
 }

@@ -36,7 +36,7 @@
 static status_t
 check_cpu_features()
 {
-#warning M68K: TODO: probe ourselves, we shouldn't trust the TOS!
+#warning M68K: TODO: probe ourselves, we shouldnt trust the TOS!
 
 	const tos_cookie *c;
 	uint16 cpu_type, fpu_type, fpu_emul;
