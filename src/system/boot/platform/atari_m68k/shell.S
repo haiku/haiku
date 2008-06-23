@@ -25,7 +25,7 @@
  * dd if=generated/objects/haiku/m68k/release/system/boot/zbeos of=~/floppy.img bs=512 count=20 conv=notrunc
  * src/system/boot/platform/atari_m68k/fixup_tos_floppy_chksum ~/floppy.img
  * generate .prg:
- * generated.m68k/cross-tools/bin/m68k-unknown-haiku-ld -o haiku.prg -T src/system/boot/platform/atari_m68k/prg.ld generated/objects/haiku/m68k/release/system/boot/boot_loader_atari_m68k
+ * generated.m68k/cross-tools/bin/m68k-unknown-haiku-ld -o haiku.prg -T src/system/ldscripts/m68k/boot_prg_atari_m68k.ld generated/objects/haiku/m68k/release/system/boot/boot_loader_atari_m68k
  */
 
 #include "atari_memory_map.h"
@@ -248,7 +248,7 @@ nextsect:
 copysect_loop:
 	move.l		(%a0)+,(%a1)+
 	dbf		%d1,copysect_loop
-	bsr		putx
+	//bsr		putx
 	dbf		%d0,nextsect
 
 	lea		msg_j1,%a0

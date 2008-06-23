@@ -59,6 +59,46 @@ KernelMergeObject boot_platform_atari_m68k.o :
 	boot_platform_atari_m68k_other.o
 ;
 
+# AUTO folder PRG target
+
+# based on KernelLd
+rule AtariBootPrgLd
+{
+	# AtariBootPrgLd <name> : <objs> : <linkerscript> : <args> ;
+
+	LINK on $(1) = $(TARGET_LD) ;
+
+	LINKFLAGS on $(1) = $(4) ;
+	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
+
+	# Remove any preset LINKLIBS
+	LINKLIBS on $(1) = ;
+
+	# TODO: Do we really want to invoke SetupKernel here? The objects should
+	# have been compiled with KernelObjects anyway, so we're doing that twice.
+	SetupKernel $(2) ;
+
+	# Show that we depend on the libraries we need
+	LocalClean clean : $(1) ;
+	LocalDepends all : $(1) ;
+	Depends $(1) : $(2) ;
+
+	MakeLocateDebug $(1) ; 
+
+}
+
+actions AtariBootPrgLd
+{
+	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
+}
+
+AtariBootPrgLd haiku.prg :
+	boot_loader_$(TARGET_BOOT_PLATFORM)
+	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_prg_$(TARGET_BOOT_PLATFORM).ld
+	: -Bstatic
+;
+
+
 SEARCH on [ FGristFiles text_menu.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
