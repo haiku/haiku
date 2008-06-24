@@ -157,7 +157,7 @@ public:
 	UdpDomainSupport(net_domain *domain);
 	~UdpDomainSupport();
 
-	status_t InitCheck() const;
+	status_t Init();
 
 	net_domain *Domain() const { return fDomain; }
 
@@ -245,7 +245,7 @@ net_stack_module_info *gStackModule;
 UdpDomainSupport::UdpDomainSupport(net_domain *domain)
 	:
 	fDomain(domain),
-	fActiveEndpoints(domain->address_module, kNumHashBuckets),
+	fActiveEndpoints(domain->address_module),
 	fEndpointCount(0)
 {
 	mutex_init(&fLock, "udp domain");
@@ -261,9 +261,9 @@ UdpDomainSupport::~UdpDomainSupport()
 
 
 status_t
-UdpDomainSupport::InitCheck() const
+UdpDomainSupport::Init()
 {
-	return fActiveEndpoints.InitCheck();
+	return fActiveEndpoints.Init(kNumHashBuckets);
 }
 
 
@@ -766,7 +766,7 @@ UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
 
 	UdpDomainSupport *domainSupport =
 		new (std::nothrow) UdpDomainSupport(domain);
-	if (domainSupport == NULL || domainSupport->InitCheck() < B_OK) {
+	if (domainSupport == NULL || domainSupport->Init() < B_OK) {
 		delete domainSupport;
 		return NULL;
 	}

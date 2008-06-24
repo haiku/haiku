@@ -1596,7 +1596,7 @@ init_ipv4()
 		goto err4;
 	}
 
-	status = sMulticastState->InitCheck();
+	status = sMulticastState->Init();
 	if (status < B_OK)
 		goto err5;
 

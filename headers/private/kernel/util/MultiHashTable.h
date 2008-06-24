@@ -31,14 +31,16 @@ public:
 	typedef typename Definition::KeyType KeyType;
 	typedef typename Definition::ValueType ValueType;
 
-	MultiHashTable(size_t initialSize = HashTable::kMinimumSize)
-		: HashTable(initialSize) {}
+	MultiHashTable()
+		: HashTable() {}
 
-	MultiHashTable(const Definition& definition,
-		size_t initialSize = HashTable::kMinimumSize)
-		: HashTable(definition, initialSize) {}
+	MultiHashTable(const Definition& definition)
+		: HashTable(definition) {}
 
-	status_t InitCheck() const { return HashTable::InitCheck(); }
+	status_t Init(size_t initialSize = HashTable::kMinimumSize)
+	{
+		return HashTable::Init(initialSize);
+	}
 
 	void Insert(ValueType *value)
 	{
@@ -103,9 +105,13 @@ public:
 
 	ValueIterator Lookup(const KeyType &key) const
 	{
-		size_t index = HashTable::fDefinition.HashKey(key)
-			& (HashTable::fTableSize - 1);
-		ValueType *slot = HashTable::fTable[index];
+		size_t index = 0;
+		ValueType *slot = NULL;
+		if (HashTable::fTableSize > 0) {
+			index = HashTable::fDefinition.HashKey(key)
+				& (HashTable::fTableSize - 1);
+			slot = HashTable::fTable[index];
+		}
 
 		while (slot) {
 			if (HashTable::fDefinition.Compare(key, slot))

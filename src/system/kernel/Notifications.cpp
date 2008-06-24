@@ -156,7 +156,7 @@ NotificationManager::_Init()
 {
 	mutex_init(&fLock, "notification manager");
 
-	return fServiceHash.InitCheck();
+	return fServiceHash.Init();
 }
 
 

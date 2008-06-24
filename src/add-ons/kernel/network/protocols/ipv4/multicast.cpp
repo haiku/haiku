@@ -142,7 +142,7 @@ MulticastGroupInterface<Addressing>::FilterAccepts(net_buffer *buffer) const
 
 template<typename Addressing>
 MulticastFilter<Addressing>::MulticastFilter(ProtocolType *socket)
-	: fParent(socket), fStates((size_t)0)
+	: fParent(socket), fStates()
 {
 }
 

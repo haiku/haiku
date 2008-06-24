@@ -232,11 +232,11 @@ EndpointManager::~EndpointManager()
 
 
 status_t
-EndpointManager::InitCheck() const
+EndpointManager::Init()
 {
-	status_t status = fConnectionHash.InitCheck();
+	status_t status = fConnectionHash.Init();
 	if (status == B_OK)
-		status = fEndpointHash.InitCheck();
+		status = fEndpointHash.Init();
 
 	return status;
 }

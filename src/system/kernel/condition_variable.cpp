@@ -327,10 +327,9 @@ ConditionVariable::_NotifyChecked(bool all, status_t result)
 void
 condition_variable_init()
 {
-	new(&sConditionVariableHash) ConditionVariableHash(
-		kConditionVariableHashSize);
+	new(&sConditionVariableHash) ConditionVariableHash;
 
-	status_t error = sConditionVariableHash.InitCheck();
+	status_t error = sConditionVariableHash.Init(kConditionVariableHashSize);
 	if (error != B_OK) {
 		panic("condition_variable_init(): Failed to init hash table: %s",
 			strerror(error));

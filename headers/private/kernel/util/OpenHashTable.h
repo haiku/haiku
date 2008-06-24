@@ -59,26 +59,21 @@ public:
 	// regrowth factor: 200 / 256 = 78.125%
 	//                   50 / 256 = 19.53125%
 
-	OpenHashTable(size_t initialSize = kMinimumSize)
+	OpenHashTable()
 		:
 		fTableSize(0),
 		fItemCount(0),
 		fTable(NULL)
 	{
-		if (initialSize > 0)
-			_Resize(initialSize);
 	}
 
-	OpenHashTable(const Definition& definition,
-			size_t initialSize = kMinimumSize)
+	OpenHashTable(const Definition& definition)
 		:
 		fDefinition(definition),
 		fTableSize(0),
 		fItemCount(0),
 		fTable(NULL)
 	{
-		if (initialSize > 0)
-			_Resize(initialSize);
 	}
 
 	~OpenHashTable()
@@ -86,9 +81,11 @@ public:
 		delete [] fTable;
 	}
 
-	status_t InitCheck() const
+	status_t Init(size_t initialSize = kMinimumSize)
 	{
-		return (fTableSize == 0 || fTable) ? B_OK : B_NO_MEMORY;
+		if (initialSize > 0 && !_Resize(initialSize))
+			return B_NO_MEMORY;
+		return B_OK;
 	}
 
 	ValueType *Lookup(const KeyType &key) const

@@ -52,11 +52,7 @@ public:
 
 	status_t Init()
 	{
-		status_t error = fBoundEndpoints.InitCheck();
-		if (error != B_OK)
-			return error;
-
-		return B_OK;
+		return fBoundEndpoints.Init();
 	}
 
 	bool Lock()

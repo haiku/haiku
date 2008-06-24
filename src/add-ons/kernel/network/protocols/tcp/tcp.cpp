@@ -286,9 +286,15 @@ get_endpoint_manager(net_domain* domain)
 		return endpointManager;
 
 	endpointManager = new (std::nothrow) EndpointManager(domain);
-	if (endpointManager)
-		sEndpointManagers.Add(endpointManager);
+	if (endpointManager == NULL)
+		return NULL;
 
+	if (endpointManager->Init() != B_OK) {
+		delete endpointManager;
+		return NULL;
+	}
+
+	sEndpointManagers.Add(endpointManager);
 	return endpointManager;
 }
 

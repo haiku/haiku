@@ -316,10 +316,10 @@ public:
 
 	status_t Init()
 	{
-		status_t error = fNamedSemaphores.InitCheck();
+		status_t error = fNamedSemaphores.Init();
 		if (error != B_OK)
 			return error;
-		return fUnnamedSemaphores.InitCheck();
+		return fUnnamedSemaphores.Init();
 	}
 
 	status_t OpenNamedSem(const char* name, int openFlags, mode_t mode,
@@ -569,7 +569,7 @@ struct realtime_sem_context {
 	status_t Init()
 	{
 		fNextPrivateSemID = -1;
-		return fSemaphores.InitCheck();
+		return fSemaphores.Init();
 	}
 
 	realtime_sem_context* Clone()

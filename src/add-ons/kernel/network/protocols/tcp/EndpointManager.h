@@ -70,7 +70,7 @@ public:
 							EndpointManager(net_domain* domain);
 							~EndpointManager();
 
-			status_t		InitCheck() const;
+			status_t		Init();
 
 			TCPEndpoint*	FindConnection(sockaddr* local, sockaddr* peer);
 
