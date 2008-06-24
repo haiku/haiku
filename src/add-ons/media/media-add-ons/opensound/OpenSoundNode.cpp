@@ -100,43 +100,18 @@ public:
 		RecycleAllBuffers();
 	}
 
-	status_t FillBuffer(BBuffer* buffer)
+	status_t Write(void* data, size_t size)
 	{
 		CALLED();
 
-		ssize_t written = fRealEngine->Write(
-			buffer->Data(), buffer->SizeUsed());
+		ssize_t written = fRealEngine->Write(data, size);
 
 		if (written < 0)
 			return (status_t)written;
-		if (written < (ssize_t)buffer->SizeUsed())
+		if (written < (ssize_t)size)
 			return B_IO_ERROR;
 
 		return B_OK;
-	}
-
-	void WriteSilence(size_t bytes)
-	{
-		CALLED();
-
-		// TODO: A silenceBuffer could be cached!
-		uint8 formatSilence = 0;
-		if (fInput.format.u.raw_audio.format
-				== media_raw_audio_format::B_AUDIO_UCHAR)
-			formatSilence = 128;
-
-		size_t bufferSize = 2048;
-		char buffer[bufferSize];
-
-		memset(buffer, formatSilence, bufferSize);
-
-		while (bytes) {
-			size_t chunk = MIN(bytes, bufferSize);
-			ssize_t written = fRealEngine->Write(buffer, chunk);
-			if (written < 0)
-				return;
-			bytes -= written;
-		}
 	}
 
 	void WriteTestTone(size_t bytes)
@@ -1630,7 +1605,9 @@ OpenSoundNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 			}
 			break;
 		case B_TIMESOURCE_SEEK:
-			TRACE("TimeSourceOp op B_TIMESOURCE_SEEK\n");
+//			TRACE("TimeSourceOp op B_TIMESOURCE_SEEK\n");
+printf("TimeSourceOp op B_TIMESOURCE_SEEK, real %lld, "
+	"perf %lld\n", op.real_time, op.performance_time);
 			BroadcastTimeWarp(op.real_time, op.performance_time);
 			break;
 		default:
@@ -2245,13 +2222,29 @@ OpenSoundNode::_PlayThread(NodeInput* input)
 			"size: %ld", driverBufferSize, bufferSize);
 	}
 
+	// cache a silence buffer
+	uint8 silenceBuffer[bufferSize];
+	uint8 formatSilence = 0;
+	if (input->fInput.format.u.raw_audio.format
+			== media_raw_audio_format::B_AUDIO_UCHAR)
+		formatSilence = 128;
+
+	memset(silenceBuffer, formatSilence, bufferSize);
+
 	// start by writing the OSS driver buffer size of silence
 	// so that the first call to write() already blocks for (almost) the
 	// buffer duration
-	input->WriteSilence(driverBufferSize);
+	input->Write(silenceBuffer, bufferSize);
 
 	int64 bytesWritten = 0;
-	bigtime_t realTimeStart = RealTime();
+	bigtime_t lastRealTime = RealTime();
+	bigtime_t lastPerformanceTime = 0;
+
+	const int32 driftValueCount = 64;
+	int32 currentDriftValueIndex = 0;
+	float driftValues[driftValueCount];
+	for (int32 i = 0; i < driftValueCount; i++)
+		driftValues[i] = 1.0;
 
 	do {
 		if (!fDevice->Locker()->Lock())
@@ -2275,47 +2268,45 @@ OpenSoundNode::_PlayThread(NodeInput* input)
 //	buffer->Recycle();
 //continue;
 
+		int32 additionalBytesWritten = 0;
 		if (buffer != NULL) {
-			input->FillBuffer(buffer);
-			bytesWritten += buffer->SizeUsed();
+			if (input->Write(buffer->Data(), buffer->SizeUsed()) == B_OK)
+				additionalBytesWritten = buffer->SizeUsed();
 			buffer->Recycle();
 		} else {
-			if (input->fInput.source != media_source::null) {
-//printf("no buffer - silence\n");
-				input->WriteSilence(bufferSize);
-				bytesWritten += bufferSize;
-			} else {
-//printf("no buffer - snooze\n");
-				snooze(3000);
-				// NOTE - stippi: I think this is what needs to happen
-				// anyways, or the "drift" will be totally screwed:
-				realTimeStart = RealTime();
-				bytesWritten = 0;
-			}
+			input->Write(silenceBuffer, bufferSize);
+			additionalBytesWritten = bufferSize;
 		}
 
 		// TODO: do not assume channel 0 will always be running!
 		// update the timesource
 		if (input->fEngineIndex == 0 && input->fThread >= 0) {
 
-			bigtime_t now = RealTime();
-// NOTE stippi: I am unsure which realtime start time to use here,
-// "fTimeSourceStartTime" is the time at which the Timesource start op
-// was received, realTimeStart should be more precise though for calculating
-// the "drift":
-			bigtime_t realPlaybackDuration = now - realTimeStart;
-//bigtime_t realPlaybackDuration = now - fTimeSourceStartTime;
-			bigtime_t estimatedPlaybackDuration
+			bigtime_t realTime = RealTime();
+			bigtime_t realPlaybackDuration = realTime - lastRealTime;
+			bigtime_t performanceTime
 				= time_for_buffer(bytesWritten, input->fInput.format);
-			float drift = (double)estimatedPlaybackDuration
-				/ realPlaybackDuration;
+			float drift = (double)(performanceTime
+				- lastPerformanceTime) / realPlaybackDuration;
+
+			lastPerformanceTime = performanceTime;
+			lastRealTime = realTime;
+
+			driftValues[currentDriftValueIndex++] = drift;
+			if (currentDriftValueIndex == driftValueCount)
+				currentDriftValueIndex = 0;
+			drift = 0.0;
+			for (int32 i = 0; i < driftValueCount; i++)
+				drift += driftValues[i];
+			drift /= driftValueCount;
 
 			if (fDevice->Locker()->Lock()) {
 				if (input->fThread >= 0)
-					_UpdateTimeSource(estimatedPlaybackDuration, now, drift);
+					_UpdateTimeSource(performanceTime, realTime, drift);
 				fDevice->Locker()->Unlock();
 			}
 		}
+		bytesWritten += additionalBytesWritten;
 
 	} while (input->fThread > -1);
 
@@ -2507,8 +2498,8 @@ OpenSoundNode::_UpdateTimeSource(bigtime_t performanceTime,
 
 	PublishTime(performanceTime, realTime, drift);
 
-//	TRACE("_UpdateTimeSource() perfTime : %lli, realTime : %lli,
-//		drift : %f\n", perfTime, realTime, drift);
+//	TRACE("_UpdateTimeSource() perfTime : %lli, realTime : %lli, "
+//		"drift : %f\n", perfTime, realTime, drift);
 }
 
 
