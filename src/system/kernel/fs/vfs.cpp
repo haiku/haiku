@@ -297,7 +297,8 @@ static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer,
 static status_t fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
 	struct vnode **_vnode, ino_t *_parentID, bool kernel);
 static void inc_vnode_ref_count(struct vnode *vnode);
-static status_t dec_vnode_ref_count(struct vnode *vnode, bool reenter);
+static status_t dec_vnode_ref_count(struct vnode *vnode, bool alwaysFree,
+	bool reenter);
 static inline void put_vnode(struct vnode *vnode);
 static status_t fs_unmount(char *path, dev_t mountID, uint32 flags,
 	bool kernel);
@@ -792,7 +793,7 @@ free_vnode(struct vnode *vnode, bool reenter)
 	\return \c B_OK, if everything went fine, an error code otherwise.
 */
 static status_t
-dec_vnode_ref_count(struct vnode *vnode, bool reenter)
+dec_vnode_ref_count(struct vnode *vnode, bool alwaysFree, bool reenter)
 {
 	mutex_lock(&sVnodeMutex);
 
@@ -810,7 +811,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 
 		// Just insert the vnode into an unused list if we don't need
 		// to delete it
-		if (vnode->remove) {
+		if (vnode->remove || alwaysFree) {
 			vnode->busy = true;
 			freeNode = true;
 		} else {
@@ -1012,7 +1013,7 @@ err:
 static inline void
 put_vnode(struct vnode *vnode)
 {
-	dec_vnode_ref_count(vnode, false);
+	dec_vnode_ref_count(vnode, false, false);
 }
 
 
@@ -1039,7 +1040,7 @@ vnode_low_memory_handler(void */*data*/, int32 level)
 	if (count > sUnusedVnodes)
 		count = sUnusedVnodes;
 
-	// first, write back the modified pages of some unused vnodes
+	// Write back the modified pages of some unused vnodes and free them
 
 	uint32 freeCount = count;
 
@@ -1060,32 +1061,8 @@ vnode_low_memory_handler(void */*data*/, int32 level)
 		if (vnode->cache != NULL)
 			vm_cache_write_modified(vnode->cache, false);
 
-		dec_vnode_ref_count(vnode, false);
-	}
-
-	// and then free them
-
-	for (uint32 i = 0; i < freeCount; i++) {
-		mutex_lock(&sVnodeMutex);
-
-		// We're removing vnodes from the tail of the list - hoping it's
-		// one of those we have just written back; otherwise we'll write
-		// back the vnode with the busy flag turned on, and that might
-		// take some time.
-		struct vnode *vnode = (struct vnode *)list_remove_tail_item(
-			&sUnusedVnodeList);
-		if (vnode == NULL) {
-			mutex_unlock(&sVnodeMutex);
-			break;
-		}
-		TRACE(("  free vnode %ld:%Ld (%p)\n", vnode->device, vnode->id, vnode));
-
-		vnode->busy = true;
-		sUnusedVnodes--;
-
-		mutex_unlock(&sVnodeMutex);
-
-		free_vnode(vnode, false);
+		dec_vnode_ref_count(vnode, true, false);
+			// this should free the vnode when it's still unused
 	}
 }
 
@@ -3236,7 +3213,7 @@ put_vnode(fs_volume *volume, ino_t vnodeID)
 	mutex_unlock(&sVnodeMutex);
 
 	if (vnode)
-		dec_vnode_ref_count(vnode, true);
+		dec_vnode_ref_count(vnode, false, true);
 
 	return B_OK;
 }
@@ -4218,10 +4195,10 @@ vfs_free_io_context(void *_ioContext)
 	uint32 i;
 
 	if (context->root)
-		dec_vnode_ref_count(context->root, false);
+		put_vnode(context->root);
 
 	if (context->cwd)
-		dec_vnode_ref_count(context->cwd, false);
+		put_vnode(context->cwd);
 
 	mutex_lock(&context->io_mutex);
 
