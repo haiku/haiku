@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src bin strace ;
 
 UsePrivateHeaders device ;
 UsePrivateHeaders drivers ;
+UsePrivateHeaders libroot ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders net ;
 UsePrivateSystemHeaders ;

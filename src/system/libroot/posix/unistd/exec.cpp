@@ -97,9 +97,18 @@ do_exec(const char *path, char * const args[], char * const environment[],
 		path = newArgs[0];
 	}
 
-	errno = _kern_exec(path, argCount, newArgs ? newArgs : args, envCount,
-		environment);
-		// if this call returns, something definitely went wrong
+	char** flatArgs = NULL;
+	size_t flatArgsSize;
+	status = __flatten_process_args(newArgs ? newArgs : args, argCount,
+		environment, envCount, &flatArgs, &flatArgsSize);
+
+	if (status == B_OK) {
+		errno = _kern_exec(path, flatArgs, flatArgsSize, argCount, envCount);
+			// if this call returns, something definitely went wrong
+
+		free(flatArgs);
+	} else
+		errno = status;
 
 	free(newArgs);
 	return -1;

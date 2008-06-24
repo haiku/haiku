@@ -16,7 +16,7 @@ MergeObject os_main.o :
 	fs_info.c
 	fs_query.cpp
 	fs_volume.c
-	image.c
+	image.cpp
 	parsedate.cpp
 	port.c
 	scheduler.c

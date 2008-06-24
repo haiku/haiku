@@ -91,17 +91,18 @@ extern status_t		_kern_realtime_sem_wait(sem_id semID, bigtime_t timeout);
 
 /* team & thread syscalls */
 
-extern thread_id	_kern_load_image(int32 argCount, const char **args,
-						int32 envCount, const char **envp, int32 priority,
-						uint32 flags, port_id errorPort, uint32 errorToken);
+extern thread_id	_kern_load_image(const char* const* flatArgs,
+						size_t flatArgsSize, int32 argCount, int32 envCount,
+						int32 priority, uint32 flags, port_id errorPort,
+						uint32 errorToken);
 extern void			_kern_exit_team(status_t returnValue);
 extern status_t		_kern_kill_team(team_id team);
 extern team_id		_kern_get_current_team();
 extern status_t		_kern_wait_for_team(team_id team, status_t *_returnCode);
 extern thread_id	_kern_wait_for_child(thread_id child, uint32 flags,
 						int32 *_reason, status_t *_returnCode);
-extern status_t		_kern_exec(const char *path, int32 argc, char * const *argv, int32 envCount,
-						char * const *environment);
+extern status_t		_kern_exec(const char *path, const char* const* flatArgs,
+						size_t flatArgsSize, int32 argCount, int32 envCount);
 extern thread_id	_kern_fork(void);
 extern pid_t		_kern_process_info(pid_t process, int32 which);
 extern pid_t		_kern_setpgid(pid_t process, pid_t group);

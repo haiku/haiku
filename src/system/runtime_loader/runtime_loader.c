@@ -370,6 +370,33 @@ runtime_loader(void *_args)
 
 	gProgramArgs = (struct user_space_program_args *)_args;
 
+	// Relocate the args and env arrays -- they are organized in a contiguous
+	// buffer which the kernel just copied into user space without adjusting the
+	// pointers.
+	{
+		int32 i;
+		addr_t relocationOffset = 0;
+
+		if (gProgramArgs->arg_count > 0)
+			relocationOffset = (addr_t)gProgramArgs->args[0];
+		else if (gProgramArgs->env_count > 0)
+			relocationOffset = (addr_t)gProgramArgs->env[0];
+
+		// That's basically: <new buffer address> - <old buffer address>.
+		// It looks a little complicated, since we don't have the latter one at
+		// hand and thus need to reconstruct it (<first string pointer> -
+		// <arguments + environment array sizes>).
+		relocationOffset = (addr_t)gProgramArgs->args - relocationOffset
+			+ (gProgramArgs->arg_count + gProgramArgs->env_count + 2)
+				* sizeof(char*);
+
+		for (i = 0; i < gProgramArgs->arg_count; i++)
+			gProgramArgs->args[i] += relocationOffset;
+
+		for (i = 0; i < gProgramArgs->env_count; i++)
+			gProgramArgs->env[i] += relocationOffset;
+	}
+
 #if DEBUG_RLD
 	close(0); open("/dev/console", 0); /* stdin   */
 	close(1); open("/dev/console", 0); /* stdout  */

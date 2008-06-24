@@ -60,10 +60,11 @@ struct team_key {
 };
 
 struct team_arg {
+	char	*path;
+	char	**flat_args;
+	size_t	flat_args_size;
 	uint32	arg_count;
-	char	**args;
 	uint32	env_count;
-	char	**env;
 	port_id	error_port;
 	uint32	error_token;
 };
@@ -371,138 +372,6 @@ dump_teams(int argc, char **argv)
 
 	hash_close(sTeamHash, &iterator, false);
 	return 0;
-}
-
-
-/*!	Frees an array of strings in kernel space.
-
-	\param strings strings array
-	\param count number of strings in array
-*/
-static void
-free_strings_array(char **strings, int32 count)
-{
-	int32 i;
-
-	if (strings == NULL)
-		return;
-
-	for (i = 0; i < count; i++)
-		free(strings[i]);
-
-    free(strings);
-}
-
-
-/*!	Copy an array of strings in kernel space
-
-	\param strings strings array to be copied
-	\param count number of strings in array
-	\param kstrings	pointer to the kernel copy
-	\return \c B_OK on success, or an appropriate error code on
-		failure.
-*/
-static status_t
-kernel_copy_strings_array(char * const *in, int32 count, char ***_strings)
-{
-	status_t status;
-	char **strings;
-	int32 i = 0;
-
-	strings = (char **)malloc((count + 1) * sizeof(char *));
-	if (strings == NULL)
-		return B_NO_MEMORY;
-
-	for (; i < count; i++) {
-		strings[i] = strdup(in[i]);
-		if (strings[i] == NULL) {
-			status = B_NO_MEMORY;
-			goto error;
-		}
-	}
-
-	strings[count] = NULL;
-	*_strings = strings;
-
-	return B_OK;
-
-error:
-	free_strings_array(strings, i);
-	return status;
-}
-
-
-/*!	Copy an array of strings from user space to kernel space
-
-	\param strings userspace strings array
-	\param count number of strings in array
-	\param kstrings	pointer to the kernel copy
-	\return \c B_OK on success, or an appropriate error code on
-		failure.
-*/
-static status_t
-user_copy_strings_array(char * const *userStrings, int32 count, char ***_strings)
-{
-	char *buffer;
-	char **strings;
-	status_t err;
-	int32 i = 0;
-
-	if (!IS_USER_ADDRESS(userStrings))
-		return B_BAD_ADDRESS;
-
-	// buffer for safely accessing the user string
-	// TODO: maybe have a user_strdup() instead?
-	buffer = (char *)malloc(4 * B_PAGE_SIZE);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	strings = (char **)malloc((count + 1) * sizeof(char *));
-	if (strings == NULL) {
-		err = B_NO_MEMORY;
-		goto error;
-	}
-
-	if ((err = user_memcpy(strings, userStrings, count * sizeof(char *))) < B_OK)
-		goto error;
-
-	// scan all strings and copy to kernel space
-
-	for (; i < count; i++) {
-		err = user_strlcpy(buffer, strings[i], 4 * B_PAGE_SIZE);
-		if (err < B_OK)
-			goto error;
-
-		strings[i] = strdup(buffer);
-		if (strings[i] == NULL) {
-			err = B_NO_MEMORY;
-			goto error;
-		}
-	}
-
-	strings[count] = NULL;
-	*_strings = strings;
-	free(buffer);
-
-	return B_OK;
-
-error:
-	free_strings_array(strings, i);
-	free(buffer);
-
-	TRACE(("user_copy_strings_array failed %ld\n", err));
-	return err;
-}
-
-
-static status_t
-copy_strings_array(char * const *strings, int32 count, char ***_strings,
-	bool kernel)
-{
-	if (kernel)
-		return kernel_copy_strings_array(strings, count, _strings);
-
-	return user_copy_strings_array(strings, count, _strings);
 }
 
 
@@ -938,19 +807,6 @@ delete_team_struct(struct team *team)
 }
 
 
-static uint32
-get_arguments_data_size(char **args, int32 argc)
-{
-	uint32 size = 0;
-	int32 count;
-
-	for (count = 0; count < argc; count++)
-		size += strlen(args[count]) + 1;
-
-	return size + (argc + 1) * sizeof(char *) + sizeof(struct user_space_program_args);
-}
-
-
 static status_t
 create_team_user_data(struct team* team)
 {
@@ -987,47 +843,97 @@ delete_team_user_data(struct team* team)
 }
 
 
+static status_t
+copy_user_process_args(const char* const* userFlatArgs, size_t flatArgsSize,
+	int32 argCount, int32 envCount, char**& _flatArgs)
+{
+	if (argCount < 0 || envCount < 0)
+		return B_BAD_VALUE;
+
+	if (flatArgsSize > MAX_PROCESS_ARGS_SIZE)
+		return B_TOO_MANY_ARGS;
+	if ((argCount + envCount + 2) * sizeof(char*) > flatArgsSize)
+		return B_BAD_VALUE;
+
+	if (!IS_USER_ADDRESS(userFlatArgs))
+		return B_BAD_ADDRESS;
+
+	// allocate kernel memory
+	char** flatArgs = (char**)malloc(flatArgsSize);
+	if (flatArgs == NULL)
+		return B_NO_MEMORY;
+
+	if (user_memcpy(flatArgs, userFlatArgs, flatArgsSize) != B_OK) {
+		free(flatArgs);
+		return B_BAD_ADDRESS;
+	}
+
+	// check and relocate the array
+	status_t error = B_OK;
+	const char* stringBase = (char*)flatArgs + argCount + envCount + 2;
+	const char* stringEnd = (char*)flatArgs + flatArgsSize;
+	for (int32 i = 0; i < argCount + envCount + 2; i++) {
+		if (i == argCount || i == argCount + envCount + 1) {
+			// check array null termination
+			if (flatArgs[i] != NULL) {
+				error = B_BAD_VALUE;
+				break;
+			}
+		} else {
+			// check string
+			char* arg = (char*)flatArgs + (flatArgs[i] - (char*)userFlatArgs);
+			size_t maxLen = stringEnd - arg;
+			if (arg < stringBase || arg >= stringEnd
+					|| strnlen(arg, maxLen) == maxLen) {
+				error = B_BAD_VALUE;
+				break;
+			}
+
+			flatArgs[i] = arg;
+		}
+	}
+
+	if (error == B_OK)
+		_flatArgs = flatArgs;
+	else
+		free(flatArgs);
+
+	return error;
+}
+
+
 static void
 free_team_arg(struct team_arg *teamArg)
 {
-	free_strings_array(teamArg->args, teamArg->arg_count);
-	free_strings_array(teamArg->env, teamArg->env_count);
-
-	free(teamArg);
+	if (teamArg != NULL) {
+		free(teamArg->flat_args);
+		free(teamArg->path);
+		free(teamArg);
+	}
 }
 
 
 static status_t
-create_team_arg(struct team_arg **_teamArg, int32 argCount, char * const *args,
-	int32 envCount, char * const *env, port_id port, uint32 token, bool kernel)
+create_team_arg(struct team_arg **_teamArg, const char *path, char** flatArgs,
+	size_t flatArgsSize, int32 argCount, int32 envCount, port_id port,
+	uint32 token)
 {
-	status_t status;
-	char **argsCopy;
-	char **envCopy;
-
-	struct team_arg *teamArg = (struct team_arg *)malloc(sizeof(struct team_arg));
+	struct team_arg *teamArg = (struct team_arg*)malloc(sizeof(team_arg));
 	if (teamArg == NULL)
 		return B_NO_MEMORY;
 
+	teamArg->path = strdup(path);
+	if (teamArg->path == NULL) {
+		free(teamArg);
+		return B_NO_MEMORY;
+	}
+
 	// copy the args over
-	
-	status = copy_strings_array(args, argCount, &argsCopy, kernel);
-	if (status != B_OK) {
-		free(teamArg);
-		return status;
-	}
 
-	status = copy_strings_array(env, envCount, &envCopy, kernel);
-	if (status != B_OK) {
-		free_strings_array(argsCopy, argCount);
-		free(teamArg);
-		return status;
-	}
-
+	teamArg->flat_args = flatArgs;
+	teamArg->flat_args_size = flatArgsSize;
 	teamArg->arg_count = argCount;
-	teamArg->args = argsCopy;
 	teamArg->env_count = envCount;
-	teamArg->env = envCopy;
 	teamArg->error_port = port;
 	teamArg->error_token = token;
 
@@ -1049,13 +955,12 @@ team_create_thread_start(void *args)
 	uint32 sizeLeft;
 	char **userArgs;
 	char **userEnv;
-	char *userDest;
 	struct user_space_program_args *programArgs;
 	uint32 argCount, envCount, i;
 
 	t = thread_get_current_thread();
 	team = t->team;
-	cache_node_launched(teamArgs->arg_count, teamArgs->args);
+	cache_node_launched(teamArgs->arg_count, teamArgs->flat_args);
 
 	TRACE(("team_create_thread_start: entry thread %ld\n", t->id));
 
@@ -1066,18 +971,19 @@ team_create_thread_start(void *args)
 
 	// Main stack area layout is currently as follows (starting from 0):
 	//
-	// size							| usage
-	// -----------------------------+--------------------------------
-	// USER_MAIN_THREAD_STACK_SIZE	| actual stack
-	// TLS_SIZE						| TLS data
-	// ENV_SIZE						| environment variables
-	// arguments size				| arguments passed to the team
+	// size								| usage
+	// ---------------------------------+--------------------------------
+	// USER_MAIN_THREAD_STACK_SIZE		| actual stack
+	// TLS_SIZE							| TLS data
+	// sizeof(user_space_program_args)	| argument structure for the runtime
+	//									| loader
+	// flat arguments size				| flat process arguments and environment
 
 	// ToDo: ENV_SIZE is a) limited, and b) not used after libroot copied it to the heap
 	// ToDo: we could reserve the whole USER_STACK_REGION upfront...
 
-	sizeLeft = PAGE_ALIGN(USER_MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
-		get_arguments_data_size(teamArgs->args, teamArgs->arg_count));
+	sizeLeft = PAGE_ALIGN(USER_MAIN_THREAD_STACK_SIZE + TLS_SIZE
+		+ sizeof(struct user_space_program_args) + teamArgs->flat_args_size);
 	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - sizeLeft;
 	t->user_stack_size = USER_MAIN_THREAD_STACK_SIZE;
 		// the exact location at the end of the user stack area
@@ -1099,57 +1005,13 @@ team_create_thread_start(void *args)
 	envCount = teamArgs->env_count;
 
 	programArgs = (struct user_space_program_args *)(t->user_stack_base
-		+ t->user_stack_size + TLS_SIZE + ENV_SIZE);
-	userArgs = (char **)(programArgs + 1);
-	userDest = (char *)(userArgs + argCount + 1);
+		+ t->user_stack_size + TLS_SIZE);
 
-	TRACE(("addr: stack base = 0x%lx, userArgs = %p, userDest = %p, sizeLeft = %lu\n",
-		t->user_stack_base, userArgs, userDest, sizeLeft));
+	userArgs = (char**)(programArgs + 1);
+	userEnv = userArgs + argCount + 1;
+	path = teamArgs->path;
 
-	sizeLeft = t->user_stack_base + sizeLeft - (addr_t)userDest;
-
-	for (i = 0; i < argCount; i++) {
-		ssize_t length = user_strlcpy(userDest, teamArgs->args[i], sizeLeft);
-		if (length < B_OK) {
-			argCount = 0;
-			break;
-		}
-
-		userArgs[i] = userDest;
-		userDest += ++length;
-		sizeLeft -= length;
-	}
-	userArgs[argCount] = NULL;
-
-	userEnv = (char **)(t->user_stack_base + t->user_stack_size + TLS_SIZE);
-	sizeLeft = ENV_SIZE;
-	userDest = (char *)userEnv + ENV_SIZE - 1;
-		// the environment variables are copied from back to front
-
-	TRACE(("team_create_thread_start: envc: %ld, env: %p\n",
-		teamArgs->env_count, (void *)teamArgs->env));
-
-	for (i = 0; i < envCount; i++) {
-		ssize_t length = strlen(teamArgs->env[i]) + 1;
-		userDest -= length;
-		if (userDest < (char *)&userEnv[envCount]) {
-			envCount = i;
-			break;
-		}
-
-		userEnv[i] = userDest;
-
-		if (user_memcpy(userDest, teamArgs->env[i], length) < B_OK) {
-			envCount = 0;
-			break;
-		}
-
-		sizeLeft -= length;
-	}
-	userEnv[envCount] = NULL;
-
-	path = teamArgs->args[0];
-	if (user_memcpy(programArgs->program_path, path,
+	if (user_strlcpy(programArgs->program_path, path,
 				sizeof(programArgs->program_path)) < B_OK
 		|| user_memcpy(&programArgs->arg_count, &argCount, sizeof(int32)) < B_OK
 		|| user_memcpy(&programArgs->args, &userArgs, sizeof(char **)) < B_OK
@@ -1158,7 +1020,9 @@ team_create_thread_start(void *args)
 		|| user_memcpy(&programArgs->error_port, &teamArgs->error_port,
 				sizeof(port_id)) < B_OK
 		|| user_memcpy(&programArgs->error_token, &teamArgs->error_token,
-				sizeof(uint32)) < B_OK) {
+				sizeof(uint32)) < B_OK
+		|| user_memcpy(userArgs, teamArgs->flat_args,
+				teamArgs->flat_args_size) < B_OK) {
 		// the team deletion process will clean this mess
 		return B_BAD_ADDRESS;
 	}
@@ -1170,7 +1034,7 @@ team_create_thread_start(void *args)
 	strlcpy(team->args, path, sizeof(team->args));
 	for (i = 1; i < argCount; i++) {
 		strlcat(team->args, " ", sizeof(team->args));
-		strlcat(team->args, teamArgs->args[i], sizeof(team->args));
+		strlcat(team->args, teamArgs->flat_args[i], sizeof(team->args));
 	}
 
 	free_team_arg(teamArgs);
@@ -1213,10 +1077,11 @@ team_create_thread_start(void *args)
 	different parameters; we should not make it public.
 */
 static thread_id
-load_image_etc(int32 argCount, char * const *args, int32 envCount,
-	char * const *env, int32 priority, uint32 flags,
-	port_id errorPort, uint32 errorToken, bool kernel)
+load_image_etc(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
+	int32 envCount, int32 priority, uint32 flags, port_id errorPort,
+	uint32 errorToken)
 {
+	char** flatArgs = _flatArgs;
 	struct team *team, *parent;
 	const char *threadName;
 	thread_id thread;
@@ -1225,13 +1090,15 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 	struct team_arg *teamArgs;
 	struct team_loading_info loadingInfo;
 
-	if (args == NULL || argCount == 0)
+	if (flatArgs == NULL || argCount == 0)
 		return B_BAD_VALUE;
 
-	TRACE(("load_image_etc: name '%s', args = %p, argCount = %ld\n",
-		args[0], args, argCount));
+	const char* path = flatArgs[0];
 
-	team = create_team_struct(args[0], false);
+	TRACE(("load_image_etc: name '%s', args = %p, argCount = %ld\n",
+		path, flatArgs, argCount));
+
+	team = create_team_struct(path, false);
 	if (team == NULL)
 		return B_NO_MEMORY;
 
@@ -1247,7 +1114,7 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 	// Inherit the parent's user/group, but also check the executable's
 	// set-user/group-id permission
 	inherit_parent_user_and_group(team, parent);
-	update_set_id_user_and_group(team, args[0]);
+	update_set_id_user_and_group(team, path);
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
@@ -1260,10 +1127,14 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	status = create_team_arg(&teamArgs, argCount, args, envCount, env,
-		errorPort, errorToken, kernel);
+	status = create_team_arg(&teamArgs, path, flatArgs, flatArgsSize, argCount,
+		envCount, errorPort, errorToken);
+
 	if (status != B_OK)
 		goto err1;
+
+	_flatArgs = NULL;
+		// args are owned by the team_arg structure now
 
 	// create a new io_context for this team
 	team->io_context = vfs_new_io_context(parent->io_context);
@@ -1282,11 +1153,11 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 		goto err3;
 
 	// cut the path from the main thread name
-	threadName = strrchr(args[0], '/');
+	threadName = strrchr(path, '/');
 	if (threadName != NULL)
 		threadName++;
 	else
-		threadName = args[0];
+		threadName = path;
 
 	// create the user data area
 	status = create_team_user_data(team);
@@ -1373,9 +1244,10 @@ err1:
 	This function may only be called from user space.
 */
 static status_t
-exec_team(const char *path, int32 argCount, char * const *args,
-	int32 envCount, char * const *env)
+exec_team(const char *path, char**& _flatArgs, size_t flatArgsSize,
+	int32 argCount, int32 envCount)
 {
+	char** flatArgs = _flatArgs;
 	struct team *team = thread_get_current_thread()->team;
 	struct team_arg *teamArgs;
 	const char *threadName;
@@ -1385,7 +1257,9 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	thread_id nubThreadID = -1;
 
 	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %ld\n",
-		args[0], argCount, envCount, team->id));
+		path, argCount, envCount, team->id));
+
+	T(ExecTeam(path, argCount, flatArgs, envCount, flatArgs + argCount + 1));
 
 	// switching the kernel at run time is probably not a good idea :)
 	if (team == team_get_kernel_team())
@@ -1422,17 +1296,14 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	if (status != B_OK)
 		return status;
 
-	status = create_team_arg(&teamArgs, argCount, args, envCount, env,
-		-1, 0, false);
+	status = create_team_arg(&teamArgs, path, flatArgs, flatArgsSize, argCount,
+		envCount, -1, 0);
+
 	if (status != B_OK)
 		return status;
 
-	T(ExecTeam(path, teamArgs->arg_count, teamArgs->args, envCount, env));
-		// trace here, so we don't have to deal with the user addresses
-
-	// replace args[0] with the path argument, just to be on the safe side
-	free(teamArgs->args[0]);
-	teamArgs->args[0] = strdup(path);
+	_flatArgs = NULL;
+		// args are owned by the team_arg structure now
 
 	// ToDo: remove team resources if there are any left
 	// thread_atkernel_exit() might not be called at all
@@ -2740,15 +2611,59 @@ team_free_user_thread(struct thread* thread)
 thread_id
 load_image(int32 argCount, const char **args, const char **env)
 {
+	// we need to flatten the args and environment
+
+	if (args == NULL)
+		return B_BAD_VALUE;
+
+	// determine total needed size
+	int32 argSize = 0;
+	for (int32 i = 0; i < argCount; i++)
+		argSize += strlen(args[i]) + 1;
+
 	int32 envCount = 0;
+	int32 envSize = 0;
+	while (env != NULL && env[envCount] != NULL)
+		envSize += strlen(env[envCount++]) + 1;
 
-	// count env variables
-	while (env && env[envCount] != NULL)
-		envCount++;
+	int32 size = (argCount + envCount + 2) * sizeof(char*) + argSize + envSize;
+	if (size > MAX_PROCESS_ARGS_SIZE)
+		return B_TOO_MANY_ARGS;
 
-	return load_image_etc(argCount, (char * const *)args, envCount,
-		(char * const *)env, B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED,
-		-1, 0, true);
+	// allocate space
+	char** flatArgs = (char**)malloc(size);
+	if (flatArgs == NULL)
+		return B_NO_MEMORY;
+
+	char** slot = flatArgs;
+	char* stringSpace = (char*)(flatArgs + argCount + envCount + 2);
+
+	// copy arguments and environment
+	for (int32 i = 0; i < argCount; i++) {
+		int32 argSize = strlen(args[i]) + 1;
+		memcpy(stringSpace, args[i], argSize);
+		*slot++ = stringSpace;
+		stringSpace += argSize;
+	}
+
+	*slot++ = NULL;
+
+	for (int32 i = 0; i < envCount; i++) {
+		int32 envSize = strlen(env[i]) + 1;
+		memcpy(stringSpace, env[i], envSize);
+		*slot++ = stringSpace;
+		stringSpace += envSize;
+	}
+
+	*slot++ = NULL;
+
+	thread_id thread = load_image_etc(flatArgs, size, argCount, envCount,
+		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED, -1, 0);
+
+	free(flatArgs);
+		// load_image_etc() unset our variable if it took over ownership
+
+	return thread;
 }
 
 
@@ -3031,21 +2946,28 @@ getsid(pid_t process)
 
 
 status_t
-_user_exec(const char *userPath, int32 argCount, char * const *userArgs,
-	int32 envCount, char * const *userEnvironment)
+_user_exec(const char *userPath, const char* const* userFlatArgs,
+	size_t flatArgsSize, int32 argCount, int32 envCount)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	if (argCount < 1)
-		return B_BAD_VALUE;
-
-	if (!IS_USER_ADDRESS(userPath) || !IS_USER_ADDRESS(userArgs)
-		|| !IS_USER_ADDRESS(userEnvironment)
+	if (!IS_USER_ADDRESS(userPath) || !IS_USER_ADDRESS(userFlatArgs)
 		|| user_strlcpy(path, userPath, sizeof(path)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return exec_team(path, argCount, userArgs, envCount, userEnvironment);
-		// this one only returns in case of error
+	// copy and relocate the flat arguments
+	char** flatArgs;
+	status_t error = copy_user_process_args(userFlatArgs, flatArgsSize,
+		argCount, envCount, flatArgs);
+
+	if (error == B_OK) {
+		error = exec_team(path, flatArgs, _ALIGN(flatArgsSize), argCount,
+			envCount);
+			// this one only returns in case of error
+	}
+
+	free(flatArgs);
+	return error;
 }
 
 
@@ -3320,22 +3242,30 @@ _user_wait_for_team(team_id id, status_t *_userReturnCode)
 }
 
 
-team_id
-_user_load_image(int32 argCount, const char **userArgs, int32 envCount,
-	const char **userEnv, int32 priority, uint32 flags, port_id errorPort,
-	uint32 errorToken)
+thread_id
+_user_load_image(const char* const* userFlatArgs, size_t flatArgsSize,
+	int32 argCount, int32 envCount, int32 priority, uint32 flags,
+	port_id errorPort, uint32 errorToken)
 {
 	TRACE(("_user_load_image_etc: argc = %ld\n", argCount));
 
-	if (argCount < 1 || userArgs == NULL || userEnv == NULL)
+	if (argCount < 1)
 		return B_BAD_VALUE;
 
-	if (!IS_USER_ADDRESS(userArgs) || !IS_USER_ADDRESS(userEnv))
-		return B_BAD_ADDRESS;
+	// copy and relocate the flat arguments
+	char** flatArgs;
+	status_t error = copy_user_process_args(userFlatArgs, flatArgsSize,
+		argCount, envCount, flatArgs);
+	if (error != B_OK)
+		return error;
 
-	return load_image_etc(argCount, (char * const *)userArgs,
-		envCount, (char * const *)userEnv, priority, flags, errorPort,
-		errorToken, false);
+	thread_id thread = load_image_etc(flatArgs, _ALIGN(flatArgsSize), argCount,
+		envCount, priority, flags, errorPort, errorToken);
+
+	free(flatArgs);
+		// load_image_etc() unset our variable if it took over ownership
+
+	return thread;
 }
 
 

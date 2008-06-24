@@ -15,6 +15,10 @@
 
 #define MAGIC_APP_NAME	"_APP_"
 
+#define MAX_PROCESS_ARGS_SIZE	(128 * 1024)
+	// maximal total size needed for process arguments and environment strings
+
+
 struct user_space_program_args {
 	char	program_name[B_OS_NAME_LENGTH];
 	char	program_path[B_PATH_NAME_LENGTH];

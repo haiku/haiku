@@ -43,8 +43,18 @@ load_image(int32 argCount, const char **args, const char **environ)
 	while (environ[envCount] != NULL)
 		envCount++;
 
-	thread = _kern_load_image(argCount, args, envCount, environ,
-		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED, -1, 0);
+	char** flatArgs = NULL;
+	size_t flatArgsSize;
+	status_t status = __flatten_process_args(args, argCount, environ, envCount,
+		&flatArgs, &flatArgsSize);
+
+	if (status == B_OK) {
+		thread = _kern_load_image(flatArgs, flatArgsSize, argCount, envCount,
+			B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED, -1, 0);
+
+		free(flatArgs);
+	} else
+		thread = status;
 
 	free(newArgs);
 	return thread;
@@ -159,7 +169,7 @@ __parse_invoke_line(char *invoker, char ***_newArgs,
 	}
 
 	// this is a shell script and requires special treatment
-	newArgs = malloc((*_argCount + count + 1) * sizeof(void *));
+	newArgs = (char**)malloc((*_argCount + count + 1) * sizeof(void *));
 	if (newArgs == NULL)
 		return B_NO_MEMORY;
 
@@ -170,7 +180,7 @@ __parse_invoke_line(char *invoker, char ***_newArgs,
 	}
 	for (i = 0; i < *_argCount; i++) {
 		if (i == 0)
-			newArgs[i + count] = arg0;
+			newArgs[i + count] = (char*)arg0;
 		else
 			newArgs[i + count] = (char *)(*_oldArgs)[i];
 	}
@@ -199,7 +209,72 @@ __test_executable(const char *path, char *invoker)
 }
 
 
-void _call_init_routines_(void);
+/*!	Allocates a flat buffer and copies the argument and environment strings
+	into it. The buffer starts with a char* array which contains pointers to
+	the strings of the arguments and environment, followed by the strings. Both
+	arguments and environment arrays are NULL-terminated.
+*/
+status_t
+__flatten_process_args(const char* const* args, int32 argCount,
+	const char* const* env, int32 envCount, char*** _flatArgs,
+	size_t* _flatSize)
+{
+	if (args == NULL || env == NULL)
+		return B_BAD_VALUE;
+
+	// determine total needed size
+	int32 argSize = 0;
+	for (int32 i = 0; i < argCount; i++) {
+		if (args[i] == NULL)
+			return B_BAD_VALUE;
+		argSize += strlen(args[i]) + 1;
+	}
+
+	int32 envSize = 0;
+	for (int32 i = 0; i < envCount; i++) {
+		if (env[i] == NULL)
+			return B_BAD_VALUE;
+		envSize += strlen(env[i]) + 1;
+	}
+
+	int32 size = (argCount + envCount + 2) * sizeof(char*) + argSize + envSize;
+	if (size > MAX_PROCESS_ARGS_SIZE)
+		return B_TOO_MANY_ARGS;
+
+	// allocate space
+	char** flatArgs = (char**)malloc(size);
+	if (flatArgs == NULL)
+		return B_NO_MEMORY;
+
+	char** slot = flatArgs;
+	char* stringSpace = (char*)(flatArgs + argCount + envCount + 2);
+
+	// copy arguments and environment
+	for (int32 i = 0; i < argCount; i++) {
+		int32 argSize = strlen(args[i]) + 1;
+		memcpy(stringSpace, args[i], argSize);
+		*slot++ = stringSpace;
+		stringSpace += argSize;
+	}
+
+	*slot++ = NULL;
+
+	for (int32 i = 0; i < envCount; i++) {
+		int32 envSize = strlen(env[i]) + 1;
+		memcpy(stringSpace, env[i], envSize);
+		*slot++ = stringSpace;
+		stringSpace += envSize;
+	}
+
+	*slot++ = NULL;
+
+	*_flatArgs = flatArgs;
+	*_flatSize = size;
+	return B_OK;
+}
+
+
+extern "C" void _call_init_routines_(void);
 void
 _call_init_routines_(void)
 {

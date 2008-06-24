@@ -16,6 +16,7 @@
 
 #include <debugger.h>
 #include <image.h>
+#include <libroot_private.h>
 #include <syscalls.h>
 
 #include "Context.h"
@@ -228,14 +229,25 @@ load_program(const char *const *args, int32 argCount, bool traceLoading)
 	while (environ[envCount] != NULL)
 		envCount++;
 
+	// flatten the program args and environment
+	char** flatArgs = NULL;
+	size_t flatArgsSize;
+	error = __flatten_process_args(mutableArgs, argCount, environ, envCount,
+		&flatArgs, &flatArgsSize);
+
 	// load the program
-	error = _kern_load_image(argCount, mutableArgs, envCount,
-		(const char**)environ, B_NORMAL_PRIORITY,
-		(traceLoading ? 0 : B_WAIT_TILL_LOADED), -1, 0);
+	thread_id thread;
+	if (error == B_OK) {
+		thread = _kern_load_image(flatArgs, flatArgsSize, argCount, envCount,
+			B_NORMAL_PRIORITY, (traceLoading ? 0 : B_WAIT_TILL_LOADED), -1, 0);
+
+		free(flatArgs);
+	} else
+		thread = error;
 
 	delete[] mutableArgs;
 
-	return error;
+	return thread;
 }
 
 // set_team_debugging_flags
