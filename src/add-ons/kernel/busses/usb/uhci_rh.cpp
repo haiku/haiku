@@ -136,7 +136,7 @@ UHCIRootHub::ProcessTransfer(UHCI *uhci, Transfer *transfer)
 		return B_ERROR;
 
 	usb_request_data *request = transfer->RequestData();
-	TRACE(("usb_ohci_roothub: request: %d\n", request->Request));
+	TRACE(("usb_uhci_roothub: request: %d\n", request->Request));
 
 	status_t status = B_TIMED_OUT;
 	size_t actualLength = 0;
