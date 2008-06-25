@@ -186,7 +186,7 @@ BPoseView::BPoseView(Model *model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fCountView(NULL),
 	fUpdateRegion(new BRegion),				// does this need to be allocated ??
 	fDropTarget(NULL),
-	fDropTargetWasSelected(false),
+	fAlreadySelectedDropTarget(NULL),
 	fSelectionHandler(be_app),
 	fLastClickPt(LONG_MAX, LONG_MAX),
 	fLastClickTime(0),
@@ -8844,10 +8844,24 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 	if (!fDropTarget)
 		return;
 
-	// drop target already has the desired state
-	if (fDropTarget->IsSelected() == hiliteState || (!hiliteState && fDropTargetWasSelected)) {
-		fDropTargetWasSelected = hiliteState;
-		return;
+	// note: fAlreadySelectedDropTarget is a trick to avoid to really search
+	// fSelectionList. Another solution would be to add Hilite/IsHilited just
+	// like Select/IsSelected in BPose and let it handle this case internally
+	
+	// can happen when starting a new drag
+	if (fAlreadySelectedDropTarget != fDropTarget)		
+		fAlreadySelectedDropTarget = NULL;	
+	
+	// don't select, this droptarget was already part of a user selection
+	if (fDropTarget->IsSelected() && hiliteState) {		
+		fAlreadySelectedDropTarget = fDropTarget;		
+		return;	
+ 	} 	
+	
+	// don't unselect the fAlreadySelectedDropTarget 
+	if ((fAlreadySelectedDropTarget == fDropTarget) && !hiliteState) {
+		fAlreadySelectedDropTarget = NULL;
+		return;	
 	}
 
 	fDropTarget->Select(hiliteState);

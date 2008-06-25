@@ -613,7 +613,7 @@ class BPoseView : public BView {
 		float fIconPoseHeight;
 		BRegion *fUpdateRegion;
 		BPose *fDropTarget;
-		bool fDropTargetWasSelected;
+		BPose *fAlreadySelectedDropTarget;
 		BLooper *fSelectionHandler;
 		BPoint fLastClickPt;
 		bigtime_t fLastClickTime;
