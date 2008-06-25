@@ -307,8 +307,7 @@ class Vnode {
 
 		status_t Get(Inode** _inode)
 		{
-			if (fStatus == B_OK)
-				*_inode = fInode;
+			*_inode = fInode;
 			return fStatus;
 		}
 
@@ -327,7 +326,7 @@ class AttributeIterator {
 	public:
 		AttributeIterator(Inode *inode);
 		~AttributeIterator();
-		
+
 		status_t Rewind();
 		status_t GetNext(char *name, size_t *length, uint32 *type, ino_t *id);
 
