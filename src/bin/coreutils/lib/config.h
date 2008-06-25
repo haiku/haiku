@@ -1411,7 +1411,7 @@
 /* #undef HAVE___FSETLOCKING */
 
 /* The host operating system. */
-#define HOST_OPERATING_SYSTEM "BeOS"
+#define HOST_OPERATING_SYSTEM "Haiku"
 
 /* Define as const if the declaration of iconv() needs const. */
 /* #undef ICONV_CONST */
