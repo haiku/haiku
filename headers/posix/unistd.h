@@ -34,7 +34,7 @@
 #define _POSIX_JOB_CONTROL		1
 #define _POSIX_NO_TRUNC			0
 #define _POSIX_SAVED_IDS		1
-#define _POSIX_VDISABLE			((char)-2)	/* TODO: Check this! */
+#define _POSIX_VDISABLE			((char) - 2)	/* TODO: Check this! */
 #define _POSIX_SEMAPHORES		(200112L)
 #define _POSIX_THREADS			(200112L)
 
@@ -88,7 +88,7 @@
 #define _SC_THREADS				31
 /* TODO: check and reorder */
 #define _SC_IOV_MAX				32
-#define _SC_UIO_MAXIOV			_CS_IOV_MAX
+#define _SC_UIO_MAXIOV			_SC_IOV_MAX
 #define _SC_NPROCESSORS_MAX		33
 #define _SC_NPROCESSORS_CONF	34
 #define _SC_NPROCESSORS_ONLN	35
