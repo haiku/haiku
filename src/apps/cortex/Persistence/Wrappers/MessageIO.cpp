@@ -2,6 +2,7 @@
 
 #include "MessageIO.h"
 
+#include <BeBuild.h>
 #include <Debug.h>
 
 #include <cstdlib>
@@ -118,6 +119,9 @@ void MessageIO::xmlExportContent(
 	typedef vector<BString> field_set;
 	field_set fields;
 	
+#ifdef B_BEOS_VERSION_DANO
+	const 
+#endif
 	char* name;
 	type_code type;
 	int32 count;

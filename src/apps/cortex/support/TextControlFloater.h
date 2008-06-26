@@ -15,6 +15,7 @@
 #include <Messenger.h>
 #include <Window.h>
 
+class BFont;
 class BTextControl;
 
 #include "cortex_defs.h"
