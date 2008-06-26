@@ -599,6 +599,7 @@ AudioProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 			if (RunState() != B_STARTED) {
 				fFramesSent = 0;
 				fStartTime = event->event_time;
+printf("B_START: start time: %lld\n", fStartTime);
 				media_timed_event firstBufferEvent(fStartTime,
 					BTimedEventQueue::B_HANDLE_BUFFER);
 				EventQueue()->AddEvent(firstBufferEvent);
@@ -630,8 +631,7 @@ AudioProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 						& media_raw_audio_format::B_AUDIO_SIZE_MASK;
 
 				size_t nFrames = fOutput.format.u.raw_audio.buffer_size
-								 / (sampleSize
-								 * fOutput.format.u.raw_audio.channel_count);
+					/ (sampleSize * fOutput.format.u.raw_audio.channel_count);
 				fFramesSent += nFrames;
 	
 				bigtime_t nextEvent = fStartTime
@@ -640,6 +640,8 @@ AudioProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 				media_timed_event nextBufferEvent(nextEvent,
 					BTimedEventQueue::B_HANDLE_BUFFER);
 				EventQueue()->AddEvent(nextBufferEvent);
+			} else {
+				fprintf(stderr, "B_HANDLE_BUFFER, but not started!\n");
 			}
 			TRACE("AudioProducer::HandleEvent(B_HANDLE_BUFFER) done\n");
 			break;
@@ -692,7 +694,7 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 		fOutput.format.u.raw_audio.buffer_size, BufferDuration());
 
 	if (!buffer) {
-		TRACE("AudioProducer::_FillNextBuffer() - no buffer\n");
+		ERROR("AudioProducer::_FillNextBuffer() - no buffer\n");
 		return NULL;
 	}
 
@@ -719,7 +721,7 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 	if (!fSupplier || fSupplier->InitCheck() != B_OK
 		|| fSupplier->GetFrames(buffer->Data(), frameCount, startTime,
 			endTime) != B_OK) {
-		TRACE("AudioProducer::_FillNextBuffer() - error -> silence\n");
+		ERROR("AudioProducer::_FillNextBuffer() - supplier error -> silence\n");
 		memset(buffer->Data(), 0, buffer->SizeUsed());
 	}
 

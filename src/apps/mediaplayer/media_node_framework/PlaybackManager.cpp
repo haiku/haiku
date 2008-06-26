@@ -370,6 +370,7 @@ PlaybackManager::SetCurrentFrame(int64 frame)
 void
 PlaybackManager::SetPlayMode(int32 mode, bool continuePlaying)
 {
+//printf("PlaybackManager::SetPlayMode(%ld, %d)\n", mode, continuePlaying);
 	PlayingState* newState = new PlayingState(*_LastState());
 	newState->play_mode = mode;
 	// Jump to the playing start frame if we should not continue, where we
@@ -603,6 +604,8 @@ PlaybackManager::PlaylistFrameAtFrame(int64 frame, int32& playingDirection,
 		result = _FrameForRangeFrame(state, index);
 	}
 //TRACE("PlaybackManager::PlaylistFrameAtFrame() done: %lld\n", result);
+//printf("PlaybackManager::PlaylistFrameAtFrame(%lld): %lld, direction: %ld\n",
+//	frame, result, playingDirection);
 	return result;
 }
 
@@ -791,7 +794,7 @@ if (!info) {
 	else if (TimeForFrame(frame + 1) <= time)
 		frame++;
 //TRACE("PlaybackManager::FrameForTime() done: %lld\n", frame);
-//fprintf(stderr, "PlaybackManager::FrameForTime(%lld): %lld\n", time, frame);
+//printf("PlaybackManager::FrameForTime(%lld): %lld\n", time, frame);
 	return frame;
 }
 
@@ -1563,6 +1566,7 @@ PlaybackManager::_TimeForNextFrame() const
 void
 PlaybackManager::_CheckStopPlaying()
 {
+//printf("_CheckStopPlaying() - %lld, next: %lld\n", fStopPlayingFrame, NextFrame());
 	if (fStopPlayingFrame >= 0 && fStopPlayingFrame <= NextFrame()) {
 		StopPlaying();
 		NotifyStopFrameReached();
