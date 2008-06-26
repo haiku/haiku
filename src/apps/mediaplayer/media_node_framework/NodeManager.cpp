@@ -155,7 +155,11 @@ NodeManager::RealTimeForTime(bigtime_t time) const
 	if (fVideoProducer) {
 		result = fVideoProducer->TimeSource()->RealTimeFor(
 			fPerformanceTimeBase + time, 0);
+	} else if (fAudioProducer) {
+		result = fAudioProducer->TimeSource()->RealTimeFor(
+			fPerformanceTimeBase + time, 0);
 	}
+//printf("NodeManager::RealTimeForTime(%lld) -> %lld\n", time, result);
 	return result;
 }
 
@@ -577,97 +581,103 @@ NodeManager::_StartNodes()
 	if (!fMediaRoster || !fAudioProducer)
 		return status;
 	// begin mucking with the media roster
-	if (fMediaRoster->Lock()) {
-		bigtime_t latency = 0;
-		bigtime_t initLatency = 0;
-		if (fVideoProducer && fVideoConsumer) {
-			// figure out what recording delay to use
-			status = fMediaRoster->GetLatencyFor(fVideoConnection.producer,
-				&latency);
-			if (status < B_OK) {
-				print_error("error getting latency for video producer",
-					status);	
-			} else
-				TRACE("video latency: %Ld\n", latency);
-			status = fMediaRoster->SetProducerRunModeDelay(
-				fVideoConnection.producer, latency);
-			if (status < B_OK) {
-				print_error("error settings run mode delay for video producer",
-					status);	
-			}
-		
-			// start the nodes
-			status = fMediaRoster->GetInitialLatencyFor(
-				fVideoConnection.producer, &initLatency);
-			if (status < B_OK) {
-				print_error("error getting initial latency for video producer",
-					status);	
-			}
-		}
-		initLatency += estimate_max_scheduling_latency();
-	
-		bigtime_t audioLatency = 0;
-		status = fMediaRoster->GetLatencyFor(fAudioConnection.producer,
-			&audioLatency);
-		TRACE("audio latency: %Ld\n", audioLatency);
-		
-		BTimeSource* timeSource;
-		if (fVideoProducer) {
-			timeSource = fMediaRoster->MakeTimeSourceFor(
-				fVideoConnection.producer);
-		} else {
-			timeSource = fMediaRoster->MakeTimeSourceFor(
-				fAudioConnection.producer);
-		}
-		bool running = timeSource->IsRunning();
-		
-		// workaround for people without sound cards
-		// because the system time source won't be running
-		bigtime_t real = BTimeSource::RealTime();
-		if (!running) {
-			status = fMediaRoster->StartTimeSource(fTimeSource, real);
-			if (status != B_OK) {
-				timeSource->Release();
-				print_error("cannot start time source!", status);
-				return status;
-			}
-			status = fMediaRoster->SeekTimeSource(fTimeSource, 0, real);
-			if (status != B_OK) {
-				timeSource->Release();
-				print_error("cannot seek time source!", status);
-				return status;
-			}
-		}
+	if (!fMediaRoster->Lock())
+		return B_ERROR;
 
-		bigtime_t perf = timeSource->PerformanceTimeFor(real + latency
-			+ initLatency);
-
-		timeSource->Release();
+	bigtime_t latency = 0;
+	bigtime_t initLatency = 0;
+	if (fVideoProducer && fVideoConsumer) {
+		// figure out what recording delay to use
+		status = fMediaRoster->GetLatencyFor(fVideoConnection.producer,
+			&latency);
+		if (status < B_OK) {
+			print_error("error getting latency for video producer",
+				status);	
+		} else
+			TRACE("video latency: %Ld\n", latency);
+		status = fMediaRoster->SetProducerRunModeDelay(
+			fVideoConnection.producer, latency);
+		if (status < B_OK) {
+			print_error("error settings run mode delay for video producer",
+				status);	
+		}
 	
 		// start the nodes
-		if (fVideoProducer && fVideoConsumer) {
-			status = fMediaRoster->StartNode(fVideoConnection.consumer, perf);
-			if (status != B_OK) {
-				print_error("Can't start the video consumer", status);
-				return status;
-			}
-			status = fMediaRoster->StartNode(fVideoConnection.producer, perf);
-			if (status != B_OK) {
-				print_error("Can't start the video producer", status);
-				return status;
-			}
+		status = fMediaRoster->GetInitialLatencyFor(
+			fVideoConnection.producer, &initLatency);
+		if (status < B_OK) {
+			print_error("error getting initial latency for video producer",
+				status);	
 		}
+	}
+	initLatency += estimate_max_scheduling_latency();
+
+	bigtime_t audioLatency = 0;
+	status = fMediaRoster->GetLatencyFor(fAudioConnection.producer,
+		&audioLatency);
+	TRACE("audio latency: %Ld\n", audioLatency);
 	
-		fAudioProducer->SetRunning(true);
-		status = fMediaRoster->StartNode(fAudioConnection.producer, perf);
+	BTimeSource* timeSource;
+	if (fVideoProducer) {
+		timeSource = fMediaRoster->MakeTimeSourceFor(
+			fVideoConnection.producer);
+	} else {
+		timeSource = fMediaRoster->MakeTimeSourceFor(
+			fAudioConnection.producer);
+	}
+	bool running = timeSource->IsRunning();
+	
+	// workaround for people without sound cards
+	// because the system time source won't be running
+	bigtime_t real = BTimeSource::RealTime();
+	if (!running) {
+		status = fMediaRoster->StartTimeSource(fTimeSource, real);
 		if (status != B_OK) {
-			print_error("Can't start the audio producer", status);
+			timeSource->Release();
+			print_error("cannot start time source!", status);
 			return status;
 		}
-		fPerformanceTimeBase = perf;
-		// done mucking with the media roster
-		fMediaRoster->Unlock();
+		status = fMediaRoster->SeekTimeSource(fTimeSource, 0, real);
+		if (status != B_OK) {
+			timeSource->Release();
+			print_error("cannot seek time source!", status);
+			return status;
+		}
 	}
+
+	bigtime_t perf = timeSource->PerformanceTimeFor(real + latency
+		+ initLatency);
+printf("performance time for %lld: %lld\n", real + latency
+	+ initLatency, perf);
+
+	timeSource->Release();
+
+	// start the nodes
+	if (fVideoProducer && fVideoConsumer) {
+		status = fMediaRoster->StartNode(fVideoConnection.consumer, perf);
+		if (status != B_OK) {
+			print_error("Can't start the video consumer", status);
+			return status;
+		}
+		status = fMediaRoster->StartNode(fVideoConnection.producer, perf);
+		if (status != B_OK) {
+			print_error("Can't start the video producer", status);
+			return status;
+		}
+	}
+
+	fAudioProducer->SetRunning(true);
+	status = fMediaRoster->StartNode(fAudioConnection.producer, perf);
+	if (status != B_OK) {
+		print_error("Can't start the audio producer", status);
+		return status;
+	}
+
+	fPerformanceTimeBase = perf;
+
+	// done mucking with the media roster
+	fMediaRoster->Unlock();
+
 	return status;
 }
 
