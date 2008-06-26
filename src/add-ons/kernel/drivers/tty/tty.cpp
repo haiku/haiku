@@ -789,7 +789,7 @@ reset_termios(struct termios &termios)
 	// control characters	
 	termios.c_cc[VINTR] = CTRL('C');
 	termios.c_cc[VQUIT] = CTRL('\\');
-	termios.c_cc[VERASE] = CTRL('H');
+	termios.c_cc[VERASE] = 0x7f;
 	termios.c_cc[VKILL] = CTRL('U');
 	termios.c_cc[VEOF] = CTRL('D');
 	termios.c_cc[VEOL] = '\0';
@@ -1231,10 +1231,10 @@ process_output_char(struct tty* tty, char c, char* buffer,
 	if (flags & OPOST) {
 		if (echoed && c == tty->settings->termios.c_cc[VERASE]) {
 			if (tty->settings->termios.c_lflag & ECHOE) {
-				// ERASE -> ERASE SPACE ERASE
-				buffer[0] = tty->settings->termios.c_cc[VERASE];
+				// ERASE -> BS SPACE BS
+				buffer[0] = CTRL('H');
 				buffer[1] = ' ';
-				buffer[2] = tty->settings->termios.c_cc[VERASE];
+				buffer[2] = CTRL('H');;
 				*_bytesWritten = 3;
 				return;
 			}
