@@ -1147,7 +1147,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	BMessage *currentMessage = Looper()->CurrentMessage();
 	if (currentMessage == NULL)
 		return;
-	
+
 	currentMessage->FindInt32("modifiers", &mod);
 	currentMessage->FindInt32("key", &key);
 	currentMessage->FindInt32("raw_char", &rawChar);
@@ -1155,7 +1155,6 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	_ActivateCursor(true);
 
 	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
-	// TODO: Cleanup
 	if (numBytes == 1) {
 		const char *toWrite = NULL;
 		switch (*bytes) {
@@ -1169,7 +1168,10 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				break;
 
 			case B_BACKSPACE:
-				toWrite = BACKSPACE_KEY_CODE;
+				// Translate only the actual backspace key to the backspace
+				// code. CTRL-H shall just be echoed.
+				if (!((mod & B_CONTROL_KEY) && rawChar == 'h'))
+					toWrite = BACKSPACE_KEY_CODE;
 				break;
 
 			case B_LEFT_ARROW:
