@@ -708,23 +708,6 @@ Controller::_PlaybackState(int32 playingMode) const
 }
 
 
-void
-Controller::_EndOfStreamReached(bool isVideo)
-{
-	// you need to hold the fDataLock
-
-	// prefer end of audio stream over end of video stream
-	if (isVideo && fAudioTrackSupplier)
-		return;
-
-	// NOTE: executed in audio/video decode thread
-	if (!fStopped) {
-		fPauseAtEndOfStream = true;
-		_NotifyFileFinished();
-	}
-}
-
-
 // #pragma mark - Notifications
 
 

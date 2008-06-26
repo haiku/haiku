@@ -124,7 +124,6 @@ public:
 
 private:
 			uint32				_PlaybackState(int32 playingMode) const;
-			void				_EndOfStreamReached(bool isVideo = false);
 
 			void				_NotifyFileChanged() const;
 			void				_NotifyFileFinished() const;
