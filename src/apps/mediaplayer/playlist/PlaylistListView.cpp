@@ -384,10 +384,15 @@ PlaylistListView::_FullSync()
 	if (!fPlaylist->Lock())
 		return;
 
-	// TODO: detach scrollbar, and this will be quick...
-//	BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
-//	SetScrollBar();
-//
+	// detaching the scrollbar temporarily will
+	// make this much quicker
+	BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
+	if (scrollBar) {
+		if (Window())
+			Window()->UpdateIfNeeded();
+		scrollBar->SetTarget((BView*)NULL);
+	}
+
 	MakeEmpty();
 
 	int32 count = fPlaylist->CountItems();
@@ -399,6 +404,12 @@ PlaylistListView::_FullSync()
 
 	_SetCurrentPlaylistIndex(fPlaylist->CurrentRefIndex());
 	_SetPlaybackState(fController->PlaybackState());
+
+	// reattach scrollbar and sync it by calling FrameResized()
+	if (scrollBar) {
+		scrollBar->SetTarget(this);
+		FrameResized(Bounds().Width(), Bounds().Height());
+	}
 
 	fPlaylist->Unlock();
 }
