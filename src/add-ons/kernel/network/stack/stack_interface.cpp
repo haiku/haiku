@@ -84,7 +84,10 @@ stack_interface_recvfrom(net_socket* socket, void* data, size_t length,
 	msghdr message;
 	iovec vecs[1] = { { data, length } };
 	message.msg_name = address;
-	message.msg_namelen = *_addressLength;
+	if (_addressLength != NULL)
+		message.msg_namelen = *_addressLength;
+	else
+		message.msg_namelen = 0;
 	message.msg_iov = vecs;
 	message.msg_iovlen = 1;
 	message.msg_control = NULL;
