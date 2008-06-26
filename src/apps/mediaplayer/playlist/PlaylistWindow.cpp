@@ -145,6 +145,7 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			fOpenPanel->Show();
 			break;						
 		case M_PLAYLIST_EMPTY:
+			fListView->RemoveAll();
 			break;						
 		default:
 			BWindow::MessageReceived(message);

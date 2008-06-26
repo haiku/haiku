@@ -717,6 +717,21 @@ DragSortableListView::RemoveSelected()
 		RemoveItemList(indices);
 }
 
+// RemoveAll
+void
+DragSortableListView::RemoveAll()
+{
+	BList indices;
+	int32 count = CountItems();
+	for (int32 i = 0; i < count; i++) {
+		if (!indices.AddItem((void*)i))
+			break;
+	}
+
+	if (indices.CountItems() > 0)
+		RemoveItemList(indices);
+}
+
 // CountSelectedItems
 int32
 DragSortableListView::CountSelectedItems() const
