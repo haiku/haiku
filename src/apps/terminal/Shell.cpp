@@ -425,7 +425,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		/* set control characters. */
 		tio.c_cc[VINTR]  = 'C' & 0x1f;	/* '^C'	*/
 		tio.c_cc[VQUIT]  = CQUIT;		/* '^\'	*/
-		tio.c_cc[VERASE] = 0x08;		/* '^H'	*/
+		tio.c_cc[VERASE] = 0x7f;		/* '^?'	*/
 		tio.c_cc[VKILL]  = 'U' & 0x1f;	/* '^U'	*/
 		tio.c_cc[VEOF]   = CEOF;		/* '^D' */
 		tio.c_cc[VEOL]   = CEOL;		/* '^@' */
