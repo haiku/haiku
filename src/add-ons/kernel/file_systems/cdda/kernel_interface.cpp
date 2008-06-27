@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -76,11 +76,11 @@ enum attr_mode {
 
 class Volume {
 	public:
-		Volume(dev_t id);
+		Volume(fs_volume *fsVolume);
 		~Volume();
 
 		status_t	InitCheck();
-		dev_t		ID() const { return fID; }
+		fs_volume	*FSVolume() const { return fFSVolume; }
 		uint32		DiscID() const { return fDiscID; }
 		Inode		&RootNode() const { return *fRootNode; }
 
@@ -115,6 +115,7 @@ class Volume {
 		void		_StoreSharedAttributes();
 
 		Semaphore	fLock;
+		fs_volume	*fFSVolume;
 		int			fDevice;
 		dev_t		fID;
 		uint32		fDiscID;
@@ -245,6 +246,9 @@ struct file_cookie {
 
 static const uint32 kMaxAttributeSize = 65536;
 static const uint32 kMaxAttributes = 64;
+
+extern fs_volume_ops gCDDAVolumeOps;
+extern fs_vnode_ops gCDDAVnodeOps;
 
 
 //	#pragma mark helper functions
@@ -419,7 +423,7 @@ static void
 fill_stat_buffer(Volume *volume, Inode *inode, Attribute *attribute,
 	struct stat &stat)
 {
-	stat.st_dev = volume->ID();
+	stat.st_dev = volume->FSVolume()->id;
 	stat.st_ino = inode->ID();
 
 	if (attribute != NULL) {
@@ -468,11 +472,11 @@ count_audio_tracks(scsi_toc_toc* toc)
 //	#pragma mark - Volume class
 
 
-Volume::Volume(dev_t id)
+Volume::Volume(fs_volume *fsVolume)
 	:
 	fLock("cdda"),
+	fFSVolume(fsVolume),
 	fDevice(-1),
-	fID(id),
 	fRootNode(NULL),
 	fNextID(1),
 	fName(NULL),
@@ -491,7 +495,7 @@ Volume::~Volume()
 
 	// put_vnode on the root to release the ref to it
 	if (fRootNode)
-		put_vnode(ID(), fRootNode->ID());
+		put_vnode(FSVolume(), fRootNode->ID());
 
 	delete fRootNode;
 
@@ -506,7 +510,7 @@ Volume::~Volume()
 }
 
 
-status_t 
+status_t
 Volume::InitCheck()
 {
 	if (fLock.InitCheck() < B_OK)
@@ -557,8 +561,10 @@ Volume::Mount(const char* device)
 	fRootNode = _CreateNode(NULL, "", 0, 0, S_IFDIR | 0777);
 	if (fRootNode == NULL)
 		status = B_NO_MEMORY;
-	if (status >= B_OK)
-		status = publish_vnode(ID(), fRootNode->ID(), fRootNode);
+	if (status >= B_OK) {
+		status = publish_vnode(FSVolume(), fRootNode->ID(), fRootNode,
+			&gCDDAVnodeOps, fRootNode->Type(), 0);
+	}
 	if (status < B_OK) {
 		free(toc);
 		return status;
@@ -1082,7 +1088,7 @@ Inode::~Inode()
 }
 
 
-status_t 
+status_t
 Inode::InitCheck()
 {
 	if (fName == NULL)
@@ -1170,7 +1176,7 @@ status_t
 Inode::AddAttribute(const char *name, type_code type, const char *string)
 {
 	if (string == NULL)
-		return NULL;
+		return B_BAD_VALUE;
 
 	return AddAttribute(name, type, true, (const uint8 *)string,
 		strlen(string));
@@ -1192,7 +1198,7 @@ Inode::RemoveAttribute(const char *name)
 		return B_ENTRY_NOT_FOUND;
 
 	AttributeList::Iterator iterator = fAttributes.GetIterator();
-	
+
 	while (iterator.HasNext()) {
 		Attribute *attribute = iterator.Next();
 		if (!strcmp(attribute->Name(), name)) {
@@ -1302,12 +1308,12 @@ cdda_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 
 static status_t
-cdda_mount(dev_t id, const char *device, uint32 flags, const char *args,
-	fs_volume *_volume, ino_t *_rootVnodeID)
+cdda_mount(fs_volume *fsVolume, const char *device, uint32 flags,
+	const char *args, ino_t *_rootVnodeID)
 {
 	TRACE(("cdda_mount: entry\n"));
 
-	Volume *volume = new Volume(id);
+	Volume *volume = new Volume(fsVolume);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 
@@ -1321,16 +1327,17 @@ cdda_mount(dev_t id, const char *device, uint32 flags, const char *args,
 	}
 
 	*_rootVnodeID = volume->RootNode().ID();
-	*_volume = volume;
+	fsVolume->private_volume = volume;
+	fsVolume->ops = &gCDDAVolumeOps;
 
 	return B_OK;
 }
 
 
 static status_t
-cdda_unmount(fs_volume _volume)
+cdda_unmount(fs_volume *_volume)
 {
-	struct Volume *volume = (struct Volume *)_volume;
+	struct Volume *volume = (struct Volume *)_volume->private_volume;
 
 	TRACE(("cdda_unmount: entry fs = %p\n", _volume));
 	delete volume;
@@ -1340,9 +1347,9 @@ cdda_unmount(fs_volume _volume)
 
 
 static status_t
-cdda_read_fs_stat(fs_volume _volume, struct fs_info *info)
+cdda_read_fs_stat(fs_volume *_volume, struct fs_info *info)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 	Locker locker(volume->Lock());
 
 	// File system flags.
@@ -1365,9 +1372,9 @@ cdda_read_fs_stat(fs_volume _volume, struct fs_info *info)
 
 
 static status_t
-cdda_write_fs_stat(fs_volume _volume, const struct fs_info *info, uint32 mask)
+cdda_write_fs_stat(fs_volume *_volume, const struct fs_info *info, uint32 mask)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 	Locker locker(volume->Lock());
 
 	status_t status = B_BAD_VALUE;
@@ -1380,23 +1387,23 @@ cdda_write_fs_stat(fs_volume _volume, const struct fs_info *info, uint32 mask)
 
 
 static status_t
-cdda_sync(fs_volume fs)
+cdda_sync(fs_volume *_volume)
 {
 	TRACE(("cdda_sync: entry\n"));
 
-	return 0;
+	return B_OK;
 }
 
 
 static status_t
-cdda_lookup(fs_volume _volume, fs_vnode _dir, const char *name, ino_t *_id, int *_type)
+cdda_lookup(fs_volume *_volume, fs_vnode *_dir, const char *name, ino_t *_id)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 	status_t status;
 
 	TRACE(("cdda_lookup: entry dir %p, name '%s'\n", _dir, name));
 
-	Inode *directory = (Inode *)_dir;
+	Inode *directory = (Inode *)_dir->private_node;
 	if (!S_ISDIR(directory->Type()))
 		return B_NOT_A_DIRECTORY;
 
@@ -1406,22 +1413,21 @@ cdda_lookup(fs_volume _volume, fs_vnode _dir, const char *name, ino_t *_id, int 
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	Inode *dummy;
-	status = get_vnode(volume->ID(), inode->ID(), (fs_vnode *)&dummy);
+	status = get_vnode(volume->FSVolume(), inode->ID(), NULL);
 	if (status < B_OK)
 		return status;
 
 	*_id = inode->ID();
-	*_type = inode->Type();
 	return B_OK;
 }
 
 
 static status_t
-cdda_get_vnode_name(fs_volume _volume, fs_vnode _node, char *buffer, size_t bufferSize)
+cdda_get_vnode_name(fs_volume *_volume, fs_vnode *_node, char *buffer,
+	size_t bufferSize)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("cdda_get_vnode_name(): inode = %p\n", inode));
 
@@ -1432,9 +1438,10 @@ cdda_get_vnode_name(fs_volume _volume, fs_vnode _node, char *buffer, size_t buff
 
 
 static status_t
-cdda_get_vnode(fs_volume _volume, ino_t id, fs_vnode *_inode, bool reenter)
+cdda_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
+	uint32 *_flags, bool reenter)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 	Inode *inode;
 
 	TRACE(("cdda_getvnode: asking for vnode 0x%Lx, r %d\n", id, reenter));
@@ -1443,20 +1450,23 @@ cdda_get_vnode(fs_volume _volume, ino_t id, fs_vnode *_inode, bool reenter)
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	*_inode = inode;
+	_node->private_node = inode;
+	_node->ops = &gCDDAVnodeOps;
+	*_type = inode->Type();
+	*_flags = 0;
 	return B_OK;
 }
 
 
 static status_t
-cdda_put_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
+cdda_put_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 {
 	return B_OK;
 }
 
 
 static status_t
-cdda_open(fs_volume _volume, fs_vnode _node, int openMode, fs_cookie *_cookie)
+cdda_open(fs_volume *_volume, fs_vnode *_node, int openMode, void **_cookie)
 {
 	TRACE(("cdda_open(): node = %p, openMode = %d\n", _node, openMode));
 
@@ -1475,14 +1485,14 @@ cdda_open(fs_volume _volume, fs_vnode _node, int openMode, fs_cookie *_cookie)
 
 
 static status_t
-cdda_close(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
+cdda_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-cdda_free_cookie(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
+cdda_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
@@ -1494,19 +1504,19 @@ cdda_free_cookie(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
 
 
 static status_t
-cdda_fsync(fs_volume _volume, fs_vnode _v)
+cdda_fsync(fs_volume *_volume, fs_vnode *_node)
 {
 	return B_OK;
 }
 
 
 static status_t
-cdda_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t offset,
+cdda_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t offset,
 	void *buffer, size_t *_length)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("cdda_read(vnode = %p, offset %Ld, length = %lu, mode = %d)\n",
 		_node, offset, *_length, cookie->open_mode));
@@ -1566,14 +1576,14 @@ cdda_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t offset,
 
 
 static bool
-cdda_can_page(fs_volume _volume, fs_vnode _v, fs_cookie cookie)
+cdda_can_page(fs_volume *_volume, fs_vnode *_node, void *cookie)
 {
 	return false;
 }
 
 
 static status_t
-cdda_read_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos,
+cdda_read_pages(fs_volume *_volume, fs_vnode *_node, void *cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	return B_NOT_ALLOWED;
@@ -1581,7 +1591,7 @@ cdda_read_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos,
 
 
 static status_t
-cdda_write_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos,
+cdda_write_pages(fs_volume *_volume, fs_vnode *_node, void *cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	return B_NOT_ALLOWED;
@@ -1589,10 +1599,10 @@ cdda_write_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos,
 
 
 static status_t
-cdda_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
+cdda_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("cdda_read_stat: vnode %p (0x%Lx), stat %p\n", inode, inode->ID(), stat));
 
@@ -1602,11 +1612,11 @@ cdda_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
 }
 
 
-status_t 
-cdda_rename(fs_volume _volume, void *_oldDir, const char *oldName, void *_newDir,
-	const char *newName)
+status_t
+cdda_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
+	fs_vnode *_newDir, const char *newName)
 {
-	if (_volume == NULL || _oldDir == NULL || _newDir == NULL
+	if (_oldDir != _newDir
 		|| oldName == NULL || *oldName == '\0'
 		|| newName == NULL || *newName == '\0'
 		|| !strcmp(oldName, ".") || !strcmp(oldName, "..")
@@ -1616,7 +1626,7 @@ cdda_rename(fs_volume _volume, void *_oldDir, const char *oldName, void *_newDir
 
 	// we only have a single directory which simplifies things a bit :-)
 
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 	Locker _(volume->Lock());
 
 	Inode *inode = volume->Find(oldName);
@@ -1634,13 +1644,13 @@ cdda_rename(fs_volume _volume, void *_oldDir, const char *oldName, void *_newDir
 
 
 static status_t
-cdda_open_dir(fs_volume _volume, fs_vnode _node, fs_cookie *_cookie)
+cdda_open_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 
 	TRACE(("cdda_open_dir(): vnode = %p\n", _node));
 
-	Inode *inode = (Inode *)_node;
+	Inode *inode = (Inode *)_node->private_node;
 	if (!S_ISDIR(inode->Type()))
 		return B_BAD_VALUE;
 
@@ -1660,16 +1670,16 @@ cdda_open_dir(fs_volume _volume, fs_vnode _node, fs_cookie *_cookie)
 
 
 static status_t
-cdda_read_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
+cdda_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 	status_t status = 0;
 
 	TRACE(("cdda_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %ld, num = %p\n", _node, _cookie, dirent, bufferSize,_num));
 
-	if (_node != &volume->RootNode())
+	if ((Inode *)_node->private_node != &volume->RootNode())
 		return B_BAD_VALUE;
 
 	Locker _(volume->Lock());
@@ -1708,7 +1718,7 @@ cdda_read_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 		return B_OK;
 	}
 
-	dirent->d_dev = volume->ID();
+	dirent->d_dev = volume->FSVolume()->id;
 	dirent->d_ino = inode->ID();
 	dirent->d_reclen = strlen(name) + sizeof(struct dirent);
 
@@ -1726,9 +1736,9 @@ cdda_read_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 
 
 static status_t
-cdda_rewind_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+cdda_rewind_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 
 	dir_cookie *cookie = (dir_cookie *)_cookie;
 	cookie->current = volume->FirstEntry();
@@ -1739,7 +1749,7 @@ cdda_rewind_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-cdda_close_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
+cdda_close_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	TRACE(("cdda_close: entry vnode %p, cookie %p\n", _node, _cookie));
 
@@ -1748,7 +1758,7 @@ cdda_close_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
 
 
 static status_t
-cdda_free_dir_cookie(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+cdda_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	dir_cookie *cookie = (dir_cookie *)_cookie;
 
@@ -1763,12 +1773,12 @@ cdda_free_dir_cookie(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-cdda_open_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie *_cookie)
+cdda_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_vnode;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
-	attr_cookie *cookie = new attr_cookie;
+	attr_cookie *cookie = new(std::nothrow) attr_cookie;
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
@@ -1781,17 +1791,17 @@ cdda_open_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie *_cookie)
 
 
 static status_t
-cdda_close_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+cdda_close_attr_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-cdda_free_attr_dir_cookie(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+cdda_free_attr_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_vnode;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 	attr_cookie *cookie = (attr_cookie *)_cookie;
 
 	Locker _(volume->Lock());
@@ -1803,10 +1813,10 @@ cdda_free_attr_dir_cookie(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-cdda_rewind_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+cdda_rewind_attr_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_vnode;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 	attr_cookie *cookie = (attr_cookie *)_cookie;
 
 	Locker _(volume->Lock());
@@ -1817,11 +1827,11 @@ cdda_rewind_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-cdda_read_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie,
+cdda_read_attr_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_vnode;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 	attr_cookie *cookie = (attr_cookie *)_cookie;
 
 	Locker _(volume->Lock());
@@ -1833,7 +1843,7 @@ cdda_read_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie,
 	}
 
 	size_t length = strlcpy(dirent->d_name, attribute->Name(), bufferSize);
-	dirent->d_dev = volume->ID();
+	dirent->d_dev = volume->FSVolume()->id;
 	dirent->d_ino = inode->ID();
 	dirent->d_reclen = sizeof(struct dirent) + length;
 
@@ -1844,11 +1854,11 @@ cdda_read_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie,
 
 
 static status_t
-cdda_create_attr(fs_volume _volume, fs_vnode _node, const char *name,
-	uint32 type, int openMode, fs_cookie *_cookie)
+cdda_create_attr(fs_volume *_volume, fs_vnode *_node, const char *name,
+	uint32 type, int openMode, void **_cookie)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	Locker _(volume->Lock());
 
@@ -1873,11 +1883,11 @@ cdda_create_attr(fs_volume _volume, fs_vnode _node, const char *name,
 
 
 static status_t
-cdda_open_attr(fs_volume _volume, fs_vnode _node, const char *name,
-	int openMode, fs_cookie *_cookie)
+cdda_open_attr(fs_volume *_volume, fs_vnode *_node, const char *name,
+	int openMode, void **_cookie)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	Locker _(volume->Lock());
 
@@ -1894,14 +1904,14 @@ cdda_open_attr(fs_volume _volume, fs_vnode _node, const char *name,
 
 
 static status_t
-cdda_close_attr(fs_volume _fs, fs_vnode _file, fs_cookie cookie)
+cdda_close_attr(fs_volume *_volume, fs_vnode *_node, void *cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-cdda_free_attr_cookie(fs_volume _fs, fs_vnode _file, fs_cookie cookie)
+cdda_free_attr_cookie(fs_volume *_volume, fs_vnode *_node, void *cookie)
 {
 	free(cookie);
 	return B_OK;
@@ -1909,11 +1919,11 @@ cdda_free_attr_cookie(fs_volume _fs, fs_vnode _file, fs_cookie cookie)
 
 
 static status_t
-cdda_read_attr(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
+cdda_read_attr(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	off_t offset, void *buffer, size_t *_length)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	Locker _(volume->Lock());
 
@@ -1926,11 +1936,11 @@ cdda_read_attr(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 
 
 static status_t
-cdda_write_attr(fs_volume _volume, fs_vnode _file, fs_cookie _cookie,
+cdda_write_attr(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	off_t offset, const void *buffer, size_t *_length)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_file;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	Locker _(volume->Lock());
 
@@ -1943,11 +1953,11 @@ cdda_write_attr(fs_volume _volume, fs_vnode _file, fs_cookie _cookie,
 
 
 static status_t
-cdda_read_attr_stat(fs_volume _volume, fs_vnode _file, fs_cookie _cookie,
+cdda_read_attr_stat(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	struct stat *stat)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_file;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	Locker _(volume->Lock());
 
@@ -1961,7 +1971,7 @@ cdda_read_attr_stat(fs_volume _volume, fs_vnode _file, fs_cookie _cookie,
 
 
 static status_t
-cdda_write_attr_stat(fs_volume _volume, fs_vnode file, fs_cookie cookie,
+cdda_write_attr_stat(fs_volume *_volume, fs_vnode *_node, void *cookie,
 	const struct stat *stat, int statMask)
 {
 	return EOPNOTSUPP;
@@ -1969,13 +1979,13 @@ cdda_write_attr_stat(fs_volume _volume, fs_vnode file, fs_cookie cookie,
 
 
 static status_t
-cdda_remove_attr(fs_volume _volume, fs_vnode _node, const char *name)
+cdda_remove_attr(fs_volume *_volume, fs_vnode *_node, const char *name)
 {
 	if (name == NULL)
 		return B_BAD_VALUE;
 
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	Locker _(volume->Lock());
 
@@ -1983,48 +1993,20 @@ cdda_remove_attr(fs_volume _volume, fs_vnode _node, const char *name)
 }
 
 
-static status_t
-cdda_std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-			return B_OK;
-
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
-}
-
-
-static file_system_module_info sCDDAFileSystem = {
-	{
-		"file_systems/cdda" B_CURRENT_FS_API_VERSION,
-		0,
-		cdda_std_ops,
-	},
-
-	"cdda",					// short_name
-	"CDDA File System",		// pretty_name
-	0,	// DDM flags
-
-	cdda_identify_partition,
-	cdda_scan_partition,
-	cdda_free_identify_partition_cookie,
-	NULL,	// free_partition_content_cookie()
-
-	cdda_mount,
+fs_volume_ops gCDDAVolumeOps = {
 	cdda_unmount,
 	cdda_read_fs_stat,
 	cdda_write_fs_stat,
 	cdda_sync,
+	cdda_get_vnode,
 
+	// the other operations are not yet supported (indices, queries)
+	NULL,
+};
+
+fs_vnode_ops gCDDAVnodeOps = {
 	cdda_lookup,
 	cdda_get_vnode_name,
-
-	cdda_get_vnode,
 	cdda_put_vnode,
 	NULL,	// fs_remove_vnode()
 
@@ -2088,7 +2070,28 @@ static file_system_module_info sCDDAFileSystem = {
 	NULL,	// fs_rename_attr()
 	cdda_remove_attr,
 
-	// the other operations are not yet supported (indices, queries)
+	NULL,	// fs_create_special_node()
+};
+
+static file_system_module_info sCDDAFileSystem = {
+	{
+		"file_systems/cdda" B_CURRENT_FS_API_VERSION,
+		0,
+		NULL,
+	},
+
+	"cdda",					// short_name
+	"CDDA File System",		// pretty_name
+	0,	// DDM flags
+
+	cdda_identify_partition,
+	cdda_scan_partition,
+	cdda_free_identify_partition_cookie,
+	NULL,	// free_partition_content_cookie()
+
+	cdda_mount,
+
+	// all other functions are not supported
 	NULL,
 };
 

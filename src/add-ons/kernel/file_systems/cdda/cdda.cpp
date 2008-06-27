@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -74,7 +74,7 @@ sanitize_string(char *&string)
 	if (garbage)
 		memmove(string, string + garbage, length + 1);
 
-	// strip garbage from the end	
+	// strip garbage from the end
 
 	while (length > 1 && isspace(string[length - 1])) {
 		string[--length] = '\0';
@@ -140,7 +140,7 @@ sanitize_album(cdtext &text)
 		text.album = NULL;
 	}
 
-	if ((text.artist == NULL || text.artist[0] == NULL) && text.album != NULL) {
+	if ((text.artist == NULL || text.artist[0] == '\0') && text.album != NULL) {
 		// try to extract artist from album
 		char *space = strstr(text.album, "  ");
 		if (space != NULL) {
