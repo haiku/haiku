@@ -22,6 +22,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	OpenSSL
 #	Pe
 #	Perl
+#	Subversion
 #	Vision
 #	VLC
 #	WonderBrush
@@ -31,7 +32,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 OptionalPackageDependencies APR-util : APR ;
 OptionalPackageDependencies Development : Perl ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
-
+OptionalPackageDependencies Subversion : OpenSSL ;
 
 
 # APR
@@ -315,6 +316,21 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage perl-5.10.0-gcc2-2008-03-24
 			: $(baseURL)/perl-5.10.0-gcc2-2008-03-24.zip
+			: home
+		;
+	}
+}
+
+
+# Subversion
+if [ IsOptionalHaikuImagePackageAdded Subversion ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Subversion available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		Echo "No optional package Subversion available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage Subversion
+			: http://haiku.mlotz.ch/subversion-1.4.6-haiku-20080628.zip
 			: home
 		;
 	}
