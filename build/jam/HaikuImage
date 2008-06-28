@@ -39,7 +39,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2 cal cat
 	mount_nfs mountvolume mv nc netstat nl nohup od open passwd paste patch
 	pathchk pc ping play playfile playsound playwav pr prio printenv printf ps
 	ptx pwd query quit rc readlink release renice rescan rlog rm rmattr rmindex
-	rmdir roster route safemode screen_blanker sed setdecor settype setversion
+	rmdir roster route safemode screen_blanker screenmode sed setdecor settype setversion
 	setvolume seq sh sha1sum shar shred shuf shutdown sleep sort split stat
 	strace stty su sum sync sysinfo tac tail tar tcpdump tcptester tee telnet
 	telnetd test top touch tput tr traceroute
