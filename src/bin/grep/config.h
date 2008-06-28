@@ -247,7 +247,7 @@
 /* #undef HAVE_WCTYPE_H */
 
 /* Define to 1 if strerror_r returns a string. */
-#define HAVE_WORKING_STRERROR_R 1
+/* #undef HAVE_WORKING_STRERROR_R */
 
 /* Define to 1 if you have the `__argz_count' function. */
 /* #undef HAVE___ARGZ_COUNT */
