@@ -688,7 +688,7 @@ int32
 BOutlineListView::CountItemsUnder(BListItem* underItem,
 	bool oneLevelOnly) const
 {
-	int32 i = IndexOf(underItem);
+	int32 i = FullListIndexOf(underItem) + 1;
 	if (i == -1)
 		return 0;
 
@@ -698,7 +698,7 @@ BOutlineListView::CountItemsUnder(BListItem* underItem,
 		BListItem *item = FullListItemAt(i);
 
 		// If we jump out of the subtree, return count
-		if (item->fLevel < underItem->OutlineLevel())
+		if (item->fLevel <= underItem->OutlineLevel())
 			return count;
 
 		// If the level matches, increase count
@@ -770,29 +770,42 @@ BOutlineListView::ItemUnderAt(BListItem* underItem,
 	return NULL;
 }
 
-int32
-BOutlineListView::_GetSubitemCount(BList &list, int32 itemIndex)
+static void _GetSubItems(BList &sourceList, BList &destList,
+	BListItem *parent, int32 start)
 {
-	uint32 level = ((BListItem *)list.ItemAt(itemIndex))->OutlineLevel();
-	int32 count = 1; // the count we return includes the parent
-	for (int32 i = itemIndex + 1; i < fFullList.CountItems(); i++, count++) {
-		if (((BListItem *)list.ItemAt(i))->OutlineLevel() <= level)
+	for (int32 i = start; i < sourceList.CountItems(); i++) {
+		BListItem *item = (BListItem *)sourceList.ItemAt(i);
+		if (item->OutlineLevel() <= parent->OutlineLevel())
 			break;
+		destList.AddItem(item);	
 	}
+}
 
-	return count;
+static void
+_DoSwap(BList &list, int32 firstIndex, int32 secondIndex, BList *firstItems,
+	BList *secondItems)
+{
+	BListItem *item = (BListItem *)list.ItemAt(firstIndex);
+	list.SwapItems(firstIndex, secondIndex);
+	list.RemoveItems(secondIndex + 1, secondItems->CountItems());
+	list.RemoveItems(firstIndex + 1, firstItems->CountItems());
+	list.AddList(secondItems, firstIndex + 1);
+	int32 newIndex = list.IndexOf(item);
+	if (newIndex + 1 < list.CountItems())
+		list.AddList(firstItems, newIndex + 1);
+	else
+		list.AddList(firstItems);
 }
 
 void
-BOutlineListView::_DoSwap(BList &list, int32 firstIndex, int32 secondIndex, int32 firstCount, 
-	int32 secondCount, int32 swapCount)
+BOutlineListView::_CullInvisibleItems(BList &list)
 {
-	if (firstCount < secondCount) { 
-		for (int32 i = swapCount + 1; i < secondCount; i++)
-			list.MoveItem(secondIndex + swapCount + i, firstIndex + i);
-	} else {
-		for (int32 i = swapCount + 1; i < firstCount; i++)
-			list.MoveItem(firstIndex + swapCount + 1, secondIndex + swapCount + 1);
+	int32 index = 0;
+	while (index < list.CountItems()) {
+		if (reinterpret_cast<BListItem *>(list.ItemAt(index))->IsItemVisible())
+			++index;
+		else
+			list.RemoveItem(index);
 	}
 }
 
@@ -815,32 +828,27 @@ BOutlineListView::_SwapItems(int32 first, int32 second)
 	int32 secondIndex = max_c(first, second);
 	BListItem *firstItem = ItemAt(firstIndex);
 	BListItem *secondItem = ItemAt(secondIndex);
+	BList firstSubItems, secondSubItems;
 	
 	if (Superitem(firstItem) != Superitem(secondItem))
 		return false;
-
 	if (!firstItem->IsItemVisible() || !secondItem->IsItemVisible())
 		return false;
-	
+
 	int32 fullFirstIndex = FullListIndex(firstIndex);
 	int32 fullSecondIndex = FullListIndex(secondIndex);
-	int32 firstCount = _GetSubitemCount(fFullList, fullFirstIndex);
-	int32 secondCount = _GetSubitemCount(fFullList, fullSecondIndex);
-		
-	int32 index = (firstCount < secondCount) ? firstCount : secondCount;
-	for (int32 i = 0; i < index; i++) 
-		fFullList.SwapItems(fullFirstIndex + i, fullSecondIndex + i);
-	_DoSwap(fFullList, fullFirstIndex, fullSecondIndex, firstCount, secondCount, index);
-	
-	firstCount = _GetSubitemCount(fList, firstIndex);
-	secondCount = _GetSubitemCount(fList, secondIndex);
-	index = (firstCount < secondCount) ? firstCount : secondCount;
-	for (int32 i = 0; i < index; i++)
-		fList.SwapItems(firstIndex + i, secondIndex + i);
-	_DoSwap(fList, firstIndex, secondIndex, firstCount, secondCount, index);	
+	_GetSubItems(fFullList, firstSubItems, firstItem, fullFirstIndex + 1);
+	_GetSubItems(fFullList, secondSubItems, secondItem, fullSecondIndex + 1);
+	_DoSwap(fFullList, fullFirstIndex, fullSecondIndex, &firstSubItems,
+		&secondSubItems);
+
+	_CullInvisibleItems(firstSubItems);
+	_CullInvisibleItems(secondSubItems);
+	_DoSwap(fList, firstIndex, secondIndex, &firstSubItems, 
+		&secondSubItems);
 
 	_RecalcItemTops(firstIndex);
-	_RescanSelection(firstIndex, secondIndex + secondCount);
+	_RescanSelection(firstIndex, secondIndex + secondSubItems.CountItems());
 	Invalidate(Bounds());	
 	return true;
 }

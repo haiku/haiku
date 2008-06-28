@@ -118,9 +118,7 @@ class BOutlineListView : public BListView {
 
 		BListItem*			_RemoveItem(BListItem* item, int32 fullListIndex);
 		bool				_SwapItems(int32 first, int32 second);
-						void _DoSwap(BList &list, int32 firstIndex, int32 secondIndex, 
-								int32 firstCount, int32 secondCount, int32 swapCount);
-						int32 _GetSubitemCount(BList &list, int32 itemIndex);
+		void				_CullInvisibleItems(BList &list);
 		BListItem*			RemoveOne(int32 fullListIndex);
 
 		static void			TrackInLatchItem(void *);
