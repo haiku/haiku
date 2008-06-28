@@ -2211,8 +2211,6 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 	if (GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	RecursiveLocker locker(fVolume->Lock());
-
 	// does the file even exist?
 	off_t id;
 	if (tree->Find((uint8 *)name, (uint16)strlen(name), &id) < B_OK)

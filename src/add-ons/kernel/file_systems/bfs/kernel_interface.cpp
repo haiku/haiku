@@ -937,7 +937,7 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 	if (status < B_OK)
 		return status;
 
-	RecursiveLocker locker(volume->Lock());
+	Transaction transaction(volume, oldDirectory->BlockNumber());
 
 	// Get the directory's tree, and a pointer to the inode which should be
 	// changed
@@ -981,8 +981,6 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 	}
 
 	// Everything okay? Then lets get to work...
-
-	Transaction transaction(volume, oldDirectory->BlockNumber());
 
 	// First, try to make sure there is nothing that will stop us in
 	// the target directory - since this is the only non-critical
