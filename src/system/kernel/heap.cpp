@@ -87,6 +87,7 @@ typedef struct heap_allocator_s {
 
 	uint32		bin_count;
 	uint32		page_count;
+	uint32		free_page_count;
 	heap_page *	free_pages;
 
 	heap_bin *	bins;
@@ -237,13 +238,9 @@ dump_bin(heap_bin *bin)
 static void
 dump_allocator(heap_allocator *heap)
 {
-	uint32 count = 0;
-	for (heap_page *page = heap->free_pages; page != NULL; page = page->next)
-		count++;
-
-	dprintf("allocator %p: base: 0x%08lx; size: %lu; bin_count: %lu; free_pages: %p (%lu entr%s)\n", heap,
-		heap->base, heap->size, heap->bin_count, heap->free_pages, count,
-		count == 1 ? "y" : "ies");
+	dprintf("allocator %p: base: 0x%08lx; size: %lu; bin_count: %lu; free_pages: %p (%lu entr%s)\n",
+		heap, heap->base, heap->size, heap->bin_count, heap->free_pages,
+		heap->free_page_count, heap->free_page_count == 1 ? "y" : "ies");
 
 	for (uint32 i = 0; i < heap->bin_count; i++)
 		dump_bin(&heap->bins[i]);
@@ -589,6 +586,9 @@ heap_validate_heap(heap_allocator *heap)
 		freePageCount++;
 	}
 
+	if (heap->free_page_count != freePageCount)
+		panic("free page count doesn't match free page list\n");
+
 	// validate the page table
 	uint32 usedPageCount = 0;
 	for (uint32 i = 0; i < heap->page_count; i++) {
@@ -718,6 +718,7 @@ heap_attach(addr_t base, size_t size)
 		heap->page_table[i].prev = &heap->page_table[i - 1];
 	}
 	heap->free_pages = &heap->page_table[0];
+	heap->free_page_count = pageCount;
 	heap->page_table[0].prev = NULL;
 
 	mutex_init(&heap->lock, "heap_mutex");
@@ -808,6 +809,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		// small allocation, just grab the next free page
 		heap_page *page = heap->free_pages;
 		heap->free_pages = page->next;
+		heap->free_page_count--;
 		if (page->next)
 			page->next->prev = NULL;
 
@@ -872,6 +874,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		page->free_list = NULL;
 		page->allocation_id = (uint16)first;
 	}
+	heap->free_page_count -= pageCount;
 
 #if KERNEL_HEAP_LEAK_CHECK
 	heap_leak_check_info *info = (heap_leak_check_info *)(heap->base
@@ -929,10 +932,8 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
 
 	if (heap->next == NULL && shouldGrow) {
 		// suggest growing if we are the last heap and we have
-		// less than three free pages left
-		*shouldGrow = (heap->free_pages == NULL
-			|| heap->free_pages->next == NULL
-			|| heap->free_pages->next->next == NULL);
+		// less than 10% free pages
+		*shouldGrow = heap->free_page_count < heap->page_count / 10;
 	}
 
 #if KERNEL_HEAP_LEAK_CHECK
@@ -1029,6 +1030,7 @@ heap_free(heap_allocator *heap, void *address)
 			heap_unlink_page(page, &bin->page_list);
 			page->in_use = 0;
 			heap_link_page(page, &heap->free_pages);
+			heap->free_page_count++;
 		} else if (page->free_count == 1) {
 			// we need to add ourselfs to the page list of the bin
 			heap_link_page(page, &bin->page_list);
@@ -1066,6 +1068,7 @@ heap_free(heap_allocator *heap, void *address)
 
 			// return it to the free list
 			heap_link_page(&page[i], &heap->free_pages);
+			heap->free_page_count++;
 		}
 	}
 
@@ -1431,7 +1434,10 @@ malloc_nogrow(size_t size)
 	}
 
 	// no memory available
-	panic("heap: all heaps have run out of memory\n");
+	if (thread_get_current_thread_id() == sHeapGrowThread)
+		panic("heap: all heaps have run out of memory while growing\n");
+	else
+		dprintf("heap: all heaps have run out of memory\n");
 	return NULL;
 }
 
