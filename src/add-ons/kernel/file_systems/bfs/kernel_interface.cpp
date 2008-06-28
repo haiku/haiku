@@ -500,10 +500,6 @@ bfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 		return status;
 	}
 
-	RecursiveLocker locker(volume->Lock());
-		// we have to hold the volume lock in order to not
-		// interfere with new_vnode() here
-
 	Inode *inode;
 	status = get_vnode(volume->FSVolume(), *_vnodeID, (void **)&inode);
 	if (status != B_OK) {
@@ -1378,8 +1374,7 @@ bfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 }
 
 
-//	#pragma mark -
-//	Directory functions
+//	#pragma mark - Directory functions
 
 
 static status_t
@@ -1540,8 +1535,7 @@ bfs_free_dir_cookie(fs_volume *_volume, fs_vnode *node, void *_cookie)
 }
 
 
-//	#pragma mark -
-//	Attribute functions
+//	#pragma mark - Attribute functions
 
 
 static status_t
@@ -1821,8 +1815,7 @@ bfs_create_special_node(fs_volume *_volume, fs_vnode *_directory,
 }
 
 
-//	#pragma mark -
-//	Index functions
+//	#pragma mark - Index functions
 
 
 static status_t
@@ -2003,8 +1996,7 @@ bfs_stat_index(fs_volume *_volume, const char *name, struct stat *stat)
 }
 
 
-//	#pragma mark -
-//	Query functions
+//	#pragma mark - Query functions
 
 
 static status_t
