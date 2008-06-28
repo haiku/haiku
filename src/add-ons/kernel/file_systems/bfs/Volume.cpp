@@ -328,12 +328,6 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	if (opener.IsReadOnly())
 		fFlags |= VOLUME_READ_ONLY;
 
-	// check if it's a regular file, and if so, disable the cache for the
-	// underlaying file system
-	struct stat stat;
-	if (fstat(fDevice, &stat) < 0)
-		RETURN_ERROR(B_ERROR);
-
 	// read the super block
 	if (Identify(fDevice, &fSuperBlock) != B_OK) {
 		FATAL(("invalid super block!\n"));
@@ -387,7 +381,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	}
 
 	fRootNode = new Inode(this, ToVnode(Root()));
-	if (fRootNode && fRootNode->InitCheck() == B_OK) {
+	if (fRootNode != NULL && fRootNode->InitCheck() == B_OK) {
 		status = publish_vnode(fVolume, ToVnode(Root()), (void *)fRootNode,
 			&gBFSVnodeOps, fRootNode->Mode(), 0);
 		if (status == B_OK) {
