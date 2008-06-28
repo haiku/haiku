@@ -30,6 +30,9 @@
 //#define DEBUG_CACHE_LIST 1
 
 #ifdef __cplusplus
+
+#include <util/SplayTree.h>
+
 struct vm_page_mapping;
 typedef DoublyLinkedListLink<vm_page_mapping> vm_page_mapping_link;
 
@@ -69,20 +72,20 @@ class DoublyLinkedAreaLink {
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedPageLink> vm_page_mappings;
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedAreaLink> vm_area_mappings;
 
+typedef uint32 page_num_t;
+
 struct vm_page {
 	struct vm_page		*queue_prev;
 	struct vm_page		*queue_next;
 
-	struct vm_page		*hash_next;
-
 	addr_t				physical_page_number;
 
 	struct vm_cache		*cache;
-	uint32				cache_offset;
+	page_num_t			cache_offset;
 							// in page size units
 
-	struct vm_page		*cache_prev;
-	struct vm_page		*cache_next;
+	SplayTreeLink<vm_page>	cache_link;
+	vm_page					*cache_next;
 
 	vm_page_mappings	mappings;
 
@@ -134,6 +137,34 @@ struct vm_dummy_page : vm_page {
 	ConditionVariable	busy_condition;
 };
 
+struct VMCachePagesTreeDefinition {
+	typedef page_num_t KeyType;
+	typedef	vm_page NodeType;
+
+	static page_num_t GetKey(const NodeType* node)
+	{
+		return node->cache_offset;
+	}
+
+	static SplayTreeLink<NodeType>* GetLink(NodeType* node)
+	{
+		return &node->cache_link;
+	}
+
+	static int Compare(page_num_t key, const NodeType* node)
+	{
+		return key == node->cache_offset ? 0
+			: (key < node->cache_offset ? -1 : 1);
+	}
+
+	static NodeType** GetListLink(NodeType* node)
+	{
+		return &node->cache_next;
+	}
+};
+
+typedef IteratableSplayTree<VMCachePagesTreeDefinition> VMCachePagesTree;
+
 struct vm_cache {
 	mutex				lock;
 	struct vm_area		*areas;
@@ -141,7 +172,7 @@ struct vm_cache {
 	struct list_link	consumer_link;
 	struct list			consumers;
 		// list of caches that use this cache as a source
-	vm_page				*page_list;
+	VMCachePagesTree	pages;
 	struct vm_cache		*source;
 	struct vm_store		*store;
 	off_t				virtual_base;

@@ -2793,16 +2793,9 @@ dump_vnode_caches(int argc, char **argv)
 		if (device != -1 && vnode->device != device)
 			continue;
 
-		// count pages in cache
-		size_t numPages = 0;
-		for (struct vm_page *page = vnode->cache->page_list;
-				page != NULL; page = page->cache_next) {
-			numPages++;
-		}
-
 		kprintf("%p%4ld%10Ld %p %8Ld%8ld\n", vnode, vnode->device, vnode->id,
 			vnode->cache, (vnode->cache->virtual_size + B_PAGE_SIZE - 1)
-				/ B_PAGE_SIZE, numPages);
+				/ B_PAGE_SIZE, vnode->cache->page_count);
 	}
 
 	hash_close(sVnodeTable, &iterator, false);

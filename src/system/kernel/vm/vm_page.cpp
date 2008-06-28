@@ -497,11 +497,10 @@ dump_page(int argc, char **argv)
 
 	kprintf("PAGE: %p\n", page);
 	kprintf("queue_next,prev: %p, %p\n", page->queue_next, page->queue_prev);
-	kprintf("hash_next:       %p\n", page->hash_next);
 	kprintf("physical_number: %lx\n", page->physical_page_number);
 	kprintf("cache:           %p\n", page->cache);
 	kprintf("cache_offset:    %ld\n", page->cache_offset);
-	kprintf("cache_next,prev: %p, %p\n", page->cache_next, page->cache_prev);
+	kprintf("cache_next:      %p\n", page->cache_next);
 	kprintf("type:            %d\n", page->type);
 	kprintf("state:           %s\n", page_state_to_string(page->state));
 	kprintf("wired_count:     %d\n", page->wired_count);
@@ -1324,11 +1323,13 @@ vm_page_write_modified_page_range(struct vm_cache *cache, uint32 firstPage,
 {
 	// TODO: join adjacent pages into one vec list
 
-	for (vm_page *page = cache->page_list; page; page = page->cache_next) {
+	for (VMCachePagesTree::Iterator it
+				= cache->pages.GetIterator(firstPage, true, true);
+			vm_page *page = it.Next();) {
 		bool dequeuedPage = false;
 
-		if (page->cache_offset < firstPage || page->cache_offset >= endPage)
-			continue;
+		if (page->cache_offset >= endPage)
+			break;
 
 		if (page->state == PAGE_STATE_MODIFIED) {
 			InterruptsSpinLocker locker(&sPageLock);
@@ -1428,11 +1429,15 @@ vm_page_schedule_write_page_range(struct vm_cache *cache, uint32 firstPage,
 	uint32 endPage)
 {
 	uint32 modified = 0;
-	for (vm_page *page = cache->page_list; page; page = page->cache_next) {
+	for (VMCachePagesTree::Iterator it
+				= cache->pages.GetIterator(firstPage, true, true);
+			vm_page *page = it.Next();) {
 		bool dequeuedPage = false;
 
-		if (page->cache_offset >= firstPage && page->cache_offset < endPage
-			&& page->state == PAGE_STATE_MODIFIED) {
+		if (page->cache_offset >= endPage)
+			break;
+
+		if (page->state == PAGE_STATE_MODIFIED) {
 			vm_page_requeue(page, false);
 			modified++;
 		}

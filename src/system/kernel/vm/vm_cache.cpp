@@ -36,13 +36,11 @@
 #endif
 
 
-static hash_table* sPageCacheTable;
-static spinlock sPageCacheTableLock;
-
 #if DEBUG_CACHE_LIST
 vm_cache* gDebugCacheList;
-static spinlock sDebugCacheListLock;
 #endif
+static mutex sCacheListLock = MUTEX_INITIALIZER("global vm_cache list");
+	// The lock is also needed when the debug feature is disabled.
 
 
 struct page_lookup_key {
@@ -352,8 +350,7 @@ page_hash_func(void* _p, const void* _key, uint32 range)
 
 /*!	Acquires a reference to a cache yet unreferenced by the caller. The
 	caller must make sure, that the cache is not deleted, e.g. by holding the
-	cache's source cache lock or by holding the page cache table lock while the
-	cache is still referred to by a page.
+	cache's source cache lock or by holding the global cache list lock.
 	Returns \c true, if the reference could be acquired.
 */
 static inline bool
@@ -380,56 +377,45 @@ delete_cache(vm_cache* cache)
 
 	T(Delete(cache));
 
-#if DEBUG_CACHE_LIST
-	int state = disable_interrupts();
-	acquire_spinlock(&sDebugCacheListLock);
+	// delete the cache's backing store
+	cache->store->ops->destroy(cache->store);
 
+	// free all of the pages in the cache
+	while (vm_page* page = cache->pages.Root()) {
+		if (!page->mappings.IsEmpty() || page->wired_count != 0) {
+			panic("remove page %p from cache %p: page still has mappings!\n",
+				page, cache);
+		}
+
+		// remove it
+		cache->pages.Remove(page);
+		page->cache = NULL;
+		// TODO: we also need to remove all of the page's mappings!
+
+		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
+			oldPage->physical_page_number));
+		vm_page_free(cache, page);
+	}
+
+	// remove the ref to the source
+	if (cache->source)
+		vm_cache_remove_consumer(cache->source, cache);
+
+	// We lock and unlock the sCacheListLock, even if the DEBUG_CACHE_LIST is
+	// not enabled. This synchronization point is needed for
+	// vm_cache_acquire_page_cache_ref().
+	mutex_lock(&sCacheListLock);
+
+#if DEBUG_CACHE_LIST
 	if (cache->debug_previous)
 		cache->debug_previous->debug_next = cache->debug_next;
 	if (cache->debug_next)
 		cache->debug_next->debug_previous = cache->debug_previous;
 	if (cache == gDebugCacheList)
 		gDebugCacheList = cache->debug_next;
-
-	release_spinlock(&sDebugCacheListLock);
-	restore_interrupts(state);
 #endif
 
-	// delete the cache's backing store
-	cache->store->ops->destroy(cache->store);
-
-	// free all of the pages in the cache
-	vm_page* page = cache->page_list;
-	while (page) {
-		vm_page* oldPage = page;
-		int state;
-
-		page = page->cache_next;
-
-		if (!oldPage->mappings.IsEmpty() || oldPage->wired_count != 0) {
-			panic("remove page %p from cache %p: page still has mappings!\n",
-				oldPage, cache);
-		}
-
-		// remove it from the hash table
-		state = disable_interrupts();
-		acquire_spinlock(&sPageCacheTableLock);
-
-		hash_remove(sPageCacheTable, oldPage);
-		oldPage->cache = NULL;
-		// TODO: we also need to remove all of the page's mappings!
-
-		release_spinlock(&sPageCacheTableLock);
-		restore_interrupts(state);
-
-		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
-			oldPage->physical_page_number));
-		vm_page_free(cache, oldPage);
-	}
-
-	// remove the ref to the source
-	if (cache->source)
-		vm_cache_remove_consumer(cache->source, cache);
+	mutex_unlock(&sCacheListLock);
 
 	mutex_destroy(&cache->lock);
 	free(cache);
@@ -505,13 +491,11 @@ merge_cache_with_only_consumer(vm_cache* cache)
 
 	T(Merge(cache, consumer));
 
-	vm_page* nextPage;
-	for (vm_page* page = cache->page_list; page != NULL;
-			page = nextPage) {
-		vm_page* consumerPage;
-		nextPage = page->cache_next;
-
-		consumerPage = vm_cache_lookup_page(consumer,
+	for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
+			vm_page* page = it.Next();) {
+		// Note: Removing the current node while iterating through a
+		// IteratableSplayTree is safe.
+		vm_page* consumerPage = vm_cache_lookup_page(consumer,
 			(off_t)page->cache_offset << PAGE_SHIFT);
 		if (consumerPage == NULL) {
 			// the page is not yet in the consumer cache - move it upwards
@@ -583,12 +567,6 @@ panic("cacheRef %p ref count too low!\n", cache);
 status_t
 vm_cache_init(kernel_args* args)
 {
-	// TODO: The table should grow/shrink dynamically.
-	sPageCacheTable = hash_init(vm_page_num_pages() / 2,
-		offsetof(vm_page, hash_next), &page_compare_func, &page_hash_func);
-	if (sPageCacheTable == NULL)
-		panic("vm_cache_init: no memory\n");
-
 	return B_OK;
 }
 
@@ -609,7 +587,7 @@ vm_cache_create(vm_store* store)
 
 	mutex_init(&cache->lock, "vm_cache");
 	list_init_etc(&cache->consumers, offsetof(vm_cache, consumer_link));
-	cache->page_list = NULL;
+	new(&cache->pages) VMCachePagesTree;
 	cache->areas = NULL;
 	cache->ref_count = 1;
 	cache->source = NULL;
@@ -622,8 +600,7 @@ vm_cache_create(vm_store* store)
 
 
 #if DEBUG_CACHE_LIST
-	int state = disable_interrupts();
-	acquire_spinlock(&sDebugCacheListLock);
+	mutex_lock(&sCacheListLock);
 
 	if (gDebugCacheList)
 		gDebugCacheList->debug_previous = cache;
@@ -631,8 +608,7 @@ vm_cache_create(vm_store* store)
 	cache->debug_next = gDebugCacheList;
 	gDebugCacheList = cache;
 
-	release_spinlock(&sDebugCacheListLock);
-	restore_interrupts(state);
+	mutex_unlock(&sCacheListLock);
 #endif
 
 	// connect the store to its cache
@@ -708,9 +684,10 @@ vm_cache_release_ref(vm_cache* cache)
 vm_cache*
 vm_cache_acquire_page_cache_ref(vm_page* page)
 {
-	InterruptsSpinLocker locker(sPageCacheTableLock);
+	MutexLocker locker(sCacheListLock);
 
 	vm_cache* cache = page->cache;
+		// Getting/setting the pointer must be atomic on all architectures.
 	if (cache == NULL)
 		return NULL;
 
@@ -727,17 +704,7 @@ vm_cache_lookup_page(vm_cache* cache, off_t offset)
 {
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
-	struct page_lookup_key key;
-	key.offset = (uint32)(offset >> PAGE_SHIFT);
-	key.cache = cache;
-
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sPageCacheTableLock);
-
-	vm_page* page = (vm_page*)hash_lookup(sPageCacheTable, &key);
-
-	release_spinlock(&sPageCacheTableLock);
-	restore_interrupts(state);
+	vm_page* page = cache->pages.Lookup((page_num_t)(offset >> PAGE_SHIFT));
 
 	if (page != NULL && cache != page->cache)
 		panic("page %p not in cache %p\n", page, cache);
@@ -760,27 +727,13 @@ vm_cache_insert_page(vm_cache* cache, vm_page* page, off_t offset)
 
 	T2(InsertPage(cache, page, offset));
 
-	page->cache_offset = (uint32)(offset >> PAGE_SHIFT);
-
-	if (cache->page_list != NULL)
-		cache->page_list->cache_prev = page;
-
-	page->cache_next = cache->page_list;
-	page->cache_prev = NULL;
-	cache->page_list = page;
+	page->cache_offset = (page_num_t)(offset >> PAGE_SHIFT);
 	cache->page_count++;
-
 	page->usage_count = 2;
-
-	InterruptsSpinLocker locker(sPageCacheTableLock);
-
 	page->cache = cache;
 
 #if KDEBUG
-	struct page_lookup_key key;
-	key.offset = (uint32)(offset >> PAGE_SHIFT);
-	key.cache = cache;
-	vm_page* otherPage = (vm_page*)hash_lookup(sPageCacheTable, &key);
+	vm_page* otherPage = cache->pages.Lookup(page->cache_offset);
 	if (otherPage != NULL) {
 		panic("vm_cache_insert_page(): there's already page %p with cache "
 			"offset %lu in cache %p; inserting page %p", otherPage,
@@ -788,7 +741,7 @@ vm_cache_insert_page(vm_cache* cache, vm_page* page, off_t offset)
 	}
 #endif	// KDEBUG
 
-	hash_insert(sPageCacheTable, page);
+	cache->pages.Insert(page);
 }
 
 
@@ -809,25 +762,8 @@ vm_cache_remove_page(vm_cache* cache, vm_page* page)
 
 	T2(RemovePage(cache, page));
 
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sPageCacheTableLock);
-
-	hash_remove(sPageCacheTable, page);
+	cache->pages.Remove(page);
 	page->cache = NULL;
-
-	release_spinlock(&sPageCacheTableLock);
-	restore_interrupts(state);
-
-	if (cache->page_list == page) {
-		if (page->cache_next != NULL)
-			page->cache_next->cache_prev = NULL;
-		cache->page_list = page->cache_next;
-	} else {
-		if (page->cache_prev != NULL)
-			page->cache_prev->cache_next = page->cache_next;
-		if (page->cache_next != NULL)
-			page->cache_next->cache_prev = page->cache_prev;
-	}
 	cache->page_count--;
 }
 
@@ -907,40 +843,34 @@ vm_cache_resize(vm_cache* cache, off_t newSize)
 	if (newPageCount < oldPageCount) {
 		// we need to remove all pages in the cache outside of the new virtual
 		// size
-		vm_page* page = cache->page_list;
-		vm_page* next;
+		for (VMCachePagesTree::Iterator it
+					= cache->pages.GetIterator(newPageCount, true, true);
+				vm_page* page = it.Next();) {
+			if (page->state == PAGE_STATE_BUSY) {
+				if (page->busy_writing) {
+					// We cannot wait for the page to become available
+					// as we might cause a deadlock this way
+					page->busy_writing = false;
+						// this will notify the writer to free the page
+				} else {
+					// wait for page to become unbusy
+					ConditionVariableEntry entry;
+					entry.Add(page);
+					mutex_unlock(&cache->lock);
+					entry.Wait();
+					mutex_lock(&cache->lock);
 
-		while (page != NULL) {
-			next = page->cache_next;
-
-			if (page->cache_offset >= newPageCount) {
-				if (page->state == PAGE_STATE_BUSY) {
-					if (page->busy_writing) {
-						// We cannot wait for the page to become available
-						// as we might cause a deadlock this way
-						page->busy_writing = false;
-							// this will notify the writer to free the page
-						page = next;
-					} else {
-						// wait for page to become unbusy
-						ConditionVariableEntry entry;
-						entry.Add(page);
-						mutex_unlock(&cache->lock);
-						entry.Wait();
-						mutex_lock(&cache->lock);
-
-						// restart from the start of the list
-						page = cache->page_list;
-					}
-					continue;
+					// restart from the start of the list
+					it = cache->pages.GetIterator(newPageCount, true, true);
 				}
-
-				// remove the page and put it into the free queue
-				vm_cache_remove_page(cache, page);
-				vm_page_free(cache, page);
+				continue;
 			}
 
-			page = next;
+			// remove the page and put it into the free queue
+			vm_cache_remove_page(cache, page);
+			vm_page_free(cache, page);
+				// Note: When iterating through a IteratableSplayTree
+				// removing the current node is safe.
 		}
 	}
 

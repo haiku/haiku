@@ -2226,11 +2226,11 @@ vm_clone_area(team_id team, const char *name, void **address,
 			vm_page_reserve_pages(reservePages);
 
 			// map in all pages from source
-			for (vm_page *page = cache->page_list; page != NULL;
-					page = page->cache_next) {
+			for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
+					vm_page* page  = it.Next();) {
 				vm_map_page(newArea, page, newArea->base
-					+ ((page->cache_offset << PAGE_SHIFT) - newArea->cache_offset),
-					protection);
+					+ ((page->cache_offset << PAGE_SHIFT)
+					- newArea->cache_offset), protection);
 			}
 
 			vm_page_unreserve_pages(reservePages);
@@ -2532,16 +2532,8 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 				// we can change the cache's commitment to take only those pages
 				// into account that really are in this cache.
 
-				// count existing pages in this cache
-				struct vm_page *page = cache->page_list;
-				uint32 count = 0;
-
-				for (; page != NULL; page = page->cache_next) {
-					count++;
-				}
-
 				status = cache->store->ops->commit(cache->store,
-					cache->virtual_base + count * B_PAGE_SIZE);
+					cache->virtual_base + cache->page_count * B_PAGE_SIZE);
 
 				// ToDo: we may be able to join with our source cache, if count == 0
 			}
@@ -2573,13 +2565,12 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 					= &area->address_space->translation_map;
 				map->ops->lock(map);
 
-				vm_page* page = cache->page_list;
-				while (page) {
+				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
+						vm_page* page = it.Next();) {
 					addr_t address = area->base
 						+ (page->cache_offset << PAGE_SHIFT);
 					map->ops->protect(map, address, address - 1 + B_PAGE_SIZE,
 						newProtection);
-					page = page->cache_next;
 				}
 
 				map->ops->unlock(map);
@@ -3324,25 +3315,22 @@ dump_cache(int argc, char **argv)
 	}
 
 	kprintf("  pages:\n");
-	int32 count = 0;
-	for (vm_page *page = cache->page_list; page != NULL; page = page->cache_next) {
-		count++;
-		if (!showPages)
-			continue;
-
-		if (page->type == PAGE_TYPE_PHYSICAL) {
-			kprintf("\t%p ppn 0x%lx offset 0x%lx type %u state %u (%s) wired_count %u\n",
-				page, page->physical_page_number, page->cache_offset, page->type, page->state,
-				page_state_to_string(page->state), page->wired_count);
-		} else if(page->type == PAGE_TYPE_DUMMY) {
-			kprintf("\t%p DUMMY PAGE state %u (%s)\n",
-				page, page->state, page_state_to_string(page->state));
-		} else
-			kprintf("\t%p UNKNOWN PAGE type %u\n", page, page->type);
-	}
-
-	if (!showPages)
-		kprintf("\t%ld in cache\n", count);
+	if (showPages) {
+		for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
+				vm_page *page = it.Next();) {
+			if (page->type == PAGE_TYPE_PHYSICAL) {
+				kprintf("\t%p ppn 0x%lx offset 0x%lx type %u state %u (%s) "
+					"wired_count %u\n", page, page->physical_page_number,
+					page->cache_offset, page->type, page->state,
+					page_state_to_string(page->state), page->wired_count);
+			} else if(page->type == PAGE_TYPE_DUMMY) {
+				kprintf("\t%p DUMMY PAGE state %u (%s)\n",
+					page, page->state, page_state_to_string(page->state));
+			} else
+				kprintf("\t%p UNKNOWN PAGE type %u\n", page, page->type);
+		}
+	} else
+		kprintf("\t%ld in cache\n", cache->page_count);
 
 	return 0;
 }

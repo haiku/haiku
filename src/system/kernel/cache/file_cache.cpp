@@ -127,8 +127,8 @@ reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
 
 			if (isWrite) {
 				// just schedule some pages to be written back
-				for (vm_page *page = cache->page_list; page != NULL;
-						page = page->cache_next) {
+				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
+						vm_page* page = it.Next();) {
 					if (page->state == PAGE_STATE_MODIFIED) {
 						// TODO: for now, we only schedule one
 						vm_page_schedule_write_page(page);
@@ -137,13 +137,11 @@ reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
 				}
 			} else {
 				// free some pages from our cache
-				// TODO: start with oldest (requires the page list to be a real list)!
+				// TODO: start with oldest
 				uint32 left = reservePages;
-				vm_page *next;
-				for (vm_page *page = cache->page_list;
-						page != NULL && left > 0; page = next) {
-					next = page->cache_next;
-
+				vm_page *page;
+				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
+						(page = it.Next()) != NULL && left > 0;) {
 					if (page->state != PAGE_STATE_MODIFIED
 						&& page->state != PAGE_STATE_BUSY) {
 						vm_cache_remove_page(cache, page);
