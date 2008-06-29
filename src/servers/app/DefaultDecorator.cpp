@@ -1093,13 +1093,13 @@ DefaultDecorator::_DrawButtonBitmap(ServerBitmap *bitmap, BRect rect)
 	if (bitmap == NULL)
 		return;
 
-	if (fDrawingEngine->LockParallelAccess()) {
-		bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
-		fDrawingEngine->SetCopyToFrontEnabled(true);
-		fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
-		fDrawingEngine->SetCopyToFrontEnabled(copyToFrontEnabled);
-		fDrawingEngine->UnlockParallelAccess();
-	}
+	// TODO: find out why locking sometimes deadlocks here and re-add locking
+	// once the problem is fixed (or remove this comment if locking isn't
+	// necessary at all...)
+	bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
+	fDrawingEngine->SetCopyToFrontEnabled(true);
+	fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
+	fDrawingEngine->SetCopyToFrontEnabled(copyToFrontEnabled);
 }
 
 
