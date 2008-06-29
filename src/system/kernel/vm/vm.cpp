@@ -3219,6 +3219,8 @@ dump_caches(int argc, char **argv)
 
 	uint32 totalCount = 0;
 	uint32 rootCount = 0;
+	off_t totalCommitted = 0;
+	page_num_t totalPages = 0;
 
 	vm_cache* cache = gDebugCacheList;
 	while (cache) {
@@ -3229,6 +3231,8 @@ dump_caches(int argc, char **argv)
 			info.page_count = 0;
 			info.committed = 0;
 			update_cache_info_recursively(cache, info);
+			totalCommitted += info.committed;
+			totalPages += info.page_count;
 		}
 
 		cache = cache->debug_next;
@@ -3238,6 +3242,8 @@ dump_caches(int argc, char **argv)
 		sortByPageCount
 			? &cache_info_compare_page_count : &cache_info_compare_committed);
 
+	kprintf("total committed memory: %lld, total used pages: %lu\n",
+		totalCommitted, totalPages);
 	kprintf("%lu caches (%lu root caches), sorted by %s per cache "
 		"tree...\n\n", totalCount, rootCount,
 		sortByPageCount ? "page count" : "committed size");
