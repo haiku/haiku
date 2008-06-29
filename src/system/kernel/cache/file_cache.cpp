@@ -498,6 +498,8 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 			bufferSize -= chunkSize;
 			pageOffset += chunkSize;
 		}
+
+		free((void*)buffer);
 	} else {
 		status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
 			&vec, 1, &bufferSize, false);
