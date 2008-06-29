@@ -341,6 +341,8 @@ free(void *ptr)
 		return;
 	KTRACE("free(%p)", ptr);
 	ptr = check_wall((uint8*)ptr);
+#else
+	KTRACE("free(%p)", ptr);
 #endif
 
 	defer_signals();
