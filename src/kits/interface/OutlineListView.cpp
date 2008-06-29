@@ -688,24 +688,24 @@ int32
 BOutlineListView::CountItemsUnder(BListItem* underItem,
 	bool oneLevelOnly) const
 {
-	int32 i = FullListIndexOf(underItem) + 1;
+	int32 i = FullListIndexOf(underItem);
 	if (i == -1)
 		return 0;
-
+	
+	++i;
 	int32 count = 0;
+	uint32 baseLevel = underItem->OutlineLevel();
 
-	while (i < FullListCountItems()) {
+	for (; i < FullListCountItems(); i++) {
 		BListItem *item = FullListItemAt(i);
 
 		// If we jump out of the subtree, return count
-		if (item->fLevel <= underItem->OutlineLevel())
+		if (item->fLevel <= baseLevel)
 			return count;
 
 		// If the level matches, increase count
-		if (!oneLevelOnly || item->fLevel == underItem->OutlineLevel() + 1)
+		if (!oneLevelOnly || item->fLevel == baseLevel + 1)
 			count++;
-
-		i++;
 	}
 
 	return count;
