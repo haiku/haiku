@@ -94,13 +94,24 @@ dump_aspace_list(int argc, char **argv)
 	vm_address_space *space;
 	struct hash_iterator iter;
 
-	dprintf("addr\tid\tbase\t\tsize\n");
+	dprintf("   address      id         base         size   area count   "
+		" area size\n");
 
 	hash_open(sAddressSpaceTable, &iter);
 	while ((space = (vm_address_space *)hash_next(sAddressSpaceTable,
 			&iter)) != NULL) {
-		dprintf("%p\t0x%lx\t0x%lx\t\t0x%lx\n",
-			space, space->id, space->base, space->size);
+		int32 areaCount = 0;
+		off_t areaSize = 0;
+		for (vm_area* area = space->areas; area != NULL;
+				area = area->address_space_next) {
+			if (area->id != RESERVED_AREA_ID
+				&& area->cache->type != CACHE_TYPE_NULL) {
+				areaCount++;
+				areaSize += area->size;
+			}
+		}
+		dprintf("%p  %6ld   %#010lx   %#10lx   %10ld   %10lld\n",
+			space, space->id, space->base, space->size, areaCount, areaSize);
 	}
 	hash_close(sAddressSpaceTable, &iter, false);
 	return 0;
