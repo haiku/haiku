@@ -12,6 +12,7 @@
 #include <OS.h>
 
 #include <arch_cpu.h>
+#include <arch_platform.h>
 #include <arch/system_info.h>
 #include <boot/kernel_args.h>
 
@@ -30,7 +31,7 @@ arch_get_system_info(system_info *info, size_t size)
 	info->cpu_clock_speed = sCPUClockFrequency;
 	info->bus_clock_speed = sBusClockFrequency;
 
-	info->platform_type = B_MAC_PLATFORM;//XXX
+	info->platform_type = M68KPlatform::Default()->PlatformType();
 
 	return B_OK;
 }
@@ -44,7 +45,7 @@ arch_system_info_init(struct kernel_args *args)
 	sCPUClockFrequency = args->arch_args.cpu_frequency;
 	sBusClockFrequency = args->arch_args.bus_frequency;
 
-	sCPURevision = 0x68030; //XXX
+	sCPURevision = args->arch_args.cpu_type; //XXX
 	sCPUType = B_CPU_M68K;
 	
 	return B_OK;

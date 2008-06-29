@@ -13,12 +13,50 @@
 #include <real_time_clock.h>
 #include <util/kernel_cpp.h>
 
+
+namespace BPrivate {
+
+//class MfpPIC;
+
+// #pragma mark - Atari (Falcon)
+
+class M68KAtari : public M68KPlatform {
+public:
+	M68KAtari();
+	virtual ~M68KAtari();
+
+	virtual status_t Init(struct kernel_args *kernelArgs);
+	virtual status_t InitSerialDebug(struct kernel_args *kernelArgs);
+	virtual status_t InitPostVM(struct kernel_args *kernelArgs);
+	virtual status_t InitPIC(struct kernel_args *kernelArgs);
+	virtual status_t InitRTC(struct kernel_args *kernelArgs,
+		struct real_time_data *data);
+	virtual status_t InitTimer(struct kernel_args *kernelArgs);
+
+	virtual char SerialDebugGetChar();
+	virtual void SerialDebugPutChar(char c);
+
+	virtual	void SetHardwareRTC(uint32 seconds);
+	virtual	uint32 GetHardwareRTC();
+
+	virtual void SetHardwareTimer(bigtime_t timeout);
+	virtual void ClearHardwareTimer(void);
+
+	virtual	void ShutDown(bool reboot);
+
+private:
+	int	fRTC;
+};
+
+
+}	// namespace BPrivate
+
 using BPrivate::M68KAtari;
 
 
 // constructor
 M68KAtari::M68KAtari()
-	: M68KPlatform(M68K_PLATFORM_ATARI),
+	: M68KPlatform(B_ATARI_PLATFORM, M68K_PLATFORM_ATARI),
 	  fRTC(-1)
 {
 }
@@ -132,4 +170,14 @@ void
 M68KAtari::ShutDown(bool reboot)
 {
 	panic("WRITEME");
+}
+
+// static buffer for constructing the actual M68KPlatform
+static char *sM68KPlatformBuffer[sizeof(M68KAtari)];
+#warning PTR HERE ???
+
+
+M68KPlatform *instanciate_m68k_platform_atari()
+{
+	return new(sM68KPlatformBuffer) M68KAtari;
 }

@@ -17,11 +17,6 @@
 #include <real_time_clock.h>
 #include <util/kernel_cpp.h>
 
-using BPrivate::M68KAtari;
-//using BPrivate::M68KAmiga;
-//using BPrivate::M68KMac;
-//using BPrivate::M68KNext;
-
 
 static M68KPlatform *sM68KPlatform;
 
@@ -48,29 +43,25 @@ M68KPlatform::Default()
 // # pragma mark -
 
 
-// static buffer for constructing the actual M68KPlatform
-static char *sM68KPlatformBuffer[sizeof(M68KAtari)];
-
 status_t
 arch_platform_init(struct kernel_args *kernelArgs)
 {
-#warning M68K: switch platform from kernel args
 	// only Atari supported for now
 	switch (kernelArgs->arch_args.platform) {
 #if 0
 		case M68K_PLATFORM_AMIGA:
-			sM68KPlatform = new(sM68KPlatformBuffer) M68KAmiga;
+			sM68KPlatform = instanciate_m68k_platform_amiga();
 			break;
 #endif
 		case M68K_PLATFORM_ATARI:
-			sM68KPlatform = new(sM68KPlatformBuffer) M68KAtari;
+			sM68KPlatform = instanciate_m68k_platform_atari();
 			break;
 #if 0
 		case M68K_PLATFORM_MAC:
-			sM68KPlatform = new(sM68KPlatformBuffer) M68KApple;
+			sM68KPlatform = instanciate_m68k_platform_mac();
 			break;
 		case M68K_PLATFORM_NEXT:
-			sM68KPlatform = new(sM68KPlatformBuffer) M68KNext;
+			sM68KPlatform = instanciate_m68k_platform_next();
 			break;
 #endif
 		default:

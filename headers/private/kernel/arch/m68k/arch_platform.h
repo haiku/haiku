@@ -9,12 +9,12 @@
 
 struct real_time_data;
 
-enum m68k_platform_type {
+typedef enum m68k_platform_types {
 	M68K_PLATFORM_AMIGA = 0,
 	M68K_PLATFORM_ATARI,		/* TT, Falcon, Hades, Milan... */
 	M68K_PLATFORM_MAC,
 	M68K_PLATFORM_NEXT
-};
+} m68k_platform_type;
 
 namespace BPrivate {
 
@@ -22,12 +22,13 @@ namespace BPrivate {
 
 class M68KPlatform {
 public:
-	M68KPlatform(m68k_platform_type platformType);
+	M68KPlatform(platform_type platformType, m68k_platform_type m68kPlatformType);
 	virtual ~M68KPlatform();
 
 	static M68KPlatform *Default();
 
-	inline m68k_platform_type PlatformType() const	{ return fPlatformType; }
+	inline platform_type PlatformType() const	{ return fPlatformType; }
+	inline m68k_platform_type M68KPlatformType() const	{ return fM68KPlatformType; }
 
 	virtual status_t Init(struct kernel_args *kernelArgs) = 0;
 	virtual status_t InitSerialDebug(struct kernel_args *kernelArgs) = 0;
@@ -49,50 +50,19 @@ public:
 	virtual	void ShutDown(bool reboot) = 0;
 
 private:
-	m68k_platform_type	fPlatformType;
+	m68k_platform_type	fM68KPlatformType;
+	platform_type	fPlatformType;
 };
 
-
-// #pragma mark - Amiga
-
-
-
-// #pragma mark - Atari (Falcon)
-// implemented in src/system/kernel/platform/atari_m68k/platform.cpp
-
-class M68KAtari : public M68KPlatform {
-public:
-	M68KAtari();
-	virtual ~M68KAtari();
-
-	virtual status_t Init(struct kernel_args *kernelArgs);
-	virtual status_t InitSerialDebug(struct kernel_args *kernelArgs);
-	virtual status_t InitPostVM(struct kernel_args *kernelArgs);
-	virtual status_t InitPIC(struct kernel_args *kernelArgs);
-	virtual status_t InitRTC(struct kernel_args *kernelArgs,
-		struct real_time_data *data);
-	virtual status_t InitTimer(struct kernel_args *kernelArgs);
-
-	virtual char SerialDebugGetChar();
-	virtual void SerialDebugPutChar(char c);
-
-	virtual	void SetHardwareRTC(uint32 seconds);
-	virtual	uint32 GetHardwareRTC();
-
-	virtual void SetHardwareTimer(bigtime_t timeout);
-	virtual void ClearHardwareTimer(void);
-
-	virtual	void ShutDown(bool reboot);
-
-private:
-	int	fRTC;
-};
-
-// #pragma mark - Mac
 
 }	// namespace BPrivate
 
 using BPrivate::M68KPlatform;
+
+//extern "C" M68KPlatform *instanciate_m68k_platform_amiga();
+extern "C" M68KPlatform *instanciate_m68k_platform_atari();
+//extern "C" M68KPlatform *instanciate_m68k_platform_mac();
+//extern "C" M68KPlatform *instanciate_m68k_platform_next();
 
 
 #endif	// _KERNEL_M68K_ARCH_PLATFORM_H
