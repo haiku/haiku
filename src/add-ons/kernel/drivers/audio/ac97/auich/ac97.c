@@ -238,15 +238,15 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 		snooze(1000);
 	}
 
-	/* setup register cache */
-	ac97_update_register_cache(dev);
-
 	dev->codec_id = ((uint32)reg_read(cookie, AC97_VENDOR_ID1) << 16) | reg_read(cookie, AC97_VENDOR_ID2);
 	codec = find_codec_table(dev->codec_id);
 	dev->codec_info = codec->info;
 	dev->init = codec->init;
 		
 	dev->codec_3d_stereo_enhancement = stereo_enhancement_technique[(ac97_reg_cached_read(dev, AC97_RESET) >> 10) & 31];
+
+	/* setup register cache */
+	ac97_update_register_cache(dev);
 	
 	ac97_reg_update_bits(dev, AC97_EXTENDED_STAT_CTRL, 1, 1); // enable variable rate audio
 
