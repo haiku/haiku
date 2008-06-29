@@ -92,7 +92,7 @@ static addr_t sNextPageTableAddress = 0x90000;
 static const uint32 kPageTableRegionEnd = 0x9e000;
 	// we need to reserve 2 pages for the SMP trampoline code XXX:no
 
-static struct boot_mmu_ops *gMMUOps;
+static const struct boot_mmu_ops *gMMUOps;
 
 static addr_t
 get_next_virtual_address(size_t size)
@@ -568,25 +568,25 @@ extern "C" void
 mmu_init(void)
 {
 	TRACE(("mmu_init\n"));
-	switch (gKernelArgs.arch.mmu_type) {
+	switch (gKernelArgs.arch_args.mmu_type) {
 #if 0
 		case 68851:
-			gMMUOps = k851MMUOps;
+			gMMUOps = &k851MMUOps;
 			break;
 #endif
 		case 68030:
-			gMMUOps = k030MMUOps;
+			gMMUOps = &k030MMUOps;
 			break;
 		case 68040:
-			gMMUOps = k040MMUOps;
+			gMMUOps = &k040MMUOps;
 			break;
 #if 0
 		case 68060:
-			gMMUOps = k060MMUOps;
+			gMMUOps = &k060MMUOps;
 			break;
 #endif
 		default:
-			panic("unknown mmu type %d\n", gKernelArgs.arch.mmu_type);
+			panic("unknown mmu type %d\n", gKernelArgs.arch_args.mmu_type);
 	}
 
 	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
