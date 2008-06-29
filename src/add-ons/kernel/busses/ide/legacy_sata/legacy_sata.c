@@ -56,9 +56,10 @@ static const char * const kChannelNames[] = {
 	"Tertiary Channel", "Quaternary Channel"
 };
 
-static ide_for_controller_interface*	ide;
-static ide_adapter_interface*		ide_adapter;
-static device_manager_info*		dm;
+static ide_for_controller_interface* ide;
+static ide_adapter_interface* ide_adapter;
+static device_manager_info* dm;
+
 
 static float
 controller_supports(device_node *parent)
@@ -224,7 +225,6 @@ err:
 }
 
 
-
 static status_t
 controller_init(device_node *node, void **controller_cookie)
 {
@@ -240,6 +240,7 @@ controller_uninit(void *controller_cookie)
 	ide_adapter->uninit_controller(controller_cookie);
 }
 
+
 static void
 controller_removed(void *controller_cookie)
 {
@@ -251,8 +252,7 @@ controller_removed(void *controller_cookie)
 static status_t
 channel_init(device_node *node, void **channel_cookie)
 {
-	return ide_adapter->init_channel(
-		node,
+	return ide_adapter->init_channel(node,
 		(ide_adapter_channel_info**)channel_cookie,
 		sizeof(ide_adapter_channel_info),
 		ide_adapter->inthand);
@@ -270,6 +270,13 @@ static void
 channel_removed(void *channel_cookie)
 {
 	ide_adapter->channel_removed(channel_cookie);
+}
+
+
+static void
+channel_set(void *cookie, ide_channel channel)
+{
+	ide_adapter->set_channel((ide_adapter_channel_info *)cookie, channel);
 }
 
 
@@ -337,9 +344,9 @@ dma_finish(void *channel_cookie)
 
 
 module_dependency module_dependencies[] = {
-	{ IDE_FOR_CONTROLLER_MODULE_NAME,	(module_info **)&ide },
-	{ B_DEVICE_MANAGER_MODULE_NAME,		(module_info **)&dm },
-	{ IDE_ADAPTER_MODULE_NAME,		(module_info **)&ide_adapter },
+	{ IDE_FOR_CONTROLLER_MODULE_NAME, (module_info **)&ide },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&dm },
+	{ IDE_ADAPTER_MODULE_NAME, (module_info **)&ide_adapter },
 	{}
 };
 
@@ -351,24 +358,30 @@ static ide_controller_interface sChannelInterface = {
 			NULL
 		},
 
-		.supports_device	= NULL,
-		.register_device	= NULL,
-		.init_driver		= channel_init,
-		.uninit_driver		= channel_uninit,
-		.device_removed		= channel_removed,
+		NULL,
+		NULL,
+		channel_init,
+		channel_uninit,
+		NULL,
+		NULL,
+		channel_removed,
 	},
 
-	.write_command_block_regs	= task_file_write,
-	.read_command_block_regs	= task_file_read,
-	.get_altstatus			= altstatus_read,
-	.write_device_control		= device_control_write,
-	.write_pio			= pio_write,
-	.read_pio			= pio_read,
-	.prepare_dma			= dma_prepare,
-	.start_dma			= dma_start,
-	.finish_dma			= dma_finish,
-};
+	channel_set,
 
+	task_file_write,
+	task_file_read,
+
+	altstatus_read,
+	device_control_write,
+
+	pio_write,
+	pio_read,
+
+	dma_prepare,
+	dma_start,
+	dma_finish,
+};
 
 static driver_module_info sControllerInterface = {
 	{
