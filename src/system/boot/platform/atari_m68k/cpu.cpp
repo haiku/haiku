@@ -41,7 +41,7 @@ check_cpu_features()
 	const tos_cookie *c;
 	uint16 cpu_type, fpu_type, fpu_emul;
 	uint16 machine_type;
-	int fpu;
+	int fpu = 0;
 
 	c = tos_find_cookie('_CPU');
 	if (!c) {

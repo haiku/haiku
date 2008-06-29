@@ -5,6 +5,7 @@
 #ifndef _KERNEL_M68K_ARCH_PLATFORM_H
 #define _KERNEL_M68K_ARCH_PLATFORM_H
 
+#include <OS.h>
 #include <arch/platform.h>
 
 struct real_time_data;
