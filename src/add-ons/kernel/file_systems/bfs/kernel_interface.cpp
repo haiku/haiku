@@ -1179,6 +1179,8 @@ bfs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 
 	if (!inode->HasUserAccessableStream()) {
 		*_length = 0;
+		if (inode->IsDirectory())
+			RETURN_ERROR(B_IS_A_DIRECTORY);
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
