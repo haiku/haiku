@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2008, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -157,14 +157,6 @@ class KDiskDeviceManager::DeviceWatcher : public NotificationListener {
 	private:
 		KDiskDeviceManager *fManager;
 };
-
-
-static bool
-is_active_job_status(uint32 status)
-{
-	return (status == B_DISK_DEVICE_JOB_SCHEDULED
-			|| status == B_DISK_DEVICE_JOB_IN_PROGRESS);
-}
 
 
 //	#pragma mark -
@@ -919,9 +911,9 @@ KDiskDeviceManager::StartMonitoring()
 }
 
 
-// _RescanDiskSystems
 status_t
-KDiskDeviceManager::_RescanDiskSystems(bool fileSystems)
+KDiskDeviceManager::_RescanDiskSystems(DiskSystemMap& addedSystems,
+	bool fileSystems)
 {
 	void *cookie = open_module_list(fileSystems
 		? kFileSystemPrefix : kPartitioningSystemPrefix);
@@ -949,19 +941,43 @@ KDiskDeviceManager::_RescanDiskSystems(bool fileSystems)
 			DBG(OUT("partitioning system: %s\n", name.Path()));
 			_AddPartitioningSystem(name.Path());
 		}
+
+		if (KDiskSystem* system = FindDiskSystem(name.Path()))
+			addedSystems.Put(system->ID(), system);
 	}
 
 	close_module_list(cookie);
 	return B_OK;
 }
 
-// RescanDiskSystems
+
+/*!	Rescan the existing disk systems. This is called after the boot device
+	has become available.
+*/
 status_t
 KDiskDeviceManager::RescanDiskSystems()
 {
+	DiskSystemMap addedSystems;
+
 	// rescan for partitioning and file systems
-	_RescanDiskSystems(false);
-	_RescanDiskSystems(true);
+	_RescanDiskSystems(addedSystems, false);
+	_RescanDiskSystems(addedSystems, true);
+
+	// rescan existing devices with the new disk systems
+	int32 cookie = 0;
+	while (KDiskDevice *device = RegisterNextDevice(&cookie)) {
+		PartitionRegistrar _(device, true);
+		if (DeviceWriteLocker deviceLocker = device) {
+			if (ManagerLocker locker = this) {
+				status_t status = _ScanPartition(device, false, &addedSystems);
+				device->UnmarkBusy(true);
+				if (status != B_OK)
+					break;
+			} else
+				return B_ERROR;
+		} else
+			return B_ERROR;
+	}
 
 	return B_OK;
 }
@@ -1158,7 +1174,8 @@ DBG(OUT("  found device: %s\n", path));
 	The device must be write locked, the manager must be locked.
 */
 status_t
-KDiskDeviceManager::_ScanPartition(KPartition *partition, bool async)
+KDiskDeviceManager::_ScanPartition(KPartition *partition, bool async,
+	DiskSystemMap* restrictScan)
 {
 // TODO: There's no reason why the manager needs to be locked anymore.
 	if (!partition)
@@ -1197,22 +1214,26 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition, bool async)
 
 	// scan synchronously
 
-	return _ScanPartition(partition);
+	return _ScanPartition(partition, restrictScan);
 }
 
 
 status_t
-KDiskDeviceManager::_ScanPartition(KPartition *partition)
+KDiskDeviceManager::_ScanPartition(KPartition* partition,
+	DiskSystemMap* restrictScan)
 {
 	// the partition's device must be write-locked
-	if (!partition)
+	if (partition == NULL)
 		return B_BAD_VALUE;
-	if (!partition->Device()->HasMedia())
+	if (!partition->Device()->HasMedia() || partition->IsMounted())
 		return B_OK;
-	if (partition->DiskSystem() != NULL) {
-		// TODO: this is more or less a hack to allow rescanning a partition
-		for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++)
-			_ScanPartition(child);
+
+	if (partition->CountChildren() > 0) {
+		// Since this partition has already children, we don't scan it
+		// again, but only its children.
+		for (int32 i = 0; KPartition* child = partition->ChildAt(i); i++) {
+			_ScanPartition(child, restrictScan);
+		}
 		return B_OK;
 	}
 
@@ -1230,12 +1251,20 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 			return error;
 	}
 
+	DiskSystemMap* diskSystems = restrictScan;
+	if (diskSystems == NULL)
+		diskSystems = fDiskSystems;
+
 	// find the disk system that returns the best priority for this partition
-	float bestPriority = -1;
+	float bestPriority = partition->DiskSystemPriority();
 	KDiskSystem *bestDiskSystem = NULL;
 	void *bestCookie = NULL;
-	int32 itCookie = 0;
-	while (KDiskSystem *diskSystem = LoadNextDiskSystem(&itCookie)) {
+	for (DiskSystemMap::Iterator iterator = diskSystems->Begin();
+			iterator != diskSystems->End(); iterator++) {
+		KDiskSystem* diskSystem = iterator->Value();
+		if (diskSystem->Load() != B_OK)
+			continue;
+
 		DBG(OUT("  trying: %s\n", diskSystem->Name()));
 
 		void *cookie = NULL;
@@ -1267,9 +1296,9 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 		error = bestDiskSystem->Scan(partition, bestCookie);
 		bestDiskSystem->FreeIdentifyCookie(partition, bestCookie);
 		if (error == B_OK) {
-			partition->SetDiskSystem(bestDiskSystem);
+			partition->SetDiskSystem(bestDiskSystem, bestPriority);
 			for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++)
-				_ScanPartition(child);
+				_ScanPartition(child, restrictScan);
 		} else {
 			// TODO: Handle the error.
 			DBG(OUT("  scanning failed: %s\n", strerror(error)));

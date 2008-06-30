@@ -98,10 +98,16 @@ public:
 	status_t StartMonitoring();
 
 private:
+	struct DeviceMap;
+	struct DiskSystemMap;
+	struct PartitionMap;
+	struct PartitionSet;
+	class DeviceWatcher;
+
 	static status_t _CheckMediaStatusDaemon(void* self);
 	status_t _CheckMediaStatus();
 
-	status_t _RescanDiskSystems(bool fileSystems);
+	status_t _RescanDiskSystems(DiskSystemMap& addedSystems, bool fileSystems);
 
 	status_t _AddPartitioningSystem(const char *name);
 	status_t _AddFileSystem(const char *name);
@@ -111,18 +117,13 @@ private:
 	bool _RemoveDevice(KDiskDevice *device);
 
 	status_t _Scan(const char *path);
-	status_t _ScanPartition(KPartition *partition, bool async);
+	status_t _ScanPartition(KPartition *partition, bool async,
+		DiskSystemMap* restrictScan = NULL);
 		// the manager must be locked and the device write locked
-	status_t _ScanPartition(KPartition *partition);
-		// used by the other _ScanPartition() version only
+	status_t _ScanPartition(KPartition *partition,
+		DiskSystemMap* restrictScan);
 
 	status_t _AddRemoveMonitoring(const char *path, bool add);
-
-	struct DeviceMap;
-	struct DiskSystemMap;
-	struct PartitionMap;
-	struct PartitionSet;
-	class DeviceWatcher;
 
 	BLocker						fLock;
 	DeviceMap					*fDevices;

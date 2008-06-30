@@ -1,4 +1,10 @@
-// KPartition.cpp
+/*
+ * Copyright 2004-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #include <errno.h>
 #include <fcntl.h>
@@ -44,6 +50,7 @@ KPartition::KPartition(partition_id id)
 	  fDevice(NULL),
 	  fParent(NULL),
 	  fDiskSystem(NULL),
+	  fDiskSystemPriority(-1),
 	  fListeners(NULL),
 	  fChangeFlags(0),
 	  fChangeCounter(0),
@@ -52,7 +59,7 @@ KPartition::KPartition(partition_id id)
 	  fObsolete(false),
 	  fPublished(false)
 {
-	fPartitionData.id = (id >= 0 ? id : _NextID());
+	fPartitionData.id = id >= 0 ? id : _NextID();
 	fPartitionData.offset = 0;
 	fPartitionData.size = 0;
 	fPartitionData.content_size = 0;
@@ -895,13 +902,14 @@ KPartition::VisitEachDescendant(KPartitionVisitor *visitor)
 
 // SetDiskSystem
 void
-KPartition::SetDiskSystem(KDiskSystem *diskSystem)
+KPartition::SetDiskSystem(KDiskSystem *diskSystem, float priority)
 {
 	// unload former disk system
 	if (fDiskSystem) {
 		fPartitionData.content_type = NULL;
 		fDiskSystem->Unload();
 		fDiskSystem = NULL;
+		fDiskSystemPriority = -1;
 	}
 	// set and load new one
 	fDiskSystem = diskSystem;
@@ -910,6 +918,7 @@ KPartition::SetDiskSystem(KDiskSystem *diskSystem)
 	// update concerned partition flags
 	if (fDiskSystem) {
 		fPartitionData.content_type = fDiskSystem->PrettyName();
+		fDiskSystemPriority = priority;
 		if (fDiskSystem->IsFileSystem())
 			AddFlags(B_PARTITION_FILE_SYSTEM);
 		else
@@ -925,6 +934,14 @@ KPartition::DiskSystem() const
 {
 	return fDiskSystem;
 }
+
+
+float
+KPartition::DiskSystemPriority() const
+{
+	return fDiskSystemPriority;
+}
+
 
 // ParentDiskSystem
 KDiskSystem *

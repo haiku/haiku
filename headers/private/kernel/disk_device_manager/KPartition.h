@@ -148,8 +148,9 @@ public:
 
 	// DiskSystem
 
-	void SetDiskSystem(KDiskSystem *diskSystem);
+	void SetDiskSystem(KDiskSystem *diskSystem, float priority = 0.0f);
 	KDiskSystem *DiskSystem() const;
+	float DiskSystemPriority() const;
 	KDiskSystem *ParentDiskSystem() const;
 		// When setting a disk system, it must already be loaded.
 		// The partition will load it too, hence it won't be unloaded before
@@ -218,6 +219,7 @@ protected:
 	KDiskDevice			*fDevice;
 	KPartition			*fParent;
 	KDiskSystem			*fDiskSystem;
+	float				fDiskSystemPriority;
 	ListenerSet			*fListeners;
 	uint32				fChangeFlags;
 	int32				fChangeCounter;
