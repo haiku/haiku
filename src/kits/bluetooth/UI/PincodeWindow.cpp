@@ -149,7 +149,7 @@ void PincodeWindow::MessageReceived(BMessage *msg)
 				// TODO: something failed here
 			}
 
-			QuitRequested();
+			PostMessage(B_QUIT_REQUESTED);
 		}
 		break;
 
@@ -179,7 +179,7 @@ void PincodeWindow::MessageReceived(BMessage *msg)
 				// TODO: something failed here
 			}
 
-			QuitRequested();
+			PostMessage(B_QUIT_REQUESTED);
 		}
 		break;
 
@@ -193,9 +193,7 @@ void PincodeWindow::MessageReceived(BMessage *msg)
 
 bool PincodeWindow::QuitRequested()
 {
-	Lock();
-	Quit();
-	return (true);
+	return BWindow::QuitRequested();
 };
 
 }

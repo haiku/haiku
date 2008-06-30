@@ -46,7 +46,7 @@ void ConnectionView::Pulse()
 {
 	static int a = 0;
 	if (a++ == B_PULSES_BY_SECOND(5))
-		Window()->QuitRequested();
+		Window()->PostMessage(B_QUIT_REQUESTED);
 
 }
 
@@ -85,7 +85,7 @@ void ConnectionIncoming::MessageReceived(BMessage *message)
 //---------------------------------------------------------------
 bool ConnectionIncoming::QuitRequested()
 {
-	Quit();
+
 	return BWindow::QuitRequested();
 }
 
