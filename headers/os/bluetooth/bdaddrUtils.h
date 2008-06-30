@@ -15,7 +15,7 @@
 namespace Bluetooth {
 
 class bdaddrUtils {
-   
+
        public:
 		static inline bdaddr_t NullAddress() 
 		{
@@ -58,7 +58,24 @@ class bdaddrUtils {
 															
 			return str;
 		}
-			
+
+		static bdaddr_t FromString(const char * addr)
+		{
+			int b0, b1, b2, b3, b4, b5;
+			size_t count = sscanf(addr, "%2X:%2X:%2X:%2X:%2X:%2X",
+						&b0,
+						&b1,
+						&b2,
+						&b3,
+						&b4,
+						&b5);
+
+			if (count == 6)
+				return ((bdaddr_t) {{b0, b1, b2, b3, b4, b5}});
+
+			return NullAddress();
+		}	
+
 };
 
 }
