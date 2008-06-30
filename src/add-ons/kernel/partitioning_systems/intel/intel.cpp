@@ -164,12 +164,9 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 	if (hasChildren)
 		return 0.4;
 
-	// No children but a parent. Extremely unlikely that this is desired.
-	// Just indicate that we don't support this partition, it's probably a
-	// filesystem and not a partition at all.
-	*cookie = NULL;
-	delete map;
-	return -1;
+	// No children. Extremely unlikely, that this is desired. But if no one
+	// else claims the partition, we take it anyway.
+	return 0.1;
 }
 
 // pm_scan_partition
