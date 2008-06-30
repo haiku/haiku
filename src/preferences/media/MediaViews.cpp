@@ -144,9 +144,9 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	rect2.bottom = rect.Height() - 5;
 	BRect textRect(3, 3, rect2.Width() - 3, rect2.Height() - 3);
 	BTextView *textView = new BTextView(rect2, "stringView", textRect, B_FOLLOW_ALL, B_WILL_DRAW);
-	textView->Insert(fIsVideo ? "Enabling Real-Time Video allows Haiku to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM."
+	textView->Insert(fIsVideo ? "Enabling Real-Time Video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM."
 		"\n\nOnly enable this feature if you need the lowest latency possible."
-		: "Enabling Real-time Audio allows Haiku to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM."
+		: "Enabling Real-time Audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM."
 		"\n\nOnly enable this feature if you need the lowest latency possible.");
 	textView->MakeEditable(false);
 	textView->MakeSelectable(false);
