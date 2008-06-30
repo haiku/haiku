@@ -344,6 +344,7 @@ TBeMenu::AddStandardBeMenuItems()
 	subMenu->SetFont(be_plain_font);
 	AddItem(subMenu);
 
+#ifndef __HAIKU__
 	if ((modifiers() & (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY))
 			== (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY)) {
 		subMenu = new BMenu("Window Decor");
@@ -372,6 +373,7 @@ TBeMenu::AddStandardBeMenuItems()
 		subMenu->SetFont(be_plain_font);
 		AddItem(subMenu);
 	};
+#endif
 
 	AddSeparatorItem();
 
