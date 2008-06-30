@@ -438,24 +438,28 @@ add_safe_mode_menu()
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Safe mode"));
 	item->SetData(B_SAFEMODE_SAFE_MODE);
 	item->SetType(MENU_ITEM_MARKABLE);
-	item->SetHelpText("Puts the system into safe mode. This can be enabled independently "
-		"from the other options.");
+	item->SetHelpText("Puts the system into safe mode. This can be enabled "
+		"independently from the other options.");
 
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Disable user add-ons"));
 	item->SetData(B_SAFEMODE_DISABLE_USER_ADD_ONS);
 	item->SetType(MENU_ITEM_MARKABLE);
-	item->SetHelpText("Prevent all user installed add-ons to be loaded. Only the add-ons "
-		"in the system directory will be used.");
+    item->SetHelpText("Prevents all user installed add-ons from being loaded. "
+		"Only the add-ons in the system directory will be used.");
 
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Disable IDE DMA"));
 	item->SetData(B_SAFEMODE_DISABLE_IDE_DMA);
 	item->SetType(MENU_ITEM_MARKABLE);
+    item->SetHelpText("Disables IDE DMA, increasing IDE compatibilty "
+		"at the expense of performance.");
 	
 	platform_add_menus(safeMenu);
 
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Enable on screen debug output"));
 	item->SetData("debug_screen");
 	item->SetType(MENU_ITEM_MARKABLE);
+    item->SetHelpText("Displays debug output on screen while the system "
+		"is booting, instead of the normal boot logo.");
 
 	safeMenu->AddSeparatorItem();
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));

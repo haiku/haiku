@@ -589,6 +589,7 @@ smp_add_safemode_menus(Menu *menu)
 	menu->AddItem(item);
 	item->SetData(B_SAFEMODE_DISABLE_SMP);
 	item->SetType(MENU_ITEM_MARKABLE);
+	item->SetHelpText("Disables all but one CPU core.");
 }
 
 

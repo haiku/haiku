@@ -26,22 +26,27 @@ platform_add_menus(Menu *menu)
 			menu->AddItem(item = new(nothrow) MenuItem("Use fail-safe video mode"));
 			item->SetType(MENU_ITEM_MARKABLE);
 			item->SetData(B_SAFEMODE_FAIL_SAFE_VIDEO_MODE);
-			item->SetHelpText("The system will use VESA mode and won't try to open any video graphics driver");
+			item->SetHelpText("The system will use VESA mode "
+				"and won't try to use any video graphics drivers.");
 
 			smp_add_safemode_menus(menu);
 
 			menu->AddItem(item = new(nothrow) MenuItem("Don't call the BIOS"));
+			item->SetHelpText("Stops the system from calling BIOS functions.");
 			item->SetType(MENU_ITEM_MARKABLE);
 
 			menu->AddItem(item = new(nothrow) MenuItem("Disable APM"));
 			item->SetType(MENU_ITEM_MARKABLE);
 			item->SetData(B_SAFEMODE_DISABLE_APM);
-			item->SetHelpText("This overrides the APM setting in the kernel settings file");
+			item->SetHelpText("Disables Advanced Power Management hardware support, "
+				"overriding the APM setting in the kernel settings file.");
 
 			menu->AddItem(item = new(nothrow) MenuItem("Disable ACPI"));
 			item->SetType(MENU_ITEM_MARKABLE);
 			item->SetData(B_SAFEMODE_DISABLE_ACPI);
-			item->SetHelpText("This overrides the ACPI setting in the kernel settings file");
+			item->SetHelpText("Disables Advanced Configuration and Power "
+				"Interface hardware support, overriding the ACPI setting "
+				"in the kernel settings file.");
 			break;
 		default:
 			break;
