@@ -155,13 +155,11 @@ AcpiHwGetBitRegisterInfo (
 
 ACPI_STATUS
 AcpiHwRegisterRead (
-    BOOLEAN                 UseLock,
     UINT32                  RegisterId,
     UINT32                  *ReturnValue);
 
 ACPI_STATUS
 AcpiHwRegisterWrite (
-    BOOLEAN                 UseLock,
     UINT32                  RegisterId,
     UINT32                  Value);
 

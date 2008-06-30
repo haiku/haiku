@@ -201,7 +201,7 @@ AfWriteBuffer (
 char *
 AfGenerateFilename (char *TableId)
 {
-    ACPI_NATIVE_UINT         i;
+    UINT16                  i;
 
 
     for (i = 0; i < 8 && TableId[i] != ' ' && TableId[i] != 0; i++)

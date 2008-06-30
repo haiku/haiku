@@ -218,7 +218,7 @@ AcpiUtMemcpy (
 void *
 AcpiUtMemset (
     void                    *Dest,
-    ACPI_NATIVE_UINT        Value,
+    UINT8                   Value,
     ACPI_SIZE               Count)
 {
     char                    *New = (char *) Dest;

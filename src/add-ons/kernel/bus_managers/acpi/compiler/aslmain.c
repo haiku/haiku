@@ -328,7 +328,7 @@ AslCommandLine (
     char                    **argv)
 {
     BOOLEAN                 BadCommandLine = FALSE;
-    ACPI_NATIVE_INT         j;
+    int                     j;
 
 
     /* Minimum command line contains at least one option or an input file */

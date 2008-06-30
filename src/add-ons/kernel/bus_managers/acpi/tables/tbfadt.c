@@ -246,7 +246,7 @@ AcpiTbInitGenericAddress (
 
 void
 AcpiTbParseFadt (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     UINT8                   Flags)
 {
     UINT32                  Length;
@@ -378,9 +378,9 @@ static void
 AcpiTbConvertFadt (
     void)
 {
-    UINT8                       Pm1RegisterLength;
-    ACPI_GENERIC_ADDRESS        *Target;
-    ACPI_NATIVE_UINT            i;
+    UINT8                   Pm1RegisterLength;
+    ACPI_GENERIC_ADDRESS    *Target;
+    UINT32                  i;
 
 
     /* Update the local FADT table header length */
@@ -487,7 +487,7 @@ AcpiTbValidateFadt (
     UINT32                  *Address32;
     ACPI_GENERIC_ADDRESS    *Address64;
     UINT8                   Length;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     /* Examine all of the 64-bit extended address fields (X fields) */

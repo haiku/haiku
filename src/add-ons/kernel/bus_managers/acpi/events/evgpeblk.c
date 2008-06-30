@@ -286,8 +286,8 @@ AcpiEvDeleteGpeHandlers (
     ACPI_GPE_BLOCK_INFO     *GpeBlock)
 {
     ACPI_GPE_EVENT_INFO     *GpeEventInfo;
-    ACPI_NATIVE_UINT        i;
-    ACPI_NATIVE_UINT        j;
+    UINT32                  i;
+    UINT32                  j;
 
 
     ACPI_FUNCTION_TRACE (EvDeleteGpeHandlers);
@@ -301,7 +301,7 @@ AcpiEvDeleteGpeHandlers (
 
         for (j = 0; j < ACPI_GPE_REGISTER_WIDTH; j++)
         {
-            GpeEventInfo = &GpeBlock->EventInfo[(i * ACPI_GPE_REGISTER_WIDTH) + j];
+            GpeEventInfo = &GpeBlock->EventInfo[((ACPI_SIZE) i * ACPI_GPE_REGISTER_WIDTH) + j];
 
             if ((GpeEventInfo->Flags & ACPI_GPE_DISPATCH_MASK) ==
                     ACPI_GPE_DISPATCH_HANDLER)
@@ -894,8 +894,8 @@ AcpiEvCreateGpeInfoBlocks (
     ACPI_GPE_EVENT_INFO     *GpeEventInfo = NULL;
     ACPI_GPE_EVENT_INFO     *ThisEvent;
     ACPI_GPE_REGISTER_INFO  *ThisRegister;
-    ACPI_NATIVE_UINT        i;
-    ACPI_NATIVE_UINT        j;
+    UINT32                  i;
+    UINT32                  j;
     ACPI_STATUS             Status;
 
 
@@ -1140,8 +1140,8 @@ AcpiEvInitializeGpeBlock (
     ACPI_GPE_WALK_INFO      GpeInfo;
     UINT32                  WakeGpeCount;
     UINT32                  GpeEnabledCount;
-    ACPI_NATIVE_UINT        i;
-    ACPI_NATIVE_UINT        j;
+    UINT32                  i;
+    UINT32                  j;
 
 
     ACPI_FUNCTION_TRACE (EvInitializeGpeBlock);
@@ -1191,7 +1191,7 @@ AcpiEvInitializeGpeBlock (
         {
             /* Get the info block for this particular GPE */
 
-            GpeEventInfo = &GpeBlock->EventInfo[(i * ACPI_GPE_REGISTER_WIDTH) + j];
+            GpeEventInfo = &GpeBlock->EventInfo[((ACPI_SIZE) i * ACPI_GPE_REGISTER_WIDTH) + j];
 
             if (((GpeEventInfo->Flags & ACPI_GPE_DISPATCH_MASK) == ACPI_GPE_DISPATCH_METHOD) &&
                  (GpeEventInfo->Flags & ACPI_GPE_TYPE_RUNTIME))

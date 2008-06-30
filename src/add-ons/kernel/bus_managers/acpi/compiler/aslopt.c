@@ -288,9 +288,9 @@ OptBuildShortestPath (
 {
     UINT32                  NumCommonSegments;
     UINT32                  MaxCommonSegments;
-    ACPI_NATIVE_UINT        Index;
+    UINT32                  Index;
     UINT32                  NumCarats;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
     char                    *NewPath;
     char                    *NewPathExternal;
     ACPI_NAMESPACE_NODE     *Node;

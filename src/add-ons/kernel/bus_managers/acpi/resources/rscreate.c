@@ -271,9 +271,9 @@ AcpiRsCreatePciRoutingTable (
     }
 
     /*
-     * Loop through the ACPI_INTERNAL_OBJECTS - Each object
-     * should be a package that in turn contains an
-     * ACPI_INTEGER Address, a UINT8 Pin, a Name and a UINT8 SourceIndex.
+     * Loop through the ACPI_INTERNAL_OBJECTS - Each object should be a
+     * package that in turn contains an ACPI_INTEGER Address, a UINT8 Pin,
+     * a Name, and a UINT8 SourceIndex.
      */
     TopObjectList    = PackageObject->Package.Elements;
     NumberOfElements = PackageObject->Package.Count;
@@ -328,31 +328,42 @@ AcpiRsCreatePciRoutingTable (
         /* 1) First subobject: Dereference the PRT.Address */
 
         ObjDesc = SubObjectList[0];
-        if (ACPI_GET_OBJECT_TYPE (ObjDesc) == ACPI_TYPE_INTEGER)
+        if (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER)
         {
-            UserPrt->Address = ObjDesc->Integer.Value;
-        }
-        else
-        {
-            ACPI_ERROR ((AE_INFO,
-                "(PRT[%X].Address) Need Integer, found %s",
+            ACPI_ERROR ((AE_INFO, "(PRT[%X].Address) Need Integer, found %s",
                 Index, AcpiUtGetObjectTypeName (ObjDesc)));
             return_ACPI_STATUS (AE_BAD_DATA);
         }
+
+        UserPrt->Address = ObjDesc->Integer.Value;
 
         /* 2) Second subobject: Dereference the PRT.Pin */
 
         ObjDesc = SubObjectList[1];
-        if (ACPI_GET_OBJECT_TYPE (ObjDesc) == ACPI_TYPE_INTEGER)
+        if (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER)
         {
-            UserPrt->Pin = (UINT32) ObjDesc->Integer.Value;
-        }
-        else
-        {
-            ACPI_ERROR ((AE_INFO,
-                "(PRT[%X].Pin) Need Integer, found %s",
+            ACPI_ERROR ((AE_INFO, "(PRT[%X].Pin) Need Integer, found %s",
                 Index, AcpiUtGetObjectTypeName (ObjDesc)));
             return_ACPI_STATUS (AE_BAD_DATA);
+        }
+
+        UserPrt->Pin = (UINT32) ObjDesc->Integer.Value;
+
+        /*
+         * If the BIOS has erroneously reversed the _PRT SourceName (index 2)
+         * and the SourceIndex (index 3), fix it. _PRT is important enough to
+         * workaround this BIOS error. This also provides compatibility with
+         * other ACPI implementations.
+         */
+        ObjDesc = SubObjectList[3];
+        if (!ObjDesc || (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER))
+        {
+            SubObjectList[3] = SubObjectList[2];
+            SubObjectList[2] = ObjDesc;
+
+            ACPI_WARNING ((AE_INFO,
+                "(PRT[%X].Source) SourceName and SourceIndex are reversed, fixed",
+                Index));
         }
 
         /*
@@ -430,17 +441,15 @@ AcpiRsCreatePciRoutingTable (
         /* 4) Fourth subobject: Dereference the PRT.SourceIndex */
 
         ObjDesc = SubObjectList[3];
-        if (ACPI_GET_OBJECT_TYPE (ObjDesc) == ACPI_TYPE_INTEGER)
-        {
-            UserPrt->SourceIndex = (UINT32) ObjDesc->Integer.Value;
-        }
-        else
+        if (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER)
         {
             ACPI_ERROR ((AE_INFO,
                 "(PRT[%X].SourceIndex) Need Integer, found %s",
                 Index, AcpiUtGetObjectTypeName (ObjDesc)));
             return_ACPI_STATUS (AE_BAD_DATA);
         }
+
+        UserPrt->SourceIndex = (UINT32) ObjDesc->Integer.Value;
 
         /* Point to the next ACPI_OPERAND_OBJECT in the top level package */
 

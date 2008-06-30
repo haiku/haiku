@@ -685,7 +685,7 @@ AcpiDbDisplayObjectType (
     ACPI_BUFFER             Buffer;
     ACPI_DEVICE_INFO        *Info;
     ACPI_STATUS             Status;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     Handle = ACPI_TO_POINTER (ACPI_STRTOUL (ObjectArg, NULL, 16));
@@ -707,7 +707,7 @@ AcpiDbDisplayObjectType (
         {
             for (i = 0; i < Info->CompatibilityId.Count; i++)
             {
-                AcpiOsPrintf ("CID #%d: %s\n", (UINT32) i,
+                AcpiOsPrintf ("CID #%d: %s\n", i,
                     Info->CompatibilityId.Id[i].Value);
             }
         }

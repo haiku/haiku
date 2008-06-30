@@ -187,9 +187,9 @@ SEARCH on [ FGristFiles $(namespace_src)  ] = [ FDirName $(HAIKU_TOP) src add-on
 SEARCH on [ FGristFiles $(resources_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi resources ] ;
 SEARCH on [ FGristFiles $(tables_src) tbutils.c ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi tables ] ;
 SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi utilities ] ;
-SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter dispatcher ] ;
-SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter executer ] ;
-SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter parser ] ;
+SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi dispatcher ] ;
+SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi executer ] ;
+SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi parser ] ;
 
 KernelAddon acpi :
 	oshaiku.c

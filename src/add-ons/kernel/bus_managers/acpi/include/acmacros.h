@@ -155,12 +155,12 @@
  */
 #define ACPI_CAST_PTR(t, p)             ((t *) (ACPI_UINTPTR_T) (p))
 #define ACPI_CAST_INDIRECT_PTR(t, p)    ((t **) (ACPI_UINTPTR_T) (p))
-#define ACPI_ADD_PTR(t,a,b)             ACPI_CAST_PTR (t, (ACPI_CAST_PTR (UINT8,(a)) + (ACPI_NATIVE_UINT)(b)))
-#define ACPI_PTR_DIFF(a,b)              (ACPI_NATIVE_UINT) (ACPI_CAST_PTR (UINT8,(a)) - ACPI_CAST_PTR (UINT8,(b)))
+#define ACPI_ADD_PTR(t,a,b)             ACPI_CAST_PTR (t, (ACPI_CAST_PTR (UINT8,(a)) + (ACPI_SIZE)(b)))
+#define ACPI_PTR_DIFF(a,b)              (ACPI_SIZE) (ACPI_CAST_PTR (UINT8,(a)) - ACPI_CAST_PTR (UINT8,(b)))
 
 /* Pointer/Integer type conversions */
 
-#define ACPI_TO_POINTER(i)              ACPI_ADD_PTR (void,(void *) NULL,(ACPI_NATIVE_UINT) i)
+#define ACPI_TO_POINTER(i)              ACPI_ADD_PTR (void,(void *) NULL,(ACPI_SIZE) i)
 #define ACPI_TO_INTEGER(p)              ACPI_PTR_DIFF (p,(void *) NULL)
 #define ACPI_OFFSET(d,f)                (ACPI_SIZE) ACPI_PTR_DIFF (&(((d *)0)->f),(void *) NULL)
 #define ACPI_PHYSADDR_TO_PTR(i)         ACPI_TO_POINTER(i)
@@ -375,22 +375,22 @@ typedef struct acpi_integer_overlay
 /*
  * Rounding macros (Power of two boundaries only)
  */
-#define ACPI_ROUND_DOWN(value,boundary)     (((ACPI_NATIVE_UINT)(value)) & \
-                                                (~(((ACPI_NATIVE_UINT) boundary)-1)))
+#define ACPI_ROUND_DOWN(value,boundary)     (((ACPI_SIZE)(value)) & \
+                                                (~(((ACPI_SIZE) boundary)-1)))
 
-#define ACPI_ROUND_UP(value,boundary)       ((((ACPI_NATIVE_UINT)(value)) + \
-                                                (((ACPI_NATIVE_UINT) boundary)-1)) & \
-                                                (~(((ACPI_NATIVE_UINT) boundary)-1)))
+#define ACPI_ROUND_UP(value,boundary)       ((((ACPI_SIZE)(value)) + \
+                                                (((ACPI_SIZE) boundary)-1)) & \
+                                                (~(((ACPI_SIZE) boundary)-1)))
 
-/* Note: sizeof(ACPI_NATIVE_UINT) evaluates to either 2, 4, or 8 */
+/* Note: sizeof(ACPI_SIZE) evaluates to either 4 or 8 (32- vs 64-bit mode) */
 
 #define ACPI_ROUND_DOWN_TO_32BIT(a)         ACPI_ROUND_DOWN(a,4)
 #define ACPI_ROUND_DOWN_TO_64BIT(a)         ACPI_ROUND_DOWN(a,8)
-#define ACPI_ROUND_DOWN_TO_NATIVE_WORD(a)   ACPI_ROUND_DOWN(a,sizeof(ACPI_NATIVE_UINT))
+#define ACPI_ROUND_DOWN_TO_NATIVE_WORD(a)   ACPI_ROUND_DOWN(a,sizeof(ACPI_SIZE))
 
 #define ACPI_ROUND_UP_TO_32BIT(a)           ACPI_ROUND_UP(a,4)
 #define ACPI_ROUND_UP_TO_64BIT(a)           ACPI_ROUND_UP(a,8)
-#define ACPI_ROUND_UP_TO_NATIVE_WORD(a)     ACPI_ROUND_UP(a,sizeof(ACPI_NATIVE_UINT))
+#define ACPI_ROUND_UP_TO_NATIVE_WORD(a)     ACPI_ROUND_UP(a,sizeof(ACPI_SIZE))
 
 #define ACPI_ROUND_BITS_UP_TO_BYTES(a)      ACPI_DIV_8((a) + 7)
 #define ACPI_ROUND_BITS_DOWN_TO_BYTES(a)    ACPI_DIV_8((a))
@@ -401,7 +401,7 @@ typedef struct acpi_integer_overlay
 
 #define ACPI_ROUND_UP_TO(value,boundary)    (((value) + ((boundary)-1)) / (boundary))
 
-#define ACPI_IS_MISALIGNED(value)           (((ACPI_NATIVE_UINT)value) & (sizeof(ACPI_NATIVE_UINT)-1))
+#define ACPI_IS_MISALIGNED(value)           (((ACPI_SIZE)value) & (sizeof(ACPI_SIZE)-1))
 
 /*
  * Bitmask creation
@@ -496,7 +496,7 @@ typedef struct acpi_integer_overlay
  * error messages. The __FILE__ macro is not very useful for this, because it
  * often includes the entire pathname to the module
  */
-#define ACPI_MODULE_NAME(Name)          static char ACPI_UNUSED_VAR *_AcpiModuleName = Name;
+#define ACPI_MODULE_NAME(Name)          static const char ACPI_UNUSED_VAR _AcpiModuleName[] = Name;
 #else
 #define ACPI_MODULE_NAME(Name)
 #endif
@@ -549,19 +549,17 @@ typedef struct acpi_integer_overlay
 /*
  * If ACPI_GET_FUNCTION_NAME was not defined in the compiler-dependent header,
  * define it now. This is the case where there the compiler does not support
- * a __FUNCTION__ macro or equivalent. We save the function name on the
- * local stack.
+ * a __FUNCTION__ macro or equivalent.
  */
 #ifndef ACPI_GET_FUNCTION_NAME
 #define ACPI_GET_FUNCTION_NAME          _AcpiFunctionName
 /*
  * The Name parameter should be the procedure name as a quoted string.
- * This is declared as a local string ("MyFunctionName") so that it can
- * be also used by the function exit macros below.
+ * The function name is also used by the function exit macros below.
  * Note: (const char) is used to be compatible with the debug interfaces
  * and macros such as __FUNCTION__.
  */
-#define ACPI_FUNCTION_NAME(Name)        const char *_AcpiFunctionName = #Name;
+#define ACPI_FUNCTION_NAME(Name)        static const char _AcpiFunctionName[] = #Name;
 
 #else
 /* Compiler supports __FUNCTION__ (or equivalent) -- Ignore this macro */
@@ -660,7 +658,7 @@ typedef struct acpi_integer_overlay
 /* Stack and buffer dumping */
 
 #define ACPI_DUMP_STACK_ENTRY(a)        AcpiExDumpOperand((a),0)
-#define ACPI_DUMP_OPERANDS(a,b,c,d,e)   AcpiExDumpOperands(a,b,c,d,e,_AcpiModuleName,__LINE__)
+#define ACPI_DUMP_OPERANDS(a,b,c)       AcpiExDumpOperands(a,b,c)
 
 
 #define ACPI_DUMP_ENTRY(a,b)            AcpiNsDumpEntry (a,b)
@@ -698,7 +696,7 @@ typedef struct acpi_integer_overlay
 #define ACPI_FUNCTION_VALUE_EXIT(s)
 #define ACPI_FUNCTION_ENTRY()
 #define ACPI_DUMP_STACK_ENTRY(a)
-#define ACPI_DUMP_OPERANDS(a,b,c,d,e)
+#define ACPI_DUMP_OPERANDS(a,b,c)
 #define ACPI_DUMP_ENTRY(a,b)
 #define ACPI_DUMP_TABLES(a,b)
 #define ACPI_DUMP_PATHNAME(a,b,c,d)

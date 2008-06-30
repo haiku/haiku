@@ -144,7 +144,7 @@ AcpiRsDecodeBitmask (
     UINT16                  Mask,
     UINT8                   *List)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT8                   i;
     UINT8                   BitCount;
 
 
@@ -157,7 +157,7 @@ AcpiRsDecodeBitmask (
     {
         if (Mask & 0x0001)
         {
-            List[BitCount] = (UINT8) i;
+            List[BitCount] = i;
             BitCount++;
         }
 
@@ -186,8 +186,8 @@ AcpiRsEncodeBitmask (
     UINT8                   *List,
     UINT8                   Count)
 {
-    ACPI_NATIVE_UINT        i;
-    ACPI_NATIVE_UINT        Mask;
+    UINT32                  i;
+    UINT16                  Mask;
 
 
     ACPI_FUNCTION_ENTRY ();
@@ -200,7 +200,7 @@ AcpiRsEncodeBitmask (
         Mask |= (0x1 << List[i]);
     }
 
-    return ((UINT16) Mask);
+    return (Mask);
 }
 
 
@@ -228,7 +228,7 @@ AcpiRsMoveData (
     UINT16                  ItemCount,
     UINT8                   MoveType)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_ENTRY ();
@@ -824,7 +824,6 @@ AcpiRsSetSrsMethodData (
     Info->PrefixNode = Node;
     Info->Pathname = METHOD_NAME__SRS;
     Info->Parameters = Args;
-    Info->ParameterType = ACPI_PARAM_ARGS;
     Info->Flags = ACPI_IGNORE_RETURN_VALUE;
 
     /*

@@ -162,6 +162,7 @@
 #define ACPI_DMARS_OFFSET(f)            (UINT8) ACPI_OFFSET (ACPI_DMAR_DEVICE_SCOPE,f)
 #define ACPI_DMAR0_OFFSET(f)            (UINT8) ACPI_OFFSET (ACPI_DMAR_HARDWARE_UNIT,f)
 #define ACPI_DMAR1_OFFSET(f)            (UINT8) ACPI_OFFSET (ACPI_DMAR_RESERVED_MEMORY,f)
+#define ACPI_DMAR2_OFFSET(f)            (UINT8) ACPI_OFFSET (ACPI_DMAR_ATSR,f)
 #define ACPI_EINJ0_OFFSET(f)            (UINT8) ACPI_OFFSET (ACPI_WHEA_HEADER,f)
 #define ACPI_HEST9_OFFSET(f)            (UINT8) ACPI_OFFSET (ACPI_HEST_GENERIC,f)
 #define ACPI_HESTN_OFFSET(f)            (UINT8) ACPI_OFFSET (ACPI_HEST_NOTIFY,f)
@@ -576,6 +577,7 @@ ACPI_DMTABLE_INFO           AcpiDmTableInfoDbgp[] =
 ACPI_DMTABLE_INFO           AcpiDmTableInfoDmar[] =
 {
     {ACPI_DMT_UINT8,    ACPI_DMAR_OFFSET (Width),                   "Host Address Width"},
+    {ACPI_DMT_UINT8,    ACPI_DMAR_OFFSET (Flags),                   "Flags"},
     {ACPI_DMT_EXIT,     0,                                          NULL}
 };
 
@@ -585,8 +587,6 @@ ACPI_DMTABLE_INFO           AcpiDmTableInfoDmarHdr[] =
 {
     {ACPI_DMT_DMAR,     ACPI_DMAR0_OFFSET (Header.Type),            "Subtable Type"},
     {ACPI_DMT_UINT16,   ACPI_DMAR0_OFFSET (Header.Length),          "Length"},
-    {ACPI_DMT_UINT8,    ACPI_DMAR0_OFFSET (Header.Flags),           "Flags"},
-    {ACPI_DMT_UINT24,   ACPI_DMAR0_OFFSET (Header.Reserved[0]),     "Reserved"},
     {ACPI_DMT_EXIT,     0,                                          NULL}
 };
 
@@ -596,7 +596,8 @@ ACPI_DMTABLE_INFO           AcpiDmTableInfoDmarScope[] =
 {
     {ACPI_DMT_UINT8,    ACPI_DMARS_OFFSET (EntryType),              "Device Scope Entry Type"},
     {ACPI_DMT_UINT8,    ACPI_DMARS_OFFSET (Length),                 "Entry Length"},
-    {ACPI_DMT_UINT8,    ACPI_DMARS_OFFSET (Segment),                "PCI Segment Number"},
+    {ACPI_DMT_UINT16,   ACPI_DMARS_OFFSET (Reserved),               "Reserved"},
+    {ACPI_DMT_UINT8,    ACPI_DMARS_OFFSET (EnumerationId),          "Enumeration ID"},
     {ACPI_DMT_UINT8,    ACPI_DMARS_OFFSET (Bus),                    "PCI Bus Number"},
     {ACPI_DMT_EXIT,     0,                                          NULL}
 };
@@ -607,16 +608,31 @@ ACPI_DMTABLE_INFO           AcpiDmTableInfoDmarScope[] =
 
 ACPI_DMTABLE_INFO           AcpiDmTableInfoDmar0[] =
 {
+    {ACPI_DMT_UINT8,    ACPI_DMAR0_OFFSET (Flags),                  "Flags"},
+    {ACPI_DMT_UINT8,    ACPI_DMAR0_OFFSET (Reserved),               "Reserved"},
+    {ACPI_DMT_UINT16,   ACPI_DMAR0_OFFSET (Segment),                "PCI Segment Number"},
     {ACPI_DMT_UINT64,   ACPI_DMAR0_OFFSET (Address),                "Register Base Address"},
     {ACPI_DMT_EXIT,     0,                                          NULL}
 };
 
-/* 1: Reserved Memory Defininition */
+/* 1: Reserved Memory Definition */
 
 ACPI_DMTABLE_INFO           AcpiDmTableInfoDmar1[] =
 {
-    {ACPI_DMT_UINT64,   ACPI_DMAR1_OFFSET (Address),                "Base Address"},
+    {ACPI_DMT_UINT16,   ACPI_DMAR1_OFFSET (Reserved),               "Reserved"},
+    {ACPI_DMT_UINT16,   ACPI_DMAR1_OFFSET (Segment),                "PCI Segment Number"},
+    {ACPI_DMT_UINT64,   ACPI_DMAR1_OFFSET (BaseAddress),            "Base Address"},
     {ACPI_DMT_UINT64,   ACPI_DMAR1_OFFSET (EndAddress),             "End Address (limit)"},
+    {ACPI_DMT_EXIT,     0,                                          NULL}
+};
+
+/* 2: Root Port ATS Capability Definition */
+
+ACPI_DMTABLE_INFO           AcpiDmTableInfoDmar2[] =
+{
+    {ACPI_DMT_UINT8,    ACPI_DMAR2_OFFSET (Flags),                  "Flags"},
+    {ACPI_DMT_UINT8,    ACPI_DMAR2_OFFSET (Reserved),               "Reserved"},
+    {ACPI_DMT_UINT16,   ACPI_DMAR2_OFFSET (Segment),                "PCI Segment Number"},
     {ACPI_DMT_EXIT,     0,                                          NULL}
 };
 
@@ -1034,7 +1050,6 @@ ACPI_DMTABLE_INFO           AcpiDmTableInfoSrat1[] =
     {ACPI_DMT_UINT16,   ACPI_SRAT1_OFFSET (Reserved),               "Reserved"},
     {ACPI_DMT_UINT64,   ACPI_SRAT1_OFFSET (BaseAddress),            "Base Address"},
     {ACPI_DMT_UINT64,   ACPI_SRAT1_OFFSET (Length),                 "Address Length"},
-    {ACPI_DMT_UINT32,   ACPI_SRAT1_OFFSET (MemoryType),             "Memory Type"},
     {ACPI_DMT_UINT32,   ACPI_SRAT1_OFFSET (Flags),                  "Flags (decoded below)"},
     {ACPI_DMT_FLAG0,    ACPI_SRAT1_FLAG_OFFSET (Flags,0),           "Enabled"},
     {ACPI_DMT_FLAG1,    ACPI_SRAT1_FLAG_OFFSET (Flags,0),           "Hot Pluggable"},

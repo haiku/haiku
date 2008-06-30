@@ -156,7 +156,7 @@ AcpiPsGetNextPackageLength (
 {
     UINT8                   *Aml = ParserState->Aml;
     UINT32                  PackageLength = 0;
-    ACPI_NATIVE_UINT        ByteCount;
+    UINT32                  ByteCount;
     UINT8                   ByteZeroMask = 0x3F; /* Default [0:5] */
 
 
@@ -168,7 +168,7 @@ AcpiPsGetNextPackageLength (
      * used to encode the package length, either 0,1,2, or 3
      */
     ByteCount = (Aml[0] >> 6);
-    ParserState->Aml += (ByteCount + 1);
+    ParserState->Aml += ((ACPI_SIZE) ByteCount + 1);
 
     /* Get bytes 3, 2, 1 as needed */
 
@@ -371,7 +371,7 @@ AcpiPsGetNextNamepath (
         PossibleMethodCall &&
         (Node->Type == ACPI_TYPE_METHOD))
     {
-        if (WalkState->Op->Common.AmlOpcode == AML_UNLOAD_OP)
+        if (WalkState->Opcode == AML_UNLOAD_OP)
         {
             /*
              * AcpiPsGetNextNamestring has increased the AML pointer,
@@ -831,7 +831,7 @@ AcpiPsGetNextArg (
 
             /* To support SuperName arg of Unload */
 
-            if (WalkState->Op->Common.AmlOpcode == AML_UNLOAD_OP)
+            if (WalkState->Opcode == AML_UNLOAD_OP)
             {
                 Status = AcpiPsGetNextNamepath (WalkState, ParserState, Arg, 1);
 

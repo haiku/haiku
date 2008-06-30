@@ -121,8 +121,6 @@
 #include "acinterp.h"
 #include "amlcode.h"
 #include "acnamesp.h"
-#include "acevents.h"
-#include "actables.h"
 
 
 #define _COMPONENT          ACPI_EXECUTER

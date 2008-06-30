@@ -179,7 +179,7 @@ AcpiDsMethodError (
 
 ACPI_STATUS
 AcpiNsLoadTable (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     ACPI_NAMESPACE_NODE     *Node)
 {
     return (AE_NOT_IMPLEMENTED);
@@ -665,7 +665,30 @@ AdCreateTableHeader (
     AcpiOsPrintf (" *\n * Original Table Header:\n");
     AcpiOsPrintf (" *     Signature        \"%4.4s\"\n",    Table->Signature);
     AcpiOsPrintf (" *     Length           0x%8.8X (%u)\n", Table->Length, Table->Length);
-    AcpiOsPrintf (" *     Revision         0x%2.2X\n",      Table->Revision);
+
+    /* Print and validate the revision */
+
+    AcpiOsPrintf (" *     Revision         0x%2.2X",      Table->Revision);
+
+    switch (Table->Revision)
+    {
+    case 0:
+        AcpiOsPrintf (" **** Invalid Revision");
+        break;
+
+    case 1:
+        /* Revision of DSDT controls the ACPI integer width */
+
+        if (ACPI_COMPARE_NAME (Table->Signature, ACPI_SIG_DSDT))
+        {
+            AcpiOsPrintf (" **** ACPI 1.0, no 64-bit math support");
+        }
+        break;
+
+    default:
+        break;
+    }
+    AcpiOsPrintf ("\n");
 
     /* Print and validate the table checksum */
 
@@ -980,7 +1003,7 @@ AdGetLocalTables (
     ACPI_TABLE_HEADER       *NewTable;
     UINT32                  NumTables;
     UINT32                  PointerSize;
-    ACPI_NATIVE_UINT        TableIndex;
+    UINT32                  TableIndex;
 
 
     if (GetAllTables)
@@ -1087,7 +1110,7 @@ AdParseTable (
     ACPI_WALK_STATE         *WalkState;
     UINT8                   *AmlStart;
     UINT32                  AmlLength;
-    ACPI_NATIVE_UINT        TableIndex;
+    UINT32                  TableIndex;
 
 
     if (!Table)
@@ -1139,7 +1162,7 @@ AdParseTable (
 
     if (LoadTable)
     {
-        Status = AcpiTbStoreTable ((ACPI_NATIVE_UINT) Table, Table,
+        Status = AcpiTbStoreTable ((ACPI_PHYSICAL_ADDRESS) Table, Table,
                     Table->Length, ACPI_TABLE_ORIGIN_ALLOCATED, &TableIndex);
         if (ACPI_FAILURE (Status))
         {

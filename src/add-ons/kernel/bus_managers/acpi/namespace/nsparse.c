@@ -142,13 +142,13 @@
 
 ACPI_STATUS
 AcpiNsOneCompleteParse (
-    ACPI_NATIVE_UINT        PassNumber,
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  PassNumber,
+    UINT32                  TableIndex,
     ACPI_NAMESPACE_NODE     *StartNode)
 {
     ACPI_PARSE_OBJECT       *ParseRoot;
     ACPI_STATUS             Status;
-    ACPI_NATIVE_UINT        AmlLength;
+    UINT32                  AmlLength;
     UINT8                   *AmlStart;
     ACPI_WALK_STATE         *WalkState;
     ACPI_TABLE_HEADER       *Table;
@@ -200,7 +200,7 @@ AcpiNsOneCompleteParse (
         AmlStart = (UINT8 *) Table + sizeof (ACPI_TABLE_HEADER);
         AmlLength = Table->Length - sizeof (ACPI_TABLE_HEADER);
         Status = AcpiDsInitAmlWalk (WalkState, ParseRoot, NULL,
-                    AmlStart, (UINT32) AmlLength, NULL, (UINT8) PassNumber);
+                    AmlStart, AmlLength, NULL, (UINT8) PassNumber);
     }
 
     if (ACPI_FAILURE (Status))
@@ -247,7 +247,7 @@ Cleanup:
 
 ACPI_STATUS
 AcpiNsParseTable (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     ACPI_NAMESPACE_NODE     *StartNode)
 {
     ACPI_STATUS             Status;

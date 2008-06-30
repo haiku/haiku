@@ -185,7 +185,7 @@ AcpiUtOsiImplementation (
     ACPI_STATUS             Status;
     ACPI_OPERAND_OBJECT     *StringDesc;
     ACPI_OPERAND_OBJECT     *ReturnDesc;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_TRACE (UtOsiImplementation);
@@ -288,7 +288,6 @@ AcpiUtEvaluateObject (
 
     Info->PrefixNode = PrefixNode;
     Info->Pathname = Path;
-    Info->ParameterType = ACPI_PARAM_ARGS;
 
     /* Evaluate the object/method */
 
@@ -613,7 +612,7 @@ AcpiUtExecute_CID (
     UINT32                  Count;
     UINT32                  Size;
     ACPI_COMPATIBLE_ID_LIST *CidList;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_TRACE (UtExecute_CID);

@@ -357,7 +357,7 @@ AcpiDsMethodError (
  */
 ACPI_STATUS
 AcpiDsInitializeObjects (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     ACPI_NAMESPACE_NODE     *StartNode);
 
 

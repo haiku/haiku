@@ -536,7 +536,7 @@ UtDisplaySummary (
     if ((Gbl_ExceptionCount[ASL_ERROR] == 0) || (Gbl_IgnoreErrors))
     {
         FlPrintFile (FileId,
-            "AML Output: %s - %d bytes %d named objects %d executable opcodes\n\n",
+            "AML Output: %s - %d bytes, %d named objects, %d executable opcodes\n\n",
             Gbl_Files[ASL_FILE_AML_OUTPUT].Filename, Gbl_TableLength,
             TotalNamedObjects, TotalExecutableOpcodes);
     }

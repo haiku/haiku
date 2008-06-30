@@ -127,7 +127,7 @@ AcpiAllocateRootTable (
  */
 void
 AcpiTbParseFadt (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     UINT8                   Flags);
 
 void
@@ -144,7 +144,7 @@ AcpiTbFindTable (
     char                    *Signature,
     char                    *OemId,
     char                    *OemTableId,
-    ACPI_NATIVE_UINT        *TableIndex);
+    UINT32                  *TableIndex);
 
 
 /*
@@ -161,7 +161,7 @@ AcpiTbVerifyTable (
 ACPI_STATUS
 AcpiTbAddTable (
     ACPI_TABLE_DESC         *TableDesc,
-    ACPI_NATIVE_UINT        *TableIndex);
+    UINT32                  *TableIndex);
 
 ACPI_STATUS
 AcpiTbStoreTable (
@@ -169,7 +169,7 @@ AcpiTbStoreTable (
     ACPI_TABLE_HEADER       *Table,
     UINT32                  Length,
     UINT8                   Flags,
-    ACPI_NATIVE_UINT        *TableIndex);
+    UINT32                  *TableIndex);
 
 void
 AcpiTbDeleteTable (
@@ -181,28 +181,28 @@ AcpiTbTerminate (
 
 void
 AcpiTbDeleteNamespaceByOwner (
-    ACPI_NATIVE_UINT        TableIndex);
+    UINT32                  TableIndex);
 
 ACPI_STATUS
 AcpiTbAllocateOwnerId (
-    ACPI_NATIVE_UINT        TableIndex);
+    UINT32                  TableIndex);
 
 ACPI_STATUS
 AcpiTbReleaseOwnerId (
-    ACPI_NATIVE_UINT        TableIndex);
+    UINT32                  TableIndex);
 
 ACPI_STATUS
 AcpiTbGetOwnerId (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     ACPI_OWNER_ID           *OwnerId);
 
 BOOLEAN
 AcpiTbIsTableLoaded (
-    ACPI_NATIVE_UINT        TableIndex);
+    UINT32                  TableIndex);
 
 void
 AcpiTbSetTableLoadedFlag (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     BOOLEAN                 IsLoaded);
 
 
@@ -221,7 +221,7 @@ AcpiTbPrintTableHeader(
 UINT8
 AcpiTbChecksum (
     UINT8                   *Buffer,
-    ACPI_NATIVE_UINT        Length);
+    UINT32                  Length);
 
 ACPI_STATUS
 AcpiTbVerifyChecksum (
@@ -233,7 +233,7 @@ AcpiTbInstallTable (
     ACPI_PHYSICAL_ADDRESS   Address,
     UINT8                   Flags,
     char                    *Signature,
-    ACPI_NATIVE_UINT        TableIndex);
+    UINT32                  TableIndex);
 
 ACPI_STATUS
 AcpiTbParseRootTable (

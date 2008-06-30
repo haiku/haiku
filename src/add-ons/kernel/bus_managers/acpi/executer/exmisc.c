@@ -429,8 +429,8 @@ AcpiExDoConcatenate (
 
         /* Result of two Strings is a String */
 
-        ReturnDesc = AcpiUtCreateStringObject ((ACPI_SIZE)
-                        (Operand0->String.Length +
+        ReturnDesc = AcpiUtCreateStringObject (
+                        ((ACPI_SIZE) Operand0->String.Length +
                         LocalOperand1->String.Length));
         if (!ReturnDesc)
         {
@@ -451,8 +451,8 @@ AcpiExDoConcatenate (
 
         /* Result of two Buffers is a Buffer */
 
-        ReturnDesc = AcpiUtCreateBufferObject ((ACPI_SIZE)
-                        (Operand0->Buffer.Length +
+        ReturnDesc = AcpiUtCreateBufferObject (
+                        ((ACPI_SIZE) Operand0->Buffer.Length +
                         LocalOperand1->Buffer.Length));
         if (!ReturnDesc)
         {

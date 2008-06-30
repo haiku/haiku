@@ -146,8 +146,8 @@ AdGenerateFilename (
     char                    *Prefix,
     char                    *TableId)
 {
-    ACPI_NATIVE_UINT         i;
-    ACPI_NATIVE_UINT         j;
+    UINT32                  i;
+    UINT32                  j;
 
 
     for (i = 0; Prefix[i]; i++)
@@ -183,7 +183,7 @@ AdGenerateFilename (
  *
  ******************************************************************************/
 
-ACPI_NATIVE_INT
+INT32
 AdWriteBuffer (
     char                *Filename,
     char                *Buffer,
@@ -202,7 +202,7 @@ AdWriteBuffer (
 
     Actual = fwrite (Buffer, (size_t) Length, 1, fp);
     fclose (fp);
-    return ((ACPI_NATIVE_INT) Actual);
+    return ((INT32) Actual);
 }
 
 

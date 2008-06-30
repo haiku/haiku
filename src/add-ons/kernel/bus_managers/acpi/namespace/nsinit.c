@@ -666,7 +666,6 @@ AcpiNsInitOneDevice (
     Info->PrefixNode = DeviceNode;
     Info->Pathname = METHOD_NAME__INI;
     Info->Parameters = NULL;
-    Info->ParameterType = ACPI_PARAM_ARGS;
     Info->Flags = ACPI_IGNORE_RETURN_VALUE;
 
     Status = AcpiNsEvaluate (Info);

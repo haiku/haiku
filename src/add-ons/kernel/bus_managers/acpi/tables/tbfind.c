@@ -145,9 +145,9 @@ AcpiTbFindTable (
     char                    *Signature,
     char                    *OemId,
     char                    *OemTableId,
-    ACPI_NATIVE_UINT        *TableIndex)
+    UINT32                  *TableIndex)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
     ACPI_STATUS             Status;
     ACPI_TABLE_HEADER       Header;
 

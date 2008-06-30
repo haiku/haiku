@@ -221,6 +221,38 @@ AcpiNsEvaluate (
             return_ACPI_STATUS (AE_NULL_OBJECT);
         }
 
+        /* Calculate the number of arguments being passed to the method */
+
+        Info->ParamCount = 0;
+        if (Info->Parameters)
+        {
+            while (Info->Parameters[Info->ParamCount])
+            {
+                Info->ParamCount++;
+            }
+        }
+
+        /* Error if too few arguments were passed in */
+
+        if (Info->ParamCount < Info->ObjDesc->Method.ParamCount)
+        {
+            ACPI_ERROR ((AE_INFO,
+                "Insufficient arguments - method [%4.4s] needs %d, found %d",
+                AcpiUtGetNodeName (Info->ResolvedNode),
+                Info->ObjDesc->Method.ParamCount, Info->ParamCount));
+            return_ACPI_STATUS (AE_MISSING_ARGUMENTS);
+        }
+
+        /* Just a warning if too many arguments */
+
+        else if (Info->ParamCount > Info->ObjDesc->Method.ParamCount)
+        {
+            ACPI_WARNING ((AE_INFO,
+                "Excess arguments - method [%4.4s] needs %d, found %d",
+                AcpiUtGetNodeName (Info->ResolvedNode),
+                Info->ObjDesc->Method.ParamCount, Info->ParamCount));
+        }
+
         ACPI_DUMP_PATHNAME (Info->ResolvedNode, "Execute Method:",
             ACPI_LV_INFO, _COMPONENT);
 

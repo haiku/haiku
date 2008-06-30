@@ -486,7 +486,6 @@ AcpiDsCallControlMethod (
     }
 
     Info->Parameters = &ThisWalkState->Operands[0];
-    Info->ParameterType = ACPI_PARAM_ARGS;
 
     Status = AcpiDsInitAmlWalk (NextWalkState, NULL, MethodNode,
                 ObjDesc->Method.AmlStart, ObjDesc->Method.AmlLength,

@@ -213,7 +213,7 @@ AcpiInitializeTables (
         /* Root Table Array has been statically allocated by the host */
 
         ACPI_MEMSET (InitialTableArray, 0,
-            InitialTableCount * sizeof (ACPI_TABLE_DESC));
+            (ACPI_SIZE) InitialTableCount * sizeof (ACPI_TABLE_DESC));
 
         AcpiGbl_RootTableList.Tables = InitialTableArray;
         AcpiGbl_RootTableList.Size = InitialTableCount;
@@ -279,7 +279,8 @@ AcpiReallocateRootTable (
         return_ACPI_STATUS (AE_SUPPORT);
     }
 
-    NewSize = (AcpiGbl_RootTableList.Count + ACPI_ROOT_TABLE_SIZE_INCREMENT) *
+    NewSize = ((ACPI_SIZE) AcpiGbl_RootTableList.Count +
+                    ACPI_ROOT_TABLE_SIZE_INCREMENT) *
                 sizeof (ACPI_TABLE_DESC);
 
     /* Create new array and copy the old array */
@@ -323,11 +324,11 @@ ACPI_EXPORT_SYMBOL (AcpiReallocateRootTable)
 ACPI_STATUS
 AcpiGetTableHeader (
     char                    *Signature,
-    ACPI_NATIVE_UINT        Instance,
+    UINT32                  Instance,
     ACPI_TABLE_HEADER       *OutTableHeader)
 {
-    ACPI_NATIVE_UINT        i;
-    ACPI_NATIVE_UINT        j;
+    UINT32                  i;
+    UINT32                  j;
     ACPI_TABLE_HEADER       *Header;
 
 
@@ -408,11 +409,11 @@ ACPI_EXPORT_SYMBOL (AcpiGetTableHeader)
 ACPI_STATUS
 AcpiGetTable (
     char                    *Signature,
-    ACPI_NATIVE_UINT        Instance,
+    UINT32                  Instance,
     ACPI_TABLE_HEADER       **OutTable)
 {
-    ACPI_NATIVE_UINT        i;
-    ACPI_NATIVE_UINT        j;
+    UINT32                  i;
+    UINT32                  j;
     ACPI_STATUS             Status;
 
 
@@ -469,7 +470,7 @@ ACPI_EXPORT_SYMBOL (AcpiGetTable)
 
 ACPI_STATUS
 AcpiGetTableByIndex (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     ACPI_TABLE_HEADER       **Table)
 {
     ACPI_STATUS             Status;
@@ -534,7 +535,7 @@ AcpiTbLoadNamespace (
 {
     ACPI_STATUS             Status;
     ACPI_TABLE_HEADER       *Table;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_TRACE (TbLoadNamespace);

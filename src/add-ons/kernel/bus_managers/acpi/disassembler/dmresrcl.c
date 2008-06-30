@@ -215,7 +215,7 @@ AcpiDmMemoryFields (
     UINT8                   Type,
     UINT32                  Level)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     for (i = 0; i < 4; i++)
@@ -261,7 +261,7 @@ AcpiDmAddressFields (
     UINT8                   Type,
     UINT32                  Level)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     AcpiOsPrintf ("\n");

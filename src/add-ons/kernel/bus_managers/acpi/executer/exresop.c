@@ -806,6 +806,9 @@ NextOperand:
         }
     }
 
+    ACPI_DUMP_OPERANDS (WalkState->Operands,
+        AcpiPsGetOpcodeName (Opcode), WalkState->NumOperands);
+
     return_ACPI_STATUS (Status);
 }
 

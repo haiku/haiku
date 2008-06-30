@@ -453,11 +453,10 @@ AcpiPsUpdateParameterList (
     ACPI_EVALUATE_INFO      *Info,
     UINT16                  Action)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
-    if ((Info->ParameterType == ACPI_PARAM_ARGS) &&
-        (Info->Parameters))
+    if (Info->Parameters)
     {
         /* Update reference count for each parameter */
 

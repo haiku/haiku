@@ -166,7 +166,7 @@ AcpiRsConvertAmlToResource (
     ACPI_FUNCTION_TRACE (RsConvertAmlToResource);
 
 
-    if (((ACPI_NATIVE_UINT) Resource) & 0x3)
+    if (((ACPI_SIZE) Resource) & 0x3)
     {
         /* Each internal resource struct is expected to be 32-bit aligned */
 

@@ -332,7 +332,7 @@ AcpiUtAcquireMutex (
          * the mutex ordering rule.  This indicates a coding error somewhere in
          * the ACPI subsystem code.
          */
-        for (i = MutexId; i < ACPI_MAX_MUTEX; i++)
+        for (i = MutexId; i < ACPI_NUM_MUTEX; i++)
         {
             if (AcpiGbl_MutexInfo[i].ThreadId == ThisThreadId)
             {
@@ -434,7 +434,7 @@ AcpiUtReleaseMutex (
          * ordering rule.  This indicates a coding error somewhere in
          * the ACPI subsystem code.
          */
-        for (i = MutexId; i < ACPI_MAX_MUTEX; i++)
+        for (i = MutexId; i < ACPI_NUM_MUTEX; i++)
         {
             if (AcpiGbl_MutexInfo[i].ThreadId == ThisThreadId)
             {

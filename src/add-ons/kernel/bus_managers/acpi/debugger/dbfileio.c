@@ -118,7 +118,10 @@
 
 #include "acpi.h"
 #include "acdebug.h"
+
+#ifdef ACPI_APPLICATION
 #include "actables.h"
+#endif
 
 #if (defined ACPI_DEBUGGER || defined ACPI_DISASSEMBLER)
 

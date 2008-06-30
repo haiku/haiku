@@ -262,7 +262,9 @@ AcpiEnableSubsystem (
      *
      * Note2: Fixed events are initialized and enabled here. GPEs are
      * initialized, but cannot be enabled until after the hardware is
-     * completely initialized (SCI and GlobalLock activated)
+     * completely initialized (SCI and GlobalLock activated) and the various
+     * initialization control methods are run (_REG, _STA, _INI) on the
+     * entire namespace.
      */
     if (!(Flags & ACPI_NO_EVENT_INIT))
     {
@@ -289,26 +291,6 @@ AcpiEnableSubsystem (
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
-        }
-    }
-
-    /*
-     * Complete the GPE initialization for the GPE blocks defined in the FADT
-     * (GPE block 0 and 1).
-     *
-     * Note1: This is where the _PRW methods are executed for the GPEs. These
-     * methods can only be executed after the SCI and Global Lock handlers are
-     * installed and initialized.
-     *
-     * Note2: Currently, there seems to be no need to run the _REG methods
-     * before execution of the _PRW methods and enabling of the GPEs.
-     */
-    if (!(Flags & ACPI_NO_EVENT_INIT))
-    {
-        Status = AcpiEvInstallFadtGpes ();
-        if (ACPI_FAILURE (Status))
-        {
-            return (Status);
         }
     }
 
@@ -390,6 +372,27 @@ AcpiInitializeObjects (
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
+        }
+    }
+
+    /*
+     * Initialize the GPE blocks defined in the FADT (GPE block 0 and 1).
+     * The runtime GPEs are enabled here.
+     *
+     * This is where the _PRW methods are executed for the GPEs. These
+     * methods can only be executed after the SCI and Global Lock handlers are
+     * installed and initialized.
+     *
+     * GPEs can only be enabled after the _REG, _STA, and _INI methods have
+     * been run. This ensures that all Operation Regions and all Devices have
+     * been initialized and are ready.
+     */
+    if (!(Flags & ACPI_NO_EVENT_INIT))
+    {
+        Status = AcpiEvInstallFadtGpes ();
+        if (ACPI_FAILURE (Status))
+        {
+            return (Status);
         }
     }
 

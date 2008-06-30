@@ -459,7 +459,7 @@ AcpiDsBuildInternalPackageObj (
     ACPI_PARSE_OBJECT       *Parent;
     ACPI_OPERAND_OBJECT     *ObjDesc = NULL;
     ACPI_STATUS             Status = AE_OK;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
     UINT16                  Index;
     UINT16                  ReferenceCount;
 

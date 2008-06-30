@@ -156,8 +156,7 @@ AcpiHwClearAcpiStatus (
 
     LockFlags = AcpiOsAcquireLock (AcpiGbl_HardwareLock);
 
-    Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
-                ACPI_REGISTER_PM1_STATUS,
+    Status = AcpiHwRegisterWrite (ACPI_REGISTER_PM1_STATUS,
                 ACPI_BITMASK_ALL_FIXED_STATUS);
     if (ACPI_FAILURE (Status))
     {
@@ -347,6 +346,63 @@ AcpiHwGetBitRegisterInfo (
 
 /*******************************************************************************
  *
+ * FUNCTION:    AcpiGetRegisterUnlocked
+ *
+ * PARAMETERS:  RegisterId      - ID of ACPI BitRegister to access
+ *              ReturnValue     - Value that was read from the register
+ *
+ * RETURN:      Status and the value read from specified Register. Value
+ *              returned is normalized to bit0 (is shifted all the way right)
+ *
+ * DESCRIPTION: ACPI BitRegister read function.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiGetRegisterUnlocked (
+    UINT32                  RegisterId,
+    UINT32                  *ReturnValue)
+{
+    UINT32                  RegisterValue = 0;
+    ACPI_BIT_REGISTER_INFO  *BitRegInfo;
+    ACPI_STATUS             Status;
+
+
+    ACPI_FUNCTION_TRACE (AcpiGetRegisterUnlocked);
+
+
+    /* Get the info structure corresponding to the requested ACPI Register */
+
+    BitRegInfo = AcpiHwGetBitRegisterInfo (RegisterId);
+    if (!BitRegInfo)
+    {
+        return_ACPI_STATUS (AE_BAD_PARAMETER);
+    }
+
+    /* Read from the register */
+
+    Status = AcpiHwRegisterRead (BitRegInfo->ParentRegister, 
+                &RegisterValue);
+
+    if (ACPI_SUCCESS (Status))
+    {
+        /* Normalize the value that was read */
+
+        RegisterValue = ((RegisterValue & BitRegInfo->AccessBitMask)
+                            >> BitRegInfo->BitPosition);
+
+        *ReturnValue = RegisterValue;
+
+        ACPI_DEBUG_PRINT ((ACPI_DB_IO, "Read value %8.8X register %X\n",
+            RegisterValue, BitRegInfo->ParentRegister));
+    }
+
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
  * FUNCTION:    AcpiGetRegister
  *
  * PARAMETERS:  RegisterId      - ID of ACPI BitRegister to access
@@ -364,41 +420,15 @@ AcpiGetRegister (
     UINT32                  RegisterId,
     UINT32                  *ReturnValue)
 {
-    UINT32                  RegisterValue = 0;
-    ACPI_BIT_REGISTER_INFO  *BitRegInfo;
     ACPI_STATUS             Status;
+    ACPI_CPU_FLAGS          Flags;
 
 
-    ACPI_FUNCTION_TRACE (AcpiGetRegister);
+    Flags = AcpiOsAcquireLock (AcpiGbl_HardwareLock);
+    Status = AcpiGetRegisterUnlocked (RegisterId, ReturnValue);
+    AcpiOsReleaseLock (AcpiGbl_HardwareLock, Flags);
 
-
-    /* Get the info structure corresponding to the requested ACPI Register */
-
-    BitRegInfo = AcpiHwGetBitRegisterInfo (RegisterId);
-    if (!BitRegInfo)
-    {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
-    }
-
-    /* Read from the register */
-
-    Status = AcpiHwRegisterRead (ACPI_MTX_LOCK,
-                BitRegInfo->ParentRegister, &RegisterValue);
-
-    if (ACPI_SUCCESS (Status))
-    {
-        /* Normalize the value that was read */
-
-        RegisterValue = ((RegisterValue & BitRegInfo->AccessBitMask)
-                            >> BitRegInfo->BitPosition);
-
-        *ReturnValue = RegisterValue;
-
-        ACPI_DEBUG_PRINT ((ACPI_DB_IO, "Read value %8.8X register %X\n",
-            RegisterValue, BitRegInfo->ParentRegister));
-    }
-
-    return_ACPI_STATUS (Status);
+    return Status;
 }
 
 ACPI_EXPORT_SYMBOL (AcpiGetRegister)
@@ -445,8 +475,8 @@ AcpiSetRegister (
 
     /* Always do a register read first so we can insert the new bits  */
 
-    Status = AcpiHwRegisterRead (ACPI_MTX_DO_NOT_LOCK,
-                BitRegInfo->ParentRegister, &RegisterValue);
+    Status = AcpiHwRegisterRead (BitRegInfo->ParentRegister, 
+                &RegisterValue);
     if (ACPI_FAILURE (Status))
     {
         goto UnlockAndExit;
@@ -473,8 +503,8 @@ AcpiSetRegister (
                     BitRegInfo->BitPosition, BitRegInfo->AccessBitMask);
         if (Value)
         {
-            Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
-                        ACPI_REGISTER_PM1_STATUS, (UINT16) Value);
+            Status = AcpiHwRegisterWrite (ACPI_REGISTER_PM1_STATUS, 
+                        (UINT16) Value);
             RegisterValue = 0;
         }
         break;
@@ -485,8 +515,8 @@ AcpiSetRegister (
         ACPI_REGISTER_INSERT_VALUE (RegisterValue, BitRegInfo->BitPosition,
             BitRegInfo->AccessBitMask, Value);
 
-        Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
-                    ACPI_REGISTER_PM1_ENABLE, (UINT16) RegisterValue);
+        Status = AcpiHwRegisterWrite (ACPI_REGISTER_PM1_ENABLE, 
+                    (UINT16) RegisterValue);
         break;
 
 
@@ -503,15 +533,15 @@ AcpiSetRegister (
         ACPI_REGISTER_INSERT_VALUE (RegisterValue, BitRegInfo->BitPosition,
             BitRegInfo->AccessBitMask, Value);
 
-        Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
-                    ACPI_REGISTER_PM1_CONTROL, (UINT16) RegisterValue);
+        Status = AcpiHwRegisterWrite (ACPI_REGISTER_PM1_CONTROL, 
+                    (UINT16) RegisterValue);
         break;
 
 
     case ACPI_REGISTER_PM2_CONTROL:
 
-        Status = AcpiHwRegisterRead (ACPI_MTX_DO_NOT_LOCK,
-                    ACPI_REGISTER_PM2_CONTROL, &RegisterValue);
+        Status = AcpiHwRegisterRead (ACPI_REGISTER_PM2_CONTROL, 
+                    &RegisterValue);
         if (ACPI_FAILURE (Status))
         {
             goto UnlockAndExit;
@@ -528,8 +558,8 @@ AcpiSetRegister (
             RegisterValue,
             ACPI_FORMAT_UINT64 (AcpiGbl_FADT.XPm2ControlBlock.Address)));
 
-        Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
-                    ACPI_REGISTER_PM2_CONTROL, (UINT8) (RegisterValue));
+        Status = AcpiHwRegisterWrite (ACPI_REGISTER_PM2_CONTROL, 
+                    (UINT8) (RegisterValue));
         break;
 
 
@@ -560,8 +590,7 @@ ACPI_EXPORT_SYMBOL (AcpiSetRegister)
  *
  * FUNCTION:    AcpiHwRegisterRead
  *
- * PARAMETERS:  UseLock             - Lock hardware? True/False
- *              RegisterId          - ACPI Register ID
+ * PARAMETERS:  RegisterId          - ACPI Register ID
  *              ReturnValue         - Where the register value is returned
  *
  * RETURN:      Status and the value read.
@@ -572,23 +601,16 @@ ACPI_EXPORT_SYMBOL (AcpiSetRegister)
 
 ACPI_STATUS
 AcpiHwRegisterRead (
-    BOOLEAN                 UseLock,
     UINT32                  RegisterId,
     UINT32                  *ReturnValue)
 {
     UINT32                  Value1 = 0;
     UINT32                  Value2 = 0;
     ACPI_STATUS             Status;
-    ACPI_CPU_FLAGS          LockFlags = 0;
 
 
     ACPI_FUNCTION_TRACE (HwRegisterRead);
 
-
-    if (ACPI_MTX_LOCK == UseLock)
-    {
-        LockFlags = AcpiOsAcquireLock (AcpiGbl_HardwareLock);
-    }
 
     switch (RegisterId)
     {
@@ -597,7 +619,7 @@ AcpiHwRegisterRead (
         Status = AcpiHwLowLevelRead (16, &Value1, &AcpiGbl_FADT.XPm1aEventBlock);
         if (ACPI_FAILURE (Status))
         {
-            goto UnlockAndExit;
+            goto Exit;
         }
 
         /* PM1B is optional */
@@ -612,7 +634,7 @@ AcpiHwRegisterRead (
         Status = AcpiHwLowLevelRead (16, &Value1, &AcpiGbl_XPm1aEnable);
         if (ACPI_FAILURE (Status))
         {
-            goto UnlockAndExit;
+            goto Exit;
         }
 
         /* PM1B is optional */
@@ -627,7 +649,7 @@ AcpiHwRegisterRead (
         Status = AcpiHwLowLevelRead (16, &Value1, &AcpiGbl_FADT.XPm1aControlBlock);
         if (ACPI_FAILURE (Status))
         {
-            goto UnlockAndExit;
+            goto Exit;
         }
 
         Status = AcpiHwLowLevelRead (16, &Value2, &AcpiGbl_FADT.XPm1bControlBlock);
@@ -658,12 +680,7 @@ AcpiHwRegisterRead (
         break;
     }
 
-UnlockAndExit:
-    if (ACPI_MTX_LOCK == UseLock)
-    {
-        AcpiOsReleaseLock (AcpiGbl_HardwareLock, LockFlags);
-    }
-
+Exit:
     if (ACPI_SUCCESS (Status))
     {
         *ReturnValue = Value1;
@@ -677,8 +694,7 @@ UnlockAndExit:
  *
  * FUNCTION:    AcpiHwRegisterWrite
  *
- * PARAMETERS:  UseLock             - Lock hardware? True/False
- *              RegisterId          - ACPI Register ID
+ * PARAMETERS:  RegisterId          - ACPI Register ID
  *              Value               - The value to write
  *
  * RETURN:      Status
@@ -702,22 +718,15 @@ UnlockAndExit:
 
 ACPI_STATUS
 AcpiHwRegisterWrite (
-    BOOLEAN                 UseLock,
     UINT32                  RegisterId,
     UINT32                  Value)
 {
     ACPI_STATUS             Status;
-    ACPI_CPU_FLAGS          LockFlags = 0;
     UINT32                  ReadValue;
 
 
     ACPI_FUNCTION_TRACE (HwRegisterWrite);
 
-
-    if (ACPI_MTX_LOCK == UseLock)
-    {
-        LockFlags = AcpiOsAcquireLock (AcpiGbl_HardwareLock);
-    }
 
     switch (RegisterId)
     {
@@ -725,11 +734,11 @@ AcpiHwRegisterWrite (
 
         /* Perform a read first to preserve certain bits (per ACPI spec) */
 
-        Status = AcpiHwRegisterRead (ACPI_MTX_DO_NOT_LOCK,
-                    ACPI_REGISTER_PM1_STATUS, &ReadValue);
+        Status = AcpiHwRegisterRead (ACPI_REGISTER_PM1_STATUS, 
+                    &ReadValue);
         if (ACPI_FAILURE (Status))
         {
-            goto UnlockAndExit;
+            goto Exit;
         }
 
         /* Insert the bits to be preserved */
@@ -741,7 +750,7 @@ AcpiHwRegisterWrite (
         Status = AcpiHwLowLevelWrite (16, Value, &AcpiGbl_FADT.XPm1aEventBlock);
         if (ACPI_FAILURE (Status))
         {
-            goto UnlockAndExit;
+            goto Exit;
         }
 
         /* PM1B is optional */
@@ -755,7 +764,7 @@ AcpiHwRegisterWrite (
         Status = AcpiHwLowLevelWrite (16, Value, &AcpiGbl_XPm1aEnable);
         if (ACPI_FAILURE (Status))
         {
-            goto UnlockAndExit;
+            goto Exit;
         }
 
         /* PM1B is optional */
@@ -771,11 +780,11 @@ AcpiHwRegisterWrite (
          *
          * Note: This includes SCI_EN, we never want to change this bit
          */
-        Status = AcpiHwRegisterRead (ACPI_MTX_DO_NOT_LOCK,
-                    ACPI_REGISTER_PM1_CONTROL, &ReadValue);
+        Status = AcpiHwRegisterRead (ACPI_REGISTER_PM1_CONTROL, 
+                    &ReadValue);
         if (ACPI_FAILURE (Status))
         {
-            goto UnlockAndExit;
+            goto Exit;
         }
 
         /* Insert the bits to be preserved */
@@ -787,7 +796,7 @@ AcpiHwRegisterWrite (
         Status = AcpiHwLowLevelWrite (16, Value, &AcpiGbl_FADT.XPm1aControlBlock);
         if (ACPI_FAILURE (Status))
         {
-            goto UnlockAndExit;
+            goto Exit;
         }
 
         Status = AcpiHwLowLevelWrite (16, Value, &AcpiGbl_FADT.XPm1bControlBlock);
@@ -831,12 +840,7 @@ AcpiHwRegisterWrite (
         break;
     }
 
-UnlockAndExit:
-    if (ACPI_MTX_LOCK == UseLock)
-    {
-        AcpiOsReleaseLock (AcpiGbl_HardwareLock, LockFlags);
-    }
-
+Exit:
     return_ACPI_STATUS (Status);
 }
 

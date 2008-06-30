@@ -127,7 +127,7 @@
 static ACPI_PHYSICAL_ADDRESS
 AcpiTbGetRootTableEntry (
     UINT8                   *TableEntry,
-    ACPI_NATIVE_UINT        TableEntrySize);
+    UINT32                  TableEntrySize);
 
 
 /*******************************************************************************
@@ -267,7 +267,7 @@ AcpiTbVerifyChecksum (
 UINT8
 AcpiTbChecksum (
     UINT8                   *Buffer,
-    ACPI_NATIVE_UINT        Length)
+    UINT32                  Length)
 {
     UINT8                   Sum = 0;
     UINT8                   *End = Buffer + Length;
@@ -303,7 +303,7 @@ AcpiTbInstallTable (
     ACPI_PHYSICAL_ADDRESS   Address,
     UINT8                   Flags,
     char                    *Signature,
-    ACPI_NATIVE_UINT        TableIndex)
+    UINT32                  TableIndex)
 {
     ACPI_TABLE_HEADER       *Table;
 
@@ -377,7 +377,7 @@ UnmapAndExit:
 static ACPI_PHYSICAL_ADDRESS
 AcpiTbGetRootTableEntry (
     UINT8                   *TableEntry,
-    ACPI_NATIVE_UINT        TableEntrySize)
+    UINT32                  TableEntrySize)
 {
     UINT64                  Address64;
 
@@ -441,8 +441,8 @@ AcpiTbParseRootTable (
     UINT8                   Flags)
 {
     ACPI_TABLE_RSDP         *Rsdp;
-    ACPI_NATIVE_UINT        TableEntrySize;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  TableEntrySize;
+    UINT32                  i;
     UINT32                  TableCount;
     ACPI_TABLE_HEADER       *Table;
     ACPI_PHYSICAL_ADDRESS   Address;

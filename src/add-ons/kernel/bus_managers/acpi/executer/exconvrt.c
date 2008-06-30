@@ -395,11 +395,11 @@ AcpiExConvertToAscii (
     UINT8                   DataWidth)
 {
     ACPI_INTEGER            Digit;
-    ACPI_NATIVE_UINT        i;
-    ACPI_NATIVE_UINT        j;
-    ACPI_NATIVE_UINT        k = 0;
-    ACPI_NATIVE_UINT        HexLength;
-    ACPI_NATIVE_UINT        DecimalLength;
+    UINT32                  i;
+    UINT32                  j;
+    UINT32                  k = 0;
+    UINT32                  HexLength;
+    UINT32                  DecimalLength;
     UINT32                  Remainder;
     BOOLEAN                 SupressZeros;
 
@@ -461,7 +461,7 @@ AcpiExConvertToAscii (
 
         /* HexLength: 2 ascii hex chars per data byte */
 
-        HexLength = (ACPI_NATIVE_UINT) ACPI_MUL_2 (DataWidth);
+        HexLength = ACPI_MUL_2 (DataWidth);
         for (i = 0, j = (HexLength-1); i < HexLength; i++, j--)
         {
             /* Get one hex digit, most significant digits first */

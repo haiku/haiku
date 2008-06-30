@@ -151,6 +151,7 @@ static const char           *AcpiDmDmarSubnames[] =
 {
     "Hardware Unit Definition",
     "Reserved Memory Region",
+    "Root Port ATS Capability",
     "Unknown SubTable Type"         /* Reserved */
 };
 

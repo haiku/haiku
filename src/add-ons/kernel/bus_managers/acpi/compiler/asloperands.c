@@ -948,7 +948,7 @@ OpnDoDefinitionBlock (
 {
     ACPI_PARSE_OBJECT       *Child;
     ACPI_SIZE               Length;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
     char                    *Filename;
 
 

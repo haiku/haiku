@@ -546,7 +546,7 @@ OpcDoEisaId (
     UINT32                  BigEndianId;
     char                    *InString;
     ACPI_STATUS             Status = AE_OK;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     InString = (char *) Op->Asl.Value.String;
@@ -642,7 +642,7 @@ OpcDoUuId (
     char                    *InString;
     char                    *Buffer;
     ACPI_STATUS             Status = AE_OK;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
     ACPI_PARSE_OBJECT       *NewOp;
 
 

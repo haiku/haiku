@@ -205,7 +205,7 @@ AcpiReallocateRootTable (
 
 ACPI_STATUS
 AcpiFindRootPointer (
-    ACPI_NATIVE_UINT        *RsdpAddress);
+    ACPI_SIZE               *RsdpAddress);
 
 ACPI_STATUS
 AcpiLoadTables (
@@ -214,18 +214,18 @@ AcpiLoadTables (
 ACPI_STATUS
 AcpiGetTableHeader (
     ACPI_STRING             Signature,
-    ACPI_NATIVE_UINT        Instance,
+    UINT32                  Instance,
     ACPI_TABLE_HEADER       *OutTableHeader);
 
 ACPI_STATUS
 AcpiGetTable (
     ACPI_STRING             Signature,
-    ACPI_NATIVE_UINT        Instance,
+    UINT32                  Instance,
     ACPI_TABLE_HEADER       **OutTable);
 
 ACPI_STATUS
 AcpiGetTableByIndex (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     ACPI_TABLE_HEADER       **OutTable);
 
 ACPI_STATUS
@@ -521,6 +521,11 @@ AcpiResourceToAddress64 (
  */
 ACPI_STATUS
 AcpiGetRegister (
+    UINT32                  RegisterId,
+    UINT32                  *ReturnValue);
+
+ACPI_STATUS
+AcpiGetRegisterUnlocked (
     UINT32                  RegisterId,
     UINT32                  *ReturnValue);
 

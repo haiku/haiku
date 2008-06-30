@@ -515,12 +515,6 @@ AcpiDsExecEndOp (
             Status = AcpiExResolveOperands (WalkState->Opcode,
                         &(WalkState->Operands [WalkState->NumOperands -1]),
                         WalkState);
-            if (ACPI_SUCCESS (Status))
-            {
-                ACPI_DUMP_OPERANDS (ACPI_WALK_OPERANDS, ACPI_IMODE_EXECUTE,
-                    AcpiPsGetOpcodeName (WalkState->Opcode),
-                    WalkState->NumOperands, "after ExResolveOperands");
-            }
         }
 
         if (ACPI_SUCCESS (Status))

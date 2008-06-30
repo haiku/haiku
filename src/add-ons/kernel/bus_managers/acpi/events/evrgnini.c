@@ -393,6 +393,7 @@ AcpiEvPciConfigRegionSetup (
 
     if (!PciDeviceNode)
     {
+        ACPI_FREE (PciId);
         return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
     }
 
@@ -493,7 +494,7 @@ AcpiEvIsPciRootBridge (
     ACPI_STATUS             Status;
     ACPI_DEVICE_ID          Hid;
     ACPI_COMPATIBLE_ID_LIST *Cid;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     /*

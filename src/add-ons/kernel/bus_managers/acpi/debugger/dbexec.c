@@ -512,12 +512,12 @@ AcpiDbMethodThread (
     if (Info->InitArgs)
     {
         AcpiDbUInt32ToHexString (Info->NumCreated, Info->IndexOfThreadStr);
-        AcpiDbUInt32ToHexString (AcpiOsGetThreadId (), Info->IdOfThreadStr);
+        AcpiDbUInt32ToHexString ((UINT32) AcpiOsGetThreadId (), Info->IdOfThreadStr);
     }
 
     if (Info->Threads && (Info->NumCreated < Info->NumThreads))
     {
-        Info->Threads[Info->NumCreated++] = AcpiOsGetThreadId();
+        Info->Threads[Info->NumCreated++] = (UINT32) AcpiOsGetThreadId();
     }
 
     for (i = 0; i < Info->NumLoops; i++)

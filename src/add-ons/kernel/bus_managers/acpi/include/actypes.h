@@ -184,10 +184,10 @@
  * usually used for memory allocation, efficient loop counters, and array
  * indexes. The types are similar to the size_t type in the C library and are
  * required because there is no C type that consistently represents the native
- * data width.
+ * data width. ACPI_SIZE is needed because there is no guarantee that a
+ * kernel-level C library is present.
  *
  * ACPI_SIZE        16/32/64-bit unsigned value
- * ACPI_NATIVE_UINT 16/32/64-bit unsigned value
  * ACPI_NATIVE_INT  16/32/64-bit signed value
  *
  */
@@ -223,9 +223,9 @@ typedef int                             INT32;
 /*! [End] no source code translation !*/
 
 
-typedef UINT64                          ACPI_NATIVE_UINT;
 typedef INT64                           ACPI_NATIVE_INT;
 
+typedef UINT64                          ACPI_SIZE;
 typedef UINT64                          ACPI_IO_ADDRESS;
 typedef UINT64                          ACPI_PHYSICAL_ADDRESS;
 
@@ -264,9 +264,9 @@ typedef int                             INT32;
 /*! [End] no source code translation !*/
 
 
-typedef UINT32                          ACPI_NATIVE_UINT;
 typedef INT32                           ACPI_NATIVE_INT;
 
+typedef UINT32                          ACPI_SIZE;
 typedef UINT32                          ACPI_IO_ADDRESS;
 typedef UINT32                          ACPI_PHYSICAL_ADDRESS;
 
@@ -279,11 +279,6 @@ typedef UINT32                          ACPI_PHYSICAL_ADDRESS;
 
 #error unknown ACPI_MACHINE_WIDTH
 #endif
-
-
-/* Variable-width type, used instead of clib size_t */
-
-typedef ACPI_NATIVE_UINT                ACPI_SIZE;
 
 
 /*******************************************************************************
@@ -300,7 +295,7 @@ typedef ACPI_NATIVE_UINT                ACPI_SIZE;
 /* Value returned by AcpiOsGetThreadId */
 
 #ifndef ACPI_THREAD_ID
-#define ACPI_THREAD_ID                  ACPI_NATIVE_UINT
+#define ACPI_THREAD_ID                  ACPI_SIZE
 #endif
 
 /* Object returned from AcpiOsCreateLock */
@@ -312,7 +307,7 @@ typedef ACPI_NATIVE_UINT                ACPI_SIZE;
 /* Flags for AcpiOsAcquireLock/AcpiOsReleaseLock */
 
 #ifndef ACPI_CPU_FLAGS
-#define ACPI_CPU_FLAGS                  ACPI_NATIVE_UINT
+#define ACPI_CPU_FLAGS                  ACPI_SIZE
 #endif
 
 /* Object returned from AcpiOsCreateCache */

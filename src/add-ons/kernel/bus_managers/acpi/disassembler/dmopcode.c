@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dmopcode - AML disassembler, specific AML opcodes
- *              $Revision: 1.105 $
+ *              $Revision: 1.106 $
  *
  ******************************************************************************/
 
@@ -549,7 +549,7 @@ AcpiDmDisassembleOneOp (
 
     case AML_INT_NAMEDFIELD_OP:
 
-        Length = AcpiDmDumpName ((char *) &Op->Named.Name);
+        Length = AcpiDmDumpName (Op->Named.Name);
         AcpiOsPrintf (",%*.s  %d", (int) (5 - Length), " ",
             (UINT32) Op->Common.Value.Integer);
         AcpiDmCommaIfFieldMember (Op);

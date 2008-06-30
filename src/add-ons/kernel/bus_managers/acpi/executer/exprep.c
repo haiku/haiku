@@ -605,8 +605,8 @@ AcpiExPrepFieldValue (
          * operands must be evaluated.
          */
         SecondDesc                  = ObjDesc->Common.NextObject;
-        SecondDesc->Extra.AmlStart  = ((ACPI_PARSE_OBJECT*) (Info->DataRegisterNode))->Named.Data;
-        SecondDesc->Extra.AmlLength = ((ACPI_PARSE_OBJECT*) (Info->DataRegisterNode))->Named.Length;
+        SecondDesc->Extra.AmlStart  = ACPI_CAST_PTR (ACPI_PARSE_OBJECT, Info->DataRegisterNode)->Named.Data;
+        SecondDesc->Extra.AmlLength = ACPI_CAST_PTR (ACPI_PARSE_OBJECT, Info->DataRegisterNode)->Named.Length;
 
         break;
 

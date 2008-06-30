@@ -557,7 +557,7 @@ AcpiUtUpdateObjectReference (
     ACPI_GENERIC_STATE      *StateList = NULL;
     ACPI_OPERAND_OBJECT     *NextObject = NULL;
     ACPI_GENERIC_STATE      *State;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_TRACE_PTR (UtUpdateObjectReference, Object);

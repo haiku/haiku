@@ -431,11 +431,6 @@ AcpiExStore (
             "Target is not a Reference or Constant object - %s [%p]",
             AcpiUtGetObjectTypeName (DestDesc), DestDesc));
 
-        ACPI_DUMP_STACK_ENTRY (SourceDesc);
-        ACPI_DUMP_STACK_ENTRY (DestDesc);
-        ACPI_DUMP_OPERANDS (&DestDesc, ACPI_IMODE_EXECUTE, "ExStore",
-                        2, "Target is not a Reference or Constant object");
-
         return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
     }
 

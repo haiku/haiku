@@ -392,8 +392,8 @@ typedef struct acpi_predefined_names
 
 typedef struct acpi_namestring_info
 {
-    char                            *ExternalName;
-    char                            *NextExternalChar;
+    const char                      *ExternalName;
+    const char                      *NextExternalChar;
     char                            *InternalName;
     UINT32                          Length;
     UINT32                          NumSegments;

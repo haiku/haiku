@@ -158,7 +158,7 @@ static UINT8
 AcpiRsCountSetBits (
     UINT16                  BitField)
 {
-    ACPI_NATIVE_UINT        BitsSet;
+    UINT8                   BitsSet;
 
 
     ACPI_FUNCTION_ENTRY ();
@@ -171,7 +171,7 @@ AcpiRsCountSetBits (
         BitField &= (UINT16) (BitField - 1);
     }
 
-    return ((UINT8) BitsSet);
+    return (BitsSet);
 }
 
 

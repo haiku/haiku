@@ -680,7 +680,7 @@ AcpiUtCopyEpackageToIpackage (
     ACPI_STATUS             Status = AE_OK;
     ACPI_OPERAND_OBJECT     *PackageObject;
     ACPI_OPERAND_OBJECT     **PackageElements;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_TRACE (UtCopyEpackageToIpackage);
@@ -709,7 +709,7 @@ AcpiUtCopyEpackageToIpackage (
         {
             /* Truncate package and delete it */
 
-            PackageObject->Package.Count = (UINT32) i;
+            PackageObject->Package.Count = i;
             PackageElements[i] = NULL;
             AcpiUtRemoveReference (PackageObject);
             return_ACPI_STATUS (Status);

@@ -423,6 +423,7 @@ typedef struct acpi_table_dbgp
 /*******************************************************************************
  *
  * DMAR - DMA Remapping table
+ *        From "Intel Virtualization Technology for Directed I/O", Sept. 2007
  *
  ******************************************************************************/
 
@@ -430,9 +431,14 @@ typedef struct acpi_table_dmar
 {
     ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
     UINT8                   Width;              /* Host Address Width */
-    UINT8                   Reserved[11];
+    UINT8                   Flags;
+    UINT8                   Reserved[10];
 
 } ACPI_TABLE_DMAR;
+
+/* Flags */
+
+#define ACPI_DMAR_INTR_REMAP        (1)
 
 /* DMAR subtable header */
 
@@ -440,8 +446,6 @@ typedef struct acpi_dmar_header
 {
     UINT16                  Type;
     UINT16                  Length;
-    UINT8                   Flags;
-    UINT8                   Reserved[3];
 
 } ACPI_DMAR_HEADER;
 
@@ -451,14 +455,16 @@ enum AcpiDmarType
 {
     ACPI_DMAR_TYPE_HARDWARE_UNIT        = 0,
     ACPI_DMAR_TYPE_RESERVED_MEMORY      = 1,
-    ACPI_DMAR_TYPE_RESERVED             = 2     /* 2 and greater are reserved */
+    ACPI_DMAR_TYPE_ATSR                 = 2,
+    ACPI_DMAR_TYPE_RESERVED             = 3     /* 3 and greater are reserved */
 };
 
 typedef struct acpi_dmar_device_scope
 {
     UINT8                   EntryType;
     UINT8                   Length;
-    UINT8                   Segment;
+    UINT16                  Reserved;
+    UINT8                   EnumerationId;
     UINT8                   Bus;
 
 } ACPI_DMAR_DEVICE_SCOPE;
@@ -470,9 +476,17 @@ enum AcpiDmarScopeType
     ACPI_DMAR_SCOPE_TYPE_NOT_USED       = 0,
     ACPI_DMAR_SCOPE_TYPE_ENDPOINT       = 1,
     ACPI_DMAR_SCOPE_TYPE_BRIDGE         = 2,
-    ACPI_DMAR_SCOPE_TYPE_RESERVED       = 3     /* 3 and greater are reserved */
+    ACPI_DMAR_SCOPE_TYPE_IOAPIC         = 3,
+    ACPI_DMAR_SCOPE_TYPE_HPET           = 4,
+    ACPI_DMAR_SCOPE_TYPE_RESERVED       = 5     /* 5 and greater are reserved */
 };
 
+typedef struct acpi_dmar_pci_path
+{
+    UINT8                   Device;
+    UINT8                   Function;
+
+} ACPI_DMAR_PCI_PATH;
 
 /*
  * DMAR Sub-tables, correspond to Type in ACPI_DMAR_HEADER
@@ -483,6 +497,9 @@ enum AcpiDmarScopeType
 typedef struct acpi_dmar_hardware_unit
 {
     ACPI_DMAR_HEADER        Header;
+    UINT8                   Flags;
+    UINT8                   Reserved;
+    UINT16                  Segment;
     UINT64                  Address;            /* Register Base Address */
 
 } ACPI_DMAR_HARDWARE_UNIT;
@@ -496,7 +513,9 @@ typedef struct acpi_dmar_hardware_unit
 typedef struct acpi_dmar_reserved_memory
 {
     ACPI_DMAR_HEADER        Header;
-    UINT64                  Address;            /* 4K aligned base address */
+    UINT16                  Reserved;
+    UINT16                  Segment;
+    UINT64                  BaseAddress;        /* 4K aligned base address */
     UINT64                  EndAddress;         /* 4K aligned limit address */
 
 } ACPI_DMAR_RESERVED_MEMORY;
@@ -504,6 +523,21 @@ typedef struct acpi_dmar_reserved_memory
 /* Flags */
 
 #define ACPI_DMAR_ALLOW_ALL         (1)
+
+/* 2: Root Port ATS Capability Reporting Structure */
+
+typedef struct acpi_dmar_atsr
+{
+    ACPI_DMAR_HEADER        Header;
+    UINT8                   Flags;
+    UINT8                   Reserved;
+    UINT16                  Segment;
+
+} ACPI_DMAR_ATSR;
+
+/* Flags */
+
+#define ACPI_DMAR_ALL_PORTS         (1)
 
 
 /*******************************************************************************
@@ -1420,9 +1454,9 @@ typedef struct acpi_srat_mem_affinity
     UINT16                  Reserved;           /* Reserved, must be zero */
     UINT64                  BaseAddress;
     UINT64                  Length;
-    UINT32                  MemoryType;         /* See acpi_address_range_id */
+    UINT32                  Reserved1;
     UINT32                  Flags;
-    UINT64                  Reserved1;          /* Reserved, must be zero */
+    UINT64                  Reserved2;          /* Reserved, must be zero */
 
 } ACPI_SRAT_MEM_AFFINITY;
 
@@ -1431,17 +1465,6 @@ typedef struct acpi_srat_mem_affinity
 #define ACPI_SRAT_MEM_ENABLED       (1)         /* 00: Use affinity structure */
 #define ACPI_SRAT_MEM_HOT_PLUGGABLE (1<<1)      /* 01: Memory region is hot pluggable */
 #define ACPI_SRAT_MEM_NON_VOLATILE  (1<<2)      /* 02: Memory region is non-volatile */
-
-/* Memory types */
-
-enum acpi_address_range_id
-{
-    ACPI_ADDRESS_RANGE_MEMORY   = 1,
-    ACPI_ADDRESS_RANGE_RESERVED = 2,
-    ACPI_ADDRESS_RANGE_ACPI     = 3,
-    ACPI_ADDRESS_RANGE_NVS      = 4,
-    ACPI_ADDRESS_RANGE_COUNT    = 5
-};
 
 
 /*******************************************************************************

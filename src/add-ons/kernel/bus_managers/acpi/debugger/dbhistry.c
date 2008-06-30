@@ -210,7 +210,7 @@ void
 AcpiDbDisplayHistory (
     void)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
     UINT16                  HistoryIndex;
 
 
@@ -249,7 +249,7 @@ char *
 AcpiDbGetFromHistory (
     char                    *CommandNumArg)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
     UINT16                  HistoryIndex;
     UINT32                  CmdNum;
 

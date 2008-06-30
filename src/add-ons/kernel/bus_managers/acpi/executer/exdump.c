@@ -680,26 +680,22 @@ AcpiExDumpOperand (
 
     case ACPI_TYPE_BUFFER:
 
-        AcpiOsPrintf ("Buffer len %X @ %p\n",
+        AcpiOsPrintf ("Buffer length %.2X @ %p\n",
             ObjDesc->Buffer.Length, ObjDesc->Buffer.Pointer);
 
-        Length = ObjDesc->Buffer.Length;
-        if (Length > 64)
-        {
-            Length = 64;
-        }
 
         /* Debug only -- dump the buffer contents */
 
         if (ObjDesc->Buffer.Pointer)
         {
-            AcpiOsPrintf ("Buffer Contents: ");
-
-            for (Index = 0; Index < Length; Index++)
+            Length = ObjDesc->Buffer.Length;
+            if (Length > 128)
             {
-                AcpiOsPrintf (" %02x", ObjDesc->Buffer.Pointer[Index]);
+                Length = 128;
             }
-            AcpiOsPrintf ("\n");
+
+            AcpiOsPrintf ("Buffer Contents: (displaying length 0x%.2X)\n", Length);
+            ACPI_DUMP_BUFFER (ObjDesc->Buffer.Pointer, Length);
         }
         break;
 
@@ -877,63 +873,48 @@ AcpiExDumpOperand (
  *
  * FUNCTION:    AcpiExDumpOperands
  *
- * PARAMETERS:  Operands            - Operand list
- *              InterpreterMode     - Load or Exec
- *              Ident               - Identification
- *              NumLevels           - # of stack entries to dump above line
- *              Note                - Output notation
- *              ModuleName          - Caller's module name
- *              LineNumber          - Caller's invocation line number
+ * PARAMETERS:  Operands            - A list of Operand objects
+ *              OpcodeName          - AML opcode name
+ *              NumOperands         - Operand count for this opcode
  *
- * DESCRIPTION: Dump the object stack
+ * DESCRIPTION: Dump the operands associated with the opcode
  *
  ******************************************************************************/
 
 void
 AcpiExDumpOperands (
     ACPI_OPERAND_OBJECT     **Operands,
-    ACPI_INTERPRETER_MODE   InterpreterMode,
-    char                    *Ident,
-    UINT32                  NumLevels,
-    char                    *Note,
-    char                    *ModuleName,
-    UINT32                  LineNumber)
+    const char              *OpcodeName,
+    UINT32                  NumOperands)
 {
-    ACPI_NATIVE_UINT        i;
-
-
     ACPI_FUNCTION_NAME (ExDumpOperands);
 
 
-    if (!Ident)
+    if (!OpcodeName)
     {
-        Ident = "?";
-    }
-
-    if (!Note)
-    {
-        Note = "?";
+        OpcodeName = "UNKNOWN";
     }
 
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
-        "************* Operand Stack Contents (Opcode [%s], %d Operands)\n",
-        Ident, NumLevels));
+        "**** Start operand dump for opcode [%s], %d operands\n",
+        OpcodeName, NumOperands));
 
-    if (NumLevels == 0)
+    if (NumOperands == 0)
     {
-        NumLevels = 1;
+        NumOperands = 1;
     }
 
-    /* Dump the operand stack starting at the top */
+    /* Dump the individual operands */
 
-    for (i = 0; NumLevels > 0; i--, NumLevels--)
+    while (NumOperands)
     {
-        AcpiExDumpOperand (Operands[i], 0);
+        AcpiExDumpOperand (*Operands, 0);
+        Operands++;
+        NumOperands--;
     }
 
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
-        "************* Operand Stack dump from %s(%d), %s\n",
-        ModuleName, LineNumber, Note));
+        "**** End operand dump for [%s]\n", OpcodeName));
     return;
 }
 

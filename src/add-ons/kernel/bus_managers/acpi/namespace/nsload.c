@@ -154,7 +154,7 @@ AcpiNsDeleteSubtree (
 
 ACPI_STATUS
 AcpiNsLoadTable (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     ACPI_NAMESPACE_NODE     *Node)
 {
     ACPI_STATUS             Status;

@@ -240,7 +240,8 @@ AcpiExSystemMemorySpaceHandler (
 
         /* Create a new mapping starting at the address given */
 
-        MemInfo->MappedLogicalAddress = AcpiOsMapMemory ((ACPI_NATIVE_UINT) Address, WindowSize);
+        MemInfo->MappedLogicalAddress = AcpiOsMapMemory (
+            (ACPI_PHYSICAL_ADDRESS) Address, WindowSize);
         if (!MemInfo->MappedLogicalAddress)
         {
             ACPI_ERROR ((AE_INFO,

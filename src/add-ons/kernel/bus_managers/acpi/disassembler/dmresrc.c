@@ -133,7 +133,7 @@ void (*ACPI_RESOURCE_HANDLER) (
     UINT32                  Length,
     UINT32                  Level);
 
-static ACPI_RESOURCE_HANDLER    AcpiGbl_DumpResourceDispatch [] =
+static ACPI_RESOURCE_HANDLER    AcpiGbl_DmResourceDispatch [] =
 {
     /* Small descriptors */
 
@@ -325,7 +325,7 @@ AcpiDmResourceTemplate (
     UINT32                  ByteCount)
 {
     ACPI_STATUS             Status;
-    ACPI_NATIVE_UINT        CurrentByteOffset;
+    UINT32                  CurrentByteOffset;
     UINT8                   ResourceType;
     UINT32                  ResourceLength;
     void                    *Aml;
@@ -343,7 +343,7 @@ AcpiDmResourceTemplate (
         Node = Node->Child;
     }
 
-    for (CurrentByteOffset = 0; CurrentByteOffset < ByteCount; )
+    for (CurrentByteOffset = 0; CurrentByteOffset < ByteCount;)
     {
         Aml = &ByteData[CurrentByteOffset];
 
@@ -423,7 +423,7 @@ AcpiDmResourceTemplate (
             Node = Node->Peer;
         }
 
-        AcpiGbl_DumpResourceDispatch [ResourceIndex] (
+        AcpiGbl_DmResourceDispatch [ResourceIndex] (
             Aml, ResourceLength, Level);
 
         /* Descriptor post-processing */

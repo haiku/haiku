@@ -200,7 +200,7 @@ ACPI_PHYSICAL_ADDRESS
 AcpiOsGetRootPointer (void)
 {
 #ifdef _KERNEL_MODE
-	ACPI_NATIVE_UINT address;
+	ACPI_SIZE address;
 	ACPI_STATUS status;
 	if (acpi_root == 0) {
 		status = AcpiFindRootPointer(&address);
@@ -500,7 +500,7 @@ AcpiOsGetLine (
 void *
 AcpiOsMapMemory (
     ACPI_PHYSICAL_ADDRESS   where,
-    ACPI_NATIVE_UINT	length)
+    ACPI_SIZE	length)
 {
 
 #ifdef _KERNEL_MODE

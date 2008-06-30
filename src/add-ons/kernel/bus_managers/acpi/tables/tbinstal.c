@@ -193,10 +193,10 @@ AcpiTbVerifyTable (
 ACPI_STATUS
 AcpiTbAddTable (
     ACPI_TABLE_DESC         *TableDesc,
-    ACPI_NATIVE_UINT        *TableIndex)
+    UINT32                  *TableIndex)
 {
-    ACPI_NATIVE_UINT        i;
-    ACPI_NATIVE_UINT        Length;
+    UINT32                  i;
+    UINT32                  Length;
     ACPI_STATUS             Status = AE_OK;
 
 
@@ -212,27 +212,13 @@ AcpiTbAddTable (
         }
     }
 
-    /* The table must be either an SSDT or a PSDT */
-
-    if ((!ACPI_COMPARE_NAME (TableDesc->Pointer->Signature, ACPI_SIG_PSDT)) &&
-        (!ACPI_COMPARE_NAME (TableDesc->Pointer->Signature, ACPI_SIG_SSDT)))
-    {
-        /* Check for a printable name */
-
-        if (AcpiUtValidAcpiName (*(UINT32 *) TableDesc->Pointer->Signature))
-        {
-            ACPI_ERROR ((AE_INFO,
-                "Table has invalid signature [%4.4s], must be SSDT or PSDT",
-                TableDesc->Pointer->Signature));
-        }
-        else
-        {
-            ACPI_ERROR ((AE_INFO,
-                "Table has invalid signature (0x%8.8X), must be SSDT or PSDT",
-                *(UINT32 *) TableDesc->Pointer->Signature));
-        }
-        return_ACPI_STATUS (AE_BAD_SIGNATURE);
-    }
+    /*
+     * Originally, we checked the table signature for "SSDT" or "PSDT" here.
+     * Next, we added support for OEMx tables, signature "OEM".
+     * Valid tables were encountered with a null signature, so we've just
+     * given up on validating the signature, since it seems to be a waste
+     * of code. The original code was removed (05/2008).
+     */
 
     (void) AcpiUtAcquireMutex (ACPI_MTX_TABLES);
 
@@ -316,8 +302,8 @@ AcpiTbResizeRootTableList (
     /* Increase the Table Array size */
 
     Tables = ACPI_ALLOCATE_ZEROED (
-                (AcpiGbl_RootTableList.Size + ACPI_ROOT_TABLE_SIZE_INCREMENT)
-                * sizeof (ACPI_TABLE_DESC));
+        ((ACPI_SIZE) AcpiGbl_RootTableList.Size + ACPI_ROOT_TABLE_SIZE_INCREMENT)
+        * sizeof (ACPI_TABLE_DESC));
     if (!Tables)
     {
         ACPI_ERROR ((AE_INFO, "Could not allocate new root table array"));
@@ -329,7 +315,7 @@ AcpiTbResizeRootTableList (
     if (AcpiGbl_RootTableList.Tables)
     {
         ACPI_MEMCPY (Tables, AcpiGbl_RootTableList.Tables,
-            AcpiGbl_RootTableList.Size * sizeof (ACPI_TABLE_DESC));
+            (ACPI_SIZE) AcpiGbl_RootTableList.Size * sizeof (ACPI_TABLE_DESC));
 
         if (AcpiGbl_RootTableList.Flags & ACPI_ROOT_ORIGIN_ALLOCATED)
         {
@@ -366,7 +352,7 @@ AcpiTbStoreTable (
     ACPI_TABLE_HEADER       *Table,
     UINT32                  Length,
     UINT8                   Flags,
-    ACPI_NATIVE_UINT        *TableIndex)
+    UINT32                  *TableIndex)
 {
     ACPI_STATUS             Status = AE_OK;
 
@@ -458,7 +444,7 @@ void
 AcpiTbTerminate (
     void)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_TRACE (TbTerminate);
@@ -505,7 +491,7 @@ AcpiTbTerminate (
 
 void
 AcpiTbDeleteNamespaceByOwner (
-    ACPI_NATIVE_UINT        TableIndex)
+    UINT32                  TableIndex)
 {
     ACPI_OWNER_ID           OwnerId;
 
@@ -540,7 +526,7 @@ AcpiTbDeleteNamespaceByOwner (
 
 ACPI_STATUS
 AcpiTbAllocateOwnerId (
-    ACPI_NATIVE_UINT        TableIndex)
+    UINT32                  TableIndex)
 {
     ACPI_STATUS             Status = AE_BAD_PARAMETER;
 
@@ -574,7 +560,7 @@ AcpiTbAllocateOwnerId (
 
 ACPI_STATUS
 AcpiTbReleaseOwnerId (
-    ACPI_NATIVE_UINT        TableIndex)
+    UINT32                  TableIndex)
 {
     ACPI_STATUS             Status = AE_BAD_PARAMETER;
 
@@ -609,7 +595,7 @@ AcpiTbReleaseOwnerId (
 
 ACPI_STATUS
 AcpiTbGetOwnerId (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     ACPI_OWNER_ID           *OwnerId)
 {
     ACPI_STATUS             Status = AE_BAD_PARAMETER;
@@ -642,7 +628,7 @@ AcpiTbGetOwnerId (
 
 BOOLEAN
 AcpiTbIsTableLoaded (
-    ACPI_NATIVE_UINT        TableIndex)
+    UINT32                  TableIndex)
 {
     BOOLEAN                 IsLoaded = FALSE;
 
@@ -674,7 +660,7 @@ AcpiTbIsTableLoaded (
 
 void
 AcpiTbSetTableLoadedFlag (
-    ACPI_NATIVE_UINT        TableIndex,
+    UINT32                  TableIndex,
     BOOLEAN                 IsLoaded)
 {
 

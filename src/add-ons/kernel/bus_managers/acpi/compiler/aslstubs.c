@@ -275,7 +275,7 @@ AcpiTbFindTable (
     char                    *Signature,
     char                    *OemId,
     char                    *OemTableId,
-    ACPI_NATIVE_UINT        *TableIndex)
+    UINT32                  *TableIndex)
 {
     return (AE_SUPPORT);
 }

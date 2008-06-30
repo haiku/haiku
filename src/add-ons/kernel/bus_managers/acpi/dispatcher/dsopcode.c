@@ -826,11 +826,6 @@ AcpiDsEvalBufferFieldOperands (
 
     Status = AcpiExResolveOperands (Op->Common.AmlOpcode,
                     ACPI_WALK_OPERANDS, WalkState);
-
-    ACPI_DUMP_OPERANDS (ACPI_WALK_OPERANDS, ACPI_IMODE_EXECUTE,
-                    AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
-                    WalkState->NumOperands, "after AcpiExResolveOperands");
-
     if (ACPI_FAILURE (Status))
     {
         ACPI_ERROR ((AE_INFO, "(%s) bad operand(s) (%X)",
@@ -922,10 +917,6 @@ AcpiDsEvalRegionOperands (
         return_ACPI_STATUS (Status);
     }
 
-    ACPI_DUMP_OPERANDS (ACPI_WALK_OPERANDS, ACPI_IMODE_EXECUTE,
-                    AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
-                    1, "after AcpiExResolveOperands");
-
     ObjDesc = AcpiNsGetAttachedObject (Node);
     if (!ObjDesc)
     {
@@ -988,7 +979,7 @@ AcpiDsEvalTableRegionOperands (
     ACPI_OPERAND_OBJECT     **Operand;
     ACPI_NAMESPACE_NODE     *Node;
     ACPI_PARSE_OBJECT       *NextOp;
-    ACPI_NATIVE_UINT        TableIndex;
+    UINT32                  TableIndex;
     ACPI_TABLE_HEADER       *Table;
 
 
@@ -1025,10 +1016,6 @@ AcpiDsEvalTableRegionOperands (
     {
         return_ACPI_STATUS (Status);
     }
-
-    ACPI_DUMP_OPERANDS (ACPI_WALK_OPERANDS, ACPI_IMODE_EXECUTE,
-                    AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
-                    1, "after AcpiExResolveOperands");
 
     Operand = &WalkState->Operands[0];
 
@@ -1247,10 +1234,8 @@ AcpiDsEvalBankFieldOperands (
         return_ACPI_STATUS (Status);
     }
 
-    ACPI_DUMP_OPERANDS (ACPI_WALK_OPERANDS, ACPI_IMODE_EXECUTE,
-                    AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
-                    1, "after AcpiExResolveOperands");
-
+    ACPI_DUMP_OPERANDS (ACPI_WALK_OPERANDS,
+        AcpiPsGetOpcodeName (Op->Common.AmlOpcode), 1);
     /*
      * Get the BankValue operand and save it
      * (at Top of stack)

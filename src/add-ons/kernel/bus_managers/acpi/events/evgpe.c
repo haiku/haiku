@@ -350,16 +350,10 @@ AcpiEvDisableGpe (
 
 
     /*
-     * Ignore this if the GPE is valid and not enabled.
-     *
-     * Flags is only zero if GPE is neither enabled or disabled -- it may
-     * be a spurious or stray GPE -- disable it in the default case below.
+     * Note: Always disable the GPE, even if we think that that it is already
+     * disabled. It is possible that the AML or some other code has enabled
+     * the GPE behind our back.
      */
-    if (GpeEventInfo->Flags &&
-       (!(GpeEventInfo->Flags & ACPI_GPE_ENABLE_MASK)))
-    {
-        return_ACPI_STATUS (AE_OK);
-    }
 
     /* Make sure HW enable masks are updated */
 
@@ -392,7 +386,7 @@ AcpiEvDisableGpe (
 
     default:
         /*
-         * Even if we don't know the GPE type, make sure that we always
+         * If we don't know the GPE type, make sure that we always
          * disable it. This can prevent a certain type of GPE flood, where
          * the GPE has no _Lxx/_Exx method, and it cannot be determined
          * whether the GPE is wake, run, or wake/run.
@@ -429,7 +423,7 @@ AcpiEvGetGpeEventInfo (
 {
     ACPI_OPERAND_OBJECT     *ObjDesc;
     ACPI_GPE_BLOCK_INFO     *GpeBlock;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_ENTRY ();
@@ -508,8 +502,8 @@ AcpiEvGpeDetect (
     UINT32                  StatusReg;
     UINT32                  EnableReg;
     ACPI_CPU_FLAGS          Flags;
-    ACPI_NATIVE_UINT        i;
-    ACPI_NATIVE_UINT        j;
+    UINT32                  i;
+    UINT32                  j;
 
 
     ACPI_FUNCTION_NAME (EvGpeDetect);
@@ -589,8 +583,8 @@ AcpiEvGpeDetect (
                      * or method.
                      */
                     IntStatus |= AcpiEvGpeDispatch (
-                        &GpeBlock->EventInfo[(i * ACPI_GPE_REGISTER_WIDTH) + j],
-                        (UINT32) j + GpeRegisterInfo->BaseGpeNumber);
+                        &GpeBlock->EventInfo[((ACPI_SIZE) i * ACPI_GPE_REGISTER_WIDTH) + j],
+                        j + GpeRegisterInfo->BaseGpeNumber);
                 }
             }
         }
@@ -696,8 +690,6 @@ AcpiEvAsynchExecuteGpeMethod (
              * control method that corresponds to this GPE
              */
             Info->PrefixNode = LocalGpeEventInfo->Dispatch.MethodNode;
-            Info->Parameters = ACPI_CAST_PTR (ACPI_OPERAND_OBJECT *, LocalGpeEventInfo);
-            Info->ParameterType = ACPI_PARAM_GPE;
             Info->Flags = ACPI_IGNORE_RETURN_VALUE;
 
             Status = AcpiNsEvaluate (Info);

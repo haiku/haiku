@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nsdump - table dumping routines for debug
- *              $Revision: 1.184 $
+ *              $Revision: 1.185 $
  *
  *****************************************************************************/
 
@@ -160,7 +160,7 @@ AcpiNsPrintPathname (
     UINT32                  NumSegments,
     char                    *Pathname)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_NAME (NsPrintPathname);
@@ -309,14 +309,6 @@ AcpiNsDumpOneObject (
         if (Type > ACPI_TYPE_LOCAL_MAX)
         {
             ACPI_WARNING ((AE_INFO, "Invalid ACPI Object Type %08X", Type));
-        }
-
-        if (!AcpiUtValidAcpiName (ThisNode->Name.Integer))
-        {
-            ThisNode->Name.Integer = AcpiUtRepairName (ThisNode->Name.Ascii);
-
-            ACPI_WARNING ((AE_INFO, "Invalid ACPI Name %08X",
-                ThisNode->Name.Integer));
         }
 
         AcpiOsPrintf ("%4.4s", AcpiUtGetNodeName (ThisNode));
@@ -617,13 +609,13 @@ AcpiNsDumpOneObject (
 
             if (ObjType > ACPI_TYPE_LOCAL_MAX)
             {
-                AcpiOsPrintf ("(Ptr to ACPI Object type %X [UNKNOWN])\n",
+                AcpiOsPrintf ("(Pointer to ACPI Object type %.2X [UNKNOWN])\n",
                     ObjType);
                 BytesToDump = 32;
             }
             else
             {
-                AcpiOsPrintf ("(Ptr to ACPI Object type %X [%s])\n",
+                AcpiOsPrintf ("(Pointer to ACPI Object type %.2X [%s])\n",
                     ObjType, AcpiUtGetTypeName (ObjType));
                 BytesToDump = sizeof (ACPI_OPERAND_OBJECT);
             }

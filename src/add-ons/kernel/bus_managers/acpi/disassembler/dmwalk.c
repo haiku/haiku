@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dmwalk - AML disassembly tree walk
- *              $Revision: 1.34 $
+ *              $Revision: 1.35 $
  *
  ******************************************************************************/
 
@@ -622,7 +622,7 @@ AcpiDmDescendingOp (
                 }
                 else
                 {
-                    AcpiDmDumpName ((char *) &Name);
+                    AcpiDmDumpName (Name);
                 }
 
                 if (Op->Common.AmlOpcode != AML_INT_NAMEDFIELD_OP)

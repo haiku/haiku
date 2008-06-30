@@ -433,7 +433,7 @@ void
 AcpiDbDisplayTableInfo (
     char                    *TableArg)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
     ACPI_TABLE_DESC         *TableDesc;
 
 

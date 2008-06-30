@@ -299,7 +299,7 @@ AcpiDbDumpExternalObject (
 
     case ACPI_TYPE_LOCAL_REFERENCE:
 
-        AcpiOsPrintf ("[Object Reference] = ", ObjDesc->Reference.Handle);
+        AcpiOsPrintf ("[Object Reference] = ");
         AcpiDmDisplayInternalObject (ObjDesc->Reference.Handle, NULL);
         break;
 

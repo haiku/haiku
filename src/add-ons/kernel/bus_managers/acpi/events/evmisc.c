@@ -681,7 +681,7 @@ void
 AcpiEvTerminate (
     void)
 {
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
     ACPI_STATUS             Status;
 
 
@@ -699,7 +699,7 @@ AcpiEvTerminate (
 
         for (i = 0; i < ACPI_NUM_FIXED_EVENTS; i++)
         {
-            Status = AcpiDisableEvent ((UINT32) i, 0);
+            Status = AcpiDisableEvent (i, 0);
             if (ACPI_FAILURE (Status))
             {
                 ACPI_ERROR ((AE_INFO,

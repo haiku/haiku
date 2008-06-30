@@ -408,7 +408,7 @@ void *
 AcpiUtAllocate (
     ACPI_SIZE               Size,
     UINT32                  Component,
-    char                    *Module,
+    const char              *Module,
     UINT32                  Line)
 {
     void                    *Allocation;
@@ -460,7 +460,7 @@ void *
 AcpiUtAllocateZeroed (
     ACPI_SIZE               Size,
     UINT32                  Component,
-    char                    *Module,
+    const char              *Module,
     UINT32                  Line)
 {
     void                    *Allocation;

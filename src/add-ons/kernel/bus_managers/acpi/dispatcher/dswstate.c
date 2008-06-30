@@ -154,7 +154,7 @@ AcpiDsResultPop (
     ACPI_OPERAND_OBJECT     **Object,
     ACPI_WALK_STATE         *WalkState)
 {
-    ACPI_NATIVE_UINT        Index;
+    UINT32                  Index;
     ACPI_GENERIC_STATE      *State;
     ACPI_STATUS             Status;
 
@@ -212,7 +212,7 @@ AcpiDsResultPop (
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
         "Obj=%p [%s] Index=%X State=%p Num=%X\n", *Object,
         AcpiUtGetObjectTypeName (*Object),
-        (UINT32) Index, WalkState, WalkState->ResultCount));
+        Index, WalkState, WalkState->ResultCount));
 
     return (AE_OK);
 }
@@ -238,7 +238,7 @@ AcpiDsResultPush (
 {
     ACPI_GENERIC_STATE      *State;
     ACPI_STATUS             Status;
-    ACPI_NATIVE_UINT        Index;
+    UINT32                  Index;
 
 
     ACPI_FUNCTION_NAME (DsResultPush);
@@ -517,7 +517,7 @@ AcpiDsObjStackPopAndDelete (
     UINT32                  PopCount,
     ACPI_WALK_STATE         *WalkState)
 {
-    ACPI_NATIVE_INT         i;
+    INT32                   i;
     ACPI_OPERAND_OBJECT     *ObjDesc;
 
 
@@ -529,7 +529,7 @@ AcpiDsObjStackPopAndDelete (
         return;
     }
 
-    for (i = (ACPI_NATIVE_INT)(PopCount - 1); i >= 0; i--)
+    for (i = (INT32) PopCount - 1; i >= 0; i--)
     {
         if (WalkState->NumOperands == 0)
         {
@@ -763,16 +763,8 @@ AcpiDsInitAmlWalk (
 
     if (Info)
     {
-        if (Info->ParameterType == ACPI_PARAM_GPE)
-        {
-            WalkState->GpeEventInfo =
-                ACPI_CAST_PTR (ACPI_GPE_EVENT_INFO, Info->Parameters);
-        }
-        else
-        {
-            WalkState->Params = Info->Parameters;
-            WalkState->CallerReturnDesc = &Info->ReturnObject;
-        }
+        WalkState->Params = Info->Parameters;
+        WalkState->CallerReturnDesc = &Info->ReturnObject;
     }
 
     Status = AcpiPsInitScope (&WalkState->ParserState, Op);

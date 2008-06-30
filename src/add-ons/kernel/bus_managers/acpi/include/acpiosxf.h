@@ -274,7 +274,7 @@ AcpiOsFree (
 void *
 AcpiOsMapMemory (
     ACPI_PHYSICAL_ADDRESS   Where,
-    ACPI_NATIVE_UINT        Length);
+    ACPI_SIZE               Length);
 
 void
 AcpiOsUnmapMemory (

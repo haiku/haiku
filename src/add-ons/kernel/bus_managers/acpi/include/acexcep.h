@@ -185,8 +185,9 @@
 #define AE_BAD_HEX_CONSTANT             (ACPI_STATUS) (0x0007 | AE_CODE_PROGRAMMER)
 #define AE_BAD_OCTAL_CONSTANT           (ACPI_STATUS) (0x0008 | AE_CODE_PROGRAMMER)
 #define AE_BAD_DECIMAL_CONSTANT         (ACPI_STATUS) (0x0009 | AE_CODE_PROGRAMMER)
+#define AE_MISSING_ARGUMENTS            (ACPI_STATUS) (0x000A | AE_CODE_PROGRAMMER)
 
-#define AE_CODE_PGM_MAX                 0x0009
+#define AE_CODE_PGM_MAX                 0x000A
 
 
 /*
@@ -309,6 +310,7 @@ char const   *AcpiGbl_ExceptionNames_Env[] =
 
 char const   *AcpiGbl_ExceptionNames_Pgm[] =
 {
+    NULL,
     "AE_BAD_PARAMETER",
     "AE_BAD_CHARACTER",
     "AE_BAD_PATHNAME",
@@ -317,11 +319,13 @@ char const   *AcpiGbl_ExceptionNames_Pgm[] =
     "AE_ALIGNMENT",
     "AE_BAD_HEX_CONSTANT",
     "AE_BAD_OCTAL_CONSTANT",
-    "AE_BAD_DECIMAL_CONSTANT"
+    "AE_BAD_DECIMAL_CONSTANT",
+    "AE_MISSING_ARGUMENTS"
 };
 
 char const   *AcpiGbl_ExceptionNames_Tbl[] =
 {
+    NULL,
     "AE_BAD_SIGNATURE",
     "AE_BAD_HEADER",
     "AE_BAD_CHECKSUM",
@@ -332,6 +336,7 @@ char const   *AcpiGbl_ExceptionNames_Tbl[] =
 
 char const   *AcpiGbl_ExceptionNames_Aml[] =
 {
+    NULL,
     "AE_AML_ERROR",
     "AE_AML_PARSE",
     "AE_AML_BAD_OPCODE",
@@ -370,6 +375,7 @@ char const   *AcpiGbl_ExceptionNames_Aml[] =
 
 char const   *AcpiGbl_ExceptionNames_Ctrl[] =
 {
+    NULL,
     "AE_CTRL_RETURN_VALUE",
     "AE_CTRL_PENDING",
     "AE_CTRL_TERMINATE",

@@ -208,7 +208,7 @@ AcpiTbValidateRsdp (
 
 ACPI_STATUS
 AcpiFindRootPointer (
-    ACPI_NATIVE_UINT        *TableAddress)
+    ACPI_SIZE               *TableAddress)
 {
     UINT8                   *TablePtr;
     UINT8                   *MemRover;
@@ -248,7 +248,7 @@ AcpiFindRootPointer (
          *     minimum of 1K length)
          */
         TablePtr = AcpiOsMapMemory (
-                    (ACPI_NATIVE_UINT) PhysicalAddress,
+                    (ACPI_PHYSICAL_ADDRESS) PhysicalAddress,
                     ACPI_EBDA_WINDOW_SIZE);
         if (!TablePtr)
         {

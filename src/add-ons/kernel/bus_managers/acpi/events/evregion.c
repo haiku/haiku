@@ -169,7 +169,7 @@ AcpiEvInstallRegionHandlers (
     void)
 {
     ACPI_STATUS             Status;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_TRACE (EvInstallRegionHandlers);
@@ -245,7 +245,7 @@ AcpiEvInitializeOpRegions (
     void)
 {
     ACPI_STATUS             Status;
-    ACPI_NATIVE_UINT        i;
+    UINT32                  i;
 
 
     ACPI_FUNCTION_TRACE (EvInitializeOpRegions);
@@ -323,7 +323,6 @@ AcpiEvExecuteRegMethod (
     Info->PrefixNode = RegionObj2->Extra.Method_REG;
     Info->Pathname = NULL;
     Info->Parameters = Args;
-    Info->ParameterType = ACPI_PARAM_ARGS;
     Info->Flags = ACPI_IGNORE_RETURN_VALUE;
 
     /*

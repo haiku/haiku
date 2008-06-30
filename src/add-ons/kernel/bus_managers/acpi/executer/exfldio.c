@@ -248,13 +248,13 @@ AcpiExSetupRegion (
             /*
              * Slack mode only:  We will go ahead and allow access to this
              * field if it is within the region length rounded up to the next
-             * access width boundary.
+             * access width boundary. ACPI_SIZE cast for 64-bit compile.
              */
             if (ACPI_ROUND_UP (RgnDesc->Region.Length,
                     ObjDesc->CommonField.AccessByteWidth) >=
-                (ObjDesc->CommonField.BaseByteOffset +
-                (ACPI_NATIVE_UINT) ObjDesc->CommonField.AccessByteWidth +
-                FieldDatumByteOffset))
+                ((ACPI_SIZE) ObjDesc->CommonField.BaseByteOffset +
+                    ObjDesc->CommonField.AccessByteWidth +
+                    FieldDatumByteOffset))
             {
                 return_ACPI_STATUS (AE_OK);
             }

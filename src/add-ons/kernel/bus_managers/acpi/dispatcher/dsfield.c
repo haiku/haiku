@@ -561,11 +561,6 @@ AcpiDsInitFieldObjects (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    if (!Arg)
-    {
-        return_ACPI_STATUS (AE_AML_NO_OPERAND);
-    }
-
     /* Creating new namespace node(s), should not already exist */
 
     Flags = ACPI_NS_NO_UPSEARCH | ACPI_NS_DONT_OPEN_SCOPE |
@@ -580,6 +575,7 @@ AcpiDsInitFieldObjects (
 
     /*
      * Walk the list of entries in the FieldList
+     * Note: FieldList can be of zero length. In this case, Arg will be NULL.
      */
     while (Arg)
     {
