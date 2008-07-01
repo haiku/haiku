@@ -44,6 +44,8 @@
 #include "Volume.h"
 
 
+using std::nothrow;
+
 static const size_t kOptimalIOSize = 65536;
 
 extern fs_volume_ops gReiserFSVolumeOps;
@@ -54,6 +56,57 @@ inline static bool is_user_in_group(gid_t gid);
 
 
 // #pragma mark - FS
+
+
+// reiserfs_identify_partition
+static float
+reiserfs_identify_partition(int fd, partition_data *partition, void **cookie)
+{
+	Volume* volume = new(nothrow) Volume();
+	if (volume == NULL)
+		return -1.0;
+
+	status_t status = volume->Identify(fd, partition);
+	if (status != B_OK) {
+		delete volume;
+		return -1.0;
+	}
+
+	*cookie = (void*)volume;
+	return 0.8;
+}
+
+
+// reiserfs_scan_partition
+static status_t
+reiserfs_scan_partition(int fd, partition_data *partition, void *_cookie)
+{
+	Volume* volume = (Volume*)_cookie;
+
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_FILE_SYSTEM;
+	partition->content_size = volume->CountBlocks()
+		* volume->GetBlockSize();
+	partition->block_size = volume->GetBlockSize();
+	// TODO: Construct name from partition layout?
+	partition->content_name = strdup("Untitled ReiserFS");
+	if (partition->content_name == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+// reiserfs_free_identify_partition_cookie
+static void
+reiserfs_free_identify_partition_cookie(partition_data* partition,
+	void* _cookie)
+{
+	delete (Volume*)_cookie;
+}
+
+
+//	#pragma mark -
 
 
 // reiserfs_mount
@@ -663,9 +716,9 @@ static file_system_module_info sReiserFSModuleInfo = {
 
 
 	// scanning
-	NULL,	// identify_partition()
-	NULL,	// scan_partition()
-	NULL,	// free_identify_partition_cookie()
+	&reiserfs_identify_partition,
+	&reiserfs_scan_partition,
+	&reiserfs_free_identify_partition_cookie,
 	NULL,	// free_partition_content_cookie()
 
 	&reiserfs_mount

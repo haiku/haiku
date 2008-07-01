@@ -86,6 +86,19 @@ Volume::~Volume()
 	Unmount();
 }
 
+// Identify
+status_t
+Volume::Identify(int fd, partition_data *partition)
+{
+	// open disk
+	fDevice = dup(fd);
+	if (fDevice < 0)
+		return B_ERROR;
+
+	// read and analyze super block
+	return _ReadSuperBlock();
+}
+
 // Mount
 status_t
 Volume::Mount(fs_volume *fsVolume, const char *path)

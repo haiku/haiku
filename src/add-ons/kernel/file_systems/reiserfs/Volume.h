@@ -41,6 +41,8 @@ public:
 	Volume();
 	~Volume();
 
+	status_t Identify(int fd, partition_data *partition);
+
 	status_t Mount(fs_volume *fsVolume, const char *path);
 	status_t Unmount();
 
