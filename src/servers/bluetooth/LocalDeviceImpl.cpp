@@ -98,17 +98,18 @@ printf("### \n");
 	
 
 	BMessage* request = NULL;
+	int32 	  eventIndexLocation;
 	
 	// Check if its a requested one
 	if ( event->ecode == HCI_EVENT_CMD_COMPLETE ) {
 	
 		(Output::Instance()->Post("Incoming Command Complete\n", BLACKBOARD_EVENTS));
-		request = FindPetition(event->ecode, ((struct hci_ev_cmd_complete*)(event+1))->opcode );
+		request = FindPetition(event->ecode, ((struct hci_ev_cmd_complete*)(event+1))->opcode, &eventIndexLocation );
 	
 	} else if ( event->ecode == HCI_EVENT_CMD_STATUS ) {
 
 		(Output::Instance()->Post("Incoming Command Status\n", BLACKBOARD_EVENTS));
-		request = FindPetition(event->ecode, ((struct hci_ev_cmd_status*)(event+1))->opcode );
+		request = FindPetition(event->ecode, ((struct hci_ev_cmd_status*)(event+1))->opcode, &eventIndexLocation );
 
 	} else 
 	{	
@@ -160,11 +161,11 @@ printf("### \n");
 		break;
 
 		case HCI_EVENT_CMD_COMPLETE:    				
-			CommandComplete((struct hci_ev_cmd_complete*)(event+1), request);
+			CommandComplete((struct hci_ev_cmd_complete*)(event+1), request, eventIndexLocation);
  		break;
- 	
+
  		case HCI_EVENT_CMD_STATUS:
- 			CommandStatus((struct hci_ev_cmd_status*)(event+1), request); 		
+ 			CommandStatus((struct hci_ev_cmd_status*)(event+1), request, eventIndexLocation);
 		break;
 
 		case HCI_EVENT_FLUSH_OCCUR:
@@ -230,7 +231,7 @@ printf("### \n");
 
 
 void 
-LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request) {
+LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request, int32 index) {
     
 	int16   opcodeExpected;
 	BMessage reply;
@@ -241,11 +242,11 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 	// Handle command complete information
 	// FIX ME! the expected code might me in another 
 	// index as is relative to the event not the request
-    request->FindInt16("opcodeExpected", 0 /*REVIEW!*/, &opcodeExpected);
+    request->FindInt16("opcodeExpected", index, &opcodeExpected);
 
 
 	if (request->IsSourceWaiting() == false)
-		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);                	
+		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);
  
     switch (opcodeExpected) {
 
@@ -332,7 +333,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 
 void 
-LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* request) {
+LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* request, int32 index) {
 
 	int16   opcodeExpected;
 	BMessage reply;
@@ -341,31 +342,30 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
     Output::Instance()->Post("\n", BLACKBOARD_LD_OFFSET + GetID());
 	
 	// Handle command complete information
-    request->FindInt16("opcodeExpected", 0 /*REVIEW!*/, &opcodeExpected);
+    request->FindInt16("opcodeExpected", index, &opcodeExpected);
 
 
 	if (request->IsSourceWaiting() == false)
-		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);                	
-    
-    
+		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);
+
     switch (opcodeExpected) {
-        
+
         case PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY):
-        {            	        	       	
+        {
         	reply.what = BT_MSG_INQUIRY_STARTED;
         	reply.AddInt8("status", event->status);
-        	
-            if (event->status == BT_OK) {                                
+
+            if (event->status == BT_OK) {
 			    Output::Instance()->Post("Positive reply for inquiry status\n", BLACKBOARD_KIT);
             } else {
-			    Output::Instance()->Post("Negative reply for inquiry status\n", BLACKBOARD_KIT);                
+			    Output::Instance()->Post("Negative reply for inquiry status\n", BLACKBOARD_KIT);
             }
 
-            printf("Sending reply ... %ld\n", request->SendReply(&reply));                                
+            printf("Sending reply ... %ld\n", request->SendReply(&reply));
             reply.PrintToStream();
-                        
+
             ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
-     	}       
+     	}
         break;
 		
 		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST):
@@ -374,7 +374,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 		}
 		break;
 		default:
-		    Output::Instance()->Post("Command Status not handled\n", BLACKBOARD_KIT);                		
+		    Output::Instance()->Post("Command Status not handled\n", BLACKBOARD_KIT);
 		break;
 	}
 
@@ -415,21 +415,21 @@ void
 LocalDeviceImpl::RemoteNameRequestComplete(struct hci_remote_name_request_complete_reply* remotename, BMessage* request)
 {
 	BMessage reply;
-	        	
-  	reply.AddInt8("status", remotename->status);
-        	
+	
+	reply.AddInt8("status", remotename->status);
+	
     if (remotename->status == BT_OK) {
-                                
-        reply.AddString("friendlyname", (const char*)remotename->remote_name );                    
+
+        reply.AddString("friendlyname", (const char*)remotename->remote_name );
 	    Output::Instance()->Post("Positive reply for remote friendly name\n", BLACKBOARD_KIT);
 
     } else {
 
-	    Output::Instance()->Post("Negative reply for remote friendly name\n", BLACKBOARD_KIT);                
+	    Output::Instance()->Post("Negative reply for remote friendly name\n", BLACKBOARD_KIT);
 
     }
 
-    printf("Sending reply ... %ld\n", request->SendReply(&reply));                                
+    printf("Sending reply ... %ld\n", request->SendReply(&reply));
     reply.PrintToStream();
 
 	// This request is not genna be used anymore

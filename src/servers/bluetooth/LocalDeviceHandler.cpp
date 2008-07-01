@@ -82,39 +82,39 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode)
     int16 eventFound;
     int16 opcodeFound;
 	int32 eventIndex = 0;
-	   
+
     // for each Event    
     while (msg->FindInt16("eventExpected", eventIndex, &eventFound) == B_OK ) {
 
-   		printf("@ Event expected found @%ld\n", eventIndex);                
+   		printf("@ Event expected found @%ld\n", eventIndex);
 
         if (eventFound == event) {
 
-     		printf("@ Event matches %ld\n", eventIndex);                
+     		printf("@ Event matches %ld\n", eventIndex);
             // there is an opcode specified
             if (opcode != 0) {
-                	
+
               	// The opcode matches
                	if ( (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK) &&
                	     ((uint16)opcodeFound == opcode) ) {
-               	     
+
                	    // this should remove only the entry
                	    printf("@ Removed event %d and opcoce %d from message %p\n", event, opcode, msg); 
                		(void)msg->RemoveData("eventExpected", eventIndex);
-              		(void)msg->RemoveData("opcodeExpected", eventIndex);                		
+              		(void)msg->RemoveData("opcodeExpected", eventIndex);
                		goto bail;
-               	}                    
-            }  else {                
+               	}
+            }  else {
                	// Event matches so far
                	printf("@ Removed event %d from message %p\n", event, msg); 
            		(void)msg->RemoveData("eventExpected", eventIndex);
            		goto bail;
             }
-                
+
         } 
         eventIndex++;
     }
-            
+
 bail:
 
     fEventsWanted.Unlock();
@@ -123,45 +123,48 @@ bail:
 
 
 BMessage*
-LocalDeviceHandler::FindPetition(uint16 event, uint16 opcode)
+LocalDeviceHandler::FindPetition(uint16 event, uint16 opcode, int32* indexFound)
 {
     int16 eventFound;
     int16 opcodeFound;
 	int32 eventIndex;
-	    
-    fEventsWanted.Lock();        
+
+    fEventsWanted.Lock();
     // for each Petition
     for (int32 index = 0 ; index < fEventsWanted.CountMessages() ; index++) {
         BMessage* msg = fEventsWanted.FindMessage(index);
 		
 		printf("Petition %ld ... of %ld msg #%p\n", index, fEventsWanted.CountMessages(), msg);
 		msg->PrintToStream();
-       	eventIndex = 0;         
-        // for each Event    
+       	eventIndex = 0;
+
+        // for each Event
         while (msg->FindInt16("eventExpected", eventIndex, &eventFound) == B_OK ) {
             if (eventFound == event) {
 
-        		printf("Event found %ld\n", eventIndex);        
+        		printf("Event found %ld\n", eventIndex);
                 // there is an opcode specified.. 
                 if (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK) {
-                	
+
                 	// ensure the opcode
                 	if ((uint16)opcodeFound != opcode) {
-		        		printf("opcode does not match %d\n", opcode);        
+		        		printf("opcode does not match %d\n", opcode);
     	                break;
     	            }
-              		printf("Opcdodes match %d %d \n", opcode , opcodeFound);        
+              		printf("Opcdodes match %d %d \n", opcode , opcodeFound);
                 } 
-                                    
+
 	            fEventsWanted.Unlock();
+				if (indexFound != NULL)
+					*indexFound = eventIndex;
     	        return msg;
-    	        
+
 
             } 
             eventIndex++;
         }
     }
-    
+
     fEventsWanted.Unlock();
     return NULL;
 }

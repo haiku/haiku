@@ -40,7 +40,7 @@ protected:
     void 		ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode = 0);
     void 		ClearWantedEvent(BMessage* msg);
         
-    BMessage* 	FindPetition(uint16 event, uint16 opcode = 0);
+    BMessage* 	FindPetition(uint16 event, uint16 opcode = 0, int32* indexFound = NULL);
 
 private:    
     
