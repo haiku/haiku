@@ -105,8 +105,9 @@ Inode::FindBlock(off_t offset, uint32& block)
 	} else if ((index -= EXT2_DIRECT_BLOCKS) < perBlock) {
 		// indirect blocks
 		CachedBlock cached(fVolume);
-		uint32* indirectBlocks = (uint32*)cached.SetTo(Node().stream.indirect);
-		if (indirectBlocks != NULL)
+		uint32* indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
+			Node().stream.indirect));
+		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
 		block = B_LENDIAN_TO_HOST_INT32(indirectBlocks[index]);
@@ -115,12 +116,12 @@ Inode::FindBlock(off_t offset, uint32& block)
 		CachedBlock cached(fVolume);
 		uint32* indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
 			Node().stream.double_indirect));
-		if (indirectBlocks != NULL)
+		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
 		indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
 			indirectBlocks[index / perBlock]));
-		if (indirectBlocks != NULL)
+		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
 		block = B_LENDIAN_TO_HOST_INT32(indirectBlocks[index & (perBlock - 1)]);
@@ -129,17 +130,17 @@ Inode::FindBlock(off_t offset, uint32& block)
 		CachedBlock cached(fVolume);
 		uint32* indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
 			Node().stream.triple_indirect));
-		if (indirectBlocks != NULL)
+		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
 		indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
 			indirectBlocks[index / perIndirectBlock]));
-		if (indirectBlocks != NULL)
+		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
 		indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
 			indirectBlocks[(index / perBlock) & (perBlock - 1)]));
-		if (indirectBlocks != NULL)
+		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
 		block = B_LENDIAN_TO_HOST_INT32(indirectBlocks[index & (perBlock - 1)]);
