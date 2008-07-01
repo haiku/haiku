@@ -30,6 +30,7 @@ Inode::Inode(Volume* volume, ino_t id)
 	}
 
 	if (fNode != NULL) {
+		// TODO: we don't need a cache for short symlinks
 		fCache = file_cache_create(fVolume->ID(), ID(), Size());
 		fMap = file_map_create(fVolume->ID(), ID(), Size());
 	}

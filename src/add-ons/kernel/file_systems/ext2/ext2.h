@@ -6,6 +6,8 @@
 #define EXT2_H
 
 
+#include <sys/stat.h>
+
 #include <ByteOrder.h>
 #include <fs_interface.h>
 
@@ -160,7 +162,11 @@ struct ext2_inode {
 	};
 	uint32	generation;
 	uint32	file_access_control;
-	uint32	directory_access_control;
+	union {
+		// for directories vs. files
+		uint32	directory_access_control;
+		uint32	size_high;
+	};
 	uint32	fragment;
 	uint8	fragment_number;
 	uint8	fragment_size;
@@ -170,13 +176,23 @@ struct ext2_inode {
 	uint32	_reserved2;
 
 	uint16 Mode() const { return B_LENDIAN_TO_HOST_INT16(mode); }
-	uint32 Size() const { return B_LENDIAN_TO_HOST_INT32(size); }
 	uint32 Flags() const { return B_LENDIAN_TO_HOST_INT32(flags); }
+	uint16 NumLinks() const { return B_LENDIAN_TO_HOST_INT16(num_links); }
 
 	time_t AccessTime() const { return B_LENDIAN_TO_HOST_INT32(access_time); }
 	time_t CreationTime() const { return B_LENDIAN_TO_HOST_INT32(creation_time); }
 	time_t ModificationTime() const { return B_LENDIAN_TO_HOST_INT32(modification_time); }
 	time_t DeletionTime() const { return B_LENDIAN_TO_HOST_INT32(deletion_time); }
+
+	off_t Size() const
+	{
+		if (S_ISREG(Mode())) {
+			return B_LENDIAN_TO_HOST_INT32(size)
+				| ((off_t)B_LENDIAN_TO_HOST_INT32(size_high) << 32);
+		}
+
+		return B_LENDIAN_TO_HOST_INT32(size);
+	}
 
 	uint16 UserID() const
 	{

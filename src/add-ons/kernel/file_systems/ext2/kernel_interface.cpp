@@ -327,7 +327,7 @@ ext2_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 
 	stat->st_dev = inode->GetVolume()->ID();
 	stat->st_ino = inode->ID();
-	stat->st_nlink = 1;
+	stat->st_nlink = node.NumLinks();
 	stat->st_blksize = EXT2_IO_SIZE;
 
 	stat->st_uid = node.UserID();
