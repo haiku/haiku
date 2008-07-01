@@ -1179,9 +1179,7 @@ bfs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 
 	if (!inode->HasUserAccessableStream()) {
 		*_length = 0;
-		if (inode->IsDirectory())
-			RETURN_ERROR(B_IS_A_DIRECTORY);
-		RETURN_ERROR(B_BAD_VALUE);
+		return inode->IsDirectory() ? B_IS_A_DIRECTORY : B_BAD_VALUE;
 	}
 
 	return inode->ReadAt(pos, (uint8 *)buffer, _length);
@@ -1201,7 +1199,7 @@ bfs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 
 	if (!inode->HasUserAccessableStream()) {
 		*_length = 0;
-		RETURN_ERROR(B_BAD_VALUE);
+		return inode->IsDirectory() ? B_IS_A_DIRECTORY : B_BAD_VALUE;
 	}
 
 	file_cookie *cookie = (file_cookie *)_cookie;
@@ -1475,8 +1473,6 @@ bfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	FUNCTION();
 
 	TreeIterator *iterator = (TreeIterator *)_cookie;
-	if (iterator == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
 
 	uint16 length;
 	ino_t id;
@@ -1507,9 +1503,6 @@ bfs_rewind_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void *_cookie)
 	FUNCTION();
 	TreeIterator *iterator = (TreeIterator *)_cookie;
 
-	if (iterator == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
 	return iterator->Rewind();
 }
 
@@ -1525,12 +1518,7 @@ bfs_close_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void * /*_cookie*/)
 static status_t
 bfs_free_dir_cookie(fs_volume *_volume, fs_vnode *node, void *_cookie)
 {
-	TreeIterator *iterator = (TreeIterator *)_cookie;
-
-	if (iterator == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
-	delete iterator;
+	delete (TreeIterator *)_cookie;
 	return B_OK;
 }
 
