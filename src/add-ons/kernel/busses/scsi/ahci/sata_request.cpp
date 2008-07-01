@@ -84,47 +84,63 @@ sata_request::set_ata48_cmd(uint8 command, uint64 lba, uint16 sectorCount)
 
 
 void
-sata_request::set_atapi_cmd()
+sata_request::set_atapi_cmd(size_t transferLength)
 {
 	fIsATAPI = true;
 	set_ata_cmd(0xa0);
-	fFis[5] = 0xfe;
-	fFis[6] = 0xff;
+	if (1 /* isPIO */) {
+		if (transferLength == 0)
+			transferLength = 2;
+		else if (transferLength > 0xfffe)
+			transferLength = 0xfffe;
+		fFis[5] = transferLength & 0xff;
+		fFis[6] = (transferLength >> 8) & 0xff;
+	}
 }
 
 
 void
 sata_request::finish(int tfd, size_t bytesTransfered)
 {
-	if (tfd & ATA_ERR)
-		dprintf("ahci: sata_request::finish ATA_ERR set for command 0x%02x\n", fFis[2]);
+	if (tfd & (ATA_ERR | ATA_DF)) {
+		uint8 status = tfd & 0xff;
+		uint8 error = (tfd >> 8) & 0xff;
+		dprintf("ahci: sata_request::finish ATA command 0x%02x failed\n", fFis[2]);
+		dprintf("ahci: sata_request::finish status 0x%02x, error 0x%02x\n", status, error);
+	}
+
 	if (fCcb) {
 		fCcb->data_resid = fCcb->data_length - bytesTransfered;
 		fCcb->subsys_status = SCSI_REQ_CMP;
 		if (tfd & (ATA_ERR | ATA_DF)) {
-			uint8 error = (tfd >> 8) & 0xff;
-			dprintf("ahci: sata_request::finish status 0x%02x, error 0x%02x\n", tfd & 0xff, error);
+			fCcb->subsys_status = SCSI_REQ_CMP_ERR;
 			if (fIsATAPI) {
-				fCcb->subsys_status = SCSI_REQ_CMP_ERR;
+				dprintf("ahci: sata_request::finish ATAPI packet %02x %02x %02x %02x "
+						"%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x (len %d)\n",
+						fCcb->cdb[0], fCcb->cdb[1], fCcb->cdb[2], fCcb->cdb[3],
+						fCcb->cdb[4], fCcb->cdb[5], fCcb->cdb[6], fCcb->cdb[7],
+						fCcb->cdb[8], fCcb->cdb[9], fCcb->cdb[10], fCcb->cdb[11],
+						fCcb->cdb[12], fCcb->cdb[13], fCcb->cdb[14], fCcb->cdb[15],
+						fCcb->cdb_length);
 				fCcb->device_status = SCSI_STATUS_CHECK_CONDITION;
 			} else {
-				fCcb->subsys_status = SCSI_REQ_CMP_ERR;
-				// TODO error handling goes here
-			}
+				// TODO ATA error handling goes here
 /*
-			if (error & 0x04) { // ABRT
-				fCcb->subsys_status = SCSI_REQ_ABORTED;
-			} else {
-				fCcb->device_status = SCSI_STATUS_CHECK_CONDITION;
-				fCcb->subsys_status |= SCSI_AUTOSNS_VALID;
-				fCcb->sense_resid = 0; //FIXME
-				scsi_sense *sense = (scsi_sense *)fCcb->sense;
-				sense->error_code = SCSIS_CURR_ERROR;
-				sense->sense_key = error >> 4;
-				sense->asc = 0;
-				sense->ascq = 0;
-			}
+				// TODO check ABORT bit if this is useful
+				if ((tfd >> 8) & 0x04) { // ABRT
+					fCcb->subsys_status = SCSI_REQ_ABORTED;
+				} else {
+					fCcb->device_status = SCSI_STATUS_CHECK_CONDITION;
+					fCcb->subsys_status |= SCSI_AUTOSNS_VALID;
+					fCcb->sense_resid = 0; //FIXME
+					scsi_sense *sense = (scsi_sense *)fCcb->sense;
+					sense->error_code = SCSIS_CURR_ERROR;
+					sense->sense_key = error >> 4;
+					sense->asc = 0;
+					sense->ascq = 0;
+				}
 */
+			}
 		}
 		gSCSI->finished(fCcb, 1);
 		delete this;
@@ -144,7 +160,7 @@ sata_request::abort()
 		gSCSI->finished(fCcb, 1);
 		delete this;
 	} else {
-		fCompletionStatus = -1;
+		fCompletionStatus = ATA_ERR;
 		release_sem(fCompletionSem);
 	}
 }

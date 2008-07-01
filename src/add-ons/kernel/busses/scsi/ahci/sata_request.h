@@ -20,7 +20,7 @@ public:
 	void			set_ata28_cmd(uint8 command, uint32 lba, uint8 sectorCount);
 	void			set_ata48_cmd(uint8 command, uint64 lba, uint16 sectorCount);
 
-	void			set_atapi_cmd();
+	void			set_atapi_cmd(size_t transferLength);
 	bool 			is_atapi();
 
 	scsi_ccb *		ccb();

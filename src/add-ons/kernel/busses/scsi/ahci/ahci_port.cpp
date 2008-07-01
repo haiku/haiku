@@ -790,7 +790,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 //		TRACE("AHCIPort::ScsiExecuteRequest ATAPI: port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
 		sata_request *sreq = new(std::nothrow) sata_request(request);
-		sreq->set_atapi_cmd();
+		sreq->set_atapi_cmd(request->data_length);
 //		uint8 *data = (uint8*) sreq->ccb()->cdb;
 //		for (int i = 0; i < 16; i += 8) {
 //			TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
