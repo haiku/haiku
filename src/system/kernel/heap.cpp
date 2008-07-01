@@ -1158,7 +1158,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 
 	// copy the old data and free the old allocation
 	memcpy(*newAddress, address, min_c(maxSize, newSize));
-	free(address);
+	heap_free(heap, address);
 	return B_OK;
 }
 
