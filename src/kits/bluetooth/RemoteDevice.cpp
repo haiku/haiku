@@ -64,15 +64,18 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 	remoteNameCommand = buildRemoteNameRequest(fBdaddr, fPageRepetitionMode, fClockOffset, &size); // Fill correctily
 
 	request.AddData("raw command", B_ANY_TYPE, remoteNameCommand, size);
+	
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
+    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST));
 
-    request.AddInt16("eventExpected",  HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE);
-    //request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST));
+	request.AddInt16("eventExpected",  HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE);
+
 
     if (btsm->SendMessage(&request, &reply) == B_OK)
     {
         BString name;
         int8 status;
-        
+
         if (reply.FindInt8("status", &status) == B_OK &&
             reply.FindString("friendlyname", &name) == B_OK ) {
                     return name;

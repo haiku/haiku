@@ -368,6 +368,11 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
      	}       
         break;
 		
+		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST):
+		{
+			ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST));
+		}
+		break;
 		default:
 		    Output::Instance()->Post("Command Status not handled\n", BLACKBOARD_KIT);                		
 		break;
