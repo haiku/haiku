@@ -159,7 +159,7 @@ struct ext2_inode {
 			uint32 triple_indirect;
 		} stream;
 		char symlink[EXT2_SHORT_SYMLINK_LENGTH];
-	};
+	} u;
 	uint32	generation;
 	uint32	file_access_control;
 	union {

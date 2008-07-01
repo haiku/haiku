@@ -5,7 +5,7 @@
 
 
 #include <dirent.h>
-#include <new>
+#include <util/kernel_cpp.h>
 #include <string.h>
 
 #include <fs_cache.h>
@@ -414,7 +414,7 @@ ext2_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 	if (inode->Size() > EXT2_SHORT_SYMLINK_LENGTH)
 		return inode->ReadAt(0, (uint8 *)buffer, _bufferSize);
 
-	memcpy(buffer, inode->Node().symlink, *_bufferSize);
+	memcpy(buffer, inode->Node().u.symlink, *_bufferSize);
 	return B_OK;
 }
 
