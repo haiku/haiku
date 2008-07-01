@@ -57,7 +57,6 @@ public:
 			status_t			Init(BRect frame, window_look look,
 									window_feel feel, uint32 flags,
 									uint32 workspace);
-	virtual bool				Run();
 	virtual port_id				MessagePort() const { return fMessagePort; }
 
 			::EventTarget&		EventTarget() { return fEventTarget; }

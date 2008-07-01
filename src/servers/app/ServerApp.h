@@ -50,7 +50,6 @@ class ServerApp : public MessageLooper {
 			status_t			InitCheck();
 			void				Quit(sem_id shutdownSemaphore = -1);
 
-	virtual	bool				Run();
 	virtual	port_id				MessagePort() const { return fMessagePort; }
 
 	/*!

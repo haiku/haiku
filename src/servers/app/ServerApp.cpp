@@ -206,26 +206,6 @@ ServerApp::InitCheck()
 
 
 /*!
-	\brief Starts the ServerApp monitoring for messages
-	\return false if the application couldn't start, true if everything went OK.
-*/
-bool
-ServerApp::Run()
-{
-	if (!MessageLooper::Run())
-		return false;
-
-	// Let's tell the client how to talk with us
-	fLink.StartMessage(B_OK);
-	fLink.Attach<port_id>(fMessagePort);
-	fLink.Attach<area_id>(fDesktop->SharedReadOnlyArea());
-	fLink.Flush();
-
-	return true;
-}
-
-
-/*!
 	\brief This quits the application and deletes it. You're not supposed
 		to call its destructor directly.
 
@@ -339,6 +319,12 @@ void
 ServerApp::_MessageLooper()
 {
 	// Message-dispatching loop for the ServerApp
+
+	// First let's tell the client how to talk with us.
+	fLink.StartMessage(B_OK);
+	fLink.Attach<port_id>(fMessagePort);
+	fLink.Attach<area_id>(fDesktop->SharedReadOnlyArea());
+	fLink.Flush();
 
 	BPrivate::LinkReceiver &receiver = fLink.Receiver();
 

@@ -297,32 +297,6 @@ ServerWindow::Init(BRect frame, window_look look, window_feel feel,
 }
 
 
-bool
-ServerWindow::Run()
-{
-	if (!MessageLooper::Run())
-		return false;
-
-	// Send a reply to our window - it is expecting fMessagePort
-	// port and some other info
-
-	fLink.StartMessage(B_OK);
-	fLink.Attach<port_id>(fMessagePort);
-
-	int32 minWidth, maxWidth, minHeight, maxHeight;
-	fWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-
-	fLink.Attach<BRect>(fWindow->Frame());
-	fLink.Attach<float>((float)minWidth);
-	fLink.Attach<float>((float)maxWidth);
-	fLink.Attach<float>((float)minHeight);
-	fLink.Attach<float>((float)maxHeight);
-	fLink.Flush();
-
-	return true;
-}
-
-
 void
 ServerWindow::_PrepareQuit()
 {
@@ -2844,6 +2818,22 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 void
 ServerWindow::_MessageLooper()
 {
+	// Send a reply to our window - it is expecting fMessagePort
+	// port and some other info.
+
+	fLink.StartMessage(B_OK);
+	fLink.Attach<port_id>(fMessagePort);
+
+	int32 minWidth, maxWidth, minHeight, maxHeight;
+	fWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+
+	fLink.Attach<BRect>(fWindow->Frame());
+	fLink.Attach<float>((float)minWidth);
+	fLink.Attach<float>((float)maxWidth);
+	fLink.Attach<float>((float)minHeight);
+	fLink.Attach<float>((float)maxHeight);
+	fLink.Flush();
+
 	BPrivate::LinkReceiver& receiver = fLink.Receiver();
 	bool quitLoop = false;
 
