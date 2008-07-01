@@ -87,6 +87,7 @@ typedef struct heap_allocator_s {
 
 	uint32		bin_count;
 	uint32		page_count;
+	uint32		page_size;
 	uint32		free_page_count;
 	heap_page *	free_pages;
 
@@ -321,7 +322,7 @@ dump_allocations(int argc, char **argv)
 			if (!page->in_use)
 				continue;
 
-			addr_t base = heap->base + i * B_PAGE_SIZE;
+			addr_t base = heap->base + i * heap->page_size;
 			if (page->bin_index < heap->bin_count) {
 				// page is used by a small allocation bin
 				uint32 elementCount = page->empty_index;
@@ -366,8 +367,8 @@ dump_allocations(int argc, char **argv)
 					&& heap->page_table[i + pageCount].allocation_id == page->allocation_id)
 					pageCount++;
 
-				info = (heap_leak_check_info *)(base + pageCount * B_PAGE_SIZE
-					- sizeof(heap_leak_check_info));
+				info = (heap_leak_check_info *)(base + pageCount
+					* heap->page_size - sizeof(heap_leak_check_info));
 
 				if ((team == -1 || info->team == team)
 					&& (thread == -1 || info->thread == thread)
@@ -461,7 +462,7 @@ dump_allocations_per_caller(int argc, char **argv)
 			if (!page->in_use)
 				continue;
 
-			addr_t base = heap->base + i * B_PAGE_SIZE;
+			addr_t base = heap->base + i * heap->page_size;
 			if (page->bin_index < heap->bin_count) {
 				// page is used by a small allocation bin
 				uint32 elementCount = page->empty_index;
@@ -501,8 +502,8 @@ dump_allocations_per_caller(int argc, char **argv)
 					&& heap->page_table[i + pageCount].allocation_id == page->allocation_id)
 					pageCount++;
 
-				info = (heap_leak_check_info *)(base + pageCount * B_PAGE_SIZE
-					- sizeof(heap_leak_check_info));
+				info = (heap_leak_check_info *)(base + pageCount
+					* heap->page_size - sizeof(heap_leak_check_info));
 
 				caller_info* callerInfo = get_caller_info(info->caller);
 				if (callerInfo == NULL) {
@@ -636,10 +637,10 @@ heap_validate_heap(heap_allocator *heap)
 			// validate the free list
 			uint32 freeSlotsCount = 0;
 			addr_t *element = page->free_list;
-			addr_t pageBase = heap->base + page->index * B_PAGE_SIZE;
+			addr_t pageBase = heap->base + page->index * heap->page_size;
 			while (element) {
 				if ((addr_t)element < pageBase
-					|| (addr_t)element >= pageBase + B_PAGE_SIZE)
+					|| (addr_t)element >= pageBase + heap->page_size)
 					panic("free list entry out of page range\n");
 
 				if (((addr_t)element - pageBase) % bin->element_size != 0)
@@ -681,6 +682,7 @@ heap_attach(addr_t base, size_t size)
 
 	size_t binSizes[] = { 8, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 1024, 2048, B_PAGE_SIZE };
 	uint32 binCount = sizeof(binSizes) / sizeof(binSizes[0]);
+	heap->page_size = B_PAGE_SIZE;
 	heap->bin_count = binCount;
 	heap->bins = (heap_bin *)base;
 	base += binCount * sizeof(heap_bin);
@@ -689,11 +691,11 @@ heap_attach(addr_t base, size_t size)
 	for (uint32 i = 0; i < binCount; i++) {
 		heap_bin *bin = &heap->bins[i];
 		bin->element_size = binSizes[i];
-		bin->max_free_count = B_PAGE_SIZE / binSizes[i];
+		bin->max_free_count = heap->page_size / binSizes[i];
 		bin->page_list = NULL;
 	}
 
-	uint32 pageCount = size / B_PAGE_SIZE;
+	uint32 pageCount = size / heap->page_size;
 	size_t pageTableSize = pageCount * sizeof(heap_page);
 	heap->page_table = (heap_page *)base;
 	base += pageTableSize;
@@ -704,7 +706,7 @@ heap_attach(addr_t base, size_t size)
 	heap->size = (size_t)(size / B_PAGE_SIZE) * B_PAGE_SIZE;
 
 	// now we know the real page count
-	pageCount = heap->size / B_PAGE_SIZE;
+	pageCount = heap->size / heap->page_size;
 	heap->page_count = pageCount;
 
 	// zero out the heap alloc table at the base of the heap
@@ -773,7 +775,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 			page->free_list = (addr_t *)*page->free_list;
 		} else {
 			// the page hasn't been fully allocated so use the next empty_index
-			address = (void *)(heap->base + page->index * B_PAGE_SIZE
+			address = (void *)(heap->base + page->index * heap->page_size
 				+ page->empty_index * bin->element_size);
 			page->empty_index++;
 		}
@@ -827,7 +829,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 
 #if KERNEL_HEAP_LEAK_CHECK
 		heap_leak_check_info *info = (heap_leak_check_info *)(heap->base
-			+ page->index * B_PAGE_SIZE + bin->element_size
+			+ page->index * heap->page_size + bin->element_size
 			- sizeof(heap_leak_check_info));
 		info->size = size - sizeof(heap_leak_check_info);
 		info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
@@ -836,7 +838,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 #endif
 
 		// we return the first slot in this page
-		return (void *)(heap->base + page->index * B_PAGE_SIZE);
+		return (void *)(heap->base + page->index * heap->page_size);
 	}
 
 	// large allocation, we must search for contiguous slots
@@ -849,7 +851,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		}
 
 		if (first > 0) {
-			if ((1 + i - first) * B_PAGE_SIZE >= size) {
+			if ((1 + i - first) * heap->page_size >= size) {
 				found = true;
 				break;
 			}
@@ -862,7 +864,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		return NULL;
 	}
 
-	uint32 pageCount = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+	uint32 pageCount = (size + heap->page_size - 1) / heap->page_size;
 	for (uint32 i = first; i < first + pageCount; i++) {
 		heap_page *page = &heap->page_table[i];
 		page->in_use = 1;
@@ -878,13 +880,13 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 
 #if KERNEL_HEAP_LEAK_CHECK
 	heap_leak_check_info *info = (heap_leak_check_info *)(heap->base
-		+ (first + pageCount) * B_PAGE_SIZE - sizeof(heap_leak_check_info));
+		+ (first + pageCount) * heap->page_size - sizeof(heap_leak_check_info));
 	info->size = size - sizeof(heap_leak_check_info);
 	info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
 	info->team = (kernel_startup ? 0 : team_get_current_team_id());
 	info->caller = get_caller();
 #endif
-	return (void *)(heap->base + first * B_PAGE_SIZE);
+	return (void *)(heap->base + first * heap->page_size);
 }
 
 
@@ -976,7 +978,8 @@ heap_free(heap_allocator *heap, void *address)
 
 	TRACE(("free(): asked to free at ptr = %p\n", address));
 
-	heap_page *page = &heap->page_table[((addr_t)address - heap->base) / B_PAGE_SIZE];
+	heap_page *page = &heap->page_table[((addr_t)address - heap->base)
+		/ heap->page_size];
 
 	TRACE(("free(): page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
 
@@ -989,7 +992,8 @@ heap_free(heap_allocator *heap, void *address)
 	if (page->bin_index < heap->bin_count) {
 		// small allocation
 		heap_bin *bin = &heap->bins[page->bin_index];
-		if (((addr_t)address - heap->base - page->index * B_PAGE_SIZE) % bin->element_size != 0) {
+		if (((addr_t)address - heap->base - page->index
+			* heap->page_size) % bin->element_size != 0) {
 			panic("free(): passed invalid pointer %p supposed to be in bin for element size %ld\n", address, bin->element_size);
 			mutex_unlock(&heap->lock);
 			return B_ERROR;
@@ -1091,7 +1095,8 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	mutex_lock(&heap->lock);
 	TRACE(("realloc(address = %p, newSize = %lu)\n", address, newSize));
 
-	heap_page *page = &heap->page_table[((addr_t)address - heap->base) / B_PAGE_SIZE];
+	heap_page *page = &heap->page_table[((addr_t)address - heap->base)
+		/ heap->page_size];
 	if (page->bin_index > heap->bin_count) {
 		panic("realloc(): page %p: invalid bin_index %d\n", page, page->bin_index);
 		mutex_unlock(&heap->lock);
@@ -1111,14 +1116,14 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 		// this was a large allocation
 		uint32 allocationID = page->allocation_id;
 		uint32 maxPages = heap->page_count - page->index;
-		maxSize = B_PAGE_SIZE;
+		maxSize = heap->page_size;
 		for (uint32 i = 1; i < maxPages; i++) {
 			if (!page[i].in_use || page[i].bin_index != heap->bin_count
 				|| page[i].allocation_id != allocationID)
 				break;
 
-			minSize += B_PAGE_SIZE;
-			maxSize += B_PAGE_SIZE;
+			minSize += heap->page_size;
+			maxSize += heap->page_size;
 		}
 	}
 
