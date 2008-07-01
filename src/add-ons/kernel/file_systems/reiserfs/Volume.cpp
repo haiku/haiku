@@ -40,6 +40,10 @@
 #include "Tree.h"
 #include "VNode.h"
 
+
+extern fs_vnode_ops gReiserFSVnodeOps;
+
+
 // min and max
 // We don't want to include <algobase.h> otherwise we also get <iostream.h>
 // and other undesired things.
@@ -63,7 +67,7 @@ static inline C max(const C &a, const C &b) { return (a > b ? a : b); }
 
 // constructor
 Volume::Volume()
-	: fID(0),
+	: fFSVolume(NULL),
 	  fDevice(-1),
 	  fBlockCache(NULL),
 	  fTree(NULL),
@@ -84,11 +88,11 @@ Volume::~Volume()
 
 // Mount
 status_t
-Volume::Mount(dev_t id, const char *path)
+Volume::Mount(fs_volume *fsVolume, const char *path)
 {
 	Unmount();
 	status_t error = (path ? B_OK : B_BAD_VALUE);
-	fID = id;
+	fFSVolume = fsVolume;
 	// load the settings
 	if (error == B_OK) {
 		fSettings = new(nothrow) Settings;
@@ -148,8 +152,10 @@ REPORT_ERROR(error);
 			error = FindVNode(REISERFS_ROOT_PARENT_OBJECTID,
 							  REISERFS_ROOT_OBJECTID, fRootVNode);
 REPORT_ERROR(error);
-			if (error == B_OK)
-				error = publish_vnode(fID, fRootVNode->GetID(), fRootVNode);
+			if (error == B_OK) {
+				error = publish_vnode(fFSVolume, fRootVNode->GetID(),
+					fRootVNode, &gReiserFSVnodeOps, S_IFDIR, 0);
+			}
 REPORT_ERROR(error);
 		} else
 			error = B_NO_MEMORY;
@@ -200,7 +206,7 @@ Volume::Unmount()
 	}
 	fNegativeEntries.MakeEmpty();
 	fHashFunction = NULL;
-	fID = 0;
+	fFSVolume = NULL;
 	return B_OK;
 }
 
@@ -257,14 +263,14 @@ Volume::GetKeyOffsetForName(const char *name, int len, uint64 *result)
 status_t
 Volume::GetVNode(ino_t id, VNode **node)
 {
-	return get_vnode(GetID(), id, (void**)node);
+	return get_vnode(GetFSVolume(), id, (void**)node);
 }
 
 // PutVNode
 status_t
 Volume::PutVNode(ino_t id)
 {
-	return put_vnode(GetID(), id);
+	return put_vnode(GetFSVolume(), id);
 }
 
 // FindVNode

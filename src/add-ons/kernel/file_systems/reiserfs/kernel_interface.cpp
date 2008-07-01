@@ -46,6 +46,9 @@
 
 static const size_t kOptimalIOSize = 65536;
 
+extern fs_volume_ops gReiserFSVolumeOps;
+extern fs_vnode_ops gReiserFSVnodeOps;
+
 
 inline static bool is_user_in_group(gid_t gid);
 
@@ -55,8 +58,8 @@ inline static bool is_user_in_group(gid_t gid);
 
 // reiserfs_mount
 static status_t
-reiserfs_mount(dev_t nsid, const char *device, uint32 flags,
-	const char *parameters, fs_volume *data, ino_t *rootID)
+reiserfs_mount(fs_volume *_volume, const char *device, uint32 flags,
+	const char *parameters, ino_t *rootID)
 {
 	TOUCH(flags); TOUCH(parameters);
 	FUNCTION_START();
@@ -68,12 +71,13 @@ reiserfs_mount(dev_t nsid, const char *device, uint32 flags,
 	if (!volume)
 		error = B_NO_MEMORY;
 	if (error == B_OK)
-		error = volume->Mount(nsid, device);
+		error = volume->Mount(_volume, device);
 
 	// set the results
 	if (error == B_OK) {
 		*rootID = volume->GetRootVNode()->GetID();
-		*data = volume;
+		_volume->private_volume = volume;
+		_volume->ops = &gReiserFSVolumeOps;
 	}
 
 	// cleanup on failure
@@ -82,12 +86,13 @@ reiserfs_mount(dev_t nsid, const char *device, uint32 flags,
 	RETURN_ERROR(error);
 }
 
+
 // reiserfs_unmount
 static status_t
-reiserfs_unmount(fs_volume fs)
+reiserfs_unmount(fs_volume* fs)
 {
 	FUNCTION_START();
-	Volume *volume = (Volume*)fs;
+	Volume *volume = (Volume*)fs->private_volume;
 	status_t error = volume->Unmount();
 	if (error == B_OK)
 		delete volume;
@@ -96,10 +101,10 @@ reiserfs_unmount(fs_volume fs)
 
 // reiserfs_read_fs_info
 static status_t
-reiserfs_read_fs_info(fs_volume fs, struct fs_info *info)
+reiserfs_read_fs_info(fs_volume* fs, struct fs_info *info)
 {
 	FUNCTION_START();
-	Volume *volume = (Volume*)fs;
+	Volume *volume = (Volume*)fs->private_volume;
 	info->flags = B_FS_IS_PERSISTENT | B_FS_IS_READONLY;
 	info->block_size = volume->GetBlockSize();
 	info->io_size = kOptimalIOSize;
@@ -117,12 +122,12 @@ reiserfs_read_fs_info(fs_volume fs, struct fs_info *info)
 
 // reiserfs_lookup
 static status_t
-reiserfs_lookup(fs_volume fs, fs_vnode _dir, const char *entryName,
-	ino_t *vnid, int *type)
+reiserfs_lookup(fs_volume* fs, fs_vnode* _dir, const char *entryName,
+	ino_t *vnid)
 {
 //	FUNCTION_START();
-	Volume *volume = (Volume*)fs;
-	VNode *dir = (VNode*)_dir;
+	Volume *volume = (Volume*)fs->private_volume;
+	VNode *dir = (VNode*)_dir->private_node;
 FUNCTION(("dir: (%Ld: %lu, %lu), entry: `%s'\n", dir->GetID(), dir->GetDirID(),
 		  dir->GetObjectID(), entryName));
 	status_t error = B_OK;
@@ -161,30 +166,30 @@ FUNCTION(("dir: (%Ld: %lu, %lu), entry: `%s'\n", dir->GetID(), dir->GetDirID(),
 		}
 	}
 
-	// get type
-	if (error == B_OK)
-		*type = entryNode->GetStatData()->GetMode() & S_IFMT;
-
 	RETURN_ERROR(error);
 }
 
 // reiserfs_read_vnode
 static status_t
-reiserfs_read_vnode(fs_volume fs, ino_t vnid, fs_vnode *node, bool reenter)
+reiserfs_read_vnode(fs_volume *fs, ino_t vnid, fs_vnode *node, int *_type,
+	uint32 *_flags, bool reenter)
 {
 	TOUCH(reenter);
 //	FUNCTION_START();
 	FUNCTION(("(%Ld: %lu, %ld)\n", vnid, VNode::GetDirIDFor(vnid),
 			  VNode::GetObjectIDFor(vnid)));
-	Volume *volume = (Volume*)fs;
+	Volume *volume = (Volume*)fs->private_volume;
 	status_t error = B_OK;
 	VNode *foundNode = new(nothrow) VNode;
 	if (foundNode) {
 		error = volume->FindVNode(vnid, foundNode);
-		if (error == B_OK)
-			*node = foundNode;
-		else
-			delete foundNode;;
+		if (error == B_OK) {
+			node->private_node = foundNode;
+			node->ops = &gReiserFSVnodeOps;
+			*_type = foundNode->GetStatData()->GetMode() & S_IFMT;
+			*_flags = 0;
+		} else
+			delete foundNode;
 	} else
 		error = B_NO_MEMORY;
 	RETURN_ERROR(error);
@@ -192,7 +197,7 @@ reiserfs_read_vnode(fs_volume fs, ino_t vnid, fs_vnode *node, bool reenter)
 
 // reiserfs_write_vnode
 static status_t
-reiserfs_write_vnode(fs_volume fs, fs_vnode _node, bool reenter)
+reiserfs_write_vnode(fs_volume *fs, fs_vnode *_node, bool reenter)
 {
 	TOUCH(reenter);
 // DANGER: If dbg_printf() is used, this thread will enter another FS and
@@ -201,8 +206,8 @@ reiserfs_write_vnode(fs_volume fs, fs_vnode _node, bool reenter)
 // called from another FS may cause the VFS layer to free vnodes and thus
 // invoke this hook.
 //	FUNCTION_START();
-	Volume *volume = (Volume*)fs;
-	VNode *node = (VNode*)_node;
+	Volume *volume = (Volume*)fs->private_volume;
+	VNode *node = (VNode*)_node->private_node;
 	status_t error = B_OK;
 	if (node != volume->GetRootVNode())
 		delete node;
@@ -216,12 +221,12 @@ reiserfs_write_vnode(fs_volume fs, fs_vnode _node, bool reenter)
 
 // reiserfs_read_symlink
 static status_t
-reiserfs_read_symlink(fs_volume fs, fs_vnode _node, char *buffer,
+reiserfs_read_symlink(fs_volume *fs, fs_vnode *_node, char *buffer,
 	size_t *bufferSize)
 {
 //	FUNCTION_START();
-	Volume *volume = (Volume*)fs;
-	VNode *node = (VNode*)_node;
+	Volume *volume = (Volume*)fs->private_volume;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	status_t error = B_OK;
@@ -236,12 +241,12 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 
 // reiserfs_access
 static status_t
-reiserfs_access(fs_volume fs, fs_vnode _node, int mode)
+reiserfs_access(fs_volume *fs, fs_vnode *_node, int mode)
 {
 	TOUCH(fs);
 //	FUNCTION_START();
-//	Volume *volume = (Volume*)fs;
-	VNode *node = (VNode*)_node;
+//	Volume *volume = (Volume*)fs->private_volume;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	// write access requested?
@@ -278,11 +283,11 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 
 // reiserfs_read_stat
 static status_t
-reiserfs_read_stat(fs_volume fs, fs_vnode _node, struct stat *st)
+reiserfs_read_stat(fs_volume *fs, fs_vnode *_node, struct stat *st)
 {
 //	FUNCTION_START();
-	Volume *volume = (Volume*)fs;
-	VNode *node = (VNode*)_node;
+	Volume *volume = (Volume*)fs->private_volume;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	status_t error = B_OK;
@@ -307,11 +312,11 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 
 // reiserfs_open
 static status_t
-reiserfs_open(fs_volume fs, fs_vnode _node, int openMode, fs_cookie *cookie)
+reiserfs_open(fs_volume *fs, fs_vnode *_node, int openMode, void **cookie)
 {
 //	FUNCTION_START();
-	Volume *volume = (Volume*)fs;
-	VNode *node = (VNode*)_node;
+	Volume *volume = (Volume*)fs->private_volume;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	status_t error = B_OK;
@@ -338,11 +343,11 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 
 // reiserfs_close
 static status_t
-reiserfs_close(fs_volume fs, fs_vnode _node, fs_cookie cookie)
+reiserfs_close(fs_volume *fs, fs_vnode *_node, void *cookie)
 {
 	TOUCH(fs); TOUCH(cookie);
 //	FUNCTION_START();
-	VNode *node = (VNode*)_node;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	TOUCH(node);
@@ -351,11 +356,11 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 
 // reiserfs_free_cookie
 static status_t
-reiserfs_free_cookie(fs_volume fs, fs_vnode _node, fs_cookie cookie)
+reiserfs_free_cookie(fs_volume *fs, fs_vnode *_node, void *cookie)
 {
 	TOUCH(fs);
 //	FUNCTION_START();
-	VNode *node = (VNode*)_node;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	TOUCH(node);
@@ -366,13 +371,13 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 
 // reiserfs_read
 static status_t
-reiserfs_read(fs_volume fs, fs_vnode _node, fs_cookie cookie, off_t pos,
+reiserfs_read(fs_volume *fs, fs_vnode *_node, void *cookie, off_t pos,
 	void *buffer, size_t *bufferSize)
 {
 	TOUCH(fs);
 //	FUNCTION_START();
-//	Volume *volume = (Volume*)ns;
-	VNode *node = (VNode*)_node;
+//	Volume *volume = (Volume*)fs->private_volume;
+	VNode *node = (VNode*)_node->private_node;
 	FUNCTION(("((%Ld: %lu, %lu), %Ld, %p, %lu)\n", node->GetID(),
 			  node->GetDirID(), node->GetObjectID(), pos, buffer,
 			  *bufferSize));
@@ -438,11 +443,11 @@ public:
 
 // reiserfs_open_dir
 static status_t
-reiserfs_open_dir(fs_volume fs, fs_vnode _node, fs_cookie *cookie)
+reiserfs_open_dir(fs_volume *fs, fs_vnode *_node, void **cookie)
 {
 //	FUNCTION_START();
-	Volume *volume = (Volume*)fs;
-	VNode *node = (VNode*)_node;
+	Volume *volume = (Volume*)fs->private_volume;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	status_t error = (node->IsDir() ? B_OK : B_BAD_VALUE);
@@ -479,11 +484,11 @@ set_dirent_name(struct dirent *buffer, size_t bufferSize,
 
 // reiserfs_close_dir
 static status_t
-reiserfs_close_dir(void *ns, void *_node, void *cookie)
+reiserfs_close_dir(fs_volume *fs, fs_vnode *_node, void *cookie)
 {
-	TOUCH(ns); TOUCH(cookie);
+	TOUCH(fs); TOUCH(cookie);
 //	FUNCTION_START();
-	VNode *node = (VNode*)_node;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	TOUCH(node);
@@ -492,11 +497,11 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 
 // reiserfs_free_dir_cookie
 static status_t
-reiserfs_free_dir_cookie(void *ns, void *_node, void *cookie)
+reiserfs_free_dir_cookie(fs_volume *fs, fs_vnode *_node, void *cookie)
 {
-	TOUCH(ns);
+	TOUCH(fs);
 //	FUNCTION_START();
-	VNode *node = (VNode*)_node;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	TOUCH(node);
@@ -507,12 +512,12 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 			
 // reiserfs_read_dir
 static status_t
-reiserfs_read_dir(fs_volume fs, fs_vnode _node, fs_cookie cookie,
+reiserfs_read_dir(fs_volume *fs, fs_vnode *_node, void *cookie,
 	struct dirent *buffer, size_t bufferSize, uint32 *count)
 {
 //	FUNCTION_START();
-	Volume *volume = (Volume*)fs;
-	VNode *node = (VNode*)_node;
+	Volume *volume = (Volume*)fs->private_volume;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	DirectoryCookie *iterator = (DirectoryCookie*)cookie;
@@ -601,11 +606,11 @@ PRINT(("returning %ld entries\n", *count));
 
 // reiserfs_rewind_dir
 static status_t
-reiserfs_rewind_dir(fs_volume fs, fs_vnode _node, fs_cookie cookie)
+reiserfs_rewind_dir(fs_volume *fs, fs_vnode *_node, void *cookie)
 {
 	TOUCH(fs);
 //	FUNCTION_START();
-	VNode *node = (VNode*)_node;
+	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
 	TOUCH(node);
@@ -642,6 +647,9 @@ reiserfs_std_ops(int32 op, ...)
 	}
 }
 
+
+
+
 static file_system_module_info sReiserFSModuleInfo = {
 	{
 		"file_systems/reiserfs" B_CURRENT_FS_API_VERSION,
@@ -653,22 +661,31 @@ static file_system_module_info sReiserFSModuleInfo = {
 	"Reiser File System",		// pretty_name
 	0,							// DDM flags
 
+
 	// scanning
 	NULL,	// identify_partition()
 	NULL,	// scan_partition()
 	NULL,	// free_identify_partition_cookie()
 	NULL,	// free_partition_content_cookie()
 
-	&reiserfs_mount,
+	&reiserfs_mount
+};
+
+
+fs_volume_ops gReiserFSVolumeOps = {
 	&reiserfs_unmount,
 	&reiserfs_read_fs_info,
 	NULL,	// &reiserfs_write_fs_info,
 	NULL,	// &reiserfs_sync,
 
+	&reiserfs_read_vnode
+};
+
+
+fs_vnode_ops gReiserFSVnodeOps = {
 	/* vnode operations */
 	&reiserfs_lookup,
 	NULL,	// &reiserfs_get_vnode_name,
-	&reiserfs_read_vnode,
 	&reiserfs_write_vnode,
 	NULL,	// &reiserfs_remove_vnode,
 
@@ -711,46 +728,9 @@ static file_system_module_info sReiserFSModuleInfo = {
 	&reiserfs_close_dir,
 	&reiserfs_free_dir_cookie,
 	&reiserfs_read_dir,
-	&reiserfs_rewind_dir,
-	
-	/* attribute directory operations */
-	NULL,	// &reiserfs_open_attr_dir,
-	NULL,	// &reiserfs_close_attr_dir,
-	NULL,	// &reiserfs_free_attr_dir_cookie,
-	NULL,	// &reiserfs_read_attr_dir,
-	NULL,	// &reiserfs_rewind_attr_dir,
-
-	/* attribute operations */
-	NULL,	// &reiserfs_create_attr,
-	NULL,	// &reiserfs_open_attr,
-	NULL,	// &reiserfs_close_attr,
-	NULL,	// &reiserfs_free_attr_cookie,
-	NULL,	// &reiserfs_read_attr,
-	NULL,	// &reiserfs_write_attr,
-
-	NULL,	// &reiserfs_read_attr_stat,
-	NULL,	// &reiserfs_write_attr_stat,
-	NULL,	// &reiserfs_rename_attr,
-	NULL,	// &reiserfs_remove_attr,
-
-	/* index directory & index operations */
-	NULL,	// &reiserfs_open_index_dir,
-	NULL,	// &reiserfs_close_index_dir,
-	NULL,	// &reiserfs_free_index_dir_cookie,
-	NULL,	// &reiserfs_read_index_dir,
-	NULL,	// &reiserfs_rewind_index_dir,
-
-	NULL,	// &reiserfs_create_index,
-	NULL,	// &reiserfs_remove_index,
-	NULL,	// &reiserfs_read_index_stat,
-
-	/* query operations */
-	NULL,	// &reiserfs_open_query,
-	NULL,	// &reiserfs_close_query,
-	NULL,	// &reiserfs_free_query_cookie,
-	NULL,	// &reiserfs_read_query,
-	NULL,	// &reiserfs_rewind_query,
+	&reiserfs_rewind_dir
 };
+
 
 module_info *modules[] = {
 	(module_info *)&sReiserFSModuleInfo,

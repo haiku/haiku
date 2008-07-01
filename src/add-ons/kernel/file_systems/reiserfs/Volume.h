@@ -41,10 +41,11 @@ public:
 	Volume();
 	~Volume();
 
-	status_t Mount(dev_t nsid, const char *path);
+	status_t Mount(fs_volume *fsVolume, const char *path);
 	status_t Unmount();
 
-	dev_t GetID() const { return fID; }
+	dev_t GetID() const				{ return fFSVolume->id; }
+	fs_volume *GetFSVolume() const	{ return fFSVolume; }
 
 	off_t GetBlockSize() const;
 	off_t CountBlocks() const;
@@ -89,7 +90,7 @@ private:
 	void _InitNegativeEntries();
 
 private:
-	dev_t					fID;
+	fs_volume				*fFSVolume;
 	int						fDevice;
 	BlockCache				*fBlockCache;
 	Tree					*fTree;
