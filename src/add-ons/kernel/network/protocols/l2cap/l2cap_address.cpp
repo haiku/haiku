@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Oliver Ruiz Dorantes, oliver-ruiz.dorantes_at_gmail.com
+ *		Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  */
 
 
