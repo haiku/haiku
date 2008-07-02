@@ -66,8 +66,8 @@ extern size_t	strlcpy(char *dest, const char *source, size_t length);
 
 extern size_t	strnlen(const char *string, size_t count);
 
-/* extern char		*strlwr(char *string); */
-/* extern char		*strupr(char *string); */
+extern char		*strlwr(char *string);
+extern char		*strupr(char *string);
 
 /* extern char		*strsep(char **stringPointer, const char *delimiter); */
 

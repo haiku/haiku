@@ -25,6 +25,7 @@ MergeObject posix_string.o :
 	strerror.c
 	strlcat.c
 	strlcpy.c
+	strlwr.c
 	strncat.c
 	strncmp.c
 	strncpy.c
@@ -34,6 +35,7 @@ MergeObject posix_string.o :
 	strspn.c
 	strstr.c
 	strtok.c
+	strupr.c
 	strxfrm.c
 ;
 

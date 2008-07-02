@@ -138,6 +138,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #define asm         __asm
 
@@ -205,18 +206,6 @@ do { \
 	: "edx"); \
 } while (0)
 
-
-/* Kernel doesn't have strupr, should be fixed. */
-static __inline char *
-strupr(char *str)
-{
-    char *c = str;
-    while(*c) {
-        *c = toupper(*c);
-        c++;
-    }
-    return(str);
-}
 
 #else /* _KERNEL_MODE */
 
