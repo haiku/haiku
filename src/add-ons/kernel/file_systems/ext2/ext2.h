@@ -132,7 +132,7 @@ struct ext2_block_group {
 
 	uint32 InodeTable() const
 		{ return B_LENDIAN_TO_HOST_INT32(inode_table); }
-};
+} _PACKED;
 
 #define EXT2_DIRECT_BLOCKS			12
 #define EXT2_ROOT_NODE				2
@@ -143,7 +143,7 @@ struct ext2_data_stream {
 	uint32 indirect;
 	uint32 double_indirect;
 	uint32 triple_indirect;
-};
+} _PACKED;
 
 struct ext2_inode {
 	uint16	mode;
@@ -196,13 +196,13 @@ struct ext2_inode {
 		return B_LENDIAN_TO_HOST_INT32(size);
 	}
 
-	uint16 UserID() const
+	uint32 UserID() const
 	{
 		return B_LENDIAN_TO_HOST_INT16(uid)
 			| (B_LENDIAN_TO_HOST_INT16(uid_high) << 16);
 	}
 
-	uint16 GroupID() const
+	uint32 GroupID() const
 	{
 		return B_LENDIAN_TO_HOST_INT16(gid)
 			| (B_LENDIAN_TO_HOST_INT16(gid_high) << 16);
