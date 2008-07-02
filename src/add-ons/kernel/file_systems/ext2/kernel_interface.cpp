@@ -257,7 +257,7 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		if (status != B_OK)
 			return status;
 
-		off_t blockOffset = block << volume->BlockShift();
+		off_t blockOffset = (off_t)block << volume->BlockShift();
 		uint32 blockLength = volume->BlockSize();
 
 		if (index > 0 && vecs[index - 1].offset == blockOffset - blockLength) {

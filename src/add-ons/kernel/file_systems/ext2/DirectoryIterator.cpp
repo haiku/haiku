@@ -11,6 +11,14 @@
 #include "Inode.h"
 
 
+//#define TRACE_EXT2
+#ifdef TRACE_EXT2
+#	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 DirectoryIterator::DirectoryIterator(Inode* inode)
 	:
 	fInode(inode),
@@ -24,7 +32,7 @@ DirectoryIterator::~DirectoryIterator()
 }
 
 
-status_t	
+status_t
 DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 {
 	if (fOffset + sizeof(ext2_dir_entry) >= fInode->Size())
@@ -47,6 +55,10 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 
 		fOffset += entry.Length();
 	}
+
+	TRACE("offset %Ld: entry ino %lu, length %u, name length %u, type %u\n",
+		fOffset, entry.InodeID(), entry.Length(), entry.NameLength(),
+		entry.FileType());
 
 	// read name
 

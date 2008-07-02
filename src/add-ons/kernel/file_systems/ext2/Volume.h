@@ -62,6 +62,7 @@ private:
 	uint32				fFlags;
 	uint32				fBlockSize;
 	uint32				fBlockShift;
+	uint32				fFirstDataBlock;
 	uint32				fNumGroups;
 	uint32				fGroupsPerBlock;
 	ext2_block_group**	fGroupBlocks;

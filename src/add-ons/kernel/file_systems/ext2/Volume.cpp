@@ -20,6 +20,14 @@
 #include "Inode.h"
 
 
+//#define TRACE_EXT2
+#ifdef TRACE_EXT2
+#	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 class DeviceOpener {
 	public:
 		DeviceOpener(int fd, int mode);
@@ -268,13 +276,20 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	// initialize short hands to the super block (to save byte swapping)
 	fBlockShift = fSuperBlock.BlockShift();
 	fBlockSize = 1UL << fSuperBlock.BlockShift();
+	fFirstDataBlock = fSuperBlock.FirstDataBlock();
 
-	fNumGroups = (fSuperBlock.NumBlocks() - fSuperBlock.FirstDataBlock() - 1)
+	fNumGroups = (fSuperBlock.NumBlocks() - fFirstDataBlock - 1)
 		/ fSuperBlock.BlocksPerGroup() + 1;
 	fGroupsPerBlock = fBlockSize / sizeof(ext2_block_group);
 
+	TRACE("block size %ld, num groups %ld, groups per block %ld, first %lu\n",
+		fBlockSize, fNumGroups, fGroupsPerBlock, fFirstDataBlock);
+	TRACE("features %lx, incompatible features %lx, read-only features %lx\n",
+		fSuperBlock.CompatibleFeatures(), fSuperBlock.IncompatibleFeatures(),
+		fSuperBlock.ReadOnlyFeatures());
+
 	uint32 blockCount = (fNumGroups + fGroupsPerBlock - 1) / fGroupsPerBlock;
-	
+
 	fGroupBlocks = (ext2_block_group**)malloc(blockCount * sizeof(void*));
 	if (fGroupBlocks == NULL)
 		return B_NO_MEMORY;
@@ -298,8 +313,9 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		// all went fine
 		opener.Keep();
 		return B_OK;
-	} else
-		dprintf("ext2: could not create root node: get_vnode() failed!\n");
+	} else {
+		TRACE("could not create root node: get_vnode() failed!\n");
+	}
 
 	return status;
 }
@@ -344,7 +360,7 @@ Volume::_GroupBlockOffset(uint32 blockIndex)
 	if ((fSuperBlock.IncompatibleFeatures()
 			& EXT2_INCOMPATIBLE_FEATURE_META_GROUP) == 0
 		|| blockIndex < fSuperBlock.FirstMetaBlockGroup())
-		return EXT2_SUPER_BLOCK_OFFSET + fBlockSize * (1 + blockIndex);
+		return (fFirstDataBlock + blockIndex + 1) << fBlockShift;
 
 	panic("meta block");
 	return 0;
@@ -380,6 +396,9 @@ Volume::GetBlockGroup(int32 index, ext2_block_group** _group)
 		}
 
 		fGroupBlocks[blockIndex] = groupBlock;
+
+		TRACE("group [%ld]: inode table %ld\n", index,
+			(fGroupBlocks[blockIndex] + index % fGroupsPerBlock)->InodeTable());
 	}
 
 	*_group = fGroupBlocks[blockIndex] + index % fGroupsPerBlock;

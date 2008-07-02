@@ -11,6 +11,14 @@
 #include "CachedBlock.h"
 
 
+//#define TRACE_EXT2
+#ifdef TRACE_EXT2
+#	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 Inode::Inode(Volume* volume, ino_t id)
 	:
 	fVolume(volume),
@@ -23,6 +31,7 @@ Inode::Inode(Volume* volume, ino_t id)
 
 	uint32 block;
 	if (volume->GetInodeBlock(id, block) == B_OK) {
+		TRACE("inode %Ld at block %lu\n", ID(), block);
 		ext2_inode* inodes = (ext2_inode*)block_cache_get(volume->BlockCache(),
 			block);
 		if (inodes != NULL)
@@ -150,7 +159,7 @@ Inode::FindBlock(off_t offset, uint32& block)
 		return B_ERROR;
 	}
 
-	//dprintf("FindBlock(offset %Ld): %lu\n", offset, block);
+	TRACE("inode %Ld: FindBlock(offset %Ld): %lu\n", ID(), offset, block);
 	return B_OK;
 }
 

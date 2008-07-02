@@ -45,7 +45,7 @@ struct ext2_super_block {
 	uint16	block_group;
 	uint32	compatible_features;
 	uint32	incompatible_features;
-	uint32	readonly_features;
+	uint32	read_only_features;
 	uint8	uuid[16];
 	char	name[16];
 	char	last_mount_point[64];
@@ -53,7 +53,7 @@ struct ext2_super_block {
 	uint8	preallocated_blocks;
 	uint8	preallocated_directory_blocks;
 	uint16	_padding;
-	
+
 	// journaling ext3 support
 	uint8	journal_uuid[16];
 	uint32	journal_inode;
@@ -85,7 +85,7 @@ struct ext2_super_block {
 	uint32 CompatibleFeatures() const
 		{ return B_LENDIAN_TO_HOST_INT32(compatible_features); }
 	uint32 ReadOnlyFeatures() const
-		{ return B_LENDIAN_TO_HOST_INT32(readonly_features); }
+		{ return B_LENDIAN_TO_HOST_INT32(read_only_features); }
 	uint32 IncompatibleFeatures() const
 		{ return B_LENDIAN_TO_HOST_INT32(incompatible_features); }
 
