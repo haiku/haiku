@@ -753,8 +753,8 @@ heap_attach(addr_t base, size_t size, uint32 heapClass)
 	size -= pageTableSize;
 
 	// the rest is now actually usable memory (rounded to the next page)
-	heap->base = (addr_t)(base + B_PAGE_SIZE - 1) / B_PAGE_SIZE * B_PAGE_SIZE;
-	heap->size = (size_t)(size / B_PAGE_SIZE) * B_PAGE_SIZE;
+	heap->base = ROUNDUP(base, B_PAGE_SIZE);
+	heap->size = (size / B_PAGE_SIZE) * B_PAGE_SIZE;
 
 	// now we know the real page count
 	pageCount = heap->size / heap->page_size;
@@ -1453,15 +1453,15 @@ memalign(size_t alignment, size_t size)
 		return NULL;
 	}
 
-	if (size > HEAP_AREA_USE_THRESHOLD) {
+	if (!kernel_startup && size > HEAP_AREA_USE_THRESHOLD) {
 		// don't even attempt such a huge allocation - use areas instead
 		dprintf("heap: using area for huge allocation of %lu bytes!\n", size);
 		size_t areaSize = size + sizeof(area_allocation_info);
 		if (alignment != 0)
-			areaSize = (areaSize + alignment - 1) / alignment;
+			areaSize = ROUNDUP(areaSize, alignment);
 
 		void *address = NULL;
-		areaSize = (areaSize + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+		areaSize = ROUNDUP(areaSize, B_PAGE_SIZE);
 		area_id allocationArea = create_area("memalign area", &address,
 			B_ANY_KERNEL_BLOCK_ADDRESS, areaSize, B_FULL_LOCK,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -1480,7 +1480,7 @@ memalign(size_t alignment, size_t size)
 
 		address = (void *)((addr_t)address + sizeof(area_allocation_info));
 		if (alignment != 0)
-			address = (void *)(((addr_t)address + alignment - 1) / alignment);
+			address = (void *)ROUNDUP((addr_t)address, alignment);
 
 		dprintf("heap: allocated area %ld for huge allocation returning %p\n",
 			allocationArea, address);
