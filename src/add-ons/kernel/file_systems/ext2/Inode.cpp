@@ -110,12 +110,12 @@ Inode::FindBlock(off_t offset, uint32& block)
 
 	if (index < EXT2_DIRECT_BLOCKS) {
 		// direct blocks
-		block = B_LENDIAN_TO_HOST_INT32(Node().u.stream.direct[index]);
+		block = B_LENDIAN_TO_HOST_INT32(Node().stream.direct[index]);
 	} else if ((index -= EXT2_DIRECT_BLOCKS) < perBlock) {
 		// indirect blocks
 		CachedBlock cached(fVolume);
 		uint32* indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
-			Node().u.stream.indirect));
+			Node().stream.indirect));
 		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
@@ -124,7 +124,7 @@ Inode::FindBlock(off_t offset, uint32& block)
 		// double indirect blocks
 		CachedBlock cached(fVolume);
 		uint32* indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
-			Node().u.stream.double_indirect));
+			Node().stream.double_indirect));
 		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
@@ -138,7 +138,7 @@ Inode::FindBlock(off_t offset, uint32& block)
 		// triple indirect blocks
 		CachedBlock cached(fVolume);
 		uint32* indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
-			Node().u.stream.triple_indirect));
+			Node().stream.triple_indirect));
 		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 

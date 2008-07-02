@@ -138,6 +138,13 @@ struct ext2_block_group {
 #define EXT2_ROOT_NODE				2
 #define EXT2_SHORT_SYMLINK_LENGTH	60
 
+struct ext2_data_stream {
+	uint32 direct[EXT2_DIRECT_BLOCKS];
+	uint32 indirect;
+	uint32 double_indirect;
+	uint32 triple_indirect;
+};
+
 struct ext2_inode {
 	uint16	mode;
 	uint16	uid;
@@ -152,14 +159,9 @@ struct ext2_inode {
 	uint32	flags;
 	uint32	_reserved1;
 	union {
-		struct data_stream {
-			uint32 direct[EXT2_DIRECT_BLOCKS];
-			uint32 indirect;
-			uint32 double_indirect;
-			uint32 triple_indirect;
-		} stream;
+		ext2_data_stream stream;
 		char symlink[EXT2_SHORT_SYMLINK_LENGTH];
-	} u;
+	};
 	uint32	generation;
 	uint32	file_access_control;
 	union {
