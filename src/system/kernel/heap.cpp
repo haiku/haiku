@@ -975,7 +975,7 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
 		// aligned) page has to be allocated anyway.
 		size_t elementSize = heap->bins[binIndex].element_size;
 		if (size <= elementSize && (alignment == 0
-			|| (elementSize & (alignment - 1) == 0)))
+			|| (elementSize & (alignment - 1)) == 0))
 			break;
 	}
 
