@@ -587,7 +587,7 @@ set_vga_mode(void)
 {
 	// sets 640x480 16 colors graphics mode
 	bios_regs regs;
-	regs.eax = 0x12;
+	regs.eax = 0x0012;
 	call_bios(0x10, &regs);
 }
 
@@ -597,7 +597,12 @@ set_text_mode(void)
 {
 	// sets 80x25 text console
 	bios_regs regs;
-	regs.eax = 3;
+	regs.eax = 0x0003;
+	call_bios(0x10, &regs);
+
+	// turns off text cursor
+	regs.eax = 0x0100;
+	regs.ecx = 0x2000;
 	call_bios(0x10, &regs);
 }
 
