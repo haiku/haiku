@@ -965,18 +965,23 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
 	size += sizeof(heap_leak_check_info);
 #endif
 
-	// ToDo: that code "aligns" the buffer because the bins are always
-	//	aligned on their bin size
-	if (size < alignment)
-		size = alignment;
-
 	uint32 binIndex;
 	for (binIndex = 0; binIndex < heap->bin_count; binIndex++) {
-		if (size <= heap->bins[binIndex].element_size)
+		// TODO: The alignment is done by ensuring that the element size
+		// of the target bin is aligned with the requested alignment. This
+		// has the problem that it wastes space because a better (smaller) bin
+		// could possibly be selected. We should pick the best bin and check
+		// if there is an aligned block in the free list or if a new (page
+		// aligned) page has to be allocated anyway.
+		size_t elementSize = heap->bins[binIndex].element_size;
+		if (size <= elementSize && (alignment == 0
+			|| (elementSize & (alignment - 1) == 0)))
 			break;
 	}
 
 	void *address = heap_raw_alloc(heap, size, binIndex);
+	if (alignment != 0 && ((addr_t)address & (alignment - 1)))
+		panic("alignment not met at %p with 0x%08lx\n", address, alignment);
 
 	TRACE(("memalign(): asked to allocate %lu bytes, returning pointer %p\n", size, address));
 
