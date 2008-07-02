@@ -98,7 +98,9 @@ typedef long 		*PKEVENT ;
 #define CONST const
 typedef	void **		PPVOID;
 
+#ifndef PAGE_SIZE
 #define PAGE_SIZE                B_PAGE_SIZE
+#endif
 
 #define WideToSInt64(x)         (*((int64*)(&x)))
 #define WideToUInt64(x)         (*((uint64*)(&x)))
