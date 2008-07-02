@@ -137,6 +137,7 @@ static heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
 };
 
 static heap_allocator *sHeapList[HEAP_CLASS_COUNT];
+static heap_allocator *sLastGrowRequest[HEAP_CLASS_COUNT];
 static heap_allocator *sGrowHeapList = NULL;
 static thread_id sHeapGrowThread = -1;
 static sem_id sHeapGrowSem = -1;
@@ -1332,8 +1333,11 @@ heap_grow_thread(void *)
 			while (heap->next)
 				heap = heap->next;
 
-			if (heap_should_grow(heap)) {
-				// grow this heap if it makes sense to
+			if (sLastGrowRequest[i] == heap || heap_should_grow(heap)) {
+				// grow this heap if it is nearly full or if a grow was
+				// explicitly requested for this heap (happens when a large
+				// allocation cannot be fulfilled due to lack of contiguous
+				// pages)
 				heap_allocator *newHeap = heap_create_new_heap("additional heap",
 					HEAP_GROW_SIZE, i);
 				if (newHeap != NULL) {
@@ -1362,6 +1366,7 @@ heap_init(addr_t base, size_t size)
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
 		size_t partSize = size * sHeapClasses[i].initial_percentage / 100;
 		sHeapList[i] = heap_attach(base, partSize, i);
+		sLastGrowRequest[i] = sHeapList[i];
 		base += partSize;
 	}
 
@@ -1490,6 +1495,7 @@ memalign(size_t alignment, size_t size)
 		void *result = heap_memalign(heap, alignment, size, &shouldGrow);
 		if (heap->next == NULL && (shouldGrow || result == NULL)) {
 			// the last heap will or has run out of memory, notify the grower
+			sLastGrowRequest[heap_class_for(size)] = heap;
 			if (result == NULL) {
 				// urgent request, do the request and wait
 				switch_sem(sHeapGrowSem, sHeapGrownNotify);
