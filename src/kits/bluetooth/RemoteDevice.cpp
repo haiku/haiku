@@ -38,21 +38,18 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 
     if (!alwaysAsk) {
         // Check if the name is already retrieved
-        return BString("Not implemented");
-
         // TODO: Check if It is known from a KnownDevicesList
+        return BString("Not implemented");
     }
 
     if (fDiscovererLocalDevice == NULL)
         return BString("#NoOwnerError#Not Valid name");
 
-    BMessenger* btsm = NULL;
-	size_t size;
-
-    if ((btsm = _RetrieveBluetoothMessenger()) == NULL)
+    if (fMessenger == NULL)
         return BString("#ServerNotReady#Not Valid name");
 
     void*  remoteNameCommand = NULL;
+	size_t size;
 
     /* Issue inquiry command */
     BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
@@ -71,7 +68,7 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 	request.AddInt16("eventExpected",  HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE);
 
 
-    if (btsm->SendMessage(&request, &reply) == B_OK)
+    if (fMessenger->SendMessage(&request, &reply) == B_OK)
     {
         BString name;
         int8 status;
@@ -155,12 +152,21 @@ RemoteDevice::SetLocalDeviceOwner(LocalDevice* ld)
 RemoteDevice::RemoteDevice(bdaddr_t address)
 {
 	fBdaddr = address;
+	fMessenger = _RetrieveBluetoothMessenger();
 }
 
 
 RemoteDevice::RemoteDevice(BString address)
 {
 	fBdaddr = bdaddrUtils::FromString((const char *)address.String());
+	fMessenger = _RetrieveBluetoothMessenger();
+}
+
+
+RemoteDevice::~RemoteDevice()
+{
+	if (fMessenger)
+		delete fMessenger;
 }
 
 

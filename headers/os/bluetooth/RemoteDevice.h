@@ -28,6 +28,8 @@ class RemoteDevice : public BluetoothDevice {
         static const int WAIT = B_BT_WAIT;
         static const int SUCCEEDED = B_BT_SUCCEEDED;
 
+		virtual ~RemoteDevice();
+
         bool IsTrustedDevice();
         BString GetFriendlyName(bool alwaysAsk); /* Throwing */
         BString GetFriendlyName(void); /* Throwing */
@@ -52,6 +54,8 @@ class RemoteDevice : public BluetoothDevice {
         RemoteDevice(BString address);
         RemoteDevice(bdaddr_t address);
 
+
+
         /* Instances of this class only would be instantiated by Discovery[Listener|Agent] */
         friend class DiscoveryListener;
 		void SetLocalDeviceOwner(LocalDevice* ld);
@@ -59,6 +63,7 @@ class RemoteDevice : public BluetoothDevice {
     private:
 
     	LocalDevice* fDiscovererLocalDevice;
+		BMessenger*	 fMessenger;
 
     	uint8		fPageRepetitionMode;
     	uint8		fScanPeriodMode;

@@ -27,7 +27,7 @@ DiscoveryAgent::RetrieveDevices(int option)
 {
     /* No inquiry process initiated */
     if (fLastUsedListener == NULL)
-        return NULL; // xxx: Fix me
+        return RemoteDevicesList();
 
     return fLastUsedListener->GetRemoteDevicesList();
 }

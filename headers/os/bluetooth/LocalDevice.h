@@ -25,7 +25,7 @@ namespace Bluetooth {
 class DiscoveryAgent;
 
 class LocalDevice : public BluetoothDevice {
-   
+
     public:
         /* Possible throwing */
         static  LocalDevice* GetLocalDevice();
@@ -49,17 +49,18 @@ class LocalDevice : public BluetoothDevice {
                 ServiceRecord getRecord(Connection notifier);
                 void updateRecord(ServiceRecord srvRecord);
 		 */
-				
+
     private:
 		        LocalDevice(hci_id hid);
+				virtual  ~LocalDevice();
+
 				hci_id	GetID(void) {return hid;}
         static  LocalDevice*   RequestLocalDeviceID(BMessage* request);
-				 
-        static  BMessenger*      sfMessenger;
-                BMessenger*      fMessenger;
+
+				BMessenger*      fMessenger;
 
 		hci_id	 hid;
-		
+
 		friend class DiscoveryAgent;
 		friend class RemoteDevice;
 		friend class PincodeWindow;
