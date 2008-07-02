@@ -196,7 +196,8 @@ typedef struct {
     uint32		prdtl_flags_cfl;
   } _PACKED;
 	uint32		prdbc;			// PRD Byte Count
-	uint32		ctba;			// command table desciptor base address (alignment 128 byte)
+	uint32		ctba;			// command table desciptor base address
+								// (alignment 128 byte)
 	uint32		ctbau;			// command table desciptor base address upper
 	uint8		res1[0x10];
 } _PACKED command_list_entry;
@@ -251,7 +252,8 @@ typedef struct {
 	uint32 flags;
 } device_info;
 
-status_t get_device_info(uint16 vendorID, uint16 deviceID, const char **name, uint32 *flags);
+status_t get_device_info(uint16 vendorID, uint16 deviceID, const char **name,
+	uint32 *flags);
 
 
 extern scsi_sim_interface gAHCISimInterface;

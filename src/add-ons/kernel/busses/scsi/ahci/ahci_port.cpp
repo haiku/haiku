@@ -59,12 +59,15 @@ AHCIPort::Init1()
 {
 	TRACE("AHCIPort::Init1 port %d\n", fIndex);
 
-	size_t size = sizeof(command_list_entry) * COMMAND_LIST_ENTRY_COUNT + sizeof(fis) + sizeof(command_table) + sizeof(prd) * PRD_TABLE_ENTRY_COUNT;
+	size_t size = sizeof(command_list_entry) * COMMAND_LIST_ENTRY_COUNT
+		+ sizeof(fis) + sizeof(command_table)
+		+ sizeof(prd) * PRD_TABLE_ENTRY_COUNT;
 
 	char *virtAddr;
 	char *physAddr;
 
-	fArea = alloc_mem((void **)&virtAddr, (void **)&physAddr, size, 0, "some AHCI port");
+	fArea = alloc_mem((void **)&virtAddr, (void **)&physAddr, size, 0,
+		"some AHCI port");
 	if (fArea < B_OK) {
 		TRACE("failed allocating memory for port %d\n", fIndex);
 		return fArea;
@@ -167,7 +170,8 @@ AHCIPort::Uninit()
 
 	// wait for DMA completition
 	if (wait_until_clear(&fRegs->cmd, PORT_CMD_CR, 500000) < B_OK) {
-		TRACE("AHCIPort::Uninit port %d error DMA engine still running\n", fIndex);
+		TRACE("AHCIPort::Uninit port %d error DMA engine still running\n",
+			fIndex);
 	}
 
 	// disable interrupts
@@ -209,7 +213,8 @@ AHCIPort::ResetDevice()
 
 	if (fRegs->ssts & 1) {
 		if (wait_until_set(&fRegs->ssts, 0x3, 500000) < B_OK) {
-			TRACE("AHCIPort::ResetDevice port %d device present but no phy communication\n", fIndex);
+			TRACE("AHCIPort::ResetDevice port %d device present but no phy "
+				"communication\n", fIndex);
 		}
 	}
 
@@ -230,7 +235,8 @@ AHCIPort::ResetPort(bool forceDeviceReset)
 	FlushPostedWrites();
 
 	if (wait_until_clear(&fRegs->cmd, PORT_CMD_CR, 500000) < B_OK) {
-		TRACE("AHCIPort::ResetPort port %d error DMA engine doesn't stop\n", fIndex);
+		TRACE("AHCIPort::ResetPort port %d error DMA engine doesn't stop\n",
+			fIndex);
 	}
 
 	bool deviceBusy = fRegs->tfd & (ATA_BSY | ATA_DRQ);
@@ -263,7 +269,8 @@ AHCIPort::PostReset()
 		snooze(200000);
 
 	if ((fRegs->tfd & 0xff) == 0xff) {
-		TRACE("AHCIPort::PostReset port %d: invalid task file status 0xff\n", fIndex);
+		TRACE("AHCIPort::PostReset port %d: invalid task file status 0xff\n",
+			fIndex);
 		return B_ERROR;
 	}
 
@@ -278,7 +285,8 @@ AHCIPort::PostReset()
 	FlushPostedWrites();
 
 	TRACE("device signature 0x%08lx (%s)\n", fRegs->sig,
-		(fRegs->sig == 0xeb140101) ? "ATAPI" : (fRegs->sig == 0x00000101) ? "ATA" : "unknown");
+		(fRegs->sig == 0xeb140101) ? "ATAPI" : (fRegs->sig == 0x00000101) ?
+			"ATA" : "unknown");
 
 	return B_OK;
 }
@@ -288,11 +296,16 @@ void
 AHCIPort::DumpD2HFis()
 {
 	TRACE("D2H FIS:\n");
-	TRACE("  DW0  %02x %02x %02x %02x\n", fFIS->rfis[3], fFIS->rfis[2], fFIS->rfis[1], fFIS->rfis[0]);
-	TRACE("  DW1  %02x %02x %02x %02x\n", fFIS->rfis[7], fFIS->rfis[6], fFIS->rfis[5], fFIS->rfis[4]);
-	TRACE("  DW2  %02x %02x %02x %02x\n", fFIS->rfis[11], fFIS->rfis[10], fFIS->rfis[9], fFIS->rfis[8]);
-	TRACE("  DW3  %02x %02x %02x %02x\n", fFIS->rfis[15], fFIS->rfis[14], fFIS->rfis[13], fFIS->rfis[12]);
-	TRACE("  DW4  %02x %02x %02x %02x\n", fFIS->rfis[19], fFIS->rfis[18], fFIS->rfis[17], fFIS->rfis[16]);
+	TRACE("  DW0  %02x %02x %02x %02x\n", fFIS->rfis[3], fFIS->rfis[2],
+		fFIS->rfis[1], fFIS->rfis[0]);
+	TRACE("  DW1  %02x %02x %02x %02x\n", fFIS->rfis[7], fFIS->rfis[6],
+		fFIS->rfis[5], fFIS->rfis[4]);
+	TRACE("  DW2  %02x %02x %02x %02x\n", fFIS->rfis[11], fFIS->rfis[10],
+		fFIS->rfis[9], fFIS->rfis[8]);
+	TRACE("  DW3  %02x %02x %02x %02x\n", fFIS->rfis[15], fFIS->rfis[14],
+		fFIS->rfis[13], fFIS->rfis[12]);
+	TRACE("  DW4  %02x %02x %02x %02x\n", fFIS->rfis[19], fFIS->rfis[18],
+		fFIS->rfis[17], fFIS->rfis[16]);
 }
 
 
@@ -309,19 +322,16 @@ AHCIPort::Interrupt()
 
 	uint32 ci = fRegs->ci;
 
-	RWTRACE("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
-
-	int release = 0;
+	RWTRACE("[%lld] %ld AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, "
+		"is 0x%08lx, ci 0x%08lx\n", system_time(), find_thread(NULL),
+		fIndex, fCommandsActive, is, ci);
 
 	acquire_spinlock(&fSpinlock);
 	if ((fCommandsActive & 1) && !(ci & 1)) {
-		release = 1;
 		fCommandsActive &= ~1;
+		release_sem_etc(fResponseSem, 1, B_DO_NOT_RESCHEDULE);
 	}
 	release_spinlock(&fSpinlock);
-
-	if (release)
-		release_sem_etc(fResponseSem, 1, B_RELEASE_IF_WAITING_ONLY | B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -330,7 +340,8 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 {
 	uint32 ci = fRegs->ci;
 
-	TRACE("AHCIPort::InterruptErrorHandler port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
+	TRACE("AHCIPort::InterruptErrorHandler port %d, fCommandsActive 0x%08lx, "
+		"is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
 
 	TRACE("ssts 0x%08lx\n", fRegs->ssts);
 	TRACE("sctl 0x%08lx\n", fRegs->sctl);
@@ -385,13 +396,20 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 		fResetPort = true;
 	}
 
-	if (fError)
-		release_sem_etc(fResponseSem, 1, B_RELEASE_IF_WAITING_ONLY | B_DO_NOT_RESCHEDULE);
+	if (fError) {
+		acquire_spinlock(&fSpinlock);
+		if ((fCommandsActive & 1)) {
+			fCommandsActive &= ~1;
+			release_sem_etc(fResponseSem, 1, B_DO_NOT_RESCHEDULE);
+		}
+		release_spinlock(&fSpinlock);
+	}
 }
 
 
 status_t
-AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const void *data, size_t dataSize)
+AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax,
+	const void *data, size_t dataSize)
 {
 	int peMax = prdMax + 1;
 	physical_entry pe[peMax];
@@ -407,7 +425,8 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 
 
 status_t
-AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const physical_entry *sgTable, int sgCount, size_t dataSize)
+AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax,
+	const physical_entry *sgTable, int sgCount, size_t dataSize)
 {
 	*prdCount = 0;
 	while (sgCount > 0 && dataSize > 0) {
@@ -426,7 +445,9 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 				TRACE("AHCIPort::FillPrdTable: prd table exhausted\n");
 				return B_ERROR;
 			}
-			FLOW("FillPrdTable: prd-entry %u, addr %p, size %lu\n", *prdCount, address, bytes);
+			FLOW("FillPrdTable: prd-entry %u, addr %p, size %lu\n",
+				*prdCount, address, bytes);
+
 			prdTable->dba  = LO32(address);
 			prdTable->dbau = HI32(address);
 			prdTable->res  = 0;
@@ -444,7 +465,8 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 		return B_ERROR;
 	}
 	if (dataSize > 0) {
-		TRACE("AHCIPort::FillPrdTable: sg table %ld bytes too small\n", dataSize);
+		TRACE("AHCIPort::FillPrdTable: sg table %ld bytes too small\n",
+			dataSize);
 		return B_ERROR;
 	}
 	return B_OK;
@@ -461,9 +483,15 @@ AHCIPort::StartTransfer()
 status_t
 AHCIPort::WaitForTransfer(int *tfd, bigtime_t timeout)
 {
-	status_t result = B_OK;
-	if (acquire_sem_etc(fResponseSem, 1, B_RELATIVE_TIMEOUT, timeout) < B_OK) {
+	status_t result = acquire_sem_etc(fResponseSem, 1, B_RELATIVE_TIMEOUT,
+		timeout);
+	if (result < B_OK) {
+		cpu_status cpu = disable_interrupts();
+		acquire_spinlock(&fSpinlock);
 		fCommandsActive &= ~1;
+		release_spinlock(&fSpinlock);
+		restore_interrupts(cpu);
+
 		result = B_TIMED_OUT;
 	} else if (fError) {
 		*tfd = fRegs->tfd;
@@ -526,7 +554,8 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 /*
 	uint8 *data = (uint8*) &ataData;
 	for (int i = 0; i < 512; i += 8) {
-		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
+		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1],
+			data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
 	}
 */
 
@@ -547,9 +576,12 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	scsiData.write_bus16 = true;
 	scsiData.write_bus32 = false;
 	scsiData.relative_address = false;
-	memcpy(scsiData.vendor_ident, ataData.model_number, sizeof(scsiData.vendor_ident));
-	memcpy(scsiData.product_ident, ataData.model_number + 8, sizeof(scsiData.product_ident));
-	memcpy(scsiData.product_rev, ataData.serial_number, sizeof(scsiData.product_rev));
+	memcpy(scsiData.vendor_ident, ataData.model_number,
+		sizeof(scsiData.vendor_ident));
+	memcpy(scsiData.product_ident, ataData.model_number + 8,
+		sizeof(scsiData.product_ident));
+	memcpy(scsiData.product_rev, ataData.serial_number,
+		sizeof(scsiData.product_rev));
 
 	if (!fIsATAPI) {
 		bool lba			= (ataData.words[49] & (1 << 9)) != 0;
@@ -559,8 +591,10 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		fUse48BitCommands   = lba && lba48;
 		fSectorSize			= 512;
 		fSectorCount		= !(lba || sectors) ? 0 : lba48 ? sectors48 : sectors;
-		TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %lu, sectors48 %llu, size %llu\n",
-			lba, lba48, fUse48BitCommands, sectors, sectors48, fSectorCount * fSectorSize);
+		TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %lu, "
+			"sectors48 %llu, size %llu\n",
+			lba, lba48, fUse48BitCommands, sectors, sectors48,
+			fSectorCount * fSectorSize);
 	}
 
 #if 0
@@ -586,7 +620,8 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	TRACE("serial number: %s\n", serialNumber);
   	TRACE("firmware rev.: %s\n", firmwareRev);
 
-	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData, sizeof(scsiData)) < B_OK) {
+	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData,
+		sizeof(scsiData)) < B_OK) {
 		request->subsys_status = SCSI_DATA_RUN_ERR;
 	} else {
 		request->subsys_status = SCSI_REQ_CMP;
@@ -641,7 +676,8 @@ AHCIPort::ScsiReadCapacity(scsi_ccb *request)
 void
 AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount, bool isWrite)
 {
-	RWTRACE("ScsiReadWrite: position %llu, size %lu, isWrite %d\n", lba * 512, sectorCount * 512, isWrite);
+	RWTRACE("[%lld] %ld ScsiReadWrite: position %llu, size %lu, isWrite %d\n",
+		system_time(), find_thread(NULL), lba * 512, sectorCount * 512, isWrite);
 
 #if 0
 	if (isWrite) {
@@ -684,9 +720,12 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	int prdEntrys;
 
 	if (request->ccb() && request->ccb()->data_length)
-		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->ccb()->sg_list, request->ccb()->sg_count, request->ccb()->data_length);
+		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT,
+			request->ccb()->sg_list, request->ccb()->sg_count,
+			request->ccb()->data_length);
 	else if (request->data() && request->size())
-		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->data(), request->size());
+		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT,
+			request->data(), request->size());
 	else
 		prdEntrys = 0;
 
@@ -699,7 +738,8 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	if (request->is_atapi()) {
 		// ATAPI PACKET is a 12 or 16 byte SCSI command
 		memset((char *)fCommandTable->acmd, 0, 32);
-		memcpy((char *)fCommandTable->acmd, request->ccb()->cdb, request->ccb()->cdb_length);
+		memcpy((char *)fCommandTable->acmd, request->ccb()->cdb,
+			request->ccb()->cdb_length);
 		fCommandList->a = 1;
 	}
 
