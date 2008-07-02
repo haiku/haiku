@@ -130,7 +130,7 @@ private:
 		#else
 			offset_v2 temp;
 			*(uint64*)&temp = h2le(*(uint64*)&u.k_offset_v2);
-			return tmp.k_offset;
+			return temp.k_offset;
 		#endif
 	}
 	uint32 _GetType() const
@@ -140,7 +140,7 @@ private:
 		#else
 			offset_v2 temp;
 			*(uint64*)&temp = h2le(*(uint64*)&u.k_offset_v2);
-			return tmp.k_type;
+			return temp.k_type;
 		#endif
 	}
 	void _SetOffsetAndType(uint64 offset, uint32 type)
