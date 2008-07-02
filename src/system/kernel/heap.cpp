@@ -105,6 +105,17 @@ typedef struct heap_class_s {
 	size_t		bin_sizes[20];
 } heap_class;
 
+static const uint32 kAreaAllocationMagic = 'AAMG';
+typedef struct area_allocation_info_s {
+	area_id		area;
+	void *		base;
+	uint32		magic;
+	size_t		size;
+	size_t		allocation_size;
+	size_t		allocation_alignment;
+	void *		allocation_base;
+} area_allocation_info;
+
 struct DeferredFreeListEntry : DoublyLinkedListLinkImpl<DeferredFreeListEntry> {
 };
 typedef DoublyLinkedList<DeferredFreeListEntry> DeferredFreeList;
@@ -943,7 +954,7 @@ inline bool
 heap_should_grow(heap_allocator *heap)
 {
 	// suggest growing if it is the last heap and has less than 10% free pages
-	return (heap->next == NULL)
+	return heap->next == NULL
 		&& heap->free_page_count < heap->page_count / 10;
 }
 
@@ -1311,7 +1322,8 @@ heap_grow_thread(void *)
 				growHeap->next = newHeap;
 				sAddGrowHeap = false;
 				TRACE(("heap_grower: new grow heap %p linked in\n", newHeap));
-			}
+			} else
+				dprintf("heap_grower: failed to create new grow heap\n");
 		}
 
 		for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
@@ -1331,7 +1343,8 @@ heap_grow_thread(void *)
 					heap->next = newHeap;
 					TRACE(("heap_grower: new %s heap linked in\n",
 						sHeapClasses[i].name));
-				}
+				} else
+					dprintf("heap_grower: failed to create new heap\n");
 			}
 		}
 
@@ -1437,8 +1450,38 @@ memalign(size_t alignment, size_t size)
 
 	if (size > HEAP_AREA_USE_THRESHOLD) {
 		// don't even attempt such a huge allocation - use areas instead
-		panic("heap: huge allocation of %lu bytes asked!\n", size);
-		return NULL;
+		dprintf("heap: using area for huge allocation of %lu bytes!\n", size);
+		size_t areaSize = size + sizeof(area_allocation_info);
+		if (alignment != 0)
+			areaSize = (areaSize + alignment - 1) / alignment;
+
+		void *address = NULL;
+		areaSize = (areaSize + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+		area_id allocationArea = create_area("memalign area", &address,
+			B_ANY_KERNEL_BLOCK_ADDRESS, areaSize, B_FULL_LOCK,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (allocationArea < B_OK) {
+			dprintf("heap: failed to create area for huge allocation\n");
+			return NULL;
+		}
+
+		area_allocation_info *info = (area_allocation_info *)address;
+		info->magic = kAreaAllocationMagic;
+		info->area = allocationArea;
+		info->base = address;
+		info->size = areaSize;
+		info->allocation_size = size;
+		info->allocation_alignment = alignment;
+
+		address = (void *)((addr_t)address + sizeof(area_allocation_info));
+		if (alignment != 0)
+			address = (void *)(((addr_t)address + alignment - 1) / alignment);
+
+		dprintf("heap: allocated area %ld for huge allocation returning %p\n",
+			allocationArea, address);
+
+		info->allocation_base = address;
+		return address;
 	}
 
 	heap_allocator *heap = sHeapList[heap_class_for(size)];
@@ -1558,6 +1601,23 @@ free(void *address)
 		heap = heap->next;
 	}
 
+	// or maybe it was a huge allocation using an area
+	area_info areaInfo;
+	area_id area = area_for(address);
+	if (area >= B_OK && get_area_info(area, &areaInfo) == B_OK) {
+		area_allocation_info *info = (area_allocation_info *)areaInfo.address;
+
+		// just make extra sure it was allocated by us
+		if (info->magic == kAreaAllocationMagic && info->area == area
+			&& info->size == areaInfo.size && info->base == areaInfo.address
+			&& info->allocation_size < areaInfo.size) {
+			delete_area(area);
+			dprintf("free(): freed huge allocation by deleting area %ld\n",
+				area);
+			return;
+		}
+	}
+
 	panic("free(): free failed for address %p\n", address);
 }
 
@@ -1590,6 +1650,42 @@ realloc(void *address, size_t newSize)
 			}
 
 			heap = heap->next;
+		}
+	}
+
+	// maybe a huge allocation using an area
+	area_info areaInfo;
+	area_id area = area_for(address);
+	if (area >= B_OK && get_area_info(area, &areaInfo) == B_OK) {
+		area_allocation_info *info = (area_allocation_info *)areaInfo.address;
+
+		// just make extra sure it was allocated by us
+		if (info->magic == kAreaAllocationMagic && info->area == area
+			&& info->size == areaInfo.size && info->base == areaInfo.address
+			&& info->allocation_size < areaInfo.size) {
+			size_t available = info->size - ((addr_t)info->allocation_base
+				- (addr_t)info->base);
+
+			if (available >= newSize) {
+				// there is enough room available for the newSize
+				dprintf("realloc(): new size %ld fits in old area %ld with %ld available",
+					newSize, area, available);
+				return address;
+			}
+
+			// have to allocate/copy/free - TODO maybe resize the area instead?
+			void *newAddress = memalign(0, newSize);
+			if (newAddress == NULL) {
+				dprintf("realloc(): failed to allocate new block of %ld bytes\n",
+					newSize);
+				return NULL;
+			}
+
+			memcpy(newAddress, address, min_c(newSize, info->allocation_size));
+			delete_area(area);
+			dprintf("realloc(): allocated new block %p for size %ld and deleted old area %ld\n",
+				newAddress, newSize, area);
+			return newAddress;
 		}
 	}
 
