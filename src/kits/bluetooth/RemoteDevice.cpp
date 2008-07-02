@@ -160,8 +160,7 @@ RemoteDevice::RemoteDevice(bdaddr_t address)
 
 RemoteDevice::RemoteDevice(BString address)
 {
-   /* TODO */
-
+	fBdaddr = bdaddrUtils::FromString((const char *)address.String());
 }
 
 
@@ -180,11 +179,11 @@ RemoteDevice::GetProperty(const char* property, uint32* value) /* Throwing */
 }
 
 
-}
-
-
 DeviceClass
 RemoteDevice::GetDeviceClass()
 {
 	return fDeviceClass;
+}
+
+
 }
