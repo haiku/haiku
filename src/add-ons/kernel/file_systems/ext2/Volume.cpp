@@ -360,7 +360,7 @@ Volume::_GroupBlockOffset(uint32 blockIndex)
 	if ((fSuperBlock.IncompatibleFeatures()
 			& EXT2_INCOMPATIBLE_FEATURE_META_GROUP) == 0
 		|| blockIndex < fSuperBlock.FirstMetaBlockGroup())
-		return (fFirstDataBlock + blockIndex + 1) << fBlockShift;
+		return off_t(fFirstDataBlock + blockIndex + 1) << fBlockShift;
 
 	panic("meta block");
 	return 0;
