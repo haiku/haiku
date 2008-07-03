@@ -53,7 +53,7 @@
 	call	system_time;									\
 															\
 	movl	%eax, %ebx;				/* save for later */	\
-	movl	%edx, %ecx;
+	movl	%edx, %ecx;										\
 															\
 	/* thread->kernel_time += now - thread->last_time; */	\
 	sub		THREAD_last_time(%edi), %eax;					\
@@ -248,7 +248,16 @@ int_bottom:
 
 	testl	$0x20000, IFRAME_flags(%ebp)	// VM86 mode
 	jnz		int_bottom_vm86
-	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)
+	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)	// user mode
+	je		int_bottom_user
+
+	// We need to recheck user mode using the thread's in_kernel flag, since
+	// sysexit introduces a raced condition: It doesn't reenable interrupts,
+	// so that we have to do it in the instruction before, thus opening a
+	// window for an interrupt while still being in the kernel, but having set
+	// up everything for userland already.
+	movl	%dr3, %edi						// thread pointer
+	cmpb	$0, THREAD_in_kernel(%edi)
 	je		int_bottom_user
 
 	// disable interrupts -- the handler will enable them, if necessary
@@ -474,8 +483,7 @@ handle_syscall:
 	// make sure interrupts are enabled (they are, when coming from a syscall
 	// but otherwise they might be disabled)
 	sti
-	call	thread_at_kernel_exit
-	cli								// disable interrupts
+	call	thread_at_kernel_exit	// also disables interrupts
 	jmp		kernel_exit_work_done
 
   bad_syscall_params:

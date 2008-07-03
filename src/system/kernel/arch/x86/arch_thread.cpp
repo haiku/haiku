@@ -409,7 +409,8 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1,
 	if (user_memcpy((void *)stackTop, args, sizeof(args)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	disable_interrupts();
+	thread_at_kernel_exit();
+		// also disables interrupts
 
 	i386_set_tss_and_kstack(t->kernel_stack_top);
 

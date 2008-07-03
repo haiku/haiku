@@ -331,9 +331,6 @@ _create_user_thread_kentry(void)
 {
 	struct thread *thread = thread_get_current_thread();
 
-	// a signal may have been delivered here
-	thread_at_kernel_exit();
-
 	// jump to the entry point in user space
 	arch_thread_enter_userspace(thread, (addr_t)thread->entry,
 		thread->args1, thread->args2);
@@ -1571,6 +1568,8 @@ thread_at_kernel_entry(bigtime_t now)
 /*!
 	Called whenever a thread exits kernel space to user space.
 	Tracks time, handles signals, ...
+	Interrupts must be enabled. When the function returns, interrupts will be
+	disabled.
 */
 void
 thread_at_kernel_exit(void)
@@ -1584,7 +1583,7 @@ thread_at_kernel_exit(void)
 		scheduler_reschedule();
 	}
 
-	cpu_status state = disable_interrupts();
+	disable_interrupts();
 
 	thread->in_kernel = false;
 
@@ -1592,14 +1591,12 @@ thread_at_kernel_exit(void)
 	bigtime_t now = system_time();
 	thread->kernel_time += now - thread->last_time;
 	thread->last_time = now;
-
-	restore_interrupts(state);
 }
 
 
 /*!	The quick version of thread_kernel_exit(), in case no signals are pending
 	and no debugging shall be done.
-	Interrupts are disabled in this case.
+	Interrupts must be disabled.
 */
 void
 thread_at_kernel_exit_no_signals(void)
