@@ -109,9 +109,18 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 			if (type == NULL)
 				return false;
 
-			name = "(unnamed ";
-			name << type;
-			name << ")";
+			uint32 divisor = 1UL << 30;
+			char unit = 'G';
+			if (partition->Size() < divisor) {
+				divisor = 1UL << 20;
+				unit = 'M';
+			}
+
+			char* buffer = name.LockBuffer(256);
+			snprintf(buffer, 256, "(%.1f %cB %s)",
+				1.0 * partition->Size() / divisor, unit, type);
+
+			name.UnlockBuffer();
 		}
 	}
 
@@ -167,7 +176,7 @@ AddOnePartitionAsMenuItem(Partition *partition, void *castToParams)
 	AddOneAsMenuItemParams *params = (AddOneAsMenuItemParams *)castToParams;
 	BBitmap *icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
 		B_CMAP8);
-	get_device_icon(partition->GetDevice()->Name(), icon->Bits(), B_MINI_ICON);	
+	get_device_icon(partition->GetDevice()->Name(), icon->Bits(), B_MINI_ICON);
 
 
 	const char *name = partition->GetDevice()->DisplayName();
@@ -182,21 +191,21 @@ AddOnePartitionAsMenuItem(Partition *partition, void *castToParams)
 
 	BMessage *message = new BMessage;
 
-	if (partition->Mounted() == kMounted) {	
-		message->what = kUnmountVolume;	
+	if (partition->Mounted() == kMounted) {
+		message->what = kUnmountVolume;
 		message->AddInt32("device_id", partition->VolumeDeviceID());
 	} else {
 		message->what = kMountVolume;
-		
+
 		//
-		//	Floppies have an ID of -1, because they don't have 
+		//	Floppies have an ID of -1, because they don't have
 		//	partition (and hence no parititon ID).
 		//
 		if (partition->GetDevice()->IsFloppy())
 			message->AddInt32("id", kFloppyID);
 		else
 			message->AddInt32("id", partition->UniqueID());
-	}	
+	}
 
 	BMenuItem *item = new IconMenuItem(name, message, icon);
 	if (partition->Mounted() == kMounted)
@@ -277,12 +286,12 @@ MountMenu::AddDynamicItem(add_state)
 			// Use the shared icon instead of the device icon
 			if (get_device_icon(info.device_name, icon->Bits(), B_MINI_ICON) != B_OK)
 				GetTrackerResources()->GetIconResource(kResShareIcon, B_MINI_ICON, icon);
-			
+
 			BMessage *message = new BMessage(kUnmountVolume);
 			message->AddInt32("device_id", volume.Device());
 			char volumeName[B_FILE_NAME_LENGTH];
 			volume.GetName(volumeName);
-			
+
 			BMenuItem *item = new IconMenuItem(volumeName, message, icon);
 			item->SetMarked(true);
 			AddItem(item);
@@ -303,12 +312,12 @@ MountMenu::AddDynamicItem(add_state)
 
 	BMenuItem *mountAll = new BMenuItem("Mount All", new BMessage(kMountAllNow));
 	AddItem(mountAll);
-	BMenuItem *mountSettings = new BMenuItem("Settings"B_UTF8_ELLIPSIS, 
+	BMenuItem *mountSettings = new BMenuItem("Settings" B_UTF8_ELLIPSIS,
 		new BMessage(kRunAutomounterSettings));
 	AddItem(mountSettings);
 
 	SetTargetForItems(be_app);
-	
+
 #ifndef __HAIKU__
 	if (rescanItem)
 		rescanItem->SetTarget(autoMounter);
