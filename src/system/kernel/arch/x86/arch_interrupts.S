@@ -357,7 +357,8 @@ handle_syscall:
 	movl	%eax,%ds
 	movl	%eax,%es
 
-	lea		4(%esp), %ebp			// stack frame pointer is the iframe
+	lea		4(%esp), %ebp			// skipping the return address, the stack
+									// frame pointer is the iframe
 	movl	%dr3, %edi				// thread pointer
 
 	// disable breakpoints, if installed
@@ -437,8 +438,8 @@ handle_syscall:
 	// post syscall debugging
 	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%edi)
 	jz		1f
-	pushl	-4(%ebp)				// syscall start time
-	pushl	-8(%ebp)
+	pushl	-8(%ebp)				// syscall start time
+	pushl	-12(%ebp)
 	movl	IFRAME_edx(%ebp), %edx	// syscall return value
 	movl	IFRAME_eax(%ebp), %eax
 	push	%edx
