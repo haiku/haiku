@@ -24,7 +24,7 @@ resource(4, "META:EXTENS") message(234) {
 	"type" = "text/x-source-code"
 };
 
-resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-StyledEdit";
+resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.beunited.pe";
 
 resource(6, "META:ICON") #'VICN' array {
 	$"6E6369660505010200060338D2F73CD163BF82B23B84A94B88504870C900B6F5"
