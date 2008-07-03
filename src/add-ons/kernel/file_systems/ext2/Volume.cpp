@@ -10,6 +10,7 @@
 
 #include <errno.h>
 #include <new>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <fs_cache.h>
@@ -242,7 +243,7 @@ Volume::Name() const
 	if (fSuperBlock.name[0])
 		return fSuperBlock.name;
 
-	return "Unnamed Ext2 Volume";
+	return fName;
 }
 
 
@@ -309,15 +310,31 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return B_ERROR;
 
 	status = get_vnode(fFSVolume, EXT2_ROOT_NODE, (void**)&fRootNode);
-	if (status == B_OK) {
-		// all went fine
-		opener.Keep();
-		return B_OK;
-	} else {
+	if (status != B_OK) {
 		TRACE("could not create root node: get_vnode() failed!\n");
+		return status;
 	}
 
-	return status;
+	// all went fine
+	opener.Keep();
+
+	if (!fSuperBlock.name[0]) {
+		// generate a more or less descriptive volume name
+		uint32 divisor = 1UL << 30;
+		char unit = 'G';
+		if (diskSize < divisor) {
+			divisor = 1UL << 20;
+			unit = 'M';
+		}
+
+		double size = double((10 * diskSize + divisor - 1) / divisor);
+			// %g in the kernel does not support precision...
+
+		snprintf(fName, sizeof(fName), "%g %cB Ext2 Volume",
+			size / 10, unit);
+	}
+
+	return B_OK;
 }
 
 

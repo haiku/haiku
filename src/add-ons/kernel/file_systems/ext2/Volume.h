@@ -59,6 +59,7 @@ private:
 	fs_volume*			fFSVolume;
 	int					fDevice;
 	ext2_super_block	fSuperBlock;
+	char				fName[32];
 	uint32				fFlags;
 	uint32				fBlockSize;
 	uint32				fBlockShift;
