@@ -60,7 +60,27 @@ static caller_info sCallerInfoTable[kCallerInfoTableSize];
 static int32 sCallerInfoCount = 0;
 #endif
 
+typedef struct heap_page_s heap_page;
+
+typedef struct heap_area_s {
+	area_id			area;
+
+	addr_t			base;
+	size_t			size;
+
+	uint32			page_count;
+	uint32			free_page_count;
+
+	heap_page *		free_pages;
+	heap_page *		page_table;
+
+	heap_area_s *	prev;
+	heap_area_s *	next;
+	heap_area_s *	all_next;
+} heap_area;
+
 typedef struct heap_page_s {
+	heap_area *		area;
 	uint16			index;
 	uint16			bin_index : 5;
 	uint16			free_count : 10;
@@ -81,20 +101,17 @@ typedef struct heap_bin_s {
 } heap_bin;
 
 typedef struct heap_allocator_s {
-	addr_t		base;
-	size_t		size;
 	mutex		lock;
-
+	uint32		heap_class;
 	uint32		bin_count;
-	uint32		page_count;
 	uint32		page_size;
-	uint32		free_page_count;
-	heap_page *	free_pages;
+
+	uint32		total_pages;
+	uint32		total_free_pages;
 
 	heap_bin *	bins;
-	heap_page *	page_table;
-
-	heap_allocator_s *	next;
+	heap_area *	areas; // sorted so that the desired area is always first
+	heap_area *	all_areas; // all areas including full ones
 } heap_allocator;
 
 typedef struct heap_class_s {
@@ -137,8 +154,9 @@ static heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
 };
 
 static heap_allocator *sHeapList[HEAP_CLASS_COUNT];
-static heap_allocator *sLastGrowRequest[HEAP_CLASS_COUNT];
-static heap_allocator *sGrowHeapList = NULL;
+static uint32 *sLastGrowRequest[HEAP_CLASS_COUNT];
+static uint32 *sLastHandledGrowRequest[HEAP_CLASS_COUNT];
+static heap_allocator *sGrowHeap = NULL;
 static thread_id sHeapGrowThread = -1;
 static sem_id sHeapGrowSem = -1;
 static sem_id sHeapGrownNotify = -1;
@@ -272,16 +290,40 @@ dump_bin(heap_bin *bin)
 
 
 static void
-dump_allocator(heap_allocator *heap)
+dump_bin_list(heap_allocator *heap)
 {
-	dprintf("allocator %p: base: 0x%08lx; size: %lu; bin_count: %lu; free_pages: %p (%lu entr%s)\n",
-		heap, heap->base, heap->size, heap->bin_count, heap->free_pages,
-		heap->free_page_count, heap->free_page_count == 1 ? "y" : "ies");
-
 	for (uint32 i = 0; i < heap->bin_count; i++)
 		dump_bin(&heap->bins[i]);
+	dprintf("\n");
+}
+
+
+static void
+dump_allocator_areas(heap_allocator *heap)
+{
+	heap_area *area = heap->all_areas;
+	while (area) {
+		dprintf("\tarea %p: area: %ld; base: 0x%08lx; size: %lu; free_pages: %p (%lu entr%s)\n",
+			area, area->area, area->base, area->size, area->free_pages,
+			area->free_page_count, area->free_page_count == 1 ? "y" : "ies");
+		area = area->all_next;
+	}
 
 	dprintf("\n");
+}
+
+
+static void
+dump_allocator(heap_allocator *heap, bool areas, bool bins)
+{
+	dprintf("allocator %p: class: %s; page_size: %lu; bin_count: %lu; pages: %lu; free: %lu\n", heap,
+		sHeapClasses[heap->heap_class].name, heap->page_size, heap->bin_count,
+		heap->total_pages, heap->total_free_pages);
+
+	if (areas)
+		dump_allocator_areas(heap);
+	if (bins)
+		dump_bin_list(heap);
 }
 
 
@@ -291,38 +333,19 @@ dump_heap_list(int argc, char **argv)
 	if (argc == 2) {
 		if (strcmp(argv[1], "grow") == 0) {
 			// only dump dedicated grow heap info
-			dprintf("dedicated grow heap(s):\n");
-			heap_allocator *heap = sGrowHeapList;
-			while (heap) {
-				dump_allocator(heap);
-				heap = heap->next;
-			}
+			dprintf("dedicated grow heap:\n");
+			dump_allocator(sGrowHeap, true, true);
 		} else if (strcmp(argv[1], "stats") == 0) {
-			for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
-				uint32 heapCount = 0;
-				heap_allocator *heap = sHeapList[i];
-				while (heap) {
-					heapCount++;
-					heap = heap->next;
-				}
-
-				dprintf("current %s heap count: %ld\n", sHeapClasses[i].name,
-					heapCount);
-			}
+			for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
+				dump_allocator(sHeapList[i], false, false);
 		} else
 			print_debugger_command_usage(argv[0]);
 
 		return 0;
 	}
 
-	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
-		dprintf("dumping list of %s heaps\n", sHeapClasses[i].name);
-		heap_allocator *heap = sHeapList[i];
-		while (heap) {
-			dump_allocator(heap);
-			heap = heap->next;
-		}
-	}
+	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
+		dump_allocator(sHeapList[i], true, true);
 
 	return 0;
 }
@@ -354,86 +377,88 @@ dump_allocations(int argc, char **argv)
 
 	size_t totalSize = 0;
 	uint32 totalCount = 0;
-	uint32 heapClassIndex = 0;
-	heap_allocator *heap = sHeapList[0];
-	while (heap) {
-		// go through all the pages
-		heap_leak_check_info *info = NULL;
-		for (uint32 i = 0; i < heap->page_count; i++) {
-			heap_page *page = &heap->page_table[i];
-			if (!page->in_use)
-				continue;
+	for (uint32 classIndex = 0; classIndex < HEAP_CLASS_COUNT; classIndex++) {
+		heap_allocator *heap = sHeapList[classIndex];
 
-			addr_t base = heap->base + i * heap->page_size;
-			if (page->bin_index < heap->bin_count) {
-				// page is used by a small allocation bin
-				uint32 elementCount = page->empty_index;
-				size_t elementSize = heap->bins[page->bin_index].element_size;
-				for (uint32 j = 0; j < elementCount; j++, base += elementSize) {
-					// walk the free list to see if this element is in use
-					bool elementInUse = true;
-					for (addr_t *temp = page->free_list; temp != NULL; temp = (addr_t *)*temp) {
-						if ((addr_t)temp == base) {
-							elementInUse = false;
-							break;
+		// go through all the pages in all the areas
+		heap_area *area = heap->all_areas;
+		while (area) {
+			heap_leak_check_info *info = NULL;
+			for (uint32 i = 0; i < area->page_count; i++) {
+				heap_page *page = &area->page_table[i];
+				if (!page->in_use)
+					continue;
+
+				addr_t base = area->base + i * heap->page_size;
+				if (page->bin_index < heap->bin_count) {
+					// page is used by a small allocation bin
+					uint32 elementCount = page->empty_index;
+					size_t elementSize = heap->bins[page->bin_index].element_size;
+					for (uint32 j = 0; j < elementCount; j++, base += elementSize) {
+						// walk the free list to see if this element is in use
+						bool elementInUse = true;
+						for (addr_t *temp = page->free_list; temp != NULL; temp = (addr_t *)*temp) {
+							if ((addr_t)temp == base) {
+								elementInUse = false;
+								break;
+							}
+						}
+
+						if (!elementInUse)
+							continue;
+
+						info = (heap_leak_check_info *)(base + elementSize
+							- sizeof(heap_leak_check_info));
+
+						if ((team == -1 || info->team == team)
+							&& (thread == -1 || info->thread == thread)
+							&& (caller == 0 || info->caller == caller)) {
+							// interesting...
+							if (!statsOnly) {
+								dprintf("team: % 6ld; thread: % 6ld; "
+									"address: 0x%08lx; size: %lu bytes; "
+									"caller: %#lx\n", info->team, info->thread,
+									base, info->size, info->caller);
+							}
+
+							totalSize += info->size;
+							totalCount++;
 						}
 					}
+				} else {
+					// page is used by a big allocation, find the page count
+					uint32 pageCount = 1;
+					while (i + pageCount < area->page_count
+						&& area->page_table[i + pageCount].in_use
+						&& area->page_table[i + pageCount].bin_index == heap->bin_count
+						&& area->page_table[i + pageCount].allocation_id == page->allocation_id)
+						pageCount++;
 
-					if (!elementInUse)
-						continue;
-
-					info = (heap_leak_check_info *)(base + elementSize
-						- sizeof(heap_leak_check_info));
+					info = (heap_leak_check_info *)(base + pageCount
+						* heap->page_size - sizeof(heap_leak_check_info));
 
 					if ((team == -1 || info->team == team)
 						&& (thread == -1 || info->thread == thread)
 						&& (caller == 0 || info->caller == caller)) {
 						// interesting...
 						if (!statsOnly) {
-							dprintf("team: % 6ld; thread: % 6ld; "
-								"address: 0x%08lx; size: %lu bytes, "
-								"caller: %#lx\n", info->team, info->thread,
+							dprintf("team: % 6ld; thread: % 6ld;"
+								" address: 0x%08lx; size: %lu bytes;"
+								" caller: %#lx\n", info->team, info->thread,
 								base, info->size, info->caller);
 						}
 
 						totalSize += info->size;
 						totalCount++;
 					}
+
+					// skip the allocated pages
+					i += pageCount - 1;
 				}
-			} else {
-				// page is used by a big allocation, find the page count
-				uint32 pageCount = 1;
-				while (i + pageCount < heap->page_count
-					&& heap->page_table[i + pageCount].in_use
-					&& heap->page_table[i + pageCount].bin_index == heap->bin_count
-					&& heap->page_table[i + pageCount].allocation_id == page->allocation_id)
-					pageCount++;
-
-				info = (heap_leak_check_info *)(base + pageCount
-					* heap->page_size - sizeof(heap_leak_check_info));
-
-				if ((team == -1 || info->team == team)
-					&& (thread == -1 || info->thread == thread)
-					&& (caller == 0 || info->caller == caller)) {
-					// interesting...
-					if (!statsOnly) {
-						dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx;"
-							" size: %lu bytes, caller: %#lx\n", info->team,
-							info->thread, base, info->size, info->caller);
-					}
-
-					totalSize += info->size;
-					totalCount++;
-				}
-
-				// skip the allocated pages
-				i += pageCount - 1;
 			}
-		}
 
-		heap = heap->next;
-		if (heap == NULL && ++heapClassIndex < HEAP_CLASS_COUNT)
-			heap = sHeapList[heapClassIndex];
+			area = area->all_next;
+		}
 	}
 
 	dprintf("total allocations: %lu; total bytes: %lu\n", totalCount, totalSize);
@@ -497,37 +522,60 @@ dump_allocations_per_caller(int argc, char **argv)
 
 	sCallerInfoCount = 0;
 
-	uint32 heapClassIndex = 0;
-	heap_allocator *heap = sHeapList[0];
-	while (heap) {
-		// go through all the pages
-		heap_leak_check_info *info = NULL;
-		for (uint32 i = 0; i < heap->page_count; i++) {
-			heap_page *page = &heap->page_table[i];
-			if (!page->in_use)
-				continue;
+	for (uint32 classIndex = 0; classIndex < HEAP_CLASS_COUNT; classIndex++) {
+		heap_allocator *heap = sHeapList[classIndex];
 
-			addr_t base = heap->base + i * heap->page_size;
-			if (page->bin_index < heap->bin_count) {
-				// page is used by a small allocation bin
-				uint32 elementCount = page->empty_index;
-				size_t elementSize = heap->bins[page->bin_index].element_size;
-				for (uint32 j = 0; j < elementCount; j++, base += elementSize) {
-					// walk the free list to see if this element is in use
-					bool elementInUse = true;
-					for (addr_t *temp = page->free_list; temp != NULL;
+		// go through all the pages in all the areas
+		heap_area *area = heap->all_areas;
+		while (area) {
+			heap_leak_check_info *info = NULL;
+			for (uint32 i = 0; i < area->page_count; i++) {
+				heap_page *page = &area->page_table[i];
+				if (!page->in_use)
+					continue;
+
+				addr_t base = area->base + i * heap->page_size;
+				if (page->bin_index < heap->bin_count) {
+					// page is used by a small allocation bin
+					uint32 elementCount = page->empty_index;
+					size_t elementSize = heap->bins[page->bin_index].element_size;
+					for (uint32 j = 0; j < elementCount; j++, base += elementSize) {
+						// walk the free list to see if this element is in use
+						bool elementInUse = true;
+						for (addr_t *temp = page->free_list; temp != NULL;
 							temp = (addr_t *)*temp) {
-						if ((addr_t)temp == base) {
-							elementInUse = false;
-							break;
+							if ((addr_t)temp == base) {
+								elementInUse = false;
+								break;
+							}
 						}
+
+						if (!elementInUse)
+							continue;
+
+						info = (heap_leak_check_info *)(base + elementSize
+							- sizeof(heap_leak_check_info));
+
+						caller_info* callerInfo = get_caller_info(info->caller);
+						if (callerInfo == NULL) {
+							kprintf("out of space for caller infos\n");
+							return 0;
+						}
+
+						callerInfo->count++;
+						callerInfo->size += info->size;
 					}
+				} else {
+					// page is used by a big allocation, find the page count
+					uint32 pageCount = 1;
+					while (i + pageCount < area->page_count
+						&& area->page_table[i + pageCount].in_use
+						&& area->page_table[i + pageCount].bin_index == heap->bin_count
+						&& area->page_table[i + pageCount].allocation_id == page->allocation_id)
+						pageCount++;
 
-					if (!elementInUse)
-						continue;
-
-					info = (heap_leak_check_info *)(base + elementSize
-						- sizeof(heap_leak_check_info));
+					info = (heap_leak_check_info *)(base + pageCount
+						* heap->page_size - sizeof(heap_leak_check_info));
 
 					caller_info* callerInfo = get_caller_info(info->caller);
 					if (callerInfo == NULL) {
@@ -537,36 +585,14 @@ dump_allocations_per_caller(int argc, char **argv)
 
 					callerInfo->count++;
 					callerInfo->size += info->size;
+
+					// skip the allocated pages
+					i += pageCount - 1;
 				}
-			} else {
-				// page is used by a big allocation, find the page count
-				uint32 pageCount = 1;
-				while (i + pageCount < heap->page_count
-					&& heap->page_table[i + pageCount].in_use
-					&& heap->page_table[i + pageCount].bin_index == heap->bin_count
-					&& heap->page_table[i + pageCount].allocation_id == page->allocation_id)
-					pageCount++;
-
-				info = (heap_leak_check_info *)(base + pageCount
-					* heap->page_size - sizeof(heap_leak_check_info));
-
-				caller_info* callerInfo = get_caller_info(info->caller);
-				if (callerInfo == NULL) {
-					kprintf("out of space for caller infos\n");
-					return 0;
-				}
-
-				callerInfo->count++;
-				callerInfo->size += info->size;
-
-				// skip the allocated pages
-				i += pageCount - 1;
 			}
-		}
 
-		heap = heap->next;
-		if (heap == NULL && ++heapClassIndex < HEAP_CLASS_COUNT)
-			heap = sHeapList[heapClassIndex];
+			area = area->all_next;
+		}
 	}
 
 	// sort the array
@@ -608,63 +634,102 @@ heap_validate_heap(heap_allocator *heap)
 {
 	mutex_lock(&heap->lock);
 
-	// validate the free pages list
-	uint32 freePageCount = 0;
-	heap_page *lastPage = NULL;
-	heap_page *page = heap->free_pages;
-	while (page) {
-		if ((addr_t)page < (addr_t)&heap->page_table[0]
-			|| (addr_t)page >= (addr_t)&heap->page_table[heap->page_count])
-			panic("free page is not part of the page table\n");
+	uint32 totalPageCount = 0;
+	uint32 totalFreePageCount = 0;
+	heap_area *area = heap->all_areas;
+	while (area) {
+		// validate the free pages list
+		uint32 freePageCount = 0;
+		heap_page *lastPage = NULL;
+		heap_page *page = area->free_pages;
+		while (page) {
+			if ((addr_t)page < (addr_t)&area->page_table[0]
+				|| (addr_t)page >= (addr_t)&area->page_table[area->page_count])
+				panic("free page is not part of the page table\n");
 
-		if (page->index >= heap->page_count)
-			panic("free page has invalid index\n");
+			if (page->index >= area->page_count)
+				panic("free page has invalid index\n");
 
-		if ((addr_t)&heap->page_table[page->index] != (addr_t)page)
-			panic("free page index does not lead to target page\n");
+			if ((addr_t)&area->page_table[page->index] != (addr_t)page)
+				panic("free page index does not lead to target page\n");
 
-		if (page->prev != lastPage)
-			panic("free page entry has invalid prev link\n");
+			if (page->prev != lastPage)
+				panic("free page entry has invalid prev link\n");
 
-		if (page->in_use)
-			panic("free page marked as in use\n");
+			if (page->in_use)
+				panic("free page marked as in use\n");
 
-		lastPage = page;
-		page = page->next;
-		freePageCount++;
+			lastPage = page;
+			page = page->next;
+			freePageCount++;
+		}
+
+		totalPageCount += freePageCount;
+		totalFreePageCount += freePageCount;
+		if (area->free_page_count != freePageCount)
+			panic("free page count doesn't match free page list\n");
+
+		// validate the page table
+		uint32 usedPageCount = 0;
+		for (uint32 i = 0; i < area->page_count; i++) {
+			if (area->page_table[i].in_use)
+				usedPageCount++;
+		}
+
+		totalPageCount += usedPageCount;
+		if (freePageCount + usedPageCount != area->page_count) {
+			panic("free pages and used pages do not add up (%lu + %lu != %lu)\n",
+				freePageCount, usedPageCount, area->page_count);
+		}
+
+		area = area->all_next;
 	}
 
-	if (heap->free_page_count != freePageCount)
-		panic("free page count doesn't match free page list\n");
+	// validate the areas
+	area = heap->areas;
+	heap_area *lastArea = NULL;
+	uint32 lastFreeCount = 0;
+	while (area) {
+		if (area->free_page_count < lastFreeCount)
+			panic("ordering of area list broken\n");
 
-	// validate the page table
-	uint32 usedPageCount = 0;
-	for (uint32 i = 0; i < heap->page_count; i++) {
-		if (heap->page_table[i].in_use)
-			usedPageCount++;
-	}
+		if (area->prev != lastArea)
+			panic("area list entry has invalid prev link\n");
 
-	if (freePageCount + usedPageCount != heap->page_count) {
-		panic("free pages and used pages do not add up (%lu + %lu != %lu)\n",
-			freePageCount, usedPageCount, heap->page_count);
+		lastArea = area;
+		lastFreeCount = area->free_page_count;
+		area = area->next;
 	}
 
 	// validate the bins
 	for (uint32 i = 0; i < heap->bin_count; i++) {
 		heap_bin *bin = &heap->bins[i];
 
-		lastPage = NULL;
-		page = bin->page_list;
-		int32 lastFreeCount = 0;
+		heap_page *lastPage = NULL;
+		heap_page *page = bin->page_list;
+		lastFreeCount = 0;
 		while (page) {
-			if ((addr_t)page < (addr_t)&heap->page_table[0]
-				|| (addr_t)page >= (addr_t)&heap->page_table[heap->page_count])
+			area = heap->all_areas;
+			while (area) {
+				if (area == page->area)
+					break;
+				area = area->all_next;
+			}
+
+			if (area == NULL) {
+				panic("page area not present in area list\n");
+				page = page->next;
+				continue;
+			}
+
+			if ((addr_t)page < (addr_t)&area->page_table[0]
+				|| (addr_t)page >= (addr_t)&area->page_table[area->page_count])
 				panic("used page is not part of the page table\n");
 
-			if (page->index >= heap->page_count)
+			if (page->index >= area->page_count)
 				panic("used page has invalid index\n");
 
-			if ((addr_t)&heap->page_table[page->index] != (addr_t)page)
+			if ((addr_t)&area->page_table[page->index] != (addr_t)page)
 				panic("used page index does not lead to target page\n");
 
 			if (page->prev != lastPage)
@@ -684,7 +749,7 @@ heap_validate_heap(heap_allocator *heap)
 			// validate the free list
 			uint32 freeSlotsCount = 0;
 			addr_t *element = page->free_list;
-			addr_t pageBase = heap->base + page->index * heap->page_size;
+			addr_t pageBase = area->base + page->index * heap->page_size;
 			while (element) {
 				if ((addr_t)element < pageBase
 					|| (addr_t)element >= pageBase + heap->page_size)
@@ -720,14 +785,86 @@ heap_validate_heap(heap_allocator *heap)
 // #pragma mark - Heap functions
 
 
+static void
+heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
+{
+	mutex_lock(&heap->lock);
+
+	heap_area *area = (heap_area *)base;
+	area->area = areaID;
+
+	base += sizeof(heap_area);
+	size -= sizeof(heap_area);
+
+	uint32 pageCount = size / heap->page_size;
+	size_t pageTableSize = pageCount * sizeof(heap_page);
+	area->page_table = (heap_page *)base;
+	base += pageTableSize;
+	size -= pageTableSize;
+
+	// the rest is now actually usable memory (rounded to the next page)
+	area->base = ROUNDUP(base, B_PAGE_SIZE);
+	area->size = size & ~(B_PAGE_SIZE - 1);
+
+	// now we know the real page count
+	pageCount = area->size / heap->page_size;
+	area->page_count = pageCount;
+
+	// zero out the page table and fill in page indexes
+	memset((void *)area->page_table, 0, pageTableSize);
+	for (uint32 i = 0; i < pageCount; i++) {
+		area->page_table[i].area = area;
+		area->page_table[i].index = i;
+	}
+
+	// add all pages up into the free pages list
+	for (uint32 i = 1; i < pageCount; i++) {
+		area->page_table[i - 1].next = &area->page_table[i];
+		area->page_table[i].prev = &area->page_table[i - 1];
+	}
+	area->free_pages = &area->page_table[0];
+	area->free_page_count = pageCount;
+	area->page_table[0].prev = NULL;
+
+	area->next = NULL;
+	if (heap->areas == NULL) {
+		// it's the only (empty) area in that heap
+		area->prev = NULL;
+		heap->areas = area;
+	} else {
+		// link in this area as the last one as it is completely empty
+		heap_area *lastArea = heap->areas;
+		while (lastArea->next != NULL)
+			lastArea = lastArea->next;
+
+		lastArea->next = area;
+		area->prev = lastArea;
+	}
+
+	area->all_next = heap->all_areas;
+	heap->all_areas = area;
+	heap->total_pages += area->page_count;
+	heap->total_free_pages += area->free_page_count;
+
+	mutex_unlock(&heap->lock);
+
+	dprintf("heap_add_area: area added to %s heap %p - usable range 0x%08lx - 0x%08lx\n",
+		sHeapClasses[heap->heap_class].name, heap, area->base,
+		area->base + area->size);
+}
+
+
 static heap_allocator *
-heap_attach(addr_t base, size_t size, uint32 heapClass)
+heap_create_allocator(addr_t base, size_t size, uint32 heapClass)
 {
 	heap_allocator *heap = (heap_allocator *)base;
 	base += sizeof(heap_allocator);
 	size -= sizeof(heap_allocator);
 
+	heap->heap_class = heapClass;
 	heap->page_size = sHeapClasses[heapClass].page_size;
+	heap->total_pages = heap->total_free_pages = 0;
+	heap->areas = heap->all_areas = NULL;
 	heap->bins = (heap_bin *)base;
 
 	heap->bin_count = 0;
@@ -746,40 +883,78 @@ heap_attach(addr_t base, size_t size, uint32 heapClass)
 	base += heap->bin_count * sizeof(heap_bin);
 	size -= heap->bin_count * sizeof(heap_bin);
 
-	uint32 pageCount = size / heap->page_size;
-	size_t pageTableSize = pageCount * sizeof(heap_page);
-	heap->page_table = (heap_page *)base;
-	base += pageTableSize;
-	size -= pageTableSize;
-
-	// the rest is now actually usable memory (rounded to the next page)
-	heap->base = ROUNDUP(base, B_PAGE_SIZE);
-	heap->size = (size / B_PAGE_SIZE) * B_PAGE_SIZE;
-
-	// now we know the real page count
-	pageCount = heap->size / heap->page_size;
-	heap->page_count = pageCount;
-
-	// zero out the heap alloc table at the base of the heap
-	memset((void *)heap->page_table, 0, pageTableSize);
-	for (uint32 i = 0; i < pageCount; i++)
-		heap->page_table[i].index = i;
-
-	// add all pages up into the free pages list
-	for (uint32 i = 1; i < pageCount; i++) {
-		heap->page_table[i - 1].next = &heap->page_table[i];
-		heap->page_table[i].prev = &heap->page_table[i - 1];
-	}
-	heap->free_pages = &heap->page_table[0];
-	heap->free_page_count = pageCount;
-	heap->page_table[0].prev = NULL;
-
 	mutex_init(&heap->lock, "heap_mutex");
 
-	heap->next = NULL;
-	dprintf("heap_attach: %s heap attached to %p - usable range 0x%08lx - 0x%08lx\n",
-		sHeapClasses[heapClass].name, heap, heap->base, heap->base + heap->size);
+	heap_add_area(heap, -1, base, size);
 	return heap;
+}
+
+
+static inline void
+heap_free_pages_added(heap_allocator *heap, heap_area *area, uint32 pageCount)
+{
+	area->free_page_count += pageCount;
+	heap->total_free_pages += pageCount;
+
+	if (area->free_page_count == 1) {
+		// we need to add ourselfs to the area list of the heap
+		area->prev = NULL;
+		area->next = heap->areas;
+		if (area->next)
+			area->next->prev = area;
+		heap->areas = area;
+	} else {
+		// we might need to move back in the area list
+		if (area->next && area->next->free_page_count < area->free_page_count) {
+			// move ourselfs so the list stays ordered
+			heap_area *insert = area->next;
+			while (insert->next
+				&& insert->next->free_page_count < area->free_page_count)
+				insert = insert->next;
+
+			if (area->prev)
+				area->prev->next = area->next;
+			if (area->next)
+				area->next->prev = area->prev;
+			if (heap->areas == area) {
+				heap->areas = area->next;
+				if (area->next)
+					area->next->prev = NULL;
+			}
+
+			area->prev = insert;
+			area->next = insert->next;
+			if (area->next)
+				area->next->prev = area;
+			insert->next = area;
+		}
+	}
+
+	// can and should we free this area?
+	if (area->free_page_count == area->page_count && area->area >= B_OK) {
+		uint32 pagesLeft = heap->total_pages - area->page_count;
+		uint32 freePagesLeft = heap->total_free_pages - area->free_page_count;
+		if (freePagesLeft > pagesLeft / 10) {
+			// there are still more than 10% of free pages if we free it
+			dprintf("heap: should free empty area %ld\n", area->area);
+		}
+	}
+}
+
+
+static inline void
+heap_free_pages_removed(heap_allocator *heap, heap_area *area, uint32 pageCount)
+{
+	area->free_page_count -= pageCount;
+	heap->total_free_pages -= pageCount;
+
+	if (area->free_page_count == 0) {
+		// the area is now full so we remove it from the area list
+		heap->areas = area->next;
+		if (area->next)
+			area->next->prev = NULL;
+		area->next = area->prev = NULL;
+	}
 }
 
 
@@ -809,24 +984,93 @@ heap_unlink_page(heap_page *page, heap_page **list)
 }
 
 
+static heap_page *
+heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount)
+{
+	heap_area *area = heap->areas;
+	while (area) {
+		bool found = false;
+		int32 first = -1;
+		for (uint32 i = 0; i < area->page_count; i++) {
+			if (area->page_table[i].in_use) {
+				first = -1;
+				continue;
+			}
+
+			if (first > 0) {
+				if ((i + 1 - first) == pageCount) {
+					found = true;
+					break;
+				}
+			} else
+				first = i;
+		}
+
+		if (!found) {
+			area = area->next;
+			continue;
+		}
+
+		for (uint32 i = first; i < first + pageCount; i++) {
+			heap_page *page = &area->page_table[i];
+			page->in_use = 1;
+			page->bin_index = heap->bin_count;
+
+			heap_unlink_page(page, &area->free_pages);
+
+			page->next = page->prev = NULL;
+			page->free_list = NULL;
+			page->allocation_id = (uint16)first;
+		}
+
+		heap_free_pages_removed(heap, area, pageCount);
+		return &area->page_table[first];
+	}
+
+	return NULL;
+}
+
+
 static void *
 heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 {
-	heap_bin *bin = NULL;
-	if (binIndex < heap->bin_count)
-		bin = &heap->bins[binIndex];
+	if (binIndex < heap->bin_count) {
+		heap_bin *bin = &heap->bins[binIndex];
+		heap_page *page = bin->page_list;
+		if (page == NULL) {
+			heap_area *area = heap->areas;
+			if (area == NULL) {
+				TRACE(("heap %p: no free pages to allocate %lu bytes\n", heap,
+					size));
+				return NULL;
+			}
 
-	if (bin && bin->page_list != NULL) {
+			// by design there are only areas in the list that still have
+			// free pages available
+			page = area->free_pages;
+			area->free_pages = page->next;
+			if (page->next)
+				page->next->prev = NULL;
+
+			heap_free_pages_removed(heap, area, 1);
+			page->in_use = 1;
+			page->bin_index = binIndex;
+			page->free_count = bin->max_free_count;
+			page->empty_index = 0;
+			page->free_list = NULL;
+			page->next = page->prev = NULL;
+			bin->page_list = page;
+		}
+
 		// we have a page where we have a free slot
 		void *address = NULL;
-		heap_page *page = bin->page_list;
 		if (page->free_list) {
 			// there's a previously freed entry we can use
 			address = page->free_list;
 			page->free_list = (addr_t *)*page->free_list;
 		} else {
 			// the page hasn't been fully allocated so use the next empty_index
-			address = (void *)(heap->base + page->index * heap->page_size
+			address = (void *)(page->area->base + page->index * heap->page_size
 				+ page->empty_index * bin->element_size);
 			page->empty_index++;
 		}
@@ -851,93 +1095,24 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		return address;
 	}
 
-	// we don't have anything free right away, we must allocate a new page
-	if (heap->free_pages == NULL) {
-		// there are no free pages anymore, we ran out of memory
-		TRACE(("heap %p: no free pages to allocate %lu bytes\n", heap, size));
-		return NULL;
-	}
-
-	if (bin) {
-		// small allocation, just grab the next free page
-		heap_page *page = heap->free_pages;
-		heap->free_pages = page->next;
-		heap->free_page_count--;
-		if (page->next)
-			page->next->prev = NULL;
-
-		page->in_use = 1;
-		page->bin_index = binIndex;
-		page->free_count = bin->max_free_count - 1;
-		page->empty_index = 1;
-		page->free_list = NULL;
-		page->next = page->prev = NULL;
-
-		if (page->free_count > 0) {
-			// by design there are no other pages in the bins page list
-			bin->page_list = page;
-		}
-
-#if KERNEL_HEAP_LEAK_CHECK
-		heap_leak_check_info *info = (heap_leak_check_info *)(heap->base
-			+ page->index * heap->page_size + bin->element_size
-			- sizeof(heap_leak_check_info));
-		info->size = size - sizeof(heap_leak_check_info);
-		info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
-		info->team = (kernel_startup ? 0 : team_get_current_team_id());
-		info->caller = get_caller();
-#endif
-
-		// we return the first slot in this page
-		return (void *)(heap->base + page->index * heap->page_size);
-	}
-
-	// large allocation, we must search for contiguous slots
-	bool found = false;
-	int32 first = -1;
-	for (uint32 i = 0; i < heap->page_count; i++) {
-		if (heap->page_table[i].in_use) {
-			first = -1;
-			continue;
-		}
-
-		if (first > 0) {
-			if ((1 + i - first) * heap->page_size >= size) {
-				found = true;
-				break;
-			}
-		} else
-			first = i;
-	}
-
-	if (!found) {
-		TRACE(("heap %p: found no contiguous pages to allocate %ld bytes\n", heap, size));
-		return NULL;
-	}
-
 	uint32 pageCount = (size + heap->page_size - 1) / heap->page_size;
-	for (uint32 i = first; i < first + pageCount; i++) {
-		heap_page *page = &heap->page_table[i];
-		page->in_use = 1;
-		page->bin_index = binIndex;
-
-		heap_unlink_page(page, &heap->free_pages);
-
-		page->next = page->prev = NULL;
-		page->free_list = NULL;
-		page->allocation_id = (uint16)first;
+	heap_page *firstPage = heap_allocate_contiguous_pages(heap, pageCount);
+	if (firstPage == NULL) {
+		TRACE(("heap %p: found no contiguous pages to allocate %ld bytes\n",
+			heap, size));
+		return NULL;
 	}
-	heap->free_page_count -= pageCount;
 
 #if KERNEL_HEAP_LEAK_CHECK
-	heap_leak_check_info *info = (heap_leak_check_info *)(heap->base
-		+ (first + pageCount) * heap->page_size - sizeof(heap_leak_check_info));
+	heap_leak_check_info *info = (heap_leak_check_info *)(firstPage->area->base
+		+ (firstPage->index + pageCount) * heap->page_size
+		- sizeof(heap_leak_check_info));
 	info->size = size - sizeof(heap_leak_check_info);
 	info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
 	info->team = (kernel_startup ? 0 : team_get_current_team_id());
 	info->caller = get_caller();
 #endif
-	return (void *)(heap->base + first * heap->page_size);
+	return (void *)(firstPage->area->base + firstPage->index * heap->page_size);
 }
 
 
@@ -954,9 +1129,8 @@ is_valid_alignment(size_t number)
 inline bool
 heap_should_grow(heap_allocator *heap)
 {
-	// suggest growing if it is the last heap and has less than 10% free pages
-	return heap->next == NULL
-		&& heap->free_page_count < heap->page_count / 10;
+	// suggest growing if there are less than 10% free pages
+	return heap->total_free_pages < heap->total_pages / 10;
 }
 
 
@@ -1030,17 +1204,26 @@ heap_free(heap_allocator *heap, void *address)
 	if (address == NULL)
 		return B_OK;
 
-	if ((addr_t)address < heap->base
-		|| (addr_t)address >= heap->base + heap->size) {
+	mutex_lock(&heap->lock);
+
+	heap_area *area = heap->all_areas;
+	while (area) {
+		if ((addr_t)address >= area->base
+			&& (addr_t)address < area->base + area->size)
+			break;
+
+		area = area->all_next;
+	}
+
+	if (area == NULL) {
 		// this address does not belong to us
+		mutex_unlock(&heap->lock);
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	mutex_lock(&heap->lock);
+	TRACE(("free(): asked to free pointer %p\n", address));
 
-	TRACE(("free(): asked to free at ptr = %p\n", address));
-
-	heap_page *page = &heap->page_table[((addr_t)address - heap->base)
+	heap_page *page = &area->page_table[((addr_t)address - area->base)
 		/ heap->page_size];
 
 	TRACE(("free(): page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
@@ -1054,7 +1237,7 @@ heap_free(heap_allocator *heap, void *address)
 	if (page->bin_index < heap->bin_count) {
 		// small allocation
 		heap_bin *bin = &heap->bins[page->bin_index];
-		if (((addr_t)address - heap->base - page->index
+		if (((addr_t)address - area->base - page->index
 			* heap->page_size) % bin->element_size != 0) {
 			panic("free(): passed invalid pointer %p supposed to be in bin for element size %ld\n", address, bin->element_size);
 			mutex_unlock(&heap->lock);
@@ -1095,8 +1278,8 @@ heap_free(heap_allocator *heap, void *address)
 			// we are now empty, remove the page from the bin list
 			heap_unlink_page(page, &bin->page_list);
 			page->in_use = 0;
-			heap_link_page(page, &heap->free_pages);
-			heap->free_page_count++;
+			heap_link_page(page, &area->free_pages);
+			heap_free_pages_added(heap, area, 1);
 		} else if (page->free_count == 1) {
 			// we need to add ourselfs to the page list of the bin
 			heap_link_page(page, &bin->page_list);
@@ -1121,7 +1304,8 @@ heap_free(heap_allocator *heap, void *address)
 	} else {
 		// large allocation, just return the pages to the page free list
 		uint32 allocationID = page->allocation_id;
-		uint32 maxPages = heap->page_count - page->index;
+		uint32 maxPages = area->page_count - page->index;
+		uint32 pageCount = 0;
 		for (uint32 i = 0; i < maxPages; i++) {
 			// loop until we find the end of this allocation
 			if (!page[i].in_use || page[i].bin_index != heap->bin_count
@@ -1133,13 +1317,12 @@ heap_free(heap_allocator *heap, void *address)
 			page[i].allocation_id = 0;
 
 			// return it to the free list
-			heap_link_page(&page[i], &heap->free_pages);
-			heap->free_page_count++;
+			heap_link_page(&page[i], &area->free_pages);
+			pageCount++;
 		}
-	}
 
-	if (heap->free_page_count == heap->page_count)
-		dprintf("heap_free: heap %p is completely empty and could be freed\n", heap);
+		heap_free_pages_added(heap, area, pageCount);
+	}
 
 	T(Free((addr_t)address));
 	mutex_unlock(&heap->lock);
@@ -1151,16 +1334,25 @@ static status_t
 heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	size_t newSize)
 {
-	if ((addr_t)address < heap->base
-		|| (addr_t)address >= heap->base + heap->size) {
+	mutex_lock(&heap->lock);
+	heap_area *area = heap->all_areas;
+	while (area) {
+		if ((addr_t)address >= area->base
+			&& (addr_t)address < area->base + area->size)
+			break;
+
+		area = area->all_next;
+	}
+
+	if (area == NULL) {
 		// this address does not belong to us
+		mutex_unlock(&heap->lock);
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	mutex_lock(&heap->lock);
 	TRACE(("realloc(address = %p, newSize = %lu)\n", address, newSize));
 
-	heap_page *page = &heap->page_table[((addr_t)address - heap->base)
+	heap_page *page = &area->page_table[((addr_t)address - area->base)
 		/ heap->page_size];
 	if (page->bin_index > heap->bin_count) {
 		panic("realloc(): page %p: invalid bin_index %d\n", page, page->bin_index);
@@ -1180,7 +1372,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	} else {
 		// this was a large allocation
 		uint32 allocationID = page->allocation_id;
-		uint32 maxPages = heap->page_count - page->index;
+		uint32 maxPages = area->page_count - page->index;
 		maxSize = heap->page_size;
 		for (uint32 i = 1; i < maxPages; i++) {
 			if (!page[i].in_use || page[i].bin_index != heap->bin_count
@@ -1219,7 +1411,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 #endif
 
 	// if not, allocate a new chunk of memory
-	*newAddress = malloc(newSize);
+	*newAddress = memalign(0, newSize);
 	T(Reallocate((addr_t)address, (addr_t)*newAddress, newSize));
 	if (*newAddress == NULL) {
 		// we tried but it didn't work out, but still the operation is done
@@ -1272,83 +1464,56 @@ deferred_deleter(void *arg, int iteration)
 //	#pragma mark -
 
 
-static heap_allocator *
-heap_create_new_heap(const char *name, size_t size, uint32 heapClass)
+static status_t
+heap_create_new_heap_area(heap_allocator *heap, const char *name, size_t size)
 {
-	void *heapAddress = NULL;
-	area_id heapArea = create_area(name, &heapAddress,
+	void *address = NULL;
+	area_id heapArea = create_area(name, &address,
 		B_ANY_KERNEL_BLOCK_ADDRESS, size, B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (heapArea < B_OK) {
-		TRACE(("heap: couldn't allocate heap \"%s\"\n", name));
-		return NULL;
+		TRACE(("heap: couldn't allocate heap area \"%s\"\n", name));
+		return heapArea;
 	}
 
-	heap_allocator *newHeap = heap_attach((addr_t)heapAddress, size, heapClass);
-	if (newHeap == NULL) {
-		panic("heap: could not attach heap to area!\n");
-		delete_area(heapArea);
-		return NULL;
-	}
-
+	heap_add_area(heap, heapArea, (addr_t)address, size);
 #if PARANOID_VALIDATION
-	heap_validate_heap(newHeap);
+	heap_validate_heap(heap);
 #endif
-	return newHeap;
+	return B_OK;
 }
 
 
 static int32
 heap_grow_thread(void *)
 {
-	heap_allocator *growHeap = sGrowHeapList;
 	while (true) {
 		// wait for a request to grow the heap list
 		if (acquire_sem(sHeapGrowSem) < B_OK)
 			continue;
 
 		if (sAddGrowHeap) {
-			while (growHeap->next)
-				growHeap = growHeap->next;
-
 			// the last grow heap is going to run full soon, try to allocate
 			// a new one to make some room.
 			TRACE(("heap_grower: grow heaps will run out of memory soon\n"));
-			heap_allocator *newHeap = heap_create_new_heap(
-				"additional grow heap", HEAP_DEDICATED_GROW_SIZE, 0);
-			if (newHeap != NULL) {
-#if PARANOID_VALIDATION
-				heap_validate_heap(newHeap);
-#endif
-				growHeap->next = newHeap;
-				sAddGrowHeap = false;
-				TRACE(("heap_grower: new grow heap %p linked in\n", newHeap));
-			} else
-				dprintf("heap_grower: failed to create new grow heap\n");
+			if (heap_create_new_heap_area(sGrowHeap, "additional grow heap",
+				HEAP_DEDICATED_GROW_SIZE) != B_OK)
+				dprintf("heap_grower: failed to create new grow heap area\n");
 		}
 
 		for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
 			// find the last heap
 			heap_allocator *heap = sHeapList[i];
-			while (heap->next)
-				heap = heap->next;
-
-			if (sLastGrowRequest[i] == heap || heap_should_grow(heap)) {
+			if (sLastGrowRequest[i] > sLastHandledGrowRequest[i]
+				|| heap_should_grow(heap)) {
 				// grow this heap if it is nearly full or if a grow was
 				// explicitly requested for this heap (happens when a large
 				// allocation cannot be fulfilled due to lack of contiguous
 				// pages)
-				heap_allocator *newHeap = heap_create_new_heap("additional heap",
-					HEAP_GROW_SIZE, i);
-				if (newHeap != NULL) {
-#if PARANOID_VALIDATION
-					heap_validate_heap(newHeap);
-#endif
-					heap->next = newHeap;
-					TRACE(("heap_grower: new %s heap linked in\n",
-						sHeapClasses[i].name));
-				} else
-					dprintf("heap_grower: failed to create new heap\n");
+				if (heap_create_new_heap_area(heap, "additional heap",
+					HEAP_GROW_SIZE) != B_OK)
+					dprintf("heap_grower: failed to create new heap area\n");
+				sLastHandledGrowRequest[i] = sLastGrowRequest[i];
 			}
 		}
 
@@ -1365,8 +1530,8 @@ heap_init(addr_t base, size_t size)
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
 		size_t partSize = size * sHeapClasses[i].initial_percentage / 100;
-		sHeapList[i] = heap_attach(base, partSize, i);
-		sLastGrowRequest[i] = sHeapList[i];
+		sHeapList[i] = heap_create_allocator(base, partSize, i);
+		sLastGrowRequest[i] = sLastHandledGrowRequest[i] = 0;
 		base += partSize;
 	}
 
@@ -1420,10 +1585,19 @@ heap_init_post_sem()
 status_t
 heap_init_post_thread()
 {
-	sGrowHeapList = heap_create_new_heap("dedicated grow heap",
+	void *address = NULL;
+	area_id growHeapArea = create_area("dedicated grow heap", &address,
+		B_ANY_KERNEL_BLOCK_ADDRESS, HEAP_DEDICATED_GROW_SIZE, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (growHeapArea < B_OK) {
+		panic("heap_init_post_thread(): couldn't allocate dedicate grow heap area");
+		return growHeapArea;
+	}
+
+	sGrowHeap = heap_create_allocator((addr_t)address,
 		HEAP_DEDICATED_GROW_SIZE, 0);
-	if (sGrowHeapList == NULL) {
-		panic("heap_init_post_thread(): failed to attach dedicated grow heap\n");
+	if (sGrowHeap == NULL) {
+		panic("heap_init_post_thread(): failed to create dedicated grow heap\n");
 		return B_ERROR;
 	}
 
@@ -1490,39 +1664,29 @@ memalign(size_t alignment, size_t size)
 	}
 
 	heap_allocator *heap = sHeapList[heap_class_for(size)];
-	while (heap) {
-		bool shouldGrow = false;
-		void *result = heap_memalign(heap, alignment, size, &shouldGrow);
-		if (heap->next == NULL && (shouldGrow || result == NULL)) {
-			// the last heap will or has run out of memory, notify the grower
-			sLastGrowRequest[heap_class_for(size)] = heap;
-			if (result == NULL) {
-				// urgent request, do the request and wait
-				switch_sem(sHeapGrowSem, sHeapGrownNotify);
-				if (heap->next == NULL) {
-					// the grower didn't manage to add a new heap
-					return NULL;
-				}
-			} else {
-				// not so urgent, just notify the grower
-				release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
-			}
-		}
-
+	bool shouldGrow = false;
+	void *result = heap_memalign(heap, alignment, size, &shouldGrow);
+	if (shouldGrow || result == NULL) {
+		// the heap will or has run out of memory, notify the grower
+		sLastGrowRequest[heap_class_for(size)]++;
 		if (result == NULL) {
-			heap = heap->next;
-			continue;
+			// urgent request, do the request and wait
+			switch_sem(sHeapGrowSem, sHeapGrownNotify);
+			// try again now
+			result = heap_memalign(heap, alignment, size, NULL);
+		} else {
+			// not so urgent, just notify the grower
+			release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
 		}
-
-#if PARANOID_VALIDATION
-		heap_validate_heap(heap);
-#endif
-
-		return result;
 	}
 
-	panic("heap: kernel heap has run out of memory\n");
-	return NULL;
+#if PARANOID_VALIDATION
+	heap_validate_heap(heap);
+#endif
+
+	if (result == NULL)
+		panic("heap: kernel heap has run out of memory\n");
+	return result;
 }
 
 
@@ -1532,39 +1696,32 @@ malloc_nogrow(size_t size)
 	// use dedicated memory in the grow thread by default
 	if (thread_get_current_thread_id() == sHeapGrowThread) {
 		bool shouldGrow = false;
-		heap_allocator *heap = sGrowHeapList;
-		while (heap) {
-			void *result = heap_memalign(heap, 0, size, &shouldGrow);
-			if (shouldGrow && heap->next == NULL && !sAddGrowHeap) {
-				// hopefully the heap grower will manage to create a new heap
-				// before running out of private memory...
-				dprintf("heap: requesting new grow heap\n");
-				sAddGrowHeap = true;
-				release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
-			}
-
-			if (result != NULL)
-				return result;
-
-			heap = heap->next;
+		heap_allocator *heap = sGrowHeap;
+		void *result = heap_memalign(heap, 0, size, &shouldGrow);
+		if (shouldGrow && !sAddGrowHeap) {
+			// hopefully the heap grower will manage to create a new heap
+			// before running out of private memory...
+			dprintf("heap: requesting new grow heap\n");
+			sAddGrowHeap = true;
+			release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
 		}
+
+		if (result != NULL)
+			return result;
 	}
 
 	// try public memory, there might be something available
 	heap_allocator *heap = sHeapList[heap_class_for(size)];
-	while (heap) {
-		void *result = heap_memalign(heap, 0, size, NULL);
-		if (result != NULL)
-			return result;
-
-		heap = heap->next;
-	}
+	void *result = heap_memalign(heap, 0, size, NULL);
+	if (result != NULL)
+		return result;
 
 	// no memory available
 	if (thread_get_current_thread_id() == sHeapGrowThread)
 		panic("heap: all heaps have run out of memory while growing\n");
 	else
 		dprintf("heap: all heaps have run out of memory\n");
+
 	return NULL;
 }
 
@@ -1586,26 +1743,17 @@ free(void *address)
 
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
 		heap_allocator *heap = sHeapList[i];
-		while (heap) {
-			if (heap_free(heap, address) == B_OK) {
+		if (heap_free(heap, address) == B_OK) {
 #if PARANOID_VALIDATION
-				heap_validate_heap(heap);
+			heap_validate_heap(heap);
 #endif
-				return;
-			}
-
-			heap = heap->next;
+			return;
 		}
 	}
 
-	// maybe it was allocated from a dedicated grow heap
-	heap_allocator *heap = sGrowHeapList;
-	while (heap) {
-		if (heap_free(heap, address) == B_OK)
-			return;
-
-		heap = heap->next;
-	}
+	// maybe it was allocated from the dedicated grow heap
+	if (heap_free(sGrowHeap, address) == B_OK)
+		return;
 
 	// or maybe it was a huge allocation using an area
 	area_info areaInfo;
@@ -1644,22 +1792,22 @@ realloc(void *address, size_t newSize)
 		return NULL;
 	}
 
+	void *newAddress = NULL;
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
 		heap_allocator *heap = sHeapList[i];
-		while (heap) {
-			void *newAddress = NULL;
-			if (heap_realloc(heap, address, &newAddress, newSize) == B_OK) {
+		if (heap_realloc(heap, address, &newAddress, newSize) == B_OK) {
 #if PARANOID_VALIDATION
-				heap_validate_heap(heap);
+			heap_validate_heap(heap);
 #endif
-				return newAddress;
-			}
-
-			heap = heap->next;
+			return newAddress;
 		}
 	}
 
-	// maybe a huge allocation using an area
+	// maybe it was allocated from the dedicated grow heap
+	if (heap_realloc(sGrowHeap, address, &newAddress, newSize) == B_OK)
+		return newAddress;
+
+	// or maybe it was a huge allocation using an area
 	area_info areaInfo;
 	area_id area = area_for(address);
 	if (area >= B_OK && get_area_info(area, &areaInfo) == B_OK) {
@@ -1680,7 +1828,7 @@ realloc(void *address, size_t newSize)
 			}
 
 			// have to allocate/copy/free - TODO maybe resize the area instead?
-			void *newAddress = memalign(0, newSize);
+			newAddress = memalign(0, newSize);
 			if (newAddress == NULL) {
 				dprintf("realloc(): failed to allocate new block of %ld bytes\n",
 					newSize);
