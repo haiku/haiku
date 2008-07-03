@@ -17,16 +17,18 @@
 #include <sys/stat.h>
 
 #include <FindDirectory.h>
+#include <NodeMonitor.h>
 
 #include <boot_device.h>
-#include <elf.h>
-#include <lock.h>
-#include <vfs.h>
 #include <boot/elf.h>
+#include <elf.h>
 #include <fs/KPath.h>
+#include <lock.h>
+#include <Notifications.h>
 #include <safemode.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
+#include <vfs.h>
 
 
 //#define TRACE_MODULE
@@ -51,7 +53,7 @@ extern module_info gFrameBufferConsoleModule;
 extern module_info gRootFileSystem;
 extern module_info gDeviceFileSystem;
 
-static module_info *sBuiltInModules[] = {
+static module_info* sBuiltInModules[] = {
 	&gDeviceManagerModule,
 	&gDeviceRootModule,
 	&gFrameBufferConsoleModule,
@@ -74,17 +76,17 @@ enum module_state {
 /* Each loaded module image (which can export several modules) is put
  * in a hash (gModuleImagesHash) to be easily found when you search
  * for a specific file name.
- * ToDo: Could use only the inode number for hashing. Would probably be
+ * TODO: Could use only the inode number for hashing. Would probably be
  * a little bit slower, but would lower the memory foot print quite a lot.
  */
 
 struct module_image {
-	struct module_image	*next;
-	module_info			**info;		/* the module_info we use */
-	module_dependency	*dependencies;
-	char				*path;		/* the full path for the module */
+	struct module_image* next;
+	module_info**		info;		// the module_info we use
+	module_dependency*	dependencies;
+	char*				path;		// the full path for the module
 	image_id			image;
-	int32				ref_count;	/* how many ref's to this file */
+	int32				ref_count;	// how many ref's to this file
 	bool				keep_loaded;
 };
 
@@ -93,56 +95,98 @@ struct module_image {
  */
 
 struct module {
-	struct module		*next;
-	::module_image		*module_image;
-	char				*name;
-	char				*file;
+	struct module*		next;
+	::module_image*		module_image;
+	char*				name;
+	char*				file;
 	int32				ref_count;
-	module_info			*info;		/* will only be valid if ref_count > 0 */
-	int32				offset;		/* this is the offset in the headers */
-	module_state		state;		/* state of module */
+	module_info*		info;		// will only be valid if ref_count > 0
+	int32				offset;		// this is the offset in the headers
+	module_state		state;
 	uint32				flags;
 };
 
 #define B_BUILT_IN_MODULE	2
 
 typedef struct module_path {
-	const char			*name;
+	const char*			name;
 	uint32				base_length;
 } module_path;
 
 typedef struct module_iterator {
-	module_path			*stack;
+	module_path*		stack;
 	int32				stack_size;
 	int32				stack_current;
 
-	char				*prefix;
+	char*				prefix;
 	size_t				prefix_length;
-	const char			*suffix;
+	const char*			suffix;
 	size_t				suffix_length;
-	DIR					*current_dir;
+	DIR*				current_dir;
 	status_t			status;
 	int32				module_offset;
-		/* This is used to keep track of which module_info
-		 * within a module we're addressing. */
-	::module_image		*module_image;
-	module_info			**current_header;
-	const char			*current_path;
+		// This is used to keep track of which module_info
+		// within a module we're addressing.
+	::module_image*		module_image;
+	module_info**		current_header;
+	const char*			current_path;
 	uint32				path_base_length;
-	const char			*current_module_path;
+	const char*			current_module_path;
 	bool				builtin_modules;
 	bool				loaded_modules;
 } module_iterator;
 
+namespace Module {
 
-static bool sDisableUserAddOns = false;
+struct module_listener : DoublyLinkedListLink<module_listener> {
+	NotificationListener* listener;
+	const char*			prefix;
+};
 
-/* locking scheme: there is a global lock only; having several locks
- * makes trouble if dependent modules get loaded concurrently ->
- * they have to wait for each other, i.e. we need one lock per module;
- * also we must detect circular references during init and not dead-lock
- */
-static recursive_lock sModulesLock;
+typedef DoublyLinkedList<module_listener> ModuleListenerList;
+
+class ModuleNotificationService : public NotificationService {
+public:
+						ModuleNotificationService();
+	virtual				~ModuleNotificationService();
+
+			status_t	InitCheck();
+
+			status_t	AddListener(const KMessage* eventSpecifier,
+							NotificationListener& listener);
+			status_t	UpdateListener(const KMessage* eventSpecifier,
+							NotificationListener& listener);
+			status_t	RemoveListener(const KMessage* eventSpecifier,
+							NotificationListener& listener);
+
+	virtual const char*	Name() { return "modules"; }
+
+private:
+	recursive_lock		fLock;
+	ModuleListenerList	fListeners;
+};
+
+class DirectoryWatcher : public NotificationListener {
+public:
+						DirectoryWatcher();
+	virtual				~DirectoryWatcher();
+
+	virtual void		EventOccured(NotificationService& service,
+							const KMessage* event);
+};
+
+class ModuleWatcher : public NotificationListener {
+public:
+						ModuleWatcher();
+	virtual				~ModuleWatcher();
+
+	virtual void		EventOccured(NotificationService& service,
+							const KMessage* event);
+};
+
+}	// namespace Module
+
+using namespace Module;
 
 /* These are the standard base paths where we start to look for modules
  * to load. Order is important, the last entry here will be searched
@@ -158,19 +202,30 @@ static const uint32 kNumModulePaths = sizeof(kModulePaths)
 	/ sizeof(kModulePaths[0]);
 static const uint32 kFirstNonSystemModulePath = 1;
 
+
+static ModuleNotificationService sModuleNotificationService;
+static bool sDisableUserAddOns = false;
+
+/* locking scheme: there is a global lock only; having several locks
+ * makes trouble if dependent modules get loaded concurrently ->
+ * they have to wait for each other, i.e. we need one lock per module;
+ * also we must detect circular references during init and not dead-lock
+ */
+static recursive_lock sModulesLock;
+
 /* We store the loaded modules by directory path, and all known modules
  * by module name in a hash table for quick access
  */
-static hash_table *sModuleImagesHash;
-static hash_table *sModulesHash;
+static hash_table* sModuleImagesHash;
+static hash_table* sModulesHash;
 
 
 /*!	Calculates hash for a module using its name */
 static uint32
-module_hash(void *_module, const void *_key, uint32 range)
+module_hash(void* _module, const void* _key, uint32 range)
 {
-	module *module = (struct module *)_module;
-	const char *name = (const char *)_key;
+	module* module = (struct module*)_module;
+	const char* name = (const char*)_key;
 
 	if (module != NULL)
 		return hash_hash_string(module->name) % range;
@@ -184,10 +239,10 @@ module_hash(void *_module, const void *_key, uint32 range)
 
 /*!	Compares a module to a given name */
 static int
-module_compare(void *_module, const void *_key)
+module_compare(void* _module, const void* _key)
 {
-	module *module = (struct module *)_module;
-	const char *name = (const char *)_key;
+	module* module = (struct module*)_module;
+	const char* name = (const char*)_key;
 	if (name == NULL)
 		return -1;
 
@@ -197,10 +252,10 @@ module_compare(void *_module, const void *_key)
 
 /*!	Calculates the hash of a module image using its path */
 static uint32
-module_image_hash(void *_module, const void *_key, uint32 range)
+module_image_hash(void* _module, const void* _key, uint32 range)
 {
-	module_image *image = (module_image *)_module;
-	const char *path = (const char *)_key;
+	module_image* image = (module_image*)_module;
+	const char* path = (const char*)_key;
 
 	if (image != NULL)
 		return hash_hash_string(image->path) % range;
@@ -214,10 +269,10 @@ module_image_hash(void *_module, const void *_key, uint32 range)
 
 /*!	Compares a module image to a path */
 static int
-module_image_compare(void *_module, const void *_key)
+module_image_compare(void* _module, const void* _key)
 {
-	module_image *image = (module_image *)_module;
-	const char *path = (const char *)_key;
+	module_image* image = (module_image*)_module;
+	const char* path = (const char*)_key;
 	if (path == NULL)
 		return -1;
 
@@ -230,9 +285,9 @@ module_image_compare(void *_module, const void *_key)
 	to the module_image object in "_moduleImage".
 */
 static status_t
-load_module_image(const char *path, module_image **_moduleImage)
+load_module_image(const char* path, module_image** _moduleImage)
 {
-	module_image *moduleImage;
+	module_image* moduleImage;
 	status_t status;
 	image_id image;
 
@@ -245,14 +300,14 @@ load_module_image(const char *path, module_image **_moduleImage)
 		return image;
 	}
 
-	moduleImage = (module_image *)malloc(sizeof(module_image));
-	if (!moduleImage) {
+	moduleImage = (module_image*)malloc(sizeof(module_image));
+	if (moduleImage == NULL) {
 		status = B_NO_MEMORY;
 		goto err;
 	}
 
 	if (get_image_symbol(image, "modules", B_SYMBOL_TYPE_DATA,
-			(void **)&moduleImage->info) != B_OK) {
+			(void**)&moduleImage->info) != B_OK) {
 		TRACE(("load_module_image: Failed to load \"%s\" due to lack of 'modules' symbol\n", path));
 		status = B_BAD_TYPE;
 		goto err1;
@@ -260,7 +315,7 @@ load_module_image(const char *path, module_image **_moduleImage)
 
 	moduleImage->dependencies = NULL;
 	get_image_symbol(image, "module_dependencies", B_SYMBOL_TYPE_DATA,
-		(void **)&moduleImage->dependencies);
+		(void**)&moduleImage->dependencies);
 		// this is allowed to be NULL
 
 	moduleImage->path = strdup(path);
@@ -290,7 +345,7 @@ err:
 
 
 static status_t
-unload_module_image(module_image *moduleImage, const char *path)
+unload_module_image(module_image* moduleImage, const char* path)
 {
 	TRACE(("unload_module_image(image = %p, path = %s)\n", moduleImage, path));
 
@@ -298,7 +353,7 @@ unload_module_image(module_image *moduleImage, const char *path)
 
 	if (moduleImage == NULL) {
 		// if no image was specified, lookup it up in the hash table
-		moduleImage = (module_image *)hash_lookup(sModuleImagesHash, path);
+		moduleImage = (module_image*)hash_lookup(sModuleImagesHash, path);
 		if (moduleImage == NULL)
 			return B_ENTRY_NOT_FOUND;
 	}
@@ -321,7 +376,7 @@ unload_module_image(module_image *moduleImage, const char *path)
 
 
 static void
-put_module_image(module_image *image)
+put_module_image(module_image* image)
 {
 	int32 refCount = atomic_add(&image->ref_count, -1);
 	ASSERT(refCount > 0);
@@ -335,15 +390,15 @@ put_module_image(module_image *image)
 
 
 static status_t
-get_module_image(const char *path, module_image **_image)
+get_module_image(const char* path, module_image** _image)
 {
-	struct module_image *image;
+	struct module_image* image;
 
 	TRACE(("get_module_image(path = \"%s\")\n", path));
 
 	RecursiveLocker _(sModulesLock);
 
-	image = (module_image *)hash_lookup(sModuleImagesHash, path);
+	image = (module_image*)hash_lookup(sModuleImagesHash, path);
 	if (image == NULL) {
 		status_t status = load_module_image(path, &image);
 		if (status < B_OK)
@@ -361,9 +416,9 @@ get_module_image(const char *path, module_image **_image)
 	by "info" and create the entries required for access to it's details.
 */
 static status_t
-create_module(module_info *info, const char *file, int offset, module **_module)
+create_module(module_info* info, const char* file, int offset, module** _module)
 {
-	module *module;
+	module* module;
 
 	TRACE(("create_module(info = %p, file = \"%s\", offset = %d, _module = %p)\n",
 		info, file, offset, _module));
@@ -371,13 +426,13 @@ create_module(module_info *info, const char *file, int offset, module **_module)
 	if (!info->name)
 		return B_BAD_VALUE;
 
-	module = (struct module *)hash_lookup(sModulesHash, info->name);
+	module = (struct module*)hash_lookup(sModulesHash, info->name);
 	if (module) {
 		FATAL(("Duplicate module name (%s) detected... ignoring new one\n", info->name));
 		return B_FILE_EXISTS;
 	}
 
-	if ((module = (struct module *)malloc(sizeof(struct module))) == NULL)
+	if ((module = (struct module*)malloc(sizeof(struct module))) == NULL)
 		return B_NO_MEMORY;
 
 	TRACE(("create_module: name = \"%s\", file = \"%s\"\n", info->name, file));
@@ -421,10 +476,10 @@ create_module(module_info *info, const char *file, int offset, module **_module)
 	"searchedName" is allowed to be NULL (if all modules should be scanned)
 */
 static status_t
-check_module_image(const char *path, const char *searchedName)
+check_module_image(const char* path, const char* searchedName)
 {
-	module_image *image;
-	module_info **info;
+	module_image* image;
+	module_info** info;
 	int index = 0, match = B_ENTRY_NOT_FOUND;
 
 	TRACE(("check_module_image(path = \"%s\", searchedName = \"%s\")\n", path,
@@ -460,8 +515,8 @@ check_module_image(const char *path, const char *searchedName)
 /*!	This is only called if we fail to find a module already in our cache...
 	saves us some extra checking here :)
 */
-static module *
-search_module(const char *name)
+static module*
+search_module(const char* name)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
 	uint32 i;
@@ -496,15 +551,15 @@ search_module(const char *name)
 	if (status != B_OK)
 		return NULL;
 
-	return (module *)hash_lookup(sModulesHash, name);
+	return (module*)hash_lookup(sModulesHash, name);
 }
 
 
 static status_t
-put_dependent_modules(struct module *module)
+put_dependent_modules(struct module* module)
 {
-	module_image *image = module->module_image;
-	module_dependency *dependencies;
+	module_image* image = module->module_image;
+	module_dependency* dependencies;
 
 	// built-in modules don't have a module_image structure
 	if (image == NULL
@@ -522,10 +577,10 @@ put_dependent_modules(struct module *module)
 
 
 static status_t
-get_dependent_modules(struct module *module)
+get_dependent_modules(struct module* module)
 {
-	module_image *image = module->module_image;
-	module_dependency *dependencies;
+	module_image* image = module->module_image;
+	module_dependency* dependencies;
 
 	// built-in modules don't have a module_image structure
 	if (image == NULL
@@ -550,7 +605,7 @@ get_dependent_modules(struct module *module)
 
 /*!	Initializes a loaded module depending on its state */
 static inline status_t
-init_module(module *module)
+init_module(module* module)
 {
 	switch (module->state) {
 		case MODULE_QUERIED:
@@ -610,7 +665,7 @@ init_module(module *module)
 
 /*!	Uninitializes a module depeding on its state */
 static inline int
-uninit_module(module *module)
+uninit_module(module* module)
 {
 	TRACE(("uninit_module(%s)\n", module->name));
 
@@ -660,8 +715,8 @@ uninit_module(module *module)
 }
 
 
-static const char *
-iterator_pop_path_from_stack(module_iterator *iterator, uint32 *_baseLength)
+static const char*
+iterator_pop_path_from_stack(module_iterator* iterator, uint32* _baseLength)
 {
 	if (iterator->stack_current <= 0)
 		return NULL;
@@ -674,11 +729,12 @@ iterator_pop_path_from_stack(module_iterator *iterator, uint32 *_baseLength)
 
 
 static status_t
-iterator_push_path_on_stack(module_iterator *iterator, const char *path, uint32 baseLength)
+iterator_push_path_on_stack(module_iterator* iterator, const char* path,
+	uint32 baseLength)
 {
 	if (iterator->stack_current + 1 > iterator->stack_size) {
 		// allocate new space on the stack
-		module_path *stack = (module_path *)realloc(iterator->stack,
+		module_path* stack = (module_path*)realloc(iterator->stack,
 			(iterator->stack_size + 8) * sizeof(module_path));
 		if (stack == NULL)
 			return B_NO_MEMORY;
@@ -694,7 +750,7 @@ iterator_push_path_on_stack(module_iterator *iterator, const char *path, uint32 
 
 
 static bool
-match_iterator_suffix(module_iterator *iterator, const char *name)
+match_iterator_suffix(module_iterator* iterator, const char* name)
 {
 	if (iterator->suffix == NULL || iterator->suffix_length == 0)
 		return true;
@@ -709,8 +765,8 @@ match_iterator_suffix(module_iterator *iterator, const char *name)
 
 
 static status_t
-iterator_get_next_module(module_iterator *iterator, char *buffer,
-	size_t *_bufferSize)
+iterator_get_next_module(module_iterator* iterator, char* buffer,
+	size_t* _bufferSize)
 {
 	status_t status;
 
@@ -737,7 +793,7 @@ iterator_get_next_module(module_iterator *iterator, char *buffer,
 		hash_iterator hashIterator;
 		hash_open(sModulesHash, &hashIterator);
 
-		struct module *module = (struct module *)hash_next(sModulesHash,
+		struct module* module = (struct module*)hash_next(sModulesHash,
 			&hashIterator);
 		for (int32 i = 0; module != NULL; i++) {
 			if (i >= iterator->module_offset) {
@@ -752,7 +808,7 @@ iterator_get_next_module(module_iterator *iterator, char *buffer,
 					return B_OK;
 				}
 			}
-			module = (struct module *)hash_next(sModulesHash, &hashIterator);
+			module = (struct module*)hash_next(sModulesHash, &hashIterator);
 		}
 
 		hash_close(sModulesHash, &hashIterator, false);
@@ -765,14 +821,14 @@ iterator_get_next_module(module_iterator *iterator, char *buffer,
 nextPath:
 	if (iterator->current_dir == NULL) {
 		// get next directory path from the stack
-		const char *path = iterator_pop_path_from_stack(iterator,
+		const char* path = iterator_pop_path_from_stack(iterator,
 			&iterator->path_base_length);
 		if (path == NULL) {
 			// we are finished, there are no more entries on the stack
 			return B_ENTRY_NOT_FOUND;
 		}
 
-		free((void *)iterator->current_path);
+		free((char*)iterator->current_path);
 		iterator->current_path = path;
 		iterator->current_dir = opendir(path);
 		TRACE(("open directory at %s -> %p\n", path, iterator->current_dir));
@@ -790,7 +846,7 @@ nextModuleImage:
 
 		errno = 0;
 
-		struct dirent *dirent;
+		struct dirent* dirent;
 		if ((dirent = readdir(iterator->current_dir)) == NULL) {
 			closedir(iterator->current_dir);
 			iterator->current_dir = NULL;
@@ -832,15 +888,15 @@ nextModuleImage:
 			return B_BUFFER_OVERFLOW;
 
 		// find out if it's a directory or a file
-		struct stat st;
-		if (stat(path.Path(), &st) < 0)
+		struct stat stat;
+		if (::stat(path.Path(), &stat) < 0)
 			return errno;
 
 		iterator->current_module_path = strdup(path.Path());
 		if (iterator->current_module_path == NULL)
 			return B_NO_MEMORY;
 
-		if (S_ISDIR(st.st_mode)) {
+		if (S_ISDIR(stat.st_mode)) {
 			status = iterator_push_path_on_stack(iterator,
 				iterator->current_module_path, iterator->path_base_length);
 			if (status < B_OK)
@@ -850,14 +906,14 @@ nextModuleImage:
 			goto nextModuleImage;
 		}
 
-		if (!S_ISREG(st.st_mode))
+		if (!S_ISREG(stat.st_mode))
 			return B_BAD_TYPE;
 
 		TRACE(("open module at %s\n", path.Path()));
 
 		status = get_module_image(path.Path(), &iterator->module_image);
 		if (status < B_OK) {
-			free((void *)iterator->current_module_path);
+			free((char*)iterator->current_module_path);
 			iterator->current_module_path = NULL;
 			goto nextModuleImage;
 		}
@@ -868,9 +924,9 @@ nextModuleImage:
 
 	// search the current module image until we've got a match
 	while (*iterator->current_header != NULL) {
-		module_info *info = *iterator->current_header;
+		module_info* info = *iterator->current_header;
 
-		// TODO: we might want to create a module here and cache it in the
+		// TODO: we mightS want to create a module here and cache it in the
 		// hash table
 
 		iterator->current_header++;
@@ -887,7 +943,7 @@ nextModuleImage:
 	// leave this module and get the next one
 
 	iterator->current_header = NULL;
-	free((void *)iterator->current_module_path);
+	free((char*)iterator->current_module_path);
 	iterator->current_module_path = NULL;
 
 	put_module_image(iterator->module_image);
@@ -898,7 +954,7 @@ nextModuleImage:
 
 
 static void
-register_builtin_modules(struct module_info **info)
+register_builtin_modules(struct module_info** info)
 {
 	for (; *info; info++) {
 		(*info)->flags |= B_BUILT_IN_MODULE;
@@ -911,10 +967,10 @@ register_builtin_modules(struct module_info **info)
 
 
 static status_t
-register_preloaded_module_image(struct preloaded_image *image)
+register_preloaded_module_image(struct preloaded_image* image)
 {
-	module_image *moduleImage;
-	struct module_info **info;
+	module_image* moduleImage;
+	struct module_info** info;
 	status_t status;
 	int32 index = 0;
 
@@ -925,12 +981,12 @@ register_preloaded_module_image(struct preloaded_image *image)
 	if (image->id < 0)
 		return B_BAD_VALUE;
 
-	moduleImage = (module_image *)malloc(sizeof(module_image));
+	moduleImage = (module_image*)malloc(sizeof(module_image));
 	if (moduleImage == NULL)
 		return B_NO_MEMORY;
 
 	if (get_image_symbol(image->id, "modules", B_SYMBOL_TYPE_DATA,
-			(void **)&moduleImage->info) != B_OK) {
+			(void**)&moduleImage->info) != B_OK) {
 		status = B_BAD_TYPE;
 		goto error;
 	}
@@ -939,7 +995,7 @@ register_preloaded_module_image(struct preloaded_image *image)
 
 	moduleImage->dependencies = NULL;
 	get_image_symbol(image->id, "module_dependencies", B_SYMBOL_TYPE_DATA,
-		(void **)&moduleImage->dependencies);
+		(void**)&moduleImage->dependencies);
 		// this is allowed to be NULL
 
 	// Try to recreate the full module path, so that we don't try to load the
@@ -951,7 +1007,8 @@ register_preloaded_module_image(struct preloaded_image *image)
 		//	(it always assumes the preloaded add-ons to be in the system
 		//	directory)
 		char path[B_FILE_NAME_LENGTH];
-		const char *name, *suffix;
+		const char* suffix;
+		const char* name;
 		if (moduleImage->info[0]
 			&& (suffix = strstr(name = moduleImage->info[0]->name,
 					image->name)) != NULL) {
@@ -1015,16 +1072,16 @@ error:
 
 
 static int
-dump_modules(int argc, char **argv)
+dump_modules(int argc, char** argv)
 {
 	hash_iterator iterator;
-	struct module_image *image;
-	struct module *module;
+	struct module_image* image;
+	struct module* module;
 
 	hash_rewind(sModulesHash, &iterator);
 	dprintf("-- known modules:\n");
 
-	while ((module = (struct module *)hash_next(sModulesHash, &iterator)) != NULL) {
+	while ((module = (struct module*)hash_next(sModulesHash, &iterator)) != NULL) {
 		dprintf("%p: \"%s\", \"%s\" (%ld), refcount = %ld, state = %d, mimage = %p\n",
 			module, module->name, module->file, module->offset, module->ref_count,
 			module->state, module->module_image);
@@ -1033,12 +1090,114 @@ dump_modules(int argc, char **argv)
 	hash_rewind(sModuleImagesHash, &iterator);
 	dprintf("\n-- loaded module images:\n");
 
-	while ((image = (struct module_image *)hash_next(sModuleImagesHash, &iterator)) != NULL) {
+	while ((image = (struct module_image*)hash_next(sModuleImagesHash, &iterator)) != NULL) {
 		dprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld, %s\n", image,
 			image->path, image->image, image->info, image->ref_count,
 			image->keep_loaded ? "keep loaded" : "can be unloaded");
 	}
 	return 0;
+}
+
+
+//	#pragma mark - DirectoryWatcher
+
+
+DirectoryWatcher::DirectoryWatcher()
+{
+}
+
+
+DirectoryWatcher::~DirectoryWatcher()
+{
+}
+
+
+void
+DirectoryWatcher::EventOccured(NotificationService& service,
+	const KMessage* event)
+{
+	int32 opcode = event->GetInt32("opcode", -1);
+	dev_t device = event->GetInt32("device", -1);
+	ino_t directory = event->GetInt64("directory", -1);
+	const char *name = event->GetString("name", NULL);
+
+	if (opcode == B_ENTRY_MOVED) {
+		// Determine wether it's a move within, out of, or into one
+		// of our watched directories.
+		ino_t from = event->GetInt64("from directory", -1);
+		ino_t to = event->GetInt64("to directory", -1);
+	}
+
+	KPath path(B_PATH_NAME_LENGTH + 1);
+	if (path.InitCheck() != B_OK || vfs_entry_ref_to_path(device, directory,
+			name, path.LockBuffer(), path.BufferSize()) != B_OK)
+		return;
+
+	path.UnlockBuffer();
+
+	dprintf("module \"%s\" %s\n", path.Leaf(),
+		opcode == B_ENTRY_CREATED ? "added" : "removed");
+}
+
+
+//	#pragma mark - ModuleWatcher
+
+
+ModuleWatcher::ModuleWatcher()
+{
+}
+
+
+ModuleWatcher::~ModuleWatcher()
+{
+}
+
+
+void
+ModuleWatcher::EventOccured(NotificationService& service, const KMessage* event)
+{
+	if (event->GetInt32("opcode", -1) != B_STAT_CHANGED
+		|| (event->GetInt32("fields", 0) & B_STAT_MODIFICATION_TIME) == 0)
+		return;
+}
+
+
+//	#pragma mark - ModuleNotificationService
+
+
+ModuleNotificationService::ModuleNotificationService()
+{
+	recursive_lock_init(&fLock, "module notifications");
+}
+
+
+ModuleNotificationService::~ModuleNotificationService()
+{
+	recursive_lock_destroy(&fLock);
+}
+
+
+status_t
+ModuleNotificationService::AddListener(const KMessage* eventSpecifier,
+	NotificationListener& listener)
+{
+	return B_ERROR;
+}
+
+
+status_t
+ModuleNotificationService::UpdateListener(const KMessage* eventSpecifier,
+	NotificationListener& listener)
+{
+	return B_ERROR;
+}
+
+
+status_t
+ModuleNotificationService::RemoveListener(const KMessage* eventSpecifier,
+	NotificationListener& listener)
+{
+	return B_ERROR;
 }
 
 
@@ -1049,12 +1208,12 @@ dump_modules(int argc, char **argv)
 	to load_module().
 */
 status_t
-unload_module(const char *path)
+unload_module(const char* path)
 {
-	struct module_image *moduleImage;
+	struct module_image* moduleImage;
 
 	recursive_lock_lock(&sModulesLock);
-	moduleImage = (module_image *)hash_lookup(sModuleImagesHash, path);
+	moduleImage = (module_image*)hash_lookup(sModuleImagesHash, path);
 	recursive_lock_unlock(&sModulesLock);
 
 	if (moduleImage == NULL)
@@ -1074,9 +1233,9 @@ unload_module(const char *path)
 	add-on won't be unloaded until the last put_module().
 */
 status_t
-load_module(const char *path, module_info ***_modules)
+load_module(const char* path, module_info*** _modules)
 {
-	module_image *moduleImage;
+	module_image* moduleImage;
 	status_t status = get_module_image(path, &moduleImage);
 	if (status != B_OK)
 		return status;
@@ -1086,13 +1245,37 @@ load_module(const char *path, module_info ***_modules)
 }
 
 
+status_t
+start_watching_modules(const char* prefix, NotificationListener& listener)
+{
+	KMessage specifier;
+	status_t status = specifier.AddString("prefix", prefix);
+	if (status != B_OK)
+		return status;
+
+	return sModuleNotificationService.AddListener(&specifier, listener);
+}
+
+
+status_t
+stop_watching_modules(const char* prefix, NotificationListener& listener)
+{
+	KMessage specifier;
+	status_t status = specifier.AddString("prefix", prefix);
+	if (status != B_OK)
+		return status;
+
+	return sModuleNotificationService.RemoveListener(&specifier, listener);
+}
+
+
 /*! Setup the module structures and data for use - must be called
 	before any other module call.
 */
 status_t
-module_init(kernel_args *args)
+module_init(kernel_args* args)
 {
-	struct preloaded_image *image;
+	struct preloaded_image* image;
 
 	recursive_lock_init(&sModulesLock, "modules rlock");
 
@@ -1119,6 +1302,8 @@ module_init(kernel_args *args)
 		}
 	}
 
+	new(&sModuleNotificationService) ModuleNotificationService();
+
 	sDisableUserAddOns = get_safemode_boolean(B_SAFEMODE_DISABLE_USER_ADD_ONS,
 		false);
 
@@ -1140,8 +1325,8 @@ module_init(kernel_args *args)
 	The structure is then used by read_next_module_name(), and
 	must be freed by calling close_module_list().
 */
-void *
-open_module_list_etc(const char *prefix, const char *suffix)
+void*
+open_module_list_etc(const char* prefix, const char* suffix)
 {
 	TRACE(("open_module_list(prefix = %s)\n", prefix));
 
@@ -1150,9 +1335,9 @@ open_module_list_etc(const char *prefix, const char *suffix)
 		return NULL;
 	}
 
-	module_iterator *iterator = (module_iterator *)malloc(
+	module_iterator* iterator = (module_iterator*)malloc(
 		sizeof(module_iterator));
-	if (!iterator)
+	if (iterator == NULL)
 		return NULL;
 
 	memset(iterator, 0, sizeof(module_iterator));
@@ -1189,7 +1374,7 @@ open_module_list_etc(const char *prefix, const char *suffix)
 			pathBuffer.Append("kernel");
 
 			// Copy base path onto the iterator stack
-			char *path = strdup(pathBuffer.Path());
+			char* path = strdup(pathBuffer.Path());
 			if (path == NULL)
 				continue;
 
@@ -1202,7 +1387,7 @@ open_module_list_etc(const char *prefix, const char *suffix)
 #if 0
 			// Build path component: base path + '/' + prefix
 			size_t length = strlen(sModulePaths[i]);
-			char *path = (char *)malloc(length + iterator->prefix_length + 2);
+			char* path = (char*)malloc(length + iterator->prefix_length + 2);
 			if (path == NULL) {
 				// ToDo: should we abort the whole operation here?
 				//	if we do, don't forget to empty the stack
@@ -1223,12 +1408,12 @@ open_module_list_etc(const char *prefix, const char *suffix)
 		iterator->loaded_modules = true;
 	}
 
-	return (void *)iterator;
+	return (void*)iterator;
 }
 
 
-void *
-open_module_list(const char *prefix)
+void*
+open_module_list(const char* prefix)
 {
 	return open_module_list_etc(prefix, NULL);
 }
@@ -1236,10 +1421,10 @@ open_module_list(const char *prefix)
 
 /*!	Frees the cookie allocated by open_module_list() */
 status_t
-close_module_list(void *cookie)
+close_module_list(void* cookie)
 {
-	module_iterator *iterator = (module_iterator *)cookie;
-	const char *path;
+	module_iterator* iterator = (module_iterator*)cookie;
+	const char* path;
 
 	TRACE(("close_module_list()\n"));
 
@@ -1248,7 +1433,7 @@ close_module_list(void *cookie)
 
 	// free stack
 	while ((path = iterator_pop_path_from_stack(iterator, NULL)) != NULL)
-		free((void *)path);
+		free((char*)path);
 
 	// close what have been left open
 	if (iterator->module_image != NULL)
@@ -1258,8 +1443,8 @@ close_module_list(void *cookie)
 		closedir(iterator->current_dir);
 
 	free(iterator->stack);
-	free((void *)iterator->current_path);
-	free((void *)iterator->current_module_path);
+	free((char*)iterator->current_path);
+	free((char*)iterator->current_module_path);
 
 	free(iterator->prefix);
 	free(iterator);
@@ -1274,9 +1459,9 @@ close_module_list(void *cookie)
 	when done.
 */
 status_t
-read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
+read_next_module_name(void* cookie, char* buffer, size_t* _bufferSize)
 {
-	module_iterator *iterator = (module_iterator *)cookie;
+	module_iterator* iterator = (module_iterator*)cookie;
 	status_t status;
 
 	TRACE(("read_next_module_name: looking for next module\n"));
@@ -1302,12 +1487,12 @@ read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
 
 
 /*!	Iterates through all loaded modules, and stores its path in "buffer".
-	ToDo: check if the function in BeOS really does that (could also mean:
+	TODO: check if the function in BeOS really does that (could also mean:
 		iterate through all modules that are currently loaded; have a valid
-		module_image pointer, which would be hard to test for)
+		module_image pointer)
 */
 status_t
-get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
+get_next_loaded_module_name(uint32* _cookie, char* buffer, size_t* _bufferSize)
 {
 	if (sModulesHash == NULL) {
 		dprintf("get_next_loaded_module_name() called too early!\n");
@@ -1326,8 +1511,7 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 
 	hash_iterator iterator;
 	hash_open(sModulesHash, &iterator);
-	struct module *module = (struct module *)hash_next(sModulesHash,
-		&iterator);
+	struct module* module = (struct module*)hash_next(sModulesHash, &iterator);
 
 	for (uint32 i = 0; module != NULL; i++) {
 		if (i >= offset) {
@@ -1336,7 +1520,7 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 			status = B_OK;
 			break;
 		}
-		module = (struct module *)hash_next(sModulesHash, &iterator);
+		module = (struct module*)hash_next(sModulesHash, &iterator);
 	}
 
 	hash_close(sModulesHash, &iterator, false);
@@ -1346,10 +1530,10 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 
 
 status_t
-get_module(const char *path, module_info **_info)
+get_module(const char* path, module_info** _info)
 {
-	module_image *moduleImage;
-	module *module;
+	module_image* moduleImage;
+	module* module;
 	status_t status;
 
 	TRACE(("get_module(%s)\n", path));
@@ -1359,7 +1543,7 @@ get_module(const char *path, module_info **_info)
 
 	RecursiveLocker _(sModulesLock);
 
-	module = (struct module *)hash_lookup(sModulesHash, path);
+	module = (struct module*)hash_lookup(sModulesHash, path);
 
 	// if we don't have it cached yet, search for it
 	if (module == NULL) {
@@ -1411,15 +1595,15 @@ get_module(const char *path, module_info **_info)
 
 
 status_t
-put_module(const char *path)
+put_module(const char* path)
 {
-	module *module;
+	module* module;
 
 	TRACE(("put_module(path = %s)\n", path));
 
 	RecursiveLocker _(sModulesLock);
 
-	module = (struct module *)hash_lookup(sModulesHash, path);
+	module = (struct module*)hash_lookup(sModulesHash, path);
 	if (module == NULL) {
 		FATAL(("module: We don't seem to have a reference to module %s\n",
 			path));

@@ -1,6 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- *
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_MODULE_H
@@ -14,6 +13,16 @@ struct kernel_args;
 
 
 #ifdef __cplusplus
+// C++ only part
+
+class NotificationListener;
+
+extern status_t start_watching_modules(const char *prefix,
+	NotificationListener &listener);
+extern status_t stop_watching_modules(const char *prefix,
+	NotificationListener &listener);
+
+
 extern "C" {
 #endif
 
