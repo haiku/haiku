@@ -108,6 +108,7 @@ typedef struct heap_allocator_s {
 
 	uint32		total_pages;
 	uint32		total_free_pages;
+	uint32		empty_areas;
 
 	heap_bin *	bins;
 	heap_area *	areas; // sorted so that the desired area is always first
@@ -303,9 +304,10 @@ dump_allocator_areas(heap_allocator *heap)
 {
 	heap_area *area = heap->all_areas;
 	while (area) {
-		dprintf("\tarea %p: area: %ld; base: 0x%08lx; size: %lu; free_pages: %p (%lu entr%s)\n",
-			area, area->area, area->base, area->size, area->free_pages,
-			area->free_page_count, area->free_page_count == 1 ? "y" : "ies");
+		dprintf("\tarea %p: area: %ld; base: 0x%08lx; size: %lu; page_count: %lu; free_pages: %p (%lu entr%s)\n",
+			area, area->area, area->base, area->size, area->page_count,
+			area->free_pages, area->free_page_count,
+			area->free_page_count == 1 ? "y" : "ies");
 		area = area->all_next;
 	}
 
@@ -316,9 +318,9 @@ dump_allocator_areas(heap_allocator *heap)
 static void
 dump_allocator(heap_allocator *heap, bool areas, bool bins)
 {
-	dprintf("allocator %p: class: %s; page_size: %lu; bin_count: %lu; pages: %lu; free: %lu\n", heap,
+	dprintf("allocator %p: class: %s; page_size: %lu; bin_count: %lu; pages: %lu; free_pages: %lu; empty_areas: %lu\n", heap,
 		sHeapClasses[heap->heap_class].name, heap->page_size, heap->bin_count,
-		heap->total_pages, heap->total_free_pages);
+		heap->total_pages, heap->total_free_pages, heap->empty_areas);
 
 	if (areas)
 		dump_allocator_areas(heap);
@@ -846,11 +848,70 @@ heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 	heap->total_pages += area->page_count;
 	heap->total_free_pages += area->free_page_count;
 
+	if (areaID >= B_OK) {
+		// this later on deletable area is yet empty - the empty count will be
+		// decremented as soon as this area is used for the first time
+		heap->empty_areas++;
+	}
+
 	mutex_unlock(&heap->lock);
 
-	dprintf("heap_add_area: area added to %s heap %p - usable range 0x%08lx - 0x%08lx\n",
-		sHeapClasses[heap->heap_class].name, heap, area->base,
+	dprintf("heap_add_area: area %ld added to %s heap %p - usable range 0x%08lx - 0x%08lx\n",
+		area->area, sHeapClasses[heap->heap_class].name, heap, area->base,
 		area->base + area->size);
+}
+
+
+static status_t
+heap_remove_area(heap_allocator *heap, heap_area *area, bool locked)
+{
+	if (!locked)
+		mutex_lock(&heap->lock);
+
+	if (area->free_page_count != area->page_count) {
+		panic("tried removing heap area that has still pages in use");
+		return B_ERROR;
+	}
+
+	if (area->prev == NULL && area->next == NULL) {
+		panic("tried removing the last non-full heap area");
+		return B_ERROR;
+	}
+
+	if (heap->areas == area)
+		heap->areas = area->next;
+	if (area->prev != NULL)
+		area->prev->next = area->next;
+	if (area->next != NULL)
+		area->next->prev = area->prev;
+
+	if (heap->all_areas == area)
+		heap->all_areas = area->all_next;
+	else {
+		heap_area *previous = heap->all_areas;
+		while (previous) {
+			if (previous->all_next == area) {
+				previous->all_next = area->all_next;
+				break;
+			}
+
+			previous = previous->all_next;
+		}
+
+		if (previous == NULL)
+			panic("removing heap area that is not in all list");
+	}
+
+	heap->total_pages -= area->page_count;
+	heap->total_free_pages -= area->free_page_count;
+
+	if (!locked)
+		mutex_unlock(&heap->lock);
+
+	dprintf("heap_remove_area: area %ld with range 0x%08lx - 0x%08lx removed from %s heap %p\n",
+		area->area, area->base, area->base + area->size,
+		sHeapClasses[heap->heap_class].name, heap);
+	return B_OK;
 }
 
 
@@ -863,7 +924,7 @@ heap_create_allocator(addr_t base, size_t size, uint32 heapClass)
 
 	heap->heap_class = heapClass;
 	heap->page_size = sHeapClasses[heapClass].page_size;
-	heap->total_pages = heap->total_free_pages = 0;
+	heap->total_pages = heap->total_free_pages = heap->empty_areas = 0;
 	heap->areas = heap->all_areas = NULL;
 	heap->bins = (heap_bin *)base;
 
@@ -890,7 +951,7 @@ heap_create_allocator(addr_t base, size_t size, uint32 heapClass)
 }
 
 
-static inline void
+static inline area_id
 heap_free_pages_added(heap_allocator *heap, heap_area *area, uint32 pageCount)
 {
 	area->free_page_count += pageCount;
@@ -932,19 +993,31 @@ heap_free_pages_added(heap_allocator *heap, heap_area *area, uint32 pageCount)
 
 	// can and should we free this area?
 	if (area->free_page_count == area->page_count && area->area >= B_OK) {
-		uint32 pagesLeft = heap->total_pages - area->page_count;
-		uint32 freePagesLeft = heap->total_free_pages - area->free_page_count;
-		if (freePagesLeft > pagesLeft / 10) {
-			// there are still more than 10% of free pages if we free it
-			dprintf("heap: should free empty area %ld\n", area->area);
+		if (heap->empty_areas > 0) {
+			// we already have at least another empty area, just free this one
+			if (heap_remove_area(heap, area, true) == B_OK) {
+				// we cannot delete the area here, because it would result
+				// in calls to free, which would necessarily deadlock as we
+				// are locked at this point
+				return area->area;
+			}
 		}
+
+		heap->empty_areas++;
 	}
+
+	return -1;
 }
 
 
 static inline void
 heap_free_pages_removed(heap_allocator *heap, heap_area *area, uint32 pageCount)
 {
+	if (area->free_page_count == area->page_count && area->area >= B_OK) {
+		// this area was completely empty
+		heap->empty_areas--;
+	}
+
 	area->free_page_count -= pageCount;
 	heap->total_free_pages -= pageCount;
 
@@ -1129,8 +1202,8 @@ is_valid_alignment(size_t number)
 inline bool
 heap_should_grow(heap_allocator *heap)
 {
-	// suggest growing if there are less than 10% free pages
-	return heap->total_free_pages < heap->total_pages / 10;
+	// suggest growing if there is less than 20% of a grow size available
+	return heap->total_free_pages * heap->page_size < HEAP_GROW_SIZE / 5;
 }
 
 
@@ -1234,6 +1307,7 @@ heap_free(heap_allocator *heap, void *address)
 		return B_ERROR;
 	}
 
+	area_id areaToDelete = -1;
 	if (page->bin_index < heap->bin_count) {
 		// small allocation
 		heap_bin *bin = &heap->bins[page->bin_index];
@@ -1279,7 +1353,7 @@ heap_free(heap_allocator *heap, void *address)
 			heap_unlink_page(page, &bin->page_list);
 			page->in_use = 0;
 			heap_link_page(page, &area->free_pages);
-			heap_free_pages_added(heap, area, 1);
+			areaToDelete = heap_free_pages_added(heap, area, 1);
 		} else if (page->free_count == 1) {
 			// we need to add ourselfs to the page list of the bin
 			heap_link_page(page, &bin->page_list);
@@ -1321,11 +1395,18 @@ heap_free(heap_allocator *heap, void *address)
 			pageCount++;
 		}
 
-		heap_free_pages_added(heap, area, pageCount);
+		areaToDelete = heap_free_pages_added(heap, area, pageCount);
 	}
 
 	T(Free((addr_t)address));
 	mutex_unlock(&heap->lock);
+
+	if (areaToDelete >= B_OK) {
+		// adding free pages caused an area to become empty and freeable that
+		// we can now delete as we don't hold the heap lock anymore
+		delete_area(areaToDelete);
+	}
+
 	return B_OK;
 }
 
@@ -1493,8 +1574,8 @@ heap_grow_thread(void *)
 			continue;
 
 		if (sAddGrowHeap) {
-			// the last grow heap is going to run full soon, try to allocate
-			// a new one to make some room.
+			// the grow heap is going to run full soon, try to allocate a new
+			// one to make some room.
 			TRACE(("heap_grower: grow heaps will run out of memory soon\n"));
 			if (heap_create_new_heap_area(sGrowHeap, "additional grow heap",
 				HEAP_DEDICATED_GROW_SIZE) != B_OK)
@@ -1502,7 +1583,6 @@ heap_grow_thread(void *)
 		}
 
 		for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
-			// find the last heap
 			heap_allocator *heap = sHeapList[i];
 			if (sLastGrowRequest[i] > sLastHandledGrowRequest[i]
 				|| heap_should_grow(heap)) {
@@ -1629,7 +1709,6 @@ memalign(size_t alignment, size_t size)
 
 	if (!kernel_startup && size > HEAP_AREA_USE_THRESHOLD) {
 		// don't even attempt such a huge allocation - use areas instead
-		dprintf("heap: using area for huge allocation of %lu bytes!\n", size);
 		size_t areaSize = size + sizeof(area_allocation_info);
 		if (alignment != 0)
 			areaSize = ROUNDUP(areaSize, alignment);
@@ -1656,28 +1735,27 @@ memalign(size_t alignment, size_t size)
 		if (alignment != 0)
 			address = (void *)ROUNDUP((addr_t)address, alignment);
 
-		dprintf("heap: allocated area %ld for huge allocation returning %p\n",
-			allocationArea, address);
+		dprintf("heap: allocated area %ld for huge allocation of %lu bytes\n",
+			allocationArea, size);
 
 		info->allocation_base = address;
 		return address;
 	}
 
-	heap_allocator *heap = sHeapList[heap_class_for(size)];
+	uint32 heapClass = heap_class_for(size);
+	heap_allocator *heap = sHeapList[heapClass];
 	bool shouldGrow = false;
 	void *result = heap_memalign(heap, alignment, size, &shouldGrow);
-	if (shouldGrow || result == NULL) {
-		// the heap will or has run out of memory, notify the grower
-		sLastGrowRequest[heap_class_for(size)]++;
-		if (result == NULL) {
-			// urgent request, do the request and wait
-			switch_sem(sHeapGrowSem, sHeapGrownNotify);
-			// try again now
-			result = heap_memalign(heap, alignment, size, NULL);
-		} else {
-			// not so urgent, just notify the grower
-			release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
-		}
+	if (result == NULL) {
+		// request an urgent grow and wait
+		sLastGrowRequest[heapClass]++;
+		switch_sem(sHeapGrowSem, sHeapGrownNotify);
+
+		// and then try again
+		result = heap_memalign(heap, alignment, size, NULL);
+	} else if (shouldGrow) {
+		// should grow sometime soon, notify the grower
+		release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
 	}
 
 #if PARANOID_VALIDATION
