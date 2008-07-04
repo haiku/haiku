@@ -33,11 +33,11 @@
 #endif
 
 // initialize newly allocated memory with something non zero
-#define PARANOID_KMALLOC 1
+#define PARANOID_KERNEL_MALLOC 1
 // check for double free, and fill freed memory with 0xdeadbeef
-#define PARANOID_KFREE 1
+#define PARANOID_KERNEL_FREE 1
 // validate sanity of the heap after each operation (slow!)
-#define PARANOID_VALIDATION 0
+#define PARANOID_HEAP_VALIDATION 0
 // store size, thread and team info at the end of each allocation block
 #define KERNEL_HEAP_LEAK_CHECK 0
 
@@ -102,6 +102,8 @@ typedef struct heap_bin_s {
 
 typedef struct heap_allocator_s {
 	mutex		lock;
+
+	const char *name;
 	uint32		heap_class;
 	uint32		bin_count;
 	uint32		page_size;
@@ -154,7 +156,7 @@ static heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
 	}
 };
 
-static heap_allocator *sHeapList[HEAP_CLASS_COUNT];
+static heap_allocator *sHeaps[HEAP_CLASS_COUNT];
 static uint32 *sLastGrowRequest[HEAP_CLASS_COUNT];
 static uint32 *sLastHandledGrowRequest[HEAP_CLASS_COUNT];
 static heap_allocator *sGrowHeap = NULL;
@@ -318,9 +320,9 @@ dump_allocator_areas(heap_allocator *heap)
 static void
 dump_allocator(heap_allocator *heap, bool areas, bool bins)
 {
-	dprintf("allocator %p: class: %s; page_size: %lu; bin_count: %lu; pages: %lu; free_pages: %lu; empty_areas: %lu\n", heap,
-		sHeapClasses[heap->heap_class].name, heap->page_size, heap->bin_count,
-		heap->total_pages, heap->total_free_pages, heap->empty_areas);
+	dprintf("allocator %p: name: %s; page_size: %lu; bin_count: %lu; pages: %lu; free_pages: %lu; empty_areas: %lu\n", heap,
+		heap->name, heap->page_size, heap->bin_count, heap->total_pages,
+		heap->total_free_pages, heap->empty_areas);
 
 	if (areas)
 		dump_allocator_areas(heap);
@@ -339,7 +341,7 @@ dump_heap_list(int argc, char **argv)
 			dump_allocator(sGrowHeap, true, true);
 		} else if (strcmp(argv[1], "stats") == 0) {
 			for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
-				dump_allocator(sHeapList[i], false, false);
+				dump_allocator(sHeaps[i], false, false);
 		} else
 			print_debugger_command_usage(argv[0]);
 
@@ -347,7 +349,7 @@ dump_heap_list(int argc, char **argv)
 	}
 
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
-		dump_allocator(sHeapList[i], true, true);
+		dump_allocator(sHeaps[i], true, true);
 
 	return 0;
 }
@@ -380,7 +382,7 @@ dump_allocations(int argc, char **argv)
 	size_t totalSize = 0;
 	uint32 totalCount = 0;
 	for (uint32 classIndex = 0; classIndex < HEAP_CLASS_COUNT; classIndex++) {
-		heap_allocator *heap = sHeapList[classIndex];
+		heap_allocator *heap = sHeaps[classIndex];
 
 		// go through all the pages in all the areas
 		heap_area *area = heap->all_areas;
@@ -525,7 +527,7 @@ dump_allocations_per_caller(int argc, char **argv)
 	sCallerInfoCount = 0;
 
 	for (uint32 classIndex = 0; classIndex < HEAP_CLASS_COUNT; classIndex++) {
-		heap_allocator *heap = sHeapList[classIndex];
+		heap_allocator *heap = sHeaps[classIndex];
 
 		// go through all the pages in all the areas
 		heap_area *area = heap->all_areas;
@@ -630,7 +632,7 @@ dump_allocations_per_caller(int argc, char **argv)
 #endif // KERNEL_HEAP_LEAK_CHECK
 
 
-#if PARANOID_VALIDATION
+#if PARANOID_HEAP_VALIDATION
 static void
 heap_validate_heap(heap_allocator *heap)
 {
@@ -781,7 +783,7 @@ heap_validate_heap(heap_allocator *heap)
 
 	mutex_unlock(&heap->lock);
 }
-#endif // PARANOID_VALIDATION
+#endif // PARANOID_HEAP_VALIDATION
 
 
 // #pragma mark - Heap functions
@@ -857,8 +859,7 @@ heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 	mutex_unlock(&heap->lock);
 
 	dprintf("heap_add_area: area %ld added to %s heap %p - usable range 0x%08lx - 0x%08lx\n",
-		area->area, sHeapClasses[heap->heap_class].name, heap, area->base,
-		area->base + area->size);
+		area->area, heap->name, heap, area->base, area->base + area->size);
 }
 
 
@@ -909,19 +910,20 @@ heap_remove_area(heap_allocator *heap, heap_area *area, bool locked)
 		mutex_unlock(&heap->lock);
 
 	dprintf("heap_remove_area: area %ld with range 0x%08lx - 0x%08lx removed from %s heap %p\n",
-		area->area, area->base, area->base + area->size,
-		sHeapClasses[heap->heap_class].name, heap);
+		area->area, area->base, area->base + area->size, heap->name, heap);
 	return B_OK;
 }
 
 
 static heap_allocator *
-heap_create_allocator(addr_t base, size_t size, uint32 heapClass)
+heap_create_allocator(const char *name, addr_t base, size_t size,
+	uint32 heapClass)
 {
 	heap_allocator *heap = (heap_allocator *)base;
 	base += sizeof(heap_allocator);
 	size -= sizeof(heap_allocator);
 
+	heap->name = name;
 	heap->heap_class = heapClass;
 	heap->page_size = sHeapClasses[heapClass].page_size;
 	heap->total_pages = heap->total_free_pages = heap->empty_areas = 0;
@@ -1256,14 +1258,14 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
 	if (address == NULL)
 		return address;
 
-#if PARANOID_KFREE
+#if PARANOID_KERNEL_FREE
 	// make sure 0xdeadbeef is cleared if we do not overwrite the memory
 	// and the user does not clear it
 	if (((uint32 *)address)[1] == 0xdeadbeef)
 		((uint32 *)address)[1] = 0xcccccccc;
 #endif
 
-#if PARANOID_KMALLOC
+#if PARANOID_KERNEL_MALLOC
 	memset(address, 0xcc, size);
 #endif
 
@@ -1318,7 +1320,7 @@ heap_free(heap_allocator *heap, void *address)
 			return B_ERROR;
 		}
 
-#if PARANOID_KFREE
+#if PARANOID_KERNEL_FREE
 		if (((uint32 *)address)[1] == 0xdeadbeef) {
 			// This block looks like it was freed already, walk the free list
 			// on this page to make sure this address doesn't exist.
@@ -1558,7 +1560,7 @@ heap_create_new_heap_area(heap_allocator *heap, const char *name, size_t size)
 	}
 
 	heap_add_area(heap, heapArea, (addr_t)address, size);
-#if PARANOID_VALIDATION
+#if PARANOID_HEAP_VALIDATION
 	heap_validate_heap(heap);
 #endif
 	return B_OK;
@@ -1583,7 +1585,7 @@ heap_grow_thread(void *)
 		}
 
 		for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
-			heap_allocator *heap = sHeapList[i];
+			heap_allocator *heap = sHeaps[i];
 			if (sLastGrowRequest[i] > sLastHandledGrowRequest[i]
 				|| heap_should_grow(heap)) {
 				// grow this heap if it is nearly full or if a grow was
@@ -1610,7 +1612,7 @@ heap_init(addr_t base, size_t size)
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
 		size_t partSize = size * sHeapClasses[i].initial_percentage / 100;
-		sHeapList[i] = heap_create_allocator(base, partSize, i);
+		sHeaps[i] = heap_create_allocator(sHeapClasses[i].name, base, partSize, i);
 		sLastGrowRequest[i] = sLastHandledGrowRequest[i] = 0;
 		base += partSize;
 	}
@@ -1674,7 +1676,7 @@ heap_init_post_thread()
 		return growHeapArea;
 	}
 
-	sGrowHeap = heap_create_allocator((addr_t)address,
+	sGrowHeap = heap_create_allocator("grow", (addr_t)address,
 		HEAP_DEDICATED_GROW_SIZE, 0);
 	if (sGrowHeap == NULL) {
 		panic("heap_init_post_thread(): failed to create dedicated grow heap\n");
@@ -1735,15 +1737,19 @@ memalign(size_t alignment, size_t size)
 		if (alignment != 0)
 			address = (void *)ROUNDUP((addr_t)address, alignment);
 
-		dprintf("heap: allocated area %ld for huge allocation of %lu bytes\n",
-			allocationArea, size);
+		TRACE(("heap: allocated area %ld for huge allocation of %lu bytes\n",
+			allocationArea, size));
 
 		info->allocation_base = address;
+
+#if PARANOID_KERNEL_MALLOC
+		memset(address, 0xcc, size);
+#endif
 		return address;
 	}
 
 	uint32 heapClass = heap_class_for(size);
-	heap_allocator *heap = sHeapList[heapClass];
+	heap_allocator *heap = sHeaps[heapClass];
 	bool shouldGrow = false;
 	void *result = heap_memalign(heap, alignment, size, &shouldGrow);
 	if (result == NULL) {
@@ -1758,7 +1764,7 @@ memalign(size_t alignment, size_t size)
 		release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
 	}
 
-#if PARANOID_VALIDATION
+#if PARANOID_HEAP_VALIDATION
 	heap_validate_heap(heap);
 #endif
 
@@ -1789,7 +1795,7 @@ malloc_nogrow(size_t size)
 	}
 
 	// try public memory, there might be something available
-	heap_allocator *heap = sHeapList[heap_class_for(size)];
+	heap_allocator *heap = sHeaps[heap_class_for(size)];
 	void *result = heap_memalign(heap, 0, size, NULL);
 	if (result != NULL)
 		return result;
@@ -1820,9 +1826,9 @@ free(void *address)
 	}
 
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
-		heap_allocator *heap = sHeapList[i];
+		heap_allocator *heap = sHeaps[i];
 		if (heap_free(heap, address) == B_OK) {
-#if PARANOID_VALIDATION
+#if PARANOID_HEAP_VALIDATION
 			heap_validate_heap(heap);
 #endif
 			return;
@@ -1844,8 +1850,7 @@ free(void *address)
 			&& info->size == areaInfo.size && info->base == areaInfo.address
 			&& info->allocation_size < areaInfo.size) {
 			delete_area(area);
-			dprintf("free(): freed huge allocation by deleting area %ld\n",
-				area);
+			TRACE(("free(): freed huge allocation by deleting area %ld\n", area));
 			return;
 		}
 	}
@@ -1872,9 +1877,9 @@ realloc(void *address, size_t newSize)
 
 	void *newAddress = NULL;
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
-		heap_allocator *heap = sHeapList[i];
+		heap_allocator *heap = sHeaps[i];
 		if (heap_realloc(heap, address, &newAddress, newSize) == B_OK) {
-#if PARANOID_VALIDATION
+#if PARANOID_HEAP_VALIDATION
 			heap_validate_heap(heap);
 #endif
 			return newAddress;
@@ -1900,8 +1905,8 @@ realloc(void *address, size_t newSize)
 
 			if (available >= newSize) {
 				// there is enough room available for the newSize
-				dprintf("realloc(): new size %ld fits in old area %ld with %ld available\n",
-					newSize, area, available);
+				TRACE(("realloc(): new size %ld fits in old area %ld with %ld available\n",
+					newSize, area, available));
 				return address;
 			}
 
@@ -1915,8 +1920,8 @@ realloc(void *address, size_t newSize)
 
 			memcpy(newAddress, address, min_c(newSize, info->allocation_size));
 			delete_area(area);
-			dprintf("realloc(): allocated new block %p for size %ld and deleted old area %ld\n",
-				newAddress, newSize, area);
+			TRACE(("realloc(): allocated new block %p for size %ld and deleted old area %ld\n",
+				newAddress, newSize, area));
 			return newAddress;
 		}
 	}
