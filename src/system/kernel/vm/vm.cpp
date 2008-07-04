@@ -4321,6 +4321,9 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 		cache = nextCache;
 	}
 
+	if (page == &dummyPage)
+		page = NULL;
+
 	if (page == NULL) {
 		// there was no adequate page, determine the cache for a clean one
 		if (cache == NULL) {
