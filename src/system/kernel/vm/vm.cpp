@@ -4761,7 +4761,7 @@ vm_try_reserve_memory(size_t amount)
 
 	//dprintf("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory);
 
-	if (sAvailableMemory > amount) {
+	if (sAvailableMemory >= amount) {
 		sAvailableMemory -= amount;
 		status = B_OK;
 	} else

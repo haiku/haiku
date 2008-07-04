@@ -66,6 +66,9 @@ anonymous_commit(struct vm_store *_store, off_t size)
 			size = precommitted;
 	}
 
+	if (size == store->vm.committed_size)
+		return B_OK;
+
 	// Check to see how much we could commit - we need real memory
 
 	if (size > store->vm.committed_size) {
