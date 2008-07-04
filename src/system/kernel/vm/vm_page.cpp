@@ -596,7 +596,6 @@ static int
 dump_page_stats(int argc, char **argv)
 {
 	uint32 counter[8];
-	int32 totalActive;
 	addr_t i;
 
 	memset(counter, 0, sizeof(counter));
@@ -785,7 +784,6 @@ page_scrubber(void *unused)
 		snooze(100000); // 100ms
 
 		if (sFreePageQueue.count > 0) {
-			cpu_status state;
 			vm_page *page[SCRUB_SIZE];
 			int32 i, scrubCount;
 
@@ -1432,8 +1430,6 @@ vm_page_schedule_write_page_range(struct vm_cache *cache, uint32 firstPage,
 	for (VMCachePagesTree::Iterator it
 				= cache->pages.GetIterator(firstPage, true, true);
 			vm_page *page = it.Next();) {
-		bool dequeuedPage = false;
-
 		if (page->cache_offset >= endPage)
 			break;
 
@@ -1669,7 +1665,6 @@ vm_page_reserve_pages(uint32 count)
 vm_page *
 vm_page_allocate_page(int pageState, bool reserved)
 {
-	ConditionVariableEntry freeConditionEntry;
 	page_queue *queue;
 	page_queue *otherQueue;
 

@@ -127,8 +127,6 @@ allocate_cbuf_mem(size_t size)
 	cbuf *buffer = NULL;
 	cbuf *lastBuffer = NULL;
 	cbuf *headBuffer = NULL;
-	int i;
-	int count;
 	size_t foundSize;
 
 	size = PAGE_ALIGN(size);
@@ -944,7 +942,6 @@ cbuf_test(void)
 status_t
 cbuf_init(void)
 {
-	cbuf *buffer;
 	int i;
 
 	// add the debug command

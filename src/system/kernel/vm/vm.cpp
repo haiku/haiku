@@ -2336,8 +2336,6 @@ vm_copy_on_write_area(vm_cache* lowerCache)
 {
 	vm_store *store;
 	vm_cache *upperCache;
-	vm_page *page;
-	status_t status;
 
 	TRACE(("vm_copy_on_write_area(cache = %p)\n", lowerCache));
 
@@ -3939,8 +3937,6 @@ vm_init(kernel_args *args)
 status_t
 vm_init_post_sem(kernel_args *args)
 {
-	vm_area *area;
-
 	// This frees all unused boot loader resources and makes its space available again
 	arch_vm_init_end(args);
 	unreserve_boot_loader_ranges(args);
@@ -4605,7 +4601,6 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 	vm_cache *topCache = vm_area_get_locked_cache(area);
 	off_t cacheOffset = address - area->base + area->cache_offset;
-	int32 changeCount = addressSpace->change_count;
 
 	atomic_add(&area->no_cache_change, 1);
 		// make sure the area's cache isn't replaced during the page fault
