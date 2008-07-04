@@ -1799,7 +1799,7 @@ vm_page_allocate_page_run(int pageState, addr_t length)
 				sPages[start + i].is_cleared
 					= sPages[start + i].state == PAGE_STATE_CLEAR;
 				set_page_state_nolock(&sPages[start + i], PAGE_STATE_BUSY);
-				sPages[i].usage_count = 2;
+				sPages[start + i].usage_count = 2;
 			}
 			firstPage = &sPages[start];
 			break;
