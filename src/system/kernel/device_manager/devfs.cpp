@@ -1190,7 +1190,6 @@ devfs_read_link(fs_volume *_volume, fs_vnode *_link, char *buffer,
 	size_t *_bufferSize)
 {
 	struct devfs_vnode *link = (struct devfs_vnode *)_link->private_node;
-	size_t bufferSize = *_bufferSize;
 
 	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
@@ -1461,7 +1460,6 @@ static status_t
 devfs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
 	void *buffer, size_t length)
 {
-	struct devfs *fs = (struct devfs *)_volume->private_volume;
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
@@ -1499,8 +1497,8 @@ devfs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
 
 			case B_GET_DRIVER_FOR_DEVICE:
 			{
-				const char* path;
 #if 0
+				const char* path;
 				if (!vnode->stream.u.dev.driver)
 					return B_ENTRY_NOT_FOUND;
 				path = vnode->stream.u.dev.driver->path;
@@ -1531,7 +1529,6 @@ devfs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
 			case B_GET_PATH_FOR_DEVICE:
 			{
 				char path[256];
-				status_t err;
 				/* TODO: we might want to actually find the mountpoint
 				 * of that instance of devfs...
 				 * but for now we assume it's mounted on /dev

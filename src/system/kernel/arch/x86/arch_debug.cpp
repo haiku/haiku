@@ -270,7 +270,7 @@ stack_trace(int argc, char **argv)
 	struct thread *thread = NULL;
 	addr_t oldPageDirectory = 0;
 	uint32 ebp = x86_read_ebp();
-	int32 i, num = 0, last = 0;
+	int32 num = 0, last = 0;
 
 	setup_for_thread(argc == 2 ? argv[1] : NULL, &thread, &ebp,
 		&oldPageDirectory);
@@ -490,7 +490,6 @@ dump_iframes(int argc, char **argv)
 	}
 
 	struct thread *thread = NULL;
-	int32 i;
 
 	if (argc < 2) {
 		thread = thread_get_current_thread();

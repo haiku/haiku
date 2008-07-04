@@ -2214,7 +2214,6 @@ void
 _user_debugger(const char *userMessage)
 {
 	// install the default debugger, if there is none yet
-	struct thread *thread = thread_get_current_thread();
 	port_id nubPort;
 	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
 	if (error != B_OK) {

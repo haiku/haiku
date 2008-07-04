@@ -38,7 +38,7 @@ KernelMergeObject kernel_arch_x86.o :
 
 	generic_vm_physical_page_mapper.cpp
 	:
-	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
 CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;

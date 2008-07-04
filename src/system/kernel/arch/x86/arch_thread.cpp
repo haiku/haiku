@@ -310,7 +310,6 @@ status_t
 arch_thread_init_tls(struct thread *thread)
 {
 	uint32 tls[TLS_USER_THREAD_SLOT + 1];
-	int32 i;
 
 	thread->user_local_storage = thread->user_stack_base
 		+ thread->user_stack_size;

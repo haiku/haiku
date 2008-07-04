@@ -377,7 +377,7 @@ MessagingService::UnregisterService()
 
 	// unset the other members
 	fLockSem = -1;
-	fCounterSem -1;
+	fCounterSem = -1;
 	fServerTeam = -1;
 
 	return B_OK;

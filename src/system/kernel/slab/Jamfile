@@ -6,5 +6,5 @@ KernelMergeObject kernel_slab.o :
 	allocator.cpp
 	Slab.cpp
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 	;

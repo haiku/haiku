@@ -121,8 +121,6 @@ private:
 			return;
 		}
 
-		status_t error = B_OK;
-
 		while (dirent* entry = readdir(dir)) {
 			// skip "." and ".."
 			if (strcmp(entry->d_name, ".") == 0

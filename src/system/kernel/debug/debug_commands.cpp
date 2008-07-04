@@ -392,7 +392,6 @@ sort_debugger_commands()
 			}
 
 			if (strcmp((*command)->name, nextCommand->name) > 0) {
-				debugger_command* tmpCommand = nextCommand->next;
 				(*command)->next = nextCommand->next;
 				nextCommand->next = *command;
 				*command = nextCommand;

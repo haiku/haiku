@@ -186,7 +186,7 @@ arch_debug_blue_screen_getchar(void)
 	static bool altPressed = false;
 	static uint8 special = 0;
 	static uint8 special2 = 0;
-	uint8 key, ascii = 0;
+	uint8 key = 0;
 
 	if (special & 0x80) {
 		special &= ~0x80;

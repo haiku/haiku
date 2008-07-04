@@ -12,5 +12,5 @@ KernelMergeObject kernel_messaging.o :
 	KMessage.cpp
 	MessagingService.cpp
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

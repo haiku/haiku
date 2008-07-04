@@ -33,7 +33,7 @@ KernelMergeObject kernel_disk_device_manager.o :
 	# disk device types
 	DiskDeviceTypes.cpp
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
 # KFileDiskDevice.cpp needs the virtualdrive.h Header. Add it here to not

@@ -159,8 +159,6 @@ x86_count_mtrrs(void)
 void
 x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 {
-	cpu_status state;
-
 	struct set_mtrr_parameter parameter;
 	parameter.index = index;
 	parameter.base = base;
@@ -242,89 +240,89 @@ make_feature_string(cpu_ent *cpu, char *str, size_t strlen)
 {
 	str[0] = 0;
 
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)
 		strlcat(str, "fpu ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_VME)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_VME)
 		strlcat(str, "vme ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_DE)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_DE)
 		strlcat(str, "de ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSE)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSE)
 		strlcat(str, "pse ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_TSC)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_TSC)
 		strlcat(str, "tsc ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MSR)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MSR)
 		strlcat(str, "msr ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PAE)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PAE)
 		strlcat(str, "pae ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MCE)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MCE)
 		strlcat(str, "mce ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CX8)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CX8)
 		strlcat(str, "cx8 ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_APIC)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_APIC)
 		strlcat(str, "apic ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SEP)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SEP)
 		strlcat(str, "sep ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MTRR)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MTRR)
 		strlcat(str, "mtrr ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PGE)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PGE)
 		strlcat(str, "pge ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MCA)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MCA)
 		strlcat(str, "mca ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CMOV)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CMOV)
 		strlcat(str, "cmov ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PAT)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PAT)
 		strlcat(str, "pat ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSE36)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSE36)
 		strlcat(str, "pse36 ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSN)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSN)
 		strlcat(str, "psn ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CLFSH)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CLFSH)
 		strlcat(str, "clfsh ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_DS)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_DS)
 		strlcat(str, "ds ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_ACPI)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_ACPI)
 		strlcat(str, "acpi ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MMX)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MMX)
 		strlcat(str, "mmx ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FXSR)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FXSR)
 		strlcat(str, "fxsr ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SSE)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SSE)
 		strlcat(str, "sse ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SSE2)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SSE2)
 		strlcat(str, "sse2 ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SS)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SS)
 		strlcat(str, "ss ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_HTT)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_HTT)
 		strlcat(str, "htt ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_TM)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_TM)
 		strlcat(str, "tm ", strlen);
-	if(cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PBE)
+	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PBE)
 		strlcat(str, "pbe ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSE3)
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSE3)
 		strlcat(str, "sse3 ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_MONITOR)
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_MONITOR)
 		strlcat(str, "monitor ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_DSCPL)
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_DSCPL)
 		strlcat(str, "dscpl ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_EST)
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_EST)
 		strlcat(str, "est ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_TM2)
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_TM2)
 		strlcat(str, "tm2 ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_CNXTID)
+	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_CNXTID)
 		strlcat(str, "cnxtid ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_SYSCALL)
+	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_SYSCALL)
 		strlcat(str, "syscall ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_NX)
+	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_NX)
 		strlcat(str, "nx ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_MMXEXT)
+	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_MMXEXT)
 		strlcat(str, "mmxext ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_FFXSR)
+	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_FFXSR)
 		strlcat(str, "ffxsr ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_LONG)
+	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_LONG)
 		strlcat(str, "long ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOWEXT)
+	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOWEXT)
 		strlcat(str, "3dnowext ", strlen);
-	if(cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOW)
+	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOW)
 		strlcat(str, "3dnow ", strlen);
 }
 
@@ -333,7 +331,6 @@ static int
 detect_cpu(int curr_cpu) 
 {
 	cpuid_info cpuid;
-	unsigned int data[4];
 	char vendor_str[17];
 	int i;
 	cpu_ent *cpu = get_cpu_struct();
@@ -369,13 +366,13 @@ detect_cpu(int curr_cpu)
 
 	// figure out what vendor we have here
 
-	for(i=0; i<VENDOR_NUM; i++) {
-		if(vendor_info[i].ident_string[0] && !strcmp(vendor_str, vendor_info[i].ident_string[0])) {
+	for (i = 0; i < VENDOR_NUM; i++) {
+		if (vendor_info[i].ident_string[0] && !strcmp(vendor_str, vendor_info[i].ident_string[0])) {
 			cpu->arch.vendor = i;
 			cpu->arch.vendor_name = vendor_info[i].vendor;
 			break;
 		}
-		if(vendor_info[i].ident_string[1] && !strcmp(vendor_str, vendor_info[i].ident_string[1])) {
+		if (vendor_info[i].ident_string[1] && !strcmp(vendor_str, vendor_info[i].ident_string[1])) {
 			cpu->arch.vendor = i;
 			cpu->arch.vendor_name = vendor_info[i].vendor;
 			break;
@@ -384,7 +381,7 @@ detect_cpu(int curr_cpu)
 
 	// see if we can get the model name
 	get_current_cpuid(&cpuid, 0x80000000);
-	if(cpuid.eax_0.max_eax >= 0x80000004) {
+	if (cpuid.eax_0.max_eax >= 0x80000004) {
 		// build the model string (need to swap ecx/edx data before copying)
 		unsigned int temp;
 		memset(cpu->arch.model_name, 0, sizeof(cpu->arch.model_name));
@@ -399,9 +396,9 @@ detect_cpu(int curr_cpu)
 		memcpy(cpu->arch.model_name + 32, cpuid.as_chars, sizeof(cpuid.as_chars));
 
 		// some cpus return a right-justified string
-		for(i = 0; cpu->arch.model_name[i] == ' '; i++)
+		for (i = 0; cpu->arch.model_name[i] == ' '; i++)
 			;
-		if(i > 0) {
+		if (i > 0) {
 			memmove(cpu->arch.model_name, 
 				&cpu->arch.model_name[i], 
 				strlen(&cpu->arch.model_name[i]) + 1);
@@ -417,7 +414,7 @@ detect_cpu(int curr_cpu)
 	get_current_cpuid(&cpuid, 1);
 	cpu->arch.feature[FEATURE_COMMON] = cpuid.eax_1.features; // edx
 	cpu->arch.feature[FEATURE_EXT] = cpuid.eax_1.extended_features; // ecx
-	if(cpu->arch.vendor == VENDOR_AMD) {
+	if (cpu->arch.vendor == VENDOR_AMD) {
 		get_current_cpuid(&cpuid, 0x80000001);
 		cpu->arch.feature[FEATURE_EXT_AMD] = cpuid.regs.edx; // edx
 	}

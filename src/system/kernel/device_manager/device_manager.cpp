@@ -194,8 +194,6 @@ static device_node *sRootNode;
 static recursive_lock sLock;
 static const char* sGenericContextPath;
 
-static uint32 sDriverUpdateCycle = 1;
-
 
 //	#pragma mark -
 

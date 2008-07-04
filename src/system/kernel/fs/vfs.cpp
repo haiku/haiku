@@ -169,8 +169,6 @@ struct advisory_locking {
 	}
 };
 
-static mutex sFileSystemsMutex = MUTEX_INITIALIZER("vfs_lock");
-
 /*!	\brief Guards sMountsTable.
 
 	The holder is allowed to read/write access the sMountsTable.
@@ -539,7 +537,6 @@ static status_t
 get_mount(dev_t id, struct fs_mount **_mount)
 {
 	struct fs_mount *mount;
-	status_t status;
 
 	MutexLocker nodeLocker(sVnodeMutex);
 	MutexLocker mountLocker(sMountMutex);
@@ -1041,8 +1038,6 @@ vnode_low_memory_handler(void */*data*/, int32 level)
 		count = sUnusedVnodes;
 
 	// Write back the modified pages of some unused vnodes and free them
-
-	uint32 freeCount = count;
 
 	for (uint32 i = 0; i < count; i++) {
 		mutex_lock(&sVnodeMutex);
@@ -1846,7 +1841,6 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 	while (true) {
 		struct vnode *nextVnode;
-		ino_t vnodeID;
 		char *nextPath;
 
 		TRACE(("vnode_path_to_vnode: top of loop. p = %p, p = '%s'\n", path, path));
@@ -4215,8 +4209,6 @@ vfs_free_io_context(void *_ioContext)
 static status_t
 vfs_resize_fd_table(struct io_context *context, const int newSize)
 {
-	struct file_descriptor **fds;
-
 	if (newSize <= 0 || newSize > MAX_FD_TABLE_SIZE)
 		return EINVAL;
 
@@ -4278,7 +4270,6 @@ vfs_resize_fd_table(struct io_context *context, const int newSize)
 static status_t
 vfs_resize_monitor_table(struct io_context *context, const int newSize)
 {
-	void *fds;
 	int	status = B_OK;
 
 	if (newSize <= 0 || newSize > MAX_NODE_MONITORS)
@@ -7208,8 +7199,6 @@ _kern_remove_dir(int fd, const char *path)
 status_t
 _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 {
-	status_t status;
-
 	if (path) {
 		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 		if (pathBuffer.InitCheck() != B_OK)
@@ -7837,7 +7826,6 @@ _user_normalize_path(const char* userPath, bool traverseLink, char* buffer)
 		}
 
 		// read link
-		struct stat st;
 		if (HAS_FS_CALL(fileVnode, read_symlink)) {
 			size_t bufferSize = B_PATH_NAME_LENGTH - 1;
 			error = FS_CALL(fileVnode, read_symlink, path, &bufferSize);

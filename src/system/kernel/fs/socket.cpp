@@ -946,7 +946,7 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 		if (message.msg_controllen < 0)
 			return B_BAD_VALUE;
 		if (message.msg_controllen > MAX_ANCILLARY_DATA_LEN)
-			message.msg_controllen > MAX_ANCILLARY_DATA_LEN;
+			message.msg_controllen = MAX_ANCILLARY_DATA_LEN;
 
 		message.msg_control = ancillary = malloc(message.msg_controllen);
 		if (message.msg_control == NULL)

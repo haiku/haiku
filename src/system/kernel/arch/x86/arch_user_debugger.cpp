@@ -530,8 +530,6 @@ void
 arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 {
 	if (struct iframe *frame = i386_get_user_iframe()) {
-		struct thread *thread = thread_get_current_thread();
-
 		i386_frstor(cpuState->extended_regs);
 			// For this to be correct the calling function must not use these
 			// registers (not even indirectly).
@@ -564,8 +562,6 @@ void
 arch_get_debug_cpu_state(struct debug_cpu_state *cpuState)
 {
 	if (struct iframe *frame = i386_get_user_iframe()) {
-		struct thread *thread = thread_get_current_thread();
-
 		i386_fnsave(cpuState->extended_regs);
 			// For this to be correct the calling function must not use these
 			// registers (not even indirectly).

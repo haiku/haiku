@@ -856,8 +856,6 @@ _user_seek(int fd, off_t pos, int seekType)
 status_t
 _user_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
-	struct file_descriptor *descriptor;
-
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 

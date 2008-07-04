@@ -13,5 +13,5 @@ KernelMergeObject kernel_device_manager.o :
 #	probe.cpp
 	settings.cpp
 	:
-	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;

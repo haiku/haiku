@@ -109,9 +109,6 @@ free_temporary_variable_slot()
 static Variable*
 get_variable(const char* variableName, bool create)
 {
-	Variable* variables;
-	int variableCount;
-
 	// find the variable in the respective array and a free slot, we can
 	// use, if it doesn't exist yet
 	Variable* freeSlot = NULL;

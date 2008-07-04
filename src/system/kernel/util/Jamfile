@@ -11,5 +11,5 @@ KernelMergeObject kernel_util.o :
 	queue.c
 	ring_buffer.cpp
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -DUSING_LIBGCC
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -DUSING_LIBGCC
 ;

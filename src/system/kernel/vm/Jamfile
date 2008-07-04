@@ -14,5 +14,5 @@ KernelMergeObject kernel_vm.o :
 	vm_store_null.c
 	#vm_tests.c
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

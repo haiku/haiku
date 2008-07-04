@@ -178,7 +178,6 @@ static status_t unload_driver(legacy_driver *driver);
 static status_t load_driver(legacy_driver *driver);
 
 
-static int32 sDefaultApiVersion = 1;
 static hash_table* sDriverHash;
 static DriverWatcher sDriverWatcher;
 static int32 sDriverEvents;
@@ -334,8 +333,6 @@ load_driver(legacy_driver *driver)
 {
 	status_t (*init_hardware)(void);
 	status_t (*init_driver)(void);
-	const char **devicePaths;
-	int32 exported = 0;
 	status_t status;
 
 	driver->binary_updated = false;
@@ -416,10 +413,6 @@ load_driver(legacy_driver *driver)
 
 	driver->image = image;
 	return republish_driver(driver);
-
-error3:
-	if (driver->uninit_driver)
-		driver->uninit_driver();
 
 error2:
 	if (driver->uninit_hardware)
@@ -679,10 +672,8 @@ reload_driver(legacy_driver *driver)
 
 
 static void
-handle_driver_events(void *_fs, int /*iteration*/)
+handle_driver_events(void */*_fs*/, int /*iteration*/)
 {
-	struct devfs *fs = (devfs *)_fs;
-
 	if (atomic_and(&sDriverEvents, 0) == 0)
 		return;
 

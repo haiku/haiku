@@ -17,5 +17,5 @@ KernelMergeObject kernel_debug.o :
 	tracing.cpp
 	user_debugger.cpp
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

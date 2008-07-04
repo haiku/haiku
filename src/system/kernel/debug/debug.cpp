@@ -87,7 +87,6 @@ static const uint32 kMaxDebuggerModules = sizeof(sDebuggerModules)
 #define HISTORY_SIZE 16
 
 static char sLineBuffer[HISTORY_SIZE][LINE_BUFFER_SIZE] = { "", };
-static char sParseLine[LINE_BUFFER_SIZE];
 static int32 sCurrentLine = 0;
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
@@ -880,8 +879,6 @@ syslog_init(struct kernel_args *args)
 	syslog_write(revisionBuffer, length);
 	return B_OK;
 
-err3:
-	free(sSyslogBuffer);
 err2:
 	free(sSyslogMessage);
 err1:

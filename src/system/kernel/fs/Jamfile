@@ -17,5 +17,5 @@ KernelMergeObject kernel_fs.o :
 	vfs_boot.cpp
 	vfs_net_boot.cpp
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
