@@ -1900,7 +1900,7 @@ realloc(void *address, size_t newSize)
 
 			if (available >= newSize) {
 				// there is enough room available for the newSize
-				dprintf("realloc(): new size %ld fits in old area %ld with %ld available",
+				dprintf("realloc(): new size %ld fits in old area %ld with %ld available\n",
 					newSize, area, available);
 				return address;
 			}
