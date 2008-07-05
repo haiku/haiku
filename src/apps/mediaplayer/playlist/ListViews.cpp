@@ -338,7 +338,7 @@ DragSortableListView::MessageReceived(BMessage* message)
 			fDropIndex = -1;
 		}
 	} else {
-		switch ( message->what ) {
+		switch (message->what) {
 			case MSG_TICK: {
 				float scrollV = 0.0;
 				BRect rect(Bounds());
