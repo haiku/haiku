@@ -106,7 +106,6 @@ MediaTrackAudioSupplier::GetCodecInfo(media_codec_info* info) const
 bigtime_t
 MediaTrackAudioSupplier::Duration() const
 {
-	fMediaTrack, fMediaTrack ? fMediaTrack->Duration() : 0LL, fCountFrames);
 	if (!fMediaTrack)
 		return 0;
 
