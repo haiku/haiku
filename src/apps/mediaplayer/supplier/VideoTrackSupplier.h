@@ -31,6 +31,8 @@ class VideoTrackSupplier {
 	virtual	bigtime_t			Position() const = 0;
 	virtual	bigtime_t			Duration() const = 0;
 	virtual	int64				CurrentFrame() const = 0;
+
+	virtual	int32				TrackIndex() const = 0;
 };
 
 #endif // VIDEO_TRACK_SUPPLIER_H

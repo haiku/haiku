@@ -83,7 +83,9 @@ public:
 			int					VideoTrackCount();
 	
 			status_t			SelectAudioTrack(int n);
+			int					CurrentAudioTrack();
 			status_t			SelectVideoTrack(int n);
+			int					CurrentVideoTrack();
 
 			void				Stop();
 			void				Play();

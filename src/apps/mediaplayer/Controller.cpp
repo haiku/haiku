@@ -125,6 +125,10 @@ Controller::~Controller()
 int64
 Controller::Duration()
 {
+	// TODO: It is not so nice that the MediaPlayer still measures
+	// in video frames if only playing audio. Here for example, it will
+	// return a duration of 0 if the audio clip happens to be shorter than
+	// one video frame at 25 fps.
 	return (int64)((double)fDuration * fVideoFrameRate / 1000000.0);
 }
 
@@ -195,7 +199,7 @@ Controller::SetTo(const entry_ref &ref)
 
 	status_t err;
 	
-	BMediaFile *mf = new BMediaFile(&ref);
+	BMediaFile* mf = new BMediaFile(&ref);
 	ObjectDeleter<BMediaFile> mediaFileDeleter(mf);
 
 	err = mf->InitCheck();
@@ -213,19 +217,21 @@ Controller::SetTo(const entry_ref &ref)
 	}
 	
 	for (int i = 0; i < trackcount; i++) {
-		BMediaTrack *t = mf->TrackAt(i);
+		BMediaTrack* t = mf->TrackAt(i);
 		media_format f;
 		err = t->EncodedFormat(&f);
-		if (err != B_OK) {
+		if (err != B_OK || t->Duration() <= 0) {
 			printf("Controller::SetTo: EncodedFormat failed for track index %d, error 0x%08lx (%s)\n",
 				i, err, strerror(err));
 			mf->ReleaseTrack(t);
 			continue;
 		}
 		if (f.IsAudio()) {
-			fAudioTrackList.AddItem(t);
+			if (!fAudioTrackList.AddItem(t))
+				return B_NO_MEMORY;
 		} else if (f.IsVideo()) {
-			fVideoTrackList.AddItem(t);
+			if (!fVideoTrackList.AddItem(t))
+				return B_NO_MEMORY;
 		} else {
 			printf("Controller::SetTo: track index %d has unknown type\n", i);
 			mf->ReleaseTrack(t);
@@ -326,7 +332,7 @@ Controller::SelectAudioTrack(int n)
 		return B_ERROR;
 
 	ObjectDeleter<AudioTrackSupplier> deleter(fAudioTrackSupplier);
-	fAudioTrackSupplier = new MediaTrackAudioSupplier(track);
+	fAudioTrackSupplier = new MediaTrackAudioSupplier(track, n);
 
 	bigtime_t a = fAudioTrackSupplier->Duration();
 	bigtime_t v = fVideoTrackSupplier ? fVideoTrackSupplier->Duration() : 0;;
@@ -334,14 +340,22 @@ Controller::SelectAudioTrack(int n)
 	DurationChanged();
 	// TODO: notify duration changed!
 
-	// TODO: Not good, because the ProxyAudioSupplier currently
-	// uses the supplier without locking the Controller!
-	// This is only a problem when selecting a different audio track
-	// from the interface menu.
 	fAudioSupplier->SetSupplier(fAudioTrackSupplier, fVideoFrameRate);
 
 	_NotifyAudioTrackChanged(n);
 	return B_OK;
+}
+
+
+int
+Controller::CurrentAudioTrack()
+{
+	BAutolock _(this);
+
+	if (fAudioTrackSupplier == NULL)
+		return -1;
+
+	return fAudioTrackSupplier->TrackIndex();
 }
 
 
@@ -356,7 +370,7 @@ Controller::SelectVideoTrack(int n)
 
 	status_t initStatus;
 	ObjectDeleter<VideoTrackSupplier> deleter(fVideoTrackSupplier);
-	fVideoTrackSupplier = new MediaTrackVideoSupplier(track, initStatus);
+	fVideoTrackSupplier = new MediaTrackVideoSupplier(track, n, initStatus);
 	if (initStatus < B_OK) {
 		delete fVideoTrackSupplier;
 		fVideoTrackSupplier = NULL;
@@ -380,6 +394,18 @@ Controller::SelectVideoTrack(int n)
 
 	_NotifyVideoTrackChanged(n);
 	return B_OK;
+}
+
+
+int
+Controller::CurrentVideoTrack()
+{
+	BAutolock _(this);
+
+	if (fVideoTrackSupplier == NULL)
+		return -1;
+
+	return fVideoTrackSupplier->TrackIndex();
 }
 
 

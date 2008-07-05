@@ -17,7 +17,7 @@ class BMediaTrack;
 class MediaTrackVideoSupplier : public VideoTrackSupplier {
  public:
 								MediaTrackVideoSupplier(BMediaTrack* track,
-									status_t& initStatus);
+									int32 trackIndex, status_t& initStatus);
 	virtual						~MediaTrackVideoSupplier();
 
 	virtual	const media_format&	Format() const;
@@ -42,6 +42,9 @@ class MediaTrackVideoSupplier : public VideoTrackSupplier {
 	virtual	color_space			ColorSpace() const;
 	virtual	uint32				BytesPerRow() const;
 
+	virtual	int32				TrackIndex() const
+									{ return fTrackIndex; }
+
  private:
 			status_t			_SwitchFormat(color_space format,
 									uint32 bytesPerRow);
@@ -55,6 +58,8 @@ class MediaTrackVideoSupplier : public VideoTrackSupplier {
 			bigtime_t			fPerformanceTime;
 			bigtime_t			fDuration;
 			int64				fCurrentFrame;
+
+			int32				fTrackIndex;
 };
 
 #endif // MEDIA_TRACK_VIDEO_SUPPLIER_H

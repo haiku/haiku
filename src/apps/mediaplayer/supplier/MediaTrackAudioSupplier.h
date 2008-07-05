@@ -16,7 +16,8 @@ struct media_format;
 
 class MediaTrackAudioSupplier : public AudioTrackSupplier {
  public:
-								MediaTrackAudioSupplier(BMediaTrack* track);
+								MediaTrackAudioSupplier(BMediaTrack* track,
+									int32 trackIndex);
 	virtual						~MediaTrackAudioSupplier();
 
 	virtual	const media_format&	Format() const;
@@ -29,6 +30,9 @@ class MediaTrackAudioSupplier : public AudioTrackSupplier {
 	virtual	status_t			Read(void* buffer, int64 pos, int64 frames);
 
 	virtual	status_t			InitCheck() const;
+
+	virtual	int32				TrackIndex() const
+									{ return fTrackIndex; }
 
  private:
 			struct Buffer;
@@ -84,6 +88,7 @@ class MediaTrackAudioSupplier : public AudioTrackSupplier {
 			bool				fHasKeyFrames;
 			int64				fCountFrames;
 			bool				fReportSeekError;
+			int32				fTrackIndex;
 };
 
 #endif	// MEDIA_TRACK_AUDIO_SUPPLIER_H

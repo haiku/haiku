@@ -23,6 +23,8 @@ class AudioTrackSupplier : public AudioReader {
 									const = 0;
 	virtual	status_t			GetCodecInfo(media_codec_info* info) const = 0;
 	virtual	bigtime_t			Duration() const = 0;
+
+	virtual	int32				TrackIndex() const = 0;
 };
 
 #endif // AUDIO_TRACK_SUPPLIER_H

@@ -54,7 +54,8 @@ MediaTrackAudioSupplier::Buffer::CompareOffset(const void* a, const void* b)
 // #pragma mark - MediaTrackAudioSupplier
 
 
-MediaTrackAudioSupplier::MediaTrackAudioSupplier(BMediaTrack* mediaTrack)
+MediaTrackAudioSupplier::MediaTrackAudioSupplier(BMediaTrack* mediaTrack,
+		int32 trackIndex)
 	: AudioTrackSupplier(),
 	  fMediaTrack(mediaTrack),
 	  fBuffer(NULL),
@@ -63,7 +64,8 @@ MediaTrackAudioSupplier::MediaTrackAudioSupplier(BMediaTrack* mediaTrack)
 	  fBuffers(10),
 	  fHasKeyFrames(false),
 	  fCountFrames(0),
-	  fReportSeekError(true)
+	  fReportSeekError(true),
+	  fTrackIndex(trackIndex)
 {
 	_InitFromTrack();
 }
@@ -104,6 +106,7 @@ MediaTrackAudioSupplier::GetCodecInfo(media_codec_info* info) const
 bigtime_t
 MediaTrackAudioSupplier::Duration() const
 {
+	fMediaTrack, fMediaTrack ? fMediaTrack->Duration() : 0LL, fCountFrames);
 	if (!fMediaTrack)
 		return 0;
 
@@ -199,6 +202,9 @@ MediaTrackAudioSupplier::_InitFromTrack()
 
 		// get the length of the track
 		fCountFrames = fMediaTrack->CountFrames();
+
+		TRACE("MediaTrackAudioSupplier: keyframes: %d, frame count: %lld\n",
+			fHasKeyFrames, fCountFrames);
 	} else
 		fMediaTrack = NULL;
 }

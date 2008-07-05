@@ -709,10 +709,21 @@ MainWin::OpenFile(const entry_ref &ref)
 	if (err != B_OK) {
 		if (fPlaylist->CountItems() == 1) {
 			// display error if this is the only file we're supposed to play
-			char s[300];
-			sprintf(s, "Can't open file\n\n%s\n\nError 0x%08lx\n(%s)\n",
-				ref.name, err, strerror(err));
-			(new BAlert("error", s, "OK"))->Go();
+			BString message;
+			message << "The file '";
+			message << ref.name;
+			message << "' could not be opened.\n\n";
+			
+			if (err == B_MEDIA_NO_HANDLER) {
+				// give a more detailed message for the most likely of all
+				// errors
+				message << "There is no decoder installed to handle the "
+					"file format, or the decoder has trouble with the specific "
+					"version of the format.";
+			} else {
+				message << "Error: " << strerror(err);
+			}
+			(new BAlert("error", message.String(), "OK"))->Go();
 		} else {
 			// just go to the next file and don't bother user
 			fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
@@ -828,9 +839,6 @@ MainWin::_SetupWindow()
 	// Enable both if a file was loaded
 	fAudioTrackMenu->SetEnabled(fHasFile);
 	fVideoTrackMenu->SetEnabled(fHasFile);
-	// Select first track (might be "none") in both
-	fAudioTrackMenu->ItemAt(0)->SetMarked(true);
-	fVideoTrackMenu->ItemAt(0)->SetMarked(true);
 
 	fVideoMenu->SetEnabled(fHasVideo);
 	fAudioMenu->SetEnabled(fHasAudio);
@@ -847,6 +855,8 @@ MainWin::_SetupWindow()
 	}
 	_UpdateControlsEnabledStatus();
 
+	// TODO: Don't if the video size did not change! Also don't
+	// exit full screen mode.
 	_ResizeWindow(100);
 
 	fVideoView->MakeFocus();
@@ -958,26 +968,36 @@ MainWin::_SetupTrackMenus()
 	fAudioTrackMenu->RemoveItems(0, fAudioTrackMenu->CountItems(), true);
 	fVideoTrackMenu->RemoveItems(0, fVideoTrackMenu->CountItems(), true);
 	
-	int c, i;
 	char s[100];
 	
-	c = fController->AudioTrackCount();
-	for (i = 0; i < c; i++) {
+	int count = fController->AudioTrackCount();
+	int current = fController->CurrentAudioTrack();
+	for (int i = 0; i < count; i++) {
 		sprintf(s, "Track %d", i + 1);
-		fAudioTrackMenu->AddItem(new BMenuItem(s,
-			new BMessage(M_SELECT_AUDIO_TRACK + i)));
+		BMenuItem* item = new BMenuItem(s,
+			new BMessage(M_SELECT_AUDIO_TRACK + i));
+		item->SetMarked(i == current);
+		fAudioTrackMenu->AddItem(item);
 	}
-	if (!c)
+	if (!count) {
 		fAudioTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
-
-	c = fController->VideoTrackCount();
-	for (i = 0; i < c; i++) {
-		sprintf(s, "Track %d", i + 1);
-		fVideoTrackMenu->AddItem(new BMenuItem(s,
-			new BMessage(M_SELECT_VIDEO_TRACK + i)));
+		fAudioTrackMenu->ItemAt(0)->SetMarked(true);
 	}
-	if (!c)
+
+
+	count = fController->VideoTrackCount();
+	current = fController->CurrentVideoTrack();
+	for (int i = 0; i < count; i++) {
+		sprintf(s, "Track %d", i + 1);
+		BMenuItem* item = new BMenuItem(s,
+			new BMessage(M_SELECT_VIDEO_TRACK + i));
+		item->SetMarked(i == current);
+		fVideoTrackMenu->AddItem(item);
+	}
+	if (!count) {
 		fVideoTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
+		fVideoTrackMenu->ItemAt(0)->SetMarked(true);
+	}
 }
 
 
