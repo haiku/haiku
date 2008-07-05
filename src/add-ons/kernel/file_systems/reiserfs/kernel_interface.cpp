@@ -436,8 +436,13 @@ reiserfs_read(fs_volume *fs, fs_vnode *_node, void *cookie, off_t pos,
 			  *bufferSize));
 	status_t error = B_OK;
 	// don't read anything but files
-	if (!node->IsFile())
-		error = B_BAD_VALUE;
+	if (!node->IsFile()) {
+		if (node->IsDir())
+			error = B_IS_A_DIRECTORY;
+		else
+			error = B_BAD_VALUE;
+	}
+	
 	// read
 	StreamReader *reader = (StreamReader*)cookie;
 	if (error == B_OK) {
