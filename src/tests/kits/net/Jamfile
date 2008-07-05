@@ -14,6 +14,9 @@ SimpleTest getpeername : getpeername.cpp : $(TARGET_NETWORK_LIBS) ;
 SimpleTest tcp_connection_test : tcp_connection_test.cpp
 	: $(TARGET_NETWORK_LIBS) ;
 
+SimpleTest NetAddressTest : NetAddressTest.cpp 
+	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) ;
+
 SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
 SubInclude HAIKU_TOP src tests kits net multicast ;
 SubInclude HAIKU_TOP src tests kits net netperf ;
