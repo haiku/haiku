@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -39,18 +39,25 @@ struct file_extent {
 	file_io_vec		disk;
 };
 
+struct file_extent_array {
+	file_extent		*array;
+	size_t			max_count;
+};
+
 struct file_map {
 	file_map(off_t size);
 	~file_map();
 
 	file_extent *operator[](uint32 index);
 	file_extent *ExtentAt(uint32 index);
+	file_extent *FindExtent(off_t offset, uint32 *_index);
 	status_t Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset);
+	void Invalidate(off_t offset, off_t size);
 	void Free();
 
 	union {
 		file_extent	direct[CACHED_FILE_EXTENTS];
-		file_extent	*array;
+		file_extent_array indirect;
 	};
 	size_t			count;
 	struct vnode	*vnode;
@@ -60,7 +67,7 @@ struct file_map {
 
 file_map::file_map(off_t _size)
 {
-	array = NULL;
+	indirect.array = NULL;
 	count = 0;
 	size = _size;
 }
@@ -86,16 +93,45 @@ file_map::ExtentAt(uint32 index)
 		return NULL;
 
 	if (count > CACHED_FILE_EXTENTS)
-		return &array[index];
+		return &indirect.array[index];
 
 	return &direct[index];
+}
+
+
+file_extent *
+file_map::FindExtent(off_t offset, uint32 *_index)
+{
+	int32 left = 0;
+	int32 right = count - 1;
+
+	while (left <= right) {
+		int32 index = (left + right) / 2;
+		file_extent *extent = ExtentAt(index);
+
+		if (extent->offset > offset) {
+			// search in left part
+			right = index - 1;
+		} else if (extent->offset + extent->disk.length <= offset) {
+			// search in right part
+			left = index + 1;
+		} else {
+			// found extent
+			if (_index)
+				*_index = index;
+
+			return extent;
+		}
+	}
+
+	return NULL;
 }
 
 
 status_t
 file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 {
-	TRACE(("file_map::Add(vecCount = %ld)\n", vecCount));
+	TRACE(("file_map@%p::Add(vecCount = %ld)\n", this, vecCount));
 
 	off_t offset = 0;
 
@@ -105,12 +141,12 @@ file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 		// TODO: once we can invalidate only parts of the file map,
 		//	we might need to copy the previously cached file extends
 		//	from the direct range
-		file_extent *newMap = (file_extent *)realloc(array,
+		file_extent *newMap = (file_extent *)realloc(indirect.array,
 			(count + vecCount) * sizeof(file_extent));
 		if (newMap == NULL)
 			return B_NO_MEMORY;
 
-		array = newMap;
+		indirect.array = newMap;
 
 		if (count != 0) {
 			file_extent *extent = ExtentAt(count - 1);
@@ -131,7 +167,7 @@ file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 	}
 
 #ifdef TRACE_FILE_MAP
-	for (uint32 i = 0; i < count; i++) {
+	for (uint32 i = start; i < count; i++) {
 		file_extent *extent = ExtentAt(i);
 		dprintf("[%ld] extend offset %Ld, disk offset %Ld, length %Ld\n",
 			i, extent->offset, extent->disk.offset, extent->disk.length);
@@ -144,36 +180,21 @@ file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 
 
 void
-file_map::Free()
+file_map::Invalidate(off_t offset, off_t size)
 {
-	if (count > CACHED_FILE_EXTENTS)
-		free(array);
-
-	array = NULL;
-	count = 0;
+	// TODO: honour offset/size parameters
+	Free();
 }
 
 
-//	#pragma mark -
-
-
-static file_extent *
-find_file_extent(file_map &map, off_t offset, uint32 *_index)
+void
+file_map::Free()
 {
-	// TODO: do binary search
+	if (count > CACHED_FILE_EXTENTS)
+		free(indirect.array);
 
-	for (uint32 index = 0; index < map.count; index++) {
-		file_extent *extent = map[index];
-
-		if (extent->offset <= offset
-			&& extent->offset + extent->disk.length > offset) {
-			if (_index)
-				*_index = index;
-			return extent;
-		}
-	}
-
-	return NULL;
+	indirect.array = NULL;
+	count = 0;
 }
 
 
@@ -219,10 +240,11 @@ file_map_set_size(void *_map, off_t size)
 	if (_map == NULL)
 		return;
 
-	// TODO: honour offset/size parameters
 	file_map *map = (file_map *)_map;
-//	if (size < map->size)
-		map->Free();
+
+	if (size < map->size)
+		map->Invalidate(size, map->size - size);
+
 	map->size = size;
 }
 
@@ -233,9 +255,8 @@ file_map_invalidate(void *_map, off_t offset, off_t size)
 	if (_map == NULL)
 		return;
 
-	// TODO: honour offset/size parameters
 	file_map *map = (file_map *)_map;
-	map->Free();
+	map->Invalidate(offset, size);
 }
 
 
@@ -298,7 +319,7 @@ file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
 	// translate it for the requested access.
 
 	uint32 index;
-	file_extent *fileExtent = find_file_extent(map, offset, &index);
+	file_extent *fileExtent = map.FindExtent(offset, &index);
 	if (fileExtent == NULL) {
 		// access outside file bounds? But that's not our problem
 		*_count = 0;
