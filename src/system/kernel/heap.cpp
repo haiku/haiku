@@ -641,7 +641,7 @@ heap_validate_heap(heap_allocator *heap)
 	uint32 totalPageCount = 0;
 	uint32 totalFreePageCount = 0;
 	heap_area *area = heap->all_areas;
-	while (area) {
+	while (area != NULL) {
 		// validate the free pages list
 		uint32 freePageCount = 0;
 		heap_page *lastPage = NULL;
@@ -693,9 +693,9 @@ heap_validate_heap(heap_allocator *heap)
 	area = heap->areas;
 	heap_area *lastArea = NULL;
 	uint32 lastFreeCount = 0;
-	while (area) {
+	while (area != NULL) {
 		if (area->free_page_count < lastFreeCount)
-			panic("ordering of area list broken\n");
+			panic("size ordering of area list broken\n");
 
 		if (area->prev != lastArea)
 			panic("area list entry has invalid prev link\n");
@@ -703,6 +703,16 @@ heap_validate_heap(heap_allocator *heap)
 		lastArea = area;
 		lastFreeCount = area->free_page_count;
 		area = area->next;
+	}
+
+	lastArea = NULL;
+	area = heap->all_areas;
+	while (area != NULL) {
+		if (lastArea != NULL && lastArea->base < area->base)
+			panic("base ordering of all_areas list broken\n");
+
+		lastArea = area;
+		area = area->all_next;
 	}
 
 	// validate the bins
@@ -845,8 +855,19 @@ heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 		area->prev = lastArea;
 	}
 
-	area->all_next = heap->all_areas;
-	heap->all_areas = area;
+	// insert this area in the all_areas list so it stays ordered by base
+	if (heap->all_areas == NULL || heap->all_areas->base < area->base) {
+		area->all_next = heap->all_areas;
+		heap->all_areas = area;
+	} else {
+		heap_area *insert = heap->all_areas;
+		while (insert->all_next && insert->all_next->base > area->base)
+			insert = insert->all_next;
+
+		area->all_next = insert->all_next;
+		insert->all_next = area;
+	}
+
 	heap->total_pages += area->page_count;
 	heap->total_free_pages += area->free_page_count;
 
@@ -1283,9 +1304,19 @@ heap_free(heap_allocator *heap, void *address)
 
 	heap_area *area = heap->all_areas;
 	while (area) {
-		if ((addr_t)address >= area->base
-			&& (addr_t)address < area->base + area->size)
+		// since the all_areas list is ordered by base with the biggest
+		// base at the top, we need only find the first area with a base
+		// smaller than our address to become our only candidate for freeing
+		if (area->base <= (addr_t)address) {
+			if ((addr_t)address >= area->base + area->size) {
+				// the only candidate area doesn't contain the address,
+				// set it to NULL so we return below (none of the other areas
+				// can contain the address as the list is ordered)
+				area = NULL;
+			}
+
 			break;
+		}
 
 		area = area->all_next;
 	}
