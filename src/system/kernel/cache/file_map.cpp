@@ -55,6 +55,8 @@ struct file_map {
 	void Invalidate(off_t offset, off_t size);
 	void Free();
 
+	status_t _MakeSpace(size_t amount);
+
 	union {
 		file_extent	direct[CACHED_FILE_EXTENTS];
 		file_extent_array indirect;
@@ -129,47 +131,94 @@ file_map::FindExtent(off_t offset, uint32 *_index)
 
 
 status_t
+file_map::_MakeSpace(size_t amount)
+{
+	if (amount <= CACHED_FILE_EXTENTS) {
+		// just use the reserved area in the file_cache_ref structure
+		if (amount <= CACHED_FILE_EXTENTS && count > CACHED_FILE_EXTENTS) {
+			// the new size is smaller than the minimal array size
+			file_extent *array = indirect.array;
+			memcpy(direct, array, sizeof(file_extent) * amount);
+			free(array);
+		}
+	} else {
+		// resize array if needed
+		file_extent *oldArray = NULL;
+		size_t maxCount = CACHED_FILE_EXTENTS;
+		if (count > CACHED_FILE_EXTENTS) {
+			oldArray = indirect.array;
+			maxCount = indirect.max_count;
+		}
+
+		if (amount > maxCount) {
+			// allocate new array
+			while (maxCount < amount) {
+				if (maxCount < 32768)
+					maxCount <<= 1;
+				else
+					maxCount += 32768;
+			}
+
+			file_extent *newArray = (file_extent *)realloc(oldArray,
+				maxCount * sizeof(file_extent));
+			if (newArray == NULL)
+				return B_NO_MEMORY;
+
+			if (count > 0 && count <= CACHED_FILE_EXTENTS)
+				memcpy(newArray, direct, sizeof(file_extent) * count);
+
+			indirect.array = newArray;
+			indirect.max_count = maxCount;
+		}
+	}
+
+	count = amount;
+	return B_OK;
+}
+
+
+status_t
 file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 {
 	TRACE(("file_map@%p::Add(vecCount = %ld)\n", this, vecCount));
 
+	uint32 start = count;
 	off_t offset = 0;
 
-	if (vecCount <= CACHED_FILE_EXTENTS && count == 0) {
-		// just use the reserved area in the file_cache_ref structure
-	} else {
-		// TODO: once we can invalidate only parts of the file map,
-		//	we might need to copy the previously cached file extends
-		//	from the direct range
-		file_extent *newMap = (file_extent *)realloc(indirect.array,
-			(count + vecCount) * sizeof(file_extent));
-		if (newMap == NULL)
-			return B_NO_MEMORY;
+	status_t status = _MakeSpace(count + vecCount);
+	if (status != B_OK)
+		return status;
 
-		indirect.array = newMap;
-
-		if (count != 0) {
-			file_extent *extent = ExtentAt(count - 1);
-			offset = extent->offset + extent->disk.length;
-		}
+	file_extent *lastExtent = NULL;
+	if (start != 0) {
+		lastExtent = ExtentAt(start - 1);
+		offset = lastExtent->offset + lastExtent->disk.length;
 	}
 
-	int32 start = count;
-	count += vecCount;
-
 	for (uint32 i = 0; i < vecCount; i++) {
-		file_extent *extent = ExtentAt(start + i);
+		if (lastExtent != NULL) {
+			if (lastExtent->disk.offset + lastExtent->disk.length
+					== vecs[i].offset) {
+				lastExtent->disk.length += vecs[i].length;
+				offset += vecs[i].length;
+				start--;
+				_MakeSpace(count - 1);
+				continue;
+			}
+		}
 
+		file_extent *extent = ExtentAt(start + i);
 		extent->offset = offset;
 		extent->disk = vecs[i];
 
 		offset += extent->disk.length;
+		lastExtent = extent;
 	}
 
 #ifdef TRACE_FILE_MAP
-	for (uint32 i = start; i < count; i++) {
+	for (uint32 i = 0; i < count; i++) {
 		file_extent *extent = ExtentAt(i);
-		dprintf("[%ld] extend offset %Ld, disk offset %Ld, length %Ld\n",
+		dprintf("[%ld] extent offset %Ld, disk offset %Ld, length %Ld\n",
 			i, extent->offset, extent->disk.offset, extent->disk.length);
 	}
 #endif
@@ -179,11 +228,25 @@ file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 }
 
 
+/*!	Invalidates or removes the specified part of the file map.
+*/
 void
 file_map::Invalidate(off_t offset, off_t size)
 {
-	// TODO: honour offset/size parameters
-	Free();
+	// TODO: honour size, we currently always remove everything after "offset"
+	if (offset == 0) {
+		Free();
+		return;
+	}
+
+	uint32 index;
+	file_extent *extent = FindExtent(offset, &index);
+	if (extent != NULL) {
+		_MakeSpace(index);
+
+		if (extent->offset + extent->disk.length > offset)
+			extent->disk.length = offset - extent->offset;
+	}
 }
 
 
@@ -193,7 +256,6 @@ file_map::Free()
 	if (count > CACHED_FILE_EXTENTS)
 		free(indirect.array);
 
-	indirect.array = NULL;
 	count = 0;
 }
 
@@ -281,50 +343,45 @@ file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
 	if (offset + size > map.size)
 		size = map.size - offset;
 
-	if (map.count == 0) {
-		// we don't yet have the map of this file, so let's grab it
-		// (ordered by offset, so that we can do a binary search on them)
+	// First, we need to make sure that we have already cached all file
+	// extents needed for this request.
+
+	file_extent *lastExtent = NULL;
+	if (map.count > 0)
+		lastExtent = map.ExtentAt(map.count - 1);
+
+	off_t mapOffset = 0;
+	if (lastExtent != NULL)
+		mapOffset = lastExtent->offset + lastExtent->disk.length;
+
+	off_t end = offset + size;
+
+	while (mapOffset < end) {
+		// We don't have the requested extents yet, retrieve them
 		size_t vecCount = maxVecs;
-		off_t mapOffset = 0;
+		status = vfs_get_file_map(map.vnode, mapOffset, ~0UL, vecs,
+			&vecCount);
+		if (status < B_OK && status != B_BUFFER_OVERFLOW)
+			return status;
 
-		while (true) {
-			status = vfs_get_file_map(map.vnode, mapOffset, ~0UL, vecs,
-				&vecCount);
-			if (status < B_OK && status != B_BUFFER_OVERFLOW)
-				return status;
-
-			status_t addStatus = map.Add(vecs, vecCount, mapOffset);
-			if (addStatus != B_OK) {
-				// only clobber the status in case of failure
-				status = addStatus;
-			}
-
-			if (status != B_BUFFER_OVERFLOW)
-				break;
-
-			// when we are here, the map has been stored in the array, and
-			// the array size was still too small to cover the whole file
-			vecCount = maxVecs;
+		status_t addStatus = map.Add(vecs, vecCount, mapOffset);
+		if (addStatus != B_OK) {
+			// only clobber the status in case of failure
+			status = addStatus;
 		}
+
+		if (status != B_BUFFER_OVERFLOW)
+			break;
 	}
 
-	if (status != B_OK) {
-		// We must invalidate the (part of the) map we already
-		// have, as we cannot know if it's complete or not
-		map.Free();
+	if (status != B_OK)
 		return status;
-	}
 
-	// We now have cached the map of this file, we now need to
-	// translate it for the requested access.
+	// We now have cached the map of this file as far as we need it, now
+	// we need to translate it for the requested access.
 
 	uint32 index;
 	file_extent *fileExtent = map.FindExtent(offset, &index);
-	if (fileExtent == NULL) {
-		// access outside file bounds? But that's not our problem
-		*_count = 0;
-		return B_OK;
-	}
 
 	offset -= fileExtent->offset;
 	vecs[0].offset = fileExtent->disk.offset + offset;
