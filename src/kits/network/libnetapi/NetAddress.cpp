@@ -1,17 +1,18 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2006,2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Scott T. Mansfield, thephantom@mac.com
+ *		Oliver Tappe, zooey@hirschkaefer.de
  */
 
 /*!
 	NetAddress.cpp -- Implementation of the BNetAddress class.
 	Remarks:
-	 * In all accessors, address and port are converted from network to
+	 * In all accessors, non-struct output values are converted from network to
 	   host byte order.
-	 * In all mutators, address and port are converted from host to
+	 * In all mutators, non-struct input values are converted from host to
 	   network byte order.
 	 * No trouts were harmed during the development of this class.
 */
@@ -76,16 +77,16 @@ BNetAddress::BNetAddress(const BNetAddress& other)
 
 BNetAddress::BNetAddress(BMessage* archive)
 {
-    int8 int8value;
-    if (archive->FindInt8("bnaddr_family", &int8value) != B_OK)
+    int16 int16value;
+    if (archive->FindInt16("bnaddr_family", &int16value) != B_OK)
         return;
 
-    fFamily = int8value;
+    fFamily = int16value;
 
-    if (archive->FindInt8("bnaddr_port", &int8value) != B_OK)
+    if (archive->FindInt16("bnaddr_port", &int16value) != B_OK)
         return;
 
-    fPort = int8value;
+    fPort = int16value;
 
     if (archive->FindInt32("bnaddr_addr", &fAddress) != B_OK)
         return;
@@ -187,9 +188,9 @@ status_t BNetAddress::GetAddr( struct sockaddr_in& sa ) const
         return B_NO_INIT;
     }
 
-    sa.sin_family = ( uint8 )fFamily;
-    sa.sin_port = ( uint8 )fPort;
-    sa.sin_addr.s_addr = ( in_addr_t )fAddress;
+    sa.sin_family = fFamily;
+    sa.sin_port = fPort;
+    sa.sin_addr.s_addr = fAddress;
 
     return B_OK;
 }
@@ -208,22 +209,18 @@ status_t BNetAddress::GetAddr( struct sockaddr_in& sa ) const
  *     B_OK for success, B_NO_INIT if instance was not properly constructed.
  *
  * Remarks:
- *     Output parameters will be in network byte order, so it is not
- *     necessary to call htons after calling this method.
+ *     Output port will be in host byte order, but addr will be in the usual
+ *     network byte order (ready to be used by other network functions).
  */
 status_t BNetAddress::GetAddr( in_addr& addr, unsigned short* port ) const
 {
     if ( fInit != B_OK )
-    {
         return B_NO_INIT;
-    }
 
     addr.s_addr = fAddress;
 
     if ( port != NULL )
-    {
-        *port = fPort;
-    }
+        *port = ntohs(fPort);
 
     return B_OK;
 }
@@ -261,24 +258,16 @@ status_t BNetAddress::InitCheck( void )
 status_t BNetAddress::Archive( BMessage* into, bool deep ) const
 {
     if ( fInit != B_OK )
-    {
         return B_NO_INIT;
-    }
 
-    if ( into->AddInt8( "bnaddr_family", fFamily ) != B_OK )
-    {
+    if ( into->AddInt16( "bnaddr_family", fFamily ) != B_OK )
         return B_ERROR;
-    }
 
-    if ( into->AddInt8( "bnaddr_port", fPort ) != B_OK )
-    {
+    if ( into->AddInt16( "bnaddr_port", fPort ) != B_OK )
         return B_ERROR;
-    }
 
     if ( into->AddInt32( "bnaddr_addr", fAddress ) != B_OK )
-    {
         return B_ERROR;
-    }
 
     return B_OK;
 }
@@ -354,7 +343,7 @@ BNetAddress::SetTo(const char* hostname, unsigned short port)
 
 	fFamily = AF_INET;
 	fPort = htons(port);
-	fAddress = htonl(addr);
+	fAddress = addr;
 
 	return fInit = B_OK;
 }
@@ -370,8 +359,8 @@ status_t
 BNetAddress::SetTo(const struct sockaddr_in& addr)
 {
 	fFamily = addr.sin_family;
-	fPort = htons(addr.sin_port);
-	fAddress = htonl(addr.sin_addr.s_addr);
+	fPort = addr.sin_port;
+	fAddress = addr.sin_addr.s_addr;
 
 	return fInit = B_OK;
 }
@@ -389,8 +378,8 @@ status_t
 BNetAddress::SetTo(in_addr addr, int port)
 {
 	fFamily = AF_INET;
-	fPort = htons(port);
-	fAddress = htonl(addr.s_addr);
+	fPort = htons((short)port);
+	fAddress = addr.s_addr;
 
 	return fInit = B_OK;
 }
@@ -408,8 +397,8 @@ status_t
 BNetAddress::SetTo(uint32 addr, int port)
 {
 	fFamily = AF_INET;
-	fPort = htons(port);
-	fAddress = htonl(addr);
+	fPort = htons((short)port);
+	fAddress = addr;
 
 	return fInit = B_OK;
 }

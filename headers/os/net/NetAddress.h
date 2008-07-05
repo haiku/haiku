@@ -52,10 +52,10 @@ class BNetAddress : public BArchivable {
 		virtual void _ReservedBNetAddressFBCCruft6();
 
 		status_t fInit;
-		int32	fFamily;
-		int32	fPort;
+		int16	fFamily;
+		int16	fPort;
 		int32	fAddress;
-		int32	fPrivateData[6];
+		int32	fPrivateData[7];
 };
 
 #endif	// H_NETADDRESS
