@@ -28,6 +28,7 @@
 #include <Roster.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "EventQueue.h"
@@ -224,6 +225,8 @@ int
 main()
 {
 	EventQueue::CreateDefault();
+
+	srand(system_time());
 
 	gMainApp = new MainApp;
 	gMainApp->Run();

@@ -26,6 +26,7 @@
 #include "PlaybackState.h"
 #include "Playlist.h"
 #include "PlaylistObserver.h"
+#include "RandomizePLItemsCommand.h"
 #include "RemovePLItemsCommand.h"
 
 using std::nothrow;
@@ -372,6 +373,41 @@ PlaylistListView::RefsReceived(BMessage* message, int32 appendIndex)
 {
 	fCommandStack->Perform(new (nothrow) ImportPLItemsCommand(fPlaylist,
 		message, appendIndex));
+}
+
+
+void
+PlaylistListView::Randomize()
+{
+	int32 count = CountItems();
+	if (count == 0)
+		return;
+
+	BList indices;
+
+	// add current selection
+	count = 0;
+	while (true) {
+		int32 index = CurrentSelection(count);
+		if (index < 0)
+			break;
+		if (!indices.AddItem((void*)index))
+			return;
+		count++;
+	}
+
+	// was anything selected?
+	if (count == 0) {
+		// no selection, simply add all items
+		count = CountItems();
+		for (int32 i = 0; i < count; i++) {
+			if (!indices.AddItem((void*)i))
+				return;
+		}
+	}
+
+	fCommandStack->Perform(new (nothrow) RandomizePLItemsCommand(fPlaylist,
+		(int32*)indices.Items(), indices.CountItems()));
 }
 
 

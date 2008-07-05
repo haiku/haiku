@@ -44,6 +44,8 @@ class PlaylistListView : public SimpleListView {
 			void				RefsReceived(BMessage* message,
 									int32 appendIndex);
 
+			void				Randomize();
+
  private:
 			void				_FullSync();
 			void				_AddItem(const entry_ref& ref, int32 index);

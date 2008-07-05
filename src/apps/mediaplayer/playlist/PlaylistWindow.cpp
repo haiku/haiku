@@ -31,9 +31,13 @@
 #define DEBUG 1
 
 enum {
-	M_PLAYLIST_OPEN		= 'open',
-	M_PLAYLIST_SAVE		= 'save',
-	M_PLAYLIST_EMPTY	= 'emty'
+	// file
+	M_PLAYLIST_OPEN			= 'open',
+	M_PLAYLIST_SAVE			= 'save',
+
+	// edit
+	M_PLAYLIST_EMPTY		= 'emty',
+	M_PLAYLIST_RANDOMIZE	= 'rand'
 };
 
 #define SPACE 5
@@ -144,9 +148,14 @@ PlaylistWindow::MessageReceived(BMessage* message)
 				fOpenPanel = new BFilePanel(B_OPEN_PANEL);
 			fOpenPanel->Show();
 			break;						
+
 		case M_PLAYLIST_EMPTY:
 			fListView->RemoveAll();
-			break;						
+			break;
+		case M_PLAYLIST_RANDOMIZE:
+			fListView->Randomize();
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -180,6 +189,8 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	editMenu->AddSeparatorItem();
 	editMenu->AddItem(new BMenuItem("Make Empty",
 		new BMessage(M_PLAYLIST_EMPTY), 'N'));
+	editMenu->AddItem(new BMenuItem("Randomize",
+		new BMessage(M_PLAYLIST_RANDOMIZE), 'R'));
 	menuBar->AddItem(editMenu);
 
 	AddChild(menuBar);

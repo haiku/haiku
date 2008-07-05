@@ -61,6 +61,7 @@ Application MediaPlayer :
 	PlaylistListView.cpp
 	PlaylistObserver.cpp
 	PlaylistWindow.cpp
+	RandomizePLItemsCommand.cpp
 	RemovePLItemsCommand.cpp
 
 	# settings

@@ -43,6 +43,7 @@ MovePLItemsCommand::MovePLItemsCommand(Playlist* playlist,
 	int32 itemsBeforeIndex = 0;
 	for (int32 i = 0; i < fCount; i++) {
 		if (fPlaylist->GetRefAt(fIndices[i], &fRefs[i]) < B_OK) {
+			// indicate a bad object state
 			delete[] fRefs;
 			fRefs = NULL;
 			return;
@@ -64,7 +65,7 @@ MovePLItemsCommand::~MovePLItemsCommand()
 status_t
 MovePLItemsCommand::InitCheck()
 {
-	if (!fPlaylist || !fRefs || !fIndices)
+	if (!fRefs)
 		return B_NO_INIT;
 
 	// analyse the move, don't return B_OK in case

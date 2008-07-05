@@ -52,7 +52,7 @@ public:
 			// list functionality
 			void				MakeEmpty();
 			int32				CountItems() const;
-			
+
 			void				Sort();
 		
 			bool				AddRef(const entry_ref& ref);
