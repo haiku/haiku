@@ -17,6 +17,8 @@
 #include <arch/vm.h>
 #include <arch/smp.h>
 
+#include <timer.h>
+
 #include <arch/x86/smp_priv.h>
 #include <arch/x86/smp_apic.h>
 #include <arch/x86/timer.h>
@@ -39,23 +41,13 @@
 #	define TRACE_TIMER(x) ;
 #endif
 
+extern timer_info gAPICTimer;
 
 static void *apic = NULL;
 static uint32 cpu_apic_id[B_MAX_CPU_COUNT] = {0, 0};
 static uint32 cpu_os_id[B_MAX_CPU_COUNT] = {0, 0};
 static uint32 cpu_apic_version[B_MAX_CPU_COUNT] = {0, 0};
 static void *ioapic = NULL;
-static uint32 apic_timer_tics_per_sec = 0;
-
-
-static int32
-i386_timer_interrupt(void *data)
-{
-	arch_smp_ack_interrupt();
-
-	return apic_timer_interrupt();
-}
-
 
 static int32
 i386_ici_interrupt(void *data)
@@ -147,16 +139,7 @@ setup_apic(kernel_args *args, int32 cpu)
 	}
 #endif
 
-	/* setup timer */
-	config = apic_read(APIC_LVT_TIMER) & APIC_LVT_TIMER_MASK;
-	config |= 0xfb | APIC_LVT_MASKED; // vector 0xfb, timer masked
-	apic_write(APIC_LVT_TIMER, config);
-
-	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the clock
-
-	config = apic_read(APIC_TIMER_DIVIDE_CONFIG) & 0xfffffff0;
-	config |= APIC_TIMER_DIVIDE_CONFIG_1; // clock division by 1
-	apic_write(APIC_TIMER_DIVIDE_CONFIG, config);
+	apic_smp_init_timer(args, cpu);
 
 	/* setup error vector to 0xfe */
 	config = (apic_read(APIC_LVT_ERROR) & 0xffffff00) | 0xfe;
@@ -185,7 +168,6 @@ arch_smp_init(kernel_args *args)
 		memcpy(cpu_apic_id, args->arch_args.cpu_apic_id, sizeof(args->arch_args.cpu_apic_id));
 		memcpy(cpu_os_id, args->arch_args.cpu_os_id, sizeof(args->arch_args.cpu_os_id));
 		memcpy(cpu_apic_version, args->arch_args.cpu_apic_version, sizeof(args->arch_args.cpu_apic_version));
-		apic_timer_tics_per_sec = args->arch_args.apic_time_cv_factor;
 
 		// setup regions that represent the apic & ioapic
 		map_physical_memory("local apic", (void *)args->arch_args.apic_phys, B_PAGE_SIZE,
@@ -197,7 +179,6 @@ arch_smp_init(kernel_args *args)
 		arch_smp_per_cpu_init(args, 0);
 
 		// I/O interrupts start at ARCH_INTERRUPT_BASE, so all interrupts are shifted
-		install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE, &i386_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
 		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &i386_ici_interrupt, NULL, B_NO_LOCK_VECTOR);
 		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &i386_smp_error_interrupt, NULL, B_NO_LOCK_VECTOR);
 		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &i386_spurious_interrupt, NULL, B_NO_LOCK_VECTOR);
@@ -268,63 +249,3 @@ arch_smp_ack_interrupt(void)
 {
 	apic_write(APIC_EOI, 0);
 }
-
-#define MIN_TIMEOUT 1000
-
-status_t
-arch_smp_set_apic_timer(bigtime_t relativeTimeout)
-{
-	cpu_status state;
-	uint32 config;
-	uint32 ticks;
-
-	if (apic == NULL)
-		return B_ERROR;
-
-	if (relativeTimeout < MIN_TIMEOUT)
-		relativeTimeout = MIN_TIMEOUT;
-
-	// calculation should be ok, since it's going to be 64-bit
-	ticks = ((relativeTimeout * apic_timer_tics_per_sec) / 1000000);
-
-	state = disable_interrupts();
-
-	config = apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED; // mask the timer
-	apic_write(APIC_LVT_TIMER, config);
-
-	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
-
-	config = apic_read(APIC_LVT_TIMER) & ~APIC_LVT_MASKED; // unmask the timer
-	apic_write(APIC_LVT_TIMER, config);
-
-	TRACE_TIMER(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %lu, tics %lu\n",
-		config, relativeTimeout, apic_timer_tics_per_sec, ticks));
-
-	apic_write(APIC_INITIAL_TIMER_COUNT, ticks); // start it up
-
-	restore_interrupts(state);
-
-	return B_OK;
-}
-
-
-status_t
-arch_smp_clear_apic_timer(void)
-{
-	cpu_status state;
-	uint32 config;
-
-	if (apic == NULL)
-		return B_ERROR;
-
-	state = disable_interrupts();
-
-	config = apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED; // mask the timer
-	apic_write(APIC_LVT_TIMER, config);
-
-	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
-
-	restore_interrupts(state);
-	return B_OK;
-}
-

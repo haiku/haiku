@@ -32,60 +32,24 @@
 #	define TRACE(x) ;
 #endif
 
+extern timer_info gPITTimer;
+extern timer_info gAPICTimer;
+extern timer_info gHPETTimer;
 
-#define PIT_CLOCK_RATE 1193180
-#define PIT_MAX_TIMER_INTERVAL (0xffff * 1000000ll / PIT_CLOCK_RATE)
+static timer_info *sTimers[] = {
+	&gPITTimer,
+	&gAPICTimer,
+	&gHPETTimer,
+	NULL
+};
 
-
-static void
-set_isa_hardware_timer(bigtime_t relative_timeout)
-{
-	uint16 next_event_clocks;
-
-	if (relative_timeout <= 0)
-		next_event_clocks = 2;			
-	else if (relative_timeout < PIT_MAX_TIMER_INTERVAL)
-		next_event_clocks = relative_timeout * PIT_CLOCK_RATE / 1000000;
-	else
-		next_event_clocks = 0xffff;
-
-	out8(0x30, 0x43);		
-	out8(next_event_clocks & 0xff, 0x40);
-	out8((next_event_clocks >> 8) & 0xff, 0x40);
-
-	arch_int_enable_io_interrupt(0);
-}
-
-
-static void
-clear_isa_hardware_timer(void)
-{
-	// mask out the timer
-	arch_int_disable_io_interrupt(0);
-}
-
-
-static int32
-isa_timer_interrupt(void *data)
-{
-	return timer_interrupt();
-}
-
-
-int
-apic_timer_interrupt(void)
-{
-	return timer_interrupt();
-}
-
+static timer_info *sTimer = NULL;
 
 void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
 	TRACE(("arch_timer_set_hardware_timer: timeout %lld\n", timeout));
-	// try the apic timer first
-	if (arch_smp_set_apic_timer(timeout) != B_OK)
-		set_isa_hardware_timer(timeout);
+	sTimer->set_hardware_timer(timeout);
 }
 
 
@@ -93,20 +57,41 @@ void
 arch_timer_clear_hardware_timer(void)
 {
 	TRACE(("arch_timer_clear_hardware_timer\n"));
-	if (arch_smp_clear_apic_timer() != B_OK)
-		clear_isa_hardware_timer();
+	sTimer->clear_hardware_timer();
 }
 
 
 int
 arch_init_timer(kernel_args *args)
 {
-	//dprintf("arch_init_timer: entry\n");
+	int i = 0;
+	int bestPriority = -1;
+	timer_info *timer = NULL;
+	cpu_status state = disable_interrupts();
 
-	install_io_interrupt_handler(0, &isa_timer_interrupt, NULL, 0);
-	clear_isa_hardware_timer();
+	for (i = 0; (timer = sTimers[i]) != NULL; i++) {
+		int priority;
+		if (timer->init(args) != B_OK) {
+			TRACE(("arch_init_timer: %s failed init. Skipping.\n", timer->name));
+			continue;
+		}
 
-	// apic timer interrupt set up by smp code
+		priority = timer->get_priority();
+
+		if (priority > bestPriority) {
+			bestPriority = priority;
+			sTimer = timer;
+			TRACE(("arch_init_timer: %s is now best timer module with prio %d.\n", timer->name, bestPriority));
+		}
+	}
+
+	if (sTimer != NULL) {
+		dprintf("arch_init_timer: using %s timer.\n", sTimer->name);
+	} else {
+		panic("No system timers were found usable.\n");
+	}
+
+	restore_interrupts(state);
 
 	return 0;
 }

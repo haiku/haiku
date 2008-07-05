@@ -4,10 +4,13 @@ SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) system kernel ] ;
 	# for syscall_numbers.h
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers ps2 ;
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
+SubDirHdrs $(SUBDIR) timers ;
 
 UsePrivateKernelHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
 
 KernelMergeObject kernel_arch_x86.o :
 	arch_commpage.cpp
@@ -15,7 +18,6 @@ KernelMergeObject kernel_arch_x86.o :
 	arch_debug.cpp
 	arch_debug_console.c
 	arch_elf.c
-	arch_hpet.c
 	arch_int.c
 	arch_platform.c
 #	arch_selector.c
@@ -35,6 +37,10 @@ KernelMergeObject kernel_arch_x86.o :
 	cpuid.S
 	syscall.S
 	vm86.cpp
+	
+	x86_pit.c
+	x86_apic.c
+	x86_hpet.c
 
 	generic_vm_physical_page_mapper.cpp
 	:
