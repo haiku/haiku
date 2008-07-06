@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Oliver Tappe, zooey@hirschkaefer.de
  */
 
 
@@ -59,25 +60,31 @@ initialize_before()
 
 	// We're using the BeOS startup code, check if BONE libraries are in
 	// use, and if not, enable the R5 compatibility layer.
-
-	const char *name;
-	cookie = 0;
+	// As dependencies to network libraries may be "hidden" in libraries, we
+	// may have to scan not only the executable, but every loaded image.
 	int enable = 0;
+	uint32 crumble;
+	const char *name;
+	do {
+		crumble = 0;
+		while (__get_next_image_dependency(info.id, &crumble, &name) == B_OK) {
+			if (!strcmp(name, "libbind.so")
+				|| !strcmp(name, "libsocket.so")
+				|| !strcmp(name, "libbnetapi.so")
+				|| !strcmp(name, "libnetwork.so"))
+				enable -= 2;
+			else if (!strcmp(name, "libnet.so")
+				|| !strcmp(name, "libnetapi.so"))
+				enable++;
+		}
 
-	while (__get_next_image_dependency(info.id, &cookie, &name) == B_OK) {
-		if (!strcmp(name, "libbind.so")
-			|| !strcmp(name, "libsocket.so")
-			|| !strcmp(name, "libbnetapi.so")
-			|| !strcmp(name, "libnetwork.so"))
-			enable -= 2;
-		else if (!strcmp(name, "libnet.so")
-			|| !strcmp(name, "libnetapi.so"))
-			enable++;
-	}
-
-	if (enable > 0) {
-		__gR5Compatibility = true;
-		find_own_image();
-		debug_printf("libnetwork.so running in R5 compatibility mode.\n");
-	}
+		if (enable > 0) {
+			__gR5Compatibility = true;
+			find_own_image();
+			debug_printf("libnetwork.so running in R5 compatibility mode.\n");
+			return;
+		}
+	} while(enable == 0 
+		&& get_next_image_info(B_CURRENT_TEAM, (int32 *)&cookie, &info) 
+			== B_OK);
 }
