@@ -344,14 +344,12 @@ firewire_watchdog(void *arg)
 	 */
 	if (watchdog_clock > WATCHDOG_HZ * 15)
 //		taskqueue_enqueue(fc->taskqueue, &fc->task_timeout);
-		gDpc->queue_dpc(fc->taskqueue, firewire_xfer_timeout, fc);
+		firewire_xfer_timeout(fc);
 	else
 		watchdog_clock ++;
 
 //	callout_reset(&fc->timeout_callout, hz / WATCHDOG_HZ,
 //			(void *)firewire_watchdog, (void *)fc);
-	fc->timeout_callout = create_timer(firewire_watchdog, fc, 
-			hz/WATCHDOG_HZ, B_ONE_SHOT_RELATIVE_TIMER);
 }
 
 #if 0//to do
@@ -447,7 +445,7 @@ firewire_attach(struct firewire_comm *fc, struct firewire_softc *sc)
 //	callout_reset(&sc->fc->timeout_callout, hz,
 //			(void *)firewire_watchdog, (void *)sc->fc);
 	fc->timeout_callout = create_timer(firewire_watchdog, fc, 
-			hz/WATCHDOG_HZ, B_ONE_SHOT_RELATIVE_TIMER);
+			hz/WATCHDOG_HZ, B_PERIODIC_TIMER);
 
 	/* create thread */
 //	kthread_create(fw_bus_probe_thread, (void *)fc, &fc->probe_thread,

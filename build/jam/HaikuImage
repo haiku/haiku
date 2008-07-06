@@ -30,7 +30,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2 cal cat
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
 	draggers driveinfo dstcheck du echo eject env error expand expr
 	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp ftpd
-	funzip #fwcontrol
+	funzip fwcontrol
 	gawk $(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname id ident
 	ideinfo idestatus ifconfig <bin>install installsound iroster isvolume join
 	keymap kill less lessecho lesskey link listarea listattr listimage listdev
@@ -171,7 +171,7 @@ AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
 									  random <driver>tty zero ;
 AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage midi			: $(BEOS_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToHaikuImage bus			: usb_raw ; # fw_raw
+AddDriversToHaikuImage bus			: usb_raw fw_raw ;
 AddDriversToHaikuImage disk floppy	: $(X86_ONLY)pc_floppy ;
 AddDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 AddDriversToHaikuImage disk usb		: usb_disk ;
