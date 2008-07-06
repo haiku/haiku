@@ -32,7 +32,7 @@ struct ListItemComparator {
 private:
 	int (*fCompareFunc)(const BListItem *, const BListItem *);
 };
-	
+
 //	#pragma mark -
 
 
@@ -46,6 +46,17 @@ BOutlineListView::BOutlineListView(BRect frame, const char* name,
 BOutlineListView::BOutlineListView(BMessage* archive)
 	: BListView(archive)
 {
+	int32 i = 0;
+	BMessage subData;
+	while (archive->FindMessage("_l_full_items", i++, &subData) == B_OK) {
+		BArchivable *object = instantiate_object(&subData);
+		if (!object)
+			continue;
+
+		BListItem *item = dynamic_cast<BListItem*>(object);
+		if (item)
+			AddItem(item);
+	}
 }
 
 
@@ -68,7 +79,36 @@ BOutlineListView::Instantiate(BMessage* archive)
 status_t
 BOutlineListView::Archive(BMessage* archive, bool deep) const
 {
-	return BListView::Archive(archive, deep);
+	// Note: We can't call the BListView Archive function here, as we are also
+	// interested in subitems BOutlineListView can have. They are even stored
+	// with a different field name (_l_full_items vs. _l_items).
+
+	status_t status = BView::Archive(archive, deep);
+	if (status != B_OK)
+		return status;
+
+	status = archive->AddInt32("_lv_type", fListType);
+	if (status == B_OK && deep) {
+		int32 i = 0;
+		BListItem *item = NULL;
+		while ((item = static_cast<BListItem*>(fFullList.ItemAt(i++)))) {
+			BMessage subData;
+			status = item->Archive(&subData, true);
+			if (status >= B_OK)
+				status = archive->AddMessage("_l_full_items", &subData);
+
+			if (status < B_OK)
+				break;
+		}
+	}
+
+	if (status >= B_OK && InvocationMessage() != NULL)
+		status = archive->AddMessage("_msg", InvocationMessage());
+
+	if (status == B_OK && fSelectMessage != NULL)
+		status = archive->AddMessage("_2nd_msg", fSelectMessage);
+
+	return status;
 }
 
 
@@ -147,7 +187,7 @@ BOutlineListView::AddUnder(BListItem* item, BListItem* superitem)
 {
 	if (superitem == NULL)
 		return AddItem(item);
-	
+
 	fFullList.AddItem(item, FullListIndexOf(superitem) + 1);
 
 	item->fLevel = superitem->OutlineLevel() + 1;
@@ -279,7 +319,7 @@ int32
 BOutlineListView::FullListIndexOf(BPoint point) const
 {
 	int32 index = BListView::IndexOf(point);
-	
+
 	if (index > 0)
 		index = FullListIndex(index);
 
@@ -458,7 +498,7 @@ BOutlineListView::Collapse(BListItem* item)
 
 		items++;
 	}
-	
+
 	_RecalcItemTops(startIndex);
 	// fix selection hints
 	// TODO: revise for multi selection lists
@@ -473,7 +513,7 @@ BOutlineListView::Collapse(BListItem* item)
 			Select(index);
 		}
 	}
-	
+
 	_FixupScrollBar();
 	Invalidate();
 }
@@ -484,7 +524,7 @@ BOutlineListView::IsExpanded(int32 fullListIndex)
 {
 	BListItem *item = FullListItemAt(fullListIndex);
 	if (!item)
-		return false;	
+		return false;
 
 	return item->IsExpanded();
 }
@@ -625,7 +665,7 @@ BOutlineListView::_SortTree(BList* tree, bool oneLevelOnly,
 	int (*compareFunc)(const BListItem* a, const BListItem* b))
 {
 	BListItem **items = (BListItem **)tree->Items();
-	std::sort(items, items + tree->CountItems(), ListItemComparator(compareFunc));	
+	std::sort(items, items + tree->CountItems(), ListItemComparator(compareFunc));
 
 	if (oneLevelOnly)
 		return;
@@ -691,7 +731,7 @@ BOutlineListView::CountItemsUnder(BListItem* underItem,
 	int32 i = FullListIndexOf(underItem);
 	if (i == -1)
 		return 0;
-	
+
 	++i;
 	int32 count = 0;
 	uint32 baseLevel = underItem->OutlineLevel();
@@ -777,7 +817,7 @@ static void _GetSubItems(BList &sourceList, BList &destList,
 		BListItem *item = (BListItem *)sourceList.ItemAt(i);
 		if (item->OutlineLevel() <= parent->OutlineLevel())
 			break;
-		destList.AddItem(item);	
+		destList.AddItem(item);
 	}
 }
 
@@ -829,7 +869,7 @@ BOutlineListView::_SwapItems(int32 first, int32 second)
 	BListItem *firstItem = ItemAt(firstIndex);
 	BListItem *secondItem = ItemAt(secondIndex);
 	BList firstSubItems, secondSubItems;
-	
+
 	if (Superitem(firstItem) != Superitem(secondItem))
 		return false;
 	if (!firstItem->IsItemVisible() || !secondItem->IsItemVisible())
@@ -844,12 +884,12 @@ BOutlineListView::_SwapItems(int32 first, int32 second)
 
 	_CullInvisibleItems(firstSubItems);
 	_CullInvisibleItems(secondSubItems);
-	_DoSwap(fList, firstIndex, secondIndex, &firstSubItems, 
+	_DoSwap(fList, firstIndex, secondIndex, &firstSubItems,
 		&secondSubItems);
 
 	_RecalcItemTops(firstIndex);
 	_RescanSelection(firstIndex, secondIndex + secondSubItems.CountItems());
-	Invalidate(Bounds());	
+	Invalidate(Bounds());
 	return true;
 }
 
@@ -858,7 +898,7 @@ BOutlineListView::DoMiscellaneous(MiscCode code, MiscData* data)
 {
 	if (code == B_SWAP_OP)
 		return _SwapItems(data->swap.a, data->swap.b);
-	
+
 	return BListView::DoMiscellaneous(code, data);
 }
 
@@ -976,24 +1016,24 @@ BOutlineListView::_RemoveItem(BListItem* item, int32 fullIndex)
 	uint32 level = item->OutlineLevel();
 	int32 superIndex;
 	BListItem* super = _SuperitemForIndex(fullIndex, level, &superIndex);
-	
+
 	if (item->IsItemVisible()) {
 		// remove children, too
 		while (fullIndex + 1 < CountItems()) {
 			BListItem *subItem = ItemAt(fullIndex + 1);
-			
+
 			if (subItem->OutlineLevel() <= level)
 				break;
 
 			if (subItem->IsItemVisible())
 				BListView::RemoveItem(subItem);
-			
+
 			fFullList.RemoveItem(fullIndex + 1);
 			delete subItem;
 		}
 		BListView::RemoveItem(item);
 	}
-	
+
 	fFullList.RemoveItem(fullIndex);
 
 	if (super != NULL) {
