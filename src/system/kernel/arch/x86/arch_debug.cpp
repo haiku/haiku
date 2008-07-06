@@ -103,7 +103,8 @@ lookup_symbol(struct thread* thread, addr_t address, addr_t *_baseAddress,
 
 
 static void
-print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp)
+print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
+	int32 callIndex)
 {
 	const char *symbol, *image;
 	addr_t baseAddress;
@@ -120,7 +121,7 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp)
 	status = lookup_symbol(thread, eip, &baseAddress, &symbol, &image,
 		&exactMatch);
 
-	kprintf("%08lx (+%4ld) %08lx", ebp, diff, eip);
+	kprintf("%2ld %08lx (+%4ld) %08lx", callIndex, ebp, diff, eip);
 
 	if (status == B_OK) {
 		if (symbol != NULL) {
@@ -293,7 +294,7 @@ stack_trace(int argc, char **argv)
 
 	bool onKernelStack = true;
 
-	for (;;) {
+	for (int32 callIndex = 0;; callIndex++) {
 		onKernelStack = onKernelStack
 			&& is_kernel_stack_address(thread, ebp);
 
@@ -301,7 +302,7 @@ stack_trace(int argc, char **argv)
 			struct iframe *frame = (struct iframe *)ebp;
 
 			print_iframe(frame);
-			print_stack_frame(thread, frame->eip, ebp, frame->ebp);
+			print_stack_frame(thread, frame->eip, ebp, frame->ebp, callIndex);
 
  			ebp = frame->ebp;
 		} else {
@@ -315,7 +316,7 @@ stack_trace(int argc, char **argv)
 			if (eip == 0 || ebp == 0)
 				break;
 
-			print_stack_frame(thread, eip, ebp, nextEbp);
+			print_stack_frame(thread, eip, ebp, nextEbp, callIndex);
 			ebp = nextEbp;
 		}
 
