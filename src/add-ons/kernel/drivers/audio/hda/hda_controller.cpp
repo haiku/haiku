@@ -110,15 +110,8 @@ hda_interrupt_handler(hda_controller* controller)
 
 	/* Controller or stream related? */
 	if (intrStatus & INTR_STATUS_CONTROLLER) {
-		uint32 stateStatus = controller->Read16(HDAC_STATE_STATUS);
 		uint8 rirbStatus = controller->Read8(HDAC_RIRB_STATUS);
 		uint8 corbStatus = controller->Read8(HDAC_CORB_STATUS);
-
-		if (stateStatus) {
-			/* Detected Codec state change */
-			controller->Write16(HDAC_STATE_STATUS, stateStatus);
-			controller->codec_status = stateStatus;
-		}
 
 		/* Check for incoming responses */			
 		if (rirbStatus) {
@@ -672,7 +665,7 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 status_t
 hda_hw_init(hda_controller* controller)
 {
-	uint16 capabilities;
+	uint16 capabilities, stateStatus;
 	status_t status;
 
 	/* Map MMIO registers */
@@ -708,13 +701,17 @@ hda_hw_init(hda_controller* controller)
 
 	/* Get controller into valid state */
 	status = reset_controller(controller);
-	if (status != B_OK)
+	if (status != B_OK) {
+		dprintf("hda: reset_controller failed\n");
 		goto reset_failed;
+	}
 
 	/* Setup CORB/RIRB/DMA POS */
 	status = init_corb_rirb_pos(controller);
-	if (status != B_OK)
+	if (status != B_OK) {
+		dprintf("hda: init_corb_rirb_pos failed\n");
 		goto corb_rirb_failed;
+	}
 
 	controller->Write16(HDAC_WAKE_ENABLE, 0x7fff);
 
@@ -722,14 +719,19 @@ hda_hw_init(hda_controller* controller)
 	controller->Write32(HDAC_INTR_CONTROL, INTR_CONTROL_GLOBAL_ENABLE
 		| INTR_CONTROL_CONTROLLER_ENABLE);
 
-	if (!controller->codec_status) {	
+	snooze(1000);
+
+	stateStatus = controller->Read16(HDAC_STATE_STATUS);
+	if (!stateStatus) {
+		dprintf("hda: bad codec status\n");
 		status = ENODEV;
 		goto corb_rirb_failed;
 	}
+	controller->Write16(HDAC_STATE_STATUS, stateStatus);
 
 	// Create codecs
 	for (uint32 index = 0; index < HDA_MAX_CODECS; index++) {
-		if ((controller->codec_status & (1 << index)) != 0)
+		if ((stateStatus & (1 << index)) != 0)
 			hda_codec_new(controller, index);
 	}
 	for (uint32 index = 0; index < HDA_MAX_CODECS; index++) {
@@ -743,6 +745,7 @@ hda_hw_init(hda_controller* controller)
 	if (controller->active_codec != NULL)
 		return B_OK;
 
+	dprintf("hda: no active codec\n");
 	status = ENODEV;
 
 corb_rirb_failed:
