@@ -776,7 +776,8 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 			float maxAbs = max_c(fabs(min[i]), fabs(max[i]));
 			message.AddFloat("max", maxAbs);
 		}
-		bigtime_t realTime = TimeSource()->RealTimeFor(performanceTime, 0);
+		bigtime_t realTime = TimeSource()->RealTimeFor(
+			fStartTime + performanceTime, 0);
 		realTime -= 2000;
 			// deliver event about one video frame earlier to account
 			// for latency between app_server and client
