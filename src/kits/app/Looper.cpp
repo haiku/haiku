@@ -173,7 +173,11 @@ BLooper::BLooper(BMessage* data)
 	if (data->FindInt32("_port_cap", &portCapacity) != B_OK || portCapacity < 0)
 		portCapacity = B_LOOPER_PORT_DEFAULT_CAPACITY;
 
-	_InitData(Name(), B_NORMAL_PRIORITY, portCapacity);
+	int32 priority;
+	if (data->FindInt32("_prio", &priority) != B_OK)
+		priority = B_NORMAL_PRIORITY;
+
+	_InitData(Name(), priority, portCapacity);
 }
 
 
@@ -199,7 +203,9 @@ BLooper::Archive(BMessage* data, bool deep) const
 	if (status == B_OK)
 		status = data->AddInt32("_port_cap", info.capacity);
 
-	// TODO: what about the thread priority?
+	thread_info threadInfo;
+	if (get_thread_info(Thread(), &threadInfo) == B_OK)
+		status = data->AddInt32("_prio", threadInfo.priority);
 
 	return status;
 }
@@ -522,7 +528,7 @@ PRINT(("  fAtomicCount now: %ld\n", fAtomicCount));
 		// and release if it's the case
 		if (atomicCount > 1)
 #endif
-			release_sem(fLockSem); 
+			release_sem(fLockSem);
 	}
 PRINT(("BLooper::Unlock() done\n"));
 }
@@ -898,7 +904,7 @@ BLooper::_LockComplete(BLooper *looper, int32 oldCount, thread_id thread,
 {
 	status_t err = B_OK;
 
-#if DEBUG < 1	
+#if DEBUG < 1
 	if (oldCount > 0) {
 #endif
 		do {
