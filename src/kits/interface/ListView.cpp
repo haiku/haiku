@@ -91,31 +91,19 @@ BListView::BListView(BMessage* archive)
 	: BView(archive)
 {
 	int32 listType;
-
 	archive->FindInt32("_lv_type", &listType);
-	fListType = (list_view_type)listType;
-
-	fFirstSelected = -1;
-	fLastSelected = -1;
-	fAnchorIndex = -1;
-
-	fSelectMessage = NULL;
-	fScrollView = NULL;
-	fTrack = NULL;
+	_InitObject((list_view_type)listType);
 
 	int32 i = 0;
 	BMessage subData;
-
-	while (archive->FindMessage("_l_items", i++, &subData)) {
+	while (archive->FindMessage("_l_items", i++, &subData) == B_OK) {
 		BArchivable *object = instantiate_object(&subData);
 		if (!object)
 			continue;
 
 		BListItem *item = dynamic_cast<BListItem*>(object);
-		if (!item)
-			continue;
-
-		AddItem(item);
+		if (item)
+			AddItem(item);
 	}
 
 	if (archive->HasMessage("_msg")) {
@@ -136,6 +124,7 @@ BListView::BListView(BMessage* archive)
 
 BListView::~BListView()
 {
+	delete fTrack;
 	SetSelectionMessage(NULL);
 }
 
@@ -1459,7 +1448,7 @@ BListView::_TryInitiateDrag(BPoint where)
 
 	if (dragDistance > 5.0) {
 		fTrack->try_drag = false;
-		return InitiateDrag(fTrack->drag_start, fTrack->item_index, fTrack->was_selected);;
+		return InitiateDrag(fTrack->drag_start, fTrack->item_index, fTrack->was_selected);
 	}
 	return false;
 }
