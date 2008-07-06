@@ -1,13 +1,10 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 // NOTE: Based on my code in the BeOS interface for the VLC media player
-// that I did during the VLC 0.4.3 - 0.4.6 times. Code not done by me
+// that I did during the VLC 0.4.3 - 0.4.6 times. Code not written by me
 // removed. -Stephan Aßmus
 
 #include "TransportControlGroup.h"
@@ -18,6 +15,7 @@
 #include <String.h>
 
 #include "ButtonBitmaps.h"
+#include "PeakView.h"
 #include "PlaybackState.h"
 #include "SeekSlider.h"
 #include "TransportButton.h"
@@ -53,63 +51,55 @@ enum {
 
 // constructor
 TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
-		bool useWindButtons)
+		bool usePeakView, bool useWindButtons)
 	: BView(frame, "transport control group",
 			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_FRAME_EVENTS)
 	, fBottomControlHeight(0.0)
+	, fPeakViewMinWidth(0.0)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	frame.Set(0.0, 0.0, 10.0, 10.0);
 
     // Seek Slider
-	fSeekSlider = new SeekSlider(frame, "seek slider",
-								 new BMessage(MSG_SEEK),
-								 0, kPositionFactor);
+	fSeekSlider = new SeekSlider(frame, "seek slider", new BMessage(MSG_SEEK),
+		0, kPositionFactor);
 	fSeekSlider->ResizeToPreferred();
 	AddChild(fSeekSlider);
 
     // Buttons
-    if (useSkipButtons) {
-	    // Skip Back
-	    frame.right = kRewindBitmapWidth - 1;
-	    frame.bottom = kRewindBitmapHeight - 1;
+	if (useSkipButtons) {
+		// Skip Back
+		frame.right = kRewindBitmapWidth - 1;
+		frame.bottom = kRewindBitmapHeight - 1;
 		fBottomControlHeight = kRewindBitmapHeight - 1.0;
-	    fSkipBack = new TransportButton(frame, B_EMPTY_STRING,
-	                                    kSkipBackBitmapBits,
-	                                    kPressedSkipBackBitmapBits,
-	                                    kDisabledSkipBackBitmapBits,
-	                                    new BMessage(MSG_SKIP_BACKWARDS));
-	    AddChild(fSkipBack);
-	
-	    // Skip Foward
-	    fSkipForward = new TransportButton(frame, B_EMPTY_STRING,
-	                                       kSkipForwardBitmapBits,
-	                                       kPressedSkipForwardBitmapBits,
-	                                       kDisabledSkipForwardBitmapBits,
-	                                       new BMessage(MSG_SKIP_FORWARD));
-	    AddChild(fSkipForward);
-    } else {
-    	fSkipBack = NULL;
-    	fSkipForward = NULL;
+		fSkipBack = new TransportButton(frame, B_EMPTY_STRING,
+			kSkipBackBitmapBits, kPressedSkipBackBitmapBits,
+			kDisabledSkipBackBitmapBits, new BMessage(MSG_SKIP_BACKWARDS));
+		AddChild(fSkipBack);
+
+		// Skip Foward
+		fSkipForward = new TransportButton(frame, B_EMPTY_STRING,
+			kSkipForwardBitmapBits, kPressedSkipForwardBitmapBits,
+			kDisabledSkipForwardBitmapBits, new BMessage(MSG_SKIP_FORWARD));
+		AddChild(fSkipForward);
+	} else {
+		fSkipBack = NULL;
+		fSkipForward = NULL;
 	}
 
 	if (useWindButtons) {
 		// Forward
 		fForward = new TransportButton(frame, B_EMPTY_STRING,
-									   kForwardBitmapBits,
-									   kPressedForwardBitmapBits,
-									   kDisabledForwardBitmapBits,
-									   new BMessage(MSG_FORWARD));
+			kForwardBitmapBits, kPressedForwardBitmapBits,
+			kDisabledForwardBitmapBits, new BMessage(MSG_FORWARD));
 		AddChild(fForward);
-	
+
 		// Rewind
 		fRewind = new TransportButton(frame, B_EMPTY_STRING,
-									  kRewindBitmapBits,
-									  kPressedRewindBitmapBits,
-									  kDisabledRewindBitmapBits,
-									  new BMessage(MSG_REWIND));
+			kRewindBitmapBits, kPressedRewindBitmapBits,
+			kDisabledRewindBitmapBits, new BMessage(MSG_REWIND));
 		AddChild(fRewind);
 	} else {
 		fForward = NULL;
@@ -117,56 +107,56 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	}
 
 	// Play Pause
-    frame.right = kPlayPauseBitmapWidth - 1;
-    frame.bottom = kPlayPauseBitmapHeight - 1;
+	frame.right = kPlayPauseBitmapWidth - 1;
+	frame.bottom = kPlayPauseBitmapHeight - 1;
 	if (fBottomControlHeight < kPlayPauseBitmapHeight - 1.0)
 		fBottomControlHeight = kPlayPauseBitmapHeight - 1.0;
-    fPlayPause = new PlayPauseButton(frame, B_EMPTY_STRING,
-                                     kPlayButtonBitmapBits,
-                                     kPressedPlayButtonBitmapBits,
-                                     kDisabledPlayButtonBitmapBits,
-                                     kPlayingPlayButtonBitmapBits,
-                                     kPressedPlayingPlayButtonBitmapBits,
-                                     kPausedPlayButtonBitmapBits,
-                                     kPressedPausedPlayButtonBitmapBits,
-                                     new BMessage(MSG_PLAY));
+	fPlayPause = new PlayPauseButton(frame, B_EMPTY_STRING,
+		kPlayButtonBitmapBits, kPressedPlayButtonBitmapBits,
+		kDisabledPlayButtonBitmapBits, kPlayingPlayButtonBitmapBits,
+		kPressedPlayingPlayButtonBitmapBits, kPausedPlayButtonBitmapBits,
+		kPressedPausedPlayButtonBitmapBits, new BMessage(MSG_PLAY));
 
-    AddChild(fPlayPause);
+	AddChild(fPlayPause);
 
-    // Stop
-    frame.right = kStopBitmapWidth - 1;
-    frame.bottom = kStopBitmapHeight - 1;
+	// Stop
+	frame.right = kStopBitmapWidth - 1;
+	frame.bottom = kStopBitmapHeight - 1;
 	if (fBottomControlHeight < kStopBitmapHeight - 1.0)
 		fBottomControlHeight = kStopBitmapHeight - 1.0;
-    fStop = new TransportButton(frame, B_EMPTY_STRING,
-                                kStopButtonBitmapBits,
-                                kPressedStopButtonBitmapBits,
-                                kDisabledStopButtonBitmapBits,
-                                new BMessage(MSG_STOP));
+	fStop = new TransportButton(frame, B_EMPTY_STRING, kStopButtonBitmapBits,
+		kPressedStopButtonBitmapBits, kDisabledStopButtonBitmapBits,
+		new BMessage(MSG_STOP));
 	AddChild(fStop);
 
 	// Mute
-    frame.right = kSpeakerIconBitmapWidth - 1;
-    frame.bottom = kSpeakerIconBitmapHeight - 1;
+	frame.right = kSpeakerIconBitmapWidth - 1;
+	frame.bottom = kSpeakerIconBitmapHeight - 1;
 	if (fBottomControlHeight < kSpeakerIconBitmapHeight - 1.0)
 		fBottomControlHeight = kSpeakerIconBitmapHeight - 1.0;
-    fMute = new TransportButton(frame, B_EMPTY_STRING,
-                                kSpeakerIconBits,
-                                kPressedSpeakerIconBits,
-                                kSpeakerIconBits,
-                                new BMessage(MSG_SET_MUTE));
+	fMute = new TransportButton(frame, B_EMPTY_STRING, kSpeakerIconBits,
+		kPressedSpeakerIconBits, kSpeakerIconBits, new BMessage(MSG_SET_MUTE));
 
 	AddChild(fMute);
 
-    // Volume Slider
+	// Volume Slider
 	fVolumeSlider = new VolumeSlider(BRect(0.0, 0.0, VOLUME_MIN_WIDTH,
-										   kVolumeSliderBitmapHeight - 1.0),
-									 "volume slider", 
-									 _DbToGain(_ExponentialToLinear(kVolumeDbMin)) * kVolumeFactor, 
-									 _DbToGain(_ExponentialToLinear(kVolumeDbMax)) * kVolumeFactor,
-									 new BMessage(MSG_SET_VOLUME));
-	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(0.0)) * kVolumeFactor);
+		kVolumeSliderBitmapHeight - 1.0), "volume slider", 
+		_DbToGain(_ExponentialToLinear(kVolumeDbMin)) * kVolumeFactor,
+		_DbToGain(_ExponentialToLinear(kVolumeDbMax)) * kVolumeFactor,
+		new BMessage(MSG_SET_VOLUME));
+	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(0.0))
+		* kVolumeFactor);
 	AddChild(fVolumeSlider);
+
+	// Peak view
+	if (usePeakView) {
+		fPeakView = new PeakView("peak view", false, false);
+		AddChild(fPeakView);
+		fPeakView->GetPreferredSize(&fPeakViewMinWidth, NULL);
+	} else {
+		fPeakView = NULL;
+	}
 }
 
 // destructor
@@ -469,6 +459,8 @@ TransportControlGroup::_LayoutControls(BRect frame) const
 		minWidth += fSkipForward->Bounds().Width();
 	minWidth += fMute->Bounds().Width();
 	minWidth += VOLUME_MIN_WIDTH;
+	if (fPeakView)
+		minWidth += fPeakViewMinWidth;
 
 	// layout seek slider
 	r.bottom = r.top + fSeekSlider->Bounds().Height();
@@ -481,7 +473,8 @@ TransportControlGroup::_LayoutControls(BRect frame) const
 	float currentWidth = frame.Width();
 	float space = (currentWidth - minWidth) / 6.0;
 	// apply weighting
-	space = MIN_SPACE + (space - MIN_SPACE) / VOLUME_SLIDER_LAYOUT_WEIGHT;
+	space = min_c(MIN_SPACE + (space - MIN_SPACE) / VOLUME_SLIDER_LAYOUT_WEIGHT,
+		MIN_SPACE * 2.0);
 	// layout controls with "space" inbetween
 	r.left = frame.left;
 	r.top = r.bottom + MIN_SPACE + 1.0;
@@ -522,11 +515,24 @@ TransportControlGroup::_LayoutControls(BRect frame) const
 	r.left = r.right + space + space;
 	r.right = r.left + fMute->Bounds().Width();
 	_LayoutControl(fMute, r);
+
 	// volume slider
 	r.left = r.right + SPEAKER_SLIDER_DIST;
 		// keep speaker icon and volume slider attached
-	r.right = frame.right;
+	// layout volume slider
+	float peakViewWidth = 0.0;
+	if (fPeakView)
+		peakViewWidth = (frame.right - r.left) / 2 + space;
+
+	r.right = frame.right - peakViewWidth;
 	_LayoutControl(fVolumeSlider, r, true);
+
+	if (fPeakView) {
+		peakViewWidth -= space;
+		r.left = r.right + space;
+		r.right = r.left + peakViewWidth;
+		_LayoutControl(fPeakView, r, true, true);
+	}
 }
 
 // _MinFrame
@@ -547,6 +553,8 @@ TransportControlGroup::_MinFrame() const
 		minWidth += fSkipForward->Bounds().Width() + MIN_SPACE + MIN_SPACE;
 	minWidth += fMute->Bounds().Width() + SPEAKER_SLIDER_DIST;
 	minWidth += VOLUME_MIN_WIDTH;
+	if (fPeakView)
+		minWidth += fPeakViewMinWidth;
 
 	// add up height of seek slider and heighest control on bottom
 	float minHeight = 2 * BORDER_INSET;

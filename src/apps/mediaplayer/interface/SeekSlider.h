@@ -1,9 +1,6 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #ifndef SEEK_SLIDER_H
@@ -15,10 +12,8 @@
 class SeekSlider : public BControl {
  public:
 								SeekSlider(BRect frame,
-										   const char* name,
-										   BMessage* message,
-										   int32 minValue,
-										   int32 maxValue);
+									const char* name, BMessage* message,
+									int32 minValue, int32 maxValue);
 
 	virtual						~SeekSlider();
 
@@ -28,9 +23,10 @@ class SeekSlider : public BControl {
 	virtual void				Draw(BRect updateRect);
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
-										   const BMessage* dragMessage);
+									const BMessage* dragMessage);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				ResizeToPreferred();
+	virtual	void				FrameResized(float width, float height);
 
 	// SeekSlider
 			void				SetPosition(float position);
@@ -41,10 +37,8 @@ private:
 			int32				_KnobPosFor(BRect bounds,
 											int32 value) const;
 			void				_StrokeFrame(BRect frame,
-											 rgb_color left,
-											 rgb_color top,
-											 rgb_color right,
-											 rgb_color bottom);
+									rgb_color left, rgb_color top,
+									rgb_color right, rgb_color bottom);
 			void				_SetKnobPosition(int32 knobPos);
 
 

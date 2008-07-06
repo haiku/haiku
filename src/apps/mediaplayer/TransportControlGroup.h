@@ -1,9 +1,6 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 // NOTE: Based on my code in the BeOS interface for the VLC media player
@@ -15,6 +12,7 @@
 
 #include <View.h>
 
+class PeakView;
 class PlayPauseButton;
 class TransportButton;
 class SeekSlider;
@@ -33,8 +31,9 @@ enum {
 class TransportControlGroup : public BView {
  public:
 								TransportControlGroup(BRect frame,
-									bool useSkipButtons = true,
-									bool useWindButtons = false);
+									bool useSkipButtons,
+									bool usePeakView,
+									bool useWindButtons);
 	virtual						~TransportControlGroup();
 
 	// BView interface
@@ -67,6 +66,9 @@ class TransportControlGroup : public BView {
 			void				SetVolume(float value);
 			void				SetPosition(float value);
 
+			PeakView*			GetPeakView() const
+									{ return fPeakView; }
+
  private:
 			void				_LayoutControls(BRect frame) const;
 			BRect				_MinFrame() const;
@@ -91,7 +93,7 @@ class TransportControlGroup : public BView {
 			float				_GainToDb(float gain);
 
 			SeekSlider*			fSeekSlider;
-
+			PeakView*			fPeakView;
 			VolumeSlider*		fVolumeSlider;
 
 			TransportButton*	fSkipBack;
@@ -103,6 +105,7 @@ class TransportControlGroup : public BView {
 			TransportButton*	fMute;
 
 			float				fBottomControlHeight;
+			float				fPeakViewMinWidth;
 };
 
 #endif	// TRANSPORT_CONTROL_GROUP_H

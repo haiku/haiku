@@ -51,7 +51,8 @@ NodeManager::NodeManager()
 	  fVideoTarget(NULL),
 	  fAudioSupplier(NULL),
 	  fVideoSupplier(NULL),
-	  fVideoBounds(0, 0, -1, -1)
+	  fVideoBounds(0, 0, -1, -1),
+	  fPeakListener(NULL)
 {
 }
 
@@ -233,13 +234,22 @@ NodeManager::SetVolume(float percent)
 	// our audio node...
 }
 
+// SetPeakListener
+void
+NodeManager::SetPeakListener(BHandler* handler)
+{
+	fPeakListener = handler;
+	if (fAudioProducer)
+		fAudioProducer->SetPeakListener(fPeakListener);
+}
+
 // #pragma mark -
 
 // _SetUpNodes
 status_t
 NodeManager::_SetUpNodes(color_space preferredVideoFormat)
 {
-printf("NodeManager::_SetUpNodes()\n");
+	TRACE("NodeManager::_SetUpNodes()\n");
 
 	// find the media roster
 	fStatus = B_OK;
@@ -425,6 +435,7 @@ status_t
 NodeManager::_SetUpAudioNodes()
 {
 	fAudioProducer = new AudioProducer("MediaPlayer Audio Out", fAudioSupplier);
+	fAudioProducer->SetPeakListener(fPeakListener);
 	fStatus = fMediaRoster->RegisterNode(fAudioProducer);
 	if (fStatus != B_OK) {
 		print_error("unable to register audio producer node!\n", fStatus);

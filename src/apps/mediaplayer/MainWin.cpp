@@ -41,8 +41,10 @@
 #include <String.h>
 #include <View.h>
 
+#include "AudioProducer.h"
 #include "ControllerObserver.h"
 #include "MainApp.h"
+#include "PeakView.h"
 #include "PlaylistObserver.h"
 #include "PlaylistWindow.h"
 #include "SettingsWindow.h"
@@ -170,6 +172,9 @@ MainWin::MainWin()
 	fPlaylist->AddListener(fPlaylistObserver);
 	fController->SetVideoView(fVideoView);
 	fController->AddListener(fControllerObserver);
+	PeakView* peakView = fControls->GetPeakView();
+	peakView->SetPeakNotificationWhat(MSG_PEAK_NOTIFICATION);
+	fController->SetPeakListener(peakView);
 	
 //	printf("fMenuBarHeight %d\n", fMenuBarHeight);
 //	printf("fControlsHeight %d\n", fControlsHeight);
@@ -201,6 +206,7 @@ MainWin::~MainWin()
 
 	fPlaylist->RemoveListener(fPlaylistObserver);
 	fController->RemoveListener(fControllerObserver);
+	fController->SetPeakListener(NULL);
 
 	// give the views a chance to detach from any notifiers
 	// before we delete them

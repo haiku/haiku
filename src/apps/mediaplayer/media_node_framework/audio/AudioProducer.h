@@ -13,6 +13,11 @@
 #include <MediaEventLooper.h>
 
 class AudioSupplier;
+class BHandler;
+
+enum {
+	MSG_PEAK_NOTIFICATION		= 'pknt'
+};
 
 class AudioProducer : public BBufferProducer, public BMediaEventLooper {
 public:
@@ -95,6 +100,9 @@ public:
 
 			void				SetRunning(bool running);
 
+	// AudioProducer
+			void				SetPeakListener(BHandler* handler);
+
 private:
 			status_t			_AllocateBuffers(media_format* format);
 			BBuffer*			_FillNextBuffer(bigtime_t eventTime);
@@ -116,6 +124,8 @@ private:
 
 			AudioSupplier*		fSupplier;
 	volatile bool				fRunning;
+
+			BHandler*			fPeakListener;
 };
 
 #endif // AUDIO_PRODUCER_H

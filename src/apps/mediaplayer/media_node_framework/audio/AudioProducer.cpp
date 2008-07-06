@@ -18,6 +18,8 @@
 #include <TimeSource.h>
 
 #include "AudioSupplier.h"
+#include "EventQueue.h"
+#include "MessageEvent.h"
 
 #define DEBUG_TO_FILE 0
 
@@ -94,7 +96,9 @@ AudioProducer::AudioProducer(const char* name, AudioSupplier* supplier,
 	  fFramesSent(0),
 	  fStartTime(0),
 	  fSupplier(supplier),
-	  fRunning(false)
+	  fRunning(false),
+
+	  fPeakListener(NULL)
 {
 	TRACE("%p->AudioProducer::AudioProducer(%s, %p, %d)\n", this, name,
 		supplier, lowLatency);
@@ -661,6 +665,13 @@ AudioProducer::SetRunning(bool running)
 }
 
 
+void
+AudioProducer::SetPeakListener(BHandler* handler)
+{
+	fPeakListener = handler;
+}
+
+
 // #pragma mark -
 
 
@@ -738,6 +749,42 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 		track->WriteFrames(buffer->Data(), frameCount);
 	}
 #endif // DEBUG_TO_FILE
+
+	if (fPeakListener
+		&& fOutput.format.u.raw_audio.format
+			== media_raw_audio_format::B_AUDIO_FLOAT) {
+		// TODO: extend the peak notifier for other sample formats
+		int32 channels = fOutput.format.u.raw_audio.channel_count;
+		float max[channels];
+		float min[channels];
+		for (int32 i = 0; i < channels; i++) {
+			max[i] = -1.0;
+			min[i] = 1.0;
+		}
+		float* sample = (float*)buffer->Data();
+		for (uint32 i = 0; i < frameCount; i++) {
+			for (int32 k = 0; k < channels; k++) {
+				if (*sample < min[k])
+					min[k] = *sample;
+				if (*sample > max[k])
+					max[k] = *sample;
+				sample++;
+			}
+		}
+		BMessage message(MSG_PEAK_NOTIFICATION);
+		for (int32 i = 0; i < channels; i++) {
+			float maxAbs = max_c(fabs(min[i]), fabs(max[i]));
+			message.AddFloat("max", maxAbs);
+		}
+		bigtime_t realTime = TimeSource()->RealTimeFor(performanceTime, 0);
+		realTime -= 2000;
+			// deliver event about one video frame earlier to account
+			// for latency between app_server and client
+		MessageEvent* event = new (nothrow) MessageEvent(realTime,
+			fPeakListener, message);
+		if (event != NULL)
+			EventQueue::Default().AddEvent(event);
+	}
 
 	return buffer;
 }

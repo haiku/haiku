@@ -11,7 +11,16 @@
 MessageEvent::MessageEvent(bigtime_t time, BHandler* handler, uint32 command)
 	: Event(time),
 	  AbstractLOAdapter(handler),
-	  fCommand(command)
+	  fMessage(command)
+{
+}
+
+
+MessageEvent::MessageEvent(bigtime_t time, BHandler* handler,
+		const BMessage& message)
+	: Event(time),
+	  AbstractLOAdapter(handler),
+	  fMessage(message)
 {
 }
 
@@ -31,7 +40,7 @@ MessageEvent::~MessageEvent()
 void
 MessageEvent::Execute()
 {
-	BMessage msg(fCommand);
+	BMessage msg(fMessage);
 	msg.AddInt64("time", Time());
 	DeliverMessage(msg);
 }

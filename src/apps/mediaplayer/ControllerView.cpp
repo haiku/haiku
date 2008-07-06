@@ -32,7 +32,7 @@
 
 ControllerView::ControllerView(BRect frame, Controller* controller,
 		Playlist* playlist)
- :	TransportControlGroup(frame)
+ :	TransportControlGroup(frame, true, true, false)
  ,	fController(controller)
  ,	fPlaylist(playlist)
  ,	fPlaylistObserver(new PlaylistObserver(this))

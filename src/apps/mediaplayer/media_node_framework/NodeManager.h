@@ -62,6 +62,8 @@ class NodeManager : public PlaybackManager {
 
 	virtual	void				SetVolume(float percent);
 
+			void				SetPeakListener(BHandler* handler);
+
  private:
 			status_t			_SetUpNodes(color_space preferredVideoFormat);
 			status_t			_SetUpVideoNodes(
@@ -103,6 +105,8 @@ private:
 			AudioSupplier*		fAudioSupplier;
 			VideoSupplier*		fVideoSupplier;
 			BRect				fVideoBounds;
+
+			BHandler*			fPeakListener;
 };
 
 

@@ -26,6 +26,7 @@ for sourceDir in $(sourceDirs) {
 Application MediaPlayer :
 	# interface
 	DrawingTidbits.cpp
+	PeakView.cpp
 	SeekSlider.cpp
 	TransportButton.cpp
 	VolumeSlider.cpp

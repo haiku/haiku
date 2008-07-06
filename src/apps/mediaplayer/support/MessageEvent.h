@@ -7,12 +7,14 @@
 #define MESSAGE_EVENT_H
 
 
+#include <Message.h>
+
 #include "AbstractLOAdapter.h"
 #include "Event.h"
 
 
 enum {
-	MSG_EVENT	= 'evnt',
+	MSG_EVENT	= 'evnt'
 };
 
 
@@ -22,13 +24,16 @@ class MessageEvent : public Event, public AbstractLOAdapter {
 									BHandler* handler,
 									uint32 command = MSG_EVENT);
 								MessageEvent(bigtime_t time,
+									BHandler* handler,
+									const BMessage& message);
+								MessageEvent(bigtime_t time,
 									const BMessenger& messenger);
 	virtual						~MessageEvent();
 
 	virtual	void				Execute();
 
  private:
-			uint32				fCommand;
+			BMessage			fMessage;
 };
 
 #endif	// MESSAGE_EVENT_H

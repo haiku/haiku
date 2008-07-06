@@ -1,13 +1,10 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 // NOTE: Based on my code in the BeOS interface for the VLC media player
-// that I did during the VLC 0.4.3 - 0.4.6 times. Code not done by me
+// that I did during the VLC 0.4.3 - 0.4.6 times. Code not written by me
 // removed. -Stephan Aßmus
 
 #include "SeekSlider.h"
@@ -32,7 +29,7 @@ const char* kDisabledSeekMessage = "Drop files to play";
 SeekSlider::SeekSlider(BRect frame, const char* name, BMessage* message,
 					   int32 minValue, int32 maxValue)
 	: BControl(frame, name, NULL, message, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			   B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
+			   B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 	, fTracking(false)
 	, fLastTrackTime(0)
 	, fKnobPos(_KnobPosFor(Bounds(), Value()))
@@ -101,9 +98,9 @@ SeekSlider::Draw(BRect updateRect)
 	rgb_color dotGrey = midShadow;
 	rgb_color dotGreen = greenShadow;
 	// draw frame
-	_StrokeFrame(r, softShadow, softShadow, softLight, softLight);
+	_StrokeFrame(r, softShadow, softShadow, light, light);
 	r.InsetBy(1.0, 1.0);
-	_StrokeFrame(r, black, black, light, light);
+	_StrokeFrame(r, black, black, softShadow, softShadow);
 	if (IsEnabled()) {
 		// *** enabled look ***
 		r.InsetBy(1.0, 1.0);
@@ -277,6 +274,13 @@ SeekSlider::ResizeToPreferred()
 {
 	float width = 15.0 + StringWidth(kDisabledSeekMessage) + 15.0;
 	ResizeTo(width, 17.0);
+}
+
+
+void
+SeekSlider::FrameResized(float width, float height)
+{
+	_SetKnobPosition(_KnobPosFor(Bounds(), Value()));
 }
 
 
