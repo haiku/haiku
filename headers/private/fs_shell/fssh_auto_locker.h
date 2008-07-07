@@ -6,6 +6,9 @@
 #define _FSSH_AUTO_LOCKER_H
 
 
+#include <stddef.h>
+
+
 namespace FSShell {
 
 // AutoLockerStandardLocking
