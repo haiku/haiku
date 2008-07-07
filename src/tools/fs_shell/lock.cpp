@@ -123,6 +123,13 @@ fssh_mutex_init(fssh_mutex *m, const char *name)
 
 
 extern "C" void
+fssh_mutex_init_etc(fssh_mutex *m, const char *name, uint32_t flags)
+{
+	fssh_mutex_init(m, name);
+}
+
+
+extern "C" void
 fssh_mutex_destroy(fssh_mutex *mutex)
 {
 	if (mutex == NULL)
@@ -184,6 +191,13 @@ fssh_rw_lock_init(fssh_rw_lock *lock, const char *name)
 	lock->sem = fssh_create_sem(FSSH_RW_MAX_READERS, name);
 	if (lock->sem < FSSH_B_OK)
 		fssh_panic("could not create r/w lock");
+}
+
+
+extern "C" void
+fssh_rw_lock_init_etc(fssh_rw_lock *lock, const char *name, uint32_t flags)
+{
+	fssh_rw_lock_init(lock, name);
 }
 
 

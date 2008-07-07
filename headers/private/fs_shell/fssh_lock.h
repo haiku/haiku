@@ -115,11 +115,42 @@ public:
 // RecursiveLocker
 typedef AutoLocker<fssh_recursive_lock, RecursiveLockLocking> RecursiveLocker;
 
+class ReadWriteLockReadLocking {
+public:
+	inline bool Lock(fssh_rw_lock *lockable)
+	{
+		return fssh_rw_lock_read_lock(lockable) == FSSH_B_OK;
+	}
+
+	inline void Unlock(fssh_rw_lock *lockable)
+	{
+		fssh_rw_lock_read_unlock(lockable);
+	}
+};
+
+class ReadWriteLockWriteLocking {
+public:
+	inline bool Lock(fssh_rw_lock *lockable)
+	{
+		return fssh_rw_lock_write_lock(lockable) == FSSH_B_OK;
+	}
+
+	inline void Unlock(fssh_rw_lock *lockable)
+	{
+		fssh_rw_lock_write_unlock(lockable);
+	}
+};
+
+typedef AutoLocker<fssh_rw_lock, ReadWriteLockReadLocking> ReadLocker;
+typedef AutoLocker<fssh_rw_lock, ReadWriteLockWriteLocking> WriteLocker;
+
 }	// namespace FSShell
 
 using FSShell::AutoLocker;
 using FSShell::MutexLocker;
 using FSShell::RecursiveLocker;
+using FSShell::ReadLocker;
+using FSShell::WriteLocker;
 
 #endif	// __cplusplus
 

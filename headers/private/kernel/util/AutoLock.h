@@ -1,5 +1,7 @@
 /*
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_UTIL_AUTO_LOCKER_H
@@ -49,6 +51,35 @@ public:
 
 // RecursiveLocker
 typedef AutoLocker<recursive_lock, RecursiveLockLocking> RecursiveLocker;
+
+class ReadWriteLockReadLocking {
+public:
+	inline bool Lock(rw_lock *lockable)
+	{
+		return rw_lock_read_lock(lockable) == B_OK;
+	}
+
+	inline void Unlock(rw_lock *lockable)
+	{
+		rw_lock_read_unlock(lockable);
+	}
+};
+
+class ReadWriteLockWriteLocking {
+public:
+	inline bool Lock(rw_lock *lockable)
+	{
+		return rw_lock_write_lock(lockable) == B_OK;
+	}
+
+	inline void Unlock(rw_lock *lockable)
+	{
+		rw_lock_write_unlock(lockable);
+	}
+};
+
+typedef AutoLocker<rw_lock, ReadWriteLockReadLocking> ReadLocker;
+typedef AutoLocker<rw_lock, ReadWriteLockWriteLocking> WriteLocker;
 
 // InterruptsLocking
 class InterruptsLocking {
@@ -135,6 +166,8 @@ typedef AutoLocker<spinlock, InterruptsSpinLocking> InterruptsSpinLocker;
 using BPrivate::AutoLocker;
 using BPrivate::MutexLocker;
 using BPrivate::RecursiveLocker;
+using BPrivate::ReadLocker;
+using BPrivate::WriteLocker;
 using BPrivate::InterruptsLocker;
 using BPrivate::SpinLocker;
 using BPrivate::InterruptsSpinLocker;
