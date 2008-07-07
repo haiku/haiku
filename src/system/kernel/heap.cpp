@@ -122,7 +122,10 @@ typedef struct heap_class_s {
 	uint32		initial_percentage;
 	size_t		max_allocation_size;
 	size_t		page_size;
-	size_t		bin_sizes[20];
+	size_t		min_bin_size;
+	size_t		bin_alignment;
+	uint32		min_count_per_page;
+	size_t		max_waste_per_page;
 } heap_class;
 
 static const uint32 kAreaAllocationMagic = 'AAMG';
@@ -143,16 +146,35 @@ typedef DoublyLinkedList<DeferredFreeListEntry> DeferredFreeList;
 // Heap class configuration
 #define HEAP_CLASS_COUNT 3
 static heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
-	{ "small", 50, B_PAGE_SIZE, B_PAGE_SIZE,
-		{ 8, 12, 16, 24, 32, 48, 64, 96, 128, 160, 192, 256, 384, 512, 1024,
-			2048, 4096, 0 }
+	{
+		"small",					/* name */
+		50,							/* initial percentage */
+		B_PAGE_SIZE / 8,			/* max allocation size */
+		B_PAGE_SIZE,				/* page size */
+		8,							/* min bin size */
+		4,							/* bin alignment */
+		8,							/* min count per page */
+		16							/* max waste per page */
 	},
-	{ "large", 30, B_PAGE_SIZE * 32, B_PAGE_SIZE * 32,
-		{ 4096, 5120, 6144, 7168, 8192, 12288, 16384, 24576, 32768, 65536,
-			131072, 0 }
+	{
+		"medium",					/* name */
+		30,							/* initial percentage */
+		B_PAGE_SIZE * 2,			/* max allocation size */
+		B_PAGE_SIZE * 8,			/* page size */
+		B_PAGE_SIZE / 8,			/* min bin size */
+		32,							/* bin alignment */
+		4,							/* min count per page */
+		64							/* max waste per page */
 	},
-	{ "huge", 20, HEAP_AREA_USE_THRESHOLD, B_PAGE_SIZE * 64,
-		{ 131072, 262144, 0 }
+	{
+		"large",					/* name */
+		20,							/* initial percentage */
+		HEAP_AREA_USE_THRESHOLD,	/* max allocation size */
+		B_PAGE_SIZE * 16,			/* page size */
+		B_PAGE_SIZE * 2,			/* min bin size */
+		128,						/* bin alignment */
+		1,							/* min count per page */
+		256							/* max waste per page */
 	}
 };
 
@@ -938,30 +960,38 @@ heap_remove_area(heap_allocator *heap, heap_area *area, bool locked)
 
 static heap_allocator *
 heap_create_allocator(const char *name, addr_t base, size_t size,
-	uint32 heapClass)
+	uint32 heapClassIndex)
 {
+	heap_class *heapClass = &sHeapClasses[heapClassIndex];
 	heap_allocator *heap = (heap_allocator *)base;
 	base += sizeof(heap_allocator);
 	size -= sizeof(heap_allocator);
 
 	heap->name = name;
-	heap->heap_class = heapClass;
-	heap->page_size = sHeapClasses[heapClass].page_size;
+	heap->heap_class = heapClassIndex;
+	heap->page_size = heapClass->page_size;
 	heap->total_pages = heap->total_free_pages = heap->empty_areas = 0;
 	heap->areas = heap->all_areas = NULL;
 	heap->bins = (heap_bin *)base;
 
 	heap->bin_count = 0;
-	while (true) {
-		size_t binSize = sHeapClasses[heapClass].bin_sizes[heap->bin_count];
-		if (binSize == 0)
-			break;
+	size_t binSize = 0, lastSize = 0;
+	uint32 count = heap->page_size / heapClass->min_bin_size;
+	for (; count >= heapClass->min_count_per_page; count--, lastSize = binSize) {
+		binSize = (heap->page_size / count) & ~(heapClass->bin_alignment - 1);
+		if (binSize == lastSize)
+			continue;
+		if (heap->page_size - count * binSize > heapClass->max_waste_per_page)
+			continue;
 
 		heap_bin *bin = &heap->bins[heap->bin_count];
 		bin->element_size = binSize;
 		bin->max_free_count = heap->page_size / binSize;
 		bin->page_list = NULL;
 		heap->bin_count++;
+
+		if (heap->bin_count >= 32)
+			panic("heap configuration invalid - max bin count reached\n");
 	};
 
 	base += heap->bin_count * sizeof(heap_bin);
@@ -980,7 +1010,7 @@ heap_free_pages_added(heap_allocator *heap, heap_area *area, uint32 pageCount)
 	area->free_page_count += pageCount;
 	heap->total_free_pages += pageCount;
 
-	if (area->free_page_count == 1) {
+	if (area->free_page_count == pageCount) {
 		// we need to add ourselfs to the area list of the heap
 		area->prev = NULL;
 		area->next = heap->areas;
@@ -1000,11 +1030,8 @@ heap_free_pages_added(heap_allocator *heap, heap_area *area, uint32 pageCount)
 				area->prev->next = area->next;
 			if (area->next)
 				area->next->prev = area->prev;
-			if (heap->areas == area) {
+			if (heap->areas == area)
 				heap->areas = area->next;
-				if (area->next)
-					area->next->prev = NULL;
-			}
 
 			area->prev = insert;
 			area->next = insert->next;
@@ -1231,8 +1258,7 @@ heap_should_grow(heap_allocator *heap)
 
 
 static void *
-heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
-	bool *shouldGrow)
+heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 {
 	TRACE(("memalign(alignment = %lu, size = %lu)\n", alignment, size));
 
@@ -1247,28 +1273,25 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
 	size += sizeof(heap_leak_check_info);
 #endif
 
-	uint32 binIndex;
-	for (binIndex = 0; binIndex < heap->bin_count; binIndex++) {
+	if (alignment != 0) {
 		// TODO: The alignment is done by ensuring that the element size
 		// of the target bin is aligned with the requested alignment. This
 		// has the problem that it wastes space because a better (smaller) bin
 		// could possibly be selected. We should pick the best bin and check
 		// if there is an aligned block in the free list or if a new (page
 		// aligned) page has to be allocated anyway.
-		size_t elementSize = heap->bins[binIndex].element_size;
-		if (size <= elementSize && (alignment == 0
-			|| (elementSize & (alignment - 1)) == 0))
+		size = ROUNDUP(size, alignment);
+	}
+
+	uint32 binIndex;
+	for (binIndex = 0; binIndex < heap->bin_count; binIndex++) {
+		if (size <= heap->bins[binIndex].element_size)
 			break;
 	}
 
 	void *address = heap_raw_alloc(heap, size, binIndex);
-	if (alignment != 0 && ((addr_t)address & (alignment - 1)))
-		panic("alignment not met at %p with 0x%08lx\n", address, alignment);
 
 	TRACE(("memalign(): asked to allocate %lu bytes, returning pointer %p\n", size, address));
-
-	if (shouldGrow)
-		*shouldGrow = heap_should_grow(heap);
 
 #if KERNEL_HEAP_LEAK_CHECK
 	size -= sizeof(heap_leak_check_info);
@@ -1547,12 +1570,13 @@ heap_class_for(size_t size)
 	size += sizeof(heap_leak_check_info_s);
 #endif
 
-	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
-		if (size <= sHeapClasses[i].max_allocation_size)
-			return i;
+	uint32 index = 0;
+	for (; index < HEAP_CLASS_COUNT - 1; index++) {
+		if (size <= sHeapClasses[index].max_allocation_size)
+			return index;
 	}
 
-	return HEAP_CLASS_COUNT - 1;
+	return index;
 }
 
 
@@ -1781,16 +1805,18 @@ memalign(size_t alignment, size_t size)
 
 	uint32 heapClass = heap_class_for(size);
 	heap_allocator *heap = sHeaps[heapClass];
-	bool shouldGrow = false;
-	void *result = heap_memalign(heap, alignment, size, &shouldGrow);
+	void *result = heap_memalign(heap, alignment, size);
 	if (result == NULL) {
-		// request an urgent grow and wait
+		// request an urgent grow and wait - we don't do it ourselfs here to
+		// serialize growing through the grow thread, as otherwise multiple
+		// threads hitting this situation (likely when memory ran out) would
+		// all add areas
 		sLastGrowRequest[heapClass]++;
 		switch_sem(sHeapGrowSem, sHeapGrownNotify);
 
 		// and then try again
-		result = heap_memalign(heap, alignment, size, NULL);
-	} else if (shouldGrow) {
+		result = heap_memalign(heap, alignment, size);
+	} else if (heap_should_grow(heap)) {
 		// should grow sometime soon, notify the grower
 		release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
 	}
@@ -1810,10 +1836,8 @@ malloc_nogrow(size_t size)
 {
 	// use dedicated memory in the grow thread by default
 	if (thread_get_current_thread_id() == sHeapGrowThread) {
-		bool shouldGrow = false;
-		heap_allocator *heap = sGrowHeap;
-		void *result = heap_memalign(heap, 0, size, &shouldGrow);
-		if (shouldGrow && !sAddGrowHeap) {
+		void *result = heap_memalign(sGrowHeap, 0, size);
+		if (!sAddGrowHeap && heap_should_grow(sGrowHeap)) {
 			// hopefully the heap grower will manage to create a new heap
 			// before running out of private memory...
 			dprintf("heap: requesting new grow heap\n");
@@ -1827,7 +1851,7 @@ malloc_nogrow(size_t size)
 
 	// try public memory, there might be something available
 	heap_allocator *heap = sHeaps[heap_class_for(size)];
-	void *result = heap_memalign(heap, 0, size, NULL);
+	void *result = heap_memalign(heap, 0, size);
 	if (result != NULL)
 		return result;
 
