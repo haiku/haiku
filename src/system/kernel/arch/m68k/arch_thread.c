@@ -84,7 +84,7 @@ m68k_get_user_iframe(void)
 
 	for (i = thread->arch_info.iframes.index - 1; i >= 0; i--) {
 		struct iframe *frame = thread->arch_info.iframes.frames[i];
-		if (frame->sr & (1 << M68K_SR_S) == 0)
+		if (frame->cpu.sr & (1 << M68K_SR_S) == 0)
 			return frame;
 	}
 
