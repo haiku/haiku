@@ -6,7 +6,7 @@
 #define _FSSH_AUTO_LOCKER_H
 
 
-#include <stddef.h>
+#include <fssh_types.h>
 
 
 namespace FSShell {
