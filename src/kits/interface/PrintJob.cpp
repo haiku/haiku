@@ -846,7 +846,7 @@ namespace BPrivate {
 
 		BMessage reply;
 		if (printServer.SendMessage(request, &reply) != B_OK
-			|| reply.what == 'baad') {
+			|| reply.what != 'okok' ) {
 			messenger->SetResult(NULL);
 			return B_ERROR;
 		}
