@@ -22,6 +22,7 @@
 #include <syscalls.h>
 
 
+#include <stdio.h>
 static inline bool
 check_r5_compatibility()
 {
@@ -39,9 +40,7 @@ check_r5_compatibility()
 
 	stack_frame* frame = (stack_frame*)get_stack_frame();
 	if (frame->return_address >= __gNetworkStart
-			&& frame->return_address < __gNetworkEnd
-		|| frame->return_address >= __gNetAPIStart
-			&& frame->return_address < __gNetAPIEnd) {
+		&& frame->return_address < __gNetworkEnd) {
 		return false;
 	}
 
@@ -49,6 +48,27 @@ check_r5_compatibility()
 #endif
 }
 
+
+static bool
+is_r5_sockaddr(const struct sockaddr *_addr)
+{
+	/* r5_sockaddr_in structs do not contain sin_len, but have a larger 
+	 * sin_family instead (two bytes), so in a r5_sockaddr_in, the first two
+	 * bytes will always be equal to R5_AF_INET, while for haiku's own 
+	 * sockaddr_in, that will never be the case, since the first byte contains
+	 * the length which should never be zero.
+	 * The only other case where this check could fail is when the address does 
+	 * not belong to the internet family at all. But even in that case we would 
+	 * not want to try to convert the addresses, as the conversion itself 
+	 * blindly casts the address to sockaddr_in, which would yield unpredictable
+	 * results for other address families.
+	 */
+	const r5_sockaddr_in *addr = (r5_sockaddr_in *)_addr;
+	if (addr == NULL || addr->sin_family != R5_AF_INET)
+		return false;
+
+	return true;
+}
 
 static void
 convert_from_r5_sockaddr(struct sockaddr *_to, const struct sockaddr *_from)
@@ -174,11 +194,11 @@ socket(int family, int type, int protocol)
 extern "C" int
 bind(int socket, const struct sockaddr *address, socklen_t addressLength)
 {
-	struct sockaddr r5addr;
+	struct sockaddr haikuAddr;
 
-	if (check_r5_compatibility()) {
-		convert_from_r5_sockaddr(&r5addr, address);
-		address = &r5addr;
+	if (check_r5_compatibility() && is_r5_sockaddr(address)) {
+		convert_from_r5_sockaddr(&haikuAddr, address);
+		address = &haikuAddr;
 		addressLength = sizeof(struct sockaddr_in);
 	}
 
@@ -196,11 +216,11 @@ shutdown(int socket, int how)
 extern "C" int
 connect(int socket, const struct sockaddr *address, socklen_t addressLength)
 {
-	struct sockaddr r5addr;
+	struct sockaddr haikuAddr;
 
-	if (check_r5_compatibility()) {
-		convert_from_r5_sockaddr(&r5addr, address);
-		address = &r5addr;
+	if (check_r5_compatibility() && is_r5_sockaddr(address)) {
+		convert_from_r5_sockaddr(&haikuAddr, address);
+		address = &haikuAddr;
 		addressLength = sizeof(struct sockaddr_in);
 	}
 
@@ -219,14 +239,14 @@ extern "C" int
 accept(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 {
 	bool r5compatible = check_r5_compatibility();
-	struct sockaddr r5addr;
+	struct sockaddr haikuAddr;
 
 	sockaddr* address;
 	socklen_t addressLength;
 
 	if (r5compatible && _address != NULL) {
-		address = &r5addr;
-		addressLength = sizeof(r5addr);
+		address = &haikuAddr;
+		addressLength = sizeof(haikuAddr);
 	} else {
 		address = _address;
 		addressLength = _addressLength ? *_addressLength : 0;
@@ -239,7 +259,7 @@ accept(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 	}
 
 	if (r5compatible && _address != NULL) {
-		convert_to_r5_sockaddr(_address, &r5addr);
+		convert_to_r5_sockaddr(_address, &haikuAddr);
 		if (_addressLength != NULL)
 			*_addressLength = sizeof(struct r5_sockaddr_in);
 	} else if (_addressLength != NULL)
@@ -261,14 +281,14 @@ recvfrom(int socket, void *data, size_t length, int flags,
 	struct sockaddr *_address, socklen_t *_addressLength)
 {
 	bool r5compatible = check_r5_compatibility();
-	struct sockaddr r5addr;
+	struct sockaddr haikuAddr;
 
 	sockaddr* address;
 	socklen_t addressLength;
 
 	if (r5compatible && _address != NULL) {
-		address = &r5addr;
-		addressLength = sizeof(r5addr);
+		address = &haikuAddr;
+		addressLength = sizeof(haikuAddr);
 	} else {
 		address = _address;
 		addressLength = _addressLength ? *_addressLength : 0;
@@ -282,7 +302,7 @@ recvfrom(int socket, void *data, size_t length, int flags,
 	}
 
 	if (r5compatible) {
-		convert_to_r5_sockaddr(_address, &r5addr);
+		convert_to_r5_sockaddr(_address, &haikuAddr);
 		if (_addressLength != NULL)
 			*_addressLength = sizeof(struct r5_sockaddr_in);
 	} else if (_addressLength != NULL)
@@ -310,11 +330,11 @@ extern "C" ssize_t
 sendto(int socket, const void *data, size_t length, int flags,
 	const struct sockaddr *address, socklen_t addressLength)
 {
-	struct sockaddr r5addr;
+	struct sockaddr haikuAddr;
 
-	if (check_r5_compatibility()) {
-		convert_from_r5_sockaddr(&r5addr, address);
-		address = &r5addr;
+	if (check_r5_compatibility() && is_r5_sockaddr(address)) {
+		convert_from_r5_sockaddr(&haikuAddr, address);
+		address = &haikuAddr;
 		addressLength = sizeof(struct sockaddr_in);
 	}
 
@@ -364,14 +384,14 @@ extern "C" int
 getpeername(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 {
 	bool r5compatible = check_r5_compatibility();
-	struct sockaddr r5addr;
+	struct sockaddr haikuAddr;
 
 	sockaddr* address;
 	socklen_t addressLength;
 
 	if (r5compatible && _address != NULL) {
-		address = &r5addr;
-		addressLength = sizeof(r5addr);
+		address = &haikuAddr;
+		addressLength = sizeof(haikuAddr);
 	} else {
 		address = _address;
 		addressLength = _addressLength ? *_addressLength : 0;
@@ -384,7 +404,7 @@ getpeername(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 	}
 
 	if (r5compatible) {
-		convert_to_r5_sockaddr(_address, &r5addr);
+		convert_to_r5_sockaddr(_address, &haikuAddr);
 		if (_addressLength != NULL)
 			*_addressLength = sizeof(struct r5_sockaddr_in);
 	} else if (_addressLength != NULL)
@@ -398,14 +418,14 @@ extern "C" int
 getsockname(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 {
 	bool r5compatible = check_r5_compatibility();
-	struct sockaddr r5addr;
+	struct sockaddr haikuAddr;
 
 	sockaddr* address;
 	socklen_t addressLength;
 
 	if (r5compatible && _address != NULL) {
-		address = &r5addr;
-		addressLength = sizeof(r5addr);
+		address = &haikuAddr;
+		addressLength = sizeof(haikuAddr);
 	} else {
 		address = _address;
 		addressLength = _addressLength ? *_addressLength : 0;
@@ -418,7 +438,7 @@ getsockname(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 	}
 
 	if (r5compatible) {
-		convert_to_r5_sockaddr(_address, &r5addr);
+		convert_to_r5_sockaddr(_address, &haikuAddr);
 		if (_addressLength != NULL)
 			*_addressLength = sizeof(struct r5_sockaddr_in);
 	} else if (_addressLength != NULL)
