@@ -4716,21 +4716,29 @@ file_free_fd(struct file_descriptor *descriptor)
 
 
 static status_t
-file_read(struct file_descriptor *descriptor, off_t pos, void *buffer, size_t *length)
+file_read(struct file_descriptor *descriptor, off_t pos, void *buffer,
+	size_t *length)
 {
 	struct vnode *vnode = descriptor->u.vnode;
-
 	FUNCTION(("file_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length, *length));
+
+	if (S_ISDIR(vnode->type))
+		return B_IS_A_DIRECTORY;
+
 	return FS_CALL(vnode, read, descriptor->cookie, pos, buffer, length);
 }
 
 
 static status_t
-file_write(struct file_descriptor *descriptor, off_t pos, const void *buffer, size_t *length)
+file_write(struct file_descriptor *descriptor, off_t pos, const void *buffer,
+	size_t *length)
 {
 	struct vnode *vnode = descriptor->u.vnode;
-
 	FUNCTION(("file_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
+
+	if (S_ISDIR(vnode->type))
+		return B_IS_A_DIRECTORY;
+
 	return FS_CALL(vnode, write, descriptor->cookie, pos, buffer, length);
 }
 
@@ -4738,22 +4746,13 @@ file_write(struct file_descriptor *descriptor, off_t pos, const void *buffer, si
 static off_t
 file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 {
+	struct vnode *vnode = descriptor->u.vnode;
 	off_t offset;
 
 	FUNCTION(("file_seek(pos = %Ld, seekType = %d)\n", pos, seekType));
 
-	// stat() the node
-	struct vnode *vnode = descriptor->u.vnode;
-	if (!HAS_FS_CALL(vnode, read_stat))
-		return EOPNOTSUPP;
-
-	struct stat stat;
-	status_t status = FS_CALL(vnode, read_stat, &stat);
-	if (status < B_OK)
-		return status;
-
 	// some kinds of files are not seekable
-	switch (stat.st_mode & S_IFMT) {
+	switch (vnode->type & S_IFMT) {
 		case S_IFIFO:
 		case S_IFSOCK:
 			return ESPIPE;
@@ -4776,8 +4775,19 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 			offset = descriptor->pos;
 			break;
 		case SEEK_END:
+		{
+			// stat() the node
+			if (!HAS_FS_CALL(vnode, read_stat))
+				return EOPNOTSUPP;
+
+			struct stat stat;
+			status_t status = FS_CALL(vnode, read_stat, &stat);
+			if (status < B_OK)
+				return status;
+
 			offset = stat.st_size;
 			break;
+		}
 		default:
 			return B_BAD_VALUE;
 	}
@@ -5784,13 +5794,12 @@ attr_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 		case SEEK_END:
 		{
 			struct vnode *vnode = descriptor->u.vnode;
-			struct stat stat;
-			status_t status;
-
 			if (!HAS_FS_CALL(vnode, read_stat))
 				return EOPNOTSUPP;
 
-			status = FS_CALL(vnode, read_attr_stat, descriptor->cookie, &stat);
+			struct stat stat;
+			status_t status = FS_CALL(vnode, read_attr_stat, descriptor->cookie,
+				&stat);
 			if (status < B_OK)
 				return status;
 
@@ -6388,13 +6397,8 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		if (status < B_OK)
 			goto err5;
 
-		// make sure covered_vnode is a DIR
-		struct stat coveredNodeStat;
-		status = FS_CALL(coveredVnode, read_stat, &coveredNodeStat);
-		if (status < B_OK)
-			goto err5;
-
-		if (!S_ISDIR(coveredNodeStat.st_mode)) {
+		// make sure covered_vnode is a directory
+		if (!S_ISDIR(coveredVnode->type)) {
 			status = B_NOT_A_DIRECTORY;
 			goto err5;
 		}
@@ -6838,7 +6842,6 @@ set_cwd(int fd, char *path, bool kernel)
 	struct io_context *context;
 	struct vnode *vnode = NULL;
 	struct vnode *oldDirectory;
-	struct stat stat;
 	status_t status;
 
 	FUNCTION(("set_cwd: path = \'%s\'\n", path));
@@ -6848,11 +6851,7 @@ set_cwd(int fd, char *path, bool kernel)
 	if (status < 0)
 		return status;
 
-	status = FS_CALL(vnode, read_stat, &stat);
-	if (status < 0)
-		goto err;
-
-	if (!S_ISDIR(stat.st_mode)) {
+	if (!S_ISDIR(vnode->type)) {
 		// nope, can't cwd to here
 		status = B_NOT_A_DIRECTORY;
 		goto err;
