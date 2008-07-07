@@ -15,6 +15,7 @@
 
 #define SR_IP_MASK 0x0700
 #define SR_S 0x2000
+#define M68K_SR_S 13
 #define M68K_SR_T_MASK 0xC000
 #define M68K_SR_T0 14
 #define M68K_SR_T1 15
@@ -365,6 +366,7 @@ struct iframe {
 	double f0;*/
 } _PACKED;
 
+#if 0 /* ppc */
 enum machine_state {
 	MSR_EXCEPTIONS_ENABLED			= 1L << 15,		// EE
 	MSR_PRIVILEGE_LEVEL				= 1L << 14,		// PR
@@ -376,6 +378,7 @@ enum machine_state {
 };
 
 //struct block_address_translation;
+#endif
 
 typedef struct arch_cpu_info {
 	int null;
