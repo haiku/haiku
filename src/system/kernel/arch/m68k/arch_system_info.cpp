@@ -46,6 +46,7 @@ arch_system_info_init(struct kernel_args *args)
 	sBusClockFrequency = args->arch_args.bus_frequency;
 
 	sCPURevision = args->arch_args.cpu_type; //XXX
+#warning M68K: use 060 PCR[15:8]
 	sCPUType = B_CPU_M68K;
 	
 	return B_OK;

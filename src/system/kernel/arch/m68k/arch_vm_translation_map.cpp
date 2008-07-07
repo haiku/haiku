@@ -28,10 +28,13 @@
  * so we use a function array to switch to the one we want.
  */
 
+#warning M68K: 060: must *not* have pgtables in copyback cachable mem!!!
+
 //extern struct m68k_vm_ops m68851_vm_ops;
 extern struct m68k_vm_ops m68030_vm_ops;
-//extern struct m68k_vm_ops m68030_vm_ops;
-//extern struct m68k_vm_ops m68030_vm_ops;
+//extern struct m68k_vm_ops m68040_vm_ops;
+// 060 should be identical to 040 except for copyback issue
+//extern struct m68k_vm_ops m68060_vm_ops;
 
 #warning M68K: use a static!
 m68k_vm_ops *get_vm_ops()

@@ -52,6 +52,8 @@ arch_update_thread_single_step()
 		// 0  1  trace on flow
 		// 1  0  single step
 		// 1  1  undef
+		// note 060 and 020(?) only have T1 bit, 
+		// but this should be compatible as well.
 		if (thread->debug_info.flags & B_THREAD_DEBUG_SINGLE_STEP) {
 			frame->cpu.sr &= ~(M68K_SR_T_MASK);
 			frame->cpu.sr |= (1 << M68K_SR_T1);

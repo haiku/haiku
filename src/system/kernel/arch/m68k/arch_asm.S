@@ -79,6 +79,7 @@ FUNCTION(get_time_base):
 
 
 #warning M68K: FIX m68k_context_switch
+// XXX:sync with arch_thread.c:arch_thread_init_kthread_stack
 // void m68k_context_switch(addr_t *old_sp, addr_t new_sp);
 FUNCTION(m68k_context_switch):
 	// save fp ?
@@ -86,6 +87,7 @@ FUNCTION(m68k_context_switch):
 	movem.l		%d0-%d7/%a0-%a7,-(%sp)
 	fmovem		%fp0-%fp7,-(%sp)
 	fsave		-(%sp)
+#warning M68K: use fixed size for fsave
 
 	// XXX
 	
