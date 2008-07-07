@@ -22,7 +22,6 @@
 #include <syscalls.h>
 
 
-#include <stdio.h>
 static inline bool
 check_r5_compatibility()
 {
