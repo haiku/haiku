@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku. All rights reserved.
+ * Copyright 2001-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,7 +29,7 @@
 
 
 SpoolFolder::SpoolFolder(BLocker*locker, BLooper* looper, const BDirectory& spoolDir)
-	: Folder(locker, looper, spoolDir) 
+	: Folder(locker, looper, spoolDir)
 {
 }
 
@@ -40,7 +40,7 @@ void SpoolFolder::Notify(Job* job, int kind)
 	if ((kind == kJobAdded || kind == kJobAttrChanged) &&
 		job->IsValid() && job->IsWaiting()) {
 		be_app_messenger.SendMessage(PSRV_PRINT_SPOOLED_JOB);
-	}	
+	}
 }
 
 
@@ -74,10 +74,11 @@ Printer* Printer::Find(const BString& name)
 			return sPrinters.ItemAt(idx);
 		}
 	}
-	
+
 		// None found, so return NULL
 	return NULL;
 }
+
 
 Printer* Printer::Find(node_ref* node)
 {
@@ -86,19 +87,23 @@ Printer* Printer::Find(node_ref* node)
 	for (int32 idx=0; idx < sPrinters.CountItems(); idx++) {
 		Printer* printer = sPrinters.ItemAt(idx);
 		printer->SpoolDir()->GetNodeRef(&n);
-		if (n == *node) return printer;
+		if (n == *node)
+			return printer;
 	}
-	
+
 		// None found, so return NULL
 	return NULL;
 }
+
 
 Printer* Printer::At(int32 idx)
 {
 	return sPrinters.ItemAt(idx);
 }
 
-void Printer::Remove(Printer* printer) {
+
+void Printer::Remove(Printer* printer)
+{
 	sPrinters.RemoveItem(printer);
 }
 
@@ -106,6 +111,7 @@ int32 Printer::CountPrinters()
 {
 	return sPrinters.CountItems();
 }
+
 
 // ---------------------------------------------------------------
 // Printer [constructor]
@@ -133,13 +139,15 @@ Printer::Printer(const BDirectory* node, Resource* res)
 	if (SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name) == B_OK)
 		SetName(name.String());
 
-	if (name == "Preview") fSinglePrintThread = false;
-	
+	if (name == "Preview")
+		fSinglePrintThread = false;
+
 		// Add us to the global list of known printer definitions
 	sPrinters.AddItem(this);
-	
+
 	ResetJobStatus();
 }
+
 
 Printer::~Printer()
 {
@@ -157,9 +165,10 @@ status_t Printer::Remove()
 		path.Append(Name());
 		rc = rmdir(path.Path());
 	}
-	
+
 	return rc;
 }
+
 
 // ---------------------------------------------------------------
 // ConfigurePrinter
@@ -174,23 +183,23 @@ status_t Printer::Remove()
 // ---------------------------------------------------------------
 status_t Printer::ConfigurePrinter()
 {
-	image_id id;
 	status_t rc;
-	
-	if ((rc=LoadPrinterAddon(id)) == B_OK) {
+	image_id id;
+	if ((rc = LoadPrinterAddon(id)) == B_OK) {
 			// Addon was loaded, so try and get the add_printer symbol
 		add_printer_func_t func;
-
-		if (get_image_symbol(id, "add_printer", B_SYMBOL_TYPE_TEXT, (void**)&func) == B_OK) {
-				// call the function and check its result
+		if (get_image_symbol(id, "add_printer", B_SYMBOL_TYPE_TEXT,
+			(void**)&func) == B_OK) {
+			// call the function and check its result
 			rc = ((*func)(Name()) == NULL) ? B_ERROR : B_OK;
 		}
-		
+
 		::unload_add_on(id);
 	}
-	
+
 	return rc;
 }
+
 
 // ---------------------------------------------------------------
 // ConfigurePage
@@ -207,29 +216,30 @@ status_t Printer::ConfigurePrinter()
 // ---------------------------------------------------------------
 status_t Printer::ConfigurePage(BMessage& settings)
 {
-	image_id id;
 	status_t rc;
-	
-	if ((rc=LoadPrinterAddon(id)) == B_OK) {
+	image_id id;
+	if ((rc = LoadPrinterAddon(id)) == B_OK) {
 			// Addon was loaded, so try and get the config_page symbol
 		config_func_t func;
-
-		if ((rc=get_image_symbol(id, "config_page", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
-				// call the function and check its result
+		if ((rc=get_image_symbol(id, "config_page", B_SYMBOL_TYPE_TEXT,
+			(void**)&func)) == B_OK) {
+			// call the function and check its result
 			BMessage* new_settings = (*func)(SpoolDir(), &settings);
 			if (new_settings != NULL && new_settings->what != 'baad') {
 				settings = *new_settings;
 				AddCurrentPrinter(&settings);
-			} else
+			} else {
 				rc = B_ERROR;
+			}
 			delete new_settings;
 		}
-		
+
 		::unload_add_on(id);
 	}
-	
+
 	return rc;
 }
+
 
 // ---------------------------------------------------------------
 // ConfigureJob
@@ -246,27 +256,27 @@ status_t Printer::ConfigurePage(BMessage& settings)
 // ---------------------------------------------------------------
 status_t Printer::ConfigureJob(BMessage& settings)
 {
-	image_id id;
 	status_t rc;
-	
-	if ((rc=LoadPrinterAddon(id)) == B_OK) {
+	image_id id;
+	if ((rc = LoadPrinterAddon(id)) == B_OK) {
 			// Addon was loaded, so try and get the config_job symbol
 		config_func_t func;
-
-		if ((rc=get_image_symbol(id, "config_job", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
-				// call the function and check its result
+		if ((rc = get_image_symbol(id, "config_job", B_SYMBOL_TYPE_TEXT,
+			(void**)&func)) == B_OK) {
+			// call the function and check its result
 			BMessage* new_settings = (*func)(SpoolDir(), &settings);
 			if ((new_settings != NULL) && (new_settings->what != 'baad')) {
 				settings = *new_settings;
 				AddCurrentPrinter(&settings);
-			} else
+			} else {
 				rc = B_ERROR;
+			}
 			delete new_settings;
 		}
-		
+
 		::unload_add_on(id);
 	}
-	
+
 	return rc;
 }
 
@@ -276,13 +286,15 @@ status_t Printer::ConfigureJob(BMessage& settings)
 //
 // Print spooled jobs in a new thread.
 // ---------------------------------------------------------------
-void Printer::HandleSpooledJob() {
+void Printer::HandleSpooledJob()
+{
 	BAutolock lock(gLock);
-	if (lock.IsLocked() && (!fSinglePrintThread || fProcessing == 0) && FindSpooledJob()) {
+	if (lock.IsLocked()
+		&& (!fSinglePrintThread || fProcessing == 0) && FindSpooledJob()) {
 		StartPrintThread();
 	}
 }
- 
+
 
 // ---------------------------------------------------------------
 // GetDefaultSettings
@@ -295,37 +307,38 @@ void Printer::HandleSpooledJob() {
 // Returns:
 //    B_OK if successful or errorcode otherwise.
 // ---------------------------------------------------------------
-status_t Printer::GetDefaultSettings(BMessage& settings) {
-	image_id id;
+status_t Printer::GetDefaultSettings(BMessage& settings)
+{
 	status_t rc;
-	
-	if ((rc=LoadPrinterAddon(id)) == B_OK) {
+	image_id id;
+	if ((rc = LoadPrinterAddon(id)) == B_OK) {
 			// Addon was loaded, so try and get the default_settings symbol
 		default_settings_t func;
-
-		if ((rc=get_image_symbol(id, "default_settings", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
+		if ((rc = get_image_symbol(id, "default_settings", B_SYMBOL_TYPE_TEXT,
+			(void**)&func)) == B_OK) {
 				// call the function and check its result
 			BMessage* new_settings = (*func)(SpoolDir());
 			if (new_settings) {
-				settings = *new_settings; 
+				settings = *new_settings;
 				AddCurrentPrinter(&settings);
 			} else {
 				rc = B_ERROR;
 			}
 			delete new_settings;
 		}
-		
+
 		::unload_add_on(id);
 	}
-	
 	return rc;
 }
- 
- 
-void Printer::AbortPrintThread() {
+
+
+void Printer::AbortPrintThread()
+{
 	fAbort = true;
 }
- 
+
+
 // ---------------------------------------------------------------
 // LoadPrinterAddon
 //
@@ -339,25 +352,27 @@ void Printer::AbortPrintThread() {
 // ---------------------------------------------------------------
 status_t Printer::LoadPrinterAddon(image_id& id)
 {
-	BString drName;
 	status_t rc;
-	BPath path;
-
-	if ((rc=SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_DRV_NAME, &drName)) == B_OK) {
-			// try to locate the driver
-		if ((rc=::TestForAddonExistence(drName.String(), B_USER_ADDONS_DIRECTORY, "Print", path)) != B_OK) {
-			if ((rc=::TestForAddonExistence(drName.String(), B_COMMON_ADDONS_DIRECTORY, "Print", path)) != B_OK) {
-				rc = ::TestForAddonExistence(drName.String(), B_BEOS_ADDONS_DIRECTORY, "Print", path);
+	BString drName;
+	if ((rc = SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_DRV_NAME, &drName)) == B_OK) {
+		// try to locate the driver
+		BPath path;
+		if ((rc= ::TestForAddonExistence(drName.String(), B_USER_ADDONS_DIRECTORY,
+			"Print", path)) != B_OK) {
+			if ((rc = ::TestForAddonExistence(drName.String(), B_COMMON_ADDONS_DIRECTORY,
+				"Print", path)) != B_OK) {
+				rc = ::TestForAddonExistence(drName.String(), B_BEOS_ADDONS_DIRECTORY,
+					"Print", path);
 			}
 		}
-		
-			// If the driver was found
+
+		// If the driver was found
 		if (rc == B_OK) {
-				// If we cannot load the addon
+			// If we cannot load the addon
 			if ((id=::load_add_on(path.Path())) < 0)
 				rc = id;
 		}
-	}	
+	}
 	return rc;
 }
 
@@ -401,11 +416,12 @@ void Printer::MessageReceived(BMessage* msg)
 		case B_EXECUTE_PROPERTY:
 			HandleScriptingCommand(msg);
 			break;
-		
+
 		default:
 			Inherited::MessageReceived(msg);
 	}
 }
+
 
 // ---------------------------------------------------------------
 // GetName
@@ -415,26 +431,31 @@ void Printer::MessageReceived(BMessage* msg)
 // Parameters:
 //    name - the name of the printer.
 // ---------------------------------------------------------------
-void Printer::GetName(BString& name) {
+void Printer::GetName(BString& name)
+{
 	if (B_OK != SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name))
 		name = "Unknown Printer";
 }
+
 
 // ---------------------------------------------------------------
 // ResetJobStatus
 //
 // Reset status of "processing" jobs to "waiting" at print_server start.
 // ---------------------------------------------------------------
-void Printer::ResetJobStatus() {
+void Printer::ResetJobStatus()
+{
 	if (fPrinter.Lock()) {
 		const int32 n = fPrinter.CountJobs();
 		for (int32 i = 0; i < n; i ++) {
 			Job* job = fPrinter.JobAt(i);
-			if (job->Status() == kProcessing) job->SetStatus(kWaiting);
+			if (job->Status() == kProcessing)
+				job->SetStatus(kWaiting);
 		}
 		fPrinter.Unlock();
 	}
 }
+
 
 // ---------------------------------------------------------------
 // HasCurrentPrinter
@@ -447,15 +468,17 @@ void Printer::ResetJobStatus() {
 // Returns:
 //    true if successful.
 // ---------------------------------------------------------------
-bool Printer::HasCurrentPrinter(BString& name) {
+bool Printer::HasCurrentPrinter(BString& name)
+{
 	BMessage settings;
 		// read settings from spool file and get printer name
 	BFile jobFile(&fJob->EntryRef(), B_READ_WRITE);
-	return jobFile.InitCheck() == B_OK &&
-		jobFile.Seek(sizeof(print_file_header), SEEK_SET) == sizeof(print_file_header) &&
-		settings.Unflatten(&jobFile) == B_OK &&
-		settings.FindString(PSRV_FIELD_CURRENT_PRINTER, &name) == B_OK;
+	return jobFile.InitCheck() == B_OK
+		&& jobFile.Seek(sizeof(print_file_header), SEEK_SET) == sizeof(print_file_header)
+		&& settings.Unflatten(&jobFile) == B_OK
+		&& settings.FindString(PSRV_FIELD_CURRENT_PRINTER, &name) == B_OK;
 }
+
 
 // ---------------------------------------------------------------
 // MoveJob
@@ -468,16 +491,19 @@ bool Printer::HasCurrentPrinter(BString& name) {
 // Returns:
 //    true if successful.
 // ---------------------------------------------------------------
-bool Printer::MoveJob(const BString& name) {
+bool Printer::MoveJob(const BString& name)
+{
 	BPath file(&fJob->EntryRef());
 	BPath path;
 	file.GetParent(&path);
-	path.Append(".."); path.Append(name.String());
+	path.Append("..");
+	path.Append(name.String());
 	BDirectory dir(path.Path());
 	BEntry entry(&fJob->EntryRef());
 		// try to move job file to proper directory
 	return entry.MoveTo(&dir) == B_OK;
 }
+
 
 // ---------------------------------------------------------------
 // FindSpooledJob
@@ -485,15 +511,16 @@ bool Printer::MoveJob(const BString& name) {
 // Looks if there is a job waiting to be processed and moves
 // jobs to the proper printer folder.
 //
-// Note: 
+// Note:
 //       Our implementation of BPrintJob moves jobs to the
 //       proper printer folder.
-//       
+//
 //
 // Returns:
 //    true if there is a job present in fJob.
 // ---------------------------------------------------------------
-bool Printer::FindSpooledJob() {
+bool Printer::FindSpooledJob()
+{
 	BString name2;
 	GetName(name2);
 	do {
@@ -514,6 +541,7 @@ bool Printer::FindSpooledJob() {
 	return false;
 }
 
+
 // ---------------------------------------------------------------
 // PrintSpooledJob
 //
@@ -528,30 +556,28 @@ bool Printer::FindSpooledJob() {
 // ---------------------------------------------------------------
 status_t Printer::PrintSpooledJob(BFile* spoolFile)
 {
-	take_job_func_t func;
-	image_id id;
 	status_t rc;
-	
-	if ((rc=LoadPrinterAddon(id)) == B_OK) {
-			// Addon was loaded, so try and get the take_job symbol
-		if ((rc=get_image_symbol(id, "take_job", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
-				// This seems to be required for legacy?
-				// HP PCL3 add-on crashes without it!
+	image_id id;
+	if ((rc = LoadPrinterAddon(id)) == B_OK) {
+		take_job_func_t func;
+		// Addon was loaded, so try and get the take_job symbol
+		if ((rc = get_image_symbol(id, "take_job", B_SYMBOL_TYPE_TEXT,
+			(void**)&func)) == B_OK) {
+			// This seems to be required for legacy?
+			// HP PCL3 add-on crashes without it!
 			BMessage params(B_REFS_RECEIVED);
 			params.AddInt32("file", (int32)spoolFile);
 			params.AddInt32("printer", (int32)SpoolDir());
 				// call the function and check its result
 			BMessage* result = (*func)(spoolFile, SpoolDir(), &params);
-			
+
 			if (result == NULL || result->what != 'okok')
 				rc = B_ERROR;
-
 			delete result;
 		}
-		
+
 		::unload_add_on(id);
 	}
-	
 	return rc;
 }
 
@@ -565,12 +591,13 @@ status_t Printer::PrintSpooledJob(BFile* spoolFile)
 // Parameters:
 //    job - the spool job.
 // ---------------------------------------------------------------
-void Printer::PrintThread(Job* job) {
-		// Wait until resource is available
+void Printer::PrintThread(Job* job)
+{
+	// Wait until resource is available
 	fResource->Lock();
 	bool failed = true;
 		// Can we continue?
-	if (!fAbort) {				
+	if (!fAbort) {
 		BFile jobFile(&job->EntryRef(), B_READ_WRITE);
 				// Tell the printer to print the spooled job
 		if (jobFile.InitCheck() == B_OK && PrintSpooledJob(&jobFile) == B_OK) {
@@ -579,14 +606,16 @@ void Printer::PrintThread(Job* job) {
 		}
 	}
 		// Set status of spooled job on error
-	if (failed) job->SetStatus(kFailed);
+	if (failed)
+		job->SetStatus(kFailed);
 	fResource->Unlock();
 	job->Release();
 	atomic_add(&fProcessing, -1);
 	Release();
 		// Notify print_server to process next spooled job
-	be_app_messenger.SendMessage(PSRV_PRINT_SPOOLED_JOB);	
+	be_app_messenger.SendMessage(PSRV_PRINT_SPOOLED_JOB);
 }
+
 
 // ---------------------------------------------------------------
 // print_thread
@@ -599,11 +628,13 @@ void Printer::PrintThread(Job* job) {
 // Returns:
 //    0 always.
 // ---------------------------------------------------------------
-status_t Printer::print_thread(void* data) {
+status_t Printer::print_thread(void* data)
+{
 	Job* job = static_cast<Job*>(data);
 	job->GetPrinter()->PrintThread(job);
 	return 0;
 }
+
 
 // ---------------------------------------------------------------
 // StartPrintThread
@@ -611,15 +642,17 @@ status_t Printer::print_thread(void* data) {
 // Sets the status of the current spool job to "processing" and
 // starts the print_thread.
 // ---------------------------------------------------------------
-void Printer::StartPrintThread() {
+void Printer::StartPrintThread()
+{
 	Acquire();
 	thread_id tid = spawn_thread(print_thread, "print", B_NORMAL_PRIORITY, (void*)fJob);
 	if (tid > 0) {
 		fJob->SetStatus(kProcessing);
 		atomic_add(&fProcessing, 1);
-		resume_thread(tid);	
+		resume_thread(tid);
 	} else {
-		fJob->Release(); Release();
+		fJob->Release();
+		Release();
 	}
 }
 
