@@ -778,9 +778,6 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 		}
 		bigtime_t realTime = TimeSource()->RealTimeFor(
 			fStartTime + performanceTime, 0);
-		realTime -= 2000;
-			// deliver event about one video frame earlier to account
-			// for latency between app_server and client
 		MessageEvent* event = new (std::nothrow) MessageEvent(realTime,
 			fPeakListener, message);
 		if (event != NULL)
