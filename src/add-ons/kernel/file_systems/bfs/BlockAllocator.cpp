@@ -474,6 +474,10 @@ BlockAllocator::Initialize(bool full)
 			"bfs block allocator", B_LOW_PRIORITY, (void *)this);
 	if (id < B_OK)
 		return _Initialize(this);
+#ifdef KDEBUG
+	else
+		fLock.holder = id;
+#endif
 
 	return resume_thread(id);
 }
