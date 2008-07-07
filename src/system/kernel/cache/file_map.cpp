@@ -62,7 +62,6 @@ public:
 
 			void			Invalidate(off_t offset, off_t size);
 			void			SetSize(off_t size);
-			void			Free();
 
 			status_t		Translate(off_t offset, size_t size,
 								file_io_vec* vecs, size_t* _count);
@@ -78,11 +77,14 @@ private:
 			status_t		_MakeSpace(size_t count);
 			status_t		_Add(file_io_vec* vecs, size_t vecCount,
 								off_t& lastOffset);
+			void			_InvalidateAfter(off_t offset);
+			void			_Free();
 
 	union {
 		file_extent	fDirect[CACHED_FILE_EXTENTS];
 		file_extent_array fIndirect;
 	};
+	mutex			fLock;
 	size_t			fCount;
 	struct vnode*	fVnode;
 	off_t			fSize;
@@ -98,6 +100,7 @@ static mutex sLock;
 
 FileMap::FileMap(struct vnode* vnode, off_t size)
 {
+	mutex_init(&fLock, "file map");
 	fCount = 0;
 	fVnode = vnode;
 	fSize = size;
@@ -111,7 +114,8 @@ FileMap::FileMap(struct vnode* vnode, off_t size)
 
 FileMap::~FileMap()
 {
-	Free();
+	_Free();
+	mutex_destroy(&fLock);
 
 #ifdef DEBUG_FILE_MAP
 	MutexLocker _(sLock);
@@ -260,17 +264,9 @@ FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 }
 
 
-/*!	Invalidates or removes the specified part of the file map.
-*/
 void
-FileMap::Invalidate(off_t offset, off_t size)
+FileMap::_InvalidateAfter(off_t offset)
 {
-	// TODO: honour size, we currently always remove everything after "offset"
-	if (offset == 0) {
-		Free();
-		return;
-	}
-
 	uint32 index;
 	file_extent* extent = _FindExtent(offset, &index);
 	if (extent != NULL) {
@@ -282,18 +278,37 @@ FileMap::Invalidate(off_t offset, off_t size)
 }
 
 
+/*!	Invalidates or removes the specified part of the file map.
+*/
+void
+FileMap::Invalidate(off_t offset, off_t size)
+{
+	MutexLocker _(fLock);
+
+	// TODO: honour size, we currently always remove everything after "offset"
+	if (offset == 0) {
+		_Free();
+		return;
+	}
+
+	_InvalidateAfter(offset);
+}
+
+
 void
 FileMap::SetSize(off_t size)
 {
+	MutexLocker _(fLock);
+
 	if (size < fSize)
-		Invalidate(size, fSize - size);
+		_InvalidateAfter(size);
 
 	fSize = size;
 }
 
 
 void
-FileMap::Free()
+FileMap::_Free()
 {
 	if (fCount > CACHED_FILE_EXTENTS)
 		free(fIndirect.array);
@@ -305,6 +320,8 @@ FileMap::Free()
 status_t
 FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 {
+	MutexLocker _(fLock);
+
 	size_t maxVecs = *_count;
 	status_t status = B_OK;
 
