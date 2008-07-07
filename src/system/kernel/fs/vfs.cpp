@@ -4722,12 +4722,8 @@ file_read(struct file_descriptor *descriptor, off_t pos, void *buffer,
 	struct vnode *vnode = descriptor->u.vnode;
 	FUNCTION(("file_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length, *length));
 
-	if (!S_ISREG(vnode->type)) {
-		if (S_ISDIR(vnode->type))
-			return B_IS_A_DIRECTORY;
-
-		return B_BAD_VALUE;
-	}
+	if (S_ISDIR(vnode->type))
+		return B_IS_A_DIRECTORY;
 
 	return FS_CALL(vnode, read, descriptor->cookie, pos, buffer, length);
 }
@@ -4740,12 +4736,8 @@ file_write(struct file_descriptor *descriptor, off_t pos, const void *buffer,
 	struct vnode *vnode = descriptor->u.vnode;
 	FUNCTION(("file_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
 
-	if (!S_ISREG(vnode->type)) {
-		if (S_ISDIR(vnode->type))
-			return B_IS_A_DIRECTORY;
-
-		return B_BAD_VALUE;
-	}
+	if (S_ISDIR(vnode->type))
+		return B_IS_A_DIRECTORY;
 
 	return FS_CALL(vnode, write, descriptor->cookie, pos, buffer, length);
 }
