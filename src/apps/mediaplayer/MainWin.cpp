@@ -122,8 +122,8 @@ MainWin::MainWin()
  ,	fNoMenu(false)
  ,	fNoBorder(false)
  ,	fNoControls(false)
- ,	fSourceWidth(0)
- ,	fSourceHeight(0)
+ ,	fSourceWidth(-1)
+ ,	fSourceHeight(-1)
  ,	fWidthScale(1.0)
  ,	fHeightScale(1.0)
  ,	fMouseDownTracking(false)
@@ -849,10 +849,13 @@ MainWin::_SetupWindow()
 	fVideoMenu->SetEnabled(fHasVideo);
 	fAudioMenu->SetEnabled(fHasAudio);
 //	fDebugMenu->SetEnabled(fHasVideo);
+	int previousSourceWidth = fSourceWidth;
+	int previousSourceHeight = fSourceHeight;
 	if (fHasVideo) {
 		fController->GetSize(&fSourceWidth, &fSourceHeight);
 		fWidthScale = 1.0;
 		fHeightScale = 1.0;
+			// TODO: implement aspect ratio
 	} else {
 		fSourceWidth = 0;
 		fSourceHeight = 0;
@@ -861,9 +864,11 @@ MainWin::_SetupWindow()
 	}
 	_UpdateControlsEnabledStatus();
 
-	// TODO: Don't if the video size did not change! Also don't
-	// exit full screen mode.
-	_ResizeWindow(100);
+	// adopt the size and window layout if necessary
+	if (!fIsFullscreen && (previousSourceWidth != fSourceWidth
+			|| previousSourceHeight != fSourceHeight)) {
+		_ResizeWindow(100);
+	}
 
 	fVideoView->MakeFocus();
 }
@@ -1024,12 +1029,9 @@ MainWin::_SetWindowSizeLimits()
 void
 MainWin::_ResizeWindow(int percent)
 {
-	int video_width;
-	int video_height;
-
 	// Get required window size
-	video_width = lround(fSourceWidth * fWidthScale);
-	video_height = lround(fSourceHeight * fHeightScale);
+	int video_width = lround(fSourceWidth * fWidthScale);
+	int video_height = lround(fSourceHeight * fHeightScale);
 	
 	video_width = (video_width * percent) / 100;
 	video_height = (video_height * percent) / 100;
