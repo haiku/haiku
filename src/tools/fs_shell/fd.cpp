@@ -1,13 +1,15 @@
-/* Operations on file descriptors
- *
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
+
+//! Operations on file descriptors
 
 #include "fd.h"
 
 #include <stdlib.h>
 
+#include "fssh_atomic.h"
 #include "fssh_fcntl.h"
 #include "fssh_kernel_export.h"
 #include "fssh_kernel_priv.h"
@@ -96,7 +98,7 @@ new_fd_etc(struct io_context *context, struct file_descriptor *descriptor,
 	int fd = -1;
 	uint32_t i;
 
-	mutex_lock(&context->io_mutex);
+	fssh_mutex_lock(&context->io_mutex);
 
 	for (i = firstIndex; i < context->table_size; i++) {
 		if (!context->fds[i]) {
@@ -114,7 +116,7 @@ new_fd_etc(struct io_context *context, struct file_descriptor *descriptor,
 	fssh_atomic_add(&descriptor->open_count, 1);
 
 err:
-	mutex_unlock(&context->io_mutex);
+	fssh_mutex_unlock(&context->io_mutex);
 
 	return fd;
 }
@@ -215,7 +217,7 @@ get_fd(struct io_context *context, int fd)
 	if (fd < 0)
 		return NULL;
 
-	mutex_lock(&context->io_mutex);
+	fssh_mutex_lock(&context->io_mutex);
 
 	if ((uint32_t)fd < context->table_size)
 		descriptor = context->fds[fd];
@@ -228,7 +230,7 @@ get_fd(struct io_context *context, int fd)
 			inc_fd_ref_count(descriptor);
 	}
 
-	mutex_unlock(&context->io_mutex);
+	fssh_mutex_unlock(&context->io_mutex);
 
 	return descriptor;
 }
@@ -245,7 +247,7 @@ remove_fd(struct io_context *context, int fd)
 	if (fd < 0)
 		return NULL;
 
-	mutex_lock(&context->io_mutex);
+	fssh_mutex_lock(&context->io_mutex);
 
 	if ((uint32_t)fd < context->table_size)
 		descriptor = context->fds[fd];
@@ -260,7 +262,7 @@ remove_fd(struct io_context *context, int fd)
 			descriptor = NULL;
 	}
 
-	mutex_unlock(&context->io_mutex);
+	fssh_mutex_unlock(&context->io_mutex);
 
 	return descriptor;
 }
@@ -285,9 +287,9 @@ dup_fd(int fd, bool kernel)
 	if (status < 0)
 		put_fd(descriptor);
 	else {
-		mutex_lock(&context->io_mutex);
+		fssh_mutex_lock(&context->io_mutex);
 		fd_set_close_on_exec(context, status, false);
-		mutex_unlock(&context->io_mutex);
+		fssh_mutex_unlock(&context->io_mutex);
 	}
 
 	return status;
@@ -315,14 +317,14 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 
 	// Get current I/O context and lock it
 	context = get_current_io_context(kernel);
-	mutex_lock(&context->io_mutex);
+	fssh_mutex_lock(&context->io_mutex);
 
 	// Check if the fds are valid (mutex must be locked because
 	// the table size could be changed)
 	if ((uint32_t)oldfd >= context->table_size
 		|| (uint32_t)newfd >= context->table_size
 		|| context->fds[oldfd] == NULL) {
-		mutex_unlock(&context->io_mutex);
+		fssh_mutex_unlock(&context->io_mutex);
 		return FSSH_B_FILE_ERROR;
 	}
 
@@ -342,7 +344,7 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 
 	fd_set_close_on_exec(context, newfd, false);
 
-	mutex_unlock(&context->io_mutex);
+	fssh_mutex_unlock(&context->io_mutex);
 
 	// Say bye bye to the evicted fd
 	if (evicted) {

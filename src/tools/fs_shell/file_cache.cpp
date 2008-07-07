@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku Inc. All rights reserved.
+ * Copyright 2004-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,12 +15,12 @@
 
 #include "DoublyLinkedList.h"
 #include "fssh_kernel_export.h"
+#include "fssh_lock.h"
 #include "fssh_stdio.h"
 #include "fssh_string.h"
 #include "fssh_uio.h"
 #include "fssh_unistd.h"
 #include "hash.h"
-#include "lock.h"
 #include "vfs.h"
 
 
@@ -61,7 +61,7 @@ typedef fssh_status_t (*cache_func)(file_cache_ref *ref, void *cookie,
 	fssh_size_t bufferSize);
 
 struct file_cache_ref {
-	mutex						lock;
+	fssh_mutex					lock;
 	fssh_mount_id				mountID;
 	fssh_vnode_id				nodeID;
 	void*						node;
@@ -87,12 +87,12 @@ read_from_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
 	vec.iov_base = (void *)buffer;
 	vec.iov_len = bufferSize;
 
-	mutex_unlock(&ref->lock);
+	fssh_mutex_unlock(&ref->lock);
 
 	fssh_status_t status = vfs_read_pages(ref->node, cookie,
 		offset + pageOffset, &vec, 1, &bufferSize, false);
 
-	mutex_lock(&ref->lock);
+	fssh_mutex_lock(&ref->lock);
 
 	return status;
 }
@@ -106,12 +106,12 @@ write_to_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
 	vec.iov_base = (void *)buffer;
 	vec.iov_len = bufferSize;
 
-	mutex_unlock(&ref->lock);
+	fssh_mutex_unlock(&ref->lock);
 
 	fssh_status_t status = vfs_write_pages(ref->node, cookie,
 		offset + pageOffset, &vec, 1, &bufferSize, false);
 
-	mutex_lock(&ref->lock);
+	fssh_mutex_lock(&ref->lock);
 
 	return status;
 }
@@ -258,13 +258,7 @@ fssh_file_cache_create(fssh_mount_id mountID, fssh_vnode_id vnodeID,
 	// create lock
 	char buffer[32];
 	fssh_snprintf(buffer, sizeof(buffer), "file cache %d:%lld", (int)mountID, vnodeID);
-	error = mutex_init(&ref->lock, buffer);
-	if (error != FSSH_B_OK) {
-		fssh_dprintf("file_cache_create(): Failed to init mutex: %s\n",
-			fssh_strerror(error));
-		delete ref;
-		return NULL;
-	}
+	fssh_mutex_init(&ref->lock, buffer);
 
 	return ref;
 }
@@ -280,8 +274,8 @@ fssh_file_cache_delete(void *_cacheRef)
 
 	TRACE(("file_cache_delete(ref = %p)\n", ref));
 
-	mutex_lock(&ref->lock);
-	mutex_destroy(&ref->lock);
+	fssh_mutex_lock(&ref->lock);
+	fssh_mutex_destroy(&ref->lock);
 
 	delete ref;
 }
@@ -297,9 +291,9 @@ fssh_file_cache_set_size(void *_cacheRef, fssh_off_t size)
 	if (ref == NULL)
 		return FSSH_B_OK;
 
-	mutex_lock(&ref->lock);
+	fssh_mutex_lock(&ref->lock);
 	ref->virtual_size = size;
-	mutex_unlock(&ref->lock);
+	fssh_mutex_unlock(&ref->lock);
 
 	return FSSH_B_OK;
 }

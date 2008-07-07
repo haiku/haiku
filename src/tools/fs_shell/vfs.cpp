@@ -114,7 +114,7 @@ struct fs_mount {
 	void			*cookie;
 	char			*device_name;
 	char			*fs_name;
-	recursive_lock	rlock;	// guards the vnodes list
+	fssh_recursive_lock	rlock;	// guards the vnodes list
 	struct vnode	*root_vnode;
 	struct vnode	*covers_vnode;
 	struct list		vnodes;
@@ -122,7 +122,7 @@ struct fs_mount {
 	bool			owns_file_device;
 };
 
-static mutex sFileSystemsMutex;
+static fssh_mutex sFileSystemsMutex;
 
 /**	\brief Guards sMountsTable.
  *
@@ -130,7 +130,7 @@ static mutex sFileSystemsMutex;
  *	Manipulation of the fs_mount structures themselves
  *	(and their destruction) requires different locks though.
  */
-static mutex sMountMutex;
+static fssh_mutex sMountMutex;
 
 /**	\brief Guards mount/unmount operations.
  *
@@ -145,7 +145,7 @@ static mutex sMountMutex;
  *	The thread trying to lock the lock must not hold sVnodeMutex or
  *	sMountMutex.
  */
-static recursive_lock sMountOpLock;
+static fssh_recursive_lock sMountOpLock;
 
 /**	\brief Guards the vnode::covered_by field of any vnode
  *
@@ -154,7 +154,7 @@ static recursive_lock sMountOpLock;
  *
  *	The thread trying to lock the must not hold sVnodeMutex.
  */
-static mutex sVnodeCoveredByMutex;
+static fssh_mutex sVnodeCoveredByMutex;
 
 /**	\brief Guards sVnodeTable.
  *
@@ -168,7 +168,7 @@ static mutex sVnodeCoveredByMutex;
  *	You must not have this mutex held when calling create_sem(), as this
  *	might call vfs_free_unused_vnodes().
  */
-static mutex sVnodeMutex;
+static fssh_mutex sVnodeMutex;
 
 #define VNODE_HASH_TABLE_SIZE 1024
 static hash_table *sVnodeTable;
@@ -443,7 +443,7 @@ get_mount(fssh_mount_id id, struct fs_mount **_mount)
 	struct fs_mount *mount;
 	fssh_status_t status;
 
-	mutex_lock(&sMountMutex);
+	fssh_mutex_lock(&sMountMutex);
 
 	mount = find_mount(id);
 	if (mount) {
@@ -459,7 +459,7 @@ get_mount(fssh_mount_id id, struct fs_mount **_mount)
 	} else
 		status = FSSH_B_BAD_VALUE;
 
-	mutex_unlock(&sMountMutex);
+	fssh_mutex_unlock(&sMountMutex);
 
 	if (mount == NULL)
 		return FSSH_B_BUSY;
@@ -577,23 +577,23 @@ vnode_hash(void *_vnode, const void *_key, uint32_t range)
 static void
 add_vnode_to_mount_list(struct vnode *vnode, struct fs_mount *mount)
 {
-	recursive_lock_lock(&mount->rlock);
+	fssh_recursive_lock_lock(&mount->rlock);
 
 	list_add_link_to_head(&mount->vnodes, &vnode->mount_link);
 
-	recursive_lock_unlock(&mount->rlock);
+	fssh_recursive_lock_unlock(&mount->rlock);
 }
 
 
 static void
 remove_vnode_from_mount_list(struct vnode *vnode, struct fs_mount *mount)
 {
-	recursive_lock_lock(&mount->rlock);
+	fssh_recursive_lock_lock(&mount->rlock);
 
 	list_remove_link(&vnode->mount_link);
 	vnode->mount_link.next = vnode->mount_link.prev = NULL;
 
-	recursive_lock_unlock(&mount->rlock);
+	fssh_recursive_lock_unlock(&mount->rlock);
 }
 
 
@@ -612,10 +612,10 @@ create_new_vnode(struct vnode **_vnode, fssh_mount_id mountID, fssh_vnode_id vno
 	vnode->id = vnodeID;
 
 	// add the vnode to the mount structure
-	mutex_lock(&sMountMutex);	
+	fssh_mutex_lock(&sMountMutex);	
 	vnode->mount = find_mount(mountID);
 	if (!vnode->mount || vnode->mount->unmounting) {
-		mutex_unlock(&sMountMutex);
+		fssh_mutex_unlock(&sMountMutex);
 		free(vnode);
 		return FSSH_B_ENTRY_NOT_FOUND;
 	}
@@ -623,7 +623,7 @@ create_new_vnode(struct vnode **_vnode, fssh_mount_id mountID, fssh_vnode_id vno
 	hash_insert(sVnodeTable, vnode);
 	add_vnode_to_mount_list(vnode, vnode->mount);
 
-	mutex_unlock(&sMountMutex);
+	fssh_mutex_unlock(&sMountMutex);
 
 	vnode->ref_count = 1;
 	*_vnode = vnode;
@@ -658,9 +658,9 @@ free_vnode(struct vnode *vnode, bool reenter)
 
 	// The file system has removed the resources of the vnode now, so we can
 	// make it available again (and remove the busy vnode from the hash)
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 	hash_remove(sVnodeTable, vnode);
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 
 	remove_vnode_from_mount_list(vnode, vnode->mount);
 
@@ -684,7 +684,7 @@ free_vnode(struct vnode *vnode, bool reenter)
 static fssh_status_t
 dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 {
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 
 	int32_t oldRefCount = fssh_atomic_add(&vnode->ref_count, -1);
 
@@ -713,12 +713,12 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 			}
 		}
 
-		mutex_unlock(&sVnodeMutex);
+		fssh_mutex_unlock(&sVnodeMutex);
 
 		if (freeNode)
 			free_vnode(vnode, reenter);
 	} else
-		mutex_unlock(&sVnodeMutex);
+		fssh_mutex_unlock(&sVnodeMutex);
 
 	return FSSH_B_OK;
 }
@@ -783,21 +783,21 @@ get_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID, struct vnode **_vnode, i
 {
 	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID, _vnode));
 
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 
 	int32_t tries = 300;
 		// try for 3 secs
 restart:
 	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
 	if (vnode && vnode->busy) {
-		mutex_unlock(&sVnodeMutex);
+		fssh_mutex_unlock(&sVnodeMutex);
 		if (--tries < 0) {
 			// vnode doesn't seem to become unbusy
 			fssh_panic("vnode %d:%lld is not becoming unbusy!\n", (int)mountID, vnodeID);
 			return FSSH_B_BUSY;
 		}
 		fssh_snooze(10000); // 10 ms
-		mutex_lock(&sVnodeMutex);
+		fssh_mutex_lock(&sVnodeMutex);
 		goto restart;
 	}
 
@@ -819,7 +819,7 @@ restart:
 			goto err;
 
 		vnode->busy = true;
-		mutex_unlock(&sVnodeMutex);
+		fssh_mutex_unlock(&sVnodeMutex);
 
 		int type;
 		uint32_t flags;
@@ -828,7 +828,7 @@ restart:
 		if (status == FSSH_B_OK && vnode->private_node == NULL)
 			status = FSSH_B_BAD_VALUE;
 
-		mutex_lock(&sVnodeMutex);
+		fssh_mutex_lock(&sVnodeMutex);
 
 		if (status < FSSH_B_OK)
 			goto err1;
@@ -837,7 +837,7 @@ restart:
 		vnode->busy = false;
 	}
 
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 
 	TRACE(("get_vnode: returning %p\n", vnode));
 
@@ -848,7 +848,7 @@ err1:
 	hash_remove(sVnodeTable, vnode);
 	remove_vnode_from_mount_list(vnode, vnode->mount);
 err:
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 	if (vnode)
 		free(vnode);
 
@@ -912,12 +912,12 @@ resolve_mount_point_to_volume_root(struct vnode *vnode)
 
 	struct vnode *volumeRoot = NULL;
 
-	mutex_lock(&sVnodeCoveredByMutex);
+	fssh_mutex_lock(&sVnodeCoveredByMutex);
 	if (vnode->covered_by) {
 		volumeRoot = vnode->covered_by;
 		inc_vnode_ref_count(volumeRoot);
 	}
-	mutex_unlock(&sVnodeCoveredByMutex);
+	fssh_mutex_unlock(&sVnodeCoveredByMutex);
 
 	return volumeRoot;
 }
@@ -1075,9 +1075,9 @@ lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 	if (status < FSSH_B_OK)
 		return status;
 
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 	*_vnode = lookup_vnode(dir->device, id);
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 
 	if (*_vnode == NULL) {
 		fssh_panic("lookup_dir_entry(): could not lookup vnode (mountid 0x%x vnid "
@@ -1272,11 +1272,11 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 	} else {
 		struct io_context *context = get_current_io_context(kernel);
 
-		mutex_lock(&context->io_mutex);
+		fssh_mutex_lock(&context->io_mutex);
 		start = context->cwd;
 		if (start != NULL)
 			inc_vnode_ref_count(start);
-		mutex_unlock(&context->io_mutex);
+		fssh_mutex_unlock(&context->io_mutex);
 
 		if (start == NULL)
 			return FSSH_B_ERROR;
@@ -1896,7 +1896,7 @@ fssh_new_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID,
 	if (privateNode == NULL)
 		return FSSH_B_BAD_VALUE;
 
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 
 	// file system integrity check:
 	// test if the vnode already exists and bail out if this is the case!
@@ -1920,7 +1920,7 @@ fssh_new_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID,
 
 	TRACE(("returns: %s\n", strerror(status)));
 
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 	return status;
 }
 
@@ -2022,9 +2022,9 @@ fssh_put_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 {
 	struct vnode *vnode;
 
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 	vnode = lookup_vnode(volume->id, vnodeID);
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 
 	if (vnode)
 		dec_vnode_ref_count(vnode, true);
@@ -2047,7 +2047,7 @@ fssh_remove_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 
 	if (vnode->covered_by != NULL) {
 		// this vnode is in use
-		mutex_unlock(&sVnodeMutex);
+		fssh_mutex_unlock(&sVnodeMutex);
 		return FSSH_B_BUSY;
 	}
 
@@ -2075,13 +2075,13 @@ fssh_unremove_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 {
 	struct vnode *vnode;
 
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 
 	vnode = lookup_vnode(volume->id, vnodeID);
 	if (vnode)
 		vnode->remove = false;
 
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 	return FSSH_B_OK;
 }
 
@@ -2089,7 +2089,7 @@ fssh_unremove_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 extern "C" fssh_status_t 
 fssh_get_vnode_removed(fssh_fs_volume *volume, fssh_vnode_id vnodeID, bool* removed)
 {
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 
 	fssh_status_t result;
 
@@ -2100,7 +2100,7 @@ fssh_get_vnode_removed(fssh_fs_volume *volume, fssh_vnode_id vnodeID, bool* remo
 	} else
 		result = FSSH_B_BAD_VALUE;
 
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 	return result;
 }
 
@@ -2347,9 +2347,9 @@ vfs_fs_vnode_to_node_ref(void *_vnode, fssh_mount_id *_mountID,
 fssh_status_t
 vfs_lookup_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID, void **_vnode)
 {
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 
 	if (vnode == NULL)
 		return FSSH_B_ERROR;
@@ -2591,7 +2591,7 @@ vfs_get_cwd(fssh_mount_id *_mountID, fssh_vnode_id *_vnodeID)
 	struct io_context *context = get_current_io_context(false);
 	fssh_status_t status = FSSH_B_OK;
 
-	mutex_lock(&context->io_mutex);
+	fssh_mutex_lock(&context->io_mutex);
 
 	if (context->cwd != NULL) {
 		*_mountID = context->cwd->device;
@@ -2599,7 +2599,7 @@ vfs_get_cwd(fssh_mount_id *_mountID, fssh_vnode_id *_vnodeID)
 	} else
 		status = FSSH_B_ERROR;
 
-	mutex_unlock(&context->io_mutex);
+	fssh_mutex_unlock(&context->io_mutex);
 	return status;
 }
 
@@ -2707,7 +2707,7 @@ vfs_exec_io_context(void *_context)
 	uint32_t i;
 
 	for (i = 0; i < context->table_size; i++) {
-		mutex_lock(&context->io_mutex);
+		fssh_mutex_lock(&context->io_mutex);
 
 		struct file_descriptor *descriptor = context->fds[i];
 		bool remove = false;
@@ -2719,7 +2719,7 @@ vfs_exec_io_context(void *_context)
 			remove = true;
 		}
 
-		mutex_unlock(&context->io_mutex);
+		fssh_mutex_unlock(&context->io_mutex);
 
 		if (remove) {
 			close_fd(descriptor);
@@ -2764,18 +2764,14 @@ vfs_new_io_context(void *_parentContext)
 		+ (tableSize + 7) / 8);
 	context->fds_close_on_exec = (uint8_t *)(context->fds + tableSize);
 
-	if (mutex_init(&context->io_mutex, "I/O context") < 0) {
-		free(context->fds);
-		free(context);
-		return NULL;
-	}
+	fssh_mutex_init(&context->io_mutex, "I/O context");
 
 	// Copy all parent files which don't have the FSSH_O_CLOEXEC flag set
 
 	if (parentContext) {
 		fssh_size_t i;
 
-		mutex_lock(&parentContext->io_mutex);
+		fssh_mutex_lock(&parentContext->io_mutex);
 
 		context->cwd = parentContext->cwd;
 		if (context->cwd)
@@ -2792,7 +2788,7 @@ vfs_new_io_context(void *_parentContext)
 			}
 		}
 
-		mutex_unlock(&parentContext->io_mutex);
+		fssh_mutex_unlock(&parentContext->io_mutex);
 	} else {
 		context->cwd = sRoot;
 
@@ -2815,7 +2811,7 @@ vfs_free_io_context(void *_ioContext)
 	if (context->cwd)
 		dec_vnode_ref_count(context->cwd, false);
 
-	mutex_lock(&context->io_mutex);
+	fssh_mutex_lock(&context->io_mutex);
 
 	for (i = 0; i < context->table_size; i++) {
 		if (struct file_descriptor *descriptor = context->fds[i]) {
@@ -2824,7 +2820,7 @@ vfs_free_io_context(void *_ioContext)
 		}
 	}
 
-	mutex_destroy(&context->io_mutex);
+	fssh_mutex_destroy(&context->io_mutex);
 
 	free(context->fds);
 	free(context);
@@ -2850,20 +2846,11 @@ vfs_init(kernel_args *args)
 
 	sRoot = NULL;
 
-	if (mutex_init(&sFileSystemsMutex, "vfs_lock") < 0)
-		fssh_panic("vfs_init: error allocating file systems lock\n");
-
-	if (recursive_lock_init(&sMountOpLock, "vfs_mount_op_lock") < 0)
-		fssh_panic("vfs_init: error allocating mount op lock\n");
-
-	if (mutex_init(&sMountMutex, "vfs_mount_lock") < 0)
-		fssh_panic("vfs_init: error allocating mount lock\n");
-
-	if (mutex_init(&sVnodeCoveredByMutex, "vfs_vnode_covered_by_lock") < 0)
-		fssh_panic("vfs_init: error allocating vnode::covered_by lock\n");
-
-	if (mutex_init(&sVnodeMutex, "vfs_vnode_lock") < 0)
-		fssh_panic("vfs_init: error allocating vnode lock\n");
+	fssh_mutex_init(&sFileSystemsMutex, "vfs_lock");
+	fssh_recursive_lock_init(&sMountOpLock, "vfs_mount_op_lock");
+	fssh_mutex_init(&sMountMutex, "vfs_mount_lock");
+	fssh_mutex_init(&sVnodeCoveredByMutex, "vfs_vnode_covered_by_lock");
+	fssh_mutex_init(&sVnodeMutex, "vfs_vnode_lock");
 
 	if (block_cache_init() != FSSH_B_OK)
 		return FSSH_B_ERROR;
@@ -2895,9 +2882,9 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 	if (status < FSSH_B_OK)
 		return status;
 
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 	vnode = lookup_vnode(directory->device, newID);
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 
 	if (vnode == NULL) {
 		fssh_dprintf("vfs: fs_create() returned success but there is no vnode!");
@@ -3349,12 +3336,12 @@ fix_dirent(struct vnode *parent, struct fssh_dirent *entry)
 		if (status != FSSH_B_OK)
 			return;
 
-		mutex_lock(&sVnodeCoveredByMutex);
+		fssh_mutex_lock(&sVnodeCoveredByMutex);
 		if (vnode->covered_by) {
 			entry->d_dev = vnode->covered_by->device;
 			entry->d_ino = vnode->covered_by->id;
 		}
-		mutex_unlock(&sVnodeCoveredByMutex);
+		fssh_mutex_unlock(&sVnodeCoveredByMutex);
 
 		put_vnode(vnode);
 	}
@@ -3473,9 +3460,9 @@ common_fcntl(int fd, int op, uint32_t argument, bool kernel)
 			// Set file descriptor flags
 
 			// FSSH_O_CLOEXEC is the only flag available at this time
-			mutex_lock(&context->io_mutex);
+			fssh_mutex_lock(&context->io_mutex);
 			fd_set_close_on_exec(context, fd, argument == FSSH_FD_CLOEXEC);
-			mutex_unlock(&context->io_mutex);
+			fssh_mutex_unlock(&context->io_mutex);
 			
 			status = FSSH_B_OK;
 			break;
@@ -3486,9 +3473,9 @@ common_fcntl(int fd, int op, uint32_t argument, bool kernel)
 			struct io_context *context = get_current_io_context(kernel);
 
 			// Get file descriptor flags
-			mutex_lock(&context->io_mutex);
+			fssh_mutex_lock(&context->io_mutex);
 			status = fd_close_on_exec(context, fd) ? FSSH_FD_CLOEXEC : 0;
-			mutex_unlock(&context->io_mutex);
+			fssh_mutex_unlock(&context->io_mutex);
 			break;
 		}
 
@@ -3519,9 +3506,9 @@ common_fcntl(int fd, int op, uint32_t argument, bool kernel)
 
 			status = new_fd_etc(context, descriptor, (int)argument);
 			if (status >= 0) {
-				mutex_lock(&context->io_mutex);
+				fssh_mutex_lock(&context->io_mutex);
 				fd_set_close_on_exec(context, fd, false);
-				mutex_unlock(&context->io_mutex);
+				fssh_mutex_unlock(&context->io_mutex);
 
 				fssh_atomic_add(&descriptor->ref_count, 1);
 			}
@@ -4538,9 +4525,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 		goto err3;
 	}
 
-	status = recursive_lock_init(&mount->rlock, "mount rlock");
-	if (status < FSSH_B_OK)
-		goto err4;
+	fssh_recursive_lock_init(&mount->rlock, "mount rlock");
 
 	// initialize structure
 	mount->id = sNextMountID++;
@@ -4558,9 +4543,9 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 
 	// insert mount struct into list before we call FS's mount() function
 	// so that vnodes can be created for this mount
-	mutex_lock(&sMountMutex);
+	fssh_mutex_lock(&sMountMutex);
 	hash_insert(sMountsTable, mount);
-	mutex_unlock(&sMountMutex);
+	fssh_mutex_unlock(&sMountMutex);
 
 	fssh_vnode_id rootID;
 
@@ -4568,36 +4553,36 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 		// we haven't mounted anything yet
 		if (fssh_strcmp(path, "/") != 0) {
 			status = FSSH_B_ERROR;
-			goto err5;
+			goto err4;
 		}
 
 		status = mount->fs->mount(mount->volume, device, flags, args, &rootID);
 		if (status < 0) {
 			// ToDo: why should we hide the error code from the file system here?
 			//status = ERR_VFS_GENERAL;
-			goto err5;
+			goto err4;
 		}
 	} else {
 		struct vnode *coveredVnode;
 		status = path_to_vnode(path, true, &coveredVnode, NULL, kernel);
 		if (status < FSSH_B_OK)
-			goto err5;
+			goto err4;
 
 		// make sure covered_vnode is a DIR
 		struct fssh_stat coveredNodeStat;
 		status = FS_CALL(coveredVnode, read_stat, &coveredNodeStat);
 		if (status < FSSH_B_OK)
-			goto err5;
+			goto err4;
 
 		if (!FSSH_S_ISDIR(coveredNodeStat.fssh_st_mode)) {
 			status = FSSH_B_NOT_A_DIRECTORY;
-			goto err5;
+			goto err4;
 		}
 
 		if (coveredVnode->mount->root_vnode == coveredVnode) {
 			// this is already a mount point
 			status = FSSH_B_BUSY;
-			goto err5;
+			goto err4;
 		}
 
 		mount->covers_vnode = coveredVnode;
@@ -4605,7 +4590,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 		// mount it
 		status = mount->fs->mount(mount->volume, device, flags, args, &rootID);
 		if (status < FSSH_B_OK)
-			goto err6;
+			goto err5;
 	}
 
 	// the root node is supposed to be owned by the file system - it must
@@ -4614,33 +4599,34 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 	if (mount->root_vnode == NULL || mount->root_vnode->ref_count != 1) {
 		fssh_panic("fs_mount: file system does not own its root node!\n");
 		status = FSSH_B_ERROR;
-		goto err7;
+		goto err6;
 	}
 
 	// No race here, since fs_mount() is the only function changing
 	// covers_vnode (and holds sMountOpLock at that time).
-	mutex_lock(&sVnodeCoveredByMutex);
+	fssh_mutex_lock(&sVnodeCoveredByMutex);
 	if (mount->covers_vnode)
 		mount->covers_vnode->covered_by = mount->root_vnode;
-	mutex_unlock(&sVnodeCoveredByMutex);
+	fssh_mutex_unlock(&sVnodeCoveredByMutex);
 
 	if (!sRoot)
 		sRoot = mount->root_vnode;
 
 	return mount->id;
 
-err7:
-	FS_MOUNT_CALL_NO_PARAMS(mount, unmount);
 err6:
+	FS_MOUNT_CALL_NO_PARAMS(mount, unmount);
+err5:
 	if (mount->covers_vnode)
 		put_vnode(mount->covers_vnode);
-err5:
-	mutex_lock(&sMountMutex);
-	hash_remove(sMountsTable, mount);
-	mutex_unlock(&sMountMutex);
 
-	recursive_lock_destroy(&mount->rlock);
 err4:
+	fssh_mutex_lock(&sMountMutex);
+	hash_remove(sMountsTable, mount);
+	fssh_mutex_unlock(&sMountMutex);
+
+	fssh_recursive_lock_destroy(&mount->rlock);
+
 	put_file_system(mount->fs);
 	free(mount->device_name);
 err3:
@@ -4680,7 +4666,7 @@ fs_unmount(char *path, uint32_t flags, bool kernel)
 
 	// grab the vnode master mutex to keep someone from creating
 	// a vnode while we're figuring out if we can continue
-	mutex_lock(&sVnodeMutex);
+	fssh_mutex_lock(&sVnodeMutex);
 
 	bool disconnectedDescriptors = false;
 
@@ -4707,7 +4693,7 @@ fs_unmount(char *path, uint32_t flags, bool kernel)
 			break;
 
 		if ((flags & FSSH_B_FORCE_UNMOUNT) == 0) {
-			mutex_unlock(&sVnodeMutex);
+			fssh_mutex_unlock(&sVnodeMutex);
 			put_vnode(mount->root_vnode);
 
 			return FSSH_B_BUSY;
@@ -4715,11 +4701,11 @@ fs_unmount(char *path, uint32_t flags, bool kernel)
 
 		if (disconnectedDescriptors) {
 			// wait a bit until the last access is finished, and then try again
-			mutex_unlock(&sVnodeMutex);
+			fssh_mutex_unlock(&sVnodeMutex);
 			fssh_snooze(100000);
 			// TODO: if there is some kind of bug that prevents the ref counts
 			//	from getting back to zero, this will fall into an endless loop...
-			mutex_lock(&sVnodeMutex);
+			fssh_mutex_lock(&sVnodeMutex);
 			continue;
 		}
 
@@ -4729,12 +4715,12 @@ fs_unmount(char *path, uint32_t flags, bool kernel)
 		mount->unmounting = true;
 			// prevent new vnodes from being created
 
-		mutex_unlock(&sVnodeMutex);
+		fssh_mutex_unlock(&sVnodeMutex);
 
 		disconnect_mount_or_vnode_fds(mount, NULL);
 		disconnectedDescriptors = true;
 
-		mutex_lock(&sVnodeMutex);
+		fssh_mutex_lock(&sVnodeMutex);
 	}
 
 	// we can safely continue, mark all of the vnodes busy and this mount
@@ -4754,11 +4740,11 @@ fs_unmount(char *path, uint32_t flags, bool kernel)
 	// The ref_count of the root node is 2 at this point, see above why this is
 	mount->root_vnode->ref_count -= 2;
 
-	mutex_unlock(&sVnodeMutex);
+	fssh_mutex_unlock(&sVnodeMutex);
 
-	mutex_lock(&sVnodeCoveredByMutex);
+	fssh_mutex_lock(&sVnodeCoveredByMutex);
 	mount->covers_vnode->covered_by = NULL;
-	mutex_unlock(&sVnodeCoveredByMutex);
+	fssh_mutex_unlock(&sVnodeCoveredByMutex);
 	put_vnode(mount->covers_vnode);
 
 	// Free all vnodes associated with this mount.
@@ -4769,9 +4755,9 @@ fs_unmount(char *path, uint32_t flags, bool kernel)
 	}
 
 	// remove the mount structure from the hash table
-	mutex_lock(&sMountMutex);
+	fssh_mutex_lock(&sMountMutex);
 	hash_remove(sMountsTable, mount);
-	mutex_unlock(&sMountMutex);
+	fssh_mutex_unlock(&sMountMutex);
 
 	mountOpLocker.Unlock();
 
@@ -4796,17 +4782,17 @@ fs_sync(fssh_dev_t device)
 	if (status < FSSH_B_OK)
 		return status;
 
-	mutex_lock(&sMountMutex);
+	fssh_mutex_lock(&sMountMutex);
 
 	if (HAS_FS_MOUNT_CALL(mount, sync))
 		status = FS_MOUNT_CALL_NO_PARAMS(mount, sync);
 
-	mutex_unlock(&sMountMutex);
+	fssh_mutex_unlock(&sMountMutex);
 
 	struct vnode *previousVnode = NULL;
 	while (true) {
 		// synchronize access to vnode list
-		recursive_lock_lock(&mount->rlock);
+		fssh_recursive_lock_lock(&mount->rlock);
 
 		struct vnode *vnode = (struct vnode *)list_get_next_item(&mount->vnodes,
 			previousVnode);
@@ -4815,7 +4801,7 @@ fs_sync(fssh_dev_t device)
 		if (vnode != NULL)
 			id = vnode->id;
 
-		recursive_lock_unlock(&mount->rlock);
+		fssh_recursive_lock_unlock(&mount->rlock);
 
 		if (vnode == NULL)
 			break;
@@ -4902,7 +4888,7 @@ fs_next_device(int32_t *_cookie)
 	struct fs_mount *mount = NULL;
 	fssh_dev_t device = *_cookie;
 
-	mutex_lock(&sMountMutex);	
+	fssh_mutex_lock(&sMountMutex);	
 
 	// Since device IDs are assigned sequentially, this algorithm
 	// does work good enough. It makes sure that the device list
@@ -4922,7 +4908,7 @@ fs_next_device(int32_t *_cookie)
 	else
 		device = FSSH_B_BAD_VALUE;
 
-	mutex_unlock(&sMountMutex);
+	fssh_mutex_unlock(&sMountMutex);
 	
 	return device;
 }
@@ -4937,14 +4923,14 @@ get_cwd(char *buffer, fssh_size_t size, bool kernel)
 
 	FUNCTION(("vfs_get_cwd: buf %p, size %ld\n", buffer, size));
 
-	mutex_lock(&context->io_mutex);
+	fssh_mutex_lock(&context->io_mutex);
 
 	if (context->cwd)
 		status = dir_vnode_to_path(context->cwd, buffer, size);
 	else
 		status = FSSH_B_ERROR;
 
-	mutex_unlock(&context->io_mutex);
+	fssh_mutex_unlock(&context->io_mutex);
 	return status; 
 }
 
@@ -4977,13 +4963,13 @@ set_cwd(int fd, char *path, bool kernel)
 
 	// Get current io context and lock
 	context = get_current_io_context(kernel);
-	mutex_lock(&context->io_mutex);
+	fssh_mutex_lock(&context->io_mutex);
 
 	// save the old current working directory first
 	oldDirectory = context->cwd;
 	context->cwd = vnode;
 
-	mutex_unlock(&context->io_mutex);
+	fssh_mutex_unlock(&context->io_mutex);
 
 	if (oldDirectory)
 		put_vnode(oldDirectory);

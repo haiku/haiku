@@ -33,6 +33,7 @@
 #include "fssh_fs_query.h"
 #include "fssh_fs_volume.h"
 #include "fssh_kernel_export.h"
+#include "fssh_lock.h"
 #include "fssh_module.h"
 #include "fssh_node_monitor.h"
 #include "fssh_os.h"
@@ -951,6 +952,46 @@
 #define debugger_command_hook	fssh_debugger_command_hook
 #define add_debugger_command	fssh_add_debugger_command
 #define remove_debugger_command	fssh_remove_debugger_command
+
+
+////////////////////////////////////////////////////////////////////////////////
+// #pragma mark - fssh_lock.h
+
+#define mutex						fssh_mutex
+#define rw_lock						fssh_rw_lock
+#define recursive_lock				fssh_recursive_lock
+
+#define MUTEX_FLAG_CLONE_NAME		FSSH_MUTEX_FLAG_CLONE_NAME
+#define RW_LOCK_FLAG_CLONE_NAME		FSSH_RW_LOCK_FLAG_CLONE_NAME
+
+#define ASSERT_LOCKED_RECURSIVE(r)	FSSH_ASSERT_LOCKED_RECURSIVE(r)
+#define ASSERT_LOCKED_MUTEX(m)		FSSH_ASSERT_LOCKED_MUTEX(m)
+
+#define MUTEX_INITIALIZER(name)		FSSH_MUTEX_INITIALIZER(name)
+#define RECURSIVE_LOCK_INITIALIZER(name) FSSH_RECURSIVE_LOCK_INITIALIZER(name)
+#define RW_LOCK_INITIALIZER(name)	FSSH_RW_LOCK_INITIALIZER(name)
+
+#define	recursive_lock_init			fssh_recursive_lock_init
+#define recursive_lock_init_etc		fssh_recursive_lock_init_etc
+#define recursive_lock_destroy		fssh_recursive_lock_destroy
+#define recursive_lock_lock			fssh_recursive_lock_lock
+#define recursive_lock_unlock		fssh_recursive_lock_unlock
+#define recursive_lock_get_recursion fssh_recursive_lock_get_recursion
+
+#define rw_lock_init				fssh_rw_lock_init
+#define rw_lock_init_etc			fssh_rw_lock_init_etc
+#define rw_lock_destroy				fssh_rw_lock_destroy
+#define rw_lock_read_lock			fssh_rw_lock_read_lock
+#define rw_lock_read_unlock			fssh_rw_lock_read_unlock
+#define rw_lock_write_lock			fssh_rw_lock_write_lock
+#define rw_lock_write_unlock		fssh_rw_lock_write_unlock
+
+#define mutex_init					fssh_mutex_init
+#define mutex_init_etc				fssh_mutex_init_etc
+#define mutex_destroy				fssh_mutex_destroy
+#define mutex_lock					fssh_mutex_lock
+#define mutex_trylock				fssh_mutex_trylock
+#define mutex_unlock				fssh_mutex_unlock
 
 
 ////////////////////////////////////////////////////////////////////////////////

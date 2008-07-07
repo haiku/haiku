@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -8,16 +8,16 @@
 
 /* Mutex and recursive_lock code */
 
-#include "lock.h"
+#include "fssh_lock.h"
 
 #include "fssh_kernel_export.h"
 
 
-namespace FSShell {
+#define FSSH_RW_MAX_READERS 100000
 
 
-int32_t
-recursive_lock_get_recursion(recursive_lock *lock)
+extern "C" int32_t
+fssh_recursive_lock_get_recursion(fssh_recursive_lock *lock)
 {
 	if (lock->holder == fssh_find_thread(NULL))
 		return lock->recursion;
@@ -26,11 +26,11 @@ recursive_lock_get_recursion(recursive_lock *lock)
 }
 
 
-fssh_status_t
-recursive_lock_init(recursive_lock *lock, const char *name)
+extern "C" void
+fssh_recursive_lock_init(fssh_recursive_lock *lock, const char *name)
 {
 	if (lock == NULL)
-		return FSSH_B_BAD_VALUE;
+		return;
 
 	if (name == NULL)
 		name = "recursive lock";
@@ -38,16 +38,13 @@ recursive_lock_init(recursive_lock *lock, const char *name)
 	lock->holder = -1;
 	lock->recursion = 0;
 	lock->sem = fssh_create_sem(1, name);
-
-	if (lock->sem >= FSSH_B_OK)
-		return FSSH_B_OK;
-
-	return lock->sem;
+	if (lock->sem < FSSH_B_OK)
+		fssh_panic("could not create recursive lock");
 }
 
 
-void
-recursive_lock_destroy(recursive_lock *lock)
+extern "C" void
+fssh_recursive_lock_destroy(fssh_recursive_lock *lock)
 {
 	if (lock == NULL)
 		return;
@@ -57,8 +54,8 @@ recursive_lock_destroy(recursive_lock *lock)
 }
 
 
-fssh_status_t
-recursive_lock_lock(recursive_lock *lock)
+extern "C" fssh_status_t
+fssh_recursive_lock_lock(fssh_recursive_lock *lock)
 {
 	fssh_thread_id thread = fssh_find_thread(NULL);
 
@@ -74,8 +71,8 @@ recursive_lock_lock(recursive_lock *lock)
 }
 
 
-void
-recursive_lock_unlock(recursive_lock *lock)
+extern "C" void
+fssh_recursive_lock_unlock(fssh_recursive_lock *lock)
 {
 	if (fssh_find_thread(NULL) != lock->holder)
 		fssh_panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
@@ -90,11 +87,11 @@ recursive_lock_unlock(recursive_lock *lock)
 //	#pragma mark -
 
 
-fssh_status_t
-mutex_init(mutex *m, const char *name)
+extern "C" void
+fssh_mutex_init(fssh_mutex *m, const char *name)
 {
 	if (m == NULL)
-		return FSSH_EINVAL;
+		return;
 
 	if (name == NULL)
 		name = "mutex_sem";
@@ -102,15 +99,13 @@ mutex_init(mutex *m, const char *name)
 	m->holder = -1;
 
 	m->sem = fssh_create_sem(1, name);
-	if (m->sem >= FSSH_B_OK)
-		return FSSH_B_OK;
-
-	return m->sem;
+	if (m->sem < FSSH_B_OK)
+		fssh_panic("could not create mutex");
 }
 
 
-void
-mutex_destroy(mutex *mutex)
+extern "C" void
+fssh_mutex_destroy(fssh_mutex *mutex)
 {
 	if (mutex == NULL)
 		return;
@@ -123,8 +118,8 @@ mutex_destroy(mutex *mutex)
 }
 
 
-fssh_status_t
-mutex_lock(mutex *mutex)
+extern "C" fssh_status_t
+fssh_mutex_lock(fssh_mutex *mutex)
 {
 	fssh_thread_id me = fssh_find_thread(NULL);
 	fssh_status_t status;
@@ -141,8 +136,8 @@ mutex_lock(mutex *mutex)
 }
 
 
-void
-mutex_unlock(mutex *mutex)
+extern "C" void
+fssh_mutex_unlock(fssh_mutex *mutex)
 {
 	fssh_thread_id me = fssh_find_thread(NULL);
 
@@ -159,51 +154,23 @@ mutex_unlock(mutex *mutex)
 //	#pragma mark -
 
 
-fssh_status_t
-benaphore_init(benaphore *ben, const char *name)
-{
-	if (ben == NULL || name == NULL)
-		return FSSH_B_BAD_VALUE;
-
-	ben->count = 1;
-	ben->sem = fssh_create_sem(0, name);
-	if (ben->sem >= FSSH_B_OK)
-		return FSSH_B_OK;
-
-	return ben->sem;
-}
-
-
-void
-benaphore_destroy(benaphore *ben)
-{
-	fssh_delete_sem(ben->sem);
-	ben->sem = -1;
-}
-
-
-//	#pragma mark -
-
-
-fssh_status_t
-rw_lock_init(rw_lock *lock, const char *name)
+extern "C" void
+fssh_rw_lock_init(fssh_rw_lock *lock, const char *name)
 {
 	if (lock == NULL)
-		return FSSH_B_BAD_VALUE;
+		return;
 
 	if (name == NULL)
 		name = "r/w lock";
 
 	lock->sem = fssh_create_sem(FSSH_RW_MAX_READERS, name);
-	if (lock->sem >= FSSH_B_OK)
-		return FSSH_B_OK;
-
-	return lock->sem;
+	if (lock->sem < FSSH_B_OK)
+		fssh_panic("could not create r/w lock");
 }
 
 
-void
-rw_lock_destroy(rw_lock *lock)
+extern "C" void
+fssh_rw_lock_destroy(fssh_rw_lock *lock)
 {
 	if (lock == NULL)
 		return;
@@ -212,32 +179,30 @@ rw_lock_destroy(rw_lock *lock)
 }
 
 
-fssh_status_t
-rw_lock_read_lock(rw_lock *lock)
+extern "C" fssh_status_t
+fssh_rw_lock_read_lock(fssh_rw_lock *lock)
 {
 	return fssh_acquire_sem(lock->sem);
 }
 
 
-fssh_status_t
-rw_lock_read_unlock(rw_lock *lock)
+extern "C" fssh_status_t
+fssh_rw_lock_read_unlock(fssh_rw_lock *lock)
 {
 	return fssh_release_sem(lock->sem);
 }
 
 
-fssh_status_t
-rw_lock_write_lock(rw_lock *lock)
+extern "C" fssh_status_t
+fssh_rw_lock_write_lock(fssh_rw_lock *lock)
 {
 	return fssh_acquire_sem_etc(lock->sem, FSSH_RW_MAX_READERS, 0, 0);
 }
 
 
-fssh_status_t
-rw_lock_write_unlock(rw_lock *lock)
+extern "C" fssh_status_t
+fssh_rw_lock_write_unlock(fssh_rw_lock *lock)
 {
 	return fssh_release_sem_etc(lock->sem, FSSH_RW_MAX_READERS, 0);
 }
 
-
-}	// namespace FSShell

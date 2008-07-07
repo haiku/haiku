@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -10,8 +10,8 @@
 
 
 #include "fssh_fs_interface.h"
+#include "fssh_lock.h"
 #include "list.h"
-#include "lock.h"
 
 
 namespace FSShell {
@@ -31,7 +31,7 @@ struct file_descriptor;
 /** The I/O context of a process/team, holds the fd array among others */
 typedef struct io_context {
 	struct vnode 			*cwd;
-	mutex					io_mutex;
+	fssh_mutex				io_mutex;
 	uint32_t				table_size;
 	uint32_t				num_used_fds;
 	struct file_descriptor	**fds;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Copyright 2002-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Thomas Kurschel. All rights reserved.
@@ -14,10 +14,10 @@
 
 #include "fssh_errors.h"
 #include "fssh_kernel_export.h"
+#include "fssh_lock.h"
 #include "fssh_module.h"
 #include "fssh_string.h"
 #include "hash.h"
-#include "lock.h"
 
 
 //#define TRACE_MODULE
@@ -67,7 +67,7 @@ struct module {
  * they have to wait for each other, i.e. we need one lock per module;
  * also we must detect circular references during init and not dead-lock
  */
-static recursive_lock sModulesLock;		
+static fssh_recursive_lock sModulesLock;		
 
 /* we store the loaded modules by directory path, and all known modules by module name
  * in a hash table for quick access
@@ -167,9 +167,9 @@ create_module(fssh_module_info *info, const char *file, int offset, module **_mo
 	module->ref_count = 0;
 	module->flags = info->flags;
 
-	recursive_lock_lock(&sModulesLock);
+	fssh_recursive_lock_lock(&sModulesLock);
 	hash_insert(sModulesHash, module);
-	recursive_lock_unlock(&sModulesLock);
+	fssh_recursive_lock_unlock(&sModulesLock);
 
 	if (_module)
 		*_module = module;
@@ -317,8 +317,7 @@ dump_modules(int argc, char **argv)
 fssh_status_t
 module_init(kernel_args *args)
 {
-	if (recursive_lock_init(&sModulesLock, "modules rlock") < FSSH_B_OK)
-		return FSSH_B_ERROR;
+	fssh_recursive_lock_init(&sModulesLock, "modules rlock");
 
 	sModulesHash = hash_init(MODULE_HASH_SIZE, 0, module_compare, module_hash);
 	if (sModulesHash == NULL)
@@ -351,7 +350,7 @@ fssh_get_module(const char *path, fssh_module_info **_info)
 	if (path == NULL)
 		return FSSH_B_BAD_VALUE;
 
-	recursive_lock_lock(&sModulesLock);
+	fssh_recursive_lock_lock(&sModulesLock);
 
 	module = (struct module *)hash_lookup(sModulesHash, path);
 	if (module == NULL)
@@ -369,11 +368,11 @@ fssh_get_module(const char *path, fssh_module_info **_info)
 		*_info = module->info;
 	}
 
-	recursive_lock_unlock(&sModulesLock);
+	fssh_recursive_lock_unlock(&sModulesLock);
 	return status;
 
 err:
-	recursive_lock_unlock(&sModulesLock);
+	fssh_recursive_lock_unlock(&sModulesLock);
 	return FSSH_B_ENTRY_NOT_FOUND;
 }
 
@@ -385,12 +384,12 @@ fssh_put_module(const char *path)
 
 	TRACE(("put_module(path = %s)\n", path));
 
-	recursive_lock_lock(&sModulesLock);
+	fssh_recursive_lock_lock(&sModulesLock);
 
 	module = (struct module *)hash_lookup(sModulesHash, path);
 	if (module == NULL) {
 		FATAL(("module: We don't seem to have a reference to module %s\n", path));
-		recursive_lock_unlock(&sModulesLock);
+		fssh_recursive_lock_unlock(&sModulesLock);
 		return FSSH_B_BAD_VALUE;
 	}
 	
@@ -401,6 +400,6 @@ fssh_put_module(const char *path)
 			uninit_module(module);
 	}
 
-	recursive_lock_unlock(&sModulesLock);
+	fssh_recursive_lock_unlock(&sModulesLock);
 	return FSSH_B_OK;
 }

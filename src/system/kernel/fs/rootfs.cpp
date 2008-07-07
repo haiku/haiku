@@ -12,7 +12,6 @@
 
 #	include "hash.h"
 #	include "list.h"
-#	include "lock.h"
 #else
 #	include <KernelExport.h>
 #	include <vfs.h>

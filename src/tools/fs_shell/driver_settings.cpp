@@ -28,19 +28,16 @@
 #include <stdlib.h>
 
 #include "fssh_fcntl.h"
+#include "fssh_lock.h"
 #include "fssh_os.h"
 #include "fssh_stat.h"
 #include "fssh_string.h"
 #include "fssh_unistd.h"
 
 #include "list.h"
-#include "lock.h"
 
 
 using namespace FSShell;
-
-#define ASSERT_LOCKED_MUTEX(lock)
-
 
 #define SETTINGS_DIRECTORY "/kernel/drivers/"
 #define SETTINGS_MAGIC		'DrvS'
@@ -72,7 +69,7 @@ enum assignment_mode {
 
 
 static struct list sHandles;
-static mutex sLock;
+static fssh_mutex sLock;
 
 
 //	#pragma mark - private functions
@@ -587,7 +584,7 @@ find_driver_settings(const char *name)
 {
 	settings_handle *handle = NULL;
 
-	ASSERT_LOCKED_MUTEX(&sLock);
+	FSSH_ASSERT_LOCKED_MUTEX(&sLock);
 
 	while ((handle = (settings_handle*)list_get_next_item(&sHandles, handle)) != NULL) {
 		if (!fssh_strcmp(handle->name, name))
@@ -603,10 +600,11 @@ namespace FSShell {
 fssh_status_t
 driver_settings_init()
 {
-	return mutex_init(&sLock, "driver settings");
+	fssh_mutex_init(&sLock, "driver settings");
+	return FSSH_B_OK;
 }
 
-}
+}	// namespace FSShell
 
 
 //	#pragma mark - public API
@@ -619,13 +617,13 @@ fssh_unload_driver_settings(void *handle)
 		return FSSH_B_BAD_VALUE;
 
 #if 0
-	mutex_lock(&sLock);
+	fssh_mutex_lock(&sLock);
 	// ToDo: as soon as "/boot" is accessible, we should start throwing away settings
 	if (--handle->ref_count == 0) {
 		list_remove_link(&handle->link);
 	} else
 		handle = NULL;
-	mutex_unlock(&sLock);
+	fssh_mutex_unlock(&sLock);
 #endif
 
 	if (handle != NULL)
@@ -645,7 +643,7 @@ fssh_load_driver_settings(const char *driverName)
 		return NULL;
 
 	// see if we already have these settings loaded
-	mutex_lock(&sLock);
+	fssh_mutex_lock(&sLock);
 	handle = find_driver_settings(driverName);
 	if (handle != NULL) {
 		handle->ref_count++;
@@ -661,7 +659,7 @@ fssh_load_driver_settings(const char *driverName)
 				handle = NULL;
 			}
 		}
-		mutex_unlock(&sLock);
+		fssh_mutex_unlock(&sLock);
 		return handle;
 	}
 
@@ -683,7 +681,7 @@ fssh_load_driver_settings(const char *driverName)
 		file = fssh_open(driverName, FSSH_O_RDONLY);
 
 	if (file < FSSH_B_OK) {
-		mutex_unlock(&sLock);
+		fssh_mutex_unlock(&sLock);
 		return NULL;
 	}
 
@@ -691,7 +689,7 @@ fssh_load_driver_settings(const char *driverName)
 
 	if (handle != NULL)
 		list_add_item(&sHandles, handle);
-	mutex_unlock(&sLock);
+	fssh_mutex_unlock(&sLock);
 
 	fssh_close(file);
 	return (void *)handle;

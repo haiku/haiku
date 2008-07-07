@@ -3,16 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "block_cache_priv.h"
-
 #include <new>
-
 #include <stdlib.h>
 
+#include "DoublyLinkedList.h"
 #include "fssh_atomic.h"
 #include "fssh_errno.h"
 #include "fssh_fs_cache.h"
 #include "fssh_kernel_export.h"
+#include "fssh_lock.h"
 #include "fssh_string.h"
 #include "fssh_unistd.h"
 #include "hash.h"
@@ -42,6 +41,78 @@ using std::nothrow;
 
 
 namespace FSShell {
+
+struct hash_table;
+struct vm_page;
+
+
+//#define DEBUG_CHANGED
+#undef DEBUG_CHANGED
+
+
+struct cache_transaction;
+struct cached_block;
+struct block_cache;
+typedef DoublyLinkedListLink<cached_block> block_link;
+
+
+struct cached_block {
+	cached_block	*next;			// next in hash
+	cached_block	*transaction_next;
+	block_link		link;
+	fssh_off_t		block_number;
+	void			*current_data;
+	void			*original_data;
+	void			*parent_data;
+#ifdef DEBUG_CHANGED
+	void			*compare;
+#endif
+	int32_t			ref_count;
+	int32_t			accessed;
+	bool			busy : 1;
+	bool			is_writing : 1;
+	bool			is_dirty : 1;
+	bool			unused : 1;
+	bool			unmapped : 1;
+	cache_transaction *transaction;
+	cache_transaction *previous_transaction;
+
+	static int Compare(void *_cacheEntry, const void *_block);
+	static uint32_t Hash(void *_cacheEntry, const void *_block, uint32_t range);
+};
+
+typedef DoublyLinkedList<cached_block,
+	DoublyLinkedListMemberGetLink<cached_block,
+		&cached_block::link> > block_list;
+
+struct block_cache {
+	hash_table	*hash;
+	fssh_mutex	lock;
+	int			fd;
+	fssh_off_t	max_blocks;
+	fssh_size_t	block_size;
+	int32_t		allocated_block_count;
+	int32_t		next_transaction_id;
+	cache_transaction *last_transaction;
+	hash_table	*transaction_hash;
+
+	block_list	unused_blocks;
+
+	bool		read_only;
+
+	block_cache(int fd, fssh_off_t numBlocks, fssh_size_t blockSize, bool readOnly);
+	~block_cache();
+
+	fssh_status_t InitCheck();
+
+	void RemoveUnusedBlocks(int32_t maxAccessed = LONG_MAX, int32_t count = LONG_MAX);
+	void FreeBlock(cached_block *block);
+	cached_block *NewBlock(fssh_off_t blockNumber);
+	void Free(void *address);
+	void *Allocate();
+
+	static void LowMemoryHandler(void *data, int32_t level);
+};
 
 static const int32_t kMaxBlockCount = 1024;
 
@@ -200,14 +271,13 @@ block_cache::block_cache(int _fd, fssh_off_t numBlocks, fssh_size_t blockSize,
 	if (transaction_hash == NULL)
 		return;
 
-	if (benaphore_init(&lock, "block cache") < FSSH_B_OK)
-		return;
+	fssh_mutex_init(&lock, "block cache");
 }
 
 
 block_cache::~block_cache()
 {
-	benaphore_destroy(&lock);
+	fssh_mutex_destroy(&lock);
 
 	hash_uninit(transaction_hash);
 	hash_uninit(hash);
@@ -627,7 +697,7 @@ int32_t
 fssh_cache_start_transaction(void *_cache)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	if (cache->last_transaction && cache->last_transaction->open) {
 		fssh_panic("last transaction (%d) still open!\n",
@@ -653,7 +723,7 @@ fssh_status_t
 fssh_cache_sync_transaction(void *_cache, int32_t id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 	fssh_status_t status = FSSH_B_ENTRY_NOT_FOUND;
 
 	TRACE(("cache_sync_transaction(id %d)\n", id));
@@ -690,7 +760,7 @@ fssh_cache_end_transaction(void *_cache, int32_t id,
 	fssh_transaction_notification_hook hook, void *data)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_end_transaction(id = %d)\n", id));
 
@@ -744,7 +814,7 @@ fssh_status_t
 fssh_cache_abort_transaction(void *_cache, int32_t id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_abort_transaction(id = %ld)\n", id));
 
@@ -794,7 +864,7 @@ fssh_cache_detach_sub_transaction(void *_cache, int32_t id,
 	fssh_transaction_notification_hook hook, void *data)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_detach_sub_transaction(id = %d)\n", id));
 
@@ -878,7 +948,7 @@ fssh_status_t
 fssh_cache_abort_sub_transaction(void *_cache, int32_t id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_abort_sub_transaction(id = %ld)\n", id));
 
@@ -929,7 +999,7 @@ fssh_status_t
 fssh_cache_start_sub_transaction(void *_cache, int32_t id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_start_sub_transaction(id = %d)\n", id));
 
@@ -985,7 +1055,7 @@ fssh_cache_add_transaction_listener(void *_cache, int32_t id, int32_t events,
 	if (hook == NULL)
 		return FSSH_B_NO_MEMORY;
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -1008,7 +1078,7 @@ fssh_cache_remove_transaction_listener(void *_cache, int32_t id,
 {
 	block_cache *cache = (block_cache *)_cache;
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -1036,7 +1106,7 @@ fssh_cache_next_block_in_transaction(void *_cache, int32_t id, bool mainOnly,
 	cached_block *block = (cached_block *)*_cookie;
 	block_cache *cache = (block_cache *)_cache;
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL || !transaction->open)
@@ -1072,7 +1142,7 @@ int32_t
 fssh_cache_blocks_in_transaction(void *_cache, int32_t id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -1086,7 +1156,7 @@ int32_t
 fssh_cache_blocks_in_main_transaction(void *_cache, int32_t id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -1100,7 +1170,7 @@ int32_t
 fssh_cache_blocks_in_sub_transaction(void *_cache, int32_t id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -1122,7 +1192,7 @@ fssh_block_cache_delete(void *_cache, bool allowWrites)
 	if (allowWrites)
 		fssh_block_cache_sync(cache);
 
-	BenaphoreLocker locker(&cache->lock);
+	fssh_mutex_lock(&cache->lock);
 
 	// free all blocks
 
@@ -1171,7 +1241,7 @@ fssh_block_cache_sync(void *_cache)
 	// we will sync all dirty blocks to disk that have a completed
 	// transaction or no transaction only
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 	hash_iterator iterator;
 	hash_open(cache->hash, &iterator);
 
@@ -1205,7 +1275,7 @@ fssh_block_cache_sync_etc(void *_cache, fssh_off_t blockNumber,
 		return FSSH_B_BAD_VALUE;
 	}
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	for (; numBlocks > 0; numBlocks--, blockNumber++) {
 		cached_block *block = (cached_block *)hash_lookup(cache->hash,
@@ -1228,7 +1298,7 @@ fssh_status_t
 fssh_block_cache_make_writable(void *_cache, fssh_off_t blockNumber, int32_t transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	if (cache->read_only)
 		fssh_panic("tried to make block writable on a read-only cache!");
@@ -1250,7 +1320,7 @@ fssh_block_cache_get_writable_etc(void *_cache, fssh_off_t blockNumber, fssh_off
 	fssh_off_t length, int32_t transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("block_cache_get_writable_etc(block = %Ld, transaction = %ld)\n",
 		blockNumber, transaction));
@@ -1276,7 +1346,7 @@ fssh_block_cache_get_empty(void *_cache, fssh_off_t blockNumber,
 	int32_t transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("block_cache_get_empty(block = %Ld, transaction = %ld)\n",
 		blockNumber, transaction));
@@ -1293,7 +1363,7 @@ fssh_block_cache_get_etc(void *_cache, fssh_off_t blockNumber, fssh_off_t base,
 	fssh_off_t length)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 	bool allocated;
 
 	cached_block *block = get_cached_block(cache, blockNumber, &allocated);
@@ -1341,7 +1411,7 @@ void
 fssh_block_cache_put(void *_cache, fssh_off_t blockNumber)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	put_cached_block(cache, blockNumber);
 }
