@@ -441,15 +441,16 @@ AllocationGroup::Free(Transaction &transaction, uint16 start, int32 length)
 BlockAllocator::BlockAllocator(Volume *volume)
 	:
 	fVolume(volume),
-	fLock("bfs allocator"),
 	fGroups(NULL),
 	fCheckBitmap(NULL)
 {
+	mutex_init(&fLock, "bfs allocator");
 }
 
 
 BlockAllocator::~BlockAllocator()
 {
+	mutex_destroy(&fLock);
 	delete[] fGroups;
 }
 
@@ -457,9 +458,6 @@ BlockAllocator::~BlockAllocator()
 status_t
 BlockAllocator::Initialize(bool full)
 {
-	if (fLock.InitCheck() < B_OK)
-		return B_ERROR;
-
 	fNumGroups = fVolume->AllocationGroups();
 	fBlocksPerGroup = fVolume->SuperBlock().BlocksPerAllocationGroup();
 	fGroups = new AllocationGroup[fNumGroups];
@@ -469,8 +467,8 @@ BlockAllocator::Initialize(bool full)
 	if (!full)
 		return B_OK;
 
-	fLock.Lock();
-		// the lock will be released by the initialize() function
+	mutex_lock(&fLock);
+		// the lock will be released by the _Initialize() method
 
 	thread_id id = spawn_kernel_thread((thread_func)BlockAllocator::_Initialize,
 			"bfs block allocator", B_LOW_PRIORITY, (void *)this);
@@ -547,7 +545,7 @@ BlockAllocator::_Initialize(BlockAllocator *allocator)
 
 	uint32 *buffer = (uint32 *)malloc(blocks << blockShift);
 	if (buffer == NULL) {
-		allocator->fLock.Unlock();
+		mutex_unlock(&allocator->fLock);
 		RETURN_ERROR(B_NO_MEMORY);
 	}
 
@@ -621,7 +619,7 @@ BlockAllocator::_Initialize(BlockAllocator *allocator)
 		volume->SuperBlock().used_blocks = HOST_ENDIAN_TO_BFS_INT64(usedBlocks);
 	}
 
-	allocator->fLock.Unlock();
+	mutex_unlock(&allocator->fLock);
 	return B_OK;
 }
 
@@ -636,7 +634,7 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
 	FUNCTION_START(("group = %ld, start = %u, maximum = %u, minimum = %u\n", group, start, maximum, minimum));
 
 	AllocationBlock cached(fVolume);
-	Locker lock(fLock);
+	MutexLocker lock(fLock);
 
 	// The first scan through all allocation groups will look for the
 	// wanted maximum of blocks, the second scan will just look to
@@ -821,7 +819,7 @@ BlockAllocator::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks
 status_t
 BlockAllocator::Free(Transaction &transaction, block_run run)
 {
-	Locker lock(fLock);
+	MutexLocker lock(fLock);
 
 	int32 group = run.AllocationGroup();
 	uint16 start = run.Start();
@@ -896,14 +894,14 @@ BlockAllocator::StartChecking(check_control *control)
 	if (!_IsValidCheckControl(control))
 		return B_BAD_VALUE;
 
-	status_t status = fLock.Lock();
+	status_t status = mutex_lock(&fLock);
 	if (status < B_OK)
 		return status;
 
 	size_t size = BitmapSize();
 	fCheckBitmap = (uint32 *)malloc(size);
 	if (fCheckBitmap == NULL) {
-		fLock.Unlock();
+		mutex_unlock(&fLock);
 		return B_NO_MEMORY;
 	}
 
@@ -911,7 +909,7 @@ BlockAllocator::StartChecking(check_control *control)
 	if (cookie == NULL) {
 		free(fCheckBitmap);
 		fCheckBitmap = NULL;
-		fLock.Unlock();
+		mutex_unlock(&fLock);
 
 		return B_NO_MEMORY;
 	}
@@ -1013,7 +1011,7 @@ BlockAllocator::StopChecking(check_control *control)
 	fCheckBitmap = NULL;
 	fCheckCookie = NULL;
 	delete cookie;
-	fLock.Unlock();
+	mutex_unlock(&fLock);
 
 	return B_OK;
 }
@@ -1113,7 +1111,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 
 			// check if the inode's name is the same as in the b+tree
 			if (inode->IsRegularNode()) {
-				SimpleLocker locker(inode->SmallDataLock());
+				RecursiveLocker locker(inode->SmallDataLock());
 				NodeGetter node(fVolume, inode);
 
 				const char *localName = inode->Name(node.Node());

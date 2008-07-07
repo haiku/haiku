@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -37,7 +37,7 @@ class Volume {
 		bool				IsValidSuperBlock();
 		bool				IsReadOnly() const;
 		void				Panic();
-		RecursiveLock		&Lock();
+		mutex				&Lock();
 
 		block_run			Root() const { return fSuperBlock.root_dir; }
 		Inode				*RootNode() const { return fRootNode; }
@@ -117,7 +117,7 @@ class Volume {
 		uint32				fAllocationGroupShift;
 
 		BlockAllocator		fBlockAllocator;
-		RecursiveLock		fLock;
+		mutex				fLock;
 		Journal				*fJournal;
 		vint32				fLogStart, fLogEnd;
 
@@ -126,7 +126,7 @@ class Volume {
 
 		vint32				fDirtyCachedBlocks;
 
-		SimpleLock			fQueryLock;
+		mutex				fQueryLock;
 		Chain<Query>		fQueries;
 
 		int32				fUniqueID;
@@ -145,7 +145,7 @@ Volume::IsReadOnly() const
 }
 
 
-inline RecursiveLock &
+inline mutex &
 Volume::Lock()
 {
 	 return fLock;

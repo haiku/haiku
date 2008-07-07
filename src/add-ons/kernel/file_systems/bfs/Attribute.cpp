@@ -79,13 +79,13 @@ Attribute::Get(const char *name)
 	fName = name;
 
 	// try to find it in the small data region
-	if (fInode->SmallDataLock().Lock() == B_OK) {
+	if (recursive_lock_lock(&fInode->SmallDataLock()) == B_OK) {
 		fNodeGetter.SetToNode(fInode);
 		fSmall = fInode->FindSmallData(fNodeGetter.Node(), (const char *)name);
 		if (fSmall != NULL)
 			return B_OK;
 
-		fInode->SmallDataLock().Unlock();
+		recursive_lock_unlock(&fInode->SmallDataLock());
 		fNodeGetter.Unset();
 	}
 
@@ -98,7 +98,7 @@ void
 Attribute::Put()
 {
 	if (fSmall != NULL) {
-		fInode->SmallDataLock().Unlock();
+		recursive_lock_unlock(&fInode->SmallDataLock());
 		fNodeGetter.Unset();
 		fSmall = NULL;
 	}
@@ -195,7 +195,7 @@ Attribute::Read(attr_cookie *cookie, off_t pos, uint8 *buffer, size_t *_length)
 	if (fSmall == NULL && fAttribute == NULL)
 		return B_NO_INIT;
 
-	// ToDo: move small_data logic from Inode::ReadAttribute() over to here!
+	// TODO: move small_data logic from Inode::ReadAttribute() over to here!
 	return fInode->ReadAttribute(cookie->name, 0, pos, buffer, _length);
 }
 

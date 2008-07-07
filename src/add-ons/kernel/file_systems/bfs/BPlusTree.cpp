@@ -341,6 +341,7 @@ BPlusTree::BPlusTree(Transaction &transaction, Inode *stream, int32 nodeSize)
 	fHeader(NULL),
 	fCachedHeader(this)
 {
+	mutex_init(&fIteratorLock, "bfs b+tree iterator");
 	SetTo(transaction, stream);
 }
 
@@ -351,6 +352,7 @@ BPlusTree::BPlusTree(Inode *stream)
 	fHeader(NULL),
 	fCachedHeader(this)
 {
+	mutex_init(&fIteratorLock, "bfs b+tree iterator");
 	SetTo(stream);
 }
 
@@ -364,6 +366,7 @@ BPlusTree::BPlusTree()
 	fAllowDuplicates(true),
 	fStatus(B_NO_INIT)
 {
+	mutex_init(&fIteratorLock, "bfs b+tree iterator");
 }
 
 
@@ -372,14 +375,13 @@ BPlusTree::~BPlusTree()
 	// if there are any TreeIterators left, we need to stop them
 	// (can happen when the tree's inode gets deleted while
 	// traversing the tree - a TreeIterator doesn't lock the inode)
-	if (fIteratorLock.Lock() < B_OK)
-		return;
+	mutex_lock(&fIteratorLock);
 
 	TreeIterator *iterator = NULL;
 	while ((iterator = fIterators.Next(iterator)) != NULL)
 		iterator->Stop();
 
-	fIteratorLock.Unlock();
+	mutex_destroy(&fIteratorLock);
 }
 
 
@@ -565,38 +567,27 @@ BPlusTree::_UpdateIterators(off_t offset, off_t nextOffset, uint16 keyIndex,
 	// Although every iterator which is affected by this update currently
 	// waits on a semaphore, other iterators could be added/removed at
 	// any time, so we need to protect this loop
-	if (fIteratorLock.Lock() < B_OK)
-		return;
+	MutexLocker _(fIteratorLock);
 
 	TreeIterator *iterator = NULL;
 	while ((iterator = fIterators.Next(iterator)) != NULL)
 		iterator->Update(offset, nextOffset, keyIndex, splitAt, change);
-
-	fIteratorLock.Unlock();
 }
 
 
 void
 BPlusTree::_AddIterator(TreeIterator *iterator)
 {
-	if (fIteratorLock.Lock() < B_OK)
-		return;
-
+	MutexLocker _(fIteratorLock);
 	fIterators.Add(iterator);
-
-	fIteratorLock.Unlock();
 }
 
 
 void
 BPlusTree::_RemoveIterator(TreeIterator *iterator)
 {
-	if (fIteratorLock.Lock() < B_OK)
-		return;
-
+	MutexLocker _(fIteratorLock);
 	fIterators.Remove(iterator);
-
-	fIteratorLock.Unlock();
 }
 
 
@@ -2139,7 +2130,8 @@ TreeIterator::SkipDuplicates()
 
 
 void
-TreeIterator::Update(off_t offset, off_t nextOffset, uint16 keyIndex, uint16 splitAt, int8 change)
+TreeIterator::Update(off_t offset, off_t nextOffset, uint16 keyIndex,
+	uint16 splitAt, int8 change)
 {
 	if (offset != fCurrentNodeOffset)
 		return;
@@ -2158,7 +2150,7 @@ TreeIterator::Update(off_t offset, off_t nextOffset, uint16 keyIndex, uint16 spl
 	if (keyIndex <= fCurrentKey)
 		fCurrentKey += change;
 
-	// ToDo: duplicate handling!
+	// TODO: duplicate handling!
 }
 
 

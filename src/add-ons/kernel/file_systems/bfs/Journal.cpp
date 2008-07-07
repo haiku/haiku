@@ -395,7 +395,6 @@ RunArrays::MaxArrayLength()
 Journal::Journal(Volume *volume)
 	:
 	fVolume(volume),
-	fLock("bfs journal"),
 	fOwner(NULL),
 	fLogSize(volume->Log().Length()),
 	fMaxTransactionSize(fLogSize / 2 - 5),
@@ -403,19 +402,24 @@ Journal::Journal(Volume *volume)
 	fUnwrittenTransactions(0),
 	fHasSubtransaction(false)
 {
+	recursive_lock_init(&fLock, "bfs journal");
+	mutex_init(&fEntriesLock, "bfs journal entries");
 }
 
 
 Journal::~Journal()
 {
 	FlushLogAndBlocks();
+
+	recursive_lock_destroy(&fLock);
+	mutex_destroy(&fEntriesLock);
 }
 
 
 status_t
 Journal::InitCheck()
 {
-	return fLock.InitCheck();
+	return B_OK;
 }
 
 
@@ -605,7 +609,7 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 
 	// Set log_start pointer if possible...
 
-	journal->fEntriesLock.Lock();
+	mutex_lock(&journal->fEntriesLock);
 
 	if (logEntry == journal->fEntries.First()) {
 		LogEntry *next = journal->fEntries.GetNext(logEntry);
@@ -624,7 +628,7 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 
 	journal->fUsed -= logEntry->Length();
 	journal->fEntries.Remove(logEntry);
-	journal->fEntriesLock.Unlock();
+	mutex_unlock(&journal->fEntriesLock);
 
 	delete logEntry;
 
@@ -839,10 +843,10 @@ Journal::_WriteTransactionToLog()
 	// at this point, we can finally end the transaction - we're in
 	// a guaranteed valid state
 
-	fEntriesLock.Lock();
+	mutex_lock(&fEntriesLock);
 	fEntries.Add(logEntry);
 	fUsed += logEntry->Length();
-	fEntriesLock.Unlock();
+	mutex_unlock(&fEntriesLock);
 
 	if (detached) {
 		fTransactionID = cache_detach_sub_transaction(fVolume->BlockCache(),
@@ -864,13 +868,14 @@ Journal::_WriteTransactionToLog()
 status_t
 Journal::_FlushLog(bool canWait, bool flushBlocks)
 {
-	status_t status = canWait ? fLock.Lock() : fLock.LockWithTimeout(0);
+	status_t status = canWait ? recursive_lock_lock(&fLock)
+		: recursive_lock_trylock(&fLock);
 	if (status != B_OK)
 		return status;
 
-	if (fLock.OwnerCount() > 1) {
+	if (recursive_lock_get_recursion(&fLock) > 1) {
 		// whoa, FlushLogAndBlocks() was called from inside a transaction
-		fLock.Unlock();
+		recursive_lock_unlock(&fLock);
 		return B_OK;
 	}
 
@@ -885,7 +890,7 @@ Journal::_FlushLog(bool canWait, bool flushBlocks)
 	if (flushBlocks)
 		status = fVolume->FlushDevice();
 
-	fLock.Unlock();
+	recursive_lock_unlock(&fLock);
 	return status;
 }
 
@@ -903,11 +908,11 @@ Journal::FlushLogAndBlocks()
 status_t
 Journal::Lock(Transaction *owner)
 {
-	status_t status = fLock.Lock();
+	status_t status = recursive_lock_lock(&fLock);
 	if (status != B_OK)
 		return status;
 
-	if (fLock.OwnerCount() > 1) {
+	if (recursive_lock_get_recursion(&fLock) > 1) {
 		// we'll just use the current transaction again
 		return B_OK;
 	}
@@ -929,7 +934,7 @@ Journal::Lock(Transaction *owner)
 		fTransactionID = cache_start_transaction(fVolume->BlockCache());
 
 	if (fTransactionID < B_OK) {
-		fLock.Unlock();
+		recursive_lock_unlock(&fLock);
 		return fTransactionID;
 	}
 
@@ -943,7 +948,7 @@ Journal::Lock(Transaction *owner)
 void
 Journal::Unlock(Transaction *owner, bool success)
 {
-	if (fLock.OwnerCount() == 1) {
+	if (recursive_lock_get_recursion(&fLock) == 1) {
 		// we only end the transaction if we would really unlock it
 		// ToDo: what about failing transactions that do not unlock?
 		_TransactionDone(success);
@@ -952,7 +957,7 @@ Journal::Unlock(Transaction *owner, bool success)
 		fOwner = NULL;
 	}
 
-	fLock.Unlock();
+	recursive_lock_unlock(&fLock);
 }
 
 

@@ -273,7 +273,7 @@ class BPlusTree {
 		int32		fNodeSize;
 		bool		fAllowDuplicates;
 		status_t	fStatus;
-		SimpleLock	fIteratorLock;
+		mutex		fIteratorLock;
 		Chain<TreeIterator> fIterators;
 };
 

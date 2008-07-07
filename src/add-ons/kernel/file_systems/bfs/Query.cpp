@@ -805,13 +805,13 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 		// we need to lock before accessing Inode::Name()
 		nodeGetter.SetToNode(inode);
 
-		inode->SmallDataLock().Lock();
+		recursive_lock_lock(&inode->SmallDataLock());
 		locked = true;
 
 		// if not, check for "fake" attributes, "name", "size", "last_modified",
 		buffer = (uint8 *)inode->Name(nodeGetter.Node());
 		if (buffer == NULL) {
-			inode->SmallDataLock().Unlock();
+			recursive_lock_unlock(&inode->SmallDataLock());
 			return B_ERROR;
 		}
 
@@ -837,7 +837,7 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 		nodeGetter.SetToNode(inode);
 		Inode *attribute;
 
-		inode->SmallDataLock().Lock();
+		recursive_lock_lock(&inode->SmallDataLock());
 		small_data *smallData = inode->FindSmallData(nodeGetter.Node(), fAttribute);
 		if (smallData != NULL) {
 			buffer = smallData->Data();
@@ -846,7 +846,7 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 			locked = true;
 		} else {
 			// needed to unlock the small_data section as fast as possible
-			inode->SmallDataLock().Unlock();
+			recursive_lock_unlock(&inode->SmallDataLock());
 			nodeGetter.Unset();
 
 			if (inode->GetAttribute(fAttribute, &attribute) == B_OK) {
@@ -872,7 +872,7 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 		status = CompareTo(buffer, size) ? MATCH_OK : NO_MATCH;
 
 	if (locked)
-		inode->SmallDataLock().Unlock();
+		recursive_lock_unlock(&inode->SmallDataLock());
 
 	RETURN_ERROR(status);
 }

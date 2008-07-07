@@ -46,7 +46,7 @@ class Inode {
 		off_t BlockNumber() const { return fVolume->VnodeToBlock(fID); }
 
 		ReadWriteLock &Lock() { return fLock; }
-		SimpleLock &SmallDataLock() { return fSmallDataLock; }
+		recursive_lock &SmallDataLock() { return fSmallDataLock; }
 		status_t WriteBack(Transaction &transaction);
 
 		bool IsContainer() const
@@ -207,7 +207,7 @@ class Inode {
 			// we need those values to ensure we will remove
 			// the correct keys from the indices
 
-		mutable SimpleLock	fSmallDataLock;
+		mutable recursive_lock fSmallDataLock;
 		Chain<AttributeIterator> fIterators;
 };
 

@@ -149,7 +149,7 @@ bfs_read_fs_stat(fs_volume *_volume, struct fs_info *info)
 	FUNCTION();
 
 	Volume *volume = (Volume *)_volume->private_volume;
-	RecursiveLocker locker(volume->Lock());
+	MutexLocker locker(volume->Lock());
 
 	// File system flags.
 	info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME
@@ -181,7 +181,7 @@ bfs_write_fs_stat(fs_volume *_volume, const struct fs_info *info, uint32 mask)
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	RecursiveLocker locker(volume->Lock());
+	MutexLocker locker(volume->Lock());
 
 	status_t status = B_BAD_VALUE;
 

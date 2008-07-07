@@ -276,18 +276,20 @@ Volume::Volume(fs_volume *volume)
 	:
 	fVolume(volume),
 	fBlockAllocator(this),
-	fLock("bfs volume"),
 	fRootNode(NULL),
 	fIndicesNode(NULL),
 	fDirtyCachedBlocks(0),
 	fUniqueID(0),
 	fFlags(0)
 {
+	mutex_init(&fLock, "bfs volume");
+	mutex_init(&fQueryLock, "bfs queries");
 }
 
 
 Volume::~Volume()
 {
+	mutex_destroy(&fLock);
 }
 
 
@@ -516,16 +518,13 @@ Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type,
 	const uint8 *oldKey, size_t oldLength, const uint8 *newKey,
 	size_t newLength)
 {
-	if (fQueryLock.Lock() < B_OK)
-		return;
+	MutexLocker _(fQueryLock);
 
 	Query *query = NULL;
 	while ((query = fQueries.Next(query)) != NULL) {
 		query->LiveUpdate(inode, attribute, type, oldKey, oldLength, newKey,
 			newLength);
 	}
-
-	fQueryLock.Unlock();
 }
 
 
@@ -545,24 +544,16 @@ Volume::CheckForLiveQuery(const char *attribute)
 void
 Volume::AddQuery(Query *query)
 {
-	if (fQueryLock.Lock() < B_OK)
-		return;
-
+	MutexLocker _(fQueryLock);
 	fQueries.Add(query);
-
-	fQueryLock.Unlock();
 }
 
 
 void
 Volume::RemoveQuery(Query *query)
 {
-	if (fQueryLock.Lock() < B_OK)
-		return;
-
+	MutexLocker _(fQueryLock);
 	fQueries.Remove(query);
-
-	fQueryLock.Unlock();
 }
 
 

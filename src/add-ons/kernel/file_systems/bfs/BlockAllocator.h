@@ -6,7 +6,7 @@
 #define BLOCK_ALLOCATOR_H
 
 
-#include "Lock.h"
+#include "system_dependencies.h"
 
 
 class AllocationGroup;
@@ -57,7 +57,7 @@ class BlockAllocator {
 		static status_t _Initialize(BlockAllocator *);
 
 		Volume			*fVolume;
-		Semaphore		fLock;
+		mutex			fLock;
 		AllocationGroup	*fGroups;
 		int32			fNumGroups;
 		uint32			fBlocksPerGroup;

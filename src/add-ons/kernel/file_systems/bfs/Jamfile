@@ -24,10 +24,9 @@ SubDir HAIKU_TOP src add-ons kernel file_systems bfs ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
 }
 
-UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+UsePrivateKernelHeaders ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName shared ] ;
-UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateHeaders shared storage ;
 
 KernelAddon bfs :
 	bfs_disk_system.cpp

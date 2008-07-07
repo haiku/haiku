@@ -12,6 +12,7 @@
 
 #else	// !BFS_SHELL
 
+#include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
 #include <util/Stack.h>

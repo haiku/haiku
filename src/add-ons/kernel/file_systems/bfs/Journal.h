@@ -14,6 +14,7 @@
 
 #include "Volume.h"
 #include "Chain.h"
+#include "Lock.h"
 #include "Utility.h"
 
 
@@ -69,11 +70,11 @@ class Journal {
 			void *_journal);
 
 		Volume			*fVolume;
-		RecursiveLock	fLock;
+		recursive_lock	fLock;
 		Transaction 	*fOwner;
 		uint32			fLogSize, fMaxTransactionSize, fUsed;
 		int32			fUnwrittenTransactions;
-		SimpleLock		fEntriesLock;
+		mutex			fEntriesLock;
 		LogEntryList	fEntries;
 		bigtime_t		fTimestamp;
 		int32			fTransactionID;
