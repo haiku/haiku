@@ -70,6 +70,9 @@ bus_space_barrier(bus_space_tag_t tag, bus_space_handle_t handle,
 		__asm__ __volatile__ ("" : : : "memory");
 }
 
+#define bus_barrier(r, o, l, f) \
+	bus_space_barrier((r)->r_bustag, (r)->r_bushandle, (o), (l), (f))
+
 struct resource;
 
 struct resource_spec {
