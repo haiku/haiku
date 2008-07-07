@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku. All rights reserved.
+ * Copyright 2001-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,13 +26,15 @@ class Printer;
 	// OpenTracker shared sources
 #include "ObjectList.h"
 
+
 class SpoolFolder : public Folder {
 protected:
 	void Notify(Job* job, int kind);
-	
+
 public:
 	SpoolFolder(BLocker* locker, BLooper* looper, const BDirectory& spoolDir);
 };
+
 
 /*****************************************************************************/
 // Printer
@@ -43,65 +45,73 @@ public:
 class Printer : public BHandler, public Object
 {
 	typedef BHandler Inherited;
-
 public:
-	Printer(const BDirectory* node, Resource* res);
-	~Printer();
+								Printer(const BDirectory* node, Resource* res);
+	virtual						~Printer();
 
-		// Static helper functions
-	static Printer* Find(const BString& name);
-	static Printer* Find(node_ref* node);
-	static Printer* At(int32 idx);
-	static void Remove(Printer* printer);
-	static int32 CountPrinters();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	status_t			GetSupportedSuites(BMessage* msg);
+	virtual	BHandler*			ResolveSpecifier(BMessage* msg, int32 index,
+									BMessage* spec, int32 form, const char* prop);
 
-	status_t Remove();
-	status_t ConfigurePrinter();
-	status_t ConfigureJob(BMessage& ioSettings);
-	status_t ConfigurePage(BMessage& ioSettings);
-	status_t GetDefaultSettings(BMessage& configuration);
+			// Static helper functions
+	static	Printer*			Find(const BString& name);
+	static	Printer*			Find(node_ref* node);
+	static	Printer*			At(int32 idx);
+	static	void				Remove(Printer* printer);
+	static	int32				CountPrinters();
 
-		// Try to start processing of next spooled job
-	void HandleSpooledJob();
-		// Abort print_thread without processing spooled job
-	void AbortPrintThread();
+			status_t			Remove();
+			status_t			ConfigurePrinter();
+			status_t			ConfigureJob(BMessage& ioSettings);
+			status_t			ConfigurePage(BMessage& ioSettings);
+			status_t			GetDefaultSettings(BMessage& configuration);
 
-	void MessageReceived(BMessage* msg);
+			// Try to start processing of next spooled job
+			void				HandleSpooledJob();
 
-		// Scripting support, see Printer.Scripting.cpp
-	status_t GetSupportedSuites(BMessage* msg);
-	void HandleScriptingCommand(BMessage* msg);
-	BHandler* ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
-								int32 form, const char* prop);
-								
-	void GetName(BString& name);
-	Resource* GetResource() { return fResource; }
-	
+			// Abort print_thread without processing spooled job
+			void				AbortPrintThread();
+
+			// Scripting support, see Printer.Scripting.cpp
+			void				HandleScriptingCommand(BMessage* msg);
+
+			void				GetName(BString& name);
+			Resource*			GetResource() { return fResource; }
+
 private:
-	status_t LoadPrinterAddon(image_id& id);
-	void AddCurrentPrinter(BMessage* m);
+			status_t			LoadPrinterAddon(image_id& id);
+			void				AddCurrentPrinter(BMessage* m);
 
-	SpoolFolder fPrinter;      // the printer spooling directory
-	Resource* fResource;       // the resource required for processing a print job
-	bool fSinglePrintThread;   // is printer add-on allowed to process multiple print job at once
-	Job* fJob;                 // the next job to process
-	vint32 fProcessing;        // the current nmber of processing threads
-	bool fAbort;	           // stop processing
-	
-	static BObjectList<Printer> sPrinters;
+			// Accessor
+			BDirectory*			SpoolDir() { return fPrinter.GetSpoolDir(); }
 
-		// Accessor
-	BDirectory* SpoolDir() { return fPrinter.GetSpoolDir(); }
+			void				ResetJobStatus();
+			bool				HasCurrentPrinter(BString& name);
+			bool				MoveJob(const BString& name);
 
-	void ResetJobStatus();
-	bool HasCurrentPrinter(BString& name);
-	bool MoveJob(const BString& name);
-		// Get next spooled job if any
-	bool FindSpooledJob();
-	status_t PrintSpooledJob(BFile* spoolFile);
-	void PrintThread(Job* job);
-	static status_t print_thread(void* data);
-	void StartPrintThread();
+			// Get next spooled job if any
+			bool				FindSpooledJob();
+			status_t			PrintSpooledJob(BFile* spoolFile);
+			void				PrintThread(Job* job);
+
+	static	status_t			print_thread(void* data);
+			void				StartPrintThread();
+
+private:
+			// the printer spooling directory
+			SpoolFolder			fPrinter;
+			// the resource required for processing a print job
+			Resource*			fResource;
+			// is printer add-on allowed to process multiple print job at once
+			bool				fSinglePrintThread;
+			// the next job to process
+			Job*				fJob;
+			// the current nmber of processing threads
+			vint32				fProcessing;
+			// stop processing
+			bool				fAbort;
+	static	BObjectList<Printer> sPrinters;
 };
 
 #endif
