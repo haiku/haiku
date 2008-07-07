@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_FILE_CACHE_H
@@ -44,6 +44,8 @@ extern void cache_node_closed(struct vnode *vnode, int32 fdType, vm_cache *cache
 extern void cache_node_launched(size_t argCount, char * const *args);
 extern void cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size);
 extern void cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size);
+
+extern status_t file_map_init(void);
 extern status_t file_cache_init_post_boot_device(void);
 extern status_t file_cache_init(void);
 

@@ -4394,6 +4394,8 @@ vfs_init(kernel_args *args)
 
 	register_low_memory_handler(&vnode_low_memory_handler, NULL, 0);
 
+	file_map_init();
+
 	return file_cache_init();
 }
 

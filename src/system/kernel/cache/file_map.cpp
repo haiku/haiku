@@ -15,7 +15,7 @@
 #include <file_cache.h>
 #include <generic_syscall.h>
 #include <util/AutoLock.h>
-#include <util/kernel_cpp.h>
+#include <util/DoublyLinkedList.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_page.h>
@@ -35,6 +35,8 @@
 //	for the whole map.
 // TODO: it would be nice if we could free a file map in low memory situations.
 
+#define DEBUG_FILE_MAP
+
 #define CACHED_FILE_EXTENTS	2
 	// must be smaller than MAX_FILE_IO_VECS
 	// TODO: find out how much of these are typically used
@@ -49,7 +51,11 @@ struct file_extent_array {
 	size_t			max_count;
 };
 
-class FileMap {
+class FileMap
+#ifdef DEBUG_FILE_MAP
+	: public DoublyLinkedListLinkImpl<FileMap>
+#endif
+{
 public:
 							FileMap(struct vnode* vnode, off_t size);
 							~FileMap();
@@ -61,12 +67,13 @@ public:
 			status_t		Translate(off_t offset, size_t size,
 								file_io_vec* vecs, size_t* _count);
 
+			file_extent*	ExtentAt(uint32 index);
+
 			size_t			Count() const { return fCount; }
 			struct vnode*	Vnode() const { return fVnode; }
 			off_t			Size() const { return fSize; }
 
 private:
-			file_extent*	_ExtentAt(uint32 index);
 			file_extent*	_FindExtent(off_t offset, uint32* _index);
 			status_t		_MakeSpace(size_t count);
 			status_t		_Add(file_io_vec* vecs, size_t vecCount,
@@ -81,23 +88,40 @@ private:
 	off_t			fSize;
 };
 
+#ifdef DEBUG_FILE_MAP
+typedef DoublyLinkedList<FileMap> FileMapList;
+
+static FileMapList sList;
+static mutex sLock;
+#endif
+
 
 FileMap::FileMap(struct vnode* vnode, off_t size)
 {
 	fCount = 0;
 	fVnode = vnode;
 	fSize = size;
+
+#ifdef DEBUG_FILE_MAP
+	MutexLocker _(sLock);
+	sList.Add(this);
+#endif
 }
 
 
 FileMap::~FileMap()
 {
 	Free();
+
+#ifdef DEBUG_FILE_MAP
+	MutexLocker _(sLock);
+	sList.Remove(this);
+#endif
 }
 
 
 file_extent*
-FileMap::_ExtentAt(uint32 index)
+FileMap::ExtentAt(uint32 index)
 {
 	if (index >= fCount)
 		return NULL;
@@ -117,7 +141,7 @@ FileMap::_FindExtent(off_t offset, uint32 *_index)
 
 	while (left <= right) {
 		int32 index = (left + right) / 2;
-		file_extent* extent = _ExtentAt(index);
+		file_extent* extent = ExtentAt(index);
 
 		if (extent->offset > offset) {
 			// search in left part
@@ -199,7 +223,7 @@ FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 
 	file_extent* lastExtent = NULL;
 	if (start != 0) {
-		lastExtent = _ExtentAt(start - 1);
+		lastExtent = ExtentAt(start - 1);
 		offset = lastExtent->offset + lastExtent->disk.length;
 	}
 
@@ -215,7 +239,7 @@ FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 			}
 		}
 
-		file_extent* extent = _ExtentAt(start + i);
+		file_extent* extent = ExtentAt(start + i);
 		extent->offset = offset;
 		extent->disk = vecs[i];
 
@@ -225,7 +249,7 @@ FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 
 #ifdef TRACE_FILE_MAP
 	for (uint32 i = 0; i < fCount; i++) {
-		file_extent* extent = _ExtentAt(i);
+		file_extent* extent = ExtentAt(i);
 		dprintf("[%ld] extent offset %Ld, disk offset %Ld, length %Ld\n",
 			i, extent->offset, extent->disk.offset, extent->disk.length);
 	}
@@ -296,7 +320,7 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 
 	file_extent* lastExtent = NULL;
 	if (fCount > 0)
-		lastExtent = _ExtentAt(fCount - 1);
+		lastExtent = ExtentAt(fCount - 1);
 
 	off_t mapOffset = 0;
 	if (lastExtent != NULL)
@@ -361,6 +385,118 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 	}
 
 	*_count = index;
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
+#ifdef DEBUG_FILE_MAP
+
+static int
+dump_file_map(int argc, char** argv)
+{
+	if (argc < 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	bool printExtents = false;
+	if (argc > 2 && !strcmp(argv[1], "-p"))
+		printExtents = true;
+
+	FileMap* map = (FileMap*)parse_expression(argv[argc - 1]);
+	if (map == NULL) {
+		kprintf("invalid file map!\n");
+		return 0;
+	}
+
+	kprintf("FileMap %p\n", map);
+	kprintf("  size    %Ld\n", map->Size());
+	kprintf("  count   %lu\n", map->Count());
+
+	if (!printExtents)
+		return 0;
+
+	for (uint32 i = 0; i < map->Count(); i++) {
+		file_extent* extent = map->ExtentAt(i);
+
+		kprintf("  [%lu] offset %Ld, disk offset %Ld, length %Ld\n",
+			i, extent->offset, extent->disk.offset, extent->disk.length);
+	}
+
+	return 0;
+}
+
+
+static int
+dump_file_map_stats(int argc, char** argv)
+{
+	off_t minSize = 0;
+	off_t maxSize = -1;
+
+	if (argc == 2) {
+		maxSize = parse_expression(argv[1]);
+	} else if (argc > 2) {
+		minSize = parse_expression(argv[1]);
+		maxSize = parse_expression(argv[2]);
+	}
+
+	FileMapList::Iterator iterator = sList.GetIterator();
+	off_t size = 0;
+	off_t mapSize = 0;
+	uint32 extents = 0;
+	uint32 count = 0;
+	uint32 emptyCount = 0;
+
+	while (iterator.HasNext()) {
+		FileMap* map = iterator.Next();
+
+		if (minSize > map->Size() || (maxSize != -1 && maxSize < map->Size()))
+			continue;
+
+		if (map->Count() != 0) {
+			file_extent* extent = map->ExtentAt(map->Count() - 1);
+			if (extent != NULL)
+				mapSize += extent->offset + extent->disk.length;
+
+			extents += map->Count();
+		} else
+			emptyCount++;
+
+		size += map->Size();
+		count++;
+	}
+
+	kprintf("%ld file maps (%ld empty), %Ld file bytes in total, %Ld bytes "
+		"cached, %lu extents\n", count, emptyCount, size, mapSize, extents);
+	kprintf("average %lu extents per map for %Ld bytes.\n",
+		extents / (count - emptyCount), mapSize / (count - emptyCount));
+
+	return 0;
+}
+
+#endif	// DEBUG_FILE_MAP
+
+
+//	#pragma mark - private kernel API
+
+
+extern "C" status_t
+file_map_init(void)
+{
+#ifdef DEBUG_FILE_MAP
+	add_debugger_command_etc("file_map", &dump_file_map,
+		"Dumps the specified file map.",
+		"[-p] <file-map>\n"
+		"  -p          - causes the file extents to be printed as well.\n"
+		"  <file-map>  - pointer to the file map.\n", 0);
+	add_debugger_command("file_map_stats", &dump_file_map_stats,
+		"Dumps some file map statistics.");
+
+	mutex_init(&sLock, "file map list");
+#endif
 	return B_OK;
 }
 
