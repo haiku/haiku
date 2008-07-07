@@ -81,7 +81,7 @@ public:
 
 private:
 			status_t			LoadPrinterAddon(image_id& id);
-			void				AddCurrentPrinter(BMessage* m);
+			void				AddCurrentPrinter(BMessage& message);
 
 			// Accessor
 			BDirectory*			SpoolDir() { return fPrinter.GetSpoolDir(); }

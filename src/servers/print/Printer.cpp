@@ -37,8 +37,8 @@ SpoolFolder::SpoolFolder(BLocker*locker, BLooper* looper, const BDirectory& spoo
 // Notify print_server that there is a job file waiting for printing
 void SpoolFolder::Notify(Job* job, int kind)
 {
-	if ((kind == kJobAdded || kind == kJobAttrChanged) &&
-		job->IsValid() && job->IsWaiting()) {
+	if ((kind == kJobAdded || kind == kJobAttrChanged)
+		&& job->IsValid() && job->IsWaiting()) {
 		be_app_messenger.SendMessage(PSRV_PRINT_SPOOLED_JOB);
 	}
 }
@@ -70,12 +70,9 @@ Printer* Printer::Find(const BString& name)
 {
 		// Look in list to find printer definition
 	for (int32 idx=0; idx < sPrinters.CountItems(); idx++) {
-		if (name == sPrinters.ItemAt(idx)->Name()) {
+		if (name == sPrinters.ItemAt(idx)->Name())
 			return sPrinters.ItemAt(idx);
-		}
 	}
-
-		// None found, so return NULL
 	return NULL;
 }
 
@@ -84,7 +81,7 @@ Printer* Printer::Find(node_ref* node)
 {
 	node_ref n;
 		// Look in list to find printer definition
-	for (int32 idx=0; idx < sPrinters.CountItems(); idx++) {
+	for (int32 idx = 0; idx < sPrinters.CountItems(); idx++) {
 		Printer* printer = sPrinters.ItemAt(idx);
 		printer->SpoolDir()->GetNodeRef(&n);
 		if (n == *node)
@@ -152,6 +149,24 @@ Printer::Printer(const BDirectory* node, Resource* res)
 Printer::~Printer()
 {
 	((PrintServerApp*)be_app)->NotifyPrinterDeletion(this);
+}
+
+
+void Printer::MessageReceived(BMessage* msg)
+{
+	switch(msg->what) {
+		case B_GET_PROPERTY:
+		case B_SET_PROPERTY:
+		case B_CREATE_PROPERTY:
+		case B_DELETE_PROPERTY:
+		case B_COUNT_PROPERTIES:
+		case B_EXECUTE_PROPERTY:
+			HandleScriptingCommand(msg);
+			break;
+
+		default:
+			Inherited::MessageReceived(msg);
+	}
 }
 
 
@@ -227,7 +242,8 @@ status_t Printer::ConfigurePage(BMessage& settings)
 			BMessage* new_settings = (*func)(SpoolDir(), &settings);
 			if (new_settings != NULL && new_settings->what != 'baad') {
 				settings = *new_settings;
-				AddCurrentPrinter(&settings);
+				settings.what = 'okok';
+				AddCurrentPrinter(settings);
 			} else {
 				rc = B_ERROR;
 			}
@@ -267,7 +283,8 @@ status_t Printer::ConfigureJob(BMessage& settings)
 			BMessage* new_settings = (*func)(SpoolDir(), &settings);
 			if ((new_settings != NULL) && (new_settings->what != 'baad')) {
 				settings = *new_settings;
-				AddCurrentPrinter(&settings);
+				settings.what = 'okok';
+				AddCurrentPrinter(settings);
 			} else {
 				rc = B_ERROR;
 			}
@@ -320,7 +337,8 @@ status_t Printer::GetDefaultSettings(BMessage& settings)
 			BMessage* new_settings = (*func)(SpoolDir());
 			if (new_settings) {
 				settings = *new_settings;
-				AddCurrentPrinter(&settings);
+				settings.what = 'okok';
+				AddCurrentPrinter(settings);
 			} else {
 				rc = B_ERROR;
 			}
@@ -385,41 +403,13 @@ status_t Printer::LoadPrinterAddon(image_id& id)
 // Parameters:
 //    msg - message.
 // ---------------------------------------------------------------
-void Printer::AddCurrentPrinter(BMessage* msg)
+void Printer::AddCurrentPrinter(BMessage& message)
 {
 	BString name;
 	GetName(name);
-	if (msg->HasString(PSRV_FIELD_CURRENT_PRINTER)) {
-		msg->ReplaceString(PSRV_FIELD_CURRENT_PRINTER, name.String());
-	} else {
-		msg->AddString(PSRV_FIELD_CURRENT_PRINTER, name.String());
-	}
-}
 
-
-// ---------------------------------------------------------------
-// MessageReceived
-//
-// Handle scripting messages.
-//
-// Parameters:
-//    msg - message.
-// ---------------------------------------------------------------
-void Printer::MessageReceived(BMessage* msg)
-{
-	switch(msg->what) {
-		case B_GET_PROPERTY:
-		case B_SET_PROPERTY:
-		case B_CREATE_PROPERTY:
-		case B_DELETE_PROPERTY:
-		case B_COUNT_PROPERTIES:
-		case B_EXECUTE_PROPERTY:
-			HandleScriptingCommand(msg);
-			break;
-
-		default:
-			Inherited::MessageReceived(msg);
-	}
+	message.RemoveName(PSRV_FIELD_CURRENT_PRINTER);
+	message.AddString(PSRV_FIELD_CURRENT_PRINTER, name.String());
 }
 
 
@@ -433,7 +423,7 @@ void Printer::MessageReceived(BMessage* msg)
 // ---------------------------------------------------------------
 void Printer::GetName(BString& name)
 {
-	if (B_OK != SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name))
+	if (SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name) != B_OK)
 		name = "Unknown Printer";
 }
 
