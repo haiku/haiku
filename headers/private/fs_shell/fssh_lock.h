@@ -55,6 +55,7 @@ extern void fssh_recursive_lock_init_etc(fssh_recursive_lock *lock, const char *
 	uint32_t flags);
 extern void fssh_recursive_lock_destroy(fssh_recursive_lock *lock);
 extern fssh_status_t fssh_recursive_lock_lock(fssh_recursive_lock *lock);
+extern fssh_status_t fssh_recursive_lock_trylock(fssh_recursive_lock *lock);
 extern void fssh_recursive_lock_unlock(fssh_recursive_lock *lock);
 extern int32_t fssh_recursive_lock_get_recursion(fssh_recursive_lock *lock);
 

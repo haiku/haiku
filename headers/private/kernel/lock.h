@@ -84,6 +84,7 @@ extern void recursive_lock_init_etc(recursive_lock *lock, const char *name,
 	uint32 flags);
 extern void recursive_lock_destroy(recursive_lock *lock);
 extern status_t recursive_lock_lock(recursive_lock *lock);
+extern status_t recursive_lock_trylock(recursive_lock *lock);
 extern void recursive_lock_unlock(recursive_lock *lock);
 extern int32 recursive_lock_get_recursion(recursive_lock *lock);
 

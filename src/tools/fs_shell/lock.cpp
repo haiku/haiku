@@ -71,6 +71,24 @@ fssh_recursive_lock_lock(fssh_recursive_lock *lock)
 }
 
 
+extern "C" fssh_status_t
+fssh_recursive_lock_trylock(fssh_recursive_lock *lock)
+{
+	fssh_thread_id thread = fssh_find_thread(NULL);
+
+	if (thread != lock->holder) {
+		fssh_status_t status = fssh_acquire_sem_etc(lock->sem, 1,
+			FSSH_B_RELATIVE_TIMEOUT, 0);
+		if (status < FSSH_B_OK)
+			return status;
+
+		lock->holder = thread;
+	}
+	lock->recursion++;
+	return FSSH_B_OK;
+}
+
+
 extern "C" void
 fssh_recursive_lock_unlock(fssh_recursive_lock *lock)
 {
