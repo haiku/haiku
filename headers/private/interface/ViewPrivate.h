@@ -30,8 +30,8 @@ enum {
 	B_VIEW_BLENDING_BIT			= 0x00000020,
 	B_VIEW_SCALE_BIT			= 0x00000040,
 	B_VIEW_FONT_ALIASING_BIT	= 0x00000080,
-	B_VIEW_FRAME_BIT			= 0x00000100,	
-	B_VIEW_ORIGIN_BIT			= 0x00000200,	
+	B_VIEW_FRAME_BIT			= 0x00000100,
+	B_VIEW_ORIGIN_BIT			= 0x00000200,
 	B_VIEW_PEN_SIZE_BIT			= 0x00000400,
 	B_VIEW_PEN_LOCATION_BIT		= 0x00000800,
 	B_VIEW_LOW_COLOR_BIT		= 0x00008000,
@@ -101,6 +101,9 @@ class ViewState {
 		uint32				valid_flags;
 		// flags used for archiving
 		uint32				archiving_flags;
+
+		// maintain our own rect as seen from the app while printing
+		BRect				print_rect;
 };
 
 inline bool
@@ -120,7 +123,7 @@ ViewState::IsAllValid() const
 
 struct _array_hdr_{
 	float			startX;
-	float			startY;	
+	float			startY;
 	float			endX;
 	float			endY;
 	rgb_color		color;
@@ -129,7 +132,7 @@ struct _array_hdr_{
 struct _array_data_{
 		// the max number of points in the array
 	uint32			maxCount;
-		// the current number of points in the array	
+		// the current number of points in the array
 	uint32			count;
 		// the array of points
 	_array_hdr_*	array;

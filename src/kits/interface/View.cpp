@@ -639,6 +639,9 @@ BView::Bounds() const
 		}
 	}
 */
+	if (fIsPrinting)
+		return fState->print_rect;
+
 	return fBounds;
 }
 
@@ -1506,7 +1509,7 @@ BView::ScrollTo(BPoint where)
 	// no reason to process this further if no scroll is intended.
 	if (where.x == fBounds.left && where.y == fBounds.top)
 		return;
-	
+
 	// make sure scrolling is within valid bounds
 	if (fHorScroller) {
 		float min, max;
@@ -2286,7 +2289,13 @@ BView::GetClippingRegion(BRegion* region) const
 	// changed, so it is always read from the server
 	region->MakeEmpty();
 
+
 	if (fOwner) {
+		if (fIsPrinting && _CheckOwnerLock()) {
+			region->Set(fState->print_rect);
+			return;
+		}
+
 		_CheckLockAndSwitchCurrent();
 		fOwner->fLink->StartMessage(AS_VIEW_GET_CLIP_REGION);
 

@@ -27,6 +27,7 @@
 
 
 #include <pr_server.h>
+#include <ViewPrivate.h>
 
 
 #include <stdio.h>
@@ -506,9 +507,9 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 
 	BRegion region;
 	region.Set(BRect(rect.left, rect.top, rect.right, rect.bottom));
+	view->fState->print_rect = rect;
 
 	view->AppendToPicture(picture);
-	view->fIsPrinting = true;
 	view->PushState();
 	view->SetOrigin(origin);
 	view->ConstrainClippingRegion(&region);
@@ -520,9 +521,11 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 		view->SetHighColor(highColor);
 	}
 
+	view->fIsPrinting = true;
 	view->Draw(rect);
-	view->PopState();
 	view->fIsPrinting = false;
+
+	view->PopState();
 	view->EndPicture();
 
 	BView *child = view->ChildAt(0);
@@ -538,13 +541,13 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 
 	if (view->Flags() & B_DRAW_ON_CHILDREN)	{
 		view->AppendToPicture(picture);
-		view->fIsPrinting = true;
 		view->PushState();
 		view->SetOrigin(origin);
 		view->ConstrainClippingRegion(&region);
+		view->fIsPrinting = true;
 		view->DrawAfterChildren(rect);
-		view->PopState();
 		view->fIsPrinting = false;
+		view->PopState();
 		view->EndPicture();
 	}
 }
