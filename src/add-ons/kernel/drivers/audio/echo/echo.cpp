@@ -385,9 +385,19 @@ void
 echo_stream_delete(echo_stream *stream)
 {
 	cpu_status status;
+	ECHOGALS_CLOSEAUDIOPARAMETERS  close_params;
 	LOG(("echo_stream_delete\n"));
 	
 	echo_stream_halt(stream);
+		
+	if (stream->pipe >= 0) {
+		close_params.wPipeIndex = stream->pipe;	
+		status = stream->card->pEG->CloseAudio(&close_params);
+		if (status != ECHOSTATUS_OK && status != ECHOSTATUS_CHANNEL_NOT_OPEN) {
+			PRINT(("echo_stream_set_audioparms : CloseAudio failed\n"));
+			PRINT((" status: %s \n", pStatusStrs[status]));
+		}
+	}
 	
 	if(stream->buffer)
 		echo_mem_free(stream->card, stream->buffer->log_base);
