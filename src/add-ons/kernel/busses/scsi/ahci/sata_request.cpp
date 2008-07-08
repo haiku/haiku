@@ -111,6 +111,7 @@ sata_request::finish(int tfd, size_t bytesTransfered)
 
 	if (fCcb) {
 		fCcb->data_resid = fCcb->data_length - bytesTransfered;
+		fCcb->device_status = SCSI_STATUS_GOOD;
 		fCcb->subsys_status = SCSI_REQ_CMP;
 		if (tfd & (ATA_ERR | ATA_DF)) {
 			fCcb->subsys_status = SCSI_REQ_CMP_ERR;
