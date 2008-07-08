@@ -15,7 +15,7 @@ HCIControllerAccessor::HCIControllerAccessor(BPath* path) : HCIDelegate(path)
 }
 
 status_t
-HCIControllerAccessor::IssueCommand(raw_command* rc, size_t size)
+HCIControllerAccessor::IssueCommand(raw_command rc, size_t size)
 {
 
 	if (GetID() < 0)
@@ -23,4 +23,12 @@ HCIControllerAccessor::IssueCommand(raw_command* rc, size_t size)
 
 
 	return B_ERROR;
+}
+
+
+status_t 
+HCIControllerAccessor::Launch() {
+
+	return B_OK;
+
 }

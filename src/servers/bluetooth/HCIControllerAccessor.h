@@ -17,7 +17,8 @@ class HCIControllerAccessor : public HCIDelegate {
 
 	public:
 		HCIControllerAccessor(BPath* path);
-		status_t IssueCommand(raw_command* rc,  size_t size);
+		status_t IssueCommand(raw_command rc,  size_t size);
+		status_t Launch();
 };
 
 #endif

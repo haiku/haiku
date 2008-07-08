@@ -33,3 +33,11 @@ printf("### \n");
 
 	return ioctl(fFD, ISSUE_BT_COMMAND, rc, size);
 }
+
+
+status_t 
+HCITransportAccessor::Launch() {
+
+	return B_OK;
+
+}

@@ -41,16 +41,15 @@ class HCIDelegate {
 
 		}
 						
+		
 		hci_id GetID(void)
 		{
 			return fHID;
 		}
-				
-		virtual status_t IssueCommand(raw_command rc, size_t size)
-		{
-			return B_ERROR;
-		}
-	
+
+		virtual status_t IssueCommand(raw_command rc, size_t size)=0;		
+		virtual status_t Launch()=0;
+
 	protected:
 		
 
