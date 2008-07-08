@@ -60,8 +60,8 @@ sorted_array::Remove(off_t value)
 	if (index == -1)
 		return false;
 
-	memmove(&values[index], &values[index + 1], (count - index) * sizeof(off_t));
 	count--;
+	memmove(&values[index], &values[index + 1], (count - index) * sizeof(off_t));
 
 	return true;
 }
