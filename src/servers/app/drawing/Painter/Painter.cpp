@@ -45,6 +45,13 @@
 #include "Painter.h"
 
 
+//#define TRACE_PAINTER
+#ifdef TRACE_PAINTER
+#	define TRACE(x...)		printf(x)
+#else
+#	define TRACE(x...)
+#endif
+
 #define CHECK_CLIPPING	if (!fValidClipping) return BRect(0, 0, -1, -1);
 #define CHECK_CLIPPING_NO_RETURN	if (!fValidClipping) return;
 
@@ -1049,6 +1056,16 @@ Painter::DrawBitmap(const ServerBitmap* bitmap,
 		// the native bitmap coordinate system
 		BRect actualBitmapRect(bitmap->Bounds());
 
+		TRACE("Painter::DrawBitmap()\n");
+		TRACE("   actualBitmapRect = (%.1f, %.1f) - (%.1f, %.1f)\n",
+			actualBitmapRect.left, actualBitmapRect.top,
+			actualBitmapRect.right, actualBitmapRect.bottom);
+		TRACE("   bitmapRect = (%.1f, %.1f) - (%.1f, %.1f)\n",
+			bitmapRect.left, bitmapRect.top, bitmapRect.right,
+			bitmapRect.bottom);
+		TRACE("   viewRect = (%.1f, %.1f) - (%.1f, %.1f)\n",
+			viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
+
 		agg::rendering_buffer srcBuffer;
 		srcBuffer.attach(bitmap->Bits(),
 						 bitmap->Width(),
@@ -1304,10 +1321,16 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	}
 
 	if (!fSubpixelPrecise) {
-		align_rect_to_pixels(&viewRect);
 		align_rect_to_pixels(&bitmapRect);
+		align_rect_to_pixels(&viewRect);
 	}
-		
+
+	TRACE("Painter::_DrawBitmap()\n");
+	TRACE("   bitmapRect = (%.1f, %.1f) - (%.1f, %.1f)\n",
+		bitmapRect.left, bitmapRect.top, bitmapRect.right, bitmapRect.bottom);
+	TRACE("   viewRect = (%.1f, %.1f) - (%.1f, %.1f)\n",
+		viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
+
 	double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
 	double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
 
@@ -1512,6 +1535,11 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 							  double xScale, double yScale,
 							  BRect viewRect) const
 {
+	TRACE("Painter::_DrawBitmapGeneric32()\n");
+	TRACE("   offset: %.1f, %.1f\n", xOffset, yOffset);
+	TRACE("   scale: %.3f, %.3f\n", xScale, yScale);
+	TRACE("   viewRect: (%.1f, %.1f) - (%.1f, %.1f)\n",
+		viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
 	// AGG pipeline
 
 	// pixel format attached to bitmap
@@ -1524,8 +1552,10 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 //											   -actualBitmapRect.top);
 
 	agg::trans_affine imgMatrix;
+	imgMatrix *= agg::trans_affine_translation(xOffset - viewRect.left,
+		yOffset - viewRect.top);
 	imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
-	imgMatrix *= agg::trans_affine_translation(xOffset, yOffset);
+	imgMatrix *= agg::trans_affine_translation(viewRect.left, viewRect.top);
 	imgMatrix.invert();
 
 	// image interpolator
