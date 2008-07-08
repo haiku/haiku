@@ -1532,11 +1532,14 @@ BView::ScrollTo(BPoint where)
 
 	_CheckLockAndSwitchCurrent();
 
+	float xDiff = where.x - fBounds.left;
+	float yDiff = where.y - fBounds.top;
+
 	// if we're attached to a window tell app_server about this change
 	if (fOwner) {
 		fOwner->fLink->StartMessage(AS_VIEW_SCROLL);
-		fOwner->fLink->Attach<float>(where.x - fBounds.left);
-		fOwner->fLink->Attach<float>(where.y - fBounds.top);
+		fOwner->fLink->Attach<float>(xDiff);
+		fOwner->fLink->Attach<float>(yDiff);
 
 		fOwner->fLink->Flush();
 
@@ -1547,9 +1550,9 @@ BView::ScrollTo(BPoint where)
 	fBounds.OffsetTo(where.x, where.y);
 
 	// then set the new values of the scrollbars
-	if (fHorScroller)
+	if (fHorScroller && xDiff != 0.0)
 		fHorScroller->SetValue(fBounds.left);
-	if (fVerScroller)
+	if (fVerScroller && yDiff != 0.0)
 		fVerScroller->SetValue(fBounds.top);
 
 }
