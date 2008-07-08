@@ -149,8 +149,8 @@ struct hda_stream {
 					/* Physical addresses for buffer */
 	sem_id		buffer_ready_sem;
 	bigtime_t	real_time;
-	uint32		frames_count;
-	uint32		buffer_cycle;
+	uint64		frames_count;
+	int32		buffer_cycle;
 
 	uint32		rate, bps;			/* Samplerate & bits per sample */
 
@@ -168,7 +168,7 @@ struct hda_stream {
 		return controller->Read16(HDAC_STREAM_BASE + offset + reg);
 	}
 
-	uint8 Read32(uint32 reg)
+	uint32 Read32(uint32 reg)
 	{
 		return controller->Read32(HDAC_STREAM_BASE + offset + reg);
 	}
@@ -178,12 +178,12 @@ struct hda_stream {
 		*(controller->regs + HDAC_STREAM_BASE + offset + reg) = value;
 	}
 
-	void Write16(uint32 reg, uint8 value)
+	void Write16(uint32 reg, uint16 value)
 	{
 		*(vuint16*)(controller->regs + HDAC_STREAM_BASE + offset + reg) = value;
 	}
 
-	void Write32(uint32 reg, uint8 value)
+	void Write32(uint32 reg, uint32 value)
 	{
 		*(vuint32*)(controller->regs + HDAC_STREAM_BASE + offset + reg) = value;
 	}

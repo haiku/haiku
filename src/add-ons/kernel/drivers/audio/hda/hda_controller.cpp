@@ -26,6 +26,8 @@
 	(((controller)->num_input_streams + (controller)->num_output_streams \
 		+ (index)) * HDAC_STREAM_SIZE)
 
+#define PAGE_ALIGN(size)	(((size) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1))
+
 static const struct {
 	uint32 multi_rate;
 	uint32 hw_rate;
@@ -197,15 +199,15 @@ reset_controller(hda_controller* controller)
 	}
 	for (uint32 i = 0; i < controller->num_output_streams; i++) {
 		controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
-			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+			+ HDAC_OUTPUT_STREAM_OFFSET(controller, i), 0);
 		controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
-			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+			+ HDAC_OUTPUT_STREAM_OFFSET(controller, i), 0);
 	}
 	for (uint32 i = 0; i < controller->num_bidir_streams; i++) {
 		controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
-			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+			+ HDAC_BIDIR_STREAM_OFFSET(controller, i), 0);
 		controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
-			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+			+ HDAC_BIDIR_STREAM_OFFSET(controller, i), 0);
 	}
 
 	// stop DMA
@@ -305,7 +307,7 @@ init_corb_rirb_pos(hda_controller* controller)
 	posSize = 8 * (controller->num_input_streams
 		+ controller->num_output_streams + controller->num_bidir_streams);
 
-	memSize = (posOffset + posSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+	memSize = PAGE_ALIGN(posOffset + posSize);
 
 	/* Allocate memory area */
 	controller->corb_rirb_pos_area = create_area("hda corb/rirb/pos",
@@ -504,7 +506,7 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 
 	/* Calculate total size of all buffers (aligned to size of B_PAGE_SIZE) */
 	alloc = bufferSize * stream->num_buffers;
-	alloc = (alloc + B_PAGE_SIZE - 1) & (~(B_PAGE_SIZE -1));
+	alloc = PAGE_ALIGN(alloc);
 
 	/* Allocate memory for buffers */
 	stream->buffer_area = create_area("hda buffers", (void**)&buffer,
@@ -533,7 +535,7 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 
 	/* Now allocate BDL for buffer range */
 	alloc = stream->num_buffers * sizeof(bdl_entry_t);
-	alloc = (alloc + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+	alloc = PAGE_ALIGN(alloc);
 
 	stream->buffer_descriptors_area = create_area("hda buffer descriptors",
 		(void**)&bufferDescriptors, B_ANY_KERNEL_ADDRESS, alloc,
