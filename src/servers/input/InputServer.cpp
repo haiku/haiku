@@ -1492,6 +1492,9 @@ InputServer::_SanitizeEvents(EventList& events)
 					PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
 				}
 
+				if (!event->HasInt64("when"))
+					event->AddInt64("when", system_time());
+
 				event->AddInt32("modifiers", fKeyInfo.modifiers);
 				break;
 	   		}
