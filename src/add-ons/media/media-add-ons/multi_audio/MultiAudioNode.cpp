@@ -129,7 +129,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 	fPreferredFormat.u.raw_audio.format = MultiAudio::convert_to_media_format(fDevice->FormatInfo().output.format);
 	fPreferredFormat.u.raw_audio.valid_bits = MultiAudio::convert_to_valid_bits(fDevice->FormatInfo().output.format);
 	fPreferredFormat.u.raw_audio.channel_count = 2;
-	fPreferredFormat.u.raw_audio.frame_rate = MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().input.rate);		// measured in Hertz
+	fPreferredFormat.u.raw_audio.frame_rate = MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().output.rate);		// measured in Hertz
 	fPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 
 	// we'll use the consumer's preferred buffer size, if any
@@ -224,7 +224,7 @@ MultiAudioNode::NodeRegistered()
 				&& ( fDevice->Description().channels[i].designations & B_CHANNEL_LEFT ||
 					!(fDevice->Description().channels[i].designations & B_CHANNEL_SURROUND_BUS)))
 			) {
-			PRINT(("NodeRegistered() : creating an input for %i\n", i));
+			PRINT(("NodeRegistered() : creating an input for %li\n", i));
 			PRINT(("%ld\t%d\t0x%lx\t0x%lx\n",
 				fDevice->Description().channels[i].channel_id,
 				fDevice->Description().channels[i].kind,
@@ -270,7 +270,7 @@ MultiAudioNode::NodeRegistered()
 				&& ( fDevice->Description().channels[i].designations & B_CHANNEL_LEFT ||
 					!(fDevice->Description().channels[i].designations & B_CHANNEL_SURROUND_BUS)))
 			) {
-			PRINT(("NodeRegistered() : creating an output for %i\n", i));
+			PRINT(("NodeRegistered() : creating an output for %li\n", i));
 			PRINT(("%ld\t%d\t0x%lx\t0x%lx\n",fDevice->Description().channels[i].channel_id,
 											fDevice->Description().channels[i].kind,
 											fDevice->Description().channels[i].designations,
@@ -320,7 +320,7 @@ MultiAudioNode::NodeRegistered()
 		index++;
 	}
 
-	PRINT(("apply configuration in : %ld\n", system_time() - start));
+	PRINT(("apply configuration in : %Ld\n", system_time() - start));
 }
 
 
@@ -409,7 +409,7 @@ MultiAudioNode::GetNextInput(int32* cookie, media_input* _input)
 	node_input *channel = (node_input *)fInputs.ItemAt(*cookie);
 	*_input = channel->fInput;
 	*cookie += 1;
-	PRINT(("input.format : %u\n", channel->fInput.format.u.raw_audio.format));
+	PRINT(("input.format : %lu\n", channel->fInput.format.u.raw_audio.format));
 	return B_OK;
 }
 
@@ -1011,7 +1011,7 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 	} else {
 		//WriteBuffer(buffer, *channel);
 		if (channel->fBuffer != NULL) {
-			PRINT(("MultiAudioNode::HandleBuffer snoozing recycling channelId : %i, how_early:%lli\n", channel->fChannelId, how_early));
+			PRINT(("MultiAudioNode::HandleBuffer snoozing recycling channelId : %li, how_early:%Ld\n", channel->fChannelId, howEarly));
 			//channel->fBuffer->Recycle();
 			snooze(100);
 			if (channel->fBuffer != NULL)
@@ -1019,7 +1019,7 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 			else
 				channel->fBuffer = buffer;
 		} else {
-			//PRINT(("MultiAudioNode::HandleBuffer writing channelId : %i, how_early:%lli\n", channel->fChannelId, how_early));
+			//PRINT(("MultiAudioNode::HandleBuffer writing channelId : %li, how_early:%Ld\n", channel->fChannelId, how_early));
 			channel->fBuffer = buffer;
 		}
 	}
@@ -1032,7 +1032,7 @@ MultiAudioNode::_HandleDataStatus(const media_timed_event* event,
 	bigtime_t lateness, bool realTimeEvent)
 {
 	//CALLED();
-	PRINT(("MultiAudioNode::HandleDataStatus status:%li, lateness:%li\n", event->data, lateness));
+	PRINT(("MultiAudioNode::HandleDataStatus status:%li, lateness:%Li\n", event->data, lateness));
 	switch (event->data) {
 		case B_DATA_NOT_AVAILABLE:
 			break;
@@ -1168,7 +1168,7 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 {
 	CALLED();
 
-	PRINT(("id : %i\n", id));
+	PRINT(("id : %li\n", id));
 	BParameter* parameter = NULL;
 	for (int32 i = 0; i < fWeb->CountParameters(); i++) {
 		parameter = fWeb->ParameterAt(i);
@@ -1223,7 +1223,7 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 				}
 
 				for (uint32 i = 0; i < *size / sizeof(float); i++) {
-					PRINT(("GetParameterValue B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
+					PRINT(("GetParameterValue B_CONTINUOUS_PARAMETER value[%li] : %f\n", i, ((float*)value)[i]));
 				}
 			} else if (parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
 				BDiscreteParameter* discrete = (BDiscreteParameter*)parameter;
@@ -1235,7 +1235,7 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 				*size = sizeof(int32);
 
 				for (uint32 i = 0; i < *size / sizeof(int32); i++) {
-					PRINT(("GetParameterValue B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
+					PRINT(("GetParameterValue B_DISCRETE_PARAMETER value[%li] : %li\n", i, ((int32*)value)[i]));
 				}
 			}
 		}
@@ -1249,7 +1249,7 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 	const void* value, size_t size)
 {
 	CALLED();
-	PRINT(("id : %i, performance_time : %lld, size : %i\n", id, performanceTime, size));
+	PRINT(("id : %li, performance_time : %lld, size : %li\n", id, performanceTime, size));
 
 	BParameter* parameter = NULL;
 	for (int32 i = 0; i < fWeb->CountParameters(); i++) {
@@ -1270,7 +1270,7 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 
 	if (parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
 		for (uint32 i = 0; i < size / sizeof(float); i++) {
-			PRINT(("SetParameterValue B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
+			PRINT(("SetParameterValue B_CONTINUOUS_PARAMETER value[%li] : %f\n", i, ((float*)value)[i]));
 		}
 		info.item_count = 1;
 		values[0].id = id;
@@ -1283,7 +1283,7 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 		}
 	} else if (parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
 		for (uint32 i = 0; i < size / sizeof(int32); i++) {
-			PRINT(("SetParameterValue B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
+			PRINT(("SetParameterValue B_DISCRETE_PARAMETER value[%li] : %li\n", i, ((int32*)value)[i]));
 		}
 
 		BDiscreteParameter* discrete = (BDiscreteParameter*)parameter;
@@ -1312,7 +1312,7 @@ MultiAudioNode::MakeParameterWeb()
 	CALLED();
 	BParameterWeb* web = new BParameterWeb;
 
-	PRINT(("MixControlInfo().control_count : %i\n",
+	PRINT(("MixControlInfo().control_count : %li\n",
 		fDevice->MixControlInfo().control_count));
 
 	multi_mix_control* controls = fDevice->MixControlInfo().controls;
@@ -1389,7 +1389,7 @@ MultiAudioNode::_ProcessGroup(BParameterGroup* group, int32 index,
 				i++;
 			}
 
-			PRINT(("num parameters : %d\n", numParameters));
+			PRINT(("num parameters : %ld\n", numParameters));
 			if (numParameters > 0) {
 				(group->ParameterAt(numParameters - 1))->AddOutput(
 					group->ParameterAt(numParameters));
@@ -1981,7 +1981,7 @@ MultiAudioNode::GetConfigurationFor(BMessage* message)
 			&& parameter->Type() != BParameter::B_DISCRETE_PARAMETER)
 			continue;
 
-		PRINT(("getting parameter %i\n", parameter->ID()));
+		PRINT(("getting parameter %li\n", parameter->ID()));
 		size_t size = bufferSize;
 		while ((err = GetParameterValue(parameter->ID(), &lastChange, buffer,
 				&size)) == B_NO_MEMORY && bufferSize < 128 * 1024) {

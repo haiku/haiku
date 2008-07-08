@@ -180,18 +180,18 @@ MultiAudioDevice::_InitDriver()
 
 	for (int32 i = 0; i < fBufferList.return_playback_buffers; i++) {
 		for (int32 j = 0; j < fBufferList.return_playback_channels; j++) {
-			PRINT(("fBufferList.playback_buffers[%d][%d].base: %p\n",
+			PRINT(("fBufferList.playback_buffers[%ld][%ld].base: %p\n",
 				i, j, fBufferList.playback_buffers[i][j].base));
-			PRINT(("fBufferList.playback_buffers[%d][%d].stride: %i\n",
+			PRINT(("fBufferList.playback_buffers[%ld][%ld].stride: %li\n",
 				i, j, fBufferList.playback_buffers[i][j].stride));
 		}
 	}
 
 	for (int32 i = 0; i < fBufferList.return_record_buffers; i++) {
 		for (int32 j = 0; j < fBufferList.return_record_channels; j++) {
-			PRINT(("fBufferList.record_buffers[%d][%d].base: %p\n",
+			PRINT(("fBufferList.record_buffers[%ld][%ld].base: %p\n",
 				i, j, fBufferList.record_buffers[i][j].base));
-			PRINT(("fBufferList.record_buffers[%d][%d].stride: %i\n",
+			PRINT(("fBufferList.record_buffers[%ld][%ld].stride: %li\n",
 				i, j, fBufferList.record_buffers[i][j].stride));
 		}
 	}
