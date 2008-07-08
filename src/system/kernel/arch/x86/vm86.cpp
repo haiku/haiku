@@ -44,8 +44,8 @@
 #define PUSHF   0x9c
 #define STI     0xfb
 
-#define I_FLAG          (1 << 9)
-#define DIRECTION_FLAG  (1 << 10)
+#define I_FLAG          (1u << 9)
+#define DIRECTION_FLAG  (1u << 10)
 
 #define CSEG 0x2e
 #define SSEG 0x36
@@ -442,7 +442,7 @@ emulate(struct vm86_state *state)
 				uint16 flags = state->regs.flags;
 
 				/* store real IF */
-				flags &= I_FLAG;
+				flags &= ~I_FLAG;
 				flags |= (uint16)state->if_flag << 9;
 
 				pushw(&state->regs, flags);
@@ -475,10 +475,11 @@ emulate(struct vm86_state *state)
 		case PUSHF:
 		{
 			TRACE_NP("PUSHF");
-			uint16 flags = state->regs.flags & I_FLAG;
+			uint32 flags = state->regs.flags;
 
 			/* store real IF */
-			flags |= (uint16)state->if_flag << 9;
+			flags &= ~I_FLAG;
+			flags |= (uint32)state->if_flag << 9;
 			if (prefix.size)
 				pushl(&state->regs, flags);
 			else
