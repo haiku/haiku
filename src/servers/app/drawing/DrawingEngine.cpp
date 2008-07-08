@@ -1067,12 +1067,14 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BPoint penLocation = pt;
 
 	// try a fast clipping path
-	float fontSize = fPainter->Font().Size();
-	BRect clippingFrame = fPainter->ClippingRegion()->Frame();
-	if (pt.x > clippingFrame.right || pt.y + fontSize < clippingFrame.top
-		|| pt.y - fontSize > clippingFrame.bottom) {
-		penLocation.x += StringWidth(string, length, delta);
-		return penLocation;
+	if (fPainter->ClippingRegion()) {
+		float fontSize = fPainter->Font().Size();
+		BRect clippingFrame = fPainter->ClippingRegion()->Frame();
+		if (pt.x > clippingFrame.right || pt.y + fontSize < clippingFrame.top
+			|| pt.y - fontSize > clippingFrame.bottom) {
+			penLocation.x += StringWidth(string, length, delta);
+			return penLocation;
+		}
 	}
 
 	// use a FontCacheRefernece to speed up the second pass of
