@@ -176,6 +176,13 @@ fssh_mutex_unlock(fssh_mutex *mutex)
 }
 
 
+extern "C" void
+fssh_mutex_transfer_lock(fssh_mutex *mutex, fssh_thread_id thread)
+{
+	mutex->holder = thread;
+}
+
+
 //	#pragma mark -
 
 
@@ -187,6 +194,9 @@ fssh_rw_lock_init(fssh_rw_lock *lock, const char *name)
 
 	if (name == NULL)
 		name = "r/w lock";
+
+	lock->count = 0;
+	lock->holder = -1;
 
 	lock->sem = fssh_create_sem(FSSH_RW_MAX_READERS, name);
 	if (lock->sem < FSSH_B_OK)
@@ -214,6 +224,11 @@ fssh_rw_lock_destroy(fssh_rw_lock *lock)
 extern "C" fssh_status_t
 fssh_rw_lock_read_lock(fssh_rw_lock *lock)
 {
+	if (lock->holder == fssh_find_thread(NULL)) {
+		lock->count++;
+		return FSSH_B_OK;
+	}
+
 	return fssh_acquire_sem(lock->sem);
 }
 
@@ -221,6 +236,9 @@ fssh_rw_lock_read_lock(fssh_rw_lock *lock)
 extern "C" fssh_status_t
 fssh_rw_lock_read_unlock(fssh_rw_lock *lock)
 {
+	if (lock->holder == fssh_find_thread(NULL) && --lock->count > 0)
+		return FSSH_B_OK;
+
 	return fssh_release_sem(lock->sem);
 }
 
@@ -228,13 +246,29 @@ fssh_rw_lock_read_unlock(fssh_rw_lock *lock)
 extern "C" fssh_status_t
 fssh_rw_lock_write_lock(fssh_rw_lock *lock)
 {
-	return fssh_acquire_sem_etc(lock->sem, FSSH_RW_MAX_READERS, 0, 0);
+	if (lock->holder == fssh_find_thread(NULL)) {
+		lock->count++;
+		return FSSH_B_OK;
+	}
+
+	fssh_status_t status = fssh_acquire_sem_etc(lock->sem, FSSH_RW_MAX_READERS,
+		0, 0);
+	if (status == FSSH_B_OK) {
+		lock->holder = fssh_find_thread(NULL);
+		lock->count = 1;
+	}
+	return status;
 }
 
 
 extern "C" fssh_status_t
 fssh_rw_lock_write_unlock(fssh_rw_lock *lock)
 {
+	if (--lock->count > 0)
+		return FSSH_B_OK;
+
+	lock->holder = -1;
+
 	return fssh_release_sem_etc(lock->sem, FSSH_RW_MAX_READERS, 0);
 }
 

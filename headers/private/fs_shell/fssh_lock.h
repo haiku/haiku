@@ -32,6 +32,7 @@ typedef struct fssh_recursive_lock {
 
 typedef struct fssh_rw_lock {
 	fssh_sem_id		sem;
+	fssh_thread_id	holder;
 	int32_t			count;
 } fssh_rw_lock;
 
@@ -75,6 +76,7 @@ extern void fssh_mutex_destroy(fssh_mutex* lock);
 extern fssh_status_t fssh_mutex_lock(fssh_mutex* lock);
 extern fssh_status_t fssh_mutex_trylock(fssh_mutex* lock);
 extern void fssh_mutex_unlock(fssh_mutex* lock);
+extern void fssh_mutex_transfer_lock(fssh_mutex* lock, fssh_thread_id thread);
 
 #ifdef __cplusplus
 }

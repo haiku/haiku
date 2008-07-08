@@ -191,7 +191,7 @@ rw_lock_unblock(rw_lock* lock)
 				lock->waiters->last = waiter->last;
 
 			lock->holder = waiter->thread->id;
-	
+
 			// unblock thread
 			thread_unblock_locked(waiter->thread, B_OK);
 		}
@@ -221,6 +221,7 @@ rw_lock_init(rw_lock* lock, const char* name)
 	lock->holder = -1;
 	lock->reader_count = 0;
 	lock->writer_count = 0;
+	lock->owner_count = 0;
 	lock->flags = 0;
 }
 
@@ -233,6 +234,7 @@ rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags)
 	lock->holder = -1;
 	lock->reader_count = 0;
 	lock->writer_count = 0;
+	lock->owner_count = 0;
 	lock->flags = flags & RW_LOCK_FLAG_CLONE_NAME;
 }
 
@@ -284,6 +286,10 @@ rw_lock_read_lock(rw_lock* lock)
 		lock->reader_count++;
 		return B_OK;
 	}
+	if (lock->holder == thread_get_current_thread_id()) {
+		lock->owner_count++;
+		return B_OK;
+	}
 
 	return rw_lock_wait(lock, false);
 }
@@ -294,6 +300,18 @@ rw_lock_read_unlock(rw_lock* lock)
 {
 	InterruptsSpinLocker locker(thread_spinlock);
 
+	if (lock->holder == thread_get_current_thread_id()) {
+		if (--lock->owner_count > 0)
+			return B_OK;
+
+		// this originally has been a write lock
+		lock->writer_count--;
+		lock->holder = -1;
+
+		rw_lock_unblock(lock);
+		return B_OK;
+	}
+
 	if (lock->reader_count <= 0) {
 		panic("rw_lock_read_unlock(): lock %p not read-locked", lock);
 		return B_BAD_VALUE;
@@ -302,7 +320,6 @@ rw_lock_read_unlock(rw_lock* lock)
 	lock->reader_count--;
 
 	rw_lock_unblock(lock);
-
 	return B_OK;
 }
 
@@ -315,11 +332,22 @@ rw_lock_write_lock(rw_lock* lock)
 	if (lock->reader_count == 0 && lock->writer_count == 0) {
 		lock->writer_count++;
 		lock->holder = thread_get_current_thread_id();
+		lock->owner_count = 1;
+		return B_OK;
+	}
+	if (lock->holder == thread_get_current_thread_id()) {
+		lock->owner_count++;
 		return B_OK;
 	}
 
 	lock->writer_count++;
-	return rw_lock_wait(lock, true);
+
+	status_t status = rw_lock_wait(lock, true);
+	if (status == B_OK) {
+		lock->holder = thread_get_current_thread_id();
+		lock->owner_count = 1;
+	}
+	return status;
 }
 
 
@@ -333,6 +361,8 @@ rw_lock_write_unlock(rw_lock* lock)
 			lock);
 		return B_BAD_VALUE;
 	}
+	if (--lock->owner_count > 0)
+		return B_OK;
 
 	lock->writer_count--;
 	lock->holder = -1;

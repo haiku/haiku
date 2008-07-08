@@ -993,6 +993,7 @@
 #define mutex_lock					fssh_mutex_lock
 #define mutex_trylock				fssh_mutex_trylock
 #define mutex_unlock				fssh_mutex_unlock
+#define mutex_transfer_lock			fssh_mutex_transfer_lock
 
 
 ////////////////////////////////////////////////////////////////////////////////

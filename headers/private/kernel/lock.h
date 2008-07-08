@@ -46,6 +46,7 @@ typedef struct rw_lock {
 	thread_id				holder;
 	int32					reader_count;
 	int32					writer_count;
+	int32					owner_count;
 	uint32					flags;
 } rw_lock;
 
@@ -155,6 +156,15 @@ mutex_unlock(mutex* lock)
 #else
 	if (atomic_add(&lock->count, 1) < -1)
 		_mutex_unlock(lock);
+#endif
+}
+
+
+static inline void
+mutex_transfer_lock(mutex* lock, thread_id thread)
+{
+#ifdef KDEBUG
+	lock->holder = thread;
 #endif
 }
 
