@@ -372,6 +372,7 @@ echo_stream_new(echo_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	
 	stream->frames_count = 0;
 	stream->real_time = 0;
+	stream->buffer_cycle = 0;
 	stream->update_needed = false;
 	
 	status = lock();
