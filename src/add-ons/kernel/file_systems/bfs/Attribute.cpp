@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -71,7 +71,7 @@ Attribute::CheckAccess(const char *name, int openMode)
 }
 
 
-status_t 
+status_t
 Attribute::Get(const char *name)
 {
 	Put();
@@ -119,7 +119,7 @@ Attribute::Create(const char *name, type_code type, int openMode, attr_cookie **
 
 	attr_cookie *cookie = (attr_cookie *)malloc(sizeof(attr_cookie));
 	if (cookie == NULL)
-		RETURN_ERROR(B_NO_MEMORY); 
+		RETURN_ERROR(B_NO_MEMORY);
 
 	fName = name;
 
@@ -152,7 +152,7 @@ Attribute::Open(const char *name, int openMode, attr_cookie **_cookie)
 
 	attr_cookie *cookie = (attr_cookie *)malloc(sizeof(attr_cookie));
 	if (cookie == NULL)
-		RETURN_ERROR(B_NO_MEMORY); 
+		RETURN_ERROR(B_NO_MEMORY);
 
 	// initialize the cookie
 	strlcpy(cookie->name, fName, B_ATTR_NAME_LENGTH);
@@ -222,7 +222,7 @@ Attribute::_Truncate()
 	}
 
 	if (fAttribute != NULL) {
-		WriteLocked locked(fAttribute->Lock());
+		WriteLocker locker(fAttribute->Lock());
 		Transaction transaction(fAttribute->GetVolume(), fAttribute->BlockNumber());
 
 		status_t status = fAttribute->SetFileSize(transaction, 0);

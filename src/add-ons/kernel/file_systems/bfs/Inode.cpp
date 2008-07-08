@@ -328,7 +328,7 @@ Inode::Inode(Volume *volume, ino_t id)
 	char lockName[B_OS_NAME_LENGTH];
 	snprintf(lockName, sizeof(lockName), "bfs inode %d.%d",
 		(int)BlockRun().AllocationGroup(), BlockRun().Start());
-	fLock.Initialize(lockName);
+	rw_lock_init_etc(&fLock, lockName, RW_LOCK_FLAG_CLONE_NAME);
 
 	recursive_lock_init(&fSmallDataLock, "bfs inode small data");
 
@@ -361,7 +361,7 @@ Inode::Inode(Volume *volume, Transaction &transaction, ino_t id, mode_t mode,
 	char lockName[B_OS_NAME_LENGTH];
 	snprintf(lockName, sizeof(lockName), "bfs inode+%d.%d",
 		(int)run.AllocationGroup(), run.Start());
-	fLock.Initialize(lockName);
+	rw_lock_init_etc(&fLock, lockName, RW_LOCK_FLAG_CLONE_NAME);
 
 	recursive_lock_init(&fSmallDataLock, "bfs inode small data");
 
@@ -399,6 +399,8 @@ Inode::~Inode()
 	file_cache_delete(FileCache());
 	file_map_delete(Map());
 	delete fTree;
+
+	rw_lock_destroy(&fLock);
 }
 
 
@@ -429,9 +431,7 @@ Inode::InitCheck(bool checkNode)
 		}
 	}
 
-	// it's more important to know that the inode is corrupt
-	// so we check for the lock not until here
-	return fLock.InitCheck();
+	return B_OK;
 }
 
 
@@ -1055,7 +1055,7 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 	}
 
 	if (attribute != NULL) {
-		if (attribute->Lock().LockWrite() == B_OK) {
+		if (rw_lock_write_lock(&attribute->Lock()) == B_OK) {
 			// Save the old attribute data (if this fails, oldLength will
 			// reflect it)
 			if (fVolume->CheckForLiveQuery(name) && attribute->Size() > 0) {
@@ -1071,14 +1071,14 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 
 			if (status == B_OK) {
 				// it does - remove its file
-				attribute->Lock().UnlockWrite();
+				rw_lock_write_unlock(&attribute->Lock());
 				status = _RemoveAttribute(transaction, name, false, NULL);
 			} else {
 				// The attribute type might have been changed - we need to
 				// adopt the new one
 				attribute->Node().type = HOST_ENDIAN_TO_BFS_INT32(type);
 				status = attribute->WriteBack(transaction);
-				attribute->Lock().UnlockWrite();
+				rw_lock_write_unlock(&attribute->Lock());
 
 				if (status == B_OK) {
 					status = attribute->WriteAt(transaction, pos, buffer,
@@ -1376,7 +1376,7 @@ Inode::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 	if (pos < 0)
 		return B_BAD_VALUE;
 
-	ReadLocked locker(Lock());
+	ReadLocker locker(Lock());
 
 	if (pos >= Size() || length == 0) {
 		*_length = 0;
@@ -1393,8 +1393,8 @@ status_t
 Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 	size_t *_length)
 {
-	WriteLocked locker(Lock());
-	if (locker.IsLocked() < B_OK)
+	WriteLocker locker(Lock());
+	if (!locker.IsLocked())
 		RETURN_ERROR(B_ERROR);
 
 	// update the last modification time in memory, it will be written
@@ -2310,7 +2310,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 			RETURN_ERROR(B_BAD_VALUE);
 	}
 
-	WriteLocked locker(parent != NULL ? &parent->Lock() : NULL);
+	WriteLocker locker(parent != NULL ? &parent->Lock() : NULL);
 		// the parent directory is locked during the whole inode creation
 
 	if (parent != NULL && parent->IsDirectory()) {
@@ -2354,7 +2354,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 					return status;
 
 				// truncate the existing file
-				WriteLocked locked(inode->Lock());
+				WriteLocker _(inode->Lock());
 
 				status_t status = inode->SetFileSize(transaction, 0);
 				if (status >= B_OK)

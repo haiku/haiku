@@ -10,7 +10,6 @@
 
 #include "Volume.h"
 #include "Journal.h"
-#include "Lock.h"
 #include "Chain.h"
 #include "Debug.h"
 #include "CachedBlock.h"
@@ -45,7 +44,7 @@ class Inode {
 		ino_t ID() const { return fID; }
 		off_t BlockNumber() const { return fVolume->VnodeToBlock(fID); }
 
-		ReadWriteLock &Lock() { return fLock; }
+		rw_lock &Lock() { return fLock; }
 		recursive_lock &SmallDataLock() { return fSmallDataLock; }
 		status_t WriteBack(Transaction &transaction);
 
@@ -193,7 +192,7 @@ class Inode {
 		status_t _ShrinkStream(Transaction &transaction, off_t size);
 
 	private:
-		ReadWriteLock	fLock;
+		rw_lock			fLock;
 		Volume			*fVolume;
 		ino_t			fID;
 		BPlusTree		*fTree;

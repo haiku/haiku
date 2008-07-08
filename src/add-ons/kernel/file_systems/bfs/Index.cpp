@@ -1,5 +1,5 @@
-/* 
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -63,7 +63,7 @@ Index::SetTo(const char *name)
 {
 	// remove the old node, if the index is set for the second time
 	Unset();
-	
+
 	fName = name;
 		// only stores the pointer, so it assumes that it will stay constant
 		// in further comparisons (currently only used in Index::Update())
@@ -138,7 +138,7 @@ Index::KeySize()
 {
 	if (fNode == NULL)
 		return 0;
-	
+
 	int32 mode = fNode->Mode() & (S_STR_INDEX | S_INT_INDEX | S_UINT_INDEX
 		| S_LONG_LONG_INDEX | S_ULONG_LONG_INDEX | S_FLOAT_INDEX
 		| S_DOUBLE_INDEX);

@@ -1259,7 +1259,7 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength,
 #endif
 
 	// lock access to stream
-	WriteLocked locked(fStream->Lock());
+	WriteLocker locker(fStream->Lock());
 
 	Stack<node_and_key> stack;
 	if (_SeekDown(stack, key, keyLength) != B_OK)
@@ -1653,7 +1653,7 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength,
 		RETURN_ERROR(B_BAD_VALUE);
 
 	// lock access to stream
-	WriteLocked locked(fStream->Lock());
+	WriteLocker locker(fStream->Lock());
 
 	Stack<node_and_key> stack;
 	if (_SeekDown(stack, key, keyLength) != B_OK)
@@ -1771,7 +1771,7 @@ BPlusTree::Replace(Transaction &transaction, const uint8 *key,
 		RETURN_ERROR(B_BAD_TYPE);
 
 	// lock access to stream (a read lock is okay for this purpose)
-	ReadLocked locked(fStream->Lock());
+	ReadLocker locker(fStream->Lock());
 
 	off_t nodeOffset = fHeader->RootNode();
 	CachedNode cached(this);
@@ -1825,7 +1825,7 @@ BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
 		RETURN_ERROR(B_BAD_TYPE);
 
 	// lock access to stream
-	ReadLocked locked(fStream->Lock());
+	ReadLocker locker(fStream->Lock());
 
 	off_t nodeOffset = fHeader->RootNode();
 	CachedNode cached(this);
@@ -1889,7 +1889,7 @@ TreeIterator::Goto(int8 to)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	// lock access to stream
-	ReadLocked locked(fTree->fStream->Lock());
+	ReadLocker locker(fTree->fStream->Lock());
 
 	off_t nodeOffset = fTree->fHeader->RootNode();
 	CachedNode cached(fTree);
@@ -1959,7 +1959,7 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength,
 		return B_ENTRY_NOT_FOUND;
 
 	// lock access to stream
-	ReadLocked locked(fTree->fStream->Lock());
+	ReadLocker locker(fTree->fStream->Lock());
 
 	CachedNode cached(fTree);
 	const bplustree_node *node;
@@ -2095,7 +2095,7 @@ TreeIterator::Find(const uint8 *key, uint16 keyLength)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	// lock access to stream
-	ReadLocked locked(fTree->fStream->Lock());
+	ReadLocker locker(fTree->fStream->Lock());
 
 	off_t nodeOffset = fTree->fHeader->RootNode();
 

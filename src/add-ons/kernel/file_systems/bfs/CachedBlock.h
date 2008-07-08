@@ -12,7 +12,6 @@
 
 #include "Volume.h"
 #include "Journal.h"
-#include "Lock.h"
 #include "Chain.h"
 #include "Debug.h"
 
@@ -96,7 +95,7 @@ CachedBlock::CachedBlock(Volume *volume, block_run run)
 }
 
 
-inline 
+inline
 CachedBlock::CachedBlock(CachedBlock *cached)
 	:
 	fVolume(cached->fVolume),
@@ -161,7 +160,7 @@ CachedBlock::SetToWritable(Transaction &transaction, off_t block, off_t base,
 {
 	Unset();
 	fBlockNumber = block;
-	
+
 	if (empty) {
 		fBlock = (uint8 *)block_cache_get_empty(fVolume->BlockCache(),
 			block, transaction.ID());

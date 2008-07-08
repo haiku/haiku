@@ -339,7 +339,7 @@ bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if (!reenter)
-		inode->Lock().Lock();
+		rw_lock_read_lock(&inode->Lock());
 
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
@@ -368,7 +368,7 @@ bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	}
 
 	if (!reenter)
-		inode->Lock().Unlock();
+		rw_lock_read_unlock(&inode->Lock());
 
 	return status;
 }
@@ -388,7 +388,7 @@ bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if (!reenter)
-		inode->Lock().Lock();
+		rw_lock_read_lock(&inode->Lock());
 
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
@@ -417,7 +417,7 @@ bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	}
 
 	if (!reenter)
-		inode->Lock().Unlock();
+		rw_lock_read_unlock(&inode->Lock());
 
 	return status;
 }
@@ -646,11 +646,10 @@ bfs_fsync(fs_volume *_volume, fs_vnode *_node)
 		return B_BAD_VALUE;
 
 	Inode *inode = (Inode *)_node->private_node;
-	ReadLocked locked(inode->Lock());
+	ReadLocker locker(inode->Lock());
 
-	status_t status = locked.IsLocked();
-	if (status < B_OK)
-		RETURN_ERROR(status);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
 
 	return inode->Sync();
 }
@@ -689,8 +688,8 @@ bfs_write_stat(fs_volume *_volume, fs_vnode *_node, const struct stat *stat,
 
 	Transaction transaction(volume, inode->BlockNumber());
 
-	WriteLocked locked(inode->Lock());
-	if (locked.IsLocked() < B_OK)
+	WriteLocker locker(inode->Lock());
+	if (!locker.IsLocked())
 		RETURN_ERROR(B_ERROR);
 
 	bfs_inode &node = inode->Node();
@@ -1150,7 +1149,7 @@ bfs_open(fs_volume *_volume, fs_vnode *_node, int openMode, void **_cookie)
 	// Should we truncate the file?
 	if (openMode & O_TRUNC) {
 		Transaction transaction(volume, inode->BlockNumber());
-		WriteLocked locked(inode->Lock());
+		WriteLocker locker(inode->Lock());
 
 		status_t status = inode->SetFileSize(transaction, 0);
 		if (status >= B_OK)
@@ -1219,7 +1218,7 @@ bfs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		transaction.Done();
 
 	if (status == B_OK) {
-		ReadLocked locker(inode->Lock());
+		ReadLocker locker(inode->Lock());
 
 		// periodically notify if the file size has changed
 		// TODO: should we better test for a change in the last_modified time only?
@@ -1258,7 +1257,7 @@ bfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 	bool needsTrimming = false;
 
 	if (!volume->IsReadOnly()) {
-		ReadLocked locker(inode->Lock());
+		ReadLocker locker(inode->Lock());
 		needsTrimming = inode->NeedsTrimming();
 
 		if ((cookie->open_mode & O_RWMASK) != 0
@@ -1274,7 +1273,7 @@ bfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 	status_t status = transaction.IsStarted() ? B_OK : B_ERROR;
 
 	if (status == B_OK) {
-		WriteLocked locker(inode->Lock());
+		WriteLocker locker(inode->Lock());
 
 		// trim the preallocated blocks and update the size,
 		// and last_modified indices if needed
