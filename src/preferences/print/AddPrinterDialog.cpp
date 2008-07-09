@@ -400,7 +400,6 @@ void AddPrinterDialog::FillTransportMenu(BMenu* menu)
 
 		// Now get ports...
 		BString portId, portName;
-		status_t err;
 		msg.MakeEmpty();
 		msg.what = B_GET_PROPERTY;
 		msg.AddSpecifier("Ports");
