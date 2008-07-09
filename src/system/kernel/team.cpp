@@ -1041,20 +1041,25 @@ team_create_thread_start(void *args)
 		// the arguments are already on the user stack, we no longer need
 		// them in this form
 
-	// find runtime_loader path
-	KPath runtimeLoaderPath;
-	err = find_directory(B_BEOS_SYSTEM_DIRECTORY, gBootDevice, false,
-		runtimeLoaderPath.LockBuffer(), runtimeLoaderPath.BufferSize());
-	if (err < B_OK) {
-		TRACE(("team_create_thread_start: find_directory() failed: %s\n",
-			strerror(err))); 
-		return err;
-	}
-	runtimeLoaderPath.UnlockBuffer();
-	err = runtimeLoaderPath.Append("runtime_loader");
+	// NOTE: Normally arch_thread_enter_userspace() never returns, that is
+	// automatic variables with function scope will never be destroyed.
+	{
+		// find runtime_loader path
+		KPath runtimeLoaderPath;
+		err = find_directory(B_BEOS_SYSTEM_DIRECTORY, gBootDevice, false,
+			runtimeLoaderPath.LockBuffer(), runtimeLoaderPath.BufferSize());
+		if (err < B_OK) {
+			TRACE(("team_create_thread_start: find_directory() failed: %s\n",
+				strerror(err))); 
+			return err;
+		}
+		runtimeLoaderPath.UnlockBuffer();
+		err = runtimeLoaderPath.Append("runtime_loader");
 
-	if (err == B_OK)
-		err = elf_load_user_image(runtimeLoaderPath.Path(), team, 0, &entry);
+		if (err == B_OK)
+			err = elf_load_user_image(runtimeLoaderPath.Path(), team, 0, &entry);
+	}
+
 	if (err < B_OK) {
 		// Luckily, we don't have to clean up the mess we created - that's
 		// done for us by the normal team deletion process
@@ -1247,6 +1252,8 @@ static status_t
 exec_team(const char *path, char**& _flatArgs, size_t flatArgsSize,
 	int32 argCount, int32 envCount)
 {
+	// NOTE: Since this function normally doesn't return, don't use automatic
+	// variables that need destruction in the function scope.
 	char** flatArgs = _flatArgs;
 	struct team *team = thread_get_current_thread()->team;
 	struct team_arg *teamArgs;
@@ -2949,6 +2956,8 @@ status_t
 _user_exec(const char *userPath, const char* const* userFlatArgs,
 	size_t flatArgsSize, int32 argCount, int32 envCount)
 {
+	// NOTE: Since this function normally doesn't return, don't use automatic
+	// variables that need destruction in the function scope.
 	char path[B_PATH_NAME_LENGTH];
 
 	if (!IS_USER_ADDRESS(userPath) || !IS_USER_ADDRESS(userFlatArgs)
