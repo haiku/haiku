@@ -208,8 +208,8 @@ struct cache_info {
 	addr_t		committed;
 };
 
-static const int kCacheInfoTableCount = 10240;
-static cache_info sCacheInfoTable[kCacheInfoTableCount];
+static const int kCacheInfoTableCount = 100 * 1024;
+static cache_info* sCacheInfoTable;
 
 #endif	// DEBUG_CACHE_LIST
 
@@ -3171,7 +3171,7 @@ dump_caches_recursively(vm_cache* cache, cache_info& info, int level)
 	if (level == 0)
 		kprintf("/%lu", info.page_count);
 
-	if (cache->type == CACHE_TYPE_RAM) {
+	if (cache->type == CACHE_TYPE_RAM || level == 0 && info.committed > 0) {
 		kprintf(", committed: %lld", cache->store->committed_size);
 
 		if (level == 0)
@@ -3204,6 +3204,11 @@ dump_caches_recursively(vm_cache* cache, cache_info& info, int level)
 static int
 dump_caches(int argc, char **argv)
 {
+	if (sCacheInfoTable == NULL) {
+		kprintf("No cache info table!\n");
+		return 0;
+	}
+
 	bool sortByPageCount = true;
 
 	for (int32 i = 1; i < argc; i++) {
@@ -3224,7 +3229,10 @@ dump_caches(int argc, char **argv)
 	while (cache) {
 		totalCount++;
 		if (cache->source == NULL) {
-			cache_info& info = sCacheInfoTable[rootCount++];
+			cache_info stackInfo;
+			cache_info& info = rootCount < (uint32)kCacheInfoTableCount
+				? sCacheInfoTable[rootCount] : stackInfo;
+			rootCount++;
 			info.cache = cache;
 			info.page_count = 0;
 			info.committed = 0;
@@ -3236,9 +3244,12 @@ dump_caches(int argc, char **argv)
 		cache = cache->debug_next;
 	}
 
-	qsort(sCacheInfoTable, rootCount, sizeof(cache_info),
-		sortByPageCount
-			? &cache_info_compare_page_count : &cache_info_compare_committed);
+	if (rootCount <= (uint32)kCacheInfoTableCount) {
+		qsort(sCacheInfoTable, rootCount, sizeof(cache_info),
+			sortByPageCount
+				? &cache_info_compare_page_count
+				: &cache_info_compare_committed);
+	}
 
 	kprintf("total committed memory: %lld, total used pages: %lu\n",
 		totalCommitted, totalPages);
@@ -3246,10 +3257,13 @@ dump_caches(int argc, char **argv)
 		"tree...\n\n", totalCount, rootCount,
 		sortByPageCount ? "page count" : "committed size");
 
-	for (uint32 i = 0; i < rootCount; i++) {
-		cache_info& info = sCacheInfoTable[i];
-		dump_caches_recursively(info.cache, info, 0);
-	}
+	if (rootCount <= (uint32)kCacheInfoTableCount) {
+		for (uint32 i = 0; i < rootCount; i++) {
+			cache_info& info = sCacheInfoTable[i];
+			dump_caches_recursively(info.cache, info, 0);
+		}
+	} else
+		kprintf("Cache info table too small! Can't sort and print caches!\n");
 
 	return 0;
 }
@@ -3907,6 +3921,13 @@ vm_init(kernel_args *args)
 		create_area(name, &address, B_EXACT_ADDRESS, args->cpu_kstack[i].size,
 			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
+
+#if DEBUG_CACHE_LIST
+	create_area("cache info table", (void**)&sCacheInfoTable,
+		B_ANY_KERNEL_ADDRESS,
+		ROUNDUP(kCacheInfoTableCount * sizeof(cache_info), B_PAGE_SIZE),
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+#endif	// DEBUG_CACHE_LIST
 
 	// add some debugger commands
 	add_debugger_command("areas", &dump_area_list, "Dump a list of all areas");
