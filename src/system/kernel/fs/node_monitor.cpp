@@ -264,7 +264,7 @@ NodeMonitorService::_RemoveListener(monitor_listener *listener)
 {
 	node_monitor *monitor = listener->monitor;
 
-	// remove it from the listener and I/O context lists	
+	// remove it from the listener and I/O context lists
 	monitor->listeners.Remove(listener);
 	list_remove_link(listener);
 
@@ -317,7 +317,7 @@ NodeMonitorService::_GetMonitor(io_context *context, dev_t device, ino_t node,
 	if (monitor == NULL)
 		return B_NO_MEMORY;
 
-	// initialize monitor		
+	// initialize monitor
 	monitor->device = device;
 	monitor->node = node;
 
@@ -477,7 +477,7 @@ NodeMonitorService::_GetInterestedMonitorListeners(dev_t device, ino_t node,
 	\param message The message to be sent.
 	\param interestedListeners An array of listener lists.
 	\param interestedListenerCount The number of elements in the
-		   \a interestedListeners array. 
+		   \a interestedListeners array.
 	\return
 	- \c B_OK, if everything went fine,
 	- another error code otherwise.
@@ -950,7 +950,7 @@ notify_mount(dev_t device, dev_t parentDevice, ino_t parentDirectory)
 
 
 status_t
-remove_node_listener(dev_t device, dev_t node, NotificationListener& listener)
+remove_node_listener(dev_t device, ino_t node, NotificationListener& listener)
 {
 	return sNodeMonitorService.RemoveListener(get_current_io_context(true),
 		device, node, listener);
@@ -958,7 +958,7 @@ remove_node_listener(dev_t device, dev_t node, NotificationListener& listener)
 
 
 status_t
-add_node_listener(dev_t device, dev_t node, uint32 flags,
+add_node_listener(dev_t device, ino_t node, uint32 flags,
 	NotificationListener& listener)
 {
 	return sNodeMonitorService.AddListener(get_current_io_context(true),

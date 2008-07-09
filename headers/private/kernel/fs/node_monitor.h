@@ -17,9 +17,9 @@ struct io_context;
 
 class NotificationListener;
 
-extern status_t remove_node_listener(dev_t device, dev_t node,
+extern status_t remove_node_listener(dev_t device, ino_t node,
 	NotificationListener& listener);
-extern status_t add_node_listener(dev_t device, dev_t node, uint32 flags,
+extern status_t add_node_listener(dev_t device, ino_t node, uint32 flags,
 	NotificationListener& listener);
 
 extern "C" {
