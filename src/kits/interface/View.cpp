@@ -1393,7 +1393,11 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 {
 	_CheckOwnerLockAndSwitchCurrent();
 
-	if (checkMessageQueue) {
+	uint32 eventOptions = fEventOptions | fMouseEventOptions;
+	bool noHistory = eventOptions & B_NO_POINTER_HISTORY;
+	bool fullHistory = eventOptions & B_FULL_POINTER_HISTORY;
+
+	if (checkMessageQueue && !noHistory) {
 		Window()->UpdateIfNeeded();
 		BMessageQueue *queue = Window()->MessageQueue();
 		queue->Lock();
@@ -1410,7 +1414,7 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 					if (!Window()->_StealMouseMessage(message, deleteMessage))
 						continue;
 
-					if (message->what == B_MOUSE_MOVED) {
+					if (!fullHistory && message->what == B_MOUSE_MOVED) {
 						// Check if the message is too old. Some applications
 						// check the message queue in such a way that mouse
 						// messages *must* pile up. This check makes them work

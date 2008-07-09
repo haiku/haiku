@@ -43,7 +43,11 @@ enum {
 enum {
 	B_LOCK_WINDOW_FOCUS		= 0x00000001,
 	B_SUSPEND_VIEW_FOCUS	= 0x00000002,
-	B_NO_POINTER_HISTORY	= 0x00000004
+	B_NO_POINTER_HISTORY	= 0x00000004,
+	// new in Haiku (unless this flag is
+	// specified, both BWindow and BView::GetMouse()
+	// will filter out older mouse moved messages)
+	B_FULL_POINTER_HISTORY	= 0x00000008
 };
 
 enum {

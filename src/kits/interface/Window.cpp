@@ -1092,8 +1092,20 @@ FrameMoved(origin);
 		case B_MOUSE_MOVED:
 		{
 			if (BView *view = dynamic_cast<BView *>(target)) {
-				if (((view->fEventOptions | view->fMouseEventOptions)
-						& B_NO_POINTER_HISTORY) != 0) {
+
+				uint32 eventOptions = view->fEventOptions
+					| view->fMouseEventOptions;
+				bool noHistory = eventOptions & B_NO_POINTER_HISTORY;
+				bool fullHistory = eventOptions & B_FULL_POINTER_HISTORY;
+
+				bigtime_t eventTime;
+				if (noHistory
+					|| msg->FindInt64("when", (int64*)&eventTime) < B_OK) {
+					eventTime = system_time();
+				}
+
+				if (noHistory || (!fullHistory
+						&& (system_time() - eventTime > 20000))) {
 					// filter out older mouse moved messages in the queue
 					_DequeueAll();
 					BMessageQueue *queue = MessageQueue();
@@ -1102,6 +1114,9 @@ FrameMoved(origin);
 					BMessage *moved;
 					for (int32 i = 0; (moved = queue->FindMessage(i)) != NULL; i++) {
 						if (moved != msg && moved->what == B_MOUSE_MOVED) {
+							// there is a newer mouse moved message in the
+							// queue, just ignore the current one, the newer one
+							// will be handled here eventually
 							queue->Unlock();
 							return;
 						}
@@ -1115,14 +1130,6 @@ FrameMoved(origin);
 				msg->FindPoint("be:view_where", &where);
 				msg->FindInt32("buttons", (int32*)&buttons);
 				msg->FindInt32("be:transit", (int32*)&transit);
-
-#if 0
-				bigtime_t when;
-				if (msg->FindInt64("when", (int64*)&when) < B_OK)
-					printf("BWindow B_MOUSE_MOVED no when\n");
-				else if (system_time() - when > 5000)
-					printf("BWindow B_MOUSE_MOVED lagging behind\n");
-#endif
 
 				BMessage* dragMessage = NULL;
 				if (msg->HasMessage("be:drag_message")) {
