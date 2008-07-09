@@ -41,8 +41,7 @@
 #define MAX_INPUTS				32
 #define MAX_IO_WIDGETS			8
 
-/* FIXME: Find out why we need so much! */
-#define DEFAULT_FRAMES_PER_BUFFER	4096
+#define DEFAULT_FRAMES_PER_BUFFER	512
 
 #define STREAM_MAX_BUFFERS	10
 #define STREAM_MIN_BUFFERS	2
