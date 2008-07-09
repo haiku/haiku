@@ -1410,6 +1410,30 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 					if (!Window()->_StealMouseMessage(message, deleteMessage))
 						continue;
 
+					if (message->what == B_MOUSE_MOVED) {
+						// Check if the message is too old. Some applications
+						// check the message queue in such a way that mouse
+						// messages *must* pile up. This check makes them work
+						// as intended, although these applications could simply
+						// use the version of BView::GetMouse() that does not
+						// check the history. Also note that it isn't a problem
+						// to delete the message in case there is not a newer
+						// one. If we don't find a message in the queue, we will
+						// just fall back to asking the app_sever directly. So
+						// the imposed delay will not be a problem on slower
+						// computers. This check also prevents another problem,
+						// when the message that we use is *not* removed from
+						// the queue. Subsequent calls to GetMouse() would find
+						// this message over and over!
+						bigtime_t eventTime;
+						if (message->FindInt64("when", &eventTime) == B_OK
+							&& system_time() - eventTime > 10000) {
+							// just discard the message
+							if (deleteMessage)
+								delete message;
+							continue;
+						}
+					}
 					message->FindPoint("screen_where", location);
 					message->FindInt32("buttons", (int32 *)buttons);
 					queue->Unlock();
