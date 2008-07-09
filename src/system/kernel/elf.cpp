@@ -752,11 +752,8 @@ unload_elf_image(struct elf_image_info *image)
 
 	unregister_elf_image(image);
 
-// TODO: We're leaking memory here. We can't just free those, since in case of
-// pre-loaded images they have been allocated by the bootloader via
-// kernel_args_malloc().
-//	free(image->debug_symbols);
-//	free((void*)image->debug_string_table);
+	free(image->debug_symbols);
+	free((void*)image->debug_string_table);
 	free(image->elf_header);
 	free(image->name);
 	free(image);
@@ -897,9 +894,28 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 	} else
 		sKernelImage = image;
 
-	image->debug_symbols = preloadedImage->debug_symbols;
+	// copy debug symbols to the kernel heap
+	if (preloadedImage->debug_symbols != NULL) {
+		int32 debugSymbolsSize = sizeof(Elf32_Sym)
+			* preloadedImage->num_debug_symbols;
+		image->debug_symbols = (Elf32_Sym*)malloc(debugSymbolsSize);
+		if (image->debug_symbols != NULL) {
+			memcpy(image->debug_symbols, preloadedImage->debug_symbols,
+				debugSymbolsSize);
+		}
+	}
 	image->num_debug_symbols = preloadedImage->num_debug_symbols;
-	image->debug_string_table = preloadedImage->debug_string_table;
+
+	// copy debug string table to the kernel heap
+	if (preloadedImage->debug_string_table != NULL) {
+		image->debug_string_table = (char*)malloc(
+			preloadedImage->debug_string_table_size);
+		if (image->debug_string_table != NULL) {
+			memcpy((void*)image->debug_string_table,
+				preloadedImage->debug_string_table,
+				preloadedImage->debug_string_table_size);
+		}
+	}
 
 	register_elf_image(image);
 	preloadedImage->id = image->id;
