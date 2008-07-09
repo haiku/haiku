@@ -752,6 +752,11 @@ unload_elf_image(struct elf_image_info *image)
 
 	unregister_elf_image(image);
 
+// TODO: We're leaking memory here. We can't just free those, since in case of
+// pre-loaded images they have been allocated by the bootloader via
+// kernel_args_malloc().
+//	free(image->debug_symbols);
+//	free((void*)image->debug_string_table);
 	free(image->elf_header);
 	free(image->name);
 	free(image);
