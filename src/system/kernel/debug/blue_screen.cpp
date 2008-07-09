@@ -103,6 +103,8 @@ scroll_up(void)
 static void
 next_line(void)
 {
+	bool abortCommand = false;
+
 #if USE_SCROLLING
 	// TODO: scrolling is usually too slow; we could probably just remove it
 	if (sScreen.y == sScreen.rows - 1)
@@ -121,7 +123,9 @@ next_line(void)
 		// Use the paging mechanism: either, we're in the debugger, and a
 		// command is being executed, or we're currently showing boot debug
 		// output
-		const char *text = "Press key to continue, Q to quit, A to abort";
+		const char *text = in_command_invocation()
+			? "Press key to continue, Q to quit, S to skip output"
+			: "Press key to continue, Q or S to skip output";
 		int32 length = strlen(text);
 		if (sScreen.x + length > sScreen.columns) {
 			// make sure we don't overwrite too much
@@ -136,11 +140,10 @@ next_line(void)
 		}
 
 		char c = blue_screen_getchar();
-		if (c == 'q') {
+		if (c == 's') {
 			sScreen.ignore_output = true;
-		} else if (c == 'a') {
-			abort_debugger_command();
-				// should not return
+		} else if (c == 'q') {
+			abortCommand = in_command_invocation();
 			sScreen.ignore_output = true;
 		}
 
@@ -162,6 +165,11 @@ next_line(void)
 	}
 #endif
 	sScreen.x = 0;
+
+	if (abortCommand) {
+		abort_debugger_command();
+			// should not return
+	}
 }
 
 
