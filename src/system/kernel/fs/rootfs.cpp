@@ -588,7 +588,7 @@ rootfs_fsync(fs_volume *_volume, fs_vnode *_v)
 
 
 static status_t
-rootfs_read(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, 
+rootfs_read(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 	off_t pos, void *buffer, size_t *_length)
 {
 	return EINVAL;
@@ -596,10 +596,10 @@ rootfs_read(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 
 
 static status_t
-rootfs_write(fs_volume *_volume, fs_vnode *vnode, void *cookie, 
+rootfs_write(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 	off_t pos, const void *buffer, size_t *_length)
 {
-	TRACE(("rootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", 
+	TRACE(("rootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n",
 		vnode, cookie, pos, *_length));
 
 	return EPERM;
@@ -638,7 +638,7 @@ rootfs_create_dir(fs_volume *_volume, fs_vnode *_dir, const char *name,
 
 	notify_entry_created(fs->id, dir->id, name, vnode->id);
 
-	mutex_unlock(&fs->lock);	
+	mutex_unlock(&fs->lock);
 	return B_OK;
 
 err:
@@ -767,6 +767,7 @@ rootfs_read_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 
 	cookie->current = nextChildNode;
 	cookie->state = nextState;
+	*_num = 1;
 	status = B_OK;
 
 err:
@@ -971,7 +972,7 @@ rootfs_rename(fs_volume *_volume, fs_vnode *_fromDir, const char *fromName,
 	rootfs_remove_from_dir(fs, fromDirectory, vnode);
 
 	// Add it back to the dir with the new name.
-	// We need to do this even in the same directory, 
+	// We need to do this even in the same directory,
 	// so that it keeps sorted correctly.
 	rootfs_insert_in_dir(fs, toDirectory, vnode);
 
@@ -1044,7 +1045,7 @@ rootfs_write_stat(fs_volume *_volume, fs_vnode *_vnode, const struct stat *stat,
 
 	if (statMask & B_STAT_MODIFICATION_TIME)
 		vnode->modification_time = stat->st_mtime;
-	if (statMask & B_STAT_CREATION_TIME) 
+	if (statMask & B_STAT_CREATION_TIME)
 		vnode->creation_time = stat->st_crtime;
 
 	mutex_unlock(&fs->lock);

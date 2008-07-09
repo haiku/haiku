@@ -1427,6 +1427,7 @@ devfs_read_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 
 	cookie->current = nextChildNode;
 	cookie->state = nextState;
+	*_num = 1;
 
 	return B_OK;
 }
