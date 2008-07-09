@@ -29,6 +29,7 @@ extern "C" {
 #endif
 
 void boot_splash_init(uint8 * boot_splash);
+void boot_splash_uninit(void);
 void boot_splash_set_stage(int stage);
 
 #ifdef __cplusplus

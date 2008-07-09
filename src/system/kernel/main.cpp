@@ -245,17 +245,6 @@ main2(void *unused)
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_1_INIT_MODULES);
 	module_init(&sKernelArgs);
 
-	// ToDo: the preloaded image debug data is placed in the kernel args, and
-	//	thus, if they are enabled, the kernel args shouldn't be freed, so
-	//	that we don't have to copy them.
-	//	What is yet missing is a mechanism that controls this (via driver settings).
-	if (0) {
-		// module_init() is supposed to be the last user of the kernel args
-		// Note: don't confuse the kernel_args structure (which is never freed)
-		// with the kernel args ranges it contains (and which are freed here).
-		vm_free_kernel_args(&sKernelArgs);
-	}
-
 	// init userland debugging
 	TRACE("Init Userland debugging\n");
 	init_user_debug();
@@ -297,9 +286,16 @@ main2(void *unused)
 	device_manager_init_post_modules(&sKernelArgs);
 
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_7_RUN_BOOT_SCRIPT);
-//	kernel_args_free(sKernelArgs.boot_splash);
-// NOTE: We could introduce a syscall to draw more icons indicating
-// stages in the boot script itself. Then we should not free the image.
+	boot_splash_uninit();
+		// NOTE: We could introduce a syscall to draw more icons indicating
+		// stages in the boot script itself. Then we should not free the image.
+		// In that case we should copy it over to the kernel heap, so that we
+		// can still free the kernel args.
+
+	// The boot splash screen is the last user of the kernel args.
+	// Note: don't confuse the kernel_args structure (which is never freed)
+	// with the kernel args ranges it contains (and which are freed here).
+	vm_free_kernel_args(&sKernelArgs);
 
 	// start the init process
 	{

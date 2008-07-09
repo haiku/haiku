@@ -186,6 +186,13 @@ boot_splash_init(uint8 *boot_splash)
 
 
 void
+boot_splash_uninit(void)
+{
+	sInfo = NULL;
+}
+
+
+void
 boot_splash_set_stage(int stage)
 {
 	TRACE("boot_splash_set_stage: stage=%d\n", stage);
