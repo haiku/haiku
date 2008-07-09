@@ -1,6 +1,7 @@
-/* 
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DIRENT_H
 #define _DIRENT_H
 
@@ -17,10 +18,7 @@ typedef struct dirent {
 	char			d_name[1];	/* name of the entry (null byte terminated) */
 } dirent_t;
 
-typedef struct {
-	int				fd;
-	struct dirent	ent;
-} DIR;
+typedef struct __DIR DIR;
 
 #ifndef MAXNAMLEN
 #	ifdef  NAME_MAX

@@ -1,5 +1,5 @@
-/* 
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,10 +10,12 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#include "dirent_private.h"
 #include "syscalls.h"
 
 
-// ToDo: think about adding special syscalls for the read/write/stat functions to speed them up
+// TODO: think about adding special syscalls for the read/write/stat functions
+// to speed them up
 
 #define RETURN_AND_SET_ERRNO(status) \
 	{ \
@@ -24,11 +26,8 @@
 		return status; \
 	}
 
-// for the DIR structure
-#define BUFFER_SIZE 2048
 
-
-ssize_t 
+ssize_t
 fs_read_attr(int fd, const char *attribute, uint32 type,
 	off_t pos, void *buffer, size_t readBytes)
 {
@@ -48,7 +47,7 @@ fs_read_attr(int fd, const char *attribute, uint32 type,
 }
 
 
-ssize_t 
+ssize_t
 fs_write_attr(int fd, const char *attribute, uint32 type,
 	off_t pos, const void *buffer, size_t writeBytes)
 {
@@ -65,7 +64,7 @@ fs_write_attr(int fd, const char *attribute, uint32 type,
 }
 
 
-int 
+int
 fs_remove_attr(int fd, const char *attribute)
 {
 	status_t status = _kern_remove_attr(fd, attribute);
@@ -74,7 +73,7 @@ fs_remove_attr(int fd, const char *attribute)
 }
 
 
-int 
+int
 fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 {
 	struct stat stat;
@@ -96,17 +95,17 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 
 
 /*
-int 
+int
 fs_open_attr(const char *path, const char *attribute, uint32 type, int openMode)
 {
-	// ToDo: implement fs_open_attr() - or remove it completely
+	// TODO: implement fs_open_attr() - or remove it completely
 	//	if it will be implemented, rename the current fs_open_attr() to fs_fopen_attr()
 	return B_ERROR;
 }
 */
 
 
-int 
+int
 fs_open_attr(int fd, const char *attribute, uint32 type, int openMode)
 {
 	status_t status;
@@ -120,7 +119,7 @@ fs_open_attr(int fd, const char *attribute, uint32 type, int openMode)
 }
 
 
-int 
+int
 fs_close_attr(int fd)
 {
 	status_t status = _kern_close(fd);
@@ -141,13 +140,14 @@ open_attr_dir(int file, const char *path)
 	}
 
 	/* allocate the memory for the DIR structure */
-	if ((dir = (DIR *)malloc(sizeof(DIR) + BUFFER_SIZE)) == NULL) {
+	if ((dir = (DIR *)malloc(DIR_BUFFER_SIZE)) == NULL) {
 		errno = B_NO_MEMORY;
 		_kern_close(fd);
 		return NULL;
 	}
 
 	dir->fd = fd;
+	dir->entries_left = 0;
 
 	return dir;
 }
@@ -167,7 +167,7 @@ fs_fopen_attr_dir(int fd)
 }
 
 
-int 
+int
 fs_close_attr_dir(DIR *dir)
 {
 	int status = _kern_close(dir->fd);
@@ -181,22 +181,13 @@ fs_close_attr_dir(DIR *dir)
 struct dirent *
 fs_read_attr_dir(DIR *dir)
 {
-	ssize_t count = _kern_read_dir(dir->fd, &dir->ent, BUFFER_SIZE, 1);
-	if (count <= 0) {
-		if (count < 0)
-			errno = count;
-		return NULL;
-	}
-
-	return &dir->ent;
+	return readdir(dir);
 }
 
 
-void 
+void
 fs_rewind_attr_dir(DIR *dir)
 {
-	int status = _kern_rewind_dir(dir->fd);
-	if (status < 0)
-		errno = status;
+	rewinddir(dir);
 }
 

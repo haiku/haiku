@@ -1,5 +1,5 @@
-/* 
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+/*
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,11 +11,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "syscalls.h"
-
-
-// for the DIR structure
-#define BUFFER_SIZE 2048
+#include <dirent_private.h>
+#include <syscalls.h>
 
 
 static DIR *
@@ -35,13 +32,16 @@ open_query_etc(dev_t device, const char *query,
 	}
 
 	// allocate a DIR
-	DIR *dir = (DIR *)malloc(BUFFER_SIZE);
+	DIR *dir = (DIR *)malloc(DIR_BUFFER_SIZE);
 	if (!dir) {
 		_kern_close(fd);
 		errno = B_NO_MEMORY;
 		return NULL;
 	}
+
 	dir->fd = fd;
+	dir->entries_left = 0;
+
 	return dir;
 }
 
@@ -84,24 +84,7 @@ fs_close_query(DIR *dir)
 struct dirent *
 fs_read_query(DIR *dir)
 {
-	// check parameters
-	if (dir == NULL) {
-		errno = B_BAD_VALUE;
-		return NULL;
-	}
-
-	// read
-	int32 bufferSize = BUFFER_SIZE - ((uint8 *)&dir->ent - (uint8 *)dir);
-	ssize_t result = _kern_read_dir(dir->fd, &dir->ent, bufferSize, 1);
-	if (result < 0) {
-		errno = result;
-		return NULL;
-	}
-	if (result == 0) {
-		errno = B_ENTRY_NOT_FOUND;
-		return NULL;
-	}
-	return &dir->ent;
+	return readdir(dir);
 }
 
 

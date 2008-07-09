@@ -1,7 +1,7 @@
-/* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <fs_index.h>
@@ -10,7 +10,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "syscalls.h"
+#include <dirent_private.h>
+#include <syscalls.h>
 
 
 #define RETURN_AND_SET_ERRNO(status) \
@@ -22,9 +23,6 @@
 		return status; \
 	}
 
-// for the DIR structure
-#define BUFFER_SIZE 2048
-
 
 int
 fs_create_index(dev_t device, const char *name, uint32 type, uint32 flags)
@@ -35,7 +33,7 @@ fs_create_index(dev_t device, const char *name, uint32 type, uint32 flags)
 }
 
 
-int 
+int
 fs_remove_index(dev_t device, const char *name)
 {
 	status_t status = _kern_remove_index(device, name);
@@ -44,7 +42,7 @@ fs_remove_index(dev_t device, const char *name)
 }
 
 
-int 
+int
 fs_stat_index(dev_t device, const char *name, struct index_info *indexInfo)
 {
 	struct stat stat;
@@ -75,19 +73,20 @@ fs_open_index_dir(dev_t device)
 	}
 
 	/* allocate the memory for the DIR structure */
-	if ((dir = (DIR *)malloc(sizeof(DIR) + BUFFER_SIZE)) == NULL) {
+	if ((dir = (DIR *)malloc(DIR_BUFFER_SIZE)) == NULL) {
 		errno = B_NO_MEMORY;
 		_kern_close(fd);
 		return NULL;
 	}
 
 	dir->fd = fd;
+	dir->entries_left = 0;
 
 	return dir;
 }
 
 
-int 
+int
 fs_close_index_dir(DIR *dir)
 {
 	int status = _kern_close(dir->fd);
@@ -101,22 +100,13 @@ fs_close_index_dir(DIR *dir)
 struct dirent *
 fs_read_index_dir(DIR *dir)
 {
-	ssize_t count = _kern_read_dir(dir->fd, &dir->ent, BUFFER_SIZE, 1);
-	if (count <= 0) {
-		if (count < 0)
-			errno = count;
-		return NULL;
-	}
-
-	return &dir->ent;
+	return readdir(dir);
 }
 
 
-void 
+void
 fs_rewind_index_dir(DIR *dir)
 {
-	int status = _kern_rewind_dir(dir->fd);
-	if (status < 0)
-		errno = status;
+	rewinddir(dir);
 }
 

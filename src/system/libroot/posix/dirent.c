@@ -1,17 +1,16 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
-
-#include <syscalls.h>
 
 #include <dirent.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 
-
-#define BUFFER_SIZE 4096
+#include <dirent_private.h>
+#include <syscalls.h>
 
 
 #define RETURN_AND_SET_ERRNO(err) \
@@ -34,13 +33,14 @@ opendir(const char *path)
 	}
 
 	/* allocate the memory for the DIR structure */
-	if ((dir = (DIR *)malloc(sizeof(DIR) + BUFFER_SIZE)) == NULL) {
+	if ((dir = (DIR *)malloc(DIR_BUFFER_SIZE)) == NULL) {
 		errno = B_NO_MEMORY;
 		_kern_close(fd);
 		return NULL;
 	}
 
 	dir->fd = fd;
+	dir->entries_left = 0;
 
 	return dir;
 }
@@ -60,26 +60,42 @@ closedir(DIR *dir)
 struct dirent *
 readdir(DIR *dir)
 {
-	/* get the next entry and return a pointer to a dirent structure 
-	 * containing the data
-	 */
-	
-	ssize_t count = _kern_read_dir(dir->fd, &dir->ent, BUFFER_SIZE, 1);
+	ssize_t count;
+
+	if (dir->entries_left > 0) {
+		struct dirent *dirent
+			= (struct dirent *)((uint8 *)&dir->first_entry + dir->next_entry);
+
+		dir->entries_left--;
+		dir->next_entry += dirent->d_reclen;
+
+		return dirent;
+	}
+
+	// we need to retrieve new entries
+
+	count = _kern_read_dir(dir->fd, &dir->first_entry, DIRENT_BUFFER_SIZE,
+		USHRT_MAX);
 	if (count <= 0) {
 		if (count < 0)
 			errno = count;
 
+		// end of directory
 		return NULL;
 	}
-	
-	return &dir->ent;
+
+	dir->entries_left = count - 1;
+	dir->next_entry = dir->first_entry.d_reclen;
+
+	return &dir->first_entry;
 }
 
 
 int
 readdir_r(DIR *dir, struct dirent *entry, struct dirent **_result)
 {
-	ssize_t count = _kern_read_dir(dir->fd, entry, sizeof(struct dirent) + B_FILE_NAME_LENGTH, 1);
+	ssize_t count = _kern_read_dir(dir->fd, entry, sizeof(struct dirent)
+		+ B_FILE_NAME_LENGTH, 1);
 	if (count < B_OK)
 		return count;
 
@@ -99,14 +115,16 @@ rewinddir(DIR *dir)
 	status_t status = _kern_rewind_dir(dir->fd);
 	if (status < 0)
 		errno = status;
+	else
+		dir->entries_left = 0;
 }
 
 
-/** This is no POSIX compatible call; it's not exported in the headers
- *	but here for BeOS compatiblity.
- */
+#ifndef _KERNEL_MODE
 
-// ToDo: disable this for the kernel build! (will be possible once we use Kernel build rules for the kernel only)
+/* This is no POSIX compatible call; it's not exported in the headers
+ * but here for BeOS compatiblity.
+ */
 
 int dirfd(DIR *dir);
 
@@ -115,3 +133,5 @@ dirfd(DIR *dir)
 {
 	return dir->fd;
 }
+
+#endif	// !_KERNEL_MODE
