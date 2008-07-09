@@ -62,12 +62,14 @@ fail:
 void
 nb_destroy(net_buffer* nbuf)
 {
+	if (nbuf == NULL)
+		return;
 
     /* Free possible allocated */
     if (nbuf->COOKIEFIELD != NULL)
         free((void*)nbuf->COOKIEFIELD);
 
-// TODO check for survivers...
+	// TODO check for survivers...
 	if (nb != NULL)
 	    nb->free(nbuf);
     

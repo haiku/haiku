@@ -38,6 +38,7 @@ printf("### \n");
 status_t 
 HCITransportAccessor::Launch() {
 
-	return B_OK;
+	uint32 dummy;	
+	return ioctl(fFD, BT_UP, &dummy, sizeof(uint32));
 
 }

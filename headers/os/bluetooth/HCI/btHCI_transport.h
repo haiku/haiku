@@ -13,11 +13,11 @@
 #include <net_buffer.h>
 #include <Drivers.h>
 
-typedef enum { ANCILLYANT = 1, 
-               RUNNING, 
-               LEAVING,
-               SENDING,
-               PROCESSING
+typedef enum { ANCILLYANT = (1<<0), 
+               RUNNING    = (1<<1), 
+               LEAVING    = (1<<2),
+               SENDING    = (1<<3),
+               PROCESSING = (1<<4)
               } bt_transport_status_t;
 
 typedef uint8 bt_stat_t; 
@@ -84,6 +84,7 @@ typedef struct bt_hci_device {
 
 enum {
 	ISSUE_BT_COMMAND = B_DEVICE_OP_CODES_END + BT_IOCTLS_OFFSET ,
+	BT_UP,
 	GET_STATICS,
 	GET_NOTIFICATION_PORT, 
     GET_HCI_ID

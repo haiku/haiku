@@ -20,10 +20,11 @@ class LocalDeviceHandler {
 
 public:
 
-	virtual hci_id GetID();
+	hci_id GetID();
 	
-	virtual bool Available();	
+	bool Available();	
 	void Acquire(void);
+	status_t Launch(void);
 	
 	BMessage* 	  GetPropertiesMessage(void) { return fProperties; }
 	bool  		  IsPropertyAvailable(const BString& property);

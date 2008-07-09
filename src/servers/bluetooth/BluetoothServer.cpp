@@ -135,6 +135,9 @@ void BluetoothServer::MessageReceived(BMessage *message)
             }
             
             status = B_WOULD_BLOCK;
+            
+            /* TODO: This should be by user request only! */
+            ldi->Launch();
         }   
 			
 		case BT_MSG_COUNT_LOCAL_DEVICES: 

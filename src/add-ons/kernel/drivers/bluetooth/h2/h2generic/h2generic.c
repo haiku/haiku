@@ -429,8 +429,8 @@ device_open(const char *name, uint32 flags, void **cookie)
 	}	
 	
 	acquire_sem(bdev->lock);	
-	// Set HCI_RUNNING
-	if ( TEST_AND_SET(&bdev->state, RUNNING) ) {
+	// Set RUNNING
+	if ( TEST_AND_SET(&bdev->state, ANCILLYANT) ) {
 	    flowf("dev already running! - reOpened device!\n");
 	    return B_ERROR;
 	}	
@@ -451,7 +451,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 	// dumping the USB frames	
     init_room(&bdev->eventRoom);
     init_room(&bdev->aclRoom);
-    //Init_room(new_bt_dev->scoRoom);
+    //init_room(new_bt_dev->scoRoom);
     
    	list_init(&bdev->snetBufferRecycleTrash);		
     			
@@ -470,37 +470,15 @@ device_open(const char *name, uint32 flags, void **cookie)
         hdev = bdev->num;
     }    	
 	bdev->hdev = hdev;		
-
-	//  H: set the special flags
-
-    //  EVENTS
-	err = submit_rx_event(bdev);
-	if (err != B_OK)    
-	    goto unrun;	    
-#if BT_DRIVER_SUPPORTS_ACL        	
-	// ACL
-	for (i = 0; i < MAX_ACL_IN_WINDOW; i++)  {		
-		err = submit_rx_acl(bdev);
-		if (err != B_OK && i == 0 )
-		    goto unrun;			    
-	}
-#endif
-
-#if BT_DRIVER_SUPPORTS_SCO
-	// TODO:  SCO / eSCO
-#endif	
 		
+
+
 	*cookie = bdev;	
 	release_sem(bdev->lock);	
 
 	flowf(" successful\n");
 	return B_OK;
 
-unrun:
-    CLEAR_BIT(bdev->state, RUNNING);	// Set the flaq in the HCI world
-	flowf("Queuing failed device stops running\n");
-
-	return err;
 }
 
 
@@ -617,13 +595,42 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 		    snb_put(snbuf, params, size);
 			
 			err = submit_tx_command(bdev, snbuf);
-		    		
+			debugf("device launched %ld\n", err);				    		
+		break;
+		
+		case BT_UP:
+
+		    //  EVENTS
+			err = submit_rx_event(bdev);
+			if (err != B_OK) {
+			    CLEAR_BIT(bdev->state, ANCILLYANT);
+				flowf("Queuing failed device stops running\n");
+				break;
+			}
+			
+			#if BT_DRIVER_SUPPORTS_ACL // ACL
+			for (i = 0; i < MAX_ACL_IN_WINDOW; i++) {
+				err = submit_rx_acl(bdev);
+				if (err != B_OK && i == 0 ) {
+	  			    CLEAR_BIT(bdev->state, ANCILLYANT);	// Set the flaq in the HCI world
+					flowf("Queuing failed device stops running\n");
+					break;
+			   	}
+			}
+			#endif
+			
+			SET_BIT(bdev->state, RUNNING);
+			
+			#if BT_DRIVER_SUPPORTS_SCO
+				// TODO:  SCO / eSCO
+			#endif
+			flowf("device launched\n");
 		break;
 		
 		case GET_STATICS:
 		    memcpy(params, &bdev->stat, sizeof(bt_hci_statistics));
 		    err = B_OK;
-		break;		
+		break;
 
 		case GET_HCI_ID:
 		    *(hci_id*)params = bdev->hdev;

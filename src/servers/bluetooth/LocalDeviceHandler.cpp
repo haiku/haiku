@@ -29,6 +29,12 @@ LocalDeviceHandler::GetID()
     return fHCIDelegate->GetID();
 }
 
+status_t
+LocalDeviceHandler::Launch(void)
+{
+    return fHCIDelegate->Launch();
+}
+
 
 bool 
 LocalDeviceHandler::Available() {
