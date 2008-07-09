@@ -19,15 +19,20 @@
 #include <FindDirectory.h>
 #include <NodeMonitor.h>
 
+#include <dirent_private.h>
+
 #include <boot_device.h>
 #include <boot/elf.h>
 #include <elf.h>
 #include <fs/KPath.h>
+#include <fs/node_monitor.h>
 #include <lock.h>
 #include <Notifications.h>
 #include <safemode.h>
+#include <syscalls.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
+#include <util/Stack.h>
 #include <vfs.h>
 
 
@@ -138,33 +143,49 @@ typedef struct module_iterator {
 
 namespace Module {
 
-struct module_listener : DoublyLinkedListLink<module_listener> {
+struct entry {
+	dev_t				device;
+	ino_t				node;
+};
+
+struct hash_entry : entry {
+	HashTableLink<hash_entry> link;
+};
+
+struct NodeHashDefinition {
+	typedef entry* KeyType;
+	typedef hash_entry ValueType;
+
+	size_t Hash(ValueType* entry) const
+		{ return HashKey(entry); }
+	HashTableLink<ValueType>* GetLink(ValueType* entry) const
+		{ return &entry->link; }
+
+	size_t HashKey(KeyType key) const
+	{
+		return ((uint32)(key->node >> 32) + (uint32)key->node) ^ key->device;
+	}
+
+	bool Compare(KeyType key, ValueType* entry) const
+	{
+		return key->device == entry->device
+			&& key->node == entry->node;
+	}
+};
+
+typedef OpenHashTable<NodeHashDefinition> NodeHash;
+
+struct module_listener : DoublyLinkedListLinkImpl<module_listener> {
+	~module_listener()
+	{
+		free((char*)prefix);
+	}
+
 	NotificationListener* listener;
 	const char*			prefix;
 };
 
 typedef DoublyLinkedList<module_listener> ModuleListenerList;
-
-class ModuleNotificationService : public NotificationService {
-public:
-						ModuleNotificationService();
-	virtual				~ModuleNotificationService();
-
-			status_t	InitCheck();
-
-			status_t	AddListener(const KMessage* eventSpecifier,
-							NotificationListener& listener);
-			status_t	UpdateListener(const KMessage* eventSpecifier,
-							NotificationListener& listener);
-			status_t	RemoveListener(const KMessage* eventSpecifier,
-							NotificationListener& listener);
-
-	virtual const char*	Name() { return "modules"; }
-
-private:
-	recursive_lock		fLock;
-	ModuleListenerList	fListeners;
-};
 
 class DirectoryWatcher : public NotificationListener {
 public:
@@ -182,6 +203,43 @@ public:
 
 	virtual void		EventOccured(NotificationService& service,
 							const KMessage* event);
+};
+
+class ModuleNotificationService : public NotificationService {
+public:
+						ModuleNotificationService();
+	virtual				~ModuleNotificationService();
+
+			status_t	InitCheck();
+
+			status_t	AddListener(const KMessage* eventSpecifier,
+							NotificationListener& listener);
+			status_t	UpdateListener(const KMessage* eventSpecifier,
+							NotificationListener& listener);
+			status_t	RemoveListener(const KMessage* eventSpecifier,
+							NotificationListener& listener);
+
+			bool		HasNode(dev_t device, ino_t node);
+
+	virtual const char*	Name() { return "modules"; }
+
+private:
+			status_t	_AddNode(dev_t device, ino_t node, uint32 flags,
+							NotificationListener& listener);
+			status_t	_AddDirectoryNode(dev_t device, ino_t node);
+			status_t	_AddModuleNode(dev_t device, ino_t node);
+
+			status_t	_AddDirectory(const char* prefix);
+			status_t	_ScanDirectory(char* directoryPath, const char* prefix,
+							size_t& prefixPosition);
+			status_t	_ScanDirectory(Stack<DIR*>& stack, DIR* dir,
+							const char* prefix, size_t prefixPosition);
+
+	recursive_lock		fLock;
+	ModuleListenerList	fListeners;
+	NodeHash			fNodes;
+	DirectoryWatcher	fDirectoryWatcher;
+	ModuleWatcher		fModuleWatcher;
 };
 
 }	// namespace Module
@@ -926,7 +984,7 @@ nextModuleImage:
 	while (*iterator->current_header != NULL) {
 		module_info* info = *iterator->current_header;
 
-		// TODO: we mightS want to create a module here and cache it in the
+		// TODO: we might want to create a module here and cache it in the
 		// hash table
 
 		iterator->current_header++;
@@ -1124,8 +1182,14 @@ DirectoryWatcher::EventOccured(NotificationService& service,
 	if (opcode == B_ENTRY_MOVED) {
 		// Determine wether it's a move within, out of, or into one
 		// of our watched directories.
-		ino_t from = event->GetInt64("from directory", -1);
-		ino_t to = event->GetInt64("to directory", -1);
+		directory = event->GetInt64("to directory", -1);
+		if (!sModuleNotificationService.HasNode(device, directory)) {
+			directory = event->GetInt64("from directory", -1);
+			opcode = B_ENTRY_REMOVED;
+		} else {
+			// Move within, doesn't sound like a good idea for modules
+			opcode = B_ENTRY_CREATED;
+		}
 	}
 
 	KPath path(B_PATH_NAME_LENGTH + 1);
@@ -1137,6 +1201,7 @@ DirectoryWatcher::EventOccured(NotificationService& service,
 
 	dprintf("module \"%s\" %s\n", path.Leaf(),
 		opcode == B_ENTRY_CREATED ? "added" : "removed");
+	//sModuleNotificationService.Notify(path.Path(), opcode);
 }
 
 
@@ -1181,7 +1246,30 @@ status_t
 ModuleNotificationService::AddListener(const KMessage* eventSpecifier,
 	NotificationListener& listener)
 {
-	return B_ERROR;
+	const char* prefix = eventSpecifier->GetString("prefix", NULL);
+	if (prefix == NULL)
+		return B_BAD_VALUE;
+
+	module_listener* moduleListener = new(std::nothrow) module_listener;
+	if (moduleListener == NULL)
+		return B_NO_MEMORY;
+
+	moduleListener->prefix = strdup(prefix);
+	if (moduleListener->prefix == NULL) {
+		delete moduleListener;
+		return B_NO_MEMORY;
+	}
+
+	status_t status = _AddDirectory(prefix);
+	if (status != B_OK) {
+		delete moduleListener;
+		return status;
+	}
+
+	moduleListener->listener = &listener;
+	fListeners.Add(moduleListener);
+
+	return B_OK;
 }
 
 
@@ -1198,6 +1286,205 @@ ModuleNotificationService::RemoveListener(const KMessage* eventSpecifier,
 	NotificationListener& listener)
 {
 	return B_ERROR;
+}
+
+
+bool
+ModuleNotificationService::HasNode(dev_t device, ino_t node)
+{
+	RecursiveLocker _(fLock);
+
+	struct entry entry = {device, node};
+	return fNodes.Lookup(&entry) != NULL;
+}
+
+
+status_t
+ModuleNotificationService::_AddNode(dev_t device, ino_t node, uint32 flags,
+	NotificationListener& listener)
+{
+	RecursiveLocker locker(fLock);
+
+	if (HasNode(device, node))
+		return B_OK;
+
+	struct hash_entry* entry = new(std::nothrow) hash_entry;
+	if (entry == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = add_node_listener(device, node, flags, listener);
+	if (status != B_OK) {
+		delete entry;
+		return status;
+	}
+
+	//dprintf("  add %s %ld:%Ld\n", flags == B_WATCH_DIRECTORY ? "dir" : "file", device, node);
+
+	entry->device = device;
+	entry->node = node;
+	fNodes.Insert(entry);
+
+	return B_OK;
+}
+
+
+status_t
+ModuleNotificationService::_AddDirectoryNode(dev_t device, ino_t node)
+{
+	return _AddNode(device, node, B_WATCH_DIRECTORY, fDirectoryWatcher);
+}
+
+
+status_t
+ModuleNotificationService::_AddModuleNode(dev_t device, ino_t node)
+{
+	return _AddNode(device, node, B_WATCH_STAT, fModuleWatcher);
+}
+
+
+status_t
+ModuleNotificationService::_AddDirectory(const char* prefix)
+{
+	for (uint32 i = 0; i < kNumModulePaths; i++) {
+		if (sDisableUserAddOns && i >= kFirstNonSystemModulePath)
+			break;
+
+		KPath pathBuffer;
+		if (find_directory(kModulePaths[i], gBootDevice, true,
+				pathBuffer.LockBuffer(), pathBuffer.BufferSize()) != B_OK)
+			continue;
+
+		pathBuffer.UnlockBuffer();
+		pathBuffer.Append("kernel");
+		pathBuffer.Append(prefix);
+
+		size_t prefixPosition = strlen(prefix);
+		status_t status = _ScanDirectory(pathBuffer.LockBuffer(), prefix,
+			prefixPosition);
+
+		pathBuffer.UnlockBuffer();
+
+		if (status != B_OK)
+			return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ModuleNotificationService::_ScanDirectory(char* directoryPath,
+	const char* prefix, size_t& prefixPosition)
+{
+	DIR* dir = NULL;
+	while (true) {
+		dir = opendir(directoryPath);
+		if (dir != NULL || prefixPosition == 0)
+			break;
+
+		// the full prefix is not accessible, remove path components
+		const char* parentPrefix = prefix + prefixPosition - 1;
+		while (parentPrefix != prefix && parentPrefix[0] != '/')
+			parentPrefix--;
+
+		size_t cutPosition = parentPrefix - prefix;
+		size_t length = strlen(directoryPath);
+		directoryPath[length - prefixPosition + cutPosition] = '\0';
+		prefixPosition = cutPosition;
+	}
+
+	if (dir == NULL)
+		return B_ERROR;
+
+	Stack<DIR*> stack;
+	stack.Push(dir);
+
+	while (stack.Pop(&dir)) {
+		status_t status = _ScanDirectory(stack, dir, prefix, prefixPosition);
+		if (status != B_OK)
+			return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ModuleNotificationService::_ScanDirectory(Stack<DIR*>& stack, DIR* dir,
+	const char* prefix, size_t prefixPosition)
+{
+	bool directMatchAdded = false;
+	struct dirent* dirent;
+
+	while ((dirent = readdir(dir)) != NULL) {
+		if (dirent->d_name[0] == '.')
+			continue;
+
+		bool directMatch = false;
+
+		if (prefix[prefixPosition] != '\0') {
+			// the start must match
+			const char* startPrefix = prefix + prefixPosition;
+			if (startPrefix[0] == '/')
+				startPrefix++;
+
+			const char* endPrefix = strchr(startPrefix, '/');
+			size_t length;
+
+			if (endPrefix != NULL)
+				length = endPrefix - startPrefix;
+			else
+				length = strlen(startPrefix);
+
+			if (strncmp(dirent->d_name, startPrefix, length))
+				continue;
+
+			if (dirent->d_name[length] == '\0')
+				directMatch = true;
+		}
+
+		struct stat stat;
+		status_t status = vfs_read_stat(dir->fd, dirent->d_name, true, &stat,
+			true);
+		if (status != B_OK)
+			continue;
+
+		if (S_ISDIR(stat.st_mode)) {
+			int fd = _kern_open_dir(dir->fd, dirent->d_name);
+			if (fd < 0)
+				continue;
+
+			DIR* subDir = (DIR*)malloc(DIR_BUFFER_SIZE);
+			if (subDir == NULL) {
+				close(fd);
+				continue;
+			}
+
+			subDir->fd = fd;
+			subDir->entries_left = 0;
+
+			stack.Push(subDir);
+
+			if (_AddDirectoryNode(stat.st_dev, stat.st_ino) == B_OK
+				&& directMatch)
+				directMatchAdded = true;
+		} else if (S_ISREG(stat.st_mode)) {
+			if (_AddModuleNode(stat.st_dev, stat.st_ino) == B_OK && directMatch)
+				directMatchAdded = true;
+		}
+	}
+
+	if (!directMatchAdded) {
+		// We need to monitor this directory to see if a matching file
+		// is added.
+		struct stat stat;
+		status_t status = vfs_read_stat(dir->fd, NULL, true, &stat, true);
+		if (status == B_OK)
+			_AddDirectoryNode(stat.st_dev, stat.st_ino);
+	}
+
+	closedir(dir);
+	return B_OK;
 }
 
 
