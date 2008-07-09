@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -135,7 +135,7 @@ public:
 	status_t ReceiveFrom(port_id fromPort, bigtime_t timeout = -1,
 		port_message_info* messageInfo = NULL);
 
-	void Dump(void (*printFunc)(const char*,...));
+	void Dump(void (*printFunc)(const char*,...)) const;
 
 private:
 	friend class KMessageField;
@@ -201,7 +201,7 @@ public:
 	type_code TypeCode() const;
 	bool HasFixedElementSize() const;
 	int32 ElementSize() const;		// if HasFixedElementSize()
-	
+
 	status_t AddElement(const void *data, int32 size = -1);
 	status_t AddElements(const void *data, int32 count, int32 elementSize = -1);
 	const void *ElementAt(int32 index, int32 *size = NULL) const;

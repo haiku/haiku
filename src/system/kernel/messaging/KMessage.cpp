@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -601,7 +601,7 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout,
 
 
 void
-KMessage::Dump(void (*printFunc)(const char*,...))
+KMessage::Dump(void (*printFunc)(const char*,...)) const
 {
 	Header* header = _Header();
 	printFunc("KMessage: buffer: %p (size/capacity: %ld/%ld), flags: 0x0lx\n",
@@ -946,7 +946,7 @@ int32
 KMessageField::ElementSize() const
 {
 	KMessage::FieldHeader* header = _Header();
-	return (header ? header->elementSize : -1); 
+	return (header ? header->elementSize : -1);
 }
 
 // AddElement
@@ -992,7 +992,7 @@ int32
 KMessageField::CountElements() const
 {
 	KMessage::FieldHeader* header = _Header();
-	return (header ? header->elementCount : 0); 
+	return (header ? header->elementCount : 0);
 }
 
 // SetTo
