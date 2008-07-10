@@ -21,11 +21,13 @@
 #include <VectorSet.h>
 
 #include <KernelExport.h>
-#include <util/kernel_cpp.h>
-
 #include <NodeMonitor.h>
+
+#include <boot_device.h>
+#include <kmodule.h>
 #include <node_monitor.h>
 #include <Notifications.h>
+#include <util/kernel_cpp.h>
 #include <vfs.h>
 
 #include <dirent.h>
@@ -89,6 +91,30 @@ struct KDiskDeviceManager::DiskSystemMap : VectorMap<disk_system_id,
 
 // PartitionSet
 struct KDiskDeviceManager::PartitionSet : VectorSet<KPartition*> {
+};
+
+
+class KDiskDeviceManager::DiskSystemWatcher : public NotificationListener {
+public:
+	DiskSystemWatcher(KDiskDeviceManager* manager)
+		:
+		fManager(manager)
+	{
+	}
+
+	virtual ~DiskSystemWatcher()
+	{
+	}
+
+	virtual void EventOccured(NotificationService& service,
+		const KMessage* event)
+	{
+		if (event->GetInt32("opcode", -1) != B_ENTRY_REMOVED)
+			fManager->RescanDiskSystems();
+	}
+
+private:
+	KDiskDeviceManager* fManager;
 };
 
 
@@ -170,6 +196,7 @@ KDiskDeviceManager::KDiskDeviceManager()
 	  fObsoletePartitions(new(nothrow) PartitionSet),
 	  fMediaChecker(-1),
 	  fTerminating(false),
+	  fDiskSystemWatcher(NULL),
 	  fDeviceWatcher(new(nothrow) DeviceWatcher(this))
 {
 	if (InitCheck() != B_OK)
@@ -905,9 +932,17 @@ KDiskDeviceManager::StartMonitoring()
 {
 	// do another scan, this will populate the devfs directories
 	InitialDeviceScan();
+
+	// start monitoring the disk systems
+	fDiskSystemWatcher = new(std::nothrow) DiskSystemWatcher(this);
+	if (fDiskSystemWatcher != NULL) {
+		start_watching_modules(kFileSystemPrefix, *fDiskSystemWatcher);
+		start_watching_modules(kPartitioningSystemPrefix,
+			*fDiskSystemWatcher);
+	}
+
 	// start monitoring all dirs under /dev/disk
-	status_t result = _AddRemoveMonitoring("/dev/disk", true);
-	return result;
+	return _AddRemoveMonitoring("/dev/disk", true);
 }
 
 
@@ -959,9 +994,13 @@ KDiskDeviceManager::RescanDiskSystems()
 {
 	DiskSystemMap addedSystems;
 
+	Lock();
+
 	// rescan for partitioning and file systems
 	_RescanDiskSystems(addedSystems, false);
 	_RescanDiskSystems(addedSystems, true);
+
+	Unlock();
 
 	// rescan existing devices with the new disk systems
 	int32 cookie = 0;

@@ -102,6 +102,7 @@ private:
 	struct DiskSystemMap;
 	struct PartitionMap;
 	struct PartitionSet;
+	class DiskSystemWatcher;
 	class DeviceWatcher;
 
 	static status_t _CheckMediaStatusDaemon(void* self);
@@ -132,6 +133,7 @@ private:
 	PartitionSet				*fObsoletePartitions;
 	thread_id					fMediaChecker;
 	volatile bool				fTerminating;
+	DiskSystemWatcher			*fDiskSystemWatcher;
 	DeviceWatcher				*fDeviceWatcher;
 
 	static KDiskDeviceManager	*sDefaultManager;
