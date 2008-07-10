@@ -7,6 +7,7 @@
  *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 
 
@@ -183,7 +184,7 @@ FontList::_Update()
 				delete family;
 				return B_NO_MEMORY;
 			}
-			
+
 			link.ReadString(style->name);
 			link.Read<uint16>(&style->face);
 			link.Read<uint32>(&style->flags);
@@ -365,12 +366,12 @@ status_t set_font_cache_info(uint32 id, void *set)
 	\param family the new family for the system font
 	\param style the new style for the system font
 	\param size the size for the system font to have
-	
+
 	R5 used a global area offset table to set the system fonts in the Font
 	preferences panel. Bleah.
 */
 void
-_set_system_font_(const char *which, font_family family, font_style style, 
+_set_system_font_(const char *which, font_family family, font_style style,
 	float size)
 {
 	BPrivate::AppServerLink link;
@@ -401,6 +402,59 @@ _get_system_default_font_(const char* which, font_family family,
 	link.ReadString(family, sizeof(font_family));
 	link.ReadString(style, sizeof(font_style));
 	link.Read<float>(_size);
+	return B_OK;
+}
+
+
+void
+_set_font_subpixel_antialiasing_(bool subpix)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_SET_FONT_SUBPIXEL_ANTIALIASING);
+	link.Attach<bool>(subpix);
+	link.Flush();
+}
+
+
+status_t
+_get_font_subpixel_antialiasing_(bool* subpix)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_FONT_SUBPIXEL_ANTIALIASING);
+	int32 status = B_ERROR;
+	if (link.FlushWithReply(status) != B_OK
+		|| status < B_OK)
+		return status;
+	link.Read<bool>(subpix);
+	return B_OK;
+}
+
+
+void
+_set_hinting_(bool hinting)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_SET_HINTING);
+	link.Attach<bool>(hinting);
+	link.Flush();
+}
+
+
+status_t
+_get_hinting_(bool* hinting)
+{
+
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_HINTING);
+	int32 status = B_ERROR;
+	if (link.FlushWithReply(status) != B_OK
+		|| status < B_OK)
+		return status;
+	link.Read<bool>(hinting);
 	return B_OK;
 }
 
@@ -469,7 +523,7 @@ get_font_style(font_family family, int32 index, font_style *_name,
 	\param flags if non-NULL, the values of the flags IS_FIXED and
 		B_HAS_TUNED_FONT are returned
 	\return B_ERROR if the index does not correspond to a font style
-	
+
 	The face value returned by this function is not very reliable. At the same
 	time, the value returned should be fairly reliable, returning the proper
 	flag for 90%-99% of font names.
@@ -500,7 +554,7 @@ update_font_families(bool /*checkOnly*/)
 //	#pragma mark -
 
 
-BFont::BFont() 
+BFont::BFont()
 	:
 	// initialise for be_plain_font (avoid circular definition)
 	fFamilyID(0),
@@ -619,7 +673,7 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	\param family Font family to set
 	\param face Font face to set.
 	\return B_ERROR if family does not exists or face is an invalid value.
-	
+
 	To comply with the BeBook, this function will only set valid values - i.e.
 	passing a nonexistent family will cause only the face to be set.
 	Additionally, if a particular  face does not exist in a family, the closest
@@ -817,7 +871,7 @@ BFont::Direction() const
 	_GetExtraFlags();
 	return (font_direction)(fExtraFlags >> B_PRIVATE_FONT_DIRECTION_SHIFT);
 }
- 
+
 
 bool
 BFont::IsFixed() const
@@ -830,7 +884,7 @@ BFont::IsFixed() const
 /*!
 	\brief Returns true if the font is fixed-width and contains both full
 		   and half-width characters
-	
+
 	This was left unimplemented as of R5. It was a way to work with both
 	Kanji and Roman characters in the same fixed-width font.
 */
@@ -943,7 +997,7 @@ BFont::TruncateString(BString *inOut, uint32 mode, float width) const
 
 
 void
-BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings, 
+BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 	uint32 mode, float width, BString resultArray[]) const
 {
 	if (stringArray && resultArray && numStrings > 0) {
@@ -967,7 +1021,7 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 
 
 void
-BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings, 
+BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 	uint32 mode, float width, char *resultArray[]) const
 {
 	if (stringArray && numStrings > 0) {
@@ -1018,7 +1072,7 @@ BFont::StringWidth(const char *string, int32 length) const
 
 
 void
-BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[], 
+BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	int32 numStrings, float widthArray[]) const
 {
 	if (!stringArray || !lengthArray || numStrings < 1 || !widthArray)
@@ -1232,7 +1286,7 @@ BFont::_GetBoundingBoxes(const char charArray[], int32 numChars,
 	link.Attach<float>(fShear);
 	link.Attach<float>(fFalseBoldWidth);
 	link.Attach<uint8>(fSpacing);
-	
+
 	link.Attach<uint32>(fFlags);
 	link.Attach<font_metric_mode>(mode);
 	link.Attach<bool>(string_escapement);
