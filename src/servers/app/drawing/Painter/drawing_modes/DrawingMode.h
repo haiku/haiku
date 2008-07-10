@@ -1,6 +1,7 @@
 /*
- * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Base class for different drawing modes.
  *
@@ -34,6 +35,16 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	d[3] = 255; \
 }
 
+#define BLEND_SUBPIX(d, r, g, b, a1, a2, a3) \
+{ \
+	pixel32 _p; \
+	_p.data32 = *(uint32*)d; \
+	d[0] = (((((b) - _p.data8[0]) * (a1)) + (_p.data8[0] << 8)) >> 8); \
+	d[1] = (((((g) - _p.data8[1]) * (a2)) + (_p.data8[1] << 8)) >> 8); \
+	d[2] = (((((r) - _p.data8[2]) * (a3)) + (_p.data8[2] << 8)) >> 8); \
+	d[3] = 255; \
+}
+
 // BLEND_FROM
 //
 // This macro assumes source alpha in range 0..255 and
@@ -46,6 +57,14 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	d[0] = (((((b2) - (b1)) * (a)) + ((b1) << 8)) >> 8); \
 	d[1] = (((((g2) - (g1)) * (a)) + ((g1) << 8)) >> 8); \
 	d[2] = (((((r2) - (r1)) * (a)) + ((r1) << 8)) >> 8); \
+	d[3] = 255; \
+}
+
+#define BLEND_FROM_SUBPIX(d, r1, g1, b1, r2, g2, b2, a1, a2, a3) \
+{ \
+	d[0] = (((((b2) - (b1)) * (a1)) + ((b1) << 8)) >> 8); \
+	d[1] = (((((g2) - (g1)) * (a2)) + ((g1) << 8)) >> 8); \
+	d[2] = (((((r2) - (r1)) * (a3)) + ((r1) << 8)) >> 8); \
 	d[3] = 255; \
 }
 
@@ -65,7 +84,16 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	d[3] = 255; \
 }
 
-
+// BLEND16_SUBPIX
+#define BLEND16_SUBPIX(d, r, g, b, a1, a2, a3) \
+{ \
+	pixel32 _p; \
+	_p.data32 = *(uint32*)d; \
+	d[0] = (((((b) - _p.data8[0]) * (a1)) + (_p.data8[0] << 16)) >> 16); \
+	d[1] = (((((g) - _p.data8[1]) * (a2)) + (_p.data8[1] << 16)) >> 16); \
+	d[2] = (((((r) - _p.data8[2]) * (a3)) + (_p.data8[2] << 16)) >> 16); \
+	d[3] = 255; \
+}
 
 // BLEND_COMPOSITE
 //
@@ -99,6 +127,43 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	} \
 }
 
+// BLEND_COMPOSITE_SUBPIX
+#define BLEND_COMPOSITE_SUBPIX(d, r, g, b, a1, a2, a3) \
+{ \
+	pixel32 _p; \
+	_p.data32 = *(uint32*)d; \
+	if (_p.data8[3] == 255) { \
+		d[0] = (((((b) - _p.data8[0]) * (a1)) + (_p.data8[0] << 8)) >> 8); \
+		d[1] = (((((g) - _p.data8[1]) * (a2)) + (_p.data8[1] << 8)) >> 8); \
+		d[2] = (((((r) - _p.data8[2]) * (a3)) + (_p.data8[2] << 8)) >> 8); \
+		d[3] = 255; \
+	} else { \
+		if (_p.data8[3] == 0) { \
+			d[0] = (b); \
+			d[1] = (g); \
+			d[2] = (r); \
+			d[3] = (a1 + a2 + a3)/3; \
+		} else { \
+			uint8 alphaRest1 = 255 - (a1); \
+			uint8 alphaRest2 = 255 - (a2); \
+			uint8 alphaRest3 = 255 - (a3); \
+			uint32 alphaTemp1 = (65025 - alphaRest1 * (255 - _p.data8[3])); \
+			uint32 alphaTemp2 = (65025 - alphaRest2 * (255 - _p.data8[3])); \
+			uint32 alphaTemp3 = (65025 - alphaRest3 * (255 - _p.data8[3])); \
+			uint32 alphaDest1 = _p.data8[3] * alphaRest1; \
+			uint32 alphaDest2 = _p.data8[3] * alphaRest2; \
+			uint32 alphaDest3 = _p.data8[3] * alphaRest3; \
+			uint32 alphaSrc1 = 255 * (a1); \
+			uint32 alphaSrc2 = 255 * (a2); \
+			uint32 alphaSrc3 = 255 * (a3); \
+			d[0] = (_p.data8[0] * alphaDest1 + (b) * alphaSrc1) / alphaTemp1; \
+			d[1] = (_p.data8[1] * alphaDest2 + (g) * alphaSrc2) / alphaTemp2; \
+			d[2] = (_p.data8[2] * alphaDest3 + (r) * alphaSrc3) / alphaTemp3; \
+			d[3] = (alphaTemp1 + alphaTemp2 + alphaTemp3)/765; \
+		} \
+	} \
+}
+
 // BLEND_COMPOSITE16
 //
 // This macro assumes source alpha in range 0..65025 and
@@ -110,6 +175,14 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	BLEND_COMPOSITE(d, r, g, b, _a); \
 }
 
+// BLEND_COMPOSITE16_SUBPIX
+#define BLEND_COMPOSITE16_SUBPIX(d, r, g, b, a1, a2, a3) \
+{ \
+	uint16 _a1 = (a1) / 255; \
+	uint16 _a2 = (a2) / 255; \
+	uint16 _a3 = (a3) / 255; \
+	BLEND_COMPOSITE_SUBPIX(d, r, g, b, _a1, _a2, _a3); \
+}
 
 static inline
 uint8
@@ -120,7 +193,6 @@ brightness_for(uint8 red, uint8 green, uint8 blue)
 	// brightness = (308 * red + 600 * green + 116 * blue) / 1024
 	return uint8((308 * red + 600 * green + 116 * blue) / 1024);
 }
-
 
 #endif // DRAWING_MODE_H
 
