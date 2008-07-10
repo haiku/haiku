@@ -1,6 +1,7 @@
 /*
- * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef AGG_TEXT_RENDERER_H
 #define AGG_TEXT_RENDERER_H
@@ -21,7 +22,8 @@ class FontCacheReference;
 
 class AGGTextRenderer {
  public:
-								AGGTextRenderer(renderer_type& solidRenderer,
+								AGGTextRenderer(renderer_subpix_type& subpixRenderer,
+									renderer_type& solidRenderer,
 									renderer_bin_type& binRenderer,
 									scanline_unpacked_type& scanline);
 	virtual						~AGGTextRenderer();
@@ -62,12 +64,14 @@ class AGGTextRenderer {
 	FontCacheEntry::GlyphGray8Scanline	fGray8Scanline;
 	FontCacheEntry::GlyphMonoAdapter	fMonoAdaptor;
 	FontCacheEntry::GlyphMonoScanline	fMonoScanline;
+	FontCacheEntry::SubpixAdapter		fSubpixAdaptor;
 
 	FontCacheEntry::CurveConverter		fCurves;
 	FontCacheEntry::ContourConverter	fContour;
 
 	renderer_type&				fSolidRenderer;
 	renderer_bin_type&			fBinRenderer;
+	renderer_subpix_type&		fSubpixRenderer;
 	scanline_unpacked_type&		fScanline;
 	rasterizer_type				fRasterizer;
 		// NOTE: the object has it's own rasterizer object

@@ -1,6 +1,7 @@
 /*
- * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  *
  * API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
  * rendering pipe-lines for stroke, fills, bitmap and text rendering.
@@ -72,6 +73,9 @@ class Painter {
 			void				SetDrawingMode(drawing_mode mode);
 	inline	drawing_mode		DrawingMode() const
 									{ return fDrawingMode; }
+			void				SetSubpixelAntialiasing(bool subpixelAntialias);
+			bool				SubpixelAntialiasing() const
+									{ return fSubpixelAntialias; }
 			void				SetBlendingMode(source_alpha srcAlpha,
 									alpha_function alphaFunc);
 
@@ -110,7 +114,7 @@ class Painter {
 								// bezier curves
 			BRect				DrawBezier(		BPoint* controlPoints,
 												bool filled) const;
-	
+
 								// shapes
 			BRect				DrawShape(		const int32& opCount,
 												const uint32* opList,
@@ -261,6 +265,7 @@ mutable renderer_base			fBaseRenderer;
 mutable scanline_unpacked_type	fUnpackedScanline;
 mutable scanline_packed_type	fPackedScanline;
 mutable rasterizer_type			fRasterizer;
+mutable renderer_subpix_type	fSubpixRenderer;
 mutable renderer_type			fRenderer;
 mutable renderer_bin_type		fRendererBin;
 
@@ -281,6 +286,7 @@ mutable agg::conv_curve<agg::path_storage> fCurve;
 	cap_mode					fLineCapMode;
 	join_mode					fLineJoinMode;
 	float						fMiterLimit;
+	bool						fSubpixelAntialias;
 
 	PatternHandler				fPatternHandler;
 

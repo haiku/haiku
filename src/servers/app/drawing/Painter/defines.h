@@ -1,6 +1,7 @@
 /*
- * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  *
  * global definitions for the Painter frame work, mainly types for the
  * AGG pipelines
@@ -22,6 +23,7 @@
 #include <agg_rendering_buffer.h>
 
 #include "agg_renderer_region.h"
+#include "agg_renderer_scanline_subpix.h"
 
 #include "PixelFormat.h"
 
@@ -47,6 +49,7 @@
 #endif
 
 	typedef agg::renderer_scanline_bin_solid<renderer_base>		renderer_bin_type;
+	typedef agg::renderer_scanline_subpix_solid<renderer_base>  renderer_subpix_type;
 
 	typedef agg::rasterizer_scanline_aa<>						rasterizer_type;
 

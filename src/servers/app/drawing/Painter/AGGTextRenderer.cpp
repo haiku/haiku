@@ -1,6 +1,7 @@
 /*
- * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -29,19 +30,22 @@
 
 
 // constructor
-AGGTextRenderer::AGGTextRenderer(renderer_type& solidRenderer,
-		renderer_bin_type& binRenderer, scanline_unpacked_type& scanline)
+AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
+		renderer_type& solidRenderer, renderer_bin_type& binRenderer,
+		scanline_unpacked_type& scanline)
 	: fPathAdaptor()
 	, fGray8Adaptor()
 	, fGray8Scanline()
 	, fMonoAdaptor()
 	, fMonoScanline()
+	, fSubpixAdaptor()
 
 	, fCurves(fPathAdaptor)
 	, fContour(fCurves)
 
 	, fSolidRenderer(solidRenderer)
 	, fBinRenderer(binRenderer)
+	, fSubpixRenderer(subpixRenderer)
 	, fScanline(scanline)
 	, fRasterizer()
 
@@ -175,7 +179,7 @@ class AGGTextRenderer::StringRenderer {
 			// the glyph is different depending on wether we
 			// deal with non-(rotated/sheared) text, in which
 			// case we have a native FT bitmap. For rotated or
-			// sheared text, we use AGG vector outlines and 
+			// sheared text, we use AGG vector outlines and
 			// a transformation pipeline, which will be applied
 			// _after_ we retrieve the outline, and that's why
 			// we simply pass x and y, which are untransformed.
@@ -210,13 +214,19 @@ class AGGTextRenderer::StringRenderer {
 			if (fClippingFrame.Intersects(glyphBounds)) {
 				switch (glyph->data_type) {
 					case glyph_data_mono:
-						agg::render_scanlines(fRenderer.fMonoAdaptor, 
+						agg::render_scanlines(fRenderer.fMonoAdaptor,
 							fRenderer.fMonoScanline, fRenderer.fBinRenderer);
 						break;
 
 					case glyph_data_gray8:
-						agg::render_scanlines(fRenderer.fGray8Adaptor, 
+						agg::render_scanlines(fRenderer.fGray8Adaptor,
 							fRenderer.fGray8Scanline, fRenderer.fSolidRenderer);
+						break;
+
+					case glyph_data_subpix:
+						agg::render_scanlines(fRenderer.fGray8Adaptor,
+							fRenderer.fGray8Scanline,
+							fRenderer.fSubpixRenderer);
 						break;
 
 					case glyph_data_outline: {

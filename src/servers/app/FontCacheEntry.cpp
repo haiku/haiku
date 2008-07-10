@@ -5,14 +5,15 @@
  * Authors:
  *		Maxim Shemanarev <mcseemagg@yahoo.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
-// Permission to copy, use, modify, sell and distribute this software 
-// is granted provided this copyright notice appears in all copies. 
+// Permission to copy, use, modify, sell and distribute this software
+// is granted provided this copyright notice appears in all copies.
 // This software is provided "as is" without express or implied
 // warranty, and with no claim as to its suitability for any purpose.
 //
@@ -35,6 +36,12 @@
 BLocker
 FontCacheEntry::sUsageUpdateLock("FontCacheEntry usage lock");
 
+glyph_rendering
+FontCacheEntry::sDefaultRenderType;
+
+bool
+FontCacheEntry::sDefaultHinting;
+
 
 class FontCacheEntry::GlyphCachePool {
  public:
@@ -49,7 +56,7 @@ class FontCacheEntry::GlyphCachePool {
 	const GlyphCache* FindGlyph(uint16 glyphCode) const
 	{
 		unsigned msb = (glyphCode >> 8) & 0xFF;
-		if (fGlyphs[msb]) 
+		if (fGlyphs[msb])
 			return fGlyphs[msb][glyphCode & 0xFF];
 		return 0;
 	}
@@ -120,7 +127,7 @@ FontCacheEntry::Init(const ServerFont& font)
 
 	// TODO: encoding from font
 	FT_Encoding charMap = FT_ENCODING_NONE;
-	bool hinting = true; // TODO: font.Hinting();
+	bool hinting = sDefaultHinting; // TODO: font.Hinting();
 
 	if (!fEngine.Init(font.Path(), 0, font.Size(), charMap,
 			renderingType, hinting)) {
@@ -188,6 +195,10 @@ FontCacheEntry::InitAdaptors(const GlyphCache* glyph,
 			gray8Adapter.init(glyph->data, glyph->data_size, x, y);
 			break;
 
+		case glyph_data_subpix:
+			gray8Adapter.init(glyph->data, glyph->data_size, x, y);
+			break;
+
 		case glyph_data_outline:
 			pathAdapter.init(glyph->data, glyph->data_size, x, y, scale);
 			break;
@@ -213,7 +224,7 @@ FontCacheEntry::GenerateSignature(char* signature, const ServerFont& font)
 
 	// TODO: read more of these from the font
 	FT_Encoding charMap = FT_ENCODING_NONE;
-	bool hinting = true; // TODO: font.Hinting();
+	bool hinting = sDefaultHinting; // TODO: font.Hinting();
 
 	sprintf(signature, "%ld,%u,%d,%d,%.1f,%d",
 		font.GetFamilyAndStyle(), charMap,
@@ -235,15 +246,31 @@ FontCacheEntry::UpdateUsage()
 	fUseCounter++;
 }
 
+
+void
+FontCacheEntry::SetDefaultRenderType(glyph_rendering renderingType)
+{
+	sDefaultRenderType = renderingType;
+}
+
+
+void
+FontCacheEntry::SetDefaultHinting(bool hinting)
+{
+	sDefaultHinting = hinting;
+}
+
+
 // _RenderTypeFor
 /*static*/ glyph_rendering
 FontCacheEntry::_RenderTypeFor(const ServerFont& font)
 {
-	glyph_rendering renderingType = glyph_ren_native_gray8;
+	glyph_rendering renderingType = sDefaultRenderType;
 	if (font.Rotation() != 0.0 || font.Shear() != 90.0
 		|| font.FalseBoldWidth() != 0.0
 		|| font.Flags() & B_DISABLE_ANTIALIASING
-		|| font.Size() > 30) {
+		|| font.Size() > 30
+		|| !sDefaultHinting) {
 		renderingType = glyph_ren_outline;
 	}
 	return renderingType;

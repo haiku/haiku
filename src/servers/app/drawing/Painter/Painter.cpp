@@ -1,6 +1,7 @@
 /*
- * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  *
  * API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
  * rendering pipe-lines for stroke, fills, bitmap and text rendering.
@@ -64,6 +65,7 @@ Painter::Painter()
 	  fUnpackedScanline(),
 	  fPackedScanline(),
 	  fRasterizer(),
+	  fSubpixRenderer(fBaseRenderer),
 	  fRenderer(fBaseRenderer),
 	  fRendererBin(fBaseRenderer),
 
@@ -74,6 +76,7 @@ Painter::Painter()
 	  fValidClipping(false),
 	  fDrawingText(false),
 	  fAttached(false),
+	  fSubpixelAntialias(true),
 
 	  fPenSize(1.0),
 	  fClippingRegion(NULL),
@@ -85,7 +88,7 @@ Painter::Painter()
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
 
 	  fPatternHandler(),
-	  fTextRenderer(fRenderer, fRendererBin, fUnpackedScanline)
+	  fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline)
 {
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
 
@@ -230,6 +233,14 @@ Painter::SetDrawingMode(drawing_mode mode)
 	}
 }
 
+void
+Painter::SetSubpixelAntialiasing(bool subpixelAntialias)
+{
+	if (fSubpixelAntialias != subpixelAntialias) {
+		fSubpixelAntialias = subpixelAntialias;
+	}
+}
+
 // SetBlendingMode
 void
 Painter::SetBlendingMode(source_alpha srcAlpha, alpha_function alphaFunc)
@@ -322,7 +333,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 			return;
 		}
 	}
-	
+
 	fPath.remove_all();
 
 	if (a == b) {
@@ -381,7 +392,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 					a.y++;
 			}
 		}
-	
+
 		fPath.move_to(a.x, a.y);
 		fPath.line_to(b.x, b.y);
 
@@ -685,7 +696,7 @@ Painter::FillRect(const BRect& r) const
 			return _Clipped(rect);
 		}
 	}
-	
+
 
 	// account for stricter interpretation of coordinates in AGG
 	// the rectangle ranges from the top-left (.0, .0)
@@ -787,7 +798,7 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 		agg::rounded_rect rect;
 		rect.rect(lt.x, lt.y, rb.x, rb.y);
 		rect.radius(xRadius, yRadius);
-	
+
 		return _StrokePath(rect);
 	} else {
 		// NOTE: This implementation might seem a little strange, but it makes
@@ -796,10 +807,10 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 		// The fact that the bounding box of the round rect is not enlarged
 		// by fPenSize/2 is actually on purpose, though one could argue it is unexpected.
 
-		// enclose the right and bottom edge	
+		// enclose the right and bottom edge
 		rb.x++;
 		rb.y++;
-	
+
 		agg::rounded_rect outer;
 		outer.rect(lt.x, lt.y, rb.x, rb.y);
 		outer.radius(xRadius, yRadius);
@@ -813,10 +824,10 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 			agg::rounded_rect inner;
 			inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize, rb.y - fPenSize);
 			inner.radius(max_c(0.0, xRadius - fPenSize), max_c(0.0, yRadius - fPenSize));
-		
+
 			fRasterizer.add_path(inner);
 		}
-	
+
 		// make the inner rect work as a hole
 		fRasterizer.filling_rule(agg::fill_even_odd);
 
@@ -824,10 +835,10 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
 		else
 			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
-	
+
 		// reset to default
 		fRasterizer.filling_rule(agg::fill_non_zero);
-	
+
 		return _Clipped(_BoundingBox(outer));
 	}
 }
@@ -1189,6 +1200,10 @@ Painter::_SetRendererColor(const rgb_color& color) const
 							  color.green / 255.0,
 							  color.blue / 255.0,
 							  color.alpha / 255.0));
+	fSubpixRenderer.color(agg::rgba(color.red / 255.0,
+							  color.green / 255.0,
+							  color.blue / 255.0,
+							  color.alpha / 255.0));
 // TODO: bitmap fonts not yet correctly setup in AGGTextRenderer
 //	fRendererBin.color(agg::rgba(color.red / 255.0,
 //								 color.green / 255.0,
@@ -1364,7 +1379,7 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 		viewRect.bottom -= diff * yScale;
 		bitmapRect.bottom = actualBitmapRect.bottom;
 	}
-	
+
 	double xOffset = viewRect.left - bitmapRect.left;
 	double yOffset = viewRect.top - bitmapRect.top;
 

@@ -5,6 +5,7 @@
  * Authors:
  *		Maxim Shemanarev <mcseemagg@yahoo.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 
 //----------------------------------------------------------------------------
@@ -60,6 +61,7 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 	typedef GlyphGray8Adapter::embedded_scanline	GlyphGray8Scanline;
 	typedef FontEngine::MonoAdapter					GlyphMonoAdapter;
 	typedef GlyphMonoAdapter::embedded_scanline		GlyphMonoScanline;
+	typedef FontEngine::SubpixAdapter				SubpixAdapter;
 	typedef agg::conv_curve<GlyphPathAdapter>		CurveConverter;
 	typedef agg::conv_contour<CurveConverter>		ContourConverter;
 
@@ -92,6 +94,13 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 
 	static	void				GenerateSignature(char* signature,
 									const ServerFont& font);
+									
+	static void					SetDefaultRenderType(glyph_rendering renderType);
+	static glyph_rendering		DefaultRenderType()
+									{ return sDefaultRenderType; }
+	static void					SetDefaultHinting(bool hinting);
+	static bool					DefaultHinting()
+									{ return sDefaultHinting; }
 
 	// private to FontCache class:
 			void				UpdateUsage();
@@ -110,6 +119,8 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 
 			GlyphCachePool*		fGlyphCache;
 			FontEngine			fEngine;
+	static	glyph_rendering		sDefaultRenderType;
+	static	bool				sDefaultHinting;
 
 	static	BLocker				sUsageUpdateLock;
 			bigtime_t			fLastUsedTime;

@@ -1,6 +1,7 @@
 /*
- * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>
+ * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Copyright 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
  *
@@ -104,12 +105,22 @@ class PixelFormat {
 											const color_type& c,
 											uint8 cover);
 
+	inline	void				blend_hline_subpix(int x, int y,
+											unsigned len,
+											const color_type& c,
+											uint8 cover);
+
 	inline	void				blend_vline(int x, int y,
 											unsigned len,
 											const color_type& c,
 											uint8 cover);
 
 	inline	void				blend_solid_hspan(int x, int y,
+												  unsigned len,
+												  const color_type& c,
+												  const uint8* covers);
+
+	inline	void				blend_solid_hspan_subpix(int x, int y,
 												  unsigned len,
 												  const color_type& c,
 												  const uint8* covers);
@@ -138,8 +149,10 @@ class PixelFormat {
 
 	blend_pixel_f				fBlendPixel;
 	blend_line					fBlendHLine;
+	blend_line					fBlendHLineSubpix;
 	blend_line					fBlendVLine;
 	blend_solid_span			fBlendSolidHSpan;
+	blend_solid_span            fBlendSolidHSpanSubpix;
 	blend_solid_span			fBlendSolidVSpan;
 	blend_color_span			fBlendColorHSpan;
 	blend_color_span			fBlendColorVSpan;
@@ -198,6 +211,14 @@ PixelFormat::blend_hline(int x, int y, unsigned len,
 	fBlendHLine(x, y, len, c, cover, fBuffer, fPatternHandler);
 }
 
+// blend_hline_subpix
+inline void
+PixelFormat::blend_hline_subpix(int x, int y, unsigned len,
+						 const color_type& c, uint8 cover)
+{
+	fBlendHLineSubpix(x, y, len, c, cover, fBuffer, fPatternHandler);
+}
+
 // blend_vline
 inline void
 PixelFormat::blend_vline(int x, int y, unsigned len,
@@ -208,15 +229,23 @@ PixelFormat::blend_vline(int x, int y, unsigned len,
 
 // blend_solid_hspan
 inline void
-PixelFormat::blend_solid_hspan(int x, int y, unsigned len, 
+PixelFormat::blend_solid_hspan(int x, int y, unsigned len,
 							   const color_type& c, const uint8* covers)
 {
 	fBlendSolidHSpan(x, y, len, c, covers, fBuffer, fPatternHandler);
 }
 
+// blend_solid_hspan_subpix
+inline void
+PixelFormat::blend_solid_hspan_subpix(int x, int y, unsigned len,
+							   const color_type& c, const uint8* covers)
+{
+	fBlendSolidHSpanSubpix(x, y, len, c, covers, fBuffer, fPatternHandler);
+}
+
 // blend_solid_vspan
 inline void
-PixelFormat::blend_solid_vspan(int x, int y, unsigned len, 
+PixelFormat::blend_solid_vspan(int x, int y, unsigned len,
 							   const color_type& c, const uint8* covers)
 {
 	fBlendSolidVSpan(x, y, len, c, covers, fBuffer, fPatternHandler);
@@ -224,8 +253,8 @@ PixelFormat::blend_solid_vspan(int x, int y, unsigned len,
 
 // blend_color_hspan
 inline void
-PixelFormat::blend_color_hspan(int x, int y, unsigned len, 
-							   const color_type* colors, 
+PixelFormat::blend_color_hspan(int x, int y, unsigned len,
+							   const color_type* colors,
 							   const uint8* covers,
 							   uint8 cover)
 {
@@ -235,8 +264,8 @@ PixelFormat::blend_color_hspan(int x, int y, unsigned len,
 
 // blend_color_vspan
 inline void
-PixelFormat::blend_color_vspan(int x, int y, unsigned len, 
-							   const color_type* colors, 
+PixelFormat::blend_color_vspan(int x, int y, unsigned len,
+							   const color_type* colors,
 							   const uint8* covers,
 							   uint8 cover)
 {

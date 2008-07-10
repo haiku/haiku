@@ -6,14 +6,15 @@
  *		Maxim Shemanarev <mcseemagg@yahoo.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Anthony Lee <don.anthony.lee@gmail.com>
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
-// Permission to copy, use, modify, sell and distribute this software 
-// is granted provided this copyright notice appears in all copies. 
+// Permission to copy, use, modify, sell and distribute this software
+// is granted provided this copyright notice appears in all copies.
 // This software is provided "as is" without express or implied
 // warranty, and with no claim as to its suitability for any purpose.
 //
@@ -26,10 +27,16 @@
 
 #include "FontEngine.h"
 
+#include FT_GLYPH_H
+#include FT_OUTLINE_H
+#include FT_LCD_FILTER_H
+
 #include <stdio.h>
 
 #include <agg_bitset_iterator.h>
 #include <agg_renderer_scanline.h>
+
+
 
 
 static const bool kFlipY = true;
@@ -54,7 +61,7 @@ dbl_to_int26p6(double p)
 template<class PathStorage>
 bool
 decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
-{   
+{
 	typedef typename PathStorage::value_type value_type;
 
 	FT_Vector v_last;
@@ -114,7 +121,7 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 		x1 = int26p6_to_dbl(v_start.x);
 		y1 = int26p6_to_dbl(v_start.y);
 		if (flip_y) y1 = -y1;
-		path.move_to(value_type(dbl_to_int26p6(x1)), 
+		path.move_to(value_type(dbl_to_int26p6(x1)),
 					 value_type(dbl_to_int26p6(y1)));
 
 		while(point < limit) {
@@ -127,7 +134,7 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 					x1 = int26p6_to_dbl(point->x);
 					y1 = int26p6_to_dbl(point->y);
 					if (flip_y) y1 = -y1;
-					path.line_to(value_type(dbl_to_int26p6(x1)), 
+					path.line_to(value_type(dbl_to_int26p6(x1)),
 								 value_type(dbl_to_int26p6(y1)));
 					//path.line_to(conv(point->x), flip_y ? -conv(point->y) : conv(point->y));
 					continue;
@@ -155,9 +162,9 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 							x2 = int26p6_to_dbl(vec.x);
 							y2 = int26p6_to_dbl(vec.y);
 							if (flip_y) { y1 = -y1; y2 = -y2; }
-							path.curve3(value_type(dbl_to_int26p6(x1)), 
+							path.curve3(value_type(dbl_to_int26p6(x1)),
 										value_type(dbl_to_int26p6(y1)),
-										value_type(dbl_to_int26p6(x2)), 
+										value_type(dbl_to_int26p6(x2)),
 										value_type(dbl_to_int26p6(y2)));
 							continue;
 						}
@@ -173,14 +180,14 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 						x2 = int26p6_to_dbl(v_middle.x);
 						y2 = int26p6_to_dbl(v_middle.y);
 						if (flip_y) { y1 = -y1; y2 = -y2; }
-						path.curve3(value_type(dbl_to_int26p6(x1)), 
+						path.curve3(value_type(dbl_to_int26p6(x1)),
 									value_type(dbl_to_int26p6(y1)),
-									value_type(dbl_to_int26p6(x2)), 
+									value_type(dbl_to_int26p6(x2)),
 									value_type(dbl_to_int26p6(y2)));
 
-						//path.curve3(conv(v_control.x), 
-						//			flip_y ? -conv(v_control.y) : conv(v_control.y), 
-						//			conv(v_middle.x), 
+						//path.curve3(conv(v_control.x),
+						//			flip_y ? -conv(v_control.y) : conv(v_control.y),
+						//			conv(v_middle.x),
 						//			flip_y ? -conv(v_middle.y) : conv(v_middle.y));
 
 						v_control = vec;
@@ -192,14 +199,14 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 					x2 = int26p6_to_dbl(v_start.x);
 					y2 = int26p6_to_dbl(v_start.y);
 					if (flip_y) { y1 = -y1; y2 = -y2; }
-					path.curve3(value_type(dbl_to_int26p6(x1)), 
+					path.curve3(value_type(dbl_to_int26p6(x1)),
 								value_type(dbl_to_int26p6(y1)),
-								value_type(dbl_to_int26p6(x2)), 
+								value_type(dbl_to_int26p6(x2)),
 								value_type(dbl_to_int26p6(y2)));
 
-					//path.curve3(conv(v_control.x), 
-					//			flip_y ? -conv(v_control.y) : conv(v_control.y), 
-					//			conv(v_start.x), 
+					//path.curve3(conv(v_control.x),
+					//			flip_y ? -conv(v_control.y) : conv(v_control.y),
+					//			conv(v_start.x),
 					//			flip_y ? -conv(v_start.y) : conv(v_start.y));
 					goto Close;
 				}
@@ -210,9 +217,9 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 					if (point + 1 > limit || FT_CURVE_TAG(tags[1]) != FT_CURVE_TAG_CUBIC)
 						return false;
 
-					vec1.x = point[0].x; 
+					vec1.x = point[0].x;
 					vec1.y = point[0].y;
-					vec2.x = point[1].x; 
+					vec2.x = point[1].x;
 					vec2.y = point[1].y;
 
 					point += 2;
@@ -231,18 +238,18 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 						x3 = int26p6_to_dbl(vec.x);
 						y3 = int26p6_to_dbl(vec.y);
 						if (flip_y) { y1 = -y1; y2 = -y2; y3 = -y3; }
-						path.curve4(value_type(dbl_to_int26p6(x1)), 
+						path.curve4(value_type(dbl_to_int26p6(x1)),
 									value_type(dbl_to_int26p6(y1)),
-									value_type(dbl_to_int26p6(x2)), 
+									value_type(dbl_to_int26p6(x2)),
 									value_type(dbl_to_int26p6(y2)),
-									value_type(dbl_to_int26p6(x3)), 
+									value_type(dbl_to_int26p6(x3)),
 									value_type(dbl_to_int26p6(y3)));
 
-						//path.curve4(conv(vec1.x), 
-						//			flip_y ? -conv(vec1.y) : conv(vec1.y), 
-						//			conv(vec2.x), 
+						//path.curve4(conv(vec1.x),
+						//			flip_y ? -conv(vec1.y) : conv(vec1.y),
+						//			conv(vec2.x),
 						//			flip_y ? -conv(vec2.y) : conv(vec2.y),
-						//			conv(vec.x), 
+						//			conv(vec.x),
 						//			flip_y ? -conv(vec.y) : conv(vec.y));
 						continue;
 					}
@@ -254,18 +261,18 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 					x3 = int26p6_to_dbl(v_start.x);
 					y3 = int26p6_to_dbl(v_start.y);
 					if (flip_y) { y1 = -y1; y2 = -y2; y3 = -y3; }
-					path.curve4(value_type(dbl_to_int26p6(x1)), 
+					path.curve4(value_type(dbl_to_int26p6(x1)),
 								value_type(dbl_to_int26p6(y1)),
-								value_type(dbl_to_int26p6(x2)), 
+								value_type(dbl_to_int26p6(x2)),
 								value_type(dbl_to_int26p6(y2)),
-								value_type(dbl_to_int26p6(x3)), 
+								value_type(dbl_to_int26p6(x3)),
 								value_type(dbl_to_int26p6(y3)));
 
-					//path.curve4(conv(vec1.x), 
-					//			flip_y ? -conv(vec1.y) : conv(vec1.y), 
-					//			conv(vec2.x), 
+					//path.curve4(conv(vec1.x),
+					//			flip_y ? -conv(vec1.y) : conv(vec1.y),
+					//			conv(vec2.x),
 					//			flip_y ? -conv(vec2.y) : conv(vec2.y),
-					//			conv(v_start.x), 
+					//			conv(v_start.x),
 					//			flip_y ? -conv(v_start.y) : conv(v_start.y));
 					goto Close;
 				}
@@ -275,11 +282,12 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 		path.close_polygon();
 
    Close:
-		first = last + 1; 
+		first = last + 1;
 	}
 
 	return true;
 }
+
 
 // decompose_ft_bitmap_mono
 template<class Scanline, class ScanlineStorage>
@@ -313,6 +321,7 @@ decompose_ft_bitmap_mono(const FT_Bitmap& bitmap, int x, int y,
 		}
 	}
 }
+
 
 // decompose_ft_bitmap_gray8
 template<class Scanline, class ScanlineStorage>
@@ -360,6 +369,142 @@ decompose_ft_bitmap_gray8(const FT_Bitmap& bitmap, int x, int y,
 }
 
 
+// decompose_ft_bitmap_subpix
+template<class Scanline, class ScanlineStorage>
+void
+decompose_ft_bitmap_subpix(const FT_Bitmap& bitmap, int x, int y,
+	bool flip_y, Scanline& sl, ScanlineStorage& storage)
+{
+	//Filtering weights
+	const uint8 filter[5] = { 0x10, 0x40, 0x70, 0x40, 0x10 };
+
+	int i, j;
+	const uint8* buf = (const uint8*)bitmap.buffer;
+	int pitch = bitmap.pitch;
+	sl.reset(x-1, x + bitmap.width/3 + 1);
+	storage.prepare();
+	if (flip_y) {
+		buf += bitmap.pitch * (bitmap.rows - 1);
+		y += bitmap.rows;
+		pitch = -pitch;
+	}
+	for (i = 0; i < bitmap.rows; i++) {
+		sl.reset_spans();
+
+		if (bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
+			// font has built-in mono bitmap
+			agg::bitset_iterator bits(buf, 0);
+			int j;
+			for (j = 0; j < bitmap.width; j++) {
+				if (bits.bit())
+					sl.add_cell(x + j,
+						agg::cover_full, agg::cover_full, agg::cover_full);
+				++bits;
+			}
+		} else {
+			const uint8* p = buf;
+			uint32 coverRed;
+			uint32 coverGreen;
+			uint32 coverBlue;
+			int w = bitmap.width/3;
+			if (w && !(p[0] == p[1] && p[1] == p[2]
+						&& (w == 1 || (p[3] == p[4] && p[4] == p[5])))){
+				coverRed = 0;
+				coverGreen = (p[0] * filter[0]) >> 8;
+				coverBlue = (p[0] * filter[1] + p[1] * filter[0]) >> 8;
+				coverGreen = coverGreen | ( -(coverGreen >> 8));
+				coverBlue = coverBlue | ( -(coverBlue >> 8));
+				if (coverRed || coverGreen || coverBlue){
+					sl.add_cell(x - 1, coverRed, coverGreen, coverBlue);
+				}
+			}
+			for (j = 0; j < w; j++) {
+				if (p[0] == p[1] && p[1] == p[2]
+					&& (j == 0 || (p[-3] == p[-2] && p[-2] == p[-1]))
+					&& (j == w-1 || (p[3] == p[4] && p[4] == p[5]))){
+					coverRed = p[0];
+					coverGreen = p[0];
+					coverBlue = p[0];
+				} else if (p[0] == p[1] && p[1] == p[2]
+						&& (j < w-1 && p[3] == p[4] && p[4] == p[5])
+						&& (j == w-2 || (p[6] == p[7] && p[7] == p[8]))){
+						coverRed = ((j > 0 ? p[-2] * filter[4]
+												+ p[-1] * filter[3] : 0)
+								+ p[0] * filter[2] + p[1] * filter[1]
+								+ p[2] * filter[0])
+								>> 8;
+						coverGreen = ((j > 0 ? p[-1] * filter[4] : 0)
+								+ p[0] * filter[3] + p[1] * filter[2]
+								+ p[2] * filter[1])
+								>> 8;
+						coverBlue = (p[0] * filter[4]
+								+ p[1] * filter[3] + p[2] * filter[2]) >> 8;
+						coverRed = coverRed | ( -(coverRed >> 8));
+						coverGreen = coverGreen | ( -(coverGreen >> 8));
+						coverBlue = coverBlue | ( -(coverBlue >> 8));
+				} else if (p[0] == p[1] && p[1] == p[2]
+						&& (j > 0 && p[-3] == p[-2] && p[-2] == p[-1])
+						&& (j == 1 || (p[-6] == p[-5] && p[-5] == p[-4]))){
+						coverRed = (p[0] * filter[2] + p[1] * filter[1]
+								+ p[2] * filter[0]) >> 8;
+						coverGreen = (p[0] * filter[3] + p[1] * filter[2]
+									+ p[2] * filter[1]
+									+ (j < w-1 ? p[3] * filter[0] : 0))
+									>> 8;
+						coverBlue = (p[0] * filter[4] + p[1] * filter[3]
+									+ p[2] * filter[2]
+									+ (j < w-1 ? p[3] * filter[1]
+													+ p[4] * filter[0] : 0))
+									>> 8;
+						coverRed = coverRed | ( -(coverRed >> 8));
+						coverGreen = coverGreen | ( -(coverGreen >> 8));
+						coverBlue = coverBlue | ( -(coverBlue >> 8));
+				} else {
+					coverRed = ((j > 0 ? p[-2] * filter[4]
+							+ p[-1] * filter[3] : 0)
+							+ p[0] * filter[2] + p[1] * filter[1]
+							+ p[2] * filter[0])
+							>> 8;
+					coverGreen = ((j > 0 ? p[-1] * filter[4] : 0)
+								+ p[0] * filter[3] + p[1] * filter[2]
+								+ p[2] * filter[1]
+								+ (j < w-1 ? p[3] * filter[0] : 0))
+								>> 8;
+					coverBlue = (p[0] * filter[4] + p[1] * filter[3]
+								+ p[2] * filter[2]
+								+ (j < w-1 ? p[3] * filter[1]
+										+ p[4] * filter[0] : 0))
+								>> 8;
+					coverRed = coverRed | ( -(coverRed >> 8));
+					coverGreen = coverGreen | ( -(coverGreen >> 8));
+					coverBlue = coverBlue | ( -(coverBlue >> 8));
+				}
+				if (coverRed || coverGreen || coverBlue) {
+						sl.add_cell(x + j, coverRed, coverGreen, coverBlue);
+				}
+				p += 3;
+			}
+			if (w && !(p[-3] == p[-2] && p[-2] == p[-1]
+						&& (w == 1 || (p[-6] == p[-5] && p[-5] == p[-4])))){
+				coverRed = (p[-2] * filter[4] + p[-1] * filter[3]) >> 8;
+				coverGreen = (p[-1] * filter[4]) >> 8;
+				coverBlue = 0;
+				coverRed = coverRed | ( -(coverRed >> 8));
+				coverGreen = coverGreen | ( -(coverGreen >> 8));
+				if (coverRed || coverGreen || coverBlue){
+					sl.add_cell(x + w, coverRed, coverGreen, coverBlue);
+				}
+			}
+ 		}
+
+		buf += pitch;
+		if (sl.num_spans()) {
+			sl.finalize(y - i - 1);
+			storage.render(sl);
+		}
+	}
+}
+
 // #pragma mark -
 
 
@@ -386,8 +531,10 @@ FontEngine::FontEngine()
 	, fCurves(fPath)
 	, fScanlineAA()
 	, fScanlineBin()
+	, fScanlineSubpix()
 	, fScanlineStorageAA()
 	, fScanlineStorageBin()
+	, fScanlineStorageSubpix()
 {
 	fCurves.approximation_scale(4.0);
 
@@ -395,6 +542,7 @@ FontEngine::FontEngine()
 	if (fLastError == 0)
 		fLibraryInitialized = true;
 }
+
 
 // destructor
 FontEngine::~FontEngine()
@@ -404,6 +552,7 @@ FontEngine::~FontEngine()
 	if (fLibraryInitialized)
 		FT_Done_FreeType(fLibrary);
 }
+
 
 // CountFaces
 unsigned
@@ -415,14 +564,14 @@ FontEngine::CountFaces() const
 	return 0;
 }
 
+
 // PrepareGlyph
 bool
 FontEngine::PrepareGlyph(unsigned glyphCode)
 {
 	fGlyphIndex = FT_Get_Char_Index(fFace, glyphCode);
 	fLastError = FT_Load_Glyph(fFace, fGlyphIndex,
-		fHinting ? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING);
-//		fHinting ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_NO_HINTING);
+		(fHinting ? (FT_LOAD_DEFAULT | FT_LOAD_TARGET_LCD) : FT_LOAD_NO_HINTING));
 
 	if (fLastError != 0)
 		return false;
@@ -430,7 +579,7 @@ FontEngine::PrepareGlyph(unsigned glyphCode)
 	fAdvanceX = int26p6_to_dbl(fFace->glyph->advance.x);
 	fAdvanceY = int26p6_to_dbl(fFace->glyph->advance.y);
 	fInsetLeft = int26p6_to_dbl(fFace->glyph->metrics.horiBearingX);
-	fInsetRight = int26p6_to_dbl(fFace->glyph->metrics.horiBearingX 
+	fInsetRight = int26p6_to_dbl(fFace->glyph->metrics.horiBearingX
 		+ fFace->glyph->metrics.width - fFace->glyph->metrics.horiAdvance);
 
 	switch(fGlyphRendering) {
@@ -445,17 +594,17 @@ FontEngine::PrepareGlyph(unsigned glyphCode)
 				fBounds.y1 = fScanlineStorageBin.min_y();
 				fBounds.x2 = fScanlineStorageBin.max_x();
 				fBounds.y2 = fScanlineStorageBin.max_y();
-				fDataSize = fScanlineStorageBin.byte_size(); 
+				fDataSize = fScanlineStorageBin.byte_size();
 				fDataType = glyph_data_mono;
 				return true;
 			}
 			break;
-	
-	
+
+
 		case glyph_ren_native_gray8:
 			fLastError = FT_Render_Glyph(fFace->glyph, FT_RENDER_MODE_NORMAL);
 			if (fLastError == 0) {
-				decompose_ft_bitmap_gray8(fFace->glyph->bitmap, 
+				decompose_ft_bitmap_gray8(fFace->glyph->bitmap,
 					fFace->glyph->bitmap_left, kFlipY ?
 					-fFace->glyph->bitmap_top : fFace->glyph->bitmap_top,
 					kFlipY, fScanlineAA, fScanlineStorageAA);
@@ -463,13 +612,31 @@ FontEngine::PrepareGlyph(unsigned glyphCode)
 				fBounds.y1 = fScanlineStorageAA.min_y();
 				fBounds.x2 = fScanlineStorageAA.max_x();
 				fBounds.y2 = fScanlineStorageAA.max_y();
-				fDataSize = fScanlineStorageAA.byte_size(); 
+				fDataSize = fScanlineStorageAA.byte_size();
 				fDataType = glyph_data_gray8;
 				return true;
 			}
 			break;
-	
-	
+
+
+		case glyph_ren_subpix:
+			fLastError = FT_Render_Glyph(fFace->glyph, FT_RENDER_MODE_LCD);
+			if (fLastError == 0) {
+				decompose_ft_bitmap_subpix(fFace->glyph->bitmap,
+					fFace->glyph->bitmap_left, kFlipY ?
+					-fFace->glyph->bitmap_top : fFace->glyph->bitmap_top,
+					kFlipY, fScanlineSubpix, fScanlineStorageSubpix);
+				fBounds.x1 = fScanlineStorageSubpix.min_x();
+				fBounds.y1 = fScanlineStorageSubpix.min_y();
+				fBounds.x2 = fScanlineStorageSubpix.max_x();
+				fBounds.y2 = fScanlineStorageSubpix.max_y();
+				fDataSize = fScanlineStorageSubpix.byte_size();
+				fDataType = glyph_data_subpix;
+				return true;
+			}
+			break;
+
+
 		case glyph_ren_outline:
 			fPath.remove_all();
 			if (decompose_ft_outline(fFace->glyph->outline, kFlipY, fPath)) {
@@ -500,19 +667,24 @@ FontEngine::WriteGlyphTo(uint8* data) const
 				break;
 
 			case glyph_data_gray8:
-				fScanlineStorageAA.serialize(data); 
+				fScanlineStorageAA.serialize(data);
 				break;
 
-			case glyph_data_outline: 
+			case glyph_data_subpix:
+				fScanlineStorageSubpix.serialize(data);
+				break;
+
+			case glyph_data_outline:
 				fPath.serialize(data);
 				break;
 
-			case glyph_data_invalid: 
+			case glyph_data_invalid:
 			default:
 				break;
 		}
 	}
 }
+
 
 // GetKerning
 bool
@@ -561,7 +733,7 @@ FontEngine::Init(const char* fontFilePath, unsigned faceIndex, double size,
 
 	if (fLastError != 0)
 		return false;
-		
+
 	switch(ren_type) {
 		case glyph_ren_native_mono:
 			fGlyphRendering = glyph_ren_native_mono;
@@ -569,6 +741,10 @@ FontEngine::Init(const char* fontFilePath, unsigned faceIndex, double size,
 
 		case glyph_ren_native_gray8:
 			fGlyphRendering = glyph_ren_native_gray8;
+			break;
+
+		case glyph_ren_subpix:
+			fGlyphRendering = glyph_ren_subpix;
 			break;
 
 		case glyph_ren_outline:
