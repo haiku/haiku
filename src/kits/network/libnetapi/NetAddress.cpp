@@ -17,6 +17,8 @@
 	 * No trouts were harmed during the development of this class.
 */
 
+#include <r5_compatibility.h>
+
 #include <ByteOrder.h>
 #include <NetAddress.h>
 #include <Message.h>
@@ -184,13 +186,18 @@ BNetAddress::GetAddr(char* hostname, unsigned short* port) const
 status_t BNetAddress::GetAddr( struct sockaddr_in& sa ) const
 {
     if ( fInit != B_OK )
-    {
         return B_NO_INIT;
-    }
 
-    sa.sin_family = fFamily;
     sa.sin_port = fPort;
     sa.sin_addr.s_addr = fAddress;
+	if (check_r5_compatibility()) {
+	    r5_sockaddr_in* r5Addr = (r5_sockaddr_in *)&sa;
+    	if (fFamily == AF_INET)
+    		r5Addr->sin_family = R5_AF_INET;
+    	else
+    		r5Addr->sin_family = fFamily;
+    } else
+        sa.sin_family = fFamily;
 
     return B_OK;
 }
@@ -358,9 +365,17 @@ BNetAddress::SetTo(const char* hostname, unsigned short port)
 status_t
 BNetAddress::SetTo(const struct sockaddr_in& addr)
 {
-	fFamily = addr.sin_family;
 	fPort = addr.sin_port;
 	fAddress = addr.sin_addr.s_addr;
+
+	if (check_r5_compatibility()) {
+	    const r5_sockaddr_in* r5Addr = (const r5_sockaddr_in *)&addr;
+    	if (r5Addr->sin_family == R5_AF_INET)
+    		fFamily = AF_INET;
+    	else
+    		fFamily = r5Addr->sin_family;
+    } else
+    	fFamily = addr.sin_family;
 
 	return fInit = B_OK;
 }

@@ -44,4 +44,31 @@ extern addr_t __gNetworkEnd;
 extern addr_t __gNetAPIStart;
 extern addr_t __gNetAPIEnd;
 
+
+static inline bool
+check_r5_compatibility()
+{
+	if (!__gR5Compatibility)
+		return false;
+
+#ifndef __INTEL__
+	return false;
+#else
+
+	struct stack_frame {
+		struct stack_frame*	previous;
+		addr_t					return_address;
+	};
+
+	stack_frame* frame = (stack_frame*)get_stack_frame();
+	if (frame->return_address >= __gNetworkStart
+		&& frame->return_address < __gNetworkEnd) {
+		return false;
+	}
+
+	return true;
+#endif
+}
+
+
 #endif	// NET_R5_COMPATIBILITY_H
