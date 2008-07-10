@@ -9,6 +9,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 
 /*!
@@ -2531,6 +2532,46 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (status == B_OK)
 				fLink.AttachString(path.String());
 
+			fLink.Flush();
+			break;
+		}
+
+		case AS_SET_FONT_SUBPIXEL_ANTIALIASING:
+		{
+			bool subpix;
+			if (link.Read<bool>(&subpix) == B_OK) {
+				LockedDesktopSettings settings(fDesktop);
+				settings.SetFontSubpixelAntialiasing(subpix);
+			}
+			fDesktop->Redraw();
+			break;
+		}
+
+		case AS_GET_FONT_SUBPIXEL_ANTIALIASING:
+		{
+			DesktopSettings settings(fDesktop);
+			fLink.StartMessage(B_OK);
+			fLink.Attach<bool>(settings.FontSubpixelAntialiasing());
+			fLink.Flush();
+			break;
+		}
+
+		case AS_SET_HINTING:
+		{
+			bool hinting;
+			if (link.Read<bool>(&hinting) == B_OK) {
+				LockedDesktopSettings settings(fDesktop);
+				settings.SetHinting(hinting);
+			}
+			fDesktop->Redraw();
+			break;
+		}
+
+		case AS_GET_HINTING:
+		{
+			DesktopSettings settings(fDesktop);
+			fLink.StartMessage(B_OK);
+			fLink.Attach<bool>(settings.Hinting());
 			fLink.Flush();
 			break;
 		}

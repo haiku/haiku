@@ -6,6 +6,7 @@
  *		Adrian Oanca <adioanca@cotty.iren.ro>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 #ifndef DESKTOP_H
 #define DESKTOP_H
@@ -190,6 +191,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 #endif // USE_MULTI_LOCKER
 
 		void					MarkDirty(BRegion& region);
+		void					Redraw();
 
 		BRegion&				BackgroundRegion()
 									{ return fBackgroundRegion; }

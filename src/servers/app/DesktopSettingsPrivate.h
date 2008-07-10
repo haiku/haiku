@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 #ifndef DESKTOP_SETTINGS_PRIVATE_H
 #define DESKTOP_SETTINGS_PRIVATE_H
@@ -54,6 +55,12 @@ class DesktopSettingsPrivate {
 
 		void			SetUIColor(color_which which, const rgb_color color);
 		rgb_color		UIColor(color_which which) const;
+
+		void			SetFontSubpixelAntialiasing(bool subpix);
+		bool			FontSubpixelAntialiasing() const;
+		void			SetHinting(bool hinting);
+		bool			Hinting() const;
+
 	private:
 		void			_SetDefaults();
 		status_t		_Load();
@@ -69,6 +76,9 @@ class DesktopSettingsPrivate {
 		bool			fShowAllDraggers;
 		int32			fWorkspacesCount;
 		BMessage		fWorkspaceMessages[kMaxWorkspaces];
+
+		bool			fFontSubpixelAntialiasing;
+		bool			fHinting;
 
 		server_read_only_memory& fShared;
 };

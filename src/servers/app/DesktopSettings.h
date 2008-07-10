@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 #ifndef DESKTOP_SETTINGS_H
 #define DESKTOP_SETTINGS_H
@@ -52,6 +53,9 @@ class DesktopSettings {
 
 		rgb_color		UIColor(color_which which) const;
 
+		bool			FontSubpixelAntialiasing() const;
+		bool			Hinting() const;
+
 	protected:
 		DesktopSettingsPrivate*	fSettings;
 };
@@ -73,6 +77,9 @@ class LockedDesktopSettings : public DesktopSettings {
 		void			SetShowAllDraggers(bool show);
 
 		void			SetUIColor(color_which which, const rgb_color color);
+
+		void			SetFontSubpixelAntialiasing(bool subpix);
+		void			SetHinting(bool hinting);
 
 	private:
 		Desktop*		fDesktop;

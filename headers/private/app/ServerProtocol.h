@@ -6,6 +6,7 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 #ifndef APP_SERVER_PROTOCOL_H
 #define APP_SERVER_PROTOCOL_H
@@ -187,6 +188,11 @@ enum {
 	AS_GET_DECORATOR_SETTINGS,
 	AS_GET_SHOW_ALL_DRAGGERS,
 	AS_SET_SHOW_ALL_DRAGGERS,
+
+	AS_SET_FONT_SUBPIXEL_ANTIALIASING,
+	AS_GET_FONT_SUBPIXEL_ANTIALIASING,
+	AS_SET_HINTING,
+	AS_GET_HINTING,
 
 	// Graphics calls
 	AS_SET_HIGH_COLOR,

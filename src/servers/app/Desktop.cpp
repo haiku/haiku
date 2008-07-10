@@ -6,6 +6,7 @@
  *		Adrian Oanca <adioanca@cotty.iren.ro>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 
 /*!	Class used to encapsulate desktop management */
@@ -2458,6 +2459,14 @@ Desktop::MarkDirty(BRegion& region)
 
 		UnlockAllWindows();
 	}
+}
+
+
+void
+Desktop::Redraw()
+{
+	BRegion dirty(fVirtualScreen.Frame());
+	MarkDirty(dirty);
 }
 
 

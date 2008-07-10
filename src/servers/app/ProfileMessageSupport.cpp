@@ -9,7 +9,7 @@
 
 #include "ProfileMessageSupport.h"
 
-#include "ServerProtocol.h"
+#include <ServerProtocol.h>
 
 
 void
@@ -174,6 +174,11 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_GET_DECORATOR_SETTINGS: string = "AS_GET_DECORATOR_SETTINGS"; break;
 		case AS_GET_SHOW_ALL_DRAGGERS: string = "AS_GET_SHOW_ALL_DRAGGERS"; break;
 		case AS_SET_SHOW_ALL_DRAGGERS: string = "AS_SET_SHOW_ALL_DRAGGERS"; break;
+		
+		case AS_SET_FONT_SUBPIXEL_ANTIALIASING: string = "AS_SET_FONT_SUBPIXEL_ANTIALIASING"; break;
+		case AS_GET_FONT_SUBPIXEL_ANTIALIASING: string = "AS_GET_FONT_SUBPIXEL_ANTIALIASING"; break;
+		case AS_SET_HINTING: string = "AS_SET_HINTING"; break;
+		case AS_GET_HINTING: string = "AS_GET_HINTING"; break;
 
 		// Graphics calls
 		case AS_SET_HIGH_COLOR: string = "AS_SET_HIGH_COLOR"; break;

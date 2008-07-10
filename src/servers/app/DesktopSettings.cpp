@@ -5,12 +5,15 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 
 
 #include "DesktopSettings.h"
 #include "DesktopSettingsPrivate.h"
 #include "Desktop.h"
+#include "FontCache.h"
+#include "FontCacheEntry.h"
 #include "FontManager.h"
 #include "ServerConfig.h"
 
@@ -60,7 +63,7 @@ DesktopSettingsPrivate::_SetDefaults()
 	strlcpy(fMenuInfo.f_style, fPlainFont.Style(), B_FONT_STYLE_LENGTH);
 	fMenuInfo.font_size = fPlainFont.Size();
 	fMenuInfo.background_color.set_to(216, 216, 216);
-	
+
 	fMenuInfo.separator = 0;
 		// look of the separator (R5: (0, 1, 2), default 0)
 	fMenuInfo.click_to_open = true; // always true
@@ -69,6 +72,11 @@ DesktopSettingsPrivate::_SetDefaults()
 	fWorkspacesCount = 4;
 
 	memcpy(fShared.colors, BPrivate::kDefaultColors, sizeof(rgb_color) * kNumColors);
+
+	fFontSubpixelAntialiasing = false;
+	FontCacheEntry::SetDefaultRenderType(glyph_ren_native_gray8);
+	fHinting = true;
+	FontCacheEntry::SetDefaultHinting(true);
 }
 
 
@@ -101,7 +109,7 @@ DesktopSettingsPrivate::_Load()
 
 	BPath path(basePath);
 	path.Append("workspaces");
-	
+
 	BFile file;
 	status = file.SetTo(path.Path(), B_READ_ONLY);
 	if (status == B_OK) {
@@ -127,7 +135,7 @@ DesktopSettingsPrivate::_Load()
 
 	path = basePath;
 	path.Append("fonts");
-	
+
 	status = file.SetTo(path.Path(), B_READ_ONLY);
 	if (status == B_OK) {
 		BMessage settings;
@@ -136,6 +144,8 @@ DesktopSettingsPrivate::_Load()
 			const char* family;
 			const char* style;
 			float size;
+			bool subpix;
+			bool hinting;
 			if (settings.FindString("plain family", &family) == B_OK
 				&& settings.FindString("plain style", &style) == B_OK
 				&& settings.FindFloat("plain size", &size) == B_OK) {
@@ -158,6 +168,15 @@ DesktopSettingsPrivate::_Load()
 					fFixedFont.SetStyle(fontStyle);
 				fFixedFont.SetSize(size);
 			}
+			if (settings.FindBool("font subpix", &subpix) == B_OK) {
+				fFontSubpixelAntialiasing = subpix;
+				FontCacheEntry::SetDefaultRenderType(
+						(subpix) ? glyph_ren_subpix : glyph_ren_native_gray8);
+			}
+			if (settings.FindBool("hinting", &hinting) == B_OK) {
+				fHinting = hinting;
+				FontCacheEntry::SetDefaultHinting(fHinting);
+			}
 			gFontManager->Unlock();
 		}
 	}
@@ -166,7 +185,7 @@ DesktopSettingsPrivate::_Load()
 
 	path = basePath;
 	path.Append("mouse");
-	
+
 	status = file.SetTo(path.Path(), B_READ_ONLY);
 	if (status == B_OK) {
 		BMessage settings;
@@ -183,7 +202,7 @@ DesktopSettingsPrivate::_Load()
 
 	path = basePath;
 	path.Append("appearance");
-	
+
 	status = file.SetTo(path.Path(), B_READ_ONLY);
 	if (status == B_OK) {
 		BMessage settings;
@@ -192,7 +211,7 @@ DesktopSettingsPrivate::_Load()
 			float fontSize;
 			if (settings.FindFloat("font size", &fontSize) == B_OK)
 				fMenuInfo.font_size = fontSize;
-				
+
 			const char* fontFamily;
 			if (settings.FindString("font family", &fontFamily) == B_OK)
 				strlcpy(fMenuInfo.f_family, fontFamily, B_FONT_FAMILY_LENGTH);
@@ -273,6 +292,9 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			settings.AddString("fixed family", fFixedFont.Family());
 			settings.AddString("fixed style", fFixedFont.Style());
 			settings.AddFloat("fixed size", fFixedFont.Size());
+
+			settings.AddBool("font subpix",fFontSubpixelAntialiasing);
+			settings.AddBool("hinting",fHinting);
 
 			BFile file;
 			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
@@ -521,6 +543,42 @@ DesktopSettingsPrivate::UIColor(color_which which) const
 }
 
 
+void
+DesktopSettingsPrivate::SetFontSubpixelAntialiasing(bool subpix)
+{
+	if (fFontSubpixelAntialiasing != subpix) {
+		fFontSubpixelAntialiasing = subpix;
+		FontCacheEntry::SetDefaultRenderType(
+			(subpix)?glyph_ren_subpix:glyph_ren_native_gray8);
+		Save(kFontSettings);
+	}
+}
+
+
+bool
+DesktopSettingsPrivate::FontSubpixelAntialiasing() const
+{
+	return fFontSubpixelAntialiasing;
+}
+
+
+void
+DesktopSettingsPrivate::SetHinting(bool hinting)
+{
+	if (fHinting != hinting) {
+		fHinting = hinting;
+		FontCacheEntry::SetDefaultHinting(hinting);
+		Save(kFontSettings);
+	}
+}
+
+
+bool
+DesktopSettingsPrivate::Hinting() const
+{
+	return fHinting;
+}
+
 //	#pragma mark - read access
 
 
@@ -613,6 +671,19 @@ DesktopSettings::UIColor(color_which which) const
 }
 
 
+bool
+DesktopSettings::FontSubpixelAntialiasing() const
+{
+	return fSettings->FontSubpixelAntialiasing();
+}
+
+
+bool
+DesktopSettings::Hinting() const
+{
+	return fSettings->Hinting();
+}
+
 //	#pragma mark - write access
 
 
@@ -690,4 +761,17 @@ LockedDesktopSettings::SetUIColor(color_which which, const rgb_color color)
 	fSettings->SetUIColor(which, color);
 }
 
+
+void
+LockedDesktopSettings::SetFontSubpixelAntialiasing(bool subpix)
+{
+	fSettings->SetFontSubpixelAntialiasing(subpix);
+}
+
+
+void
+LockedDesktopSettings::SetHinting(bool hinting)
+{
+	fSettings->SetHinting(hinting);
+}
 
