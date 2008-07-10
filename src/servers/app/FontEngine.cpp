@@ -295,7 +295,6 @@ void
 decompose_ft_bitmap_mono(const FT_Bitmap& bitmap, int x, int y,
 	bool flip_y, Scanline& sl, ScanlineStorage& storage)
 {
-	int i;
 	const uint8* buf = (const uint8*)bitmap.buffer;
 	int pitch = bitmap.pitch;
 	sl.reset(x, x + bitmap.width);
@@ -305,11 +304,10 @@ decompose_ft_bitmap_mono(const FT_Bitmap& bitmap, int x, int y,
 		y += bitmap.rows;
 		pitch = -pitch;
 	}
-	for (i = 0; i < bitmap.rows; i++) {
+	for (int i = 0; i < bitmap.rows; i++) {
 		sl.reset_spans();
 		agg::bitset_iterator bits(buf, 0);
-		int j;
-		for (j = 0; j < bitmap.width; j++) {
+		for (int j = 0; j < bitmap.width; j++) {
 			if (bits.bit())
 				sl.add_cell(x + j, agg::cover_full);
 			++bits;
@@ -329,7 +327,6 @@ void
 decompose_ft_bitmap_gray8(const FT_Bitmap& bitmap, int x, int y,
 	bool flip_y, Scanline& sl, ScanlineStorage& storage)
 {
-	int i, j;
 	const uint8* buf = (const uint8*)bitmap.buffer;
 	int pitch = bitmap.pitch;
 	sl.reset(x, x + bitmap.width);
@@ -339,21 +336,20 @@ decompose_ft_bitmap_gray8(const FT_Bitmap& bitmap, int x, int y,
 		y += bitmap.rows;
 		pitch = -pitch;
 	}
-	for (i = 0; i < bitmap.rows; i++) {
+	for (int i = 0; i < bitmap.rows; i++) {
 		sl.reset_spans();
 
 		if (bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
 			// font has built-in mono bitmap
 			agg::bitset_iterator bits(buf, 0);
-			int j;
-			for (j = 0; j < bitmap.width; j++) {
+			for (int j = 0; j < bitmap.width; j++) {
 				if (bits.bit())
 					sl.add_cell(x + j, agg::cover_full);
 				++bits;
 			}
 		} else {
 			const uint8* p = buf;
-			for (j = 0; j < bitmap.width; j++) {
+			for (int j = 0; j < bitmap.width; j++) {
 				if (*p)
 					sl.add_cell(x + j, *p);
 				++p;
@@ -369,131 +365,76 @@ decompose_ft_bitmap_gray8(const FT_Bitmap& bitmap, int x, int y,
 }
 
 
+#define AVERAGE_BASED_SUBPIXEL_FILTERING
+// NOTE stippi: My basic idea is that filtering tries to minimize colored
+// edges, but it does so by blurring the coverage values. This will also
+// affect neighboring pixels and add blur where there were perfectly sharp
+// edges. Andrej's method of filtering adds a special case for perfectly
+// sharp edges, but the drawback here is that there will be a visible
+// transition between blurred and non-blurred subpixels. I had the idea that
+// when simply fading the subpixels towards the plain gray-scale-aa values,
+// there must be a sweet spot for when colored edges become non-disturbing
+// and there is still a benefit of sharpness compared to straight gray-scale-
+// aa. The define above enables this method against the colored edges. My
+// method still has a drawback, since jaggies in diagonal lines will be more
+// visible again than with the filter method.
+
+
 // decompose_ft_bitmap_subpix
 template<class Scanline, class ScanlineStorage>
 void
 decompose_ft_bitmap_subpix(const FT_Bitmap& bitmap, int x, int y,
 	bool flip_y, Scanline& sl, ScanlineStorage& storage)
 {
-	//Filtering weights
-	const uint8 filter[5] = { 0x10, 0x40, 0x70, 0x40, 0x10 };
+#ifdef AVERAGE_BASED_SUBPIXEL_FILTERING
+	// The weight with which the average of the subpixels is applied to counter
+	// color fringes (0 = full sharpness ... 255 = grayscale anti-aliasing)
+	// TODO: This could be a config option, but don't forget to include the
+	// value in the font cache entry signature generation!
+	const uint8 averageWeight = 100;
+	const uint8 subpixelWeight = 255 - averageWeight;
 
-	int i, j;
 	const uint8* buf = (const uint8*)bitmap.buffer;
 	int pitch = bitmap.pitch;
-	sl.reset(x-1, x + bitmap.width/3 + 1);
+	sl.reset(x, x + bitmap.width / 3);
 	storage.prepare();
+
 	if (flip_y) {
 		buf += bitmap.pitch * (bitmap.rows - 1);
 		y += bitmap.rows;
 		pitch = -pitch;
 	}
-	for (i = 0; i < bitmap.rows; i++) {
+
+	for (int i = 0; i < bitmap.rows; i++) {
 		sl.reset_spans();
 
 		if (bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
 			// font has built-in mono bitmap
 			agg::bitset_iterator bits(buf, 0);
-			int j;
-			for (j = 0; j < bitmap.width; j++) {
-				if (bits.bit())
+			for (int j = 0; j < bitmap.width; j++) {
+				if (bits.bit()) {
 					sl.add_cell(x + j,
 						agg::cover_full, agg::cover_full, agg::cover_full);
+				}
 				++bits;
 			}
 		} else {
 			const uint8* p = buf;
-			uint32 coverRed;
-			uint32 coverGreen;
-			uint32 coverBlue;
-			int w = bitmap.width/3;
-			if (w && !(p[0] == p[1] && p[1] == p[2]
-						&& (w == 1 || (p[3] == p[4] && p[4] == p[5])))){
-				coverRed = 0;
-				coverGreen = (p[0] * filter[0]) >> 8;
-				coverBlue = (p[0] * filter[1] + p[1] * filter[0]) >> 8;
-				coverGreen = coverGreen | ( -(coverGreen >> 8));
-				coverBlue = coverBlue | ( -(coverBlue >> 8));
-				if (coverRed || coverGreen || coverBlue){
-					sl.add_cell(x - 1, coverRed, coverGreen, coverBlue);
-				}
-			}
-			for (j = 0; j < w; j++) {
-				if (p[0] == p[1] && p[1] == p[2]
-					&& (j == 0 || (p[-3] == p[-2] && p[-2] == p[-1]))
-					&& (j == w-1 || (p[3] == p[4] && p[4] == p[5]))){
-					coverRed = p[0];
-					coverGreen = p[0];
-					coverBlue = p[0];
-				} else if (p[0] == p[1] && p[1] == p[2]
-						&& (j < w-1 && p[3] == p[4] && p[4] == p[5])
-						&& (j == w-2 || (p[6] == p[7] && p[7] == p[8]))){
-						coverRed = ((j > 0 ? p[-2] * filter[4]
-												+ p[-1] * filter[3] : 0)
-								+ p[0] * filter[2] + p[1] * filter[1]
-								+ p[2] * filter[0])
-								>> 8;
-						coverGreen = ((j > 0 ? p[-1] * filter[4] : 0)
-								+ p[0] * filter[3] + p[1] * filter[2]
-								+ p[2] * filter[1])
-								>> 8;
-						coverBlue = (p[0] * filter[4]
-								+ p[1] * filter[3] + p[2] * filter[2]) >> 8;
-						coverRed = coverRed | ( -(coverRed >> 8));
-						coverGreen = coverGreen | ( -(coverGreen >> 8));
-						coverBlue = coverBlue | ( -(coverBlue >> 8));
-				} else if (p[0] == p[1] && p[1] == p[2]
-						&& (j > 0 && p[-3] == p[-2] && p[-2] == p[-1])
-						&& (j == 1 || (p[-6] == p[-5] && p[-5] == p[-4]))){
-						coverRed = (p[0] * filter[2] + p[1] * filter[1]
-								+ p[2] * filter[0]) >> 8;
-						coverGreen = (p[0] * filter[3] + p[1] * filter[2]
-									+ p[2] * filter[1]
-									+ (j < w-1 ? p[3] * filter[0] : 0))
-									>> 8;
-						coverBlue = (p[0] * filter[4] + p[1] * filter[3]
-									+ p[2] * filter[2]
-									+ (j < w-1 ? p[3] * filter[1]
-													+ p[4] * filter[0] : 0))
-									>> 8;
-						coverRed = coverRed | ( -(coverRed >> 8));
-						coverGreen = coverGreen | ( -(coverGreen >> 8));
-						coverBlue = coverBlue | ( -(coverBlue >> 8));
-				} else {
-					coverRed = ((j > 0 ? p[-2] * filter[4]
-							+ p[-1] * filter[3] : 0)
-							+ p[0] * filter[2] + p[1] * filter[1]
-							+ p[2] * filter[0])
-							>> 8;
-					coverGreen = ((j > 0 ? p[-1] * filter[4] : 0)
-								+ p[0] * filter[3] + p[1] * filter[2]
-								+ p[2] * filter[1]
-								+ (j < w-1 ? p[3] * filter[0] : 0))
-								>> 8;
-					coverBlue = (p[0] * filter[4] + p[1] * filter[3]
-								+ p[2] * filter[2]
-								+ (j < w-1 ? p[3] * filter[1]
-										+ p[4] * filter[0] : 0))
-								>> 8;
-					coverRed = coverRed | ( -(coverRed >> 8));
-					coverGreen = coverGreen | ( -(coverGreen >> 8));
-					coverBlue = coverBlue | ( -(coverBlue >> 8));
-				}
-				if (coverRed || coverGreen || coverBlue) {
-						sl.add_cell(x + j, coverRed, coverGreen, coverBlue);
-				}
+			uint32 coverR;
+			uint32 coverG;
+			uint32 coverB;
+			int w = bitmap.width / 3;
+
+			for (int j = 0; j < w; j++) {
+				uint32 average = (p[0] + p[1] + p[2] + 2) / 3;
+				coverR = (p[0] * subpixelWeight + average * averageWeight) >> 8;
+				coverG = (p[1] * subpixelWeight + average * averageWeight) >> 8;
+				coverB = (p[2] * subpixelWeight + average * averageWeight) >> 8;
+
+				if (coverR || coverG || coverB)
+					sl.add_cell(x + j, coverR, coverG, coverB);
+
 				p += 3;
-			}
-			if (w && !(p[-3] == p[-2] && p[-2] == p[-1]
-						&& (w == 1 || (p[-6] == p[-5] && p[-5] == p[-4])))){
-				coverRed = (p[-2] * filter[4] + p[-1] * filter[3]) >> 8;
-				coverGreen = (p[-1] * filter[4]) >> 8;
-				coverBlue = 0;
-				coverRed = coverRed | ( -(coverRed >> 8));
-				coverGreen = coverGreen | ( -(coverGreen >> 8));
-				if (coverRed || coverGreen || coverBlue){
-					sl.add_cell(x + w, coverRed, coverGreen, coverBlue);
-				}
 			}
  		}
 
@@ -503,6 +444,147 @@ decompose_ft_bitmap_subpix(const FT_Bitmap& bitmap, int x, int y,
 			storage.render(sl);
 		}
 	}
+#else // filter based anti-colored edges method
+	// Filtering weights
+	const uint8 filter[5] = { 0x10, 0x40, 0x70, 0x40, 0x10 };
+
+	const uint8* buf = (const uint8*)bitmap.buffer;
+	int pitch = bitmap.pitch;
+	sl.reset(x - 1, x + bitmap.width / 3 + 1);
+		// -1 and +1 to account for additional edge pixels needed by filtering
+	storage.prepare();
+	if (flip_y) {
+		buf += bitmap.pitch * (bitmap.rows - 1);
+		y += bitmap.rows;
+		pitch = -pitch;
+	}
+	for (int i = 0; i < bitmap.rows; i++) {
+		sl.reset_spans();
+
+		if (bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
+			// font has built-in mono bitmap
+			agg::bitset_iterator bits(buf, 0);
+			for (int j = 0; j < bitmap.width; j++) {
+				if (bits.bit()) {
+					sl.add_cell(x + j,
+						agg::cover_full, agg::cover_full, agg::cover_full);
+				}
+				++bits;
+			}
+		} else {
+			const uint8* p = buf;
+			uint32 coverR;
+			uint32 coverG;
+			uint32 coverB;
+			int w = bitmap.width / 3;
+			// handle the left extra edge pixel
+			if (w && !(p[0] == p[1] && p[1] == p[2]
+				&& (w == 1 || (p[3] == p[4] && p[4] == p[5])))) {
+
+				coverR = 0;
+				coverG = (p[0] * filter[0]) >> 8;
+				coverB = (p[0] * filter[1] + p[1] * filter[0]) >> 8;
+				coverG = coverG | ( -(coverG >> 8));
+				coverB = coverB | ( -(coverB >> 8));
+
+				if (coverR || coverG || coverB)
+					sl.add_cell(x - 1, coverR, coverG, coverB);
+			}
+			for (int j = 0; j < w; j++) {
+				if (p[0] == p[1] && p[1] == p[2]
+					&& (j == 0 || (p[-3] == p[-2] && p[-2] == p[-1]))
+					&& (j == w-1 || (p[3] == p[4] && p[4] == p[5]))) {
+
+					coverR = p[0];
+					coverG = p[0];
+					coverB = p[0];
+
+				} else if (p[0] == p[1] && p[1] == p[2]
+					&& (j < w-1 && p[3] == p[4] && p[4] == p[5])
+					&& (j == w-2 || (p[6] == p[7] && p[7] == p[8]))) {
+
+					coverR = ((j > 0 ? p[-2] * filter[4]
+						+ p[-1] * filter[3] : 0)
+						+ p[0] * filter[2] + p[1] * filter[1]
+						+ p[2] * filter[0])
+						>> 8;
+					coverG = ((j > 0 ? p[-1] * filter[4] : 0)
+						+ p[0] * filter[3] + p[1] * filter[2]
+						+ p[2] * filter[1])
+						>> 8;
+					coverB = (p[0] * filter[4]
+							+ p[1] * filter[3] + p[2] * filter[2]) >> 8;
+					coverR = coverR | ( -(coverR >> 8));
+					coverG = coverG | ( -(coverG >> 8));
+					coverB = coverB | ( -(coverB >> 8));
+
+				} else if (p[0] == p[1] && p[1] == p[2]
+					&& (j > 0 && p[-3] == p[-2] && p[-2] == p[-1])
+					&& (j == 1 || (p[-6] == p[-5] && p[-5] == p[-4]))) {
+
+					coverR = (p[0] * filter[2] + p[1] * filter[1]
+						+ p[2] * filter[0]) >> 8;
+					coverG = (p[0] * filter[3] + p[1] * filter[2]
+						+ p[2] * filter[1]
+						+ (j < w-1 ? p[3] * filter[0] : 0))
+						>> 8;
+					coverB = (p[0] * filter[4] + p[1] * filter[3]
+						+ p[2] * filter[2]
+						+ (j < w-1 ? p[3] * filter[1]
+						+ p[4] * filter[0] : 0))
+						>> 8;
+					coverR = coverR | ( -(coverR >> 8));
+					coverG = coverG | ( -(coverG >> 8));
+					coverB = coverB | ( -(coverB >> 8));
+
+				} else {
+
+					coverR = ((j > 0 ? p[-2] * filter[4]
+						+ p[-1] * filter[3] : 0)
+						+ p[0] * filter[2] + p[1] * filter[1]
+						+ p[2] * filter[0])
+						>> 8;
+					coverG = ((j > 0 ? p[-1] * filter[4] : 0)
+						+ p[0] * filter[3] + p[1] * filter[2]
+						+ p[2] * filter[1]
+						+ (j < w-1 ? p[3] * filter[0] : 0))
+						>> 8;
+					coverB = (p[0] * filter[4] + p[1] * filter[3]
+						+ p[2] * filter[2]
+						+ (j < w-1 ? p[3] * filter[1]
+						+ p[4] * filter[0] : 0))
+						>> 8;
+					coverR = coverR | ( -(coverR >> 8));
+					coverG = coverG | ( -(coverG >> 8));
+					coverB = coverB | ( -(coverB >> 8));
+				}
+
+				if (coverR || coverG || coverB)
+					sl.add_cell(x + j, coverR, coverG, coverB);
+				p += 3;
+			}
+			// handle the right extra edge pixel
+			if (w && !(p[-3] == p[-2] && p[-2] == p[-1]
+				&& (w == 1 || (p[-6] == p[-5] && p[-5] == p[-4])))) {
+
+				coverR = (p[-2] * filter[4] + p[-1] * filter[3]) >> 8;
+				coverG = (p[-1] * filter[4]) >> 8;
+				coverB = 0;
+				coverR = coverR | ( -(coverR >> 8));
+				coverG = coverG | ( -(coverG >> 8));
+
+				if (coverR || coverG || coverB)
+					sl.add_cell(x + w, coverR, coverG, coverB);
+			}
+ 		}
+
+		buf += pitch;
+		if (sl.num_spans()) {
+			sl.finalize(y - i - 1);
+			storage.render(sl);
+		}
+	}
+#endif
 }
 
 // #pragma mark -
