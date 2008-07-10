@@ -98,7 +98,7 @@ class ServerApp : public MessageLooper {
 			bool				_HasWindowUnderMouse();
 
 			port_id				fMessagePort;
-			port_id				fClientReplyPort;	
+			port_id				fClientReplyPort;
 									// our BApplication's event port
 
 			BMessenger			fHandlerMessenger;
