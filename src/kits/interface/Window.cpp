@@ -1108,6 +1108,16 @@ FrameMoved(origin);
 				if (transit == B_ENTERED_VIEW || transit == B_EXITED_VIEW)
 					dropIfLate = false;
 
+				// TODO: The dropping code may have the following problem:
+				// On slower computers, 20ms may just be to abitious a delay.
+				// There, we might constantly check the message queue for a
+				// newer message, not find any, and still use the only but
+				// later than 20ms message, which of course makes the whole
+				// thing later than need be. An adaptive delay would be
+				// kind of neat, but would probably use additional BWindow
+				// members to count the successful versus fruitless queue
+				// searches and the delay value itself or something similar.
+
 				if (noHistory
 					|| (dropIfLate && (system_time() - eventTime > 20000))) {
 					// filter out older mouse moved messages in the queue
