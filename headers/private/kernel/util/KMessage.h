@@ -55,6 +55,7 @@ public:
 	status_t FindField(const char *name, type_code type,
 		KMessageField *field) const;
 	status_t GetNextField(KMessageField *field) const;
+	bool IsEmpty() const;
 
 	status_t AddData(const char *name, type_code type, const void *data,
 		int32 numBytes, bool isFixedSize = true);
@@ -135,7 +136,7 @@ public:
 	status_t ReceiveFrom(port_id fromPort, bigtime_t timeout = -1,
 		port_message_info* messageInfo = NULL);
 
-	void Dump(void (*printFunc)(const char*,...)) const;
+	void Dump(void (*printFunc)(const char*, ...)) const;
 
 private:
 	friend class KMessageField;

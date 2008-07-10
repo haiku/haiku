@@ -85,7 +85,7 @@ compare_image_boot(const void *_a, const void *_b)
 	if (!strncmp(b->ContentName(), "System", 6))
 		return -1;
 
-	return compare;	
+	return compare;
 }
 
 
@@ -278,7 +278,7 @@ DiskBootMethod::SortPartitions(KPartition** partitions, int32 count)
 // #pragma mark -
 
 
-/*!	Make the boot partition (and probably others) available. 
+/*!	Make the boot partition (and probably others) available.
 	The partitions that are a boot candidate a put into the /a partitions
 	stack. If the user selected a boot device, there is will only be one
 	entry in this stack; if not, the most likely is put up first.
@@ -290,53 +290,7 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 	const KMessage& bootVolume = args->boot_volume;
 
 	dprintf("get_boot_partitions(): boot volume message:\n");
-	KMessageField field;
-	while (bootVolume.GetNextField(&field) == B_OK) {
-		type_code type = field.TypeCode();
-		uint32 bigEndianType = B_HOST_TO_BENDIAN_INT32(type);
-		dprintf("field: \"%s\", type: %.4s (0x%lx):\n", field.Name(),
-			(char*)&bigEndianType, type);
-
-		if (field.CountElements() == 0)
-			dprintf("\n");
-
-		int32 size;
-		for (int i = 0; const void* data = field.ElementAt(i, &size); i++) {
-			dprintf("  [%2d] ", i);
-			bool isIntType = false;
-			int64 intData = 0;
-			switch (type) {
-				case B_BOOL_TYPE:
-					dprintf("%s\n", (*(bool*)data ? "true" : "false"));
-					break;
-				case B_INT8_TYPE:
-					isIntType = true;
-					intData = *(int8*)data;
-					break;
-				case B_INT16_TYPE:
-					isIntType = true;
-					intData = *(int16*)data;
-					break;
-				case B_INT32_TYPE:
-					isIntType = true;
-					intData = *(int32*)data;
-					break;
-				case B_INT64_TYPE:
-					isIntType = true;
-					intData = *(int64*)data;
-					break;
-				case B_STRING_TYPE:
-					dprintf("\"%s\"\n", (char*)data);
-					break;
-				default:
-					dprintf("data: \"%p\", %ld bytes\n", (char*)data, size);
-					break;
-			}
-			if (isIntType)
-				dprintf("%lld (0x%llx)\n", intData, intData);
-		}
-	}
-
+	bootVolume.Dump(&dprintf);
 
 	// create boot method
 	int32 bootMethodType = bootVolume.GetInt32(BOOT_METHOD,

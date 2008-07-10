@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ByteOrder.h>
 #include <Debug.h>
 #include <KernelExport.h>
 #include <TypeConstants.h>
@@ -299,6 +300,14 @@ KMessage::GetNextField(KMessageField *field) const
 	field->SetTo(const_cast<KMessage*>(this), _BufferOffsetFor(fieldHeader));
 	return B_OK;
 }
+
+
+bool
+KMessage::IsEmpty() const
+{
+	return _LastFieldHeader() == NULL;
+}
+
 
 // AddData
 status_t
@@ -601,7 +610,7 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout,
 
 
 void
-KMessage::Dump(void (*printFunc)(const char*,...)) const
+KMessage::Dump(void (*printFunc)(const char*, ...)) const
 {
 	Header* header = _Header();
 	printFunc("KMessage: buffer: %p (size/capacity: %ld/%ld), flags: 0x0lx\n",
@@ -610,10 +619,54 @@ KMessage::Dump(void (*printFunc)(const char*,...)) const
 	KMessageField field;
 	while (GetNextField(&field) == B_OK) {
 		type_code type = field.TypeCode();
-		int32 count = field.CountElements();
-		printFunc("  field: %-20s: type: 0x%lx ('%c%c%c%c'), %ld element%s\n",
-			field.Name(), type, (char)(type >> 24), (char)(type >> 16),
-			(char)(type >> 8), (char)type, count, count == 1 ? "" : "s");
+		uint32 bigEndianType = B_HOST_TO_BENDIAN_INT32(type);
+		int nameSpacing = 17 - strlen(field.Name());
+		if (nameSpacing < 0)
+			nameSpacing = 0;
+
+		printFunc("  field: \"%s\"%*s (%.4s): ", field.Name(), nameSpacing, "",
+			(char*)&bigEndianType);
+
+		if (field.CountElements() != 1)
+			printFunc("\n");
+
+		int32 size;
+		for (int i = 0; const void* data = field.ElementAt(i, &size); i++) {
+			if (field.CountElements() != 1)
+				printFunc("    [%2d] ", i);
+
+			bool isIntType = false;
+			int64 intData = 0;
+			switch (type) {
+				case B_BOOL_TYPE:
+					printFunc("%s\n", (*(bool*)data ? "true" : "false"));
+					break;
+				case B_INT8_TYPE:
+					isIntType = true;
+					intData = *(int8*)data;
+					break;
+				case B_INT16_TYPE:
+					isIntType = true;
+					intData = *(int16*)data;
+					break;
+				case B_INT32_TYPE:
+					isIntType = true;
+					intData = *(int32*)data;
+					break;
+				case B_INT64_TYPE:
+					isIntType = true;
+					intData = *(int64*)data;
+					break;
+				case B_STRING_TYPE:
+					printFunc("\"%s\"\n", (char*)data);
+					break;
+				default:
+					printFunc("data at %p, %ld bytes\n", (char*)data, size);
+					break;
+			}
+			if (isIntType)
+				printFunc("%lld (0x%llx)\n", intData, intData);
+		}
 	}
 }
 
