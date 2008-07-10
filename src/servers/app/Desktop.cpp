@@ -1106,14 +1106,17 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
 			&& floating->Feel() != B_FLOATING_APP_WINDOW_FEEL)
 			continue;
 
-		if (fFront != NULL && fFront->IsNormal() && floating->HasInSubset(fFront)) {
+		if (fFront != NULL && fFront->IsNormal()
+			&& floating->HasInSubset(fFront)) {
 			// is now visible
 			if (_Windows(previousWorkspace).HasWindow(floating)
-				&& previousWorkspace != nextWorkspace) {
+				&& previousWorkspace != nextWorkspace
+				&& !floating->InSubsetWorkspace(previousWorkspace)) {
 				// but no longer on the previous workspace
 				_Windows(previousWorkspace).RemoveWindow(floating);
 				floating->SetCurrentWorkspace(-1);
 			}
+
 			if (!_Windows(nextWorkspace).HasWindow(floating)) {
 				// but wasn't before
 				_Windows(nextWorkspace).AddWindow(floating,
@@ -1122,11 +1125,11 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
 				if (mouseEventWindow != fFront)
 					_ShowWindow(floating);
 
-				// TODO:
-				// put the floating last in the floating window list to preserve
-				// the on screen window order
+				// TODO: put the floating last in the floating window list to
+				// preserve the on screen window order
 			}
-		} else if (_Windows(previousWorkspace).HasWindow(floating)) {
+		} else if (_Windows(previousWorkspace).HasWindow(floating)
+			&& !floating->InSubsetWorkspace(previousWorkspace)) {
 			// was visible, but is no longer
 
 			_Windows(previousWorkspace).RemoveWindow(floating);
@@ -1140,8 +1143,7 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
 }
 
 
-/*!
-	Search the visible windows for a valid back window
+/*!	Search the visible windows for a valid back window
 	(only desktop windows can't be back windows)
 */
 void
@@ -1160,8 +1162,7 @@ Desktop::_UpdateBack()
 }
 
 
-/*!
-	Search the visible windows for a valid front window
+/*!	Search the visible windows for a valid front window
 	(only normal and modal windows can be front windows)
 
 	The only place where you don't want to update floating windows is
@@ -1915,8 +1916,7 @@ Desktop::SetWindowDecoratorSettings(Window* window, const BMessage& settings)
 }
 
 
-/*!
-	Updates the workspaces of all subset windows with regard to the
+/*!	Updates the workspaces of all subset windows with regard to the
 	specifed window.
 	If newIndex is not -1, it will move all subset windows that belong to
 	the specifed window to the new workspace; this form is only called by
@@ -1950,11 +1950,7 @@ Desktop::_UpdateSubsetWorkspaces(Window* window, int32 previousIndex,
 
 		if (subset->HasInSubset(window)) {
 			// adopt the workspace change
-			if (newIndex != -1) {
-				_Windows(newIndex).AddWindow(subset);
-				_Windows(previousIndex).RemoveWindow(subset);
-			} else
-				SetWindowWorkspaces(subset, subset->SubsetWorkspaces());
+			SetWindowWorkspaces(subset, subset->SubsetWorkspaces());
 		}
 	}
 }
@@ -1967,6 +1963,9 @@ void
 Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
 	uint32 newWorkspaces)
 {
+	if (oldWorkspaces == newWorkspaces)
+		return;
+
 	// apply changes to the workspaces' window lists
 
 	LockAllWindows();

@@ -209,6 +209,7 @@ public:
 			bool				HasInSubset(const Window* window) const;
 			bool				SameSubset(Window* window);
 			uint32				SubsetWorkspaces() const;
+			bool				InSubsetWorkspace(int32 index) const;
 
 			bool				HasWorkspacesViews() const
 									{ return fWorkspacesViewCount != 0; }
@@ -250,7 +251,7 @@ protected:
 			void				_ObeySizeLimits();
 			void				_PropagatePosition();
 
-			BString				fTitle;	
+			BString				fTitle;
 			// TODO: no fp rects anywhere
 			BRect				fFrame;
 
@@ -259,7 +260,7 @@ protected:
 			// the visible region is only recalculated from the
 			// Desktop thread, when using it, Desktop::ReadLockClipping()
 			// has to be called
-	
+
 			BRegion				fVisibleRegion;
 			BRegion				fVisibleContentRegion;
 			// our part of the "global" dirty region
@@ -313,15 +314,15 @@ protected:
 	public:
 									UpdateSession();
 		virtual						~UpdateSession();
-	
+
 				void				Include(BRegion* additionalDirty);
 				void				Exclude(BRegion* dirtyInNextSession);
-	
+
 		inline	BRegion&			DirtyRegion()
 										{ return fDirtyRegion; }
-	
+
 				void				MoveBy(int32 x, int32 y);
-	
+
 				void				SetUsed(bool used);
 		inline	bool				IsUsed() const
 										{ return fInUse; }
@@ -331,7 +332,7 @@ protected:
 										{ return fCause & UPDATE_EXPOSE; }
 		inline	bool				IsRequest() const
 										{ return fCause & UPDATE_REQUEST; }
-	
+
 	private:
 				BRegion				fDirtyRegion;
 				bool				fInUse;

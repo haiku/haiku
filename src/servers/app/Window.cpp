@@ -1606,6 +1606,17 @@ Window::SubsetWorkspaces() const
 }
 
 
+/*!	Returns wether or not a window is in the subset workspace list with the
+	specified \a index.
+	See SubsetWorkspaces().
+*/
+bool
+Window::InSubsetWorkspace(int32 index) const
+{
+	return (SubsetWorkspaces() & (1UL << index)) != 0;
+}
+
+
 // #pragma mark - static
 
 
