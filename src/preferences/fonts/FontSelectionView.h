@@ -61,5 +61,5 @@ class FontSelectionView : public BView {
 		BFont			fCurrentFont;
 		float			fMaxFontNameWidth;
 };
-	
+
 #endif	/* FONT_SELECTION_VIEW_H */

@@ -114,7 +114,7 @@ FontSelectionView::FontSelectionView(BRect _rect, const char* name,
 	// it doesn't overlap the box outline.
 	rect = fPreviewBox->Bounds().InsetByCopy(3, 3);
 	fPreviewText = new BStringView(rect, "preview text",
-		"The quick brown fox jumps over the lazy dog.", 
+		"The quick brown fox jumps over the lazy dog.",
 		B_FOLLOW_LEFT_RIGHT);
 	fPreviewText->SetFont(&fCurrentFont);
 	fPreviewBox->AddChild(fPreviewText);
@@ -172,7 +172,7 @@ FontSelectionView::RelayoutIfNeeded()
 	GetPreferredSize(&width, &height);
 
 	if (width > Bounds().Width()) {
-		fSizesMenuField->MoveTo(fMaxFontNameWidth + fDivider + 40.0f, 
+		fSizesMenuField->MoveTo(fMaxFontNameWidth + fDivider + 40.0f,
 				fFontsMenuField->Bounds().top);
 		ResizeTo(width, height);
 	}
@@ -424,7 +424,7 @@ FontSelectionView::IsRevertable()
 void
 FontSelectionView::UpdateFontsMenu()
 {
-	int32 numFamilies = count_font_families(); 
+	int32 numFamilies = count_font_families();
 
 	fFontsMenu->RemoveItems(0, fFontsMenu->CountItems(), true);
 	BFont font;
@@ -434,8 +434,8 @@ FontSelectionView::UpdateFontsMenu()
 	font_style currentStyle;
 	fCurrentFont.GetFamilyAndStyle(&currentFamily, &currentStyle);
 
-	for (int32 i = 0; i < numFamilies; i++) { 
-		font_family family; 
+	for (int32 i = 0; i < numFamilies; i++) {
+		font_family family;
 		uint32 flags;
 		if (get_font_family(i, &family, &flags) != B_OK)
 			continue;
@@ -457,10 +457,10 @@ FontSelectionView::UpdateFontsMenu()
 		BMenuItem* familyItem = new BMenuItem(stylesMenu, message);
 		fFontsMenu->AddItem(familyItem);
 
-		int32 numStyles = count_font_styles(family); 
+		int32 numStyles = count_font_styles(family);
 
 		for (int32 j = 0; j < numStyles; j++) {
-			font_style style; 
+			font_style style;
 			if (get_font_style(family, j, &style, &flags) != B_OK)
 				continue;
 

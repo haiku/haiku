@@ -12,6 +12,7 @@
 
 
 #include "FontSelectionView.h"
+#include "AdvancedSettingsView.h"
 
 
 class FontView : public BView {
@@ -29,9 +30,9 @@ class FontView : public BView {
 		bool	IsRevertable();
 
 	private:
-		FontSelectionView 	*fPlainView;
-		FontSelectionView 	*fBoldView;
-		FontSelectionView 	*fFixedView;
+		FontSelectionView		*fPlainView;
+		FontSelectionView		*fBoldView;
+		FontSelectionView		*fFixedView;
 };
-	
+
 #endif	/* FONT_VIEW_H */

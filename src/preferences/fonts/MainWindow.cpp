@@ -6,6 +6,7 @@
  *		Mark Hogben
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 
 
@@ -25,7 +26,7 @@ static const uint32 kMsgCheckFonts = 'chkf';
 
 
 MainWindow::MainWindow()
-	: BWindow(BRect(100, 100, 445, 340), "Fonts", B_TITLED_WINDOW,
+	: BWindow(BRect(100, 100, 445, 410), "Fonts", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	BRect rect = Bounds();
@@ -36,7 +37,8 @@ MainWindow::MainWindow()
 	rect.left = 10;
 	rect.top = rect.bottom - 10;
 	fDefaultsButton = new BButton(rect, "defaults", "Defaults",
-		new BMessage(kMsgSetDefaults), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
+		new BMessage(kMsgSetDefaults), B_FOLLOW_LEFT
+			| B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fDefaultsButton->ResizeToPreferred();
 	fDefaultsButton->SetEnabled(false);
 	float buttonHeight = fDefaultsButton->Bounds().Height();
@@ -56,10 +58,12 @@ MainWindow::MainWindow()
 	rect.top += 5;
 	rect.bottom -= 20 + buttonHeight;
 	rect.left += 5;
-	BTabView *tabView = new BTabView(rect, "tabview", B_WIDTH_FROM_LABEL); 
+	BTabView *tabView = new BTabView(rect, "tabview", B_WIDTH_FROM_LABEL);
 
 	rect = tabView->ContainerView()->Bounds().InsetByCopy(5, 8);
 	fFontsView = new FontView(rect);
+
+	fAdvancedSettings = new AdvancedSettingsView(rect, "Advanced");
 
 	tabView->AddTab(fFontsView);
 
@@ -83,7 +87,8 @@ MainWindow::MainWindow()
 		tabView->ContainerView()->ResizeBy(0, heightDiff);
 	}
 
-	ResizeTo(tabView->Bounds().Width() + 10, tabView->Frame().bottom + 20 + buttonHeight);
+	ResizeTo(tabView->Bounds().Width() + 10, tabView->Frame().bottom + 20
+		+ buttonHeight);
 	view->AddChild(tabView);
 	fFontsView->ResizeToPreferred();
 
@@ -97,6 +102,23 @@ MainWindow::MainWindow()
 		BScreen screen(this);
 		if (!screen.Frame().InsetByCopy(10, 10).Intersects(Frame()))
 			_Center();
+	}
+
+	tabView->AddTab(fAdvancedSettings);
+
+	fAdvancedSettings->RelayoutIfNeeded();
+	fAdvancedSettings->GetPreferredSize(&width, &height);
+	
+	widthDiff = width + 10 - tabView->ContainerView()->Bounds().Width();
+	if (widthDiff > 0) {
+		tabView->ResizeBy(widthDiff, 0);
+		tabView->ContainerView()->ResizeBy(widthDiff, 0);
+	}
+	
+	heightDiff = height + 16 - tabView->ContainerView()->Bounds().Height();
+	if (heightDiff > 0) {
+		tabView->ResizeBy(0, heightDiff);
+		tabView->ContainerView()->ResizeBy(0, heightDiff);
 	}
 
 	fRunner = new BMessageRunner(this, new BMessage(kMsgCheckFonts), 3000000);
@@ -127,19 +149,25 @@ MainWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgUpdate:
-			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable());
-			fRevertButton->SetEnabled(fFontsView->IsRevertable());
+			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable()
+								|| fAdvancedSettings->IsDefaultable());
+			fRevertButton->SetEnabled(fFontsView->IsRevertable()
+								|| fAdvancedSettings->IsRevertable());
 			break;
 
 		case kMsgSetDefaults:
 			fFontsView->SetDefaults();
+			fAdvancedSettings->SetDefaults();
 			fDefaultsButton->SetEnabled(false);
-			fRevertButton->SetEnabled(fFontsView->IsRevertable());
+			fRevertButton->SetEnabled(fFontsView->IsRevertable()
+								|| fAdvancedSettings->IsRevertable());
 			break;
 
 		case kMsgRevert:
 			fFontsView->Revert();
-			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable());
+			fAdvancedSettings->Revert();
+			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable()
+								|| fAdvancedSettings->IsDefaultable());
 			fRevertButton->SetEnabled(false);
 			break;
 

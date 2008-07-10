@@ -12,6 +12,7 @@
 
 
 #include "FontsSettings.h"
+#include "AdvancedSettingsView.h"
 
 #include <Window.h>
 
@@ -31,12 +32,13 @@ class MainWindow : public BWindow {
 	private:
 		void			_Center();
 
-		BMessageRunner*	fRunner;
-		FontView*		fFontsView;
-		BButton*		fDefaultsButton;
-		BButton*		fRevertButton;
+		BMessageRunner*			fRunner;
+		FontView*				fFontsView;
+		BButton*				fDefaultsButton;
+		BButton*				fRevertButton;
 
-		FontsSettings	fSettings;
+		FontsSettings			fSettings;
+		AdvancedSettingsView*	fAdvancedSettings;
 };
 
 static const int32 kMsgUpdate = 'updt';

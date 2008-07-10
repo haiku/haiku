@@ -5,6 +5,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 Preference Fonts :
 	FontSelectionView.cpp
+	AdvancedSettingsView.cpp
 	FontsSettings.cpp
 	FontView.cpp
 	main.cpp
