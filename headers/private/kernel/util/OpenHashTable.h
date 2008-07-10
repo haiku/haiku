@@ -1,9 +1,6 @@
 /*
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *      Hugo Santos, hugosantos@gmail.com
  */
 #ifndef _KERNEL_UTIL_OPEN_HASH_TABLE_H
 #define _KERNEL_UTIL_OPEN_HASH_TABLE_H
@@ -20,7 +17,7 @@
 
 	struct Foo : HashTableLink<Foo> {
 		int bar;
-	
+
 		HashTableLink<Foo> otherLink;
 	};
 
@@ -125,6 +122,8 @@ public:
 		_Insert(fTable, fTableSize, value);
 		fItemCount++;
 	}
+
+	// TODO: a ValueType* Remove(const KeyType& key) method is missing
 
 	bool Remove(ValueType *value)
 	{
