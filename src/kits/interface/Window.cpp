@@ -1096,16 +1096,20 @@ FrameMoved(origin);
 				uint32 eventOptions = view->fEventOptions
 					| view->fMouseEventOptions;
 				bool noHistory = eventOptions & B_NO_POINTER_HISTORY;
-				bool fullHistory = eventOptions & B_FULL_POINTER_HISTORY;
+				bool dropIfLate = !(eventOptions & B_FULL_POINTER_HISTORY);
 
 				bigtime_t eventTime;
-				if (noHistory
-					|| msg->FindInt64("when", (int64*)&eventTime) < B_OK) {
+				if (msg->FindInt64("when", (int64*)&eventTime) < B_OK)
 					eventTime = system_time();
-				}
 
-				if (noHistory || (!fullHistory
-						&& (system_time() - eventTime > 20000))) {
+				uint32 transit;
+				msg->FindInt32("be:transit", (int32*)&transit);
+				// don't drop late messages with these important transit values
+				if (transit == B_ENTERED_VIEW || transit == B_EXITED_VIEW)
+					dropIfLate = false;
+
+				if (noHistory
+					|| (dropIfLate && (system_time() - eventTime > 20000))) {
 					// filter out older mouse moved messages in the queue
 					_DequeueAll();
 					BMessageQueue *queue = MessageQueue();
@@ -1126,10 +1130,8 @@ FrameMoved(origin);
 
 				BPoint where;
 				uint32 buttons;
-				uint32 transit;
 				msg->FindPoint("be:view_where", &where);
 				msg->FindInt32("buttons", (int32*)&buttons);
-				msg->FindInt32("be:transit", (int32*)&transit);
 
 				BMessage* dragMessage = NULL;
 				if (msg->HasMessage("be:drag_message")) {
