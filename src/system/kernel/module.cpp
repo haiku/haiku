@@ -149,7 +149,13 @@ struct entry {
 };
 
 struct hash_entry : entry {
+	~hash_entry()
+	{
+		free((char*)path);
+	}
+
 	HashTableLink<hash_entry> link;
+	const char*			path;
 };
 
 struct NodeHashDefinition {
@@ -187,6 +193,21 @@ struct module_listener : DoublyLinkedListLinkImpl<module_listener> {
 
 typedef DoublyLinkedList<module_listener> ModuleListenerList;
 
+struct module_notification : DoublyLinkedListLinkImpl<module_notification> {
+	~module_notification()
+	{
+		free((char*)name);
+	}
+
+	int32		opcode;
+	dev_t		device;
+	ino_t		directory;
+	ino_t		node;
+	const char*	name;
+};
+
+typedef DoublyLinkedList<module_notification> NotificationList;
+
 class DirectoryWatcher : public NotificationListener {
 public:
 						DirectoryWatcher();
@@ -221,13 +242,20 @@ public:
 
 			bool		HasNode(dev_t device, ino_t node);
 
+			void		Notify(int32 opcode, dev_t device, ino_t directory,
+							ino_t node, const char* name);
+
 	virtual const char*	Name() { return "modules"; }
 
+	static	void		HandleNotifications(void *data, int iteration);
+
 private:
-			status_t	_AddNode(dev_t device, ino_t node, uint32 flags,
-							NotificationListener& listener);
+			status_t	_RemoveNode(dev_t device, ino_t node);
+			status_t	_AddNode(dev_t device, ino_t node, const char* path,
+							uint32 flags, NotificationListener& listener);
 			status_t	_AddDirectoryNode(dev_t device, ino_t node);
-			status_t	_AddModuleNode(dev_t device, ino_t node);
+			status_t	_AddModuleNode(dev_t device, ino_t node, int fd,
+							const char* name);
 
 			status_t	_AddDirectory(const char* prefix);
 			status_t	_ScanDirectory(char* directoryPath, const char* prefix,
@@ -235,11 +263,16 @@ private:
 			status_t	_ScanDirectory(Stack<DIR*>& stack, DIR* dir,
 							const char* prefix, size_t prefixPosition);
 
+			void		_Notify(int32 opcode, dev_t device, ino_t directory,
+							ino_t node, const char* name);
+			void		_HandleNotifications();
+
 	recursive_lock		fLock;
 	ModuleListenerList	fListeners;
 	NodeHash			fNodes;
 	DirectoryWatcher	fDirectoryWatcher;
 	ModuleWatcher		fModuleWatcher;
+	NotificationList	fNotifications;
 };
 
 }	// namespace Module
@@ -1177,6 +1210,7 @@ DirectoryWatcher::EventOccured(NotificationService& service,
 	int32 opcode = event->GetInt32("opcode", -1);
 	dev_t device = event->GetInt32("device", -1);
 	ino_t directory = event->GetInt64("directory", -1);
+	ino_t node = event->GetInt64("node", -1);
 	const char *name = event->GetString("name", NULL);
 
 	if (opcode == B_ENTRY_MOVED) {
@@ -1192,16 +1226,7 @@ DirectoryWatcher::EventOccured(NotificationService& service,
 		}
 	}
 
-	KPath path(B_PATH_NAME_LENGTH + 1);
-	if (path.InitCheck() != B_OK || vfs_entry_ref_to_path(device, directory,
-			name, path.LockBuffer(), path.BufferSize()) != B_OK)
-		return;
-
-	path.UnlockBuffer();
-
-	dprintf("module \"%s\" %s\n", path.Leaf(),
-		opcode == B_ENTRY_CREATED ? "added" : "removed");
-	//sModuleNotificationService.Notify(path.Path(), opcode);
+	sModuleNotificationService.Notify(opcode, device, directory, node, name);
 }
 
 
@@ -1224,6 +1249,11 @@ ModuleWatcher::EventOccured(NotificationService& service, const KMessage* event)
 	if (event->GetInt32("opcode", -1) != B_STAT_CHANGED
 		|| (event->GetInt32("fields", 0) & B_STAT_MODIFICATION_TIME) == 0)
 		return;
+
+	dev_t device = event->GetInt32("device", -1);
+	ino_t node = event->GetInt64("node", -1);
+
+	sModuleNotificationService.Notify(B_STAT_CHANGED, device, -1, node, NULL);
 }
 
 
@@ -1300,8 +1330,29 @@ ModuleNotificationService::HasNode(dev_t device, ino_t node)
 
 
 status_t
-ModuleNotificationService::_AddNode(dev_t device, ino_t node, uint32 flags,
-	NotificationListener& listener)
+ModuleNotificationService::_RemoveNode(dev_t device, ino_t node)
+{
+	RecursiveLocker _(fLock);
+
+	struct entry key = {device, node};
+	hash_entry* entry = fNodes.Lookup(&key);
+	if (entry == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	remove_node_listener(device, node, entry->path != NULL
+		? (NotificationListener&)fModuleWatcher
+		: (NotificationListener&)fDirectoryWatcher);
+
+	fNodes.Remove(entry);
+	delete entry;
+
+	return B_OK;
+}
+
+
+status_t
+ModuleNotificationService::_AddNode(dev_t device, ino_t node, const char* path,
+	uint32 flags, NotificationListener& listener)
 {
 	RecursiveLocker locker(fLock);
 
@@ -1312,13 +1363,23 @@ ModuleNotificationService::_AddNode(dev_t device, ino_t node, uint32 flags,
 	if (entry == NULL)
 		return B_NO_MEMORY;
 
+	if (path != NULL) {
+		entry->path = strdup(path);
+		if (entry->path == NULL) {
+			delete entry;
+			return B_NO_MEMORY;
+		}
+	} else
+		entry->path = NULL;
+
 	status_t status = add_node_listener(device, node, flags, listener);
 	if (status != B_OK) {
 		delete entry;
 		return status;
 	}
 
-	//dprintf("  add %s %ld:%Ld\n", flags == B_WATCH_DIRECTORY ? "dir" : "file", device, node);
+	//dprintf("  add %s %ld:%Ld (%s)\n", flags == B_WATCH_DIRECTORY
+	//	? "dir" : "file", device, node, path);
 
 	entry->device = device;
 	entry->node = node;
@@ -1331,20 +1392,42 @@ ModuleNotificationService::_AddNode(dev_t device, ino_t node, uint32 flags,
 status_t
 ModuleNotificationService::_AddDirectoryNode(dev_t device, ino_t node)
 {
-	return _AddNode(device, node, B_WATCH_DIRECTORY, fDirectoryWatcher);
+	return _AddNode(device, node, NULL, B_WATCH_DIRECTORY, fDirectoryWatcher);
 }
 
 
 status_t
-ModuleNotificationService::_AddModuleNode(dev_t device, ino_t node)
+ModuleNotificationService::_AddModuleNode(dev_t device, ino_t node, int fd,
+	const char* name)
 {
-	return _AddNode(device, node, B_WATCH_STAT, fModuleWatcher);
+	struct vnode* vnode;
+	status_t status = vfs_get_vnode_from_fd(fd, true, &vnode);
+	if (status != B_OK)
+		return status;
+
+	ino_t directory;
+	vfs_vnode_to_node_ref(vnode, &device, &directory);
+
+	KPath path;
+	status = path.InitCheck();
+	if (status == B_OK) {
+		status = vfs_entry_ref_to_path(device, directory, name,
+			path.LockBuffer(), path.BufferSize());
+	}
+	if (status != B_OK)
+		return status;
+
+	path.UnlockBuffer();
+
+	return _AddNode(device, node, path.Path(), B_WATCH_STAT, fModuleWatcher);
 }
 
 
 status_t
 ModuleNotificationService::_AddDirectory(const char* prefix)
 {
+	status_t status = B_ERROR;
+
 	for (uint32 i = 0; i < kNumModulePaths; i++) {
 		if (sDisableUserAddOns && i >= kFirstNonSystemModulePath)
 			break;
@@ -1359,16 +1442,17 @@ ModuleNotificationService::_AddDirectory(const char* prefix)
 		pathBuffer.Append(prefix);
 
 		size_t prefixPosition = strlen(prefix);
-		status_t status = _ScanDirectory(pathBuffer.LockBuffer(), prefix,
+		status_t scanStatus = _ScanDirectory(pathBuffer.LockBuffer(), prefix,
 			prefixPosition);
 
 		pathBuffer.UnlockBuffer();
 
+		// It's enough if we succeed for one directory
 		if (status != B_OK)
-			return status;
+			status = scanStatus;
 	}
 
-	return B_OK;
+	return status;
 }
 
 
@@ -1469,7 +1553,8 @@ ModuleNotificationService::_ScanDirectory(Stack<DIR*>& stack, DIR* dir,
 				&& directMatch)
 				directMatchAdded = true;
 		} else if (S_ISREG(stat.st_mode)) {
-			if (_AddModuleNode(stat.st_dev, stat.st_ino) == B_OK && directMatch)
+			if (_AddModuleNode(stat.st_dev, stat.st_ino, dir->fd,
+					dirent->d_name) == B_OK && directMatch)
 				directMatchAdded = true;
 		}
 	}
@@ -1485,6 +1570,143 @@ ModuleNotificationService::_ScanDirectory(Stack<DIR*>& stack, DIR* dir,
 
 	closedir(dir);
 	return B_OK;
+}
+
+
+void
+ModuleNotificationService::_Notify(int32 opcode, dev_t device, ino_t directory,
+	ino_t node, const char* name)
+{
+	// construct path
+
+	KPath pathBuffer;
+	const char* path;
+
+	if (name != NULL) {
+		// we have an entry ref
+		if (pathBuffer.InitCheck() != B_OK
+			|| vfs_entry_ref_to_path(device, directory, name,
+				pathBuffer.LockBuffer(), pathBuffer.BufferSize()) != B_OK)
+			return;
+
+		pathBuffer.UnlockBuffer();
+		path = pathBuffer.Path();
+	} else {
+		// we only have a node ref
+		RecursiveLocker _(fLock);
+
+		struct entry key = {device, node};
+		hash_entry* entry = fNodes.Lookup(&key);
+		if (entry == NULL || entry->path == NULL)
+			return;
+
+		path = entry->path;
+	}
+
+	// remove kModulePaths from path
+
+	for (uint32 i = 0; i < kNumModulePaths; i++) {
+		KPath modulePath;
+		if (find_directory(kModulePaths[i], gBootDevice, true,
+				modulePath.LockBuffer(), modulePath.BufferSize()) != B_OK)
+			continue;
+
+		modulePath.UnlockBuffer();
+		modulePath.Append("kernel");
+
+		if (strncmp(path, modulePath.Path(), modulePath.Length()))
+			continue;
+
+		path += modulePath.Length();
+		if (path[i] == '/')
+			path++;
+
+		break;
+	}
+
+	KMessage event;
+
+	// find listeners by prefix/path
+
+	ModuleListenerList::Iterator iterator = fListeners.GetIterator();
+	while (iterator.HasNext()) {
+		module_listener* listener = iterator.Next();
+
+		if (strncmp(path, listener->prefix, strlen(listener->prefix)))
+			continue;
+
+		if (event.IsEmpty()) {
+			// construct message only when needed
+			event.AddInt32("opcode", opcode);
+			event.AddString("path", path);
+		}
+
+		// notify them!
+		listener->listener->EventOccured(*this, &event);
+
+		// we might need to watch new files now
+		if (opcode == B_ENTRY_CREATED)
+			_AddDirectory(listener->prefix);
+
+	}
+
+	// remove notification listeners, if needed
+
+	if (opcode == B_ENTRY_REMOVED)
+		_RemoveNode(device, node);
+}
+
+
+void
+ModuleNotificationService::_HandleNotifications()
+{
+	RecursiveLocker _(fLock);
+
+	NotificationList::Iterator iterator = fNotifications.GetIterator();
+	while (iterator.HasNext()) {
+		module_notification* notification = iterator.Next();
+
+		_Notify(notification->opcode, notification->device,
+			notification->directory, notification->node, notification->name);
+
+		iterator.Remove();
+		delete notification;
+	}
+}
+
+
+void
+ModuleNotificationService::Notify(int32 opcode, dev_t device, ino_t directory,
+	ino_t node, const char* name)
+{
+	module_notification* notification = new(std::nothrow) module_notification;
+	if (notification == NULL)
+		return;
+
+	if (name != NULL) {
+		notification->name = strdup(name);
+		if (notification->name == NULL) {
+			delete notification;
+			return;
+		}
+	} else
+		notification->name = NULL;
+
+	notification->opcode = opcode;
+	notification->device = device;
+	notification->directory = directory;
+	notification->node = node;
+
+	RecursiveLocker _(fLock);
+	fNotifications.Add(notification);
+}
+
+
+/*static*/ void
+ModuleNotificationService::HandleNotifications(void */*data*/,
+	int /*iteration*/)
+{
+	sModuleNotificationService._HandleNotifications();
 }
 
 
@@ -1590,6 +1812,10 @@ module_init(kernel_args* args)
 	}
 
 	new(&sModuleNotificationService) ModuleNotificationService();
+
+	register_kernel_daemon(&ModuleNotificationService::HandleNotifications,
+		NULL, 10);
+		// once every second
 
 	sDisableUserAddOns = get_safemode_boolean(B_SAFEMODE_DISABLE_USER_ADD_ONS,
 		false);
