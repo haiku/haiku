@@ -58,6 +58,14 @@ printf(const char *format, ...)
 }
 
 
+extern "C" uint32
+__swap_int32(uint32 value)
+{
+	return value >> 24 | (value >> 8) & 0xff00 | value << 24
+		| (value << 8) & 0xff0000;
+}
+
+
 // Copied from libroot/os/thread.c:
 
 
