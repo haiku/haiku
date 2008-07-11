@@ -22,6 +22,11 @@
 #include <bluetooth/HCI/btHCI_module.h>
 
 #define BT_DEBUG_THIS_MODULE
+
+#define MODULE_NAME "BT"
+#define SUBMODULE_NAME BLUETOOTH_DEVICE_DEVFS_NAME
+#define SUBMODULE_COLOR 31
+
 #include <btDebug.h>
 
 #include "h2generic.h"
@@ -147,15 +152,20 @@ exit:
 
 /* remove a device from the list of connected devices */
 static void
-kill_device(bt_usb_dev* dev)
+kill_device(bt_usb_dev* bdev)
 {
-	debugf("remove_device(%p)\n", dev);
+	if (bdev != NULL) {
+		debugf("(%p)\n", bdev);
 		
-	delete_sem(dev->lock);
-	delete_sem(dev->cmd_complete);
-	
-	free(dev);
-	dev_count--;
+		delete_sem(bdev->lock);
+		delete_sem(bdev->cmd_complete);
+		
+		// mark it free
+		bt_usb_devices[bdev->num] = NULL;
+		
+		free(bdev);
+		dev_count--;
+	}
 }
 
 
@@ -347,46 +357,37 @@ bail_no_mem:
 static status_t
 device_removed(void* cookie)
 {
-	int32 i;
-	void* item;
 	bt_usb_dev* bdev = (bt_usb_dev*) fetch_device(cookie, 0);
 	
 	debugf("device_removed(%p)\n", bdev);
 
     if (bdev == NULL) {    
-        flowf("Weird condition...\n");
+        flowf(" not present in driver¿?\n");
         return B_ERROR;
     }
-	// TODO: Consider some other place
-	// TX
-	for (i = 0; i < BT_DRIVER_TXCOVERAGE; i++) {
-		if (i == BT_COMMAND)
-			while ((item = list_remove_head_item(&bdev->nbuffersTx[i])) != NULL) {
-				snb_free(item);			
-			}
-		else
-			while ((item = list_remove_head_item(&bdev->nbuffersTx[i])) != NULL) {
-				nb_destroy(item);			
-			}
-	
-	}
-	// RX
-	for (i = 0; i < BT_DRIVER_RXCOVERAGE; i++) {
-	    nb_destroy(bdev->nbufferRx[i]);				
-	}
-	snb_free(bdev->eventRx);
-	
-    purge_room(&bdev->eventRoom);
-    purge_room(&bdev->aclRoom);
-	// TODO: Consider some other place
-    
-    if (hci != NULL)
-        hci->UnregisterDriver(bdev->hdev);    
 
-	bdev->connected = false;
+	if (!TEST_AND_CLEAR(&bdev->state, RUNNING) ) {
+		flowf(" wasnt running¿?\n");	
+	}
+
+
+	flowf("Cancelling queues...\n");
+	if ( bdev->intr_in_ep != NULL ) {
+		usb->cancel_queued_transfers(bdev->intr_in_ep->handle);
+		flowf("Cancelling impossible EVENTS\n");
+	}
 	
-	/* TODO: maybe we still need this struct for close and free hooks */
-	kill_device(bdev);
+	if (bdev->bulk_in_ep!=NULL) {
+		usb->cancel_queued_transfers(bdev->bulk_in_ep->handle);
+		flowf("Cancelling impossible ACL in\n");
+	}
+	
+	if (bdev->bulk_out_ep!=NULL) {
+		usb->cancel_queued_transfers(bdev->bulk_out_ep->handle);
+		flowf("Cancelling impossible ACL out\n");
+	}
+	
+	bdev->connected = false;
 
 	return B_OK;
 }
@@ -487,40 +488,47 @@ device_open(const char *name, uint32 flags, void **cookie)
 static status_t
 device_close(void *cookie)
 {
+	int32 i;
+	void* item;
 	bt_usb_dev* bdev = (bt_usb_dev*)cookie;
-
+	
 	if (bdev == NULL)
 		panic("bad cookie");
 		
 	debugf("device_close() called on %ld\n", bdev->hdev );
 
+	// Clean queues
 	
-	if (!TEST_AND_CLEAR(&bdev->state, RUNNING) ) {
-		flowf("Device wasnt running!!!\n");	
+	// TX
+	for (i = 0; i < BT_DRIVER_TXCOVERAGE; i++) {
+		if (i == BT_COMMAND)
+			while ((item = list_remove_head_item(&bdev->nbuffersTx[i])) != NULL) {
+				snb_free(item);			
+			}
+		else
+			while ((item = list_remove_head_item(&bdev->nbuffersTx[i])) != NULL) {
+				nb_destroy(item);			
+			}
+	
 	}
-	
-	flowf("Stopping device and cancelling queues...\n");
-	
-	if ( bdev->intr_in_ep != NULL ) {
-		usb->cancel_queued_transfers(bdev->intr_in_ep->handle);
-		
-	} else {
-		flowf("Cancelling impossible EVENTS\n");
+	// RX
+	for (i = 0; i < BT_DRIVER_RXCOVERAGE; i++) {
+	    nb_destroy(bdev->nbufferRx[i]);				
 	}
+	snb_free(bdev->eventRx);
 	
-	if (bdev->bulk_in_ep!=NULL) {
-		usb->cancel_queued_transfers(bdev->bulk_in_ep->handle);
-	} else {
-		flowf("Cancelling impossible ACL in\n");
-	}
-	
-	if (bdev->bulk_out_ep!=NULL) {
-		usb->cancel_queued_transfers(bdev->bulk_out_ep->handle);
-	} else {
-		flowf("Cancelling impossible ACL out\n");
-	}
+    purge_room(&bdev->eventRoom);
+    purge_room(&bdev->aclRoom);
     
-    // TODO: Kill if its not connected?
+    /* Device no longer in our Stack*/
+    if (hci != NULL)
+        hci->UnregisterDriver(bdev->hdev);
+
+	// unSet RUNNING
+	if (TEST_AND_CLEAR(&bdev->state, RUNNING)) { 
+	    debugf(" %s not running¿?\n",bdev->name);
+	    return B_ERROR;
+	}	
 
 	return B_OK;
 }
@@ -532,23 +540,22 @@ static status_t
 device_free (void *cookie)
 {
 	status_t err = B_OK;
-	bt_usb_dev* dev = (bt_usb_dev*)cookie;
+	bt_usb_dev* bdev = (bt_usb_dev*)cookie;
 	
 	debugf("device_free() called on %s \n",BLUETOOTH_DEVICE_PATH);
 		
 
-	if (--dev->open_count == 0) {
+	if (--bdev->open_count == 0) {
 
 		/* GotoLowPower */
 		// interesting .....
 	}
 	else {
 		/* The last client has closed, and the device is no longer
-		   connected, so remove it from the list. */
-		   
+		   connected, so remove it from the list. */	   
 	}
 	
-	// TODO: Kill if its not connected?
+	kill_device(bdev);
 
 	return err;
 }
@@ -747,10 +754,9 @@ uninit_driver(void)
 		    //	if (connected_dev != NULL) {
             //		debugf("Device %p still exists.\n",	connected_dev);
             //	}
+            debugf("%s still present¿?\n",bt_usb_devices[j]->name);
 			kill_device(bt_usb_devices[j]);
-			bt_usb_devices[j] = NULL;
 		}
-
 	}
 	
 	usb->uninstall_notify(BLUETOOTH_DEVICE_DEVFS_NAME);
