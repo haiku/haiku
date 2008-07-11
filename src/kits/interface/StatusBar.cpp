@@ -361,6 +361,11 @@ BStatusBar::SetMaxValue(float max)
 void
 BStatusBar::Update(float delta, const char* text, const char* trailingText)
 {
+	// If any of these are NULL, the existing text remains (BeBook)
+	if (text == NULL)
+		text = fText.String();
+	if (trailingText == NULL)
+		trailingText = fTrailingText.String();
 	BStatusBar::SetTo(fCurrent + delta, text, trailingText);
 }
 
