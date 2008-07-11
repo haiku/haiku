@@ -131,6 +131,11 @@ BHandler::BHandler(const char *name)
 
 BHandler::~BHandler()
 {
+	if (LockLooper()) {
+		Looper()->RemoveHandler(this);
+		UnlockLooper();
+	}
+
 	// remove all filters
 	if (fFilters) {
 		int32 count = fFilters->CountItems();
