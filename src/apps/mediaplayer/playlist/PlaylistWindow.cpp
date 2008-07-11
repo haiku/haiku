@@ -71,7 +71,7 @@ PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 		// make it so the frame of the menubar is also the frame of
 		// the scroll bar (appears to be)
 		scrollBar->MoveBy(0, -1);
-		scrollBar->ResizeBy(0, 1);
+		scrollBar->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 2));
 	}
 
 	fCommandStack->AddListener(&fCommandStackListener);
