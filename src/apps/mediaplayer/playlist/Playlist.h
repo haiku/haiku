@@ -48,25 +48,29 @@ public:
 public:
 								Playlist();
 								~Playlist();
-							
+			// archiving
+			status_t			UnArchive(const BMessage* archive);
+			status_t			Archive(BMessage* into) const;
+
+
 			// list functionality
 			void				MakeEmpty();
 			int32				CountItems() const;
 
 			void				Sort();
-		
+
 			bool				AddRef(const entry_ref& ref);
 			bool				AddRef(const entry_ref& ref, int32 index);
 			entry_ref			RemoveRef(int32 index,
 									bool careAboutCurrentIndex = true);
-		
+
 			bool				AdoptPlaylist(Playlist& other);
 			bool				AdoptPlaylist(Playlist& other, int32 index);
-		
+
 			int32				IndexOf(const entry_ref& ref) const;
 			status_t			GetRefAt(int32 index, entry_ref* ref) const;
 		//	bool				HasRef(const entry_ref& ref) const;
-		
+
 			// navigating current ref
 			void				SetCurrentRefIndex(int32 index);
 			int32				CurrentRefIndex() const;

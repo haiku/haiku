@@ -24,15 +24,15 @@
 #include <debugger.h>
 #include <new.h>
 #include <stdio.h>
-#include <String.h>
-#include <NodeInfo.h>
-#include <File.h>
-#include <Mime.h>
 
 #include <Autolock.h>
 #include <Directory.h>
+#include <File.h>
 #include <Message.h>
+#include <Mime.h>
+#include <NodeInfo.h>
 #include <Path.h>
+#include <String.h>
 
 #include "FileReadWrite.h"
 
@@ -66,6 +66,59 @@ Playlist::~Playlist()
 	if (fListeners.CountItems() > 0)
 		debugger("Playlist::~Playlist() - there are still listeners attached!");
 }
+
+
+// #pragma mark - archiving
+
+
+static const char* kPathKey = "path";
+
+
+status_t
+Playlist::UnArchive(const BMessage* archive)
+{
+	if (archive == NULL)
+		return B_BAD_VALUE;
+
+	MakeEmpty();
+
+	BString path;
+	for (int32 i = 0; archive->FindString(kPathKey, i, &path) == B_OK; i++) {
+		BEntry entry(path.String(), false);
+			// don't follow links, we want to do that when opening files only
+		entry_ref ref;
+		if (entry.GetRef(&ref) != B_OK)
+			continue;
+		if (!AddRef(ref))
+			return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Playlist::Archive(BMessage* into) const
+{
+	if (into == NULL)
+		return B_BAD_VALUE;
+
+	int32 count = fRefs.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const entry_ref* ref = (entry_ref*)fRefs.ItemAtFast(i);
+		BPath path(ref);
+		if (path.InitCheck() != B_OK)
+			continue;
+		status_t ret = into->AddString(kPathKey, path.Path());
+		if (ret != B_OK)
+			return ret;
+	}
+
+	return B_OK;
+}
+
+
+// #pragma mark - list access
 
 
 void
