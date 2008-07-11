@@ -244,7 +244,7 @@ BString::operator=(const BString& string)
 BString&
 BString::operator=(const char* string)
 {
-	if (string)
+	if (string && string != String())
 		SetTo(string, strlen(string));
 	return *this;
 }
@@ -375,8 +375,11 @@ BString::CopyInto(char* into, int32 fromOffset, int32 length) const
 BString&
 BString::operator+=(const char* string)
 {
-	if (string)
-		_DoAppend(string, strlen(string));
+	if (string) {
+		int32 length = strlen(string);
+		if (length > 0)
+			_DoAppend(string, length);
+	}
 	return *this;
 }
 
@@ -392,8 +395,11 @@ BString::operator+=(char c)
 BString&
 BString::Append(const BString& string, int32 length)
 {
-	if (&string != this)
-		_DoAppend(string.fPrivateData, min_clamp0(length, string.Length()));
+	if (&string != this) {
+		int32 length = min_clamp0(length, string.Length());
+		if (length > 0)
+			_DoAppend(string.fPrivateData, length);
+	}
 	return *this;
 }
 
@@ -401,8 +407,11 @@ BString::Append(const BString& string, int32 length)
 BString&
 BString::Append(const char* string, int32 length)
 {
-	if (string)
-		_DoAppend(string, strlen_clamp(string, length));
+	if (string) {
+		int32 length = strlen_clamp(string, length);
+		if (length > 0)
+			_DoAppend(string, length);
+	}
 	return *this;
 }
 
@@ -410,9 +419,9 @@ BString::Append(const char* string, int32 length)
 BString&
 BString::Append(char c, int32 count)
 {
-	int32 len = Length();
+	int32 oldLength = Length();
 	if (count > 0 && _DoAppend("", count))
-		memset(fPrivateData + len, c, count);
+		memset(fPrivateData + oldLength, c, count);
 	return *this;
 }
 
@@ -1557,8 +1566,11 @@ BString::CharacterDeescape(char escapeChar)
 BString&
 BString::operator<<(const char* string)
 {
-	if (string != NULL)
-		_DoAppend(string, strlen(string));
+	if (string != NULL) {
+		int32 length = strlen(string);
+		if (length > 0)
+			_DoAppend(string, length);
+	}
 	return *this;
 }
 
@@ -1853,8 +1865,7 @@ BString::_DoAppend(const char* string, int32 length)
 {
 	int32 oldLength = Length();
 	if (_DetachWith(fPrivateData, oldLength + length) == B_OK) {
-		if (string && length)
-			strncpy(fPrivateData + oldLength, string, length);
+		strncpy(fPrivateData + oldLength, string, length);
 		return true;
 	}
 	return false;
