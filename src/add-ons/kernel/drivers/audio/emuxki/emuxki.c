@@ -3,6 +3,10 @@
  *
  * Copyright (c) 2002, Jerome Duval (jerome.duval@free.fr)
  *
+ * Authors:
+ *		Alexander Coers		Alexander.Coers@gmx.de
+ *		Fredrik Modéen 		fredrik@modeen.se
+ *
 */
 /* This code is derived from the NetBSD driver for Creative Labs SBLive! series
  *
@@ -69,7 +73,8 @@ device_hooks * find_device(const char *);
 
 pci_module_info	*pci;
 generic_mpu401_module * mpu401;
-
+//static char gameport_name[] = "generic/gameport/v2";
+//generic_gameport_module * gameport;
 
 int32 num_cards;
 emuxki_dev cards[NUM_CARDS];
@@ -88,6 +93,7 @@ status_t emuxki_init(emuxki_dev * card);
 
 extern device_hooks multi_hooks;
 extern device_hooks midi_hooks;
+//extern device_hooks joy_hooks;
 
 /* Hardware Dump */
 
@@ -2007,8 +2013,9 @@ emuxki_int(void *arg)
 status_t 
 init_hardware(void)
 {
-	int ix=0;
+	int ix = 0;
 	pci_info info;
+//	uint32 buffer;
 	status_t err = ENODEV;
 	
 	LOG_CREATE();
@@ -2027,6 +2034,16 @@ init_hardware(void)
 #endif
 			)) {
 			err = B_OK;
+			
+/*			
+			Joystick suport
+			if (!(info.u.h0.subsystem_id == 0x20 || 
+					info.u.h0.subsystem_id == 0xc400 || 
+ 					(info.u.h0.subsystem_id == 0x21 && info.revision < 6))) {
+	    		buffer = (*pci->read_io_32)(info.u.h0.base_registers[0] + HCFG);
+	    		buffer |= HCFG_JOYENABLE;
+	    		(*pci->write_io_32)(info.u.h0.base_registers[0] + HCFG, buffer);
+	   		}*/
 		}
 		ix++;
 	}
@@ -2040,11 +2057,13 @@ static void
 make_device_names(
 	emuxki_dev * card)
 {
-
 #if MIDI	
 	sprintf(card->midi.name, "midi/emuxki/%ld", card-cards+1);
 	names[num_names++] = card->midi.name;
 #endif
+
+//	sprintf(card->joy.name1, "joystick/"DRIVER_NAME "/%x", card-cards+1);
+//	names[num_names++] = card->joy.name1;
 	
 	sprintf(card->name, "audio/hmulti/emuxki/%ld", card-cards+1);
 	names[num_names++] = card->name;
@@ -2058,6 +2077,7 @@ emuxki_setup(emuxki_dev * card)
 {
 	status_t err = B_OK;
 	unsigned char cmd;
+	int32 base;
 
 	PRINT(("setup_emuxki(%p)\n", card));
 
@@ -2092,11 +2112,22 @@ emuxki_setup(emuxki_dev * card)
 	//SBLIVE : EMU_MUDATA, workaround 0, AUDIGY, AUDIGY2: 0, workaround 0x11020004
 	if ((err = (*mpu401->create_device)((card->config.nabmbar + !IS_AUDIGY(&card->config) ? EMU_MUDATA : 0), 
 		&card->midi.driver, !IS_AUDIGY(&card->config) ? 0 : 0x11020004, midi_interrupt_op, &card->midi)) < B_OK)
-		return (err);
+		return (err);		
 
 	card->midi.card = card;
 #endif
-
+	
+	// begin Joystick part
+/*	base = card->info.u.h0.base_registers[0];
+	(*pci->write_pci_config) (card->info.bus,card->info.device, 
+			card->info.function, 0x10, 2, base);
+	
+	if ((*gameport->create_device)(base, &card->joy.driver) < B_OK) {
+		dprintf("Audigy joystick - Error creating device\n");
+		(*gameport->delete_device)(card->joy.driver);
+	}*/
+	// end Joystick part
+	
 	/* reset the codec */	
 	PRINT(("codec reset\n"));
 	emuxki_codec_write(&card->config, 0x00, 0x0000);
@@ -2816,7 +2847,13 @@ init_driver(void)
 	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
 		
+//	if (get_module (gameport_name, (module_info **)&gameport)) {		
+//		put_module (B_PCI_MODULE_NAME);
+//		return ENOSYS;
+//	}
+	
 	if (get_module(B_MPU_401_MODULE_NAME, (module_info **) &mpu401)) {
+		//put_module(gameport_name);
 		put_module(B_PCI_MODULE_NAME);
 		return ENOSYS;
 	}
@@ -2846,6 +2883,7 @@ init_driver(void)
 	}
 	if (!num_cards) {
 		put_module(B_MPU_401_MODULE_NAME);
+//		put_module(gameport_name);
 		put_module(B_PCI_MODULE_NAME);
 		PRINT(("emuxki: no suitable cards found\n"));
 		return ENODEV;
@@ -2919,6 +2957,8 @@ emuxki_shutdown(emuxki_dev *card)
 	PRINT(("freeing silentpage_area\n"));
 	if (card->silentpage_area > B_OK)
 		delete_area(card->silentpage_area);
+	
+//	(*gameport->delete_device)(card->joy.driver);
 }
 
 
@@ -2934,6 +2974,7 @@ uninit_driver(void)
 	}
 	memset(&cards, 0, sizeof(cards));
 	put_module(B_MPU_401_MODULE_NAME);
+//	put_module(gameport_name);
 	put_module(B_PCI_MODULE_NAME);
 	num_cards = 0;
 }
@@ -2965,6 +3006,10 @@ find_device(const char * name)
 			return &midi_hooks;
 		}
 #endif
+//		if (!strcmp(cards[ix].joy.name1, name)) {
+//			return &joy_hooks;
+//		}
+		
 		if (!strcmp(cards[ix].name, name)) {
 			return &multi_hooks;
 		}

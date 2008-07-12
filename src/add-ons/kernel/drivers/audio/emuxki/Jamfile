@@ -12,6 +12,7 @@ KernelAddon emuxki :
 	midi.c
 	multi.c
 	util.c
+#	joy.c
 ;
 
 SEARCH on <emuxki!driver>emuxki.settings = $(SUBDIR) ;

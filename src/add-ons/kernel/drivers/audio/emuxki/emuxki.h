@@ -3,6 +3,10 @@
  *
  * Copyright (c) 2002, Jerome Duval (jerome.duval@free.fr)
  *
+ * Authors:
+ *		Alexander Coers		Alexander.Coers@gmx.de
+ *		Fredrik Modéen 		fredrik@modeen.se
+ *
  * Copyright (c) 2001 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
@@ -48,6 +52,7 @@
 #include "queue.h"
 #include "hmulti_audio.h"
 #include "multi.h"
+#include "joystick_driver.h"
 
 
 #define CREATIVELABS_VENDOR_ID	0x1102	/* Creative Labs */
@@ -85,6 +90,22 @@ typedef struct {
 } emuxki_settings;	
  	 	
 extern emuxki_settings current_settings;
+
+/*
+ * Gameport stuff
+ */
+
+#define HCFG					0x14			/* Hardware Configuration Register of SB-Live */
+#define HCFG_JOYENABLE			0x00000200		/* Mask for enabling Joystick */ 
+
+extern generic_gameport_module * gameport;
+
+typedef struct _joy_dev 
+{
+	void *		driver;
+	char		name1[64];
+} joy_dev;
+/* End Gameport stuff*/
 
 /*
  * Emu10k1 midi
@@ -321,6 +342,7 @@ typedef enum {
 	EMU_AUDIO_MODE = 1 << 1
 } emuxki_parameter_type;
 
+
 /*
  * Devices
  */
@@ -357,6 +379,7 @@ typedef struct _emuxki_dev {
 	
 	sem_id buffer_ready_sem;
 	
+	joy_dev		joy;
 	midi_dev	midi;
 	
 	/* mixer controls */
@@ -364,7 +387,7 @@ typedef struct _emuxki_dev {
 	uint32 gpr_count;
 
 	/* multi_audio */
-	multi_dev	multi;
+	multi_dev	multi;	
 } emuxki_dev;
 
 extern int32 num_cards;
