@@ -4,9 +4,9 @@ MarginView.h
 
 Copyright (c) 2002 OpenBeOS.
 
-Authors: 
+Authors:
 	Philippe Houdoin
-	Simon Gauvin	
+	Simon Gauvin
 	Michael Pfeiffer
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -28,40 +28,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 	Documentation:
-	
+
 	The MarginView is designed to be a self contained component that manages
 	the display of a BBox control that shows a graphic of a page and its'
 	margings. The component also includes text fields that are used to mofify
 	the margin values and a popup to change the units used for the margins.
 
 	There are two interfaces for the MarginView component:
-	
+
 	1) Set methods:
 		- page size
 		- orientation
-	   
+
 	   Get methods to retrieve:
 		- margins
 		- page size
-		
-		The method interface is available for the parent Component to call on 
+
+		The method interface is available for the parent Component to call on
 		the MarginView in response to the Window receiveing messages from
 		other BControls that it contains, such as a Page Size popup. The
-		Get methods are used to extract the page size and margins so that 
+		Get methods are used to extract the page size and margins so that
 		the printer driver may put these values into a BMessage for printing.
-		
+
 	2) 'Optional' Message interface:
 		- Set Page Size
 		- Flip Orientation
-	
-		The message interface is available for GUI Controls, BPopupMenu to send 
+
+		The message interface is available for GUI Controls, BPopupMenu to send
 		messages to the MarginView if the parent Window is not used to handle
-		the messages. 
+		the messages.
 
 	General Use of MarginView component:
-	
-		1) Simply construct a new MarginView object with the margins 
-			you want as defaults and add this view to the parent view 
+
+		1) Simply construct a new MarginView object with the margins
+			you want as defaults and add this view to the parent view
 			of the dialog.
 
 			MarginView *mv;
@@ -69,17 +69,17 @@ THE SOFTWARE.
 			parentView->AddChild(mv);
 
 			* you can also set the margins in the constructor, and the units:
-			
+
 			mv = new MarginView(viewSizeRect, pageWidth, pageHeight
 						marginRect, kUnitPointS);
 
 			! but remeber to have the marginRect values match the UNITS :-)
-			
+
 		2) Set Page Size with methods:
 
 			mv-SetPageSize( pageWidth, pageHeight );
 			mv->UpdateView();
-		
+
 		3) Set Page Size with BMessage:
 
 			BMessage* msg = new BMessage(CHANGE_PAGE_SIZE);
@@ -88,12 +88,12 @@ THE SOFTWARE.
 			mv->PostMessage(msg);
 
 		4) Flip Page with methods:
-		
+
 			mv-SetPageSize( pageHeight, pageWidth );
 			mv->UpdateView();
-		
-		5) Flip Page with BMessage: 
-		
+
+		5) Flip Page with BMessage:
+
 			BMessage* msg = new BMessage(FLIP_PAGE);
 			mv->Looper()->PostMessage(msg);
 
@@ -103,16 +103,16 @@ THE SOFTWARE.
 		6) Get Page Size
 
 			BPoint pageSize = mv->GetPageSize();
-			
+
 		7) Get Margins
 
 			BRect margins = mv->GetMargins();
-		
+
 		8) Get Units
-			
+
 			uint32 units = mv->GetUnits();
 
-			where units is one of: 
+			where units is one of:
 				kUnitInch,  72 points/in
 				kUnitCM,    28.346 points/cm
 				kUnitPoint, 1 point/point
@@ -124,6 +124,7 @@ THE SOFTWARE.
 #include <InterfaceKit.h>
 #include <Looper.h>
 
+class BTextControl;
 class MarginManager;
 
 // Messages that the MarginManager accepts
@@ -145,81 +146,77 @@ enum MarginUnit {
 /**
  * Class MarginView
  */
-class MarginView : public BBox 
+class MarginView : public BBox
 {
 friend class MarginManager;
 
-private:
-
-	// GUI components
-	BTextControl *fTop, *fBottom, *fLeft, *fRight;
-
-	// rect that holds the margins for the page as a set of point offsets
-	BRect fMargins;
-
-	// the maximum size of the page view calculated from the view size
-	float fMaxPageWidth;
-	float fMaxPageHeight;
-
-	// the actual size of the page in points
-	float fPageHeight;
-	float fPageWidth;
-
-	// the units used to calculate the page size
-	MarginUnit fMarginUnit;
-	float fUnitValue;
-
-	// the size of the drawing area we have to draw the view in pixels
-	float fViewHeight;
-	float fViewWidth;
-
-	// Calculate the view size for the margins
-	void CalculateViewSize(uint32 msg);
-
-	// performed internally using the supplied popup
-	void  SetMarginUnit(MarginUnit unit);
-
-	// performed internally using text fields
-	void  SetMargin(BRect margin);
-
-	// utility method
-	void AllowOnlyNumbers(BTextControl *textControl, int maxNum);
-	
 public:
-	MarginView(BRect rect,
-		int32 pageWidth = 0,
-		int32 pageHeight = 0,
-		BRect margins = BRect(1, 1, 1, 1), // default to 1 inch
-		MarginUnit unit = kUnitInch);
+							MarginView(BRect rect, int32 pageWidth = 0,
+								int32 pageHeight = 0,
+								BRect margins = BRect(1, 1, 1, 1), // 1 inch
+								MarginUnit unit = kUnitInch);
 
-	~MarginView();
+	virtual					~MarginView();
 
-	/// all the GUI construction code
-	void ConstructGUI();
-	
-	// page size
-	void SetPageSize(float pageWidth, float pageHeight);
-	// point.x = width, point.y = height
-	BPoint GetPageSize(void);
+	virtual	void			AttachedToWindow();
+	virtual	void			Draw(BRect rect);
+	virtual	void			FrameResized(float width, float height);
+	virtual	void			MessageReceived(BMessage *msg);
 
-	// margin
-	BRect GetMargin(void);
+			// point.x = width, point.y = height
+			BPoint			PageSize() const;
+			void			SetPageSize(float pageWidth, float pageHeight);
 
-	// orientation
-	// None, this state should be saved elsewhere in the page setup code
-	//	and not here. See the FLIP_PAGE message to perform this function.
-		
-	// units
-	MarginUnit GetMarginUnit(void);
+			// margin
+			BRect			Margin() const;
 
-	// will cause a recalc and redraw
-	void UpdateView(uint32 msg);
+			// units
+			MarginUnit		Unit() const;
 
-	// BeOS Hook methods
-	virtual void AttachedToWindow(void);
-	void Draw(BRect rect);
-	void FrameResized(float width, float height);
-	void MessageReceived(BMessage *msg);
+			// will cause a recalc and redraw
+			void			UpdateView(uint32 msg);
+
+private:
+			// all the GUI construction code
+			void			_ConstructGUI();
+
+			// utility method
+			void			_AllowOnlyNumbers(BTextControl *textControl,
+								int32 maxNum);
+
+			// performed internally using text fields
+			void			_SetMargin(BRect margin);
+
+			// performed internally using the supplied popup
+			void			_SetMarginUnit(MarginUnit unit);
+
+			// Calculate the view size for the margins
+			void			_CalculateViewSize(uint32 msg);
+
+private:
+			BTextControl*	fTop;
+			BTextControl*	fBottom;
+			BTextControl*	fLeft;
+			BTextControl*	fRight;
+
+			// rect that holds the margins for the page as a set of point offsets
+			BRect			fMargins;
+
+			// the maximum size of the page view calculated from the view size
+			float			fMaxPageWidth;
+			float			fMaxPageHeight;
+
+			// the actual size of the page in points
+			float			fPageHeight;
+			float			fPageWidth;
+
+			// the units used to calculate the page size
+			MarginUnit		fMarginUnit;
+			float			fUnitValue;
+
+			// the size of the drawing area we have to draw the view in pixels
+			float			fViewHeight;
+			float			fViewWidth;
 };
 
 #endif // _MARGIN_VIEW_H

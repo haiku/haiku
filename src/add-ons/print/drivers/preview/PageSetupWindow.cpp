@@ -276,7 +276,7 @@ PageSetupWindow::UpdateSetupMessage()
 		AddString(fSetupMsg, "preview:paper_size", item->Label());
 
 		// Save the printable_rect
-		BRect margin = fMarginView->GetMargin();
+		BRect margin = fMarginView->Margin();
 		if (fCurrentOrientation == PrinterDriver::PORTRAIT_ORIENTATION) {
 			margin.right = w - margin.right;
 			margin.bottom = h - margin.bottom;
@@ -287,7 +287,7 @@ PageSetupWindow::UpdateSetupMessage()
 		SetRect(fSetupMsg, "preview:printable_rect", margin);
 		SetRect(fSetupMsg, "printable_rect", ScaleRect(margin, scaleR));
 
-		SetInt32(fSetupMsg, "units", fMarginView->GetMarginUnit());
+		SetInt32(fSetupMsg, "units", fMarginView->Unit());
 	}
 }
 
@@ -323,7 +323,7 @@ PageSetupWindow::MessageReceived(BMessage *msg)
 
 			if (fCurrentOrientation != orientation) {
 				fCurrentOrientation = orientation;
-				BPoint p = fMarginView->GetPageSize();
+				BPoint p = fMarginView->PageSize();
 				fMarginView->SetPageSize(p.y, p.x);
 				fMarginView->UpdateView(MARGIN_CHANGED);
 			}

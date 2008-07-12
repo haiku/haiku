@@ -2,11 +2,11 @@
  * PageSetupDlg.cpp
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
- 
+
 #include <string>
 #include <cstring>
 #include <cstdlib>
-#include <fcntl.h>  
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
@@ -40,7 +40,7 @@
 
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
-#else 
+#else
 #define std
 #endif
 
@@ -159,7 +159,7 @@ PageSetupView::AddOrientationItem(const char* name, JobData::Orientation orienta
 	BMessage *msg = new BMessage(kMsgOrientationChanged);
 	msg->AddInt32("orientation", orientation);
 	BMenuItem *item = new BMenuItem(name, msg);
-	
+
 	fOrientation->AddItem(item);
 	item->SetTarget(this);
 	if (fJobData->getOrientation() == orientation) {
@@ -169,7 +169,7 @@ PageSetupView::AddOrientationItem(const char* name, JobData::Orientation orienta
 	}
 }
 
-void 
+void
 PageSetupView::AttachedToWindow()
 {
 	BMenuItem  *item = NULL;
@@ -189,8 +189,8 @@ PageSetupView::AttachedToWindow()
 	margin.right = paper.right - margin.right;
 	margin.bottom = paper.bottom - margin.bottom;
 
-	fMarginView = new MarginView(MARGIN_RECT, 
-		paper.IntegerWidth(), 
+	fMarginView = new MarginView(MARGIN_RECT,
+		paper.IntegerWidth(),
 		paper.IntegerHeight(),
 			margin, units);
 	AddChild(fMarginView);
@@ -224,10 +224,10 @@ PageSetupView::AttachedToWindow()
 	/* orientaion */
 	fOrientation = new BPopUpMenu("orientation");
 	fOrientation->SetRadioMode(true);
-	
+
 	menuField = new BMenuField(ORIENTATION_RECT, "orientation", ORIENTATION_TEXT, fOrientation);
 	menuField->SetDivider(width);
-	
+
 	count = fPrinterCap->countCap(PrinterCap::kOrientation);
 	if (count == 0) {
 		AddOrientationItem(PORTRAIT_TEXT, JobData::kPortrait);
@@ -240,7 +240,7 @@ PageSetupView::AttachedToWindow()
 			orientation_cap++;
 		}
 	}
-	
+
 	AddChild(menuField);
 
 	/* resolution */
@@ -269,7 +269,7 @@ PageSetupView::AttachedToWindow()
 	/* scale */
 	BString scale;
 	scale << (int)fJobData->getScaling();
-	fScaling = new BTextControl(SCALE_RECT, "scale", "Scale [%]:", 
+	fScaling = new BTextControl(SCALE_RECT, "scale", "Scale [%]:",
 									scale.String(),
 	                                NULL, B_FOLLOW_RIGHT);
 	int num;
@@ -282,7 +282,7 @@ PageSetupView::AttachedToWindow()
 	fScaling->TextView()->SetMaxBytes(3);
 	fScaling->SetDivider(width);
 
-	AddChild(fScaling);		
+	AddChild(fScaling);
 
 	/* cancel */
 
@@ -296,7 +296,7 @@ PageSetupView::AttachedToWindow()
 	button->MakeDefault(true);
 }
 
-inline void 
+inline void
 swap(float *e1, float *e2)
 {
 	float e = *e1;
@@ -304,7 +304,7 @@ swap(float *e1, float *e2)
 	*e2 = e;
 }
 
-JobData::Orientation 
+JobData::Orientation
 PageSetupView::GetOrientation()
 {
 	BMenuItem *item = fOrientation->FindMarked();
@@ -330,12 +330,12 @@ PageSetupView::GetPaperCap()
 	}
 }
 
-bool 
+bool
 PageSetupView::UpdateJobData()
 {
 	fJobData->setOrientation(GetOrientation());
 
-	PaperCap *paperCap = GetPaperCap();	
+	PaperCap *paperCap = GetPaperCap();
 	BRect paper_rect = paperCap->paper_rect;
 	BRect physical_rect = paperCap->physical_rect;
 	fJobData->setPaper(paperCap->paper);
@@ -363,8 +363,8 @@ PageSetupView::UpdateJobData()
 	}
 
 	// adjust printable rect by margin
-	fJobData->setMarginUnit(fMarginView->GetMarginUnit());
-	BRect margin = fMarginView->GetMargin();
+	fJobData->setMarginUnit(fMarginView->Unit());
+	BRect margin = fMarginView->Margin();
 	BRect printable_rect;
 	printable_rect.left = paper_rect.left + margin.left;
 	printable_rect.top = paper_rect.top + margin.top;
@@ -392,13 +392,13 @@ PageSetupView::UpdateJobData()
 	fJobData->setPrintableRect(printable_rect);
 	fJobData->setScaledPrintableRect(ScaleRect(printable_rect, scalingR));
 	fJobData->setPhysicalRect(physical_rect);
-	fJobData->setScaledPhysicalRect(ScaleRect(physical_rect, scalingR));	
+	fJobData->setScaledPhysicalRect(ScaleRect(physical_rect, scalingR));
 
 	fJobData->save();
 	return true;
 }
 
-void 
+void
 PageSetupView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
@@ -414,7 +414,7 @@ PageSetupView::MessageReceived(BMessage *msg)
 				}
 				fMarginView->SetPageSize(width, height);
 				fMarginView->UpdateView(MARGIN_CHANGED);
-				
+
 			}
 			break;
 	}
@@ -431,11 +431,11 @@ PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const P
 
 	PageSetupView *view = new PageSetupView(Bounds(), job_data, printer_data, printer_cap);
 	AddChild(view);
-	
+
 	SetResult(B_ERROR);
 }
 
-void 
+void
 PageSetupDlg::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {

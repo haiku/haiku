@@ -4,11 +4,11 @@ PDF Writer printer driver.
 
 Version: 12.19.2000
 
-Copyright (c) 2001 OpenBeOS. 
+Copyright (c) 2001 OpenBeOS.
 
-Authors: 
+Authors:
 	Philippe Houdoin
-	Simon Gauvin	
+	Simon Gauvin
 	Michael Pfeiffer
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 #include <InterfaceKit.h>
 #include <SupportKit.h>
-#include "pdflib.h"				// for pageFormat constants 
+#include "pdflib.h"				// for pageFormat constants
 #include "PrinterDriver.h"
 #include "PageSetupWindow.h"
 
@@ -42,12 +42,12 @@ THE SOFTWARE.
 #include "AdvancedSettingsWindow.h"
 
 // static global variables
-static struct 
+static struct
 {
 	char  *label;
 	float width;
 	float height;
-} pageFormat[] = 
+} pageFormat[] =
 {
 	{"Letter", letter_width, letter_height },
 	{"Legal",  legal_width,  legal_height  },
@@ -65,11 +65,11 @@ static struct
 };
 
 
-static struct 
+static struct
 {
 	char  *label;
 	int32 orientation;
-} orientation[] = 
+} orientation[] =
 {
 	{"Portrait",  PrinterDriver::PORTRAIT_ORIENTATION},
 	{"Landscape", PrinterDriver::LANDSCAPE_ORIENTATION},
@@ -82,7 +82,7 @@ static const char *pdf_compatibility[] = {"1.3", "1.4", NULL};
 /**
  * Constuctor
  *
- * @param 
+ * @param
  * @return
  */
 PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
@@ -94,10 +94,10 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	fExitSem 	= create_sem(0, "PageSetup");
 	fResult		= B_ERROR;
 	fAdvancedSettings = *msg;
-	
+
 	if ( printerName ) {
 		BString	title;
-		
+
 		title << printerName << " Page Setup";
 		SetTitle( title.String() );
 
@@ -122,23 +122,23 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 
 	// load orientation
 	fSetupMsg->FindInt32("orientation", &orient);
-//	(new BAlert("", "orientation not in msg", "Shit"))->Go(); 
+//	(new BAlert("", "orientation not in msg", "Shit"))->Go();
 
 	// load page rect
 	fSetupMsg->FindRect("paper_rect", &r);
 	width = r.Width();
 	height = r.Height();
 	page = r;
-	
+
 	// Load compression
 	fSetupMsg->FindInt32("pdf_compression", &compression);
-	
+
 	// Load units
 	fSetupMsg->FindInt32("units", &units);
 
 	// Load printable rect
 	fSetupMsg->FindRect("printable_rect", &margin);
-	
+
 	// Load pdf compatability
 	fSetupMsg->FindString("pdf_compatibility", &setting_value);
 
@@ -149,15 +149,15 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	if (fSetupMsg->FindMessage("fonts", &fonts) == B_OK) {
 		fFonts->SetTo(&fonts);
 	}
-	
+
 	// add a *dialog* background
 	r = Bounds();
-	panel = new BBox(r, "top_panel", B_FOLLOW_ALL, 
+	panel = new BBox(r, "top_panel", B_FOLLOW_ALL,
 					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 					B_PLAIN_BORDER);
 
 	////////////// Create the margin view //////////////////////
-	
+
 	// re-calculate the margin from the printable rect in points
 	margin.top -= page.top;
 	margin.left -= page.left;
@@ -167,7 +167,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	fMarginView = new MarginView(BRect(20,20,200,160), (int32)width, (int32)height,
 			margin, (MarginUnit)units);
 	panel->AddChild(fMarginView);
-	
+
 	// add page format menu
 	// Simon Changed to OFFSET popups
 	x = r.left + kMargin * 2 + kOffset; y = r.top + kMargin * 2;
@@ -176,7 +176,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	m->SetRadioMode(true);
 
 	// Simon changed width 200->140
-	BMenuField *mf = new BMenuField(BRect(x, y, x + 140, y + 20), "page_size", 
+	BMenuField *mf = new BMenuField(BRect(x, y, x + 140, y + 20), "page_size",
 		"Page Size:", m);
 	fPageSizeMenu = mf;
 	mf->ResizeToPreferred();
@@ -188,19 +188,19 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	panel->AddChild(mf);
 
 	item = NULL;
-	for (i = 0; pageFormat[i].label != NULL; i++) 
+	for (i = 0; pageFormat[i].label != NULL; i++)
 	{
 		BMessage* msg = new BMessage('pgsz');
 		msg->AddFloat("width", pageFormat[i].width);
 		msg->AddFloat("height", pageFormat[i].height);
 		BMenuItem* mi = new BMenuItem(pageFormat[i].label, msg);
 		m->AddItem(mi);
-	
+
 		if (width == pageFormat[i].width && height == pageFormat[i].height) {
-			item = mi; 
+			item = mi;
 		}
 		if (height == pageFormat[i].width && width == pageFormat[i].height) {
-			item = mi; 
+			item = mi;
 		}
 	}
 	mf->Menu()->SetLabelFromMarked(true);
@@ -212,28 +212,28 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 
 	// add orientation menu
 	y += h + kMargin;
-	 
+
 	m = new BPopUpMenu("orientation");
 	m->SetRadioMode(true);
-	
+
 	// Simon changed 200->140
 	mf = new BMenuField(BRect(x, y, x + 140, y + 20), "orientation", "Orientation:", m);
-	
+
 	// Simon added: SetDivider
 	mf->SetDivider(be_plain_font->StringWidth("Orientation#"));
-		
+
 	fOrientationMenu = mf;
 	mf->ResizeToPreferred();
 	panel->AddChild(mf);
 	r.top += h;
 	item = NULL;
-	for (int i = 0; orientation[i].label != NULL; i++) 
+	for (int i = 0; orientation[i].label != NULL; i++)
 	{
-	 	BMessage* msg = new BMessage('ornt');		
+	 	BMessage* msg = new BMessage('ornt');
 		msg->AddInt32("orientation", orientation[i].orientation);
 		BMenuItem* mi = new BMenuItem(orientation[i].label, msg);
 		m->AddItem(mi);
-		
+
 		if (orient == orientation[i].orientation) {
 			item = mi;
 		}
@@ -249,7 +249,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 
 	// add PDF comptibility  menu
 	y += h + kMargin;
-	 
+
 	m = new BPopUpMenu("pdf_compatibility");
 	m->SetRadioMode(true);
 	mf = new BMenuField(BRect(x, y, x + 200, y + 20), "pdf_compatibility", "PDF Compatibility:", m);
@@ -259,12 +259,12 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	r.top += h;
 
 	item = NULL;
-	for (int i = 0; pdf_compatibility[i] != NULL; i++) 
-	{	
+	for (int i = 0; pdf_compatibility[i] != NULL; i++)
+	{
 		BMenuItem* mi = new BMenuItem(pdf_compatibility[i], NULL);
 		m->AddItem(mi);
-		
-//(new BAlert("", setting_value.String(), pdf_compatibility[i]))->Go(); 
+
+//(new BAlert("", setting_value.String(), pdf_compatibility[i]))->Go();
 		if (setting_value == pdf_compatibility[i]) {
 			item = mi;
 		}
@@ -290,16 +290,16 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	fPDFCompressionSlider = slider;
 
 	panel->AddChild(slider);
-					
+
 	slider->SetLimitLabels("None", "Best");
 	slider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	slider->ResizeToPreferred();
 	slider->GetPreferredSize(&w, &h);
-	
+
 	slider->SetValue(compression);
-	
+
 	// add a "OK" button, and make it default
-	button 	= new BButton(r, NULL, "OK", new BMessage(OK_MSG), 
+	button 	= new BButton(r, NULL, "OK", new BMessage(OK_MSG),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->GetPreferredSize(&w, &h);
@@ -309,25 +309,25 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	panel->AddChild(button);
 	button->MakeDefault(true);
 
-	// add a "Cancel button	
-	button 	= new BButton(r, NULL, "Cancel", new BMessage(CANCEL_MSG), 
+	// add a "Cancel button
+	button 	= new BButton(r, NULL, "Cancel", new BMessage(CANCEL_MSG),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->GetPreferredSize(&w, &h);
 	button->ResizeToPreferred();
 	button->MoveTo(x - w - 8, y);
 	panel->AddChild(button);
 
-	// add a "Fonts" button	
-	button 	= new BButton(r, NULL, "Fonts" B_UTF8_ELLIPSIS, new BMessage(FONTS_MSG), 
+	// add a "Fonts" button
+	button 	= new BButton(r, NULL, "Fonts" B_UTF8_ELLIPSIS, new BMessage(FONTS_MSG),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->GetPreferredSize(&w, &h);
 	button->ResizeToPreferred();
 	button->MoveTo(r.left + 8, y);
 	panel->AddChild(button);
 
-	// add a "Fonts" button	
+	// add a "Fonts" button
 	BButton* font = button;
-	button 	= new BButton(r, NULL, "Advanced" B_UTF8_ELLIPSIS, new BMessage(ADVANCED_MSG), 
+	button 	= new BButton(r, NULL, "Advanced" B_UTF8_ELLIPSIS, new BMessage(ADVANCED_MSG),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->GetPreferredSize(&w, &h);
 	button->ResizeToPreferred();
@@ -353,7 +353,7 @@ PageSetupWindow::~PageSetupWindow()
 
 
 // --------------------------------------------------
-bool 
+bool
 PageSetupWindow::QuitRequested()
 {
 	release_sem(fExitSem);
@@ -362,8 +362,8 @@ PageSetupWindow::QuitRequested()
 
 
 // --------------------------------------------------
-void 
-PageSetupWindow::UpdateSetupMessage() 
+void
+PageSetupWindow::UpdateSetupMessage()
 {
 	BMenuItem *item;
 	int32 orientation = 0;
@@ -382,7 +382,7 @@ PageSetupWindow::UpdateSetupMessage()
 		else
 			fSetupMsg->AddString("pdf_compatibility", item->Label());
 	}
-			
+
 	if (fSetupMsg->HasInt32("pdf_compression")) {
 		fSetupMsg->ReplaceInt32("pdf_compression", fPDFCompressionSlider->Value());
 	} else {
@@ -396,14 +396,14 @@ PageSetupWindow::UpdateSetupMessage()
 		msg->FindFloat("width", &w);
 		msg->FindFloat("height", &h);
 		BRect r;
-		if (orientation == 0) 
+		if (orientation == 0)
 			r.Set(0, 0, w, h);
 		else
 			r.Set(0, 0, h, w);
 		fSetupMsg->ReplaceRect("paper_rect", r);
-		
-		// Save the printable_rect 
-		BRect margin = fMarginView->GetMargin();
+
+		// Save the printable_rect
+		BRect margin = fMarginView->Margin();
 		if (orientation == 0) {
 			margin.right = w - margin.right;
 			margin.bottom = h - margin.bottom;
@@ -414,12 +414,12 @@ PageSetupWindow::UpdateSetupMessage()
 		fSetupMsg->ReplaceRect("printable_rect", margin);
 
 		// save the units used
-		int32 units = fMarginView->GetMarginUnit();
+		int32 units = fMarginView->Unit();
 		if (fSetupMsg->HasInt32("units")) {
 			fSetupMsg->ReplaceInt32("units", units);
 		} else {
 			fSetupMsg->AddInt32("units", units);
-		}	
+		}
 	}
 
 	BMessage fonts;
@@ -436,8 +436,8 @@ PageSetupWindow::UpdateSetupMessage()
 	float   f;
 	BString s;
 	int32   i;
-	
-	
+
+
 	if (fAdvancedSettings.FindString("pdflib_license_key", &s) == B_OK) {
 		if (fSetupMsg->HasString("pdflib_license_key")) {
 			fSetupMsg->ReplaceString("pdflib_license_key", s.String());
@@ -505,7 +505,7 @@ PageSetupWindow::UpdateSetupMessage()
 
 
 // --------------------------------------------------
-void 
+void
 PageSetupWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what){
@@ -514,7 +514,7 @@ PageSetupWindow::MessageReceived(BMessage *msg)
 			fResult = B_OK;
 			release_sem(fExitSem);
 			break;
-		
+
 		case CANCEL_MSG:
 			fResult = B_ERROR;
 			release_sem(fExitSem);
@@ -543,12 +543,12 @@ PageSetupWindow::MessageReceived(BMessage *msg)
 
 		// Simon added
 		case 'ornt':
-			{	
-				BPoint p = fMarginView->GetPageSize();
+			{
+				BPoint p = fMarginView->PageSize();
 				int32 orientation;
 				msg->FindInt32("orientation", &orientation);
 				if (orientation == PrinterDriver::LANDSCAPE_ORIENTATION
-					&& p.y > p.x) { 
+					&& p.y > p.x) {
 					fMarginView->SetPageSize(p.y, p.x);
 					fMarginView->UpdateView(MARGIN_CHANGED);
 				}
@@ -563,20 +563,20 @@ PageSetupWindow::MessageReceived(BMessage *msg)
 		case FONTS_MSG:
 			(new FontsWindow(fFonts))->Show();
 			break;
-	
+
 		case ADVANCED_MSG:
 			(new AdvancedSettingsWindow(&fAdvancedSettings))->Show();
 			break;
-	
+
 		default:
 			inherited::MessageReceived(msg);
 			break;
 	}
 }
-			
+
 
 // --------------------------------------------------
-status_t 
+status_t
 PageSetupWindow::Go()
 {
 	MoveTo(300,300);
