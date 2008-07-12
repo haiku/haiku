@@ -1990,7 +1990,7 @@ TermView::_Select(TermPos start, TermPos end, bool inclusive,
 	if (start.x < 0)
 		start.x = 0;
 	if (end.x >= fTermColumns)
-		end.x = fTermColumns - 1;
+		end.x = fTermColumns;
 
 	TermPos minPos(0, -fTextBuffer->HistorySize());
 	TermPos maxPos(0, fTextBuffer->Height());
