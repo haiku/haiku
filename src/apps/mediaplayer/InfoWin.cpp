@@ -79,7 +79,7 @@ InfoView::Draw(BRect updateRect)
 InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	: BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + MIN_WIDTH - 1,
 		leftTop.y + 300), NAME, B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 	, fController(controller)
 	, fControllerObserver(new ControllerObserver(this,
 		OBSERVE_FILE_CHANGES | OBSERVE_TRACK_CHANGES | OBSERVE_STAT_CHANGES))
