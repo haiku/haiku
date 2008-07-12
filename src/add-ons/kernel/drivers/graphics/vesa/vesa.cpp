@@ -13,6 +13,7 @@
 #include <frame_buffer_console.h>
 #include <util/kernel_cpp.h>
 #include <arch/x86/vm86.h>
+#include <vm.h>
 
 #include "driver.h"
 #include "utility.h"
@@ -174,7 +175,7 @@ vesa_set_display_mode(vesa_info &info, unsigned int mode)
 
 	// Prepare vm86 mode environment
 	struct vm86_state vmState;
-	status_t status = vm86_prepare(&vmState, 0x2000);
+	status_t status = vm86_prepare(&vmState, 0x20000);
 	if (status != B_OK) {
 		dprintf(DEVICE_NAME": vesa_set_display_mode(): vm86_prepare failed\n");
 		return status;
@@ -209,6 +210,9 @@ vesa_set_display_mode(vesa_info &info, unsigned int mode)
 		goto error;
 	}
 	delete_area(info.shared_info->frame_buffer_area);
+
+	// Turn on write combining for the area
+	vm_set_area_memory_type(newFBArea, modeInfo.physical_base, B_MTR_WC);
 
 	// Update shared frame buffer information
 	info.shared_info->frame_buffer_area = newFBArea;
