@@ -1933,8 +1933,19 @@ TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 
 	switch (fSelectGranularity) {
 		case SELECT_CHARS:
+		{
+			// If we just start selecting, we first select the initially
+			// hit char, so that we get a proper initial selection -- the char
+			// in question, which will thus always be selected, regardless of
+			// whether selecting forward or backward.
+			if (fInitialSelectionStart == fInitialSelectionEnd) {
+				_Select(fInitialSelectionStart, fInitialSelectionEnd, true,
+					true);
+			}
+
 			_ExtendSelection(_ConvertToTerminal(where), true, true);
       		break;
+		}
 		case SELECT_WORDS:
 			_SelectWord(where, true, true);
       		break;
@@ -2056,6 +2067,8 @@ TermView::_ExtendSelection(TermPos pos, bool inclusive,
 		_Select(pos, end, false, !useInitialSelection);
 	else if (pos > end)
 		_Select(start, pos, false, !useInitialSelection);
+	else if (useInitialSelection)
+		_Select(start, end, false, false);
 }
 
 
@@ -2098,6 +2111,8 @@ TermView::_SelectWord(BPoint where, bool extend, bool useInitialSelection)
 			_ExtendSelection(start, false, useInitialSelection);
 		else if (end > (useInitialSelection ? fInitialSelectionEnd : fSelEnd))
 			_ExtendSelection(end, false, useInitialSelection);
+		else if (useInitialSelection)
+			_Select(start, end, false, false);
 	} else
 		_Select(start, end, false, !useInitialSelection);
 }
@@ -2114,7 +2129,8 @@ TermView::_SelectLine(BPoint where, bool extend, bool useInitialSelection)
 			_ExtendSelection(start, false, useInitialSelection);
 		else if (end > (useInitialSelection ? fInitialSelectionEnd : fSelEnd))
 			_ExtendSelection(end, false, useInitialSelection);
-		
+		else if (useInitialSelection)
+			_Select(start, end, false, false);
 	} else
 		_Select(start, end, false, !useInitialSelection);
 }
