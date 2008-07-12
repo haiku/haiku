@@ -320,7 +320,9 @@ BasicTerminalBuffer::GetStringFromRegion(BString& string, const TermPos& start,
 
 	// get all but the last line
 	while (pos.y < end.y) {
-		if (_GetPartialLineString(string, pos.y, pos.x, fWidth))
+		TerminalLine* line = _GetPartialLineString(string, pos.y, pos.x,
+			fWidth);
+		if (line != NULL && !line->softBreak)
 			string.Append('\n', 1);
 		pos.x = 0;
 		pos.y++;
@@ -1347,14 +1349,14 @@ BasicTerminalBuffer::_InsertGap(int32 width)
 
 /*!	\a endColumn is not inclusive.
 */
-bool
+TerminalLine*
 BasicTerminalBuffer::_GetPartialLineString(BString& string, int32 row,
 	int32 startColumn, int32 endColumn) const
 {
 	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
 	TerminalLine* line = _HistoryLineAt(row, lineBuffer);
 	if (line == NULL)
-		return false;
+		return NULL;
 
 	if (endColumn > line->length)
 		endColumn = line->length;
@@ -1367,7 +1369,7 @@ BasicTerminalBuffer::_GetPartialLineString(BString& string, int32 row,
 			x++;
 	}
 
-	return true;
+	return line;
 }
 
 

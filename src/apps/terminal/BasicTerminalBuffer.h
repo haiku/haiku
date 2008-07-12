@@ -160,7 +160,7 @@ protected:
 			void				_PadLineToCursor();
 	static	void				_TruncateLine(TerminalLine* line, int32 length);
 			void				_InsertGap(int32 width);
-			bool				_GetPartialLineString(BString& string,
+			TerminalLine*		_GetPartialLineString(BString& string,
 									int32 row, int32 startColumn,
 									int32 endColumn) const;
 			bool				_PreviousChar(TermPos& pos, UTF8Char& c) const;
