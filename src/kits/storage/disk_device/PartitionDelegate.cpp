@@ -71,7 +71,7 @@ BPartition::Delegate::InitAfterHierarchy()
 	if (!addOn) {
 		TRACE("BPartition::Delegate::InitAfterHierarchy(): add-on for disk "
 			"system \"%s\" not found\n", fMutablePartition.ContentType());
-		return B_ENTRY_NOT_FOUND;
+		return B_OK;
 	}
 
 	BPartitionHandle* handle;
