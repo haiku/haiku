@@ -13,9 +13,12 @@
 
 
 // debugging
-//#define DBG(x)
-#define DBG(x) x
-#define OUT dprintf
+//#define TRACE_KDISK_SYSTEM
+#ifdef TRACE_KDISK_SYSTEM
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)	do { } while (false)
+#endif
 
 
 // constructor
@@ -131,7 +134,7 @@ status_t
 KDiskSystem::Load()
 {
 	ManagerLocker locker(KDiskDeviceManager::Default());
-dprintf("KDiskSystem::Load(): %s -> %ld\n", Name(), fLoadCounter + 1);
+TRACE("KDiskSystem::Load(): %s -> %ld\n", Name(), fLoadCounter + 1);
 	status_t error = B_OK;
 	if (fLoadCounter == 0)
 		error = LoadModule();
@@ -146,7 +149,7 @@ void
 KDiskSystem::Unload()
 {
 	ManagerLocker locker(KDiskDeviceManager::Default());
-dprintf("KDiskSystem::Unload(): %s -> %ld\n", Name(), fLoadCounter - 1);
+TRACE("KDiskSystem::Unload(): %s -> %ld\n", Name(), fLoadCounter - 1);
 	if (fLoadCounter > 0 && --fLoadCounter == 0)
 		UnloadModule();
 }
