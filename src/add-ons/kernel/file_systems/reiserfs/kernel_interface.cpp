@@ -1,6 +1,6 @@
 // kernel_interface.cpp
 //
-// Copyright (c) 2003-2004, Ingo Weinhold (bonefish@cs.tu-berlin.de)
+// Copyright (c) 2003-2008, Ingo Weinhold (bonefish@cs.tu-berlin.de)
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -88,8 +88,10 @@ reiserfs_scan_partition(int fd, partition_data *partition, void *_cookie)
 	partition->content_size = volume->CountBlocks()
 		* volume->GetBlockSize();
 	partition->block_size = volume->GetBlockSize();
-	// TODO: Construct name from partition layout?
-	partition->content_name = strdup("Untitled ReiserFS");
+
+	volume->UpdateName(partition->id);
+		// must be done after setting the content size
+	partition->content_name = strdup(volume->GetName());
 	if (partition->content_name == NULL)
 		return B_NO_MEMORY;
 
@@ -163,9 +165,9 @@ reiserfs_read_fs_info(fs_volume* fs, struct fs_info *info)
 	info->io_size = kOptimalIOSize;
 	info->total_blocks = volume->CountBlocks();
 	info->free_blocks = volume->CountFreeBlocks();
-	strncpy(info->device_name, volume->GetDeviceName(),
+	strlcpy(info->device_name, volume->GetDeviceName(),
 			sizeof(info->device_name));
-	strncpy(info->volume_name, volume->GetName(), sizeof(info->volume_name));
+	strlcpy(info->volume_name, volume->GetName(), sizeof(info->volume_name));
 	return B_OK;
 }
 

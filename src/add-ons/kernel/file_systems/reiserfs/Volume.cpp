@@ -78,6 +78,7 @@ Volume::Volume()
 	  fSettings(NULL),
 	  fNegativeEntries()
 {
+	fVolumeName[0] = '\0';
 }
 
 // destructor
@@ -85,6 +86,7 @@ Volume::~Volume()
 {
 	Unmount();
 }
+
 
 // Identify
 status_t
@@ -131,6 +133,10 @@ Volume::Mount(fs_volume *fsVolume, const char *path)
 	// read and analyze super block
 	if (error == B_OK)
 		error = _ReadSuperBlock();
+
+	if (error == B_OK)
+		UpdateName(fsVolume->partition);
+
 	// create and init block cache
 	if (error == B_OK) {
 		fBlockCache = new(nothrow) BlockCache;
@@ -248,8 +254,20 @@ Volume::CountFreeBlocks() const
 const char *
 Volume::GetName() const
 {
-	return fSettings->GetVolumeName();
+	return fVolumeName;
 }
+
+
+// UpdateName
+void
+Volume::UpdateName(partition_id partitionID)
+{
+	if (get_default_partition_content_name(partitionID, "ReiserFS",
+			fVolumeName, sizeof(fVolumeName)) != B_OK) {
+		strlcpy(fVolumeName, "ReiserFS Volume", sizeof(fVolumeName));
+	}
+}
+
 
 // GetDeviceName
 const char *
@@ -658,4 +676,3 @@ Volume::_InitNegativeEntries()
 		}
 	}
 }
-

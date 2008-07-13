@@ -53,6 +53,7 @@ public:
 	off_t CountBlocks() const;
 	off_t CountFreeBlocks() const;
 	const char *GetName() const;
+	void UpdateName(partition_id partitionID);
 	const char *GetDeviceName() const;
 
 	BlockCache *GetBlockCache() const	{ return fBlockCache; }
@@ -102,6 +103,7 @@ private:
 	char					*fDeviceName;
 	Settings				*fSettings;
 	List<ino_t>				fNegativeEntries;
+	char					fVolumeName[B_OS_NAME_LENGTH];
 };
 
 #endif	// VOLUME_H
