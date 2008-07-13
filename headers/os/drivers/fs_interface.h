@@ -54,6 +54,7 @@ typedef struct fs_vnode_ops fs_vnode_ops;
 
 struct fs_volume {
 	dev_t			id;
+	partition_id	partition;
 	int32			layer;
 	void*			private_volume;
 	fs_volume_ops*	ops;

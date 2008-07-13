@@ -6284,7 +6284,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	// Write lock the partition's device. For the time being, we keep the lock
 	// until we're done mounting -- not nice, but ensure, that no-one is
 	// interfering.
-	// TODO: Find a better solution.
+	// TODO: Just mark the partition busy while mounting!
 	KDiskDevice *diskDevice = NULL;
 	if (partition) {
 		diskDevice = ddm->WriteLockDevice(partition->Device()->ID());
@@ -6364,6 +6364,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	mount->owns_file_device = false;
 
 	mount->volume->id = mount->id;
+	mount->volume->partition = partition != NULL ? partition->ID() : -1;
 	mount->volume->layer = 0;
 	mount->volume->private_volume = NULL;
 	mount->volume->ops = NULL;
