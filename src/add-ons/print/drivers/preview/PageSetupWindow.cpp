@@ -273,7 +273,7 @@ PageSetupWindow::UpdateSetupMessage()
 
 		SetRect(fSetupMsg, "preview:paper_rect", r);
 		SetRect(fSetupMsg, "paper_rect", ScaleRect(r, scaleR));
-		AddString(fSetupMsg, "preview:paper_size", item->Label());
+		SetString(fSetupMsg, "preview:paper_size", item->Label());
 
 		// Save the printable_rect
 		BRect margin = fMarginView->Margin();

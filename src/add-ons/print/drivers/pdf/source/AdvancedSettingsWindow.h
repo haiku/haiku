@@ -2,9 +2,9 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2002 OpenBeOS. 
+Copyright (c) 2002 OpenBeOS.
 
-Authors: 
+Authors:
 	Philippe Houdoin
 	Simon Gauvin
 	Michael Pfeiffer
@@ -32,59 +32,58 @@ THE SOFTWARE.
 #ifndef ADVANCED_SETTINGS_WINDOW_H
 #define ADVANCED_SETTINGS_WINDOW_H
 
-#include <InterfaceKit.h>
-#include <Message.h>
-#include <Messenger.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <Path.h>
-#include <String.h>
+
 #include "InterfaceUtils.h"
-#include "Utils.h"
 #include "PrinterDriver.h"
 
-class AdvancedSettingsWindow : public HWindow 
+
+#include <Directory.h>
+#include <String.h>
+
+
+class BMessage;
+class BPopUpMenu;
+class BTextControl;
+
+
+class AdvancedSettingsWindow : public HWindow
 {
+	typedef HWindow	inherited;
 public:
 	// Constructors, destructors, operators...
 
-							AdvancedSettingsWindow(BMessage *doc_info);
+					AdvancedSettingsWindow(BMessage *doc_info);
 
-	typedef HWindow 		inherited;
+	virtual void	MessageReceived(BMessage *msg);
 
-	// public constantes
 	enum {
-		OK_MSG				 = 'ok__',
-		CANCEL_MSG			 = 'cncl',
-		CREATE_LINKS_MSG     = 'clnk',
-		LINK_BORDER_MSG      = 'lnkb',
-		CREATE_BOOKMARKS_MSG = 'cbmk',
-		DEFINITION_MSG       = 'defi',
-		CREATE_XREFS_MSG     = 'cxrf',
-		XREFS_MSG            = 'xref',
-		AUTO_CLOSE_MSG       = 'acls',
-		OPEN_SETTINGS_FOLDER_MSG = 'opsf',
+					OK_MSG						= 'ok__',
+					CANCEL_MSG					= 'cncl',
+					CREATE_LINKS_MSG			= 'clnk',
+					LINK_BORDER_MSG				= 'lnkb',
+					CREATE_BOOKMARKS_MSG		= 'cbmk',
+					DEFINITION_MSG				= 'defi',
+					CREATE_XREFS_MSG			= 'cxrf',
+					XREFS_MSG					= 'xref',
+					AUTO_CLOSE_MSG				= 'acls',
+					OPEN_SETTINGS_FOLDER_MSG	= 'opsf',
 	};
-			
-	// Virtual function overrides
-public:	
-	virtual void 			MessageReceived(BMessage *msg);
 
 private:
+	void			_UpdateSettings();
+	BDirectory		_SetupDirectory(const char* dirName);
+	void			_AddMenuItem(BPopUpMenu* menu, const char* label, CloseOption option);
 
-	BMessage*               fSettings;
-
-	BTextControl*			fLicenseKey;
-	bool                    fCreateLinks;
-	float                   fLinkBorderWidth;
-	bool                    fCreateBookmarks;
-	BString                 fBookmarkDefinition;
-	bool                    fCreateXRefs;
-	BString                 fXRefs;
-	CloseOption             fCloseOption;
-	
-	void                    UpdateSettings();
-	void                    AddMenuItem(BPopUpMenu* menu, const char* label, CloseOption option);
+private:
+	BMessage*		fSettings;
+	BTextControl*	fLicenseKey;
+	bool			fCreateLinks;
+	float			fLinkBorderWidth;
+	bool			fCreateBookmarks;
+	BString			fBookmarkDefinition;
+	bool			fCreateXRefs;
+	BString			fXRefs;
+	CloseOption		fCloseOption;
 };
 
 #endif

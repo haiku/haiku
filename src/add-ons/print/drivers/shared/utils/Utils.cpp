@@ -2,14 +2,14 @@
 
 Preview printer driver.
 
-Copyright (c) 2001, 2002 OpenBeOS. 
-Copyright (c) 2005 Haiku.
+Copyright (c) 2001, 2002 OpenBeOS.
+Copyright (c) 2005 - 2008 Haiku.
 
-Authors: 
+Authors:
 	Philippe Houdoin
-	Simon Gauvin	
+	Simon Gauvin
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -32,18 +32,86 @@ THE SOFTWARE.
 
 #include "Utils.h"
 
-// --------------------------------------------------
-EscapeMessageFilter::EscapeMessageFilter(BWindow *window, int32 what) 
-	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, '_KYD')
-	, fWindow(window), 
-	fWhat(what) 
-{ 
+
+#include <Message.h>
+#include <Window.h>
+
+
+void
+SetBool(BMessage* msg, const char* name, bool value)
+{
+	if (msg->HasBool(name)) {
+		msg->ReplaceBool(name, value);
+	} else {
+		msg->AddBool(name, value);
+	}
 }
 
 
-// --------------------------------------------------
-filter_result 
-EscapeMessageFilter::Filter(BMessage *msg, BHandler **target) 
+void
+SetFloat(BMessage* msg, const char* name, float value)
+{
+	if (msg->HasFloat(name)) {
+		msg->ReplaceFloat(name, value);
+	} else {
+		msg->AddFloat(name, value);
+	}
+}
+
+
+void
+SetInt32(BMessage* msg, const char* name, int32 value)
+{
+	if (msg->HasInt32(name)) {
+		msg->ReplaceInt32(name, value);
+	} else {
+		msg->AddInt32(name, value);
+	}
+}
+
+
+void
+SetString(BMessage* msg, const char* name, const char* value)
+{
+	if (msg->HasString(name, 0)) {
+		msg->ReplaceString(name, value);
+	} else {
+		msg->AddString(name, value);
+	}
+}
+
+
+void
+SetRect(BMessage* msg, const char* name, const BRect& rect)
+{
+	if (msg->HasRect(name)) {
+		msg->ReplaceRect(name, rect);
+	} else {
+		msg->AddRect(name, rect);
+	}
+}
+
+
+void
+SetString(BMessage* msg, const char* name, const BString& value)
+{
+	SetString(msg, name, value.String());
+}
+
+
+// #pragma mark -- EscapeMessageFilter
+
+
+EscapeMessageFilter::EscapeMessageFilter(BWindow *window, int32 what)
+	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, '_KYD')
+	, fWindow(window),
+	fWhat(what)
+{
+}
+
+
+filter_result
+EscapeMessageFilter::Filter(BMessage *msg, BHandler **target)
 {
 	int32 key;
 	// notify window with message fWhat if Escape key is hit
@@ -52,36 +120,4 @@ EscapeMessageFilter::Filter(BMessage *msg, BHandler **target)
 		return B_SKIP_MESSAGE;
 	}
 	return B_DISPATCH_MESSAGE;
-}
-
-void AddString(BMessage* m, const char* name, const char* value) {
-	if (m->HasString(name, 0)) {
-		m->ReplaceString(name, value);
-	} else {
-		m->AddString(name, value);
-	}
-}
-
-void SetRect(BMessage* msg, const char* name, BRect rect) {
-	if (msg->HasRect(name)) {
-		msg->ReplaceRect(name, rect);
-	} else {
-		msg->AddRect(name, rect);
-	}
-}
-
-void SetFloat(BMessage* msg, const char* name, float value) {
-	if (msg->HasFloat(name)) {
-		msg->ReplaceFloat(name, value);
-	} else {
-		msg->AddFloat(name, value);
-	}
-}
-
-void SetInt32(BMessage* msg, const char* name, int32 value) {
-	if (msg->HasInt32(name)) {
-		msg->ReplaceInt32(name, value);
-	} else {
-		msg->AddInt32(name, value);
-	}
 }

@@ -2,9 +2,9 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001 OpenBeOS. 
+Copyright (c) 2001 OpenBeOS.
 
-Authors: 
+Authors:
 	Philippe Houdoin
 	Simon Gauvin
 	Michael Pfeiffer
@@ -32,65 +32,60 @@ THE SOFTWARE.
 #ifndef PAGESETUPWINDOW_H
 #define PAGESETUPWINDOW_H
 
-#include <InterfaceKit.h>
-#include <Message.h>
-#include <Messenger.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <Path.h>
-#include <String.h>
-#include "InterfaceUtils.h"
-#include "Utils.h"
-#include "Fonts.h"
 
+#include "InterfaceUtils.h"
+
+
+#include <Message.h>
+#include <String.h>
+
+
+class BMenuField;
+class BSlider;
+class Fonts;
 class MarginView;
 
-class PageSetupWindow : public HWindow 
+
+class PageSetupWindow : public HWindow
 {
+	typedef HWindow	inherited;
 public:
 	// Constructors, destructors, operators...
 
-							PageSetupWindow(BMessage *msg, const char *printerName = NULL);
-							~PageSetupWindow();
+					PageSetupWindow(BMessage *msg, const char *printerName = NULL);
+					~PageSetupWindow();
 
-	typedef HWindow 		inherited;
+	virtual	void	MessageReceived(BMessage *msg);
+	virtual	bool	QuitRequested();
 
-	// public constantes
+	status_t		Go();
+
 	enum {
-		OK_MSG				= 'ok__',
-		CANCEL_MSG			= 'cncl',
-		FONTS_MSG			= 'font',
-		ADVANCED_MSG        = 'advc'
+					OK_MSG				= 'ok__',
+					CANCEL_MSG			= 'cncl',
+					FONTS_MSG			= 'font',
+					ADVANCED_MSG        = 'advc',
+					PAGE_SIZE_CHANGED	= 'pgsz',
+					ORIENTATION_CHANGED	= 'ornt'
 	};
-			
-	// Virtual function overrides
-public:	
-	virtual void 			MessageReceived(BMessage *msg);
-	virtual bool 			QuitRequested();
-	status_t 				Go();
 
-	// From here, it's none of your business! ;-)
 private:
-	long 					fExitSem;
-	status_t 				fResult;
-	BMessage *				fSetupMsg;
-	BMenuField *			fPageSizeMenu;
-	BMenuField *			fOrientationMenu;
-	BMenuField *			fPDFCompatibilityMenu;
-	BSlider *				fPDFCompressionSlider;
-	Fonts *                 fFonts;
-	BMessage                fAdvancedSettings;
-		
-	void					UpdateSetupMessage();
+			void	_UpdateSetupMessage();
+private:
+	long			fExitSem;
+	status_t		fResult;
+	BMessage*		fSetupMsg;
+	BMenuField*		fPageSizeMenu;
+	BMenuField*		fOrientationMenu;
+	BMenuField*		fPDFCompatibilityMenu;
+	BSlider*		fPDFCompressionSlider;
+	Fonts*			fFonts;
+	BMessage		fAdvancedSettings;
+	MarginView * 	fMarginView;
 
-	MarginView * 			fMarginView;
-	
-	// used for saving settings 
-	BString					fPrinterDirName;
-
-	//private class constants
-	static const int kMargin = 10;
-	static const int kOffset = 200;
+	// used for saving settings
+	BString			fPrinterDirName;
+	int32			fCurrentOrientation;
 };
 
 #endif

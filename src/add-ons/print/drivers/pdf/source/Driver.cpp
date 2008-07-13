@@ -2,13 +2,13 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001 OpenBeOS. 
+Copyright (c) 2001 OpenBeOS.
 
-Authors: 
+Authors:
 	Philippe Houdoin
-	Simon Gauvin	
+	Simon Gauvin
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -37,124 +37,100 @@ THE SOFTWARE.
 
 #include "Driver.h"
 #include "PDFWriter.h"
+#include "PrinterDriver.h"
 #include "PrinterSettings.h"
+
 
 static PrinterDriver *instanciate_driver(BNode *spoolDir);
 
 //  ======== For testing only ==================
 
-BMessage* 
-take_job(BFile *spoolFile, BNode *spoolDir, BMessage *msg) 
+BMessage*
+take_job(BFile *spoolFile, BNode *spoolDir, BMessage *msg)
 {
-	PrinterDriver *driver;
-	
-	driver = instanciate_driver(spoolDir);
-	if (driver->PrintJob(spoolFile, spoolDir, msg) == B_OK) {
-		msg = new BMessage('okok');
-	} else {	
-		msg = new BMessage('baad');
-	}
+	PrinterDriver *driver = instanciate_driver(spoolDir);
+	status_t status = driver->PrintJob(spoolFile, spoolDir, msg);
 	delete driver;
-			
+
+	msg = new BMessage('okok');
+	if (status != B_OK)
+		msg->what = 'baad';
+
 	return msg;
 }
 
 
-// --------------------------------------------------
-BMessage* 
-config_page(BNode *spoolDir, BMessage *msg) 
+BMessage*
+config_page(BNode *spoolDir, BMessage *msg)
 {
-	BMessage		*pagesetupMsg;
-	PrinterDriver	*driver;
-	const char		*printerName;
-	char			buffer[B_ATTR_NAME_LENGTH+1];
-
-	pagesetupMsg = new BMessage(*msg);
-	
+	BMessage *pagesetupMsg = new BMessage(*msg);
 	PrinterSettings::Read(spoolDir, pagesetupMsg, PrinterSettings::kPageSettings);
 
-	// retrieve the printer (spool) name.
-	printerName = NULL;
-	if (spoolDir->ReadAttr("Printer Name", B_STRING_TYPE, 1, buffer, B_ATTR_NAME_LENGTH+1) > 0) {
-		printerName = buffer;
-	}
+	BString printerName;
+	spoolDir->ReadAttrString("Printer Name", &printerName);
 
-	driver = instanciate_driver(spoolDir);
-	if (driver->PageSetup(pagesetupMsg, printerName) == B_OK) {
+	PrinterDriver *driver = instanciate_driver(spoolDir);
+	if (driver->PageSetup(pagesetupMsg, printerName.String()) == B_OK) {
 		pagesetupMsg->what = 'okok';
-		PrinterSettings::Update(spoolDir, pagesetupMsg, PrinterSettings::kPageSettings);
+		PrinterSettings::Update(spoolDir, pagesetupMsg,
+			PrinterSettings::kPageSettings);
 	} else {
 		delete pagesetupMsg;
 		pagesetupMsg = NULL;
 	}
-		
 	delete driver;
-	
 	return pagesetupMsg;
 }
 
 
-// --------------------------------------------------
-BMessage* 
+BMessage*
 config_job(BNode *spoolDir, BMessage *msg)
 {
-	BMessage		*jobsetupMsg;
-	PrinterDriver	*driver;
-	const char		*printerName;
-	char			buffer[B_ATTR_NAME_LENGTH+1];
-
-	jobsetupMsg = new BMessage(*msg);
-
+	BMessage *jobsetupMsg = new BMessage(*msg);
 	PrinterSettings::Read(spoolDir, jobsetupMsg, PrinterSettings::kJobSettings);
 
-	// retrieve the printer (spool) name.
-	printerName = NULL;
-	if (spoolDir->ReadAttr("Printer Name", B_STRING_TYPE, 1, buffer, B_ATTR_NAME_LENGTH+1) > 0) {
-		printerName = buffer;
-	}
-	driver = instanciate_driver(spoolDir);
-	if (driver->JobSetup(jobsetupMsg, printerName) == B_OK) {
+	BString printerName;
+	spoolDir->ReadAttrString("Printer Name", &printerName);
+
+	PrinterDriver *driver = instanciate_driver(spoolDir);
+	if (driver->JobSetup(jobsetupMsg, printerName.String()) == B_OK) {
 		jobsetupMsg->what = 'okok';
-		PrinterSettings::Update(spoolDir, jobsetupMsg, PrinterSettings::kJobSettings);
+		PrinterSettings::Update(spoolDir, jobsetupMsg,
+			PrinterSettings::kJobSettings);
 	} else {
 		delete jobsetupMsg;
 		jobsetupMsg = NULL;
 	}
-
 	delete driver;
-	
 	return jobsetupMsg;
 }
 
 
-// --------------------------------------------------
-char* 
+char*
 add_printer(char *printerName)
 {
-	return printerName; 
+	return printerName;
 }
 
 
-// --------------------------------------------------
-static PrinterDriver* 
+static PrinterDriver*
 instanciate_driver(BNode *spoolDir)
 {
 	return new PDFWriter();
 }
 
+
 /**
- * default_settings  
+ * default_settings
  *
  * @param BNode* printer spool directory
  * @return BMessage* the settings
  */
-BMessage* 
+BMessage*
 default_settings(BNode* printer)
 {
 	BMessage *msg = new BMessage();
-
 	PrinterSettings::Read(printer, msg, PrinterSettings::kPageSettings);
-	
+
 	return msg;
 }
-

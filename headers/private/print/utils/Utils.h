@@ -2,14 +2,14 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001, 2002 OpenBeOS. 
-Copyright (c) 2005 Haiku.
+Copyright (c) 2001, 2002 OpenBeOS.
+Copyright (c) 2005 - 2008 Haiku.
 
-Authors: 
+Authors:
 	Philippe Houdoin
-	Simon Gauvin	
+	Simon Gauvin
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -33,24 +33,34 @@ THE SOFTWARE.
 #ifndef _UTILS_H
 #define _UTILS_H
 
-#include <Window.h>
-#include <Message.h>
+
+#include <List.h>
 #include <MessageFilter.h>
+#include <String.h>
+#include <Rect.h>
 
 
-void AddString(BMessage* m, const char* name, const char* value);
+class BHandler;
+class BMessage;
+class BWindow;
+
 
 // set or replace a value in a BMessage
-void SetRect(BMessage* msg, const char* name, BRect rect);
+void SetBool(BMessage* msg, const char* name, bool value);
 void SetFloat(BMessage* msg, const char* name, float value);
 void SetInt32(BMessage* msg, const char* name, int32 value);
+void SetString(BMessage* msg, const char* name, const char* value);
 
-class EscapeMessageFilter : public BMessageFilter 
+void SetRect(BMessage* msg, const char* name, const BRect& rect);
+void SetString(BMessage* msg, const char* name, const BString& value);
+
+
+class EscapeMessageFilter : public BMessageFilter
 {
 private:
 	BWindow *fWindow;
 	int32    fWhat;
-		
+
 public:
 	EscapeMessageFilter(BWindow *window, int32 what);
 	filter_result Filter(BMessage *msg, BHandler **target);
@@ -65,7 +75,7 @@ class TList {
 private:
 	BList fList;
 	typedef int (*sort_func)(const void*, const void*);
-	
+
 public:
 	virtual ~TList();
 	void     MakeEmpty();

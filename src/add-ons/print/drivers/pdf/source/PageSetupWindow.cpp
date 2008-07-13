@@ -31,320 +31,256 @@ THE SOFTWARE.
 
 */
 
-#include <InterfaceKit.h>
-#include <SupportKit.h>
-#include "pdflib.h"				// for pageFormat constants
-#include "PrinterDriver.h"
 #include "PageSetupWindow.h"
 
-#include "MarginView.h"
-#include "FontsWindow.h"
 #include "AdvancedSettingsWindow.h"
+#include "Fonts.h"
+#include "FontsWindow.h"
+#include "InterfaceUtils.h"
+#include "MarginView.h"
+#include "PrinterDriver.h"
+#include "pdflib.h"				// for pageFormat constants
+#include "Utils.h"
+
+
+#include <Box.h>
+#include <Button.h>
+#include <MenuField.h>
+#include <Message.h>
+#include <PopUpMenu.h>
+#include <Screen.h>
+#include <TextControl.h>
+
 
 // static global variables
 static struct
 {
-	char  *label;
+	char *label;
 	float width;
 	float height;
 } pageFormat[] =
 {
-	{"Letter", letter_width, letter_height },
-	{"Legal",  legal_width,  legal_height  },
-	{"Ledger", ledger_width, ledger_height  },
-	{"p11x17", p11x17_width, p11x17_height  },
-	{"A0",     a0_width,     a0_height     },
-	{"A1",     a1_width,     a1_height     },
-	{"A2",     a2_width,     a2_height     },
-	{"A3",     a3_width,     a3_height     },
-	{"A4",     a4_width,     a4_height     },
-	{"A5",     a5_width,     a5_height     },
-	{"A6",     a6_width,     a6_height     },
-	{"B5",     b5_width,     b5_height     },
-	{NULL,     0.0,          0.0           }
+	{ "Letter", letter_width, letter_height },
+	{ "Legal",  legal_width,  legal_height  },
+	{ "Ledger", ledger_width, ledger_height },
+	{ "p11x17", p11x17_width, p11x17_height },
+	{ "A0",     a0_width,     a0_height     },
+	{ "A1",     a1_width,     a1_height     },
+	{ "A2",     a2_width,     a2_height     },
+	{ "A3",     a3_width,     a3_height     },
+	{ "A4",     a4_width,     a4_height     },
+	{ "A5",     a5_width,     a5_height     },
+	{ "A6",     a6_width,     a6_height     },
+	{ "B5",     b5_width,     b5_height     },
+	{ NULL,     0.0,          0.0           }
 };
 
 
 static struct
 {
-	char  *label;
+	char *label;
 	int32 orientation;
 } orientation[] =
 {
-	{"Portrait",  PrinterDriver::PORTRAIT_ORIENTATION},
-	{"Landscape", PrinterDriver::LANDSCAPE_ORIENTATION},
-	{NULL, 0}
+	{ "Portrait", PrinterDriver::PORTRAIT_ORIENTATION },
+	{ "Landscape", PrinterDriver::LANDSCAPE_ORIENTATION },
+	{ NULL, 0 }
 };
 
 // PDFLib 5.x does not support PDF 1.2 anymore!
-static const char *pdf_compatibility[] = {"1.3", "1.4", NULL};
+static const char *pdf_compatibility[] = { "1.3", "1.4", NULL };
 
-/**
- * Constuctor
- *
- * @param
- * @return
- */
+
 PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
-	:	HWindow(BRect(0,0,400,220), "Page Setup", B_TITLED_WINDOW_LOOK,
- 			B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 			B_NOT_ZOOMABLE)
+	: HWindow(BRect(0,0,400,220), "Page Setup", B_TITLED_WINDOW_LOOK,
+ 		B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
+ 		B_NOT_ZOOMABLE),
+	 fResult(B_ERROR),
+	 fSetupMsg(msg),
+	 fAdvancedSettings(*msg),
+	 fPrinterDirName(printerName)
 {
-	fSetupMsg	= msg;
 	fExitSem 	= create_sem(0, "PageSetup");
-	fResult		= B_ERROR;
-	fAdvancedSettings = *msg;
 
-	if ( printerName ) {
-		BString	title;
+	if (printerName)
+		SetTitle(BString(printerName).Append(" Page Setup").String());
 
-		title << printerName << " Page Setup";
-		SetTitle( title.String() );
+	if (fSetupMsg->FindInt32("orientation", &fCurrentOrientation) != B_OK)
+		fCurrentOrientation = PrinterDriver::PORTRAIT_ORIENTATION;
 
-		// save the printer name
-		fPrinterDirName = printerName;
+	BRect page;
+	float width = letter_width;
+	float height = letter_height;
+	if (fSetupMsg->FindRect("paper_rect", &page) == B_OK) {
+		width = page.Width();
+		height = page.Height();
+	} else {
+		page.Set(0, 0, width, height);
 	}
 
-	// ---- Ok, build a default page setup user interface
-	BRect		r;
-	BBox		*panel;
-	BButton		*button;
-	float		x, y, w, h;
-	int         i;
-	BMenuItem	*item;
-	float       width, height;
-	int32       orient;
-	BRect		page;
-	BRect		margin(0,0,0,0);
-	int32 		units;
-	int32 		compression;
-	BString 	setting_value;
+	BString label;
+	if (fSetupMsg->FindString("pdf_paper_size", &label) != B_OK)
+		label = "Letter";
 
-	// load orientation
-	fSetupMsg->FindInt32("orientation", &orient);
-//	(new BAlert("", "orientation not in msg", "Shit"))->Go();
-
-	// load page rect
-	fSetupMsg->FindRect("paper_rect", &r);
-	width = r.Width();
-	height = r.Height();
-	page = r;
-
-	// Load compression
+	int32 compression;
 	fSetupMsg->FindInt32("pdf_compression", &compression);
 
-	// Load units
-	fSetupMsg->FindInt32("units", &units);
+	int32 units;
+	if (fSetupMsg->FindInt32("units", &units) != B_OK)
+		units = kUnitInch;
 
-	// Load printable rect
-	fSetupMsg->FindRect("printable_rect", &margin);
+	// re-calculate the margin from the printable rect in points
+	BRect margin = page;
+	if (fSetupMsg->FindRect("printable_rect", &margin) == B_OK) {
+		margin.top -= page.top;
+		margin.left -= page.left;
+		margin.right = page.right - margin.right;
+		margin.bottom = page.bottom - margin.bottom;
+	} else {
+		margin.Set(28.34, 28.34, 28.34, 28.34);		// 28.34 dots = 1cm
+	}
 
-	// Load pdf compatability
-	fSetupMsg->FindString("pdf_compatibility", &setting_value);
+	BString setting_value;
+	if (fSetupMsg->FindString("pdf_compatibility", &setting_value) != B_OK)
+		setting_value = "1.3";
 
 	// Load font settings
 	fFonts = new Fonts();
 	fFonts->CollectFonts();
 	BMessage fonts;
-	if (fSetupMsg->FindMessage("fonts", &fonts) == B_OK) {
+	if (fSetupMsg->FindMessage("fonts", &fonts) == B_OK)
 		fFonts->SetTo(&fonts);
-	}
 
 	// add a *dialog* background
-	r = Bounds();
-	panel = new BBox(r, "top_panel", B_FOLLOW_ALL,
-					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-					B_PLAIN_BORDER);
+	BRect bounds(Bounds());
+	BBox *panel = new BBox(bounds, "background", B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
+	AddChild(panel);
 
-	////////////// Create the margin view //////////////////////
-
-	// re-calculate the margin from the printable rect in points
-	margin.top -= page.top;
-	margin.left -= page.left;
-	margin.right = page.right - margin.right;
-	margin.bottom = page.bottom - margin.bottom;
-
-	fMarginView = new MarginView(BRect(20,20,200,160), (int32)width, (int32)height,
-			margin, (MarginUnit)units);
+	bounds.InsetBy(10.0, 10.0);
+	bounds.right = 230.0;
+	bounds.bottom = 160.0;
+	fMarginView = new MarginView(bounds, int32(width), int32(height), margin,
+		MarginUnit(units));
 	panel->AddChild(fMarginView);
+	fMarginView->SetResizingMode(B_FOLLOW_NONE);
 
-	// add page format menu
-	// Simon Changed to OFFSET popups
-	x = r.left + kMargin * 2 + kOffset; y = r.top + kMargin * 2;
-
-	BPopUpMenu* m = new BPopUpMenu("page_size");
+	BPopUpMenu* m = new BPopUpMenu("Page Size");
 	m->SetRadioMode(true);
 
-	// Simon changed width 200->140
-	BMenuField *mf = new BMenuField(BRect(x, y, x + 140, y + 20), "page_size",
-		"Page Size:", m);
-	fPageSizeMenu = mf;
-	mf->ResizeToPreferred();
-	mf->GetPreferredSize(&w, &h);
+	bounds.OffsetBy(bounds.Width() + 10.0, 5.0);
+	float divider = be_plain_font->StringWidth("PDF Compatibility: ");
+	fPageSizeMenu = new BMenuField(bounds, "page_size", "Page Size:", m);
+	panel->AddChild(fPageSizeMenu);
+	fPageSizeMenu->ResizeToPreferred();
+	fPageSizeMenu->SetDivider(divider);
+	fPageSizeMenu->Menu()->SetLabelFromMarked(true);
 
-	// Simon added: SetDivider
-	mf->SetDivider(be_plain_font->StringWidth("Page Size#"));
+	for (int32 i = 0; pageFormat[i].label != NULL; i++) {
+		BMessage* message = new BMessage(PAGE_SIZE_CHANGED);
+		message->AddFloat("width", pageFormat[i].width);
+		message->AddFloat("height", pageFormat[i].height);
+		BMenuItem* item = new BMenuItem(pageFormat[i].label, message);
+		m->AddItem(item);
 
-	panel->AddChild(mf);
-
-	item = NULL;
-	for (i = 0; pageFormat[i].label != NULL; i++)
-	{
-		BMessage* msg = new BMessage('pgsz');
-		msg->AddFloat("width", pageFormat[i].width);
-		msg->AddFloat("height", pageFormat[i].height);
-		BMenuItem* mi = new BMenuItem(pageFormat[i].label, msg);
-		m->AddItem(mi);
-
-		if (width == pageFormat[i].width && height == pageFormat[i].height) {
-			item = mi;
-		}
-		if (height == pageFormat[i].width && width == pageFormat[i].height) {
-			item = mi;
-		}
+		if (label.Compare(pageFormat[i].label) == 0)
+			item->SetMarked(true);
 	}
-	mf->Menu()->SetLabelFromMarked(true);
-	if (!item) {
-		item = m->ItemAt(0);
-	}
-	item->SetMarked(true);
-	mf->MenuItem()->SetLabel(item->Label());
 
-	// add orientation menu
-	y += h + kMargin;
-
-	m = new BPopUpMenu("orientation");
+	m = new BPopUpMenu("Orientation");
 	m->SetRadioMode(true);
 
-	// Simon changed 200->140
-	mf = new BMenuField(BRect(x, y, x + 140, y + 20), "orientation", "Orientation:", m);
+	bounds.OffsetBy(0.0, fPageSizeMenu->Bounds().Height() + 10.0);
+	fOrientationMenu = new BMenuField(bounds, "orientation", "Orientation:", m);
+	panel->AddChild(fOrientationMenu);
+	fOrientationMenu->ResizeToPreferred();
+	fOrientationMenu->SetDivider(divider);
+	fOrientationMenu->Menu()->SetLabelFromMarked(true);
 
-	// Simon added: SetDivider
-	mf->SetDivider(be_plain_font->StringWidth("Orientation#"));
+	for (int32 i = 0; orientation[i].label != NULL; i++) {
+	 	BMessage* message = new BMessage(ORIENTATION_CHANGED);
+		message->AddInt32("orientation", orientation[i].orientation);
+		BMenuItem* item = new BMenuItem(orientation[i].label, message);
+		m->AddItem(item);
 
-	fOrientationMenu = mf;
-	mf->ResizeToPreferred();
-	panel->AddChild(mf);
-	r.top += h;
-	item = NULL;
-	for (int i = 0; orientation[i].label != NULL; i++)
-	{
-	 	BMessage* msg = new BMessage('ornt');
-		msg->AddInt32("orientation", orientation[i].orientation);
-		BMenuItem* mi = new BMenuItem(orientation[i].label, msg);
-		m->AddItem(mi);
-
-		if (orient == orientation[i].orientation) {
-			item = mi;
-		}
+		if (fCurrentOrientation == orientation[i].orientation)
+			item->SetMarked(true);
 	}
-	mf->Menu()->SetLabelFromMarked(true);
-// SHOULD BE REMOVED
-	if (!item) {
-		item = m->ItemAt(0);
-	}
-///////////////////
-	item->SetMarked(true);
-	mf->MenuItem()->SetLabel(item->Label());
 
-	// add PDF comptibility  menu
-	y += h + kMargin;
-
-	m = new BPopUpMenu("pdf_compatibility");
+	m = new BPopUpMenu("PDF Compatibility");
 	m->SetRadioMode(true);
-	mf = new BMenuField(BRect(x, y, x + 200, y + 20), "pdf_compatibility", "PDF Compatibility:", m);
-	fPDFCompatibilityMenu = mf;
-	mf->ResizeToPreferred();
-	panel->AddChild(mf);
-	r.top += h;
 
-	item = NULL;
-	for (int i = 0; pdf_compatibility[i] != NULL; i++)
-	{
-		BMenuItem* mi = new BMenuItem(pdf_compatibility[i], NULL);
-		m->AddItem(mi);
+	bounds.OffsetBy(0.0, fOrientationMenu->Bounds().Height() + 10.0);
+	fPDFCompatibilityMenu = new BMenuField(bounds, "pdf_compatibility",
+		"PDF Compatibility:", m);
+	panel->AddChild(fPDFCompatibilityMenu);
+	fPDFCompatibilityMenu->ResizeToPreferred();
+	fPDFCompatibilityMenu->SetDivider(divider);
+	fPDFCompatibilityMenu->Menu()->SetLabelFromMarked(true);
 
-//(new BAlert("", setting_value.String(), pdf_compatibility[i]))->Go();
-		if (setting_value == pdf_compatibility[i]) {
-			item = mi;
-		}
+	for (int32 i = 0; pdf_compatibility[i] != NULL; i++) {
+		BMenuItem* item = new BMenuItem(pdf_compatibility[i], NULL);
+		m->AddItem(item);
+		if (setting_value == pdf_compatibility[i])
+			item->SetMarked(true);
 	}
 
-	mf->Menu()->SetLabelFromMarked(true);
+	bounds.OffsetBy(0.0, fPDFCompatibilityMenu->Bounds().Height() + 10.0);
+	fPDFCompressionSlider = new BSlider(bounds, "pdf_compression",
+		"Compression:", NULL, 0, 9);
+	panel->AddChild(fPDFCompressionSlider);
+	fPDFCompressionSlider->SetLimitLabels("None", "Best");
+	fPDFCompressionSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fPDFCompressionSlider->SetValue(compression);
+	fPDFCompressionSlider->ResizeToPreferred();
 
-/// SHOULD BE REMOVED
-	if (!item) {
-		item = m->ItemAt(0);
-	}
-////////////////////
-
-	item->SetMarked(true);
-	mf->MenuItem()->SetLabel(item->Label());
-
-	// add PDF compression slider
-	y += h + kMargin;
-
-	BSlider * slider = new BSlider(BRect(x, y, panel->Bounds().right - kMargin, y + 20), "pdf_compression",
-								"Compression:",
-								NULL, 0, 9);
-	fPDFCompressionSlider = slider;
-
-	panel->AddChild(slider);
-
-	slider->SetLimitLabels("None", "Best");
-	slider->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	slider->ResizeToPreferred();
-	slider->GetPreferredSize(&w, &h);
-
-	slider->SetValue(compression);
-
-	// add a "OK" button, and make it default
-	button 	= new BButton(r, NULL, "OK", new BMessage(OK_MSG),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->GetPreferredSize(&w, &h);
-	x = r.right - w - 8;
-	y = r.bottom - h - 8;
-	button->MoveTo(x, y);
-	panel->AddChild(button);
-	button->MakeDefault(true);
-
-	// add a "Cancel button
-	button 	= new BButton(r, NULL, "Cancel", new BMessage(CANCEL_MSG),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	button->MoveTo(x - w - 8, y);
-	panel->AddChild(button);
-
-	// add a "Fonts" button
-	button 	= new BButton(r, NULL, "Fonts" B_UTF8_ELLIPSIS, new BMessage(FONTS_MSG),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	button->MoveTo(r.left + 8, y);
-	panel->AddChild(button);
-
-	// add a "Fonts" button
-	BButton* font = button;
-	button 	= new BButton(r, NULL, "Advanced" B_UTF8_ELLIPSIS, new BMessage(ADVANCED_MSG),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	button->MoveTo(font->Frame().right + 8, y);
-	panel->AddChild(button);
-
-	// add a separator line...
-	BBox * line = new BBox(BRect(r.left, y - 9, r.right, y - 8), NULL,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM );
+	bounds = Bounds();
+	bounds.InsetBy(5.0, 0.0);
+	bounds.top = MAX(fPDFCompressionSlider->Frame().bottom,
+		fMarginView->Frame().bottom) + 10.0;
+	BBox *line = new BBox(BRect(bounds.left, bounds.top, bounds.right,
+		bounds.top + 1.0), NULL, B_FOLLOW_LEFT_RIGHT);
 	panel->AddChild(line);
 
-	// Finally, add our panel to window
-	AddChild(panel);
+	bounds.InsetBy(5.0, 0.0);
+	bounds.OffsetBy(0.0, 11.0);
+	BButton *cancel = new BButton(bounds, NULL, "Cancel", new BMessage(CANCEL_MSG));
+	panel->AddChild(cancel);
+	cancel->ResizeToPreferred();
+
+	BButton *ok = new BButton(bounds, NULL, "OK", new BMessage(OK_MSG));
+	panel->AddChild(ok, cancel);
+	ok->ResizeToPreferred();
+
+	bounds.right = fPDFCompressionSlider->Frame().right;
+	ok->MoveTo(bounds.right - ok->Bounds().Width(), ok->Frame().top);
+
+	bounds = ok->Frame();
+	cancel->MoveTo(bounds.left - cancel->Bounds().Width() - 10.0, bounds.top);
+
+	ok->MakeDefault(true);
+	ResizeTo(bounds.right + 10.0, bounds.bottom + 10.0);
+
+	BButton *button = new BButton(bounds, NULL, "Fonts" B_UTF8_ELLIPSIS,
+		new BMessage(FONTS_MSG));
+	panel->AddChild(button);
+	button->ResizeToPreferred();
+	button->MoveTo(fMarginView->Frame().left, bounds.top);
+
+	bounds = button->Frame();
+	button = new BButton(bounds, NULL, "Advanced" B_UTF8_ELLIPSIS,
+		new BMessage(ADVANCED_MSG));
+	panel->AddChild(button);
+	button->ResizeToPreferred();
+	button->MoveTo(bounds.right + 10, bounds.top);
+
+	BRect winFrame(Frame());
+	BRect screenFrame(BScreen().Frame());
+	MoveTo((screenFrame.right - winFrame.right) / 2,
+		(screenFrame.bottom - winFrame.bottom) / 2);
 }
 
 
-// --------------------------------------------------
 PageSetupWindow::~PageSetupWindow()
 {
 	delete_sem(fExitSem);
@@ -352,221 +288,52 @@ PageSetupWindow::~PageSetupWindow()
 }
 
 
-// --------------------------------------------------
-bool
-PageSetupWindow::QuitRequested()
-{
-	release_sem(fExitSem);
-	return true;
-}
-
-
-// --------------------------------------------------
-void
-PageSetupWindow::UpdateSetupMessage()
-{
-	BMenuItem *item;
-	int32 orientation = 0;
-
-	item = fOrientationMenu->Menu()->FindMarked();
-	if (item) {
-		BMessage *msg = item->Message();
-		msg->FindInt32("orientation", &orientation);
-		fSetupMsg->ReplaceInt32("orientation", orientation);
-	}
-
-	item = fPDFCompatibilityMenu->Menu()->FindMarked();
-	if (item) {
-		if (fSetupMsg->HasString("pdf_compatibility"))
-			fSetupMsg->ReplaceString("pdf_compatibility", item->Label());
-		else
-			fSetupMsg->AddString("pdf_compatibility", item->Label());
-	}
-
-	if (fSetupMsg->HasInt32("pdf_compression")) {
-		fSetupMsg->ReplaceInt32("pdf_compression", fPDFCompressionSlider->Value());
-	} else {
-		fSetupMsg->AddInt32("pdf_compression", fPDFCompressionSlider->Value());
-	}
-
-	item = fPageSizeMenu->Menu()->FindMarked();
-	if (item) {
-		float w, h;
-		BMessage *msg = item->Message();
-		msg->FindFloat("width", &w);
-		msg->FindFloat("height", &h);
-		BRect r;
-		if (orientation == 0)
-			r.Set(0, 0, w, h);
-		else
-			r.Set(0, 0, h, w);
-		fSetupMsg->ReplaceRect("paper_rect", r);
-
-		// Save the printable_rect
-		BRect margin = fMarginView->Margin();
-		if (orientation == 0) {
-			margin.right = w - margin.right;
-			margin.bottom = h - margin.bottom;
-		} else {
-			margin.right = h - margin.right;
-			margin.bottom = w - margin.bottom;
-		}
-		fSetupMsg->ReplaceRect("printable_rect", margin);
-
-		// save the units used
-		int32 units = fMarginView->Unit();
-		if (fSetupMsg->HasInt32("units")) {
-			fSetupMsg->ReplaceInt32("units", units);
-		} else {
-			fSetupMsg->AddInt32("units", units);
-		}
-	}
-
-	BMessage fonts;
-	if (B_OK == fFonts->Archive(&fonts)) {
-		if (fSetupMsg->HasMessage("fonts")) {
-			fSetupMsg->ReplaceMessage("fonts", &fonts);
-		} else {
-			fSetupMsg->AddMessage("fonts", &fonts);
-		}
-	}
-
-	// advanced settings
-	bool    b;
-	float   f;
-	BString s;
-	int32   i;
-
-
-	if (fAdvancedSettings.FindString("pdflib_license_key", &s) == B_OK) {
-		if (fSetupMsg->HasString("pdflib_license_key")) {
-			fSetupMsg->ReplaceString("pdflib_license_key", s.String());
-		} else {
-			fSetupMsg->AddString("pdflib_license_key", s.String());
-		}
-	}
-
-	if (fAdvancedSettings.FindBool("create_web_links", &b) == B_OK) {
-		if (fSetupMsg->HasBool("create_web_links")) {
-			fSetupMsg->ReplaceBool("create_web_links", b);
-		} else {
-			fSetupMsg->AddBool("create_web_links", b);
-		}
-	}
-
-	if (fAdvancedSettings.FindFloat("link_border_width", &f) == B_OK) {
-		if (fSetupMsg->HasFloat("link_border_width")) {
-			fSetupMsg->ReplaceFloat("link_border_width", f);
-		} else {
-			fSetupMsg->AddFloat("link_border_width", f);
-		}
-	}
-
-	if (fAdvancedSettings.FindBool("create_bookmarks", &b) == B_OK) {
-		if (fSetupMsg->HasBool("create_bookmarks")) {
-			fSetupMsg->ReplaceBool("create_bookmarks", b);
-		} else {
-			fSetupMsg->AddBool("create_bookmarks", b);
-		}
-	}
-
-	if (fAdvancedSettings.FindString("bookmark_definition_file", &s) == B_OK) {
-		if (fSetupMsg->HasString("bookmark_definition_file")) {
-			fSetupMsg->ReplaceString("bookmark_definition_file", s.String());
-		} else {
-			fSetupMsg->AddString("bookmark_definition_file", s.String());
-		}
-	}
-
-	if (fAdvancedSettings.FindBool("create_xrefs", &b) == B_OK) {
-		if (fSetupMsg->HasBool("create_xrefs")) {
-			fSetupMsg->ReplaceBool("create_xrefs", b);
-		} else {
-			fSetupMsg->AddBool("create_xrefs", b);
-		}
-	}
-
-	if (fAdvancedSettings.FindString("xrefs_file", &s) == B_OK) {
-		if (fSetupMsg->HasString("xrefs_file")) {
-			fSetupMsg->ReplaceString("xrefs_file", s.String());
-		} else {
-			fSetupMsg->AddString("xrefs_file", s.String());
-		}
-	}
-
-	if (fAdvancedSettings.FindInt32("close_option", &i) == B_OK) {
-		if (fSetupMsg->HasInt32("close_option")) {
-			fSetupMsg->ReplaceInt32("close_option", i);
-		} else {
-			fSetupMsg->AddInt32("close_option", i);
-		}
-	}
-}
-
-
-// --------------------------------------------------
 void
 PageSetupWindow::MessageReceived(BMessage *msg)
 {
-	switch (msg->what){
-		case OK_MSG:
-			UpdateSetupMessage();
+	switch (msg->what) {
+		case OK_MSG: {
+			_UpdateSetupMessage();
 			fResult = B_OK;
 			release_sem(fExitSem);
-			break;
+		}	break;
 
-		case CANCEL_MSG:
+		case CANCEL_MSG: {
 			fResult = B_ERROR;
 			release_sem(fExitSem);
-			break;
+		}	break;
 
-		// Simon added
-		case 'pgsz':
-			{
-				float w, h;
-				msg->FindFloat("width", &w);
-				msg->FindFloat("height", &h);
-				BMenuItem *item = fOrientationMenu->Menu()->FindMarked();
-				if (item) {
-					int32 orientation = 0;
-					BMessage *m = item->Message();
-					m->FindInt32("orientation", &orientation);
-					if (orientation == PrinterDriver::PORTRAIT_ORIENTATION) {
-						fMarginView->SetPageSize(w, h);
-					} else {
-						fMarginView->SetPageSize(h, w);
-					}
-					fMarginView->UpdateView(MARGIN_CHANGED);
-				}
+		case PAGE_SIZE_CHANGED:	{
+			float w, h;
+			msg->FindFloat("width", &w);
+			msg->FindFloat("height", &h);
+			if (fCurrentOrientation == PrinterDriver::PORTRAIT_ORIENTATION) {
+				fMarginView->SetPageSize(w, h);
+			} else {
+				fMarginView->SetPageSize(h, w);
 			}
-			break;
+			fMarginView->UpdateView(MARGIN_CHANGED);
+		}	break;
 
-		// Simon added
-		case 'ornt':
-			{
+		case ORIENTATION_CHANGED: {
+			int32 orientation;
+			msg->FindInt32("orientation", &orientation);
+
+			if (fCurrentOrientation != orientation) {
+				fCurrentOrientation = orientation;
 				BPoint p = fMarginView->PageSize();
-				int32 orientation;
-				msg->FindInt32("orientation", &orientation);
-				if (orientation == PrinterDriver::LANDSCAPE_ORIENTATION
-					&& p.y > p.x) {
-					fMarginView->SetPageSize(p.y, p.x);
-					fMarginView->UpdateView(MARGIN_CHANGED);
-				}
-				if (orientation == PrinterDriver::PORTRAIT_ORIENTATION
-					&& p.x > p.y) {
-					fMarginView->SetPageSize(p.y, p.x);
-					fMarginView->UpdateView(MARGIN_CHANGED);
-				}
+				fMarginView->SetPageSize(p.y, p.x);
+				fMarginView->UpdateView(MARGIN_CHANGED);
 			}
-			break;
+		}	break;
 
-		case FONTS_MSG:
+		case FONTS_MSG: {
 			(new FontsWindow(fFonts))->Show();
-			break;
+		}	break;
 
-		case ADVANCED_MSG:
+		case ADVANCED_MSG: {
 			(new AdvancedSettingsWindow(&fAdvancedSettings))->Show();
-			break;
+		}	break;
 
 		default:
 			inherited::MessageReceived(msg);
@@ -575,7 +342,14 @@ PageSetupWindow::MessageReceived(BMessage *msg)
 }
 
 
-// --------------------------------------------------
+bool
+PageSetupWindow::QuitRequested()
+{
+	release_sem(fExitSem);
+	return true;
+}
+
+
 status_t
 PageSetupWindow::Go()
 {
@@ -589,3 +363,77 @@ PageSetupWindow::Go()
 }
 
 
+void
+PageSetupWindow::_UpdateSetupMessage()
+{
+	SetInt32(fSetupMsg, "orientation", fCurrentOrientation);
+
+	BMenuItem *item = fPDFCompatibilityMenu->Menu()->FindMarked();
+	if (item)
+		SetString(fSetupMsg, "pdf_compatibility", item->Label());
+
+	SetInt32(fSetupMsg, "pdf_compression", fPDFCompressionSlider->Value());
+
+	item = fPageSizeMenu->Menu()->FindMarked();
+	if (item) {
+		float w, h;
+		BMessage *msg = item->Message();
+		msg->FindFloat("width", &w);
+		msg->FindFloat("height", &h);
+		BRect r(0, 0, w, h);
+		if (fCurrentOrientation == PrinterDriver::LANDSCAPE_ORIENTATION)
+			r.Set(0, 0, h, w);
+
+		// Save the printable_rect
+		BRect margin = fMarginView->Margin();
+		if (fCurrentOrientation == PrinterDriver::PORTRAIT_ORIENTATION) {
+			margin.right = w - margin.right;
+			margin.bottom = h - margin.bottom;
+		} else {
+			margin.right = h - margin.right;
+			margin.bottom = w - margin.bottom;
+		}
+
+		SetRect(fSetupMsg, "paper_rect", r);
+		SetRect(fSetupMsg, "printable_rect", margin);
+		SetInt32(fSetupMsg, "units", fMarginView->Unit());
+		SetString(fSetupMsg, "pdf_paper_size", item->Label());
+	}
+
+	BMessage fonts;
+	if (fFonts->Archive(&fonts) == B_OK) {
+		fSetupMsg->RemoveName("fonts");
+		fSetupMsg->AddMessage("fonts", &fonts);
+	}
+
+	// advanced settings
+	BString value;
+	if (fAdvancedSettings.FindString("pdflib_license_key", &value) == B_OK)
+		SetString(fSetupMsg, "pdflib_license_key", value);
+
+	bool webLinks;
+	if (fAdvancedSettings.FindBool("create_web_links", &webLinks) == B_OK)
+		SetBool(fSetupMsg, "create_web_links", webLinks);
+
+	float linkBorder;
+	if (fAdvancedSettings.FindFloat("link_border_width", &linkBorder) == B_OK)
+		SetFloat(fSetupMsg, "link_border_width", linkBorder);
+
+	bool createBookmarks;
+	if (fAdvancedSettings.FindBool("create_bookmarks", &createBookmarks) == B_OK)
+		SetBool(fSetupMsg, "create_bookmarks", createBookmarks);
+
+	if (fAdvancedSettings.FindString("bookmark_definition_file", &value) == B_OK)
+		SetString(fSetupMsg, "bookmark_definition_file", value);
+
+	bool createXrefs;
+	if (fAdvancedSettings.FindBool("create_xrefs", &createXrefs) == B_OK)
+		SetBool(fSetupMsg, "create_xrefs", createXrefs);
+
+	if (fAdvancedSettings.FindString("xrefs_file", &value) == B_OK)
+		SetString(fSetupMsg, "xrefs_file", value.String());
+
+	int32 closeOption;
+	if (fAdvancedSettings.FindInt32("close_option", &closeOption) == B_OK)
+		SetInt32(fSetupMsg, "close_option", closeOption);
+}

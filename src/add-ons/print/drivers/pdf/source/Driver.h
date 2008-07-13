@@ -2,13 +2,13 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2002 OpenBeOS. 
+Copyright (c) 2002 OpenBeOS.
 
-Authors: 
+Authors:
 	Philippe Houdoin
-	Simon Gauvin	
+	Simon Gauvin
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -33,11 +33,9 @@ THE SOFTWARE.
 
 extern "C"
 {
-__declspec(dllexport) BMessage * take_job(BFile * spool_file, BNode * spool_dir, BMessage * msg);
-__declspec(dllexport) BMessage * config_page(BNode * spool_dir, BMessage * msg);
-__declspec(dllexport) BMessage * config_job(BNode * spool_dir, BMessage * msg);
-__declspec(dllexport) char * add_printer(char * printer_name);
-__declspec(dllexport) BMessage * default_settings(BNode * printer);
+	BMessage * take_job(BFile * spool_file, BNode * spool_dir, BMessage * msg);
+	BMessage * config_page(BNode * spool_dir, BMessage * msg);
+	BMessage * config_job(BNode * spool_dir, BMessage * msg);
+	char * add_printer(char * printer_name);
+	BMessage * default_settings(BNode * printer);
 }
-
-
