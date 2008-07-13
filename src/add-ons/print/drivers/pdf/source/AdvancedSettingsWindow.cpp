@@ -97,12 +97,15 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	fLicenseKey->SetEnabled(false);
 	fLicenseKey->ResizeToPreferred();
 	fLicenseKey->SetDivider(divider);
-	//fLicenseKey->TextView()->HideTyping(true);
+	fLicenseKey->TextView()->HideTyping(true);
 	fLicenseKey->TextView()->SetText(licenseKey.String());
 
+	// Hide the license key field as it is only supported in the commercial
+	// version of of pdflib. Leave it here for layout atm.
+	fLicenseKey->Hide();
 	// border link
 
-	bounds.OffsetBy(0.0, fLicenseKey->Bounds().Height() + 10.0);
+	// bounds.OffsetBy(0.0, fLicenseKey->Bounds().Height() + 10.0);
 	BPopUpMenu* m = new BPopUpMenu("Link Border");
 	m->SetRadioMode(true);
 
@@ -329,7 +332,7 @@ void
 AdvancedSettingsWindow::_UpdateSettings()
 {
 #if 0
-	AddString(fSettings, "pdflib_license_key", fLicenseKey);
+	SetString(fSettings, "pdflib_license_key", fLicenseKey);
 #endif
 
 	SetInt32(fSettings, "close_option", fCloseOption);
