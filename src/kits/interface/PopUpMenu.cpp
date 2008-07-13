@@ -63,7 +63,7 @@ BPopUpMenu::~BPopUpMenu()
 	if (fTrackThread >= 0) {
 		status_t status;
 		while (wait_for_thread(fTrackThread, &status) == B_INTERRUPTED)
-			;		
+			;
 	}
 }
 
@@ -273,7 +273,7 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 	sem_id sem = create_sem(0, "window close lock");
 	if (sem < B_OK) {
 		delete data;
-		return NULL;	
+		return NULL;
 	}
 
 	// Get a pointer to the window from which Go() was called
@@ -284,7 +284,7 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 	// and let BWindow block when needed
 	if (async && window != NULL) {
 		_set_menu_sem_(window, sem);
-	} 
+	}
 
 	data->object = this;
 	data->autoInvoke = autoInvoke;
@@ -298,7 +298,7 @@ BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 	data->lock = sem;
 
 	// Spawn the tracking thread
-	fTrackThread = spawn_thread(_thread_entry, "popup", B_DISPLAY_PRIORITY, data); 
+	fTrackThread = spawn_thread(_thread_entry, "popup", B_DISPLAY_PRIORITY, data);
 	if (fTrackThread < B_OK) {
 		// Something went wrong. Cleanup and return NULL
 		delete_sem(sem);
@@ -322,22 +322,22 @@ int32
 BPopUpMenu::_thread_entry(void *arg)
 {
 	popup_menu_data *data = static_cast<popup_menu_data *>(arg);
-	BPopUpMenu *menu = data->object;	
+	BPopUpMenu *menu = data->object;
 	BRect *rect = NULL;
-	
+
 	if (data->useRect)
 		rect = &data->rect;
 
 	data->selected = menu->_StartTrack(data->where, data->autoInvoke, data->startOpened, rect);
 
-	// Reset the window menu semaphore	
+	// Reset the window menu semaphore
 	if (data->async && data->window)
 		_set_menu_sem_(data->window, B_BAD_SEM_ID);
 
 	delete_sem(data->lock);
 
-	// Commit suicide if needed	
-	if (menu->fAutoDestruct) {
+	// Commit suicide if needed
+	if (data->async && menu->fAutoDestruct) {
 		menu->fTrackThread = -1;
 		delete menu;
 	}
@@ -388,13 +388,13 @@ BPopUpMenu::_WaitMenu(void *_data)
  	status_t unused;
 	while (wait_for_thread(fTrackThread, &unused) == B_INTERRUPTED)
 		;
-	
+
 	fTrackThread = -1;
-	
+
 	BMenuItem *selected = data->selected;
 		// data->selected is filled by the tracking thread
-	
+
 	delete data;
-	
+
 	return selected;
 }
