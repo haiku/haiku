@@ -602,7 +602,7 @@ PDFWriter::FindTransparency(uint8 alpha)
 	float a = (float)alpha/255.0;
 	sprintf(trans, "opacitystroke=%f opacityfill=%f", a, a);
 	
-	int handle = -1;
+	volatile int handle = -1;
 	PDF_TRY(fPdf) {
 		handle = PDF_create_gstate(fPdf, trans);
 	} PDF_CATCH(fPdf) {
@@ -621,30 +621,34 @@ PDFWriter::FindTransparency(uint8 alpha)
 }
 
 // --------------------------------------------------
-void 
-PDFWriter::BeginTransparency() 
+void
+PDFWriter::BeginTransparency()
 {
-	if (!SupportsOpacity() || !MakesPDF() || !IsDrawing()) return;
+	if (!SupportsOpacity() || !MakesPDF() || !IsDrawing())
+		return;
+
 	REPORT(kDebug, fPage, ">>> BeginTransparency");
-	REPORT(kDebug, fPage, "current_color(%d, %d, %d, %d)", fState->currentColor.red, fState->currentColor.green, fState->currentColor.blue, fState->currentColor.alpha);
-	REPORT(kDebug, fPage, "drawing_mode %d alpha %d", (int)fState->drawingMode, (int)fState->currentColor.alpha);
-	
-	Transparency* t = NULL;
-	
+	REPORT(kDebug, fPage, "current_color(%d, %d, %d, %d)", fState->currentColor.red,
+		fState->currentColor.green, fState->currentColor.blue, fState->currentColor.alpha);
+	REPORT(kDebug, fPage, "drawing_mode %d alpha %d", (int)fState->drawingMode,
+		(int)fState->currentColor.alpha);
+
 	uint8 alpha = fState->currentColor.alpha;
 	if (fState->drawingMode == B_OP_ALPHA && alpha < 255) {
 		PDF_save(fPdf);
-		t = FindTransparency(alpha);
+		Transparency* t = FindTransparency(alpha);
 		if (t != NULL) {
 			PDF_TRY(fPdf) {
 				PDF_set_gstate(fPdf, t->Handle());
 			} PDF_CATCH(fPdf) {
-				REPORT(kError, 0, PDF_get_errmsg(fPdf));	
+				REPORT(kError, 0, PDF_get_errmsg(fPdf));
 			}
-		} 
+			fTransparencyStack.AddItem(t);
+			return;
+		}
 	}
-	// if transparency is not set then push NULL to transparency stack 
-	fTransparencyStack.AddItem(t);
+	// if transparency is not set then push NULL to transparency stack
+	fTransparencyStack.AddItem(NULL);
 }
 
 // --------------------------------------------------
