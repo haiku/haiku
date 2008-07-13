@@ -2,11 +2,11 @@
 
 Image Cache Item.
 
-Copyright (c) 2003 OpenBeOS. 
+Copyright (c) 2003 OpenBeOS.
 
-Author: 
+Author:
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include <TranslatorRoster.h>
 #include <BitmapStream.h>
 #include <Debug.h>
+#include <Message.h>
 
 #include "Report.h"
 #include "Image.h"
@@ -72,7 +73,7 @@ Image* ImageDescription::Store(PDF* pdf, int id, BBitmap* bitmap, int mask) {
 	fileName << id;
 	pdfFileName = fileName;
 	pdfFileName << ".png";
-	
+
 	bitmap->Lock();
 	w = bitmap->Bounds().IntegerWidth()+1;
 	h = bitmap->Bounds().IntegerHeight()+1;
@@ -94,9 +95,9 @@ Image* ImageDescription::Store(PDF* pdf, int id, BBitmap* bitmap, int mask) {
 		unlink(pdfFileName.String());
 		return NULL;
 	}
-	
+
 	int image;
-	image = PDF_open_image_file(pdf, "png", pdfFileName.String(), 
+	image = PDF_open_image_file(pdf, "png", pdfFileName.String(),
 		mask == -1 ? "" : "masked", mask == -1 ? 0 : mask);
 
 #if STORE_AS_BBITMAP
@@ -178,11 +179,11 @@ bool Image::Equals(BBitmap* bitmap) const {
 	if (bm) {
 		bm->Lock();
 		bitmap->Lock();
-		
+
 		equals = bm->BitsLength() == bitmap->BitsLength() &&
 			bm->ColorSpace() == bitmap->ColorSpace() &&
 			memcmp(bm->Bits(), bitmap->Bits(), bm->BitsLength()) == 0;
-		
+
 		bitmap->Unlock();
 		bm->Unlock();
 		delete bm;
