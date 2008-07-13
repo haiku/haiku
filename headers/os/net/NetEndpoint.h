@@ -25,18 +25,19 @@ class BNetEndpoint : public BArchivable {
 
 		BNetEndpoint& operator=(const BNetEndpoint& other);
 
-		status_t InitCheck();
+		status_t InitCheck() const;
 
 		virtual	status_t Archive(BMessage* into, bool deep = true) const;
 		static BArchivable* Instantiate(BMessage* archive);
 
 		status_t SetProtocol(int protocol);
-		int SetOption(int32 option, int32 level, const void* data, unsigned int dataSize);
+		int SetOption(int32 option, int32 level, const void* data, 
+			unsigned int dataSize);
 		int SetNonBlocking(bool on = true);
 		int SetReuseAddr(bool on = true);
 
-		const BNetAddress& LocalAddr();
-		const BNetAddress& RemoteAddr();
+		const BNetAddress& LocalAddr() const;
+		const BNetAddress& RemoteAddr() const;
 
 		int Socket() const;
 
@@ -71,7 +72,14 @@ class BNetEndpoint : public BArchivable {
 
 		virtual bool IsDataPending(bigtime_t timeout = 0);
 
+		// TODO: drop these compatibility cruft methods after R1
+		status_t InitCheck();
+		const BNetAddress& LocalAddr();
+		const BNetAddress& RemoteAddr();
+
 	private:
+		status_t _SetupSocket();
+
 		virtual	void _ReservedBNetEndpointFBCCruft1();
 		virtual	void _ReservedBNetEndpointFBCCruft2();
 		virtual	void _ReservedBNetEndpointFBCCruft3();
@@ -79,14 +87,17 @@ class BNetEndpoint : public BArchivable {
 		virtual	void _ReservedBNetEndpointFBCCruft5();
 		virtual	void _ReservedBNetEndpointFBCCruft6();
 
-		status_t	fInit;
+		status_t	fStatus;
+		int			fFamily;
+		int			fType;
+		int			fProtocol;
 		int			fSocket;
 		bigtime_t	fTimeout;
-		int			fLastError;
 		BNetAddress fAddr;
 		BNetAddress fPeer;
 
-		int32		_reserved[18];
+		int32		_reserved[16];
 };
+
 
 #endif	// H_NETENDPOINT

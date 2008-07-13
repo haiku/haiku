@@ -27,21 +27,27 @@ class BNetAddress : public BArchivable {
 		BNetAddress(in_addr addr, int port = 0);
 		BNetAddress(uint32 addr, int port = 0);
 		BNetAddress(const BNetAddress& other);
-		BNetAddress(const char* hostname, const char* protocol, const char* service);
+		BNetAddress(const char* hostname, const char* protocol, 
+			const char* service);
 
 		BNetAddress& operator=(const BNetAddress&);
 
-		status_t InitCheck();
+		status_t InitCheck() const;
 
-		status_t SetTo(const char* hostname, const char* protocol, const char* service);
+		status_t SetTo(const char* hostname, const char* protocol, 
+			const char* service);
 		status_t SetTo(const char* hostname = NULL, unsigned short port = 0);
 		status_t SetTo(const struct sockaddr_in& addr);
 		status_t SetTo(in_addr addr, int port = 0);
 		status_t SetTo(uint32 addr = INADDR_ANY, int port = 0);
 
-		status_t GetAddr(char* hostname = NULL, unsigned short* port = NULL) const;
+		status_t GetAddr(char* hostname = NULL, 
+			unsigned short* port = NULL) const;
 		status_t GetAddr(struct sockaddr_in& addr) const;
 		status_t GetAddr(in_addr& addr, unsigned short* port = NULL) const;
+
+		// TODO: drop this compatibility cruft method after R1
+		status_t InitCheck();
 
 	private:
 		virtual void _ReservedBNetAddressFBCCruft1();

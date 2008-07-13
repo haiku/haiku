@@ -241,9 +241,15 @@ status_t BNetAddress::GetAddr( in_addr& addr, unsigned short* port ) const
  * Returns:
  *     B_OK if this instance is initialized, B_ERROR if not.
  */
-status_t BNetAddress::InitCheck( void )
+status_t BNetAddress::InitCheck( void ) const
 {
     return ( fInit == B_OK ) ? B_OK : B_ERROR;
+}
+
+
+status_t BNetAddress::InitCheck()
+{
+	return const_cast<const BNetAddress*>(this)->InitCheck();
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,71 +20,87 @@
 
 BNetEndpoint::BNetEndpoint(int type)
 	:
-	fInit(B_NO_INIT),
+	fStatus(B_NO_INIT),
+	fFamily(AF_INET),
+	fType(type),
+	fProtocol(0),
 	fSocket(-1),
-	fTimeout(B_INFINITE_TIMEOUT),
-	fLastError(0)
+	fTimeout(B_INFINITE_TIMEOUT)
 {
-	if ((fSocket = socket(AF_INET, type, 0)) < 0)
-		fLastError = errno;
-	else
-		fInit = B_OK;
+	_SetupSocket();
 }
 
 
 BNetEndpoint::BNetEndpoint(int family, int type, int protocol)
 	:
-	fInit(B_NO_INIT),
+	fStatus(B_NO_INIT),
+	fFamily(family),
+	fType(type),
+	fProtocol(protocol),
 	fSocket(-1),
-	fTimeout(B_INFINITE_TIMEOUT),
-	fLastError(0)
+	fTimeout(B_INFINITE_TIMEOUT)
 {
-	if ((fSocket = socket(family, type, protocol)) < 0)
-		fLastError = errno;
-	else
-		fInit = B_OK;
+	_SetupSocket();
 }
 
 
 BNetEndpoint::BNetEndpoint(BMessage* archive)
 	:
-	fInit(B_NO_INIT),
+	fStatus(B_NO_INIT),
+	fFamily(AF_INET),
+	fProtocol(0),
 	fSocket(-1),
-	fTimeout(B_INFINITE_TIMEOUT),
-	fLastError(0)
+	fTimeout(B_INFINITE_TIMEOUT)
 {
-	// TODO
-	if (! archive)
+	if (!archive)
 		return;
 
-	BMessage msg;
-	if (archive->FindMessage("bnendp_peer", &msg) != B_OK)
-		return;
-	fPeer = BNetAddress(&msg);
+	in_addr addr, peer;
+	unsigned short addrPort = 0, peerPort = 0;
+
+	fStatus = archive->FindInt32("_BNetEndpoint_addr_addr", 
+		(int32 *)&addr.s_addr);
+	if (fStatus == B_OK) {
+		fStatus = archive->FindInt16("_BNetEndpoint_addr_port", 
+			(int16 *)&addrPort);
+		if (fStatus == B_OK)
+			fStatus = fAddr.SetTo(addr, addrPort);
+	}
+
+	fStatus = archive->FindInt32("_BNetEndpoint_peer_addr", 
+		(int32 *)&peer.s_addr);
+	if (fStatus == B_OK) {
+		fStatus = archive->FindInt16("_BNetEndpoint_peer_port", 
+			(int16 *)&peerPort);
+		if (fStatus == B_OK)
+			fStatus = fPeer.SetTo(peer, peerPort);
+	}
 	
-	if (archive->FindMessage("bnendp_addr", &msg) != B_OK)
-		return;
-	fAddr = BNetAddress(&msg);
+	fStatus = archive->FindInt64("_BNetEndpoint_timeout", (int64 *)&fTimeout);
+	if (fStatus == B_OK)
+		fStatus = archive->FindInt32("_BNetEndpoint_proto", (int32 *)&fType);
 
-	fInit = B_OK;
+	if (fStatus == B_OK)
+		_SetupSocket();
 }
 
 
 BNetEndpoint::BNetEndpoint(const BNetEndpoint& endpoint)
 	:
-	fInit(endpoint.fInit),
+	fStatus(endpoint.fStatus),
+	fFamily(endpoint.fFamily),
+	fType(endpoint.fType),
+	fProtocol(endpoint.fProtocol),
+	fSocket(-1),
 	fTimeout(endpoint.fTimeout),
-	fLastError(endpoint.fLastError),
 	fAddr(endpoint.fAddr),
 	fPeer(endpoint.fPeer)
+
 {
-	fSocket = -1;
 	if (endpoint.fSocket >= 0) {
 		fSocket = dup(endpoint.fSocket);
-		if (fSocket < 0) {
-			fLastError = errno;
-			fInit = B_NO_INIT;
-		}
+		if (fSocket < 0)
+			fStatus = errno;
 	}
 }
 
@@ -92,21 +108,24 @@ BNetEndpoint::BNetEndpoint(const BNetEndpoint& endpoint)
 BNetEndpoint&
 BNetEndpoint::operator=(const BNetEndpoint& endpoint)
 {
+	if (this == &endpoint)
+		return *this;
+	
 	Close();
 
-	fInit = endpoint.fInit;
+	fStatus = endpoint.fStatus;
+	fFamily = endpoint.fFamily;
+	fType = endpoint.fType;
+	fProtocol = endpoint.fProtocol;
 	fTimeout = endpoint.fTimeout;
-	fLastError = endpoint.fLastError;
 	fAddr = endpoint.fAddr;
 	fPeer = endpoint.fPeer;
 
 	fSocket = -1;
 	if (endpoint.fSocket >= 0) {
 		fSocket = dup(endpoint.fSocket);
-		if (fSocket < 0) {
-			fLastError = errno;
-			fInit = B_NO_INIT;
-		}
+		if (fSocket < 0)
+			fStatus = errno;
 	}
 
     return *this;
@@ -115,7 +134,8 @@ BNetEndpoint::operator=(const BNetEndpoint& endpoint)
 
 BNetEndpoint::~BNetEndpoint()
 {
-	Close();
+	if (fSocket >= 0)
+		Close();
 }
 
 
@@ -125,25 +145,38 @@ BNetEndpoint::~BNetEndpoint()
 status_t
 BNetEndpoint::Archive(BMessage* into, bool deep) const
 {
-	// TODO
-	if (into == 0)
+	if (!into)
 		return B_ERROR;
 
-	if (fInit != B_OK)
-		return B_NO_INIT;
+	status_t status = BArchivable::Archive(into, deep);
+	if (status != B_OK)
+		return status;
 
-	BMessage msg;
-	if (fPeer.Archive(&msg) != B_OK)
-		return B_ERROR;
-	if (into->AddMessage("bnendp_peer", &msg) != B_OK)
-		return B_ERROR;
+	in_addr addr, peer;
+	unsigned short addrPort, peerPort;
 
-	if (fAddr.Archive(&msg) != B_OK)
-		return B_ERROR;
-	if (into->AddMessage("bnendp_addr", &msg) != B_OK)
-		return B_ERROR;
+	status = fAddr.GetAddr(addr, &addrPort);
+	if (status == B_OK) {
+		status = into->AddInt32("_BNetEndpoint_addr_addr", addr.s_addr);
+		if (status == B_OK)
+			status = into->AddInt16("_BNetEndpoint_addr_port", addrPort);
+		if (status != B_OK)
+			return status;
+	}
+	status = fPeer.GetAddr(peer, &peerPort);
+	if (status == B_OK) {
+		status = into->AddInt32("_BNetEndpoint_peer_addr", peer.s_addr);
+		if (status == B_OK)
+			status = into->AddInt16("_BNetEndpoint_peer_port", peerPort);
+		if (status != B_OK)
+			return status;
+	}
 
-	return B_OK;
+	status = into->AddInt64("_BNetEndpoint_timeout", fTimeout);
+	if (status == B_OK)
+		status = into->AddInt32("_BNetEndpoint_proto", fType);
+
+	return status;
 }
 
 
@@ -153,7 +186,7 @@ BNetEndpoint::Instantiate(BMessage* archive)
 	if (!archive)
 		return NULL;
 
-	if (!validate_instantiation(archive, "BNetAddress"))
+	if (!validate_instantiation(archive, "BNetEndpoint"))
 		return NULL;
 
 	BNetEndpoint* endpoint = new BNetEndpoint(archive);
@@ -169,9 +202,9 @@ BNetEndpoint::Instantiate(BMessage* archive)
 
 
 status_t
-BNetEndpoint::InitCheck()
+BNetEndpoint::InitCheck() const
 {
-	return fInit;
+	return fSocket == -1 ? B_NO_INIT : B_OK;
 }
 
 
@@ -183,14 +216,14 @@ BNetEndpoint::Socket() const
 
 
 const BNetAddress&
-BNetEndpoint::LocalAddr()
+BNetEndpoint::LocalAddr() const
 {
 	return fAddr;
 }
 
 
 const BNetAddress&
-BNetEndpoint::RemoteAddr()
+BNetEndpoint::RemoteAddr() const
 {
 	return fPeer;
 }
@@ -200,12 +233,8 @@ status_t
 BNetEndpoint::SetProtocol(int protocol)
 {
 	Close();
-	if ((fSocket = socket(AF_INET, protocol, 0)) < 0) {
-		fLastError = errno;
-		return fLastError;
-	}
-	fInit = B_OK;	
-	return fInit;
+	fType = protocol;	// sic (protocol is SOCK_DGRAM or SOCK_STREAM)
+	return _SetupSocket();
 }
 
 
@@ -213,11 +242,11 @@ int
 BNetEndpoint::SetOption(int32 option, int32 level,
 	const void* data, unsigned int length)
 {
-	if (fInit < B_OK)
-		return fInit;
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
 
 	if (setsockopt(fSocket, level, option, data, length) < 0) {
-		fLastError = errno;
+		fStatus = errno;
 		return B_ERROR;
 	}
 
@@ -228,9 +257,12 @@ BNetEndpoint::SetOption(int32 option, int32 level,
 int
 BNetEndpoint::SetNonBlocking(bool enable)
 {
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
+
 	int flags = fcntl(fSocket, F_GETFL);
 	if (flags < 0) {
-		fLastError = errno;
+		fStatus = errno;
 		return B_ERROR;
 	}
 
@@ -240,7 +272,7 @@ BNetEndpoint::SetNonBlocking(bool enable)
 		flags &= ~O_NONBLOCK;
 
 	if (fcntl(fSocket, F_SETFL, flags) < 0) {
-		fLastError = errno;
+		fStatus = errno;
 		return B_ERROR;
 	}
 
@@ -251,6 +283,9 @@ BNetEndpoint::SetNonBlocking(bool enable)
 int
 BNetEndpoint::SetReuseAddr(bool enable)
 {
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
+
 	int onoff = (int) enable;
 	return SetOption(SO_REUSEADDR, SOL_SOCKET, &onoff, sizeof(onoff));
 }
@@ -266,14 +301,14 @@ BNetEndpoint::SetTimeout(bigtime_t timeout)
 int
 BNetEndpoint::Error() const
 {
-	return fLastError;
+	return (int)fStatus;
 }
 
 
 char*
 BNetEndpoint::ErrorStr() const
 {
-	return strerror(fLastError);
+	return strerror(fStatus);
 }
 
 
@@ -287,15 +322,15 @@ BNetEndpoint::Close()
 		close(fSocket);
 
 	fSocket = -1;
-	fInit = B_NO_INIT;
+	fStatus = B_NO_INIT;
 }
 
 
 status_t
 BNetEndpoint::Bind(const BNetAddress& address)
 {
-	if (fInit < B_OK)
-		return fInit;
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
 
 	struct sockaddr_in addr;
 	status_t status = address.GetAddr(addr);
@@ -303,26 +338,16 @@ BNetEndpoint::Bind(const BNetAddress& address)
 		return status;
 
 	if (bind(fSocket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		fLastError = errno;
+		fStatus = errno;
 		Close();
 		return B_ERROR;
 	}
 
 	socklen_t addrSize = sizeof(addr);
 	if (getsockname(fSocket, (struct sockaddr *)&addr, &addrSize) < 0) {
-		fLastError = errno;
+		fStatus = errno;
 		Close();
 		return B_ERROR;
-	}
-
-	if (addr.sin_addr.s_addr == 0) {
-		// TODO: does this still apply?
-		// Grrr, buggy getsockname!
-		char hostname[MAXHOSTNAMELEN];
-		gethostname(hostname, sizeof(hostname));
-		struct hostent *host = gethostbyname(hostname);
-		if (host != NULL)
-			memcpy(&addr.sin_addr.s_addr, host->h_addr, sizeof(addr.sin_addr.s_addr));
 	}
 
 	fAddr.SetTo(addr);
@@ -341,8 +366,8 @@ BNetEndpoint::Bind(int port)
 status_t
 BNetEndpoint::Connect(const BNetAddress& address)
 {
-	if (fInit < B_OK)
-		return fInit;
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
 
 	sockaddr_in addr;
 	if (address.GetAddr(addr) != B_OK)
@@ -350,17 +375,16 @@ BNetEndpoint::Connect(const BNetAddress& address)
 
 	if (connect(fSocket, (sockaddr *) &addr, sizeof(addr)) < 0) {
 		Close();
-		fLastError = errno;
+		fStatus = errno;
 		return B_ERROR;
 	}
 
 	socklen_t addrSize = sizeof(addr);
 	if (getpeername(fSocket, (sockaddr *) &addr, &addrSize) < 0) {
 		Close();
-		fLastError = errno;
+		fStatus = errno;
 		return B_ERROR;
 	}
-
 	fPeer.SetTo(addr);
 	return B_OK;
 }
@@ -377,12 +401,12 @@ BNetEndpoint::Connect(const char *hostname, int port)
 status_t
 BNetEndpoint::Listen(int backlog)
 {
-	if (fInit < B_OK)
-		return fInit;
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
 
 	if (listen(fSocket, backlog) < 0) {
 		Close();
-		fLastError = errno;
+		fStatus = errno;
 		return B_ERROR;
 	}
 	return B_OK;
@@ -401,14 +425,14 @@ BNetEndpoint::Accept(int32 timeout)
 	int socket = accept(fSocket, (struct sockaddr *) &addr, &addrSize);
 	if (socket < 0) {
 		Close();
-		fLastError = errno;
+		fStatus = errno;
 		return NULL;
 	}
 
 	BNetEndpoint* endpoint = new (std::nothrow) BNetEndpoint(*this);
 	if (endpoint == NULL) {
 		close(socket);
-		fLastError = B_NO_MEMORY;
+		fStatus = B_NO_MEMORY;
 		return NULL;
 	}
 
@@ -417,7 +441,7 @@ BNetEndpoint::Accept(int32 timeout)
 
 	if (getsockname(socket, (struct sockaddr *)&addr, &addrSize) < 0) {
 		delete endpoint;
-		fLastError = errno;
+		fStatus = errno;
 		return NULL;
 	}
 
@@ -444,7 +468,7 @@ BNetEndpoint::IsDataPending(bigtime_t timeout)
 	}
 
 	if (select(fSocket + 1, &fds, NULL, NULL, timeout > 0 ? &tv : NULL) < 0) {
-		fLastError = errno;
+		fStatus = errno;
 		return false;
 	}
 
@@ -455,12 +479,15 @@ BNetEndpoint::IsDataPending(bigtime_t timeout)
 int32
 BNetEndpoint::Receive(void* buffer, size_t length, int flags)
 {
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
+
 	if (fTimeout >= 0 && IsDataPending(fTimeout) == false)
 		return 0;
 
 	ssize_t bytesReceived = recv(fSocket, buffer, length, flags);
 	if (bytesReceived < 0)
-		fLastError = errno;
+		fStatus = errno;
 
 	return bytesReceived;
 }
@@ -480,6 +507,9 @@ int32
 BNetEndpoint::ReceiveFrom(void* buffer, size_t length,
 	BNetAddress& address, int flags)
 {
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
+
 	if (fTimeout >= 0 && IsDataPending(fTimeout) == false)
 		return 0;
 
@@ -489,7 +519,7 @@ BNetEndpoint::ReceiveFrom(void* buffer, size_t length,
 	length = recvfrom(fSocket, buffer, length, flags,
 		(struct sockaddr *)&addr, &addrSize);
 	if (length < 0)
-		fLastError = errno;
+		fStatus = errno;
 	else
 		address.SetTo(addr);
 
@@ -511,9 +541,12 @@ BNetEndpoint::ReceiveFrom(BNetBuffer& buffer, size_t length,
 int32
 BNetEndpoint::Send(const void* buffer, size_t length, int flags)
 {
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
+
 	ssize_t bytesSent = send(fSocket, (const char *) buffer, length, flags);
 	if (bytesSent < 0)
-		fLastError = errno;
+		fStatus = errno;
 
 	return bytesSent;
 }
@@ -530,6 +563,9 @@ int32
 BNetEndpoint::SendTo(const void* buffer, size_t length,
 	const BNetAddress& address, int flags)
 {
+	if (fSocket < 0 && _SetupSocket() != B_OK)
+		return fStatus;
+
 	struct sockaddr_in addr;
 	if (address.GetAddr(addr) != B_OK)
 		return B_ERROR;
@@ -537,7 +573,7 @@ BNetEndpoint::SendTo(const void* buffer, size_t length,
 	ssize_t	bytesSent = sendto(fSocket, buffer, length, flags,
 		(struct sockaddr *) &addr, sizeof(addr));
 	if (bytesSent < 0)
-		fLastError = errno;
+		fStatus = errno;
 
 	return bytesSent;
 }
@@ -548,6 +584,40 @@ BNetEndpoint::SendTo(BNetBuffer& buffer,
 	const BNetAddress& address, int flags)
 {
 	return SendTo(buffer.Data(), buffer.Size(), address, flags);
+}
+
+
+// #pragma mark -
+
+
+status_t
+BNetEndpoint::_SetupSocket()
+{
+	if ((fSocket = socket(fFamily, fType, fProtocol)) < 0)
+		fStatus = errno;
+	else
+		fStatus = B_OK;
+	return fStatus;
+}
+
+
+// #pragma mark -
+
+status_t BNetEndpoint::InitCheck()
+{
+	return const_cast<const BNetEndpoint*>(this)->InitCheck();
+}
+
+
+const BNetAddress& BNetEndpoint::LocalAddr() 
+{
+	return const_cast<const BNetEndpoint*>(this)->LocalAddr();
+}
+
+
+const BNetAddress& BNetEndpoint::RemoteAddr() 
+{
+	return const_cast<const BNetEndpoint*>(this)->RemoteAddr();
 }
 
 
