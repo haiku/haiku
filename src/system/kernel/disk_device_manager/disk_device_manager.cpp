@@ -224,6 +224,38 @@ scan_partition(partition_id partitionID)
 }
 
 
+// get_default_partition_content_name
+status_t
+get_default_partition_content_name(partition_id partitionID,
+	const char* fileSystemName, char* buffer, size_t bufferSize)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *partition = manager->RegisterPartition(partitionID);
+	if (partition == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	off_t size = partition->ContentSize();
+	partition->Unregister();
+
+    const char* const suffixes[] = {
+        "", "K", "M", "G", "T", "P", "E", NULL
+    };
+
+	size *= 10;
+		// We want one digit precision.
+    int index = 0;
+    while (size >= 1024 * 10 && suffixes[index + 1]) {
+        size /= 1024;
+        index++;
+    }
+
+    snprintf(buffer, bufferSize, "%s Volume (%ld.%ld %sB)", fileSystemName,
+		int32(size / 10), int32(size % 10), suffixes[index]);
+
+	return B_OK;
+}
+
+
 // find_disk_system
 disk_system_id
 find_disk_system(const char *name)

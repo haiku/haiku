@@ -114,6 +114,12 @@ status_t scan_partition(partition_id partitionID);
 	// Service method for disks systems: Synchronously scans the partition.
 	// Device must not be locked.
 
+// partition support functions
+// (no lock required)
+status_t get_default_partition_content_name(partition_id partitionID,
+		const char* fileSystemName, char* buffer, size_t bufferSize);
+	// The partition_data::content_size field must already be initialized.
+
 // disk systems
 disk_system_id find_disk_system(const char *name);
 
