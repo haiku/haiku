@@ -449,7 +449,7 @@ WorkspacesView::MouseDown(BPoint where)
 
 	changeItem->SetTarget(this);
 	ConvertToScreen(&where);
-	menu->Go(where, true, false, true);
+	menu->Go(where, true, true, true);
 }
 
 
