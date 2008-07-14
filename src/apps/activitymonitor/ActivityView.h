@@ -6,14 +6,18 @@
 #define ACTIVITY_VIEW_H
 
 
+#include <map>
+
 #include <View.h>
 #include <ObjectList.h>
 
 #include "CircularBuffer.h"
+#include "DataSource.h"
 
 class BBitmap;
 class BMessageRunner;
 class DataSource;
+class Scale;
 class SystemInfoHandler;
 struct data_item;
 
@@ -32,6 +36,7 @@ public:
 			bigtime_t	End() const;
 
 			void		SetRefreshInterval(bigtime_t interval);
+			void		SetScale(Scale* scale);
 
 private:
 	CircularBuffer<data_item> fBuffer;
@@ -39,6 +44,7 @@ private:
 	int64				fMaximumValue;
 	bigtime_t			fRefreshInterval;
 	int32				fLastIndex;
+	Scale*				fScale;
 };
 
 
@@ -77,6 +83,7 @@ protected:
 
 	virtual void		FrameResized(float width, float height);
 	virtual void		MouseDown(BPoint where);
+	virtual void		MouseUp(BPoint where);
 	virtual void		MouseMoved(BPoint where, uint32 transit,
 							const BMessage* dragMessage);
 
@@ -86,6 +93,7 @@ protected:
 
 private:
 			void		_Init(const BMessage* settings);
+			::Scale*	_ScaleFor(scale_type type);
 			void		_Refresh();
 			void		_UpdateOffscreenBitmap();
 			BView*		_OffscreenView();
@@ -99,6 +107,7 @@ private:
 							DataHistory* values, int64 value);
 			void		_DrawHistory();
 
+private:
 	class HistoryLayoutItem;
 	class LegendLayoutItem;
 
@@ -120,7 +129,11 @@ private:
 	bigtime_t			fDrawInterval;
 	int32				fDrawResolution;
 	bool				fShowLegend;
+	bool				fZooming;
+	BPoint				fZoomPoint;
+	int32				fOriginalResolution;
 	SystemInfoHandler*	fSystemInfoHandler;
+	std::map<scale_type, ::Scale*> fScales;
 };
 
 #endif	// ACTIVITY_VIEW_H

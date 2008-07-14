@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 #ifdef __HAIKU__
-#include <AbstractLayoutItem.h>
+#	include <AbstractLayoutItem.h>
 #endif
 #include <Application.h>
 #include <Bitmap.h>
@@ -23,10 +23,25 @@
 
 #include "ActivityMonitor.h"
 #include "ActivityWindow.h"
-#include "DataSource.h"
 #include "SystemInfo.h"
 #include "SystemInfoHandler.h"
 
+
+class Scale {
+public:
+							Scale(scale_type type);
+
+			int64			MinimumValue() const { return fMinimumValue; }
+			int64			MaximumValue() const { return fMaximumValue; }
+
+			void			Update(int64 value);
+
+private:
+	scale_type				fType;
+	int64					fMinimumValue;
+	int64					fMaximumValue;
+	bool					fInitialized;
+};
 
 struct data_item {
 	bigtime_t	time;
@@ -85,13 +100,39 @@ const uint32 kMsgToggleLegend = 'tglg';
 extern const char* kSignature;
 
 
+Scale::Scale(scale_type type)
+	:
+	fType(type),
+	fMinimumValue(0),
+	fMaximumValue(0),
+	fInitialized(false)
+{
+}
+
+
+void
+Scale::Update(int64 value)
+{
+	if (!fInitialized || fMinimumValue > value)
+		fMinimumValue = value;
+	if (!fInitialized || fMaximumValue > value)
+		fMaximumValue = value;
+
+	fInitialized = true;
+}
+
+
+//	#pragma mark -
+
+
 DataHistory::DataHistory(bigtime_t memorize, bigtime_t interval)
 	:
 	fBuffer(10000),
 	fMinimumValue(0),
 	fMaximumValue(0),
 	fRefreshInterval(interval),
-	fLastIndex(-1)
+	fLastIndex(-1),
+	fScale(NULL)
 {
 }
 
@@ -108,6 +149,8 @@ DataHistory::AddValue(bigtime_t time, int64 value)
 		fMaximumValue = value;
 	if (fBuffer.IsEmpty() || fMinimumValue > value)
 		fMinimumValue = value;
+	if (fScale != NULL)
+		fScale->Update(value);
 
 	data_item item = {time, value};
 	fBuffer.AddItem(item);
@@ -117,11 +160,28 @@ DataHistory::AddValue(bigtime_t time, int64 value)
 int64
 DataHistory::ValueAt(bigtime_t time)
 {
-	// TODO: if the refresh rate changes, this computation won't work anymore!
-	int32 index = (time - Start()) / fRefreshInterval;
-	data_item* item = fBuffer.ItemAt(index);
-	if (item != NULL)
-		return item->value;
+	int32 left = 0;
+	int32 right = fBuffer.CountItems() - 1;
+	data_item* item = NULL;
+
+	while (left <= right) {
+		int32 index = (left + right) / 2;
+		item = fBuffer.ItemAt(index);
+
+		if (item->time > time) {
+			// search in left part
+			right = index - 1;
+		} else {
+			if (index + 1 >= fBuffer.CountItems()
+				|| fBuffer.ItemAt(index + 1)->time > time) {
+				// found item
+				return item->value;
+			}
+
+			// search in right part
+			left = index + 1;
+		}
+	}
 
 	return 0;
 }
@@ -130,6 +190,9 @@ DataHistory::ValueAt(bigtime_t time)
 int64
 DataHistory::MaximumValue() const
 {
+	if (fScale != NULL)
+		return fScale->MaximumValue();
+
 	return fMaximumValue;
 }
 
@@ -137,6 +200,9 @@ DataHistory::MaximumValue() const
 int64
 DataHistory::MinimumValue() const
 {
+	if (fScale != NULL)
+		return fScale->MinimumValue();
+
 	return fMinimumValue;
 }
 
@@ -165,6 +231,13 @@ void
 DataHistory::SetRefreshInterval(bigtime_t interval)
 {
 	// TODO: adjust buffer size
+}
+
+
+void
+DataHistory::SetScale(Scale* scale)
+{
+	fScale = scale;
 }
 
 
@@ -378,6 +451,7 @@ ActivityView::_Init(const BMessage* settings)
 	fDrawInterval = kInitialRefreshInterval * 2;
 	fLastRefresh = 0;
 	fDrawResolution = 1;
+	fZooming = false;
 
 	fSystemInfoHandler = new SystemInfoHandler;
 
@@ -385,11 +459,8 @@ ActivityView::_Init(const BMessage* settings)
 		|| settings->FindBool("show legend", &fShowLegend) != B_OK)
 		fShowLegend = true;
 
-	if (settings == NULL) {
-		AddDataSource(new UsedMemoryDataSource());
-		AddDataSource(new CachedMemoryDataSource());
+	if (settings == NULL)
 		return;
-	}
 
 	ssize_t colorLength;
 	rgb_color *color;
@@ -466,6 +537,24 @@ ActivityView::SaveState(BMessage& state) const
 }
 
 
+Scale*
+ActivityView::_ScaleFor(scale_type type)
+{
+	if (type == kNoScale)
+		return NULL;
+
+	std::map<scale_type, ::Scale*>::iterator iterator = fScales.find(type);
+	if (iterator != fScales.end())
+		return iterator->second;
+
+	// add new scale
+	::Scale* scale = new ::Scale(type);
+	fScales[type] = scale;
+
+	return scale;
+}
+
+
 #ifdef __HAIKU__
 BLayoutItem*
 ActivityView::CreateHistoryLayoutItem()
@@ -534,6 +623,8 @@ ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 			delete values;
 			return B_NO_MEMORY;
 		}
+
+		values->SetScale(_ScaleFor(source->ScaleType()));
 
 		DataSource* copy;
 		if (source->PerCPU())
@@ -688,14 +779,16 @@ ActivityView::_OffscreenView()
 void
 ActivityView::MouseDown(BPoint where)
 {
-#if 0
-	int32 buttons = B_PRIMARY_MOUSE_BUTTON;
-	int32 clicks = 1;
-	if (Looper() != NULL && Looper()->CurrentMessage() != NULL) {
+	int32 buttons = B_SECONDARY_MOUSE_BUTTON;
+	if (Looper() != NULL && Looper()->CurrentMessage() != NULL)
 		Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
-		Looper()->CurrentMessage()->FindInt32("clicks", &clicks);
+
+	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
+		fZoomPoint = where;
+		fOriginalResolution = fDrawResolution;
+		fZooming = true;
+		return;
 	}
-#endif
 
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetFont(be_plain_font);
@@ -749,9 +842,34 @@ ActivityView::MouseDown(BPoint where)
 
 
 void
+ActivityView::MouseUp(BPoint where)
+{
+	fZooming = false;
+}
+
+
+void
 ActivityView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {
+	if (!fZooming)
+		return;
+
+	int32 previousResolution = fDrawResolution;
+
+	int32 shift = int32(where.x - fZoomPoint.x) / 25;
+	if (shift > 0)
+		fDrawResolution = fOriginalResolution << shift;
+	else
+		fDrawResolution = fOriginalResolution >> -shift;
+
+	if (fDrawResolution < 1)
+		fDrawResolution = 1;
+	if (fDrawResolution > 128)
+		fDrawResolution = 128;
+
+	if (previousResolution != fDrawResolution)
+		Invalidate();
 }
 
 

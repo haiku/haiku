@@ -176,6 +176,13 @@ DataSource::AdaptiveScale() const
 }
 
 
+scale_type
+DataSource::ScaleType() const
+{
+	return kNoScale;
+}
+
+
 int32
 DataSource::CPU() const
 {

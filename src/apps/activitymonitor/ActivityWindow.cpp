@@ -22,13 +22,14 @@
 
 #include "ActivityMonitor.h"
 #include "ActivityView.h"
+#include "DataSource.h"
 
 
 static const uint32 kMsgAddView = 'advw';
 
 
 ActivityWindow::ActivityWindow()
-	: BWindow(BRect(100, 100, 500, 250), "ActivityMonitor", B_TITLED_WINDOW,
+	: BWindow(BRect(100, 100, 500, 350), "ActivityMonitor", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
 	BMessage settings;
@@ -68,12 +69,11 @@ ActivityWindow::ActivityWindow()
 		count++;
 	}
 	if (count == 0) {
-		ActivityView* view = new ActivityView("ActivityMonitor", NULL);
-		fLayout->AddItem(view->CreateHistoryLayoutItem());
-		fLayout->AddItem(view->CreateLegendLayoutItem());
+		// Add default views (memory & CPU usage)
+		_AddDefaultView();
+		_AddDefaultView();
 	}
-
-#else
+#else	// !__HAIKU__
 	BView *layout = new BView(Bounds(), "topmost", B_FOLLOW_NONE, 0);
 	AddChild(layout);
 
@@ -222,6 +222,34 @@ ActivityWindow::_MessageDropped(BMessage* message)
 
 
 void
+ActivityWindow::_AddDefaultView()
+{
+	ActivityView* view = new ActivityView("ActivityMonitor", NULL);
+
+	switch (ActivityViewCount()) {
+		case 0:
+			// The first view defaults to memory usage
+			view->AddDataSource(new UsedMemoryDataSource());
+			view->AddDataSource(new CachedMemoryDataSource());
+			break;
+		case 2:
+			// The third view defaults to network in/out
+			view->AddDataSource(new NetworkUsageDataSource(true));
+			view->AddDataSource(new NetworkUsageDataSource(false));
+			break;
+		case 1:
+		default:
+			// Everything beyond that defaults to a CPU usage view
+			view->AddDataSource(new CPUUsageDataSource());
+			break;
+	}
+
+	fLayout->AddItem(view->CreateHistoryLayoutItem());
+	fLayout->AddItem(view->CreateLegendLayoutItem());
+}
+
+
+void
 ActivityWindow::MessageReceived(BMessage* message)
 {
 	if (message->WasDropped()) {
@@ -240,9 +268,7 @@ ActivityWindow::MessageReceived(BMessage* message)
 #ifdef __HAIKU__
 			BView* firstView = fLayout->View()->ChildAt(0);
 
-			ActivityView* view = new ActivityView("ActivityMonitor", NULL);
-			fLayout->AddItem(view->CreateHistoryLayoutItem());
-			fLayout->AddItem(view->CreateLegendLayoutItem());
+			_AddDefaultView();
 
 			if (firstView != NULL)
 				ResizeBy(0, firstView->Bounds().Height() + fLayout->Spacing());

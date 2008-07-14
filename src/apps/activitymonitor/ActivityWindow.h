@@ -29,6 +29,7 @@ private:
 			status_t	_LoadSettings(BMessage& settings);
 			status_t	_SaveSettings();
 
+			void		_AddDefaultView();
 			void		_UpdateRemoveItem();
 			void		_MessageDropped(BMessage *message);
 

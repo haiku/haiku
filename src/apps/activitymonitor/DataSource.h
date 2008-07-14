@@ -12,6 +12,11 @@
 class SystemInfo;
 
 
+enum scale_type {
+	kNoScale,
+	kBytePerSecondScale,
+};
+
 class DataSource {
 public:
 						DataSource(int64 initialMin, int64 initialMax);
@@ -38,6 +43,7 @@ public:
 	virtual const char*	Unit() const;
 	virtual rgb_color	Color() const;
 	virtual bool		AdaptiveScale() const;
+	virtual scale_type	ScaleType() const;
 	virtual int32		CPU() const;
 	virtual bool		PerCPU() const;
 	virtual bool		MultiCPUOnly() const;
