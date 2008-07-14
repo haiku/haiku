@@ -28,7 +28,7 @@
 //------------------------------------------------------------------------------
 
 ScopeView::ScopeView()
-	: BView(BRect(0, 0, 127, 63), NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	: BView(BRect(0, 0, 180, 63), NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 	        B_WILL_DRAW)
 {
 	SetViewColor(0, 0, 0);

@@ -20,9 +20,13 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <GridLayoutBuilder.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <MidiProducer.h>
 #include <MidiRoster.h>
 #include <StorageKit.h>
+#include <SpaceLayoutItem.h>
 
 #include "MidiPlayerApp.h"
 #include "MidiPlayerWindow.h"
@@ -36,7 +40,7 @@
 
 MidiPlayerWindow::MidiPlayerWindow()
 	: BWindow(BRect(0, 0, 1, 1), "MidiPlayer", B_TITLED_WINDOW, 
-	          B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+	          B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	playing = false;
 	scopeEnabled = true;
@@ -188,12 +192,7 @@ void MidiPlayerWindow::CreateInputMenu()
 
 	inputPopUp->AddItem(inputOff);
 
-	inputMenu = new BMenuField(
-		BRect(0, 0, 128, 17), "inputMenu", "Live Input:", inputPopUp,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP);
-
-	inputMenu->SetDivider(55);
-	inputMenu->ResizeToPreferred();
+	inputMenu = new BMenuField("Live Input:", inputPopUp, NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -227,26 +226,20 @@ void MidiPlayerWindow::CreateReverbMenu()
 	reverbPopUp->AddItem(reverbCavern);
 	reverbPopUp->AddItem(reverbDungeon);
 
-	reverbMenu = new BMenuField(
-		BRect(0, 0, 128, 17), "reverbMenu", "Reverb:", reverbPopUp,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP);
-
-	reverbMenu->SetDivider(55);
-	reverbMenu->ResizeToPreferred();
+	reverbMenu = new BMenuField("Reverb:", reverbPopUp, NULL);
 }
 
 //------------------------------------------------------------------------------
 
 void MidiPlayerWindow::CreateViews()
 {
+	// Set up needed views
 	scopeView = new ScopeView;
 
 	showScope = new BCheckBox(
 		BRect(0, 0, 1, 1), "showScope", "Scope",
 		new BMessage(MSG_SHOW_SCOPE), B_FOLLOW_LEFT);
-	
 	showScope->SetValue(B_CONTROL_ON);
-	showScope->ResizeToPreferred();
 
 	CreateInputMenu();
 	CreateReverbMenu();
@@ -254,83 +247,52 @@ void MidiPlayerWindow::CreateViews()
 	volumeSlider = new BSlider(
 		BRect(0, 0, 1, 1), "volumeSlider", NULL, NULL,
 		0, 100, B_TRIANGLE_THUMB);
-
 	rgb_color col = { 152, 152, 255 };
 	volumeSlider->UseFillColor(true, &col);
 	volumeSlider->SetModificationMessage(new BMessage(MSG_VOLUME));
-	volumeSlider->ResizeToPreferred();
-	volumeSlider->ResizeTo(_W(scopeView) - 42, _H(volumeSlider));
 
 	playButton = new BButton(
 		BRect(0, 1, 80, 1), "playButton", "Play", new BMessage(MSG_PLAY_STOP),
 		B_FOLLOW_RIGHT);
-	
-	//playButton->MakeDefault(true);
-	playButton->ResizeToPreferred();
 	playButton->SetEnabled(false);
-
-	BBox* background = new BBox(
-		BRect(0, 0, 1, 1), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES, 
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, 
-		B_PLAIN_BORDER); 
 
 	BBox* divider = new BBox(
 		BRect(0, 0, 1, 1), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES, 
 		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER); 
-
-	divider->ResizeTo(_W(scopeView), 1);
+	divider->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, 1));
 
 	BStringView* volumeLabel = new BStringView(
 					BRect(0, 0, 1, 1), NULL, "Volume:");
-		
-	volumeLabel->ResizeToPreferred();
+	volumeLabel->SetAlignment(B_ALIGN_LEFT);
+	volumeLabel->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	float width = 8 + _W(scopeView) + 8;
+	// Build the layout
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	float height =
-		  8  + _H(scopeView) 
-		+ 8  + _H(showScope) 
-		+ 4  + _H(inputMenu)
-		     + _H(reverbMenu)
-		+ 2  + _H(volumeSlider) 
-		+ 10 + _H(divider) 
-		+ 6  + _H(playButton)
-		+ 16;
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+		.Add(scopeView)
+		.Add(BGridLayoutBuilder(10, 10)
+			.Add(BSpaceLayoutItem::CreateGlue(), 0, 0)
+			.Add(showScope, 1, 0)
 
-	ResizeTo(width, height);  
+			.Add(reverbMenu->CreateLabelLayoutItem(), 0, 1)
+			.Add(reverbMenu->CreateMenuBarLayoutItem(), 1, 1)
 
-	AddChild(background);
-	background->ResizeTo(width,	height);
-	background->AddChild(scopeView);
-	background->AddChild(showScope);
-	background->AddChild(reverbMenu);
-	background->AddChild(inputMenu);
-	background->AddChild(volumeLabel);
-	background->AddChild(volumeSlider);
-	background->AddChild(divider);
-	background->AddChild(playButton);
+			.Add(inputMenu->CreateLabelLayoutItem(), 0, 2)
+			.Add(inputMenu->CreateMenuBarLayoutItem(), 1, 2)
 
-	float y = 8;
-	scopeView->MoveTo(8, y);
-
-	y += _H(scopeView) + 8;
-	showScope->MoveTo(8 + 55, y);
-
-	y += _H(showScope) + 4;
-	inputMenu->MoveTo(8, y);
-
-	y += _H(inputMenu);
-	reverbMenu->MoveTo(8, y);
-
-	y += _H(reverbMenu) + 2;
-	volumeLabel->MoveTo(8, y);
-	volumeSlider->MoveTo(8 + 49, y);
-
-	y += _H(volumeSlider) + 10;
-	divider->MoveTo(8, y);
-	
-	y += _H(divider) + 6;
-	playButton->MoveTo((width - _W(playButton)) / 2, y);
+			.Add(volumeLabel, 0, 3)
+			.Add(volumeSlider, 1, 3)
+		)
+		.AddGlue()
+		.Add(divider)
+		.AddGlue()
+		.Add(playButton)
+		.AddGlue()
+		.SetInsets(5, 5, 5, 5)
+	);
 }
 
 //------------------------------------------------------------------------------
