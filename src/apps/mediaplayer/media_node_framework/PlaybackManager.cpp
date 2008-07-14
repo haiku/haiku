@@ -67,7 +67,8 @@ PlaybackManager::PlaybackManager()
 	  fPerformanceTime(0),
 	  fFrameRate(1.0),
 	  fStopPlayingFrame(-1),
-	  fListeners()
+	  fListeners(),
+	  fNoAudio(false)
 {
 	Run();
 }
@@ -452,8 +453,11 @@ PlaybackManager::SetSpeed(float speed)
 int64
 PlaybackManager::NextFrame() const
 {
+	if (fNoAudio)
+		return FrameForTime(fCurrentVideoTime - 1) + 1;
+
 	return FrameForTime(max((bigtime_t)fCurrentAudioTime,
-							(bigtime_t)fCurrentVideoTime) - 1) + 1;
+		(bigtime_t)fCurrentVideoTime) - 1) + 1;
 }
 
 
@@ -1549,6 +1553,9 @@ PlaybackManager::_UpdateSpeedInfos()
 bigtime_t
 PlaybackManager::_TimeForLastFrame() const
 {
+	if (fNoAudio)
+		return TimeForFrame(FrameForTime(fCurrentVideoTime));
+
 	return TimeForFrame(FrameForTime(min((bigtime_t)fCurrentAudioTime,
 										 (bigtime_t)fCurrentVideoTime)));
 }

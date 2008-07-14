@@ -67,7 +67,7 @@ NodeManager::~NodeManager()
 status_t
 NodeManager::Init(BRect videoBounds, float videoFrameRate,
 	color_space preferredVideoFormat, int32 loopingMode,
-	bool loopingEnabled, float speed)
+	bool loopingEnabled, float speed, uint32 enabledNodes)
 {
 	// init base class
 	PlaybackManager::Init(videoFrameRate, loopingMode, loopingEnabled, speed);
@@ -83,7 +83,7 @@ NodeManager::Init(BRect videoBounds, float videoFrameRate,
 		fAudioSupplier = CreateAudioSupplier();
 
 	return FormatChanged(videoBounds, videoFrameRate, preferredVideoFormat,
-		true);
+		enabledNodes, true);
 }
 
 // InitCheck
@@ -118,13 +118,16 @@ NodeManager::CleanupNodes()
 // FormatChanged
 status_t
 NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
-	color_space preferredVideoFormat, bool force)
+	color_space preferredVideoFormat, uint32 enabledNodes, bool force)
 {
 	TRACE("NodeManager::FormatChanged()\n");
 
 	if (!force && videoBounds == VideoBounds()
 		&& videoFrameRate == FramesPerSecond()) {
 		TRACE("   -> reusing existing nodes\n");
+		// TODO: if enabledNodes would indicate that audio or video
+		// is no longer needed, or, worse yet, suddenly needed when
+		// it wasn't before, then we should not return here!
 		return B_OK;
 	}
 
@@ -139,7 +142,7 @@ NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
 
 	SetVideoBounds(videoBounds);
 
-	status_t ret = _SetUpNodes(preferredVideoFormat);
+	status_t ret = _SetUpNodes(preferredVideoFormat, enabledNodes);
 	if (ret == B_OK)
 		_StartNodes();
 	else
@@ -247,7 +250,7 @@ NodeManager::SetPeakListener(BHandler* handler)
 
 // _SetUpNodes
 status_t
-NodeManager::_SetUpNodes(color_space preferredVideoFormat)
+NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes)
 {
 	TRACE("NodeManager::_SetUpNodes()\n");
 
@@ -271,7 +274,7 @@ NodeManager::_SetUpNodes(color_space preferredVideoFormat)
 	}
 
 	// setup the video nodes
-	if (fVideoBounds.IsValid()) {
+	if (enabledNodes != AUDIO_ONLY) {
 		fStatus = _SetUpVideoNodes(preferredVideoFormat);
 		if (fStatus != B_OK) {
 			print_error("Error setting up video nodes", fStatus);
@@ -282,11 +285,17 @@ NodeManager::_SetUpNodes(color_space preferredVideoFormat)
 		printf("running without video node\n");
 	
 	// setup the audio nodes
-	fStatus = _SetUpAudioNodes();
-	if (fStatus != B_OK) {
-		print_error("Error setting up audio nodes", fStatus);
-		fMediaRoster->Unlock();
-		return fStatus;
+	if (enabledNodes != VIDEO_ONLY) {
+		fStatus = _SetUpAudioNodes();
+		if (fStatus != B_OK) {
+			print_error("Error setting up audio nodes", fStatus);
+			fMediaRoster->Unlock();
+			return fStatus;
+		}
+fNoAudio = false;
+	} else {
+fNoAudio = true;
+		printf("running without audio node\n");
 	}
 
 	// we're done mocking with the media roster
@@ -589,7 +598,7 @@ status_t
 NodeManager::_StartNodes()
 {
 	status_t status = B_NO_INIT;
-	if (!fMediaRoster || !fAudioProducer)
+	if (!fMediaRoster)
 		return status;
 	// begin mucking with the media roster
 	if (!fMediaRoster->Lock())
@@ -623,10 +632,13 @@ NodeManager::_StartNodes()
 	}
 	initLatency += estimate_max_scheduling_latency();
 
-	bigtime_t audioLatency = 0;
-	status = fMediaRoster->GetLatencyFor(fAudioConnection.producer,
-		&audioLatency);
-	TRACE("audio latency: %Ld\n", audioLatency);
+	if (fAudioProducer) {
+		// TODO: was this supposed to be added to initLatency?!?
+		bigtime_t audioLatency = 0;
+		status = fMediaRoster->GetLatencyFor(fAudioConnection.producer,
+			&audioLatency);
+		TRACE("audio latency: %Ld\n", audioLatency);
+	}
 	
 	BTimeSource* timeSource;
 	if (fVideoProducer) {
@@ -677,11 +689,13 @@ printf("performance time for %lld: %lld\n", real + latency
 		}
 	}
 
-	fAudioProducer->SetRunning(true);
-	status = fMediaRoster->StartNode(fAudioConnection.producer, perf);
-	if (status != B_OK) {
-		print_error("Can't start the audio producer", status);
-		return status;
+	if (fAudioProducer) {
+		fAudioProducer->SetRunning(true);
+		status = fMediaRoster->StartNode(fAudioConnection.producer, perf);
+		if (status != B_OK) {
+			print_error("Can't start the audio producer", status);
+			return status;
+		}
 	}
 
 	fPerformanceTimeBase = perf;

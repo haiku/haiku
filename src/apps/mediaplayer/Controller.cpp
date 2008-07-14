@@ -100,6 +100,7 @@ Controller::Controller()
  ,	fPosition(0)
  ,	fDuration(0)
  ,	fVideoFrameRate(25.0)
+ ,	fSeekFrame(-1)
 
  ,	fAutoplay(true)
  ,	fPauseAtEndOfStream(false)
@@ -164,7 +165,7 @@ Controller::SetTo(const entry_ref &ref)
 
 	if (fRef == ref) {
 		if (InitCheck() == B_OK) {
-			SetCurrentFrame(0);
+			SetPosition(0.0);
 			StartPlaying();
 		}
 		return B_OK;
@@ -269,17 +270,25 @@ Controller::SetTo(const entry_ref &ref)
 		preferredVideoFormat = format.u.raw_video.display.format;
 	}
 
+	uint32 enabledNodes;
+	if (!fVideoTrackSupplier)
+		enabledNodes = AUDIO_ONLY;
+	else if (!fAudioTrackSupplier)
+		enabledNodes = VIDEO_ONLY;
+	else
+		enabledNodes = AUDIO_AND_VIDEO;
+
 	if (InitCheck() != B_OK) {
 		Init(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
-			preferredVideoFormat, LOOPING_ALL, false);
+			preferredVideoFormat, LOOPING_ALL, false, 1.0, enabledNodes);
 	} else {
 		FormatChanged(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
-			preferredVideoFormat);
+			preferredVideoFormat, enabledNodes);
 	}
 
 	_NotifyFileChanged();
 
-	SetCurrentFrame(0);
+	SetPosition(0.0);
 	if (fAutoplay)
 		StartPlaying(true);
 
@@ -420,7 +429,7 @@ Controller::Stop()
 	BAutolock _(this);
 
 	StopPlaying();
-	SetCurrentFrame(0);
+	SetPosition(0.0);
 }
 
 
@@ -559,8 +568,14 @@ Controller::SetPosition(float value)
 {
 	BAutolock _(this);
 
-	SetCurrentFrame(Duration() * value);
+	fSeekFrame = (int32)(Duration() * value);
+	int32 currentFrame = CurrentFrame();
+	if (fSeekFrame != currentFrame)
+		SetCurrentFrame(fSeekFrame);
+	else
+		fSeekFrame = -1;
 
+	// TODO: What was this used for in the old framework?
 	fSeekToStartAfterPause = false;
 }
 
@@ -891,6 +906,12 @@ Controller::NotifyFPSChanged(float fps) const
 void
 Controller::NotifyCurrentFrameChanged(int32 frame) const
 {
+	// check if we are still waiting to reach the seekframe,
+	// don't pass the event on to the listeners in that case
+	if (fSeekFrame >= 0 && frame != fSeekFrame)
+		return;
+	fSeekFrame = -1;
+
 	float position = 0.0;
 	double duration = (double)fDuration * fVideoFrameRate / 1000000.0;
 	if (duration > 0)

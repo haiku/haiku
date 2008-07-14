@@ -228,6 +228,8 @@ public:
 													// disabled: -1
 
 			BList				fListeners;
+ protected:
+ 			bool				fNoAudio;
 };
 
 

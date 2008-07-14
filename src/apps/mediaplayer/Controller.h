@@ -174,6 +174,7 @@ private:
 	mutable	bigtime_t			fPosition;
 			bigtime_t			fDuration;
 			float				fVideoFrameRate;
+	mutable	int32				fSeekFrame;
 
 			bool 				fAutoplay;
 	volatile bool				fPauseAtEndOfStream;

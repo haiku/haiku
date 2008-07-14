@@ -32,11 +32,18 @@ class NodeManager : public PlaybackManager {
 	virtual	AudioSupplier*		CreateAudioSupplier() = 0;
 
 	// NodeManager
+	enum {
+		AUDIO_AND_VIDEO	= 0,
+		VIDEO_ONLY,
+		AUDIO_ONLY
+	};
+
 			status_t			Init(BRect videoBounds, float videoFrameRate,
 									color_space preferredVideoFormat,
 									int32 loopingMode = LOOPING_ALL,
 									bool loopingEnabled = true,
-									float speed = 1.0);
+									float speed = 1.0,
+									uint32 enabledNodes = AUDIO_AND_VIDEO);
 			status_t			InitCheck();
 								// only call this if the
 								// media_server has died!
@@ -45,6 +52,7 @@ class NodeManager : public PlaybackManager {
 			status_t			FormatChanged(BRect videoBounds,
 									float videoFrameRate,
 									color_space preferredVideoFormat,
+									uint32 enabledNodes = AUDIO_AND_VIDEO,
 									bool force = false);
 	virtual	void				SetPlayMode(int32 mode,
 									bool continuePlaying = true);
@@ -65,7 +73,8 @@ class NodeManager : public PlaybackManager {
 			void				SetPeakListener(BHandler* handler);
 
  private:
-			status_t			_SetUpNodes(color_space preferredVideoFormat);
+			status_t			_SetUpNodes(color_space preferredVideoFormat,
+									uint32 enabledNodes);
 			status_t			_SetUpVideoNodes(
 									color_space preferredVideoFormat);
 			status_t			_SetUpAudioNodes();
