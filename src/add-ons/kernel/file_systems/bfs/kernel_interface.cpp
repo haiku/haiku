@@ -1147,7 +1147,14 @@ bfs_open(fs_volume *_volume, fs_vnode *_node, int openMode, void **_cookie)
 	cookie->last_notification = system_time();
 
 	// Should we truncate the file?
-	if (openMode & O_TRUNC) {
+	if ((openMode & O_TRUNC) != 0) {
+		if ((openMode & O_RWMASK) == O_RDONLY)
+			return B_NOT_ALLOWED;
+		// TODO: this check is only necessary as long as we allow directories
+		// to be opened r/w, see above.
+		if (inode->IsDirectory())
+			return B_IS_A_DIRECTORY;
+
 		Transaction transaction(volume, inode->BlockNumber());
 		WriteLocker locker(inode->Lock());
 
