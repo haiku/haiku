@@ -31,7 +31,7 @@ struct net_device {
 
 	struct net_hardware_address address;
 
-	ifreq_stats stats;
+	struct ifreq_stats stats;
 };
 
 struct net_device_module_info {
@@ -56,9 +56,9 @@ struct net_device_module_info {
 	status_t	(*set_media)(struct net_device *device, uint32 media);
 
 	status_t	(*add_multicast)(struct net_device *device,
-					const sockaddr *address);
+					const struct sockaddr *address);
 	status_t	(*remove_multicast)(struct net_device *device,
-					const sockaddr *address);
+					const struct sockaddr *address);
 };
 
 #endif	// NET_DEVICE_H
