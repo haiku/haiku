@@ -1,0 +1,150 @@
+Getting a Grip on BJoystick
+by Eric Shepherd
+
+The BJoystick class is getting a major overhaul for BeOS Release 4.  In earlier versions of BeOS, BJoystick was limited to supporting a simple two-axis, two-button analog stick.  But in this age of games with complicated moves, high-realism flight simulations, and the like, this just isn't enough.  The new, improved BJoystick class gives you access to modern digital game controllers (such as the Logitech Wingman Extreme Digital, the Microsoft Sidewinder, and others).  As always, the warning goes (come on, you can say it along with me): "BeOS R4 isn't final, and this is all subject to change."
+
+These sticks often have a half-dozen buttons or more, thumb hats (those little direction knobs on top of the main stick), and additional axes, such as rotational controls or throttles.  Game players want to use these controls to their maximum potential, and the new BJoystick class lets you do just that.
+
+The old BJoystick mechanism still works, but I'm not going to talk about it, because the old API doesn't support these advanced features.  Note, however, that enhanced joysticks don't work on the BeBox's built-in game port hardware -- all you can get are two-axis, two-button joysticks.
+
+This article will be based on the sample project StickIt.  StickIt lets you pick a joystick (previously configured using the new Joysticks preference application), then presents a window showing all the buttons, hats, and axes provided by that joystick, providing instant feedback as the joystick is manipulated.  Only key portions of the code will be shown here; you can download the complete source code at <>.
+
+On R4 Intel, you can use the following command in a Terminal window to compile and link the program:
+
+cc -o StickIt main.cpp japplication.cpp jwindow.cpp -lbe -ldevice
+
+On R4 PowerPC, the following command will compile and link the program:
+
+cc -o StickIt main.cpp japplication.cpp jwindow.cpp
+
+Note that I use the term "joystick," but I mean "any BeOS-compatible game controller."  There are supported game pads as well.
+
+Let's begin by looking at how to figure out what joysticks are available, and how to open them.  Take a look at the PickJoystick() function in StickIt's main.cpp file.  This function presents, in the Terminal from which StickIt was launched, a list of joysticks, and lets the user pick the one they want to play with.
+
+It begins by calling BJoystick->CountDevices(), which returns the number of devices connected (this isn't technically the same thing as the number of joysticks connected, since "devices" really refers to game ports, and it's possible for multiple devices to be chained to one game port, although none of the drivers provided in R4 support this).  If there aren't any devices available, an error message is printed, and PickJoystick() returns false.
+
+Otherwise, a loop prints out the names of the joysticks the user has configured for each game port:
+
+for (i=0; i<numDevices; i++) {
+	if (stick->GetDeviceName(i, devName) != B_OK) {
+		printf("*** Error while reading controller list.\n");
+		return false;
+	}
+	if (stick->Open(devName, true) < B_OK) {
+		printf("%4d. No controller on %s.\n", i+1, devPath);
+	}
+	else {
+		if (stick->GetControllerName(&name) != B_OK) {
+			printf("*** Can't get name of controller %s.\n", devPath);
+			return false;
+		}
+		printf("%4d. %s\n", i+1, name.String());
+		stick->Close();
+	}
+}
+
+This begins by obtaining the device name of the joystick that's configured for the port (calling GetDeviceName() with an index number indicating which port to check).  BJoystick::Open() is then called to open the joystick device.  If this fails, an error message is displayed and the loop continues (in case there are empty or unconfigured game ports, but others may be valid).
+
+Once the device is open, GetControllerName() is called to get the name of the joystick.  The returned name will be the same as the name indicated by the Joysticks preference application.  This name is then displayed as the option for the user to select, and the joystick is closed.  This loop continues until the entire menu is displayed on the terminal.
+
+PickJoystick() then lets the user select the joystick they want to use, and then the device is opened, using code very similar to the code above: first the device name is obtained by calling GetDeviceName(), then the Open() function is used to actually open the device.  Open() returns the file descriptor of the joystick's device driver (which you don't really need to know), or a negative number if an error occurred while opening the device).
+
+PickJoystick() returns with the BJoystick object open and ready to use.
+
+StickIt's main() function is fairly simple.  It calls PickJoystick() to get a joystick to use, then instantiates a JWindow, in which the instant joystick feedback is presented.
+
+JWindow is a very simple class and we won't dwell on it -- it just sets up the JView, which does all the real work, and sets the pulse rate to 100,000 microseconds.
+
+Let's just skim on to the JView class, where all the cool stuff is done.  The constructor creates labels for the various displays in the view, and resizes the view and the window, vertically, so it's the right size for the controls provided by the joystick it's displaying).
+
+At the top of the window, in a nice large font, the joystick's name is displayed:
+
+stick->GetControllerName(&name);
+stickName = new BStringView(BRect(5,5,350, 25), "stickname", name.String());
+stickName->SetFontSize(18);
+AddChild(stickName);
+
+We've seen how GetControllerName() works already, in PickJoystick(), so we skip on to the labels for the buttons.
+
+	numButtons = stick->CountButtons();
+	r.Set(5,50,100, 64);
+	for (i=0; i<numButtons; i++) {
+		stick->GetButtonNameAt(i, &name);
+		name.Append(":");
+		sview = new BStringView(r, "buttonlabel", name.String());
+		sview->SetAlignment(B_ALIGN_RIGHT);
+		sview->SetFont(be_bold_font);
+		AddChild(sview);
+		r.top += 18;
+		r.bottom += 18;
+	}
+
+CountButtons() returns the number of buttons the joystick provides.  The buttons are numbered from 0 to numButtons-1.  The BRect, r, is initialized to the rectangle of the first button's label, and then we enter the for loop.
+
+In the loop, each button's name is retrieved by calling GetButtonNameAt(), which returns the name (as specified by the joystick's driver) for the specified button number.  The name is returned in a BString object.  We append a colon to the name (which makes it look like a label, instead of just random text displayed in a window), then we create a BStringView using the name as the label.  Alignment and font settings are tweaked as appropriate, and the rectangle is adjusted so that the next button will be created 18 pixels further down in the window.
+
+A similar procedure is done to create the labels for the hats, which are displayed in the same column as the buttons.  CountHats() is called to get the number of hats, and the labels are generated in the same way (except that the hat displays are larger, so each hat is displayed 40 pixels below the previous one, instead of just 18 pixels).
+
+The right-hand column is dedicated to displays for the axes.  The topmost display is a two-dimensional display for the X and Y axes, and a "Stick:" label is displayed there, under the assumption that all joysticks have an X/Y axis pair.
+
+Below this are created labels for any other axes, such as throttles, twist controls, and the like.  This is done just like the button labels (except that CountAxes() is called to get the number of axes available).  Note that axes 0 and 1 are the X and Y axes (this is standard), and all axes above that are treated as one-dimensional axes.
+
+Finally, the view and window are resized so the height of the view and window is just a bit higher than needed to display the taller of the two columns.  This makes the window look nice, without a lot of wasted space on the screen.
+
+The Pulse() function just locks the window and calls Draw() to refresh the display.
+
+The Draw() function actually handles drawing the joystick's movements interactively.  It begins by getting the numbers of buttons, hats, and axes, and by allocating buffers for the axis and hat values:
+
+numButtons = stick->CountButtons();
+numHats = stick->CountHats();
+numAxes = stick->CountAxes();
+axes = (int16 *) malloc(sizeof(int16) * numAxes);
+hats = (uint8 *) malloc(numHats);
+
+The axes and hats arrays will be used when we call GetAxisValues() and GetHatValues(); these functions fill these arrays with the values of each of the axes and hats on the joystick.
+
+Then, BJoystick::Update() is called.  This tells the joystick driver to look at the state of the joystick and record the current values.  Now we can actually retrieve the values and do something with them.
+
+We begin by drawing the state of the buttons.  Each button is represented by a box next to the corresponding label.  If the button is pressed, a solid black box is drawn.  If the button isn't pressed, a hollow box is drawn.  This is done in a loop, as follows:
+
+r.Set(105,50,115,60);
+buttons = stick->ButtonValues();
+for (i=0; i<numButtons; i++) {
+	if (buttons & (1 << i)) {
+		FillRect(r, B_SOLID_HIGH);
+	}
+	else {
+		r.InsetBy(1,1);
+		FillRect(r, B_SOLID_LOW);
+		r.InsetBy(-1,-1);
+		StrokeRect(r, B_SOLID_HIGH);
+	}
+	r.top += 18;
+	r.bottom += 18;
+}
+
+The ButtonValues() function returns a uint32 that contains bitmapped flags, one for each button (so BJoystick supports up to 32 buttons per joystick).  The low-order bit represents button 0, the next bit is button 1, and so forth.  If the bit is set to 1, the button is pressed, otherwise it's not.
+
+This code loops through, once for each button, and looks to see whether that button is pressed or not.  If it's pressed, the rectangle is filled solid with the high color; otherwise, the interior of the rectangle is cleared to the low color and the frame is refreshed in the high color.
+
+The states of the hats are obtained by calling GetHatValues(), passing in a pointer to the hats array we allocated at the beginning of the function.  On return, each byte in the array is filled in with the state of the corresponding hat.  Each direction the hat might be pointing is represented by a different value:
+
+0	Centered
+1	Up
+2	Up and Right
+3	Right
+4	Down and Right
+5	Down
+6	Down and Left
+7	Left
+8	Up and Left
+
+These nine values represent nine different positions, which can be nicely displayed in a three-by-three grid of squares.  I won't go into the specifics of how the code that draws this grid works (this article is getting long already), but we fill in the appropriate square given the value of each hat, and make sure the others are all cleared.
+
+We read the axes by calling GetAxisValues().  This works just like GetHatValues() -- we pass in a pointer to an array of int16s that will contain the values of each axis on return. Each of these values may range from -32,768 to 32,767.
+
+Next, the X and Y axes (which we're treating as a two-dimensional field) are drawn.  This code isn't very smart, but it does the job.  It simply scales the X and Y values into the range needed to draw the dot, and raws a red, filled circle to represent the stick's position.
+
+The rest of the axes are drawn as a horizontal slider-type display, with a black box and a red oblong indicating the value of the axis.
+
+Download StickIt and have a look at the code.  When you get R4, give it a try.  The new BJoystick class should make it much easier to provide powerful control in games.
