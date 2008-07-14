@@ -163,10 +163,31 @@ StickItWindow::PickJoystick(BJoystick *stick)
 			if (err == B_OK) {
 				err = stick->Open(devName);
 				temp1 = AddToList(fListView1, "BJoystick::Open()");
-				int32 sticks = stick->CountSticks(); 
+				int32 count = stick->CountSticks(); 
 				temp1 << "BJoystick::CountSticks(), number of sticks = " 
-					<< sticks;
+					<< count;
 				temp1 = AddToList(fListView1, temp1.String());
+				
+				count = stick->CountAxes(); 
+				temp1 << "BJoystick::CountAxes(), number of Axes = " 
+					<< count;
+				temp1 = AddToList(fListView1, temp1.String());
+				
+				count = stick->CountButtons(); 
+				temp1 << "BJoystick::CountButtons(), number of Buttons = " 
+					<< count;
+				temp1 = AddToList(fListView1, temp1.String());
+				
+				count = stick->CountHats(); 
+				temp1 << "BJoystick::CountHats(), number of Hats = " 
+					<< count;
+				temp1 = AddToList(fListView1, temp1.String());
+				
+				count = stick->CountDevices(); 
+				temp1 << "BJoystick::CountDevices(), number of Devices = " 
+					<< count;
+				temp1 = AddToList(fListView1, temp1.String());
+								
 				if (err != B_ERROR) {
 					BString name;
 					err = stick->GetControllerModule(&name);
