@@ -731,8 +731,7 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		fText = static_cast<BPrivate::_BTextInput_*>(FindView("_input_"));
 
 	if (fText == NULL) {
-		BRect frame(fDivider, bounds.top,
-					bounds.right, bounds.bottom);
+		BRect frame(fDivider, bounds.top, bounds.right, bounds.bottom);
 		// we are stroking the frame around the text view, which
 		// is 2 pixels wide
 		frame.InsetBy(2.0, 3.0);
