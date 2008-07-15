@@ -149,7 +149,7 @@ NetworkStatusView::_UpdateBitmaps()
 		data = resources.LoadResource(B_VECTOR_ICON_TYPE,
 			kNetworkStatusNoDevice + i, &size);
 		if (data != NULL) {
-			BBitmap* icon = new BBitmap(Bounds(), B_RGB32);
+			BBitmap* icon = new BBitmap(Bounds(), B_RGBA32);
 			if (icon->InitCheck() == B_OK
 				&& BIconUtils::GetVectorIcon((const uint8 *)data,
 					size, icon) == B_OK) {
