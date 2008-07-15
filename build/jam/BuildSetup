@@ -305,8 +305,9 @@ HAIKU_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes -Wpointer-arit
 HAIKU_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-ctor-dtor-privacy
 	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
 
-HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes ;
-HAIKU_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs ;
+HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes
+	-Wno-multichar ;
+HAIKU_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-multichar ;
 
 # debug flags
 HAIKU_DEBUG_FLAGS ?= -ggdb ;
