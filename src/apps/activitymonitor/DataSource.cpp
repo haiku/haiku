@@ -897,8 +897,8 @@ NetworkUsageDataSource::NextValue(SystemInfo& info)
 {
 	uint64 transferred = fIn ? info.NetworkReceived() : info.NetworkSent();
 
-	int64 bytesPerSecond = uint64((transferred - fPreviousBytes)
-		/ ((info.Time() - fPreviousTime) / 1000000.0));
+	int64 bytesPerSecond = uint64(double(transferred - fPreviousBytes)
+		/ (info.Time() - fPreviousTime) * 1000000.0);
 
 	fPreviousBytes = transferred;
 	fPreviousTime = info.Time();
