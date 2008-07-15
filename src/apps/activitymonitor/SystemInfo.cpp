@@ -48,7 +48,7 @@ uint64
 SystemInfo::CachedMemory() const
 {
 #ifdef __HAIKU__
-	return fSystemInfo.cached_pages * B_PAGE_SIZE;
+	return (uint64)fSystemInfo.cached_pages * B_PAGE_SIZE;
 #else
 	return 0LL;
 #endif
@@ -58,14 +58,14 @@ SystemInfo::CachedMemory() const
 uint64
 SystemInfo::UsedMemory() const
 {
-	return fSystemInfo.used_pages * B_PAGE_SIZE;
+	return (uint64)fSystemInfo.used_pages * B_PAGE_SIZE;
 }
 
 
 uint64
 SystemInfo::MaxMemory() const
 {
-	return fSystemInfo.max_pages * B_PAGE_SIZE;
+	return (uint64)fSystemInfo.max_pages * B_PAGE_SIZE;
 }
 
 
