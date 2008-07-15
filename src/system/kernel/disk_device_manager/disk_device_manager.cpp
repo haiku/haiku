@@ -234,23 +234,25 @@ get_default_partition_content_name(partition_id partitionID,
 	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	off_t size = partition->ContentSize();
+	double size = partition->ContentSize();
 	partition->Unregister();
 
-    const char* const suffixes[] = {
-        "", "K", "M", "G", "T", "P", "E", NULL
-    };
+	const char* const suffixes[] = {
+		"", "K", "M", "G", "T", "P", "E", NULL
+	};
 
-	size *= 10;
-		// We want one digit precision.
-    int index = 0;
-    while (size >= 1024 * 10 && suffixes[index + 1]) {
-        size /= 1024;
-        index++;
-    }
+	int index = 0;
+	while (size >= 1024 && suffixes[index + 1]) {
+		size /= 1024;
+		index++;
+	}
 
-    snprintf(buffer, bufferSize, "%s Volume (%ld.%ld %sB)", fileSystemName,
-		int32(size / 10), int32(size % 10), suffixes[index]);
+	// Our kernel snprintf() ignores the precision argument, so we manually
+	// do one digit precision.
+	uint64 result = uint64(size * 10 + 0.5);
+
+	snprintf(buffer, bufferSize, "%s Volume (%ld.%ld %sB)", fileSystemName,
+		int32(result / 10), int32(result % 10), suffixes[index]);
 
 	return B_OK;
 }
