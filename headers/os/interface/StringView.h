@@ -19,6 +19,8 @@ class BStringView : public BView{
 								const char* text,
 								uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 								uint32 flags = B_WILL_DRAW);
+							BStringView(const char* name, const char* text,
+								uint32 flags = B_WILL_DRAW);
 							BStringView(BMessage* data);
 		virtual 			~BStringView();
 
@@ -53,7 +55,15 @@ class BStringView : public BView{
 		virtual void		AllDetached();
 		virtual status_t	GetSupportedSuites(BMessage* data);
 
+// TODO: should be implemented and invalidate the layout
+//		virtual	void		SetFont(const BFont* font,
+//								uint32 mask = B_FONT_ALL);
+
+		virtual	void		InvalidateLayout(bool descendants = false);
+		
+		virtual	BSize		MinSize();
 		virtual	BSize		MaxSize();
+		virtual	BSize		PreferredSize();
 
 	private:
 		virtual status_t	Perform(perform_code d, void* arg);
@@ -61,11 +71,14 @@ class BStringView : public BView{
 		virtual	void		_ReservedStringView2();
 		virtual	void		_ReservedStringView3();
 
+				BSize		_ValidatePreferredSize();
+
 		BStringView	&operator=(const BStringView&);
 
 		char*		fText;
 		alignment	fAlign;
-		uint32		_reserved[3];
+		BSize		fPreferredSize;
+		uint32		_reserved[1];
 };
 
 #endif	// _STRING_VIEW_H

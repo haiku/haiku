@@ -1,12 +1,14 @@
 /*
- * Copyright 2001-2005, Haiku Inc.
+ * Copyright 2001-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Frans van Nispen (xlr8@tref.nl)
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/**	BStringView draw a non-editable text string */
+//!	BStringView draws a non-editable text string.
 
 
 #include <StringView.h>
@@ -22,17 +24,28 @@
 
 
 BStringView::BStringView(BRect frame, const char* name, const char* text,
-		uint32 resizeMask, uint32 flags)
-	: BView(frame, name, resizeMask, flags)
+			uint32 resizeMask, uint32 flags)
+	:	BView(frame, name, resizeMask, flags),
+		fText(text ? strdup(text) : NULL),
+		fAlign(B_ALIGN_LEFT),
+		fPreferredSize(-1, -1)
 {
-	fText = text ? strdup(text) : NULL;
-	fAlign = B_ALIGN_LEFT;
+}
+
+
+BStringView::BStringView(const char* name, const char* text, uint32 flags)
+	:	BView(name, flags),
+		fText(text ? strdup(text) : NULL),
+		fAlign(B_ALIGN_LEFT),
+		fPreferredSize(-1, -1)
+{
 }
 
 
 BStringView::BStringView(BMessage* data)
-	: BView(data),
-	fText(NULL)
+	:	BView(data),
+		fText(NULL),
+		fPreferredSize(-1, -1)
 {
 	int32 align;
 	if (data->FindInt32("_align", &align) == B_OK)
@@ -82,11 +95,13 @@ BStringView::~BStringView()
 void
 BStringView::SetText(const char* text)
 {
-	if ((text && fText && !strcmp(text, fText))
-		|| (!text && !fText))
+	if ((text && fText && !strcmp(text, fText)) || (!text && !fText))
 		return;
+
 	free(fText);
 	fText = text ? strdup(text) : NULL;
+
+	InvalidateLayout();
 	Invalidate();
 }
 
@@ -132,19 +147,22 @@ BStringView::Draw(BRect bounds)
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
-	float y = Bounds().bottom - ceil(fontHeight.descent);
+	BRect bounds = Bounds();
+
+	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
+		- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
 	float x;
 	switch (fAlign) {
 		case B_ALIGN_RIGHT:
-			x = Bounds().Width() - StringWidth(fText) - 2.0f;
+			x = bounds.Width() - StringWidth(fText);
 			break;
 
 		case B_ALIGN_CENTER:
-			x = (Bounds().Width() - StringWidth(fText)) / 2.0f;
+			x = (bounds.Width() - StringWidth(fText)) / 2.0;
 			break;
 
 		default:
-			x = 2.0f;
+			x = 0.0;
 			break;
 	}
 
@@ -169,19 +187,13 @@ BStringView::ResizeToPreferred()
 void
 BStringView::GetPreferredSize(float* _width, float* _height)
 {
-	if (!fText) {
-		BView::GetPreferredSize(_width, _height);
-		return;
-	}
+	_ValidatePreferredSize();
 
 	if (_width)
-		*_width = 4.0f + ceil(StringWidth(fText));
+		*_width = fPreferredSize.width;
 
-	if (_height) {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
-		*_height = ceil(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 2.0f;
-	}
+	if (_height)
+		*_height = fPreferredSize.height;
 }
 
 
@@ -270,13 +282,37 @@ BStringView::GetSupportedSuites(BMessage* message)
 }
 
 
+void
+BStringView::InvalidateLayout(bool descendants)
+{
+	// invalidate cached preferred size
+	fPreferredSize.Set(-1, -1);
+
+	BView::InvalidateLayout(descendants);
+}
+
+
+BSize
+BStringView::MinSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
+		_ValidatePreferredSize());
+}
+
+
 BSize
 BStringView::MaxSize()
 {
-	float width, height;
-	GetPreferredSize(&width, &height);
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		_ValidatePreferredSize());
+}
 
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), BSize(width, height));
+
+BSize
+BStringView::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		_ValidatePreferredSize());
 }
 
 
@@ -298,3 +334,22 @@ BStringView::operator=(const BStringView&)
 	// Assignment not allowed (private)
 	return *this;
 }
+
+BSize
+BStringView::_ValidatePreferredSize()
+{
+	if (fPreferredSize.width < 0) {
+		// width
+		fPreferredSize.width = ceilf(StringWidth(fText));
+
+		// height
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+	
+		fPreferredSize.height = ceilf(fontHeight.ascent + fontHeight.descent 
+			+ fontHeight.leading);
+	}
+
+	return fPreferredSize;
+}
+
