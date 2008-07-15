@@ -7,7 +7,7 @@
  * rendering pipe-lines for stroke, fills, bitmap and text rendering.
  */
 
-
+#include <new>
 #include <stdio.h>
 #include <string.h>
 
@@ -36,6 +36,7 @@
 
 #include "DrawState.h"
 
+#include <AutoDeleter.h>
 #include "DrawingMode.h"
 #include "PatternHandler.h"
 #include "RenderingBuffer.h"
@@ -45,7 +46,9 @@
 
 #include "Painter.h"
 
+using std::nothrow;
 
+#undef TRACE
 //#define TRACE_PAINTER
 #ifdef TRACE_PAINTER
 #	define TRACE(x...)		printf(x)
@@ -76,7 +79,6 @@ Painter::Painter()
 	  fValidClipping(false),
 	  fDrawingText(false),
 	  fAttached(false),
-	  fSubpixelAntialias(true),
 
 	  fPenSize(1.0),
 	  fClippingRegion(NULL),
@@ -86,6 +88,7 @@ Painter::Painter()
 	  fLineCapMode(B_BUTT_CAP),
 	  fLineJoinMode(B_MITER_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
+	  fSubpixelAntialias(true),
 
 	  fPatternHandler(),
 	  fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline)
@@ -1397,106 +1400,102 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	double xOffset = viewRect.left - bitmapRect.left;
 	double yOffset = viewRect.top - bitmapRect.top;
 
-	switch (format) {
-		case B_RGB32:
-		case B_RGBA32: {
-			// maybe we can use an optimized version
-			if (xScale == 1.0 && yScale == 1.0) {
-				if (fDrawingMode == B_OP_COPY) {
-					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4,
-						srcBuffer, xOffset, yOffset, viewRect);
-					return;
-				} else if (fDrawingMode == B_OP_OVER) {
-					if (format == B_RGB32)
-						_DrawBitmapNoScale32(copy_bitmap_row_bgr32_over, 4,
-							srcBuffer, xOffset, yOffset, viewRect);
-					else
-						_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4,
-							srcBuffer, xOffset, yOffset, viewRect);
-					return;
-				} else if (fDrawingMode == B_OP_ALPHA
-						 && fAlphaSrcMode == B_PIXEL_ALPHA
-						 && fAlphaFncMode == B_ALPHA_OVERLAY) {
-					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4,
-						srcBuffer, xOffset, yOffset, viewRect);
-					return;
-				}
-			}
-
-			if (format == B_RGBA32 || fDrawingMode == B_OP_COPY) {
-				_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset,
-					xScale, yScale, viewRect);
+	// optimized code path for B_CMAP8 and no scale
+	if (xScale == 1.0 && yScale == 1.0) {
+		if (format == B_CMAP8) {
+			if (fDrawingMode == B_OP_COPY) {
+				_DrawBitmapNoScale32(copy_bitmap_row_cmap8_copy, 1,
+					srcBuffer, xOffset, yOffset, viewRect);
+				return;
+			} else if (fDrawingMode == B_OP_OVER) {
+				_DrawBitmapNoScale32(copy_bitmap_row_cmap8_over, 1,
+					srcBuffer, xOffset, yOffset, viewRect);
 				return;
 			}
-			// otherwise fall through to get proper transparency handling for
-			// B_RGB32 where a B_TRANSPARENT_MAGIC might be set on pixels
-		}
-		default: {
-			if (format == B_CMAP8 && xScale == 1.0 && yScale == 1.0) {
-				if (fDrawingMode == B_OP_COPY) {
-					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_copy, 1,
-						srcBuffer, xOffset, yOffset, viewRect);
-					return;
-				} else if (fDrawingMode == B_OP_OVER) {
-					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_over, 1,
-						srcBuffer, xOffset, yOffset, viewRect);
-					return;
-				}
+		} else if (format == B_RGB32) {
+			if (fDrawingMode == B_OP_OVER) {
+				_DrawBitmapNoScale32(copy_bitmap_row_bgr32_over, 4,
+					srcBuffer, xOffset, yOffset, viewRect);
+				return;
 			}
-
-			// TODO: this is only a temporary implementation,
-			// to really handle other colorspaces, one would
-			// rather do the conversion with much less overhead,
-			// for example in the nn filter (hm), or in the
-			// scanline generator (better)
-			// maybe we can use an optimized version
-			BBitmap temp(actualBitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGBA32);
-			status_t err = temp.ImportBits(srcBuffer.buf(),
-				srcBuffer.height() * srcBuffer.stride(),
-				srcBuffer.stride(), 0, format);
-
-			if (err >= B_OK) {
-				// the original bitmap might have had some of the
-				// transaparent magic colors set that we now need to
-				// make transparent in our RGBA32 bitmap again.
-				switch (format) {
-					case B_RGB32:
-						_TransparentMagicToAlpha((uint32 *)srcBuffer.buf(),
-							srcBuffer.width(), srcBuffer.height(),
-							srcBuffer.stride(), B_TRANSPARENT_MAGIC_RGBA32,
-							&temp);
-						break;
-
-					// TODO: not sure if this applies to B_RGBA15 too. It
-					// should not because B_RGBA15 actually has an alpha
-					// channel itself and it should have been preserved
-					// when importing the bitmap. Maybe it applies to
-					// B_RGB16 though?
-					case B_RGB15:
-						_TransparentMagicToAlpha((uint16 *)srcBuffer.buf(),
-							srcBuffer.width(), srcBuffer.height(),
-							srcBuffer.stride(), B_TRANSPARENT_MAGIC_RGBA15,
-							&temp);
-						break;
-
-					default:
-						break;
-				}
-
-				agg::rendering_buffer convertedBuffer;
-				convertedBuffer.attach((uint8*)temp.Bits(),
-					(uint32)actualBitmapRect.IntegerWidth() + 1,
-					(uint32)actualBitmapRect.IntegerHeight() + 1,
-					temp.BytesPerRow());
-				_DrawBitmapGeneric32(convertedBuffer, xOffset, yOffset,
-					xScale, yScale, viewRect);
-			} else {
-				fprintf(stderr, "Painter::_DrawBitmap() - "
-						"colorspace conversion failed: %s\n", strerror(err));
-			}
-			break;
 		}
 	}
+
+	BBitmap* temp = NULL;
+	ObjectDeleter<BBitmap> tempDeleter;
+
+	if ((format != B_RGBA32 && format != B_RGB32)
+		|| (format == B_RGB32 && fDrawingMode != B_OP_COPY)) {
+		temp = new (nothrow) BBitmap(actualBitmapRect, B_BITMAP_NO_SERVER_LINK,
+			B_RGBA32);
+		if (temp == NULL) {
+			fprintf(stderr, "Painter::_DrawBitmap() - "
+				"out of memory for creating temporary conversion bitmap\n");
+			return;
+		}
+
+		tempDeleter.SetTo(temp);
+
+		status_t err = temp->ImportBits(srcBuffer.buf(),
+			srcBuffer.height() * srcBuffer.stride(),
+			srcBuffer.stride(), 0, format);
+		if (err < B_OK) {
+			fprintf(stderr, "Painter::_DrawBitmap() - "
+				"colorspace conversion failed: %s\n", strerror(err));
+			return;
+		}
+
+		// the original bitmap might have had some of the
+		// transaparent magic colors set that we now need to
+		// make transparent in our RGBA32 bitmap again.
+		switch (format) {
+			case B_RGB32:
+				_TransparentMagicToAlpha((uint32 *)srcBuffer.buf(),
+					srcBuffer.width(), srcBuffer.height(),
+					srcBuffer.stride(), B_TRANSPARENT_MAGIC_RGBA32,
+					temp);
+				break;
+	
+			// TODO: not sure if this applies to B_RGBA15 too. It
+			// should not because B_RGBA15 actually has an alpha
+			// channel itself and it should have been preserved
+			// when importing the bitmap. Maybe it applies to
+			// B_RGB16 though?
+			case B_RGB15:
+				_TransparentMagicToAlpha((uint16 *)srcBuffer.buf(),
+					srcBuffer.width(), srcBuffer.height(),
+					srcBuffer.stride(), B_TRANSPARENT_MAGIC_RGBA15,
+					temp);
+				break;
+	
+			default:
+				break;
+		}
+
+		srcBuffer.attach((uint8*)temp->Bits(),
+			(uint32)actualBitmapRect.IntegerWidth() + 1,
+			(uint32)actualBitmapRect.IntegerHeight() + 1,
+			temp->BytesPerRow());
+	}
+
+	// maybe we can use an optimized version if there is no scale
+	if (xScale == 1.0 && yScale == 1.0) {
+		if (fDrawingMode == B_OP_COPY) {
+			_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4, srcBuffer,
+				xOffset, yOffset, viewRect);
+			return;
+		} else if (fDrawingMode == B_OP_OVER
+			|| (fDrawingMode == B_OP_ALPHA
+				 && fAlphaSrcMode == B_PIXEL_ALPHA
+				 && fAlphaFncMode == B_ALPHA_OVERLAY)) {
+			_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4, srcBuffer,
+				xOffset, yOffset, viewRect);
+			return;
+		}
+	}
+
+	// for all other cases (non-optimized drawing mode or scaled drawing)
+	_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset, xScale, yScale, viewRect);
 }
 
 #define DEBUG_DRAW_BITMAP 0
