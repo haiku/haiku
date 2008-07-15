@@ -30,7 +30,7 @@ rule SubIncludeGPL
 	# add-ons
 	if $(INCLUDE_GPL_ADDONS) = 1 {
 		SubInclude $(1) ;
-	} 
+	}
 }
 
 
@@ -329,6 +329,12 @@ rule DefineBuildProfile name : type : path {
 			JAM_TARGETS = $(buildTarget) ;
 			SetUpdateHaikuImageOnly 1 ;
 			HAIKU_INCLUDE_IN_IMAGE on $(HAIKU_BUILD_PROFILE_PARAMETERS) = 1 ;
+		}
+
+		case "update-all" : {
+			JAM_TARGETS = $(buildTarget) ;
+			SetUpdateHaikuImageOnly 1 ;
+			HAIKU_INCLUDE_IN_IMAGE = 1 ;
 		}
 
 		case "mount" : {
