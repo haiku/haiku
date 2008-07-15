@@ -2241,6 +2241,8 @@ BView::SetFont(const BFont* font, uint32 mask)
 
 		fState->UpdateServerFontState(*fOwner->fLink);
 	}
+
+	// TODO: InvalidateLayout() here for convenience?
 }
 
 
