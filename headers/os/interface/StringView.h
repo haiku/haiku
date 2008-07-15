@@ -55,9 +55,8 @@ class BStringView : public BView{
 		virtual void		AllDetached();
 		virtual status_t	GetSupportedSuites(BMessage* data);
 
-// TODO: should be implemented and invalidate the layout
-//		virtual	void		SetFont(const BFont* font,
-//								uint32 mask = B_FONT_ALL);
+		virtual	void		SetFont(const BFont* font,
+								uint32 mask = B_FONT_ALL);
 
 		virtual	void		InvalidateLayout(bool descendants = false);
 		

@@ -137,7 +137,7 @@ BStringView::AttachedToWindow()
 
 
 void
-BStringView::Draw(BRect bounds)
+BStringView::Draw(BRect updateRect)
 {
 	if (!fText)
 		return;
@@ -279,6 +279,16 @@ status_t
 BStringView::GetSupportedSuites(BMessage* message)
 {
 	return BView::GetSupportedSuites(message);
+}
+
+
+void
+BStringView::SetFont(const BFont* font, uint32 mask)
+{
+	BView::SetFont(font, mask);
+
+	InvalidateLayout();
+	Invalidate();
 }
 
 
