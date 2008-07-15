@@ -2684,7 +2684,7 @@ void BTextView::_ReservedTextView12() {}
 */
 void
 BTextView::_InitObject(BRect textRect, const BFont *initialFont,
-						   const rgb_color *initialColor)
+	const rgb_color *initialColor)
 {
 	BFont font;
 	if (initialFont == NULL)
@@ -2703,7 +2703,7 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	
 	// We put these here instead of in the constructor initializer list
 	// to have less code duplication, and a single place where to do changes
-	// if needed.,
+	// if needed.
 	fTextRect = textRect;
 	fMinTextRectWidth = fTextRect.Width();
 	fSelStart = fSelEnd = 0;
