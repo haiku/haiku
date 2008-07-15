@@ -14,6 +14,7 @@
 #	include <AbstractLayoutItem.h>
 #endif
 #include <Application.h>
+#include <Autolock.h>
 #include <Bitmap.h>
 #include <Dragger.h>
 #include <MenuItem.h>
@@ -93,7 +94,6 @@ private:
 
 const bigtime_t kInitialRefreshInterval = 500000LL;
 
-const uint32 kMsgRefresh = 'refr';
 const uint32 kMsgToggleDataSource = 'tgds';
 const uint32 kMsgToggleLegend = 'tglg';
 
@@ -392,7 +392,8 @@ ActivityView::LegendLayoutItem::BaseAlignment()
 ActivityView::ActivityView(BRect frame, const char* name,
 		const BMessage* settings, uint32 resizingMode)
 	: BView(frame, name, resizingMode,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	fSourcesLock("data sources")
 {
 	_Init(settings);
 
@@ -407,10 +408,12 @@ ActivityView::ActivityView(BRect frame, const char* name,
 
 ActivityView::ActivityView(const char* name, const BMessage* settings)
 #ifdef __HAIKU__
-	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
+	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 #else
-	: BView(BRect(0,0,300,200), name, B_FOLLOW_NONE, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
+	: BView(BRect(0,0,300,200), name, B_FOLLOW_NONE,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 #endif
+	fSourcesLock("data sources")
 {
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -585,6 +588,8 @@ ActivityView::CreateLegendLayoutItem()
 DataSource*
 ActivityView::FindDataSource(const DataSource* search)
 {
+	BAutolock _(fSourcesLock);
+
 	for (int32 i = fSources.CountItems(); i-- > 0;) {
 		DataSource* source = fSources.ItemAt(i);
 		if (!strcmp(source->Name(), search->Name()))
@@ -600,6 +605,8 @@ ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 {
 	if (source == NULL)
 		return B_BAD_VALUE;
+
+	BAutolock _(fSourcesLock);
 
 	int32 insert = DataSource::IndexOf(source);
 	for (int32 i = 0; i < fSources.CountItems() && i < insert; i++) {
@@ -667,6 +674,8 @@ ActivityView::RemoveDataSource(const DataSource* remove)
 {
 	bool removed = false;
 
+	BAutolock _(fSourcesLock);
+
 	while (true) {
 		DataSource* source = FindDataSource(remove);
 debug_printf("SEARCH %s, found %p\n", remove->Name(), source);
@@ -697,6 +706,8 @@ debug_printf("SEARCH %s, found %p\n", remove->Name(), source);
 void
 ActivityView::RemoveAllDataSources()
 {
+	BAutolock _(fSourcesLock);
+
 	fSources.MakeEmpty();
 	fValues.MakeEmpty();
 }
@@ -708,8 +719,10 @@ ActivityView::AttachedToWindow()
 	Looper()->AddHandler(fSystemInfoHandler);
 	fSystemInfoHandler->StartWatching();
 
-	BMessage refresh(kMsgRefresh);
-	fRunner = new BMessageRunner(this, &refresh, fRefreshInterval);
+	fRefreshSem = create_sem(0, "refresh sem");
+	fRefreshThread = spawn_thread(&_RefreshThread, "source refresh",
+		B_NORMAL_PRIORITY, this);
+	resume_thread(fRefreshThread);
 
 	FrameResized(Bounds().Width(), Bounds().Height());
 }
@@ -721,7 +734,8 @@ ActivityView::DetachedFromWindow()
 	fSystemInfoHandler->StopWatching();
 	Looper()->RemoveHandler(fSystemInfoHandler);
 
-	delete fRunner;
+	delete_sem(fRefreshSem);
+	wait_for_thread(fRefreshThread, NULL);
 }
 
 
@@ -896,6 +910,8 @@ ActivityView::MessageReceived(BMessage* message)
 				Invalidate(_HistoryFrame());
 			} else {
 				// check each legend color box
+				BAutolock _(fSourcesLock);
+
 				BRect legendFrame = _LegendFrame();
 				for (int32 i = 0; i < fSources.CountItems(); i++) {
 					BRect frame = _LegendColorFrameAt(legendFrame, i);
@@ -921,10 +937,6 @@ ActivityView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
 			ActivityMonitor::ShowAbout();
-			break;
-
-		case kMsgRefresh:
-			_Refresh();
 			break;
 
 		case kMsgToggleDataSource:
@@ -1022,6 +1034,8 @@ ActivityView::_LegendHeight() const
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
+	BAutolock _(fSourcesLock);
+
 	int32 rows = (fSources.CountItems() + 1) / 2;
 	return rows * (4 + ceilf(fontHeight.ascent)
 		+ ceilf(fontHeight.descent) + ceilf(fontHeight.leading));
@@ -1055,6 +1069,8 @@ ActivityView::_LegendFrameAt(BRect frame, int32 index) const
 		frame.right = frame.left + floorf(frame.Width() / 2) - 5;
 	else
 		frame.left = frame.right - floorf(frame.Width() / 2) + 5;
+
+	BAutolock _(fSourcesLock);
 
 	int32 rows = (fSources.CountItems() + 1) / 2;
 	float height = floorf((frame.Height() - 5) / rows);
@@ -1146,6 +1162,7 @@ ActivityView::_DrawHistory()
 	// Draw values
 
 	view->SetPenSize(2);
+	BAutolock _(fSourcesLock);
 
 	for (uint32 i = fSources.CountItems(); i-- > 0;) {
 		DataSource* source = fSources.ItemAt(i);
@@ -1210,6 +1227,7 @@ ActivityView::Draw(BRect /*updateRect*/)
 
 	// draw legend
 
+	BAutolock _(fSourcesLock);
 	BRect legendFrame = _LegendFrame();
 
 	SetLowColor(fLegendBackgroundColor);
@@ -1252,22 +1270,46 @@ ActivityView::Draw(BRect /*updateRect*/)
 void
 ActivityView::_Refresh()
 {
-	SystemInfo info(fSystemInfoHandler);
+	bigtime_t lastTimeout = system_time() - fRefreshInterval;
 
-	// TODO: run refresh in another thread to decouple it from the UI!
+	while (true) {
+		status_t status = acquire_sem_etc(fRefreshSem, 1, B_ABSOLUTE_TIMEOUT,
+			lastTimeout + fRefreshInterval);
+		if (status == B_OK || status == B_BAD_SEM_ID)
+			break;
+		if (status == B_INTERRUPTED)
+			continue;
 
-	for (uint32 i = fSources.CountItems(); i-- > 0;) {
-		DataSource* source = fSources.ItemAt(i);
-		DataHistory* values = fValues.ItemAt(i);
+		SystemInfo info(fSystemInfoHandler);
+		lastTimeout += fRefreshInterval;
 
-		int64 value = source->NextValue(info);
-		values->AddValue(info.Time(), value);
-	}
+		fSourcesLock.Lock();
 
-	bigtime_t now = info.Time();
-	if (fLastRefresh + fDrawInterval <= now) {
-		Invalidate();
-		fLastRefresh = now;
+		for (uint32 i = fSources.CountItems(); i-- > 0;) {
+			DataSource* source = fSources.ItemAt(i);
+			DataHistory* values = fValues.ItemAt(i);
+
+			int64 value = source->NextValue(info);
+			values->AddValue(info.Time(), value);
+		}
+
+		fSourcesLock.Unlock();
+
+		bigtime_t now = info.Time();
+		if (fLastRefresh + fDrawInterval <= now) {
+			if (LockLooper()) {
+				Invalidate();
+				UnlockLooper();
+				fLastRefresh = now;
+			}
+		}
 	}
 }
 
+
+/*static*/ status_t
+ActivityView::_RefreshThread(void* self)
+{
+	((ActivityView*)self)->_Refresh();
+	return B_OK;
+}

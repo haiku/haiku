@@ -8,8 +8,9 @@
 
 #include <map>
 
-#include <View.h>
+#include <Locker.h>
 #include <ObjectList.h>
+#include <View.h>
 
 #include "CircularBuffer.h"
 #include "DataSource.h"
@@ -95,6 +96,7 @@ private:
 			void		_Init(const BMessage* settings);
 			::Scale*	_ScaleFor(scale_type type);
 			void		_Refresh();
+	static	status_t	_RefreshThread(void* self);
 			void		_UpdateOffscreenBitmap();
 			BView*		_OffscreenView();
 			void		_UpdateFrame();
@@ -121,9 +123,11 @@ private:
 	BLayoutItem*		fHistoryLayoutItem;
 	BLayoutItem*		fLegendLayoutItem;
 #endif
+	mutable BLocker		fSourcesLock;
 	BObjectList<DataSource> fSources;
 	BObjectList<DataHistory> fValues;
-	BMessageRunner*		fRunner;
+	thread_id			fRefreshThread;
+	sem_id				fRefreshSem;
 	bigtime_t			fRefreshInterval;
 	bigtime_t			fLastRefresh;
 	bigtime_t			fDrawInterval;
