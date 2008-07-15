@@ -1441,9 +1441,9 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 // B_RGB32 bitmaps therefore don't draw correctly on BeOS if they actually
 // use this color, unless the alpha channel contains 255 for all other
 // pixels, which is inconsistent.
-			&& fDrawingMode != B_OP_ALPHA)
+			&& fDrawingMode != B_OP_ALPHA
 #endif
-		) {
+		)) {
 		temp = new (nothrow) BBitmap(actualBitmapRect, B_BITMAP_NO_SERVER_LINK,
 			B_RGBA32);
 		if (temp == NULL) {
