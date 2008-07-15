@@ -785,6 +785,8 @@ reset_termios(struct termios &termios)
 	termios.c_cflag = B19200 | CS8 | CREAD | HUPCL;
 		// enable receiver, hang up on last close
 	termios.c_lflag = ECHO | ISIG | ICANON;
+	termios.c_ispeed = B19200;
+	termios.c_ospeed = B19200;
 
 	// control characters	
 	termios.c_cc[VINTR] = CTRL('C');
