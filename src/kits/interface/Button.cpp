@@ -60,10 +60,13 @@ BButton::~BButton()
 
 
 BButton::BButton(BMessage *archive)
-	:	BControl (archive)
+	:	BControl(archive),
+		fPreferredSize(-1, -1)
 {
 	if (archive->FindBool("_default", &fDrawAsDefault) != B_OK)
 		fDrawAsDefault = false;
+	// NOTE: Default button state will be synchronized with the window
+	// in AttachedToWindow().
 }
 
 
@@ -247,7 +250,7 @@ BButton::Draw(BRect updateRect)
 	const float x = (rect.right - stringWidth) / 2.0;
 	const float labelY = bounds.top
 		+ ((bounds.Height() - fh.ascent - fh.descent) / 2.0)
-		+ fh.ascent +  1.0;
+		+ fh.ascent + 1.0;
 	const float focusLineY = labelY + fh.descent;
 
 	/* speed trick:
@@ -260,8 +263,10 @@ BButton::Draw(BRect updateRect)
 		if (pushed) {
 			rect.InsetBy(2.0, 2.0);
 			InvertRect(rect);
-		} else 
-			DrawFocusLine(x, focusLineY, stringWidth, IsFocus() && Window()->IsActive());
+		} else {
+			DrawFocusLine(x, focusLineY, stringWidth, IsFocus()
+				&& Window()->IsActive());
+		}
 		
 		return;
 	}
@@ -294,19 +299,24 @@ BButton::Draw(BRect updateRect)
 		bevelColor2 = panelBgColor;
 
 		if (IsDefault()) {
-			borderBevelShadow = tint_color(dark1BorderColor, (B_NO_TINT + B_DARKEN_1_TINT) / 2);
+			borderBevelShadow = tint_color(dark1BorderColor,
+				(B_NO_TINT + B_DARKEN_1_TINT) / 2);
 			borderBevelLight = tint_color(dark1BorderColor, B_LIGHTEN_1_TINT);
 
-			borderBevelLight.red = (borderBevelLight.red + panelBgColor.red) / 2;
-			borderBevelLight.green = (borderBevelLight.green + panelBgColor.green) / 2;
-			borderBevelLight.blue = (borderBevelLight.blue + panelBgColor.blue) / 2;
+			borderBevelLight.red = (borderBevelLight.red + panelBgColor.red)
+				/ 2;
+			borderBevelLight.green = (borderBevelLight.green
+				+ panelBgColor.green) / 2;
+			borderBevelLight.blue = (borderBevelLight.blue
+				+ panelBgColor.blue) / 2;
 	
 			dark1BorderColor = tint_color(dark1BorderColor, B_DARKEN_3_TINT);
 			dark2BorderColor = tint_color(dark1BorderColor, B_DARKEN_4_TINT);
 
 			bevelColorRBCorner = borderBevelShadow;
 		} else {
-			borderBevelShadow = tint_color(panelBgColor, (B_NO_TINT + B_DARKEN_1_TINT) / 2);
+			borderBevelShadow = tint_color(panelBgColor,
+				(B_NO_TINT + B_DARKEN_1_TINT) / 2);
 			borderBevelLight = buttonBgColor;
 
 			bevelColorRBCorner = dark1BorderColor;
