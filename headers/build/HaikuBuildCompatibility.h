@@ -146,7 +146,7 @@ extern float	roundf(float value);
 #endif
 
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
-#	ifndef HAIKU_HOST_PLATFORM_DANO
+#	if !defined(B_NOT_SUPPORTED) && !defined(HAIKU_HOST_PLATFORM_DANO)
 #		define B_NOT_SUPPORTED			(B_ERROR)
 #	endif
 #	define B_KERNEL_READ_AREA			0
