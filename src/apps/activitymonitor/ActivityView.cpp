@@ -172,9 +172,14 @@ DataHistory::ValueAt(bigtime_t time)
 			// search in left part
 			right = index - 1;
 		} else {
-			if (index + 1 >= fBuffer.CountItems()
-				|| fBuffer.ItemAt(index + 1)->time > time) {
+			data_item* nextItem = fBuffer.ItemAt(index + 1);
+			if (nextItem == NULL)
+				return item->value;
+			if (nextItem->time > time) {
 				// found item
+				int64 value = item->value;
+				value += int64(double(nextItem->value - value)
+					/ (nextItem->time - item->time) * (time - item->time));
 				return item->value;
 			}
 
