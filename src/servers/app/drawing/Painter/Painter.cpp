@@ -157,8 +157,12 @@ Painter::SetDrawState(const DrawState* data, int32 xOffset, int32 yOffset)
 	// NOTE: The custom clipping in "data" is ignored, because it has already
 	// been taken into account elsewhere
 
-	// TODO: optimize "context switch" for speed...
-	// but for now...
+	// NOTE: Usually this function is only used when the "current view"
+	// is switched in the ServerWindow and after the decorator has drawn
+	// and messed up the state. For other graphics state changes, the
+	// Painter methods are used directly, so this function is much less
+	// speed critical than it used to be.
+
 	SetPenSize(data->PenSize());
 
 	SetFont(data);
@@ -167,19 +171,21 @@ Painter::SetDrawState(const DrawState* data, int32 xOffset, int32 yOffset)
 
 	// any of these conditions means we need to use a different drawing
 	// mode instance
-	bool updateDrawingMode = !(data->GetPattern() == fPatternHandler.GetPattern()) ||
-		data->GetDrawingMode() != fDrawingMode ||
-		(data->GetDrawingMode() == B_OP_ALPHA && (data->AlphaSrcMode() != fAlphaSrcMode ||
-												  data->AlphaFncMode() != fAlphaFncMode));
+	bool updateDrawingMode
+		= !(data->GetPattern() == fPatternHandler.GetPattern())
+			|| data->GetDrawingMode() != fDrawingMode
+			|| (data->GetDrawingMode() == B_OP_ALPHA
+				&& (data->AlphaSrcMode() != fAlphaSrcMode
+					|| data->AlphaFncMode() != fAlphaFncMode));
 
-	fDrawingMode	= data->GetDrawingMode();
-	fAlphaSrcMode	= data->AlphaSrcMode();
-	fAlphaFncMode	= data->AlphaFncMode();
+	fDrawingMode = data->GetDrawingMode();
+	fAlphaSrcMode = data->AlphaSrcMode();
+	fAlphaFncMode = data->AlphaFncMode();
 	fPatternHandler.SetPattern(data->GetPattern());
 	fPatternHandler.SetOffsets(xOffset, yOffset);
-	fLineCapMode	= data->LineCapMode();
-	fLineJoinMode	= data->LineJoinMode();
-	fMiterLimit		= data->MiterLimit();
+	fLineCapMode = data->LineCapMode();
+	fLineJoinMode = data->LineJoinMode();
+	fMiterLimit = data->MiterLimit();
 
 	// adopt the color *after* the pattern is set
 	// to set the renderers to the correct color
@@ -1180,7 +1186,7 @@ Painter::_UpdateDrawingMode(bool drawingText)
 	// has been implemented for B_OP_COPY and a couple others (the
 	// DrawingMode*Solid ones) as of now. The PixelFormat knows the
 	// PatternHandler and makes its decision based on the pattern.
-	// The last parameter to SetDrawingMode() is a flag if a special
+	// The last parameter to SetDrawingMode() is a special flag
 	// for when Painter is used to draw text. In this case, another
 	// special version of B_OP_COPY is used that acts like R5 in that
 	// anti-aliased pixel are not rendered against the actual background
