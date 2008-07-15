@@ -1253,7 +1253,7 @@ copy_bitmap_row_cmap8_copy(uint8* dst, const uint8* src, int32 numPixels,
 // copy_bitmap_row_cmap8_over
 static inline void
 copy_bitmap_row_cmap8_over(uint8* dst, const uint8* src, int32 numPixels,
-						   const rgb_color* colorMap)
+	const rgb_color* colorMap)
 {
 	uint32* d = (uint32*)dst;
 	const uint8* s = src;
@@ -1268,15 +1268,30 @@ copy_bitmap_row_cmap8_over(uint8* dst, const uint8* src, int32 numPixels,
 // copy_bitmap_row_bgr32_copy
 static inline void
 copy_bitmap_row_bgr32_copy(uint8* dst, const uint8* src, int32 numPixels,
-						   const rgb_color* colorMap)
+	const rgb_color* colorMap)
 {
 	memcpy(dst, src, numPixels * 4);
+}
+
+// copy_bitmap_row_bgr32_over
+static inline void
+copy_bitmap_row_bgr32_over(uint8* dst, const uint8* src, int32 numPixels,
+	const rgb_color* colorMap)
+{
+	uint32* d = (uint32*)dst;
+	uint32* s = (uint32*)src;
+	while (numPixels--) {
+		if (*s != B_TRANSPARENT_MAGIC_RGBA32)
+			*(uint32*)d = *(uint32*)s;
+		d++;
+		s++;
+	}
 }
 
 // copy_bitmap_row_bgr32_alpha
 static inline void
 copy_bitmap_row_bgr32_alpha(uint8* dst, const uint8* src, int32 numPixels,
-							const rgb_color* colorMap)
+	const rgb_color* colorMap)
 {
 	uint32* d = (uint32*)dst;
 	int32 bytes = numPixels * 4;
@@ -1291,7 +1306,7 @@ copy_bitmap_row_bgr32_alpha(uint8* dst, const uint8* src, int32 numPixels,
 			b[1] = ((src[1] - b[1]) * src[3] + (b[1] << 8)) >> 8;
 			b[2] = ((src[2] - b[2]) * src[3] + (b[2] << 8)) >> 8;
 		}
-		d ++;
+		d++;
 		b += 4;
 		src += 4;
 	}
@@ -1326,8 +1341,7 @@ Painter::_TransparentMagicToAlpha(sourcePixel* buffer, uint32 width,
 // _DrawBitmap
 void
 Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
-					 BRect actualBitmapRect, BRect bitmapRect,
-					 BRect viewRect) const
+	BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
 {
 	if (!fValidClipping
 		|| !bitmapRect.IsValid() || !bitmapRect.Intersects(actualBitmapRect)
@@ -1390,21 +1404,29 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 			if (xScale == 1.0 && yScale == 1.0) {
 				if (fDrawingMode == B_OP_COPY) {
 					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4,
-										 srcBuffer, xOffset, yOffset, viewRect);
+						srcBuffer, xOffset, yOffset, viewRect);
+					return;
+				} else if (fDrawingMode == B_OP_OVER) {
+					if (format == B_RGB32)
+						_DrawBitmapNoScale32(copy_bitmap_row_bgr32_over, 4,
+							srcBuffer, xOffset, yOffset, viewRect);
+					else
+						_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4,
+							srcBuffer, xOffset, yOffset, viewRect);
 					return;
 				} else if (fDrawingMode == B_OP_ALPHA
 						 && fAlphaSrcMode == B_PIXEL_ALPHA
 						 && fAlphaFncMode == B_ALPHA_OVERLAY) {
 					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4,
-										 srcBuffer, xOffset, yOffset, viewRect);
+						srcBuffer, xOffset, yOffset, viewRect);
 					return;
 				}
 			}
 
 			if (format == B_RGBA32 || fDrawingMode == B_OP_COPY) {
 				_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset,
-									 xScale, yScale, viewRect);
-				break;
+					xScale, yScale, viewRect);
+				return;
 			}
 			// otherwise fall through to get proper transparency handling for
 			// B_RGB32 where a B_TRANSPARENT_MAGIC might be set on pixels
@@ -1413,11 +1435,11 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 			if (format == B_CMAP8 && xScale == 1.0 && yScale == 1.0) {
 				if (fDrawingMode == B_OP_COPY) {
 					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_copy, 1,
-										 srcBuffer, xOffset, yOffset, viewRect);
+						srcBuffer, xOffset, yOffset, viewRect);
 					return;
 				} else if (fDrawingMode == B_OP_OVER) {
 					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_over, 1,
-										 srcBuffer, xOffset, yOffset, viewRect);
+						srcBuffer, xOffset, yOffset, viewRect);
 					return;
 				}
 			}
@@ -1430,9 +1452,8 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 			// maybe we can use an optimized version
 			BBitmap temp(actualBitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 			status_t err = temp.ImportBits(srcBuffer.buf(),
-										   srcBuffer.height() * srcBuffer.stride(),
-										   srcBuffer.stride(),
-										   0, format);
+				srcBuffer.height() * srcBuffer.stride(),
+				srcBuffer.stride(), 0, format);
 
 			if (err >= B_OK) {
 				// the original bitmap might have had some of the
@@ -1464,11 +1485,11 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 
 				agg::rendering_buffer convertedBuffer;
 				convertedBuffer.attach((uint8*)temp.Bits(),
-									   (uint32)actualBitmapRect.IntegerWidth() + 1,
-									   (uint32)actualBitmapRect.IntegerHeight() + 1,
-									   temp.BytesPerRow());
+					(uint32)actualBitmapRect.IntegerWidth() + 1,
+					(uint32)actualBitmapRect.IntegerHeight() + 1,
+					temp.BytesPerRow());
 				_DrawBitmapGeneric32(convertedBuffer, xOffset, yOffset,
-									 xScale, yScale, viewRect);
+					xScale, yScale, viewRect);
 			} else {
 				fprintf(stderr, "Painter::_DrawBitmap() - "
 						"colorspace conversion failed: %s\n", strerror(err));
