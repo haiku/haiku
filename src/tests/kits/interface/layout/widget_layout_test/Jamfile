@@ -27,6 +27,7 @@ SimpleTest WidgetLayoutTest :
 	MenuBarTest.cpp
 	MenuFieldTest.cpp
 	MenuTest.cpp
+	SliderTest.cpp
 	:
 	be
 ;
