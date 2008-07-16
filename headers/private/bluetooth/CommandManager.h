@@ -22,6 +22,8 @@ void* buildInquiry(uint32 lap, uint8 length, uint8 num_rsp, size_t* outsize);
 void* buildInquiryCancel(size_t* outsize);
 void* buildPinCodeRequestReply(bdaddr_t bdaddr, uint8 length, char pincode[16], size_t* outsize);
 void* buildPinCodeRequestNegativeReply(bdaddr_t bdaddr, size_t* outsize);
+void* buildAcceptConnectionRequest(bdaddr_t bdaddr, uint8 role, size_t* outsize);
+void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize);
 
 /* OGF_INFORMATIONAL_PARAM */
 void* buildReadBufferSize(size_t* outsize);

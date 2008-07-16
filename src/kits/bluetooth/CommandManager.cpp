@@ -99,6 +99,7 @@ void* buildAuthEnable(uint8 auth, size_t* outsize)
 #pragma mark - LINK CONTROL -
 #endif
 
+
 void* buildCreateConnection(bdaddr_t bdaddr)
 {
 	/*
@@ -157,6 +158,7 @@ void* buildInquiry(uint32 lap, uint8 length, uint8 num_rsp, size_t* outsize)
     return command;
 }
 
+
 void* buildInquiryCancel(size_t* outsize)
 {
 
@@ -202,6 +204,37 @@ void* buildPinCodeRequestNegativeReply(bdaddr_t bdaddr, size_t* outsize)
     }
 
     return command;
+}
+
+
+void* buildAcceptConnectionRequest(bdaddr_t bdaddr, uint8 role, size_t* outsize)
+{
+	struct hci_cp_accept_conn_req* param;
+
+	void* command = buildCommand(OGF_LINK_CONTROL, OCF_ACCEPT_CONN_REQ,
+					(void**) &param, sizeof(struct hci_cp_accept_conn_req), outsize);
+
+	if (command != NULL) {
+		param->bdaddr = bdaddr;
+		param->role = role;
+	}
+
+	return command;
+}
+
+
+void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize)
+{
+	struct hci_cp_reject_conn_req* param;
+
+	void *command = buildCommand(OGF_LINK_CONTROL, OCF_REJECT_CONN_REQ,
+					(void**) &param, sizeof(struct hci_cp_reject_conn_req), outsize);
+
+	if (command != NULL) {
+		param->bdaddr = bdaddr;
+	}
+
+	return command;
 }
 
 
