@@ -12,6 +12,7 @@
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <fs_cache.h>
 #include <fs_volume.h>

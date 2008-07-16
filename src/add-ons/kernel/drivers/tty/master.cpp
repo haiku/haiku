@@ -7,6 +7,7 @@
 #include "tty_private.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <util/AutoLock.h>
 
 
