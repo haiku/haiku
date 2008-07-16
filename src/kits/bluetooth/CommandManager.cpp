@@ -1,5 +1,6 @@
 /*
  * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * Copyright 2008 Mika Lindqvist
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -25,22 +26,22 @@ inline void* buildCommand(uint8 ogf, uint8 ocf, void** param, size_t psize, size
 #else
 	size_t* size = (size_t*)malloc(psize + sizeof(struct hci_command_header) + sizeof(size_t));
 	*outsize = psize + sizeof(struct hci_command_header) + sizeof(size_t);
-	    
+
     *size = psize + sizeof(struct hci_command_header);
     header = (struct hci_command_header*) (((uint8*)size)+4);
 #endif
 
-    
+
     if (header != NULL) {
-        
+
         header->opcode = B_HOST_TO_LENDIAN_INT16(PACK_OPCODE(ogf, ocf));
         header->clen = psize;
-        
+
         if (param != NULL && psize != 0) {
             *param = ((uint8*)header) + sizeof(struct hci_command_header);
         }
     }
-#ifdef BT_IOCTLS_PASS_SIZE        
+#ifdef BT_IOCTLS_PASS_SIZE
     return header;
 #else
     return (void*)size;
@@ -69,8 +70,8 @@ void* buildWriteScan(uint8 scanmode, size_t* outsize)
 {
     struct hci_write_scan_enable* param;
 	void* command = buildCommand(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE, (void**) &param, sizeof(struct hci_write_scan_enable), outsize);
-     
-     
+
+
     if (command != NULL) {
         param->scan = scanmode;
     }
@@ -84,8 +85,8 @@ void* buildAuthEnable(uint8 auth, size_t* outsize)
 {
     struct hci_write_authentication_enable* param;
 	void* command = buildCommand(OGF_CONTROL_BASEBAND, OCF_WRITE_AUTH_ENABLE, (void**) &param, sizeof(struct hci_write_authentication_enable), outsize);
-     
-     
+
+
     if (command != NULL) {
         param->authentication = auth;
     }
@@ -126,10 +127,10 @@ void* buildCreateConnection(bdaddr_t bdaddr)
 
 void* buildRemoteNameRequest(bdaddr_t bdaddr,uint8 pscan_rep_mode, uint16 clock_offset, size_t* outsize)
 {
-    
+
     struct hci_remote_name_request* param;
     void* command = buildCommand(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST, (void**) &param, sizeof(struct hci_remote_name_request), outsize);
-    
+
     if (command != NULL) {
         param->bdaddr = bdaddr;
         param->pscan_rep_mode = pscan_rep_mode;
@@ -246,13 +247,13 @@ void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize)
 void* buildReadBufferSize(size_t* outsize)
 {
     return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE, NULL, 0, outsize);
-}    
+}
 
 
 void* buildReadBdAddr(size_t* outsize)
 {
 	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR, NULL, 0, outsize);
-}    
+}
 
 
 
