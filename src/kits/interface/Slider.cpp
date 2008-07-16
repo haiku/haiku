@@ -687,9 +687,18 @@ BSlider::SetValue(int32 value)
 int32
 BSlider::ValueForPoint(BPoint location) const
 {
-	float position = fOrientation == B_HORIZONTAL ? location.x : location.y;
-	float min = _MinPosition();
-	float max = _MaxPosition();
+	float min;
+	float max;
+	float position;
+	if (fOrientation == B_HORIZONTAL) {
+		min = _MinPosition();
+		max = _MaxPosition();
+		position = location.x;
+	} else {
+		max = _MinPosition();
+		min = _MaxPosition();
+		position = min + (max - location.y);
+	}
 
 	if (position < min)
 		position = min;
