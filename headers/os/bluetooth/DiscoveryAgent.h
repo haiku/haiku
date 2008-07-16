@@ -31,38 +31,39 @@ class RemoteDevice;
 class DiscoveryAgent {
 
     public:
-                
+
         static const int GIAC = BT_GIAC;
         static const int LIAC = BT_LIAC;
-        
+
         static const int PREKNOWN = BT_PREKNOWN;
         static const int CACHED = BT_CACHED;
         static const int NOT_DISCOVERABLE = BT_NOT_DISCOVERABLE;
-        
+
         RemoteDevicesList RetrieveDevices(int option); /* TODO */
         status_t StartInquiry(int accessCode, DiscoveryListener* listener); /* Throwing */
         status_t StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs);
         status_t CancelInquiry(DiscoveryListener* listener);
-        
+
         /*
         int searchServices(int[] attrSet,
                                UUID[] uuidSet,
                                RemoteDevice btDev,
                                DiscoveryListener discListener);
-                               
-        bool cancelServiceSearch(int transID);                               
+
+        bool cancelServiceSearch(int transID);
         BString selectService(UUID uuid, int security, boolean master);
         */
-        
+
     private:
-        DiscoveryAgent(LocalDevice* ld);
-        void SetLocalDeviceOwner(LocalDevice* ld);
+		DiscoveryAgent(LocalDevice* ld);
+		~DiscoveryAgent();
+		void SetLocalDeviceOwner(LocalDevice* ld);
 
-        DiscoveryListener* fLastUsedListener;
-        LocalDevice*       fLocalDevice;
-        
-        friend class LocalDevice;
+		DiscoveryListener* fLastUsedListener;
+		LocalDevice*       fLocalDevice;
+		BMessenger*        fMessenger;
 
+		friend class LocalDevice;
 };
 
 }

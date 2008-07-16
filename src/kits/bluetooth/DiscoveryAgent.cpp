@@ -43,10 +43,9 @@ DiscoveryAgent::StartInquiry(int accessCode, DiscoveryListener* listener)
 status_t
 DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs)
 {
-    BMessenger* btsm = NULL;
     size_t size;
 
-    if ((btsm = _RetrieveBluetoothMessenger()) == NULL)
+    if (fMessenger == NULL)
     	return B_ERROR;
 
 	if (secs < 1 || secs > 61 )
@@ -81,7 +80,7 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
     request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_COMPLETE);
 
 
-    if (btsm->SendMessage(&request, listener) == B_OK)
+    if (fMessenger->SendMessage(&request, listener) == B_OK)
     {
     	return B_OK;
     }
@@ -94,10 +93,9 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
 status_t
 DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
 {
-    BMessenger* btsm = NULL; //TODO: this should be a member field
     size_t size;
 
-    if ((btsm = _RetrieveBluetoothMessenger()) == NULL)
+    if (fMessenger == NULL)
     	return B_ERROR;
 
     void* cancelInquiryCommand = NULL;
@@ -114,11 +112,11 @@ DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
     request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
     request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL));
 
-    if (btsm->SendMessage(&request, &reply) == B_OK) {
+    if (fMessenger->SendMessage(&request, &reply) == B_OK) {
         if (reply.FindInt8("status", &bt_status ) == B_OK ) {
-		return bt_status;				
-	}
-    }    
+			return bt_status;
+		}
+    }
 
     return B_ERROR;
 }
@@ -131,7 +129,15 @@ DiscoveryAgent::SetLocalDeviceOwner(LocalDevice* ld)
 
 DiscoveryAgent::DiscoveryAgent(LocalDevice* ld)
 {
-    fLocalDevice = ld;
+	fLocalDevice = ld;
+	fMessenger = _RetrieveBluetoothMessenger();
+}
+
+
+DiscoveryAgent::~DiscoveryAgent()
+{
+	if (fMessenger)
+		delete fMessenger;
 }
 
 
