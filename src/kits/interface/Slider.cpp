@@ -1242,31 +1242,30 @@ BSlider::ThumbFrame() const
 
 	if (fStyle == B_BLOCK_THUMB) {
 		if (Orientation() == B_HORIZONTAL) {
-			frame.left = (float)floor(Position() * (_MaxPosition() - _MinPosition()) +
-				_MinPosition()) - 8.0;
-			frame.top = 2.0 + (Label() ? textHeight + 4.0 : 0.0);
-			frame.right = frame.left + 17.0;
-			frame.bottom = frame.top + fBarThickness + 7.0;
+			frame.left = floorf(Position() * (_MaxPosition()
+				- _MinPosition()) + _MinPosition()) - 8;
+			frame.top = 2 + (Label() ? textHeight + 4 : 0);
+			frame.right = frame.left + 17;
+			frame.bottom = frame.top + fBarThickness + 7;
 		} else {
-			frame.left = floor((frame.Width() - fBarThickness) / 2.0) - 4;
-			frame.top = (float)floor(Position() * (_MaxPosition() - _MinPosition()) +
-				_MinPosition()) - 8.0;
-			frame.right = frame.left + fBarThickness + 7.0;
-			frame.bottom = frame.top + 17.0;
+			frame.left = floor((frame.Width() - fBarThickness) / 2) - 4;
+			frame.top = floorf(Position() * (_MaxPosition()
+				- _MinPosition()) + _MinPosition()) - 8;
+			frame.right = frame.left + fBarThickness + 7;
+			frame.bottom = frame.top + 17;
 		}
 	} else {
 		if (Orientation() == B_HORIZONTAL) {
-			frame.left = (float)floor(Position() * (_MaxPosition() - _MinPosition()) +
-				_MinPosition()) - 6;
-			frame.right = frame.left + 12.0f;
-			frame.bottom = frame.bottom - 2.0f -
-				(MinLimitLabel() || MaxLimitLabel() ? textHeight + 4.0f : 0.0f);
-			frame.top = frame.bottom - 8.0f;
+			frame.left = floorf(Position() * (_MaxPosition()
+				- _MinPosition()) + _MinPosition()) - 6;
+			frame.right = frame.left + 12;
+			frame.top = 3 + fBarThickness + (Label() ? textHeight + 4 : 0);
+			frame.bottom = frame.top + 8;
 		} else {
-			frame.left = floor((frame.Width() - fBarThickness) / 2.0f) - 3;
-			frame.top = (float)floor(Position() * (_MaxPosition() - _MinPosition())) +
-				_MinPosition() - 6.0f;
-			frame.right = frame.left + 7;
+			frame.left = floorf((frame.Width() + fBarThickness) / 2) - 3;
+			frame.top = floorf(Position() * (_MaxPosition()
+				- _MinPosition())) + _MinPosition() - 6;
+			frame.right = frame.left + 8;
 			frame.bottom = frame.top + 12;
 		}
 	}
@@ -1310,35 +1309,32 @@ BSlider::ResizeToPreferred()
 
 
 status_t
-BSlider::Invoke(BMessage *msg)
+BSlider::Invoke(BMessage* message)
 {
-	return BControl::Invoke(msg);
+	return BControl::Invoke(message);
 }
 
 
 BHandler*
-BSlider::ResolveSpecifier(BMessage *message, int32 index,
-						  BMessage *specifier, int32 command,
-						  const char *property)
+BSlider::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
+	int32 command, const char *property)
 {
-	return BControl::ResolveSpecifier(message, index, specifier,
-									  command, property);
+	return BControl::ResolveSpecifier(message, index, specifier, command,
+		property);
 }
 
 
 status_t
-BSlider::GetSupportedSuites(BMessage *message)
+BSlider::GetSupportedSuites(BMessage* message)
 {
 	return BControl::GetSupportedSuites(message);
 }
 
 
 void
-BSlider::SetModificationMessage(BMessage *message)
+BSlider::SetModificationMessage(BMessage* message)
 {
-	if (fModificationMessage)
-		delete fModificationMessage;
-
+	delete fModificationMessage;
 	fModificationMessage = message;
 }
 
@@ -1370,9 +1366,9 @@ BSlider::SnoozeAmount() const
 
 
 void
-BSlider::SetKeyIncrementValue(int32 increment_value)
+BSlider::SetKeyIncrementValue(int32 incrementValue)
 {
-	fKeyIncrementValue = increment_value;
+	fKeyIncrementValue = incrementValue;
 }
 
 
@@ -1384,9 +1380,9 @@ BSlider::KeyIncrementValue() const
 
 
 void
-BSlider::SetHashMarkCount(int32 hash_mark_count)
+BSlider::SetHashMarkCount(int32 hashMarkCount)
 {
-	fHashMarkCount = hash_mark_count;
+	fHashMarkCount = hashMarkCount;
 	Invalidate();
 }
 
@@ -1431,10 +1427,10 @@ BSlider::Style() const
 
 
 void
-BSlider::SetBarColor(rgb_color bar_color)
+BSlider::SetBarColor(rgb_color barColor)
 {
-	fBarColor = bar_color;
-	Invalidate();
+	fBarColor = barColor;
+	Invalidate(BarFrame());
 }
 
 
@@ -1446,22 +1442,22 @@ BSlider::BarColor() const
 
 
 void
-BSlider::UseFillColor(bool use_fill, const rgb_color *bar_color)
+BSlider::UseFillColor(bool useFill, const rgb_color* barColor)
 {
-	fUseFillColor = use_fill;
+	fUseFillColor = useFill;
 
-	if (use_fill && bar_color)
-		fFillColor = *bar_color;
+	if (useFill && barColor)
+		fFillColor = *barColor;
 
-	Invalidate();
+	Invalidate(BarFrame());
 }
 
 
 bool
-BSlider::FillColor(rgb_color *bar_color) const
+BSlider::FillColor(rgb_color* barColor) const
 {
-	if (bar_color && fUseFillColor)
-		*bar_color = fFillColor;
+	if (barColor && fUseFillColor)
+		*barColor = fFillColor;
 
 	return fUseFillColor;
 }
@@ -1507,7 +1503,20 @@ BSlider::SetBarThickness(float thickness)
 	if (thickness < 1.0)
 		thickness = 1.0;
 	if (thickness != fBarThickness) {
+		// calculate invalid barframe and extend by hashmark size
+		float hInset = 0.0;
+		float vInset = 0.0;
+		if (fOrientation == B_HORIZONTAL)
+			vInset = -6.0;
+		else
+			hInset = -6.0;
+		BRect invalid = BarFrame().InsetByCopy(hInset, vInset) | ThumbFrame();
+
 		fBarThickness = thickness;
+
+		invalid = invalid | BarFrame().InsetByCopy(hInset, vInset)
+			| ThumbFrame();
+		Invalidate(invalid);
 		InvalidateLayout();
 	}
 }
@@ -1760,62 +1769,78 @@ BSlider::_DrawTriangleThumb()
 	} else {
 		lightenmax	= tint_color(no_tint, B_LIGHTEN_2_TINT);
 		lighten1	= tint_color(no_tint, B_LIGHTEN_1_TINT);
-		darken2		= tint_color(no_tint, (B_NO_TINT + B_DARKEN_1_TINT) / 2.0);
+		darken2		= tint_color(no_tint, (B_NO_TINT + B_DARKEN_1_TINT) / 2);
 		darken3		= tint_color(no_tint, B_DARKEN_1_TINT);
 		darkenmax	= tint_color(no_tint, B_DARKEN_3_TINT);
 	}
 
-	view->SetDrawingMode(B_OP_OVER);
-
 	if (Orientation() == B_HORIZONTAL) {
 		view->SetHighColor(lighten1);
-		view->FillTriangle(BPoint(frame.left + 1.0, frame.bottom - 2.0),
-						   BPoint(frame.left + 6.0, frame.top + 1.0),
-						   BPoint(frame.right - 1.0, frame.bottom - 2.0));
+		view->FillTriangle(
+			BPoint(frame.left + 1, frame.bottom - 3),
+			BPoint((frame.left + frame.right) / 2, frame.top + 1),
+			BPoint(frame.right - 1, frame.bottom - 3));
 
 		view->SetHighColor(no_tint);
-		view->StrokeLine(BPoint(frame.right - 2.0, frame.bottom - 2.0),
-						 BPoint(frame.left + 3.0, frame.bottom - 2.0));
+		view->StrokeLine(BPoint(frame.right - 2, frame.bottom - 3),
+			BPoint(frame.left + 3, frame.bottom - 3));
 
 		view->SetHighColor(darkenmax);
-		view->StrokeLine(BPoint(frame.left, frame.bottom),
-						 BPoint(frame.right, frame.bottom));
-		view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0),
-						 BPoint(frame.left + 6.0, frame.top + 1.0));
+		view->StrokeLine(BPoint(frame.left, frame.bottom - 1),
+			BPoint(frame.right, frame.bottom - 1));
+		view->StrokeLine(BPoint(frame.right, frame.bottom - 2),
+			BPoint((frame.left + frame.right) / 2, frame.top));
 
 		view->SetHighColor(darken2);
-		view->StrokeLine(BPoint(frame.right - 1.0, frame.bottom - 1.0),
-						 BPoint(frame.left + 1.0, frame.bottom - 1.0));
+		view->StrokeLine(BPoint(frame.right - 1, frame.bottom - 2),
+			BPoint(frame.left + 1, frame.bottom - 2));
 		view->SetHighColor(darken3);
-		view->StrokeLine(BPoint(frame.left, frame.bottom - 1.0),
-						 BPoint(frame.left + 5.0, frame.top + 2.0));
+		view->StrokeLine(BPoint(frame.left, frame.bottom - 2),
+			BPoint((frame.left + frame.right) / 2 - 1, frame.top + 1));
 
 		view->SetHighColor(lightenmax);
-		view->StrokeLine(BPoint(frame.left + 2.0, frame.bottom - 2.0),
-						 BPoint(frame.left + 6.0, frame.top + 2.0));
+		view->StrokeLine(BPoint(frame.left + 2, frame.bottom - 3),
+			BPoint((frame.left + frame.right) / 2, frame.top + 1));
+
+		// Shadow
+		view->SetHighColor(0, 0, 0, IsEnabled() ? 80 : 40);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->StrokeLine(BPoint(frame.left + 1, frame.bottom),
+			BPoint(frame.right, frame.bottom));
 	} else {
 		view->SetHighColor(lighten1);
-		view->FillTriangle(BPoint(frame.left + 1.0f, frame.top),
-			BPoint(frame.left + 7.0f, frame.top + 6.0f),
-			BPoint(frame.left + 1.0f, frame.bottom));
+		view->FillTriangle(
+			BPoint(frame.left, (frame.top + frame.bottom) / 2),
+			BPoint(frame.right - 1, frame.top + 1),
+			BPoint(frame.right - 1, frame.bottom - 1));
 
 		view->SetHighColor(darkenmax);
-		view->StrokeLine(BPoint(frame.left, frame.top + 1),
-			BPoint(frame.left, frame.bottom));
-		view->StrokeLine(BPoint(frame.left + 1.0f, frame.bottom),
-			BPoint(frame.left + 7.0f, frame.top + 6.0f));
+		view->StrokeLine(BPoint(frame.right - 1, frame.top),
+			BPoint(frame.right - 1, frame.bottom));
+		view->StrokeLine(BPoint(frame.right - 1, frame.bottom),
+			BPoint(frame.right - 2, frame.bottom));
 
 		view->SetHighColor(darken2);
-		view->StrokeLine(BPoint(frame.left, frame.top),
-			BPoint(frame.left, frame.bottom - 1));
-		view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
-			BPoint(frame.left + 6.0f, frame.top + 5.0f));
+		view->StrokeLine(BPoint(frame.right - 2, frame.top + 2),
+			BPoint(frame.right - 2, frame.bottom - 1));
+		view->StrokeLine(
+			BPoint(frame.left, (frame.top + frame.bottom) / 2),
+			BPoint(frame.right - 2, frame.top));
+		view->SetHighColor(darken3);
+		view->StrokeLine(
+			BPoint(frame.left + 1, (frame.top + frame.bottom) / 2 + 1),
+			BPoint(frame.right - 3, frame.bottom - 1));
 
-		view->SetHighColor(no_tint);
-		view->StrokeLine(BPoint(frame.left + 1.0f, frame.top + 2.0f),
-			BPoint(frame.left + 1.0f, frame.bottom - 1.0f));
-		view->StrokeLine(BPoint(frame.left + 2.0f, frame.bottom - 2.0f),
-			BPoint(frame.left + 6.0f, frame.top + 6.0f));
+		view->SetHighColor(lightenmax);
+		view->StrokeLine(
+			BPoint(frame.left + 1, (frame.top + frame.bottom) / 2),
+			BPoint(frame.right - 2, frame.top + 1));
+
+		// Shadow
+		view->SetHighColor(0, 0, 0, IsEnabled() ? 80 : 40);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->StrokeLine(BPoint(frame.right, frame.top + 1),
+			BPoint(frame.right, frame.bottom));
 	}
 
 	view->SetDrawingMode(B_OP_COPY);
