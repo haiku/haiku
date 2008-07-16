@@ -1573,6 +1573,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 	vm_page *page = NULL;
 	bool isStack = (protection & B_STACK_AREA) != 0;
 	bool canOvercommit = false;
+	addr_t physicalBase = 0;
 
 	TRACE(("create_anonymous_area %s: size 0x%lx\n", name, size));
 
@@ -1596,6 +1597,10 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 		case B_BASE_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
+			break;
+		case B_PHYSICAL_BASE_ADDRESS:
+			physicalBase = (addr_t)*address;
+			addressSpec = B_ANY_KERNEL_ADDRESS;
 			break;
 
 		default:
@@ -1629,7 +1634,8 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 	if (wiring == B_CONTIGUOUS) {
 		// we try to allocate the page run here upfront as this may easily
 		// fail for obvious reasons
-		page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, size / B_PAGE_SIZE);
+		page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, physicalBase,
+			size / B_PAGE_SIZE);
 		if (page == NULL)
 			return B_NO_MEMORY;
 	}

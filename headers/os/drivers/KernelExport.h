@@ -86,6 +86,7 @@ typedef struct {
 
 /* address specifications for mapping physical memory */
 #define	B_ANY_KERNEL_BLOCK_ADDRESS	(B_ANY_KERNEL_ADDRESS + 1)
+#define	B_PHYSICAL_BASE_ADDRESS		(B_ANY_KERNEL_ADDRESS + 2)
 
 /* area protection flags for the kernel */
 #define B_KERNEL_READ_AREA			16

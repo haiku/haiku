@@ -1761,14 +1761,15 @@ vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages)
 
 
 vm_page *
-vm_page_allocate_page_run(int pageState, addr_t length)
+vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 {
 	vm_page *firstPage = NULL;
-	uint32 start = 0;
+	uint32 start = base >> PAGE_SHIFT;
 
 	InterruptsSpinLocker locker(sPageLock);
 
-	if (sFreePageQueue.count + sClearPageQueue.count - sReservedPages < length) {
+	if (sFreePageQueue.count + sClearPageQueue.count - sReservedPages
+			< length) {
 		// TODO: add more tries, ie. free some inactive, ...
 		// no free space
 		return NULL;
