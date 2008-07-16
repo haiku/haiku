@@ -1,5 +1,5 @@
-/* 
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -236,11 +236,6 @@ struct vm_address_space {
 	int32				ref_count;
 	int32				fault_count;
 	int32				state;
-	addr_t				scan_va;
-	addr_t				working_set_size;
-	addr_t				max_working_set;
-	addr_t				min_working_set;
-	bigtime_t			last_working_set_adjust;
 	struct vm_address_space *hash_next;
 };
 

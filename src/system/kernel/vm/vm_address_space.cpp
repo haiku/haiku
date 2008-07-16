@@ -43,7 +43,6 @@ _dump_aspace(vm_address_space *aspace)
 	dprintf("id: 0x%lx\n", aspace->id);
 	dprintf("ref_count: %ld\n", aspace->ref_count);
 	dprintf("fault_count: %ld\n", aspace->fault_count);
-	dprintf("working_set_size: 0x%lx\n", aspace->working_set_size);
 	dprintf("translation_map: %p\n", &aspace->translation_map);
 	dprintf("base: 0x%lx\n", aspace->base);
 	dprintf("size: 0x%lx\n", aspace->size);
@@ -301,12 +300,6 @@ vm_create_address_space(team_id id, addr_t base, addr_t size,
 	addressSpace->ref_count = 1;
 	addressSpace->state = VM_ASPACE_STATE_NORMAL;
 	addressSpace->fault_count = 0;
-	addressSpace->scan_va = base;
-	addressSpace->working_set_size = kernel
-		? DEFAULT_KERNEL_WORKING_SET : DEFAULT_WORKING_SET;
-	addressSpace->max_working_set = DEFAULT_MAX_WORKING_SET;
-	addressSpace->min_working_set = DEFAULT_MIN_WORKING_SET;
-	addressSpace->last_working_set_adjust = system_time();
 
 	// initialize the corresponding translation map
 	status = arch_vm_translation_map_init_map(&addressSpace->translation_map,
