@@ -23,32 +23,30 @@
 #include <Slider.h>
 
 
-BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *message, 
-				 int32 minValue, int32 maxValue, thumb_style thumbType, 
-				 uint32 resizingMode, uint32 flags)
-	: BControl(frame, name, label, message, resizingMode, flags)
+BSlider::BSlider(BRect frame, const char* name, const char* label,
+			BMessage* message, int32 minValue, int32 maxValue,
+			thumb_style thumbType, uint32 resizingMode, uint32 flags)
+	: BControl(frame, name, label, message, resizingMode, flags),
+	fModificationMessage(NULL),
+	fSnoozeAmount(20000),
+
+	fMinLimitLabel(NULL),
+	fMaxLimitLabel(NULL),
+
+	fMinValue(minValue),
+	fMaxValue(maxValue),
+	fKeyIncrementValue(1),
+
+	fHashMarkCount(0),
+	fHashMarks(B_HASH_MARKS_NONE),
+
+	fStyle(thumbType),
+
+	fOrientation(B_HORIZONTAL),
+	fBarThickness(6.0)
 {
-	fModificationMessage = NULL;
-	fSnoozeAmount = 20000;
-	fOrientation = B_HORIZONTAL;
-	fBarThickness = 6.0f;
-	fMinLimitLabel = NULL;
-	fMaxLimitLabel = NULL;
-	fMinValue = minValue;
-	fMaxValue = maxValue;
-
-	fKeyIncrementValue = 1;
-	fHashMarkCount = 0;
-	fHashMarks = B_HASH_MARKS_NONE;
-	fStyle = thumbType;
-
-	if (Style() == B_BLOCK_THUMB) {
-		SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DARKEN_4_TINT));
-	} else {
-		SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DARKEN_4_TINT));
-	}
+	SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_4_TINT));
 
 	UseFillColor(false, NULL);
 
@@ -57,31 +55,63 @@ BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *mes
 }
 
 
-BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *message, 
-				 int32 minValue, int32 maxValue, orientation posture,
-				 thumb_style thumbType, uint32 resizingMode, uint32 flags)
-	: BControl(frame, name, label, message, resizingMode, flags)
+BSlider::BSlider(BRect frame, const char *name, const char *label,
+			BMessage *message, int32 minValue, int32 maxValue,
+			orientation posture, thumb_style thumbType, uint32 resizingMode,
+			uint32 flags)
+	: BControl(frame, name, label, message, resizingMode, flags),
+	fModificationMessage(NULL),
+	fSnoozeAmount(20000),
+
+	fMinLimitLabel(NULL),
+	fMaxLimitLabel(NULL),
+
+	fMinValue(minValue),
+	fMaxValue(maxValue),
+	fKeyIncrementValue(1),
+
+	fHashMarkCount(0),
+	fHashMarks(B_HASH_MARKS_NONE),
+
+	fStyle(thumbType),
+
+	fOrientation(posture),
+	fBarThickness(6.0)
 {
-	fModificationMessage = NULL;
-	fSnoozeAmount = 20000;
-	fOrientation = posture;
-	fBarThickness = 6.0f;
-	fMinLimitLabel = NULL;
-	fMaxLimitLabel = NULL;
-	fMinValue = minValue;
-	fMaxValue = maxValue;
+	SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_4_TINT));
 
-	fKeyIncrementValue = 1;
-	fHashMarkCount = 0;
-	fHashMarks = B_HASH_MARKS_NONE;
-	fStyle = thumbType;
+	UseFillColor(false, NULL);
 
-	if (Style() == B_BLOCK_THUMB)
-		SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DARKEN_4_TINT));
-	else
-		SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DARKEN_4_TINT));
+	_InitObject();
+	SetValue(0);
+}
+
+
+BSlider::BSlider(const char *name, const char *label, BMessage *message, 
+			int32 minValue, int32 maxValue, orientation posture,
+			thumb_style thumbType, uint32 flags)
+	: BControl(name, label, message, flags),
+	fModificationMessage(NULL),
+	fSnoozeAmount(20000),
+
+	fMinLimitLabel(NULL),
+	fMaxLimitLabel(NULL),
+
+	fMinValue(minValue),
+	fMaxValue(maxValue),
+	fKeyIncrementValue(1),
+
+	fHashMarkCount(0),
+	fHashMarks(B_HASH_MARKS_NONE),
+
+	fStyle(thumbType),
+
+	fOrientation(posture),
+	fBarThickness(6.0)
+{
+	SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_4_TINT));
 
 	UseFillColor(false, NULL);
 
@@ -96,7 +126,7 @@ BSlider::BSlider(BMessage *archive)
 	fModificationMessage = NULL;
 
 	if (archive->HasMessage("_mod_msg")) {
-		BMessage *message = new BMessage;
+		BMessage* message = new BMessage;
 
 		archive->FindMessage("_mod_msg", message);
 		
@@ -107,14 +137,12 @@ BSlider::BSlider(BMessage *archive)
 		SetSnoozeAmount(20000);
 
 	rgb_color color;
-	
-	if (archive->FindInt32("_fcolor", (int32 *)&color) == B_OK) {
+	if (archive->FindInt32("_fcolor", (int32 *)&color) == B_OK)
 		UseFillColor(true, &color);
-	} else
+	else
 		UseFillColor(false);
 
 	int32 orient;
-
 	if (archive->FindInt32("_orient", &orient) == B_OK)
 		fOrientation = (orientation)orient;
 	else
@@ -123,7 +151,8 @@ BSlider::BSlider(BMessage *archive)
 	fMinLimitLabel = NULL;
 	fMaxLimitLabel = NULL;
 
-	const char *minlbl = NULL, *maxlbl = NULL;
+	const char* minlbl = NULL;
+	const char* maxlbl = NULL;
 
 	archive->FindString("_minlbl", &minlbl);
 	archive->FindString("_maxlbl", &maxlbl);
@@ -143,32 +172,22 @@ BSlider::BSlider(BMessage *archive)
 		fHashMarkCount = 11;
 
 	int16 hashloc;
-
 	if (archive->FindInt16("_hashloc", &hashloc) == B_OK)
 		fHashMarks = (hash_mark_location)hashloc;
 	else
 		fHashMarks = B_HASH_MARKS_NONE;
 
 	int16 sstyle;
-
 	if (archive->FindInt16("_sstyle", &sstyle) == B_OK)
 		fStyle = (thumb_style)sstyle;
 	else
 		fStyle = B_BLOCK_THUMB;
 
-	if (archive->FindInt32("_bcolor", (int32 *)&color) == B_OK)
-		SetBarColor(color);
-	else {
-		if (Style() == B_BLOCK_THUMB)
-			SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-				B_DARKEN_4_TINT));
-		else
-			SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-				B_DARKEN_4_TINT));
-	}
+	if (archive->FindInt32("_bcolor", (int32 *)&color) != B_OK)
+		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT);
+	SetBarColor(color);
 
 	float bthickness;
-
 	if (archive->FindFloat("_bthickness", &bthickness) == B_OK)
 		fBarThickness = bthickness;
 	else
@@ -181,8 +200,7 @@ BSlider::BSlider(BMessage *archive)
 BSlider::~BSlider()
 {
 #if USE_OFF_SCREEN_VIEW
-	if (fOffScreenBits)
-		delete fOffScreenBits;
+	delete fOffScreenBits;
 #endif
 
 	delete fModificationMessage;
@@ -558,18 +576,13 @@ BSlider::SetLabel(const char *label)
 void
 BSlider::SetLimitLabels(const char *minLabel, const char *maxLabel)
 {
-	if (minLabel) {
-		free(fMinLimitLabel);
-		fMinLimitLabel = strdup(minLabel);
-	}
+	free(fMinLimitLabel);
+	fMinLimitLabel = minLabel ? strdup(minLabel) : NULL;
 
-	if (maxLabel) {
-		free(fMaxLimitLabel);
-		fMaxLimitLabel = strdup(maxLabel);
-	}
+	free(fMaxLimitLabel);
+	fMaxLimitLabel = maxLabel ? strdup(maxLabel) : NULL;
 
-	// TODO: Auto resizing?!? I would not want this as an app programmer!
-	ResizeToPreferred();
+	InvalidateLayout();
 	Invalidate();
 }
 
@@ -596,74 +609,75 @@ BSlider::SetValue(int32 value)
 	if (value > fMaxValue)
 		value = fMaxValue;
 
-	if (value != Value()) {
-		BPoint loc;
-		float range = (float)(fMaxValue - fMinValue);
-		if (range == 0)
-			range = 1;
+	if (value == Value())
+		return;
 
-		float pos = (float)(value - fMinValue) / range *
-			_MaxPosition() - _MinPosition();
+	BPoint loc;
+	float range = (float)(fMaxValue - fMinValue);
+	if (range == 0)
+		range = 1;
 
+	float pos = (float)(value - fMinValue) / range *
+		_MaxPosition() - _MinPosition();
+
+	if (fOrientation == B_HORIZONTAL) {
+		loc.x = ceil(_MinPosition() + pos);
+		loc.y = 0;
+	} else {
+		loc.x = 0;
+		loc.y = floor(_MaxPosition() - pos);
+	}
+
+	BRect oldThumbFrame = ThumbFrame();
+
+	// While it would be enough to do this dependent on fUseFillColor,
+	// that doesn't work out if DrawBar() has been overridden by a sub class
+	if (fOrientation == B_HORIZONTAL)
+		oldThumbFrame.top = BarFrame().top;
+	else
+		oldThumbFrame.right = BarFrame().right;
+
+	_SetLocation(loc);
+
+	BControl::SetValueNoUpdate(value);
+	BRect invalid = oldThumbFrame | ThumbFrame();
+
+	if (Style() == B_TRIANGLE_THUMB) {
+		// 1) we need to take care of pixels touched because of
+		//    anti-aliasing
+		// 2) we need to update the region with the focus mark as well
+		//    (a method BSlider::FocusMarkFrame() would be nice as well)
 		if (fOrientation == B_HORIZONTAL) {
-			loc.x = ceil(_MinPosition() + pos);
-			loc.y = 0;
+			if (IsFocus())
+				invalid.bottom += 2;
+			invalid.InsetBy(-1, 0);
 		} else {
-			loc.x = 0;
-			loc.y = floor(_MaxPosition() - pos);
+			if (IsFocus())
+				invalid.left -= 2;
+			invalid.InsetBy(0, -1);
 		}
+	}
 
-		BRect oldThumbFrame = ThumbFrame();
+	Invalidate(invalid);
 
-		// While it would be enough to do this dependent on fUseFillColor,
-		// that doesn't work out if DrawBar() has been overridden by a sub class
-		if (fOrientation == B_HORIZONTAL)
-			oldThumbFrame.top = BarFrame().top;
-		else
-			oldThumbFrame.right = BarFrame().right;
+	// update text label
 
-		_SetLocation(loc);
+	float oldWidth = 0.0f, width = 0.0f;
+	if (fUpdateText != NULL)
+		oldWidth = StringWidth(fUpdateText);
 
-		BControl::SetValueNoUpdate(value);
-		BRect invalid = oldThumbFrame | ThumbFrame();
+	fUpdateText = UpdateText();
+	if (fUpdateText != NULL)
+		width = StringWidth(fUpdateText);
 
-		if (Style() == B_TRIANGLE_THUMB) {
-			// 1) we need to take care of pixels touched because of
-			//    anti-aliasing
-			// 2) we need to update the region with the focus mark as well
-			//    (a method BSlider::FocusMarkFrame() would be nice as well)
-			if (fOrientation == B_HORIZONTAL) {
-				if (IsFocus())
-					invalid.bottom += 2;
-				invalid.InsetBy(-1, 0);
-			} else {
-				if (IsFocus())
-					invalid.left -= 2;
-				invalid.InsetBy(0, -1);
-			}
-		}
+	width = ceilf(max_c(width, oldWidth)) + 2.0f;
+	if (width != 0) {
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
 
-		Invalidate(invalid);
-
-		// update text label
-
-		float oldWidth = 0.0f, width = 0.0f;
-		if (fUpdateText != NULL)
-			oldWidth = StringWidth(fUpdateText);
-
-		fUpdateText = UpdateText();
-		if (fUpdateText != NULL)
-			width = StringWidth(fUpdateText);
-
-		width = ceilf(max_c(width, oldWidth)) + 2.0f;
-		if (width != 0) {
-			font_height fontHeight;
-			GetFontHeight(&fontHeight);
-
-			BRect rect(-width, 0, 0, ceilf(fontHeight.ascent + fontHeight.descent));
-			rect.OffsetBy(Bounds().Width(), 0);
-			Invalidate(rect);
-		}
+		BRect rect(-width, 0, 0, ceilf(fontHeight.ascent + fontHeight.descent));
+		rect.OffsetBy(Bounds().Width(), 0);
+		Invalidate(rect);
 	}
 }
 
@@ -740,6 +754,8 @@ BSlider::Draw(BRect updateRect)
 		return;
 
 	if (fOffScreenBits->Lock()) {
+		fOffScreenView->SetViewColor(ViewColor());
+		fOffScreenView->SetLowColor(ViewColor());
 #endif
 
 		if (background.Frame().IsValid())

@@ -45,6 +45,11 @@ class BSlider : public BControl {
 			uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
 
+		BSlider(const char *name, const char *label,
+			BMessage *message, int32 minValue, int32 maxValue,
+			orientation posture, thumb_style thumbType = B_BLOCK_THUMB,
+			uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
+
 		BSlider(BMessage *data);
 		virtual	~BSlider();
 
@@ -135,7 +140,8 @@ class BSlider : public BControl {
 				float		BarThickness() const;
 		virtual void		SetBarThickness(float thickness);
 
-		virtual void		SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
+		virtual void		SetFont(const BFont *font,
+								uint32 properties = B_FONT_ALL);
 
 		virtual void		SetLimits(int32 minimum, int32 maximum);
 
