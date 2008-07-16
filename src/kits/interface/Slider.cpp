@@ -9,6 +9,8 @@
  */
 
 
+#include <Slider.h>
+
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -16,11 +18,10 @@
 
 #include <Bitmap.h>
 #include <Errors.h>
+#include <LayoutUtils.h>
 #include <Message.h>
 #include <Region.h>
 #include <Window.h>
-
-#include <Slider.h>
 
 
 BSlider::BSlider(BRect frame, const char* name, const char* label,
@@ -223,6 +224,7 @@ BSlider::_InitObject()
 #endif
 
 	fUpdateText = NULL;
+	fMinSize.Set(-1, -1);
 }
 
 
@@ -736,6 +738,9 @@ BSlider::GetLimits(int32 *minimum, int32 *maximum)
 }
 
 
+// #pragma mark - drawing
+
+
 void
 BSlider::Draw(BRect updateRect)
 {
@@ -743,9 +748,9 @@ BSlider::Draw(BRect updateRect)
 	BRegion background(updateRect);
 	background.Exclude(BarFrame());
 
-	// ToDo: the triangle thumb doesn't delete its background, so we still have to do it
-	// Note, this also creates a different behaviour for subclasses, depending on the
-	// thumb style - if possible this should be avoided.
+	// ToDo: the triangle thumb doesn't delete its background, so we still have
+	// to do it Note, this also creates a different behaviour for subclasses,
+	// depending on the thumb style - if possible this should be avoided.
 	if (Style() == B_BLOCK_THUMB)
 		background.Exclude(ThumbFrame());
 
@@ -1095,6 +1100,9 @@ BSlider::DrawText()
 }
 
 
+// #pragma mark -
+
+
 char*
 BSlider::UpdateText() const
 {
@@ -1229,86 +1237,13 @@ BSlider::SetResizingMode(uint32 mode)
 void
 BSlider::GetPreferredSize(float* _width, float* _height)
 {
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-
-	float width, height;
-	int32 rows = 0;
-
-	if (Orientation() == B_HORIZONTAL) {
-		width = Frame().Width();
-		height = 12.0f + fBarThickness;
-
-		float labelWidth = 0;
-		if (Label()) {
-			labelWidth = StringWidth(Label());
-			rows++;
-		}
-
-		float minWidth = 0;
-		if (MinLimitLabel())
-			minWidth = StringWidth(MinLimitLabel());
-		if (MaxLimitLabel()) {
-			// some space between the labels
-			if (MinLimitLabel())
-				minWidth += 8.0f;
-
-			minWidth += StringWidth(MaxLimitLabel());
-		}
-
-		if (minWidth > width)
-			width = minWidth;
-		if (labelWidth > width)
-			width = labelWidth;
-		if (width < 32.0f)
-			width = 32.0f;
-
-		if (MinLimitLabel() || MaxLimitLabel())
-			rows++;
-
-		height += rows * ((float)ceil(fontHeight.ascent + fontHeight.descent) + 4.0f);
-	} else { 
-		// B_VERTICAL
-		width = 12.0f + fBarThickness;
-		height = Frame().Height();
-
-		// find largest label
-
-		float minWidth = 0;
-		if (Label()) {
-			minWidth = StringWidth(Label());
-			rows++;
-		}
-		if (MinLimitLabel()) {
-			float width = StringWidth(MinLimitLabel());
-			if (width > minWidth)
-				minWidth = width;
-			rows++;
-		}
-		if (MaxLimitLabel()) {
-			float width = StringWidth(MaxLimitLabel());
-			if (width > minWidth)
-				minWidth = width;
-			rows++;
-		}
-
-		if (minWidth > width)
-			width = minWidth;
-
-		float minHeight = 32.0f + rows
-			* ((float)ceil(fontHeight.ascent + fontHeight.descent) + 4.0f);
-
-		if (Label() && MaxLimitLabel())
-			minHeight -= 4.0f;
-
-		if (minHeight > height)
-			height = minHeight;
-	}
+	BSize preferredSize = PreferredSize();
 
 	if (_width)
-		*_width = width;
+		*_width = preferredSize.width;
+
 	if (_height)
-		*_height = height;
+		*_height = preferredSize.height;
 }
 
 
@@ -1412,6 +1347,7 @@ void
 BSlider::SetHashMarks(hash_mark_location where)
 {
 	fHashMarks = where;
+	InvalidateLayout();
 	Invalidate();
 }
 
@@ -1427,6 +1363,7 @@ void
 BSlider::SetStyle(thumb_style style)
 {
 	fStyle = style;
+	InvalidateLayout();
 	Invalidate();
 }
 
@@ -1497,6 +1434,7 @@ void
 BSlider::SetOrientation(orientation posture)
 {
 	fOrientation = posture;
+	InvalidateLayout();
 	Invalidate();
 }
 
@@ -1511,8 +1449,12 @@ BSlider::BarThickness() const
 void
 BSlider::SetBarThickness(float thickness)
 {
-	if (thickness >= 1.0f)
+	if (thickness < 1.0)
+		thickness = 1.0;
+	if (thickness != fBarThickness) {
 		fBarThickness = thickness;
+		InvalidateLayout();
+	}
 }
 
 
@@ -1529,6 +1471,8 @@ BSlider::SetFont(const BFont *font, uint32 properties)
 		}
 	}
 #endif
+
+	InvalidateLayout();
 }
 
 
@@ -1549,6 +1493,53 @@ BSlider::SetLimits(int32 minimum, int32 maximum)
 	}
 }
 
+
+// #pragma mark - layout related
+
+
+void
+BSlider::InvalidateLayout(bool descendants)
+{
+	// invalidate cached preferred size
+	fMinSize.Set(-1, -1);
+
+	BControl::InvalidateLayout(descendants);
+}
+
+
+BSize
+BSlider::MinSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
+		_ValidateMinSize());
+}
+
+
+BSize
+BSlider::MaxSize()
+{
+	BSize maxSize = _ValidateMinSize();
+	if (fOrientation == B_HORIZONTAL)	
+		maxSize.width = B_SIZE_UNLIMITED;
+	else
+		maxSize.height = B_SIZE_UNLIMITED;
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), maxSize);
+}
+
+
+BSize
+BSlider::PreferredSize()
+{
+	BSize preferredSize = _ValidateMinSize();
+	if (fOrientation == B_HORIZONTAL)	
+		preferredSize.width = max_c(100.0, preferredSize.width);
+	else
+		preferredSize.height = max_c(100.0, preferredSize.height);
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), preferredSize);
+}
+
+
+// #pragma mark - private
 
 void
 BSlider::_DrawBlockThumb()
@@ -1793,6 +1784,87 @@ BSlider::_MaxPosition() const
 	return BarFrame().top + 1.0f;
 }
 
+
+BSize
+BSlider::_ValidateMinSize()
+{
+	if (fMinSize.width >= 0) {
+		// the preferred size is up to date
+		return fMinSize;
+	}
+
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+
+	float width = 0.0;
+	float height = 0.0;
+	int32 rows = 0;
+
+	if (Orientation() == B_HORIZONTAL) {
+		height = 12.0 + fBarThickness;
+
+		float labelWidth = 0;
+		if (Label()) {
+			labelWidth = StringWidth(Label());
+			rows++;
+		}
+
+		if (MinLimitLabel())
+			width = StringWidth(MinLimitLabel());
+		if (MaxLimitLabel()) {
+			// some space between the labels
+			if (MinLimitLabel())
+				width += 8.0;
+
+			width += StringWidth(MaxLimitLabel());
+		}
+
+		if (labelWidth > width)
+			width = labelWidth;
+		if (width < 32.0)
+			width = 32.0;
+
+		if (MinLimitLabel() || MaxLimitLabel())
+			rows++;
+
+		height += rows * (ceilf(fontHeight.ascent)
+			+ ceilf(fontHeight.descent) + 4.0);
+	} else { 
+		// B_VERTICAL
+		width = 12.0 + fBarThickness;
+
+		// find largest label
+		float labelWidth = 0;
+		if (Label()) {
+			labelWidth = StringWidth(Label());
+			rows++;
+		}
+		if (MinLimitLabel()) {
+			labelWidth = max_c(labelWidth, StringWidth(MinLimitLabel()));
+			rows++;
+		}
+		if (MaxLimitLabel()) {
+			labelWidth = max_c(labelWidth, StringWidth(MaxLimitLabel()));
+			rows++;
+		}
+
+		width = max_c(labelWidth, width);
+
+		height = 32.0 + rows * (ceilf(fontHeight.ascent)
+			+ ceilf(fontHeight.descent) + 4.0);
+
+		if (Label() && MaxLimitLabel())
+			height -= 4.0f;
+	}
+
+	fMinSize.width = width;
+	fMinSize.height = height;
+
+	return fMinSize;
+}
+
+
+// #pragma mark - FBC padding
 
 void BSlider::_ReservedSlider5() {}
 void BSlider::_ReservedSlider6() {}

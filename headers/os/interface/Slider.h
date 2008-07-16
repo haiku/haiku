@@ -145,6 +145,12 @@ class BSlider : public BControl {
 
 		virtual void		SetLimits(int32 minimum, int32 maximum);
 
+		virtual	void		InvalidateLayout(bool descendants = false);
+
+		virtual	BSize		MinSize();
+		virtual	BSize		MaxSize();
+		virtual	BSize		PreferredSize();
+
 	private:
 				void		_DrawBlockThumb();
 				void		_DrawTriangleThumb();
@@ -155,6 +161,8 @@ class BSlider : public BControl {
 				float		_MinPosition() const;
 				float		_MaxPosition() const;
 				bool		_ConstrainPoint(BPoint& point, BPoint compare) const;
+
+				BSize		_ValidateMinSize();
 
 		virtual	void		_ReservedSlider5();
 		virtual	void		_ReservedSlider6();
@@ -201,10 +209,12 @@ class BSlider : public BControl {
 		orientation			fOrientation;
 		float				fBarThickness;
 
+		BSize				fMinSize;
+
 #if USE_OFF_SCREEN_VIEW
-		uint32				_reserved[7];
+		uint32				_reserved[5];
 #else
-		uint32				_reserved[9];
+		uint32				_reserved[7];
 #endif
 };
 
