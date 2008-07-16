@@ -171,17 +171,14 @@ ConditionVariableEntry::Wait(const void* object, uint32 flags,
 
 
 inline void
-ConditionVariableEntry::AddToVariable(ConditionVariable* variable, uint32 flags)
+ConditionVariableEntry::AddToVariable(ConditionVariable* variable)
 {
 	fThread = thread_get_current_thread();
 
-	thread_prepare_to_block(fThread, flags,
-		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, fVariable);
-
-	// add to the variable
 	InterruptsSpinLocker _(sConditionVariablesLock);
 
 	fVariable = variable;
+	fWaitStatus = STATUS_ADDED;
 	fVariable->fEntries.Add(this);
 }
 
@@ -246,9 +243,9 @@ ConditionVariable::Unpublish(bool threadsLocked)
 
 
 void
-ConditionVariable::Add(ConditionVariableEntry* entry, uint32 flags)
+ConditionVariable::Add(ConditionVariableEntry* entry)
 {
-	entry->AddToVariable(this, flags);
+	entry->AddToVariable(this);
 }
 
 

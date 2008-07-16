@@ -35,8 +35,7 @@ public:
 	inline	ConditionVariable* Variable() const		{ return fVariable; }
 
 private:
-	inline	void				AddToVariable(ConditionVariable* variable,
-									uint32 flags);
+	inline	void				AddToVariable(ConditionVariable* variable);
 
 private:
 			ConditionVariable*	fVariable;
@@ -60,8 +59,7 @@ public:
 	inline	void				NotifyOne(bool threadsLocked = false);
 	inline	void				NotifyAll(bool threadsLocked = false);
 
-			void				Add(ConditionVariableEntry* entry,
-									uint32 flags = 0);
+			void				Add(ConditionVariableEntry* entry);
 
 			const void*			Object() const	{ return fObject; }
 

@@ -447,10 +447,11 @@ UnixFifo::_Read(UnixRequest& request, bigtime_t timeout)
 	while (fReaders.Head() != &request
 		&& !(IsReadShutdown() && fBuffer.Readable() == 0)) {
 		ConditionVariableEntry entry;
-		fReadCondition.Add(&entry, B_CAN_INTERRUPT);
+		fReadCondition.Add(&entry);
 
 		mutex_unlock(&fLock);
-		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
+		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT,
+			timeout);
 		mutex_lock(&fLock);
 
 		if (error != B_OK)
@@ -473,10 +474,11 @@ UnixFifo::_Read(UnixRequest& request, bigtime_t timeout)
 	while (fBuffer.Readable() == 0
 			&& !IsReadShutdown() && !IsWriteShutdown()) {
 		ConditionVariableEntry entry;
-		fReadCondition.Add(&entry, B_CAN_INTERRUPT);
+		fReadCondition.Add(&entry);
 
 		mutex_unlock(&fLock);
-		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
+		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT,
+			timeout);
 		mutex_lock(&fLock);
 
 		if (error != B_OK)
@@ -503,10 +505,11 @@ UnixFifo::_Write(UnixRequest& request, bigtime_t timeout)
 	// wait for the request to reach the front of the queue
 	while (fWriters.Head() != &request && !IsWriteShutdown()) {
 		ConditionVariableEntry entry;
-		fWriteCondition.Add(&entry, B_CAN_INTERRUPT);
+		fWriteCondition.Add(&entry);
 
 		mutex_unlock(&fLock);
-		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
+		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT,
+			timeout);
 		mutex_lock(&fLock);
 
 		if (error != B_OK)
@@ -529,19 +532,19 @@ UnixFifo::_Write(UnixRequest& request, bigtime_t timeout)
 		while (error == B_OK && fBuffer.Writable() == 0 && !IsWriteShutdown()
 				&& !IsReadShutdown()) {
 			ConditionVariableEntry entry;
-			fWriteCondition.Add(&entry, B_CAN_INTERRUPT);
-	
+			fWriteCondition.Add(&entry);
+
 			mutex_unlock(&fLock);
-			error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
+			error = entry.Wait(B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 			mutex_lock(&fLock);
 
 			if (error != B_OK)
 				RETURN_ERROR(error);
 		}
-	
+
 		if (IsWriteShutdown())
 			RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
-	
+
 		if (IsReadShutdown())
 			RETURN_ERROR(EPIPE);
 
