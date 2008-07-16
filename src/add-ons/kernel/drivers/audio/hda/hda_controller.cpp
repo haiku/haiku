@@ -303,7 +303,7 @@ init_corb_rirb_pos(hda_controller* controller)
 	/* Determine rirb offset in memory and total size of corb+alignment+rirb */
 	rirbOffset = (controller->corb_length * sizeof(corb_t) + 0x7f) & ~0x7f;
 	posOffset = (rirbOffset + controller->rirb_length * sizeof(rirb_t) + 0x7f)
-		& 0x7f;
+		& ~0x7f;
 	posSize = 8 * (controller->num_input_streams
 		+ controller->num_output_streams + controller->num_bidir_streams);
 
