@@ -26,7 +26,8 @@ typedef uint32_t socklen_t;
 #define AF_NOTIFY		8
 #define AF_LOCAL		9
 #define AF_UNIX			AF_LOCAL
-#define AF_MAX			10
+#define AF_BLUETOOTH	10
+#define AF_MAX			11
 
 /* Protocol families, deprecated */
 #define PF_UNSPEC		AF_UNSPEC
@@ -36,6 +37,7 @@ typedef uint32_t socklen_t;
 #define PF_INET6		AF_INET6
 #define PF_LOCAL		AF_LOCAL
 #define PF_UNIX			AF_UNIX
+#define PF_BLUETOOTH	AF_BLUETOOTH
 
 /* Socket types */
 #define	SOCK_STREAM	1
