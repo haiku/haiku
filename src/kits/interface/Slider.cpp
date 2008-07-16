@@ -926,32 +926,36 @@ BSlider::DrawBar()
 void
 BSlider::DrawHashMarks()
 {
+	if (fHashMarks == B_HASH_MARKS_NONE)
+		return;
+
 	BRect frame = HashMarksFrame();
-	BView *view = OffscreenView();
+	BView* view = OffscreenView();
 
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color lightenmax;
 	rgb_color darken2;
 
 	if (IsEnabled()) {
-		lightenmax	= tint_color(no_tint, B_LIGHTEN_MAX_TINT);
-		darken2		= tint_color(no_tint, B_DARKEN_2_TINT);
+		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT);
+		darken2 = tint_color(no_tint, B_DARKEN_2_TINT);
 	} else {
-		lightenmax	= tint_color(no_tint, B_LIGHTEN_2_TINT);
-		darken2		= tint_color(no_tint, B_DARKEN_1_TINT);
+		lightenmax = tint_color(no_tint, B_LIGHTEN_2_TINT);
+		darken2 = tint_color(no_tint, B_DARKEN_1_TINT);
 	}
 
 	float pos = _MinPosition();
-	float factor = 0.0f;
-	if (fHashMarkCount > 1)
-		factor = (_MaxPosition() - pos) / (fHashMarkCount - 1);
+	int32 hashMarkCount = max_c(fHashMarkCount, 2);
+		// draw at least two hashmarks at min/max if
+		// fHashMarks != B_HASH_MARKS_NONE
+	float factor = (_MaxPosition() - pos) / (hashMarkCount - 1);
 
-	if (fHashMarks & B_HASH_MARKS_TOP && fHashMarkCount > 0) {
+	if (fHashMarks & B_HASH_MARKS_TOP) {
 
-		view->BeginLineArray(fHashMarkCount * 2);
+		view->BeginLineArray(hashMarkCount * 2);
 
 		if (fOrientation == B_HORIZONTAL) {
-			for (int32 i = 0; i < fHashMarkCount; i++) {
+			for (int32 i = 0; i < hashMarkCount; i++) {
 				view->AddLine(BPoint(pos, frame.top),
 							  BPoint(pos, frame.top + 5), darken2);
 				view->AddLine(BPoint(pos + 1, frame.top),
@@ -960,7 +964,7 @@ BSlider::DrawHashMarks()
 				pos += factor;
 			}
 		} else {
-			for (int32 i = 0; i < fHashMarkCount; i++) {
+			for (int32 i = 0; i < hashMarkCount; i++) {
 				view->AddLine(BPoint(frame.left, pos),
 							  BPoint(frame.left + 5, pos), darken2);
 				view->AddLine(BPoint(frame.left, pos + 1),
@@ -975,11 +979,12 @@ BSlider::DrawHashMarks()
 
 	pos = _MinPosition();
 
-	if (fHashMarks & B_HASH_MARKS_BOTTOM && fHashMarkCount > 0) {
-		view->BeginLineArray(fHashMarkCount * 2);
+	if (fHashMarks & B_HASH_MARKS_BOTTOM) {
+
+		view->BeginLineArray(hashMarkCount * 2);
 
 		if (fOrientation == B_HORIZONTAL) {
-			for (int32 i = 0; i < fHashMarkCount; i++) {
+			for (int32 i = 0; i < hashMarkCount; i++) {
 				view->AddLine(BPoint(pos, frame.bottom - 5),
 							  BPoint(pos, frame.bottom), darken2);
 				view->AddLine(BPoint(pos + 1, frame.bottom - 5),
@@ -988,7 +993,7 @@ BSlider::DrawHashMarks()
 				pos += factor;
 			}
 		} else {
-			for (int32 i = 0; i < fHashMarkCount; i++) {
+			for (int32 i = 0; i < hashMarkCount; i++) {
 				view->AddLine(BPoint(frame.right - 5, pos),
 							  BPoint(frame.right, pos), darken2);
 				view->AddLine(BPoint(frame.right - 5, pos + 1),
