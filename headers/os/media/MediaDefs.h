@@ -242,6 +242,7 @@ struct media_multi_audio_format;
 struct media_raw_audio_format {
 	enum {						// for "format"
 		B_AUDIO_FLOAT = 0x24,	// 0 == mid, -1.0 == bottom, 1.0 == top (the preferred format for non-game audio)
+		B_AUDIO_DOUBLE = 0x28,	// 0 == mid, -1.0 == bottom, 1.0 == top (only useful for pro audio)
 		B_AUDIO_INT = 0x4,		// 0 == mid, 0x80000001 == bottom, 0x7fffffff == top (all >16-bit formats, left-adjusted)
 		B_AUDIO_SHORT = 0x2,	// 0 == mid, -32767 == bottom, +32767 == top
 		B_AUDIO_UCHAR = 0x11,	// 128 == mid, 1 == bottom, 255 == top (discouraged but supported format)
