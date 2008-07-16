@@ -21,6 +21,7 @@
 #include <LayoutUtils.h>
 #include <Message.h>
 #include <Region.h>
+#include <String.h>
 #include <Window.h>
 
 
@@ -225,6 +226,7 @@ BSlider::_InitObject()
 
 	fUpdateText = NULL;
 	fMinSize.Set(-1, -1);
+	fMaxUpdateTextWidth = -1.0;
 }
 
 
@@ -662,25 +664,7 @@ BSlider::SetValue(int32 value)
 
 	Invalidate(invalid);
 
-	// update text label
-
-	float oldWidth = 0.0f, width = 0.0f;
-	if (fUpdateText != NULL)
-		oldWidth = StringWidth(fUpdateText);
-
-	fUpdateText = UpdateText();
-	if (fUpdateText != NULL)
-		width = StringWidth(fUpdateText);
-
-	width = ceilf(max_c(width, oldWidth)) + 2.0f;
-	if (width != 0) {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
-
-		BRect rect(-width, 0, 0, ceilf(fontHeight.ascent + fontHeight.descent));
-		rect.OffsetBy(Bounds().Width(), 0);
-		Invalidate(rect);
-	}
+	UpdateTextChanged();
 }
 
 
@@ -1069,46 +1053,53 @@ BSlider::DrawText()
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-
 	if (Orientation() == B_HORIZONTAL) {
 		if (Label())
-			view->DrawString(Label(), BPoint(2.0f, ceilf(fontHeight.ascent)));
+			view->DrawString(Label(), BPoint(0.0, ceilf(fontHeight.ascent)));
 
 		// the update text is updated in SetValue() only
 		if (fUpdateText != NULL) {
-			view->DrawString(fUpdateText, BPoint(bounds.right - StringWidth(fUpdateText)
-				- 2.0f, ceilf(fontHeight.ascent)));
-		}
-
-		if (fMinLimitLabel)
-			view->DrawString(fMinLimitLabel, BPoint(2.0f, bounds.bottom - 4.0f));
-
-		if (fMaxLimitLabel) {
-			view->DrawString(fMaxLimitLabel, BPoint(bounds.right
-				- StringWidth(fMaxLimitLabel) - 2.0f, bounds.bottom - 4.0f));
-		}
-	} else {
-		if (Label()) {
-			view->DrawString(Label(), BPoint(bounds.Width() / 2.0f -
-											 StringWidth(Label()) / 2.0f,
-											 fontHeight.ascent));
-		}
-
-		if (fUpdateText != NULL) {
-			view->DrawString(fUpdateText, BPoint(bounds.Width() / 2.0f -
-				StringWidth(fUpdateText) / 2.0f, bounds.bottom - fontHeight.descent - 4.0f));
-		}
-
-		if (fMaxLimitLabel) {
-			view->DrawString(fMaxLimitLabel, BPoint(bounds.Width() / 2.0f -
-				StringWidth(fMaxLimitLabel) / 2.0f, fontHeight.ascent + (Label()
-					? ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading + 2.0f)
-					: 0.0f)));
+			view->DrawString(fUpdateText, BPoint(bounds.right
+				- StringWidth(fUpdateText), ceilf(fontHeight.ascent)));
 		}
 
 		if (fMinLimitLabel) {
-			view->DrawString(fMinLimitLabel, BPoint(bounds.Width() / 2.0f
-				- StringWidth(fMinLimitLabel) / 2.0f, bounds.bottom - 2.0f));
+			view->DrawString(fMinLimitLabel, BPoint(0.0, bounds.bottom
+				- fontHeight.descent));
+		}
+
+		if (fMaxLimitLabel) {
+			view->DrawString(fMaxLimitLabel, BPoint(bounds.right
+				- StringWidth(fMaxLimitLabel), bounds.bottom
+				- fontHeight.descent));
+		}
+	} else {
+		float lineHeight = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent)
+			+ ceilf(fontHeight.leading);
+		float baseLine = ceilf(fontHeight.ascent);
+
+		if (Label()) {
+			view->DrawString(Label(), BPoint((bounds.Width()
+				- StringWidth(Label())) / 2.0, baseLine));
+			baseLine += lineHeight;
+		}
+
+		if (fMaxLimitLabel) {
+			view->DrawString(fMaxLimitLabel, BPoint((bounds.Width()
+				- StringWidth(fMaxLimitLabel)) / 2.0, baseLine));
+		}
+
+		baseLine = bounds.bottom - ceilf(fontHeight.descent);
+
+		if (fMinLimitLabel) {
+			view->DrawString(fMinLimitLabel, BPoint((bounds.Width()
+				- StringWidth(fMinLimitLabel)) / 2.0, baseLine));
+			baseLine -= lineHeight;
+		}
+
+		if (fUpdateText != NULL) {
+			view->DrawString(fUpdateText, BPoint((bounds.Width()
+				- StringWidth(fUpdateText)) / 2.0, baseLine));
 		}
 	}
 }
@@ -1117,10 +1108,56 @@ BSlider::DrawText()
 // #pragma mark -
 
 
-char*
+const char*
 BSlider::UpdateText() const
 {
 	return NULL;
+}
+
+
+void
+BSlider::UpdateTextChanged()
+{
+	// update text label
+	float oldWidth = 0.0;
+	if (fUpdateText != NULL)
+		oldWidth = StringWidth(fUpdateText);
+
+	const char* oldUpdateText = fUpdateText;
+	fUpdateText = UpdateText();
+	bool updateTextOnOff = fUpdateText == NULL && oldUpdateText != NULL
+		|| fUpdateText != NULL && oldUpdateText == NULL;
+
+	float newWidth = 0.0;
+	if (fUpdateText != NULL)
+		newWidth = StringWidth(fUpdateText);
+
+	float width = ceilf(max_c(newWidth, oldWidth)) + 2.0f;
+	if (width != 0) {
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+
+		float height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
+		float lineHeight = height + ceilf(fontHeight.leading);
+		BRect invalid(Bounds());
+		if (fOrientation == B_HORIZONTAL)
+			invalid = BRect(invalid.right - width, 0, invalid.right, height);
+		else {
+			if (!updateTextOnOff) {
+				invalid.left = (invalid.left + invalid.right - width) / 2;
+				invalid.right = invalid.left + width;
+				if (fMinLimitLabel)
+					invalid.bottom -= lineHeight;
+				invalid.top = invalid.bottom - height;
+			}
+		}
+		Invalidate(invalid);
+	}
+
+	float oldMaxUpdateTextWidth = fMaxUpdateTextWidth;
+	fMaxUpdateTextWidth = MaxUpdateTextWidth();
+	if (oldMaxUpdateTextWidth != fMaxUpdateTextWidth)
+		InvalidateLayout();
 }
 
 
@@ -1132,35 +1169,39 @@ BSlider::BarFrame() const
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
-	float textHeight = (float)ceil(fontHeight.ascent + fontHeight.descent);
-	
-	if (fStyle == B_BLOCK_THUMB) {
-		if (Orientation() == B_HORIZONTAL) {
-			frame.left = 8.0f;
-			frame.top = 6.0f + (Label() ? textHeight + 4.0f : 0.0f);
-			frame.right -= 8.0f;
-			frame.bottom = frame.top + fBarThickness;
-		} else {
-			frame.left = floor((frame.Width() - fBarThickness) / 2.0f);
-			frame.top = 12.0f + (Label() ? textHeight : 0.0f) +
-				(fMaxLimitLabel ? textHeight : 0.0f);
-			frame.right = frame.left + fBarThickness;
-			frame.bottom = frame.bottom - 8.0f -
-				(fMinLimitLabel ? textHeight + 4 : 0.0f);
-		}
+	float textHeight = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
+	float leading = ceilf(fontHeight.leading);
+
+	float thumbInset;
+	if (fStyle == B_BLOCK_THUMB)
+		thumbInset = 8.0;
+	else
+		thumbInset = 7.0;
+
+	if (Orientation() == B_HORIZONTAL) {
+		frame.left = thumbInset;
+		frame.top = 6.0 + (Label() ? textHeight + 4.0 : 0.0);
+		frame.right -= thumbInset;
+		frame.bottom = frame.top + fBarThickness;
 	} else {
-		if (Orientation() == B_HORIZONTAL) {
-			frame.left = 7.0f;
-			frame.top = 6.0f + (Label() ? textHeight + 4.0f : 0.0f);
-			frame.right -= 7.0f;
-			frame.bottom = frame.top + fBarThickness;
-		} else {
-			frame.left = floor((frame.Width() - fBarThickness) / 2.0f);
-			frame.top = 11.0f + (Label() ? textHeight : 0.0f) +
-				(fMaxLimitLabel ? textHeight : 0.0f);
-			frame.right = frame.left + fBarThickness;
-			frame.bottom = frame.bottom - 7.0f -
-				(fMinLimitLabel ? textHeight + 4 : 0.0f);
+		frame.left = floorf((frame.Width() - fBarThickness) / 2.0);
+		frame.top = thumbInset;
+		if (Label())
+			frame.top += textHeight;
+		if (fMaxLimitLabel) {
+			frame.top += textHeight;
+			if (Label())
+				frame.top += leading;
+		}
+
+		frame.right = frame.left + fBarThickness;
+		frame.bottom = frame.bottom - thumbInset;
+		if (fMinLimitLabel)
+			frame.bottom -= textHeight;
+		if (fUpdateText) {
+			frame.bottom -= textHeight;
+			if (fMinLimitLabel)
+				frame.bottom -= leading;
 		}
 	}
 
@@ -1174,11 +1215,11 @@ BSlider::HashMarksFrame() const
 	BRect frame(BarFrame());
 
 	if (fOrientation == B_HORIZONTAL) {
-		frame.top -= 6.0f;
-		frame.bottom += 6.0f;
+		frame.top -= 6.0;
+		frame.bottom += 6.0;
 	} else {
-		frame.left -= 6.0f;
-		frame.right += 6.0f;
+		frame.left -= 6.0;
+		frame.right += 6.0;
 	}
 
 	return frame;
@@ -1193,25 +1234,25 @@ BSlider::ThumbFrame() const
 	// and spread them further apart for the thumb
 
 	BRect frame = Bounds();
-	font_height fheight;
 
-	GetFontHeight(&fheight);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
 
-	float textHeight = (float)ceil(fheight.ascent + fheight.descent);
+	float textHeight = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
 
 	if (fStyle == B_BLOCK_THUMB) {
 		if (Orientation() == B_HORIZONTAL) {
 			frame.left = (float)floor(Position() * (_MaxPosition() - _MinPosition()) +
-				_MinPosition()) - 8.0f;
-			frame.top = 2.0f + (Label() ? textHeight + 4.0f : 0.0f);
-			frame.right = frame.left + 17.0f;
-			frame.bottom = frame.top + fBarThickness + 7.0f;
+				_MinPosition()) - 8.0;
+			frame.top = 2.0 + (Label() ? textHeight + 4.0 : 0.0);
+			frame.right = frame.left + 17.0;
+			frame.bottom = frame.top + fBarThickness + 7.0;
 		} else {
-			frame.left = floor((frame.Width() - fBarThickness) / 2.0f) - 4;
+			frame.left = floor((frame.Width() - fBarThickness) / 2.0) - 4;
 			frame.top = (float)floor(Position() * (_MaxPosition() - _MinPosition()) +
-				_MinPosition()) - 8.0f;
-			frame.right = frame.left + fBarThickness + 7.0f;
-			frame.bottom = frame.top + 17;
+				_MinPosition()) - 8.0;
+			frame.right = frame.left + fBarThickness + 7.0;
+			frame.bottom = frame.top + 17.0;
 		}
 	} else {
 		if (Orientation() == B_HORIZONTAL) {
@@ -1505,6 +1546,22 @@ BSlider::SetLimits(int32 minimum, int32 maximum)
 			SetValue(value);
 		}
 	}
+}
+
+
+float
+BSlider::MaxUpdateTextWidth()
+{
+	// very simplistic implementation that assumes the string will be widest
+	// at the maximum value
+	int32 value = Value();
+	SetValueNoUpdate(fMaxValue);
+	float width = StringWidth(UpdateText());
+	SetValueNoUpdate(value);
+	// in case the derived class uses a fixed buffer, the contents
+	// should be reset for the old value
+	UpdateText();
+	return width;
 }
 
 
@@ -1812,23 +1869,35 @@ BSlider::_ValidateMinSize()
 
 	float width = 0.0;
 	float height = 0.0;
-	int32 rows = 0;
+
+	if (fMaxUpdateTextWidth < 0.0)
+		fMaxUpdateTextWidth = MaxUpdateTextWidth();
 
 	if (Orientation() == B_HORIZONTAL) {
 		height = 12.0 + fBarThickness;
+		int32 rows = 0;
 
 		float labelWidth = 0;
+		int32 labelRows = 0;
+		float labelSpacing = StringWidth("M") * 2;
 		if (Label()) {
 			labelWidth = StringWidth(Label());
-			rows++;
+			labelRows = 1;
 		}
+		if (fMaxUpdateTextWidth > 0.0) {
+			if (labelWidth > 0)
+				labelWidth += labelSpacing;
+			labelWidth += fMaxUpdateTextWidth;
+			labelRows = 1;
+		}
+		rows += labelRows;
 
 		if (MinLimitLabel())
 			width = StringWidth(MinLimitLabel());
 		if (MaxLimitLabel()) {
 			// some space between the labels
 			if (MinLimitLabel())
-				width += 8.0;
+				width += labelSpacing;
 
 			width += StringWidth(MaxLimitLabel());
 		}
@@ -1846,29 +1915,32 @@ BSlider::_ValidateMinSize()
 	} else { 
 		// B_VERTICAL
 		width = 12.0 + fBarThickness;
+		height = 32.0;
+
+		float lineHeightNoLeading = ceilf(fontHeight.ascent)
+			+ ceilf(fontHeight.descent);
+		float lineHeight = lineHeightNoLeading + ceilf(fontHeight.leading);
 
 		// find largest label
 		float labelWidth = 0;
 		if (Label()) {
 			labelWidth = StringWidth(Label());
-			rows++;
-		}
-		if (MinLimitLabel()) {
-			labelWidth = max_c(labelWidth, StringWidth(MinLimitLabel()));
-			rows++;
+			height += lineHeightNoLeading;
 		}
 		if (MaxLimitLabel()) {
 			labelWidth = max_c(labelWidth, StringWidth(MaxLimitLabel()));
-			rows++;
+			height += Label() ? lineHeight : lineHeightNoLeading;
+		}
+		if (MinLimitLabel()) {
+			labelWidth = max_c(labelWidth, StringWidth(MinLimitLabel()));
+			height += lineHeightNoLeading;
+		}
+		if (fMaxUpdateTextWidth > 0.0) {
+			labelWidth = max_c(labelWidth, fMaxUpdateTextWidth);
+			height += MinLimitLabel() ? lineHeight : lineHeightNoLeading;
 		}
 
 		width = max_c(labelWidth, width);
-
-		height = 32.0 + rows * (ceilf(fontHeight.ascent)
-			+ ceilf(fontHeight.descent) + 4.0);
-
-		if (Label() && MaxLimitLabel())
-			height -= 4.0f;
 	}
 
 	fMinSize.width = width;
@@ -1880,7 +1952,6 @@ BSlider::_ValidateMinSize()
 
 // #pragma mark - FBC padding
 
-void BSlider::_ReservedSlider5() {}
 void BSlider::_ReservedSlider6() {}
 void BSlider::_ReservedSlider7() {}
 void BSlider::_ReservedSlider8() {}
@@ -1897,15 +1968,23 @@ BSlider::operator=(const BSlider &)
 }
 
 
-//	#pragma mark - R4.5 compatibility
+//	#pragma mark - BeOS compatibility
 
 
 #if __GNUC__ < 3
 
 extern "C"
-void _ReservedSlider4__7BSlider(BSlider *slider, int32 minimum, int32 maximum)
+void
+_ReservedSlider4__7BSlider(BSlider *slider, int32 minimum, int32 maximum)
 {
 	slider->BSlider::SetLimits(minimum, maximum);
+}
+
+extern "C"
+float
+_ReservedSlider5__7BSlider(BSlider *slider)
+{
+	return slider->BSlider::MaxUpdateTextWidth();
 }
 
 extern "C" void _ReservedSlider1__7BSlider() {}

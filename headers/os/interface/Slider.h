@@ -91,7 +91,8 @@ class BSlider : public BControl {
 		virtual void		DrawThumb();
 		virtual void		DrawFocusMark();
 		virtual	void		DrawText();
-		virtual char*		UpdateText() const;			
+		virtual const char*	UpdateText() const;
+				void		UpdateTextChanged();
 
 		virtual BRect		BarFrame() const;
 		virtual BRect		HashMarksFrame() const;
@@ -145,6 +146,8 @@ class BSlider : public BControl {
 
 		virtual void		SetLimits(int32 minimum, int32 maximum);
 
+		virtual	float		MaxUpdateTextWidth();
+
 		virtual	void		InvalidateLayout(bool descendants = false);
 
 		virtual	BSize		MinSize();
@@ -164,7 +167,6 @@ class BSlider : public BControl {
 
 				BSize		_ValidateMinSize();
 
-		virtual	void		_ReservedSlider5();
 		virtual	void		_ReservedSlider6();
 		virtual	void		_ReservedSlider7();
 		virtual	void		_ReservedSlider8();
@@ -187,7 +189,7 @@ class BSlider : public BControl {
 
 		char*				fMinLimitLabel;
 		char*				fMaxLimitLabel;
-		char*				fUpdateText;
+		const char*			fUpdateText;
 
 		int32 				fMinValue;
 		int32 				fMaxValue;
@@ -211,10 +213,12 @@ class BSlider : public BControl {
 
 		BSize				fMinSize;
 
+		float				fMaxUpdateTextWidth;
+
 #if USE_OFF_SCREEN_VIEW
-		uint32				_reserved[5];
+		uint32				_reserved[4];
 #else
-		uint32				_reserved[7];
+		uint32				_reserved[6];
 #endif
 };
 
