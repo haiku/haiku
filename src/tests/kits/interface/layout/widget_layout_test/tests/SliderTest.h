@@ -10,7 +10,7 @@
 #include "Test.h"
 
 
-class BSlider;
+class LabeledCheckBox;
 class RadioButtonGroup;
 
 
@@ -33,8 +33,10 @@ private:
 			void				_UpdateBarThickness();
 			void				_UpdateLabel();
 			void				_UpdateLimitLabels();
+			void				_UpdateUpdateText();
 
 private:
+			class TestSlider;
 			class OrientationRadioButton;
 			class ThumbStyleRadioButton;
 			class HashMarkLocationRadioButton;
@@ -42,13 +44,14 @@ private:
 			class LabelRadioButton;
 			class LimitLabelsRadioButton;
 
-			BSlider*			fSlider;
+			TestSlider*			fSlider;
 			RadioButtonGroup*	fOrientationRadioGroup;
 			RadioButtonGroup*	fThumbStyleRadioGroup;
 			RadioButtonGroup*	fHashMarkLocationRadioGroup;
 			RadioButtonGroup*	fBarThicknessRadioGroup;
 			RadioButtonGroup*	fLabelRadioGroup;
 			RadioButtonGroup*	fLimitLabelsRadioGroup;
+			LabeledCheckBox*	fUpdateTextCheckBox;
 };
 
 

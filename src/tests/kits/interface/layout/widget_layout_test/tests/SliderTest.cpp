@@ -11,6 +11,7 @@
 #include <Message.h>
 #include <Slider.h>
 
+#include "CheckBox.h"
 #include "GroupView.h"
 #include "RadioButton.h"
 #include "TestView.h"
@@ -23,9 +24,31 @@ enum {
 	MSG_HASH_MARKS_CHANGED			= 'hmch',
 	MSG_BAR_THICKNESS_CHANGED		= 'btch',
 	MSG_LABEL_CHANGED				= 'lbch',
-	MSG_LIMIT_LABELS_CHANGED		= 'lmch'
+	MSG_LIMIT_LABELS_CHANGED		= 'lmch',
+	MSG_UPDATE_TEXT_CHANGED			= 'utch'
 };
 
+
+// TestSlider
+class SliderTest::TestSlider : public BSlider {
+public:
+	TestSlider()
+		: BSlider("test slider", "Label", NULL, 1, 100, B_HORIZONTAL),
+		fExportUpdateText(false)
+	{
+	}
+
+	virtual char* UpdateText() const
+	{
+		if (!fExportUpdateText)
+			return NULL;
+		sprintf(fUpdateText, "%ld", Value());
+		return fUpdateText;
+	}
+
+	mutable char fUpdateText[32];
+	bool fExportUpdateText;
+};
 
 // OrientationRadioButton
 class SliderTest::OrientationRadioButton : public LabeledRadioButton {
@@ -110,13 +133,14 @@ public:
 // constructor
 SliderTest::SliderTest()
 	: Test("Slider", NULL),
-	  fSlider(new BSlider("test slider", "Label", NULL, 1, 100, B_HORIZONTAL)),
+	  fSlider(new TestSlider()),
 	  fOrientationRadioGroup(NULL),
 	  fThumbStyleRadioGroup(NULL),
 	  fHashMarkLocationRadioGroup(NULL),
 	  fBarThicknessRadioGroup(NULL),
 	  fLabelRadioGroup(NULL),
-	  fLimitLabelsRadioGroup(NULL)
+	  fLimitLabelsRadioGroup(NULL),
+	  fUpdateTextCheckBox(NULL)
 {
 	SetView(fSlider);
 }
@@ -321,6 +345,14 @@ SliderTest::ActivateTest(View* controls)
 	// default to no limit labels
 	fLimitLabelsRadioGroup->SelectButton(0L);
 
+	// spacing
+	group->AddChild(new VStrut(10));
+
+	// update text
+	fUpdateTextCheckBox = new LabeledCheckBox("Update text",
+		new BMessage(MSG_UPDATE_TEXT_CHANGED), this);
+	group->AddChild(fUpdateTextCheckBox);
+
 
 	// glue
 	group->AddChild(new Glue());
@@ -356,6 +388,9 @@ SliderTest::MessageReceived(BMessage* message)
 			break;
 		case MSG_LIMIT_LABELS_CHANGED:
 			_UpdateLimitLabels();
+			break;
+		case MSG_UPDATE_TEXT_CHANGED:
+			_UpdateUpdateText();
 			break;
 		default:
 			Test::MessageReceived(message);
@@ -468,5 +503,17 @@ SliderTest::_UpdateLimitLabels()
 		if (button)
 			fSlider->SetLimitLabels(button->fMinLabel, button->fMaxLabel);
 	}
+}
+
+// _UpdateUpdateText
+void
+SliderTest::_UpdateUpdateText()
+{
+	if (!fUpdateTextCheckBox
+		|| fUpdateTextCheckBox->IsSelected() == fSlider->fExportUpdateText)
+		return;
+
+	fSlider->fExportUpdateText = fUpdateTextCheckBox->IsSelected();
+	fSlider->UpdateTextChanged();
 }
 
