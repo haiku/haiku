@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -32,7 +32,7 @@ struct vm_address_space *vm_kernel_address_space(void);
 team_id vm_kernel_address_space_id(void);
 struct vm_address_space *vm_get_current_user_address_space(void);
 team_id vm_current_user_address_space_id(void);
-struct vm_address_space *vm_get_address_space_by_id(team_id aid);
+struct vm_address_space *vm_get_address_space(team_id team);
 void vm_put_address_space(struct vm_address_space *aspace);
 #define vm_swap_address_space(aspace) arch_vm_aspace_swap(aspace)
 

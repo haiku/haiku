@@ -272,7 +272,7 @@ AddressSpaceReadLocker::Unset()
 status_t
 AddressSpaceReadLocker::SetTo(team_id team)
 {
-	fSpace = vm_get_address_space_by_id(team);
+	fSpace = vm_get_address_space(team);
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
 
@@ -365,7 +365,7 @@ AddressSpaceWriteLocker::Unset()
 status_t
 AddressSpaceWriteLocker::SetTo(team_id team)
 {
-	fSpace = vm_get_address_space_by_id(team);
+	fSpace = vm_get_address_space(team);
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
 
@@ -557,7 +557,7 @@ inline status_t
 MultiAddressSpaceLocker::AddTeam(team_id team, bool writeLock,
 	vm_address_space** _space)
 {
-	return _AddAddressSpace(vm_get_address_space_by_id(team), writeLock,
+	return _AddAddressSpace(vm_get_address_space(team), writeLock,
 		_space);
 }
 
@@ -1327,7 +1327,7 @@ unmap_address_range(vm_address_space *addressSpace, addr_t address, addr_t size,
 		area = addressSpace->areas;
 		while (area != NULL) {
 			vm_area* nextArea = area->address_space_next;
-	
+
 			if (area->id != RESERVED_AREA_ID) {
 				addr_t areaLast = area->base + (area->size - 1);
 				if (area->base < lastAddress && address < areaLast) {
@@ -1335,7 +1335,7 @@ unmap_address_range(vm_address_space *addressSpace, addr_t address, addr_t size,
 						return B_NOT_ALLOWED;
 				}
 			}
-	
+
 			area = nextArea;
 		}
 	}
@@ -2599,7 +2599,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 status_t
 vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr)
 {
-	vm_address_space *addressSpace = vm_get_address_space_by_id(team);
+	vm_address_space *addressSpace = vm_get_address_space(team);
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
@@ -5021,8 +5021,8 @@ user_memset(void *s, char c, size_t count)
 }
 
 
-long
-lock_memory(void *address, ulong numBytes, ulong flags)
+status_t
+lock_memory_etc(team_id team, void *address, size_t numBytes, uint32 flags)
 {
 	vm_address_space *addressSpace = NULL;
 	struct vm_translation_map *map;
@@ -5032,9 +5032,12 @@ lock_memory(void *address, ulong numBytes, ulong flags)
 	bool isUser = IS_USER_ADDRESS(address);
 	bool needsLocking = true;
 
-	if (isUser)
-		addressSpace = vm_get_current_user_address_space();
-	else
+	if (isUser) {
+		if (team == B_CURRENT_TEAM)
+			addressSpace = vm_get_current_user_address_space();
+		else
+			addressSpace = vm_get_address_space(team);
+	} else
 		addressSpace = vm_get_kernel_address_space();
 	if (addressSpace == NULL)
 		return B_ERROR;
@@ -5107,8 +5110,15 @@ out:
 }
 
 
-long
-unlock_memory(void *address, ulong numBytes, ulong flags)
+status_t
+lock_memory(void *address, size_t numBytes, uint32 flags)
+{
+	return lock_memory_etc(B_CURRENT_TEAM, address, numBytes, flags);
+}
+
+
+status_t
+unlock_memory_etc(team_id team, void *address, size_t numBytes, uint32 flags)
 {
 	vm_address_space *addressSpace = NULL;
 	struct vm_translation_map *map;
@@ -5117,9 +5127,12 @@ unlock_memory(void *address, ulong numBytes, ulong flags)
 	addr_t base = ROUNDOWN(unalignedBase, B_PAGE_SIZE);
 	bool needsLocking = true;
 
-	if (IS_USER_ADDRESS(address))
-		addressSpace = vm_get_current_user_address_space();
-	else
+	if (IS_USER_ADDRESS(address)) {
+		if (team == B_CURRENT_TEAM)
+			addressSpace = vm_get_current_user_address_space();
+		else
+			addressSpace = vm_get_address_space(team);
+	} else
 		addressSpace = vm_get_kernel_address_space();
 	if (addressSpace == NULL)
 		return B_ERROR;
@@ -5162,10 +5175,16 @@ out:
 }
 
 
-/** According to the BeBook, this function should always succeed.
- *	This is no longer the case.
- */
+status_t
+unlock_memory(void *address, size_t numBytes, uint32 flags)
+{
+	return unlock_memory_etc(B_CURRENT_TEAM, address, numBytes, flags);
+}
 
+
+/*!	According to the BeBook, this function should always succeed.
+	This is no longer the case.
+*/
 long
 get_memory_map(const void *address, ulong numBytes, physical_entry *table,
 	long numEntries)
@@ -5434,13 +5453,13 @@ clone_area(const char *name, void **_address, uint32 addressSpec,
 
 
 area_id
-create_area_etc(struct team *team, const char *name, void **address, uint32 addressSpec,
-	uint32 size, uint32 lock, uint32 protection)
+create_area_etc(team_id team, const char *name, void **address,
+	uint32 addressSpec, uint32 size, uint32 lock, uint32 protection)
 {
 	fix_protection(&protection);
 
-	return vm_create_anonymous_area(team->id, (char *)name, address,
-		addressSpec, size, lock, protection, false, true);
+	return vm_create_anonymous_area(team, (char *)name, address, addressSpec,
+		size, lock, protection, false, true);
 }
 
 
@@ -5452,13 +5471,6 @@ create_area(const char *name, void **_address, uint32 addressSpec, size_t size, 
 
 	return vm_create_anonymous_area(vm_kernel_address_space_id(), (char *)name, _address,
 		addressSpec, size, lock, protection, false, true);
-}
-
-
-status_t
-delete_area_etc(struct team *team, area_id area)
-{
-	return vm_delete_area(team->id, area, true);
 }
 
 
@@ -5841,7 +5853,7 @@ _user_sync_memory(void *_address, addr_t size, int flags)
 		address += rangeSize;
 		size -= rangeSize;
 	}
-	
+
 	// NOTE: If I understand it correctly the purpose of MS_INVALIDATE is to
 	// synchronize multiple mappings of the same file. In our VM they never get
 	// out of sync, though, so we don't have to do anything.

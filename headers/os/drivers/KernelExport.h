@@ -144,8 +144,12 @@ extern thread_id	spawn_kernel_thread(thread_func function,
 extern int			send_signal_etc(pid_t thread, uint signal, uint32 flags);
 
 /* virtual memory */
-extern long			lock_memory(void *buffer, ulong numBytes, ulong flags);
-extern long			unlock_memory(void *buffer, ulong numBytes, ulong flags);
+extern status_t		lock_memory_etc(team_id team, void *buffer, size_t numBytes,
+						uint32 flags);
+extern status_t		lock_memory(void *buffer, size_t numBytes, uint32 flags);
+extern status_t		unlock_memory_etc(team_id team, void *address,
+						size_t numBytes, uint32 flags);
+extern status_t		unlock_memory(void *buffer, size_t numBytes, uint32 flags);
 extern long			get_memory_map(const void *buffer, ulong size,
 						physical_entry *table, long numEntries);
 extern area_id		map_physical_memory(const char *areaName,
@@ -168,7 +172,7 @@ extern uint64		parse_expression(const char *string);
 
 extern int			add_debugger_command(char *name, debugger_command_hook hook, char *help);
 extern int			remove_debugger_command(char *name,
-						debugger_command_hook hook); 
+						debugger_command_hook hook);
 
 /* Miscellaneous */
 extern void			spin(bigtime_t microseconds);

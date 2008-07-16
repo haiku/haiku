@@ -160,7 +160,7 @@ class ExecTeam : public AbstractTraceEntry {
 			for (int32 i = 0; !out.IsFull() && i < fArgCount; i++) {
 				out.Print(" \"%s\"", args);
 				args += strlen(args) + 1;
-			}			
+			}
 		}
 
 	private:
@@ -812,7 +812,7 @@ create_team_user_data(struct team* team)
 {
 	void* address = (void*)KERNEL_USER_DATA_BASE;
 	size_t size = 4 * B_PAGE_SIZE;
-	team->user_data_area = create_area_etc(team, "user area", &address,
+	team->user_data_area = create_area_etc(team->id, "user area", &address,
 		B_BASE_ADDRESS, size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (team->user_data_area < 0)
 		return team->user_data_area;
@@ -830,7 +830,7 @@ static void
 delete_team_user_data(struct team* team)
 {
 	if (team->user_data_area >= 0) {
-		delete_area_etc(team, team->user_data_area);
+		vm_delete_area(team->id, team->user_data_area, true);
 		team->user_data = 0;
 		team->used_user_data = 0;
 		team->user_data_size = 0;
@@ -989,8 +989,9 @@ team_create_thread_start(void *args)
 		// the exact location at the end of the user stack area
 
 	sprintf(ustack_name, "%s_main_stack", team->name);
-	t->user_stack_area = create_area_etc(team, ustack_name, (void **)&t->user_stack_base,
-		B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
+	t->user_stack_area = create_area_etc(team->id, ustack_name,
+		(void **)&t->user_stack_base, B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK,
+		B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
 	if (t->user_stack_area < 0) {
 		dprintf("team_create_thread_start: could not create default user stack region\n");
 
@@ -1050,7 +1051,7 @@ team_create_thread_start(void *args)
 			runtimeLoaderPath.LockBuffer(), runtimeLoaderPath.BufferSize());
 		if (err < B_OK) {
 			TRACE(("team_create_thread_start: find_directory() failed: %s\n",
-				strerror(err))); 
+				strerror(err)));
 			return err;
 		}
 		runtimeLoaderPath.UnlockBuffer();
@@ -1064,7 +1065,7 @@ team_create_thread_start(void *args)
 		// Luckily, we don't have to clean up the mess we created - that's
 		// done for us by the normal team deletion process
 		TRACE(("team_create_thread_start: elf_load_user_image() failed: "
-			"%s\n", strerror(err))); 
+			"%s\n", strerror(err)));
 		return err;
 	}
 
@@ -1210,7 +1211,7 @@ load_image_etc(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 		if (loadingInfo.result < B_OK)
 			return loadingInfo.result;
-	}	
+	}
 
 	// notify the debugger
 	user_debug_team_created(team->id);
@@ -1849,11 +1850,11 @@ fill_team_info(struct team *team, team_info *info, size_t size)
 	info->team = team->id;
 	info->thread_count = team->num_threads;
 	info->image_count = count_images(team);
-	//info->area_count = 
+	//info->area_count =
 	info->debugger_nub_thread = team->debug_info.nub_thread;
 	info->debugger_nub_port = team->debug_info.nub_port;
-	//info->uid = 
-	//info->gid = 
+	//info->uid =
+	//info->gid =
 
 	strlcpy(info->args, team->args, sizeof(info->args));
 	info->argc = 1;
@@ -2187,7 +2188,7 @@ team_remove_team(struct team *team)
 
 		session->controlling_tty = -1;
 
-		// send SIGHUP to the foreground 
+		// send SIGHUP to the foreground
 		if (session->foreground_group >= 0) {
 			send_signal_etc(-session->foreground_group, SIGHUP,
 				SIGNAL_FLAG_TEAMS_LOCKED);
@@ -2206,7 +2207,7 @@ team_remove_team(struct team *team)
 				send_signal_etc(-childGroup->id, SIGCONT,
 					SIGNAL_FLAG_TEAMS_LOCKED);
 			}
-	
+
 			child = child->siblings_next;
 		}
 	} else {
@@ -2216,7 +2217,7 @@ team_remove_team(struct team *team)
 			process_group* childGroup = child->group;
 			if (!childGroup->orphaned)
 				update_orphaned_process_group(childGroup, team->id);
-	
+
 			child = child->siblings_next;
 		}
 
@@ -2509,8 +2510,8 @@ start_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
 
 	return B_OK;
 }
-	
-	
+
+
 status_t
 stop_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
 {
@@ -3304,7 +3305,7 @@ _user_get_team_info(team_id id, team_info *userInfo)
 	team_info info;
 
 	if (!IS_USER_ADDRESS(userInfo))
-		return B_BAD_ADDRESS;	
+		return B_BAD_ADDRESS;
 
 	status = _get_team_info(id, &info, sizeof(team_info));
 	if (status == B_OK) {

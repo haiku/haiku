@@ -46,9 +46,8 @@ void permit_page_faults(void);
 void forbid_page_faults(void);
 
 // private kernel only extension (should be moved somewhere else):
-area_id create_area_etc(struct team *team, const char *name, void **address,
+area_id create_area_etc(team_id team, const char *name, void **address,
 			uint32 addressSpec, uint32 size, uint32 lock, uint32 protection);
-status_t delete_area_etc(struct team *team, area_id area);
 
 status_t vm_unreserve_address_range(team_id team, void *address, addr_t size);
 status_t vm_reserve_address_range(team_id team, void **_address,

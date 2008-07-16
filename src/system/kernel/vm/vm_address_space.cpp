@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -166,7 +166,7 @@ delete_address_space(vm_address_space *addressSpace)
 
 
 vm_address_space *
-vm_get_address_space_by_id(team_id id)
+vm_get_address_space(team_id id)
 {
 	vm_address_space *addressSpace;
 
@@ -334,7 +334,7 @@ vm_address_space_init(void)
 	// create the area and address space hash tables
 	{
 		vm_address_space *aspace;
-		sAddressSpaceTable = hash_init(ASPACE_HASH_TABLE_SIZE, 
+		sAddressSpaceTable = hash_init(ASPACE_HASH_TABLE_SIZE,
 			(addr_t)&aspace->hash_next - (addr_t)aspace, &aspace_compare,
 			&aspace_hash);
 		if (sAddressSpaceTable == NULL)

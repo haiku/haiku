@@ -502,7 +502,7 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 
 			snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_stack",
 				attributes.name, thread->id);
-			thread->user_stack_area = create_area_etc(team, stack_name,
+			thread->user_stack_area = create_area_etc(team->id, stack_name,
 					(void **)&thread->user_stack_base, B_BASE_ADDRESS,
 					thread->user_stack_size + TLS_SIZE, B_NO_LOCK,
 					B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
@@ -1003,7 +1003,7 @@ state_to_text(struct thread *thread, int32 state)
 			switch (thread->wait.type) {
 				case THREAD_BLOCK_TYPE_SNOOZE:
 					return "zzz";
-	
+
 				case THREAD_BLOCK_TYPE_SEMAPHORE:
 				{
 					sem_id sem = (sem_id)(addr_t)thread->wait.object;
@@ -1314,7 +1314,7 @@ thread_exit(void)
 	if (team->address_space != NULL && thread->user_stack_area >= 0) {
 		area_id area = thread->user_stack_area;
 		thread->user_stack_area = -1;
-		delete_area_etc(team, area);
+		vm_delete_area(team->id, area, true);
 	}
 
 	struct job_control_entry *death = NULL;
@@ -2550,7 +2550,7 @@ getrlimit(int resource, struct rlimit * rlp)
 		return -1;
 	}
 
-	return 0;	
+	return 0;
 }
 
 
@@ -2563,7 +2563,7 @@ setrlimit(int resource, const struct rlimit * rlp)
 		return -1;
 	}
 
-	return 0;	
+	return 0;
 }
 
 

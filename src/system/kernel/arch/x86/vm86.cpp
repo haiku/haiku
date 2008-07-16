@@ -547,9 +547,8 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 		ramSize = VM86_MIN_RAM_SIZE;
 
 	void *address = (void *)0;
-	state->ram_area = create_area_etc(team, "dos", &address, B_EXACT_ADDRESS,
-		ramSize, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA
-		| B_READ_AREA | B_WRITE_AREA);
+	state->ram_area = create_area_etc(team->id, "dos", &address,
+		B_EXACT_ADDRESS, ramSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (state->ram_area < B_OK) {
 		ret = state->ram_area;
 		TRACE("Could not create RAM area\n");
@@ -566,7 +565,7 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 		goto error;
 	}
 	ret = user_memcpy((void *)0, address, 0x502);
-	*((uint32 *)0) = 0xDEADBEEF;
+	*((uint32 *)0) = 0xdeadbeef;
 	delete_area(vectors);
 	if (ret != B_OK)
 		goto error;
@@ -586,9 +585,9 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 
 error:
 	if (state->bios_area > B_OK)
-		delete_area_etc(team, state->bios_area);
+		vm_delete_area(team->id, state->bios_area, true);
 	if (state->ram_area > B_OK)
-		delete_area_etc(team, state->ram_area);
+		vm_delete_area(team->id, state->ram_area, true);
 	return ret;
 }
 
@@ -601,9 +600,9 @@ vm86_cleanup(struct vm86_state *state)
 	struct team *team = thread_get_current_thread()->team;
 
 	if (state->bios_area > B_OK)
-		delete_area_etc(team, state->bios_area);
+		vm_delete_area(team->id, state->bios_area, true);
 	if (state->ram_area > B_OK)
-		delete_area_etc(team, state->ram_area);
+		vm_delete_area(team->id, state->ram_area, true);
 }
 
 
