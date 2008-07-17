@@ -505,6 +505,7 @@ fSurfaceTestMI->SetEnabled(false);
 			parentPartition = disk->FindDescendant(parentID);
 
 		if (parentPartition) {
+			bool prepared = disk->PrepareModifications() == B_OK;
 			fCreateMenu->SetEnabled(true);
 			BString supportedChildType;
 			int32 cookie = 0;
@@ -522,6 +523,8 @@ fSurfaceTestMI->SetEnabled(false);
 			if (fCreateMenu->CountItems() == 0)
 				fprintf(stderr, "Failed to get supported child types: %s\n",
 					strerror(ret));
+			if (prepared)
+				disk->CancelModifications();
 		} else {
 			fCreateMenu->SetEnabled(false);
 		}
