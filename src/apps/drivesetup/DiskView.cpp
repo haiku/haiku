@@ -447,9 +447,10 @@ DiskView::_UpdateLayout()
 		// TODO: cancelling modifications here is of course undesired
 		// once we hold off the real modifications until an explicit
 		// command to write them to disk...
-fDisk->PrepareModifications();
+		bool prepared = fDisk->PrepareModifications() == B_OK;
 		fDisk->VisitEachDescendant(fPartitionLayout);
-fDisk->CancelModifications();
+		if (prepared)
+			fDisk->CancelModifications();
 	}
 
 	Invalidate();

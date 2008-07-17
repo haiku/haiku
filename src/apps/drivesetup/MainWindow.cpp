@@ -40,6 +40,7 @@ public:
 		: fPartitionList(list)
 		, fDiskCount(diskCount)
 		, fSpaceIDMap(spaceIDMap)
+		, fLastPreparedDevice(NULL)
 	{
 		fDiskCount = 0;
 		fSpaceIDMap.Clear();
@@ -51,6 +52,11 @@ public:
 			delete row;
 		}
 	}
+	~ListPopulatorVisitor()
+	{
+		if (fLastPreparedDevice)
+			fLastPreparedDevice->CancelModifications();
+	}
 
 	virtual bool Visit(BDiskDevice* device)
 	{
@@ -58,7 +64,12 @@ public:
 		// if we don't prepare the device for modifications,
 		// we cannot get information about available empty
 		// regions on the device or child partitions
-device->PrepareModifications();
+		if (fLastPreparedDevice) {
+			fLastPreparedDevice->CancelModifications();
+			fLastPreparedDevice = NULL;
+		}
+		if (device->PrepareModifications() == B_OK)
+			fLastPreparedDevice = device;
 		_AddPartition(device);
 		return false; // Don't stop yet!
 	}
@@ -98,6 +109,7 @@ private:
 	PartitionListView*	fPartitionList;
 	int32&				fDiskCount;
 	SpaceIDMap&			fSpaceIDMap;
+	BDiskDevice*		fLastPreparedDevice;
 };
 
 
@@ -493,7 +505,6 @@ fSurfaceTestMI->SetEnabled(false);
 			parentPartition = disk->FindDescendant(parentID);
 
 		if (parentPartition) {
-disk->PrepareModifications();
 			fCreateMenu->SetEnabled(true);
 			BString supportedChildType;
 			int32 cookie = 0;
@@ -511,7 +522,6 @@ disk->PrepareModifications();
 			if (fCreateMenu->CountItems() == 0)
 				fprintf(stderr, "Failed to get supported child types: %s\n",
 					strerror(ret));
-disk->CancelModifications();
 		} else {
 			fCreateMenu->SetEnabled(false);
 		}
@@ -648,6 +658,34 @@ MainWindow::_MountAll()
 
 // #pragma mark -
 
+class ModificationPreparer {
+public:
+	ModificationPreparer(BDiskDevice* disk)
+		: fDisk(disk)
+		, fModificationStatus(fDisk->PrepareModifications())
+	{
+	}
+	~ModificationPreparer()
+	{
+		if (fModificationStatus == B_OK)
+			fDisk->CancelModifications();
+	}
+	status_t ModificationStatus() const
+	{
+		return fModificationStatus;
+	}
+	status_t CommitModifications()
+	{
+		status_t ret = fDisk->CommitModifications();
+		if (ret == B_OK)
+			fModificationStatus = B_ERROR;
+		return ret;
+	}
+
+private:
+	BDiskDevice*	fDisk;
+	status_t		fModificationStatus;
+};
 
 void
 MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
@@ -716,7 +754,8 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 	}
 
-	status_t ret = disk->PrepareModifications();
+	ModificationPreparer modificationPreparer(disk);
+	status_t ret = modificationPreparer.ModificationStatus();
 	if (ret != B_OK) {
 		_DisplayPartitionError("There was an error preparing the "
 			"disk for modifications.", NULL, ret);
@@ -766,7 +805,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 
 	// commit
-	ret = disk->CommitModifications();
+	ret = modificationPreparer.CommitModifications();
 	if (ret == B_OK) {
 		_DisplayPartitionError("The partition %s has been successfully "
 			"initialized.\n", partition);
