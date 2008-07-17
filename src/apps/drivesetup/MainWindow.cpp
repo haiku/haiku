@@ -40,7 +40,6 @@ public:
 		: fPartitionList(list)
 		, fDiskCount(diskCount)
 		, fSpaceIDMap(spaceIDMap)
-		, fLastPreparedDevice(NULL)
 	{
 		fDiskCount = 0;
 		fSpaceIDMap.Clear();
@@ -52,11 +51,6 @@ public:
 			delete row;
 		}
 	}
-	~ListPopulatorVisitor()
-	{
-		if (fLastPreparedDevice)
-			fLastPreparedDevice->CancelModifications();
-	}
 
 	virtual bool Visit(BDiskDevice* device)
 	{
@@ -64,12 +58,7 @@ public:
 		// if we don't prepare the device for modifications,
 		// we cannot get information about available empty
 		// regions on the device or child partitions
-		if (fLastPreparedDevice) {
-			fLastPreparedDevice->CancelModifications();
-			fLastPreparedDevice = NULL;
-		}
-		if (device->PrepareModifications() == B_OK)
-			fLastPreparedDevice = device;
+		device->PrepareModifications();
 		_AddPartition(device);
 		return false; // Don't stop yet!
 	}
