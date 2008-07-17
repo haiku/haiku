@@ -94,7 +94,7 @@ check_cpu_features()
 		return EINVAL;
 	}
 	machine_type = (uint16)(c->ivalue >> 16);
-	gKernelArgs.arch_args.platform = machine_type;
+	gKernelArgs.arch_args.machine = machine_type;
 
 	return B_OK;
 }
