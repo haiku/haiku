@@ -13,13 +13,13 @@ typedef int32 hci_id;
 
 typedef enum { H2 = 2, H3, H4, H5 } transport_type; 
 
-// TODO: something more authomatic here? 
-#define HCI_NUM_PACKET_TYPES 5
 typedef enum { BT_COMMAND = 0, 
                BT_EVENT, 
                BT_ACL, 
                BT_SCO,
-               BT_ESCO
+               BT_ESCO,
+               // more packet types
+               HCI_NUM_PACKET_TYPES //max
               } bt_packet_t;
 
 

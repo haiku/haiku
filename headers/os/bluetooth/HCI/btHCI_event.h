@@ -49,7 +49,7 @@ struct hci_ev_conn_request {
 } __attribute__ ((packed));
 
 #define HCI_EVENT_DISCONNECTION_COMPLETE	0x05
-struct hci_disconnection_complete_reply {
+struct hci_ev_disconnection_complete_reply {
 	uint8     status;
 	uint16    handle;
 	uint8     reason;
@@ -62,7 +62,7 @@ struct hci_ev_auth_complete {
 } __attribute__ ((packed));
 
 #define HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE	0x07
-struct hci_remote_name_request_complete_reply {
+struct hci_ev_remote_name_request_complete_reply {
 	uint8     status;
 	bdaddr_t  bdaddr;
 	char	  remote_name[248];
