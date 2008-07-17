@@ -66,8 +66,8 @@ struct node {
 
 class Session {
 	public:
-		Session(team_id team, const char *name, mount_id device,
-			vnode_id node, int32 seconds);
+		Session(team_id team, const char *name, dev_t device,
+			ino_t node, int32 seconds);
 		Session(const char *name);
 		~Session();
 
@@ -80,8 +80,8 @@ class Session {
 		bool IsMainSession() const;
 		bool IsWorthSaving() const;
 
-		void AddNode(mount_id device, vnode_id node);
-		void RemoveNode(mount_id device, vnode_id node);
+		void AddNode(dev_t device, ino_t node);
+		void RemoveNode(dev_t device, ino_t node);
 
 		void Lock() { mutex_lock(&fLock); }
 		void Unlock() { mutex_unlock(&fLock); }
@@ -97,7 +97,7 @@ class Session {
 		static uint32 NextOffset() { return offsetof(Session, fNext); }
 
 	private:
-		struct node *_FindNode(mount_id device, vnode_id node);
+		struct node *_FindNode(dev_t device, ino_t node);
 
 		Session		*fNext;
 		char		fName[B_OS_NAME_LENGTH];
@@ -118,7 +118,7 @@ class SessionGetter {
 		SessionGetter(team_id team, Session **_session);
 		~SessionGetter();
 
-		status_t New(const char *name, mount_id device, vnode_id node,
+		status_t New(const char *name, dev_t device, ino_t node,
 					Session **_session);
 		void Stop();
 
@@ -245,7 +245,7 @@ stop_session(Session *session)
 
 
 static Session *
-start_session(team_id team, mount_id device, vnode_id node, const char *name,
+start_session(team_id team, dev_t device, ino_t node, const char *name,
 	int32 seconds = 30)
 {
 	RecursiveLocker locker(&sLock);
@@ -317,7 +317,7 @@ parse_node_ref(const char *string, node_ref &ref, const char **_end = NULL)
 
 
 static struct node *
-new_node(mount_id device, vnode_id id)
+new_node(dev_t device, ino_t id)
 {
 	struct node *node = new ::node;
 	if (node == NULL)
@@ -345,7 +345,7 @@ load_prefetch_data()
 
 		Session *session = new Session(dirent->d_name);
 
-		if (session->LoadFromDirectory(dir->fd) != B_OK) {
+		if (session->LoadFromDirectory(dirfd(dir)) != B_OK) {
 			delete session;
 			continue;
 		}
@@ -365,8 +365,8 @@ load_prefetch_data()
 //	#pragma mark -
 
 
-Session::Session(team_id team, const char *name, mount_id device,
-	vnode_id node, int32 seconds)
+Session::Session(team_id team, const char *name, dev_t device,
+	ino_t node, int32 seconds)
 	:
 	fNodes(NULL),
 	fNodeCount(0),
@@ -447,9 +447,6 @@ Session::~Session()
 status_t
 Session::InitCheck()
 {
-	if (fLock.sem < B_OK)
-		return fLock.sem;
-
 	if (fNodeHash == NULL)
 		return B_NO_MEMORY;
 
@@ -458,7 +455,7 @@ Session::InitCheck()
 
 
 node *
-Session::_FindNode(mount_id device, vnode_id node)
+Session::_FindNode(dev_t device, ino_t node)
 {
 	node_ref key;
 	key.device = device;
@@ -469,7 +466,7 @@ Session::_FindNode(mount_id device, vnode_id node)
 
 
 void
-Session::AddNode(mount_id device, vnode_id id)
+Session::AddNode(dev_t device, ino_t id)
 {
 	struct node *node = _FindNode(device, id);
 	if (node != NULL) {
@@ -487,7 +484,7 @@ Session::AddNode(mount_id device, vnode_id id)
 
 
 void
-Session::RemoveNode(mount_id device, vnode_id id)
+Session::RemoveNode(dev_t device, ino_t id)
 {
 	struct node *node = _FindNode(device, id);
 	if (node != NULL && --node->ref_count <= 0) {
@@ -685,7 +682,7 @@ SessionGetter::~SessionGetter()
 
 
 status_t
-SessionGetter::New(const char *name, mount_id device, vnode_id node,
+SessionGetter::New(const char *name, dev_t device, ino_t node,
 	Session **_session)
 {
 	struct thread *thread = thread_get_current_thread();
@@ -714,8 +711,8 @@ SessionGetter::Stop()
 
 
 static void
-node_opened(void *vnode, int32 fdType, mount_id device, vnode_id parent,
-	vnode_id node, const char *name, off_t size)
+node_opened(struct vnode *vnode, int32 fdType, dev_t device, ino_t parent,
+	ino_t node, const char *name, off_t size)
 {
 	if (device < gBootDevice) {
 		// we ignore any access to rootfs, pipefs, and devfs
@@ -749,7 +746,8 @@ node_opened(void *vnode, int32 fdType, mount_id device, vnode_id parent,
 
 
 static void
-node_closed(void *vnode, int32 fdType, mount_id device, vnode_id node, int32 accessType)
+node_closed(struct vnode *vnode, int32 fdType, dev_t device, ino_t node,
+	int32 accessType)
 {
 	Session *session;
 	SessionGetter getter(team_get_current_team_id(), &session);
