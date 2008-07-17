@@ -120,18 +120,8 @@ rewinddir(DIR *dir)
 }
 
 
-#ifndef _KERNEL_MODE
-
-/* This is no POSIX compatible call; it's not exported in the headers
- * but here for BeOS compatiblity.
- */
-
-int dirfd(DIR *dir);
-
 int
 dirfd(DIR *dir)
 {
 	return dir->fd;
 }
-
-#endif	// !_KERNEL_MODE
