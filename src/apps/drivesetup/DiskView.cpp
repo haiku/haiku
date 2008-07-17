@@ -420,18 +420,15 @@ DiskView::SetDisk(BDiskDevice* disk, partition_id selectedPartition)
 {
 	if (fDisk != disk) {
 		fDisk = disk;
-		_UpdateLayout();
+		ForceUpdate();
 	}
 
 	fPartitionLayout->SetSelectedPartition(selectedPartition);
 }
 
 
-// #pragma mark -
-
-
 void
-DiskView::_UpdateLayout()
+DiskView::ForceUpdate()
 {
 	while (BView* view = ChildAt(0)) {
 		view->RemoveSelf();

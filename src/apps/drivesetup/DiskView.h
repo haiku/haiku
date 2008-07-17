@@ -26,9 +26,9 @@ public:
 			void				SetDiskCount(int32 count);
 			void				SetDisk(BDiskDevice* disk,
 									partition_id selectedPartition);
-private:
-			void				_UpdateLayout();
 
+			void				ForceUpdate();
+private:
 			int32				fDiskCount;
 			BDiskDevice*		fDisk;
 			SpaceIDMap&			fSpaceIDMap;

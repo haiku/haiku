@@ -376,6 +376,7 @@ MainWindow::_ScanDrives()
 		fListView->AddToSelection(previousSelection);
 		_EnabledDisableMenuItems(fCurrentDisk, fCurrentPartitionID,
 			previousSelection->ParentID());
+		fDiskView->ForceUpdate();
 	} else {
 		_EnabledDisableMenuItems(NULL, -1, -1);
 	}
@@ -650,6 +651,7 @@ MainWindow::_MountAll()
 
 // #pragma mark -
 
+
 class ModificationPreparer {
 public:
 	ModificationPreparer(BDiskDevice* disk)
@@ -678,6 +680,7 @@ private:
 	BDiskDevice*	fDisk;
 	status_t		fModificationStatus;
 };
+
 
 void
 MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
@@ -760,7 +763,8 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	BString name = "Haiku";
 	BString parameters;
 	InitParamsPanel* panel = new InitParamsPanel(this);
-	panel->Go(name, parameters);
+	if (panel->Go(name, parameters) == GO_CANCELED)
+		return;
 
 	bool supportsName = diskSystem.SupportsContentName();
 	BString validatedName(name);
