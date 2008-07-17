@@ -760,13 +760,12 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer,
 extern "C" void
 cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 {
-#if 0
 	vm_cache *cache;
 	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
 		return;
 
-	file_cache_ref *ref = (struct file_cache_ref *)
-		((vnode_store *)cache->store)->file_cache_ref;
+	file_cache_ref *ref
+		= (file_cache_ref *)((vnode_store *)cache->store)->file_cache_ref;
 	off_t fileSize = cache->virtual_size;
 
 	if (size > fileSize)
@@ -776,58 +775,8 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 	if (size > 4 * 1024 * 1024)
 		size = 4 * 1024 * 1024;
 
-	size_t bytesLeft = size, lastLeft = size;
-	off_t lastOffset = offset;
-	size_t lastSize = 0;
-
-	mutex_lock(&cache->lock);
-
-	for (; bytesLeft > 0; offset += B_PAGE_SIZE) {
-		// check if this page is already in memory
-		addr_t virtualAddress;
-	restart:
-		vm_page *page = vm_cache_lookup_page(cache, offset);
-		if (page != NULL) {
-			if (page->state == PAGE_STATE_BUSY) {
-				// if busy retry again later
-				ConditionVariableEntry entry;
-				entry.Add(page);
-				mutex_unlock(&cache->lock);
-				entry.Wait();
-				mutex_lock(&cache->lock);
-
-				goto restart;
-			}
-
-			// it is, so let's satisfy in the first part of the request
-			if (lastOffset < offset) {
-				size_t requestSize = offset - lastOffset;
-				read_into_cache(ref, lastOffset, requestSize, NULL, 0);
-			}
-
-			if (bytesLeft <= B_PAGE_SIZE) {
-				// we've read the last page, so we're done!
-				goto out;
-			}
-
-			// prepare a potential gap request
-			lastOffset = offset + B_PAGE_SIZE;
-			lastLeft = bytesLeft - B_PAGE_SIZE;
-		}
-
-		if (bytesLeft <= B_PAGE_SIZE)
-			break;
-
-		bytesLeft -= B_PAGE_SIZE;
-	}
-
-	// read in the last part
-	read_into_cache(ref, lastOffset, lastLeft, NULL, 0);
-
-out:
-	mutex_unlock(&cache->lock);
+	cache_io(ref, NULL, offset, 0, &size, false);
 	vm_cache_release_ref(cache);
-#endif
 }
 
 
