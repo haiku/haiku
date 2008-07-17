@@ -148,7 +148,7 @@ sign_symbol(int flags, bool negative)
 
 
 static void
-number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
+number(char **_string, int32 *_bytesLeft, uint64 num, uint32 base, int size,
 	int precision, int flags)
 {
 	const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -164,11 +164,14 @@ number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
 
 	c = (flags & ZEROPAD) ? '0' : ' ';
 
-	sign = sign_symbol(flags, num < 0);
-	if (num < 0)
-		num = -num;
-	if (sign)
-		size--;
+	if (flags & SIGN) {
+		sign = sign_symbol(flags, (int64)num < 0);
+		if ((int64)num < 0)
+			num = -(int64)num;
+		if (sign)
+			size--;
+	} else
+		sign = 0;
 
 	if ((flags & SPECIAL) != 0) {
 		if (base == 16)
@@ -181,7 +184,7 @@ number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
 	if (num == 0)
 		tmp[i++] = '0';
 	else while (num != 0)
-		tmp[i++] = digits[do_div((uint64 *)&num, base)];
+		tmp[i++] = digits[do_div(&num, base)];
 
 	if (i > precision)
 		precision = i;
