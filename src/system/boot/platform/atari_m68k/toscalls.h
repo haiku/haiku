@@ -260,10 +260,18 @@ struct tos_pun_info {
 /* handy shortcut */
 static inline int Bconput(int16 handle, const char *string)
 {
-	int i, err;
-	for (i = 0; string[i]; i++) {
-		if (string[i] == '\n')
+	int i, col, err;
+	for (i = 0, col = 0; string[i]; i++, col++) {
+		if (string[i] == '\n') {
 			Bconout(handle, '\r');
+			col = 0;
+		}
+		/* hard wrap at 80 col as the ST console emulation doesn't do this. */
+		if (col == 80) {
+			Bconout(handle, '\r');
+			Bconout(handle, '\n');
+			col = 0;
+		}
 		err = Bconout(handle, string[i]);
 		if (err < 0)
 			break;
