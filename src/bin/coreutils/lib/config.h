@@ -262,7 +262,7 @@
 
 /* Define to 1 if you have the declaration of `dirfd', and to 0 if you don't.
    */
-#define HAVE_DECL_DIRFD 0
+#define HAVE_DECL_DIRFD 1
 
 /* Define to 1 if you have the declaration of `euidaccess', and to 0 if you
    don't. */
@@ -1560,7 +1560,7 @@
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'sig_atomic_t'. */
-#define SIG_ATOMIC_T_SUFFIX 
+#define SIG_ATOMIC_T_SUFFIX
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'size_t'. */
@@ -1665,7 +1665,7 @@
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wchar_t'. */
-#define WCHAR_T_SUFFIX 
+#define WCHAR_T_SUFFIX
 
 /* Define if sys/ptem.h is required for struct winsize. */
 /* #undef WINSIZE_IN_PTEM */

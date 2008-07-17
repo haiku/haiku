@@ -41,7 +41,7 @@ void 			seekdir(DIR *dir, long int loc);
 long int		telldir(DIR *);
 
 /* Non-POSIX extension to get the FD out of the private DIR */
-int				dirfd(DIR *dir);
+int				dirfd(const DIR *dir);
 
 #ifdef __cplusplus
 }

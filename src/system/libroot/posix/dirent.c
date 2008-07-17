@@ -121,7 +121,7 @@ rewinddir(DIR *dir)
 
 
 int
-dirfd(DIR *dir)
+dirfd(const DIR *dir)
 {
 	return dir->fd;
 }
