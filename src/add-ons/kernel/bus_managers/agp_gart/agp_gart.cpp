@@ -534,7 +534,7 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 	uint32 count = size / B_PAGE_SIZE;
 
 	if ((flags & B_APERTURE_NEED_PHYSICAL) != 0) {
-		memory->page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, count);
+		memory->page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, 0, count);
 		if (memory->page == NULL)
 			return B_NO_MEMORY;
 	} else {
@@ -987,7 +987,7 @@ get_aperture_info(aperture_id id, aperture_info *info)
 	if (aperture == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	Autolock _(aperture->Lock());	
+	Autolock _(aperture->Lock());
 	return aperture->GetInfo(info);
 }
 
