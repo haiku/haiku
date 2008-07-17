@@ -266,7 +266,7 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 {
 	if (nodeInfo) {
 #ifdef __HAIKU__
-		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGB32);
+		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGBA32);
 #else
 		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
 #endif
@@ -291,7 +291,7 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 {
 	BMimeType mime(iconType);	
 #ifdef __HAIKU__
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGB32);
+	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGBA32);
 #else
 	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
 #endif
@@ -315,7 +315,7 @@ IconMenuItem::IconMenuItem(BMenu *submenu, BMessage *message,
 {
 	BMimeType mime(iconType);
 #ifdef __HAIKU__
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGB32);
+	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGBA32);
 #else
 	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
 #endif

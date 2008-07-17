@@ -167,7 +167,7 @@ TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 #endif
 
 #ifdef __HAIKU__
-	BBitmap vectorIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_RGB32);
+	BBitmap vectorIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 #endif
 	BBitmap largeIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_CMAP8);
 	BBitmap miniIcon(BRect(0, 0, 15, 15), B_BITMAP_NO_SERVER_LINK, B_CMAP8);

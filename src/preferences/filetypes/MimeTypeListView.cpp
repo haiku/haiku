@@ -90,7 +90,7 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 		}
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGB32);
+		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGBA32);
 #else
 		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8);
 #endif

@@ -860,7 +860,7 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 
 		icon->CopyTo(message);
 
-		BBitmap *dragBitmap = new BBitmap(fIcon->Bounds(), B_RGB32, true);
+		BBitmap *dragBitmap = new BBitmap(fIcon->Bounds(), B_RGBA32, true);
 		dragBitmap->Lock();
 		BView *view = new BView(dragBitmap->Bounds(), B_EMPTY_STRING, B_FOLLOW_NONE, 0);
 		dragBitmap->AddChild(view);
