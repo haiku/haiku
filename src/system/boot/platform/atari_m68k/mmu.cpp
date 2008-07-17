@@ -6,6 +6,7 @@
  */
 
 
+#include "atari_memory_map.h"
 #include "mmu.h"
 
 #include <boot/platform.h>
@@ -46,20 +47,14 @@
 /** The (physical) memory layout of the boot loader is currently as follows:
  *	  0x0800 - 0x10000	supervisor mode stack (1) XXX: more ? x86 starts at 500
  *	 0x10000 - ?		code (up to ~500 kB)
- *	unused (TT0 instead):
- *	 0x90000			1st temporary page table (identity maps 0-4 MB)
- *	 0x91000			2nd (4-8 MB)
- *
- *	 0x92000 - 0x92000	further page tables
- *	0x100000			page directory
+ *  0x100000 or FAST_RAM_BASE if any:
+ *	     ...			page directory
  *	     ...			boot loader heap (32 kB)
  *	     ...			free physical memory
- *	[0xa00000]			end of chip RAM for TT (falcon has more till ROM)
- *	[0xe00000 - 0xf00000	TOS ROM]
- *	[0xf00000 - 0x1000000	I/O]
- XXX: where is the video buffer ?
+ *  0xdNNNNN			video buffer usually there, as per v_bas_ad
+ *						(=Logbase() but Physbase() is better)
  *
- *	The first 16 MB (2) are identity mapped (0x0 - 0x1000000); paging 
+ *	The first 32 MB (2) are identity mapped (0x0 - 0x1000000); paging 
  *	is turned on. The kernel is mapped at 0x80000000, all other stuff 
  *	mapped by the loader (kernel args, modules, driver settings, ...) 
  *	comes after 0x81000000 which means that there is currently only 
@@ -67,9 +62,10 @@
  *	
  *	(1) no need for user stack, we are already in supervisor mode in the
  *	loader.
- *	(2) maps the whole regular ST space; transparent translation registers 
- *	have larger granularity anyway;
+ *	(2) maps the whole regular ST space; transparent translation registers
+ *	have larger granularity anyway.
  */
+#warning M68K: check for Physbase() < ST_RAM_TOP
 
 #define TRACE_MMU
 #ifdef TRACE_MMU
@@ -444,7 +440,8 @@ mmu_init_for_kernel(void)
 
 
 	// remove identity mapping of ST space
-	gMMUOps->set_tt(0, NULL, 0, 0);
+	// actually done by the kernel when it's done using query_early
+	//gMMUOps->set_tt(0, NULL, 0, 0);
 
 #if 0
 	// set up a new idt
@@ -593,6 +590,11 @@ mmu_init(void)
 	gKernelArgs.physical_allocated_range[0].size = 0;
 	gKernelArgs.num_physical_allocated_ranges = 1;
 		// remember the start of the allocated physical pages
+
+	// enable transparent translation of the first 32 MB
+	gMMUOps->set_tt(0, ATARI_CHIPRAM_BASE, 0x02000000, 0);
+	// enable transparent translation of the 16MB ST shadow range for I/O
+	gMMUOps->set_tt(0, ATARI_SHADOW_BASE, 0x01000000, 0);
 
 	init_page_directory();
 #if 0

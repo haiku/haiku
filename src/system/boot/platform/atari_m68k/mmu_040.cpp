@@ -43,21 +43,21 @@ initialize(void)
 
 
 static status_t
-set_tt(int which, addr_t pa, size_t len, uint32 perms)
+set_tt(int which, addr_t pa, size_t len, uint32 perms /* NOTUSED */)
 {
-	TRACE(("mmu_040:set_tt(%d, 0x%lx, %ld, 0x%08lx)\n", which, pa, len, perms));
+	TRACE(("mmu_040:set_tt(%d, 0x%lx, 0x%lx, 0x%08lx)\n", which, pa, len, perms));
 	uint32 mask;
 	uint32 ttr = 0;
-	mask = 1;
+	mask = 0x0000ffff;
 	if (len) {
+		len = (len >> 24) & 0x00ff;
 		while (len >>= 1)
 			mask <<= 1;
-		mask = (mask - 1);
 		// enable, super only, upa=0,
 		// cachable write-through, rw
 		ttr = 0x0a000;
 		ttr |= (pa & 0xff000000);
-		ttr |= ((mask & 0xff000000) >> 8);
+		ttr |= (mask & 0x00ff0000);
 	}
 	TRACE(("mmu_040:set_tt: 0x%08lx\n", ttr));
 	

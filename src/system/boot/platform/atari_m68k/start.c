@@ -123,11 +123,16 @@ _start(void)
 	init_nat_features();
 
 	//serial_init();
-	console_init();
 	Bconout(DEV_CON, 'K');
-	cpu_init();
+	console_init();
 	Bconout(DEV_CON, 'U');
-	//mmu_init();
+	dprintf("membot  = %p\n", *TOSVAR_membot);
+	dprintf("memtop  = %p\n", *TOSVAR_memtop);
+	dprintf("v_bas_ad= %p\n", *TOSVAR_v_bas_ad);
+	dprintf("phystop = %p\n", *TOSVARphystop);
+	dprintf("ramtop  = %p\n", *TOSVARramtop);
+	cpu_init();
+	mmu_init();
 
 	// wait a bit to give the user the opportunity to press a key
 	spin(750000);
