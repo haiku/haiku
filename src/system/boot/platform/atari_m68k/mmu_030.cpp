@@ -62,17 +62,23 @@ set_tt(int which, addr_t pa, size_t len, uint32 perms)
 	}
 	TRACE(("mmu_030:set_tt: 0x%08lx\n", ttr));
 	
-
+	/* as seen in linux and BSD code,
+	 * we need to use .chip pseudo op here as -m68030 doesn't seem to help gas grok it. 
+	 */
 	switch (which) {
 		case 0:
 			asm volatile(  \
-				"pmove %0,%%tt0\n"				\
-				: : "d"(ttr));
+				".chip 68030\n\t"				\
+				"pmove %%tt0,(%0)\n\t"				\
+				".chip 68k\n\t"					\
+				: : "a"(&ttr));
 			break;
 		case 1:
 			asm volatile(  \
-				"pmove %0,%%tt1\n"				\
-				: : "d"(ttr));
+				".chip 68030\n\t"				\
+				"pmove (%0),%%tt1\n"				\
+				".chip 68k\n\t"					\
+				: : "a"(&ttr));
 			break;
 		default:
 			return EINVAL;
