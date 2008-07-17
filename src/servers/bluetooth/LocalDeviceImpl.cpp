@@ -65,24 +65,25 @@ void
 LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 {
 
-printf("### Event comming: len = %d\n", event->elen);
+printf("### Incoming event: len = %d\n", event->elen);
 for (int16 index = 0 ; index < event->elen + 2; index++ ) {
 	printf("%x:",((uint8*)event)[index]);
 }
 printf("### \n");
 
 	// Events here might have not been initated by us
+	// TODO: ML mark as handled pass a reply by parameter and reply in common
     switch (event->ecode) {
 	        case HCI_EVENT_HARDWARE_ERROR:
    				//HardwareError(event);    	
    			return;
 			case HCI_EVENT_CONN_REQUEST:
-	
+				ConnectionRequest((struct hci_ev_conn_request*)(event+1), NULL); // incoming request
 			break;
 
 			case HCI_EVENT_CONN_COMPLETE:
-				ConnectionComplete((struct hci_ev_conn_complete*)(event+1), NULL); // should belong to a request?
-	
+				ConnectionComplete((struct hci_ev_conn_complete*)(event+1), NULL); // should belong to a request? 
+																				   // can be sporadic or initiated by us¿?...
 			break;
 
 			case HCI_EVENT_PIN_CODE_REQ:
@@ -132,14 +133,14 @@ printf("### \n");
 		break;
 
 		case HCI_EVENT_DISCONNECTION_COMPLETE:
-
+			DisconnectionComplete((struct hci_ev_disconnection_complete_reply*)(event+1), request);
 		break;
  	
 		case HCI_EVENT_AUTH_COMPLETE:
 		break;
  			
 		case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE:
-			RemoteNameRequestComplete((struct hci_remote_name_request_complete_reply*)(event+1), request);		
+			RemoteNameRequestComplete((struct hci_ev_remote_name_request_complete_reply*)(event+1), request);	
 		break;
  	
 		case HCI_EVENT_ENCRYPT_CHANGE:
@@ -172,6 +173,7 @@ printf("### \n");
 		break;
  	
 		case HCI_EVENT_ROLE_CHANGE:
+			RoleChange((struct hci_ev_role_change*)(event+1), request, eventIndexLocation);
 		break;
  	
 		case HCI_EVENT_NUM_COMP_PKTS:
@@ -187,6 +189,7 @@ printf("### \n");
 		break;
  	
 		case HCI_EVENT_LINK_KEY_NOTIFY:
+			LinkKeyNotify((struct hci_ev_link_key_notify*)(event+1), request, eventIndexLocation);
 		break;
  		
 		case HCI_EVENT_LOOPBACK_COMMAND:
@@ -232,7 +235,7 @@ printf("### \n");
 
 void 
 LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request, int32 index) {
-    
+
 	int16   opcodeExpected;
 	BMessage reply;
 	
@@ -240,8 +243,6 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
     Output::Instance()->Post("\n", BLACKBOARD_LD_OFFSET + GetID());
 	
 	// Handle command complete information
-	// FIX ME! the expected code might me in another 
-	// index as is relative to the event not the request
     request->FindInt16("opcodeExpected", index, &opcodeExpected);
 
 
@@ -262,15 +263,15 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
                 printf("Sending reply ... %ld\n",request->SendReply(&reply));
                 reply.PrintToStream();
 
-			    Output::Instance()->Post("Positive reply for getAdress\n", BLACKBOARD_KIT);
+			    Output::Instance()->Post("Positive reply for getAddress\n", BLACKBOARD_KIT);
 
             } else {
                 reply.AddInt8("status", readbdaddr->status); 
                 request->SendReply(&reply);
-			    Output::Instance()->Post("Negative reply for getAdress\n", BLACKBOARD_KIT);
+			    Output::Instance()->Post("Negative reply for getAddress\n", BLACKBOARD_KIT);
             }
 
- 			// This request is not genna be used anymore
+ 			// This request is not gonna be used anymore
             ClearWantedEvent(request);
      	}
         break;
@@ -295,7 +296,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             printf("Sending reply ... %ld\n",request->SendReply(&reply));
             reply.PrintToStream();
 
- 			// This request is not genna be used anymore
+ 			// This request is not gonna be used anymore
             ClearWantedEvent(request);
      	}
         break;
@@ -319,7 +320,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             printf("Sending reply ... %ld\n",request->SendReply(&reply));
             reply.PrintToStream();
 
- 			// This request is not genna be used anymore
+ 			// This request is not gonna be used anymore
             ClearWantedEvent(request);
      	}
         break;
@@ -388,7 +389,7 @@ LocalDeviceImpl::InquiryResult(uint8* numberOfResponses, BMessage* request)
 	BMessage reply(BT_MSG_INQUIRY_DEVICE);
 
 	
-    reply.AddData("info", B_ANY_TYPE, numberOfResponses+1 // skiping here the number of responses
+    reply.AddData("info", B_ANY_TYPE, numberOfResponses+1 // skipping here the number of responses
                         , (*numberOfResponses) * sizeof(struct inquiry_info) );
 	
     printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));
@@ -412,7 +413,7 @@ LocalDeviceImpl::InquiryComplete(uint8* status, BMessage* request)
 
 
 void
-LocalDeviceImpl::RemoteNameRequestComplete(struct hci_remote_name_request_complete_reply* remotename, BMessage* request)
+LocalDeviceImpl::RemoteNameRequestComplete(struct hci_ev_remote_name_request_complete_reply* remotename, BMessage* request)
 {
 	BMessage reply;
 	
@@ -432,9 +433,15 @@ LocalDeviceImpl::RemoteNameRequestComplete(struct hci_remote_name_request_comple
     printf("Sending reply ... %ld\n", request->SendReply(&reply));
     reply.PrintToStream();
 
-	// This request is not genna be used anymore
-	// Although there are many middle events that should be tracked todo: ticket 2377
+	// This request is not gonna be used anymore
     ClearWantedEvent(request);
+
+}
+
+
+void
+LocalDeviceImpl::ConnectionRequest(struct hci_ev_conn_request* event, BMessage* request)
+{
 
 }
 
@@ -445,6 +452,17 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event, BMessage
 	ConnectionIncoming* iConnection = new ConnectionIncoming(NULL);
 	iConnection->Show();
 
+	// TODO: Connection is valid create needed instances here or in KL
+
+	ClearWantedEvent(request);
+
+}
+
+
+void
+LocalDeviceImpl::DisconnectionComplete(struct hci_ev_disconnection_complete_reply* event, BMessage * request)
+{
+	Output::Instance()->Post("Disconnected\n", BLACKBOARD_KIT);
 }
 
 
@@ -456,6 +474,21 @@ LocalDeviceImpl::PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* req
 
 }
 
+
+void
+LocalDeviceImpl::RoleChange(hci_ev_role_change *event, BMessage* request, int32 index)
+{
+
+}
+
+
+void
+LocalDeviceImpl::LinkKeyNotify(hci_ev_link_key_notify *event, BMessage* request, int32 index)
+{
+
+}
+
+
 #if 0
 #pragma mark - Request Methods -
 #endif
@@ -464,9 +497,9 @@ LocalDeviceImpl::PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* req
 status_t 
 LocalDeviceImpl::GetAddress(bdaddr_t* bdaddr, BMessage* request)
 {	
-	ssize_t size;
+	ssize_t ssize;
 	
-	if (fProperties->FindData("bdaddr", B_ANY_TYPE, 0, (const void **)bdaddr, &size) == B_OK) {
+	if (fProperties->FindData("bdaddr", B_ANY_TYPE, 0, (const void **)bdaddr, &ssize) == B_OK) {
 	    
 		(Output::Instance()->Post("BDADDR already present in server\n", BLACKBOARD_EVENTS));
 	    /* We have this info, returning back */
