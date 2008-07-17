@@ -289,6 +289,7 @@ Volume::Volume(fs_volume *volume)
 
 Volume::~Volume()
 {
+	mutex_destroy(&fQueryLock);
 	mutex_destroy(&fLock);
 }
 
