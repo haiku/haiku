@@ -46,8 +46,38 @@ static status_t
 set_tt(int which, addr_t pa, size_t len, uint32 perms)
 {
 	TRACE(("mmu_030:set_tt(%d, 0x%lx, %ld, 0x%08lx)\n", which, pa, len, perms));
+	uint32 mask;
+	uint32 ttr = 0;
+	mask = 1;
+	if (len) {
+		while (len >>= 1)
+			mask <<= 1;
+		mask = (mask - 1);
+		// enable, cachable(?), r/w
+		// super only
+		// mc68030 user's manual, page 9-57
+		ttr = 0x08043;
+		ttr |= (pa & 0xff000000);
+		ttr |= ((mask & 0xff000000) >> 8);
+	}
+	TRACE(("mmu_030:set_tt: 0x%08lx\n", ttr));
 	
-	return B_ERROR;
+
+	switch (which) {
+		case 0:
+			asm volatile(  \
+				"pmove %0,%%tt0\n"				\
+				: : "d"(ttr));
+			break;
+		case 1:
+			asm volatile(  \
+				"pmove %0,%%tt1\n"				\
+				: : "d"(ttr));
+			break;
+		default:
+			return EINVAL;
+	}
+	return B_OK;
 }
 
 
