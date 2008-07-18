@@ -3113,12 +3113,14 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 			if (message->FindPoint("screen_where", &where) != B_OK)
 				break;
 
+			// add local window coordinates
+			message->AddPoint("where", ConvertFromScreen(where));
+
 			BView* view = dynamic_cast<BView*>(target);
 			if (view != NULL) {
 				// add local view coordinates
 				message->AddPoint("be:view_where",
 					view->ConvertFromScreen(where));
-				message->AddPoint("where", view->ConvertFromScreen(where));
 
 				if (message->what == B_MOUSE_MOVED) {
 					// is there a token of the view that is currently under the mouse?
@@ -3148,9 +3150,6 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 					if (usePreferred || viewUnderMouse == NULL)
 						fLastMouseMovedView = viewUnderMouse;
 				}
-			} else {
-				// add local window coordinates
-				message->AddPoint("where", ConvertFromScreen(where));
 			}
 			break;
 		}
