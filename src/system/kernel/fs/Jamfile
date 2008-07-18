@@ -8,7 +8,6 @@ UsePrivateHeaders net shared storage ;
 KernelMergeObject kernel_fs.o :
 	fd.cpp
 	fifo.cpp
-	IOScheduler.cpp
 	KPath.cpp
 	node_monitor.cpp
 	rootfs.cpp

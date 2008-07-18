@@ -9,9 +9,13 @@ KernelMergeObject kernel_device_manager.o :
 	devfs.cpp
 	id_generator.cpp
 	io_resources.cpp
+	IOScheduler.cpp
 	legacy_drivers.cpp
 #	probe.cpp
 	settings.cpp
+
+	dma_resources.cpp
+	io_requests.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;
