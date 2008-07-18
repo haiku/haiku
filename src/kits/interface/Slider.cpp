@@ -587,6 +587,13 @@ BSlider::SetLimitLabels(const char *minLabel, const char *maxLabel)
 	fMaxLimitLabel = maxLabel ? strdup(maxLabel) : NULL;
 
 	InvalidateLayout();
+
+	// TODO: This is for backwards compatibility and should
+	// probably be removed when breaking binary compatiblity.
+	// Applications like our own Mouse rely on this behavior.
+	if ((Flags() & B_SUPPORTS_LAYOUT) == 0)
+		ResizeToPreferred();
+
 	Invalidate();
 }
 
@@ -1398,7 +1405,8 @@ void
 BSlider::SetHashMarks(hash_mark_location where)
 {
 	fHashMarks = where;
-	InvalidateLayout();
+// TODO: enable if the hashmark look is influencing the control size!
+//	InvalidateLayout();
 	Invalidate();
 }
 
