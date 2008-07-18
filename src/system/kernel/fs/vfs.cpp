@@ -6500,7 +6500,11 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 
 	RecursiveLocker mountOpLocker(sMountOpLock);
 
+	// this lock is not strictly necessary, but here in case of KDEBUG
+	// to keep the ASSERT in find_mount() working.
+	KDEBUG_ONLY(mutex_lock(&sMountMutex));
 	mount = find_mount(path != NULL ? vnode->device : mountID);
+	KDEBUG_ONLY(mutex_unlock(&sMountMutex));
 	if (mount == NULL) {
 		panic("fs_unmount: find_mount() failed on root vnode @%p of mount\n",
 			vnode);
