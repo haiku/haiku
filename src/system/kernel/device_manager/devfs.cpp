@@ -36,7 +36,6 @@
 #include <vm.h>
 
 #include "BaseDevice.h"
-#include "../fs/IOScheduler.h"
 #include "legacy_drivers.h"
 
 
@@ -72,7 +71,6 @@ struct devfs_stream {
 		struct stream_dev {
 			BaseDevice*				device;
 			struct devfs_partition*	partition;
-			IOScheduler*			scheduler;
 		} dev;
 		struct stream_symlink {
 			const char*				path;
@@ -254,10 +252,6 @@ devfs_delete_vnode(struct devfs* fs, struct devfs_vnode* vnode,
 		if (vnode->stream.u.dev.partition) {
 			put_vnode(fs->volume,
 				vnode->stream.u.dev.partition->raw_device->id);
-		} else {
-#if 0
-			delete vnode->stream.u.dev.scheduler;
-#endif
 		}
 	}
 
@@ -421,7 +415,6 @@ add_partition(struct devfs* fs, struct devfs_vnode* device, const char* name,
 	partitionNode->stream.type = device->stream.type;
 	partitionNode->stream.u.dev.device = device->stream.u.dev.device;
 	partitionNode->stream.u.dev.partition = partition;
-	partitionNode->stream.u.dev.scheduler = device->stream.u.dev.scheduler;
 
 	hash_insert(fs->vnode_hash, partitionNode);
 	devfs_insert_in_dir(device->parent, partitionNode);
@@ -690,11 +683,6 @@ publish_device(struct devfs* fs, const char* path, BaseDevice* device)
 		return B_BAD_VALUE;
 #endif
 
-	// mark disk devices - they might get an I/O scheduler
-	bool isDisk = false;
-	if (!strncmp(path, "disk/", 5))
-		isDisk = true;
-
 	struct devfs_vnode* node;
 	struct devfs_vnode* dirNode;
 	status_t status;
@@ -708,16 +696,6 @@ publish_device(struct devfs* fs, const char* path, BaseDevice* device)
 	// all went fine, let's initialize the node
 	node->stream.type = S_IFCHR | 0644;
 	node->stream.u.dev.device = device;
-
-#if 0
-	// every raw disk gets an I/O scheduler object attached
-	// ToDo: the driver should ask for a scheduler (ie. using its devfs node attributes)
-	if (isDisk && !strcmp(node->name, "raw")) {
-		node->stream.u.dev.scheduler = new(nothrow) IOScheduler(path, info);
-		if (!node->stream.u.dev.scheduler)
-			return B_NO_MEMORY;
-	}
-#endif
 
 	// the node is now fully valid and we may insert it into the dir
 	publish_node(fs, dirNode, node);
@@ -795,7 +773,6 @@ dump_node(int argc, char **argv)
 		kprintf(" device:      %p\n", vnode->stream.u.dev.device);
 		kprintf(" node:        %p\n", vnode->stream.u.dev.device->Node());
 		kprintf(" partition:   %p\n", vnode->stream.u.dev.partition);
-		kprintf(" scheduler:   %p\n", vnode->stream.u.dev.scheduler);
 	}
 
 	return 0;
@@ -1228,17 +1205,6 @@ devfs_read(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, off_t pos,
 	if (*_length == 0)
 		return B_OK;
 
-	// if this device has an I/O scheduler attached, the request must go through it
-	if (IOScheduler* scheduler = vnode->stream.u.dev.scheduler) {
-		IORequest request(cookie->device_cookie, pos, buffer, *_length);
-
-		status_t status = scheduler->Process(request);
-		if (status == B_OK)
-			*_length = request.Size();
-
-		return status;
-	}
-
 	// pass the call through to the device
 	return vnode->stream.u.dev.device->Read(cookie->device_cookie, pos, buffer,
 		_length);
@@ -1270,16 +1236,6 @@ devfs_write(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, off_t pos,
 
 	if (*_length == 0)
 		return B_OK;
-
-	if (IOScheduler* scheduler = vnode->stream.u.dev.scheduler) {
-		IORequest request(cookie->device_cookie, pos, buffer, *_length);
-
-		status_t status = scheduler->Process(request);
-		if (status == B_OK)
-			*_length = request.Size();
-
-		return status;
-	}
 
 	return vnode->stream.u.dev.device->Write(cookie->device_cookie, pos, buffer,
 		_length);
