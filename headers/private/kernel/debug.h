@@ -42,6 +42,12 @@
 #	define ASSERT_PRINT(x, format...)	do { } while(0)
 #endif
 
+#if KDEBUG
+#	define KDEBUG_ONLY(x)				x
+#else
+#	define KDEBUG_ONLY(x)				/* nothing */
+#endif
+
 // command return value
 #define B_KDEBUG_ERROR	4
 
