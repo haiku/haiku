@@ -4855,7 +4855,7 @@ fill_area_info(struct vm_area *area, area_info *info, size_t size)
 
 
 /*!
-	Tests wether or not the area that contains the specified address
+	Tests whether or not the area that contains the specified address
 	needs any kind of locking, and actually exists.
 	Used by both lock_memory() and unlock_memory().
 */
