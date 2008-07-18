@@ -16,6 +16,9 @@
 #include "pci_private.h"
 #include "pci.h"
 
+// private header for configuring io interrupts to level triggered
+#include <arch/int.h>
+
 #define TRACE_CAP(x...) dprintf(x)
 #define FLOW(x...)
 //#define FLOW(x...) dprintf(x)
@@ -1005,6 +1008,12 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 				dev->device, dev->function, PCI_min_grant, 1);
 			dev->info.u.h0.max_latency = ReadConfig(dev->domain, dev->bus,
 				dev->device, dev->function, PCI_max_latency, 1);
+
+			if (dev->info.u.h0.interrupt_line != 0
+				&& dev->info.u.h0.interrupt_line != 0xff) {
+				arch_int_configure_io_interrupt(dev->info.u.h0.interrupt_line,
+					B_LEVEL_TRIGGERED | B_LOW_ACTIVE_POLARITY);
+			}
 			break;
 		}
 

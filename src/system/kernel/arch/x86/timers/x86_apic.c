@@ -21,6 +21,8 @@
 static void *sApicPtr = NULL;
 static uint32 sApicTicsPerSec = 0;
 
+extern bool gUsingIOAPIC;
+
 struct timer_info gAPICTimer = {
 	"APIC",
 	&apic_get_prio,
@@ -51,17 +53,14 @@ _apic_write(uint32 offset, uint32 data)
 }
 
 
-static void
-_apic_acknowledge_interrupt(void)
-{
-	_apic_write(APIC_EOI, 0);
-}
-
-
 static int32
 apic_timer_interrupt(void *data)
 {
-	_apic_acknowledge_interrupt();
+	// if we are not using the IO APIC we need to acknowledge the
+	// interrupt ourselfs
+	if (!gUsingIOAPIC)
+		_apic_write(APIC_EOI, 0);
+
 	return timer_interrupt();
 }
 

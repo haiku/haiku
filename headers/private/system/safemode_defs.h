@@ -11,6 +11,7 @@
 
 #define B_SAFEMODE_DISABLE_USER_ADD_ONS		"disableuseraddons"
 #define B_SAFEMODE_DISABLE_IDE_DMA			"disableidedma"
+#define B_SAFEMODE_DISABLE_IOAPIC			"disable_ioapic"
 #define B_SAFEMODE_DISABLE_ACPI				"disable_acpi"
 #define B_SAFEMODE_DISABLE_APM				"disable_apm"
 #define B_SAFEMODE_DISABLE_SMP				"disable_smp"

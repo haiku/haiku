@@ -8,17 +8,22 @@
 #ifndef KERNEL_ARCH_INT_H
 #define KERNEL_ARCH_INT_H
 
-
-#include <boot/kernel_args.h>
 #include <arch_int.h>
 
+// config flags for arch_int_configure_io_interrupt()
+#define B_EDGE_TRIGGERED		1
+#define B_LEVEL_TRIGGERED		2
+#define B_LOW_ACTIVE_POLARITY	4
+#define B_HIGH_ACTIVE_POLARITY	8
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-status_t arch_int_init(kernel_args *args);
-status_t arch_int_init_post_vm(kernel_args *args);
+struct kernel_args;
+
+status_t arch_int_init(struct kernel_args *args);
+status_t arch_int_init_post_vm(struct kernel_args *args);
 status_t arch_int_init_post_device_manager(struct kernel_args *args);
 
 void arch_int_enable_interrupts(void);
@@ -26,6 +31,7 @@ int arch_int_disable_interrupts(void);
 void arch_int_restore_interrupts(int oldstate);
 void arch_int_enable_io_interrupt(int irq);
 void arch_int_disable_io_interrupt(int irq);
+void arch_int_configure_io_interrupt(int irq, uint32 config);
 bool arch_int_are_interrupts_enabled(void);
 
 #ifdef __cplusplus

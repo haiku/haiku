@@ -34,65 +34,24 @@
 #	define TRACE(x) ;
 #endif
 
-//#define TRACE_ARCH_SMP_TIMER
-#ifdef TRACE_ARCH_SMP_TIMER
-#	define TRACE_TIMER(x) dprintf x
-#else
-#	define TRACE_TIMER(x) ;
-#endif
+static void *sLocalAPIC = NULL;
+static uint32 sCPUAPICIds[B_MAX_CPU_COUNT];
+static uint32 sCPUOSIds[B_MAX_CPU_COUNT];
+static uint32 sAPICVersions[B_MAX_CPU_COUNT];
 
-extern timer_info gAPICTimer;
-
-static void *apic = NULL;
-static uint32 cpu_apic_id[B_MAX_CPU_COUNT] = {0, 0};
-static uint32 cpu_os_id[B_MAX_CPU_COUNT] = {0, 0};
-static uint32 cpu_apic_version[B_MAX_CPU_COUNT] = {0, 0};
-static void *ioapic = NULL;
-
-static int32
-i386_ici_interrupt(void *data)
-{
-	// genuine inter-cpu interrupt
-	TRACE(("inter-cpu interrupt on cpu %ld\n", smp_get_current_cpu()));
-	arch_smp_ack_interrupt();
-
-	return smp_intercpu_int_handler();
-}
-
-
-static int32
-i386_spurious_interrupt(void *data)
-{
-	// spurious interrupt
-	TRACE(("spurious interrupt on cpu %ld\n", smp_get_current_cpu()));
-	arch_smp_ack_interrupt();
-
-	return B_HANDLED_INTERRUPT;
-}
-
-
-static int32
-i386_smp_error_interrupt(void *data)
-{
-	// smp error interrupt
-	TRACE(("smp error interrupt on cpu %ld\n", smp_get_current_cpu()));
-	arch_smp_ack_interrupt();
-
-	return B_HANDLED_INTERRUPT;
-}
-
+extern bool gUsingIOAPIC;
 
 static uint32
 apic_read(uint32 offset)
 {
-	return *(volatile uint32 *)((char *)apic + offset);
+	return *(volatile uint32 *)((char *)sLocalAPIC + offset);
 }
 
 
 static void
 apic_write(uint32 offset, uint32 data)
 {
-	*(volatile uint32 *)((char *)apic + offset) = data;
+	*(volatile uint32 *)((char *)sLocalAPIC + offset) = data;
 }
 
 
@@ -156,33 +115,74 @@ setup_apic(kernel_args *args, int32 cpu)
 }
 
 
+static int32
+i386_ici_interrupt(void *data)
+{
+	// genuine inter-cpu interrupt
+	TRACE(("inter-cpu interrupt on cpu %ld\n", smp_get_current_cpu()));
+
+	// if we are not using the IO APIC we need to acknowledge the
+	// interrupt ourselfs
+	if (!gUsingIOAPIC)
+		apic_write(APIC_EOI, 0);
+
+	return smp_intercpu_int_handler();
+}
+
+
+static int32
+i386_spurious_interrupt(void *data)
+{
+	// spurious interrupt
+	TRACE(("spurious interrupt on cpu %ld\n", smp_get_current_cpu()));
+
+	// spurious interrupts must not be acknowledged as it does not expect
+	// a end of interrupt - if we still do it we would loose the next best
+	// interrupt
+	return B_HANDLED_INTERRUPT;
+}
+
+
+static int32
+i386_smp_error_interrupt(void *data)
+{
+	// smp error interrupt
+	TRACE(("smp error interrupt on cpu %ld\n", smp_get_current_cpu()));
+
+	// if we are not using the IO APIC we need to acknowledge the
+	// interrupt ourselfs
+	if (!gUsingIOAPIC)
+		apic_write(APIC_EOI, 0);
+
+	return B_HANDLED_INTERRUPT;
+}
+
+
 status_t
 arch_smp_init(kernel_args *args)
 {
 	TRACE(("arch_smp_init: entry\n"));
 
+	if (args->arch_args.apic == NULL)
+		return B_OK;
+
+	sLocalAPIC = args->arch_args.apic;
+
+	// setup some globals
+	memcpy(sCPUAPICIds, args->arch_args.cpu_apic_id, sizeof(args->arch_args.cpu_apic_id));
+	memcpy(sCPUOSIds, args->arch_args.cpu_os_id, sizeof(args->arch_args.cpu_os_id));
+	memcpy(sAPICVersions, args->arch_args.cpu_apic_version, sizeof(args->arch_args.cpu_apic_version));
+
+	// set up the local apic on the boot cpu
+	arch_smp_per_cpu_init(args, 0);
+
 	if (args->num_cpus > 1) {
-		// setup some globals
-		apic = (void *)args->arch_args.apic;
-		ioapic = (void *)args->arch_args.ioapic;
-		memcpy(cpu_apic_id, args->arch_args.cpu_apic_id, sizeof(args->arch_args.cpu_apic_id));
-		memcpy(cpu_os_id, args->arch_args.cpu_os_id, sizeof(args->arch_args.cpu_os_id));
-		memcpy(cpu_apic_version, args->arch_args.cpu_apic_version, sizeof(args->arch_args.cpu_apic_version));
-
-		// setup regions that represent the apic & ioapic
-		map_physical_memory("local apic", (void *)args->arch_args.apic_phys, B_PAGE_SIZE,
-			B_EXACT_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &apic);
-		map_physical_memory("ioapic", (void *)args->arch_args.ioapic_phys, B_PAGE_SIZE,
-			B_EXACT_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &ioapic);
-
-		// set up the local apic on the boot cpu
-		arch_smp_per_cpu_init(args, 0);
-
 		// I/O interrupts start at ARCH_INTERRUPT_BASE, so all interrupts are shifted
 		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &i386_ici_interrupt, NULL, B_NO_LOCK_VECTOR);
 		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &i386_smp_error_interrupt, NULL, B_NO_LOCK_VECTOR);
 		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &i386_spurious_interrupt, NULL, B_NO_LOCK_VECTOR);
 	}
+
 	return B_OK;
 }
 
@@ -224,7 +224,7 @@ arch_smp_send_ici(int32 target_cpu)
 	state = disable_interrupts();
 
 	config = apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK;
-	apic_write(APIC_INTR_COMMAND_2, config | cpu_apic_id[target_cpu] << 24);
+	apic_write(APIC_INTR_COMMAND_2, config | sCPUAPICIds[target_cpu] << 24);
 
 	config = apic_read(APIC_INTR_COMMAND_1) & APIC_INTR_COMMAND_1_MASK;
 	apic_write(APIC_INTR_COMMAND_1, config | 0xfd | APIC_DELIVERY_MODE_FIXED
@@ -241,11 +241,4 @@ arch_smp_send_ici(int32 target_cpu)
 		panic("arch_smp_send_ici: timeout, target_cpu %ld", target_cpu);
 
 	restore_interrupts(state);
-}
-
-
-void
-arch_smp_ack_interrupt(void)
-{
-	apic_write(APIC_EOI, 0);
 }

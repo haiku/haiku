@@ -22,11 +22,13 @@
 #include <arch/user_debugger.h>
 #include <arch/vm.h>
 
+#include <arch/x86/smp_apic.h>
 #include <arch/x86/descriptors.h>
 #include <arch/x86/vm86.h>
 
 #include "interrupts.h"
 
+#include <safemode.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -70,9 +72,77 @@
 
 #define PIC_NON_SPECIFIC_EOI	0x20
 
-#define PIC_INT_BASE			ARCH_INTERRUPT_BASE
-#define PIC_SLAVE_INT_BASE		(ARCH_INTERRUPT_BASE + 8)
+#define PIC_SLAVE_INT_BASE		8
 #define PIC_NUM_INTS			0x0f
+
+
+// Definitions for a 82093AA IO APIC controller
+#define IO_APIC_IDENTIFICATION				0x00
+#define IO_APIC_VERSION						0x01
+#define IO_APIC_ARBITRATION					0x02
+#define IO_APIC_REDIRECTION_TABLE			0x10 // entry = base + 2 * index
+
+// Fields for the version register
+#define IO_APIC_VERSION_SHIFT				0
+#define IO_APIC_VERSION_MASK				0xff
+#define IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT	16
+#define IO_APIC_MAX_REDIRECTION_ENTRY_MASK	0xff
+
+// Fields of each redirection table entry
+#define IO_APIC_DESTINATION_FIELD_SHIFT		56
+#define IO_APIC_DESTINATION_FIELD_MASK		0x0f
+#define IO_APIC_INTERRUPT_MASK_SHIFT		16
+#define IO_APIC_INTERRUPT_MASKED			1
+#define IO_APIC_INTERRUPT_UNMASKED			0
+#define IO_APIC_TRIGGER_MODE_SHIFT			15
+#define IO_APIC_TRIGGER_MODE_EDGE			0
+#define IO_APIC_TRIGGER_MODE_LEVEL			1
+#define IO_APIC_REMOTE_IRR_SHIFT			14
+#define IO_APIC_PIN_POLARITY_SHIFT			13
+#define IO_APIC_PIN_POLARITY_HIGH_ACTIVE	0
+#define IO_APIC_PIN_POLARITY_LOW_ACTIVE		1
+#define IO_APIC_DELIVERY_STATUS_SHIFT		12
+#define IO_APIC_DELIVERY_STATUS_IDLE		0
+#define IO_APIC_DELIVERY_STATUS_PENDING		1
+#define IO_APIC_DESTINATION_MODE_SHIFT		11
+#define IO_APIC_DESTINATION_MODE_PHYSICAL	0
+#define IO_APIC_DESTINATION_MODE_LOGICAL	1
+#define IO_APIC_DELIVERY_MODE_SHIFT			8
+#define IO_APIC_DELIVERY_MODE_MASK			0x07
+#define IO_APIC_DELIVERY_MODE_FIXED			0
+#define IO_APIC_DELIVERY_MODE_LOWEST_PRIO	1
+#define IO_APIC_DELIVERY_MODE_SMI			2
+#define IO_APIC_DELIVERY_MODE_NMI			4
+#define IO_APIC_DELIVERY_MODE_INIT			5
+#define IO_APIC_DELIVERY_MODE_EXT_INT		7
+#define IO_APIC_INTERRUPT_VECTOR_SHIFT		0
+#define IO_APIC_INTERRUPT_VECTOR_MASK		0xff
+
+typedef struct ioapic_s {
+	volatile uint32	io_register_select;
+	uint32			reserved[3];
+	volatile uint32	io_window_register;
+} ioapic _PACKED;
+
+static ioapic *sIOAPIC = NULL;
+static uint32 sIOAPICMaxRedirectionEntry = 23;
+static void *sLocalAPIC = NULL;
+
+static uint32 sIRQToIOAPICPin[256];
+
+bool gUsingIOAPIC = false;
+
+typedef struct interrupt_controller_s {
+	const char *name;
+	void	(*enable_io_interrupt)(int32 num);
+	void	(*disable_io_interrupt)(int32 num);
+	void	(*configure_io_interrupt)(int32 num, uint32 config);
+	bool	(*is_spurious_interrupt)(int32 num);
+	void	(*end_of_interrupt)(int32 num);
+} interrupt_controller;
+
+static interrupt_controller *sCurrentPIC = NULL;
+
 
 static const char *kInterruptNames[] = {
 	/*  0 */ "Divide Error Exception",
@@ -105,7 +175,7 @@ typedef struct {
 } desc_table;
 static desc_table *sIDT = NULL;
 
-static uint16 sLevelTriggeredInterrupts;
+static uint32 sLevelTriggeredInterrupts = 0;
 	// binary mask: 1 level, 0 edge
 
 // table with functions handling respective interrupts
@@ -156,7 +226,7 @@ x86_set_task_gate(int32 n, int32 segment)
  *	it must assume it's a spurious interrupt.
  */
 
-static inline bool
+static bool
 pic_is_spurious_interrupt(int32 num)
 {
 	int32 isr;
@@ -184,34 +254,107 @@ pic_is_spurious_interrupt(int32 num)
 static void
 pic_end_of_interrupt(int32 num)
 {
-	if (num >= PIC_INT_BASE && num <= PIC_INT_BASE + PIC_NUM_INTS) {
-		// PIC 8259 controlled interrupt
-		if (num >= PIC_SLAVE_INT_BASE)
-			out8(PIC_NON_SPECIFIC_EOI, PIC_SLAVE_CONTROL);
+	if (num < 0 || num > PIC_NUM_INTS)
+		return;
 
-		// we always need to acknowledge the master PIC
-		out8(PIC_NON_SPECIFIC_EOI, PIC_MASTER_CONTROL);
-	}
+	// PIC 8259 controlled interrupt
+	if (num >= PIC_SLAVE_INT_BASE)
+		out8(PIC_NON_SPECIFIC_EOI, PIC_SLAVE_CONTROL);
+
+	// we always need to acknowledge the master PIC
+	out8(PIC_NON_SPECIFIC_EOI, PIC_MASTER_CONTROL);
 }
 
 
-static inline bool
-pic_is_level_triggered(int32 num)
+static void
+pic_enable_io_interrupt(int32 num)
 {
-	return sLevelTriggeredInterrupts & (1U << (num - PIC_INT_BASE));
+	// interrupt is specified "normalized"
+	if (num < 0 || num > PIC_NUM_INTS)
+		return;
+
+	// enable PIC 8259 controlled interrupt
+
+	TRACE(("pic_enable_io_interrupt: irq %ld\n", num));
+
+	if (num < PIC_SLAVE_INT_BASE)
+		out8(in8(PIC_MASTER_MASK) & ~(1 << num), PIC_MASTER_MASK);
+	else
+		out8(in8(PIC_SLAVE_MASK) & ~(1 << (num - PIC_SLAVE_INT_BASE)), PIC_SLAVE_MASK);
+}
+
+
+static void
+pic_disable_io_interrupt(int32 num)
+{
+	// interrupt is specified "normalized"
+	// never disable slave pic line IRQ 2
+	if (num < 0 || num > PIC_NUM_INTS || num == 2)
+		return;
+
+	// disable PIC 8259 controlled interrupt
+
+	TRACE(("pic_disable_io_interrupt: irq %ld\n", num));
+
+	if (num < PIC_SLAVE_INT_BASE)
+		out8(in8(PIC_MASTER_MASK) | (1 << num), PIC_MASTER_MASK);
+	else
+		out8(in8(PIC_SLAVE_MASK) | (1 << (num - PIC_SLAVE_INT_BASE)), PIC_SLAVE_MASK);
+}
+
+
+static void
+pic_configure_io_interrupt(int32 num, uint32 config)
+{
+	uint8 value;
+	int32 localBit;
+	if (num < 0 || num > PIC_NUM_INTS || num == 2)
+		return;
+
+	TRACE(("pic_configure_io_interrupt: irq %ld; config 0x%08lx\n", num, config));
+
+	if (num < PIC_SLAVE_INT_BASE) {
+		value = in8(PIC_MASTER_TRIGGER_MODE);
+		localBit = num;
+	} else {
+		value = in8(PIC_SLAVE_TRIGGER_MODE);
+		localBit = num - PIC_SLAVE_INT_BASE;
+	}
+
+	if (config & B_LEVEL_TRIGGERED)
+		value |= 1 << localBit;
+	else
+		value &= ~(1 << localBit);
+
+	if (num < PIC_SLAVE_INT_BASE)
+		out8(value, PIC_MASTER_TRIGGER_MODE);
+	else
+		out8(value, PIC_SLAVE_TRIGGER_MODE);
+
+	sLevelTriggeredInterrupts = in8(PIC_MASTER_TRIGGER_MODE)
+		| (in8(PIC_SLAVE_TRIGGER_MODE) << 8);
 }
 
 
 static void
 pic_init(void)
 {
+	static interrupt_controller picController = {
+		"8259 PIC",
+		&pic_enable_io_interrupt,
+		&pic_disable_io_interrupt,
+		&pic_configure_io_interrupt,
+		&pic_is_spurious_interrupt,
+		&pic_end_of_interrupt
+	};
+
 	// Start initialization sequence for the master and slave PICs
 	out8(PIC_INIT1 | PIC_INIT1_SEND_INIT4, PIC_MASTER_INIT1);
 	out8(PIC_INIT1 | PIC_INIT1_SEND_INIT4, PIC_SLAVE_INIT1);
 
 	// Set start of interrupts to 0x20 for master, 0x28 for slave
-	out8(PIC_INT_BASE, PIC_MASTER_INIT2);
-	out8(PIC_SLAVE_INT_BASE, PIC_SLAVE_INIT2);
+	out8(ARCH_INTERRUPT_BASE, PIC_MASTER_INIT2);
+	out8(ARCH_INTERRUPT_BASE + PIC_SLAVE_INT_BASE, PIC_SLAVE_INIT2);
 
 	// Specify cascading through interrupt 2
 	out8(PIC_INIT3_IR2_IS_SLAVE, PIC_MASTER_INIT3);
@@ -228,49 +371,277 @@ pic_init(void)
 
 #if 0
 	// should set everything possible to level triggered
-	out8(PIC_MASTER_TRIGGER_MODE, 0xf8);
-	out8(PIC_SLAVE_TRIGGER_MODE, 0xde);
+	out8(0xf8, PIC_MASTER_TRIGGER_MODE);
+	out8(0xde, PIC_SLAVE_TRIGGER_MODE);
 #endif
 
 	sLevelTriggeredInterrupts = in8(PIC_MASTER_TRIGGER_MODE)
 		| (in8(PIC_SLAVE_TRIGGER_MODE) << 8);
 
-	TRACE(("PIC level trigger mode: %04x\n", sLevelTriggeredInterrupts));
+	TRACE(("PIC level trigger mode: 0x%08lx\n", sLevelTriggeredInterrupts));
+
+	// make the pic controller the current one
+	sCurrentPIC = &picController;
+	gUsingIOAPIC = false;
+}
+
+
+static inline uint32
+ioapic_read_32(uint8 registerSelect)
+{
+	sIOAPIC->io_register_select = registerSelect;
+	return sIOAPIC->io_window_register;
+}
+
+
+static inline void
+ioapic_write_32(uint8 registerSelect, uint32 value)
+{
+	sIOAPIC->io_register_select = registerSelect;
+	sIOAPIC->io_window_register = value;
+}
+
+
+static inline uint64
+ioapic_read_64(uint8 registerSelect)
+{
+	uint64 result;
+	sIOAPIC->io_register_select = registerSelect + 1;
+	result = sIOAPIC->io_window_register;
+	result <<= 32;
+	sIOAPIC->io_register_select = registerSelect;
+	result |= sIOAPIC->io_window_register;
+	return result;
+}
+
+
+static inline void
+ioapic_write_64(uint8 registerSelect, uint64 value)
+{
+	sIOAPIC->io_register_select = registerSelect;
+	sIOAPIC->io_window_register = (uint32)value;
+	sIOAPIC->io_register_select = registerSelect + 1;
+	sIOAPIC->io_window_register = (uint32)(value >> 32);
+}
+
+
+static bool
+ioapic_is_spurious_interrupt(int32 num)
+{
+	// the spurious interrupt vector is initialized to the max value in smp
+	return num == 0xff - ARCH_INTERRUPT_BASE;
+}
+
+
+static void
+ioapic_end_of_interrupt(int32 num)
+{
+	*(volatile uint32 *)((char *)sLocalAPIC + APIC_EOI) = 0;
+}
+
+
+static void
+ioapic_enable_io_interrupt(int32 num)
+{
+	uint64 entry;
+	int32 pin = sIRQToIOAPICPin[num];
+	if (pin < 0 || pin > sIOAPICMaxRedirectionEntry)
+		return;
+
+	TRACE(("ioapic_enable_io_interrupt: IRQ %ld -> pin %ld\n", num, pin));
+
+	entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
+	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
+	entry |= IO_APIC_INTERRUPT_UNMASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
+	ioapic_write_64(IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+}
+
+
+static void
+ioapic_disable_io_interrupt(int32 num)
+{
+	uint64 entry;
+	int32 pin = sIRQToIOAPICPin[num];
+	if (pin < 0 || pin > sIOAPICMaxRedirectionEntry)
+		return;
+
+	TRACE(("ioapic_disable_io_interrupt: IRQ %ld -> pin %ld\n", num, pin));
+
+	entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
+	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
+	entry |= IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
+	ioapic_write_64(IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+}
+
+
+static void
+ioapic_configure_io_interrupt(int32 num, uint32 config)
+{
+	uint64 entry;
+	int32 pin = sIRQToIOAPICPin[num];
+	if (pin < 0 || pin > sIOAPICMaxRedirectionEntry)
+		return;
+
+	TRACE(("ioapic_configure_io_interrupt: IRQ %ld -> pin %ld; config 0x%08lx\n",
+		num, pin, config));
+
+	entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
+	entry &= ~((1 << IO_APIC_TRIGGER_MODE_SHIFT)
+		| (1 << IO_APIC_PIN_POLARITY_SHIFT)
+		| (IO_APIC_INTERRUPT_VECTOR_MASK << IO_APIC_INTERRUPT_VECTOR_SHIFT));
+
+	if (config & B_LEVEL_TRIGGERED) {
+		entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT);
+		sLevelTriggeredInterrupts |= (1 << num);
+	} else {
+		entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT);
+		sLevelTriggeredInterrupts &= ~(1 << num);
+	}
+
+	if (config & B_LOW_ACTIVE_POLARITY)
+		entry |= (IO_APIC_PIN_POLARITY_LOW_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
+	else
+		entry |= (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT);
+
+	entry |= (num + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT;
+	ioapic_write_64(IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
+}
+
+
+static void
+ioapic_init(kernel_args *args)
+{
+	uint32 i;
+	uint32 version;
+	uint64 targetAPIC;
+	void *settings;
+
+	static interrupt_controller ioapicController = {
+		"82093AA IOAPIC",
+		&ioapic_enable_io_interrupt,
+		&ioapic_disable_io_interrupt,
+		&ioapic_configure_io_interrupt,
+		&ioapic_is_spurious_interrupt,
+		&ioapic_end_of_interrupt
+	};
+
+	if (args->arch_args.apic == NULL) {
+		dprintf("no local apic availabe\n");
+		return;
+	}
+
+	// always map the local apic as it can be used for timers even if we
+	// don't end up using the io apic
+	sLocalAPIC = args->arch_args.apic;
+	if (map_physical_memory("local apic", (void *)args->arch_args.apic_phys,
+		B_PAGE_SIZE, B_EXACT_ADDRESS, B_KERNEL_READ_AREA
+		| B_KERNEL_WRITE_AREA, &sLocalAPIC) < B_OK) {
+		panic("mapping the local apic failed");
+		return;
+	}
+
+	if (args->arch_args.ioapic == NULL) {
+		dprintf("no ioapic available, not using ioapics for interrupt routing\n");
+		return;
+	}
+
+	settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+	if (settings != NULL && get_driver_boolean_parameter(settings,
+		B_SAFEMODE_DISABLE_IOAPIC, false, false)) {
+		dprintf("ioapic explicitly disabled, not using ioapics for interrupt routing\n");
+		unload_driver_settings(settings);
+		return;
+	} else if (settings != NULL)
+		unload_driver_settings(settings);
+
+	// TODO: remove when the PCI IRQ routing through ACPI is available below
+	return;
+
+	// map in the ioapic
+	sIOAPIC = (ioapic *)args->arch_args.ioapic;
+	if (map_physical_memory("ioapic", (void *)args->arch_args.ioapic_phys,
+		B_PAGE_SIZE, B_EXACT_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		(void **)&sIOAPIC) < B_OK) {
+		panic("mapping the ioapic failed");
+		return;
+	}
+
+	version = ioapic_read_32(IO_APIC_VERSION);
+	if (version == 0xffffffff) {
+		dprintf("ioapic seems inaccessible, not using it\n");
+		return;
+	}
+
+	sLevelTriggeredInterrupts = 0;
+	sIOAPICMaxRedirectionEntry
+		= ((version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
+		& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
+
+	// use the boot CPU as the target for all interrupts
+	targetAPIC = args->arch_args.cpu_apic_id[0];
+
+	// program the interrupt vectors of the ioapic
+	for (i = 0; i <= sIOAPICMaxRedirectionEntry; i++) {
+		// initialize everything to deliver to the boot CPU in physical mode
+		// and masked until explicitly enabled through enable_io_interrupt()
+		uint64 entry = (targetAPIC << IO_APIC_DESTINATION_FIELD_SHIFT)
+			| (IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT)
+			| (IO_APIC_DESTINATION_MODE_PHYSICAL << IO_APIC_DESTINATION_MODE_SHIFT)
+			| ((i + ARCH_INTERRUPT_BASE) << IO_APIC_INTERRUPT_VECTOR_SHIFT);
+
+		if (i == 0) {
+			// make redirection entry 0 into an external interrupt
+			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
+				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
+				| (IO_APIC_DELIVERY_MODE_EXT_INT << IO_APIC_DELIVERY_MODE_SHIFT);
+		} else if (i < 16) {
+			// make 1-15 ISA interrupts
+			entry |= (IO_APIC_TRIGGER_MODE_EDGE << IO_APIC_TRIGGER_MODE_SHIFT)
+				| (IO_APIC_PIN_POLARITY_HIGH_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
+				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
+		} else {
+			// and the rest are PCI interrupts
+			entry |= (IO_APIC_TRIGGER_MODE_LEVEL << IO_APIC_TRIGGER_MODE_SHIFT)
+				| (IO_APIC_PIN_POLARITY_LOW_ACTIVE << IO_APIC_PIN_POLARITY_SHIFT)
+				| (IO_APIC_DELIVERY_MODE_FIXED << IO_APIC_DELIVERY_MODE_SHIFT);
+			sLevelTriggeredInterrupts |= (1 << i);
+		}
+
+		ioapic_write_64(IO_APIC_REDIRECTION_TABLE + 2 * i, entry);
+	}
+
+	// setup default 1:1 mapping
+	for (i = 0; i < 256; i++)
+		sIRQToIOAPICPin[i] = i;
+
+	// TODO: here ACPI needs to be used to properly set up the PCI IRQ
+	// routing.
+
+	// prefer the ioapic over the normal pic
+	dprintf("using ioapic for interrupt routing\n");
+	sCurrentPIC = &ioapicController;
+	gUsingIOAPIC = true;
 }
 
 
 void
 arch_int_enable_io_interrupt(int irq)
 {
-	// interrupt is specified "normalized"
-	if (irq < 0 || irq > PIC_NUM_INTS)
-		return;
-
-	// enable PIC 8259 controlled interrupt
-
-	TRACE(("arch_int_enable_io_interrupt: irq %d\n", irq));
-
-	if (irq < 8)
-		out8(in8(PIC_MASTER_MASK) & ~(1 << irq), PIC_MASTER_MASK);
-	else
-		out8(in8(PIC_SLAVE_MASK) & ~(1 << (irq - 8)), PIC_SLAVE_MASK);
+	sCurrentPIC->enable_io_interrupt(irq);
 }
 
 
 void
 arch_int_disable_io_interrupt(int irq)
 {
-	// interrupt is specified "normalized"
-	// never disable slave pic line IRQ 2
-	if (irq < 0 || irq > PIC_NUM_INTS || irq == 2)
-		return;
+	sCurrentPIC->disable_io_interrupt(irq);
+}
 
-	// disable PIC 8259 controlled interrupt
 
-	if (irq < 8)
-		out8(in8(PIC_MASTER_MASK) | (1 << irq), PIC_MASTER_MASK);
-	else
-		out8(in8(PIC_SLAVE_MASK) | (1 << (irq - 8)), PIC_SLAVE_MASK);
+void
+arch_int_configure_io_interrupt(int irq, uint32 config)
+{
+	sCurrentPIC->configure_io_interrupt(irq, config);
 }
 
 
@@ -504,24 +875,25 @@ page_fault_exception(struct iframe* frame)
 static void
 hardware_interrupt(struct iframe* frame)
 {
-	bool levelTriggered = pic_is_level_triggered(frame->vector);
+	int32 vector = frame->vector - ARCH_INTERRUPT_BASE;
+	bool levelTriggered = false;
 	int ret;
 
-	// This is a workaround for spurious assertions of interrupts 7/15
-	// which seems to be an often seen problem on the PC platform
-	if (pic_is_spurious_interrupt(frame->vector - ARCH_INTERRUPT_BASE)) {
-		TRACE(("got spurious interrupt at vector %ld\n", frame->vector));
+	if (sCurrentPIC->is_spurious_interrupt(vector)) {
+		TRACE(("got spurious interrupt at vector %ld\n", vector));
 		return;
 	}
 
-	if (!levelTriggered)
-		pic_end_of_interrupt(frame->vector);
+	if (vector < 32)
+		levelTriggered = (sLevelTriggeredInterrupts & (1 << vector)) != 0;
 
-	ret = int_io_interrupt_handler(frame->vector - ARCH_INTERRUPT_BASE,
-		levelTriggered);
+	if (!levelTriggered)
+		sCurrentPIC->end_of_interrupt(vector);
+
+	ret = int_io_interrupt_handler(vector, levelTriggered);
 
 	if (levelTriggered)
-		pic_end_of_interrupt(frame->vector);
+		sCurrentPIC->end_of_interrupt(vector);
 
 	if (ret == B_INVOKE_SCHEDULER) {
 		cpu_status state = disable_interrupts();
@@ -536,7 +908,7 @@ hardware_interrupt(struct iframe* frame)
 
 
 status_t
-arch_int_init(kernel_args *args)
+arch_int_init(struct kernel_args *args)
 {
 	int i;
 	interrupt_handler_function** table;
@@ -544,7 +916,7 @@ arch_int_init(kernel_args *args)
 	// set the global sIDT variable
 	sIDT = (desc_table *)args->arch_args.vir_idt;
 
-	// setup the interrupt controller
+	// setup the standard programmable interrupt controller
 	pic_init();
 
 	set_intr_gate(0,  &trap0);
@@ -584,6 +956,14 @@ arch_int_init(kernel_args *args)
 	set_intr_gate(45,  &trap45);
 	set_intr_gate(46,  &trap46);
 	set_intr_gate(47,  &trap47);
+	set_intr_gate(48,  &trap48);
+	set_intr_gate(49,  &trap49);
+	set_intr_gate(50,  &trap50);
+	set_intr_gate(51,  &trap51);
+	set_intr_gate(52,  &trap52);
+	set_intr_gate(53,  &trap53);
+	set_intr_gate(54,  &trap54);
+	set_intr_gate(55,  &trap55);
 
 	set_system_gate(98, &trap98);	// for performance testing only
 	set_system_gate(99, &trap99);
@@ -628,9 +1008,11 @@ arch_int_init(kernel_args *args)
 
 
 status_t
-arch_int_init_post_vm(kernel_args *args)
+arch_int_init_post_vm(struct kernel_args *args)
 {
 	area_id area;
+
+	ioapic_init(args);
 
 	sIDT = (desc_table *)args->arch_args.vir_idt;
 	area = create_area("idt", (void *)&sIDT, B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,

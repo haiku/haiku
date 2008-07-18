@@ -421,24 +421,29 @@ smp_init_other_cpus(void)
 		unload_driver_settings(handle);
 	}
 
-	if (gKernelArgs.num_cpus < 2)
+	if (gKernelArgs.arch_args.apic_phys == 0)
 		return;
 
-	TRACE(("smp: found %ld cpus\n", gKernelArgs.num_cpus));
+	TRACE(("smp: found %ld cpu%s\n", gKernelArgs.num_cpus, gKernelArgs.num_cpus != 1 ? "s" : ""));
 	TRACE(("smp: apic_phys = %p\n", (void *)gKernelArgs.arch_args.apic_phys));
 	TRACE(("smp: ioapic_phys = %p\n", (void *)gKernelArgs.arch_args.ioapic_phys));
 
-	// map in the apic & ioapic
+	// map in the apic & ioapic (if available)
 	gKernelArgs.arch_args.apic = (uint32 *)mmu_map_physical_memory(
 		gKernelArgs.arch_args.apic_phys, B_PAGE_SIZE, kDefaultPageFlags);
-	gKernelArgs.arch_args.ioapic = (uint32 *)mmu_map_physical_memory(
-		gKernelArgs.arch_args.ioapic_phys, B_PAGE_SIZE, kDefaultPageFlags);
+	if (gKernelArgs.arch_args.ioapic_phys != 0) {
+		gKernelArgs.arch_args.ioapic = (uint32 *)mmu_map_physical_memory(
+			gKernelArgs.arch_args.ioapic_phys, B_PAGE_SIZE, kDefaultPageFlags);
+	}
 
 	TRACE(("smp: apic = %p\n", gKernelArgs.arch_args.apic));
 	TRACE(("smp: ioapic = %p\n", gKernelArgs.arch_args.ioapic));
 
 	// calculate how fast the apic timer is
 	calculate_apic_timer_conversion_factor();
+
+	if (gKernelArgs.num_cpus < 2)
+		return;
 
 	for (uint32 i = 1; i < gKernelArgs.num_cpus; i++) {
 		// create a final stack the trampoline code will put the ap processor on
