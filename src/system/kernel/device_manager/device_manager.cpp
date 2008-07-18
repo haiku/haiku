@@ -42,6 +42,7 @@
 
 
 #define DEVICE_MANAGER_ROOT_NAME "system/devices_root/driver_v1"
+#define DEVICE_MANAGER_GENERIC_NAME "system/devices_generic/driver_v1"
 
 
 struct device_attr_private : device_attr,
@@ -346,13 +347,13 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 
 			device_node* node = (device_node*)cookie;
 			NodeList::ConstIterator iterator = node->Children().GetIterator();
-			
+
 			if (!iterator.HasNext()) {
 				return B_ENTRY_NOT_FOUND;
 			}
 			node = iterator.Next();
 			cookie = (device_node_cookie)node;
-			
+
 			// copy back to user space
 			return user_memcpy(buffer, &cookie, sizeof(device_node_cookie));
 		}
@@ -372,7 +373,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (!last->Parent())
 				return B_ENTRY_NOT_FOUND;
 			NodeList::ConstIterator iterator = last->Parent()->Children().GetIterator();
-			
+
 			// skip those we already traversed
 			while (iterator.HasNext() && last != NULL) {
 				device_node* node = iterator.Next();
@@ -385,7 +386,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 				return B_ENTRY_NOT_FOUND;
 			device_node* node = iterator.Next();
 			cookie = (device_node_cookie)node;
-			
+
 			// copy back to user space
 			return user_memcpy(buffer, &cookie, sizeof(device_node_cookie));
 		}
@@ -1187,8 +1188,13 @@ device_node::InitDriver()
 		return status;
 	}
 
-	if (fDriver->init_driver != NULL)
+	if (fDriver->init_driver != NULL) {
 		status = fDriver->init_driver(this, &fDriverData);
+		if (status != B_OK) {
+			dprintf("driver %s init failed: %s\n", ModuleName(),
+				strerror(status));
+		}
+	}
 
 	if (status < B_OK) {
 		if (Parent() != NULL)
@@ -1969,13 +1975,17 @@ device_node::CompareTo(const device_attr* attributes) const
 		// find corresponding attribute
 		AttributeList::ConstIterator iterator = Attributes().GetIterator();
 		device_attr_private* attr = NULL;
+		bool found = false;
+
 		while (iterator.HasNext()) {
 			attr = iterator.Next();
 
-			if (!strcmp(attr->name, attributes->name))
+			if (!strcmp(attr->name, attributes->name)) {
+				found = true;
 				break;
+			}
 		}
-		if (!iterator.HasNext())
+		if (!found)
 			return -1;
 
 		int compare = device_attr_private::Compare(attr, attributes);
@@ -2069,7 +2079,7 @@ device_node::Dump(int32 level)
 
 
 static void
-init_root_node(void)
+init_node_tree(void)
 {
 	device_attr attrs[] = {
 		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Devices Root"}},
@@ -2079,9 +2089,23 @@ init_root_node(void)
 		{NULL}
 	};
 
-	if (register_node(NULL, DEVICE_MANAGER_ROOT_NAME, attrs, NULL, NULL)
+	device_node* node;
+	if (register_node(NULL, DEVICE_MANAGER_ROOT_NAME, attrs, NULL, &node)
 			!= B_OK) {
 		dprintf("Cannot register Devices Root Node\n");
+	}
+
+	device_attr genericAttrs[] = {
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Generic"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {string: "generic"}},
+		{B_DEVICE_FLAGS, B_UINT32_TYPE, {ui32: B_FIND_MULTIPLE_CHILDREN
+			| B_KEEP_DRIVER_LOADED | B_FIND_CHILD_ON_DEMAND}},
+		{NULL}
+	};
+
+	if (register_node(node, DEVICE_MANAGER_GENERIC_NAME, genericAttrs, NULL,
+			NULL) != B_OK) {
+		dprintf("Cannot register Generic Devices Node\n");
 	}
 }
 
@@ -2089,6 +2113,15 @@ init_root_node(void)
 driver_module_info gDeviceRootModule = {
 	{
 		DEVICE_MANAGER_ROOT_NAME,
+		0,
+		NULL,
+	},
+};
+
+
+driver_module_info gDeviceGenericModule = {
+	{
+		DEVICE_MANAGER_GENERIC_NAME,
 		0,
 		NULL,
 	},
@@ -2121,7 +2154,7 @@ device_manager_init(struct kernel_args* args)
 	dm_init_io_resources();
 
 	recursive_lock_init(&sLock, "device manager");
-	init_root_node();
+	init_node_tree();
 
 #ifdef TRACE_DEVICE_MANAGER
 	sRootNode->Dump();
