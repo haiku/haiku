@@ -177,7 +177,7 @@ extern "C" {
 #define TOSVAR_vbclock	_TOSV_L(0x462)
 #define TOSVARphystop	_TOSV_L(0x42e)
 #define TOSVARramtop	_TOSV_L(0x5a4)
-#define TOSVARramvalid	_TOSV_(0x5a8)
+#define TOSVARramvalid	_TOSV_L(0x5a8)
 #define TOSVARramvalid_MAGIC 0x1357bd13
 
 

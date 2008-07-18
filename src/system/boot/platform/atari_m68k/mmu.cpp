@@ -7,6 +7,7 @@
 
 
 #include "atari_memory_map.h"
+#include "toscalls.h"
 #include "mmu.h"
 
 #include <boot/platform.h>
@@ -586,6 +587,14 @@ mmu_init(void)
 			panic("unknown mmu type %d\n", gKernelArgs.arch_args.mmu_type);
 	}
 
+	addr_t fastram_top = 0;
+	if (*TOSVARramvalid == TOSVARramvalid_MAGIC)
+		fastram_top = *TOSVARramtop;
+	if (fastram_top) {
+		// we have some fastram, use it first
+		sNextPhysicalAddress = ATARI_FASTRAM_BASE;
+	}
+
 	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
 	gKernelArgs.physical_allocated_range[0].size = 0;
 	gKernelArgs.num_physical_allocated_ranges = 1;
@@ -597,17 +606,18 @@ mmu_init(void)
 	gMMUOps->set_tt(0, ATARI_SHADOW_BASE, 0x01000000, 0);
 
 	init_page_directory();
-#if 0
+#if 0//XXX:HOLE
 
 	// Map the page directory into kernel space at 0xffc00000-0xffffffff
 	// this enables a mmu trick where the 4 MB region that this pgdir entry
 	// represents now maps the 4MB of potential pagetables that the pgdir
 	// points to. Thrown away later in VM bringup, but useful for now.
 	sPageDirectory[1023] = (uint32)sPageDirectory | kDefaultPageFlags;
+#endif
 
 	// also map it on the next vpage
-	gKernelArgs.arch_args.vir_pgdir = get_next_virtual_page();
-	map_page(gKernelArgs.arch_args.vir_pgdir, (uint32)sPageDirectory, kDefaultPageFlags);
+	gKernelArgs.arch_args.vir_pgroot = get_next_virtual_page();
+	map_page(gKernelArgs.arch_args.vir_pgroot, (uint32)sPageDirectory, kDefaultPageFlags);
 
 	// map in a kernel stack
 	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
@@ -616,6 +626,31 @@ mmu_init(void)
 	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
 
+	// st ram as 1st range
+	gKernelArgs.physical_memory_range[0].start = ATARI_CHIPRAM_BASE;
+	gKernelArgs.physical_memory_range[0].size = *TOSVARphystop;
+	gKernelArgs.num_physical_memory_ranges = 1;
+
+	// fast ram as 2nd range
+	if (fastram_top) {
+		gKernelArgs.physical_memory_range[1].start =
+			ATARI_FASTRAM_BASE;
+		gKernelArgs.physical_memory_range[1].size =
+			fastram_top - ATARI_FASTRAM_BASE;
+		gKernelArgs.num_physical_memory_ranges++;
+		
+	}
+	
+	// mark the video area allocated
+	addr_t video_base = *TOSVAR_memtop;
+	video_base &= ~(B_PAGE_SIZE-1);
+	gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].start = video_base;
+	gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].size = *TOSVARphystop - video_base;
+	gKernelArgs.num_physical_allocated_ranges++;
+
+
+
+#if 0
 	extended_memory *extMemoryBlock;
 	uint32 extMemoryCount = get_memory_map(&extMemoryBlock);
 
