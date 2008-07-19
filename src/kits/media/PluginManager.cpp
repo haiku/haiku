@@ -32,10 +32,12 @@ PluginManager::CreateReader(Reader **reader, int32 *streamCount,
 	// get list of available readers from the server
 	server_get_readers_request request;
 	server_get_readers_reply reply;
-	if (QueryServer(SERVER_GET_READERS, &request, sizeof(request),
-			&reply, sizeof(reply)) != B_OK) {
-		printf("PluginManager::CreateReader: can't get list of readers\n");
-		return B_ERROR;
+	status_t ret = QueryServer(SERVER_GET_READERS, &request, sizeof(request),
+		&reply, sizeof(reply));
+	if (ret != B_OK) {
+		printf("PluginManager::CreateReader: can't get list of readers: %s\n",
+			strerror(ret));
+		return ret;
 	}
 
 	// try each reader by calling it's Sniff function...
@@ -98,10 +100,12 @@ PluginManager::CreateDecoder(Decoder **_decoder, const media_format &format)
 	server_get_decoder_for_format_request request;
 	server_get_decoder_for_format_reply reply;
 	request.format = format;
-	if (B_OK != QueryServer(SERVER_GET_DECODER_FOR_FORMAT, &request,
-			sizeof(request), &reply, sizeof(reply))) {
-		TRACE("PluginManager::CreateDecoder: can't get decoder for format\n");
-		return B_ERROR;
+	status_t ret = QueryServer(SERVER_GET_DECODER_FOR_FORMAT, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (ret != B_OK) {
+		printf("PluginManager::CreateDecoder: can't get decoder for format: "
+			"%s\n", strerror(ret));
+		return ret;
 	}
 
 	MediaPlugin *plugin = GetPlugin(reply.ref);
