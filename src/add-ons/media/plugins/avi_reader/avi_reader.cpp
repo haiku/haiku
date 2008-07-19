@@ -253,13 +253,22 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		cookie->frames_per_sec_scale =  fFile->StreamInfo(streamNumber)->frames_per_sec_scale;
 		cookie->line_count = fFile->AviMainHeader()->height;
 		
-		TRACE("video frame_count %Ld, duration %.6f\n", cookie->frame_count, cookie->duration / 1E6);
+		TRACE("video frame_count %Ld, duration %.6f\n", cookie->frame_count,
+			cookie->duration / 1E6);
 
 		description.family = B_AVI_FORMAT_FAMILY;
-		if (stream_header->fourcc_handler == 'ekaf' || stream_header->fourcc_handler == 0) // 'fake' or 0 fourcc => used compression id
+		if (stream_header->fourcc_handler == 'ekaf'
+			|| stream_header->fourcc_handler == 0) {
+			// 'fake' or 0 fourcc => used compression id
 			description.u.avi.codec = video_format->compression;
-		else
+		} else
 			description.u.avi.codec = stream_header->fourcc_handler;
+
+		TRACE("codec '%.4s' (fourcc: '%.4s', compression: '%.4s')\n",
+			(char*)&description.u.avi.codec,
+			(char*)&stream_header->fourcc_handler,
+			(char*)&video_format->compression);
+
 		if (formats.GetFormatFor(description, format) < B_OK)
 			format->type = B_MEDIA_ENCODED_VIDEO;
 			
@@ -284,9 +293,15 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		
 		TRACE("max_bit_rate %.3f\n", format->u.encoded_video.max_bit_rate);
 		TRACE("field_rate   %.3f\n", format->u.encoded_video.output.field_rate);
+		#ifdef TRACE_AVI_READER
+			uint32 encoding = format->Encoding();
+			TRACE("encoding '%.4s'\n", (char*)&encoding);
+		#endif
 
 		return B_OK;
 	}
+
+	TRACE("aviReader::GetStreamInfo: stream is neither video nor audio\n");
 
 	delete cookie;
 	return B_ERROR;
