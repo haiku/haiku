@@ -134,6 +134,8 @@ IOScheduler::_Finisher()
 		} else {
 			MutexLocker _(fLock);
 			operation->Parent()->RemoveOperation(operation);
+			if (fDMAResource != NULL)
+				fDMAResource->RecycleBuffer(operation->Buffer());
 
 			fUnusedOperations.Add(operation);
 		}

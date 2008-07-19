@@ -31,7 +31,8 @@ struct dma_restrictions {
 class DMABuffer : public DoublyLinkedListLinkImpl<DMABuffer> {
 public:
 	static	DMABuffer*			Create(size_t count, void* bounceBuffer,
-									addr_t physicalBounceBuffer);
+									addr_t physicalBounceBuffer,
+									size_t bounceBufferSize);
 
 			iovec*				Vecs() { return fVecs; }
 			iovec&				VecAt(size_t index) { return fVecs[index]; }
@@ -43,6 +44,8 @@ public:
 			void*				BounceBuffer() const { return fBounceBuffer; }
 			addr_t				PhysicalBounceBuffer() const
 									{ return fPhysicalBounceBuffer; }
+			size_t				BounceBufferSize() const
+									{ return fBounceBufferSize; }
 
 			void				SetToBounceBuffer(size_t length);
 			bool				UsesBounceBuffer() const
@@ -53,6 +56,7 @@ public:
 private:
 			void*				fBounceBuffer;
 			addr_t				fPhysicalBounceBuffer;
+			size_t				fBounceBufferSize;
 			uint32				fVecCount;
 			iovec				fVecs[1];
 };
@@ -81,6 +85,8 @@ public:
 
 private:
 			bool				_NeedsBoundsBuffers() const;
+			void				_RestrictBoundaryAndSegmentSize(addr_t base,
+									addr_t& length);
 
 			mutex				fLock;
 			dma_restrictions	fRestrictions;

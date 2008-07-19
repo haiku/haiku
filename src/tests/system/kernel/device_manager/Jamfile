@@ -6,7 +6,15 @@ BinCommand <test>listdev :
 ;
 
 KernelAddon <test_driver>config :
-        config.c
-        ;
+	config.c
+;
+
+SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
+UsePrivateKernelHeaders ;
+
+KernelAddon <test_driver>dma_resource_test :
+	dma_resource_test.cpp
+#: $(HAIKU_LIBSUPC++)
+;
 
 SubInclude HAIKU_TOP src tests system kernel device_manager playground ;
