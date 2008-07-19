@@ -184,6 +184,10 @@ AcpiHwClearAcpiStatus (
  * hwgpe - GPE support
  */
 ACPI_STATUS
+AcpiHwLowDisableGpe (
+    ACPI_GPE_EVENT_INFO     *GpeEventInfo);
+
+ACPI_STATUS
 AcpiHwWriteGpeEnableReg (
     ACPI_GPE_EVENT_INFO     *GpeEventInfo);
 

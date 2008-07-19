@@ -129,6 +129,60 @@ AcpiHwEnableWakeupGpeBlock (
     ACPI_GPE_BLOCK_INFO     *GpeBlock);
 
 
+
+/******************************************************************************
+ *
+ * FUNCTION:    AcpiHwLowDisableGpe
+ *
+ * PARAMETERS:  GpeEventInfo        - Info block for the GPE to be disabled
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Disable a single GPE in the enable register.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiHwLowDisableGpe (
+    ACPI_GPE_EVENT_INFO     *GpeEventInfo)
+{
+    ACPI_GPE_REGISTER_INFO  *GpeRegisterInfo;
+    ACPI_STATUS             Status;
+    UINT32                  EnableMask;
+
+
+    /* Get the info block for the entire GPE register */
+
+    GpeRegisterInfo = GpeEventInfo->RegisterInfo;
+    if (!GpeRegisterInfo)
+    {
+        return (AE_NOT_EXIST);
+    }
+
+    /* Get current value of the enable register that contains this GPE */
+
+    Status = AcpiHwLowLevelRead (ACPI_GPE_REGISTER_WIDTH, &EnableMask,
+                &GpeRegisterInfo->EnableAddress);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
+
+    /* Clear just the bit that corresponds to this GPE */
+
+    ACPI_CLEAR_BIT (EnableMask,
+        ((UINT32) 1 << (GpeEventInfo->GpeNumber - GpeRegisterInfo->BaseGpeNumber)));
+
+
+    /* Write the updated enable mask */
+
+    Status = AcpiHwLowLevelWrite (ACPI_GPE_REGISTER_WIDTH, EnableMask,
+                &GpeRegisterInfo->EnableAddress);
+
+    return (Status);
+}
+
+
 /******************************************************************************
  *
  * FUNCTION:    AcpiHwWriteGpeEnableReg

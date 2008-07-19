@@ -363,15 +363,17 @@ AcpiEvDisableGpe (
         return_ACPI_STATUS (Status);
     }
 
-    /* Mark wake-disabled or HW disable, or both */
+    /* Clear the appropriate enabled flags for this GPE */
 
     switch (GpeEventInfo->Flags & ACPI_GPE_TYPE_MASK)
     {
     case ACPI_GPE_TYPE_WAKE:
+
         ACPI_CLEAR_BIT (GpeEventInfo->Flags, ACPI_GPE_WAKE_ENABLED);
         break;
 
     case ACPI_GPE_TYPE_WAKE_RUN:
+
         ACPI_CLEAR_BIT (GpeEventInfo->Flags, ACPI_GPE_WAKE_ENABLED);
 
         /*lint -fallthrough */
@@ -381,21 +383,22 @@ AcpiEvDisableGpe (
         /* Disable the requested runtime GPE */
 
         ACPI_CLEAR_BIT (GpeEventInfo->Flags, ACPI_GPE_RUN_ENABLED);
-
-        /*lint -fallthrough */
+        break;
 
     default:
-        /*
-         * If we don't know the GPE type, make sure that we always
-         * disable it. This can prevent a certain type of GPE flood, where
-         * the GPE has no _Lxx/_Exx method, and it cannot be determined
-         * whether the GPE is wake, run, or wake/run.
-         */
-        Status = AcpiHwWriteGpeEnableReg (GpeEventInfo);
         break;
     }
 
-    return_ACPI_STATUS (AE_OK);
+    /*
+     * Always H/W disable this GPE, even if we don't know the GPE type.
+     * Simply clear the enable bit for this particular GPE, but do not
+     * write out the current GPE enable mask since this may inadvertently
+     * enable GPEs too early. An example is a rogue GPE that has arrived
+     * during ACPICA initialization - possibly because AML or other code
+     * has enabled the GPE.
+     */
+    Status = AcpiHwLowDisableGpe (GpeEventInfo);
+    return_ACPI_STATUS (Status);
 }
 
 

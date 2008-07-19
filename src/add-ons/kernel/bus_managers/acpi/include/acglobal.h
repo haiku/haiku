@@ -440,7 +440,7 @@ ACPI_EXTERN char                       *optarg;
 ACPI_EXTERN BOOLEAN                     AcpiGbl_DbOpt_tables;
 ACPI_EXTERN BOOLEAN                     AcpiGbl_DbOpt_stats;
 ACPI_EXTERN BOOLEAN                     AcpiGbl_DbOpt_ini_methods;
-
+ACPI_EXTERN BOOLEAN                     AcpiGbl_DbOpt_NoRegionSupport;
 
 ACPI_EXTERN char                       *AcpiGbl_DbArgs[ACPI_DEBUGGER_MAX_ARGS];
 ACPI_EXTERN char                        AcpiGbl_DbLineBuf[80];

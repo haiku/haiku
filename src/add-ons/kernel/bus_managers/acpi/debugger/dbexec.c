@@ -175,7 +175,10 @@ AcpiDbExecuteMethod (
     ACPI_STATUS             Status;
     ACPI_OBJECT_LIST        ParamObjects;
     ACPI_OBJECT             Params[ACPI_METHOD_NUM_ARGS];
+    ACPI_HANDLE             Handle;
+    ACPI_BUFFER             Buffer;
     UINT32                  i;
+    ACPI_DEVICE_INFO        *ObjInfo;
 
 
     if (AcpiGbl_DbOutputToFile && !AcpiDbgLevel)
@@ -183,33 +186,74 @@ AcpiDbExecuteMethod (
         AcpiOsPrintf ("Warning: debug output is not enabled!\n");
     }
 
-    /* Are there arguments to the method? */
+    /* Get the NS node, determines existence also */
 
-    if (Info->Args && Info->Args[0])
+    Status = AcpiGetHandle (NULL, Info->Pathname, &Handle);
+    if (ACPI_FAILURE (Status))
     {
-        for (i = 0; Info->Args[i] && i < ACPI_METHOD_NUM_ARGS; i++)
+        return (Status);
+    }
+
+    /* Get the object info for number of method parameters */
+
+    Buffer.Length = ACPI_ALLOCATE_LOCAL_BUFFER;
+    Status = AcpiGetObjectInfo (Handle, &Buffer);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
+
+    ObjInfo = Buffer.Pointer;
+    if (ObjInfo->Type == ACPI_TYPE_METHOD)
+    {
+        /* Are there arguments to the method? */
+
+        if (Info->Args && Info->Args[0])
         {
-            Params[i].Type          = ACPI_TYPE_INTEGER;
-            Params[i].Integer.Value = ACPI_STRTOUL (Info->Args[i], NULL, 16);
+            for (i = 0; Info->Args[i] && i < ACPI_METHOD_NUM_ARGS; i++)
+            {
+                Params[i].Type          = ACPI_TYPE_INTEGER;
+                Params[i].Integer.Value = ACPI_STRTOUL (Info->Args[i], NULL, 16);
+            }
+
+            ParamObjects.Pointer = Params;
+            ParamObjects.Count   = i;
         }
+        else
+        {
+            /* Setup default parameters */
 
-        ParamObjects.Pointer = Params;
-        ParamObjects.Count   = i;
+            for (i = 0; i < ObjInfo->ParamCount; i++)
+            {
+                switch (i)
+                {
+                case 0:
+
+                    Params[0].Type           = ACPI_TYPE_INTEGER;
+                    Params[0].Integer.Value  = 0x01020304;
+                    break;
+
+                case 1:
+
+                    Params[1].Type           = ACPI_TYPE_STRING;
+                    Params[1].String.Length  = 12;
+                    Params[1].String.Pointer = "AML Debugger";
+                    break;
+
+                default:
+
+                    Params[i].Type           = ACPI_TYPE_INTEGER;
+                    Params[i].Integer.Value  = i * (ACPI_INTEGER) 0x1000;
+                    break;
+                }
+            }
+
+            ParamObjects.Pointer     = Params;
+            ParamObjects.Count       = ObjInfo->ParamCount;
+        }
     }
-    else
-    {
-        /* Setup default parameters */
 
-        Params[0].Type           = ACPI_TYPE_INTEGER;
-        Params[0].Integer.Value  = 0x01020304;
-
-        Params[1].Type           = ACPI_TYPE_STRING;
-        Params[1].String.Length  = 12;
-        Params[1].String.Pointer = "AML Debugger";
-
-        ParamObjects.Pointer     = Params;
-        ParamObjects.Count       = 2;
-    }
+    ACPI_FREE (Buffer.Pointer);
 
     /* Prepare for a return object of arbitrary size */
 

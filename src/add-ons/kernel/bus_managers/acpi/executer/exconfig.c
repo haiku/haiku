@@ -180,7 +180,7 @@ AcpiExAddTable (
 
     /* Install the new table into the local data structures */
 
-    ObjDesc->Reference.Object = ACPI_CAST_PTR (void, TableIndex);
+    ObjDesc->Reference.Object = ACPI_TO_POINTER (TableIndex);
 
     /* Add the table to the namespace */
 
@@ -379,6 +379,7 @@ AcpiExLoadOp (
     ACPI_WALK_STATE         *WalkState)
 {
     ACPI_OPERAND_OBJECT     *DdbHandle;
+    ACPI_TABLE_HEADER       *Table;
     ACPI_TABLE_DESC         TableDesc;
     UINT32                  TableIndex;
     ACPI_STATUS             Status;
@@ -396,8 +397,8 @@ AcpiExLoadOp (
     {
     case ACPI_TYPE_REGION:
 
-        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "Load from Region %p %s\n",
-            ObjDesc, AcpiUtGetObjectTypeName (ObjDesc)));
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "Load table from Region %p\n", ObjDesc));
 
         /* Region must be SystemMemory (from ACPI spec) */
 
@@ -420,21 +421,18 @@ AcpiExLoadOp (
         }
 
         /*
-         * We will simply map the memory region for the table. However, the
-         * memory region is technically not guaranteed to remain stable and
-         * we may eventually have to copy the table to a local buffer.
+         * Map the table header and get the actual table length. The region
+         * length is not guaranteed to be the same as the table length.
          */
-        TableDesc.Address = ObjDesc->Region.Address;
-        TableDesc.Length = ObjDesc->Region.Length;
-        TableDesc.Flags = ACPI_TABLE_ORIGIN_MAPPED;
-        break;
+        Table = AcpiOsMapMemory (ObjDesc->Region.Address,
+                    sizeof (ACPI_TABLE_HEADER));
+        if (!Table)
+        {
+            return_ACPI_STATUS (AE_NO_MEMORY);
+        }
 
-    case ACPI_TYPE_BUFFER: /* Buffer or resolved RegionField */
-
-        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "Load from Buffer or Field %p %s\n",
-            ObjDesc, AcpiUtGetObjectTypeName (ObjDesc)));
-
-        Length = ObjDesc->Buffer.Length;
+        Length = Table->Length;
+        AcpiOsUnmapMemory (Table, sizeof (ACPI_TABLE_HEADER));
 
         /* Must have at least an ACPI table header */
 
@@ -443,18 +441,68 @@ AcpiExLoadOp (
             return_ACPI_STATUS (AE_INVALID_TABLE_LENGTH);
         }
 
-        /* Validate checksum here. It won't get validated in TbAddTable */
+        /*
+         * The memory region is not guaranteed to remain stable and we must
+         * copy the table to a local buffer. For example, the memory region
+         * is corrupted after suspend on some machines. Dynamically loaded
+         * tables are usually small, so this overhead is minimal.
+         */
 
-        Status = AcpiTbVerifyChecksum (
-                    ACPI_CAST_PTR (ACPI_TABLE_HEADER, ObjDesc->Buffer.Pointer), Length);
-        if (ACPI_FAILURE (Status))
+        /* Allocate a buffer for the table */
+
+        TableDesc.Pointer = ACPI_ALLOCATE (Length);
+        if (!TableDesc.Pointer)
         {
-            return_ACPI_STATUS (Status);
+            return_ACPI_STATUS (AE_NO_MEMORY);
+        }
+
+        /* Map the entire table and copy it */
+
+        Table = AcpiOsMapMemory (ObjDesc->Region.Address, Length);
+        if (!Table)
+        {
+            ACPI_FREE (TableDesc.Pointer);
+            return_ACPI_STATUS (AE_NO_MEMORY);
+        }
+
+        ACPI_MEMCPY (TableDesc.Pointer, Table, Length);
+        AcpiOsUnmapMemory (Table, Length);
+
+        TableDesc.Address = ObjDesc->Region.Address;
+        break;
+
+
+    case ACPI_TYPE_BUFFER: /* Buffer or resolved RegionField */
+
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "Load table from Buffer or Field %p\n", ObjDesc));
+
+        /* Must have at least an ACPI table header */
+
+        if (ObjDesc->Buffer.Length < sizeof (ACPI_TABLE_HEADER))
+        {
+            return_ACPI_STATUS (AE_INVALID_TABLE_LENGTH);
+        }
+
+        /* Get the actual table length from the table header */
+
+        Table = ACPI_CAST_PTR (ACPI_TABLE_HEADER, ObjDesc->Buffer.Pointer);
+        Length = Table->Length;
+
+        /* Table cannot extend beyond the buffer */
+
+        if (Length > ObjDesc->Buffer.Length)
+        {
+            return_ACPI_STATUS (AE_AML_BUFFER_LIMIT);
+        }
+        if (Length < sizeof (ACPI_TABLE_HEADER))
+        {
+            return_ACPI_STATUS (AE_INVALID_TABLE_LENGTH);
         }
 
         /*
-         * We need to copy the buffer since the original buffer could be
-         * changed or deleted in the future
+         * Copy the table from the buffer because the buffer could be modified
+         * or even deleted in the future
          */
         TableDesc.Pointer = ACPI_ALLOCATE (Length);
         if (!TableDesc.Pointer)
@@ -462,18 +510,31 @@ AcpiExLoadOp (
             return_ACPI_STATUS (AE_NO_MEMORY);
         }
 
-        ACPI_MEMCPY (TableDesc.Pointer, ObjDesc->Buffer.Pointer, Length);
-        TableDesc.Length = Length;
-        TableDesc.Flags = ACPI_TABLE_ORIGIN_ALLOCATED;
+        ACPI_MEMCPY (TableDesc.Pointer, Table, Length);
+        TableDesc.Address = ACPI_TO_INTEGER (TableDesc.Pointer);
         break;
+
 
     default:
         return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
     }
 
-    /*
-     * Install the new table into the local data structures
-     */
+    /* Validate table checksum (will not get validated in TbAddTable) */
+
+    Status = AcpiTbVerifyChecksum (TableDesc.Pointer, Length);
+    if (ACPI_FAILURE (Status))
+    {
+        ACPI_FREE (TableDesc.Pointer);
+        return_ACPI_STATUS (Status);
+    }
+
+    /* Complete the table descriptor */
+
+    TableDesc.Length = Length;
+    TableDesc.Flags = ACPI_TABLE_ORIGIN_ALLOCATED;
+
+    /* Install the new table into the local data structures */
+
     Status = AcpiTbAddTable (&TableDesc, &TableIndex);
     if (ACPI_FAILURE (Status))
     {
@@ -483,7 +544,7 @@ AcpiExLoadOp (
     /*
      * Add the table to the namespace.
      *
-     * Note: We load the table objects relative to the root of the namespace.
+     * Note: Load the table objects relative to the root of the namespace.
      * This appears to go against the ACPI specification, but we do it for
      * compatibility with other ACPI implementations.
      */
@@ -519,7 +580,7 @@ AcpiExLoadOp (
 Cleanup:
     if (ACPI_FAILURE (Status))
     {
-        /* Delete allocated buffer or mapping */
+        /* Delete allocated table buffer */
 
         AcpiTbDeleteTable (&TableDesc);
     }
@@ -590,6 +651,9 @@ AcpiExUnloadTable (
 
     AcpiTbSetTableLoadedFlag (TableIndex, FALSE);
 
+    /* Table unloaded, remove a reference to the DdbHandle object */
+
+    AcpiUtRemoveReference (DdbHandle);
     return_ACPI_STATUS (AE_OK);
 }
 

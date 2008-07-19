@@ -2078,6 +2078,7 @@ AnOtherSemanticAnalysisWalkBegin (
             {
             case PARSEOP_ACQUIRE:
             case PARSEOP_WAIT:
+            case PARSEOP_LOADTABLE:
                 break;
 
             default:

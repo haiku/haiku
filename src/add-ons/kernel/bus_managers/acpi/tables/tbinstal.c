@@ -196,7 +196,6 @@ AcpiTbAddTable (
     UINT32                  *TableIndex)
 {
     UINT32                  i;
-    UINT32                  Length;
     ACPI_STATUS             Status = AE_OK;
 
 
@@ -235,25 +234,64 @@ AcpiTbAddTable (
             }
         }
 
-        Length = ACPI_MIN (TableDesc->Length,
-                    AcpiGbl_RootTableList.Tables[i].Length);
-        if (ACPI_MEMCMP (TableDesc->Pointer,
-                AcpiGbl_RootTableList.Tables[i].Pointer, Length))
+        /*
+         * Check for a table match on the entire table length,
+         * not just the header.
+         */
+        if (TableDesc->Length != AcpiGbl_RootTableList.Tables[i].Length)
         {
             continue;
         }
 
-        /* Table is already registered */
+        if (ACPI_MEMCMP (TableDesc->Pointer,
+                AcpiGbl_RootTableList.Tables[i].Pointer,
+                AcpiGbl_RootTableList.Tables[i].Length))
+        {
+            continue;
+        }
 
+        /*
+         * Note: the current mechanism does not unregister a table if it is
+         * dynamically unloaded. The related namespace entries are deleted,
+         * but the table remains in the root table list.
+         *
+         * The assumption here is that the number of different tables that
+         * will be loaded is actually small, and there is minimal overhead
+         * in just keeping the table in case it is needed again.
+         *
+         * If this assumption changes in the future (perhaps on large
+         * machines with many table load/unload operations), tables will
+         * need to be unregistered when they are unloaded, and slots in the
+         * root table list should be reused when empty.
+         */
+
+        /*
+         * Table is already registered.
+         * We can delete the table that was passed as a parameter.
+         */
         AcpiTbDeleteTable (TableDesc);
         *TableIndex = i;
-        Status = AE_ALREADY_EXISTS;
-        goto Release;
+
+        if (AcpiGbl_RootTableList.Tables[i].Flags & ACPI_TABLE_IS_LOADED)
+        {
+            /* Table is still loaded, this is an error */
+
+            Status = AE_ALREADY_EXISTS;
+            goto Release;
+        }
+        else
+        {
+            /* Table was unloaded, allow it to be reloaded */
+
+            TableDesc->Pointer = AcpiGbl_RootTableList.Tables[i].Pointer;
+            TableDesc->Address = AcpiGbl_RootTableList.Tables[i].Address;
+            Status = AE_OK;
+            goto PrintHeader;
+        }
     }
 
-    /*
-     * Add the table to the global table list
-     */
+    /* Add the table to the global root table list */
+
     Status = AcpiTbStoreTable (TableDesc->Address, TableDesc->Pointer,
                 TableDesc->Length, TableDesc->Flags, TableIndex);
     if (ACPI_FAILURE (Status))
@@ -261,6 +299,7 @@ AcpiTbAddTable (
         goto Release;
     }
 
+PrintHeader:
     AcpiTbPrintTableHeader (TableDesc->Address, TableDesc->Pointer);
 
 Release:

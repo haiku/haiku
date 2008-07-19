@@ -124,7 +124,6 @@
 #include <sys/types.h>
 #include <machine/acpica_machdep.h>
 
-#define ACPI_THREAD_ID                  uintptr_t
 #define ACPI_UINTPTR_T                  uintptr_t
 #define ACPI_USE_LOCAL_CACHE
 #define __cdecl
@@ -176,7 +175,7 @@
 /* Always use FreeBSD code over our local versions */
 #define ACPI_USE_SYSTEM_CLIBRARY
 
-+#if defined(_KERNEL) && (__FreeBSD_version < 700020)
+#if defined(_KERNEL) && (__FreeBSD_version < 700020)
 /* Or strstr (used in debugging mode, also move to libkern) */
 static __inline char *
 strstr (char *s, char *find)

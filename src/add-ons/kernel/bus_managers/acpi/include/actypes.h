@@ -1036,6 +1036,7 @@ typedef struct acpi_device_info
 {
     ACPI_COMMON_OBJ_INFO;
 
+    UINT32                          ParamCount;         /* If a method, required parameter count */
     UINT32                          Valid;              /* Indicates which fields below are valid */
     UINT32                          CurrentStatus;      /* _STA value */
     ACPI_INTEGER                    Address;            /* _ADR value if any */
@@ -1473,8 +1474,8 @@ typedef struct acpi_resource
 #pragma pack()
 
 
-#define ACPI_RS_SIZE_MIN                    12
 #define ACPI_RS_SIZE_NO_DATA                8       /* Id + Length fields */
+#define ACPI_RS_SIZE_MIN                    (UINT32) ACPI_ROUND_UP_TO_NATIVE_WORD (12)
 #define ACPI_RS_SIZE(Type)                  (UINT32) (ACPI_RS_SIZE_NO_DATA + sizeof (Type))
 
 #define ACPI_NEXT_RESOURCE(Res)             (ACPI_RESOURCE *)((UINT8 *) Res + Res->Length)

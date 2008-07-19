@@ -354,7 +354,7 @@ AcpiHwGetBitRegisterInfo (
  * RETURN:      Status and the value read from specified Register. Value
  *              returned is normalized to bit0 (is shifted all the way right)
  *
- * DESCRIPTION: ACPI BitRegister read function.
+ * DESCRIPTION: ACPI BitRegister read function. Does not acquire the HW lock.
  *
  ******************************************************************************/
 
@@ -428,7 +428,7 @@ AcpiGetRegister (
     Status = AcpiGetRegisterUnlocked (RegisterId, ReturnValue);
     AcpiOsReleaseLock (AcpiGbl_HardwareLock, Flags);
 
-    return Status;
+    return (Status);
 }
 
 ACPI_EXPORT_SYMBOL (AcpiGetRegister)

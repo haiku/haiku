@@ -266,6 +266,7 @@ const ASL_RESERVED_INFO         ReservedMethods[] = {
     {"_ALR",     0,      ASL_RSVD_RETURN_VALUE},    /* Acpi 3.0 */
     {"_ALT",     0,      ASL_RSVD_RETURN_VALUE},    /* Acpi 3.0 */
     {"_ASI",     0,      ASL_RSVD_RESOURCE_NAME},
+    {"_ASZ",     0,      ASL_RSVD_RESOURCE_NAME},
     {"_BAS",     0,      ASL_RSVD_RESOURCE_NAME},
     {"_BBN",     0,      ASL_RSVD_RETURN_VALUE},
     {"_BCL",     0,      ASL_RSVD_RETURN_VALUE},
@@ -343,6 +344,7 @@ const ASL_RESERVED_INFO         ReservedMethods[] = {
     {"_MIN",     0,      ASL_RSVD_RESOURCE_NAME},
     {"_MLS",     0,      ASL_RSVD_RETURN_VALUE},    /* Acpi 3.0 */
     {"_MSG",     1,      0},
+    {"_MTP",     0,      ASL_RSVD_RESOURCE_NAME},
     {"_OFF",     0,      0},
     {"_ON_",     0,      0},
     {"_OS_",     0,      ASL_RSVD_RETURN_VALUE},

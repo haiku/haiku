@@ -222,6 +222,10 @@ AcpiUtDeleteInternalObj (
         break;
 
 
+    /*
+     * These objects have a possible list of notify handlers.
+     * Device object also may have a GPE block.
+     */
     case ACPI_TYPE_DEVICE:
 
         if (Object->Device.GpeBlock)
@@ -229,9 +233,14 @@ AcpiUtDeleteInternalObj (
             (void) AcpiEvDeleteGpeBlock (Object->Device.GpeBlock);
         }
 
-        /* Walk the handler list for this device */
+        /*lint -fallthrough */
 
-        HandlerDesc = Object->Device.Handler;
+    case ACPI_TYPE_PROCESSOR:
+    case ACPI_TYPE_THERMAL:
+
+        /* Walk the notify handler list for this object */
+
+        HandlerDesc = Object->CommonNotify.Handler;
         while (HandlerDesc)
         {
             NextDesc = HandlerDesc->AddressSpace.Next;

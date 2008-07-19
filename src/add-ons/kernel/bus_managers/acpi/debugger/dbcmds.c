@@ -123,8 +123,7 @@
 #include "acdebug.h"
 #include "acresrc.h"
 #include "acdisasm.h"
-
-
+#include "actables.h"
 #include "acparser.h"
 
 #ifdef ACPI_DEBUGGER
@@ -437,24 +436,30 @@ AcpiDbDisplayTableInfo (
     ACPI_TABLE_DESC         *TableDesc;
 
 
-    /*
-     * Walk the root table list
-     */
+    /* Walk the entire root table list */
+
     for (i = 0; i < AcpiGbl_RootTableList.Count; i++)
     {
         TableDesc = &AcpiGbl_RootTableList.Tables[i];
-        AcpiOsPrintf ( "%.4s at %p length %.5X",
-                TableDesc->Signature.Ascii, TableDesc->Pointer,
-                (UINT32) TableDesc->Length);
+        AcpiOsPrintf ("%d ", i);
 
-        if (TableDesc->Pointer && (i != ACPI_TABLE_INDEX_FACS))
+        /* Make sure that the table is mapped */
+
+        AcpiTbVerifyTable (TableDesc);
+
+        /* Dump the table header */
+
+        if (TableDesc->Pointer)
         {
-            AcpiOsPrintf (" OemId=\"%.6s\" OemTableId=\"%.8s\" OemRevision=%8.8X",
-                    TableDesc->Pointer->OemId,
-                    TableDesc->Pointer->OemTableId,
-                    TableDesc->Pointer->OemRevision);
+            AcpiTbPrintTableHeader (TableDesc->Address, TableDesc->Pointer);
         }
-        AcpiOsPrintf ("\n");
+        else
+        {
+            /* If the pointer is null, the table has been unloaded */
+
+            ACPI_INFO ((AE_INFO, "%4.4s - Table has been unloaded",
+                TableDesc->Signature.Ascii));
+        }
     }
 }
 
