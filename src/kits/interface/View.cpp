@@ -621,24 +621,8 @@ BView::~BView()
 BRect
 BView::Bounds() const
 {
-	// do we need to update our bounds?
+	_CheckLock();
 
-// TODO: why should our frame be out of sync ever?
-/*
-	if (!fState->IsValid(B_VIEW_FRAME_BIT) && fOwner) {
-		_CheckLockAndSwitchCurrent();
-
-		fOwner->fLink->StartMessage(AS_VIEW_GET_COORD);
-
-		int32 code;
-		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == B_OK) {
-			fOwner->fLink->Read<BPoint>(const_cast<BPoint *>(&fParentOffset));
-			fOwner->fLink->Read<BRect>(const_cast<BRect *>(&fBounds));
-			fState->valid_flags |= B_VIEW_FRAME_BIT;
-		}
-	}
-*/
 	if (fIsPrinting)
 		return fState->print_rect;
 
@@ -906,8 +890,6 @@ BView::SetFlags(uint32 flags)
 BRect
 BView::Frame() const
 {
-	_CheckLock();
-
 	return Bounds().OffsetToCopy(fParentOffset.x, fParentOffset.y);
 }
 
