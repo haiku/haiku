@@ -145,7 +145,7 @@ FT_BEGIN_HEADER
   *       A pointer to the JSTF table.
   *
   * @return:
-  *   FreeType error code.  0 means success.
+  *   FreeType error code.  0~means success.
   *
   * @note:
   *   This function only works with OpenType fonts, returning an error

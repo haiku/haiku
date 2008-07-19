@@ -557,10 +557,10 @@
       FT_Stream  stream = loader->stream;
 
 
-      /* we must undo the FT_FRAME_ENTER in order to point to the */
-      /* composite instructions, if we find some.               */
-      /* we will process them later...                          */
-      /*                                                        */
+      /* we must undo the FT_FRAME_ENTER in order to point */
+      /* to the composite instructions, if we find some.   */
+      /* We will process them later.                       */
+      /*                                                   */
       loader->ins_pos = (FT_ULong)( FT_STREAM_POS() +
                                     p - limit );
     }
@@ -1668,8 +1668,8 @@
     }
 
     /* adjust advance width to the value contained in the hdmx table */
-    if ( !face->postscript.isFixedPitch &&
-         IS_HINTED( loader->load_flags )        )
+    if ( !face->postscript.isFixedPitch  &&
+         IS_HINTED( loader->load_flags ) )
     {
       FT_Byte*  widthp;
 
@@ -1957,6 +1957,40 @@
         if ( ( face->header.Flags & 2 ) == 0 && loader.pp1.x )
           FT_Outline_Translate( &glyph->outline, -loader.pp1.x, 0 );
       }
+
+#ifdef TT_USE_BYTECODE_INTERPRETER
+
+      if ( IS_HINTED( load_flags ) )
+      {
+        if ( loader.exec->GS.scan_control )
+        {
+          /* convert scan conversion mode to FT_OUTLINE_XXX flags */
+          switch ( loader.exec->GS.scan_type )
+          {
+          case 0: /* simple drop-outs including stubs */
+            glyph->outline.flags |= FT_OUTLINE_INCLUDE_STUBS;
+            break;
+          case 1: /* simple drop-outs excluding stubs */
+            /* nothing; it's the default rendering mode */
+            break;
+          case 4: /* smart drop-outs including stubs */
+            glyph->outline.flags |= FT_OUTLINE_SMART_DROPOUTS |
+                                    FT_OUTLINE_INCLUDE_STUBS;
+            break;
+          case 5: /* smart drop-outs excluding stubs  */
+            glyph->outline.flags |= FT_OUTLINE_SMART_DROPOUTS;
+            break;
+
+          default: /* no drop-out control */
+            glyph->outline.flags |= FT_OUTLINE_IGNORE_DROPOUTS;
+            break;
+          }
+        }
+        else 
+          glyph->outline.flags |= FT_OUTLINE_IGNORE_DROPOUTS;
+      }
+
+#endif /* TT_USE_BYTECODE_INTERPRETER */
 
       compute_glyph_metrics( &loader, glyph_index );
     }

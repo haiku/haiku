@@ -43,7 +43,7 @@ FT_BEGIN_HEADER
   /*    The basic data types defined by the library.                       */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    This section contains the basic data types defined by FreeType 2,  */
+  /*    This section contains the basic data types defined by FreeType~2,  */
   /*    ranging from simple scalar types to bitmap descriptors.  More      */
   /*    font-specific structures are defined in a different section.       */
   /*                                                                       */
@@ -99,7 +99,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    A typedef of unsigned char, used for simple booleans.  As usual,   */
-  /*    values 1 and 0 represent true and false, respectively.             */
+  /*    values 1 and~0 represent true and false, respectively.             */
   /*                                                                       */
   typedef unsigned char  FT_Bool;
 
@@ -167,7 +167,7 @@ FT_BEGIN_HEADER
   /*    FT_Tag                                                             */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    A typedef for 32bit tags (as used in the SFNT format).             */
+  /*    A typedef for 32-bit tags (as used in the SFNT format).             */
   /*                                                                       */
   typedef FT_UInt32  FT_Tag;
 
@@ -290,7 +290,7 @@ FT_BEGIN_HEADER
   /*    FT_Error                                                           */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    The FreeType error code type.  A value of 0 is always interpreted  */
+  /*    The FreeType error code type.  A value of~0 is always interpreted  */
   /*    as a successful operation.                                         */
   /*                                                                       */
   typedef int  FT_Error;
@@ -313,7 +313,7 @@ FT_BEGIN_HEADER
   /*    FT_Offset                                                          */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    This is equivalent to the ANSI C `size_t' type, i.e., the largest  */
+  /*    This is equivalent to the ANSI~C `size_t' type, i.e., the largest  */
   /*    _unsigned_ integer type used to express a file size or position,   */
   /*    or a memory block size.                                            */
   /*                                                                       */
@@ -326,7 +326,7 @@ FT_BEGIN_HEADER
   /*    FT_PtrDist                                                         */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    This is equivalent to the ANSI C `ptrdiff_t' type, i.e., the       */
+  /*    This is equivalent to the ANSI~C `ptrdiff_t' type, i.e., the       */
   /*    largest _signed_ integer type used to express the distance         */
   /*    between two pointers.                                              */
   /*                                                                       */
@@ -413,7 +413,7 @@ FT_BEGIN_HEADER
   /*    FT_Generic_Finalizer                                               */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Describes a function used to destroy the `client' data of any      */
+  /*    Describe a function used to destroy the `client' data of any       */
   /*    FreeType object.  See the description of the @FT_Generic type for  */
   /*    details of usage.                                                  */
   /*                                                                       */
@@ -470,8 +470,8 @@ FT_BEGIN_HEADER
   /*    TrueType tables into an unsigned long to be used within FreeType.  */
   /*                                                                       */
   /* <Note>                                                                */
-  /*    The produced values *must* be 32bit integers.  Don't redefine this */
-  /*    macro.                                                             */
+  /*    The produced values *must* be 32-bit integers.  Don't redefine     */
+  /*    this macro.                                                        */
   /*                                                                       */
 #define FT_MAKE_TAG( _x1, _x2, _x3, _x4 ) \
           ( ( (FT_ULong)_x1 << 24 ) |     \

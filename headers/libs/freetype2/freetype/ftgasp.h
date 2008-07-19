@@ -31,11 +31,11 @@
    *   Gasp Table
    *
    * @abstract:
-   *   Retrieving TrueType `gasp' table entries
+   *   Retrieving TrueType `gasp' table entries.
    *
    * @description:
    *   The function @FT_Get_Gasp can be used to query a TrueType or OpenType
-   *   font for specific entries in their `gasp' table, if any.  This is
+   *   font for specific entries in its `gasp' table, if any.  This is
    *   mainly useful when implementing native TrueType hinting with the
    *   bytecode interpreter to duplicate the Windows text rendering results.
    */

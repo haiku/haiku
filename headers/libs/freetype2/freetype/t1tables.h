@@ -43,7 +43,7 @@ FT_BEGIN_HEADER
   /*    Type 1 Tables                                                      */
   /*                                                                       */
   /* <Abstract>                                                            */
-  /*    Type 1 (PostScript) specific font tables.                          */
+  /*    Type~1 (PostScript) specific font tables.                          */
   /*                                                                       */
   /* <Description>                                                         */
   /*    This section contains the definition of Type 1-specific tables,    */
@@ -62,8 +62,8 @@ FT_BEGIN_HEADER
   /*    PS_FontInfoRec                                                     */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    A structure used to model a Type1/Type2 FontInfo dictionary.  Note */
-  /*    that for Multiple Master fonts, each instance has its own          */
+  /*    A structure used to model a Type~1 or Type~2 FontInfo dictionary.  */
+  /*    Note that for Multiple Master fonts, each instance has its own     */
   /*    FontInfo dictionary.                                               */
   /*                                                                       */
   typedef struct  PS_FontInfoRec_
@@ -111,9 +111,9 @@ FT_BEGIN_HEADER
   /*    PS_PrivateRec                                                      */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    A structure used to model a Type1/Type2 private dictionary.  Note  */
-  /*    that for Multiple Master fonts, each instance has its own Private  */
-  /*    dictionary.                                                        */
+  /*    A structure used to model a Type~1 or Type~2 private dictionary.   */
+  /*    Note that for Multiple Master fonts, each instance has its own     */
+  /*    Private dictionary.                                                */
   /*                                                                       */
   typedef struct  PS_PrivateRec_
   {
@@ -408,7 +408,7 @@ FT_BEGIN_HEADER
    *    FT_Has_PS_Glyph_Names
    *
    * @description:
-   *    Return true if a given face provides reliable Postscript glyph
+   *    Return true if a given face provides reliable PostScript glyph
    *    names.  This is similar to using the @FT_HAS_GLYPH_NAMES macro,
    *    except that certain fonts (mostly TrueType) contain incorrect
    *    glyph name tables.
@@ -435,24 +435,24 @@ FT_BEGIN_HEADER
    *
    * @description:
    *    Retrieve the @PS_FontInfoRec structure corresponding to a given
-   *    Postscript font.
+   *    PostScript font.
    *
    * @input:
    *    face ::
-   *       Postscript face handle.
+   *       PostScript face handle.
    *
    * @output:
    *    afont_info ::
    *       Output font info structure pointer.
    *
    * @return:
-   *    FreeType error code.  0 means success.
+   *    FreeType error code.  0~means success.
    *
    * @note:
    *    The string pointers within the font info structure are owned by
    *    the face and don't need to be freed by the caller.
    *
-   *    If the font's format is not Postscript-based, this function will
+   *    If the font's format is not PostScript-based, this function will
    *    return the `FT_Err_Invalid_Argument' error code.
    *
    */
@@ -468,24 +468,24 @@ FT_BEGIN_HEADER
    *
    * @description:
    *    Retrieve the @PS_PrivateRec structure corresponding to a given
-   *    Postscript font.
+   *    PostScript font.
    *
    * @input:
    *    face ::
-   *       Postscript face handle.
+   *       PostScript face handle.
    *
    * @output:
    *    afont_private ::
    *       Output private dictionary structure pointer.
    *
    * @return:
-   *    FreeType error code.  0 means success.
+   *    FreeType error code.  0~means success.
    *
    * @note:
    *    The string pointers within the font info structure are owned by
    *    the face and don't need to be freed by the caller.
    *
-   *    If the font's format is not Postscript-based, this function will
+   *    If the font's format is not PostScript-based, this function will
    *    return the `FT_Err_Invalid_Argument' error code.
    *
    */

@@ -64,16 +64,16 @@ FT_BEGIN_HEADER
    *
    * @output:
    *    registry ::
-   *       The registry, as a C string, owned by the face.
+   *       The registry, as a C~string, owned by the face.
    *
    *    ordering ::
-   *       The ordering, as a C string, owned by the face.
+   *       The ordering, as a C~string, owned by the face.
    *
    *    supplement ::
    *       The supplement.
    *
    * @return:
-   *    FreeType error code.  0 means success.
+   *    FreeType error code.  0~means success.
    *
    * @note:
    *    This function only works with CID faces, returning an error

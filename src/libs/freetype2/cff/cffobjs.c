@@ -534,6 +534,111 @@
         goto Bad_Format;
       }
 
+      if ( !dict->units_per_em )
+        dict->units_per_em = pure_cff ? 1000 : face->root.units_per_EM;
+
+      /* Normalize the font matrix so that `matrix->xx' is 1; the */
+      /* scaling is done with `units_per_em' then (at this point, */
+      /* it already contains the scaling factor, but without      */
+      /* normalization of the matrix).                            */
+      /*                                                          */
+      /* Note that the offsets must be expressed in integer font  */
+      /* units.                                                   */
+
+      {
+        FT_Matrix*  matrix = &dict->font_matrix;
+        FT_Vector*  offset = &dict->font_offset;
+        FT_ULong*   upm    = &dict->units_per_em;
+        FT_Fixed    temp   = FT_ABS( matrix->yy );
+
+
+        if ( temp != 0x10000L )
+        {
+          *upm = FT_DivFix( *upm, temp );
+
+          matrix->xx = FT_DivFix( matrix->xx, temp );
+          matrix->yx = FT_DivFix( matrix->yx, temp );
+          matrix->xy = FT_DivFix( matrix->xy, temp );
+          matrix->yy = FT_DivFix( matrix->yy, temp );
+          offset->x  = FT_DivFix( offset->x,  temp );
+          offset->y  = FT_DivFix( offset->y,  temp );
+        }
+
+        offset->x >>= 16;
+        offset->y >>= 16;
+      }
+
+      for ( i = cff->num_subfonts; i > 0; i-- )
+      {
+        CFF_FontRecDict  sub = &cff->subfonts[i - 1]->font_dict;
+        CFF_FontRecDict  top = &cff->top_font.font_dict;
+
+        FT_Matrix*  matrix;
+        FT_Vector*  offset;
+        FT_ULong*   upm;
+        FT_Fixed    temp;
+
+
+        if ( sub->units_per_em )
+        {
+          FT_Int  scaling;
+
+
+          if ( top->units_per_em > 1 && sub->units_per_em > 1 )
+            scaling = FT_MIN( top->units_per_em, sub->units_per_em );
+          else
+            scaling = 1;
+
+          FT_Matrix_Multiply_Scaled( &top->font_matrix,
+                                     &sub->font_matrix,
+                                     scaling );
+          FT_Vector_Transform_Scaled( &sub->font_offset,
+                                      &top->font_matrix,
+                                      scaling );
+
+          sub->units_per_em = FT_MulDiv( sub->units_per_em,
+                                         top->units_per_em,
+                                         scaling );
+        }
+        else
+        {
+          sub->font_matrix = top->font_matrix;
+          sub->font_offset = top->font_offset;
+
+          sub->units_per_em = top->units_per_em;
+        }
+
+        matrix = &sub->font_matrix;
+        offset = &sub->font_offset;
+        upm    = &sub->units_per_em;
+        temp   = FT_ABS( matrix->yy );
+
+        if ( temp != 0x10000L )
+        {
+          *upm = FT_DivFix( *upm, temp );
+
+          /* if *upm is larger than 100*1000 we divide by 1000 --     */
+          /* this can happen if e.g. there is no top-font FontMatrix  */
+          /* and the subfont FontMatrix already contains the complete */
+          /* scaling for the subfont (see section 5.11 of the PLRM)   */
+
+          /* 100 is a heuristic value */
+
+          if ( *upm > 100L * 1000L )
+            *upm = ( *upm + 500 ) / 1000;
+
+          matrix->xx = FT_DivFix( matrix->xx, temp );
+          matrix->yx = FT_DivFix( matrix->yx, temp );
+          matrix->xy = FT_DivFix( matrix->xy, temp );
+          matrix->yy = FT_DivFix( matrix->yy, temp );
+          offset->x  = FT_DivFix( offset->x,  temp );
+          offset->y  = FT_DivFix( offset->y,  temp );
+        }
+
+        offset->x >>= 16;
+        offset->y >>= 16;
+      }
+
       if ( pure_cff )
       {
         char*  style_name = NULL;
@@ -554,8 +659,6 @@
         cffface->bbox.xMax = ( dict->font_bbox.xMax + 0xFFFFU ) >> 16;
         cffface->bbox.yMax = ( dict->font_bbox.yMax + 0xFFFFU ) >> 16;
 
-        if ( !dict->units_per_em )
-          dict->units_per_em = 1000;
 
         cffface->units_per_EM = dict->units_per_em;
 
@@ -711,113 +814,7 @@
 
         cffface->style_flags = flags;
       }
-      else
-      {
-        if ( !dict->units_per_em )
-          dict->units_per_em = face->root.units_per_EM;
-      }
 
-      /* Normalize the font matrix so that `matrix->xx' is 1; the */
-      /* scaling is done with `units_per_em' then (at this point, */
-      /* it already contains the scaling factor, but without      */
-      /* normalization of the matrix).                            */
-      /*                                                          */
-      /* Note that the offsets must be expressed in integer font  */
-      /* units.                                                   */
-
-      {
-        FT_Matrix*  matrix = &dict->font_matrix;
-        FT_Vector*  offset = &dict->font_offset;
-        FT_ULong*   upm    = &dict->units_per_em;
-        FT_Fixed    temp   = FT_ABS( matrix->yy );
-
-
-        if ( temp != 0x10000L )
-        {
-          *upm = FT_DivFix( *upm, temp );
-
-          matrix->xx = FT_DivFix( matrix->xx, temp );
-          matrix->yx = FT_DivFix( matrix->yx, temp );
-          matrix->xy = FT_DivFix( matrix->xy, temp );
-          matrix->yy = FT_DivFix( matrix->yy, temp );
-          offset->x  = FT_DivFix( offset->x,  temp );
-          offset->y  = FT_DivFix( offset->y,  temp );
-        }
-
-        offset->x >>= 16;
-        offset->y >>= 16;
-      }
-
-      for ( i = cff->num_subfonts; i > 0; i-- )
-      {
-        CFF_FontRecDict  sub = &cff->subfonts[i - 1]->font_dict;
-        CFF_FontRecDict  top = &cff->top_font.font_dict;
-
-        FT_Matrix*  matrix;
-        FT_Vector*  offset;
-        FT_ULong*   upm;
-        FT_Fixed    temp;
-
-
-        if ( sub->units_per_em )
-        {
-          FT_Int  scaling;
-
-
-          if ( top->units_per_em > 1 && sub->units_per_em > 1 )
-            scaling = FT_MIN( top->units_per_em, sub->units_per_em );
-          else
-            scaling = 1;
-
-          FT_Matrix_Multiply_Scaled( &top->font_matrix,
-                                     &sub->font_matrix,
-                                     scaling );
-          FT_Vector_Transform_Scaled( &sub->font_offset,
-                                      &top->font_matrix,
-                                      scaling );
-
-          sub->units_per_em = FT_MulDiv( sub->units_per_em,
-                                         top->units_per_em,
-                                         scaling );
-        }
-        else
-        {
-          sub->font_matrix = top->font_matrix;
-          sub->font_offset = top->font_offset;
-
-          sub->units_per_em = top->units_per_em;
-        }
-
-        matrix = &sub->font_matrix;
-        offset = &sub->font_offset;
-        upm    = &sub->units_per_em;
-        temp   = FT_ABS( matrix->yy );
-
-        if ( temp != 0x10000L )
-        {
-          *upm = FT_DivFix( *upm, temp );
-
-          /* if *upm is larger than 100*1000 we divide by 1000 --     */
-          /* this can happen if e.g. there is no top-font FontMatrix  */
-          /* and the subfont FontMatrix already contains the complete */
-          /* scaling for the subfont (see section 5.11 of the PLRM)   */
-
-          /* 100 is a heuristic value */
-
-          if ( *upm > 100L * 1000L )
-            *upm = ( *upm + 500 ) / 1000;
-
-          matrix->xx = FT_DivFix( matrix->xx, temp );
-          matrix->yx = FT_DivFix( matrix->yx, temp );
-          matrix->xy = FT_DivFix( matrix->xy, temp );
-          matrix->yy = FT_DivFix( matrix->yy, temp );
-          offset->x  = FT_DivFix( offset->x,  temp );
-          offset->y  = FT_DivFix( offset->y,  temp );
-        }
-
-        offset->x >>= 16;
-        offset->y >>= 16;
-      }
 
 #ifndef FT_CONFIG_OPTION_NO_GLYPH_NAMES
       /* CID-keyed CFF fonts don't have glyph names -- the SFNT loader */

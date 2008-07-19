@@ -77,8 +77,8 @@
 #define OS_INLINE  static __inline__
 #endif
 
-  /* The ResourceIndex type was only added in the 10.5 SDK */
-#ifndef MAC_OS_X_VERSION_10_5
+  /* The ResourceIndex type was available SDKs on 10.5 */
+#ifndef HAVE_TYPE_RESOURCE_INDEX
 typedef short ResourceIndex;
 #endif
 
@@ -134,7 +134,7 @@ typedef short ResourceIndex;
                               FSRef*      ats_font_ref )
   {
 #if defined( MAC_OS_X_VERSION_10_5 ) && \
-    MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5
+    ( MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5 )
  
     OSStatus  err;
 
@@ -235,7 +235,7 @@ typedef short ResourceIndex;
                                 FT_Long*     face_index )
   {
 #if ( __LP64__ ) || ( defined( MAC_OS_X_VERSION_10_5 ) && \
-      MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5 )
+      ( MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5 ) )
     FT_UNUSED( fontName );
     FT_UNUSED( pathSpec );
     FT_UNUSED( face_index );
@@ -1108,7 +1108,7 @@ typedef short ResourceIndex;
                            FT_Face*       aface )
   {
 #if ( __LP64__ ) || ( defined( MAC_OS_X_VERSION_10_5 ) && \
-      MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5 )
+      ( MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5 ) )
     FT_UNUSED( library );
     FT_UNUSED( spec );
     FT_UNUSED( face_index );

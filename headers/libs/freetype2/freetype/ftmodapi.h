@@ -179,7 +179,7 @@ FT_BEGIN_HEADER
   /*    FT_Add_Module                                                      */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Adds a new module to a given library instance.                     */
+  /*    Add a new module to a given library instance.                      */
   /*                                                                       */
   /* <InOut>                                                               */
   /*    library :: A handle to the library object.                         */
@@ -188,7 +188,7 @@ FT_BEGIN_HEADER
   /*    clazz   :: A pointer to class descriptor for the module.           */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    An error will be returned if a module already exists by that name, */
@@ -205,7 +205,7 @@ FT_BEGIN_HEADER
   /*    FT_Get_Module                                                      */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Finds a module by its name.                                        */
+  /*    Find a module by its name.                                         */
   /*                                                                       */
   /* <Input>                                                               */
   /*    library     :: A handle to the library object.                     */
@@ -213,7 +213,7 @@ FT_BEGIN_HEADER
   /*    module_name :: The module's name (as an ASCII string).             */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    A module handle.  0 if none was found.                             */
+  /*    A module handle.  0~if none was found.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    FreeType's internal modules aren't documented very well, and you   */
@@ -230,7 +230,7 @@ FT_BEGIN_HEADER
   /*    FT_Remove_Module                                                   */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Removes a given module from a library instance.                    */
+  /*    Remove a given module from a library instance.                     */
   /*                                                                       */
   /* <InOut>                                                               */
   /*    library :: A handle to a library object.                           */
@@ -239,7 +239,7 @@ FT_BEGIN_HEADER
   /*    module  :: A handle to a module object.                            */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    The module object is destroyed by the function in case of success. */
@@ -266,7 +266,7 @@ FT_BEGIN_HEADER
   /*    alibrary :: A pointer to handle of a new library object.           */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_New_Library( FT_Memory    memory,
@@ -279,14 +279,14 @@ FT_BEGIN_HEADER
   /*    FT_Done_Library                                                    */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Discards a given library object.  This closes all drivers and      */
+  /*    Discard a given library object.  This closes all drivers and       */
   /*    discards all resource objects.                                     */
   /*                                                                       */
   /* <Input>                                                               */
   /*    library :: A handle to the target library.                         */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Done_Library( FT_Library  library );
@@ -303,7 +303,7 @@ FT_BEGIN_HEADER
   /*    FT_Set_Debug_Hook                                                  */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Sets a debug hook function for debugging the interpreter of a font */
+  /*    Set a debug hook function for debugging the interpreter of a font  */
   /*    format.                                                            */
   /*                                                                       */
   /* <InOut>                                                               */
@@ -318,7 +318,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Note>                                                                */
   /*    Currently, four debug hook slots are available, but only two (for  */
-  /*    the TrueType and the Type 1 interpreter) are defined.              */
+  /*    the TrueType and the Type~1 interpreter) are defined.              */
   /*                                                                       */
   /*    Since the internal headers of FreeType are no longer installed,    */
   /*    the symbol `FT_DEBUG_HOOK_TRUETYPE' isn't available publicly.      */
@@ -336,7 +336,7 @@ FT_BEGIN_HEADER
   /*    FT_Add_Default_Modules                                             */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Adds the set of default drivers to a given library object.         */
+  /*    Add the set of default drivers to a given library object.          */
   /*    This is only useful when you create a library object with          */
   /*    @FT_New_Library (usually to plug a custom memory manager).         */
   /*                                                                       */

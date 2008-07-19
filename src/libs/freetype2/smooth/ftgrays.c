@@ -1616,15 +1616,14 @@
 
     volatile int  error = 0;
 
+
     if ( ft_setjmp( ras.jump_buffer ) == 0 )
     {
       error = FT_Outline_Decompose( &ras.outline, &func_interface, &ras );
       gray_record_cell( RAS_VAR );
     }
     else
-    {
       error = ErrRaster_Memory_Overflow;
-    }
 
     return error;
   }
@@ -1678,10 +1677,12 @@
       ras.cubic_level <<= level;
     }
 
-    /* setup vertical bands */
+    /* set up vertical bands */
     num_bands = (int)( ( ras.max_ey - ras.min_ey ) / ras.band_size );
-    if ( num_bands == 0 )  num_bands = 1;
-    if ( num_bands >= 39 ) num_bands = 39;
+    if ( num_bands == 0 )
+      num_bands = 1;
+    if ( num_bands >= 39 )
+      num_bands = 39;
 
     ras.band_shoot = 0;
 

@@ -693,7 +693,7 @@
   /*    exec  :: A handle to the target execution context.                 */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    TrueTyoe error code.  0 means success.                             */
+  /*    TrueType error code.  0 means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    Only the glyph loader and debugger should call this function.      */
@@ -5092,12 +5092,8 @@
       return;
     }
 
-    A *= 64;
-
-#if 0
-    if ( ( args[0] & 0x100 ) != 0 && CUR.metrics.pointSize <= A )
+    if ( ( args[0] & 0x100 ) != 0 && CUR.tt_metrics.ppem < A )
       CUR.GS.scan_control = TRUE;
-#endif
 
     if ( ( args[0] & 0x200 ) != 0 && CUR.tt_metrics.rotated )
       CUR.GS.scan_control = TRUE;
@@ -5105,10 +5101,8 @@
     if ( ( args[0] & 0x400 ) != 0 && CUR.tt_metrics.stretched )
       CUR.GS.scan_control = TRUE;
 
-#if 0
-    if ( ( args[0] & 0x800 ) != 0 && CUR.metrics.pointSize > A )
+    if ( ( args[0] & 0x800 ) != 0 && CUR.tt_metrics.ppem >= A )
       CUR.GS.scan_control = FALSE;
-#endif
 
     if ( ( args[0] & 0x1000 ) != 0 && CUR.tt_metrics.rotated )
       CUR.GS.scan_control = FALSE;
@@ -5127,16 +5121,8 @@
   static void
   Ins_SCANTYPE( INS_ARG )
   {
-    /* for compatibility with future enhancements, */
-    /* we must ignore new modes                    */
-
-    if ( args[0] >= 0 && args[0] <= 5 )
-    {
-      if ( args[0] == 3 )
-        args[0] = 2;
-
+    if ( args[0] >= 0 )
       CUR.GS.scan_type = (FT_Int)args[0];
-    }
   }
 
 

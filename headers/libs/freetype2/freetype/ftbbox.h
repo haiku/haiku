@@ -58,7 +58,7 @@ FT_BEGIN_HEADER
   /*    FT_Outline_Get_BBox                                                */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Computes the exact bounding box of an outline.  This is slower     */
+  /*    Compute the exact bounding box of an outline.  This is slower      */
   /*    than computing the control box.  However, it uses an advanced      */
   /*    algorithm which returns _very_ quickly when the two boxes          */
   /*    coincide.  Otherwise, the outline Bézier arcs are traversed to     */
@@ -71,7 +71,7 @@ FT_BEGIN_HEADER
   /*    abbox   :: The outline's exact bounding box.                       */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Outline_Get_BBox( FT_Outline*  outline,

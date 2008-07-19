@@ -49,7 +49,7 @@ FT_BEGIN_HEADER
    *
    *   Apart from that, all other tables are loaded normally from the font
    *   file.  This mode is useful when FreeType is used within another
-   *   engine, e.g., a Postscript Imaging Processor.
+   *   engine, e.g., a PostScript Imaging Processor.
    *
    *   To enable this mode, you must use @FT_Open_Face, passing an
    *   @FT_Parameter with the @FT_PARAM_TAG_INCREMENTAL tag and an
@@ -67,7 +67,7 @@ FT_BEGIN_HEADER
    * @description:
    *   An opaque type describing a user-provided object used to implement
    *   `incremental' glyph loading within FreeType.  This is used to support
-   *   embedded fonts in certain environments (e.g., Postscript interpreters),
+   *   embedded fonts in certain environments (e.g., PostScript interpreters),
    *   where the glyph data isn't in the font file, or must be overridden by
    *   different values.
    *
@@ -142,7 +142,7 @@ FT_BEGIN_HEADER
    *
    *   Note that the format of the glyph's data bytes depends on the font
    *   file format.  For TrueType, it must correspond to the raw bytes within
-   *   the `glyf' table.  For Postscript formats, it must correspond to the
+   *   the `glyf' table.  For PostScript formats, it must correspond to the
    *   *unencrypted* charstring bytes, without any `lenIV' header.  It is
    *   undefined for any other format.
    *
@@ -160,7 +160,7 @@ FT_BEGIN_HEADER
    *     accessed as a read-only byte block).
    *
    * @return:
-   *   FreeType error code.  0 means success.
+   *   FreeType error code.  0~means success.
    *
    * @note:
    *   If this function returns successfully the method

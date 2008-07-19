@@ -86,10 +86,10 @@ FT_BEGIN_HEADER
   /*    Base Interface                                                     */
   /*                                                                       */
   /* <Abstract>                                                            */
-  /*    The FreeType 2 base font interface.                                */
+  /*    The FreeType~2 base font interface.                                */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    This section describes the public high-level API of FreeType 2.    */
+  /*    This section describes the public high-level API of FreeType~2.    */
   /*                                                                       */
   /* <Order>                                                               */
   /*    FT_Library                                                         */
@@ -485,7 +485,7 @@ FT_BEGIN_HEADER
   /*    used to define `encoding' identifiers (see @FT_Encoding).          */
   /*                                                                       */
   /* <Note>                                                                */
-  /*    Since many 16bit compilers don't like 32bit enumerations, you      */
+  /*    Since many 16-bit compilers don't like 32-bit enumerations, you    */
   /*    should redefine this macro in case of problems to something like   */
   /*    this:                                                              */
   /*                                                                       */
@@ -527,7 +527,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Values>                                                              */
   /*   FT_ENCODING_NONE ::                                                 */
-  /*     The encoding value 0 is reserved.                                 */
+  /*     The encoding value~0 is reserved.                                 */
   /*                                                                       */
   /*   FT_ENCODING_UNICODE ::                                              */
   /*     Corresponds to the Unicode character set.  This value covers      */
@@ -559,26 +559,26 @@ FT_BEGIN_HEADER
   /*     `http://www.microsoft.com/typography/unicode/949.txt'.            */
   /*                                                                       */
   /*   FT_ENCODING_JOHAB ::                                                */
-  /*     The Korean standard character set (KS C-5601-1992), which         */
+  /*     The Korean standard character set (KS~C 5601-1992), which         */
   /*     corresponds to MS Windows code page 1361.  This character set     */
   /*     includes all possible Hangeul character combinations.             */
   /*                                                                       */
   /*   FT_ENCODING_ADOBE_LATIN_1 ::                                        */
-  /*     Corresponds to a Latin-1 encoding as defined in a Type 1          */
-  /*     Postscript font.  It is limited to 256 character codes.           */
+  /*     Corresponds to a Latin-1 encoding as defined in a Type~1          */
+  /*     PostScript font.  It is limited to 256 character codes.           */
   /*                                                                       */
   /*   FT_ENCODING_ADOBE_STANDARD ::                                       */
-  /*     Corresponds to the Adobe Standard encoding, as found in Type 1,   */
+  /*     Corresponds to the Adobe Standard encoding, as found in Type~1,   */
   /*     CFF, and OpenType/CFF fonts.  It is limited to 256 character      */
   /*     codes.                                                            */
   /*                                                                       */
   /*   FT_ENCODING_ADOBE_EXPERT ::                                         */
-  /*     Corresponds to the Adobe Expert encoding, as found in Type 1,     */
+  /*     Corresponds to the Adobe Expert encoding, as found in Type~1,     */
   /*     CFF, and OpenType/CFF fonts.  It is limited to 256 character      */
   /*     codes.                                                            */
   /*                                                                       */
   /*   FT_ENCODING_ADOBE_CUSTOM ::                                         */
-  /*     Corresponds to a custom encoding, as found in Type 1, CFF, and    */
+  /*     Corresponds to a custom encoding, as found in Type~1, CFF, and    */
   /*     OpenType/CFF fonts.  It is limited to 256 character codes.        */
   /*                                                                       */
   /*   FT_ENCODING_APPLE_ROMAN ::                                          */
@@ -607,7 +607,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Note>                                                                */
   /*   By default, FreeType automatically synthetizes a Unicode charmap    */
-  /*   for Postscript fonts, using their glyph names dictionaries.         */
+  /*   for PostScript fonts, using their glyph names dictionaries.         */
   /*   However, it also reports the encodings defined explicitly in the    */
   /*   font file, for the cases when they are needed, with the Adobe       */
   /*   values as well.                                                     */
@@ -630,16 +630,16 @@ FT_BEGIN_HEADER
   /*   and `encoding_id' is not @TT_MAC_ID_ROMAN (otherwise it is set to   */
   /*   FT_ENCODING_APPLE_ROMAN).                                           */
   /*                                                                       */
-  /*   If `platform_id' is @TT_PLATFORM_MACINTOSH, use the function  c     */
+  /*   If `platform_id' is @TT_PLATFORM_MACINTOSH, use the function        */
   /*   @FT_Get_CMap_Language_ID  to query the Mac language ID which may be */
   /*   needed to be able to distinguish Apple encoding variants.  See      */
   /*                                                                       */
   /*     http://www.unicode.org/Public/MAPPINGS/VENDORS/APPLE/README.TXT   */
   /*                                                                       */
-  /*   to get an idea how to do that.  Basically, if the language ID is 0, */
+  /*   to get an idea how to do that.  Basically, if the language ID is~0, */
   /*   don't use it, otherwise subtract 1 from the language ID.  Then      */
   /*   examine `encoding_id'.  If, for example, `encoding_id' is           */
-  /*   @TT_MAC_ID_ROMAN and the language ID (minus 1) is                   */
+  /*   @TT_MAC_ID_ROMAN and the language ID (minus~1) is                   */
   /*   `TT_MAC_LANGID_GREEK', it is the Greek encoding, not Roman.         */
   /*   @TT_MAC_ID_ARABIC with `TT_MAC_LANGID_FARSI' means the Farsi        */
   /*   variant the Arabic encoding.                                        */
@@ -753,7 +753,7 @@ FT_BEGIN_HEADER
   /*    An opaque handle to an `FT_Face_InternalRec' structure, used to    */
   /*    model private data of a given @FT_Face object.                     */
   /*                                                                       */
-  /*    This structure might change between releases of FreeType 2 and is  */
+  /*    This structure might change between releases of FreeType~2 and is  */
   /*    not generally available to client applications.                    */
   /*                                                                       */
   typedef struct FT_Face_InternalRec_*  FT_Face_Internal;
@@ -774,7 +774,7 @@ FT_BEGIN_HEADER
   /*                           a font file.                                */
   /*                                                                       */
   /*    face_index          :: The index of the face in the font file.  It */
-  /*                           is set to 0 if there is only one face in    */
+  /*                           is set to~0 if there is only one face in    */
   /*                           the font file.                              */
   /*                                                                       */
   /*    face_flags          :: A set of bit flags that give important      */
@@ -789,6 +789,9 @@ FT_BEGIN_HEADER
   /*                           face is scalable and has sbits (see         */
   /*                           `num_fixed_sizes'), it is set to the number */
   /*                           of outline glyphs.                          */
+  /*                                                                       */
+  /*                           For CID-keyed fonts, this value gives the   */
+  /*                           highest CID used in the font.               */
   /*                                                                       */
   /*    family_name         :: The face's family name.  This is an ASCII   */
   /*                           string, usually in English, which describes */
@@ -838,9 +841,13 @@ FT_BEGIN_HEADER
   /*                           descender'.  Only relevant for scalable     */
   /*                           formats.                                    */
   /*                                                                       */
+  /*                           Note that the bounding box might be off by  */
+  /*                           (at least) one pixel for hinted fonts.  See */
+  /*                           @FT_Size_Metrics for further discussion.    */
+  /*                                                                       */
   /*    units_per_EM        :: The number of font units per EM square for  */
   /*                           this face.  This is typically 2048 for      */
-  /*                           TrueType fonts, and 1000 for Type 1 fonts.  */
+  /*                           TrueType fonts, and 1000 for Type~1 fonts.  */
   /*                           Only relevant for scalable formats.         */
   /*                                                                       */
   /*    ascender            :: The typographic ascender of the face,       */
@@ -1099,7 +1106,7 @@ FT_BEGIN_HEADER
    *
    * @description:
    *   A macro that returns true whenever a face object contains a scalable
-   *   font face (true for TrueType, Type 1, Type 42, CID, OpenType/CFF,
+   *   font face (true for TrueType, Type~1, Type~42, CID, OpenType/CFF,
    *   and PFR font formats.
    *
    */
@@ -1461,7 +1468,7 @@ FT_BEGIN_HEADER
   /*    bitmap_top        :: This is the bitmap's top bearing expressed in */
   /*                         integer pixels.  Remember that this is the    */
   /*                         distance from the baseline to the top-most    */
-  /*                         glyph scanline, upwards y-coordinates being   */
+  /*                         glyph scanline, upwards y~coordinates being   */
   /*                         *positive*.                                   */
   /*                                                                       */
   /*    outline           :: The outline descriptor for the current glyph  */
@@ -1484,7 +1491,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    control_data      :: Certain font drivers can also return the      */
   /*                         control data for a given glyph image (e.g.    */
-  /*                         TrueType bytecode, Type 1 charstrings, etc.). */
+  /*                         TrueType bytecode, Type~1 charstrings, etc.). */
   /*                         This field is a pointer to such data.         */
   /*                                                                       */
   /*    control_len       :: This is the length in bytes of the control    */
@@ -1506,7 +1513,7 @@ FT_BEGIN_HEADER
   /* <Note>                                                                */
   /*    If @FT_Load_Glyph is called with default flags (see                */
   /*    @FT_LOAD_DEFAULT) the glyph image is loaded in the glyph slot in   */
-  /*    its native format (e.g., an outline glyph for TrueType and Type 1  */
+  /*    its native format (e.g., an outline glyph for TrueType and Type~1  */
   /*    formats).                                                          */
   /*                                                                       */
   /*    This image can later be converted into a bitmap by calling         */
@@ -1609,7 +1616,7 @@ FT_BEGIN_HEADER
   /*    alibrary :: A handle to a new library object.                      */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Init_FreeType( FT_Library  *alibrary );
@@ -1628,7 +1635,7 @@ FT_BEGIN_HEADER
   /*    library :: A handle to the target library object.                  */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Done_FreeType( FT_Library  library );
@@ -1648,8 +1655,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    FT_OPEN_STREAM      :: Copy the stream from the `stream' field.    */
   /*                                                                       */
-  /*    FT_OPEN_PATHNAME    :: Create a new input stream from a C          */
-  /*                           path name.                                  */
+  /*    FT_OPEN_PATHNAME    :: Create a new input stream from a C~path     */
+  /*                           name.                                       */
   /*                                                                       */
   /*    FT_OPEN_DRIVER      :: Use the `driver' field.                     */
   /*                                                                       */
@@ -1731,7 +1738,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    driver      :: This field is exclusively used by @FT_Open_Face;    */
   /*                   it simply specifies the font driver to use to open  */
-  /*                   the face.  If set to 0, FreeType tries to load the  */
+  /*                   the face.  If set to~0, FreeType tries to load the  */
   /*                   face with each one of the drivers in its list.      */
   /*                                                                       */
   /*    num_params  :: The number of extra parameters.                     */
@@ -1794,7 +1801,7 @@ FT_BEGIN_HEADER
   /*    pathname   :: A path to the font file.                             */
   /*                                                                       */
   /*    face_index :: The index of the face within the font.  The first    */
-  /*                  face has index 0.                                    */
+  /*                  face has index~0.                                    */
   /*                                                                       */
   /* <Output>                                                              */
   /*    aface      :: A handle to a new face object.  If `face_index' is   */
@@ -1802,7 +1809,7 @@ FT_BEGIN_HEADER
   /*                  See @FT_Open_Face for more details.                  */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_New_Face( FT_Library   library,
@@ -1829,7 +1836,7 @@ FT_BEGIN_HEADER
   /*    file_size  :: The size of the memory chunk used by the font data.  */
   /*                                                                       */
   /*    face_index :: The index of the face within the font.  The first    */
-  /*                  face has index 0.                                    */
+  /*                  face has index~0.                                    */
   /*                                                                       */
   /* <Output>                                                              */
   /*    aface      :: A handle to a new face object.  If `face_index' is   */
@@ -1837,7 +1844,7 @@ FT_BEGIN_HEADER
   /*                  See @FT_Open_Face for more details.                  */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    You must not deallocate the memory before calling @FT_Done_Face.   */
@@ -1867,7 +1874,7 @@ FT_BEGIN_HEADER
   /*                  be filled by the caller.                             */
   /*                                                                       */
   /*    face_index :: The index of the face within the font.  The first    */
-  /*                  face has index 0.                                    */
+  /*                  face has index~0.                                    */
   /*                                                                       */
   /* <Output>                                                              */
   /*    aface      :: A handle to a new face object.  If `face_index' is   */
@@ -1875,7 +1882,7 @@ FT_BEGIN_HEADER
   /*                  See note below.                                      */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    Unlike FreeType 1.x, this function automatically creates a glyph   */
@@ -1884,7 +1891,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    FT_Open_Face can be used to quickly check whether the font         */
   /*    format of a given font resource is supported by FreeType.  If the  */
-  /*    `face_index' field is negative, the function's return value is 0   */
+  /*    `face_index' field is negative, the function's return value is~0   */
   /*    if the font format is recognized, or non-zero otherwise;           */
   /*    the function returns a more or less empty face handle in `*aface'  */
   /*    (if `aface' isn't NULL).  The only useful field in this special    */
@@ -1917,7 +1924,7 @@ FT_BEGIN_HEADER
   /*    filepathname :: The pathname.                                      */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Attach_File( FT_Face      face,
@@ -1932,7 +1939,7 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    `Attach' data to a face object.  Normally, this is used to read    */
   /*    additional information for the face object.  For example, you can  */
-  /*    attach an AFM file that comes with a Type 1 font to get the        */
+  /*    attach an AFM file that comes with a Type~1 font to get the        */
   /*    kerning values and other metrics.                                  */
   /*                                                                       */
   /* <InOut>                                                               */
@@ -1943,7 +1950,7 @@ FT_BEGIN_HEADER
   /*                  the caller.                                          */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    The meaning of the `attach' (i.e., what really happens when the    */
@@ -1972,7 +1979,7 @@ FT_BEGIN_HEADER
   /*    face :: A handle to a target face object.                          */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Done_Face( FT_Face  face );
@@ -1994,7 +2001,7 @@ FT_BEGIN_HEADER
   /*                    `available_sizes' field of @FT_FaceRec structure.  */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Select_Size( FT_Face  face,
@@ -2120,7 +2127,7 @@ FT_BEGIN_HEADER
   /*    req  :: A pointer to a @FT_Size_RequestRec.                        */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    Although drivers may select the bitmap strike matching the         */
@@ -2155,7 +2162,7 @@ FT_BEGIN_HEADER
   /*    vert_resolution :: The vertical resolution in dpi.                 */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    If either the character width or height is zero, it is set equal   */
@@ -2194,7 +2201,7 @@ FT_BEGIN_HEADER
   /*    pixel_height :: The nominal height, in pixels.                     */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Set_Pixel_Sizes( FT_Face  face,
@@ -2227,7 +2234,7 @@ FT_BEGIN_HEADER
   /*                   whether to hint the outline, etc).                  */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    The loaded glyph may be transformed.  See @FT_Set_Transform for    */
@@ -2268,7 +2275,7 @@ FT_BEGIN_HEADER
   /*                   whether to hint the outline, etc).                  */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    This function simply calls @FT_Get_Char_Index and @FT_Load_Glyph.  */
@@ -2290,7 +2297,7 @@ FT_BEGIN_HEADER
    *
    * @values:
    *   FT_LOAD_DEFAULT ::
-   *     Corresponding to 0, this value is used as the default glyph load
+   *     Corresponding to~0, this value is used as the default glyph load
    *     operation.  In this case, the following happens:
    *
    *     1. FreeType looks for a bitmap for the glyph corresponding to the
@@ -2380,7 +2387,7 @@ FT_BEGIN_HEADER
    *   FT_LOAD_MONOCHROME ::
    *     This flag is used with @FT_LOAD_RENDER to indicate that you want to
    *     render an outline glyph to a 1-bit monochrome bitmap glyph, with
-   *     8 pixels packed into each byte of the bitmap data.
+   *     8~pixels packed into each byte of the bitmap data.
    *
    *     Note that this has no effect on the hinting algorithm used.  You
    *     should use @FT_LOAD_TARGET_MONO instead so that the
@@ -2451,7 +2458,7 @@ FT_BEGIN_HEADER
    *   FT_LOAD_TARGET_LIGHT ::
    *     A lighter hinting algorithm for non-monochrome modes.  Many
    *     generated glyphs are more fuzzy but better resemble its original
-   *     shape.  A bit like rendering on Mac OS X.
+   *     shape.  A bit like rendering on Mac OS~X.
    *
    *     As a special exception, this target implies @FT_LOAD_FORCE_AUTOHINT.
    *
@@ -2526,9 +2533,9 @@ FT_BEGIN_HEADER
   /*    face   :: A handle to the source face object.                      */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    matrix :: A pointer to the transformation's 2x2 matrix.  Use 0 for */
+  /*    matrix :: A pointer to the transformation's 2x2 matrix.  Use~0 for */
   /*              the identity matrix.                                     */
-  /*    delta  :: A pointer to the translation vector.  Use 0 for the null */
+  /*    delta  :: A pointer to the translation vector.  Use~0 for the null */
   /*              vector.                                                  */
   /*                                                                       */
   /* <Note>                                                                */
@@ -2553,17 +2560,19 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    An enumeration type that lists the render modes supported by       */
-  /*    FreeType 2.  Each mode corresponds to a specific type of scanline  */
+  /*    FreeType~2.  Each mode corresponds to a specific type of scanline  */
   /*    conversion performed on the outline.                               */
   /*                                                                       */
   /*    For bitmap fonts the `bitmap->pixel_mode' field in the             */
   /*    @FT_GlyphSlotRec structure gives the format of the returned        */
   /*    bitmap.                                                            */
   /*                                                                       */
+  /*    All modes except @FT_RENDER_MODE_MONO use 256 levels of opacity.   */
+  /*                                                                       */
   /* <Values>                                                              */
   /*    FT_RENDER_MODE_NORMAL ::                                           */
   /*      This is the default render mode; it corresponds to 8-bit         */
-  /*      anti-aliased bitmaps, using 256 levels of opacity.               */
+  /*      anti-aliased bitmaps.                                            */
   /*                                                                       */
   /*    FT_RENDER_MODE_LIGHT ::                                            */
   /*      This is equivalent to @FT_RENDER_MODE_NORMAL.  It is only        */
@@ -2572,18 +2581,19 @@ FT_BEGIN_HEADER
   /*      @FT_LOAD_TARGET_XXX for details.                                 */
   /*                                                                       */
   /*    FT_RENDER_MODE_MONO ::                                             */
-  /*      This mode corresponds to 1-bit bitmaps.                          */
+  /*      This mode corresponds to 1-bit bitmaps (with 2~levels of         */
+  /*      opacity).                                                        */
   /*                                                                       */
   /*    FT_RENDER_MODE_LCD ::                                              */
   /*      This mode corresponds to horizontal RGB and BGR sub-pixel        */
   /*      displays, like LCD-screens.  It produces 8-bit bitmaps that are  */
-  /*      3 times the width of the original glyph outline in pixels, and   */
+  /*      3~times the width of the original glyph outline in pixels, and   */
   /*      which use the @FT_PIXEL_MODE_LCD mode.                           */
   /*                                                                       */
   /*    FT_RENDER_MODE_LCD_V ::                                            */
   /*      This mode corresponds to vertical RGB and BGR sub-pixel displays */
   /*      (like PDA screens, rotated LCD displays, etc.).  It produces     */
-  /*      8-bit bitmaps that are 3 times the height of the original        */
+  /*      8-bit bitmaps that are 3~times the height of the original        */
   /*      glyph outline in pixels and use the @FT_PIXEL_MODE_LCD_V mode.   */
   /*                                                                       */
   /* <Note>                                                                */
@@ -2643,7 +2653,7 @@ FT_BEGIN_HEADER
   /*                   list of possible values.                            */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Render_Glyph( FT_GlyphSlot    slot,
@@ -2661,7 +2671,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Values>                                                              */
   /*    FT_KERNING_DEFAULT  :: Return scaled and grid-fitted kerning       */
-  /*                           distances (value is 0).                     */
+  /*                           distances (value is~0).                     */
   /*                                                                       */
   /*    FT_KERNING_UNFITTED :: Return scaled but un-grid-fitted kerning    */
   /*                           distances.                                  */
@@ -2739,7 +2749,7 @@ FT_BEGIN_HEADER
   /*                   and in pixels for fixed-sizes formats.              */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    Only horizontal layouts (left-to-right & right-to-left) are        */
@@ -2774,7 +2784,7 @@ FT_BEGIN_HEADER
   /*    akerning    :: The kerning in 16.16 fractional points.             */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Get_Track_Kerning( FT_Face    face,
@@ -2790,7 +2800,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    Retrieve the ASCII name of a given glyph in a face.  This only     */
-  /*    works for those faces where @FT_HAS_GLYPH_NAMES(face) returns 1.   */
+  /*    works for those faces where @FT_HAS_GLYPH_NAMES(face) returns~1.   */
   /*                                                                       */
   /* <Input>                                                               */
   /*    face        :: A handle to a source face object.                   */
@@ -2805,12 +2815,12 @@ FT_BEGIN_HEADER
   /*                   copied to.                                          */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    An error is returned if the face doesn't provide glyph names or if */
   /*    the glyph index is invalid.  In all cases of failure, the first    */
-  /*    byte of `buffer' is set to 0 to indicate an empty name.            */
+  /*    byte of `buffer' is set to~0 to indicate an empty name.            */
   /*                                                                       */
   /*    The glyph name is truncated to fit within the buffer if it is too  */
   /*    long.  The returned string is always zero-terminated.              */
@@ -2832,14 +2842,14 @@ FT_BEGIN_HEADER
   /*    FT_Get_Postscript_Name                                             */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Retrieve the ASCII Postscript name of a given face, if available.  */
-  /*    This only works with Postscript and TrueType fonts.                */
+  /*    Retrieve the ASCII PostScript name of a given face, if available.  */
+  /*    This only works with PostScript and TrueType fonts.                */
   /*                                                                       */
   /* <Input>                                                               */
   /*    face :: A handle to the source face object.                        */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    A pointer to the face's Postscript name.  NULL if unavailable.     */
+  /*    A pointer to the face's PostScript name.  NULL if unavailable.     */
   /*                                                                       */
   /* <Note>                                                                */
   /*    The returned pointer is owned by the face and is destroyed with    */
@@ -2865,7 +2875,7 @@ FT_BEGIN_HEADER
   /*    encoding :: A handle to the selected encoding.                     */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    This function returns an error if no charmap in the face           */
@@ -2897,14 +2907,14 @@ FT_BEGIN_HEADER
   /*    charmap :: A handle to the selected charmap.                       */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    This function returns an error if the charmap is not part of       */
   /*    the face (i.e., if it is not listed in the `face->charmaps'        */
   /*    table).                                                            */
   /*                                                                       */
-  /*    It also fails if a type 14 charmap is selected.                    */
+  /*    It also fails if a type~14 charmap is selected.                    */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Set_Charmap( FT_Face     face,
@@ -2947,13 +2957,13 @@ FT_BEGIN_HEADER
   /*    charcode :: The character code.                                    */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    The glyph index.  0 means `undefined character code'.              */
+  /*    The glyph index.  0~means `undefined character code'.              */
   /*                                                                       */
   /* <Note>                                                                */
   /*    If you use FreeType to manipulate the contents of font files       */
   /*    directly, be aware that the glyph index returned by this function  */
   /*    doesn't always correspond to the internal indices used within      */
-  /*    the file.  This is done to ensure that value 0 always corresponds  */
+  /*    the file.  This is done to ensure that value~0 always corresponds  */
   /*    to the `missing glyph'.                                            */
   /*                                                                       */
   FT_EXPORT( FT_UInt )
@@ -2975,7 +2985,7 @@ FT_BEGIN_HEADER
   /*    face    :: A handle to the source face object.                     */
   /*                                                                       */
   /* <Output>                                                              */
-  /*    agindex :: Glyph index of first character code.  0 if charmap is   */
+  /*    agindex :: Glyph index of first character code.  0~if charmap is   */
   /*               empty.                                                  */
   /*                                                                       */
   /* <Return>                                                              */
@@ -3000,9 +3010,9 @@ FT_BEGIN_HEADER
   /*      }                                                                */
   /*    }                                                                  */
   /*                                                                       */
-  /*    Note that `*agindex' is set to 0 if the charmap is empty.  The     */
-  /*    result itself can be 0 in two cases: if the charmap is empty or    */
-  /*    when the value 0 is the first valid character code.                */
+  /*    Note that `*agindex' is set to~0 if the charmap is empty.  The     */
+  /*    result itself can be~0 in two cases: if the charmap is empty or    */
+  /*    when the value~0 is the first valid character code.                */
   /*                                                                       */
   FT_EXPORT( FT_ULong )
   FT_Get_First_Char( FT_Face   face,
@@ -3024,7 +3034,7 @@ FT_BEGIN_HEADER
   /*    char_code :: The starting character code.                          */
   /*                                                                       */
   /* <Output>                                                              */
-  /*    agindex   :: Glyph index of first character code.  0 if charmap    */
+  /*    agindex   :: Glyph index of first character code.  0~if charmap    */
   /*                 is empty.                                             */
   /*                                                                       */
   /* <Return>                                                              */
@@ -3035,7 +3045,7 @@ FT_BEGIN_HEADER
   /*    over all character codes available in a given charmap.  See the    */
   /*    note for this function for a simple code example.                  */
   /*                                                                       */
-  /*    Note that `*agindex' is set to 0 when there are no more codes in   */
+  /*    Note that `*agindex' is set to~0 when there are no more codes in   */
   /*    the charmap.                                                       */
   /*                                                                       */
   FT_EXPORT( FT_ULong )
@@ -3059,7 +3069,7 @@ FT_BEGIN_HEADER
   /*    glyph_name :: The glyph name.                                      */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    The glyph index.  0 means `undefined character code'.              */
+  /*    The glyph index.  0~means `undefined character code'.              */
   /*                                                                       */
   FT_EXPORT( FT_UInt )
   FT_Get_Name_Index( FT_Face     face,
@@ -3128,7 +3138,7 @@ FT_BEGIN_HEADER
    *     The subglyph transformation (if any).
    *
    * @return:
-   *   FreeType error code.  0 means success.
+   *   FreeType error code.  0~means success.
    *
    * @note:
    *   The values of `*p_arg1', `*p_arg2', and `*p_transform' must be
@@ -3155,8 +3165,8 @@ FT_BEGIN_HEADER
   /*    Glyph Variants                                                     */
   /*                                                                       */
   /* <Abstract>                                                            */
-  /*    The FreeType 2 interface to Unicode Ideographic Variation          */
-  /*    Sequences (IVS), using the SFNT cmap format 14.                    */
+  /*    The FreeType~2 interface to Unicode Ideographic Variation          */
+  /*    Sequences (IVS), using the SFNT cmap format~14.                    */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Many CJK characters have variant forms.  They are a sort of grey   */
@@ -3170,10 +3180,10 @@ FT_BEGIN_HEADER
   /*    An IVS is registered and unique; for further details please refer  */
   /*    to Unicode Technical Report #37, the Ideographic Variation         */
   /*    Database.  To date (October 2007), the character with the most     */
-  /*    variants is U+908A, having 8 such IVS.                             */
+  /*    variants is U+908A, having 8~such IVS.                             */
   /*                                                                       */
   /*    Adobe and MS decided to support IVS with a new cmap subtable       */
-  /*    (format 14).  It is an odd subtable because it is not a mapping of */
+  /*    (format~14).  It is an odd subtable because it is not a mapping of */
   /*    input code points to glyphs, but contains lists of all variants    */
   /*    supported by the font.                                             */
   /*                                                                       */
@@ -3205,7 +3215,7 @@ FT_BEGIN_HEADER
   /*      The Unicode code point of the variation selector.                */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    The glyph index.  0 means either `undefined character code', or    */
+  /*    The glyph index.  0~means either `undefined character code', or    */
   /*    `undefined selector code', or `no variation selector cmap          */
   /*    subtable', or `current CharMap is not Unicode'.                    */
   /*                                                                       */
@@ -3213,7 +3223,7 @@ FT_BEGIN_HEADER
   /*    If you use FreeType to manipulate the contents of font files       */
   /*    directly, be aware that the glyph index returned by this function  */
   /*    doesn't always correspond to the internal indices used within      */
-  /*    the file.  This is done to ensure that value 0 always corresponds  */
+  /*    the file.  This is done to ensure that value~0 always corresponds  */
   /*    to the `missing glyph'.                                            */
   /*                                                                       */
   /*    This function is only meaningful if                                */
@@ -3250,7 +3260,7 @@ FT_BEGIN_HEADER
   /*      The Unicode codepoint of the variation selector.                 */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    1 if found in the standard (Unicode) cmap, 0 if found in the       */
+  /*    1~if found in the standard (Unicode) cmap, 0~if found in the       */
   /*    variation selector cmap, or -1 if it is not a variant.             */
   /*                                                                       */
   /* <Note>                                                                */
@@ -3284,7 +3294,7 @@ FT_BEGIN_HEADER
   /*    no valid variant selector cmap subtable.                           */
   /*                                                                       */
   /* <Note>                                                                */
-  /*    The last item in the array is 0; the array is owned by the         */
+  /*    The last item in the array is~0; the array is owned by the         */
   /*    @FT_Face object but can be overwritten or released on the next     */
   /*    call to a FreeType function.                                       */
   /*                                                                       */
@@ -3317,7 +3327,7 @@ FT_BEGIN_HEADER
   /*    is empty.                                                          */
   /*                                                                       */
   /* <Note>                                                                */
-  /*    The last item in the array is 0; the array is owned by the         */
+  /*    The last item in the array is~0; the array is owned by the         */
   /*    @FT_Face object but can be overwritten or released on the next     */
   /*    call to a FreeType function.                                       */
   /*                                                                       */
@@ -3351,7 +3361,7 @@ FT_BEGIN_HEADER
   /*    is no valid cmap or the variant selector is invalid.               */
   /*                                                                       */
   /* <Note>                                                                */
-  /*    The last item in the array is 0; the array is owned by the         */
+  /*    The last item in the array is~0; the array is owned by the         */
   /*    @FT_Face object but can be overwritten or released on the next     */
   /*    call to a FreeType function.                                       */
   /*                                                                       */
@@ -3474,8 +3484,8 @@ FT_BEGIN_HEADER
   /*    The result of `(a*0x10000)/b'.                                     */
   /*                                                                       */
   /* <Note>                                                                */
-  /*    The optimization for FT_DivFix() is simple: If (a << 16) fits in   */
-  /*    32 bits, then the division is computed directly.  Otherwise, we    */
+  /*    The optimization for FT_DivFix() is simple: If (a~<<~16) fits in   */
+  /*    32~bits, then the division is computed directly.  Otherwise, we    */
   /*    use a specialized version of @FT_MulDiv.                           */
   /*                                                                       */
   FT_EXPORT( FT_Long )
@@ -3601,7 +3611,7 @@ FT_BEGIN_HEADER
    */
 #define FREETYPE_MAJOR  2
 #define FREETYPE_MINOR  3
-#define FREETYPE_PATCH  6
+#define FREETYPE_PATCH  7
 
 
   /*************************************************************************/
@@ -3658,8 +3668,8 @@ FT_BEGIN_HEADER
   /*    face :: A face handle.                                             */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    1 if this is a TrueType font that uses one of the patented         */
-  /*    opcodes, 0 otherwise.                                              */
+  /*    1~if this is a TrueType font that uses one of the patented         */
+  /*    opcodes, 0~otherwise.                                              */
   /*                                                                       */
   /* <Since>                                                               */
   /*    2.3.5                                                              */

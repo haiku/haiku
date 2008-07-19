@@ -303,7 +303,7 @@ FT_BEGIN_HEADER
    *   TT_ADOBE_ID_CUSTOM ::
    *     Adobe custom encoding.
    *   TT_ADOBE_ID_LATIN_1 ::
-   *     Adobe Latin 1 encoding.
+   *     Adobe Latin~1 encoding.
    */
 
 #define TT_ADOBE_ID_STANDARD  0
@@ -1117,7 +1117,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* Here some alias #defines in order to be clearer.                      */
   /*                                                                       */
-  /* These are not always #defined to stay within the 31 character limit   */
+  /* These are not always #defined to stay within the 31~character limit   */
   /* which some compilers have.                                            */
   /*                                                                       */
   /* Credits go to Dave Hoo <dhoo@flash.net> for pointing out that modern  */

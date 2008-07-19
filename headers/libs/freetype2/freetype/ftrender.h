@@ -167,7 +167,7 @@ FT_BEGIN_HEADER
   /*    FT_Get_Renderer                                                    */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Retrieves the current renderer for a given glyph format.           */
+  /*    Retrieve the current renderer for a given glyph format.            */
   /*                                                                       */
   /* <Input>                                                               */
   /*    library :: A handle to the library object.                         */
@@ -175,7 +175,7 @@ FT_BEGIN_HEADER
   /*    format  :: The glyph format.                                       */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    A renderer handle.  0 if none found.                               */
+  /*    A renderer handle.  0~if none found.                               */
   /*                                                                       */
   /* <Note>                                                                */
   /*    An error will be returned if a module already exists by that name, */
@@ -195,7 +195,7 @@ FT_BEGIN_HEADER
   /*    FT_Set_Renderer                                                    */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Sets the current renderer to use, and set additional mode.         */
+  /*    Set the current renderer to use, and set additional mode.          */
   /*                                                                       */
   /* <InOut>                                                               */
   /*    library    :: A handle to the library object.                      */
@@ -208,7 +208,7 @@ FT_BEGIN_HEADER
   /*    parameters :: Additional parameters.                               */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
+  /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   /* <Note>                                                                */
   /*    In case of success, the renderer will be used to convert glyph     */

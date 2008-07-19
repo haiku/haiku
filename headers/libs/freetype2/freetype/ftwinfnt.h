@@ -111,11 +111,11 @@ FT_BEGIN_HEADER
    *     ordering and minor deviations).
    *
    *   FT_WinFNT_ID_CP949 ::
-   *     A superset of Korean Hangul KS C 5601-1987 (with different
+   *     A superset of Korean Hangul KS~C 5601-1987 (with different
    *     ordering and minor deviations).
    *
    *   FT_WinFNT_ID_CP950 ::
-   *     A superset of traditional Chinese Big 5 ETen (with different
+   *     A superset of traditional Chinese Big~5 ETen (with different
    *     ordering and minor deviations).
    *
    *   FT_WinFNT_ID_CP1250 ::
@@ -248,7 +248,7 @@ FT_BEGIN_HEADER
    *    aheader :: The WinFNT header.
    *
    * @return:
-   *   FreeType error code.  0 means success.
+   *   FreeType error code.  0~means success.
    *
    * @note:
    *   This function only works with Windows FNT faces, returning an error

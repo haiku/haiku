@@ -119,7 +119,7 @@ FT_BEGIN_HEADER
    *     well on most LCD screens.
    *
    * @return:
-   *   FreeType error code.  0 means success.
+   *   FreeType error code.  0~means success.
    *
    * @note:
    *   This feature is always disabled by default.  Clients must make an
@@ -141,8 +141,8 @@ FT_BEGIN_HEADER
    *   If this feature is activated, the dimensions of LCD glyph bitmaps are
    *   either larger or taller than the dimensions of the corresponding
    *   outline with regards to the pixel grid.  For example, for
-   *   @FT_RENDER_MODE_LCD, the filter adds up to 3 pixels to the left, and
-   *   up to 3 pixels to the right.
+   *   @FT_RENDER_MODE_LCD, the filter adds up to 3~pixels to the left, and
+   *   up to 3~pixels to the right.
    *
    *   The bitmap offset values are adjusted correctly, so clients shouldn't
    *   need to modify their layout and glyph positioning code when enabling
