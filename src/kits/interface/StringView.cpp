@@ -131,8 +131,16 @@ BStringView::Alignment() const
 void
 BStringView::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+	rgb_color color = B_TRANSPARENT_COLOR;
+
+	BView* parent = Parent();
+	if (parent != NULL)
+		color = parent->ViewColor();
+
+	if (color == B_TRANSPARENT_COLOR)
+		color = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+	SetViewColor(color);
 }
 
 
