@@ -1,7 +1,7 @@
 /*
  * Copyright 2001-2008, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
- * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -74,20 +74,20 @@ enum {
 };
 
 
-static property_info sPropList[] = { 
-	{ "encoding", 
+static property_info sPropList[] = {
+	{ "encoding",
 	{B_GET_PROPERTY, 0},
 	{B_DIRECT_SPECIFIER, 0},
-	"get terminal encoding"}, 
+	"get terminal encoding"},
 	{ "encoding",
 	{B_SET_PROPERTY, 0},
 	{B_DIRECT_SPECIFIER, 0},
-	"set terminal encoding"}, 
+	"set terminal encoding"},
 	{ "tty",
 	{B_GET_PROPERTY, 0},
 	{B_DIRECT_SPECIFIER, 0},
-	"get tty name."}, 
-	{ 0  }	     
+	"get tty name."},
+	{ 0  }
 };
 
 
@@ -228,8 +228,8 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
-	fIMflag(false)	
-{	
+	fIMflag(false)
+{
 	_InitObject(argc, argv);
 }
 
@@ -271,18 +271,18 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
-	fIMflag(false)	
-{	
+	fIMflag(false)
+{
 	_InitObject(argc, argv);
 	SetTermSize(fTermRows, fTermColumns, true);
-	
+
 	// TODO: Don't show the dragger, since replicant capabilities
 	// don't work very well ATM.
 	/*
 	BRect rect(0, 0, 16, 16);
 	rect.OffsetTo(Bounds().right - rect.Width(),
 				Bounds().bottom - rect.Height());
-	
+
 	SetFlags(Flags() | B_DRAW_ON_CHILDREN | B_FOLLOW_ALL);
 	AddChild(new BDragger(rect, this,
 		B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW));*/
@@ -325,30 +325,30 @@ TermView::TermView(BMessage *archive)
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
-	fIMflag(false)	
+	fIMflag(false)
 {
 	// We need this
 	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
-	
+
 	if (archive->FindInt32("encoding", (int32 *)&fEncoding) < B_OK)
 		fEncoding = M_UTF8;
 	if (archive->FindInt32("columns", (int32 *)&fTermColumns) < B_OK)
 		fTermColumns = COLUMNS_DEFAULT;
 	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
 		fTermRows = ROWS_DEFAULT;
-	
+
 	int32 argc = 0;
 	if (archive->HasInt32("argc"))
 		archive->FindInt32("argc", &argc);
-		
-	const char **argv = new const char*[argc];	
+
+	const char **argv = new const char*[argc];
 	for (int32 i = 0; i < argc; i++) {
 		archive->FindString("argv", i, (const char **)&argv[i]);
 	}
-	
+
 	// TODO: Retrieve colors, history size, etc. from archive
 	_InitObject(argc, argv);
-	
+
 	delete[] argv;
 }
 
@@ -382,23 +382,23 @@ TermView::_InitObject(int32 argc, const char **argv)
 	fShell = new (std::nothrow) Shell();
 	if (fShell == NULL)
 		return B_NO_MEMORY;
-	
+
 	SetTermFont(be_fixed_font);
 	SetTermSize(fTermRows, fTermColumns, false);
 	//SetIMAware(false);
-	
+
 	status_t status = fShell->Open(fTermRows, fTermColumns,
 								EncodingAsShortString(fEncoding),
 								argc, argv);
-	
+
 	if (status < B_OK)
 		return status;
-		
+
 	status = _AttachShell(fShell);
 	if (status < B_OK)
 		return status;
-	
-	
+
+
 	SetLowColor(fTextBackColor);
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
@@ -410,7 +410,7 @@ TermView::~TermView()
 {
 	Shell *shell = fShell;
 		// _DetachShell sets fShell to NULL
-	
+
 	_DetachShell();
 
 	delete fSyncRunner;
@@ -428,7 +428,7 @@ TermView::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "TermView"))
 		return new (std::nothrow) TermView(data);
-	
+
 	return NULL;
 }
 
@@ -438,17 +438,17 @@ TermView::Archive(BMessage* data, bool deep) const
 {
 	status_t status = BView::Archive(data, deep);
 	if (status == B_OK)
-		status = data->AddString("add_on", TERM_SIGNATURE);	
+		status = data->AddString("add_on", TERM_SIGNATURE);
 	if (status == B_OK)
 		status = data->AddInt32("encoding", (int32)fEncoding);
 	if (status == B_OK)
 		status = data->AddInt32("columns", (int32)fTermColumns);
 	if (status == B_OK)
 		status = data->AddInt32("rows", (int32)fTermRows);
-	
+
 	if (data->ReplaceString("class", "TermView") != B_OK)
 		data->AddString("class", "TermView");
-	
+
 	return status;
 }
 
@@ -530,7 +530,7 @@ TermView::SetTermSize(int rows, int columns, bool resize)
 		fVisibleTextBuffer->SynchronizeWith(fTextBuffer, offset, offset,
 			offset + rows + 2);
 	}
-	
+
 	return rect;
 }
 
@@ -572,7 +572,7 @@ void
 TermView::SetEncoding(int encoding)
 {
 	// TODO: Shell::_Spawn() sets the "TTYPE" environment variable using
-	// the string value of encoding. But when this function is called and 
+	// the string value of encoding. But when this function is called and
 	// the encoding changes, the new value is never passed to Shell.
 	fEncoding = encoding;
 
@@ -596,9 +596,9 @@ TermView::SetTermFont(const BFont *font)
 	int halfWidth = 0;
 
 	fHalfFont = font;
-	
+
 	fHalfFont.SetSpacing(B_FIXED_SPACING);
-	
+
 	// calculate half font's max width
 	// Not Bounding, check only A-Z(For case of fHalfFont is KanjiFont. )
 	for (int c = 0x20 ; c <= 0x7e; c++){
@@ -613,11 +613,11 @@ TermView::SetTermFont(const BFont *font)
 
 	font_height hh;
 	fHalfFont.GetHeight(&hh);
-	
+
 	int font_ascent = (int)hh.ascent;
 	int font_descent =(int)hh.descent;
 	int font_leading =(int)hh.leading;
-	
+
 	if (font_leading == 0)
 		font_leading = 1;
 
@@ -625,7 +625,7 @@ TermView::SetTermFont(const BFont *font)
 	fFontHeight = font_ascent + font_descent + font_leading + 1;
 
 	fCursorHeight = fFontHeight;
-	
+
 	_ScrollTo(0, false);
 	if (fScrollBar != NULL)
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
@@ -753,9 +753,9 @@ TermView::_AttachShell(Shell *shell)
 {
 	if (shell == NULL)
 		return B_BAD_VALUE;
-	
+
 	fShell = shell;
-	fShell->ViewAttached(this);	
+	fShell->ViewAttached(this);
 
 	return B_OK;
 }
@@ -822,7 +822,7 @@ TermView::_DrawLinePart(int32 x1, int32 y1, uint16 attr, char *buf,
 	// bold attribute.
 	if (IS_BOLD(attr)) {
 		inView->MovePenTo(x1 + 1, y1 + fFontAscent);
-		
+
 		inView->SetDrawingMode(B_OP_OVER);
 		inView->DrawString((char *)buf);
 		inView->SetDrawingMode(B_OP_COPY);
@@ -1111,7 +1111,7 @@ TermView::_DoPrint(BRect updateRect)
 		}
 	}
 #endif	// 0
-} 
+}
 
 
 void
@@ -1154,131 +1154,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 
 	_ActivateCursor(true);
 
-	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
-	if (numBytes == 1) {
-		const char *toWrite = NULL;
-		switch (*bytes) {
-			case B_RETURN:
-				if (rawChar == B_RETURN)
-					toWrite = "\r";
-				break;
-
-			case B_DELETE:
-				toWrite = DELETE_KEY_CODE;
-				break;
-
-			case B_BACKSPACE:
-				// Translate only the actual backspace key to the backspace
-				// code. CTRL-H shall just be echoed.
-				if (!((mod & B_CONTROL_KEY) && rawChar == 'h'))
-					toWrite = BACKSPACE_KEY_CODE;
-				break;
-
-			case B_LEFT_ARROW:
-				if (rawChar == B_LEFT_ARROW) {
-					if (mod & B_SHIFT_KEY) {
-						BMessage message(MSG_PREVIOUS_TAB);
-						message.AddPointer("termView", this);
-						Window()->PostMessage(&message);
-					} else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY)) {
-						toWrite = CTRL_LEFT_ARROW_KEY_CODE;
-					} else
-						toWrite = LEFT_ARROW_KEY_CODE;
-				}
-				break;
-
-			case B_RIGHT_ARROW:
-				if (rawChar == B_RIGHT_ARROW) {
-					if (mod & B_SHIFT_KEY) {
-						BMessage message(MSG_NEXT_TAB);
-						message.AddPointer("termView", this);
-						Window()->PostMessage(&message);
-					} else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY)) {
-						toWrite = CTRL_RIGHT_ARROW_KEY_CODE;
-					} else
-						toWrite = RIGHT_ARROW_KEY_CODE;
-				}
-				break;
-
-			case B_UP_ARROW:
-				if (mod & B_SHIFT_KEY) {
-					_ScrollTo(fScrollOffset - fFontHeight, true);
-					return;
-				}
-				if (rawChar == B_UP_ARROW) {
-					if (mod & B_CONTROL_KEY)
-						toWrite = CTRL_UP_ARROW_KEY_CODE;
-					else
-						toWrite = UP_ARROW_KEY_CODE;
-				}
-				break;
-	 
-			case B_DOWN_ARROW:
-				if (mod & B_SHIFT_KEY) {
-					_ScrollTo(fScrollOffset + fFontHeight, true);
-					return;
-				}
-
-				if (rawChar == B_DOWN_ARROW) {
-					if (mod & B_CONTROL_KEY)
-						toWrite = CTRL_DOWN_ARROW_KEY_CODE;
-					else
-						toWrite = DOWN_ARROW_KEY_CODE;
-				}
-				break;
-
-			case B_INSERT:
-				if (rawChar == B_INSERT)
-					toWrite = INSERT_KEY_CODE;
-				break;
-
-			case B_HOME:
-				if (rawChar == B_HOME)
-					toWrite = HOME_KEY_CODE;
-				break;
-
-			case B_END:
-				if (rawChar == B_END)
-					toWrite = END_KEY_CODE;
-				break;
-
-			case B_PAGE_UP:
-				if (mod & B_SHIFT_KEY) {
-					_ScrollTo(fScrollOffset - fFontHeight  * fTermRows, true);
-					return;
-				}
-				if (rawChar == B_PAGE_UP)
-					toWrite = PAGE_UP_KEY_CODE;
-				break;
-
-			case B_PAGE_DOWN:
-				if (mod & B_SHIFT_KEY) {
-					_ScrollTo(fScrollOffset + fFontHeight * fTermRows, true);
-					return;
-				}
-	 
-				if (rawChar == B_PAGE_DOWN)
-					toWrite = PAGE_DOWN_KEY_CODE;
-				break;
-
-			case B_FUNCTION_KEY:
-				for (int32 i = 0; i < 12; i++) {
-					if (key == function_keycode_table[i]) {
-						fShell->Write(function_key_char_table[i], 5);
-						return;
-					}
-				}
-				break;
-			default:
-				break;
-		}
-		if (toWrite) {
-			_ScrollTo(0, true);
-			fShell->Write(toWrite, strlen(toWrite));
-			return;
-		}
-	} else {
-		// input multibyte character
+	// handle multi-byte chars
+	if (numBytes > 1) {
 		if (fEncoding != M_UTF8) {
 			char destBuffer[16];
 			int cnum = CodeConv::ConvertFromInternal(bytes, numBytes,
@@ -1287,10 +1164,138 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 			fShell->Write(destBuffer, cnum);
 			return;
 		}
+
+		_ScrollTo(0, true);
+		fShell->Write(bytes, numBytes);
+		return;
 	}
 
-	_ScrollTo(0, true);
-	fShell->Write(bytes, numBytes);
+	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
+	const char *toWrite = NULL;
+	int32 toWriteLen = -1;
+
+	switch (*bytes) {
+		case B_RETURN:
+			if (rawChar == B_RETURN)
+				toWrite = "\r";
+			break;
+
+		case B_DELETE:
+			toWrite = DELETE_KEY_CODE;
+			break;
+
+		case B_BACKSPACE:
+			// Translate only the actual backspace key to the backspace
+			// code. CTRL-H shall just be echoed.
+			if (!((mod & B_CONTROL_KEY) && rawChar == 'h'))
+				toWrite = BACKSPACE_KEY_CODE;
+			break;
+
+		case B_LEFT_ARROW:
+			if (rawChar == B_LEFT_ARROW) {
+				if (mod & B_SHIFT_KEY) {
+					BMessage message(MSG_PREVIOUS_TAB);
+					message.AddPointer("termView", this);
+					Window()->PostMessage(&message);
+				} else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY)) {
+					toWrite = CTRL_LEFT_ARROW_KEY_CODE;
+				} else
+					toWrite = LEFT_ARROW_KEY_CODE;
+			}
+			break;
+
+		case B_RIGHT_ARROW:
+			if (rawChar == B_RIGHT_ARROW) {
+				if (mod & B_SHIFT_KEY) {
+					BMessage message(MSG_NEXT_TAB);
+					message.AddPointer("termView", this);
+					Window()->PostMessage(&message);
+				} else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY)) {
+					toWrite = CTRL_RIGHT_ARROW_KEY_CODE;
+				} else
+					toWrite = RIGHT_ARROW_KEY_CODE;
+			}
+			break;
+
+		case B_UP_ARROW:
+			if (mod & B_SHIFT_KEY) {
+				_ScrollTo(fScrollOffset - fFontHeight, true);
+				return;
+			}
+			if (rawChar == B_UP_ARROW) {
+				if (mod & B_CONTROL_KEY)
+					toWrite = CTRL_UP_ARROW_KEY_CODE;
+				else
+					toWrite = UP_ARROW_KEY_CODE;
+			}
+			break;
+
+		case B_DOWN_ARROW:
+			if (mod & B_SHIFT_KEY) {
+				_ScrollTo(fScrollOffset + fFontHeight, true);
+				return;
+			}
+
+			if (rawChar == B_DOWN_ARROW) {
+				if (mod & B_CONTROL_KEY)
+					toWrite = CTRL_DOWN_ARROW_KEY_CODE;
+				else
+					toWrite = DOWN_ARROW_KEY_CODE;
+			}
+			break;
+
+		case B_INSERT:
+			if (rawChar == B_INSERT)
+				toWrite = INSERT_KEY_CODE;
+			break;
+
+		case B_HOME:
+			if (rawChar == B_HOME)
+				toWrite = HOME_KEY_CODE;
+			break;
+
+		case B_END:
+			if (rawChar == B_END)
+				toWrite = END_KEY_CODE;
+			break;
+
+		case B_PAGE_UP:
+			if (mod & B_SHIFT_KEY) {
+				_ScrollTo(fScrollOffset - fFontHeight  * fTermRows, true);
+				return;
+			}
+			if (rawChar == B_PAGE_UP)
+				toWrite = PAGE_UP_KEY_CODE;
+			break;
+
+		case B_PAGE_DOWN:
+			if (mod & B_SHIFT_KEY) {
+				_ScrollTo(fScrollOffset + fFontHeight * fTermRows, true);
+				return;
+			}
+
+			if (rawChar == B_PAGE_DOWN)
+				toWrite = PAGE_DOWN_KEY_CODE;
+			break;
+
+		case B_FUNCTION_KEY:
+			for (int32 i = 0; i < 12; i++) {
+				if (key == function_keycode_table[i]) {
+					fShell->Write(function_key_char_table[i], 5);
+					return;
+				}
+			}
+			break;
+		default:
+			toWrite = bytes;
+			toWriteLen = 1;
+			break;
+	}
+
+	if (toWrite) {
+		_ScrollTo(0, true);
+		fShell->Write(toWrite, toWriteLen < 0 ? strlen(toWrite) : toWriteLen);
+	}
 }
 
 
@@ -1310,7 +1315,7 @@ TermView::FrameResized(float width, float height)
 }
 
 
-void 
+void
 TermView::MessageReceived(BMessage *msg)
 {
 	entry_ref ref;
@@ -1321,7 +1326,7 @@ TermView::MessageReceived(BMessage *msg)
 		char *text;
 		int32 numBytes;
 		//rgb_color *color;
-	
+
 		int32 i = 0;
 
 		if (msg->FindRef("refs", i++, &ref) == B_OK) {
@@ -1333,14 +1338,14 @@ TermView::MessageReceived(BMessage *msg)
 			}
 			return;
 #if 0
-		} else if (msg->FindData("RGBColor", B_RGB_COLOR_TYPE, 
+		} else if (msg->FindData("RGBColor", B_RGB_COLOR_TYPE,
 				(const void **)&color, &numBytes) == B_OK
 				 && numBytes == sizeof(color)) {
 			// TODO: handle color drop
 			// maybe only on replicants ?
 			return;
 #endif
-		} else if (msg->FindData("text/plain", B_MIME_TYPE, 
+		} else if (msg->FindData("text/plain", B_MIME_TYPE,
 			 	(const void **)&text, &numBytes) == B_OK) {
 			_WritePTY(text, numBytes);
 			return;
@@ -1349,7 +1354,7 @@ TermView::MessageReceived(BMessage *msg)
 
 	switch (msg->what){
 		case B_ABOUT_REQUESTED:
-			// (replicant) about box requested 
+			// (replicant) about box requested
 			_AboutRequested();
 			break;
 
@@ -1385,7 +1390,7 @@ TermView::MessageReceived(BMessage *msg)
 		case B_SELECT_ALL:
 			SelectAll();
 			break;
-		
+
 		case B_SET_PROPERTY:
 		{
 			int32 i;
@@ -1402,7 +1407,7 @@ TermView::MessageReceived(BMessage *msg)
 			break;
 		}
 
-		case B_GET_PROPERTY: 
+		case B_GET_PROPERTY:
 		{
 			int32 i;
 			BMessage specifier;
@@ -1420,18 +1425,18 @@ TermView::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-	
+
 		case MENU_CLEAR_ALL:
 			Clear();
 			fShell->Write(ctrl_l, 1);
 			break;
 
-		
+
 //  case B_INPUT_METHOD_EVENT:
 //    {
    //   int32 op;
   //    msg->FindInt32("be:opcode", &op);
-   //   switch (op){ 
+   //   switch (op){
    //   case B_INPUT_METHOD_STARTED:
 	//DoIMStart(msg);
 //	break;
@@ -1483,16 +1488,16 @@ TermView::MessageReceived(BMessage *msg)
 			BView::MessageReceived(msg);
 			break;
 	}
-}  
+}
 
 
 status_t
-TermView::GetSupportedSuites(BMessage *message) 
-{ 
-	BPropertyInfo propInfo(sPropList); 
-	message->AddString("suites", "suite/vnd.naan-termview"); 	
-	message->AddFlat("messages", &propInfo); 
-	return BView::GetSupportedSuites(message); 
+TermView::GetSupportedSuites(BMessage *message)
+{
+	BPropertyInfo propInfo(sPropList);
+	message->AddString("suites", "suite/vnd.naan-termview");
+	message->AddFlat("messages", &propInfo);
+	return BView::GetSupportedSuites(message);
 }
 
 
@@ -1545,18 +1550,18 @@ TermView::ResolveSpecifier(BMessage *message, int32 index, BMessage *specifier,
 {
 	BHandler *target = this;
 	BPropertyInfo propInfo(sPropList);
-	if (propInfo.FindMatch(message, index, specifier, what, property) < B_OK)			
+	if (propInfo.FindMatch(message, index, specifier, what, property) < B_OK)
 		target = BView::ResolveSpecifier(message, index, specifier, what, property);
-	
+
 	return target;
 }
 
 
 //! Gets dropped file full path and display it at cursor position.
-void 
+void
 TermView::_DoFileDrop(entry_ref &ref)
 {
-	BEntry ent(&ref); 
+	BEntry ent(&ref);
 	BPath path(&ent);
 	BString string(path.Path());
 
@@ -1806,7 +1811,7 @@ TermView::MouseDown(BPoint where)
 		MakeFocus();
 
 	int32 buttons;
-	Window()->CurrentMessage()->FindInt32("buttons", &buttons); 
+	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
 
 	fMouseButtons = buttons;
 
@@ -1830,17 +1835,17 @@ TermView::MouseDown(BPoint where)
 					uint32 bt;
 					do {
 						GetMouse(&p, &bt);
-					
+
 						if (bt == 0) {
 							_Deselect();
 							return;
 						}
-					
+
 						snooze(40000);
-					
+
 					} while (abs((int)(where.x - p.x)) < 4
 						&& abs((int)(where.y - p.y)) < 4);
-				
+
 					InitiateDrag();
 					return;
 				}
@@ -1852,12 +1857,12 @@ TermView::MouseDown(BPoint where)
 		if (abs((int)inPoint.x) > 16 || abs((int)inPoint.y) > 16)
 			clicks = 1;
 		*/
-		
+
 		SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,
 				B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
 
 		TermPos clickPos = _ConvertToTerminal(where);
-	    
+
 		if (mod & B_SHIFT_KEY) {
 			fInitialSelectionStart = clickPos;
 			fInitialSelectionEnd = clickPos;
@@ -1867,22 +1872,22 @@ TermView::MouseDown(BPoint where)
 			fInitialSelectionStart = clickPos;
 			fInitialSelectionEnd = clickPos;
 		}
-	    
+
 		// If clicks larger than 3, reset mouse click counter.
 		clicks = (clicks - 1) % 3 + 1;
-	    
+
 		switch (clicks) {
 			case 1:
 				fMouseTracking = true;
 				fSelectGranularity = SELECT_CHARS;
 	      		break;
-	  
+
 			case 2:
 				_SelectWord(where, (mod & B_SHIFT_KEY) != 0, false);
 				fMouseTracking = true;
 				fSelectGranularity = SELECT_WORDS;
 				break;
-	
+
 			case 3:
 	 			_SelectLine(where, (mod & B_SHIFT_KEY) != 0, false);
 				fMouseTracking = true;
@@ -2014,13 +2019,13 @@ TermView::_Select(TermPos start, TermPos end, bool inclusive,
 		end.y++;
 		end.x = 0;
 	}
-	
+
 	if (fTextBuffer->IsFullWidthChar(start.y, start.x)) {
 		start.x--;
 		if (start.x < 0)
 			start.x = 0;
 	}
-	
+
 	if (fTextBuffer->IsFullWidthChar(end.y, end.x)) {
 		end.x++;
 		if (end.x >= fTermColumns)
@@ -2029,7 +2034,7 @@ TermView::_Select(TermPos start, TermPos end, bool inclusive,
 
 	if (fSelStart != fSelEnd)
 		_InvalidateTextRange(fSelStart, fSelEnd);
-	
+
 	fSelStart = start;
 	fSelEnd = end;
 
@@ -2079,9 +2084,9 @@ TermView::_Deselect()
 //debug_printf("TermView::_Deselect(): has selection: %d\n", _HasSelection());
 	if (!_HasSelection())
 		return;
-	
+
 	_InvalidateTextRange(fSelStart, fSelEnd);
-	
+
 	fSelStart.SetTo(0, 0);
 	fSelEnd.SetTo(0, 0);
 	fInitialSelectionStart.SetTo(0, 0);
@@ -2196,7 +2201,7 @@ TermView::GetFrameSize(float *width, float *height)
 
 	if (width != NULL)
 		*width = fTermColumns * fFontWidth;
-	
+
 	if (height != NULL)
 		*height = (fTermRows + historySize) * fFontHeight;
 }
@@ -2285,14 +2290,14 @@ TermView::InitiateDrag()
 	BPoint start = _ConvertFromTerminal(fSelStart);
 	BPoint end = _ConvertFromTerminal(fSelEnd);
 
-	BRect rect;	
+	BRect rect;
 	if (fSelStart.y == fSelEnd.y)
 		rect.Set(start.x, start.y, end.x + fFontWidth, end.y + fFontHeight);
 	else
 		rect.Set(0, start.y, fTermColumns * fFontWidth, end.y + fFontHeight);
 
 	rect = rect & Bounds();
-	
+
 	DragMessage(&message, rect);
 }
 
