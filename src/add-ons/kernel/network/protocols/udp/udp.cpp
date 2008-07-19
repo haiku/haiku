@@ -418,7 +418,7 @@ UdpDomainSupport::_BindToEphemeral(UdpEndpoint *endpoint,
 	if (allocedPort == 0)
 		return ENOBUFS;
 
-	newAddress.SetPort(allocedPort);
+	newAddress.SetPort(htons(allocedPort));
 
 	return _FinishBind(endpoint, *newAddress);
 }
@@ -442,7 +442,7 @@ UdpEndpoint *
 UdpDomainSupport::_FindActiveEndpoint(const sockaddr *ourAddress,
 	const sockaddr *peerAddress)
 {
-	TRACE_DOMAIN("finding Endpoint for %s -> %s",
+	TRACE_DOMAIN("finding Endpoint for %s <- %s",
 		AddressString(fDomain, ourAddress, true).Data(),
 		AddressString(fDomain, peerAddress, true).Data());
 
@@ -524,8 +524,10 @@ UdpDomainSupport::_DemuxUnicast(net_buffer *buffer)
 		}
 	}
 
-	if (!endpoint)
+	if (!endpoint) {
+		TRACE_DOMAIN("_DemuxBroadcast(%p) - no matching endpoint found!", buffer);
 		return B_NAME_NOT_FOUND;
+	}
 
 	endpoint->StoreData(buffer);
 	return B_OK;
@@ -544,12 +546,11 @@ UdpDomainSupport::_GetNextEphemeral()
 		curr = kFirst;
 	}
 
-	// TODO: a free list could be used to avoid the impact of these
-	//       two nested loops most of the time... let's see how bad this really is
-
 	TRACE_DOMAIN("_GetNextEphemeral(), last %hu, curr %hu, stop %hu",
 		fLastUsedEphemeral, curr, stop);
 
+	// TODO: a free list could be used to avoid the impact of these two
+	//        nested loops most of the time... let's see how bad this really is
 	for (; curr != stop; curr = (curr < kLast) ? (curr + 1) : kFirst) {
 		TRACE_DOMAIN("  _GetNextEphemeral(): trying port %hu...", curr);
 
@@ -878,8 +879,6 @@ UdpEndpoint::SendRoutedData(net_buffer *buffer, net_route *route)
 		calculatedChecksum = 0xffff;
 
 	*UDPChecksumField(buffer) = calculatedChecksum;
-
-	TRACE_BLOCK(((char*)&header, sizeof(udp_header), "udp-hdr: "));
 
 	return next->module->send_routed_data(next, route, buffer);
 }
