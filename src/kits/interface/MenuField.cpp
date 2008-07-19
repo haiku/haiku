@@ -280,9 +280,15 @@ BMenuField::Draw(BRect update)
 void
 BMenuField::AttachedToWindow()
 {
-	if (Parent()) {
-		SetViewColor(Parent()->ViewColor());
-		SetLowColor(Parent()->ViewColor());
+	BView* parent = Parent();
+	if (parent != NULL) {
+		// inherit the color from parent
+		rgb_color color = parent->ViewColor();
+		if (color == B_TRANSPARENT_COLOR)
+			color = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+		SetViewColor(color);
+		SetLowColor(color);
 	}
 }
 

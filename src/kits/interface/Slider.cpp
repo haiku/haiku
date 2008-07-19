@@ -330,19 +330,9 @@ BSlider::AttachedToWindow()
 	BControl::AttachedToWindow();
 
 	BView* view = OffscreenView();
-	if (view) {
-		rgb_color color = ViewColor();
-		if (Parent() != NULL)
-			color = Parent()->ViewColor();
-
-/*		fOffScreenBits->Lock();
-		fOffScreenView->SetViewColor(color);
-		fOffScreenView->SetLowColor(color);
-		fOffScreenBits->Unlock();*/
-
-		view->LockLooper();
+	if (view && view->LockLooper()) {
 		view->SetViewColor(B_TRANSPARENT_COLOR);
-		view->SetLowColor(color);
+		view->SetLowColor(ViewColor());
 		view->UnlockLooper();
 	}
 

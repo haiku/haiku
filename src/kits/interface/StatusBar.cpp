@@ -146,9 +146,16 @@ BStatusBar::AttachedToWindow()
 	ResizeTo(Bounds().Width(), height);
 
 	SetViewColor(B_TRANSPARENT_COLOR);
+	rgb_color lowColor = B_TRANSPARENT_COLOR;
 
-	if (Parent())
-		SetLowColor(Parent()->ViewColor());
+	BView* parent = Parent();
+	if (parent != NULL)
+		lowColor = parent->ViewColor();
+
+	if (lowColor == B_TRANSPARENT_COLOR)
+		lowColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+	SetLowColor(lowColor);
 
 	fTextDivider = Bounds().Width();
 }
