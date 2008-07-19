@@ -1,5 +1,5 @@
 /*
-        Copyright (C) 1993, Hewlett-Packard Company
+        Copyright (C) 1993-2004 Hewlett-Packard Company
 */
 
  /* This file contains the test-specific definitions for netperf's */
@@ -185,12 +185,12 @@ struct dg_rr_results_struct {
   int   num_cpus;
 };
 
-extern void scan_unix_args();
+extern void scan_unix_args(int argc, char *argv[]);
 
-extern void send_stream_stream();
-extern void send_stream_rr();
-extern void send_dg_stream();
-extern void send_dg_rr();
+extern void send_stream_stream(char remote_host[]);
+extern void send_stream_rr(char remote_host[]);
+extern void send_dg_stream(char remote_host[]);
+extern void send_dg_rr(char remote_host[]);
 
 extern void recv_stream_stream();
 extern void recv_stream_rr();

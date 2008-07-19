@@ -101,4 +101,115 @@ Fabrice Bacchella
 for pointing-out that Solaris 9 has a copy of Linux sendfile()
 
 Andrew Gallatin 
-for assistance with the FreeBSD sysctl() stuff
+for assistance with the FreeBSD sysctl() stuff, and later making it
+calibration-free
+fixes to configure to recognize Solaris 11
+
+Mark Cooper
+pointing-out the need for -lresolv when compiling -DDO_DNS on RedHat
+7.1
+
+Carl Mascott 
+finding some cut-and-paste erors in create_data_socket error logging
+
+Fabrice Bacchella
+Fixes for -DHISTOGRAM and -DUNIX on Mac OS X, updates to usage strings
+
+Spencer Frink
+Fixes and Cleanup for WIN32.  Many over many years.
+
+Nicholas Thomas
+Fixes for DLPI on SVR4 Streams under Linux
+
+Dave Craig
+Fixes for getaddrinfo error returns
+
+David Mosberger of HP
+Workaround for the Linux getsockopt() bug that returns more than that
+for which one asked.
+
+Stephen Burger of HP
+Code to implement the netserver CPU binding.
+
+Vladislav "Vlad" Yasevich of HP
+Initial SCTP tests.  Enhancements to the configure.ac sources to show
+the way to make many of the LIBS="foo" before ./configure unnecessary.
+
+Padmanabhan "Paddu" S N of HP
+Patches for /proc/stat CPU util and recv_tcp_rr.
+
+Cary Coutant and other hp-mac-users of HP
+Access to Mac OS X systems for porting netperf 2.4.0
+
+Chris Bertin of HP
+Access to AIX for initial porting of netperf 2.4.0
+
+James Carlson
+Assistance finding the right magic to compile SCTP on Solaris 10.
+
+Gavin 
+Pointers on Solaris 10 Microstate accounting.
+
+Brent Draney
+Getting netcpu_perfstat.c in running order on AIX and other misc
+fixups in places such as BSD.
+
+Samuel Ying
+Change struct sockaddr to struct sockaddr storage in netserver.c
+
+Rodolpho Boer
+Fix for default message size in UDP_STREAM when defualt SO_SNDBUF size
+is > max UDP datagram size.
+
+Michael Dorff
+Getting netperf/netserver to compile under Windows with MS Visual
+Studio 2003
+
+George Davis
+Changes to deal with different floating-point formats.
+
+Anonymous
+Changes to retrieve CPU util on MacOS X.
+
+Dickon Reed
+Patches to attend to some windows in TCP_CRR and TCP_CC under Windows
+
+Bret McKee <bret@hp.com>
+Fixes to get netcpu_looper compiling and working after the "netcpu"
+split
+
+Hans Blom
+Improvements to closing/redirecting stdin/stdout/stderr in netserver
+
+Martin Brown
+RPM support in the form of netperf.spec.in and related configure.ac
+etc changes
+
+Shilpi Agarwal
+Changes to allow UDP_STREAM to use connected sockets on both sides.
+
+Steve Reinhardt <stever@eecs.umich.edu>
+Fixes for buffer filling.
+
+Gisle Vanem
+Fixes for Windows compilation under MingW/gcc.
+
+Scott Weitzenkamp
+Patches to enable demo mode in the UDP_STREAM test
+
+Emir Halepovic
+Feedback on the manual
+
+Kouhei Sutou
+Generate netperf_version.h and netperf.spec via configure rather than
+makefile, include limits to get PathMAX on FreeBSD.
+
+Dan Yost
+Fix to fflush() each interim result in demo mode to make things
+happier for folks redirecting same to a file.
+
+Alexander Duyck
+Fixes to replace struct sockaddr_in with struct sockaddr_storage
+
+Anonymous
+Support for sendfile() on OSX
