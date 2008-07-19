@@ -145,6 +145,8 @@ BControl::AttachedToWindow()
 	if (Parent()) {
 		// inherit the color from parent
 		rgb_color color = Parent()->ViewColor();
+		if (color == B_TRANSPARENT_COLOR)
+			color = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 		SetViewColor(color);
 		SetLowColor(color);
