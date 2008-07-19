@@ -110,8 +110,6 @@ loopback_control(net_device *device, int32 op, void *argument,
 status_t
 loopback_send_data(net_device *device, net_buffer *buffer)
 {
-	gBufferModule->swap_addresses(buffer);
-
 	return sStackModule->device_enqueue_buffer(device, buffer);
 }
 
