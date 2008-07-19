@@ -583,9 +583,9 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 	// adapt MTU to be a multiple of 8 (fragment offsets can only be specified this way)
 	mtu -= headerLength;
 	mtu &= ~7;
-	dprintf("  adjusted MTU to %ld\n", mtu);
+	TRACE("  adjusted MTU to %ld\n", mtu);
 
-	dprintf("  bytesLeft = %ld\n", bytesLeft);
+	TRACE("  bytesLeft = %ld\n", bytesLeft);
 	while (bytesLeft > 0) {
 		uint32 fragmentLength = min_c(bytesLeft, mtu);
 		bytesLeft -= fragmentLength;
@@ -598,7 +598,7 @@ send_fragments(ipv4_protocol *protocol, struct net_route *route,
 		header->checksum = gStackModule->checksum((uint8 *)header, headerLength);
 			// TODO: compute the checksum only for those parts that changed?
 
-		dprintf("  send fragment of %ld bytes (%ld bytes left)\n", fragmentLength, bytesLeft);
+		TRACE("  send fragment of %ld bytes (%ld bytes left)\n", fragmentLength, bytesLeft);
 
 		net_buffer *fragmentBuffer;
 		if (!lastFragment) {
