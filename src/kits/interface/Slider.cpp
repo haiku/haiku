@@ -1300,8 +1300,13 @@ BSlider::GetPreferredSize(float* _width, float* _height)
 {
 	BSize preferredSize = PreferredSize();
 
-	if (_width)
-		*_width = preferredSize.width;
+	if (_width) {
+//		*_width = preferredSize.width;
+		// NOTE: For compatibility reasons, the BSlider never shrinks
+		// horizontally. This only affects applications which do not
+		// use the new layout system.
+		*_width = max_c(Bounds().Width(), preferredSize.width);
+	}
 
 	if (_height)
 		*_height = preferredSize.height;
