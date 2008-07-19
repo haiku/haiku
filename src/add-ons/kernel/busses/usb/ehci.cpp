@@ -1089,11 +1089,10 @@ EHCI::FinishTransfers()
 							transfer->data_descriptor,
 							vector, vectorCount,
 							&nextDataToggle);
-					} else {
+					} else if (transfer->data_descriptor) {
 						// calculate transfered length
 						actualLength = ReadActualLength(
-							(ehci_qtd *)transfer->queue_head->element_log,
-							&nextDataToggle);
+							transfer->data_descriptor, &nextDataToggle);
 					}
 
 					transfer->transfer->TransferPipe()->SetDataToggle(nextDataToggle);

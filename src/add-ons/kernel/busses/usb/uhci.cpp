@@ -1225,10 +1225,10 @@ UHCI::FinishTransfers()
 							transfer->data_descriptor,
 							vector, vectorCount,
 							&lastDataToggle);
-					} else {
+					} else if (transfer->data_descriptor) {
 						// read the actual length that was sent
 						actualLength = ReadActualLength(
-							transfer->first_descriptor, &lastDataToggle);
+							transfer->data_descriptor, &lastDataToggle);
 					}
 
 					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);

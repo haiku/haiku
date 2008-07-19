@@ -1029,10 +1029,10 @@ OHCI::_FinishTransfers()
 						actualLength = _ReadDescriptorChain(
 							transfer->data_descriptor,
 							vector, vectorCount);
-					} else {
+					} else if (transfer->data_descriptor) {
 						// read the actual length that was sent
 						actualLength = _ReadActualLength(
-							transfer->first_descriptor);
+							transfer->data_descriptor);
 					}
 
 					if (transfer->transfer->IsFragmented()) {
