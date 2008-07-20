@@ -41,7 +41,8 @@ class TraceOutput {
 		TraceOutput(char* buffer, size_t bufferSize, uint32 flags);
 
 		void Clear();
-		void Print(const char* format,...);
+		void Print(const char* format,...)
+			__attribute__ ((format (__printf__, 2, 3)));
 		void PrintStackTrace(tracing_stack_trace* stackTrace);
 		bool IsFull() const	{ return fSize >= fCapacity; }
 
