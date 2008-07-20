@@ -760,7 +760,9 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	// TODO: use partition initialization editor
 	// (partition->GetInitializationParameterEditor())
 
-	BString name = "Haiku";
+	BString name = partition->ContentName();
+	if (name.Length() == 0)
+		name = "Haiku";
 	BString parameters;
 	InitParamsPanel* panel = new InitParamsPanel(this);
 	if (panel->Go(name, parameters) == GO_CANCELED)
