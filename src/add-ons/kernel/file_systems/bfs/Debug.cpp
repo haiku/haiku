@@ -288,8 +288,17 @@ dump_inode(int argc, char** argv)
 	bfs_inode* node;
 	if (block)
 		node = (bfs_inode*)address;
-	else
-		node = &((Inode*)address)->Node();
+	else {
+		Inode* inode = (Inode*)address;
+
+		kprintf("INODE %p\n", inode);
+		kprintf("  file cache:        %p\n", inode->FileCache());
+		kprintf("  file map:          %p\n", inode->Map());
+		kprintf("  old size:          %Ld\n", inode->OldSize());
+		kprintf("  old last modified: %Ld\n", inode->OldLastModified());
+
+		node = &inode->Node();
+	}
 
 	dump_inode(node);
 	return 0;
