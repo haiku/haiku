@@ -20,6 +20,7 @@
 
 #define AHCI_PORT_TRACING						0
 #define BFS_TRACING								0
+#define BLOCK_CACHE_BLOCK_TRACING				0
 #define BLOCK_CACHE_TRANSACTION_TRACING			0
 #define BMESSAGE_TRACING						0
 #define KERNEL_HEAP_TRACING						0

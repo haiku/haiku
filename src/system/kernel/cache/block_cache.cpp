@@ -162,6 +162,130 @@ struct cache_transaction {
 	bigtime_t		last_used;
 };
 
+#if BLOCK_CACHE_BLOCK_TRACING
+namespace BlockTracing {
+
+class Action : public AbstractTraceEntry {
+public:
+	Action(block_cache *cache, cached_block* block)
+		:
+		fCache(cache),
+		fBlockNumber(block->block_number),
+		fIsDirty(block->is_dirty),
+		fHasOriginal(block->original_data != NULL),
+		fHasParent(block->parent_data != NULL),
+		fTransactionID(-1),
+		fPreviousID(-1)
+	{
+		if (block->transaction != NULL)
+			fTransactionID = block->transaction->id;
+		if (block->previous_transaction != NULL)
+			fPreviousID = block->previous_transaction->id;
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("block cache %p, %s %Ld, %c%c%c transaction %ld "
+			"(previous id %ld)\n", fCache, _Action(), fBlockNumber,
+			fIsDirty ? 'd' : '-', fHasOriginal ? 'o' : '-',
+			fHasParent ? 'p' : '-', fTransactionID, fPreviousID);
+	}
+
+	virtual const char* _Action() const = 0;
+
+private:
+	block_cache			*fCache;
+	uint64				fBlockNumber;
+	bool				fIsDirty;
+	bool				fHasOriginal;
+	bool				fHasParent;
+	int32				fTransactionID;
+	int32				fPreviousID;
+};
+
+class Get : public Action {
+public:
+	Get(block_cache *cache, cached_block* block)
+		: Action(cache, block)
+	{
+		Initialized();
+	}
+
+	virtual const char* _Action() const { return "get"; }
+};
+
+class Put : public Action {
+public:
+	Put(block_cache *cache, cached_block* block)
+		: Action(cache, block)
+	{
+		Initialized();
+	}
+
+	virtual const char* _Action() const { return "put"; }
+};
+
+class Write : public Action {
+public:
+	Write(block_cache *cache, cached_block* block)
+		: Action(cache, block)
+	{
+		Initialized();
+	}
+
+	virtual const char* _Action() const { return "write"; }
+};
+
+class Flush : public Action {
+public:
+	Flush(block_cache *cache, cached_block* block, bool getUnused = false)
+		: Action(cache, block),
+		fGetUnused(getUnused)
+	{
+		Initialized();
+	}
+
+	virtual const char* _Action() const
+		{ return fGetUnused ? "get-unused" : "flush"; }
+
+private:
+	bool	fGetUnused;
+};
+
+class Error : public AbstractTraceEntry {
+public:
+	Error(block_cache *cache, uint64 blockNumber, const char* message,
+			status_t status = B_OK)
+		:
+		fCache(cache),
+		fBlockNumber(blockNumber),
+		fMessage(message),
+		fStatus(status)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("block cache %p, error %Ld, %s%s%s",
+			fCache, fBlockNumber, fMessage, fStatus != B_OK ? ": " : "",
+			fStatus != B_OK ? strerror(fStatus) : "");
+	}
+
+private:
+	block_cache*	fCache;
+	uint64			fBlockNumber;
+	const char*		fMessage;
+	status_t		fStatus;
+};
+
+}	// namespace BlockTracing
+
+#	define TB(x) new(std::nothrow) BlockTracing::x;
+#else
+#	define TB(x) ;
+#endif
+
 #if BLOCK_CACHE_TRANSACTION_TRACING
 namespace TransactionTracing {
 
@@ -734,6 +858,7 @@ block_cache::_GetUnusedBlock()
 
 	for (block_list::Iterator iterator = unused_blocks.GetIterator();
 			cached_block *block = iterator.Next();) {
+		TB(Flush(this, block, true));
 		// this can only happen if no transactions are used
 		if (block->is_dirty)
 			write_cached_block(this, block, false);
@@ -762,12 +887,14 @@ block_cache::NewBlock(off_t blockNumber)
 {
 	cached_block *block = (cached_block *)object_cache_alloc(sBlockCache, 0);
 	if (block == NULL) {
+		TB(Error(this, blockNumber, "allocation failed"));
 		dprintf("block allocation failed, unused list is %sempty.\n",
 			unused_blocks.IsEmpty() ? "" : "not ");
 
 		// allocation failed, try to reuse an unused block
 		block = _GetUnusedBlock();
 		if (block == NULL) {
+			TB(Error(this, blockNumber, "get unused failed"));
 			FATAL(("could not allocate block!\n"));
 			return NULL;
 		}
@@ -806,6 +933,7 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 		if (maxAccessed < block->accessed)
 			continue;
 
+		TB(Flush(this, block));
 		TRACE(("  remove block %Ld, accessed %ld times\n",
 			block->block_number, block->accessed));
 
@@ -891,6 +1019,7 @@ put_cached_block(block_cache *cache, cached_block *block)
 		block->compare = NULL;
 	}
 #endif
+	TB(Put(cache, block));
 
 	if (block->ref_count < 1) {
 		panic("Invalid ref_count for block %p, cache %p\n", block, cache);
@@ -941,6 +1070,9 @@ put_cached_block(block_cache *cache, off_t blockNumber)
 	cached_block *block = (cached_block *)hash_lookup(cache->hash, &blockNumber);
 	if (block != NULL)
 		put_cached_block(cache, block);
+	else {
+		TB(Error(cache, blockNumber, "put unknown"));
+	}
 }
 
 
@@ -985,6 +1117,8 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
 		if (bytesRead < blockSize) {
 			hash_remove(cache->hash, block);
 			cache->FreeBlock(block);
+			TB(Error(cache, blockNumber, "read failed", bytesRead));
+
 			FATAL(("could not read block %Ld: bytesRead: %ld, error: %s\n",
 				blockNumber, bytesRead, strerror(errno)));
 			return NULL;
@@ -1040,6 +1174,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 		block->is_dirty = true;
 			// mark the block as dirty
 
+		TB(Get(cache, block));
 		return block->current_data;
 	}
 
@@ -1084,6 +1219,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 		// we already have data, so we need to preserve it
 		block->original_data = cache->Allocate();
 		if (block->original_data == NULL) {
+			TB(Error(cache, blockNumber, "allocate original failed"));
 			FATAL(("could not allocate original_data\n"));
 			put_cached_block(cache, block);
 			return NULL;
@@ -1096,6 +1232,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 		block->parent_data = cache->Allocate();
 		if (block->parent_data == NULL) {
 			// TODO: maybe we should just continue the current transaction in this case...
+			TB(Error(cache, blockNumber, "allocate parent failed"));
 			FATAL(("could not allocate parent\n"));
 			put_cached_block(cache, block);
 			return NULL;
@@ -1111,6 +1248,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 		memset(block->current_data, 0, cache->block_size);
 
 	block->is_dirty = true;
+	TB(Get(cache, block));
 
 	return block->current_data;
 }
@@ -1134,11 +1272,13 @@ write_cached_block(block_cache *cache, cached_block *block,
 		// we first need to write back changes from previous transactions
 
 	TRACE(("write_cached_block(block %Ld)\n", block->block_number));
+	TB(Write(cache, block));
 
 	ssize_t written = write_pos(cache->fd, block->block_number * blockSize,
 		data, blockSize);
 
 	if (written < blockSize) {
+		TB(Error(cache, block->block_number, "write failed", written));
 		FATAL(("could not write back block %Ld (%s)\n", block->block_number,
 			strerror(errno)));
 		return B_IO_ERROR;
@@ -2379,6 +2519,8 @@ block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 	if (block->compare != NULL)
 		memcpy(block->compare, block->current_data, cache->block_size);
 #endif
+	TB(Get(cache, block));
+
 	return block->current_data;
 }
 
