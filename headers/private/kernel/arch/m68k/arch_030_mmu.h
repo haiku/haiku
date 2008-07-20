@@ -131,9 +131,9 @@ typedef uint64 page_indirect_entry_scalar;
  * add them from the aligned index needed, to make it easy to free them.
  */
 
-#define SIZ_ROOTTBL (128 * sizeof(page_root_entry))
-#define SIZ_DIRTBL (128 * sizeof(page_directory_entry))
-#define SIZ_PAGETBL (64 * sizeof(page_table_entry))
+#define SIZ_ROOTTBL (NUM_ROOTENT_PER_TBL * sizeof(page_root_entry))
+#define SIZ_DIRTBL (NUM_DIRENT_PER_TBL * sizeof(page_directory_entry))
+#define SIZ_PAGETBL (NUM_PAGEENT_PER_TBL * sizeof(page_table_entry))
 
 //#define NUM_ROOTTBL_PER_PAGE (B_PAGE_SIZE / SIZ_ROOTTBL)
 #define NUM_DIRTBL_PER_PAGE (B_PAGE_SIZE / SIZ_DIRTBL)

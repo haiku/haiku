@@ -38,14 +38,6 @@ static void
 initialize(void)
 {
 	TRACE(("mmu_040:initialize\n"));
-	//XXX TESTING for bitfield order
-	long_page_directory_entry ent;
-	*(uint64 *)&ent = 0LL;
-	TRACE(("ent: %llx [0] %02x\n", ent, *(uint8 *)&ent));
-	ent.type=3;
-	TRACE(("ent: %llx [0] %02x\n", ent, *(uint8 *)&ent));
-	ent.addr = 0x0aaaaaaa;
-	TRACE(("ent: %llx [0] %02x\n", ent, *(uint8 *)&ent));
 }
 
 
@@ -98,6 +90,11 @@ load_rp(addr_t pa)
 		panic("mmu root pointer missaligned!");
 		return EINVAL;
 	}
+	// make sure it's empty
+	page_directory_entry_scalar *pr = (page_directory_entry_scalar *)pa;
+	for (int32 j = 0; j < NUM_ROOTENT_PER_TBL; j++)
+		pr[j] = DFL_ROOTENT_VAL;
+	
 	/* mc68040 user's manual, 6-37 */
 	/* pflush before... why not after ? */
 	asm volatile(		   \
@@ -244,6 +241,7 @@ unmap_page(addr_t virtualAddress)
 	pt->addr = TA_TO_PTEA(0xdeadb00b);
 	pt->type = DT_INVALID;
 
+	// flush ATC
 	asm volatile("pflush (%0)" : : "a" (virtualAddress));
 }
 
@@ -273,10 +271,15 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 	pt->addr = TA_TO_PTEA(physicalAddress);
 	pt->supervisor = 1;
+#ifdef MMU_HAS_GLOBAL_PAGES
+	pt->global = 1;
+#endif
 	pt->type = DT_PAGE;
 	// XXX: are flags needed ? ro ? global ?
 
+	// flush ATC
 	asm volatile("pflush (%0)" : : "a" (virtualAddress));
+
 	TRACE(("mmu->map_page: done\n"));
 }
 

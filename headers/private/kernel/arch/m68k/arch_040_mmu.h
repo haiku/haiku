@@ -13,7 +13,15 @@
 
 // global pages only available on 040/060
 // check this
-//#define MMU_HAS_GLOBAL_PAGES
+#define MMU_HAS_GLOBAL_PAGES
+
+
+enum _mmu040_cache_mode {
+	CM_CACHABLE_WRITETHROUGH,
+	CM_CACHABLE_COPYBACK,
+	CM_DISABLED_SERIALIZED,
+	CM_DISABLED,
+};
 
 /* This is the normal layout of the descriptors, as per documentation.
  * When page size > 256, several bits are unused in the LSB of page
@@ -30,51 +38,18 @@ struct short_page_directory_entry {
 	uint32 type : 2;						// DT_*
 };
 
-struct long_page_directory_entry {
-	// upper 32 bits
-	uint32 low_up : 1;						// limit is lower(1)/upper(0)
-	uint32 limit : 15;
-	uint32 _ones : 6;
-	uint32 _zero2 : 1;
-	uint32 supervisor : 1;
-	uint32 _zero1 : 4;
-	uint32 accessed : 1;					// = used
-	uint32 write_protect : 1;
-	uint32 type : 2;
-	// lower 32 bits
-	uint32 addr : 28;						// address
-	uint32 unused : 4;						// 
-};
-
 struct short_page_table_entry {
-	uint32 addr : 24;						// address
-	uint32 _zero2 : 1;
-	uint32 cache_disabled : 1;				// = cache_inhibit
-	uint32 _zero1 : 1;
-	uint32 dirty : 1;						// = modified
-	uint32 accessed : 1;					// = used
-	uint32 write_protect : 1;
-	uint32 type : 2;
-};
-
-struct long_page_table_entry {
-	// upper 32 bits
-	uint32 low_up : 1;						// limit is lower(1)/upper(0)
-	// limit only used on early table terminators, else unused
-	uint32 limit : 15;
-	uint32 _ones : 6;
-	uint32 _zero3 : 1;
+	uint32 addr : 20;						// address
+	uint32 user_reserved : 1;
+	uint32 global : 1;
+	uint32 upa0 : 1;						// User Page Attribute 0
+	uint32 upa1 : 1;						// User Page Attribute 1
 	uint32 supervisor : 1;
-	uint32 _zero2 : 1;
-	uint32 cache_disabled : 1;				// = cache_inhibit
-	uint32 _zero1 : 1;
+	uint32 cache_mode : 2;
 	uint32 dirty : 1;						// = modified
 	uint32 accessed : 1;					// = used
 	uint32 write_protect : 1;
 	uint32 type : 2;
-	// lower 32 bits
-	uint32 addr : 24;						// address
-	uint32 unused : 8;						// 
 };
 
 /* rarely used */
@@ -82,15 +57,6 @@ struct short_indirect_entry {
 	// upper 32 bits
 	uint32 addr : 30;						// address
 	uint32 type : 2;						// DT_*
-};
-
-struct long_indirect_entry {
-	// upper 32 bits
-	uint32 unused1 : 30;
-	uint32 type : 2;
-	// lower 32 bits
-	uint32 addr : 30;						// address
-	uint32 unused2 : 2;						// 
 };
 
 /* for clarity:
@@ -118,9 +84,7 @@ typedef uint32 page_indirect_entry_scalar;
 /* default scalar values for entries */
 #define DFL_ROOTENT_VAL 0x00000000
 #define DFL_DIRENT_VAL 0x00000000
-// limit disabled, 6bits at 1
-// (limit isn't used on that level, but just in case)
-#define DFL_PAGEENT_VAL 0x7FFFFC0000000000LL
+#define DFL_PAGEENT_VAL 0x00000000
 
 #define NUM_ROOTENT_PER_TBL 128
 #define NUM_DIRENT_PER_TBL 128
@@ -132,9 +96,9 @@ typedef uint32 page_indirect_entry_scalar;
  * add them from the aligned index needed, to make it easy to free them.
  */
 
-#define SIZ_ROOTTBL (128 * sizeof(page_root_entry))
-#define SIZ_DIRTBL (128 * sizeof(page_directory_entry))
-#define SIZ_PAGETBL (64 * sizeof(page_table_entry))
+#define SIZ_ROOTTBL (NUM_ROOTENT_PER_TBL * sizeof(page_root_entry))
+#define SIZ_DIRTBL (NUM_DIRENT_PER_TBL * sizeof(page_directory_entry))
+#define SIZ_PAGETBL (NUM_PAGEENT_PER_TBL * sizeof(page_table_entry))
 
 //#define NUM_ROOTTBL_PER_PAGE (B_PAGE_SIZE / SIZ_ROOTTBL)
 #define NUM_DIRTBL_PER_PAGE (B_PAGE_SIZE / SIZ_DIRTBL)
@@ -142,26 +106,6 @@ typedef uint32 page_indirect_entry_scalar;
 
 /* macros to get the physical page or table number and address of tables from
  * descriptors */
-#if 0
-/* XXX:
-   suboptimal:
-   struct foo {
-   int a:2;
-   int b:30;
-   } v = {...};
-   *(int *)0 = (v.b) << 2;
-   generates:
-   sarl    $2, %eax
-   sall    $2, %eax
-   We use a cast + bitmasking, since all address fields are already shifted
-*/
-// from a root entry
-#define PREA_TO_TA(a) ((a) << 4)
-#define PREA_TO_PN(a) ((a) >> (12-4))
-#define PREA_TO_PA(a) ((a) << 4)
-#define TA_TO_PREA(a) ((a) >> 4)
-//...
-#endif
 
 // TA: table address
 // PN: page number
@@ -170,29 +114,29 @@ typedef uint32 page_indirect_entry_scalar;
 // PI: page index (index of table relative to page start)
 
 // from a root entry
-#define PRE_TO_TA(a) ((*(uint32 *)(&(a))) & ~((1<<4)-1))
+#define PRE_TO_TA(a) ((*(uint32 *)(&(a))) & ~((1<<9)-1))
 #define PRE_TO_PN(e) ((*(uint32 *)(&(e))) >> 12)
 #define PRE_TO_PA(e) ((*(uint32 *)(&(e))) & ~((1<<12)-1))
 //#define PRE_TO_PO(e) ((*(uint32 *)(&(e))) & ((1<<12)-1))
 //#define PRE_TO_PI(e) (((*(uint32 *)(&(e))) & ((1<<12)-1)) / SIZ_DIRTBL)
 #define TA_TO_PREA(a) ((a) >> 4)
 // from a directory entry
-#define PDE_TO_TA(a) ((*(uint32 *)(&(a))) & ~((1<<4)-1))
+#define PDE_TO_TA(a) ((*(uint32 *)(&(a))) & ~((1<<8)-1))
 #define PDE_TO_PN(e) ((*(uint32 *)(&(e))) >> 12)
 #define PDE_TO_PA(e) ((*(uint32 *)(&(e))) & ~((1<<12)-1))
 //#define PDE_TO_PO(e) ((*(uint32 *)(&(e))) & ((1<<12)-1))
 //#define PDE_TO_PI(e) (((*(uint32 *)(&(e))) & ((1<<12)-1)) / SIZ_PAGETBL)
 #define TA_TO_PDEA(a) ((a) >> 4)
 // from a table entry
-#define PTE_TO_TA(a) ((((uint32 *)(&(a)))[1]) & ~((1<<8)-1))
-#define PTE_TO_PN(e) ((((uint32 *)(&(e)))[1]) >> 12)
-#define PTE_TO_PA(e) ((((uint32 *)(&(e)))[1]) & ~((1<<12)-1))
-#define TA_TO_PTEA(a) ((a) >> 8)
+#define PTE_TO_TA(a) ((*((uint32 *)(&(a)))) & ~((1<<12)-1))
+#define PTE_TO_PN(e) ((*((uint32 *)(&(e)))) >> 12)
+#define PTE_TO_PA(e) ((*((uint32 *)(&(e)))) & ~((1<<12)-1))
+#define TA_TO_PTEA(a) ((a) >> 12)
 // from an indirect entry
-#define PIE_TO_TA(a) ((((uint32 *)(&(a)))[1]) & ~((1<<2)-1))
-#define PIE_TO_PN(e) ((((uint32 *)(&(e)))[1]) >> 12)
-#define PIE_TO_PA(e) ((((uint32 *)(&(e)))[1]) & ~((1<<12)-1))
-#define PIE_TO_PO(e) ((((uint32 *)(&(e)))[1]) & ((1<<12)-(1<<2)))
+#define PIE_TO_TA(a) ((*((uint32 *)(&(a)))) & ~((1<<2)-1))
+#define PIE_TO_PN(e) ((*((uint32 *)(&(e)))) >> 12)
+#define PIE_TO_PA(e) ((*((uint32 *)(&(e)))) & ~((1<<12)-1))
+#define PIE_TO_PO(e) ((*((uint32 *)(&(e)))) & ((1<<12)-(1<<2)))
 #define TA_TO_PIEA(a) ((a) >> 2)
 
 /* 7/7/6 split */
