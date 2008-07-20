@@ -52,6 +52,7 @@
 */
 extern module_info gDeviceManagerModule;
 extern module_info gDeviceRootModule;
+extern module_info gDeviceGenericModule;
 extern module_info gFrameBufferConsoleModule;
 
 // file systems
@@ -61,6 +62,7 @@ extern module_info gDeviceFileSystem;
 static module_info* sBuiltInModules[] = {
 	&gDeviceManagerModule,
 	&gDeviceRootModule,
+	&gDeviceGenericModule,
 	&gFrameBufferConsoleModule,
 
 	&gRootFileSystem,
@@ -1170,19 +1172,19 @@ dump_modules(int argc, char** argv)
 	struct module* module;
 
 	hash_rewind(sModulesHash, &iterator);
-	dprintf("-- known modules:\n");
+	kprintf("-- known modules:\n");
 
 	while ((module = (struct module*)hash_next(sModulesHash, &iterator)) != NULL) {
-		dprintf("%p: \"%s\", \"%s\" (%ld), refcount = %ld, state = %d, mimage = %p\n",
+		kprintf("%p: \"%s\", \"%s\" (%ld), refcount = %ld, state = %d, mimage = %p\n",
 			module, module->name, module->file, module->offset, module->ref_count,
 			module->state, module->module_image);
 	}
 
 	hash_rewind(sModuleImagesHash, &iterator);
-	dprintf("\n-- loaded module images:\n");
+	kprintf("\n-- loaded module images:\n");
 
 	while ((image = (struct module_image*)hash_next(sModuleImagesHash, &iterator)) != NULL) {
-		dprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld, %s\n", image,
+		kprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld, %s\n", image,
 			image->path, image->image, image->info, image->ref_count,
 			image->keep_loaded ? "keep loaded" : "can be unloaded");
 	}
