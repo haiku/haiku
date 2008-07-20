@@ -18,19 +18,25 @@
 void
 panic(const char *format, ...)
 {
+	const char greetings[] = "\n*** PANIC ***";
 	char buffer[512];
 	va_list list;
 	int length;
 
 	//platform_switch_to_text_mode();
 
-	Bconputs(DEV_CONSOLE, "\n*** PANIC ***");
+	Bconputs(DEV_CONSOLE, greetings);
+	// send to the emulator's stdout if available
+	nat_feat_debugprintf(greetings);
+	nat_feat_debugprintf("\n");
 
 	va_start(list, format);
 	length = vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
 
 	Bconputs(DEV_CONSOLE, buffer);
+	// send to the emulator's stdout if available
+	nat_feat_debugprintf(buffer);
 
 	Bconputs(DEV_CONSOLE, "\nPress key to reboot.");
 
