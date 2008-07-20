@@ -115,7 +115,7 @@ struct bplustree_node {
 enum bplustree_traversing {
 	BPLUSTREE_FORWARD = 1,
 	BPLUSTREE_BACKWARD = -1,
-	
+
 	BPLUSTREE_BEGIN = 0,
 	BPLUSTREE_END = 1
 };
@@ -239,7 +239,7 @@ class BPlusTree {
 		status_t	_SeekDown(Stack<node_and_key> &stack, const uint8 *key,
 						uint16 keyLength);
 
-		status_t	_FindFreeDuplicateFragment(Transaction &transaction, 
+		status_t	_FindFreeDuplicateFragment(Transaction &transaction,
 						const bplustree_node *node, CachedNode &cached,
 						off_t *_offset, bplustree_node **_fragment,
 						uint32 *_index);
@@ -424,7 +424,7 @@ TreeIterator::GetPreviousEntry(void *key, uint16 *keyLength, uint16 maxLength,
 //	#pragma mark - bplustree_header inline functions
 
 
-inline bool 
+inline bool
 bplustree_header::CheckNode(bplustree_node *node) const
 {
 	// sanity checks (links, all_key_count)
@@ -450,7 +450,7 @@ bplustree_header::IsValidLink(off_t link) const
 inline uint16 *
 bplustree_node::KeyLengths() const
 {
-	return (uint16 *)(((char *)this) + round_up(sizeof(bplustree_node)
+	return (uint16 *)(((char *)this) + key_align(sizeof(bplustree_node)
 		+ AllKeyLength()));
 }
 
@@ -472,12 +472,12 @@ bplustree_node::Keys() const
 inline int32
 bplustree_node::Used() const
 {
-	return round_up(sizeof(bplustree_node) + AllKeyLength()) + NumKeys()
+	return key_align(sizeof(bplustree_node) + AllKeyLength()) + NumKeys()
 		* (sizeof(uint16) + sizeof(off_t));
 }
 
 
-inline bool 
+inline bool
 bplustree_node::IsLeaf() const
 {
 	return OverflowLink() == BPLUSTREE_NULL;
@@ -514,7 +514,7 @@ bplustree_node::MakeLink(uint8 type, off_t link, uint32 fragmentIndex)
 }
 
 
-inline bool 
+inline bool
 bplustree_node::IsDuplicate(off_t link)
 {
 	return (LinkType(link)

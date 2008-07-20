@@ -431,7 +431,7 @@ bfs_get_file_map(fs_volume *_volume, fs_vnode *_node, off_t offset, size_t size,
 	Inode *inode = (Inode *)_node->private_node;
 
 	int32 blockShift = volume->BlockShift();
-	size_t index = 0, max = *_count;
+	uint32 index = 0, max = *_count;
 	block_run run;
 	off_t fileOffset;
 
@@ -445,21 +445,20 @@ bfs_get_file_map(fs_volume *_volume, fs_vnode *_node, off_t offset, size_t size,
 		vecs[index].offset = volume->ToOffset(run) + offset - fileOffset;
 		vecs[index].length = (run.Length() << blockShift) - offset + fileOffset;
 
-		offset += vecs[index].length;
-
 		// are we already done?
 		if (size <= vecs[index].length
-			|| offset >= inode->Size()) {
-			if (offset > inode->Size()) {
+			|| offset + vecs[index].length >= inode->Size()) {
+			if (offset + vecs[index].length > inode->Size()) {
 				// make sure the extent ends with the last official file
 				// block (without taking any preallocations into account)
-				vecs[index].length = (inode->Size() - fileOffset
-					+ volume->BlockSize() - 1) & ~(volume->BlockSize() - 1);
+				vecs[index].length = round_up(inode->Size() - offset,
+					volume->BlockSize());
 			}
 			*_count = index + 1;
 			return B_OK;
 		}
 
+		offset += vecs[index].length;
 		size -= vecs[index].length;
 		index++;
 

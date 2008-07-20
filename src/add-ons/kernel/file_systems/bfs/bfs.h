@@ -160,8 +160,8 @@ struct small_data {
 
 // the file name is part of the small_data structure
 #define FILE_NAME_TYPE			'CSTR'
-#define FILE_NAME_NAME			0x13 
-#define FILE_NAME_NAME_LENGTH	1 
+#define FILE_NAME_NAME			0x13
+#define FILE_NAME_NAME_LENGTH	1
 
 
 //**************************************
@@ -193,7 +193,7 @@ struct bfs_inode {
 	int32		pad[4];
 
 	small_data	small_data_start[0];
-	
+
 	int32 Magic1() const { return BFS_ENDIAN_TO_HOST_INT32(magic1); }
 	int32 UserID() const { return BFS_ENDIAN_TO_HOST_INT32(uid); }
 	int32 GroupID() const { return BFS_ENDIAN_TO_HOST_INT32(gid); }
@@ -207,7 +207,7 @@ struct bfs_inode {
 
 	status_t InitCheck(Volume *volume);
 		// defined in Inode.cpp
-} _PACKED;	
+} _PACKED;
 
 #define INODE_MAGIC1			0x3bbe0ad9
 #define INODE_TIME_SHIFT		16
@@ -267,8 +267,8 @@ get_shift(uint64 i)
 	return c;
 }
 
-inline int32
-round_up(uint32 data)
+inline uint32
+key_align(uint32 data)
 {
 	// rounds up to the next off_t boundary
 	return (data + sizeof(off_t) - 1) & ~(sizeof(off_t) - 1);
@@ -304,7 +304,7 @@ block_run::IsZero() const
 }
 
 
-inline bool 
+inline bool
 block_run::MergeableWith(block_run run) const
 {
 	// 65535 is the maximum allowed run size for BFS
@@ -352,7 +352,7 @@ small_data::Data() const
 }
 
 
-inline uint32 
+inline uint32
 small_data::Size() const
 {
 	return sizeof(small_data) + NameSize() + 3 + DataSize() + 1;

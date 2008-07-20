@@ -1036,7 +1036,7 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 		}
 		out++;
 
-		if (round_up(sizeof(bplustree_node) + bytesBefore + bytesAfter + bytes)
+		if (key_align(sizeof(bplustree_node) + bytesBefore + bytesAfter + bytes)
 				+ out * (sizeof(uint16) + sizeof(off_t)) >= size) {
 			// we have found the number of keys in the new node!
 			break;
@@ -1303,7 +1303,7 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength,
 			return B_IO_ERROR;
 
 		// is the node big enough to hold the pair?
-		if (int32(round_up(sizeof(bplustree_node)
+		if (int32(key_align(sizeof(bplustree_node)
 				+ writableNode->AllKeyLength() + keyLength)
 				+ (writableNode->NumKeys() + 1) * (sizeof(uint16)
 				+ sizeof(off_t))) < fNodeSize) {

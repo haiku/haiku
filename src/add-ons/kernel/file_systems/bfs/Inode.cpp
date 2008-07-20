@@ -1280,7 +1280,7 @@ Inode::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 
 	// find matching block run
 
-	if (data->MaxDirectRange() > 0 && pos >= data->MaxDirectRange()) {
+	if (data->MaxIndirectRange() > 0 && pos >= data->MaxDirectRange()) {
 		if (data->MaxDoubleIndirectRange() > 0
 			&& pos >= data->MaxIndirectRange()) {
 			// access to double indirect blocks
@@ -1581,7 +1581,7 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 		blocksRequested = blocksNeeded;
 		if (minimum > 1) {
 			// make sure that "blocks" is a multiple of minimum
-			blocksRequested = (blocksRequested + minimum - 1) & ~(minimum - 1);
+			blocksRequested = round_up(blocksRequested, minimum);
 		}
 
 		// Direct block range
@@ -1694,8 +1694,7 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 					return status;
 
 				blocksNeeded += rest;
-				blocksRequested = (blocksNeeded + NUM_ARRAY_BLOCKS - 1)
-					& ~(NUM_ARRAY_BLOCKS - 1);
+				blocksRequested = round_up(blocksNeeded, NUM_ARRAY_BLOCKS);
 				minimum = NUM_ARRAY_BLOCKS;
 					// we make sure here that we have at minimum
 					// NUM_ARRAY_BLOCKS allocated, so if the allocation
@@ -2042,8 +2041,7 @@ Inode::NeedsTrimming()
 	if (IsIndex() || IsDeleted())
 		return false;
 
-	off_t roundedSize = (Size() + fVolume->BlockSize() - 1)
-		& ~(fVolume->BlockSize() - 1);
+	off_t roundedSize = round_up(Size(), fVolume->BlockSize());
 
 	return Node().data.MaxDirectRange() > roundedSize
 		|| Node().data.MaxIndirectRange() > roundedSize

@@ -33,4 +33,14 @@ sorted_array::Find(off_t value) const
 	return _FindInternal(value, i) ? i : -1;
 }
 
+
+/*!	\a to must be a power of 2.
+*/
+template<typename IntType, typename RoundType>
+inline IntType
+round_up(const IntType& value, const RoundType& to)
+{
+	return (value + (to - 1)) & ~((IntType)to - 1);
+}
+
 #endif	/* UTILITY_H */
