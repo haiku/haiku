@@ -24,73 +24,73 @@
 											// or comments
 struct short_page_directory_entry {
 	// upper 32 bits
-	uint32 type : 2;						// DT_*
-	uint32 write_protect : 1;
-	uint32 accessed : 1;					// = used
 	uint32 addr : 28;						// address
+	uint32 accessed : 1;					// = used
+	uint32 write_protect : 1;
+	uint32 type : 2;						// DT_*
 };
 
 struct long_page_directory_entry {
 	// upper 32 bits
-	uint32 type : 2;
-	uint32 write_protect : 1;
-	uint32 accessed : 1;					// = used
-	uint32 _zero1 : 4;
-	uint32 supervisor : 1;
-	uint32 _zero2 : 1;
-	uint32 _ones : 6;
-	uint32 limit : 15;
 	uint32 low_up : 1;						// limit is lower(1)/upper(0)
+	uint32 limit : 15;
+	uint32 _ones : 6;
+	uint32 _zero2 : 1;
+	uint32 supervisor : 1;
+	uint32 _zero1 : 4;
+	uint32 accessed : 1;					// = used
+	uint32 write_protect : 1;
+	uint32 type : 2;
 	// lower 32 bits
-	uint32 unused : 4;						// 
 	uint32 addr : 28;						// address
+	uint32 unused : 4;						// 
 };
 
 struct short_page_table_entry {
-	uint32 type : 2;
-	uint32 write_protect : 1;
-	uint32 accessed : 1;					// = used
-	uint32 dirty : 1;						// = modified
-	uint32 _zero1 : 1;
-	uint32 cache_disabled : 1;				// = cache_inhibit
-	uint32 _zero2 : 1;
 	uint32 addr : 24;						// address
+	uint32 _zero2 : 1;
+	uint32 cache_disabled : 1;				// = cache_inhibit
+	uint32 _zero1 : 1;
+	uint32 dirty : 1;						// = modified
+	uint32 accessed : 1;					// = used
+	uint32 write_protect : 1;
+	uint32 type : 2;
 };
 
 struct long_page_table_entry {
 	// upper 32 bits
-	uint32 type : 2;
-	uint32 write_protect : 1;
-	uint32 accessed : 1;					// = used
-	uint32 dirty : 1;						// = modified
-	uint32 _zero1 : 1;
-	uint32 cache_disabled : 1;				// = cache_inhibit
-	uint32 _zero2 : 1;
-	uint32 supervisor : 1;
-	uint32 _zero3 : 1;
-	uint32 _ones : 6;
+	uint32 low_up : 1;						// limit is lower(1)/upper(0)
 	// limit only used on early table terminators, else unused
 	uint32 limit : 15;
-	uint32 low_up : 1;						// limit is lower(1)/upper(0)
+	uint32 _ones : 6;
+	uint32 _zero3 : 1;
+	uint32 supervisor : 1;
+	uint32 _zero2 : 1;
+	uint32 cache_disabled : 1;				// = cache_inhibit
+	uint32 _zero1 : 1;
+	uint32 dirty : 1;						// = modified
+	uint32 accessed : 1;					// = used
+	uint32 write_protect : 1;
+	uint32 type : 2;
 	// lower 32 bits
-	uint32 unused : 8;						// 
 	uint32 addr : 24;						// address
+	uint32 unused : 8;						// 
 };
 
 /* rarely used */
 struct short_indirect_entry {
 	// upper 32 bits
-	uint32 type : 2;						// DT_*
 	uint32 addr : 30;						// address
+	uint32 type : 2;						// DT_*
 };
 
 struct long_indirect_entry {
 	// upper 32 bits
-	uint32 type : 2;
 	uint32 unused1 : 30;
+	uint32 type : 2;
 	// lower 32 bits
-	uint32 unused2 : 2;						// 
 	uint32 addr : 30;						// address
+	uint32 unused2 : 2;						// 
 };
 
 /* for clarity:
@@ -101,19 +101,19 @@ struct long_indirect_entry {
 
 typedef struct short_page_directory_entry page_root_entry;
 typedef struct short_page_directory_entry page_directory_entry;
-typedef struct long_page_table_entry page_table_entry;
-typedef struct long_indirect_entry page_indirect_entry;
+typedef struct short_page_table_entry page_table_entry;
+typedef struct short_indirect_entry page_indirect_entry;
 
 /* scalar storage type that maps them */
 typedef uint32 page_root_entry_scalar;
 typedef uint32 page_directory_entry_scalar;
-typedef uint64 page_table_entry_scalar;
-typedef uint64 page_indirect_entry_scalar;
+typedef uint32 page_table_entry_scalar;
+typedef uint32 page_indirect_entry_scalar;
 
 #define DT_ROOT DT_VALID_4
-#define DT_DIR DT_VALID_8
+#define DT_DIR DT_VALID_4
 //#define DT_PAGE DT_PAGE :)
-#define DT_INDIRECT DT_VALID_8
+#define DT_INDIRECT DT_VALID_4
 
 /* default scalar values for entries */
 #define DFL_ROOTENT_VAL 0x00000000

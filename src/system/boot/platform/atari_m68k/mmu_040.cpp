@@ -142,7 +142,7 @@ add_page_table(addr_t virtualAddress)
 	index = VADDR_TO_PRENT(virtualAddress);
 	if (pr[index].type != DT_ROOT) {
 		unsigned aindex = index & ~(NUM_DIRTBL_PER_PAGE-1); /* aligned */
-		TRACE(("missing page root entry %d ai %d\n", index, aindex));
+		//TRACE(("missing page root entry %d ai %d\n", index, aindex));
 		tbl = mmu_get_next_page_tables();
 		if (!tbl)
 			return ENOMEM;
@@ -151,24 +151,21 @@ add_page_table(addr_t virtualAddress)
 			page_root_entry *apr = &pr[aindex + i];
 			apr->addr = TA_TO_PREA(tbl);
 			apr->type = DT_ROOT;
-			TRACE(("inserting tbl @ %p as %08x entry %08x\n", tbl, TA_TO_PREA(tbl), *(uint32 *)apr));
+			//TRACE(("inserting tbl @ %p as %08x entry %08x\n", tbl, TA_TO_PREA(tbl), *(uint32 *)apr));
 			// clear the table
-			TRACE(("clearing table[%d]\n", i));
+			//TRACE(("clearing table[%d]\n", i));
 			pd = (page_directory_entry *)tbl;
 			for (int32 j = 0; j < NUM_DIRENT_PER_TBL; j++)
 				*(page_directory_entry_scalar *)(&pd[j]) = DFL_DIRENT_VAL;
 			tbl += SIZ_DIRTBL;
 		}
 	}
-	TRACE(("B %08lx\n", PRE_TO_TA(pr[index])));
 	pd = (page_directory_entry *)PRE_TO_TA(pr[index]);
-	TRACE(("C\n"));
 
 	index = VADDR_TO_PDENT(virtualAddress);
-	TRACE(("checking pgdir@%p[%d]\n", pd, index));
 	if (pd[index].type != DT_DIR) {
 		unsigned aindex = index & ~(NUM_PAGETBL_PER_PAGE-1); /* aligned */
-		TRACE(("missing page dir entry %d ai %d\n", index, aindex));
+		//TRACE(("missing page dir entry %d ai %d\n", index, aindex));
 		tbl = mmu_get_next_page_tables();
 		if (!tbl)
 			return ENOMEM;
@@ -178,7 +175,7 @@ add_page_table(addr_t virtualAddress)
 			apd->addr = TA_TO_PDEA(tbl);
 			apd->type = DT_DIR;
 			// clear the table
-			TRACE(("clearing table[%d]\n", i));
+			//TRACE(("clearing table[%d]\n", i));
 			pt = (page_table_entry *)tbl;
 			for (int32 j = 0; j < NUM_PAGEENT_PER_TBL; j++)
 				*(page_table_entry_scalar *)(&pt[j]) = DFL_PAGEENT_VAL;
@@ -203,23 +200,26 @@ lookup_pte(addr_t virtualAddress)
 	page_root_entry *pr = gPageRoot;
 	page_directory_entry *pd;
 	page_table_entry *pt;
-	uint32 index;
+	uint32 rindex, dindex, pindex;
 
-	index = VADDR_TO_PRENT(virtualAddress);
-	if (pr[index].type != DT_ROOT)
-		panic("lookup_pte: invalid page root entry %d", index);
-	pd = (page_directory_entry *)PRE_TO_TA(pr[index]);
+	rindex = VADDR_TO_PRENT(virtualAddress);
+	if (pr[rindex].type != DT_ROOT)
+		panic("lookup_pte: invalid entry pgrt[%d]", rindex);
+	pd = (page_directory_entry *)PRE_TO_TA(pr[rindex]);
 
-	index = VADDR_TO_PDENT(virtualAddress);
-	if (pd[index].type != DT_DIR)
-		panic("lookup_pte: invalid page directory entry %d", index);
-	pt = (page_table_entry *)PDE_TO_TA(pd[index]);
+	dindex = VADDR_TO_PDENT(virtualAddress);
+	if (pd[dindex].type != DT_DIR)
+		panic("lookup_pte: invalid entry pgrt[%d] prdir[%d]", rindex, dindex);
+	pt = (page_table_entry *)PDE_TO_TA(pd[dindex]);
 	
-	index = VADDR_TO_PTENT(virtualAddress);
-	if (pt[index].type != DT_PAGE)
-		panic("lookup_pte: invalid page table entry %d", index);
+	pindex = VADDR_TO_PTENT(virtualAddress);
+#if 0 // of course, it's used in map_page!
+	if (pt[pindex].type != DT_PAGE)
+		panic("lookup_pte: invalid entry pgrt[%d] prdir[%d] pgtbl[%d]",
+			rindex, dindex, pindex);
+#endif
 
-	return (&pt[index]);
+	return (&pt[pindex]);
 }
 
 
@@ -231,10 +231,15 @@ unmap_page(addr_t virtualAddress)
 	TRACE(("mmu->unmap_page(virtualAddress = %p)\n", (void *)virtualAddress));
 
 	if (virtualAddress < KERNEL_BASE)
-		panic("unmap_page: asked to unmap invalid page %p!\n", (void *)virtualAddress);
+		panic("unmap_page: asked to unmap invalid page %p!\n",
+			(void *)virtualAddress);
 
 	// unmap the page from the correct page table
 	pt = lookup_pte(virtualAddress);
+
+	if (pt->type != DT_PAGE)
+		panic("unmap_page: asked to map non-existing page for %08x\n",
+			virtualAddress);
 
 	pt->addr = TA_TO_PTEA(0xdeadb00b);
 	pt->type = DT_INVALID;
@@ -257,6 +262,10 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	// map the page to the correct page table
 
 	pt = lookup_pte(virtualAddress);
+
+	if (pt->type != DT_INVALID)
+		panic("map_page: asked to map existing page for %08x\n",
+			virtualAddress);
 
 	TRACE(("map_page: inserting pageTableEntry %p, physicalAddress %p\n", 
 		pt, physicalAddress));
