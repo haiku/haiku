@@ -326,7 +326,7 @@ dump_volume(int argc, char** argv)
 				block_run run;
 				run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(
 					strtoul(arg, &arg, 0));
-				run.start = HOST_ENDIAN_TO_BFS_INT16(strtoul(arg, NULL, 0));
+				run.start = HOST_ENDIAN_TO_BFS_INT16(strtoul(arg + 1, NULL, 0));
 				run.length = 0;
 
 				kprintf("%ld.%u -> block %Ld\n", run.AllocationGroup(),
