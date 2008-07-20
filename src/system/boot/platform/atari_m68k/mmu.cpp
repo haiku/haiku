@@ -79,15 +79,17 @@ static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
 
 // working page directory and page table
-static uint32 *sPageDirectory = 0;
+addr_t gPageRoot = 0;
 
 static addr_t sNextPhysicalAddress = 0x100000;
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
-static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
+static addr_t sMaxVirtualAddress = KERNEL_BASE /*+ 0x400000*/;
 
+#if 0
 static addr_t sNextPageTableAddress = 0x90000;
 static const uint32 kPageTableRegionEnd = 0x9e000;
 	// we need to reserve 2 pages for the SMP trampoline code XXX:no
+#endif
 
 static const struct boot_mmu_ops *gMMUOps;
 
@@ -97,6 +99,7 @@ get_next_virtual_address(size_t size)
 	addr_t address = sNextVirtualAddress;
 	sNextVirtualAddress += size;
 
+	TRACE(("%s(%d): %08x\n", __FUNCTION__, size, address));
 	return address;
 }
 
@@ -107,6 +110,7 @@ get_next_physical_address(size_t size)
 	addr_t address = sNextPhysicalAddress;
 	sNextPhysicalAddress += size;
 
+	TRACE(("%s(%d): %08x\n", __FUNCTION__, size, address));
 	return address;
 }
 
@@ -114,6 +118,7 @@ get_next_physical_address(size_t size)
 static addr_t
 get_next_virtual_page()
 {
+	TRACE(("%s\n", __FUNCTION__));
 	return get_next_virtual_address(B_PAGE_SIZE);
 }
 
@@ -121,14 +126,17 @@ get_next_virtual_page()
 static addr_t
 get_next_physical_page()
 {
+	TRACE(("%s\n", __FUNCTION__));
 	return get_next_physical_address(B_PAGE_SIZE);
 }
 
 
-static uint32 *
-get_next_page_table()
+// allocate a page worth of page dir or tables
+extern "C" addr_t
+mmu_get_next_page_tables()
 {
-	TRACE(("get_next_page_table, sNextPageTableAddress %p, kPageTableRegionEnd %p\n", 
+#if 0
+	TRACE(("mmu_get_next_page_tables, sNextPageTableAddress %p, kPageTableRegionEnd %p\n", 
 		sNextPageTableAddress, kPageTableRegionEnd));
 	
 	addr_t address = sNextPageTableAddress;
@@ -137,9 +145,20 @@ get_next_page_table()
 
 	sNextPageTableAddress += B_PAGE_SIZE;
 	return (uint32 *)address;
+#endif
+	addr_t tbl = get_next_physical_page();
+	if (!tbl)
+		return tbl;
+#if 0
+	// clear them
+	uint32 *p = (uint32 *)tbl;
+	for (int32 i = 0; i < 1024; i++)
+		p[i] = 0;
+#endif
+	return tbl;
 }
 
-
+#if 0
 /**	Adds a new page table for the specified base address */
 
 static void
@@ -149,7 +168,7 @@ add_page_table(addr_t base)
 #if 0
 
 	// Get new page table and clear it out
-	uint32 *pageTable = get_next_page_table();
+	uint32 *pageTable = mmu_get_next_page_tables();
 	if (pageTable > (uint32 *)(8 * 1024 * 1024))
 		panic("tried to add page table beyond the indentity mapped 8 MB region\n");
 
@@ -159,27 +178,16 @@ add_page_table(addr_t base)
 		pageTable[i] = 0;
 
 	// put the new page table into the page directory
-	sPageDirectory[base/(4*1024*1024)] = (uint32)pageTable | kDefaultPageTableFlags;
+	gPageRoot[base/(4*1024*1024)] = (uint32)pageTable | kDefaultPageTableFlags;
 #endif
 }
+#endif
 
 
 static void
 unmap_page(addr_t virtualAddress)
 {
-	TRACE(("unmap_page(virtualAddress = %p)\n", (void *)virtualAddress));
-
-	if (virtualAddress < KERNEL_BASE)
-		panic("unmap_page: asked to unmap invalid page %p!\n", (void *)virtualAddress);
-#if 0
-
-	// unmap the page from the correct page table
-	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
-		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
-	pageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = 0;
-
-	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
-#endif
+	gMMUOps->unmap_page(virtualAddress);
 }
 
 
@@ -196,33 +204,26 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 	if (virtualAddress < KERNEL_BASE)
 		panic("map_page: asked to map invalid page %p!\n", (void *)virtualAddress);
-#if 0
 
+	// slow but I'm too lazy to fix the code below
+	gMMUOps->add_page_table(virtualAddress);
+#if 0
 	if (virtualAddress >= sMaxVirtualAddress) {
 		// we need to add a new page table
 
-		add_page_table(sMaxVirtualAddress);
-		sMaxVirtualAddress += B_PAGE_SIZE * 1024;
+		gMMUOps->add_page_table(sMaxVirtualAddress);
+		// 64 pages / page table
+		sMaxVirtualAddress += B_PAGE_SIZE * 64;
 
 		if (virtualAddress >= sMaxVirtualAddress)
 			panic("map_page: asked to map a page to %p\n", (void *)virtualAddress);
 	}
+#endif
 
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
 
 	// map the page to the correct page table
-	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
-		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
-	uint32 tableEntry = (virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE;
-	
-	TRACE(("map_page: inserting pageTable %p, tableEntry %ld, physicalAddress %p\n", 
-		pageTable, tableEntry, physicalAddress));
-
-	pageTable[tableEntry] = physicalAddress | flags;
-
-	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
-#endif
-	TRACE(("map_page: done\n"));
+	gMMUOps->map_page(virtualAddress, physicalAddress, flags);
 }
 
 
@@ -247,58 +248,26 @@ sort_addr_range(addr_range *range, int count)
 }
 
 
-#if 0
-static uint32
-get_memory_map(extended_memory **_extendedMemory)
-{
-	extended_memory *block = (extended_memory *)kExtraSegmentScratch;
-	bios_regs regs = { 0, 0, sizeof(extended_memory), 0, 0, (uint32)block, 0, 0};
-	uint32 count = 0;
-
-	TRACE(("get_memory_map()\n"));
-
-	do {
-		regs.eax = 0xe820;
-		regs.edx = 'SMAP';
-
-		call_bios(0x15, &regs);
-		if (regs.flags & CARRY_FLAG)
-			return 0;
-
-		regs.edi += sizeof(extended_memory);
-		count++;
-	} while (regs.ebx != 0);
-
-	*_extendedMemory = block;
-
-#ifdef TRACE_MMU
-	dprintf("extended memory info (from 0xe820):\n");
-	for (uint32 i = 0; i < count; i++) {
-		dprintf("    base 0x%Lx, len 0x%Lx, type %lu\n", 
-			block[i].base_addr, block[i].length, block[i].type);
-	}
-#endif
-
-	return count;
-}
-#endif
-
-
 static void
 init_page_directory(void)
 {
 	TRACE(("init_page_directory\n"));
 
-	gMMUOps->load_rp(NULL);
+	// allocate a new pg root dir
+	gPageRoot = get_next_physical_page();
+	gKernelArgs.arch_args.phys_pgroot = (uint32)gPageRoot;
+
+	// set the root pointers
+	gMMUOps->load_rp(gPageRoot);
+	// enable mmu translation
 	gMMUOps->enable_paging();
+
 #if 0
-	// allocate a new pgdir
-	sPageDirectory = (uint32 *)get_next_physical_page();
-	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
+
 
 	// clear out the pgdir
 	for (int32 i = 0; i < 1024; i++) {
-		sPageDirectory[i] = 0;
+		gPageRoot[i] = 0;
 	}
 
 	// Identity map the first 8 MB of memory so that their
@@ -306,29 +275,29 @@ init_page_directory(void)
 	// These page tables won't be taken over into the kernel.
 
 	// make the first page table at the first free spot
-	uint32 *pageTable = get_next_page_table();
+	uint32 *pageTable = mmu_get_next_page_tables();
 
 	for (int32 i = 0; i < 1024; i++) {
 		pageTable[i] = (i * 0x1000) | kDefaultPageFlags;
 	}
 
-	sPageDirectory[0] = (uint32)pageTable | kDefaultPageFlags;
+	gPageRoot[0] = (uint32)pageTable | kDefaultPageFlags;
 
 	// make the second page table
-	pageTable = get_next_page_table();
+	pageTable = mmu_get_next_page_tables();
 
 	for (int32 i = 0; i < 1024; i++) {
 		pageTable[i] = (i * 0x1000 + 0x400000) | kDefaultPageFlags;
 	}
 
-	sPageDirectory[1] = (uint32)pageTable | kDefaultPageFlags;
+	gPageRoot[1] = (uint32)pageTable | kDefaultPageFlags;
 
 	gKernelArgs.arch_args.num_pgtables = 0;
 	add_page_table(KERNEL_BASE);
 
 	// switch to the new pgdir and enable paging
 	asm("movl %0, %%eax;"
-		"movl %%eax, %%cr3;" : : "m" (sPageDirectory) : "eax");
+		"movl %%eax, %%cr3;" : : "m" (gPageRoot) : "eax");
 	// Important.  Make sure supervisor threads can fault on read only pages...
 	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 #endif
@@ -587,6 +556,8 @@ mmu_init(void)
 			panic("unknown mmu type %d\n", gKernelArgs.arch_args.mmu_type);
 	}
 
+	gMMUOps->initialize();
+
 	addr_t fastram_top = 0;
 	if (*TOSVARramvalid == TOSVARramvalid_MAGIC)
 		fastram_top = *TOSVARramtop;
@@ -603,7 +574,7 @@ mmu_init(void)
 	// enable transparent translation of the first 32 MB
 	gMMUOps->set_tt(0, ATARI_CHIPRAM_BASE, 0x02000000, 0);
 	// enable transparent translation of the 16MB ST shadow range for I/O
-	gMMUOps->set_tt(0, ATARI_SHADOW_BASE, 0x01000000, 0);
+	gMMUOps->set_tt(1, ATARI_SHADOW_BASE, 0x01000000, 0);
 
 	init_page_directory();
 #if 0//XXX:HOLE
@@ -612,12 +583,12 @@ mmu_init(void)
 	// this enables a mmu trick where the 4 MB region that this pgdir entry
 	// represents now maps the 4MB of potential pagetables that the pgdir
 	// points to. Thrown away later in VM bringup, but useful for now.
-	sPageDirectory[1023] = (uint32)sPageDirectory | kDefaultPageFlags;
+	gPageRoot[1023] = (uint32)gPageRoot | kDefaultPageFlags;
 #endif
 
 	// also map it on the next vpage
 	gKernelArgs.arch_args.vir_pgroot = get_next_virtual_page();
-	map_page(gKernelArgs.arch_args.vir_pgroot, (uint32)sPageDirectory, kDefaultPageFlags);
+	map_page(gKernelArgs.arch_args.vir_pgroot, (uint32)gPageRoot, kDefaultPageFlags);
 
 	// map in a kernel stack
 	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);

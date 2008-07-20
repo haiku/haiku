@@ -31,14 +31,21 @@
 #endif
 
 
-static uint32 *sPageDirectory = 0;
-
+extern page_root_entry *gPageRoot;
 
 
 static void
 initialize(void)
 {
 	TRACE(("mmu_040:initialize\n"));
+	//XXX TESTING for bitfield order
+	long_page_directory_entry ent;
+	*(uint64 *)&ent = 0LL;
+	TRACE(("ent: %llx [0] %02x\n", ent, *(uint8 *)&ent));
+	ent.type=3;
+	TRACE(("ent: %llx [0] %02x\n", ent, *(uint8 *)&ent));
+	ent.addr = 0x0aaaaaaa;
+	TRACE(("ent: %llx [0] %02x\n", ent, *(uint8 *)&ent));
 }
 
 
@@ -107,7 +114,7 @@ static status_t
 enable_paging(void)
 {
 	TRACE(("mmu_040:enable_paging\n"));
-	uint16 tcr = 0x80; // Enable, 4K page size
+	uint16 tcr = 0x8000; // Enable, 4K page size
 	asm volatile( \
 		"pflusha\n"		   \
 		"movec %0,%%tcr\n" \
@@ -117,9 +124,162 @@ enable_paging(void)
 }
 
 
+static status_t
+add_page_table(addr_t virtualAddress)
+{
+	page_root_entry *pr = gPageRoot;
+	page_directory_entry *pd;
+	page_table_entry *pt;
+	addr_t tbl;
+	uint32 index;
+	uint32 i;
+	
+	TRACE(("mmu->add_page_table(base = %p)\n", (void *)virtualAddress));
+
+	// everything much simpler here because pa = va
+	// thanks to transparent translation
+
+	index = VADDR_TO_PRENT(virtualAddress);
+	if (pr[index].type != DT_ROOT) {
+		unsigned aindex = index & ~(NUM_DIRTBL_PER_PAGE-1); /* aligned */
+		TRACE(("missing page root entry %d ai %d\n", index, aindex));
+		tbl = mmu_get_next_page_tables();
+		if (!tbl)
+			return ENOMEM;
+		// for each pgdir on the allocated page:
+		for (i = 0; i < NUM_DIRTBL_PER_PAGE; i++) {
+			page_root_entry *apr = &pr[aindex + i];
+			apr->addr = TA_TO_PREA(tbl);
+			apr->type = DT_ROOT;
+			TRACE(("inserting tbl @ %p as %08x entry %08x\n", tbl, TA_TO_PREA(tbl), *(uint32 *)apr));
+			// clear the table
+			TRACE(("clearing table[%d]\n", i));
+			pd = (page_directory_entry *)tbl;
+			for (int32 j = 0; j < NUM_DIRENT_PER_TBL; j++)
+				*(page_directory_entry_scalar *)(&pd[j]) = DFL_DIRENT_VAL;
+			tbl += SIZ_DIRTBL;
+		}
+	}
+	TRACE(("B %08lx\n", PRE_TO_TA(pr[index])));
+	pd = (page_directory_entry *)PRE_TO_TA(pr[index]);
+	TRACE(("C\n"));
+
+	index = VADDR_TO_PDENT(virtualAddress);
+	TRACE(("checking pgdir@%p[%d]\n", pd, index));
+	if (pd[index].type != DT_DIR) {
+		unsigned aindex = index & ~(NUM_PAGETBL_PER_PAGE-1); /* aligned */
+		TRACE(("missing page dir entry %d ai %d\n", index, aindex));
+		tbl = mmu_get_next_page_tables();
+		if (!tbl)
+			return ENOMEM;
+		// for each pgdir on the allocated page:
+		for (i = 0; i < NUM_PAGETBL_PER_PAGE; i++) {
+			page_directory_entry *apd = &pd[aindex + i];
+			apd->addr = TA_TO_PDEA(tbl);
+			apd->type = DT_DIR;
+			// clear the table
+			TRACE(("clearing table[%d]\n", i));
+			pt = (page_table_entry *)tbl;
+			for (int32 j = 0; j < NUM_PAGEENT_PER_TBL; j++)
+				*(page_table_entry_scalar *)(&pt[j]) = DFL_PAGEENT_VAL;
+			tbl += SIZ_PAGETBL;
+		}
+	}
+#if 0
+	pt = PDE_TO_TA(pd[index]);
+
+	index = VADDR_TO_PTENT(virtualAddress);
+	pt[index].addr = TA_TO_PTEA(0xdeadb00b);
+	pt[index].supervisor = 1;
+	pt[index].type = DT_PAGE;
+#endif
+	return B_OK;
+}
+
+
+static page_table_entry *
+lookup_pte(addr_t virtualAddress)
+{
+	page_root_entry *pr = gPageRoot;
+	page_directory_entry *pd;
+	page_table_entry *pt;
+	uint32 index;
+
+	index = VADDR_TO_PRENT(virtualAddress);
+	if (pr[index].type != DT_ROOT)
+		panic("lookup_pte: invalid page root entry %d", index);
+	pd = (page_directory_entry *)PRE_TO_TA(pr[index]);
+
+	index = VADDR_TO_PDENT(virtualAddress);
+	if (pd[index].type != DT_DIR)
+		panic("lookup_pte: invalid page directory entry %d", index);
+	pt = (page_table_entry *)PDE_TO_TA(pd[index]);
+	
+	index = VADDR_TO_PTENT(virtualAddress);
+	if (pt[index].type != DT_PAGE)
+		panic("lookup_pte: invalid page table entry %d", index);
+
+	return (&pt[index]);
+}
+
+
+static void
+unmap_page(addr_t virtualAddress)
+{
+	page_table_entry *pt;
+
+	TRACE(("mmu->unmap_page(virtualAddress = %p)\n", (void *)virtualAddress));
+
+	if (virtualAddress < KERNEL_BASE)
+		panic("unmap_page: asked to unmap invalid page %p!\n", (void *)virtualAddress);
+
+	// unmap the page from the correct page table
+	pt = lookup_pte(virtualAddress);
+
+	pt->addr = TA_TO_PTEA(0xdeadb00b);
+	pt->type = DT_INVALID;
+
+	asm volatile("pflush (%0)" : : "a" (virtualAddress));
+}
+
+
+/** insert the physical address into existing page table */
+static void
+map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
+{
+	page_table_entry *pt;
+
+	TRACE(("mmu->map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress, physicalAddress));
+
+
+	physicalAddress &= ~(B_PAGE_SIZE - 1);
+
+	// map the page to the correct page table
+
+	pt = lookup_pte(virtualAddress);
+
+	TRACE(("map_page: inserting pageTableEntry %p, physicalAddress %p\n", 
+		pt, physicalAddress));
+
+
+	pt->addr = TA_TO_PTEA(physicalAddress);
+	pt->supervisor = 1;
+	pt->type = DT_PAGE;
+	// XXX: are flags needed ? ro ? global ?
+
+	asm volatile("pflush (%0)" : : "a" (virtualAddress));
+	TRACE(("mmu->map_page: done\n"));
+}
+
+
+
+
 const struct boot_mmu_ops k040MMUOps = {
 	&initialize,
 	&set_tt,
 	&load_rp,
-	&enable_paging
+	&enable_paging,
+	&add_page_table,
+	&unmap_page,
+	&map_page
 };

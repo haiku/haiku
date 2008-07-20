@@ -22,6 +22,9 @@ extern addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint3
 extern void *mmu_allocate(void *virtualAddress, size_t size);
 extern void mmu_free(void *virtualAddress, size_t size);
 
+extern addr_t mmu_get_next_page_tables();
+
+
 struct boot_mmu_ops {
 	void (*initialize)(void);
 		/* len=0 to disable */
@@ -29,12 +32,16 @@ struct boot_mmu_ops {
 		/* load root pointers */
 	status_t (*load_rp)(addr_t pa);
 	status_t (*enable_paging)(void);
-	
+	status_t (*add_page_table)(addr_t virtualAddress);
+	void (*unmap_page)(addr_t virtualAddress);
+	void (*map_page)(addr_t virtualAddress, addr_t pa, uint32 flags);
 };
 
 extern const struct boot_mmu_ops k030MMUOps;
 extern const struct boot_mmu_ops k040MMUOps;
 extern const struct boot_mmu_ops k060MMUOps;
+
+
 
 
 #ifdef __cplusplus

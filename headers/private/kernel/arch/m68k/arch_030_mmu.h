@@ -194,4 +194,9 @@ typedef uint64 page_indirect_entry_scalar;
 #define PIE_TO_PO(e) ((((uint32 *)(&(e)))[1]) & ((1<<12)-(1<<2)))
 #define TA_TO_PIEA(a) ((a) >> 2)
 
+/* 7/7/6 split */
+#define VADDR_TO_PRENT(va) (((va) / B_PAGE_SIZE) / (64*128))
+#define VADDR_TO_PDENT(va) ((((va) / B_PAGE_SIZE) / 64) % 128)
+#define VADDR_TO_PTENT(va) (((va) / B_PAGE_SIZE) % 64)
+
 #endif	/* _KERNEL_ARCH_M68K_030_MMU_H */

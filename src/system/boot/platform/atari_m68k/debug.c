@@ -37,6 +37,7 @@ panic(const char *format, ...)
 	Bconputs(DEV_CONSOLE, buffer);
 	// send to the emulator's stdout if available
 	nat_feat_debugprintf(buffer);
+	nat_feat_debugprintf("\n");
 
 	Bconputs(DEV_CONSOLE, "\nPress key to reboot.");
 

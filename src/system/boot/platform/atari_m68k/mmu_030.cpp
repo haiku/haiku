@@ -31,8 +31,7 @@
 #endif
 
 
-static uint32 *sPageDirectory = 0;
-
+extern page_root_entry *gPageRoot;
 
 
 static void
