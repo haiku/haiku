@@ -171,7 +171,7 @@ FileMap::_MakeSpace(size_t count)
 {
 	if (count <= CACHED_FILE_EXTENTS) {
 		// just use the reserved area in the file_cache_ref structure
-		if (count <= CACHED_FILE_EXTENTS && fCount > CACHED_FILE_EXTENTS) {
+		if (fCount > CACHED_FILE_EXTENTS) {
 			// the new size is smaller than the minimal array size
 			file_extent *array = fIndirect.array;
 			memcpy(fDirect, array, sizeof(file_extent) * count);
@@ -270,10 +270,13 @@ FileMap::_InvalidateAfter(off_t offset)
 	uint32 index;
 	file_extent* extent = _FindExtent(offset, &index);
 	if (extent != NULL) {
-		_MakeSpace(index);
+		_MakeSpace(index + 1);
 
-		if (extent->offset + extent->disk.length > offset)
+		if (extent->offset + extent->disk.length > offset) {
 			extent->disk.length = offset - extent->offset;
+			if (extent->disk.length == 0)
+				_MakeSpace(index);
+		}
 	}
 }
 
@@ -345,21 +348,12 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 
 	off_t end = offset + size;
 
-	while (mapOffset < end) {
+	while (status == B_OK && mapOffset < end) {
 		// We don't have the requested extents yet, retrieve them
 		size_t vecCount = maxVecs;
 		status = vfs_get_file_map(Vnode(), mapOffset, ~0UL, vecs, &vecCount);
-		if (status < B_OK && status != B_BUFFER_OVERFLOW)
-			return status;
-
-		status_t addStatus = _Add(vecs, vecCount, mapOffset);
-		if (addStatus != B_OK) {
-			// only clobber the status in case of failure
-			status = addStatus;
-		}
-
-		if (status != B_BUFFER_OVERFLOW)
-			break;
+		if (status == B_OK || status == B_BUFFER_OVERFLOW)
+			status = _Add(vecs, vecCount, mapOffset);
 	}
 
 	if (status != B_OK)
@@ -375,7 +369,9 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 	vecs[0].offset = fileExtent->disk.offset + offset;
 	vecs[0].length = fileExtent->disk.length - offset;
 
-	if (vecs[0].length >= size || index >= fCount - 1) {
+	if (vecs[0].length >= size) {
+		if (vecs[0].length > size)
+			vecs[0].length = size;
 		*_count = 1;
 		return B_OK;
 	}
@@ -383,25 +379,28 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 	// copy the rest of the vecs
 
 	size -= vecs[0].length;
+	uint32 vecIndex = 1;
 
-	for (index = 1; index < fCount;) {
+	while (true) {
 		fileExtent++;
 
-		vecs[index] = fileExtent->disk;
-		index++;
+		vecs[vecIndex++] = fileExtent->disk;
 
-		if (size <= fileExtent->disk.length)
+		if (size <= fileExtent->disk.length) {
+			if (size < fileExtent->disk.length)
+				vecs[vecIndex - 1].length = size;
 			break;
+		}
 
-		if (index >= maxVecs) {
-			*_count = index;
+		if (vecIndex >= maxVecs) {
+			*_count = vecIndex;
 			return B_BUFFER_OVERFLOW;
 		}
 
 		size -= fileExtent->disk.length;
 	}
 
-	*_count = index;
+	*_count = vecIndex;
 	return B_OK;
 }
 
