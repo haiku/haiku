@@ -262,7 +262,7 @@ IconView::UpdateIcon()
 {
 	if (fBitmap == NULL)
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGB32);
+		fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
 #else
 		fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
 #endif
