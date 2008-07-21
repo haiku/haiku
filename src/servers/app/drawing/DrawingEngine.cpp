@@ -526,8 +526,11 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 	}
 
 	// trigger the HW accelerated version if is was available
-	if (sortedRectList)
+	if (sortedRectList) {
 		fGraphicsCard->CopyRegion(sortedRectList, count, xOffset, yOffset);
+		if (fGraphicsCard->IsDoubleBuffered())
+			fGraphicsCard->Invalidate(region->Frame());
+	}
 
 	delete[] sortedRectList;
 }
@@ -540,19 +543,21 @@ DrawingEngine::InvertRect(BRect r)
 
 	make_rect_valid(r);
 	r = fPainter->ClipRect(r);
-	if (r.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, r);
+	if (!r.IsValid())
+		return;
 
-		// try hardware optimized version first
-		if (fAvailableHWAccleration & HW_ACC_INVERT_REGION) {
-			BRegion region(r);
-			region.IntersectWith(fPainter->ClippingRegion());
-			fGraphicsCard->InvertRegion(region);
-		} else {
-			fPainter->InvertRect(r);
+	AutoFloatingOverlaysHider _(fGraphicsCard, r);
 
+	// try hardware optimized version first
+	if (fAvailableHWAccleration & HW_ACC_INVERT_REGION) {
+		BRegion region(r);
+		region.IntersectWith(fPainter->ClippingRegion());
+		fGraphicsCard->InvertRegion(region);
+		if (fGraphicsCard->IsDoubleBuffered())
 			_CopyToFront(r);
-		}
+	} else {
+		fPainter->InvertRect(r);
+		_CopyToFront(r);
 	}
 }
 
@@ -575,16 +580,20 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 
 // DrawArc
 void
-DrawingEngine::DrawArc(BRect r, const float &angle,
-					   const float &span, bool filled)
+DrawingEngine::DrawArc(BRect r, const float &angle, const float &span,
+	bool filled)
 {
 	CRASH_IF_NOT_LOCKED
 
 	make_rect_valid(r);
+	fPainter->AlignEllipseRect(&r, filled);
 	BRect clipped(r);
+
 	if (!filled)
 		extend_by_stroke_width(clipped, fPainter->PenSize());
+
 	clipped = fPainter->ClipRect(r);
+
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
@@ -731,21 +740,23 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 	// gut feeling.
 	make_rect_valid(r);
 	r = fPainter->ClipRect(r);
-	if (r.IsValid()) {
-		AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
+	if (!r.IsValid())
+		return;
 
-		// try hardware optimized version first
-		if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
-			BRegion region(r);
-			region.IntersectWith(fPainter->ClippingRegion());
-			fGraphicsCard->FillRegion(region, color,
-									  fSuspendSyncLevel == 0
-									  || overlaysHider.WasHidden());
-		} else {
-			fPainter->FillRect(r, color);
+	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
 
+	// try hardware optimized version first
+	if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
+		BRegion region(r);
+		region.IntersectWith(fPainter->ClippingRegion());
+		fGraphicsCard->FillRegion(region, color,
+			fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
+
+		if (fGraphicsCard->IsDoubleBuffered())
 			_CopyToFront(r);
-		}
+	} else {
+		fPainter->FillRect(r, color);
+		_CopyToFront(r);
 	}
 }
 
@@ -778,11 +789,12 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 		&& frame.Width() * frame.Height() > 100) {
 		fGraphicsCard->FillRegion(r, color, fSuspendSyncLevel == 0
 											|| overlaysHider.WasHidden());
+		if (fGraphicsCard->IsDoubleBuffered())
+			_CopyToFront(frame);
 	} else {
 		int32 count = r.CountRects();
-		for (int32 i = 0; i < count; i++) {
+		for (int32 i = 0; i < count; i++)
 			fPainter->FillRectNoClipping(r.RectAtInt(i), color);
-		}
 
 		_CopyToFront(frame);
 	}
@@ -817,50 +829,51 @@ DrawingEngine::FillRect(BRect r)
 
 	make_rect_valid(r);
 	r = fPainter->AlignAndClipRect(r);
-	if (r.IsValid()) {
-		AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
+	if (!r.IsValid())
+		return;
 
-		bool doInSoftware = true;
-		if ((r.Width() + 1) * (r.Height() + 1) > 100.0) {
-			// try hardware optimized version first
-			// if the rect is large enough
-			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-				if (fPainter->Pattern() == B_SOLID_HIGH
-					&& (fPainter->DrawingMode() == B_OP_COPY
-						|| fPainter->DrawingMode() == B_OP_OVER)) {
-					BRegion region(r);
-					region.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(region, fPainter->HighColor(),
-											  fSuspendSyncLevel == 0
-											  || overlaysHider.WasHidden());
-					doInSoftware = false;
-				} else if (fPainter->Pattern() == B_SOLID_LOW
-						&& fPainter->DrawingMode() == B_OP_COPY) {
-					BRegion region(r);
-					region.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(region, fPainter->LowColor(),
-											  fSuspendSyncLevel == 0
-											  || overlaysHider.WasHidden());
-					doInSoftware = false;
-				}
+	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
+
+	bool doInSoftware = true;
+	if ((r.Width() + 1) * (r.Height() + 1) > 100.0) {
+		// try hardware optimized version first
+		// if the rect is large enough
+		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+			if (fPainter->Pattern() == B_SOLID_HIGH
+				&& (fPainter->DrawingMode() == B_OP_COPY
+					|| fPainter->DrawingMode() == B_OP_OVER)) {
+				BRegion region(r);
+				region.IntersectWith(fPainter->ClippingRegion());
+				fGraphicsCard->FillRegion(region, fPainter->HighColor(),
+										  fSuspendSyncLevel == 0
+										  || overlaysHider.WasHidden());
+				doInSoftware = false;
+			} else if (fPainter->Pattern() == B_SOLID_LOW
+					&& fPainter->DrawingMode() == B_OP_COPY) {
+				BRegion region(r);
+				region.IntersectWith(fPainter->ClippingRegion());
+				fGraphicsCard->FillRegion(region, fPainter->LowColor(),
+										  fSuspendSyncLevel == 0
+										  || overlaysHider.WasHidden());
+				doInSoftware = false;
 			}
 		}
-
-		if (doInSoftware && fAvailableHWAccleration & HW_ACC_INVERT_REGION
-				&& fPainter->Pattern() == B_SOLID_HIGH
-				&& fPainter->DrawingMode() == B_OP_INVERT) {
-			BRegion region(r);
-			region.IntersectWith(fPainter->ClippingRegion());
-			fGraphicsCard->InvertRegion(region);
-			doInSoftware = false;
-		}
-
-		if (doInSoftware) {
-			fPainter->FillRect(r);
-
-			_CopyToFront(r);
-		}
 	}
+
+	if (doInSoftware && fAvailableHWAccleration & HW_ACC_INVERT_REGION
+			&& fPainter->Pattern() == B_SOLID_HIGH
+			&& fPainter->DrawingMode() == B_OP_INVERT) {
+		BRegion region(r);
+		region.IntersectWith(fPainter->ClippingRegion());
+		fGraphicsCard->InvertRegion(region);
+		doInSoftware = false;
+	}
+
+	if (doInSoftware)
+		fPainter->FillRect(r);
+
+	if (fGraphicsCard->IsDoubleBuffered())
+		_CopyToFront(r);
 }
 
 
@@ -870,50 +883,51 @@ DrawingEngine::FillRegion(BRegion& r)
 	CRASH_IF_NOT_LOCKED
 
 	BRect clipped = fPainter->ClipRect(r.Frame());
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, clipped);
+	if (!clipped.IsValid())
+		return;
 
-		bool doInSoftware = true;
-		// try hardware optimized version first
-		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-			if (fPainter->Pattern() == B_SOLID_HIGH
-				&& (fPainter->DrawingMode() == B_OP_COPY
-					|| fPainter->DrawingMode() == B_OP_OVER)) {
-				r.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(r, fPainter->HighColor(),
-										  fSuspendSyncLevel == 0
-										  || overlaysHider.WasHidden());
-				doInSoftware = false;
-			} else if (fPainter->Pattern() == B_SOLID_LOW
-					&& fPainter->DrawingMode() == B_OP_COPY) {
-				r.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(r, fPainter->LowColor(),
-										  fSuspendSyncLevel == 0
-										  || overlaysHider.WasHidden());
-				doInSoftware = false;
-			}
-		}
+	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, clipped);
 
-		if (doInSoftware && fAvailableHWAccleration & HW_ACC_INVERT_REGION
-				&& fPainter->Pattern() == B_SOLID_HIGH
-				&& fPainter->DrawingMode() == B_OP_INVERT) {
+	bool doInSoftware = true;
+	// try hardware optimized version first
+	if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+		if (fPainter->Pattern() == B_SOLID_HIGH
+			&& (fPainter->DrawingMode() == B_OP_COPY
+				|| fPainter->DrawingMode() == B_OP_OVER)) {
 			r.IntersectWith(fPainter->ClippingRegion());
-			fGraphicsCard->InvertRegion(r);
+			fGraphicsCard->FillRegion(r, fPainter->HighColor(),
+									  fSuspendSyncLevel == 0
+									  || overlaysHider.WasHidden());
+			doInSoftware = false;
+		} else if (fPainter->Pattern() == B_SOLID_LOW
+				&& fPainter->DrawingMode() == B_OP_COPY) {
+			r.IntersectWith(fPainter->ClippingRegion());
+			fGraphicsCard->FillRegion(r, fPainter->LowColor(),
+									  fSuspendSyncLevel == 0
+									  || overlaysHider.WasHidden());
 			doInSoftware = false;
 		}
-
-		if (doInSoftware) {
-
-			BRect touched = fPainter->FillRect(r.RectAt(0));
-
-			int32 count = r.CountRects();
-			for (int32 i = 1; i < count; i++) {
-				touched = touched | fPainter->FillRect(r.RectAt(i));
-			}
-
-			_CopyToFront(touched);
-		}
 	}
+
+	if (doInSoftware && fAvailableHWAccleration & HW_ACC_INVERT_REGION
+			&& fPainter->Pattern() == B_SOLID_HIGH
+			&& fPainter->DrawingMode() == B_OP_INVERT) {
+		r.IntersectWith(fPainter->ClippingRegion());
+		fGraphicsCard->InvertRegion(r);
+		doInSoftware = false;
+	}
+
+	if (doInSoftware) {
+
+		BRect touched = fPainter->FillRect(r.RectAt(0));
+
+		int32 count = r.CountRects();
+		for (int32 i = 1; i < count; i++)
+			touched = touched | fPainter->FillRect(r.RectAt(i));
+	}
+
+	if (fGraphicsCard->IsDoubleBuffered())
+		_CopyToFront(r.Frame());
 }
 
 
