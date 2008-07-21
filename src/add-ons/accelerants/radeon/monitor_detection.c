@@ -1069,10 +1069,17 @@ Radeon_DetectDisplays(accelerator_info *ai)
 		if (routes->port_info[1].mon_type == mt_none) {
 			routes->port_info[0].mon_type = mt_crt;
 		} else {
-			radeon_connector swap_entity;
-			swap_entity = routes->port_info[0];
+			radeon_connector portSwapEntity;
+			fp_info panelInfoSwapEntity;
+
+			portSwapEntity = routes->port_info[0];
 			routes->port_info[0] = routes->port_info[1];
-			routes->port_info[1] = swap_entity;
+			routes->port_info[1] = portSwapEntity;
+
+			panelInfoSwapEntity = ai->si->flatpanels[0];
+			ai->si->flatpanels[0] = ai->si->flatpanels[1];
+			ai->si->flatpanels[1] = panelInfoSwapEntity;
+
 			SHOW_ERROR0(2, "swapping active port 2 to free port 1");
 		}
 			
