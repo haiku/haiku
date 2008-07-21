@@ -15,8 +15,8 @@
 #include <image.h>
 #include <video_overlay.h>
 
-class MallocBuffer;
 class AccelerantBuffer;
+class RenderingBuffer;
 
 
 class AccelerantHWInterface : public HWInterface {
@@ -54,8 +54,19 @@ public:
 	virtual status_t			GetAccelerantPath(BString &path);
 	virtual status_t			GetDriverPath(BString &path);
 
-	// query for available hardware accleration and perform it
+	// query for available hardware accleration
 	virtual	uint32				AvailableHWAcceleration() const;
+
+	// accelerated drawing
+	virtual	void				CopyRegion(const clipping_rect* sortedRectList,
+										   uint32 count,
+										   int32 xOffset, int32 yOffset);
+	virtual	void				FillRegion(/*const*/ BRegion& region,
+										   const rgb_color& color,
+										   bool autoSync);
+	virtual	void				InvertRegion(/*const*/ BRegion& region);
+
+	virtual	void				Sync();
 
 	// overlay support
 	virtual overlay_token		AcquireOverlayChannel();
@@ -72,17 +83,6 @@ public:
 	virtual void				ConfigureOverlay(Overlay* overlay);
 	virtual void				HideOverlay(Overlay* overlay);
 
-	// accelerated drawing
-	virtual	void				CopyRegion(const clipping_rect* sortedRectList,
-										   uint32 count,
-										   int32 xOffset, int32 yOffset);
-	virtual	void				FillRegion(/*const*/ BRegion& region,
-										   const rgb_color& color,
-										   bool autoSync);
-	virtual	void				InvertRegion(/*const*/ BRegion& region);
-
-	virtual	void				Sync();
-
 	// cursor handling
 	virtual	void				SetCursor(ServerCursor* cursor);
 	virtual	void				SetCursorVisible(bool visible);
@@ -95,6 +95,8 @@ public:
 	virtual	bool				IsDoubleBuffered() const;
 
 protected:
+	virtual	void				CopyBackToFront(/*const*/ BRegion& region);
+
 	virtual	void				_DrawCursor(IntRect area) const;
 
 private:
@@ -104,7 +106,10 @@ private:
 		status_t				_UpdateModeList();
 		status_t				_UpdateFrameBufferConfig();
 		void					_RegionToRectParams(/*const*/ BRegion* region,
-													uint32* count) const;
+									uint32* count) const;
+		void					_CopyRegion(const clipping_rect* sortedRectList,
+									uint32 count, int32 xOffset, int32 yOffset,
+									bool inBackBuffer);
 		uint32					_NativeColor(const rgb_color& color) const;
 		status_t				_FindBestMode(const display_mode& compareMode,
 									float compareAspectRatio,
@@ -164,8 +169,9 @@ private:
 		int						fModeCount;
 		display_mode*			fModeList;
 
-		MallocBuffer*			fBackBuffer;
+		RenderingBuffer*		fBackBuffer;
 		AccelerantBuffer*		fFrontBuffer;
+		bool					fOffscreenBackBuffer;
 
 		display_mode			fDisplayMode;
 		bool					fInitialModeSwitch;
