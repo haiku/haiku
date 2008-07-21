@@ -250,6 +250,10 @@ elf_load_image(int fd, preloaded_image *image)
 				image->dynamic_section.start = header.p_vaddr;
 				image->dynamic_section.size = header.p_memsz;
 				continue;
+			case PT_INTERP:
+			case PT_PHDR:
+				// known but unused type
+				continue;
 			default:
 				dprintf("unhandled pheader type 0x%lx\n", header.p_type);
 				continue;
