@@ -45,6 +45,7 @@ All rights reserved.
 #	include <DiskDeviceRoster.h>
 #	include <DiskDevice.h>
 #	include <DiskDeviceList.h>
+#	include <DiskDeviceTypes.h>
 #	include <fs_volume.h>
 #endif
 
@@ -133,7 +134,7 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 
 				if (mode == kRestorePreviousVolumes) {
 					// mount all volumes that were stored in the settings file
-					const char *volumeName;
+					const char *volumeName = NULL;
 					BPath path;
 					if (partition->GetPath(&path) != B_OK
 						|| partition->ContentName() == NULL
@@ -142,7 +143,7 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 						return false;
 				} else if (mode == kOnlyBFSVolumes) {
 					if (partition->ContentType() == NULL
-						|| strcmp(partition->ContentType(), "BFS"))
+						|| strcmp(partition->ContentType(), kPartitionTypeBFS))
 						return false;
 				}
 
@@ -367,7 +368,10 @@ AutoMounter::_ReadSettings()
 
 	delete [] buffer;
 
+	// update flags and modes from the message
 	_UpdateSettingsFromMessage(&message);
+	// copy the previously mounted partitions
+	fSettings = message;
 }
 
 
