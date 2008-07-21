@@ -215,8 +215,10 @@ Hub::Explore(change_item **changeList)
 
 				// reset the port, this will also enable it
 				result = ResetPort(i);
-				if (result < B_OK)
+				if (result < B_OK) {
+					TRACE_ERROR(("USB Hub %d: resetting port %ld failed\n", DeviceAddress(), i));
 					continue;
+				}
 
 				result = UpdatePortStatus(i);
 				if (result < B_OK)

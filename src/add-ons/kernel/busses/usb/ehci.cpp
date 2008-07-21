@@ -721,7 +721,7 @@ EHCI::ResetPort(uint8 index)
 
 	portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
 	if (portStatus & EHCI_PORTSC_PORTRESET) {
-		TRACE(("usb_ehci: port reset won't complete\n"));
+		TRACE_ERROR(("usb_ehci: port reset won't complete\n"));
 		return B_ERROR;
 	}
 
