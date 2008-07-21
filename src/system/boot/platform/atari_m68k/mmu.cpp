@@ -149,6 +149,9 @@ mmu_get_next_page_tables()
 	addr_t tbl = get_next_physical_page();
 	if (!tbl)
 		return tbl;
+	// shouldn't we fill this ?
+	//gKernelArgs.arch_args.pgtables[gKernelArgs.arch_args.num_pgtables++] = (uint32)pageTable;
+
 #if 0
 	// clear them
 	uint32 *p = (uint32 *)tbl;
@@ -261,6 +264,9 @@ init_page_directory(void)
 	gMMUOps->load_rp(gPageRoot);
 	// enable mmu translation
 	gMMUOps->enable_paging();
+
+	//gKernelArgs.arch_args.num_pgtables = 0;
+	gMMUOps->add_page_table(KERNEL_BASE);
 
 #if 0
 
@@ -621,71 +627,6 @@ mmu_init(void)
 
 
 
-#if 0
-	extended_memory *extMemoryBlock;
-	uint32 extMemoryCount = get_memory_map(&extMemoryBlock);
-
-	// figure out the memory map
-	if (extMemoryCount > 0) {
-		gKernelArgs.num_physical_memory_ranges = 0;
-
-		for (uint32 i = 0; i < extMemoryCount; i++) {
-			// Type 1 is available memory
-			if (extMemoryBlock[i].type == 1) {
-				// round everything up to page boundaries, exclusive of pages
-				// it partially occupies
-				extMemoryBlock[i].length -= (extMemoryBlock[i].base_addr % B_PAGE_SIZE)
-					? (B_PAGE_SIZE - (extMemoryBlock[i].base_addr % B_PAGE_SIZE)) : 0;
-				extMemoryBlock[i].base_addr = ROUNDUP(extMemoryBlock[i].base_addr, B_PAGE_SIZE);
-				extMemoryBlock[i].length = ROUNDOWN(extMemoryBlock[i].length, B_PAGE_SIZE);
-
-				// we ignore all memory beyond 4 GB
-				if (extMemoryBlock[i].base_addr > 0xffffffffULL)
-					continue;
-				if (extMemoryBlock[i].base_addr + extMemoryBlock[i].length > 0xffffffffULL)
-					extMemoryBlock[i].length = 0x100000000ULL - extMemoryBlock[i].base_addr;
-
-				if (gKernelArgs.num_physical_memory_ranges > 0) {
-					// we might want to extend a previous hole
-					addr_t previousEnd = gKernelArgs.physical_memory_range[
-							gKernelArgs.num_physical_memory_ranges - 1].start
-						+ gKernelArgs.physical_memory_range[
-							gKernelArgs.num_physical_memory_ranges - 1].size;
-					addr_t holeSize = extMemoryBlock[i].base_addr - previousEnd;
-
-					// if the hole is smaller than 1 MB, we try to mark the memory
-					// as allocated and extend the previous memory range
-					if (previousEnd <= extMemoryBlock[i].base_addr
-						&& holeSize < 0x100000
-						&& insert_physical_allocated_range(previousEnd,
-							extMemoryBlock[i].base_addr - previousEnd) == B_OK) {
-						gKernelArgs.physical_memory_range[
-							gKernelArgs.num_physical_memory_ranges - 1].size += holeSize;
-					}
-				}
-
-				insert_physical_memory_range(extMemoryBlock[i].base_addr,
-					extMemoryBlock[i].length);
-			}
-		}
-	} else {
-		// ToDo: for now!
-		dprintf("No extended memory block - using 32 MB (fix me!)\n");
-		uint32 memSize = 32 * 1024 * 1024;
-
-		// we dont have an extended map, assume memory is contiguously mapped at 0x0
-		gKernelArgs.physical_memory_range[0].start = 0;
-		gKernelArgs.physical_memory_range[0].size = memSize;
-		gKernelArgs.num_physical_memory_ranges = 1;
-
-		// mark the bios area allocated
-		gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].start = 0x9f000; // 640k - 1 page
-		gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].size = 0x61000;
-		gKernelArgs.num_physical_allocated_ranges++;
-	}
-
-	gKernelArgs.arch_args.page_hole = 0xffc00000;
-#endif
 }
 
 

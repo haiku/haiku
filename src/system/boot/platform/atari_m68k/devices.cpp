@@ -15,7 +15,7 @@
 #include "Handle.h"
 #include "toscalls.h"
 
-#define TRACE_DEVICES
+//#define TRACE_DEVICES
 #ifdef TRACE_DEVICES
 #	define TRACE(x) dprintf x
 #else
