@@ -396,7 +396,7 @@ BString&
 BString::Append(const BString& string, int32 length)
 {
 	if (&string != this) {
-		int32 length = min_clamp0(length, string.Length());
+		length = min_clamp0(length, string.Length());
 		if (length > 0)
 			_DoAppend(string.fPrivateData, length);
 	}
@@ -408,7 +408,7 @@ BString&
 BString::Append(const char* string, int32 length)
 {
 	if (string) {
-		int32 length = strlen_clamp(string, length);
+		length = strlen_clamp(string, length);
 		if (length > 0)
 			_DoAppend(string, length);
 	}
