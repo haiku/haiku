@@ -122,7 +122,7 @@ static ehci_root_hub_string_s sEHCIRootHubStrings[3] = {
 
 
 EHCIRootHub::EHCIRootHub(Object *rootObject, int8 deviceAddress)
-	:	Hub(rootObject, rootObject->GetStack()->IndexOfBusManager(rootObject->GetBusManager()),
+	:	Hub(rootObject, 0, rootObject->GetStack()->IndexOfBusManager(rootObject->GetBusManager()),
 			sEHCIRootHubDevice, deviceAddress, USB_SPEED_HIGHSPEED, true)
 {
 }

@@ -10,8 +10,9 @@
 #include "usb_p.h"
 
 
-Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
-	int8 deviceAddress, usb_speed speed, bool isRootHub)
+Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
+	usb_device_descriptor &desc, int8 deviceAddress, usb_speed speed,
+	bool isRootHub)
 	:	Object(parent),
 		fDeviceDescriptor(desc),
 		fInitOK(false),
@@ -21,6 +22,7 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 		fCurrentConfiguration(NULL),
 		fSpeed(speed),
 		fDeviceAddress(deviceAddress),
+		fHubAddress(hubAddress),
 		fHubPort(hubPort)
 {
 	TRACE(("USB Device %d: creating device\n", fDeviceAddress));
@@ -31,11 +33,8 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 		return;
 	}
 
-	int8 hubAddress = 0;
-	if (parent->Type() & USB_OBJECT_HUB)
-		hubAddress = ((Hub *)parent)->DeviceAddress();
 	fDefaultPipe->InitCommon(fDeviceAddress, 0, fSpeed, Pipe::Default,
-		fDeviceDescriptor.max_packet_size_0, 0, hubAddress, fHubPort);
+		fDeviceDescriptor.max_packet_size_0, 0, fHubAddress, fHubPort);
 
 	// Get the device descriptor
 	// We already have a part of it, but we want it all
@@ -436,10 +435,6 @@ Device::SetConfigurationAt(uint8 index)
 void
 Device::InitEndpoints(int32 interfaceIndex)
 {
-	int8 hubAddress = 0;
-	if (Parent() && (Parent()->Type() & USB_OBJECT_HUB))
-		hubAddress = ((Hub *)Parent())->DeviceAddress();
-
 	for (size_t j = 0; j < fCurrentConfiguration->interface_count; j++) {
 		if (interfaceIndex >= 0 && j != (size_t)interfaceIndex)
 			continue;
@@ -475,7 +470,7 @@ Device::InitEndpoints(int32 interfaceIndex)
 			pipe->InitCommon(fDeviceAddress,
 				endpoint->descr->endpoint_address & 0x0f,
 				fSpeed, direction, endpoint->descr->max_packet_size,
-				endpoint->descr->interval, hubAddress, fHubPort);
+				endpoint->descr->interval, fHubAddress, fHubPort);
 			endpoint->handle = pipe->USBID();
 		}
 	}

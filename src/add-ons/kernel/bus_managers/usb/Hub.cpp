@@ -11,9 +11,11 @@
 #include <stdio.h>
 
 
-Hub::Hub(Object *parent, int8 hubPort, usb_device_descriptor &desc,
-	int8 deviceAddress, usb_speed speed, bool isRootHub)
-	:	Device(parent, hubPort, desc, deviceAddress, speed, isRootHub),
+Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
+	usb_device_descriptor &desc, int8 deviceAddress, usb_speed speed,
+	bool isRootHub)
+	:	Device(parent, hubAddress, hubPort, desc, deviceAddress, speed,
+			isRootHub),
 		fInterruptPipe(NULL)
 {
 	TRACE(("USB Hub %d: creating hub\n", DeviceAddress()));
@@ -61,15 +63,15 @@ Hub::Hub(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 		fHubDescriptor.num_ports = USB_MAX_PORT_COUNT;
 	}
 
-	Object *object = GetStack()->GetObject(Configuration()->interface->active->endpoint[0].handle);
-	if (!object || (object->Type() & USB_OBJECT_INTERRUPT_PIPE) == 0) {
+	usb_interface_list *list = Configuration()->interface;
+	Object *object = GetStack()->GetObject(list->active->endpoint[0].handle);
+	if (object && (object->Type() & USB_OBJECT_INTERRUPT_PIPE) != 0) {
+		fInterruptPipe = (InterruptPipe *)object;
+		fInterruptPipe->QueueInterrupt(fInterruptStatus,
+			sizeof(fInterruptStatus), InterruptCallback, this);
+	} else {
 		TRACE_ERROR(("USB Hub %d: no interrupt pipe found\n", DeviceAddress()));
-		return;
 	}
-
-	fInterruptPipe = (InterruptPipe *)object;
-	fInterruptPipe->QueueInterrupt(fInterruptStatus, sizeof(fInterruptStatus),
-		InterruptCallback, this);
 
 	// Wait some time before powering up the ports
 	if (!isRootHub)
@@ -242,7 +244,19 @@ Hub::Explore(change_item **changeList)
 				if (fPortStatus[i].status & PORT_STATUS_HIGH_SPEED)
 					speed = USB_SPEED_HIGHSPEED;
 
-				Device *newDevice = GetBusManager()->AllocateDevice(this, i, speed);
+				// either let the device inherit our addresses (if we are
+				// already potentially using a transaction translator) or set
+				// ourselfs as the hub when we might become the transaction
+				// translator for the device.
+				int8 hubAddress = HubAddress();
+				uint8 hubPort = HubPort();
+				if (Speed() == USB_SPEED_HIGHSPEED) {
+					hubAddress = DeviceAddress();
+					hubPort = i + 1;
+				}
+
+				Device *newDevice = GetBusManager()->AllocateDevice(this,
+					hubAddress, hubPort, speed);
 
 				if (newDevice) {
 					newDevice->Changed(changeList, true);

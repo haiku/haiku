@@ -180,7 +180,8 @@ virtual	status_t						InitCheck();
 		void							FreeAddress(int8 address);
 
 		Device							*AllocateDevice(Hub *parent,
-											uint8 port, usb_speed speed);
+											int8 hubAddress, uint8 hubPort,
+											usb_speed speed);
 		void							FreeDevice(Device *device);
 
 virtual	status_t						Start();
@@ -270,6 +271,7 @@ virtual	uint32							Type() { return USB_OBJECT_PIPE; };
 		size_t							MaxPacketSize() { return fMaxPacketSize; };
 		uint8							Interval() { return fInterval; };
 
+		// Hub port being the one-based logical port number on the hub
 		void							SetHubInfo(int8 address, uint8 port);
 		int8							HubAddress() { return fHubAddress; };
 		uint8							HubPort() { return fHubPort; };
@@ -419,7 +421,8 @@ private:
 
 class Device : public Object {
 public:
-										Device(Object *parent, int8 hubPort,
+										Device(Object *parent, int8 hubAddress,
+											uint8 hubPort,
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
 											usb_speed speed, bool isRootHub);
@@ -464,7 +467,8 @@ virtual	status_t						BuildDeviceName(char *string,
 											uint32 *index, size_t bufferSize,
 											Device *device);
 
-		int8							HubPort() const { return fHubPort; };
+		int8							HubAddress() const { return fHubAddress; };
+		uint8							HubPort() const { return fHubPort; };
 
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
@@ -482,14 +486,16 @@ private:
 		usb_configuration_info			*fCurrentConfiguration;
 		usb_speed						fSpeed;
 		int8							fDeviceAddress;
-		int8							fHubPort;
+		int8							fHubAddress;
+		uint8							fHubPort;
 		ControlPipe						*fDefaultPipe;
 };
 
 
 class Hub : public Device {
 public:
-										Hub(Object *parent, int8 hubPort,
+										Hub(Object *parent, int8 hubAddress,
+											uint8 hubPort,
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
 											usb_speed speed, bool isRootHub);

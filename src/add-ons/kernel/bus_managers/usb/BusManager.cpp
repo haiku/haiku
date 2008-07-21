@@ -112,7 +112,8 @@ BusManager::FreeAddress(int8 address)
 
 
 Device *
-BusManager::AllocateDevice(Hub *parent, uint8 port, usb_speed speed)
+BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
+	usb_speed speed)
 {
 	// Check if there is a free entry in the device map (for the device number)
 	int8 deviceAddress = AllocateAddress();
@@ -123,7 +124,7 @@ BusManager::AllocateDevice(Hub *parent, uint8 port, usb_speed speed)
 
 	TRACE(("USB BusManager: setting device address to %d\n", deviceAddress));
 	ControlPipe *defaultPipe = _GetDefaultPipe(speed);
-	defaultPipe->SetHubInfo(parent->DeviceAddress(), port);
+	defaultPipe->SetHubInfo(hubAddress, hubPort);
 
 	if (!defaultPipe) {
 		TRACE_ERROR(("USB BusManager: error getting the default pipe for speed %d\n", (int)speed));
@@ -161,8 +162,8 @@ BusManager::AllocateDevice(Hub *parent, uint8 port, usb_speed speed)
 
 	// Create a temporary pipe with the new address
 	ControlPipe pipe(fRootObject);
-	pipe.InitCommon(deviceAddress, 0, speed, Pipe::Default, 8, 0,
-		parent->DeviceAddress(), port);
+	pipe.InitCommon(deviceAddress, 0, speed, Pipe::Default, 8, 0, hubAddress,
+		hubPort);
 
 	// Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
@@ -200,8 +201,8 @@ BusManager::AllocateDevice(Hub *parent, uint8 port, usb_speed speed)
 	// Create a new instance based on the type (Hub or Device)
 	if (deviceDescriptor.device_class == 0x09) {
 		TRACE(("USB BusManager: creating new hub\n"));
-		Hub *hub = new(std::nothrow) Hub(parent, port, deviceDescriptor,
-			deviceAddress, speed, false);
+		Hub *hub = new(std::nothrow) Hub(parent, hubAddress, hubPort,
+			deviceDescriptor, deviceAddress, speed, false);
 		if (!hub) {
 			TRACE_ERROR(("USB BusManager: no memory to allocate hub\n"));
 			FreeAddress(deviceAddress);
@@ -219,8 +220,8 @@ BusManager::AllocateDevice(Hub *parent, uint8 port, usb_speed speed)
 	}
 
 	TRACE(("USB BusManager: creating new device\n"));
-	Device *device = new(std::nothrow) Device(parent, port, deviceDescriptor,
-		deviceAddress, speed, false);
+	Device *device = new(std::nothrow) Device(parent, hubAddress, hubPort,
+		deviceDescriptor, deviceAddress, speed, false);
 	if (!device) {
 		TRACE_ERROR(("USB BusManager: no memory to allocate device\n"));
 		FreeAddress(deviceAddress);
