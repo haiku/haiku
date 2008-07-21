@@ -77,6 +77,8 @@ platform_start_kernel(void)
 	mmu_init_for_kernel();
 	//smp_boot_other_cpus();
 
+#warning M68K: stop ints
+	
 	dprintf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
 
 	asm("move.l	%0, %%sp;	"			// move stack out of way

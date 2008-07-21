@@ -29,7 +29,7 @@ extern uint8 gBootDriveID;
 extern uint32 gBootPartitionOffset;
 
 #define SCRATCH_SIZE (2*4096)
-static uint8 gScratchBuffer[4096];
+static uint8 gScratchBuffer[SCRATCH_SIZE];
 
 static const uint16 kParametersSizeVersion1 = sizeof(struct tos_bpb);
 static const uint16 kParametersSizeVersion2 = 0x1e;
@@ -584,8 +584,8 @@ BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	uint32 blocksLeft = (bufferSize + offset + fBlockSize - 1) / fBlockSize;
 	int32 totalBytesRead = 0;
 
-	//TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu), drive %u\n",
-	//	blocksLeft * fBlockSize, pos * fBlockSize, offset, fDriveID));
+	//TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu)\n",
+	//	blocksLeft * fBlockSize, pos * fBlockSize, offset));
 
 	// read partial block
 	if (offset) {
@@ -622,6 +622,7 @@ BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 		totalBytesRead += bytesRead;
 	}
 
+	//TRACE(("BlockHandle::%s: %d bytes read\n", __FUNCTION__, totalBytesRead));
 	return totalBytesRead;
 }
 
@@ -893,7 +894,7 @@ XHDIDrive::FillIdentifier()
 ssize_t
 XHDIDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 {
-	int sectorsPerBlocks = (fBlockSize / 256);
+	int sectorsPerBlock = (fBlockSize / 256);
 	int32 ret;
 	uint16 flags = RW_READ;
 	TRACE(("XHDIDrive::%s(%Ld, %d) (%d,%d)\n", __FUNCTION__, first, count, fMajor, fMinor));

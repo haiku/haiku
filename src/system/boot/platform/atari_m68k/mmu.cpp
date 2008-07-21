@@ -68,7 +68,7 @@
  */
 #warning M68K: check for Physbase() < ST_RAM_TOP
 
-#define TRACE_MMU
+//#define TRACE_MMU
 #ifdef TRACE_MMU
 #	define TRACE(x) dprintf x
 #else
@@ -355,6 +355,7 @@ mmu_allocate(void *virtualAddress, size_t size)
 			address += B_PAGE_SIZE;
 		}
 
+		TRACE(("mmu_allocate(KERNEL, %d): done\n", size));
 		return virtualAddress;
 	}
 
@@ -364,6 +365,7 @@ mmu_allocate(void *virtualAddress, size_t size)
 		map_page(get_next_virtual_page(), get_next_physical_page(), kDefaultPageFlags);
 	}
 
+	TRACE(("mmu_allocate(NULL, %d): %p\n", size, address));
 	return address;
 }
 
