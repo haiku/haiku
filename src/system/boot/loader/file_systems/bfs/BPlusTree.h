@@ -4,7 +4,7 @@
 **
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
 ** Roughly based on 'btlib' written by Marcus J. Ranum
-** 
+**
 ** Copyright (c) 2001-2002 pinc Software. All Rights Reserved.
 ** This file may be used under the terms of the OpenBeOS License.
 */
@@ -110,7 +110,7 @@ struct bplustree_node {
 enum bplustree_traversing {
 	BPLUSTREE_FORWARD = 1,
 	BPLUSTREE_BACKWARD = -1,
-	
+
 	BPLUSTREE_BEGIN = 0,
 	BPLUSTREE_END = 1
 };
@@ -292,7 +292,8 @@ bplustree_header::IsValidLink(off_t link)
 inline uint16 *
 bplustree_node::KeyLengths() const
 {
-	return (uint16 *)(((char *)this) + round_up(sizeof(bplustree_node) + AllKeyLength()));
+	return (uint16 *)(((char *)this)
+		+ key_align(sizeof(bplustree_node) + AllKeyLength()));
 }
 
 inline off_t *
@@ -310,10 +311,11 @@ bplustree_node::Keys() const
 inline int32
 bplustree_node::Used() const
 {
-	return round_up(sizeof(bplustree_node) + AllKeyLength()) + NumKeys() * (sizeof(uint16) + sizeof(off_t));
+	return key_align(sizeof(bplustree_node) + AllKeyLength())
+		+ NumKeys() * (sizeof(uint16) + sizeof(off_t));
 }
 
-inline bool 
+inline bool
 bplustree_node::IsLeaf() const
 {
 	return OverflowLink() == BPLUSTREE_NULL;
@@ -349,7 +351,7 @@ bplustree_node::MakeLink(uint8 type, off_t link, uint32 fragmentIndex)
 }
 
 
-inline bool 
+inline bool
 bplustree_node::IsDuplicate(off_t link)
 {
 	return (LinkType(link) & (BPLUSTREE_DUPLICATE_NODE | BPLUSTREE_DUPLICATE_FRAGMENT)) > 0;
