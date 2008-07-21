@@ -125,10 +125,10 @@ class HWInterface : protected MultiLocker {
 
 	virtual status_t			GetOverlayRestrictions(const Overlay* overlay,
 									overlay_restrictions* restrictions);
-	virtual bool				CheckOverlayRestrictions(int32 width, int32 height,
-									color_space colorSpace);
-	virtual const overlay_buffer* AllocateOverlayBuffer(int32 width, int32 height,
-									color_space space);
+	virtual bool				CheckOverlayRestrictions(int32 width,
+									int32 height, color_space colorSpace);
+	virtual const overlay_buffer* AllocateOverlayBuffer(int32 width,
+									int32 height, color_space space);
 	virtual void				FreeOverlayBuffer(const overlay_buffer* buffer);
 
 	virtual void				ConfigureOverlay(Overlay* overlay);
@@ -146,6 +146,10 @@ class HWInterface : protected MultiLocker {
 	// while as CopyBackToFront() actually performs the operation
 			status_t			CopyBackToFront(const BRect& frame);
 
+protected:
+	virtual	void				CopyBackToFront(/*const*/ BRegion& region);
+
+public:
 	// TODO: Just a quick and primitive way to get single buffered mode working.
 	// Later, the implementation should be smarter, right now, it will
 	// draw the cursor for almost every drawing operation.

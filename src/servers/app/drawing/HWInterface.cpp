@@ -336,26 +336,35 @@ HWInterface::CopyBackToFront(const BRect& frame)
 		// make sure we don't copy out of bounds
 		area = bufferClip & area;
 
-		uint32 srcBPR = backBuffer->BytesPerRow();
-		uint8* src = (uint8*)backBuffer->Bits();
-
 		BRegion region((BRect)area);
 		if (IsDoubleBuffered())
 			region.Exclude((clipping_rect)_CursorFrame());
-		
-		int32 count = region.CountRects();
-		for (int32 i = 0; i < count; i++) {
-			clipping_rect r = region.RectAtInt(i);
-			// offset to left top pixel in source buffer (always B_RGBA32)
-			uint8* srcOffset = src + r.top * srcBPR + r.left * 4;
-			_CopyToFront(srcOffset, srcBPR, r.left, r.top, r.right, r.bottom);
-		}
+
+		CopyBackToFront(region);
 
 		_DrawCursor(area);
 
 		return B_OK;
 	}
 	return B_BAD_VALUE;
+}
+
+
+void
+HWInterface::CopyBackToFront(/*const*/ BRegion& region)
+{
+	RenderingBuffer* backBuffer = BackBuffer();
+
+	uint32 srcBPR = backBuffer->BytesPerRow();
+	uint8* src = (uint8*)backBuffer->Bits();
+
+	int32 count = region.CountRects();
+	for (int32 i = 0; i < count; i++) {
+		clipping_rect r = region.RectAtInt(i);
+		// offset to left top pixel in source buffer (always B_RGBA32)
+		uint8* srcOffset = src + r.top * srcBPR + r.left * 4;
+		_CopyToFront(srcOffset, srcBPR, r.left, r.top, r.right, r.bottom);
+	}
 }
 
 
@@ -609,9 +618,8 @@ HWInterface::_DrawCursor(IntRect area) const
 // * location in front buffer is calculated
 // * conversion from B_RGBA32 to format of front buffer is taken care of
 void
-HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
-						  int32 x, int32 y,
-						  int32 right, int32 bottom) const
+HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
+	int32 right, int32 bottom) const
 {
 	RenderingBuffer* frontBuffer = FrontBuffer();
 
@@ -727,7 +735,7 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 		case B_GRAY8:
 			if (frontBuffer->Width() > dstBPR) {
 				// VGA 16 color grayscale planar mode
-				if (fVGADevice > 0) {
+				if (fVGADevice >= 0) {
 					vga_planar_blit_args args;
 					args.source = src;
 					args.source_bytes_per_row = srcBPR;
