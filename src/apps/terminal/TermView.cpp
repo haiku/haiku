@@ -1172,7 +1172,6 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 
 	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
 	const char *toWrite = NULL;
-	int32 toWriteLen = -1;
 
 	switch (*bytes) {
 		case B_RETURN:
@@ -1197,6 +1196,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					BMessage message(MSG_PREVIOUS_TAB);
 					message.AddPointer("termView", this);
 					Window()->PostMessage(&message);
+					return;
 				} else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY)) {
 					toWrite = CTRL_LEFT_ARROW_KEY_CODE;
 				} else
@@ -1210,6 +1210,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					BMessage message(MSG_NEXT_TAB);
 					message.AddPointer("termView", this);
 					Window()->PostMessage(&message);
+					return;
 				} else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY)) {
 					toWrite = CTRL_RIGHT_ARROW_KEY_CODE;
 				} else
@@ -1273,7 +1274,6 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				_ScrollTo(fScrollOffset + fFontHeight * fTermRows, true);
 				return;
 			}
-
 			if (rawChar == B_PAGE_DOWN)
 				toWrite = PAGE_DOWN_KEY_CODE;
 			break;
@@ -1281,21 +1281,25 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 		case B_FUNCTION_KEY:
 			for (int32 i = 0; i < 12; i++) {
 				if (key == function_keycode_table[i]) {
-					fShell->Write(function_key_char_table[i], 5);
-					return;
+					toWrite = function_key_char_table[i];
+					break;
 				}
 			}
 			break;
-		default:
-			toWrite = bytes;
-			toWriteLen = 1;
-			break;
 	}
 
-	if (toWrite) {
-		_ScrollTo(0, true);
-		fShell->Write(toWrite, toWriteLen < 0 ? strlen(toWrite) : toWriteLen);
+	// If the above code proposed an alternative string to write, we get it's
+	// length. Otherwise we write exactly the bytes passed to this method.
+	size_t toWriteLen;
+	if (toWrite != NULL) {
+		toWriteLen = strlen(toWrite);
+	} else {
+		toWrite = bytes;
+		toWriteLen = numBytes;
 	}
+
+	_ScrollTo(0, true);
+	fShell->Write(toWrite, toWriteLen);
 }
 
 
