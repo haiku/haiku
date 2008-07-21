@@ -142,7 +142,8 @@ add_device(usb_device dev)
 			DPRINTF_INFO((ID "add_device() - examining interface: %d\n", ifc));
 			for (alt = 0; alt < conf->interface[ifc].alt_count; alt++) {
 				ii = &conf->interface[ifc].alt[alt];
-				DPRINTF_INFO((ID "add_device() - examining alt interface: %d\n", alt));
+				DPRINTF_INFO((ID "add_device() - examining alt interface: "
+					"%d\n", alt));
 
 
 				// does it have the correct type of interface?
@@ -191,7 +192,8 @@ got_one:
 			// the interface we found is not the active one and has to be set
 			DPRINTF_INFO((ID "add_device() - setting interface: %p...\n", ii));
 			if ((st = usb->set_alt_interface(dev, ii)) != B_OK) {
-				dprintf(ID "add_device() -> set_alt_interface() returns %ld\n", st);
+				dprintf(ID "add_device() -> set_alt_interface() returns %ld\n",
+					st);
 				goto fail;
 			} else
 				DPRINTF_ERR((ID " ... success!\n"));
@@ -205,16 +207,20 @@ got_one:
 			st = usb->send_request(dev, 0x21, 0x0b, 1, 0, 0, 0,
 				&controlTransferLength);
 	
-			if (st < B_OK)
-				dprintf(ID "add_device() - control transfer 1 failed: %ld\n", st);
+			if (st < B_OK) {
+				dprintf(ID "add_device() - control transfer 1 failed: %ld\n",
+					st);
+			}
 	
 			// "set interface" -> ?!?
 			controlTransferLength = 2;
 			st = usb->send_request(dev, 0x21, 0x09, (3 << 8) + 2, 1, 2, repData,
 				&controlTransferLength);
 	
-			if (st < B_OK)
-				dprintf(ID "add_device() - control transfer 2 failed: %ld\n", st);
+			if (st < B_OK) {
+				dprintf(ID "add_device() - control transfer 2 failed: %ld\n",
+					st);
+			}
 		}
 //	}
 
@@ -226,12 +232,14 @@ got_one:
 	device->data = (char*)malloc(device->max_packet_size);
 	if (device->data == NULL)
 		goto fail;
-//DPRINTF_INFO((ID "add_device() - max packet length = %ld\n", device->max_packet_size));
+//DPRINTF_INFO((ID "add_device() - max packet length = %ld\n",
+//	device->max_packet_size));
 	device->status = 0;//B_USB_STATUS_SUCCESS;
 	device->vendor = udd->vendor_id;
 	device->product = udd->product_id;
 
-	DPRINTF_INFO((ID "add_device() - added %p (/dev/%s%d)\n", device, kBasePublishPath, num));
+	DPRINTF_INFO((ID "add_device() - added %p (/dev/%s%d)\n", device,
+		kBasePublishPath, num));
 	
 	// add it to the list of devices so it will be published, etc
 	acquire_sem(sDeviceListLock);
@@ -283,7 +291,7 @@ device_added(usb_device dev, void** cookie)
 		DPRINTF_INFO((ID "device_added() - done!\n"));
 		return B_OK;
 	} else
-		DPRINTF_ERR((ID "device_added() - failed to add device!\n"));
+		DPRINTF_INFO((ID "device_added() - failed to add device!\n"));
 
 	return B_ERROR;
 }
@@ -325,7 +333,7 @@ device_removed(void *cookie)
 			remove_device(device);
 		} else {
 			dprintf(ID "device /dev/%s%d still open -- marked for removal\n",
-					 kBasePublishPath, device->number);
+				kBasePublishPath, device->number);
 		}
 		
 		release_sem(sDeviceListLock);
@@ -340,7 +348,7 @@ device_removed(void *cookie)
 
 // device_open
 static status_t
-device_open(const char *dname, uint32 flags, void **cookie)
+device_open(const char *dname, uint32 flags, void** cookie)
 {	
 	wacom_device *device;
 	int n;
@@ -366,11 +374,13 @@ device_open(const char *dname, uint32 flags, void **cookie)
 				DPRINTF_ERR((ID "device_open() open: %d\n", device->open));
 
 				if (device->notify_lock < 0) {
-					if ((device->notify_lock = create_sem(0, "notify_lock")) < 0) {
+					device->notify_lock = create_sem(0, "notify_lock");
+					if (device->notify_lock < 0) {
 						ret = device->notify_lock;
 						device->open--;
 						*cookie = NULL;
-						dprintf(ID "device_open() -> create_sem() returns %ld\n", ret);
+						dprintf(ID "device_open() -> create_sem() returns %ld\n",
+							ret);
 					} else {
 						ret = B_OK;
 					}
@@ -394,7 +404,8 @@ device_close (void *cookie)
 {
 #if DEBUG_DRIVER
 	wacom_device *device = (wacom_device*) cookie;
-	DPRINTF_ERR((ID "device_close() name = \"%s%d\"\n", kBasePublishPath, device->number));
+	DPRINTF_ERR((ID "device_close() name = \"%s%d\"\n", kBasePublishPath,
+		device->number));
 #endif
 	return B_OK;
 }
@@ -405,7 +416,8 @@ device_free(void *cookie)
 {
 	wacom_device *device = (wacom_device *)cookie;
 	
-	DPRINTF_INFO((ID "device_free() name = \"%s%d\"\n", kBasePublishPath, device->number));
+	DPRINTF_INFO((ID "device_free() name = \"%s%d\"\n", kBasePublishPath,
+		device->number));
 	
 	acquire_sem(sDeviceListLock);
 
@@ -423,8 +435,8 @@ device_free(void *cookie)
 
 // device_interupt_callback
 static void
-device_interupt_callback(void* cookie, uint32 status,
-						 void* data, uint32 actualLength)
+device_interupt_callback(void* cookie, status_t status, void* data,
+	uint32 actualLength)
 {
 	wacom_device* device = (wacom_device*)cookie;
 	uint32 length = min_c(actualLength, device->max_packet_size);
@@ -435,7 +447,7 @@ device_interupt_callback(void* cookie, uint32 status,
 
 	device->status = status;
 	if (device->notify_lock >= 0) {
-		if (status == 0/*B_USB_STATUS_SUCCESS*/) {
+		if (status == B_OK) {
 			memcpy(device->data, data, length);
 			device->length = length;
 		} else {
@@ -477,26 +489,29 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 			 cookie, pos, buf, *count, kBasePublishPath, device->number));
 
 	if (ret >= B_OK) {
-		// what the client "reads" is decided depending on how much bytes are provided
-		// 8 bytes are needed to "read" vendor id, product id and max packet size
-		// in case the client wants to read more than 8 bytes, a usb interupt transfer
-		// is scheduled, and an error report is returned as appropriate
+		// what the client "reads" is decided depending on how much bytes are
+		// provided 8 bytes are needed to "read" vendor id, product id and max
+		// packet size in case the client wants to read more than 8 bytes, a usb
+		// interupt transfer is scheduled, and an error report is returned as
+		// appropriate
 		if (*count > 8) {
 			// queue the interrupt transfer
-			ret = usb->queue_interrupt(device->pipe, device->data, device->max_packet_size,
-				device_interupt_callback, device);
+			ret = usb->queue_interrupt(device->pipe, device->data,
+				device->max_packet_size, device_interupt_callback, device);
 			if (ret >= B_OK) {
 				// we will block here until the interrupt transfer has been done
-				ret = acquire_sem_etc(device->notify_lock, 1, B_RELATIVE_TIMEOUT, 500 * 1000);
+				ret = acquire_sem_etc(device->notify_lock, 1,
+					B_RELATIVE_TIMEOUT, 500 * 1000);
 				// handle time out
 				if (ret < B_OK) {
 //					usb->cancel_queued_transfers(device->pipe);
 					if (ret == B_TIMED_OUT) {
 						// a time_out is ok, since it only means that the device
-						// had nothing to report (ie mouse/pen was not moved) within
-						// the given time interval
+						// had nothing to report (ie mouse/pen was not moved)
+						// within the given time interval
 						DPRINTF_INFO((ID "device_read(%p) name = \"%s%d\" -> "
-							"B_TIMED_OUT\n", cookie, kBasePublishPath, device->number));
+							"B_TIMED_OUT\n", cookie, kBasePublishPath,
+							device->number));
 						*count = 8;
 						read_header(device, buffer);
 						ret = B_OK;
@@ -515,21 +530,24 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 					} else {
 						// an error happened during the interrupt transfer
 						*count = 0;
-						dprintf(ID "interrupt transfer - failure: %ld\n", device->status);
+						dprintf(ID "interrupt transfer - failure: %ld\n",
+							device->status);
 						ret = B_ERROR;
 					}
 				}
 			} else {
 				*count = 0;
-				dprintf(ID "device_read(%p) name = \"%s%d\" -> error queuing interrupt: %ld\n",
-						 cookie, kBasePublishPath, device->number, ret);
+				dprintf(ID "device_read(%p) name = \"%s%d\" -> error queuing "
+					"interrupt: %ld\n", cookie, kBasePublishPath,
+					device->number, ret);
 			}
 		} else if (*count == 8) {
 			read_header(device, buffer);
 			ret = B_OK;
 		} else {
-			dprintf(ID "device_read(%p) name = \"%s%d\" -> buffer size must be at least 8 bytes!\n",
-						 cookie, kBasePublishPath, device->number);
+			dprintf(ID "device_read(%p) name = \"%s%d\" -> buffer size must be "
+				"at least 8 bytes!\n", cookie, kBasePublishPath,
+				device->number);
 			*count = 0;
 			ret = B_BAD_VALUE;
 		}
@@ -645,26 +663,27 @@ publish_devices()
 	}
 
 	acquire_sem(sDeviceListLock);	
-	sDeviceNames = (char **) malloc(sizeof(char*) * (sDeviceCount + 2));
+	sDeviceNames = (char**)malloc(sizeof(char*) * (sDeviceCount + 2));
 	if (sDeviceNames) {
 		for (i = 0, device = sDeviceList; device; device = device->next) {
-			if ((sDeviceNames[i] = (char *) malloc(strlen(kBasePublishPath) + 4))) {
+			sDeviceNames[i] = (char*)malloc(strlen(kBasePublishPath) + 4);
+			if (sDeviceNames[i]) {
 				sprintf(sDeviceNames[i],"%s%d",kBasePublishPath,device->number);
 				DPRINTF_INFO((ID "publishing: \"/dev/%s\"\n",sDeviceNames[i]));
 				i++;
 			}
 		}
 		// publish the currently fake control device
-		if ((sDeviceNames[i] = (char *) malloc(strlen(kBasePublishPath) + 8))) {
+		sDeviceNames[i] = (char*)malloc(strlen(kBasePublishPath) + 8);
+		if (sDeviceNames[i])
 			sprintf(sDeviceNames[i], "%s%s", kBasePublishPath, "control");
-		}
 	
 		sDeviceNames[i + 1] = NULL;
 	}
 
 	release_sem(sDeviceListLock);
 	
-	return (const char **) sDeviceNames;
+	return (const char**)sDeviceNames;
 }
 
 static device_hooks sDeviceHooks = {
