@@ -225,6 +225,17 @@ public:
 	virtual const char* _Action() const { return "put"; }
 };
 
+class Read : public Action {
+public:
+	Read(block_cache *cache, cached_block* block)
+		: Action(cache, block)
+	{
+		Initialized();
+	}
+
+	virtual const char* _Action() const { return "read"; }
+};
+
 class Write : public Action {
 public:
 	Write(block_cache *cache, cached_block* block)
@@ -1123,6 +1134,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
 				blockNumber, bytesRead, strerror(errno)));
 			return NULL;
 		}
+		TB(Read(cache, block));
 	}
 
 	if (block->unused) {
