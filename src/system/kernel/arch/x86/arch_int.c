@@ -22,7 +22,7 @@
 #include <arch/user_debugger.h>
 #include <arch/vm.h>
 
-#include <arch/x86/smp_apic.h>
+#include <arch/x86/arch_apic.h>
 #include <arch/x86/descriptors.h>
 #include <arch/x86/vm86.h>
 

@@ -11,7 +11,7 @@
 #include <arch/x86/timer.h>
 
 #include <int.h>
-#include <arch/x86/smp_apic.h>
+#include <arch/x86/arch_apic.h>
 
 #include <arch/cpu.h>
 #include <arch/smp.h>

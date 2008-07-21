@@ -20,7 +20,7 @@
 #include <timer.h>
 
 #include <arch/x86/smp_priv.h>
-#include <arch/x86/smp_apic.h>
+#include <arch/x86/arch_apic.h>
 #include <arch/x86/timer.h>
 
 #include <string.h>

@@ -1,12 +1,13 @@
 /*
+ * Copyright 2008, Dustin Howett, dustin.howett@gmail.com. All rights reserved.
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_ARCH_x86_SMP_APIC_H
-#define _KERNEL_ARCH_x86_SMP_APIC_H
+#ifndef _KERNEL_ARCH_x86_ARCH_APIC_H
+#define _KERNEL_ARCH_x86_ARCH_APIC_H
 
 #define MP_FLOATING_SIGNATURE			'_PM_'
 #define MP_CONFIG_TABLE_SIGNATURE		'PCMP'
@@ -191,4 +192,4 @@ enum {
 	MP_INTR_TYPE_ExtINT,
 };
 
-#endif	/* _KERNEL_ARCH_x86_SMP_APIC_H */
+#endif	/* _KERNEL_ARCH_x86_ARCH_APIC_H */

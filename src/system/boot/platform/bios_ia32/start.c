@@ -10,6 +10,7 @@
 #include "cpu.h"
 #include "mmu.h"
 #include "smp.h"
+#include "acpi.h"
 #include "keyboard.h"
 #include "bios.h"
 
@@ -132,6 +133,7 @@ _start(void)
 		serial_enable();
 
 	apm_init();
+	acpi_init();
 	smp_init();
 	main(&args);
 }

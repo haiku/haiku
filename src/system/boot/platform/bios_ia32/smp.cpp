@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Dustin Howett, dustin.howett@gmail.com. All rights reserved.
  * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -9,6 +10,7 @@
 
 #include "smp.h"
 #include "mmu.h"
+#include "acpi.h"
 
 #include <KernelExport.h>
 
@@ -16,8 +18,8 @@
 #include <safemode.h>
 #include <boot/stage2.h>
 #include <boot/menu.h>
-#include <arch/x86/smp_acpi.h>
-#include <arch/x86/smp_apic.h>
+#include <arch/x86/arch_acpi.h>
+#include <arch/x86/arch_apic.h>
 #include <arch/x86/arch_system_info.h>
 
 #include <string.h>
@@ -36,21 +38,9 @@ struct gdt_idt_descr {
 	uint32 *b;
 } _PACKED;
 
-struct smp_scan_spots_struct {
-	uint32 start;
-	uint32 stop;
-	uint32 length;
-};
-
-static struct smp_scan_spots_struct smp_scan_spots[] = {
+static struct scan_spots_struct smp_scan_spots[] = {
 	{ 0x9fc00, 0xa0000, 0xa0000 - 0x9fc00 },
 	{ 0xf0000, 0x100000, 0x100000 - 0xf0000 },
-	{ 0, 0, 0 }
-};
-
-static struct smp_scan_spots_struct acpi_scan_spots[] = {
-	{ 0x0, 0x400, 0x400 - 0x0 },
-	{ 0xe0000, 0x100000, 0x100000 - 0xe0000 },
 	{ 0, 0, 0 }
 };
 
@@ -96,21 +86,6 @@ smp_mp_probe(uint32 base, uint32 limit)
 		if (*pointer == MP_FLOATING_SIGNATURE) {
 			TRACE(("smp_mp_probe: found floating pointer structure at %p\n", pointer));
 			return (mp_floating_struct *)pointer;
-		}
-	}
-
-	return NULL;
-}
-
-
-static acpi_rsdp *
-smp_acpi_probe(uint32 base, uint32 limit)
-{
-	TRACE(("smp_acpi_probe: entry base 0x%lx, limit 0x%lx\n", base, limit));
-	for (char *pointer = (char *)base; (uint32)pointer < limit; pointer += 16) {
-		if (strncmp(pointer, ACPI_RSDP_SIGNATURE, 8) == 0) {
-			TRACE(("smp_acpi_probe: found ACPI RSDP signature at %p\n", pointer));
-			return (acpi_rsdp *)pointer;
 		}
 	}
 
@@ -241,85 +216,59 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 
 
 static status_t
-smp_do_acpi_config(acpi_rsdp *rsdp)
+smp_do_acpi_config(void)
 {
 	TRACE(("smp: using ACPI to detect MP configuration\n"));
-	TRACE(("smp: found rsdp at %p oem id: %.6s\n", rsdp, rsdp->oem_id));
-	TRACE(("smp: rsdp points to rsdt at 0x%lx\n", rsdp->rsdt_address));
 
 	// reset CPU count
 	gKernelArgs.num_cpus = 0;
 
-	// map and validate the root system description table
-	acpi_descriptor_header *rsdt
-		= (acpi_descriptor_header *)mmu_map_physical_memory(
-		rsdp->rsdt_address, B_PAGE_SIZE, kDefaultPageFlags);
-	if (!rsdt || strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
-		TRACE(("smp: invalid root system description table\n"));
+	acpi_madt *madt = (acpi_madt *)acpi_find_table(ACPI_MADT_SIGNATURE);
+
+	if (madt == NULL) {
+		TRACE(("smp: Failed to find MADT!\n"));
 		return B_ERROR;
 	}
 
-	int32 numEntries = (rsdt->length - sizeof(acpi_descriptor_header)) / 4;
-	if (numEntries <= 0) {
-		TRACE(("smp: root system description table is empty\n"));
-		return B_ERROR;
-	}
+	gKernelArgs.arch_args.apic_phys = madt->local_apic_address;
+	TRACE(("smp: local apic address is 0x%lx\n", madt->local_apic_address));
 
-	TRACE(("smp: searching %ld entries for APIC information\n", numEntries));
-	uint32 *pointer = (uint32 *)((uint8 *)rsdt + sizeof(acpi_descriptor_header));
-	for (int32 j = 0; j < numEntries; j++, pointer++) {
-		acpi_descriptor_header *header = (acpi_descriptor_header *)
-			mmu_map_physical_memory(*pointer, B_PAGE_SIZE, kDefaultPageFlags);
-		if (!header || strncmp(header->signature, ACPI_MADT_SIGNATURE, 4) != 0) {
-			// not interesting for us
-			TRACE(("smp: skipping uninteresting header '%.4s'\n", header->signature));
-			continue;
-		}
-
-		acpi_madt *madt = (acpi_madt *)header;
-		gKernelArgs.arch_args.apic_phys = madt->local_apic_address;
-		TRACE(("smp: local apic address is 0x%lx\n", madt->local_apic_address));
-
-		acpi_apic *apic = (acpi_apic *)((uint8 *)madt + sizeof(acpi_madt));
-		acpi_apic *end = (acpi_apic *)((uint8 *)madt + header->length);
-		while (apic < end) {
-			switch (apic->type) {
-				case ACPI_MADT_LOCAL_APIC:
-				{
-					if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
-						TRACE(("smp: already reached maximum boot CPUs (%d)\n", MAX_BOOT_CPUS));
-						break;
-					}
-
-					acpi_local_apic *localApic = (acpi_local_apic *)apic;
-					TRACE(("smp: found local APIC with id %u\n", localApic->apic_id));
-					if ((localApic->flags & ACPI_LOCAL_APIC_ENABLED) == 0) {
-						TRACE(("smp: APIC is disabled and will not be used\n"));
-						break;
-					}
-
-					gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = localApic->apic_id;
-					gKernelArgs.arch_args.cpu_os_id[localApic->apic_id] = gKernelArgs.num_cpus;
-					// ToDo: how to find out? putting 0x10 in to indicate a local apic
-					gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = 0x10;
-					gKernelArgs.num_cpus++;
+	acpi_apic *apic = (acpi_apic *)((uint8 *)madt + sizeof(acpi_madt));
+	acpi_apic *end = (acpi_apic *)((uint8 *)madt + madt->header.length);
+	while (apic < end) {
+		switch (apic->type) {
+			case ACPI_MADT_LOCAL_APIC:
+			{
+				if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
+					TRACE(("smp: already reached maximum boot CPUs (%d)\n", MAX_BOOT_CPUS));
 					break;
 				}
 
-				case ACPI_MADT_IO_APIC: {
-					acpi_io_apic *ioApic = (acpi_io_apic *)apic;
-					TRACE(("smp: found io APIC with id %u and address 0x%lx\n",
-						ioApic->io_apic_id, ioApic->io_apic_address));
-					gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
+				acpi_local_apic *localApic = (acpi_local_apic *)apic;
+				TRACE(("smp: found local APIC with id %u\n", localApic->apic_id));
+				if ((localApic->flags & ACPI_LOCAL_APIC_ENABLED) == 0) {
+					TRACE(("smp: APIC is disabled and will not be used\n"));
 					break;
 				}
+
+				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = localApic->apic_id;
+				gKernelArgs.arch_args.cpu_os_id[localApic->apic_id] = gKernelArgs.num_cpus;
+				// ToDo: how to find out? putting 0x10 in to indicate a local apic
+				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = 0x10;
+				gKernelArgs.num_cpus++;
+				break;
 			}
 
-			apic = (acpi_apic *)((uint8 *)apic + apic->length);
+			case ACPI_MADT_IO_APIC: {
+				acpi_io_apic *ioApic = (acpi_io_apic *)apic;
+				TRACE(("smp: found io APIC with id %u and address 0x%lx\n",
+					ioApic->io_apic_id, ioApic->io_apic_address));
+				gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
+				break;
+			}
 		}
 
-		if (gKernelArgs.num_cpus > 0)
-			break;
+		apic = (acpi_apic *)((uint8 *)apic + apic->length);
 	}
 
 	return gKernelArgs.num_cpus > 0 ? B_OK : B_ERROR;
@@ -609,12 +558,8 @@ smp_init(void)
 	// first try to find ACPI tables to get MP configuration as it handles
 	// physical as well as logical MP configurations as in multiple cpus,
 	// multiple cores or hyper threading.
-	for (int32 i = 0; acpi_scan_spots[i].length > 0; i++) {
-		acpi_rsdp *rsdp = smp_acpi_probe(smp_scan_spots[i].start,
-			smp_scan_spots[i].stop);
-		if (rsdp != NULL && smp_do_acpi_config(rsdp) == B_OK)
-			return;
-	}
+	if (smp_do_acpi_config() == B_OK)
+		return;
 
 	// then try to find MPS tables and do configuration based on them
 	for (int32 i = 0; smp_scan_spots[i].length > 0; i++) {
