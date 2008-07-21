@@ -3,11 +3,19 @@ OUTPUT_ARCH(m68k)
 
 ENTRY(_start)
 SEARCH_DIR("libgcc");
+/* XXX: this shouldn't be needed to make kernel_m68k have separate text and data segments!!! */
+PHDRS
+{
+	headers PT_PHDR PHDRS ;
+	text PT_LOAD FILEHDR PHDRS ;
+	data PT_LOAD ;
+	dynamic PT_DYNAMIC ;
+}
 SECTIONS
 {
 	. = 0x80000000 + SIZEOF_HEADERS;
 
-	.interp : { *(.interp) }
+	.interp : { *(.interp) } :text
 	.hash : { *(.hash) }
 	.dynsym : { *(.dynsym) }
 	.dynstr : { *(.dynstr) }
@@ -35,14 +43,14 @@ SECTIONS
 	.plt : { *(.plt) }
 
 	/* text/read-only data */
-	.text :	{ *(.text .gnu.linkonce.t.*) } =0x9090
+	.text :	{ *(.text .gnu.linkonce.t.*) } :text =0x9090
 
 	.rodata : { *(.rodata) }
 
 	/* writable data  */
 	. = ALIGN(0x1000);
 	__data_start = .;
-	.data : { *(.data .gnu.linkonce.d.*) }
+	.data : { *(.data .gnu.linkonce.d.*) } :data
 
 	. = ALIGN(0x4);
 	__ctor_list = .;
