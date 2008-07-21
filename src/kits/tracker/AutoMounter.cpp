@@ -368,7 +368,6 @@ AutoMounter::_ReadSettings()
 	delete [] buffer;
 
 	_UpdateSettingsFromMessage(&message);
-	GetSettings(&fSettings);
 }
 
 
