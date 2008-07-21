@@ -53,6 +53,7 @@ const uint32 kCloseWindowAndChildren = 'Tcwc';
 
 // end external app messages
 
+const uint32 kOpenPreviouslyOpenWindows = 'Topw';
 const uint32 kRestoreState = 'Trst';
 
 const uint32 kCutMoreSelectionToClipboard = 'Tmvm';

@@ -459,6 +459,7 @@ AutoMounter::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case kMsgInitialScan:
 			_MountVolumes(fNormalMode, fRemovableMode, true);
+			be_app->PostMessage(kOpenPreviouslyOpenWindows);
 			break;
 
 		case kMountVolume:
@@ -1486,6 +1487,8 @@ AutoMounter::InitialRescan()
 	}
 	
 	sInitialRescan = false;
+
+	be_app->PostMessage(kOpenPreviouslyOpenWindows);
 }
 
 

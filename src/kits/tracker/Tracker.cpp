@@ -356,6 +356,11 @@ TTracker::MessageReceived(BMessage *message)
 		return;
 
 	switch (message->what) {
+		case kOpenPreviouslyOpenWindows:
+			if (!BootedInSafeMode())
+				_OpenPreviouslyOpenedWindows();
+			break;
+
 		case kGetInfo:
 			OpenInfoWindows(message);
 			break;
@@ -1327,10 +1332,6 @@ TTracker::ReadyToRun()
 			}
 		} else
 			delete model;
-
-		// open previously open windows
-		if (!BootedInSafeMode())
-			_OpenPreviouslyOpenedWindows();
 	}
 
 	// kick off building the mime type list for find panels, etc.
