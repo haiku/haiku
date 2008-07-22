@@ -88,7 +88,7 @@ struct SwapHashTableDefinition {
 
 	size_t HashKey(const swap_hash_key& key) const
 	{
-		off_t cacheOffset = key.cache_offset > SWAP_BLOCK_SHIFT;
+		off_t cacheOffset = key.cache_offset >> SWAP_BLOCK_SHIFT;
 		VMAnonymousCache *cache = key.cache;
 		return cacheOffset ^ (int)(int *)cache;
 	}
