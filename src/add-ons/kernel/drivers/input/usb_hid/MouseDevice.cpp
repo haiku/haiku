@@ -82,8 +82,9 @@ MouseDevice::_InterpretBuffer()
 		if (IsRemoved())
 			return B_ERROR;
 
-		if (gUSBModule->clear_feature(fInterruptPipe,
-			USB_FEATURE_ENDPOINT_HALT) != B_OK)
+		if (fTransferStatus == B_DEV_STALLED
+			&& gUSBModule->clear_feature(fInterruptPipe,
+				USB_FEATURE_ENDPOINT_HALT) != B_OK)
 			return B_ERROR;
 
 		return B_OK;
