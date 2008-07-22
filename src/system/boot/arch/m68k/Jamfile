@@ -10,6 +10,7 @@ local librootArchObjects =
 KernelMergeObject boot_arch_m68k.o :
 	arch_elf.cpp
 	$(librootArchObjects)
+	: -fno-pic
 ;
 
 SEARCH on [ FGristFiles arch_elf.cpp ]
