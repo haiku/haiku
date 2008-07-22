@@ -181,7 +181,7 @@ load_elf_symbol_table(int fd, preloaded_image *image)
 		goto error3;
 	}
 
-	TRACE(("loaded debug %ld symbols\n", numSymbols));
+	TRACE(("loaded %ld debug symbols\n", numSymbols));
 
 	// insert tables into image
 	image->debug_symbols = symbolTable;
@@ -470,6 +470,8 @@ elf_relocate_image(struct preloaded_image *image)
 	}
 
 	if (image->rela) {
+		TRACE(("total %i rela relocs\n",
+			image->rela_len / (int)sizeof(struct Elf32_Rela)));
 		status = boot_arch_elf_relocate_rela(image, image->rela,
 			image->rela_len);
 		if (status < B_OK)
