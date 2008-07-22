@@ -13,22 +13,24 @@
 #include <DiskDevice.h>
 #include <DiskDeviceRoster.h>
 
+
 class FsCreator {
 public:
-	FsCreator(const char* devPath, BString& type, BString& volumeName,
-		const char* fsOpt, bool verbose);
+							FsCreator(const char* path, const char* type,
+								const char* volumeName, const char* fsOptions,
+								bool quick, bool verbose);
 
-	bool Run();
+			bool			Run();
+
 private:
-	inline BString _ReadLine();
+			BString			_ReadLine();
 
-	BString fType;
-	BString fDevicePath;
-	BString& fVolumeName;
-	const char* fFsOptions;
-	BDiskDevice fDevice;
-	BPartition* fPartition;
-	const bool fVerbose;
+			const char*		fType;
+			const char*		fPath;
+			const char*		fVolumeName;
+			const char*		fFsOptions;
+			bool			fVerbose;
+			bool			fQuick;
 };
 
-#endif // _FSCREATOR_H_
+#endif	// _FSCREATOR_H_

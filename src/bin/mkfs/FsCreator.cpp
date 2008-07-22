@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Marco Minutoli, mminutoli@gmail.com
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 #include "FsCreator.h"
@@ -13,63 +14,116 @@
 #include <DiskSystem.h>
 
 
-FsCreator::FsCreator(const char* devPath, BString& type,
-	BString& volumeName, const char* fsOpt, bool verbose)
+class UnregisterFileDevice {
+public:
+	UnregisterFileDevice()
+		:
+		fID(-1)
+	{
+	}
+
+	~UnregisterFileDevice()
+	{
+		if (fID >= 0) {
+			BDiskDeviceRoster roster;
+			roster.UnregisterFileDevice(fID);
+		}
+	}
+
+	void SetTo(partition_id id)
+	{
+		fID = id;
+	}
+
+	void Detach()
+	{
+		fID = -1;
+	}
+
+private:
+	partition_id	fID;
+};
+
+
+extern "C" const char* __progname;
+static const char* kProgramName = __progname;
+
+
+FsCreator::FsCreator(const char* path, const char* type, const char* volumeName,
+		const char* fsOptions, bool quick, bool verbose)
 	:
 	fType(type),
-	fDevicePath(devPath),
+	fPath(path),
 	fVolumeName(volumeName),
-	fFsOptions(fsOpt),
-	fVerbose(verbose)
+	fFsOptions(fsOptions),
+	fVerbose(verbose),
+	fQuick(quick)
 {
-	BDiskDeviceRoster roster;
-	status_t ret = roster.GetDeviceForPath(devPath, &fDevice);
-	if (ret != B_OK) {
-		std::cerr << "Error: Failed to get disk device for path "
-				  << devPath << ": " << strerror(ret);
-	}
 }
 
 
 bool
 FsCreator::Run()
 {
+	UnregisterFileDevice unregisterFileDevice;
+
+	BDiskDeviceRoster roster;
+	BPartition* partition;
+	BDiskDevice device;
+
+	status_t status = roster.GetPartitionForPath(fPath, &device,
+		&partition);
+	if (status != B_OK) {
+		if (!strncmp(fPath, "/dev", 4)) {
+			std::cerr << kProgramName << ": Failed to get disk device for path "
+				<< fPath << ": " << strerror(status) << std::endl;
+			return false;
+		}
+
+		// try to register file device
+
+		partition_id id = roster.RegisterFileDevice(fPath);
+		if (id < B_OK) {
+			std::cerr << kProgramName << ": Could not register file device for "
+				"path " << fPath << ": " << strerror(status) << std::endl;
+			return false;
+		}
+
+		unregisterFileDevice.SetTo(id);
+
+		status = roster.GetPartitionWithID(id, &device, &partition);
+		if (!strncmp(fPath, "/dev", 4)) {
+			std::cerr << kProgramName << ": Cannot find registered file device "
+				"for path " << fPath << ": " << strerror(status)
+				<< std::endl;
+			return false;
+		}
+	}
+
 	// check that the device is writable
-	if (fDevice.IsReadOnly()) {
-		std::cerr << "Error: Can't Inizialize the device. "
-			"It is read only.\n";
+	if (partition->IsReadOnly()) {
+		std::cerr << kProgramName << ": Cannot initialize read-only device.\n";
 		return false;
 	}
 
 	// check if the device is mounted
-	if (fDevice.IsMounted()) {
-		std::cerr << "Error: The device has to be unmounted before.\n";
+	if (partition->IsMounted()) {
+		std::cerr << kProgramName << ": Cannot initialize mounted device.\n";
 		return false;
 	}
 
 	BDiskSystem diskSystem;
-	BDiskDeviceRoster dDRoster;
-	bool found = false;
-	while (dDRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
-		if (diskSystem.IsFileSystem() && diskSystem.SupportsInitializing()) {
-			if (diskSystem.ShortName() == fType) {
-				found = true;
-				break;
-			}
-		}
-	}
-
-	if (!found) {
-		std::cerr << "Error: " << fType.String()
-				  << " is an invalid or unsupported file system type.\n";
+	if (roster.GetDiskSystem(&diskSystem, fType) != B_OK) {
+		std::cerr << kProgramName << ": " << fType
+			<< " is an invalid or unsupported file system type.\n";
 		return false;
 	}
 
 	// prepare the device for modifications
-	status_t ret = fDevice.PrepareModifications();
-	if (ret != B_OK) {
-		std::cerr << "Error: A problem occurred preparing the device for the"
-			"modifications\n";
+	status = device.PrepareModifications();
+	if (status != B_OK) {
+		std::cerr << kProgramName << ": A problem occurred preparing the "
+			"device for the modifications\n";
 		return false;
 	}
 	if (fVerbose)
@@ -77,52 +131,64 @@ FsCreator::Run()
 
 	// validate parameters
 	BString name(fVolumeName);
-	if (fDevice.ValidateInitialize(diskSystem.PrettyName(),
-			&fVolumeName, fFsOptions) != B_OK) {
-		std::cerr << "Error: Parameters validation failed. "
+	if (partition->ValidateInitialize(diskSystem.PrettyName(),
+			&name, fFsOptions) != B_OK) {
+		std::cerr << kProgramName << ": Parameters validation failed. "
 			"Check what you wrote\n";
-		std::cerr << ret;
+		std::cerr << status;
 		return false;
 	}
 	if (fVerbose)
 		std::cout << "Parameters Validation...\n\n";
-	if (name != fVolumeName)
+	if (name != fVolumeName) {
 		std::cout << "Volume name was adjusted to "
-				  << fVolumeName.String() << std::endl;
+			<< name.String() << std::endl;
+	}
 
 	// Initialize the partition
-	ret = fDevice.Initialize(diskSystem.PrettyName(),
-		fVolumeName.String(), fFsOptions);
-	if (ret != B_OK) {
-		std::cerr << "Initialization failed: " <<  strerror(ret) << std::endl;
+	status = partition->Initialize(diskSystem.PrettyName(), name.String(),
+		fFsOptions);
+	if (status != B_OK) {
+		std::cerr << kProgramName << ": Initialization failed: "
+			<< strerror(status) << std::endl;
 		return false;
 	}
 
-	std::cout << "\nAre you sure you want to do this now?\n"
-			  << "\nALL YOUR DATA in " << fDevicePath.String()
-			  << " will be lost forever.\n";
+	if (!fQuick) {
+		std::cout << "\nAbout to initialize " << fPath << " with "
+			<< diskSystem.PrettyName()
+			<< "\nAre you sure you want to do this now?\n"
+			<< "\nALL YOUR DATA in " << fPath << " will be lost forever.\n";
 
-	BString reply;
-	do {
-		std::cout << "Continue? [yes|no]: ";
-		reply = _ReadLine();
-		if (reply == "")
-			reply = "no"; // silence is dissence
-	} while (reply != "yes" && reply != "no");
+		BString reply;
+		do {
+			std::cout << "Continue (yes|[no])? ";
+			reply = _ReadLine();
+			if (reply == "")
+				reply = "no"; // silence is dissence
+		} while (reply != "yes" && reply != "no");
 
-	if (reply == "yes") {
-		ret = fDevice.CommitModifications();
-		if (ret == B_OK) {
-			if (fVerbose) {
-				std::cout << "Volume " << fDevice.ContentName()
-						  << " has been initialized successfully!\n";
-			}
-		} else {
-			std::cout << "Error: Initialization of " << fDevice.ContentName()
-					  << " failed: " << strerror(ret) << std::endl;
-			return false;
-		}
+		if (reply != "yes")
+			return true;
 	}
+
+	status = device.CommitModifications();
+	if (status == B_OK) {
+		if (fVerbose) {
+			std::cout << "Volume " << partition->ContentName()
+				<< " has been initialized successfully!\n";
+		}
+	} else {
+		std::cout << kProgramName << ": Initialization of "
+			<< partition->ContentName() << " failed: " << strerror(status)
+			<< std::endl;
+		return false;
+	}
+
+	// TODO: should we keep the file device around, or unregister it
+	// after we're done? This could be an option, too (for now, we'll
+	// just keep them if everything went well).
+	unregisterFileDevice.Detach();
 	return true;
 }
 
