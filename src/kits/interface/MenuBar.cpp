@@ -549,9 +549,12 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			buttons = newButtons;
 
 			if (buttons != 0 && _IsStickyMode()) {
-				if (menuItem == NULL)
+				if (menuItem == NULL
+					|| (menuItem->Submenu() && menuItem->Submenu()->Window())) {
+					// clicked outside menu bar or on item with already
+					// open sub menu
 					fState = MENU_STATE_CLOSED;
-				else
+				} else
 					_SetStickyMode(false);
 			} else if (buttons == 0 && !_IsStickyMode()) {
 				if ((fSelected != NULL && fSelected->Submenu() == NULL)
