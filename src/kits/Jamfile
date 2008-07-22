@@ -94,6 +94,7 @@ SubInclude HAIKU_TOP src kits midi ;
 SubInclude HAIKU_TOP src kits midi2 ;
 SubInclude HAIKU_TOP src kits network ;
 SubInclude HAIKU_TOP src kits opengl ;
+SubInclude HAIKU_TOP src kits print ;
 SubInclude HAIKU_TOP src kits screensaver ;
 SubInclude HAIKU_TOP src kits shared ;
 SubInclude HAIKU_TOP src kits storage ;

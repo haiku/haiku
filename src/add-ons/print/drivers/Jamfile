@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons print drivers ;
 
-SubInclude HAIKU_TOP src add-ons print drivers shared ;
 SubInclude HAIKU_TOP src add-ons print drivers canon_lips ;
 SubInclude HAIKU_TOP src add-ons print drivers pcl5 ;
 SubInclude HAIKU_TOP src add-ons print drivers pcl6 ;

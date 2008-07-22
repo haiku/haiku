@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences print ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders interface shared print ;
+UsePrivateHeaders shared print ;
 
 Preference Printers :
 	AddPrinterDialog.cpp

@@ -2,22 +2,13 @@ SubDir HAIKU_TOP src servers print ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-SubInclude HAIKU_TOP src servers print shared ;
+UsePrivateHeaders shared print ;
 
-SubDir HAIKU_TOP src servers print ;
-
-UsePrivateHeaders shared interface print ;
-UsePrivateHeaders print ;
-
-AddResources
-	print_server
-	:
+AddResources print_server :
 	print_server.rdef
-	;
+;
 
-Server 
-	print_server 
-	:
+Server print_server :
 	PrintServerApp.cpp
 	PrintServerApp.R5.cpp
 	PrintServerApp.Scripting.cpp
@@ -28,16 +19,14 @@ Server
 	ResourceManager.cpp
 	Settings.cpp
 	ConfigWindow.cpp
-	;
+;
 
-LinkAgainst 
-	print_server 
-	: 
+LinkAgainst print_server : 
 	be 
 	root
 	translation
 	libprintutils.a
-	;
+;
 
 Package haiku-printingkit-cvs :
 	print_server :

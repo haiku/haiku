@@ -1,13 +1,9 @@
-SubDir HAIKU_TOP src add-ons print drivers shared libprint ;
+SubDir HAIKU_TOP src libs print libprint ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print libprint ] ; 
-
-# for BeUtils.h
-SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print ] ; 
-# for Utils.h, InterfaceUtils.h
-SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ; 
+UsePrivateHeaders print ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ; 
 
 StaticLibrary libprint.a :
 	AboutBox.cpp

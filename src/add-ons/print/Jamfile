@@ -1,5 +1,4 @@
 SubDir HAIKU_TOP src add-ons print ;
 
-SubInclude HAIKU_TOP src add-ons print shared ;
 SubInclude HAIKU_TOP src add-ons print drivers ;
 SubInclude HAIKU_TOP src add-ons print transports ;
