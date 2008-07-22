@@ -60,11 +60,11 @@ SECTIONS
 	.dtors : { *(.dtors) }
 	__dtor_end = .;
 	.got : { *(.got.plt) *(.got) }
-	.dynamic : { *(.dynamic) }
+	.dynamic : { *(.dynamic) } :dynamic :data
 	
 	/* unintialized data (in same segment as writable data) */
 	__bss_start = .;
-	.bss : { *(.bss) }
+	.bss : { *(.bss) } :data
 
 	. = ALIGN(0x1000);
 	_end = . ;
