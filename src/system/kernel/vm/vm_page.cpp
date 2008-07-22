@@ -18,12 +18,12 @@
 #include <boot/kernel_args.h>
 #include <condition_variable.h>
 #include <kernel.h>
+#include <low_resource_manager.h>
 #include <thread.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <vm.h>
 #include <vm_address_space.h>
-#include <vm_low_memory.h>
 #include <vm_priv.h>
 #include <vm_page.h>
 #include <vm_cache.h>
@@ -846,7 +846,6 @@ page_scrubber(void *unused)
 static status_t
 write_page(vm_page *page, bool fsReenter)
 {
-	vm_store *store = page->cache->store;
 	size_t length = B_PAGE_SIZE;
 	status_t status;
 	iovec vecs[1];
@@ -859,7 +858,7 @@ write_page(vm_page *page, bool fsReenter)
 		panic("could not map page!");
 	vecs->iov_len = B_PAGE_SIZE;
 
-	status = store->ops->write(store, (off_t)page->cache_offset << PAGE_SHIFT,
+	status = page->cache->Write((off_t)page->cache_offset << PAGE_SHIFT,
 		vecs, 1, &length, fsReenter);
 
 	vm_put_physical_page((addr_t)vecs[0].iov_base);
@@ -991,18 +990,18 @@ page_writer(void* /*unused*/)
 
 			vm_cache *cache = page->cache;
 			// TODO: write back temporary ones as soon as we have swap file support
-			if (cache->temporary/* && vm_low_memory_state() == B_NO_LOW_MEMORY*/)
+			if (cache->temporary
+				/*&& low_resource_state(B_KERNEL_RESOURCE_PAGES)
+					== B_NO_LOW_RESOURCE*/) {
 				continue;
+			}
 
-			if (cache->store->ops->acquire_unreferenced_ref != NULL) {
-				// we need our own reference to the store, as it might
-				// currently be destructed
-				if (cache->store->ops->acquire_unreferenced_ref(cache->store)
-						!= B_OK) {
-					cacheLocker.Unlock();
-					thread_yield(true);
-					continue;
-				}
+			// we need our own reference to the store, as it might
+			// currently be destructed
+			if (cache->AcquireUnreferencedStoreRef() != B_OK) {
+				cacheLocker.Unlock();
+				thread_yield(true);
+				continue;
 			}
 
 			InterruptsSpinLocker locker(sPageLock);
@@ -1010,8 +1009,7 @@ page_writer(void* /*unused*/)
 			// state might have change while we were locking the cache
 			if (page->state != PAGE_STATE_MODIFIED) {
 				// release the cache reference first
-				if (cache->store->ops->release_ref != NULL)
-					cache->store->ops->release_ref(cache->store);
+				cache->ReleaseStoreRef();
 				continue;
 			}
 
@@ -1025,7 +1023,7 @@ page_writer(void* /*unused*/)
 
 			//dprintf("write page %p, cache %p (%ld)\n", page, page->cache, page->cache->ref_count);
 			vm_clear_map_flags(page, PAGE_MODIFIED);
-			vm_cache_acquire_ref(cache);
+			cache->AcquireRefLocked();
 			u.pages[numPages++] = page;
 		}
 
@@ -1044,7 +1042,7 @@ page_writer(void* /*unused*/)
 
 		for (uint32 i = 0; i < numPages; i++) {
 			vm_cache *cache = u.pages[i]->cache;
-			mutex_lock(&cache->lock);
+			cache->Lock();
 
 			if (writeStatus[i] == B_OK) {
 				// put it into the active queue
@@ -1062,7 +1060,7 @@ page_writer(void* /*unused*/)
 				if (!u.pages[i]->busy_writing) {
 					// someone has cleared the busy_writing flag which tells
 					// us our page has gone invalid
-					vm_cache_remove_page(cache, u.pages[i]);
+					cache->RemovePage(u.pages[i]);
 				} else
 					u.pages[i]->busy_writing = false;
 			}
@@ -1070,7 +1068,7 @@ page_writer(void* /*unused*/)
 			busyConditions[i].Unpublish();
 
 			u.caches[i] = cache;
-			mutex_unlock(&cache->lock);
+			cache->Unlock();
 		}
 
 		for (uint32 i = 0; i < numPages; i++) {
@@ -1078,9 +1076,8 @@ page_writer(void* /*unused*/)
 
 			// We release the cache references after all pages were made
 			// unbusy again - otherwise releasing a vnode could deadlock.
-			if (cache->store->ops->release_ref != NULL)
-				cache->store->ops->release_ref(cache->store);
-			vm_cache_release_ref(cache);
+			cache->ReleaseStoreRef();
+			cache->ReleaseRef();
 		}
 	}
 
@@ -1147,44 +1144,10 @@ static bool
 steal_page(vm_page *page, bool stealActive)
 {
 	// try to lock the page's cache
-
-	class PageCacheTryLocker {
-	public:
-		PageCacheTryLocker(vm_page *page)
-			:
-			fIsLocked(false),
-			fOwnsLock(false)
-		{
-			fCache = vm_cache_acquire_page_cache_ref(page);
-			if (fCache != NULL) {
-				if (mutex_trylock(&fCache->lock) != B_OK)
-					return;
-
-				fOwnsLock = true;
-
-				if (fCache == page->cache)
-					fIsLocked = true;
-			}
-		}
-
-		~PageCacheTryLocker()
-		{
-			if (fOwnsLock)
-				mutex_unlock(&fCache->lock);
-			if (fCache != NULL)
-				vm_cache_release_ref(fCache);
-		}
-
-		bool IsLocked() { return fIsLocked; }
-
-	private:
-		vm_cache *fCache;
-		bool fIsLocked;
-		bool fOwnsLock;
-	} cacheLocker(page);
-
-	if (!cacheLocker.IsLocked())
+	if (vm_cache_acquire_locked_page_cache(page, false) == NULL)
 		return false;
+
+	AutoLocker<VMCache> cacheLocker(page->cache, true, false);
 
 	// check again if that page is still a candidate
 	if (page->state != PAGE_STATE_INACTIVE
@@ -1210,7 +1173,7 @@ steal_page(vm_page *page, bool stealActive)
 	//dprintf("  steal page %p from cache %p%s\n", page, page->cache,
 	//	page->state == PAGE_STATE_INACTIVE ? "" : " (ACTIVE)");
 
-	vm_cache_remove_page(page->cache, page);
+	page->cache->RemovePage(page);
 
 	InterruptsSpinLocker _(sPageLock);
 	remove_page_from_queue(page->state == PAGE_STATE_ACTIVE
@@ -1289,7 +1252,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 		freeConditionEntry.Add(&sFreePageQueue);
 		locker.Unlock();
 
-		vm_low_memory(count);
+		low_resource(B_KERNEL_RESOURCE_PAGES, count, B_RELATIVE_TIMEOUT, 0);
 		//snooze(50000);
 			// sleep for 50ms
 
@@ -1316,7 +1279,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 		at this offset is not included.
 */
 status_t
-vm_page_write_modified_page_range(struct vm_cache *cache, uint32 firstPage,
+vm_page_write_modified_page_range(struct VMCache *cache, uint32 firstPage,
 	uint32 endPage, bool fsReenter)
 {
 	// TODO: join adjacent pages into one vec list
@@ -1357,9 +1320,9 @@ vm_page_write_modified_page_range(struct vm_cache *cache, uint32 firstPage,
 		// clear the modified flag
 		vm_clear_map_flags(page, PAGE_MODIFIED);
 
-		mutex_unlock(&cache->lock);
+		cache->Unlock();
 		status_t status = write_page(page, fsReenter);
-		mutex_lock(&cache->lock);
+		cache->Lock();
 
 		InterruptsSpinLocker locker(&sPageLock);
 
@@ -1378,7 +1341,7 @@ vm_page_write_modified_page_range(struct vm_cache *cache, uint32 firstPage,
 			if (!page->busy_writing) {
 				// someone has cleared the busy_writing flag which tells
 				// us our page has gone invalid
-				vm_cache_remove_page(cache, page);
+				cache->RemovePage(page);
 			} else {
 				if (!dequeuedPage)
 					set_page_state_nolock(page, PAGE_STATE_MODIFIED);
@@ -1401,7 +1364,7 @@ status_t
 vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 {
 	return vm_page_write_modified_page_range(cache, 0,
-		(cache->virtual_size + B_PAGE_SIZE - 1) >> PAGE_SHIFT, fsReenter);
+		(cache->virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT, fsReenter);
 }
 
 
@@ -1423,7 +1386,7 @@ vm_page_schedule_write_page(vm_page *page)
 /*!	Cache must be locked.
 */
 void
-vm_page_schedule_write_page_range(struct vm_cache *cache, uint32 firstPage,
+vm_page_schedule_write_page_range(struct VMCache *cache, uint32 firstPage,
 	uint32 endPage)
 {
 	uint32 modified = 0;

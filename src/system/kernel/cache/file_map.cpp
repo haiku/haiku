@@ -20,7 +20,6 @@
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_cache.h>
-#include <vm_low_memory.h>
 
 
 //#define TRACE_FILE_MAP

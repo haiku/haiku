@@ -249,6 +249,15 @@ ConditionVariable::Add(ConditionVariableEntry* entry)
 }
 
 
+status_t
+ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
+{
+	ConditionVariableEntry entry;
+	Add(&entry);
+	return entry.Wait(flags, timeout);
+}
+
+
 /*static*/ void
 ConditionVariable::ListAll()
 {
@@ -283,8 +292,6 @@ ConditionVariable::Dump() const
 void
 ConditionVariable::_Notify(bool all, bool threadsLocked)
 {
-	ASSERT(fObject != NULL);
-
 	InterruptsLocker _;
 	SpinLocker threadLocker(threadsLocked ? NULL : &thread_spinlock);
 	SpinLocker locker(sConditionVariablesLock);

@@ -440,6 +440,20 @@ mutex_destroy(mutex* lock)
 
 
 status_t
+mutex_switch_lock(mutex* from, mutex* to)
+{
+	InterruptsSpinLocker locker(thread_spinlock);
+
+#if !defined(KDEBUG)
+	if (atomic_add(&from->count, 1) < -1)
+#endif
+		_mutex_unlock(from, true);
+
+	return mutex_lock_threads_locked(to);
+}
+
+
+status_t
 _mutex_lock(mutex* lock, bool threadsLocked)
 {
 #ifdef KDEBUG
@@ -496,9 +510,10 @@ _mutex_lock(mutex* lock, bool threadsLocked)
 
 
 void
-_mutex_unlock(mutex* lock)
+_mutex_unlock(mutex* lock, bool threadsLocked)
 {
-	InterruptsSpinLocker _(thread_spinlock);
+	// lock only, if !threadsLocked
+	InterruptsSpinLocker locker(thread_spinlock, false, !threadsLocked);
 
 #ifdef KDEBUG
 	if (thread_get_current_thread_id() != lock->holder) {

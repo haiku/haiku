@@ -1,0 +1,43 @@
+/*
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
+#include "VMDeviceCache.h"
+
+
+status_t
+VMDeviceCache::Init(addr_t baseAddress)
+{
+	fBaseAddress = baseAddress;
+	return VMCache::Init(CACHE_TYPE_DEVICE);
+}
+
+
+bool
+VMDeviceCache::HasPage(off_t offset)
+{
+	// this should never be called
+	return false;
+}
+
+
+status_t
+VMDeviceCache::Read(off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
+{
+	panic("device_store: read called. Invalid!\n");
+	return B_ERROR;
+}
+
+
+status_t
+VMDeviceCache::Write(off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
+{
+	// no place to write, this will cause the page daemon to skip this store
+	return B_OK;
+}

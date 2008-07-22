@@ -118,7 +118,10 @@ find_image_at_address(addr_t address)
 	struct hash_iterator iterator;
 	struct elf_image_info *image;
 
-	ASSERT_LOCKED_MUTEX(&sImageMutex);
+#if KDEBUG
+	if (!debug_debugger_running())
+		ASSERT_LOCKED_MUTEX(&sImageMutex);
+#endif
 
 	hash_open(sImagesHash, &iterator);
 

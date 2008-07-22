@@ -566,7 +566,7 @@ static status_t
 new_node(struct devfs *fs, const char *path, struct devfs_vnode **_node,
 	struct devfs_vnode **_dir)
 {
-	ASSERT_LOCKED_MUTEX(&fs->lock);
+	ASSERT_LOCKED_RECURSIVE(&fs->lock);
 
 	// copy the path over to a temp buffer so we can munge it
 	KPath tempPath(path);

@@ -17,7 +17,6 @@
 #include <heap.h>
 #include <int.h>
 #include <kernel.h>
-#include <lock.h>
 #include <smp.h>
 #include <tracing.h>
 #include <util/khash.h>
@@ -37,16 +36,10 @@
 
 
 #if DEBUG_CACHE_LIST
-vm_cache* gDebugCacheList;
+VMCache* gDebugCacheList;
 #endif
 static mutex sCacheListLock = MUTEX_INITIALIZER("global vm_cache list");
 	// The lock is also needed when the debug feature is disabled.
-
-
-struct page_lookup_key {
-	uint32	offset;
-	vm_cache* cache;
-};
 
 
 #if VM_CACHE_TRACING
@@ -55,20 +48,20 @@ namespace VMCacheTracing {
 
 class VMCacheTraceEntry : public AbstractTraceEntry {
 	public:
-		VMCacheTraceEntry(vm_cache* cache)
+		VMCacheTraceEntry(VMCache* cache)
 			:
 			fCache(cache)
 		{
 		}
 
 	protected:
-		vm_cache*	fCache;
+		VMCache*	fCache;
 };
 
 
 class Create : public VMCacheTraceEntry {
 	public:
-		Create(vm_cache* cache, vm_store* store)
+		Create(VMCache* cache, vm_store* store)
 			:
 			VMCacheTraceEntry(cache),
 			fStore(store)
@@ -89,7 +82,7 @@ class Create : public VMCacheTraceEntry {
 
 class Delete : public VMCacheTraceEntry {
 	public:
-		Delete(vm_cache* cache)
+		Delete(VMCache* cache)
 			:
 			VMCacheTraceEntry(cache)
 		{
@@ -105,10 +98,10 @@ class Delete : public VMCacheTraceEntry {
 
 class SetMinimalCommitment : public VMCacheTraceEntry {
 	public:
-		SetMinimalCommitment(vm_cache* cache, off_t commitment)
+		SetMinimalCommitment(VMCache* cache, off_t commitment)
 			:
 			VMCacheTraceEntry(cache),
-			fOldCommitment(cache->store->committed_size),
+			fOldCommitment(cache->committed_size),
 			fCommitment(commitment)
 		{
 			Initialized();
@@ -129,10 +122,10 @@ class SetMinimalCommitment : public VMCacheTraceEntry {
 
 class Resize : public VMCacheTraceEntry {
 	public:
-		Resize(vm_cache* cache, off_t size)
+		Resize(VMCache* cache, off_t size)
 			:
 			VMCacheTraceEntry(cache),
-			fOldSize(cache->virtual_size),
+			fOldSize(cache->virtual_end),
 			fSize(size)
 		{
 			Initialized();
@@ -152,7 +145,7 @@ class Resize : public VMCacheTraceEntry {
 
 class AddConsumer : public VMCacheTraceEntry {
 	public:
-		AddConsumer(vm_cache* cache, vm_cache* consumer)
+		AddConsumer(VMCache* cache, VMCache* consumer)
 			:
 			VMCacheTraceEntry(cache),
 			fConsumer(consumer)
@@ -167,13 +160,13 @@ class AddConsumer : public VMCacheTraceEntry {
 		}
 
 	private:
-		vm_cache*	fConsumer;
+		VMCache*	fConsumer;
 };
 
 
 class RemoveConsumer : public VMCacheTraceEntry {
 	public:
-		RemoveConsumer(vm_cache* cache, vm_cache* consumer)
+		RemoveConsumer(VMCache* cache, VMCache* consumer)
 			:
 			VMCacheTraceEntry(cache),
 			fConsumer(consumer)
@@ -188,13 +181,13 @@ class RemoveConsumer : public VMCacheTraceEntry {
 		}
 
 	private:
-		vm_cache*	fConsumer;
+		VMCache*	fConsumer;
 };
 
 
 class Merge : public VMCacheTraceEntry {
 	public:
-		Merge(vm_cache* cache, vm_cache* consumer)
+		Merge(VMCache* cache, VMCache* consumer)
 			:
 			VMCacheTraceEntry(cache),
 			fConsumer(consumer)
@@ -209,13 +202,13 @@ class Merge : public VMCacheTraceEntry {
 		}
 
 	private:
-		vm_cache*	fConsumer;
+		VMCache*	fConsumer;
 };
 
 
 class InsertArea : public VMCacheTraceEntry {
 	public:
-		InsertArea(vm_cache* cache, vm_area* area)
+		InsertArea(VMCache* cache, vm_area* area)
 			:
 			VMCacheTraceEntry(cache),
 			fArea(area)
@@ -236,7 +229,7 @@ class InsertArea : public VMCacheTraceEntry {
 
 class RemoveArea : public VMCacheTraceEntry {
 	public:
-		RemoveArea(vm_cache* cache, vm_area* area)
+		RemoveArea(VMCache* cache, vm_area* area)
 			:
 			VMCacheTraceEntry(cache),
 			fArea(area)
@@ -264,7 +257,7 @@ namespace VMCacheTracing {
 
 class InsertPage : public VMCacheTraceEntry {
 	public:
-		InsertPage(vm_cache* cache, vm_page* page, off_t offset)
+		InsertPage(VMCache* cache, vm_page* page, off_t offset)
 			:
 			VMCacheTraceEntry(cache),
 			fPage(page),
@@ -287,7 +280,7 @@ class InsertPage : public VMCacheTraceEntry {
 
 class RemovePage : public VMCacheTraceEntry {
 	public:
-		RemovePage(vm_cache* cache, vm_page* page)
+		RemovePage(VMCache* cache, vm_page* page)
 			:
 			VMCacheTraceEntry(cache),
 			fPage(page)
@@ -317,204 +310,592 @@ class RemovePage : public VMCacheTraceEntry {
 #endif
 
 
-static int
-page_compare_func(void* _p, const void* _key)
+//	#pragma mark -
+
+
+status_t
+vm_cache_init(kernel_args* args)
 {
-	vm_page* page = (vm_page*)_p;
-	const struct page_lookup_key* key = (page_lookup_key*)_key;
-
-	TRACE(("page_compare_func: page %p, key %p\n", page, key));
-
-	if (page->cache == key->cache && page->cache_offset == key->offset)
-		return 0;
-
-	return -1;
+	return B_OK;
 }
 
 
-static uint32
-page_hash_func(void* _p, const void* _key, uint32 range)
+VMCache*
+vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 {
-	vm_page* page = (vm_page*)_p;
-	const struct page_lookup_key* key = (page_lookup_key*)_key;
+	mutex_lock(&sCacheListLock);
 
-	#define HASH(offset, ref) ((offset) + ((uint32)(ref) >> 6) * 997)
-		// sizeof(vm_cache) >= 64, hence (uint32)(ref) >> 6 is still unique
+	while (dontWait) {
+		vm_cache* cache = page->cache;
+		if (cache == NULL || !cache->TryLock()) {
+			mutex_unlock(&sCacheListLock);
+			return NULL;
+		}
 
-	if (page)
-		return HASH(page->cache_offset, page->cache) % range;
+		if (cache == page->cache) {
+			cache->AcquireRefLocked();
+			mutex_unlock(&sCacheListLock);
+			return cache;
+		}
 
-	return HASH(key->offset, key->cache) % range;
-}
+		// the cache changed in the meantime
+		cache->Unlock();
+	}
 
-
-/*!	Acquires a reference to a cache yet unreferenced by the caller. The
-	caller must make sure, that the cache is not deleted, e.g. by holding the
-	cache's source cache lock or by holding the global cache list lock.
-	Returns \c true, if the reference could be acquired.
-*/
-static inline bool
-acquire_unreferenced_cache_ref(vm_cache* cache)
-{
 	while (true) {
-		int32 count = cache->ref_count;
-		if (count == 0)
-			return false;
+		vm_cache* cache = page->cache;
+		if (cache == NULL) {
+			mutex_unlock(&sCacheListLock);
+			return NULL;
+		}
 
-		if (atomic_test_and_set(&cache->ref_count, count + 1, count) == count)
-			return true;
+		if (!cache->SwitchLock(&sCacheListLock)) {
+			// cache has been deleted
+			mutex_lock(&sCacheListLock);
+			continue;
+		}
+
+		if (cache == page->cache) {
+			cache->AcquireRefLocked();
+			return cache;
+		}
+
+		// the cache changed in the meantime
+		cache->Unlock();
+		mutex_lock(&sCacheListLock);
 	}
 }
 
 
-static void
-delete_cache(vm_cache* cache)
+// #pragma mark - VMCache
+
+
+bool
+VMCache::_IsMergeable() const
 {
-	if (cache->areas != NULL)
-		panic("cache %p to be deleted still has areas", cache);
-	if (!list_is_empty(&cache->consumers))
-		panic("cache %p to be deleted still has consumers", cache);
+	return (areas == NULL && temporary
+		&& !list_is_empty(const_cast<list*>(&consumers))
+		&& consumers.link.next == consumers.link.prev);
+}
 
-	T(Delete(cache));
 
-	// delete the cache's backing store
-	cache->store->ops->destroy(cache->store);
+VMCache::VMCache()
+{
+}
+
+
+VMCache::~VMCache()
+{
+}
+
+
+status_t
+VMCache::Init(uint32 cacheType)
+{
+	mutex_init(&fLock, "vm_cache");
+	list_init_etc(&consumers, offsetof(VMCache, consumer_link));
+	areas = NULL;
+	fRefCount = 1;
+	source = NULL;
+	virtual_base = 0;
+	virtual_end = 0;
+	committed_size = 0;
+	temporary = 0;
+	scan_skip = 0;
+	page_count = 0;
+	type = cacheType;
+
+#if DEBUG_CACHE_LIST
+	mutex_lock(&sCacheListLock);
+
+	if (gDebugCacheList)
+		gDebugCacheList->debug_previous = this;
+	debug_previous = NULL;
+	debug_next = gDebugCacheList;
+	gDebugCacheList = this;
+
+	mutex_unlock(&sCacheListLock);
+#endif
+
+	return B_OK;
+}
+
+
+void
+VMCache::Delete()
+{
+	if (areas != NULL)
+		panic("cache %p to be deleted still has areas", this);
+	if (!list_is_empty(&consumers))
+		panic("cache %p to be deleted still has consumers", this);
+
+	T(Delete(this));
 
 	// free all of the pages in the cache
-	while (vm_page* page = cache->pages.Root()) {
+	while (vm_page* page = pages.Root()) {
 		if (!page->mappings.IsEmpty() || page->wired_count != 0) {
 			panic("remove page %p from cache %p: page still has mappings!\n",
-				page, cache);
+				page, this);
 		}
 
 		// remove it
-		cache->pages.Remove(page);
+		pages.Remove(page);
 		page->cache = NULL;
 		// TODO: we also need to remove all of the page's mappings!
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
 			oldPage->physical_page_number));
-		vm_page_free(cache, page);
+		vm_page_free(this, page);
 	}
 
 	// remove the ref to the source
-	if (cache->source)
-		vm_cache_remove_consumer(cache->source, cache);
+	if (source)
+		source->_RemoveConsumer(this);
 
 	// We lock and unlock the sCacheListLock, even if the DEBUG_CACHE_LIST is
 	// not enabled. This synchronization point is needed for
-	// vm_cache_acquire_page_cache_ref().
+	// vm_cache_acquire_locked_page_cache().
 	mutex_lock(&sCacheListLock);
 
 #if DEBUG_CACHE_LIST
-	if (cache->debug_previous)
-		cache->debug_previous->debug_next = cache->debug_next;
-	if (cache->debug_next)
-		cache->debug_next->debug_previous = cache->debug_previous;
-	if (cache == gDebugCacheList)
-		gDebugCacheList = cache->debug_next;
+	if (debug_previous)
+		debug_previous->debug_next = debug_next;
+	if (debug_next)
+		debug_next->debug_previous = debug_previous;
+	if (this == gDebugCacheList)
+		gDebugCacheList = debug_next;
 #endif
+
+	mutex_destroy(&fLock);
 
 	mutex_unlock(&sCacheListLock);
 
-	mutex_destroy(&cache->lock);
-	free(cache);
+	delete this;
 }
 
 
-static bool
-is_cache_mergeable(vm_cache* cache)
+void
+VMCache::Unlock()
 {
-	return (cache->areas == NULL && cache->temporary
-		&& !list_is_empty(&cache->consumers)
-		&& cache->consumers.link.next == cache->consumers.link.prev);
+	while (fRefCount == 1 && _IsMergeable()) {
+		VMCache* consumer = (VMCache*)list_get_first_item(&consumers);
+		if (consumer->TryLock()) {
+			_MergeWithOnlyConsumer();
+		} else {
+			// Someone else has locked the consumer ATM. Unlock this cache and
+			// wait for the consumer lock. Increment the cache's ref count
+			// temporarily, so that no one else will try what we are doing or
+			// delete the cache.
+			fRefCount++;
+			bool consumerLocked = consumer->SwitchLock(&fLock);
+			Lock();
+			fRefCount--;
+
+			if (consumerLocked) {
+				if (fRefCount == 1 && _IsMergeable()
+						&& consumer == list_get_first_item(&consumers)) {
+					_MergeWithOnlyConsumer();
+				} else {
+					// something changed, get rid of the consumer lock
+					consumer->Unlock();
+				}
+			}
+		}
+	}
+
+	if (fRefCount == 0) {
+		// delete this cache
+		Delete();
+	} else
+		mutex_unlock(&fLock);
+}
+
+
+void
+VMCache::AcquireRefLocked()
+{
+// TODO: Inline!
+	ASSERT_LOCKED_MUTEX(&fLock);
+
+	fRefCount++;
+}
+
+
+void
+VMCache::AcquireRef()
+{
+	Lock();
+	fRefCount++;
+	Unlock();
+}
+
+
+void
+VMCache::ReleaseRefLocked()
+{
+// TODO: Inline!
+	ASSERT_LOCKED_MUTEX(&fLock);
+
+	fRefCount--;
+}
+
+
+void
+VMCache::ReleaseRef()
+{
+	Lock();
+	fRefCount--;
+	Unlock();
+}
+
+
+vm_page*
+VMCache::LookupPage(off_t offset)
+{
+	AssertLocked();
+
+	vm_page* page = pages.Lookup((page_num_t)(offset >> PAGE_SHIFT));
+
+#if KDEBUG
+	if (page != NULL && page->cache != this)
+		panic("page %p not in cache %p\n", page, this);
+#endif
+
+	return page;
+}
+
+
+void
+VMCache::InsertPage(vm_page* page, off_t offset)
+{
+	TRACE(("VMCache::InsertPage(): cache %p, page %p, offset %Ld\n",
+		this, page, offset));
+	AssertLocked();
+
+	if (page->cache != NULL) {
+		panic("insert page %p into cache %p: page cache is set to %p\n",
+			page, this, page->cache);
+	}
+
+	T2(InsertPage(this, page, offset));
+
+	page->cache_offset = (page_num_t)(offset >> PAGE_SHIFT);
+	page_count++;
+	page->usage_count = 2;
+	page->cache = this;
+
+#if KDEBUG
+	vm_page* otherPage = pages.Lookup(page->cache_offset);
+	if (otherPage != NULL) {
+		panic("VMCache::InsertPage(): there's already page %p with cache "
+			"offset %lu in cache %p; inserting page %p", otherPage,
+			page->cache_offset, this, page);
+	}
+#endif	// KDEBUG
+
+	pages.Insert(page);
+}
+
+
+/*!	Removes the vm_page from this cache. Of course, the page must
+	really be in this cache or evil things will happen.
+	The cache lock must be held.
+*/
+void
+VMCache::RemovePage(vm_page* page)
+{
+	TRACE(("VMCache::RemovePage(): cache %p, page %p\n", this, page));
+	AssertLocked();
+
+	if (page->cache != this) {
+		panic("remove page %p from cache %p: page cache is set to %p\n", page,
+			this, page->cache);
+	}
+
+	T2(RemovePage(this, page));
+
+	pages.Remove(page);
+	page->cache = NULL;
+	page_count--;
+}
+
+
+/*!	Makes this case the source of the \a consumer cache,
+	and adds the \a consumer to its list.
+	This also grabs a reference to the source cache.
+	Assumes you have the cache and the consumer's lock held.
+*/
+void
+VMCache::AddConsumer(VMCache* consumer)
+{
+	TRACE(("add consumer vm cache %p to cache %p\n", consumer, cache));
+	AssertLocked();
+	consumer->AssertLocked();
+
+	T(AddConsumer(this, consumer));
+
+	consumer->source = this;
+	list_add_item(&consumers, consumer);
+
+	AcquireRefLocked();
+	AcquireStoreRef();
+}
+
+
+/*!	Adds the \a area to this cache.
+	Assumes you have the locked the cache.
+*/
+status_t
+VMCache::InsertAreaLocked(vm_area* area)
+{
+	TRACE(("VMCache::InsertAreaLocked(cache %p, area %p)\n", this, area));
+	AssertLocked();
+
+	T(InsertArea(this, area));
+
+	area->cache_next = areas;
+	if (area->cache_next)
+		area->cache_next->cache_prev = area;
+	area->cache_prev = NULL;
+	areas = area;
+
+	AcquireStoreRef();
+
+	return B_OK;
+}
+
+
+status_t
+VMCache::RemoveArea(vm_area* area)
+{
+	TRACE(("VMCache::RemoveArea(cache %p, area %p)\n", this, area));
+
+	T(RemoveArea(this, area));
+
+	AutoLocker<VMCache> locker(this);
+
+	if (area->cache_prev)
+		area->cache_prev->cache_next = area->cache_next;
+	if (area->cache_next)
+		area->cache_next->cache_prev = area->cache_prev;
+	if (areas == area)
+		areas = area->cache_next;
+
+	ReleaseStoreRef();
+
+	return B_OK;
+}
+
+
+status_t
+VMCache::WriteModified(bool fsReenter)
+{
+	TRACE(("VMCache::WriteModified(cache = %p)\n", this));
+
+	if (temporary)
+		return B_OK;
+
+	Lock();
+	status_t status = vm_page_write_modified_pages(this, fsReenter);
+	Unlock();
+
+	return status;
+}
+
+
+/*!	Commits the memory to the store if the \a commitment is larger than
+	what's committed already.
+	Assumes you have the cache's lock held.
+*/
+status_t
+VMCache::SetMinimalCommitment(off_t commitment)
+{
+	TRACE(("VMCache::SetMinimalCommitment(cache %p, commitment %Ld)\n",
+		this, commitment));
+	AssertLocked();
+
+	T(SetMinimalCommitment(this, commitment));
+
+	status_t status = B_OK;
+
+	// If we don't have enough committed space to cover through to the new end
+	// of the area...
+	if (committed_size < commitment) {
+		// ToDo: should we check if the cache's virtual size is large
+		//	enough for a commitment of that size?
+
+		// try to commit more memory
+		status = Commit(commitment);
+	}
+
+	return status;
+}
+
+
+/*!	This function updates the size field of the cache.
+	If needed, it will free up all pages that don't belong to the cache anymore.
+	The cache lock must be held when you call it.
+	Since removed pages don't belong to the cache any longer, they are not
+	written back before they will be removed.
+
+	Note, this function way temporarily release the cache lock in case it
+	has to wait for busy pages.
+*/
+status_t
+VMCache::Resize(off_t newSize)
+{
+	TRACE(("VMCache::Resize(cache %p, newSize %Ld) old size %Ld\n",
+		this, newSize, this->virtual_end));
+	this->AssertLocked();
+
+	T(Resize(this, newSize));
+
+	status_t status = Commit(newSize - virtual_base);
+	if (status != B_OK)
+		return status;
+
+	uint32 oldPageCount = (uint32)((virtual_end + B_PAGE_SIZE - 1)
+		>> PAGE_SHIFT);
+	uint32 newPageCount = (uint32)((newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+
+	if (newPageCount < oldPageCount) {
+		// we need to remove all pages in the cache outside of the new virtual
+		// size
+		for (VMCachePagesTree::Iterator it
+					= pages.GetIterator(newPageCount, true, true);
+				vm_page* page = it.Next();) {
+			if (page->state == PAGE_STATE_BUSY) {
+				if (page->busy_writing) {
+					// We cannot wait for the page to become available
+					// as we might cause a deadlock this way
+					page->busy_writing = false;
+						// this will notify the writer to free the page
+				} else {
+					// wait for page to become unbusy
+					ConditionVariableEntry entry;
+					entry.Add(page);
+					Unlock();
+					entry.Wait();
+					Lock();
+
+					// restart from the start of the list
+					it = pages.GetIterator(newPageCount, true, true);
+				}
+				continue;
+			}
+
+			// remove the page and put it into the free queue
+			RemovePage(page);
+			vm_page_free(this, page);
+				// Note: When iterating through a IteratableSplayTree
+				// removing the current node is safe.
+		}
+	}
+
+	virtual_end = newSize;
+	return B_OK;
+}
+
+
+status_t
+VMCache::Commit(off_t size)
+{
+	committed_size = size;
+	return B_OK;
+}
+
+
+bool
+VMCache::HasPage(off_t offset)
+{
+	return offset >= virtual_base && offset <= virtual_end;
+}
+
+
+status_t
+VMCache::Read(off_t offset, const iovec *vecs, size_t count, size_t *_numBytes,
+	bool fsReenter)
+{
+	return B_ERROR;
+}
+
+
+status_t
+VMCache::Write(off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
+{
+	return B_ERROR;
+}
+
+
+status_t
+VMCache::Fault(struct vm_address_space *aspace, off_t offset)
+{
+	return B_BAD_ADDRESS;
+}
+
+
+void
+VMCache::MergeStore(VMCache* source)
+{
+}
+
+
+status_t
+VMCache::AcquireUnreferencedStoreRef()
+{
+	return B_OK;
+}
+
+
+void
+VMCache::AcquireStoreRef()
+{
+}
+
+
+void
+VMCache::ReleaseStoreRef()
+{
 }
 
 
 /*!	Merges the given cache with its only consumer.
-	The caller must own a reference (other than the one from the consumer) and
-	hold the cache's lock.
+	The caller must hold both the cache's and the consumer's lock. The method
+	will unlock the consumer lock.
 */
-static void
-merge_cache_with_only_consumer(vm_cache* cache)
+void
+VMCache::_MergeWithOnlyConsumer()
 {
-	vm_cache* consumer = (vm_cache*)list_get_first_item(&cache->consumers);
-
-	if (!acquire_unreferenced_cache_ref(consumer))
-		return;
-
-	// In case we managed to grab a reference to the consumerRef,
-	// this doesn't guarantee that we get the cache we wanted
-	// to, so we need to check if this cache is really the last
-	// consumer of the cache we want to merge it with.
-
-	ConditionVariable busyCondition;
-
-	// But since we need to keep the locking order upper->lower cache, we
-	// need to unlock our cache now
-	busyCondition.Publish(cache, "cache");
-	cache->busy = true;
-
-	while (true) {
-		mutex_unlock(&cache->lock);
-
-		mutex_lock(&consumer->lock);
-		mutex_lock(&cache->lock);
-
-		bool isMergeable = is_cache_mergeable(cache);
-		if (isMergeable && consumer == list_get_first_item(&cache->consumers))
-			break;
-
-		// something changed, get rid of the consumer lock and ref
-		mutex_unlock(&consumer->lock);
-		vm_cache_release_ref(consumer);
-
-		if (!isMergeable) {
-			dprintf("merge_cache_with_only_consumer(): cache %p is no longer; "
-				"mergeable\n", cache);
-			cache->busy = false;
-			busyCondition.Unpublish();
-			return;
-		}
-
-		// the cache is still mergeable, just the consumer changed
-		consumer = (vm_cache*)list_get_first_item(&cache->consumers);
-	
-		if (!acquire_unreferenced_cache_ref(consumer))
-			return;
-	}
-
-	consumer = (vm_cache*)list_remove_head_item(&cache->consumers);
+	VMCache* consumer = (VMCache*)list_remove_head_item(&consumers);
 
 	TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
-		cache, cache->ref_count, consumer));
+		this, this->fRefCount, consumer));
 
-	T(Merge(cache, consumer));
+	T(Merge(this, consumer));
 
-	for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
+	for (VMCachePagesTree::Iterator it = pages.GetIterator();
 			vm_page* page = it.Next();) {
 		// Note: Removing the current node while iterating through a
 		// IteratableSplayTree is safe.
-		vm_page* consumerPage = vm_cache_lookup_page(consumer,
+		vm_page* consumerPage = consumer->LookupPage(
 			(off_t)page->cache_offset << PAGE_SHIFT);
 		if (consumerPage == NULL) {
 			// the page is not yet in the consumer cache - move it upwards
-			vm_cache_remove_page(cache, page);
-			vm_cache_insert_page(consumer, page,
-				(off_t)page->cache_offset << PAGE_SHIFT);
+			RemovePage(page);
+			consumer->InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
 		} else if (consumerPage->state == PAGE_STATE_BUSY
 			&& consumerPage->type == PAGE_TYPE_DUMMY) {
 			// the page is currently busy taking a read fault - IOW,
 			// vm_soft_fault() has mapped our page so we can just
 			// move it up
 			//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
-			vm_cache_remove_page(consumer, consumerPage);
+			consumer->RemovePage(consumerPage);
 			consumerPage->state = PAGE_STATE_INACTIVE;
 			((vm_dummy_page*)consumerPage)->busy_condition.Unpublish();
 
-			vm_cache_remove_page(cache, page);
-			vm_cache_insert_page(consumer, page,
-				(off_t)page->cache_offset << PAGE_SHIFT);
+			RemovePage(page);
+			consumer->InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
 #ifdef DEBUG_PAGE_CACHE_TRANSITIONS
 		} else {
 			page->debug_flags = 0;
@@ -528,459 +909,140 @@ merge_cache_with_only_consumer(vm_cache* cache)
 		}
 	}
 
+	// merge the backing store
+	consumer->MergeStore(this);
+
 	// The remaining consumer has got a new source.
-	if (cache->source != NULL) {
-		vm_cache* newSource = cache->source;
+	if (source != NULL) {
+		VMCache* newSource = source;
 
-		mutex_lock(&newSource->lock);
+		newSource->Lock();
 
-		list_remove_item(&newSource->consumers, cache);
+		list_remove_item(&newSource->consumers, this);
 		list_add_item(&newSource->consumers, consumer);
 		consumer->source = newSource;
-		cache->source = NULL;
+		source = NULL;
 
-		mutex_unlock(&newSource->lock);
+		newSource->Unlock();
 	} else
 		consumer->source = NULL;
 
 	// Release the reference the cache's consumer owned. The consumer takes
 	// over the cache's ref to its source (if any) instead.
-if (cache->ref_count < 2)
-panic("cacheRef %p ref count too low!\n", cache);
-	vm_cache_release_ref(cache);
+	ReleaseRefLocked();
 
-	// Unpublishing the condition variable will wake up all threads waiting for
-	// the cache. It will still remain marked busy, though. In fact "busy" is
-	// a misnomer, since it actually means "to be deleted". Any thread we woke
-	// up will not touch the cache anymore, but release its reference and retry
-	// the hierarchy (cf. fault_find_page()).
-	busyCondition.Unpublish();
-
-	mutex_unlock(&consumer->lock);
-	vm_cache_release_ref(consumer);
+	consumer->Unlock();
 }
 
 
-//	#pragma mark -
-
-
-status_t
-vm_cache_init(kernel_args* args)
-{
-	return B_OK;
-}
-
-
-vm_cache*
-vm_cache_create(vm_store* store)
-{
-	vm_cache* cache;
-
-	if (store == NULL) {
-		panic("vm_cache created with NULL store!");
-		return NULL;
-	}
-
-	cache = (vm_cache*)malloc_nogrow(sizeof(vm_cache));
-	if (cache == NULL)
-		return NULL;
-
-	mutex_init(&cache->lock, "vm_cache");
-	list_init_etc(&cache->consumers, offsetof(vm_cache, consumer_link));
-	new(&cache->pages) VMCachePagesTree;
-	cache->areas = NULL;
-	cache->ref_count = 1;
-	cache->source = NULL;
-	cache->virtual_base = 0;
-	cache->virtual_size = 0;
-	cache->temporary = 0;
-	cache->scan_skip = 0;
-	cache->page_count = 0;
-	cache->busy = false;
-
-
-#if DEBUG_CACHE_LIST
-	mutex_lock(&sCacheListLock);
-
-	if (gDebugCacheList)
-		gDebugCacheList->debug_previous = cache;
-	cache->debug_previous = NULL;
-	cache->debug_next = gDebugCacheList;
-	gDebugCacheList = cache;
-
-	mutex_unlock(&sCacheListLock);
-#endif
-
-	// connect the store to its cache
-	cache->store = store;
-	store->cache = cache;
-
-	T(Create(cache, store));
-
-	return cache;
-}
-
-
-void
-vm_cache_acquire_ref(vm_cache* cache)
-{
-	TRACE(("vm_cache_acquire_ref: cache %p, ref will be %ld\n",
-		cache, cache->ref_count + 1));
-
-	if (cache == NULL)
-		panic("vm_cache_acquire_ref: passed NULL\n");
-
-	atomic_add(&cache->ref_count, 1);
-}
-
-
-void
-vm_cache_release_ref(vm_cache* cache)
-{
-	TRACE(("vm_cache_release_ref: cacheRef %p, ref will be %ld\n",
-		cache, cache->ref_count - 1));
-
-	if (cache == NULL)
-		panic("vm_cache_release_ref: passed NULL\n");
-
-	if (atomic_add(&cache->ref_count, -1) != 1) {
-#if 0
-{
-	// count min references to see if everything is okay
-	struct stack_frame {
-		struct stack_frame*	previous;
-		void*				return_address;
-	};
-	int32 min = 0;
-	vm_area* a;
-	vm_cache* c;
-	bool locked = false;
-	if (cacheRef->lock.holder != find_thread(NULL)) {
-		mutex_lock(&cacheRef->lock);
-		locked = true;
-	}
-	for (a = cacheRef->areas; a != NULL; a = a->cache_next)
-		min++;
-	for (c = NULL; (c = list_get_next_item(&cacheRef->cache->consumers, c)) != NULL; )
-		min++;
-	dprintf("! %ld release cache_ref %p, ref_count is now %ld (min %ld, called from %p)\n",
-		find_thread(NULL), cacheRef, cacheRef->ref_count,
-		min, ((struct stack_frame*)x86_read_ebp())->return_address);
-	if (cacheRef->ref_count < min)
-		panic("cache_ref %p has too little ref_count!!!!", cacheRef);
-	if (locked)
-		mutex_unlock(&cacheRef->lock);
-}
-#endif
-		return;
-	}
-
-	// delete this cache
-
-	delete_cache(cache);
-}
-
-
-vm_cache*
-vm_cache_acquire_page_cache_ref(vm_page* page)
-{
-	MutexLocker locker(sCacheListLock);
-
-	vm_cache* cache = page->cache;
-		// Getting/setting the pointer must be atomic on all architectures.
-	if (cache == NULL)
-		return NULL;
-
-	// get a reference
-	if (!acquire_unreferenced_cache_ref(cache))
-		return NULL;
-
-	return cache;
-}
-
-
-vm_page*
-vm_cache_lookup_page(vm_cache* cache, off_t offset)
-{
-	ASSERT_LOCKED_MUTEX(&cache->lock);
-
-	vm_page* page = cache->pages.Lookup((page_num_t)(offset >> PAGE_SHIFT));
-
-	if (page != NULL && cache != page->cache)
-		panic("page %p not in cache %p\n", page, cache);
-
-	return page;
-}
-
-
-void
-vm_cache_insert_page(vm_cache* cache, vm_page* page, off_t offset)
-{
-	TRACE(("vm_cache_insert_page: cache %p, page %p, offset %Ld\n",
-		cache, page, offset));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
-
-	if (page->cache != NULL) {
-		panic("insert page %p into cache %p: page cache is set to %p\n",
-			page, cache, page->cache);
-	}
-
-	T2(InsertPage(cache, page, offset));
-
-	page->cache_offset = (page_num_t)(offset >> PAGE_SHIFT);
-	cache->page_count++;
-	page->usage_count = 2;
-	page->cache = cache;
-
-#if KDEBUG
-	vm_page* otherPage = cache->pages.Lookup(page->cache_offset);
-	if (otherPage != NULL) {
-		panic("vm_cache_insert_page(): there's already page %p with cache "
-			"offset %lu in cache %p; inserting page %p", otherPage,
-			page->cache_offset, cache, page);
-	}
-#endif	// KDEBUG
-
-	cache->pages.Insert(page);
-}
-
-
-/*!	Removes the vm_page from this cache. Of course, the page must
-	really be in this cache or evil things will happen.
-	The cache lock must be held.
+/*!	Removes the \a consumer from this cache.
+	It will also release the reference to the cache owned by the consumer.
+	Assumes you have the consumer's cache lock held. This cache must not be
+	locked.
 */
 void
-vm_cache_remove_page(vm_cache* cache, vm_page* page)
+VMCache::_RemoveConsumer(VMCache* consumer)
 {
-	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cache, page));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
+	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, this));
+	consumer->AssertLocked();
 
-	if (page->cache != cache) {
-		panic("remove page %p from cache %p: page cache is set to %p\n", page,
-			cache, page->cache);
-	}
-
-	T2(RemovePage(cache, page));
-
-	cache->pages.Remove(page);
-	page->cache = NULL;
-	cache->page_count--;
-}
-
-
-status_t
-vm_cache_write_modified(vm_cache* cache, bool fsReenter)
-{
-	TRACE(("vm_cache_write_modified(cache = %p)\n", cache));
-
-	if (cache->temporary)
-		return B_OK;
-
-	mutex_lock(&cache->lock);
-	status_t status = vm_page_write_modified_pages(cache, fsReenter);
-	mutex_unlock(&cache->lock);
-
-	return status;
-}
-
-
-/*!	Commits the memory to the store if the \a commitment is larger than
-	what's committed already.
-	Assumes you have the \a ref's lock held.
-*/
-status_t
-vm_cache_set_minimal_commitment_locked(vm_cache* cache, off_t commitment)
-{
-	TRACE(("vm_cache_set_minimal_commitment_locked(cache %p, commitment %Ld)\n",
-		cache, commitment));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
-
-	T(SetMinimalCommitment(cache, commitment));
-
-	vm_store* store = cache->store;
-	status_t status = B_OK;
-
-	// If we don't have enough committed space to cover through to the new end
-	// of the area...
-	if (store->committed_size < commitment) {
-		// ToDo: should we check if the cache's virtual size is large
-		//	enough for a commitment of that size?
-
-		// try to commit more memory
-		status = store->ops->commit(store, commitment);
-	}
-
-	return status;
-}
-
-
-/*!	This function updates the size field of the vm_cache structure.
-	If needed, it will free up all pages that don't belong to the cache anymore.
-	The cache lock must be held when you call it.
-	Since removed pages don't belong to the cache any longer, they are not
-	written back before they will be removed.
-
-	Note, this function way temporarily release the cache lock in case it
-	has to wait for busy pages.
-*/
-status_t
-vm_cache_resize(vm_cache* cache, off_t newSize)
-{
-	TRACE(("vm_cache_resize(cache %p, newSize %Ld) old size %Ld\n",
-		cache, newSize, cache->virtual_size));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
-
-	T(Resize(cache, newSize));
-
-	status_t status = cache->store->ops->commit(cache->store, newSize);
-	if (status != B_OK)
-		return status;
-
-	uint32 oldPageCount = (uint32)((cache->virtual_size + B_PAGE_SIZE - 1)
-		>> PAGE_SHIFT);
-	uint32 newPageCount = (uint32)((newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
-
-	if (newPageCount < oldPageCount) {
-		// we need to remove all pages in the cache outside of the new virtual
-		// size
-		for (VMCachePagesTree::Iterator it
-					= cache->pages.GetIterator(newPageCount, true, true);
-				vm_page* page = it.Next();) {
-			if (page->state == PAGE_STATE_BUSY) {
-				if (page->busy_writing) {
-					// We cannot wait for the page to become available
-					// as we might cause a deadlock this way
-					page->busy_writing = false;
-						// this will notify the writer to free the page
-				} else {
-					// wait for page to become unbusy
-					ConditionVariableEntry entry;
-					entry.Add(page);
-					mutex_unlock(&cache->lock);
-					entry.Wait();
-					mutex_lock(&cache->lock);
-
-					// restart from the start of the list
-					it = cache->pages.GetIterator(newPageCount, true, true);
-				}
-				continue;
-			}
-
-			// remove the page and put it into the free queue
-			vm_cache_remove_page(cache, page);
-			vm_page_free(cache, page);
-				// Note: When iterating through a IteratableSplayTree
-				// removing the current node is safe.
-		}
-	}
-
-	cache->virtual_size = newSize;
-	return B_OK;
-}
-
-
-/*!	Removes the \a consumer from the \a cache.
-	It will also release the reference to the cacheRef owned by the consumer.
-	Assumes you have the consumer's cache lock held.
-*/
-void
-vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
-{
-	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cache));
-	ASSERT_LOCKED_MUTEX(&consumer->lock);
-
-	T(RemoveConsumer(cache, consumer));
+	T(RemoveConsumer(this, consumer));
 
 	// Remove the store ref before locking the cache. Otherwise we'd call into
 	// the VFS while holding the cache lock, which would reverse the usual
 	// locking order.
-	if (cache->store->ops->release_ref)
-		cache->store->ops->release_ref(cache->store);
+	ReleaseStoreRef();
 
 	// remove the consumer from the cache, but keep its reference until later
-	mutex_lock(&cache->lock);
-	list_remove_item(&cache->consumers, consumer);
+	Lock();
+	list_remove_item(&consumers, consumer);
 	consumer->source = NULL;
 
-	// merge cache, if possible
-	if (is_cache_mergeable(cache))
-		merge_cache_with_only_consumer(cache);
-
-	mutex_unlock(&cache->lock);
-	vm_cache_release_ref(cache);
+	ReleaseRefAndUnlock();
 }
 
 
-/*!	Marks the \a cache as source of the \a consumer cache,
-	and adds the \a consumer to its list.
-	This also grabs a reference to the source cache.
-	Assumes you have the cache and the consumer's lock held.
-*/
-void
-vm_cache_add_consumer_locked(vm_cache* cache, vm_cache* consumer)
+// #pragma mark - VMCacheFactory
+	// TODO: Move to own source file!
+
+
+#include <heap.h>
+
+#include "VMAnonymousNoSwapCache.h"
+#include "VMDeviceCache.h"
+#include "VMNullCache.h"
+#include "../cache/vnode_store.h"
+
+
+/*static*/ status_t
+VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
+	int32 numPrecommittedPages, int32 numGuardPages)
 {
-	TRACE(("add consumer vm cache %p to cache %p\n", consumer, cache));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
-	ASSERT_LOCKED_MUTEX(&consumer->lock);
+	VMAnonymousNoSwapCache* cache = new(nogrow) VMAnonymousNoSwapCache;
+	if (cache == NULL)
+		return B_NO_MEMORY;
 
-	T(AddConsumer(cache, consumer));
+	status_t error = cache->Init(canOvercommit, numPrecommittedPages,
+		numGuardPages);
+	if (error != B_OK) {
+		cache->Delete();
+		return error;
+	}
 
-	consumer->source = cache;
-	list_add_item(&cache->consumers, consumer);
-
-	vm_cache_acquire_ref(cache);
-
-	if (cache->store->ops->acquire_ref != NULL)
-		cache->store->ops->acquire_ref(cache->store);
-}
-
-
-/*!	Adds the \a area to the \a cache.
-	Assumes you have the locked the cache.
-*/
-status_t
-vm_cache_insert_area_locked(vm_cache* cache, vm_area* area)
-{
-	TRACE(("vm_cache_insert_area_locked(cache %p, area %p)\n", cache, area));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
-
-	T(InsertArea(cache, area));
-
-	area->cache_next = cache->areas;
-	if (area->cache_next)
-		area->cache_next->cache_prev = area;
-	area->cache_prev = NULL;
-	cache->areas = area;
-
-	if (cache->store->ops->acquire_ref != NULL)
-		cache->store->ops->acquire_ref(cache->store);
-
+	_cache = cache;
 	return B_OK;
 }
 
 
-status_t
-vm_cache_remove_area(vm_cache* cache, vm_area* area)
+/*static*/ status_t
+VMCacheFactory::CreateVnodeCache(VMCache*& _cache, struct vnode* vnode)
 {
-	TRACE(("vm_cache_remove_area(cache %p, area %p)\n", cache, area));
+	VMVnodeCache* cache = new(nogrow) VMVnodeCache;
+	if (cache == NULL)
+		return B_NO_MEMORY;
 
-	T(RemoveArea(cache, area));
+	status_t error = cache->Init(vnode);
+	if (error != B_OK) {
+		cache->Delete();
+		return error;
+	}
 
-	MutexLocker locker(cache->lock);
+	_cache = cache;
+	return B_OK;
+}
 
-	if (area->cache_prev)
-		area->cache_prev->cache_next = area->cache_next;
-	if (area->cache_next)
-		area->cache_next->cache_prev = area->cache_prev;
-	if (cache->areas == area)
-		cache->areas = area->cache_next;
 
-	if (cache->store->ops->release_ref)
-		cache->store->ops->release_ref(cache->store);
+/*static*/ status_t
+VMCacheFactory::CreateDeviceCache(VMCache*& _cache, addr_t baseAddress)
+{
+	VMDeviceCache* cache = new(nogrow) VMDeviceCache;
+	if (cache == NULL)
+		return B_NO_MEMORY;
 
-	// merge cache, if possible
-	if (is_cache_mergeable(cache))
-		merge_cache_with_only_consumer(cache);
+	status_t error = cache->Init(baseAddress);
+	if (error != B_OK) {
+		cache->Delete();
+		return error;
+	}
 
+	_cache = cache;
+	return B_OK;
+}
+
+
+/*static*/ status_t
+VMCacheFactory::CreateNullCache(VMCache*& _cache)
+{
+	VMNullCache* cache = new(nogrow) VMNullCache;
+	if (cache == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = cache->Init();
+	if (error != B_OK) {
+		cache->Delete();
+		return error;
+	}
+
+	_cache = cache;
 	return B_OK;
 }

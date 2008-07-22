@@ -29,6 +29,7 @@ KernelMergeObject kernel_core.o :
 	kernel_daemon.cpp
 	linkhack.c
 	lock.cpp
+	low_resource_manager.cpp
 	main.cpp
 	module.cpp
 	Notifications.cpp

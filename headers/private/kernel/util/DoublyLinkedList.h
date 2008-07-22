@@ -484,34 +484,20 @@ void
 DOUBLY_LINKED_LIST_CLASS_NAME::Swap(Element *a, Element *b)
 {
 	if (a && b && a != b) {
-		Link *aLink = sGetLink(a);
-		Link *bLink = sGetLink(b);
-		Element *aPrev = aLink->previous;
-		Element *bPrev = bLink->previous;
-		Element *aNext = aLink->next;
-		Element *bNext = bLink->next;
-		// place a
-		if (bPrev)
-			sGetLink(bPrev)->next = a;
-		else
-			fFirst = a;
-		if (bNext)
-			sGetLink(bNext)->previous = a;
-		else
-			fLast = a;
-		aLink->previous = bPrev;
-		aLink->next = bNext;
-		// place b
-		if (aPrev)
-			sGetLink(aPrev)->next = b;
-		else
-			fFirst = b;
-		if (aNext)
-			sGetLink(aNext)->previous = b;
-		else
-			fLast = b;
-		bLink->previous = aPrev;
-		bLink->next = aNext;
+		Element *aNext = sGetLink(a)->next;
+		Element *bNext = sGetLink(b)->next;
+		if (a == bNext) {
+			Remove(a);
+			Insert(b, a);
+		} else if (b == aNext) {
+			Remove(b);
+			Insert(a, b);
+		} else {
+			Remove(a);
+			Remove(b);
+			Insert(aNext, b);
+			Insert(bNext, a);
+		}
 	}
 }
 

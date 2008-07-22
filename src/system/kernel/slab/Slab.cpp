@@ -6,6 +6,7 @@
  */
 
 
+#include <Slab.h>
 #include "slab_private.h"
 
 #include <algorithm>
@@ -17,14 +18,13 @@
 
 #include <Depot.h>
 #include <kernel.h>
-#include <Slab.h>
+#include <low_resource_manager.h>
 #include <smp.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 #include <vm.h>
-#include <vm_low_memory.h>
 
 
 // TODO kMagazineCapacity should be dynamically tuned per cache.
@@ -477,9 +477,9 @@ early_free_pages(object_cache *cache, void *pages)
 
 
 static void
-object_cache_low_memory(void *_self, int32 level)
+object_cache_low_memory(void *_self, uint32 resources, int32 level)
 {
-	if (level == B_NO_LOW_MEMORY)
+	if (level == B_NO_LOW_RESOURCE)
 		return;
 
 	object_cache *cache = (object_cache *)_self;
@@ -497,11 +497,11 @@ object_cache_low_memory(void *_self, int32 level)
 	size_t minimumAllowed;
 
 	switch (level) {
-	case B_LOW_MEMORY_NOTE:
+	case B_LOW_RESOURCE_NOTE:
 		minimumAllowed = cache->pressure / 2 + 1;
 		break;
 
-	case B_LOW_MEMORY_WARNING:
+	case B_LOW_RESOURCE_WARNING:
 		cache->pressure /= 2;
 		minimumAllowed = 0;
 		break;
@@ -594,7 +594,8 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 		cache->free_pages = area_free_pages;
 	}
 
-	register_low_memory_handler(object_cache_low_memory, cache, 5);
+	register_low_resource_handler(object_cache_low_memory, cache, 
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 5);
 
 	MutexLocker _(sObjectCacheListLock);
 	sObjectCaches.Add(cache);
@@ -745,7 +746,7 @@ delete_object_cache(object_cache *cache)
 	if (!(cache->flags & CACHE_NO_DEPOT))
 		object_depot_destroy(&cache->depot);
 
-	unregister_low_memory_handler(object_cache_low_memory, cache);
+	unregister_low_resource_handler(object_cache_low_memory, cache);
 
 	if (!cache->full.IsEmpty())
 		panic("cache destroy: still has full slabs");

@@ -37,7 +37,7 @@ struct net_stat;
 struct pollfd;
 struct selectsync;
 struct select_info;
-struct vm_cache;
+struct VMCache;
 struct vnode;
 
 
@@ -97,7 +97,7 @@ status_t vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos,
 			const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
 status_t vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos,
 			const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
-status_t vfs_get_vnode_cache(struct vnode *vnode, struct vm_cache **_cache,
+status_t vfs_get_vnode_cache(struct vnode *vnode, struct VMCache **_cache,
 			bool allocate);
 status_t vfs_get_file_map(struct vnode *vnode, off_t offset, size_t size,
 			struct file_io_vec *vecs, size_t *_count);

@@ -49,8 +49,6 @@ extern status_t file_map_init(void);
 extern status_t file_cache_init_post_boot_device(void);
 extern status_t file_cache_init(void);
 
-extern vm_store *vm_create_vnode_store(struct vnode *vnode);
-
 #ifdef __cplusplus
 }
 #endif

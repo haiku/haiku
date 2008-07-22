@@ -13,6 +13,7 @@
 #include <arch/vm_translation_map.h>
 #include <condition_variable.h>
 #include <kernel.h>
+#include <lock.h>
 #include <util/DoublyLinkedQueue.h>
 
 #include <sys/uio.h>
@@ -34,6 +35,7 @@
 #include <util/SplayTree.h>
 
 struct vm_page_mapping;
+struct VMCache;
 typedef DoublyLinkedListLink<vm_page_mapping> vm_page_mapping_link;
 
 typedef struct vm_page_mapping {
@@ -80,7 +82,7 @@ struct vm_page {
 
 	addr_t				physical_page_number;
 
-	struct vm_cache		*cache;
+	VMCache				*cache;
 	page_num_t			cache_offset;
 							// in page size units
 
@@ -165,35 +167,120 @@ struct VMCachePagesTreeDefinition {
 
 typedef IteratableSplayTree<VMCachePagesTreeDefinition> VMCachePagesTree;
 
-struct vm_cache {
-	mutex				lock;
+struct VMCache {
+public:
+	VMCache();
+	virtual ~VMCache();
+
+	status_t Init(uint32 cacheType);
+
+	virtual	void		Delete();
+
+			bool		Lock()
+							{ return mutex_lock(&fLock) == B_OK; }
+			bool		TryLock()
+							{ return mutex_trylock(&fLock) == B_OK; }
+			bool		SwitchLock(mutex* from)
+							{ return mutex_switch_lock(from, &fLock) == B_OK; }
+			void		Unlock();
+			void		AssertLocked()
+							{ ASSERT_LOCKED_MUTEX(&fLock); }
+
+			void		AcquireRefLocked();
+			void		AcquireRef();
+			void		ReleaseRefLocked();
+			void		ReleaseRef();
+			void		ReleaseRefAndUnlock()
+							{ ReleaseRefLocked(); Unlock(); }
+
+			vm_page*	LookupPage(off_t offset);
+			void		InsertPage(vm_page* page, off_t offset);
+			void		RemovePage(vm_page* page);
+
+			void		AddConsumer(VMCache* consumer);
+
+			status_t	InsertAreaLocked(vm_area* area);
+			status_t	RemoveArea(vm_area* area);
+
+			status_t	WriteModified(bool fsReenter);
+			status_t	SetMinimalCommitment(off_t commitment);
+			status_t	Resize(off_t newSize);
+
+			// for debugging only
+			mutex*		GetLock()
+							{ return &fLock; }
+			int32		RefCount() const
+							{ return fRefCount; }
+
+	// backing store operations
+	virtual	status_t	Commit(off_t size);
+	virtual	bool		HasPage(off_t offset);
+
+	virtual	status_t	Read(off_t offset, const iovec *vecs, size_t count,
+							size_t *_numBytes, bool fsReenter);
+	virtual	status_t	Write(off_t offset, const iovec *vecs, size_t count,
+							size_t *_numBytes, bool fsReenter);
+
+	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
+
+	virtual	void		MergeStore(VMCache* source);
+
+	virtual	status_t	AcquireUnreferencedStoreRef();
+	virtual	void		AcquireStoreRef();
+	virtual	void		ReleaseStoreRef();
+
+private:
+	inline	bool		_IsMergeable() const;
+
+			void		_MergeWithOnlyConsumer();
+			void		_RemoveConsumer(VMCache* consumer);
+
+
+public:
 	struct vm_area		*areas;
-	vint32				ref_count;
 	struct list_link	consumer_link;
 	struct list			consumers;
 		// list of caches that use this cache as a source
 	VMCachePagesTree	pages;
-	struct vm_cache		*source;
-	struct vm_store		*store;
+	VMCache				*source;
 	off_t				virtual_base;
-	off_t				virtual_size;
-		// the size is absolute, and independent from virtual_base
+	off_t				virtual_end;
+	off_t				committed_size;
+		// TODO: Remove!
 	uint32				page_count;
 	uint32				temporary : 1;
 	uint32				scan_skip : 1;
-	uint32				busy : 1;
-	uint32				type : 5;
+	uint32				type : 6;
 
 #if DEBUG_CACHE_LIST
-	struct vm_cache*	debug_previous;
-	struct vm_cache*	debug_next;
+	struct VMCache*		debug_previous;
+	struct VMCache*		debug_next;
 #endif
+
+private:
+	int32				fRefCount;
+	mutex				fLock;
 };
+
+typedef VMCache vm_cache;
+	// TODO: Remove!
 
 
 #if DEBUG_CACHE_LIST
 extern vm_cache* gDebugCacheList;
 #endif
+
+
+class VMCacheFactory {
+public:
+	static	status_t	CreateAnonymousCache(VMCache*& cache,
+							bool canOvercommit, int32 numPrecommittedPages,
+							int32 numGuardPages);
+	static	status_t	CreateVnodeCache(VMCache*& cache, struct vnode* vnode);
+	static	status_t	CreateDeviceCache(VMCache*& cache, addr_t baseAddress);
+	static	status_t	CreateNullCache(VMCache*& cache);
+};
+
 
 struct vm_area {
 	char				*name;
@@ -204,7 +291,7 @@ struct vm_area {
 	uint16				wiring;
 	uint16				memory_type;
 
-	struct vm_cache		*cache;
+	VMCache				*cache;
 	vint32				no_cache_change;
 	off_t				cache_offset;
 	uint32				cache_type;
@@ -238,26 +325,5 @@ struct vm_address_space {
 	int32				state;
 	struct vm_address_space *hash_next;
 };
-
-struct vm_store {
-	struct vm_store_ops	*ops;
-	struct vm_cache		*cache;
-	off_t				committed_size;
-};
-
-typedef struct vm_store_ops {
-	void (*destroy)(struct vm_store *backingStore);
-	status_t (*commit)(struct vm_store *backingStore, off_t size);
-	bool (*has_page)(struct vm_store *backingStore, off_t offset);
-	status_t (*read)(struct vm_store *backingStore, off_t offset,
-		const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
-	status_t (*write)(struct vm_store *backingStore, off_t offset,
-		const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
-	status_t (*fault)(struct vm_store *backingStore,
-		struct vm_address_space *aspace, off_t offset);
-	status_t (*acquire_unreferenced_ref)(struct vm_store *backingStore);
-	void (*acquire_ref)(struct vm_store *backingStore);
-	void (*release_ref)(struct vm_store *backingStore);
-} vm_store_ops;
 
 #endif	/* _KERNEL_VM_TYPES_H */

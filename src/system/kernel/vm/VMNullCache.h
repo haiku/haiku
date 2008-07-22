@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -8,13 +9,13 @@
 #ifndef _KERNEL_VM_STORE_NULL_H
 #define _KERNEL_VM_STORE_NULL_H
 
-
 #include <vm_types.h>
 
 
-#ifdef __cplusplus
-extern "C"
-#endif
-struct vm_store *vm_store_create_null(void);
+class VMNullCache : public VMCache {
+public:
+	status_t	Init();
+};
+
 
 #endif	/* _KERNEL_VM_STORE_NULL_H */

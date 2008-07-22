@@ -7,11 +7,11 @@ KernelMergeObject kernel_vm.o :
 	vm_address_space.cpp
 	vm_cache.cpp
 	vm_daemons.cpp
-	vm_low_memory.cpp
 	vm_page.cpp
-	vm_store_anonymous_noswap.cpp
-	vm_store_device.c
-	vm_store_null.c
+	VMAnonymousCache.cpp
+	VMAnonymousNoSwapCache.cpp
+	VMDeviceCache.cpp
+	VMNullCache.cpp
 	#vm_tests.c
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)

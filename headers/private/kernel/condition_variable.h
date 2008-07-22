@@ -61,6 +61,10 @@ public:
 
 			void				Add(ConditionVariableEntry* entry);
 
+			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
+									// all-in one, i.e. doesn't need a
+									// ConditionVariableEntry
+
 			const void*			Object() const	{ return fObject; }
 
 	static	void				ListAll();

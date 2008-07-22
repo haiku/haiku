@@ -53,13 +53,13 @@ typedef struct rw_lock {
 #define RW_LOCK_FLAG_CLONE_NAME	0x1
 
 
-#if 0 && KDEBUG // XXX disable this for now, it causes problems when including thread.h here
-#	include <thread.h>
-#define ASSERT_LOCKED_RECURSIVE(r) { ASSERT(thread_get_current_thread_id() == (r)->holder); }
-#define ASSERT_LOCKED_MUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
+#if KDEBUG
+#	define ASSERT_LOCKED_RECURSIVE(r) \
+		{ ASSERT(find_thread(NULL) == (r)->lock.holder); }
+#	define ASSERT_LOCKED_MUTEX(m) { ASSERT(find_thread(NULL) == (m)->holder); }
 #else
-#define ASSERT_LOCKED_RECURSIVE(r)
-#define ASSERT_LOCKED_MUTEX(m)
+#	define ASSERT_LOCKED_RECURSIVE(r)	do {} while (false)
+#	define ASSERT_LOCKED_MUTEX(m)		do {} while (false)
 #endif
 
 
@@ -102,10 +102,15 @@ extern void mutex_init(mutex* lock, const char* name);
 	// name is *not* cloned nor freed in mutex_destroy()
 extern void mutex_init_etc(mutex* lock, const char* name, uint32 flags);
 extern void mutex_destroy(mutex* lock);
+extern status_t mutex_switch_lock(mutex* from, mutex* to);
+	// Unlocks "from" and locks "to" such that unlocking and starting to wait
+	// for the lock is atomically. I.e. if "from" guards the object "to" belongs
+	// to, the operation is safe as long as "from" is held while destroying
+	// "to".
 
 // implementation private:
 extern status_t _mutex_lock(mutex* lock, bool threadsLocked);
-extern void _mutex_unlock(mutex* lock);
+extern void _mutex_unlock(mutex* lock, bool threadsLocked);
 extern status_t _mutex_trylock(mutex* lock);
 
 
@@ -151,12 +156,10 @@ mutex_trylock(mutex* lock)
 static inline void
 mutex_unlock(mutex* lock)
 {
-#ifdef KDEBUG
-	_mutex_unlock(lock);
-#else
+#if !defined(KDEBUG)
 	if (atomic_add(&lock->count, 1) < -1)
-		_mutex_unlock(lock);
 #endif
+		_mutex_unlock(lock, false);
 }
 
 

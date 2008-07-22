@@ -40,6 +40,7 @@
 #include <khash.h>
 #include <KPath.h>
 #include <lock.h>
+#include <low_resource_manager.h>
 #include <syscalls.h>
 #include <syscall_restart.h>
 #include <util/AutoLock.h>
@@ -47,7 +48,6 @@
 #include <vfs.h>
 #include <vm.h>
 #include <vm_cache.h>
-#include <vm_low_memory.h>
 
 #include "fifo.h"
 
@@ -767,7 +767,7 @@ free_vnode(struct vnode *vnode, bool reenter)
 
 	// if we have a vm_cache attached, remove it
 	if (vnode->cache)
-		vm_cache_release_ref(vnode->cache);
+		vnode->cache->ReleaseRef();
 
 	vnode->cache = NULL;
 
@@ -814,10 +814,12 @@ dec_vnode_ref_count(struct vnode *vnode, bool alwaysFree, bool reenter)
 		} else {
 			list_add_item(&sUnusedVnodeList, vnode);
 			if (++sUnusedVnodes > kMaxUnusedVnodes
-				&& vm_low_memory_state() != B_NO_LOW_MEMORY) {
+				&& low_resource_state(
+					B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)
+						!= B_NO_LOW_RESOURCE) {
 				// there are too many unused vnodes so we free the oldest one
-				// ToDo: evaluate this mechanism
-				vnode = (struct vnode *)list_remove_head_item(&sUnusedVnodeList);
+				// TODO: evaluate this mechanism
+				vnode = (struct vnode*)list_remove_head_item(&sUnusedVnodeList);
 				vnode->busy = true;
 				freeNode = true;
 				sUnusedVnodes--;
@@ -1015,21 +1017,21 @@ put_vnode(struct vnode *vnode)
 
 
 static void
-vnode_low_memory_handler(void */*data*/, int32 level)
+vnode_low_resource_handler(void */*data*/, uint32 resources, int32 level)
 {
-	TRACE(("vnode_low_memory_handler(level = %ld)\n", level));
+	TRACE(("vnode_low_resource_handler(level = %ld)\n", level));
 
 	uint32 count = 1;
 	switch (level) {
-		case B_NO_LOW_MEMORY:
+		case B_NO_LOW_RESOURCE:
 			return;
-		case B_LOW_MEMORY_NOTE:
+		case B_LOW_RESOURCE_NOTE:
 			count = sUnusedVnodes / 100;
 			break;
-		case B_LOW_MEMORY_WARNING:
+		case B_LOW_RESOURCE_WARNING:
 			count = sUnusedVnodes / 10;
 			break;
-		case B_LOW_MEMORY_CRITICAL:
+		case B_LOW_RESOURCE_CRITICAL:
 			count = sUnusedVnodes;
 			break;
 	}
@@ -1054,7 +1056,7 @@ vnode_low_memory_handler(void */*data*/, int32 level)
 		mutex_unlock(&sVnodeMutex);
 
 		if (vnode->cache != NULL)
-			vm_cache_write_modified(vnode->cache, false);
+			vnode->cache->WriteModified(false);
 
 		dec_vnode_ref_count(vnode, true, false);
 			// this should free the vnode when it's still unused
@@ -2788,7 +2790,7 @@ dump_vnode_caches(int argc, char **argv)
 			continue;
 
 		kprintf("%p%4ld%10Ld %p %8Ld%8ld\n", vnode, vnode->device, vnode->id,
-			vnode->cache, (vnode->cache->virtual_size + B_PAGE_SIZE - 1)
+			vnode->cache, (vnode->cache->virtual_end + B_PAGE_SIZE - 1)
 				/ B_PAGE_SIZE, vnode->cache->page_count);
 	}
 
@@ -3868,7 +3870,8 @@ vfs_disconnect_vnode(dev_t mountID, ino_t vnodeID)
 extern "C" void
 vfs_free_unused_vnodes(int32 level)
 {
-	vnode_low_memory_handler(NULL, level);
+	vnode_low_resource_handler(NULL,
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, level);
 }
 
 
@@ -3914,7 +3917,7 @@ extern "C" status_t
 vfs_get_vnode_cache(struct vnode *vnode, vm_cache **_cache, bool allocate)
 {
 	if (vnode->cache != NULL) {
-		vm_cache_acquire_ref(vnode->cache);
+		vnode->cache->AcquireRef();
 		*_cache = vnode->cache;
 		return B_OK;
 	}
@@ -3940,12 +3943,13 @@ vfs_get_vnode_cache(struct vnode *vnode, vm_cache **_cache, bool allocate)
 			status = B_BAD_VALUE;
 	}
 
+	mutex_unlock(&sVnodeMutex);
+
 	if (status == B_OK) {
-		vm_cache_acquire_ref(vnode->cache);
+		vnode->cache->AcquireRef();
 		*_cache = vnode->cache;
 	}
 
-	mutex_unlock(&sVnodeMutex);
 	return status;
 }
 
@@ -4392,7 +4396,8 @@ vfs_init(kernel_args *args)
 	add_debugger_command("vnode_usage", &dump_vnode_usage, "info about vnode usage");
 #endif
 
-	register_low_memory_handler(&vnode_low_memory_handler, NULL, 0);
+	register_low_resource_handler(&vnode_low_resource_handler, NULL,
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 0);
 
 	file_map_init();
 
@@ -6707,7 +6712,7 @@ fs_sync(dev_t device)
 				put_vnode(previousVnode);
 
 			if (vnode->cache != NULL)
-				vm_cache_write_modified(vnode->cache, false);
+				vnode->cache->WriteModified(false);
 
 			// the next vnode might change until we lock the vnode list again,
 			// but this vnode won't go away since we keep a reference to it.

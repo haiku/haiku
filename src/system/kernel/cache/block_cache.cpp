@@ -17,7 +17,7 @@
 
 #include <condition_variable.h>
 #include <lock.h>
-#include <vm_low_memory.h>
+#include <low_resource_manager.h>
 #include <slab/Slab.h>
 #include <tracing.h>
 #include <util/kernel_cpp.h>
@@ -129,7 +129,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	void Free(void *buffer);
 	void *Allocate();
 
-	static void LowMemoryHandler(void *data, int32 level);
+	static void LowMemoryHandler(void *data, uint32 resources, int32 level);
 
 private:
 	cached_block *_GetUnusedBlock();
@@ -793,7 +793,8 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 		return;
 
 	mutex_init(&lock, "block cache");
-	register_low_memory_handler(&block_cache::LowMemoryHandler, this, 0);
+	register_low_resource_handler(&block_cache::LowMemoryHandler, this,
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 0);
 }
 
 
@@ -802,7 +803,7 @@ block_cache::~block_cache()
 {
 	deleting = true;
 
-	unregister_low_memory_handler(&block_cache::LowMemoryHandler, this);
+	unregister_low_resource_handler(&block_cache::LowMemoryHandler, this);
 
 	mutex_destroy(&lock);
 
@@ -965,7 +966,7 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 
 
 void
-block_cache::LowMemoryHandler(void *data, int32 level)
+block_cache::LowMemoryHandler(void *data, uint32 resources, int32 level)
 {
 	block_cache *cache = (block_cache *)data;
 	MutexLocker locker(&cache->lock);
@@ -984,18 +985,19 @@ block_cache::LowMemoryHandler(void *data, int32 level)
 
 	int32 free = 1;
 	int32 accessed = 1;
-	switch (vm_low_memory_state()) {
-		case B_NO_LOW_MEMORY:
+	switch (low_resource_state(
+			B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)) {
+		case B_NO_LOW_RESOURCE:
 			return;
-		case B_LOW_MEMORY_NOTE:
+		case B_LOW_RESOURCE_NOTE:
 			free = 50;
 			accessed = 2;
 			break;
-		case B_LOW_MEMORY_WARNING:
+		case B_LOW_RESOURCE_WARNING:
 			free = 200;
 			accessed = 10;
 			break;
-		case B_LOW_MEMORY_CRITICAL:
+		case B_LOW_RESOURCE_CRITICAL:
 			free = LONG_MAX;
 			accessed = LONG_MAX;
 			break;
@@ -1052,16 +1054,17 @@ if (block->original_data != NULL || block->parent_data != NULL)
 	// (if there is enough memory left, we don't free any)
 
 	int32 free = 1;
-	switch (vm_low_memory_state()) {
-		case B_NO_LOW_MEMORY:
+	switch (low_resource_state(
+			B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)) {
+		case B_NO_LOW_RESOURCE:
 			return;
-		case B_LOW_MEMORY_NOTE:
+		case B_LOW_RESOURCE_NOTE:
 			free = 1;
 			break;
-		case B_LOW_MEMORY_WARNING:
+		case B_LOW_RESOURCE_WARNING:
 			free = 5;
 			break;
-		case B_LOW_MEMORY_CRITICAL:
+		case B_LOW_RESOURCE_CRITICAL:
 			free = 20;
 			break;
 	}

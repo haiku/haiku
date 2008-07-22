@@ -13,7 +13,6 @@
 #include <vm.h>
 #include <vm_priv.h>
 #include <vm_cache.h>
-#include <vm_low_memory.h>
 #include <vm_page.h>
 
 
@@ -61,21 +60,12 @@ PageCacheLocker::Lock(vm_page* page, bool dontWait)
 		return false;
 
 	// Grab a reference to this cache.
-	vm_cache* cache = vm_cache_acquire_page_cache_ref(page);
+	vm_cache* cache = vm_cache_acquire_locked_page_cache(page, dontWait);
 	if (cache == NULL)
 		return false;
 
-	if (dontWait) {
-		if (mutex_trylock(&cache->lock) != B_OK) {
-			vm_cache_release_ref(cache);
-			return false;
-		}
-	} else
-		mutex_lock(&cache->lock);
-
-	if (cache != page->cache || _IgnorePage(page)) {
-		mutex_unlock(&cache->lock);
-		vm_cache_release_ref(cache);
+	if (_IgnorePage(page)) {
+		cache->ReleaseRefAndUnlock();
 		return false;
 	}
 
@@ -90,9 +80,7 @@ PageCacheLocker::Unlock()
 	if (fPage == NULL)
 		return;
 
-	vm_cache* cache = fPage->cache;
-	mutex_unlock(&cache->lock);
-	vm_cache_release_ref(cache);
+	fPage->cache->ReleaseRefAndUnlock();
 
 	fPage = NULL;
 }

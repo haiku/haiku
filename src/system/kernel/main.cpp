@@ -32,6 +32,7 @@
 #include <kscheduler.h>
 #include <ksyscalls.h>
 #include <lock.h>
+#include <low_resource_manager.h>
 #include <messaging.h>
 #include <Notifications.h>
 #include <port.h>
@@ -128,6 +129,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		vm_init(&sKernelArgs);
 			// Before vm_init_post_sem() is called, we have to make sure that
 			// the boot loader allocated region is not used anymore
+		low_resource_manager_init();
 
 		// now we can use the heap and create areas
 		arch_platform_init_post_vm(&sKernelArgs);
@@ -174,6 +176,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);
+		low_resource_manager_init_post_thread();
 		TRACE("init ELF loader\n");
 		elf_init(&sKernelArgs);
 		TRACE("init scheduler\n");

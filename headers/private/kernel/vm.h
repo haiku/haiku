@@ -17,7 +17,7 @@
 struct kernel_args;
 struct team;
 struct vm_page;
-struct vm_cache;
+struct VMCache;
 struct vm_area;
 struct vm_address_space;
 struct vnode;
@@ -60,8 +60,8 @@ area_id vm_map_physical_memory(team_id team, const char *name, void **address,
 area_id vm_map_file(team_id aid, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, uint32 mapping,
 			int fd, off_t offset);
-struct vm_cache *vm_area_get_locked_cache(struct vm_area *area);
-void vm_area_put_locked_cache(struct vm_cache *cache);
+struct VMCache *vm_area_get_locked_cache(struct vm_area *area);
+void vm_area_put_locked_cache(struct VMCache *cache);
 area_id vm_create_null_area(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size);
 area_id vm_copy_area(team_id team, const char *name, void **_address,
@@ -70,7 +70,7 @@ area_id vm_clone_area(team_id team, const char *name, void **address,
 			uint32 addressSpec, uint32 protection, uint32 mapping,
 			area_id sourceArea, bool kernel);
 status_t vm_delete_area(team_id teamID, area_id areaID, bool kernel);
-status_t vm_create_vnode_cache(struct vnode *vnode, struct vm_cache **_cache);
+status_t vm_create_vnode_cache(struct vnode *vnode, struct VMCache **_cache);
 struct vm_area *vm_area_lookup(struct vm_address_space *addressSpace,
 			addr_t address);
 status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
@@ -87,6 +87,7 @@ status_t vm_get_physical_page(addr_t paddr, addr_t *vaddr, uint32 flags);
 status_t vm_put_physical_page(addr_t vaddr);
 
 off_t vm_available_memory(void);
+off_t vm_available_not_needed_memory(void);
 
 // user syscalls
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,

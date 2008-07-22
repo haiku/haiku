@@ -44,4 +44,21 @@ status_t heap_init_post_thread();
 }
 #endif
 
+
+#ifdef __cplusplus
+
+#include <new>
+
+static const struct nogrow_t {
+} nogrow = {};
+
+inline void*
+operator new(size_t size, const nogrow_t& nogrow)
+{
+	return malloc_nogrow(size);
+}
+
+#endif	/* __cplusplus */
+
+
 #endif	/* _KERNEL_MEMHEAP_H */

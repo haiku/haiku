@@ -1,8 +1,8 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
-
 
 #include "vnode_store.h"
 
@@ -13,25 +13,24 @@
 #include <vfs.h>
 
 
-static void
-store_destroy(struct vm_store *store)
+status_t
+VMVnodeCache::Init(struct vnode *vnode)
 {
-	free(store);
-}
+	status_t error = VMCache::Init(CACHE_TYPE_VNODE);
+	if (error != B_OK)
+		return error;
 
+	fVnode = vnode;
+	fFileCacheRef = NULL;
 
-static status_t
-store_commit(struct vm_store *_store, off_t size)
-{
-	vnode_store *store = (vnode_store *)_store;
+	vfs_vnode_to_node_ref(fVnode, &fDevice, &fInode);
 
-	store->vm.committed_size = size;
 	return B_OK;
 }
 
 
-static bool
-store_has_page(struct vm_store *_store, off_t offset)
+bool
+VMVnodeCache::HasPage(off_t offset)
 {
 	// We always pretend to have the page - even if it's beyond the size of
 	// the file. The read function will only cut down the size of the read,
@@ -40,14 +39,13 @@ store_has_page(struct vm_store *_store, off_t offset)
 }
 
 
-static status_t
-store_read(struct vm_store *_store, off_t offset, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool fsReenter)
+status_t
+VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
-	vnode_store *store = (vnode_store *)_store;
 	size_t bytesUntouched = *_numBytes;
 
-	status_t status = vfs_read_pages(store->vnode, NULL, offset, vecs, count,
+	status_t status = vfs_read_pages(fVnode, NULL, offset, vecs, count,
 		_numBytes, fsReenter);
 
 	bytesUntouched -= *_numBytes;
@@ -73,79 +71,47 @@ store_read(struct vm_store *_store, off_t offset, const iovec *vecs,
 }
 
 
-static status_t
-store_write(struct vm_store *_store, off_t offset, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool fsReenter)
+status_t
+VMVnodeCache::Write(off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
-	vnode_store *store = (vnode_store *)_store;
-	return vfs_write_pages(store->vnode, NULL, offset, vecs, count, _numBytes,
+	return vfs_write_pages(fVnode, NULL, offset, vecs, count, _numBytes,
 		fsReenter);
 }
 
 
-static status_t
-store_acquire_unreferenced_ref(struct vm_store *_store)
+status_t
+VMVnodeCache::Fault(struct vm_address_space *aspace, off_t offset)
 {
-	vnode_store *store = (vnode_store *)_store;
+	return B_BAD_HANDLER;
+}
+
+
+status_t
+VMVnodeCache::AcquireUnreferencedStoreRef()
+{
 	struct vnode *vnode;
-	status_t status = vfs_get_vnode(store->device, store->inode, false, &vnode);
+	status_t status = vfs_get_vnode(fDevice, fInode, false, &vnode);
 
 	// If successful, update the store's vnode pointer, so that release_ref()
 	// won't use a stale pointer.
 	if (status == B_OK)
-		store->vnode = vnode;
+		fVnode = vnode;
 
 	return status;
 }
 
 
-static void
-store_acquire_ref(struct vm_store *_store)
+void
+VMVnodeCache::AcquireStoreRef()
 {
-	vnode_store *store = (vnode_store *)_store;
-	vfs_acquire_vnode(store->vnode);
+	vfs_acquire_vnode(fVnode);
 }
 
 
-static void
-store_release_ref(struct vm_store *_store)
+void
+VMVnodeCache::ReleaseStoreRef()
 {
-	vnode_store *store = (vnode_store *)_store;
-	vfs_put_vnode(store->vnode);
-}
-
-
-static vm_store_ops sStoreOps = {
-	&store_destroy,
-	&store_commit,
-	&store_has_page,
-	&store_read,
-	&store_write,
-	NULL,	/* fault */
-	&store_acquire_unreferenced_ref,
-	&store_acquire_ref,
-	&store_release_ref
-};
-
-
-//	#pragma mark -
-
-
-extern "C" vm_store *
-vm_create_vnode_store(struct vnode *vnode)
-{
-	vnode_store *store = (vnode_store *)malloc(sizeof(struct vnode_store));
-	if (store == NULL)
-		return NULL;
-
-	store->vm.ops = &sStoreOps;
-	store->vm.cache = NULL;
-	store->vm.committed_size = 0;
-
-	store->vnode = vnode;
-	store->file_cache_ref = NULL;
-
-	vfs_vnode_to_node_ref(vnode, &store->device, &store->inode);
-	return &store->vm;
+	vfs_put_vnode(fVnode);
 }
 
