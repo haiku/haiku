@@ -13,9 +13,11 @@
 
 #include "dma_resources.h"
 #include "io_requests.h"
+#include "IOScheduler.h"
 
 
-#define DMA_TEST_BLOCK_SIZE	512
+#define DMA_TEST_BLOCK_SIZE		512
+#define DMA_TEST_BUFFER_COUNT	10
 
 
 class TestSuite;
@@ -162,6 +164,46 @@ static area_id sArea;
 static size_t sAreaSize;
 static void* sAreaAddress;
 static DMAResource* sDMAResource;
+static IOScheduler* sIOScheduler;
+
+
+status_t
+do_io(void* data, IOOperation* operation)
+{
+	uint8* disk = (uint8*)sAreaAddress;
+	off_t offset = operation->Offset();
+
+	for (uint32 i = 0; i < operation->VecCount(); i++) {
+		const iovec& vec = operation->Vecs()[i];
+		addr_t base = (addr_t)vec.iov_base;
+		size_t length = vec.iov_len;
+		size_t pageOffset = base & ~(B_PAGE_SIZE - 1);
+
+		while (length > 0) {
+			size_t toCopy = min_c(length, B_PAGE_SIZE - pageOffset);
+
+			uint8* virtualAddress;
+			vm_get_physical_page(base - pageOffset, (addr_t*)&virtualAddress,
+				PHYSICAL_PAGE_NO_WAIT);
+
+			if (operation->IsWrite())
+				memcpy(disk + offset, virtualAddress + pageOffset, toCopy);
+			else
+				memcpy(virtualAddress + pageOffset, disk + offset, toCopy);
+
+			length -= toCopy;
+			offset += toCopy;
+			pageOffset = 0;
+		}
+	}
+
+	if (sIOScheduler != NULL)
+		sIOScheduler->OperationCompleted(operation, B_OK);
+	return B_OK;
+}
+
+
+//	#pragma mark -
 
 
 TestSuiteContext::TestSuiteContext()
@@ -390,7 +432,7 @@ Test::_CheckWrite()
 
 		if (disk[i] != i % 26 + 'a') {
 			dprintf("disk[i] %c, expected %c, i %lu, fLength + fOffset %Ld\n",
-				disk[i], i % 26 + 'a', i, fLength + fOffset);
+				disk[i], (int)(i % 26 + 'a'), i, fLength + fOffset);
 			dprintf("offset %lu differs, touched innocent data:\n", i);
 			i &= ~63;
 			dump_block((char*)&disk[i], min_c(64, fSuite.Size() - i), "  ");
@@ -441,34 +483,7 @@ Test::_CheckResults()
 status_t
 Test::_DoIO(IOOperation& operation)
 {
-	uint8* disk = (uint8*)sAreaAddress;
-	off_t offset = operation.Offset();
-
-	for (uint32 i = 0; i < operation.VecCount(); i++) {
-		const iovec& vec = operation.Vecs()[i];
-		addr_t base = (addr_t)vec.iov_base;
-		size_t length = vec.iov_len;
-		size_t pageOffset = base & ~(B_PAGE_SIZE - 1);
-
-		while (length > 0) {
-			size_t toCopy = min_c(length, B_PAGE_SIZE - pageOffset);
-
-			uint8* virtualAddress;
-			vm_get_physical_page(base - pageOffset, (addr_t*)&virtualAddress,
-				PHYSICAL_PAGE_NO_WAIT);
-
-			if (operation.IsWrite())
-				memcpy(disk + offset, virtualAddress + pageOffset, toCopy);
-			else
-				memcpy(virtualAddress + pageOffset, disk + offset, toCopy);
-
-			length -= toCopy;
-			offset += toCopy;
-			pageOffset = 0;
-		}
-	}
-
-	return B_OK;
+	return do_io(NULL, &operation);
 }
 
 
@@ -933,7 +948,7 @@ run_test()
 	run_tests_interesting_restrictions(context);
 	run_tests_mean_restrictions(context);
 
-	panic("All tests passed!");
+	dprintf("All tests passed!\n");
 }
 
 
@@ -1002,7 +1017,43 @@ dma_test_register_child_devices(void *driverCookie)
 status_t
 dma_test_init_device(void *driverCookie, void **_deviceCookie)
 {
+	const dma_restrictions restrictions = {
+		0x0,	// low
+		0x0,	// high
+		4,		// alignment
+		0,		// boundary
+		0,		// max transfer
+		0,		// max segment count
+		B_PAGE_SIZE, // max segment size
+		0		// flags
+	};
+
 	*_deviceCookie = driverCookie;
+	sDMAResource = new(std::nothrow) DMAResource;
+	if (sDMAResource == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = sDMAResource->Init(restrictions, DMA_TEST_BLOCK_SIZE,
+		DMA_TEST_BUFFER_COUNT);
+	if (status != B_OK) {
+		delete sDMAResource;
+		return status;
+	}
+
+	sIOScheduler = new(std::nothrow) IOScheduler(sDMAResource);
+	if (sIOScheduler == NULL) {
+		delete sDMAResource;
+		return B_NO_MEMORY;
+	}
+
+	status = sIOScheduler->Init("dma test scheduler");
+	if (status != B_OK) {
+		delete sIOScheduler;
+		delete sDMAResource;
+		return status;
+	}
+
+	sIOScheduler->SetCallback(&do_io, NULL);
 	return B_OK;
 }
 
@@ -1045,11 +1096,27 @@ dma_test_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 	if (pos + length > sAreaSize)
 		length = sAreaSize - pos;
 
+#if 0
+	IORequest request;
+	status_t status = request.Init(pos, buffer, length, false,
+		B_USER_IO_REQUEST);
+	if (status != B_OK)
+		return status;
+
+	status = sIOScheduler->ScheduleRequest(&request);
+	if (status != B_OK)
+		return status;
+
+	// TODO: wait for I/O request to finish!
+	while (request.Status() > B_OK) {
+		snooze(10000);
+	}
+#else
 	status_t status = user_memcpy(buffer, (uint8*)sAreaAddress + pos, length);
+#endif
 
 	if (status == B_OK)
 		*_length = length;
-
 	return status;
 }
 
@@ -1064,7 +1131,24 @@ dma_test_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 	if (pos + length > sAreaSize)
 		length = sAreaSize - pos;
 
+#if 0
+	IORequest request;
+	status_t status = request.Init(pos, (void*)buffer, length, true,
+		B_USER_IO_REQUEST);
+	if (status != B_OK)
+		return status;
+
+	status = sIOScheduler->ScheduleRequest(&request);
+	if (status != B_OK)
+		return status;
+
+	// TODO: wait for I/O request to finish!
+	while (request.Status() > B_OK) {
+		snooze(10000);
+	}
+#else
 	status_t status = user_memcpy((uint8*)sAreaAddress + pos, buffer, length);
+#endif
 
 	if (status == B_OK)
 		*_length = length;
