@@ -1408,9 +1408,9 @@ BMenu::_Track(int *action, long start)
 
 	BPoint location;
 	uint32 buttons;
-	if (LockLooper()) {	
+	if (LockLooper()) {
 		GetMouse(&location, &buttons);
-		UnlockLooper();	
+		UnlockLooper();
 	}
 
 	int32 mouseSpeed = 0;
