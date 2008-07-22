@@ -202,7 +202,7 @@ IOScheduler::_Scheduler()
 // TODO: If the device has block size restrictions, we might need to use a
 // bounce buffer.
 			IOOperation* operation = _GetOperation();
-			operation->SetRequest(request);
+			operation->Prepare(request);
 			operation->SetOriginalRange(request->Offset(), request->Length());
 			fIOCallback(fIOCallbackData, operation);
 		}

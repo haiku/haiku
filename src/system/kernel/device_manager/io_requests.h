@@ -100,7 +100,7 @@ public:
 			bool				Finish();
 									// returns true, if it can be recycled
 
-			status_t			SetRequest(IORequest* request);
+			status_t			Prepare(IORequest* request);
 			void				SetOriginalRange(off_t offset, size_t length);
 									// also sets range
 			void				SetRange(off_t offset, size_t length);

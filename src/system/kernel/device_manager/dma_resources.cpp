@@ -582,7 +582,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 	operation->SetPartial(partialBegin != 0, offset + dmaLength > requestEnd);
 	operation->SetUsesBounceBuffer(bounceLeft < fBounceBufferSize);
 
-	status_t error = operation->SetRequest(request);
+	status_t error = operation->Prepare(request);
 	if (error != B_OK)
 		return error;
 

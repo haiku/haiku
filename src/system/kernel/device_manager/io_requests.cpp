@@ -226,7 +226,7 @@ IOOperation::Finish()
 /*!	Note: SetPartial() must be called first!
 */
 status_t
-IOOperation::SetRequest(IORequest* request)
+IOOperation::Prepare(IORequest* request)
 {
 	if (fParent != NULL)
 		fParent->RemoveOperation(this);
