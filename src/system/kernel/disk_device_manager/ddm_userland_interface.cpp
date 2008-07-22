@@ -129,6 +129,16 @@ struct UserStringParameter {
 
 		return B_OK;
 	}
+
+	inline operator const char*()
+	{
+		return value;
+	}
+
+	inline operator char*()
+	{
+		return value;
+	}
 };
 
 
@@ -236,7 +246,10 @@ _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 				// get the needed size
 				UserDataWriter writer;
 				device->WriteUserData(writer);
-				*neededSize = writer.AllocatedSize();
+				status_t status = copy_to_user_value(neededSize,
+					writer.AllocatedSize());
+				if (status != B_OK)
+					return status;
 			} else {
 				id = B_ERROR;
 			}
@@ -251,12 +264,9 @@ _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 partition_id
 _user_find_disk_device(const char *_filename, size_t *neededSize)
 {
-	if (!_filename)
-		return B_BAD_VALUE;
-
-	char filename[B_PATH_NAME_LENGTH];
-	status_t error = ddm_strlcpy(filename, _filename, B_PATH_NAME_LENGTH);
-	if (error)
+	UserStringParameter<false> filename;
+	status_t error = filename.Init(_filename, B_PATH_NAME_LENGTH);
+	if (error != B_OK)
 		return error;
 
 	partition_id id = B_ENTRY_NOT_FOUND;
@@ -270,7 +280,9 @@ _user_find_disk_device(const char *_filename, size_t *neededSize)
 				// get the needed size
 				UserDataWriter writer;
 				device->WriteUserData(writer);
-				*neededSize = writer.AllocatedSize();
+				error = copy_to_user_value(neededSize, writer.AllocatedSize());
+				if (error != B_OK)
+					return error;
 			} else
 				return B_ERROR;
 		}
@@ -283,12 +295,9 @@ _user_find_disk_device(const char *_filename, size_t *neededSize)
 partition_id
 _user_find_partition(const char *_filename, size_t *neededSize)
 {
-	if (!_filename)
-		return B_BAD_VALUE;
-
-	char filename[B_PATH_NAME_LENGTH];
-	status_t error = ddm_strlcpy(filename, _filename, B_PATH_NAME_LENGTH);
-	if (error)
+	UserStringParameter<false> filename;
+	status_t error = filename.Init(_filename, B_PATH_NAME_LENGTH);
+	if (error != B_OK)
 		return error;
 
 	partition_id id = B_ENTRY_NOT_FOUND;
@@ -299,7 +308,8 @@ _user_find_partition(const char *_filename, size_t *neededSize)
 		id = partition->ID();
 		if (neededSize) {
 			// get and lock the partition's device
-			KDiskDevice *device = manager->RegisterDevice(partition->ID());
+			KDiskDevice *device = manager->RegisterDevice(partition->ID(),
+				false);
 			if (!device)
 				return B_ENTRY_NOT_FOUND;
 			PartitionRegistrar _2(device, true);
@@ -307,7 +317,9 @@ _user_find_partition(const char *_filename, size_t *neededSize)
 				// get the needed size
 				UserDataWriter writer;
 				device->WriteUserData(writer);
-				*neededSize = writer.AllocatedSize();
+				error = copy_to_user_value(neededSize, writer.AllocatedSize());
+				if (error != B_OK)
+					return error;
 			} else
 				return B_ERROR;
 		}
@@ -412,12 +424,11 @@ _user_get_disk_device_data(partition_id id, bool deviceOnly,
 partition_id
 _user_register_file_device(const char *_filename)
 {
-	if (!_filename)
-		return B_BAD_VALUE;
-	char filename[B_PATH_NAME_LENGTH];
-	status_t error = ddm_strlcpy(filename, _filename, B_PATH_NAME_LENGTH);
-	if (error)
+	UserStringParameter<false> filename;
+	status_t error = filename.Init(_filename, B_PATH_NAME_LENGTH);
+	if (error != B_OK)
 		return error;
+
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KFileDiskDevice *device = manager->FindFileDevice(filename))
@@ -438,10 +449,11 @@ _user_unregister_file_device(partition_id deviceID, const char *_filename)
 	if (deviceID >= 0) {
 		return manager->DeleteFileDevice(deviceID);
 	} else {
-		char filename[B_PATH_NAME_LENGTH];
-		status_t error = ddm_strlcpy(filename, _filename, B_PATH_NAME_LENGTH);
-		if (error)
+		UserStringParameter<false> filename;
+		status_t error = filename.Init(_filename, B_PATH_NAME_LENGTH);
+		if (error != B_OK)
 			return error;
+
 		return manager->DeleteFileDevice(filename);
 	}
 }

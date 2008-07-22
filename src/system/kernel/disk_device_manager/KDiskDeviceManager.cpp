@@ -233,9 +233,9 @@ KDiskDeviceManager::~KDiskDeviceManager()
 	// some sanity checks
 	if (fPartitions->Count() > 0) {
 		DBG(OUT("WARNING: There are still %ld unremoved partitions!\n",
-				fPartitions->Count()));
+			fPartitions->Count()));
 		for (PartitionMap::Iterator it = fPartitions->Begin();
-			 it != fPartitions->End(); ++it) {
+				it != fPartitions->End(); ++it) {
 			DBG(OUT("         partition: %ld\n", it->Value()->ID()));
 		}
 	}
@@ -243,17 +243,16 @@ KDiskDeviceManager::~KDiskDeviceManager()
 		DBG(OUT("WARNING: There are still %ld obsolete partitions!\n",
 				fObsoletePartitions->Count()));
 		for (PartitionSet::Iterator it = fObsoletePartitions->Begin();
-			 it != fObsoletePartitions->End(); ++it) {
+				it != fObsoletePartitions->End(); ++it) {
 			DBG(OUT("         partition: %ld\n", (*it)->ID()));
 		}
 	}
 	// remove all disk systems
-	for (int32 cookie = 0;
-		 KDiskSystem *diskSystem = NextDiskSystem(&cookie); ) {
+	for (int32 cookie = 0; KDiskSystem *diskSystem = NextDiskSystem(&cookie);) {
 		fDiskSystems->Remove(diskSystem->ID());
 		if (diskSystem->IsLoaded()) {
 			DBG(OUT("WARNING: Disk system `%s' (%ld) is still loaded!\n",
-					diskSystem->Name(), diskSystem->ID()));
+				diskSystem->Name(), diskSystem->ID()));
 		} else
 			delete diskSystem;
 	}
@@ -361,8 +360,7 @@ KDiskDeviceManager::FindPartition(const char *path)
 		return NULL;
 
 	for (PartitionMap::Iterator it = fPartitions->Begin();
-		 it != fPartitions->End();
-		 ++it) {
+			it != fPartitions->End(); ++it) {
 		KPartition *partition = it->Value();
 		if (partition->GetPath(&partitionPath) == B_OK
 			&& partitionPath == path) {
@@ -807,8 +805,7 @@ KDiskDeviceManager::DeletePartition(KPartition *partition)
 KDiskSystem *
 KDiskDeviceManager::FindDiskSystem(const char *name, bool byPrettyName)
 {
-	for (int32 cookie = 0;
-		 KDiskSystem *diskSystem = NextDiskSystem(&cookie); ) {
+	for (int32 cookie = 0; KDiskSystem *diskSystem = NextDiskSystem(&cookie);) {
 		if (byPrettyName) {
 			if (strcmp(name, diskSystem->PrettyName()) == 0)
 				return diskSystem;
@@ -1053,15 +1050,16 @@ KDiskDeviceManager::_AddDiskSystem(KDiskSystem *diskSystem)
 {
 	if (!diskSystem)
 		return B_BAD_VALUE;
-DBG(OUT("KDiskDeviceManager::_AddDiskSystem(%s)\n", diskSystem->Name()));
+	DBG(OUT("KDiskDeviceManager::_AddDiskSystem(%s)\n", diskSystem->Name()));
 	status_t error = diskSystem->Init();
-if (error != B_OK)
-DBG(OUT("  initialization failed: %s\n", strerror(error)));
+	DBG(if (error != B_OK)
+		OUT("  initialization failed: %s\n", strerror(error)));
 	if (error == B_OK)
 		error = fDiskSystems->Put(diskSystem->ID(), diskSystem);
 	if (error != B_OK)
 		delete diskSystem;
-DBG(OUT("KDiskDeviceManager::_AddDiskSystem() done: %s\n", strerror(error)));
+	DBG(OUT("KDiskDeviceManager::_AddDiskSystem() done: %s\n",
+		strerror(error)));
 	return error;
 }
 
@@ -1155,7 +1153,7 @@ KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
 status_t
 KDiskDeviceManager::_Scan(const char *path)
 {
-DBG(OUT("KDiskDeviceManager::_Scan(%s)\n", path));
+	DBG(OUT("KDiskDeviceManager::_Scan(%s)\n", path));
 	status_t error = B_ENTRY_NOT_FOUND;
 	struct stat st;
 	if (lstat(path, &st) < 0) {
@@ -1191,7 +1189,7 @@ DBG(OUT("KDiskDeviceManager::_Scan(%s)\n", path));
 			return B_OK;
 		}
 
-DBG(OUT("  found device: %s\n", path));
+		DBG(OUT("  found device: %s\n", path));
 		// create a KDiskDevice for it
 		KDiskDevice *device = new(nothrow) KDiskDevice;
 		if (!device)
