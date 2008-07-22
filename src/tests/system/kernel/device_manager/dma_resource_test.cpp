@@ -9,6 +9,8 @@
 
 #include <device_manager.h>
 
+#include <vm.h>
+
 #include "dma_resources.h"
 #include "io_requests.h"
 
@@ -16,18 +18,36 @@
 #define DMA_TEST_BLOCK_SIZE	512
 
 
-struct device_manager_info* sDeviceManager;
+class TestSuite;
 
-static area_id sArea;
-static size_t sAreaSize;
-static void* sAreaAddress;
-static DMAResource* sDMAResource;
+class TestSuiteContext {
+public:
+							TestSuiteContext();
+							~TestSuiteContext();
 
+			status_t		Init(size_t size);
+
+			addr_t			DataBase() const { return fDataBase; }
+			addr_t			PhysicalDataBase() const
+								{ return fPhysicalDataBase; }
+
+			addr_t			CompareBase() const { return fCompareBase; }
+
+			size_t			Size() const { return fSize; }
+
+private:
+			area_id			fDataArea;
+			addr_t			fDataBase;
+			addr_t			fPhysicalDataBase;
+			area_id			fCompareArea;
+			addr_t			fCompareBase;
+			size_t			fSize;
+};
 
 class Test : public DoublyLinkedListLinkImpl<Test> {
 public:
-							Test(off_t offset, uint8* base, uint8* physicalBase,
-								size_t length, bool isWrite, uint32 flags);
+							Test(TestSuite& suite, off_t offset, size_t length,
+								bool isWrite, uint32 flags);
 
 			Test&			AddSource(addr_t base, size_t length);
 			Test&			NextResult(off_t offset, bool partialBegin,
@@ -38,11 +58,17 @@ public:
 			void			Run(DMAResource& resource);
 
 private:
+			addr_t			_SourceToVirtual(addr_t source);
+			addr_t			_SourceToCompare(addr_t source);
+			void			_Prepare();
+			void			_CheckCompare();
+			void			_CheckWrite();
+			void			_CheckResults();
+			status_t		_DoIO(IOOperation& operation);
 			void			_Panic(const char* message,...);
 
+			TestSuite&		fSuite;
 			off_t			fOffset;
-			uint8*			fBase;
-			uint8*			fPhysicalBase;
 			size_t			fLength;
 			bool			fIsWrite;
 			uint32			fFlags;
@@ -70,11 +96,10 @@ typedef DoublyLinkedList<Test> TestList;
 
 class TestSuite {
 public:
-	TestSuite(const char* name, const dma_restrictions& restrictions,
-			size_t blockSize, uint8* base, uint8* physicalBase)
+	TestSuite(TestSuiteContext& context, const char* name,
+			const dma_restrictions& restrictions, size_t blockSize)
 		:
-		fBase(base),
-		fPhysicalBase(physicalBase)
+		fContext(context)
 	{
 		dprintf("----- Run \"%s\" tests ---------------------------\n", name);
 		dprintf("  DMA restrictions: address %#lx - %#lx, align %lu, boundary "
@@ -99,8 +124,8 @@ public:
 
 	Test& AddTest(off_t offset, size_t length, bool isWrite, uint32 flags)
 	{
-		Test* test = new(std::nothrow) Test(offset, fBase, fPhysicalBase,
-			length, isWrite, flags);
+		Test* test = new(std::nothrow) Test(*this, offset, length, isWrite,
+			flags);
 		fTests.Add(test);
 
 		return *test;
@@ -116,20 +141,79 @@ public:
 		}
 	}
 
+	addr_t DataBase() const { return fContext.DataBase(); }
+	addr_t PhysicalDataBase() const { return fContext.PhysicalDataBase(); }
+	addr_t CompareBase() const { return fContext.CompareBase(); }
+	size_t Size() const { return fContext.Size(); }
+
 private:
+	TestSuiteContext& fContext;
 	DMAResource		fDMAResource;
 	uint8*			fBase;
 	uint8*			fPhysicalBase;
+	size_t			fSize;
 	TestList		fTests;
 };
 
 
-Test::Test(off_t offset, uint8* base, uint8* physicalBase, size_t length,
-		bool isWrite, uint32 flags)
+struct device_manager_info* sDeviceManager;
+
+static area_id sArea;
+static size_t sAreaSize;
+static void* sAreaAddress;
+static DMAResource* sDMAResource;
+
+
+TestSuiteContext::TestSuiteContext()
 	:
+	fDataArea(-1),
+	fCompareArea(-1),
+	fSize(0)
+{
+}
+
+
+TestSuiteContext::~TestSuiteContext()
+{
+	delete_area(fDataArea);
+	delete_area(fCompareArea);
+}
+
+
+status_t
+TestSuiteContext::Init(size_t size)
+{
+	fDataArea = create_area("data buffer", (void**)&fDataBase,
+		B_ANY_KERNEL_ADDRESS, size, B_CONTIGUOUS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (fDataArea < B_OK)
+		return fDataArea;
+
+	physical_entry entry;
+	get_memory_map((void*)fDataBase, size, &entry, 1);
+
+	dprintf("DMA Test area %p, physical %p\n", (void*)fDataBase, entry.address);
+	fPhysicalDataBase = (addr_t)entry.address;
+
+	fCompareArea = create_area("compare buffer", (void**)&fCompareBase,
+		B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (fCompareArea < B_OK)
+		return fCompareArea;
+
+	fSize = size;
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
+Test::Test(TestSuite& suite, off_t offset, size_t length, bool isWrite,
+		uint32 flags)
+	:
+	fSuite(suite),
 	fOffset(offset),
-	fBase(base),
-	fPhysicalBase(physicalBase),
 	fLength(length),
 	fIsWrite(isWrite),
 	fFlags(flags),
@@ -144,7 +228,7 @@ Test::AddSource(addr_t address, size_t length)
 {
 	fSourceVecs[fSourceCount].iov_base
 		= (void*)(((fFlags & B_PHYSICAL_IO_REQUEST) == 0
-			? fBase : fPhysicalBase) + address);
+			? fSuite.DataBase() : fSuite.PhysicalDataBase()) + address);
 	fSourceVecs[fSourceCount].iov_len = length;
 	fSourceCount++;
 
@@ -179,9 +263,220 @@ Test::AddTarget(addr_t base, size_t length, bool usesBounceBuffer)
 }
 
 
+addr_t
+Test::_SourceToVirtual(addr_t source)
+{
+	if ((fFlags & B_PHYSICAL_IO_REQUEST) != 0)
+		return source - fSuite.PhysicalDataBase() + fSuite.DataBase();
+
+	return source;
+}
+
+
+addr_t
+Test::_SourceToCompare(addr_t source)
+{
+	if ((fFlags & B_PHYSICAL_IO_REQUEST) != 0)
+		return source - fSuite.PhysicalDataBase() + fSuite.CompareBase();
+
+	return source - fSuite.DataBase() + fSuite.CompareBase();
+}
+
+
+void
+Test::_Prepare()
+{
+	// prepare disk
+
+	uint8* disk = (uint8*)sAreaAddress;
+	for (size_t i = 0; i < sAreaSize; i++) {
+		disk[i] = i % 26 + 'a';
+	}
+
+	// prepare data
+
+	memset((void*)fSuite.DataBase(), 0xcc, fSuite.Size());
+
+	if (fIsWrite) {
+		off_t offset = fOffset;
+		size_t length = fLength;
+
+		for (uint32 i = 0; i < fSourceCount; i++) {
+			uint8* data = (uint8*)_SourceToVirtual(
+				(addr_t)fSourceVecs[i].iov_base);
+			size_t vecLength = min_c(fSourceVecs[i].iov_len, length);
+
+			for (uint32 j = 0; j < vecLength; j++) {
+				data[j] = (offset + j) % 10 + '0';
+			}
+			offset += vecLength;
+			length -= vecLength;
+		}
+	}
+
+	// prepare compare data
+
+	memset((void*)fSuite.CompareBase(), 0xcc, fSuite.Size());
+
+	if (fIsWrite) {
+		// copy data from source
+		off_t offset = fOffset;
+		size_t length = fLength;
+
+		for (uint32 i = 0; i < fSourceCount; i++) {
+			uint8* compare = (uint8*)_SourceToCompare(
+				(addr_t)fSourceVecs[i].iov_base);
+			size_t vecLength = min_c(fSourceVecs[i].iov_len, length);
+
+			memcpy(compare,
+				(void*)_SourceToVirtual((addr_t)fSourceVecs[i].iov_base),
+				vecLength);
+			offset += vecLength;
+			length -= vecLength;
+		}
+	} else {
+		// copy data from drive
+		off_t offset = fOffset;
+		size_t length = fLength;
+
+		for (uint32 i = 0; i < fSourceCount; i++) {
+			uint8* compare = (uint8*)_SourceToCompare(
+				(addr_t)fSourceVecs[i].iov_base);
+			size_t vecLength = min_c(fSourceVecs[i].iov_len, length);
+
+			memcpy(compare, disk + offset, vecLength);
+			offset += vecLength;
+			length -= vecLength;
+		}
+	}
+
+	if (fIsWrite)
+		_CheckCompare();
+}
+
+
+void
+Test::_CheckCompare()
+{
+	uint8* data = (uint8*)fSuite.DataBase();
+	uint8* compare = (uint8*)fSuite.CompareBase();
+
+	for (size_t i = 0; i < fSuite.Size(); i++) {
+		if (data[i] != compare[i]) {
+			dprintf("offset %lu differs, %s:\n", i,
+				fIsWrite ? "write" : "read");
+			i &= ~63;
+			dump_block((char*)&data[i], min_c(64, fSuite.Size() - i), "  ");
+			dprintf("should be:\n");
+			dump_block((char*)&compare[i], min_c(64, fSuite.Size() - i), "  ");
+
+			_Panic("Data %s differs", fIsWrite ? "write" : "read");
+		}
+	}
+}
+
+
+void
+Test::_CheckWrite()
+{
+	_CheckCompare();
+
+	// check if we overwrote parts we shouldn't have
+
+	uint8* disk = (uint8*)sAreaAddress;
+	for (size_t i = 0; i < sAreaSize; i++) {
+		if (i >= fOffset && i < fOffset + fLength)
+			continue;
+
+		if (disk[i] != i % 26 + 'a') {
+			dprintf("disk[i] %c, expected %c, i %lu, fLength + fOffset %Ld\n",
+				disk[i], i % 26 + 'a', i, fLength + fOffset);
+			dprintf("offset %lu differs, touched innocent data:\n", i);
+			i &= ~63;
+			dump_block((char*)&disk[i], min_c(64, fSuite.Size() - i), "  ");
+
+			_Panic("Data %s differs", fIsWrite ? "write" : "read");
+		}
+	}
+
+	// check if the data we wanted to have on disk ended up there
+
+	off_t offset = fOffset;
+	size_t length = fLength;
+
+	for (uint32 i = 0; i < fSourceCount; i++) {
+		uint8* data = (uint8*)_SourceToVirtual(
+			(addr_t)fSourceVecs[i].iov_base);
+		size_t vecLength = min_c(fSourceVecs[i].iov_len, length);
+
+		for (uint32 j = 0; j < vecLength; j++) {
+			if (disk[offset + j] != data[j]) {
+				dprintf("offset %lu differs, found on disk:\n", j);
+				j &= ~63;
+				dump_block((char*)&disk[offset + j],
+					min_c(64, fSuite.Size() - i), "  ");
+				dprintf("should be:\n");
+				dump_block((char*)&data[j], min_c(64, fSuite.Size() - j), "  ");
+
+				_Panic("Data write differs");
+			}
+		}
+
+		offset += vecLength;
+		length -= vecLength;
+	}
+}
+
+
+void
+Test::_CheckResults()
+{
+	if (fIsWrite)
+		_CheckWrite();
+	else
+		_CheckCompare();
+}
+
+
+status_t
+Test::_DoIO(IOOperation& operation)
+{
+	uint8* disk = (uint8*)sAreaAddress;
+	off_t offset = operation.Offset();
+
+	for (uint32 i = 0; i < operation.VecCount(); i++) {
+		const iovec& vec = operation.Vecs()[i];
+		addr_t base = (addr_t)vec.iov_base;
+		size_t length = vec.iov_len;
+		size_t pageOffset = base & ~(B_PAGE_SIZE - 1);
+
+		while (length > 0) {
+			size_t toCopy = min_c(length, B_PAGE_SIZE - pageOffset);
+
+			uint8* virtualAddress;
+			vm_get_physical_page(base - pageOffset, (addr_t*)&virtualAddress,
+				PHYSICAL_PAGE_NO_WAIT);
+
+			if (operation.IsWrite())
+				memcpy(disk + offset, virtualAddress + pageOffset, toCopy);
+			else
+				memcpy(virtualAddress + pageOffset, disk + offset, toCopy);
+
+			length -= toCopy;
+			offset += toCopy;
+			pageOffset = 0;
+		}
+	}
+
+	return B_OK;
+}
+
+
 void
 Test::Run(DMAResource& resource)
 {
+	_Prepare();
+
 	IORequest request;
 	status_t status = request.Init(fOffset, fSourceVecs, fSourceCount,
 		fLength, fIsWrite, fFlags);
@@ -210,10 +505,11 @@ Test::Run(DMAResource& resource)
 		dprintf("  DMABuffer %p, %lu vecs, bounce buffer: %p (%p) %s\n", buffer,
 			buffer->VecCount(), buffer->BounceBuffer(),
 			(void*)buffer->PhysicalBounceBuffer(),
-			buffer->UsesBounceBuffer() ? "used" : "unused");
+			operation.UsesBounceBuffer() ? "used" : "unused");
 		for (uint32 i = 0; i < buffer->VecCount(); i++) {
-			dprintf("    [%lu] base %p, length %lu\n", i,
-				buffer->VecAt(i).iov_base, buffer->VecAt(i).iov_len);
+			dprintf("    [%lu] base %p, length %lu%s\n", i,
+				buffer->VecAt(i).iov_base, buffer->VecAt(i).iov_len,
+				buffer->UsesBounceBufferAt(i) ? ", bounce" : "");
 		}
 
 		dprintf("  remaining bytes: %lu\n", request.RemainingBytes());
@@ -236,7 +532,7 @@ Test::Run(DMAResource& resource)
 				address = (void*)(target.address
 					+ (addr_t)buffer->PhysicalBounceBuffer());
 			} else
-				address = (void*)(target.address + fPhysicalBase);
+				address = (void*)(target.address + fSuite.PhysicalDataBase());
 
 			if (address != vec.iov_base) {
 				_Panic("[%lu] address differs: %p, should be %p", i,
@@ -244,6 +540,7 @@ Test::Run(DMAResource& resource)
 			}
 		}
 
+		_DoIO(operation);
 		operation.SetStatus(B_OK);
 		bool finished = operation.Finish();
 		bool isPartial = result.partial_begin || result.partial_end;
@@ -252,6 +549,7 @@ Test::Run(DMAResource& resource)
 
 		if (!finished) {
 			dprintf("  operation not done yet!\n");
+			_DoIO(operation);
 			operation.SetStatus(B_OK);
 
 			isPartial = result.partial_begin && result.partial_end;
@@ -261,6 +559,7 @@ Test::Run(DMAResource& resource)
 
 			if (!finished) {
 				dprintf("  operation not done yet!\n");
+				_DoIO(operation);
 				operation.SetStatus(B_OK);
 
 				if (!operation.Finish())
@@ -270,6 +569,8 @@ Test::Run(DMAResource& resource)
 
 		resultIndex++;
 	}
+
+	_CheckResults();
 }
 
 
@@ -285,7 +586,8 @@ Test::_Panic(const char* message,...)
 
 	dprintf("test failed\n");
 	dprintf("  offset:  %lld\n", fOffset);
-	dprintf("  base:    %p (physical: %p)\n", fBase, fPhysicalBase);
+	dprintf("  base:    %p (physical: %p)\n", (void*)fSuite.DataBase(),
+		(void*)fSuite.PhysicalDataBase());
 	dprintf("  length:  %lu\n", fLength);
 	dprintf("  write:   %d\n", fIsWrite);
 	dprintf("  flags:   %#lx\n", fFlags);
@@ -313,7 +615,7 @@ Test::_Panic(const char* message,...)
 
 
 static void
-run_tests_no_restrictions(uint8* address, uint8* physicalAddress, size_t size)
+run_tests_no_restrictions(TestSuiteContext& context)
 {
 	const dma_restrictions restrictions = {
 		0x0,	// low
@@ -326,38 +628,64 @@ run_tests_no_restrictions(uint8* address, uint8* physicalAddress, size_t size)
 		0		// flags
 	};
 
-	TestSuite suite("no restrictions", restrictions, 512, address,
-		physicalAddress);
+	TestSuite suite(context, "no restrictions", restrictions, 512);
 
 	suite.AddTest(0, 1024, false, B_USER_IO_REQUEST)
 		.AddSource(0, 1024)
 		.NextResult(0, false, false)
 			.AddTarget(0, 1024, false);
-	suite.AddTest(23, 1024, true, B_USER_IO_REQUEST)
+
+	// read partial begin/end
+	suite.AddTest(23, 1024, false, B_USER_IO_REQUEST)
 		.AddSource(0, 1024)
 		.NextResult(0, true, true)
 			.AddTarget(0, 23, true)
 			.AddTarget(0, 1024, false)
-			.AddTarget(23, 512 - 23, true)
-			;
-	suite.AddTest(0, 1028, true, B_USER_IO_REQUEST)
+			.AddTarget(23, 512 - 23, true);
+
+	// read less than a block
+	suite.AddTest(23, 30, false, B_USER_IO_REQUEST)
+		.AddSource(0, 1024)
+		.NextResult(0, true, true)
+			.AddTarget(0, 23, true)
+			.AddTarget(0, 30, false)
+			.AddTarget(23, 512 - 53, true);
+
+	// write begin/end
+	suite.AddTest(23, 1024, true, B_USER_IO_REQUEST)
+		.AddSource(0, 1024)
+		.NextResult(0, true, true)
+			.AddTarget(0, 512, true)
+			.AddTarget(489, 512, false)
+			.AddTarget(512, 512, true);
+
+	// read partial end, length < iovec length
+	suite.AddTest(0, 1028, false, B_USER_IO_REQUEST)
 		.AddSource(0, 512)
-		.AddSource(1024, 516)
+		.AddSource(1024, 1024)
 		.NextResult(0, false, true)
 			.AddTarget(0, 512, false)
 			.AddTarget(1024, 516, false)
 			.AddTarget(0, 508, true);
+
+	// write partial end, length < iovec length
+	suite.AddTest(0, 1028, true, B_USER_IO_REQUEST)
+		.AddSource(0, 512)
+		.AddSource(1024, 1024)
+		.NextResult(0, false, true)
+			.AddTarget(0, 512, false)
+			.AddTarget(1024, 512, false)
+			.AddTarget(0, 512, true);
 
 	suite.Run();
 }
 
 
 static void
-run_tests_address_restrictions(uint8* address, uint8* physicalAddress,
-	size_t size)
+run_tests_address_restrictions(TestSuiteContext& context)
 {
 	const dma_restrictions restrictions = {
-		(addr_t)physicalAddress + 512,	// low
+		context.PhysicalDataBase() + 512,	// low
 		0,		// high
 		0,		// alignment
 		0,		// boundary
@@ -367,7 +695,7 @@ run_tests_address_restrictions(uint8* address, uint8* physicalAddress,
 		0		// flags
 	};
 
-	TestSuite suite("address", restrictions, 512, address, physicalAddress);
+	TestSuite suite(context, "address", restrictions, 512);
 
 	suite.AddTest(0, 1024, false, B_USER_IO_REQUEST)
 		.AddSource(0, 1024)
@@ -380,8 +708,7 @@ run_tests_address_restrictions(uint8* address, uint8* physicalAddress,
 
 
 static void
-run_tests_alignment_restrictions(uint8* address, uint8* physicalAddress,
-	size_t size)
+run_tests_alignment_restrictions(TestSuiteContext& context)
 {
 	const dma_restrictions restrictions = {
 		0x0,	// low
@@ -394,7 +721,7 @@ run_tests_alignment_restrictions(uint8* address, uint8* physicalAddress,
 		0		// flags
 	};
 
-	TestSuite suite("alignment", restrictions, 512, address, physicalAddress);
+	TestSuite suite(context, "alignment", restrictions, 512);
 
 	suite.AddTest(0, 1024, false, B_PHYSICAL_IO_REQUEST)
 		.AddSource(16, 1024)
@@ -406,8 +733,7 @@ run_tests_alignment_restrictions(uint8* address, uint8* physicalAddress,
 
 
 static void
-run_tests_boundary_restrictions(uint8* address, uint8* physicalAddress,
-	size_t size)
+run_tests_boundary_restrictions(TestSuiteContext& context)
 {
 	const dma_restrictions restrictions = {
 		0x0,	// low
@@ -420,7 +746,7 @@ run_tests_boundary_restrictions(uint8* address, uint8* physicalAddress,
 		0		// flags
 	};
 
-	TestSuite suite("boundary", restrictions, 512, address, physicalAddress);
+	TestSuite suite(context, "boundary", restrictions, 512);
 
 	suite.AddTest(0, 2000, false, B_USER_IO_REQUEST)
 		.AddSource(0, 2048)
@@ -434,8 +760,7 @@ run_tests_boundary_restrictions(uint8* address, uint8* physicalAddress,
 
 
 static void
-run_tests_segment_restrictions(uint8* address, uint8* physicalAddress,
-	size_t size)
+run_tests_segment_restrictions(TestSuiteContext& context)
 {
 	const dma_restrictions restrictions = {
 		0x0,	// low
@@ -448,41 +773,144 @@ run_tests_segment_restrictions(uint8* address, uint8* physicalAddress,
 		0		// flags
 	};
 
-	TestSuite suite("segment", restrictions, 512, address, physicalAddress);
+	TestSuite suite(context, "segment", restrictions, 512);
 
-#if 0
-	suite.AddTest(0, 1024, false, B_USER_IO_REQUEST)
-		.AddSource(0, 1024)
-		.NextResult(0, false)
-			.AddTarget(0, 1024, false);
-#endif
+	suite.AddTest(0, 4096, false, B_USER_IO_REQUEST)
+		.AddSource(0, 4096)
+		.NextResult(0, false, false)
+			.AddTarget(0, 1024, false)
+			.AddTarget(1024, 1024, false)
+			.AddTarget(2048, 1024, false)
+			.AddTarget(3072, 1024, false);
 
 	suite.Run();
 }
 
 
 static void
-run_tests_mean_restrictions(uint8* address, uint8* physicalAddress, size_t size)
+run_tests_transfer_restrictions(TestSuiteContext& context)
 {
 	const dma_restrictions restrictions = {
-		(addr_t)physicalAddress + 1024,	// low
+		0x0,	// low
 		0x0,	// high
-		32,		// alignment
-		512,	// boundary
-		2048,	// max transfer
-		2,		// max segment count
-		1024,	// max segment size
+		0,		// alignment
+		0,		// boundary
+		1024,	// max transfer
+		0,		// max segment count
+		0,		// max segment size
 		0		// flags
 	};
 
-	TestSuite suite("mean", restrictions, 512, address, physicalAddress);
+	TestSuite suite(context, "transfer", restrictions, 512);
 
-#if 0
+	suite.AddTest(0, 4000, false, B_USER_IO_REQUEST)
+		.AddSource(0, 4096)
+		.NextResult(0, false, false)
+			.AddTarget(0, 1024, false)
+		.NextResult(0, false, false)
+			.AddTarget(1024, 1024, false)
+		.NextResult(0, false, false)
+			.AddTarget(2048, 1024, false)
+		.NextResult(0, false, false)
+			.AddTarget(3072, 1024 - 96, false)
+			.AddTarget(0, 96, true);
+
+	suite.Run();
+}
+
+
+static void
+run_tests_interesting_restrictions(TestSuiteContext& context)
+{
+	dma_restrictions restrictions = {
+		0x0,	// low
+		0x0,	// high
+		32,		// alignment
+		512,	// boundary
+		0,		// max transfer
+		0,		// max segment count
+		0,		// max segment size
+		0		// flags
+	};
+
+	TestSuite suite(context, "interesting", restrictions, 512);
+
+	// read with partial begin/end
+	suite.AddTest(32, 1000, false, B_USER_IO_REQUEST)
+		.AddSource(0, 1024)
+		.NextResult(0, true, true)
+			.AddTarget(0, 32, true)
+			.AddTarget(0, 512, false)
+			.AddTarget(512, 480, false)
+			.AddTarget(32, 480, true)
+			.AddTarget(512, 32, true);
+
+	// write with partial begin/end
+	suite.AddTest(32, 1000, true, B_USER_IO_REQUEST)
+		.AddSource(0, 1024)
+		.NextResult(0, true, true)
+			.AddTarget(0, 512, true)
+			.AddTarget(480, 32, false)
+			.AddTarget(512, 480, false)
+			.AddTarget(512, 512, true);
+
+	suite.Run();
+
+	restrictions = (dma_restrictions){
+		0x0,	// low
+		0x0,	// high
+		32,		// alignment
+		512,	// boundary
+		0,		// max transfer
+		4,		// max segment count
+		0,		// max segment size
+		0		// flags
+	};
+
+	TestSuite suite2(context, "interesting2", restrictions, 512);
+
+	suite2.AddTest(32, 1000, false, B_USER_IO_REQUEST)
+		.AddSource(0, 1024)
+		.NextResult(0, true, false)
+			.AddTarget(0, 32, true)
+			.AddTarget(0, 512, false)
+			.AddTarget(512, 480, false)
+		.NextResult(0, false, true)
+			.AddTarget(0, 512, true);
+
+	suite2.Run();
+}
+
+
+static void
+run_tests_mean_restrictions(TestSuiteContext& context)
+{
+	const dma_restrictions restrictions = {
+		context.PhysicalDataBase() + 1024,	// low
+		0x0,	// high
+		32,		// alignment
+		1024,	// boundary
+		0,		// max transfer
+		2,		// max segment count
+		512,	// max segment size
+		0		// flags
+	};
+
+	TestSuite suite(context, "mean", restrictions, 512);
+
 	suite.AddTest(0, 1024, false, B_USER_IO_REQUEST)
 		.AddSource(0, 1024)
-		.NextResult(0, false)
-			.AddTarget(0, 1024, false);
-#endif
+		.NextResult(0, false, false)
+			.AddTarget(0, 512, true)
+			.AddTarget(512, 512, true);
+
+	suite.AddTest(0, 1024, false, B_USER_IO_REQUEST)
+		.AddSource(1024 + 32, 1024)
+		.NextResult(0, false, false)
+			.AddTarget(1024 + 32, 512, false)
+		.NextResult(0, false, false)
+			.AddTarget(1568, 480, false)
+			.AddTarget(1568 + 480, 32, false);
 
 	suite.Run();
 }
@@ -491,28 +919,21 @@ run_tests_mean_restrictions(uint8* address, uint8* physicalAddress, size_t size)
 static void
 run_test()
 {
-	size_t size = 1 * 1024 * 1024;
-	uint8* address;
-	area_id area = create_area("dma source", (void**)&address,
-		B_ANY_KERNEL_ADDRESS, size, B_CONTIGUOUS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < B_OK)
+	TestSuiteContext context;
+	status_t status = context.Init(4 * B_PAGE_SIZE);
+	if (status != B_OK)
 		return;
 
-	physical_entry entry;
-	get_memory_map(address, size, &entry, 1);
+	run_tests_no_restrictions(context);
+	run_tests_address_restrictions(context);
+	run_tests_alignment_restrictions(context);
+	run_tests_boundary_restrictions(context);
+	run_tests_segment_restrictions(context);
+	run_tests_transfer_restrictions(context);
+	run_tests_interesting_restrictions(context);
+	run_tests_mean_restrictions(context);
 
-	dprintf("DMA Test area %p, physical %p\n", address, entry.address);
-
-	run_tests_no_restrictions(address, (uint8*)entry.address, size);
-	run_tests_address_restrictions(address, (uint8*)entry.address, size);
-	run_tests_alignment_restrictions(address, (uint8*)entry.address, size);
-	run_tests_boundary_restrictions(address, (uint8*)entry.address, size);
-	run_tests_segment_restrictions(address, (uint8*)entry.address, size);
-	run_tests_mean_restrictions(address, (uint8*)entry.address, size);
-
-	delete_area(area);
-	panic("done.");
+	panic("All tests passed!");
 }
 
 
@@ -554,6 +975,7 @@ dma_test_init_driver(device_node *node, void **_driverCookie)
 		return sArea;
 
 	*_driverCookie = node;
+
 	run_test();
 	return B_OK;
 }

@@ -105,8 +105,9 @@ public:
 									// also sets range
 			void				SetRange(off_t offset, size_t length);
 
-			off_t				Offset() const	{ return fOffset; }
-			size_t				Length() const	{ return fLength; }
+// TODO: Fix Offset() and Length() for partial write phases!
+			off_t				Offset() const;
+			size_t				Length() const;
 			off_t				OriginalOffset() const
 									{ return fOriginalOffset; }
 			size_t				OriginalLength() const
@@ -123,26 +124,36 @@ public:
 			bool				IsWrite() const;
 			bool				IsRead() const;
 
+			void				SetBlockSize(size_t blockSize)
+									{ fBlockSize  = blockSize; }
+
 			bool				UsesBounceBuffer() const
-									{ return fDMABuffer->UsesBounceBuffer(); }
+									{ return fUsesBounceBuffer; }
+			void				SetUsesBounceBuffer(bool uses)
+									{ fUsesBounceBuffer = uses; }
 
 			DMABuffer*			Buffer() const { return fDMABuffer; }
 			void				SetBuffer(DMABuffer* buffer)
 									{ fDMABuffer = buffer; }
 
 protected:
+			void				_PrepareVecs();
 			status_t			_CopyPartialBegin(bool isWrite,
 									bool& partialBlockOnly);
 			status_t			_CopyPartialEnd(bool isWrite);
 
 			DMABuffer*			fDMABuffer;
 			off_t				fOffset;
-			size_t				fLength;
 			off_t				fOriginalOffset;
+			size_t				fLength;
 			size_t				fOriginalLength;
-			uint32				fPhase;
+			size_t				fBlockSize;
+			uint16				fSavedVecIndex;
+			uint16				fSavedVecLength;
+			uint8				fPhase;
 			bool				fPartialBegin;
 			bool				fPartialEnd;
+			bool				fUsesBounceBuffer;
 };
 
 typedef IOOperation io_operation;

@@ -14,6 +14,14 @@
 #include "dma_resources.h"
 
 
+#define TRACE_IO_REQUEST
+#ifdef TRACE_IO_REQUEST
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 // partial I/O operation phases
 enum {
 	PHASE_READ_BEGIN	= 0,
@@ -105,12 +113,15 @@ IOBuffer::UnlockMemory(bool isWrite)
 bool
 IOOperation::Finish()
 {
-dprintf("IOOperation::Finish()\n");
+	TRACE("IOOperation::Finish()\n");
 	if (fStatus == B_OK) {
 		if (fParent->IsWrite()) {
-dprintf("  is write\n");
+			TRACE("  is write\n");
 			if (fPhase == PHASE_READ_BEGIN) {
-dprintf("  phase read begin\n");
+				TRACE("  phase read begin\n");
+				// repair phase adjusted vec
+				fDMABuffer->VecAt(fSavedVecIndex).iov_len = fSavedVecLength;
+
 				// partial write: copy partial begin to bounce buffer
 				bool skipReadEndPhase;
 				status_t error = _CopyPartialBegin(true, skipReadEndPhase);
@@ -119,6 +130,7 @@ dprintf("  phase read begin\n");
 					// Get ready for next phase...
 					fPhase = HasPartialEnd() && !skipReadEndPhase
 						? PHASE_READ_END : PHASE_DO_ALL;
+					_PrepareVecs();
 					SetStatus(1);
 						// TODO: Is there a race condition, if the request is
 						// aborted at the same time?
@@ -127,7 +139,13 @@ dprintf("  phase read begin\n");
 
 				SetStatus(error);
 			} else if (fPhase == PHASE_READ_END) {
-dprintf("  phase read end\n");
+				TRACE("  phase read end\n");
+				// repair phase adjusted vec
+				iovec& vec = fDMABuffer->VecAt(fSavedVecIndex);
+				vec.iov_base = (uint8*)vec.iov_base
+					+ vec.iov_len - fSavedVecLength;
+				vec.iov_len = fSavedVecLength;
+
 				// partial write: copy partial end to bounce buffer
 				status_t error = _CopyPartialEnd(true);
 				if (error == B_OK) {
@@ -146,7 +164,7 @@ dprintf("  phase read end\n");
 	}
 
 	if (fParent->IsRead() && UsesBounceBuffer()) {
-dprintf("  read with bounce buffer\n");
+		TRACE("  read with bounce buffer\n");
 		// copy the bounce buffer segments to the final location
 		uint8* bounceBuffer = (uint8*)fDMABuffer->BounceBuffer();
 		addr_t bounceBufferStart = fDMABuffer->PhysicalBounceBuffer();
@@ -155,32 +173,42 @@ dprintf("  read with bounce buffer\n");
 
 		const iovec* vecs = fDMABuffer->Vecs();
 		uint32 vecCount = fDMABuffer->VecCount();
-		uint32 i = 0;
-
-		off_t offset = Offset();
 
 		status_t error = B_OK;
-		bool partialBlockOnly = false;
-		if (HasPartialBegin()) {
-			error = _CopyPartialBegin(false, partialBlockOnly);
-			offset += vecs[0].iov_len;
-			i++;
-		}
 
-		if (error == B_OK && HasPartialEnd() && !partialBlockOnly) {
-			error = _CopyPartialEnd(false);
-			vecCount--;
-		}
+		off_t offset = fOffset;
+		off_t startOffset = fOriginalOffset;
+		off_t endOffset = fOriginalOffset + fOriginalLength;
 
-		for (; error == B_OK && i < vecCount; i++) {
+		for (uint32 i = 0; error == B_OK && i < vecCount; i++) {
 			const iovec& vec = vecs[i];
 			addr_t base = (addr_t)vec.iov_base;
+			size_t length = vec.iov_len;
+
+			if (offset < startOffset) {
+				if (offset + length <= startOffset) {
+					offset += length;
+					continue;
+				}
+
+				size_t diff = startOffset - offset;
+				base += diff;
+				length -= diff;
+			}
+
+			if (offset + length > endOffset) {
+				if (offset >= endOffset)
+					break;
+
+				length = endOffset - offset;
+			}
+
 			if (base >= bounceBufferStart && base < bounceBufferEnd) {
 				error = fParent->CopyData(
-					bounceBuffer + (base - bounceBufferStart), offset,
-					vec.iov_len);
+					bounceBuffer + (base - bounceBufferStart), offset, length);
 			}
-			offset += vec.iov_len;
+
+			offset += length;
 		}
 
 		if (error != B_OK)
@@ -208,15 +236,10 @@ IOOperation::SetRequest(IORequest* request)
 	// set initial phase
 	fPhase = PHASE_DO_ALL;
 	if (fParent->IsWrite()) {
-		if (HasPartialBegin())
-			fPhase = PHASE_READ_BEGIN;
-		else if (HasPartialEnd())
-			fPhase = PHASE_READ_END;
-
 		// Copy data to bounce buffer segments, save the partial begin/end vec,
 		// which will be copied after their respective read phase.
 		if (UsesBounceBuffer()) {
-dprintf("  write with bounce buffer\n");
+			TRACE("  write with bounce buffer\n");
 			uint8* bounceBuffer = (uint8*)fDMABuffer->BounceBuffer();
 			addr_t bounceBufferStart = fDMABuffer->PhysicalBounceBuffer();
 			addr_t bounceBufferEnd = bounceBufferStart
@@ -224,30 +247,67 @@ dprintf("  write with bounce buffer\n");
 
 			const iovec* vecs = fDMABuffer->Vecs();
 			uint32 vecCount = fDMABuffer->VecCount();
+			size_t vecOffset = 0;
 			uint32 i = 0;
 
-			off_t offset = Offset();
+			off_t offset = fOffset;
+			off_t endOffset = fOffset + fLength;
 
 			if (HasPartialBegin()) {
-				offset += vecs[0].iov_len;
-				i++;
+				// skip first block
+				size_t toSkip = fBlockSize;
+				while (toSkip > 0) {
+					if (vecs[i].iov_len <= toSkip) {
+						toSkip -= vecs[i].iov_len;
+						i++;
+					} else {
+						vecOffset = toSkip;
+						break;
+					}
+				}
+
+				offset += fBlockSize;
 			}
 
-			if (HasPartialEnd())
-				vecCount--;
+			if (HasPartialEnd()) {
+				// skip last block
+				size_t toSkip = fBlockSize;
+				while (toSkip > 0) {
+					if (vecs[vecCount - 1].iov_len <= toSkip) {
+						toSkip -= vecs[vecCount - 1].iov_len;
+						vecCount--;
+					} else
+						break;
+				}
+
+				endOffset -= fBlockSize;
+			}
 
 			for (; i < vecCount; i++) {
 				const iovec& vec = vecs[i];
-				addr_t base = (addr_t)vec.iov_base;
+				addr_t base = (addr_t)vec.iov_base + vecOffset;
+				size_t length = vec.iov_len - vecOffset;
+				vecOffset = 0;
+
 				if (base >= bounceBufferStart && base < bounceBufferEnd) {
+					if (offset + length > endOffset)
+						length = endOffset - offset;
 					status_t error = fParent->CopyData(offset,
-						bounceBuffer + (base - bounceBufferStart), vec.iov_len);
+						bounceBuffer + (base - bounceBufferStart), length);
 					if (error != B_OK)
 						return error;
 				}
-				offset += vec.iov_len;
+
+				offset += length;
 			}
 		}
+
+		if (HasPartialBegin())
+			fPhase = PHASE_READ_BEGIN;
+		else if (HasPartialEnd())
+			fPhase = PHASE_READ_END;
+
+		_PrepareVecs();
 	}
 
 	fStatus = 1;
@@ -275,12 +335,26 @@ IOOperation::SetRange(off_t offset, size_t length)
 }
 
 
+off_t
+IOOperation::Offset() const
+{
+	return fPhase == PHASE_READ_END ? fOffset + fLength - fBlockSize : fOffset;
+}
+
+
+size_t
+IOOperation::Length() const
+{
+	return fPhase == PHASE_DO_ALL ? fLength : fBlockSize;
+}
+
+
 iovec*
 IOOperation::Vecs() const
 {
 	switch (fPhase) {
 		case PHASE_READ_END:
-			return fDMABuffer->Vecs() + (fDMABuffer->VecCount() - 1);
+			return fDMABuffer->Vecs() + fSavedVecIndex;
 		case PHASE_READ_BEGIN:
 		case PHASE_DO_ALL:
 		default:
@@ -294,8 +368,9 @@ IOOperation::VecCount() const
 {
 	switch (fPhase) {
 		case PHASE_READ_BEGIN:
+			return fSavedVecIndex + 1;
 		case PHASE_READ_END:
-			return 1;
+			return fDMABuffer->VecCount() - fSavedVecIndex;
 		case PHASE_DO_ALL:
 		default:
 			return fDMABuffer->VecCount();
@@ -306,6 +381,7 @@ IOOperation::VecCount() const
 void
 IOOperation::SetPartial(bool partialBegin, bool partialEnd)
 {
+	TRACE("partial begin %d, end %d\n", partialBegin, partialEnd);
 	fPartialBegin = partialBegin;
 	fPartialEnd = partialEnd;
 }
@@ -314,7 +390,7 @@ IOOperation::SetPartial(bool partialBegin, bool partialEnd)
 bool
 IOOperation::IsWrite() const
 {
-	return fParent->IsWrite() && fPhase != PHASE_DO_ALL;
+	return fParent->IsWrite() && fPhase == PHASE_DO_ALL;
 }
 
 
@@ -325,24 +401,64 @@ IOOperation::IsRead() const
 }
 
 
-status_t
-IOOperation::_CopyPartialBegin(bool isWrite, bool& partialBlockOnly)
+void
+IOOperation::_PrepareVecs()
 {
-	size_t relativeOffset = OriginalOffset() - Offset();
-	size_t length = fDMABuffer->VecAt(0).iov_len;
+	// we need to prepare the vecs for consumption by the drivers
+	if (fPhase == PHASE_READ_BEGIN) {
+		iovec* vecs = fDMABuffer->Vecs();
+		uint32 vecCount = fDMABuffer->VecCount();
+		size_t vecLength = fBlockSize;
+		for (uint32 i = 0; i < vecCount; i++) {
+			iovec& vec = vecs[i];
+			if (vec.iov_len >= vecLength) {
+				fSavedVecIndex = i;
+				fSavedVecLength = vec.iov_len;
+				vec.iov_len = vecLength;
+				break;
+			}
+			vecLength -= vec.iov_len;
+		}
+	} else if (fPhase == PHASE_READ_END) {
+		iovec* vecs = fDMABuffer->Vecs();
+		uint32 vecCount = fDMABuffer->VecCount();
+		size_t vecLength = fBlockSize;
+		for (int32 i = vecCount - 1; i >= 0; i--) {
+			iovec& vec = vecs[i];
+			if (vec.iov_len >= vecLength) {
+				fSavedVecIndex = i;
+				fSavedVecLength = vec.iov_len;
+				vec.iov_base = (uint8*)vec.iov_base
+					+ vec.iov_len - vecLength;
+				vec.iov_len = vecLength;
+				break;
+			}
+			vecLength -= vec.iov_len;
+		}
+	}
+}
 
-	partialBlockOnly = relativeOffset + OriginalLength() <= length;
-	if (partialBlockOnly)
-		length = relativeOffset + OriginalLength();
+
+status_t
+IOOperation::_CopyPartialBegin(bool isWrite, bool& singleBlockOnly)
+{
+	size_t relativeOffset = OriginalOffset() - fOffset;
+	size_t length = fBlockSize - relativeOffset;
+
+	singleBlockOnly = length >= OriginalLength();
+	if (singleBlockOnly)
+		length = OriginalLength();
+
+	TRACE("_CopyPartialBegin(%s, single only %d)\n",
+		isWrite ? "write" : "read", singleBlockOnly);
 
 	if (isWrite) {
 		return fParent->CopyData(OriginalOffset(),
-			(uint8*)fDMABuffer->BounceBuffer() + relativeOffset,
-			length - relativeOffset);
+			(uint8*)fDMABuffer->BounceBuffer() + relativeOffset, length);
 	} else {
 		return fParent->CopyData(
 			(uint8*)fDMABuffer->BounceBuffer() + relativeOffset,
-			OriginalOffset(), length - relativeOffset);
+			OriginalOffset(), length);
 	}
 }
 
@@ -350,20 +466,20 @@ IOOperation::_CopyPartialBegin(bool isWrite, bool& partialBlockOnly)
 status_t
 IOOperation::_CopyPartialEnd(bool isWrite)
 {
+	TRACE("_CopyPartialEnd(%s)\n", isWrite ? "write" : "read");
+
 	const iovec& lastVec = fDMABuffer->VecAt(fDMABuffer->VecCount() - 1);
-	off_t lastVecPos = Offset() + Length() - lastVec.iov_len;
-	if (isWrite) {
-		return fParent->CopyData(lastVecPos,
-			(uint8*)fDMABuffer->BounceBuffer()
-				+ ((addr_t)lastVec.iov_base
-					- fDMABuffer->PhysicalBounceBuffer()),
-			OriginalOffset() + OriginalLength() - lastVecPos);
-	} else {
-		return fParent->CopyData((uint8*)fDMABuffer->BounceBuffer()
-				+ ((addr_t)lastVec.iov_base
-					- fDMABuffer->PhysicalBounceBuffer()),
-			lastVecPos, OriginalOffset() + OriginalLength() - lastVecPos);
-	}
+	off_t lastVecPos = fOffset + fLength - fBlockSize;
+	uint8* base = (uint8*)fDMABuffer->BounceBuffer() + ((addr_t)lastVec.iov_base
+		+ lastVec.iov_len - fBlockSize - fDMABuffer->PhysicalBounceBuffer());
+		// NOTE: this won't work if we don't use the bounce buffer contiguously
+		// (because of boundary alignments).
+	size_t length = OriginalOffset() + OriginalLength() - lastVecPos;
+
+	if (isWrite)
+		return fParent->CopyData(lastVecPos, base, length);
+
+	return fParent->CopyData(base, lastVecPos, length);
 }
 
 
@@ -435,8 +551,8 @@ IORequest::ChunkFinished(IORequestChunk* chunk, status_t status)
 void
 IORequest::Advance(size_t bySize)
 {
-dprintf("IORequest::Advance(%lu): remaining: %lu -> %lu\n", bySize,
-fRemainingBytes, fRemainingBytes - bySize);
+	TRACE("IORequest::Advance(%lu): remaining: %lu -> %lu\n", bySize,
+		fRemainingBytes, fRemainingBytes - bySize);
 	fRemainingBytes -= bySize;
 
 	iovec* vecs = fBuffer->Vecs();
@@ -540,7 +656,8 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 IORequest::_CopySimple(void* bounceBuffer, void* external, size_t size,
 	bool copyIn)
 {
-dprintf("  IORequest::_CopySimple(%p, %p, %lu, %d)\n", bounceBuffer, external, size, copyIn);
+	TRACE("  IORequest::_CopySimple(%p, %p, %lu, %d)\n", bounceBuffer, external,
+		size, copyIn);
 	if (copyIn)
 		memcpy(bounceBuffer, external, size);
 	else

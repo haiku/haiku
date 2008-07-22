@@ -47,11 +47,8 @@ public:
 			size_t				BounceBufferSize() const
 									{ return fBounceBufferSize; }
 
+			bool				UsesBounceBufferAt(uint32 index);
 			void				SetToBounceBuffer(size_t length);
-			bool				UsesBounceBuffer() const
-									{ return fVecCount >= 1
-										&& (addr_t)fVecs[0].iov_base
-											== fPhysicalBounceBuffer; }
 
 private:
 			void*				fBounceBuffer;
@@ -87,6 +84,13 @@ private:
 			bool				_NeedsBoundsBuffers() const;
 			void				_RestrictBoundaryAndSegmentSize(addr_t base,
 									addr_t& length);
+			void				_CutBuffer(DMABuffer& buffer,
+									addr_t& physicalBounceBuffer,
+									size_t& bounceLeft, size_t toCut);
+			size_t				_AddBounceBuffer(DMABuffer& buffer,
+									addr_t& physicalBounceBuffer,
+									size_t& bounceLeft, size_t length,
+									bool fixedLength);
 
 			mutex				fLock;
 			dma_restrictions	fRestrictions;
