@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
-/* Contains the ELF loader */
+/*!	Contains the ELF loader */
 
 #include <elf.h>
 
@@ -43,16 +43,6 @@
 #	define TRACE(x) ;
 #endif
 
-
-// ToDo: this shall contain a list of linked images (one day)
-//	this is a preparation for shared libraries in the kernel
-//	and not yet used.
-#if 0
-typedef struct elf_linked_image {
-	struct elf_linked_image *next;
-	struct elf_image_info *image;
-} elf_linked_image;
-#endif
 
 #define IMAGE_HASH_SIZE 16
 
@@ -115,7 +105,8 @@ register_elf_image(struct elf_image_info *image)
 	imageInfo.data = (void *)image->data_region.start;
 	imageInfo.data_size = image->data_region.size;
 
-	image->id = register_image(team_get_kernel_team(), &imageInfo, sizeof(image_info));
+	image->id = register_image(team_get_kernel_team(), &imageInfo,
+		sizeof(image_info));
 	hash_insert(sImagesHash, image);
 }
 
@@ -133,11 +124,13 @@ find_image_at_address(addr_t address)
 
 	// get image that may contain the address
 
-	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
-		if ((address >= image->text_region.start
-				&& address <= (image->text_region.start + image->text_region.size))
+	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
+			!= NULL) {
+		if ((address >= image->text_region.start && address
+				<= (image->text_region.start + image->text_region.size))
 			|| (address >= image->data_region.start
-				&& address <= (image->data_region.start + image->data_region.size)))
+				&& address
+					<= (image->data_region.start + image->data_region.size)))
 			break;
 	}
 
@@ -187,7 +180,8 @@ find_image_by_vnode(void *vnode)
 	mutex_lock(&sImageMutex);
 	hash_open(sImagesHash, &iterator);
 
-	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
+	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
+			!= NULL) {
 		if (image->vnode == vnode)
 			break;
 	}
@@ -202,7 +196,8 @@ find_image_by_vnode(void *vnode)
 static struct elf_image_info *
 create_image_struct()
 {
-	struct elf_image_info *image = (struct elf_image_info *)malloc(sizeof(struct elf_image_info));
+	struct elf_image_info *image
+		= (struct elf_image_info *)malloc(sizeof(struct elf_image_info));
 	if (image == NULL)
 		return NULL;
 
@@ -330,9 +325,11 @@ dump_symbols(int argc, char **argv)
 				// find image at address
 
 				hash_open(sImagesHash, &iterator);
-				while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
+				while ((image = (elf_image_info *)hash_next(sImagesHash,
+						&iterator)) != NULL) {
 					if (image->text_region.start <= num
-						&& image->text_region.start + image->text_region.size >= num)
+						&& image->text_region.start + image->text_region.size
+							>= num)
 						break;
 				}
 				hash_close(sImagesHash, &iterator, false);
@@ -347,7 +344,8 @@ dump_symbols(int argc, char **argv)
 		} else {
 			// look for image by name
 			hash_open(sImagesHash, &iterator);
-			while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
+			while ((image = (elf_image_info *)hash_next(sImagesHash,
+					&iterator)) != NULL) {
 				if (!strcmp(image->name, argv[1]))
 					break;
 			}
@@ -366,35 +364,40 @@ dump_symbols(int argc, char **argv)
 
 	// dump symbols
 
-	kprintf("Symbols of image %ld \"%s\":\nAddress  Type       Size Name\n", image->id, image->name);
+	kprintf("Symbols of image %ld \"%s\":\nAddress  Type       Size Name\n",
+		image->id, image->name);
 
 	if (image->num_debug_symbols > 0) {
 		// search extended debug symbol table (contains static symbols)
 		for (i = 0; i < image->num_debug_symbols; i++) {
 			struct Elf32_Sym *symbol = &image->debug_symbols[i];
 
-			if (symbol->st_value == 0
-				|| symbol->st_size >= image->text_region.size + image->data_region.size)
+			if (symbol->st_value == 0 || symbol->st_size
+					>= image->text_region.size + image->data_region.size)
 				continue;
 
-			kprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->text_region.delta,
-				get_symbol_type_string(symbol), get_symbol_bind_string(symbol), symbol->st_size,
-				image->debug_string_table + symbol->st_name);
+			kprintf("%08lx %s/%s %5ld %s\n",
+				symbol->st_value + image->text_region.delta,
+				get_symbol_type_string(symbol), get_symbol_bind_string(symbol),
+				symbol->st_size, image->debug_string_table + symbol->st_name);
 		}
 	} else {
 		int32 j;
 
 		// search standard symbol lookup table
 		for (i = 0; i < HASHTABSIZE(image); i++) {
-			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
+			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
+					j = HASHCHAINS(image)[j]) {
 				struct Elf32_Sym *symbol = &image->syms[j];
 
-				if (symbol->st_value == 0
-					|| symbol->st_size >= image->text_region.size + image->data_region.size)
+				if (symbol->st_value == 0 || symbol->st_size
+						>= image->text_region.size + image->data_region.size)
 					continue;
 
-				kprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->text_region.delta,
-					get_symbol_type_string(symbol), get_symbol_bind_string(symbol),
+				kprintf("%08lx %s/%s %5ld %s\n",
+					symbol->st_value + image->text_region.delta,
+					get_symbol_type_string(symbol),
+					get_symbol_bind_string(symbol),
 					symbol->st_size, SYMNAME(image, symbol));
 			}
 		}
@@ -407,7 +410,7 @@ dump_symbols(int argc, char **argv)
 static void
 dump_elf_region(struct elf_region *region, const char *name)
 {
-	kprintf("   %s.id 0x%lx\n", name, region->id);
+	kprintf("   %s.id %ld\n", name, region->id);
 	kprintf("   %s.start 0x%lx\n", name, region->start);
 	kprintf("   %s.size 0x%lx\n", name, region->size);
 	kprintf("   %s.delta %ld\n", name, region->delta);
@@ -419,7 +422,7 @@ dump_image_info(struct elf_image_info *image)
 {
 	kprintf("elf_image_info at %p:\n", image);
 	kprintf(" next %p\n", image->next);
-	kprintf(" id 0x%lx\n", image->id);
+	kprintf(" id %ld\n", image->id);
 	dump_elf_region(&image->text_region, "text");
 	dump_elf_region(&image->data_region, "data");
 	kprintf(" dynamic_section 0x%lx\n", image->dynamic_section);
@@ -434,7 +437,8 @@ dump_image_info(struct elf_image_info *image)
 	kprintf(" pltrel %p\n", image->pltrel);
 	kprintf(" pltrel_len 0x%x\n", image->pltrel_len);
 
-	kprintf(" debug_symbols %p (%ld)\n", image->debug_symbols, image->num_debug_symbols);
+	kprintf(" debug_symbols %p (%ld)\n",
+		image->debug_symbols, image->num_debug_symbols);
 }
 
 
@@ -465,7 +469,8 @@ dump_image(int argc, char **argv)
 
 	hash_open(sImagesHash, &iterator);
 
-	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
+	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
+			!= NULL) {
 		kprintf("%p (%ld) %s\n", image, image->id, image->name);
 	}
 
@@ -502,7 +507,8 @@ elf_find_symbol(struct elf_image_info *image, const char *name)
 		return NULL;
 
 	hash = elf_hash(name) % HASHTABSIZE(image);
-	for (i = HASHBUCKETS(image)[hash]; i != STN_UNDEF; i = HASHCHAINS(image)[i]) {
+	for (i = HASHBUCKETS(image)[hash]; i != STN_UNDEF;
+			i = HASHCHAINS(image)[i]) {
 		if (!strcmp(SYMNAME(image, &image->syms[i]), name))
 			return &image->syms[i];
 	}
@@ -622,13 +628,15 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 			// make sure they're the same type
 			if (ELF32_ST_TYPE(symbol->st_info)
 					!= ELF32_ST_TYPE(newSymbol->st_info)) {
-				dprintf("elf_resolve_symbol: found symbol '%s' in shared image but wrong type\n", newName);
+				dprintf("elf_resolve_symbol: found symbol '%s' in shared image "
+					"but wrong type\n", newName);
 				return B_MISSING_SYMBOL;
 			}
 
 			if (ELF32_ST_BIND(newSymbol->st_info) != STB_GLOBAL
 				&& ELF32_ST_BIND(newSymbol->st_info) != STB_WEAK) {
-				TRACE(("elf_resolve_symbol: found symbol '%s' but not exported\n", newName));
+				TRACE(("elf_resolve_symbol: found symbol '%s' but not "
+					"exported\n", newName));
 				return B_MISSING_SYMBOL;
 			}
 
@@ -652,7 +660,7 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 }
 
 
-/*! Until we have shared library support, just links against the kernel */
+/*! Until we have shared library support, just this links against the kernel */
 static int
 elf_relocate(struct elf_image_info *image, const char *symbolPrepend)
 {
@@ -716,23 +724,6 @@ verify_eheader(struct Elf32_Ehdr *elfHeader)
 }
 
 
-#if 0
-static int
-elf_unlink_relocs(struct elf_image_info *image)
-{
-	elf_linked_image *link, *next_link;
-
-	for (link = image->linked_images; link; link = next_link) {
-		next_link = link->next;
-		elf_unload_image(link->image);
-		free(link);
-	}
-
-	return B_NO_ERROR;
-}
-#endif
-
-
 static status_t
 unload_elf_image(struct elf_image_info *image)
 {
@@ -740,9 +731,6 @@ unload_elf_image(struct elf_image_info *image)
 		return B_OK;
 
 	TRACE(("unload image %ld, %s\n", image->id, image->name));
-
-	//elf_unlink_relocs(image);
-		// not yet used
 
 	delete_area(image->text_region.id);
 	delete_area(image->data_region.id);
@@ -803,13 +791,15 @@ load_elf_symbol_table(int fd, struct elf_image_info *image)
 			}
 
 			// read in symbol table
-			symbolTable = (struct Elf32_Sym *)malloc(size = sectionHeaders[i].sh_size);
+			symbolTable
+				= (struct Elf32_Sym *)malloc(size = sectionHeaders[i].sh_size);
 			if (symbolTable == NULL) {
 				status = B_NO_MEMORY;
 				goto error1;
 			}
 
-			length = read_pos(fd, sectionHeaders[i].sh_offset, symbolTable, size);
+			length
+				= read_pos(fd, sectionHeaders[i].sh_offset, symbolTable, size);
 			if (length < size) {
 				TRACE(("error reading in symbol table\n"));
 				status = B_ERROR;
@@ -974,11 +964,12 @@ public:
 	{
 		// Note, that this function doesn't find all symbols that we would like
 		// to find. E.g. static functions do not appear in the symbol table
-		// as function symbols, but as sections without name and size. The .symtab
-		// section together with the .strtab section, which apparently differ from
-		// the tables referred to by the .dynamic section, also contain proper names
-		// and sizes for those symbols. Therefore, to get completely satisfying
-		// results, we would need to read those tables from the shared object.
+		// as function symbols, but as sections without name and size. The
+		// .symtab section together with the .strtab section, which apparently
+		// differ from the tables referred to by the .dynamic section, also
+		// contain proper names and sizes for those symbols. Therefore, to get
+		// completely satisfying results, we would need to read those tables
+		// from the shared object.
 
 		// get the image for the address
 		image_t image;
@@ -1016,13 +1007,13 @@ public:
 				if (!_Read(image.syms + j, symbol))
 					continue;
 
-				// The symbol table contains not only symbols referring to functions
-				// and data symbols within the shared object, but also referenced
-				// symbols of other shared objects, as well as section and file
-				// references. We ignore everything but function and data symbols
-				// that have an st_value != 0 (0 seems to be an indication for a
-				// symbol defined elsewhere -- couldn't verify that in the specs
-				// though).
+				// The symbol table contains not only symbols referring to
+				// functions and data symbols within the shared object, but also
+				// referenced symbols of other shared objects, as well as
+				// section and file references. We ignore everything but
+				// function and data symbols that have an st_value != 0 (0
+				// seems to be an indication for a symbol defined elsewhere
+				// -- couldn't verify that in the specs though).
 				if ((ELF32_ST_TYPE(symbol.st_info) != STT_FUNC
 						&& ELF32_ST_TYPE(symbol.st_info) != STT_OBJECT)
 					|| symbol.st_value == 0
@@ -1079,7 +1070,6 @@ public:
 
 		return B_OK;
 	}
-
 
 	status_t _FindImageAtAddress(addr_t address, image_t& image)
 	{
@@ -1144,7 +1134,8 @@ UserSymbolLookup UserSymbolLookup::sLookup;
 
 
 status_t
-get_image_symbol(image_id id, const char *name, int32 sclass, void **_symbol)
+get_image_symbol(image_id id, const char *name, int32 symbolClass,
+	void **_symbol)
 {
 	struct elf_image_info *image;
 	struct Elf32_Sym *symbol;
@@ -1166,9 +1157,10 @@ get_image_symbol(image_id id, const char *name, int32 sclass, void **_symbol)
 		goto done;
 	}
 
-	// ToDo: support the "sclass" parameter!
+	// TODO: support the "symbolClass" parameter!
 
-	TRACE(("found: %lx (%lx + %lx)\n", symbol->st_value + image->text_region.delta,
+	TRACE(("found: %lx (%lx + %lx)\n",
+		symbol->st_value + image->text_region.delta,
 		symbol->st_value, image->text_region.delta));
 
 	*_symbol = (void *)(symbol->st_value + image->text_region.delta);
@@ -1223,11 +1215,12 @@ elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
 			for (i = 0; i < image->num_debug_symbols; i++) {
 				struct Elf32_Sym *symbol = &image->debug_symbols[i];
 
-				if (symbol->st_value == 0
-					|| symbol->st_size >= image->text_region.size + image->data_region.size)
+				if (symbol->st_value == 0 || symbol->st_size
+						>= image->text_region.size + image->data_region.size)
 					continue;
 
-				symbolDelta = address - (symbol->st_value + image->text_region.delta);
+				symbolDelta
+					= address - (symbol->st_value + image->text_region.delta);
 				if (symbolDelta >= 0 && symbolDelta < symbol->st_size)
 					exactMatch = true;
 
@@ -1246,14 +1239,17 @@ elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
 			TRACE((" searching standard symbols...\n"));
 
 			for (i = 0; i < HASHTABSIZE(image); i++) {
-				for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
+				for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
+						j = HASHCHAINS(image)[j]) {
 					struct Elf32_Sym *symbol = &image->syms[j];
 
 					if (symbol->st_value == 0
-						|| symbol->st_size >= image->text_region.size + image->data_region.size)
+						|| symbol->st_size >= image->text_region.size
+							+ image->data_region.size)
 						continue;
 
-					symbolDelta = address - (long)(symbol->st_value + image->text_region.delta);
+					symbolDelta = address - (long)(symbol->st_value
+						+ image->text_region.delta);
 					if (symbolDelta >= 0 && symbolDelta < symbol->st_size)
 						exactMatch = true;
 
@@ -1329,7 +1325,8 @@ elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
 
 
 status_t
-elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entry)
+elf_load_user_image(const char *path, struct team *team, int flags,
+	addr_t *entry)
 {
 	struct Elf32_Ehdr elfHeader;
 	struct Elf32_Phdr *programHeaders = NULL;
@@ -1364,15 +1361,18 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 
 	// read program header
 
-	programHeaders = (struct Elf32_Phdr *)malloc(elfHeader.e_phnum * elfHeader.e_phentsize);
+	programHeaders = (struct Elf32_Phdr *)malloc(
+		elfHeader.e_phnum * elfHeader.e_phentsize);
 	if (programHeaders == NULL) {
 		dprintf("error allocating space for program headers\n");
 		status = B_NO_MEMORY;
 		goto error;
 	}
 
-	TRACE(("reading in program headers at 0x%lx, length 0x%x\n", elfHeader.e_phoff, elfHeader.e_phnum * elfHeader.e_phentsize));
-	length = _kern_read(fd, elfHeader.e_phoff, programHeaders, elfHeader.e_phnum * elfHeader.e_phentsize);
+	TRACE(("reading in program headers at 0x%lx, length 0x%x\n",
+		elfHeader.e_phoff, elfHeader.e_phnum * elfHeader.e_phentsize));
+	length = _kern_read(fd, elfHeader.e_phoff, programHeaders,
+		elfHeader.e_phnum * elfHeader.e_phentsize);
 	if (length < B_OK) {
 		status = length;
 		dprintf("error reading in program headers\n");
@@ -1411,23 +1411,22 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 		if (programHeaders[i].p_type != PT_LOAD)
 			continue;
 
-		regionAddress = (char *)ROUNDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
+		regionAddress = (char *)ROUNDOWN(programHeaders[i].p_vaddr,
+			B_PAGE_SIZE);
 		if (programHeaders[i].p_flags & PF_WRITE) {
-			/*
-			 * rw/data segment
-			 */
-			uint32 memUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE) + programHeaders[i].p_memsz;
-			uint32 fileUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE) + programHeaders[i].p_filesz;
+			// rw/data segment
+			uint32 memUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+				+ programHeaders[i].p_memsz;
+			uint32 fileUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+				+ programHeaders[i].p_filesz;
 
 			memUpperBound = ROUNDUP(memUpperBound, B_PAGE_SIZE);
 			fileUpperBound = ROUNDUP(fileUpperBound, B_PAGE_SIZE);
 
 			sprintf(regionName, "%s_seg%drw", baseName, i);
 
-			id = vm_map_file(team->id, regionName,
-				(void **)&regionAddress,
-				B_EXACT_ADDRESS,
-				fileUpperBound,
+			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
+				B_EXACT_ADDRESS, fileUpperBound,
 				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
 				fd, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
@@ -1438,27 +1437,25 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 
 			// clean garbage brought by mmap (the region behind the file,
 			// at least parts of it are the bss and have to be zeroed)
-			{
-				uint32 start = (uint32)regionAddress
-					+ (programHeaders[i].p_vaddr % B_PAGE_SIZE)
-					+ programHeaders[i].p_filesz;
-				uint32 amount = fileUpperBound
-					- (programHeaders[i].p_vaddr % B_PAGE_SIZE)
-					- (programHeaders[i].p_filesz);
-				memset((void *)start, 0, amount);
-			}
+			uint32 start = (uint32)regionAddress
+				+ (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+				+ programHeaders[i].p_filesz;
+			uint32 amount = fileUpperBound
+				- (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+				- (programHeaders[i].p_filesz);
+			memset((void *)start, 0, amount);
 
 			// Check if we need extra storage for the bss - we have to do this if
 			// the above region doesn't already comprise the memory size, too.
 
 			if (memUpperBound != fileUpperBound) {
-				size_t bss_size = memUpperBound - fileUpperBound;
+				size_t bssSize = memUpperBound - fileUpperBound;
 
 				snprintf(regionName, B_OS_NAME_LENGTH, "%s_bss%d", baseName, i);
 
 				regionAddress += fileUpperBound;
 				id = create_area_etc(team->id, regionName,
-					(void **)&regionAddress, B_EXACT_ADDRESS, bss_size,
+					(void **)&regionAddress, B_EXACT_ADDRESS, bssSize,
 					B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 				if (id < B_OK) {
 					dprintf("error allocating bss area: %s!\n", strerror(id));
@@ -1467,15 +1464,12 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 				}
 			}
 		} else {
-			/*
-			 * assume ro/text segment
-			 */
+			// assume ro/text segment
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%dro", baseName, i);
 
-			id = vm_map_file(team->id, regionName,
-				(void **)&regionAddress,
-				B_EXACT_ADDRESS,
-				ROUNDUP(programHeaders[i].p_memsz + (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE),
+			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
+				B_EXACT_ADDRESS, ROUNDUP(programHeaders[i].p_memsz
+					+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE),
 				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP,
 				fd, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
@@ -1489,7 +1483,6 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 	TRACE(("elf_load: done!\n"));
 
 	*entry = elfHeader.e_entry;
-
 	status = B_OK;
 
 error:
@@ -1823,7 +1816,8 @@ elf_init(kernel_args *args)
 		insert_preloaded_image(image, false);
 	}
 
-	add_debugger_command("ls", &dump_address_info, "lookup symbol for a particular address");
+	add_debugger_command("ls", &dump_address_info,
+		"lookup symbol for a particular address");
 	add_debugger_command("symbols", &dump_symbols, "dump symbols for image");
 	add_debugger_command("symbol", &dump_symbol, "search symbol in images");
 	add_debugger_command("image", &dump_image, "dump image info");
