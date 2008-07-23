@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -958,7 +958,7 @@ file_cache_sync(void *_cacheRef)
 	if (ref == NULL)
 		return B_BAD_VALUE;
 
-	return ref->cache->WriteModified(true);
+	return ref->cache->WriteModified(false);
 }
 
 
