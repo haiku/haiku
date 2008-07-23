@@ -18,7 +18,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <regex.h>
 
 
 #define CHARS_TABLE_MAXSIZE  10000

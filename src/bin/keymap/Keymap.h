@@ -14,6 +14,7 @@
 #include <Entry.h>
 
 #include <stdio.h>
+#include <regex.h>
 
 
 class Keymap {

@@ -4,10 +4,19 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin keymap ] ;
 
 USES_BE_API on <build>keymap = true ;
 
+local reSources ;
+if $(HOST_PLATFORM) = cygwin {
+	reSources = regex.c ;
+}
+
 BuildPlatformMain <build>keymap :
 	main.cpp
 	Keymap.cpp
+	$(reSources)
 	: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;
 
 LinkAgainst <build>keymap : $(HOST_LIBBE) ;
+
+SEARCH on [ FGristFiles $(reSources) ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc regex ] ;
