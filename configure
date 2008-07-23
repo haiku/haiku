@@ -330,6 +330,7 @@ case "${platform}" in
 	Haiku)	buildPlatform=haiku_host ;;
 	Linux)	buildPlatform=linux ;;
 	SunOS)	buildPlatform=sunos ;;
+	CYGWIN_NT-*) buildPlatform=cygwin ;;
 	*)		echo Unsupported platform: ${platform}
 			exit 1 ;;
 esac
