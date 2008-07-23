@@ -46,9 +46,12 @@ public:
 
 private:
 			void				_Finisher();
+			bool				_FinisherWorkPending();
 			IOOperation*		_GetOperation();
+			IORequest*			_GetNextUnscheduledRequest();
 			status_t			_Scheduler();
 	static	status_t			_SchedulerThread(void* self);
+
 
 private:
 			DMAResource*		fDMAResource;
@@ -62,6 +65,7 @@ private:
 			ConditionVariable	fFinishedOperationCondition;
 			IOOperationList		fUnusedOperations;
 			IOOperationList		fCompletedOperations;
+			bool				fWaiting;
 };
 
 #endif	// IO_SCHEDULER_H

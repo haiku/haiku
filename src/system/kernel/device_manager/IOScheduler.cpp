@@ -22,7 +22,8 @@
 
 IOScheduler::IOScheduler(DMAResource* resource)
 	:
-	fDMAResource(resource)
+	fDMAResource(resource),
+	fWaiting(false)
 {
 	mutex_init(&fLock, "I/O scheduler");
 	B_INITIALIZE_SPINLOCK(&fFinisherLock);
@@ -98,8 +99,7 @@ IOScheduler::AbortRequest(IORequest* request, status_t status)
 void
 IOScheduler::OperationCompleted(IOOperation* operation, status_t status)
 {
-	InterruptsLocker _;
-	SpinLocker locker(fFinisherLock);
+	InterruptsSpinLocker _(fFinisherLock);
 
 	// finish operation only once
 	if (operation->Status() <= 0)
@@ -108,10 +108,11 @@ IOScheduler::OperationCompleted(IOOperation* operation, status_t status)
 	operation->SetStatus(status);
 
 	fCompletedOperations.Add(operation);
-	locker.Unlock();
 
-	locker.SetTo(thread_spinlock, false);
-	thread_interrupt(thread_get_thread_struct_locked(fThread), false);
+	if (fWaiting) {
+		SpinLocker _2(thread_spinlock);
+		thread_interrupt(thread_get_thread_struct_locked(fThread), false);
+	}
 }
 
 
@@ -143,6 +144,15 @@ IOScheduler::_Finisher()
 }
 
 
+/*!	Called with \c fFinisherLock held.
+*/
+bool
+IOScheduler::_FinisherWorkPending()
+{
+	return !fCompletedOperations.IsEmpty();
+}
+
+
 IOOperation*
 IOScheduler::_GetOperation()
 {
@@ -153,12 +163,60 @@ IOScheduler::_GetOperation()
 		if (operation != NULL)
 			return operation;
 
+		// Wait for new operations. First check whether any finisher work has
+		// to be done.
+		InterruptsSpinLocker finisherLocker(fFinisherLock);
+		if (_FinisherWorkPending()) {
+			finisherLocker.Unlock();
+			locker.Unlock();
+			_Finisher();
+			continue;
+		}
+
 		ConditionVariableEntry entry;
 		fFinishedOperationCondition.Add(&entry);
+		fWaiting = true;
 
+		finisherLocker.Unlock();
 		locker.Unlock();
 
-		entry.Wait();
+		entry.Wait(B_CAN_INTERRUPT);
+		fWaiting = false;
+		_Finisher();
+	}
+}
+
+
+IORequest*
+IOScheduler::_GetNextUnscheduledRequest()
+{
+	while (true) {
+		MutexLocker locker(fLock);
+		IORequest* request = fUnscheduledRequests.RemoveHead();
+
+		if (request != NULL)
+			return request;
+
+		// Wait for new requests. First check whether any finisher work has
+		// to be done.
+		InterruptsSpinLocker finisherLocker(fFinisherLock);
+		if (_FinisherWorkPending()) {
+			finisherLocker.Unlock();
+			locker.Unlock();
+			_Finisher();
+			continue;
+		}
+
+		// Wait for new requests.
+		ConditionVariableEntry entry;
+		fNewRequestCondition.Add(&entry);
+		fWaiting = true;
+
+		finisherLocker.Unlock();
+		locker.Unlock();
+
+		entry.Wait(B_CAN_INTERRUPT);
+		fWaiting = false;
 		_Finisher();
 	}
 }
@@ -169,21 +227,7 @@ IOScheduler::_Scheduler()
 {
 // TODO: This is a no-op scheduler. Implement something useful!
 	while (true) {
-		MutexLocker locker(fLock);
-		IORequest* request = fUnscheduledRequests.RemoveHead();
-
-		if (request == NULL) {
-			ConditionVariableEntry entry;
-			fNewRequestCondition.Add(&entry);
-			locker.Unlock();
-
-			if (entry.Wait(B_CAN_INTERRUPT) != B_OK)
-				_Finisher();
-
-			continue;
-		}
-
-		locker.Unlock();
+		IORequest* request = _GetNextUnscheduledRequest();
 
 		if (fDMAResource != NULL) {
 			while (request->RemainingBytes() > 0) {
