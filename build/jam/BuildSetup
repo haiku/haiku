@@ -465,14 +465,18 @@ HOST_UNARFLAGS		?= x ;
 
 # check the host platform compatibility
 SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
-	: linux freebsd darwin sunos ;
+	: linux freebsd darwin sunos cygwin ;
 
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
-	|| $(HOST_PLATFORM) = darwin {
+	|| $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = cygwin {
 	# don't use lex: otherwise rc will not work correctly
 	if $(LEX) = lex {
 		LEX = flex ;
 	}
+}
+
+if $(HOST_PLATFORM) = cygwin {
+	HOST_LINKFLAGS += -Xlinker --allow-multiple-definition -Xlinker --enable-auto-import ;
 }
 
 HOST_CPU	?= $(OSPLAT:L) ;
@@ -506,8 +510,10 @@ HOST_ASFLAGS = ;
 HOST_CCFLAGS += -Wno-multichar ;
 HOST_C++FLAGS += -Wno-multichar ;
 
-HOST_PIC_CCFLAGS += -fPIC ;
-HOST_PIC_C++FLAGS += -fPIC ;
+if $(HOST_PLATFORM) != cygwin {
+	HOST_PIC_CCFLAGS += -fPIC ;
+	HOST_PIC_C++FLAGS += -fPIC ;
+}
 
 HOST_KERNEL_CCFLAGS += $(HOST_GCC_BASE_FLAGS) -finline -fno-builtin
 	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
@@ -613,8 +619,13 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	HOST_LIBROOT = libroot_build.so ;
 	HOST_STATIC_LIBROOT = libroot_build.a ;
 	HOST_LIBBE = libbe_build.so ;
-	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
-		= "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
+	if $(HOST_PLATFORM) = cygwin {
+		HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
+			= "export PATH=$PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
+	} else {
+		HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
+			= "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
+	}
 
 	# the C++ support library
 	if $(HOST_GCC_VERSION[1]) < 3 {
@@ -829,6 +840,7 @@ switch $(TARGET_PLATFORM) {
 	case linux		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LINUX ;
 	case freebsd	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_FREEBSD ;
 	case darwin		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_DARWIN ;
+	case cygwin	: TARGET_DEFINES += HAIKU_TARGET_PLATFORM_CYGWIN ;
 	case libbe_test	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LIBBE_TEST ;
 }
 
@@ -841,6 +853,7 @@ switch $(HOST_PLATFORM) {
 	case linux		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
 	case freebsd	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_FREEBSD ;
 	case darwin		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DARWIN ;
+	case cygwin	: HOST_DEFINES += HAIKU_HOST_PLATFORM_CYGWIN ;
 }
 
 
