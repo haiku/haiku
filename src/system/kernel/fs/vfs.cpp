@@ -6579,7 +6579,6 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 
 		if ((flags & B_FORCE_UNMOUNT) == 0) {
 			mutex_unlock(&sVnodeMutex);
-			put_vnode(mount->root_vnode);
 
 			return B_BUSY;
 		}
