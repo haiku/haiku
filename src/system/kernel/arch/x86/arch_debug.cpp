@@ -98,6 +98,10 @@ lookup_symbol(struct thread* thread, addr_t address, addr_t *_baseAddress,
 		}
 	}
 
+	if (status == B_OK) {
+		*_symbolName = debug_demangle(*_symbolName);
+	}
+
 	return status;
 }
 

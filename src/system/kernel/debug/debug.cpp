@@ -89,6 +89,8 @@ static const uint32 kMaxDebuggerModules = sizeof(sDebuggerModules)
 static char sLineBuffer[HISTORY_SIZE][LINE_BUFFER_SIZE] = { "", };
 static int32 sCurrentLine = 0;
 
+static const char *(*sDemangleHook)(const char *) = NULL;
+
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
 
 
@@ -1383,3 +1385,20 @@ dump_block(const char *buffer, int size, const char *prefix)
 		dprintf("\n");
 	}
 }
+
+
+extern void
+debug_set_demangle_hook(const char *(*hook)(const char *))
+{
+	sDemangleHook = hook;
+}
+
+
+extern const char *
+debug_demangle(const char *sym)
+{
+	if (sDemangleHook)
+		return sDemangleHook(sym);
+	return sym;
+}
+

@@ -111,6 +111,9 @@ extern bool		print_debugger_command_usage(const char* command);
 
 extern void		_user_debug_output(const char *userString);
 
+extern void debug_set_demangle_hook(const char *(*hook)(const char *));
+extern const char *debug_demangle(const char *);
+
 #ifdef __cplusplus
 }
 #endif
