@@ -23,7 +23,7 @@ using std::map;
 static const int kVirtualDescriptorStart = 10000;
 
 typedef map<int, BPrivate::Descriptor*> DescriptorMap;
-static DescriptorMap sDescriptors;
+static DescriptorMap *sDescriptors = 0;
 
 namespace BPrivate {
 
@@ -91,7 +91,7 @@ FileDescriptor::Close()
 			return errno;
 	}
 
-	return B_OK;			
+	return B_OK;
 }
 
 // Dup
@@ -101,7 +101,7 @@ FileDescriptor::Dup(Descriptor *&clone)
 	int dupFD = dup(fd);
 	if (dupFD < 0)
 		return errno;
-	
+
 	clone = new FileDescriptor(dupFD);
 	return B_OK;
 }
@@ -150,7 +150,7 @@ DirectoryDescriptor::Close()
 			return errno;
 	}
 
-	return B_OK;			
+	return B_OK;
 }
 
 // Dup
@@ -165,7 +165,7 @@ DirectoryDescriptor::Dup(Descriptor *&clone)
 	DIR *dupDir = opendir(path.c_str());
 	if (!dupDir)
 		return errno;
-	
+
 	clone = new DirectoryDescriptor(dupDir, ref);
 	return B_OK;
 }
@@ -213,7 +213,7 @@ SymlinkDescriptor::SymlinkDescriptor(const char *path)
 status_t
 SymlinkDescriptor::Close()
 {
-	return B_OK;			
+	return B_OK;
 }
 
 // Dup
@@ -276,7 +276,7 @@ AttrDirDescriptor::Close()
 			return errno;
 	}
 
-	return B_OK;			
+	return B_OK;
 }
 
 // Dup
@@ -309,8 +309,10 @@ AttrDirDescriptor::GetNodeRef(NodeRef &ref)
 Descriptor *
 get_descriptor(int fd)
 {
-	DescriptorMap::iterator it = sDescriptors.find(fd);
-	if (it == sDescriptors.end())
+	if (!sDescriptors)
+		return NULL;
+	DescriptorMap::iterator it = sDescriptors->find(fd);
+	if (it == sDescriptors->end())
 		return NULL;
 	return it->second;
 }
@@ -319,18 +321,21 @@ get_descriptor(int fd)
 int
 add_descriptor(Descriptor *descriptor)
 {
+	if (!sDescriptors)
+		sDescriptors = new DescriptorMap;
+
 	int fd = -1;
 	if (FileDescriptor *file = dynamic_cast<FileDescriptor*>(descriptor)) {
 		fd = file->fd;
 	} else {
 		// find a free slot
 		for (fd = kVirtualDescriptorStart;
-			sDescriptors.find(fd) != sDescriptors.end();
+			sDescriptors->find(fd) != sDescriptors->end();
 			fd++) {
 		}
 	}
 
-	sDescriptors[fd] = descriptor;
+	(*sDescriptors)[fd] = descriptor;
 	descriptor->fd = fd;
 
 	return fd;
@@ -340,14 +345,18 @@ add_descriptor(Descriptor *descriptor)
 status_t
 delete_descriptor(int fd)
 {
-	DescriptorMap::iterator it = sDescriptors.find(fd);
-	if (it == sDescriptors.end())
+	DescriptorMap::iterator it = sDescriptors->find(fd);
+	if (it == sDescriptors->end())
 		return B_FILE_ERROR;
 
 	status_t error = it->second->Close();
 	delete it->second;
-	sDescriptors.erase(it);
-	
+	sDescriptors->erase(it);
+
+	if (sDescriptors->size() == 0) {
+		delete sDescriptors;
+		sDescriptors = 0;
+	}
 	return error;
 }
 
