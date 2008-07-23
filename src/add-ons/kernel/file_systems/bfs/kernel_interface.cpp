@@ -66,7 +66,7 @@ bfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	if (status != B_OK)
 		return status;
 
-	identify_cookie *cookie = new identify_cookie;
+	identify_cookie *cookie = new(std::nothrow) identify_cookie;
 	memcpy(&cookie->super_block, &superBlock, sizeof(disk_super_block));
 
 	*_cookie = cookie;
@@ -96,7 +96,6 @@ static void
 bfs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 {
 	identify_cookie *cookie = (identify_cookie *)_cookie;
-
 	delete cookie;
 }
 
@@ -110,7 +109,7 @@ bfs_mount(fs_volume *_volume, const char *device, uint32 flags,
 {
 	FUNCTION();
 
-	Volume *volume = new Volume(_volume);
+	Volume *volume = new(std::nothrow) Volume(_volume);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 
@@ -241,7 +240,7 @@ bfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 		return status;
 	}
 
-	Inode *inode = new Inode(volume, id);
+	Inode *inode = new(std::nothrow) Inode(volume, id);
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
@@ -545,7 +544,7 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 			check_control *control = (check_control *)buffer;
 
 			status_t status = allocator.StartChecking(control);
-			if (status == B_OK && inode != NULL)
+			if (status == B_OK)
 				inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_CHKBFS_RUNNING);
 
 			return status;
@@ -557,7 +556,7 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 			check_control *control = (check_control *)buffer;
 
 			status_t status = allocator.StopChecking(control);
-			if (status == B_OK && inode != NULL)
+			if (status == B_OK)
 				inode->Node().flags &= HOST_ENDIAN_TO_BFS_INT32(~INODE_CHKBFS_RUNNING);
 
 			return status;
@@ -602,19 +601,6 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 			}
 			return B_OK;
 		}
-		case 56743:
-			dump_super_block(&volume->SuperBlock());
-			return B_OK;
-		case 56744:
-			if (inode != NULL)
-				dump_inode(&inode->Node());
-			return B_OK;
-		case 56745:
-			if (inode != NULL) {
-				NodeGetter node(volume, inode);
-				dump_block((const char *)node.Node(), volume->BlockSize());
-			}
-			return B_OK;
 #endif
 	}
 	return B_BAD_VALUE;
@@ -641,15 +627,8 @@ static status_t
 bfs_fsync(fs_volume *_volume, fs_vnode *_node)
 {
 	FUNCTION();
-	if (_node == NULL)
-		return B_BAD_VALUE;
 
 	Inode *inode = (Inode *)_node->private_node;
-	ReadLocker locker(inode->Lock());
-
-	if (!locker.IsLocked())
-		RETURN_ERROR(B_ERROR);
-
 	return inode->Sync();
 }
 
@@ -660,7 +639,6 @@ bfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 	FUNCTION();
 
 	Inode *inode = (Inode *)_node->private_node;
-
 	fill_stat_buffer(inode, *stat);
 	return B_OK;
 }
@@ -776,7 +754,7 @@ bfs_create(fs_volume *_volume, fs_vnode *_directory, const char *name,
 
 	// We are creating the cookie at this point, so that we don't have
 	// to remove the inode if we don't have enough free memory later...
-	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
+	file_cookie *cookie = new(std::nothrow) file_cookie;
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -802,7 +780,7 @@ bfs_create(fs_volume *_volume, fs_vnode *_directory, const char *name,
 				*_vnodeID);
 		}
 	} else
-		free(cookie);
+		delete cookie;
 
 	return status;
 }
@@ -1135,7 +1113,7 @@ bfs_open(fs_volume *_volume, fs_vnode *_node, int openMode, void **_cookie)
 	// This could greatly speed up continuous reads of big files, especially
 	// in the indirect block section.
 
-	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
+	file_cookie *cookie = new(std::nothrow) file_cookie;
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -1163,7 +1141,7 @@ bfs_open(fs_volume *_volume, fs_vnode *_node, int openMode, void **_cookie)
 
 		if (status < B_OK) {
 			// bfs_free_cookie() is only called if this function is successful
-			free(cookie);
+			delete cookie;
 			return status;
 		}
 
@@ -1219,11 +1197,9 @@ bfs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 
 	status_t status = inode->WriteAt(transaction, pos, (const uint8 *)buffer,
 		_length);
-
-	if (status == B_OK)
+	if (status == B_OK) {
 		transaction.Done();
 
-	if (status == B_OK) {
 		ReadLocker locker(inode->Lock());
 
 		// periodically notify if the file size has changed
@@ -1323,7 +1299,7 @@ bfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 		volume->Allocator().StopChecking(NULL);
 	}
 
-	free(cookie);
+	delete cookie;
 	return B_OK;
 }
 
@@ -1462,7 +1438,7 @@ bfs_open_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 	if (inode->GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	TreeIterator *iterator = new TreeIterator(tree);
+	TreeIterator *iterator = new(std::nothrow) TreeIterator(tree);
 	if (iterator == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -1538,7 +1514,7 @@ bfs_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 
 	FUNCTION();
 
-	AttributeIterator *iterator = new AttributeIterator(inode);
+	AttributeIterator *iterator = new(std::nothrow) AttributeIterator(inode);
 	if (iterator == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -1561,9 +1537,6 @@ bfs_free_attr_dir_cookie(fs_volume *_volume, fs_vnode *node, void *_cookie)
 	FUNCTION();
 	AttributeIterator *iterator = (AttributeIterator *)_cookie;
 
-	if (iterator == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
 	delete iterator;
 	return B_OK;
 }
@@ -1575,9 +1548,6 @@ bfs_rewind_attr_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 	FUNCTION();
 
 	AttributeIterator *iterator = (AttributeIterator *)_cookie;
-	if (iterator == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
 	RETURN_ERROR(iterator->Rewind());
 }
 
@@ -1650,7 +1620,7 @@ bfs_close_attr(fs_volume *_volume, fs_vnode *_file, void *cookie)
 static status_t
 bfs_free_attr_cookie(fs_volume *_volume, fs_vnode *_file, void *cookie)
 {
-	free(cookie);
+	delete (attr_cookie*)cookie;
 	return B_OK;
 }
 
@@ -1818,8 +1788,10 @@ bfs_open_index_dir(fs_volume *_volume, void **_cookie)
 
 	Volume *volume = (Volume *)_volume->private_volume;
 
-	if (volume->IndicesNode() == NULL)
+	if (volume->IndicesNode() == NULL) {
+		// This volume does not have any indices
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
+	}
 
 	// Since the indices root node is just a directory, and we are storing
 	// a pointer to it in our Volume object, we can just use the directory
@@ -1828,8 +1800,6 @@ bfs_open_index_dir(fs_volume *_volume, void **_cookie)
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node == NULL)
-		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_open_dir(_volume, &indicesNode, _cookie));
 }
@@ -1844,8 +1814,6 @@ bfs_close_index_dir(fs_volume *_volume, void *_cookie)
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node == NULL)
-		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_close_dir(_volume, &indicesNode, _cookie));
 }
@@ -1860,8 +1828,6 @@ bfs_free_index_dir_cookie(fs_volume *_volume, void *_cookie)
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node == NULL)
-		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_free_dir_cookie(_volume, &indicesNode, _cookie));
 }
@@ -1876,8 +1842,6 @@ bfs_rewind_index_dir(fs_volume *_volume, void *_cookie)
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node == NULL)
-		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_rewind_dir(_volume, &indicesNode, _cookie));
 }
@@ -1893,8 +1857,6 @@ bfs_read_index_dir(fs_volume *_volume, void *_cookie, struct dirent *dirent,
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node == NULL)
-		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_read_dir(_volume, &indicesNode, _cookie, dirent,
 		bufferSize, _num));
@@ -1942,8 +1904,8 @@ bfs_remove_index(fs_volume *_volume, const char *name)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-	Inode *indices;
-	if ((indices = volume->IndicesNode()) == NULL)
+	Inode *indices = volume->IndicesNode();
+	if (indices == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	Transaction transaction(volume, volume->Indices());
@@ -2001,7 +1963,7 @@ bfs_open_query(fs_volume *_volume, const char *queryString, uint32 flags,
 
 	Volume *volume = (Volume *)_volume->private_volume;
 
-	Expression *expression = new Expression((char *)queryString);
+	Expression *expression = new(std::nothrow) Expression((char *)queryString);
 	if (expression == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -2013,7 +1975,7 @@ bfs_open_query(fs_volume *_volume, const char *queryString, uint32 flags,
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
-	Query *query = new Query(volume, expression, flags);
+	Query *query = new(std::nothrow) Query(volume, expression, flags);
 	if (query == NULL) {
 		delete expression;
 		RETURN_ERROR(B_NO_MEMORY);
@@ -2072,10 +2034,8 @@ static status_t
 bfs_rewind_query(fs_volume * /*_volume*/, void *cookie)
 {
 	FUNCTION();
-	Query *query = (Query *)cookie;
-	if (query == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
 
+	Query *query = (Query *)cookie;
 	return query->Rewind();
 }
 

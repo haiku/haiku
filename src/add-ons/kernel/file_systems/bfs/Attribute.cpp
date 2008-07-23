@@ -9,8 +9,8 @@
 #include "Attribute.h"
 
 
-// ToDo: clean this up, find a better separation between Inode and this class
-// ToDo: even after Create(), the attribute cannot be stat() for until the first write
+// TODO: clean this up, find a better separation between Inode and this class
+// TODO: even after Create(), the attribute cannot be stat() for until the first write
 
 
 extern void fill_stat_buffer(Inode *inode, struct stat &stat);
@@ -111,13 +111,14 @@ Attribute::Put()
 
 
 status_t
-Attribute::Create(const char *name, type_code type, int openMode, attr_cookie **_cookie)
+Attribute::Create(const char *name, type_code type, int openMode,
+	attr_cookie **_cookie)
 {
 	status_t status = CheckAccess(name, openMode);
 	if (status < B_OK)
 		return status;
 
-	attr_cookie *cookie = (attr_cookie *)malloc(sizeof(attr_cookie));
+	attr_cookie *cookie = new(std::nothrow) attr_cookie;
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -150,7 +151,7 @@ Attribute::Open(const char *name, int openMode, attr_cookie **_cookie)
 	if (status < B_OK)
 		return status;
 
-	attr_cookie *cookie = (attr_cookie *)malloc(sizeof(attr_cookie));
+	attr_cookie *cookie = new(std::nothrow) attr_cookie;
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -223,7 +224,8 @@ Attribute::_Truncate()
 
 	if (fAttribute != NULL) {
 		WriteLocker locker(fAttribute->Lock());
-		Transaction transaction(fAttribute->GetVolume(), fAttribute->BlockNumber());
+		Transaction transaction(fAttribute->GetVolume(),
+			fAttribute->BlockNumber());
 
 		status_t status = fAttribute->SetFileSize(transaction, 0);
 		if (status >= B_OK)

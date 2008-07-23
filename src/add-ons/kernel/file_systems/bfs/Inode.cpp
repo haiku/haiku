@@ -2111,6 +2111,8 @@ Inode::Sync()
 	if (IsSymLink() && (Flags() & INODE_LONG_SYMLINK) == 0)
 		return B_OK;
 
+	ReadLocker locker(Lock());
+
 	data_stream *data = &Node().data;
 	status_t status = B_OK;
 

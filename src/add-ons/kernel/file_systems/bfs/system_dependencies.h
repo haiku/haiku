@@ -39,6 +39,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <new>
 #include <null.h>
 #include <string.h>
 #include <stdio.h>
