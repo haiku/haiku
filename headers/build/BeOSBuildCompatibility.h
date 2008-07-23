@@ -1,6 +1,22 @@
 #ifndef BEOS_BUILD_COMPATIBILITY_H
 #define BEOS_BUILD_COMPATIBILITY_H
 
+#if defined(HAIKU_HOST_PLATFORM_CYGWIN)
+#ifndef __addr_t_defined
+#define __addr_t_defined
+#endif
+
+#ifndef DEFFILEMODE
+#define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
+#endif
+
+#ifndef S_IUMSK
+#define	S_IUMSK 07777
+#endif
+
+#include <ctype.h>
+#endif
+
 typedef unsigned long haiku_build_addr_t;
 #define addr_t haiku_build_addr_t
 
@@ -25,6 +41,11 @@ extern size_t	strlcat(char *dest, const char *source, size_t length);
 
 #if defined(HAIKU_HOST_PLATFORM_FREEBSD) || defined(HAIKU_HOST_PLATFORM_DARWIN)
 extern size_t	strnlen(const char *string, size_t length);
+#endif
+
+#if defined(HAIKU_HOST_PLATFORM_CYGWIN)
+extern char * stpcpy(char *dest, const char *src);
+extern char * strcasestr(const char *s, const char *find);
 #endif
 
 // BeOS only
@@ -61,7 +82,6 @@ extern char *_haiku_build_strerror(int errnum);
 #define strerror(errnum)	_haiku_build_strerror(errnum)
 
 #endif
-
 
 #ifdef __cplusplus
 } // extern "C"

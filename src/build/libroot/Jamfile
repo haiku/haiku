@@ -27,6 +27,10 @@ if $(HOST_PLATFORM) != darwin {
 	strlSources = strlcpy.c strlcat.c ;
 }
 
+if $(HOST_PLATFORM) = cygwin {
+	strlSources += stpcpy.c strcasestr.c ;
+}
+
 local hostPlatformSources ;
 if $(HOST_PLATFORM) = freebsd {
 	hostPlatformSources = fs_freebsd.cpp ;
