@@ -61,22 +61,17 @@ class VMCacheTraceEntry : public AbstractTraceEntry {
 
 class Create : public VMCacheTraceEntry {
 	public:
-		Create(VMCache* cache, vm_store* store)
+		Create(VMCache* cache)
 			:
-			VMCacheTraceEntry(cache),
-			fStore(store)
+			VMCacheTraceEntry(cache)
 		{
 			Initialized();
 		}
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("vm cache create: store: %p -> cache: %p", fStore,
-				fCache);
+			out.Print("vm cache create: -> cache: %p", fCache);
 		}
-
-	private:
-		vm_store*	fStore;
 };
 
 
@@ -987,6 +982,8 @@ VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
 		return error;
 	}
 
+	T(Create(cache));
+
 	_cache = cache;
 	return B_OK;
 }
@@ -1004,6 +1001,8 @@ VMCacheFactory::CreateVnodeCache(VMCache*& _cache, struct vnode* vnode)
 		cache->Delete();
 		return error;
 	}
+
+	T(Create(cache));
 
 	_cache = cache;
 	return B_OK;
@@ -1023,6 +1022,8 @@ VMCacheFactory::CreateDeviceCache(VMCache*& _cache, addr_t baseAddress)
 		return error;
 	}
 
+	T(Create(cache));
+
 	_cache = cache;
 	return B_OK;
 }
@@ -1040,6 +1041,8 @@ VMCacheFactory::CreateNullCache(VMCache*& _cache)
 		cache->Delete();
 		return error;
 	}
+
+	T(Create(cache));
 
 	_cache = cache;
 	return B_OK;
