@@ -271,7 +271,7 @@ AddressSpaceReadLocker::SetTo(team_id team)
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	acquire_sem_etc(fSpace->sem, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&fSpace->lock);
 	fLocked = true;
 	return B_OK;
 }
@@ -282,7 +282,7 @@ void
 AddressSpaceReadLocker::SetTo(vm_address_space* space)
 {
 	fSpace = space;
-	acquire_sem_etc(fSpace->sem, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&fSpace->lock);
 	fLocked = true;
 }
 
@@ -294,14 +294,14 @@ AddressSpaceReadLocker::SetFromArea(area_id areaID, vm_area*& area)
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	acquire_sem_etc(fSpace->sem, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&fSpace->lock);
 
 	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
 	area = (vm_area *)hash_lookup(sAreaHash, &areaID);
 	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
 
 	if (area == NULL || area->address_space != fSpace) {
-		release_sem_etc(fSpace->sem, READ_COUNT, 0);
+		rw_lock_read_unlock(&fSpace->lock);
 		return B_BAD_VALUE;
 	}
 
@@ -314,7 +314,7 @@ void
 AddressSpaceReadLocker::Unlock()
 {
 	if (fLocked) {
-		release_sem_etc(fSpace->sem, READ_COUNT, 0);
+		rw_lock_read_unlock(&fSpace->lock);
 		fLocked = false;
 	}
 }
@@ -364,7 +364,7 @@ AddressSpaceWriteLocker::SetTo(team_id team)
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	acquire_sem_etc(fSpace->sem, WRITE_COUNT, 0, 0);
+	rw_lock_write_lock(&fSpace->lock);
 	fLocked = true;
 	return B_OK;
 }
@@ -377,14 +377,14 @@ AddressSpaceWriteLocker::SetFromArea(area_id areaID, vm_area*& area)
 	if (fSpace == NULL)
 		return B_BAD_VALUE;
 
-	acquire_sem_etc(fSpace->sem, WRITE_COUNT, 0, 0);
+	rw_lock_write_lock(&fSpace->lock);
 
 	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
 	area = (vm_area*)hash_lookup(sAreaHash, &areaID);
 	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
 
 	if (area == NULL || area->address_space != fSpace) {
-		release_sem_etc(fSpace->sem, WRITE_COUNT, 0);
+		rw_lock_write_unlock(&fSpace->lock);
 		return B_BAD_VALUE;
 	}
 
@@ -415,14 +415,14 @@ AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 	// Second try to get the area -- this time with the address space
 	// write lock held
 
-	acquire_sem_etc(fSpace->sem, WRITE_COUNT, 0, 0);
+	rw_lock_write_lock(&fSpace->lock);
 
 	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
 	area = (vm_area *)hash_lookup(sAreaHash, &areaID);
 	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
 
 	if (area == NULL) {
-		release_sem_etc(fSpace->sem, WRITE_COUNT, 0);
+		rw_lock_write_unlock(&fSpace->lock);
 		return B_BAD_VALUE;
 	}
 
@@ -443,7 +443,10 @@ void
 AddressSpaceWriteLocker::Unlock()
 {
 	if (fLocked) {
-		release_sem_etc(fSpace->sem, fDegraded ? READ_COUNT : WRITE_COUNT, 0);
+		if (fDegraded)
+			rw_lock_read_unlock(&fSpace->lock);
+		else
+			rw_lock_write_unlock(&fSpace->lock);
 		fLocked = false;
 		fDegraded = false;
 	}
@@ -453,7 +456,9 @@ AddressSpaceWriteLocker::Unlock()
 void
 AddressSpaceWriteLocker::DegradeToReadLock()
 {
-	release_sem_etc(fSpace->sem, WRITE_COUNT - READ_COUNT, 0);
+	// TODO: the current R/W lock implementation just keeps the write lock here
+	rw_lock_read_lock(&fSpace->lock);
+	rw_lock_write_unlock(&fSpace->lock);
 	fDegraded = true;
 }
 
@@ -586,12 +591,18 @@ MultiAddressSpaceLocker::Lock()
 	qsort(fItems, fCount, sizeof(lock_item), &_CompareItems);
 
 	for (int32 i = 0; i < fCount; i++) {
-		status_t status = acquire_sem_etc(fItems[i].space->sem,
-			fItems[i].write_lock ? WRITE_COUNT : READ_COUNT, 0, 0);
+		status_t status;
+		if (fItems[i].write_lock)
+			status = rw_lock_write_lock(&fItems[i].space->lock);
+		else
+			status = rw_lock_read_lock(&fItems[i].space->lock);
+
 		if (status < B_OK) {
 			while (--i >= 0) {
-				release_sem_etc(fItems[i].space->sem,
-					fItems[i].write_lock ? WRITE_COUNT : READ_COUNT, 0);
+				if (fItems[i].write_lock)
+					rw_lock_write_unlock(&fItems[i].space->lock);
+				else
+					rw_lock_read_unlock(&fItems[i].space->lock);
 			}
 			return status;
 		}
@@ -609,8 +620,10 @@ MultiAddressSpaceLocker::Unlock()
 		return;
 
 	for (int32 i = 0; i < fCount; i++) {
-		release_sem_etc(fItems[i].space->sem,
-			fItems[i].write_lock ? WRITE_COUNT : READ_COUNT, 0);
+		if (fItems[i].write_lock)
+			rw_lock_write_unlock(&fItems[i].space->lock);
+		else
+			rw_lock_read_unlock(&fItems[i].space->lock);
 	}
 
 	fLocked = false;
@@ -3416,7 +3429,7 @@ vm_delete_areas(struct vm_address_space *addressSpace)
 	TRACE(("vm_delete_areas: called on address space 0x%lx\n",
 		addressSpace->id));
 
-	acquire_sem_etc(addressSpace->sem, WRITE_COUNT, 0, 0);
+	rw_lock_write_lock(&addressSpace->lock);
 
 	// remove all reserved areas in this address space
 
@@ -3445,7 +3458,7 @@ vm_delete_areas(struct vm_address_space *addressSpace)
 		delete_area(addressSpace, area);
 	}
 
-	release_sem_etc(addressSpace->sem, WRITE_COUNT, 0);
+	rw_lock_write_unlock(&addressSpace->lock);
 	return B_OK;
 }
 
@@ -3976,7 +3989,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			vm_address_space *addressSpace = vm_get_current_user_address_space();
 			vm_area *area;
 
-			acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
+			rw_lock_read_lock(&addressSpace->lock);
 // TODO: The user_memcpy() below can cause a deadlock, if it causes a page
 // fault and someone is already waiting for a write lock on the same address
 // space. This thread will then try to acquire the semaphore again and will
@@ -4038,7 +4051,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			}
 #endif	// 0 (stack trace)
 
-			release_sem_etc(addressSpace->sem, READ_COUNT, 0);
+			rw_lock_read_unlock(&addressSpace->lock);
 			vm_put_address_space(addressSpace);
 #endif
 			struct thread *thread = thread_get_current_thread();
@@ -4756,7 +4769,7 @@ static status_t
 test_lock_memory(vm_address_space *addressSpace, addr_t address,
 	bool &needsLocking)
 {
-	acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&addressSpace->lock);
 
 	vm_area *area = vm_area_lookup(addressSpace, address);
 	if (area != NULL) {
@@ -4767,7 +4780,7 @@ test_lock_memory(vm_address_space *addressSpace, addr_t address,
 			&& area->wiring != B_CONTIGUOUS;
 	}
 
-	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
+	rw_lock_read_unlock(&addressSpace->lock);
 
 	if (area == NULL)
 		return B_BAD_ADDRESS;

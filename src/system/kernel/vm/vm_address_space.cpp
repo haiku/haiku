@@ -31,7 +31,7 @@ static vm_address_space *sKernelAddressSpace;
 
 #define ASPACE_HASH_TABLE_SIZE 1024
 static struct hash_table *sAddressSpaceTable;
-static sem_id sAddressSpaceHashSem;
+static rw_lock sAddressSpaceTableLock;
 
 
 static void
@@ -47,7 +47,6 @@ _dump_aspace(vm_address_space *aspace)
 	dprintf("base: 0x%lx\n", aspace->base);
 	dprintf("size: 0x%lx\n", aspace->size);
 	dprintf("change_count: 0x%lx\n", aspace->change_count);
-	dprintf("sem: 0x%lx\n", aspace->sem);
 	dprintf("area_hint: %p\n", aspace->area_hint);
 	dprintf("area_list:\n");
 	for (area = aspace->areas; area != NULL; area = area->address_space_next) {
@@ -154,9 +153,11 @@ delete_address_space(vm_address_space *addressSpace)
 	if (addressSpace == sKernelAddressSpace)
 		panic("tried to delete the kernel aspace!\n");
 
-	acquire_sem_etc(addressSpace->sem, WRITE_COUNT, 0, 0);
-	(*addressSpace->translation_map.ops->destroy)(&addressSpace->translation_map);
-	delete_sem(addressSpace->sem);
+	rw_lock_write_lock(&addressSpace->lock);
+
+	addressSpace->translation_map.ops->destroy(&addressSpace->translation_map);
+
+	rw_lock_destroy(&addressSpace->lock);
 	free(addressSpace);
 }
 
@@ -169,11 +170,11 @@ vm_get_address_space(team_id id)
 {
 	vm_address_space *addressSpace;
 
-	acquire_sem_etc(sAddressSpaceHashSem, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&sAddressSpaceTableLock);
 	addressSpace = (vm_address_space *)hash_lookup(sAddressSpaceTable, &id);
 	if (addressSpace)
 		atomic_add(&addressSpace->ref_count, 1);
-	release_sem_etc(sAddressSpaceHashSem, READ_COUNT, 0);
+	rw_lock_read_unlock(&sAddressSpaceTableLock);
 
 	return addressSpace;
 }
@@ -236,12 +237,12 @@ vm_put_address_space(vm_address_space *addressSpace)
 {
 	bool remove = false;
 
-	acquire_sem_etc(sAddressSpaceHashSem, WRITE_COUNT, 0, 0);
+	rw_lock_write_lock(&sAddressSpaceTableLock);
 	if (atomic_add(&addressSpace->ref_count, -1) == 1) {
 		hash_remove(sAddressSpaceTable, addressSpace);
 		remove = true;
 	}
-	release_sem_etc(sAddressSpaceHashSem, WRITE_COUNT, 0);
+	rw_lock_write_unlock(&sAddressSpaceTableLock);
 
 	if (remove)
 		delete_address_space(addressSpace);
@@ -258,9 +259,9 @@ vm_put_address_space(vm_address_space *addressSpace)
 void
 vm_delete_address_space(vm_address_space *addressSpace)
 {
-	acquire_sem_etc(addressSpace->sem, WRITE_COUNT, 0, 0);
+	rw_lock_write_lock(&addressSpace->lock);
 	addressSpace->state = VM_ASPACE_STATE_DELETION;
-	release_sem_etc(addressSpace->sem, WRITE_COUNT, 0);
+	rw_lock_write_unlock(&addressSpace->lock);
 
 	vm_delete_areas(addressSpace);
 	vm_put_address_space(addressSpace);
@@ -286,15 +287,8 @@ vm_create_address_space(team_id id, addr_t base, addr_t size,
 	addressSpace->areas = NULL;
 	addressSpace->area_hint = NULL;
 	addressSpace->change_count = 0;
-	if (!kernel) {
-		// the kernel address space will create its semaphore later
-		addressSpace->sem = create_sem(WRITE_COUNT, "address space");
-		if (addressSpace->sem < B_OK) {
-			status_t status = addressSpace->sem;
-			free(addressSpace);
-			return status;
-		}
-	}
+	rw_lock_init(&addressSpace->lock,
+		kernel ? "kernel address space" : "address space");
 
 	addressSpace->id = id;
 	addressSpace->ref_count = 1;
@@ -310,9 +304,9 @@ vm_create_address_space(team_id id, addr_t base, addr_t size,
 	}
 
 	// add the aspace to the global hash table
-	acquire_sem_etc(sAddressSpaceHashSem, WRITE_COUNT, 0, 0);
+	rw_lock_write_lock(&sAddressSpaceTableLock);
 	hash_insert(sAddressSpaceTable, addressSpace);
-	release_sem_etc(sAddressSpaceHashSem, WRITE_COUNT, 0);
+	rw_lock_write_unlock(&sAddressSpaceTableLock);
 
 	*_addressSpace = addressSpace;
 	return B_OK;
@@ -322,7 +316,7 @@ vm_create_address_space(team_id id, addr_t base, addr_t size,
 status_t
 vm_address_space_init(void)
 {
-	sAddressSpaceHashSem = -1;
+	rw_lock_init(&sAddressSpaceTableLock, "address spaces table");
 
 	// create the area and address space hash tables
 	{
@@ -333,8 +327,6 @@ vm_address_space_init(void)
 		if (sAddressSpaceTable == NULL)
 			panic("vm_init: error creating aspace hash table\n");
 	}
-
-	sKernelAddressSpace = NULL;
 
 	// create the initial kernel address space
 	if (vm_create_address_space(1, KERNEL_BASE, KERNEL_SIZE,
@@ -355,15 +347,6 @@ vm_address_space_init_post_sem(void)
 {
 	status_t status = arch_vm_translation_map_init_kernel_map_post_sem(
 		&sKernelAddressSpace->translation_map);
-	if (status < B_OK)
-		return status;
-
-	status = sKernelAddressSpace->sem = create_sem(WRITE_COUNT,
-		"kernel_aspacelock");
-	if (status < B_OK)
-		return status;
-
-	status = sAddressSpaceHashSem = create_sem(WRITE_COUNT, "aspace_hash_sem");
 	if (status < B_OK)
 		return status;
 

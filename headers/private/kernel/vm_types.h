@@ -314,7 +314,7 @@ enum {
 struct vm_address_space {
 	struct vm_area		*areas;
 	struct vm_area		*area_hint;
-	sem_id				sem;
+	rw_lock				lock;
 	addr_t				base;
 	addr_t				size;
 	int32				change_count;
