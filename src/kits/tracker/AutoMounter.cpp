@@ -245,8 +245,8 @@ AutoMounter::_UnmountAndEjectVolume(BMessage *message)
 
 			if (status < B_OK)
 				_ReportUnmountError(partition->ContentName(), status);
-			
-			rmdir(path.Path());			
+			else
+				rmdir(path.Path());			
 		}
 		return;
 	}
