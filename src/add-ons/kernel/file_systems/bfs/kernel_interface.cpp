@@ -67,6 +67,9 @@ bfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 		return status;
 
 	identify_cookie *cookie = new(std::nothrow) identify_cookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
 	memcpy(&cookie->super_block, &superBlock, sizeof(disk_super_block));
 
 	*_cookie = cookie;
