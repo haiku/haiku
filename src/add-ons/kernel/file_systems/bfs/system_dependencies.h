@@ -8,6 +8,8 @@
 
 #ifdef BFS_SHELL
 
+#include <new>
+
 #include "fssh_api_wrapper.h"
 
 #else	// !BFS_SHELL
