@@ -36,8 +36,8 @@ size_t vm_page_num_free_pages(void);
 size_t vm_page_num_available_pages(void);
 
 status_t vm_page_write_modified_page_range(struct VMCache *cache,
-	uint32 firstPage, uint32 endPage, bool fsReenter);
-status_t vm_page_write_modified_pages(struct VMCache *cache, bool fsReenter);
+	uint32 firstPage, uint32 endPage);
+status_t vm_page_write_modified_pages(struct VMCache *cache);
 void vm_page_schedule_write_page(struct vm_page *page);
 void vm_page_schedule_write_page_range(struct VMCache *cache,
 	uint32 firstPage, uint32 endPage);

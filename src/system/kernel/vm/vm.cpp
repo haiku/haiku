@@ -2249,7 +2249,7 @@ delete_area(vm_address_space *addressSpace, vm_area *area)
 	vm_unmap_pages(area, area->base, area->size, !area->cache->temporary);
 
 	if (!area->cache->temporary)
-		area->cache->WriteModified(false);
+		area->cache->WriteModified();
 
 	arch_vm_unset_memory_type(area);
 	remove_area_from_address_space(addressSpace, area);
@@ -4195,8 +4195,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			size_t bytesRead = vec.iov_len = B_PAGE_SIZE;
 
 			// read it in
-			status_t status = cache->Read(cacheOffset, &vec, 1, &bytesRead,
-				false);
+			status_t status = cache->Read(cacheOffset, &vec, 1, &bytesRead);
 
 			map->ops->put_physical_page((addr_t)vec.iov_base);
 
@@ -5759,7 +5758,7 @@ _user_sync_memory(void *_address, addr_t size, int flags)
 			if (writeSync) {
 				// synchronous
 				error = vm_page_write_modified_page_range(cache, firstPage,
-					endPage, false);
+					endPage);
 				if (error != B_OK)
 					return error;
 			} else {

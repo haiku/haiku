@@ -20,7 +20,7 @@ namespace FSShell {
 /* R5 figures, but we don't use a table for monitors anyway */
 #define DEFAULT_FD_TABLE_SIZE	128
 #define MAX_FD_TABLE_SIZE		8192
-#define DEFAULT_NODE_MONITORS	4096 
+#define DEFAULT_NODE_MONITORS	4096
 #define MAX_NODE_MONITORS		65536
 
 struct kernel_args;
@@ -75,10 +75,10 @@ void			vfs_acquire_vnode(void *vnode);
 fssh_status_t	vfs_get_cookie_from_fd(int fd, void **_cookie);
 fssh_status_t	vfs_read_pages(void *vnode, void *cookie, fssh_off_t pos,
 					const fssh_iovec *vecs, fssh_size_t count,
-					fssh_size_t *_numBytes, bool fsReenter);
+					fssh_size_t *_numBytes);
 fssh_status_t	vfs_write_pages(void *vnode, void *cookie,
 					fssh_off_t pos, const fssh_iovec *vecs, fssh_size_t count,
-					fssh_size_t *_numBytes, bool fsReenter);
+					fssh_size_t *_numBytes);
 fssh_status_t	vfs_get_file_map(void *_vnode, fssh_off_t offset,
 					fssh_size_t size, fssh_file_io_vec *vecs,
 					fssh_size_t *_count);

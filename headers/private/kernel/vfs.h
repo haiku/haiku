@@ -26,7 +26,7 @@
 
 #define DEFAULT_FD_TABLE_SIZE	256
 #define MAX_FD_TABLE_SIZE		8192
-#define DEFAULT_NODE_MONITORS	4096 
+#define DEFAULT_NODE_MONITORS	4096
 #define MAX_NODE_MONITORS		65536
 
 #define B_UNMOUNT_BUSY_PARTITION	0x80000000
@@ -64,7 +64,7 @@ typedef struct io_context {
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 status_t vfs_init(struct kernel_args *args);
 status_t vfs_bootstrap_file_systems(void);
@@ -94,9 +94,9 @@ void vfs_acquire_vnode(struct vnode *vnode);
 status_t vfs_get_cookie_from_fd(int fd, void **_cookie);
 bool vfs_can_page(struct vnode *vnode, void *cookie);
 status_t vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos,
-			const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
+			const iovec *vecs, size_t count, size_t *_numBytes);
 status_t vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos,
-			const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
+			const iovec *vecs, size_t count, size_t *_numBytes);
 status_t vfs_get_vnode_cache(struct vnode *vnode, struct VMCache **_cache,
 			bool allocate);
 status_t vfs_get_file_map(struct vnode *vnode, off_t offset, size_t size,
@@ -250,6 +250,6 @@ extern status_t		_user_get_next_socket_stat(int family, uint32 *cookie,
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif	/* _KERNEL_VFS_H */

@@ -202,7 +202,7 @@ public:
 			status_t	InsertAreaLocked(vm_area* area);
 			status_t	RemoveArea(vm_area* area);
 
-			status_t	WriteModified(bool fsReenter);
+			status_t	WriteModified();
 			status_t	SetMinimalCommitment(off_t commitment);
 			status_t	Resize(off_t newSize);
 
@@ -217,9 +217,9 @@ public:
 	virtual	bool		HasPage(off_t offset);
 
 	virtual	status_t	Read(off_t offset, const iovec *vecs, size_t count,
-							size_t *_numBytes, bool fsReenter);
+							size_t *_numBytes);
 	virtual	status_t	Write(off_t offset, const iovec *vecs, size_t count,
-							size_t *_numBytes, bool fsReenter);
+							size_t *_numBytes);
 
 	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
 

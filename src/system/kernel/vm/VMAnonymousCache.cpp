@@ -186,7 +186,7 @@ VMAnonymousCache::HasPage(off_t offset)
 
 status_t
 VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+	size_t *_numBytes)
 {
 	off_t cacheOffset = offset >> PAGE_SHIFT;
 
@@ -207,7 +207,7 @@ VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
 		off_t pos = (startPageIndex - swapFile->first_page) * PAGE_SIZE;
 
 		status_t status = vfs_read_pages(swapFile->vnode, NULL, pos, vecs + i,
-				j - i, _numBytes, fsReenter);
+				j - i, _numBytes);
 		if (status != B_OK)
 			return status;
 	}
@@ -218,7 +218,7 @@ VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 status_t
 VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+	size_t *_numBytes)
 {
 	offset >>= PAGE_SHIFT;
 	uint32 n = count;
@@ -243,7 +243,7 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 		off_t pos = (pageIndex - swapFile->first_page) * PAGE_SIZE;
 
 		status_t status = vfs_write_pages(swapFile->vnode, NULL, pos, vecs + i ,
-				n, _numBytes, fsReenter);
+				n, _numBytes);
 		if (status != B_OK)
 			return status;
 	}

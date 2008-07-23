@@ -688,7 +688,7 @@ VMCache::RemoveArea(vm_area* area)
 
 
 status_t
-VMCache::WriteModified(bool fsReenter)
+VMCache::WriteModified()
 {
 	TRACE(("VMCache::WriteModified(cache = %p)\n", this));
 
@@ -696,7 +696,7 @@ VMCache::WriteModified(bool fsReenter)
 		return B_OK;
 
 	Lock();
-	status_t status = vm_page_write_modified_pages(this, fsReenter);
+	status_t status = vm_page_write_modified_pages(this);
 	Unlock();
 
 	return status;
@@ -813,16 +813,14 @@ VMCache::HasPage(off_t offset)
 
 
 status_t
-VMCache::Read(off_t offset, const iovec *vecs, size_t count, size_t *_numBytes,
-	bool fsReenter)
+VMCache::Read(off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return B_ERROR;
 }
 
 
 status_t
-VMCache::Write(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+VMCache::Write(off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return B_ERROR;
 }

@@ -332,7 +332,7 @@ bfs_can_page(fs_volume *_volume, fs_vnode *_v, void *_cookie)
 
 static status_t
 bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	Volume *volume = (Volume *)_volume->private_volume;
 	Inode *inode = (Inode *)_node->private_node;
@@ -340,8 +340,7 @@ bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	if (!reenter)
-		rw_lock_read_lock(&inode->Lock());
+	rw_lock_read_lock(&inode->Lock());
 
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
@@ -369,8 +368,7 @@ bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		bytesLeft -= bytes;
 	}
 
-	if (!reenter)
-		rw_lock_read_unlock(&inode->Lock());
+	rw_lock_read_unlock(&inode->Lock());
 
 	return status;
 }
@@ -378,7 +376,7 @@ bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 static status_t
 bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	Volume *volume = (Volume *)_volume->private_volume;
 	Inode *inode = (Inode *)_node->private_node;
@@ -389,8 +387,7 @@ bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	if (!reenter)
-		rw_lock_read_lock(&inode->Lock());
+	rw_lock_read_lock(&inode->Lock());
 
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
@@ -418,8 +415,7 @@ bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		bytesLeft -= bytes;
 	}
 
-	if (!reenter)
-		rw_lock_read_unlock(&inode->Lock());
+	rw_lock_read_unlock(&inode->Lock());
 
 	return status;
 }

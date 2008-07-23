@@ -115,7 +115,7 @@ fs_mount(fs_volume *_volume, const char *device, uint32 flags,
 
 		uint32 len = strlen(buf);
 		// lower case the parms data
-		for (i = 0; i < len + 1; i++) 
+		for (i = 0; i < len + 1; i++)
 			buf[i] = tolower(buf[i]);
 
 		// look for nojoliet
@@ -252,7 +252,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 			TRACE(("fs_walk - read buffer from disk at LBN %Ld into buffer 0x%x.\n",
 				block, blockData));
 
-			// Move to the next 2-block set if necessary				
+			// Move to the next 2-block set if necessary
 			// Don't go over end of buffer, if dir record sits on boundary.
 
 			node.fileIDString = NULL;
@@ -285,7 +285,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 						free(node.attr.slName);
 						node.attr.slName = NULL;
 					}
-				} else {	
+				} else {
 					result = initResult;
 					if (bytesRead == 0)
 						done = TRUE;
@@ -298,7 +298,7 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 			}
 			totalRead += ns->logicalBlkSize[FS_DATA_FORMAT];
 			block++;
-			
+
 			TRACE(("fs_walk - moving to next block %Ld, total read %Ld\n", block, totalRead));
 			block_cache_put(ns->fBlockCache, cachedBlock);
 
@@ -340,12 +340,12 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 
 	status_t result = InitNode(newNode, data + pos, NULL, ns->joliet_level);
 	block_cache_put(ns->fBlockCache, block);
-	
+
 	if (result < B_OK) {
 		free(newNode);
 		return result;
 	}
-	
+
 	newNode->id = vnodeID;
 	_node->private_node = newNode;
 	_node->ops = &gISO9660VnodeOps;
@@ -372,7 +372,7 @@ fs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 
 	TRACE(("fs_release_vnode - ENTER (0x%x)\n", node));
 
-	if (node != NULL) { 
+	if (node != NULL) {
 		if (node->id != ISO_ROOTNODE_ID) {
 			if (node->fileIDString != NULL)
 				free (node->fileIDString);
@@ -392,7 +392,7 @@ fs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 
 static status_t
 fs_read_pages(fs_volume *_vol, fs_vnode *_node, void * _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
@@ -441,7 +441,7 @@ fs_read_stat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 
 	// Same for file/dir in ISO9660
 	st->st_size = node->dataLen[FS_DATA_FORMAT];
-	if (ConvertRecDate(&(node->recordDate), &time) == B_NO_ERROR) 
+	if (ConvertRecDate(&(node->recordDate), &time) == B_NO_ERROR)
 		st->st_ctime = st->st_mtime = st->st_atime = time;
 
 	TRACE(("fs_read_stat - EXIT, result is %s\n", strerror(result)));
@@ -595,7 +595,7 @@ fs_read_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buff
 	TRACE(("fs_read_dir - EXIT, result is %s\n", strerror(result)));
 	return result;
 }
-			
+
 
 static status_t
 fs_rewind_dir(fs_volume *_vol, fs_vnode *_node, void* _cookie)

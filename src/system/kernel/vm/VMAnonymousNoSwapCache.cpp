@@ -96,7 +96,7 @@ VMAnonymousNoSwapCache::HasPage(off_t offset)
 
 status_t
 VMAnonymousNoSwapCache::Read(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+	size_t *_numBytes)
 {
 	panic("anonymous_store: read called. Invalid!\n");
 	return B_ERROR;
@@ -105,7 +105,7 @@ VMAnonymousNoSwapCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 status_t
 VMAnonymousNoSwapCache::Write(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+	size_t *_numBytes)
 {
 	// no place to write, this will cause the page daemon to skip this store
 	return B_ERROR;

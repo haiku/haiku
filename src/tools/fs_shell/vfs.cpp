@@ -141,7 +141,7 @@ static fssh_mutex sMountMutex;
  *	- the fields immutable after initialization of the fs_mount structures in
  *	  sMountsTable will not be modified,
  *	- vnode::covered_by of any vnode in sVnodeTable will not be modified.
- *	
+ *
  *	The thread trying to lock the lock must not hold sVnodeMutex or
  *	sMountMutex.
  */
@@ -612,7 +612,7 @@ create_new_vnode(struct vnode **_vnode, fssh_mount_id mountID, fssh_vnode_id vno
 	vnode->id = vnodeID;
 
 	// add the vnode to the mount structure
-	fssh_mutex_lock(&sMountMutex);	
+	fssh_mutex_lock(&sMountMutex);
 	vnode->mount = find_mount(mountID);
 	if (!vnode->mount || vnode->mount->unmounting) {
 		fssh_mutex_unlock(&sMountMutex);
@@ -862,7 +862,7 @@ err:
  *	The caller must, of course, own a reference to the vnode to call this
  *	function.
  *	The caller must not hold the sVnodeMutex or the sMountMutex.
- * 
+ *
  *	\param vnode the vnode.
  */
 
@@ -873,7 +873,7 @@ put_vnode(struct vnode *vnode)
 }
 
 
-/**	Disconnects all file descriptors that are associated with the 
+/**	Disconnects all file descriptors that are associated with the
  *	\a vnodeToDisconnect, or if this is NULL, all vnodes of the specified
  *	\a mount object.
  *
@@ -1760,7 +1760,7 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 			size = numBytes;
 
 		status = fssh_read_pages(fd, fileVecs[0].offset, &vecs[vecIndex],
-			vecCount - vecIndex, &size, false);
+			vecCount - vecIndex, &size);
 		if (status < FSSH_B_OK)
 			return status;
 
@@ -1820,7 +1820,7 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 			uint32_t tempCount = 0;
 
 			// size tracks how much of what is left of the current fileVec
-			// (fileLeft) has been assigned to tempVecs 
+			// (fileLeft) has been assigned to tempVecs
 			size = 0;
 
 			// assign what is left of the current fileVec to the tempVecs
@@ -1855,10 +1855,10 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 			fssh_size_t bytes = size;
 			if (doWrite) {
 				status = fssh_write_pages(fd, fileOffset, tempVecs,
-					tempCount, &bytes, false);
+					tempCount, &bytes);
 			} else {
 				status = fssh_read_pages(fd, fileOffset, tempVecs,
-					tempCount, &bytes, false);
+					tempCount, &bytes);
 			}
 			if (status < FSSH_B_OK)
 				return status;
@@ -2059,7 +2059,7 @@ fssh_remove_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 	}
 
 	locker.Unlock();
-	
+
 	if (remove) {
 		// if the vnode hasn't been published yet, we delete it here
 		fssh_atomic_add(&vnode->ref_count, -1);
@@ -2070,7 +2070,7 @@ fssh_remove_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 }
 
 
-extern "C" fssh_status_t 
+extern "C" fssh_status_t
 fssh_unremove_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 {
 	struct vnode *vnode;
@@ -2086,7 +2086,7 @@ fssh_unremove_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 }
 
 
-extern "C" fssh_status_t 
+extern "C" fssh_status_t
 fssh_get_vnode_removed(fssh_fs_volume *volume, fssh_vnode_id vnodeID, bool* removed)
 {
 	fssh_mutex_lock(&sVnodeMutex);
@@ -2108,7 +2108,7 @@ fssh_get_vnode_removed(fssh_fs_volume *volume, fssh_vnode_id vnodeID, bool* remo
 //! Works directly on the host's file system
 extern "C" fssh_status_t
 fssh_read_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
-	fssh_size_t count, fssh_size_t *_numBytes, bool fsReenter)
+	fssh_size_t count, fssh_size_t *_numBytes)
 {
 	// check how much the iovecs allow us to read
 	fssh_size_t toRead = 0;
@@ -2149,7 +2149,7 @@ fssh_read_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
 //! Works directly on the host's file system
 extern "C" fssh_status_t
 fssh_write_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
-	fssh_size_t count, fssh_size_t *_numBytes, bool fsReenter)
+	fssh_size_t count, fssh_size_t *_numBytes)
 {
 	// check how much the iovecs allow us to write
 	fssh_size_t toWrite = 0;
@@ -2296,25 +2296,23 @@ vfs_get_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID, void **_vnode)
 
 fssh_status_t
 vfs_read_pages(void *_vnode, void *cookie, fssh_off_t pos,
-	const fssh_iovec *vecs, fssh_size_t count, fssh_size_t *_numBytes,
-	bool fsReenter)
+	const fssh_iovec *vecs, fssh_size_t count, fssh_size_t *_numBytes)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
 	return FS_CALL(vnode, read_pages,
-		cookie, pos, vecs, count, _numBytes, fsReenter);
+		cookie, pos, vecs, count, _numBytes);
 }
 
 
 fssh_status_t
 vfs_write_pages(void *_vnode, void *cookie, fssh_off_t pos,
-	const fssh_iovec *vecs, fssh_size_t count, fssh_size_t *_numBytes,
-	bool fsReenter)
+	const fssh_iovec *vecs, fssh_size_t count, fssh_size_t *_numBytes)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
 	return FS_CALL(vnode, write_pages,
-		cookie, pos, vecs, count, _numBytes, fsReenter);
+		cookie, pos, vecs, count, _numBytes);
 }
 
 
@@ -2901,7 +2899,7 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 	put_vnode(vnode);
 
 	FS_CALL(directory, unlink, name);
-	
+
 	return status;
 }
 
@@ -2993,7 +2991,7 @@ file_create_entry_ref(fssh_mount_id mountID, fssh_vnode_id directoryID, const ch
 
 	FUNCTION(("file_create_entry_ref: name = '%s', omode %x, perms %d, kernel %d\n", name, openMode, perms, kernel));
 
-	// get directory to put the new file in	
+	// get directory to put the new file in
 	status = get_vnode(mountID, directoryID, &directory, false);
 	if (status < FSSH_B_OK)
 		return status;
@@ -3014,7 +3012,7 @@ file_create(int fd, char *path, int openMode, int perms, bool kernel)
 
 	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path, openMode, perms, kernel));
 
-	// get directory to put the new file in	
+	// get directory to put the new file in
 	status = fd_and_path_to_dir_vnode(fd, path, &directory, name, kernel);
 	if (status < 0)
 		return status;
@@ -3182,7 +3180,7 @@ dir_create_entry_ref(fssh_mount_id mountID, fssh_vnode_id parentID, const char *
 		return FSSH_B_BAD_VALUE;
 
 	FUNCTION(("dir_create_entry_ref(dev = %ld, ino = %Ld, name = '%s', perms = %d)\n", mountID, parentID, name, perms));
-	
+
 	status = get_vnode(mountID, parentID, &vnode, kernel);
 	if (status < FSSH_B_OK)
 		return status;
@@ -3297,7 +3295,7 @@ dir_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 dir_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 	fssh_size_t bufferSize, uint32_t *_count)
 {
@@ -3348,7 +3346,7 @@ fix_dirent(struct vnode *parent, struct fssh_dirent *entry)
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 dir_read(struct vnode *vnode, void *cookie, struct fssh_dirent *buffer,
 	fssh_size_t bufferSize, uint32_t *_count)
 {
@@ -3369,7 +3367,7 @@ dir_read(struct vnode *vnode, void *cookie, struct fssh_dirent *buffer,
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 dir_rewind(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -3401,7 +3399,7 @@ dir_remove(int fd, char *path, bool kernel)
 				lastSlash--;
 			}
 
-			if (!leaf[0]		
+			if (!leaf[0]
 				|| !fssh_strcmp(leaf, ".")) {
 				// "name/" -> "name", or "name/." -> "name"
 				lastSlash[0] = '\0';
@@ -3439,7 +3437,7 @@ common_ioctl(struct file_descriptor *descriptor, uint32_t op, void *buffer,
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 common_fcntl(int fd, int op, uint32_t argument, bool kernel)
 {
 	struct file_descriptor *descriptor;
@@ -3463,7 +3461,7 @@ common_fcntl(int fd, int op, uint32_t argument, bool kernel)
 			fssh_mutex_lock(&context->io_mutex);
 			fd_set_close_on_exec(context, fd, argument == FSSH_FD_CLOEXEC);
 			fssh_mutex_unlock(&context->io_mutex);
-			
+
 			status = FSSH_B_OK;
 			break;
 		}
@@ -3801,7 +3799,7 @@ common_write_stat(struct file_descriptor *descriptor,
 	const struct fssh_stat *stat, int statMask)
 {
 	struct vnode *vnode = descriptor->u.vnode;
-	
+
 	FUNCTION(("common_write_stat(vnode = %p, stat = %p, statMask = %d)\n", vnode, stat, statMask));
 	if (!HAS_FS_CALL(vnode, write_stat))
 		return FSSH_EROFS;
@@ -3906,7 +3904,7 @@ attr_dir_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 attr_dir_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 	fssh_size_t bufferSize, uint32_t *_count)
 {
@@ -3921,7 +3919,7 @@ attr_dir_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 attr_dir_rewind(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -4267,7 +4265,7 @@ index_dir_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 index_dir_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 	fssh_size_t bufferSize, uint32_t *_count)
 {
@@ -4280,7 +4278,7 @@ index_dir_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 index_dir_rewind(struct file_descriptor *descriptor)
 {
 	struct fs_mount *mount = descriptor->u.mount;
@@ -4431,7 +4429,7 @@ query_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 query_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 	fssh_size_t bufferSize, uint32_t *_count)
 {
@@ -4444,7 +4442,7 @@ query_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 }
 
 
-static fssh_status_t 
+static fssh_status_t
 query_rewind(struct file_descriptor *descriptor)
 {
 	struct fs_mount *mount = descriptor->u.mount;
@@ -4888,7 +4886,7 @@ fs_next_device(int32_t *_cookie)
 	struct fs_mount *mount = NULL;
 	fssh_dev_t device = *_cookie;
 
-	fssh_mutex_lock(&sMountMutex);	
+	fssh_mutex_lock(&sMountMutex);
 
 	// Since device IDs are assigned sequentially, this algorithm
 	// does work good enough. It makes sure that the device list
@@ -4909,7 +4907,7 @@ fs_next_device(int32_t *_cookie)
 		device = FSSH_B_BAD_VALUE;
 
 	fssh_mutex_unlock(&sMountMutex);
-	
+
 	return device;
 }
 
@@ -4931,7 +4929,7 @@ get_cwd(char *buffer, fssh_size_t size, bool kernel)
 		status = FSSH_B_ERROR;
 
 	fssh_mutex_unlock(&context->io_mutex);
-	return status; 
+	return status;
 }
 
 
@@ -5142,7 +5140,7 @@ _kern_open_dir(int fd, const char *path)
 }
 
 
-fssh_status_t 
+fssh_status_t
 _kern_fcntl(int fd, int op, uint32_t argument)
 {
 	return common_fcntl(fd, op, argument, true);
@@ -5245,7 +5243,7 @@ _kern_read_link(int fd, const char *path, char *buffer, fssh_size_t *_bufferSize
 		if (pathBuffer.InitCheck() != FSSH_B_OK)
 			return FSSH_B_NO_MEMORY;
 
-		return common_read_link(fd, pathBuffer.LockBuffer(), 
+		return common_read_link(fd, pathBuffer.LockBuffer(),
 			buffer, _bufferSize, true);
 	}
 
@@ -5282,7 +5280,7 @@ _kern_create_symlink(int fd, const char *path, const char *toPath, int mode)
 	if (status < FSSH_B_OK)
 		return status;
 
-	return common_create_symlink(fd, pathBuffer.LockBuffer(), 
+	return common_create_symlink(fd, pathBuffer.LockBuffer(),
 		toBuffer, mode, true);
 }
 
@@ -5295,7 +5293,7 @@ _kern_create_link(const char *path, const char *toPath)
 	if (pathBuffer.InitCheck() != FSSH_B_OK || toPathBuffer.InitCheck() != FSSH_B_OK)
 		return FSSH_B_NO_MEMORY;
 
-	return common_create_link(pathBuffer.LockBuffer(), 
+	return common_create_link(pathBuffer.LockBuffer(),
 		toPathBuffer.LockBuffer(), true);
 }
 
@@ -5352,7 +5350,7 @@ _kern_rename(int oldFD, const char *oldPath, int newFD, const char *newPath)
 	if (oldPathBuffer.InitCheck() != FSSH_B_OK || newPathBuffer.InitCheck() != FSSH_B_OK)
 		return FSSH_B_NO_MEMORY;
 
-	return common_rename(oldFD, oldPathBuffer.LockBuffer(), 
+	return common_rename(oldFD, oldPathBuffer.LockBuffer(),
 		newFD, newPathBuffer.LockBuffer(), true);
 }
 
@@ -5411,7 +5409,7 @@ _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
 		if (pathBuffer.InitCheck() != FSSH_B_OK)
 			return FSSH_B_NO_MEMORY;
 
-		status = common_path_read_stat(fd, pathBuffer.LockBuffer(), 
+		status = common_path_read_stat(fd, pathBuffer.LockBuffer(),
 			traverseLeafLink, stat, true);
 	} else {
 		// no path given: get the FD and use the FD operation
@@ -5481,7 +5479,7 @@ _kern_write_stat(int fd, const char *path, bool traverseLeafLink,
 		if (pathBuffer.InitCheck() != FSSH_B_OK)
 			return FSSH_B_NO_MEMORY;
 
-		status = common_path_write_stat(fd, pathBuffer.LockBuffer(), 
+		status = common_path_write_stat(fd, pathBuffer.LockBuffer(),
 			traverseLeafLink, stat, statMask, true);
 	} else {
 		// no path given: get the FD and use the FD operation

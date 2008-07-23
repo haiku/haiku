@@ -137,10 +137,10 @@ struct fssh_fs_vnode_ops {
 				fssh_fs_cookie cookie);
 	fssh_status_t (*read_pages)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
 				fssh_fs_cookie cookie, fssh_off_t pos, const fssh_iovec *vecs,
-				fssh_size_t count, fssh_size_t *_numBytes, bool reenter);
+				fssh_size_t count, fssh_size_t *_numBytes);
 	fssh_status_t (*write_pages)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
 				fssh_fs_cookie cookie, fssh_off_t pos, const fssh_iovec *vecs,
-				fssh_size_t count, fssh_size_t *_numBytes, bool reenter);
+				fssh_size_t count, fssh_size_t *_numBytes);
 
 	/* cache file access */
 	fssh_status_t (*get_file_map)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
@@ -339,10 +339,10 @@ extern fssh_status_t fssh_get_vnode_removed(fssh_fs_volume *volume,
 
 extern fssh_status_t fssh_read_pages(int fd, fssh_off_t pos,
 				const struct fssh_iovec *vecs, fssh_size_t count,
-				fssh_size_t *_numBytes, bool fsReenter);
+				fssh_size_t *_numBytes);
 extern fssh_status_t fssh_write_pages(int fd, fssh_off_t pos,
 				const struct fssh_iovec *vecs, fssh_size_t count,
-				fssh_size_t *_numBytes, bool fsReenter);
+				fssh_size_t *_numBytes);
 extern fssh_status_t fssh_read_file_io_vec_pages(int fd,
 				const struct fssh_file_io_vec *fileVecs,
 				fssh_size_t fileVecCount, const struct fssh_iovec *vecs,

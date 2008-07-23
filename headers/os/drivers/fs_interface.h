@@ -119,11 +119,10 @@ struct fs_vnode_ops {
 	/* VM file access */
 	bool (*can_page)(fs_volume *volume, fs_vnode *vnode, void *cookie);
 	status_t (*read_pages)(fs_volume *volume, fs_vnode *vnode, void *cookie,
-				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
-				bool reenter);
+				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
 	status_t (*write_pages)(fs_volume *volume, fs_vnode *vnode,
 				void *cookie, off_t pos, const iovec *vecs, size_t count,
-				size_t *_numBytes, bool reenter);
+				size_t *_numBytes);
 
 	/* cache file access */
 	status_t (*get_file_map)(fs_volume *volume, fs_vnode *vnode, off_t offset,
@@ -299,9 +298,9 @@ extern status_t get_vnode_removed(fs_volume *volume, ino_t vnodeID,
 					bool *removed);
 
 extern status_t read_pages(int fd, off_t pos, const struct iovec *vecs,
-					size_t count, size_t *_numBytes, bool fsReenter);
+					size_t count, size_t *_numBytes);
 extern status_t write_pages(int fd, off_t pos, const struct iovec *vecs,
-					size_t count, size_t *_numBytes, bool fsReenter);
+					size_t count, size_t *_numBytes);
 extern status_t read_file_io_vec_pages(int fd,
 					const struct file_io_vec *fileVecs, size_t fileVecCount,
 					const struct iovec *vecs, size_t vecCount,

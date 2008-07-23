@@ -1593,7 +1593,7 @@ devfs_can_page(fs_volume *_volume, fs_vnode *_vnode, void *cookie)
 
 static status_t
 devfs_read_pages(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
-	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	struct devfs_vnode *vnode = (devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
@@ -1651,7 +1651,7 @@ devfs_read_pages(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 
 static status_t
 devfs_write_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
-	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes, bool reenter)
+	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	struct devfs_vnode *vnode = (devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;

@@ -41,12 +41,12 @@ VMVnodeCache::HasPage(off_t offset)
 
 status_t
 VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+	size_t *_numBytes)
 {
 	size_t bytesUntouched = *_numBytes;
 
 	status_t status = vfs_read_pages(fVnode, NULL, offset, vecs, count,
-		_numBytes, fsReenter);
+		_numBytes);
 
 	bytesUntouched -= *_numBytes;
 
@@ -73,10 +73,9 @@ VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 status_t
 VMVnodeCache::Write(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+	size_t *_numBytes)
 {
-	return vfs_write_pages(fVnode, NULL, offset, vecs, count, _numBytes,
-		fsReenter);
+	return vfs_write_pages(fVnode, NULL, offset, vecs, count, _numBytes);
 }
 
 

@@ -211,7 +211,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 	// read file into reserved pages
 	status_t status = vfs_read_pages(ref->vnode, cookie, offset, vecs,
-		vecCount, &numBytes, false);
+		vecCount, &numBytes);
 	if (status < B_OK) {
 		// reading failed, free allocated pages
 
@@ -294,7 +294,7 @@ read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
 	vm_page_unreserve_pages(lastReservedPages);
 
 	status_t status = vfs_read_pages(ref->vnode, cookie, offset + pageOffset,
-		&vec, 1, &bufferSize, false);
+		&vec, 1, &bufferSize);
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, false);
 
@@ -361,7 +361,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		size_t bytesRead = B_PAGE_SIZE;
 
 		status = vfs_read_pages(ref->vnode, cookie, offset, &readVec, 1,
-			&bytesRead, false);
+			&bytesRead);
 		// ToDo: handle errors for real!
 		if (status < B_OK)
 			panic("1. vfs_read_pages() failed: %s!\n", strerror(status));
@@ -385,7 +385,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 			status = vfs_read_pages(ref->vnode, cookie,
 				PAGE_ALIGN(offset + pageOffset + bufferSize) - B_PAGE_SIZE,
-				&readVec, 1, &bytesRead, false);
+				&readVec, 1, &bytesRead);
 			// ToDo: handle errors for real!
 			if (status < B_OK)
 				panic("vfs_read_pages() failed: %s!\n", strerror(status));
@@ -420,7 +420,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	if (writeThrough) {
 		// write cached pages back to the file if we were asked to do that
 		status_t status = vfs_write_pages(ref->vnode, cookie, offset, vecs,
-			vecCount, &numBytes, false);
+			vecCount, &numBytes);
 		if (status < B_OK) {
 			// ToDo: remove allocated pages, ...?
 			panic("file_cache: remove allocated pages! write pages failed: %s\n",
@@ -491,7 +491,7 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 				chunkSize = bufferSize;
 
 			status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
-				&vec, 1, &chunkSize, false);
+				&vec, 1, &chunkSize);
 			if (status < B_OK)
 				break;
 
@@ -502,7 +502,7 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 		free((void*)buffer);
 	} else {
 		status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
-			&vec, 1, &bufferSize, false);
+			&vec, 1, &bufferSize);
 	}
 
 	if (status == B_OK)
@@ -958,7 +958,7 @@ file_cache_sync(void *_cacheRef)
 	if (ref == NULL)
 		return B_BAD_VALUE;
 
-	return ref->cache->WriteModified(false);
+	return ref->cache->WriteModified();
 }
 
 

@@ -319,7 +319,7 @@ Inode::~Inode()
 }
 
 
-status_t 
+status_t
 Inode::InitCheck()
 {
 	return B_OK;
@@ -920,7 +920,7 @@ fifo_deselect(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	Inode *inode = (Inode *)_node->private_node;
 	if (!inode)
 		return B_ERROR;
-	
+
 	MutexLocker locker(inode->RequestLock());
 	return inode->Deselect(event, sync, cookie->open_mode);
 }
@@ -935,7 +935,7 @@ fifo_can_page(fs_volume *_volume, fs_vnode *_v, void *cookie)
 
 static status_t
 fifo_read_pages(fs_volume *_volume, fs_vnode *_v, void *cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return B_NOT_ALLOWED;
 }
@@ -943,7 +943,7 @@ fifo_read_pages(fs_volume *_volume, fs_vnode *_v, void *cookie, off_t pos,
 
 static status_t
 fifo_write_pages(fs_volume *_volume, fs_vnode *_v, void *cookie,
-	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return B_NOT_ALLOWED;
 }

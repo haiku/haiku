@@ -1056,7 +1056,7 @@ vnode_low_resource_handler(void */*data*/, uint32 resources, int32 level)
 		mutex_unlock(&sVnodeMutex);
 
 		if (vnode->cache != NULL)
-			vnode->cache->WriteModified(false);
+			vnode->cache->WriteModified();
 
 		dec_vnode_ref_count(vnode, true, false);
 			// this should free the vnode when it's still unused
@@ -2912,7 +2912,7 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 			size = numBytes;
 
 		status = FS_CALL(vnode, read_pages, cookie, fileVecs[0].offset,
-			&vecs[vecIndex], vecCount - vecIndex, &size, false);
+			&vecs[vecIndex], vecCount - vecIndex, &size);
 		if (status < B_OK)
 			return status;
 
@@ -3007,10 +3007,10 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 			size_t bytes = size;
 			if (doWrite) {
 				status = FS_CALL(vnode, write_pages, cookie, fileOffset,
-					tempVecs, tempCount, &bytes, false);
+					tempVecs, tempCount, &bytes);
 			} else {
 				status = FS_CALL(vnode, read_pages, cookie, fileOffset,
-					tempVecs, tempCount, &bytes, false);
+					tempVecs, tempCount, &bytes);
 			}
 			if (status < B_OK)
 				return status;
@@ -3282,7 +3282,7 @@ get_vnode_removed(fs_volume *volume, ino_t vnodeID, bool* removed)
 
 extern "C" status_t
 read_pages(int fd, off_t pos, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+	size_t *_numBytes)
 {
 	struct file_descriptor *descriptor;
 	struct vnode *vnode;
@@ -3292,7 +3292,7 @@ read_pages(int fd, off_t pos, const iovec *vecs, size_t count,
 		return B_FILE_ERROR;
 
 	status_t status = FS_CALL(vnode, read_pages, descriptor->cookie, pos, vecs,
-		count, _numBytes, fsReenter);
+		count, _numBytes);
 
 	put_fd(descriptor);
 	return status;
@@ -3301,7 +3301,7 @@ read_pages(int fd, off_t pos, const iovec *vecs, size_t count,
 
 extern "C" status_t
 write_pages(int fd, off_t pos, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+	size_t *_numBytes)
 {
 	struct file_descriptor *descriptor;
 	struct vnode *vnode;
@@ -3311,7 +3311,7 @@ write_pages(int fd, off_t pos, const iovec *vecs, size_t count,
 		return B_FILE_ERROR;
 
 	status_t status = FS_CALL(vnode, write_pages, descriptor->cookie, pos, vecs,
-		count, _numBytes, fsReenter);
+		count, _numBytes);
 
 	put_fd(descriptor);
 	return status;
@@ -3888,23 +3888,21 @@ vfs_can_page(struct vnode *vnode, void *cookie)
 
 extern "C" status_t
 vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool fsReenter)
+	size_t count, size_t *_numBytes)
 {
 	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode, read_pages, cookie, pos, vecs, count, _numBytes,
-		fsReenter);
+	return FS_CALL(vnode, read_pages, cookie, pos, vecs, count, _numBytes);
 }
 
 
 extern "C" status_t
 vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool fsReenter)
+	size_t count, size_t *_numBytes)
 {
 	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode, write_pages, cookie, pos, vecs, count, _numBytes,
-		fsReenter);
+	return FS_CALL(vnode, write_pages, cookie, pos, vecs, count, _numBytes);
 }
 
 
@@ -6712,7 +6710,7 @@ fs_sync(dev_t device)
 				put_vnode(previousVnode);
 
 			if (vnode->cache != NULL)
-				vnode->cache->WriteModified(false);
+				vnode->cache->WriteModified();
 
 			// the next vnode might change until we lock the vnode list again,
 			// but this vnode won't go away since we keep a reference to it.

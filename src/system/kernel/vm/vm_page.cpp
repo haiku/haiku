@@ -844,7 +844,7 @@ page_scrubber(void *unused)
 
 
 static status_t
-write_page(vm_page *page, bool fsReenter)
+write_page(vm_page *page)
 {
 	size_t length = B_PAGE_SIZE;
 	status_t status;
@@ -859,7 +859,7 @@ write_page(vm_page *page, bool fsReenter)
 	vecs->iov_len = B_PAGE_SIZE;
 
 	status = page->cache->Write((off_t)page->cache_offset << PAGE_SHIFT,
-		vecs, 1, &length, fsReenter);
+		vecs, 1, &length);
 
 	vm_put_physical_page((addr_t)vecs[0].iov_base);
 #if 0
@@ -1035,7 +1035,7 @@ page_writer(void* /*unused*/)
 		// TODO: put this as requests into the I/O scheduler
 		status_t writeStatus[kNumPages];
 		for (uint32 i = 0; i < numPages; i++) {
-			writeStatus[i] = write_page(u.pages[i], false);
+			writeStatus[i] = write_page(u.pages[i]);
 		}
 
 		// mark pages depending on whether they could be written or not
@@ -1280,7 +1280,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 */
 status_t
 vm_page_write_modified_page_range(struct VMCache *cache, uint32 firstPage,
-	uint32 endPage, bool fsReenter)
+	uint32 endPage)
 {
 	// TODO: join adjacent pages into one vec list
 
@@ -1321,7 +1321,7 @@ vm_page_write_modified_page_range(struct VMCache *cache, uint32 firstPage,
 		vm_clear_map_flags(page, PAGE_MODIFIED);
 
 		cache->Unlock();
-		status_t status = write_page(page, fsReenter);
+		status_t status = write_page(page);
 		cache->Lock();
 
 		InterruptsSpinLocker locker(&sPageLock);
@@ -1361,10 +1361,10 @@ vm_page_write_modified_page_range(struct VMCache *cache, uint32 firstPage,
 	Note that the cache lock is released in this function.
 */
 status_t
-vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
+vm_page_write_modified_pages(vm_cache *cache)
 {
 	return vm_page_write_modified_page_range(cache, 0,
-		(cache->virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT, fsReenter);
+		(cache->virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 }
 
 

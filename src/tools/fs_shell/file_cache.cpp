@@ -90,7 +90,7 @@ read_from_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
 	fssh_mutex_unlock(&ref->lock);
 
 	fssh_status_t status = vfs_read_pages(ref->node, cookie,
-		offset + pageOffset, &vec, 1, &bufferSize, false);
+		offset + pageOffset, &vec, 1, &bufferSize);
 
 	fssh_mutex_lock(&ref->lock);
 
@@ -109,7 +109,7 @@ write_to_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
 	fssh_mutex_unlock(&ref->lock);
 
 	fssh_status_t status = vfs_write_pages(ref->node, cookie,
-		offset + pageOffset, &vec, 1, &bufferSize, false);
+		offset + pageOffset, &vec, 1, &bufferSize);
 
 	fssh_mutex_lock(&ref->lock);
 

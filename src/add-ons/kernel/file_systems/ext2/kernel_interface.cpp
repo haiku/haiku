@@ -199,7 +199,7 @@ ext2_can_page(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 
 static status_t
 ext2_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
-	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes, bool reenter)
+	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
@@ -207,8 +207,7 @@ ext2_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	if (inode->FileCache() == NULL)
 		return B_BAD_VALUE;
 
-	if (!reenter)
-		rw_lock_read_lock(inode->Lock());
+	rw_lock_read_lock(inode->Lock());
 
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
@@ -236,8 +235,7 @@ ext2_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		bytesLeft -= bytes;
 	}
 
-	if (!reenter)
-		rw_lock_read_unlock(inode->Lock());
+	rw_lock_read_unlock(inode->Lock());
 
 	return status;
 }
