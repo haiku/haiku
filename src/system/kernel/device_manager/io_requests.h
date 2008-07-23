@@ -105,7 +105,6 @@ public:
 									// also sets range
 			void				SetRange(off_t offset, size_t length);
 
-// TODO: Fix Offset() and Length() for partial write phases!
 			off_t				Offset() const;
 			size_t				Length() const;
 			off_t				OriginalOffset() const
