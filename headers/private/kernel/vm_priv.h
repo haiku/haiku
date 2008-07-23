@@ -12,9 +12,6 @@
 #include <vm_types.h>
 
 
-#define WRITE_COUNT 1024
-#define READ_COUNT 1
-
 // reserved area definitions
 #define RESERVED_AREA_ID -1
 #define RESERVED_AVOID_BASE 0x01

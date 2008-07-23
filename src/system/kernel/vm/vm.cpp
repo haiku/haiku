@@ -184,10 +184,10 @@ public:
 };
 
 
-#define REGION_HASH_TABLE_SIZE 1024
-static area_id sNextAreaID;
+#define AREA_HASH_TABLE_SIZE 1024
+static area_id sNextAreaID = 1;
 static hash_table *sAreaHash;
-static sem_id sAreaHashLock;
+static rw_lock sAreaHashLock = RW_LOCK_INITIALIZER("area hash");
 static mutex sMappingLock = MUTEX_INITIALIZER("page mappings");
 static mutex sAreaCacheLock = MUTEX_INITIALIZER("area->cache");
 
@@ -296,9 +296,9 @@ AddressSpaceReadLocker::SetFromArea(area_id areaID, vm_area*& area)
 
 	rw_lock_read_lock(&fSpace->lock);
 
-	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&sAreaHashLock);
 	area = (vm_area *)hash_lookup(sAreaHash, &areaID);
-	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
+	rw_lock_read_unlock(&sAreaHashLock);
 
 	if (area == NULL || area->address_space != fSpace) {
 		rw_lock_read_unlock(&fSpace->lock);
@@ -379,9 +379,9 @@ AddressSpaceWriteLocker::SetFromArea(area_id areaID, vm_area*& area)
 
 	rw_lock_write_lock(&fSpace->lock);
 
-	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&sAreaHashLock);
 	area = (vm_area*)hash_lookup(sAreaHash, &areaID);
-	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
+	rw_lock_read_unlock(&sAreaHashLock);
 
 	if (area == NULL || area->address_space != fSpace) {
 		rw_lock_write_unlock(&fSpace->lock);
@@ -397,7 +397,7 @@ status_t
 AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 	bool allowKernel, vm_area*& area)
 {
-	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&sAreaHashLock);
 
 	area = (vm_area *)hash_lookup(sAreaHash, &areaID);
 	if (area != NULL
@@ -407,7 +407,7 @@ AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 		atomic_add(&fSpace->ref_count, 1);
 	}
 
-	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
+	rw_lock_read_unlock(&sAreaHashLock);
 
 	if (fSpace == NULL)
 		return B_BAD_VALUE;
@@ -417,9 +417,9 @@ AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 
 	rw_lock_write_lock(&fSpace->lock);
 
-	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&sAreaHashLock);
 	area = (vm_area *)hash_lookup(sAreaHash, &areaID);
-	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
+	rw_lock_read_unlock(&sAreaHashLock);
 
 	if (area == NULL) {
 		rw_lock_write_unlock(&fSpace->lock);
@@ -688,9 +688,9 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 		// lock the cache again and check whether anything has changed
 
 		// check whether the area is gone in the meantime
-		acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+		rw_lock_read_lock(&sAreaHashLock);
 		area = (vm_area *)hash_lookup(sAreaHash, &areaID);
-		release_sem_etc(sAreaHashLock, READ_COUNT, 0);
+		rw_lock_read_unlock(&sAreaHashLock);
 
 		if (area == NULL) {
 			Unlock();
@@ -785,7 +785,7 @@ get_address_space_by_area_id(area_id id)
 {
 	vm_address_space* addressSpace = NULL;
 
-	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&sAreaHashLock);
 
 	vm_area *area = (vm_area *)hash_lookup(sAreaHash, &id);
 	if (area != NULL) {
@@ -793,7 +793,7 @@ get_address_space_by_area_id(area_id id)
 		atomic_add(&addressSpace->ref_count, 1);
 	}
 
-	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
+	rw_lock_read_unlock(&sAreaHashLock);
 
 	return addressSpace;
 }
@@ -803,13 +803,13 @@ get_address_space_by_area_id(area_id id)
 static vm_area *
 lookup_area(vm_address_space* addressSpace, area_id id)
 {
-	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&sAreaHashLock);
 
 	vm_area *area = (vm_area *)hash_lookup(sAreaHash, &id);
 	if (area != NULL && area->address_space != addressSpace)
 		area = NULL;
 
-	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
+	rw_lock_read_unlock(&sAreaHashLock);
 
 	return area;
 }
@@ -1449,9 +1449,9 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 		cache->Unlock();
 
 	// insert the area in the global area hash table
-	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0 ,0);
+	rw_lock_write_lock(&sAreaHashLock);
 	hash_insert(sAreaHash, area);
-	release_sem_etc(sAreaHashLock, WRITE_COUNT, 0);
+	rw_lock_write_unlock(&sAreaHashLock);
 
 	// grab a ref to the address space (the area holds this)
 	atomic_add(&addressSpace->ref_count, 1);
@@ -2238,9 +2238,9 @@ remove_area_from_address_space(vm_address_space *addressSpace, vm_area *area)
 static void
 delete_area(vm_address_space *addressSpace, vm_area *area)
 {
-	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0, 0);
+	rw_lock_write_lock(&sAreaHashLock);
 	hash_remove(sAreaHash, area);
-	release_sem_etc(sAreaHashLock, WRITE_COUNT, 0);
+	rw_lock_write_unlock(&sAreaHashLock);
 
 	// At this point the area is removed from the global hash table, but
 	// still exists in the area list.
@@ -3799,7 +3799,6 @@ vm_init(kernel_args *args)
 
 	// initialize some globals
 	sNextAreaID = 1;
-	sAreaHashLock = -1;
 
 	vm_page_init_num_pages(args);
 	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
@@ -3824,7 +3823,8 @@ vm_init(kernel_args *args)
 
 	{
 		vm_area *area;
-		sAreaHash = hash_init(REGION_HASH_TABLE_SIZE, (addr_t)&area->hash_next - (addr_t)area,
+		sAreaHash = hash_init(AREA_HASH_TABLE_SIZE,
+			(addr_t)&area->hash_next - (addr_t)area,
 			&area_compare, &area_hash);
 		if (sAreaHash == NULL)
 			panic("vm_init: error creating aspace hash table\n");
@@ -3916,8 +3916,6 @@ vm_init_post_sem(kernel_args *args)
 
 	arch_vm_translation_map_init_post_sem(args);
 	vm_address_space_init_post_sem();
-
-	sAreaHashLock = create_sem(WRITE_COUNT, "area hash");
 
 	slab_init_post_sem();
 	return heap_init_post_sem();
@@ -5221,7 +5219,7 @@ area_for(void *address)
 area_id
 find_area(const char *name)
 {
-	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+	rw_lock_read_lock(&sAreaHashLock);
 	struct hash_iterator iterator;
 	hash_open(sAreaHash, &iterator);
 
@@ -5238,7 +5236,7 @@ find_area(const char *name)
 	}
 
 	hash_close(sAreaHash, &iterator, false);
-	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
+	rw_lock_read_unlock(&sAreaHashLock);
 
 	return id;
 }
