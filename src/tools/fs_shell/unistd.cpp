@@ -28,6 +28,9 @@
 #		ifndef HAIKU_HOST_PLATFORM_DARWIN
 #			include <sys/disklabel.h>
 #		endif
+#elif defined(HAIKU_HOST_PLATFORM_CYGWIN)
+#	include <sys/ioctl.h>
+#	include <sys/stat.h>
 #	else
 		// the (POSIX) correct place of definition for ioctl()
 #		include <stropts.h>
@@ -56,7 +59,7 @@ test_size(int fd, off_t size)
 
 	if (size == 0)
 		return true;
-	
+
 	if (lseek(fd, size - 1, SEEK_SET) < 0)
 		return false;
 
@@ -233,7 +236,7 @@ fssh_ioctl(int fd, unsigned long op, ...)
 						// Seems to be a md device, then ioctls returns lots of
 						// zeroes and hardcode some defaults
 						disklabel.d_nsectors = 64;
-						disklabel.d_ntracks = 16;	
+						disklabel.d_ntracks = 16;
 					}
 
 					disklabel.d_secperunit = mediaSize / disklabel.d_secsize;
@@ -293,7 +296,7 @@ fssh_ioctl(int fd, unsigned long op, ...)
 
 			break;
 		}
-	}	
+	}
 
 	va_end(list);
 
