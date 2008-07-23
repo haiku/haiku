@@ -232,18 +232,22 @@ AutoMounter::_UnmountAndEjectVolume(BMessage *message)
 		BDiskDevice device;
 		if (roster.GetPartitionWithID(id, &device, &partition) != B_OK)
 			return;
+		BPath path;
+		if (partition->GetMountPoint(&path) == B_OK)
+		{
+			status_t status = partition->Unmount();
+			if (status < B_OK) {
+				if (!_ForceUnmount(partition->ContentName(), status))
+					return;
 
-		status_t status = partition->Unmount();
-		if (status < B_OK) {
-			if (!_ForceUnmount(partition->ContentName(), status))
-				return;
+				status = partition->Unmount(B_FORCE_UNMOUNT);
+			}
 
-			status = partition->Unmount(B_FORCE_UNMOUNT);
+			if (status < B_OK)
+				_ReportUnmountError(partition->ContentName(), status);
+			
+			rmdir(path.Path());			
 		}
-
-		if (status < B_OK)
-			_ReportUnmountError(partition->ContentName(), status);
-
 		return;
 	}
 

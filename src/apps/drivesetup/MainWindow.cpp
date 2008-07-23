@@ -626,11 +626,14 @@ MainWindow::_Unmount(BDiskDevice* disk, partition_id selectedPartition)
 	}
 
 	if (partition->IsMounted()) {
+		BPath path;
+		partition->GetMountPoint(&path);
 		status_t ret = partition->Unmount();
 		if (ret < B_OK) {
 			_DisplayPartitionError("Could not unmount partition %s.",
 				partition, ret);
 		} else {
+			rmdir(path.Path());
 			// successful unmount, adapt to the changes
 			_ScanDrives();
 		}
