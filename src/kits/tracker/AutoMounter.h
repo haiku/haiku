@@ -41,6 +41,9 @@ All rights reserved.
 
 #ifndef __HAIKU__
 #	include "DeviceMap.h"
+#else
+class BPartition;
+class BPath;
 #endif
 
 namespace BPrivate {
@@ -73,8 +76,10 @@ class AutoMounter : public BLooper {
 		void _MountVolumes(mount_mode normal, mount_mode removable,
 			bool initialRescan);
 		void _MountVolume(BMessage* message);
-		bool _ForceUnmount(const char* name, status_t error);
+		bool _SuggestForceUnmount(const char* name, status_t error);
 		void _ReportUnmountError(const char* name, status_t error);
+		void _UnmountAndEjectVolume(BPartition* partition, BPath& mountPoint,
+			const char* name);
 		void _UnmountAndEjectVolume(BMessage* message);
 
 		void _FromMode(mount_mode mode, bool& all, bool& bfs, bool& restore);
@@ -114,7 +119,7 @@ class AutoMounter : public BLooper {
 	public:
 		AutoMounter(
 			bool checkRemovableOnly = true,			// do not poll nonremovable disks
-			bool checkCDs = true,					// currently ignored			
+			bool checkCDs = true,					// currently ignored
 			bool checkFloppies = false,				//
 			bool checkOtherRemovables = true,		// currently ignored
 			bool autoMountRemovableOnly = true,		// if false, automount nonremovables too
