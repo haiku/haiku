@@ -1111,6 +1111,7 @@ dma_test_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 		return status;
 
 	status = request.Wait(0, 0);
+	dprintf("dma_test_read(): request.Wait() returned: %s\n", strerror(status));
 #else
 	status_t status = user_memcpy(buffer, (uint8*)sAreaAddress + pos, length);
 #endif
@@ -1143,6 +1144,8 @@ dma_test_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 		return status;
 
 	status = request.Wait(0, 0);
+	dprintf("dma_test_write(): request.Wait() returned: %s\n",
+		strerror(status));
 #else
 	status_t status = user_memcpy((uint8*)sAreaAddress + pos, buffer, length);
 #endif
