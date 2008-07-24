@@ -72,8 +72,9 @@ DumpInfo(LocalDevice* device)
 	simpleDiscoveryListener* dListener = new simpleDiscoveryListener(device);
 
 	dAgent->StartInquiry(BT_GIAC, dListener);
-		
-	(void)receive_data(NULL, NULL, 0);
+	
+	thread_id sender;		
+	(void)receive_data(&sender, NULL, 0);
 	
     printf("Retrieving names ...\n");
 	
