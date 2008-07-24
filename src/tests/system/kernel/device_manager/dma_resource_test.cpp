@@ -191,6 +191,8 @@ do_io(void* data, IOOperation* operation)
 			else
 				memcpy(virtualAddress + pageOffset, disk + offset, toCopy);
 
+			vm_put_physical_page((addr_t)virtualAddress);
+
 			length -= toCopy;
 			offset += toCopy;
 			pageOffset = 0;
