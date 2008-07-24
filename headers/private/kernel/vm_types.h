@@ -275,7 +275,7 @@ class VMCacheFactory {
 public:
 	static	status_t	CreateAnonymousCache(VMCache*& cache,
 							bool canOvercommit, int32 numPrecommittedPages,
-							int32 numGuardPages);
+							int32 numGuardPages, bool swappable);
 	static	status_t	CreateVnodeCache(VMCache*& cache, struct vnode* vnode);
 	static	status_t	CreateDeviceCache(VMCache*& cache, addr_t baseAddress);
 	static	status_t	CreateNullCache(VMCache*& cache);
