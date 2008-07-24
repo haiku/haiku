@@ -633,7 +633,8 @@ MainWindow::_Unmount(BDiskDevice* disk, partition_id selectedPartition)
 			_DisplayPartitionError("Could not unmount partition %s.",
 				partition, ret);
 		} else {
-			rmdir(path.Path());
+			if (dev_for_path(path.Path()) == dev_for_path("/"))
+				rmdir(path.Path());
 			// successful unmount, adapt to the changes
 			_ScanDrives();
 		}
