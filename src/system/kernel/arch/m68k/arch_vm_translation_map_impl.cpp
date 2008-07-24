@@ -85,7 +85,7 @@ typedef struct vm_translation_map_arch_info {
 	addr_t pages_to_invalidate[PAGE_INVALIDATE_CACHE_SIZE];
 } vm_translation_map_arch_info;
 
-#if 1//XXX ?
+#if 1//XXX:HOLE
 static page_table_entry *page_hole = NULL;
 static page_directory_entry *page_hole_pgdir = NULL;
 #endif
@@ -109,11 +109,6 @@ static addr_t sIOSpaceBase;
 #define ADDR_SHIFT(x) ((x)>>12)
 #define ADDR_REVERSE_SHIFT(x) ((x)<<12)
 #endif
-
-/* 7/7/6 split */
-#define VADDR_TO_PRENT(va) (((va) / B_PAGE_SIZE) / (64*128))
-#define VADDR_TO_PDENT(va) ((((va) / B_PAGE_SIZE) / 64) % 128)
-#define VADDR_TO_PTENT(va) (((va) / B_PAGE_SIZE) % 64)
 
 #define FIRST_USER_PGROOT_ENT    (VADDR_TO_PRENT(USER_BASE))
 #define FIRST_USER_PGDIR_ENT    (VADDR_TO_PDENT(USER_BASE))
@@ -220,26 +215,51 @@ _update_all_pgdirs(int index, page_root_entry e)
 }
 
 
-// XXX currently assumes this translation map is active
-
+// this is used before the vm is fully up, it uses the
+// transparent translation of the first 32MB
+// a set up by the bootloader.
+// (XXX: why just 32MB ? TT0 should just map 2G)
 static status_t
 early_query(addr_t va, addr_t *_physicalAddress)
 {
-	page_table_entry *pentry;
+	page_root_entry *pr = sKernelVirtualPageRoot;
+	page_directory_entry *pd;
+	page_indirect_entry *pi;
+	page_table_entry *pt;
+	addr_t pa;
+	int32 index;
+	status_t err = B_ERROR;	// no pagetable here
 
-	if (page_hole_pgdir[VADDR_TO_PDENT(va)].type != DT_DIR) {
-		// no pagetable here
-		return B_ERROR;
-	}
-#warning M68K: va or VADDR_TO_PTENT(va) ??
-	pentry = page_hole + va / B_PAGE_SIZE;
-	if (pentry->type != DT_PAGE) {
-		// page mapping not valid
-		return B_ERROR;
-	}
+	index = VADDR_TO_PRENT(va);
+	if (pr && pr[index].type == DT_ROOT) {
+		pa = PRE_TO_TA(pr[index]);
+		// pa == va when in TT
+		// and no need to fiddle with cache
+		pd = (page_directory_entry *)pa;
 
-	*_physicalAddress = PTE_TO_PA(*pentry);
-	return B_OK;
+		index = VADDR_TO_PDENT(va);
+		if (pd && pd[index].type == DT_DIR) {
+			pa = PDE_TO_TA(pd[index]);
+			pt = (page_table_entry *)pa;
+
+			index = VADDR_TO_PTENT(va);
+			if (pt && pt[index].type == DT_INDIRECT) {
+				pi = (page_indirect_entry *)pt;
+				pa = PIE_TO_TA(pi[index]);
+				pt = (page_table_entry *)pa;
+				index = 0; // single descriptor
+			}
+			
+			if (pt /*&& pt[index].type == DT_PAGE*/) {
+				*_physicalAddress = PTE_TO_PA(pt[index]);
+				// we should only be passed page va, but just in case.
+				*_physicalAddress += va % B_PAGE_SIZE;
+				err = B_OK;
+			}
+		}
+	}
+	
+	return err;
 }
 
 
@@ -705,14 +725,14 @@ query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
 		put_page_table_entry_in_pgtable(&sQueryDesc, PRE_TO_TA(pr[index]), B_KERNEL_READ_AREA, false);
 		arch_cpu_invalidate_TLB_range((addr_t)pt, (addr_t)pt);
 		pd = (page_directory_entry *)sQueryPage;
+
 		index = VADDR_TO_PDENT(va);
-		
 		if (pd && pd[index].type == DT_DIR) {
 			put_page_table_entry_in_pgtable(&sQueryDesc, PDE_TO_TA(pd[index]), B_KERNEL_READ_AREA, false);
 			arch_cpu_invalidate_TLB_range((addr_t)pt, (addr_t)pt);
 			pt = (page_table_entry *)sQueryPage;
+
 			index = VADDR_TO_PTENT(va);
-			
 			if (pt && pt[index].type == DT_INDIRECT) {
 				pi = (page_indirect_entry *)pt;
 				put_page_table_entry_in_pgtable(&sQueryDesc, PIE_TO_TA(pi[index]), B_KERNEL_READ_AREA, false);
@@ -1178,7 +1198,7 @@ m68k_vm_translation_map_init(kernel_args *args)
 	status_t error;
 
 	TRACE(("vm_translation_map_init: entry\n"));
-#if 0
+#if 0//XXX:HOLE
 	// page hole set up in stage2
 	page_hole = (page_table_entry *)args->arch_args.page_hole;
 	// calculate where the pgdir would be
@@ -1215,6 +1235,7 @@ m68k_vm_translation_map_init(kernel_args *args)
 
 	TRACE(("mapping iospace_pgtables\n"));
 
+#if 0
 	// put the array of pgtables directly into the kernel pagedir
 	// these will be wired and kept mapped into virtual space to be easy to get to
 	{
@@ -1231,6 +1252,7 @@ m68k_vm_translation_map_init(kernel_args *args)
 			put_pgtable_in_pgdir(e, phys_pgtable, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		}
 	}
+#endif
 
 	TRACE(("vm_translation_map_init: done\n"));
 
@@ -1260,8 +1282,10 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 	// unmap the page hole hack we were using before
 #warning M68K: FIXME
 	//sKernelVirtualPageRoot[1023].present = 0;
+#if 0
 	page_hole_pgdir = NULL;
 	page_hole = NULL;
+#endif
 
 	temp = (void *)sKernelVirtualPageRoot;
 	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, B_PAGE_SIZE,

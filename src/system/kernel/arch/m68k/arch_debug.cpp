@@ -212,7 +212,7 @@ return 0;
 				frame->a[0], frame->a[1], frame->a[2], frame->a[3]);
 			kprintf("   a4 0x%08lx    a5 0x%08lx    a6 0x%08lx    a7 0x%08lx (sp)\n",
 #warning M68K: a7 in iframe ??
-				frame->a[4], frame->a[5], frame->a[6], -1/*frame->a[7]*/);
+				frame->a[4], frame->a[5], frame->a[6], -1L/*frame->a[7]*/);
 
 			/*kprintf("   pc 0x%08lx   ccr 0x%02x\n",
 			  frame->pc, frame->ccr);*/

@@ -628,6 +628,8 @@ mmu_init(void)
 	gKernelArgs.num_physical_allocated_ranges++;
 
 
+	gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_page =
+		get_next_physical_page() /*| 0xff000000*/;
 
 }
 

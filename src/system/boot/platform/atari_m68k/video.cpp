@@ -4,6 +4,7 @@
  */
 
 
+#include "toscalls.h"
 #include "video.h"
 //#include "mmu.h"
 //#include "images.h"
@@ -130,6 +131,8 @@ extern "C" status_t
 platform_init_video(void)
 {
 	// ToDo: implement me
+	dprintf("current video mode: \n");
+	dprintf("Vsetmode(-1): 0x%08x\n", VsetMode(VM_INQUIRE));
 	return B_OK;
 }
 

@@ -46,9 +46,10 @@ typedef struct {
 			struct {
 				//XXX: are those meant to be used by physical
 				// or virtual address ?
-				int32 (*nf_get_id)(const char *);
-				int32 (*nf_call)(int32, ...);
-				int32 nf_dprintf_id;
+				uint32 (*nf_get_id)(const char *);
+				int32 (*nf_call)(uint32, ...);
+				addr_t nf_page;
+				uint32 nf_dprintf_id;
 			} nat_feat;
 		} atari;
 	} plat_args;

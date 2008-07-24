@@ -17,7 +17,7 @@ void *gXHDIEntryPoint = NULL;
 uint32 gXHDIVersion = 0;
 
 NatFeatCookie *gNatFeatCookie = NULL;
-int32 gDebugPrintfNatFeatID = 0;
+uint32 gDebugPrintfNatFeatID = 0;
 
 /*! Maps TOS error codes to native errors
  */

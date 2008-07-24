@@ -60,13 +60,6 @@ arch_cpu_init(kernel_args *args)
 	arch_mmu_type = args->arch_args.mmu_type;
 	arch_platform = args->arch_args.platform;
 	arch_platform = args->arch_args.machine;
-	void (*flush_insn_pipeline)(void);
-	void (*flush_atc_all)(void);
-	void (*flush_atc_user)(void);
-	void (*flush_atc_addr)(void *addr);
-	void (*flush_dcache)(void *address, size_t len);
-	void (*flush_icache)(void *address, size_t len);
-	void (*idle)(void);
 
 	switch (arch_cpu_type) {
 		case 68020:

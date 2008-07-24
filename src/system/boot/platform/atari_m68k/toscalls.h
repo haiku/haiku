@@ -310,6 +310,7 @@ static inline int Bconputs(int16 handle, const char *string)
 #define NVM_R_YEAR	9
 #define NVM_R_VIDEO	29
 
+#define VM_INQUIRE	-1
 
 #ifndef __ASSEMBLER__
 
@@ -724,12 +725,12 @@ static inline const struct tos_osheader *tos_get_osheader()
 
 typedef struct {
 	uint32 magic;
-	int32 (*nfGetID) (const char *);
-	int32 (*nfCall) (int32 ID, ...);
+	uint32 (*nfGetID) (const char *);
+	int32 (*nfCall) (uint32 ID, ...);
 } NatFeatCookie;
 
 extern NatFeatCookie *gNatFeatCookie;
-extern int32 gDebugPrintfNatFeatID;
+extern uint32 gDebugPrintfNatFeatID;
 
 static inline NatFeatCookie *nat_features(void)
 {
