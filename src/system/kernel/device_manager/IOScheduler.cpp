@@ -164,11 +164,12 @@ IOScheduler::_Finisher()
 
 		TRACE("IOScheduler::_Finisher(): operation: %p\n", operation);
 
-		while (!operation->Finish()) {
+		if (!operation->Finish()) {
 			TRACE("  operation: %p not finished yet\n", operation);
 			// TODO: This must be done differently once the scheduler implements
 			// an actual scheduling policy (other than no-op).
 			fIOCallback(fIOCallbackData, operation);
+			continue;
 		}
 
 		// notify request and remove operation
