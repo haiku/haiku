@@ -1,0 +1,27 @@
+SubDir HAIKU_TOP src add-ons kernel debugger disasm $(TARGET_ARCH) ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) libudis86 ] ;
+
+DEFINES += __UD_STANDALONE__ ;
+DEFINES += assert=disasm_arch_assert ;
+DEFINES += __assert_fail=disasm_arch_assert ;
+
+local libUdis86Sources = 
+	decode.c
+	input.c
+	itab.c
+	syn-att.c
+	syn.c
+	syn-intel.c
+	udis86.c
+;
+
+KernelStaticLibrary disasm_arch.a :
+	$(libUdis86Sources)
+	disasm_arch.cpp
+;
+
+SEARCH on [ FGristFiles $(libUdis86Sources) ]
+	= [ FDirName $(SUBDIR) libudis86 ] ;
+

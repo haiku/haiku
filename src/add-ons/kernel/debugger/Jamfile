@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel debugger ;
 SubInclude HAIKU_TOP src add-ons kernel debugger auto_stack_trace ;
 SubInclude HAIKU_TOP src add-ons kernel debugger bochs ;
 SubInclude HAIKU_TOP src add-ons kernel debugger demangle ;
+SubInclude HAIKU_TOP src add-ons kernel debugger disasm ;
 SubInclude HAIKU_TOP src add-ons kernel debugger hangman ;
 SubInclude HAIKU_TOP src add-ons kernel debugger invalidate_on_exit ;
 SubInclude HAIKU_TOP src add-ons kernel debugger laplinkll ;
