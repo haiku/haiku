@@ -15,6 +15,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	APR-util
 #	Beam
 #	Bluetooth
+#	CVS
 #	Development
 #	Firefox
 #	Links
@@ -96,6 +97,22 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 	
 	if [ IsOptionalHaikuImagePackageAdded Development ] {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/libbluetooth.so ;
+	}
+}
+
+
+# CVS
+if [ IsOptionalHaikuImagePackageAdded CVS ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package CVS available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		Echo "No optional package CVS available for gcc4" ;
+	} else {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage cvs-1.11.21-gcc2-2008-07-23
+			: $(baseURL)/cvs-1.11.21-gcc2-2008-07-23.zip
+			:
+		;
 	}
 }
 
