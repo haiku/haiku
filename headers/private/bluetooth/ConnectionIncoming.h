@@ -17,13 +17,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+namespace Bluetooth {
+
 class RemoteDevice;
 
 class ConnectionView
 		: public BView
 {
 public:
-						ConnectionView(BRect frame, const char *name, uint32 resizeMask, uint32 flags);
+						ConnectionView(BRect frame, const char *name);
 						~ConnectionView();
 	virtual void		MessageReceived(BMessage *message);
 	void				Draw(BRect update);
@@ -35,8 +37,7 @@ private:
 };
 
 
-class ConnectionIncoming
-		 : public BWindow
+class ConnectionIncoming : public BWindow
 {
 public:
 						ConnectionIncoming(RemoteDevice* rDevice);
@@ -47,5 +48,12 @@ public:
 private:
 	ConnectionView*				_ConnectionView;
 };
+
+}
+
+#ifndef _BT_USE_EXPLICIT_NAMESPACE
+using Bluetooth::ConnectionIncoming;
+#endif
+
 
 #endif

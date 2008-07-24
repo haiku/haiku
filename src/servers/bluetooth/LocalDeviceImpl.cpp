@@ -12,6 +12,8 @@
 #include "CommandManager.h"
 #include "Output.h"
 
+#include <bluetooth/bdaddrUtils.h>
+#include <bluetooth/RemoteDevice.h>
 #include <bluetooth/bluetooth_error.h>
 #include <bluetooth/HCI/btHCI_event.h>
 
@@ -79,27 +81,29 @@ printf("### \n");
    			return;
 			case HCI_EVENT_CONN_REQUEST:
 				ConnectionRequest((struct hci_ev_conn_request*)(event+1), NULL); // incoming request
+				return;
 			break;
 
 			case HCI_EVENT_CONN_COMPLETE:
 				ConnectionComplete((struct hci_ev_conn_complete*)(event+1), NULL); // should belong to a request? 
-																				   // can be sporadic or initiated by us¿?...
+				return;  														   // can be sporadic or initiated by us¿?...
 			break;
 
 			case HCI_EVENT_PIN_CODE_REQ:
 				PinCodeRequest((struct hci_ev_pin_code_req*)(event+1), NULL);
+				return;
 			break;
 
 
-   			default:
-   				// lets go on
-   			break;        
+   		default:
+   			// lets go on
+   		break;        
 	}
 
 	
 
-	BMessage* request = NULL;
-	int32 	  eventIndexLocation;
+	BMessage*	request = NULL;
+	int32		eventIndexLocation;
 	
 	// Check if its a requested one
 	if ( event->ecode == HCI_EVENT_CMD_COMPLETE ) {
@@ -163,9 +167,9 @@ printf("### \n");
 
 		case HCI_EVENT_CMD_COMPLETE:    				
 			CommandComplete((struct hci_ev_cmd_complete*)(event+1), request, eventIndexLocation);
- 		break;
+		break;
 
- 		case HCI_EVENT_CMD_STATUS:
+		case HCI_EVENT_CMD_STATUS:
  			CommandStatus((struct hci_ev_cmd_status*)(event+1), request, eventIndexLocation);
 		break;
 
@@ -211,6 +215,7 @@ printf("### \n");
 		break;
  	
 		case HCI_EVENT_PAGE_SCAN_REP_MODE_CHANGE:
+			PageScanRepetitionModeChange((struct hci_ev_page_scan_rep_mode_change*)(event+1), request, eventIndexLocation);
 		break;
  	
 		case HCI_EVENT_FLOW_SPECIFICATION:
@@ -324,7 +329,57 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             ClearWantedEvent(request);
      	}
         break;
+        case PACK_OPCODE(OGF_LINK_CONTROL, OCF_PIN_CODE_REPLY):
+        {
+        	uint8* statusReply = (uint8*)(event+1);
+			//TODO: This reply has to match the BDADDR of the outgoing message
+        	reply.AddInt8("status", *statusReply);
+
+            if (*statusReply == BT_OK) {
+
+                Output::Instance()->Post("Positive reply for pincode accept\n", BLACKBOARD_KIT);
+
+            } else {
+
+                Output::Instance()->Post("Negative reply for pincode accept\n", BLACKBOARD_KIT);
+
+            }
+
+            printf("Sending reply ... %ld\n",request->SendReply(&reply));
+            reply.PrintToStream();
+
+ 			// This request is not gonna be used anymore
+            ClearWantedEvent(request);
+     	}
+        break;
 		
+
+        case PACK_OPCODE(OGF_LINK_CONTROL, OCF_PIN_CODE_NEG_REPLY):
+        {
+        	uint8* statusReply = (uint8*)(event+1);
+			//TODO: This reply might to match the BDADDR of the outgoing message
+			//  	xxx:FindPetition should be expanded....
+        	reply.AddInt8("status", *statusReply);
+
+            if (*statusReply == BT_OK) {
+
+                Output::Instance()->Post("Positive reply for pincode reject\n", BLACKBOARD_KIT);
+
+            } else {
+
+                Output::Instance()->Post("Negative reply for pincode reject\n", BLACKBOARD_KIT);
+
+            }
+
+            printf("Sending reply ... %ld\n",request->SendReply(&reply));
+            reply.PrintToStream();
+
+ 			// This request is not gonna be used anymore
+            ClearWantedEvent(request);
+     	}
+        break;
+
+
 		default:
 		    Output::Instance()->Post("Command Complete not handled\n", BLACKBOARD_KIT);
 		break;
@@ -374,6 +429,20 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 			ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST));
 		}
 		break;
+		/*
+		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_ACCEPT_CONN_REQ):
+		{	
+			ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, PACK_OPCODE(OGF_LINK_CONTROL, OCF_ACCEPT_CONN_REQ));
+		}
+		break;
+
+		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_REJECT_CONN_REQ):
+		{
+			ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, PACK_OPCODE(OGF_LINK_CONTROL, OCF_REJECT_CONN_REQ));
+		}
+		break;*/
+
+
 		default:
 		    Output::Instance()->Post("Command Status not handled\n", BLACKBOARD_KIT);
 		break;
@@ -442,6 +511,40 @@ LocalDeviceImpl::RemoteNameRequestComplete(struct hci_ev_remote_name_request_com
 void
 LocalDeviceImpl::ConnectionRequest(struct hci_ev_conn_request* event, BMessage* request)
 {
+	size_t size;
+	void* command;
+
+	printf("Connection type %d from %s\n", event->link_type, bdaddrUtils::ToString(event->bdaddr));
+	(Output::Instance()->Post("Connection Incoming ...\n", BLACKBOARD_EVENTS));
+
+
+    /* TODO: add a possible request in the queue */
+	if (true) { // Check Preferences if we are to accept this connection
+	    command = buildAcceptConnectionRequest(event->bdaddr, 0x01 /*slave*/, &size);
+
+
+		BMessage* newrequest = new BMessage;
+		newrequest->AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
+		newrequest->AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_ACCEPT_CONN_REQ));
+
+		newrequest->AddInt16("eventExpected",  HCI_EVENT_PIN_CODE_REQ);
+		newrequest->AddInt16("eventExpected",  HCI_EVENT_ROLE_CHANGE);
+		newrequest->AddInt16("eventExpected",  HCI_EVENT_LINK_KEY_NOTIFY);
+		newrequest->AddInt16("eventExpected",  HCI_EVENT_PAGE_SCAN_REP_MODE_CHANGE);
+		
+		AddWantedEvent(newrequest);
+
+	    if ((fHCIDelegate)->IssueCommand(command, size) == B_ERROR) {
+			(Output::Instance()->Post("Command issue error for ConnAccpq\n", BLACKBOARD_EVENTS));
+			// remove the request
+			
+		}
+		else {
+			(Output::Instance()->Post("Command issued for ConnAccp\n", BLACKBOARD_EVENTS));
+
+
+		}
+	}
 
 }
 
@@ -449,12 +552,19 @@ LocalDeviceImpl::ConnectionRequest(struct hci_ev_conn_request* event, BMessage* 
 void
 LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event, BMessage* request)
 {
-	ConnectionIncoming* iConnection = new ConnectionIncoming(NULL);
-	iConnection->Show();
 
-	// TODO: Connection is valid create needed instances here or in KL
+	if (event->status == BT_OK) {
 
-	ClearWantedEvent(request);
+		ConnectionIncoming* iConnection = new ConnectionIncoming(new RemoteDevice(event->bdaddr));
+		iConnection->Show();
+		printf("%s: Address %s handle=%#x type=%d encrypt=%d\n", __FUNCTION__, bdaddrUtils::ToString(event->bdaddr), event->handle,
+                                                                 event->link_type, event->encrypt_mode);
+
+	} else {
+		printf("%s: failed with status %#x\n", __FUNCTION__, event->status);
+	}
+	
+
 
 }
 
@@ -469,7 +579,8 @@ LocalDeviceImpl::DisconnectionComplete(struct hci_ev_disconnection_complete_repl
 void
 LocalDeviceImpl::PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* request)
 {
-	PincodeWindow* iPincode = new PincodeWindow(NULL);
+	
+	PincodeWindow* iPincode = new PincodeWindow(event->bdaddr, GetID());
 	iPincode->Show();
 
 }
@@ -478,13 +589,21 @@ LocalDeviceImpl::PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* req
 void
 LocalDeviceImpl::RoleChange(hci_ev_role_change *event, BMessage* request, int32 index)
 {
+	printf("%s: Address %s role=%d status=%d\n", __FUNCTION__, bdaddrUtils::ToString(event->bdaddr), event->role, event->status);
+}
 
+void
+LocalDeviceImpl::PageScanRepetitionModeChange(struct hci_ev_page_scan_rep_mode_change* event, BMessage* request, int32 index)
+{
+	printf("%s: Address %s type=%d\n", __FUNCTION__, bdaddrUtils::ToString(event->bdaddr), event->page_scan_rep_mode);
 }
 
 
 void
 LocalDeviceImpl::LinkKeyNotify(hci_ev_link_key_notify *event, BMessage* request, int32 index)
 {
+
+	printf("%s: Address %s [----] type=%d\n", __FUNCTION__, bdaddrUtils::ToString(event->bdaddr), event->key_type);
 
 }
 
@@ -501,7 +620,7 @@ LocalDeviceImpl::GetAddress(bdaddr_t* bdaddr, BMessage* request)
 	
 	if (fProperties->FindData("bdaddr", B_ANY_TYPE, 0, (const void **)bdaddr, &ssize) == B_OK) {
 	    
-		(Output::Instance()->Post("BDADDR already present in server\n", BLACKBOARD_EVENTS));
+
 	    /* We have this info, returning back */
 	    return B_OK;    
 	    
@@ -514,7 +633,6 @@ LocalDeviceImpl::GetAddress(bdaddr_t* bdaddr, BMessage* request)
 	    request->AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
 	    request->AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR));
 	    
-	    printf("Adding request... %p\n", request);
 	    AddWantedEvent(request);
 		request->PrintToStream();
 		
@@ -547,7 +665,6 @@ LocalDeviceImpl::GetFriendlyName(BString str, BMessage* request)
 	    request->AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
 	    request->AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME));
 	    
-	    printf("Adding request... %p\n", request);
 	    AddWantedEvent(request);
 		request->PrintToStream();
 		
@@ -568,14 +685,20 @@ LocalDeviceImpl::ProcessSimpleRequest(BMessage* request)
 	ssize_t size;
 	void* command = NULL;
 
-	if (request->FindData("raw command", B_ANY_TYPE, 0, (const void **)&command, &size) == B_OK) 
-	    if (((HCITransportAccessor*)fHCIDelegate)->IssueCommand(command, size) == B_ERROR)
+	if (request->FindData("raw command", B_ANY_TYPE, 0, (const void **)&command, &size) == B_OK) {
+		
+		AddWantedEvent(request);
+		    
+	    if (((HCITransportAccessor*)fHCIDelegate)->IssueCommand(command, size) == B_ERROR) {
+			// TODO: - Reply the request with error!
+			//       - Remove the just added request
 			(Output::Instance()->Post("Command issue error\n", BLACKBOARD_EVENTS));
-		else
-		{
-		    AddWantedEvent(request);
+		}
+		else {
+
 			return B_OK;
 		}
+	}
 	else {
 		(Output::Instance()->Post("No command specified for simple request\n", BLACKBOARD_KIT));
 	}	

@@ -18,8 +18,8 @@ public:
 	BPortNot(BluetoothServer* app, const char* name) ;
 	void loop();
 
-	port_id 		fPort;	
-	port_id 		sdp_request_port;
+	port_id 		 fPort;	
+	port_id 		 sdp_request_port;
 	thread_id		sdp_server_thread;
 
 	BluetoothServer* 		    ourapp;		

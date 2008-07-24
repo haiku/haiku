@@ -41,15 +41,15 @@ class PincodeView : public BView
 class PincodeWindow : public BWindow
 {
 	public:
-		PincodeWindow(RemoteDevice* rDevice);
+		PincodeWindow(bdaddr_t address, hci_id hid);
 		virtual void MessageReceived(BMessage *msg);
 		virtual bool QuitRequested();
 
 	private:
 		PincodeView*	fView;
 		bdaddr_t 		bdaddr;
-		RemoteDevice*   fRemoteDevice;
-		BMessenger*		fMessenger;
+		bdaddr_t		fBdaddr;
+		hci_id			fHid;
 };
 
 }

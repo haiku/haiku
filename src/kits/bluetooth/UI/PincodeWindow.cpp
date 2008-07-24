@@ -47,23 +47,23 @@ PincodeView::PincodeView(BRect rect) : BView(rect,"View", B_FOLLOW_NONE, B_WILL_
 	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-  	fMessage = new BStringView(BRect(0,0,5,5),"Pincode","Please enter the pincode ...", B_FOLLOW_ALL_SIDES);
+	fMessage = new BStringView(BRect(0,0,5,5),"Pincode","Please enter the pincode ...", B_FOLLOW_ALL_SIDES);
 	fMessage->SetFont(be_bold_font);
 	fMessage->ResizeToPreferred();
 	fMessage->MoveBy(20, 20);
 	rect1 = fMessage->Frame();
 	
-  	fRemoteInfo = new BStringView(BRect(rect1.left, rect1.bottom + V_SEPARATION , 0 , 0), 
+	fRemoteInfo = new BStringView(BRect(rect1.left, rect1.bottom + V_SEPARATION , 0 , 0), 
                                       "bdaddr","BD_ADDR: ", B_FOLLOW_ALL_SIDES);
 	fRemoteInfo->ResizeToPreferred();
-	rect = fRemoteInfo->Frame();
+	rect1 = fRemoteInfo->Frame();
 	
 	// TODO: IT CANNOT BE MORE THAN 16 BYTES 
-	fPincodeText = new BTextControl(BRect(rect1.left, rect1.bottom + V_SEPARATION , 0, 0), 
-                                        "pincode TextControl","PIN code:", "", NULL);
+	fPincodeText = new BTextControl(BRect(rect1.left, rect1.bottom + V_SEPARATION , rect1.right, rect1.bottom + V_SEPARATION + 20), 
+                                        "pincode TextControl","PIN code:", "5555", NULL);
 	fPincodeText->ResizeToPreferred();
 	rect1 = fPincodeText->Frame();
-		
+
 	fAcceptButton = new BButton(BRect(rect1.left , rect1.bottom + V_SEPARATION ,0, 0 ),
                                     "fAcceptButton","Pair",new BMessage(MSG_ACCEPT_BUTTON));
 	fAcceptButton->ResizeToPreferred();
@@ -73,17 +73,17 @@ PincodeView::PincodeView(BRect rect) : BView(rect,"View", B_FOLLOW_NONE, B_WILL_
                                     "fCancelButton","Cancel",new BMessage(MSG_CANCEL_BUTTON));
 	fCancelButton->ResizeToPreferred();
 
-  	this->AddChild(fMessage);
+	this->AddChild(fMessage);
 	this->AddChild(fPincodeText);
-  	this->AddChild(fAcceptButton);
-  	this->AddChild(fCancelButton);
+	this->AddChild(fAcceptButton);
+	this->AddChild(fCancelButton);
 
-  	this->AddChild(fRemoteInfo);
+	this->AddChild(fRemoteInfo);
 
-  	// Now resize the the view according all what we found here
+	// Now resize the the view according all what we found here
 	rect1 = fMessage->Frame();
 	rect2 = fCancelButton->Frame();
-  	ResizeTo(rect1.right + 15 , rect2.bottom +15 );
+	ResizeTo(rect1.right + 15 , rect2.bottom +15 );
 
 }
 
@@ -103,10 +103,11 @@ void PincodeView::SetBDaddr(const char* address){
 #pragma mark -
 #endif
 
-PincodeWindow::PincodeWindow(RemoteDevice* rDevice) :
-		BWindow(BRect(700, 100, 900, 150), "Pincode Request",  B_MODAL_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,
-                                           B_WILL_ACCEPT_FIRST_CLICK | B_NOT_RESIZABLE ,
-                                           B_ALL_WORKSPACES), fRemoteDevice(rDevice)
+PincodeWindow::PincodeWindow(bdaddr_t address, hci_id hid) :
+		BWindow(BRect(700, 100, 900, 150), "Pincode Request", 
+		                                   B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+        		                           B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE | B_NOT_RESIZABLE,
+                                           B_ALL_WORKSPACES), fBdaddr(address), fHid(hid)
 {
 	fView = new PincodeView(Bounds());
 	AddChild(fView);
@@ -114,7 +115,7 @@ PincodeWindow::PincodeWindow(RemoteDevice* rDevice) :
 	ResizeTo( fView->Bounds().right , fView->Bounds().bottom );
 	
 	// TODO: Get more info about device" ote name/features/encry/auth... etc
-	fView->SetBDaddr( bdaddrUtils::ToString(rDevice->GetBluetoothAddress()) );
+	fView->SetBDaddr( bdaddrUtils::ToString(fBdaddr) );
 };
 
 void PincodeWindow::MessageReceived(BMessage *msg)
@@ -130,26 +131,26 @@ void PincodeWindow::MessageReceived(BMessage *msg)
 			size_t   size;
 			int8     bt_status = BT_ERROR;
 				
-			void* command = buildPinCodeRequestReply(fRemoteDevice->GetBluetoothAddress(), strlen(fView->fPincodeText->Text()), 
+			void* command = buildPinCodeRequestReply(fBdaddr, strlen(fView->fPincodeText->Text()), 
 													(char*)fView->fPincodeText->Text(), &size);
 		
 			if (command == NULL) {
 				break;
 			}
 
-			request.AddInt32("hci_id", (fRemoteDevice->GetLocalDeviceOwner())->GetID());
+			request.AddInt32("hci_id", fHid);
 			request.AddData("raw command", B_ANY_TYPE, command, size);
 			request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
 			request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_PIN_CODE_REPLY));
 		
-			if (fMessenger->SendMessage(&request, &reply) == B_OK) {
+			if (be_app_messenger.SendMessage(&request, &reply) == B_OK) {
 				if (reply.FindInt8("status", &bt_status ) == B_OK ) {
-					break;
+					PostMessage(B_QUIT_REQUESTED);
 				}
 				// TODO: something failed here
 			}
 
-			PostMessage(B_QUIT_REQUESTED);
+
 		}
 		break;
 
@@ -161,25 +162,24 @@ void PincodeWindow::MessageReceived(BMessage *msg)
 			size_t   size;
 			int8     bt_status = BT_ERROR;
 				
-			void* command = buildPinCodeRequestNegativeReply(fRemoteDevice->GetBluetoothAddress(), &size);
+			void* command = buildPinCodeRequestNegativeReply(fBdaddr, &size);
 		
 			if (command == NULL) {
 				break;
 			}
 
-			request.AddInt32("hci_id", (fRemoteDevice->GetLocalDeviceOwner())->GetID());
+			request.AddInt32("hci_id", fHid);
 			request.AddData("raw command", B_ANY_TYPE, command, size);
 			request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
 			request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_PIN_CODE_NEG_REPLY));
 		
-			if (fMessenger->SendMessage(&request, &reply) == B_OK) {
+			if (be_app_messenger.SendMessage(&request, &reply) == B_OK) {
 				if (reply.FindInt8("status", &bt_status ) == B_OK ) {
-					break;
+					PostMessage(B_QUIT_REQUESTED);
 				}
 				// TODO: something failed here
 			}
 
-			PostMessage(B_QUIT_REQUESTED);
 		}
 		break;
 
@@ -193,6 +193,7 @@ void PincodeWindow::MessageReceived(BMessage *msg)
 
 bool PincodeWindow::QuitRequested()
 {
+
 	return BWindow::QuitRequested();
 };
 

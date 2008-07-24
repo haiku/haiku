@@ -9,10 +9,11 @@
 
 #define B_PULSES_BY_SECOND(x) (2*x)
 
+namespace Bluetooth {
 
-ConnectionView::ConnectionView(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
-		: BView(BRect(0, 0, 400, 400), "MyViewName", B_FOLLOW_LEFT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_PULSE_NEEDED)
+ConnectionView::ConnectionView(BRect frame, const char *name): BView(BRect(0, 0, 400, 400), "MyViewName", 
+																	B_FOLLOW_LEFT | B_FOLLOW_TOP,
+																	B_WILL_DRAW | B_PULSE_NEEDED)
 {
 
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -45,33 +46,34 @@ void ConnectionView::Draw(BRect update)
 void ConnectionView::Pulse()
 {
 	static int a = 0;
-	if (a++ == B_PULSES_BY_SECOND(5))
+	
+	if (a++ == B_PULSES_BY_SECOND(5)) {
+		// BUG: for some reason the window is not being removed...
 		Window()->PostMessage(B_QUIT_REQUESTED);
-
+		Window()->Quit();
+	}
 }
 
 
 
 //---------------------------------------------------------------
-//---------------------------------------------------------------
-//---------------------------------------------------------------
 ConnectionIncoming::ConnectionIncoming(RemoteDevice* rDevice)
-			 : BWindow(BRect(700, 100, 900, 150), "Incomming Connection", 
+			 : BWindow(BRect(700, 100, 900, 150), "Connection Completed", 
                                    B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
                                    B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
-_ConnectionView = new ConnectionView(BRect(0, 0, 400, 400),"mViewName", B_FOLLOW_TOP | B_FOLLOW_LEFT, B_WILL_DRAW);
+	_ConnectionView = new ConnectionView(BRect(0, 0, 400, 400),"mViewName");
 
-AddChild(_ConnectionView);
+	AddChild(_ConnectionView);
 }
 
-//---------------------------------------------------------------
+
 ConnectionIncoming::~ConnectionIncoming()
 {
 
 }
 
-//---------------------------------------------------------------
+
 void ConnectionIncoming::MessageReceived(BMessage *message)
 {
 	switch(message->what)
@@ -82,10 +84,10 @@ void ConnectionIncoming::MessageReceived(BMessage *message)
 	}
 }
 
-//---------------------------------------------------------------
+
 bool ConnectionIncoming::QuitRequested()
 {
-
 	return BWindow::QuitRequested();
 }
 
+}
