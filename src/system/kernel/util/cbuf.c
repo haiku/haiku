@@ -949,8 +949,9 @@ cbuf_init(void)
 
 	// errors are fatal, that's why we don't clean up here
 
-	sBufferArea = create_area("cbuf region", (void **)&sBuffer, B_ANY_KERNEL_ADDRESS,
-		CBUF_REGION_SIZE, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	sBufferArea = create_area("cbuf region", (void **)&sBuffer,
+		B_ANY_KERNEL_ADDRESS, CBUF_REGION_SIZE, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (sBufferArea < 0) {
 		panic("cbuf_init: error creating cbuf region\n");
 		return B_NO_MEMORY;
