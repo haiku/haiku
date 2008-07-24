@@ -4,13 +4,14 @@
  */
 
 
-#include "toscalls.h"
-
 #include <boot/platform.h>
+#include <boot/stage2.h>
 #include <boot/stdio.h>
 #include <stdarg.h>
 
 #include <Errors.h>
+
+#include "toscalls.h"
 
 void *gXHDIEntryPoint = NULL;
 uint32 gXHDIVersion = 0;
@@ -203,10 +204,19 @@ init_xhdi(void)
 status_t
 init_nat_features(void)
 {
+	gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_get_id = NULL;
+	gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_call = NULL;
+	gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_dprintf_id = 0;
 	if (nat_features()) {
 		// find debugprintf id
 		gDebugPrintfNatFeatID = nat_feat_getid("DEBUGPRINTF");
-		//
+		// pass native features infos to the kernel
+		gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_get_id =
+			nat_features()->nfGetID;
+		gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_call = 
+			nat_features()->nfCall;
+		gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_dprintf_id =
+			gDebugPrintfNatFeatID;
 	}
 	return nat_features() ? B_OK : ENOENT;
 }

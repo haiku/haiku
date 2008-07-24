@@ -39,6 +39,19 @@ typedef struct {
 	// to the Open Firmware.
 //	uint32		num_virtual_ranges_to_keep;
 //	addr_range	virtual_ranges_to_keep[MAX_VIRTUAL_RANGES_TO_KEEP];
+
+	// platform specific
+	union {
+		struct {
+			struct {
+				//XXX: are those meant to be used by physical
+				// or virtual address ?
+				int32 (*nf_get_id)(const char *);
+				int32 (*nf_call)(int32, ...);
+				int32 nf_dprintf_id;
+			} nat_feat;
+		} atari;
+	} plat_args;
 } arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_M68K_KERNEL_ARGS_H */
