@@ -13,10 +13,13 @@ AddDirectoryToHaikuImage var tmp ;
 
 local X86_ONLY = ;
 local PPC_ONLY = ;
+local M68K_ONLY = ;
 if $(TARGET_ARCH) = x86 {
 	X86_ONLY = "" ;
 } else if $(TARGET_ARCH) = ppc {
-	X86_ONLY = ;
+	PPC_ONLY = "" ;
+} else if $(TARGET_ARCH) = m68k {
+	M68K_ONLY = "" ;
 }
 
 local GPL_ONLY = ;
