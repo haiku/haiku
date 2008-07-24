@@ -151,6 +151,9 @@ extern status_t		lock_memory(void *buffer, size_t numBytes, uint32 flags);
 extern status_t		unlock_memory_etc(team_id team, void *address,
 						size_t numBytes, uint32 flags);
 extern status_t		unlock_memory(void *buffer, size_t numBytes, uint32 flags);
+extern status_t		get_memory_map_etc(team_id team, const void *address,
+						size_t numBytes, physical_entry *table,
+						uint32* _numEntries);
 extern long			get_memory_map(const void *buffer, ulong size,
 						physical_entry *table, long numEntries);
 extern area_id		map_physical_memory(const char *areaName,

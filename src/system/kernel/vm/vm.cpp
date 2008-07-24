@@ -5100,13 +5100,21 @@ unlock_memory(void *address, size_t numBytes, uint32 flags)
 }
 
 
-/*!	According to the BeBook, this function should always succeed.
-	This is no longer the case.
+/*!	Similar to get_memory_map(), but also allows to specify the address space
+	for the memory in question and has a saner semantics.
+	Returns \c B_OK when the complete range could be translated or
+	\c B_BUFFER_OVERFLOW, if the provided array wasn't big enough. In either
+	case the actual number of entries is written to \c *_numEntries. Any other
+	error case indicates complete failure; \c *_numEntries will be set to \c 0
+	in this case.
 */
-long
-get_memory_map(const void *address, ulong numBytes, physical_entry *table,
-	long numEntries)
+status_t
+get_memory_map_etc(team_id team, const void *address, size_t numBytes,
+	physical_entry *table, uint32* _numEntries)
 {
+	uint32 numEntries = *_numEntries;
+	*_numEntries = 0;
+
 	vm_address_space *addressSpace;
 	addr_t virtualAddress = (addr_t)address;
 	addr_t pageOffset = virtualAddress & (B_PAGE_SIZE - 1);
@@ -5116,17 +5124,20 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table,
 	addr_t offset = 0;
 	bool interrupts = are_interrupts_enabled();
 
-	TRACE(("get_memory_map(%p, %lu bytes, %ld entries)\n", address, numBytes,
-		numEntries));
+	TRACE(("get_memory_map_etc(%ld, %p, %lu bytes, %ld entries)\n", team,
+		address, numBytes, numEntries));
 
 	if (numEntries == 0 || numBytes == 0)
 		return B_BAD_VALUE;
 
 	// in which address space is the address to be found?
-	if (IS_USER_ADDRESS(virtualAddress))
-		addressSpace = thread_get_current_thread()->team->address_space;
-	else
-		addressSpace = vm_kernel_address_space();
+	if (IS_USER_ADDRESS(virtualAddress)) {
+		if (team == B_CURRENT_TEAM)
+			addressSpace = vm_get_current_user_address_space();
+		else
+			addressSpace = vm_get_address_space(team);
+	} else
+		addressSpace = vm_get_kernel_address_space();
 
 	if (addressSpace == NULL)
 		return B_ERROR;
@@ -5163,7 +5174,7 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table,
 		// need to switch to the next physical_entry?
 		if (index < 0 || (addr_t)table[index].address
 				!= physicalAddress - table[index].size) {
-			if (++index + 1 > numEntries) {
+			if ((uint32)++index + 1 > numEntries) {
 				// table to small
 				status = B_BUFFER_OVERFLOW;
 				break;
@@ -5181,21 +5192,45 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table,
 	if (interrupts)
 		map->ops->unlock(map);
 
-	// close the entry list
+	if (status != B_OK)
+		return status;
 
-	if (status == B_OK) {
-		// if it's only one entry, we will silently accept the missing ending
-		if (numEntries == 1)
-			return B_OK;
-
-		if (++index + 1 > numEntries)
-			return B_BUFFER_OVERFLOW;
-
-		table[index].address = NULL;
-		table[index].size = 0;
+	if ((uint32)index + 1 > numEntries) {
+		*_numEntries = index;
+		return B_BUFFER_OVERFLOW;
 	}
 
-	return status;
+	*_numEntries = index + 1;
+	return B_OK;
+}
+
+
+/*!	According to the BeBook, this function should always succeed.
+	This is no longer the case.
+*/
+long
+get_memory_map(const void *address, ulong numBytes, physical_entry *table,
+	long numEntries)
+{
+	uint32 entriesRead = numEntries;
+	status_t error = get_memory_map_etc(B_CURRENT_TEAM, address, numBytes,
+		table, &entriesRead);
+	if (error != B_OK)
+		return error;
+
+	// close the entry list
+
+	// if it's only one entry, we will silently accept the missing ending
+	if (numEntries == 1)
+		return B_OK;
+
+	if (entriesRead + 1 > (uint32)numEntries)
+		return B_BUFFER_OVERFLOW;
+
+	table[entriesRead].address = NULL;
+	table[entriesRead].size = 0;
+
+	return B_OK;
 }
 
 
