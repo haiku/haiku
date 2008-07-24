@@ -331,14 +331,14 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 	uint32 segmentCount = 0;
 
 	size_t partialBegin = offset & (fBlockSize - 1);
-	TRACE("  offset %Ld, block size %lu -> partial: %lu\n", offset, fBlockSize,
-		partialBegin);
+	TRACE("  offset %Ld, remaining size: %lu, block size %lu -> partial: %lu\n",
+		offset, request->RemainingBytes(), fBlockSize, partialBegin);
 
 	if (buffer->IsVirtual()) {
 		// Unless we need the bounce buffer anyway, we have to translate the
 		// virtual addresses to physical addresses, so we can check the DMA
 		// restrictions.
-		TRACE("  buffer is virtual\n");
+		TRACE("  buffer is virtual %s\n", buffer->IsUser() ? "user" : "kernel");
 		// TODO: !partialOperation || totalLength >= fBlockSize
 		// TODO: Maybe enforce fBounceBufferSize >= 2 * fBlockSize.
 		if (true) {
@@ -357,7 +357,9 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 				while (size > 0 && segmentCount
 						< fRestrictions.max_segment_count) {
 					physical_entry entry;
-					get_memory_map((void*)base, size, &entry, 1);
+					uint32 count = 1;
+					get_memory_map_etc(request->Team(), (void*)base, size,
+						&entry, &count);
 
 					vecs[segmentCount].iov_base = entry.address;
 					vecs[segmentCount].iov_len = entry.size;

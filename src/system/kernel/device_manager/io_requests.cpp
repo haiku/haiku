@@ -681,7 +681,7 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 
 	// If we can, we directly copy from/to the virtual buffer. The memory is
 	// locked in this case.
-	status_t (*copyFunction)(void*, void*, size_t, bool);
+	status_t (*copyFunction)(void*, void*, size_t, team_id, bool);
 	if (fBuffer->IsPhysical()) {
 		copyFunction = &IORequest::_CopyPhysical;
 	} else {
@@ -707,7 +707,7 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 	while (size > 0) {
 		size_t toCopy = min_c(size, vecs[0].iov_len - vecOffset);
 		status_t error = copyFunction(buffer,
-			(uint8*)vecs[0].iov_base + vecOffset, toCopy, copyIn);
+			(uint8*)vecs[0].iov_base + vecOffset, toCopy, fTeam, copyIn);
 		if (error != B_OK)
 			return error;
 
@@ -723,7 +723,7 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 
 /* static */ status_t
 IORequest::_CopySimple(void* bounceBuffer, void* external, size_t size,
-	bool copyIn)
+	team_id team, bool copyIn)
 {
 	TRACE("  IORequest::_CopySimple(%p, %p, %lu, %d)\n", bounceBuffer, external,
 		size, copyIn);
@@ -737,7 +737,7 @@ IORequest::_CopySimple(void* bounceBuffer, void* external, size_t size,
 
 /* static */ status_t
 IORequest::_CopyPhysical(void* _bounceBuffer, void* _external, size_t size,
-	bool copyIn)
+	team_id team, bool copyIn)
 {
 	uint8* bounceBuffer = (uint8*)_bounceBuffer;
 	addr_t external = (addr_t)_external;
@@ -749,7 +749,7 @@ IORequest::_CopyPhysical(void* _bounceBuffer, void* _external, size_t size,
 			return error;
 
 		size_t toCopy = min_c(size, B_PAGE_SIZE);
-		_CopySimple(bounceBuffer, (void*)virtualAddress, toCopy, copyIn);
+		_CopySimple(bounceBuffer, (void*)virtualAddress, toCopy, team, copyIn);
 
 		vm_put_physical_page(virtualAddress);
 
@@ -764,24 +764,28 @@ IORequest::_CopyPhysical(void* _bounceBuffer, void* _external, size_t size,
 
 /* static */ status_t
 IORequest::_CopyUser(void* _bounceBuffer, void* _external, size_t size,
-	bool copyIn)
+	team_id team, bool copyIn)
 {
 	uint8* bounceBuffer = (uint8*)_bounceBuffer;
 	uint8* external = (uint8*)_external;
 
 	while (size > 0) {
-		physical_entry entries[8];
-		int32 count = get_memory_map(external, size, entries, 8);
-		if (count <= 0) {
+		static const int32 kEntryCount = 8;
+		physical_entry entries[kEntryCount];
+
+		uint32 count = kEntryCount;
+		status_t error = get_memory_map_etc(team, external, size, entries,
+			&count);
+		if (error != B_OK && error != B_BUFFER_OVERFLOW) {
 			panic("IORequest::_CopyUser(): Failed to get physical memory for "
 				"user memory %p\n", external);
 			return B_BAD_ADDRESS;
 		}
 
-		for (int32 i = 0; i < count; i++) {
+		for (uint32 i = 0; i < count; i++) {
 			const physical_entry& entry = entries[i];
-			status_t error = _CopyPhysical(bounceBuffer, entry.address,
-				entry.size, copyIn);
+			error = _CopyPhysical(bounceBuffer, entry.address,
+				entry.size, team, copyIn);
 			if (error != B_OK)
 				return error;
 

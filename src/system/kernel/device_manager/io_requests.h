@@ -31,7 +31,7 @@ public:
 
 			bool				IsVirtual() const { return !fPhysical; }
 			bool				IsPhysical() const { return fPhysical; }
-			bool				IsUser() const { return !fUser; }
+			bool				IsUser() const { return fUser; }
 
 			void				SetVecs(const iovec* vecs, uint32 count,
 									size_t length, uint32 flags);
@@ -193,6 +193,7 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 
 			bool				IsWrite() const	{ return fIsWrite; }
 			bool				IsRead() const	{ return !fIsWrite; }
+			team_id				Team() const	{ return fTeam; }
 
 			IOBuffer*			Buffer() const	{ return fBuffer; }
 			off_t				Offset() const	{ return fOffset; }
@@ -215,11 +216,12 @@ private:
 			status_t			_CopyData(void* buffer, off_t offset,
 									size_t size, bool copyIn);
 	static	status_t			_CopySimple(void* bounceBuffer, void* external,
-									size_t size, bool copyIn);
+									size_t size, team_id team, bool copyIn);
 	static	status_t			_CopyPhysical(void* bounceBuffer,
-									void* external, size_t size, bool copyIn);
+									void* external, size_t size, team_id team,
+									bool copyIn);
 	static	status_t			_CopyUser(void* bounceBuffer, void* external,
-									size_t size, bool copyIn);
+									size_t size, team_id team, bool copyIn);
 
 			mutex				fLock;
 			IOBuffer*			fBuffer;
