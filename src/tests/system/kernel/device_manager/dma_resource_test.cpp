@@ -976,7 +976,7 @@ dma_test_register_device(device_node *parent)
 	};
 
 	return sDeviceManager->register_node(parent,
-		"drivers/disk/dma_test/driver_v1", attrs, NULL, NULL);
+		"drivers/disk/dma_resource_test/driver_v1", attrs, NULL, NULL);
 }
 
 
@@ -1007,7 +1007,8 @@ status_t
 dma_test_register_child_devices(void *driverCookie)
 {
 	return sDeviceManager->publish_device((device_node*)driverCookie,
-		"disk/virtual/dma_test/raw", "drivers/disk/dma_test/device_v1");
+		"disk/virtual/dma_test/raw",
+		"drivers/disk/dma_resource_test/device_v1");
 }
 
 
@@ -1096,7 +1097,7 @@ dma_test_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 	if (pos + length > sAreaSize)
 		length = sAreaSize - pos;
 
-#if 0
+#if 1
 	IORequest request;
 	status_t status = request.Init(pos, buffer, length, false,
 		B_USER_IO_REQUEST);
@@ -1107,10 +1108,7 @@ dma_test_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 	if (status != B_OK)
 		return status;
 
-	// TODO: wait for I/O request to finish!
-	while (request.Status() > B_OK) {
-		snooze(10000);
-	}
+	status = request.Wait(0, 0);
 #else
 	status_t status = user_memcpy(buffer, (uint8*)sAreaAddress + pos, length);
 #endif
@@ -1131,7 +1129,7 @@ dma_test_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 	if (pos + length > sAreaSize)
 		length = sAreaSize - pos;
 
-#if 0
+#if 1
 	IORequest request;
 	status_t status = request.Init(pos, (void*)buffer, length, true,
 		B_USER_IO_REQUEST);
@@ -1142,10 +1140,7 @@ dma_test_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 	if (status != B_OK)
 		return status;
 
-	// TODO: wait for I/O request to finish!
-	while (request.Status() > B_OK) {
-		snooze(10000);
-	}
+	status = request.Wait(0, 0);
 #else
 	status_t status = user_memcpy((uint8*)sAreaAddress + pos, buffer, length);
 #endif
@@ -1221,7 +1216,7 @@ module_dependency module_dependencies[] = {
 
 const static struct driver_module_info sDMATestDriverModule = {
 	{
-		"drivers/disk/dma_test/driver_v1",
+		"drivers/disk/dma_resource_test/driver_v1",
 		0,
 		NULL
 	},
@@ -1235,7 +1230,7 @@ const static struct driver_module_info sDMATestDriverModule = {
 
 const static struct device_module_info sDMATestDeviceModule = {
 	{
-		"drivers/disk/dma_test/device_v1",
+		"drivers/disk/dma_resource_test/device_v1",
 		0,
 		NULL
 	},
