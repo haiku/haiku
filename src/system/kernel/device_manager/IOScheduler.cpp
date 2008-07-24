@@ -108,7 +108,8 @@ IOScheduler::ScheduleRequest(IORequest* request)
 	// lock memory (via another thread or a dedicated call).
 
 	if (buffer->IsVirtual()) {
-		status_t status = buffer->LockMemory(request->IsWrite());
+		status_t status = buffer->LockMemory(B_CURRENT_TEAM,
+			request->IsWrite());
 		if (status != B_OK)
 			return status;
 	}

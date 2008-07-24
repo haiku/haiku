@@ -49,13 +49,14 @@ public:
 			size_t				VecCount() const { return fVecCount; }
 			size_t				Capacity() const { return fCapacity; }
 
-			status_t			LockMemory(bool isWrite);
-			void				UnlockMemory(bool isWrite);
+			status_t			LockMemory(team_id team, bool isWrite);
+			void				UnlockMemory(team_id team, bool isWrite);
 
 private:
 								~IOBuffer();
 									// not implemented
-			void				_UnlockMemory(size_t count, bool isWrite);
+			void				_UnlockMemory(team_id team, size_t count,
+									bool isWrite);
 
 			bool				fUser;
 			bool				fPhysical;

@@ -76,13 +76,13 @@ IOBuffer::SetVecs(const iovec* vecs, uint32 count, size_t length, uint32 flags)
 
 
 status_t
-IOBuffer::LockMemory(bool isWrite)
+IOBuffer::LockMemory(team_id team, bool isWrite)
 {
 	for (uint32 i = 0; i < fVecCount; i++) {
-		status_t status = lock_memory(fVecs[i].iov_base, fVecs[i].iov_len,
-			isWrite ? 0 : B_READ_DEVICE);
+		status_t status = lock_memory_etc(team, fVecs[i].iov_base,
+			fVecs[i].iov_len, isWrite ? 0 : B_READ_DEVICE);
 		if (status != B_OK) {
-			_UnlockMemory(i, isWrite);
+			_UnlockMemory(team, i, isWrite);
 			return status;
 		}
 	}
@@ -92,19 +92,19 @@ IOBuffer::LockMemory(bool isWrite)
 
 
 void
-IOBuffer::_UnlockMemory(size_t count, bool isWrite)
+IOBuffer::_UnlockMemory(team_id team, size_t count, bool isWrite)
 {
 	for (uint32 i = 0; i < count; i++) {
-		unlock_memory(fVecs[i].iov_base, fVecs[i].iov_len,
+		unlock_memory_etc(team, fVecs[i].iov_base, fVecs[i].iov_len,
 			isWrite ? 0 : B_READ_DEVICE);
 	}
 }
 
 
 void
-IOBuffer::UnlockMemory(bool isWrite)
+IOBuffer::UnlockMemory(team_id team, bool isWrite)
 {
-	_UnlockMemory(fVecCount, isWrite);
+	_UnlockMemory(team, fVecCount, isWrite);
 }
 
 
@@ -594,6 +594,12 @@ IORequest::ChunkFinished(IORequestChunk* chunk, status_t status, bool remove)
 	// set status, if not done yet
 	if (fStatus == 1)
 		fStatus = B_OK;
+
+	// unlock the memory
+	// TODO: That should only happen for the request that locked the memory,
+	// not for its ancestors.
+	if (fBuffer->IsVirtual())
+		fBuffer->UnlockMemory(fTeam, fIsWrite);
 
 	// Cache the callbacks before we unblock waiters and unlock. Any of the
 	// following could delete this request, so we don't want to touch it once
