@@ -573,6 +573,9 @@ IORequest::Wait(uint32 flags, bigtime_t timeout)
 void
 IORequest::ChunkFinished(IORequestChunk* chunk, status_t status, bool remove)
 {
+	TRACE("IORequest::ChunkFinished(%p, %#lx, %d): request: %p\n", chunk,
+		status, remove, this);
+
 	MutexLocker locker(fLock);
 
 	if (remove) {
