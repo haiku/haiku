@@ -733,6 +733,14 @@ AboutView::AboutView(const BRect &rect)
 //		"http://www.opensound.com");
 // BSD license
 
+#ifdef __INTEL__
+	// Udis86 copyrights
+	AddCopyrightEntry("Udis86",
+		"Copyright " B_UTF8_COPYRIGHT " 2002, 2003, 2004 Vivek Mohan. "
+		"All rights reserved.",
+		"http://udis86.sourceforge.net");
+#endif
+
 	_AddCopyrightsFromAttribute();
 
 	// Build a list of installed applications and show their
