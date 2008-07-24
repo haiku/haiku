@@ -8,14 +8,15 @@
 #ifndef _H2GENERIC_H_
 #define _H2GENERIC_H_
 
+#include <net_buffer.h>
+#include <net_device.h>
+
 #include <OS.h>
 #include <USB.h>
 
 #include <util/list.h>
 #include <bluetooth/HCI/btHCI.h>
 #include <bluetooth/HCI/btHCI_module.h>
-
-#include <net_buffer.h>
 
 #include "snet_buffer.h"
 
@@ -28,8 +29,6 @@
 #define BLUETOOTH_DEVICE_NAME "generic"
 #include "h2cfg.h"
 
-//#define ID DEVICE_NAME ": " /* prefix for debug messages */
-
 #define USB_TYPE_CLASS			(0x01 << 5)  /// Check if it is in some other header
 #define USB_TYPE_VENDOR			(0x02 << 5)
 
@@ -39,6 +38,7 @@
 
 extern usb_module_info* usb;
 extern bt_hci_module_info* hci;
+extern struct net_device_module_info* btDevices;
 extern struct net_buffer_module_info* nb;
 
 #define MAX_COMMAND_WINDOW 1
@@ -53,6 +53,7 @@ typedef struct bt_usb_dev bt_usb_dev;
 struct bt_usb_dev {
 	const usb_device*		dev;          /* opaque handle */
 	hci_id					hdev;		  /* HCI device id*/	
+	struct net_device*		ndev;
 	
 	char			name[B_OS_NAME_LENGTH];
 	bool			connected;    /* is the device plugged into the USB? */

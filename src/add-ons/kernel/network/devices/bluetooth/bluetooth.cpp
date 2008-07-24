@@ -28,6 +28,8 @@
 #include <string.h>
 
 #define BT_DEBUG_THIS_MODULE
+#define SUBMODULE_NAME "bluetooth_device"
+#define SUBMODULE_COLOR 34
 #include <btDebug.h>
 
 
@@ -49,10 +51,10 @@ static sem_id sLinkChangeSemaphore;
 status_t
 bluetooth_init(const char *name, net_device **_device)
 {
-	debugf("Inidializing bluetooth device %s\n",name);
+	debugf("Initializing bluetooth device %s\n",name);
 	
-	// make sure this is a device in /dev/bluetooth
-	if (strncmp(name, "/dev/bluetooth/", 15))
+	// TODO: make sure this is a device in /dev/bluetooth
+	if (strncmp(name, "bluetooth/h", 11))
 		return B_BAD_VALUE;
 
 	if (gBufferModule == NULL) { // lazy allocation
@@ -73,11 +75,16 @@ bluetooth_init(const char *name, net_device **_device)
 	strcpy(device->name, name);
 
 	MutexLocker _(&sListLock);
-
-	device->index = (sDeviceList.Tail())->index + 1; // TODO: index will be assigned by netstack
+	
+	if (sDeviceList.IsEmpty())
+		device->index = 0x0000007C; // REVIEW: dev index
+	else
+		device->index = (sDeviceList.Tail())->index + 1; // TODO: index will be assigned by netstack
 
 	// TODO: add to list whould be done in up hook
 	sDeviceList.Add(device);
+
+	debugf("Device %s %x\n", device->name, device->index );
 
 	*_device = device;
 	return B_OK;
@@ -89,7 +96,7 @@ bluetooth_uninit(net_device *_device)
 {
 	bluetooth_device *device = (bluetooth_device *)_device;
 
-	debugf("index %ld\n",device->index);
+	debugf("index %x\n",device->index);
 
 	// if the device is still part of the list, remove it
 	if (device->GetDoublyLinkedListLink()->next != NULL
@@ -241,6 +248,23 @@ bluetooth_remove_multicast(struct net_device *_device, const sockaddr *_address)
 }
 
 
+
+static int
+dump_bluetooth_devices(int argc, char** argv)
+{
+	bluetooth_device*	device;
+
+	DoublyLinkedList<bluetooth_device>::Iterator iterator = sDeviceList.GetIterator();
+	while (iterator.HasNext()) {
+
+		device = iterator.Next();
+		kprintf("\tname=%s index=%#x\n",device->name, device->index);
+	}
+	
+	return 0;
+}
+
+
 static status_t
 bluetooth_std_ops(int32 op, ...)
 {
@@ -266,6 +290,8 @@ bluetooth_std_ops(int32 op, ...)
 
 			mutex_init(&sListLock, "bluetooth devices");
 
+			add_debugger_command("btLocalDevices", &dump_bluetooth_devices, "Lists Bluetooth LocalDevices registered in the Stack");
+
 			return B_OK;
 		}
 
@@ -275,6 +301,9 @@ bluetooth_std_ops(int32 op, ...)
 
 			mutex_destroy(&sListLock);
 			put_module(NET_STACK_MODULE_NAME);
+			
+			remove_debugger_command("btLocalDevices", &dump_bluetooth_devices);
+			
 			return B_OK;
 		}
 

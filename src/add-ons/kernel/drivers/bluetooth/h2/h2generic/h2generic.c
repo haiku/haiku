@@ -22,11 +22,9 @@
 #include <bluetooth/HCI/btHCI_module.h>
 
 #define BT_DEBUG_THIS_MODULE
-
 #define MODULE_NAME "BT"
 #define SUBMODULE_NAME BLUETOOTH_DEVICE_DEVFS_NAME
 #define SUBMODULE_COLOR 31
-
 #include <btDebug.h>
 
 #include "h2generic.h"
@@ -41,8 +39,13 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 static char* usb_name = B_USB_MODULE_NAME;
 static char* hci_name = BT_HCI_MODULE_NAME;
 
+#define NET_BLUETOOTH_DEVICE_NAME "network/devices/bluetooth/v1" //move out!!
+static char* btDevices_name = NET_BLUETOOTH_DEVICE_NAME;
+
+
 usb_module_info *usb = NULL;
 bt_hci_module_info *hci = NULL;
+struct net_device_module_info* btDevices;
 struct net_buffer_module_info *nb = NULL;
 
 /* Driver Global data */
@@ -457,19 +460,21 @@ device_open(const char *name, uint32 flags, void **cookie)
    	list_init(&bdev->snetBufferRecycleTrash);		
     			
 	// Allocate set and register the HCI device
-	if (hci != NULL) {
+	if (btDevices != NULL) {
+		struct net_device* ndev;
 		//	TODO: Fill the transport descriptor
-	    hci->RegisterDriver(&bt_usb_hooks, &hdev, (void*)bdev);
+	    err = btDevices->init_device(bdev->name, &ndev);
 	    
-    	if ( err != B_OK ) 
-    	{ 
-    		flowf("Impossible to register a hci device.\n");
-    		hdev = bdev->num; /* XXX: Lets try to go on*/
-    	}
+    	if ( err == B_OK ) {
+    		hdev = ndev->index;
+    		bdev->ndev = ndev;
+ 		} else
+	        hdev = bdev->num; /* XXX: Lets try to go on*/
     }
     else {
-        hdev = bdev->num;
+	        hdev = bdev->num; /* XXX: Lets try to go on*/
     }    	
+
 	bdev->hdev = hdev;		
 		
 
@@ -521,8 +526,8 @@ device_close(void *cookie)
     purge_room(&bdev->aclRoom);
     
     /* Device no longer in our Stack*/
-    if (hci != NULL)
-        hci->UnregisterDriver(bdev->hdev);
+    if (btDevices != NULL)
+        btDevices->uninit_device(bdev->ndev);
 
 	// unSet RUNNING
 	if (TEST_AND_CLEAR(&bdev->state, RUNNING)) { 
@@ -687,31 +692,42 @@ init_driver(void)
 	int j;
 	flowf("init_driver()\n");
 	
+
+	// BT devices MODULE INITS
+	if (get_module(btDevices_name,(module_info**)&btDevices) != B_OK) {
+		debugf("cannot get module \"%s\"\n", btDevices_name);
+		return B_ERROR;
+	} else
+		debugf("btDevices module at %p\n", btDevices);	
+
+
 	// HCI MODULE INITS
 	if (get_module(hci_name,(module_info**)&hci) != B_OK) {
 		debugf("cannot get module \"%s\"\n", hci_name);
 #ifndef BT_SURVIVE_WITHOUT_HCI
-		return B_ERROR;
+		return err_release2;
 #endif
+	} else {
+		debugf("hci module at %p\n", hci);	
 	}
-	debugf("hci module at %p\n", hci);	
-
+	
 	// USB MODULE INITS	
 	if (get_module(usb_name,(module_info**)&usb) != B_OK) {
 		debugf("cannot get module \"%s\"\n", usb_name);
-		goto err_release;
+		goto err_release1;
+	} else {
+		debugf("usb module at %p\n", usb);
 	}
-	debugf("usb module at %p\n", usb);
-
 
 	if (get_module(NET_BUFFER_MODULE_NAME,(module_info**)&nb) != B_OK) {
 		debugf("cannot get module \"%s\"\n", NET_BUFFER_MODULE_NAME);
 #ifndef BT_SURVIVE_WITHOUT_NET_BUFFERS
 		goto err_release;
 #endif		
+	} else {
+		debugf("nb module at %p\n", nb);
 	}
-	debugf("nb module at %p\n", nb);
-
+	
 	// GENERAL INITS
 	dev_table_sem = create_sem(1, BLUETOOTH_DEVICE_DEVFS_NAME "dev_table_lock");
 	if (dev_table_sem < 0) {
@@ -729,9 +745,13 @@ init_driver(void)
 
 	return B_OK;
 	
-err: 	// Releasing 
+err:	// Releasing 
+	put_module(NET_BUFFER_MODULE_NAME);
+err_release: 	
 	put_module(usb_name);
-err_release:	
+err_release1:	
+	put_module(hci_name);
+err_release2:
 	put_module(hci_name);
 	return B_ERROR;
 }
