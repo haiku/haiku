@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include <team.h>
+#include <util/AutoLock.h>
 #include <vm.h>
 
 #include "dma_resources.h"
@@ -131,7 +132,7 @@ IOOperation::Finish()
 					fPhase = HasPartialEnd() && !skipReadEndPhase
 						? PHASE_READ_END : PHASE_DO_ALL;
 					_PrepareVecs();
-					SetStatus(1);
+					ResetStatus();
 						// TODO: Is there a race condition, if the request is
 						// aborted at the same time?
 					return false;
@@ -152,7 +153,7 @@ IOOperation::Finish()
 					// We're done with the second phase only (read in end).
 					// Get ready for next phase...
 					fPhase = PHASE_DO_ALL;
-					SetStatus(1);
+					ResetStatus();
 						// TODO: Is there a race condition, if the request is
 						// aborted at the same time?
 					return false;
@@ -214,10 +215,6 @@ IOOperation::Finish()
 		if (error != B_OK)
 			SetStatus(error);
 	}
-
-	// notify parent request
-	if (fParent != NULL)
-		fParent->ChunkFinished(this, fStatus);
 
 	return true;
 }
@@ -310,7 +307,7 @@ IOOperation::Prepare(IORequest* request)
 		_PrepareVecs();
 	}
 
-	fStatus = 1;
+	ResetStatus();
 
 	if (fParent != NULL)
 		fParent->AddOperation(this);
@@ -487,12 +484,19 @@ IOOperation::_CopyPartialEnd(bool isWrite)
 
 
 IORequest::IORequest()
+	:
+	fFinishedCallback(NULL),
+	fFinishedCookie(NULL)
 {
+	mutex_init(&fLock, "I/O request lock");
+	fFinishedCondition.Init(this, "I/O request finished");
 }
 
 
 IORequest::~IORequest()
 {
+	mutex_lock(&fLock);
+	mutex_destroy(&fLock);
 }
 
 
@@ -528,23 +532,86 @@ IORequest::Init(off_t offset, iovec* vecs, size_t count, size_t length,
 	fVecOffset = 0;
 	fRemainingBytes = length;
 
+	fPendingChildren = 0;
+
+	fStatus = 1;
+
 	return B_OK;
 }
 
 
 void
-IORequest::ChunkFinished(IORequestChunk* chunk, status_t status)
+IORequest::SetFinishedCallback(io_request_finished_callback callback,
+	void* cookie)
 {
-	// TODO: we would need to update status atomically
-	if (fStatus <= 0) {
-		// we're already done
-		return;
+	fFinishedCallback = callback;
+	fFinishedCookie = cookie;
+}
+
+
+status_t
+IORequest::Wait(uint32 flags, bigtime_t timeout)
+{
+	MutexLocker locker(fLock);
+
+	if (IsFinished())
+		return Status();
+
+	ConditionVariableEntry entry;
+	fFinishedCondition.Add(&entry);
+
+	locker.Unlock();
+
+	status_t error = entry.Wait(B_CAN_INTERRUPT);
+	if (error != B_OK)
+		return error;
+
+	return Status();
+}
+
+
+void
+IORequest::ChunkFinished(IORequestChunk* chunk, status_t status, bool remove)
+{
+	MutexLocker locker(fLock);
+
+	if (remove) {
+		fChildren.Remove(chunk);
+		chunk->SetParent(NULL);
 	}
 
-	fStatus = status;
+	if (status != B_OK && fStatus == 1)
+		fStatus = status;
 
-	if (fParent != NULL)
-		fParent->ChunkFinished(this, Status());
+	if (--fPendingChildren > 0)
+		return;
+
+	// last child finished
+
+	// set status, if not done yet
+	if (fStatus == 1)
+		fStatus = B_OK;
+
+	// Cache the callbacks before we unblock waiters and unlock. Any of the
+	// following could delete this request, so we don't want to touch it once
+	// we have started telling others that it is done.
+	IORequest* parent = fParent;
+	io_request_finished_callback finishedCallback = fFinishedCallback;
+	void* finishedCookie = fFinishedCookie;
+	status = fStatus;
+
+	// unblock waiters
+	fFinishedCondition.NotifyAll();
+
+	locker.Unlock();
+
+	// notify callback
+	if (finishedCallback != NULL)
+		finishedCallback(finishedCookie, this);
+
+	// notify parent
+	if (parent != NULL)
+		parent->ChunkFinished(this, status, false);
 }
 
 
@@ -569,16 +636,18 @@ IORequest::Advance(size_t bySize)
 void
 IORequest::AddOperation(IOOperation* operation)
 {
-	// TODO: locking?
+	MutexLocker locker(fLock);
 	fChildren.Add(operation);
+	fPendingChildren++;
 }
 
 
 void
 IORequest::RemoveOperation(IOOperation* operation)
 {
-	// TODO: locking?
+	MutexLocker locker(fLock);
 	fChildren.Remove(operation);
+	operation->SetParent(NULL);
 }
 
 

@@ -20,6 +20,14 @@
 #include <util/AutoLock.h>
 
 
+#define TRACE_IO_SCHEDULER
+#ifdef TRACE_IO_SCHEDULER
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 IOScheduler::IOScheduler(DMAResource* resource)
 	:
 	fDMAResource(resource),
@@ -66,9 +74,33 @@ IOScheduler::Init(const char* name)
 }
 
 
+void
+IOScheduler::SetCallback(IOCallback& callback)
+{
+	SetCallback(&_IOCallbackWrapper, &callback);
+}
+
+
+void
+IOScheduler::SetCallback(io_callback callback, void* data)
+{
+	fIOCallback = callback;
+	fIOCallbackData = data;
+}
+
+
+/*static*/ status_t
+IOScheduler::_IOCallbackWrapper(void* data, io_operation* operation)
+{
+	return ((IOCallback*)data)->DoIO(operation);
+}
+
+
 status_t
 IOScheduler::ScheduleRequest(IORequest* request)
 {
+	TRACE("IOScheduler::ScheduleRequest(%p)\n", request);
+
 	IOBuffer* buffer = request->Buffer();
 
 	// TODO: it would be nice to be able to lock the memory later, but we can't
@@ -83,6 +115,7 @@ IOScheduler::ScheduleRequest(IORequest* request)
 
 	MutexLocker _(fLock);
 	fUnscheduledRequests.Add(request);
+	fNewRequestCondition.NotifyAll();
 
 	return B_OK;
 }
@@ -108,6 +141,7 @@ IOScheduler::OperationCompleted(IOOperation* operation, status_t status)
 	operation->SetStatus(status);
 
 	fCompletedOperations.Add(operation);
+	fFinishedOperationCondition.NotifyAll();
 
 	if (fWaiting) {
 		SpinLocker _2(thread_spinlock);
@@ -128,18 +162,26 @@ IOScheduler::_Finisher()
 
 		locker.Unlock();
 
-		if (!operation->Finish()) {
+		TRACE("IOScheduler::_Finisher(): operation: %p\n", operation);
+
+		while (!operation->Finish()) {
+			TRACE("  operation: %p not finished yet\n", operation);
 			// TODO: This must be done differently once the scheduler implements
 			// an actual scheduling policy (other than no-op).
 			fIOCallback(fIOCallbackData, operation);
-		} else {
-			MutexLocker _(fLock);
-			operation->Parent()->RemoveOperation(operation);
-			if (fDMAResource != NULL)
-				fDMAResource->RecycleBuffer(operation->Buffer());
-
-			fUnusedOperations.Add(operation);
 		}
+
+		// notify request and remove operation
+		IORequest* request = operation->Parent();
+		if (request != NULL)
+			request->ChunkFinished(operation, operation->Status(), true);
+
+		// recycle the operation
+		MutexLocker _(fLock);
+		if (fDMAResource != NULL)
+			fDMAResource->RecycleBuffer(operation->Buffer());
+
+		fUnusedOperations.Add(operation);
 	}
 }
 
@@ -229,6 +271,8 @@ IOScheduler::_Scheduler()
 	while (true) {
 		IORequest* request = _GetNextUnscheduledRequest();
 
+		TRACE("IOScheduler::_Scheduler(): request: %p\n", request);
+
 		if (fDMAResource != NULL) {
 			while (request->RemainingBytes() > 0) {
 				IOOperation* operation = _GetOperation();
@@ -239,6 +283,9 @@ IOScheduler::_Scheduler()
 					AbortRequest(request, status);
 					break;
 				}
+
+				TRACE("IOScheduler::_Scheduler(): calling callback for "
+					"operation: %p\n", operation);
 
 				fIOCallback(fIOCallbackData, operation);
 			}

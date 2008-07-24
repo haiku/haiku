@@ -153,7 +153,7 @@ struct driver_module_info {
 
 /* interface of device */
 
-typedef struct io_request io_request;
+typedef struct IORequest io_request;
 
 struct device_module_info {
 	module_info info;

@@ -52,6 +52,8 @@ private:
 			status_t			_Scheduler();
 	static	status_t			_SchedulerThread(void* self);
 
+	static	status_t			_IOCallbackWrapper(void* data,
+									io_operation* operation);
 
 private:
 			DMAResource*		fDMAResource;

@@ -10,6 +10,8 @@
 
 #include <SupportDefs.h>
 
+#include <condition_variable.h>
+#include <lock.h>
 #include <util/DoublyLinkedList.h>
 
 #include "dma_resources.h"
@@ -21,6 +23,7 @@
 struct DMABuffer;
 struct IOOperation;
 
+typedef struct IOOperation io_operation;
 
 class IOBuffer : public DoublyLinkedListLinkImpl<IOBuffer> {
 public:
@@ -71,13 +74,15 @@ public:
 								IORequestChunk();
 	virtual						~IORequestChunk();
 
-//	virtual status_t			Wait(bigtime_t timeout = B_INFINITE_TIMEOUT);
-
 			IORequest*			Parent() const { return fParent; }
+			void				SetParent(IORequest* parent)
+									{ fParent = parent; }
 
 			status_t			Status() const { return fStatus; }
 			void				SetStatus(status_t status)
 									{ fStatus = status; }
+			void				ResetStatus()
+									{ fStatus = 1; }
 
 			DoublyLinkedListLink<IORequestChunk>*
 									ListLink()	{ return &fListLink; }
@@ -158,6 +163,10 @@ protected:
 typedef IOOperation io_operation;
 typedef DoublyLinkedList<IOOperation> IOOperationList;
 
+typedef struct IORequest io_request;
+typedef status_t (*io_request_finished_callback)(void* data,
+	io_request* request);
+
 
 struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 								IORequest();
@@ -168,8 +177,16 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			status_t			Init(off_t offset, iovec* vecs, size_t count,
 									size_t length, bool write, uint32 flags);
 
+			void				SetFinishedCallback(
+									io_request_finished_callback callback,
+									void* cookie);
+
+			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
+
+			bool				IsFinished() const	{ return fStatus != 1; }
+
 			void				ChunkFinished(IORequestChunk* chunk,
-									status_t status);
+									status_t status, bool remove);
 
 			size_t				RemainingBytes() const
 									{ return fRemainingBytes; }
@@ -204,13 +221,19 @@ private:
 	static	status_t			_CopyUser(void* bounceBuffer, void* external,
 									size_t size, bool copyIn);
 
+			mutex				fLock;
 			IOBuffer*			fBuffer;
 			off_t				fOffset;
 			size_t				fLength;
 			IORequestChunkList	fChildren;
+			int32				fPendingChildren;
 			uint32				fFlags;
 			team_id				fTeam;
 			bool				fIsWrite;
+
+			io_request_finished_callback fFinishedCallback;
+			void*				fFinishedCookie;
+			ConditionVariable	fFinishedCondition;
 
 			// these are for iteration
 			uint32				fVecIndex;
