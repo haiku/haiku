@@ -1481,23 +1481,24 @@ fork_team(void)
 
 	cookie = 0;
 	while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
-		void *address;
-		area_id area = vm_copy_area(team->address_space->id, info.name,
-			&address, B_CLONE_ADDRESS, info.protection, info.area);
-		if (area < B_OK) {
-			status = area;
-			break;
-		}
+		if (info.area == parentTeam->user_data_area) {
+			// don't clone the user area; just create a new one
+			status = create_team_user_data(team);
+			if (status != B_OK)
+				break;
 
-		if (info.area == parentThread->user_stack_area) {
-			forkArgs->user_stack_area = area;
-		} else if (info.area == parentTeam->user_data_area) {
-			team->user_data = (addr_t)address;
-			team->used_user_data = 0;
-			team->user_data_size = info.size;
-			team->user_data_area = area;
-			team->free_user_threads = NULL;
 			forkArgs->user_thread = team_allocate_user_thread(team);
+		} else {
+			void *address;
+			area_id area = vm_copy_area(team->address_space->id, info.name,
+				&address, B_CLONE_ADDRESS, info.protection, info.area);
+			if (area < B_OK) {
+				status = area;
+				break;
+			}
+
+			if (info.area == parentThread->user_stack_area)
+				forkArgs->user_stack_area = area;
 		}
 	}
 
