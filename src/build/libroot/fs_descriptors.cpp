@@ -23,7 +23,7 @@ using std::map;
 static const int kVirtualDescriptorStart = 10000;
 
 typedef map<int, BPrivate::Descriptor*> DescriptorMap;
-static DescriptorMap *sDescriptors = 0;
+static DescriptorMap *sDescriptors;
 
 namespace BPrivate {
 
@@ -355,7 +355,7 @@ delete_descriptor(int fd)
 
 	if (sDescriptors->size() == 0) {
 		delete sDescriptors;
-		sDescriptors = 0;
+		sDescriptors = NULL;
 	}
 	return error;
 }
