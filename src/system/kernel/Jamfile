@@ -99,7 +99,7 @@ KernelLd kernel_$(TARGET_ARCH) :
 
 	$(HAIKU_STATIC_LIBSUPC++)
 
-	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld 
+	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
 	: -Bdynamic -export-dynamic -dynamic-linker /foo/bar
 	  $(TARGET_KERNEL_PIC_LINKFLAGS)
 	:
@@ -131,7 +131,7 @@ KernelLd kernel.so :
 
 	$(HAIKU_STATIC_LIBSUPC++)
 
-	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld 
+	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
 	: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
 	  $(TARGET_KERNEL_PIC_LINKFLAGS)
 ;
