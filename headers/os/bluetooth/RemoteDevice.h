@@ -50,15 +50,14 @@ class RemoteDevice : public BluetoothDevice {
         void GetProperty(const char* property, uint32* value); /* Throwing */
 
 		LocalDevice* GetLocalDeviceOwner();
-    protected:
+
         RemoteDevice(BString address);
         RemoteDevice(bdaddr_t address);
 
-
-
-        /* Instances of this class only would be instantiated by Discovery[Listener|Agent] */
-        friend class DiscoveryListener;
+    protected:
+        /* called by Discovery[Listener|Agent] */
 		void SetLocalDeviceOwner(LocalDevice* ld);
+		friend class DiscoveryListener;
 
     private:
 
