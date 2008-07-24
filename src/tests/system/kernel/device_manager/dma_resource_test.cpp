@@ -177,7 +177,7 @@ do_io(void* data, IOOperation* operation)
 		const iovec& vec = operation->Vecs()[i];
 		addr_t base = (addr_t)vec.iov_base;
 		size_t length = vec.iov_len;
-		size_t pageOffset = base & ~(B_PAGE_SIZE - 1);
+		size_t pageOffset = base % B_PAGE_SIZE;
 
 		while (length > 0) {
 			size_t toCopy = min_c(length, B_PAGE_SIZE - pageOffset);
