@@ -6,8 +6,8 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_VM_STORE_ANONYMOUS_H
-#define _KERNEL_VM_STORE_ANONYMOUS_H
+#ifndef _KERNEL_VM_STORE_ANONYMOUS_NO_SWAP_H
+#define _KERNEL_VM_STORE_ANONYMOUS_NO_SWAP_H
 
 #include <vm_types.h>
 
@@ -39,4 +39,4 @@ private:
 };
 
 
-#endif	/* _KERNEL_VM_STORE_ANONYMOUS_H */
+#endif	/* _KERNEL_VM_STORE_ANONYMOUS_NO_SWAP_H */

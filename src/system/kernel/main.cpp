@@ -50,6 +50,8 @@
 
 #include <string.h>
 
+#include "vm/VMAnonymousCache.h"
+
 
 //#define TRACE_BOOT
 #ifdef TRACE_BOOT
@@ -185,6 +187,10 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		notifications_init();
 		TRACE("init VFS\n");
 		vfs_init(&sKernelArgs);
+#if ENABLE_SWAP_SUPPORT
+		TRACE("init swap support\n");
+		swap_init();
+#endif
 
 		// bring up the AP cpus in a lock step fashion
 		TRACE("waking up AP cpus\n");

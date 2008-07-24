@@ -12,6 +12,12 @@
 #include <vm_types.h>
 
 
+// uncomment to build in swap support
+//#define ENABLE_SWAP_SUPPORT 1
+
+#if ENABLE_SWAP_SUPPORT
+
+
 typedef page_num_t swap_addr_t;
 struct swap_block;
 
@@ -48,5 +54,9 @@ private:
 	off_t   fCommittedSwapSize;
 };
 
+
+extern "C" void swap_init(void);
+
+#endif	// ENABLE_SWAP_SUPPORT
 
 #endif	/* _KERNEL_VM_STORE_ANONYMOUS_H */

@@ -961,6 +961,7 @@ VMCache::_RemoveConsumer(VMCache* consumer)
 
 #include <heap.h>
 
+#include "VMAnonymousCache.h"
 #include "VMAnonymousNoSwapCache.h"
 #include "VMDeviceCache.h"
 #include "VMNullCache.h"
@@ -969,8 +970,28 @@ VMCache::_RemoveConsumer(VMCache* consumer)
 
 /*static*/ status_t
 VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
-	int32 numPrecommittedPages, int32 numGuardPages)
+	int32 numPrecommittedPages, int32 numGuardPages, bool swappable)
 {
+#if ENABLE_SWAP_SUPPORT
+	if (swappable) {
+		VMAnonymousCache* cache = new(nogrow) VMAnonymousCache;
+		if (cache == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = cache->Init(canOvercommit, numPrecommittedPages,
+			numGuardPages);
+		if (error != B_OK) {
+			cache->Delete();
+			return error;
+		}
+
+		T(Create(cache));
+
+		_cache = cache;
+		return B_OK;
+	}
+#endif
+
 	VMAnonymousNoSwapCache* cache = new(nogrow) VMAnonymousNoSwapCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;

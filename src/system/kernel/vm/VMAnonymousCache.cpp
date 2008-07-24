@@ -22,6 +22,9 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
+
+#if	ENABLE_SWAP_SUPPORT
+
 //#define TRACE_STORE
 #ifdef TRACE_STORE
 #	define TRACE(x) dprintf x
@@ -724,4 +727,6 @@ swap_init(void)
 	mutex_init(&sAvailSwapSpaceLock, "avail swap space");
 	sAvailSwapSpace = 0;
 }
+
+#endif	// ENABLE_SWAP_SUPPORT
 

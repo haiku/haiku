@@ -1401,7 +1401,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 
 		// create an anonymous cache
 		status = VMCacheFactory::CreateAnonymousCache(newCache,
-			(protection & B_STACK_AREA) != 0, 0, USER_STACK_GUARD_PAGES);
+			(protection & B_STACK_AREA) != 0, 0, USER_STACK_GUARD_PAGES, true);
 		if (status != B_OK)
 			goto err1;
 
@@ -1639,7 +1639,8 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 	status = VMCacheFactory::CreateAnonymousCache(cache,
 		canOvercommit, isStack ? 2 : 0,
 		isStack ? ((protection & B_USER_PROTECTION) != 0 ?
-			USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0);
+			USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0,
+		wiring == B_NO_LOCK);
 	if (status != B_OK)
 		goto err1;
 
@@ -2302,7 +2303,7 @@ vm_copy_on_write_area(vm_cache* lowerCache)
 
 	// create an anonymous cache
 	status_t status = VMCacheFactory::CreateAnonymousCache(upperCache, false, 0,
-		0);
+		0, true);
 	if (status != B_OK)
 		return status;
 

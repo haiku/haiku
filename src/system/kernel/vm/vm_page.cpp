@@ -989,10 +989,16 @@ page_writer(void* /*unused*/)
 				continue;
 
 			vm_cache *cache = page->cache;
-			// TODO: write back temporary ones as soon as we have swap file support
-			if (cache->temporary
-				/*&& low_resource_state(B_KERNEL_RESOURCE_PAGES)
-					== B_NO_LOW_RESOURCE*/) {
+
+			// Don't write back wired (locked) pages and don't write RAM pages
+			// until we're low on pages.
+			if (page->wired_count > 0
+#if ENABLE_SWAP_SUPPORT
+				|| cache->temporary
+					&& low_resource_state(B_KERNEL_RESOURCE_PAGES)
+							== B_NO_LOW_RESOURCE
+#endif
+				) {
 				continue;
 			}
 
