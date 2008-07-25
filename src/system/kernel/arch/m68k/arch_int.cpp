@@ -15,6 +15,7 @@
 
 #include <int.h>
 
+#include <arch_platform.h>
 #include <arch/smp.h>
 #include <boot/kernel_args.h>
 #include <device_manager.h>
@@ -64,28 +65,30 @@ struct iframe_stack gBootFrameStack;
 
 // interrupt controller interface (initialized
 // in arch_int_init_post_device_manager())
-static struct interrupt_controller_module_info *sPIC;
-static void *sPICCookie;
+//static struct interrupt_controller_module_info *sPIC;
+//static void *sPICCookie;
 
 
 void 
 arch_int_enable_io_interrupt(int irq)
 {
-	if (!sPIC)
-		return;
+	//if (!sPIC)
+	//	return;
 
 	// TODO: I have no idea, what IRQ type is appropriate.
-	sPIC->enable_io_interrupt(sPICCookie, irq, IRQ_TYPE_LEVEL);
+	//sPIC->enable_io_interrupt(sPICCookie, irq, IRQ_TYPE_LEVEL);
+	M68KPlatform::Default()->EnableIOInterrupt(irq);
 }
 
 
 void 
 arch_int_disable_io_interrupt(int irq)
 {
-	if (!sPIC)
-		return;
+	//if (!sPIC)
+	//	return;
 
-	sPIC->disable_io_interrupt(sPICCookie, irq);
+	//sPIC->disable_io_interrupt(sPICCookie, irq);
+	M68KPlatform::Default()->DisableIOInterrupt(irq);
 }
 
 
@@ -243,28 +246,36 @@ m68k_exception_entry(struct iframe *iframe)
 		case 30: // autovector interrupt
 		case 31: // autovector interrupt
 		{
+#if 0
 			if (!sPIC) {
 				panic("m68k_exception_entry(): external interrupt although we "
 					"don't have a PIC driver!");
 				ret = B_HANDLED_INTERRUPT;
 				break;
 			}
+#endif
+			M68KPlatform::Default()->AcknowledgeIOInterrupt(vector);
 
 dprintf("handling I/O interrupts...\n");
-			int irq;
+			ret = int_io_interrupt_handler(vector, true);
+#if 0
 			while ((irq = sPIC->acknowledge_io_interrupt(sPICCookie)) >= 0) {
 // TODO: correctly pass level-triggered vs. edge-triggered to the handler!
 				ret = int_io_interrupt_handler(irq, true);
 			}
+#endif
 dprintf("handling I/O interrupts done\n");
 			break;
 		}
 
-		case 0x1700: // thermal management exception
-			panic("thermal management exception: unimplemented\n");
-			break;
 		case 9: // trace
 		default:
+			// vectors >= 64 are user defined vectors, used for IRQ
+			if (vector >= 64) {
+				M68KPlatform::Default()->AcknowledgeIOInterrupt(irq);
+				ret = int_io_interrupt_handler(vector, true);
+				break;
+			}
 			dprintf("unhandled exception type 0x%x\n", vector);
 			print_iframe(iframe);
 			panic("unhandled exception type\n");
@@ -286,10 +297,6 @@ dprintf("handling I/O interrupts done\n");
 }
 
 
-#warning M68K: WTF do I need that here ?
-extern status_t 
-arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical);
-
 status_t 
 arch_int_init(kernel_args *args)
 {
@@ -302,15 +309,7 @@ arch_int_init(kernel_args *args)
 	/* fill in the vector table */
 	for (i = 0; i < M68K_EXCEPTION_VECTOR_COUNT; i++)
 		gExceptionVectors[i] = &__m68k_exception_common;
-#if 0
-	/* get the physical address */
-	err = arch_vm_translation_map_early_query(
-		(addr_t)gExceptionVectors, &vbr);
-	if (err < B_OK) {
-		panic("can't query phys for vbr");
-		return err;
-	}
-#endif
+
 	vbr = args->arch_args.phys_vbr;
 	/* point VBR to the new table */
 	asm volatile  ("movec %0,%%vbr" : : "r"(vbr):);
@@ -482,7 +481,9 @@ probe_pic_device(device_node_handle node, PICModuleList &picModules)
 status_t
 arch_int_init_post_device_manager(struct kernel_args *args)
 {
-#warning M68K: init PIC from M68KPlatform::
+	status_t err;
+	err = M68KPlatform::Default()->InitPIC(args);
+	return err;
 #if 0 /* PIC modules */
 	// get the interrupt controller driver modules
 	PICModuleList picModules;
@@ -541,7 +542,7 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 }
 
 
-#if 0
+#if 0//PPC
 // #pragma mark -
 
 struct m68k_cpu_exception_context *

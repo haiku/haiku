@@ -81,16 +81,28 @@ platform_start_kernel(void)
 	
 	dprintf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
 
-	asm("move.l	%0, %%sp;	"			// move stack out of way
+	asm volatile (
+		"move.l	%0, %%sp;	"			// move stack out of way
 		: : "m" (stackTop));
-	asm("move.l  #0x0,-(%%sp); "		// we're the BSP cpu (0)
+
+	asm volatile (
+		"ori	#0x0700,%%sr; ");		// disable interrupts
+
+	asm volatile (
+		"move.l  #0x0,-(%%sp); "		// we're the BSP cpu (0)
 		"move.l 	%0,-(%%sp);	"		// kernel args
 		"move.l 	#0x0,-(%%sp);"		// dummy retval for call to main
 		"move.l 	%1,-(%%sp);	"		// this is the start address
 		"rts;		"					// jump.
 		: : "g" (args), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
 
+	// Huston, we have a problem!
+
+	asm volatile (
+		"andi	#0xf8ff,%%sr; ");		// reenable interrupts
+
 	panic("kernel returned!\n");
+
 }
 
 

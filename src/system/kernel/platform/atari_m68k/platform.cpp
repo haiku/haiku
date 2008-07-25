@@ -10,8 +10,22 @@
 
 #include <boot/kernel_args.h>
 //#include <platform/openfirmware/openfirmware.h>
+#include <platform/atari_m68k/MFP.h>
 #include <real_time_clock.h>
 #include <util/kernel_cpp.h>
+
+#define MFP0_BASE	0xFFFFFA00
+#define MFP1_BASE	0xFFFFFA80
+
+#define MFP0_VECTOR_BASE	64
+#define MFP1_VECTOR_BASE	(MFP0_VECTOR_BASE+16)
+// ?
+#define SCC_C0_VECTOR_BASE	(MFP1_VECTOR_BASE+16)
+// ??
+#define SCC_C1_VECTOR_BASE	(0x1BC/4)
+
+#define inb(a)  (*(volatile uint8 *)(a))
+#define outb(a, v)  (*(volatile uint8 *)(a) = v)
 
 
 namespace BPrivate {
@@ -20,7 +34,26 @@ namespace BPrivate {
 
 // #pragma mark - Atari (Falcon)
 
+
 class M68KAtari : public M68KPlatform {
+
+	class MFP {
+	public:
+		MFP(uint32 base, int vector);
+		~MFP();
+
+		uint32 Base() const { return fBase; };
+		int Vector() const { return fVector; };
+
+		void EnableIOInterrupt(int irq);
+		void DisableIOInterrupt(int irq);
+		void AcknowledgeIOInterrupt(int irq);
+
+	private:
+		uint32 fBase;
+		int fVector;
+	};
+
 public:
 	M68KAtari();
 	virtual ~M68KAtari();
@@ -36,6 +69,10 @@ public:
 	virtual char SerialDebugGetChar();
 	virtual void SerialDebugPutChar(char c);
 
+	virtual void EnableIOInterrupt(int irq);
+	virtual void DisableIOInterrupt(int irq);
+	virtual void AcknowledgeIOInterrupt(int irq);
+
 	virtual	void SetHardwareRTC(uint32 seconds);
 	virtual	uint32 GetHardwareRTC();
 
@@ -45,7 +82,11 @@ public:
 	virtual	void ShutDown(bool reboot);
 
 private:
+	MFP	*MFPForIrq(int irq);
 	int	fRTC;
+
+	MFP	*fMFP[2];
+
 	// native features (ARAnyM emulator)
 	uint32 (*nfGetID)(const char *name);
 	int32 (*nfCall)(uint32 ID, ...);
@@ -58,6 +99,71 @@ private:
 }	// namespace BPrivate
 
 using BPrivate::M68KAtari;
+
+
+// #pragma mark - M68KAtari::MFP
+
+
+static char sMFP0Buffer[sizeof(M68KAtari::MFP)];
+static char sMFP1Buffer[sizeof(M68KAtari::MFP)];
+
+// constructor
+MFP::MFP(uint32 base, int vector)
+{
+	fBase = base;
+	fVector = vector;
+}
+
+
+MFP::~MFP()
+{
+}
+
+#warning M68K: use enable or mark register ?
+
+void
+MFP::EnableIOInterrupt(int irq)
+{
+	uint8 bit = 1 << (irq % 8);
+	// I*B[0] is vector+0, I*A[0] is vector+8
+	uint32 reg = Base() + ((irq > 8) ? (MFP_IERA) : (MFP_IERB));
+	uint8 val = inb(reg);
+	if (val & bit == 0) {
+		val |= bit;
+		outb(reg, val);
+	}
+}
+
+
+void
+MFP::DisableIOInterrupt(int irq)
+{
+	uint8 bit = 1 << (irq % 8);
+	// I*B[0] is vector+0, I*A[0] is vector+8
+	uint32 reg = Base() + ((irq > 8) ? (MFP_IERA) : (MFP_IERB));
+	uint8 val = inb(reg);
+	if (val & bit) {
+		val &= ~bit;
+		outb(reg, val);
+	}
+}
+
+
+void
+MFP::AcknowledgeIOInterrupt(int irq)
+{
+	uint8 bit = 1 << (irq % 8);
+	// I*B[0] is vector+0, I*A[0] is vector+8
+	uint32 reg = Base() + ((irq > 8) ? (MFP_ISRA) : (MFP_ISRB));
+	uint8 val = inb(reg);
+	if (val & bit) {
+		val &= ~bit;
+		outb(reg, val);
+	}
+}
+
+
+// #pragma mark - M68KAtari
 
 
 // constructor
@@ -77,6 +183,9 @@ M68KAtari::~M68KAtari()
 status_t
 M68KAtari::Init(struct kernel_args *kernelArgs)
 {
+	fMFP[0] = NULL;
+	fMFP[1] = NULL;
+
 	nfGetID =
 		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_get_id;
 	nfCall = 
@@ -119,6 +228,10 @@ status_t
 M68KAtari::InitPIC(struct kernel_args *kernelArgs)
 {
 	panic("WRITEME");
+	fMFP[0] = new(sMFP0Buffer) M68KAtari::MFP(MFP0_BASE, MFP0_VECTOR_BASE);
+	//if (kernelArgs->arch_args.machine == /*TT*/) {
+		fMFP[1] = new(sMFP1Buffer) M68KAtari::MFP(MFP1_BASE, MFP1_VECTOR_BASE);
+	//}
 	return B_NO_INIT;
 }
 
@@ -172,6 +285,35 @@ M68KAtari::SerialDebugPutChar(char c)
 
 
 void
+M68KAtari::EnableIOInterrupt(int irq)
+{
+	MFP *mfp = MFPForIrq(irq);
+
+	if (mfp)
+		mfp->EnableIOInterrupt(irq - mfp->Vector());
+}
+
+
+void
+M68KAtari::DisableIOInterrupt(int irq)
+{
+	MFP *mfp = MFPForIrq(irq);
+
+	if (mfp)
+		mfp->DisableIOInterrupt(irq - mfp->Vector());
+}
+
+
+void
+M68KAtari::AcknowledgeIOInterrupt(int irq)
+{
+	MFP *mfp = MFPForIrq(irq);
+
+	if (mfp)
+		mfp->AcknowledgeIOInterrupt(irq - mfp->Vector());
+}
+
+void
 M68KAtari::SetHardwareRTC(uint32 seconds)
 {
 }
@@ -202,6 +344,22 @@ M68KAtari::ShutDown(bool reboot)
 	panic("Bombs!");
 	panic("WRITEME");
 }
+
+
+MFP *
+M68KAtari::MFPForIrq(int irq)
+{
+	int i;
+
+	for (i = 0; i < 2; i++) {
+		if (fMFP[i]) {
+			if (irq >= fMFP[i]->Vector() && irq < fMFP[i]->Vector() + 16)
+				return &fMFP[i];
+		}
+	}
+	return NULL;
+}
+
 
 // static buffer for constructing the actual M68KPlatform
 static char *sM68KPlatformBuffer[sizeof(M68KAtari)];
