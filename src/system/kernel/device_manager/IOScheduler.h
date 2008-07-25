@@ -51,6 +51,8 @@ private:
 			IORequest*			_GetNextUnscheduledRequest();
 			status_t			_Scheduler();
 	static	status_t			_SchedulerThread(void* self);
+			status_t			_RequestNotifier();
+	static	status_t			_RequestNotifierThread(void* self);
 
 	static	status_t			_IOCallbackWrapper(void* data,
 									io_operation* operation);
@@ -59,12 +61,15 @@ private:
 			DMAResource*		fDMAResource;
 			spinlock			fFinisherLock;
 			mutex				fLock;
-			thread_id			fThread;
+			thread_id			fSchedulerThread;
+			thread_id			fRequestNotifierThread;
 			io_callback			fIOCallback;
 			void*				fIOCallbackData;
 			IORequestList		fUnscheduledRequests;
+			IORequestList		fFinishedRequests;
 			ConditionVariable	fNewRequestCondition;
 			ConditionVariable	fFinishedOperationCondition;
+			ConditionVariable	fFinishedRequestCondition;
 			IOOperationList		fUnusedOperations;
 			IOOperationList		fCompletedOperations;
 			bool				fWaiting;

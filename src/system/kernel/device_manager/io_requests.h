@@ -165,8 +165,7 @@ typedef IOOperation io_operation;
 typedef DoublyLinkedList<IOOperation> IOOperationList;
 
 typedef struct IORequest io_request;
-typedef status_t (*io_request_finished_callback)(void* data,
-	io_request* request);
+typedef status_t (*io_request_callback)(void* data, io_request* request);
 
 
 struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
@@ -179,15 +178,24 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 									size_t length, bool write, uint32 flags);
 
 			void				SetFinishedCallback(
-									io_request_finished_callback callback,
+									io_request_callback callback,
+									void* cookie);
+			void				SetIterationCallback(
+									io_request_callback callback,
 									void* cookie);
 
 			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
 
-			bool				IsFinished() const	{ return fStatus != 1; }
+			bool				IsFinished() const
+									{ return fStatus != 1
+										&& fPendingChildren == 0; }
+			void				NotifyFinished();
+			bool				HasCallbacks() const;
 
-			void				ChunkFinished(IORequestChunk* chunk,
-									status_t status, bool remove);
+			void				OperationFinished(IOOperation* operation,
+									status_t status);
+			void				SubrequestFinished(IORequest* request,
+									status_t status);
 
 			size_t				RemainingBytes() const
 									{ return fRemainingBytes; }
@@ -234,8 +242,10 @@ private:
 			team_id				fTeam;
 			bool				fIsWrite;
 
-			io_request_finished_callback fFinishedCallback;
+			io_request_callback	fFinishedCallback;
 			void*				fFinishedCookie;
+			io_request_callback	fIterationCallback;
+			void*				fIterationCookie;
 			ConditionVariable	fFinishedCondition;
 
 			// these are for iteration

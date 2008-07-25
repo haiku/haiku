@@ -486,7 +486,9 @@ IOOperation::_CopyPartialEnd(bool isWrite)
 IORequest::IORequest()
 	:
 	fFinishedCallback(NULL),
-	fFinishedCookie(NULL)
+	fFinishedCookie(NULL),
+	fIterationCallback(NULL),
+	fIterationCookie(NULL)
 {
 	mutex_init(&fLock, "I/O request lock");
 	fFinishedCondition.Init(this, "I/O request finished");
@@ -541,11 +543,18 @@ IORequest::Init(off_t offset, iovec* vecs, size_t count, size_t length,
 
 
 void
-IORequest::SetFinishedCallback(io_request_finished_callback callback,
-	void* cookie)
+IORequest::SetFinishedCallback(io_request_callback callback, void* cookie)
 {
 	fFinishedCallback = callback;
 	fFinishedCookie = cookie;
+}
+
+
+void
+IORequest::SetIterationCallback(io_request_callback callback, void* cookie)
+{
+	fIterationCallback = callback;
+	fIterationCookie = cookie;
 }
 
 
@@ -571,17 +580,68 @@ IORequest::Wait(uint32 flags, bigtime_t timeout)
 
 
 void
-IORequest::ChunkFinished(IORequestChunk* chunk, status_t status, bool remove)
+IORequest::NotifyFinished()
 {
-	TRACE("IORequest::ChunkFinished(%p, %#lx, %d): request: %p\n", chunk,
-		status, remove, this);
+	TRACE("IORequest::NotifyFinished(): request: %p\n", this);
 
 	MutexLocker locker(fLock);
 
-	if (remove) {
-		fChildren.Remove(chunk);
-		chunk->SetParent(NULL);
+	if (fStatus == B_OK && RemainingBytes() > 0) {
+		// The request is not really done yet. If it has an iteration callback,
+		// call it.
+		if (fIterationCallback != NULL) {
+			locker.Unlock();
+			fIterationCallback(fIterationCookie, this);
+		}
+	} else {
+		// Cache the callbacks before we unblock waiters and unlock. Any of the
+		// following could delete this request, so we don't want to touch it
+		// once we have started telling others that it is done.
+		IORequest* parent = fParent;
+		io_request_callback finishedCallback = fFinishedCallback;
+		void* finishedCookie = fFinishedCookie;
+		status_t status = fStatus;
+
+		// unblock waiters
+		fFinishedCondition.NotifyAll();
+
+		locker.Unlock();
+
+		// notify callback
+		if (finishedCallback != NULL)
+			finishedCallback(finishedCookie, this);
+
+		// notify parent
+		if (parent != NULL)
+			parent->SubrequestFinished(this, status);
 	}
+}
+
+
+/*!	Returns whether this request or any of it's ancestors has a finished or
+	notification callback. Used to decide whether NotifyFinished() can be called
+	synchronously.
+*/
+bool
+IORequest::HasCallbacks() const
+{
+	if (fFinishedCallback != NULL || fIterationCallback != NULL)
+		return true;
+
+	return fParent != NULL && fParent->HasCallbacks();
+}
+
+
+void
+IORequest::OperationFinished(IOOperation* operation, status_t status)
+{
+	TRACE("IORequest::OperationFinished(%p, %#lx): request: %p\n", operation,
+		status, this);
+
+	MutexLocker locker(fLock);
+
+	fChildren.Remove(operation);
+	operation->SetParent(NULL);
 
 	if (status != B_OK && fStatus == 1)
 		fStatus = status;
@@ -600,27 +660,32 @@ IORequest::ChunkFinished(IORequestChunk* chunk, status_t status, bool remove)
 	// not for its ancestors.
 	if (fBuffer->IsVirtual())
 		fBuffer->UnlockMemory(fTeam, fIsWrite);
+}
 
-	// Cache the callbacks before we unblock waiters and unlock. Any of the
-	// following could delete this request, so we don't want to touch it once
-	// we have started telling others that it is done.
-	IORequest* parent = fParent;
-	io_request_finished_callback finishedCallback = fFinishedCallback;
-	void* finishedCookie = fFinishedCookie;
-	status = fStatus;
 
-	// unblock waiters
-	fFinishedCondition.NotifyAll();
+void
+IORequest::SubrequestFinished(IORequest* request, status_t status)
+{
+	TRACE("IORequest::SubrequestFinished(%p, %#lx): request: %p\n", request,
+		status, this);
+
+	MutexLocker locker(fLock);
+
+	if (status != B_OK && fStatus == 1)
+		fStatus = status;
+
+	if (--fPendingChildren > 0)
+		return;
+
+	// last child finished
+
+	// set status, if not done yet
+	if (fStatus == 1)
+		fStatus = B_OK;
 
 	locker.Unlock();
 
-	// notify callback
-	if (finishedCallback != NULL)
-		finishedCallback(finishedCookie, this);
-
-	// notify parent
-	if (parent != NULL)
-		parent->ChunkFinished(this, status, false);
+	NotifyFinished();
 }
 
 

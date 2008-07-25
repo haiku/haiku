@@ -40,6 +40,8 @@ IOScheduler::IOScheduler(DMAResource* resource)
 
 IOScheduler::~IOScheduler()
 {
+	// TODO: Shutdown threads.
+
 	mutex_lock(&fLock);
 	mutex_destroy(&fLock);
 
@@ -53,6 +55,7 @@ IOScheduler::Init(const char* name)
 {
 	fNewRequestCondition.Init(this, "I/O new request");
 	fFinishedOperationCondition.Init(this, "I/O finished operation");
+	fFinishedRequestCondition.Init(this, "I/O finished request");
 
 	size_t count = fDMAResource != NULL ? fDMAResource->BufferCount() : 16;
 	for (size_t i = 0; i < count; i++) {
@@ -63,13 +66,24 @@ IOScheduler::Init(const char* name)
 		fUnusedOperations.Add(operation);
 	}
 
-	// start thread for device
-	fThread = spawn_kernel_thread(&_SchedulerThread, name, B_NORMAL_PRIORITY,
-		(void *)this);
-	if (fThread < B_OK)
-		return fThread;
+	// start threads
+	char buffer[B_OS_NAME_LENGTH];
+	strlcpy(buffer, name, sizeof(buffer));
+	strlcat(buffer, " scheduler", sizeof(buffer));
+	fSchedulerThread = spawn_kernel_thread(&_SchedulerThread, buffer,
+		B_NORMAL_PRIORITY, (void *)this);
+	if (fSchedulerThread < B_OK)
+		return fSchedulerThread;
 
-	resume_thread(fThread);
+	strlcpy(buffer, name, sizeof(buffer));
+	strlcat(buffer, " notifier", sizeof(buffer));
+	fRequestNotifierThread = spawn_kernel_thread(&_RequestNotifierThread,
+		buffer, B_NORMAL_PRIORITY, (void *)this);
+	if (fRequestNotifierThread < B_OK)
+		return fRequestNotifierThread;
+
+	resume_thread(fSchedulerThread);
+	resume_thread(fRequestNotifierThread);
 	return B_OK;
 }
 
@@ -89,13 +103,6 @@ IOScheduler::SetCallback(io_callback callback, void* data)
 }
 
 
-/*static*/ status_t
-IOScheduler::_IOCallbackWrapper(void* data, io_operation* operation)
-{
-	return ((IOCallback*)data)->DoIO(operation);
-}
-
-
 status_t
 IOScheduler::ScheduleRequest(IORequest* request)
 {
@@ -108,7 +115,7 @@ IOScheduler::ScheduleRequest(IORequest* request)
 	// lock memory (via another thread or a dedicated call).
 
 	if (buffer->IsVirtual()) {
-		status_t status = buffer->LockMemory(B_CURRENT_TEAM,
+		status_t status = buffer->LockMemory(request->Team(),
 			request->IsWrite());
 		if (status != B_OK)
 			return status;
@@ -146,7 +153,8 @@ IOScheduler::OperationCompleted(IOOperation* operation, status_t status)
 
 	if (fWaiting) {
 		SpinLocker _2(thread_spinlock);
-		thread_interrupt(thread_get_thread_struct_locked(fThread), false);
+		thread_interrupt(thread_get_thread_struct_locked(fSchedulerThread),
+			false);
 	}
 }
 
@@ -176,7 +184,7 @@ IOScheduler::_Finisher()
 		// notify request and remove operation
 		IORequest* request = operation->Parent();
 		if (request != NULL)
-			request->ChunkFinished(operation, operation->Status(), true);
+			request->OperationFinished(operation, operation->Status());
 
 		// recycle the operation
 		MutexLocker _(fLock);
@@ -184,6 +192,19 @@ IOScheduler::_Finisher()
 			fDMAResource->RecycleBuffer(operation->Buffer());
 
 		fUnusedOperations.Add(operation);
+
+		// If the request is done, we need to perform its notifications.
+		if (request->IsFinished()) {
+			if (request->HasCallbacks()) {
+				// The request has callbacks that may take some time to perform,
+				// so we hand it over to the request notifier.
+				fFinishedRequests.Add(request);
+				fFinishedRequestCondition.NotifyAll();
+			} else {
+				// No callbacks -- finish the request right now.
+				request->NotifyFinished();
+			}
+		}
 	}
 }
 
@@ -305,10 +326,53 @@ IOScheduler::_Scheduler()
 }
 
 
-status_t
+/*static*/ status_t
 IOScheduler::_SchedulerThread(void *_self)
 {
 	IOScheduler *self = (IOScheduler *)_self;
 	return self->_Scheduler();
+}
+
+
+status_t
+IOScheduler::_RequestNotifier()
+{
+	while (true) {
+		MutexLocker locker(fLock);
+
+		// get a request
+		IORequest* request = fFinishedRequests.RemoveHead();
+
+		if (request == NULL) {
+			ConditionVariableEntry entry;
+			fFinishedRequestCondition.Add(&entry);
+			fWaiting = true;
+
+			locker.Unlock();
+
+			entry.Wait();
+			continue;
+		}
+
+		locker.Unlock();
+
+		// notify the request
+		request->NotifyFinished();
+	}
+}
+
+
+/*static*/ status_t
+IOScheduler::_RequestNotifierThread(void *_self)
+{
+	IOScheduler *self = (IOScheduler*)_self;
+	return self->_RequestNotifier();
+}
+
+
+/*static*/ status_t
+IOScheduler::_IOCallbackWrapper(void* data, io_operation* operation)
+{
+	return ((IOCallback*)data)->DoIO(operation);
 }
 
