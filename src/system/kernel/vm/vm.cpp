@@ -5029,6 +5029,15 @@ lock_memory_etc(team_id team, void *address, size_t numBytes, uint32 flags)
 			goto out;
 		}
 
+		// TODO: Here's a race condition. We should probably add a parameter
+		// to vm_soft_fault() that would cause the page's wired count to be
+		// incremented immediately.
+		// TODO: After memory has been locked in an area, we need to prevent the
+		// area from being deleted, resized, cut, etc. That could be done using
+		// a "locked pages" count in vm_area, and maybe a condition variable, if
+		// we want to allow waiting for the area to become eligible for these
+		// operations again.
+
 		map->ops->lock(map);
 		status = map->ops->query(map, base, &physicalAddress, &protection);
 		map->ops->unlock(map);
