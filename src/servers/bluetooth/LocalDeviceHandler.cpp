@@ -106,7 +106,7 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode)
 					((uint16)opcodeFound == opcode) ) {
 
 					// this should remove only the entry
-					printf("Removed event@%d and opcode %d from request %p\n", event, opcode, msg); 
+					printf("Removed event %#x and opcode %d from request %p\n", event, opcode, msg); 
 					(void)msg->RemoveData("eventExpected", eventIndex);
 					(void)msg->RemoveData("opcodeExpected", eventIndex);
 					goto finish;
