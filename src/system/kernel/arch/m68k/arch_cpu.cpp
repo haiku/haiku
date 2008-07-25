@@ -64,6 +64,8 @@ arch_cpu_init(kernel_args *args)
 	switch (arch_cpu_type) {
 		case 68020:
 		case 68030:
+			memcpy(&cpu_ops, &cpu_ops_030, sizeof(cpu_ops));
+			/*
 			cpu_ops.flush_insn_pipeline = cpu_ops_030.flush_insn_pipeline;
 			cpu_ops.flush_atc_all = cpu_ops_030.flush_atc_all;
 			cpu_ops.flush_atc_user = cpu_ops_030.flush_atc_user;
@@ -71,9 +73,12 @@ arch_cpu_init(kernel_args *args)
 			cpu_ops.flush_dcache = cpu_ops_030.flush_dcache;
 			cpu_ops.flush_icache = cpu_ops_030.flush_icache;
 			cpu_ops.idle = cpu_ops_030.idle; // NULL
+			*/
 			break;
-#ifdef SUPPORTS_040
+//#ifdef SUPPORTS_040
 		case 68040:
+			memcpy(&cpu_ops, &cpu_ops_030, sizeof(cpu_ops));
+			/*
 			cpu_ops.flush_insn_pipeline = cpu_ops_040.flush_insn_pipeline;
 			cpu_ops.flush_atc_all = cpu_ops_040.flush_atc_all;
 			cpu_ops.flush_atc_user = cpu_ops_040.flush_atc_user;
@@ -81,8 +86,9 @@ arch_cpu_init(kernel_args *args)
 			cpu_ops.flush_dcache = cpu_ops_040.flush_dcache;
 			cpu_ops.flush_icache = cpu_ops_040.flush_icache;
 			cpu_ops.idle = cpu_ops_040.idle; // NULL
+			*/
 			break;
-#endif
+//#endif
 #ifdef SUPPORTS_060
 		case 68060:
 			cpu_ops.flush_insn_pipeline = cpu_ops_060.flush_insn_pipeline;

@@ -148,7 +148,7 @@ add_page_table(addr_t virtualAddress)
 			page_root_entry *apr = &pr[aindex + i];
 			apr->addr = TA_TO_PREA(tbl);
 			apr->type = DT_ROOT;
-			//TRACE(("inserting tbl @ %p as %08x entry %08x\n", tbl, TA_TO_PREA(tbl), *(uint32 *)apr));
+			//TRACE(("inserting tbl @ %p as %08x pr[%d] %08x\n", tbl, TA_TO_PREA(tbl), aindex + i, *(uint32 *)apr));
 			// clear the table
 			//TRACE(("clearing table[%d]\n", i));
 			pd = (page_directory_entry *)tbl;

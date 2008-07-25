@@ -14,7 +14,9 @@ KernelMergeObject arch_m68k_030.o :
 ;
 
 KernelMergeObject arch_m68k_040.o :
-	arch_040.cpp
+	arch_040_cpu.cpp
+	arch_040_mmu.cpp
+	arch_040_asm.S
 	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68040
 ;
 
@@ -50,7 +52,7 @@ KernelMergeObject kernel_arch_m68k.o :
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 	:
 	arch_m68k_030.o
-#	arch_m68k_040.a
+	arch_m68k_040.o
 #	arch_m68k_060.a
 
 ;

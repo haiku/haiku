@@ -46,6 +46,12 @@ public:
 
 private:
 	int	fRTC;
+	// native features (ARAnyM emulator)
+	uint32 (*nfGetID)(const char *name);
+	int32 (*nfCall)(uint32 ID, ...);
+	char *nfPage;
+	uint32 nfDebugPrintfID;
+	
 };
 
 
@@ -71,7 +77,13 @@ M68KAtari::~M68KAtari()
 status_t
 M68KAtari::Init(struct kernel_args *kernelArgs)
 {
-	return B_NO_INIT;
+	nfGetID =
+		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_get_id;
+	nfCall = 
+		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_call;
+	nfPage = (char *)
+		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_page;
+
 	return B_OK;
 }
 
@@ -79,7 +91,11 @@ M68KAtari::Init(struct kernel_args *kernelArgs)
 status_t
 M68KAtari::InitSerialDebug(struct kernel_args *kernelArgs)
 {
-	return B_NO_INIT;
+	nfDebugPrintfID =
+		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_dprintf_id;
+
+#warning M68K: add real serial debug output someday
+
 	return B_OK;
 }
 
@@ -137,7 +153,21 @@ M68KAtari::SerialDebugGetChar()
 void
 M68KAtari::SerialDebugPutChar(char c)
 {
-	panic("WRITEME");
+	if (nfCall && nfDebugPrintfID) {
+#if 0
+		static char buffer[2] = { '\0', '\0' };
+		buffer[0] = c;
+		
+		nfCall(nfDebugPrintfID /*| 0*/, buffer);
+#endif
+		nfPage[0] = c;
+		nfPage[1] = '\0';
+		nfCall(nfDebugPrintfID /*| 0*/, nfPage);
+	}
+
+#warning M68K: WRITEME
+	// real serial
+	//panic("WRITEME");
 }
 
 
@@ -169,6 +199,7 @@ M68KAtari::ClearHardwareTimer(void)
 void
 M68KAtari::ShutDown(bool reboot)
 {
+	panic("Bombs!");
 	panic("WRITEME");
 }
 

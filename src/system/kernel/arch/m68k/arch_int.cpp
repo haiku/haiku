@@ -43,7 +43,8 @@
 typedef void (*m68k_exception_handler)(void);
 #define M68K_EXCEPTION_VECTOR_COUNT 256
 #warning M68K: align on 4 ?
-m68k_exception_handler gExceptionVectors[M68K_EXCEPTION_VECTOR_COUNT];
+//m68k_exception_handler gExceptionVectors[M68K_EXCEPTION_VECTOR_COUNT];
+m68k_exception_handler *gExceptionVectors;
 
 // defined in arch_exceptions.S
 extern "C" void __m68k_exception_noop(void);
@@ -296,9 +297,12 @@ arch_int_init(kernel_args *args)
 	addr_t vbr;
 	int i;
 
+	gExceptionVectors = (m68k_exception_handler *)args->arch_args.vir_vbr;
+
 	/* fill in the vector table */
 	for (i = 0; i < M68K_EXCEPTION_VECTOR_COUNT; i++)
 		gExceptionVectors[i] = &__m68k_exception_common;
+#if 0
 	/* get the physical address */
 	err = arch_vm_translation_map_early_query(
 		(addr_t)gExceptionVectors, &vbr);
@@ -306,8 +310,10 @@ arch_int_init(kernel_args *args)
 		panic("can't query phys for vbr");
 		return err;
 	}
+#endif
+	vbr = args->arch_args.phys_vbr;
 	/* point VBR to the new table */
-	asm volatile  ("movec %0,%%cacr" : : "r"(vbr):);
+	asm volatile  ("movec %0,%%vbr" : : "r"(vbr):);
 	return B_OK;
 }
 

@@ -49,6 +49,8 @@
  *	  0x0800 - 0x10000	supervisor mode stack (1) XXX: more ? x86 starts at 500
  *	 0x10000 - ?		code (up to ~500 kB)
  *  0x100000 or FAST_RAM_BASE if any:
+ *	     ...			page root directory
+ *	     ...			interrupt vectors (VBR)
  *	     ...			page directory
  *	     ...			boot loader heap (32 kB)
  *	     ...			free physical memory
@@ -74,6 +76,11 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+// since the page root directory doesn't take a full page (1k)
+// we stuff some other stuff after it, like the interrupt vectors (1k)
+#define VBR_PAGE_OFFSET 1024
 
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
@@ -259,6 +266,7 @@ init_page_directory(void)
 	// allocate a new pg root dir
 	gPageRoot = get_next_physical_page();
 	gKernelArgs.arch_args.phys_pgroot = (uint32)gPageRoot;
+	gKernelArgs.arch_args.phys_vbr = (uint32)gPageRoot + VBR_PAGE_OFFSET;
 
 	// set the root pointers
 	gMMUOps->load_rp(gPageRoot);
@@ -598,6 +606,10 @@ mmu_init(void)
 	gKernelArgs.arch_args.vir_pgroot = get_next_virtual_page();
 	map_page(gKernelArgs.arch_args.vir_pgroot, (uint32)gPageRoot, kDefaultPageFlags);
 
+	// set virtual addr for interrupt vector table
+	gKernelArgs.arch_args.vir_vbr = gKernelArgs.arch_args.vir_pgroot
+		+ VBR_PAGE_OFFSET;
+	
 	// map in a kernel stack
 	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE;

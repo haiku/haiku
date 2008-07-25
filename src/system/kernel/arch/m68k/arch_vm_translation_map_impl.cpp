@@ -58,7 +58,7 @@
 
 
 
-//#define TRACE_VM_TMAP
+#define TRACE_VM_TMAP
 #ifdef TRACE_VM_TMAP
 #	define TRACE(x) dprintf x
 #else
@@ -229,8 +229,10 @@ early_query(addr_t va, addr_t *_physicalAddress)
 	addr_t pa;
 	int32 index;
 	status_t err = B_ERROR;	// no pagetable here
-
+	TRACE(("%s(%p,)", __FUNCTION__, va));
+	
 	index = VADDR_TO_PRENT(va);
+	TRACE(("%s: pr[%d].type %d\n", __FUNCTION__, index, pr[index].type));
 	if (pr && pr[index].type == DT_ROOT) {
 		pa = PRE_TO_TA(pr[index]);
 		// pa == va when in TT
@@ -238,11 +240,15 @@ early_query(addr_t va, addr_t *_physicalAddress)
 		pd = (page_directory_entry *)pa;
 
 		index = VADDR_TO_PDENT(va);
+		TRACE(("%s: pd[%d].type %d\n", __FUNCTION__, index,
+				pd?(pd[index].type):-1));
 		if (pd && pd[index].type == DT_DIR) {
 			pa = PDE_TO_TA(pd[index]);
 			pt = (page_table_entry *)pa;
 
 			index = VADDR_TO_PTENT(va);
+			TRACE(("%s: pt[%d].type %d\n", __FUNCTION__, index,
+					pt?(pt[index].type):-1));
 			if (pt && pt[index].type == DT_INDIRECT) {
 				pi = (page_indirect_entry *)pt;
 				pa = PIE_TO_TA(pi[index]);
@@ -335,7 +341,7 @@ destroy_tmap(vm_translation_map *map)
 
 	if (map->arch_data->rtdir_virt != NULL) {
 		// cycle through and free all of the user space pgtables
-		// since the size of tables don't match B_PAEG_SIZE,
+		// since the size of tables don't match B_PAGE_SIZE,
 		// we alloc several at once, based on modulos,
 		// we make sure they are either all in the tree or none.
 		for (i = VADDR_TO_PRENT(USER_BASE); i <= VADDR_TO_PRENT(USER_BASE + (USER_SIZE - 1)); i++) {

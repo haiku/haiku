@@ -32,7 +32,7 @@
 
 //extern struct m68k_vm_ops m68851_vm_ops;
 extern struct m68k_vm_ops m68030_vm_ops;
-//extern struct m68k_vm_ops m68040_vm_ops;
+extern struct m68k_vm_ops m68040_vm_ops;
 // 060 should be identical to 040 except for copyback issue
 //extern struct m68k_vm_ops m68060_vm_ops;
 
@@ -49,7 +49,7 @@ m68k_vm_ops *get_vm_ops()
 		case 68030:
 			return &m68030_vm_ops;
 		case 68040:
-			//return &m68040_vm_ops;
+			return &m68040_vm_ops;
 		case 68060:
 			//return &m68060_vm_ops;
 			panic("Unimplemented yet (mmu)");

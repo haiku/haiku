@@ -29,6 +29,9 @@ typedef struct {
 	// page root table
 	uint32	phys_pgroot;
 	uint32	vir_pgroot;
+	// interrupt vector table (VBR)
+	uint32	phys_vbr;
+	uint32	vir_vbr;
 //XXX:
 	addr_range	page_table;		// virtual address and size of the page table
 	addr_range	exception_handlers;

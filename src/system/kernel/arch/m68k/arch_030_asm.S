@@ -14,7 +14,7 @@ FUNCTION(flush_atc_all_030):
 	pflusha
 	rts
 
-	/* flush all ATC entries */
+	/* flush ATC entries for given address */
 FUNCTION(flush_atc_addr_030):
 	move.l	(4,%a7),%a0
 	pflush	#0,#0,(%a0)
