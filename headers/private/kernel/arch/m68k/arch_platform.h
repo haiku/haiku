@@ -42,9 +42,9 @@ public:
 	virtual char SerialDebugGetChar() = 0;
 	virtual void SerialDebugPutChar(char c) = 0;
 
-	virtual void EnableIOInterrupt(int irq);
-	virtual void DisableIOInterrupt(int irq);
-	virtual void AcknowledgeIOInterrupt(int irq);
+	virtual void EnableIOInterrupt(int irq) = 0;
+	virtual void DisableIOInterrupt(int irq) = 0;
+	virtual void AcknowledgeIOInterrupt(int irq) = 0;
 
 	virtual	void SetHardwareRTC(uint32 seconds) = 0;
 	virtual	uint32 GetHardwareRTC() = 0;

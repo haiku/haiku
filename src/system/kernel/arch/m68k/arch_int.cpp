@@ -272,7 +272,7 @@ dprintf("handling I/O interrupts done\n");
 		default:
 			// vectors >= 64 are user defined vectors, used for IRQ
 			if (vector >= 64) {
-				M68KPlatform::Default()->AcknowledgeIOInterrupt(irq);
+				M68KPlatform::Default()->AcknowledgeIOInterrupt(vector);
 				ret = int_io_interrupt_handler(vector, true);
 				break;
 			}

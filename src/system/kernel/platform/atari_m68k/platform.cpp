@@ -36,7 +36,7 @@ namespace BPrivate {
 
 
 class M68KAtari : public M68KPlatform {
-
+public:
 	class MFP {
 	public:
 		MFP(uint32 base, int vector);
@@ -54,7 +54,6 @@ class M68KAtari : public M68KPlatform {
 		int fVector;
 	};
 
-public:
 	M68KAtari();
 	virtual ~M68KAtari();
 
@@ -108,21 +107,21 @@ static char sMFP0Buffer[sizeof(M68KAtari::MFP)];
 static char sMFP1Buffer[sizeof(M68KAtari::MFP)];
 
 // constructor
-MFP::MFP(uint32 base, int vector)
+M68KAtari::MFP::MFP(uint32 base, int vector)
 {
 	fBase = base;
 	fVector = vector;
 }
 
 
-MFP::~MFP()
+M68KAtari::MFP::~MFP()
 {
 }
 
 #warning M68K: use enable or mark register ?
 
 void
-MFP::EnableIOInterrupt(int irq)
+M68KAtari::MFP::EnableIOInterrupt(int irq)
 {
 	uint8 bit = 1 << (irq % 8);
 	// I*B[0] is vector+0, I*A[0] is vector+8
@@ -136,7 +135,7 @@ MFP::EnableIOInterrupt(int irq)
 
 
 void
-MFP::DisableIOInterrupt(int irq)
+M68KAtari::MFP::DisableIOInterrupt(int irq)
 {
 	uint8 bit = 1 << (irq % 8);
 	// I*B[0] is vector+0, I*A[0] is vector+8
@@ -150,7 +149,7 @@ MFP::DisableIOInterrupt(int irq)
 
 
 void
-MFP::AcknowledgeIOInterrupt(int irq)
+M68KAtari::MFP::AcknowledgeIOInterrupt(int irq)
 {
 	uint8 bit = 1 << (irq % 8);
 	// I*B[0] is vector+0, I*A[0] is vector+8
@@ -346,7 +345,7 @@ M68KAtari::ShutDown(bool reboot)
 }
 
 
-MFP *
+M68KAtari::MFP *
 M68KAtari::MFPForIrq(int irq)
 {
 	int i;
@@ -354,7 +353,7 @@ M68KAtari::MFPForIrq(int irq)
 	for (i = 0; i < 2; i++) {
 		if (fMFP[i]) {
 			if (irq >= fMFP[i]->Vector() && irq < fMFP[i]->Vector() + 16)
-				return &fMFP[i];
+				return fMFP[i];
 		}
 	}
 	return NULL;
