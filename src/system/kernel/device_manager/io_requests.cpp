@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+#include <kernel.h>
 #include <team.h>
 #include <util/AutoLock.h>
 #include <vm.h>
@@ -70,7 +71,7 @@ IOBuffer::SetVecs(const iovec* vecs, uint32 count, size_t length, uint32 flags)
 	memcpy(fVecs, vecs, sizeof(iovec) * count);
 	fVecCount = count;
 	fLength = length;
-	fUser = (flags & B_USER_IO_REQUEST) != 0;
+	fUser = IS_USER_ADDRESS(vecs[0].iov_base);
 	fPhysical = (flags & B_PHYSICAL_IO_REQUEST) != 0;
 }
 

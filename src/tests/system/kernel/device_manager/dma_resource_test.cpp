@@ -647,13 +647,13 @@ run_tests_no_restrictions(TestSuiteContext& context)
 
 	TestSuite suite(context, "no restrictions", restrictions, 512);
 
-	suite.AddTest(0, 1024, false, B_USER_IO_REQUEST)
+	suite.AddTest(0, 1024, false, 0)
 		.AddSource(0, 1024)
 		.NextResult(0, false, false)
 			.AddTarget(0, 1024, false);
 
 	// read partial begin/end
-	suite.AddTest(23, 1024, false, B_USER_IO_REQUEST)
+	suite.AddTest(23, 1024, false, 0)
 		.AddSource(0, 1024)
 		.NextResult(0, true, true)
 			.AddTarget(0, 23, true)
@@ -661,7 +661,7 @@ run_tests_no_restrictions(TestSuiteContext& context)
 			.AddTarget(23, 512 - 23, true);
 
 	// read less than a block
-	suite.AddTest(23, 30, false, B_USER_IO_REQUEST)
+	suite.AddTest(23, 30, false, 0)
 		.AddSource(0, 1024)
 		.NextResult(0, true, true)
 			.AddTarget(0, 23, true)
@@ -669,7 +669,7 @@ run_tests_no_restrictions(TestSuiteContext& context)
 			.AddTarget(23, 512 - 53, true);
 
 	// write begin/end
-	suite.AddTest(23, 1024, true, B_USER_IO_REQUEST)
+	suite.AddTest(23, 1024, true, 0)
 		.AddSource(0, 1024)
 		.NextResult(0, true, true)
 			.AddTarget(0, 512, true)
@@ -677,7 +677,7 @@ run_tests_no_restrictions(TestSuiteContext& context)
 			.AddTarget(512, 512, true);
 
 	// read partial end, length < iovec length
-	suite.AddTest(0, 1028, false, B_USER_IO_REQUEST)
+	suite.AddTest(0, 1028, false, 0)
 		.AddSource(0, 512)
 		.AddSource(1024, 1024)
 		.NextResult(0, false, true)
@@ -686,7 +686,7 @@ run_tests_no_restrictions(TestSuiteContext& context)
 			.AddTarget(0, 508, true);
 
 	// write partial end, length < iovec length
-	suite.AddTest(0, 1028, true, B_USER_IO_REQUEST)
+	suite.AddTest(0, 1028, true, 0)
 		.AddSource(0, 512)
 		.AddSource(1024, 1024)
 		.NextResult(0, false, true)
@@ -714,7 +714,7 @@ run_tests_address_restrictions(TestSuiteContext& context)
 
 	TestSuite suite(context, "address", restrictions, 512);
 
-	suite.AddTest(0, 1024, false, B_USER_IO_REQUEST)
+	suite.AddTest(0, 1024, false, 0)
 		.AddSource(0, 1024)
 		.NextResult(0, false, false)
 			.AddTarget(0, 512, true)
@@ -765,7 +765,7 @@ run_tests_boundary_restrictions(TestSuiteContext& context)
 
 	TestSuite suite(context, "boundary", restrictions, 512);
 
-	suite.AddTest(0, 2000, false, B_USER_IO_REQUEST)
+	suite.AddTest(0, 2000, false, 0)
 		.AddSource(0, 2048)
 		.NextResult(0, false, false)
 			.AddTarget(0, 1024, false)
@@ -792,7 +792,7 @@ run_tests_segment_restrictions(TestSuiteContext& context)
 
 	TestSuite suite(context, "segment", restrictions, 512);
 
-	suite.AddTest(0, 4096, false, B_USER_IO_REQUEST)
+	suite.AddTest(0, 4096, false, 0)
 		.AddSource(0, 4096)
 		.NextResult(0, false, false)
 			.AddTarget(0, 1024, false)
@@ -820,7 +820,7 @@ run_tests_transfer_restrictions(TestSuiteContext& context)
 
 	TestSuite suite(context, "transfer", restrictions, 512);
 
-	suite.AddTest(0, 4000, false, B_USER_IO_REQUEST)
+	suite.AddTest(0, 4000, false, 0)
 		.AddSource(0, 4096)
 		.NextResult(0, false, false)
 			.AddTarget(0, 1024, false)
@@ -853,7 +853,7 @@ run_tests_interesting_restrictions(TestSuiteContext& context)
 	TestSuite suite(context, "interesting", restrictions, 512);
 
 	// read with partial begin/end
-	suite.AddTest(32, 1000, false, B_USER_IO_REQUEST)
+	suite.AddTest(32, 1000, false, 0)
 		.AddSource(0, 1024)
 		.NextResult(0, true, true)
 			.AddTarget(0, 32, true)
@@ -863,7 +863,7 @@ run_tests_interesting_restrictions(TestSuiteContext& context)
 			.AddTarget(512, 32, true);
 
 	// write with partial begin/end
-	suite.AddTest(32, 1000, true, B_USER_IO_REQUEST)
+	suite.AddTest(32, 1000, true, 0)
 		.AddSource(0, 1024)
 		.NextResult(0, true, true)
 			.AddTarget(0, 512, true)
@@ -886,7 +886,7 @@ run_tests_interesting_restrictions(TestSuiteContext& context)
 
 	TestSuite suite2(context, "interesting2", restrictions, 512);
 
-	suite2.AddTest(32, 1000, false, B_USER_IO_REQUEST)
+	suite2.AddTest(32, 1000, false, 0)
 		.AddSource(0, 1024)
 		.NextResult(0, true, false)
 			.AddTarget(0, 32, true)
@@ -915,13 +915,13 @@ run_tests_mean_restrictions(TestSuiteContext& context)
 
 	TestSuite suite(context, "mean", restrictions, 512);
 
-	suite.AddTest(0, 1024, false, B_USER_IO_REQUEST)
+	suite.AddTest(0, 1024, false, 0)
 		.AddSource(0, 1024)
 		.NextResult(0, false, false)
 			.AddTarget(0, 512, true)
 			.AddTarget(512, 512, true);
 
-	suite.AddTest(0, 1024, false, B_USER_IO_REQUEST)
+	suite.AddTest(0, 1024, false, 0)
 		.AddSource(1024 + 32, 1024)
 		.NextResult(0, false, false)
 			.AddTarget(1024 + 32, 512, false)
@@ -1101,8 +1101,7 @@ dma_test_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 
 #if 1
 	IORequest request;
-	status_t status = request.Init(pos, buffer, length, false,
-		B_USER_IO_REQUEST);
+	status_t status = request.Init(pos, buffer, length, false, 0);
 	if (status != B_OK)
 		return status;
 
@@ -1134,8 +1133,7 @@ dma_test_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 
 #if 1
 	IORequest request;
-	status_t status = request.Init(pos, (void*)buffer, length, true,
-		B_USER_IO_REQUEST);
+	status_t status = request.Init(pos, (void*)buffer, length, true, 0);
 	if (status != B_OK)
 		return status;
 

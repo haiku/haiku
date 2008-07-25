@@ -18,7 +18,8 @@
 
 
 #define B_PHYSICAL_IO_REQUEST	0x01	/* buffer points to physical memory */
-#define B_USER_IO_REQUEST		0x02	/* buffer points to user memory */
+#define B_VIP_IO_REQUEST		0x02	/* used by the page writer -- make sure
+										   allocations won't fail */
 
 struct DMABuffer;
 struct IOOperation;
