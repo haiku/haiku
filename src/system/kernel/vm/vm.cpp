@@ -64,12 +64,12 @@
 class AddressSpaceReadLocker {
 public:
 	AddressSpaceReadLocker(team_id team);
-	AddressSpaceReadLocker(vm_address_space* space);
+	AddressSpaceReadLocker(vm_address_space* space, bool getNewReference);
 	AddressSpaceReadLocker();
 	~AddressSpaceReadLocker();
 
 	status_t SetTo(team_id team);
-	void SetTo(vm_address_space* space);
+	void SetTo(vm_address_space* space, bool getNewReference);
 	status_t SetFromArea(area_id areaID, vm_area*& area);
 
 	bool IsLocked() const { return fLocked; }
@@ -212,7 +212,8 @@ static cache_info* sCacheInfoTable;
 // function declarations
 static void delete_area(vm_address_space *addressSpace, vm_area *area);
 static vm_address_space *get_address_space_by_area_id(area_id id);
-static status_t vm_soft_fault(addr_t address, bool isWrite, bool isUser);
+static status_t vm_soft_fault(vm_address_space *addressSpace, addr_t address,
+	bool isWrite, bool isUser);
 static status_t map_backing_store(vm_address_space *addressSpace,
 	vm_cache *cache, void **_virtualAddress, off_t offset, addr_t size,
 	uint32 addressSpec, int wiring, int protection, int mapping,
@@ -231,13 +232,16 @@ AddressSpaceReadLocker::AddressSpaceReadLocker(team_id team)
 }
 
 
-//! Takes over the reference of the address space
-AddressSpaceReadLocker::AddressSpaceReadLocker(vm_address_space* space)
+/*! Takes over the reference of the address space, if \a getNewReference is
+	\c false.
+*/
+AddressSpaceReadLocker::AddressSpaceReadLocker(vm_address_space* space,
+		bool getNewReference)
 	:
 	fSpace(NULL),
 	fLocked(false)
 {
-	SetTo(space);
+	SetTo(space, getNewReference);
 }
 
 
@@ -277,11 +281,17 @@ AddressSpaceReadLocker::SetTo(team_id team)
 }
 
 
-//! Takes over the reference of the address space
+/*! Takes over the reference of the address space, if \a getNewReference is
+	\c false.
+*/
 void
-AddressSpaceReadLocker::SetTo(vm_address_space* space)
+AddressSpaceReadLocker::SetTo(vm_address_space* space, bool getNewReference)
 {
 	fSpace = space;
+
+	if (getNewReference)
+		atomic_add(&fSpace->ref_count, 1);
+
 	rw_lock_read_lock(&fSpace->lock);
 	fLocked = true;
 }
@@ -3965,7 +3975,38 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 
 	*newIP = 0;
 
-	status_t status = vm_soft_fault(address, isWrite, isUser);
+	addr_t pageAddress = ROUNDOWN(address, B_PAGE_SIZE);
+
+	status_t status = B_OK;
+
+	vm_address_space *addressSpace;
+
+	if (IS_KERNEL_ADDRESS(pageAddress)) {
+		addressSpace = vm_get_kernel_address_space();
+	} else if (IS_USER_ADDRESS(pageAddress)) {
+		addressSpace = vm_get_current_user_address_space();
+		if (addressSpace == NULL) {
+			if (!isUser) {
+				dprintf("vm_page_fault: kernel thread accessing invalid user "
+					"memory!\n");
+				status = B_BAD_ADDRESS;
+			} else {
+				// XXX weird state.
+				panic("vm_page_fault: non kernel thread accessing user memory "
+					"that doesn't exist!\n");
+				status = B_BAD_ADDRESS;
+			}
+		}
+	} else {
+		// the hit was probably in the 64k DMZ between kernel and user space
+		// this keeps a user space thread from passing a buffer that crosses
+		// into kernel space
+		status = B_BAD_ADDRESS;
+	}
+
+	if (status == B_OK)
+		status = vm_soft_fault(addressSpace, pageAddress, isWrite, isUser);
+
 	if (status < B_OK) {
 		dprintf("vm_page_fault: vm_soft_fault returned error '%s' on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
 			strerror(status), address, faultAddress, isWrite, isUser,
@@ -3984,17 +4025,16 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			}
 		} else {
 #if 1
-			// ToDo: remove me once we have proper userland debugging support (and tools)
-			vm_address_space *addressSpace = vm_get_current_user_address_space();
-			vm_area *area;
-
 			rw_lock_read_lock(&addressSpace->lock);
+
+			// TODO: remove me once we have proper userland debugging support
+			// (and tools)
+			vm_area *area = vm_area_lookup(addressSpace, faultAddress);
+
 // TODO: The user_memcpy() below can cause a deadlock, if it causes a page
 // fault and someone is already waiting for a write lock on the same address
 // space. This thread will then try to acquire the semaphore again and will
 // be queued after the writer.
-			area = vm_area_lookup(addressSpace, faultAddress);
-
 			dprintf("vm_page_fault: sending team \"%s\" 0x%lx SIGSEGV, ip %#lx (\"%s\" +%#lx)\n",
 				thread_get_current_thread()->team->name,
 				thread_get_current_thread()->team->id, faultAddress,
@@ -4051,8 +4091,8 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 #endif	// 0 (stack trace)
 
 			rw_lock_read_unlock(&addressSpace->lock);
-			vm_put_address_space(addressSpace);
 #endif
+
 			struct thread *thread = thread_get_current_thread();
 			// TODO: the fault_callback is a temporary solution for vm86
 			if (thread->fault_callback == NULL
@@ -4062,6 +4102,8 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			}
 		}
 	}
+
+	vm_put_address_space(addressSpace);
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -4448,40 +4490,19 @@ if (cacheOffset == 0x12000)
 
 
 static status_t
-vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
+vm_soft_fault(vm_address_space *addressSpace, addr_t originalAddress,
+	bool isWrite, bool isUser)
 {
-	vm_address_space *addressSpace;
-
 	FTRACE(("vm_soft_fault: thid 0x%lx address 0x%lx, isWrite %d, isUser %d\n",
 		thread_get_current_thread_id(), originalAddress, isWrite, isUser));
 
-	addr_t address = ROUNDOWN(originalAddress, B_PAGE_SIZE);
-
-	if (IS_KERNEL_ADDRESS(address)) {
-		addressSpace = vm_get_kernel_address_space();
-	} else if (IS_USER_ADDRESS(address)) {
-		addressSpace = vm_get_current_user_address_space();
-		if (addressSpace == NULL) {
-			if (!isUser) {
-				dprintf("vm_soft_fault: kernel thread accessing invalid user memory!\n");
-				return B_BAD_ADDRESS;
-			} else {
-				// XXX weird state.
-				panic("vm_soft_fault: non kernel thread accessing user memory that doesn't exist!\n");
-			}
-		}
-	} else {
-		// the hit was probably in the 64k DMZ between kernel and user space
-		// this keeps a user space thread from passing a buffer that crosses
-		// into kernel space
-		return B_BAD_ADDRESS;
-	}
-
-	AddressSpaceReadLocker locker(addressSpace);
+	AddressSpaceReadLocker locker(addressSpace, true);
 
 	atomic_add(&addressSpace->fault_count, 1);
 
 	// Get the area the fault was in
+
+	addr_t address = ROUNDOWN(originalAddress, B_PAGE_SIZE);
 
 	vm_area *area = vm_area_lookup(addressSpace, address);
 	if (area == NULL) {
@@ -5000,7 +5021,8 @@ lock_memory_etc(team_id team, void *address, size_t numBytes, uint32 flags)
 			}
 		}
 
-		status = vm_soft_fault(base, (flags & B_READ_DEVICE) != 0, isUser);
+		status = vm_soft_fault(addressSpace, base, (flags & B_READ_DEVICE) != 0,
+			isUser);
 		if (status != B_OK)	{
 			dprintf("lock_memory(address = %p, numBytes = %lu, flags = %lu) failed: %s\n",
 				(void *)unalignedBase, numBytes, flags, strerror(status));
