@@ -10,13 +10,15 @@
 #include <bluetooth/DiscoveryListener.h>
 #include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/LocalDevice.h>
-
 #include <bluetooth/RemoteDevice.h>
 
-#include <bluetoothserver_p.h>
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/HCI/btHCI_event.h>
+
+#include <bluetooth/bluetooth_error.h>
+
 #include <CommandManager.h>
+#include <bluetoothserver_p.h>
 
 #include "KitSupport.h"
 
@@ -73,13 +75,21 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
         BString name;
         int8 status;
 
-        if (reply.FindInt8("status", &status) == B_OK &&
-            reply.FindString("friendlyname", &name) == B_OK ) {
-                    return name;
+        if ((reply.FindInt8("status", &status) == B_OK) && (status == BT_OK)) {
+            
+            if ((reply.FindString("friendlyname", &name) == B_OK ) ) {
+            	return name;
+            } else {
+		        return BString("");// should not happen
             }
+            
+        } else {
+        	// seems we got a netative event
+     		return BString("#CommandFailed#Not Valid name");   
+        }
     }
 
-    return BString("#NotCompletedRequestr#Not Valid name");
+    return BString("#NotCompletedRequest#Not Valid name");
 }
 
 

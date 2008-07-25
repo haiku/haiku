@@ -426,7 +426,16 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 		
 		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST):
 		{
-			ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST));
+			if (event->status==BT_OK) {
+				ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST));
+			}
+			else {
+				BMessage reply;
+  		    	reply.AddInt8("status", event->status);
+			    Output::Instance()->Post("Negative reply for remote friendly name\n", BLACKBOARD_KIT);
+			    printf("Sending reply ... %ld\n", request->SendReply(&reply));
+		        ClearWantedEvent(request);
+		    }
 		}
 		break;
 		/*
@@ -504,7 +513,6 @@ LocalDeviceImpl::RemoteNameRequestComplete(struct hci_ev_remote_name_request_com
 
 	// This request is not gonna be used anymore
     ClearWantedEvent(request);
-
 }
 
 
