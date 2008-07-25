@@ -11,6 +11,7 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/HCI/btHCI_transport.h>
 
+#include "h2generic.h"
 #include "h2upper.h"
 #include "h2transactions.h"
 #include "snet_buffer.h"
@@ -89,6 +90,8 @@ post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
     
     status_t err = B_OK;
     port_id port;
+
+	debugf("Frame up type=%d\n", type);
             
     if (hci == NULL) {
 		
@@ -99,22 +102,28 @@ post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
 
 			snet_buffer* snbuf = (snet_buffer*) buf;
 			
-	        flowf("HCI not present, Posting to userland\n");
+	        flowf("HCI not present for event, Posting to userland\n");
 			port = find_port(BT_USERLAND_PORT_NAME);
 	        if (port != B_NAME_NOT_FOUND) {
 	            
-	           
-	           err = write_port_etc(port, PACK_PORTCODE(type,bdev->hdev, -1),
+				err = write_port_etc(port, PACK_PORTCODE(type,bdev->hdev, -1),
 	                                snb_get(snbuf), snb_size(snbuf), B_TIMEOUT, 1*1000*1000);
-	           if (err != B_OK) 	            
+				if (err != B_OK) 	            
 	                debugf("Error posting userland %s\n", strerror(err));
+
+				snb_park(&bdev->snetBufferRecycleTrash, snbuf);
 
 	        }
 	        else {
 	            flowf("ERROR:bluetooth_server not found for posting\n");
 	            err = B_NAME_NOT_FOUND;
 	        }
-			/* No need to free the buffer at allocation is gonna be reused */
+        } else {
+			net_buffer* nbuf = (net_buffer*) buf;
+  			/* No need to free the buffer at allocation is gonna be reused */
+  			flowf("HCI not present for acl posting to net_device\n");
+   	        btDevices->receive_data(bdev->ndev, &nbuf);
+			
         }
     }
     else {
@@ -125,6 +134,7 @@ post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
     
     return err;
 }
+
 
 status_t
 send_packet(hci_id hid, bt_packet_t type, net_buffer* nbuf)
@@ -146,7 +156,6 @@ send_packet(hci_id hid, bt_packet_t type, net_buffer* nbuf)
             case BT_COMMAND:
             case BT_ACL:
             case BT_SCO:
-
                     list_add_item(&bdev->nbuffersTx[type],nbuf);
                     bdev->nbuffersPendingTx[type]++;
             break;

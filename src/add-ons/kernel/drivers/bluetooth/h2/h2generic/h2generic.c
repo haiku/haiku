@@ -432,13 +432,13 @@ device_open(const char *name, uint32 flags, void **cookie)
 		return B_ERROR;
 	}	
 	
-	acquire_sem(bdev->lock);	
 	// Set RUNNING
 	if ( TEST_AND_SET(&bdev->state, ANCILLYANT) ) {
 	    flowf("dev already running! - reOpened device!\n");
 	    return B_ERROR;
 	}	
 
+	acquire_sem(bdev->lock);
 	// TX structures 			
 	for (i = 0; i < BT_DRIVER_TXCOVERAGE; i++) {
 		list_init(&bdev->nbuffersTx[i]);		
@@ -476,11 +476,9 @@ device_open(const char *name, uint32 flags, void **cookie)
     }    	
 
 	bdev->hdev = hdev;		
-		
 
-
-	*cookie = bdev;	
-	release_sem(bdev->lock);	
+	*cookie = bdev;
+	release_sem(bdev->lock);
 
 	flowf(" successful\n");
 	return B_OK;
@@ -573,8 +571,11 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 	status_t 	err = B_ERROR;
 	bt_usb_dev*	bdev = (bt_usb_dev*)cookie;
 	snet_buffer* snbuf;
+	#if BT_DRIVER_SUPPORTS_ACL // ACL
+	int32	i;
+	#endif
+	
 	TOUCH(size);
-
 	debugf("ioctl() opcode %ld size %ld.\n", msg, size);
 	
 	if (bdev == NULL) {
@@ -752,7 +753,7 @@ err_release:
 err_release1:	
 	put_module(hci_name);
 err_release2:
-	put_module(hci_name);
+	put_module(btDevices_name);
 	return B_ERROR;
 }
 

@@ -39,8 +39,7 @@ void event_complete(void* cookie, status_t status, void* data, size_t actual_len
 
 static status_t 
 assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
-{
-    
+{    
     net_buffer*		nbuf = NULL;
     snet_buffer*	snbuf = NULL;
     
@@ -56,8 +55,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 
     while (count) {  
 
-		debugf("count %d %p %p\n",count, nbuf, nb);		
-
+		debugf("count %d nb=%p sb=%p type=%d\n",count, nbuf, snbuf, type);		
 
         if ( (type != BT_EVENT && nbuf == NULL) ||
              (type == BT_EVENT && (snbuf == NULL || snb_completed(snbuf))) ) {
@@ -70,7 +68,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
     					struct hci_event_header* headerPkt = data;
     					expectedPacketLen = HCI_EVENT_HDR_SIZE + headerPkt->elen;
     					snbuf = bdev->eventRx = snb_fetch(&bdev->snetBufferRecycleTrash, expectedPacketLen);
-    					
+    		  			
     				} else {
     					flowf("EVENT frame corrupted\n");
     					return -EILSEQ;
@@ -79,15 +77,22 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
     
     			case BT_ACL:
     				if (count >= HCI_ACL_HDR_SIZE) {
-    				    
+						int16 index;    				    
     					struct hci_acl_header* headerPkt = data;
+
     					expectedPacketLen = HCI_ACL_HDR_SIZE + B_LENDIAN_TO_HOST_INT16(headerPkt->alen);
     					
     					/* Create the buffer */
 			            bdev->nbufferRx[type] = nbuf = nb->create(expectedPacketLen);
+			            // TODO: this allocation can fail!!
             			nbuf->protocol = type;
-
-    					
+    					debugf("new ACL frame %p\n", nbuf);
+						debugf("### Incoming ACL: len = %d\n", count);
+						for (index = 0 ; index < count; index++ ) {
+							dprintf("%x:",((uint8*)data)[index]);
+						}
+						flowf("### \n");
+						
     				} else {
     					flowf("ACL frame corrupted\n");
     					return -EILSEQ;
@@ -100,21 +105,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
         		default:
         		    panic("unkown packet type in assembly");
         		break;
-            }
-#if 0            
-            if (nb == NULL) {            	
-            	port_id port;
-            	/* Coded for test purpose only we should panic here */
-            	debugf("net_buffers are not ready post manually %d/%d\n",count,expectedPacketLen);       
-           		port = find_port(BT_USERLAND_PORT_NAME);
-	            if (port != B_NAME_NOT_FOUND) {
-            		(void)write_port(port, PACK_HEADER_PORT(bdev->num,type), data, count);
-            		return B_OK;
-				}
-                panic("Algorithm just ready to arrive here");
-        		return B_ERROR;
-            }
-#endif            
+            } 
 
             currentPacketLen = expectedPacketLen;
 
@@ -136,8 +127,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 
 		/* Complete frame? */
         if (type == BT_EVENT && snb_completed(snbuf)) {
-
-			flowf("Frame goes up!\n");
+        
 			post_packet_up(bdev, type, snbuf);
 			snbuf = bdev->eventRx = NULL;
 
@@ -145,10 +135,12 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 	
 		if (type != BT_EVENT && (get_expected_size(nbuf) - nbuf->size) == 0 ) {
 
-			flowf("Frame goes up!\n");
 			post_packet_up(bdev, type, nbuf);
 			bdev->nbufferRx[type] = nbuf = NULL;
-		}
+		} /*else {
+			if (type == BT_ACL)
+				debugf("ACL Packet not filled size=%ld expected=%ld\n", nbuf->size, get_expected_size(nbuf));
+		}*/
 		        
         /* in case in the pipe there is info about the next buffer ... */
 		count -= currentPacketLen; 
