@@ -536,7 +536,7 @@ static int
 dump_allocations_per_caller(int argc, char **argv)
 {
 	bool sortBySize = true;
-	
+
 	for (int32 i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-c") == 0) {
 			sortBySize = false;
