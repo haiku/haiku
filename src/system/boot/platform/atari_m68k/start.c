@@ -82,11 +82,11 @@ platform_start_kernel(void)
 	dprintf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
 
 	asm volatile (
-		"move.l	%0, %%sp;	"			// move stack out of way
+		"move.l	%0,%%sp;	"			// move stack out of way
 		: : "m" (stackTop));
 
 	asm volatile (
-		"ori	#0x0700,%%sr; ");		// disable interrupts
+		"or	#0x0700,%%sr; " : : );		// disable interrupts
 
 	asm volatile (
 		"move.l  #0x0,-(%%sp); "		// we're the BSP cpu (0)
@@ -99,7 +99,7 @@ platform_start_kernel(void)
 	// Huston, we have a problem!
 
 	asm volatile (
-		"andi	#0xf8ff,%%sr; ");		// reenable interrupts
+		"and	#0xf8ff,%%sr; " : : );		// reenable interrupts
 
 	panic("kernel returned!\n");
 
