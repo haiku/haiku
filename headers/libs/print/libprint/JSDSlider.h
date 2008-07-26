@@ -17,15 +17,15 @@
 class JSDSlider : public BSlider 
 {
 public: 
-	JSDSlider(BRect frame, const char* name, const char *label, BMessage *msg, 
-				int32 min, int32 max, thumb_style t); 
+						JSDSlider(BRect frame, const char* name, const char *label,
+							BMessage *msg, int32 min, int32 max, thumb_style t);
 
-	~JSDSlider(); 
-  
-	char* UpdateText() const; 
-	
+	virtual				~JSDSlider();
+
+	virtual const char* UpdateText() const;
+
 private:
-	BString* fResult;	
+	mutable	BString		fResult;
 };
 
 #endif 

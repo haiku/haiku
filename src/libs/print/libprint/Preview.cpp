@@ -11,11 +11,11 @@
 
 #include <Debug.h>
 #include <String.h>
-#include "BeUtils.h"
-#include "Utils.h"
 
 #include "GraphicsDriver.h"
 #include "Preview.h"
+#include "PrintUtils.h"
+
 
 // Implementation of PreviewPage
 PreviewPage::PreviewPage(int32 page, PrintJobPage* pjp)

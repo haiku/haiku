@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include <String.h>
 
 #include "pdflib.h"
-#include "Utils.h"
+#include "PrintUtils.h"
 #include "Cache.h"
 
 extern const char* kTemporaryPath;

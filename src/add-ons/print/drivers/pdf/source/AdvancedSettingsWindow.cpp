@@ -28,7 +28,7 @@ THE SOFTWARE.
 */
 
 #include "AdvancedSettingsWindow.h"
-#include "Utils.h"
+#include "PrintUtils.h"
 
 
 #include <Box.h>

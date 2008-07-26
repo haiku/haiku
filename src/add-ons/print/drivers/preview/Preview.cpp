@@ -8,10 +8,8 @@
  *		julun <host.haiku@gmx.de>
  */
 
-#include "BeUtils.h"
-#include "Utils.h"
 #include "Preview.h"
-
+#include "PrintUtils.h"
 
 #include <stdlib.h>
 

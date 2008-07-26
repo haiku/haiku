@@ -90,16 +90,11 @@ public:
 
 // mimetype from sender
 bool MimeTypeForSender(BMessage* sender, BString& mime);
-// adds fields to message or replaces existing fields
-void AddFields(BMessage* to, const BMessage* from, const char* excludeList[] = NULL, const char* includeList[] = NULL, bool overwrite = true);
 // load bitmap from application resources
 BBitmap* LoadBitmap(const char* name, uint32 type_code = B_TRANSLATOR_BITMAP);
 // convert bitmap to picture; view must be attached to a window!
 // returns NULL if bitmap is NULL
 BPicture *BitmapToPicture(BView* view, BBitmap *bitmap);
 BPicture *BitmapToGrayedPicture(BView* view, BBitmap *bitmap);
-
-// scalar multiplication
-BRect ScaleRect(BRect rect, float scale); 
 
 #endif

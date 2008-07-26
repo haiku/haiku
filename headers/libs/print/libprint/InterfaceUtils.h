@@ -31,8 +31,21 @@ THE SOFTWARE.
 #define _INTERFACE_UTILS_H
 
 #include <InterfaceKit.h>
+#include <MessageFilter.h>
 
-// --------------------------------------------------
+
+class EscapeMessageFilter : public BMessageFilter
+{
+private:
+	BWindow *fWindow;
+	int32    fWhat;
+
+public:
+	EscapeMessageFilter(BWindow *window, int32 what);
+	filter_result Filter(BMessage *msg, BHandler **target);
+};
+
+
 class HWindow : public BWindow
 {
 protected:
@@ -49,7 +62,7 @@ public:
 	virtual const char* AboutText() const { return NULL; }
 };
 
-// --------------------------------------------------
+
 class BlockingWindow : public HWindow
 {
 public:

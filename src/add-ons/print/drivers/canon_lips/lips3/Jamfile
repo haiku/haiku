@@ -11,11 +11,7 @@ Addon Canon\ LIPS3\ Compatible :
 	Lips3.cpp
 	Lips3Cap.cpp
 	Compress3.cpp
-	:
-	be
-	libprint.a
-	libprintutils.a
-	$(TARGET_LIBSTDC++)
+	: be libprint.a $(TARGET_LIBSTDC++)
 ;
 
 Package haiku-printingkit-cvs :

@@ -37,6 +37,8 @@ THE SOFTWARE.
 
 #include "PrintTransport.h"
 
+class BNode;
+
 #ifndef ROUND_UP
 	#define ROUND_UP(x, y) (((x) + (y) - 1) & ~((y) - 1))
 #endif

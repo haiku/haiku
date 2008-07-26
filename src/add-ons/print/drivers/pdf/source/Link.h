@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include <String.h>
 #include <Font.h>
 #include <Point.h>
-#include "Utils.h"
+#include "PrintUtils.h"
 #include "PDFSystem.h"
 
 class PDFSystem;

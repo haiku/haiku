@@ -8,12 +8,13 @@
 
 #include <fs_attr.h> // for attr_info
 #include <File.h>
+#include <FindDirectory.h>
 #include <Message.h>
 #include <Node.h>
+#include <Path.h>
 #include <String.h>
 #include <memory> // for auto_ptr
 
-#include "BeUtils.h"
 #include "AboutBox.h"
 #include "AddPrinterDlg.h"
 #include "DbgMsg.h"
@@ -23,6 +24,7 @@
 #include "PrinterData.h"
 #include "UIDriver.h"
 #include "Preview.h"
+#include "PrintUtils.h"
 
 
 // Implementation of PrinterDriver

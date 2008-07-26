@@ -43,7 +43,7 @@ THE SOFTWARE.
 #include "PictureIterator.h"
 #include "Fonts.h"
 #include "SubPath.h"
-#include "Utils.h"
+#include "PrintUtils.h"
 #include "Link.h"
 #include "ImageCache.h"
 #include "PDFSystem.h"

@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
-#include "Utils.h"
+#include "PrintUtils.h"
 #include "Fonts.h"
 
 #define USE_CLV 0

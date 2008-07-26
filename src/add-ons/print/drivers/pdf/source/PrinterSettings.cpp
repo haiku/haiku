@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 #include <fs_attr.h>
 
-#include "BeUtils.h"
+#include "PrintUtils.h"
 
 #include "PrinterPrefs.h"
 

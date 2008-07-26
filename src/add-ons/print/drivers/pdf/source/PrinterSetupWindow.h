@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 #include <InterfaceKit.h>
 #include "InterfaceUtils.h"
-#include "Utils.h"
+#include "PrintUtils.h"
 
 class PrinterSetupWindow : public HWindow 
 {

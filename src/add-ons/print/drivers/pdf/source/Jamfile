@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src add-ons print drivers pdf source ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders print ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs pdflib ] ;
 
 AddResources PDF\ Writer : 
@@ -45,7 +46,8 @@ Addon PDF\ Writer :
 	be 
 	textencoding 
 	translation
-	libpdf.a 
+	libpdf.a
+	libprint.a 
 	libprintutils.a 
 ;
 

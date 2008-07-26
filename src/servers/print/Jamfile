@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src servers print ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders shared print ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
 AddResources print_server :
 	print_server.rdef
@@ -25,6 +26,7 @@ LinkAgainst print_server :
 	be 
 	root
 	translation
+	libprint.a
 	libprintutils.a
 ;
 

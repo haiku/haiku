@@ -8,13 +8,9 @@ StaticLibrary libprintutils.a :
 	BeUtils.cpp
 	BeUtilsTranslation.cpp
 	FolderWatcher.cpp
-	InterfaceUtils.cpp
 	Jobs.cpp
-	MarginView.cpp
-	PrintJobReader.cpp
 	PicturePrinter.cpp
 	PrintTransport.cpp
 	PictureIterator.cpp
 	PrintTransportAddOn.cpp
-	Utils.cpp
 ;

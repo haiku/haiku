@@ -30,7 +30,7 @@ THE SOFTWARE.
 #ifndef _CACHE_H
 #define _CACHE_H
 
-#include "Utils.h"
+#include "PrintUtils.h"
 
 class CacheItem;
 

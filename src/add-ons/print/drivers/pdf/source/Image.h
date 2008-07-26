@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include <Bitmap.h>
 
 #include "pdflib.h"
-#include "Utils.h"
+#include "PrintUtils.h"
 #include "Cache.h"
 
 class Image;

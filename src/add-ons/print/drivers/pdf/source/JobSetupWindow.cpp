@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include <SupportKit.h>
 #include <stdlib.h>
 
-#include "BeUtils.h"
+#include "PrintUtils.h"
 
 #include "PrinterDriver.h"
 #include "JobSetupWindow.h"

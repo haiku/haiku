@@ -30,8 +30,8 @@ THE SOFTWARE.
 
 */
 
-#ifndef _UTILS_H
-#define _UTILS_H
+#ifndef _PRINT_UTILS_H_
+#define _PRINT_UTILS_H_
 
 
 #include <List.h>
@@ -45,29 +45,21 @@ class BMessage;
 class BWindow;
 
 
+#define BEGINS_CHAR(byte) ((byte & 0xc0) != 0x80)
+
+
+BRect ScaleRect(const BRect& rect, float scale);
+
+
 // set or replace a value in a BMessage
 void SetBool(BMessage* msg, const char* name, bool value);
 void SetFloat(BMessage* msg, const char* name, float value);
 void SetInt32(BMessage* msg, const char* name, int32 value);
 void SetString(BMessage* msg, const char* name, const char* value);
-
 void SetRect(BMessage* msg, const char* name, const BRect& rect);
 void SetString(BMessage* msg, const char* name, const BString& value);
-
-
-class EscapeMessageFilter : public BMessageFilter
-{
-private:
-	BWindow *fWindow;
-	int32    fWhat;
-
-public:
-	EscapeMessageFilter(BWindow *window, int32 what);
-	filter_result Filter(BMessage *msg, BHandler **target);
-};
-
-
-#define BEGINS_CHAR(byte) ((byte & 0xc0) != 0x80)
+void AddFields(BMessage* to, const BMessage* from, const char* excludeList[] = NULL,
+	const char* includeList[] = NULL, bool overwrite = true);
 
 
 template <class T>
@@ -139,4 +131,4 @@ void TList<T>::SortItems(int (*comp)(const T**, const T**)) {
 	fList.SortItems(sort);
 }
 
-#endif
+#endif	// _PRINT_UTILS_H_

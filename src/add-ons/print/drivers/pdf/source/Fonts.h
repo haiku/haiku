@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include <Archivable.h>
 #include <String.h>
 #include <List.h>
-#include "Utils.h"
+#include "PrintUtils.h"
 
 enum font_encoding 
 {

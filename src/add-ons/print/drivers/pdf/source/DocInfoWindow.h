@@ -40,7 +40,7 @@ THE SOFTWARE.
 #include <Path.h>
 #include <String.h>
 #include "InterfaceUtils.h"
-#include "Utils.h"
+#include "PrintUtils.h"
 
 #define HAVE_FULLVERSION_PDF_LIB 0
 

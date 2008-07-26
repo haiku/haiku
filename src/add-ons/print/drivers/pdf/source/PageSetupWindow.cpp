@@ -40,7 +40,7 @@ THE SOFTWARE.
 #include "MarginView.h"
 #include "PrinterDriver.h"
 #include "pdflib.h"				// for pageFormat constants
-#include "Utils.h"
+#include "PrintUtils.h"
 
 
 #include <Box.h>

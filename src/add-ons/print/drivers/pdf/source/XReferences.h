@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include <List.h>
 #include "Link.h"
 #include "RegExp.h" 
-#include "Utils.h"
+#include "PrintUtils.h"
 
 class MatchResult;
 class Pattern;

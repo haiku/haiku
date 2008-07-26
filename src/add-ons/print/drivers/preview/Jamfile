@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons print drivers preview ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders print ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
 AddResources Preview : Preview.rsrc ;
 
@@ -13,10 +13,7 @@ Addon Preview :
 	Preview.cpp
 	PrinterDriver.cpp
 	PreviewDriver.cpp
-	:
-	be
-	root
-	libprintutils.a
+	: be libprint.a
 ;
 
 Package haiku-printingkit-cvs :

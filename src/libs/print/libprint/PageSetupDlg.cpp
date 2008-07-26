@@ -30,13 +30,15 @@
 #include <TextControl.h>
 #include <View.h>
 
-#include "BeUtils.h"
+
 #include "DbgMsg.h"
 #include "JobData.h"
 #include "MarginView.h"
 #include "PageSetupDlg.h"
 #include "PrinterData.h"
 #include "PrinterCap.h"
+#include "PrintUtils.h"
+
 
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;

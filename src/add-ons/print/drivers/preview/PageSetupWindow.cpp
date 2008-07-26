@@ -10,11 +10,10 @@
  *		julun <host.haiku@gmx.de>
  */
 
-#include "BeUtils.h"
 #include "MarginView.h"
 #include "PrinterDriver.h"
 #include "PageSetupWindow.h"
-
+#include "PrintUtils.h"
 
 #include <stdlib.h>
 

@@ -30,7 +30,28 @@ THE SOFTWARE.
 #include <string.h>
 #include <Debug.h>
 #include "InterfaceUtils.h"
-#include "Utils.h"
+
+
+EscapeMessageFilter::EscapeMessageFilter(BWindow *window, int32 what)
+	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, '_KYD')
+	, fWindow(window),
+	fWhat(what)
+{
+}
+
+
+filter_result
+EscapeMessageFilter::Filter(BMessage *msg, BHandler **target)
+{
+	int32 key;
+	// notify window with message fWhat if Escape key is hit
+	if (B_OK == msg->FindInt32("key", &key) && key == 1) {
+		fWindow->PostMessage(fWhat);
+		return B_SKIP_MESSAGE;
+	}
+	return B_DISPATCH_MESSAGE;
+}
+
 
 // Implementation of HWindow
 

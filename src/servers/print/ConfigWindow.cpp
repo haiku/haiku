@@ -10,7 +10,7 @@
 #include "Printer.h"
 #include "PrintServerApp.h"
 #include "ConfigWindow.h"
-#include "BeUtils.h"
+#include "PrintUtils.h"
 
 // posix
 #include <limits.h>
