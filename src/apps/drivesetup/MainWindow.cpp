@@ -808,6 +808,11 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 
 	// commit
 	ret = modificationPreparer.CommitModifications();
+
+	// The partition pointer is toast now! Use the partition id to
+	// retrieve it again.
+	partition = disk->FindDescendant(selectedPartition);
+
 	if (ret == B_OK) {
 		_DisplayPartitionError("The partition %s has been successfully "
 			"initialized.\n", partition);
