@@ -273,9 +273,9 @@ BDiskDevice::PrepareModifications()
  *
  * 	Creates a set of jobs that perform all the changes done after
  * 	\ref PrepareModifications. The changes are then written to device.
- *  Deletes and recreates all BPartition children to apply the changes,
- *  so cached pointers to BPartition objects cannot be used after this
- *  call.
+ * 	Deletes and recreates all BPartition children to apply the changes,
+ * 	so cached pointers to BPartition objects cannot be used after this
+ * 	call.
  * 	Unlocks the device for further use.
  */
 status_t
