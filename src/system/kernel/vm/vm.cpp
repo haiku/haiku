@@ -1714,11 +1714,6 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 					continue;
 #endif
 				vm_page *page = vm_page_allocate_page(PAGE_STATE_CLEAR, false);
-				if (page == NULL) {
-					// this shouldn't really happen, as we reserve the memory upfront
-					panic("couldn't fulfill B_FULL lock!");
-				}
-
 				cache->InsertPage(page, offset);
 				vm_map_page(area, page, address, protection);
 			}
