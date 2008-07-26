@@ -58,7 +58,7 @@ static addr_t sPhysicalPageOffset;
 static size_t sNumPages;
 static size_t sReservedPages;
 static vint32 sPageDeficit;
-static size_t sModifiedTemporaryPages;
+static size_t sModifiedNoSwapPages;
 
 static ConditionVariable sFreePageCondition;
 static spinlock sPageLock;
@@ -621,8 +621,8 @@ dump_page_stats(int argc, char **argv)
 		sFreePageQueue.count);
 	kprintf("clear queue: %p, count = %ld\n", &sClearPageQueue,
 		sClearPageQueue.count);
-	kprintf("modified queue: %p, count = %ld (%ld temporary)\n",
-		&sModifiedPageQueue, sModifiedPageQueue.count, sModifiedTemporaryPages);
+	kprintf("modified queue: %p, count = %ld (%ld no_swap)\n",
+		&sModifiedPageQueue, sModifiedPageQueue.count, sModifiedNoSwapPages);
 	kprintf("active queue: %p, count = %ld\n", &sActivePageQueue,
 		sActivePageQueue.count);
 	kprintf("inactive queue: %p, count = %ld\n", &sInactivePageQueue,
@@ -708,11 +708,15 @@ set_page_state_nolock(vm_page *page, int pageState)
 		if (pageState != PAGE_STATE_INACTIVE && page->cache != NULL)
 			panic("to be freed page %p has cache", page);
 	}
-	if (page->cache != NULL && page->cache->temporary) {
+	if (page->cache != NULL && page->cache->temporary
+#if ENABLE_SWAP_SUPPORT
+			&& page->wired_count > 0
+#endif
+			) {
 		if (pageState == PAGE_STATE_MODIFIED)
-			sModifiedTemporaryPages++;
+			sModifiedNoSwapPages++;
 		else if (page->state == PAGE_STATE_MODIFIED)
-			sModifiedTemporaryPages--;
+			sModifiedNoSwapPages--;
 	}
 
 #ifdef PAGE_ALLOCATION_TRACING
@@ -747,8 +751,12 @@ move_page_to_active_or_inactive_queue(vm_page *page, bool dequeued)
 		page->state = state;
 		enqueue_page(state == PAGE_STATE_ACTIVE
 			? &sActivePageQueue : &sInactivePageQueue, page);
-		if (page->cache->temporary)
-			sModifiedTemporaryPages--;
+		if (page->cache->temporary) {
+#if ENABLE_SWAP_SUPPORT
+			if (page->wired_count > 0)
+#endif
+				sModifiedNoSwapPages--;
+		}
 	} else
 		set_page_state_nolock(page, state);
 }
@@ -953,7 +961,7 @@ page_writer(void* /*unused*/)
 	marker.state = PAGE_STATE_UNUSED;
 
 	while (true) {
-		if (sModifiedPageQueue.count - sModifiedTemporaryPages < 1024) {
+		if (sModifiedPageQueue.count - sModifiedNoSwapPages < 1024) {
 			int32 count = 0;
 			get_sem_count(sWriterWaitSem, &count);
 			if (count == 0)
@@ -1819,8 +1827,12 @@ vm_page_free(vm_cache *cache, vm_page *page)
 	InterruptsSpinLocker _(sPageLock);
 
 	if (page->cache == NULL && page->state == PAGE_STATE_MODIFIED
-		&& cache->temporary)
-		sModifiedTemporaryPages--;
+		&& cache->temporary) {
+#if ENABLE_SWAP_SUPPORT
+		if (page->wired_count > 0)
+#endif
+			sModifiedNoSwapPages--;
+	}
 
 	set_page_state_nolock(page, PAGE_STATE_FREE);
 }
