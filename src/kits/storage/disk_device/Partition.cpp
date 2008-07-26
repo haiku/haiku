@@ -1379,7 +1379,7 @@ BPartition::_Update(user_partition_data* data, bool* updated)
 			if (!child)
 				return B_NO_MEMORY;
 
-			error = child->_SetTo(fDevice, this, data->children[i]);
+			error = child->_SetTo(fDevice, this, childData);
 			if (error != B_OK) {
 				delete child;
 				return error;
