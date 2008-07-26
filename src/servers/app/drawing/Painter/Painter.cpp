@@ -1093,7 +1093,7 @@ Painter::DrawBitmap(const ServerBitmap* bitmap,
 						 bitmap->BytesPerRow());
 
 		_DrawBitmap(srcBuffer, bitmap->ColorSpace(), actualBitmapRect,
-			bitmapRect, viewRect);
+			bitmapRect, viewRect, bitmap->Flags());
 	}
 	return touched;
 }
@@ -1350,7 +1350,8 @@ Painter::_TransparentMagicToAlpha(sourcePixel* buffer, uint32 width,
 // _DrawBitmap
 void
 Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
-	BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
+	BRect actualBitmapRect, BRect bitmapRect, BRect viewRect,
+	uint32 bitmapFlags) const
 {
 	if (!fValidClipping
 		|| !bitmapRect.IsValid() || !bitmapRect.Intersects(actualBitmapRect)
@@ -1434,7 +1435,7 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 
 	if ((format != B_RGBA32 && format != B_RGB32)
 		|| (format == B_RGB32 && fDrawingMode != B_OP_COPY
-#if 0
+#if 1
 // Enabling this would make the behavior compatible to BeOS, which
 // treats B_RGB32 bitmaps as B_RGB*A*32 bitmaps in B_OP_ALPHA - unlike in
 // all other drawing modes, where B_TRANSPARENT_MAGIC_RGBA32 is handled.
@@ -1513,7 +1514,8 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	}
 
 	// for all other cases (non-optimized drawing mode or scaled drawing)
-	_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset, xScale, yScale, viewRect);
+	_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset, xScale, yScale, viewRect,
+		bitmapFlags);
 }
 
 #define DEBUG_DRAW_BITMAP 0
@@ -1584,9 +1586,8 @@ if (left - xOffset < 0 || left - xOffset >= (int32)srcBuffer.width() ||
 // _DrawBitmapGeneric32
 void
 Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
-							  double xOffset, double yOffset,
-							  double xScale, double yScale,
-							  BRect viewRect) const
+	double xOffset, double yOffset, double xScale, double yScale,
+	BRect viewRect, uint32 bitmapFlags) const
 {
 	TRACE("Painter::_DrawBitmapGeneric32()\n");
 	TRACE("   offset: %.1f, %.1f\n", xOffset, yOffset);
@@ -1622,12 +1623,6 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	typedef agg::image_accessor_clip<pixfmt_image> source_type;
 	source_type source(pixf_img, agg::rgba8(0, 0, 0, 0));
 
-	// image filter (nearest neighbor)
-	typedef agg::span_image_filter_rgba_nn<source_type,
-										   interpolator_type> span_gen_type;
-	span_gen_type spanGenerator(source, interpolator);
-
-
 	// clip to the current clipping region's frame
 	viewRect = viewRect & fClippingRegion->Frame();
 	// convert to pixel coords (versus pixel indices)
@@ -1646,12 +1641,25 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	fRasterizer.reset();
 	fRasterizer.add_path(transformedPath);
 
-	// render the path with the bitmap as scanline fill
-	agg::render_scanlines_aa(fRasterizer,
-							 fUnpackedScanline,
-							 fBaseRenderer,
-							 spanAllocator,
-							 spanGenerator);
+	if ((bitmapFlags & B_BITMAP_SCALE_BILINEAR) != 0) {
+		// image filter (bilinear)
+		typedef agg::span_image_filter_rgba_bilinear<
+			source_type, interpolator_type> span_gen_type;
+		span_gen_type spanGenerator(source, interpolator);
+
+		// render the path with the bitmap as scanline fill
+		agg::render_scanlines_aa(fRasterizer, fUnpackedScanline, fBaseRenderer,
+			spanAllocator, spanGenerator);
+	} else {
+		// image filter (nearest neighbor)
+		typedef agg::span_image_filter_rgba_nn<
+			source_type, interpolator_type> span_gen_type;
+		span_gen_type spanGenerator(source, interpolator);
+
+		// render the path with the bitmap as scanline fill
+		agg::render_scanlines_aa(fRasterizer, fUnpackedScanline, fBaseRenderer,
+			spanAllocator, spanGenerator);
+	}
 }
 
 // _InvertRect32

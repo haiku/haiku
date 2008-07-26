@@ -28,7 +28,11 @@ enum {
 	B_BITMAP_IS_OFFSCREEN				= 0x00000020,
 	B_BITMAP_WILL_OVERLAY				= 0x00000040 | B_BITMAP_IS_OFFSCREEN,
 	B_BITMAP_RESERVE_OVERLAY_CHANNEL	= 0x00000080,
-	B_BITMAP_NO_SERVER_LINK				= 0x00000100
+	// Haiku extensions:
+	B_BITMAP_NO_SERVER_LINK				= 0x00000100,
+	B_BITMAP_SCALE_BILINEAR				= 0x00000200
+		// TODO: Make this simply "SMOOTH_SCALE" and use
+		// better quality methods the faster the computer?
 };
 
 #define B_ANY_BYTES_PER_ROW	-1

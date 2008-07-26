@@ -997,7 +997,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 			link.StartMessage(AS_CREATE_BITMAP);
 			link.Attach<BRect>(bounds);
 			link.Attach<color_space>(colorSpace);
-			link.Attach<int32>((int32)flags);
+			link.Attach<uint32>(flags);
 			link.Attach<int32>(bytesPerRow);
 			link.Attach<int32>(screenID.id);
 

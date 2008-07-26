@@ -50,9 +50,8 @@ using std::nothrow;
 	greater than the default will result in the number of bytes specified.
 	\param screen Screen assigned to the bitmap.
 */
-ServerBitmap::ServerBitmap(BRect rect, color_space space,
-						   int32 flags, int32 bytesPerRow,
-						   screen_id screen)
+ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
+		int32 bytesPerRow, screen_id screen)
 	:
 	fAllocator(NULL),
 	fAllocationCookie(NULL),
@@ -253,11 +252,10 @@ ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 	}
 	if (minBPR > 0 || bytesPerRow > 0) {
 		// add the padding or use the provided bytesPerRow if sufficient
-		if (bytesPerRow >= minBPR) {
+		if (bytesPerRow >= minBPR)
 			fBytesPerRow = bytesPerRow;
-		} else {
+		else
 			fBytesPerRow = ((minBPR + 3) / 4) * 4;
-		}
 	}
 }
 
@@ -346,9 +344,8 @@ ServerBitmap::PrintToStream()
 //	#pragma mark -
 
 
-UtilityBitmap::UtilityBitmap(BRect rect, color_space space,
-							 int32 flags, int32 bytesperline,
-							 screen_id screen)
+UtilityBitmap::UtilityBitmap(BRect rect, color_space space, uint32 flags,
+		int32 bytesperline, screen_id screen)
 	: ServerBitmap(rect, space, flags, bytesperline, screen)
 {
 	_AllocateBuffer();
@@ -365,9 +362,8 @@ UtilityBitmap::UtilityBitmap(const ServerBitmap* bitmap)
 }
 
 
-UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData,
-							 uint32 width, uint32 height,
-							 color_space format)
+UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData, uint32 width,
+		uint32 height, color_space format)
 	: ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0)
 {
 	_AllocateBuffer();

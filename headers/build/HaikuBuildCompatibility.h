@@ -135,6 +135,7 @@ extern float	roundf(float value);
 #		define B_MINI_ICON_TYPE			'MICN'
 #		define B_VECTOR_ICON_TYPE		'VICN'
 #		define B_BITMAP_NO_SERVER_LINK	0
+#		define B_BITMAP_SCALE_BILINEAR	0
 #	endif
 #endif	// HAIKU_TARGET_PLATFORM_LIBBE_TEST
 

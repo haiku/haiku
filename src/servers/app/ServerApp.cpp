@@ -587,12 +587,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			BRect frame;
 			color_space colorSpace;
-			int32 flags, bytesPerRow;
+			uint32 flags;
+			int32 bytesPerRow;
 			screen_id screenID;
 
 			link.Read<BRect>(&frame);
 			link.Read<color_space>(&colorSpace);
-			link.Read<int32>(&flags);
+			link.Read<uint32>(&flags);
 			link.Read<int32>(&bytesPerRow);
 			if (link.Read<screen_id>(&screenID) == B_OK) {
 				// TODO: choose the right HWInterface with regards to the screenID

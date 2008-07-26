@@ -89,7 +89,7 @@ BitmapManager::~BitmapManager()
 */
 ServerBitmap*
 BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
-	HWInterface& hwInterface, BRect bounds, color_space space, int32 flags,
+	HWInterface& hwInterface, BRect bounds, color_space space, uint32 flags,
 	int32 bytesPerRow, screen_id screen, uint8* _allocationFlags)
 {
 	BAutolock locker(fLock);

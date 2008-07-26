@@ -54,6 +54,8 @@ class ServerBitmap {
 								{ return fBitsPerPixel; } 
 	inline	color_space		ColorSpace() const
 								{ return fSpace; }
+	inline	uint32			Flags() const
+								{ return fFlags; }
 
 	//! Returns the identifier token for the bitmap
 	inline	int32			Token() const
@@ -87,11 +89,9 @@ protected:
 	friend class BitmapManager;
 	friend class PicturePlayer;
 
-							ServerBitmap(BRect rect,
-										 color_space space,
-										 int32 flags,
-										 int32 bytesPerRow = -1,
-										 screen_id screen = B_MAIN_SCREEN_ID);
+							ServerBitmap(BRect rect, color_space space,
+								uint32 flags, int32 bytesPerRow = -1,
+								screen_id screen = B_MAIN_SCREEN_ID);
 							ServerBitmap(const ServerBitmap* bmp);
 	virtual					~ServerBitmap();
 
@@ -104,7 +104,7 @@ protected:
 			void			_AllocateBuffer();
 
 			void			_HandleSpace(color_space space,
-										 int32 bytesperline = -1);
+								int32 bytesperline = -1);
 
 			ClientMemoryAllocator* fAllocator;
 			void*			fAllocationCookie;
@@ -116,7 +116,7 @@ protected:
 			int32			fHeight;
 			int32			fBytesPerRow;
 			color_space		fSpace;
-			int32			fFlags;
+			uint32			fFlags;
 			int				fBitsPerPixel;
 
 			ServerApp*		fOwner;
@@ -125,17 +125,14 @@ protected:
 
 class UtilityBitmap : public ServerBitmap {
  public:
-							UtilityBitmap(BRect rect,
-										  color_space space,
-										  int32 flags,
-										  int32 bytesperline = -1,
-										  screen_id screen = B_MAIN_SCREEN_ID);
+							UtilityBitmap(BRect rect, color_space space,
+								uint32 flags, int32 bytesperline = -1,
+								screen_id screen = B_MAIN_SCREEN_ID);
 							UtilityBitmap(const ServerBitmap* bmp);
 
 							UtilityBitmap(const uint8* alreadyPaddedData,
-										  uint32 width,
-										  uint32 height,
-										  color_space format);
+								uint32 width, uint32 height,
+								color_space format);
 
 
 	virtual					~UtilityBitmap();

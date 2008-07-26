@@ -229,7 +229,8 @@ class Painter {
 												color_space format,
 												BRect actualBitmapRect,
 												BRect bitmapRect,
-												BRect viewRect) const;
+												BRect viewRect,
+												uint32 bitmapFlags) const;
 			template <class F>
 			void				_DrawBitmapNoScale32(
 												F copyRowFunction,
@@ -241,7 +242,8 @@ class Painter {
 												agg::rendering_buffer& srcBuffer,
 												double xOffset, double yOffset,
 												double xScale, double yScale,
-												BRect viewRect) const;
+												BRect viewRect,
+												uint32 bitmapFlags) const;
 
 			void				_InvertRect32(	BRect r) const;
 			void				_BlendRect32(	const BRect& r,
