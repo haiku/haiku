@@ -12,11 +12,7 @@
 #include <vm_types.h>
 
 
-// uncomment to build in swap support
-//#define ENABLE_SWAP_SUPPORT 1
-
 #if ENABLE_SWAP_SUPPORT
-
 
 typedef page_num_t swap_addr_t;
 struct swap_block;

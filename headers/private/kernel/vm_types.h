@@ -30,6 +30,9 @@
 // Enables a global list of all vm_cache structures.
 //#define DEBUG_CACHE_LIST 1
 
+// uncomment to build in swap support
+//#define ENABLE_SWAP_SUPPORT 1
+
 #ifdef __cplusplus
 
 #include <util/SplayTree.h>
