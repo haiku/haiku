@@ -519,11 +519,16 @@ typedef enum cpu_types {
 	
 	B_CPU_AMD_SEMPRON_MODEL_8			= B_CPU_AMD_ATHLON_XP_MODEL_8,
 	B_CPU_AMD_SEMPRON_MODEL_10			= B_CPU_AMD_ATHLON_XP_MODEL_10,
+
+	/* According to "Revision Guide for AMD Family 10h
+	 * Processors" (41322.pdf) 
+	 */
+	B_CPU_AMD_PHENOM					= 0x11f2,
 	
 	/* According to "Revision guide for AMD Athlon 64
 	 * and AMD Opteron Processors" (25759.pdf)
 	 */
-	B_CPU_AMD_ATHLON_64_MODEL_3		= 0x11f3,
+	B_CPU_AMD_ATHLON_64_MODEL_3			= 0x11f3,
 	B_CPU_AMD_ATHLON_64_MODEL_4,
 	B_CPU_AMD_ATHLON_64_MODEL_5,
 	B_CPU_AMD_OPTERON					= B_CPU_AMD_ATHLON_64_MODEL_5,
