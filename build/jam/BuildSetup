@@ -278,15 +278,13 @@ if $(HAIKU_ARCH) = ppc {
 	HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
 }
 if $(HAIKU_ARCH) = m68k {
-	# Build a position independent M68K kernel. We need to be able to relocate
-	# the kernel, since the virtual address space layout at boot time is not
-	# fixed.
-	#HAIKU_KERNEL_PIC_CCFLAGS = -mpcrel -Wa,--pcrel ;
-	#HAIKU_KERNEL_PIC_LINKFLAGS = -mpcrel ;
-	#HAIKU_KERNEL_PIC_CCFLAGS = -msep-data -Wa,--pcrel ;
-	#HAIKU_KERNEL_PIC_LINKFLAGS = -msep-data ;
+	# We don't need a PIC kernel as it's always at the same place.
+	# it's actually needed to not use pic, else linking fails due to too large pc refs.
 	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
+	# we don't want to have to handle emulating missing FPU opcodes for 040 and 060 in the kernel
+	HAIKU_KERNEL_CCFLAGS += -m68020-60 ;
+	HAIKU_KERNEL_C++FLAGS += -m68020-60 ;
 }
 
 # If the environment variable DEBUG_PRINTF is defined we define an equally
