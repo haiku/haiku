@@ -6,15 +6,15 @@ Test:
 
 Implement:
 
-* "escapment_delta" text rendering
-
 (* handling of other BBitmap colorspaces)
 
 
 
 Improve:
 
-* make special verions of DrawingModes for B_SOLID_* patterns
+* make more special verions of DrawingModes for B_SOLID_* patterns
 
-* get rid of virtual function use in DrawingMode framework
+* fast versions of nearest neighbor upscaling / downscaling of BBitmaps
+
+* fast versions of bilinear scaling of BBitmaps
 
