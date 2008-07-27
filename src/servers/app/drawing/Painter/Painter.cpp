@@ -1513,6 +1513,12 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 		}
 	}
 
+	if (fDrawingMode == B_OP_COPY && (bitmapFlags & B_BITMAP_SCALE_BILINEAR)) {
+		_DrawBitmapBilinearCopy32(srcBuffer, xOffset, yOffset, xScale, yScale,
+			viewRect);
+		return;
+	}
+
 	// for all other cases (non-optimized drawing mode or scaled drawing)
 	_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset, xScale, yScale, viewRect,
 		bitmapFlags);
@@ -1581,6 +1587,161 @@ if (left - xOffset < 0 || left - xOffset >= (int32)srcBuffer.width() ||
 			}
 		}
 	} while (fBaseRenderer.next_clip_box());
+}
+
+// _DrawBitmapBilinearCopy32
+void
+Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
+	double xOffset, double yOffset, double xScale, double yScale,
+	BRect viewRect) const
+{
+//bigtime_t now = system_time();
+	uint32 dstWidth = viewRect.IntegerWidth() + 1;
+	uint32 dstHeight = viewRect.IntegerHeight() + 1;
+	uint32 srcWidth = srcBuffer.width();
+	uint32 srcHeight = srcBuffer.height();
+
+	struct FilterInfo {
+		uint16 index;	// index into source bitmap row/column
+		uint16 weight;	// weight of the pixel at index [0..255]
+	};
+
+	FilterInfo xWeights[dstWidth];
+	FilterInfo yWeights[dstHeight];
+
+	// Extract the cropping information for the source bitmap,
+	// If only a part of the source bitmap is to be drawn with scale,
+	// the offset will be different from the viewRect left top corner.
+	int32 xBitmapShift = (int32)(xOffset - viewRect.left);
+	int32 yBitmapShift = (int32)(yOffset - viewRect.top);
+
+	for (uint32 i = 0; i < dstWidth; i++) {
+		// fractional index into source
+		// NOTE: It is very important to calculate the fractional index
+		// into the source pixel grid like this to prevent out of bounds
+		// access! It will result in the rightmost pixel of the destination
+		// to access the rightmost pixel of the source with a weighting
+		// of 255. This in turn will trigger an optimization in the loop
+		// that also prevents out of bounds access.
+		float index = i * (srcWidth - 1) / ((srcWidth * xScale) - 1);
+		// round down to get the left pixel
+		xWeights[i].index = (uint16)index;
+		xWeights[i].weight = 255 - (uint16)((index - xWeights[i].index) * 255);
+		// handle cropped source bitmap
+		xWeights[i].index += xBitmapShift;
+		// precompute index for 32 bit pixels
+		xWeights[i].index *= 4;
+	}
+
+	for (uint32 i = 0; i < dstHeight; i++) {
+		// fractional index into source
+		// NOTE: It is very important to calculate the fractional index
+		// into the source pixel grid like this to prevent out of bounds
+		// access! It will result in the bottommost pixel of the destination
+		// to access the bottommost pixel of the source with a weighting
+		// of 255. This in turn will trigger an optimization in the loop
+		// that also prevents out of bounds access.
+		float index = i * (srcHeight - 1) / ((srcHeight * yScale) - 1);
+		// round down to get the top pixel
+		yWeights[i].index = (uint16)index;
+		yWeights[i].weight = 255 - (uint16)((index - yWeights[i].index) * 255);
+		// handle cropped source bitmap
+		yWeights[i].index += yBitmapShift;
+	}
+//printf("X: %d/%d ... %d/%d, %d/%d\n", xWeights[0].index, xWeights[0].weight,
+//	xWeights[dstWidth - 2].index, xWeights[dstWidth - 2].weight,
+//	xWeights[dstWidth - 1].index, xWeights[dstWidth - 1].weight);
+//printf("Y: %d/%d ... %d/%d, %d/%d\n", yWeights[0].index, yWeights[0].weight,
+//	yWeights[dstHeight - 2].index, yWeights[dstHeight - 2].weight,
+//	yWeights[dstHeight - 1].index, yWeights[dstHeight - 1].weight);
+
+	int32 left = (int32)viewRect.left;
+	int32 top = (int32)viewRect.top;
+	int32 right = (int32)viewRect.right;
+	int32 bottom = (int32)viewRect.bottom;
+
+	uint32 dstBPR = fBuffer.stride();
+	uint32 srcBPR = srcBuffer.stride();
+
+	// iterate over clipping boxes
+	fBaseRenderer.first_clip_box();
+	do {
+		int32 x1 = max_c(fBaseRenderer.xmin(), left);
+		int32 x2 = min_c(fBaseRenderer.xmax(), right);
+		if (x1 > x2)
+			continue;
+
+		int32 y1 = max_c(fBaseRenderer.ymin(), top);
+		int32 y2 = min_c(fBaseRenderer.ymax(), bottom);
+		if (y1 > y2)
+			continue;
+
+		// buffer offset into destination
+		uint8* dst = fBuffer.row_ptr(y1) + x1 * 4;
+
+		// x and y are needed as indeces into the wheight arrays, so the
+		// offset into the target buffer needs to be compensated
+		int32 xIndexL = x1 - (int32)xOffset;
+		int32 xIndexR = x2 - (int32)xOffset;
+		y1 -= (int32)yOffset;
+		y2 -= (int32)yOffset;
+
+		for (; y1 <= y2; y1++) {
+			// cache the weight of the top and bottom row
+			uint16 wTop = yWeights[y1].weight;
+			uint16 wBottom = 255 - yWeights[y1].weight;
+
+			// buffer offset into source (top row)
+			const uint8* src = srcBuffer.row_ptr(yWeights[y1].index);
+			// buffer handle for destination to be incremented per pixel
+			uint8* d = dst;
+
+			for (int32 x = xIndexL; x <= xIndexR; x++) {
+				const uint8* s = src + xWeights[x].index;
+				if (wTop == 255) {
+					// This case is important to prevent out
+					// of bounds access at bottom edge of the source
+					// bitmap. If the scale is low and integer, it will
+					// also help the speed.
+					if (xWeights[x].weight == 255) {
+						// As above, but to prevent out of bounds
+						// on the right edge.
+						*(uint32*)d = *(uint32*)s;
+					} else {
+						// Only the left and right pixels are interpolated,
+						// since the top row has 100% weight.
+						uint16 wLeft = xWeights[x].weight;
+						uint16 wRight = 255 - xWeights[x].weight;
+						d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
+						d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
+						d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
+					}
+				} else {
+					// calculate the weighted sum of all four interpolated
+					// pixels
+					uint16 wLeft = xWeights[x].weight;
+					uint16 wRight = 255 - xWeights[x].weight;
+					// left and right of top row
+					uint32 t0 = (s[0] * wLeft + s[4] * wRight) * wTop;
+					uint32 t1 = (s[1] * wLeft + s[5] * wRight) * wTop;
+					uint32 t2 = (s[2] * wLeft + s[6] * wRight) * wTop;
+	
+					// left and right of bottom row
+					s += srcBPR;
+					t0 += (s[0] * wLeft + s[4] * wRight) * wBottom;
+					t1 += (s[1] * wLeft + s[5] * wRight) * wBottom;
+					t2 += (s[2] * wLeft + s[6] * wRight) * wBottom;
+
+					d[0] = t0 >> 16;
+					d[1] = t1 >> 16;
+					d[2] = t2 >> 16;
+				}
+				d += 4;
+			}
+			dst += dstBPR;
+		}
+	} while (fBaseRenderer.next_clip_box());
+//printf("draw bitmap %.5fx%.5f: %lld\n", xScale, yScale, system_time() - now);
 }
 
 // _DrawBitmapGeneric32
