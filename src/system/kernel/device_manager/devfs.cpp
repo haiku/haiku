@@ -36,6 +36,7 @@
 #include <vm.h>
 
 #include "BaseDevice.h"
+#include "io_requests.h"
 #include "legacy_drivers.h"
 
 
@@ -111,6 +112,11 @@ struct devfs_dir_cookie {
 
 struct devfs_cookie {
 	void*				device_cookie;
+};
+
+struct synchronous_io_cookie {
+	BaseDevice*		device;
+	void*			cookie;
 };
 
 // directory iteration states
@@ -443,6 +449,18 @@ translate_partition_access(devfs_partition* partition, off_t& offset,
 }
 
 
+static inline void
+translate_partition_access(devfs_partition* partition, io_request* request)
+{
+	off_t offset = request->Offset();
+
+	ASSERT(offset >= 0);
+	ASSERT(offset + request->Length() <= partition->info.size);
+
+	request->SetOffset(offset + partition->info.offset);
+}
+
+
 static status_t
 get_node_for_path(struct devfs *fs, const char *path,
 	struct devfs_vnode **_node)
@@ -734,6 +752,30 @@ get_device_name(struct devfs_vnode* vnode, char* buffer, size_t size)
 
 		offset = start;
 	}
+}
+
+
+static status_t
+device_read(void* _cookie, off_t offset, void* buffer, size_t length)
+{
+	synchronous_io_cookie* cookie = (synchronous_io_cookie*)_cookie;
+
+	size_t transferred = length;
+	status_t error = cookie->device->Read(cookie->cookie, offset, buffer,
+		&transferred);
+	return error == B_OK && transferred != length ? B_FILE_ERROR : error;
+}
+
+
+static status_t
+device_write(void* _cookie, off_t offset, void* buffer, size_t length)
+{
+	synchronous_io_cookie* cookie = (synchronous_io_cookie*)_cookie;
+
+	size_t transferred = length;
+	status_t error = cookie->device->Write(cookie->cookie, offset, buffer,
+		&transferred);
+	return error == B_OK && transferred != length ? B_FILE_ERROR : error;
 }
 
 
@@ -1708,6 +1750,44 @@ devfs_write_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 
 
 static status_t
+devfs_io(fs_volume *volume, fs_vnode *_vnode, void *_cookie,
+	io_request *request)
+{
+	devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
+	devfs_cookie* cookie = (devfs_cookie*)_cookie;
+
+	bool isWrite = request->IsWrite();
+
+	if (!S_ISCHR(vnode->stream.type)
+		|| ((isWrite && !vnode->stream.u.dev.device->HasWrite()
+				|| !isWrite && !vnode->stream.u.dev.device->HasRead())
+			&& !vnode->stream.u.dev.device->HasIO())
+		|| cookie == NULL) {
+		return B_NOT_ALLOWED;
+	}
+
+	if (vnode->stream.u.dev.partition) {
+		if (request->Offset() + request->Length()
+				>= vnode->stream.u.dev.partition->info.size) {
+			return B_BAD_VALUE;
+		}
+		translate_partition_access(vnode->stream.u.dev.partition, request);
+	}
+
+	if (vnode->stream.u.dev.device->HasIO())
+		return vnode->stream.u.dev.device->IO(cookie->device_cookie, request);
+
+	synchronous_io_cookie synchronousCookie = {
+		vnode->stream.u.dev.device,
+		cookie->device_cookie
+	};
+
+	return vfs_synchronous_io(request,
+		request->IsWrite() ? &device_write : &device_read, &synchronousCookie);
+}
+
+
+static status_t
 devfs_read_stat(fs_volume* _volume, fs_vnode* _vnode, struct stat* stat)
 {
 	struct devfs_vnode* vnode = (struct devfs_vnode*)_vnode->private_node;
@@ -1836,7 +1916,7 @@ fs_vnode_ops kVnodeOps = {
 	&devfs_read_pages,
 	&devfs_write_pages,
 
-	NULL,	// io()
+	&devfs_io,
 	NULL,	// cancel_io()
 
 	NULL,	// get_file_map
