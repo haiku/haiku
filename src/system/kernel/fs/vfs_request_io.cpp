@@ -310,7 +310,21 @@ synchronous_io(io_request* request, DoIO& io)
 // #pragma mark - kernel private API
 
 
-extern "C" status_t
+status_t
+vfs_vnode_io(struct vnode* vnode, void* cookie, io_request* request)
+{
+	if (!HAS_FS_CALL(vnode, io)) {
+		// no io() call -- fall back to synchronous I/O
+		IOBuffer* buffer = request->Buffer();
+		VnodeIO io(request->IsWrite(), buffer->IsPhysical(), vnode, cookie);
+		return synchronous_io(request, io);
+	}
+
+	return FS_CALL(vnode, io, cookie, request);
+}
+
+
+status_t
 vfs_synchronous_io(io_request* request,
 	status_t (*doIO)(void* cookie, off_t offset, void* buffer, size_t length),
 	void* cookie)
@@ -325,7 +339,7 @@ vfs_synchronous_io(io_request* request,
 // #pragma mark - public API
 
 
-extern "C" status_t
+status_t
 do_fd_io(int fd, io_request* request)
 {
 	struct vnode* vnode;
@@ -337,19 +351,11 @@ do_fd_io(int fd, io_request* request)
 
 	CObjectDeleter<file_descriptor> descriptorPutter(descriptor, put_fd);
 
-	if (!HAS_FS_CALL(vnode, io)) {
-		// no io() call -- fall back to synchronous I/O
-		IOBuffer* buffer = request->Buffer();
-		VnodeIO io(request->IsWrite(), buffer->IsPhysical(), vnode,
-			descriptor->cookie);
-		return synchronous_io(request, io);
-	}
-
-	return FS_CALL(vnode, io, descriptor->cookie, request);
+	return vfs_vnode_io(vnode, descriptor->cookie, request);
 }
 
 
-extern "C" status_t
+status_t
 do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 	iterative_io_finished finished, void* cookie)
 {
