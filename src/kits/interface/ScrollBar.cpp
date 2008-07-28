@@ -195,6 +195,7 @@ BScrollBar::BScrollBar(BRect frame, const char* name, BView *target,
 	fPrivateData = new BScrollBar::Private(this);
 
 	SetTarget(target);
+	SetEventMask(B_NO_POINTER_HISTORY);
 
 	_UpdateThumbFrame();
 	_UpdateArrowButtons();
