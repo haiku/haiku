@@ -679,6 +679,9 @@ fs_vnode_ops gISO9660VnodeOps = {
 	&fs_read_pages,
 	NULL,
 
+	NULL,	// io()
+	NULL,	// cancel_io()
+
 	/* cache file access */
 	NULL,
 

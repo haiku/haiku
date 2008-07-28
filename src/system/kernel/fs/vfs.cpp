@@ -8705,3 +8705,6 @@ _user_open_query(dev_t device, const char *userQuery, size_t queryLength,
 	free(query);
 	return fd;
 }
+
+
+#include "vfs_request_io.cpp"

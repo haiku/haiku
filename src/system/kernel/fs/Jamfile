@@ -5,6 +5,8 @@ UsePrivateHeaders [ FDirName kernel fs ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders net shared storage ;
 
+UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) device_manager ] ;
+
 KernelMergeObject kernel_fs.o :
 	fd.cpp
 	fifo.cpp

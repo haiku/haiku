@@ -26,6 +26,8 @@ typedef fssh_ino_t fssh_vnode_id;
 /* the file system's private data structures */
 typedef void *fssh_fs_cookie;
 
+typedef struct FSSHIORequest fssh_io_request;
+
 /* additional flags passed to write_stat() */
 #define FSSH_B_STAT_SIZE_INSECURE	0x2000
 
@@ -141,6 +143,12 @@ struct fssh_fs_vnode_ops {
 	fssh_status_t (*write_pages)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
 				fssh_fs_cookie cookie, fssh_off_t pos, const fssh_iovec *vecs,
 				fssh_size_t count, fssh_size_t *_numBytes);
+
+	/* asynchronous I/O */
+	fssh_status_t (*io)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
+				void *cookie, fssh_io_request *request);
+	fssh_status_t (*cancel_io)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
+				void *cookie, fssh_io_request *request);
 
 	/* cache file access */
 	fssh_status_t (*get_file_map)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,

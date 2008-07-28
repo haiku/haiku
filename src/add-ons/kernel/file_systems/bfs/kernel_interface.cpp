@@ -2165,6 +2165,9 @@ fs_vnode_ops gBFSVnodeOps = {
 	&bfs_read_pages,
 	&bfs_write_pages,
 
+	NULL,	// io()
+	NULL,	// cancel_io()
+
 	&bfs_get_file_map,
 
 	&bfs_ioctl,

@@ -980,6 +980,9 @@ static fs_vnode_ops sFIFOVnodeOps = {
 	&fifo_read_pages,
 	&fifo_write_pages,
 
+	NULL,	// io()
+	NULL,	// cancel_io()
+
 	NULL,	// get_file_map
 
 	/* common */

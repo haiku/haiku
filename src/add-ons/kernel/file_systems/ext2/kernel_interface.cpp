@@ -509,6 +509,9 @@ fs_vnode_ops gExt2VnodeOps = {
 	&ext2_read_pages,
 	NULL,
 
+	NULL,	// io()
+	NULL,	// cancel_io()
+
 	&ext2_get_file_map,
 
 	NULL,

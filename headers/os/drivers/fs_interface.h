@@ -21,6 +21,9 @@ struct stat;
 struct fs_info;
 struct select_sync;
 
+typedef struct IORequest io_request;
+
+
 /* additional flags passed to write_stat() (see NodeMonitor.h for the others) */
 // NOTE: Changing the constants here or in NodeMonitor.h will break
 // src/kits/storage/LibBeAdapter.cpp:_kern_write_stat().
@@ -123,6 +126,12 @@ struct fs_vnode_ops {
 	status_t (*write_pages)(fs_volume *volume, fs_vnode *vnode,
 				void *cookie, off_t pos, const iovec *vecs, size_t count,
 				size_t *_numBytes);
+
+	/* asynchronous I/O */
+	status_t (*io)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				io_request *request);
+	status_t (*cancel_io)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				io_request *request);
 
 	/* cache file access */
 	status_t (*get_file_map)(fs_volume *volume, fs_vnode *vnode, off_t offset,
@@ -284,6 +293,14 @@ typedef struct file_system_module_info {
 
 
 /* file system add-ons only prototypes */
+
+// callbacks for do_iterative_fd_io()
+typedef status_t (*iterative_io_get_vecs)(void *cookie, io_request* request,
+				off_t offset, size_t size, struct file_io_vec *vecs,
+				size_t *_count);
+typedef status_t (*iterative_io_finished)(void* cookie, io_request* request,
+				status_t status);
+
 extern status_t new_vnode(fs_volume *volume, ino_t vnodeID, void *privateNode,
 					fs_vnode_ops *ops);
 extern status_t publish_vnode(fs_volume *volume, ino_t vnodeID,
@@ -309,6 +326,10 @@ extern status_t write_file_io_vec_pages(int fd,
 					const struct file_io_vec *fileVecs, size_t fileVecCount,
 					const struct iovec *vecs, size_t vecCount,
 					uint32 *_vecIndex, size_t *_vecOffset, size_t *_bytes);
+extern status_t do_fd_io(int fd, io_request *request);
+extern status_t do_iterative_fd_io(int fd, io_request *request,
+					iterative_io_get_vecs getVecs,
+					iterative_io_finished finished, void *cookie);
 
 extern status_t notify_entry_created(dev_t device, ino_t directory,
 					const char *name, ino_t node);

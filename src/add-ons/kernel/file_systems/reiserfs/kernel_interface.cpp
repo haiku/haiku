@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -444,7 +444,7 @@ reiserfs_read(fs_volume *fs, fs_vnode *_node, void *cookie, off_t pos,
 		else
 			error = B_BAD_VALUE;
 	}
-	
+
 	// read
 	StreamReader *reader = (StreamReader*)cookie;
 	if (error == B_OK) {
@@ -569,7 +569,7 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 	delete iterator;
 	return B_OK;
 }
-			
+
 // reiserfs_read_dir
 static status_t
 reiserfs_read_dir(fs_volume *fs, fs_vnode *_node, void *cookie,
@@ -753,6 +753,9 @@ fs_vnode_ops gReiserFSVnodeOps = {
 	NULL,	// &reiserfs_can_page,
 	NULL,	// &reiserfs_read_pages,
 	NULL,	// &reiserfs_write_pages,
+
+	NULL,	// io()
+	NULL,	// cancel_io()
 
 	NULL,	// &reiserfs_get_file_map,
 

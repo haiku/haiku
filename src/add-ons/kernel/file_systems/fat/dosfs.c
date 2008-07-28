@@ -1268,6 +1268,9 @@ fs_vnode_ops gFATVnodeOps = {
 	&dosfs_read_pages,
 	&dosfs_write_pages,
 
+	NULL,	// io()
+	NULL,	// cancel_io()
+
 	&dosfs_get_file_map,
 
 	&dosfs_ioctl,

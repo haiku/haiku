@@ -97,6 +97,10 @@ status_t vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos,
 			const iovec *vecs, size_t count, size_t *_numBytes);
 status_t vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos,
 			const iovec *vecs, size_t count, size_t *_numBytes);
+status_t vfs_synchronous_io(io_request* request,
+			status_t (*doIO)(void* cookie, off_t offset, void* buffer,
+				size_t length),
+			void* cookie);
 status_t vfs_get_vnode_cache(struct vnode *vnode, struct VMCache **_cache,
 			bool allocate);
 status_t vfs_get_file_map(struct vnode *vnode, off_t offset, size_t size,

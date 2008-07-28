@@ -2014,6 +2014,9 @@ fs_vnode_ops gCDDAVnodeOps = {
 	cdda_read_pages,
 	cdda_write_pages,
 
+	NULL,	// io()
+	NULL,	// cancel_io()
+
 	NULL,	// get_file_map()
 
 	// common
