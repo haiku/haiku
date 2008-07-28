@@ -1713,9 +1713,9 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 			// buffer handle for destination to be incremented per pixel
 			register uint8* d = dst;
 
-			for (int32 x = xIndexL; x <= xIndexR; x++) {
-				const uint8* s = src + xWeights[x].index;
-				if (wTop == 255) {
+			if (wTop == 255) {
+				for (int32 x = xIndexL; x <= xIndexR; x++) {
+					const uint8* s = src + xWeights[x].index;
 					// This case is important to prevent out
 					// of bounds access at bottom edge of the source
 					// bitmap. If the scale is low and integer, it will
@@ -1733,7 +1733,11 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 						d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
 						d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
 					}
-				} else {
+					d += 4;
+				}
+			} else {
+				for (int32 x = xIndexL; x <= xIndexR; x++) {
+					const uint8* s = src + xWeights[x].index;
 					if (xWeights[x].weight == 255) {
 						// Prevent out of bounds access on the right edge
 						// or simply speed up.
@@ -1761,8 +1765,8 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 						d[1] = t1 >> 16;
 						d[2] = t2 >> 16;
 					}
+					d += 4;
 				}
-				d += 4;
 			}
 			dst += dstBPR;
 		}
