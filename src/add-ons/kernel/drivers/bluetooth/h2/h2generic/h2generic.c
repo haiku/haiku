@@ -269,8 +269,9 @@ device_added(const usb_device* dev, void** cookie)
 	/* Place to find out whats our concrete device and set up  some special info to our driver */
 	/* TODO: if this code increases too much reconsider this implementation*/
 	desc = usb->get_device_descriptor(dev);
-	if ( desc->vendor_id == 0x0a5c && desc->product_id == 0x200a && desc->product_id == 0x2009) {
-		// Tecom Device VENDOR_ID 0x0a5c PRODUCT_ID 0x2035
+	if ( desc->vendor_id == 0x0a5c && (desc->product_id == 0x200a || 
+										desc->product_id == 0x2009 ||
+										desc->product_id == 0x2035 )) {
 		new_bt_dev->driver_info = BT_WILL_NEED_A_RESET | BT_SCO_NOT_WORKING;
 	} 
 	/*
