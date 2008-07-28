@@ -20,9 +20,9 @@
 
 // mouse button
 enum {
-	B_PRIMARY_MOUSE_BUTTON = 0x01,
-	B_SECONDARY_MOUSE_BUTTON = 0x02,
-	B_TERTIARY_MOUSE_BUTTON = 0x04
+	B_PRIMARY_MOUSE_BUTTON		= 0x01,
+	B_SECONDARY_MOUSE_BUTTON	= 0x02,
+	B_TERTIARY_MOUSE_BUTTON		= 0x04
 };
 
 // mouse transit
@@ -35,19 +35,19 @@ enum {
 
 // event mask
 enum {
-	B_POINTER_EVENTS		= 0x00000001,
-	B_KEYBOARD_EVENTS		= 0x00000002
+	B_POINTER_EVENTS			= 0x00000001,
+	B_KEYBOARD_EVENTS			= 0x00000002
 };
 
 // event mask options
 enum {
-	B_LOCK_WINDOW_FOCUS		= 0x00000001,
-	B_SUSPEND_VIEW_FOCUS	= 0x00000002,
-	B_NO_POINTER_HISTORY	= 0x00000004,
+	B_LOCK_WINDOW_FOCUS			= 0x00000001,
+	B_SUSPEND_VIEW_FOCUS		= 0x00000002,
+	B_NO_POINTER_HISTORY		= 0x00000004,
 	// new in Haiku (unless this flag is
 	// specified, both BWindow and BView::GetMouse()
 	// will filter out older mouse moved messages)
-	B_FULL_POINTER_HISTORY	= 0x00000008
+	B_FULL_POINTER_HISTORY		= 0x00000008
 };
 
 enum {
@@ -57,16 +57,16 @@ enum {
 
 // set font mask
 enum {
-	B_FONT_FAMILY_AND_STYLE	= 0x00000001,
-	B_FONT_SIZE				= 0x00000002,
-	B_FONT_SHEAR			= 0x00000004,
-	B_FONT_ROTATION			= 0x00000008,
-	B_FONT_SPACING     		= 0x00000010,
-	B_FONT_ENCODING			= 0x00000020,
-	B_FONT_FACE				= 0x00000040,
-	B_FONT_FLAGS			= 0x00000080,
-	B_FONT_FALSE_BOLD_WIDTH	= 0x00000100,
-	B_FONT_ALL				= 0x000001FF
+	B_FONT_FAMILY_AND_STYLE		= 0x00000001,
+	B_FONT_SIZE					= 0x00000002,
+	B_FONT_SHEAR				= 0x00000004,
+	B_FONT_ROTATION				= 0x00000008,
+	B_FONT_SPACING     			= 0x00000010,
+	B_FONT_ENCODING				= 0x00000020,
+	B_FONT_FACE					= 0x00000040,
+	B_FONT_FLAGS				= 0x00000080,
+	B_FONT_FALSE_BOLD_WIDTH		= 0x00000100,
+	B_FONT_ALL					= 0x000001FF
 };
 
 // view flags
@@ -138,7 +138,7 @@ public:
 							BView(const char* name, uint32 flags,
 								BLayout* layout = NULL);
 							BView(BRect frame, const char* name,
-								  uint32 resizeMask, uint32 flags);
+								uint32 resizeMask, uint32 flags);
 	virtual					~BView();
 
 							BView(BMessage* data);
@@ -166,37 +166,30 @@ public:
 	virtual	void			Draw(BRect updateRect);
 	virtual	void			MouseDown(BPoint where);
 	virtual	void			MouseUp(BPoint where);
-	virtual	void			MouseMoved(BPoint where,
-									   uint32 code,
-									   const BMessage* a_message);
+	virtual	void			MouseMoved(BPoint where, uint32 code,
+								const BMessage* dragMessage);
 	virtual	void			WindowActivated(bool state);
 	virtual	void			KeyDown(const char* bytes, int32 numBytes);
 	virtual	void			KeyUp(const char* bytes, int32 numBytes);
 	virtual	void			Pulse();
-	virtual	void			FrameMoved(BPoint new_position);
-	virtual	void			FrameResized(float new_width, float new_height);
+	virtual	void			FrameMoved(BPoint newPosition);
+	virtual	void			FrameResized(float newWidth, float newHeight);
 
-	virtual	void			TargetedByScrollView(BScrollView* scroll_view);
+	virtual	void			TargetedByScrollView(BScrollView* scrollView);
 			void			BeginRectTracking(BRect startRect,
-											  uint32 style = B_TRACK_WHOLE_RECT);
+								uint32 style = B_TRACK_WHOLE_RECT);
 			void			EndRectTracking();
 
-			void			GetMouse(BPoint* location,
-									 uint32* buttons,
-									 bool checkMessageQueue = true);
+			void			GetMouse(BPoint* location, uint32* buttons,
+								bool checkMessageQueue = true);
 
-			void			DragMessage(BMessage* aMessage,
-										BRect dragRect,
-										BHandler* reply_to = NULL);
-			void			DragMessage(BMessage* aMessage,
-										BBitmap* anImage,
-										BPoint offset,
-										BHandler* reply_to = NULL);
-			void			DragMessage(BMessage* aMessage,
-										BBitmap* anImage,
-										drawing_mode dragMode,
-										BPoint offset,
-										BHandler* reply_to = NULL);
+			void			DragMessage(BMessage* message, BRect dragRect,
+								BHandler* replyTo = NULL);
+			void			DragMessage(BMessage* message, BBitmap* bitmap,
+								BPoint offset, BHandler* replyTo = NULL);
+			void			DragMessage(BMessage* message, BBitmap* bitmap,
+								drawing_mode dragMode, BPoint offset,
+								BHandler* replyTo = NULL);
 
 			BView*			FindView(const char* name) const;
 			BView*			Parent() const;
@@ -223,59 +216,65 @@ public:
 			void			GetClippingRegion(BRegion* region) const;
 	virtual	void			ConstrainClippingRegion(BRegion* region);
 			void			ClipToPicture(BPicture* picture,
-										  BPoint where = B_ORIGIN,
-										  bool sync = true);
+								BPoint where = B_ORIGIN, bool sync = true);
 			void			ClipToInversePicture(BPicture* picture,
-												 BPoint where = B_ORIGIN,
-												 bool sync = true);
+								BPoint where = B_ORIGIN, bool sync = true);
 
 	virtual	void			SetDrawingMode(drawing_mode mode);
 			drawing_mode 	DrawingMode() const;
 
 			void			SetBlendingMode(source_alpha srcAlpha,
-											alpha_function alphaFunc);
+								alpha_function alphaFunc);
 			void	 		GetBlendingMode(source_alpha* srcAlpha,
-											alpha_function* alphaFunc) const;
+								alpha_function* alphaFunc) const;
 
 	virtual	void			SetPenSize(float size);
 			float			PenSize() const;
 
-			void			SetViewCursor(const BCursor* cursor, bool sync=true);
+			void			SetViewCursor(const BCursor* cursor,
+								bool sync = true);
 
 	virtual	void			SetViewColor(rgb_color c);
-			void			SetViewColor(uchar r, uchar g, uchar b, uchar a = 255);
+			void			SetViewColor(uchar r, uchar g, uchar b,
+								uchar a = 255);
 			rgb_color		ViewColor() const;
 
 			void			SetViewBitmap(const BBitmap* bitmap,
-										  BRect srcRect, BRect dstRect,
-										  uint32 followFlags = B_FOLLOW_TOP|B_FOLLOW_LEFT,
-										  uint32 options = B_TILE_BITMAP);
+								BRect srcRect, BRect dstRect,
+								uint32 followFlags
+									= B_FOLLOW_TOP | B_FOLLOW_LEFT,
+								uint32 options = B_TILE_BITMAP);
 			void			SetViewBitmap(const BBitmap* bitmap,
-										  uint32 followFlags = B_FOLLOW_TOP|B_FOLLOW_LEFT,
-										  uint32 options = B_TILE_BITMAP);
+								uint32 followFlags
+									= B_FOLLOW_TOP | B_FOLLOW_LEFT,
+								uint32 options = B_TILE_BITMAP);
 			void			ClearViewBitmap();
 
 			status_t		SetViewOverlay(const BBitmap* overlay,
-										   BRect srcRect, BRect dstRect,
-										   rgb_color* colorKey,
-										   uint32 followFlags = B_FOLLOW_TOP|B_FOLLOW_LEFT,
-										   uint32 options = 0);
-			status_t		SetViewOverlay(const BBitmap* overlay, rgb_color* colorKey,
-										   uint32 followFlags = B_FOLLOW_TOP|B_FOLLOW_LEFT,
-										   uint32 options = 0);
+								BRect srcRect, BRect dstRect,
+								rgb_color* colorKey,
+								uint32 followFlags
+									= B_FOLLOW_TOP | B_FOLLOW_LEFT,
+								uint32 options = 0);
+			status_t		SetViewOverlay(const BBitmap* overlay,
+								rgb_color* colorKey,
+								uint32 followFlags
+									= B_FOLLOW_TOP | B_FOLLOW_LEFT,
+								uint32 options = 0);
 			void			ClearViewOverlay();
 
 	virtual	void			SetHighColor(rgb_color a_color);
-			void			SetHighColor(uchar r, uchar g, uchar b, uchar a = 255);
+			void			SetHighColor(uchar r, uchar g, uchar b,
+								uchar a = 255);
 			rgb_color		HighColor() const;
 
 	virtual	void			SetLowColor(rgb_color a_color);
-			void			SetLowColor(uchar r, uchar g, uchar b, uchar a = 255);
+			void			SetLowColor(uchar r, uchar g, uchar b,
+								uchar a = 255);
 			rgb_color		LowColor() const;
 
-			void			SetLineMode(cap_mode lineCap,
-										join_mode lineJoin,
-										float miterLimit = B_DEFAULT_MITER_LIMIT);
+			void			SetLineMode(cap_mode lineCap, join_mode lineJoin,
+								float miterLimit = B_DEFAULT_MITER_LIMIT);
 			join_mode		LineJoinMode() const;
 			cap_mode		LineCapMode() const;
 			float			LineMiterLimit() const;
@@ -291,151 +290,114 @@ public:
 			void			MovePenTo(float x, float y);
 			void			MovePenBy(float x, float y);
 			BPoint			PenLocation() const;
-			void			StrokeLine(BPoint toPt,
-									   pattern p = B_SOLID_HIGH);
-			void			StrokeLine(BPoint pt0,
-									   BPoint pt1,
-									   pattern p = B_SOLID_HIGH);
+			void			StrokeLine(BPoint toPt, pattern p = B_SOLID_HIGH);
+			void			StrokeLine(BPoint a, BPoint b,
+								pattern p = B_SOLID_HIGH);
 			void			BeginLineArray(int32 count);
-			void			AddLine(BPoint pt0, BPoint pt1, rgb_color col);
+			void			AddLine(BPoint a, BPoint b, rgb_color color);
 			void			EndLineArray();
 
-			void			StrokePolygon(const BPolygon* aPolygon,
-										  bool closed = true,
-										  pattern p = B_SOLID_HIGH);
-			void			StrokePolygon(const BPoint* ptArray,
-										  int32 numPts,
-										  bool closed = true,
-										  pattern p = B_SOLID_HIGH);
-			void			StrokePolygon(const BPoint* ptArray,
-										  int32 numPts,
-										  BRect bounds,
-										  bool closed = true,
-										  pattern p = B_SOLID_HIGH);
-			void			FillPolygon(const BPolygon* aPolygon,
-										pattern p = B_SOLID_HIGH);
-			void			FillPolygon(const BPoint* ptArray,
-										int32 numPts,
-										pattern p = B_SOLID_HIGH);
-			void			FillPolygon(const BPoint* ptArray,
-										int32 numPts,
-										BRect bounds,
-										pattern p = B_SOLID_HIGH);
+			void			StrokePolygon(const BPolygon* polygon,
+								bool closed = true, pattern p = B_SOLID_HIGH);
+			void			StrokePolygon(const BPoint* ptArray, int32 numPts,
+								bool closed = true, pattern p = B_SOLID_HIGH);
+			void			StrokePolygon(const BPoint* ptArray, int32 numPts,
+								BRect bounds, bool closed = true,
+								pattern p = B_SOLID_HIGH);
+			void			FillPolygon(const BPolygon* polygon,
+								pattern p = B_SOLID_HIGH);
+			void			FillPolygon(const BPoint* ptArray, int32 numPts,
+								pattern p = B_SOLID_HIGH);
+			void			FillPolygon(const BPoint* ptArray, int32 numPts,
+								BRect bounds, pattern p = B_SOLID_HIGH);
 
-			void			StrokeTriangle(BPoint pt1,
-										   BPoint pt2,
-										   BPoint pt3,
-										   BRect bounds,
-										   pattern p = B_SOLID_HIGH);
-			void			StrokeTriangle(BPoint pt1,
-										   BPoint pt2,
-										   BPoint pt3,
-										   pattern p = B_SOLID_HIGH);
-			void			FillTriangle(BPoint pt1,
-										 BPoint pt2,
-										 BPoint pt3,
-										 pattern p = B_SOLID_HIGH);
-			void			FillTriangle(BPoint pt1,
-										 BPoint pt2,
-										 BPoint pt3,
-										 BRect bounds,
-										 pattern p = B_SOLID_HIGH);
+			void			StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+								BRect bounds, pattern p = B_SOLID_HIGH);
+			void			StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+								pattern p = B_SOLID_HIGH);
+			void			FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+								pattern p = B_SOLID_HIGH);
+			void			FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+								BRect bounds, pattern p = B_SOLID_HIGH);
 
 			void			StrokeRect(BRect r, pattern p = B_SOLID_HIGH);
 			void			FillRect(BRect r, pattern p = B_SOLID_HIGH);
-			void			FillRegion(BRegion* a_region, pattern p= B_SOLID_HIGH);
+			void			FillRegion(BRegion* region,
+								pattern p = B_SOLID_HIGH);
 			void			InvertRect(BRect r);
 
-			void			StrokeRoundRect(BRect r,
-											float xRadius,
-											float yRadius,
-											pattern p = B_SOLID_HIGH);
-			void			FillRoundRect(BRect r,
-										  float xRadius,
-										  float yRadius,
-										  pattern p = B_SOLID_HIGH);
+			void			StrokeRoundRect(BRect r, float xRadius,
+								float yRadius, pattern p = B_SOLID_HIGH);
+			void			FillRoundRect(BRect r, float xRadius, float yRadius,
+								pattern p = B_SOLID_HIGH);
 
-			void			StrokeEllipse(BPoint center,
-										  float xRadius,
-										  float yRadius,
-										  pattern p = B_SOLID_HIGH);
+			void			StrokeEllipse(BPoint center, float xRadius,
+								float yRadius, pattern p = B_SOLID_HIGH);
 			void			StrokeEllipse(BRect r, pattern p = B_SOLID_HIGH);
-			void			FillEllipse(BPoint center,
-										float xRadius,
-										float yRadius,
-										pattern p = B_SOLID_HIGH);
+			void			FillEllipse(BPoint center, float xRadius,
+								float yRadius, pattern p = B_SOLID_HIGH);
 			void			FillEllipse(BRect r, pattern p = B_SOLID_HIGH);
 
-			void			StrokeArc(BPoint center,
-									  float xRadius,
-									  float yRadius,
-									  float start_angle,
-									  float arc_angle,
-									  pattern p = B_SOLID_HIGH);
-			void			StrokeArc(BRect r,
-									  float start_angle,
-									  float arc_angle,
-									  pattern p = B_SOLID_HIGH);
-			void			FillArc(BPoint center,
-									float xRadius,
-									float yRadius,
-									float start_angle,
-									float arc_angle,
-									pattern p = B_SOLID_HIGH);
-			void			FillArc(BRect r,
-									float start_angle,
-									float arc_angle,
-									pattern p = B_SOLID_HIGH);
+			void			StrokeArc(BPoint center, float xRadius,
+								float yRadius, float startAngle, float arcAngle,
+								pattern p = B_SOLID_HIGH);
+			void			StrokeArc(BRect r, float startAngle,
+								float arcAngle, pattern p = B_SOLID_HIGH);
+			void			FillArc(BPoint center, float xRadius, float yRadius,
+								float startAngle, float arcAngle,
+								pattern p = B_SOLID_HIGH);
+			void			FillArc(BRect r, float startAngle, float arcAngle,
+								pattern p = B_SOLID_HIGH);
 
 			void			StrokeBezier(BPoint* controlPoints,
-										 pattern p = B_SOLID_HIGH);
+								pattern p = B_SOLID_HIGH);
 			void			FillBezier(BPoint* controlPoints,
-									   pattern p = B_SOLID_HIGH);
+								pattern p = B_SOLID_HIGH);
 	
 			void			StrokeShape(BShape* shape,
-										pattern p = B_SOLID_HIGH);
-			void			FillShape(BShape* shape,
-									  pattern p = B_SOLID_HIGH);
+								pattern p = B_SOLID_HIGH);
+			void			FillShape(BShape* shape, pattern p = B_SOLID_HIGH);
 
 			void			CopyBits(BRect src, BRect dst);
+
 			void			DrawBitmapAsync(const BBitmap* aBitmap,
-											BRect srcRect,
-											BRect dstRect);
+								BRect bitmapRect, BRect viewRect);
+			void			DrawBitmapAsync(const BBitmap* aBitmap,
+								BRect viewRect);
+			void			DrawBitmapAsync(const BBitmap* aBitmap,
+								BPoint where);
 			void			DrawBitmapAsync(const BBitmap* aBitmap);
-			void			DrawBitmapAsync(const BBitmap* aBitmap, BPoint where);
-			void			DrawBitmapAsync(const BBitmap* aBitmap, BRect dstRect);
+
 			void			DrawBitmap(const BBitmap* aBitmap,
-									   BRect srcRect,
-									   BRect dstRect);
+								BRect bitmapRect, BRect viewRect);
+			void			DrawBitmap(const BBitmap* aBitmap,
+								BRect viewRect);
+			void			DrawBitmap(const BBitmap* aBitmap,
+								BPoint where);
 			void			DrawBitmap(const BBitmap* aBitmap);
-			void			DrawBitmap(const BBitmap* aBitmap, BPoint where);
-			void			DrawBitmap(const BBitmap* aBitmap, BRect dstRect);
 
 			void			DrawChar(char aChar);
 			void			DrawChar(char aChar, BPoint location);
 			void			DrawString(const char* aString,
-									   escapement_delta* delta = NULL);
+								escapement_delta* delta = NULL);
 			void			DrawString(const char* aString, BPoint location,
-									   escapement_delta* delta = NULL);
+								escapement_delta* delta = NULL);
 			void			DrawString(const char* aString, int32 length,
-									   escapement_delta* delta = NULL);
-			void			DrawString(const char* aString,
-									   int32 length,
-									   BPoint location,
-									   escapement_delta* delta = 0L);
+								escapement_delta* delta = NULL);
+			void			DrawString(const char* aString, int32 length,
+								BPoint location, escapement_delta* delta = 0L);
 
-	virtual void            SetFont(const BFont* font, uint32 mask = B_FONT_ALL);
+	virtual void            SetFont(const BFont* font,
+								uint32 mask = B_FONT_ALL);
 
 			void            GetFont(BFont* font) const;
-			void			TruncateString(BString* in_out,
-										   uint32 mode,
-										   float width) const;
+			void			TruncateString(BString* in_out, uint32 mode,
+								float width) const;
 			float			StringWidth(const char* string) const;
 			float			StringWidth(const char* string, int32 length) const;
 			void			GetStringWidths(char* stringArray[],
-											int32 lengthArray[],
-											int32 numStrings,
-											float widthArray[]) const;
+								int32 lengthArray[], int32 numStrings,
+								float widthArray[]) const;
 			void			SetFontSize(float size);
 			void			ForceFontAliasing(bool enable);
 			void			GetFontHeight(font_height* height) const;
@@ -451,16 +413,19 @@ public:
 			BPicture*		EndPicture();
 
 			void			DrawPicture(const BPicture* a_picture);
-			void			DrawPicture(const BPicture* a_picture, BPoint where);
-			void			DrawPicture(const char* filename, long offset, BPoint where);
+			void			DrawPicture(const BPicture* a_picture,
+								BPoint where);
+			void			DrawPicture(const char* filename, long offset,
+								BPoint where);
 			void			DrawPictureAsync(const BPicture* a_picture);
-			void			DrawPictureAsync(const BPicture* a_picture, BPoint where);
+			void			DrawPictureAsync(const BPicture* a_picture,
+								BPoint where);
 			void			DrawPictureAsync(const char* filename, long offset,
-											 BPoint where);
+								BPoint where);
 
-			status_t		SetEventMask(uint32 mask, uint32 options=0);
+			status_t		SetEventMask(uint32 mask, uint32 options = 0);
 			uint32			EventMask();
-			status_t		SetMouseEventMask(uint32 mask, uint32 options=0);
+			status_t		SetMouseEventMask(uint32 mask, uint32 options = 0);
 
 	virtual	void			SetFlags(uint32 flags);
 			uint32			Flags() const;
@@ -491,11 +456,9 @@ public:
 
 			BScrollBar*		ScrollBar(orientation posture) const;
 
-	virtual BHandler*		ResolveSpecifier(BMessage* msg,
-											 int32 index,
-											 BMessage* specifier,
-											 int32 form,
-											 const char* property);
+	virtual BHandler*		ResolveSpecifier(BMessage* msg, int32 index,
+								BMessage* specifier, int32 form,
+								const char* property);
 	virtual status_t		GetSupportedSuites(BMessage* data);
 
 			bool			IsPrinting() const;
@@ -595,10 +558,12 @@ private:
 								int32 deltaHeight);
 
 			void			_ConvertToScreen(BPoint* pt, bool checkLock) const;
-			void			_ConvertFromScreen(BPoint* pt, bool checkLock) const;
+			void			_ConvertFromScreen(BPoint* pt,
+								bool checkLock) const;
 
 			void			_ConvertToParent(BPoint* pt, bool checkLock) const;
-			void			_ConvertFromParent(BPoint* pt, bool checkLock) const;
+			void			_ConvertFromParent(BPoint* pt,
+								bool checkLock) const;
 
 
 			void			_Activate(bool state);
@@ -670,8 +635,10 @@ inline void
 BView::SetViewColor(uchar r, uchar g, uchar b, uchar a)
 {
 	rgb_color color;
-	color.red = r;		color.green = g;
-	color.blue = b;		color.alpha = a;
+	color.red = r;
+	color.green = g;
+	color.blue = b;
+	color.alpha = a;
 	SetViewColor(color);
 }
 
@@ -679,8 +646,10 @@ inline void
 BView::SetHighColor(uchar r, uchar g, uchar b, uchar a)
 {
 	rgb_color color;
-	color.red = r;		color.green = g;
-	color.blue = b;		color.alpha = a;
+	color.red = r;
+	color.green = g;
+	color.blue = b;
+	color.alpha = a;
 	SetHighColor(color);
 }
 
@@ -688,8 +657,10 @@ inline void
 BView::SetLowColor(uchar r, uchar g, uchar b, uchar a)
 {
 	rgb_color color;
-	color.red = r;		color.green = g;
-	color.blue = b;		color.alpha = a;
+	color.red = r;
+	color.green = g;
+	color.blue = b;
+	color.alpha = a;
 	SetLowColor(color);
 }
 

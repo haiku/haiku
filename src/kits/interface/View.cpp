@@ -2356,68 +2356,76 @@ BView::ConstrainClippingRegion(BRegion* region)
 
 
 void
-BView::DrawBitmapAsync(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
+BView::DrawBitmapAsync(const BBitmap* bitmap, BRect bitmapRect, BRect viewRect)
 {
-	if (!bitmap || !srcRect.IsValid() || !dstRect.IsValid())
+	if (bitmap == NULL || fOwner == NULL
+		|| !bitmapRect.IsValid() || !viewRect.IsValid())
 		return;
 
-	if (fOwner) {
-		_CheckLockAndSwitchCurrent();
+	_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_VIEW_DRAW_BITMAP);
-		fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
-		fOwner->fLink->Attach<BRect>(dstRect);
-		fOwner->fLink->Attach<BRect>(srcRect);
+	fOwner->fLink->StartMessage(AS_VIEW_DRAW_BITMAP);
+	fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
+	fOwner->fLink->Attach<BRect>(viewRect);
+	fOwner->fLink->Attach<BRect>(bitmapRect);
 
-		_FlushIfNotInTransaction();
-	}
+	_FlushIfNotInTransaction();
 }
 
 
 void
-BView::DrawBitmapAsync(const BBitmap *bitmap, BRect dstRect)
+BView::DrawBitmapAsync(const BBitmap* bitmap, BRect viewRect)
 {
-	DrawBitmapAsync(bitmap, bitmap->Bounds().OffsetToCopy(B_ORIGIN), dstRect);
+	DrawBitmapAsync(bitmap, bitmap->Bounds().OffsetToCopy(B_ORIGIN), viewRect);
 }
 
 
 void
-BView::DrawBitmapAsync(const BBitmap *bitmap)
+BView::DrawBitmapAsync(const BBitmap* bitmap)
 {
 	DrawBitmapAsync(bitmap, PenLocation());
 }
 
 
 void
-BView::DrawBitmapAsync(const BBitmap *bitmap, BPoint where)
+BView::DrawBitmapAsync(const BBitmap* bitmap, BPoint where)
 {
-	if (bitmap == NULL)
+	if (bitmap == NULL || fOwner == NULL)
 		return;
 
+	_CheckLockAndSwitchCurrent();
+
+	BRect bitmapRect = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
+	BRect viewRect = bitmapRect.OffsetToCopy(where);
+
+	fOwner->fLink->StartMessage(AS_VIEW_DRAW_BITMAP);
+	fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
+	fOwner->fLink->Attach<BRect>(viewRect);
+	fOwner->fLink->Attach<BRect>(bitmapRect);
+
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::DrawBitmap(const BBitmap* bitmap, BRect bitmapRect, BRect viewRect)
+{
 	if (fOwner) {
-		_CheckLockAndSwitchCurrent();
-
-		fOwner->fLink->StartMessage(AS_VIEW_DRAW_BITMAP);
-		fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
-		BRect src = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
-		BRect dst = src.OffsetToCopy(where);
-		fOwner->fLink->Attach<BRect>(dst);
-		fOwner->fLink->Attach<BRect>(src);
-
-		_FlushIfNotInTransaction();
+		DrawBitmapAsync(bitmap, bitmapRect, viewRect);
+		Sync();
 	}
 }
 
 
 void
-BView::DrawBitmap(const BBitmap *bitmap)
+BView::DrawBitmap(const BBitmap* bitmap, BRect viewRect)
 {
-	DrawBitmap(bitmap, PenLocation());
+	DrawBitmap(bitmap, bitmap->Bounds().OffsetToCopy(B_ORIGIN), viewRect);
 }
 
 
 void
-BView::DrawBitmap(const BBitmap *bitmap, BPoint where)
+BView::DrawBitmap(const BBitmap* bitmap, BPoint where)
 {
 	if (fOwner) {
 		DrawBitmapAsync(bitmap, where);
@@ -2427,19 +2435,9 @@ BView::DrawBitmap(const BBitmap *bitmap, BPoint where)
 
 
 void
-BView::DrawBitmap(const BBitmap *bitmap, BRect dstRect)
+BView::DrawBitmap(const BBitmap* bitmap)
 {
-	DrawBitmap(bitmap, bitmap->Bounds().OffsetToCopy(B_ORIGIN), dstRect);
-}
-
-
-void
-BView::DrawBitmap(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
-{
-	if (fOwner) {
-		DrawBitmapAsync(bitmap, srcRect, dstRect);
-		Sync();
-	}
+	DrawBitmap(bitmap, PenLocation());
 }
 
 
