@@ -207,9 +207,11 @@ AddSymlinkToHaikuImage beos system lib : libbnetapi.so : libnetapi.so ;
 BEOS_SYSTEM_LIBS_LIBGL_ALIASES
 	= libGLU.so libglut.so ;
 
+if $(TARGET_ARCH) = x86 {
 local lib ;
 for lib in $(BEOS_SYSTEM_LIBS_LIBGL_ALIASES) {
-	AddSymlinkToHaikuImage beos system lib : $(X86_ONLY)libGL.so : $(lib) ;
+	AddSymlinkToHaikuImage beos system lib : libGL.so : $(lib) ;
+}
 }
 
 # servers
