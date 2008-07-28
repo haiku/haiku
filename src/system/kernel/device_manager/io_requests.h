@@ -232,6 +232,8 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			off_t				Offset() const	{ return fOffset; }
 			size_t				Length() const	{ return fLength; }
 
+			void				SetOffset(off_t offset)	{ fOffset = offset; }
+
 			uint32				VecIndex() const	{ return fVecIndex; }
 			size_t				VecOffset() const	{ return fVecOffset; }
 
