@@ -167,13 +167,20 @@ BRegion::FrameInt() const
 }
 
 
+BRect
+BRegion::RectAt(int32 index)
+{
+	return const_cast<const BRegion*>(this)->RectAt(index);
+}
+
+
 /*! \brief Returns the regions's BRect at the given index.
 	\param index The index (zero based) of the wanted rectangle.
 	\return If the given index is valid, it returns the BRect at that index,
 		otherwise, it returns an invalid BRect.
 */
 BRect
-BRegion::RectAt(int32 index) /*const*/
+BRegion::RectAt(int32 index) const
 {
 	if (index >= 0 && index < fCount) {
 		const clipping_rect& r = fData[index];
@@ -185,13 +192,20 @@ BRegion::RectAt(int32 index) /*const*/
 }
 
 
+clipping_rect
+BRegion::RectAtInt(int32 index)
+{
+	return const_cast<const BRegion*>(this)->RectAtInt(index);
+}
+
+
 /*! \brief Returns the regions's clipping_rect at the given index.
 	\param index The index (zero based) of the wanted rectangle.
 	\return If the given index is valid, it returns the clipping_rect at that index,
 		otherwise, it returns an invalid clipping_rect.
 */
 clipping_rect
-BRegion::RectAtInt(int32 index) /*const*/
+BRegion::RectAtInt(int32 index) const
 {
 	if (index >= 0 && index < fCount) {
 		const clipping_rect& r = fData[index];
@@ -207,7 +221,17 @@ BRegion::RectAtInt(int32 index) /*const*/
 	\return An int32 which is the total number of rects in the region.
 */
 int32
-BRegion::CountRects() /*const*/
+BRegion::CountRects()
+{
+	return fCount;
+}
+
+
+/*!	\brief Counts the region rects.
+	\return An int32 which is the total number of rects in the region.
+*/
+int32
+BRegion::CountRects() const
 {
 	return fCount;
 }
@@ -261,7 +285,19 @@ BRegion::Contains(BPoint point) const
 	\return \ctrue if the region contains the point, \cfalse if not.
 */
 bool
-BRegion::Contains(int32 x, int32 y) /*const*/
+BRegion::Contains(int32 x, int32 y)
+{
+	return Support::XPointInRegion(this, x, y);
+}
+
+
+/*!	\brief Check if the region contains the given coordinates.
+	\param x The \cx coordinate of the point to be checked.
+	\param y The \cy coordinate of the point to be checked.
+	\return \ctrue if the region contains the point, \cfalse if not.
+*/
+bool
+BRegion::Contains(int32 x, int32 y) const
 {
 	return Support::XPointInRegion(this, x, y);
 }

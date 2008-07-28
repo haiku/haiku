@@ -31,7 +31,7 @@ class BRegion {
 								BRegion(const BRect rect);
 	virtual						~BRegion();	
 
-			BRegion			&operator=(const BRegion &from);
+			BRegion				&operator=(const BRegion &from);
 
 			void				Set(BRect newBounds);
 			void				Set(clipping_rect newBounds);
@@ -39,16 +39,20 @@ class BRegion {
 			BRect				Frame() const;
 			clipping_rect		FrameInt() const;
 
-			BRect				RectAt(int32 index) /*const*/;
-			clipping_rect		RectAtInt(int32 index) /*const*/;
+			BRect				RectAt(int32 index);
+			BRect				RectAt(int32 index) const;
+			clipping_rect		RectAtInt(int32 index);
+			clipping_rect		RectAtInt(int32 index) const;
 
-			int32				CountRects() /*const*/;
+			int32				CountRects();
+			int32				CountRects() const;
 
 			bool				Intersects(BRect rect) const;
 			bool				Intersects(clipping_rect rect) const;
 
 			bool				Contains(BPoint point) const;
-			bool				Contains(int32 x, int32 y) /*const*/;
+			bool				Contains(int32 x, int32 y);
+			bool				Contains(int32 x, int32 y) const;
 
 			void				PrintToStream() const;
 
