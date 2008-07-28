@@ -34,7 +34,8 @@ public:
 			bool				IsPhysical() const { return fPhysical; }
 			bool				IsUser() const { return fUser; }
 
-			void				SetVecs(const iovec* vecs, uint32 count,
+			void				SetVecs(size_t firstVecOffset,
+									const iovec* vecs, uint32 count,
 									size_t length, uint32 flags);
 
 			void				SetPhysical(bool physical)
@@ -81,13 +82,15 @@ public:
 									{ fParent = parent; }
 
 			status_t			Status() const { return fStatus; }
+
+			DoublyLinkedListLink<IORequestChunk>*
+									ListLink()	{ return &fListLink; }
+
+protected:
 			void				SetStatus(status_t status)
 									{ fStatus = status; }
 			void				ResetStatus()
 									{ fStatus = 1; }
-
-			DoublyLinkedListLink<IORequestChunk>*
-									ListLink()	{ return &fListLink; }
 
 protected:
 			IORequest*			fParent;
@@ -111,6 +114,9 @@ public:
 			void				SetOriginalRange(off_t offset, size_t length);
 									// also sets range
 			void				SetRange(off_t offset, size_t length);
+
+			void				SetStatus(status_t status)
+									{ IORequestChunk::SetStatus(status); }
 
 			off_t				Offset() const;
 			size_t				Length() const;
@@ -162,11 +168,15 @@ protected:
 			bool				fUsesBounceBuffer;
 };
 
+
 typedef IOOperation io_operation;
 typedef DoublyLinkedList<IOOperation> IOOperationList;
 
 typedef struct IORequest io_request;
-typedef status_t (*io_request_callback)(void* data, io_request* request);
+typedef status_t (*io_request_finished_callback)(void* data,
+			io_request* request, status_t status);
+typedef status_t (*io_request_iterate_callback)(void* data,
+			io_request* request);
 
 
 struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
@@ -176,14 +186,26 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			status_t			Init(off_t offset, void* buffer, size_t length,
 									bool write, uint32 flags);
 			status_t			Init(off_t offset, iovec* vecs, size_t count,
-									size_t length, bool write, uint32 flags);
+									size_t length, bool write, uint32 flags)
+									{ return Init(offset, 0, vecs, count,
+										length, write, flags); }
+			status_t			Init(off_t offset, size_t firstVecOffset,
+									iovec* vecs, size_t count, size_t length,
+									bool write, uint32 flags);
+
+			status_t			CreateSubRequest(off_t parentOffset,
+									off_t offset, size_t length,
+									IORequest*& subRequest);
+			void				DeleteSubRequests();
 
 			void				SetFinishedCallback(
-									io_request_callback callback,
+									io_request_finished_callback callback,
 									void* cookie);
 			void				SetIterationCallback(
-									io_request_callback callback,
+									io_request_iterate_callback callback,
 									void* cookie);
+			io_request_finished_callback FinishedCallback(
+									void** _cookie = NULL) const;
 
 			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
 
@@ -192,10 +214,11 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 										&& fPendingChildren == 0; }
 			void				NotifyFinished();
 			bool				HasCallbacks() const;
+			void				SetStatusAndNotify(status_t status);
 
 			void				OperationFinished(IOOperation* operation,
 									status_t status);
-			void				SubrequestFinished(IORequest* request,
+			void				SubRequestFinished(IORequest* request,
 									status_t status);
 
 			size_t				RemainingBytes() const
@@ -213,6 +236,9 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			size_t				VecOffset() const	{ return fVecOffset; }
 
 			void				Advance(size_t bySize);
+
+			IORequest*			FirstSubRequest();
+			IORequest*			NextSubRequest(IORequest* previous);
 
 			void				AddOperation(IOOperation* operation);
 			void				RemoveOperation(IOOperation* operation);
@@ -243,9 +269,9 @@ private:
 			team_id				fTeam;
 			bool				fIsWrite;
 
-			io_request_callback	fFinishedCallback;
+			io_request_finished_callback	fFinishedCallback;
 			void*				fFinishedCookie;
-			io_request_callback	fIterationCallback;
+			io_request_iterate_callback	fIterationCallback;
 			void*				fIterationCookie;
 			ConditionVariable	fFinishedCondition;
 

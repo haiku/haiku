@@ -66,9 +66,15 @@ IOBuffer::Create(size_t count)
 
 
 void
-IOBuffer::SetVecs(const iovec* vecs, uint32 count, size_t length, uint32 flags)
+IOBuffer::SetVecs(size_t firstVecOffset, const iovec* vecs, uint32 count,
+	size_t length, uint32 flags)
 {
 	memcpy(fVecs, vecs, sizeof(iovec) * count);
+	if (count > 0 && firstVecOffset > 0) {
+		fVecs[0].iov_base = (uint8*)fVecs[0].iov_base + firstVecOffset;
+		fVecs[0].iov_len -= firstVecOffset;
+	}
+
 	fVecCount = count;
 	fLength = length;
 	fUser = IS_USER_ADDRESS(vecs[0].iov_base);
@@ -499,6 +505,7 @@ IORequest::IORequest()
 IORequest::~IORequest()
 {
 	mutex_lock(&fLock);
+	DeleteSubRequests();
 	mutex_destroy(&fLock);
 }
 
@@ -515,14 +522,14 @@ IORequest::Init(off_t offset, void* buffer, size_t length, bool write,
 
 
 status_t
-IORequest::Init(off_t offset, iovec* vecs, size_t count, size_t length,
-	bool write, uint32 flags)
+IORequest::Init(off_t offset, size_t firstVecOffset, iovec* vecs, size_t count,
+	size_t length, bool write, uint32 flags)
 {
 	fBuffer = IOBuffer::Create(count);
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
 
-	fBuffer->SetVecs(vecs, count, length, flags);
+	fBuffer->SetVecs(firstVecOffset, vecs, count, length, flags);
 
 	fOffset = offset;
 	fLength = length;
@@ -543,8 +550,72 @@ IORequest::Init(off_t offset, iovec* vecs, size_t count, size_t length,
 }
 
 
+status_t
+IORequest::CreateSubRequest(off_t parentOffset, off_t offset, size_t length,
+	IORequest*& _subRequest)
+{
+	ASSERT(parentOffset >= fOffset && length <= fLength
+		&& parentOffset - fOffset <= fLength - length);
+
+	// find start vec
+	size_t vecOffset = parentOffset - fOffset;
+	iovec* vecs = fBuffer->Vecs();
+	int32 vecCount = fBuffer->VecCount();
+	int32 startVec = 0;
+	for (; startVec < vecCount; startVec++) {
+		const iovec& vec = vecs[startVec];
+		if (vecOffset < vec.iov_len)
+			break;
+
+		vecOffset -= vec.iov_len;
+	}
+
+	// count vecs
+	size_t currentVecOffset = vecOffset;
+	int32 endVec = startVec;
+	size_t remainingLength = length;
+	for (; endVec < vecCount; endVec++) {
+		const iovec& vec = vecs[endVec];
+		if (vec.iov_len - currentVecOffset >= remainingLength)
+			break;
+
+		remainingLength -= vec.iov_len - currentVecOffset;
+		currentVecOffset = 0;
+	}
+
+	// create subrequest
+	IORequest* subRequest = new(std::nothrow) IORequest;
+		// TODO: Heed B_VIP_IO_REQUEST!
+	if (subRequest == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = subRequest->Init(offset, vecOffset, vecs + startVec,
+		endVec - startVec + 1, length, fIsWrite, fFlags);
+	if (error != B_OK) {
+		delete subRequest;
+		return error;
+	}
+
+	MutexLocker _(fLock);
+
+	fChildren.Add(subRequest);
+	fPendingChildren++;
+
+	return B_OK;
+}
+
+
 void
-IORequest::SetFinishedCallback(io_request_callback callback, void* cookie)
+IORequest::DeleteSubRequests()
+{
+	while (IORequestChunk* chunk = fChildren.RemoveHead())
+		delete chunk;
+}
+
+
+void
+IORequest::SetFinishedCallback(io_request_finished_callback callback,
+	void* cookie)
 {
 	fFinishedCallback = callback;
 	fFinishedCookie = cookie;
@@ -552,10 +623,20 @@ IORequest::SetFinishedCallback(io_request_callback callback, void* cookie)
 
 
 void
-IORequest::SetIterationCallback(io_request_callback callback, void* cookie)
+IORequest::SetIterationCallback(io_request_iterate_callback callback,
+	void* cookie)
 {
 	fIterationCallback = callback;
 	fIterationCookie = cookie;
+}
+
+
+io_request_finished_callback
+IORequest::FinishedCallback(void** _cookie) const
+{
+	if (_cookie != NULL)
+		*_cookie = fFinishedCookie;
+	return fFinishedCallback;
 }
 
 
@@ -591,31 +672,39 @@ IORequest::NotifyFinished()
 		// The request is not really done yet. If it has an iteration callback,
 		// call it.
 		if (fIterationCallback != NULL) {
+			ResetStatus();
 			locker.Unlock();
-			fIterationCallback(fIterationCookie, this);
+			status_t error = fIterationCallback(fIterationCookie, this);
+			if (error == B_OK)
+				return;
+
+			// Iteration failed, which means we're responsible for notifying the
+			// requests finished.
+			locker.Lock();
+			fStatus = error;
 		}
-	} else {
-		// Cache the callbacks before we unblock waiters and unlock. Any of the
-		// following could delete this request, so we don't want to touch it
-		// once we have started telling others that it is done.
-		IORequest* parent = fParent;
-		io_request_callback finishedCallback = fFinishedCallback;
-		void* finishedCookie = fFinishedCookie;
-		status_t status = fStatus;
-
-		// unblock waiters
-		fFinishedCondition.NotifyAll();
-
-		locker.Unlock();
-
-		// notify callback
-		if (finishedCallback != NULL)
-			finishedCallback(finishedCookie, this);
-
-		// notify parent
-		if (parent != NULL)
-			parent->SubrequestFinished(this, status);
 	}
+
+	// Cache the callbacks before we unblock waiters and unlock. Any of the
+	// following could delete this request, so we don't want to touch it
+	// once we have started telling others that it is done.
+	IORequest* parent = fParent;
+	io_request_finished_callback finishedCallback = fFinishedCallback;
+	void* finishedCookie = fFinishedCookie;
+	status_t status = fStatus;
+
+	// unblock waiters
+	fFinishedCondition.NotifyAll();
+
+	locker.Unlock();
+
+	// notify callback
+	if (finishedCallback != NULL)
+		finishedCallback(finishedCookie, this, status);
+
+	// notify parent
+	if (parent != NULL)
+		parent->SubRequestFinished(this, status);
 }
 
 
@@ -630,6 +719,22 @@ IORequest::HasCallbacks() const
 		return true;
 
 	return fParent != NULL && fParent->HasCallbacks();
+}
+
+
+void
+IORequest::SetStatusAndNotify(status_t status)
+{
+	MutexLocker locker(fLock);
+
+	if (fStatus != 1)
+		return;
+
+	fStatus = status;
+
+	locker.Unlock();
+
+	NotifyFinished();
 }
 
 
@@ -665,7 +770,7 @@ IORequest::OperationFinished(IOOperation* operation, status_t status)
 
 
 void
-IORequest::SubrequestFinished(IORequest* request, status_t status)
+IORequest::SubRequestFinished(IORequest* request, status_t status)
 {
 	TRACE("IORequest::SubrequestFinished(%p, %#lx): request: %p\n", request,
 		status, this);
@@ -705,6 +810,22 @@ IORequest::Advance(size_t bySize)
 	}
 
 	fVecOffset += bySize;
+}
+
+
+IORequest*
+IORequest::FirstSubRequest()
+{
+	return dynamic_cast<IORequest*>(fChildren.Head());
+}
+
+
+IORequest*
+IORequest::NextSubRequest(IORequest* previous)
+{
+	if (previous == NULL)
+		return NULL;
+	return dynamic_cast<IORequest*>(fChildren.GetNext(previous));
 }
 
 
@@ -818,13 +939,16 @@ IORequest::_CopyPhysical(void* _bounceBuffer, void* _external, size_t size,
 	addr_t external = (addr_t)_external;
 
 	while (size > 0) {
+		addr_t pageOffset = external % B_PAGE_SIZE;
 		addr_t virtualAddress;
-		status_t error = vm_get_physical_page(external, &virtualAddress, 0);
+		status_t error = vm_get_physical_page(external - pageOffset,
+			&virtualAddress, 0);
 		if (error != B_OK)
 			return error;
 
-		size_t toCopy = min_c(size, B_PAGE_SIZE);
-		_CopySimple(bounceBuffer, (void*)virtualAddress, toCopy, team, copyIn);
+		size_t toCopy = min_c(size, B_PAGE_SIZE - pageOffset);
+		_CopySimple(bounceBuffer, (void*)(virtualAddress + pageOffset), toCopy,
+			team, copyIn);
 
 		vm_put_physical_page(virtualAddress);
 
