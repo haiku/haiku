@@ -1607,7 +1607,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 	};
 
 //#define FILTER_INFOS_ON_HEAP
-#if FILTER_INFOS_ON_HEAP
+#ifdef FILTER_INFOS_ON_HEAP
 	FilterInfo* xWeights = new (nothrow) FilterInfo[dstWidth];
 	FilterInfo* yWeights = new (nothrow) FilterInfo[dstHeight];
 	if (xWeights == NULL || yWeights == NULL) {
@@ -1771,7 +1771,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 		}
 	} while (fBaseRenderer.next_clip_box());
 
-#if FILTER_INFOS_ON_HEAP
+#ifdef FILTER_INFOS_ON_HEAP
 	delete[] xWeights;
 	delete[] yWeights;
 #endif
