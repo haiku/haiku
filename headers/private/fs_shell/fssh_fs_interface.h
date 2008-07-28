@@ -328,6 +328,14 @@ typedef struct fssh_file_system_module_info {
 
 
 /* file system add-ons only prototypes */
+
+// callbacks for do_iterative_fd_io()
+typedef fssh_status_t (*fssh_iterative_io_get_vecs)(void *cookie,
+				fssh_io_request* request, fssh_off_t offset, fssh_size_t size,
+				struct fssh_file_io_vec *vecs, fssh_size_t *_count);
+typedef fssh_status_t (*fssh_iterative_io_finished)(void* cookie,
+				fssh_io_request* request, fssh_status_t status);
+
 extern fssh_status_t fssh_new_vnode(fssh_fs_volume *volume,
 				fssh_vnode_id vnodeID, void *privateNode,
 				fssh_fs_vnode_ops *ops);
@@ -344,6 +352,8 @@ extern fssh_status_t fssh_unremove_vnode(fssh_fs_volume *volume,
 				fssh_vnode_id vnodeID);
 extern fssh_status_t fssh_get_vnode_removed(fssh_fs_volume *volume,
 				fssh_vnode_id vnodeID, bool* removed);
+extern fssh_fs_volume* fssh_volume_for_vnode(fssh_fs_vnode *vnode);
+
 
 extern fssh_status_t fssh_read_pages(int fd, fssh_off_t pos,
 				const struct fssh_iovec *vecs, fssh_size_t count,
@@ -361,6 +371,10 @@ extern fssh_status_t fssh_write_file_io_vec_pages(int fd,
 				fssh_size_t fileVecCount, const struct fssh_iovec *vecs,
 				fssh_size_t vecCount, uint32_t *_vecIndex,
 				fssh_size_t *_vecOffset, fssh_size_t *_bytes);
+extern fssh_status_t fssh_do_fd_io(int fd, fssh_io_request *request);
+extern fssh_status_t fssh_do_iterative_fd_io(int fd, fssh_io_request *request,
+				fssh_iterative_io_get_vecs getVecs,
+				fssh_iterative_io_finished finished, void *cookie);
 
 extern fssh_status_t fssh_notify_entry_created(fssh_mount_id device,
 				fssh_vnode_id directory, const char *name, fssh_vnode_id node);

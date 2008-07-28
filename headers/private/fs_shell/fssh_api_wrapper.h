@@ -871,6 +871,10 @@
 #define mount_id	fssh_mount_id
 #define vnode_id	fssh_vnode_id
 
+// TODO: These two don't belong here!
+#define IORequest	FSSHIORequest
+#define io_request	fssh_io_request
+
 /* additional flags passed to write_stat() */
 #define B_STAT_SIZE_INSECURE	FSSH_B_STAT_SIZE_INSECURE
 
@@ -893,6 +897,9 @@
 
 
 /* file system add-ons only prototypes */
+#define iterative_io_get_vecs		fssh_iterative_io_get_vecs
+#define iterative_io_finished		fssh_iterative_io_finished
+
 #define new_vnode 					fssh_new_vnode
 #define publish_vnode				fssh_publish_vnode
 #define get_vnode					fssh_get_vnode
@@ -900,10 +907,13 @@
 #define remove_vnode				fssh_remove_vnode
 #define unremove_vnode				fssh_unremove_vnode
 #define get_vnode_removed			fssh_get_vnode_removed
+#define volume_for_vnode			fssh_volume_for_vnode
 #define read_pages					fssh_read_pages
 #define write_pages					fssh_write_pages
 #define read_file_io_vec_pages		fssh_read_file_io_vec_pages
 #define write_file_io_vec_pages		fssh_write_file_io_vec_pages
+#define do_fd_io					fssh_do_fd_io
+#define do_iterative_fd_io			fssh_do_iterative_fd_io
 
 #define notify_entry_created		fssh_notify_entry_created
 #define notify_entry_removed		fssh_notify_entry_removed

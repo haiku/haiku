@@ -2105,6 +2105,17 @@ fssh_get_vnode_removed(fssh_fs_volume *volume, fssh_vnode_id vnodeID, bool* remo
 }
 
 
+extern "C" fssh_fs_volume*
+fssh_volume_for_vnode(fssh_fs_vnode *_vnode)
+{
+	if (_vnode == NULL)
+		return NULL;
+
+	struct vnode* vnode = static_cast<struct vnode*>(_vnode);
+	return vnode->mount->volume;
+}
+
+
 //! Works directly on the host's file system
 extern "C" fssh_status_t
 fssh_read_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
@@ -5650,3 +5661,6 @@ _kern_open_query(fssh_dev_t device, const char *query, fssh_size_t queryLength,
 
 
 }	// namespace FSShell
+
+
+#include "vfs_request_io.cpp"
