@@ -1606,8 +1606,21 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 		uint16 weight;	// weight of the pixel at index [0..255]
 	};
 
+//#define FILTER_INFOS_ON_HEAP
+#if FILTER_INFOS_ON_HEAP
+	FilterInfo* xWeights = new (nothrow) FilterInfo[dstWidth];
+	FilterInfo* yWeights = new (nothrow) FilterInfo[dstHeight];
+	if (xWeights == NULL || yWeights == NULL) {
+		delete[] xWeights;
+		delete[] yWeights;
+		return;
+	}
+#else
+	// stack based saves about 200µs on 1.85 GHz Core 2 Duo
+	// don't know if it could be a problem though with stack overflow
 	FilterInfo xWeights[dstWidth];
 	FilterInfo yWeights[dstHeight];
+#endif
 
 	// Extract the cropping information for the source bitmap,
 	// If only a part of the source bitmap is to be drawn with scale,
@@ -1648,12 +1661,16 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 		// handle cropped source bitmap
 		yWeights[i].index += yBitmapShift;
 	}
-//printf("X: %d/%d ... %d/%d, %d/%d\n", xWeights[0].index, xWeights[0].weight,
+//printf("X: %d/%d ... %d/%d, %d/%d (%ld)\n",
+//	xWeights[0].index, xWeights[0].weight,
 //	xWeights[dstWidth - 2].index, xWeights[dstWidth - 2].weight,
-//	xWeights[dstWidth - 1].index, xWeights[dstWidth - 1].weight);
-//printf("Y: %d/%d ... %d/%d, %d/%d\n", yWeights[0].index, yWeights[0].weight,
+//	xWeights[dstWidth - 1].index, xWeights[dstWidth - 1].weight,
+//	dstWidth);
+//printf("Y: %d/%d ... %d/%d, %d/%d (%ld)\n",
+//	yWeights[0].index, yWeights[0].weight,
 //	yWeights[dstHeight - 2].index, yWeights[dstHeight - 2].weight,
-//	yWeights[dstHeight - 1].index, yWeights[dstHeight - 1].weight);
+//	yWeights[dstHeight - 1].index, yWeights[dstHeight - 1].weight,
+//	dstHeight);
 
 	int32 left = (int32)viewRect.left;
 	int32 top = (int32)viewRect.top;
@@ -1686,6 +1703,9 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 		y1 -= (int32)yOffset;
 		y2 -= (int32)yOffset;
 
+//printf("x: %ld - %ld\n", xIndexL, xIndexR);
+//printf("y: %ld - %ld\n", y1, y2);
+
 		for (; y1 <= y2; y1++) {
 			// cache the weight of the top and bottom row
 			uint16 wTop = yWeights[y1].weight;
@@ -1717,30 +1737,44 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 						d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
 					}
 				} else {
-					// calculate the weighted sum of all four interpolated
-					// pixels
-					uint16 wLeft = xWeights[x].weight;
-					uint16 wRight = 255 - xWeights[x].weight;
-					// left and right of top row
-					uint32 t0 = (s[0] * wLeft + s[4] * wRight) * wTop;
-					uint32 t1 = (s[1] * wLeft + s[5] * wRight) * wTop;
-					uint32 t2 = (s[2] * wLeft + s[6] * wRight) * wTop;
+					if (xWeights[x].weight == 255) {
+						// Prevent out of bounds access on the right edge
+						// or simply speed up.
+						const uint8* sBottom = s + srcBPR;
+						d[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
+						d[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
+						d[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
+					} else {
+						// calculate the weighted sum of all four interpolated
+						// pixels
+						uint16 wLeft = xWeights[x].weight;
+						uint16 wRight = 255 - xWeights[x].weight;
+						// left and right of top row
+						uint32 t0 = (s[0] * wLeft + s[4] * wRight) * wTop;
+						uint32 t1 = (s[1] * wLeft + s[5] * wRight) * wTop;
+						uint32 t2 = (s[2] * wLeft + s[6] * wRight) * wTop;
+		
+						// left and right of bottom row
+						s += srcBPR;
+						t0 += (s[0] * wLeft + s[4] * wRight) * wBottom;
+						t1 += (s[1] * wLeft + s[5] * wRight) * wBottom;
+						t2 += (s[2] * wLeft + s[6] * wRight) * wBottom;
 	
-					// left and right of bottom row
-					s += srcBPR;
-					t0 += (s[0] * wLeft + s[4] * wRight) * wBottom;
-					t1 += (s[1] * wLeft + s[5] * wRight) * wBottom;
-					t2 += (s[2] * wLeft + s[6] * wRight) * wBottom;
-
-					d[0] = t0 >> 16;
-					d[1] = t1 >> 16;
-					d[2] = t2 >> 16;
+						d[0] = t0 >> 16;
+						d[1] = t1 >> 16;
+						d[2] = t2 >> 16;
+					}
 				}
 				d += 4;
 			}
 			dst += dstBPR;
 		}
 	} while (fBaseRenderer.next_clip_box());
+
+#if FILTER_INFOS_ON_HEAP
+	delete[] xWeights;
+	delete[] yWeights;
+#endif
 //printf("draw bitmap %.5fx%.5f: %lld\n", xScale, yScale, system_time() - now);
 }
 
