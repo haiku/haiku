@@ -9,15 +9,16 @@
 
 
 #include "ServerBitmap.h"
-#include "ClientMemoryAllocator.h"
-#include "ColorConversion.h"
-#include "HWInterface.h"
-#include "Overlay.h"
 
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "ClientMemoryAllocator.h"
+#include "ColorConversion.h"
+#include "HWInterface.h"
+#include "Overlay.h"
 
 using std::nothrow;
 
