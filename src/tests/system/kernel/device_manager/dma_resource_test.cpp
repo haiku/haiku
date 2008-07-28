@@ -584,6 +584,8 @@ Test::Run(DMAResource& resource)
 			}
 		}
 
+		request.OperationFinished(&operation, operation.Status());
+
 		resultIndex++;
 	}
 
