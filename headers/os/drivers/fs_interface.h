@@ -313,6 +313,7 @@ extern status_t remove_vnode(fs_volume *volume, ino_t vnodeID);
 extern status_t unremove_vnode(fs_volume *volume, ino_t vnodeID);
 extern status_t get_vnode_removed(fs_volume *volume, ino_t vnodeID,
 					bool *removed);
+extern fs_volume* volume_for_vnode(fs_vnode *vnode);
 
 extern status_t read_pages(int fd, off_t pos, const struct iovec *vecs,
 					size_t count, size_t *_numBytes);

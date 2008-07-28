@@ -3280,6 +3280,17 @@ get_vnode_removed(fs_volume *volume, ino_t vnodeID, bool* removed)
 }
 
 
+extern "C" fs_volume*
+volume_for_vnode(fs_vnode *_vnode)
+{
+	if (_vnode == NULL)
+		return NULL;
+
+	struct vnode* vnode = static_cast<struct vnode*>(_vnode);
+	return vnode->mount->volume;
+}
+
+
 extern "C" status_t
 read_pages(int fd, off_t pos, const iovec *vecs, size_t count,
 	size_t *_numBytes)
