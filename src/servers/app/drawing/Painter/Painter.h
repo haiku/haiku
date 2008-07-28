@@ -189,7 +189,8 @@ class Painter {
 								// bitmaps
 			BRect				DrawBitmap(		const ServerBitmap* bitmap,
 												BRect bitmapRect,
-												BRect viewRect) const;
+												BRect viewRect,
+												uint32 options) const;
 
 								// some convenience stuff
 			BRect				FillRegion(		const BRegion* region) const;

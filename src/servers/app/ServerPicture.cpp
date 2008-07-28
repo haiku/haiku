@@ -411,10 +411,10 @@ draw_string(View *view, const char *string, float deltaSpace,
 
 static void
 draw_pixels(View *view, BRect src, BRect dest, int32 width, int32 height,
-	int32 bytesPerRow, int32 pixelFormat, int32 flags, const void *data)
+	int32 bytesPerRow, int32 pixelFormat, int32 options, const void *data)
 {
 	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1),
-		(color_space)pixelFormat, flags, bytesPerRow);
+		(color_space)pixelFormat, 0, bytesPerRow);
 	
 	if (!bitmap.IsValid())
 		return;
@@ -423,7 +423,8 @@ draw_pixels(View *view, BRect src, BRect dest, int32 width, int32 height,
 
 	view->ConvertToScreenForDrawing(&dest);
 	
-	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest);
+	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest,
+		options);
 }
 
 

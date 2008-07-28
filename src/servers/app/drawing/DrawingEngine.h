@@ -93,18 +93,19 @@ public:
 
 			void			InvertRect(BRect r);
 
-			void			DrawBitmap(ServerBitmap *bitmap,
-								const BRect &source, const BRect &dest);
+			void			DrawBitmap(ServerBitmap* bitmap,
+								const BRect& bitmapRect, const BRect& viewRect,
+								uint32 options = 0);
 			// drawing primitives
 
-			void			DrawArc(BRect r, const float &angle,
-								const float &span, bool filled);
+			void			DrawArc(BRect r, const float& angle,
+								const float& span, bool filled);
 
-			void			DrawBezier(BPoint *pts, bool filled);
+			void			DrawBezier(BPoint* pts, bool filled);
 
 			void			DrawEllipse(BRect r, bool filled);
 
-			void			DrawPolygon(BPoint *ptlist, int32 numpts,
+			void			DrawPolygon(BPoint* ptlist, int32 numpts,
 								BRect bounds, bool filled, bool closed);
 
 			// these rgb_color versions are used internally by the server

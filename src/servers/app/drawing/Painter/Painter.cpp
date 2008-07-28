@@ -37,6 +37,8 @@
 #include "DrawState.h"
 
 #include <AutoDeleter.h>
+#include <View.h>
+
 #include "DrawingMode.h"
 #include "PatternHandler.h"
 #include "RenderingBuffer.h"
@@ -951,8 +953,8 @@ Painter::DrawEllipse(BRect r, bool fill) const
 
 // StrokeArc
 BRect
-Painter::StrokeArc(BPoint center, float xRadius, float yRadius,
-				   float angle, float span) const
+Painter::StrokeArc(BPoint center, float xRadius, float yRadius, float angle,
+	float span) const
 {
 	CHECK_CLIPPING
 
@@ -971,8 +973,8 @@ Painter::StrokeArc(BPoint center, float xRadius, float yRadius,
 
 // FillArc
 BRect
-Painter::FillArc(BPoint center, float xRadius, float yRadius,
-				 float angle, float span) const
+Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
+	float span) const
 {
 	CHECK_CLIPPING
 
@@ -1009,9 +1011,8 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 
 // DrawString
 BRect
-Painter::DrawString(const char* utf8String, uint32 length,
-					BPoint baseLine, const escapement_delta* delta,
-					FontCacheReference* cacheReference)
+Painter::DrawString(const char* utf8String, uint32 length, BPoint baseLine,
+	const escapement_delta* delta, FontCacheReference* cacheReference)
 {
 	CHECK_CLIPPING
 
@@ -1038,10 +1039,9 @@ Painter::DrawString(const char* utf8String, uint32 length,
 
 // BoundingBox
 BRect
-Painter::BoundingBox(const char* utf8String, uint32 length,
-					 BPoint baseLine, BPoint* penLocation,
-					 const escapement_delta* delta,
-					 FontCacheReference* cacheReference) const
+Painter::BoundingBox(const char* utf8String, uint32 length, BPoint baseLine,
+	BPoint* penLocation, const escapement_delta* delta,
+	FontCacheReference* cacheReference) const
 {
 	if (!fSubpixelPrecise) {
 		baseLine.x = roundf(baseLine.x);
@@ -1065,8 +1065,8 @@ Painter::StringWidth(const char* utf8String, uint32 length,
 
 // DrawBitmap
 BRect
-Painter::DrawBitmap(const ServerBitmap* bitmap,
-					BRect bitmapRect, BRect viewRect) const
+Painter::DrawBitmap(const ServerBitmap* bitmap, BRect bitmapRect,
+	BRect viewRect, uint32 options) const
 {
 	CHECK_CLIPPING
 
@@ -1087,13 +1087,11 @@ Painter::DrawBitmap(const ServerBitmap* bitmap,
 			viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
 
 		agg::rendering_buffer srcBuffer;
-		srcBuffer.attach(bitmap->Bits(),
-						 bitmap->Width(),
-						 bitmap->Height(),
-						 bitmap->BytesPerRow());
+		srcBuffer.attach(bitmap->Bits(), bitmap->Width(), bitmap->Height(),
+			bitmap->BytesPerRow());
 
 		_DrawBitmap(srcBuffer, bitmap->ColorSpace(), actualBitmapRect,
-			bitmapRect, viewRect, bitmap->Flags());
+			bitmapRect, viewRect, options);
 	}
 	return touched;
 }
@@ -1351,7 +1349,7 @@ Painter::_TransparentMagicToAlpha(sourcePixel* buffer, uint32 width,
 void
 Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	BRect actualBitmapRect, BRect bitmapRect, BRect viewRect,
-	uint32 bitmapFlags) const
+	uint32 options) const
 {
 	if (!fValidClipping
 		|| !bitmapRect.IsValid() || !bitmapRect.Intersects(actualBitmapRect)
@@ -1513,7 +1511,7 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 		}
 	}
 
-	if (fDrawingMode == B_OP_COPY && (bitmapFlags & B_BITMAP_SCALE_BILINEAR)) {
+	if (fDrawingMode == B_OP_COPY && (options & B_FILTER_BITMAP_BILINEAR)) {
 		_DrawBitmapBilinearCopy32(srcBuffer, xOffset, yOffset, xScale, yScale,
 			viewRect);
 		return;
@@ -1521,7 +1519,7 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 
 	// for all other cases (non-optimized drawing mode or scaled drawing)
 	_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset, xScale, yScale, viewRect,
-		bitmapFlags);
+		options);
 }
 
 #define DEBUG_DRAW_BITMAP 0
@@ -1530,9 +1528,8 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 template <class F>
 void
 Painter::_DrawBitmapNoScale32(F copyRowFunction, uint32 bytesPerSourcePixel,
-							  agg::rendering_buffer& srcBuffer,
-							  int32 xOffset, int32 yOffset,
-							  BRect viewRect) const
+	agg::rendering_buffer& srcBuffer, int32 xOffset, int32 yOffset,
+	BRect viewRect) const
 {
 	// NOTE: this would crash if viewRect was large enough to read outside the
 	// bitmap, so make sure this is not the case before calling this function!
@@ -1672,19 +1669,19 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 //	yWeights[dstHeight - 1].index, yWeights[dstHeight - 1].weight,
 //	dstHeight);
 
-	int32 left = (int32)viewRect.left;
-	int32 top = (int32)viewRect.top;
-	int32 right = (int32)viewRect.right;
-	int32 bottom = (int32)viewRect.bottom;
+	const int32 left = (int32)viewRect.left;
+	const int32 top = (int32)viewRect.top;
+	const int32 right = (int32)viewRect.right;
+	const int32 bottom = (int32)viewRect.bottom;
 
-	uint32 dstBPR = fBuffer.stride();
-	uint32 srcBPR = srcBuffer.stride();
+	const uint32 dstBPR = fBuffer.stride();
+	const uint32 srcBPR = srcBuffer.stride();
 
 	// iterate over clipping boxes
 	fBaseRenderer.first_clip_box();
 	do {
-		int32 x1 = max_c(fBaseRenderer.xmin(), left);
-		int32 x2 = min_c(fBaseRenderer.xmax(), right);
+		const int32 x1 = max_c(fBaseRenderer.xmin(), left);
+		const int32 x2 = min_c(fBaseRenderer.xmax(), right);
 		if (x1 > x2)
 			continue;
 
@@ -1698,8 +1695,8 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 
 		// x and y are needed as indeces into the wheight arrays, so the
 		// offset into the target buffer needs to be compensated
-		int32 xIndexL = x1 - (int32)xOffset;
-		int32 xIndexR = x2 - (int32)xOffset;
+		const int32 xIndexL = x1 - (int32)xOffset;
+		const int32 xIndexR = x2 - (int32)xOffset;
 		y1 -= (int32)yOffset;
 		y2 -= (int32)yOffset;
 
@@ -1708,13 +1705,13 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 
 		for (; y1 <= y2; y1++) {
 			// cache the weight of the top and bottom row
-			uint16 wTop = yWeights[y1].weight;
-			uint16 wBottom = 255 - yWeights[y1].weight;
+			const uint16 wTop = yWeights[y1].weight;
+			const uint16 wBottom = 255 - yWeights[y1].weight;
 
 			// buffer offset into source (top row)
-			const uint8* src = srcBuffer.row_ptr(yWeights[y1].index);
+			register const uint8* src = srcBuffer.row_ptr(yWeights[y1].index);
 			// buffer handle for destination to be incremented per pixel
-			uint8* d = dst;
+			register uint8* d = dst;
 
 			for (int32 x = xIndexL; x <= xIndexR; x++) {
 				const uint8* s = src + xWeights[x].index;
@@ -1730,8 +1727,8 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 					} else {
 						// Only the left and right pixels are interpolated,
 						// since the top row has 100% weight.
-						uint16 wLeft = xWeights[x].weight;
-						uint16 wRight = 255 - xWeights[x].weight;
+						const uint16 wLeft = xWeights[x].weight;
+						const uint16 wRight = 255 - wLeft;
 						d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
 						d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
 						d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
@@ -1747,8 +1744,8 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 					} else {
 						// calculate the weighted sum of all four interpolated
 						// pixels
-						uint16 wLeft = xWeights[x].weight;
-						uint16 wRight = 255 - xWeights[x].weight;
+						const uint16 wLeft = xWeights[x].weight;
+						const uint16 wRight = 255 - wLeft;
 						// left and right of top row
 						uint32 t0 = (s[0] * wLeft + s[4] * wRight) * wTop;
 						uint32 t1 = (s[1] * wLeft + s[5] * wRight) * wTop;
@@ -1782,7 +1779,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 void
 Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	double xOffset, double yOffset, double xScale, double yScale,
-	BRect viewRect, uint32 bitmapFlags) const
+	BRect viewRect, uint32 options) const
 {
 	TRACE("Painter::_DrawBitmapGeneric32()\n");
 	TRACE("   offset: %.1f, %.1f\n", xOffset, yOffset);
@@ -1836,7 +1833,7 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	fRasterizer.reset();
 	fRasterizer.add_path(transformedPath);
 
-	if ((bitmapFlags & B_BITMAP_SCALE_BILINEAR) != 0) {
+	if ((options & B_FILTER_BITMAP_BILINEAR) != 0) {
 		// image filter (bilinear)
 		typedef agg::span_image_filter_rgba_bilinear<
 			source_type, interpolator_type> span_gen_type;

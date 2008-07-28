@@ -563,16 +563,16 @@ DrawingEngine::InvertRect(BRect r)
 
 // DrawBitmap
 void
-DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
-						  const BRect &source, const BRect &dest)
+DrawingEngine::DrawBitmap(ServerBitmap* bitmap, const BRect& bitmapRect,
+	const BRect& viewRect, uint32 options)
 {
 	CRASH_IF_NOT_LOCKED
 
-	BRect clipped = fPainter->ClipRect(dest);
+	BRect clipped = fPainter->ClipRect(viewRect);
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
-		fPainter->DrawBitmap(bitmap, source, dest);
+		fPainter->DrawBitmap(bitmap, bitmapRect, viewRect, options);
 
 		_CopyToFront(clipped);
 	}
@@ -580,7 +580,7 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 
 // DrawArc
 void
-DrawingEngine::DrawArc(BRect r, const float &angle, const float &span,
+DrawingEngine::DrawArc(BRect r, const float& angle, const float& span,
 	bool filled)
 {
 	CRASH_IF_NOT_LOCKED
@@ -613,7 +613,7 @@ DrawingEngine::DrawArc(BRect r, const float &angle, const float &span,
 
 // DrawBezier
 void
-DrawingEngine::DrawBezier(BPoint *pts, bool filled)
+DrawingEngine::DrawBezier(BPoint* pts, bool filled)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -656,8 +656,8 @@ DrawingEngine::DrawEllipse(BRect r, bool filled)
 
 // DrawPolygon
 void
-DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
-						   BRect bounds, bool filled, bool closed)
+DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
+	bool filled, bool closed)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -677,7 +677,7 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
 // #pragma mark - rgb_color
 
 void
-DrawingEngine::StrokePoint(const BPoint& pt, const rgb_color &color)
+DrawingEngine::StrokePoint(const BPoint& pt, const rgb_color& color)
 {
 	StrokeLine(pt, pt, color);
 }
@@ -687,8 +687,8 @@ DrawingEngine::StrokePoint(const BPoint& pt, const rgb_color &color)
 // * this function is only used by Decorators
 // * it assumes a one pixel wide line
 void
-DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
-						  const rgb_color &color)
+DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end,
+	const rgb_color& color)
 {
 	CRASH_IF_NOT_LOCKED
 

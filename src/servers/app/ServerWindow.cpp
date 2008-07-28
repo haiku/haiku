@@ -2105,17 +2105,21 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		{
 			DTRACE(("ServerWindow %s: Message AS_VIEW_DRAW_BITMAP: View name: %s\n", fTitle, fCurrentView->Name()));
 			int32 bitmapToken;
-			BRect srcRect, dstRect;
+			uint32 options;
+			BRect bitmapRect;
+			BRect viewRect;
 
 			link.Read<int32>(&bitmapToken);
-			link.Read<BRect>(&dstRect);
-			link.Read<BRect>(&srcRect);
+			link.Read<uint32>(&options);
+			link.Read<BRect>(&viewRect);
+			link.Read<BRect>(&bitmapRect);
 
 			ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
 			if (bitmap) {
-				fCurrentView->ConvertToScreenForDrawing(&dstRect);
+				fCurrentView->ConvertToScreenForDrawing(&viewRect);
 
-				drawingEngine->DrawBitmap(bitmap, srcRect, dstRect);
+				drawingEngine->DrawBitmap(bitmap, bitmapRect, viewRect,
+					options);
 			}
 
 			break;
@@ -2688,20 +2692,23 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			int32 token;
 			link.Read<int32>(&token);
+
+			uint32 options;
+			link.Read<uint32>(&options);
+
+			BRect viewRect;
+			link.Read<BRect>(&viewRect);
 			
-			BRect destRect;
-			link.Read<BRect>(&destRect);
-			
-			BRect sourceRect;
-			link.Read<BRect>(&sourceRect);
+			BRect bitmapRect;
+			link.Read<BRect>(&bitmapRect);
 			
 			ServerBitmap *bitmap = App()->FindBitmap(token);
 			if (bitmap == NULL)
 				break;
 
-			picture->WriteDrawBitmap(sourceRect, destRect, bitmap->Width(), bitmap->Height(),
-						bitmap->BytesPerRow(), bitmap->ColorSpace(), /*bitmap->Flags()*/0,
-						bitmap->Bits(), bitmap->BitsLength());
+			picture->WriteDrawBitmap(bitmapRect, viewRect, bitmap->Width(),
+				bitmap->Height(), bitmap->BytesPerRow(), bitmap->ColorSpace(),
+				options, bitmap->Bits(), bitmap->BitsLength());
 
 			break;
 		}
