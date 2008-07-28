@@ -24,6 +24,8 @@ struct identify_cookie {
 	disk_super_block super_block;
 };
 
+static status_t bfs_get_file_map(fs_volume *_volume, fs_vnode *_node,
+	off_t offset, size_t size, struct file_io_vec *vecs, size_t *_count);
 
 extern void fill_stat_buffer(Inode *inode, struct stat &stat);
 
@@ -418,6 +420,49 @@ bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	rw_lock_read_unlock(&inode->Lock());
 
 	return status;
+}
+
+
+static status_t
+bfs_iterative_io_get_vecs(void* cookie, io_request *request, off_t offset,
+	size_t size, struct file_io_vec *vecs, size_t *_count)
+{
+	fs_vnode *node = (fs_vnode*)cookie;
+
+	return bfs_get_file_map(volume_for_vnode(node), node, offset, size, vecs,
+		_count);
+}
+
+
+static status_t
+bfs_iterative_io_finished(void *cookie, io_request *request, status_t status)
+{
+	fs_vnode *_node = (fs_vnode*)cookie;
+	Inode *inode = (Inode *)_node->private_node;
+
+	rw_lock_read_unlock(&inode->Lock());
+
+	return B_OK;
+}
+
+
+static status_t
+bfs_io(fs_volume *_volume, fs_vnode *_node, void *_cookie, io_request *request)
+{
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (inode->FileCache() == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	// We lock the node here and will unlock it in the "finished" hook.
+	rw_lock_read_lock(&inode->Lock());
+
+	return do_iterative_fd_io(volume->Device(), request,
+		bfs_iterative_io_get_vecs, bfs_iterative_io_finished, _node);
 }
 
 
@@ -2165,7 +2210,7 @@ fs_vnode_ops gBFSVnodeOps = {
 	&bfs_read_pages,
 	&bfs_write_pages,
 
-	NULL,	// io()
+	&bfs_io,
 	NULL,	// cancel_io()
 
 	&bfs_get_file_map,
