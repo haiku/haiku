@@ -36,6 +36,8 @@ StringTest::~StringTest()
 void
 StringTest::Prepare(BView* view)
 {
+//	SetupClipping(view);
+
 	font_height fh;
 	view->GetFontHeight(&fh);
 	fLineHeight = ceilf(fh.ascent) + ceilf(fh.descent)

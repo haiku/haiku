@@ -25,6 +25,7 @@ public:
 									drawing_mode mode,
 									const BMessenger& target);
 
+	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
 
 private:

@@ -11,13 +11,21 @@
 #include "TestWindow.h"
 
 // tests
+#include "ClippedLineTest.h"
+#include "HorizontalLineTest.h"
+#include "RandomLineTest.h"
 #include "StringTest.h"
+#include "VerticalLineTest.h"
 
 class Benchmark : public BApplication {
 public:
 	Benchmark()
 		: BApplication("application/x-vnd.haiku-benchmark"),
-		  fTest(new StringTest),
+		  fTest(new ClippedLineTest),
+//		  fTest(new HorizontalLineTest),
+//		  fTest(new RandomLineTest),
+//		  fTest(new StringTest),
+//		  fTest(new VerticalLineTest),
 		  fTestWindow(NULL)
 	{
 	}

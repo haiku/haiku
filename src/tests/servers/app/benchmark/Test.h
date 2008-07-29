@@ -15,6 +15,8 @@ public:
 	virtual	void				Prepare(BView* view) = 0;
 	virtual	bool				RunIteration(BView* view) = 0;
 	virtual	void				PrintResults() = 0;
+
+			void				SetupClipping(BView* view);
 };
 
 #endif // TEST_H

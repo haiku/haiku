@@ -14,6 +14,12 @@ TestView::TestView(BRect frame, Test* test, drawing_mode mode,
 	  fTarget(target)
 {
 	SetDrawingMode(mode);
+}
+
+
+void
+TestView::AttachedToWindow()
+{
 	fTest->Prepare(this);
 }
 
