@@ -66,15 +66,8 @@ dump_condition_variable(int argc, char** argv)
 	ConditionVariable* variable = sConditionVariableHash.Lookup((void*)address);
 
 	if (variable == NULL) {
-		// It might be a direct pointer to a condition variable. Search the
-		// hash.
-		ConditionVariableHash::Iterator it(&sConditionVariableHash);
-		while (ConditionVariable* hashVariable = it.Next()) {
-			if (hashVariable == (void*)address) {
-				variable = hashVariable;
-				break;
-			}
-		}
+		// It must be a direct pointer to a condition variable.
+		variable = (ConditionVariable*)address;
 	}
 
 	if (variable != NULL) {
