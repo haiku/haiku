@@ -429,6 +429,8 @@ Volume::Unmount()
 	// Unlike in BeOS, we need to put the reference to our root node ourselves
 	put_vnode(fVolume, ToVnode(Root()));
 
+	fBlockAllocator.Uninitialize();
+
 	// This will also flush the log & all blocks to disk
 	delete fJournal;
 	fJournal = NULL;

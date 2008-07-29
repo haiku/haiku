@@ -27,6 +27,8 @@ class BlockAllocator {
 		status_t Initialize(bool full = true);
 		status_t InitializeAndClearBitmap(Transaction &transaction);
 
+		void Uninitialize();
+
 		status_t AllocateForInode(Transaction &transaction, const block_run *parent,
 					mode_t type, block_run &run);
 		status_t Allocate(Transaction &transaction, Inode *inode, off_t numBlocks,

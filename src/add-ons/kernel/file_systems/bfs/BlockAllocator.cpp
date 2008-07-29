@@ -626,6 +626,15 @@ BlockAllocator::_Initialize(BlockAllocator *allocator)
 }
 
 
+void
+BlockAllocator::Uninitialize()
+{
+	// We only have to make sure that the initializer thread isn't running
+	// anymore.
+	mutex_lock(&fLock);
+}
+
+
 status_t
 BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
 	uint16 start, uint16 maximum, uint16 minimum, block_run &run)
