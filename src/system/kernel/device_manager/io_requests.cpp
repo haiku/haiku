@@ -596,6 +596,9 @@ IORequest::CreateSubRequest(off_t parentOffset, off_t offset, size_t length,
 		return error;
 	}
 
+	_subRequest = subRequest;
+	subRequest->SetParent(this);
+
 	MutexLocker _(fLock);
 
 	fChildren.Add(subRequest);
