@@ -9,9 +9,9 @@
 
 TestView::TestView(BRect frame, Test* test, drawing_mode mode,
 		const BMessenger& target)
-	: BView(frame, "test view", B_FOLLOW_ALL, B_WILL_DRAW)
-	, fTest(test)
-	, fTarget(target)
+	: BView(frame, "test view", B_FOLLOW_ALL, B_WILL_DRAW),
+	  fTest(test),
+	  fTarget(target)
 {
 	SetDrawingMode(mode);
 	fTest->Prepare(this);
@@ -33,9 +33,9 @@ TestView::Draw(BRect updateRect)
 TestWindow::TestWindow(BRect frame, Test* test, drawing_mode mode,
 		const BMessenger& target)
 	: BWindow(frame, "Test Window", B_TITLED_WINDOW_LOOK,
-		B_FLOATING_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
-	, fTarget(target)
-	, fAllowedToQuit(false)
+		B_FLOATING_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	  fTarget(target),
+	  fAllowedToQuit(false)
 {
 	TestView* view = new TestView(Bounds(), test, mode, target);
 	AddChild(view);

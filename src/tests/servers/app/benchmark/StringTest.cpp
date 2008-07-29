@@ -2,6 +2,7 @@
  * Copyright (C) 2008 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
+
 #include "StringTest.h"
 
 #include <stdio.h>
@@ -13,16 +14,16 @@
 
 
 StringTest::StringTest()
-	: Test()
-	, fTestDuration(0)
-	, fTestStart(-1)
-	, fGlyphsRendered(0)
-	, fGlyphsPerLine(500)
-	, fIterations(0)
-	, fMaxIterations(1500)
+	: Test(),
+	  fTestDuration(0),
+	  fTestStart(-1),
+	  fGlyphsRendered(0),
+	  fGlyphsPerLine(500),
+	  fIterations(0),
+	  fMaxIterations(1500),
 
-	, fStartHeight(11.0)
-	, fLineHeight(15.0)
+	  fStartHeight(11.0),
+	  fLineHeight(15.0)
 {
 }
 
@@ -72,7 +73,7 @@ StringTest::RunIteration(BView* view)
 	while (true) {
 		// fill string with random chars
 		for (uint32 j = 0; j < fGlyphsPerLine; j++)
-			buffer[j] = 'a' + rand() % ('Z' - 'a');
+			buffer[j] = 'A' + rand() % ('z' - 'A');
 
 		view->DrawString(buffer, textLocation);
 

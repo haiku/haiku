@@ -2,6 +2,7 @@
  * Copyright (C) 2008 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
+
 #include <stdio.h>
 
 #include <Application.h>
@@ -15,9 +16,9 @@
 class Benchmark : public BApplication {
 public:
 	Benchmark()
-		: BApplication("application/x-vnd.haiku-benchmark")
-		, fTest(new StringTest)
-		, fTestWindow(NULL)
+		: BApplication("application/x-vnd.haiku-benchmark"),
+		  fTest(new StringTest),
+		  fTestWindow(NULL)
 	{
 	}
 
@@ -37,7 +38,7 @@ public:
 		frame.right = frame.left + width - 1;
 		frame.bottom = frame.top + height - 1;
 
-		fTestWindow = new TestWindow(frame, fTest, B_OP_OVER,
+		fTestWindow = new TestWindow(frame, fTest, B_OP_COPY,
 			BMessenger(this));
 	}
 
