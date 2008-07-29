@@ -182,6 +182,7 @@ struct team {
 	int32			flags;
 	void			*io_context;
 	struct realtime_sem_context	*realtime_sem_context;
+	int32			xsi_sem_undo_requests;
 	sem_id			death_sem;		// semaphore to wait on for dying threads
 	struct list		dead_threads;
 	int				dead_threads_count;

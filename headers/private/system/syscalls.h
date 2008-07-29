@@ -30,6 +30,8 @@ struct rlimit;
 struct sigaction;
 struct stat;
 struct _sem_t;
+struct sembuf;
+union semun;
 
 struct disk_device_job_progress_info;
 struct partitionable_space_data;
@@ -55,24 +57,26 @@ extern int			_kern_getrlimit(int resource, struct rlimit * rlp);
 extern int			_kern_setrlimit(int resource, const struct rlimit * rlp);
 
 extern status_t		_kern_shutdown(bool reboot);
-extern status_t		_kern_get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize);
+extern status_t		_kern_get_safemode_option(const char *parameter,
+						char *buffer, size_t *_bufferSize);
 
 extern ssize_t		_kern_wait_for_objects(object_wait_info* infos, int numInfos,
 						uint32 flags, bigtime_t timeout);
-
 
 /* sem functions */
 extern sem_id		_kern_create_sem(int count, const char *name);
 extern status_t		_kern_delete_sem(sem_id id);
 extern status_t		_kern_switch_sem(sem_id releaseSem, sem_id id);
-extern status_t		_kern_switch_sem_etc(sem_id releaseSem, sem_id id, uint32 count,
-						uint32 flags, bigtime_t timeout);
+extern status_t		_kern_switch_sem_etc(sem_id releaseSem, sem_id id,
+						uint32 count, uint32 flags, bigtime_t timeout);
 extern status_t		_kern_acquire_sem(sem_id id);
-extern status_t		_kern_acquire_sem_etc(sem_id id, uint32 count, uint32 flags, bigtime_t timeout);
+extern status_t		_kern_acquire_sem_etc(sem_id id, uint32 count, uint32 flags,
+						bigtime_t timeout);
 extern status_t		_kern_release_sem(sem_id id);
 extern status_t		_kern_release_sem_etc(sem_id id, uint32 count, uint32 flags);
 extern status_t		_kern_get_sem_count(sem_id id, int32* thread_count);
-extern status_t		_kern_get_sem_info(sem_id semaphore, struct sem_info *info, size_t size);
+extern status_t		_kern_get_sem_info(sem_id semaphore, struct sem_info *info,
+						size_t size);
 extern status_t		_kern_get_next_sem_info(team_id team, int32 *cookie,
 						struct sem_info *info, size_t size);
 extern status_t		_kern_set_sem_owner(sem_id id, team_id proc);
@@ -89,8 +93,14 @@ extern status_t		_kern_realtime_sem_get_value(sem_id semID, int* value);
 extern status_t		_kern_realtime_sem_post(sem_id semID);
 extern status_t		_kern_realtime_sem_wait(sem_id semID, bigtime_t timeout);
 
-/* team & thread syscalls */
+/* POSIX XSI semaphore syscalls */
+extern int			_kern_xsi_semget(key_t key, int numSems, int flags);
+extern int			_kern_xsi_semctl(int semID, int semNumber, int command,
+						union semun* args);
+extern status_t		_kern_xsi_semop(int semID, struct sembuf *semOps,
+						size_t numSemOps);
 
+/* team & thread syscalls */
 extern thread_id	_kern_load_image(const char* const* flatArgs,
 						size_t flatArgsSize, int32 argCount, int32 envCount,
 						int32 priority, uint32 flags, port_id errorPort,

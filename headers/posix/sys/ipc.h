@@ -6,8 +6,8 @@
 #define _SYS_IPC_H
 
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
-#error functionality has not yet been implemented
 
 
 /* Mode bits for msgget(), semget(), and shmget() */
@@ -17,15 +17,15 @@
 
 /* Control commands for msgctl(), semctl(), and shmctl() */
 #define IPC_RMID	0		/* remove identifier */
-#define IPC_SET		1
-#define IPC_STAT	2
+#define IPC_SET		1		/* set options */
+#define IPC_STAT	2		/* get options */
 
 /* Private key */
-#define IPC_PRIVATE	0
+#define IPC_PRIVATE		(key_t)0
 
 
 struct ipc_perm {
-	key_t	key;
+	key_t	key;			/* IPC identifier */
 	uid_t	uid;			/* owner's user ID */
 	gid_t	gid;			/* owner's group ID */
 	uid_t	cuid;			/* creator's user ID */
@@ -34,14 +34,10 @@ struct ipc_perm {
 };
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 key_t ftok(const char *path, int id);
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif	/* _SYS_IPC_H */

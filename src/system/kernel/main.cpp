@@ -37,6 +37,7 @@
 #include <Notifications.h>
 #include <port.h>
 #include <posix/realtime_sem.h>
+#include <posix/xsi_semaphore.h>
 #include <real_time_clock.h>
 #include <sem.h>
 #include <smp.h>
@@ -174,7 +175,9 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init kernel daemons\n");
 		kernel_daemon_init();
 		arch_platform_init_post_thread(&sKernelArgs);
+		TRACE("init posix semaphores\n");
 		realtime_sem_init();
+		xsi_ipc_init();
 
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);

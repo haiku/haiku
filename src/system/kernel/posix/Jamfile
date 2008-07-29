@@ -4,6 +4,7 @@ UsePrivateHeaders shared ;
 
 KernelMergeObject kernel_posix.o : 
 	realtime_sem.cpp
+	xsi_semaphore.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

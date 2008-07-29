@@ -7,6 +7,7 @@ MergeObject posix_sys.o :
 	chmod.c
 	flock.c
 	ftime.c
+	ftok.c
 	getrusage.c
  	gettimeofday.c
 	itimer.c
@@ -23,4 +24,5 @@ MergeObject posix_sys.o :
  	uname.c
  	utimes.c
 	wait.c
+	xsi_sem.cpp
 ;
