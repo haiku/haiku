@@ -134,7 +134,7 @@ struct CObjectDelete
 {
 	inline void operator()(Type *object)
 	{
-		if (fDestructor != NULL)
+		if (fDestructor != NULL && object != NULL)
 			fDestructor(object);
 	}
 
@@ -175,7 +175,7 @@ struct MethodDelete
 {
 	inline void operator()(Type *object)
 	{
-		if (fDestructor)
+		if (fDestructor && object != NULL)
 			(object->*fDestructor)();
 	}
 
