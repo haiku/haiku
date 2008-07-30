@@ -26,136 +26,87 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 */
-
 #ifndef _INTERFACE_UTILS_H
 #define _INTERFACE_UTILS_H
 
-#include <InterfaceKit.h>
+
+#include <AppDefs.h>
 #include <MessageFilter.h>
+#include <Window.h>
+
+
+class BHandler;
+class BMessage;
 
 
 class EscapeMessageFilter : public BMessageFilter
 {
-private:
-	BWindow *fWindow;
-	int32    fWhat;
-
 public:
-	EscapeMessageFilter(BWindow *window, int32 what);
-	filter_result Filter(BMessage *msg, BHandler **target);
+							EscapeMessageFilter(BWindow *window, int32 what);
+			filter_result	Filter(BMessage *msg, BHandler **target);
+
+private:
+			BWindow*		fWindow;
+			int32			fWhat;
 };
 
 
 class HWindow : public BWindow
 {
-protected:
-	void Init(uint32 escape_msg);
-	
-public:
 	typedef BWindow 		inherited;
+public:
+							HWindow(BRect frame, const char *title,
+								window_type type, uint32 flags,
+								uint32 workspace = B_CURRENT_WORKSPACE,
+								uint32 escape_msg = B_QUIT_REQUESTED);
+							HWindow(BRect frame, const char *title,
+								window_look look, window_feel feel, uint32 flags,
+								uint32 workspace = B_CURRENT_WORKSPACE,
+								uint32 escape_msg = B_QUIT_REQUESTED);
+	virtual					~HWindow() {}
 
-	HWindow(BRect frame, const char *title, window_type type, uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE, uint32 escape_msg = B_QUIT_REQUESTED);
-	HWindow(BRect frame, const char *title, window_look look, window_feel feel, uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE, uint32 escape_msg = B_QUIT_REQUESTED);
-	
-	virtual void MessageReceived(BMessage* m);
-	virtual void AboutRequested();
-	virtual const char* AboutText() const { return NULL; }
+	virtual void			MessageReceived(BMessage* m);
+	virtual void			AboutRequested();
+	virtual const char*		AboutText() const { return NULL; }
+
+protected:
+			void			Init(uint32 escape_msg);
 };
 
 
 class BlockingWindow : public HWindow
 {
+	typedef HWindow 		inherited;
 public:
-	BlockingWindow(BRect frame, const char *title, window_type type, uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE, uint32 escape_msg = B_QUIT_REQUESTED);
-	BlockingWindow(BRect frame, const char *title, window_look look, window_feel feel, uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE, uint32 escape_msg = B_QUIT_REQUESTED);
-	~BlockingWindow();
-	
-	bool QuitRequested();
+							BlockingWindow(BRect frame, const char *title,
+								window_type type, uint32 flags,
+								uint32 workspace = B_CURRENT_WORKSPACE,
+								uint32 escape_msg = B_QUIT_REQUESTED);
+							BlockingWindow(BRect frame, const char *title,
+								window_look look, window_feel feel, uint32 flags,
+								uint32 workspace = B_CURRENT_WORKSPACE,
+								uint32 escape_msg = B_QUIT_REQUESTED);
+	virtual					~BlockingWindow();
+
+	virtual bool			QuitRequested();
 	// Quit() is called by child class with result code
-	void Quit(status_t result);
+			void			Quit(status_t result);
 	// Show window and wait for it to quit, returns result code
-	virtual status_t Go();
+	virtual status_t		Go();
 	// Or quit window e.g. something went wrong in constructor
-	void Quit();
+	virtual void			Quit();
 	// Sets the result that is returned when the user closes the window.
 	// Default is B_OK.
-	void SetUserQuitResult(status_t result);
-	
-	typedef HWindow 		inherited;
-	
+			void			SetUserQuitResult(status_t result);
+
 private:
-	void Init(const char* title);
-	
-	status_t                fUserQuitResult;
-	bool                    fReadyToQuit;
-	sem_id 					fExitSem;
-	status_t* 				fResult;
-};
+			void			Init(const char* title);
 
-// --------------------------------------------------
-class TextView : public BTextView
-{
-public:
-	typedef BTextView inherited;
-	
-	TextView(BRect frame,
-				const char *name,
-				BRect textRect,
-				uint32 rmask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-				uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
-
-	TextView(BRect frame,
-				const char *name,
-				BRect textRect,
-				const BFont *font, const rgb_color *color,
-				uint32 rmask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-				uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
-
-	void KeyDown(const char *bytes, int32 numBytes);
-	void MakeFocus(bool focus = true);
-	void Draw(BRect r);
-};
-
-
-// --------------------------------------------------
-class TextControl : public BView
-{
-	BStringView *fLabel;
-	TextView   *fText;
-public:
-	TextControl(BRect frame,
-				const char *name,
-				const char *label, 
-				const char *initial_text, 
-				BMessage *message,
-				uint32 rmask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-				uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
-	const char *Label() { return fLabel->Text(); }
-	const char *Text()  { return fText->Text(); }
-	void MakeFocus(bool focus = true) { fText->MakeFocus(focus); }	
-	void ConvertToParent(BView* parent, BView* child, BRect &rect);
-	void FocusSetTo(BView* child);
-};
-
-
-// --------------------------------------------------
-class Table : public BView
-{
-public:
-	typedef BView inherited;
-	
-	Table(BRect frame, const char *name, uint32 rmode, uint32 flags);
-	void ScrollTo(BPoint p);
-};
-
-class DragListView : public BListView
-{
-public:
-	DragListView(BRect frame, const char *name,
-		list_view_type type = B_SINGLE_SELECTION_LIST,
-		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP, 
-		uint32 flags = B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS);
-	bool InitiateDrag(BPoint point, int32 index, bool wasSelected);
+private:
+			status_t		fUserQuitResult;
+			bool			fReadyToQuit;
+			sem_id			fExitSem;
+			status_t*		fResult;
 };
 
 #endif

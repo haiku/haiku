@@ -28,122 +28,137 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 */
-
 #ifndef DOCINFOWINDOW_H
 #define DOCINFOWINDOW_H
 
-#include <InterfaceKit.h>
-#include <Message.h>
-#include <Messenger.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <Path.h>
-#include <String.h>
+
 #include "InterfaceUtils.h"
-#include "PrintUtils.h"
+
+
+#include <String.h>
+
+
+class BBox;
+class BMenu;
+class BScrollView;
+class BTabView;
+class BTextControl;
+class BView;
+
 
 #define HAVE_FULLVERSION_PDF_LIB 0
 
+
 #if HAVE_FULLVERSION_PDF_LIB
+
 class PermissionLabels {
-private:
-	const char* fName;
-	const char* fPDFName;
-	
 public:
-	PermissionLabels(const char* name, const char* pdfName) : fName(name), fPDFName(pdfName) { }
-	// accessors
-	const char* GetName() const { return fName; }
-	const char* GetPDFName() const { return fName; }
+					PermissionLabels(const char* name, const char* pdfName)
+						: fName(name), fPDFName(pdfName) { }
+
+	const char*		GetName() const		{ return fName; }
+	const char*		GetPDFName() const	{ return fName; }
+
+private:
+	const char*		fName;
+	const char*		fPDFName;
 };
 
+
 class Permission {
-private:
-	const PermissionLabels* fLabels;
-	bool fAllowed;
-	
 public:
-	Permission() : fLabels(NULL), fAllowed(true) { }
-	// accessors	
-	const char* GetName() const { return fLabels->GetName(); }
-	const char* GetPDFName() const { return fLabels->GetPDFName(); }
-	bool IsAllowed() const { return fAllowed; }
-	// setter
-	void SetLabels(const PermissionLabels* labels) { fLabels = labels; }
-	void SetAllowed(bool allowed) { fAllowed = allowed; }
+					Permission()
+						: fLabels(NULL), fAllowed(true) { }
+
+	const char*		GetName() const		{ return fLabels->GetName(); }
+	const char*		GetPDFName() const	{ return fLabels->GetPDFName(); }
+	bool			IsAllowed() const	{ return fAllowed; }
+
+	void			SetLabels(const PermissionLabels* labels) { fLabels = labels; }
+	void			SetAllowed(bool allowed) { fAllowed = allowed; }
+
+private:
+	const PermissionLabels*		fLabels;
+	bool						fAllowed;
 };
 
 class Permissions {
-private:
-	Permission* fPermissions;
-	int fNofPermissions;
-	
 public:
-	Permissions();
+						Permissions();
+
 	// accessors
-	Permission* At(int i) { return &fPermissions[i]; }
-	int Length() const { return fNofPermissions; }
+	Permission*			At(int32 i)		{ return &fPermissions[i]; }
+	int32				Length() const	{ return fNofPermissions; }
+
 	// decode/encode pdflib permission string
-	void Decode(const char* s);
-	void Encode(BString* s);
+	void				Decode(const char* s);
+	void				Encode(BString& permissions);
+
+private:
+	Permission*			fPermissions;
+	int32				fNofPermissions;
 };
-#endif
+
+#endif	// HAVE_FULLVERSION_PDF_LIB
+
 
 class DocInfoWindow : public HWindow 
 {
+	typedef HWindow				inherited;
 public:
-	// Constructors, destructors, operators...
+								DocInfoWindow(BMessage *doc_info);
 
-							DocInfoWindow(BMessage *doc_info);
+	virtual void				Quit();
+	virtual bool				QuitRequested();
+	virtual void				MessageReceived(BMessage *message);
+	virtual void				FrameResized(float newWidth, float newHeight);
 
-	typedef HWindow 		inherited;
-
-	// public constantes
 	enum {
-		OK_MSG				= 'ok__',
-		CANCEL_MSG			= 'cncl',
-		ADD_KEY_MSG         = 'add_',
-		REMOVE_KEY_MSG      = 'rmov',
-		DEFAULT_KEY_MSG     = 'dflt',
+								OK_MSG			= 'ok__',
+								CANCEL_MSG		= 'cncl',
+								ADD_KEY_MSG		= 'add_',
+								REMOVE_KEY_MSG	= 'rmov',
+								DEFAULT_KEY_MSG	= 'dflt',
 	};
-			
-	// Virtual function overrides
-public:	
-	virtual void 			MessageReceived(BMessage *msg);
-	virtual bool 			QuitRequested();
-	virtual void            Quit();
 
 private:
-	BMessage               *fDocInfo; // owned by parent window
-	BView                  *fTable;
-	BScrollView            *fTableScrollView;
-	BMenu                  *fKeyList;
-#if HAVE_FULLVERSION_PDF_LIB
-	BTextControl           *fMasterPassword;
-	BTextControl           *fUserPassword;
-	Permissions             fPermissions;
-#endif
-	
-	BMessage*               DocInfo() {  return fDocInfo; }
+			BMessage*			_DocInfo() { return fDocInfo; }
+			void				_SetupDocInfoView(BBox* panel);
+			void				_BuildTable(const BMessage& fromDocInfo);
+			void				_AdjustScrollBar(float controlHeight,
+									float fieldsHeight);
+			BTextControl*		_AddFieldToTable(BRect rect, const char* name,
+									const char* value);
+			void				_ReadFieldsFromTable(BMessage& docInfo);
 
-	BBox*                   CreateTabPanel(BTabView* tabView, const char* label);
-	void                    SetupButtons(BBox* panel);
-	void                    SetupDocInfoView(BBox* panel);
+			void				_RemoveKey(BMessage* msg);
+			bool				_IsKeyValid(const char *key) const;
+			void				_AddKey(BMessage* msg, bool textControl);
+
+			void				_EmptyKeyList();
+
 #if HAVE_FULLVERSION_PDF_LIB
-	BTextControl*           AddPasswordControl(BRect r, BView* panel, const char* name, const char* label);
-	void                    SetupPasswordView(BBox* panel);
-	void                    SetupPermissionsView(BBox* panel);
-#endif
-	void                    BuildTable(BMessage *fromDocInfo);
-	void                    ReadFieldsFromTable(BMessage* doc_info);
+			void				_SetupPasswordView(BBox* panel);
+			void				_SetupPermissionsView(BBox* panel);
+			BBox*				_CreateTabPanel(BTabView* tabView, const char* label);
+			BTextControl*		_AddPasswordControl(BRect r, BView* panel,
+									const char* name, const char* label);
+
+			void				_ReadPasswords();
+			void				_ReadPermissions();
+#endif	// HAVE_FULLVERSION_PDF_LIB
+
+private:
+			BMessage*			fDocInfo; // owned by parent window
+			BView*				fTable;
+			BScrollView*		fTableScrollView;
+			BMenu*				fKeyList;
+
 #if HAVE_FULLVERSION_PDF_LIB
-	void                    ReadPasswords();
-	void                    ReadPermissions();
-#endif
-	void                    EmptyKeyList();
-	bool                    IsValidKey(const char *key);
-	void                    AddKey(BMessage* msg, bool textControl);
-	void                    RemoveKey(BMessage* msg);
+			BTextControl*		fMasterPassword;
+			BTextControl*		fUserPassword;
+			Permissions			fPermissions;
+#endif	// HAVE_FULLVERSION_PDF_LIB
 };
 
 #endif

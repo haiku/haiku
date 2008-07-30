@@ -20,6 +20,7 @@
 #include <File.h>
 #include <Node.h>
 #include <Message.h>
+#include <PrintJob.h>
 
 
 #include <stdio.h>

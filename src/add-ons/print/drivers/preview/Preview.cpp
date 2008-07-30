@@ -17,6 +17,8 @@
 #include <Application.h>
 #include <Button.h>
 #include <Debug.h>
+#include <Region.h>
+#include <Screen.h>
 #include <String.h>
 #include <ScrollView.h>
 #include <StringView.h>

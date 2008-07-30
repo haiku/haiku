@@ -27,9 +27,19 @@ THE SOFTWARE.
 
 */
 
-#include <string.h>
-#include <Debug.h>
 #include "InterfaceUtils.h"
+
+
+#include <Alert.h>
+#include <Debug.h>
+#include <Message.h>
+#include <TextView.h>
+
+
+#include <string.h>
+
+
+// #pragma mark -- EscapeMessageFilter
 
 
 EscapeMessageFilter::EscapeMessageFilter(BWindow *window, int32 what)
@@ -44,34 +54,34 @@ filter_result
 EscapeMessageFilter::Filter(BMessage *msg, BHandler **target)
 {
 	int32 key;
-	// notify window with message fWhat if Escape key is hit
-	if (B_OK == msg->FindInt32("key", &key) && key == 1) {
+	filter_result result = B_DISPATCH_MESSAGE;
+	if (msg->FindInt32("key", &key) == B_OK && key == 1) {
 		fWindow->PostMessage(fWhat);
-		return B_SKIP_MESSAGE;
+		result = B_SKIP_MESSAGE;
 	}
-	return B_DISPATCH_MESSAGE;
+	return result;
 }
 
 
-// Implementation of HWindow
+// #pragma mark -- HWindow
 
-// --------------------------------------------------
-HWindow::HWindow(BRect frame, const char *title, window_type type, uint32 flags, uint32 workspace, uint32 escape_msg)
+
+HWindow::HWindow(BRect frame, const char *title, window_type type, uint32 flags,
+		uint32 workspace, uint32 escape_msg)
 	: BWindow(frame, title, type, flags, workspace)
 {
 	Init(escape_msg);
 }
 
 
-// --------------------------------------------------
-HWindow::HWindow(BRect frame, const char *title, window_look look, window_feel feel, uint32 flags, uint32 workspace, uint32 escape_msg)
+HWindow::HWindow(BRect frame, const char *title, window_look look, window_feel feel,
+		uint32 flags, uint32 workspace, uint32 escape_msg)
 	: BWindow(frame, title, look, feel, flags, workspace)
 {
 	Init(escape_msg);
 }
 
 
-// --------------------------------------------------
 void
 HWindow::Init(uint32 escape_msg)
 {
@@ -80,7 +90,6 @@ HWindow::Init(uint32 escape_msg)
 }
 
 
-// --------------------------------------------------
 void
 HWindow::MessageReceived(BMessage* msg)
 {
@@ -91,15 +100,14 @@ HWindow::MessageReceived(BMessage* msg)
 	}
 }
 
-// --------------------------------------------------
+
 void
 HWindow::AboutRequested()
 {
 	const char* aboutText = AboutText();
-	if (aboutText == NULL) {
+	if (aboutText == NULL)
 		return;
-	}
-	
+
 	BAlert *about = new BAlert("About", aboutText, "Cool");
 	BTextView *v = about->TextView();
 	if (v) {
@@ -127,24 +135,30 @@ HWindow::AboutRequested()
 }
 
 
-// Implementation of BlockingWindow
+// #pragma mark -- BlockingWindow
 
-BlockingWindow::BlockingWindow(BRect frame, const char *title, window_type type, uint32 flags, uint32 workspace, uint32 escape_msg)
+
+BlockingWindow::BlockingWindow(BRect frame, const char *title, window_type type,
+		uint32 flags, uint32 workspace, uint32 escape_msg)
 	: HWindow(frame, title, type, flags, workspace)
 {
 	Init(title);
 }
 
-BlockingWindow::BlockingWindow(BRect frame, const char *title, window_look look, window_feel feel, uint32 flags, uint32 workspace, uint32 escape_msg)
+
+BlockingWindow::BlockingWindow(BRect frame, const char *title, window_look look,
+		window_feel feel, uint32 flags, uint32 workspace, uint32 escape_msg)
 	: HWindow(frame, title, look, feel, flags, workspace)
 {
 	Init(title);
 }
 
+
 BlockingWindow::~BlockingWindow() 
 {
 	delete_sem(fExitSem);
 }
+
 
 void
 BlockingWindow::Init(const char* title) 
@@ -155,45 +169,55 @@ BlockingWindow::Init(const char* title)
 	fReadyToQuit = false;
 }
 
+
 bool
-BlockingWindow::QuitRequested() {
-	if (fReadyToQuit) {
+BlockingWindow::QuitRequested()
+{
+	if (fReadyToQuit)
 		return true;
-	} else {
-		// user requested to quit the window
-		*fResult = fUserQuitResult;
-		release_sem(fExitSem);
-		return false;
-	}
+
+	// user requested to quit the window
+	*fResult = fUserQuitResult;
+	release_sem(fExitSem);
+	return false;
 }
 
+
 void
-BlockingWindow::Quit() {
+BlockingWindow::Quit()
+{
 	fReadyToQuit = false; // finally allow window to quit
-	inherited::Quit(); // and quit it 	
+	inherited::Quit(); // and quit it
 }
 
+
 void
-BlockingWindow::Quit(status_t result) {
-	if (fResult) {
+BlockingWindow::Quit(status_t result)
+{
+	if (fResult)
 		*fResult = result;
-	}
+
 	release_sem(fExitSem);
 }
 
+
 void
-BlockingWindow::SetUserQuitResult(status_t result) {
+BlockingWindow::SetUserQuitResult(status_t result)
+{
 	fUserQuitResult = result;
 }
 
+
 status_t
-BlockingWindow::Go() {
+BlockingWindow::Go()
+{
 	status_t result = B_ERROR;
 	fResult = &result;
 	Show();
 	acquire_sem(fExitSem);
-	// here the window still exists, because QuitRequested returns false if fReadyToQuit is false
-	// now we can quit the window and am sure that the window thread dies before this thread
+	// here the window still exists, because QuitRequested returns false if
+	// fReadyToQuit is false, now we can quit the window and am sure that the
+	// window thread dies before this thread
 	if (Lock()) {
 		Quit();
 	} else {
@@ -202,174 +226,3 @@ BlockingWindow::Go() {
 	// here the window does not exist, good to have the result in a local variable
 	return result;
 }
-
-// Impelementation of TextView
-
-// --------------------------------------------------
-TextView::TextView(BRect frame,
-				const char *name,
-				BRect textRect,
-				uint32 rmask,
-				uint32 flags)
-	: BTextView(frame, name, textRect, rmask, flags)
-{
-}
-
-
-// --------------------------------------------------
-TextView::TextView(BRect frame,
-				const char *name,
-				BRect textRect,
-				const BFont *font, const rgb_color *color,
-				uint32 rmask,
-				uint32 flags)
-	: BTextView(frame, name, textRect, font, color, rmask, flags)
-{
-}
-
-
-// --------------------------------------------------
-void 
-TextView::KeyDown(const char *bytes, int32 numBytes)
-{
-	if (numBytes == 1 && *bytes == B_TAB) {
-		BView::KeyDown(bytes, numBytes);
-		return;
-	}
-	inherited::KeyDown(bytes, numBytes);
-}
-
-
-// --------------------------------------------------
-void 
-TextView::Draw(BRect update)
-{
-	inherited::Draw(update);
-	if (IsFocus()) {
-		// stroke focus rectangle
-		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		StrokeRect(Bounds());
-	}
-}
-
-
-// --------------------------------------------------
-void 
-TextView::MakeFocus(bool focus)
-{
-	Invalidate();
-	inherited::MakeFocus(focus);
-	// notify TextControl
-	BView* parent = Parent(); // BBox
-	if (focus && parent) {
-		parent = parent->Parent(); // TextControl
-		TextControl* control = dynamic_cast<TextControl*>(parent);
-		if (control) control->FocusSetTo(this);
-	}
-}
-
-
-// Impelementation of TextControl
-
-// --------------------------------------------------
-TextControl::TextControl(BRect frame,
-				const char *name,
-				const char *label, 
-				const char *initial_text, 
-				BMessage *message,
-				uint32 rmask,
-				uint32 flags)
-	: BView(frame, name, rmask, flags)
-{
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	BRect r(0, 0, frame.Width() / 2 -1, frame.Height());
-	fLabel = new BStringView(r, "", label);
-	BRect f(r);
-	f.OffsetTo(frame.Width() / 2 + 1, 0);
-	// box around TextView
-	BBox *box = new BBox(f, "", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	f.OffsetTo(0, 0);
-	f.InsetBy(1,1);
-	r.InsetBy(2,2);
-	fText  = new TextView(f, "", r, rmask, flags | B_NAVIGABLE);
-	fText->SetWordWrap(false);
-	fText->DisallowChar('\n');
-	fText->Insert(initial_text);
-	AddChild(fLabel); 
-	AddChild(box);
-	box->AddChild(fText);
-}
-
-
-// --------------------------------------------------
-void 
-TextControl::ConvertToParent(BView* parent, BView* child, BRect &rect) 
-{
-	do {
-		child->ConvertToParent(&rect);
-		child = child->Parent();
-	} while (child != NULL && child != parent);
-}
-
-
-// --------------------------------------------------
-void
-TextControl::FocusSetTo(BView *child)
-{
-	BRect r;
-	BView* parent = Parent(); // Table
-	if (parent) {
-		ConvertToParent(parent, child, r);
-		parent->ScrollTo(0, r.top);
-	}
-}
-
-
-// Impelementation of Implementation of Table
-
-// --------------------------------------------------
-Table::Table(BRect frame, const char *name, uint32 rmode, uint32 flags)
-	: BView(frame, name, rmode, flags)
-{
-}
-
-
-// --------------------------------------------------
-void
-Table::ScrollTo(BPoint p)
-{
-	float h = Frame().Height()+1;
-	if (Parent()) {
-		BScrollView* scrollView = dynamic_cast<BScrollView*>(Parent());
-		if (scrollView) {
-			BScrollBar *sb = scrollView->ScrollBar(B_VERTICAL);
-			float min, max;
-			sb->GetRange(&min, &max);
-			if (p.y < (h/2)) p.y = 0;
-			else if (p.y > max) p.y = max;
-		}
-	}
-	inherited::ScrollTo(p);
-}
-
-
-// Impelementation of DragListView
-
-// --------------------------------------------------
-DragListView::DragListView(BRect frame, const char *name,
-		list_view_type type,
-		uint32 resizingMode, uint32 flags)
-	: BListView(frame, name, type, resizingMode, flags)
-{
-}
-
-// --------------------------------------------------
-bool DragListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
-{
-	BMessage m;
-	DragMessage(&m, ItemFrame(index), this);
-	return true;
-}
-
-
-

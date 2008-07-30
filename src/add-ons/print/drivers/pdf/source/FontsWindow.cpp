@@ -78,6 +78,27 @@ static const char* FontName(font_encoding enc) {
 	}
 }
 
+
+// #pragma mark -- of DragListView
+
+
+DragListView::DragListView(BRect frame, const char *name,
+		list_view_type type,
+		uint32 resizingMode, uint32 flags)
+	: BListView(frame, name, type, resizingMode, flags)
+{
+}
+
+
+bool
+DragListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
+{
+	BMessage m;
+	DragMessage(&m, ItemFrame(index), this);
+	return true;
+}
+
+
 /**
  * Constuctor
  *
