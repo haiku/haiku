@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include <InterfaceKit.h>
 #include <SupportKit.h>
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 #include "FontsWindow.h"
 #include "Fonts.h"
 

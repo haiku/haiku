@@ -7,12 +7,12 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 StaticLibrary libprint.a :
 	AboutBox.cpp
 	AddPrinterDlg.cpp
+	BlockingWindow.cpp
 	DbgMsg.cpp
 	DialogWindow.cpp
 	GraphicsDriver.cpp
 	Halftone.cpp
 	HalftoneView.cpp
-	InterfaceUtils.cpp
 	JSDSlider.cpp
 	JobData.cpp
 	JobSetupDlg.cpp

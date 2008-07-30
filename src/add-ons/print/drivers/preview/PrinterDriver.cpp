@@ -10,11 +10,10 @@
  */
 
 #include "PrinterDriver.h"
-#include "PrintJobReader.h"
-
 
 #include "JobSetupWindow.h"
 #include "PageSetupWindow.h"
+#include "PrintJobReader.h"
 
 
 #include <File.h>

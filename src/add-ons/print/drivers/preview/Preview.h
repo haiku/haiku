@@ -7,7 +7,7 @@
  *		Hartmut Reh
  *		julun <host.haiku@gmx.de>
  */
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 #include "PrintJobReader.h"
 
 

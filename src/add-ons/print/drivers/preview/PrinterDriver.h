@@ -13,10 +13,11 @@
 #define PRINTERDRIVER_H
 
 
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 
 
 class BFile;
+class BlockingWindow;
 class BNode;
 class BMessage;
 

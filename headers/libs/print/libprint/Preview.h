@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include <InterfaceKit.h>
 #include "PrintJobReader.h"
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 
 class PreviewPage {
 	int32 fPage;

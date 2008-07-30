@@ -33,7 +33,7 @@ THE SOFTWARE.
 #define JOBSETUPWINDOW_H
 
 #include <InterfaceKit.h>
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 #include "PrintUtils.h"
 
 class JobSetupWindow : public HWindow 

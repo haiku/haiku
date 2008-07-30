@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "AdvancedSettingsWindow.h"
 #include "Fonts.h"
 #include "FontsWindow.h"
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 #include "MarginView.h"
 #include "PrinterDriver.h"
 #include "pdflib.h"				// for pageFormat constants

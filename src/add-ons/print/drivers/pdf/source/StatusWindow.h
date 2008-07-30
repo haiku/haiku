@@ -36,7 +36,7 @@ THE SOFTWARE.
 
 //class PrinterDriver;
 #include "PrinterDriver.h"
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 #include "PrintUtils.h"
 
 class StatusWindow : public HWindow 

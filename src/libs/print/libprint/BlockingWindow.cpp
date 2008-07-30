@@ -27,7 +27,7 @@ THE SOFTWARE.
 
 */
 
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 
 
 #include <Alert.h>

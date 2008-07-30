@@ -32,7 +32,7 @@ THE SOFTWARE.
 #define DOCINFOWINDOW_H
 
 
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 
 
 #include <String.h>

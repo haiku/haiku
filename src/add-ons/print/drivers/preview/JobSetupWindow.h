@@ -13,7 +13,7 @@
 #define JOBSETUPWINDOW_H
 
 
-#include "InterfaceUtils.h"
+#include "BlockingWindow.h"
 #include "PrintUtils.h"
 
 
