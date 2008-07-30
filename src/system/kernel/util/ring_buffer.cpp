@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,20 +18,13 @@
 #define user_memcpy(x...) (memcpy(x), B_OK)
 #endif
 
-/**	This is a light-weight ring_buffer implementation.
+/*!	This is a light-weight ring_buffer implementation.
  *	It does not provide any locking - you are supposed to ensure thread-safety
  *	with the restrictions you choose. Unless you are passing in unsafe buffers,
  *	the functions are safe to be called with interrupts turned off as well (not
  *	the user functions).
  *	They also don't use malloc() or any kind of locking after initialization.
  */
-
-struct ring_buffer {
-	int32		first;
-	int32		in;
-	int32		size;
-	uint8		buffer[0];
-};
 
 
 static inline int32

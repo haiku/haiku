@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -650,17 +650,20 @@ kernel_debugger_loop(void)
 	int32 previousCPU = sDebuggerOnCPU;
 	sDebuggerOnCPU = smp_get_current_cpu();
 
-	// set a few temporary debug variables
+	kprintf("Welcome to Kernel Debugging Land...\n");
+
 	if (struct thread* thread = thread_get_current_thread()) {
+		// set a few temporary debug variables
 		set_debug_variable("_thread", (uint64)(addr_t)thread);
 		set_debug_variable("_threadID", thread->id);
 		set_debug_variable("_team", (uint64)(addr_t)thread->team);
 		set_debug_variable("_teamID", thread->team->id);
 		set_debug_variable("_cpu", sDebuggerOnCPU);
-	}
 
-	kprintf("Welcome to Kernel Debugging Land...\n");
-	kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
+		kprintf("Thread %ld \"%s\" running on CPU %ld\n", thread->id,
+			thread->name, sDebuggerOnCPU);
+	} else
+		kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
 
 	int32 continuableLine = -1;
 		// Index of the previous command line, if the command returned
@@ -713,6 +716,63 @@ cmd_dump_kdl_message(int argc, char **argv)
 		kputs(sCurrentKernelDebuggerMessage);
 		kputs("\n");
 	}
+
+	return 0;
+}
+
+
+static int
+cmd_dump_syslog(int argc, char **argv)
+{
+	if (!sSyslogOutputEnabled) {
+		kprintf("Syslog is not enabled.\n");
+		return 0;
+	}
+
+	bool currentOnly = false;
+	if (argc > 1) {
+		if (!strcmp(argv[1], "-n"))
+			currentOnly = true;
+		else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	uint32 start = sSyslogBuffer->first;
+	size_t end = start + sSyslogBuffer->in;
+	if (!currentOnly) {
+		// Start the buffer after the current end (we don't really know if
+		// this part has been written to already).
+		start = (start + sSyslogBuffer->in) % sSyslogBuffer->size;
+		end = start + sSyslogBuffer->size;
+	} else if (!ring_buffer_readable(sSyslogBuffer)) {
+		kprintf("Syslog is empty.\n");
+		return 0;
+	}
+
+	// break it down to lines to make it grep'able
+
+	bool newLine = false;
+	char line[256];
+	size_t linePos = 0;
+	for (int32 i = start; i < end; i++) {
+		char c = sSyslogBuffer->buffer[i % sSyslogBuffer->size];
+		if (c == '\0' || (uint8)c == 0xcc)
+			continue;
+
+		line[linePos++] = c;
+		newLine = false;
+
+		if (c == '\n' || linePos == sizeof(line) - 1) {
+			newLine = c == '\n';
+			line[linePos] = '\0';
+			linePos = 0;
+			kprintf(line);
+		}
+	}
+	if (!newLine)
+		kprintf("\n");
 
 	return 0;
 }
@@ -879,6 +939,11 @@ syslog_init(struct kernel_args *args)
 		"Welcome to syslog debug output!\nHaiku revision: %lu\n",
 		get_haiku_revision());
 	syslog_write(revisionBuffer, length);
+
+	add_debugger_command_etc("syslog", &cmd_dump_syslog,
+		"Dumps the syslog buffer.\n",
+		"[-n]\nDumps the whole syslog buffer, or, if -n is specified, only "
+		"the part that hasn't been send yet.\n", 0);
 	return B_OK;
 
 err2:

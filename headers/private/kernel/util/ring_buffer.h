@@ -9,7 +9,13 @@
 #include <OS.h>
 
 
-struct ring_buffer;
+struct ring_buffer {
+	int32		first;
+	int32		in;
+	int32		size;
+	uint8		buffer[0];
+};
+
 
 #ifdef __cplusplus
 extern "C" {
