@@ -50,7 +50,7 @@ enum ops {
 enum match {
 	NO_MATCH = 0,
 	MATCH_OK = 1,
-	
+
 	MATCH_BAD_PATTERN = -2,
 	MATCH_INVALID_CHARACTER
 };
@@ -79,31 +79,32 @@ union value {
 #endif
 
 class Term {
-	public:
-		Term(int8 op) : fOp(op), fParent(NULL) {}
-		virtual ~Term() {}
+public:
+						Term(int8 op) : fOp(op), fParent(NULL) {}
+	virtual				~Term() {}
 
-		int8		Op() const { return fOp; }
+			int8		Op() const { return fOp; }
 
-		void		SetParent(Term *parent) { fParent = parent; }
-		Term		*Parent() const { return fParent; }
+			void		SetParent(Term* parent) { fParent = parent; }
+			Term*		Parent() const { return fParent; }
 
-		virtual status_t Match(Inode *inode,const char *attribute = NULL,int32 type = 0,
-				const uint8 *key = NULL,size_t size = 0) = 0;
-		virtual void Complement() = 0;
+	virtual	status_t	Match(Inode* inode, const char* attribute = NULL,
+							int32 type = 0, const uint8* key = NULL,
+							size_t size = 0) = 0;
+	virtual	void		Complement() = 0;
 
-		virtual void CalculateScore(Index &index) = 0;
-		virtual int32 Score() const = 0;
+	virtual	void		CalculateScore(Index& index) = 0;
+	virtual	int32		Score() const = 0;
 
-		virtual status_t InitCheck() = 0;
+	virtual	status_t	InitCheck() = 0;
 
 #ifdef DEBUG
-		virtual void	PrintToStream() = 0;
+	virtual	void		PrintToStream() = 0;
 #endif
 
-	protected:
-		int8	fOp;
-		Term	*fParent;
+protected:
+			int8		fOp;
+			Term*		fParent;
 };
 
 // Although an Equation object is quite independent from the volume on which
@@ -116,101 +117,104 @@ class Term {
 // queries more than once.
 
 class Equation : public Term {
-	public:
-		Equation(char **expr);
-		virtual ~Equation();
+public:
+						Equation(char** expression);
+	virtual				~Equation();
 
-		virtual status_t InitCheck();
+	virtual	status_t	InitCheck();
 
-		status_t	ParseQuotedString(char **_start, char **_end);
-		char		*CopyString(char *start, char *end);
+			status_t	ParseQuotedString(char** _start, char** _end);
+			char*		CopyString(char* start, char* end);
 
-		virtual status_t Match(Inode *inode, const char *attribute = NULL, int32 type = 0,
-						const uint8 *key = NULL, size_t size = 0);
-		virtual void Complement();
+	virtual	status_t	Match(Inode* inode, const char* attribute = NULL,
+							int32 type = 0, const uint8* key = NULL,
+							size_t size = 0);
+	virtual void		Complement();
 
-		status_t	PrepareQuery(Volume *volume, Index &index, TreeIterator **iterator,
-						bool queryNonIndexed);
-		status_t	GetNextMatching(Volume *volume, TreeIterator *iterator,
-						struct dirent *dirent, size_t bufferSize);
+			status_t	PrepareQuery(Volume* volume, Index& index,
+							TreeIterator** iterator, bool queryNonIndexed);
+			status_t	GetNextMatching(Volume* volume, TreeIterator* iterator,
+							struct dirent* dirent, size_t bufferSize);
 
-		virtual void CalculateScore(Index &index);
-		virtual int32 Score() const { return fScore; }
+	virtual	void		CalculateScore(Index &index);
+	virtual	int32		Score() const { return fScore; }
 
 #ifdef DEBUG
-		virtual void PrintToStream();
+	virtual	void		PrintToStream();
 #endif
 
-	private:
-		Equation(const Equation &);
-		Equation &operator=(const Equation &);
-			// no implementation
+private:
+						Equation(const Equation& other);
+						Equation& operator=(const Equation& other);
+							// no implementation
 
-		status_t	ConvertValue(type_code type);
-		bool		CompareTo(const uint8 *value, uint16 size);
-		uint8		*Value() const { return (uint8 *)&fValue; }
-		status_t	MatchEmptyString();
+			status_t	ConvertValue(type_code type);
+			bool		CompareTo(const uint8* value, uint16 size);
+			uint8*		Value() const { return (uint8*)&fValue; }
+			status_t	MatchEmptyString();
 
-		char		*fAttribute;
-		char		*fString;
-		union value fValue;
-		type_code	fType;
-		size_t		fSize;
-		bool		fIsPattern;
-		bool		fIsSpecialTime;
+			char*		fAttribute;
+			char*		fString;
+			union value fValue;
+			type_code	fType;
+			size_t		fSize;
+			bool		fIsPattern;
+			bool		fIsSpecialTime;
 
-		int32		fScore;
-		bool		fHasIndex;
+			int32		fScore;
+			bool		fHasIndex;
 };
 
 class Operator : public Term {
-	public:
-		Operator(Term *,int8,Term *);
-		virtual ~Operator();
+public:
+						Operator(Term* left, int8 op, Term* right);
+	virtual				~Operator();
 
-		Term		*Left() const { return fLeft; }
-		Term		*Right() const { return fRight; }
+			Term*		Left() const { return fLeft; }
+			Term*		Right() const { return fRight; }
 
-		virtual status_t Match(Inode *inode, const char *attribute = NULL, int32 type = 0,
-			const uint8 *key = NULL, size_t size = 0);
-		virtual void Complement();
+	virtual	status_t	Match(Inode* inode, const char* attribute = NULL,
+							int32 type = 0, const uint8* key = NULL,
+							size_t size = 0);
+	virtual	void		Complement();
 
-		virtual void CalculateScore(Index &index);
-		virtual int32 Score() const;
+	virtual	void		CalculateScore(Index& index);
+	virtual	int32		Score() const;
 
-		virtual status_t InitCheck();
+	virtual	status_t	InitCheck();
 
-		//Term		*Copy() const;
 #ifdef DEBUG
-		virtual void PrintToStream();
+	virtual	void		PrintToStream();
 #endif
 
-	private:
-		Operator(const Operator &);
-		Operator &operator=(const Operator &);
-			// no implementation
+private:
+						Operator(const Operator& other);
+						Operator& operator=(const Operator& other);
+							// no implementation
 
-		Term		*fLeft,*fRight;
+			Term*		fLeft;
+			Term*		fRight;
 };
 
 
-//---------------------------------
+//	#pragma mark -
 
 
-void 
-skipWhitespace(char **expr, int32 skip = 0)
+void
+skipWhitespace(char** expr, int32 skip = 0)
 {
-	char *string = (*expr) + skip;
+	char* string = (*expr) + skip;
 	while (*string == ' ' || *string == '\t') string++;
 	*expr = string;
 }
 
 
-void 
-skipWhitespaceReverse(char **expr,char *stop)
+void
+skipWhitespaceReverse(char** expr, char* stop)
 {
-	char *string = *expr;
-	while (string > stop && (*string == ' ' || *string == '\t')) string--;
+	char* string = *expr;
+	while (string > stop && (*string == ' ' || *string == '\t'))
+		string--;
 	*expr = string;
 }
 
@@ -219,16 +223,20 @@ skipWhitespaceReverse(char **expr,char *stop)
 
 
 uint32
-utf8ToUnicode(char **string)
+utf8ToUnicode(char** string)
 {
-	uint8 *bytes = (uint8 *)*string;
+	uint8* bytes = (uint8*)*string;
 	int32 length;
 	uint8 mask = 0x1f;
 
 	switch (bytes[0] & 0xf0) {
 		case 0xc0:
-		case 0xd0:	length = 2; break;
-		case 0xe0:	length = 3; break;
+		case 0xd0:
+			length = 2;
+			break;
+		case 0xe0:
+			length = 3;
+			break;
 		case 0xf0:
 			mask = 0x0f;
 			length = 4;
@@ -241,7 +249,7 @@ utf8ToUnicode(char **string)
 	}
 	uint32 c = bytes[0] & mask;
 	int32 i = 1;
-	for (;i < length && (bytes[i] & 0x80) > 0;i++)
+	for (; i < length && (bytes[i] & 0x80) > 0; i++)
 		c = (c << 6) | (bytes[i] & 0x3f);
 
 	if (i < length) {
@@ -255,11 +263,11 @@ utf8ToUnicode(char **string)
 
 
 int32
-getFirstPatternSymbol(char *string)
+getFirstPatternSymbol(char* string)
 {
 	char c;
 
-	for (int32 index = 0;(c = *string++);index++) {
+	for (int32 index = 0; (c = *string++); index++) {
 		if (c == '*' || c == '?' || c == '[')
 			return index;
 	}
@@ -268,14 +276,14 @@ getFirstPatternSymbol(char *string)
 
 
 bool
-isPattern(char *string)
+isPattern(char* string)
 {
 	return getFirstPatternSymbol(string) >= 0 ? true : false;
 }
 
 
 status_t
-isValidPattern(char *pattern)
+isValidPattern(char* pattern)
 {
 	while (*pattern) {
 		switch (*pattern++) {
@@ -308,14 +316,12 @@ isValidPattern(char *pattern)
 }
 
 
-/**	Matches the string against the given wildcard pattern.
- *	Returns either MATCH_OK, or NO_MATCH when everything went fine,
- *	or values < 0 (see enum at the top of Query.cpp) if an error
- *	occurs
- */
-
+/*!	Matches the string against the given wildcard pattern.
+	Returns either MATCH_OK, or NO_MATCH when everything went fine, or
+	values < 0 (see enum at the top of Query.cpp) if an error occurs.
+*/
 status_t
-matchString(char *pattern, char *string)
+matchString(char* pattern, char* string)
 {
 	while (*pattern) {
 		// end of string == valid end of pattern?
@@ -356,7 +362,7 @@ matchString(char *pattern, char *string)
 					if (pattern[0] == string[0]
 						|| pattern[0] == '['
 						|| pattern[0] == '\\') {
-						status_t status = matchString(pattern,string);
+						status_t status = matchString(pattern, string);
 						if (status < B_OK || status == MATCH_OK)
 							return status;
 					}
@@ -398,7 +404,8 @@ matchString(char *pattern, char *string)
 					if (first == c) {
 						matched = true;
 						break;
-					} else if (pattern[0] == '-' && pattern[1] != ']' && pattern[1]) {
+					} else if (pattern[0] == '-' && pattern[1] != ']'
+							&& pattern[1]) {
 						pattern++;
 
 						if (pattern[0] == '\\') {
@@ -444,7 +451,7 @@ matchString(char *pattern, char *string)
 
 	if (string[0])
 		return NO_MATCH;
-	
+
 	return MATCH_OK;
 }
 
@@ -452,20 +459,21 @@ matchString(char *pattern, char *string)
 //	#pragma mark -
 
 
-Equation::Equation(char **expr)
+Equation::Equation(char** expr)
 	: Term(OP_EQUATION),
 	fAttribute(NULL),
 	fString(NULL),
 	fType(0),
 	fIsPattern(false)
 {
-	char *string = *expr;
-	char *start = string;
-	char *end = NULL;
+	char* string = *expr;
+	char* start = string;
+	char* end = NULL;
 
 	// Since the equation is the integral part of any query, we're just parsing
 	// the whole thing here.
-	// The whitespace at the start is already removed in Expression::ParseEquation()
+	// The whitespace at the start is already removed in
+	// Expression::ParseEquation()
 
 	if (*start == '"' || *start == '\'') {
 		// string is quoted (start has to be on the beginning of a string)
@@ -475,16 +483,18 @@ Equation::Equation(char **expr)
 		// set string to a valid start of the equation symbol
 		string = end + 2;
 		skipWhitespace(&string);
-		if (*string != '=' && *string != '<' && *string != '>' && *string != '!') {
+		if (*string != '=' && *string != '<' && *string != '>'
+			&& *string != '!') {
 			*expr = string;
 			return;
 		}
 	} else {
 		// search the (in)equation for the actual equation symbol (and for other operators
 		// in case the equation is malformed)
-		while (*string && *string != '=' && *string != '<' && *string != '>' && *string != '!'
-			&& *string != '&' && *string != '|')
+		while (*string && *string != '=' && *string != '<' && *string != '>'
+			&& *string != '!' && *string != '&' && *string != '|') {
 			string++;
+		}
 
 		// get the attribute string	(and trim whitespace), in case
 		// the string was not quoted
@@ -495,10 +505,10 @@ Equation::Equation(char **expr)
 	// attribute string is empty (which is not allowed)
 	if (start > end)
 		return;
-		
-	// at this point, "start" points to the beginning of the string, "end" points
-	// to the last character of the string, and "string" points to the first
-	// character of the equation symbol
+
+	// At this point, "start" points to the beginning of the string, "end"
+	// points to the last character of the string, and "string" points to the
+	// first character of the equation symbol
 
 	// test for the right symbol (as this doesn't need any memory)
 	switch (*string) {
@@ -506,22 +516,25 @@ Equation::Equation(char **expr)
 			fOp = OP_EQUAL;
 			break;
 		case '>':
-			fOp = *(string + 1) == '=' ? OP_GREATER_THAN_OR_EQUAL : OP_GREATER_THAN;
+			fOp = *(string + 1) == '='
+				? OP_GREATER_THAN_OR_EQUAL : OP_GREATER_THAN;
 			break;
 		case '<':
-			fOp = *(string + 1) == '=' ? OP_LESS_THAN_OR_EQUAL : OP_LESS_THAN;
+			fOp = *(string + 1) == '='
+				? OP_LESS_THAN_OR_EQUAL : OP_LESS_THAN;
 			break;
 		case '!':
 			if (*(string + 1) != '=')
 				return;
 			fOp = OP_UNEQUAL;
 			break;
-		
+
 		// any invalid characters will be rejected
 		default:
 			*expr = string;
 			return;
 	}
+
 	// lets change "start" to point to the first character after the symbol
 	if (*(string + 1) == '=')
 		string++;
@@ -539,7 +552,7 @@ Equation::Equation(char **expr)
 		// string is quoted (start has to be on the beginning of a string)
 		if (ParseQuotedString(&start, &end) < B_OK)
 			return;
-		
+
 		string = end + 2;
 		skipWhitespace(&string);
 	} else {
@@ -549,7 +562,7 @@ Equation::Equation(char **expr)
 		end = string - 1;
 		skipWhitespaceReverse(&end, start);
 	}
-	
+
 	// at this point, "start" will point to the first character of the value,
 	// "end" will point to its last character, and "start" to the first non-
 	// whitespace character after the value string
@@ -583,33 +596,29 @@ Equation::Equation(char **expr)
 
 Equation::~Equation()
 {
-	if (fAttribute != NULL)
-		free(fAttribute);
-	if (fString != NULL)
-		free(fString);
+	free(fAttribute);
+	free(fString);
 }
 
 
-status_t 
+status_t
 Equation::InitCheck()
 {
-	if (fAttribute == NULL
-		|| fString == NULL
-		|| fOp == OP_NONE)
+	if (fAttribute == NULL || fString == NULL || fOp == OP_NONE)
 		return B_BAD_VALUE;
 
 	return B_OK;
 }
 
 
-status_t 
-Equation::ParseQuotedString(char **_start, char **_end)
+status_t
+Equation::ParseQuotedString(char** _start, char** _end)
 {
-	char *start = *_start;
+	char* start = *_start;
 	char quote = *start++;
-	char *end = start;
-	
-	for (;*end && *end != quote;end++) {
+	char* end = start;
+
+	for (; *end && *end != quote; end++) {
 		if (*end == '\\')
 			end++;
 	}
@@ -623,8 +632,8 @@ Equation::ParseQuotedString(char **_start, char **_end)
 }
 
 
-char *
-Equation::CopyString(char *start, char *end)
+char*
+Equation::CopyString(char* start, char* end)
 {
 	// end points to the last character of the string - and the length
 	// also has to include the null-termination
@@ -634,25 +643,25 @@ Equation::CopyString(char *start, char *end)
 	if (length > INODE_FILE_NAME_LENGTH || length <= 0)
 		return NULL;
 
-	char *copy = (char *)malloc(length);
+	char* copy = (char*)malloc(length);
 	if (copy == NULL)
 		return NULL;
 
-	memcpy(copy,start,length - 1);
+	memcpy(copy, start, length - 1);
 	copy[length - 1] = '\0';
 
 	return copy;
 }
 
 
-status_t 
+status_t
 Equation::ConvertValue(type_code type)
 {
 	// Has the type already been converted?
 	if (type == fType)
 		return B_OK;
 
-	char *string = fString;
+	char* string = fString;
 
 	switch (type) {
 		case B_MIME_STRING_TYPE:
@@ -703,26 +712,27 @@ Equation::ConvertValue(type_code type)
 }
 
 
-/**	Returns true when the key matches the equation. You have to
- *	call ConvertValue() before this one.
- */
-
+/*!	Returns true when the key matches the equation. You have to
+	call ConvertValue() before this one.
+*/
 bool
-Equation::CompareTo(const uint8 *value, uint16 size)
+Equation::CompareTo(const uint8* value, uint16 size)
 {
 	int32 compare;
 
-	// fIsPattern is only true if it's a string type, and fOp OP_EQUAL, or OP_UNEQUAL
+	// fIsPattern is only true if it's a string type, and fOp OP_EQUAL, or
+	// OP_UNEQUAL
 	if (fIsPattern) {
 		// we have already validated the pattern, so we don't check for failing
 		// here - if something is broken, and matchString() returns an error,
 		// we just don't match
-		compare = matchString(fValue.String, (char *)value) == MATCH_OK ? 0 : 1;
+		compare = matchString(fValue.String, (char*)value) == MATCH_OK ? 0 : 1;
 	} else if (fIsSpecialTime) {
 		// the index is a shifted int64 index, but we have to match
 		// against an unshifted value (i.e. the last_modified index)
-		int64 timeValue = *(int64 *)value >> INODE_TIME_SHIFT;
-		compare = compareKeys(fType, &timeValue, sizeof(int64), &fValue.Int64, sizeof(int64));
+		int64 timeValue = *(int64*)value >> INODE_TIME_SHIFT;
+		compare = compareKeys(fType, &timeValue, sizeof(int64), &fValue.Int64,
+			sizeof(int64));
 	} else
 		compare = compareKeys(fType, value, size, Value(), fSize);
 
@@ -745,7 +755,7 @@ Equation::CompareTo(const uint8 *value, uint16 size)
 }
 
 
-void 
+void
 Equation::Complement()
 {
 	D(if (fOp <= OP_EQUATION || fOp > OP_LESS_THAN_OR_EQUAL) {
@@ -773,23 +783,24 @@ Equation::MatchEmptyString()
 
 	status_t status = ConvertValue(B_STRING_TYPE);
 	if (status == B_OK)
-		status = CompareTo((const uint8 *)"", fSize) ? MATCH_OK : NO_MATCH;
+		status = CompareTo((const uint8*)"", fSize) ? MATCH_OK : NO_MATCH;
 
 	return status;
 }
 
 
-/**	Matches the inode's attribute value with the equation.
- *	Returns MATCH_OK if it matches, NO_MATCH if not, < 0 if something went wrong
- */
-
+/*!	Matches the inode's attribute value with the equation.
+	Returns MATCH_OK if it matches, NO_MATCH if not, < 0 if something went
+	wrong.
+*/
 status_t
-Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8 *key, size_t size)
+Equation::Match(Inode* inode, const char* attributeName, int32 type,
+	const uint8* key, size_t size)
 {
 	// get a pointer to the attribute in question
 	NodeGetter nodeGetter(inode->GetVolume());
 	union value value;
-	uint8 *buffer = (uint8 *)&value;
+	uint8* buffer = (uint8*)&value;
 	bool locked = false;
 
 	// first, check if we are matching for a live query and use that value
@@ -800,7 +811,7 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 
 			return NO_MATCH;
 		}
-		buffer = const_cast<uint8 *>(key);
+		buffer = const_cast<uint8*>(key);
 	} else if (!strcmp(fAttribute, "name")) {
 		// we need to lock before accessing Inode::Name()
 		nodeGetter.SetToNode(inode);
@@ -808,25 +819,25 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 		recursive_lock_lock(&inode->SmallDataLock());
 		locked = true;
 
-		// if not, check for "fake" attributes, "name", "size", "last_modified",
-		buffer = (uint8 *)inode->Name(nodeGetter.Node());
+		// if not, check for "fake" attributes ("name", "size", "last_modified")
+		buffer = (uint8*)inode->Name(nodeGetter.Node());
 		if (buffer == NULL) {
 			recursive_lock_unlock(&inode->SmallDataLock());
 			return B_ERROR;
 		}
 
 		type = B_STRING_TYPE;
-		size = strlen((const char *)buffer);
+		size = strlen((const char*)buffer);
 	} else if (!strcmp(fAttribute, "size")) {
 #ifdef BFS_NATIVE_ENDIAN
-		buffer = (uint8 *)&inode->Node().data.size;
+		buffer = (uint8*)&inode->Node().data.size;
 #else
 		value.Int64 = inode->Size();
 #endif
 		type = B_INT64_TYPE;
 	} else if (!strcmp(fAttribute, "last_modified")) {
 #ifdef BFS_NATIVE_ENDIAN
-		buffer = (uint8 *)&inode->Node().last_modified_time;
+		buffer = (uint8*)&inode->Node().last_modified_time;
 #else
 		value.Int64 = inode->Node().LastModifiedTime();
 #endif
@@ -835,10 +846,11 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 		// then for attributes in the small_data section, and finally for the
 		// real attributes
 		nodeGetter.SetToNode(inode);
-		Inode *attribute;
+		Inode* attribute;
 
 		recursive_lock_lock(&inode->SmallDataLock());
-		small_data *smallData = inode->FindSmallData(nodeGetter.Node(), fAttribute);
+		small_data* smallData = inode->FindSmallData(nodeGetter.Node(),
+			fAttribute);
 		if (smallData != NULL) {
 			buffer = smallData->Data();
 			type = smallData->type;
@@ -850,7 +862,7 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 			nodeGetter.Unset();
 
 			if (inode->GetAttribute(fAttribute, &attribute) == B_OK) {
-				buffer = (uint8 *)&value;
+				buffer = (uint8*)&value;
 				type = attribute->Type();
 				size = attribute->Size();
 
@@ -878,7 +890,7 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 }
 
 
-void 
+void
 Equation::CalculateScore(Index &index)
 {
 	// As always, these values could be tuned and refined.
@@ -913,18 +925,19 @@ Equation::CalculateScore(Index &index)
 
 
 status_t
-Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator, bool queryNonIndexed)
+Equation::PrepareQuery(Volume* /*volume*/, Index& index,
+	TreeIterator** iterator, bool queryNonIndexed)
 {
 	status_t status = index.SetTo(fAttribute);
-	
+
 	// if we should query attributes without an index, we can just proceed here
 	if (status < B_OK && !queryNonIndexed)
 		return B_ENTRY_NOT_FOUND;
 
 	type_code type;
 
-	// special case for OP_UNEQUAL - it will always operate through the whole index
-	// but we need the call to the original index to get the correct type
+	// Special case for OP_UNEQUAL - it will always operate through the whole
+	// index but we need the call to the original index to get the correct type
 	if (status < B_OK || fOp == OP_UNEQUAL) {
 		// Try to get an index that holds all files (name)
 		// Also sets the default type for all attributes without index
@@ -943,7 +956,7 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 	if (ConvertValue(type) < B_OK)
 		return B_BAD_VALUE;
 
-	BPlusTree *tree;
+	BPlusTree* tree;
 	if (index.Node()->GetTree(&tree) < B_OK)
 		return B_ERROR;
 
@@ -951,14 +964,14 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 	if (*iterator == NULL)
 		return B_NO_MEMORY;
 
-	if ((fOp == OP_EQUAL || fOp == OP_GREATER_THAN || fOp == OP_GREATER_THAN_OR_EQUAL
-		|| fIsPattern)
+	if ((fOp == OP_EQUAL || fOp == OP_GREATER_THAN
+			|| fOp == OP_GREATER_THAN_OR_EQUAL || fIsPattern)
 		&& fHasIndex) {
 		// set iterator to the exact position
 
 		int32 keySize = index.KeySize();
 
-		// at this point, fIsPattern is only true if it's a string type, and fOp
+		// At this point, fIsPattern is only true if it's a string type, and fOp
 		// is either OP_EQUAL or OP_UNEQUAL
 		if (fIsPattern) {
 			// let's see if we can use the beginning of the key for positioning
@@ -977,8 +990,8 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 
 				// The empty string is a special case - we normally don't check
 				// for the trailing null byte, in the case for the empty string
-				// we do it explicitly, because there can't be keys in the B+tree
-				// with a length of zero
+				// we do it explicitly, because there can't be keys in the
+				// B+tree with a length of zero
 				if (keySize == 0)
 					keySize = 1;
 			} else
@@ -988,7 +1001,7 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 		if (fIsSpecialTime) {
 			// we have to find the first matching shifted value
 			off_t value = fValue.Int64 << INODE_TIME_SHIFT;
-			status = (*iterator)->Find((uint8 *)&value, keySize);
+			status = (*iterator)->Find((uint8*)&value, keySize);
 			if (status == B_ENTRY_NOT_FOUND)
 				return B_OK;
 		} else {
@@ -996,7 +1009,8 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 			if (fOp == OP_EQUAL && !fIsPattern)
 				return status;
 			else if (status == B_ENTRY_NOT_FOUND
-				&& (fIsPattern || fOp == OP_GREATER_THAN || fOp == OP_GREATER_THAN_OR_EQUAL))
+				&& (fIsPattern || fOp == OP_GREATER_THAN
+					|| fOp == OP_GREATER_THAN_OR_EQUAL))
 				return B_OK;
 		}
 
@@ -1007,9 +1021,9 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 }
 
 
-status_t 
-Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
-	struct dirent *dirent, size_t bufferSize)
+status_t
+Equation::GetNextMatching(Volume* volume, TreeIterator* iterator,
+	struct dirent* dirent, size_t bufferSize)
 {
 	while (true) {
 		union value indexValue;
@@ -1024,10 +1038,12 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 
 		// only compare against the index entry when this is the correct
 		// index for the equation
-		if (fHasIndex && duplicate < 2 && !CompareTo((uint8 *)&indexValue, keyLength)) {
-			// They aren't equal? let the operation decide what to do
-			// Since we always start at the beginning of the index (or the correct
-			// position), only some needs to be stopped if the entry doesn't fit.
+		if (fHasIndex && duplicate < 2
+			&& !CompareTo((uint8*)&indexValue, keyLength)) {
+			// They aren't equal? Let the operation decide what to do. Since
+			// we always start at the beginning of the index (or the correct
+			// position), only some needs to be stopped if the entry doesn't
+			// fit.
 			if (fOp == OP_LESS_THAN
 				|| fOp == OP_LESS_THAN_OR_EQUAL
 				|| (fOp == OP_EQUAL && !fIsPattern))
@@ -1039,15 +1055,16 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 		}
 
 		Vnode vnode(volume, offset);
-		Inode *inode;
+		Inode* inode;
 		if ((status = vnode.Get(&inode)) != B_OK) {
 			REPORT_ERROR(status);
-			FATAL(("could not get inode %Ld in index \"%s\"!\n", offset, fAttribute));
+			FATAL(("could not get inode %Ld in index \"%s\"!\n", offset,
+				fAttribute));
 			// try with next
 			continue;
 		}
 
-		// ToDo: check user permissions here - but which one?!
+		// TODO: check user permissions here - but which one?!
 		// we could filter out all those where we don't have
 		// read access... (we should check for every parent
 		// directory if the X_OK is allowed)
@@ -1059,25 +1076,26 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 		// go up in the tree until a &&-operator is found, and check if the
 		// inode matches with the rest of the expression - we don't have to
 		// check ||-operators for that
-		Term *term = this;
+		Term* term = this;
 		status = MATCH_OK;
 
 		if (!fHasIndex)
 			status = Match(inode);
 
 		while (term != NULL && status == MATCH_OK) {
-			Operator *parent = (Operator *)term->Parent();
+			Operator* parent = (Operator*)term->Parent();
 			if (parent == NULL)
 				break;
 
 			if (parent->Op() == OP_AND) {
 				// choose the other child of the parent
-				Term *other = parent->Right();
+				Term* other = parent->Right();
 				if (other == term)
 					other = parent->Left();
 
 				if (other == NULL) {
-					FATAL(("&&-operator has only one child... (parent = %p)\n", parent));
+					FATAL(("&&-operator has only one child... (parent = %p)\n",
+						parent));
 					break;
 				}
 				status = other->Match(inode);
@@ -1086,7 +1104,7 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 					status = NO_MATCH;
 				}
 			}
-			term = (Term *)parent;
+			term = (Term*)parent;
 		}
 
 		if (status == MATCH_OK) {
@@ -1095,8 +1113,10 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 			dirent->d_pdev = volume->ID();
 			dirent->d_pino = volume->ToVnode(inode->Parent());
 
-			if (inode->GetName(dirent->d_name) < B_OK)
-				FATAL(("inode %Ld in query has no name!\n", inode->BlockNumber()));
+			if (inode->GetName(dirent->d_name) < B_OK) {
+				FATAL(("inode %Ld in query has no name!\n",
+					inode->BlockNumber()));
+			}
 
 			dirent->d_reclen = sizeof(struct dirent) + strlen(dirent->d_name);
 		}
@@ -1111,7 +1131,7 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 //	#pragma mark -
 
 
-Operator::Operator(Term *left, int8 op, Term *right)
+Operator::Operator(Term* left, int8 op, Term* right)
 	: Term(op),
 	fLeft(left),
 	fRight(right)
@@ -1131,7 +1151,8 @@ Operator::~Operator()
 
 
 status_t
-Operator::Match(Inode *inode, const char *attribute, int32 type, const uint8 *key, size_t size)
+Operator::Match(Inode* inode, const char* attribute, int32 type,
+	const uint8* key, size_t size)
 {
 	if (fOp == OP_AND) {
 		status_t status = fLeft->Match(inode, attribute, type, key, size);
@@ -1151,20 +1172,20 @@ Operator::Match(Inode *inode, const char *attribute, int32 type, const uint8 *ke
 }
 
 
-void 
+void
 Operator::Complement()
 {
 	if (fOp == OP_AND)
 		fOp = OP_OR;
 	else
 		fOp = OP_AND;
-	
+
 	fLeft->Complement();
 	fRight->Complement();
 }
 
 
-void 
+void
 Operator::CalculateScore(Index &index)
 {
 	fLeft->CalculateScore(index);
@@ -1172,21 +1193,21 @@ Operator::CalculateScore(Index &index)
 }
 
 
-int32 
+int32
 Operator::Score() const
 {
 	if (fOp == OP_AND) {
 		// return the one with the better score
 		if (fRight->Score() > fLeft->Score())
 			return fRight->Score();
-		
+
 		return fLeft->Score();
 	}
-	
+
 	// for OP_OR, be honest, and return the one with the worse score
 	if (fRight->Score() < fLeft->Score())
 		return fRight->Score();
-	
+
 	return fLeft->Score();
 }
 
@@ -1204,22 +1225,23 @@ Operator::InitCheck()
 
 
 #if 0
-Term *
+Term*
 Operator::Copy() const
 {
 	if (fEquation != NULL) {
-		Equation *equation = new Equation(*fEquation);
+		Equation* equation = new Equation(*fEquation);
 		if (equation == NULL)
 			return NULL;
 
-		Term *term = new Term(equation);
+		Term* term = new Term(equation);
 		if (term == NULL)
 			delete equation;
-		
+
 		return term;
 	}
 
-	Term *left = NULL, *right = NULL;
+	Term* left = NULL;
+	Term* right = NULL;
 
 	if (fLeft != NULL && (left = fLeft->Copy()) == NULL)
 		return NULL;
@@ -1228,7 +1250,7 @@ Operator::Copy() const
 		return NULL;
 	}
 
-	Term *term = new Term(left,fOp,right);
+	Term* term = new Term(left, fOp, right);
 	if (term == NULL) {
 		delete left;
 		delete right;
@@ -1242,21 +1264,22 @@ Operator::Copy() const
 //	#pragma mark -
 
 #ifdef DEBUG
+
 void
 Operator::PrintToStream()
 {
 	D(__out("( "));
 	if (fLeft != NULL)
 		fLeft->PrintToStream();
-	
-	char *op;
+
+	char* op;
 	switch (fOp) {
 		case OP_OR: op = "OR"; break;
 		case OP_AND: op = "AND"; break;
 		default: op = "?"; break;
 	}
-	D(__out(" %s ",op));
-	
+	D(__out(" %s ", op));
+
 	if (fRight != NULL)
 		fRight->PrintToStream();
 
@@ -1264,10 +1287,10 @@ Operator::PrintToStream()
 }
 
 
-void 
+void
 Equation::PrintToStream()
 {
-	char *symbol = "???";
+	char* symbol = "???";
 	switch (fOp) {
 		case OP_EQUAL: symbol = "=="; break;
 		case OP_UNEQUAL: symbol = "!="; break;
@@ -1279,16 +1302,16 @@ Equation::PrintToStream()
 	D(__out("[\"%s\" %s \"%s\"]", fAttribute, symbol, fString));
 }
 
-#endif	/* DEBUG */
+#endif	// DEBUG
 
 //	#pragma mark -
 
 
-Expression::Expression(char *expr)
+Expression::Expression(char* expr)
 {
 	if (expr == NULL)
 		return;
-	
+
 	fTerm = ParseOr(&expr);
 	if (fTerm != NULL && fTerm->InitCheck() < B_OK) {
 		FATAL(("Corrupt tree in expression!\n"));
@@ -1311,8 +1334,8 @@ Expression::~Expression()
 }
 
 
-Term *
-Expression::ParseEquation(char **expr)
+Term*
+Expression::ParseEquation(char** expr)
 {
 	skipWhitespace(expr);
 
@@ -1321,7 +1344,7 @@ Expression::ParseEquation(char **expr)
 		skipWhitespace(expr, 1);
 		if (**expr != '(')
 			return NULL;
-		
+
 		_not = true;
 	}
 
@@ -1330,16 +1353,16 @@ Expression::ParseEquation(char **expr)
 		return NULL;
 	} else if (**expr == '(') {
 		skipWhitespace(expr, 1);
-		
-		Term *term = ParseOr(expr);
-		
+
+		Term* term = ParseOr(expr);
+
 		skipWhitespace(expr);
-		
+
 		if (**expr != ')') {
 			delete term;
 			return NULL;
 		}
-		
+
 		// If the term is negated, we just complement the tree, to get
 		// rid of the not, a.k.a. DeMorgan's Law.
 		if (_not)
@@ -1350,7 +1373,7 @@ Expression::ParseEquation(char **expr)
 		return term;
 	}
 
-	Equation *equation = new Equation(expr);
+	Equation* equation = new Equation(expr);
 	if (equation == NULL || equation->InitCheck() < B_OK) {
 		delete equation;
 		return NULL;
@@ -1359,18 +1382,19 @@ Expression::ParseEquation(char **expr)
 }
 
 
-Term *
-Expression::ParseAnd(char **expr)
+Term*
+Expression::ParseAnd(char** expr)
 {
-	Term *left = ParseEquation(expr);
+	Term* left = ParseEquation(expr);
 	if (left == NULL)
 		return NULL;
 
-	while (IsOperator(expr,'&')) {
-		Term *right = ParseAnd(expr);
-		Term *newParent = NULL;
+	while (IsOperator(expr, '&')) {
+		Term* right = ParseAnd(expr);
+		Term* newParent = NULL;
 
-		if (right == NULL || (newParent = new Operator(left, OP_AND, right)) == NULL) {
+		if (right == NULL
+			|| (newParent = new Operator(left, OP_AND, right)) == NULL) {
 			delete left;
 			delete right;
 
@@ -1383,18 +1407,19 @@ Expression::ParseAnd(char **expr)
 }
 
 
-Term *
-Expression::ParseOr(char **expr)
+Term*
+Expression::ParseOr(char** expr)
 {
-	Term *left = ParseAnd(expr);
+	Term* left = ParseAnd(expr);
 	if (left == NULL)
 		return NULL;
 
-	while (IsOperator(expr,'|')) {
-		Term *right = ParseAnd(expr);
-		Term *newParent = NULL;
+	while (IsOperator(expr, '|')) {
+		Term* right = ParseAnd(expr);
+		Term* newParent = NULL;
 
-		if (right == NULL || (newParent = new Operator(left, OP_OR, right)) == NULL) {
+		if (right == NULL
+			|| (newParent = new Operator(left, OP_OR, right)) == NULL) {
 			delete left;
 			delete right;
 
@@ -1407,11 +1432,11 @@ Expression::ParseOr(char **expr)
 }
 
 
-bool 
-Expression::IsOperator(char **expr, char op)
+bool
+Expression::IsOperator(char** expr, char op)
 {
-	char *string = *expr;
-	
+	char* string = *expr;
+
 	if (*string == op && *(string + 1) == op) {
 		*expr += 2;
 		return true;
@@ -1420,7 +1445,7 @@ Expression::IsOperator(char **expr, char op)
 }
 
 
-status_t 
+status_t
 Expression::InitCheck()
 {
 	if (fTerm == NULL)
@@ -1433,7 +1458,7 @@ Expression::InitCheck()
 //	#pragma mark -
 
 
-Query::Query(Volume *volume, Expression *expression, uint32 flags)
+Query::Query(Volume* volume, Expression* expression, uint32 flags)
 	:
 	fVolume(volume),
 	fExpression(expression),
@@ -1480,25 +1505,27 @@ Query::Rewind()
 
 	// put the whole expression on the stack
 
-	Stack<Term *> stack;
+	Stack<Term*> stack;
 	stack.Push(fExpression->Root());
 
-	Term *term;
+	Term* term;
 	while (stack.Pop(&term)) {
 		if (term->Op() < OP_EQUATION) {
-			Operator *op = (Operator *)term;
+			Operator* op = (Operator*)term;
 
 			if (op->Op() == OP_OR) {
 				stack.Push(op->Left());
 				stack.Push(op->Right());
 			} else {
-				// For OP_AND, we can use the scoring system to decide which path to add
+				// For OP_AND, we can use the scoring system to decide which
+				// path to add
 				if (op->Right()->Score() > op->Left()->Score())
 					stack.Push(op->Right());
 				else
 					stack.Push(op->Left());
 			}
-		} else if (term->Op() == OP_EQUATION || fStack.Push((Equation *)term) < B_OK)
+		} else if (term->Op() == OP_EQUATION
+			|| fStack.Push((Equation*)term) < B_OK)
 			FATAL(("Unknown term on stack or stack error"));
 	}
 
@@ -1507,7 +1534,7 @@ Query::Rewind()
 
 
 status_t
-Query::GetNextEntry(struct dirent *dirent, size_t size)
+Query::GetNextEntry(struct dirent* dirent, size_t size)
 {
 	// If we don't have an equation to use yet/anymore, get a new one
 	// from the stack
@@ -1522,7 +1549,8 @@ Query::GetNextEntry(struct dirent *dirent, size_t size)
 		if (fCurrent == NULL)
 			RETURN_ERROR(B_ERROR);
 
-		status_t status = fCurrent->GetNextMatching(fVolume, fIterator, dirent, size);
+		status_t status = fCurrent->GetNextMatching(fVolume, fIterator, dirent,
+			size);
 		if (status < B_OK) {
 			delete fIterator;
 			fIterator = NULL;
@@ -1535,7 +1563,7 @@ Query::GetNextEntry(struct dirent *dirent, size_t size)
 }
 
 
-void 
+void
 Query::SetLiveMode(port_id port, int32 token)
 {
 	fPort = port;
@@ -1550,19 +1578,22 @@ Query::SetLiveMode(port_id port, int32 token)
 }
 
 
-void 
-Query::LiveUpdate(Inode *inode, const char *attribute, int32 type, const uint8 *oldKey,
-	size_t oldLength, const uint8 *newKey, size_t newLength)
+void
+Query::LiveUpdate(Inode* inode, const char* attribute, int32 type,
+	const uint8* oldKey, size_t oldLength, const uint8* newKey,
+	size_t newLength)
 {
 	if (fPort < 0 || fExpression == NULL || attribute == NULL)
 		return;
 
-	// ToDo: check if the attribute is part of the query at all...
+	// TODO: check if the attribute is part of the query at all...
 
-	status_t oldStatus = fExpression->Root()->Match(inode, attribute, type, oldKey, oldLength);
-	status_t newStatus = fExpression->Root()->Match(inode, attribute, type, newKey, newLength);
+	status_t oldStatus = fExpression->Root()->Match(inode, attribute, type,
+		oldKey, oldLength);
+	status_t newStatus = fExpression->Root()->Match(inode, attribute, type,
+		newKey, newLength);
 
-	const char *name = NULL;
+	const char* name = NULL;
 	bool entryCreated;
 
 	if (oldStatus != MATCH_OK) {
@@ -1575,13 +1606,15 @@ Query::LiveUpdate(Inode *inode, const char *attribute, int32 type, const uint8 *
 		// entry got removed
 		entryCreated = false;
 	} else {
-		// the entry stays in the query - only notify in case the name of the inode was changed
+		// The entry stays in the query - only notify in case the name of the
+		// inode was changed
 		if (oldKey == NULL || strcmp(attribute, "name"))
 			return;
 
 		notify_query_entry_removed(fPort, fToken, fVolume->ID(),
-			fVolume->ToVnode(inode->Parent()), (const char *)oldKey, inode->ID());
-		name = (const char *)newKey;
+			fVolume->ToVnode(inode->Parent()), (const char*)oldKey,
+			inode->ID());
+		name = (const char*)newKey;
 		entryCreated = true;
 	}
 
@@ -1596,7 +1629,7 @@ Query::LiveUpdate(Inode *inode, const char *attribute, int32 type, const uint8 *
 			name = nameBuffer;
 		} else {
 			// a shortcut to prevent having to scan the attribute section
-			name = (const char *)newKey;
+			name = (const char*)newKey;
 		}
 	}
 
