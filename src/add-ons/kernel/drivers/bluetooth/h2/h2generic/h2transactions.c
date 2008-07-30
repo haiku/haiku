@@ -246,18 +246,18 @@ resubmit:
 status_t
 submit_rx_event(bt_usb_dev* bdev)
 {   
-    status_t    err;
+    status_t    status;
     size_t      size = bdev->max_packet_size_intr_in;
     void*       buf = alloc_room(&bdev->eventRoom, size);
     
     if (buf == NULL)
         return ENOMEM;           
 
-    err = usb->queue_interrupt(bdev->intr_in_ep->handle, 
+    status = usb->queue_interrupt(bdev->intr_in_ep->handle, 
                                    buf, size , 
 				                   event_complete, (void*) bdev);
-    if (err != B_OK )   {
-        reuse_room(&bdev->eventRoom, buf);
+    if (status != B_OK )   {
+        reuse_room(&bdev->eventRoom, buf); // reuse allocated one
         bdev->stat.rejectedRX++;
     }
     else {
@@ -265,7 +265,7 @@ submit_rx_event(bt_usb_dev* bdev)
         debugf("Accepted RX Event %d\n", bdev->stat.acceptedRX);
     }
         
-    return err;
+    return status;
 }
 
 
@@ -273,25 +273,25 @@ status_t
 submit_rx_acl(bt_usb_dev* bdev)
 {
 
-    status_t    err;
+    status_t    status;
     size_t      size = max(HCI_MAX_FRAME_SIZE,bdev->max_packet_size_bulk_in);
     void*       buf = alloc_room(&bdev->aclRoom, size);
 
     if (buf == NULL)
         return ENOMEM; 
         
-	err = usb->queue_bulk(bdev->bulk_in_ep->handle, buf, size , 
+	status = usb->queue_bulk(bdev->bulk_in_ep->handle, buf, size , 
 				                acl_rx_complete, bdev);
 
-    if (err != B_OK )   {
-        reuse_room(&bdev->aclRoom, buf);
+    if (status != B_OK )   {
+        reuse_room(&bdev->aclRoom, buf); // reuse allocated
         bdev->stat.rejectedRX++;
     }
     else {
         bdev->stat.acceptedRX++;    
     }				                
 				                
-    return B_ERROR;
+    return status;
 }
 
 
