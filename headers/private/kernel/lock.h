@@ -54,12 +54,25 @@ typedef struct rw_lock {
 
 
 #if KDEBUG
+#	define KDEBUG_RW_LOCK_DEBUG 0
+		// Define to 1 if you want to use ASSERT_READ_LOCKED_RW_LOCK().
+		// The rw_lock will just behave like a recursive locker then.
 #	define ASSERT_LOCKED_RECURSIVE(r) \
 		{ ASSERT(find_thread(NULL) == (r)->lock.holder); }
 #	define ASSERT_LOCKED_MUTEX(m) { ASSERT(find_thread(NULL) == (m)->holder); }
+#	define ASSERT_WRITE_LOCKED_RW_LOCK(l) \
+		{ ASSERT(find_thread(NULL) == (l)->holder); }
+#	if KDEBUG_RW_LOCK_DEBUG
+#		define ASSERT_READ_LOCKED_RW_LOCK(l) \
+			{ ASSERT(find_thread(NULL) == (l)->holder); }
+#	else
+#		define ASSERT_READ_LOCKED_RW_LOCK(l) do {} while (false)
+#	endif
 #else
-#	define ASSERT_LOCKED_RECURSIVE(r)	do {} while (false)
-#	define ASSERT_LOCKED_MUTEX(m)		do {} while (false)
+#	define ASSERT_LOCKED_RECURSIVE(r)		do {} while (false)
+#	define ASSERT_LOCKED_MUTEX(m)			do {} while (false)
+#	define ASSERT_WRITE_LOCKED_RW_LOCK(m)	do {} while (false)
+#	define ASSERT_READ_LOCKED_RW_LOCK(l)	do {} while (false)
 #endif
 
 

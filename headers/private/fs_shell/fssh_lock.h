@@ -40,6 +40,8 @@ typedef struct fssh_rw_lock {
 
 #define FSSH_ASSERT_LOCKED_RECURSIVE(r)
 #define FSSH_ASSERT_LOCKED_MUTEX(m)
+#define FSSH_ASSERT_WRITE_LOCKED_RW_LOCK(l)
+#define FSSH_ASSERT_READ_LOCKED_RW_LOCK(l)
 
 // static initializers
 #define FSSH_MUTEX_INITIALIZER(name)			{ name, NULL, 0, 0 }

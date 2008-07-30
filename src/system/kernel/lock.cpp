@@ -280,6 +280,9 @@ rw_lock_destroy(rw_lock* lock)
 status_t
 rw_lock_read_lock(rw_lock* lock)
 {
+#if KDEBUG_RW_LOCK_DEBUG
+	return rw_lock_write_lock(lock);
+#else
 	InterruptsSpinLocker locker(thread_spinlock);
 
 	if (lock->writer_count == 0) {
@@ -292,12 +295,16 @@ rw_lock_read_lock(rw_lock* lock)
 	}
 
 	return rw_lock_wait(lock, false);
+#endif
 }
 
 
 status_t
 rw_lock_read_unlock(rw_lock* lock)
 {
+#if KDEBUG_RW_LOCK_DEBUG
+	return rw_lock_write_unlock(lock);
+#else
 	InterruptsSpinLocker locker(thread_spinlock);
 
 	if (lock->holder == thread_get_current_thread_id()) {
@@ -321,6 +328,7 @@ rw_lock_read_unlock(rw_lock* lock)
 
 	rw_lock_unblock(lock);
 	return B_OK;
+#endif
 }
 
 
