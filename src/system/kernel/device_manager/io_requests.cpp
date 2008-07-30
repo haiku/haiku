@@ -16,7 +16,7 @@
 #include "dma_resources.h"
 
 
-#define TRACE_IO_REQUEST
+//#define TRACE_IO_REQUEST
 #ifdef TRACE_IO_REQUEST
 #	define TRACE(x...) dprintf(x)
 #else
@@ -236,6 +236,8 @@ IOOperation::Prepare(IORequest* request)
 		fParent->RemoveOperation(this);
 
 	fParent = request;
+
+	fTransferredBytes = 0;
 
 	// set initial phase
 	fPhase = PHASE_DO_ALL;
@@ -522,8 +524,8 @@ IORequest::Init(off_t offset, void* buffer, size_t length, bool write,
 
 
 status_t
-IORequest::Init(off_t offset, size_t firstVecOffset, iovec* vecs, size_t count,
-	size_t length, bool write, uint32 flags)
+IORequest::Init(off_t offset, size_t firstVecOffset, const iovec* vecs,
+	size_t count, size_t length, bool write, uint32 flags)
 {
 	fBuffer = IOBuffer::Create(count);
 	if (fBuffer == NULL)
@@ -533,9 +535,12 @@ IORequest::Init(off_t offset, size_t firstVecOffset, iovec* vecs, size_t count,
 
 	fOffset = offset;
 	fLength = length;
+	fRelativeParentOffset = 0;
+	fTransferSize = 0;
 	fFlags = flags;
 	fTeam = team_get_current_team_id();
 	fIsWrite = write;
+	fPartialTransfer = 0;
 
 	// these are for iteration
 	fVecIndex = 0;
@@ -595,6 +600,8 @@ IORequest::CreateSubRequest(off_t parentOffset, off_t offset, size_t length,
 		delete subRequest;
 		return error;
 	}
+
+	subRequest->fRelativeParentOffset = parentOffset - fOffset;
 
 	_subRequest = subRequest;
 	subRequest->SetParent(this);
@@ -671,20 +678,23 @@ IORequest::NotifyFinished()
 
 	MutexLocker locker(fLock);
 
-	if (fStatus == B_OK && RemainingBytes() > 0) {
+	if (fStatus == B_OK && !fPartialTransfer && RemainingBytes() > 0) {
 		// The request is not really done yet. If it has an iteration callback,
 		// call it.
 		if (fIterationCallback != NULL) {
 			ResetStatus();
 			locker.Unlock();
-			status_t error = fIterationCallback(fIterationCookie, this);
-			if (error == B_OK)
+			bool partialTransfer = false;
+			status_t error = fIterationCallback(fIterationCookie, this,
+				&partialTransfer);
+			if (error == B_OK && !partialTransfer)
 				return;
 
 			// Iteration failed, which means we're responsible for notifying the
 			// requests finished.
 			locker.Lock();
 			fStatus = error;
+			fPartialTransfer = true;
 		}
 	}
 
@@ -695,6 +705,8 @@ IORequest::NotifyFinished()
 	io_request_finished_callback finishedCallback = fFinishedCallback;
 	void* finishedCookie = fFinishedCookie;
 	status_t status = fStatus;
+	size_t lastTransferredOffset = fRelativeParentOffset + fTransferSize;
+	bool partialTransfer = status != B_OK || fPartialTransfer;
 
 	// unblock waiters
 	fFinishedCondition.NotifyAll();
@@ -702,12 +714,16 @@ IORequest::NotifyFinished()
 	locker.Unlock();
 
 	// notify callback
-	if (finishedCallback != NULL)
-		finishedCallback(finishedCookie, this, status);
+	if (finishedCallback != NULL) {
+		finishedCallback(finishedCookie, this, status, partialTransfer,
+			lastTransferredOffset);
+	}
 
 	// notify parent
-	if (parent != NULL)
-		parent->SubRequestFinished(this, status);
+	if (parent != NULL) {
+		parent->SubRequestFinished(this, status, partialTransfer,
+			lastTransferredOffset);
+	}
 }
 
 
@@ -742,7 +758,8 @@ IORequest::SetStatusAndNotify(status_t status)
 
 
 void
-IORequest::OperationFinished(IOOperation* operation, status_t status)
+IORequest::OperationFinished(IOOperation* operation, status_t status,
+	bool partialTransfer, size_t transferEndOffset)
 {
 	TRACE("IORequest::OperationFinished(%p, %#lx): request: %p\n", operation,
 		status, this);
@@ -751,6 +768,12 @@ IORequest::OperationFinished(IOOperation* operation, status_t status)
 
 	fChildren.Remove(operation);
 	operation->SetParent(NULL);
+
+	if (status != B_OK || partialTransfer) {
+		if (fTransferSize > transferEndOffset)
+			fTransferSize = transferEndOffset;
+		fPartialTransfer = true;
+	}
 
 	if (status != B_OK && fStatus == 1)
 		fStatus = status;
@@ -773,12 +796,19 @@ IORequest::OperationFinished(IOOperation* operation, status_t status)
 
 
 void
-IORequest::SubRequestFinished(IORequest* request, status_t status)
+IORequest::SubRequestFinished(IORequest* request, status_t status,
+	bool partialTransfer, size_t transferEndOffset)
 {
-	TRACE("IORequest::SubrequestFinished(%p, %#lx): request: %p\n", request,
-		status, this);
+	TRACE("IORequest::SubrequestFinished(%p, %#lx, %d, %lu): request: %p\n",
+		request, status, partialTransfer, transferEndOffset, this);
 
 	MutexLocker locker(fLock);
+
+	if (status != B_OK || partialTransfer) {
+		if (fTransferSize > transferEndOffset)
+			fTransferSize = transferEndOffset;
+		fPartialTransfer = true;
+	}
 
 	if (status != B_OK && fStatus == 1)
 		fStatus = status;
@@ -799,11 +829,25 @@ IORequest::SubRequestFinished(IORequest* request, status_t status)
 
 
 void
+IORequest::SetTransferredBytes(bool partialTransfer, size_t transferredBytes)
+{
+	TRACE("%p->IORequest::SetTransferredBytes(%d, %lu)\n", this,
+		partialTransfer, transferredBytes);
+
+	MutexLocker _(fLock);
+
+	fPartialTransfer = partialTransfer;
+	fTransferSize = transferredBytes;
+}
+
+
+void
 IORequest::Advance(size_t bySize)
 {
 	TRACE("IORequest::Advance(%lu): remaining: %lu -> %lu\n", bySize,
 		fRemainingBytes, fRemainingBytes - bySize);
 	fRemainingBytes -= bySize;
+	fTransferSize += bySize;
 
 	iovec* vecs = fBuffer->Vecs();
 	while (vecs[fVecIndex].iov_len - fVecOffset <= bySize) {

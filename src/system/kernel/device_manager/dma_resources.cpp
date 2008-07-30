@@ -12,7 +12,7 @@
 #include "io_requests.h"
 
 
-#define TRACE_DMA_RESOURCE
+//#define TRACE_DMA_RESOURCE
 #ifdef TRACE_DMA_RESOURCE
 #	define TRACE(x...) dprintf(x)
 #else

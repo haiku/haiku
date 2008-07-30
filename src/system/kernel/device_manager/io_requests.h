@@ -125,6 +125,11 @@ public:
 			size_t				OriginalLength() const
 									{ return fOriginalLength; }
 
+			size_t				TransferredBytes() const
+									{ return fTransferredBytes; }
+			void				SetTransferredBytes(size_t bytes)
+									{ fTransferredBytes = bytes; }
+
 			iovec*				Vecs() const;
 			uint32				VecCount() const;
 
@@ -159,6 +164,7 @@ protected:
 			off_t				fOriginalOffset;
 			size_t				fLength;
 			size_t				fOriginalLength;
+			size_t				fTransferredBytes;
 			size_t				fBlockSize;
 			uint16				fSavedVecIndex;
 			uint16				fSavedVecLength;
@@ -174,9 +180,10 @@ typedef DoublyLinkedList<IOOperation> IOOperationList;
 
 typedef struct IORequest io_request;
 typedef status_t (*io_request_finished_callback)(void* data,
-			io_request* request, status_t status);
+			io_request* request, status_t status, bool partialTransfer,
+			size_t transferEndOffset);
 typedef status_t (*io_request_iterate_callback)(void* data,
-			io_request* request);
+			io_request* request, bool* _partialTransfer);
 
 
 struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
@@ -185,13 +192,14 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 
 			status_t			Init(off_t offset, void* buffer, size_t length,
 									bool write, uint32 flags);
-			status_t			Init(off_t offset, iovec* vecs, size_t count,
-									size_t length, bool write, uint32 flags)
+			status_t			Init(off_t offset, const iovec* vecs,
+									size_t count, size_t length, bool write,
+									uint32 flags)
 									{ return Init(offset, 0, vecs, count,
 										length, write, flags); }
 			status_t			Init(off_t offset, size_t firstVecOffset,
-									iovec* vecs, size_t count, size_t length,
-									bool write, uint32 flags);
+									const iovec* vecs, size_t count,
+									size_t length, bool write, uint32 flags);
 
 			status_t			CreateSubRequest(off_t parentOffset,
 									off_t offset, size_t length,
@@ -217,12 +225,20 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			void				SetStatusAndNotify(status_t status);
 
 			void				OperationFinished(IOOperation* operation,
-									status_t status);
+									status_t status, bool partialTransfer,
+									size_t transferEndOffset);
 			void				SubRequestFinished(IORequest* request,
-									status_t status);
+									status_t status, bool partialTransfer,
+									size_t transferEndOffset);
 
 			size_t				RemainingBytes() const
 									{ return fRemainingBytes; }
+			size_t				TransferredBytes() const
+									{ return fTransferSize; }
+			bool				IsPartialTransfer() const
+									{ return fPartialTransfer; }
+			void				SetTransferredBytes(bool partialTransfer,
+									size_t transferredBytes);
 
 			bool				IsWrite() const	{ return fIsWrite; }
 			bool				IsRead() const	{ return !fIsWrite; }
@@ -265,11 +281,20 @@ private:
 			IOBuffer*			fBuffer;
 			off_t				fOffset;
 			size_t				fLength;
+			size_t				fTransferSize;
+									// After all subrequests/operations have
+									// finished, number of contiguous bytes at
+									// the beginning of the request that have
+									// actually been transferred.
+			size_t				fRelativeParentOffset;
+									// offset of this request relative to its
+									// parent
 			IORequestChunkList	fChildren;
 			int32				fPendingChildren;
 			uint32				fFlags;
 			team_id				fTeam;
 			bool				fIsWrite;
+			bool				fPartialTransfer;
 
 			io_request_finished_callback	fFinishedCallback;
 			void*				fFinishedCookie;

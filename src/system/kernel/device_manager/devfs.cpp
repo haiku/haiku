@@ -756,26 +756,18 @@ get_device_name(struct devfs_vnode* vnode, char* buffer, size_t size)
 
 
 static status_t
-device_read(void* _cookie, off_t offset, void* buffer, size_t length)
+device_read(void* _cookie, off_t offset, void* buffer, size_t* length)
 {
 	synchronous_io_cookie* cookie = (synchronous_io_cookie*)_cookie;
-
-	size_t transferred = length;
-	status_t error = cookie->device->Read(cookie->cookie, offset, buffer,
-		&transferred);
-	return error == B_OK && transferred != length ? B_FILE_ERROR : error;
+	return cookie->device->Read(cookie->cookie, offset, buffer, length);
 }
 
 
 static status_t
-device_write(void* _cookie, off_t offset, void* buffer, size_t length)
+device_write(void* _cookie, off_t offset, void* buffer, size_t* length)
 {
 	synchronous_io_cookie* cookie = (synchronous_io_cookie*)_cookie;
-
-	size_t transferred = length;
-	status_t error = cookie->device->Write(cookie->cookie, offset, buffer,
-		&transferred);
-	return error == B_OK && transferred != length ? B_FILE_ERROR : error;
+	return cookie->device->Write(cookie->cookie, offset, buffer, length);
 }
 
 
@@ -1753,6 +1745,8 @@ static status_t
 devfs_io(fs_volume *volume, fs_vnode *_vnode, void *_cookie,
 	io_request *request)
 {
+	TRACE(("[%ld] devfs_io(request: %p)\n", find_thread(NULL), request));
+
 	devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
 	devfs_cookie* cookie = (devfs_cookie*)_cookie;
 

@@ -94,13 +94,13 @@ void vfs_acquire_vnode(struct vnode *vnode);
 status_t vfs_get_cookie_from_fd(int fd, void **_cookie);
 bool vfs_can_page(struct vnode *vnode, void *cookie);
 status_t vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos,
-			const iovec *vecs, size_t count, size_t *_numBytes);
+			const iovec *vecs, size_t count, uint32 flags, size_t *_numBytes);
 status_t vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos,
-			const iovec *vecs, size_t count, size_t *_numBytes);
+			const iovec *vecs, size_t count, uint32 flags, size_t *_numBytes);
 status_t vfs_vnode_io(struct vnode* vnode, void* cookie, io_request* request);
 status_t vfs_synchronous_io(io_request* request,
 			status_t (*doIO)(void* cookie, off_t offset, void* buffer,
-				size_t length),
+				size_t* length),
 			void* cookie);
 status_t vfs_get_vnode_cache(struct vnode *vnode, struct VMCache **_cache,
 			bool allocate);

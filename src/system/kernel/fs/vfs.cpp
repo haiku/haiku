@@ -50,6 +50,7 @@
 #include <vm_cache.h>
 
 #include "fifo.h"
+#include "io_requests.h"
 
 
 //#define TRACE_VFS
@@ -3899,21 +3900,41 @@ vfs_can_page(struct vnode *vnode, void *cookie)
 
 extern "C" status_t
 vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
-	size_t count, size_t *_numBytes)
+	size_t count, uint32 flags, size_t *_numBytes)
 {
-	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
+	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
+		pos));
 
-	return FS_CALL(vnode, read_pages, cookie, pos, vecs, count, _numBytes);
+	IORequest request;
+	status_t status = request.Init(pos, vecs, count, *_numBytes, false, flags);
+	if (status == B_OK) {
+		status = vfs_vnode_io(vnode, cookie, &request);
+		if (status == B_OK)
+			status = request.Wait();
+		*_numBytes = request.TransferredBytes();
+	}
+
+	return status;
 }
 
 
 extern "C" status_t
 vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
-	size_t count, size_t *_numBytes)
+	size_t count, uint32 flags, size_t *_numBytes)
 {
-	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
+	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
+		pos));
 
-	return FS_CALL(vnode, write_pages, cookie, pos, vecs, count, _numBytes);
+	IORequest request;
+	status_t status = request.Init(pos, vecs, count, *_numBytes, true, flags);
+	if (status == B_OK) {
+		status = vfs_vnode_io(vnode, cookie, &request);
+		if (status == B_OK)
+			status = request.Wait();
+		*_numBytes = request.TransferredBytes();
+	}
+
+	return status;
 }
 
 

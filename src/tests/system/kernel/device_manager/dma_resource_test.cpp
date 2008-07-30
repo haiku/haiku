@@ -200,7 +200,7 @@ do_io(void* data, IOOperation* operation)
 	}
 
 	if (sIOScheduler != NULL)
-		sIOScheduler->OperationCompleted(operation, B_OK);
+		sIOScheduler->OperationCompleted(operation, B_OK, operation->Length());
 	return B_OK;
 }
 
@@ -584,7 +584,10 @@ Test::Run(DMAResource& resource)
 			}
 		}
 
-		request.OperationFinished(&operation, operation.Status());
+		request.OperationFinished(&operation, operation.Status(),
+			false,
+			operation.OriginalOffset() - operation.Parent()->Offset()
+				+ operation.OriginalLength());
 
 		resultIndex++;
 	}
@@ -959,7 +962,7 @@ run_test()
 //	#pragma mark - driver
 
 
-float
+static float
 dma_test_supports_device(device_node *parent)
 {
 	const char* bus = NULL;
@@ -971,7 +974,7 @@ dma_test_supports_device(device_node *parent)
 }
 
 
-status_t
+static status_t
 dma_test_register_device(device_node *parent)
 {
 	device_attr attrs[] = {
@@ -984,7 +987,7 @@ dma_test_register_device(device_node *parent)
 }
 
 
-status_t
+static status_t
 dma_test_init_driver(device_node *node, void **_driverCookie)
 {
 	sAreaSize = 10 * 1024 * 1024;
@@ -1000,14 +1003,14 @@ dma_test_init_driver(device_node *node, void **_driverCookie)
 }
 
 
-void
+static void
 dma_test_uninit_driver(void *driverCookie)
 {
 	delete_area(sArea);
 }
 
 
-status_t
+static status_t
 dma_test_register_child_devices(void *driverCookie)
 {
 	return sDeviceManager->publish_device((device_node*)driverCookie,
@@ -1019,7 +1022,7 @@ dma_test_register_child_devices(void *driverCookie)
 //	#pragma mark - device
 
 
-status_t
+static status_t
 dma_test_init_device(void *driverCookie, void **_deviceCookie)
 {
 	const dma_restrictions restrictions = {
@@ -1063,13 +1066,13 @@ dma_test_init_device(void *driverCookie, void **_deviceCookie)
 }
 
 
-void
+static void
 dma_test_uninit_device(void *deviceCookie)
 {
 }
 
 
-status_t
+static status_t
 dma_test_open(void *deviceCookie, const char *path, int openMode,
 	void **_cookie)
 {
@@ -1077,21 +1080,21 @@ dma_test_open(void *deviceCookie, const char *path, int openMode,
 }
 
 
-status_t
+static status_t
 dma_test_close(void *cookie)
 {
 	return B_OK;
 }
 
 
-status_t
+static status_t
 dma_test_free(void *cookie)
 {
 	return B_OK;
 }
 
 
-status_t
+static status_t
 dma_test_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 {
 	size_t length = *_length;
@@ -1123,7 +1126,7 @@ dma_test_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 }
 
 
-status_t
+static status_t
 dma_test_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
 	size_t length = *_length;
@@ -1157,14 +1160,16 @@ dma_test_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 }
 
 
-status_t
+static status_t
 dma_test_io(void *cookie, io_request *request)
 {
-	return B_BAD_VALUE;
+	dprintf("dma_test_io(%p)\n", request);
+
+	return sIOScheduler->ScheduleRequest(request);
 }
 
 
-status_t
+static status_t
 dma_test_control(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	switch (op) {
@@ -1219,7 +1224,7 @@ module_dependency module_dependencies[] = {
 };
 
 
-const static struct driver_module_info sDMATestDriverModule = {
+static const struct driver_module_info sDMATestDriverModule = {
 	{
 		"drivers/disk/dma_resource_test/driver_v1",
 		0,
@@ -1233,7 +1238,7 @@ const static struct driver_module_info sDMATestDriverModule = {
 	dma_test_register_child_devices
 };
 
-const static struct device_module_info sDMATestDeviceModule = {
+static const struct device_module_info sDMATestDeviceModule = {
 	{
 		"drivers/disk/dma_resource_test/device_v1",
 		0,
@@ -1250,7 +1255,7 @@ const static struct device_module_info sDMATestDeviceModule = {
 
 	dma_test_read,
 	dma_test_write,
-	NULL,	// io
+	dma_test_io,
 
 	dma_test_control,
 

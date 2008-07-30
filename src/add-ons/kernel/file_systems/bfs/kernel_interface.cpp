@@ -454,7 +454,8 @@ bfs_iterative_io_get_vecs(void* cookie, io_request *request, off_t offset,
 
 
 static status_t
-bfs_iterative_io_finished(void *cookie, io_request *request, status_t status)
+bfs_iterative_io_finished(void *cookie, io_request *request, status_t status,
+	bool partialTransfer, size_t bytesTransferred)
 {
 	Inode *inode = (Inode*)cookie;
 

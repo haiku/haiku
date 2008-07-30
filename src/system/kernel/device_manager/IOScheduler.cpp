@@ -138,7 +138,8 @@ IOScheduler::AbortRequest(IORequest* request, status_t status)
 
 
 void
-IOScheduler::OperationCompleted(IOOperation* operation, status_t status)
+IOScheduler::OperationCompleted(IOOperation* operation, status_t status,
+	size_t transferredBytes)
 {
 	InterruptsSpinLocker _(fFinisherLock);
 
@@ -147,6 +148,11 @@ IOScheduler::OperationCompleted(IOOperation* operation, status_t status)
 		return;
 
 	operation->SetStatus(status);
+
+	// set the bytes transferred (of the net data)
+	size_t partialBegin = operation->OriginalOffset() - operation->Offset();
+	operation->SetTransferredBytes(
+		transferredBytes > partialBegin ? transferredBytes - partialBegin : 0);
 
 	fCompletedOperations.Add(operation);
 	fFinishedOperationCondition.NotifyAll();
@@ -175,6 +181,7 @@ IOScheduler::_Finisher()
 
 		if (!operation->Finish()) {
 			TRACE("  operation: %p not finished yet\n", operation);
+			operation->SetTransferredBytes(0);
 			// TODO: This must be done differently once the scheduler implements
 			// an actual scheduling policy (other than no-op).
 			fIOCallback(fIOCallbackData, operation);
@@ -183,8 +190,15 @@ IOScheduler::_Finisher()
 
 		// notify request and remove operation
 		IORequest* request = operation->Parent();
-		if (request != NULL)
-			request->OperationFinished(operation, operation->Status());
+		if (request != NULL) {
+			size_t operationOffset = operation->OriginalOffset()
+				- request->Offset();
+			request->OperationFinished(operation, operation->Status(),
+				operation->TransferredBytes() < operation->OriginalLength(),
+				operation->Status() == B_OK
+					? operationOffset + operation->OriginalLength()
+					: operationOffset);
+		}
 
 		// recycle the operation
 		MutexLocker _(fLock);

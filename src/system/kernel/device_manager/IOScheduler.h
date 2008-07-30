@@ -39,7 +39,7 @@ public:
 			void				AbortRequest(IORequest* request,
 									status_t status = B_CANCELED);
 			void				OperationCompleted(IOOperation* operation,
-									status_t status);
+									status_t status, size_t transferredBytes);
 									// called by the driver when the operation
 									// has been completed successfully or failed
 									// for some reason

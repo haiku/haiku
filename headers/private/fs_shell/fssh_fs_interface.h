@@ -334,7 +334,8 @@ typedef fssh_status_t (*fssh_iterative_io_get_vecs)(void *cookie,
 				fssh_io_request* request, fssh_off_t offset, fssh_size_t size,
 				struct fssh_file_io_vec *vecs, fssh_size_t *_count);
 typedef fssh_status_t (*fssh_iterative_io_finished)(void* cookie,
-				fssh_io_request* request, fssh_status_t status);
+				fssh_io_request* request, fssh_status_t status,
+				bool partialTransfer, fssh_size_t bytesTransferred);
 
 extern fssh_status_t fssh_new_vnode(fssh_fs_volume *volume,
 				fssh_vnode_id vnodeID, void *privateNode,
