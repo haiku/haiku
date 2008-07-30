@@ -5,6 +5,8 @@
 #ifndef TEST_H
 #define TEST_H
 
+#include <Region.h>
+
 class BView;
 
 class Test {
@@ -17,6 +19,9 @@ public:
 	virtual	void				PrintResults() = 0;
 
 			void				SetupClipping(BView* view);
+
+protected:
+			BRegion				fClippingRegion;
 };
 
 #endif // TEST_H

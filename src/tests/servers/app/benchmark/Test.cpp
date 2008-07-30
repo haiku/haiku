@@ -5,7 +5,6 @@
 
 #include "Test.h"
 
-#include <Region.h>
 #include <View.h>
 
 
@@ -23,16 +22,16 @@ void
 Test::SetupClipping(BView* view)
 {
 	BRect bounds = view->Bounds();
-	BRegion clipping(bounds);
-	BRect grid(bounds.InsetByCopy(10, 10));
-	for (float y = grid.top; y < grid.bottom - 5; y += grid.Height() / 20) {
-		for (float x = grid.left; x < grid.right - 5;
-				x += grid.Width() / 20) {
+	fClippingRegion.Set(bounds);
+	BRect grid(bounds.InsetByCopy(40, 40));
+	for (float y = grid.top; y < grid.bottom + 5; y += grid.Height() / 2) {
+		for (float x = grid.left; x < grid.right + 5;
+				x += grid.Width() / 2) {
 			BRect r(x, y, x, y);
-			r.InsetBy(-5, -5);
-			clipping.Exclude(r);
+			r.InsetBy(-30, -30);
+			fClippingRegion.Exclude(r);
 		}
 	}
 
-	view->ConstrainClippingRegion(&clipping);
+	view->ConstrainClippingRegion(&fClippingRegion);
 }

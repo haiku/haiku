@@ -22,7 +22,7 @@ ClippedLineTest::ClippedLineTest()
 	  fLinesPerIteration(20),
 
 	  fIterations(0),
-	  fMaxIterations(100),
+	  fMaxTestDuration(5000000),
 
 	  fViewBounds(0, 0, -1, -1)
 {
@@ -74,7 +74,7 @@ ClippedLineTest::RunIteration(BView* view)
 	fTestDuration += system_time() - now;
 	fIterations++;
 
-	return fIterations < fMaxIterations;
+	return system_time() - fTestStart < fMaxTestDuration;
 }
 
 
@@ -87,6 +87,8 @@ ClippedLineTest::PrintResults()
 	}
 	bigtime_t timeLeak = system_time() - fTestStart - fTestDuration;
 	printf("Lines per iteration: %lu\n", fLinesPerIteration);
+	printf("Clipping rects: %ld\n", fClippingRegion.CountRects());
+	printf("Total lines rendered: %llu\n", fLinesRendered);
 	printf("Lines per second: %.3f\n",
 		fLinesRendered * 1000000.0 / fTestDuration);
 	printf("Average time between iterations: %.4f seconds.\n",

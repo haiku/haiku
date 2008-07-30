@@ -25,7 +25,7 @@ private:
 	uint32						fLinesPerIteration;
 
 	uint32						fIterations;
-	uint32						fMaxIterations;
+	bigtime_t					fMaxTestDuration;
 
 	BRect						fViewBounds;
 };
