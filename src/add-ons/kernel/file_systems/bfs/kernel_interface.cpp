@@ -24,6 +24,30 @@ struct identify_cookie {
 	disk_super_block super_block;
 };
 
+class MultiWriteLocker {
+public:
+	MultiWriteLocker(Inode* inodeA, Inode* inodeB)
+	{
+		if (inodeA->ID() < inodeB->ID()) {
+			Inode* tempInode = inodeA;
+			inodeA = inodeB;
+			inodeB = tempInode;
+		}
+
+		fOuterLocker.SetTo(inodeA->Lock(), false);
+		if (inodeA != inodeB)
+			fInnerLocker.SetTo(inodeB->Lock(), false);
+	}
+
+	~MultiWriteLocker()
+	{
+	}
+
+private:
+	WriteLocker fOuterLocker;
+	WriteLocker fInnerLocker;
+};
+
 extern void fill_stat_buffer(Inode *inode, struct stat &stat);
 
 
@@ -530,6 +554,8 @@ bfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 	if (directory->GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
+	ReadLocker locker(directory->Lock());
+
 	status = tree->Find((uint8 *)file, (uint16)strlen(file), _vnodeID);
 	if (status < B_OK) {
 		//PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
@@ -944,14 +970,15 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 	if (oldDirectory == newDirectory && !strcmp(oldName, newName))
 		return B_OK;
 
+	Transaction transaction(volume, oldDirectory->BlockNumber());
+	MultiWriteLocker locker(oldDirectory, newDirectory);
+
 	// are we allowed to do what we've been told?
 	status_t status = oldDirectory->CheckPermissions(W_OK);
 	if (status == B_OK)
 		status = newDirectory->CheckPermissions(W_OK);
 	if (status < B_OK)
 		return status;
-
-	Transaction transaction(volume, oldDirectory->BlockNumber());
 
 	// Get the directory's tree, and a pointer to the inode which should be
 	// changed
@@ -1041,10 +1068,6 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 	if (status < B_OK)
 		return status;
 
-	// If anything fails now, we have to remove the inode from the
-	// new directory in any case to restore the previous state
-	status_t bailStatus = B_OK;
-
 	// update the name only when they differ
 	bool nameUpdated = false;
 	if (strcmp(oldName, newName)) {
@@ -1082,40 +1105,8 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 					newDirectory->ID(), newName, id);
 				return B_OK;
 			}
-			// If we get here, something has gone wrong already!
-
-			// Those better don't fail, or we switch to a read-only
-			// device for safety reasons (Volume::Panic() does this
-			// for us)
-			// Anyway, if we overwrote a file in the target directory
-			// this is lost now (only in-memory, not on-disk)...
-			bailStatus = tree->Insert(transaction, (const uint8 *)oldName,
-				strlen(oldName), id);
-			if (movedTree != NULL) {
-				movedTree->Replace(transaction, (const uint8 *)"..", 2,
-					oldDirectory->ID());
-			}
 		}
 	}
-
-	if (bailStatus == B_OK && nameUpdated) {
-		bailStatus = inode->SetName(transaction, oldName);
-		if (status == B_OK) {
-			// update inode and index
-			inode->WriteBack(transaction);
-
-			Index index(volume);
-			index.UpdateName(transaction, newName, oldName, inode);
-		}
-	}
-
-	if (bailStatus == B_OK) {
-		bailStatus = newTree->Remove(transaction, (const uint8 *)newName,
-			strlen(newName), id);
-	}
-
-	if (bailStatus < B_OK)
-		volume->Panic();
 
 	return status;
 }

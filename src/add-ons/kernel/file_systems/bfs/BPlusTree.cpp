@@ -1242,9 +1242,9 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 }
 
 
-/*!
-	This inserts a key into the tree. The changes made to the tree will
+/*!	This inserts a key into the tree. The changes made to the tree will
 	all be part of the \a transaction.
+	You need to have the inode write locked.
 */
 status_t
 BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength,
@@ -1258,8 +1258,7 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength,
 		panic("tried to insert invalid value %Ld!\n", value);
 #endif
 
-	// lock access to stream
-	WriteLocker locker(fStream->Lock());
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fStream->Lock());
 
 	Stack<node_and_key> stack;
 	if (_SeekDown(stack, key, keyLength) != B_OK)
@@ -1395,8 +1394,7 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength,
 }
 
 
-/*!
-	Removes the duplicate index/value pair from the tree.
+/*!	Removes the duplicate index/value pair from the tree.
 	It's part of the private tree interface.
 */
 status_t
@@ -1578,8 +1576,7 @@ BPlusTree::_RemoveDuplicate(Transaction &transaction,
 }
 
 
-/*!
-	Removes the key with the given index from the specified node.
+/*!	Removes the key with the given index from the specified node.
 	Since it has to get the key from the node anyway (to obtain it's
 	pointer), it's not needed to pass the key & its length, although
 	the calling method (BPlusTree::Remove()) have this data.
@@ -1639,10 +1636,10 @@ BPlusTree::_RemoveKey(bplustree_node *node, uint16 index)
 }
 
 
-/*!
-	Removes the specified key from the tree. The "value" parameter is only used
+/*!	Removes the specified key from the tree. The "value" parameter is only used
 	for trees which allow duplicates, so you may safely ignore it.
 	It's not an optional parameter, so at least you have to think about it.
+	You need to have the inode write locked.
 */
 status_t
 BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength,
@@ -1652,8 +1649,7 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength,
 		|| keyLength > BPLUSTREE_MAX_KEY_LENGTH)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	// lock access to stream
-	WriteLocker locker(fStream->Lock());
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fStream->Lock());
 
 	Stack<node_and_key> stack;
 	if (_SeekDown(stack, key, keyLength) != B_OK)
@@ -1749,14 +1745,14 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength,
 }
 
 
-/*!
-	Replaces the value for the key in the tree.
+/*!	Replaces the value for the key in the tree.
 	Returns B_OK if the key could be found and its value replaced,
 	B_ENTRY_NOT_FOUND if the key couldn't be found, and other errors
 	to indicate that something went terribly wrong.
 	Note that this doesn't work with duplicates - it will just
 	return B_BAD_TYPE if you call this function on a tree where
 	duplicates are allowed.
+	You need to have the inode write locked.
 */
 status_t
 BPlusTree::Replace(Transaction &transaction, const uint8 *key,
@@ -1770,8 +1766,7 @@ BPlusTree::Replace(Transaction &transaction, const uint8 *key,
 	if (fAllowDuplicates)
 		RETURN_ERROR(B_BAD_TYPE);
 
-	// lock access to stream (a read lock is okay for this purpose)
-	ReadLocker locker(fStream->Lock());
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fStream->Lock());
 
 	off_t nodeOffset = fHeader->RootNode();
 	CachedNode cached(this);
@@ -1801,8 +1796,7 @@ BPlusTree::Replace(Transaction &transaction, const uint8 *key,
 }
 
 
-/*!
-	Searches the key in the tree, and stores the offset found in
+/*!	Searches the key in the tree, and stores the offset found in
 	_value, if successful.
 	It's very similar to BPlusTree::SeekDown(), but doesn't fill
 	a stack while it descends the tree.
@@ -1812,6 +1806,7 @@ BPlusTree::Replace(Transaction &transaction, const uint8 *key,
 	Note that this doesn't work with duplicates - it will just
 	return B_BAD_TYPE if you call this function on a tree where
 	duplicates are allowed.
+	You need to have the inode read or write locked.
 */
 status_t
 BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
@@ -1824,8 +1819,7 @@ BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
 	if (fAllowDuplicates)
 		RETURN_ERROR(B_BAD_TYPE);
 
-	// lock access to stream
-	ReadLocker locker(fStream->Lock());
+	ASSERT_READ_LOCKED_RW_LOCK(&fStream->Lock());
 
 	off_t nodeOffset = fHeader->RootNode();
 	CachedNode cached(this);
@@ -2080,8 +2074,7 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength,
 }
 
 
-/*!
-	This is more or less a copy of BPlusTree::Find() - but it just
+/*!	This is more or less a copy of BPlusTree::Find() - but it just
 	sets the current position in the iterator, regardless of if the
 	key could be found or not.
 */

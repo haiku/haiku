@@ -169,6 +169,7 @@ InodeAllocator::~InodeAllocator()
 			fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 				// this unblocks any pending bfs_read_vnode() calls
 			fInode->Free(*fTransaction);
+			rw_lock_write_unlock(&fInode->Lock());
 			remove_vnode(volume->FSVolume(), fInode->ID());
 		} else
 			volume->Free(*fTransaction, fRun);
@@ -208,6 +209,7 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
 		}
 	}
 
+	rw_lock_write_lock(&fInode->Lock());
 	*_inode = fInode;
 	return B_OK;
 }
@@ -258,6 +260,8 @@ InodeAllocator::Keep(fs_vnode_ops *vnodeOps, uint32 publishFlags)
 		cache_add_transaction_listener(volume->BlockCache(), fTransaction->ID(),
 			TRANSACTION_ABORTED, &_TransactionListener, fInode);
 	}
+
+	rw_lock_write_unlock(&fInode->Lock());
 
 	fTransaction = NULL;
 	fInode = NULL;
@@ -1163,6 +1167,8 @@ Inode::GetAttribute(const char *name, Inode **_attribute)
 	BPlusTree *tree;
 	status_t status = attributes->GetTree(&tree);
 	if (status == B_OK) {
+		ReadLocker locker(attributes->Lock());
+
 		ino_t id;
 		status = tree->Find((uint8 *)name, (uint16)strlen(name), &id);
 		if (status == B_OK) {
@@ -2206,6 +2212,8 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 	if (GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
+	WriteLocker locker(Lock());
+
 	// does the file even exist?
 	off_t id;
 	if (tree->Find((uint8 *)name, (uint16)strlen(name), &id) < B_OK)
@@ -2482,16 +2490,16 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 		index.InsertLastModified(transaction, inode);
 	}
 
-	// Everything worked well until this point, we have a fully
-	// initialized inode, and we want to keep it
-	allocator.Keep(vnodeOps, publishFlags);
-
 	if (inode->IsFile() || inode->IsAttribute()) {
 		inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(),
 			inode->Size()));
 		inode->SetMap(file_map_create(volume->ID(), inode->ID(),
 			inode->Size()));
 	}
+
+	// Everything worked well until this point, we have a fully
+	// initialized inode, and we want to keep it
+	allocator.Keep(vnodeOps, publishFlags);
 
 	if (_created)
 		*_created = true;

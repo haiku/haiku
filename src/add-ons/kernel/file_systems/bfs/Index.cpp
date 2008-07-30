@@ -75,6 +75,8 @@ Index::SetTo(const char *name)
 	if (indices == NULL)
 		return B_ENTRY_NOT_FOUND;
 
+	ReadLocker locker(indices->Lock());
+
 	BPlusTree *tree;
 	if (indices->GetTree(&tree) != B_OK)
 		return B_BAD_VALUE;
@@ -267,6 +269,8 @@ Index::Update(Transaction &transaction, const char *name, int32 type,
 		return status;
 
 	// remove the old key from the tree
+
+	WriteLocker locker(Node()->Lock());
 
 	if (oldKey != NULL) {
 		status = tree->Remove(transaction, (const uint8 *)oldKey, oldLength,
