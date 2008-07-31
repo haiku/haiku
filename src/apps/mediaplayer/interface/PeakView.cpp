@@ -225,8 +225,10 @@ PeakView::Pulse()
 		return;
 
 	if (!fPeakLocked) {
+		fLastMaxL = 0.90 * fLastMaxL;
 		if (fCurrentMaxL > fLastMaxL)
 			fLastMaxL = fCurrentMaxL;
+		fLastMaxR = 0.90 * fLastMaxR;
 		if (fCurrentMaxR > fLastMaxR)
 			fLastMaxR = fCurrentMaxR;
 	}
