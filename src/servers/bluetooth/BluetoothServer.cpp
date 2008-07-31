@@ -125,13 +125,13 @@ void BluetoothServer::MessageReceived(BMessage *message)
 
 	        if (ldi->GetID() >= 0) {
                       fLocalDevicesList.AddItem(ldi);
-					  Output::Instance()->AddTab("Local Device", BLACKBOARD_LD_OFFSET + ldi->GetID());
-				  	  (Output::Instance()->Post( str.String(), BLACKBOARD_LD_OFFSET + ldi->GetID()));
-					  (Output::Instance()->Post(" LocalDevice added\n", BLACKBOARD_LD_OFFSET + ldi->GetID()));
+					  Output::Instance()->AddTab("Local Device", BLACKBOARD_LD(ldi->GetID()));
+				  	  (Output::Instance()->Post( str.String(), BLACKBOARD_LD(ldi->GetID())));
+					  (Output::Instance()->Post(" LocalDevice added\n", BLACKBOARD_LD(ldi->GetID())));
 			 
 
             } else {
-					  (Output::Instance()->Post("Adding LocalDevice failed\n", BLACKBOARD_GENERAL));            
+					  (Output::Instance()->Post("Adding LocalDevice failed\n", BLACKBOARD_GENERAL));
             }
             
             status = B_WOULD_BLOCK;

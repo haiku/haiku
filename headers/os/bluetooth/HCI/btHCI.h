@@ -10,6 +10,7 @@
 
 /* typedefs */
 typedef int32 hci_id;
+#define HCI_DEVICE_INDEX_OFFSET 0x7c
 
 typedef enum { H2 = 2, H3, H4, H5 } transport_type; 
 

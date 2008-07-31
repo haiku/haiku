@@ -32,6 +32,7 @@
 #define SUBMODULE_COLOR 34
 #include <btDebug.h>
 
+#include <bluetooth/HCI/btHCI.h>
 
 struct bluetooth_device : net_device, DoublyLinkedListLinkImpl<bluetooth_device> {
 	int		fd;
@@ -77,14 +78,14 @@ bluetooth_init(const char *name, net_device **_device)
 	MutexLocker _(&sListLock);
 	
 	if (sDeviceList.IsEmpty())
-		device->index = 0x0000007C; // REVIEW: dev index
+		device->index = HCI_DEVICE_INDEX_OFFSET; // REVIEW: dev index
 	else
 		device->index = (sDeviceList.Tail())->index + 1; // TODO: index will be assigned by netstack
 
 	// TODO: add to list whould be done in up hook
 	sDeviceList.Add(device);
 
-	debugf("Device %s %x\n", device->name, device->index );
+	debugf("Device %s %lx\n", device->name, device->index );
 
 	*_device = device;
 	return B_OK;
@@ -96,7 +97,7 @@ bluetooth_uninit(net_device *_device)
 {
 	bluetooth_device *device = (bluetooth_device *)_device;
 
-	debugf("index %x\n",device->index);
+	debugf("index %lx\n",device->index);
 
 	// if the device is still part of the list, remove it
 	if (device->GetDoublyLinkedListLink()->next != NULL
@@ -258,7 +259,7 @@ dump_bluetooth_devices(int argc, char** argv)
 	while (iterator.HasNext()) {
 
 		device = iterator.Next();
-		kprintf("\tname=%s index=%#x\n",device->name, device->index);
+		kprintf("\tname=%s index=%#lx\n",device->name, device->index);
 	}
 	
 	return 0;

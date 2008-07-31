@@ -244,8 +244,8 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 	int16   opcodeExpected;
 	BMessage reply;
 	
-    Output::Instance()->Post(__FUNCTION__, BLACKBOARD_LD_OFFSET + GetID());
-    Output::Instance()->Post("\n", BLACKBOARD_LD_OFFSET + GetID());
+    Output::Instance()->Post(__FUNCTION__, BLACKBOARD_LD(GetID()));
+    Output::Instance()->Post("\n", BLACKBOARD_LD(GetID()));
 	
 	// Handle command complete information
     request->FindInt16("opcodeExpected", index, &opcodeExpected);
@@ -394,8 +394,8 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 	int16   opcodeExpected;
 	BMessage reply;
 	
-    Output::Instance()->Post(__FUNCTION__, BLACKBOARD_LD_OFFSET + GetID());
-    Output::Instance()->Post("\n", BLACKBOARD_LD_OFFSET + GetID());
+    Output::Instance()->Post(__FUNCTION__, BLACKBOARD_LD(GetID()));
+    Output::Instance()->Post("\n", BLACKBOARD_LD(GetID()));
 	
 	// Handle command complete information
     request->FindInt16("opcodeExpected", index, &opcodeExpected);

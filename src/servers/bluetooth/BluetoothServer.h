@@ -26,11 +26,16 @@
 
 #define BT "bluetooth_server: "
 
-#define BLACKBOARD_GENERAL 		 0
-#define BLACKBOARD_DEVICEMANAGER 1
-#define BLACKBOARD_EVENTS        2
-#define BLACKBOARD_KIT           3
-#define BLACKBOARD_LD_OFFSET     4
+typedef enum {
+	BLACKBOARD_GENERAL = 0,
+	BLACKBOARD_DEVICEMANAGER,
+	BLACKBOARD_EVENTS,
+	BLACKBOARD_KIT,
+	// more blackboards
+	BLACKBOARD_END
+} BluetoothServerBlackBoardIndex;
+
+#define BLACKBOARD_LD(X) (BLACKBOARD_END+X+HCI_DEVICE_INDEX_OFFSET)
 
 typedef BObjectList<LocalDeviceImpl> LocalDevicesList;
 
