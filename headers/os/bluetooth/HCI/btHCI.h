@@ -38,4 +38,3 @@ typedef enum { 	BT_COMMAND = 0,
 #define HCI_DEVICE_NAME_SIZE	248	/* unit name size */
 
 #endif
-

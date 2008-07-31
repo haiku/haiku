@@ -48,19 +48,11 @@ struct hci_ev_conn_request {
 	uint8		link_type;
 } __attribute__ ((packed));
 
-<<<<<<< .mine
 #define HCI_EVENT_DISCONNECTION_COMPLETE			0x05
 struct hci_ev_disconnection_complete_reply {
 	uint8		status;
 	uint16		handle;
 	uint8		reason;
-=======
-#define HCI_EVENT_DISCONNECTION_COMPLETE	0x05
-struct hci_ev_disconnection_complete_reply {
-	uint8     status;
-	uint16    handle;
-	uint8     reason;
->>>>>>> .r26700
 } __attribute__ ((packed));
 
 #define HCI_EVENT_AUTH_COMPLETE						0x06
@@ -69,19 +61,11 @@ struct hci_ev_auth_complete {
 	uint16		handle;
 } __attribute__ ((packed));
 
-<<<<<<< .mine
 #define HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE		0x07
 struct hci_ev_remote_name_request_complete_reply {
 	uint8		status;
 	bdaddr_t	bdaddr;
 	char		remote_name[248];
-=======
-#define HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE	0x07
-struct hci_ev_remote_name_request_complete_reply {
-	uint8     status;
-	bdaddr_t  bdaddr;
-	char	  remote_name[248];
->>>>>>> .r26700
 } __attribute__ ((packed));
 
 #define HCI_EVENT_ENCRYPT_CHANGE					0x08
