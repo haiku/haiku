@@ -1050,9 +1050,9 @@ _dump_thread_info(struct thread *thread)
 		thread->sig_block_mask);
 	kprintf("in_kernel:          %d\n", thread->in_kernel);
 
-	kprintf("waiting for:        ");
-
 	if (thread->state == B_THREAD_WAITING) {
+		kprintf("waiting for:        ");
+
 		switch (thread->wait.type) {
 			case THREAD_BLOCK_TYPE_SEMAPHORE:
 			{
@@ -1078,6 +1078,10 @@ _dump_thread_info(struct thread *thread)
 
 			case THREAD_BLOCK_TYPE_MUTEX:
 				kprintf("mutex %p\n", thread->wait.object);
+				break;
+
+			case THREAD_BLOCK_TYPE_RW_LOCK:
+				kprintf("rwlock %p\n", thread->wait.object);
 				break;
 
 			case THREAD_BLOCK_TYPE_OTHER:
@@ -1209,7 +1213,7 @@ dump_thread_list(int argc, char **argv)
 			kprintf("ignoring invalid team argument.\n");
 	}
 
-	kprintf("thread         id  state     wait for  object  cpu pri  stack    "
+	kprintf("thread         id  state     wait for   object  cpu pri  stack    "
 		"  team  name\n");
 
 	hash_open(sThreadHash, &i);
@@ -1233,14 +1237,14 @@ dump_thread_list(int argc, char **argv)
 				{
 					sem_id sem = (sem_id)(addr_t)thread->wait.object;
 					if (sem == thread->msg.read_sem)
-						kprintf("                   ");
+						kprintf("                     ");
 					else
-						kprintf("sem %12ld   ", sem);
+						kprintf("sem  %12ld   ", sem);
 					break;
 				}
 
 				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
-					kprintf("cvar  %p   ", thread->wait.object);
+					kprintf("cvar   %p   ", thread->wait.object);
 					break;
 
 				case THREAD_BLOCK_TYPE_SNOOZE:
@@ -1248,23 +1252,27 @@ dump_thread_list(int argc, char **argv)
 					break;
 
 				case THREAD_BLOCK_TYPE_SIGNAL:
-					kprintf("signal             ");
+					kprintf("signal              ");
 					break;
 
 				case THREAD_BLOCK_TYPE_MUTEX:
-					kprintf("mutex %p   ", thread->wait.object);
+					kprintf("mutex  %p   ", thread->wait.object);
+					break;
+
+				case THREAD_BLOCK_TYPE_RW_LOCK:
+					kprintf("rwlock %p   ", thread->wait.object);
 					break;
 
 				case THREAD_BLOCK_TYPE_OTHER:
-					kprintf("other              ");
+					kprintf("other               ");
 					break;
 
 				default:
-					kprintf("???   %p   ", thread->wait.object);
+					kprintf("???    %p   ", thread->wait.object);
 					break;
 			}
 		} else
-			kprintf("       -           ");
+			kprintf("        -           ");
 
 		// on which CPU does it run?
 		if (thread->cpu)

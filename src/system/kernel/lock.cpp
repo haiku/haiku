@@ -168,7 +168,7 @@ rw_lock_wait(rw_lock* lock, bool writer)
 	lock->waiters->last = &waiter;
 
 	// block
-	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_MUTEX, lock);
+	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_RW_LOCK, lock);
 	return thread_block_locked(waiter.thread);
 }
 
@@ -378,6 +378,41 @@ rw_lock_write_unlock(rw_lock* lock)
 	rw_lock_unblock(lock);
 
 	return B_OK;
+}
+
+
+static int
+dump_rw_lock_info(int argc, char** argv)
+{
+	if (argc < 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	rw_lock* lock = (rw_lock*)strtoul(argv[1], NULL, 0);
+
+	if (!IS_KERNEL_ADDRESS(lock)) {
+		kprintf("invalid address: %p\n", lock);
+		return 0;
+	}
+
+	kprintf("rw lock %p:\n", lock);
+	kprintf("  name:            %s\n", lock->name);
+	kprintf("  holder:          %ld\n", lock->holder);
+	kprintf("  reader count:    %ld\n", lock->reader_count);
+	kprintf("  writer count:    %ld\n", lock->writer_count);
+	kprintf("  owner count:	    %ld\n", lock->owner_count);
+	kprintf("  flags:           %#lx\n", lock->flags);
+
+	kprintf("  waiting threads:");
+	rw_lock_waiter* waiter = lock->waiters;
+	while (waiter != NULL) {
+		kprintf(" %ld/%c", waiter->thread->id, waiter->writer ? 'w' : 'r');
+		waiter = waiter->next;
+	}
+	kputs("\n");
+
+	return 0;
 }
 
 
@@ -623,4 +658,9 @@ lock_debug_init()
 		"<mutex>\n"
 		"Prints info about the specified mutex.\n"
 		"  <mutex>  - pointer to the mutex to print the info for.\n", 0);
+	add_debugger_command_etc("rwlock", &dump_rw_lock_info,
+		"Dump info about an rw lock",
+		"<lock>\n"
+		"Prints info about the specified rw lock.\n"
+		"  <lock>  - pointer to the rw lock to print the info for.\n", 0);
 }
