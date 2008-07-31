@@ -1754,7 +1754,7 @@ BMessage::FindData(const char *name, type_code type, int32 index,
 	if (!field)
 		return B_ERROR;
 
-	if (index >= field->count)
+	if (index < 0 || index >= field->count)
 		return B_BAD_INDEX;
 
 	if (field->flags & FIELD_FLAG_FIXED_SIZE) {
