@@ -236,7 +236,8 @@ dequeue_page(page_queue *queue)
 			page->queue_next->queue_prev = NULL;
 
 		queue->head = page->queue_next;
-		queue->count--;
+		if (page->type != PAGE_TYPE_DUMMY)
+			queue->count--;
 
 #ifdef DEBUG_PAGE_QUEUE
 		if (page->queue != queue) {
@@ -270,7 +271,8 @@ enqueue_page(page_queue *queue, vm_page *page)
 	page->queue_next = NULL;
 	if (queue->head == NULL)
 		queue->head = page;
-	queue->count++;
+	if (page->type != PAGE_TYPE_DUMMY)
+		queue->count++;
 
 #ifdef DEBUG_PAGE_QUEUE
 	page->queue = queue;
@@ -296,7 +298,8 @@ enqueue_page_to_head(page_queue *queue, vm_page *page)
 	page->queue_prev = NULL;
 	if (queue->tail == NULL)
 		queue->tail = page;
-	queue->count++;
+	if (page->type != PAGE_TYPE_DUMMY)
+		queue->count++;
 
 #ifdef DEBUG_PAGE_QUEUE
 	page->queue = queue;
@@ -324,7 +327,8 @@ remove_page_from_queue(page_queue *queue, vm_page *page)
 	else
 		queue->head = page->queue_next;
 
-	queue->count--;
+	if (page->type != PAGE_TYPE_DUMMY)
+		queue->count--;
 
 #ifdef DEBUG_PAGE_QUEUE
 	page->queue = NULL;
@@ -370,7 +374,8 @@ insert_page_after(page_queue *queue, vm_page *before, vm_page *page)
 	if (queue->tail == before)
 		queue->tail = page;
 
-	queue->count++;
+	if (page->type != PAGE_TYPE_DUMMY)
+		queue->count++;
 
 #ifdef DEBUG_PAGE_QUEUE
 	page->queue = queue;
