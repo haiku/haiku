@@ -1,5 +1,5 @@
 /* 
- * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_UTIL_DOUBLY_LINKED_LIST_H
@@ -19,11 +19,11 @@ namespace FSShell {
 template<typename Element>
 class DoublyLinkedListLink {
 public:
-	DoublyLinkedListLink() : previous(NULL), next(NULL) {}
+	DoublyLinkedListLink() : next(NULL), previous(NULL) {}
 	~DoublyLinkedListLink() {}
 
-	Element	*previous;
 	Element	*next;
+	Element	*previous;
 };
 
 // DoublyLinkedListLinkImpl
@@ -138,6 +138,11 @@ public:
 			fCurrent = fNext;
 			if (fNext)
 				fNext = fList->GetNext(fNext);
+			return fCurrent;
+		}
+
+		Element *Current()
+		{
 			return fCurrent;
 		}
 
@@ -455,34 +460,20 @@ void
 DOUBLY_LINKED_LIST_CLASS_NAME::Swap(Element *a, Element *b)
 {
 	if (a && b && a != b) {
-		Link *aLink = sGetLink(a);
-		Link *bLink = sGetLink(b);
-		Element *aPrev = aLink->previous;
-		Element *bPrev = bLink->previous;
-		Element *aNext = aLink->next;
-		Element *bNext = bLink->next;
-		// place a
-		if (bPrev)
-			sGetLink(bPrev)->next = a;
-		else
-			fFirst = a;
-		if (bNext)
-			sGetLink(bNext)->previous = a;
-		else
-			fLast = a;
-		aLink->previous = bPrev;
-		aLink->next = bNext;
-		// place b
-		if (aPrev)
-			sGetLink(aPrev)->next = b;
-		else
-			fFirst = b;
-		if (aNext)
-			sGetLink(aNext)->previous = b;
-		else
-			fLast = b;
-		bLink->previous = aPrev;
-		bLink->next = aNext;
+		Element *aNext = sGetLink(a)->next;
+		Element *bNext = sGetLink(b)->next;
+		if (a == bNext) {
+			Remove(a);
+			Insert(b, a);
+		} else if (b == aNext) {
+			Remove(b);
+			Insert(a, b);
+		} else {
+			Remove(a);
+			Remove(b);
+			Insert(aNext, b);
+			Insert(bNext, a);
+		}
 	}
 }
 
@@ -494,7 +485,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::MoveFrom(DOUBLY_LINKED_LIST_CLASS_NAME *fromList)
 	if (fromList && fromList->fFirst) {
 		if (fFirst) {
 			sGetLink(fLast)->next = fromList->fFirst;
-			sGetLink(fFirst)->previous = fLast;
+			sGetLink(fromList->fFirst)->previous = fLast;
 			fLast = fromList->fLast;
 		} else {
 			fFirst = fromList->fFirst;
