@@ -11,7 +11,6 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/DeviceClass.h>
 
-
 #include <Messenger.h>
 #include <Message.h>
 
@@ -21,22 +20,22 @@
 namespace Bluetooth {
 
 class BluetoothDevice {
-   
-    public:       		         
+
+	public:
 
 		virtual BString GetFriendlyName()=0;
-        virtual DeviceClass GetDeviceClass()=0;
-                 
-        virtual BString GetProperty(const char* property)=0;
-        virtual void GetProperty(const char* property, uint32* value)=0;
+		virtual DeviceClass GetDeviceClass()=0;
 
-        virtual bdaddr_t GetBluetoothAddress()=0;
-        
+		virtual BString GetProperty(const char* property)=0;
+		virtual void GetProperty(const char* property, uint32* value)=0;
+
+		virtual bdaddr_t GetBluetoothAddress()=0;
+
 	protected:
-		bdaddr_t	 fBdaddr;
-		DeviceClass  fDeviceClass;
+		bdaddr_t fBdaddr;
+		DeviceClass fDeviceClass;
 };
-    
+
 }
 
 #ifndef _BT_USE_EXPLICIT_NAMESPACE

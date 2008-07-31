@@ -48,13 +48,13 @@ typedef struct bt_hci_statistics {
 
 } bt_hci_statistics;
 
-/* TODO: Possible Hooks which drivers will have to provide */
+/* TODO: Possible hooks which drivers will have to provide */
 typedef struct bt_hci_transport {
 
-	status_t	(*SendCommand)(hci_id hci_dev, net_buffer* snbuf);
-	status_t	(*SendPacket)(hci_id hci_dev, net_buffer* nbuf );
-	status_t	(*SendSCO)(hci_id hci_dev, net_buffer* nbuf );
-	status_t	(*DeliverStatistics)(bt_hci_statistics* statistics);
+	status_t	(*SendCommand)(hci_id hci_dev, net_buffer *snbuf);
+	status_t	(*SendPacket)(hci_id hci_dev, net_buffer *nbuf );
+	status_t	(*SendSCO)(hci_id hci_dev, net_buffer *nbuf );
+	status_t	(*DeliverStatistics)(bt_hci_statistics *statistics);
 
 	transport_type	kind;
 	char			name[B_OS_NAME_LENGTH];

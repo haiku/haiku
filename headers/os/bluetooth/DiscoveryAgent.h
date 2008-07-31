@@ -19,9 +19,9 @@
 #define BT_GIAC 0x9E8B33
 #define BT_LIAC 0x9E8B00
 
-#define BT_MAX_RESPONSES         (32)
-#define BT_BASE_INQUIRY_TIME	 (1.28)
-#define BT_DEFAULT_INQUIRY_TIME  (0x15*BT_BASE_INQUIRY_TIME)  /* TODO: REVIEW SPECS! */
+#define BT_MAX_RESPONSES		(32)
+#define BT_BASE_INQUIRY_TIME	(1.28)
+#define BT_DEFAULT_INQUIRY_TIME	(0x15*BT_BASE_INQUIRY_TIME)  /* TODO: REVIEW SPECS! */
 
 namespace Bluetooth {
 
@@ -30,31 +30,29 @@ class RemoteDevice;
 
 class DiscoveryAgent {
 
-    public:
+	public:
 
-        static const int GIAC = BT_GIAC;
-        static const int LIAC = BT_LIAC;
+		static const int GIAC = BT_GIAC;
+		static const int LIAC = BT_LIAC;
 
-        static const int PREKNOWN = BT_PREKNOWN;
-        static const int CACHED = BT_CACHED;
-        static const int NOT_DISCOVERABLE = BT_NOT_DISCOVERABLE;
+		static const int PREKNOWN = BT_PREKNOWN;
+		static const int CACHED = BT_CACHED;
+		static const int NOT_DISCOVERABLE = BT_NOT_DISCOVERABLE;
 
-        RemoteDevicesList RetrieveDevices(int option); /* TODO */
-        status_t StartInquiry(int accessCode, DiscoveryListener* listener); /* Throwing */
-        status_t StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs);
-        status_t CancelInquiry(DiscoveryListener* listener);
+		RemoteDevicesList RetrieveDevices(int option); /* TODO */
+		status_t StartInquiry(int accessCode, DiscoveryListener* listener); /* Throwing */
+		status_t StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs);
+		status_t CancelInquiry(DiscoveryListener* listener);
 
-        /*
-        int searchServices(int[] attrSet,
-                               UUID[] uuidSet,
-                               RemoteDevice btDev,
-                               DiscoveryListener discListener);
+		/*
+		int searchServices(int[] attrSet, UUID[] uuidSet, RemoteDevice btDev,
+						DiscoveryListener discListener);
 
-        bool cancelServiceSearch(int transID);
-        BString selectService(UUID uuid, int security, boolean master);
-        */
+		bool cancelServiceSearch(int transID);
+		BString selectService(UUID uuid, int security, boolean master);
+		*/
 
-    private:
+	private:
 		DiscoveryAgent(LocalDevice* ld);
 		~DiscoveryAgent();
 		void SetLocalDeviceOwner(LocalDevice* ld);
