@@ -1,5 +1,6 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -170,7 +171,7 @@ struct hci_ev_mode_change {
 #define HCI_EVENT_RETURN_LINK_KEYS					0x15
 struct link_key_info {
 	bdaddr_t	bdaddr;
-	uint8		link_key[HCI_LINK_KEY_SIZE];
+	linkkey_t	link_key;
 } __attribute__ ((packed)) ;
 struct hci_ev_return_link_keys {
 	uint8					num_keys;	/* # of keys */
@@ -190,7 +191,7 @@ struct hci_ev_link_key_req {
 #define HCI_EVENT_LINK_KEY_NOTIFY					0x18
 struct hci_ev_link_key_notify {
 	bdaddr_t bdaddr;
-	uint8	 link_key[16];
+	linkkey_t	link_key;
 	uint8	 key_type;
 } __attribute__ ((packed));
 
