@@ -8,7 +8,13 @@
 #define KERNEL_UTIL_SINGLY_LINKED_LIST_H
 
 
+#include "fssh_types.h"
+
+
 #ifdef __cplusplus
+
+
+namespace FSShell {
 
 // SinglyLinkedListLink
 template<typename Element>
@@ -154,7 +160,7 @@ class SinglyLinkedList {
 
 		inline Element* GetNext(Element* element) const;
 
-		inline int32 Size() const;
+		inline int32_t Size() const;
 			// O(n)!
 
 		inline Iterator GetIterator() const	{ return Iterator(this); }
@@ -241,10 +247,10 @@ SINGLY_LINKED_LIST_CLASS_NAME::GetNext(Element* element) const
 
 // Size
 SINGLY_LINKED_LIST_TEMPLATE_LIST
-int32
+int32_t
 SINGLY_LINKED_LIST_CLASS_NAME::Size() const
 {
-	int32 count = 0;
+	int32_t count = 0;
 	for (Element* element = First(); element; element = GetNext(element))
 		count++;
 	return count;
@@ -254,6 +260,14 @@ SINGLY_LINKED_LIST_CLASS_NAME::Size() const
 SINGLY_LINKED_LIST_TEMPLATE_LIST
 GetLink SINGLY_LINKED_LIST_CLASS_NAME::sGetLink;
 
-#endif	/* __cplusplus */
+}	// namespace FSShell
+
+using FSShell::SinglyLinkedListLink;
+using FSShell::SinglyLinkedListLinkImpl;
+using FSShell::SinglyLinkedListStandardGetLink;
+using FSShell::SinglyLinkedListMemberGetLink;
+using FSShell::SinglyLinkedList;
+
+#endif	// __cplusplus
 
 #endif	// _KERNEL_UTIL_SINGLY_LINKED_LIST_H
