@@ -626,38 +626,51 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 		}
 
 		size_t bytesInPage = min_c(size_t(B_PAGE_SIZE - pageOffset), bytesLeft);
-		addr_t virtualAddress;
 
 		TRACE(("lookup page from offset %Ld: %p, size = %lu, pageOffset "
 			"= %lu\n", offset, page, bytesLeft, pageOffset));
 
 		if (page != NULL) {
-			vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
-				&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
-
 			// Since we don't actually map pages as part of an area, we have
-			// to manually maintain its usage_count
+			// to manually maintain their usage_count
 			page->usage_count = 2;
 
-			// and copy the contents of the page already in memory
-			if (doWrite) {
-				if (useBuffer) {
-					user_memcpy((void *)(virtualAddress + pageOffset),
-						(void *)buffer, bytesInPage);
-				} else {
-					user_memset((void *)(virtualAddress + pageOffset),
-						0, bytesInPage);
+			if (doWrite || useBuffer) {
+				// Since the following user_mem{cpy,set}() might cause a page
+				// fault, which in turn might cause pages to be reserved, we
+				// need to unlock the cache temporarily to avoid a potential
+				// deadlock. To make sure that our page doesn't go away, we mark
+				// it busy for the time.
+				uint8 oldPageState = page->state;
+				page->state = PAGE_STATE_BUSY;
+				locker.Unlock();
+
+				addr_t virtualAddress;
+				vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
+					&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+
+				// copy the contents of the page already in memory
+				if (doWrite) {
+					if (useBuffer) {
+						user_memcpy((void *)(virtualAddress + pageOffset),
+							(void *)buffer, bytesInPage);
+					} else {
+						user_memset((void *)(virtualAddress + pageOffset),
+							0, bytesInPage);
+					}
+				} else if (useBuffer) {
+					user_memcpy((void *)buffer,
+						(void *)(virtualAddress + pageOffset), bytesInPage);
 				}
 
-				// make sure the page is in the modified list
-				if (page->state != PAGE_STATE_MODIFIED)
-					vm_page_set_state(page, PAGE_STATE_MODIFIED);
-			} else if (useBuffer) {
-				user_memcpy((void *)buffer,
-					(void *)(virtualAddress + pageOffset), bytesInPage);
-			}
+				vm_put_physical_page(virtualAddress);
 
-			vm_put_physical_page(virtualAddress);
+				locker.Lock();
+
+				page->state = oldPageState;
+				if (doWrite && page->state != PAGE_STATE_MODIFIED)
+					vm_page_set_state(page, PAGE_STATE_MODIFIED);
+			}
 
 			if (bytesLeft <= bytesInPage) {
 				// we've read the last page, so we're done!
