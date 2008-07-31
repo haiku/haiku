@@ -19,19 +19,18 @@
 
 /* TODO: Possible definition of a bus manager of whatever is gonna be on the top */
 typedef struct bt_hci_module_info {
-   
-    /* registration */
-	status_t        (*RegisterDriver)(bt_hci_transport* desc, hci_id *id /*out*/, 
-	                                  bt_hci_device* cookie /*out*/ );
-    status_t        (*UnregisterDriver)(hci_id id);
-    
-    /* Transferences to be called from drivers */
+	/* registration */
+	status_t		(*RegisterDriver)(bt_hci_transport* desc, hci_id *id /*out*/, 
+										bt_hci_device* cookie /*out*/ );
+	status_t		(*UnregisterDriver)(hci_id id);
 
-    status_t		(*PostACL)(hci_id id, net_buffer* nbuf);
-    status_t		(*PostSCO)(hci_id id, net_buffer* nbuf);
-    
-    /* Management */
-    bt_hci_device*	(*GetHciDevice)(hci_id id);
+	/* Transferences to be called from drivers */
+
+	status_t		(*PostACL)(hci_id id, net_buffer* nbuf);
+	status_t		(*PostSCO)(hci_id id, net_buffer* nbuf);
+
+	/* Management */
+	bt_hci_device*	(*GetHciDevice)(hci_id id);
 
 } bt_hci_module_info ;
 
