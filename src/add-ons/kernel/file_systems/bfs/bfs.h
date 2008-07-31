@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * Parts of this code is based on work previously done by Marcus Overhagen.
  *
  * This file may be used under the terms of the MIT License.
@@ -17,9 +17,6 @@
 #ifdef _BOOT_MODE
 namespace BFS {
 #endif
-
-// ToDo: temporary fix! (missing but public ioctls)
-#define IOCTL_FILE_UNCACHED_IO	10000
 
 #ifndef _BOOT_MODE
 extern fs_volume_ops gBFSVolumeOps;

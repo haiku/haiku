@@ -26,37 +26,37 @@ static const int32 kDesiredAllocationGroups = 56;
 
 
 class DeviceOpener {
-	public:
-		DeviceOpener(int fd, int mode);
-		DeviceOpener(const char *device, int mode);
-		~DeviceOpener();
+public:
+						DeviceOpener(int fd, int mode);
+						DeviceOpener(const char* device, int mode);
+						~DeviceOpener();
 
-		int Open(const char *device, int mode);
-		int Open(int fd, int mode);
-		void *InitCache(off_t numBlocks, uint32 blockSize);
-		void RemoveCache(bool allowWrites);
+			int			Open(const char* device, int mode);
+			int			Open(int fd, int mode);
+			void*		InitCache(off_t numBlocks, uint32 blockSize);
+			void		RemoveCache(bool allowWrites);
 
-		void Keep();
+			void		Keep();
 
-		int Device() const { return fDevice; }
-		int Mode() const { return fMode; }
-		bool IsReadOnly() const { return _IsReadOnly(fMode); }
+			int			Device() const { return fDevice; }
+			int			Mode() const { return fMode; }
+			bool		IsReadOnly() const { return _IsReadOnly(fMode); }
 
-		status_t GetSize(off_t *_size, uint32 *_blockSize = NULL);
+			status_t	GetSize(off_t* _size, uint32* _blockSize = NULL);
 
-	private:
-		static bool _IsReadOnly(int mode)
-			{ return (mode & O_RWMASK) == O_RDONLY;}
-		static bool _IsReadWrite(int mode)
-			{ return (mode & O_RWMASK) == O_RDWR;}
+private:
+	static	bool		_IsReadOnly(int mode)
+							{ return (mode & O_RWMASK) == O_RDONLY;}
+	static	bool		_IsReadWrite(int mode)
+							{ return (mode & O_RWMASK) == O_RDWR;}
 
-		int		fDevice;
-		int		fMode;
-		void	*fBlockCache;
+			int			fDevice;
+			int			fMode;
+			void*		fBlockCache;
 };
 
 
-DeviceOpener::DeviceOpener(const char *device, int mode)
+DeviceOpener::DeviceOpener(const char* device, int mode)
 	:
 	fBlockCache(NULL)
 {
@@ -82,7 +82,7 @@ DeviceOpener::~DeviceOpener()
 
 
 int
-DeviceOpener::Open(const char *device, int mode)
+DeviceOpener::Open(const char* device, int mode)
 {
 	fDevice = open(device, mode | O_NOCACHE);
 	if (fDevice < 0)
@@ -126,7 +126,7 @@ DeviceOpener::Open(int fd, int mode)
 }
 
 
-void *
+void*
 DeviceOpener::InitCache(off_t numBlocks, uint32 blockSize)
 {
 	return fBlockCache = block_cache_create(fDevice, numBlocks, blockSize,
@@ -156,7 +156,7 @@ DeviceOpener::Keep()
 	to compute the size, or fstat() if that failed.
 */
 status_t
-DeviceOpener::GetSize(off_t *_size, uint32 *_blockSize)
+DeviceOpener::GetSize(off_t* _size, uint32* _blockSize)
 {
 	device_geometry geometry;
 	if (ioctl(fDevice, B_GET_GEOMETRY, &geometry) < 0) {
@@ -209,7 +209,7 @@ disk_super_block::IsValid()
 
 
 void
-disk_super_block::Initialize(const char *diskName, off_t numBlocks,
+disk_super_block::Initialize(const char* diskName, off_t numBlocks,
 	uint32 blockSize)
 {
 	memset(this, 0, sizeof(disk_super_block));
@@ -272,7 +272,7 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks,
 //	#pragma mark -
 
 
-Volume::Volume(fs_volume *volume)
+Volume::Volume(fs_volume* volume)
 	:
 	fVolume(volume),
 	fBlockAllocator(this),
@@ -313,9 +313,9 @@ Volume::Panic()
 
 
 status_t
-Volume::Mount(const char *deviceName, uint32 flags)
+Volume::Mount(const char* deviceName, uint32 flags)
 {
-	// ToDo: validate the FS in write mode as well!
+	// TODO: validate the FS in write mode as well!
 #if (B_HOST_IS_LENDIAN && defined(BFS_BIG_ENDIAN_ONLY)) \
 	|| (B_HOST_IS_BENDIAN && defined(BFS_LITTLE_ENDIAN_ONLY))
 	// in big endian mode, we only mount read-only for now
@@ -385,7 +385,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 
 	fRootNode = new Inode(this, ToVnode(Root()));
 	if (fRootNode != NULL && fRootNode->InitCheck() == B_OK) {
-		status = publish_vnode(fVolume, ToVnode(Root()), (void *)fRootNode,
+		status = publish_vnode(fVolume, ToVnode(Root()), (void*)fRootNode,
 			&gBFSVnodeOps, fRootNode->Mode(), 0);
 		if (status == B_OK) {
 			// try to get indices root dir
@@ -482,7 +482,7 @@ Volume::ToBlockRun(off_t block) const
 
 
 status_t
-Volume::CreateIndicesRoot(Transaction &transaction)
+Volume::CreateIndicesRoot(Transaction& transaction)
 {
 	off_t id;
 	status_t status = Inode::Create(transaction, NULL, NULL,
@@ -497,8 +497,8 @@ Volume::CreateIndicesRoot(Transaction &transaction)
 
 
 status_t
-Volume::AllocateForInode(Transaction &transaction, const Inode *parent,
-	mode_t type, block_run &run)
+Volume::AllocateForInode(Transaction& transaction, const Inode* parent,
+	mode_t type, block_run& run)
 {
 	return fBlockAllocator.AllocateForInode(transaction, &parent->BlockRun(),
 		type, run);
@@ -517,13 +517,13 @@ Volume::WriteSuperBlock()
 
 
 void
-Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type,
-	const uint8 *oldKey, size_t oldLength, const uint8 *newKey,
+Volume::UpdateLiveQueries(Inode* inode, const char* attribute, int32 type,
+	const uint8* oldKey, size_t oldLength, const uint8* newKey,
 	size_t newLength)
 {
 	MutexLocker _(fQueryLock);
 
-	Query *query = NULL;
+	Query* query = NULL;
 	while ((query = fQueries.Next(query)) != NULL) {
 		query->LiveUpdate(inode, attribute, type, oldKey, oldLength, newKey,
 			newLength);
@@ -537,15 +537,15 @@ Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type,
 	the queries - it wouldn't safe you anything in this case.
 */
 bool
-Volume::CheckForLiveQuery(const char *attribute)
+Volume::CheckForLiveQuery(const char* attribute)
 {
-	// ToDo: check for a live query that depends on the specified attribute
+	// TODO: check for a live query that depends on the specified attribute
 	return true;
 }
 
 
 void
-Volume::AddQuery(Query *query)
+Volume::AddQuery(Query* query)
 {
 	MutexLocker _(fQueryLock);
 	fQueries.Add(query);
@@ -553,7 +553,7 @@ Volume::AddQuery(Query *query)
 
 
 void
-Volume::RemoveQuery(Query *query)
+Volume::RemoveQuery(Query* query)
 {
 	MutexLocker _(fQueryLock);
 	fQueries.Remove(query);
@@ -588,7 +588,7 @@ Volume::CheckSuperBlock(const uint8* data, uint32* _offset)
 
 
 /*static*/ status_t
-Volume::Identify(int fd, disk_super_block *superBlock)
+Volume::Identify(int fd, disk_super_block* superBlock)
 {
 	uint8 buffer[1024];
 	if (read_pos(fd, 0, buffer, sizeof(buffer)) != sizeof(buffer))
@@ -604,7 +604,7 @@ Volume::Identify(int fd, disk_super_block *superBlock)
 
 
 status_t
-Volume::Initialize(int fd, const char *name, uint32 blockSize,
+Volume::Initialize(int fd, const char* name, uint32 blockSize,
 	uint32 flags)
 {
 	// although there is no really good reason for it, we won't

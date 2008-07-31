@@ -6,14 +6,13 @@
 //! block bitmap handling and allocation policies
 
 
-#include "Debug.h"
 #include "BlockAllocator.h"
-#include "Volume.h"
-#include "Inode.h"
-#include "BPlusTree.h"
-#include "bfs_control.h"
 
-#include "system_dependencies.h"
+#include "bfs_control.h"
+#include "BPlusTree.h"
+#include "Debug.h"
+#include "Inode.h"
+#include "Volume.h"
 
 
 // Things the BlockAllocator should do:
@@ -40,48 +39,48 @@
 namespace BFSBlockTracing {
 
 class Allocate : public AbstractTraceEntry {
-	public:
-		Allocate(block_run run)
-			:
-			fRun(run)
-		{
-			Initialized();
-		}
+public:
+	Allocate(block_run run)
+		:
+		fRun(run)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("bfs:alloc %lu.%u.%u", fRun.AllocationGroup(),
-				fRun.Start(), fRun.Length());
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("bfs:alloc %lu.%u.%u", fRun.AllocationGroup(),
+			fRun.Start(), fRun.Length());
+	}
 
-	private:
-		block_run	fRun;
+private:
+	block_run	fRun;
 };
 
 class Free : public AbstractTraceEntry {
-	public:
-		Free(block_run run)
-			:
-			fRun(run)
-		{
-			Initialized();
-		}
+public:
+	Free(block_run run)
+		:
+		fRun(run)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("bfs:free %lu.%u.%u", fRun.AllocationGroup(),
-				fRun.Start(), fRun.Length());
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("bfs:free %lu.%u.%u", fRun.AllocationGroup(),
+			fRun.Start(), fRun.Length());
+	}
 
-	private:
-		block_run	fRun;
+private:
+	block_run	fRun;
 };
 
 
 static uint32
-checksum(const uint8 *data, size_t size)
+checksum(const uint8* data, size_t size)
 {
-	const uint32 *data4 = (const uint32 *)data;
+	const uint32* data4 = (const uint32*)data;
 	uint32 sum = 0;
 	while (size >= 4) {
 		sum += *data4;
@@ -93,33 +92,33 @@ checksum(const uint8 *data, size_t size)
 
 
 class Block : public AbstractTraceEntry {
-	public:
-		Block(const char *label, off_t blockNumber, const uint8 *data,
-				size_t size, uint32 start = 0, uint32 length = 0)
-			:
-			fBlock(blockNumber),
-			fData(data),
-			fStart(start),
-			fLength(length)
-		{
-			strlcpy(fLabel, label, sizeof(fLabel));
-			fSum = checksum(data, size);
-			Initialized();
-		}
+public:
+	Block(const char* label, off_t blockNumber, const uint8* data,
+			size_t size, uint32 start = 0, uint32 length = 0)
+		:
+		fBlock(blockNumber),
+		fData(data),
+		fStart(start),
+		fLength(length)
+	{
+		strlcpy(fLabel, label, sizeof(fLabel));
+		fSum = checksum(data, size);
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("bfs:%s: block %Ld (%p), sum %lu, s/l %lu/%lu", fLabel,
-				fBlock, fData, fSum, fStart, fLength);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("bfs:%s: block %Ld (%p), sum %lu, s/l %lu/%lu", fLabel,
+			fBlock, fData, fSum, fStart, fLength);
+	}
 
-	private:
-		off_t		fBlock;
-		const uint8	*fData;
-		uint32		fStart;
-		uint32		fLength;
-		uint32		fSum;
-		char		fLabel[12];
+private:
+	off_t		fBlock;
+	const uint8	*fData;
+	uint32		fStart;
+	uint32		fLength;
+	uint32		fSum;
+	char		fLabel[12];
 };
 
 }	// namespace BFSBlockTracing
@@ -142,62 +141,64 @@ struct check_cookie {
 
 
 class AllocationBlock : public CachedBlock {
-	public:
-		AllocationBlock(Volume *volume);
+public:
+	AllocationBlock(Volume* volume);
 
-		void Allocate(uint16 start, uint16 numBlocks);
-		void Free(uint16 start, uint16 numBlocks);
-		inline bool IsUsed(uint16 block);
+	void Allocate(uint16 start, uint16 numBlocks);
+	void Free(uint16 start, uint16 numBlocks);
+	inline bool IsUsed(uint16 block);
 
-		status_t SetTo(AllocationGroup &group, uint16 block);
-		status_t SetToWritable(Transaction &transaction, AllocationGroup &group, uint16 block);
+	status_t SetTo(AllocationGroup& group, uint16 block);
+	status_t SetToWritable(Transaction& transaction, AllocationGroup& group,
+		uint16 block);
 
-		uint32 NumBlockBits() const { return fNumBits; }
-		uint32 &Block(int32 index) { return ((uint32 *)fBlock)[index]; }
-		uint8 *Block() const { return (uint8 *)fBlock; }
+	uint32 NumBlockBits() const { return fNumBits; }
+	uint32& Block(int32 index) { return ((uint32*)fBlock)[index]; }
+	uint8* Block() const { return (uint8*)fBlock; }
 
-	private:
-		uint32	fNumBits;
+private:
+	uint32	fNumBits;
 #ifdef DEBUG
-		bool	fWritable;
+	bool	fWritable;
 #endif
 };
 
 
 class AllocationGroup {
-	public:
-		AllocationGroup();
+public:
+	AllocationGroup();
 
-		void AddFreeRange(int32 start, int32 blocks);
-		bool IsFull() const { return fFreeBits == 0; }
+	void AddFreeRange(int32 start, int32 blocks);
+	bool IsFull() const { return fFreeBits == 0; }
 
-		status_t Allocate(Transaction &transaction, uint16 start, int32 length);
-		status_t Free(Transaction &transaction, uint16 start, int32 length);
+	status_t Allocate(Transaction& transaction, uint16 start, int32 length);
+	status_t Free(Transaction& transaction, uint16 start, int32 length);
 
-		uint32 NumBits() const { return fNumBits; }
-		uint32 NumBlocks() const { return fNumBlocks; }
-		int32 Start() const { return fStart; }
+	uint32 NumBits() const { return fNumBits; }
+	uint32 NumBlocks() const { return fNumBlocks; }
+	int32 Start() const { return fStart; }
 
-	private:
-		friend class BlockAllocator;
+private:
+	friend class BlockAllocator;
 
-		uint32	fNumBits;
-		uint32	fNumBlocks;
-		int32	fStart;
-		int32	fFirstFree, fLargest, fLargestFirst;
-			// ToDo: fLargest & fLargestFirst are not maintained (and therefore used) yet!
-		int32	fFreeBits;
+	uint32	fNumBits;
+	uint32	fNumBlocks;
+	int32	fStart;
+	int32	fFirstFree, fLargest, fLargestFirst;
+		// TODO: fLargest & fLargestFirst are not maintained
+		// (and therefore used) yet!
+	int32	fFreeBits;
 };
 
 
-AllocationBlock::AllocationBlock(Volume *volume)
+AllocationBlock::AllocationBlock(Volume* volume)
 	: CachedBlock(volume)
 {
 }
 
 
 status_t
-AllocationBlock::SetTo(AllocationGroup &group, uint16 block)
+AllocationBlock::SetTo(AllocationGroup& group, uint16 block)
 {
 	// 8 blocks per byte
 	fNumBits = fVolume->BlockSize() << 3;
@@ -213,7 +214,7 @@ AllocationBlock::SetTo(AllocationGroup &group, uint16 block)
 
 
 status_t
-AllocationBlock::SetToWritable(Transaction &transaction, AllocationGroup &group,
+AllocationBlock::SetToWritable(Transaction& transaction, AllocationGroup& group,
 	uint16 block)
 {
 	// 8 blocks per byte
@@ -266,7 +267,7 @@ AllocationBlock::Allocate(uint16 start, uint16 numBlocks)
 			mask |= 1UL << i;
 #ifdef DEBUG
 		// check for already set blocks
-		if (HOST_ENDIAN_TO_BFS_INT32(mask) & ((uint32 *)fBlock)[block]) {
+		if (HOST_ENDIAN_TO_BFS_INT32(mask) & ((uint32*)fBlock)[block]) {
 			FATAL(("AllocationBlock::Allocate(): some blocks are already allocated, start = %u, numBlocks = %u\n", start, numBlocks));
 			DEBUGGER(("blocks already set!"));
 		}
@@ -348,19 +349,19 @@ AllocationGroup::AddFreeRange(int32 start, int32 blocks)
 	Assumes that the block bitmap lock is hold.
 */
 status_t
-AllocationGroup::Allocate(Transaction &transaction, uint16 start, int32 length)
+AllocationGroup::Allocate(Transaction& transaction, uint16 start, int32 length)
 {
 	if (start > fNumBits)
 		return B_ERROR;
 
 	// Update the allocation group info
-	// ToDo: this info will be incorrect if something goes wrong later
+	// TODO: this info will be incorrect if something goes wrong later
 	// Note, the fFirstFree block doesn't have to be really free
 	if (start == fFirstFree)
 		fFirstFree = start + length;
 	fFreeBits -= length;
 
-	Volume *volume = transaction.GetVolume();
+	Volume* volume = transaction.GetVolume();
 
 	// calculate block in the block bitmap and position within
 	uint32 bitsPerBlock = volume->BlockSize() << 3;
@@ -395,18 +396,18 @@ AllocationGroup::Allocate(Transaction &transaction, uint16 start, int32 length)
 	Assumes that the block bitmap lock is hold.
 */
 status_t
-AllocationGroup::Free(Transaction &transaction, uint16 start, int32 length)
+AllocationGroup::Free(Transaction& transaction, uint16 start, int32 length)
 {
 	if (start > fNumBits)
 		return B_ERROR;
 
 	// Update the allocation group info
-	// ToDo: this info will be incorrect if something goes wrong later
+	// TODO: this info will be incorrect if something goes wrong later
 	if (fFirstFree > start)
 		fFirstFree = start;
 	fFreeBits += length;
 
-	Volume *volume = transaction.GetVolume();
+	Volume* volume = transaction.GetVolume();
 
 	// calculate block in the block bitmap and position within
 	uint32 bitsPerBlock = volume->BlockSize() << 3;
@@ -438,7 +439,7 @@ AllocationGroup::Free(Transaction &transaction, uint16 start, int32 length)
 //	#pragma mark -
 
 
-BlockAllocator::BlockAllocator(Volume *volume)
+BlockAllocator::BlockAllocator(Volume* volume)
 	:
 	fVolume(volume),
 	fGroups(NULL),
@@ -471,18 +472,18 @@ BlockAllocator::Initialize(bool full)
 		// the lock will be released by the _Initialize() method
 
 	thread_id id = spawn_kernel_thread((thread_func)BlockAllocator::_Initialize,
-			"bfs block allocator", B_LOW_PRIORITY, (void *)this);
+		"bfs block allocator", B_LOW_PRIORITY, this);
 	if (id < B_OK)
 		return _Initialize(this);
-	else
-		mutex_transfer_lock(&fLock, id);
+
+	mutex_transfer_lock(&fLock, id);
 
 	return resume_thread(id);
 }
 
 
 status_t
-BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
+BlockAllocator::InitializeAndClearBitmap(Transaction& transaction)
 {
 	status_t status = Initialize(false);
 	if (status < B_OK)
@@ -492,7 +493,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 	uint32 numBits = 8 * blocks * fVolume->BlockSize();
 	uint32 blockShift = fVolume->BlockShift();
 
-	uint32 *buffer = (uint32 *)malloc(numBits >> 3);
+	uint32* buffer = (uint32*)malloc(numBits >> 3);
 	if (buffer == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -503,13 +504,15 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 	// initialize the AllocationGroup objects and clear the on-disk bitmap
 
 	for (int32 i = 0; i < fNumGroups; i++) {
-		if (write_pos(fVolume->Device(), offset << blockShift, buffer, blocks << blockShift) < B_OK)
+		if (write_pos(fVolume->Device(), offset << blockShift, buffer,
+				blocks << blockShift) < B_OK)
 			return B_ERROR;
 
 		// the last allocation group may contain less blocks than the others
 		if (i == fNumGroups - 1) {
 			fGroups[i].fNumBits = fVolume->NumBlocks() - i * numBits;
-			fGroups[i].fNumBlocks = 1 + ((fGroups[i].NumBits() - 1) >> (blockShift + 3));
+			fGroups[i].fNumBlocks = 1 + ((fGroups[i].NumBits() - 1)
+				>> (blockShift + 3));
 		} else {
 			fGroups[i].fNumBits = numBits;
 			fGroups[i].fNumBlocks = blocks;
@@ -529,29 +532,30 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 		FATAL(("could not allocate reserved space for block bitmap/log!\n"));
 		return B_ERROR;
 	}
-	fVolume->SuperBlock().used_blocks = HOST_ENDIAN_TO_BFS_INT64(reservedBlocks);
+	fVolume->SuperBlock().used_blocks
+		= HOST_ENDIAN_TO_BFS_INT64(reservedBlocks);
 
 	return B_OK;
 }
 
 
 status_t
-BlockAllocator::_Initialize(BlockAllocator *allocator)
+BlockAllocator::_Initialize(BlockAllocator* allocator)
 {
 	// The lock must already be held at this point
 
-	Volume *volume = allocator->fVolume;
+	Volume* volume = allocator->fVolume;
 	uint32 blocks = allocator->fBlocksPerGroup;
 	uint32 blockShift = volume->BlockShift();
 	off_t freeBlocks = 0;
 
-	uint32 *buffer = (uint32 *)malloc(blocks << blockShift);
+	uint32* buffer = (uint32*)malloc(blocks << blockShift);
 	if (buffer == NULL) {
 		mutex_unlock(&allocator->fLock);
 		RETURN_ERROR(B_NO_MEMORY);
 	}
 
-	AllocationGroup *groups = allocator->fGroups;
+	AllocationGroup* groups = allocator->fGroups;
 	off_t offset = 1;
 	uint32 bitsPerGroup = 8 * (blocks << blockShift);
 	int32 numGroups = allocator->fNumGroups;
@@ -564,7 +568,8 @@ BlockAllocator::_Initialize(BlockAllocator *allocator)
 		// the last allocation group may contain less blocks than the others
 		if (i == numGroups - 1) {
 			groups[i].fNumBits = volume->NumBlocks() - i * bitsPerGroup;
-			groups[i].fNumBlocks = 1 + ((groups[i].NumBits() - 1) >> (blockShift + 3));
+			groups[i].fNumBlocks = 1 + ((groups[i].NumBits() - 1)
+				>> (blockShift + 3));
 		} else {
 			groups[i].fNumBits = bitsPerGroup;
 			groups[i].fNumBlocks = blocks;
@@ -636,8 +641,8 @@ BlockAllocator::Uninitialize()
 
 
 status_t
-BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
-	uint16 start, uint16 maximum, uint16 minimum, block_run &run)
+BlockAllocator::AllocateBlocks(Transaction& transaction, int32 group,
+	uint16 start, uint16 maximum, uint16 minimum, block_run& run)
 {
 	if (maximum == 0)
 		return B_BAD_VALUE;
@@ -670,7 +675,8 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
 
 		// The wanted maximum is smaller than the largest free block in the
 		// group or already smaller than the minimum
-		// ToDo: disabled because it's currently not maintained after the first allocation
+		// TODO: disabled because it's currently not maintained after the first
+		// allocation
 		//if (numBlocks > fGroups[group].fLargest)
 		//	continue;
 
@@ -688,7 +694,8 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
 			if (cached.SetTo(fGroups[group], block) < B_OK)
 				RETURN_ERROR(B_ERROR);
 
-			T(Block("alloc-in", fGroups[group].Start() + block, cached.Block(), fVolume->BlockSize(), group, rangeStart));
+			T(Block("alloc-in", fGroups[group].Start() + block, cached.Block(),
+				fVolume->BlockSize(), group, rangeStart));
 
 			// find a block large enough to hold the allocation
 			for (uint32 bit = start % bitsPerFullBlock;
@@ -703,7 +710,8 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
 					if (++range >= maximum)
 						break;
 				} else if (i >= fNumGroups && range >= minimum) {
-					// we have found a block larger than the required minimum (second pass)
+					// we have found a block larger than the required minimum
+					// (second pass)
 					break;
 				} else {
 					// end of a range
@@ -711,18 +719,19 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
 				}
 			}
 
-			// ToDo: we could also remember a "largest free block that fits the minimal
-			//	requirement" in the group, and use that - this would avoid the need
-			//	for a second run
+			// TODO: we could also remember a "largest free block that fits the
+			//	minimal requirement" in the group, and use that - this would
+			//	avoid the need for a second run
 
-			// if we found a suitable block, mark the blocks as in use, and write
-			// the updated block bitmap back to disk
+			// if we found a suitable block, mark the blocks as in use, and
+			// write the updated block bitmap back to disk
 			if (range >= numBlocks) {
 				// adjust allocation size
 				if (numBlocks < maximum)
 					numBlocks = range;
 
-				if (fGroups[group].Allocate(transaction, rangeStart, numBlocks) < B_OK)
+				if (fGroups[group].Allocate(transaction, rangeStart, numBlocks)
+						< B_OK)
 					RETURN_ERROR(B_IO_ERROR);
 
 				run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(group);
@@ -752,15 +761,16 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
 
 
 status_t
-BlockAllocator::AllocateForInode(Transaction &transaction,
-	const block_run *parent, mode_t type, block_run &run)
+BlockAllocator::AllocateForInode(Transaction& transaction,
+	const block_run* parent, mode_t type, block_run& run)
 {
-	// apply some allocation policies here (AllocateBlocks() will break them
+	// Apply some allocation policies here (AllocateBlocks() will break them
 	// if necessary) - we will start with those described in Dominic Giampaolo's
 	// "Practical File System Design", and see how good they work
 
-	// files are going in the same allocation group as its parent, sub-directories
-	// will be inserted 8 allocation groups after the one of the parent
+	// Files are going in the same allocation group as its parent,
+	// sub-directories will be inserted 8 allocation groups after
+	// the one of the parent
 	uint16 group = parent->AllocationGroup();
 	if ((type & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR)) == S_DIRECTORY)
 		group += 8;
@@ -770,8 +780,8 @@ BlockAllocator::AllocateForInode(Transaction &transaction,
 
 
 status_t
-BlockAllocator::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks,
-	block_run &run, uint16 minimum)
+BlockAllocator::Allocate(Transaction& transaction, Inode* inode,
+	off_t numBlocks, block_run& run, uint16 minimum)
 {
 	if (numBlocks <= 0)
 		return B_ERROR;
@@ -782,26 +792,27 @@ BlockAllocator::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks
 
 	// since block_run.length is uint16, the largest number of blocks that
 	// can be covered by a block_run is 65535
-	// ToDo: if we drop compatibility, couldn't we do this any better?
+	// TODO: if we drop compatibility, couldn't we do this any better?
 	// There are basically two possibilities:
 	// a) since a length of zero doesn't have any sense, take that for 65536 -
 	//    but that could cause many problems (bugs) in other areas
-	// b) reduce the maximum amount of blocks per block_run, so that the remaining
-	//    number of free blocks can be used in a useful manner (like 4 blocks) -
-	//    but that would also reduce the maximum file size
+	// b) reduce the maximum amount of blocks per block_run, so that the
+	//    remaining number of free blocks can be used in a useful manner
+	//    (like 4 blocks) - but that would also reduce the maximum file size
 	// c) have BlockRun::Length() return (length + 1).
 	if (numBlocks > MAX_BLOCK_RUN_LENGTH)
 		numBlocks = MAX_BLOCK_RUN_LENGTH;
 
-	// apply some allocation policies here (AllocateBlocks() will break them
+	// Apply some allocation policies here (AllocateBlocks() will break them
 	// if necessary)
 	uint16 group = inode->BlockRun().AllocationGroup();
 	uint16 start = 0;
 
-	// are there already allocated blocks? (then just try to allocate near the last one)
+	// Are there already allocated blocks? (then just try to allocate near the
+	// last one)
 	if (inode->Size() > 0) {
-		const data_stream &data = inode->Node().data;
-		// ToDo: we currently don't care for when the data stream
+		const data_stream& data = inode->Node().data;
+		// TODO: we currently don't care for when the data stream
 		// is already grown into the indirect ranges
 		if (data.max_double_indirect_range == 0
 			&& data.max_indirect_range == 0) {
@@ -828,7 +839,7 @@ BlockAllocator::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks
 
 
 status_t
-BlockAllocator::Free(Transaction &transaction, block_run run)
+BlockAllocator::Free(Transaction& transaction, block_run run)
 {
 	MutexLocker lock(fLock);
 
@@ -836,7 +847,8 @@ BlockAllocator::Free(Transaction &transaction, block_run run)
 	uint16 start = run.Start();
 	uint16 length = run.Length();
 
-	FUNCTION_START(("group = %ld, start = %u, length = %u\n", group, start, length));
+	FUNCTION_START(("group = %ld, start = %u, length = %u\n", group, start,
+		length));
 	T(Free(run));
 
 	// doesn't use Volume::IsValidBlockRun() here because it can check better
@@ -845,13 +857,17 @@ BlockAllocator::Free(Transaction &transaction, block_run run)
 		|| start > fGroups[group].NumBits()
 		|| uint32(start + length) > fGroups[group].NumBits()
 		|| length == 0) {
-		FATAL(("tried to free an invalid block_run (%d, %u, %u)\n", (int)group, start, length));
+		FATAL(("tried to free an invalid block_run (%d, %u, %u)\n", (int)group,
+			start, length));
 		DEBUGGER(("tried to free invalid block_run"));
 		return B_BAD_VALUE;
 	}
-	// check if someone tries to free reserved areas at the beginning of the drive
-	if (group == 0 && start < uint32(fVolume->Log().Start() + fVolume->Log().Length())) {
-		FATAL(("tried to free a reserved block_run (%d, %u, %u)\n", (int)group, start, length));
+	// check if someone tries to free reserved areas at the beginning of the
+	// drive
+	if (group == 0
+		&& start < uint32(fVolume->Log().Start() + fVolume->Log().Length())) {
+		FATAL(("tried to free a reserved block_run (%d, %u, %u)\n", (int)group,
+			start, length));
 		DEBUGGER(("tried to free reserved block"));
 		return B_BAD_VALUE;
 	}
@@ -864,8 +880,10 @@ BlockAllocator::Free(Transaction &transaction, block_run run)
 		RETURN_ERROR(B_IO_ERROR);
 
 #ifdef DEBUG
-	if (CheckBlockRun(run, NULL, NULL, false) < B_OK)
-		DEBUGGER(("CheckBlockRun() reports allocated blocks (which were just freed)\n"));
+	if (CheckBlockRun(run, NULL, NULL, false) < B_OK) {
+		DEBUGGER(("CheckBlockRun() reports allocated blocks (which were just "
+			"freed)\n"));
+	}
 #endif
 
 	fVolume->SuperBlock().used_blocks =
@@ -881,13 +899,16 @@ BlockAllocator::BitmapSize() const
 }
 
 
-//	#pragma mark -
-//	Functions to check the validity of the bitmap - they are used from
-//	the "chkbfs" command
+//	#pragma mark - Bitmap validity checking
+
+// TODO: implement new FS checking API
+// Functions to check the validity of the bitmap - they are used from
+// the "chkbfs" command (since this does even a bit more, maybe we should
+// move this some place else?)
 
 
 bool
-BlockAllocator::_IsValidCheckControl(check_control *control)
+BlockAllocator::_IsValidCheckControl(check_control* control)
 {
 	if (control == NULL
 		|| control->magic != BFS_IOCTL_CHECK_MAGIC) {
@@ -900,7 +921,7 @@ BlockAllocator::_IsValidCheckControl(check_control *control)
 
 
 status_t
-BlockAllocator::StartChecking(check_control *control)
+BlockAllocator::StartChecking(check_control* control)
 {
 	if (!_IsValidCheckControl(control))
 		return B_BAD_VALUE;
@@ -910,13 +931,13 @@ BlockAllocator::StartChecking(check_control *control)
 		return status;
 
 	size_t size = BitmapSize();
-	fCheckBitmap = (uint32 *)malloc(size);
+	fCheckBitmap = (uint32*)malloc(size);
 	if (fCheckBitmap == NULL) {
 		mutex_unlock(&fLock);
 		return B_NO_MEMORY;
 	}
 
-	check_cookie *cookie = new check_cookie();
+	check_cookie* cookie = new check_cookie();
 	if (cookie == NULL) {
 		free(fCheckBitmap);
 		fCheckBitmap = NULL;
@@ -940,20 +961,20 @@ BlockAllocator::StartChecking(check_control *control)
 	fCheckCookie = cookie;
 		// to be able to restore nicely if "chkbfs" exited abnormally
 
-	// ToDo: check reserved area in bitmap!
+	// TODO: check reserved area in bitmap!
 
 	return B_OK;
 }
 
 
 status_t
-BlockAllocator::StopChecking(check_control *control)
+BlockAllocator::StopChecking(check_control* control)
 {
-	check_cookie *cookie;
+	check_cookie* cookie;
 	if (control == NULL)
 		cookie = fCheckCookie;
 	else
-		cookie = (check_cookie *)control->cookie;
+		cookie = (check_cookie*)control->cookie;
 
 	if (cookie == NULL)
 		return B_ERROR;
@@ -973,7 +994,7 @@ BlockAllocator::StopChecking(check_control *control)
 		size_t size = fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
 		off_t usedBlocks = 0LL;
 
-		// ToDo: update the allocation groups used blocks info
+		// TODO: update the allocation groups used blocks info
 		for (uint32 i = size >> 2; i-- > 0;) {
 			uint32 compare = 1;
 			for (int16 j = 0; j < 32; j++, compare <<= 1) {
@@ -988,13 +1009,14 @@ BlockAllocator::StopChecking(check_control *control)
 			control->stats.freed = 0;
 
 		// Should we fix errors? Were there any errors we can fix?
-		if (control->flags & BFS_FIX_BITMAP_ERRORS
+		if ((control->flags & BFS_FIX_BITMAP_ERRORS) != 0
 			&& (control->stats.freed != 0 || control->stats.missing != 0)) {
 			// if so, write the check bitmap back over the original one,
 			// and use transactions here to play safe - we even use several
 			// transactions, so that we don't blow the maximum log size
 			// on large disks; since we don't need to make this atomic
-			fVolume->SuperBlock().used_blocks = HOST_ENDIAN_TO_BFS_INT64(usedBlocks);
+			fVolume->SuperBlock().used_blocks
+				= HOST_ENDIAN_TO_BFS_INT64(usedBlocks);
 
 			int32 blocksInBitmap = fNumGroups * fBlocksPerGroup;
 			int32 blockSize = fVolume->BlockSize();
@@ -1007,7 +1029,7 @@ BlockAllocator::StopChecking(check_control *control)
 					blocksToWrite = blocksInBitmap - i;
 
 				status_t status = transaction.WriteBlocks(1 + i,
-					(uint8 *)fCheckBitmap + i * blockSize, blocksToWrite);
+					(uint8*)fCheckBitmap + i * blockSize, blocksToWrite);
 				if (status < B_OK) {
 					FATAL(("error writing bitmap: %s\n", strerror(status)));
 					break;
@@ -1029,12 +1051,12 @@ BlockAllocator::StopChecking(check_control *control)
 
 
 status_t
-BlockAllocator::CheckNextNode(check_control *control)
+BlockAllocator::CheckNextNode(check_control* control)
 {
 	if (!_IsValidCheckControl(control))
 		return B_BAD_VALUE;
 
-	check_cookie *cookie = (check_cookie *)control->cookie;
+	check_cookie* cookie = (check_cookie*)control->cookie;
 
 	while (true) {
 		if (cookie->iterator == NULL) {
@@ -1047,20 +1069,23 @@ BlockAllocator::CheckNextNode(check_control *control)
 			// get iterator for the next directory
 
 			Vnode vnode(fVolume, cookie->current);
-			Inode *inode;
+			Inode* inode;
 			if (vnode.Get(&inode) < B_OK) {
-				FATAL(("check: Could not open inode at %Ld\n", fVolume->ToBlock(cookie->current)));
+				FATAL(("check: Could not open inode at %Ld\n",
+					fVolume->ToBlock(cookie->current)));
 				continue;
 			}
 
 			if (!inode->IsContainer()) {
-				FATAL(("check: inode at %Ld should have been a directory\n", fVolume->ToBlock(cookie->current)));
+				FATAL(("check: inode at %Ld should have been a directory\n",
+					fVolume->ToBlock(cookie->current)));
 				continue;
 			}
 
-			BPlusTree *tree;
+			BPlusTree* tree;
 			if (inode->GetTree(&tree) != B_OK) {
-				FATAL(("check: could not open b+tree from inode at %Ld\n", fVolume->ToBlock(cookie->current)));
+				FATAL(("check: could not open b+tree from inode at %Ld\n",
+					fVolume->ToBlock(cookie->current)));
 				continue;
 			}
 
@@ -1091,7 +1116,8 @@ BlockAllocator::CheckNextNode(check_control *control)
 		uint16 length;
 		ino_t id;
 
-		status_t status = cookie->iterator->GetNextEntry(name, &length, B_FILE_NAME_LENGTH, &id);
+		status_t status = cookie->iterator->GetNextEntry(name, &length,
+			B_FILE_NAME_LENGTH, &id);
 		if (status == B_ENTRY_NOT_FOUND) {
 			// there are no more entries in this iterator, free it and go on
 			delete cookie->iterator;
@@ -1112,7 +1138,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 			control->errors = 0;
 
 			Vnode vnode(fVolume, id);
-			Inode *inode;
+			Inode* inode;
 			if (vnode.Get(&inode) < B_OK) {
 				FATAL(("Could not open inode ID %Ld!\n", id));
 				control->errors |= BFS_COULD_NOT_OPEN;
@@ -1125,10 +1151,11 @@ BlockAllocator::CheckNextNode(check_control *control)
 				RecursiveLocker locker(inode->SmallDataLock());
 				NodeGetter node(fVolume, inode);
 
-				const char *localName = inode->Name(node.Node());
+				const char* localName = inode->Name(node.Node());
 				if (localName == NULL || strcmp(localName, name)) {
 					control->errors |= BFS_NAMES_DONT_MATCH;
-					FATAL(("Names differ: tree \"%s\", inode \"%s\"\n", name, localName));
+					FATAL(("Names differ: tree \"%s\", inode \"%s\"\n", name,
+						localName));
 				}
 			}
 
@@ -1136,25 +1163,30 @@ BlockAllocator::CheckNextNode(check_control *control)
 
 			// Check for the correct mode of the node (if the mode of the
 			// file don't fit to its parent, there is a serious problem)
-			if (((cookie->parent_mode & S_ATTR_DIR) != 0 && !inode->IsAttribute())
-				|| ((cookie->parent_mode & S_INDEX_DIR) != 0 && !inode->IsIndex())
-				|| ((cookie->parent_mode & (S_DIRECTORY | S_ATTR_DIR | S_INDEX_DIR))
-						== S_DIRECTORY
-					&& (inode->Mode() & (S_ATTR | S_ATTR_DIR | S_INDEX_DIR)) != 0)) {
-				FATAL(("inode at %Ld is of wrong type: %o (parent %o at %Ld)!\n",
-					inode->BlockNumber(), inode->Mode(), cookie->parent_mode, cookie->parent->BlockNumber()));
+			if (((cookie->parent_mode & S_ATTR_DIR) != 0
+					&& !inode->IsAttribute())
+				|| ((cookie->parent_mode & S_INDEX_DIR) != 0
+					&& !inode->IsIndex())
+				|| (is_directory(cookie->parent_mode)
+					&& !inode->IsRegularNode())) {
+				FATAL(("inode at %Ld is of wrong type: %o (parent %o at %Ld)!"
+					"\n", inode->BlockNumber(), inode->Mode(),
+					cookie->parent_mode, cookie->parent->BlockNumber()));
 
 				// if we are allowed to fix errors, we should remove the file
-				if (control->flags & BFS_REMOVE_WRONG_TYPES
-					&& control->flags & BFS_FIX_BITMAP_ERRORS) {
+				if ((control->flags & BFS_REMOVE_WRONG_TYPES) != 0
+					&& (control->flags & BFS_FIX_BITMAP_ERRORS) != 0) {
 					// it's safe to start a transaction, because Inode::Remove()
 					// won't touch the block bitmap (which we hold the lock for)
 					// if we set the INODE_DONT_FREE_SPACE flag - since we fix
 					// the bitmap anyway
-					Transaction transaction(fVolume, cookie->parent->BlockNumber());
+					Transaction transaction(fVolume,
+						cookie->parent->BlockNumber());
 
-					inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DONT_FREE_SPACE);
-					status = cookie->parent->Remove(transaction, name, NULL, inode->IsContainer());
+					inode->Node().flags
+						|= HOST_ENDIAN_TO_BFS_INT32(INODE_DONT_FREE_SPACE);
+					status = cookie->parent->Remove(transaction, name, NULL,
+						inode->IsContainer());
 					if (status == B_OK)
 						transaction.Done();
 				} else
@@ -1192,7 +1224,8 @@ BlockAllocator::_CheckBitmapIsUsedAt(off_t block) const
 	if (index > size / 4)
 		return false;
 
-	return BFS_ENDIAN_TO_HOST_INT32(fCheckBitmap[index]) & (1UL << (block & 0x1f));
+	return BFS_ENDIAN_TO_HOST_INT32(fCheckBitmap[index])
+		& (1UL << (block & 0x1f));
 }
 
 
@@ -1209,13 +1242,16 @@ BlockAllocator::_SetCheckBitmapAt(off_t block)
 
 
 status_t
-BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *control, bool allocated)
+BlockAllocator::CheckBlockRun(block_run run, const char* type,
+	check_control* control, bool allocated)
 {
 	if (run.AllocationGroup() < 0 || run.AllocationGroup() >= fNumGroups
 		|| run.Start() > fGroups[run.AllocationGroup()].fNumBits
-		|| uint32(run.Start() + run.Length()) > fGroups[run.AllocationGroup()].fNumBits
+		|| uint32(run.Start() + run.Length())
+				> fGroups[run.AllocationGroup()].fNumBits
 		|| run.length == 0) {
-		PRINT(("%s: block_run(%ld, %u, %u) is invalid!\n", type, run.AllocationGroup(), run.Start(), run.Length()));
+		PRINT(("%s: block_run(%ld, %u, %u) is invalid!\n", type,
+			run.AllocationGroup(), run.Start(), run.Length()));
 		if (control == NULL)
 			return B_BAD_DATA;
 
@@ -1228,7 +1264,8 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 	uint32 pos = run.Start() % bitsPerBlock;
 	int32 length = 0;
 	off_t firstMissing = -1, firstSet = -1;
-	off_t firstGroupBlock = (off_t)run.AllocationGroup() << fVolume->AllocationGroupShift();
+	off_t firstGroupBlock
+		= (off_t)run.AllocationGroup() << fVolume->AllocationGroupShift();
 
 	AllocationBlock cached(fVolume);
 
@@ -1244,8 +1281,10 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 		while (length < run.Length() && pos < cached.NumBlockBits()) {
 			if (cached.IsUsed(pos) != allocated) {
 				if (control == NULL) {
-					PRINT(("%s: block_run(%ld, %u, %u) is only partially allocated (pos = %ld, length = %ld)!\n",
-						type, run.AllocationGroup(), run.Start(), run.Length(), pos, length));
+					PRINT(("%s: block_run(%ld, %u, %u) is only partially "
+						"allocated (pos = %ld, length = %ld)!\n", type,
+						run.AllocationGroup(), run.Start(), run.Length(),
+						pos, length));
 					return B_BAD_DATA;
 				}
 				if (firstMissing == -1) {
@@ -1254,15 +1293,17 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 				}
 				control->stats.missing++;
 			} else if (firstMissing != -1) {
-				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are %sallocated!\n",
-					type, run.allocation_group, run.start, run.length, firstMissing,
-					firstGroupBlock + pos + block * bitsPerBlock - 1, allocated ? "not " : ""));
+				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are "
+					"%sallocated!\n", type, run.AllocationGroup(), run.Start(),
+					run.Length(), firstMissing,
+					firstGroupBlock + pos + block * bitsPerBlock - 1,
+					allocated ? "not " : ""));
 				firstMissing = -1;
 			}
 
 			if (fCheckBitmap != NULL) {
-				// Set the block in the check bitmap as well, but have a look if it
-				// is already allocated first
+				// Set the block in the check bitmap as well, but have a look
+				// if it is already allocated first
 				uint32 offset = pos + block * bitsPerBlock;
 				if (_CheckBitmapIsUsedAt(firstGroupBlock + offset)) {
 					if (firstSet == -1) {
@@ -1272,8 +1313,11 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 					control->stats.already_set++;
 				} else {
 					if (firstSet != -1) {
-						FATAL(("%s: block_run(%d, %u, %u): blocks %Ld - %Ld are already set!\n",
-							type, (int)run.AllocationGroup(), run.Start(), run.Length(), firstSet, firstGroupBlock + offset - 1));
+						FATAL(("%s: block_run(%d, %u, %u): blocks %Ld - %Ld "
+							"are already set!\n", type,
+							(int)run.AllocationGroup(), run.Start(),
+							run.Length(), firstSet,
+							firstGroupBlock + offset - 1));
 						firstSet = -1;
 					}
 					_SetCheckBitmapAt(firstGroupBlock + offset);
@@ -1284,10 +1328,18 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 		}
 
 		if (block + 1 >= fBlocksPerGroup || length >= run.Length()) {
-			if (firstMissing != -1)
-				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are not allocated!\n", type, run.AllocationGroup(), run.Start(), run.Length(), firstMissing, firstGroupBlock + pos + block * bitsPerBlock - 1));
-			if (firstSet != -1)
-				FATAL(("%s: block_run(%d, %u, %u): blocks %Ld - %Ld are already set!\n", type, (int)run.AllocationGroup(), run.Start(), run.Length(), firstSet, firstGroupBlock + pos + block * bitsPerBlock - 1));
+			if (firstMissing != -1) {
+				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are not "
+					"allocated!\n", type, run.AllocationGroup(), run.Start(),
+					run.Length(), firstMissing,
+					firstGroupBlock + pos + block * bitsPerBlock - 1));
+			}
+			if (firstSet != -1) {
+				FATAL(("%s: block_run(%d, %u, %u): blocks %Ld - %Ld are "
+					"already set!\n", type, (int)run.AllocationGroup(),
+					run.Start(), run.Length(), firstSet,
+					firstGroupBlock + pos + block * bitsPerBlock - 1));
+			}
 		}
 	}
 
@@ -1296,7 +1348,7 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 
 
 status_t
-BlockAllocator::CheckInode(Inode *inode, check_control *control)
+BlockAllocator::CheckInode(Inode* inode, check_control* control)
 {
 	if (control != NULL && fCheckBitmap == NULL)
 		return B_NO_INIT;
@@ -1315,7 +1367,7 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 		return B_OK;
 	}
 
-	data_stream *data = &inode->Node().data;
+	data_stream* data = &inode->Node().data;
 
 	// check the direct range
 
@@ -1342,7 +1394,7 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 		off_t block = fVolume->ToBlock(data->indirect);
 
 		for (int32 i = 0; i < data->indirect.Length(); i++) {
-			block_run *runs = (block_run *)cached.SetTo(block + i);
+			block_run* runs = (block_run*)cached.SetTo(block + i);
 			if (runs == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
@@ -1364,7 +1416,8 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 	// check the double indirect range
 
 	if (data->max_double_indirect_range) {
-		status = CheckBlockRun(data->double_indirect, "double indirect", control);
+		status = CheckBlockRun(data->double_indirect, "double indirect",
+			control);
 		if (status < B_OK)
 			return status;
 
@@ -1372,13 +1425,15 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 		int32 runsPerArray = runsPerBlock << ARRAY_BLOCKS_SHIFT;
 
 		CachedBlock cachedDirect(fVolume);
-		int32 maxIndirectIndex = (data->double_indirect.Length() << fVolume->BlockShift())
-									/ sizeof(block_run);
+		int32 maxIndirectIndex = (data->double_indirect.Length()
+			<< fVolume->BlockShift()) / sizeof(block_run);
 
-		for (int32 indirectIndex = 0; indirectIndex < maxIndirectIndex; indirectIndex++) {
+		for (int32 indirectIndex = 0; indirectIndex < maxIndirectIndex;
+				indirectIndex++) {
 			// get the indirect array block
-			block_run *array = (block_run *)cached.SetTo(fVolume->ToBlock(data->double_indirect)
-				+ indirectIndex / runsPerBlock);
+			block_run* array = (block_run*)cached.SetTo(
+				fVolume->ToBlock(data->double_indirect)
+					+ indirectIndex / runsPerBlock);
 			if (array == NULL)
 				return B_IO_ERROR;
 
@@ -1391,11 +1446,12 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 			if (status < B_OK)
 				return status;
 
-			int32 maxIndex = (indirect.Length() << fVolume->BlockShift()) / sizeof(block_run);
+			int32 maxIndex = (indirect.Length() << fVolume->BlockShift())
+				/ sizeof(block_run);
 
 			for (int32 index = 0; index < maxIndex; ) {
-				block_run *runs = (block_run *)cachedDirect.SetTo(fVolume->ToBlock(indirect)
-					+ index / runsPerBlock);
+				block_run* runs = (block_run*)cachedDirect.SetTo(
+					fVolume->ToBlock(indirect) + index / runsPerBlock);
 				if (runs == NULL)
 					return B_IO_ERROR;
 
@@ -1404,7 +1460,8 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 					if (runs[index % runsPerBlock].IsZero())
 						return B_OK;
 
-					status = CheckBlockRun(runs[index % runsPerBlock], "double indirect->runs->run", control);
+					status = CheckBlockRun(runs[index % runsPerBlock],
+						"double indirect->runs->run", control);
 					if (status < B_OK)
 						return status;
 				} while ((++index % runsPerArray) != 0);
@@ -1445,7 +1502,7 @@ BlockAllocator::Dump(int32 index)
 
 
 int
-dump_block_allocator(int argc, char **argv)
+dump_block_allocator(int argc, char** argv)
 {
 	int32 group = -1;
 	if (argc == 3) {
@@ -1458,8 +1515,8 @@ dump_block_allocator(int argc, char **argv)
 		return 0;
 	}
 
-	Volume *volume = (Volume *)parse_expression(argv[1]);
-	BlockAllocator &allocator = volume->Allocator();
+	Volume* volume = (Volume*)parse_expression(argv[1]);
+	BlockAllocator& allocator = volume->Allocator();
 
 	allocator.Dump(group);
 	return 0;

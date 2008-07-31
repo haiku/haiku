@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BFS_ENDIAN_H
@@ -35,7 +35,7 @@
 #	define HOST_ENDIAN_TO_BFS_INT32(value) __swap_int32(value)
 #	define HOST_ENDIAN_TO_BFS_INT64(value) __swap_int64(value)
 #else
-	// ToDo: maybe build a version that supports both, big & little endian?
+	// TODO: maybe build a version that supports both, big & little endian?
 	//		But since that will need some kind of global data (to
 	//		know of what type this file system is), it's probably 
 	//		something for the boot loader; anything else would be

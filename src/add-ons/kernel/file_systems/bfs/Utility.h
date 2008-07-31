@@ -43,4 +43,19 @@ round_up(const IntType& value, const RoundType& to)
 	return (value + (to - 1)) & ~((IntType)to - 1);
 }
 
+
+inline bool
+is_index(int mode)
+{
+	return (mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR;
+		// That's a stupid check, but AFAIK the only possible method...
+}
+
+
+inline bool
+is_directory(int mode)
+{
+	return (mode & (S_INDEX_DIR | S_ATTR_DIR | S_IFDIR)) == S_IFDIR;
+}
+
 #endif	/* UTILITY_H */
