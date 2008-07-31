@@ -850,7 +850,9 @@ IORequest::Advance(size_t bySize)
 	fTransferSize += bySize;
 
 	iovec* vecs = fBuffer->Vecs();
-	while (vecs[fVecIndex].iov_len - fVecOffset <= bySize) {
+	uint32 vecCount = fBuffer->VecCount();
+	while (fVecIndex < vecCount
+			&& vecs[fVecIndex].iov_len - fVecOffset <= bySize) {
 		bySize -= vecs[fVecIndex].iov_len - fVecOffset;
 		fVecOffset = 0;
 		fVecIndex++;
