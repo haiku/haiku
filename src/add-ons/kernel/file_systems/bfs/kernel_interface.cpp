@@ -1069,6 +1069,8 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 	if (status < B_OK)
 		return status;
 
+	WriteLocker _(inode->Lock());
+
 	// update the name only when they differ
 	bool nameUpdated = false;
 	if (strcmp(oldName, newName)) {
