@@ -35,7 +35,7 @@ typedef enum {
 	BLACKBOARD_END
 } BluetoothServerBlackBoardIndex;
 
-#define BLACKBOARD_LD(X) (BLACKBOARD_END+X+HCI_DEVICE_INDEX_OFFSET)
+#define BLACKBOARD_LD(X) (BLACKBOARD_END+X-HCI_DEVICE_INDEX_OFFSET)
 
 typedef BObjectList<LocalDeviceImpl> LocalDevicesList;
 
