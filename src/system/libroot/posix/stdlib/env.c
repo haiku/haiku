@@ -26,7 +26,6 @@
 // TODO: Use benaphore!
 static sem_id sEnvLock;
 static char **sManagedEnviron;
-static bool sCopied;
 
 char **environ = NULL;
 
@@ -82,14 +81,14 @@ static int32
 add_variable(void)
 {
 	int32 count = count_variables() + 1;
-	char **newEnv = realloc(environ, (count + 1) * sizeof(char *));
-	if (newEnv == NULL)
+	char **newEnviron = realloc(environ, (count + 1) * sizeof(char *));
+	if (newEnviron == NULL)
 		return B_NO_MEMORY;
 
-	newEnv[count] = NULL;
+	newEnviron[count] = NULL;
 		// null terminate the array
 
-	environ = sManagedEnviron = newEnv;
+	environ = sManagedEnviron = newEnviron;
 
 	return count - 1;
 }
@@ -115,12 +114,20 @@ find_variable(const char *name, int32 length, int32 *_index)
 }
 
 
+/*!	Copies the environment from its current location into a heap managed
+	environment, if it's not already there.
+
+	This is needed whenever the environment is changed, that is, when one
+	of the POSIX *env() functions is called, and we either used the environment
+	provided by the kernel, or by an application that changed \c environ
+	directly.
+*/
 static status_t
 copy_environ_to_heap_if_needed(void)
 {
 	int32 i = 0;
 
-	if (sCopied && environ == sManagedEnviron)
+	if (environ == sManagedEnviron)
 		return B_OK;
 
 	if (sManagedEnviron != NULL) {
@@ -143,7 +150,6 @@ copy_environ_to_heap_if_needed(void)
 		// null terminate the array
 
 	environ = sManagedEnviron;
-	sCopied = true;
 	return B_OK;
 }
 
@@ -222,6 +228,8 @@ clearenv(void)
 	environ = NULL;
 
 	unlock_variables();
+
+	return 0;
 }
 
 
