@@ -270,8 +270,12 @@ init_page_directory(void)
 
 	// set the root pointers
 	gMMUOps->load_rp(gPageRoot);
+	// allocate second level tables for kernel space
+	// this will simplify mmu code a lot, and only wastes 32KB
+	gMMUOps->allocate_kernel_pgdirs();
 	// enable mmu translation
 	gMMUOps->enable_paging();
+	//XXX: check for errors
 
 	//gKernelArgs.arch_args.num_pgtables = 0;
 	gMMUOps->add_page_table(KERNEL_BASE);

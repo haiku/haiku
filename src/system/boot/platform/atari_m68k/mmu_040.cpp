@@ -108,6 +108,30 @@ load_rp(addr_t pa)
 
 
 static status_t
+allocate_kernel_pgdirs(void)
+{
+	page_root_entry *pr = gPageRoot;
+	page_directory_entry *pd;
+	addr_t tbl;
+	int i;
+
+	// we'll fill in the 2nd half with ready made page dirs
+	for (i = NUM_ROOTENT_PER_TBL/2; i < NUM_ROOTENT_PER_TBL; i++) {
+		if (i % NUM_DIRTBL_PER_PAGE)
+			tbl += SIZ_DIRTBL;
+		else
+			tbl = mmu_get_next_page_tables();
+		pr[i].addr = TA_TO_PREA(tbl);
+		pr[i].type = DT_ROOT;
+		pd = (page_directory_entry *)tbl;
+		for (int32 j = 0; j < NUM_DIRENT_PER_TBL; j++)
+			*(page_directory_entry_scalar *)(&pd[j]) = DFL_DIRENT_VAL;
+	}
+	return B_OK;
+}
+
+
+static status_t
 enable_paging(void)
 {
 	TRACE(("mmu_040:enable_paging\n"));
@@ -137,6 +161,10 @@ add_page_table(addr_t virtualAddress)
 	// thanks to transparent translation
 
 	index = VADDR_TO_PRENT(virtualAddress);
+	if (pr[index].type != DT_ROOT)
+		panic("invalid page root entry %d\n", index);
+#if 0
+	// not needed anymore
 	if (pr[index].type != DT_ROOT) {
 		unsigned aindex = index & ~(NUM_DIRTBL_PER_PAGE-1); /* aligned */
 		//TRACE(("missing page root entry %d ai %d\n", index, aindex));
@@ -157,6 +185,7 @@ add_page_table(addr_t virtualAddress)
 			tbl += SIZ_DIRTBL;
 		}
 	}
+#endif
 	pd = (page_directory_entry *)PRE_TO_TA(pr[index]);
 
 	index = VADDR_TO_PDENT(virtualAddress);
@@ -290,6 +319,7 @@ const struct boot_mmu_ops k040MMUOps = {
 	&initialize,
 	&set_tt,
 	&load_rp,
+	&allocate_kernel_pgdirs,
 	&enable_paging,
 	&add_page_table,
 	&unmap_page,

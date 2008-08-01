@@ -31,6 +31,7 @@ struct boot_mmu_ops {
 	status_t (*set_tt)(int which, addr_t pa, size_t len, uint32 perms);
 		/* load root pointers */
 	status_t (*load_rp)(addr_t pa);
+	status_t (*allocate_kernel_pgdirs)(void);
 	status_t (*enable_paging)(void);
 	status_t (*add_page_table)(addr_t virtualAddress);
 	void (*unmap_page)(addr_t virtualAddress);
