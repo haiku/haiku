@@ -43,7 +43,6 @@
 #include "RecorderWindow.h"
 #include "SoundConsumer.h"
 #include "SoundListView.h"
-#include "array_delete.h"
 #include "FileUtils.h"
 
 #if ! NDEBUG

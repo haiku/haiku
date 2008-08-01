@@ -7,14 +7,22 @@
 /	Copyright 1998-1999, Be Incorporated, All Rights Reserved
 /
 *******************************************************************************/
-
-
-#include <stdio.h>
-#include <fs_attr.h>
-#include "array_delete.h"
 #include "FileUtils.h"
 
-status_t CopyFileData(BFile& dst, BFile& src)
+#include <new>
+#include <stdio.h>
+#include <string.h>
+
+#include <fs_attr.h>
+
+#include "AutoDeleter.h"
+
+
+using std::nothrow;
+
+
+status_t
+CopyFileData(BFile& dst, BFile& src)
 {
 	struct stat src_stat;
 	status_t err = src.GetStat(&src_stat);
@@ -24,12 +32,13 @@ status_t CopyFileData(BFile& dst, BFile& src)
 	}
 		
 	size_t bufSize = src_stat.st_blksize;
-	if (! bufSize) {
+	if (bufSize == 0)
 		bufSize = 32768;
-	}
 	
-	char* buf = new char[bufSize];
-	array_delete<char> bufDelete(buf);
+	char* buf = new (nothrow) char[bufSize];
+	if (buf == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<char> _(buf);
 	
 	printf("copy data, bufSize = %ld\n", bufSize);
 	// copy data
@@ -38,14 +47,18 @@ status_t CopyFileData(BFile& dst, BFile& src)
 		if (bytes > 0) {
 			ssize_t result = dst.Write(buf, bytes);
 			if (result != bytes) {
-				printf("result = %#010lx, bytes = %#010lx\n", (uint32) result,
-					(uint32) bytes);
-				return B_ERROR;
+				fprintf(stderr, "Failed to write %ld bytes: %s\n", bytes,
+					strerror((status_t)result));
+				if (result < 0)
+					return (status_t)result;
+				else
+					return B_IO_ERROR;
 			}
 		} else {
 			if (bytes < 0) {
-				printf(" bytes = %#010lx\n", (uint32) bytes);
-				return bytes;
+				fprintf(stderr, "Failed to read file: %s\n", strerror(
+					(status_t)bytes));
+				return (status_t)bytes;
 			} else {
 				// EOF
 				break;
@@ -64,25 +77,49 @@ status_t CopyFileData(BFile& dst, BFile& src)
 }
 
 
-status_t CopyAttributes(BNode& dst, BNode& src)
+status_t
+CopyAttributes(BNode& dst, BNode& src)
 {
 	// copy attributes
 	src.RewindAttrs();
-	char name[B_ATTR_NAME_LENGTH];
-	while (src.GetNextAttrName(name) == B_OK) {
+	char attrName[B_ATTR_NAME_LENGTH];
+	while (src.GetNextAttrName(attrName) == B_OK) {
 		attr_info info;
-		if (src.GetAttrInfo(name, &info) == B_OK) {
-			size_t bufSize = info.size;
-			char* buf = new char[bufSize];
-			array_delete<char> bufDelete = buf;
-			
-			// copy one attribute
-			ssize_t bytes = src.ReadAttr(name, info.type, 0, buf, bufSize);
-			if (bytes > 0) {
-				dst.WriteAttr(name, info.type, 0, buf, bufSize);
-			} else {
-				return bytes;
+		if (src.GetAttrInfo(attrName, &info) != B_OK) {
+			fprintf(stderr, "Failed to read info for attribute '%s'\n",
+				attrName);
+			continue;
+		}
+		// copy one attribute in chunks of 4096 bytes
+		size_t size = 4096;
+		uint8 buffer[size];
+		off_t offset = 0;
+		ssize_t read = src.ReadAttr(attrName, info.type, offset, buffer,
+			min_c(size, info.size));
+		if (read < 0) {
+			fprintf(stderr, "Error reading attribute '%s'\n", attrName);
+			return (status_t)read;
+		}
+		// NOTE: Attributes of size 0 are perfectly valid!
+		while (read >= 0) {
+			ssize_t written = dst.WriteAttr(attrName, info.type, offset, buffer,
+				read);
+			if (written != read) {
+				fprintf(stderr, "Error writing attribute '%s'\n", attrName);
+				if (written < 0)
+					return (status_t)written;
+				else
+					return B_IO_ERROR;
 			}
+			offset += read;
+			read = src.ReadAttr(attrName, info.type, offset, buffer,
+				min_c(size, info.size - offset));
+			if (read < 0) {
+				fprintf(stderr, "Error reading attribute '%s'\n", attrName);
+				return (status_t)read;
+			}
+			if (read == 0)
+				break;
 		}
 	}
 
@@ -90,7 +127,8 @@ status_t CopyAttributes(BNode& dst, BNode& src)
 }
 
 
-status_t CopyFile(BFile& dst, BFile& src)
+status_t
+CopyFile(BFile& dst, BFile& src)
 {
 	status_t err = CopyFileData(dst, src);
 	if (err != B_OK)
