@@ -17,7 +17,7 @@ public:
 	SinglyLinkedListLink() : next(NULL) {}
 	~SinglyLinkedListLink() {}
 
-	Element	*next;
+	Element* next;
 };
 
 // SinglyLinkedListLinkImpl
@@ -174,8 +174,7 @@ void
 SINGLY_LINKED_LIST_CLASS_NAME::Add(Element* element)
 {
 	if (element != NULL) {
-		Link* link = sGetLink(element);
-		link->next = fFirst;
+		sGetLink(element)->next = fFirst;
 		fFirst = element;
 	}
 }
