@@ -369,7 +369,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	// replaying the log is the first thing we will do on this disk
 	status = fJournal->ReplayLog();
 	if (status < B_OK) {
-		FATAL(("Replaying log failed, data may be corrupted, volume read-only.\n"));
+		FATAL(("Replaying log failed, data may be corrupted, volume "
+			"read-only.\n"));
 		fFlags |= VOLUME_READ_ONLY;
 			// TODO: if this is the boot volume, Bootscript will assume this
 			// is a CD...
@@ -405,6 +406,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 					delete fIndicesNode;
 					fIndicesNode = NULL;
 				}
+			} else {
+				// we don't use the vnode layer to access the indices node
 			}
 
 			// all went fine
@@ -426,7 +429,6 @@ Volume::Mount(const char* deviceName, uint32 flags)
 status_t
 Volume::Unmount()
 {
-	// Unlike in BeOS, we need to put the reference to our root node ourselves
 	put_vnode(fVolume, ToVnode(Root()));
 
 	fBlockAllocator.Uninitialize();
@@ -458,7 +460,8 @@ Volume::ValidateBlockRun(block_run run)
 		|| run.AllocationGroup() > (int32)AllocationGroups()
 		|| run.Start() > (1UL << AllocationGroupShift())
 		|| run.length == 0
-		|| uint32(run.Length() + run.Start()) > (1UL << AllocationGroupShift())) {
+		|| uint32(run.Length() + run.Start())
+				> (1UL << AllocationGroupShift())) {
 		Panic();
 		FATAL(("*** invalid run(%d,%d,%d)\n", (int)run.AllocationGroup(),
 			run.Start(), run.Length()));
@@ -705,10 +708,6 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 
 	WriteSuperBlock();
 	transaction.Done();
-
-// 	put_vnode(ID(), fRootNode->ID());
-// 	if (fIndicesNode != NULL)
-// 		put_vnode(ID(), fIndicesNode->ID());
 
 	Sync();
 	opener.RemoveCache(true);
