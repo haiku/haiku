@@ -46,6 +46,23 @@ unlock_variables(void)
 }
 
 
+static void
+free_variables(void)
+{
+	int32 i;
+
+	if (sManagedEnviron == NULL)
+		return;
+
+	for (i = 0; sManagedEnviron[i] != NULL; i++) {
+		free(sManagedEnviron[i]);
+	}
+
+	free(sManagedEnviron);
+	sManagedEnviron = NULL;
+}
+
+
 static int32
 count_variables(void)
 {
@@ -108,7 +125,7 @@ copy_environ_to_heap_if_needed(void)
 
 	if (sManagedEnviron != NULL) {
 		// free previously used "environ"; it has been changed by an application
-		free(sManagedEnviron);
+		free_variables();
 	}
 
 	sManagedEnviron = malloc((count_variables() + 1) * sizeof(char *));
@@ -201,8 +218,8 @@ clearenv(void)
 {
 	lock_variables();
 
-	free(sManagedEnviron);
-	sManagedEnviron = environ = NULL;
+	free_variables();
+	environ = NULL;
 
 	unlock_variables();
 }
