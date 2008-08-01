@@ -3194,6 +3194,23 @@ get_vnode(fs_volume *volume, ino_t vnodeID, void **_fsNode)
 
 
 extern "C" status_t
+acquire_vnode(fs_volume *volume, ino_t vnodeID)
+{
+	struct vnode *vnode;
+
+	mutex_lock(&sVnodeMutex);
+	vnode = lookup_vnode(volume->id, vnodeID);
+	mutex_unlock(&sVnodeMutex);
+
+	if (vnode == NULL)
+		return B_BAD_VALUE;
+
+	inc_vnode_ref_count(vnode);
+	return B_OK;
+}
+
+
+extern "C" status_t
 put_vnode(fs_volume *volume, ino_t vnodeID)
 {
 	struct vnode *vnode;
@@ -3202,9 +3219,10 @@ put_vnode(fs_volume *volume, ino_t vnodeID)
 	vnode = lookup_vnode(volume->id, vnodeID);
 	mutex_unlock(&sVnodeMutex);
 
-	if (vnode)
-		dec_vnode_ref_count(vnode, false, true);
+	if (vnode == NULL)
+		return B_BAD_VALUE;
 
+	dec_vnode_ref_count(vnode, false, true);
 	return B_OK;
 }
 

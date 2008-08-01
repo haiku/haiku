@@ -905,6 +905,7 @@
 #define publish_vnode				fssh_publish_vnode
 #define get_vnode					fssh_get_vnode
 #define put_vnode					fssh_put_vnode
+#define acquire_vnode				fssh_acquire_vnode
 #define remove_vnode				fssh_remove_vnode
 #define unremove_vnode				fssh_unremove_vnode
 #define get_vnode_removed			fssh_get_vnode_removed

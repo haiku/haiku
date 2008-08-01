@@ -2018,6 +2018,23 @@ fssh_get_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID, void **fsNode)
 
 
 extern "C" fssh_status_t
+fssh_acquire_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
+{
+	struct vnode *vnode;
+
+	fssh_mutex_lock(&sVnodeMutex);
+	vnode = lookup_vnode(volume->id, vnodeID);
+	fssh_mutex_unlock(&sVnodeMutex);
+
+	if (vnode == NULL)
+		return FSSH_B_BAD_VALUE;
+
+	inc_vnode_ref_count(vnode);
+	return FSSH_B_OK;
+}
+
+
+extern "C" fssh_status_t
 fssh_put_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 {
 	struct vnode *vnode;
@@ -2026,9 +2043,10 @@ fssh_put_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 	vnode = lookup_vnode(volume->id, vnodeID);
 	fssh_mutex_unlock(&sVnodeMutex);
 
-	if (vnode)
-		dec_vnode_ref_count(vnode, true);
+	if (vnode == NULL)
+		return FSSH_B_BAD_VALUE;
 
+	dec_vnode_ref_count(vnode, true);
 	return FSSH_B_OK;
 }
 
