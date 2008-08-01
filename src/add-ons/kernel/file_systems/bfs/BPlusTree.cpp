@@ -241,7 +241,7 @@ CachedNode::Free(Transaction &transaction, off_t offset)
 	if (fTree == NULL || fTree->fStream == NULL || offset == BPLUSTREE_NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	// ToDo: scan the free nodes list and remove all nodes at the end
+	// TODO: scan the free nodes list and remove all nodes at the end
 	// of the tree - perhaps that shouldn't be done everytime that
 	// function is called, perhaps it should be done when the directory
 	// inode is closed or based on some calculation or whatever...
@@ -1258,7 +1258,7 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength,
 		panic("tried to insert invalid value %Ld!\n", value);
 #endif
 
-	ASSERT_WRITE_LOCKED_RW_LOCK(&fStream->Lock());
+	ASSERT_WRITE_LOCKED_INODE(fStream);
 
 	Stack<node_and_key> stack;
 	if (_SeekDown(stack, key, keyLength) != B_OK)
@@ -1649,7 +1649,7 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength,
 		|| keyLength > BPLUSTREE_MAX_KEY_LENGTH)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	ASSERT_WRITE_LOCKED_RW_LOCK(&fStream->Lock());
+	ASSERT_WRITE_LOCKED_INODE(fStream);
 
 	Stack<node_and_key> stack;
 	if (_SeekDown(stack, key, keyLength) != B_OK)
@@ -1766,7 +1766,7 @@ BPlusTree::Replace(Transaction &transaction, const uint8 *key,
 	if (fAllowDuplicates)
 		RETURN_ERROR(B_BAD_TYPE);
 
-	ASSERT_WRITE_LOCKED_RW_LOCK(&fStream->Lock());
+	ASSERT_WRITE_LOCKED_INODE(fStream);
 
 	off_t nodeOffset = fHeader->RootNode();
 	CachedNode cached(this);
@@ -1819,7 +1819,7 @@ BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
 	if (fAllowDuplicates)
 		RETURN_ERROR(B_BAD_TYPE);
 
-	ASSERT_READ_LOCKED_RW_LOCK(&fStream->Lock());
+	ASSERT_READ_LOCKED_INODE(fStream);
 
 	off_t nodeOffset = fHeader->RootNode();
 	CachedNode cached(this);
@@ -1883,7 +1883,7 @@ TreeIterator::Goto(int8 to)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	// lock access to stream
-	ReadLocker locker(fTree->fStream->Lock());
+	InodeReadLocker locker(fTree->fStream);
 
 	off_t nodeOffset = fTree->fHeader->RootNode();
 	CachedNode cached(fTree);
@@ -1953,7 +1953,7 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength,
 		return B_ENTRY_NOT_FOUND;
 
 	// lock access to stream
-	ReadLocker locker(fTree->fStream->Lock());
+	InodeReadLocker locker(fTree->fStream);
 
 	CachedNode cached(fTree);
 	const bplustree_node *node;
@@ -2088,7 +2088,7 @@ TreeIterator::Find(const uint8 *key, uint16 keyLength)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	// lock access to stream
-	ReadLocker locker(fTree->fStream->Lock());
+	InodeReadLocker locker(fTree->fStream);
 
 	off_t nodeOffset = fTree->fHeader->RootNode();
 

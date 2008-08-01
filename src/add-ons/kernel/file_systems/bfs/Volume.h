@@ -34,6 +34,8 @@ class Volume {
 		status_t			Initialize(int fd, const char *name,
 								uint32 blockSize, uint32 flags);
 
+		bool				IsInitializing() const { return fVolume == NULL; }
+
 		bool				IsValidSuperBlock();
 		bool				IsReadOnly() const;
 		void				Panic();

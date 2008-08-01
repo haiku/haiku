@@ -24,30 +24,6 @@ struct identify_cookie {
 	disk_super_block super_block;
 };
 
-class MultiWriteLocker {
-public:
-	MultiWriteLocker(Inode* inodeA, Inode* inodeB)
-	{
-		if (inodeA->ID() < inodeB->ID()) {
-			Inode* tempInode = inodeA;
-			inodeA = inodeB;
-			inodeB = tempInode;
-		}
-
-		fOuterLocker.SetTo(inodeA->Lock(), false);
-		if (inodeA != inodeB)
-			fInnerLocker.SetTo(inodeB->Lock(), false);
-	}
-
-	~MultiWriteLocker()
-	{
-	}
-
-private:
-	WriteLocker fOuterLocker;
-	WriteLocker fInnerLocker;
-};
-
 extern void fill_stat_buffer(Inode *inode, struct stat &stat);
 
 
@@ -75,6 +51,28 @@ fill_stat_buffer(Inode *inode, struct stat &stat)
 		stat.st_size = strlen(node.short_symlink);
 	} else
 		stat.st_size = inode->Size();
+}
+
+
+//!	bfs_io() callback hook
+static status_t
+iterative_io_get_vecs_hook(void* cookie, io_request *request, off_t offset,
+	size_t size, struct file_io_vec *vecs, size_t *_count)
+{
+	Inode *inode = (Inode*)cookie;
+	return file_map_translate(inode->Map(), offset, size, vecs, _count);
+}
+
+
+//!	bfs_io() callback hook
+static status_t
+iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
+	bool partialTransfer, size_t bytesTransferred)
+{
+	Inode *inode = (Inode*)cookie;
+
+	rw_lock_read_unlock(&inode->Lock());
+	return B_OK;
 }
 
 
@@ -299,7 +297,7 @@ bfs_put_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 		if (inode->TrimPreallocation(transaction) == B_OK)
 			transaction.Done();
 		else if (transaction.HasParent()) {
-			// ToDo: for now, we don't let sub-transactions fail
+			// TODO: for now, we don't let sub-transactions fail
 			transaction.Done();
 		}
 	}
@@ -337,7 +335,7 @@ bfs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 
 		delete inode;
 	} else if (transaction.HasParent()) {
-		// ToDo: for now, we don't let sub-transactions fail
+		// TODO: for now, we don't let sub-transactions fail
 		transaction.Done();
 	}
 
@@ -363,7 +361,7 @@ bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	rw_lock_read_lock(&inode->Lock());
+	InodeReadLocker _(inode);
 
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
@@ -391,8 +389,6 @@ bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		bytesLeft -= bytes;
 	}
 
-	rw_lock_read_unlock(&inode->Lock());
-
 	return status;
 }
 
@@ -410,7 +406,7 @@ bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	rw_lock_read_lock(&inode->Lock());
+	InodeReadLocker _(inode);
 
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
@@ -438,30 +434,7 @@ bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		bytesLeft -= bytes;
 	}
 
-	rw_lock_read_unlock(&inode->Lock());
-
 	return status;
-}
-
-
-static status_t
-bfs_iterative_io_get_vecs(void* cookie, io_request *request, off_t offset,
-	size_t size, struct file_io_vec *vecs, size_t *_count)
-{
-	Inode *inode = (Inode*)cookie;
-	return file_map_translate(inode->Map(), offset, size, vecs, _count);
-}
-
-
-static status_t
-bfs_iterative_io_finished(void *cookie, io_request *request, status_t status,
-	bool partialTransfer, size_t bytesTransferred)
-{
-	Inode *inode = (Inode*)cookie;
-
-	rw_lock_read_unlock(&inode->Lock());
-
-	return B_OK;
 }
 
 
@@ -481,7 +454,7 @@ bfs_io(fs_volume *_volume, fs_vnode *_node, void *_cookie, io_request *request)
 	rw_lock_read_lock(&inode->Lock());
 
 	return do_iterative_fd_io(volume->Device(), request,
-		bfs_iterative_io_get_vecs, bfs_iterative_io_finished, inode);
+		iterative_io_get_vecs_hook, iterative_io_finished_hook, inode);
 }
 
 
@@ -546,6 +519,8 @@ bfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 	Volume *volume = (Volume *)_volume->private_volume;
 	Inode *directory = (Inode *)_directory->private_node;
 
+	InodeReadLocker locker(directory);
+
 	// check access permissions
 	status_t status = directory->CheckPermissions(X_OK);
 	if (status < B_OK)
@@ -555,13 +530,13 @@ bfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 	if (directory->GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	ReadLocker locker(directory->Lock());
-
 	status = tree->Find((uint8 *)file, (uint16)strlen(file), _vnodeID);
 	if (status < B_OK) {
 		//PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
 		return status;
 	}
+
+	locker.Unlock();
 
 	Inode *inode;
 	status = get_vnode(volume->FSVolume(), *_vnodeID, (void **)&inode);
@@ -729,10 +704,7 @@ bfs_write_stat(fs_volume *_volume, fs_vnode *_node, const struct stat *stat,
 		RETURN_ERROR(status);
 
 	Transaction transaction(volume, inode->BlockNumber());
-
-	WriteLocker locker(inode->Lock());
-	if (!locker.IsLocked())
-		RETURN_ERROR(B_ERROR);
+	inode->WriteLockInTransaction(transaction);
 
 	bfs_inode &node = inode->Node();
 
@@ -972,7 +944,10 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 		return B_OK;
 
 	Transaction transaction(volume, oldDirectory->BlockNumber());
-	MultiWriteLocker locker(oldDirectory, newDirectory);
+
+	oldDirectory->WriteLockInTransaction(transaction);
+	if (oldDirectory != newDirectory)
+		newDirectory->WriteLockInTransaction(transaction);
 
 	// are we allowed to do what we've been told?
 	status_t status = oldDirectory->CheckPermissions(W_OK);
@@ -1069,7 +1044,7 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 	if (status < B_OK)
 		return status;
 
-	WriteLocker _(inode->Lock());
+	inode->WriteLockInTransaction(transaction);
 
 	// update the name only when they differ
 	bool nameUpdated = false;
@@ -1165,7 +1140,7 @@ bfs_open(fs_volume *_volume, fs_vnode *_node, int openMode, void **_cookie)
 			return B_IS_A_DIRECTORY;
 
 		Transaction transaction(volume, inode->BlockNumber());
-		WriteLocker locker(inode->Lock());
+		inode->WriteLockInTransaction(transaction);
 
 		status_t status = inode->SetFileSize(transaction, 0);
 		if (status >= B_OK)
@@ -1232,7 +1207,7 @@ bfs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 	if (status == B_OK) {
 		transaction.Done();
 
-		ReadLocker locker(inode->Lock());
+		InodeReadLocker locker(inode);
 
 		// periodically notify if the file size has changed
 		// TODO: should we better test for a change in the last_modified time only?
@@ -1271,7 +1246,7 @@ bfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 	bool needsTrimming = false;
 
 	if (!volume->IsReadOnly()) {
-		ReadLocker locker(inode->Lock());
+		InodeReadLocker locker(inode);
 		needsTrimming = inode->NeedsTrimming();
 
 		if ((cookie->open_mode & O_RWMASK) != 0
@@ -1287,7 +1262,7 @@ bfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 	status_t status = transaction.IsStarted() ? B_OK : B_ERROR;
 
 	if (status == B_OK) {
-		WriteLocker locker(inode->Lock());
+		inode->WriteLockInTransaction(transaction);
 
 		// trim the preallocated blocks and update the size,
 		// and last_modified indices if needed

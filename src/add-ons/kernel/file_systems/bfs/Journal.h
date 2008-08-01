@@ -18,8 +18,10 @@
 
 
 struct run_array;
+class Inode;
 class LogEntry;
 typedef DoublyLinkedList<LogEntry> LogEntryList;
+typedef SinglyLinkedList<Inode> InodeList;
 
 
 // Locking policy in BFS: if you need both, the volume lock and the
@@ -118,23 +120,25 @@ class Transaction {
 
 		~Transaction()
 		{
-			if (fJournal)
+			if (fJournal != NULL) {
 				fJournal->Unlock(this, false);
+				_UnlockInodes();
+			}
 		}
 
 		status_t Start(Volume *volume, off_t refBlock);
 		bool IsStarted() const { return fJournal != NULL; }
 
-		void
-		Done()
+		void Done()
 		{
-			if (fJournal != NULL)
+			if (fJournal != NULL) {
 				fJournal->Unlock(this, true);
+				_UnlockInodes();
+			}
 			fJournal = NULL;
 		}
 
-		bool
-		HasParent()
+		bool HasParent()
 		{
 			if (fJournal != NULL)
 				return fJournal->CurrentTransaction() == this;
@@ -142,8 +146,7 @@ class Transaction {
 			return false;
 		}
 
-		status_t
-		WriteBlocks(off_t blockNumber, const uint8 *buffer,
+		status_t WriteBlocks(off_t blockNumber, const uint8 *buffer,
 			size_t numBlocks = 1)
 		{
 			if (fJournal == NULL)
@@ -172,12 +175,17 @@ class Transaction {
 		int32 ID() const
 			{ return fJournal->TransactionID(); }
 
+		void AddInode(Inode* inode);
+
 	private:
 		Transaction(const Transaction &);
 		Transaction &operator=(const Transaction &);
 			// no implementation
 
-		Journal	*fJournal;
+		void _UnlockInodes();
+
+		Journal*	fJournal;
+		InodeList	fLockedInodes;
 };
 
 #ifdef BFS_DEBUGGER_COMMANDS

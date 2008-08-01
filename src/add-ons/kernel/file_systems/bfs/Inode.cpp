@@ -169,7 +169,6 @@ InodeAllocator::~InodeAllocator()
 			fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 				// this unblocks any pending bfs_read_vnode() calls
 			fInode->Free(*fTransaction);
-			rw_lock_write_unlock(&fInode->Lock());
 			remove_vnode(volume->FSVolume(), fInode->ID());
 		} else
 			volume->Free(*fTransaction, fRun);
@@ -199,7 +198,7 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
 	if (fInode == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
-	if (volume->ID() >= 0) {
+	if (!volume->IsInitializing()) {
 		status = new_vnode(volume->FSVolume(), fInode->ID(), fInode,
 			vnodeOps != NULL ? vnodeOps : &gBFSVnodeOps);
 		if (status < B_OK) {
@@ -209,7 +208,7 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
 		}
 	}
 
-	rw_lock_write_lock(&fInode->Lock());
+	fInode->WriteLockInTransaction(*fTransaction);
 	*_inode = fInode;
 	return B_OK;
 }
@@ -261,8 +260,6 @@ InodeAllocator::Keep(fs_vnode_ops *vnodeOps, uint32 publishFlags)
 			TRANSACTION_ABORTED, &_TransactionListener, fInode);
 	}
 
-	rw_lock_write_unlock(&fInode->Lock());
-
 	fTransaction = NULL;
 	fInode = NULL;
 
@@ -305,7 +302,7 @@ bfs_inode::InitCheck(Volume *volume)
 	if (Flags() & INODE_DELETED)
 		return B_NOT_ALLOWED;
 
-	// ToDo: Add some tests to check the integrity of the other stuff here,
+	// TODO: Add some tests to check the integrity of the other stuff here,
 	// especially for the data_stream!
 
 	return B_OK;
@@ -1059,7 +1056,8 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 	}
 
 	if (attribute != NULL) {
-		if (rw_lock_write_lock(&attribute->Lock()) == B_OK) {
+		// TODO: we need to lock the inode in the transaction, see WriteAt()!
+		if (rw_lock_write_lock(&attribute->fLock) == B_OK) {
 			// Save the old attribute data (if this fails, oldLength will
 			// reflect it)
 			if (fVolume->CheckForLiveQuery(name) && attribute->Size() > 0) {
@@ -1075,14 +1073,14 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 
 			if (status == B_OK) {
 				// it does - remove its file
-				rw_lock_write_unlock(&attribute->Lock());
+				rw_lock_write_unlock(&attribute->fLock);
 				status = _RemoveAttribute(transaction, name, false, NULL);
 			} else {
 				// The attribute type might have been changed - we need to
 				// adopt the new one
 				attribute->Node().type = HOST_ENDIAN_TO_BFS_INT32(type);
 				status = attribute->WriteBack(transaction);
-				rw_lock_write_unlock(&attribute->Lock());
+				rw_lock_write_unlock(&attribute->fLock);
 
 				if (status == B_OK) {
 					status = attribute->WriteAt(transaction, pos, buffer,
@@ -1167,7 +1165,7 @@ Inode::GetAttribute(const char *name, Inode **_attribute)
 	BPlusTree *tree;
 	status_t status = attributes->GetTree(&tree);
 	if (status == B_OK) {
-		ReadLocker locker(attributes->Lock());
+		InodeReadLocker locker(attributes);
 
 		ino_t id;
 		status = tree->Find((uint8 *)name, (uint16)strlen(name), &id);
@@ -1382,7 +1380,7 @@ Inode::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 	if (pos < 0)
 		return B_BAD_VALUE;
 
-	ReadLocker locker(Lock());
+	InodeReadLocker locker(this);
 
 	if (pos >= Size() || length == 0) {
 		*_length = 0;
@@ -1399,13 +1397,11 @@ status_t
 Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 	size_t *_length)
 {
-	WriteLocker locker(Lock());
-	if (!locker.IsLocked())
-		RETURN_ERROR(B_ERROR);
+	InodeReadLocker locker(this);
 
 	// update the last modification time in memory, it will be written
 	// back to the inode, and the index when the file is closed
-	// ToDo: should update the internal last modified time only at this point!
+	// TODO: should update the internal last modified time only at this point!
 	Node().last_modified_time = HOST_ENDIAN_TO_BFS_INT64((bigtime_t)time(NULL)
 		<< INODE_TIME_SHIFT);
 
@@ -1427,7 +1423,12 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 	if (changeSize && !transaction.IsStarted())
 		transaction.Start(fVolume, BlockNumber());
 
-	locker.Lock();
+	// TODO: we actually need to call WriteLockInTransaction() here, but we
+	// cannot do this with the current locking model (ie. file cache functions
+	// are not to be called with the inode lock held).
+	// But this cannot work anyway, since we hold the lock when calling
+	// file_cache_set_size(), too... (possible deadlock)
+	rw_lock_write_lock(&fLock);
 
 	if (pos + length > Size()) {
 		// let's grow the data stream to the size needed
@@ -1453,7 +1454,7 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 	if (length == 0)
 		return B_OK;
 
-	locker.Unlock();
+	rw_lock_write_unlock(&fLock);
 
 	return file_cache_write(FileCache(), NULL, pos, buffer, _length);
 }
@@ -2117,7 +2118,7 @@ Inode::Sync()
 	if (IsSymLink() && (Flags() & INODE_LONG_SYMLINK) == 0)
 		return B_OK;
 
-	ReadLocker locker(Lock());
+	InodeReadLocker locker(this);
 
 	data_stream *data = &Node().data;
 	status_t status = B_OK;
@@ -2212,7 +2213,7 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 	if (GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	WriteLocker locker(Lock());
+	WriteLockInTransaction(transaction);
 
 	// does the file even exist?
 	off_t id;
@@ -2231,6 +2232,7 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 	}
 
 	T(Remove(inode, name));
+	inode->WriteLockInTransaction(transaction);
 
 	// Inode::IsContainer() is true also for indices (furthermore, the S_IFDIR
 	// bit is set for indices in BFS, not for attribute directories) - but you
@@ -2318,14 +2320,16 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 			RETURN_ERROR(B_BAD_VALUE);
 	}
 
-	WriteLocker locker(parent != NULL ? &parent->Lock() : NULL);
+	if (parent != NULL) {
 		// the parent directory is locked during the whole inode creation
+		parent->WriteLockInTransaction(transaction);
+	}
 
-	if (parent != NULL && parent->IsDirectory()) {
+	if (parent != NULL && !volume->IsInitializing() && parent->IsContainer()) {
 		// don't create anything in removed directories
 		bool removed;
 		if (get_vnode_removed(volume->FSVolume(), parent->ID(), &removed)
-				!= B_OK || removed) {
+				== B_OK && removed) {
 			RETURN_ERROR(B_ENTRY_NOT_FOUND);
 		}
 	}
@@ -2362,7 +2366,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 					return status;
 
 				// truncate the existing file
-				WriteLocker _(inode->Lock());
+				inode->WriteLockInTransaction(transaction);
 
 				status_t status = inode->SetFileSize(transaction, 0);
 				if (status >= B_OK)

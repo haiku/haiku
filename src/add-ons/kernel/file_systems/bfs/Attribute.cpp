@@ -58,9 +58,10 @@ Attribute::CheckAccess(const char *name, int openMode)
 	// Opening the name attribute using this function is not allowed,
 	// also using the reserved indices name, last_modified, and size
 	// shouldn't be allowed.
-	// ToDo: we might think about allowing to update those values, but
+	// TODO: we might think about allowing to update those values, but
 	//	really change their corresponding values in the bfs_inode structure
 	if (name[0] == FILE_NAME_NAME && name[1] == '\0'
+// TODO: reenable this check -- some WonderBrush locale files used them
 /*		|| !strcmp(name, "name")
 		|| !strcmp(name, "last_modified")
 		|| !strcmp(name, "size")*/)
@@ -223,9 +224,9 @@ Attribute::_Truncate()
 	}
 
 	if (fAttribute != NULL) {
-		WriteLocker locker(fAttribute->Lock());
 		Transaction transaction(fAttribute->GetVolume(),
 			fAttribute->BlockNumber());
+		fAttribute->WriteLockInTransaction(transaction);
 
 		status_t status = fAttribute->SetFileSize(transaction, 0);
 		if (status >= B_OK)

@@ -7,8 +7,9 @@
 
 
 #include "Journal.h"
-#include "Inode.h"
+
 #include "Debug.h"
+#include "Inode.h"
 
 
 struct run_array {
@@ -668,7 +669,7 @@ Journal::_TransactionIdle(int32 transactionID, int32 event, void *_journal)
 status_t
 Journal::_WriteTransactionToLog()
 {
-	// ToDo: in case of a failure, we need a backup plan like writing all
+	// TODO: in case of a failure, we need a backup plan like writing all
 	//	changed blocks back to disk immediately (hello disk corruption!)
 
 	bool detached = false;
@@ -746,7 +747,7 @@ Journal::_WriteTransactionToLog()
 
 	iovec *vecs = (iovec *)malloc(sizeof(iovec) * maxVecs);
 	if (vecs == NULL) {
-		// ToDo: write back log entries directly?
+		// TODO: write back log entries directly?
 		return B_NO_MEMORY;
 	}
 
@@ -919,7 +920,7 @@ Journal::Lock(Transaction *owner)
 
 	fOwner = owner;
 
-	// ToDo: we need a way to find out how big the current transaction is;
+	// TODO: we need a way to find out how big the current transaction is;
 	//	we need to be able to either detach the latest sub transaction on
 	//	demand, as well as having some kind of fall back plan in case the
 	//	sub transaction itself grows bigger than the log.
@@ -950,7 +951,7 @@ Journal::Unlock(Transaction *owner, bool success)
 {
 	if (recursive_lock_get_recursion(&fLock) == 1) {
 		// we only end the transaction if we would really unlock it
-		// ToDo: what about failing transactions that do not unlock?
+		// TODO: what about failing transactions that do not unlock?
 		_TransactionDone(success);
 
 		fTimestamp = system_time();
@@ -1063,5 +1064,37 @@ Transaction::Start(Volume *volume, off_t refBlock)
 
 	fJournal = NULL;
 	return B_ERROR;
+}
+
+
+void
+Transaction::AddInode(Inode* inode)
+{
+	if (GetVolume()->IsInitializing())
+		return;
+	if (fJournal == NULL)
+		panic("Transaction is not running!");
+
+	InodeList::Iterator iterator = fLockedInodes.GetIterator();
+	while (iterator.HasNext()) {
+		if (iterator.Next() == inode) {
+			//dprintf("  inode %Ld already in transaction\n", inode->ID());
+			return;
+		}
+	}
+
+	acquire_vnode(GetVolume()->FSVolume(), inode->ID());
+	rw_lock_write_lock(&inode->fLock);
+	fLockedInodes.Add(inode);
+}
+
+
+void
+Transaction::_UnlockInodes()
+{
+	while (Inode* inode = fLockedInodes.RemoveHead()) {
+		rw_lock_write_unlock(&inode->fLock);
+		put_vnode(GetVolume()->FSVolume(), inode->ID());
+	}
 }
 

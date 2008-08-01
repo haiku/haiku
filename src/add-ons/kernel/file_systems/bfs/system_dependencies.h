@@ -17,6 +17,7 @@
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
+#include <util/SinglyLinkedList.h>
 #include <util/Stack.h>
 
 #include <ByteOrder.h>

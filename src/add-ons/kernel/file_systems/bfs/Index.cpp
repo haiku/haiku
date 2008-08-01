@@ -75,7 +75,7 @@ Index::SetTo(const char *name)
 	if (indices == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	ReadLocker locker(indices->Lock());
+	InodeReadLocker locker(indices);
 
 	BPlusTree *tree;
 	if (indices->GetTree(&tree) != B_OK)
@@ -201,7 +201,6 @@ Index::Create(Transaction &transaction, const char *name, uint32 type)
 			return B_BAD_TYPE;
 	}
 
-
 	// do we need to create the index directory first?
 	if (fVolume->IndicesNode() == NULL) {
 		status_t status = fVolume->CreateIndicesRoot(transaction);
@@ -270,7 +269,7 @@ Index::Update(Transaction &transaction, const char *name, int32 type,
 
 	// remove the old key from the tree
 
-	WriteLocker locker(Node()->Lock());
+	Node()->WriteLockInTransaction(transaction);
 
 	if (oldKey != NULL) {
 		status = tree->Remove(transaction, (const uint8 *)oldKey, oldLength,
