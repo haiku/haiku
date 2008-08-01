@@ -412,8 +412,24 @@ Desktop::_LaunchInputServer()
 {
 	BRoster roster;
 	status_t status = roster.Launch("application/x-vnd.Be-input_server");
-	if (status != B_OK && status != B_ALREADY_RUNNING)
-		syslog(LOG_ERR, "Failed to launch the input server: %s!\n", strerror(status));
+	if (status == B_OK || status == B_ALREADY_RUNNING)
+		return;
+
+	// Could not load input_server by signature, try well-known location
+
+	BEntry entry("/system/servers/input_server");
+	entry_ref ref;
+	status_t entryStatus = entry.GetRef(&ref);
+	if (entryStatus == B_OK)
+		entryStatus = roster.Launch(&ref);
+	if (entryStatus == B_OK || entryStatus == B_ALREADY_RUNNING) {
+		syslog(LOG_ERR, "Failed to launch the input server by signature: %s!\n",
+			strerror(status));
+		return;
+	}
+
+	syslog(LOG_ERR, "Failed to launch the input server: %s!\n",
+		strerror(entryStatus));
 }
 
 
