@@ -1719,6 +1719,19 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			}
 
 			cache->Unlock();
+// TODO: Allocating pages with the address space write locked is not a good
+// idea, particularly if that's the kernel's address space. During that time the
+// low memory handler will block (e.g. the block cache will try to delete
+// areas). The cache backing our area has reserved the memory and thus there
+// should be enough pages available (i.e. could be freed by page write/daemon),
+// but this is not true for at least two reasons:
+// * The pages for page directories/tables are not reserved from the available
+//   memory (we should do that!) and currently we don't reclaim them (and
+//   probably can't reclaim all of them anyway). Thus there are actually less
+//   pages than there should be.
+// * ATM we write pages back using virtual addresses. The lower I/O layers will
+//   try to lock the memory, which will block, since that requires to read-lock
+//   the address space.
 			vm_page_unreserve_pages(reservePages);
 			break;
 		}
