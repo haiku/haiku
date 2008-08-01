@@ -526,8 +526,9 @@ Volume::UpdateLiveQueries(Inode* inode, const char* attribute, int32 type,
 {
 	MutexLocker _(fQueryLock);
 
-	Query* query = NULL;
-	while ((query = fQueries.Next(query)) != NULL) {
+	SinglyLinkedList<Query>::Iterator iterator = fQueries.GetIterator();
+	while (iterator.HasNext()) {
+		Query* query = iterator.Next();
 		query->LiveUpdate(inode, attribute, type, oldKey, oldLength, newKey,
 			newLength);
 	}

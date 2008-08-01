@@ -10,7 +10,6 @@
 
 #include "bfs.h"
 #include "BlockAllocator.h"
-#include "Chain.h"
 
 class Journal;
 class Inode;
@@ -129,7 +128,7 @@ class Volume {
 		vint32				fDirtyCachedBlocks;
 
 		mutex				fQueryLock;
-		Chain<Query>		fQueries;
+		SinglyLinkedList<Query> fQueries;
 
 		int32				fUniqueID;
 		uint32				fFlags;

@@ -64,7 +64,7 @@ is_directory(int mode)
 	file, it will be converted to R_OK.
 */
 inline int
-openModeToAccess(int openMode)
+open_mode_to_access(int openMode)
 {
 	openMode &= O_RWMASK;
 	if (openMode == O_RDONLY)

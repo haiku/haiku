@@ -67,7 +67,7 @@ Attribute::CheckAccess(const char *name, int openMode)
 		|| !strcmp(name, "size")*/)
 		RETURN_ERROR(B_NOT_ALLOWED);
 
-	return fInode->CheckPermissions(openModeToAccess(openMode)
+	return fInode->CheckPermissions(open_mode_to_access(openMode)
 		| (openMode & O_TRUNC ? W_OK : 0));
 }
 

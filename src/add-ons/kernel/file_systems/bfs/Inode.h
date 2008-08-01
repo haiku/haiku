@@ -9,7 +9,6 @@
 #include "system_dependencies.h"
 
 #include "CachedBlock.h"
-#include "Chain.h"
 #include "Debug.h"
 #include "Journal.h"
 #include "Volume.h"
@@ -236,7 +235,7 @@ private:
 				// the correct keys from the indices
 
 			mutable recursive_lock fSmallDataLock;
-			Chain<AttributeIterator> fIterators;
+			SinglyLinkedList<AttributeIterator> fIterators;
 };
 
 #if _KERNEL_MODE && KDEBUG
@@ -384,7 +383,7 @@ private:
 };
 
 
-class AttributeIterator {
+class AttributeIterator : public SinglyLinkedListLinkImpl<AttributeIterator> {
 public:
 							AttributeIterator(Inode* inode);
 							~AttributeIterator();
@@ -394,13 +393,11 @@ public:
 								ino_t* id);
 
 private:
-	friend class Chain<AttributeIterator>;
 	friend class Inode;
 
 			void			Update(uint16 index, int8 change);
 
 private:
-			AttributeIterator* fNext;
 			int32			fCurrentSmallData;
 			Inode*			fInode;
 			Inode*			fAttributes;

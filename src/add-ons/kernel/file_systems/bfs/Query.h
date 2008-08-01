@@ -1,6 +1,5 @@
-/* Query - query parsing and evaluation
- *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef QUERY_H
@@ -8,8 +7,8 @@
 
 #include "system_dependencies.h"
 
-#include "Chain.h"
 #include "Index.h"
+
 
 class Volume;
 class Term;
@@ -19,60 +18,58 @@ class Query;
 
 
 class Expression {
-	public:
-		Expression(char *expr);
-		~Expression();
+public:
+							Expression(char* expr);
+							~Expression();
 
-		status_t InitCheck();
-		const char *Position() const { return fPosition; }
-		Term *Root() const { return fTerm; }
+			status_t		InitCheck();
+			const char*		Position() const { return fPosition; }
+			Term*			Root() const { return fTerm; }
 
-	protected:
-		Term *ParseOr(char **expr);
-		Term *ParseAnd(char **expr);
-		Term *ParseEquation(char **expr);
+protected:
+			Term*			ParseOr(char** expr);
+			Term*			ParseAnd(char** expr);
+			Term*			ParseEquation(char** expr);
 
-		bool IsOperator(char **expr,char op);
+			bool			IsOperator(char** expr, char op);
 
-	private:
-		Expression(const Expression &);
-		Expression &operator=(const Expression &);
-			// no implementation
+private:
+							Expression(const Expression& other);
+							Expression& operator=(const Expression& other);
+								// no implementation
 
-		char *fPosition;
-		Term *fTerm;
+			char*			fPosition;
+			Term*			fTerm;
 };
 
-class Query {
-	public:
-		Query(Volume *volume, Expression *expression, uint32 flags);
-		~Query();
+class Query : public SinglyLinkedListLinkImpl<Query> {
+public:
+							Query(Volume* volume, Expression* expression,
+								uint32 flags);
+							~Query();
 
-		status_t Rewind();
-		status_t GetNextEntry(struct dirent *, size_t size);
+			status_t		Rewind();
+			status_t		GetNextEntry(struct dirent* , size_t size);
 
-		void SetLiveMode(port_id port, int32 token);
-		void LiveUpdate(Inode *inode, const char *attribute, int32 type,
-			const uint8 *oldKey, size_t oldLength, const uint8 *newKey, size_t newLength);
+			void			SetLiveMode(port_id port, int32 token);
+			void			LiveUpdate(Inode* inode, const char* attribute,
+								int32 type, const uint8* oldKey,
+								size_t oldLength, const uint8* newKey,
+								size_t newLength);
 
-		Expression *GetExpression() const { return fExpression; }
+			Expression*		GetExpression() const { return fExpression; }
 
-	private:
-		Volume			*fVolume;
-		Expression		*fExpression;
-		Equation		*fCurrent;
-		TreeIterator	*fIterator;
-		Index			fIndex;
-		Stack<Equation *> fStack;
+private:
+			Volume*			fVolume;
+			Expression*		fExpression;
+			Equation*		fCurrent;
+			TreeIterator*	fIterator;
+			Index			fIndex;
+			Stack<Equation*> fStack;
 
-		uint32			fFlags;
-		port_id			fPort;
-		int32			fToken;
-
-	private:
-		friend class Chain<Query>;
-
-		Query			*fNext;
+			uint32			fFlags;
+			port_id			fPort;
+			int32			fToken;
 };
 
-#endif	/* QUERY_H */
+#endif	// QUERY_H

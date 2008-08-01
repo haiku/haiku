@@ -377,9 +377,10 @@ BPlusTree::~BPlusTree()
 	// traversing the tree - a TreeIterator doesn't lock the inode)
 	mutex_lock(&fIteratorLock);
 
-	TreeIterator *iterator = NULL;
-	while ((iterator = fIterators.Next(iterator)) != NULL)
-		iterator->Stop();
+	SinglyLinkedList<TreeIterator>::Iterator iterator
+		= fIterators.GetIterator();
+	while (iterator.HasNext())
+		iterator.Next()->Stop();
 
 	mutex_destroy(&fIteratorLock);
 }
@@ -569,9 +570,10 @@ BPlusTree::_UpdateIterators(off_t offset, off_t nextOffset, uint16 keyIndex,
 	// any time, so we need to protect this loop
 	MutexLocker _(fIteratorLock);
 
-	TreeIterator *iterator = NULL;
-	while ((iterator = fIterators.Next(iterator)) != NULL)
-		iterator->Update(offset, nextOffset, keyIndex, splitAt, change);
+	SinglyLinkedList<TreeIterator>::Iterator iterator
+		= fIterators.GetIterator();
+	while (iterator.HasNext())
+		iterator.Next()->Update(offset, nextOffset, keyIndex, splitAt, change);
 }
 
 
@@ -1862,8 +1864,7 @@ BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
 TreeIterator::TreeIterator(BPlusTree *tree)
 	:
 	fTree(tree),
-	fCurrentNodeOffset(BPLUSTREE_NULL),
-	fNext(NULL)
+	fCurrentNodeOffset(BPLUSTREE_NULL)
 {
 	tree->_AddIterator(this);
 }
