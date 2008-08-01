@@ -6,6 +6,10 @@ SimpleTest SyslogTest
 	: SyslogTest.cpp syslog.cpp
 ;
 
+SimpleTest clearenv
+	: clearenv.cpp
+;
+
 SimpleTest flock_test
 	: flock_test.cpp
 ;

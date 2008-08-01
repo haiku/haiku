@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -25,15 +25,35 @@
 
 // TODO: Use benaphore!
 static sem_id sEnvLock;
+static char **sManagedEnviron;
 static bool sCopied;
 
 char **environ = NULL;
+
+
+static inline void
+lock_variables(void)
+{
+	while (acquire_sem(sEnvLock) == B_INTERRUPTED)
+		;
+}
+
+
+static inline void
+unlock_variables(void)
+{
+	release_sem(sEnvLock);
+}
 
 
 static int32
 count_variables(void)
 {
 	int32 i = 0;
+
+	if (environ == NULL)
+		return 0;
+
 	while (environ[i])
 		i++;
 
@@ -52,7 +72,7 @@ add_variable(void)
 	newEnv[count] = NULL;
 		// null terminate the array
 
-	environ = newEnv;
+	environ = sManagedEnviron = newEnv;
 
 	return count - 1;
 }
@@ -62,6 +82,9 @@ static char *
 find_variable(const char *name, int32 length, int32 *_index)
 {
 	int32 i;
+
+	if (environ == NULL)
+		return NULL;
 
 	for (i = 0; environ[i] != NULL; i++) {
 		if (!strncmp(name, environ[i], length) && environ[i][length] == '=') {
@@ -78,38 +101,44 @@ find_variable(const char *name, int32 length, int32 *_index)
 static status_t
 copy_environ_to_heap_if_needed(void)
 {
-	char **newEnv;
-	int32 i;
+	int32 i = 0;
 
-	if (sCopied)
+	if (sCopied && environ == sManagedEnviron)
 		return B_OK;
 
-	newEnv = malloc((count_variables() + 1) * sizeof(char *));
-	if (newEnv == NULL)
-		return B_NO_MEMORY;
-
-	for (i = 0; environ[i]; i++) {
-		newEnv[i] = strdup(environ[i]);
+	if (sManagedEnviron != NULL) {
+		// free previously used "environ"; it has been changed by an application
+		free(sManagedEnviron);
 	}
 
-	newEnv[i] = NULL;
+	sManagedEnviron = malloc((count_variables() + 1) * sizeof(char *));
+	if (sManagedEnviron == NULL)
+		return B_NO_MEMORY;
+
+	if (environ != NULL) {
+		// copy from previous
+		for (; environ[i]; i++) {
+			sManagedEnviron[i] = strdup(environ[i]);
+		}
+	}
+
+	sManagedEnviron[i] = NULL;
 		// null terminate the array
 
-	environ = newEnv;
+	environ = sManagedEnviron;
 	sCopied = true;
 	return B_OK;
 }
 
 
 static status_t
-update_variable(const char *name, int32 length, const char *value, bool overwrite)
+update_variable(const char *name, int32 length, const char *value,
+	bool overwrite)
 {
-	status_t status = B_OK;
 	bool update = false;
 	int32 index;
 	char *env;
 
-	acquire_sem(sEnvLock);
 	copy_environ_to_heap_if_needed();
 
 	env = find_variable(name, length, &index);
@@ -120,24 +149,23 @@ update_variable(const char *name, int32 length, const char *value, bool overwrit
 	} else if (env == NULL) {
 		// add variable
 		index = add_variable();
-		if (index >= 0)
-			update = true;
-		else
-			status = index;
+		if (index < 0)
+			return B_NO_MEMORY;
+
+		update = true;
 	}
 
 	if (update) {
 		environ[index] = malloc(length + 2 + strlen(value));
-		if (environ[index] != NULL) {
-			memcpy(environ[index], name, length);
-			environ[index][length] = '=';
-			strcpy(environ[index] + length + 1, value);
-		} else
-			status = B_NO_MEMORY;
+		if (environ[index] == NULL)
+			return B_NO_MEMORY;
+
+		memcpy(environ[index], name, length);
+		environ[index][length] = '=';
+		strcpy(environ[index] + length + 1, value);
 	}
 
-	release_sem(sEnvLock);
-	return status;
+	return B_OK;
 }
 
 
@@ -148,19 +176,36 @@ environ_fork_hook(void)
 }
 
 
-void 
+//	#pragma mark - libroot initializer
+
+
+void
 __init_env(const struct user_space_program_args *args)
 {
-	// Following POSIX, there is no need to make any of the
-	// environment functions thread-safe - but we do it anyway
+	// Following POSIX, there is no need to make any of the environment
+	// functions thread-safe - but we do it anyway as much as possible to
+	// protect our implementation
 	sEnvLock = create_sem(1, "env lock");
 	environ = args->env;
+	sManagedEnviron = NULL;
 
 	atfork(environ_fork_hook);
 }
 
 
-//	#pragma mark -
+//	#pragma mark - public API
+
+
+int
+clearenv(void)
+{
+	lock_variables();
+
+	free(sManagedEnviron);
+	sManagedEnviron = environ = NULL;
+
+	unlock_variables();
+}
 
 
 char *
@@ -169,9 +214,10 @@ getenv(const char *name)
 	int32 length = strlen(name);
 	char *value;
 
-	acquire_sem(sEnvLock);
+	lock_variables();
+
 	value = find_variable(name, length, NULL);
-	release_sem(sEnvLock);
+	unlock_variables();
 
 	if (value == NULL)
 		return NULL;
@@ -190,7 +236,10 @@ setenv(const char *name, const char *value, int overwrite)
 		return -1;
 	}
 
+	lock_variables();
 	status = update_variable(name, strlen(name), value, overwrite);
+	unlock_variables();
+
 	RETURN_AND_SET_ERRNO(status);
 }
 
@@ -208,7 +257,8 @@ unsetenv(const char *name)
 
 	length = strlen(name);
 
-	acquire_sem(sEnvLock);
+	lock_variables();
+
 	copy_environ_to_heap_if_needed();
 
 	env = find_variable(name, length, &index);
@@ -220,7 +270,7 @@ unsetenv(const char *name)
 			sizeof(char *) * (count_variables() - index));
 	}
 
-	release_sem(sEnvLock);
+	unlock_variables();
 	return 0;
 }
 
@@ -236,7 +286,10 @@ putenv(const char *string)
 		return -1;
 	}
 
+	lock_variables();
 	status = update_variable(string, value - string, value + 1, true);
+	unlock_variables();
+
 	RETURN_AND_SET_ERRNO(status);
 }
 

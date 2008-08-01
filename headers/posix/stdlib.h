@@ -22,21 +22,21 @@
 
 /* random data structures (for thread-safe random numbers) */
 struct random_data  {
-    int *fptr;		 
-    int *rptr;		 
-    int *state;		 
-    int rand_type;		 
-    int rand_deg;		 
-    int rand_sep;		 
-    int *end_ptr;		 
+    int *fptr;
+    int *rptr;
+    int *state;
+    int rand_type;
+    int rand_deg;
+    int rand_sep;
+    int *end_ptr;
 };
 
 struct drand48_data  {
-    unsigned short int x[3];	 
-    unsigned short int a[3];	 
-    unsigned short int c;	 
-    unsigned short int old_x[3];  
-    int init;			 
+    unsigned short int x[3];
+    unsigned short int a[3];
+    unsigned short int c;
+    unsigned short int old_x[3];
+    int init;
 };
 
 
@@ -73,6 +73,7 @@ extern char		*gcvt(double value, int digits, char *buffer);
 
 /* environment variables */
 extern char		**environ;
+extern int		clearenv(void);
 extern char		*getenv(const char *name);
 extern int		putenv(const char *string);
 extern int		setenv(char const *name, char const *value, int rewrite);
@@ -102,7 +103,7 @@ extern int		random_r(struct random_data *data, int *result);
 extern int		srandom_r(unsigned int seed, struct random_data *data);
 extern char		*initstate(unsigned int seed, char *state, size_t size);
 extern char		*setstate(char *state);
-extern int		initstate_r(unsigned int seed, void *stateBuffer, 
+extern int		initstate_r(unsigned int seed, void *stateBuffer,
 					size_t stateLength, struct random_data *data);
 extern int		setstate_r(void *stateBuffer, struct random_data *data);
 
@@ -164,7 +165,7 @@ extern size_t	mbstowcs(wchar_t *pwcs, const char *string, size_t maxSize);
 extern size_t	wcstombs(char *string, const wchar_t *pwcs, size_t maxSize);
 
 /* crypt */
-extern void 	setkey(const char *key);	
+extern void 	setkey(const char *key);
 
 
 /* pty functions */
