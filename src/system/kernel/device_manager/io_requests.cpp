@@ -66,6 +66,13 @@ IOBuffer::Create(size_t count)
 
 
 void
+IOBuffer::Delete()
+{
+	free(this);
+}
+
+
+void
 IOBuffer::SetVecs(size_t firstVecOffset, const iovec* vecs, uint32 count,
 	size_t length, uint32 flags)
 {
@@ -508,6 +515,7 @@ IORequest::~IORequest()
 {
 	mutex_lock(&fLock);
 	DeleteSubRequests();
+	fBuffer->Delete();
 	mutex_destroy(&fLock);
 }
 

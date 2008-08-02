@@ -29,6 +29,7 @@ typedef struct IOOperation io_operation;
 class IOBuffer : public DoublyLinkedListLinkImpl<IOBuffer> {
 public:
 	static	IOBuffer*			Create(size_t count);
+			void				Delete();
 
 			bool				IsVirtual() const { return !fPhysical; }
 			bool				IsPhysical() const { return fPhysical; }
@@ -55,6 +56,7 @@ public:
 			void				UnlockMemory(team_id team, bool isWrite);
 
 private:
+								IOBuffer();
 								~IOBuffer();
 									// not implemented
 			void				_UnlockMemory(team_id team, size_t count,
