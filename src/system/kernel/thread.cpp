@@ -2007,6 +2007,7 @@ thread_init(kernel_args *args)
 			panic("error finding idle kstack area\n");
 
 		thread->kernel_stack_base = (addr_t)info.address;
+		thread->kernel_stack_top = thread->kernel_stack_base + info.size;
 
 		hash_insert(sThreadHash, thread);
 		insert_thread_into_team(thread->team, thread);
