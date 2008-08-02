@@ -133,7 +133,7 @@ public:
 	int RecordUndo(int semaphoreSetID, short semaphoreNumber, short value);
 
 	// Implemented after sUndoListLock is declared
-	int RemoveUndo(int semaphoreSetID, short semaphoreNumber, short value);
+	void RemoveUndo(int semaphoreSetID, short semaphoreNumber, short value);
 
 	void Revert(short value)
 	{
@@ -256,6 +256,10 @@ public:
 
 	~XsiSemaphoreSet()
 	{
+		// Clear all sem_undo left, as our ID will be reused
+		// by another set.
+		for (uint32 i = 0; i < fNumberOfSemaphores; i++)
+			fSemaphores[i].ClearUndos(fID, i);
 		UnsetID();
 		delete []fSemaphores;
 	}
@@ -493,16 +497,20 @@ XsiSemaphore::ClearUndos(int semaphoreSetID, short semaphoreNumber)
 	// the global undo list, plus decrementing the related
 	// team xsi_sem_undo_requests field. 
 	// This happens only on semctl SETVAL and SETALL.
+	TRACE(("XsiSemaphore::ClearUndos: semaphoreSetID = %d, "
+		"semaphoreNumber = %d\n", semaphoreSetID, semaphoreNumber));
 	MutexLocker _(sUndoListLock);
 	DoublyLinkedList<sem_undo>::Iterator iterator = sUndoList.GetIterator();
 	while (iterator.HasNext()) {
 		struct sem_undo *current = iterator.Next();
 		if (current->semaphore_set_id == semaphoreSetID
 				&& current->semaphore_number == semaphoreNumber) {
-			InterruptsSpinLocker _(team_spinlock);
+			InterruptsSpinLocker lock(team_spinlock);
 			if (current->team)
 				current->team->xsi_sem_undo_requests--;
 			iterator.Remove();
+			// Restore interrupts before calling free
+			lock.Unlock();
 			free(current);
 		}
 	}
@@ -526,7 +534,8 @@ XsiSemaphore::RecordUndo(int semaphoreSetID, short semaphoreNumber, short value)
 			// Update its undo value
 			TRACE(("XsiSemaphore::RecordUndo: found record. Team = %d, "
 				"semaphoreSetID = %d, semaphoreNumber = %d, value = %d\n",
-				team->id, semaphoreSetID, semaphoreNumber, current->undo_value));
+				(int)team->id, semaphoreSetID, semaphoreNumber,
+				current->undo_value));
 			int newValue = current->undo_value + value;
 			if (newValue > USHRT_MAX || newValue < -USHRT_MAX) {
 				TRACE_ERROR(("XsiSemaphore::RecordUndo: newValue %d out of range\n",
@@ -559,13 +568,14 @@ XsiSemaphore::RecordUndo(int semaphoreSetID, short semaphoreNumber, short value)
 		sUndoList.Add(request);
 		TRACE(("XsiSemaphore::RecordUndo: new record added. Team = %d, "
 			"semaphoreSetID = %d, semaphoreNumber = %d, value = %d\n",
-			team->id, semaphoreSetID, semaphoreNumber, request->undo_value));
+			(int)team->id, semaphoreSetID, semaphoreNumber,
+			request->undo_value));
 	}
 	return B_OK;
 }
 
 
-int
+void
 XsiSemaphore::RemoveUndo(int semaphoreSetID, short semaphoreNumber, short value)
 {
 	// This can be called only when RecordUndo fails.
@@ -643,6 +653,9 @@ xsi_sem_undo(team_id teamID, int32 numberOfUndos)
 	if (numberOfUndos <= 0)
 		return;
 
+	// We must hold the set mutex before the sem_undo
+	// one in order to avoid deadlock with RecordUndo
+	MutexLocker lock(sXsiSemaphoreSetLock);
 	MutexLocker _(sUndoListLock);
 	DoublyLinkedList<sem_undo>::Iterator iterator = sUndoList.GetIterator();
 	// Look for all sem_undo request from this team
@@ -651,21 +664,21 @@ xsi_sem_undo(team_id teamID, int32 numberOfUndos)
 		if (current->team->id == teamID) {
 			// Check whether the semaphore set still exist
 			int semaphoreSetID = current->semaphore_set_id;
-			MutexLocker _(sXsiSemaphoreSetLock);
 			XsiSemaphoreSet *semaphoreSet
 				= sSemaphoreHashTable.Lookup(semaphoreSetID);
-			if (semaphoreSet == NULL) {
+			if (semaphoreSet != NULL) {
+				// Revert the changes done by this process
+				XsiSemaphore *semaphore
+					= semaphoreSet->Semaphore(current->semaphore_number);
+				TRACE(("xsi_do_undo: TeamID = %d, SemaphoreSetID = %d, "
+					"SemaphoreNumber = %d, undo value = %d\n", (int)teamID,
+					semaphoreSetID, current->semaphore_number,
+					current->undo_value));
+				semaphore->Revert(current->undo_value);	
+			} else
 				TRACE(("xsi_do_undo: semaphore set %d does not exist "
 					"anymore. Ignore record.\n", semaphoreSetID));
-				continue;
-			}
-			// Revert the changes done by this process
-			XsiSemaphore *semaphore
-				= semaphoreSet->Semaphore(current->semaphore_number);
-			TRACE(("xsi_do_undo: TeamID = %d, SemaphoreSetID = %d, "
-				"SemaphoreNumber = %d, undo value = %d\n", teamID,
-				semaphoreSetID, current->semaphore_number, current->undo_value));
-			semaphore->Revert(current->undo_value);
+
 			// Remove and free the sem_undo structure from sUndoList
 			iterator.Remove();
 			free(current);
@@ -976,7 +989,7 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 status_t
 _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 {
-	TRACE(("xsi_semop: semaphoreID = %d, ops = %p, numOps = %d\n",
+	TRACE(("xsi_semop: semaphoreID = %d, ops = %p, numOps = %ld\n",
 		semaphoreID, ops, numOps));
 	MutexLocker lock(sXsiSemaphoreSetLock);
 	XsiSemaphoreSet *semaphoreSet = sSemaphoreHashTable.Lookup(semaphoreID);
@@ -1021,14 +1034,13 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 	while (notDone) {
 		XsiSemaphore *semaphore = NULL;
 		short numberOfSemaphores = semaphoreSet->NumberOfSemaphores();
-		// TODO: Perhaps lock the set itself?
 		bool goToSleep = false;
 
 		uint32 i = 0;
 		for (; i < numOps; i++) {
 			short semaphoreNumber = operations[i].sem_num;
 			if (semaphoreNumber >= numberOfSemaphores) {
-				TRACE_ERROR(("xsi_semop: %d invalid semaphore number\n", i));
+				TRACE_ERROR(("xsi_semop: %ld invalid semaphore number\n", i));
 				result = EINVAL;
 				break;
 			}
@@ -1100,12 +1112,10 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 			// We acquired the semaphore, now records the sem_undo
 			// requests
 			XsiSemaphore *semaphore = NULL;
-			short numberOfSemaphores = semaphoreSet->NumberOfSemaphores();
 			uint32 i = 0;
 			for (; i < numOps; i++) {
 				short semaphoreNumber = operations[i].sem_num;
 				semaphore = semaphoreSet->Semaphore(semaphoreNumber);
-				unsigned short value = semaphore->Value();
 				short operation = operations[i].sem_op;
 				if (operations[i].sem_flg & SEM_UNDO)
 					if (semaphore->RecordUndo(semaphoreSet->ID(),
@@ -1129,7 +1139,8 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 						result = ENOSPC;
 				}
 			}
-			// TODO: Also set last PID for this semaphore set
+			// We did it. Set the pid.
+			semaphore->SetPid(getpid());
 		}
 	}
 	return result;

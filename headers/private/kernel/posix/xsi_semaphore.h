@@ -11,15 +11,7 @@
 #include <OS.h>
 
 #include <kernel.h>
-
-
-// TODO: move into a system/posix/xsi_semaphore_defs.h file to be shared with
-// xsi_sem.cpp in libroot!
-union semun {
-	int					val;
-	struct semid_ds		*buf;
-	unsigned short		*array;
-};
+#include <posix/xsi_semaphore_defs.h>
 
 
 __BEGIN_DECLS

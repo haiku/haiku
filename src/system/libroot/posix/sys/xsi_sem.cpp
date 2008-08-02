@@ -15,22 +15,10 @@
 
 #include <OS.h>
 
-//#include <posix/xsi_semaphore_defs.h>
+#include <posix/xsi_semaphore_defs.h>
 #include <syscall_utils.h>
 #include <syscalls.h>
 
-// TODO: this should be removed when the above commented header exists
-#if 1
-/*
- * For the semctl option argument, the user
- * should declare explicitly the following union
- */
-union semun {
-	int				val;
-	struct semid_ds	*buf;
-	unsigned short	*array;
-};
-#endif
 
 int
 semget(key_t key, int numSems, int semFlags)
