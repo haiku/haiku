@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src text text_search ;
+SubDir HAIKU_TOP src apps text_search ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
