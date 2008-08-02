@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src add-ons tracker text_search ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# TODO: does not seem to work:
+AddResources FileType-F : FileType.rdef ;
+
+Application TextSearch-G :
+	GrepApp.cpp
+	GrepListView.cpp
+	Grepper.cpp
+	GrepWindow.cpp
+	Model.cpp
+	TextSearch.cpp
+
+	: be tracker textencoding
+	: TextSearch.rdef
+;
