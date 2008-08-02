@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -47,10 +47,10 @@ clear_bss(void)
 
 static void
 call_ctors(void)
-{ 
+{
 	void (**f)(void);
 
-	for (f = &__ctor_list; f < &__ctor_end; f++) {		
+	for (f = &__ctor_list; f < &__ctor_end; f++) {
 		(**f)();
 	}
 }
@@ -74,14 +74,16 @@ platform_start_kernel(void)
 		// something goes wrong when we pass &gKernelArgs directly
 		// to the assembler inline below - might be a bug in GCC
 		// or I don't see something important...
-	addr_t stackTop = gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
+	addr_t stackTop
+		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
 	smp_init_other_cpus();
 	serial_cleanup();
 	mmu_init_for_kernel();
 	smp_boot_other_cpus();
 
-	dprintf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
+	dprintf("kernel entry at %lx\n",
+		gKernelArgs.kernel_image.elf_header.e_entry);
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
@@ -127,7 +129,8 @@ _start(void)
 	// wait a bit to give the user the opportunity to press a key
 	spin(750000);
 
-	// reading the keyboard doesn't seem to work in graphics mode (maybe a bochs problem)
+	// reading the keyboard doesn't seem to work in graphics mode
+	// (maybe a bochs problem)
 	sBootOptions = check_for_boot_keys();
 	//if (sBootOptions & BOOT_OPTION_DEBUG_OUTPUT)
 		serial_enable();
