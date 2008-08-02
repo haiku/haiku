@@ -657,7 +657,8 @@ kernel_debugger_loop(void)
 		set_debug_variable("_thread", (uint64)(addr_t)thread);
 		set_debug_variable("_threadID", thread->id);
 		set_debug_variable("_team", (uint64)(addr_t)thread->team);
-		set_debug_variable("_teamID", thread->team->id);
+		if (thread->team != NULL)
+			set_debug_variable("_teamID", thread->team->id);
 		set_debug_variable("_cpu", sDebuggerOnCPU);
 
 		kprintf("Thread %ld \"%s\" running on CPU %ld\n", thread->id,
