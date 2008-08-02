@@ -41,6 +41,7 @@ SubInclude HAIKU_TOP src apps soundrecorder ;
 SubInclude HAIKU_TOP src apps stylededit ;
 SubInclude HAIKU_TOP src apps sudoku ;
 SubInclude HAIKU_TOP src apps terminal ;
+SubInclude HAIKU_TOP src apps text_search ;
 SubInclude HAIKU_TOP src apps tracker ;
 SubInclude HAIKU_TOP src apps tv ;
 SubInclude HAIKU_TOP src apps webwatch ;
