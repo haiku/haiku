@@ -328,6 +328,12 @@ put_page_table_entry_in_pgtable(page_table_entry *entry,
 static size_t
 map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
 {
+	// If start == 0, the actual base address is not yet known to the caller and
+	// we shall assume the worst case.
+	if (start == 0) {
+		start = 1023 * B_PAGE_SIZE;
+		end += 1023 * B_PAGE_SIZE;
+	}
 	return VADDR_TO_PDENT(end) + 1 - VADDR_TO_PDENT(start);
 }
 
