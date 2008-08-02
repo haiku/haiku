@@ -65,13 +65,10 @@
 #	define TRACE(x) ;
 #endif
 
-//XXX: that's platform specific!
-// 14 MB of iospace
-#define IOSPACE_SIZE (14*1024*1024)
-// 4 MB chunks, to optimize for 4 MB pages
-// XXX: no such thing on 68k (060 ?)
-// 256K
-#define IOSPACE_CHUNK_SIZE (256*1024)
+// 4 MB of iospace
+#define IOSPACE_SIZE (4*1024*1024)
+// 256K = 2^6*4K
+#define IOSPACE_CHUNK_SIZE (NUM_PAGEENT_PER_TBL*B_PAGE_SIZE)
 
 static page_table_entry *iospace_pgtables = NULL;
 
@@ -199,6 +196,7 @@ update_page_indirect_entry(page_indirect_entry *entry, page_indirect_entry *with
 }
 
 
+#warning M68K: allocate all kernel pgdirs at boot and remove this (also dont remove them anymore from unmap)
 static void
 _update_all_pgdirs(int index, page_root_entry e)
 {
@@ -1066,12 +1064,13 @@ map_iospace_chunk(addr_t va, addr_t pa)
 		panic("map_iospace_chunk: passed invalid va 0x%lx\n", va);
 
 	pt = &iospace_pgtables[(va - sIOSpaceBase) / B_PAGE_SIZE];
-	for (i = 0; i < 1024; i++, pa += B_PAGE_SIZE) {
+	for (i = 0; i < NUM_PAGEENT_PER_TBL; i++, pa += B_PAGE_SIZE) {
 		init_page_table_entry(&pt[i]);
 		pt[i].addr = TA_TO_PTEA(pa);
 		pt[i].supervisor = 1;
 		pt[i].write_protect = 0;
 		pt[i].type = DT_PAGE;
+		//XXX: not cachable ?
 		// 040 or 060 only
 #ifdef MMU_HAS_GLOBAL_PAGES
 		pt[i].global = 1;
@@ -1223,7 +1222,9 @@ m68k_vm_translation_map_init(kernel_args *args)
 
 	// allocate some space to hold physical page mapping info
 	//XXX: check page count
-#warning M68K: XXXXXXXXXXXX pt + pd? pd = memalign ?
+	// we already have all page directories allocated by the bootloader,
+	// we only need page tables
+
 	iospace_pgtables = (page_table_entry *)vm_allocate_early(args,
 		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * NUM_PAGEENT_PER_TBL * NUM_PAGETBL_PER_PAGE)), ~0L,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -1237,28 +1238,38 @@ m68k_vm_translation_map_init(kernel_args *args)
 		return error;
 
 	// initialize our data structures
-	memset(iospace_pgtables, 0, B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)));
+	memset(iospace_pgtables, 0, B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * NUM_PAGEENT_PER_TBL * NUM_PAGETBL_PER_PAGE)));
 
 	TRACE(("mapping iospace_pgtables\n"));
 
-#if 0
 	// put the array of pgtables directly into the kernel pagedir
-	// these will be wired and kept mapped into virtual space to be easy to get to
+	// these will be wired and kept mapped into virtual space to be
+	// easy to get to.
+	// note the bootloader allocates all page directories for us
+	// as a contiguous block.
+	// we also still have transparent translation enabled, va==pa.
 	{
-#warning M68K: XXXXXXXXXXXX
 		addr_t phys_pgtable;
 		addr_t virt_pgtable;
+		page_root_entry *pr = sKernelVirtualPageRoot;
+		page_directory_entry *pd;
 		page_directory_entry *e;
+		int index;
 		int i;
 
 		virt_pgtable = (addr_t)iospace_pgtables;
-		for (i = 0; i < (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)); i++, virt_pgtable += B_PAGE_SIZE) {
+
+		for (i = 0; i < (IOSPACE_SIZE / (B_PAGE_SIZE * NUM_PAGEENT_PER_TBL));
+			 i++, virt_pgtable += SIZ_PAGETBL) {
+			// early_query handles non-page-aligned addresses
 			early_query(virt_pgtable, &phys_pgtable);
-			e = &page_hole_pgdir[(sIOSpaceBase / (B_PAGE_SIZE * 1024)) + i];
-			put_pgtable_in_pgdir(e, phys_pgtable, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			index = VADDR_TO_PRENT(sIOSpaceBase) + i / NUM_DIRENT_PER_TBL;
+			pd = (page_directory_entry *)PRE_TO_TA(pr[index]);
+			e = &pd[VADDR_TO_PRENT(sIOSpaceBase) + i % NUM_DIRENT_PER_TBL];
+			put_pgtable_in_pgdir(e, phys_pgtable,
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		}
 	}
-#endif
 
 	TRACE(("vm_translation_map_init: done\n"));
 
@@ -1387,6 +1398,8 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 }
 
 
+// almost directly taken from boot mmu code
+// x86:
 // XXX horrible back door to map a page quickly regardless of translation map object, etc.
 // used only during VM setup.
 // uses a 'page hole' set up in the stage 2 bootloader. The page hole is created by pointing one of
@@ -1397,32 +1410,66 @@ static status_t
 m68k_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
 {
-	int index;
-
+	page_root_entry *pr = (page_root_entry *)sKernelPhysicalPageRoot;
+	page_directory_entry *pd;
+	page_table_entry *pt;
+	addr_t tbl;
+	uint32 index;
+	uint32 i;
 	TRACE(("early_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
+	
+	// everything much simpler here because pa = va
+	// thanks to transparent translation which hasn't been disabled yet
 
-	// check to see if a page table exists for this range
-	index = VADDR_TO_PDENT(va);
-	if (page_hole_pgdir[index].type == DT_PAGE) {
-		addr_t pgtable;
-		page_directory_entry *e;
-		// we need to allocate a pgtable
-		pgtable = get_free_page(args);
-		// pgtable is in pages, convert to physical address
-		pgtable *= B_PAGE_SIZE;
-
-		TRACE(("early_map: asked for free page for pgtable. 0x%lx\n", pgtable));
-
-		// put it in the pgdir
-		e = &page_hole_pgdir[index];
-		put_pgtable_in_pgdir(e, pgtable, attributes);
-
-		// zero it out in it's new mapping
-		memset((unsigned int *)((unsigned int)page_hole + (va / B_PAGE_SIZE / 1024) * B_PAGE_SIZE), 0, B_PAGE_SIZE);
+	index = VADDR_TO_PRENT(va);
+	if (pr[index].type != DT_ROOT) {
+		unsigned aindex = index & ~(NUM_DIRTBL_PER_PAGE-1); /* aligned */
+		//TRACE(("missing page root entry %d ai %d\n", index, aindex));
+		tbl = get_free_page(args) * B_PAGE_SIZE;
+		if (!tbl)
+			return ENOMEM;
+		TRACE(("early_map: asked for free page for pgtable. 0x%lx\n", tbl));
+		// zero-out
+		memset((void *)tbl, 0, B_PAGE_SIZE);
+		// for each pgdir on the allocated page:
+		for (i = 0; i < NUM_DIRTBL_PER_PAGE; i++) {
+			put_pgdir_in_pgroot(&pr[aindex + i], tbl, attributes);
+			//TRACE(("inserting tbl @ %p as %08x pr[%d] %08x\n", tbl, TA_TO_PREA(tbl), aindex + i, *(uint32 *)apr));
+			// clear the table
+			//TRACE(("clearing table[%d]\n", i));
+			pd = (page_directory_entry *)tbl;
+			for (int32 j = 0; j < NUM_DIRENT_PER_TBL; j++)
+				*(page_directory_entry_scalar *)(&pd[j]) = DFL_DIRENT_VAL;
+			tbl += SIZ_DIRTBL;
+		}
 	}
+	pd = (page_directory_entry *)PRE_TO_TA(pr[index]);
 
-	// now, fill in the pentry
-	put_page_table_entry_in_pgtable(page_hole + va / B_PAGE_SIZE, pa, attributes,
+	index = VADDR_TO_PDENT(va);
+	if (pd[index].type != DT_DIR) {
+		unsigned aindex = index & ~(NUM_PAGETBL_PER_PAGE-1); /* aligned */
+		//TRACE(("missing page dir entry %d ai %d\n", index, aindex));
+		tbl = get_free_page(args) * B_PAGE_SIZE;
+		if (!tbl)
+			return ENOMEM;
+		TRACE(("early_map: asked for free page for pgtable. 0x%lx\n", tbl));
+		// zero-out
+		memset((void *)tbl, 0, B_PAGE_SIZE);
+		// for each pgdir on the allocated page:
+		for (i = 0; i < NUM_PAGETBL_PER_PAGE; i++) {
+			put_pgtable_in_pgdir(&pd[aindex + i], tbl, attributes);
+			// clear the table
+			//TRACE(("clearing table[%d]\n", i));
+			pt = (page_table_entry *)tbl;
+			for (int32 j = 0; j < NUM_PAGEENT_PER_TBL; j++)
+				*(page_table_entry_scalar *)(&pt[j]) = DFL_PAGEENT_VAL;
+			tbl += SIZ_PAGETBL;
+		}
+	}
+	pt = (page_table_entry *)PDE_TO_TA(pd[index]);
+
+	index = VADDR_TO_PTENT(va);
+	put_page_table_entry_in_pgtable(&pt[index], pa, attributes,
 		IS_KERNEL_ADDRESS(va));
 
 	arch_cpu_invalidate_TLB_range(va, va);

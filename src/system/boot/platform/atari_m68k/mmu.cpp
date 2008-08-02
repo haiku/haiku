@@ -513,6 +513,7 @@ mmu_init_for_kernel(void)
 
 		TRACE(("gdt at virtual address %p\n", (void *)gKernelArgs.arch_args.vir_gdt));
 	}
+#endif
 
 	// save the memory we've physically allocated
 	gKernelArgs.physical_allocated_range[0].size = sNextPhysicalAddress - gKernelArgs.physical_allocated_range[0].start;
@@ -546,7 +547,6 @@ mmu_init_for_kernel(void)
 			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.virtual_allocated_range[i].start, gKernelArgs.virtual_allocated_range[i].size);
 		}
 	}
-#endif
 #endif
 }
 

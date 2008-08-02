@@ -90,6 +90,7 @@ arch_vm_init_end(kernel_args *args)
 	vm_free_unused_boot_loader_range(0, 0xffffffff - B_PAGE_SIZE + 1);
 #endif
 
+#warning M68K: unset TT0 now
 	return B_OK;
 }
 
