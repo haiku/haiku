@@ -23,6 +23,7 @@
 #define MODEL_H
 
 #include <Entry.h>
+#include <File.h>
 #include <FindDirectory.h>
 #include <List.h>
 #include <Looper.h>

@@ -328,8 +328,8 @@ Model::_FreeHistory(BList* items)
 
 
 status_t
-Model::_OpenFile(BFile* file, const char* name, uint32 openMode = B_READ_ONLY, 
-	directory_which which = B_USER_SETTINGS_DIRECTORY, BVolume* volume = NULL)
+Model::_OpenFile(BFile* file, const char* name, uint32 openMode, 
+	directory_which which, BVolume* volume)
 {
 	if (file == NULL)
 		return B_BAD_VALUE;
