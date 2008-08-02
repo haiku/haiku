@@ -65,40 +65,16 @@ arch_cpu_init(kernel_args *args)
 		case 68020:
 		case 68030:
 			memcpy(&cpu_ops, &cpu_ops_030, sizeof(cpu_ops));
-			/*
-			cpu_ops.flush_insn_pipeline = cpu_ops_030.flush_insn_pipeline;
-			cpu_ops.flush_atc_all = cpu_ops_030.flush_atc_all;
-			cpu_ops.flush_atc_user = cpu_ops_030.flush_atc_user;
-			cpu_ops.flush_atc_addr = cpu_ops_030.flush_atc_addr;
-			cpu_ops.flush_dcache = cpu_ops_030.flush_dcache;
-			cpu_ops.flush_icache = cpu_ops_030.flush_icache;
-			cpu_ops.idle = cpu_ops_030.idle; // NULL
-			*/
 			break;
-//#ifdef SUPPORTS_040
+
 		case 68040:
-			memcpy(&cpu_ops, &cpu_ops_030, sizeof(cpu_ops));
-			/*
-			cpu_ops.flush_insn_pipeline = cpu_ops_040.flush_insn_pipeline;
-			cpu_ops.flush_atc_all = cpu_ops_040.flush_atc_all;
-			cpu_ops.flush_atc_user = cpu_ops_040.flush_atc_user;
-			cpu_ops.flush_atc_addr = cpu_ops_040.flush_atc_addr;
-			cpu_ops.flush_dcache = cpu_ops_040.flush_dcache;
-			cpu_ops.flush_icache = cpu_ops_040.flush_icache;
-			cpu_ops.idle = cpu_ops_040.idle; // NULL
-			*/
+			memcpy(&cpu_ops, &cpu_ops_040, sizeof(cpu_ops));
 			break;
-//#endif
+
 #ifdef SUPPORTS_060
 		case 68060:
-			cpu_ops.flush_insn_pipeline = cpu_ops_060.flush_insn_pipeline;
-			cpu_ops.flush_atc_all = cpu_ops_060.flush_atc_all;
-			cpu_ops.flush_atc_user = cpu_ops_060.flush_atc_user;
-			cpu_ops.flush_atc_addr = cpu_ops_060.flush_atc_addr;
-			cpu_ops.flush_dcache = cpu_ops_060.flush_dcache;
-			cpu_ops.flush_icache = cpu_ops_060.flush_icache;
-			cpu_ops.idle = cpu_ops_060.idle;
-		break;
+			memcpy(&cpu_ops, &cpu_ops_060, sizeof(cpu_ops));
+			break;
 #endif
 		default:
 			panic("unknown cpu_type %d\n", arch_cpu_type);
@@ -132,7 +108,7 @@ void
 arch_cpu_memory_read_barrier(void)
 {
 	asm volatile ("nop;" : : : "memory");
-#warning M68k: check arch_cpu_memory_read_barrier
+#warning M68k: check arch_cpu_memory_read_barrier (FNOP ?)
 }
 
 
@@ -140,7 +116,7 @@ void
 arch_cpu_memory_write_barrier(void)
 {
 	asm volatile ("nop;" : : : "memory");
-#warning M68k: check arch_cpu_memory_write_barrier
+#warning M68k: check arch_cpu_memory_write_barrier (FNOP ?)
 }
 
 
