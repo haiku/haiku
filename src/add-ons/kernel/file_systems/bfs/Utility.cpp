@@ -11,7 +11,7 @@
 
 
 bool
-sorted_array::_FindInternal(off_t value, int32 &index) const
+sorted_array::_FindInternal(off_t value, int32& index) const
 {
 	int32 min = 0, max = count - 1;
 	off_t cmp;
@@ -61,7 +61,8 @@ sorted_array::Remove(off_t value)
 		return false;
 
 	count--;
-	memmove(&values[index], &values[index + 1], (count - index) * sizeof(off_t));
+	memmove(&values[index], &values[index + 1],
+		(count - index) * sizeof(off_t));
 
 	return true;
 }

@@ -24,116 +24,132 @@ enum volume_initialize_flags {
 };
 
 class Volume {
-	public:
-		Volume(fs_volume *volume);
-		~Volume();
+public:
+							Volume(fs_volume* volume);
+							~Volume();
 
-		status_t			Mount(const char *device, uint32 flags);
-		status_t			Unmount();
-		status_t			Initialize(int fd, const char *name,
+			status_t		Mount(const char* device, uint32 flags);
+			status_t		Unmount();
+			status_t		Initialize(int fd, const char* name,
 								uint32 blockSize, uint32 flags);
 
-		bool				IsInitializing() const { return fVolume == NULL; }
+			bool			IsInitializing() const { return fVolume == NULL; }
 
-		bool				IsValidSuperBlock();
-		bool				IsReadOnly() const;
-		void				Panic();
-		mutex				&Lock();
+			bool			IsValidSuperBlock();
+			bool			IsReadOnly() const;
+			void			Panic();
+			mutex&			Lock();
 
-		block_run			Root() const { return fSuperBlock.root_dir; }
-		Inode				*RootNode() const { return fRootNode; }
-		block_run			Indices() const { return fSuperBlock.indices; }
-		Inode				*IndicesNode() const { return fIndicesNode; }
-		block_run			Log() const { return fSuperBlock.log_blocks; }
-		vint32				&LogStart() { return fLogStart; }
-		vint32				&LogEnd() { return fLogEnd; }
-		int					Device() const { return fDevice; }
+			block_run		Root() const { return fSuperBlock.root_dir; }
+			Inode*			RootNode() const { return fRootNode; }
+			block_run		Indices() const { return fSuperBlock.indices; }
+			Inode*			IndicesNode() const { return fIndicesNode; }
+			block_run		Log() const { return fSuperBlock.log_blocks; }
+			vint32&			LogStart() { return fLogStart; }
+			vint32&			LogEnd() { return fLogEnd; }
+			int				Device() const { return fDevice; }
 
-		dev_t				ID() const { return fVolume ? fVolume->id : -1; }
-		fs_volume			*FSVolume() const { return fVolume; }
-		const char			*Name() const { return fSuperBlock.name; }
+			dev_t			ID() const { return fVolume ? fVolume->id : -1; }
+			fs_volume*		FSVolume() const { return fVolume; }
+			const char*		Name() const { return fSuperBlock.name; }
 
-		off_t				NumBlocks() const { return fSuperBlock.NumBlocks(); }
-		off_t				UsedBlocks() const { return fSuperBlock.UsedBlocks(); }
-		off_t				FreeBlocks() const { return NumBlocks() - UsedBlocks(); }
+			off_t			NumBlocks() const
+								{ return fSuperBlock.NumBlocks(); }
+			off_t			UsedBlocks() const
+								{ return fSuperBlock.UsedBlocks(); }
+			off_t			FreeBlocks() const
+								{ return NumBlocks() - UsedBlocks(); }
 
-		uint32				BlockSize() const { return fBlockSize; }
-		uint32				BlockShift() const { return fBlockShift; }
-		uint32				InodeSize() const { return fSuperBlock.InodeSize(); }
-		uint32				AllocationGroups() const { return fSuperBlock.AllocationGroups(); }
-		uint32				AllocationGroupShift() const { return fAllocationGroupShift; }
-		disk_super_block	&SuperBlock() { return fSuperBlock; }
+			uint32			BlockSize() const { return fBlockSize; }
+			uint32			BlockShift() const { return fBlockShift; }
+			uint32			InodeSize() const
+								{ return fSuperBlock.InodeSize(); }
+			uint32			AllocationGroups() const
+								{ return fSuperBlock.AllocationGroups(); }
+			uint32			AllocationGroupShift() const
+								{ return fAllocationGroupShift; }
+			disk_super_block& SuperBlock() { return fSuperBlock; }
 
-		off_t				ToOffset(block_run run) const { return ToBlock(run) << BlockShift(); }
-		off_t				ToBlock(block_run run) const { return ((((off_t)run.AllocationGroup()) << AllocationGroupShift()) | (off_t)run.Start()); }
-		block_run			ToBlockRun(off_t block) const;
-		status_t			ValidateBlockRun(block_run run);
+			off_t			ToOffset(block_run run) const
+								{ return ToBlock(run) << BlockShift(); }
+			off_t			ToBlock(block_run run) const
+								{ return ((((off_t)run.AllocationGroup())
+										<< AllocationGroupShift())
+									| (off_t)run.Start()); }
+			block_run		ToBlockRun(off_t block) const;
+			status_t		ValidateBlockRun(block_run run);
 
-		off_t				ToVnode(block_run run) const { return ToBlock(run); }
-		off_t				ToVnode(off_t block) const { return block; }
-		off_t				VnodeToBlock(ino_t id) const { return (off_t)id; }
+			off_t			ToVnode(block_run run) const
+								{ return ToBlock(run); }
+			off_t			ToVnode(off_t block) const { return block; }
+			off_t			VnodeToBlock(ino_t id) const { return (off_t)id; }
 
-		status_t			CreateIndicesRoot(Transaction &transaction);
+			status_t		CreateIndicesRoot(Transaction& transaction);
 
-		// block bitmap
-		BlockAllocator		&Allocator();
-		status_t			AllocateForInode(Transaction &transaction, const Inode *parent,
-								mode_t type, block_run &run);
-		status_t			AllocateForInode(Transaction &transaction, const block_run *parent,
-								mode_t type, block_run &run);
-		status_t			Allocate(Transaction &transaction, Inode *inode,
-								off_t numBlocks, block_run &run, uint16 minimum = 1);
-		status_t			Free(Transaction &transaction, block_run run);
+			// block bitmap
+			BlockAllocator&	Allocator();
+			status_t		AllocateForInode(Transaction& transaction,
+								const Inode* parent, mode_t type,
+								block_run& run);
+			status_t		AllocateForInode(Transaction& transaction,
+								const block_run* parent, mode_t type,
+								block_run& run);
+			status_t		Allocate(Transaction& transaction, Inode* inode,
+								off_t numBlocks, block_run& run,
+								uint16 minimum = 1);
+			status_t		Free(Transaction& transaction, block_run run);
 
-		// cache access
-		status_t			WriteSuperBlock();
-		status_t			FlushDevice();
+			// cache access
+			status_t		WriteSuperBlock();
+			status_t		FlushDevice();
 
-		// queries
-		void				UpdateLiveQueries(Inode *inode, const char *attribute, int32 type,
-								const uint8 *oldKey, size_t oldLength,
-								const uint8 *newKey, size_t newLength);
-		bool				CheckForLiveQuery(const char *attribute);
-		void				AddQuery(Query *query);
-		void				RemoveQuery(Query *query);
+			// queries
+			void			UpdateLiveQueries(Inode* inode,
+								const char* attribute, int32 type,
+								const uint8* oldKey, size_t oldLength,
+								const uint8* newKey, size_t newLength);
+			bool			CheckForLiveQuery(const char* attribute);
+			void			AddQuery(Query* query);
+			void			RemoveQuery(Query* query);
 
-		status_t			Sync();
-		Journal				*GetJournal(off_t refBlock) const;
+			status_t		Sync();
+			Journal*		GetJournal(off_t refBlock) const;
 
-		void				*BlockCache() { return fBlockCache; }
+			void*			BlockCache() { return fBlockCache; }
 
-		uint32				GetUniqueID();
+			uint32			GetUniqueID();
 
-		static status_t		CheckSuperBlock(const uint8* data,
+	static	status_t		CheckSuperBlock(const uint8* data,
 								uint32* _offset = NULL);
-		static status_t		Identify(int fd, disk_super_block *superBlock);
+	static	status_t		Identify(int fd, disk_super_block* superBlock);
 
 	protected:
-		fs_volume			*fVolume;
-		int					fDevice;
-		disk_super_block	fSuperBlock;
+			fs_volume*		fVolume;
+			int				fDevice;
+			disk_super_block fSuperBlock;
 
-		uint32				fBlockSize;
-		uint32				fBlockShift;
-		uint32				fAllocationGroupShift;
+			uint32			fBlockSize;
+			uint32			fBlockShift;
+			uint32			fAllocationGroupShift;
 
-		BlockAllocator		fBlockAllocator;
-		mutex				fLock;
-		Journal				*fJournal;
-		vint32				fLogStart, fLogEnd;
+			BlockAllocator	fBlockAllocator;
+			mutex			fLock;
+			Journal*		fJournal;
+			vint32			fLogStart;
+			vint32			fLogEnd;
 
-		Inode				*fRootNode;
-		Inode				*fIndicesNode;
+			Inode*			fRootNode;
+			Inode*			fIndicesNode;
 
-		vint32				fDirtyCachedBlocks;
+			vint32			fDirtyCachedBlocks;
 
-		mutex				fQueryLock;
-		SinglyLinkedList<Query> fQueries;
+			mutex			fQueryLock;
+			SinglyLinkedList<Query> fQueries;
 
-		int32				fUniqueID;
-		uint32				fFlags;
+			int32			fUniqueID;
+			uint32			fFlags;
 
-		void				*fBlockCache;
+			void*			fBlockCache;
 };
 
 
@@ -146,14 +162,14 @@ Volume::IsReadOnly() const
 }
 
 
-inline mutex &
+inline mutex&
 Volume::Lock()
 {
 	 return fLock;
 }
 
 
-inline BlockAllocator &
+inline BlockAllocator&
 Volume::Allocator()
 {
 	 return fBlockAllocator;
@@ -161,21 +177,24 @@ Volume::Allocator()
 
 
 inline status_t
-Volume::AllocateForInode(Transaction &transaction, const block_run *parent, mode_t type, block_run &run)
+Volume::AllocateForInode(Transaction& transaction, const block_run* parent,
+	mode_t type, block_run& run)
 {
 	return fBlockAllocator.AllocateForInode(transaction, parent, type, run);
 }
 
 
 inline status_t
-Volume::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks, block_run &run, uint16 minimum)
+Volume::Allocate(Transaction& transaction, Inode* inode, off_t numBlocks,
+	block_run& run, uint16 minimum)
 {
-	return fBlockAllocator.Allocate(transaction, inode, numBlocks, run, minimum);
+	return fBlockAllocator.Allocate(transaction, inode, numBlocks, run,
+		minimum);
 }
 
 
 inline status_t
-Volume::Free(Transaction &transaction, block_run run)
+Volume::Free(Transaction& transaction, block_run run)
 {
 	return fBlockAllocator.Free(transaction, run);
 }
@@ -188,7 +207,7 @@ Volume::FlushDevice()
 }
 
 
-inline Journal *
+inline Journal*
 Volume::GetJournal(off_t /*refBlock*/) const
 {
 	 return fJournal;
@@ -201,4 +220,4 @@ Volume::GetUniqueID()
 	 return atomic_add(&fUniqueID, 1);
 }
 
-#endif	/* VOLUME_H */
+#endif	// VOLUME_H

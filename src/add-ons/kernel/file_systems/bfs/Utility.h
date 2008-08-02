@@ -13,16 +13,15 @@
 // TODO: this is not endian safe!!!
 
 struct sorted_array {
-	public:
-		off_t	count;
-		off_t	values[0];
+	off_t	count;
+	off_t	values[0];
 
-		inline int32 Find(off_t value) const;
-		void Insert(off_t value);
-		bool Remove(off_t value);
+	inline int32 Find(off_t value) const;
+	void Insert(off_t value);
+	bool Remove(off_t value);
 
-	private:
-		bool _FindInternal(off_t value, int32 &index) const;
+private:
+	bool _FindInternal(off_t value, int32& index) const;
 };
 
 

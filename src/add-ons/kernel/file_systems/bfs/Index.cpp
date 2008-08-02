@@ -20,7 +20,7 @@
 #endif
 
 
-Index::Index(Volume *volume)
+Index::Index(Volume* volume)
 	:
 	fVolume(volume),
 	fNode(NULL)
@@ -51,15 +51,14 @@ Index::Unset()
 }
 
 
-/*!
-	Sets the index to specified one. Returns an error if the index could
+/*!	Sets the index to specified one. Returns an error if the index could
 	not be found or initialized.
 	Note, Index::Update() may be called on the object even if this method
 	failed previously. In this case, it will only update live queries for
 	the updated attribute.
 */
 status_t
-Index::SetTo(const char *name)
+Index::SetTo(const char* name)
 {
 	// remove the old node, if the index is set for the second time
 	Unset();
@@ -71,18 +70,18 @@ Index::SetTo(const char *name)
 	// Note, the name is saved even if the index couldn't be initialized!
 	// This is used to optimize Index::Update() in case there is no index
 
-	Inode *indices = fVolume->IndicesNode();
+	Inode* indices = fVolume->IndicesNode();
 	if (indices == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	InodeReadLocker locker(indices);
 
-	BPlusTree *tree;
+	BPlusTree* tree;
 	if (indices->GetTree(&tree) != B_OK)
 		return B_BAD_VALUE;
 
 	ino_t id;
-	status_t status = tree->Find((uint8 *)name, (uint16)strlen(name), &id);
+	status_t status = tree->Find((uint8*)name, (uint16)strlen(name), &id);
 	if (status != B_OK)
 		return status;
 
@@ -167,7 +166,7 @@ Index::KeySize()
 
 
 status_t
-Index::Create(Transaction &transaction, const char *name, uint32 type)
+Index::Create(Transaction &transaction, const char* name, uint32 type)
 {
 	Unset();
 
@@ -222,9 +221,9 @@ Index::Create(Transaction &transaction, const char *name, uint32 type)
 	You may not want to let the whole transaction fail because of that.
 */
 status_t
-Index::Update(Transaction &transaction, const char *name, int32 type,
-	const uint8 *oldKey, uint16 oldLength, const uint8 *newKey,
-	uint16 newLength, Inode *inode)
+Index::Update(Transaction &transaction, const char* name, int32 type,
+	const uint8* oldKey, uint16 oldLength, const uint8* newKey,
+	uint16 newLength, Inode* inode)
 {
 	if (name == NULL
 		|| (oldKey == NULL && newKey == NULL)
@@ -262,7 +261,7 @@ Index::Update(Transaction &transaction, const char *name, int32 type,
 			newKey, newLength);
 	}
 
-	BPlusTree *tree;
+	BPlusTree* tree;
 	status_t status = Node()->GetTree(&tree);
 	if (status < B_OK)
 		return status;
@@ -272,7 +271,7 @@ Index::Update(Transaction &transaction, const char *name, int32 type,
 	Node()->WriteLockInTransaction(transaction);
 
 	if (oldKey != NULL) {
-		status = tree->Remove(transaction, (const uint8 *)oldKey, oldLength,
+		status = tree->Remove(transaction, (const uint8*)oldKey, oldLength,
 			inode->ID());
 		if (status == B_ENTRY_NOT_FOUND) {
 			// That's not nice, but no reason to let the whole thing fail
@@ -284,7 +283,7 @@ Index::Update(Transaction &transaction, const char *name, int32 type,
 	// add the new key to the tree
 
 	if (newKey != NULL) {
-		status = tree->Insert(transaction, (const uint8 *)newKey, newLength,
+		status = tree->Insert(transaction, (const uint8*)newKey, newLength,
 			inode->ID());
 	}
 
@@ -293,57 +292,57 @@ Index::Update(Transaction &transaction, const char *name, int32 type,
 
 
 status_t
-Index::InsertName(Transaction &transaction, const char *name, Inode *inode)
+Index::InsertName(Transaction &transaction, const char* name, Inode* inode)
 {
 	return UpdateName(transaction, NULL, name, inode);
 }
 
 
 status_t
-Index::RemoveName(Transaction &transaction, const char *name, Inode *inode)
+Index::RemoveName(Transaction &transaction, const char* name, Inode* inode)
 {
 	return UpdateName(transaction, name, NULL, inode);
 }
 
 
 status_t
-Index::UpdateName(Transaction &transaction, const char *oldName,
-	const char *newName, Inode *inode)
+Index::UpdateName(Transaction &transaction, const char* oldName,
+	const char* newName, Inode* inode)
 {
 	ASSERT(inode->IsRegularNode());
 
 	uint16 oldLength = oldName != NULL ? strlen(oldName) : 0;
 	uint16 newLength = newName != NULL ? strlen(newName) : 0;
-	return Update(transaction, "name", B_STRING_TYPE, (uint8 *)oldName,
-		oldLength, (uint8 *)newName, newLength, inode);
+	return Update(transaction, "name", B_STRING_TYPE, (uint8*)oldName,
+		oldLength, (uint8*)newName, newLength, inode);
 }
 
 
 status_t
-Index::InsertSize(Transaction &transaction, Inode *inode)
+Index::InsertSize(Transaction &transaction, Inode* inode)
 {
 	ASSERT(inode->IsFile());
 
 	off_t size = inode->Size();
-	return Update(transaction, "size", B_INT64_TYPE, NULL, 0, (uint8 *)&size,
+	return Update(transaction, "size", B_INT64_TYPE, NULL, 0, (uint8*)&size,
 		sizeof(int64), inode);
 }
 
 
 status_t
-Index::RemoveSize(Transaction &transaction, Inode *inode)
+Index::RemoveSize(Transaction &transaction, Inode* inode)
 {
 	ASSERT(inode->IsFile());
 
 	// Inode::OldSize() is the size that's in the index
 	off_t size = inode->OldSize();
-	return Update(transaction, "size", B_INT64_TYPE, (uint8 *)&size,
+	return Update(transaction, "size", B_INT64_TYPE, (uint8*)&size,
 		sizeof(int64), NULL, 0, inode);
 }
 
 
 status_t
-Index::UpdateSize(Transaction &transaction, Inode *inode)
+Index::UpdateSize(Transaction &transaction, Inode* inode)
 {
 	ASSERT(inode->IsFile());
 
@@ -351,7 +350,7 @@ Index::UpdateSize(Transaction &transaction, Inode *inode)
 	off_t newSize = inode->Size();
 
 	status_t status = Update(transaction, "size", B_INT64_TYPE,
-		(uint8 *)&oldSize, sizeof(int64), (uint8 *)&newSize, sizeof(int64),
+		(uint8*)&oldSize, sizeof(int64), (uint8*)&newSize, sizeof(int64),
 		inode);
 	if (status == B_OK)
 		inode->UpdateOldSize();
@@ -361,30 +360,30 @@ Index::UpdateSize(Transaction &transaction, Inode *inode)
 
 
 status_t
-Index::InsertLastModified(Transaction &transaction, Inode *inode)
+Index::InsertLastModified(Transaction &transaction, Inode* inode)
 {
 	ASSERT(inode->IsFile() || inode->IsSymLink());
 
 	off_t modified = inode->LastModified();
 	return Update(transaction, "last_modified", B_INT64_TYPE, NULL, 0,
-		(uint8 *)&modified, sizeof(int64), inode);
+		(uint8*)&modified, sizeof(int64), inode);
 }
 
 
 status_t
-Index::RemoveLastModified(Transaction &transaction, Inode *inode)
+Index::RemoveLastModified(Transaction &transaction, Inode* inode)
 {
 	ASSERT(inode->IsFile() || inode->IsSymLink());
 
 	// Inode::OldLastModified() is the value which is in the index
 	off_t modified = inode->OldLastModified();
 	return Update(transaction, "last_modified", B_INT64_TYPE,
-		(uint8 *)&modified, sizeof(int64), NULL, 0, inode);
+		(uint8*)&modified, sizeof(int64), NULL, 0, inode);
 }
 
 
 status_t
-Index::UpdateLastModified(Transaction &transaction, Inode *inode,
+Index::UpdateLastModified(Transaction &transaction, Inode* inode,
 	off_t modified)
 {
 	ASSERT(inode->IsFile() || inode->IsSymLink());
@@ -395,7 +394,7 @@ Index::UpdateLastModified(Transaction &transaction, Inode *inode,
 	modified |= fVolume->GetUniqueID() & INODE_TIME_MASK;
 
 	status_t status = Update(transaction, "last_modified", B_INT64_TYPE,
-		(uint8 *)&oldModified, sizeof(int64), (uint8 *)&modified,
+		(uint8*)&oldModified, sizeof(int64), (uint8*)&modified,
 		sizeof(int64), inode);
 
 	inode->Node().last_modified_time = HOST_ENDIAN_TO_BFS_INT64(modified);

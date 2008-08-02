@@ -18,67 +18,69 @@ struct run_array {
 	block_run	runs[0];
 
 	void Init(int32 blockSize);
-	void Insert(block_run &run);
+	void Insert(block_run& run);
 
 	int32 CountRuns() const { return BFS_ENDIAN_TO_HOST_INT32(count); }
 	int32 MaxRuns() const { return BFS_ENDIAN_TO_HOST_INT32(max_runs) - 1; }
 		// that -1 accounts for an off-by-one error in Be's BFS implementation
-	const block_run &RunAt(int32 i) const { return runs[i]; }
+	const block_run& RunAt(int32 i) const { return runs[i]; }
 
 	static int32 MaxRuns(int32 blockSize);
 
 private:
-	static int _Compare(block_run &a, block_run &b);
-	int32 _FindInsertionIndex(block_run &run);
+	static int _Compare(block_run& a, block_run& b);
+	int32 _FindInsertionIndex(block_run& run);
 };
 
 class RunArrays {
-	public:
-		RunArrays(Journal *journal);
-		~RunArrays();
+public:
+							RunArrays(Journal* journal);
+							~RunArrays();
 
-		status_t Insert(off_t blockNumber);
+			status_t		Insert(off_t blockNumber);
 
-		run_array *ArrayAt(int32 i) { return fArrays.Array()[i]; }
-		int32 CountArrays() const { return fArrays.CountItems(); }
+			run_array*		ArrayAt(int32 i) { return fArrays.Array()[i]; }
+			int32			CountArrays() const { return fArrays.CountItems(); }
 
-		uint32 CountBlocks() const { return fBlockCount; }
-		uint32 LogEntryLength() const { return CountBlocks() + CountArrays(); }
+			uint32			CountBlocks() const { return fBlockCount; }
+			uint32			LogEntryLength() const
+								{ return CountBlocks() + CountArrays(); }
 
-		int32 MaxArrayLength();
+			int32			MaxArrayLength();
 
-	private:
-		status_t _AddArray();
-		bool _ContainsRun(block_run &run);
-		bool _AddRun(block_run &run);
+private:
+			status_t		_AddArray();
+			bool			_ContainsRun(block_run& run);
+			bool			_AddRun(block_run& run);
 
-		Journal		*fJournal;
-		uint32		fBlockCount;
-		Stack<run_array *> fArrays;
-		run_array	*fLastArray;
+			Journal*		fJournal;
+			uint32			fBlockCount;
+			Stack<run_array*> fArrays;
+			run_array*		fLastArray;
 };
 
 class LogEntry : public DoublyLinkedListLinkImpl<LogEntry> {
-	public:
-		LogEntry(Journal *journal, uint32 logStart, uint32 length);
-		~LogEntry();
+public:
+							LogEntry(Journal* journal, uint32 logStart,
+								uint32 length);
+							~LogEntry();
 
-		uint32 Start() const { return fStart; }
-		uint32 Length() const { return fLength; }
+			uint32			Start() const { return fStart; }
+			uint32			Length() const { return fLength; }
 
 #ifdef BFS_DEBUGGER_COMMANDS
-		void SetTransactionID(int32 id) { fTransactionID = id; }
-		int32 TransactionID() const { return fTransactionID; }
+			void			SetTransactionID(int32 id) { fTransactionID = id; }
+			int32			TransactionID() const { return fTransactionID; }
 #endif
 
-		Journal *GetJournal() { return fJournal; }
+			Journal*		GetJournal() { return fJournal; }
 
-	private:
-		Journal		*fJournal;
-		uint32		fStart;
-		uint32		fLength;
+private:
+			Journal*		fJournal;
+			uint32			fStart;
+			uint32			fLength;
 #ifdef BFS_DEBUGGER_COMMANDS
-		int32		fTransactionID;
+			int32			fTransactionID;
 #endif
 };
 
@@ -87,44 +89,44 @@ class LogEntry : public DoublyLinkedListLinkImpl<LogEntry> {
 namespace BFSJournalTracing {
 
 class LogEntry : public AbstractTraceEntry {
-	public:
-		LogEntry(::LogEntry* entry, off_t logPosition, bool started)
-			:
-			fEntry(entry),
+public:
+	LogEntry(::LogEntry* entry, off_t logPosition, bool started)
+		:
+		fEntry(entry),
 #ifdef BFS_DEBUGGER_COMMANDS
-			fTransactionID(entry->TransactionID()),
+		fTransactionID(entry->TransactionID()),
 #endif
-			fStart(entry->Start()),
-			fLength(entry->Length()),
-			fLogPosition(logPosition),
-			fStarted(started)
-		{
-			Initialized();
-		}
+		fStart(entry->Start()),
+		fLength(entry->Length()),
+		fLogPosition(logPosition),
+		fStarted(started)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
+	virtual void AddDump(TraceOutput& out)
+	{
 #ifdef BFS_DEBUGGER_COMMANDS
-			out.Print("bfs:j:%s entry %p id %ld, start %lu, length %lu, log %s "
-				"%lu\n", fStarted ? "Started" : "Written", fEntry,
-				fTransactionID, fStart, fLength,
-				fStarted ? "end" : "start", fLogPosition);
+		out.Print("bfs:j:%s entry %p id %ld, start %lu, length %lu, log %s "
+			"%lu\n", fStarted ? "Started" : "Written", fEntry,
+			fTransactionID, fStart, fLength,
+			fStarted ? "end" : "start", fLogPosition);
 #else
-			out.Print("bfs:j:%s entry %p start %lu, length %lu, log %s %lu\n",
-				fStarted ? "Started" : "Written", fEntry, fStart, fLength,
-				fStarted ? "end" : "start", fLogPosition);
+		out.Print("bfs:j:%s entry %p start %lu, length %lu, log %s %lu\n",
+			fStarted ? "Started" : "Written", fEntry, fStart, fLength,
+			fStarted ? "end" : "start", fLogPosition);
 #endif
-		}
+	}
 
-	private:
-		::LogEntry*	fEntry;
+private:
+	::LogEntry*	fEntry;
 #ifdef BFS_DEBUGGER_COMMANDS
-		int32		fTransactionID;
+	int32		fTransactionID;
 #endif
-		uint32		fStart;
-		uint32		fLength;
-		uint32		fLogPosition;
-		bool		fStarted;
+	uint32		fStart;
+	uint32		fLength;
+	uint32		fLogPosition;
+	bool		fStarted;
 };
 
 }	// namespace BFSJournalTracing
@@ -139,7 +141,7 @@ class LogEntry : public AbstractTraceEntry {
 
 
 static void
-add_to_iovec(iovec *vecs, int32 &index, int32 max, const void *address,
+add_to_iovec(iovec* vecs, int32& index, int32 max, const void* address,
 	size_t size)
 {
 	if (index > 0 && (addr_t)vecs[index - 1].iov_base
@@ -153,7 +155,7 @@ add_to_iovec(iovec *vecs, int32 &index, int32 max, const void *address,
 		panic("no more space for iovecs!");
 
 	// we need to start a new iovec
-	vecs[index].iov_base = const_cast<void *>(address);
+	vecs[index].iov_base = const_cast<void*>(address);
 	vecs[index].iov_len = size;
 	index++;
 }
@@ -162,7 +164,7 @@ add_to_iovec(iovec *vecs, int32 &index, int32 max, const void *address,
 //	#pragma mark - LogEntry
 
 
-LogEntry::LogEntry(Journal *journal, uint32 start, uint32 length)
+LogEntry::LogEntry(Journal* journal, uint32 start, uint32 length)
 	:
 	fJournal(journal),
 	fStart(start),
@@ -196,7 +198,7 @@ run_array::Init(int32 blockSize)
 	array is large enough to contain the entry before calling this function.
 */
 void
-run_array::Insert(block_run &run)
+run_array::Insert(block_run& run)
 {
 	int32 index = _FindInsertionIndex(run);
 	if (index == -1) {
@@ -226,7 +228,7 @@ run_array::MaxRuns(int32 blockSize)
 
 
 /*static*/ int
-run_array::_Compare(block_run &a, block_run &b)
+run_array::_Compare(block_run& a, block_run& b)
 {
 	int cmp = a.AllocationGroup() - b.AllocationGroup();
 	if (cmp == 0)
@@ -237,7 +239,7 @@ run_array::_Compare(block_run &a, block_run &b)
 
 
 int32
-run_array::_FindInsertionIndex(block_run &run)
+run_array::_FindInsertionIndex(block_run& run)
 {
 	int32 min = 0, max = CountRuns() - 1;
 	int32 i = 0;
@@ -272,7 +274,7 @@ run_array::_FindInsertionIndex(block_run &run)
 //	#pragma mark - RunArrays
 
 
-RunArrays::RunArrays(Journal *journal)
+RunArrays::RunArrays(Journal* journal)
 	:
 	fJournal(journal),
 	fBlockCount(0),
@@ -284,20 +286,20 @@ RunArrays::RunArrays(Journal *journal)
 
 RunArrays::~RunArrays()
 {
-	run_array *array;
+	run_array* array;
 	while (fArrays.Pop(&array))
 		free(array);
 }
 
 
 bool
-RunArrays::_ContainsRun(block_run &run)
+RunArrays::_ContainsRun(block_run& run)
 {
 	for (int32 i = 0; i < CountArrays(); i++) {
-		run_array *array = ArrayAt(i);
+		run_array* array = ArrayAt(i);
 
 		for (int32 j = 0; j < array->CountRuns(); j++) {
-			block_run &arrayRun = array->runs[j];
+			block_run& arrayRun = array->runs[j];
 			if (run.AllocationGroup() != arrayRun.AllocationGroup())
 				continue;
 
@@ -317,7 +319,7 @@ RunArrays::_ContainsRun(block_run &run)
 	with block_runs of length 1!
 */
 bool
-RunArrays::_AddRun(block_run &run)
+RunArrays::_AddRun(block_run& run)
 {
 	ASSERT(run.length == 1);
 
@@ -338,7 +340,7 @@ RunArrays::_AddArray()
 {
 	int32 blockSize = fJournal->GetVolume()->BlockSize();
 
-	run_array *array = (run_array *)malloc(blockSize);
+	run_array* array = (run_array*)malloc(blockSize);
 	if (array == NULL)
 		return B_NO_MEMORY;
 
@@ -356,7 +358,7 @@ RunArrays::_AddArray()
 status_t
 RunArrays::Insert(off_t blockNumber)
 {
-	Volume *volume = fJournal->GetVolume();
+	Volume* volume = fJournal->GetVolume();
 	block_run run = volume->ToBlockRun(blockNumber);
 
 	if (fLastArray != NULL) {
@@ -393,7 +395,7 @@ RunArrays::MaxArrayLength()
 //	#pragma mark - Journal
 
 
-Journal::Journal(Volume *volume)
+Journal::Journal(Volume* volume)
 	:
 	fVolume(volume),
 	fOwner(NULL),
@@ -429,7 +431,7 @@ Journal::InitCheck()
 	within a the volume.
 */
 status_t
-Journal::_CheckRunArray(const run_array *array)
+Journal::_CheckRunArray(const run_array* array)
 {
 	int32 maxRuns = run_array::MaxRuns(fVolume->BlockSize()) - 1;
 		// the -1 works around an off-by-one bug in Be's BFS implementation,
@@ -458,7 +460,7 @@ Journal::_CheckRunArray(const run_array *array)
 	one if replaying succeeded.
 */
 status_t
-Journal::_ReplayRunArray(int32 *_start)
+Journal::_ReplayRunArray(int32* _start)
 {
 	PRINT(("ReplayRunArray(start = %ld)\n", *_start));
 
@@ -467,7 +469,7 @@ Journal::_ReplayRunArray(int32 *_start)
 
 	CachedBlock cachedArray(fVolume);
 
-	const run_array *array = (const run_array *)cachedArray.SetTo(logOffset
+	const run_array* array = (const run_array*)cachedArray.SetTo(logOffset
 		+ firstBlockNumber);
 	if (array == NULL)
 		return B_IO_ERROR;
@@ -484,11 +486,11 @@ Journal::_ReplayRunArray(int32 *_start)
 	int32 blockSize = fVolume->BlockSize();
 
 	for (int32 index = 0; index < array->CountRuns(); index++) {
-		const block_run &run = array->RunAt(index);
+		const block_run& run = array->RunAt(index);
 
 		off_t offset = fVolume->ToOffset(run);
 		for (int32 i = 0; i < run.Length(); i++) {
-			const uint8 *data = cached.SetTo(logOffset + blockNumber);
+			const uint8* data = cached.SetTo(logOffset + blockNumber);
 			if (data == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
@@ -514,13 +516,13 @@ Journal::_ReplayRunArray(int32 *_start)
 	int32 count = 1;
 
 	for (int32 index = 0; index < array->CountRuns(); index++) {
-		const block_run &run = array->RunAt(index);
+		const block_run& run = array->RunAt(index);
 		INFORM(("replay block run %u:%u:%u in log at %Ld!\n",
 			(int)run.AllocationGroup(), run.Start(), run.Length(), blockNumber));
 
 		off_t offset = fVolume->ToOffset(run);
 		for (int32 i = 0; i < run.Length(); i++) {
-			const uint8 *data = cached.SetTo(logOffset + blockNumber);
+			const uint8* data = cached.SetTo(logOffset + blockNumber);
 			if (data == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
@@ -597,15 +599,15 @@ Journal::ReplayLog()
 	completed in the order they were written.
 */
 /*static*/ void
-Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
+Journal::_TransactionWritten(int32 transactionID, int32 event, void* _logEntry)
 {
-	LogEntry *logEntry = (LogEntry *)_logEntry;
+	LogEntry* logEntry = (LogEntry*)_logEntry;
 
 	PRINT(("Log entry %p has been finished, transaction ID = %ld\n", logEntry,
 		transactionID));
 
-	Journal *journal = logEntry->GetJournal();
-	disk_super_block &superBlock = journal->fVolume->SuperBlock();
+	Journal* journal = logEntry->GetJournal();
+	disk_super_block& superBlock = journal->fVolume->SuperBlock();
 	bool update = false;
 
 	// Set log_start pointer if possible...
@@ -613,7 +615,7 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 	mutex_lock(&journal->fEntriesLock);
 
 	if (logEntry == journal->fEntries.First()) {
-		LogEntry *next = journal->fEntries.GetNext(logEntry);
+		LogEntry* next = journal->fEntries.GetNext(logEntry);
 		if (next != NULL) {
 			superBlock.log_start = HOST_ENDIAN_TO_BFS_INT64(next->Start()
 				% journal->fLogSize);
@@ -652,11 +654,11 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 
 /*!	Listens to TRANSACTION_IDLE events, and flushes the log when that happens */
 /*static*/ void
-Journal::_TransactionIdle(int32 transactionID, int32 event, void *_journal)
+Journal::_TransactionIdle(int32 transactionID, int32 event, void* _journal)
 {
 	// The current transaction seems to be idle - flush it
 
-	Journal *journal = (Journal *)_journal;
+	Journal* journal = (Journal*)_journal;
 	journal->_FlushLog(false, false);
 }
 
@@ -745,23 +747,23 @@ Journal::_WriteTransactionToLog()
 	int32 maxVecs = runArrays.MaxArrayLength() + 1;
 		// one extra for the index block
 
-	iovec *vecs = (iovec *)malloc(sizeof(iovec) * maxVecs);
+	iovec* vecs = (iovec*)malloc(sizeof(iovec) * maxVecs);
 	if (vecs == NULL) {
 		// TODO: write back log entries directly?
 		return B_NO_MEMORY;
 	}
 
 	for (int32 k = 0; k < runArrays.CountArrays(); k++) {
-		run_array *array = runArrays.ArrayAt(k);
+		run_array* array = runArrays.ArrayAt(k);
 		int32 index = 0, count = 1;
 		int32 wrap = fLogSize - logStart;
 
-		add_to_iovec(vecs, index, maxVecs, (void *)array, fVolume->BlockSize());
+		add_to_iovec(vecs, index, maxVecs, (void*)array, fVolume->BlockSize());
 
 		// add block runs
 
 		for (int32 i = 0; i < array->CountRuns(); i++) {
-			const block_run &run = array->RunAt(i);
+			const block_run& run = array->RunAt(i);
 			off_t blockNumber = fVolume->ToBlock(run);
 
 			for (int32 j = 0; j < run.Length(); j++) {
@@ -780,7 +782,7 @@ Journal::_WriteTransactionToLog()
 				}
 
 				// make blocks available in the cache
-				const void *data = block_cache_get(fVolume->BlockCache(),
+				const void* data = block_cache_get(fVolume->BlockCache(),
 					blockNumber + j);
 				if (data == NULL) {
 					free(vecs);
@@ -802,7 +804,7 @@ Journal::_WriteTransactionToLog()
 
 		// release blocks again
 		for (int32 i = 0; i < array->CountRuns(); i++) {
-			const block_run &run = array->RunAt(i);
+			const block_run& run = array->RunAt(i);
 			off_t blockNumber = fVolume->ToBlock(run);
 
 			for (int32 j = 0; j < run.Length(); j++) {
@@ -815,7 +817,7 @@ Journal::_WriteTransactionToLog()
 
 	free(vecs);
 
-	LogEntry *logEntry = new LogEntry(this, fVolume->LogEnd(),
+	LogEntry* logEntry = new LogEntry(this, fVolume->LogEnd(),
 		runArrays.LogEntryLength());
 	if (logEntry == NULL) {
 		FATAL(("no memory to allocate log entries!"));
@@ -907,7 +909,7 @@ Journal::FlushLogAndBlocks()
 
 
 status_t
-Journal::Lock(Transaction *owner)
+Journal::Lock(Transaction* owner)
 {
 	status_t status = recursive_lock_lock(&fLock);
 	if (status != B_OK)
@@ -947,7 +949,7 @@ Journal::Lock(Transaction *owner)
 
 
 void
-Journal::Unlock(Transaction *owner, bool success)
+Journal::Unlock(Transaction* owner, bool success)
 {
 	if (recursive_lock_get_recursion(&fLock) == 1) {
 		// we only end the transaction if we would really unlock it
@@ -1022,7 +1024,7 @@ Journal::Dump()
 	LogEntryList::Iterator iterator = fEntries.GetIterator();
 
 	while (iterator.HasNext()) {
-		LogEntry *entry = iterator.Next();
+		LogEntry* entry = iterator.Next();
 
 		kprintf("  %p %6ld %6lu %6lu\n", entry, entry->TransactionID(),
 			entry->Start(), entry->Length());
@@ -1031,15 +1033,15 @@ Journal::Dump()
 
 
 int
-dump_journal(int argc, char **argv)
+dump_journal(int argc, char** argv)
 {
 	if (argc != 2 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: %s <ptr-to-volume>\n", argv[0]);
 		return 0;
 	}
 
-	Volume *volume = (Volume *)parse_expression(argv[1]);
-	Journal *journal = volume->GetJournal(0);
+	Volume* volume = (Volume*)parse_expression(argv[1]);
+	Journal* journal = volume->GetJournal(0);
 
 	journal->Dump();
 	return 0;
@@ -1052,7 +1054,7 @@ dump_journal(int argc, char **argv)
 
 
 status_t
-Transaction::Start(Volume *volume, off_t refBlock)
+Transaction::Start(Volume* volume, off_t refBlock)
 {
 	// has it already been started?
 	if (fJournal != NULL)

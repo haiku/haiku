@@ -16,114 +16,113 @@
 namespace BFSInodeTracing {
 
 class Create : public AbstractTraceEntry {
-	public:
-		Create(Inode* inode, Inode* parent, const char* name, int32 mode,
-				int openMode, uint32 type)
-			:
-			fInode(inode),
-			fID(inode->ID()),
-			fParent(parent),
-			fParentID(parent != NULL ? parent->ID() : 0),
-			fMode(mode),
-			fOpenMode(openMode),
-			fType(type)
-		{
-			if (name != NULL)
-				strlcpy(fName, name, sizeof(fName));
-			else
-				fName[0] = '\0';
+public:
+	Create(Inode* inode, Inode* parent, const char* name, int32 mode,
+			int openMode, uint32 type)
+		:
+		fInode(inode),
+		fID(inode->ID()),
+		fParent(parent),
+		fParentID(parent != NULL ? parent->ID() : 0),
+		fMode(mode),
+		fOpenMode(openMode),
+		fType(type)
+	{
+		if (name != NULL)
+			strlcpy(fName, name, sizeof(fName));
+		else
+			fName[0] = '\0';
 
-			Initialized();
-		}
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("bfs:Create %Ld (%p), parent %Ld (%p), \"%s\", "
-				"mode %lx, omode %x, type %lx", fID, fInode, fParentID,
-				fParent, fName, fMode, fOpenMode, fType);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("bfs:Create %Ld (%p), parent %Ld (%p), \"%s\", "
+			"mode %lx, omode %x, type %lx", fID, fInode, fParentID,
+			fParent, fName, fMode, fOpenMode, fType);
+	}
 
-	private:
-		Inode*	fInode;
-		ino_t	fID;
-		Inode*	fParent;
-		ino_t	fParentID;
-		char	fName[32];
-		int32	fMode;
-		int		fOpenMode;
-		uint32	fType;
-
+private:
+	Inode*	fInode;
+	ino_t	fID;
+	Inode*	fParent;
+	ino_t	fParentID;
+	char	fName[32];
+	int32	fMode;
+	int		fOpenMode;
+	uint32	fType;
 };
 
 class Remove : public AbstractTraceEntry {
-	public:
-		Remove(Inode* inode, const char* name)
-			:
-			fInode(inode),
-			fID(inode->ID())
-		{
-			strlcpy(fName, name, sizeof(fName));
-			Initialized();
-		}
+public:
+	Remove(Inode* inode, const char* name)
+		:
+		fInode(inode),
+		fID(inode->ID())
+	{
+		strlcpy(fName, name, sizeof(fName));
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("bfs:Remove %Ld (%p), \"%s\"", fID, fInode, fName);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("bfs:Remove %Ld (%p), \"%s\"", fID, fInode, fName);
+	}
 
-	private:
-		Inode*	fInode;
-		ino_t	fID;
-		char	fName[32];
+private:
+	Inode*	fInode;
+	ino_t	fID;
+	char	fName[32];
 };
 
 class Action : public AbstractTraceEntry {
-	public:
-		Action(const char* action, Inode* inode)
-			:
-			fInode(inode),
-			fID(inode->ID())
-		{
-			strlcpy(fAction, action, sizeof(fAction));
-			Initialized();
-		}
+public:
+	Action(const char* action, Inode* inode)
+		:
+		fInode(inode),
+		fID(inode->ID())
+	{
+		strlcpy(fAction, action, sizeof(fAction));
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("bfs:%s %Ld (%p)\n", fAction, fID, fInode);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("bfs:%s %Ld (%p)\n", fAction, fID, fInode);
+	}
 
-	private:
-		Inode*	fInode;
-		ino_t	fID;
-		char	fAction[16];
+private:
+	Inode*	fInode;
+	ino_t	fID;
+	char	fAction[16];
 };
 
 class Resize : public AbstractTraceEntry {
-	public:
-		Resize(Inode* inode, off_t oldSize, off_t newSize, bool trim)
-			:
-			fInode(inode),
-			fID(inode->ID()),
-			fOldSize(oldSize),
-			fNewSize(newSize),
-			fTrim(trim)
-		{
-			Initialized();
-		}
+public:
+	Resize(Inode* inode, off_t oldSize, off_t newSize, bool trim)
+		:
+		fInode(inode),
+		fID(inode->ID()),
+		fOldSize(oldSize),
+		fNewSize(newSize),
+		fTrim(trim)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("bfs:%s %Ld (%p), %Ld -> %Ld", fTrim ? "Trim" : "Resize",
-				fID, fInode, fOldSize, fNewSize);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("bfs:%s %Ld (%p), %Ld -> %Ld", fTrim ? "Trim" : "Resize",
+			fID, fInode, fOldSize, fNewSize);
+	}
 
-	private:
-		Inode*	fInode;
-		ino_t	fID;
-		off_t	fOldSize;
-		off_t	fNewSize;
-		bool	fTrim;
+private:
+	Inode*	fInode;
+	ino_t	fID;
+	off_t	fOldSize;
+	off_t	fNewSize;
+	bool	fTrim;
 };
 
 }	// namespace BFSInodeTracing
@@ -134,25 +133,27 @@ class Resize : public AbstractTraceEntry {
 #endif
 
 class InodeAllocator {
-	public:
-		InodeAllocator(Transaction &transaction);
-		~InodeAllocator();
+public:
+							InodeAllocator(Transaction& transaction);
+							~InodeAllocator();
 
-		status_t New(block_run *parentRun, mode_t mode, block_run &run,
-			fs_vnode_ops *vnodeOps, Inode **_inode);
-		status_t CreateTree();
-		status_t Keep(fs_vnode_ops *vnodeOps, uint32 publishFlags);
+			status_t		New(block_run* parentRun, mode_t mode,
+								block_run& run, fs_vnode_ops* vnodeOps,
+								Inode** _inode);
+			status_t		CreateTree();
+			status_t		Keep(fs_vnode_ops* vnodeOps, uint32 publishFlags);
 
-	private:
-		static void _TransactionListener(int32 id, int32 event, void *_inode);
+private:
+	static	void			_TransactionListener(int32 id, int32 event,
+								void* _inode);
 
-		Transaction *fTransaction;
-		block_run fRun;
-		Inode *fInode;
+			Transaction*	fTransaction;
+			block_run		fRun;
+			Inode*			fInode;
 };
 
 
-InodeAllocator::InodeAllocator(Transaction &transaction)
+InodeAllocator::InodeAllocator(Transaction& transaction)
 	:
 	fTransaction(&transaction),
 	fInode(NULL)
@@ -163,7 +164,7 @@ InodeAllocator::InodeAllocator(Transaction &transaction)
 InodeAllocator::~InodeAllocator()
 {
 	if (fTransaction != NULL) {
-		Volume *volume = fTransaction->GetVolume();
+		Volume* volume = fTransaction->GetVolume();
 
 		if (fInode != NULL) {
 			fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
@@ -179,10 +180,10 @@ InodeAllocator::~InodeAllocator()
 
 
 status_t
-InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
-	fs_vnode_ops *vnodeOps, Inode **_inode)
+InodeAllocator::New(block_run* parentRun, mode_t mode, block_run& run,
+	fs_vnode_ops* vnodeOps, Inode** _inode)
 {
-	Volume *volume = fTransaction->GetVolume();
+	Volume* volume = fTransaction->GetVolume();
 
 	status_t status = volume->AllocateForInode(*fTransaction, parentRun, mode,
 		fRun);
@@ -217,13 +218,13 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
 status_t
 InodeAllocator::CreateTree()
 {
-	Volume *volume = fTransaction->GetVolume();
+	Volume* volume = fTransaction->GetVolume();
 
 	// force S_STR_INDEX to be set, if no type is set
 	if ((fInode->Mode() & S_INDEX_TYPES) == 0)
 		fInode->Node().mode |= HOST_ENDIAN_TO_BFS_INT32(S_STR_INDEX);
 
-	BPlusTree *tree = fInode->fTree = new BPlusTree(*fTransaction, fInode);
+	BPlusTree* tree = fInode->fTree = new BPlusTree(*fTransaction, fInode);
 	if (tree == NULL || tree->InitCheck() < B_OK)
 		return B_ERROR;
 
@@ -238,10 +239,10 @@ InodeAllocator::CreateTree()
 
 
 status_t
-InodeAllocator::Keep(fs_vnode_ops *vnodeOps, uint32 publishFlags)
+InodeAllocator::Keep(fs_vnode_ops* vnodeOps, uint32 publishFlags)
 {
 	ASSERT(fInode != NULL && fTransaction != NULL);
-	Volume *volume = fTransaction->GetVolume();
+	Volume* volume = fTransaction->GetVolume();
 
 	status_t status = fInode->WriteBack(*fTransaction);
 	if (status < B_OK) {
@@ -268,9 +269,9 @@ InodeAllocator::Keep(fs_vnode_ops *vnodeOps, uint32 publishFlags)
 
 
 /*static*/ void
-InodeAllocator::_TransactionListener(int32 id, int32 event, void *_inode)
+InodeAllocator::_TransactionListener(int32 id, int32 event, void* _inode)
 {
-	Inode *inode = (Inode *)_inode;
+	Inode* inode = (Inode*)_inode;
 
 	if (event == TRANSACTION_ABORTED)
 		panic("transaction %d aborted, inode %p still around!\n", (int)id, inode);
@@ -281,7 +282,7 @@ InodeAllocator::_TransactionListener(int32 id, int32 event, void *_inode)
 
 
 status_t
-bfs_inode::InitCheck(Volume *volume)
+bfs_inode::InitCheck(Volume* volume)
 {
 	if (Magic1() != INODE_MAGIC1
 		|| !(Flags() & INODE_IN_USE)
@@ -312,7 +313,7 @@ bfs_inode::InitCheck(Volume *volume)
 //	#pragma mark - Inode
 
 
-Inode::Inode(Volume *volume, ino_t id)
+Inode::Inode(Volume* volume, ino_t id)
 	:
 	fVolume(volume),
 	fID(id),
@@ -346,8 +347,8 @@ Inode::Inode(Volume *volume, ino_t id)
 }
 
 
-Inode::Inode(Volume *volume, Transaction &transaction, ino_t id, mode_t mode,
-		block_run &run)
+Inode::Inode(Volume* volume, Transaction& transaction, ino_t id, mode_t mode,
+		block_run& run)
 	:
 	fVolume(volume),
 	fID(id),
@@ -437,7 +438,7 @@ Inode::InitCheck(bool checkNode)
 
 
 status_t
-Inode::WriteBack(Transaction &transaction)
+Inode::WriteBack(Transaction& transaction)
 {
 	NodeGetter node(fVolume, transaction, this);
 	if (node.WritableNode() == NULL)
@@ -455,7 +456,7 @@ Inode::CheckPermissions(int accessMode) const
 	gid_t group = getegid();
 
 	// you never have write access to a read-only volume
-	if (accessMode & W_OK && fVolume->IsReadOnly())
+	if ((accessMode & W_OK) != 0 && fVolume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
 	// root users always have full access (but they can't execute files without
@@ -485,7 +486,7 @@ Inode::CheckPermissions(int accessMode) const
 
 
 void
-Inode::_AddIterator(AttributeIterator *iterator)
+Inode::_AddIterator(AttributeIterator* iterator)
 {
 	RecursiveLocker _(fSmallDataLock);
 	fIterators.Add(iterator);
@@ -493,7 +494,7 @@ Inode::_AddIterator(AttributeIterator *iterator)
 
 
 void
-Inode::_RemoveIterator(AttributeIterator *iterator)
+Inode::_RemoveIterator(AttributeIterator* iterator)
 {
 	RecursiveLocker _(fSmallDataLock);
 	fIterators.Remove(iterator);
@@ -505,13 +506,14 @@ Inode::_RemoveIterator(AttributeIterator *iterator)
 	You need to hold the fSmallDataLock when you call this method
 */
 status_t
-Inode::_MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node,
-	const char *name, int32 bytes)
+Inode::_MakeSpaceForSmallData(Transaction& transaction, bfs_inode* node,
+	const char* name, int32 bytes)
 {
 	ASSERT_LOCKED_RECURSIVE(&fSmallDataLock);
 
 	while (bytes > 0) {
-		small_data *item = node->SmallDataStart(), *max = NULL;
+		small_data* item = node->SmallDataStart();
+		small_data* max = NULL;
 		int32 index = 0, maxIndex = 0;
 		for (; !item->IsLast(node); item = item->Next(), index++) {
 			// should not remove those
@@ -537,7 +539,7 @@ Inode::_MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node,
 		// Move the attribute to a real attribute file
 		// Luckily, this doesn't cause any index updates
 
-		Inode *attribute;
+		Inode* attribute;
 		status_t status = CreateAttribute(transaction, item->Name(),
 			item->Type(), &attribute);
 		if (status < B_OK)
@@ -550,7 +552,7 @@ Inode::_MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node,
 
 		if (status < B_OK) {
 			Vnode vnode(fVolume, Attributes());
-			Inode *attributes;
+			Inode* attributes;
 			if (vnode.Get(&attributes) < B_OK
 				|| attributes->Remove(transaction, name) < B_OK) {
 				FATAL(("Could not remove newly created attribute!\n"));
@@ -570,28 +572,28 @@ Inode::_MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node,
 	You need to hold the fSmallDataLock when you call this method
 */
 status_t
-Inode::_RemoveSmallData(bfs_inode *node, small_data *item, int32 index)
+Inode::_RemoveSmallData(bfs_inode* node, small_data* item, int32 index)
 {
 	ASSERT_LOCKED_RECURSIVE(&fSmallDataLock);
 
-	small_data *next = item->Next();
+	small_data* next = item->Next();
 	if (!next->IsLast(node)) {
 		// find the last attribute
-		small_data *last = next;
+		small_data* last = next;
 		while (!last->IsLast(node))
 			last = last->Next();
 
-		int32 size = (uint8 *)last - (uint8 *)next;
+		int32 size = (uint8*)last - (uint8*)next;
 		if (size < 0
-			|| size > (uint8 *)node + fVolume->BlockSize() - (uint8 *)next)
+			|| size > (uint8*)node + fVolume->BlockSize() - (uint8*)next)
 			return B_BAD_DATA;
 
 		memmove(item, next, size);
 
 		// Move the "last" one to its new location and
 		// correctly terminate the small_data section
-		last = (small_data *)((uint8 *)last - ((uint8 *)next - (uint8 *)item));
-		memset(last, 0, (uint8 *)node + fVolume->BlockSize() - (uint8 *)last);
+		last = (small_data*)((uint8*)last - ((uint8*)next - (uint8*)item));
+		memset(last, 0, (uint8*)node + fVolume->BlockSize() - (uint8*)last);
 	} else
 		memset(item, 0, item->Size());
 
@@ -608,18 +610,18 @@ Inode::_RemoveSmallData(bfs_inode *node, small_data *item, int32 index)
 
 //!	Removes the given attribute from the small_data section.
 status_t
-Inode::_RemoveSmallData(Transaction &transaction, NodeGetter &nodeGetter,
-	const char *name)
+Inode::_RemoveSmallData(Transaction& transaction, NodeGetter& nodeGetter,
+	const char* name)
 {
 	if (name == NULL)
 		return B_BAD_VALUE;
 
-	bfs_inode *node = nodeGetter.WritableNode();
+	bfs_inode* node = nodeGetter.WritableNode();
 	RecursiveLocker locker(fSmallDataLock);
 
 	// search for the small_data item
 
-	small_data *item = node->SmallDataStart();
+	small_data* item = node->SmallDataStart();
 	int32 index = 0;
 	while (!item->IsLast(node) && strcmp(item->Name(), name)) {
 		item = item->Next();
@@ -650,11 +652,11 @@ Inode::_RemoveSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 	in most cases...
 */
 status_t
-Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
-	const char *name, uint32 type, const uint8 *data, size_t length, bool force)
+Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
+	const char* name, uint32 type, const uint8* data, size_t length, bool force)
 {
 	// TODO: support new write attr semantics and write offset!
-	bfs_inode *node = nodeGetter.WritableNode();
+	bfs_inode* node = nodeGetter.WritableNode();
 
 	if (node == NULL || name == NULL || data == NULL)
 		return B_BAD_VALUE;
@@ -669,7 +671,7 @@ Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 	RecursiveLocker locker(fSmallDataLock);
 
 	// Find the last item or one with the same name we have to add
-	small_data *item = node->SmallDataStart();
+	small_data* item = node->SmallDataStart();
 	int32 index = 0;
 	while (!item->IsLast(node) && strcmp(item->Name(), name)) {
 		item = item->Next();
@@ -680,24 +682,24 @@ Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 	// then just replace the data part of that one
 	if (!item->IsLast(node)) {
 		// find last attribute
-		small_data *last = item;
+		small_data* last = item;
 		while (!last->IsLast(node))
 			last = last->Next();
 
 		// try to change the attributes value
 		if (item->data_size > length
 			|| force
-			|| ((uint8 *)last + length - item->DataSize())
-					<= ((uint8 *)node + fVolume->InodeSize())) {
+			|| ((uint8*)last + length - item->DataSize())
+					<= ((uint8*)node + fVolume->InodeSize())) {
 			// Make room for the new attribute if needed (and we are forced
 			// to do so)
-			if (force && ((uint8 *)last + length - item->DataSize())
-					> ((uint8 *)node + fVolume->InodeSize())) {
+			if (force && ((uint8*)last + length - item->DataSize())
+					> ((uint8*)node + fVolume->InodeSize())) {
 				// We also take the free space at the end of the small_data
 				// section into account, and request only what's really needed
 				uint32 needed = length - item->DataSize() -
-					(uint32)((uint8 *)node + fVolume->InodeSize()
-						- (uint8 *)last);
+					(uint32)((uint8*)node + fVolume->InodeSize()
+						- (uint8*)last);
 
 				if (_MakeSpaceForSmallData(transaction, node, name, needed)
 						< B_OK)
@@ -720,19 +722,19 @@ Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 			// is specified by the type and does not change that often
 			if (length != item->DataSize()) {
 				// move the attributes after the current one
-				small_data *next = item->Next();
+				small_data* next = item->Next();
 				if (!next->IsLast(node)) {
-					memmove((uint8 *)item + spaceNeeded, next,
-						(uint8 *)last - (uint8 *)next);
+					memmove((uint8*)item + spaceNeeded, next,
+						(uint8*)last - (uint8*)next);
 				}
 
 				// Move the "last" one to its new location and
 				// correctly terminate the small_data section
-				last = (small_data *)((uint8 *)last
-					- ((uint8 *)next - ((uint8 *)item + spaceNeeded)));
-				if ((uint8 *)last < (uint8 *)node + fVolume->BlockSize()) {
-					memset(last, 0, (uint8 *)node + fVolume->BlockSize()
-						- (uint8 *)last);
+				last = (small_data*)((uint8*)last
+					- ((uint8*)next - ((uint8*)item + spaceNeeded)));
+				if ((uint8*)last < (uint8*)node + fVolume->BlockSize()) {
+					memset(last, 0, (uint8*)node + fVolume->BlockSize()
+						- (uint8*)last);
 				}
 
 				item->data_size = HOST_ENDIAN_TO_BFS_INT16(length);
@@ -750,7 +752,7 @@ Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 
 	// try to add the new attribute!
 
-	if ((uint8 *)item + spaceNeeded > (uint8 *)node + fVolume->InodeSize()) {
+	if ((uint8*)item + spaceNeeded > (uint8*)node + fVolume->InodeSize()) {
 		// there is not enough space for it!
 		if (!force)
 			return B_DEVICE_FULL;
@@ -778,7 +780,7 @@ Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 	// correctly terminate the small_data section
 	item = item->Next();
 	if (!item->IsLast(node))
-		memset(item, 0, (uint8 *)node + fVolume->InodeSize() - (uint8 *)item);
+		memset(item, 0, (uint8*)node + fVolume->InodeSize() - (uint8*)item);
 
 	// update all current iterators
 	SinglyLinkedList<AttributeIterator>::Iterator iterator
@@ -794,7 +796,7 @@ Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 /*!	Iterates through the small_data section of an inode.
 	To start at the beginning of this section, you let smallData
 	point to NULL, like:
-		small_data *data = NULL;
+		small_data* data = NULL;
 		while (inode->GetNextSmallData(&data) { ... }
 
 	This function is reentrant and doesn't allocate any memory;
@@ -803,14 +805,14 @@ Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 	You need to hold the fSmallDataLock when you call this method
 */
 status_t
-Inode::_GetNextSmallData(bfs_inode *node, small_data **_smallData) const
+Inode::_GetNextSmallData(bfs_inode* node, small_data** _smallData) const
 {
 	if (node == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	ASSERT_LOCKED_RECURSIVE(&fSmallDataLock);
 
-	small_data *data = *_smallData;
+	small_data* data = *_smallData;
 
 	// begin from the start?
 	if (data == NULL)
@@ -832,13 +834,13 @@ Inode::_GetNextSmallData(bfs_inode *node, small_data **_smallData) const
 	returns a pointer to it (or NULL if it doesn't exist).
 	You need to hold the fSmallDataLock when you call this method
 */
-small_data *
-Inode::FindSmallData(const bfs_inode *node, const char *name) const
+small_data*
+Inode::FindSmallData(const bfs_inode* node, const char* name) const
 {
 	ASSERT_LOCKED_RECURSIVE(&fSmallDataLock);
 
-	small_data *smallData = NULL;
-	while (_GetNextSmallData(const_cast<bfs_inode *>(node), &smallData)
+	small_data* smallData = NULL;
+	while (_GetNextSmallData(const_cast<bfs_inode*>(node), &smallData)
 			== B_OK) {
 		if (!strcmp(smallData->Name(), name))
 			return smallData;
@@ -851,16 +853,16 @@ Inode::FindSmallData(const bfs_inode *node, const char *name) const
 	section, NULL otherwise.
 	You need to hold the fSmallDataLock when you call this method
 */
-const char *
-Inode::Name(const bfs_inode *node) const
+const char*
+Inode::Name(const bfs_inode* node) const
 {
 	ASSERT_LOCKED_RECURSIVE(&fSmallDataLock);
 
-	small_data *smallData = NULL;
-	while (_GetNextSmallData((bfs_inode *)node, &smallData) == B_OK) {
+	small_data* smallData = NULL;
+	while (_GetNextSmallData((bfs_inode*)node, &smallData) == B_OK) {
 		if (*smallData->Name() == FILE_NAME_NAME
 			&& smallData->NameSize() == FILE_NAME_NAME_LENGTH)
-			return (const char *)smallData->Data();
+			return (const char*)smallData->Data();
 	}
 	return NULL;
 }
@@ -870,12 +872,12 @@ Inode::Name(const bfs_inode *node) const
 	The buffer should be B_FILE_NAME_LENGTH bytes large.
 */
 status_t
-Inode::GetName(char *buffer, size_t size) const
+Inode::GetName(char* buffer, size_t size) const
 {
 	NodeGetter node(fVolume, this);
 	RecursiveLocker locker(fSmallDataLock);
 
-	const char *name = Name(node.Node());
+	const char* name = Name(node.Node());
 	if (name == NULL)
 		return B_ENTRY_NOT_FOUND;
 
@@ -891,7 +893,7 @@ Inode::GetName(char *buffer, size_t size) const
 	(and for the same reason).
 */
 status_t
-Inode::SetName(Transaction &transaction, const char *name)
+Inode::SetName(Transaction& transaction, const char* name)
 {
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
@@ -900,24 +902,24 @@ Inode::SetName(Transaction &transaction, const char *name)
 	const char nameTag[2] = {FILE_NAME_NAME, 0};
 
 	return _AddSmallData(transaction, node, nameTag, FILE_NAME_TYPE,
-		(uint8 *)name, strlen(name), true);
+		(uint8*)name, strlen(name), true);
 }
 
 
 status_t
-Inode::_RemoveAttribute(Transaction &transaction, const char *name,
-	bool hasIndex, Index *index)
+Inode::_RemoveAttribute(Transaction& transaction, const char* name,
+	bool hasIndex, Index* index)
 {
 	// remove the attribute file if it exists
 	Vnode vnode(fVolume, Attributes());
-	Inode *attributes;
+	Inode* attributes;
 	status_t status = vnode.Get(&attributes);
 	if (status < B_OK)
 		return status;
 
 	// update index
 	if (index != NULL) {
-		Inode *attribute;
+		Inode* attribute;
 		if ((hasIndex || fVolume->CheckForLiveQuery(name))
 			&& GetAttribute(name, &attribute) == B_OK) {
 			uint8 data[BPLUSTREE_MAX_KEY_LENGTH];
@@ -956,8 +958,8 @@ Inode::_RemoveAttribute(Transaction &transaction, const char *name,
 	in the small_data section as well as real attribute files.
 */
 status_t
-Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer,
-	size_t *_length)
+Inode::ReadAttribute(const char* name, int32 type, off_t pos, uint8* buffer,
+	size_t* _length)
 {
 	if (pos < 0)
 		pos = 0;
@@ -967,7 +969,7 @@ Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer,
 		NodeGetter node(fVolume, this);
 		RecursiveLocker locker(fSmallDataLock);
 
-		small_data *smallData = FindSmallData(node.Node(), name);
+		small_data* smallData = FindSmallData(node.Node(), name);
 		if (smallData != NULL) {
 			size_t length = *_length;
 			if (pos >= smallData->data_size) {
@@ -984,10 +986,10 @@ Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer,
 	}
 
 	// search in the attribute directory
-	Inode *attribute;
+	Inode* attribute;
 	status_t status = GetAttribute(name, &attribute);
 	if (status == B_OK) {
-		status = attribute->ReadAt(pos, (uint8 *)buffer, _length);
+		status = attribute->ReadAt(pos, (uint8*)buffer, _length);
 
 		ReleaseAttribute(attribute);
 	}
@@ -1001,8 +1003,8 @@ Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer,
 	in the small_data section as well as real attribute files.
 */
 status_t
-Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
-	off_t pos, const uint8 *buffer, size_t *_length)
+Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
+	off_t pos, const uint8* buffer, size_t* _length)
 {
 	// needed to maintain the index
 	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH], *oldData = NULL;
@@ -1018,7 +1020,7 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 	Index index(fVolume);
 	index.SetTo(name);
 
-	Inode *attribute = NULL;
+	Inode* attribute = NULL;
 	status_t status = B_OK;
 
 	if (GetAttribute(name, &attribute) < B_OK) {
@@ -1026,7 +1028,7 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 		NodeGetter node(fVolume, transaction, this);
 		recursive_lock_lock(&fSmallDataLock);
 
-		small_data *smallData = FindSmallData(node.Node(), name);
+		small_data* smallData = FindSmallData(node.Node(), name);
 		if (smallData != NULL) {
 			oldLength = smallData->DataSize();
 			if (oldLength > 0) {
@@ -1120,7 +1122,7 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 	in the small_data section as well as real attribute files.
 */
 status_t
-Inode::RemoveAttribute(Transaction &transaction, const char *name)
+Inode::RemoveAttribute(Transaction& transaction, const char* name)
 {
 	Index index(fVolume);
 	bool hasIndex = index.SetTo(name) == B_OK;
@@ -1130,7 +1132,7 @@ Inode::RemoveAttribute(Transaction &transaction, const char *name)
 	{
 		RecursiveLocker _(fSmallDataLock);
 
-		small_data *smallData = FindSmallData(node.Node(), name);
+		small_data* smallData = FindSmallData(node.Node(), name);
 		if (smallData != NULL) {
 			uint32 length = smallData->DataSize();
 			if (length > BPLUSTREE_MAX_KEY_LENGTH)
@@ -1150,30 +1152,30 @@ Inode::RemoveAttribute(Transaction &transaction, const char *name)
 
 
 status_t
-Inode::GetAttribute(const char *name, Inode **_attribute)
+Inode::GetAttribute(const char* name, Inode** _attribute)
 {
 	// does this inode even have attributes?
 	if (Attributes().IsZero())
 		return B_ENTRY_NOT_FOUND;
 
 	Vnode vnode(fVolume, Attributes());
-	Inode *attributes;
+	Inode* attributes;
 	if (vnode.Get(&attributes) < B_OK) {
 		FATAL(("get_vnode() failed in Inode::GetAttribute(name = \"%s\")\n",
 			name));
 		return B_ERROR;
 	}
 
-	BPlusTree *tree;
+	BPlusTree* tree;
 	status_t status = attributes->GetTree(&tree);
 	if (status == B_OK) {
 		InodeReadLocker locker(attributes);
 
 		ino_t id;
-		status = tree->Find((uint8 *)name, (uint16)strlen(name), &id);
+		status = tree->Find((uint8*)name, (uint16)strlen(name), &id);
 		if (status == B_OK) {
 			Vnode vnode(fVolume, id);
-			Inode *inode;
+			Inode* inode;
 			// Check if the attribute is really an attribute
 			if (vnode.Get(&inode) < B_OK || !inode->IsAttribute())
 				return B_ERROR;
@@ -1188,7 +1190,7 @@ Inode::GetAttribute(const char *name, Inode **_attribute)
 
 
 void
-Inode::ReleaseAttribute(Inode *attribute)
+Inode::ReleaseAttribute(Inode* attribute)
 {
 	if (attribute == NULL)
 		return;
@@ -1198,8 +1200,8 @@ Inode::ReleaseAttribute(Inode *attribute)
 
 
 status_t
-Inode::CreateAttribute(Transaction &transaction, const char *name, uint32 type,
-	Inode **attribute)
+Inode::CreateAttribute(Transaction& transaction, const char* name, uint32 type,
+	Inode** attribute)
 {
 	// do we need to create the attribute directory first?
 	if (Attributes().IsZero()) {
@@ -1209,7 +1211,7 @@ Inode::CreateAttribute(Transaction &transaction, const char *name, uint32 type,
 			RETURN_ERROR(status);
 	}
 	Vnode vnode(fVolume, Attributes());
-	Inode *attributes;
+	Inode* attributes;
 	if (vnode.Get(&attributes) < B_OK)
 		return B_ERROR;
 
@@ -1228,7 +1230,7 @@ Inode::CreateAttribute(Transaction &transaction, const char *name, uint32 type,
 	and should work as good (though a bit slower).
 */
 status_t
-Inode::GetTree(BPlusTree **tree)
+Inode::GetTree(BPlusTree** tree)
 {
 	if (fTree) {
 		*tree = fTree;
@@ -1242,7 +1244,7 @@ Inode::GetTree(BPlusTree **tree)
 bool
 Inode::IsEmpty()
 {
-	BPlusTree *tree;
+	BPlusTree* tree;
 	status_t status = GetTree(&tree);
 	if (status < B_OK)
 		return status;
@@ -1280,9 +1282,9 @@ Inode::IsEmpty()
 	The caller has to make sure that "pos" is inside the stream.
 */
 status_t
-Inode::FindBlockRun(off_t pos, block_run &run, off_t &offset)
+Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 {
-	data_stream *data = &Node().data;
+	data_stream* data = &Node().data;
 
 	// find matching block run
 
@@ -1301,14 +1303,14 @@ Inode::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 			int32 index = start / indirectSize;
 			int32 runsPerBlock = cached.BlockSize() / sizeof(block_run);
 
-			block_run *indirect = (block_run *)cached.SetTo(
+			block_run* indirect = (block_run*)cached.SetTo(
 				fVolume->ToBlock(data->double_indirect) + index / runsPerBlock);
 			if (indirect == NULL)
 				RETURN_ERROR(B_ERROR);
 
 			int32 current = (start % indirectSize) / directSize;
 
-			indirect = (block_run *)cached.SetTo(
+			indirect = (block_run*)cached.SetTo(
 				fVolume->ToBlock(indirect[index % runsPerBlock])
 				+ current / runsPerBlock);
 			if (indirect == NULL)
@@ -1327,7 +1329,7 @@ Inode::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 			off_t block = fVolume->ToBlock(data->indirect);
 
 			for (int32 i = 0; i < data->indirect.Length(); i++) {
-				block_run *indirect = (block_run *)cached.SetTo(block + i);
+				block_run* indirect = (block_run*)cached.SetTo(block + i);
 				if (indirect == NULL)
 					RETURN_ERROR(B_IO_ERROR);
 
@@ -1374,7 +1376,7 @@ Inode::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 
 
 status_t
-Inode::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
+Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 {
 	size_t length = *_length;
 
@@ -1396,8 +1398,8 @@ Inode::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 
 status_t
-Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
-	size_t *_length)
+Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
+	size_t* _length)
 {
 	InodeReadLocker locker(this);
 
@@ -1494,7 +1496,7 @@ Inode::FillGapWithZeros(off_t pos, off_t newSize)
 	The allocated block_run is saved in "run"
 */
 status_t
-Inode::_AllocateBlockArray(Transaction &transaction, block_run &run)
+Inode::_AllocateBlockArray(Transaction& transaction, block_run& run)
 {
 	if (!run.IsZero())
 		return B_BAD_VALUE;
@@ -1509,7 +1511,7 @@ Inode::_AllocateBlockArray(Transaction &transaction, block_run &run)
 	off_t block = fVolume->ToBlock(run);
 
 	for (int32 i = 0; i < run.Length(); i++) {
-		block_run *runs = (block_run *)cached.SetToWritable(transaction,
+		block_run* runs = (block_run*)cached.SetToWritable(transaction,
 			block + i, true);
 		if (runs == NULL)
 			return B_IO_ERROR;
@@ -1519,9 +1521,9 @@ Inode::_AllocateBlockArray(Transaction &transaction, block_run &run)
 
 
 status_t
-Inode::_GrowStream(Transaction &transaction, off_t size)
+Inode::_GrowStream(Transaction& transaction, off_t size)
 {
-	data_stream *data = &Node().data;
+	data_stream* data = &Node().data;
 
 	// is the data stream already large enough to hold the new size?
 	// (can be the case with preallocated blocks)
@@ -1625,7 +1627,7 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 		if (data->Size() <= data->MaxIndirectRange()
 			|| !data->MaxIndirectRange()) {
 			CachedBlock cached(fVolume);
-			block_run *runs = NULL;
+			block_run* runs = NULL;
 			uint32 free = 0;
 			off_t block;
 
@@ -1638,7 +1640,7 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 				data->max_indirect_range = HOST_ENDIAN_TO_BFS_INT64(
 					data->MaxDirectRange());
 				// insert the block_run in the first block
-				runs = (block_run *)cached.SetTo(data->indirect);
+				runs = (block_run*)cached.SetTo(data->indirect);
 			} else {
 				uint32 numberOfRuns = fVolume->BlockSize() / sizeof(block_run);
 				block = fVolume->ToBlock(data->indirect);
@@ -1646,7 +1648,7 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 				// search first empty entry
 				int32 i = 0;
 				for (; i < data->indirect.Length(); i++) {
-					if ((runs = (block_run *)cached.SetTo(block + i)) == NULL)
+					if ((runs = (block_run*)cached.SetTo(block + i)) == NULL)
 						return B_IO_ERROR;
 
 					for (free = 0; free < numberOfRuns; free++)
@@ -1743,13 +1745,13 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 
 			CachedBlock cached(fVolume);
 			CachedBlock cachedDirect(fVolume);
-			block_run *array = NULL;
+			block_run* array = NULL;
 			uint32 runLength = run.Length();
 
 			while (run.length != 0) {
 				// get the indirect array block
 				if (array == NULL) {
-					array = (block_run *)cached.SetTo(fVolume->ToBlock(
+					array = (block_run*)cached.SetTo(fVolume->ToBlock(
 						data->double_indirect) + indirectIndex / runsPerBlock);
 					if (array == NULL)
 						return B_IO_ERROR;
@@ -1766,7 +1768,7 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 							return status;
 					}
 
-					block_run *runs = (block_run *)cachedDirect.SetToWritable(
+					block_run* runs = (block_run*)cachedDirect.SetToWritable(
 						transaction, fVolume->ToBlock(array[indirectIndex
 							% runsPerBlock]) + index / runsPerBlock);
 					if (runs == NULL)
@@ -1811,8 +1813,8 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 
 
 status_t
-Inode::_FreeStaticStreamArray(Transaction &transaction, int32 level,
-	block_run run, off_t size, off_t offset, off_t &max)
+Inode::_FreeStaticStreamArray(Transaction& transaction, int32 level,
+	block_run run, off_t size, off_t offset, off_t& max)
 {
 	int32 indirectSize = 0;
 	if (level == 0)
@@ -1837,7 +1839,7 @@ Inode::_FreeStaticStreamArray(Transaction &transaction, int32 level,
 	offset += (off_t)index * indirectSize;
 
 	for (int32 i = index / runsPerBlock; i < run.Length(); i++) {
-		block_run *array = (block_run *)cached.SetToWritable(transaction,
+		block_run* array = (block_run*)cached.SetToWritable(transaction,
 			blockNumber + i);
 		if (array == NULL)
 			RETURN_ERROR(B_ERROR);
@@ -1880,8 +1882,8 @@ Inode::_FreeStaticStreamArray(Transaction &transaction, int32 level,
 	"max" is considered to be in file system byte order.
 */
 status_t
-Inode::_FreeStreamArray(Transaction &transaction, block_run *array,
-	uint32 arrayLength, off_t size, off_t &offset, off_t &max)
+Inode::_FreeStreamArray(Transaction& transaction, block_run* array,
+	uint32 arrayLength, off_t size, off_t& offset, off_t& max)
 {
 	PRINT(("FreeStreamArray: arrayLength %lu, size %Ld, offset %Ld, max %Ld\n",
 		arrayLength, size, offset, max));
@@ -1932,17 +1934,17 @@ Inode::_FreeStreamArray(Transaction &transaction, block_run *array,
 
 
 status_t
-Inode::_ShrinkStream(Transaction &transaction, off_t size)
+Inode::_ShrinkStream(Transaction& transaction, off_t size)
 {
-	data_stream *data = &Node().data;
+	data_stream* data = &Node().data;
 	status_t status;
 
 	if (data->MaxDoubleIndirectRange() > size) {
-		off_t *maxDoubleIndirect = &data->max_double_indirect_range;
+		off_t* maxDoubleIndirect = &data->max_double_indirect_range;
 			// gcc 4 work-around: "error: cannot bind packed field
 			// 'data->data_stream::max_double_indirect_range' to 'off_t&'"
 		status = _FreeStaticStreamArray(transaction, 0, data->double_indirect,
-			size, data->MaxIndirectRange(), *maxDoubleIndirect);
+			size, data->MaxIndirectRange(),* maxDoubleIndirect);
 		if (status < B_OK)
 			return status;
 
@@ -1959,12 +1961,12 @@ Inode::_ShrinkStream(Transaction &transaction, off_t size)
 		off_t offset = data->MaxDirectRange();
 
 		for (int32 i = 0; i < data->indirect.Length(); i++) {
-			block_run *array = (block_run *)cached.SetToWritable(transaction,
+			block_run* array = (block_run*)cached.SetToWritable(transaction,
 				block + i);
 			if (array == NULL)
 				break;
 
-			off_t *maxIndirect = &data->max_indirect_range;
+			off_t* maxIndirect = &data->max_indirect_range;
 				// gcc 4 work-around: "error: cannot bind packed field
 				// 'data->data_stream::max_indirect_range' to 'off_t&'"
 			if (_FreeStreamArray(transaction, array, fVolume->BlockSize()
@@ -1995,7 +1997,7 @@ Inode::_ShrinkStream(Transaction &transaction, off_t size)
 
 
 status_t
-Inode::SetFileSize(Transaction &transaction, off_t size)
+Inode::SetFileSize(Transaction& transaction, off_t size)
 {
 	if (size < 0)
 		return B_BAD_VALUE;
@@ -2030,7 +2032,7 @@ Inode::SetFileSize(Transaction &transaction, off_t size)
 
 
 status_t
-Inode::Append(Transaction &transaction, off_t bytes)
+Inode::Append(Transaction& transaction, off_t bytes)
 {
 	return SetFileSize(transaction, Size() + bytes);
 }
@@ -2059,7 +2061,7 @@ Inode::NeedsTrimming()
 
 
 status_t
-Inode::TrimPreallocation(Transaction &transaction)
+Inode::TrimPreallocation(Transaction& transaction)
 {
 	T(Resize(this, max_c(Node().data.MaxDirectRange(),
 		Node().data.MaxIndirectRange()), Size(), true));
@@ -2074,7 +2076,7 @@ Inode::TrimPreallocation(Transaction &transaction)
 
 //!	Frees the file's data stream and removes all attributes
 status_t
-Inode::Free(Transaction &transaction)
+Inode::Free(Transaction& transaction)
 {
 	FUNCTION();
 
@@ -2122,7 +2124,7 @@ Inode::Sync()
 
 	InodeReadLocker locker(this);
 
-	data_stream *data = &Node().data;
+	data_stream* data = &Node().data;
 	status_t status = B_OK;
 
 	// flush direct range
@@ -2147,7 +2149,7 @@ Inode::Sync()
 	int32 count = fVolume->BlockSize() / sizeof(block_run);
 
 	for (int32 j = 0; j < data->indirect.Length(); j++) {
-		block_run *runs = (block_run *)cached.SetTo(block + j);
+		block_run* runs = (block_run*)cached.SetTo(block + j);
 		if (runs == NULL)
 			break;
 
@@ -2170,7 +2172,7 @@ Inode::Sync()
 	off_t indirectBlock = fVolume->ToBlock(data->double_indirect);
 
 	for (int32 l = 0; l < data->double_indirect.Length(); l++) {
-		block_run *indirectRuns = (block_run *)cached.SetTo(indirectBlock + l);
+		block_run* indirectRuns = (block_run*)cached.SetTo(indirectBlock + l);
 		if (indirectRuns == NULL)
 			return B_FILE_ERROR;
 
@@ -2182,7 +2184,7 @@ Inode::Sync()
 
 			block = fVolume->ToBlock(indirectRuns[k]);
 			for (int32 j = 0; j < indirectRuns[k].Length(); j++) {
-				block_run *runs = (block_run *)directCached.SetTo(block + j);
+				block_run* runs = (block_run*)directCached.SetTo(block + j);
 				if (runs == NULL)
 					return B_FILE_ERROR;
 
@@ -2208,10 +2210,10 @@ Inode::Sync()
 
 
 status_t
-Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
+Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	bool isDirectory)
 {
-	BPlusTree *tree;
+	BPlusTree* tree;
 	if (GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
@@ -2219,14 +2221,14 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 
 	// does the file even exist?
 	off_t id;
-	if (tree->Find((uint8 *)name, (uint16)strlen(name), &id) < B_OK)
+	if (tree->Find((uint8*)name, (uint16)strlen(name), &id) < B_OK)
 		return B_ENTRY_NOT_FOUND;
 
 	if (_id)
 		*_id = id;
 
 	Vnode vnode(fVolume, id);
-	Inode *inode;
+	Inode* inode;
 	status_t status = vnode.Get(&inode);
 	if (status < B_OK) {
 		REPORT_ERROR(status);
@@ -2261,7 +2263,7 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 	}
 
 #ifdef DEBUG
-	if (tree->Find((uint8 *)name, (uint16)strlen(name), &id) == B_OK) {
+	if (tree->Find((uint8*)name, (uint16)strlen(name), &id) == B_OK) {
 		DIE(("deleted entry still there"));
 	}
 #endif
@@ -2306,15 +2308,15 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 	has been specified, the file will also be truncated.
 */
 status_t
-Inode::Create(Transaction &transaction, Inode *parent, const char *name,
-	int32 mode, int openMode, uint32 type, bool *_created, ino_t *_id,
-	Inode **_inode, fs_vnode_ops *vnodeOps, uint32 publishFlags)
+Inode::Create(Transaction& transaction, Inode* parent, const char* name,
+	int32 mode, int openMode, uint32 type, bool* _created, ino_t* _id,
+	Inode** _inode, fs_vnode_ops* vnodeOps, uint32 publishFlags)
 {
 	FUNCTION_START(("name = %s, mode = %ld\n", name, mode));
 
 	block_run parentRun = parent ? parent->BlockRun() : block_run::Run(0, 0, 0);
-	Volume *volume = transaction.GetVolume();
-	BPlusTree *tree = NULL;
+	Volume* volume = transaction.GetVolume();
+	BPlusTree* tree = NULL;
 
 	if (parent && (mode & S_ATTR_DIR) == 0 && parent->IsContainer()) {
 		// check if the file already exists in the directory
@@ -2339,14 +2341,14 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 	if (tree != NULL) {
 		// Does the file already exist?
 		off_t offset;
-		if (tree->Find((uint8 *)name, (uint16)strlen(name), &offset) == B_OK) {
+		if (tree->Find((uint8*)name, (uint16)strlen(name), &offset) == B_OK) {
 			// Return if the file should be a directory/link or opened in
 			// exclusive mode
 			if (S_ISDIR(mode) || S_ISLNK(mode) || openMode & O_EXCL)
 				return B_FILE_EXISTS;
 
 			Vnode vnode(volume, offset);
-			Inode *inode;
+			Inode* inode;
 			status_t status = vnode.Get(&inode);
 			if (status < B_OK) {
 				REPORT_ERROR(status);
@@ -2404,7 +2406,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 	// allocate space for the new inode
 	InodeAllocator allocator(transaction);
 	block_run run;
-	Inode *inode;
+	Inode* inode;
 	status = allocator.New(&parentRun, mode, run, vnodeOps, &inode);
 	if (status < B_OK)
 		return status;
@@ -2414,7 +2416,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 	// Initialize the parts of the bfs_inode structure that
 	// InodeAllocator::New() hasn't touched yet
 
-	bfs_inode *node = &inode->Node();
+	bfs_inode* node = &inode->Node();
 
 	if (parent == NULL) {
 		// we set the parent to itself in this case
@@ -2525,7 +2527,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 //	#pragma mark - AttributeIterator
 
 
-AttributeIterator::AttributeIterator(Inode *inode)
+AttributeIterator::AttributeIterator(Inode* inode)
 	:
 	fCurrentSmallData(0),
 	fInode(inode),
@@ -2560,15 +2562,15 @@ AttributeIterator::Rewind()
 
 
 status_t
-AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type,
-	ino_t *_id)
+AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
+	ino_t* _id)
 {
 	// read attributes out of the small data section
 
 	if (fCurrentSmallData >= 0) {
 		NodeGetter nodeGetter(fInode->GetVolume(), fInode);
-		const bfs_inode *node = nodeGetter.Node();
-		const small_data *item = ((bfs_inode *)node)->SmallDataStart();
+		const bfs_inode* node = nodeGetter.Node();
+		const small_data* item = ((bfs_inode*)node)->SmallDataStart();
 
 		RecursiveLocker _(&fInode->SmallDataLock());
 
@@ -2607,18 +2609,18 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type,
 	if (fInode->Attributes().IsZero())
 		return B_ENTRY_NOT_FOUND;
 
-	Volume *volume = fInode->GetVolume();
+	Volume* volume = fInode->GetVolume();
 
 	// if you haven't yet access to the attributes directory, get it
 	if (fAttributes == NULL) {
 		if (get_vnode(volume->FSVolume(), volume->ToVnode(fInode->Attributes()),
-				(void **)&fAttributes) != B_OK) {
+				(void**)&fAttributes) != B_OK) {
 			FATAL(("get_vnode() failed in AttributeIterator::GetNext(ino_t"
 				" = %Ld,name = \"%s\")\n",fInode->ID(),name));
 			return B_ENTRY_NOT_FOUND;
 		}
 
-		BPlusTree *tree;
+		BPlusTree* tree;
 		if (fAttributes->GetTree(&tree) < B_OK
 			|| (fIterator = new TreeIterator(tree)) == NULL) {
 			FATAL(("could not get tree in AttributeIterator::GetNext(ino_t"
@@ -2635,7 +2637,7 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type,
 		return status;
 
 	Vnode vnode(volume,id);
-	Inode *attribute;
+	Inode* attribute;
 	if ((status = vnode.Get(&attribute)) == B_OK) {
 		*_type = attribute->Type();
 		*_length = length;

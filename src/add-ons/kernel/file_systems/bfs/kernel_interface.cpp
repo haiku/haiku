@@ -24,13 +24,13 @@ struct identify_cookie {
 	disk_super_block super_block;
 };
 
-extern void fill_stat_buffer(Inode *inode, struct stat &stat);
+extern void fill_stat_buffer(Inode* inode, struct stat& stat);
 
 
 void
-fill_stat_buffer(Inode *inode, struct stat &stat)
+fill_stat_buffer(Inode* inode, struct stat& stat)
 {
-	const bfs_inode &node = inode->Node();
+	const bfs_inode& node = inode->Node();
 
 	stat.st_dev = inode->GetVolume()->ID();
 	stat.st_ino = inode->ID();
@@ -56,20 +56,20 @@ fill_stat_buffer(Inode *inode, struct stat &stat)
 
 //!	bfs_io() callback hook
 static status_t
-iterative_io_get_vecs_hook(void* cookie, io_request *request, off_t offset,
-	size_t size, struct file_io_vec *vecs, size_t *_count)
+iterative_io_get_vecs_hook(void* cookie, io_request* request, off_t offset,
+	size_t size, struct file_io_vec* vecs, size_t* _count)
 {
-	Inode *inode = (Inode*)cookie;
+	Inode* inode = (Inode*)cookie;
 	return file_map_translate(inode->Map(), offset, size, vecs, _count);
 }
 
 
 //!	bfs_io() callback hook
 static status_t
-iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
+iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
 	bool partialTransfer, size_t bytesTransferred)
 {
-	Inode *inode = (Inode*)cookie;
+	Inode* inode = (Inode*)cookie;
 
 	rw_lock_read_unlock(&inode->Lock());
 	return B_OK;
@@ -80,14 +80,14 @@ iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
 
 
 static float
-bfs_identify_partition(int fd, partition_data *partition, void **_cookie)
+bfs_identify_partition(int fd, partition_data* partition, void** _cookie)
 {
 	disk_super_block superBlock;
 	status_t status = Volume::Identify(fd, &superBlock);
 	if (status != B_OK)
 		return status;
 
-	identify_cookie *cookie = new(std::nothrow) identify_cookie;
+	identify_cookie* cookie = new(std::nothrow) identify_cookie;
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
@@ -99,9 +99,9 @@ bfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 
 static status_t
-bfs_scan_partition(int fd, partition_data *partition, void *_cookie)
+bfs_scan_partition(int fd, partition_data* partition, void* _cookie)
 {
-	identify_cookie *cookie = (identify_cookie *)_cookie;
+	identify_cookie* cookie = (identify_cookie*)_cookie;
 
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_FILE_SYSTEM;
@@ -117,9 +117,9 @@ bfs_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 
 static void
-bfs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
+bfs_free_identify_partition_cookie(partition_data* partition, void* _cookie)
 {
-	identify_cookie *cookie = (identify_cookie *)_cookie;
+	identify_cookie* cookie = (identify_cookie*)_cookie;
 	delete cookie;
 }
 
@@ -128,12 +128,12 @@ bfs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 
 static status_t
-bfs_mount(fs_volume *_volume, const char *device, uint32 flags,
-	const char *args, ino_t *_rootID)
+bfs_mount(fs_volume* _volume, const char* device, uint32 flags,
+	const char* args, ino_t* _rootID)
 {
 	FUNCTION();
 
-	Volume *volume = new(std::nothrow) Volume(_volume);
+	Volume* volume = new(std::nothrow) Volume(_volume);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 
@@ -154,10 +154,10 @@ bfs_mount(fs_volume *_volume, const char *device, uint32 flags,
 
 
 static status_t
-bfs_unmount(fs_volume *_volume)
+bfs_unmount(fs_volume* _volume)
 {
 	FUNCTION();
-	Volume* volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	status_t status = volume->Unmount();
 	delete volume;
@@ -167,11 +167,11 @@ bfs_unmount(fs_volume *_volume)
 
 
 static status_t
-bfs_read_fs_stat(fs_volume *_volume, struct fs_info *info)
+bfs_read_fs_stat(fs_volume* _volume, struct fs_info* info)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 	MutexLocker locker(volume->Lock());
 
 	// File system flags.
@@ -196,11 +196,11 @@ bfs_read_fs_stat(fs_volume *_volume, struct fs_info *info)
 
 
 static status_t
-bfs_write_fs_stat(fs_volume *_volume, const struct fs_info *info, uint32 mask)
+bfs_write_fs_stat(fs_volume* _volume, const struct fs_info* info, uint32 mask)
 {
 	FUNCTION_START(("mask = %ld\n", mask));
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
@@ -209,7 +209,7 @@ bfs_write_fs_stat(fs_volume *_volume, const struct fs_info *info, uint32 mask)
 	status_t status = B_BAD_VALUE;
 
 	if (mask & FS_WRITE_FSINFO_NAME) {
-		disk_super_block &superBlock = volume->SuperBlock();
+		disk_super_block& superBlock = volume->SuperBlock();
 
 		strncpy(superBlock.name, info->volume_name,
 			sizeof(superBlock.name) - 1);
@@ -222,11 +222,11 @@ bfs_write_fs_stat(fs_volume *_volume, const struct fs_info *info, uint32 mask)
 
 
 static status_t
-bfs_sync(fs_volume *_volume)
+bfs_sync(fs_volume* _volume)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 	return volume->Sync();
 }
 
@@ -237,11 +237,11 @@ bfs_sync(fs_volume *_volume)
 /*!	Reads in the node from disk and creates an inode object from it.
 */
 static status_t
-bfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
-	uint32 *_flags, bool reenter)
+bfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
+	uint32* _flags, bool reenter)
 {
 	//FUNCTION_START(("ino_t = %Ld\n", id));
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	// first inode may be after the log area, we don't go through
 	// the hassle and try to load an earlier block from disk
@@ -252,7 +252,7 @@ bfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 	}
 
 	CachedBlock cached(volume, id);
-	bfs_inode *node = (bfs_inode *)cached.Block();
+	bfs_inode* node = (bfs_inode*)cached.Block();
 	if (node == NULL) {
 		FATAL(("could not read inode: %Ld\n", id));
 		return B_IO_ERROR;
@@ -264,7 +264,7 @@ bfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 		return status;
 	}
 
-	Inode *inode = new(std::nothrow) Inode(volume, id);
+	Inode* inode = new(std::nothrow) Inode(volume, id);
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
@@ -284,10 +284,10 @@ bfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 
 
 static status_t
-bfs_put_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
+bfs_put_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 {
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	// since a directory's size can be changed without having it opened,
 	// we need to take care about their preallocated blocks here
@@ -308,12 +308,12 @@ bfs_put_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 
 
 static status_t
-bfs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
+bfs_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	// The "chkbfs" functionality uses this flag to prevent the space used
 	// up by the inode from being freed - this flag is set only in situations
@@ -344,7 +344,7 @@ bfs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 
 
 static bool
-bfs_can_page(fs_volume *_volume, fs_vnode *_v, void *_cookie)
+bfs_can_page(fs_volume* _volume, fs_vnode* _v, void* _cookie)
 {
 	// TODO: we're obviously not even asked...
 	return false;
@@ -352,11 +352,11 @@ bfs_can_page(fs_volume *_volume, fs_vnode *_v, void *_cookie)
 
 
 static status_t
-bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+bfs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
@@ -394,11 +394,11 @@ bfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 
 static status_t
-bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+bfs_write_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -439,10 +439,10 @@ bfs_write_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 
 static status_t
-bfs_io(fs_volume *_volume, fs_vnode *_node, void *_cookie, io_request *request)
+bfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 {
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -459,11 +459,11 @@ bfs_io(fs_volume *_volume, fs_vnode *_node, void *_cookie, io_request *request)
 
 
 static status_t
-bfs_get_file_map(fs_volume *_volume, fs_vnode *_node, off_t offset, size_t size,
-	struct file_io_vec *vecs, size_t *_count)
+bfs_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset, size_t size,
+	struct file_io_vec* vecs, size_t* _count)
 {
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	int32 blockShift = volume->BlockShift();
 	uint32 index = 0, max = *_count;
@@ -513,11 +513,11 @@ bfs_get_file_map(fs_volume *_volume, fs_vnode *_node, off_t offset, size_t size,
 
 
 static status_t
-bfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
-	ino_t *_vnodeID)
+bfs_lookup(fs_volume* _volume, fs_vnode* _directory, const char* file,
+	ino_t* _vnodeID)
 {
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *directory = (Inode *)_directory->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
 
 	InodeReadLocker locker(directory);
 
@@ -526,11 +526,11 @@ bfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
-	BPlusTree *tree;
+	BPlusTree* tree;
 	if (directory->GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	status = tree->Find((uint8 *)file, (uint16)strlen(file), _vnodeID);
+	status = tree->Find((uint8*)file, (uint16)strlen(file), _vnodeID);
 	if (status < B_OK) {
 		//PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
 		return status;
@@ -538,8 +538,8 @@ bfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 
 	locker.Unlock();
 
-	Inode *inode;
-	status = get_vnode(volume->FSVolume(), *_vnodeID, (void **)&inode);
+	Inode* inode;
+	status = get_vnode(volume->FSVolume(), *_vnodeID, (void**)&inode);
 	if (status != B_OK) {
 		REPORT_ERROR(status);
 		return B_ENTRY_NOT_FOUND;
@@ -550,29 +550,29 @@ bfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 
 
 static status_t
-bfs_get_vnode_name(fs_volume *_volume, fs_vnode *_node, char *buffer,
+bfs_get_vnode_name(fs_volume* _volume, fs_vnode* _node, char* buffer,
 	size_t bufferSize)
 {
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 
 	return inode->GetName(buffer, bufferSize);
 }
 
 
 static status_t
-bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
-	void *buffer, size_t bufferLength)
+bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
+	void* buffer, size_t bufferLength)
 {
 	FUNCTION_START(("node = %p, cmd = %lu, buf = %p, len = %ld\n", _node, cmd,
 		buffer, bufferLength));
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	switch (cmd) {
 		case BFS_IOCTL_VERSION:
 		{
-			uint32 *version = (uint32 *)buffer;
+			uint32 *version = (uint32*)buffer;
 
 			*version = 0x10000;
 			return B_OK;
@@ -580,8 +580,8 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 		case BFS_IOCTL_START_CHECKING:
 		{
 			// start checking
-			BlockAllocator &allocator = volume->Allocator();
-			check_control *control = (check_control *)buffer;
+			BlockAllocator& allocator = volume->Allocator();
+			check_control* control = (check_control*)buffer;
 
 			status_t status = allocator.StartChecking(control);
 			if (status == B_OK)
@@ -592,8 +592,8 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 		case BFS_IOCTL_STOP_CHECKING:
 		{
 			// stop checking
-			BlockAllocator &allocator = volume->Allocator();
-			check_control *control = (check_control *)buffer;
+			BlockAllocator& allocator = volume->Allocator();
+			check_control* control = (check_control*)buffer;
 
 			status_t status = allocator.StopChecking(control);
 			if (status == B_OK)
@@ -604,8 +604,8 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 		case BFS_IOCTL_CHECK_NEXT_NODE:
 		{
 			// check next
-			BlockAllocator &allocator = volume->Allocator();
-			check_control *control = (check_control *)buffer;
+			BlockAllocator& allocator = volume->Allocator();
+			check_control* control = (check_control*)buffer;
 
 			return allocator.CheckNextNode(control);
 		}
@@ -614,7 +614,7 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 			// let's makebootable (or anyone else) update the boot block
 			// while BFS is mounted
 			if (user_memcpy(&volume->SuperBlock().pad_to_block,
-					(uint8 *)buffer + offsetof(disk_super_block, pad_to_block),
+					(uint8*)buffer + offsetof(disk_super_block, pad_to_block),
 					sizeof(volume->SuperBlock().pad_to_block)) < B_OK)
 				return B_BAD_ADDRESS;
 
@@ -625,7 +625,7 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 		{
 			// allocate all free blocks and zero them out
 			// (a test for the BlockAllocator)!
-			BlockAllocator &allocator = volume->Allocator();
+			BlockAllocator& allocator = volume->Allocator();
 			Transaction transaction(volume, 0);
 			CachedBlock cached(volume);
 			block_run run;
@@ -634,7 +634,7 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 				PRINT(("write block_run(%ld, %d, %d)\n", run.allocation_group,
 					run.start, run.length));
 				for (int32 i = 0;i < run.length;i++) {
-					uint8 *block = cached.SetToWritable(transaction, run);
+					uint8* block = cached.SetToWritable(transaction, run);
 					if (block != NULL)
 						memset(block, 0, volume->BlockSize());
 				}
@@ -652,11 +652,11 @@ bfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, ulong cmd,
 	for a file system.
 */
 static status_t
-bfs_set_flags(fs_volume *_volume, fs_vnode *_node, void *_cookie, int flags)
+bfs_set_flags(fs_volume* _volume, fs_vnode* _node, void* _cookie, int flags)
 {
 	FUNCTION_START(("node = %p, flags = %d", _node, flags));
 
-	file_cookie *cookie = (file_cookie *)_cookie;
+	file_cookie* cookie = (file_cookie*)_cookie;
 	cookie->open_mode = (cookie->open_mode & ~O_APPEND) | (flags & O_APPEND);
 
 	return B_OK;
@@ -664,34 +664,34 @@ bfs_set_flags(fs_volume *_volume, fs_vnode *_node, void *_cookie, int flags)
 
 
 static status_t
-bfs_fsync(fs_volume *_volume, fs_vnode *_node)
+bfs_fsync(fs_volume* _volume, fs_vnode* _node)
 {
 	FUNCTION();
 
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 	return inode->Sync();
 }
 
 
 static status_t
-bfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
+bfs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 {
 	FUNCTION();
 
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 	fill_stat_buffer(inode, *stat);
 	return B_OK;
 }
 
 
 static status_t
-bfs_write_stat(fs_volume *_volume, fs_vnode *_node, const struct stat *stat,
+bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 	uint32 mask)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -706,7 +706,7 @@ bfs_write_stat(fs_volume *_volume, fs_vnode *_node, const struct stat *stat,
 	Transaction transaction(volume, inode->BlockNumber());
 	inode->WriteLockInTransaction(transaction);
 
-	bfs_inode &node = inode->Node();
+	bfs_inode& node = inode->Node();
 
 	if (mask & B_STAT_SIZE) {
 		// Since WSTAT_SIZE is the only thing that can fail directly, we
@@ -775,13 +775,13 @@ bfs_write_stat(fs_volume *_volume, fs_vnode *_node, const struct stat *stat,
 
 
 status_t
-bfs_create(fs_volume *_volume, fs_vnode *_directory, const char *name,
-	int openMode, int mode, void **_cookie, ino_t *_vnodeID)
+bfs_create(fs_volume* _volume, fs_vnode* _directory, const char* name,
+	int openMode, int mode, void** _cookie, ino_t* _vnodeID)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d, openMode = %d\n", name, mode, openMode));
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *directory = (Inode *)_directory->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -791,7 +791,7 @@ bfs_create(fs_volume *_volume, fs_vnode *_directory, const char *name,
 
 	// We are creating the cookie at this point, so that we don't have
 	// to remove the inode if we don't have enough free memory later...
-	file_cookie *cookie = new(std::nothrow) file_cookie;
+	file_cookie* cookie = new(std::nothrow) file_cookie;
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -824,13 +824,13 @@ bfs_create(fs_volume *_volume, fs_vnode *_directory, const char *name,
 
 
 static status_t
-bfs_create_symlink(fs_volume *_volume, fs_vnode *_directory, const char *name,
-	const char *path, int mode)
+bfs_create_symlink(fs_volume* _volume, fs_vnode* _directory, const char* name,
+	const char* path, int mode)
 {
 	FUNCTION_START(("name = \"%s\", path = \"%s\"\n", name, path));
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *directory = (Inode *)_directory->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -844,7 +844,7 @@ bfs_create_symlink(fs_volume *_volume, fs_vnode *_directory, const char *name,
 
 	Transaction transaction(volume, directory->BlockNumber());
 
-	Inode *link;
+	Inode* link;
 	off_t id;
 	status = Inode::Create(transaction, directory, name, S_SYMLINK | 0777,
 		0, 0, NULL, &id, &link);
@@ -864,7 +864,7 @@ bfs_create_symlink(fs_volume *_volume, fs_vnode *_directory, const char *name,
 
 		// The following call will have to write the inode back, so
 		// we don't have to do that here...
-		status = link->WriteAt(transaction, 0, (const uint8 *)path, &length);
+		status = link->WriteAt(transaction, 0, (const uint8*)path, &length);
 	}
 
 	if (status == B_OK)
@@ -886,7 +886,7 @@ bfs_create_symlink(fs_volume *_volume, fs_vnode *_directory, const char *name,
 
 
 status_t
-bfs_link(fs_volume *_volume, fs_vnode *dir, const char *name, fs_vnode *node)
+bfs_link(fs_volume* _volume, fs_vnode* dir, const char* name, fs_vnode* node)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
 
@@ -897,15 +897,15 @@ bfs_link(fs_volume *_volume, fs_vnode *dir, const char *name, fs_vnode *node)
 
 
 status_t
-bfs_unlink(fs_volume *_volume, fs_vnode *_directory, const char *name)
+bfs_unlink(fs_volume* _volume, fs_vnode* _directory, const char* name)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
 
 	if (!strcmp(name, "..") || !strcmp(name, "."))
 		return B_NOT_ALLOWED;
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *directory = (Inode *)_directory->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
 
 	status_t status = directory->CheckPermissions(W_OK);
 	if (status < B_OK)
@@ -924,8 +924,8 @@ bfs_unlink(fs_volume *_volume, fs_vnode *_directory, const char *name)
 
 
 status_t
-bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
-	fs_vnode *_newDir, const char *newName)
+bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
+	fs_vnode* _newDir, const char* newName)
 {
 	FUNCTION_START(("oldDir = %p, oldName = \"%s\", newDir = %p, newName = \"%s\"\n", _oldDir, oldName, _newDir, newName));
 
@@ -935,9 +935,9 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 		|| strchr(newName, '/') != NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *oldDirectory = (Inode *)_oldDir->private_node;
-	Inode *newDirectory = (Inode *)_newDir->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* oldDirectory = (Inode*)_oldDir->private_node;
+	Inode* newDirectory = (Inode*)_newDir->private_node;
 
 	// are we already done?
 	if (oldDirectory == newDirectory && !strcmp(oldName, newName))
@@ -958,18 +958,18 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 
 	// Get the directory's tree, and a pointer to the inode which should be
 	// changed
-	BPlusTree *tree;
+	BPlusTree* tree;
 	status = oldDirectory->GetTree(&tree);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
 	off_t id;
-	status = tree->Find((const uint8 *)oldName, strlen(oldName), &id);
+	status = tree->Find((const uint8*)oldName, strlen(oldName), &id);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
 	Vnode vnode(volume, id);
-	Inode *inode;
+	Inode* inode;
 	if (vnode.Get(&inode) < B_OK)
 		return B_IO_ERROR;
 
@@ -989,7 +989,7 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 				break;
 
 			Vnode vnode(volume, parent);
-			Inode *parentNode;
+			Inode* parentNode;
 			if (vnode.Get(&parentNode) < B_OK)
 				return B_ERROR;
 
@@ -1002,27 +1002,27 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 	// First, try to make sure there is nothing that will stop us in
 	// the target directory - since this is the only non-critical
 	// failure, we will test this case first
-	BPlusTree *newTree = tree;
+	BPlusTree* newTree = tree;
 	if (newDirectory != oldDirectory) {
 		status = newDirectory->GetTree(&newTree);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 	}
 
-	status = newTree->Insert(transaction, (const uint8 *)newName,
+	status = newTree->Insert(transaction, (const uint8*)newName,
 		strlen(newName), id);
 	if (status == B_NAME_IN_USE) {
 		// If there is already a file with that name, we have to remove
 		// it, as long it's not a directory with files in it
 		off_t clobber;
-		if (newTree->Find((const uint8 *)newName, strlen(newName), &clobber)
+		if (newTree->Find((const uint8*)newName, strlen(newName), &clobber)
 				< B_OK)
 			return B_NAME_IN_USE;
 		if (clobber == id)
 			return B_BAD_VALUE;
 
 		Vnode vnode(volume, clobber);
-		Inode *other;
+		Inode* other;
 		if (vnode.Get(&other) < B_OK)
 			return B_NAME_IN_USE;
 
@@ -1038,7 +1038,7 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 		notify_entry_removed(volume->ID(), newDirectory->ID(), newName,
 			clobber);
 
-		status = newTree->Insert(transaction, (const uint8 *)newName,
+		status = newTree->Insert(transaction, (const uint8*)newName,
 			strlen(newName), id);
 	}
 	if (status < B_OK)
@@ -1058,18 +1058,18 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 	}
 
 	if (status == B_OK) {
-		status = tree->Remove(transaction, (const uint8 *)oldName,
+		status = tree->Remove(transaction, (const uint8*)oldName,
 			strlen(oldName), id);
 		if (status == B_OK) {
 			inode->Parent() = newDirectory->BlockRun();
 
 			// if it's a directory, update the parent directory pointer
 			// in its tree if necessary
-			BPlusTree *movedTree = NULL;
+			BPlusTree* movedTree = NULL;
 			if (oldDirectory != newDirectory
 				&& inode->IsDirectory()
 				&& (status = inode->GetTree(&movedTree)) == B_OK) {
-				status = movedTree->Replace(transaction, (const uint8 *)"..",
+				status = movedTree->Replace(transaction, (const uint8*)"..",
 					2, newDirectory->ID());
 			}
 
@@ -1091,12 +1091,12 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 
 
 static status_t
-bfs_open(fs_volume *_volume, fs_vnode *_node, int openMode, void **_cookie)
+bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	// opening a directory read-only is allowed, although you can't read
 	// any data from it.
@@ -1120,7 +1120,7 @@ bfs_open(fs_volume *_volume, fs_vnode *_node, int openMode, void **_cookie)
 	// This could greatly speed up continuous reads of big files, especially
 	// in the indirect block section.
 
-	file_cookie *cookie = new(std::nothrow) file_cookie;
+	file_cookie* cookie = new(std::nothrow) file_cookie;
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -1161,28 +1161,28 @@ bfs_open(fs_volume *_volume, fs_vnode *_node, int openMode, void **_cookie)
 
 
 static status_t
-bfs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
-	void *buffer, size_t *_length)
+bfs_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
+	void* buffer, size_t* _length)
 {
 	//FUNCTION();
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 
 	if (!inode->HasUserAccessableStream()) {
 		*_length = 0;
 		return inode->IsDirectory() ? B_IS_A_DIRECTORY : B_BAD_VALUE;
 	}
 
-	return inode->ReadAt(pos, (uint8 *)buffer, _length);
+	return inode->ReadAt(pos, (uint8*)buffer, _length);
 }
 
 
 static status_t
-bfs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
-	const void *buffer, size_t *_length)
+bfs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
+	const void* buffer, size_t* _length)
 {
 	//FUNCTION();
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -1192,7 +1192,7 @@ bfs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		return inode->IsDirectory() ? B_IS_A_DIRECTORY : B_BAD_VALUE;
 	}
 
-	file_cookie *cookie = (file_cookie *)_cookie;
+	file_cookie* cookie = (file_cookie*)_cookie;
 
 	if (cookie->open_mode & O_APPEND)
 		pos = inode->Size();
@@ -1202,7 +1202,7 @@ bfs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		// it might not be needed at all (the contents of
 		// regular files aren't logged)
 
-	status_t status = inode->WriteAt(transaction, pos, (const uint8 *)buffer,
+	status_t status = inode->WriteAt(transaction, pos, (const uint8*)buffer,
 		_length);
 	if (status == B_OK) {
 		transaction.Done();
@@ -1226,7 +1226,7 @@ bfs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 
 
 static status_t
-bfs_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
+bfs_close(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	FUNCTION();
 	return B_OK;
@@ -1234,13 +1234,13 @@ bfs_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 
 
 static status_t
-bfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
+bfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	FUNCTION();
 
-	file_cookie *cookie = (file_cookie *)_cookie;
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	file_cookie* cookie = (file_cookie*)_cookie;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	Transaction transaction;
 	bool needsTrimming = false;
@@ -1315,11 +1315,11 @@ bfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 	is not allowed.
 */
 static status_t
-bfs_access(fs_volume *_volume, fs_vnode *_node, int accessMode)
+bfs_access(fs_volume* _volume, fs_vnode* _node, int accessMode)
 {
 	//FUNCTION();
 
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 	status_t status = inode->CheckPermissions(accessMode);
 	if (status < B_OK)
 		RETURN_ERROR(status);
@@ -1329,12 +1329,12 @@ bfs_access(fs_volume *_volume, fs_vnode *_node, int accessMode)
 
 
 static status_t
-bfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
-	size_t *_bufferSize)
+bfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
+	size_t* _bufferSize)
 {
 	FUNCTION();
 
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 
 	if (!inode->IsSymLink())
 		RETURN_ERROR(B_BAD_VALUE);
@@ -1343,7 +1343,7 @@ bfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 		if (inode->Size() < *_bufferSize)
 			*_bufferSize = inode->Size();
 
-		status_t status = inode->ReadAt(0, (uint8 *)buffer, _bufferSize);
+		status_t status = inode->ReadAt(0, (uint8*)buffer, _bufferSize);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 
@@ -1354,9 +1354,7 @@ bfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 	if (linkLen < *_bufferSize)
 		*_bufferSize = linkLen;
 
-	memcpy(buffer, inode->Node().short_symlink, *_bufferSize);
-
-	return B_OK;
+	return user_memcpy(buffer, inode->Node().short_symlink, *_bufferSize);
 }
 
 
@@ -1364,13 +1362,13 @@ bfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 
 
 static status_t
-bfs_create_dir(fs_volume *_volume, fs_vnode *_directory, const char *name,
-	int mode, ino_t *_newVnodeID)
+bfs_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name,
+	int mode, ino_t* _newVnodeID)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d\n", name, mode));
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *directory = (Inode *)_directory->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -1402,12 +1400,12 @@ bfs_create_dir(fs_volume *_volume, fs_vnode *_directory, const char *name,
 
 
 static status_t
-bfs_remove_dir(fs_volume *_volume, fs_vnode *_directory, const char *name)
+bfs_remove_dir(fs_volume* _volume, fs_vnode* _directory, const char* name)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *directory = (Inode *)_directory->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
 
 	Transaction transaction(volume, directory->BlockNumber());
 
@@ -1427,11 +1425,11 @@ bfs_remove_dir(fs_volume *_volume, fs_vnode *_directory, const char *name)
 	bfs_open_dir() is also used by bfs_open_index_dir().
 */
 static status_t
-bfs_open_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
+bfs_open_dir(fs_volume* _volume, fs_vnode* _node, void** _cookie)
 {
 	FUNCTION();
 
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 	status_t status = inode->CheckPermissions(R_OK);
 	if (status < B_OK)
 		RETURN_ERROR(status);
@@ -1441,11 +1439,11 @@ bfs_open_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 	if (!inode->IsContainer())
 		RETURN_ERROR(B_BAD_VALUE);
 
-	BPlusTree *tree;
+	BPlusTree* tree;
 	if (inode->GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	TreeIterator *iterator = new(std::nothrow) TreeIterator(tree);
+	TreeIterator* iterator = new(std::nothrow) TreeIterator(tree);
 	if (iterator == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -1455,12 +1453,12 @@ bfs_open_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 
 
 static status_t
-bfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	struct dirent *dirent, size_t bufferSize, uint32 *_num)
+bfs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	struct dirent* dirent, size_t bufferSize, uint32* _num)
 {
 	FUNCTION();
 
-	TreeIterator *iterator = (TreeIterator *)_cookie;
+	TreeIterator* iterator = (TreeIterator*)_cookie;
 
 	uint16 length;
 	ino_t id;
@@ -1472,7 +1470,7 @@ bfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	} else if (status != B_OK)
 		RETURN_ERROR(status);
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	dirent->d_dev = volume->ID();
 	dirent->d_ino = id;
@@ -1486,17 +1484,17 @@ bfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 /*!	Sets the TreeIterator back to the beginning of the directory. */
 static status_t
-bfs_rewind_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void *_cookie)
+bfs_rewind_dir(fs_volume* /*_volume*/, fs_vnode* /*node*/, void* _cookie)
 {
 	FUNCTION();
-	TreeIterator *iterator = (TreeIterator *)_cookie;
+	TreeIterator* iterator = (TreeIterator*)_cookie;
 
 	return iterator->Rewind();
 }
 
 
 static status_t
-bfs_close_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void * /*_cookie*/)
+bfs_close_dir(fs_volume* /*_volume*/, fs_vnode* /*node*/, void* /*_cookie*/)
 {
 	FUNCTION();
 	return B_OK;
@@ -1504,9 +1502,9 @@ bfs_close_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void * /*_cookie*/)
 
 
 static status_t
-bfs_free_dir_cookie(fs_volume *_volume, fs_vnode *node, void *_cookie)
+bfs_free_dir_cookie(fs_volume* _volume, fs_vnode* node, void* _cookie)
 {
-	delete (TreeIterator *)_cookie;
+	delete (TreeIterator*)_cookie;
 	return B_OK;
 }
 
@@ -1515,13 +1513,13 @@ bfs_free_dir_cookie(fs_volume *_volume, fs_vnode *node, void *_cookie)
 
 
 static status_t
-bfs_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
+bfs_open_attr_dir(fs_volume* _volume, fs_vnode* _node, void** _cookie)
 {
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 
 	FUNCTION();
 
-	AttributeIterator *iterator = new(std::nothrow) AttributeIterator(inode);
+	AttributeIterator* iterator = new(std::nothrow) AttributeIterator(inode);
 	if (iterator == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -1531,7 +1529,7 @@ bfs_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 
 
 static status_t
-bfs_close_attr_dir(fs_volume *_volume, fs_vnode *node, void *cookie)
+bfs_close_attr_dir(fs_volume* _volume, fs_vnode* node, void* cookie)
 {
 	FUNCTION();
 	return B_OK;
@@ -1539,10 +1537,10 @@ bfs_close_attr_dir(fs_volume *_volume, fs_vnode *node, void *cookie)
 
 
 static status_t
-bfs_free_attr_dir_cookie(fs_volume *_volume, fs_vnode *node, void *_cookie)
+bfs_free_attr_dir_cookie(fs_volume* _volume, fs_vnode* node, void* _cookie)
 {
 	FUNCTION();
-	AttributeIterator *iterator = (AttributeIterator *)_cookie;
+	AttributeIterator* iterator = (AttributeIterator*)_cookie;
 
 	delete iterator;
 	return B_OK;
@@ -1550,21 +1548,21 @@ bfs_free_attr_dir_cookie(fs_volume *_volume, fs_vnode *node, void *_cookie)
 
 
 static status_t
-bfs_rewind_attr_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
+bfs_rewind_attr_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	FUNCTION();
 
-	AttributeIterator *iterator = (AttributeIterator *)_cookie;
+	AttributeIterator* iterator = (AttributeIterator*)_cookie;
 	RETURN_ERROR(iterator->Rewind());
 }
 
 
 static status_t
-bfs_read_attr_dir(fs_volume *_volume, fs_vnode *node, void *_cookie,
-	struct dirent *dirent, size_t bufferSize, uint32 *_num)
+bfs_read_attr_dir(fs_volume* _volume, fs_vnode* node, void* _cookie,
+	struct dirent* dirent, size_t bufferSize, uint32* _num)
 {
 	FUNCTION();
-	AttributeIterator *iterator = (AttributeIterator *)_cookie;
+	AttributeIterator* iterator = (AttributeIterator*)_cookie;
 
 	uint32 type;
 	size_t length;
@@ -1577,7 +1575,7 @@ bfs_read_attr_dir(fs_volume *_volume, fs_vnode *node, void *_cookie,
 		RETURN_ERROR(status);
 	}
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	dirent->d_dev = volume->ID();
 	dirent->d_reclen = sizeof(struct dirent) + length;
@@ -1588,44 +1586,44 @@ bfs_read_attr_dir(fs_volume *_volume, fs_vnode *node, void *_cookie,
 
 
 static status_t
-bfs_create_attr(fs_volume *_volume, fs_vnode *_node, const char *name,
-	uint32 type, int openMode, void **_cookie)
+bfs_create_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
+	uint32 type, int openMode, void** _cookie)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 	Attribute attribute(inode);
 
-	return attribute.Create(name, type, openMode, (attr_cookie **)_cookie);
+	return attribute.Create(name, type, openMode, (attr_cookie**)_cookie);
 }
 
 
 static status_t
-bfs_open_attr(fs_volume *_volume, fs_vnode *_node, const char *name,
-	int openMode, void **_cookie)
+bfs_open_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
+	int openMode, void** _cookie)
 {
 	FUNCTION();
 
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 	Attribute attribute(inode);
 
-	return attribute.Open(name, openMode, (attr_cookie **)_cookie);
+	return attribute.Open(name, openMode, (attr_cookie**)_cookie);
 }
 
 
 static status_t
-bfs_close_attr(fs_volume *_volume, fs_vnode *_file, void *cookie)
+bfs_close_attr(fs_volume* _volume, fs_vnode* _file, void* cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-bfs_free_attr_cookie(fs_volume *_volume, fs_vnode *_file, void *cookie)
+bfs_free_attr_cookie(fs_volume* _volume, fs_vnode* _file, void* cookie)
 {
 	delete (attr_cookie*)cookie;
 	return B_OK;
@@ -1633,35 +1631,35 @@ bfs_free_attr_cookie(fs_volume *_volume, fs_vnode *_file, void *cookie)
 
 
 static status_t
-bfs_read_attr(fs_volume *_volume, fs_vnode *_file, void *_cookie, off_t pos,
-	void *buffer, size_t *_length)
+bfs_read_attr(fs_volume* _volume, fs_vnode* _file, void* _cookie, off_t pos,
+	void* buffer, size_t* _length)
 {
 	FUNCTION();
 
-	attr_cookie *cookie = (attr_cookie *)_cookie;
-	Inode *inode = (Inode *)_file->private_node;
+	attr_cookie* cookie = (attr_cookie*)_cookie;
+	Inode* inode = (Inode*)_file->private_node;
 
 	Attribute attribute(inode, cookie);
 
-	return attribute.Read(cookie, pos, (uint8 *)buffer, _length);
+	return attribute.Read(cookie, pos, (uint8*)buffer, _length);
 }
 
 
 static status_t
-bfs_write_attr(fs_volume *_volume, fs_vnode *_file, void *_cookie,
-	off_t pos, const void *buffer, size_t *_length)
+bfs_write_attr(fs_volume* _volume, fs_vnode* _file, void* _cookie,
+	off_t pos, const void* buffer, size_t* _length)
 {
 	FUNCTION();
 
-	attr_cookie *cookie = (attr_cookie *)_cookie;
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_file->private_node;
+	attr_cookie* cookie = (attr_cookie*)_cookie;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_file->private_node;
 
 	Transaction transaction(volume, inode->BlockNumber());
 	Attribute attribute(inode, cookie);
 
 	status_t status = attribute.Write(transaction, cookie, pos,
-		(const uint8 *)buffer, _length);
+		(const uint8*)buffer, _length);
 	if (status == B_OK) {
 		transaction.Done();
 
@@ -1676,13 +1674,13 @@ bfs_write_attr(fs_volume *_volume, fs_vnode *_file, void *_cookie,
 
 
 static status_t
-bfs_read_attr_stat(fs_volume *_volume, fs_vnode *_file, void *_cookie,
-	struct stat *stat)
+bfs_read_attr_stat(fs_volume* _volume, fs_vnode* _file, void* _cookie,
+	struct stat* stat)
 {
 	FUNCTION();
 
-	attr_cookie *cookie = (attr_cookie *)_cookie;
-	Inode *inode = (Inode *)_file->private_node;
+	attr_cookie* cookie = (attr_cookie*)_cookie;
+	Inode* inode = (Inode*)_file->private_node;
 
 	Attribute attribute(inode, cookie);
 
@@ -1691,16 +1689,16 @@ bfs_read_attr_stat(fs_volume *_volume, fs_vnode *_file, void *_cookie,
 
 
 static status_t
-bfs_write_attr_stat(fs_volume *_volume, fs_vnode *file, void *cookie,
-	const struct stat *stat, int statMask)
+bfs_write_attr_stat(fs_volume* _volume, fs_vnode* file, void* cookie,
+	const struct stat* stat, int statMask)
 {
 	return EOPNOTSUPP;
 }
 
 
 static status_t
-bfs_rename_attr(fs_volume *_volume, fs_vnode *fromFile, const char *fromName,
-	fs_vnode *toFile, const char *toName)
+bfs_rename_attr(fs_volume* _volume, fs_vnode* fromFile, const char* fromName,
+	fs_vnode* toFile, const char* toName)
 {
 	FUNCTION_START(("name = \"%s\", to = \"%s\"\n", fromName, toName));
 
@@ -1713,12 +1711,12 @@ bfs_rename_attr(fs_volume *_volume, fs_vnode *fromFile, const char *fromName,
 
 
 static status_t
-bfs_remove_attr(fs_volume *_volume, fs_vnode *_node, const char *name)
+bfs_remove_attr(fs_volume* _volume, fs_vnode* _node, const char* name)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *inode = (Inode *)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
 
 	status_t status = inode->CheckPermissions(W_OK);
 	if (status < B_OK)
@@ -1742,9 +1740,9 @@ bfs_remove_attr(fs_volume *_volume, fs_vnode *_node, const char *name)
 
 
 status_t
-bfs_create_special_node(fs_volume *_volume, fs_vnode *_directory,
-	const char *name, fs_vnode *subVnode, mode_t mode, uint32 flags,
-	fs_vnode *_superVnode, ino_t *_nodeID)
+bfs_create_special_node(fs_volume* _volume, fs_vnode* _directory,
+	const char* name, fs_vnode* subVnode, mode_t mode, uint32 flags,
+	fs_vnode* _superVnode, ino_t* _nodeID)
 {
 	// no need to support entry-less nodes
 	if (name == NULL)
@@ -1753,8 +1751,8 @@ bfs_create_special_node(fs_volume *_volume, fs_vnode *_directory,
 	FUNCTION_START(("name = \"%s\", mode = %d, flags = 0x%lx, subVnode: %p\n",
 		name, mode, flags, subVnode));
 
-	Volume *volume = (Volume *)_volume->private_volume;
-	Inode *directory = (Inode *)_directory->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -1769,7 +1767,7 @@ bfs_create_special_node(fs_volume *_volume, fs_vnode *_directory,
 	Transaction transaction(volume, directory->BlockNumber());
 
 	off_t id;
-	Inode *inode;
+	Inode* inode;
 	status = Inode::Create(transaction, directory, name, mode, O_EXCL, 0, NULL,
 		&id, &inode, subVnode ? subVnode->ops : NULL, flags);
 	if (status == B_OK) {
@@ -1789,11 +1787,11 @@ bfs_create_special_node(fs_volume *_volume, fs_vnode *_directory,
 
 
 static status_t
-bfs_open_index_dir(fs_volume *_volume, void **_cookie)
+bfs_open_index_dir(fs_volume* _volume, void** _cookie)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	if (volume->IndicesNode() == NULL) {
 		// This volume does not have any indices
@@ -1813,11 +1811,11 @@ bfs_open_index_dir(fs_volume *_volume, void **_cookie)
 
 
 static status_t
-bfs_close_index_dir(fs_volume *_volume, void *_cookie)
+bfs_close_index_dir(fs_volume* _volume, void* _cookie)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
@@ -1827,11 +1825,11 @@ bfs_close_index_dir(fs_volume *_volume, void *_cookie)
 
 
 static status_t
-bfs_free_index_dir_cookie(fs_volume *_volume, void *_cookie)
+bfs_free_index_dir_cookie(fs_volume* _volume, void* _cookie)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
@@ -1841,11 +1839,11 @@ bfs_free_index_dir_cookie(fs_volume *_volume, void *_cookie)
 
 
 static status_t
-bfs_rewind_index_dir(fs_volume *_volume, void *_cookie)
+bfs_rewind_index_dir(fs_volume* _volume, void* _cookie)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
@@ -1855,12 +1853,12 @@ bfs_rewind_index_dir(fs_volume *_volume, void *_cookie)
 
 
 static status_t
-bfs_read_index_dir(fs_volume *_volume, void *_cookie, struct dirent *dirent,
-	size_t bufferSize, uint32 *_num)
+bfs_read_index_dir(fs_volume* _volume, void* _cookie, struct dirent* dirent,
+	size_t bufferSize, uint32* _num)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
@@ -1871,12 +1869,12 @@ bfs_read_index_dir(fs_volume *_volume, void *_cookie, struct dirent *dirent,
 
 
 static status_t
-bfs_create_index(fs_volume *_volume, const char *name, uint32 type,
+bfs_create_index(fs_volume* _volume, const char* name, uint32 type,
 	uint32 flags)
 {
 	FUNCTION_START(("name = \"%s\", type = %ld, flags = %ld\n", name, type, flags));
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -1898,11 +1896,11 @@ bfs_create_index(fs_volume *_volume, const char *name, uint32 type,
 
 
 static status_t
-bfs_remove_index(fs_volume *_volume, const char *name)
+bfs_remove_index(fs_volume* _volume, const char* name)
 {
 	FUNCTION();
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -1911,7 +1909,7 @@ bfs_remove_index(fs_volume *_volume, const char *name)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-	Inode *indices = volume->IndicesNode();
+	Inode* indices = volume->IndicesNode();
 	if (indices == NULL)
 		return B_ENTRY_NOT_FOUND;
 
@@ -1926,18 +1924,18 @@ bfs_remove_index(fs_volume *_volume, const char *name)
 
 
 static status_t
-bfs_stat_index(fs_volume *_volume, const char *name, struct stat *stat)
+bfs_stat_index(fs_volume* _volume, const char* name, struct stat* stat)
 {
 	FUNCTION_START(("name = %s\n", name));
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	Index index(volume);
 	status_t status = index.SetTo(name);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
-	bfs_inode &node = index.Node()->Node();
+	bfs_inode& node = index.Node()->Node();
 
 	stat->st_type = index.Type();
 	stat->st_size = node.data.Size();
@@ -1962,15 +1960,15 @@ bfs_stat_index(fs_volume *_volume, const char *name, struct stat *stat)
 
 
 static status_t
-bfs_open_query(fs_volume *_volume, const char *queryString, uint32 flags,
-	port_id port, uint32 token, void **_cookie)
+bfs_open_query(fs_volume* _volume, const char* queryString, uint32 flags,
+	port_id port, uint32 token, void** _cookie)
 {
 	FUNCTION_START(("bfs_open_query(\"%s\", flags = %lu, port_id = %ld, token = %ld)\n",
 		queryString, flags, port, token));
 
-	Volume *volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
-	Expression *expression = new(std::nothrow) Expression((char *)queryString);
+	Expression* expression = new(std::nothrow) Expression((char*)queryString);
 	if (expression == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -1982,7 +1980,7 @@ bfs_open_query(fs_volume *_volume, const char *queryString, uint32 flags,
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
-	Query *query = new(std::nothrow) Query(volume, expression, flags);
+	Query* query = new(std::nothrow) Query(volume, expression, flags);
 	if (query == NULL) {
 		delete expression;
 		RETURN_ERROR(B_NO_MEMORY);
@@ -1991,14 +1989,14 @@ bfs_open_query(fs_volume *_volume, const char *queryString, uint32 flags,
 	if (flags & B_LIVE_QUERY)
 		query->SetLiveMode(port, token);
 
-	*_cookie = (void *)query;
+	*_cookie = (void*)query;
 
 	return B_OK;
 }
 
 
 static status_t
-bfs_close_query(fs_volume *_volume, void *cookie)
+bfs_close_query(fs_volume* _volume, void* cookie)
 {
 	FUNCTION();
 	return B_OK;
@@ -2006,12 +2004,12 @@ bfs_close_query(fs_volume *_volume, void *cookie)
 
 
 static status_t
-bfs_free_query_cookie(fs_volume *_volume, void *cookie)
+bfs_free_query_cookie(fs_volume* _volume, void* cookie)
 {
 	FUNCTION();
 
-	Query *query = (Query *)cookie;
-	Expression *expression = query->GetExpression();
+	Query* query = (Query*)cookie;
+	Expression* expression = query->GetExpression();
 	delete query;
 	delete expression;
 
@@ -2020,11 +2018,11 @@ bfs_free_query_cookie(fs_volume *_volume, void *cookie)
 
 
 static status_t
-bfs_read_query(fs_volume * /*_volume*/, void *cookie, struct dirent *dirent,
-	size_t bufferSize, uint32 *_num)
+bfs_read_query(fs_volume* /*_volume*/, void* cookie, struct dirent* dirent,
+	size_t bufferSize, uint32* _num)
 {
 	FUNCTION();
-	Query *query = (Query *)cookie;
+	Query* query = (Query*)cookie;
 	status_t status = query->GetNextEntry(dirent, bufferSize);
 	if (status == B_OK)
 		*_num = 1;
@@ -2038,11 +2036,11 @@ bfs_read_query(fs_volume * /*_volume*/, void *cookie, struct dirent *dirent,
 
 
 static status_t
-bfs_rewind_query(fs_volume * /*_volume*/, void *cookie)
+bfs_rewind_query(fs_volume* /*_volume*/, void* cookie)
 {
 	FUNCTION();
 
-	Query *query = (Query *)cookie;
+	Query* query = (Query*)cookie;
 	return query->Rewind();
 }
 
@@ -2060,8 +2058,8 @@ bfs_get_supported_operations(partition_data* partition, uint32 mask)
 
 
 static status_t
-bfs_initialize(int fd, partition_id partitionID, const char *name,
-	const char *parameterString, off_t /*partitionSize*/, disk_job_id job)
+bfs_initialize(int fd, partition_id partitionID, const char* name,
+	const char* parameterString, off_t /*partitionSize*/, disk_job_id job)
 {
 	// check name
 	status_t status = check_volume_name(name);
@@ -2296,7 +2294,7 @@ static file_system_module_info sBeFileSystem = {
 	bfs_initialize,
 };
 
-module_info *modules[] = {
-	(module_info *)&sBeFileSystem,
+module_info* modules[] = {
+	(module_info*)&sBeFileSystem,
 	NULL,
 };
