@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _BTHCI_H_
 #define _BTHCI_H_
 
@@ -38,4 +35,4 @@ typedef enum { 	BT_COMMAND = 0,
 #define HCI_FEATURES_SIZE		8	/* LMP features */
 #define HCI_DEVICE_NAME_SIZE	248	/* unit name size */
 
-#endif
+#endif // _BTHCI_H_

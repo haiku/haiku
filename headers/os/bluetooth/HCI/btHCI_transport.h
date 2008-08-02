@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
- 
 #ifndef _BTHCI_TRANSPORT_H_
 #define _BTHCI_TRANSPORT_H_
 
@@ -99,4 +96,4 @@ enum {
    at moment refer to ioctl GET_NOTIFICATION_PORT)*/
 #define BT_USERLAND_PORT_NAME "BT kernel-user Land"
 
-#endif
+#endif // _BTHCI_TRANSPORT_H_

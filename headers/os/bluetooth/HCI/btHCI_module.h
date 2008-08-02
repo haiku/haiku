@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _BTHCI_MODULE_H_
 #define _BTHCI_MODULE_H_
 
@@ -35,4 +32,4 @@ typedef struct bt_hci_module_info {
 } bt_hci_module_info ;
 
 
-#endif
+#endif // _BTHCI_MODULE_H_

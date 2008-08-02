@@ -1,11 +1,8 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _BLUETOOTH_H
 #define _BLUETOOTH_H
 
@@ -55,4 +52,4 @@ typedef struct int128	uint128;
 #define BLUETOOTH_PROTO_MAX		256
 
 
-#endif
+#endif // _BLUETOOTH_H

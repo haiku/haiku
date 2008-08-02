@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _BTHCI_COMMAND_H_
 #define _BTHCI_COMMAND_H_
 
@@ -337,4 +334,4 @@ struct hci_command_header {
 /* Vendor specific commands */
 #define OGF_VENDOR_CMD					0x3F
 
-#endif
+#endif // _BTHCI_COMMAND_H_

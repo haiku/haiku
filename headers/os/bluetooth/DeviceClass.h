@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _DEVICE_CLASS_H
 #define _DEVICE_CLASS_H
 
@@ -14,50 +11,50 @@ namespace Bluetooth {
 
 class DeviceClass {
 
-	public:
+public:
 
-		DeviceClass(int record)
-		{
-			this->record = record;
-		}
+	DeviceClass(int record)
+	{
+		this->record = record;
+	}
 
-		DeviceClass()
-		{
-			this->record = 0;
-		}
-
-
-		int GetServiceClasses()
-		{
-			return (record & 0x00FFE000) >> 13;
-		}
+	DeviceClass()
+	{
+		this->record = 0;
+	}
 
 
-		int GetMajorDeviceClass()
-		{
-			return (record & 0x00001F00) >> 8;
-		}
+	int GetServiceClasses()
+	{
+		return (record & 0x00FFE000) >> 13;
+	}
 
 
-		void GetMajorDeviceClass(BString* str)
-		{
-
-		}
-
-
-		int GetMinorDeviceClass()
-		{
-			return (record & 0x000000FF) >> 2;
-		}
+	int GetMajorDeviceClass()
+	{
+		return (record & 0x00001F00) >> 8;
+	}
 
 
-		void GetMinorDeviceClass(BString* str)
-		{
+	void GetMajorDeviceClass(BString* str)
+	{
 
-		}
-		
-	private:
-		int record;
+	}
+
+
+	int GetMinorDeviceClass()
+	{
+		return (record & 0x000000FF) >> 2;
+	}
+
+
+	void GetMinorDeviceClass(BString* str)
+	{
+
+	}
+	
+private:
+	int record;
 };
 
 }
@@ -66,4 +63,4 @@ class DeviceClass {
 using Bluetooth::DeviceClass;
 #endif
 
-#endif
+#endif // _DEVICE_CLASS_H

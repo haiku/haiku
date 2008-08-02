@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _REMOTE_DEVICE_H
 #define _REMOTE_DEVICE_H
 
@@ -24,50 +21,50 @@ class LocalDevice;
 
 class RemoteDevice : public BluetoothDevice {
 
-    public:
-        static const int WAIT = B_BT_WAIT;
-        static const int SUCCEEDED = B_BT_SUCCEEDED;
+public:
+	static const int WAIT = B_BT_WAIT;
+	static const int SUCCEEDED = B_BT_SUCCEEDED;
 
-		virtual ~RemoteDevice();
+	virtual ~RemoteDevice();
 
-        bool IsTrustedDevice();
-        BString GetFriendlyName(bool alwaysAsk); /* Throwing */
-        BString GetFriendlyName(void); /* Throwing */
-        bdaddr_t GetBluetoothAddress();
-        DeviceClass GetDeviceClass();
+	bool IsTrustedDevice();
+	BString GetFriendlyName(bool alwaysAsk); /* Throwing */
+	BString GetFriendlyName(void); /* Throwing */
+	bdaddr_t GetBluetoothAddress();
+	DeviceClass GetDeviceClass();
 
-        bool Equals(RemoteDevice* obj);
+	bool Equals(RemoteDevice* obj);
 
-        /*static RemoteDevice* GetRemoteDevice(Connection conn);   Throwing */
-        bool Authenticate(); /* Throwing */
-        /* bool Authorize(Connection conn);  Throwing */
-        /*bool Encrypt(Connection conn, bool on);  Throwing */
-        bool IsAuthenticated(); /* Throwing */
-        /*bool IsAuthorized(Connection conn);  Throwing */
-        bool IsEncrypted(); /* Throwing */
+	/*static RemoteDevice* GetRemoteDevice(Connection conn);   Throwing */
+	bool Authenticate(); /* Throwing */
+	/* bool Authorize(Connection conn);  Throwing */
+	/*bool Encrypt(Connection conn, bool on);  Throwing */
+	bool IsAuthenticated(); /* Throwing */
+	/*bool IsAuthorized(Connection conn);  Throwing */
+	bool IsEncrypted(); /* Throwing */
 
-        BString GetProperty(const char* property); /* Throwing */
-        void GetProperty(const char* property, uint32* value); /* Throwing */
+	BString GetProperty(const char* property); /* Throwing */
+	void GetProperty(const char* property, uint32* value); /* Throwing */
 
-		LocalDevice* GetLocalDeviceOwner();
+	LocalDevice* GetLocalDeviceOwner();
 
-        RemoteDevice(BString address);
-        RemoteDevice(bdaddr_t address);
+	RemoteDevice(BString address);
+	RemoteDevice(bdaddr_t address);
 
-    protected:
-        /* called by Discovery[Listener|Agent] */
-		void SetLocalDeviceOwner(LocalDevice* ld);
-		friend class DiscoveryListener;
+protected:
+	/* called by Discovery[Listener|Agent] */
+	void SetLocalDeviceOwner(LocalDevice* ld);
+	friend class DiscoveryListener;
 
-    private:
+private:
 
-    	LocalDevice* fDiscovererLocalDevice;
-		BMessenger*	 fMessenger;
+	LocalDevice* fDiscovererLocalDevice;
+	BMessenger*	 fMessenger;
 
-    	uint8		fPageRepetitionMode;
-    	uint8		fScanPeriodMode;
-    	uint8		fScanMode;
-    	uint16		fClockOffset;
+	uint8		fPageRepetitionMode;
+	uint8		fScanPeriodMode;
+	uint8		fScanMode;
+	uint16		fClockOffset;
 
 };
 
@@ -77,4 +74,4 @@ class RemoteDevice : public BluetoothDevice {
 using Bluetooth::RemoteDevice;
 #endif
 
-#endif
+#endif // _REMOTE_DEVICE_H

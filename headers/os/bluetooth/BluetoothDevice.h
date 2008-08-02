@@ -1,10 +1,7 @@
 /*
  * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _BLUETOOTH_DEVICE_H
 #define _BLUETOOTH_DEVICE_H
 
@@ -42,4 +39,4 @@ class BluetoothDevice {
 using Bluetooth::BluetoothDevice;
 #endif
 
-#endif
+#endif // _BLUETOOTH_DEVICE_H

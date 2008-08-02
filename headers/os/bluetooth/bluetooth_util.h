@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
- 
 #ifndef _BLUETOOTH_UTIL_H
 #define _BLUETOOTH_UTIL_H
 
@@ -55,4 +52,4 @@ static inline char*	btstrerror(int error_code)
 }
 
 
-#endif
+#endif // _BLUETOOTH_UTIL_H

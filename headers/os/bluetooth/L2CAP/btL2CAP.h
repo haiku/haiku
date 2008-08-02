@@ -1,8 +1,6 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
 
 #ifndef _BTL2CAP_H_
@@ -18,4 +16,4 @@ struct sockaddr_l2cap {
 };
 
 
-#endif
+#endif // _BTL2CAP_H_

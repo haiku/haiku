@@ -1,11 +1,8 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _BTHCI_EVENT_H_
 #define _BTHCI_EVENT_H_
 
@@ -318,15 +315,13 @@ struct hci_ev_sychronous_connection_changed {
 #define HCI_EVENT_REMOTE_HOST_SUPPORTED_FEATURES_NOTIFICATION	0x3D
 
 
-
-
 /* HAIKU Internal Events, not produced by the transport devices but 
  * by some entity of the Haiku Bluetooth Stack. 
  * The MSB 0xE is chosen for this purpose
  */
  
-#define HCI_HAIKU_EVENT_SERVER_QUITTING				0xE0  
+#define HCI_HAIKU_EVENT_SERVER_QUITTING				0xE0
 #define HCI_HAIKU_EVENT_DEVICE_REMOVED				0xE1
 
 
-#endif
+#endif // _BTHCI_EVENT_H_

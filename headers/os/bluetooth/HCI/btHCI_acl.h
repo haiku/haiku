@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
- 
 #ifndef _BTHCI_ACL_H_
 #define _BTHCI_ACL_H_
 
@@ -36,4 +33,4 @@ struct hci_acl_header {
 #define HCI_ACL_BROADCAST_PICONET	0x2 /* both directions */
 										/* 11 - reserved for future use */
 
-#endif
+#endif // _BTHCI_ACL_H_

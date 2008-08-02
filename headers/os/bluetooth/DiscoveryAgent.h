@@ -1,10 +1,7 @@
 /*
  * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _DISCOVERY_AGENT_H
 #define _DISCOVERY_AGENT_H
 
@@ -30,38 +27,38 @@ class RemoteDevice;
 
 class DiscoveryAgent {
 
-	public:
+public:
 
-		static const int GIAC = BT_GIAC;
-		static const int LIAC = BT_LIAC;
+	static const int GIAC = BT_GIAC;
+	static const int LIAC = BT_LIAC;
 
-		static const int PREKNOWN = BT_PREKNOWN;
-		static const int CACHED = BT_CACHED;
-		static const int NOT_DISCOVERABLE = BT_NOT_DISCOVERABLE;
+	static const int PREKNOWN = BT_PREKNOWN;
+	static const int CACHED = BT_CACHED;
+	static const int NOT_DISCOVERABLE = BT_NOT_DISCOVERABLE;
 
-		RemoteDevicesList RetrieveDevices(int option); /* TODO */
-		status_t StartInquiry(int accessCode, DiscoveryListener* listener); /* Throwing */
-		status_t StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs);
-		status_t CancelInquiry(DiscoveryListener* listener);
+	RemoteDevicesList RetrieveDevices(int option); /* TODO */
+	status_t StartInquiry(int accessCode, DiscoveryListener* listener); /* Throwing */
+	status_t StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs);
+	status_t CancelInquiry(DiscoveryListener* listener);
 
-		/*
-		int searchServices(int[] attrSet, UUID[] uuidSet, RemoteDevice btDev,
-						DiscoveryListener discListener);
+	/*
+	int searchServices(int[] attrSet, UUID[] uuidSet, RemoteDevice btDev,
+					DiscoveryListener discListener);
 
-		bool cancelServiceSearch(int transID);
-		BString selectService(UUID uuid, int security, boolean master);
-		*/
+	bool cancelServiceSearch(int transID);
+	BString selectService(UUID uuid, int security, boolean master);
+	*/
 
-	private:
-		DiscoveryAgent(LocalDevice* ld);
-		~DiscoveryAgent();
-		void SetLocalDeviceOwner(LocalDevice* ld);
+private:
+	DiscoveryAgent(LocalDevice* ld);
+	~DiscoveryAgent();
+	void SetLocalDeviceOwner(LocalDevice* ld);
 
-		DiscoveryListener* fLastUsedListener;
-		LocalDevice*       fLocalDevice;
-		BMessenger*        fMessenger;
+	DiscoveryListener* fLastUsedListener;
+	LocalDevice*       fLocalDevice;
+	BMessenger*        fMessenger;
 
-		friend class LocalDevice;
+	friend class LocalDevice;
 };
 
 }
@@ -70,4 +67,4 @@ class DiscoveryAgent {
 using Bluetooth::DiscoveryAgent;
 #endif
 
-#endif
+#endif // _DISCOVERY_AGENT_H
