@@ -61,7 +61,7 @@
 #	define TRACE(x...) ;
 #endif
 
-bool kernel_startup = true;
+bool gKernelStartup = true;
 
 static kernel_args sKernelArgs;
 static uint32 sCpuRendezvous;
@@ -191,7 +191,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 		// exit the kernel startup phase (mutexes, etc work from now on out)
 		TRACE("exiting kernel startup\n");
-		kernel_startup = false;
+		gKernelStartup = false;
 
 		smp_cpu_rendezvous(&sCpuRendezvous2, 0);
 			// release the AP cpus to go enter the scheduler

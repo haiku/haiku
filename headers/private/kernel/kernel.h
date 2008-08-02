@@ -47,7 +47,7 @@
 #define CLEAR_BIT(a, b) ((a) & (~(1 << (b))))
 
 /* during kernel startup, interrupts are disabled (among other things) */
-extern bool kernel_startup;
+extern bool gKernelStartup;
 
 
 #ifdef __cplusplus

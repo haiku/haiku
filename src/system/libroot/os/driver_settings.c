@@ -321,7 +321,7 @@ parse_parameters(struct driver_parameter **_parameters, int *_count,
 				* sizeof(struct driver_parameter));
 			if (newArray == NULL)
 				return B_NO_MEMORY;
-	
+
 			memcpy(&newArray[*_count], &parameter, sizeof(struct driver_parameter));
 			newParameter = &newArray[*_count];
 
@@ -688,7 +688,7 @@ load_driver_settings(const char *driverName)
 {
 	settings_handle *handle;
 	int file = -1;
-	
+
 	if (driverName == NULL)
 		return NULL;
 
@@ -715,7 +715,7 @@ load_driver_settings(const char *driverName)
 	}
 
 	// we are allowed to call the driver settings pretty early in the boot process
-	if (kernel_startup) {
+	if (gKernelStartup) {
 		mutex_unlock(&sLock);
 		return NULL;
 	}

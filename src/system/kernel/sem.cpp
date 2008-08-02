@@ -711,7 +711,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	int state;
 	status_t status = B_OK;
 
-	if (kernel_startup)
+	if (gKernelStartup)
 		return B_OK;
 	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
@@ -869,7 +869,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 {
 	int32 slot = id % sMaxSems;
 
-	if (kernel_startup)
+	if (gKernelStartup)
 		return B_OK;
 	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;

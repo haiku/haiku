@@ -92,7 +92,7 @@ recursive_lock_lock(recursive_lock *lock)
 {
 	thread_id thread = thread_get_current_thread_id();
 
-	if (!kernel_startup && !are_interrupts_enabled()) {
+	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("recursive_lock_lock: called with interrupts disabled for lock "
 			"%p (\"%s\")\n", lock, lock->lock.name);
 	}
@@ -114,7 +114,7 @@ recursive_lock_trylock(recursive_lock *lock)
 {
 	thread_id thread = thread_get_current_thread_id();
 
-	if (!kernel_startup && !are_interrupts_enabled())
+	if (!gKernelStartup && !are_interrupts_enabled())
 		panic("recursive_lock_lock: called with interrupts disabled for lock "
 			"%p (\"%s\")\n", lock, lock->lock.name);
 
@@ -500,7 +500,7 @@ status_t
 _mutex_lock(mutex* lock, bool threadsLocked)
 {
 #ifdef KDEBUG
-	if (!kernel_startup && !threadsLocked && !are_interrupts_enabled()) {
+	if (!gKernelStartup && !threadsLocked && !are_interrupts_enabled()) {
 		panic("_mutex_lock(): called with interrupts disabled for lock %p",
 			lock);
 	}

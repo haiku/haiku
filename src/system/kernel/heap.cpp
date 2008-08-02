@@ -260,7 +260,7 @@ class Free : public AbstractTraceEntry {
 
 } // namespace KernelHeapTracing
 
-#	define T(x)	if (!kernel_startup) new(std::nothrow) KernelHeapTracing::x;
+#	define T(x)	if (!gKernelStartup) new(std::nothrow) KernelHeapTracing::x;
 #else
 #	define T(x)	;
 #endif
@@ -1211,8 +1211,8 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		heap_leak_check_info *info = (heap_leak_check_info *)((addr_t)address
 			+ bin->element_size - sizeof(heap_leak_check_info));
 		info->size = size - sizeof(heap_leak_check_info);
-		info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
-		info->team = (kernel_startup ? 0 : team_get_current_team_id());
+		info->thread = (gKernelStartup ? 0 : thread_get_current_thread_id());
+		info->team = (gKernelStartup ? 0 : team_get_current_team_id());
 		info->caller = get_caller();
 #endif
 		return address;
@@ -1231,8 +1231,8 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		+ (firstPage->index + pageCount) * heap->page_size
 		- sizeof(heap_leak_check_info));
 	info->size = size - sizeof(heap_leak_check_info);
-	info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
-	info->team = (kernel_startup ? 0 : team_get_current_team_id());
+	info->thread = (gKernelStartup ? 0 : thread_get_current_thread_id());
+	info->team = (gKernelStartup ? 0 : team_get_current_team_id());
 	info->caller = get_caller();
 #endif
 	return (void *)(firstPage->area->base + firstPage->index * heap->page_size);
@@ -1759,12 +1759,12 @@ heap_init_post_thread()
 void *
 memalign(size_t alignment, size_t size)
 {
-	if (!kernel_startup && !are_interrupts_enabled()) {
+	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("memalign(): called with interrupts disabled\n");
 		return NULL;
 	}
 
-	if (!kernel_startup && size > HEAP_AREA_USE_THRESHOLD) {
+	if (!gKernelStartup && size > HEAP_AREA_USE_THRESHOLD) {
 		// don't even attempt such a huge allocation - use areas instead
 		size_t areaSize = size + sizeof(area_allocation_info);
 		if (alignment != 0)
@@ -1875,7 +1875,7 @@ malloc(size_t size)
 void
 free(void *address)
 {
-	if (!kernel_startup && !are_interrupts_enabled()) {
+	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("free(): called with interrupts disabled\n");
 		return;
 	}
@@ -1917,7 +1917,7 @@ free(void *address)
 void *
 realloc(void *address, size_t newSize)
 {
-	if (!kernel_startup && !are_interrupts_enabled()) {
+	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("realloc(): called with interrupts disabled\n");
 		return NULL;
 	}

@@ -1744,7 +1744,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			vm_translation_map *map = &addressSpace->translation_map;
 			off_t offset = 0;
 
-			if (!kernel_startup)
+			if (!gKernelStartup)
 				panic("ALREADY_WIRED flag used outside kernel startup\n");
 
 			cache->Lock();
@@ -2918,16 +2918,16 @@ display_mem(int argc, char **argv)
 
 		address = ROUNDOWN(address, B_PAGE_SIZE);
 
-		kernel_startup = true;
+		gKernelStartup = true;
 			// vm_get_physical_page() needs to lock...
 
 		if (vm_get_physical_page(address, &copyAddress, PHYSICAL_PAGE_NO_WAIT) != B_OK) {
 			kprintf("getting the hardware page failed.");
-			kernel_startup = false;
+			gKernelStartup = false;
 			return 0;
 		}
 
-		kernel_startup = false;
+		gKernelStartup = false;
 		address += offset;
 		copyAddress += offset;
 	} else
@@ -3015,9 +3015,9 @@ display_mem(int argc, char **argv)
 
 	if (physical) {
 		copyAddress = ROUNDOWN(copyAddress, B_PAGE_SIZE);
-		kernel_startup = true;
+		gKernelStartup = true;
 		vm_put_physical_page(copyAddress);
-		kernel_startup = false;
+		gKernelStartup = false;
 	}
 	return 0;
 }
