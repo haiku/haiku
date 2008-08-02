@@ -1412,14 +1412,11 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	// TODO: support INODE_LOGGED!
 
 	size_t length = *_length;
-	bool changeSize = false;
+	bool changeSize = pos + length > Size();
 
 	// set/check boundaries for pos/length
 	if (pos < 0)
 		return B_BAD_VALUE;
-
-	if (pos + length > Size())
-		changeSize = true;
 
 	locker.Unlock();
 
@@ -1427,18 +1424,22 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	if (changeSize && !transaction.IsStarted())
 		transaction.Start(fVolume, BlockNumber());
 
-	// TODO: we actually need to call WriteLockInTransaction() here, but we
-	// cannot do this with the current locking model (ie. file cache functions
-	// are not to be called with the inode lock held).
-	// But this cannot work anyway, since we hold the lock when calling
-	// file_cache_set_size(), too... (possible deadlock)
-	rw_lock_write_lock(&fLock);
+	WriteLocker writeLocker(fLock);
+
+	// Work around possible race condition: Someone might have shrunken the file
+	// while we had no lock.
+	if (!transaction.IsStarted() && pos + length > Size()) {
+		writeLocker.Unlock();
+		transaction.Start(fVolume, BlockNumber());
+		writeLocker.Lock();
+	}
 
 	if (pos + length > Size()) {
 		// let's grow the data stream to the size needed
 		status_t status = SetFileSize(transaction, pos + length);
 		if (status < B_OK) {
 			*_length = 0;
+			WriteLockInTransaction(transaction);
 			RETURN_ERROR(status);
 		}
 		// TODO: In theory we would need to update the file size
@@ -1449,18 +1450,25 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 		// go into this transaction (we cannot wait until the file
 		// is closed)
 		status = WriteBack(transaction);
-		if (status < B_OK)
+		if (status < B_OK) {
+			WriteLockInTransaction(transaction);
 			return status;
+		}
 	}
+
+	writeLocker.Unlock();
 
 	// If we don't want to write anything, we can now return (we may
 	// just have changed the file size using the position parameter)
 	if (length == 0)
 		return B_OK;
 
-	rw_lock_write_unlock(&fLock);
+	status_t status = file_cache_write(FileCache(), NULL, pos, buffer, _length);
 
-	return file_cache_write(FileCache(), NULL, pos, buffer, _length);
+	if (transaction.IsStarted())
+		WriteLockInTransaction(transaction);
+
+	return status;
 }
 
 
