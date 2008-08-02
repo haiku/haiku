@@ -44,7 +44,7 @@ public:
 
 	virtual void EnableIOInterrupt(int irq) = 0;
 	virtual void DisableIOInterrupt(int irq) = 0;
-	virtual void AcknowledgeIOInterrupt(int irq) = 0;
+	virtual bool AcknowledgeIOInterrupt(int irq) = 0;
 
 	virtual	void SetHardwareRTC(uint32 seconds) = 0;
 	virtual	uint32 GetHardwareRTC() = 0;

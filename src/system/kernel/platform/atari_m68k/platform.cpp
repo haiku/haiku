@@ -47,7 +47,7 @@ public:
 
 		void EnableIOInterrupt(int irq);
 		void DisableIOInterrupt(int irq);
-		void AcknowledgeIOInterrupt(int irq);
+		bool AcknowledgeIOInterrupt(int irq);
 
 	private:
 		uint32 fBase;
@@ -70,7 +70,7 @@ public:
 
 	virtual void EnableIOInterrupt(int irq);
 	virtual void DisableIOInterrupt(int irq);
-	virtual void AcknowledgeIOInterrupt(int irq);
+	virtual bool AcknowledgeIOInterrupt(int irq);
 
 	virtual	void SetHardwareRTC(uint32 seconds);
 	virtual	uint32 GetHardwareRTC();
@@ -148,7 +148,7 @@ M68KAtari::MFP::DisableIOInterrupt(int irq)
 }
 
 
-void
+bool
 M68KAtari::MFP::AcknowledgeIOInterrupt(int irq)
 {
 	uint8 bit = 1 << (irq % 8);
@@ -158,7 +158,9 @@ M68KAtari::MFP::AcknowledgeIOInterrupt(int irq)
 	if (val & bit) {
 		val &= ~bit;
 		outb(reg, val);
+		return true;
 	}
+	return false;
 }
 
 
@@ -303,13 +305,14 @@ M68KAtari::DisableIOInterrupt(int irq)
 }
 
 
-void
+bool
 M68KAtari::AcknowledgeIOInterrupt(int irq)
 {
 	MFP *mfp = MFPForIrq(irq);
 
 	if (mfp)
-		mfp->AcknowledgeIOInterrupt(irq - mfp->Vector());
+		return mfp->AcknowledgeIOInterrupt(irq - mfp->Vector());
+	return false;
 }
 
 void
