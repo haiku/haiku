@@ -107,9 +107,9 @@ static bool sSemsActive = false;
 static struct sem_entry	*sFreeSemsHead = NULL;
 static struct sem_entry	*sFreeSemsTail = NULL;
 
-static spinlock sem_spinlock = B_SPINLOCK_INITIALIZER;
-#define GRAB_SEM_LIST_LOCK()     acquire_spinlock(&sem_spinlock)
-#define RELEASE_SEM_LIST_LOCK()  release_spinlock(&sem_spinlock)
+static spinlock sSemsSpinlock = B_SPINLOCK_INITIALIZER;
+#define GRAB_SEM_LIST_LOCK()     acquire_spinlock(&sSemsSpinlock)
+#define RELEASE_SEM_LIST_LOCK()  release_spinlock(&sSemsSpinlock)
 #define GRAB_SEM_LOCK(s)         acquire_spinlock(&(s).lock)
 #define RELEASE_SEM_LOCK(s)      release_spinlock(&(s).lock)
 
