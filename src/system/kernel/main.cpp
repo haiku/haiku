@@ -9,6 +9,9 @@
 /*! This is main - initializes the kernel and launches the Bootscript */
 
 
+#include <string.h>
+
+#include <FindDirectory.h>
 #include <OS.h>
 
 #include <arch/platform.h>
@@ -23,7 +26,6 @@
 #include <elf.h>
 #include <fs/devfs.h>
 #include <fs/KPath.h>
-#include <FindDirectory.h>
 #include <int.h>
 #include <kdevice_manager.h>
 #include <kdriver_settings.h>
@@ -49,8 +51,6 @@
 #include <vm.h>
 #include <boot/kernel_args.h>
 
-#include <string.h>
-
 #include "vm/VMAnonymousCache.h"
 
 
@@ -69,18 +69,8 @@ static uint32 sCpuRendezvous2;
 
 static int32 main2(void *);
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
 
-extern int _start(kernel_args *bootKernelArgs, int cpu);
-	/* keep compiler happy */
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-int
+extern "C" int
 _start(kernel_args *bootKernelArgs, int currentCPU)
 {
 	if (bootKernelArgs->kernel_args_size != sizeof(kernel_args)
@@ -110,8 +100,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 	// if we're not a boot cpu, spin here until someone wakes us up
 	if (smp_trap_non_boot_cpus(currentCPU)) {
-		thread_id thread;
-
 		// init platform
 		arch_platform_init(&sKernelArgs);
 
@@ -214,7 +202,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 		// start a thread to finish initializing the rest of the system
 		TRACE("starting main2 thread\n");
-		thread = spawn_kernel_thread(&main2, "main2", B_NORMAL_PRIORITY, NULL);
+		thread_id thread = spawn_kernel_thread(&main2, "main2",
+			B_NORMAL_PRIORITY, NULL);
 		TRACE("resuming main2 thread...\n");
 		resume_thread(thread);
 	} else {
@@ -243,6 +232,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 	return 0;
 }
+
 
 static int32
 main2(void *unused)
