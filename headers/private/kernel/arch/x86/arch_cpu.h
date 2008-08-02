@@ -228,7 +228,6 @@ typedef struct arch_cpu_info {
 	int stepping;
 	int model;
 	int extended_model;
-	char feature_string[256];
 
 	// local TSS for this cpu
 	struct tss tss;
