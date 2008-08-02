@@ -157,11 +157,14 @@ public:
 	{
 		out.Print("team exec, \"%p\", args:", fPath);
 
-		char* args = fArgs;
-		for (int32 i = 0; !out.IsFull() && i < fArgCount; i++) {
-			out.Print(" \"%s\"", args);
-			args += strlen(args) + 1;
-		}
+		if (fArgs != NULL) {
+			char* args = fArgs;
+			for (int32 i = 0; !out.IsFull() && i < fArgCount; i++) {
+				out.Print(" \"%s\"", args);
+				args += strlen(args) + 1;
+			}
+		} else
+			out.Print(" <too long>");
 	}
 
 private:
