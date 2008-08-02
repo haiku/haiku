@@ -94,7 +94,7 @@ FUNCTION(__m68k_exception_noop):
 
 FUNCTION(__m68k_exception_common):
 	/* save regs */
-	movem.l		%d0-%d7/%a0-%a7,-(%sp)	/* push the iframe address */
+	movem.l		%d0-%d7/%a0-%a6,-(%sp)	/* push the iframe address */
 	/* save fp */
 	sub.l		#FPU_STATE_sizeof,%sp
 	fsave		(%sp)
@@ -108,7 +108,9 @@ null_sav_1:
 	sub.l		#IFRAME_fpu-IFRAME_fp,%sp
 null_sav_2:	
 
-	bsr	m68k_exception_entry /* call C entry */
+	move.l		%sp,-(%sp)		/* push address of iframe */
+	bsr		m68k_exception_entry	/* call C entry */
+	add.l		#4,%sp
 
 	/* restore fp */
 	tst.b		IFRAME_fpu-IFRAME_fp(%sp) /* check for a null state */
@@ -123,7 +125,7 @@ null_res_2:
 	frestore	(%sp)
 	add.l		#FPU_STATE_sizeof,%sp
 	/* restore regs */
-	movem.l		(%sp)+,%d0-%d7/%a0-%a7
+	movem.l		(%sp)+,%d0-%d7/%a0-%a6
 	
 	rte
 	
