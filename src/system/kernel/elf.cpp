@@ -1310,13 +1310,16 @@ symbol_found:
 
 
 /*!	Tries to find a matching user symbol for the given address.
-	Note that the given team's address must already be in effect.
+	Note that the given team's address space must already be in effect.
 */
 status_t
 elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
 	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
 	bool *_exactMatch)
 {
+	if (team == NULL || team == team_get_kernel_team())
+		return B_BAD_VALUE;
+
 	UserSymbolLookup& lookup = UserSymbolLookup::Default();
 	status_t error = lookup.Init(team);
 	if (error != B_OK)
