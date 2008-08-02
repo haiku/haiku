@@ -1581,6 +1581,8 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 
 	TRACE(("create_anonymous_area %s: size 0x%lx\n", name, size));
 
+	size = PAGE_ALIGN(size);
+
 	if (size == 0)
 		return B_BAD_VALUE;
 	if (!arch_vm_supports_protection(protection))
@@ -1611,37 +1613,82 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			return B_BAD_VALUE;
 	}
 
+	bool doReserveMemory = false;
 	switch (wiring) {
 		case B_NO_LOCK:
+			break;
 		case B_FULL_LOCK:
 		case B_LAZY_LOCK:
 		case B_CONTIGUOUS:
+			doReserveMemory = true;
+			break;
 		case B_ALREADY_WIRED:
 			break;
 		case B_LOMEM:
 		//case B_SLOWMEM:
 			dprintf("B_LOMEM/SLOWMEM is not yet supported!\n");
 			wiring = B_FULL_LOCK;
+			doReserveMemory = true;
 			break;
 		default:
 			return B_BAD_VALUE;
 	}
 
+	// For full lock or contiguous areas we're also going to map the pages and
+	// thus need to reserve pages for the mapping backend upfront.
+	addr_t reservedMapPages = 0;
+	if (wiring == B_FULL_LOCK || wiring == B_CONTIGUOUS) {
+		AddressSpaceWriteLocker locker;
+		status_t status = locker.SetTo(team);
+		if (status != B_OK)
+			return status;
+
+		vm_translation_map *map = &locker.AddressSpace()->translation_map;
+		reservedMapPages = map->ops->map_max_pages_need(map, 0, size - 1);
+	}
+
+	// Reserve memory before acquiring the address space lock. This reduces the
+	// chances of failure, since while holding the write lock to the address
+	// space (if it is the kernel address space that is), the low memory handler
+	// won't be able to free anything for us.
+	addr_t reservedMemory = 0;
+	if (doReserveMemory) {
+		if (vm_try_reserve_memory(size, 1000000) != B_OK)
+			return B_NO_MEMORY;
+		reservedMemory = size;
+		// TODO: We don't reserve the memory for the pages for the page
+		// directories/tables. We actually need to do since we currently don't
+		// reclaim them (and probably can't reclaim all of them anyway). Thus
+		// there are actually less physical pages than there should be, which
+		// can get the VM into trouble in low memory situations.
+	}
+
+	// For full lock areas reserve the pages before locking the address
+	// space. E.g. block caches can't release their memory while we hold the
+	// address space lock.
+	page_num_t reservedPages = reservedMapPages;
+	if (wiring == B_FULL_LOCK)
+		reservedPages += size / B_PAGE_SIZE;
+	if (reservedPages > 0)
+		vm_page_reserve_pages(reservedPages);
+
 	AddressSpaceWriteLocker locker;
+	vm_address_space *addressSpace;
 	status_t status = locker.SetTo(team);
 	if (status != B_OK)
-		return status;
+		goto err0;
 
-	vm_address_space *addressSpace = locker.AddressSpace();
-	size = PAGE_ALIGN(size);
+	addressSpace = locker.AddressSpace();
 
 	if (wiring == B_CONTIGUOUS) {
 		// we try to allocate the page run here upfront as this may easily
 		// fail for obvious reasons
 		page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, physicalBase,
 			size / B_PAGE_SIZE);
-		if (page == NULL)
-			return B_NO_MEMORY;
+		if (page == NULL) {
+			status = B_NO_MEMORY;
+			goto err0;
+		}
 	}
 
 	// create an anonymous cache
@@ -1656,6 +1703,9 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 
 	cache->temporary = 1;
 	cache->virtual_end = size;
+	cache->committed_size = reservedMemory;
+		// TODO: This should be done via a method.
+	reservedMemory = 0;
 
 	switch (wiring) {
 		case B_LAZY_LOCK:
@@ -1680,8 +1730,6 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 		goto err1;
 	}
 
-	cache->Unlock();
-
 	locker.DegradeToReadLock();
 
 	switch (wiring) {
@@ -1692,13 +1740,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 
 		case B_FULL_LOCK:
 		{
-			vm_translation_map *map = &addressSpace->translation_map;
-			size_t reservePages = map->ops->map_max_pages_need(map,
-				area->base, area->base + (area->size - 1));
-			vm_page_reserve_pages(reservePages);
-
 			// Allocate and map all pages for this area
-			cache->Lock();
 
 			off_t offset = 0;
 			for (addr_t address = area->base; address < area->base + (area->size - 1);
@@ -1713,26 +1755,19 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 #	endif
 					continue;
 #endif
-				vm_page *page = vm_page_allocate_page(PAGE_STATE_CLEAR, false);
+				vm_page *page = vm_page_allocate_page(PAGE_STATE_CLEAR, true);
 				cache->InsertPage(page, offset);
 				vm_map_page(area, page, address, protection);
+
+				// Periodically unreserve pages we've already allocated, so that
+				// we don't unnecessarily increase the pressure on the VM.
+				if (offset > 0 && offset % (128 * B_PAGE_SIZE) == 0) {
+					page_num_t toUnreserve = 128;
+					vm_page_unreserve_pages(toUnreserve);
+					reservedPages -= toUnreserve;
+				}
 			}
 
-			cache->Unlock();
-// TODO: Allocating pages with the address space write locked is not a good
-// idea, particularly if that's the kernel's address space. During that time the
-// low memory handler will block (e.g. the block cache will try to delete
-// areas). The cache backing our area has reserved the memory and thus there
-// should be enough pages available (i.e. could be freed by page write/daemon),
-// but this is not true for at least two reasons:
-// * The pages for page directories/tables are not reserved from the available
-//   memory (we should do that!) and currently we don't reclaim them (and
-//   probably can't reclaim all of them anyway). Thus there are actually less
-//   pages than there should be.
-// * ATM we write pages back using virtual addresses. The lower I/O layers will
-//   try to lock the memory, which will block, since that requires to read-lock
-//   the address space.
-			vm_page_unreserve_pages(reservePages);
 			break;
 		}
 
@@ -1747,7 +1782,6 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			if (!gKernelStartup)
 				panic("ALREADY_WIRED flag used outside kernel startup\n");
 
-			cache->Lock();
 			map->ops->lock(map);
 
 			for (addr_t virtualAddress = area->base; virtualAddress < area->base
@@ -1774,7 +1808,6 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			}
 
 			map->ops->unlock(map);
-			cache->Unlock();
 			break;
 		}
 
@@ -1785,12 +1818,8 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			vm_translation_map *map = &addressSpace->translation_map;
 			addr_t physicalAddress = page->physical_page_number * B_PAGE_SIZE;
 			addr_t virtualAddress = area->base;
-			size_t reservePages = map->ops->map_max_pages_need(map,
-				virtualAddress, virtualAddress + (area->size - 1));
 			off_t offset = 0;
 
-			vm_page_reserve_pages(reservePages);
-			cache->Lock();
 			map->ops->lock(map);
 
 			for (virtualAddress = area->base; virtualAddress < area->base
@@ -1812,14 +1841,17 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			}
 
 			map->ops->unlock(map);
-			cache->Unlock();
-			vm_page_unreserve_pages(reservePages);
 			break;
 		}
 
 		default:
 			break;
 	}
+
+	cache->Unlock();
+
+	if (reservedPages > 0)
+		vm_page_unreserve_pages(reservedPages);
 
 	TRACE(("vm_create_anonymous_area: done\n"));
 
@@ -1839,6 +1871,12 @@ err1:
 			vm_page_set_state(page, PAGE_STATE_FREE);
 		}
 	}
+
+err0:
+	if (reservedPages > 0)
+		vm_page_unreserve_pages(reservedPages);
+	if (reservedMemory > 0)
+		vm_unreserve_memory(reservedMemory);
 
 	return status;
 }
