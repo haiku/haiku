@@ -246,7 +246,7 @@ rw_lock_destroy(rw_lock* lock)
 		? (char*)lock->name : NULL;
 
 	// unblock all waiters
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 #ifdef KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
@@ -283,7 +283,7 @@ rw_lock_read_lock(rw_lock* lock)
 #if KDEBUG_RW_LOCK_DEBUG
 	return rw_lock_write_lock(lock);
 #else
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	if (lock->writer_count == 0) {
 		lock->reader_count++;
@@ -305,7 +305,7 @@ rw_lock_read_unlock(rw_lock* lock)
 #if KDEBUG_RW_LOCK_DEBUG
 	return rw_lock_write_unlock(lock);
 #else
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	if (lock->holder == thread_get_current_thread_id()) {
 		if (--lock->owner_count > 0)
@@ -335,7 +335,7 @@ rw_lock_read_unlock(rw_lock* lock)
 status_t
 rw_lock_write_lock(rw_lock* lock)
 {
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	if (lock->reader_count == 0 && lock->writer_count == 0) {
 		lock->writer_count++;
@@ -362,7 +362,7 @@ rw_lock_write_lock(rw_lock* lock)
 status_t
 rw_lock_write_unlock(rw_lock* lock)
 {
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	if (thread_get_current_thread_id() != lock->holder) {
 		panic("rw_lock_write_unlock(): lock %p not write-locked by this thread",
@@ -454,7 +454,7 @@ mutex_destroy(mutex* lock)
 		? (char*)lock->name : NULL;
 
 	// unblock all waiters
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 #ifdef KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
@@ -485,7 +485,7 @@ mutex_destroy(mutex* lock)
 status_t
 mutex_switch_lock(mutex* from, mutex* to)
 {
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 #if !defined(KDEBUG)
 	if (atomic_add(&from->count, 1) < -1)
@@ -507,7 +507,7 @@ _mutex_lock(mutex* lock, bool threadsLocked)
 #endif
 
 	// lock only, if !threadsLocked
-	InterruptsSpinLocker locker(thread_spinlock, false, !threadsLocked);
+	InterruptsSpinLocker locker(gThreadSpinlock, false, !threadsLocked);
 
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
@@ -556,7 +556,7 @@ void
 _mutex_unlock(mutex* lock, bool threadsLocked)
 {
 	// lock only, if !threadsLocked
-	InterruptsSpinLocker locker(thread_spinlock, false, !threadsLocked);
+	InterruptsSpinLocker locker(gThreadSpinlock, false, !threadsLocked);
 
 #ifdef KDEBUG
 	if (thread_get_current_thread_id() != lock->holder) {
@@ -600,7 +600,7 @@ status_t
 _mutex_trylock(mutex* lock)
 {
 #ifdef KDEBUG
-	InterruptsSpinLocker _(thread_spinlock);
+	InterruptsSpinLocker _(gThreadSpinlock);
 
 	if (lock->holder <= 0) {
 		lock->holder = thread_get_current_thread_id();

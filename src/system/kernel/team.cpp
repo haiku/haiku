@@ -91,7 +91,7 @@ static struct team *sKernelTeam = NULL;
 static int32 sMaxTeams = 2048;
 static int32 sUsedTeams = 1;
 
-spinlock team_spinlock = B_SPINLOCK_INITIALIZER;
+spinlock gTeamSpinlock = B_SPINLOCK_INITIALIZER;
 
 
 // #pragma mark - Tracing
@@ -101,73 +101,73 @@ spinlock team_spinlock = B_SPINLOCK_INITIALIZER;
 namespace TeamTracing {
 
 class TeamForked : public AbstractTraceEntry {
-	public:
-		TeamForked(thread_id forkedThread)
-			:
-			fForkedThread(forkedThread)
-		{
-			Initialized();
-		}
+public:
+	TeamForked(thread_id forkedThread)
+		:
+		fForkedThread(forkedThread)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("team forked, new thread %ld", fForkedThread);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("team forked, new thread %ld", fForkedThread);
+	}
 
-	private:
-		thread_id			fForkedThread;
+private:
+	thread_id			fForkedThread;
 };
 
 
 class ExecTeam : public AbstractTraceEntry {
-	public:
-		ExecTeam(const char* path, int32 argCount, const char* const* args,
-				int32 envCount, const char* const* env)
-			:
-			fArgCount(argCount),
-			fArgs(NULL)
-		{
-			fPath = alloc_tracing_buffer_strcpy(path, B_PATH_NAME_LENGTH,
-				false);
+public:
+	ExecTeam(const char* path, int32 argCount, const char* const* args,
+			int32 envCount, const char* const* env)
+		:
+		fArgCount(argCount),
+		fArgs(NULL)
+	{
+		fPath = alloc_tracing_buffer_strcpy(path, B_PATH_NAME_LENGTH,
+			false);
 
-			// determine the buffer size we need for the args
-			size_t argBufferSize = 0;
-			for (int32 i = 0; i < argCount; i++)
-				argBufferSize += strlen(args[i]) + 1;
+		// determine the buffer size we need for the args
+		size_t argBufferSize = 0;
+		for (int32 i = 0; i < argCount; i++)
+			argBufferSize += strlen(args[i]) + 1;
 
-			// allocate a buffer
-			fArgs = (char*)alloc_tracing_buffer(argBufferSize);
-			if (fArgs) {
-				char* buffer = fArgs;
-				for (int32 i = 0; i < argCount; i++) {
-					size_t argSize = strlen(args[i]) + 1;
-					memcpy(buffer, args[i], argSize);
-					buffer += argSize;
-				}
-			}
-
-			// ignore env for the time being
-			(void)envCount;
-			(void)env;
-
-			Initialized();
-		}
-
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("team exec, \"%p\", args:", fPath);
-
-			char* args = fArgs;
-			for (int32 i = 0; !out.IsFull() && i < fArgCount; i++) {
-				out.Print(" \"%s\"", args);
-				args += strlen(args) + 1;
+		// allocate a buffer
+		fArgs = (char*)alloc_tracing_buffer(argBufferSize);
+		if (fArgs) {
+			char* buffer = fArgs;
+			for (int32 i = 0; i < argCount; i++) {
+				size_t argSize = strlen(args[i]) + 1;
+				memcpy(buffer, args[i], argSize);
+				buffer += argSize;
 			}
 		}
 
-	private:
-		char*	fPath;
-		int32	fArgCount;
-		char*	fArgs;
+		// ignore env for the time being
+		(void)envCount;
+		(void)env;
+
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("team exec, \"%p\", args:", fPath);
+
+		char* args = fArgs;
+		for (int32 i = 0; !out.IsFull() && i < fArgCount; i++) {
+			out.Print(" \"%s\"", args);
+			args += strlen(args) + 1;
+		}
+	}
+
+private:
+	char*	fPath;
+	int32	fArgCount;
+	char*	fArgs;
 };
 
 
@@ -190,91 +190,91 @@ job_control_state_name(job_control_state state)
 
 
 class SetJobControlState : public AbstractTraceEntry {
-	public:
-		SetJobControlState(team_id team, job_control_state newState, int signal)
-			:
-			fTeam(team),
-			fNewState(newState),
-			fSignal(signal)
-		{
-			Initialized();
-		}
+public:
+	SetJobControlState(team_id team, job_control_state newState, int signal)
+		:
+		fTeam(team),
+		fNewState(newState),
+		fSignal(signal)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("team set job control state, team %ld, "
-				"new state: %s, signal: %d",
-				fTeam, job_control_state_name(fNewState), fSignal);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("team set job control state, team %ld, "
+			"new state: %s, signal: %d",
+			fTeam, job_control_state_name(fNewState), fSignal);
+	}
 
-	private:
-		team_id				fTeam;
-		job_control_state	fNewState;
-		int					fSignal;
+private:
+	team_id				fTeam;
+	job_control_state	fNewState;
+	int					fSignal;
 };
 
 
 class WaitForChild : public AbstractTraceEntry {
-	public:
-		WaitForChild(pid_t child, uint32 flags)
-			:
-			fChild(child),
-			fFlags(flags)
-		{
-			Initialized();
-		}
+public:
+	WaitForChild(pid_t child, uint32 flags)
+		:
+		fChild(child),
+		fFlags(flags)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("team wait for child, child: %ld, "
-				"flags: 0x%lx", fChild, fFlags);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("team wait for child, child: %ld, "
+			"flags: 0x%lx", fChild, fFlags);
+	}
 
-	private:
-		pid_t	fChild;
-		uint32	fFlags;
+private:
+	pid_t	fChild;
+	uint32	fFlags;
 };
 
 
 class WaitForChildDone : public AbstractTraceEntry {
-	public:
-		WaitForChildDone(const job_control_entry& entry)
-			:
-			fState(entry.state),
-			fTeam(entry.thread),
-			fStatus(entry.status),
-			fReason(entry.reason),
-			fSignal(entry.signal)
-		{
-			Initialized();
-		}
+public:
+	WaitForChildDone(const job_control_entry& entry)
+		:
+		fState(entry.state),
+		fTeam(entry.thread),
+		fStatus(entry.status),
+		fReason(entry.reason),
+		fSignal(entry.signal)
+	{
+		Initialized();
+	}
 
-		WaitForChildDone(status_t error)
-			:
-			fTeam(error)
-		{
-			Initialized();
-		}
+	WaitForChildDone(status_t error)
+		:
+		fTeam(error)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			if (fTeam >= 0) {
-				out.Print("team wait for child done, team: %ld, "
-					"state: %s, status: 0x%lx, reason: 0x%x, signal: %d\n",
-					fTeam, job_control_state_name(fState), fStatus, fReason,
-					fSignal);
-			} else {
-				out.Print("team wait for child failed, error: "
-					"0x%lx, ", fTeam);
-			}
+	virtual void AddDump(TraceOutput& out)
+	{
+		if (fTeam >= 0) {
+			out.Print("team wait for child done, team: %ld, "
+				"state: %s, status: 0x%lx, reason: 0x%x, signal: %d\n",
+				fTeam, job_control_state_name(fState), fStatus, fReason,
+				fSignal);
+		} else {
+			out.Print("team wait for child failed, error: "
+				"0x%lx, ", fTeam);
 		}
+	}
 
-	private:
-		job_control_state	fState;
-		team_id				fTeam;
-		status_t			fStatus;
-		uint16				fReason;
-		uint16				fSignal;
+private:
+	job_control_state	fState;
+	team_id				fTeam;
+	status_t			fStatus;
+	uint16				fReason;
+	uint16				fSignal;
 };
 
 }	// namespace TeamTracing
@@ -1639,7 +1639,7 @@ job_control_entry::job_control_entry()
 job_control_entry::~job_control_entry()
 {
 	if (has_group_ref) {
-		InterruptsSpinLocker locker(team_spinlock);
+		InterruptsSpinLocker locker(gTeamSpinlock);
 		release_process_group_ref(group_id);
 	}
 }
@@ -1706,7 +1706,7 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 	bool ignoreFoundEntriesChecked = false;
 
 	while (true) {
-		InterruptsSpinLocker locker(team_spinlock);
+		InterruptsSpinLocker locker(gTeamSpinlock);
 
 		// check whether any condition holds
 		job_control_entry* entry = get_job_control_entry(team, child, flags);
@@ -1820,7 +1820,7 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 	// If SIGCHLD is blocked, we shall clear pending SIGCHLDs, if no other child
 	// status is available.
 	if (is_signal_blocked(SIGCHLD)) {
-		InterruptsSpinLocker locker(team_spinlock);
+		InterruptsSpinLocker locker(gTeamSpinlock);
 
 		if (get_job_control_entry(team, child, flags) == NULL)
 			atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(SIGCHLD));
@@ -1905,7 +1905,7 @@ update_orphaned_process_group(process_group* group, pid_t dyingProcess)
 static bool
 process_group_has_stopped_processes(process_group* group)
 {
-	SpinLocker _(thread_spinlock);
+	SpinLocker _(gThreadSpinlock);
 
 	struct team* team = group->teams;
 	while (team != NULL) {
@@ -2101,7 +2101,7 @@ team_set_controlling_tty(int32 ttyIndex)
 {
 	struct team* team = thread_get_current_thread()->team;
 
-	InterruptsSpinLocker _(team_spinlock);
+	InterruptsSpinLocker _(gTeamSpinlock);
 
 	team->group->session->controlling_tty = ttyIndex;
 	team->group->session->foreground_group = -1;
@@ -2113,7 +2113,7 @@ team_get_controlling_tty()
 {
 	struct team* team = thread_get_current_thread()->team;
 
-	InterruptsSpinLocker _(team_spinlock);
+	InterruptsSpinLocker _(gTeamSpinlock);
 
 	return team->group->session->controlling_tty;
 }
@@ -2125,7 +2125,7 @@ team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
 	struct thread* thread = thread_get_current_thread();
 	struct team* team = thread->team;
 
-	InterruptsSpinLocker locker(team_spinlock);
+	InterruptsSpinLocker locker(gTeamSpinlock);
 
 	process_session* session = team->group->session;
 
@@ -2610,7 +2610,7 @@ team_free_user_thread(struct thread* thread)
 		return;
 	}
 
-	InterruptsSpinLocker _(team_spinlock);
+	InterruptsSpinLocker _(gTeamSpinlock);
 
 	entry->thread = userThread;
 	entry->next = thread->team->free_user_threads;
@@ -3069,7 +3069,7 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			return B_NOT_ALLOWED;
 	} else {
 		// another team is the target of the call -- check it out
-		InterruptsSpinLocker _(team_spinlock);
+		InterruptsSpinLocker _(gTeamSpinlock);
 
 		team = team_get_team_struct_locked(processID);
 		if (team == NULL)
@@ -3106,7 +3106,7 @@ _user_setpgid(pid_t processID, pid_t groupID)
 	status_t status = B_OK;
 	struct process_group *freeGroup = NULL;
 
-	InterruptsSpinLocker locker(team_spinlock);
+	InterruptsSpinLocker locker(gTeamSpinlock);
 
 	team = team_get_team_struct_locked(processID);
 	if (team != NULL) {

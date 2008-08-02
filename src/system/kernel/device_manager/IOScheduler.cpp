@@ -158,7 +158,7 @@ IOScheduler::OperationCompleted(IOOperation* operation, status_t status,
 	fFinishedOperationCondition.NotifyAll();
 
 	if (fWaiting) {
-		SpinLocker _2(thread_spinlock);
+		SpinLocker _2(gThreadSpinlock);
 		thread_interrupt(thread_get_thread_struct_locked(fSchedulerThread),
 			false);
 	}

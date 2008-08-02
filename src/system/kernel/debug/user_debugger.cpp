@@ -150,7 +150,7 @@ update_thread_breakpoints_flag()
 static void
 update_threads_breakpoints_flag()
 {
-	InterruptsSpinLocker _(team_spinlock);
+	InterruptsSpinLocker _(gTeamSpinlock);
 
 	struct team* team = thread_get_current_thread()->team;
 	struct thread* thread = team->thread_list;
@@ -538,7 +538,7 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 						thread->id));
 					arch_set_debug_cpu_state(
 						&commandMessage.set_cpu_state.cpu_state);
-					
+
 					break;
 				}
 
@@ -562,7 +562,7 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 				case B_DEBUGGED_THREAD_DEBUGGER_CHANGED:
 				{
 					// Check, if the debugger really changed, i.e. is different
-					// than the one we know. 
+					// than the one we know.
 					team_debug_info teamDebugInfo;
 					get_team_debug_info(teamDebugInfo);
 
@@ -850,7 +850,7 @@ user_debug_update_new_thread_flags(thread_id threadID)
 
 	InterruptsLocker interruptsLocker;
 
-	SpinLocker threadLocker(thread_spinlock);
+	SpinLocker threadLocker(gThreadSpinlock);
 
 	struct thread *thread = thread_get_thread_struct_locked(threadID);
 	if (!thread)
@@ -860,7 +860,7 @@ user_debug_update_new_thread_flags(thread_id threadID)
 
 	threadLocker.Unlock();
 
-	SpinLocker teamLocker(team_spinlock);
+	SpinLocker teamLocker(gTeamSpinlock);
 	update_thread_breakpoints_flag();
 	update_thread_debugger_installed_flag();
 }
@@ -1611,7 +1611,7 @@ debug_nub_thread(void *)
 
 				break;
 			}
-			
+
 			case B_DEBUG_MESSAGE_CLEAR_BREAKPOINT:
 			{
 				// get the parameters
@@ -1758,7 +1758,7 @@ debug_nub_thread(void *)
 				// get the masks
 				uint64 ignore = 0;
 				uint64 ignoreOnce = 0;
-				
+
 				cpu_status state = disable_interrupts();
 				GRAB_THREAD_LOCK();
 
@@ -1888,7 +1888,7 @@ debug_nub_thread(void *)
 				} else {
 					// We probably got a SIGKILL. If so, we will terminate when
 					// reading the next message fails.
-				}	
+				}
 
 				break;
 			}

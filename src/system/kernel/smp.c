@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -59,15 +59,15 @@ struct smp_msg {
 
 static spinlock boot_cpu_spin[SMP_MAX_CPUS] = { };
 
-static struct smp_msg *free_msgs = NULL;
-static volatile int free_msg_count = 0;
-static spinlock free_msg_spinlock = B_SPINLOCK_INITIALIZER;
+static struct smp_msg *sFreeMessages = NULL;
+static volatile int sFreeMessageCount = 0;
+static spinlock sFreeMessageSpinlock = B_SPINLOCK_INITIALIZER;
 
-static struct smp_msg *smp_msgs[SMP_MAX_CPUS] = { NULL, };
-static spinlock cpu_msg_spinlock[SMP_MAX_CPUS];
+static struct smp_msg *sCPUMessages[SMP_MAX_CPUS] = { NULL, };
+static spinlock sCPUMessageSpinlock[SMP_MAX_CPUS];
 
-static struct smp_msg *smp_broadcast_msgs = NULL;
-static spinlock broadcast_msg_spinlock = B_SPINLOCK_INITIALIZER;
+static struct smp_msg *sBroadcastMessages = NULL;
+static spinlock sBroadcastMessageSpinlock = B_SPINLOCK_INITIALIZER;
 
 static bool sICIEnabled = false;
 static int32 sNumCPUs = 1;
@@ -89,7 +89,7 @@ static void
 push_lock_caller(void *caller, spinlock *lock)
 {
 	sLastCaller[sLastIndex].caller = caller;
-	sLastCaller[sLastIndex].lock = lock;	
+	sLastCaller[sLastIndex].lock = lock;
 
 	if (++sLastIndex >= NUM_LAST_CALLERS)
 		sLastIndex = 0;
@@ -139,7 +139,7 @@ acquire_spinlock(spinlock *lock)
 			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
 		oldValue = atomic_set((int32 *)lock, 1);
 		if (oldValue != 0) {
-			panic("acquire_spinlock: attempt to acquire lock %p twice on non-SMP system (last caller: %p, value %ld)\n", 
+			panic("acquire_spinlock: attempt to acquire lock %p twice on non-SMP system (last caller: %p, value %ld)\n",
 				lock, find_lock_caller(lock), oldValue);
 		}
 
@@ -147,7 +147,7 @@ acquire_spinlock(spinlock *lock)
 #endif
 	}
 }
- 
+
 
 static void
 acquire_spinlock_nocheck(spinlock *lock)
@@ -226,24 +226,24 @@ find_free_message(struct smp_msg **msg)
 	TRACE(("find_free_message: entry\n"));
 
 retry:
-	while (free_msg_count <= 0) 
+	while (sFreeMessageCount <= 0)
 		PAUSE();
 	state = disable_interrupts();
-	acquire_spinlock(&free_msg_spinlock);
+	acquire_spinlock(&sFreeMessageSpinlock);
 
-	if (free_msg_count <= 0) {
+	if (sFreeMessageCount <= 0) {
 		// someone grabbed one while we were getting the lock,
 		// go back to waiting for it
-		release_spinlock(&free_msg_spinlock);
+		release_spinlock(&sFreeMessageSpinlock);
 		restore_interrupts(state);
 		goto retry;
 	}
 
-	*msg = free_msgs;
-	free_msgs = (*msg)->next;
-	free_msg_count--;
+	*msg = sFreeMessages;
+	sFreeMessages = (*msg)->next;
+	sFreeMessageCount--;
 
-	release_spinlock(&free_msg_spinlock);
+	release_spinlock(&sFreeMessageSpinlock);
 
 	TRACE(("find_free_message: returning msg %p\n", *msg));
 
@@ -256,11 +256,11 @@ return_free_message(struct smp_msg *msg)
 {
 	TRACE(("return_free_message: returning msg %p\n", msg));
 
-	acquire_spinlock_nocheck(&free_msg_spinlock);
-	msg->next = free_msgs;
-	free_msgs = msg;
-	free_msg_count++;
-	release_spinlock(&free_msg_spinlock);
+	acquire_spinlock_nocheck(&sFreeMessageSpinlock);
+	msg->next = sFreeMessages;
+	sFreeMessages = msg;
+	sFreeMessageCount++;
+	release_spinlock(&sFreeMessageSpinlock);
 }
 
 
@@ -272,20 +272,20 @@ check_for_message(int currentCPU, int *source_mailbox)
 	if (!sICIEnabled)
 		return NULL;
 
-	acquire_spinlock_nocheck(&cpu_msg_spinlock[currentCPU]);
-	msg = smp_msgs[currentCPU];
+	acquire_spinlock_nocheck(&sCPUMessageSpinlock[currentCPU]);
+	msg = sCPUMessages[currentCPU];
 	if (msg != NULL) {
-		smp_msgs[currentCPU] = msg->next;
-		release_spinlock(&cpu_msg_spinlock[currentCPU]);
+		sCPUMessages[currentCPU] = msg->next;
+		release_spinlock(&sCPUMessageSpinlock[currentCPU]);
 		TRACE((" cpu %d: found msg %p in cpu mailbox\n", currentCPU, msg));
 		*source_mailbox = MAILBOX_LOCAL;
 	} else {
 		// try getting one from the broadcast mailbox
 
-		release_spinlock(&cpu_msg_spinlock[currentCPU]);
-		acquire_spinlock_nocheck(&broadcast_msg_spinlock);
+		release_spinlock(&sCPUMessageSpinlock[currentCPU]);
+		acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
 
-		msg = smp_broadcast_msgs;
+		msg = sBroadcastMessages;
 		while (msg != NULL) {
 			if (CHECK_BIT(msg->proc_bitmap, currentCPU) != 0) {
 				// we have handled this one already
@@ -298,7 +298,7 @@ check_for_message(int currentCPU, int *source_mailbox)
 			*source_mailbox = MAILBOX_BCAST;
 			break;
 		}
-		release_spinlock(&broadcast_msg_spinlock);
+		release_spinlock(&sBroadcastMessageSpinlock);
 		TRACE((" cpu %d: found msg %p in broadcast mailbox\n", currentCPU, msg));
 	}
 	return msg;
@@ -320,12 +320,12 @@ finish_message_processing(int currentCPU, struct smp_msg *msg, int source_mailbo
 		// clean up the message from one of the mailboxes
 		switch (source_mailbox) {
 			case MAILBOX_BCAST:
-				mbox = &smp_broadcast_msgs;
-				spinlock = &broadcast_msg_spinlock;
+				mbox = &sBroadcastMessages;
+				spinlock = &sBroadcastMessageSpinlock;
 				break;
 			case MAILBOX_LOCAL:
-				mbox = &smp_msgs[currentCPU];
-				spinlock = &cpu_msg_spinlock[currentCPU];
+				mbox = &sCPUMessages[currentCPU];
+				spinlock = &sCPUMessageSpinlock[currentCPU];
 				break;
 		}
 
@@ -462,8 +462,8 @@ spinlock_contention_syscall(const char* subsystem, uint32 function,
 	if (bufferSize < sizeof(spinlock_contention_info))
 		return B_BAD_VALUE;
 
-	info.thread_spinlock_counter = get_spinlock_counter(&thread_spinlock);
-	info.team_spinlock_counter = get_spinlock_counter(&team_spinlock);
+	info.thread_spinlock_counter = get_spinlock_counter(&gThreadSpinlock);
+	info.team_spinlock_counter = get_spinlock_counter(&gTeamSpinlock);
 
 	if (!IS_USER_ADDRESS(buffer)
 		|| user_memcpy(buffer, &info, sizeof(info)) != B_OK) {
@@ -529,10 +529,10 @@ smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2, uint32 d
 		msg->done = false;
 
 		// stick it in the appropriate cpu's mailbox
-		acquire_spinlock_nocheck(&cpu_msg_spinlock[targetCPU]);
-		msg->next = smp_msgs[targetCPU];
-		smp_msgs[targetCPU] = msg;
-		release_spinlock(&cpu_msg_spinlock[targetCPU]);
+		acquire_spinlock_nocheck(&sCPUMessageSpinlock[targetCPU]);
+		msg->next = sCPUMessages[targetCPU];
+		sCPUMessages[targetCPU] = msg;
+		release_spinlock(&sCPUMessageSpinlock[targetCPU]);
 
 		arch_smp_send_ici(targetCPU);
 
@@ -586,10 +586,10 @@ smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 			currentCPU, msg));
 
 		// stick it in the appropriate cpu's mailbox
-		acquire_spinlock_nocheck(&broadcast_msg_spinlock);
-		msg->next = smp_broadcast_msgs;
-		smp_broadcast_msgs = msg;
-		release_spinlock(&broadcast_msg_spinlock);
+		acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
+		msg->next = sBroadcastMessages;
+		sBroadcastMessages = msg;
+		release_spinlock(&sBroadcastMessageSpinlock);
 
 		arch_smp_send_broadcast_ici();
 
@@ -671,8 +671,8 @@ smp_init(kernel_args *args)
 	TRACE(("smp_init: entry\n"));
 
 	if (args->num_cpus > 1) {
-		free_msgs = NULL;
-		free_msg_count = 0;
+		sFreeMessages = NULL;
+		sFreeMessageCount = 0;
 		for (i = 0; i < MSG_POOL_SIZE; i++) {
 			msg = (struct smp_msg *)malloc(sizeof(struct smp_msg));
 			if (msg == NULL) {
@@ -680,9 +680,9 @@ smp_init(kernel_args *args)
 				return B_ERROR;
 			}
 			memset(msg, 0, sizeof(struct smp_msg));
-			msg->next = free_msgs;
-			free_msgs = msg;
-			free_msg_count++;
+			msg->next = sFreeMessages;
+			sFreeMessages = msg;
+			sFreeMessageCount++;
 		}
 		sNumCPUs = args->num_cpus;
 	}

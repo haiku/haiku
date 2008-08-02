@@ -132,7 +132,7 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 
 	conditionLocker.Unlock();
 
-	SpinLocker threadLocker(thread_spinlock);
+	SpinLocker threadLocker(gThreadSpinlock);
 
 	status_t error;
 	if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0)
@@ -215,7 +215,7 @@ ConditionVariable::Unpublish(bool threadsLocked)
 	ASSERT(fObject != NULL);
 
 	InterruptsLocker _;
-	SpinLocker threadLocker(threadsLocked ? NULL : &thread_spinlock);
+	SpinLocker threadLocker(threadsLocked ? NULL : &gThreadSpinlock);
 	SpinLocker locker(sConditionVariablesLock);
 
 #if KDEBUG
@@ -286,7 +286,7 @@ void
 ConditionVariable::_Notify(bool all, bool threadsLocked)
 {
 	InterruptsLocker _;
-	SpinLocker threadLocker(threadsLocked ? NULL : &thread_spinlock);
+	SpinLocker threadLocker(threadsLocked ? NULL : &gThreadSpinlock);
 	SpinLocker locker(sConditionVariablesLock);
 
 	if (!fEntries.IsEmpty())

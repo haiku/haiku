@@ -1503,7 +1503,7 @@ disconnect_mount_or_vnode_fds(struct fs_mount *mount,
 		team_id lastTeamID;
 
 		cpu_status state = disable_interrupts();
-		SpinLocker teamsLock(team_spinlock);
+		SpinLocker teamsLock(gTeamSpinlock);
 
 		lastTeamID = peek_next_thread_id();
 		if (nextTeamID < lastTeamID) {

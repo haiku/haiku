@@ -229,7 +229,7 @@ update_thread_signals_flag(struct thread* thread)
 void
 update_current_thread_signals_flag()
 {
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	update_thread_signals_flag(thread_get_current_thread());
 }
@@ -343,7 +343,7 @@ handle_signals(struct thread *thread)
 
 					// notify threads waiting for team state changes
 					if (thread == thread->team->main_thread) {
-						InterruptsSpinLocker locker(team_spinlock);
+						InterruptsSpinLocker locker(gTeamSpinlock);
 						team_set_job_control_state(thread->team,
 							JOB_CONTROL_STATE_CONTINUED, signal, false);
 
@@ -366,13 +366,13 @@ handle_signals(struct thread *thread)
 
 					// notify threads waiting for team state changes
 					if (thread == thread->team->main_thread) {
-						InterruptsSpinLocker locker(team_spinlock);
+						InterruptsSpinLocker locker(gTeamSpinlock);
 						team_set_job_control_state(thread->team,
 							JOB_CONTROL_STATE_STOPPED, signal, false);
 
 						// send a SIGCHLD to the parent (if it does have
 						// SA_NOCLDSTOP defined)
-						SpinLocker _(thread_spinlock);
+						SpinLocker _(gThreadSpinlock);
 						struct thread* parentThread
 							= thread->team->parent->main_thread;
 						struct sigaction& parentHandler

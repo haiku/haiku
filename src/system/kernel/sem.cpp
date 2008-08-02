@@ -918,7 +918,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 
 	bool unblockedAny = false;
 
-	SpinLocker threadLocker(thread_spinlock);
+	SpinLocker threadLocker(gThreadSpinlock);
 
 	while (count > 0) {
 		queued_thread* entry = sSems[slot].queue.Head();
@@ -1058,7 +1058,7 @@ _get_next_sem_info(team_id team, int32 *_cookie, struct sem_info *info,
 		team = team_get_current_team_id();
 	/* prevents sSems[].owner == -1 >= means owned by a port */
 	if (team < 0 || !team_is_valid(team))
-		return B_BAD_TEAM_ID; 
+		return B_BAD_TEAM_ID;
 
 	slot = *_cookie;
 	if (slot >= sMaxSems)

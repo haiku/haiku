@@ -19,15 +19,15 @@
 #include <arch/thread_types.h>
 
 
-extern spinlock thread_spinlock;
-#define GRAB_THREAD_LOCK()    acquire_spinlock(&thread_spinlock)
-#define RELEASE_THREAD_LOCK() release_spinlock(&thread_spinlock)
+extern spinlock gThreadSpinlock;
+#define GRAB_THREAD_LOCK()    acquire_spinlock(&gThreadSpinlock)
+#define RELEASE_THREAD_LOCK() release_spinlock(&gThreadSpinlock)
 
-extern spinlock team_spinlock;
+extern spinlock gTeamSpinlock;
 	// NOTE: TEAM lock can be held over a THREAD lock acquisition,
 	// but not the other way (to avoid deadlock)
-#define GRAB_TEAM_LOCK()    acquire_spinlock(&team_spinlock)
-#define RELEASE_TEAM_LOCK() release_spinlock(&team_spinlock)
+#define GRAB_TEAM_LOCK()    acquire_spinlock(&gTeamSpinlock)
+#define RELEASE_TEAM_LOCK() release_spinlock(&gTeamSpinlock)
 
 enum additional_thread_state {
 	THREAD_STATE_FREE_ON_RESCHED = 7, // free the thread structure upon reschedule

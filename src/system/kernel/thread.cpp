@@ -60,7 +60,7 @@ struct thread_key {
 };
 
 // global
-spinlock thread_spinlock = B_SPINLOCK_INITIALIZER;
+spinlock gThreadSpinlock = B_SPINLOCK_INITIALIZER;
 
 // thread list
 static struct thread sIdleThreads[B_MAX_CPU_COUNT];
@@ -537,7 +537,7 @@ undertaker(void* /*args*/)
 {
 	while (true) {
 		// wait for a thread to bury
-		InterruptsSpinLocker locker(thread_spinlock);
+		InterruptsSpinLocker locker(gThreadSpinlock);
 
 		while (sUndertakerEntries.IsEmpty()) {
 			ConditionVariableEntry conditionEntry;
@@ -1587,7 +1587,7 @@ thread_at_kernel_exit(void)
 	TRACE(("thread_at_kernel_exit: exit thread %ld\n", thread->id));
 
 	while (handle_signals(thread)) {
-		InterruptsSpinLocker _(thread_spinlock);
+		InterruptsSpinLocker _(gThreadSpinlock);
 		scheduler_reschedule();
 	}
 
@@ -1743,7 +1743,7 @@ thread_yield(bool force)
 			return;
 
 		// Don't force the thread off the CPU, just reschedule.
-		InterruptsSpinLocker _(thread_spinlock);
+		InterruptsSpinLocker _(gThreadSpinlock);
 		scheduler_reschedule();
 	}
 }
@@ -1894,7 +1894,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 status_t
 select_thread(int32 id, struct select_info* info, bool kernel)
 {
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	// get thread
 	struct thread* thread = thread_get_thread_struct_locked(id);
@@ -1920,7 +1920,7 @@ select_thread(int32 id, struct select_info* info, bool kernel)
 status_t
 deselect_thread(int32 id, struct select_info* info, bool kernel)
 {
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	// get thread
 	struct thread* thread = thread_get_thread_struct_locked(id);
@@ -2125,7 +2125,7 @@ thread_block_timeout(timer* timer)
 status_t
 thread_block()
 {
-	InterruptsSpinLocker _(thread_spinlock);
+	InterruptsSpinLocker _(gThreadSpinlock);
 	return thread_block_locked(thread_get_current_thread());
 }
 
@@ -2133,7 +2133,7 @@ thread_block()
 bool
 thread_unblock(status_t threadID, status_t status)
 {
-	InterruptsSpinLocker _(thread_spinlock);
+	InterruptsSpinLocker _(gThreadSpinlock);
 
 	struct thread* thread = thread_get_thread_struct_locked(threadID);
 	if (thread == NULL)
@@ -2145,7 +2145,7 @@ thread_unblock(status_t threadID, status_t status)
 status_t
 thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
 {
-	InterruptsSpinLocker _(thread_spinlock);
+	InterruptsSpinLocker _(gThreadSpinlock);
 	return thread_block_with_timeout_locked(timeoutFlags, timeout);
 }
 
@@ -2468,7 +2468,7 @@ snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 	if (timebase != B_SYSTEM_TIMEBASE)
 		return B_BAD_VALUE;
 
-	InterruptsSpinLocker _(thread_spinlock);
+	InterruptsSpinLocker _(gThreadSpinlock);
 	struct thread* thread = thread_get_current_thread();
 
 	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_SNOOZE, NULL);
@@ -2812,7 +2812,7 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 
 	struct thread* thread = thread_get_current_thread();
 
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	// check, if already done
 	if (thread->user_thread->wait_status <= 0)
@@ -2830,7 +2830,7 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 status_t
 _user_unblock_thread(thread_id threadID, status_t status)
 {
-	InterruptsSpinLocker locker(thread_spinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 	return user_unblock_thread(threadID, status);
 }
 

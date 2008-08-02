@@ -84,7 +84,7 @@ public:
 	{
 		// For some reason the semaphore is getting destroyed.
 		// Wake up any remaing awaiting threads
-		InterruptsSpinLocker _(thread_spinlock);
+		InterruptsSpinLocker _(gThreadSpinlock);
 		while (queued_thread *entry = fWaitingToIncreaseQueue.RemoveHead()) {
 			entry->queued = false;
 			thread_unblock_locked(entry->thread, EIDRM);
@@ -184,7 +184,7 @@ public:
 		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
 			THREAD_BLOCK_TYPE_OTHER, (void*)"xsi semaphore");
 
-		InterruptsSpinLocker _(thread_spinlock);
+		InterruptsSpinLocker _(gThreadSpinlock);
 		status_t result = thread_block_locked(thread);
 
 		if (queueEntry.queued) {
@@ -204,7 +204,7 @@ public:
 
 	void WakeUpThread(bool waitingForZero)
 	{
-		InterruptsSpinLocker _(thread_spinlock);
+		InterruptsSpinLocker _(gThreadSpinlock);
 		if (waitingForZero) {
 			// Wake up all threads waiting on zero
 			while (queued_thread *entry = fWaitingToBeZeroQueue.RemoveHead()) {
@@ -240,7 +240,7 @@ public:
 	XsiSemaphoreSet(int numberOfSemaphores, int flags)
 		: fInitOK(false),
 		fLastSemctlTime((time_t)real_time_clock()),
-		fLastSemopTime(0),	
+		fLastSemopTime(0),
 		fNumberOfSemaphores(numberOfSemaphores),
 		fSemaphores(0)
 	{
@@ -495,7 +495,7 @@ XsiSemaphore::ClearUndos(int semaphoreSetID, short semaphoreNumber)
 	// Clear all undo_value (Posix semadj equivalent),
 	// which result in removing the sem_undo record from
 	// the global undo list, plus decrementing the related
-	// team xsi_sem_undo_requests field. 
+	// team xsi_sem_undo_requests field.
 	// This happens only on semctl SETVAL and SETALL.
 	TRACE(("XsiSemaphore::ClearUndos: semaphoreSetID = %d, "
 		"semaphoreNumber = %d\n", semaphoreSetID, semaphoreNumber));
@@ -505,7 +505,7 @@ XsiSemaphore::ClearUndos(int semaphoreSetID, short semaphoreNumber)
 		struct sem_undo *current = iterator.Next();
 		if (current->semaphore_set_id == semaphoreSetID
 				&& current->semaphore_number == semaphoreNumber) {
-			InterruptsSpinLocker lock(team_spinlock);
+			InterruptsSpinLocker lock(gTeamSpinlock);
 			if (current->team)
 				current->team->xsi_sem_undo_requests--;
 			iterator.Remove();
@@ -560,7 +560,7 @@ XsiSemaphore::RecordUndo(int semaphoreSetID, short semaphoreNumber, short value)
 		request->semaphore_number = semaphoreNumber;
 		request->undo_value = value;
 		// Add the request to the global sem_undo list
-		InterruptsSpinLocker _(team_spinlock);
+		InterruptsSpinLocker _(gTeamSpinlock);
 		if ((int)(team->xsi_sem_undo_requests + 1) < USHRT_MAX)
 			team->xsi_sem_undo_requests++;
 		else
@@ -592,7 +592,7 @@ XsiSemaphore::RemoveUndo(int semaphoreSetID, short semaphoreNumber, short value)
 			// sem_undo request made previously by the same
 			// process
 			if (current->undo_value == 0) {
-				InterruptsSpinLocker _(team_spinlock);
+				InterruptsSpinLocker _(gTeamSpinlock);
 				if (current->team)
 					current->team->xsi_sem_undo_requests--;
 				iterator.Remove();
@@ -674,7 +674,7 @@ xsi_sem_undo(team_id teamID, int32 numberOfUndos)
 					"SemaphoreNumber = %d, undo value = %d\n", (int)teamID,
 					semaphoreSetID, current->semaphore_number,
 					current->undo_value));
-				semaphore->Revert(current->undo_value);	
+				semaphore->Revert(current->undo_value);
 			} else
 				TRACE(("xsi_do_undo: semaphore set %d does not exist "
 					"anymore. Ignore record.\n", semaphoreSetID));
@@ -756,7 +756,7 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 
 	if (create) {
 		// Create a new sempahore set for this key
-		if (numberOfSemaphores < 0 
+		if (numberOfSemaphores < 0
 				|| numberOfSemaphores >= MAX_XSI_SEMS_PER_TEAM) {
 			TRACE_ERROR(("xsi_semget: numberOfSemaphores out of range\n"));
 			return EINVAL;
@@ -1058,7 +1058,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 					break;
 				}
 			} else if (operation == 0) {
-				if (value == 0) 
+				if (value == 0)
 					continue;
 				else if (operations[i].sem_flg & IPC_NOWAIT) {
 					result = EAGAIN;

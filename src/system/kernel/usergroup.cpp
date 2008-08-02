@@ -39,7 +39,7 @@ common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 {
 	struct team* team = thread_get_current_thread()->team;
 
-	InterruptsSpinLocker _(team_spinlock);
+	InterruptsSpinLocker _(gTeamSpinlock);
 
 	bool privileged = kernel || is_privileged(team);
 
@@ -102,7 +102,7 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 {
 	struct team* team = thread_get_current_thread()->team;
 
-	InterruptsSpinLocker _(team_spinlock);
+	InterruptsSpinLocker _(gTeamSpinlock);
 
 	bool privileged = kernel || is_privileged(team);
 
@@ -165,7 +165,7 @@ common_getgroups(int groupCount, gid_t* groupList, bool kernel)
 {
 	struct team* team = thread_get_current_thread()->team;
 
-	InterruptsSpinLocker _(team_spinlock);
+	InterruptsSpinLocker _(gTeamSpinlock);
 
 	const gid_t* groups = team->supplementary_groups;
 	int actualCount = team->supplementary_group_count;
@@ -223,7 +223,7 @@ common_setgroups(int groupCount, const gid_t* groupList, bool kernel)
 		}
 	}
 
-	InterruptsSpinLocker locker(team_spinlock);
+	InterruptsSpinLocker locker(gTeamSpinlock);
 
 	struct team* team = thread_get_current_thread()->team;
 
@@ -245,7 +245,7 @@ common_setgroups(int groupCount, const gid_t* groupList, bool kernel)
 void
 inherit_parent_user_and_group(struct team* team, struct team* parent)
 {
-	InterruptsSpinLocker _(team_spinlock);
+	InterruptsSpinLocker _(gTeamSpinlock);
 
 	team->saved_set_uid = parent->saved_set_uid;
 	team->real_uid = parent->real_uid;
@@ -268,7 +268,7 @@ update_set_id_user_and_group(struct team* team, const char* file)
 	if (status != B_OK)
 		return status;
 
-	InterruptsSpinLocker _(team_spinlock);
+	InterruptsSpinLocker _(gTeamSpinlock);
 
 	if ((st.st_mode & S_ISUID) != 0) {
 		team->saved_set_uid = st.st_uid;
