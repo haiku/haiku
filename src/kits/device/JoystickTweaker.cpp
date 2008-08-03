@@ -65,7 +65,7 @@ _BJoystickTweaker::save_config(const entry_ref *ref)
 
 status_t
 _BJoystickTweaker::scan_including_disabled(const char* rootPath, BList *list,
-						BEntry *rootEntry = NULL)
+						BEntry *rootEntry)
 {
 	BDirectory root;
 
