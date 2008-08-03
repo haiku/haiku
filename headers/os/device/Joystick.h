@@ -16,11 +16,24 @@
 #include <SupportDefs.h>
 #include <OS.h>
 
+#define DEBUG
+
 class BList;
 class BString;
 struct entry_ref;
 struct _extended_joystick;
 class _BJoystickTweaker;
+
+typedef struct _joystick_info {
+	char		module_name[64];
+	char		controller_name[64];
+	int16		num_axes;
+	int16		num_buttons;
+	int16		num_hats;
+	uint32		num_sticks;
+	bool		calibration_enable;
+	bigtime_t	max_latency;
+} joystick_info;
 
 /* -----------------------------------------------------------------------*/
 class BJoystick {
@@ -89,8 +102,9 @@ virtual	void			Calibrate(
 
 private:
 friend class _BJoystickTweaker;
+//friend class JoyCalib; //Added from Zeta
 
-		struct _joystick_info;
+//		struct _joystick_info;
 
 		void		ScanDevices(
 						bool use_disabled = false);
@@ -109,10 +123,17 @@ virtual	void		_ReservedJoystick3();
 		BList *		_fDevices;
 		_joystick_info * m_info;
 		char * m_dev_name;
+#if !_PR3_COMPATIBLE_		//if statment added from Zeta
 virtual	status_t	_Reserved_Joystick_4(void *, ...);
 virtual	status_t	_Reserved_Joystick_5(void *, ...);
 virtual	status_t	_Reserved_Joystick_6(void *, ...);
 		uint32		_reserved_Joystick_[10];
+#endif
+
+#ifdef DEBUG
+public:
+	static FILE *sLogFile;
+#endif
 };
 
 #endif
