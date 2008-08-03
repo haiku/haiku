@@ -32,18 +32,20 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <Debug.h>
+#include "WindowMenuItem.h"
+
 #include <stdio.h>
+
 #include <Bitmap.h>
+#include <Debug.h>
 
 #include "BarApp.h"
 #include "BarMenuBar.h"
 #include "ExpandoMenuBar.h"
+#include "icons.h"
 #include "ResourceSet.h"
 #include "TeamMenu.h"
 #include "WindowMenu.h"
-#include "WindowMenuItem.h"
-#include "icons.h"
 
 
 const float	kHPad = 10.0f;
@@ -52,9 +54,9 @@ const float	kLabelOffset = 8.0f;
 const BRect	kIconRect(1.0f, 1.0f, 13.0f, 14.0f);
 
 
-TWindowMenuItem::TWindowMenuItem(const char *title, int32 id,
-	bool mini, bool currentWorkspace, bool dragging)
-	:	BMenuItem(title, NULL),
+TWindowMenuItem::TWindowMenuItem(const char *title, int32 id, bool mini,
+		bool currentWorkspace, bool dragging)
+	: BMenuItem(title, NULL),
 	fID(id),
 	fMini(mini),
 	fCurrentWorkSpace(currentWorkspace),
@@ -71,14 +73,15 @@ TWindowMenuItem::TWindowMenuItem(const char *title, int32 id,
 void
 TWindowMenuItem::Initialize(const char *title)
 {
-	if (fMini)
+	if (fMini) {
  		fBitmap = fCurrentWorkSpace
 			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenIcon)
 			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenSwitchIcon);
-	else
+	} else {
  		fBitmap = fCurrentWorkSpace
 			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownIcon)
 			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownSwitchIcon);
+	}
 
 	BFont font(be_plain_font);
 	fTitleWidth = ceilf(font.StringWidth(title));
@@ -90,8 +93,8 @@ TWindowMenuItem::Initialize(const char *title)
 
 
 void
-TWindowMenuItem::SetTo(const char *title, int32 id,
-	bool mini, bool currentWorkspace, bool dragging)
+TWindowMenuItem::SetTo(const char *title, int32 id, bool mini,
+	bool currentWorkspace, bool dragging)
 {
 	fModified = fCurrentWorkSpace != currentWorkspace || fMini != mini;
 
@@ -121,9 +124,9 @@ TWindowMenuItem::SetLabel(const char* string)
 	if (fExpanded && Menu()) {
 		BPoint contLoc = ContentLocation() + BPoint(kHPad, kVPad);
 		contLoc.x += kIconRect.Width() + kLabelOffset;
-	
+
 		be_plain_font->TruncateString(&truncatedTitle, B_TRUNCATE_MIDDLE,
-									  Frame().Width() - contLoc.x - 3.0f);
+			Frame().Width() - contLoc.x - 3.0f);
 	}
 
 	if (strcmp(Label(), truncatedTitle.String()) != 0)
@@ -141,22 +144,26 @@ TWindowMenuItem::ID()
 void
 TWindowMenuItem::GetContentSize(float *width, float *height)
 {
-	if (!fExpanded) {
-		*width = kHPad + fTitleWidth + kHPad;
-		if (fID >= 0)
-			*width += fBitmap->Bounds().Width() + kLabelOffset;
-	} else
-		*width = Frame().Width()/* - kHPad*/;
+	if (width != NULL) {
+		if (!fExpanded) {
+			*width = kHPad + fTitleWidth + kHPad;
+			if (fID >= 0)
+				*width += fBitmap->Bounds().Width() + kLabelOffset;
+		} else
+			*width = Frame().Width()/* - kHPad*/;
+	}
 
 	// Note: when the item is in "expanded mode", ie embedded into
 	// the Deskbar itself, then a truncated label is used in SetLabel()
 	// The code here is ignorant of this fact, but it doesn't seem to
 	// hurt anything.
 
-	*height = (fID >= 0) ? fBitmap->Bounds().Height() : 0.0f;
-	float labelHeight = fTitleAscent + fTitleDescent;
-	*height = (labelHeight > *height) ? labelHeight : *height;
-	*height += kVPad * 2;
+	if (height != NULL) {
+		*height = (fID >= 0) ? fBitmap->Bounds().Height() : 0.0f;
+		float labelHeight = fTitleAscent + fTitleDescent;
+		*height = (labelHeight > *height) ? labelHeight : *height;
+		*height += kVPad * 2;
+	}
 }
 
 
@@ -172,23 +179,26 @@ TWindowMenuItem::Draw()
 
 		//	if not selected or being tracked on, fill with gray
 		TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
-		if (!IsSelected() && !menu->IsRedrawAfterSticky() || barview->Dragging() || !IsEnabled()) {
+		if (!IsSelected() && !menu->IsRedrawAfterSticky()
+			|| barview->Dragging() || !IsEnabled()) {
 			menu->SetHighColor(menuColor);
 			menu->FillRect(frame);
 
 			if (fExpanded) {
-				rgb_color shadow = tint_color(menuColor, (B_NO_TINT + B_DARKEN_1_TINT) / 2.0f);
+				rgb_color shadow = tint_color(menuColor,
+					(B_NO_TINT + B_DARKEN_1_TINT) / 2.0f);
 				menu->SetHighColor(shadow);
 				frame.right = frame.left + kHPad / 2;
 				menu->FillRect(frame);
-			}	
+			}
 		}
 
 		if (IsEnabled() && IsSelected() && !menu->IsRedrawAfterSticky()) {
 			// fill
-			menu->SetHighColor(tint_color(menuColor, B_HIGHLIGHT_BACKGROUND_TINT));
+			menu->SetHighColor(tint_color(menuColor,
+				B_HIGHLIGHT_BACKGROUND_TINT));
 			menu->FillRect(frame);
-		} else 
+		} else
 			menu->SetLowColor(menuColor);
 
 		DrawContent();
@@ -212,7 +222,7 @@ TWindowMenuItem::DrawContent()
 
 	if (fID >= 0) {
 		menu->SetDrawingMode(B_OP_OVER);
-		
+
 		float width = fBitmap->Bounds().Width();
 
 		if (width > 16)
@@ -228,7 +238,8 @@ TWindowMenuItem::DrawContent()
 
 		menu->SetDrawingMode(B_OP_COPY);
 	}
-	contLoc.y = frame.top + ((frame.Height() - fTitleAscent - fTitleDescent) / 2) + 1.0f;
+	contLoc.y = frame.top
+		+ ((frame.Height() - fTitleAscent - fTitleDescent) / 2) + 1.0f;
 	menu->PopState();
 
 	menu->MovePenTo(contLoc);
@@ -240,12 +251,12 @@ TWindowMenuItem::DrawContent()
 
 
 status_t
-TWindowMenuItem::Invoke(BMessage *)
+TWindowMenuItem::Invoke(BMessage* /*message*/)
 {
 	if (!fDragging) {
 		if (fID >= 0) {
-			int32 action = (modifiers() & B_CONTROL_KEY)
-				? B_MINIMIZE_WINDOW :B_BRING_TO_FRONT;
+			int32 action = (modifiers() & B_CONTROL_KEY) != 0
+				? B_MINIMIZE_WINDOW : B_BRING_TO_FRONT;
 
 			bool doZoom = false;
 			BRect zoomRect(0.0f, 0.0f, 0.0f, 0.0f);
@@ -257,8 +268,8 @@ TWindowMenuItem::Invoke(BMessage *)
 
 			if (item->Menu()->Window() != NULL) {
 				zoomRect = item->Menu()->ConvertToScreen(item->Frame());
-				doZoom = fMini && (action == B_BRING_TO_FRONT) ||
-						  !fMini && (action == B_MINIMIZE_WINDOW);
+				doZoom = fMini && action == B_BRING_TO_FRONT
+					|| !fMini && action == B_MINIMIZE_WINDOW;
 			}
 
 			do_window_action(fID, action, zoomRect, doZoom);
