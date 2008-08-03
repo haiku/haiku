@@ -43,6 +43,7 @@
 #include <low_resource_manager.h>
 #include <syscalls.h>
 #include <syscall_restart.h>
+#include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/atomic.h>
 #include <vfs.h>
@@ -494,6 +495,109 @@ private:
 	int		fFD;
 	bool	fKernel;
 };
+
+
+#if VFS_PAGES_IO_TRACING
+
+namespace VFSPagesIOTracing {
+
+class PagesIOTraceEntry : public AbstractTraceEntry {
+protected:
+	PagesIOTraceEntry(struct vnode* vnode, void* cookie, off_t pos,
+		const iovec* vecs, uint32 count, uint32 flags, size_t bytesRequested,
+		status_t status, size_t bytesTransferred)
+		:
+		fVnode(vnode),
+		fMountID(vnode->mount->id),
+		fNodeID(vnode->id),
+		fCookie(cookie),
+		fPos(pos),
+		fCount(count),
+		fFlags(flags),
+		fBytesRequested(bytesRequested),
+		fStatus(status),
+		fBytesTransferred(bytesTransferred)
+	{
+		fVecs = (iovec*)alloc_tracing_buffer_memcpy(vecs, sizeof(iovec) * count,
+			false);
+	}
+
+	void AddDump(TraceOutput& out, const char* mode)
+	{
+		out.Print("vfs pages io %5s: vnode: %p (%ld, %lld), cookie: %p, "
+			"pos: %lld, size: %lu, vecs: {", mode, fVnode, fMountID, fNodeID,
+			fCookie, fPos, fBytesRequested);
+
+		if (fVecs != NULL) {
+			for (uint32 i = 0; i < fCount; i++) {
+				if (i > 0)
+					out.Print(", ");
+				out.Print("(%p, %lu)", fVecs[i].iov_base, fVecs[i].iov_len);
+			}
+		}
+
+		out.Print("}, flags: %#lx -> status: %#lx, transferred: %lu",
+			fFlags, fStatus, fBytesTransferred);
+	}
+
+protected:
+	struct vnode*	fVnode;
+	dev_t			fMountID;
+	ino_t			fNodeID;
+	void*			fCookie;
+	off_t			fPos;
+	iovec*			fVecs;
+	uint32			fCount;
+	uint32			fFlags;
+	size_t			fBytesRequested;
+	status_t		fStatus;
+	size_t			fBytesTransferred;
+};
+
+
+class ReadPages : public PagesIOTraceEntry {
+public:
+	ReadPages(struct vnode* vnode, void* cookie, off_t pos,
+		const iovec* vecs, uint32 count, uint32 flags, size_t bytesRequested,
+		status_t status, size_t bytesTransferred)
+		:
+		PagesIOTraceEntry(vnode, cookie, pos, vecs, count, flags,
+			bytesRequested, status, bytesTransferred)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		PagesIOTraceEntry::AddDump(out, "read");
+	}
+};
+
+
+class WritePages : public PagesIOTraceEntry {
+public:
+	WritePages(struct vnode* vnode, void* cookie, off_t pos,
+		const iovec* vecs, uint32 count, uint32 flags, size_t bytesRequested,
+		status_t status, size_t bytesTransferred)
+		:
+		PagesIOTraceEntry(vnode, cookie, pos, vecs, count, flags,
+			bytesRequested, status, bytesTransferred)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		PagesIOTraceEntry::AddDump(out, "write");
+	}
+};
+
+}	// namespace VFSPagesIOTracing
+
+#	define TPIO(x) new(std::nothrow) VFSPagesIOTracing::x;
+#else
+#	define TPIO(x) ;
+#endif	// VFS_PAGES_IO_TRACING
 
 
 static int
@@ -3321,8 +3425,8 @@ read_pages(int fd, off_t pos, const iovec *vecs, size_t count,
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	status_t status = FS_CALL(vnode, read_pages, descriptor->cookie, pos, vecs,
-		count, _numBytes);
+	status_t status = vfs_read_pages(vnode, descriptor->cookie, pos, vecs,
+		count, 0, _numBytes);
 
 	put_fd(descriptor);
 	return status;
@@ -3340,8 +3444,8 @@ write_pages(int fd, off_t pos, const iovec *vecs, size_t count,
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	status_t status = FS_CALL(vnode, write_pages, descriptor->cookie, pos, vecs,
-		count, _numBytes);
+	status_t status = vfs_write_pages(vnode, descriptor->cookie, pos, vecs,
+		count, 0, _numBytes);
 
 	put_fd(descriptor);
 	return status;
@@ -3923,6 +4027,10 @@ vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
 	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
 		pos));
 
+#if VFS_PAGES_IO_TRACING
+	size_t bytesRequested = *_numBytes;
+#endif
+
 	IORequest request;
 	status_t status = request.Init(pos, vecs, count, *_numBytes, false, flags);
 	if (status == B_OK) {
@@ -3931,6 +4039,9 @@ vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
 			status = request.Wait();
 		*_numBytes = request.TransferredBytes();
 	}
+
+	TPIO(ReadPages(vnode, cookie, pos, vecs, count, flags, bytesRequested,
+		status, *_numBytes));
 
 	return status;
 }
@@ -3943,6 +4054,10 @@ vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
 	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
 		pos));
 
+#if VFS_PAGES_IO_TRACING
+	size_t bytesRequested = *_numBytes;
+#endif
+
 	IORequest request;
 	status_t status = request.Init(pos, vecs, count, *_numBytes, true, flags);
 	if (status == B_OK) {
@@ -3951,6 +4066,9 @@ vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
 			status = request.Wait();
 		*_numBytes = request.TransferredBytes();
 	}
+
+	TPIO(WritePages(vnode, cookie, pos, vecs, count, flags, bytesRequested,
+		status, *_numBytes));
 
 	return status;
 }
