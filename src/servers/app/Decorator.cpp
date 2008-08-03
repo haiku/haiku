@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,28 +7,29 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/**	Base class for window decorators */
+/*!	Base class for window decorators */
 
 #include "Decorator.h"
-#include "DrawingEngine.h"
-
-#include <Region.h>
 
 #include <stdio.h>
 
+#include <Region.h>
 
-/*!
-	\brief Constructor
+#include "DrawingEngine.h"
+
+
+/*!	\brief Constructor
+
+	Does general initialization of internal data members and creates a colorset
+	object. 
+
 	\param rect Size of client area
 	\param wlook style of window look. See Window.h
 	\param wfeel style of window feel. See Window.h
 	\param wflags various window flags. See Window.h
-	
-	Does general initialization of internal data members and creates a colorset
-	object. 
 */
-Decorator::Decorator(DesktopSettings& settings, BRect rect,
-		window_look look, uint32 flags)
+Decorator::Decorator(DesktopSettings& settings, BRect rect, window_look look,
+		uint32 flags)
 	:
 	fDrawingEngine(NULL),
 	fDrawState(),
@@ -63,8 +64,7 @@ Decorator::~Decorator()
 }
 
 
-/*!
-	\brief Assigns a display driver to the decorator
+/*!	\brief Assigns a display driver to the decorator
 	\param driver A valid DrawingEngine object
 */
 void
@@ -73,24 +73,23 @@ Decorator::SetDrawingEngine(DrawingEngine* engine)
 	fDrawingEngine = engine;
 	// lots of subclasses will depend on the driver for text support, so call
 	// _DoLayout() after we have it
-	if (fDrawingEngine) {
+	if (fDrawingEngine)
 		_DoLayout();
-	}
 }
 
 
-/*!
-	\brief Sets the decorator's window flags
-	\param flags New value for the flags
+/*!	\brief Sets the decorator's window flags
 
 	While this call will not update the screen, it will affect how future
 	updates work and immediately affects input handling.
+
+	\param flags New value for the flags
 */
 void
 Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 {
-	// we're nice to our subclasses - we make sure B_NOT_{H|V|}_RESIZABLE are in sync
-	// (it's only a semantical simplification, not a necessity)
+	// we're nice to our subclasses - we make sure B_NOT_{H|V|}_RESIZABLE
+	// are in sync (it's only a semantical simplification, not a necessity)
 	if ((flags & (B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE))
 			== (B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE))
 		flags |= B_NOT_RESIZABLE;
@@ -101,8 +100,7 @@ Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 }
 
 
-/*
-	\brief Sets the decorator's font
+/*!	\brief Sets the decorator's font
 	\param font The new font object to copy from
 */
 void
@@ -113,8 +111,7 @@ Decorator::SetFont(ServerFont *font)
 }
 
 
-/*!
-	\brief Sets the decorator's window look
+/*!	\brief Sets the decorator's window look
 	\param look New value for the look
 */
 void
@@ -125,57 +122,56 @@ Decorator::SetLook(DesktopSettings& settings, window_look look,
 }
 
 
-/*!
-	\brief Sets the close button's value.
-	\param is_down Whether the button is down or not
+/*!	\brief Sets the close button's value.
 	
 	Note that this does not update the button's look - it just updates the
 	internal button value
+
+	\param is_down Whether the button is down or not
 */
 void
-Decorator::SetClose(bool is_down)
+Decorator::SetClose(bool pressed)
 {
-	if (is_down != fClosePressed) {
-		fClosePressed = is_down;
+	if (pressed != fClosePressed) {
+		fClosePressed = pressed;
 		DrawClose();
 	}
 }
 
-/*!
-	\brief Sets the minimize button's value.
-	\param is_down Whether the button is down or not
+/*!	\brief Sets the minimize button's value.
 	
 	Note that this does not update the button's look - it just updates the
 	internal button value
+
+	\param is_down Whether the button is down or not
 */
 void
-Decorator::SetMinimize(bool is_down)
+Decorator::SetMinimize(bool pressed)
 {
-	if (is_down != fMinimizePressed) {
-		fMinimizePressed = is_down;
+	if (pressed != fMinimizePressed) {
+		fMinimizePressed = pressed;
 		DrawMinimize();
 	}
 }
 
-/*!
-	\brief Sets the zoom button's value.
-	\param is_down Whether the button is down or not
+/*!	\brief Sets the zoom button's value.
 	
 	Note that this does not update the button's look - it just updates the
 	internal button value
+
+	\param is_down Whether the button is down or not
 */
 void
-Decorator::SetZoom(bool is_down)
+Decorator::SetZoom(bool pressed)
 {
-	if (is_down != fZoomPressed) {
-		fZoomPressed = is_down;
+	if (pressed != fZoomPressed) {
+		fZoomPressed = pressed;
 		DrawZoom();
 	}
 }
 
 
-/*!
-	\brief Updates the value of the decorator title
+/*!	\brief Updates the value of the decorator title
 	\param string New title value
 */
 void
@@ -187,8 +183,7 @@ Decorator::SetTitle(const char* string, BRegion* updateRegion)
 }
 
 
-/*!
-	\brief Returns the decorator's window look
+/*!	\brief Returns the decorator's window look
 	\return the decorator's window look
 */
 window_look
@@ -198,8 +193,7 @@ Decorator::Look() const
 }
 
 
-/*!
-	\brief Returns the decorator's window flags
+/*!	\brief Returns the decorator's window flags
 	\return the decorator's window flags
 */
 uint32
@@ -209,8 +203,7 @@ Decorator::Flags() const
 }
 
 
-/*!
-	\brief Returns the decorator's title
+/*!	\brief Returns the decorator's title
 	\return the decorator's title
 */
 const char*
@@ -220,8 +213,7 @@ Decorator::Title() const
 }
 
 
-/*!
-	\brief Returns the decorator's border rectangle
+/*!	\brief Returns the decorator's border rectangle
 	\return the decorator's border rectangle
 */
 BRect
@@ -231,8 +223,7 @@ Decorator::BorderRect() const
 }
 
 
-/*!
-	\brief Returns the decorator's tab rectangle
+/*!	\brief Returns the decorator's tab rectangle
 	\return the decorator's tab rectangle
 */
 BRect
@@ -241,8 +232,8 @@ Decorator::TabRect() const
 	return fTabRect;
 }
 
-/*!
-	\brief Returns the value of the close button
+
+/*!	\brief Returns the value of the close button
 	\return true if down, false if up
 */
 bool
@@ -251,8 +242,8 @@ Decorator::GetClose()
 	return fClosePressed;
 }
 
-/*!
-	\brief Returns the value of the minimize button
+
+/*!	\brief Returns the value of the minimize button
 	\return true if down, false if up
 */
 bool
@@ -261,8 +252,8 @@ Decorator::GetMinimize()
 	return fMinimizePressed;
 }
 
-/*!
-	\brief Returns the value of the zoom button
+
+/*!	\brief Returns the value of the zoom button
 	\return true if down, false if up
 */
 bool
@@ -271,59 +262,61 @@ Decorator::GetZoom()
 	return fZoomPressed;
 }
 
-// GetSizeLimits
+
 void
-Decorator::GetSizeLimits(int32* minWidth, int32* minHeight,
-						 int32* maxWidth, int32* maxHeight) const
+Decorator::GetSizeLimits(int32* minWidth, int32* minHeight, int32* maxWidth,
+	int32* maxHeight) const
 {
 }
 
-/*!
-	\brief Changes the focus value of the decorator
-	\param is_active True if active, false if not
+
+/*!	\brief Changes the focus value of the decorator
 	
 	While this call will not update the screen, it will affect how future
 	updates work.
+
+	\param active True if active, false if not
 */
 void
-Decorator::SetFocus(bool is_active)
+Decorator::SetFocus(bool active)
 {
-	fIsFocused = is_active;
+	fIsFocused = active;
 	_SetFocus();
 	// TODO: maybe it would be cleaner to handle the redraw here.
 }
 
-//-------------------------------------------------------------------------
-//						Virtual Methods
-//-------------------------------------------------------------------------
 
-/*!
-	\brief Returns the "footprint" of the entire window, including decorator
-	\param region Region to be changed to represent the window's screen footprint
-	
+//	#pragma mark - virtual methods
+
+
+/*!	\brief Returns the "footprint" of the entire window, including decorator
+
 	This function is required by all subclasses.
+
+	\param region Region to be changed to represent the window's screen
+		footprint
 */
 void
 Decorator::GetFootprint(BRegion *region)
 {
 }
 
-/*!
-	\brief Performs hit-testing for the decorator
-	\return The type of area clicked
 
-	Clicked is called whenever it has been determined that the window has received a 
-	mouse click. The default version returns DEC_NONE. A subclass may use any or all
-	of them.
-	
+/*!	\brief Performs hit-testing for the decorator
+
+	Clicked is called whenever it has been determined that the window has
+	received a mouse click. The default version returns DEC_NONE. A subclass
+	may use any or all of them.
+
 	Click type : Action taken by the server
-	
+
 	- \c DEC_NONE : Do nothing
 	- \c DEC_ZOOM : Handles the zoom button (setting states, etc)
 	- \c DEC_CLOSE : Handles the close button (setting states, etc)
 	- \c DEC_MINIMIZE : Handles the minimize button (setting states, etc)
 	- \c DEC_TAB : Currently unused
-	- \c DEC_DRAG : Moves the window to the front and prepares to move the window
+	- \c DEC_DRAG : Moves the window to the front and prepares to move the
+		window
 	- \c DEC_MOVETOBACK : Moves the window to the back of the stack
 	- \c DEC_MOVETOFRONT : Moves the window to the front of the stack
 	- \c DEC_SLIDETAB : Initiates tab-sliding
@@ -339,22 +332,24 @@ Decorator::GetFootprint(BRegion *region)
 	- \c DEC_RESIZE_RB
 
 	This function is required by all subclasses.
-	
+
+	\return The type of area clicked
 */
 click_type
-Decorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
+Decorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 {
 	return DEC_NONE;
 }
 
-/*!
-	\brief Moves the decorator frame and all default rectangles
-	\param x X Offset
-	\param y y Offset
+
+/*!	\brief Moves the decorator frame and all default rectangles
 	
 	If a subclass implements this method, be sure to call Decorator::MoveBy
-	to ensure that internal members are also updated. All members of the Decorator
-	class are automatically moved in this method
+	to ensure that internal members are also updated. All members of the
+	Decorator class are automatically moved in this method
+
+	\param x X Offset
+	\param y y Offset
 */
 void
 Decorator::MoveBy(float x, float y)
@@ -362,36 +357,38 @@ Decorator::MoveBy(float x, float y)
 	MoveBy(BPoint(x, y));
 }
 
-/*!
-	\brief Moves the decorator frame and all default rectangles
-	\param pt Point containing the offsets
+
+/*!	\brief Moves the decorator frame and all default rectangles
 	
 	If a subclass implements this method, be sure to call Decorator::MoveBy
-	to ensure that internal members are also updated. All members of the Decorator
-	class are automatically moved in this method
+	to ensure that internal members are also updated. All members of the
+	Decorator class are automatically moved in this method
+
+	\param offset BPoint containing the offsets
 */
 void
-Decorator::MoveBy(BPoint pt)
+Decorator::MoveBy(BPoint offset)
 {
-	fZoomRect.OffsetBy(pt);
-	fCloseRect.OffsetBy(pt);
-	fMinimizeRect.OffsetBy(pt);
-	fMinimizeRect.OffsetBy(pt);
-	fTabRect.OffsetBy(pt);
-	fFrame.OffsetBy(pt);
-	fResizeRect.OffsetBy(pt);
-	fBorderRect.OffsetBy(pt);
+	fZoomRect.OffsetBy(offset);
+	fCloseRect.OffsetBy(offset);
+	fMinimizeRect.OffsetBy(offset);
+	fMinimizeRect.OffsetBy(offset);
+	fTabRect.OffsetBy(offset);
+	fFrame.OffsetBy(offset);
+	fResizeRect.OffsetBy(offset);
+	fBorderRect.OffsetBy(offset);
 }
 
-/*!
-	\brief Resizes the decorator frame
-	\param dx x offset
-	\param dy y offset
+
+/*!	\brief Resizes the decorator frame
 	
-	This is a required function for subclasses to implement - the default does nothing.
-	Note that window resize flags should be followed and fFrame should be resized
-	accordingly. It would also be a wise idea to ensure that the window's rectangles
-	are not inverted. 
+	This is a required function for subclasses to implement - the default does
+	nothing. Note that window resize flags should be followed and fFrame should
+	be resized accordingly. It would also be a wise idea to ensure that the
+	window's rectangles are not inverted. 
+
+	\param x x offset
+	\param y y offset
 */
 void
 Decorator::ResizeBy(float x, float y, BRegion* dirty)
@@ -414,18 +411,19 @@ Decorator::GetSettings(BMessage* settings) const
 }
 
 
-/*!
-	\brief Updates the decorator's look in the area r
-	\param r The area to update.
-	
+/*!	\brief Updates the decorator's look in the area \a rect
+
 	The default version updates all areas which intersect the frame and tab.
+
+	\param rect The area to update.
 */
 void
-Decorator::Draw(BRect r)
+Decorator::Draw(BRect rect)
 {
-	_DrawFrame(r & fFrame);
-	_DrawTab(r & fTabRect);
+	_DrawFrame(rect & fFrame);
+	_DrawTab(rect & fTabRect);
 }
+
 
 //! Forces a complete decorator update
 void
@@ -435,12 +433,14 @@ Decorator::Draw()
 	_DrawTab(fTabRect);
 }
 
+
 //! Draws the close button
 void
 Decorator::DrawClose()
 {
 	_DrawClose(fCloseRect);
 }
+
 
 //! draws the frame
 void
@@ -449,12 +449,14 @@ Decorator::DrawFrame()
 	_DrawFrame(fFrame);
 }
 
+
 //! draws the minimize button
 void
-Decorator::DrawMinimize(void)
+Decorator::DrawMinimize()
 {
 	_DrawTab(fMinimizeRect);
 }
+
 
 //! draws the tab, title, and buttons
 void
@@ -467,16 +469,18 @@ Decorator::DrawTab()
 	_DrawClose(fCloseRect);
 }
 
-// draws the title
+
+//! draws the title
 void
 Decorator::DrawTitle()
 {
 	_DrawTitle(fTabRect);
 }
 
+
 //! draws the zoom button
 void
-Decorator::DrawZoom(void)
+Decorator::DrawZoom()
 {
 	_DrawZoom(fZoomRect);
 }
@@ -491,88 +495,88 @@ Decorator::UIColor(color_which which)
 }
 
 
-/*!
-	\brief Provides the number of characters that will fit in the given width
-	\param width Maximum number of pixels the title can be
-	\return the number of characters that will fit in the given width
-*/
-
 //! Function for calculating layout for the decorator
 void
 Decorator::_DoLayout()
 {
 }
 
-/*!
-	\brief Actually draws the frame
-	\param r Area of the frame to update
+
+/*!	\brief Actually draws the frame
+	\param rect Area of the frame to update
 */
 void
-Decorator::_DrawFrame(BRect r)
+Decorator::_DrawFrame(BRect rect)
 {
 }
 
-/*!
-	\brief Actually draws the tab
-	\param r Area of the tab to update
+
+/*!	\brief Actually draws the tab
 	
-	This function is called when the tab itself needs drawn. Other items, like the 
-	window title or buttons, should not be drawn here.
+	This function is called when the tab itself needs drawn. Other items,
+	like the window title or buttons, should not be drawn here.
+
+	\param rect Area of the tab to update
 */
 void
-Decorator::_DrawTab(BRect r)
+Decorator::_DrawTab(BRect rect)
 {
 }
 
-/*!
-	\brief Actually draws the close button
-	\param r Area of the button to update
-	
-	Unless a subclass has a particularly large button, it is probably unnecessary
-	to check the update rectangle.
+
+/*!	\brief Actually draws the close button
+
+	Unless a subclass has a particularly large button, it is probably
+	unnecessary to check the update rectangle.
+
+	\param rect Area of the button to update
 */
 void
-Decorator::_DrawClose(BRect r)
+Decorator::_DrawClose(BRect rect)
 {
 }
 
-/*!
-	\brief Actually draws the title
-	\param r area of the title to update
-	
-	The main tasks for this function are to ensure that the decorator draws the title
-	only in its own area and drawing the title itself. Using B_OP_COPY for drawing
-	the title is recommended because of the marked performance hit of the other 
-	drawing modes, but it is not a requirement.
+
+/*!	\brief Actually draws the title
+
+	The main tasks for this function are to ensure that the decorator draws
+	the title only in its own area and drawing the title itself.
+	Using B_OP_COPY for drawing the title is recommended because of the marked
+	performance hit of the other drawing modes, but it is not a requirement.
+
+	\param rect area of the title to update
 */
 void
-Decorator::_DrawTitle(BRect r)
+Decorator::_DrawTitle(BRect rect)
 {
 }
 
-/*!
-	\brief Actually draws the zoom button
-	\param r Area of the button to update
+
+/*!	\brief Actually draws the zoom button
 	
-	Unless a subclass has a particularly large button, it is probably unnecessary
-	to check the update rectangle.
+	Unless a subclass has a particularly large button, it is probably
+	unnecessary to check the update rectangle.
+
+	\param rect Area of the button to update
 */
 void
-Decorator::_DrawZoom(BRect r)
+Decorator::_DrawZoom(BRect rect)
 {
 }
 
 /*!
 	\brief Actually draws the minimize button
-	\param r Area of the button to update
 	
-	Unless a subclass has a particularly large button, it is probably unnecessary
-	to check the update rectangle.
+	Unless a subclass has a particularly large button, it is probably
+	unnecessary to check the update rectangle.
+
+	\param rect Area of the button to update
 */
 void
-Decorator::_DrawMinimize(BRect r)
+Decorator::_DrawMinimize(BRect rect)
 {
 }
+
 
 //! Hook function called when the decorator changes focus
 void
