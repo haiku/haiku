@@ -93,7 +93,7 @@ struct stat {
 #define S_IEXEC		S_IXUSR
 
 #define ACCESSPERMS (S_IRWXU | S_IRWXG | S_IRWXO)
-#define ALLPERMS    (S_ISUID | S_ISGID | S_ISTXT | S_IRWXU | S_IRWXG | S_IRWXO)
+#define ALLPERMS    (S_ISUID | S_ISGID | S_IRWXU | S_IRWXG | S_IRWXO)
 #define	DEFFILEMODE	(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
 	/* default file mode, everyone can read/write */
 
