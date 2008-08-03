@@ -1535,6 +1535,13 @@ Desktop::ActivateWindow(Window* window)
 		SetWindowWorkspaces(window, workspaces);
 	}
 
+	if (window->IsMinimized()) {
+		// Unlike WindowAction(), this is called from the application itself,
+		// so we will just unminimize the window here.
+		ShowWindow(window);
+		window->SetMinimized(false);
+	}
+
 	if (window == FrontWindow()) {
 		// see if there is a normal B_AVOID_FRONT window still in front of us
 		Window* avoidsFront = window->NextWindow(fCurrentWorkspace);
@@ -2389,12 +2396,13 @@ Desktop::WindowAction(int32 windowToken, int32 action)
 		return;
 	}
 
-	if (action == B_BRING_TO_FRONT
-		&& !window->IsMinimized()) {
+	if (action == B_BRING_TO_FRONT && !window->IsMinimized()) {
 		// the window is visible, we just need to make it the front window
 		ActivateWindow(window);
-	} else
+	} else {
+		// if not, ask the window if it wants to be unminimized
 		serverWindow->NotifyMinimize(action == B_MINIMIZE_WINDOW);
+	}
 
 	UnlockAllWindows();
 }
