@@ -13,6 +13,7 @@ UseFreeTypeHeaders ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing_modes ] ;
 
 StaticLibrary libpainter.a :
+	GlobalSubpixelSettings.cpp
 	Painter.cpp
 	Transformable.cpp
 

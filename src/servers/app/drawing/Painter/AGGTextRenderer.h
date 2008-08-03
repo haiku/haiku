@@ -25,7 +25,9 @@ class AGGTextRenderer {
 								AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 									renderer_type& solidRenderer,
 									renderer_bin_type& binRenderer,
-									scanline_unpacked_type& scanline);
+									scanline_unpacked_type& scanline,
+									scanline_unpacked_subpix_type& subpixScanline,
+									rasterizer_subpix_type& subpixRasterizer);
 	virtual						~AGGTextRenderer();
 
 			void				SetFont(const ServerFont &font);
@@ -73,6 +75,8 @@ class AGGTextRenderer {
 	renderer_bin_type&			fBinRenderer;
 	renderer_subpix_type&		fSubpixRenderer;
 	scanline_unpacked_type&		fScanline;
+	scanline_unpacked_subpix_type& fSubpixScanline;
+	rasterizer_subpix_type&		fSubpixRasterizer;
 	rasterizer_type				fRasterizer;
 		// NOTE: the object has it's own rasterizer object
 		// since it might be using a different gamma setting

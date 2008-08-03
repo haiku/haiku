@@ -11,46 +11,7 @@
 #define DRAWING_MODE_ALPHA_PO_SOLID_SUBPIX_H
 
 #include "DrawingModeAlphaPOSUBPIX.h"
-
-// blend_hline_alpha_po_solid_subpix
-void
-blend_hline_alpha_po_solid_subpix(int x, int y, unsigned len,
-	const color_type& c, uint8 cover, agg_buffer* buffer,
-	const PatternHandler* pattern)
-{
-	uint16 alpha = c.a * cover;
-	if (alpha == 255 * 255) {
-		// cache the color as 32bit values
-		uint32 v;
-		uint8* p8 = (uint8*)&v;
-		p8[0] = c.b;
-		p8[1] = c.g;
-		p8[2] = c.r;
-		p8[3] = 255;
-		// row offset as 32bit pointer
-		uint32* p32 = (uint32*)(buffer->row_ptr(y)) + x;
-		do {
-			*p32 = v;
-			p32++;
-			x++;
-			len -= 3;
-		} while (len);
-	} else {
-		uint8* p = buffer->row_ptr(y) + (x << 2);
-		if (len < 12) {
-			do {
-				BLEND_ALPHA_CO(p, c.r, c.g, c.b, alpha);
-				x++;
-				p += 4;
-				len -= 3;
-			} while (len);
-		} else {
-			alpha = alpha >> 8;
-			blend_line32(p, len / 3, c.r, c.g, c.b, alpha);
-		}
-	}
-}
-
+#include "GlobalSubpixelSettings.h"
 
 // blend_solid_hspan_alpha_po_solid_subpix
 void
@@ -62,10 +23,13 @@ blend_solid_hspan_alpha_po_solid_subpix(int x, int y, unsigned len,
 	uint16 alphaRed;
 	uint16 alphaGreen;
 	uint16 alphaBlue;
+	const int subpixelL = gSubpixelOrderingRGB ? 2 : 0;
+	const int subpixelM = 1;
+	const int subpixelR = gSubpixelOrderingRGB ? 0 : 2;
 	do {
-		alphaRed = c.a * covers[0];
-		alphaGreen = c.a * covers[1];
-		alphaBlue = c.a * covers[2];
+		alphaRed = c.a * covers[subpixelL];
+		alphaGreen = c.a * covers[subpixelM];
+		alphaBlue = c.a * covers[subpixelR];
 		BLEND_ALPHA_PO_SUBPIX(p, c.r, c.g, c.b,
 			alphaBlue, alphaGreen, alphaRed);
 		covers += 3;

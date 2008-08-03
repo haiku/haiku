@@ -12,7 +12,6 @@
 
 
 #include "FontSelectionView.h"
-#include "AdvancedSettingsView.h"
 
 
 class FontView : public BView {

@@ -25,6 +25,7 @@
 #	include <agg_path_storage.h>
 #endif
 
+#include "GlobalSubpixelSettings.h"
 #include "GlyphLayoutEngine.h"
 #include "IntRect.h"
 
@@ -32,7 +33,9 @@
 // constructor
 AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 		renderer_type& solidRenderer, renderer_bin_type& binRenderer,
-		scanline_unpacked_type& scanline)
+		scanline_unpacked_type& scanline,
+		scanline_unpacked_subpix_type& subpixScanline,
+		rasterizer_subpix_type& subpixRasterizer)
 	: fPathAdaptor()
 	, fGray8Adaptor()
 	, fGray8Scanline()
@@ -47,6 +50,8 @@ AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 	, fBinRenderer(binRenderer)
 	, fSubpixRenderer(subpixRenderer)
 	, fScanline(scanline)
+	, fSubpixScanline(subpixScanline)
+	, fSubpixRasterizer(subpixRasterizer)
 	, fRasterizer()
 
 	, fHinted(true)
@@ -100,6 +105,7 @@ AGGTextRenderer::SetAntialiasing(bool antialiasing)
 	}
 }
 
+
 typedef agg::conv_transform<FontCacheEntry::CurveConverter, Transformable>
 	conv_font_trans_type;
 
@@ -136,12 +142,18 @@ class AGGTextRenderer::StringRenderer {
 	void Start()
 	{
 		fRenderer.fRasterizer.reset();
+		fRenderer.fSubpixRasterizer.reset();
 	}
 	void Finish(double x, double y)
 	{
 		if (fVector) {
-			agg::render_scanlines(fRenderer.fRasterizer, fRenderer.fScanline,
-				fRenderer.fSolidRenderer);
+			if (gSubpixelAntialiasing) {
+				agg::render_scanlines(fRenderer.fSubpixRasterizer,
+					fRenderer.fSubpixScanline, fRenderer.fSubpixRenderer);
+			} else {
+				agg::render_scanlines(fRenderer.fRasterizer,
+					fRenderer.fScanline, fRenderer.fSolidRenderer);
+			}
 		}
 
 		if (fNextCharPos) {
@@ -231,10 +243,22 @@ class AGGTextRenderer::StringRenderer {
 
 					case glyph_data_outline: {
 						fVector = true;
-						if (fRenderer.fContour.width() == 0.0) {
-							fRenderer.fRasterizer.add_path(fTransformedGlyph);
+						if (gSubpixelAntialiasing) {
+							if (fRenderer.fContour.width() == 0.0) {
+								fRenderer.fSubpixRasterizer.add_path(
+									fTransformedGlyph);
+							} else {
+								fRenderer.fSubpixRasterizer.add_path(
+									fTransformedContour);
+							}
 						} else {
-							fRenderer.fRasterizer.add_path(fTransformedContour);
+							if (fRenderer.fContour.width() == 0.0) {
+								fRenderer.fRasterizer.add_path(
+									fTransformedGlyph);
+							} else {
+								fRenderer.fRasterizer.add_path(
+									fTransformedContour);
+							}
 						}
 #if SHOW_GLYPH_BOUNDS
 	agg::path_storage p;
@@ -245,7 +269,11 @@ class AGGTextRenderer::StringRenderer {
 	p.close_polygon();
 	agg::conv_stroke<agg::path_storage> ps(p);
 	ps.width(1.0);
-	fRenderer.fRasterizer.add_path(ps);
+	if (gSubpixelAntialiasing) {
+		fRenderer.fSubpixRasterizer.add_path(ps);
+	} else {
+		fRenderer.fRasterizer.add_path(ps);
+	}
 #endif
 
 						break;

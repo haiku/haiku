@@ -406,59 +406,6 @@ _get_system_default_font_(const char* which, font_family family,
 }
 
 
-void
-_set_font_subpixel_antialiasing_(bool subpix)
-{
-	BPrivate::AppServerLink link;
-
-	link.StartMessage(AS_SET_FONT_SUBPIXEL_ANTIALIASING);
-	link.Attach<bool>(subpix);
-	link.Flush();
-}
-
-
-status_t
-_get_font_subpixel_antialiasing_(bool* subpix)
-{
-	BPrivate::AppServerLink link;
-
-	link.StartMessage(AS_GET_FONT_SUBPIXEL_ANTIALIASING);
-	int32 status = B_ERROR;
-	if (link.FlushWithReply(status) != B_OK
-		|| status < B_OK)
-		return status;
-	link.Read<bool>(subpix);
-	return B_OK;
-}
-
-
-void
-_set_hinting_(bool hinting)
-{
-	BPrivate::AppServerLink link;
-
-	link.StartMessage(AS_SET_HINTING);
-	link.Attach<bool>(hinting);
-	link.Flush();
-}
-
-
-status_t
-_get_hinting_(bool* hinting)
-{
-
-	BPrivate::AppServerLink link;
-
-	link.StartMessage(AS_GET_HINTING);
-	int32 status = B_ERROR;
-	if (link.FlushWithReply(status) != B_OK
-		|| status < B_OK)
-		return status;
-	link.Read<bool>(hinting);
-	return B_OK;
-}
-
-
 /*!
 	\brief Returns the number of installed font families
 	\return The number of installed font families

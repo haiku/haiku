@@ -33,15 +33,11 @@
 
 #include "utf8_functions.h"
 
+#include "GlobalSubpixelSettings.h"
+
+
 BLocker
 FontCacheEntry::sUsageUpdateLock("FontCacheEntry usage lock");
-
-glyph_rendering
-FontCacheEntry::sDefaultRenderType;
-
-bool
-FontCacheEntry::sDefaultHinting;
-
 
 class FontCacheEntry::GlyphCachePool {
  public:
@@ -127,7 +123,7 @@ FontCacheEntry::Init(const ServerFont& font)
 
 	// TODO: encoding from font
 	FT_Encoding charMap = FT_ENCODING_NONE;
-	bool hinting = sDefaultHinting; // TODO: font.Hinting();
+	bool hinting = gDefaultHinting; // TODO: font.Hinting();
 
 	if (!fEngine.Init(font.Path(), 0, font.Size(), charMap,
 			renderingType, hinting)) {
@@ -224,11 +220,12 @@ FontCacheEntry::GenerateSignature(char* signature, const ServerFont& font)
 
 	// TODO: read more of these from the font
 	FT_Encoding charMap = FT_ENCODING_NONE;
-	bool hinting = sDefaultHinting; // TODO: font.Hinting();
+	bool hinting = gDefaultHinting; // TODO: font.Hinting();
+	uint8 averageWeight = gSubpixelAverageWeight;
 
-	sprintf(signature, "%ld,%u,%d,%d,%.1f,%d",
+	sprintf(signature, "%ld,%u,%d,%d,%.1f,%d,%d",
 		font.GetFamilyAndStyle(), charMap,
-		font.Face(), int(renderingType), font.Size(), hinting);
+		font.Face(), int(renderingType), font.Size(), hinting, averageWeight);
 }
 
 // UpdateUsage
@@ -247,31 +244,20 @@ FontCacheEntry::UpdateUsage()
 }
 
 
-void
-FontCacheEntry::SetDefaultRenderType(glyph_rendering renderingType)
-{
-	sDefaultRenderType = renderingType;
-}
-
-
-void
-FontCacheEntry::SetDefaultHinting(bool hinting)
-{
-	sDefaultHinting = hinting;
-}
-
-
 // _RenderTypeFor
 /*static*/ glyph_rendering
 FontCacheEntry::_RenderTypeFor(const ServerFont& font)
 {
-	glyph_rendering renderingType = sDefaultRenderType;
+	glyph_rendering renderingType = gSubpixelAntialiasing ?
+		glyph_ren_subpix : glyph_ren_native_gray8;
+
 	if (font.Rotation() != 0.0 || font.Shear() != 90.0
 		|| font.FalseBoldWidth() != 0.0
 		|| font.Flags() & B_DISABLE_ANTIALIASING
 		|| font.Size() > 30
-		|| !sDefaultHinting) {
+		|| !gDefaultHinting) {
 		renderingType = glyph_ren_outline;
 	}
+
 	return renderingType;
 }

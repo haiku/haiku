@@ -53,8 +53,10 @@ class DesktopSettings {
 
 		rgb_color		UIColor(color_which which) const;
 
-		bool			FontSubpixelAntialiasing() const;
+		bool			SubpixelAntialiasing() const;
 		bool			Hinting() const;
+		uint8			SubpixelAverageWeight() const;
+		bool			IsSubpixelOrderingRegular() const;
 
 	protected:
 		DesktopSettingsPrivate*	fSettings;
@@ -78,8 +80,10 @@ class LockedDesktopSettings : public DesktopSettings {
 
 		void			SetUIColor(color_which which, const rgb_color color);
 
-		void			SetFontSubpixelAntialiasing(bool subpix);
+		void			SetSubpixelAntialiasing(bool subpix);
 		void			SetHinting(bool hinting);
+		void			SetSubpixelAverageWeight(uint8 averageWeight);
+		void			SetSubpixelOrderingRegular(bool subpixelOrdering);
 
 	private:
 		Desktop*		fDesktop;

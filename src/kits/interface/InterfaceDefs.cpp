@@ -195,6 +195,107 @@ get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 }	// namespace BPrivate
 
 
+void
+set_subpixel_antialiasing(bool subpix)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_SET_SUBPIXEL_ANTIALIASING);
+	link.Attach<bool>(subpix);
+	link.Flush();
+}
+
+
+status_t
+get_subpixel_antialiasing(bool* subpix)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_SUBPIXEL_ANTIALIASING);
+	int32 status = B_ERROR;
+	if (link.FlushWithReply(status) != B_OK || status < B_OK)
+		return status;
+	link.Read<bool>(subpix);
+	return B_OK;
+}
+
+
+void
+set_hinting(bool hinting)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_SET_HINTING);
+	link.Attach<bool>(hinting);
+	link.Flush();
+}
+
+
+status_t
+get_hinting(bool* hinting)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_HINTING);
+	int32 status = B_ERROR;
+	if (link.FlushWithReply(status) != B_OK || status < B_OK)
+		return status;
+	link.Read<bool>(hinting);
+	return B_OK;
+}
+
+
+void
+set_average_weight(uint8 averageWeight)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_SET_SUBPIXEL_AVERAGE_WEIGHT);
+	link.Attach<uint8>(averageWeight);
+	link.Flush();
+}
+
+
+status_t
+get_average_weight(uint8* averageWeight)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_SUBPIXEL_AVERAGE_WEIGHT);
+	int32 status = B_ERROR;
+	if (link.FlushWithReply(status) != B_OK || status < B_OK)
+		return status;
+	link.Read<uint8>(averageWeight);
+	return B_OK;
+}
+
+
+void
+set_is_subpixel_ordering_regular(bool subpixelOrdering)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_SET_SUBPIXEL_ORDERING);
+	link.Attach<bool>(subpixelOrdering);
+	link.Flush();
+}
+
+
+status_t
+get_is_subpixel_ordering_regular(bool* subpixelOrdering)
+{
+
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_SUBPIXEL_ORDERING);
+	int32 status = B_ERROR;
+	if (link.FlushWithReply(status) != B_OK || status < B_OK)
+		return status;
+	link.Read<bool>(subpixelOrdering);
+	return B_OK;
+}
+
+
 const color_map *
 system_colors()
 {
@@ -964,6 +1065,7 @@ set_decorator(const int32 &index)
 
 	return B_OK;
 }
+
 
 }	// namespace BPrivate
 

@@ -15,6 +15,7 @@
 #include "FontCache.h"
 #include "FontCacheEntry.h"
 #include "FontManager.h"
+#include "GlobalSubpixelSettings.h"
 #include "ServerConfig.h"
 
 #include <DefaultColors.h>
@@ -73,10 +74,10 @@ DesktopSettingsPrivate::_SetDefaults()
 
 	memcpy(fShared.colors, BPrivate::kDefaultColors, sizeof(rgb_color) * kNumColors);
 
-	fFontSubpixelAntialiasing = false;
-	FontCacheEntry::SetDefaultRenderType(glyph_ren_native_gray8);
-	fHinting = true;
-	FontCacheEntry::SetDefaultHinting(true);
+	gSubpixelAntialiasing = false;
+	gDefaultHinting = true;
+	gSubpixelAverageWeight = 120;
+	gSubpixelOrderingRGB = true;
 }
 
 
@@ -144,7 +145,6 @@ DesktopSettingsPrivate::_Load()
 			const char* family;
 			const char* style;
 			float size;
-			bool subpix;
 			bool hinting;
 			if (settings.FindString("plain family", &family) == B_OK
 				&& settings.FindString("plain style", &style) == B_OK
@@ -168,14 +168,8 @@ DesktopSettingsPrivate::_Load()
 					fFixedFont.SetStyle(fontStyle);
 				fFixedFont.SetSize(size);
 			}
-			if (settings.FindBool("font subpix", &subpix) == B_OK) {
-				fFontSubpixelAntialiasing = subpix;
-				FontCacheEntry::SetDefaultRenderType(
-						(subpix) ? glyph_ren_subpix : glyph_ren_native_gray8);
-			}
 			if (settings.FindBool("hinting", &hinting) == B_OK) {
-				fHinting = hinting;
-				FontCacheEntry::SetDefaultHinting(fHinting);
+				gDefaultHinting = hinting;
 			}
 			gFontManager->Unlock();
 		}
@@ -233,8 +227,26 @@ DesktopSettingsPrivate::_Load()
 				fMenuInfo.click_to_open = clickToOpen;
 
 			bool triggersAlwaysShown;
-			if (settings.FindBool("triggers always shown", &triggersAlwaysShown) == B_OK)
+			if (settings.FindBool("triggers always shown", &triggersAlwaysShown)
+					== B_OK) {
 				fMenuInfo.triggers_always_shown = triggersAlwaysShown;
+			}
+
+			bool subpix;
+			if (settings.FindBool("subpixel antialiasing", &subpix) == B_OK)
+				gSubpixelAntialiasing = subpix;
+			
+			int8 averageWeight;
+			if (settings.FindInt8("subpixel average weight", &averageWeight)
+					== B_OK) {
+				gSubpixelAverageWeight = averageWeight;
+			}
+			
+			bool subpixelOrdering;
+			if (settings.FindBool("subpixel ordering", &subpixelOrdering)
+					== B_OK) {
+				gSubpixelOrderingRGB = subpixelOrdering;
+			}
 
 			for (int32 i = 0; i < kNumColors; i++) {
 				char colorName[12];
@@ -269,7 +281,8 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			}
 
 			BFile file;
-			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE
+				| B_READ_WRITE);
 			if (status == B_OK) {
 				status = settings.Flatten(&file, NULL);
 			}
@@ -293,11 +306,11 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			settings.AddString("fixed style", fFixedFont.Style());
 			settings.AddFloat("fixed size", fFixedFont.Size());
 
-			settings.AddBool("font subpix",fFontSubpixelAntialiasing);
-			settings.AddBool("hinting",fHinting);
+			settings.AddBool("hinting", gDefaultHinting);
 
 			BFile file;
-			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE
+				| B_READ_WRITE);
 			if (status == B_OK) {
 				status = settings.Flatten(&file, NULL);
 			}
@@ -311,7 +324,8 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			settings.AddInt32("mode", (int32)fMouseMode);
 
 			BFile file;
-			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE
+				| B_READ_WRITE);
 			if (status == B_OK) {
 				status = settings.Flatten(&file, NULL);
 			}
@@ -325,7 +339,8 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			settings.AddBool("show", fShowAllDraggers);
 
 			BFile file;
-			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE
+				| B_READ_WRITE);
 			if (status == B_OK) {
 				status = settings.Flatten(&file, NULL);
 			}
@@ -339,10 +354,16 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			settings.AddFloat("font size", fMenuInfo.font_size);
 			settings.AddString("font family", fMenuInfo.f_family);
 			settings.AddString("font style", fMenuInfo.f_style);
-			settings.AddInt32("bg color", (const int32&)fMenuInfo.background_color);
+			settings.AddInt32("bg color",
+				(const int32&)fMenuInfo.background_color);
 			settings.AddInt32("separator", fMenuInfo.separator);
 			settings.AddBool("click to open", fMenuInfo.click_to_open);
-			settings.AddBool("triggers always shown", fMenuInfo.triggers_always_shown);
+			settings.AddBool("triggers always shown",
+				fMenuInfo.triggers_always_shown);
+
+			settings.AddBool("subpixel antialiasing", gSubpixelAntialiasing);
+			settings.AddInt8("subpixel average weight", gSubpixelAverageWeight);
+			settings.AddBool("subpixel ordering", gSubpixelOrderingRGB);
 
 			for (int32 i = 0; i < kNumColors; i++) {
 				char colorName[12];
@@ -352,7 +373,8 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			}
 
 			BFile file;
-			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE
+				| B_READ_WRITE);
 			if (status == B_OK) {
 				status = settings.Flatten(&file, NULL);
 			}
@@ -544,39 +566,62 @@ DesktopSettingsPrivate::UIColor(color_which which) const
 
 
 void
-DesktopSettingsPrivate::SetFontSubpixelAntialiasing(bool subpix)
+DesktopSettingsPrivate::SetSubpixelAntialiasing(bool subpix)
 {
-	if (fFontSubpixelAntialiasing != subpix) {
-		fFontSubpixelAntialiasing = subpix;
-		FontCacheEntry::SetDefaultRenderType(
-			(subpix)?glyph_ren_subpix:glyph_ren_native_gray8);
-		Save(kFontSettings);
-	}
+	gSubpixelAntialiasing = subpix;
+	Save(kAppearanceSettings);
 }
 
 
 bool
-DesktopSettingsPrivate::FontSubpixelAntialiasing() const
+DesktopSettingsPrivate::SubpixelAntialiasing() const
 {
-	return fFontSubpixelAntialiasing;
+	return gSubpixelAntialiasing;
 }
 
 
 void
 DesktopSettingsPrivate::SetHinting(bool hinting)
 {
-	if (fHinting != hinting) {
-		fHinting = hinting;
-		FontCacheEntry::SetDefaultHinting(hinting);
-		Save(kFontSettings);
-	}
+	gDefaultHinting = hinting;
+	Save(kFontSettings);
 }
 
 
 bool
 DesktopSettingsPrivate::Hinting() const
 {
-	return fHinting;
+	return gDefaultHinting;
+}
+
+
+void
+DesktopSettingsPrivate::SetSubpixelAverageWeight(uint8 averageWeight)
+{
+	gSubpixelAverageWeight = averageWeight;
+	Save(kAppearanceSettings);
+}
+
+
+uint8
+DesktopSettingsPrivate::SubpixelAverageWeight() const
+{
+	return gSubpixelAverageWeight;
+}
+
+
+void
+DesktopSettingsPrivate::SetSubpixelOrderingRegular(bool subpixelOrdering)
+{
+	gSubpixelOrderingRGB = subpixelOrdering;
+	Save(kAppearanceSettings);
+}
+
+
+bool
+DesktopSettingsPrivate::IsSubpixelOrderingRegular() const
+{
+	return gSubpixelOrderingRGB;
 }
 
 //	#pragma mark - read access
@@ -672,9 +717,9 @@ DesktopSettings::UIColor(color_which which) const
 
 
 bool
-DesktopSettings::FontSubpixelAntialiasing() const
+DesktopSettings::SubpixelAntialiasing() const
 {
-	return fSettings->FontSubpixelAntialiasing();
+	return fSettings->SubpixelAntialiasing();
 }
 
 
@@ -682,6 +727,21 @@ bool
 DesktopSettings::Hinting() const
 {
 	return fSettings->Hinting();
+}
+
+
+uint8
+DesktopSettings::SubpixelAverageWeight() const
+{
+	return fSettings->SubpixelAverageWeight();
+}
+
+
+bool
+DesktopSettings::IsSubpixelOrderingRegular() const
+{
+	// True corresponds to RGB, false means BGR
+	return fSettings->IsSubpixelOrderingRegular();
 }
 
 //	#pragma mark - write access
@@ -763,9 +823,9 @@ LockedDesktopSettings::SetUIColor(color_which which, const rgb_color color)
 
 
 void
-LockedDesktopSettings::SetFontSubpixelAntialiasing(bool subpix)
+LockedDesktopSettings::SetSubpixelAntialiasing(bool subpix)
 {
-	fSettings->SetFontSubpixelAntialiasing(subpix);
+	fSettings->SetSubpixelAntialiasing(subpix);
 }
 
 
@@ -773,5 +833,18 @@ void
 LockedDesktopSettings::SetHinting(bool hinting)
 {
 	fSettings->SetHinting(hinting);
+}
+
+
+void
+LockedDesktopSettings::SetSubpixelAverageWeight(uint8 averageWeight)
+{
+	fSettings->SetSubpixelAverageWeight(averageWeight);
+}
+
+void
+LockedDesktopSettings::SetSubpixelOrderingRegular(bool subpixelOrdering)
+{
+	fSettings->SetSubpixelOrderingRegular(subpixelOrdering);
 }
 

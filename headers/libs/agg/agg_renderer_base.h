@@ -206,21 +206,6 @@ namespace agg
             m_ren->blend_hline(x1, y, x2 - x1 + 1, c, cover);
         }
 		
-		//--------------------------------------------------------------------
-        void blend_hline_subpix(int x1, int y, int x2, 
-                                const color_type& c, cover_type cover)
-        {
-            if(x1 > x2) { int t = x2; x2 = x1; x1 = t; }
-            if(y  > ymax()) return;
-            if(y  < ymin()) return;
-            if(x1 > xmax()) return;
-            if(x2 < xmin()) return;
-
-            if(x1 < xmin()) x1 = xmin();
-            if(x2 > xmax()) x2 = xmax();
-
-            m_ren->blend_hline_subpix(x1, y, x2 - x1 + 1, c, cover);
-        }
 
         //--------------------------------------------------------------------
         void blend_vline(int x, int y1, int y2, 
@@ -309,7 +294,7 @@ namespace agg
             {
                 len -= 3 * (xmin() - x);
                 if(len <= 0) return;
-                covers += 3*(xmin() - x);
+                covers += 3 * (xmin() - x);
                 x = xmin();
             }
             if(x + len / 3 > xmax())

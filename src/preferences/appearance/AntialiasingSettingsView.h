@@ -1,0 +1,59 @@
+/*
+ * Copyright 2008, Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+#ifndef ANTIALIASING_SETTINGS_VIEW_H
+#define ANTIALIASING_SETTINGS_VIEW_H
+
+
+#include <View.h>
+
+class BBox;
+class BMenuField;
+class BPopUpMenu;
+class BTextControl;
+
+
+class AntialiasingSettingsView : public BView {
+public:
+							AntialiasingSettingsView(BRect rect,
+								const char* name);
+	virtual					~AntialiasingSettingsView();
+
+	virtual	void			GetPreferredSize(float *_width, float *_height);
+	virtual	void			RelayoutIfNeeded();
+	virtual	void			AttachedToWindow();
+	virtual	void			MessageReceived(BMessage *msg);
+
+			void			SetDivider(float divider);
+
+			void			SetDefaults();
+			void			Revert();
+			bool			IsDefaultable();
+			bool			IsRevertable();
+
+private:
+			void			_BuildAntialiasingMenu();
+			void			_SetCurrentAntialiasing();
+			void			_BuildHintingMenu();
+			void			_SetCurrentHinting();
+			void			_SetCurrentAverageWeight();
+
+protected:
+			float			fDivider;
+
+			BMenuField*		fAntialiasingMenuField;
+			BPopUpMenu*		fAntialiasingMenu;
+			BMenuField*		fHintingMenuField;
+			BPopUpMenu*		fHintingMenu;
+			BTextControl*	fAverageWeightControl;
+
+			bool			fSavedSubpixelAntialiasing;
+			bool			fCurrentSubpixelAntialiasing;
+			bool			fSavedHinting;
+			bool			fCurrentHinting;
+			unsigned char	fSavedAverageWeight;
+			unsigned char	fCurrentAverageWeight;
+};
+
+#endif // ANTIALIASING_SETTINGS_VIEW_H

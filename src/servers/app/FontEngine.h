@@ -42,6 +42,9 @@
 
 #include "agg_scanline_storage_subpix.h"
 #include "agg_scanline_u_subpix.h"
+#include "agg_scanline_u_subpix_avrg_filtering.h"
+
+#include "GlobalSubpixelSettings.h"
 
 
 enum glyph_rendering {
@@ -147,7 +150,11 @@ class FontEngine {
 			CurveConverterType	fCurves;
 			agg::scanline_u8	fScanlineAA;
 			agg::scanline_bin	fScanlineBin;
+#ifdef AVERAGE_BASED_SUBPIXEL_FILTERING
+			agg::scanline_u8_subpix_avrg_filtering fScanlineSubpix;
+#else
 			agg::scanline_u8_subpix fScanlineSubpix;
+#endif
 
 			ScanlineStorageAA	fScanlineStorageAA;
 			ScanlineStorageBin	fScanlineStorageBin;

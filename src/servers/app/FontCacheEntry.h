@@ -94,13 +94,6 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 
 	static	void				GenerateSignature(char* signature,
 									const ServerFont& font);
-									
-	static void					SetDefaultRenderType(glyph_rendering renderType);
-	static glyph_rendering		DefaultRenderType()
-									{ return sDefaultRenderType; }
-	static void					SetDefaultHinting(bool hinting);
-	static bool					DefaultHinting()
-									{ return sDefaultHinting; }
 
 	// private to FontCache class:
 			void				UpdateUsage();
@@ -119,8 +112,6 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 
 			GlyphCachePool*		fGlyphCache;
 			FontEngine			fEngine;
-	static	glyph_rendering		sDefaultRenderType;
-	static	bool				sDefaultHinting;
 
 	static	BLocker				sUsageUpdateLock;
 			bigtime_t			fLastUsedTime;

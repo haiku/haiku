@@ -1,28 +1,30 @@
 /*
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * Copyright 2008, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Copyright 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
  *
  *
- * Class scanline_u8_subpix, a slightly modified version of
- * scanline_u8 customized to store 3 covers per pixel
+ * Class scanline_u8_subpix_avrg_filtering, a slightly modified version of
+ * scanline_u8 customized to store 3 covers per pixel and to implement
+ * average-based color filtering
  *
  */
 
-#ifndef AGG_SCANLINE_U_SUBPIX_INCLUDED
-#define AGG_SCANLINE_U_SUBPIX_INCLUDED
+#ifndef AGG_SCANLINE_U_SUBPIX_AVRG_FILTERING_INCLUDED
+#define AGG_SCANLINE_U_SUBPIX_AVRG_FILTERING_INCLUDED
 
-#include <agg_array.h>
+#include "GlobalSubpixelSettings.h"
 
 namespace agg
 {
-	//======================================================scanline_u8_subpix
+	//=======================================scanline_u8_subpix_avrg_filtering
 	//------------------------------------------------------------------------
-	class scanline_u8_subpix
+	class scanline_u8_subpix_avrg_filtering
 	{
 	public:
-		typedef scanline_u8_subpix self_type;
+		typedef scanline_u8_subpix_avrg_filtering self_type;
 		typedef int8u		cover_type;
 		typedef int16		coord_type;
 
@@ -38,7 +40,7 @@ namespace agg
 		typedef const span* const_iterator;
 
 		//--------------------------------------------------------------------
-		scanline_u8_subpix() :
+		scanline_u8_subpix_avrg_filtering() :
 			m_min_x(0),
 			m_last_x(0x7FFFFFF0),
 			m_cur_span(0)
@@ -61,10 +63,37 @@ namespace agg
 		//--------------------------------------------------------------------
 		void add_cell(int x, unsigned cover1, unsigned cover2, unsigned cover3)
 		{
+		
+		// NOTE stippi: My basic idea is that filtering tries to minimize colored
+		// edges, but it does so by blurring the coverage values. This will also
+		// affect neighboring pixels and add blur where there were perfectly sharp
+		// edges. Andrej's method of filtering adds a special case for perfectly
+		// sharp edges, but the drawback here is that there will be a visible
+		// transition between blurred and non-blurred subpixels. I had the idea that
+		// when simply fading the subpixels towards the plain gray-scale-aa values,
+		// there must be a sweet spot for when colored edges become non-disturbing
+		// and there is still a benefit of sharpness compared to straight gray-scale-
+		// aa. The define above enables this method against the colored edges. My
+		// method still has a drawback, since jaggies in diagonal lines will be more
+		// visible again than with the filter method.
+
+			unsigned char averageWeight = gSubpixelAverageWeight;
+			unsigned char subpixelWeight = 255 - averageWeight;
+
+			unsigned int coverR;
+			unsigned int coverG;
+			unsigned int coverB;
+			
+			unsigned int average = (cover1 + cover2 + cover3 + 2) / 3;
+			
+			coverR = (cover1 * subpixelWeight + average * averageWeight) >> 8;
+			coverG = (cover2 * subpixelWeight + average * averageWeight) >> 8;
+			coverB = (cover3 * subpixelWeight + average * averageWeight) >> 8;
+
 			x -= m_min_x;
-			m_covers[3 * x] = (cover_type)cover1;
-			m_covers[3 * x + 1] = (cover_type)cover2;
-			m_covers[3 * x + 2] = (cover_type)cover3;
+			m_covers[3 * x] = (cover_type)coverR;
+			m_covers[3 * x + 1] = (cover_type)coverG;
+			m_covers[3 * x + 2] = (cover_type)coverB;
 			if(x == m_last_x + 1)
 			{
 				m_cur_span->len += 3;
@@ -118,7 +147,7 @@ namespace agg
 		iterator	   begin()		 { return &m_spans[1]; }
 
 	private:
-		scanline_u8_subpix(const self_type&);
+		scanline_u8_subpix_avrg_filtering(const self_type&);
 		const self_type& operator = (const self_type&);
 
 	private:

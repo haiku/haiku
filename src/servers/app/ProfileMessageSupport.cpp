@@ -175,10 +175,15 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_GET_SHOW_ALL_DRAGGERS: string = "AS_GET_SHOW_ALL_DRAGGERS"; break;
 		case AS_SET_SHOW_ALL_DRAGGERS: string = "AS_SET_SHOW_ALL_DRAGGERS"; break;
 		
-		case AS_SET_FONT_SUBPIXEL_ANTIALIASING: string = "AS_SET_FONT_SUBPIXEL_ANTIALIASING"; break;
-		case AS_GET_FONT_SUBPIXEL_ANTIALIASING: string = "AS_GET_FONT_SUBPIXEL_ANTIALIASING"; break;
+		// Subpixel antialiasing & hinting
+		case AS_SET_SUBPIXEL_ANTIALIASING: string = "AS_SET_SUBPIXEL_ANTIALIASING"; break;
+		case AS_GET_SUBPIXEL_ANTIALIASING: string = "AS_GET_SUBPIXEL_ANTIALIASING"; break;
 		case AS_SET_HINTING: string = "AS_SET_HINTING"; break;
 		case AS_GET_HINTING: string = "AS_GET_HINTING"; break;
+		case AS_SET_SUBPIXEL_AVERAGE_WEIGHT: string = "AS_SET_SUBPIXEL_AVERAGE_WEIGHT"; break;
+		case AS_GET_SUBPIXEL_AVERAGE_WEIGHT: string = "AS_GET_SUBPIXEL_AVERAGE_WEIGHT"; break;
+		case AS_SET_SUBPIXEL_ORDERING: string = "AS_SET_SUBPIXEL_ORDERING"; break;
+		case AS_GET_SUBPIXEL_ORDERING: string = "AS_GET_SUBPIXEL_ORDERING"; break;
 
 		// Graphics calls
 		case AS_SET_HIGH_COLOR: string = "AS_SET_HIGH_COLOR"; break;

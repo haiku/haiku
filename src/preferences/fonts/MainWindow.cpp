@@ -63,8 +63,6 @@ MainWindow::MainWindow()
 	rect = tabView->ContainerView()->Bounds().InsetByCopy(5, 8);
 	fFontsView = new FontView(rect);
 
-	fAdvancedSettings = new AdvancedSettingsView(rect, "Advanced");
-
 	tabView->AddTab(fFontsView);
 
 	fFontsView->UpdateFonts();
@@ -104,23 +102,6 @@ MainWindow::MainWindow()
 			_Center();
 	}
 
-	tabView->AddTab(fAdvancedSettings);
-
-	fAdvancedSettings->RelayoutIfNeeded();
-	fAdvancedSettings->GetPreferredSize(&width, &height);
-	
-	widthDiff = width + 10 - tabView->ContainerView()->Bounds().Width();
-	if (widthDiff > 0) {
-		tabView->ResizeBy(widthDiff, 0);
-		tabView->ContainerView()->ResizeBy(widthDiff, 0);
-	}
-	
-	heightDiff = height + 16 - tabView->ContainerView()->Bounds().Height();
-	if (heightDiff > 0) {
-		tabView->ResizeBy(0, heightDiff);
-		tabView->ContainerView()->ResizeBy(0, heightDiff);
-	}
-
 	fRunner = new BMessageRunner(this, new BMessage(kMsgCheckFonts), 3000000);
 		// every 3 seconds
 
@@ -149,25 +130,19 @@ MainWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgUpdate:
-			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable()
-								|| fAdvancedSettings->IsDefaultable());
-			fRevertButton->SetEnabled(fFontsView->IsRevertable()
-								|| fAdvancedSettings->IsRevertable());
+			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable());
+			fRevertButton->SetEnabled(fFontsView->IsRevertable());
 			break;
 
 		case kMsgSetDefaults:
 			fFontsView->SetDefaults();
-			fAdvancedSettings->SetDefaults();
 			fDefaultsButton->SetEnabled(false);
-			fRevertButton->SetEnabled(fFontsView->IsRevertable()
-								|| fAdvancedSettings->IsRevertable());
+			fRevertButton->SetEnabled(fFontsView->IsRevertable());
 			break;
 
 		case kMsgRevert:
 			fFontsView->Revert();
-			fAdvancedSettings->Revert();
-			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable()
-								|| fAdvancedSettings->IsDefaultable());
+			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable());
 			fRevertButton->SetEnabled(false);
 			break;
 

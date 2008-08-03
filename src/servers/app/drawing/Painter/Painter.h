@@ -7,6 +7,7 @@
  * rendering pipe-lines for stroke, fills, bitmap and text rendering.
  *
  */
+ 
 #ifndef PAINTER_H
 #define PAINTER_H
 
@@ -22,7 +23,6 @@
 
 #include <Font.h>
 #include <Rect.h>
-
 
 class BBitmap;
 class BRegion;
@@ -73,9 +73,6 @@ class Painter {
 			void				SetDrawingMode(drawing_mode mode);
 	inline	drawing_mode		DrawingMode() const
 									{ return fDrawingMode; }
-			void				SetSubpixelAntialiasing(bool subpixelAntialias);
-			bool				SubpixelAntialiasing() const
-									{ return fSubpixelAntialias; }
 			void				SetBlendingMode(source_alpha srcAlpha,
 									alpha_function alphaFunc);
 
@@ -272,6 +269,9 @@ mutable renderer_base			fBaseRenderer;
 
 mutable scanline_unpacked_type	fUnpackedScanline;
 mutable scanline_packed_type	fPackedScanline;
+mutable scanline_packed_subpix_type fSubpixPackedScanline;
+mutable scanline_unpacked_subpix_type fSubpixUnpackedScanline;
+mutable rasterizer_subpix_type	fSubpixRasterizer;
 mutable rasterizer_type			fRasterizer;
 mutable renderer_subpix_type	fSubpixRenderer;
 mutable renderer_type			fRenderer;
@@ -294,7 +294,6 @@ mutable agg::conv_curve<agg::path_storage> fCurve;
 	cap_mode					fLineCapMode;
 	join_mode					fLineJoinMode;
 	float						fMiterLimit;
-	bool						fSubpixelAntialias;
 
 	PatternHandler				fPatternHandler;
 

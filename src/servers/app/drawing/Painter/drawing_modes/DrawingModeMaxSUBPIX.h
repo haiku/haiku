@@ -11,6 +11,7 @@
 #define DRAWING_MODE_MAX_SUBPIX_H
 
 #include "DrawingMode.h"
+#include "GlobalSubpixelSettings.h"
 
 // BLEND_MAX_SUBPIX
 #define BLEND_MAX_SUBPIX(d, r, g, b, a1, a2, a3) \
@@ -24,73 +25,19 @@
 }
 
 
-// BLEND_MAX
-#define BLEND_MAX(d, r, g, b, a) \
-{ \
-	pixel32 _p; \
-	_p.data32 = *(uint32*)d; \
-	if (brightness_for((r), (g), (b)) \
-		> brightness_for(_p.data8[2], _p.data8[1], _p.data8[0])) { \
-		BLEND(d, (r), (g), (b), a); \
-	} \
-}
-
-
-// ASSIGN_MAX
-#define ASSIGN_MAX(d, r, g, b) \
-{ \
-	pixel32 _p; \
-	_p.data32 = *(uint32*)d; \
-	if (brightness_for((r), (g), (b)) \
-		> brightness_for(_p.data8[2], _p.data8[1], _p.data8[0])) { \
-		d[0] = (b); \
-		d[1] = (g); \
-		d[2] = (r); \
-		d[3] = 255; \
-	} \
-}
-
-
-// blend_hline_max_subpix
-void
-blend_hline_max_subpix(int x, int y, unsigned len, const color_type& c,
-	uint8 cover, agg_buffer* buffer, const PatternHandler* pattern)
-{
-	uint8* p = buffer->row_ptr(y) + (x << 2);
-	if (cover == 255) {
-		do {
-			rgb_color color = pattern->ColorAt(x, y);
-
-			ASSIGN_MAX(p, color.red, color.green, color.blue);
-
-			p += 4;
-			x++;
-			len -= 3;
-		} while (len);
-	} else {
-		do {
-			rgb_color color = pattern->ColorAt(x, y);
-
-			BLEND_MAX(p, color.red, color.green, color.blue, cover);
-
-			x++;
-			p += 4;
-			len -= 3;
-		} while (len);
-	}
-}
-
-
 // blend_solid_hspan_max_subpix
 void
 blend_solid_hspan_max_subpix(int x, int y, unsigned len, const color_type& c,
 	const uint8* covers, agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
+	const int subpixelL = gSubpixelOrderingRGB ? 2 : 0;
+	const int subpixelM = 1;
+	const int subpixelR = gSubpixelOrderingRGB ? 0 : 2;
 	do {
 		rgb_color color = pattern->ColorAt(x, y);
 		BLEND_MAX_SUBPIX(p, color.red, color.green, color.blue,
-			covers[2], covers[1], covers[0]);
+			covers[subpixelL], covers[subpixelM], covers[subpixelR]);
 		covers += 3;
 		p += 4;
 		x++;

@@ -5,6 +5,7 @@ UsePrivateHeaders app [ FDirName servers app ] ;
 
 Preference Appearance :
 	APRMain.cpp
+	AntialiasingSettingsView.cpp
 	APRView.cpp
 	APRWindow.cpp
 	ColorSet.cpp

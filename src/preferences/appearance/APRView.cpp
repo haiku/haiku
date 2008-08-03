@@ -18,6 +18,7 @@
 #include <InterfaceDefs.h>
 
 #include "APRView.h"
+#include "APRWindow.h"
 #include "defs.h"
 #include "ColorWell.h"
 #include "ColorWhichItem.h"
@@ -152,26 +153,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	
 	fPicker = new BColorControl(BPoint(fScrollView->Frame().left,fScrollView->Frame().bottom+kBorderSpace),B_CELLS_32x8,5.0,"fPicker",
 								new BMessage(UPDATE_COLOR));
-	AddChild(fPicker);
-	
-	fDefaults = new BButton(BRect(0,0,1,1),"DefaultsButton","Defaults",
-							new BMessage(DEFAULT_SETTINGS),
-							B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-	fDefaults->ResizeToPreferred();
-	fDefaults->SetEnabled(false);
-	fDefaults->MoveTo(fPicker->Frame().left,fPicker->Frame().bottom+kBorderSpace);
-	AddChild(fDefaults);
-	
-	
-	BRect cvrect(fDefaults->Frame());
-	cvrect.OffsetBy(cvrect.Width() + kItemSpace,0);
-
-	fRevert = new BButton(cvrect,"RevertButton","Revert", 
-						new BMessage(REVERT_SETTINGS),
-						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-	fRevert->ResizeToPreferred();
-	fRevert->SetEnabled(false);
-	AddChild(fRevert);
+	AddChild(fPicker);	
 }
 
 APRView::~APRView(void)
@@ -184,21 +166,15 @@ APRView::AttachedToWindow(void)
 {
 	fPicker->SetTarget(this);
 	fAttrList->SetTarget(this);
-	fDefaults->SetTarget(this);
-	fRevert->SetTarget(this);
 	fColorWell->SetTarget(this);
 
 	fPicker->SetValue(fCurrentSet.StringToColor(fAttrString.String()));
 	
 	if (fDecorMenu)
 		fDecorMenu->SetTargetForItems(BMessenger(this));
-	
-	Window()->ResizeTo(MAX(fPicker->Frame().right,fPicker->Frame().right) + 10,
-					   fDefaults->Frame().bottom + 10);
+
 	LoadSettings();
 	fAttrList->Select(0);
-	
-	fDefaults->SetEnabled(fCurrentSet.IsDefaultable());
 }
 
 void
@@ -235,11 +211,9 @@ APRView::MessageReceived(BMessage *msg)
 				
 			// Update current fAttribute in the settings
 			fCurrentSet.SetColor(fAttribute, col);
-			UpdateCurrentColor();				
-	
-			fDefaults->SetEnabled(fCurrentSet.IsDefaultable());
-			fRevert->SetEnabled(true);
-			
+			UpdateCurrentColor();	
+						
+			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 		case ATTRIBUTE_CHOSEN: {
@@ -254,7 +228,7 @@ APRView::MessageReceived(BMessage *msg)
 			fAttrString=whichitem->Text();
 			UpdateControlsFromAttr(whichitem->Text());
 			
-			fDefaults->SetEnabled(fCurrentSet.IsDefaultable());
+			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 		case REVERT_SETTINGS: {
@@ -262,13 +236,11 @@ APRView::MessageReceived(BMessage *msg)
 			UpdateControlsFromAttr(fAttrString.String());
 			UpdateAllColors();
 			
-			fRevert->SetEnabled(false);
-			
+			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 		case DEFAULT_SETTINGS: {
 			fCurrentSet = ColorSet::DefaultColorSet();
-			fDefaults->SetEnabled(false);
 			
 			UpdateControlsFromAttr(fAttrString.String());
 			UpdateAllColors();
@@ -281,6 +253,7 @@ APRView::MessageReceived(BMessage *msg)
 				BPrivate::set_decorator(fDecorMenu->IndexOf(item));
 				#endif
 			}
+			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 		default:
@@ -300,6 +273,11 @@ void APRView::LoadSettings(void)
 	fCurrentSet.PrintToStream();
 
 	fPrevSet = fCurrentSet;
+}
+
+bool APRView::IsDefaultable(void)
+{
+	return fCurrentSet.IsDefaultable();
 }
 
 void APRView::UpdateAllColors(void)

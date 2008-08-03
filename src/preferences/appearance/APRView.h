@@ -40,6 +40,7 @@ public:
 	void	MessageReceived(BMessage *msg);
 	
 	void	LoadSettings(void);
+	bool	IsDefaultable(void);
 
 protected:
 
@@ -48,9 +49,6 @@ protected:
 	void	UpdateAllColors();
 	
 	BColorControl	*fPicker;
-	
-	BButton			*fRevert;
-	BButton			*fDefaults;
 	
 	BListView		*fAttrList;
 	

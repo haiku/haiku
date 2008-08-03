@@ -40,6 +40,7 @@
 #include <View.h>
 
 #include "DrawingMode.h"
+#include "GlobalSubpixelSettings.h"
 #include "PatternHandler.h"
 #include "RenderingBuffer.h"
 #include "ServerBitmap.h"
@@ -61,7 +62,6 @@ using std::nothrow;
 #define CHECK_CLIPPING	if (!fValidClipping) return BRect(0, 0, -1, -1);
 #define CHECK_CLIPPING_NO_RETURN	if (!fValidClipping) return;
 
-
 // constructor
 Painter::Painter()
 	: fBuffer(),
@@ -69,6 +69,9 @@ Painter::Painter()
 	  fBaseRenderer(fPixelFormat),
 	  fUnpackedScanline(),
 	  fPackedScanline(),
+	  fSubpixPackedScanline(),
+	  fSubpixUnpackedScanline(),
+	  fSubpixRasterizer(),
 	  fRasterizer(),
 	  fSubpixRenderer(fBaseRenderer),
 	  fRenderer(fBaseRenderer),
@@ -90,15 +93,16 @@ Painter::Painter()
 	  fLineCapMode(B_BUTT_CAP),
 	  fLineJoinMode(B_MITER_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
-	  fSubpixelAntialias(true),
 
 	  fPatternHandler(),
-	  fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline)
+	  fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline,
+		fSubpixUnpackedScanline, fSubpixRasterizer)
 {
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
 
 #if ALIASED_DRAWING
 	fRasterizer.gamma(agg::gamma_threshold(0.5));
+	fSubpixRasterizer.gamma(agg:gamma_threshold(0.5));
 #endif
 }
 
@@ -211,6 +215,7 @@ Painter::ConstrainClipping(const BRegion* region)
 	if (fValidClipping) {
 		clipping_rect cb = fClippingRegion->FrameInt();
 		fRasterizer.clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
+		fSubpixRasterizer.clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
 	}
 }
 
@@ -244,13 +249,6 @@ Painter::SetDrawingMode(drawing_mode mode)
 	}
 }
 
-void
-Painter::SetSubpixelAntialiasing(bool subpixelAntialias)
-{
-	if (fSubpixelAntialias != subpixelAntialias) {
-		fSubpixelAntialias = subpixelAntialias;
-	}
-}
 
 // SetBlendingMode
 void
@@ -826,29 +824,60 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 		outer.rect(lt.x, lt.y, rb.x, rb.y);
 		outer.radius(xRadius, yRadius);
 
-		fRasterizer.reset();
-		fRasterizer.add_path(outer);
+		if (gSubpixelAntialiasing) {
+			fSubpixRasterizer.reset();
+			fSubpixRasterizer.add_path(outer);
+			
+			// don't add an inner hole if the "size is negative", this avoids some
+			// defects that can be observed on R5 and could be regarded as a bug.
+			if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
+				agg::rounded_rect inner;
+				inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
+					rb.y - fPenSize);
+				inner.radius(max_c(0.0, xRadius - fPenSize),
+					max_c(0.0, yRadius - fPenSize));
 
-		// don't add an inner hole if the "size is negative", this avoids some
-		// defects that can be observed on R5 and could be regarded as a bug.
-		if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
-			agg::rounded_rect inner;
-			inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize, rb.y - fPenSize);
-			inner.radius(max_c(0.0, xRadius - fPenSize), max_c(0.0, yRadius - fPenSize));
+				fSubpixRasterizer.add_path(inner);
+			}
 
-			fRasterizer.add_path(inner);
+			// make the inner rect work as a hole
+			fSubpixRasterizer.filling_rule(agg::fill_even_odd);
+
+			if (fPenSize > 2)
+				agg::render_scanlines(fSubpixRasterizer, fSubpixPackedScanline, 
+					fSubpixRenderer);
+			else
+				agg::render_scanlines(fSubpixRasterizer, fSubpixUnpackedScanline,
+					fSubpixRenderer);
+
+			fSubpixRasterizer.filling_rule(agg::fill_non_zero);
+		} else {
+			fRasterizer.reset();
+			fRasterizer.add_path(outer);
+
+			// don't add an inner hole if the "size is negative", this avoids some
+			// defects that can be observed on R5 and could be regarded as a bug.
+			if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
+				agg::rounded_rect inner;
+				inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
+					rb.y - fPenSize);
+				inner.radius(max_c(0.0, xRadius - fPenSize),
+					max_c(0.0, yRadius - fPenSize));
+
+				fRasterizer.add_path(inner);
+			}
+
+			// make the inner rect work as a hole
+			fRasterizer.filling_rule(agg::fill_even_odd);
+
+			if (fPenSize > 2)
+				agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
+			else
+				agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
+
+			// reset to default
+			fRasterizer.filling_rule(agg::fill_non_zero);
 		}
-
-		// make the inner rect work as a hole
-		fRasterizer.filling_rule(agg::fill_even_odd);
-
-		if (fPenSize > 2)
-			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
-		else
-			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
-
-		// reset to default
-		fRasterizer.filling_rule(agg::fill_non_zero);
 
 		return _Clipped(_BoundingBox(outer));
 	}
@@ -932,20 +961,39 @@ Painter::DrawEllipse(BRect r, bool fill) const
 						   yRadius + inset,
 						   divisions);
 
-		fRasterizer.reset();
-		fRasterizer.add_path(outer);
-		fRasterizer.add_path(inner);
+		if (gSubpixelAntialiasing) {
+			fSubpixRasterizer.reset();
+			fSubpixRasterizer.add_path(outer);
+			fSubpixRasterizer.add_path(inner);
 
-		// make the inner ellipse work as a hole
-		fRasterizer.filling_rule(agg::fill_even_odd);
+			// make the inner ellipse work as a hole
+			fSubpixRasterizer.filling_rule(agg::fill_even_odd);
 
-		if (fPenSize > 4)
-			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
-		else
-			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
+			if (fPenSize > 4)
+				agg::render_scanlines(fSubpixRasterizer, fSubpixPackedScanline,
+					fSubpixRenderer);
+			else
+				agg::render_scanlines(fSubpixRasterizer, fSubpixUnpackedScanline,
+					fSubpixRenderer);
 
-		// reset to default
-		fRasterizer.filling_rule(agg::fill_non_zero);
+			// reset to default
+			fSubpixRasterizer.filling_rule(agg::fill_non_zero);
+		} else {
+			fRasterizer.reset();
+			fRasterizer.add_path(outer);
+			fRasterizer.add_path(inner);
+
+			// make the inner ellipse work as a hole
+			fRasterizer.filling_rule(agg::fill_even_odd);
+
+			if (fPenSize > 4)
+				agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
+			else
+				agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
+
+			// reset to default
+			fRasterizer.filling_rule(agg::fill_non_zero);
+		}
 
 		return _Clipped(_BoundingBox(outer));
 	}
@@ -1130,6 +1178,7 @@ Painter::InvertRect(const BRect& r) const
 	}
 	return _Clipped(r);
 }
+
 
 // #pragma mark - private
 
@@ -1968,10 +2017,20 @@ Painter::_StrokePath(VertexSource& path) const
 	stroke.line_join(agg_line_join_mode_for(fLineJoinMode));
 	stroke.miter_limit(fMiterLimit);
 
-	fRasterizer.reset();
-	fRasterizer.add_path(stroke);
+	if (gSubpixelAntialiasing) {
+	
+		fSubpixRasterizer.reset();
+		fSubpixRasterizer.add_path(stroke);
+		
+		agg::render_scanlines(fSubpixRasterizer, 
+			fSubpixPackedScanline, fSubpixRenderer);
+	} else {
 
-	agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
+		fRasterizer.reset();
+		fRasterizer.add_path(stroke);
+
+		agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
+	}
 
 	BRect touched = _BoundingBox(path);
 	float penSize = ceilf(fPenSize / 2.0);
@@ -1985,9 +2044,17 @@ template<class VertexSource>
 BRect
 Painter::_FillPath(VertexSource& path) const
 {
-	fRasterizer.reset();
-	fRasterizer.add_path(path);
-	agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
+	if (gSubpixelAntialiasing) {
+		
+		fSubpixRasterizer.reset();
+		fSubpixRasterizer.add_path(path);
+		agg::render_scanlines(fSubpixRasterizer,
+			fSubpixPackedScanline, fSubpixRenderer);
+	} else {
+		fRasterizer.reset();
+		fRasterizer.add_path(path);
+		agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
+	}
 
 	return _Clipped(_BoundingBox(path));
 }

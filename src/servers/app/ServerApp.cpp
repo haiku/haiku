@@ -2537,22 +2537,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
-		case AS_SET_FONT_SUBPIXEL_ANTIALIASING:
+		case AS_SET_SUBPIXEL_ANTIALIASING:
 		{
 			bool subpix;
 			if (link.Read<bool>(&subpix) == B_OK) {
 				LockedDesktopSettings settings(fDesktop);
-				settings.SetFontSubpixelAntialiasing(subpix);
+				settings.SetSubpixelAntialiasing(subpix);
 			}
 			fDesktop->Redraw();
 			break;
 		}
 
-		case AS_GET_FONT_SUBPIXEL_ANTIALIASING:
+		case AS_GET_SUBPIXEL_ANTIALIASING:
 		{
 			DesktopSettings settings(fDesktop);
 			fLink.StartMessage(B_OK);
-			fLink.Attach<bool>(settings.FontSubpixelAntialiasing());
+			fLink.Attach<bool>(settings.SubpixelAntialiasing());
 			fLink.Flush();
 			break;
 		}
@@ -2573,6 +2573,46 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			DesktopSettings settings(fDesktop);
 			fLink.StartMessage(B_OK);
 			fLink.Attach<bool>(settings.Hinting());
+			fLink.Flush();
+			break;
+		}
+		
+		case AS_SET_SUBPIXEL_AVERAGE_WEIGHT:
+		{
+			uint8 averageWeight;
+			if (link.Read<uint8>(&averageWeight) == B_OK) {
+				LockedDesktopSettings settings(fDesktop);
+				settings.SetSubpixelAverageWeight(averageWeight);
+			}
+			fDesktop->Redraw();
+			break;
+		}
+
+		case AS_GET_SUBPIXEL_AVERAGE_WEIGHT:
+		{
+			DesktopSettings settings(fDesktop);
+			fLink.StartMessage(B_OK);
+			fLink.Attach<uint8>(settings.SubpixelAverageWeight());
+			fLink.Flush();
+			break;
+		}
+		
+		case AS_SET_SUBPIXEL_ORDERING:
+		{
+			bool subpixelOrdering;
+			if (link.Read<bool>(&subpixelOrdering) == B_OK) {
+				LockedDesktopSettings settings(fDesktop);
+				settings.SetSubpixelOrderingRegular(subpixelOrdering);
+			}
+			fDesktop->Redraw();
+			break;
+		}
+
+		case AS_GET_SUBPIXEL_ORDERING:
+		{
+			DesktopSettings settings(fDesktop);
+			fLink.StartMessage(B_OK);
+			fLink.Attach<bool>(settings.IsSubpixelOrderingRegular());
 			fLink.Flush();
 			break;
 		}

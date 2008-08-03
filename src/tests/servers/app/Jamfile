@@ -70,6 +70,7 @@ SharedLibrary libhaikuappserver.so :
 	FontFamily.cpp
 	FontManager.cpp
 	FontStyle.cpp
+	GlobalSubpixelSettings.cpp
 	HashTable.cpp
 	IntPoint.cpp
 	IntRect.cpp

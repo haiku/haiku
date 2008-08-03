@@ -74,15 +74,6 @@ blend_hline_empty(int x, int y, unsigned len,
 	printf("blend_hline_empty()\n");
 }
 
-// blend_hline_subpix_empty
-void
-blend_hline_empty_subpix(int x, int y, unsigned len,
-				  const color_type& c, uint8 cover,
-				  agg_buffer* buffer, const PatternHandler* pattern)
-{
-	printf("blend_hline_empty_subpix()\n");
-}
-
 // blend_vline_empty
 void
 blend_vline_empty(int x, int y, unsigned len,
@@ -151,7 +142,6 @@ PixelFormat::PixelFormat(agg::rendering_buffer& rb,
 
 	  fBlendPixel(blend_pixel_empty),
 	  fBlendHLine(blend_hline_empty),
-	  fBlendHLineSubpix(blend_hline_empty_subpix),
 	  fBlendVLine(blend_vline_empty),
 	  fBlendSolidHSpan(blend_solid_hspan_empty),
 	  fBlendSolidHSpanSubpix(blend_solid_hspan_empty_subpix),
@@ -181,12 +171,10 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 				fBlendHLine = blend_hline_over_solid;
 				fBlendSolidHSpan = blend_solid_hspan_over_solid;
 				fBlendSolidVSpan = blend_solid_vspan_over_solid;
-				fBlendHLineSubpix = blend_hline_over_solid_subpix;
 				fBlendSolidHSpanSubpix = blend_solid_hspan_over_solid_subpix;
 			} else {
 				fBlendPixel = blend_pixel_over;
 				fBlendHLine = blend_hline_over;
-				fBlendHLineSubpix = blend_hline_over_subpix;
 				fBlendSolidHSpanSubpix = blend_solid_hspan_over_subpix;
 				fBlendSolidHSpan = blend_solid_hspan_over;
 				fBlendSolidVSpan = blend_solid_vspan_over;
@@ -196,7 +184,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		case B_OP_ERASE:
 			fBlendPixel = blend_pixel_erase;
 			fBlendHLine = blend_hline_erase;
-			fBlendHLineSubpix = blend_hline_erase_subpix;
 			fBlendSolidHSpanSubpix = blend_solid_hspan_erase_subpix;
 			fBlendSolidHSpan = blend_solid_hspan_erase;
 			fBlendSolidVSpan = blend_solid_vspan_erase;
@@ -205,7 +192,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		case B_OP_INVERT:
 			fBlendPixel = blend_pixel_invert;
 			fBlendHLine = blend_hline_invert;
-			fBlendHLineSubpix = blend_hline_invert_subpix;
 			fBlendSolidHSpanSubpix = blend_solid_hspan_invert_subpix;
 			fBlendSolidHSpan = blend_solid_hspan_invert;
 			fBlendSolidVSpan = blend_solid_vspan_invert;
@@ -214,7 +200,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		case B_OP_SELECT:
 			fBlendPixel = blend_pixel_select;
 			fBlendHLine = blend_hline_select;
-			fBlendHLineSubpix = blend_hline_select_subpix;
 			fBlendSolidHSpanSubpix = blend_solid_hspan_select_subpix;
 			fBlendSolidHSpan = blend_solid_hspan_select;
 			fBlendSolidVSpan = blend_solid_vspan_select;
@@ -227,7 +212,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 			if (text) {
 				fBlendPixel = blend_pixel_copy_text;
 				fBlendHLine = blend_hline_copy_text; 
-				fBlendHLineSubpix = blend_hline_copy_text_subpix;
 				fBlendSolidHSpanSubpix = blend_solid_hspan_copy_text_subpix;
 				fBlendSolidHSpan = blend_solid_hspan_copy_text;
 				fBlendSolidVSpan = blend_solid_vspan_copy_text;
@@ -239,7 +223,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 			} else if (fPatternHandler->IsSolid()) {
 				fBlendPixel = blend_pixel_copy_solid;
 				fBlendHLine = blend_hline_copy_solid;
-				fBlendHLineSubpix = blend_hline_copy_solid_subpix;
 				fBlendSolidHSpanSubpix = blend_solid_hspan_copy_solid_subpix;
 				fBlendSolidHSpan = blend_solid_hspan_copy_solid;
 				fBlendSolidVSpan = blend_solid_vspan_copy_solid;
@@ -247,7 +230,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 			} else {
 				fBlendPixel = blend_pixel_copy;
 				fBlendHLine = blend_hline_copy;
-				fBlendHLineSubpix = blend_hline_copy_subpix;
 				fBlendSolidHSpanSubpix = blend_solid_hspan_copy_subpix;
 				fBlendSolidHSpan = blend_solid_hspan_copy;
 				fBlendSolidVSpan = blend_solid_vspan_copy;
@@ -256,8 +238,7 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 			break;
 		case B_OP_ADD:
 			fBlendPixel = blend_pixel_add;
-			fBlendHLine = blend_hline_add;			
-			fBlendHLineSubpix = blend_hline_add_subpix;
+			fBlendHLine = blend_hline_add;
 			fBlendSolidHSpanSubpix = blend_solid_hspan_add_subpix;
 			fBlendSolidHSpan = blend_solid_hspan_add;
 			fBlendSolidVSpan = blend_solid_vspan_add;
@@ -266,7 +247,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		case B_OP_SUBTRACT:
 			fBlendPixel = blend_pixel_subtract;
 			fBlendHLine = blend_hline_subtract;
-			fBlendHLineSubpix = blend_hline_subtract_subpix;
 			fBlendSolidHSpanSubpix = blend_solid_hspan_subtract_subpix;
 			fBlendSolidHSpan = blend_solid_hspan_subtract;
 			fBlendSolidVSpan = blend_solid_vspan_subtract;
@@ -275,7 +255,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		case B_OP_BLEND:
 			fBlendPixel = blend_pixel_blend;
 			fBlendHLine = blend_hline_blend;
-			fBlendHLineSubpix = blend_hline_blend_subpix;
 			fBlendSolidHSpanSubpix = blend_solid_hspan_blend_subpix;
 			fBlendSolidHSpan = blend_solid_hspan_blend;
 			fBlendSolidVSpan = blend_solid_vspan_blend;
@@ -284,7 +263,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		case B_OP_MIN:
 			fBlendPixel = blend_pixel_min;
 			fBlendHLine = blend_hline_min;
-			fBlendHLineSubpix = blend_hline_min_subpix;
 			fBlendSolidHSpanSubpix = blend_solid_hspan_min_subpix;
 			fBlendSolidHSpan = blend_solid_hspan_min;
 			fBlendSolidVSpan = blend_solid_vspan_min;
@@ -293,7 +271,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		case B_OP_MAX:
 			fBlendPixel = blend_pixel_max;
 			fBlendHLine = blend_hline_max;
-			fBlendHLineSubpix = blend_hline_max_subpix;
 			fBlendSolidHSpanSubpix = blend_solid_hspan_max_subpix;
 			fBlendSolidHSpan = blend_solid_hspan_max;
 			fBlendSolidVSpan = blend_solid_vspan_max;
@@ -314,14 +291,12 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 					if (fPatternHandler->IsSolid()) {
 						fBlendPixel = blend_pixel_alpha_co_solid;
 						fBlendHLine = blend_hline_alpha_co_solid;
-						fBlendHLineSubpix = blend_hline_alpha_co_solid_subpix;
 						fBlendSolidHSpanSubpix = blend_solid_hspan_alpha_co_solid_subpix;
 						fBlendSolidHSpan = blend_solid_hspan_alpha_co_solid;
 						fBlendSolidVSpan = blend_solid_vspan_alpha_co_solid;
 					} else {
 						fBlendPixel = blend_pixel_alpha_co;
 						fBlendHLine = blend_hline_alpha_co;
-						fBlendHLineSubpix = blend_hline_alpha_co_subpix;
 						fBlendSolidHSpanSubpix = blend_solid_hspan_alpha_co_subpix;
 						fBlendSolidHSpan = blend_solid_hspan_alpha_co;
 						fBlendSolidVSpan = blend_solid_vspan_alpha_co;
@@ -330,7 +305,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
 					fBlendPixel = blend_pixel_alpha_cc;
 					fBlendHLine = blend_hline_alpha_cc;
-					fBlendHLineSubpix = blend_hline_alpha_cc_subpix;
 					fBlendSolidHSpanSubpix = blend_solid_hspan_alpha_cc_subpix;
 					fBlendSolidHSpan = blend_solid_hspan_alpha_cc;
 					fBlendSolidVSpan = blend_solid_vspan_alpha_cc;
@@ -341,14 +315,12 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 					if (fPatternHandler->IsSolid()) {
 						fBlendPixel = blend_pixel_alpha_po_solid;
 						fBlendHLine = blend_hline_alpha_po_solid;
-						fBlendHLineSubpix = blend_hline_alpha_po_solid_subpix;
 						fBlendSolidHSpanSubpix = blend_solid_hspan_alpha_po_solid_subpix;
 						fBlendSolidHSpan = blend_solid_hspan_alpha_po_solid;
 						fBlendSolidVSpan = blend_solid_vspan_alpha_po_solid;
 					} else {
 						fBlendPixel = blend_pixel_alpha_po;
 						fBlendHLine = blend_hline_alpha_po;
-						fBlendHLineSubpix = blend_hline_alpha_po_subpix;
 						fBlendSolidHSpanSubpix = blend_solid_hspan_alpha_po_subpix;
 						fBlendSolidHSpan = blend_solid_hspan_alpha_po;
 						fBlendSolidVSpan = blend_solid_vspan_alpha_po;
@@ -357,7 +329,6 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
 					fBlendPixel = blend_pixel_alpha_pc;
 					fBlendHLine = blend_hline_alpha_pc;
-					fBlendHLineSubpix = blend_hline_alpha_pc_subpix;
 					fBlendSolidHSpanSubpix = blend_solid_hspan_alpha_pc_subpix;
 					fBlendSolidHSpan = blend_solid_hspan_alpha_pc;
 					fBlendSolidVSpan = blend_solid_vspan_alpha_pc;

@@ -11,38 +11,7 @@
 #define DRAWING_MODE_COPY_TEXT_SUBPIX_H
 
 #include "DrawingModeCopySUBPIX.h"
-
-// blend_hline_copy_text_subpix
-void
-blend_hline_copy_text_subpix(int x, int y, unsigned len, const color_type& c,
-	uint8 cover, agg_buffer* buffer, const PatternHandler* pattern)
-{
-	if (cover == 255) {
-		// cache the color as 32bit value
-		uint32 v;
-		uint8* p8 = (uint8*)&v;
-		p8[0] = (uint8)c.b;
-		p8[1] = (uint8)c.g;
-		p8[2] = (uint8)c.r;
-		p8[3] = 255;
-		// row offset as 32bit pointer
-		uint32* p32 = (uint32*)(buffer->row_ptr(y)) + x;
-		do {
-			*p32 = v;
-			p32++;
-			len -= 3;
-		} while(len);
-	} else {
-		uint8* p = buffer->row_ptr(y) + (x << 2);
-		rgb_color l = pattern->LowColor();
-		do {
-			BLEND_COPY(p, c.r, c.g, c.b, cover, l.red, l.green, l.blue);
-			p += 4;
-			len -= 3;
-		} while (len);
-	}
-}
-
+#include "GlobalSubpixelSettings.h"
 
 // blend_solid_hspan_copy_text_subpix
 void
@@ -52,9 +21,13 @@ blend_solid_hspan_copy_text_subpix(int x, int y, unsigned len,
 {
 //printf("blend_solid_hspan_copy_text(%d, %d)\n", x, len);
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	//rgb_color l = pattern->LowColor();
+	rgb_color l = pattern->LowColor();
+	const int subpixelL = gSubpixelOrderingRGB ? 2 : 0;
+	const int subpixelM = 1;
+	const int subpixelR = gSubpixelOrderingRGB ? 0 : 2;
 	do {
-		BLEND_OVER_SUBPIX(p, c.r, c.g, c.b, covers[2], covers[1], covers[0]);
+		BLEND_COPY_SUBPIX(p, c.r, c.g, c.b, covers[subpixelL],
+			covers[subpixelM], covers[subpixelR], l.red, l.green, l.blue);
 		covers += 3;
 		p += 4;
 		x++;

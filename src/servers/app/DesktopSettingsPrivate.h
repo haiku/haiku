@@ -56,10 +56,14 @@ class DesktopSettingsPrivate {
 		void			SetUIColor(color_which which, const rgb_color color);
 		rgb_color		UIColor(color_which which) const;
 
-		void			SetFontSubpixelAntialiasing(bool subpix);
-		bool			FontSubpixelAntialiasing() const;
+		void			SetSubpixelAntialiasing(bool subpix);
+		bool			SubpixelAntialiasing() const;
 		void			SetHinting(bool hinting);
 		bool			Hinting() const;
+		void			SetSubpixelAverageWeight(uint8 averageWeight);
+		uint8			SubpixelAverageWeight() const;
+		void			SetSubpixelOrderingRegular(bool SubpixelOrdering);
+		bool			IsSubpixelOrderingRegular() const;
 
 	private:
 		void			_SetDefaults();
@@ -76,9 +80,6 @@ class DesktopSettingsPrivate {
 		bool			fShowAllDraggers;
 		int32			fWorkspacesCount;
 		BMessage		fWorkspaceMessages[kMaxWorkspaces];
-
-		bool			fFontSubpixelAntialiasing;
-		bool			fHinting;
 
 		server_read_only_memory& fShared;
 };

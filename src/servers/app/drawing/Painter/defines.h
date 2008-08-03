@@ -22,10 +22,17 @@
 #include <agg_scanline_u.h>
 #include <agg_rendering_buffer.h>
 
+#include "agg_rasterizer_scanline_aa_subpix.h"
 #include "agg_renderer_region.h"
 #include "agg_renderer_scanline_subpix.h"
+#include "agg_scanline_p_subpix.h"
+#include "agg_scanline_p_subpix_avrg_filtering.h"
+#include "agg_scanline_u_subpix.h"
+#include "agg_scanline_u_subpix_avrg_filtering.h"
 
+#include "GlobalSubpixelSettings.h"
 #include "PixelFormat.h"
+
 
 #define ALIASED_DRAWING 0
 
@@ -45,13 +52,21 @@
 
 	typedef agg::scanline_u8									scanline_unpacked_type;
 	typedef agg::scanline_p8									scanline_packed_type;
-	typedef agg::renderer_scanline_aa_solid<renderer_base>		renderer_type;
+#ifdef AVERAGE_BASED_SUBPIXEL_FILTERING
+	typedef agg::scanline_p8_subpix_avrg_filtering				scanline_packed_subpix_type;
+	typedef agg::scanline_u8_subpix_avrg_filtering				scanline_unpacked_subpix_type;
+#else
+	typedef agg::scanline_p8_subpix								scanline_packed_subpix_type;
+	typedef agg::scanline_u8_subpix								scanline_unpacked_subpix_type;
 #endif
+	typedef agg::renderer_scanline_aa_solid<renderer_base>		renderer_type;
+#endif // !ALIASED_DRAWING
 
 	typedef agg::renderer_scanline_bin_solid<renderer_base>		renderer_bin_type;
 	typedef agg::renderer_scanline_subpix_solid<renderer_base>  renderer_subpix_type;
 
 	typedef agg::rasterizer_scanline_aa<>						rasterizer_type;
+	typedef agg::rasterizer_scanline_aa_subpix<>				rasterizer_subpix_type;
 
 
 #endif // DEFINES_H

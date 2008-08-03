@@ -105,11 +105,6 @@ class PixelFormat {
 											const color_type& c,
 											uint8 cover);
 
-	inline	void				blend_hline_subpix(int x, int y,
-											unsigned len,
-											const color_type& c,
-											uint8 cover);
-
 	inline	void				blend_vline(int x, int y,
 											unsigned len,
 											const color_type& c,
@@ -149,7 +144,6 @@ class PixelFormat {
 
 	blend_pixel_f				fBlendPixel;
 	blend_line					fBlendHLine;
-	blend_line					fBlendHLineSubpix;
 	blend_line					fBlendVLine;
 	blend_solid_span			fBlendSolidHSpan;
 	blend_solid_span            fBlendSolidHSpanSubpix;
@@ -209,14 +203,6 @@ PixelFormat::blend_hline(int x, int y, unsigned len,
 						 const color_type& c, uint8 cover)
 {
 	fBlendHLine(x, y, len, c, cover, fBuffer, fPatternHandler);
-}
-
-// blend_hline_subpix
-inline void
-PixelFormat::blend_hline_subpix(int x, int y, unsigned len,
-						 const color_type& c, uint8 cover)
-{
-	fBlendHLineSubpix(x, y, len, c, cover, fBuffer, fPatternHandler);
 }
 
 // blend_vline
