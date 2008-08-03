@@ -5,7 +5,15 @@
 #ifndef GLOBAL_DEFS_H
 #define GLOBAL_DEFS_H
 
+
 #define APP_SIGNATURE "application/x-vnd.mahlzeit.trackergrep"
 #define APP_NAME "TextSearch"
+
+#define PREFS_FILE			"TextSearchSettings"
+#define HISTORY_LIMIT		20
+
+#define TRACKER_SIGNATURE	"application/x-vnd.Be-TRAK"
+#define PE_SIGNATURE		"application/x-vnd.beunited.pe"
+
 
 #endif // GLOBAL_DEFS_H

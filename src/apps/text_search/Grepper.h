@@ -24,10 +24,13 @@
 
 #include "Model.h"
 
+class FileIterator;
+
 // Executes "grep" in a background thread.
 class Grepper {
 public:
-								Grepper(const char* pattern, Model* model);
+								Grepper(const char* pattern, Model* model,
+									FileIterator* iterator);
 	virtual						~Grepper();
 
 			bool				IsValid() const;
@@ -49,44 +52,19 @@ private:
 	// to prevent the shell from misinterpreting them.
 			bool				_EscapeSpecialChars(char* buffer,
 									ssize_t bufferSize);
-	
-	// Returns the full path name of the next file.
-			bool				_GetNextName(char* buffer);
-	
-	// Looks for the next entry.
-			bool				_GetNextEntry(BEntry& entry);
-	
-	// Looks for the next entry in the top-level dir.
-			bool				_GetTopEntry(BEntry& entry);
-	
-	// Looks for the next entry in a subdir.
-			bool				_GetSubEntry(BEntry& entry);
-	
-	// Determines whether we can add a subdir.
-			void				_ExamineSubdir(BEntry& entry);
-	
-	// Determines whether we can grep a file.
-			bool				_ExamineFile(BEntry& entry, char* buffer);
-
-private:
-	// Contains pointers to BDirectory objects.
-			BList*				fDirectories;
-	
-	// The directory we are currently looking at.
-			BDirectory*			fCurrentDir;
-	
-	// The ref number we are currently looking at.
-			int32				fCurrentRef;
-	
+	private:
 	// The (escaped) search pattern.
 			char*				fPattern;
 		
 	// The directory or files to grep on.
 			Model*				fModel;
 	    
+	// The supplier of files to grep
+			FileIterator*		fIterator;
+	
 	// Our thread's ID.
 			thread_id			fThreadId;
-	
+
 	// Whether our thread must quit.
 	volatile bool				fMustQuit;
 };

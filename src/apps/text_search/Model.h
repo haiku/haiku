@@ -32,12 +32,7 @@
 #include <Rect.h>
 #include <String.h>
 
-
-#define PREFS_FILE			"TrackerGrepSettings"
-#define HISTORY_LIMIT		20
-
-#define TRACKER_SIGNATURE	"application/x-vnd.Be-TRAK"
-#define PE_SIGNATURE		"application/x-vnd.beunited.pe"
+#include "GlobalDefs.h"
 
 
 enum {
@@ -89,6 +84,7 @@ public:
 			void				AddToHistory(const char* text);
 			void				FillHistoryMenu(BMenu* menu);
 
+public:
 			// The directory we were invoked from.
 			entry_ref			fDirectory;
 

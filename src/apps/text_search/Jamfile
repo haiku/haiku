@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src apps text_search ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application TextSearch :
+	FileIterator.cpp
 	GrepApp.cpp
 	GrepListView.cpp
 	Grepper.cpp

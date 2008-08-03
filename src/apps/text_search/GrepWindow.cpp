@@ -38,6 +38,7 @@
 #include <String.h>
 #include <UTF8.h>
 
+#include "FileIterator.h"
 #include "GlobalDefs.h"
 #include "Grepper.h"
 #include "Translation.h"
@@ -112,10 +113,7 @@ GrepWindow::GrepWindow(BMessage* message)
 
 GrepWindow::~GrepWindow()
 {
-	if (fModel->fState == STATE_SEARCH) {
-		fGrepper->Cancel();
-	}
-	
+	delete fGrepper;
 	delete fModel;
 }
 
@@ -708,8 +706,21 @@ GrepWindow::_OnStartCancel()
 
 		fOldPattern = fSearchText->Text();
 
-		fGrepper = new Grepper(fOldPattern.String(), fModel);
-		fGrepper->Start();
+		FileIterator* iterator = new (nothrow) FileIterator(fModel);
+		fGrepper = new (nothrow) Grepper(fOldPattern.String(), fModel,
+			iterator);
+		if (fGrepper != NULL && fGrepper->IsValid())
+			fGrepper->Start();
+		else {
+			// roll back in case of problems
+			if (fGrepper == NULL)
+				delete iterator;
+			delete fGrepper;
+			fGrepper = NULL;
+			fModel->fState = STATE_CANCEL;
+			// TODO: better notification to user
+			fprintf(stderr, "Out of memory.\n");
+		}
 	} else if (fModel->fState == STATE_SEARCH) {
 		fModel->fState = STATE_CANCEL;
 		fGrepper->Cancel();

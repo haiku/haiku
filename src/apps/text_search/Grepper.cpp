@@ -33,6 +33,8 @@
 #include <Path.h>
 #include <UTF8.h>
 
+#include "FileIterator.h"
+
 using std::nothrow;
 
 // TODO: stippi: Check if this is a the best place to maintain a global
@@ -88,24 +90,13 @@ strdup_from_utf8(uint32 encode, const char* src, int32 length)
 }
 
 
-Grepper::Grepper(const char* pattern, Model* model) 
-	: fDirectories(new (nothrow) BList(10)),
-	  fCurrentDir(new (nothrow) BDirectory(&model->fDirectory)),
-	  fCurrentRef(0),
-	  fPattern(NULL),
+Grepper::Grepper(const char* pattern, Model* model, FileIterator* iterator)
+	: fPattern(NULL),
 	  fModel(model),
+	  fIterator(iterator),
 	  fThreadId(-1),
 	  fMustQuit(false)
 {
-	if (!fCurrentDir || !fDirectories || !fDirectories->AddItem(fCurrentDir)) {
-		// init error
-		delete fCurrentDir;
-		fCurrentDir = NULL;
-		delete fDirectories;
-		fDirectories = NULL;
-		return;
-	}
-
 	if (fModel->fEncoding) {
 		char *src = strdup_from_utf8(fModel->fEncoding, pattern,
 			strlen(pattern));
@@ -119,26 +110,17 @@ Grepper::Grepper(const char* pattern, Model* model)
 Grepper::~Grepper()
 {
 	Cancel();
-
 	free(fPattern);
-
-	// If the thread terminated normally, then there is only 
-	// one object in the list: the initial directory. But if 
-	// the user aborted the search, there may be more.
-
-	if (fDirectories) {
-		for (int32 i = fDirectories->CountItems() - 1; i >= 0; i--)
-			delete static_cast<BDirectory*>(fDirectories->ItemAt(i));
-
-		delete fDirectories;
-	}
+	delete fIterator;
 }
 
 
 bool
 Grepper::IsValid() const
 {
-	return fPattern != NULL && fDirectories != NULL && fCurrentDir != NULL;
+	if (fIterator == NULL || !fIterator->IsValid())
+		return false;
+	return fPattern != NULL && fModel != NULL;
 }
 
 
@@ -192,7 +174,7 @@ Grepper::_GrepperThread()
 	sprintf(fileName, "/boot/var/tmp/SearchText%ld", fThreadId);
 	tempFile.SetTo(fileName);
 
-	while (!fMustQuit && _GetNextName(fileName)) {
+	while (!fMustQuit && fIterator->GetNextName(fileName)) {
 		message.MakeEmpty();
 		message.what = MSG_REPORT_FILE_NAME;
 		message.AddString("filename", fileName);
@@ -342,155 +324,5 @@ Grepper::_EscapeSpecialChars(char* buffer, ssize_t bufferSize)
 	*buffer = '\0';
 	free(copy);
 	return result;
-}
-
-
-bool
-Grepper::_GetNextName(char* buffer)
-{
-	BEntry entry;
-	struct stat fileStat;
-
-	while (true) {
-		// Traverse the directory to get a new BEntry.
-		// _GetNextEntry returns false if there are no
-		// more entries, and we exit the loop.
-
-		if (!_GetNextEntry(entry))
-			return false;
-
-		// If the entry is a subdir, then add it to the
-		// list of directories and continue the loop. 
-		// If the entry is a file and we can grep it
-		// (i.e. it is a text file), then we're done
-		// here. Otherwise, continue with the next entry.
-
-		if (entry.GetStat(&fileStat) == B_OK) {
-			if (S_ISDIR(fileStat.st_mode)) {
-				// subdir
-				_ExamineSubdir(entry);
-			} else {
-				// file or a (non-traversed) symbolic link
-				if (_ExamineFile(entry, buffer))
-					return true;
-			}
-		}
-	}
-}
-
-
-bool
-Grepper::_GetNextEntry(BEntry& entry)
-{
-	if (fDirectories->CountItems() == 1)
-		return _GetTopEntry(entry);
-	else
-		return _GetSubEntry(entry);
-}
-
-
-bool
-Grepper::_GetTopEntry(BEntry& entry)
-{
-	// If the user selected one or more files, we must look 
-	// at the "refs" inside the message that was passed into 
-	// our add-on's process_refs(). If the user didn't select 
-	// any files, we will simply read all the entries from the 
-	// current working directory.
-	
-	entry_ref fileRef;
-
-	if (fModel->fSelectedFiles.FindRef("refs",
-		fCurrentRef, &fileRef) == B_OK) {
-		entry.SetTo(&fileRef, fModel->fRecurseLinks);
-		++fCurrentRef;
-		return true;
-	} else if (fCurrentRef > 0) {
-		// when we get here, we have processed
-		// all the refs from the message
-		return false;
-	} else {
-		// examine the whole directory
-		return fCurrentDir->GetNextEntry(&entry,
-			fModel->fRecurseLinks) == B_OK;
-	}
-}
-
-
-bool
-Grepper::_GetSubEntry(BEntry& entry)
-{
-	if (!fCurrentDir)
-		return false;
-
-	if (fCurrentDir->GetNextEntry(&entry, fModel->fRecurseLinks) == B_OK)
-		return true;
-
-	// If we get here, there are no more entries in 
-	// this subdir, so return to the parent directory.
-
-	fDirectories->RemoveItem(fCurrentDir);
-	delete fCurrentDir;
-	fCurrentDir = (BDirectory*)fDirectories->LastItem();
-
-	return _GetNextEntry(entry);
-}
-
-
-void
-Grepper::_ExamineSubdir(BEntry& entry)
-{
-	if (!fModel->fRecurseDirs)
-		return;
-
-	if (fModel->fSkipDotDirs) {
-		char nameBuf[B_FILE_NAME_LENGTH];
-		if (entry.GetName(nameBuf) == B_OK) {
-			if (*nameBuf == '.')
-				return;
-		}
-	}
-
-	BDirectory* dir = new (nothrow) BDirectory(&entry);
-	if (dir == NULL || dir->InitCheck() != B_OK
-		|| !fDirectories->AddItem(dir)) {
-		// clean up
-		delete dir;
-		return;
-	}
-
-	fCurrentDir = dir;
-}
-
-
-bool
-Grepper::_ExamineFile(BEntry& entry, char* buffer)
-{
-	BPath path;
-	if (entry.GetPath(&path) != B_OK)
-		return false;
-
-	strcpy(buffer, path.Path());
-
-	if (!fModel->fTextOnly)
-		return true;
-
-	BNode node(&entry);
-	BNodeInfo nodeInfo(&node);
-	char mimeTypeString[B_MIME_TYPE_LENGTH];
-
-	if (nodeInfo.GetType(mimeTypeString) == B_OK) {
-		BMimeType mimeType(mimeTypeString);
-		BMimeType superType;
-
-		if (mimeType.GetSupertype(&superType) == B_OK) {
-			if (strcmp("text", superType.Type()) == 0
-				|| strcmp("message", superType.Type()) == 0) {
-				return true;
-			}
-		}
-	}
-
-	return false;
 }
 
