@@ -214,9 +214,8 @@ _update_all_pgdirs(int index, page_root_entry e)
 
 
 // this is used before the vm is fully up, it uses the
-// transparent translation of the first 32MB
+// transparent translation of the first 256MB
 // a set up by the bootloader.
-// (XXX: why just 32MB ? TT0 should just map 2G)
 static status_t
 early_query(addr_t va, addr_t *_physicalAddress)
 {
@@ -254,7 +253,7 @@ early_query(addr_t va, addr_t *_physicalAddress)
 				index = 0; // single descriptor
 			}
 			
-			if (pt /*&& pt[index].type == DT_PAGE*/) {
+			if (pt && pt[index].type == DT_PAGE) {
 				*_physicalAddress = PTE_TO_PA(pt[index]);
 				// we should only be passed page va, but just in case.
 				*_physicalAddress += va % B_PAGE_SIZE;
@@ -1273,7 +1272,7 @@ m68k_vm_translation_map_init(kernel_args *args)
 			early_query(virt_pgtable, &phys_pgtable);
 			index = VADDR_TO_PRENT(sIOSpaceBase) + i / NUM_DIRENT_PER_TBL;
 			pd = (page_directory_entry *)PRE_TO_TA(pr[index]);
-			e = &pd[VADDR_TO_PRENT(sIOSpaceBase) + i % NUM_DIRENT_PER_TBL];
+			e = &pd[(VADDR_TO_PDENT(sIOSpaceBase) + i) % NUM_DIRENT_PER_TBL];
 			put_pgtable_in_pgdir(e, phys_pgtable,
 				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		}
@@ -1432,11 +1431,11 @@ m68k_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	index = VADDR_TO_PRENT(va);
 	if (pr[index].type != DT_ROOT) {
 		unsigned aindex = index & ~(NUM_DIRTBL_PER_PAGE-1); /* aligned */
-		//TRACE(("missing page root entry %d ai %d\n", index, aindex));
+		TRACE(("missing page root entry %d ai %d\n", index, aindex));
 		tbl = get_free_page(args) * B_PAGE_SIZE;
 		if (!tbl)
 			return ENOMEM;
-		TRACE(("early_map: asked for free page for pgtable. 0x%lx\n", tbl));
+		TRACE(("early_map: asked for free page for pgdir. 0x%lx\n", tbl));
 		// zero-out
 		memset((void *)tbl, 0, B_PAGE_SIZE);
 		// for each pgdir on the allocated page:
@@ -1456,7 +1455,7 @@ m68k_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	index = VADDR_TO_PDENT(va);
 	if (pd[index].type != DT_DIR) {
 		unsigned aindex = index & ~(NUM_PAGETBL_PER_PAGE-1); /* aligned */
-		//TRACE(("missing page dir entry %d ai %d\n", index, aindex));
+		TRACE(("missing page dir entry %d ai %d\n", index, aindex));
 		tbl = get_free_page(args) * B_PAGE_SIZE;
 		if (!tbl)
 			return ENOMEM;
