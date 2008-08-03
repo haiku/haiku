@@ -227,7 +227,7 @@ early_query(addr_t va, addr_t *_physicalAddress)
 	addr_t pa;
 	int32 index;
 	status_t err = B_ERROR;	// no pagetable here
-	TRACE(("%s(%p,)", __FUNCTION__, va));
+	TRACE(("%s(%p,)\n", __FUNCTION__, va));
 	
 	index = VADDR_TO_PRENT(va);
 	TRACE(("%s: pr[%d].type %d\n", __FUNCTION__, index, pr[index].type));
@@ -485,7 +485,15 @@ static size_t
 map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
 {
 	size_t need;
-	size_t pgdirs = VADDR_TO_PRENT(end) + 1 - VADDR_TO_PRENT(start);
+	size_t pgdirs;
+	// If start == 0, the actual base address is not yet known to the caller
+	// and we shall assume the worst case.
+	if (start == 0) {
+#warning M68K: FIXME?
+		start = (1023) * B_PAGE_SIZE;
+		end += start;
+	}
+	pgdirs = VADDR_TO_PRENT(end) + 1 - VADDR_TO_PRENT(start);
 	// how much for page directories
 	need = (pgdirs + NUM_DIRTBL_PER_PAGE - 1) / NUM_DIRTBL_PER_PAGE;
 	// and page tables themselves
@@ -1236,7 +1244,7 @@ m68k_vm_translation_map_init(kernel_args *args)
 		&sIOSpaceBase, IOSPACE_SIZE, IOSPACE_CHUNK_SIZE);
 	if (error != B_OK)
 		return error;
-
+	TRACE(("iospace at %p\n", sIOSpaceBase));
 	// initialize our data structures
 	memset(iospace_pgtables, 0, B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * NUM_PAGEENT_PER_TBL * NUM_PAGETBL_PER_PAGE)));
 
