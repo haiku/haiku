@@ -1538,8 +1538,13 @@ Desktop::ActivateWindow(Window* window)
 	if (window->IsMinimized()) {
 		// Unlike WindowAction(), this is called from the application itself,
 		// so we will just unminimize the window here.
-		ShowWindow(window);
 		window->SetMinimized(false);
+		UnlockAllWindows();
+
+		ShowWindow(window);
+
+		if (!LockAllWindows())
+			return;
 	}
 
 	if (window == FrontWindow()) {
