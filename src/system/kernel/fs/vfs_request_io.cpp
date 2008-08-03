@@ -210,7 +210,7 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 		if (error == B_OK) {
 			TRACE_RIO("[%ld]  scheduling subrequest: %p\n", find_thread(NULL),
 				subRequest);
-			error = FS_CALL(cookie->vnode, io, cookie->descriptor->cookie,
+			error = vfs_vnode_io(cookie->vnode, cookie->descriptor->cookie,
 				subRequest);
 		} else {
 			// Once scheduling a subrequest failed, we cancel all subsequent
@@ -335,7 +335,7 @@ synchronous_io(io_request* request, DoIO& io)
 		offset += transferred;
 		length -= transferred;
 
-		if (transferred != length)
+		if (transferred != vecLength)
 			break;
 	}
 
