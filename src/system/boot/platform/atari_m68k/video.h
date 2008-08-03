@@ -8,6 +8,13 @@
 
 #include <SupportDefs.h>
 
+/* 4CCs for custom colorspaces */
+// XXX: move to kernel/app_server header ?
+#define ATARI_IBP1 'IBP1'
+#define ATARI_IBP2 'IBP2'
+#define ATARI_IBP4 'IBP4'
+#define ATARI_IBP8 'IBP8'
+
 
 class Menu;
 class MenuItem;
