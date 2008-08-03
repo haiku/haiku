@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,7 +16,8 @@
 #define	POSITIVE_SYNC \
 	(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
 #define MODE_FLAGS \
-	(B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS | B_DPMS | B_SUPPORTS_OVERLAYS)
+	(B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS | B_DPMS \
+		| B_SUPPORTS_OVERLAYS)
 
 // TODO: move this list into the app_server
 static const display_mode kBaseModeList[] = {
@@ -25,8 +26,6 @@ static const display_mode kBaseModeList[] = {
 	{{25175, 640, 656, 752, 800, 400, 412, 414, 449, B_POSITIVE_VSYNC}, B_CMAP8, 640, 400, 0, 0, MODE_FLAGS}, /* 640x400 - www.epanorama.net/documents/pc/vga_timing.html) */
 
 	{{25175, 640, 656, 752, 800, 480, 490, 492, 525, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
-	{{27500, 640, 672, 768, 864, 480, 488, 494, 530, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* 640X480X60Hz */
-	{{30500, 640, 672, 768, 864, 480, 517, 523, 588, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* SVGA_640X480X60HzNI */
 	{{31500, 640, 664, 704, 832, 480, 489, 492, 520, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(640X480X8.Z1) */
 	{{31500, 640, 656, 720, 840, 480, 481, 484, 500, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(640X480X8.Z1) */
 	{{36000, 640, 696, 752, 832, 480, 481, 484, 509, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(640X480X8.Z1) */
@@ -214,16 +213,18 @@ ModeList::AddModes(edid1_info* info)
 	}
 
 	for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
-		if (info->detailed_monitor[i].monitor_desc_type != EDID1_IS_DETAILED_TIMING)
+		if (info->detailed_monitor[i].monitor_desc_type
+				!= EDID1_IS_DETAILED_TIMING)
 			continue;
 
 		// TODO: handle flags correctly!
-		const edid1_detailed_timing& timing = info->detailed_monitor[i].data.detailed_timing;
+		const edid1_detailed_timing& timing
+			= info->detailed_monitor[i].data.detailed_timing;
 		display_mode mode;
-		
-		if (timing.pixel_clock <= 0 || timing.sync != 3)
+
+		if (timing.pixel_clock <= 0/* || timing.sync != 3*/)
 			continue;
-			
+
 		mode.timing.pixel_clock = timing.pixel_clock * 10;
 		mode.timing.h_display = timing.h_active;
 		mode.timing.h_sync_start = timing.h_active + timing.h_sync_off;
@@ -248,10 +249,10 @@ ModeList::AddModes(edid1_info* info)
 		mode.h_display_start = 0;
 		mode.v_display_start = 0;
 		mode.flags = MODE_FLAGS;
-		
+
 		_AddMode(&mode);
 	}
-	
+
 	// TODO: add other modes from the base list that satisfy the display's
 	//	requirements!
 
@@ -329,7 +330,7 @@ ModeList::_AddBaseMode(uint16 width, uint16 height, uint32 refresh)
 		// caller.  Note that refresh rates computed from mode parameters is
 		// not exact;  thus, the tolerance of 1.2% was obtained by testing the
 		// various established modes that can be selected by the EDID info.
-		
+
 		if (mode.timing.h_display == width && mode.timing.v_display == height
 			&& fabs(get_refresh_rate(mode) - refresh) < refresh * 0.012) {
 			_AddMode(&mode);
