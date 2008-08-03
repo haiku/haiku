@@ -72,7 +72,7 @@ struct stat {
 #define S_ISUID 04000       /* set user id on execution */
 #define S_ISGID 02000       /* set group id on execution */
 
-#define S_ISVTX 01000       /* save swapped text even after use */
+#define S_ISVTX 01000       /* save swapped text even after use (sticky bit) */
 
 #define S_IRWXU 00700       /* read, write, execute: owner */
 #define S_IRUSR 00400       /* read permission: owner */
@@ -93,7 +93,7 @@ struct stat {
 #define S_IEXEC		S_IXUSR
 
 #define ACCESSPERMS (S_IRWXU | S_IRWXG | S_IRWXO)
-#define ALLPERMS    (S_ISUID | S_ISGID | S_IRWXU | S_IRWXG | S_IRWXO)
+#define ALLPERMS    (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO)
 #define	DEFFILEMODE	(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
 	/* default file mode, everyone can read/write */
 

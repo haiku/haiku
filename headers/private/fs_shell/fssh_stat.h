@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_SYS_STAT_H_
@@ -72,7 +72,7 @@ typedef struct fssh_stat fssh_struct_stat;
 #define FSSH_S_ISUID 04000       /* set user id on execution */
 #define FSSH_S_ISGID 02000       /* set group id on execution */
 
-#define FSSH_S_ISVTX 01000       /* save swapped text even after use */
+#define FSSH_S_ISVTX 01000       /* save swapped text even after use (sticky bit) */
 
 #define FSSH_S_IRWXU 00700       /* read, write, execute: owner */
 #define FSSH_S_IRUSR 00400       /* read permission: owner */
@@ -88,7 +88,7 @@ typedef struct fssh_stat fssh_struct_stat;
 #define FSSH_S_IXOTH 00001       /* execute permission: other */
 
 #define FSSH_ACCESSPERMS	(FSSH_S_IRWXU | FSSH_S_IRWXG | FSSH_S_IRWXO)
-#define FSSH_ALLPERMS		(FSSH_S_ISUID | FSSH_S_ISGID | FSSH_S_ISTXT \
+#define FSSH_ALLPERMS		(FSSH_S_ISUID | FSSH_S_ISGID | FSSH_S_ISVTX \
 								| FSSH_S_IRWXU | FSSH_S_IRWXG | FSSH_S_IRWXO)
 #define	FSSH_DEFFILEMODE	(FSSH_S_IRUSR | FSSH_S_IWUSR | FSSH_S_IRGRP \
 								| FSSH_S_IWGRP | FSSH_S_IROTH | FSSH_S_IWOTH)
