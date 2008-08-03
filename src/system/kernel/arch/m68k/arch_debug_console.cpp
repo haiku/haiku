@@ -34,7 +34,7 @@ arch_debug_install_interrupt_handlers(void)
 char
 arch_debug_blue_screen_getchar(void)
 {
-	return 0;
+	return M68KPlatform::Default()->BlueScreenGetChar();
 }
 
 

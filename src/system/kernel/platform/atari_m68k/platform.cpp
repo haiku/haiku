@@ -9,10 +9,13 @@
 #include <KernelExport.h>
 
 #include <boot/kernel_args.h>
+#include <arch/cpu.h>
 //#include <platform/openfirmware/openfirmware.h>
 #include <platform/atari_m68k/MFP.h>
 #include <real_time_clock.h>
 #include <util/kernel_cpp.h>
+
+#include "debugger_keymaps.h"
 
 #define MFP0_BASE	0xFFFFFA00
 #define MFP1_BASE	0xFFFFFA80
@@ -24,8 +27,39 @@
 // ??
 #define SCC_C1_VECTOR_BASE	(0x1BC/4)
 
-#define inb(a)  (*(volatile uint8 *)(a))
-#define outb(a, v)  (*(volatile uint8 *)(a) = v)
+#define IKBD_BASE	0xFFFFFC00
+#define IKBD_CTRL	0
+#define IKBD_DATA	2
+#define IKBD_STATUS_READ_BUFFER_FULL	0x01
+
+// keyboard scancodes, very much like PC ones
+// see
+// http://www.classiccmp.org/dunfield/atw800/h/atw800k.jpg
+// ST Mag Nr 57 page 55
+enum keycodes {
+	LEFT_SHIFT		= 42,
+	RIGHT_SHIFT		= 54,
+
+	LEFT_CONTROL	= 29,
+
+	LEFT_ALT		= 56,
+
+	CURSOR_LEFT		= 75,
+	CURSOR_RIGHT	= 77,
+	CURSOR_UP		= 72,
+	CURSOR_DOWN		= 80,
+	CURSOR_HOME		= 71,
+	CURSOR_END		= 79,	// not on real atari keyboard
+	PAGE_UP			= 73,	// not on real atari keyboard XXX remap Help ?
+	PAGE_DOWN		= 81,	// not on real atari keyboard XXX remap Undo ?
+
+	DELETE			= 83,
+	F12				= 88,	// but it's shifted
+
+};
+
+#define in8(a)  (*(volatile uint8 *)(a))
+#define out8(a, v)  (*(volatile uint8 *)(a) = v)
 
 
 namespace BPrivate {
@@ -64,6 +98,8 @@ public:
 	virtual status_t InitRTC(struct kernel_args *kernelArgs,
 		struct real_time_data *data);
 	virtual status_t InitTimer(struct kernel_args *kernelArgs);
+
+	virtual char BlueScreenGetChar();
 
 	virtual char SerialDebugGetChar();
 	virtual void SerialDebugPutChar(char c);
@@ -126,10 +162,10 @@ M68KAtari::MFP::EnableIOInterrupt(int irq)
 	uint8 bit = 1 << (irq % 8);
 	// I*B[0] is vector+0, I*A[0] is vector+8
 	uint32 reg = Base() + ((irq > 8) ? (MFP_IERA) : (MFP_IERB));
-	uint8 val = inb(reg);
+	uint8 val = in8(reg);
 	if (val & bit == 0) {
 		val |= bit;
-		outb(reg, val);
+		out8(reg, val);
 	}
 }
 
@@ -140,10 +176,10 @@ M68KAtari::MFP::DisableIOInterrupt(int irq)
 	uint8 bit = 1 << (irq % 8);
 	// I*B[0] is vector+0, I*A[0] is vector+8
 	uint32 reg = Base() + ((irq > 8) ? (MFP_IERA) : (MFP_IERB));
-	uint8 val = inb(reg);
+	uint8 val = in8(reg);
 	if (val & bit) {
 		val &= ~bit;
-		outb(reg, val);
+		out8(reg, val);
 	}
 }
 
@@ -154,10 +190,10 @@ M68KAtari::MFP::AcknowledgeIOInterrupt(int irq)
 	uint8 bit = 1 << (irq % 8);
 	// I*B[0] is vector+0, I*A[0] is vector+8
 	uint32 reg = Base() + ((irq > 8) ? (MFP_ISRA) : (MFP_ISRB));
-	uint8 val = inb(reg);
+	uint8 val = in8(reg);
 	if (val & bit) {
 		val &= ~bit;
-		outb(reg, val);
+		out8(reg, val);
 		return true;
 	}
 	return false;
@@ -205,6 +241,8 @@ M68KAtari::InitSerialDebug(struct kernel_args *kernelArgs)
 		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_dprintf_id;
 
 #warning M68K: add real serial debug output someday
+
+	//out8(IKBD_BASE+IKBD_DATA, 0x11);
 
 	return B_OK;
 }
@@ -256,11 +294,144 @@ M68KAtari::InitTimer(struct kernel_args *kernelArgs)
 
 
 char
+M68KAtari::BlueScreenGetChar()
+{
+	/* polling the keyboard, similar to code in keyboard
+	 * driver, but without using an interrupt
+	 * taken almost straight from x86 code
+	 * XXX: maybe use the keymap from the _AKP cookie instead ?
+	 */
+	static bool shiftPressed = false;
+	static bool controlPressed = false;
+	static bool altPressed = false;
+	static uint8 special = 0;
+	static uint8 special2 = 0;
+	uint8 key = 0;
+
+	if (special & 0x80) {
+		special &= ~0x80;
+		return '[';
+	}
+	if (special != 0) {
+		key = special;
+		special = 0;
+		return key;
+	}
+	if (special2 != 0) {
+		key = special2;
+		special2 = 0;
+		return key;
+	}
+
+	while (true) {
+		uint8 status = in8(IKBD_BASE+IKBD_CTRL);
+
+		if ((status & IKBD_STATUS_READ_BUFFER_FULL) == 0) {
+			// no data in keyboard buffer
+			spin(200);
+			continue;
+		}
+
+		spin(200);
+		key = in8(IKBD_BASE+IKBD_DATA);
+		/*
+		kprintf("key: %02x, %sshift %scontrol %salt\n",
+			key,
+			shiftPressed?"":"!",
+			controlPressed?"":"!",
+			altPressed?"":"!");
+		*/
+
+		if (key & 0x80) {
+			// key up
+			switch (key & ~0x80) {
+				case LEFT_SHIFT:
+				case RIGHT_SHIFT:
+					shiftPressed = false;
+					break;
+				case LEFT_CONTROL:
+					controlPressed = false;
+					break;
+				case LEFT_ALT:
+					altPressed = false;
+					break;
+			}
+		} else {
+			// key down
+			switch (key) {
+				case LEFT_SHIFT:
+				case RIGHT_SHIFT:
+					shiftPressed = true;
+					break;
+
+				case LEFT_CONTROL:
+					controlPressed = true;
+					break;
+
+				case LEFT_ALT:
+					altPressed = true;
+					break;
+
+				// start escape sequence for cursor movement
+				case CURSOR_UP:
+					special = 0x80 | 'A';
+					return '\x1b';
+				case CURSOR_DOWN:
+					special = 0x80 | 'B';
+					return '\x1b';
+				case CURSOR_RIGHT:
+					special = 0x80 | 'C';
+					return '\x1b';
+				case CURSOR_LEFT:
+					special = 0x80 | 'D';
+					return '\x1b';
+				case CURSOR_HOME:
+					special = 0x80 | 'H';
+					return '\x1b';
+				case CURSOR_END:
+					special = 0x80 | 'F';
+					return '\x1b';
+				case PAGE_UP:
+					special = 0x80 | '5';
+					special2 = '~';
+					return '\x1b';
+				case PAGE_DOWN:
+					special = 0x80 | '6';
+					special2 = '~';
+					return '\x1b';
+
+
+				case DELETE:
+					if (controlPressed && altPressed)
+						arch_cpu_shutdown(true);
+
+					special = 0x80 | '3';
+					special2 = '~';
+					return '\x1b';
+
+				default:
+					if (controlPressed) {
+						char c = kShiftedKeymap[key];
+						if (c >= 'A' && c <= 'Z')
+							return 0x1f & c;
+					}
+
+					if (altPressed)
+						return kAltedKeymap[key];
+
+					return shiftPressed
+						? kShiftedKeymap[key] : kUnshiftedKeymap[key];
+			}
+		}
+	}
+}
+
+
+char
 M68KAtari::SerialDebugGetChar()
 {
-	panic("WRITEME");
+	//WRITEME
 	return 0;
-//	return (char)key;
 }
 
 

@@ -39,6 +39,8 @@ public:
 		struct real_time_data *data) = 0;
 	virtual status_t InitTimer(struct kernel_args *kernelArgs) = 0;
 
+	virtual char BlueScreenGetChar() = 0;
+
 	virtual char SerialDebugGetChar() = 0;
 	virtual void SerialDebugPutChar(char c) = 0;
 
