@@ -10,7 +10,11 @@
 
 #include "VMAnonymousCache.h"
 
+#include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include <arch_config.h>
 #include <heap.h>
@@ -18,9 +22,11 @@
 #include <slab/Slab.h>
 #include <vfs.h>
 #include <vm.h>
+#include <vm_page.h>
 #include <vm_priv.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
+#include <driver_settings.h>
 
 
 #if	ENABLE_SWAP_SUPPORT
@@ -152,6 +158,7 @@ VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 	fPrecommittedPages = min_c(numPrecommittedPages, 255);
 	fGuardedSize = numGuardPages * B_PAGE_SIZE;
 	fCommittedSwapSize = 0;
+	fAllocatedSwapSize = 0;
 
 	return B_OK;
 }
@@ -223,6 +230,9 @@ status_t
 VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 	size_t *_numBytes)
 {
+	if (fAllocatedSwapSize + count * PAGE_SIZE > fCommittedSwapSize)
+		return B_ERROR;
+
 	offset >>= PAGE_SHIFT;
 	uint32 n = count;
 	for (uint32 i = 0; i < count; i += n) {
@@ -234,6 +244,8 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 		if (pageIndex == SWAP_PAGE_NONE)
 			panic("can't allocate swap space\n");
 
+		fAllocatedSwapSize += n * PAGE_SIZE;
+
 		for (uint32 j = 0; j < n; j++)
 			_SwapBlockBuild(offset + i + j, pageIndex + j);
 
@@ -244,7 +256,6 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 		}
 
 		off_t pos = (pageIndex - swapFile->first_page) * PAGE_SIZE;
-
 		status_t status = vfs_write_pages(swapFile->vnode, NULL, pos, vecs + i,
 				n, 0, _numBytes);
 		if (status != B_OK)
@@ -728,5 +739,40 @@ swap_init(void)
 	sAvailSwapSpace = 0;
 }
 
-#endif	// ENABLE_SWAP_SUPPORT
+void
+swap_init_post_modules()
+{
+	off_t size = 0;
 
+	void *settings = load_driver_settings("virtual_memory");
+	if (settings != NULL) {
+		if (!get_driver_boolean_parameter(settings, "vm", false, false))
+			return;
+
+		const char *string = get_driver_parameter(settings, "swap_size", NULL,
+			NULL);
+		size = string ? atoll(string) : 0;
+
+		unload_driver_settings(settings);
+	} else
+		size = vm_page_num_pages() * B_PAGE_SIZE * 2;
+
+	if (size < B_PAGE_SIZE)
+		return;
+
+	int fd = open("/var/swap", O_RDWR | O_CREAT | O_NOCACHE, S_IRUSR | S_IWUSR);
+	if (fd < 0) {
+		dprintf("Can't open/create /var/swap: %s\n", strerror(errno));
+		return;
+	}
+	close(fd);
+
+	if (truncate("/var/swap", size) < 0) {
+		dprintf("Failed to resize /var/swap to %lld bytes: %s\n", size,
+			strerror(errno));
+	}
+
+	swap_file_add("/var/swap");
+}
+
+#endif	// ENABLE_SWAP_SUPPORT

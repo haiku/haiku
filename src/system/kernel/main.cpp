@@ -273,6 +273,11 @@ main2(void *unused)
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_4_MOUNT_BOOT_FS);
 	vfs_mount_boot_file_system(&sKernelArgs);
 
+#if ENABLE_SWAP_SUPPORT
+	TRACE("swap_init_post_modules\n");
+	swap_init_post_modules();
+#endif
+
 	// CPU specific modules may now be available
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_5_INIT_CPU_MODULES);
 	cpu_init_post_modules(&sKernelArgs);

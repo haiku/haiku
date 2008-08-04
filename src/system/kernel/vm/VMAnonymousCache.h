@@ -48,10 +48,14 @@ private:
 	uint8	fPrecommittedPages;
 	int32	fGuardedSize;
 	off_t   fCommittedSwapSize;
+	off_t   fAllocatedSwapSize;
 };
 
 
-extern "C" void swap_init(void);
+extern "C" {
+	void swap_init(void);
+	void swap_init_post_modules();
+}
 
 #endif	// ENABLE_SWAP_SUPPORT
 
