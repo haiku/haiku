@@ -153,6 +153,9 @@ struct iframe {
 	uint32 eip;
 	uint32 cs;
 	uint32 flags;
+
+	// user_esp and user_ss are only present when the iframe is a userland
+	// iframe (IFRAME_IS_USER()). A kernel iframe is shorter.
 	uint32 user_esp;
 	uint32 user_ss;
 };
