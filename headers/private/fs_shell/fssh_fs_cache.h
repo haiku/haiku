@@ -18,6 +18,12 @@ enum {
 	FSSH_TRANSACTION_IDLE		= 0x08
 };
 
+/* file map modes */
+enum {
+	FSSH_FILE_MAP_CACHE_ON_DEMAND	= 0x01,	/* default mode */
+	FSSH_FILE_MAP_CACHE_ALL			= 0x02
+};
+
 typedef void (*fssh_transaction_notification_hook)(int32_t id, int32_t event,
 	void *data);
 
@@ -90,6 +96,7 @@ extern void *			fssh_file_cache_create(fssh_mount_id mountID,
 extern void				fssh_file_cache_delete(void *_cacheRef);
 extern void				fssh_file_cache_enable(void *_cacheRef);
 extern fssh_status_t	fssh_file_cache_disable(void *_cacheRef);
+extern bool				fssh_file_cache_is_enabled(void *_cacheRef);
 extern fssh_status_t	fssh_file_cache_set_size(void *_cacheRef,
 							fssh_off_t size);
 extern fssh_status_t	fssh_file_cache_sync(void *_cache);
@@ -108,6 +115,7 @@ extern void				fssh_file_map_delete(void *_map);
 extern void				fssh_file_map_set_size(void *_map, fssh_off_t size);
 extern void				fssh_file_map_invalidate(void *_map, fssh_off_t offset,
 							fssh_off_t size);
+extern fssh_status_t	fssh_file_map_set_mode(void *_map, uint32_t mode);
 extern fssh_status_t	fssh_file_map_translate(void *_map, fssh_off_t offset,
 							fssh_size_t size, struct fssh_file_io_vec *vecs,
 							fssh_size_t *_count);

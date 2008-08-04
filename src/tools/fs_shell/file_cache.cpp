@@ -296,6 +296,13 @@ fssh_file_cache_disable(void *_cacheRef)
 }
 
 
+bool
+fssh_file_cache_is_enabled(void *_cacheRef)
+{
+	return true;
+}
+
+
 fssh_status_t
 fssh_file_cache_set_size(void *_cacheRef, fssh_off_t size)
 {

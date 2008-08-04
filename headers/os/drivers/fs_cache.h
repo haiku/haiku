@@ -19,6 +19,12 @@ enum {
 	TRANSACTION_IDLE	= 0x08
 };
 
+/* file map modes */
+enum {
+	FILE_MAP_CACHE_ON_DEMAND	= 0x01,	/* default mode */
+	FILE_MAP_CACHE_ALL			= 0x02
+};
+
 typedef void (*transaction_notification_hook)(int32 id, int32 event,
 	void *data);
 
@@ -74,6 +80,7 @@ extern void block_cache_put(void *_cache, off_t blockNumber);
 extern void *file_cache_create(dev_t mountID, ino_t vnodeID, off_t size);
 extern void file_cache_delete(void *_cacheRef);
 extern void file_cache_enable(void *_cacheRef);
+extern bool file_cache_is_enabled(void *_cacheRef);
 extern status_t file_cache_disable(void *_cacheRef);
 extern status_t file_cache_set_size(void *_cacheRef, off_t size);
 extern status_t file_cache_sync(void *_cache);
@@ -88,6 +95,7 @@ extern void *file_map_create(dev_t mountID, ino_t vnodeID, off_t size);
 extern void file_map_delete(void *_map);
 extern void file_map_set_size(void *_map, off_t size);
 extern void file_map_invalidate(void *_map, off_t offset, off_t size);
+extern status_t file_map_set_mode(void *_map, uint32 mode);
 extern status_t file_map_translate(void *_map, off_t offset, size_t size,
 					struct file_io_vec *vecs, size_t *_count);
 

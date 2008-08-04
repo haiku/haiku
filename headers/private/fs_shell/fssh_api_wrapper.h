@@ -794,6 +794,9 @@
 #define TRANSACTION_ENDED				FSSH_TRANSACTION_ENDED
 #define TRANSACTION_IDLE				FSSH_TRANSACTION_IDLE
 
+#define FILE_MAP_CACHE_ON_DEMAND		FSSH_FILE_MAP_CACHE_ON_DEMAND
+#define FILE_MAP_CACHE_ALL				FSSH_FILE_MAP_CACHE_ALL
+
 #define transaction_notification_hook	fssh_transaction_notification_hook
 
 /* transactions */

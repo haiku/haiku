@@ -71,11 +71,14 @@ public:
 			struct vnode*	Vnode() const { return fVnode; }
 			off_t			Size() const { return fSize; }
 
+			status_t		SetMode(uint32 mode);
+
 private:
 			file_extent*	_FindExtent(off_t offset, uint32* _index);
 			status_t		_MakeSpace(size_t count);
 			status_t		_Add(file_io_vec* vecs, size_t vecCount,
 								off_t& lastOffset);
+			status_t		_Cache(off_t offset, off_t size);
 			void			_InvalidateAfter(off_t offset);
 			void			_Free();
 
@@ -87,6 +90,7 @@ private:
 	size_t			fCount;
 	struct vnode*	fVnode;
 	off_t			fSize;
+	bool			fCacheAll;
 };
 
 #ifdef DEBUG_FILE_MAP
@@ -98,11 +102,13 @@ static mutex sLock;
 
 
 FileMap::FileMap(struct vnode* vnode, off_t size)
+	:
+	fCount(0),
+	fVnode(vnode),
+	fSize(size),
+	fCacheAll(false)
 {
 	mutex_init(&fLock, "file map");
-	fCount = 0;
-	fVnode = vnode;
-	fSize = size;
 
 #ifdef DEBUG_FILE_MAP
 	MutexLocker _(sLock);
@@ -320,12 +326,68 @@ FileMap::_Free()
 
 
 status_t
+FileMap::_Cache(off_t offset, off_t size)
+{
+	file_extent* lastExtent = NULL;
+	if (fCount > 0)
+		lastExtent = ExtentAt(fCount - 1);
+
+	off_t mapEnd = 0;
+	if (lastExtent != NULL)
+		mapEnd = lastExtent->offset + lastExtent->disk.length;
+
+	off_t end = offset + size;
+
+	if (fCacheAll && mapEnd < end)
+		return B_ERROR;
+
+	status_t status = B_OK;
+	file_io_vec vecs[8];
+	const size_t kMaxVecs = 8;
+
+	while (status == B_OK && mapEnd < end) {
+		// We don't have the requested extents yet, retrieve them
+		size_t vecCount = kMaxVecs;
+		status = vfs_get_file_map(Vnode(), mapEnd, ~0UL, vecs, &vecCount);
+		if (status == B_OK || status == B_BUFFER_OVERFLOW)
+			status = _Add(vecs, vecCount, mapEnd);
+	}
+
+	return status;
+}
+
+
+status_t
+FileMap::SetMode(uint32 mode)
+{
+	if (mode != FILE_MAP_CACHE_ALL && mode != FILE_MAP_CACHE_ON_DEMAND)
+		return B_BAD_VALUE;
+
+	MutexLocker _(fLock);
+
+	if (mode == FILE_MAP_CACHE_ALL && fCacheAll
+		|| mode == FILE_MAP_CACHE_ON_DEMAND && !fCacheAll)
+		return B_OK;
+
+	if (mode == FILE_MAP_CACHE_ALL) {
+		status_t status = _Cache(0, fSize);
+		if (status != B_OK)
+			return status;
+
+		fCacheAll = true;
+	} else
+		fCacheAll = false;
+
+	return B_OK;
+}
+
+
+status_t
 FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 {
 	MutexLocker _(fLock);
 
 	size_t maxVecs = *_count;
-	status_t status = B_OK;
 
 	if (offset >= Size()) {
 		*_count = 0;
@@ -337,24 +399,7 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 	// First, we need to make sure that we have already cached all file
 	// extents needed for this request.
 
-	file_extent* lastExtent = NULL;
-	if (fCount > 0)
-		lastExtent = ExtentAt(fCount - 1);
-
-	off_t mapOffset = 0;
-	if (lastExtent != NULL)
-		mapOffset = lastExtent->offset + lastExtent->disk.length;
-
-	off_t end = offset + size;
-
-	while (status == B_OK && mapOffset < end) {
-		// We don't have the requested extents yet, retrieve them
-		size_t vecCount = maxVecs;
-		status = vfs_get_file_map(Vnode(), mapOffset, ~0UL, vecs, &vecCount);
-		if (status == B_OK || status == B_BUFFER_OVERFLOW)
-			status = _Add(vecs, vecCount, mapOffset);
-	}
-
+	status_t status = _Cache(offset, size);
 	if (status != B_OK)
 		return status;
 
@@ -566,6 +611,17 @@ file_map_invalidate(void* _map, off_t offset, off_t size)
 		return;
 
 	map->Invalidate(offset, size);
+}
+
+
+extern "C" status_t
+file_map_set_mode(void* _map, uint32 mode)
+{
+	FileMap* map = (FileMap*)_map;
+	if (map == NULL)
+		return B_BAD_VALUE;
+
+	return map->SetMode(mode);
 }
 
 

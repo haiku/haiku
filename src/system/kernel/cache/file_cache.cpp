@@ -979,6 +979,16 @@ file_cache_disable(void *_cacheRef)
 }
 
 
+extern "C" bool
+file_cache_is_enabled(void *_cacheRef)
+{
+	file_cache_ref *ref = (file_cache_ref*)_cacheRef;
+	AutoLocker<VMCache> _(ref->cache);
+
+	return ref->disabled_count == 0;
+}
+
+
 extern "C" status_t
 file_cache_set_size(void *_cacheRef, off_t newSize)
 {
