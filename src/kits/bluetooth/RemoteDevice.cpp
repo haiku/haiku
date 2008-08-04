@@ -1,10 +1,8 @@
 /*
  * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
+ * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
@@ -21,7 +19,6 @@
 #include <bluetoothserver_p.h>
 
 #include "KitSupport.h"
-
 
 
 namespace Bluetooth {
@@ -154,12 +151,12 @@ RemoteDevice::GetLocalDeviceOwner()
 void
 RemoteDevice::SetLocalDeviceOwner(LocalDevice* ld)
 {
-    fDiscovererLocalDevice = ld;
+	fDiscovererLocalDevice = ld;
 }
 
 
 /* Constructor */
-RemoteDevice::RemoteDevice(bdaddr_t address)
+RemoteDevice::RemoteDevice(const bdaddr_t address)
 {
 	fBdaddr = address;
 	fMessenger = _RetrieveBluetoothMessenger();

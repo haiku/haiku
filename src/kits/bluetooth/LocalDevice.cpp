@@ -1,10 +1,8 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
+ * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 
 #include <bluetooth/bluetooth_error.h>
 
@@ -29,18 +27,18 @@ namespace Bluetooth {
 LocalDevice*
 LocalDevice::RequestLocalDeviceID(BMessage* request)
 {
-    BMessage reply;
-    hci_id hid;
+	BMessage reply;
+	hci_id hid;
 	LocalDevice* lDevice = NULL;
 
 	BMessenger* messenger = _RetrieveBluetoothMessenger();
 
 	if (messenger == NULL)
 		return NULL;
-
-    if (messenger->SendMessage(request, &reply) == B_OK &&
-        reply.FindInt32("hci_id", &hid) == B_OK ) {
-
+	
+	if (messenger->SendMessage(request, &reply) == B_OK &&
+		reply.FindInt32("hci_id", &hid) == B_OK ) {
+	
 	    if (hid >= 0)
 		    lDevice = new LocalDevice(hid);
     }
@@ -60,22 +58,22 @@ LocalDevice::GetLocalDevice()
 {
 	BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);
 
-    return RequestLocalDeviceID(&request);
+	return RequestLocalDeviceID(&request);
 }
 
 
 LocalDevice*
-LocalDevice::GetLocalDevice(hci_id hid)
+LocalDevice::GetLocalDevice(const hci_id hid)
 { 
-    BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);
-    request.AddInt32("hci_id", hid);
-
-    return RequestLocalDeviceID(&request);
+	BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);
+	request.AddInt32("hci_id", hid);
+	
+	return RequestLocalDeviceID(&request);
 }
 
 
 LocalDevice*
-LocalDevice::GetLocalDevice(bdaddr_t bdaddr)
+LocalDevice::GetLocalDevice(const bdaddr_t bdaddr)
 {
 
 	BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);    
@@ -143,19 +141,19 @@ LocalDevice::GetDiscoverable()
 status_t 
 LocalDevice::SetDiscoverable(int mode)
 {
-    if (fMessenger == NULL)
-        return B_ERROR;
-
-    BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
-    BMessage reply;
-
-    size_t   size;
+	if (fMessenger == NULL)
+		return B_ERROR;
+	
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage reply;
+	
+	size_t   size;
 	int8	 bt_status = BT_ERROR;
-
-
-    request.AddInt32("hci_id", hid);
-
-
+	
+	
+	request.AddInt32("hci_id", hid);
+	
+	
 	void* command = buildWriteScan(mode, &size);
 	
 	if (command == NULL) {
@@ -163,17 +161,17 @@ LocalDevice::SetDiscoverable(int mode)
 	}
 	
 	request.AddData("raw command", B_ANY_TYPE, command, size);
-    request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
-    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE));
-
-    if (fMessenger->SendMessage(&request, &reply) == B_OK) {
-        if (reply.FindInt8("status", &bt_status ) == B_OK ) {
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE));
+	
+	if (fMessenger->SendMessage(&request, &reply) == B_OK) {
+		if (reply.FindInt8("status", &bt_status ) == B_OK ) {
 			return bt_status;
 			
 		}
 		
 	}
-
+	
 	return B_ERROR;
 }
 
@@ -181,28 +179,28 @@ LocalDevice::SetDiscoverable(int mode)
 bdaddr_t 
 LocalDevice::GetBluetoothAddress()
 {
-    if (fMessenger == NULL)
-        return bdaddrUtils::NullAddress();
- 
-    const bdaddr_t* bdaddr;
-    BMessage request(BT_MSG_GET_ADDRESS);
-    BMessage reply;
- 	ssize_t	size;   
+	if (fMessenger == NULL)
+		return bdaddrUtils::NullAddress();
 
-    /* ADD ID */
-    request.AddInt32("hci_id", hid);
-    
-    if (fMessenger->SendMessage(&request, &reply) == B_OK) {
-    
-    	if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &size) == B_OK ){
+	const bdaddr_t* bdaddr;
+	BMessage request(BT_MSG_GET_ADDRESS);
+	BMessage reply;
+	ssize_t	size;
+
+	/* ADD ID */
+	request.AddInt32("hci_id", hid);
+	
+	if (fMessenger->SendMessage(&request, &reply) == B_OK) {
+	
+		if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &size) == B_OK ){
 			
-	    	return *bdaddr;
-	    
-	    } else {
-	    	return bdaddrUtils::NullAddress();	    
-	    }
-	    
-    }
+			return *bdaddr;
+		
+		} else {
+			return bdaddrUtils::NullAddress();
+		}
+		
+	}
 
 	return bdaddrUtils::NullAddress();
 }
@@ -212,20 +210,20 @@ BString
 LocalDevice::GetFriendlyName()
 {
 	if (fMessenger == NULL)
-        return NULL;
- 
-    BString friendlyname;
-    BMessage request(BT_MSG_GET_FRIENDLY_NAME);
-    BMessage reply;
-    
-    /* ADD ID */
-    request.AddInt32("hci_id", hid);
-    
-    if (fMessenger->SendMessage(&request, &reply) == B_OK &&
-        reply.FindString("friendlyname", &friendlyname) == B_OK ){		
-	    
-	    return friendlyname;
-    }      
+		return NULL;
+
+	BString friendlyname;
+	BMessage request(BT_MSG_GET_FRIENDLY_NAME);
+	BMessage reply;
+	
+	/* ADD ID */
+	request.AddInt32("hci_id", hid);
+	
+	if (fMessenger->SendMessage(&request, &reply) == B_OK &&
+		reply.FindString("friendlyname", &friendlyname) == B_OK){		
+		
+		return friendlyname;
+	}
 	
 	return BString("Unknown");
 }

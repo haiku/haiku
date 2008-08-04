@@ -28,8 +28,8 @@ public:
 	static	LocalDevice*	GetLocalDevice();
 	static	uint32			GetLocalDeviceCount();
 
-	static	LocalDevice*	GetLocalDevice(hci_id hid);
-	static	LocalDevice*	GetLocalDevice(bdaddr_t bdaddr);
+	static	LocalDevice*	GetLocalDevice(const hci_id hid);
+	static	LocalDevice*	GetLocalDevice(const bdaddr_t bdaddr);
 
 			DiscoveryAgent*	GetDiscoveryAgent();
 			BString			GetFriendlyName();
