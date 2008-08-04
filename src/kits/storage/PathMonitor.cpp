@@ -815,6 +815,9 @@ BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target)
 /*static*/ status_t
 BPathMonitor::StopWatching(const char* path, BMessenger target)
 {
+	if (sLocker == NULL)
+		return B_NO_INIT;
+
 	BAutolock _(sLocker);
 
 	WatcherMap::iterator iterator = sWatchers.find(target);
@@ -845,6 +848,9 @@ BPathMonitor::StopWatching(const char* path, BMessenger target)
 /*static*/ status_t
 BPathMonitor::StopWatching(BMessenger target)
 {
+	if (sLocker == NULL)
+		return B_NO_INIT;
+
 	BAutolock _(sLocker);
 
 	WatcherMap::iterator iterator = sWatchers.find(target);
