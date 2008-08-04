@@ -16,17 +16,21 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <arch_config.h>
-#include <heap.h>
 #include <KernelExport.h>
+#include <NodeMonitor.h>
+
+#include <arch_config.h>
+#include <driver_settings.h>
+#include <fs_interface.h>
+#include <heap.h>
 #include <slab/Slab.h>
+#include <syscalls.h>
+#include <util/DoublyLinkedList.h>
+#include <util/OpenHashTable.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
-#include <util/DoublyLinkedList.h>
-#include <util/OpenHashTable.h>
-#include <driver_settings.h>
 
 
 #if	ENABLE_SWAP_SUPPORT
@@ -765,12 +769,18 @@ swap_init_post_modules()
 		dprintf("Can't open/create /var/swap: %s\n", strerror(errno));
 		return;
 	}
-	close(fd);
 
-	if (truncate("/var/swap", size) < 0) {
+	struct stat stat;
+	stat.st_size = size;
+	if (_kern_write_stat(fd, NULL, false, &stat, sizeof(struct stat),
+			B_STAT_SIZE | B_STAT_SIZE_INSECURE) != B_OK) {
 		dprintf("Failed to resize /var/swap to %lld bytes: %s\n", size,
 			strerror(errno));
 	}
+
+	close(fd);
+		// TODO: if we don't keep the file open, O_NOCACHE is going to be
+		// removed - we must not do this while we're using the swap file
 
 	swap_file_add("/var/swap");
 }
