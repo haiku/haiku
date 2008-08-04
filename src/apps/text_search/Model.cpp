@@ -60,8 +60,7 @@ Model::Model()
 	  fEncoding(0)
 {
 	BPath path;
-	status_t status = find_directory(B_USER_DIRECTORY, &path);
-	if (status == B_OK)
+	if (find_directory(B_USER_DIRECTORY, &path) == B_OK)
 		fFilePanelPath = path.Path();
 	else
 		fFilePanelPath = "/boot/home";
@@ -72,9 +71,7 @@ status_t
 Model::LoadPrefs()
 {
 	BFile file;
-	status_t status = _OpenFile(&file, PREFS_FILE, B_READ_ONLY, 
-		B_USER_SETTINGS_DIRECTORY, NULL);
-
+	status_t status = _OpenFile(&file, PREFS_FILE);
 	if (status != B_OK)
 		return status;
 
@@ -139,9 +136,8 @@ status_t
 Model::SavePrefs()
 {
 	BFile file;
-	status_t status = _OpenFile(&file, PREFS_FILE, 
-		B_CREATE_FILE | B_WRITE_ONLY, B_USER_SETTINGS_DIRECTORY, NULL);
-	
+	status_t status = _OpenFile(&file, PREFS_FILE,
+		B_CREATE_FILE | B_WRITE_ONLY);
 	if (status != B_OK)
 		return status;
 
@@ -193,30 +189,31 @@ Model::SavePrefs()
 void
 Model::AddToHistory(const char* text) 
 {
-	BList* items = _LoadHistory();
-	if (items == NULL)
+	BList items;
+	if (!_LoadHistory(items))
 		return;
 
 	BString* string = new (nothrow) BString(text);
-	if (string == NULL || !items->AddItem(string)) {
+	if (string == NULL || !items.AddItem(string)) {
 		delete string;
+		_FreeHistory(items);
 		return;
 	}
 
-	int32 count = items->CountItems() - 1;
+	int32 count = items.CountItems() - 1;
 		// don't check last item, since that's the one we just added
 	for (int32 t = 0; t < count; ++t) {
 		// If the same text is already in the list,
 		// then remove it first. Case-sensitive.
-		BString* string = static_cast<BString*>(items->ItemAt(t));
+		BString* string = static_cast<BString*>(items.ItemAt(t));
 		if (*string == text) {
-			delete static_cast<BString*>(items->RemoveItem(t));
+			delete static_cast<BString*>(items.RemoveItem(t));
 			break;
 		}
 	}
 
-	if (items->CountItems() == HISTORY_LIMIT)
-		delete static_cast<BString*>(items->RemoveItem(0L));
+	while (items.CountItems() >= HISTORY_LIMIT)
+		delete static_cast<BString*>(items.RemoveItem(0L));
 
 	_SaveHistory(items);
 	_FreeHistory(items);
@@ -224,14 +221,14 @@ Model::AddToHistory(const char* text)
 
 
 void
-Model::FillHistoryMenu(BMenu* menu)
+Model::FillHistoryMenu(BMenu* menu) const
 {
-	BList* items = _LoadHistory();
-	if (items == NULL)
+	BList items;
+	if (!_LoadHistory(items))
 		return;
 
-	for (int32 t = items->CountItems() - 1; t >= 0; --t) {
-		BString* item = static_cast<BString*>(items->ItemAt(t));
+	for (int32 t = items.CountItems() - 1; t >= 0; --t) {
+		BString* item = static_cast<BString*>(items.ItemAtFast(t));
 		BMessage* message = new BMessage(MSG_SELECT_HISTORY);
 		message->AddString("text", item->String());
 		menu->AddItem(new BMenuItem(item->String(), message));
@@ -244,46 +241,40 @@ Model::FillHistoryMenu(BMenu* menu)
 // #pragma mark - private
 
 
-BList*
-Model::_LoadHistory()
+bool
+Model::_LoadHistory(BList& items) const
 {
-	BList* items = new (nothrow) BList();
-	if (items == NULL)
-		return NULL;
-
 	BFile file;
-	status_t status = _OpenFile(&file, PREFS_FILE, B_READ_ONLY, 
-		B_USER_SETTINGS_DIRECTORY, NULL);
-
+	status_t status = _OpenFile(&file, PREFS_FILE);
 	if (status != B_OK)
-		return items;
+		return false;
 	
 	status = file.Lock();
 	if (status != B_OK)
-		return items;
+		return false;
 
 	BMessage message;
 	status = message.Unflatten(&file);
 	if (status != B_OK)
-		return items;
+		return false;
 
 	file.Unlock();
 
 	BString string;
 	for (int32 x = 0; message.FindString("string", x, &string) == B_OK; x++) {
 		BString* copy = new (nothrow) BString(string);
-		if (copy == NULL || !items->AddItem(copy)) {
+		if (copy == NULL || !items.AddItem(copy)) {
 			delete copy;
 			break;
 		}
 	}
 
-	return items;
+	return true;
 }
 
 
 status_t
-Model::_SaveHistory(BList* items)
+Model::_SaveHistory(const BList& items) const
 {
 	BFile file;
 	status_t status = _OpenFile(&file, PREFS_FILE, 
@@ -298,10 +289,9 @@ Model::_SaveHistory(BList* items)
 		return status;
 	
 	BMessage message;
-	for (int32 x = 0; ; x++) {
-		BString* string = static_cast<BString*>(items->ItemAt(x));
-		if (string == NULL)
-			break;
+	int32 count = items.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BString* string = static_cast<BString*>(items.ItemAtFast(i));
 
 		if (message.AddString("string", string->String()) != B_OK)
 			break;
@@ -317,18 +307,16 @@ Model::_SaveHistory(BList* items)
 
 
 void
-Model::_FreeHistory(BList* items)
+Model::_FreeHistory(const BList& items) const
 {
-	for (int32 t = items->CountItems() - 1; t >= 0; --t)
-		delete static_cast<BString*>((items->RemoveItem(t)));
-
-	delete items;
+	for (int32 t = items.CountItems() - 1; t >= 0; --t)
+		delete static_cast<BString*>((items.ItemAtFast(t)));
 }
 
 
 status_t
 Model::_OpenFile(BFile* file, const char* name, uint32 openMode, 
-	directory_which which, BVolume* volume)
+	directory_which which, BVolume* volume) const
 {
 	if (file == NULL)
 		return B_BAD_VALUE;

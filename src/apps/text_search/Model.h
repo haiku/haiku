@@ -81,7 +81,7 @@ public:
 			status_t			SavePrefs();
 
 			void				AddToHistory(const char* text);
-			void				FillHistoryMenu(BMenu* menu);
+			void				FillHistoryMenu(BMenu* menu) const;
 
 public:
 			// The directory we were invoked from.
@@ -127,14 +127,14 @@ public:
 			uint32				fEncoding;
 		
 private:
-			BList*				_LoadHistory();
-			status_t			_SaveHistory(BList* items);
-			void				_FreeHistory(BList* items);
+			bool				_LoadHistory(BList& items) const;
+			status_t			_SaveHistory(const BList& items) const;
+			void				_FreeHistory(const BList& items) const;
 			status_t			_OpenFile(BFile* file, const char* name,
 									uint32 openMode = B_READ_ONLY, 
 									directory_which which
 										= B_USER_SETTINGS_DIRECTORY,
-									BVolume* volume = NULL);
+									BVolume* volume = NULL) const;
 };
 
 #endif // MODEL_H
