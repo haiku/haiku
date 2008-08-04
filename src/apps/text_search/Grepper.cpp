@@ -34,6 +34,7 @@
 #include <UTF8.h>
 
 #include "FileIterator.h"
+#include "Model.h"
 
 using std::nothrow;
 
@@ -90,16 +91,20 @@ strdup_from_utf8(uint32 encode, const char* src, int32 length)
 }
 
 
-Grepper::Grepper(const char* pattern, Model* model, FileIterator* iterator)
+Grepper::Grepper(const char* pattern, const Model* model,
+		const BHandler* target, FileIterator* iterator)
 	: fPattern(NULL),
-	  fModel(model),
+	  fTarget(target),
+	  fEscapeText(model->fEscapeText),
+	  fCaseSensitive(model->fCaseSensitive),
+	  fEncoding(model->fEncoding),
+
 	  fIterator(iterator),
 	  fThreadId(-1),
 	  fMustQuit(false)
 {
-	if (fModel->fEncoding) {
-		char *src = strdup_from_utf8(fModel->fEncoding, pattern,
-			strlen(pattern));
+	if (fEncoding > 0) {
+		char* src = strdup_from_utf8(fEncoding, pattern, strlen(pattern));
 		_SetPattern(src);
 		free(src);
 	} else
@@ -120,7 +125,7 @@ Grepper::IsValid() const
 {
 	if (fIterator == NULL || !fIterator->IsValid())
 		return false;
-	return fPattern != NULL && fModel != NULL;
+	return fPattern != NULL;
 }
 
 
@@ -178,7 +183,7 @@ Grepper::_GrepperThread()
 		message.MakeEmpty();
 		message.what = MSG_REPORT_FILE_NAME;
 		message.AddString("filename", fileName);
-		fModel->fTarget->PostMessage(&message);
+		fTarget.SendMessage(&message);
 
 		message.MakeEmpty();
 		message.what = MSG_REPORT_RESULT;
@@ -196,13 +201,12 @@ Grepper::_GrepperThread()
 			message.MakeEmpty();
 			message.what = MSG_REPORT_ERROR;
 			message.AddString("error", tempString);
-			fModel->fTarget->PostMessage(&message);
+			fTarget.SendMessage(&message);
 			continue;
 		}
 
 		sprintf(command, "grep -hn %s %s \"%s\" > \"%s\"",
-			fModel->fCaseSensitive ? "" : "-i", fPattern, fileName, 
-			tempFile.Path());
+			fCaseSensitive ? "" : "-i", fPattern, fileName, tempFile.Path());
 
 		int res = system(command);
 
@@ -211,9 +215,9 @@ Grepper::_GrepperThread()
 
 			if (results != NULL) {
 				while (fgets(tempString, B_PATH_NAME_LENGTH, results) != 0) {
-					if (fModel->fEncoding) {
-						char *tempdup = strdup_to_utf8(fModel->fEncoding, 
-							tempString, strlen(tempString));
+					if (fEncoding > 0) {
+						char* tempdup = strdup_to_utf8(fEncoding, tempString,
+							strlen(tempString));
 						message.AddString("text", tempdup);
 						free(tempdup);
 					} else
@@ -221,7 +225,7 @@ Grepper::_GrepperThread()
 				}
 
 				if (message.HasString("text"))
-					fModel->fTarget->PostMessage(&message);
+					fTarget.SendMessage(&message);
 
 				fclose(results);
 				continue;
@@ -233,7 +237,7 @@ Grepper::_GrepperThread()
 		message.MakeEmpty();
 		message.what = MSG_REPORT_ERROR;
 		message.AddString("error", tempString);
-		fModel->fTarget->PostMessage(&message);
+		fTarget.SendMessage(&message);
 	}
 
 	// We wait with removing the temporary file until after the
@@ -244,7 +248,7 @@ Grepper::_GrepperThread()
 
 	message.MakeEmpty();
 	message.what = MSG_SEARCH_FINISHED;
-	fModel->fTarget->PostMessage(&message);
+	fTarget.SendMessage(&message);
 
 	return 0;
 }
@@ -256,7 +260,7 @@ Grepper::_SetPattern(const char* src)
 	if (src == NULL)
 		return;
 
-	if (!fModel->fEscapeText) {
+	if (!fEscapeText) {
 		fPattern = strdup(src);
 		return;
 	}

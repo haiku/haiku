@@ -22,14 +22,16 @@
 #ifndef GREPPER_H
 #define GREPPER_H
 
-#include "Model.h"
+#include <Messenger.h>
 
 class FileIterator;
+class Model;
 
 // Executes "grep" in a background thread.
 class Grepper {
 public:
-								Grepper(const char* pattern, Model* model,
+								Grepper(const char* pattern, const Model* model,
+									const BHandler* target,
 									FileIterator* iterator);
 	virtual						~Grepper();
 
@@ -56,8 +58,11 @@ private:
 	// The (escaped) search pattern.
 			char*				fPattern;
 		
-	// The directory or files to grep on.
-			Model*				fModel;
+	// The settings from the model.
+			BMessenger			fTarget;
+			bool				fEscapeText : 1;
+			bool				fCaseSensitive : 1;
+			uint32				fEncoding;
 	    
 	// The supplier of files to grep
 			FileIterator*		fIterator;

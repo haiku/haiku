@@ -53,7 +53,6 @@ Model::Model()
 
 	  fFrame(100, 100, 500, 400),
 
-	  fTarget(NULL),
 	  fState(STATE_IDLE),
 
 	  fFilePanelPath(""),

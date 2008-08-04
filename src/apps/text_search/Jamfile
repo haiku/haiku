@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application TextSearch :
 	FileIterator.cpp
+	FolderIterator.cpp
 	GrepApp.cpp
 	GrepListView.cpp
 	Grepper.cpp

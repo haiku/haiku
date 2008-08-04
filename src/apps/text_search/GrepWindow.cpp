@@ -38,7 +38,7 @@
 #include <String.h>
 #include <UTF8.h>
 
-#include "FileIterator.h"
+#include "FolderIterator.h"
 #include "GlobalDefs.h"
 #include "Grepper.h"
 #include "Translation.h"
@@ -98,7 +98,6 @@ GrepWindow::GrepWindow(BMessage* message)
 
 	fModel->fDirectory = directory;
 	fModel->fSelectedFiles = *message;
-	fModel->fTarget = this;
 
 	_SetWindowTitle();
 	_CreateMenus();
@@ -706,9 +705,9 @@ GrepWindow::_OnStartCancel()
 
 		fOldPattern = fSearchText->Text();
 
-		FileIterator* iterator = new (nothrow) FileIterator(fModel);
+		FileIterator* iterator = new (nothrow) FolderIterator(fModel);
 		fGrepper = new (nothrow) Grepper(fOldPattern.String(), fModel,
-			iterator);
+			this, iterator);
 		if (fGrepper != NULL && fGrepper->IsValid())
 			fGrepper->Start();
 		else {

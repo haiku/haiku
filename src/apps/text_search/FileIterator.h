@@ -23,54 +23,24 @@
 #ifndef FILE_ITERATOR_H
 #define FILE_ITERATOR_H
 
-#include <List.h>
-
 class BEntry;
-class BDirectory;
-class Model;
-
-// TODO: split into Folder and MessageFileIterator (_GetTopEntry)
 
 // Provides an interface to retrieve the next file that should be grepped
 // for the search string.
 class FileIterator {
 public:
-								FileIterator(Model* model);
+								FileIterator();
 	virtual						~FileIterator();
 
-	virtual	bool				IsValid() const;
+	virtual	bool				IsValid() const = 0;
 
 	// Returns the full path name of the next file.
-	virtual	bool				GetNextName(char* buffer);
+	virtual	bool				GetNextName(char* buffer) = 0;
 	
-private:
-	// Looks for the next entry.
-			bool				_GetNextEntry(BEntry& entry);
-
-	// Looks for the next entry in the top-level dir.
-			bool				_GetTopEntry(BEntry& entry);
-	
-	// Looks for the next entry in a subdir.
-			bool				_GetSubEntry(BEntry& entry);
-	
-	// Determines whether we can add a subdir.
-			void				_ExamineSubdir(BEntry& entry);
-	
+protected:
 	// Determines whether we can grep a file.
-			bool				_ExamineFile(BEntry& entry, char* buffer);
-
-private:
-	// Contains pointers to BDirectory objects.
-			BList				fDirectories;
-	
-	// The directory we are currently looking at.
-			BDirectory*			fCurrentDir;
-	
-	// The ref number we are currently looking at.
-			int32				fCurrentRef;
-
-	// The directory or files to grep on.
-			Model*				fModel;
+			bool				_ExamineFile(BEntry& entry, char* buffer,
+									bool textFilesOnly);
 };
 
 #endif // FILE_ITERATOR_H

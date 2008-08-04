@@ -26,7 +26,6 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <List.h>
-#include <Looper.h>
 #include <Menu.h>
 #include <Message.h>
 #include <Rect.h>
@@ -117,9 +116,6 @@ public:
 
 			// The dimensions of the window.
 			BRect				fFrame;
-
-			// The looper that will receive notifications.
-			BLooper*			fTarget;
 
 			// What are we doing.
 			state_t				fState;
