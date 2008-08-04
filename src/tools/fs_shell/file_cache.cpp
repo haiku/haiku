@@ -281,6 +281,21 @@ fssh_file_cache_delete(void *_cacheRef)
 }
 
 
+void
+fssh_file_cache_enable(void *_cacheRef)
+{
+	fssh_panic("fssh_file_cache_enable() called");
+}
+
+
+fssh_status_t
+fssh_file_cache_disable(void *_cacheRef)
+{
+	fssh_panic("fssh_file_cache_disable() called");
+	return FSSH_B_ERROR;
+}
+
+
 fssh_status_t
 fssh_file_cache_set_size(void *_cacheRef, fssh_off_t size)
 {

@@ -49,6 +49,7 @@ struct file_cache_ref {
 		//	significant 31 bits, and make this uint32 (one bit for
 		//	write vs. read)
 	int32			last_access_index;
+	uint16			disabled_count;
 	bool			last_access_was_write;
 };
 
@@ -58,6 +59,7 @@ typedef status_t (*cache_func)(file_cache_ref *ref, void *cookie, off_t offset,
 
 
 static struct cache_module_info *sCacheModule;
+static const uint8 kZeroBuffer[4096] = {};
 
 
 //	#pragma mark -
@@ -885,6 +887,7 @@ file_cache_create(dev_t mountID, ino_t vnodeID, off_t size)
 
 	memset(ref->last_access, 0, sizeof(ref->last_access));
 	ref->last_access_index = 0;
+	ref->disabled_count = 0;
 
 	// TODO: delay vm_cache creation until data is
 	//	requested/written for the first time? Listing lots of
@@ -927,6 +930,52 @@ file_cache_delete(void *_cacheRef)
 
 	ref->cache->ReleaseRef();
 	delete ref;
+}
+
+
+extern "C" void
+file_cache_enable(void *_cacheRef)
+{
+	file_cache_ref *ref = (file_cache_ref*)_cacheRef;
+
+	AutoLocker<VMCache> _(ref->cache);
+
+	if (ref->disabled_count == 0) {
+		panic("Unbalanced file_cache_enable()!");
+		return;
+	}
+
+	ref->disabled_count--;
+}
+
+
+extern "C" status_t
+file_cache_disable(void *_cacheRef)
+{
+	// TODO: This function only removes all pages from the cache and prevents
+	// that the file cache functions add any new ones until re-enabled. The
+	// VM (on page fault) can still add pages, if the file is mmap()ed. We
+	// should mark the cache to prevent shared mappings of the file and fix
+	// the page fault code to deal correctly with private mappings (i.e. only
+	// insert pages in consumer caches).
+
+	file_cache_ref *ref = (file_cache_ref*)_cacheRef;
+
+	AutoLocker<VMCache> _(ref->cache);
+
+	// If already disabled, there's nothing to do for us.
+	if (ref->disabled_count > 0) {
+		ref->disabled_count++;
+		return B_OK;
+	}
+
+	// The file cache is not yet disabled. We need to evict all cached pages.
+	status_t error = ref->cache->FlushAndRemoveAllPages();
+	if (error != B_OK)
+		return error;
+
+	ref->disabled_count++;
+	return B_OK;
 }
 
 
@@ -974,6 +1023,14 @@ file_cache_read(void *_cacheRef, void *cookie, off_t offset, void *buffer,
 	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu)\n",
 		ref, offset, buffer, *_size));
 
+	if (ref->disabled_count > 0) {
+		// Caching is disabled -- read directly from the file.
+		iovec vec;
+		vec.iov_base = buffer;
+		vec.iov_len = *_size;
+		return vfs_read_pages(ref->vnode, cookie, offset, &vec, 1, 0, _size);
+	}
+
 	return cache_io(ref, cookie, offset, (addr_t)buffer, _size, false);
 }
 
@@ -983,6 +1040,41 @@ file_cache_write(void *_cacheRef, void *cookie, off_t offset,
 	const void *buffer, size_t *_size)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+
+	if (ref->disabled_count > 0) {
+		// Caching is disabled -- write directly to the file.
+
+		if (buffer != NULL) {
+			iovec vec;
+			vec.iov_base = (void*)buffer;
+			vec.iov_len = *_size;
+			return vfs_write_pages(ref->vnode, cookie, offset, &vec, 1, 0,
+				_size);
+		}
+
+		// NULL buffer -- use a dummy buffer to write zeroes
+		// TODO: This is not particularly efficient!
+		iovec vec;
+		vec.iov_base = (void*)kZeroBuffer;
+		vec.iov_len = sizeof(kZeroBuffer);
+		size_t size = *_size;
+		while (size > 0) {
+			size_t toWrite = min_c(size, vec.iov_len);
+			size_t written = toWrite;
+			status_t error = vfs_write_pages(ref->vnode, cookie, offset, &vec,
+				1, 0, &written);
+			if (error != B_OK)
+				return error;
+			if (written == 0)
+				break;
+
+			offset += written;
+			size -= written;
+		}
+
+		*_size -= size;
+		return B_OK;
+	}
 
 	status_t status = cache_io(ref, cookie, offset,
 		(addr_t)const_cast<void *>(buffer), _size, true);

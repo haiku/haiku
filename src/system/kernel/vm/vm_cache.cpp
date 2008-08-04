@@ -793,6 +793,51 @@ VMCache::Resize(off_t newSize)
 
 
 status_t
+VMCache::FlushAndRemoveAllPages()
+{
+	while (page_count > 0) {
+		// write back modified pages
+		status_t error = WriteModified();
+		if (error != B_OK)
+			return error;
+
+		// remove pages
+		for (VMCachePagesTree::Iterator it = pages.GetIterator();
+				vm_page* page = it.Next();) {
+			if (page->state == PAGE_STATE_BUSY) {
+				// wait for page to become unbusy
+				ConditionVariableEntry entry;
+				entry.Add(page);
+				Unlock();
+				entry.Wait();
+				Lock();
+
+				// restart from the start of the list
+				it = pages.GetIterator();
+				continue;
+			}
+
+			// skip modified pages -- they will be written back in the next
+			// iteration
+			if (page->state == PAGE_STATE_MODIFIED)
+				continue;
+
+			// We can't remove mapped pages.
+			if (page->wired_count > 0 || !page->mappings.IsEmpty())
+				return B_BUSY;
+
+			RemovePage(page);
+			vm_page_free(this, page);
+				// Note: When iterating through a IteratableSplayTree
+				// removing the current node is safe.
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
 VMCache::Commit(off_t size)
 {
 	committed_size = size;

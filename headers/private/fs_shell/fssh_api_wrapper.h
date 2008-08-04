@@ -828,6 +828,8 @@
 /* file cache */
 #define file_cache_create				fssh_file_cache_create
 #define file_cache_delete				fssh_file_cache_delete
+#define file_cache_enable				fssh_file_cache_enable
+#define file_cache_disable				fssh_file_cache_disable
 #define file_cache_set_size				fssh_file_cache_set_size
 #define file_cache_sync					fssh_file_cache_sync
 

@@ -88,6 +88,8 @@ extern void				fssh_block_cache_put(void *_cache,
 extern void *			fssh_file_cache_create(fssh_mount_id mountID,
 							fssh_vnode_id vnodeID, fssh_off_t size);
 extern void				fssh_file_cache_delete(void *_cacheRef);
+extern void				fssh_file_cache_enable(void *_cacheRef);
+extern fssh_status_t	fssh_file_cache_disable(void *_cacheRef);
 extern fssh_status_t	fssh_file_cache_set_size(void *_cacheRef,
 							fssh_off_t size);
 extern fssh_status_t	fssh_file_cache_sync(void *_cache);
