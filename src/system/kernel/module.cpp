@@ -1815,15 +1815,22 @@ module_init(kernel_args* args)
 
 	new(&sModuleNotificationService) ModuleNotificationService();
 
-	register_kernel_daemon(&ModuleNotificationService::HandleNotifications,
-		NULL, 10);
-		// once every second
-
 	sDisableUserAddOns = get_safemode_boolean(B_SAFEMODE_DISABLE_USER_ADD_ONS,
 		false);
 
 	add_debugger_command("modules", &dump_modules,
 		"list all known & loaded modules");
+
+	return B_OK;
+}
+
+
+status_t
+module_init_post_threads(void)
+{
+	return register_kernel_daemon(
+		&ModuleNotificationService::HandleNotifications, NULL, 10);
+		// once every second
 
 	return B_OK;
 }

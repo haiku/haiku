@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -129,6 +129,12 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		boot_item_init();
 		driver_settings_init(&sKernelArgs);
 		debug_init_post_vm(&sKernelArgs);
+		TRACE("init teams\n");
+		team_init(&sKernelArgs);
+		TRACE("init ELF loader\n");
+		elf_init(&sKernelArgs);
+		TRACE("init modules\n");
+		module_init(&sKernelArgs);
 		int_init_post_vm(&sKernelArgs);
 		cpu_init_post_vm(&sKernelArgs);
 		commpage_init();
@@ -154,8 +160,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		smp_init_post_generic_syscalls();
 		TRACE("init cbuf\n");
 		cbuf_init();
-		TRACE("init teams\n");
-		team_init(&sKernelArgs);
 		TRACE("init threads\n");
 		thread_init(&sKernelArgs);
 		TRACE("init ports\n");
@@ -163,15 +167,13 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init kernel daemons\n");
 		kernel_daemon_init();
 		arch_platform_init_post_thread(&sKernelArgs);
-		TRACE("init posix semaphores\n");
+		TRACE("init POSIX semaphores\n");
 		realtime_sem_init();
 		xsi_ipc_init();
 
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);
 		low_resource_manager_init_post_thread();
-		TRACE("init ELF loader\n");
-		elf_init(&sKernelArgs);
 		TRACE("init scheduler\n");
 		scheduler_init();
 		TRACE("init notification services\n");
@@ -245,7 +247,7 @@ main2(void *unused)
 
 	TRACE("Init modules\n");
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_1_INIT_MODULES);
-	module_init(&sKernelArgs);
+	module_init_post_threads();
 
 	// init userland debugging
 	TRACE("Init Userland debugging\n");

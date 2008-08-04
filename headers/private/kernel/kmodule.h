@@ -30,6 +30,7 @@ extern status_t unload_module(const char *path);
 extern status_t load_module(const char *path, module_info ***_modules);
 
 extern status_t module_init(struct kernel_args *args);
+extern status_t module_init_post_threads(void);
 
 #ifdef __cplusplus
 }
