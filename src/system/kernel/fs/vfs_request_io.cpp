@@ -440,6 +440,9 @@ do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 	request->SetFinishedCallback(&do_iterative_fd_io_finish, iterationCookie);
 	request->SetIterationCallback(&do_iterative_fd_io_iterate, iterationCookie);
 
+	descriptorPutter.Detach();
+		// From now on the descriptor is put by our finish callback.
+
 	bool partialTransfer = false;
 	status_t error = do_iterative_fd_io_iterate(iterationCookie, request,
 		&partialTransfer);
@@ -449,13 +452,9 @@ do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 				request->TransferredBytes());
 		}
 
-		finished(cookie, request, error, request->IsPartialTransfer(),
-			request->TransferredBytes());
 		request->SetStatusAndNotify(error);
 		return error;
 	}
-
-	descriptorPutter.Detach();
 
 	return B_OK;
 }
