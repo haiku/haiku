@@ -321,7 +321,7 @@ dump_volume(int argc, char** argv)
 		// convert block_runs/offsets
 		for (int i = 2; i < argc; i++) {
 			char* arg = argv[i];
-			if (strchr(arg, '.') != NULL) {
+			if (strchr(arg, '.') != NULL || strchr(arg, ',') != NULL) {
 				// block_run to offset
 				block_run run;
 				run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(
@@ -352,6 +352,28 @@ dump_volume(int argc, char** argv)
 	set_debug_variable("_cache", (addr_t)volume->BlockCache());
 	set_debug_variable("_root", (addr_t)volume->RootNode());
 	set_debug_variable("_indices", (addr_t)volume->IndicesNode());
+
+	return 0;
+}
+
+
+static int
+dump_block_run_array(int argc, char** argv)
+{
+	if (argc < 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <ptr-to-array> [number-of-runs]\n", argv[0]);
+		return 0;
+	}
+
+	block_run* runs = (block_run*)parse_expression(argv[1]);
+	uint32 count = 16;
+	if (argc > 2)
+		count = parse_expression(argv[2]);
+
+	for (uint32 i = 0; i < count; i++) {
+		dprintf("[%3lu]  ", i);
+		dump_block_run("", runs[i]);
+	}
 
 	return 0;
 }
@@ -421,6 +443,8 @@ add_debugger_commands()
 	add_debugger_command("bfs_btree_node", dump_bplustree_node,
 		"dump a BFS B+tree node");
 	add_debugger_command("bfs", dump_volume, "dump a BFS volume");
+	add_debugger_command("bfs_block_runs", dump_block_run_array,
+		"dump a block run array");
 }
 
 
