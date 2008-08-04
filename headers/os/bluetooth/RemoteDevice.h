@@ -48,7 +48,7 @@ public:
 
 	LocalDevice* GetLocalDeviceOwner();
 
-	RemoteDevice(BString address);
+	RemoteDevice(const BString& address);
 	RemoteDevice(bdaddr_t address);
 
 protected:
