@@ -29,7 +29,7 @@ nb_get_whole_buffer(net_buffer* nbuf)
 	// !!! it could be trash from other upper protocols...
 	if (nbuf->COOKIEFIELD != NULL)
 		return (void*)nbuf->COOKIEFIELD;
-#endif       
+#endif
     err = nb->direct_access(nbuf, 0, nbuf->size, &conPointer);
 
     if (err != B_OK) {
@@ -39,17 +39,17 @@ nb_get_whole_buffer(net_buffer* nbuf)
 		nbuf->COOKIEFIELD = (uint32) malloc(nbuf->size);
 		if (nbuf->COOKIEFIELD == NULL)
 			goto fail;
-		
+
 		err = nb->write(nbuf, 0, (void*) nbuf->COOKIEFIELD, nbuf->size);
 		if (err != B_OK)
 			goto free;
-		
+
 		conPointer = (void*)nbuf->COOKIEFIELD;
 		#endif
 	}
 
 	return conPointer;
-#if 0    
+#if 0
 free:
 	free((void*) nbuf->COOKIEFIELD);
 fail:
@@ -71,7 +71,7 @@ nb_destroy(net_buffer* nbuf)
 	// TODO check for survivers...
 	if (nb != NULL)
 		nb->free(nbuf);
- 
+
 }
 
 
@@ -82,17 +82,17 @@ nb_destroy(net_buffer* nbuf)
 size_t
 get_expected_size(net_buffer* nbuf)
 {
-	
+
 	if (nbuf == NULL)
 		panic("Analizing NULL packet");
-	
+
 	switch (nbuf->protocol) {
-	
+
 		case BT_COMMAND: {
 			struct hci_command_header* header = nb_get_whole_buffer(nbuf);
 			return header->clen + sizeof(struct hci_command_header);
 		}
-			
+
 		case BT_EVENT: {
 			struct hci_event_header* header = nb_get_whole_buffer(nbuf);
 			return header->elen + sizeof(struct hci_event_header);
@@ -109,10 +109,10 @@ get_expected_size(net_buffer* nbuf)
 		}
 
 		default:
-			panic(BLUETOOTH_DEVICE_DEVFS_NAME "no protocol specified for " __FUNCTION__);
+			panic(BLUETOOTH_DEVICE_DEVFS_NAME ":no protocol specified for ");
 		break;
 	}
-	
+
 	return B_ERROR;
 }
 
@@ -120,24 +120,24 @@ get_expected_size(net_buffer* nbuf)
 #pragma mark - room util -
 #endif
 
-inline void 
-init_room(struct list* l) 
+inline void
+init_room(struct list* l)
 {
 	list_init(l);
 }
 
 
-void* 
+void*
 alloc_room(struct list* l, size_t size)
 {
-	
+
 	void* item = list_get_first_item(l);
-	
+
 	if (item == NULL)
 		item = (void*) malloc(size);
-	
+
 	return item;
-	
+
 }
 
 
@@ -152,7 +152,7 @@ void
 purge_room(struct list* l)
 {
 	void* item;
-	
+
 	while ((item = list_remove_head_item(l)) != NULL) {
 		free(item);
 	}
