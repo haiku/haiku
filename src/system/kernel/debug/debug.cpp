@@ -757,7 +757,7 @@ cmd_dump_syslog(int argc, char **argv)
 	bool newLine = false;
 	char line[256];
 	size_t linePos = 0;
-	for (int32 i = start; i < end; i++) {
+	for (uint32 i = start; i < end; i++) {
 		char c = sSyslogBuffer->buffer[i % sSyslogBuffer->size];
 		if (c == '\0' || (uint8)c == 0xcc)
 			continue;
