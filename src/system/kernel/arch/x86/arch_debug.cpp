@@ -152,14 +152,16 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 static void
 print_iframe(struct iframe *frame)
 {
-	kprintf("iframe at %p (end = %p)\n", frame, frame + 1);
+	bool isUser = IFRAME_IS_USER(frame);
+	kprintf("%s iframe at %p (end = %p)\n", isUser ? "user" : "kernel", frame,
+		isUser ? (uint32*)(frame + 1) : &frame->user_esp);
 
 	kprintf(" eax 0x%-9lx    ebx 0x%-9lx     ecx 0x%-9lx  edx 0x%lx\n",
 		frame->eax, frame->ebx, frame->ecx, frame->edx);
 	kprintf(" esi 0x%-9lx    edi 0x%-9lx     ebp 0x%-9lx  esp 0x%lx\n",
 		frame->esi, frame->edi, frame->ebp, frame->esp);
 	kprintf(" eip 0x%-9lx eflags 0x%-9lx", frame->eip, frame->flags);
-	if ((frame->error_code & 0x4) != 0) {
+	if (isUser) {
 		// from user space
 		kprintf("user esp 0x%lx", frame->user_esp);
 	}
