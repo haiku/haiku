@@ -299,10 +299,18 @@ int_bottom_user:
 	movl	IFRAME_vector(%ebp), %eax
 	call	*gInterruptHandlerTable(, %eax, 4)
 
+	// Don't do any kernel exit work, if we actually came from the kernel (but
+	// were already/still prepared for userland), since the iframe in this case
+	// will be a kernel iframe and e.g. trying to set up a signal stack will not
+	// be a very healthy endeavor.
+	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)
+	jne		1f
+
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
 			, THREAD_flags(%edi)
 	jnz		kernel_exit_work
+1:
 
 	cli								// disable interrupts
 
@@ -630,14 +638,14 @@ FUNCTION(x86_vm86_return):
 	cli
 	movl %esi, %esp
 	addl $VM86_IFRAME_sizeof, %esp
-	
+
 	// save old iframe
 	popl	%eax	// old kernel stack top
 	popl	%edi
 	movl	$(VM86_IFRAME_sizeof >> 2), %ecx
 	cld
 	rep movsl
-	
+
 	// adjust kernel_stack_top and tss.esp0
 	movl	%dr3, %edi
 	movl	%eax, THREAD_kernel_stack_top(%edi)
