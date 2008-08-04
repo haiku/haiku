@@ -57,8 +57,7 @@ static inline stack_frame *
 get_current_stack_frame()
 {
 	stack_frame *frame;
-#warning M68K: a6 or a7 ?
-	asm volatile("move.l %%a6,%0" : "=r"(frame));
+	asm volatile("move.l %%fp,%0" : "=r"(frame));
 	return frame;
 }
 
@@ -277,7 +276,66 @@ void *
 arch_debug_get_caller(void)
 {
 	// TODO: implement me
-	return (void *)&arch_debug_get_caller;
+	//return __builtin_frame_address(1);
+	struct stack_frame *frame;
+	//frame = __builtin_frame_address(0);
+	frame = get_current_stack_frame();
+	return (void *)frame->previous->return_address;
+}
+
+
+int32
+arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
+	int32 skipFrames, bool userOnly)
+{
+	struct iframe_stack *frameStack;
+	addr_t framePointer;
+	int32 count = 0;
+	int32 i, num = 0, last = 0;
+
+	// always skip our own frame
+	skipFrames++;
+
+	struct thread* thread = thread_get_current_thread();
+	framePointer = (addr_t)get_current_stack_frame();
+
+	// We don't have a thread pointer early in the boot process
+	if (thread != NULL)
+		frameStack = &thread->arch_info.iframes;
+	else
+		frameStack = &gBootFrameStack;
+
+	while (framePointer != 0 && count < maxCount) {
+		// see if the frame pointer matches the iframe
+		struct iframe *frame = NULL;
+		for (i = 0; i < frameStack->index; i++) {
+			if (framePointer == (((addr_t)frameStack->frames[i] - 8) & ~0xf)) {
+				// it's an iframe
+				frame = frameStack->frames[i];
+				break;
+			}
+		}
+
+		addr_t ip;
+		addr_t nextFrame;
+
+		if (frame) {
+			ip = frame->cpu.pc;
+ 			nextFrame = frame->a[6];
+		} else {
+			if (get_next_frame(framePointer, &nextFrame, &ip) != B_OK)
+				break;
+		}
+
+		if (skipFrames <= 0 && (!userOnly || IS_USER_ADDRESS(framePointer)))
+			returnAddresses[count++] = ip;
+		else
+			skipFrames--;
+
+		framePointer = nextFrame;
+	}
+
+	return count;
 }
 
 
