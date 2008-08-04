@@ -212,8 +212,13 @@ PathHandler::InitCheck() const
 void
 PathHandler::Quit()
 {
+	if (!LockLooper())
+		return;
+
 	BMessenger me(this);
 	me.SendMessage(B_QUIT_REQUESTED);
+
+	UnlockLooper();
 }
 
 
@@ -484,13 +489,16 @@ PathHandler::MessageReceived(BMessage* message)
 		case B_QUIT_REQUESTED:
 		{
 			BLooper* looper = Looper();
+			bool ownsLooper = fOwnsLooper;
 
 			stop_watching(this);
 			looper->RemoveHandler(this);
 			delete this;
 
-			if (fOwnsLooper)
+			if (ownsLooper) {
+				looper->Lock();
 				looper->Quit();
+			}
 
 			return;
 		}
@@ -833,8 +841,7 @@ BPathMonitor::StopWatching(const char* path, BMessenger target)
 	PathHandler* handler = i->second;
 	watcher->handlers.erase(i);
 
-	if (handler->LockLooper())
-		handler->Quit();
+	handler->Quit();
 
 	if (watcher->handlers.empty()) {
 		sWatchers.erase(iterator);
@@ -863,8 +870,7 @@ BPathMonitor::StopWatching(BMessenger target)
 		PathHandler* handler = i->second;
 		watcher->handlers.erase(i);
 
-		if (handler->LockLooper())
-			handler->Quit();
+		handler->Quit();
 	}
 
 	sWatchers.erase(iterator);
