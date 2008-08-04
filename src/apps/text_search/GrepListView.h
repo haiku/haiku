@@ -38,6 +38,9 @@ public:
 class GrepListView : public BOutlineListView {
 public:
 								GrepListView();
+
+			ResultItem*			FindItem(const entry_ref& ref,
+									int32* _index) const;
 };
 
 #endif // GREP_LIST_VIEW_H

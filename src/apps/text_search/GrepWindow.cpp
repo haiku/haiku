@@ -33,18 +33,22 @@
 #include <AppFileInfo.h>
 #include <Alert.h>
 #include <Clipboard.h>
+#include <MessageRunner.h>
 #include <Path.h>
 #include <PathMonitor.h>
 #include <Roster.h>
 #include <String.h>
 #include <UTF8.h>
 
-#include "FolderIterator.h"
+#include "ChangesIterator.h"
 #include "GlobalDefs.h"
 #include "Grepper.h"
+#include "InitialIterator.h"
 #include "Translation.h"
 
 using std::nothrow;
+
+static const bigtime_t kChangesPulseInterval = 500000;
 
 
 GrepWindow::GrepWindow(BMessage* message)
@@ -86,8 +90,10 @@ GrepWindow::GrepWindow(BMessage* message)
 
 	  fGrepper(NULL),
 	  fOldPattern(""),
-
 	  fModel(new (nothrow) Model()),
+	  fLastNodeMonitorEvent(system_time()),
+	  fChangesIterator(NULL),
+	  fChangesPulse(NULL),
 
 	  fFilePanel(NULL)
 {
@@ -223,6 +229,10 @@ void GrepWindow::MessageReceived(BMessage *message)
 
 		case B_PATH_MONITOR:
 			_OnNodeMonitorEvent(message);
+			break;
+
+		case MSG_NODE_MONITOR_PULSE:
+			_OnNodeMonitorPulse();
 			break;
 
 		case MSG_REPORT_FILE_NAME:
@@ -672,6 +682,8 @@ GrepWindow::_SavePrefs()
 void
 GrepWindow::_StartNodeMonitoring()
 {
+	_StopNodeMonitoring();
+
 	BMessenger messenger(this);
 	uint32 fileFlags = B_WATCH_NAME | B_WATCH_STAT;
 	uint32 dirFlags = B_WATCH_DIRECTORY | B_WATCH_NAME;
@@ -679,11 +691,11 @@ GrepWindow::_StartNodeMonitoring()
 	// watch the top level folder
 	BPath path(&fModel->fDirectory);
 	if (path.InitCheck() == B_OK) {
-printf("start monitoring root folder: %s\n", path.Path());
+//printf("start monitoring root folder: %s\n", path.Path());
 		BPrivate::BPathMonitor::StartWatching(path.Path(), dirFlags, messenger);
 	}
 
-	FolderIterator iterator(fModel);
+	InitialIterator iterator(fModel);
 
 	BEntry entry;
 	while (iterator.GetTopEntry(entry)) {
@@ -691,16 +703,22 @@ printf("start monitoring root folder: %s\n", path.Path());
 		if (entry.IsDirectory()) {
 			// subfolder
 			if (iterator.FollowSubdir(entry)) {
-printf("start monitoring folder: %s\n", path.Path());
+//printf("start monitoring folder: %s\n", path.Path());
 				BPrivate::BPathMonitor::StartWatching(path.Path(),
 					dirFlags | B_WATCH_RECURSIVELY, messenger);
 			}
 		} else {
 			// regular file
-printf("start monitoring file: %s\n", path.Path());
+//printf("start monitoring file: %s\n", path.Path());
 			BPrivate::BPathMonitor::StartWatching(path.Path(), fileFlags,
 				messenger);
 		}
+	}
+
+	if (fChangesPulse == NULL) {
+		BMessage message(MSG_NODE_MONITOR_PULSE);
+		fChangesPulse = new BMessageRunner(BMessenger(this), &message,
+			kChangesPulseInterval);
 	}
 }
 
@@ -709,6 +727,10 @@ void
 GrepWindow::_StopNodeMonitoring()
 {
 	BPrivate::BPathMonitor::StopWatching(BMessenger(this));
+	delete fChangesIterator;
+	fChangesIterator = NULL;
+	delete fChangesPulse;
+	fChangesPulse = NULL;
 }
 
 
@@ -721,12 +743,12 @@ GrepWindow::_OnStartCancel()
 	_StopNodeMonitoring();
 
 	if (fModel->fState == STATE_IDLE) {
-		fModel->fState = STATE_SEARCH;
-
 		fSearchResults->MakeEmpty();
-		
+
 		if (fSearchText->TextView()->TextLength() == 0)
 			return;
+
+		fModel->fState = STATE_SEARCH;
 
 		fModel->AddToHistory(fSearchText->Text());
 
@@ -756,7 +778,7 @@ GrepWindow::_OnStartCancel()
 
 		fOldPattern = fSearchText->Text();
 
-		FileIterator* iterator = new (nothrow) FolderIterator(fModel);
+		FileIterator* iterator = new (nothrow) InitialIterator(fModel);
 		fGrepper = new (nothrow) Grepper(fOldPattern.String(), fModel,
 			this, iterator);
 		if (fGrepper != NULL && fGrepper->IsValid())
@@ -770,7 +792,7 @@ GrepWindow::_OnStartCancel()
 				delete fGrepper;
 				fGrepper = NULL;
 			}
-			fModel->fState = STATE_CANCEL;
+			fModel->fState = STATE_IDLE;
 			// TODO: better notification to user
 			fprintf(stderr, "Out of memory.\n");
 		}
@@ -786,7 +808,7 @@ GrepWindow::_OnSearchFinished()
 {
 	fModel->fState = STATE_IDLE;
 
-//	_StartNodeMonitoring();
+	_StartNodeMonitoring();
 
 	delete fGrepper;
 	fGrepper = NULL;
@@ -816,39 +838,102 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 	if (message->FindInt32("opcode", &opCode) != B_OK)
 		return;
 
+	if (fChangesIterator == NULL) {
+		fChangesIterator = new (nothrow) ChangesIterator(fModel);
+		if (fChangesIterator == NULL || !fChangesIterator->IsValid()) {
+			delete fChangesIterator;
+			fChangesIterator = NULL;
+		}
+	}
+
 	switch (opCode) {
 		case B_ENTRY_CREATED:
-printf("B_ENTRY_CREATED\n");
-			break;
 		case B_ENTRY_REMOVED:
-printf("B_ENTRY_REMOVED\n");
+		{
+			const char* name;
+			BString path;
+			if (message->FindString("path", &path) == B_OK
+				&& message->FindString("name", &name) == B_OK) {
+				path << '/' << name;
+				if (opCode == B_ENTRY_CREATED)
+					fChangesIterator->EntryAdded(path.String());
+				else
+					fChangesIterator->EntryRemoved(path.String());
+			}
 			break;
+		}
 		case B_ENTRY_MOVED:
 printf("B_ENTRY_MOVED\n");
+message->PrintToStream();
+			// TODO: If the path is now outside the folder hierarchy, it's just
+			// a "removed" entry. If the move happened within the hierarchy,
+			// it should be a combined removed/added event.
 			break;
 		case B_STAT_CHANGED:
-printf("B_STAT_CHANGED\n");
+		{
+			BString path;
+			if (message->FindString("path", &path) == B_OK)
+				fChangesIterator->EntryChanged(path.String());
 			break;
-		case B_ATTR_CHANGED:
-printf("B_ATTR_CHANGED\n");
-			break;
+		}
 
 		default:
-printf("unkown opcode\n");
 			break;
 	}
 
-	message->PrintToStream();
+	fLastNodeMonitorEvent = system_time();
+}
+
+
+void
+GrepWindow::_OnNodeMonitorPulse()
+{
+	if (fChangesIterator == NULL)
+		return;
+
+	if (system_time() - fLastNodeMonitorEvent < kChangesPulseInterval) {
+		// wait for things to settle down before running the search for changes
+		return;
+	}
+
+	if (fModel->fState != STATE_IDLE) {
+		// An update or search is still in progress. New node monitor messages
+		// may arrive while an update is still running. They should not arrive
+		// during a regular search, but we want to be prepared for that anyways
+		// and check != STATE_IDLE.
+		return;
+	}
+
+	fOldPattern = fSearchText->Text();
+
+	fGrepper = new (nothrow) Grepper(fOldPattern.String(), fModel,
+		this, fChangesIterator);
+	if (fGrepper != NULL && fGrepper->IsValid()) {
+		fGrepper->Start();
+		fChangesIterator = NULL;
+		fModel->fState = STATE_UPDATE;
+	} else {
+		// roll back in case of problems
+		if (fGrepper == NULL)
+			delete fChangesIterator;
+		else {
+			// Grepper owns iterator
+			delete fGrepper;
+			fGrepper = NULL;
+		}
+		fprintf(stderr, "Out of memory.\n");
+	}
 }
 
 
 void
 GrepWindow::_OnReportFileName(BMessage* message)
 {
-	fSearchText->SetText(message->FindString("filename"));
+	if (fModel->fState != STATE_UPDATE)
+		fSearchText->SetText(message->FindString("filename"));
 }
 
-		
+
 void
 GrepWindow::_OnReportResult(BMessage* message)
 {
@@ -856,13 +941,35 @@ GrepWindow::_OnReportResult(BMessage* message)
 	if (message->FindRef("ref", &ref) != B_OK)
 		return;
 
-	BStringItem* item = new ResultItem(ref);
-	fSearchResults->AddItem(item);
-	item->SetExpanded(fModel->fShowContents);
-
 	type_code type;
 	int32 count;
 	message->GetInfo("text", &type, &count);
+
+	BStringItem* item = NULL;
+	if (fModel->fState == STATE_UPDATE) {
+		int32 index;
+		item = fSearchResults->FindItem(ref, &index);
+		if (item) {
+			// remove any sub items
+			while (true) {
+				BListItem* subItem = fSearchResults->FullListItemAt(index + 1);
+				if (subItem && subItem->OutlineLevel() > 0)
+					delete fSearchResults->RemoveItem(index + 1);
+				else
+					break;
+			}
+			if (count == 0) {
+				// remove file item itself
+				delete fSearchResults->RemoveItem(index);
+				return;
+			}
+		}
+	}
+	if (item == NULL) {
+		item = new ResultItem(ref);
+		fSearchResults->AddItem(item);
+		item->SetExpanded(fModel->fShowContents);
+	}
 
 	const char* buf;
 	while (message->FindString("text", --count, &buf) == B_OK) {
@@ -882,8 +989,7 @@ GrepWindow::_OnReportResult(BMessage* message)
 			++ptr;
 		}
 
-		fSearchResults->AddUnder(
-			new BStringItem((const char*)temp), item);
+		fSearchResults->AddUnder(new BStringItem((const char*)temp), item);
 
 		free(temp);
 	}

@@ -28,6 +28,8 @@
 #include "Model.h"
 #include "GrepListView.h"
 
+class BMessageRunner;
+class ChangesIterator;
 class Grepper;
 
 class GrepWindow : public BWindow {
@@ -60,6 +62,7 @@ private:
 			void				_OnStartCancel();
 			void				_OnSearchFinished();
 			void				_OnNodeMonitorEvent(BMessage* message);
+			void				_OnNodeMonitorPulse();
 			void				_OnReportFileName(BMessage* message);
 			void				_OnReportResult(BMessage* message);
 			void				_OnReportError(BMessage* message);
@@ -135,6 +138,8 @@ private:
 			BString				fOldPattern;
 			Model*				fModel;
 			bigtime_t			fLastNodeMonitorEvent;
+			ChangesIterator*	fChangesIterator;
+			BMessageRunner*		fChangesPulse;
 
 			BFilePanel*			fFilePanel;
 };

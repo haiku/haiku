@@ -224,7 +224,7 @@ Grepper::_GrepperThread()
 						message.AddString("text", tempString);
 				}
 
-				if (message.HasString("text"))
+				if (message.HasString("text") || fIterator->NotifyNegatives())
 					fTarget.SendMessage(&message);
 
 				fclose(results);

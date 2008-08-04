@@ -20,8 +20,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
  */
-#ifndef FOLDER_ITERATOR_H
-#define FOLDER_ITERATOR_H
+#ifndef INITIAL_ITERATOR_H
+#define INITIAL_ITERATOR_H
 
 #include <List.h>
 #include <Message.h>
@@ -41,10 +41,10 @@ class Model;
 
 // Provides an interface to retrieve the next file that should be grepped
 // for the search string.
-class FolderIterator : public FileIterator {
+class InitialIterator : public FileIterator {
 public:
-								FolderIterator(const Model* model);
-	virtual						~FolderIterator();
+								InitialIterator(const Model* model);
+	virtual						~InitialIterator();
 
 	virtual	bool				IsValid() const;
 	virtual	bool				GetNextName(char* buffer);
@@ -85,4 +85,4 @@ private:
 			bool				fTextOnly : 1;
 };
 
-#endif // FOLDER_ITERATOR_H
+#endif // INITIAL_ITERATOR_H

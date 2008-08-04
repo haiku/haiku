@@ -2,11 +2,13 @@ SubDir HAIKU_TOP src apps text_search ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
 Application TextSearch :
+	ChangesIterator.cpp
 	FileIterator.cpp
-	FolderIterator.cpp
+	InitialIterator.cpp
 	GrepApp.cpp
 	GrepListView.cpp
 	Grepper.cpp
@@ -14,6 +16,6 @@ Application TextSearch :
 	Model.cpp
 	TextSearch.cpp
 
-	: be tracker textencoding
+	: be tracker textencoding libshared.a
 	: TextSearch.rdef
 ;

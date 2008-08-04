@@ -40,3 +40,21 @@ GrepListView::GrepListView()
 		B_WILL_DRAW | B_NAVIGABLE)
 {
 }
+
+
+ResultItem*
+GrepListView::FindItem(const entry_ref& ref, int32* _index) const
+{
+	int32 count = FullListCountItems();
+	for (int32 i = 0; i < count; i++) {
+		ResultItem* item = dynamic_cast<ResultItem*>(FullListItemAt(i));
+		if (item == NULL)
+			continue;
+		if (item->ref == ref) {
+			*_index = i;
+			return item;
+		}
+	}
+	*_index = -1;
+	return NULL;
+}

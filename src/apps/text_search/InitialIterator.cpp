@@ -21,7 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "FolderIterator.h"
+#include "InitialIterator.h"
 
 #include <new>
 #include <stdio.h>
@@ -37,10 +37,10 @@ using std::nothrow;
 // TODO: stippi: Check if this is a the best place to maintain a global
 // list of files and folders for node monitoring. It should probably monitor
 // every file that was grepped, as well as every visited (sub) folder.
-// For the moment I don't know the life cycle of the FolderIterator object.
+// For the moment I don't know the life cycle of the InitialIterator object.
 
 
-FolderIterator::FolderIterator(const Model* model) 
+InitialIterator::InitialIterator(const Model* model) 
 	: FileIterator(),
 	  fDirectories(10),
 	  fCurrentDir(new (nothrow) BDirectory(&model->fDirectory)),
@@ -61,7 +61,7 @@ FolderIterator::FolderIterator(const Model* model)
 }
 
 
-FolderIterator::~FolderIterator()
+InitialIterator::~InitialIterator()
 {
 	for (int32 i = fDirectories.CountItems() - 1; i >= 0; i--)
 		delete (BDirectory*)fDirectories.ItemAt(i);
@@ -69,14 +69,14 @@ FolderIterator::~FolderIterator()
 
 
 bool
-FolderIterator::IsValid() const
+InitialIterator::IsValid() const
 {
 	return fCurrentDir != NULL;
 }
 
 
 bool
-FolderIterator::GetNextName(char* buffer)
+InitialIterator::GetNextName(char* buffer)
 {
 	BEntry entry;
 	struct stat fileStat;
@@ -110,14 +110,14 @@ FolderIterator::GetNextName(char* buffer)
 
 
 bool
-FolderIterator::NotifyNegatives() const
+InitialIterator::NotifyNegatives() const
 {
 	return false;
 }
 
 
 bool
-FolderIterator::GetTopEntry(BEntry& entry)
+InitialIterator::GetTopEntry(BEntry& entry)
 {
 	// If the user selected one or more files, we must look 
 	// at the "refs" inside the message that was passed into 
@@ -145,7 +145,7 @@ FolderIterator::GetTopEntry(BEntry& entry)
 
 
 bool
-FolderIterator::FollowSubdir(BEntry& entry) const
+InitialIterator::FollowSubdir(BEntry& entry) const
 {
 	if (!fRecurseDirs)
 		return false;
@@ -166,7 +166,7 @@ FolderIterator::FollowSubdir(BEntry& entry) const
 
 
 bool
-FolderIterator::_GetNextEntry(BEntry& entry)
+InitialIterator::_GetNextEntry(BEntry& entry)
 {
 	if (fDirectories.CountItems() == 1)
 		return GetTopEntry(entry);
@@ -176,7 +176,7 @@ FolderIterator::_GetNextEntry(BEntry& entry)
 
 
 bool
-FolderIterator::_GetSubEntry(BEntry& entry)
+InitialIterator::_GetSubEntry(BEntry& entry)
 {
 	if (!fCurrentDir)
 		return false;
@@ -196,7 +196,7 @@ FolderIterator::_GetSubEntry(BEntry& entry)
 
 
 void
-FolderIterator::_ExamineSubdir(BEntry& entry)
+InitialIterator::_ExamineSubdir(BEntry& entry)
 {
 	if (!FollowSubdir(entry))
 		return;
