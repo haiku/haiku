@@ -11,9 +11,11 @@
 #include <new>
 
 #include "fssh_api_wrapper.h"
+#include "fssh_auto_deleter.h"
 
 #else	// !BFS_SHELL
 
+#include <AutoDeleter.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>

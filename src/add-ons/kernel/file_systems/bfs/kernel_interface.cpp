@@ -70,6 +70,11 @@ iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
 	bool partialTransfer, size_t bytesTransferred)
 {
 	Inode* inode = (Inode*)cookie;
+#ifndef BFS_SHELL
+ktrace_printf("bfs iterative_io_finished_hook(): inode: %p, request: %p, "
+"status: %#lx, partial: %d, transferred: %lu", inode, request, status,
+partialTransfer, bytesTransferred);
+#endif
 
 	rw_lock_read_unlock(&inode->Lock());
 	return B_OK;
@@ -450,6 +455,9 @@ bfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
+#ifndef BFS_SHELL
+ktrace_printf("bfs_io(): inode: %p, request: %p", inode, request);
+#endif
 	// We lock the node here and will unlock it in the "finished" hook.
 	rw_lock_read_lock(&inode->Lock());
 
@@ -1123,12 +1131,22 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	file_cookie* cookie = new(std::nothrow) file_cookie;
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
+	ObjectDeleter<file_cookie> cookieDeleter(cookie);
 
 	// initialize the cookie
 	cookie->open_mode = openMode;
 		// needed by e.g. bfs_write() for O_APPEND
 	cookie->last_size = inode->Size();
 	cookie->last_notification = system_time();
+
+	// Disable the file cache, if requested?
+	CObjectDeleter<void> fileCacheEnabler(file_cache_enable);
+	if ((openMode & O_NOCACHE) != 0 && inode->FileCache() != NULL) {
+		status = file_cache_disable(inode->FileCache());
+		if (status != B_OK)
+			return status;
+		fileCacheEnabler.SetTo(inode->FileCache());
+	}
 
 	// Should we truncate the file?
 	if ((openMode & O_TRUNC) != 0) {
@@ -1143,18 +1161,18 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 		inode->WriteLockInTransaction(transaction);
 
 		status_t status = inode->SetFileSize(transaction, 0);
-		if (status >= B_OK)
-			status = inode->WriteBack(transaction);
-
-		if (status < B_OK) {
-			// bfs_free_cookie() is only called if this function is successful
-			delete cookie;
+		if (status < B_OK)
 			return status;
-		}
+
+		status = inode->WriteBack(transaction);
+		if (status < B_OK)
+			return status;
 
 		transaction.Done();
 	}
 
+	fileCacheEnabler.Detach();
+	cookieDeleter.Detach();
 	*_cookie = cookie;
 	return B_OK;
 }
@@ -1305,6 +1323,9 @@ bfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 		FATAL(("check process was aborted!\n"));
 		volume->Allocator().StopChecking(NULL);
 	}
+
+	if ((cookie->open_mode & O_NOCACHE) != 0 && inode->FileCache() != NULL)
+		file_cache_enable(inode->FileCache());
 
 	delete cookie;
 	return B_OK;
