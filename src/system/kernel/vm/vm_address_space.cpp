@@ -39,22 +39,22 @@ _dump_aspace(vm_address_space *aspace)
 {
 	vm_area *area;
 
-	dprintf("dump of address space at %p:\n", aspace);
-	dprintf("id: 0x%lx\n", aspace->id);
-	dprintf("ref_count: %ld\n", aspace->ref_count);
-	dprintf("fault_count: %ld\n", aspace->fault_count);
-	dprintf("translation_map: %p\n", &aspace->translation_map);
-	dprintf("base: 0x%lx\n", aspace->base);
-	dprintf("size: 0x%lx\n", aspace->size);
-	dprintf("change_count: 0x%lx\n", aspace->change_count);
-	dprintf("area_hint: %p\n", aspace->area_hint);
-	dprintf("area_list:\n");
+	kprintf("dump of address space at %p:\n", aspace);
+	kprintf("id: 0x%lx\n", aspace->id);
+	kprintf("ref_count: %ld\n", aspace->ref_count);
+	kprintf("fault_count: %ld\n", aspace->fault_count);
+	kprintf("translation_map: %p\n", &aspace->translation_map);
+	kprintf("base: 0x%lx\n", aspace->base);
+	kprintf("size: 0x%lx\n", aspace->size);
+	kprintf("change_count: 0x%lx\n", aspace->change_count);
+	kprintf("area_hint: %p\n", aspace->area_hint);
+	kprintf("area_list:\n");
 	for (area = aspace->areas; area != NULL; area = area->address_space_next) {
-		dprintf(" area 0x%lx: ", area->id);
-		dprintf("base_addr = 0x%lx ", area->base);
-		dprintf("size = 0x%lx ", area->size);
-		dprintf("name = '%s' ", area->name);
-		dprintf("protection = 0x%lx\n", area->protection);
+		kprintf(" area 0x%lx: ", area->id);
+		kprintf("base_addr = 0x%lx ", area->base);
+		kprintf("size = 0x%lx ", area->size);
+		kprintf("name = '%s' ", area->name);
+		kprintf("protection = 0x%lx\n", area->protection);
 	}
 }
 
@@ -65,7 +65,7 @@ dump_aspace(int argc, char **argv)
 	vm_address_space *aspace;
 
 	if (argc < 2) {
-		dprintf("aspace: not enough arguments\n");
+		kprintf("aspace: not enough arguments\n");
 		return 0;
 	}
 
@@ -76,7 +76,7 @@ dump_aspace(int argc, char **argv)
 
 		aspace = (vm_address_space *)hash_lookup(sAddressSpaceTable, &id);
 		if (aspace == NULL) {
-			dprintf("invalid aspace id\n");
+			kprintf("invalid aspace id\n");
 		} else {
 			_dump_aspace(aspace);
 		}
@@ -92,7 +92,7 @@ dump_aspace_list(int argc, char **argv)
 	vm_address_space *space;
 	struct hash_iterator iter;
 
-	dprintf("   address      id         base         size   area count   "
+	kprintf("   address      id         base         size   area count   "
 		" area size\n");
 
 	hash_open(sAddressSpaceTable, &iter);
@@ -108,7 +108,7 @@ dump_aspace_list(int argc, char **argv)
 				areaSize += area->size;
 			}
 		}
-		dprintf("%p  %6ld   %#010lx   %#10lx   %10ld   %10lld\n",
+		kprintf("%p  %6ld   %#010lx   %#10lx   %10ld   %10lld\n",
 			space, space->id, space->base, space->size, areaCount, areaSize);
 	}
 	hash_close(sAddressSpaceTable, &iter, false);
