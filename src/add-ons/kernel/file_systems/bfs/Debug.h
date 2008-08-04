@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef DEBUG_H
@@ -67,7 +67,7 @@
 	#define REPORT_ERROR(status) \
 		__out("bfs: %s:%d: %s\n", __FUNCTION__, __LINE__, strerror(status));
 	#define RETURN_ERROR(err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); return _status;}
-//	#define FATAL(x) { __out("bfs: "); __out x; sync(); panic("BFS!\n"); }
+//	#define FATAL(x) { panic x; }
 	#define FATAL(x) { __out("bfs: "); __out x; }
 	#define INFORM(x) { __out("bfs: "); __out x; }
 	#define FUNCTION() ;
@@ -88,9 +88,9 @@
 	struct disk_super_block;
 	class Inode;
 	class Volume;
-	
+
 	// some structure dump functions
-	extern void dump_block_run(const char *prefix, block_run &run);
+	extern void dump_block_run(const char *prefix, const block_run &run);
 	extern void dump_super_block(const disk_super_block *superBlock);
 	extern void dump_data_stream(const data_stream *stream);
 	extern void dump_inode(const bfs_inode *inode);

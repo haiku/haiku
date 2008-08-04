@@ -365,7 +365,7 @@ dump_block_run_array(int argc, char** argv)
 		return 0;
 	}
 
-	block_run* runs = (block_run*)parse_expression(argv[1]);
+	const block_run* runs = (const block_run*)parse_expression(argv[1]);
 	uint32 count = 16;
 	if (argc > 2)
 		count = parse_expression(argv[2]);
@@ -427,6 +427,7 @@ remove_debugger_commands()
 	remove_debugger_command("bfs_btree_header", dump_bplustree_header);
 	remove_debugger_command("bfs_btree_node", dump_bplustree_node);
 	remove_debugger_command("bfs", dump_volume);
+	remove_debugger_command("bfs_block_runs", dump_block_run_array);
 }
 
 
