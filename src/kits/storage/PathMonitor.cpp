@@ -189,7 +189,8 @@ PathHandler::PathHandler(const char* path, uint32 flags, BMessenger target)
 
 	fStatus = _AddDirectory(nodeRef);
 
-	// TODO: work-around for existing files (should not watch the directory in this case)
+	// TODO: work-around for existing files (should not watch the directory in
+	// this case)
 	BEntry entry(path);
 	if (entry.Exists() && !entry.IsDirectory())
 		_AddFile(entry);
@@ -223,7 +224,8 @@ PathHandler::Dump()
 	printf("WATCHING DIRECTORIES:\n");
 	DirectorySet::iterator i = fDirectories.begin();
 	for (; i != fDirectories.end(); i++) {
-		printf("  %ld:%Ld (%s)\n", i->node.device, i->node.node, i->contained ? "contained" : "-");
+		printf("  %ld:%Ld (%s)\n", i->node.device, i->node.node, i->contained
+			? "contained" : "-");
 	}
 
 	printf("WATCHING FILES:\n");
@@ -539,7 +541,8 @@ PathHandler::_IsContained(BEntry& entry) const
 
 
 bool
-PathHandler::_HasDirectory(const node_ref& nodeRef, bool* _contained /* = NULL */) const
+PathHandler::_HasDirectory(const node_ref& nodeRef,
+	bool* _contained /* = NULL */) const
 {
 	watched_directory directory;
 	directory.node = nodeRef;

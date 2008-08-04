@@ -18,17 +18,19 @@
 namespace BPrivate {
 
 class BPathMonitor {
-	public:
-		static status_t StartWatching(const char* path, uint32 flags, BMessenger target);
+public:
+	static	status_t			StartWatching(const char* path, uint32 flags,
+									BMessenger target);
 
-		static status_t StopWatching(const char* path, BMessenger target);
-		static status_t StopWatching(BMessenger target);
+	static	status_t			StopWatching(const char* path,
+									BMessenger target);
+	static	status_t			StopWatching(BMessenger target);
 
-	private:
-		BPathMonitor();
-		~BPathMonitor();
+private:
+								BPathMonitor();
+								~BPathMonitor();
 
-		static status_t _InitIfNeeded();
+	static	status_t			_InitIfNeeded();
 };
 
 }	// namespace BPrivate
