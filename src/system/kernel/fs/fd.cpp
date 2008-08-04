@@ -498,8 +498,8 @@ deselect_select_infos(file_descriptor* descriptor, select_info* infos)
 status_t
 select_fd(int32 fd, struct select_info* info, bool kernel)
 {
-	TRACE(("select_fd(fd = %d, info = %p (%p), 0x%x)\n", fd, info,
-		info->sync, info.selected_events));
+	TRACE(("select_fd(fd = %ld, info = %p (%p), 0x%x)\n", fd, info,
+		info->sync, info->selected_events));
 
 	FDGetter fdGetter;
 		// define before the context locker, so it will be destroyed after it
@@ -577,8 +577,8 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 status_t
 deselect_fd(int32 fd, struct select_info* info, bool kernel)
 {
-	TRACE(("deselect_fd(fd = %d, info = %p (%p), 0x%x)\n", fd, info,
-		info->sync, info.selected_events));
+	TRACE(("deselect_fd(fd = %ld, info = %p (%p), 0x%x)\n", fd, info,
+		info->sync, info->selected_events));
 
 	if (info->selected_events == 0)
 		return B_OK;
