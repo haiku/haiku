@@ -34,6 +34,7 @@
 #include <Alert.h>
 #include <Clipboard.h>
 #include <Path.h>
+#include <PathMonitor.h>
 #include <Roster.h>
 #include <String.h>
 #include <UTF8.h>
@@ -155,133 +156,137 @@ void GrepWindow::MessageReceived(BMessage *message)
 		case B_ABOUT_REQUESTED:
 			_OnAboutRequested();
 			break;
-			
+
 		case MSG_NEW_WINDOW:
 			_OnNewWindow();
 			break;
-		
+
 		case B_SIMPLE_DATA:
 			_OnFileDrop(message);
 			break;
-			
+
 		case MSG_OPEN_PANEL:
 			_OnOpenPanel();
 			break;
-			
+
 		case MSG_REFS_RECEIVED:
 			_OnRefsReceived(message);
 			break;
-			
+
 		case B_CANCEL:
 			_OnOpenPanelCancel();
 			break;
-			
+
 		case MSG_RECURSE_LINKS:
 			_OnRecurseLinks();
 			break;
-			
+
 		case MSG_RECURSE_DIRS:
 			_OnRecurseDirs();
 			break;
-			
+
 		case MSG_SKIP_DOT_DIRS:
 			_OnSkipDotDirs();
 			break;
-			
+
 		case MSG_CASE_SENSITIVE:
 			_OnCaseSensitive();
 			break;
-			
+
 		case MSG_ESCAPE_TEXT:
 			_OnEscapeText();
 			break;
-			
+
 		case MSG_TEXT_ONLY:
 			_OnTextOnly();
 			break;
-			
+
 		case MSG_INVOKE_PE:
 			_OnInvokePe();
 			break;
-			
+
 		case MSG_SEARCH_TEXT:
 			_OnSearchText();
 			break;
-			
+
 		case MSG_SELECT_HISTORY:
 			_OnHistoryItem(message);
 			break;
-			
+
 		case MSG_START_CANCEL:
 			_OnStartCancel();
 			break;
-			
+
 		case MSG_SEARCH_FINISHED:
 			_OnSearchFinished();
 			break;
-			
+
+		case B_PATH_MONITOR:
+			_OnNodeMonitorEvent(message);
+			break;
+
 		case MSG_REPORT_FILE_NAME:
 			_OnReportFileName(message);
 			break;
-			
+
 		case MSG_REPORT_RESULT:
 			_OnReportResult(message);
 			break;
-			
+
 		case MSG_REPORT_ERROR:
 			_OnReportError(message);
 			break;
-			
+
 		case MSG_SELECT_ALL:
 			_OnSelectAll(message);
 			break;
-			
+
 		case MSG_TRIM_SELECTION:
 			_OnTrimSelection();
 			break;
-			
+
 		case MSG_COPY_TEXT:
 			_OnCopyText();
 			break;
-			
+
 		case MSG_SELECT_IN_TRACKER:
 			_OnSelectInTracker();
 			break;
-			
+
 		case MSG_MENU_SHOW_LINES:
 			_OnMenuShowLines();
 			break;
-			
+
 		case MSG_CHECKBOX_SHOW_LINES:
 			_OnCheckboxShowLines();
 			break;
-		
+
 		case MSG_OPEN_SELECTION:
 			// fall through
 		case MSG_INVOKE_ITEM:
 			_OnInvokeItem();
 			break;
-			
+
 		case MSG_QUIT_NOW:
 			_OnQuitNow();
 			break;
-		
+
 		case 'utf8':
 			fModel->fEncoding = 0;
 			break;
-			
+
 		case B_SJIS_CONVERSION:
 			fModel->fEncoding = B_SJIS_CONVERSION;
 			break;
-			
+
 		case B_EUC_CONVERSION:
 			fModel->fEncoding = B_EUC_CONVERSION;
 			break;
-			
+
 		case B_JIS_CONVERSION:
 			fModel->fEncoding = B_JIS_CONVERSION;
 			break;
-		
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -292,6 +297,7 @@ void GrepWindow::MessageReceived(BMessage *message)
 void
 GrepWindow::Quit()
 {
+	_StopNodeMonitoring();
 	_SavePrefs();
 
 	// TODO: stippi: Looks like this could be done
@@ -663,12 +669,57 @@ GrepWindow::_SavePrefs()
 }
 
 
+void
+GrepWindow::_StartNodeMonitoring()
+{
+	BMessenger messenger(this);
+	uint32 fileFlags = B_WATCH_NAME | B_WATCH_STAT;
+	uint32 dirFlags = B_WATCH_DIRECTORY | B_WATCH_NAME;
+
+	// watch the top level folder
+	BPath path(&fModel->fDirectory);
+	if (path.InitCheck() == B_OK) {
+printf("start monitoring root folder: %s\n", path.Path());
+		BPrivate::BPathMonitor::StartWatching(path.Path(), dirFlags, messenger);
+	}
+
+	FolderIterator iterator(fModel);
+
+	BEntry entry;
+	while (iterator.GetTopEntry(entry)) {
+		path.SetTo(&entry);
+		if (entry.IsDirectory()) {
+			// subfolder
+			if (iterator.FollowSubdir(entry)) {
+printf("start monitoring folder: %s\n", path.Path());
+				BPrivate::BPathMonitor::StartWatching(path.Path(),
+					dirFlags | B_WATCH_RECURSIVELY, messenger);
+			}
+		} else {
+			// regular file
+printf("start monitoring file: %s\n", path.Path());
+			BPrivate::BPathMonitor::StartWatching(path.Path(), fileFlags,
+				messenger);
+		}
+	}
+}
+
+
+void
+GrepWindow::_StopNodeMonitoring()
+{
+	BPrivate::BPathMonitor::StopWatching(BMessenger(this));
+}
+
+
 // #pragma mark - events
 
 
 void
 GrepWindow::_OnStartCancel()
 {
+	_StopNodeMonitoring();
+
 	if (fModel->fState == STATE_IDLE) {
 		fModel->fState = STATE_SEARCH;
 
@@ -714,8 +765,11 @@ GrepWindow::_OnStartCancel()
 			// roll back in case of problems
 			if (fGrepper == NULL)
 				delete iterator;
-			delete fGrepper;
-			fGrepper = NULL;
+			else {
+				// Grepper owns iterator
+				delete fGrepper;
+				fGrepper = NULL;
+			}
 			fModel->fState = STATE_CANCEL;
 			// TODO: better notification to user
 			fprintf(stderr, "Out of memory.\n");
@@ -732,6 +786,8 @@ GrepWindow::_OnSearchFinished()
 {
 	fModel->fState = STATE_IDLE;
 
+//	_StartNodeMonitoring();
+
 	delete fGrepper;
 	fGrepper = NULL;
 
@@ -740,16 +796,49 @@ GrepWindow::_OnSearchFinished()
 	fPreferencesMenu->SetEnabled(true);
 	fHistoryMenu->SetEnabled(true);
 	fEncodingMenu->SetEnabled(true);
-	
+
 	fButton->SetLabel(_T("Search"));
 	fButton->SetEnabled(true);
 	fSearch->SetEnabled(true);
-	
+
 	fSearchText->SetEnabled(true);
 	fSearchText->MakeFocus(true);
 	fSearchText->SetText(fOldPattern.String());
 	fSearchText->TextView()->SelectAll();
 	fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
+}
+
+
+void
+GrepWindow::_OnNodeMonitorEvent(BMessage* message)
+{
+	int32 opCode;
+	if (message->FindInt32("opcode", &opCode) != B_OK)
+		return;
+
+	switch (opCode) {
+		case B_ENTRY_CREATED:
+printf("B_ENTRY_CREATED\n");
+			break;
+		case B_ENTRY_REMOVED:
+printf("B_ENTRY_REMOVED\n");
+			break;
+		case B_ENTRY_MOVED:
+printf("B_ENTRY_MOVED\n");
+			break;
+		case B_STAT_CHANGED:
+printf("B_STAT_CHANGED\n");
+			break;
+		case B_ATTR_CHANGED:
+printf("B_ATTR_CHANGED\n");
+			break;
+
+		default:
+printf("unkown opcode\n");
+			break;
+	}
+
+	message->PrintToStream();
 }
 
 

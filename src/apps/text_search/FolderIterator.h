@@ -47,16 +47,18 @@ public:
 	virtual						~FolderIterator();
 
 	virtual	bool				IsValid() const;
-
-	// Returns the full path name of the next file.
 	virtual	bool				GetNextName(char* buffer);
+	virtual	bool				NotifyNegatives() const;
+
+	// Looks for the next entry in the top-level dir.
+			bool				GetTopEntry(BEntry& entry);
+
+	// Should this subfolder be followed?
+			bool				FollowSubdir(BEntry& entry) const;
 
 private:
 	// Looks for the next entry.
 			bool				_GetNextEntry(BEntry& entry);
-
-	// Looks for the next entry in the top-level dir.
-			bool				_GetTopEntry(BEntry& entry);
 
 	// Looks for the next entry in a subdir.
 			bool				_GetSubEntry(BEntry& entry);

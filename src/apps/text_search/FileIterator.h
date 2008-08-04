@@ -36,7 +36,10 @@ public:
 
 	// Returns the full path name of the next file.
 	virtual	bool				GetNextName(char* buffer) = 0;
-	
+
+	// Tells the Grepper whether the targets wants to know about negative hits.
+	virtual	bool				NotifyNegatives() const = 0;
+
 protected:
 	// Determines whether we can grep a file.
 			bool				_ExamineFile(BEntry& entry, char* buffer,

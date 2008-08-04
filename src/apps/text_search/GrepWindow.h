@@ -53,9 +53,13 @@ private:
 	
 			void				_LoadPrefs();
 			void				_SavePrefs();
-	
+
+			void				_StartNodeMonitoring();
+			void				_StopNodeMonitoring();
+
 			void				_OnStartCancel();
 			void				_OnSearchFinished();
+			void				_OnNodeMonitorEvent(BMessage* message);
 			void				_OnReportFileName(BMessage* message);
 			void				_OnReportResult(BMessage* message);
 			void				_OnReportError(BMessage* message);
@@ -129,8 +133,8 @@ private:
 
 			Grepper*			fGrepper;
 			BString				fOldPattern;
-
 			Model*				fModel;
+			bigtime_t			fLastNodeMonitorEvent;
 
 			BFilePanel*			fFilePanel;
 };

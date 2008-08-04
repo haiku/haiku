@@ -109,21 +109,15 @@ FolderIterator::GetNextName(char* buffer)
 }
 
 
-// #pragma mark - private
-
-
 bool
-FolderIterator::_GetNextEntry(BEntry& entry)
+FolderIterator::NotifyNegatives() const
 {
-	if (fDirectories.CountItems() == 1)
-		return _GetTopEntry(entry);
-	else
-		return _GetSubEntry(entry);
+	return false;
 }
 
 
 bool
-FolderIterator::_GetTopEntry(BEntry& entry)
+FolderIterator::GetTopEntry(BEntry& entry)
 {
 	// If the user selected one or more files, we must look 
 	// at the "refs" inside the message that was passed into 
@@ -151,6 +145,37 @@ FolderIterator::_GetTopEntry(BEntry& entry)
 
 
 bool
+FolderIterator::FollowSubdir(BEntry& entry) const
+{
+	if (!fRecurseDirs)
+		return false;
+
+	if (fSkipDotDirs) {
+		char nameBuf[B_FILE_NAME_LENGTH];
+		if (entry.GetName(nameBuf) == B_OK) {
+			if (*nameBuf == '.')
+				return false;
+		}
+	}
+
+	return true;
+}
+
+
+// #pragma mark - private
+
+
+bool
+FolderIterator::_GetNextEntry(BEntry& entry)
+{
+	if (fDirectories.CountItems() == 1)
+		return GetTopEntry(entry);
+	else
+		return _GetSubEntry(entry);
+}
+
+
+bool
 FolderIterator::_GetSubEntry(BEntry& entry)
 {
 	if (!fCurrentDir)
@@ -173,16 +198,8 @@ FolderIterator::_GetSubEntry(BEntry& entry)
 void
 FolderIterator::_ExamineSubdir(BEntry& entry)
 {
-	if (!fRecurseDirs)
+	if (!FollowSubdir(entry))
 		return;
-
-	if (fSkipDotDirs) {
-		char nameBuf[B_FILE_NAME_LENGTH];
-		if (entry.GetName(nameBuf) == B_OK) {
-			if (*nameBuf == '.')
-				return;
-		}
-	}
 
 	BDirectory* dir = new (nothrow) BDirectory(&entry);
 	if (dir == NULL || dir->InitCheck() != B_OK || !fDirectories.AddItem(dir)) {
