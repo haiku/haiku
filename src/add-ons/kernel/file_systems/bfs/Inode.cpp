@@ -1568,7 +1568,7 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 		// blocks we need to allocate may be different from the one we request
 		// from the block allocator
 
-	// Should we preallocate some blocks (currently, always 64k)?
+	// Should we preallocate some blocks?
 	// Attributes, attribute directories, and long symlinks usually won't get
 	// that big, and should stay close to the inode - preallocating could be
 	// counterproductive.
@@ -1576,8 +1576,24 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 	// well.
 	if (!IsAttribute() && !IsAttributeDirectory() && !IsSymLink()
 		&& blocksRequested < (65536 >> fVolume->BlockShift())
-		&& fVolume->FreeBlocks() > 128)
-		blocksRequested = 65536 >> fVolume->BlockShift();
+		&& fVolume->FreeBlocks() > 128) {
+		// preallocate 64 KB at minimum
+		if (IsFile()) {
+			// request preallocated blocks depending on the file size
+			if (size < 1 * 1024 * 1024) {
+				// preallocate 64 KB for file sizes < 1 MB
+				blocksRequested = 65536 >> fVolume->BlockShift();
+			} else if (size < 32 * 1024 * 1024) {
+				// preallocate 512 KB for file sizes between 1 MB and 32 MB
+				blocksRequested = (512 * 1024) >> fVolume->BlockShift();
+			} else {
+				// preallocate 1/16 of the file size (ie. 4 MB for 64 MB,
+				// 64 MB for 1 GB)
+				blocksRequested = size >> (fVolume->BlockShift() + 4);
+			}
+		} else
+			blocksRequested = 65536 >> fVolume->BlockShift();
+	}
 
 	while (blocksNeeded > 0) {
 		// the requested blocks do not need to be returned with a
