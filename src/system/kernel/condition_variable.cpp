@@ -113,8 +113,8 @@ status_t
 ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 {
 	if (!are_interrupts_enabled()) {
-		panic("wait_for_condition_variable_entry() called with interrupts "
-			"disabled");
+		panic("ConditionVariableEntry::Wait() called with interrupts "
+			"disabled, entry: %p, variable: %p", this, fVariable);
 		return B_ERROR;
 	}
 
