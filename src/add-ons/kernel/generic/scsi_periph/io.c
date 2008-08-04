@@ -82,7 +82,8 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 			// don't allow transfer cross the 24 bit address limit
 			// (I'm not sure whether this is allowed, but this way we
 			// are sure to not ask for trouble)
-			num_blocks = min(num_blocks, 0x100000 - pos);
+			if (pos < 0x100000)
+				num_blocks = min(num_blocks, 0x100000 - pos);
 		}
 
 		num_bytes = num_blocks * block_size;
@@ -226,7 +227,7 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 
 	request->flags = 0;
 
-	if (cmd->flags & B_RAW_DEVICE_DATA_IN) 
+	if (cmd->flags & B_RAW_DEVICE_DATA_IN)
 		request->flags |= SCSI_DIR_IN;
 	else if (cmd->data_length)
 		request->flags |= SCSI_DIR_OUT;
