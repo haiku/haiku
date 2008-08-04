@@ -769,7 +769,7 @@ create_team_struct(const char *name, bool kernel)
 		return NULL;
 
 	// publish dead/stopped/continued children condition vars
-	team->dead_children->condition_variable.Publish(team->dead_children,
+	team->dead_children->condition_variable.Init(team->dead_children,
 		"team children");
 
 	// keep all allocated structures
@@ -786,8 +786,6 @@ create_team_struct(const char *name, bool kernel)
 static void
 delete_team_struct(struct team *team)
 {
-	team->dead_children->condition_variable.Unpublish();
-
 	while (death_entry* threadDeathEntry = (death_entry*)list_remove_head_item(
 			&team->dead_threads)) {
 		free(threadDeathEntry);
@@ -1756,7 +1754,7 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 		ConditionVariableEntry deadWaitEntry;
 
 		if (status == B_WOULD_BLOCK && (flags & WNOHANG) == 0)
-			deadWaitEntry.Add(team->dead_children);
+			team->dead_children->condition_variable.Add(&deadWaitEntry);
 
 		locker.Unlock();
 
