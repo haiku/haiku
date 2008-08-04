@@ -209,6 +209,8 @@ public:
 			status_t	SetMinimalCommitment(off_t commitment);
 			status_t	Resize(off_t newSize);
 
+			status_t	FlushAndRemoveAllPages();
+
 			// for debugging only
 			mutex*		GetLock()
 							{ return &fLock; }
