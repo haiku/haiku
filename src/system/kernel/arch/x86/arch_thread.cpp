@@ -170,7 +170,7 @@ x86_next_page_directory(struct thread *from, struct thread *to)
 		// the one we're switching to is kernel space
 		return i386_translation_map_get_pgdir(&vm_kernel_address_space()->translation_map);
 	}
-	
+
 	return i386_translation_map_get_pgdir(&to->team->address_space->translation_map);
 }
 
@@ -439,6 +439,11 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *action,
 	int signal, int signalMask)
 {
 	struct iframe *frame = get_current_iframe();
+	if (!IFRAME_IS_USER(frame)) {
+		panic("arch_setup_signal_frame(): No user iframe!");
+		return B_BAD_VALUE;
+	}
+
 	uint32 *signalCode;
 	uint32 *userRegs;
 	struct vregs regs;
@@ -473,7 +478,7 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *action,
 	regs._reserved_2[1] = frame->esi;
 	regs._reserved_2[2] = frame->ebp;
 	i386_fnsave((void *)(&regs.xregs));
-	
+
 	userStack -= (sizeof(struct vregs) + 3) / 4;
 	userRegs = userStack;
 	status = user_memcpy(userRegs, &regs, sizeof(regs));
