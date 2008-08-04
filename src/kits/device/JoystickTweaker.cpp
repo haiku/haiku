@@ -126,11 +126,11 @@ _BJoystickTweaker::get_info(_joystick_info* info,
 	
 	FILE *file = fopen(str.String(), "r");
 	if (file != NULL) {
-		char line [STRINGLENGTHCPY]; /* or other suitable maximum line size */
-		while (fgets ( line, sizeof line, file ) != NULL ) { /* read a line */
+		char line [STRINGLENGTHCPY];
+		while (fgets ( line, sizeof line, file ) != NULL ) {
 			int len = strlen(line);
-    		if (len > 0 && line[len-1] == '\n')  // if there's a newline
-        		line[len-1] = '\0';          // truncate the string
+    		if (len > 0 && line[len-1] == '\n')
+        		line[len-1] = '\0';
 			BuildFromJoystickDesc(line, info);
 		}
 		fclose(file);
@@ -155,23 +155,19 @@ _BJoystickTweaker::BuildFromJoystickDesc(char *string, _joystick_info* info)
 		strncpy(info->controller_name, str.String(), STRINGLENGTHCPY);
 	} else if (str.IFindFirst("num_axes") != -1) {
 		str.RemoveFirst("num_axes = ");
-		//strncpy(info->num_axes, str.String(), STRINGLENGTHCPY);
-		info->num_axes = atoi(str.String());
+		//info->num_axes = atoi(str.String());
 		//LOG("%s\n", str.String());
 	} else if (str.IFindFirst("num_hats") != -1) {
 		str.RemoveFirst("num_hats = ");
-		info->num_hats = atoi(str.String());
-		//strncpy(info->num_hats, str.String(), STRINGLENGTHCPY);
+		//info->num_hats = atoi(str.String());
 		//LOG("%s\n", str.String());
 	} else if (str.IFindFirst("num_buttons") != -1) {
 		str.RemoveFirst("num_buttons = ");
-		info->num_buttons = atoi(str.String());
-		//strncpy(info->num_buttons, str.String(), STRINGLENGTHCPY);
+		//info->num_buttons = atoi(str.String());
 		//LOG("%s\n", str.String());
 	} else if (str.IFindFirst("num_sticks") != -1) {
 		str.RemoveFirst("num_sticks = ");
-		info->num_sticks = atoi(str.String());
-		//strncpy(info->num_sticks, str.String(), STRINGLENGTHCPY);
+		//info->num_sticks = atoi(str.String());
 		//LOG("%s\n", str.String());
 	} else {
 	//	LOG("Path = %s\n", str->String());

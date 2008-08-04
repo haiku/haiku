@@ -21,6 +21,8 @@ __8JoyCalibG5BRectR9BJoystickP7BWindow:
 #include <fcntl.h>
 #include <stdio.h>
 
+#include <sys/ioctl.h>
+
 #include "Joystick.h"
 
 #ifdef DEBUG
@@ -112,6 +114,10 @@ BJoystick::Open(const char *portName, bool enter_enhanced)
 	_BJoystickTweaker jt(*this);
 	jt.get_info(m_info, portName);
 	
+	LOG("ioctl - %d\n", m_info->num_buttons);
+	ioctl(ffd, B_JOYSTICK_SET_DEVICE_MODULE, m_info);
+	ioctl(ffd, B_JOYSTICK_GET_DEVICE_MODULE, m_info);
+	LOG("ioctl - %d\n", m_info->num_buttons);
 	if (ffd >= 0) {
 		return ffd;
 	} else		
@@ -161,19 +167,21 @@ status_t
 BJoystick::GetDeviceName(int32 n, char *name, size_t bufSize)
 {
 	CALLED();
-	status_t result = B_ERROR;	
 	BString *temp = new BString();
-	if (_fDevices != NULL)
+	if (_fDevices != NULL && _fDevices->CountItems() > n)
 		temp = static_cast<BString*>(_fDevices->ItemAt(n));
+	else
+		return B_BAD_INDEX;
 
 	if (temp != NULL && name != NULL) {
+		if(temp->Length() > bufSize)
+			return B_NAME_TOO_LONG;
 		strncpy(name, temp->String(), bufSize);
 		name[bufSize - 1] = '\0';
-		result = B_OK;
+		LOG("Device Name = %s\n", name);
+		return B_OK;
 	}
-	
-	LOG("Device Name = %s\n", name);
-	return result;
+	return B_ERROR;
 }
 
 
@@ -254,7 +262,11 @@ status_t
 BJoystick::EnableCalibration(bool calibrates)
 {
 	CALLED();
-	return m_info->calibration_enable = calibrates;	
+	if(ffd >= 0) {
+		m_info->calibration_enable = calibrates;
+		return B_OK;
+	} else
+		return B_NO_INIT;
 }
 
 
@@ -263,6 +275,7 @@ BJoystick::SetMaxLatency(bigtime_t max_latency)
 {
 	CALLED();
 	m_info->max_latency = max_latency;
+	 //else B_ERROR (when?)
 	return B_OK;
 }
 
@@ -272,7 +285,7 @@ status_t
 BJoystick::GetAxisNameAt(int32 index, BString *out_name)
 {
 	CALLED();
-	return B_ERROR;
+	return B_BAD_INDEX;
 }
 
 
@@ -280,7 +293,7 @@ status_t
 BJoystick::GetHatNameAt(int32 index, BString *out_name)
 {
 	CALLED();
-	return B_ERROR;
+	return B_BAD_INDEX;
 }
 
 
@@ -288,7 +301,7 @@ status_t
 BJoystick::GetButtonNameAt(int32 index, BString *out_name)
 {
 	CALLED();
-	return B_ERROR;
+	return B_BAD_INDEX;
 }
 
 
@@ -296,7 +309,7 @@ status_t
 BJoystick::GetAxisValues(int16 *out_values, int32 for_stick)
 {
 	CALLED();
-	return B_ERROR;
+	return B_BAD_VALUE;
 }
 
 
@@ -304,7 +317,7 @@ status_t
 BJoystick::GetHatValues(uint8 *out_hats, int32 for_stick)
 {
 	CALLED();
-	return B_ERROR;
+	return B_BAD_VALUE;
 }
 
 
@@ -320,7 +333,10 @@ status_t
 BJoystick::Update(void)
 {
 	CALLED();
-	return B_ERROR;
+	if(ffd >= 0) {
+		return B_OK;
+	} else
+		return B_ERROR;
 }
 
 
