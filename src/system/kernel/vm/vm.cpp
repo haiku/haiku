@@ -4149,7 +4149,8 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 		}
 	}
 
-	vm_put_address_space(addressSpace);
+	if (addressSpace != NULL)
+		vm_put_address_space(addressSpace);
 
 	return B_HANDLED_INTERRUPT;
 }
