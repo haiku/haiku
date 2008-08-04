@@ -306,26 +306,22 @@ device_added(const usb_device* dev, void** cookie)
 					new_bt_dev->intr_in_ep = ep;
 					new_bt_dev->max_packet_size_intr_in = ep->descr->max_packet_size;
 					flowf("INT in\n");							
-				} else 
-				{
-					;
+				} else {
 					flowf("INT out\n");
 				}
 			break;
 
 			case USB_ENDPOINT_ATTR_BULK:
-				if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
-				{
+				if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)	{
 					new_bt_dev->bulk_in_ep  = ep;
 					new_bt_dev->max_packet_size_bulk_in = ep->descr->max_packet_size;;
 					flowf("BULK int\n");
-				} else
-				{
+				} else	{
 					new_bt_dev->bulk_out_ep = ep;
 					new_bt_dev->max_packet_size_bulk_out = ep->descr->max_packet_size;;
 					flowf("BULK out\n");
 				}
-			break;			
+			break;
 		}
 	}
 	
@@ -442,41 +438,39 @@ device_open(const char *name, uint32 flags, void **cookie)
 	acquire_sem(bdev->lock);
 	// TX structures 			
 	for (i = 0; i < BT_DRIVER_TXCOVERAGE; i++) {
-		list_init(&bdev->nbuffersTx[i]);		
-		bdev->nbuffersPendingTx[i] = 0;		
+		list_init(&bdev->nbuffersTx[i]);
+		bdev->nbuffersPendingTx[i] = 0;
 	}
-	
+
 	// RX structures
 	bdev->eventRx = NULL;
 	for (i = 0; i < BT_DRIVER_RXCOVERAGE; i++) {
 		bdev->nbufferRx[i] = NULL;
 	}
-	
-	
+
 	// dumping the USB frames	
     init_room(&bdev->eventRoom);
     init_room(&bdev->aclRoom);
     //init_room(new_bt_dev->scoRoom);
-    
-   	list_init(&bdev->snetBufferRecycleTrash);		
-    			
+
+   	list_init(&bdev->snetBufferRecycleTrash);
+
 	// Allocate set and register the HCI device
 	if (btDevices != NULL) {
 		struct net_device* ndev;
 		//	TODO: Fill the transport descriptor
 	    err = btDevices->init_device(bdev->name, &ndev);
-	    
+
     	if ( err == B_OK ) {
     		hdev = ndev->index;
     		bdev->ndev = ndev;
  		} else
 	        hdev = bdev->num; /* XXX: Lets try to go on*/
-    }
-    else {
+    } else {
 	        hdev = bdev->num; /* XXX: Lets try to go on*/
-    }    	
+    }
 
-	bdev->hdev = hdev;		
+	bdev->hdev = hdev;
 
 	*cookie = bdev;
 	release_sem(bdev->lock);
@@ -553,8 +547,7 @@ device_free (void *cookie)
 
 		/* GotoLowPower */
 		// interesting .....
-	}
-	else {
+	} else {
 		/* The last client has closed, and the device is no longer
 		   connected, so remove it from the list. */	   
 	}
@@ -604,12 +597,12 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 			(*(size_t**)&params)++;
 #endif			
 		   	
-		   	// TODO: Reuse from some TXcompleted queue		    	   		    
+		   	// TODO: Reuse from some TXcompleted queue
 		    snbuf = snb_create(size);
 		    snb_put(snbuf, params, size);
 			
 			err = submit_tx_command(bdev, snbuf);
-			debugf("device launched %ld\n", err);				    		
+			debugf("device launched %ld\n", err);
 		break;
 		
 		case BT_UP:
@@ -641,7 +634,7 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 			flowf("device launched\n");
 		break;
 		
-		case GET_STATICS:
+		case GET_STATS:
 		    memcpy(params, &bdev->stat, sizeof(bt_hci_statistics));
 		    err = B_OK;
 		break;
@@ -668,7 +661,7 @@ static status_t
 device_read(void *cookie, off_t pos, void *buf, size_t *count)
 {
 	debugf("Reading... count = %ld\n", *count);
-		
+
 	*count = 0;
 	return B_OK;
 }
@@ -810,10 +803,8 @@ publish_devices(void)
 	}
 	
 	acquire_sem(dev_table_sem);
-	for (j = 0; j < MAX_BT_GENERIC_USB_DEVICES; j++) 
-	{
-		if (bt_usb_devices[j] != NULL && bt_usb_devices[j]->connected)
-		{
+	for (j = 0; j < MAX_BT_GENERIC_USB_DEVICES; j++) {
+		if (bt_usb_devices[j] != NULL && bt_usb_devices[j]->connected) {
 			str = strdup(bt_usb_devices[j]->name);
 			if (str) {
 				publish_names[i++] = str;
@@ -842,16 +833,16 @@ publish_devices(void)
 
 
 static device_hooks hooks = {
-	device_open, 			
-	device_close, 			
-	device_free,			
-	device_control, 		
-	device_read,			
+	device_open,
+	device_close,
+	device_free,
+	device_control,
+	device_read,
 	device_write,
 	NULL,
 	NULL,
 	NULL,
-	NULL		 
+	NULL
 };
 
 
