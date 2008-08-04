@@ -810,9 +810,16 @@ bfs_create(fs_volume* _volume, fs_vnode* _directory, const char* name,
 
 	Transaction transaction(volume, directory->BlockNumber());
 
+	Inode* inode;
 	bool created;
 	status_t status = Inode::Create(transaction, directory, name,
-		S_FILE | (mode & S_IUMSK), openMode, 0, &created, _vnodeID);
+		S_FILE | (mode & S_IUMSK), openMode, 0, &created, _vnodeID, &inode);
+
+	// Disable the file cache, if requested?
+	if (status == B_OK && (openMode & O_NOCACHE) != 0
+		&& inode->FileCache() != NULL) {
+		status = file_cache_disable(inode->FileCache());
+	}
 
 	if (status >= B_OK) {
 		transaction.Done();
