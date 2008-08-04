@@ -452,6 +452,14 @@ x86_check_feature(uint32 feature, enum x86_feature_type type)
 }
 
 
+void*
+x86_get_double_fault_stack(int32 cpu, size_t* _size)
+{
+	*_size = sizeof(sDoubleFaultStack);
+	return sDoubleFaultStack;
+}
+
+
 //	#pragma mark -
 
 

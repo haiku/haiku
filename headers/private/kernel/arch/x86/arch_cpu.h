@@ -268,6 +268,7 @@ uint32 x86_count_mtrrs(void);
 void x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type);
 status_t x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type);
 bool x86_check_feature(uint32 feature, enum x86_feature_type type);
+void* x86_get_double_fault_stack(int32 cpu, size_t* _size);
 
 
 #define read_cr3(value) \

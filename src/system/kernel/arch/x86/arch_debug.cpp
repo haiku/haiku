@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <cpu.h>
 #include <debug.h>
 #include <elf.h>
 #include <kernel.h>
@@ -208,6 +209,14 @@ setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
 	*_thread = thread;
 }
 
+static bool
+is_double_fault_stack_address(int32 cpu, addr_t address)
+{
+	size_t size;
+	addr_t bottom = (addr_t)x86_get_double_fault_stack(cpu, &size);
+	return address >= bottom && address < bottom + size;
+}
+
 
 static bool
 is_kernel_stack_address(struct thread* thread, addr_t address)
@@ -218,7 +227,9 @@ is_kernel_stack_address(struct thread* thread, addr_t address)
 		return IS_KERNEL_ADDRESS(address);
 
 	return address >= thread->kernel_stack_base
-		&& address < thread->kernel_stack_top;
+			&& address < thread->kernel_stack_top
+		|| thread->cpu != NULL
+			&& is_double_fault_stack_address(thread->cpu->cpu_num, address);
 }
 
 
