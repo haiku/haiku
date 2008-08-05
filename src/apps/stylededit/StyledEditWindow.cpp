@@ -1101,7 +1101,7 @@ StyledEditWindow::Print(const char* documentName)
 				currentLine++;
 		}
 		if (pagesInDocument == lastPage)
-			lastLine = currentLine;
+			lastLine = currentLine - 1;
 
 		if (currentHeight >= printableRect.Height()) {
 			pagesInDocument++;
