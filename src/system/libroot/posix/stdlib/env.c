@@ -130,10 +130,8 @@ copy_environ_to_heap_if_needed(void)
 	if (environ == sManagedEnviron)
 		return B_OK;
 
-	if (sManagedEnviron != NULL) {
-		// free previously used "environ"; it has been changed by an application
-		free_variables();
-	}
+	// free previously used "environ" if it has been changed by an application
+	free_variables();
 
 	sManagedEnviron = malloc((count_variables() + 1) * sizeof(char *));
 	if (sManagedEnviron == NULL)
