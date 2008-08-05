@@ -316,7 +316,7 @@ FileMap::_Cache(fssh_off_t offset, fssh_off_t size)
 
 	while (status == FSSH_B_OK && mapEnd < end) {
 		// We don't have the requested extents yet, retrieve them
-		size_t vecCount = kMaxVecs;
+		fssh_size_t vecCount = kMaxVecs;
 		status = vfs_get_file_map(Vnode(), mapEnd, ~0UL, vecs, &vecCount);
 		if (status == FSSH_B_OK || status == FSSH_B_BUFFER_OVERFLOW)
 			status = _Add(vecs, vecCount, mapEnd);
