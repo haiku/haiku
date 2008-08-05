@@ -1,5 +1,5 @@
-/* 
- * Copyright 2004-2007, Haiku. All rights reserved.
+/*
+ * Copyright 2004-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,7 +14,7 @@
 static struct {
 	uint32 what;
 	int32 priority;
-} gWhatPriorityArray[] = {
+} sWhatPriorityArray[] = {
 	// highest priority first
 	{B_MIDI_PROCESSING, 0x78},
 	{B_AUDIO_RECORDING | B_AUDIO_PLAYBACK, 0x73},
@@ -30,28 +30,31 @@ static struct {
 	{(uint32)-1, -1}
 };
 
-int32 
-suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter, bigtime_t length)
+
+int32
+suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter,
+	bigtime_t length)
 {
 	int i;
 	int32 priority = what == B_DEFAULT_MEDIA_PRIORITY ? 0x0a : 0;
 		// default priority
-	
-	for (i = 0; gWhatPriorityArray[i].what != (uint32)-1; i ++) {
-		if ((what & gWhatPriorityArray[i].what) != 0) {
-			priority = gWhatPriorityArray[i].priority;
+
+	for (i = 0; sWhatPriorityArray[i].what != (uint32)-1; i ++) {
+		if ((what & sWhatPriorityArray[i].what) != 0) {
+			priority = sWhatPriorityArray[i].priority;
 			break;
 		}
 	}
-	
-	return priority;	
+
+	return priority;
 }
 
-bigtime_t 
-estimate_max_scheduling_latency(thread_id th)
+
+bigtime_t
+estimate_max_scheduling_latency(thread_id thread)
 {
-	if (th == -1)
-		th = find_thread(NULL);
+	if (thread == -1)
+		thread = find_thread(NULL);
 
 	return 0;
 }
