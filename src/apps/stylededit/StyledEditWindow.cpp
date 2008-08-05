@@ -105,8 +105,8 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	viewFrame.top = fMenuBar->Bounds().Height() + 1;
 	viewFrame.right -=  B_V_SCROLL_BAR_WIDTH;
 	viewFrame.left = 0;
-	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT; 
-	
+	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
+
 	BRect textBounds = viewFrame;
 	textBounds.OffsetTo(B_ORIGIN);
 	textBounds.InsetBy(TEXT_INSET, TEXT_INSET);
@@ -129,21 +129,21 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	BMenuItem* menuItem;
 	menu->AddItem(menuItem = new BMenuItem("New", new BMessage(MENU_NEW), 'N'));
 	menuItem->SetTarget(be_app);
-	
+
 	menu->AddItem(menuItem = new BMenuItem(fRecentMenu = new BMenu("Open" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_OPEN)));
 	menuItem->SetShortcut('O', 0);
 	menuItem->SetTarget(be_app);
 	menu->AddSeparatorItem();
 
-	menu->AddItem(fSaveItem = new BMenuItem("Save", new BMessage(MENU_SAVE), 'S')); 
-	fSaveItem->SetEnabled(false); 
+	menu->AddItem(fSaveItem = new BMenuItem("Save", new BMessage(MENU_SAVE), 'S'));
+	fSaveItem->SetEnabled(false);
 	menu->AddItem(menuItem = new BMenuItem("Save As" B_UTF8_ELLIPSIS, new BMessage(MENU_SAVEAS)));
 	menuItem->SetShortcut('S',B_SHIFT_KEY);
 	menuItem->SetEnabled(true);
 
 	menu->AddItem(fRevertItem = new BMenuItem("Revert to Saved" B_UTF8_ELLIPSIS,
-		new BMessage(MENU_REVERT))); 
+		new BMessage(MENU_REVERT)));
 	fRevertItem->SetEnabled(false);
 	menu->AddItem(menuItem = new BMenuItem("Close", new BMessage(MENU_CLOSE), 'W'));
 
@@ -173,7 +173,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	menu->AddItem(menuItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));
 	menuItem->SetTarget(fTextView);
 	menu->AddItem(fClearItem = new BMenuItem("Clear", new BMessage(MENU_CLEAR)));
-	fClearItem->SetEnabled(false); 
+	fClearItem->SetEnabled(false);
 	fClearItem->SetTarget(fTextView);
 
 	menu->AddSeparatorItem();
@@ -203,7 +203,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	for (uint32 i = 0; i < sizeof(fontSizes) / sizeof(fontSizes[0]); i++) {
 		BMessage* fontMessage = new BMessage(FONT_SIZE);
 		fontMessage->AddFloat("size", fontSizes[i]);
-		
+
 		char label[64];
 		snprintf(label, sizeof(label), "%ld", fontSizes[i]);
 		fFontSizeMenu->AddItem(menuItem = new BMenuItem(label, fontMessage));
@@ -211,14 +211,14 @@ StyledEditWindow::InitWindow(uint32 encoding)
 		if (fontSizes[i] == (int32)be_plain_font->Size())
 			menuItem->SetMarked(true);
 	}
-	
+
 	// "Color"-subMenu
 	fFontColorMenu = new BMenu("Color");
 	fFontColorMenu->SetRadioMode(true);
 	fFontMenu->AddItem(fFontColorMenu);
-	
+
 	fFontColorMenu->AddItem(fBlackItem = new BMenuItem("Black", new BMessage(FONT_COLOR)));
-	fBlackItem->SetMarked(true); 
+	fBlackItem->SetMarked(true);
 	fFontColorMenu->AddItem(fRedItem = new ColorMenuItem("Red", RED, new BMessage(FONT_COLOR)));
 	fFontColorMenu->AddItem(fGreenItem = new ColorMenuItem("Green", GREEN, new BMessage(FONT_COLOR)));
 	fFontColorMenu->AddItem(fBlueItem = new ColorMenuItem("Blue", BLUE, new BMessage(FONT_COLOR)));
@@ -269,10 +269,10 @@ StyledEditWindow::InitWindow(uint32 encoding)
 
 	// "Align"-subMenu:
 	subMenu = new BMenu("Align");
-	subMenu->SetRadioMode(true); 
+	subMenu->SetRadioMode(true);
 
 	subMenu->AddItem(fAlignLeft = new BMenuItem("Left", new BMessage(ALIGN_LEFT)));
-	menuItem->SetMarked(true); 
+	menuItem->SetMarked(true);
 
 	subMenu->AddItem(fAlignCenter = new BMenuItem("Center", new BMessage(ALIGN_CENTER)));
 	subMenu->AddItem(fAlignRight = new BMenuItem("Right", new BMessage(ALIGN_RIGHT)));
@@ -350,7 +350,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 
 			fTextView->Undo(be_clipboard);
 			break;
-		case B_CUT:                            
+		case B_CUT:
 			fTextView->Cut(be_clipboard);
 			break;
 		case B_COPY:
@@ -359,7 +359,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		case B_PASTE:
 			fTextView->Paste(be_clipboard);
 			break;
-		case MENU_CLEAR:                       
+		case MENU_CLEAR:
 			fTextView->Clear();
 			break;
 		case MENU_FIND:
@@ -416,7 +416,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		{
 			message->FindBool("casesens", &fCaseSens);
 			message->FindString("FindText",&fStringToFind);
-			message->FindString("ReplaceText",&fReplaceString);				
+			message->FindString("ReplaceText",&fReplaceString);
 
 			bool allWindows;
 			message->FindBool("allwindows", &allWindows);
@@ -426,9 +426,9 @@ StyledEditWindow::MessageReceived(BMessage *message)
 
 			if (allWindows)
 				SearchAllWindows(fStringToFind, fReplaceString, fCaseSens);
-			else	
+			else
 				ReplaceAll(fStringToFind, fReplaceString, fCaseSens);
-			break;	
+			break;
 		}
 
 		// Font menu
@@ -541,12 +541,12 @@ StyledEditWindow::MessageReceived(BMessage *message)
 					// we cleaned!
 					fClean = true;
 					fUndoCleans = false;
-				} else if (fClean) { 
+				} else if (fClean) {
 				   // if we were clean
 				   // then a redo will make us clean again
 				   fRedoCleans = true;
 				   fClean = false;
-				}					
+				}
 				// set mode
 				fCanUndo = false;
 				fCanRedo = true;
@@ -576,7 +576,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			}
 			if (fClean) {
 				fRevertItem->SetEnabled(false);
-			    fSaveItem->SetEnabled(fSaveMessage == NULL);
+				fSaveItem->SetEnabled(fSaveMessage == NULL);
 			} else {
 				fRevertItem->SetEnabled(fSaveMessage != NULL);
 				fSaveItem->SetEnabled(true);
@@ -605,7 +605,7 @@ StyledEditWindow::MenusBeginning()
 	BMessage documents;
 	be_roster->GetRecentDocuments(&documents, 9, NULL, APP_SIGNATURE);
 
-	// delete old items.. 
+	// delete old items..
 	//    shatty: it would be preferable to keep the old
 	//            menu around instead of continuously thrashing
 	//            the menu, but unfortunately there does not
@@ -642,7 +642,7 @@ StyledEditWindow::MenusBeginning()
 	if (oldSizeItem != NULL)
 		oldSizeItem->SetMarked(false);
 
-	// find the current font, color, size	
+	// find the current font, color, size
 	BFont font;
 	uint32 sameProperties;
 	rgb_color color = BLACK;
@@ -677,7 +677,7 @@ StyledEditWindow::MenusBeginning()
 					fYellowItem->SetMarked(true);
 				}
 			}
-		} 
+		}
 	}
 
 	if (sameProperties & B_FONT_SIZE) {
@@ -725,7 +725,7 @@ StyledEditWindow::MenusBeginning()
 void
 StyledEditWindow::Quit()
 {
-	styled_edit_app->CloseDocument();	
+	styled_edit_app->CloseDocument();
 	BWindow::Quit();
 }
 
@@ -881,7 +881,7 @@ StyledEditWindow::SaveAs(BMessage *message)
 		}
 	}
 
-	fSavePanel->SetSaveText(Title()); 
+	fSavePanel->SetSaveText(Title());
 	if (message != NULL)
 		fSavePanel->SetMessage(message);
 
@@ -992,20 +992,20 @@ StyledEditWindow::RevertToSaved()
 		status = entry.SetTo(&dir, name);
 	if (status == B_OK)
 		status = entry.GetRef(&ref);
- 	if (status != B_OK || !entry.Exists()) {
- 		BAlert *vanishedAlert;
+	if (status != B_OK || !entry.Exists()) {
+		BAlert *vanishedAlert;
 		BString alertText;
 		alertText.SetTo("Cannot revert, file not found: \"");
 		alertText << name;
 		alertText << "\".";
-		vanishedAlert = new BAlert("vanishedAlert", alertText.String(), "Bummer", 0, 0, 
+		vanishedAlert = new BAlert("vanishedAlert", alertText.String(), "Bummer", 0, 0,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_STOP_ALERT);
 		vanishedAlert->SetShortcut(0, B_ESCAPE);
 		vanishedAlert->Go();
 		return;
 	}
 
-	int32 buttonIndex = 0; 
+	int32 buttonIndex = 0;
 	BAlert* revertAlert;
 	BString alertText;
 	alertText.SetTo("Revert to the last version of \"");
@@ -1036,7 +1036,7 @@ StyledEditWindow::RevertToSaved()
 	fCanRedo = false;
 
 	// clear clean modes
-	fSaveItem->SetEnabled(false); 
+	fSaveItem->SetEnabled(false);
 	fRevertItem->SetEnabled(false);
 	fUndoCleans = false;
 	fRedoCleans = false;
@@ -1071,7 +1071,7 @@ StyledEditWindow::Print(const char* documentName)
 		result = PageSetup(documentName);
 		if (result != B_OK)
 			return;
-	} 
+	}
 
 	BPrintJob printJob(documentName);
 	printJob.SetSettings(new BMessage(*fPrintSettings));
@@ -1080,10 +1080,10 @@ StyledEditWindow::Print(const char* documentName)
 		return;
 
 	// information from printJob
-	BRect printableRect = printJob.PrintableRect();	
+	BRect printableRect = printJob.PrintableRect();
 	int32 firstPage = printJob.FirstPage();
 	int32 lastPage = printJob.LastPage();
-   
+
 	// lines eventually to be used to compute pages to print
 	int32 firstLine = 0;
 	int32 lastLine = fTextView->CountLines();
@@ -1115,7 +1115,7 @@ StyledEditWindow::Print(const char* documentName)
 		lastLine = currentLine - 1;
 	}
 
-	
+
 	printJob.BeginJob();
 	if (fTextView->CountLines() > 0 && fTextView->TextLength() > 0) {
 		int32 printLine = firstLine;
@@ -1138,7 +1138,7 @@ StyledEditWindow::Print(const char* documentName)
 			printJob.SpoolPage();
 		}
 	}
-	
+
 
 	printJob.CommitJob();
 }
@@ -1146,13 +1146,13 @@ StyledEditWindow::Print(const char* documentName)
 
 bool
 StyledEditWindow::Search(BString string, bool caseSensitive, bool wrap, bool backsearch)
-{ 
+{
 	int32 start;
 	int32 finish;
 
-	start = B_ERROR; 
+	start = B_ERROR;
 
-	int32 length = string.Length();      
+	int32 length = string.Length();
 	if (length == 0)
 		return false;
 
@@ -1195,11 +1195,11 @@ StyledEditWindow::Search(BString string, bool caseSensitive, bool wrap, bool bac
 		return true;
 	}
 
-	return false;	
+	return false;
 }
 
 
-void 
+void
 StyledEditWindow::FindSelection()
 {
 	int32 selectionStart, selectionFinish;
@@ -1252,9 +1252,9 @@ StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSensi
 
 	fTextView->SetText(viewText.String());
 
-	if (viewText.Length() < textStart) 
+	if (viewText.Length() < textStart)
 		textStart = viewText.Length();
-	if (viewText.Length() < textFinish) 
+	if (viewText.Length() < textFinish)
 		textFinish = viewText.Length();
 
 	fTextView->Select(textStart,textFinish);
@@ -1297,7 +1297,7 @@ StyledEditWindow::SetFontSize(float fontSize)
 	fTextView->GetFontAndColor(&font, &sameProperties);
 	font.SetSize(fontSize);
 	fTextView->SetFontAndColor(&font, B_FONT_SIZE);
-	
+
 	_UpdateCleanUndoRedoSaveRevert();
 }
 
@@ -1350,10 +1350,10 @@ StyledEditWindow::_UpdateCleanUndoRedoSaveRevert()
 {
 	fClean = false;
 	fUndoCleans = false;
-	fRedoCleans = false;	
+	fRedoCleans = false;
 	fRevertItem->SetEnabled(fSaveMessage != NULL);
 	fSaveItem->SetEnabled(true);
-	fUndoItem->SetLabel("Can't Undo");	
+	fUndoItem->SetLabel("Can't Undo");
 	fUndoItem->SetEnabled(false);
 	fCanUndo = false;
 	fCanRedo = false;
