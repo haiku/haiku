@@ -212,15 +212,20 @@ PreviewView::PreviewView(BFile* jobFile, BRect rect)
 	if (fReader.JobSettings()->FindInt32(kJDPageSelection, &value32) == B_OK)
 		fPageSelection = (JobData::PageSelection)value32;
 
-	fReader.JobSettings()->FindInt32(kJDNup, &fNumberOfPagesPerPage);
-	fReader.JobSettings()->FindBool(kJDReverse, &fReverse);
+	bool value;
+	if (fReader.JobSettings()->FindBool(kJDReverse, &value) == B_OK)
+		fReverse = value;
+
+	if (fReader.JobSettings()->FindInt32(kJDNup, &value32) == B_OK)
+		fNumberOfPagesPerPage = value32;
+
 	fNumberOfPages = (fReader.NumberOfPages() + fNumberOfPagesPerPage - 1)
 		/ fNumberOfPagesPerPage;
 
 	if (fPageSelection == JobData::kOddNumberedPages)
 		fNumberOfPages = (fNumberOfPages + 1) / 2;
 	else if (fPageSelection == JobData::kEvenNumberedPages)
-		fNumberOfPages /= 2;		
+		fNumberOfPages /= 2;
 
 	fPaperRect = fReader.PaperRect();
 	fPrintableRect = fReader.PrintableRect();
@@ -685,7 +690,7 @@ void PreviewView::_DrawPage(BRect rect)
 		int32 pageNumber = _GetPageNumber(index);
 		if (pageNumber < 0)
 			continue;
-		
+
 		if (!_IsPageLoaded(pageNumber))
 			_LoadPage(pageNumber);
 
@@ -700,7 +705,7 @@ void PreviewView::_DrawPage(BRect rect)
 
 		BRegion clip(clipRect);
 		ConstrainClippingRegion(&clip);
-		
+
 		SetScale(_ZoomFactor() * scaling);
 
 		fCachedPage->Draw(this, printRect.OffsetByCopy(offset));
@@ -765,7 +770,7 @@ int32 PreviewView::_GetPageNumber(int32 index) const
 		page *= 2; // 0, 2, 4, ...
 	else if (fPageSelection == JobData::kEvenNumberedPages)
 		page = 2 * page + 1; // 1, 3, 5, ...
-	
+
 	return page * fNumberOfPagesPerPage + index;
 }
 
@@ -847,7 +852,7 @@ PreviewWindow::PreviewWindow(BFile* jobFile, bool showOkAndCancelButtons)
 
 		// cancel printing if user closes the preview window
 		SetUserQuitResult(B_ERROR);
-		
+
 		BButton *printJob = new BButton(BRect(), "printJob", "Print",
 			new BMessage(MSG_PRINT_JOB), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 		AddChild(printJob);

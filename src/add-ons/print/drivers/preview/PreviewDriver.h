@@ -6,8 +6,8 @@
  *		Michael Pfeiffer
  */
 
-#include "Preview.h"
 #include "PrinterDriver.h"
+
 
 class PreviewDriver : public PrinterDriver {
 public:

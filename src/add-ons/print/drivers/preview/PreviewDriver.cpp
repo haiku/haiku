@@ -7,6 +7,7 @@
  */
 
 #include "PreviewDriver.h"
+#include "Preview.h"
 
 
 #define PREVIEW_DRIVER_DEBUG 0

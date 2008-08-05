@@ -10,10 +10,9 @@ Addon Preview :
 	PageSetupWindow.cpp
 	JobSetupWindow.cpp
 	Driver.cpp
-	Preview.cpp
 	PrinterDriver.cpp
 	PreviewDriver.cpp
-	: be libprint.a
+	: be libprint.a $(TARGET_LIBSTDC++)
 ;
 
 Package haiku-printingkit-cvs :
