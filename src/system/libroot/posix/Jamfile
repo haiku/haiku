@@ -21,6 +21,7 @@ MergeObject posix_main.o :
  	inttypes.c
  	poll.c
  	$(PWD_BACKEND)
+ 	scheduler.cpp
 	semaphore.cpp
  	syslog.cpp
  	termios.c
