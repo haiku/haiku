@@ -12,28 +12,33 @@
 #include <scsi_periph.h>
 #include <scsi.h>
 
+#include "dma_resources.h"
+#include "io_requests.h"
+#include "IOScheduler.h"
 
-#define SCSI_CD_MODULE_NAME "drivers/disk/scsi/scsi_cd/driver_v1"
+
+#define SCSI_CD_DRIVER_MODULE_NAME "drivers/disk/scsi/scsi_cd/driver_v1"
+#define SCSI_CD_DEVICE_MODULE_NAME "drivers/disk/scsi/scsi_cd/device_v1"
 
 
-// must start as block_device_cookie
-typedef struct cd_device_info {
-	device_node *node;
-	::scsi_periph_device scsi_periph_device;
-	::scsi_device scsi_device;
-	scsi_device_interface *scsi;
-	::block_io_device block_io_device;
+struct cd_driver_info {
+	device_node*			node;
+	::scsi_periph_device	scsi_periph_device;
+	::scsi_device			scsi_device;
+	scsi_device_interface*	scsi;
+	IOScheduler*			io_scheduler;
+	DMAResource*			dma_resource;
 
-	uint64 capacity;
-	uint32 block_size;
+	uint64					capacity;
+	uint32					block_size;
 
-	bool removable;
-	uint8 device_type;
-} cd_device_info;
-	
-typedef struct cd_handle_info {
-	::scsi_periph_handle scsi_periph_handle;
-	cd_device_info *device;
-} cd_handle_info;
+	bool					removable;
+	uint8					device_type;
+};
+
+struct cd_handle {
+	::scsi_periph_handle	scsi_periph_handle;
+	cd_driver_info*			info;
+};
 
 #endif	// _SCSI_CD_H
