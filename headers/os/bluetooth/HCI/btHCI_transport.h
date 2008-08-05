@@ -17,9 +17,8 @@ typedef enum { ANCILLYANT	= (1<<0),
 			   PROCESSING	= (1<<4)
 			 } bt_transport_status_t;
 
-typedef uint8 bt_stat_t; 
+typedef uint8 bt_stat_t;
 typedef struct bt_hci_statistics {
-
 	bt_stat_t	acceptedTX;
 	bt_stat_t	rejectedTX;
 	bt_stat_t	successfulTX;
@@ -41,8 +40,6 @@ typedef struct bt_hci_statistics {
 
 	bt_stat_t	bytesRX;
 	bt_stat_t	bytesTX;
-
-
 } bt_hci_statistics;
 
 /* TODO: Possible hooks which drivers will have to provide */
@@ -59,10 +56,8 @@ typedef struct bt_hci_transport {
 } bt_hci_transport;
 
 typedef struct bt_hci_device {
-
 	transport_type	kind;
 	char			realName[B_OS_NAME_LENGTH];
-
 } bt_hci_device;
 
 
@@ -92,8 +87,8 @@ enum {
 #define GET_PORTCODE_HID(code)			((code&0x00FF0000)>>16)
 #define GET_PORTCODE_DATA(code)			((code&0x0000FFFF))
 
-/* Port drivers can use to send information (1 for all for 
-   at moment refer to ioctl GET_NOTIFICATION_PORT)*/
+/*  Port drivers can use to send information (1 for all for
+	at moment refer to ioctl GET_NOTIFICATION_PORT)*/
 #define BT_USERLAND_PORT_NAME "BT kernel-user Land"
 
 #endif // _BTHCI_TRANSPORT_H_
