@@ -489,6 +489,9 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 			continue;
 		}
 		int32 frames = min_c(fOutputBufferFrameCount - *frameCount, fChunkSize / fInputFrameSize);
+		if (frames == 0)
+			break;
+
 		int32 samples = frames * fInputFormat.u.raw_audio.channel_count;
 		fConvert(output_buffer, fChunkBuffer, samples);
 		fChunkBuffer = (const char *)fChunkBuffer + frames * fInputFrameSize;
