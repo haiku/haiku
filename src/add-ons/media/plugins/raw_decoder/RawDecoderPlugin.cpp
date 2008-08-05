@@ -67,9 +67,9 @@ RawDecoder::Setup(media_format *ioEncodedFormat,
 
 	if (ioEncodedFormat->type != B_MEDIA_RAW_AUDIO && ioEncodedFormat->type != B_MEDIA_RAW_VIDEO)
 		return B_ERROR;
-		
+
 	fInputFormat = *ioEncodedFormat;
-		
+
 	if (ioEncodedFormat->type == B_MEDIA_RAW_VIDEO) {
 		fInputSampleSize = ioEncodedFormat->u.raw_video.display.line_count * ioEncodedFormat->u.raw_video.display.bytes_per_row;
 		fInputFrameSize = fInputSampleSize;
@@ -80,10 +80,10 @@ RawDecoder::Setup(media_format *ioEncodedFormat,
 
 	// since ioEncodedFormat is later passed to the application by BMediaTrack::EncodedFormat()
 	// we need to remove non public format specifications
-	
+
 	// remove non format bits, like channel order
 	ioEncodedFormat->u.raw_audio.format &= B_AUDIO_FORMAT_MASK;
-	
+
 	switch (ioEncodedFormat->u.raw_audio.format) {
 		case B_AUDIO_FORMAT_UINT8:
 		case B_AUDIO_FORMAT_INT8:
@@ -91,20 +91,20 @@ RawDecoder::Setup(media_format *ioEncodedFormat,
 		case B_AUDIO_FORMAT_INT32:
 		case B_AUDIO_FORMAT_FLOAT32:
 			break; // ok to pass through
-		
+
 		case B_AUDIO_FORMAT_INT24:
 			ioEncodedFormat->u.raw_audio.format = B_AUDIO_FORMAT_INT32;
 			break;
-			
+
 		case B_AUDIO_FORMAT_FLOAT64:
 			ioEncodedFormat->u.raw_audio.format = B_AUDIO_FORMAT_FLOAT32;
 			break;
-		
+
 		default:
 			TRACE("RawDecoder::Setup: unknown input format\n");
 			return B_ERROR;
 	}
-	
+
 	// since we can translate to a different buffer size,
 	// suggest something nicer than delivered by the
 	// file reader (perhaps we should even report wildcard?)
@@ -142,7 +142,7 @@ status_t
 RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 {
 	char s[1024];
-	
+
 	string_for_format(*ioDecodedFormat, s, sizeof(s));
 	TRACE("RawDecoder::NegotiateAudioOutputFormat enter: %s\n", s);
 
@@ -158,7 +158,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 		case media_raw_audio_format::B_AUDIO_INT:
 			ioDecodedFormat->u.raw_audio.valid_bits = fInputFormat.u.raw_audio.valid_bits;
 			break; // we can produce this on request
-		
+
 		default:
 			switch (fInputFormat.u.raw_audio.format & B_AUDIO_FORMAT_MASK) {
 				case media_raw_audio_format::B_AUDIO_SHORT:
@@ -167,13 +167,13 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 					ioDecodedFormat->u.raw_audio.format = fInputFormat.u.raw_audio.format & B_AUDIO_FORMAT_MASK;
 					ioDecodedFormat->u.raw_audio.valid_bits = 0;
 					break;
-				
+
 				case media_raw_audio_format::B_AUDIO_INT:
 				case B_AUDIO_FORMAT_INT24:
 					ioDecodedFormat->u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
 					ioDecodedFormat->u.raw_audio.valid_bits = fInputFormat.u.raw_audio.valid_bits;
 					break;
-					
+
 				case media_raw_audio_format::B_AUDIO_FLOAT:
 				case B_AUDIO_FORMAT_FLOAT64:
 				default:
@@ -191,13 +191,13 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 
 	fOutputSampleSize = (ioDecodedFormat->u.raw_audio.format & B_AUDIO_FORMAT_SIZE_MASK);
 	fOutputFrameSize = fOutputSampleSize * ioDecodedFormat->u.raw_audio.channel_count;
-	
+
 	if (ioDecodedFormat->u.raw_audio.byte_order == 0)
 		ioDecodedFormat->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
-	
+
 	ioDecodedFormat->u.raw_audio.channel_mask = 0;
 	ioDecodedFormat->u.raw_audio.matrix_mask = 0;
-	
+
 	if (ioDecodedFormat->u.raw_audio.buffer_size < 128 || ioDecodedFormat->u.raw_audio.buffer_size > 65536) {
 		ioDecodedFormat->u.raw_audio.buffer_size = AudioBufferSize(
 														ioDecodedFormat->u.raw_audio.channel_count,
@@ -207,9 +207,9 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 		// round down to exact multiple of output frame size
 		ioDecodedFormat->u.raw_audio.buffer_size = (ioDecodedFormat->u.raw_audio.buffer_size / fOutputFrameSize) * fOutputFrameSize;
 	}
-	
+
 	fOutputBufferFrameCount = ioDecodedFormat->u.raw_audio.buffer_size / fOutputFrameSize;
-	
+
 	// setup input swapping function
 	if (fInputFormat.u.raw_audio.byte_order == B_MEDIA_HOST_ENDIAN) {
 		fSwapInput = 0;
@@ -288,7 +288,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 					break;
 			}
 			break;
-		
+
 		case B_AUDIO_FORMAT_INT8:
 			switch (ioDecodedFormat->u.raw_audio.format) {
 				case B_AUDIO_FORMAT_UINT8:
@@ -431,14 +431,14 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 			debugger("RawDecoder::NegotiateAudioOutputFormat unknown input format\n");
 			break;
 	}
-	
+
 	fChunkBuffer = 0;
 	fChunkSize = 0;
 	fStartTime = 0;
 
 	string_for_format(*ioDecodedFormat, s, sizeof(s));
 	TRACE("RawDecoder::NegotiateAudioOutputFormat leave: %s\n", s);
-	
+
 	if (ioDecodedFormat->type == 0)
 		debugger("RawDecoder::NegotiateAudioOutputFormat ioDecodedFormat->type == 0");
 /*
@@ -499,7 +499,7 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 	}
 	// XXX should change channel order here for
 	// B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE and B_AUDIO_FORMAT_CHANNEL_ORDER_AIFF
-	
+
 	if (fSwapOutput)
 		fSwapOutput(buffer, *frameCount * fInputFormat.u.raw_audio.channel_count);
 	return *frameCount ? B_OK : B_ERROR;
