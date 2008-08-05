@@ -16,7 +16,7 @@ struct semaphore {
 	bool	inUse;
 };
 
-static const int kSemaphoreCount = 10240;
+static const int kSemaphoreCount = 40960;
 static semaphore sSemaphores[kSemaphoreCount];
 
 
@@ -41,11 +41,11 @@ create_sem(int32 count, const char *name)
 
 			sem.inUse = true;
 			sem.count = count;
-			
+
 			return i;
 		}
 	}
-	
+
 	return B_NO_MORE_SEMS;
 }
 
@@ -59,7 +59,7 @@ delete_sem(sem_id id)
 	sSemaphores[id].inUse = false;
 	free(sSemaphores[id].name);
 	sSemaphores[id].name = NULL;
-	
+
 	return B_OK;
 }
 
@@ -89,21 +89,21 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 	if (timeout < 0)
 		timeout = 0;
 
-	bool noTimeout = false;		
+	bool noTimeout = false;
 	if (flags & B_RELATIVE_TIMEOUT) {
 		// relative timeout: get the absolute time when to time out
-		
+
 		// special case: on timeout == 0 we return B_WOULD_BLOCK
 		if (timeout == 0)
 			return B_WOULD_BLOCK;
-		
+
 		bigtime_t currentTime = system_time();
 		if (timeout > B_INFINITE_TIMEOUT || currentTime >= B_INFINITE_TIMEOUT - timeout) {
 			noTimeout = true;
 		} else {
 			timeout += currentTime;
 		}
-	
+
 	} else if (flags & B_ABSOLUTE_TIMEOUT) {
 		// absolute timeout
 	} else {
@@ -122,7 +122,7 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 	status_t error = snooze_until(timeout, B_SYSTEM_TIMEBASE);
 	if (error != B_OK)
 		return error;
-						
+
 	return B_TIMED_OUT;
 }
 
