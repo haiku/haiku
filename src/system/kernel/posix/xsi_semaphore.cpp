@@ -138,6 +138,10 @@ public:
 	void Revert(short value)
 	{
 		fValue -= value;
+		if (fValue == 0 && fThreadsWaitingToBeZero > 0)
+			WakeUpThread(true);
+		else if (fValue > 0 && fThreadsWaitingToIncrease > 0)
+			WakeUpThread(false);
 	}
 
 	void SetPid(pid_t pid)
@@ -256,6 +260,7 @@ public:
 
 	~XsiSemaphoreSet()
 	{
+		TRACE(("XsiSemaphoreSet::~XsiSemaphoreSet(): removing semaphore set\n"));
 		// Clear all sem_undo left, as our ID will be reused
 		// by another set.
 		for (uint32 i = 0; i < fNumberOfSemaphores; i++)
@@ -670,13 +675,13 @@ xsi_sem_undo(team_id teamID, int32 numberOfUndos)
 				// Revert the changes done by this process
 				XsiSemaphore *semaphore
 					= semaphoreSet->Semaphore(current->semaphore_number);
-				TRACE(("xsi_do_undo: TeamID = %d, SemaphoreSetID = %d, "
+				TRACE(("xsi_sem_undo: TeamID = %d, SemaphoreSetID = %d, "
 					"SemaphoreNumber = %d, undo value = %d\n", (int)teamID,
 					semaphoreSetID, current->semaphore_number,
 					current->undo_value));
 				semaphore->Revert(current->undo_value);
 			} else
-				TRACE(("xsi_do_undo: semaphore set %d does not exist "
+				TRACE(("xsi_sem_undo: semaphore set %d does not exist "
 					"anymore. Ignore record.\n", semaphoreSetID));
 
 			// Remove and free the sem_undo structure from sUndoList
@@ -711,6 +716,11 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 		if (ipcKey == NULL) {
 			// The ipc key have probably just been created
 			// by the caller, add it to the system
+			if (!(flags & IPC_CREAT)) {
+				TRACE_ERROR(("xsi_semget: key %d does not exist, but the "
+					"caller did not ask for creation\n",(int)key));
+				return ENOENT;
+			}
 			ipcKey = new(std::nothrow) Ipc(key);
 			if (ipcKey == NULL) {
 				TRACE_ERROR(("xsi_semget: failed to create new Ipc object "
@@ -756,8 +766,8 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 
 	if (create) {
 		// Create a new sempahore set for this key
-		if (numberOfSemaphores < 0
-				|| numberOfSemaphores >= MAX_XSI_SEMS_PER_TEAM) {
+		if (numberOfSemaphores <= 0
+			|| numberOfSemaphores >= MAX_XSI_SEMS_PER_TEAM) {
 			TRACE_ERROR(("xsi_semget: numberOfSemaphores out of range\n"));
 			return EINVAL;
 		}
@@ -1137,9 +1147,16 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 									operations[j].sem_num, operations[j].sem_op);
 						}
 						result = ENOSPC;
-				}
+					}
 			}
-			// We did it. Set the pid.
+		}
+	}
+
+	// We did it. Set the pid of all semaphores used
+	if (result == 0) {
+		for (uint32 i = 0; i < numOps; i++) {
+			short semaphoreNumber = operations[i].sem_num;
+			XsiSemaphore *semaphore = semaphoreSet->Semaphore(semaphoreNumber);
 			semaphore->SetPid(getpid());
 		}
 	}
