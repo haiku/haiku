@@ -20,7 +20,7 @@
 #include <util/AutoLock.h>
 
 
-#define TRACE_IO_SCHEDULER
+//#define TRACE_IO_SCHEDULER
 #ifdef TRACE_IO_SCHEDULER
 #	define TRACE(x...) dprintf(x)
 #else

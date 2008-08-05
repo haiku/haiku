@@ -12,6 +12,7 @@
 #include <util/DoublyLinkedList.h>
 
 
+struct device_node;
 struct IOOperation;
 struct IORequest;
 
@@ -69,6 +70,7 @@ public:
 
 			status_t			Init(const dma_restrictions& restrictions,
 									size_t blockSize, uint32 bufferCount);
+			status_t			Init(device_node* node, size_t blockSize);
 
 			status_t			CreateBuffer(DMABuffer** _buffer)
 									{ return CreateBuffer(0, _buffer); }

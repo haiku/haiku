@@ -6,6 +6,8 @@
 
 #include "dma_resources.h"
 
+#include <block_io.h>
+
 #include <kernel.h>
 #include <util/AutoLock.h>
 
@@ -19,6 +21,8 @@
 #	define TRACE(x...) ;
 #endif
 
+
+extern device_manager_info gDeviceManagerModule;
 
 const size_t kMaxBounceBufferSize = 4 * B_PAGE_SIZE;
 
@@ -95,6 +99,40 @@ DMAResource::~DMAResource()
 
 
 status_t
+DMAResource::Init(device_node* node, size_t blockSize)
+{
+	dma_restrictions restrictions;
+	memset(&restrictions, 0, sizeof(dma_restrictions));
+
+	// TODO: add DMA attributes instead of reusing block_io's
+
+	uint32 value;
+	if (gDeviceManagerModule.get_attr_uint32(node,
+			B_BLOCK_DEVICE_DMA_ALIGNMENT, &value, true) == B_OK)
+		restrictions.alignment = value + 1;
+
+	if (gDeviceManagerModule.get_attr_uint32(node,
+			B_BLOCK_DEVICE_DMA_BOUNDARY, &value, true) == B_OK)
+		restrictions.boundary = value + 1;
+
+	if (gDeviceManagerModule.get_attr_uint32(node,
+			B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, &value, true) == B_OK)
+		restrictions.max_segment_size = value;
+
+	if (gDeviceManagerModule.get_attr_uint32(node,
+			B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &value, true) == B_OK)
+		restrictions.max_transfer_size = value * blockSize;
+
+	uint32 bufferCount;
+	if (gDeviceManagerModule.get_attr_uint32(node,
+			B_BLOCK_DEVICE_MAX_SG_BLOCKS, &bufferCount, true) != B_OK)
+		bufferCount = 16;
+
+	return Init(restrictions, blockSize, bufferCount);
+}
+
+
+status_t
 DMAResource::Init(const dma_restrictions& restrictions, size_t blockSize,
 	uint32 bufferCount)
 {
@@ -123,6 +161,13 @@ DMAResource::Init(const dma_restrictions& restrictions, size_t blockSize,
 			fBounceBufferSize);
 	}
 
+	dprintf("DMAResource@%p: low/high %lx/%lx, max segment count %lu, align %lu, "
+		"boundary %lu, max transfer %lu, max segment size %lu\n", this,
+		fRestrictions.low_address, fRestrictions.high_address,
+		fRestrictions.max_segment_count, fRestrictions.alignment,
+		fRestrictions.boundary, fRestrictions.max_transfer_size,
+		fRestrictions.max_segment_size);
+
 	fScratchVecs = (iovec*)malloc(
 		sizeof(iovec) * fRestrictions.max_segment_count);
 	if (fScratchVecs == NULL)
@@ -150,9 +195,10 @@ DMAResource::CreateBuffer(size_t size, DMABuffer** _buffer)
 	area_id area = -1;
 
 	if (size != 0) {
-		if (fRestrictions.alignment > B_PAGE_SIZE
-			|| fRestrictions.boundary > B_PAGE_SIZE)
-			panic("not yet implemented");
+		if (fRestrictions.alignment > B_PAGE_SIZE)
+			dprintf("dma buffer restrictions not yet implemented: alignment %lu\n", fRestrictions.alignment);
+		if (fRestrictions.boundary > B_PAGE_SIZE)
+			dprintf("dma buffer restrictions not yet implemented: boundary %lu\n", fRestrictions.boundary);
 
 		size = ROUNDUP(size, B_PAGE_SIZE);
 
