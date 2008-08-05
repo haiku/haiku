@@ -197,7 +197,8 @@ BPrintJob::ConfigJob()
 
 	delete fSetupMessage;
 	fSetupMessage = messenger.Result();
-	_HandlePrintSetup(fSetupMessage);
+	if (!_HandlePrintSetup(fSetupMessage))
+		return B_ERROR;
 
 	return B_OK;
 }
@@ -289,7 +290,7 @@ BPrintJob::CommitJob()
 	fSpoolFile->Write(&fSpoolFileHeader, sizeof(print_file_header));
 
 	// set file attributes
- 	app_info appInfo;
+	app_info appInfo;
 	be_app->GetAppInfo(&appInfo);
 	const char* printerName = "";
 	fSetupMessage->FindString(PSRV_FIELD_CURRENT_PRINTER, &printerName);
@@ -465,14 +466,14 @@ BPrintJob::GetResolution(int32 *xdpi, int32 *ydpi)
 int32
 BPrintJob::FirstPage()
 {
-    return fFirstPage;
+	return fFirstPage;
 }
 
 
 int32
 BPrintJob::LastPage()
 {
-    return fLastPage;
+	return fLastPage;
 }
 
 
