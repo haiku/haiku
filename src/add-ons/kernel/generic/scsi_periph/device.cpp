@@ -1,13 +1,11 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Basic handling of device.
-*/
+//!	Basic handling of device.
 
 
 #include "scsi_periph_int.h"
@@ -27,15 +25,15 @@ periph_compose_device_name(device_node *node, const char *prefix)
 	char name[128];
 	uint32 channel;
 
-	if (pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &pathID, true) != B_OK
-		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_ID_ITEM, &targetID, true) != B_OK
-		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_LUN_ITEM, &targetLUN, true) != B_OK)
+	if (gDeviceManager->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &pathID, true) != B_OK
+		|| gDeviceManager->get_attr_uint8(node, SCSI_DEVICE_TARGET_ID_ITEM, &targetID, true) != B_OK
+		|| gDeviceManager->get_attr_uint8(node, SCSI_DEVICE_TARGET_LUN_ITEM, &targetLUN, true) != B_OK)
 		return NULL;
 
 	// IDE devices have a different naming scheme
 
-	if (pnp->get_attr_uint32(node, "ide/channel_id", &channel, true) == B_OK
-		&& pnp->get_attr_uint8(node, SCSI_DEVICE_TYPE_ITEM, &type, true) == B_OK) {
+	if (gDeviceManager->get_attr_uint32(node, "ide/channel_id", &channel, true) == B_OK
+		&& gDeviceManager->get_attr_uint8(node, SCSI_DEVICE_TYPE_ITEM, &type, true) == B_OK) {
 		// this is actually an IDE device, so we ignore the prefix
 
 		// a bus device for those
@@ -56,7 +54,7 @@ periph_compose_device_name(device_node *node, const char *prefix)
 status_t
 periph_register_device(periph_device_cookie periph_device, scsi_periph_callbacks *callbacks,
 	scsi_device scsi_device, scsi_device_interface *scsi, device_node *node,
-	bool removable, scsi_periph_device *driver)
+	bool removable, int preferredCcbSize, scsi_periph_device *driver)
 {
 	scsi_periph_device_info *device;
 	status_t res;
@@ -85,6 +83,7 @@ periph_register_device(periph_device_cookie periph_device, scsi_periph_callbacks
 
 	// set some default options
 	device->next_tag_action = 0;
+	device->preferred_ccb_size = preferredCcbSize;
 	device->rw10_enabled = true;
 
 	// launch sync daemon

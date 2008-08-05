@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -24,13 +24,13 @@ periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 	SHOW_FLOW(3, "%p, %p", device, request);
 
 	// driver doesn't support capacity callback - seems to be no block
-	// device driver, so ignore	
+	// device driver, so ignore
 	if (device->callbacks->set_capacity == NULL)
 		return B_OK;
 
 	request->flags = SCSI_DIR_IN;
 
-	request->data = (char *)&capacityResult;
+	request->data = (uint8*)&capacityResult;
 	request->data_length = sizeof(capacityResult);
 	request->cdb_length = sizeof(scsi_cmd_read_capacity);
 	request->timeout = device->std_timeout;
@@ -68,7 +68,9 @@ periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 
 	SHOW_FLOW(3, "capacity = %Ld, block_size = %ld", capacity, blockSize);
 
-	device->callbacks->set_capacity(device->periph_device, 
+	device->block_size = blockSize;
+
+	device->callbacks->set_capacity(device->periph_device,
 		capacity, blockSize);
 
 /*	device->byte2blk_shift = log2( device->block_size );

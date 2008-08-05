@@ -14,7 +14,7 @@ ata_request_init(ata_request *request, struct ide_device_info *device)
 }
 
 
-/* Start the request, but don't clear sense to allow 
+/* Start the request, but don't clear sense to allow
  * retrieving the previous sense data.
  */
 void ata_request_start(ata_request **_request, struct ide_device_info *device, struct scsi_ccb *ccb)
@@ -31,7 +31,7 @@ void ata_request_start(ata_request **_request, struct ide_device_info *device, s
 
 		device->bus->state = ata_state_busy;
 		device->bus->active_device = device;
-	
+
 		request = device->requestFree;
 		device->requestActive = request;
 		device->requestFree = NULL;
@@ -77,7 +77,7 @@ ata_request_clear_sense(ata_request *request)
 void
 ata_request_set_status(ata_request *request, uint8 status)
 {
-	ASSERT(status != SCSI_REQ_CMP);
+//	ASSERT(status != SCSI_REQ_CMP);
 	if (request && request->ccb)
 		request->ccb->subsys_status = status;
 }
@@ -106,10 +106,10 @@ ata_request_finish(ata_request *request, bool resubmit)
 			request, ccb->subsys_status, request->senseKey);
 
 	// when the request completed and has set sense
-    // data, report this to the scsci stack by setting 
+    // data, report this to the scsi stack by setting
     // CHECK CONDITION status
 	if (ccb->subsys_status == SCSI_REQ_CMP && request->senseKey != 0) {
-	
+
 		TRACE("ata_request_finish - setting check condition\n");
 
 		request->ccb->subsys_status = SCSI_REQ_CMP_ERR;

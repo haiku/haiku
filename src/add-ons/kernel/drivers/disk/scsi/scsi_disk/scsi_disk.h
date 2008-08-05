@@ -12,27 +12,32 @@
 #include <scsi.h>
 #include <scsi_periph.h>
 
+#include "dma_resources.h"
+#include "io_requests.h"
+#include "IOScheduler.h"
 
-#define SCSI_DISK_MODULE_NAME "drivers/disk/scsi/scsi_dsk/driver_v1"
+
+#define SCSI_DISK_DRIVER_MODULE_NAME "drivers/disk/scsi/scsi_disk/driver_v1"
+#define SCSI_DISK_DEVICE_MODULE_NAME "drivers/disk/scsi/scsi_disk/device_v1"
 
 
-// must start as block_device_cookie
-typedef struct das_device_info {
-	device_node *node;
-	::scsi_periph_device scsi_periph_device;
-	::scsi_device scsi_device;
-	scsi_device_interface *scsi;
-	::block_io_device block_io_device;
+struct das_driver_info {
+	device_node*			node;
+	::scsi_periph_device	scsi_periph_device;
+	::scsi_device			scsi_device;
+	scsi_device_interface*	scsi;
+	IOScheduler*			io_scheduler;
+	DMAResource*			dma_resource;
 
-	uint64 capacity;
-	uint32 block_size;
+	uint64					capacity;
+	uint32					block_size;
 
-	bool removable;			// true, if device is removable
-} das_device_info;
+	bool					removable;
+};
 
-typedef struct das_handle_info {
-	::scsi_periph_handle scsi_periph_handle;
-	das_device_info *device;
-} das_handle_info;
+struct das_handle {
+	::scsi_periph_handle	scsi_periph_handle;
+	das_driver_info*		info;
+};
 
 #endif	/* _SCSI_DISK_H */

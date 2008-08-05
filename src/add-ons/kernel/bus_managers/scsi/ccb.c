@@ -8,7 +8,7 @@
 
 	CCB manager
 
-	As allocation of ccb can be on the paging path we must use a 
+	As allocation of ccb can be on the paging path we must use a
 	locked pool.
 */
 
@@ -19,7 +19,7 @@
 // ccb are relatively large, so don't make it too small to not waste memory
 #define CCB_CHUNK_SIZE 16*1024
 
-// maximum number of CCBs - probably, we want to make that editable 
+// maximum number of CCBs - probably, we want to make that editable
 // it must be at least 1 for normal use and 1 for stand-by autosense request
 #define CCB_NUM_MAX 128
 
@@ -40,6 +40,7 @@ scsi_alloc_ccb(scsi_device_info *device)
 	// reset some very important fields
 	// TODO: should we better omit that to find bugs easier?
 	ccb->sg_list = NULL;
+	ccb->io_operation = NULL;
 	ccb->sort = -1;
 
 	SHOW_FLOW(3, "path=%d", ccb->path_id);

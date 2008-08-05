@@ -160,7 +160,7 @@ AddFilesToHaikuImage beos system add-ons kernel debugger
 AddFilesToHaikuImage beos system add-ons kernel file_systems
 	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage beos system add-ons kernel generic
-	: block_io dpc ide_adapter locked_pool mpu401 scsi_periph ;
+	: dpc ide_adapter locked_pool mpu401 scsi_periph ;
 AddFilesToHaikuImage beos system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToHaikuImage beos system add-ons kernel interrupt_controllers
@@ -372,7 +372,7 @@ AddFilesToHaikuImage beos system : zbeos ;
 AddBootModuleSymlinksToHaikuImage
 	pci $(X86_ONLY)isa config_manager ide scsi usb
 	$(PPC_ONLY)openpic
-	block_io ide_adapter locked_pool scsi_periph
+	ide_adapter locked_pool scsi_periph
 	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk

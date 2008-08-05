@@ -134,6 +134,7 @@ typedef struct scsi_ccb {
 	uint16		sg_count;			// number of S/G entries
 	uint32		data_length;		// length of data
 	int32		data_resid;			// data transfer residual length: 2's comp
+	void		*io_operation;
 
 	uchar		sense[SCSI_MAX_SENSE_SIZE]; // autosense data
 	uchar		sense_resid;		// autosense resid length: 2's comp

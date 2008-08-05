@@ -1,4 +1,5 @@
 /*
+ * Copyright 2004-2008, Haiku, Inc. All Rights Reserved.
  * Copyright 2002, Thomas Kurschel. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -6,19 +7,20 @@
 #define __SCSI_PERIPH_INT_H__
 
 
+#include <stddef.h>
+
 #include <scsi_periph.h>
 #include <block_io.h>
 #include <device_manager.h>
 
-#include <stddef.h>
-
+#include "io_requests.h"
 #include "wrapper.h"
 
 
 typedef struct scsi_periph_device_info {
 	struct scsi_periph_handle_info *handles;
 
-	scsi_device scsi_device;
+	::scsi_device scsi_device;
 	scsi_device_interface *scsi;
 	periph_device_cookie periph_device;
 	device_node *node;
@@ -27,10 +29,12 @@ typedef struct scsi_periph_device_info {
 
 	bool removable;			// true, if device is removable
 
+	uint32 block_size;
+	int32 preferred_ccb_size;
 	int32 rw10_enabled;		// 10 byte r/w commands supported; access must be atomic
 	int32 next_tag_action;	// queuing flag for next r/w command; access must be atomic
 
-	mutex mutex;
+	struct mutex mutex;
 	int std_timeout;
 
 	scsi_periph_callbacks *callbacks;
@@ -46,7 +50,7 @@ typedef struct scsi_periph_handle_info {
 	periph_handle_cookie periph_handle;
 } scsi_periph_handle_info;
 
-extern device_manager_info *pnp;
+extern device_manager_info *gDeviceManager;
 
 
 // removable.c
@@ -79,20 +83,17 @@ status_t periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *ccb);
 // device.c
 
 status_t periph_register_device(periph_device_cookie periph_device,
-	scsi_periph_callbacks *callbacks, scsi_device scsi_device, scsi_device_interface *scsi,
-	device_node *node, bool removable, scsi_periph_device *driver);
+	scsi_periph_callbacks *callbacks, scsi_device scsi_device,
+	scsi_device_interface *scsi, device_node *node, bool removable,
+	int preferredCcbSize, scsi_periph_device *driver);
 status_t periph_unregister_device(scsi_periph_device_info *driver);
 char *periph_compose_device_name(device_node *device_node, const char *prefix);
 
 
 // io.c
 
-status_t periph_read(scsi_periph_handle_info *handle, const phys_vecs *vecs,
-	off_t pos, size_t num_blocks, uint32 block_size, size_t *bytes_transferred,
-	int preferred_ccb_size);
-status_t periph_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
-	off_t pos, size_t num_blocks, uint32 block_size, size_t *bytes_transferred,
-	int preferred_ccb_size);
+status_t periph_io(scsi_periph_device_info* device, io_operation* operation,
+	size_t *_bytesTransferred);
 status_t periph_ioctl(scsi_periph_handle_info *handle, int op,
 	void *buf, size_t len);
 void periph_sync_queue_daemon(void *arg, int iteration);

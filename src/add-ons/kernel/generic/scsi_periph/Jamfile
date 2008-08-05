@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel generic scsi_periph ;
 
 UsePrivateHeaders drivers kernel ;
+SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
 
 # disable debug output, if debugging is disabled
 if $(DEBUG) = 0 {
@@ -8,13 +9,13 @@ if $(DEBUG) = 0 {
 }
 
 KernelAddon scsi_periph :
-	block.c
-	device_icons.c
-	device.c
-	error_handling.c
-	handle.c
-	io.c
-	removable.c
-	scsi_periph.c
-	sync.c
+	block.cpp
+	device_icons.cpp
+	device.cpp
+	error_handling.cpp
+	handle.cpp
+	io.cpp
+	removable.cpp
+	scsi_periph.cpp
+	sync.cpp
 	;

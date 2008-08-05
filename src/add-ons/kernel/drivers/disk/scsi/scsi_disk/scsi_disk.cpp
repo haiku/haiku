@@ -29,13 +29,12 @@
 #endif
 
 
-static scsi_periph_interface *sSCSIPeripheral;
-static device_manager_info *sDeviceManager;
-static block_io_for_driver_interface *sBlockIO;
+static scsi_periph_interface* sSCSIPeripheral;
+static device_manager_info* sDeviceManager;
 
 
 static status_t
-update_capacity(das_device_info *device)
+update_capacity(das_driver_info *device)
 {
 	TRACE("update_capacity()\n");
 
@@ -53,20 +52,20 @@ update_capacity(das_device_info *device)
 
 
 static status_t
-get_geometry(das_handle_info *handle, device_geometry *geometry)
+get_geometry(das_handle* handle, device_geometry* geometry)
 {
-	das_device_info *device = handle->device;
+	das_driver_info* info = handle->info;
 
-	status_t status = update_capacity(device);
+	status_t status = update_capacity(info);
 	if (status < B_OK)
 		return status;
 
-	geometry->bytes_per_sector = device->block_size;
+	geometry->bytes_per_sector = info->block_size;
 	geometry->sectors_per_track = 1;
-	geometry->cylinder_count = device->capacity;
+	geometry->cylinder_count = info->capacity;
 	geometry->head_count = 1;
 	geometry->device_type = B_DISK;
-	geometry->removable = device->removable;
+	geometry->removable = info->removable;
 
 	// TBD: for all but CD-ROMs, read mode sense - medium type
 	// (bit 7 of block device specific parameter for Optical Memory Block Device)
@@ -86,7 +85,7 @@ get_geometry(das_handle_info *handle, device_geometry *geometry)
 
 
 static status_t
-load_eject(das_device_info *device, bool load)
+load_eject(das_driver_info *device, bool load)
 {
 	TRACE("load_eject()\n");
 
@@ -104,7 +103,7 @@ load_eject(das_device_info *device, bool load)
 
 
 static status_t
-synchronize_cache(das_device_info *device)
+synchronize_cache(das_driver_info *device)
 {
 	TRACE("synchronize_cache()\n");
 
@@ -135,36 +134,65 @@ log2(uint32 x)
 }
 
 
-//	#pragma mark - block_io API
-
-
-static void
-das_set_device(das_device_info *info, block_io_device device)
+static status_t
+do_io(void* cookie, IOOperation* operation)
 {
-	info->block_io_device = device;
+	das_driver_info* info = (das_driver_info*)cookie;
+
+	// TODO: this can go away as soon as we pushed the IOOperation to the upper
+	// layers - we can then set scsi_periph::io() as callback for the scheduler
+	size_t bytesTransferred;
+	status_t status = sSCSIPeripheral->io(info->scsi_periph_device, operation,
+		&bytesTransferred);
+
+	info->io_scheduler->OperationCompleted(operation, status, bytesTransferred);
+	return status;
+}
+
+
+//	#pragma mark - device module API
+
+
+static status_t
+das_init_device(void* _info, void** _cookie)
+{
+	das_driver_info* info = (das_driver_info*)_info;
 
 	// and get (initial) capacity
 	scsi_ccb *request = info->scsi->alloc_ccb(info->scsi_device);
 	if (request == NULL)
-		return;
+		return B_NO_MEMORY;
 
 	sSCSIPeripheral->check_capacity(info->scsi_periph_device, request);
 	info->scsi->free_ccb(request);
+
+	*_cookie = info;
+	return B_OK;
+}
+
+
+static void
+das_uninit_device(void* _cookie)
+{
+	das_driver_info* info = (das_driver_info*)_cookie;
+
+	delete info->io_scheduler;
+	delete info->dma_resource;
 }
 
 
 static status_t
-das_open(das_device_info *device, das_handle_info **_cookie)
+das_open(void* _info, const char* path, int openMode, void** _cookie)
 {
-	TRACE("open()\n");
+	das_driver_info* info = (das_driver_info*)_info;
 
-	das_handle_info *handle = (das_handle_info *)malloc(sizeof(*handle));
+	das_handle* handle = (das_handle*)malloc(sizeof(das_handle));
 	if (handle == NULL)
 		return B_NO_MEMORY;
 
-	handle->device = device;
+	handle->info = info;
 
-	status_t status = sSCSIPeripheral->handle_open(device->scsi_periph_device,
+	status_t status = sSCSIPeripheral->handle_open(info->scsi_periph_device,
 		(periph_handle_cookie)handle, &handle->scsi_periph_handle);
 	if (status < B_OK) {
 		free(handle);
@@ -177,8 +205,9 @@ das_open(das_device_info *device, das_handle_info **_cookie)
 
 
 static status_t
-das_close(das_handle_info *handle)
+das_close(void* cookie)
 {
+	das_handle* handle = (das_handle*)cookie;
 	TRACE("close()\n");
 
 	sSCSIPeripheral->handle_close(handle->scsi_periph_handle);
@@ -187,8 +216,9 @@ das_close(das_handle_info *handle)
 
 
 static status_t
-das_free(das_handle_info *handle)
+das_free(void* cookie)
 {
+	das_handle* handle = (das_handle*)cookie;
 	TRACE("free()\n");
 
 	sSCSIPeripheral->handle_free(handle->scsi_periph_handle);
@@ -198,38 +228,80 @@ das_free(das_handle_info *handle)
 
 
 static status_t
-das_read(das_handle_info *handle, const phys_vecs *vecs, off_t pos,
-	size_t num_blocks, uint32 block_size, size_t *bytes_transferred)
+das_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 {
-	return sSCSIPeripheral->read(handle->scsi_periph_handle, vecs, pos,
-		num_blocks, block_size, bytes_transferred, 10);
+	das_handle* handle = (das_handle*)cookie;
+	size_t length = *_length;
+
+	IORequest request;
+	status_t status = request.Init(pos, buffer, length, false, 0);
+	if (status != B_OK)
+		return status;
+
+	status = handle->info->io_scheduler->ScheduleRequest(&request);
+	if (status != B_OK)
+		return status;
+
+	status = request.Wait(0, 0);
+	if (status == B_OK)
+		*_length = length;
+	else
+		dprintf("das_read(): request.Wait() returned: %s\n", strerror(status));
+
+	return status;
 }
 
 
 static status_t
-das_write(das_handle_info *handle, const phys_vecs *vecs, off_t pos,
-	size_t num_blocks, uint32 block_size, size_t *bytes_transferred)
+das_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 {
-	return sSCSIPeripheral->write(handle->scsi_periph_handle, vecs, pos,
-		num_blocks, block_size, bytes_transferred, 10);
+	das_handle* handle = (das_handle*)cookie;
+	size_t length = *_length;
+
+	IORequest request;
+	status_t status = request.Init(pos, (void*)buffer, length, true, 0);
+	if (status != B_OK)
+		return status;
+
+	status = handle->info->io_scheduler->ScheduleRequest(&request);
+	if (status != B_OK)
+		return status;
+
+	status = request.Wait(0, 0);
+	if (status == B_OK)
+		*_length = length;
+	else
+		dprintf("das_write(): request.Wait() returned: %s\n", strerror(status));
+
+	return status;
 }
 
 
 static status_t
-das_ioctl(das_handle_info *handle, int op, void *buffer, size_t length)
+das_io(void *cookie, io_request *request)
 {
-	das_device_info *device = handle->device;
+	das_handle* handle = (das_handle*)cookie;
+
+	return handle->info->io_scheduler->ScheduleRequest(request);
+}
+
+
+static status_t
+das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
+{
+	das_handle* handle = (das_handle*)cookie;
+	das_driver_info* info = handle->info;
 
 	TRACE("ioctl(op = %d)\n", op);
 
 	switch (op) {
 		case B_GET_DEVICE_SIZE:
 		{
-			status_t status = update_capacity(device);
+			status_t status = update_capacity(info);
 			if (status != B_OK)
 				return status;
 
-			size_t size = device->capacity * device->block_size;
+			size_t size = info->capacity * info->block_size;
 			return user_memcpy(buffer, &size, sizeof(size_t));
 		}
 
@@ -242,23 +314,23 @@ das_ioctl(das_handle_info *handle, int op, void *buffer, size_t length)
 			status_t status = get_geometry(handle, &geometry);
 			if (status != B_OK)
 				return status;
-			
+
 			return user_memcpy(buffer, &geometry, sizeof(device_geometry));
 		}
 
 		case B_GET_ICON:
-			return sSCSIPeripheral->get_icon(device->removable
+			return sSCSIPeripheral->get_icon(info->removable
 				? icon_type_floppy : icon_type_disk, (device_icon *)buffer);
 
 		case B_EJECT_DEVICE:
 		case B_SCSI_EJECT:
-			return load_eject(device, false);
+			return load_eject(info, false);
 
 		case B_LOAD_MEDIA:
-			return load_eject(device, true);
+			return load_eject(info, true);
 
 		case B_FLUSH_DRIVE_CACHE:
-			return synchronize_cache(device);
+			return synchronize_cache(info);
 
 		default:
 			return sSCSIPeripheral->ioctl(handle->scsi_periph_handle, op,
@@ -271,7 +343,7 @@ das_ioctl(das_handle_info *handle, int op, void *buffer, size_t length)
 
 
 static void
-das_set_capacity(das_device_info *device, uint64 capacity, uint32 blockSize)
+das_set_capacity(das_driver_info* info, uint64 capacity, uint32 blockSize)
 {
 	TRACE("das_set_capacity(device = %p, capacity = %Ld, blockSize = %ld)\n",
 		device, capacity, blockSize);
@@ -282,19 +354,40 @@ das_set_capacity(das_device_info *device, uint64 capacity, uint32 blockSize)
 	if ((1UL << blockShift) != blockSize)
 		blockShift = 0;
 
-	device->capacity = capacity;
-	device->block_size = blockSize;
+	info->capacity = capacity;
 
-	sBlockIO->set_media_params(device->block_io_device, blockSize,
-		blockShift, capacity);
+	if (info->block_size != blockSize) {
+		if (info->block_size != 0) {
+			dprintf("old %ld, new %ld\n", info->block_size, blockSize);
+			panic("updating DMAResource not yet implemented...");
+		}
+
+		// TODO: we need to replace the DMAResource in our IOScheduler
+		status_t status = info->dma_resource->Init(info->node, blockSize);
+		if (status != B_OK)
+			panic("initializing DMAResource failed: %s", strerror(status));
+
+		info->io_scheduler = new(std::nothrow) IOScheduler(info->dma_resource);
+		if (info->io_scheduler == NULL)
+			panic("allocating IOScheduler failed.");
+
+		// TODO: use whole device name here
+		status = info->io_scheduler->Init("scsi");
+		if (status != B_OK)
+			panic("initializing IOScheduler failed: %s", strerror(status));
+
+		info->io_scheduler->SetCallback(do_io, info);
+	}
+
+	info->block_size = blockSize;
 }
 
 
 static void
-das_media_changed(das_device_info *device, scsi_ccb *request)
+das_media_changed(das_driver_info *device, scsi_ccb *request)
 {
 	// do a capacity check
-	// TBD: is this a good idea (e.g. if this is an empty CD)?
+	// TODO: is this a good idea (e.g. if this is an empty CD)?
 	sSCSIPeripheral->check_capacity(device->scsi_periph_device, request);
 }
 
@@ -363,53 +456,54 @@ das_register_device(device_node *node)
 		{"removable", B_UINT8_TYPE, {ui8: deviceInquiry->removable_medium}},
 		// impose own max block restriction
 		{B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, {ui32: maxBlocks}},
-		// in general, any disk can be a BIOS drive (even ZIP-disks)
-		{B_BLOCK_DEVICE_IS_BIOS_DRIVE, B_UINT8_TYPE, {ui8: 1}},
 		{ NULL }
 	};
 
-	return sDeviceManager->register_node(node, SCSI_DISK_MODULE_NAME, attrs,
-		NULL, NULL);
+	return sDeviceManager->register_node(node, SCSI_DISK_DRIVER_MODULE_NAME,
+		attrs, NULL, NULL);
 }
 
 
 static status_t
 das_init_driver(device_node *node, void **cookie)
 {
-	das_device_info *device;
-	status_t status;
-	uint8 removable;
-
 	TRACE("das_init_driver");
 
-	status = sDeviceManager->get_attr_uint8(node, "removable",
+	uint8 removable;
+	status_t status = sDeviceManager->get_attr_uint8(node, "removable",
 		&removable, false);
 	if (status != B_OK)
 		return status;
 
-	device = (das_device_info *)malloc(sizeof(*device));
-	if (device == NULL)
+	das_driver_info* info = (das_driver_info*)malloc(sizeof(das_driver_info));
+	if (info == NULL)
 		return B_NO_MEMORY;
 
-	memset(device, 0, sizeof(*device));
+	memset(info, 0, sizeof(*info));
 
-	device->node = node;
-	device->removable = removable;
+	info->dma_resource = new(std::nothrow) DMAResource;
+	if (info->dma_resource == NULL) {
+		free(info);
+		return B_NO_MEMORY;
+	}
 
-	device_node *parent = sDeviceManager->get_parent_node(node);
-	sDeviceManager->get_driver(parent, (driver_module_info **)&device->scsi,
-		(void **)&device->scsi_device);
+	info->node = node;
+	info->removable = removable;
+
+	device_node* parent = sDeviceManager->get_parent_node(node);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&info->scsi,
+		(void **)&info->scsi_device);
 	sDeviceManager->put_node(parent);
 
-	status = sSCSIPeripheral->register_device((periph_device_cookie)device,
-		&callbacks, device->scsi_device, device->scsi, device->node,
-		device->removable, &device->scsi_periph_device);
+	status = sSCSIPeripheral->register_device((periph_device_cookie)info,
+		&callbacks, info->scsi_device, info->scsi, info->node,
+		info->removable, 10, &info->scsi_periph_device);
 	if (status != B_OK) {
-		free(device);
+		free(info);
 		return status;
 	}
 
-	*cookie = device;
+	*cookie = info;
 	return B_OK;
 }
 
@@ -417,26 +511,26 @@ das_init_driver(device_node *node, void **cookie)
 static void
 das_uninit_driver(void *_cookie)
 {
-	das_device_info *device = (das_device_info *)_cookie;
+	das_driver_info* info = (das_driver_info*)_cookie;
 
-	sSCSIPeripheral->unregister_device(device->scsi_periph_device);
-	free(device);
+	sSCSIPeripheral->unregister_device(info->scsi_periph_device);
+	free(info);
 }
 
 
 static status_t
-das_register_child_devices(void *_cookie)
+das_register_child_devices(void* _cookie)
 {
-	das_device_info *device = (das_device_info *)_cookie;
+	das_driver_info* info = (das_driver_info*)_cookie;
 	status_t status;
-	char *name;
 
-	name = sSCSIPeripheral->compose_device_name(device->node, "disk/scsi");
+	char* name = sSCSIPeripheral->compose_device_name(info->node,
+		"disk/scsi");
 	if (name == NULL)
 		return B_ERROR;
 
-	status = sDeviceManager->publish_device(device->node, name,
-		B_BLOCK_IO_DEVICE_MODULE_NAME);
+	status = sDeviceManager->publish_device(info->node, name,
+		SCSI_DISK_DEVICE_MODULE_NAME);
 
 	free(name);
 	return status;
@@ -444,43 +538,52 @@ das_register_child_devices(void *_cookie)
 
 
 module_dependency module_dependencies[] = {
-	{SCSI_PERIPH_MODULE_NAME, (module_info **)&sSCSIPeripheral},
-	{B_BLOCK_IO_FOR_DRIVER_MODULE_NAME, (module_info **)&sBlockIO},
-	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager},
+	{SCSI_PERIPH_MODULE_NAME, (module_info**)&sSCSIPeripheral},
+	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager},
 	{}
 };
 
-block_device_interface sSCSIDiskModule = {
+struct device_module_info sSCSIDiskDevice = {
 	{
-		{
-			SCSI_DISK_MODULE_NAME,
-			0,
-			NULL
-		},
-
-		das_supports_device,
-		das_register_device,
-		das_init_driver,
-		das_uninit_driver,
-		das_register_child_devices,
-		NULL,	// rescan
-		NULL,	// removed
+		SCSI_DISK_DEVICE_MODULE_NAME,
+		0,
+		NULL
 	},
 
-	(void (*)(block_device_cookie *, block_io_device))	&das_set_device,
-	(status_t (*)(block_device_cookie *, block_device_handle_cookie **))&das_open,
-	(status_t (*)(block_device_handle_cookie *))		&das_close,
-	(status_t (*)(block_device_handle_cookie *))		&das_free,
+	das_init_device,
+	das_uninit_device,
+	NULL, //das_remove,
 
-	(status_t (*)(block_device_handle_cookie *, const phys_vecs *,
-		off_t, size_t, uint32, size_t *))				&das_read,
-	(status_t (*)(block_device_handle_cookie *, const phys_vecs *,
-		off_t, size_t, uint32, size_t *))				&das_write,
+	das_open,
+	das_close,
+	das_free,
+	das_read,
+	das_write,
+	das_io,
+	das_ioctl,
 
-	(status_t (*)(block_device_handle_cookie *, int, void *, size_t))&das_ioctl,
+	NULL,	// select
+	NULL,	// deselect
 };
 
-module_info *modules[] = {
-	(module_info *)&sSCSIDiskModule,
+struct driver_module_info sSCSIDiskDriver = {
+	{
+		SCSI_DISK_DRIVER_MODULE_NAME,
+		0,
+		NULL
+	},
+
+	das_supports_device,
+	das_register_device,
+	das_init_driver,
+	das_uninit_driver,
+	das_register_child_devices,
+	NULL,	// rescan
+	NULL,	// removed
+};
+
+module_info* modules[] = {
+	(module_info*)&sSCSIDiskDriver,
+	(module_info*)&sSCSIDiskDevice,
 	NULL
 };

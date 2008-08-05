@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -15,19 +15,16 @@
 #include <string.h>
 
 
-device_manager_info *pnp;
+device_manager_info* gDeviceManager;
 
 
 status_t
-periph_simple_exec(scsi_periph_device_info *device, void *cdb, uchar cdbLength,
-	void *data, size_t dataLength, int ccb_flags)
+periph_simple_exec(scsi_periph_device_info* device, void* cdb, uchar cdbLength,
+	void* data, size_t dataLength, int ccb_flags)
 {
-	scsi_ccb *ccb;
-	status_t res;
-
 	SHOW_FLOW0( 0, "" );
 
-	ccb = device->scsi->alloc_ccb(device->scsi_device);
+	scsi_ccb* ccb = device->scsi->alloc_ccb(device->scsi_device);
 	if (ccb == NULL)
 		return B_NO_MEMORY;
 
@@ -39,15 +36,15 @@ periph_simple_exec(scsi_periph_device_info *device, void *cdb, uchar cdbLength,
 	ccb->sort = -1;
 	ccb->timeout = device->std_timeout;
 
-	ccb->data = data;
+	ccb->data = (uint8*)data;
 	ccb->sg_list = NULL;
 	ccb->data_length = dataLength;
 
-	res = periph_safe_exec(device, ccb);
+	status_t status = periph_safe_exec(device, ccb);
 
 	device->scsi->free_ccb(ccb);
 
-	return res;
+	return status;
 }
 
 
@@ -60,7 +57,7 @@ periph_safe_exec(scsi_periph_device_info *device, scsi_ccb *request)
 	do {
 		device->scsi->sync_io(request);
 
-		// ask generic peripheral layer what to do now	
+		// ask generic peripheral layer what to do now
 		res = periph_check_error(device, request);
 		if (res.action == err_act_start) {
 			// backup request, as we need it temporarily for sending "start"
@@ -111,45 +108,30 @@ periph_safe_exec(scsi_periph_device_info *device, scsi_ccb *request)
 }
 
 
-static status_t
-std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
-}
-
-
 module_dependency module_dependencies[] = {
-	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&gDeviceManager},
 	{}
 };
 
 
-scsi_periph_interface scsi_periph_module = {
+static scsi_periph_interface sSCSIPeripheralModule = {
 	{
 		SCSI_PERIPH_MODULE_NAME,
 		0,
-		std_ops
+		NULL
 	},
-	
+
 	periph_register_device,
 	periph_unregister_device,
-	
+
 	periph_safe_exec,
 	periph_simple_exec,
 
 	periph_handle_open,
 	periph_handle_close,
 	periph_handle_free,
-	
-	periph_read,
-	periph_write,
+
+	periph_io,
 	periph_ioctl,
 	periph_check_capacity,
 
@@ -157,14 +139,14 @@ scsi_periph_interface scsi_periph_module = {
 	periph_check_error,
 	periph_send_start_stop,
 	periph_get_media_status,
-	
+
 	periph_compose_device_name,
 	periph_get_icon,
-	
+
 	periph_synchronize_cache
 };
 
 scsi_periph_interface *modules[] = {
-	&scsi_periph_module, 
+	&sSCSIPeripheralModule,
 	NULL
 };
