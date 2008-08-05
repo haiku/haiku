@@ -391,7 +391,8 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 		thread->id);
 	thread->kernel_stack_area = create_area(stack_name,
 		(void **)&thread->kernel_stack_base, B_ANY_KERNEL_ADDRESS,
-		KERNEL_STACK_SIZE, B_FULL_LOCK,
+		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES  * B_PAGE_SIZE,
+		B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_STACK_AREA);
 
 	if (thread->kernel_stack_area < 0) {
@@ -405,7 +406,8 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 		return status;
 	}
 
-	thread->kernel_stack_top = thread->kernel_stack_base + KERNEL_STACK_SIZE;
+	thread->kernel_stack_top = thread->kernel_stack_base + KERNEL_STACK_SIZE
+		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -499,6 +501,7 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 				thread->user_stack_size = USER_STACK_SIZE;
 			else
 				thread->user_stack_size = PAGE_ALIGN(attributes.stack_size);
+			thread->user_stack_size += USER_STACK_GUARD_PAGES * B_PAGE_SIZE;
 
 			snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_stack",
 				attributes.name, thread->id);

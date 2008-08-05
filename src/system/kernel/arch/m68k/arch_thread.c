@@ -110,7 +110,7 @@ m68k_next_page_directory(struct thread *from, struct thread *to)
 		// the one we're switching to is kernel space
 		return m68k_translation_map_get_pgdir(&vm_kernel_address_space()->translation_map);
 	}
-	
+
 	return m68k_translation_map_get_pgdir(&to->team->address_space->translation_map);
 }
 
@@ -150,15 +150,15 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 	void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
-	addr_t *kstackTop = kstack + KERNEL_STACK_SIZE / sizeof(addr_t);
+	addr_t *kstackTop = (addr_t *)t->kernel_stack_base;
 
 	// clear the kernel stack
 #ifdef DEBUG_KERNEL_STACKS
 #	ifdef STACK_GROWS_DOWNWARDS
 	memset((void *)((addr_t)kstack + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE), 0,
-		KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+		KERNEL_STACK_SIZE);
 #	else
-	memset(kstack, 0, KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+	memset(kstack, 0, KERNEL_STACK_SIZE);
 #	endif
 #else
 	memset(kstack, 0, KERNEL_STACK_SIZE);

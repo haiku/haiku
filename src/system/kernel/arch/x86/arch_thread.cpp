@@ -261,9 +261,9 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 #ifdef DEBUG_KERNEL_STACKS
 #	ifdef STACK_GROWS_DOWNWARDS
 	memset((void *)((addr_t)kstack + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE), 0,
-		KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+		KERNEL_STACK_SIZE);
 #	else
-	memset(kstack, 0, KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+	memset(kstack, 0, KERNEL_STACK_SIZE);
 #	endif
 #else
 	memset(kstack, 0, KERNEL_STACK_SIZE);

@@ -122,15 +122,15 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 	void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
-	addr_t *kstackTop = kstack + KERNEL_STACK_SIZE / sizeof(addr_t);
+	addr_t *kstackTop = (addr_t *)t->kernel_stack_top;
 
 	// clear the kernel stack
 #ifdef DEBUG_KERNEL_STACKS
 #	ifdef STACK_GROWS_DOWNWARDS
 	memset((void *)((addr_t)kstack + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE), 0,
-		KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+		KERNEL_STACK_SIZE);
 #	else
-	memset(kstack, 0, KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+	memset(kstack, 0, KERNEL_STACK_SIZE);
 #	endif
 #else
 	memset(kstack, 0, KERNEL_STACK_SIZE);
@@ -180,9 +180,9 @@ void
 arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 {
     // set the new kernel stack in the EAR register.
-	// this is used in the exception handler code to decide what kernel stack to 
-	// switch to if the exception had happened when the processor was in user mode  
-	asm("mtear  %0" :: "g"(t_to->kernel_stack_base + KERNEL_STACK_SIZE - 8));
+	// this is used in the exception handler code to decide what kernel stack to
+	// switch to if the exception had happened when the processor was in user mode
+	asm("mtear  %0" :: "g"(t_to->kernel_stack_top - 8));
 
     // switch the asids if we need to
 	if (t_to->team->address_space != NULL) {

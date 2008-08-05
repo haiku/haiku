@@ -27,12 +27,13 @@
 	// At least, you then know that the stack overflows in this case :)
 
 /** Size of the kernel stack */
-#ifndef DEBUG_KERNEL_STACKS
-#	define KERNEL_STACK_SIZE		(B_PAGE_SIZE * 3)	// 12 kB
+#define KERNEL_STACK_SIZE		(B_PAGE_SIZE * 3)	// 12 kB
+
+#ifdef DEBUG_KERNEL_STACKS
+#	define KERNEL_STACK_GUARD_PAGES	1
 #else
-#	define KERNEL_STACK_SIZE		(B_PAGE_SIZE * 4)	// 12 kB + one guard page
+#	define KERNEL_STACK_GUARD_PAGES	0
 #endif
-#define KERNEL_STACK_GUARD_PAGES	1
 
 /** Size of the environmental variables space for a process */
 #define ENV_SIZE	(B_PAGE_SIZE * 8)

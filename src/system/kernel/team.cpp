@@ -985,10 +985,12 @@ team_create_thread_start(void *args)
 	// ToDo: ENV_SIZE is a) limited, and b) not used after libroot copied it to the heap
 	// ToDo: we could reserve the whole USER_STACK_REGION upfront...
 
-	sizeLeft = PAGE_ALIGN(USER_MAIN_THREAD_STACK_SIZE + TLS_SIZE
+	sizeLeft = PAGE_ALIGN(USER_MAIN_THREAD_STACK_SIZE
+		+ USER_STACK_GUARD_PAGES * B_PAGE_SIZE + TLS_SIZE
 		+ sizeof(struct user_space_program_args) + teamArgs->flat_args_size);
 	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - sizeLeft;
-	t->user_stack_size = USER_MAIN_THREAD_STACK_SIZE;
+	t->user_stack_size = USER_MAIN_THREAD_STACK_SIZE
+		+ USER_STACK_GUARD_PAGES * B_PAGE_SIZE;
 		// the exact location at the end of the user stack area
 
 	sprintf(ustack_name, "%s_main_stack", team->name);

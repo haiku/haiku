@@ -179,7 +179,7 @@ return 0;
 
 		kprintf("    kernel stack: %p to %p\n",
 			(void *)thread->kernel_stack_base,
-			(void *)(thread->kernel_stack_base + KERNEL_STACK_SIZE));
+			(void *)(thread->kernel_stack_top));
 		if (thread->user_stack_base != 0) {
 			kprintf("      user stack: %p to %p\n",
 				(void *)thread->user_stack_base,

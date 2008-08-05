@@ -302,7 +302,7 @@ get_memory_map(extended_memory **_extendedMemory)
 	dprintf("extended memory info (from 0xe820):\n");
 	for (uint32 i = 0; i < count; i++) {
 		dprintf("    base 0x%08Lx, len 0x%08Lx, type %lu (%s)\n",
-			block[i].base_addr, block[i].length, 
+			block[i].base_addr, block[i].length,
 			block[i].type, e820_memory_type(block[i].type));
 	}
 #endif
@@ -606,8 +606,9 @@ mmu_init(void)
 
 	// map in a kernel stack
 	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL,
-		KERNEL_STACK_SIZE);
-	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE;
+		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
+		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 
 	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));

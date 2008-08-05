@@ -1576,6 +1576,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 	vm_cache *cache;
 	vm_page *page = NULL;
 	bool isStack = (protection & B_STACK_AREA) != 0;
+	page_num_t guardPages;
 	bool canOvercommit = false;
 	addr_t physicalBase = 0;
 
@@ -1693,10 +1694,10 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 
 	// create an anonymous cache
 	// if it's a stack, make sure that two pages are available at least
-	status = VMCacheFactory::CreateAnonymousCache(cache,
-		canOvercommit, isStack ? 2 : 0,
-		isStack ? ((protection & B_USER_PROTECTION) != 0 ?
-			USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0,
+	guardPages = isStack ? ((protection & B_USER_PROTECTION) != 0
+		? USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0;
+	status = VMCacheFactory::CreateAnonymousCache(cache, canOvercommit,
+		isStack ? (min_c(2, size / B_PAGE_SIZE - guardPages)) : 0, guardPages,
 		wiring == B_NO_LOCK);
 	if (status != B_OK)
 		goto err1;

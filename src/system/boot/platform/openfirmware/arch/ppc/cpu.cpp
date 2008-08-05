@@ -76,7 +76,7 @@ boot_arch_cpu_init(void)
 			gKernelArgs.arch_args.cpu_frequency = clockFrequency;
 			gKernelArgs.arch_args.bus_frequency = busFrequency;
 			gKernelArgs.arch_args.time_base_frequency = timeBaseFrequency;
-			
+
 			TRACE(("  CPU clock frequency: %ld\n", clockFrequency));
 			TRACE(("  bus clock frequency: %ld\n", busFrequency));
 			TRACE(("  time base frequency: %ld\n", timeBaseFrequency));
@@ -84,7 +84,7 @@ boot_arch_cpu_init(void)
 
 		cpuCount++;
 	}
-	
+
 	if (cpuCount == 0) {
 		printf("boot_arch_cpu_init(): Found no CPUs!\n");
 		return B_ERROR;
@@ -95,7 +95,8 @@ boot_arch_cpu_init(void)
 	// allocate the kernel stacks (the memory stuff is already initialized
 	// at this point)
 	addr_t stack = (addr_t)arch_mmu_allocate((void*)0x80000000,
-		cpuCount * KERNEL_STACK_SIZE, B_READ_AREA | B_WRITE_AREA, false);
+		cpuCount * (KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE),
+		B_READ_AREA | B_WRITE_AREA, false);
 	if (!stack) {
 		printf("boot_arch_cpu_init(): Failed to allocate kernel stack(s)!\n");
 		return B_NO_MEMORY;
@@ -103,8 +104,9 @@ boot_arch_cpu_init(void)
 
 	for (int i = 0; i < cpuCount; i++) {
 		gKernelArgs.cpu_kstack[i].start = stack;
-		gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE;
-		stack += KERNEL_STACK_SIZE;
+		gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE
+			+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
+		stack += KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 	}
 
 	return B_OK;

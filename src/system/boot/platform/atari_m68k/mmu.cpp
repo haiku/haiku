@@ -57,12 +57,12 @@
  *  0xdNNNNN			video buffer usually there, as per v_bas_ad
  *						(=Logbase() but Physbase() is better)
  *
- *	The first 32 MB (2) are identity mapped (0x0 - 0x1000000); paging 
- *	is turned on. The kernel is mapped at 0x80000000, all other stuff 
- *	mapped by the loader (kernel args, modules, driver settings, ...) 
- *	comes after 0x81000000 which means that there is currently only 
+ *	The first 32 MB (2) are identity mapped (0x0 - 0x1000000); paging
+ *	is turned on. The kernel is mapped at 0x80000000, all other stuff
+ *	mapped by the loader (kernel args, modules, driver settings, ...)
+ *	comes after 0x81000000 which means that there is currently only
  *	1 MB reserved for the kernel itself (see kMaxKernelSize).
- *	
+ *
  *	(1) no need for user stack, we are already in supervisor mode in the
  *	loader.
  *	(2) maps the whole regular ST space; transparent translation registers
@@ -143,9 +143,9 @@ extern "C" addr_t
 mmu_get_next_page_tables()
 {
 #if 0
-	TRACE(("mmu_get_next_page_tables, sNextPageTableAddress %p, kPageTableRegionEnd %p\n", 
+	TRACE(("mmu_get_next_page_tables, sNextPageTableAddress %p, kPageTableRegionEnd %p\n",
 		sNextPageTableAddress, kPageTableRegionEnd));
-	
+
 	addr_t address = sNextPageTableAddress;
 	if (address >= kPageTableRegionEnd)
 		return (uint32 *)get_next_physical_page();
@@ -492,7 +492,7 @@ mmu_init_for_kernel(void)
 		// seg 0x10 - kernel 4GB data
 		set_segment_descriptor(&virtualGDT[2], 0, 0xffffffff, DT_DATA_WRITEABLE,
 			DPL_KERNEL);
-		
+
 		// seg 0x1b - ring 3 user 4GB code
 		set_segment_descriptor(&virtualGDT[3], 0, 0xffffffff, DT_CODE_READABLE,
 			DPL_USER);
@@ -613,10 +613,12 @@ mmu_init(void)
 	// set virtual addr for interrupt vector table
 	gKernelArgs.arch_args.vir_vbr = gKernelArgs.arch_args.vir_pgroot
 		+ VBR_PAGE_OFFSET;
-	
+
 	// map in a kernel stack
-	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
-	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE;
+	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL,
+		KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
+		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 
 	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
@@ -633,9 +635,9 @@ mmu_init(void)
 		gKernelArgs.physical_memory_range[1].size =
 			fastram_top - ATARI_FASTRAM_BASE;
 		gKernelArgs.num_physical_memory_ranges++;
-		
+
 	}
-	
+
 	// mark the video area allocated
 	addr_t video_base = *TOSVAR_memtop;
 	video_base &= ~(B_PAGE_SIZE-1);

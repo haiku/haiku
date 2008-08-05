@@ -396,8 +396,10 @@ smp_init_other_cpus(void)
 
 	for (uint32 i = 1; i < gKernelArgs.num_cpus; i++) {
 		// create a final stack the trampoline code will put the ap processor on
-		gKernelArgs.cpu_kstack[i].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
-		gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE;
+		gKernelArgs.cpu_kstack[i].start = (addr_t)mmu_allocate(NULL,
+			KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+		gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE
+			+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 	}
 }
 
@@ -438,14 +440,18 @@ smp_boot_other_cpus(void)
 
 		// set this stack up
 		finalStack = (uint32 *)gKernelArgs.cpu_kstack[i].start;
-		memset(finalStack, 0, KERNEL_STACK_SIZE);
-		tempStack = (finalStack + KERNEL_STACK_SIZE / sizeof(uint32)) - 1;
+		memset((uint8*)finalStack + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE, 0,
+			KERNEL_STACK_SIZE);
+		tempStack = (finalStack
+			+ (KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
+				/ sizeof(uint32)) - 1;
 		*tempStack = (uint32)&smp_cpu_ready;
 
 		// set the trampoline stack up
 		tempStack = (uint32 *)(trampolineStack + B_PAGE_SIZE - 4);
 		// final location of the stack
-		*tempStack = ((uint32)finalStack) + KERNEL_STACK_SIZE - sizeof(uint32);
+		*tempStack = ((uint32)finalStack) + KERNEL_STACK_SIZE
+			+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE - sizeof(uint32);
 		tempStack--;
 		// page dir
 		*tempStack = gKernelArgs.arch_args.phys_pgdir;
