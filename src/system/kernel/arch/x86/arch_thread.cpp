@@ -472,11 +472,12 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *action,
 	regs.eax = frame->eax;
 	regs.ecx = frame->ecx;
 	regs.edx = frame->edx;
+	regs.ebp = frame->ebp;
 	regs.esp = frame->esp;
 	regs._reserved_1 = frame->user_esp;
 	regs._reserved_2[0] = frame->edi;
 	regs._reserved_2[1] = frame->esi;
-	regs._reserved_2[2] = frame->ebp;
+	regs._reserved_2[2] = frame->ebx;
 	i386_fnsave((void *)(&regs.xregs));
 
 	userStack -= (sizeof(struct vregs) + 3) / 4;
@@ -565,11 +566,12 @@ arch_restore_signal_frame(void)
 	frame->eax = regs.eax;
 	frame->ecx = regs.ecx;
 	frame->edx = regs.edx;
+	frame->ebp = regs.ebp;
 	frame->esp = regs.esp;
 	frame->user_esp = regs._reserved_1;
 	frame->edi = regs._reserved_2[0];
 	frame->esi = regs._reserved_2[1];
-	frame->ebp = regs._reserved_2[2];
+	frame->ebx = regs._reserved_2[2];
 
 	i386_frstor((void *)(&regs.xregs));
 
