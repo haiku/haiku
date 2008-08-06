@@ -1,12 +1,11 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Emulation of SCSI commands that a device cannot handle.
+/*!	Emulation of SCSI commands that a device cannot handle.
 
 	Some SCSI devices don't support all SCSI commands, especially
 	those connected via ATAPI, USB or FireWire. These commands are
@@ -102,8 +101,7 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 }
 
 
-/*!
-	Some ATAPI devices don't like 6 byte read/write commands, so
+/*!	Some ATAPI devices don't like 6 byte read/write commands, so
 	we translate them to their 10 byte counterparts;
 	USB devices usually don't like 10 bytes either
 */
@@ -122,7 +120,10 @@ scsi_read_write_6(scsi_ccb *request)
 	cdb->lun = cmd->lun;
 	cdb->lba = B_HOST_TO_BENDIAN_INT32((uint32)cmd->low_lba
 		| ((uint32)cmd->mid_lba << 8) | ((uint32)cmd->high_lba << 16));
-	cdb->length = B_HOST_TO_BENDIAN_INT16((uint16)cmd->length);
+	if (cmd->length == 0)
+		cdb->length = B_HOST_TO_BENDIAN_INT16(256);
+	else
+		cdb->length = B_HOST_TO_BENDIAN_INT16((uint16)cmd->length);
 	cdb->control = cmd->control;
 
 	return true;
