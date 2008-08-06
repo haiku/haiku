@@ -188,8 +188,13 @@ Grepper::_GrepperThread()
 		message.MakeEmpty();
 		message.what = MSG_REPORT_RESULT;
 		message.AddString("filename", fileName);
-		
+
 		BEntry entry(fileName);
+		if (!entry.Exists()) {
+			if (fIterator->NotifyNegatives())
+				fTarget.SendMessage(&message);
+			continue;
+		}
 		entry_ref ref;
 		entry.GetRef(&ref);
 		message.AddRef("ref", &ref);
