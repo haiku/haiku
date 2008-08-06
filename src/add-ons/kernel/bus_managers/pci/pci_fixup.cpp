@@ -1,6 +1,5 @@
 /*
- * Copyright 2007, Marcus Overhagen. All rights reserved.
- *
+ * Copyright 2007-2008, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,18 +8,19 @@
 
 #include <KernelExport.h>
 
-/* The Jmicron AHCI controller has a mode that combines IDE and AHCI functionality
- * into a single PCI device at function 0. This happens when the controller is set
- * in the BIOS to "basic" or "IDE" mode (but not in "RAID" or "AHCI" mode).
- * To avoid needing two drivers to handle a single PCI device, we switch to the
- * multifunction (split device) AHCI mode. This will set PCI device at function 0
- * to AHCI, and PCI device at function 1 to IDE controller.
+/* The Jmicron AHCI controller has a mode that combines IDE and AHCI
+ * functionality into a single PCI device at function 0. This happens when the
+ * controller is set in the BIOS to "basic" or "IDE" mode (but not in "RAID" or
+ * "AHCI" mode). To avoid needing two drivers to handle a single PCI device, we
+ * switch to the multifunction (split device) AHCI mode. This will set PCI
+ * device at function 0 to AHCI, and PCI device at function 1 to IDE controller.
  */
 static void
 jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 	uint8 function, uint16 deviceId)
 {
-	switch (deviceId) {
+	switch (deviceId)
+	{
 		case 0x2361: // 1 SATA, 1 PATA
 		case 0x2363: // 2 SATA, 1 PATA
 		case 0x2366: // 2 SATA, 2 PATA
@@ -31,14 +31,19 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 			return;
 	}
 
-	dprintf("jmicron_fixup_ahci: domain %u, bus %u, device %u, function %u, deviceId 0x%04x\n",
-		domain, bus, device, function, deviceId);
+	dprintf("jmicron_fixup_ahci: domain %u, bus %u, device %u, function %u, "
+		"deviceId 0x%04x\n", domain, bus, device, function, deviceId);
 
-	if (function == 0) {
-		dprintf("jmicron_fixup_ahci: 0x40: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0x40, 4));
-		dprintf("jmicron_fixup_ahci: 0xdc: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0xdc, 4));
+	if (function == 0)
+	{
+		dprintf("jmicron_fixup_ahci: 0x40: 0x%08lx\n",
+			pci->ReadConfig(domain, bus, device, function, 0x40, 4));
+		dprintf("jmicron_fixup_ahci: 0xdc: 0x%08lx\n",
+			pci->ReadConfig(domain, bus, device, function, 0xdc, 4));
+
 		uint32 val = pci->ReadConfig(domain, bus, device, function, 0xdc, 4);
-		if (!(val & (1 << 30))) {
+		if (!(val & (1 << 30)))
+		{
 			uint8 irq = pci->ReadConfig(domain, bus, device, function, 0x3c, 1);
 			dprintf("jmicron_fixup_ahci: enabling split device mode\n");
 			val &= ~(1 << 24);
@@ -48,23 +53,26 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 			val &= ~(1 << 16);
 			val |= (1 << 1) | (1 << 17) | (1 << 22);
 			pci->WriteConfig(domain, bus, device, function, 0x40, 4, val);
-			if (function == 0)
-				pci->WriteConfig(domain, bus, device, 1, 0x3c, 1, irq);
-			else
-				dprintf("jmicron_fixup_ahci: can't assign IRQ\n");
+			// Set IRQ for dfunction 2 (IDE) device.
+			pci->WriteConfig(domain, bus, device, 1, 0x3c, 1, irq);
 		}
-		dprintf("jmicron_fixup_ahci: 0x40: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0x40, 4));
-		dprintf("jmicron_fixup_ahci: 0xdc: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0xdc, 4));
+		dprintf("jmicron_fixup_ahci: 0x40: 0x%08lx\n",
+			pci->ReadConfig(domain, bus, device, function, 0x40, 4));
+		dprintf("jmicron_fixup_ahci: 0xdc: 0x%08lx\n",
+			pci->ReadConfig(domain, bus, device, function, 0xdc, 4));
 	}
 }
 
 
 static void
-intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, uint16 deviceId)
+intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function,
+	uint16 deviceId)
 {
-	return; /* disabled until the PCI manager can assign new resources */
+	// TODO(bga): disabled until the PCI manager can assign new resources.
+	return;
 
-	switch (deviceId) {
+	switch (deviceId)
+	{
 		case 0x2825: // ICH8 Desktop when in IDE emulation mode
 			dprintf("intel_fixup_ahci: WARNING found ICH8 device id 0x2825\n");
 			return;
@@ -83,16 +91,20 @@ intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, 
 			return;
 	}
 
-	dprintf("intel_fixup_ahci: domain %u, bus %u, device %u, function %u, deviceId 0x%04x\n",
-		domain, bus, device, function, deviceId);
+	dprintf("intel_fixup_ahci: domain %u, bus %u, device %u, function %u, "
+		"deviceId 0x%04x\n", domain, bus, device, function, deviceId);
 
-	dprintf("intel_fixup_ahci: 0x24: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0x24, 4));
-	dprintf("intel_fixup_ahci: 0x90: 0x%02lx\n", pci->ReadConfig(domain, bus, device, function, 0x90, 1));
+	dprintf("intel_fixup_ahci: 0x24: 0x%08lx\n",
+		pci->ReadConfig(domain, bus, device, function, 0x24, 4));
+	dprintf("intel_fixup_ahci: 0x90: 0x%02lx\n",
+		pci->ReadConfig(domain, bus, device, function, 0x90, 1));
 
 	uint8 map = pci->ReadConfig(domain, bus, device, function, 0x90, 1);
-	if ((map >> 6) == 0) {
+	if ((map >> 6) == 0)
+	{
 		uint32 bar5 = pci->ReadConfig(domain, bus, device, function, 0x24, 4);
-		uint16 pcicmd = pci->ReadConfig(domain, bus, device, function, PCI_command, 2);
+		uint16 pcicmd = pci->ReadConfig(domain, bus, device, function,
+			PCI_command, 2);
 
 		dprintf("intel_fixup_ahci: switching from IDE to AHCI mode\n");
 
@@ -100,18 +112,22 @@ intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, 
 			pcicmd & ~(PCI_command_io | PCI_command_memory));
 
 		pci->WriteConfig(domain, bus, device, function, 0x24, 4, 0xffffffff);
-		dprintf("intel_fixup_ahci: ide-bar5 bits-1: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0x24, 4));
+		dprintf("intel_fixup_ahci: ide-bar5 bits-1: 0x%08lx\n",
+			pci->ReadConfig(domain, bus, device, function, 0x24, 4));
 		pci->WriteConfig(domain, bus, device, function, 0x24, 4, 0);
-		dprintf("intel_fixup_ahci: ide-bar5 bits-0: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0x24, 4));
+		dprintf("intel_fixup_ahci: ide-bar5 bits-0: 0x%08lx\n",
+			pci->ReadConfig(domain, bus, device, function, 0x24, 4));
 
 		map &= ~0x03;
 		map |= 0x40;
 		pci->WriteConfig(domain, bus, device, function, 0x90, 1, map);
 
 		pci->WriteConfig(domain, bus, device, function, 0x24, 4, 0xffffffff);
-		dprintf("intel_fixup_ahci: ahci-bar5 bits-1: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0x24, 4));
+		dprintf("intel_fixup_ahci: ahci-bar5 bits-1: 0x%08lx\n",
+			pci->ReadConfig(domain, bus, device, function, 0x24, 4));
 		pci->WriteConfig(domain, bus, device, function, 0x24, 4, 0);
-		dprintf("intel_fixup_ahci: ahci-bar5 bits-0: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0x24, 4));
+		dprintf("intel_fixup_ahci: ahci-bar5 bits-0: 0x%08lx\n",
+			pci->ReadConfig(domain, bus, device, function, 0x24, 4));
 
 		if (deviceId == 0x27c0 || deviceId == 0x27c4) // restore on ICH7
 			pci->WriteConfig(domain, bus, device, function, 0x24, 4, bar5);
@@ -119,20 +135,26 @@ intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, 
 		pci->WriteConfig(domain, bus, device, function, PCI_command, 2, pcicmd);
 	}
 
-	dprintf("intel_fixup_ahci: 0x24: 0x%08lx\n", pci->ReadConfig(domain, bus, device, function, 0x24, 4));
-	dprintf("intel_fixup_ahci: 0x90: 0x%02lx\n", pci->ReadConfig(domain, bus, device, function, 0x90, 1));
+	dprintf("intel_fixup_ahci: 0x24: 0x%08lx\n",
+		pci->ReadConfig(domain, bus, device, function, 0x24, 4));
+	dprintf("intel_fixup_ahci: 0x90: 0x%02lx\n",
+		pci->ReadConfig(domain, bus, device, function, 0x90, 1));
 }
 
 
 void
 pci_fixup_device(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function)
 {
-	uint16 vendorId = pci->ReadConfig(domain, bus, device, function, PCI_vendor_id, 2);
-	uint16 deviceId = pci->ReadConfig(domain, bus, device, function, PCI_device_id, 2);
+	uint16 vendorId = pci->ReadConfig(domain, bus, device, function,
+		PCI_vendor_id, 2);
+	uint16 deviceId = pci->ReadConfig(domain, bus, device, function,
+		PCI_device_id, 2);
 
-//	dprintf("pci_fixup_device: domain %u, bus %u, device %u, function %u\n", domain, bus, device, function);
+//	dprintf("pci_fixup_device: domain %u, bus %u, device %u, function %u\n",
+//		domain, bus, device, function);
 
-	switch (vendorId) {
+	switch (vendorId)
+	{
 		case 0x197b:
 			jmicron_fixup_ahci(pci, domain, bus, device, function, deviceId);
 			break;
