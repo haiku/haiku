@@ -594,7 +594,7 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 		cache->free_pages = area_free_pages;
 	}
 
-	register_low_resource_handler(object_cache_low_memory, cache, 
+	register_low_resource_handler(object_cache_low_memory, cache,
 		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 5);
 
 	MutexLocker _(sObjectCacheListLock);
@@ -901,6 +901,14 @@ object_cache_reserve(object_cache *cache, size_t objectCount, uint32 flags)
 
 	MutexLocker _(cache->lock);
 	return object_cache_reserve_internal(cache, objectCount, flags);
+}
+
+
+void
+object_cache_get_usage(object_cache *cache, size_t *_allocatedMemory)
+{
+	MutexLocker _(cache->lock);
+	*_allocatedMemory = cache->usage;
 }
 
 
