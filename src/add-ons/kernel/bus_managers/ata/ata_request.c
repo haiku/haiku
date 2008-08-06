@@ -6,6 +6,7 @@
 
 #define TRACE dprintf
 
+
 void
 ata_request_init(ata_request *request, struct ide_device_info *device)
 {
@@ -14,10 +15,12 @@ ata_request_init(ata_request *request, struct ide_device_info *device)
 }
 
 
-/* Start the request, but don't clear sense to allow
- * retrieving the previous sense data.
- */
-void ata_request_start(ata_request **_request, struct ide_device_info *device, struct scsi_ccb *ccb)
+/*!	Start the request, but don't clear sense to allow
+	retrieving the previous sense data.
+*/
+void
+ata_request_start(ata_request **_request, struct ide_device_info *device,
+	struct scsi_ccb *ccb)
 {
 	ata_request *request;
 
@@ -77,7 +80,7 @@ ata_request_clear_sense(ata_request *request)
 void
 ata_request_set_status(ata_request *request, uint8 status)
 {
-//	ASSERT(status != SCSI_REQ_CMP);
+	ASSERT(status != SCSI_REQ_CMP);
 	if (request && request->ccb)
 		request->ccb->subsys_status = status;
 }
@@ -101,9 +104,10 @@ ata_request_finish(ata_request *request, bool resubmit)
 
 	ASSERT(ccb);
 
-	if (ccb->subsys_status != SCSI_REQ_CMP || request->senseKey)
-		TRACE("ata_request_finish: request %p, subsys_status 0x%02x, senseKey %02x\n",
-			request, ccb->subsys_status, request->senseKey);
+	if (ccb->subsys_status != SCSI_REQ_CMP || request->senseKey) {
+		TRACE("ata_request_finish: request %p, subsys_status 0x%02x, senseKey "
+			"%02x\n", request, ccb->subsys_status, request->senseKey);
+	}
 
 	// when the request completed and has set sense
     // data, report this to the scsi stack by setting
@@ -136,7 +140,8 @@ ata_request_finish(ata_request *request, bool resubmit)
 			// device sense gets reset once it's read
 			ata_request_clear_sense(request);
 
-			ASSERT(request->ccb->subsys_status == (SCSI_REQ_CMP_ERR | SCSI_AUTOSNS_VALID));
+			ASSERT(request->ccb->subsys_status
+				== (SCSI_REQ_CMP_ERR | SCSI_AUTOSNS_VALID));
 			ASSERT(request->ccb->device_status == SCSI_STATUS_CHECK_CONDITION);
 		}
 	}
