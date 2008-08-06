@@ -131,6 +131,9 @@
 #define HDAC_STREAM_BUFFERS_BASE_LOWER	0x18	// 32bits, BDPL
 #define HDAC_STREAM_BUFFERS_BASE_UPPER	0x1c	// 32bits, BDPU
 
+/* PCI space register definitions */
+#define PCI_HDA_TCSEL					0x44
+
 typedef uint32 corb_t;
 typedef struct {
 	uint32 response;
@@ -141,7 +144,8 @@ typedef struct {
 #define RESPONSE_FLAGS_UNSOLICITED		(1 << 4)
 
 typedef struct {
-	uint64	address;
+	uint32	lower;
+	uint32	upper;
 	uint32	length;
 	uint32	ioc;
 } bdl_entry_t;
