@@ -667,6 +667,12 @@ VMCache::RemoveArea(vm_area* area)
 
 	T(RemoveArea(this, area));
 
+	// We release the store reference first, since otherwise we would reverse
+	// the locking order or even deadlock ourselves (... -> free_vnode() -> ...
+	// -> bfs_remove_vnode() -> ... -> file_cache_set_size() -> mutex_lock()).
+	// Also cf. _RemoveConsumer().
+	ReleaseStoreRef();
+
 	AutoLocker<VMCache> locker(this);
 
 	if (area->cache_prev)
@@ -675,8 +681,6 @@ VMCache::RemoveArea(vm_area* area)
 		area->cache_next->cache_prev = area->cache_prev;
 	if (areas == area)
 		areas = area->cache_next;
-
-	ReleaseStoreRef();
 
 	return B_OK;
 }
