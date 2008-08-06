@@ -15,6 +15,7 @@
 
 #include <arch/cpu.h>
 #include <arch/vm_translation_map.h>
+#include <block_cache.h>
 #include <boot/kernel_args.h>
 #include <condition_variable.h>
 #include <kernel.h>
@@ -46,6 +47,8 @@ typedef struct page_queue {
 	vm_page *tail;
 	uint32	count;
 } page_queue;
+
+int32 gMappedPagesCount;
 
 static page_queue sFreePageQueue;
 static page_queue sClearPageQueue;
@@ -1916,3 +1919,28 @@ vm_page_num_free_pages(void)
 	return count - reservedPages;
 }
 
+
+void
+vm_page_get_stats(system_info *info)
+{
+	// Get free pages count -- not really exact, since we don't know how many
+	// of the reserved pages have already been allocated, but good citizens
+	// unreserve chunk-wise as they are allocating the pages, if they have
+	// reserved a larger quantity.
+	page_num_t reserved = sReservedPages;
+	page_num_t free = free_page_queue_count();
+	free = free > reserved ? free - reserved : 0;
+
+	// The pages used for the block cache buffers. Those should not be counted
+	// as used but as cached pages.
+	// TODO: We should subtract the blocks that are in use ATM, since those
+	// can't really be freed in a low memory situation.
+	page_num_t blockCachePages = block_cache_used_memory() / B_PAGE_SIZE;
+
+	info->max_pages = sNumPages;
+	info->used_pages = gMappedPagesCount - blockCachePages;
+	info->cached_pages = sNumPages >= free + info->used_pages
+		? sNumPages - free - info->used_pages : 0;
+
+	// TODO: We don't consider pages used for page directories/tables yet.
+}

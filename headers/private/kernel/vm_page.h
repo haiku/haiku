@@ -14,6 +14,7 @@
 
 struct kernel_args;
 
+extern int32 gMappedPagesCount;
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,6 +35,7 @@ void vm_page_requeue(struct vm_page *page, bool tail);
 size_t vm_page_num_pages(void);
 size_t vm_page_num_free_pages(void);
 size_t vm_page_num_available_pages(void);
+void vm_page_get_stats(system_info *info);
 
 status_t vm_page_write_modified_page_range(struct VMCache *cache,
 	uint32 firstPage, uint32 endPage);

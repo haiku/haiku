@@ -1329,6 +1329,32 @@ cut_area(vm_address_space* addressSpace, vm_area* area, addr_t address,
 }
 
 
+static inline void
+increment_page_wired_count(vm_page* page)
+{
+	// TODO: needs to be atomic on all platforms!
+	// ... but at least the check isn't. Consequently we should hold
+	// sMappingLock, which would allows us to even avoid atomic_add() on
+	// gMappedPagesCount.
+	if (page->wired_count++ == 0) {
+		if (page->mappings.IsEmpty())
+			atomic_add(&gMappedPagesCount, 1);
+	}
+}
+
+
+static inline void
+decrement_page_wired_count(vm_page* page)
+{
+	if (--page->wired_count == 0) {
+		// TODO: needs to be atomic on all platforms!
+		// See above!
+		if (page->mappings.IsEmpty())
+			atomic_add(&gMappedPagesCount, -1);
+	}
+}
+
+
 /*!	Deletes all areas in the given address range.
 	The address space must be write-locked.
 */
@@ -1802,8 +1828,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 						physicalAddress);
 				}
 
-				page->wired_count++;
-					// TODO: needs to be atomic on all platforms!
+				increment_page_wired_count(page);
 				vm_page_set_state(page, PAGE_STATE_WIRED);
 				cache->InsertPage(page, offset);
 			}
@@ -1835,8 +1860,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 				if (status < B_OK)
 					panic("couldn't map physical page in page run\n");
 
-				page->wired_count++;
-					// TODO: needs to be atomic on all platforms!
+				increment_page_wired_count(page);
 				vm_page_set_state(page, PAGE_STATE_WIRED);
 				cache->InsertPage(page, offset);
 			}
@@ -2740,6 +2764,9 @@ vm_remove_all_page_mappings(vm_page *page, uint32 *_flags)
 		accumulatedFlags |= flags;
 	}
 
+	if (page->wired_count == 0)
+		atomic_add(&gMappedPagesCount, -1);
+
 	locker.Unlock();
 
 	// free now unused mappings
@@ -2778,8 +2805,7 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size, bool preserveModified)
 					physicalAddress);
 			}
 
-			page->wired_count--;
-				// TODO: needs to be atomic on all platforms!
+			decrement_page_wired_count(page);
 		}
 	}
 
@@ -2828,8 +2854,11 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size, bool preserveModified)
 				|| page->cache_offset >= endOffset)
 				continue;
 
-			mapping->page->mappings.Remove(mapping);
+			page->mappings.Remove(mapping);
 			iterator.Remove();
+
+			if (page->mappings.IsEmpty() && page->wired_count == 0)
+				atomic_add(&gMappedPagesCount, -1);
 
 			queue.Add(mapping);
 		}
@@ -2868,11 +2897,13 @@ vm_map_page(vm_area *area, vm_page *page, addr_t address, uint32 protection)
 	map->ops->unlock(map);
 
 	if (area->wiring != B_NO_LOCK) {
-		page->wired_count++;
-			// TODO: needs to be atomic on all platforms!
+		increment_page_wired_count(page);
 	} else {
 		// insert mapping into lists
 		MutexLocker locker(sMappingLock);
+
+		if (page->mappings.IsEmpty() && page->wired_count == 0)
+			atomic_add(&gMappedPagesCount, 1);
 
 		page->mappings.Add(mapping);
 		area->mappings.Add(mapping);
@@ -5063,8 +5094,7 @@ lock_memory_etc(team_id team, void *address, size_t numBytes, uint32 flags)
 				if (page == NULL)
 					panic("couldn't lookup physical page just allocated\n");
 
-				page->wired_count++;
-					// TODO: needs to be atomic on all platforms!
+				increment_page_wired_count(page);
 				continue;
 			}
 		}
@@ -5098,7 +5128,7 @@ lock_memory_etc(team_id team, void *address, size_t numBytes, uint32 flags)
 		if (page == NULL)
 			panic("couldn't lookup physical page");
 
-		page->wired_count++;
+		increment_page_wired_count(page);
 			// TODO: needs to be atomic on all platforms!
 	}
 
@@ -5163,8 +5193,7 @@ unlock_memory_etc(team_id team, void *address, size_t numBytes, uint32 flags)
 		if (page == NULL)
 			panic("couldn't lookup physical page");
 
-		page->wired_count--;
-			// TODO: needs to be atomic on all platforms!
+		decrement_page_wired_count(page);
 	}
 
 out:

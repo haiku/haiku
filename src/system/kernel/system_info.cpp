@@ -77,11 +77,8 @@ _get_system_info(system_info *info, size_t size)
 	for (int32 i = 0; i < info->cpu_count; i++)
 		info->cpu_infos[i].active_time = cpu_get_active_time(i);
 
+	vm_page_get_stats(info);
 	// TODO: Add page_faults
-	info->max_pages = vm_page_num_pages();
-	info->used_pages = info->max_pages - vm_page_num_available_pages();
-	info->cached_pages = info->max_pages - vm_page_num_free_pages()
-		- info->used_pages;
 
 	info->used_threads = thread_used_threads();
 	info->max_threads = thread_max_threads();
