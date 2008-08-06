@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Marcus Overhagen. All rights reserved.
+ * Copyright 2007, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,14 +19,16 @@ static void
 jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 	uint8 function, uint16 deviceId)
 {
-	switch (deviceId)
-	{
+	// We only care about devices with function 0.
+	if (function != 0)
+		return;
+
+	// And only devices with combined SATA/PATA.
+	switch (deviceId) {
 		case 0x2361: // 1 SATA, 1 PATA
 		case 0x2363: // 2 SATA, 1 PATA
 		case 0x2366: // 2 SATA, 2 PATA
 			break;
-		// case 0x2360: // 1 SATA
-		// case 0x2362: // 2 SATA
 		default:
 			return;
 	}
@@ -34,32 +36,30 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 	dprintf("jmicron_fixup_ahci: domain %u, bus %u, device %u, function %u, "
 		"deviceId 0x%04x\n", domain, bus, device, function, deviceId);
 
-	if (function == 0)
-	{
-		dprintf("jmicron_fixup_ahci: 0x40: 0x%08lx\n",
-			pci->ReadConfig(domain, bus, device, function, 0x40, 4));
-		dprintf("jmicron_fixup_ahci: 0xdc: 0x%08lx\n",
-			pci->ReadConfig(domain, bus, device, function, 0xdc, 4));
+	uint32 val = pci->ReadConfig(domain, bus, device, function, 0xdc, 4);
+	if (!(val & (1 << 30))) {
+		// IDE controller at function 1 is configured in IDE mode (as opposed
+		// to AHCI or RAID). So we want to handle it.
 
-		uint32 val = pci->ReadConfig(domain, bus, device, function, 0xdc, 4);
-		if (!(val & (1 << 30)))
-		{
-			uint8 irq = pci->ReadConfig(domain, bus, device, function, 0x3c, 1);
-			dprintf("jmicron_fixup_ahci: enabling split device mode\n");
-			val &= ~(1 << 24);
-			val |= (1 << 25) | (1 << 30);
-			pci->WriteConfig(domain, bus, device, function, 0xdc, 4, val);
-			val = pci->ReadConfig(domain, bus, device, function, 0x40, 4);
-			val &= ~(1 << 16);
-			val |= (1 << 1) | (1 << 17) | (1 << 22);
-			pci->WriteConfig(domain, bus, device, function, 0x40, 4, val);
-			// Set IRQ for dfunction 2 (IDE) device.
-			pci->WriteConfig(domain, bus, device, 1, 0x3c, 1, irq);
-		}
-		dprintf("jmicron_fixup_ahci: 0x40: 0x%08lx\n",
-			pci->ReadConfig(domain, bus, device, function, 0x40, 4));
-		dprintf("jmicron_fixup_ahci: 0xdc: 0x%08lx\n",
-			pci->ReadConfig(domain, bus, device, function, 0xdc, 4));
+		dprintf("jmicron_fixup_ahci: PATA controller in IDE mode.\n");
+
+		// TODO(bga): It seems that with recent BIOS revisions no special code
+		// is needed here. We still want to handle IRQ assignment as seen
+		// below.
+
+		// Read IRQ from controller at function 0 and assign this IRQ to the
+		// controller at function 1.
+		uint8 irq = pci->ReadConfig(domain, bus, device, function, 0x3c, 1);
+		pci->WriteConfig(domain, bus, device, 1, 0x3c, 1, irq);
+	} else {
+		// TODO(bga): If the PATA controller is set to AHCI mode, the IDE
+		// driver will try to pick it up and will fail either because there is
+		// no assigned IRQ or, if we assign an IRQ, because it errors-out when
+		// detecting devices (probably because of the AHCI mode). Then the AHCI
+		// driver picks the device up but fail to find the attached devices.
+		// Maybe fixing this would be as simple as changing the device class to
+		// Serial ATA Controller instead of IDE Controller (even in AHCI mode
+		// it reports being a standard IDE controller)?
 	}
 }
 
@@ -71,8 +71,7 @@ intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function,
 	// TODO(bga): disabled until the PCI manager can assign new resources.
 	return;
 
-	switch (deviceId)
-	{
+	switch (deviceId) {
 		case 0x2825: // ICH8 Desktop when in IDE emulation mode
 			dprintf("intel_fixup_ahci: WARNING found ICH8 device id 0x2825\n");
 			return;
@@ -100,8 +99,7 @@ intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function,
 		pci->ReadConfig(domain, bus, device, function, 0x90, 1));
 
 	uint8 map = pci->ReadConfig(domain, bus, device, function, 0x90, 1);
-	if ((map >> 6) == 0)
-	{
+	if ((map >> 6) == 0) {
 		uint32 bar5 = pci->ReadConfig(domain, bus, device, function, 0x24, 4);
 		uint16 pcicmd = pci->ReadConfig(domain, bus, device, function,
 			PCI_command, 2);
@@ -153,8 +151,7 @@ pci_fixup_device(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function)
 //	dprintf("pci_fixup_device: domain %u, bus %u, device %u, function %u\n",
 //		domain, bus, device, function);
 
-	switch (vendorId)
-	{
+	switch (vendorId) {
 		case 0x197b:
 			jmicron_fixup_ahci(pci, domain, bus, device, function, deviceId);
 			break;
