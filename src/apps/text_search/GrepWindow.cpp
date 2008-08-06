@@ -958,11 +958,15 @@ GrepWindow::_OnReportResult(BMessage* message)
 				else
 					break;
 			}
-			if (count == 0) {
+		}
+		if (count == 0) {
+			// During updates because of node monitor events, negatives are
+			// also reported (count == 0).
+			if (item) {
 				// remove file item itself
 				delete fSearchResults->RemoveItem(index);
-				return;
 			}
+			return;
 		}
 	}
 	if (item == NULL) {
@@ -1010,7 +1014,7 @@ GrepWindow::_OnRecurseLinks()
 {
 	fModel->fRecurseLinks = !fModel->fRecurseLinks;
 	fRecurseLinks->SetMarked(fModel->fRecurseLinks);
-	_SavePrefs();
+	_ModelChanged();
 }
 
 
@@ -1019,7 +1023,7 @@ GrepWindow::_OnRecurseDirs()
 {
 	fModel->fRecurseDirs = !fModel->fRecurseDirs;
 	fRecurseDirs->SetMarked(fModel->fRecurseDirs);
-	_SavePrefs();
+	_ModelChanged();
 }
 
 		
@@ -1028,7 +1032,7 @@ GrepWindow::_OnSkipDotDirs()
 {
 	fModel->fSkipDotDirs = !fModel->fSkipDotDirs;
 	fSkipDotDirs->SetMarked(fModel->fSkipDotDirs);
-	_SavePrefs();
+	_ModelChanged();
 }
 
 
@@ -1037,7 +1041,7 @@ GrepWindow::_OnEscapeText()
 {
 	fModel->fEscapeText = !fModel->fEscapeText;
 	fEscapeText->SetMarked(fModel->fEscapeText);
-	_SavePrefs();
+	_ModelChanged();
 }
 
 	
@@ -1046,7 +1050,7 @@ GrepWindow::_OnCaseSensitive()
 {
 	fModel->fCaseSensitive = !fModel->fCaseSensitive;
 	fCaseSensitive->SetMarked(fModel->fCaseSensitive);
-	_SavePrefs();
+	_ModelChanged();
 }
 
 
@@ -1055,7 +1059,7 @@ GrepWindow::_OnTextOnly()
 {
 	fModel->fTextOnly = !fModel->fTextOnly;
 	fTextOnly->SetMarked(fModel->fTextOnly);
-	_SavePrefs();
+	_ModelChanged();
 }
 
 
@@ -1177,8 +1181,10 @@ GrepWindow::_OnInvokeItem()
 void
 GrepWindow::_OnSearchText()
 {
-	fButton->SetEnabled(fSearchText->TextView()->TextLength() != 0);
-	fSearch->SetEnabled(fSearchText->TextView()->TextLength() != 0);
+	bool enabled = fSearchText->TextView()->TextLength() != 0;
+	fButton->SetEnabled(enabled);
+	fSearch->SetEnabled(enabled);
+	_StopNodeMonitoring();
 }
 
 
@@ -1517,6 +1523,13 @@ GrepWindow::_OnNewWindow()
 
 // #pragma mark -
 
+
+void
+GrepWindow::_ModelChanged()
+{
+	_StopNodeMonitoring();
+	_SavePrefs();
+}
 
 bool
 GrepWindow::_OpenInPe(const entry_ref &ref, int32 lineNum)

@@ -89,7 +89,8 @@ private:
 			void				_OnOpenPanelCancel();
 			void				_OnSelectAll(BMessage* message);
 			void				_OnNewWindow();
-		
+
+			void				_ModelChanged();
 			bool				_OpenInPe(const entry_ref& ref, int32 lineNum);
 			void				_RemoveFolderListDuplicates(BList* folderList);
 			status_t			_OpenFoldersInTracker(BList* folderList);
