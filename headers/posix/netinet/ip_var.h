@@ -37,6 +37,7 @@
 #ifndef NETINET_IP_VAR_H
 #define NETINET_IP_VAR_H
 
+#include <netinet/in.h>
 #include <sys/socket.h>
 
 /*

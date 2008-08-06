@@ -38,8 +38,8 @@
 #define NETINET_IP_ICMP_H
 
 #include <endian.h>
-
 #include <netinet/in.h>
+#include <netinet/ip.h>
 #include <stdint.h>
 
 struct icmp {
