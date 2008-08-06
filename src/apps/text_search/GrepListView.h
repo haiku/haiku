@@ -23,8 +23,8 @@
 #define GREP_LIST_VIEW_H
 
 #include <Entry.h>
+#include <ListItem.h>
 #include <OutlineListView.h>
-#include <StringItem.h>
 
 
 class ResultItem : public BStringItem {

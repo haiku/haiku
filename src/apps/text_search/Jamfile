@@ -5,6 +5,12 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
+local additionalBeOSSources ;
+if $(TARGET_PLATFORM) != haiku {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
+	additionalBeOSSources += PathMonitor.cpp ;
+}
+
 Application TextSearch :
 	ChangesIterator.cpp
 	FileIterator.cpp
@@ -15,6 +21,8 @@ Application TextSearch :
 	GrepWindow.cpp
 	Model.cpp
 	TextSearch.cpp
+
+	$(additionalBeOSSources)
 
 	: be tracker textencoding libshared.a
 	: TextSearch.rdef
