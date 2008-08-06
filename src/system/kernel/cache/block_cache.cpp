@@ -1807,6 +1807,27 @@ block_cache_init(void)
 }
 
 
+extern "C" size_t
+block_cache_used_memory()
+{
+	size_t usedMemory = 0;
+
+	MutexLocker _(sCachesLock);
+
+	DoublyLinkedList<block_cache>::Iterator it = sCaches.GetIterator();
+	while (block_cache* cache = it.Next()) {
+		if (cache == (block_cache*)&sMarkCache)
+			continue;
+
+		size_t cacheUsedMemory;
+		object_cache_get_usage(cache->buffer_cache, &cacheUsedMemory);
+		usedMemory += cacheUsedMemory;
+	}
+
+	return usedMemory;
+}
+
+
 //	#pragma mark - public transaction API
 
 

@@ -14,9 +14,10 @@ extern "C" {
 #endif
 
 extern status_t block_cache_init(void);
+extern size_t block_cache_used_memory();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* _KRENEL_BLOCK_CACHE_H */
+#endif	/* _KERNEL_BLOCK_CACHE_H */
