@@ -30,6 +30,7 @@
 #include "BaseDevice.h"
 #include "devfs_private.h"
 #include "id_generator.h"
+#include "io_requests.h"
 #include "io_resources.h"
 
 
@@ -268,7 +269,63 @@ dump_attribute(device_attr* attr, int32 level)
 
 
 static int
-dump_device_nodes(int argc, char **argv)
+dump_io_request(int argc, char** argv)
+{
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <ptr-to-io-request>\n", argv[0]);
+		return 0;
+	}
+
+	IORequest* request = (IORequest*)parse_expression(argv[1]);
+	request->Dump();
+	return 0;
+}
+
+
+static int
+dump_io_operation(int argc, char** argv)
+{
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <ptr-to-io-operation>\n", argv[0]);
+		return 0;
+	}
+
+	IOOperation* operation = (IOOperation*)parse_expression(argv[1]);
+	operation->Dump();
+	return 0;
+}
+
+
+static int
+dump_io_buffer(int argc, char** argv)
+{
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <ptr-to-io-buffer>\n", argv[0]);
+		return 0;
+	}
+
+	IOBuffer* buffer = (IOBuffer*)parse_expression(argv[1]);
+	buffer->Dump();
+	return 0;
+}
+
+
+static int
+dump_dma_buffer(int argc, char** argv)
+{
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <ptr-to-dma-buffer>\n", argv[0]);
+		return 0;
+	}
+
+	DMABuffer* buffer = (DMABuffer*)parse_expression(argv[1]);
+	buffer->Dump();
+	return 0;
+}
+
+
+static int
+dump_device_nodes(int argc, char** argv)
 {
 	sRootNode->Dump();
 	return 0;
@@ -2160,10 +2217,16 @@ device_manager_init(struct kernel_args* args)
 	sRootNode->Dump();
 #endif
 
-	add_debugger_command("dm_tree", &dump_device_nodes,
-		"dump device node tree");
 	register_generic_syscall(DEVICE_MANAGER_SYSCALLS, control_device_manager,
 		1, 0);
+
+	add_debugger_command("dm_tree", &dump_device_nodes,
+		"dump device node tree");
+	add_debugger_command("io_request", &dump_io_request, "dump an I/O request");
+	add_debugger_command("io_operation", &dump_io_operation,
+		"dump an I/O operation");
+	add_debugger_command("io_buffer", &dump_io_buffer, "dump an I/O buffer");
+	add_debugger_command("dma_buffer", &dump_dma_buffer, "dump a DMA buffer");
 	return B_OK;
 }
 

@@ -82,6 +82,22 @@ DMABuffer::UsesBounceBufferAt(uint32 index)
 }
 
 
+void
+DMABuffer::Dump() const
+{
+	kprintf("DMABuffer at %p\n", this);
+
+	kprintf("  bounce buffer:      %p (physical %#lx)\n", fBounceBuffer,
+		fPhysicalBounceBuffer);
+	kprintf("  bounce buffer size: %lu\n", fBounceBufferSize);
+	kprintf("  vecs:               %lu\n", fVecCount);
+
+	for (uint32 i = 0; i < fVecCount; i++) {
+		kprintf("    [%lu] %p, %lu\n", i, fVecs[i].iov_base, fVecs[i].iov_len);
+	}
+}
+
+
 //	#pragma mark -
 
 

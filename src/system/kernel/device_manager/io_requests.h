@@ -55,6 +55,8 @@ public:
 			status_t			LockMemory(team_id team, bool isWrite);
 			void				UnlockMemory(team_id team, bool isWrite);
 
+			void				Dump() const;
+
 private:
 								IOBuffer();
 								~IOBuffer();
@@ -154,6 +156,8 @@ public:
 			DMABuffer*			Buffer() const { return fDMABuffer; }
 			void				SetBuffer(DMABuffer* buffer)
 									{ fDMABuffer = buffer; }
+
+			void				Dump() const;
 
 protected:
 			void				_PrepareVecs();
@@ -267,6 +271,8 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 									size_t size);
 			status_t			CopyData(const void* buffer, off_t offset,
 									size_t size);
+
+			void				Dump() const;
 
 private:
 			status_t			_CopyData(void* buffer, off_t offset,

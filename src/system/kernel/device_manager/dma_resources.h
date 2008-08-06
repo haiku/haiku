@@ -51,6 +51,8 @@ public:
 			bool				UsesBounceBufferAt(uint32 index);
 			void				SetToBounceBuffer(size_t length);
 
+			void				Dump() const;
+
 private:
 			void*				fBounceBuffer;
 			addr_t				fPhysicalBounceBuffer;

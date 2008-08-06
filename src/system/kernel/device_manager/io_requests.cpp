@@ -122,6 +122,23 @@ IOBuffer::UnlockMemory(team_id team, bool isWrite)
 }
 
 
+void
+IOBuffer::Dump() const
+{
+	kprintf("IOBuffer at %p\n", this);
+
+	kprintf("  origin:     %s\n", fUser ? "user" : "kernel");
+	kprintf("  kind:       %s\n", fPhysical ? "physical" : "virtual");
+	kprintf("  length:     %lu\n", fLength);
+	kprintf("  capacity:   %lu\n", fCapacity);
+	kprintf("  vecs:       %lu\n", fVecCount);
+
+	for (uint32 i = 0; i < fVecCount; i++) {
+		kprintf("    [%lu] %p, %lu\n", i, fVecs[i].iov_base, fVecs[i].iov_len);
+	}
+}
+
+
 // #pragma mark -
 
 
@@ -493,6 +510,35 @@ IOOperation::_CopyPartialEnd(bool isWrite)
 		return fParent->CopyData(lastVecPos, base, length);
 
 	return fParent->CopyData(base, lastVecPos, length);
+}
+
+
+void
+IOOperation::Dump() const
+{
+	kprintf("io_operation at %p\n", this);
+
+	kprintf("  parent:           %p\n", fParent);
+	kprintf("  status:           %s\n", strerror(fStatus));
+	kprintf("  dma buffer:       %p\n", fDMABuffer);
+	kprintf("  offset:           %-8Ld (original: %Ld)\n", fOffset,
+		fOriginalOffset);
+	kprintf("  length:           %-8lu (original: %lu)\n", fLength,
+		fOriginalLength);
+	kprintf("  transferred:      %lu\n", fTransferredBytes);
+	kprintf("  block size:       %lu\n", fBlockSize);
+	kprintf("  saved vec index:  %u\n", fSavedVecIndex);
+	kprintf("  saved vec length: %u\n", fSavedVecLength);
+	kprintf("  r/w:              %s\n", IsWrite() ? "write" : "read");
+	kprintf("  phase:            %s\n", fPhase == PHASE_READ_BEGIN
+		? "read begin" : fPhase == PHASE_READ_END ? "read end"
+		: fPhase == PHASE_DO_ALL ? "do all" : "unknown");
+	kprintf("  partial begin:    %s\n", fPartialBegin ? "yes" : "no");
+	kprintf("  partial end:      %s\n", fPartialEnd ? "yes" : "no");
+	kprintf("  bounce buffer:    %s\n", fUsesBounceBuffer ? "yes" : "no");
+
+	set_debug_variable("_parent", (addr_t)fParent);
+	set_debug_variable("_buffer", (addr_t)fDMABuffer);
 }
 
 
@@ -1052,6 +1098,47 @@ IORequest::_CopyUser(void* _bounceBuffer, void* _external, size_t size,
 	}
 
 	return B_OK;
+}
+
+
+void
+IORequest::Dump() const
+{
+	kprintf("io_request at %p\n", this);
+
+	kprintf("  parent:            %p\n", fParent);
+	kprintf("  status:            %s\n", strerror(fStatus));
+	kprintf("  mutex:             %p\n", &fLock);
+	kprintf("  IOBuffer:          %p\n", fBuffer);
+	kprintf("  offset:            %Ld\n", fOffset);
+	kprintf("  length:            %lu\n", fLength);
+	kprintf("  transfer size:     %lu\n", fTransferSize);
+	kprintf("  relative offset:   %lu\n", fRelativeParentOffset);
+	kprintf("  pending children:  %ld\n", fPendingChildren);
+	kprintf("  flags:             %#lx\n", fFlags);
+	kprintf("  team:              %ld\n", fTeam);
+	kprintf("  r/w:               %s\n", fIsWrite ? "write" : "read");
+	kprintf("  partial transfer:  %s\n", fPartialTransfer ? "yes" : "no");
+	kprintf("  finished cvar:     %p\n", &fFinishedCondition);
+	kprintf("  iteration:\n");
+	kprintf("    vec index:       %lu\n", fVecIndex);
+	kprintf("    vec offset:      %lu\n", fVecOffset);
+	kprintf("    remaining bytes: %lu\n", fRemainingBytes);
+	kprintf("  callbacks:\n");
+	kprintf("    finished %p, cookie %p\n", fFinishedCallback, fFinishedCookie);
+	kprintf("    iteration %p, cookie %p\n", fIterationCallback,
+		fIterationCookie);
+	kprintf("  children:\n");
+
+	IORequestChunkList::ConstIterator iterator = fChildren.GetIterator();
+	while (iterator.HasNext()) {
+		kprintf("    %p\n", iterator.Next());
+	}
+
+	set_debug_variable("_parent", (addr_t)fParent);
+	set_debug_variable("_mutex", (addr_t)&fLock);
+	set_debug_variable("_buffer", (addr_t)fBuffer);
+	set_debug_variable("_cvar", (addr_t)&fFinishedCondition);
 }
 
 
