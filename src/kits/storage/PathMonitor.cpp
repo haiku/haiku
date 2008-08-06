@@ -1,9 +1,10 @@
 /*
- * Copyright 2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -22,6 +23,7 @@
 #include <String.h>
 
 #include <map>
+#include <new>
 #include <set>
 
 #undef TRACE
@@ -34,6 +36,7 @@
 
 using namespace BPrivate;
 using namespace std;
+using std::nothrow; // TODO: Remove this line if the above line is enough.
 
 
 #define WATCH_NODE_FLAG_MASK	0x00ff
@@ -72,7 +75,8 @@ typedef map<BMessenger, watcher*> WatcherMap;
 
 class PathHandler : public BHandler {
 	public:
-		PathHandler(const char* path, uint32 flags, BMessenger target);
+		PathHandler(const char* path, uint32 flags, BMessenger target,
+			BLooper* looper);
 		virtual ~PathHandler();
 
 		status_t InitCheck() const;
@@ -112,7 +116,6 @@ class PathHandler : public BHandler {
 		BMessenger		fTarget;
 		uint32			fFlags;
 		status_t		fStatus;
-		bool			fOwnsLooper;
 		DirectorySet	fDirectories;
 		FileSet			fFiles;
 };
@@ -120,6 +123,7 @@ class PathHandler : public BHandler {
 
 static WatcherMap sWatchers;
 static BLocker* sLocker = NULL;
+static BLooper* sLooper = NULL;
 
 
 static status_t
@@ -159,11 +163,11 @@ operator<(const watched_directory& a, const watched_directory& b)
 //	#pragma mark -
 
 
-PathHandler::PathHandler(const char* path, uint32 flags, BMessenger target)
+PathHandler::PathHandler(const char* path, uint32 flags, BMessenger target,
+		BLooper* looper)
 	: BHandler(path),
 	fTarget(target),
-	fFlags(flags),
-	fOwnsLooper(false)
+	fFlags(flags)
 {
 	if (path == NULL || !path[0]) {
 		fStatus = B_BAD_VALUE;
@@ -175,13 +179,6 @@ PathHandler::PathHandler(const char* path, uint32 flags, BMessenger target)
 	fStatus = _GetClosest(path, true, nodeRef);
 	if (fStatus < B_OK)
 		return;
-
-	BLooper* looper;
-	// TODO: only have a single global looper!
-	// TODO: Use BLooper::LooperForThread(find_looper(NULL)) ?
-	looper = new BLooper("PathMonitor looper");
-	looper->Run();
-	fOwnsLooper = true;
 
 	looper->Lock();
 	looper->AddHandler(this);
@@ -212,13 +209,8 @@ PathHandler::InitCheck() const
 void
 PathHandler::Quit()
 {
-	if (!LockLooper())
-		return;
-
 	BMessenger me(this);
 	me.SendMessage(B_QUIT_REQUESTED);
-
-	UnlockLooper();
 }
 
 
@@ -488,17 +480,14 @@ PathHandler::MessageReceived(BMessage* message)
 
 		case B_QUIT_REQUESTED:
 		{
+			// Obviously the looper is still valid and running
+			// when we receive the message here, it is also currently
+			// locked, because it is processing the message.
 			BLooper* looper = Looper();
-			bool ownsLooper = fOwnsLooper;
 
 			stop_watching(this);
 			looper->RemoveHandler(this);
 			delete this;
-
-			if (ownsLooper) {
-				looper->Lock();
-				looper->Quit();
-			}
 
 			return;
 		}
@@ -773,7 +762,7 @@ BPathMonitor::~BPathMonitor()
 
 
 /*static*/ status_t
-BPathMonitor::_InitIfNeeded()
+BPathMonitor::_InitLockerIfNeeded()
 {
 	static vint32 lock = 0;
 	
@@ -782,7 +771,9 @@ BPathMonitor::_InitIfNeeded()
 
 	while (sLocker == NULL) {
 		if (atomic_add(&lock, 1) == 0) {
-			sLocker = new BLocker("path monitor");
+			sLocker = new (nothrow) BLocker("path monitor");
+			if (sLocker == NULL)
+				return B_NO_MEMORY;
 		}
 		snooze(5000);
 	}
@@ -792,11 +783,52 @@ BPathMonitor::_InitIfNeeded()
 
 
 /*static*/ status_t
-BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target)
+BPathMonitor::_InitLooperIfNeeded()
 {
-	status_t status = _InitIfNeeded();
+	static vint32 lock = 0;
+	
+	if (sLooper != NULL)
+		return B_OK;
+
+	while (sLooper == NULL) {
+		if (atomic_add(&lock, 1) == 0) {
+			// first thread initializes the global looper
+			sLooper = new (nothrow) BLooper("PathMonitor looper");
+			if (sLooper == NULL)
+				return B_NO_MEMORY;
+			thread_id thread = sLooper->Run();
+			if (thread < B_OK)
+				return (status_t)thread;
+		}
+		snooze(5000);
+	}
+
+	return sLooper->Thread() >= 0 ? B_OK : B_ERROR;
+}
+
+
+/*static*/ status_t
+BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target,
+	BLooper* looper)
+{
+	status_t status = _InitLockerIfNeeded();
 	if (status != B_OK)
 		return status;
+
+	// Check which BLooper should be used to receive node monitoring messages.
+	// If no looper is given, prefer the BApplication if it is running,
+	// otherwise use a global BLooper just for node monitoring.
+	if (looper == NULL) {
+		if (be_app)
+			looper = be_app;
+		else {
+			// only use the global looper if no BApplication is running
+			status = _InitLooperIfNeeded();
+			if (status < B_OK)
+				return status;
+			looper = sLooper;
+		}
+	}
 
 	BAutolock _(sLocker);
 
@@ -805,13 +837,18 @@ BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target)
 	if (iterator != sWatchers.end())
 		watcher = iterator->second;
 
-	PathHandler* handler = new PathHandler(path, flags, target);
+	PathHandler* handler = new (nothrow) PathHandler(path, flags, target,
+		looper);
+	if (handler == NULL)
+		return B_NO_MEMORY;
 	status = handler->InitCheck();
 	if (status < B_OK)
 		return status;
 
 	if (watcher == NULL) {
-		watcher = new BPrivate::watcher;
+		watcher = new (nothrow) BPrivate::watcher;
+		if (watcher == NULL)
+			return B_NO_MEMORY;
 		sWatchers[target] = watcher;
 	}
 

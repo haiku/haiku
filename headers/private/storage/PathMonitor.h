@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PATH_MONITOR_H
@@ -20,7 +20,8 @@ namespace BPrivate {
 class BPathMonitor {
 public:
 	static	status_t			StartWatching(const char* path, uint32 flags,
-									BMessenger target);
+									BMessenger target,
+									BLooper* useLooper = NULL);
 
 	static	status_t			StopWatching(const char* path,
 									BMessenger target);
@@ -30,7 +31,8 @@ private:
 								BPathMonitor();
 								~BPathMonitor();
 
-	static	status_t			_InitIfNeeded();
+	static	status_t			_InitLockerIfNeeded();
+	static	status_t			_InitLooperIfNeeded();
 };
 
 }	// namespace BPrivate
