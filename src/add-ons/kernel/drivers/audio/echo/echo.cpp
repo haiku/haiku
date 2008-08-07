@@ -123,7 +123,7 @@ echo_mem_new(echo_dev *card, size_t size)
 void
 echo_mem_delete(echo_mem *mem)
 {
-	if(mem->area > B_OK)
+	if (mem->area > B_OK)
 		delete_area(mem->area);
 	free(mem);
 }
@@ -159,11 +159,11 @@ echo_mem_free(echo_dev *card, void *ptr)
 
 /*	Echo stream functions */
 
-extern char *      pStatusStrs[ECHOSTATUS_LAST];
+extern char *pStatusStrs[ECHOSTATUS_LAST];
 
 status_t
 echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
-     uint8 bitsPerSample, uint32 sample_rate, uint8 index)
+	uint8 bitsPerSample, uint32 sample_rate, uint8 index)
 {
 	int32 			i;
 	uint8 			sample_size, frame_size;
@@ -177,7 +177,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	if (stream->pipe >= 0) {
 		close_params.wPipeIndex = stream->pipe;	
 		status = stream->card->pEG->CloseAudio(&close_params);
-		if(status!=ECHOSTATUS_OK && status!=ECHOSTATUS_CHANNEL_NOT_OPEN) {
+		if (status != ECHOSTATUS_OK && status != ECHOSTATUS_CHANNEL_NOT_OPEN) {
 			PRINT(("echo_stream_set_audioparms : CloseAudio failed\n"));
 			PRINT((" status: %s \n", pStatusStrs[status]));
 			return B_ERROR;
@@ -191,7 +191,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	open_params.ProcessId = NULL;
 	
 	status = stream->card->pEG->OpenAudio(&open_params, &stream->pipe);
-	if(status!=ECHOSTATUS_OK) {
+	if (status != ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : OpenAudio failed\n"));
 		PRINT((" status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
@@ -199,7 +199,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 
 	//PRINT(("VerifyAudioOpen\n"));
 	status = stream->card->pEG->VerifyAudioOpen(stream->pipe);
-	if(status!=ECHOSTATUS_OK) {
+	if (status != ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : VerifyAudioOpen failed\n"));
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
@@ -216,14 +216,14 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	format_params.wDataInterleave = channels == 1 ? 1 : 2;
 
 	status = stream->card->pEG->QueryAudioFormat(stream->pipe, &format_params);
-	if(status!=ECHOSTATUS_OK) {
+	if (status != ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad format when querying\n"));
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 	
 	status = stream->card->pEG->SetAudioFormat(stream->pipe, &format_params);
-	if(status!=ECHOSTATUS_OK) {
+	if (status != ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad format when setting\n"));
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
@@ -231,7 +231,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	
 	/* XXXX : setting sample rate is global in this driver */
 	status = stream->card->pEG->QueryAudioSampleRate(sample_rate);
-	if(status!=ECHOSTATUS_OK) {
+	if (status != ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad sample rate when querying\n"));
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
@@ -239,13 +239,13 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 		
 	/* XXXX : setting sample rate is global in this driver */
 	status = stream->card->pEG->SetAudioSampleRate(sample_rate);
-	if(status!=ECHOSTATUS_OK) {
+	if (status != ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad sample rate when setting\n"));
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 	
-	if(stream->buffer)
+	if (stream->buffer)
 		echo_mem_free(stream->card, stream->buffer->log_base);
 		
 	stream->bitsPerSample = bitsPerSample;
@@ -262,21 +262,21 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	stream->blksize = stream->bufframes * frame_size;
 	
 	CDaffyDuck *duck = stream->card->pEG->GetDaffyDuck(stream->pipe);
-	if(duck == NULL) {
+	if (duck == NULL) {
 		PRINT(("echo_stream_set_audioparms : Could not get daffy duck pointer\n"));
 		return B_ERROR;
 	}
 	
 	uint32 dwNumFreeEntries = 0;
 
-	for(i=0; i<stream->bufcount; i++) {
+	for (i=0; i<stream->bufcount; i++) {
 		duck->AddMapping(((uint32)stream->buffer->phy_base) + 
 			i * stream->blksize, stream->blksize, 0, TRUE, dwNumFreeEntries);
 	}
 	
 	duck->Wrap();
 	
-	if(stream->card->pEG->GetAudioPositionPtr(stream->pipe, stream->position)!=ECHOSTATUS_OK) {
+	if (stream->card->pEG->GetAudioPositionPtr(stream->pipe, stream->position)!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : Could not get audio position ptr\n"));
 		return B_ERROR;
 	}
@@ -287,7 +287,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 
 status_t
 echo_stream_get_nth_buffer(echo_stream *stream, uint8 chan, uint8 buf, 
-					char** buffer, size_t *stride)
+	char** buffer, size_t *stride)
 {
 	uint8 			sample_size, frame_size;
 	LOG(("echo_stream_get_nth_buffer\n"));
@@ -386,7 +386,7 @@ void
 echo_stream_delete(echo_stream *stream)
 {
 	cpu_status status;
-	ECHOGALS_CLOSEAUDIOPARAMETERS  close_params;
+	ECHOGALS_CLOSEAUDIOPARAMETERS close_params;
 	LOG(("echo_stream_delete\n"));
 	
 	echo_stream_halt(stream);
@@ -400,7 +400,7 @@ echo_stream_delete(echo_stream *stream)
 		}
 	}
 	
-	if(stream->buffer)
+	if (stream->buffer)
 		echo_mem_free(stream->card, stream->buffer->log_base);
 	
 	status = lock();
@@ -415,16 +415,15 @@ echo_stream_delete(echo_stream *stream)
 
 int32 echo_int(void *arg)
 {
-	echo_dev	 	*card = (echo_dev*)arg;
-	BOOL			midiReceived;
-	ECHOSTATUS 		err;
-	
-	echo_stream *stream;
-	uint32       curblk;
+	echo_dev* card = (echo_dev*)arg;
+	BOOL midiReceived;
+	ECHOSTATUS err;
+	echo_stream* stream;
+	uint32 curblk;
 			
 	err = card->pEG->ServiceIrq(midiReceived);
 	
-	if(err != ECHOSTATUS_OK) {
+	if (err != ECHOSTATUS_OK) {
 		return B_UNHANDLED_INTERRUPT;
 	}
 
@@ -442,7 +441,7 @@ int32 echo_int(void *arg)
 		//TRACE(("echo_int stream %p at trigblk %lu at stream->trigblk %lu\n",
 		//	   stream, curblk, stream->trigblk));
 		if (curblk == stream->trigblk) {
-			if(stream->inth)
+			if (stream->inth)
 				stream->inth(stream->inthparam);
 
 			stream->trigblk++;
@@ -520,7 +519,7 @@ init_hardware(void)
 		
 	put_module(B_PCI_MODULE_NAME);
 
-	if(err!=B_OK) {
+	if (err != B_OK) {
 		PRINT(("no card found\n"));
 	}
 
@@ -536,11 +535,11 @@ init_driver(void)
 
 	void *settings_handle;
 	// get driver settings
-	settings_handle  = load_driver_settings ("echo.settings");
+	settings_handle = load_driver_settings ("echo.settings");
 	if (settings_handle != NULL) {
-		const char *item;
-		char       *end;
-		uint32      value;
+		const char* item;
+		char* end;
+		uint32 value;
 
 		item = get_driver_parameter (settings_handle, "channels", NULL, NULL);
 		if (item) {
@@ -774,7 +773,7 @@ echo_setup(echo_dev * card)
 
 
 	card->pOSS = new COsSupport(card->info.device_id, card->info.revision);
-	if(card->pOSS == NULL)
+	if (card->pOSS == NULL)
 		return B_ERROR;
 
 	switch (card->type) {
@@ -863,7 +862,7 @@ echo_setup(echo_dev * card)
 
 	ECHOSTATUS status;
 	status = card->pEG->InitHw();
-	if(status != ECHOSTATUS_OK)
+	if (status != ECHOSTATUS_OK)
 		return B_ERROR;
 
 	card->pEG->GetCapabilities(&card->caps);
@@ -911,7 +910,7 @@ echo_shutdown(echo_dev *card)
 	remove_io_interrupt_handler(card->irq, echo_int, card);
 
 #ifdef MIDI_SUPPORT
-        delete_sem(card->midi.midi_ready_sem);
+	delete_sem(card->midi.midi_ready_sem);
 #endif
 	
 	delete card->pEG;

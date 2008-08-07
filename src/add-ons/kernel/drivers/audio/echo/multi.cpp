@@ -41,14 +41,14 @@
 #include "util.h"
 
 typedef enum {
-        B_MIX_GAIN = 1 << 0,
-        B_MIX_MUTE = 1 << 1,
-        B_MIX_NOMINAL = 1 << 2
-} mixer_type; 
+	B_MIX_GAIN = 1 << 0,
+	B_MIX_MUTE = 1 << 1,
+	B_MIX_NOMINAL = 1 << 2
+} mixer_type;
+
 
 static void	
 echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float *values) {
-
 	echo_dev *dev = (echo_dev*) card;
 	MIXER_MULTI_FUNCTION multi_function[2];
 	PMIXER_FUNCTION function = multi_function[0].MixerFunction;
@@ -57,15 +57,15 @@ echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 	function[1].Channel = channel;
 	function[1].Channel.wChannel++;
 	switch (type) {
-	case B_MIX_GAIN:
-		function[0].iFunction = function[1].iFunction = MXF_GET_LEVEL;
-		break;
-	case B_MIX_MUTE:
-		function[0].iFunction = function[1].iFunction = MXF_GET_MUTE;
-		break;
-	case B_MIX_NOMINAL:
-		function[0].iFunction = function[1].iFunction = MXF_GET_NOMINAL;
-		break;
+		case B_MIX_GAIN:
+			function[0].iFunction = function[1].iFunction = MXF_GET_LEVEL;
+			break;
+		case B_MIX_MUTE:
+			function[0].iFunction = function[1].iFunction = MXF_GET_MUTE;
+			break;
+		case B_MIX_NOMINAL:
+			function[0].iFunction = function[1].iFunction = MXF_GET_NOMINAL;
+			break;
 	}
 
 	multi_function[0].iCount = 2;
@@ -80,23 +80,25 @@ echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 		} else {
 			values[0] = function[0].Data.iNominal == 4 ? 1.0 : 0.0;
 		}
-		PRINT(("echo_channel_get_mix iLevel: %ld, %d, %ld\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
+		PRINT(("echo_channel_get_mix iLevel: %ld, %d, %ld\n", function[0].Data.iLevel, 
+			channel.wChannel, channel.dwType));
 	}
 
 }
+
 
 static void	
 echo_channel_set_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float *values) {
 	echo_dev *dev = (echo_dev*) card;
 	MIXER_MULTI_FUNCTION multi_function[2];
 	PMIXER_FUNCTION function = multi_function[0].MixerFunction;
-        INT32 size = ComputeMixerMultiFunctionSize(2);
-        function[0].Channel = channel;
+	INT32 size = ComputeMixerMultiFunctionSize(2);
+	function[0].Channel = channel;
 	function[1].Channel = channel;
 	function[1].Channel.wChannel++;
 	if (type == B_MIX_GAIN) {
 		function[0].Data.iLevel = (int)(values[0] * 256);
-        	function[0].iFunction = MXF_SET_LEVEL;
+		function[0].iFunction = MXF_SET_LEVEL;
 		function[1].Data.iLevel = (int)(values[1] * 256);
 		function[1].iFunction = MXF_SET_LEVEL;
 	} else if (type == B_MIX_MUTE) {
@@ -106,35 +108,36 @@ echo_channel_set_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 		function[1].iFunction = MXF_SET_MUTE;
 	} else {
 		function[0].Data.iNominal = values[0] == 1.0 ? 4 : -10;
-                function[0].iFunction = MXF_SET_NOMINAL;
-                function[1].Data.iNominal = values[0] == 1.0 ? 4 : -10;
-                function[1].iFunction = MXF_SET_NOMINAL;            
+		function[0].iFunction = MXF_SET_NOMINAL;
+		function[1].Data.iNominal = values[0] == 1.0 ? 4 : -10;
+		function[1].iFunction = MXF_SET_NOMINAL;
 	}
 
 	multi_function[0].iCount = 2;
-        dev->pEG->ProcessMixerMultiFunction(multi_function, size);
-
-        if (function[0].RtnStatus == ECHOSTATUS_OK) {
-                PRINT(("echo_channel_set_mix OK: %ld, %d, %ld\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
-        }
+	dev->pEG->ProcessMixerMultiFunction(multi_function, size);
+	
+	if (function[0].RtnStatus == ECHOSTATUS_OK) {
+		PRINT(("echo_channel_set_mix OK: %ld, %d, %ld\n", function[0].Data.iLevel, 
+			channel.wChannel, channel.dwType));
+	}
 
 }
 
 
 static int32
 echo_create_group_control(multi_dev *multi, uint32 *index, int32 parent,
-        enum strind_id string, const char* name) {
-        uint32 i = *index;
-        (*index)++;
-        multi->controls[i].mix_control.id = MULTI_CONTROL_FIRSTID + i;
-        multi->controls[i].mix_control.parent = parent;
-        multi->controls[i].mix_control.flags = B_MULTI_MIX_GROUP;
-        multi->controls[i].mix_control.master = MULTI_CONTROL_MASTERID;
-        multi->controls[i].mix_control.string = string;
-        if(name)
-                strcpy(multi->controls[i].mix_control.name, name);
-
-        return multi->controls[i].mix_control.id;
+	enum strind_id string, const char* name) {
+	uint32 i = *index;
+	(*index)++;
+	multi->controls[i].mix_control.id = MULTI_CONTROL_FIRSTID + i;
+	multi->controls[i].mix_control.parent = parent;
+	multi->controls[i].mix_control.flags = B_MULTI_MIX_GROUP;
+	multi->controls[i].mix_control.master = MULTI_CONTROL_MASTERID;
+	multi->controls[i].mix_control.string = string;
+	if (name)
+		strcpy(multi->controls[i].mix_control.name, name);
+	
+	return multi->controls[i].mix_control.id;
 }
 
 static void
@@ -216,7 +219,7 @@ echo_create_controls_list(multi_dev *multi)
 		channel.wChannel = i * 2;
 		
 		parent2 = echo_create_group_control(multi, &index, parent, S_null, "Input");
-		  
+		
 		echo_create_channel_control(multi, &index, parent2, 0, channel, 
 			card->caps.dwBusInCaps[i*2] & ECHOCAPS_NOMINAL_LEVEL);
 	}
@@ -232,32 +235,32 @@ echo_get_mix(echo_dev *card, multi_mix_value_info * MMVI)
 	int32 i;
 	uint32 id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
+	for (i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
-		if(id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("echo_get_mix : invalid control id requested : %li\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
 	
-		if(control->mix_control.flags & B_MULTI_MIX_GAIN) {
-			if(control->get) {
+		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
+			if (control->get) {
 				float values[2];
 				control->get(card, control->channel, control->type, values);
-				if(control->mix_control.master == MULTI_CONTROL_MASTERID)
+				if (control->mix_control.master == MULTI_CONTROL_MASTERID)
 					MMVI->values[i].gain = values[0];
 				else
 					MMVI->values[i].gain = values[1];
 			}			
 		}
 		
-		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
+		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
 			float values[1];
 			control->get(card, control->channel, control->type, values);
 			MMVI->values[i].enable = (values[0] == 1.0);
 		}
 		
-		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
+		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(card, control->channel, control->type, values);
 			MMVI->values[i].mux = (int32)values[0];
@@ -266,61 +269,62 @@ echo_get_mix(echo_dev *card, multi_mix_value_info * MMVI)
 	return B_OK;
 }
 
+
 static status_t 
 echo_set_mix(echo_dev *card, multi_mix_value_info * MMVI)
 {
 	int32 i;
 	uint32 id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
+	for (i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
-		if(id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("echo_set_mix : invalid control id requested : %li\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
 					
-		if(control->mix_control.flags & B_MULTI_MIX_GAIN) {
+		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
-			if(i+1<MMVI->item_count) {
+			if (i+1<MMVI->item_count) {
 				id = MMVI->values[i + 1].id - MULTI_CONTROL_FIRSTID;
-				if(id < 0 || id >= card->multi.control_count) {
+				if (id < 0 || id >= card->multi.control_count) {
 					PRINT(("echo_set_mix : invalid control id requested : %li\n", id));
 				} else {
 					control2 = &card->multi.controls[id];
-					if(control2->mix_control.master != control->mix_control.id)
+					if (control2->mix_control.master != control->mix_control.id)
 						control2 = NULL;
 				}
 			}
 
-			if(control->set) {
+			if (control->set) {
 				float values[2];
 				values[0] = 0.0;
 				values[1] = 0.0;
 
-				if(control->mix_control.master == MULTI_CONTROL_MASTERID)
+				if (control->mix_control.master == MULTI_CONTROL_MASTERID)
 					values[0] = MMVI->values[i].gain;
 				else
 					values[1] = MMVI->values[i].gain;
 					
-				if(control2 && control2->mix_control.master != MULTI_CONTROL_MASTERID)
+				if (control2 && control2->mix_control.master != MULTI_CONTROL_MASTERID)
 					values[1] = MMVI->values[i+1].gain;
 					
 				control->set(card, control->channel, control->type, values);
 			}
 			
-			if(control2)
-				i++;		
+			if (control2)
+				i++;
 		}
 	
-		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
+		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
 			float values[1];
 			
 			values[0] = MMVI->values[i].enable ? 1.0 : 0.0;
 			control->set(card, control->channel, control->type, values);
 		}
 		
-		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
+		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
 			
 			values[0] = (float)MMVI->values[i].mux;
@@ -330,6 +334,7 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * MMVI)
 	return B_OK;
 }
 
+
 static status_t 
 echo_list_mix_controls(echo_dev *card, multi_mix_control_info * MMCI)
 {
@@ -337,12 +342,12 @@ echo_list_mix_controls(echo_dev *card, multi_mix_control_info * MMCI)
 	uint32 i;
 	
 	MMC = MMCI->controls;
-	if(MMCI->control_count < 24)
+	if (MMCI->control_count < 24)
 		return B_ERROR;
 			
-	if(echo_create_controls_list(&card->multi) < B_OK)
+	if (echo_create_controls_list(&card->multi) < B_OK)
 		return B_ERROR;
-	for(i=0; i<card->multi.control_count; i++) {
+	for (i=0; i<card->multi.control_count; i++) {
 		MMC[i] = card->multi.controls[i].mix_control;
 	}
 	
@@ -350,11 +355,13 @@ echo_list_mix_controls(echo_dev *card, multi_mix_control_info * MMCI)
 	return B_OK;
 }
 
+
 static status_t 
-echo_list_mix_connections(echo_dev *card, multi_mix_connection_info * data)
+echo_list_mix_connections(echo_dev* card, multi_mix_connection_info* data)
 {
 	return B_ERROR;
 }
+
 
 static status_t 
 echo_list_mix_channels(echo_dev *card, multi_mix_channel_info *data)
@@ -414,18 +421,18 @@ echo_create_channels_list(multi_dev *multi)
 	chans = multi->chans;
 	index = 0;
 
-	for(mode=ECHO_USE_PLAY; mode!=-1; 
+	for (mode=ECHO_USE_PLAY; mode!=-1; 
 		mode = (mode == ECHO_USE_PLAY) ? ECHO_USE_RECORD : -1) {
 		LIST_FOREACH(stream, &((echo_dev*)multi->card)->streams, next) {
 			if ((stream->use & mode) == 0)
 				continue;
 				
-			if(stream->channels == 2)
+			if (stream->channels == 2)
 				designations = B_CHANNEL_STEREO_BUS;
 			else
 				designations = B_CHANNEL_SURROUND_BUS;
 			
-			for(i=0; i<stream->channels; i++) {
+			for (i=0; i<stream->channels; i++) {
 				chans[index].channel_id = index;
 				chans[index].kind = (mode == ECHO_USE_PLAY) ? B_MULTI_OUTPUT_CHANNEL : B_MULTI_INPUT_CHANNEL;
 				chans[index].designations = designations | chan_designations[i];
@@ -434,7 +441,7 @@ echo_create_channels_list(multi_dev *multi)
 			}
 		}
 		
-		if(mode==ECHO_USE_PLAY) {
+		if (mode==ECHO_USE_PLAY) {
 			multi->output_channel_count = index;
 		} else {
 			multi->input_channel_count = index - multi->output_channel_count;
@@ -618,8 +625,8 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 		if (data->request_playback_channels < data->return_playback_channels) {
 			LOG(("not enough channels\n"));
 		}	
-		for(i=0; i<current_settings.buffer_count; i++)
-			for(j=0; j<stream->channels; j++)
+		for (i=0; i<current_settings.buffer_count; i++)
+			for (j=0; j<stream->channels; j++)
 				echo_stream_get_nth_buffer(stream, j, i, 
 					&data->playback_buffers[i][channels+j].base,
 					&data->playback_buffers[i][channels+j].stride);
@@ -638,8 +645,8 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 		if (data->request_record_channels < data->return_record_channels) {
 			LOG(("not enough channels\n"));
 		}
-		for(i=0; i<current_settings.buffer_count; i++)
-			for(j=0; j<stream->channels; j++)
+		for (i=0; i<current_settings.buffer_count; i++)
+			for (j=0; j<stream->channels; j++)
 				echo_stream_get_nth_buffer(stream, j, i, 
 					&data->record_buffers[i][channels+j].base,
 					&data->record_buffers[i][channels+j].stride);
@@ -706,7 +713,7 @@ echo_buffer_exchange(echo_dev *card, multi_buffer_info *data)
 			(stream->use & ECHO_USE_PLAY == 0) ? echo_record_inth : echo_play_inth, stream);
 	}
 	
-	if(acquire_sem_etc(card->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000)
+	if (acquire_sem_etc(card->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000)
 		== B_TIMED_OUT) {
 		LOG(("buffer_exchange timeout ff\n"));
 	}
@@ -717,7 +724,7 @@ echo_buffer_exchange(echo_dev *card, multi_buffer_info *data)
 		if ((pstream->use & ECHO_USE_PLAY) == 0 || 
 			(pstream->state & ECHO_STATE_STARTED) == 0)
 			continue;
-		if(pstream->update_needed)	
+		if (pstream->update_needed)	
 			break;
 	}
 	
@@ -725,13 +732,13 @@ echo_buffer_exchange(echo_dev *card, multi_buffer_info *data)
 		if ((rstream->use & ECHO_USE_RECORD) == 0 ||
 			(rstream->state & ECHO_STATE_STARTED) == 0)
 			continue;
-		if(rstream->update_needed)	
+		if (rstream->update_needed)	
 			break;
 	}
 	
-	if(!pstream)
+	if (!pstream)
 		pstream = card->pstream;
-	if(!rstream)
+	if (!rstream)
 		rstream = card->rstream;
 	
 	/* do playback */
@@ -753,12 +760,14 @@ echo_buffer_exchange(echo_dev *card, multi_buffer_info *data)
 	return B_OK;
 }
 
+
 static status_t 
 echo_buffer_force_stop(echo_dev *card)
 {
 	//echo_voice_halt(card->pvoice);
 	return B_OK;
 }
+
 
 static status_t 
 echo_multi_control(void *cookie, uint32 op, void *data, size_t length)
@@ -773,7 +782,7 @@ echo_multi_control(void *cookie, uint32 op, void *data, size_t length)
 	}
 #endif
 
-    switch (op) {
+	switch (op) {
 		case B_MULTI_GET_DESCRIPTION: 
 			LOG(("B_MULTI_GET_DESCRIPTION\n"));
 			return echo_get_description(card, (multi_description *)data);
@@ -841,12 +850,14 @@ echo_multi_control(void *cookie, uint32 op, void *data, size_t length)
 	return B_ERROR;
 }
 
+
 static status_t echo_open(const char *name, uint32 flags, void** cookie);
 static status_t echo_close(void* cookie);
 static status_t echo_free(void* cookie);
 static status_t echo_control(void* cookie, uint32 op, void* arg, size_t len);
 static status_t echo_read(void* cookie, off_t position, void *buf, size_t* num_bytes);
 static status_t echo_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes);
+
 
 device_hooks multi_hooks = {
 	echo_open, 			/* -> open entry point */
@@ -860,6 +871,7 @@ device_hooks multi_hooks = {
 	NULL,					/* scatter-gather read from the device */
 	NULL					/* scatter-gather write to the device */
 };
+
 
 static status_t
 echo_open(const char *name, uint32 flags, void** cookie)
@@ -884,7 +896,7 @@ echo_open(const char *name, uint32 flags, void** cookie)
 	}
 #endif
 	
-	if(card == NULL) {
+	if (card == NULL) {
 		LOG(("open() card not found %s\n", name));
 #ifdef CARDBUS
 		LIST_FOREACH(card, &devices, next) {
@@ -963,6 +975,7 @@ echo_open(const char *name, uint32 flags, void** cookie)
 	return B_OK;
 }
 
+
 static status_t
 echo_close(void* cookie)
 {
@@ -974,6 +987,7 @@ echo_close(void* cookie)
 		
 	return B_OK;
 }
+
 
 static status_t
 echo_free(void* cookie)
@@ -999,11 +1013,13 @@ echo_free(void* cookie)
 	return B_OK;
 }
 
+
 static status_t
 echo_control(void* cookie, uint32 op, void* arg, size_t len)
 {
 	return echo_multi_control(cookie, op, arg, len);
 }
+
 
 static status_t
 echo_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
@@ -1012,10 +1028,10 @@ echo_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 	return B_IO_ERROR;
 }
 
+
 static status_t
 echo_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
 	*num_bytes = 0;				/* tell caller nothing was written */
 	return B_IO_ERROR;
 }
-

@@ -35,23 +35,20 @@ static status_t midi_write(void *cookie, off_t pos, const void *data, size_t *le
 
 
 device_hooks midi_hooks = {
-    &midi_open,
-    &midi_close,
-    &midi_free,
-    &midi_control,
-    &midi_read,
-    &midi_write,
-    NULL,		/* select */
-    NULL,		/* deselect */
-    NULL,		/* readv */
-    NULL		/* writev */
+	&midi_open,
+	&midi_close,
+	&midi_free,
+	&midi_control,
+	&midi_read,
+	&midi_write,
+	NULL,		/* select */
+	NULL,		/* deselect */
+	NULL,		/* readv */
+	NULL		/* writev */
 };
 
 static status_t
-midi_open(
-	const char * name,
-	uint32 flags,
-	void ** cookie)
+midi_open(const char* name, uint32 flags, void** cookie)
 {
 	int ix;
 	
@@ -77,8 +74,7 @@ midi_open(
 
 
 static status_t
-midi_close(
-	void * cookie)
+midi_close(void* cookie)
 {
 	LOG(("midi_close()\n"));
 	return B_OK;
@@ -86,8 +82,7 @@ midi_close(
 
 
 static status_t
-midi_free(
-	void * cookie)
+midi_free(void* cookie)
 {
 	echo_dev *card = (echo_dev *) cookie;
 	
@@ -102,11 +97,7 @@ midi_free(
 
 
 static status_t
-midi_control(
-	void * cookie,
-	uint32 iop,
-	void * data,
-	size_t len)
+midi_control(void* cookie, uint32 iop, void* data, size_t len)
 {
 	LOG(("midi_control()\n"));
 	
@@ -115,11 +106,7 @@ midi_control(
 
 
 static status_t
-midi_read(
-	void * cookie,
-	off_t pos,
-	void * ptr,
-	size_t * nread)
+midi_read(void* cookie, off_t pos, void* ptr, size_t* nread)
 {
 	echo_dev *card = (echo_dev *) cookie;
 	ECHOSTATUS 		err;
@@ -144,18 +131,13 @@ midi_read(
 
 
 static status_t
-midi_write(
-	void * cookie, 
-	off_t pos,
-	const void * ptr, 
-	size_t * nwritten)
+midi_write(void* cookie, off_t pos, const void* ptr, size_t* nwritten)
 {
 	echo_dev *card = (echo_dev *) cookie;
-	ECHOSTATUS 		err;
+	ECHOSTATUS err;
 	
 	LOG(("midi_write()\n"));
 	
 	err = card->pEG->WriteMidi(*nwritten, (PBYTE)ptr, nwritten);
 	return (err != ECHOSTATUS_OK) ? B_ERROR : B_OK;
 }
-
