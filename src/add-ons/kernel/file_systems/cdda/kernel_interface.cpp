@@ -388,7 +388,6 @@ read_attributes(int fd, Inode *inode)
 		return false;
 
 	count = B_BENDIAN_TO_HOST_INT32(count);
-dprintf("inode %s read %lu attrs\n", inode->Name(), count);
 	if (count > kMaxAttributes)
 		return false;
 
@@ -405,7 +404,6 @@ dprintf("inode %s read %lu attrs\n", inode->Name(), count);
 		type = B_BENDIAN_TO_HOST_INT32(type);
 		size = B_BENDIAN_TO_HOST_INT32(size);
 		name[length] = '\0';
-dprintf("  type %08lx, size %lu, name %s\n", type, size, name);
 
 		Attribute *attribute = new Attribute(name, type);
 		if (attribute->SetSize(size) != B_OK
@@ -431,7 +429,7 @@ fill_stat_buffer(Volume *volume, Inode *inode, Attribute *attribute,
 		stat.st_mode = S_ATTR | 0666;
 		stat.st_type = attribute->Type();
 	} else {
-		stat.st_size = inode->Size();
+		stat.st_size = inode->Size() + sizeof(wav_header);
 		stat.st_mode = inode->Type();
 		stat.st_type = 0;
 	}
@@ -782,7 +780,6 @@ Volume::_OpenAttributes(int mode, enum attr_mode attrMode)
 	} else
 		strlcat(path, "/shared", B_PATH_NAME_LENGTH);
 
-dprintf("PATH: %s\n", path);
 	int fd = open(path, mode | (create ? O_CREAT | O_TRUNC : 0), 0644);
 
 	free(path);
@@ -807,7 +804,6 @@ Volume::_RestoreAttributes()
 		return;
 	}
 
-dprintf("VOLUME %s\n", line);
 	SetName(line);
 
 	for (Inode *inode = fFirstEntry; inode != NULL; inode = inode->Next()) {
@@ -815,7 +811,6 @@ dprintf("VOLUME %s\n", line);
 			break;
 
 		inode->SetName(line);
-dprintf("INODE %s\n", line);
 	}
 
 	if (read_attributes(fd, fRootNode)) {
@@ -1546,17 +1541,20 @@ cdda_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t offset,
 		length = maxSize - offset;
 
 	status_t status = B_OK;
+	size_t bytesRead = 0;
 
 	if (offset < sizeof(wav_header)) {
 		// read fake WAV header
 		size_t size = sizeof(wav_header) - offset;
 		size = min_c(size, length);
 
-		if (user_memcpy(buffer, (uint8 *)inode->WAVHeader() + offset, size) < B_OK)
+		if (user_memcpy(buffer, (uint8 *)inode->WAVHeader() + offset, size)
+				< B_OK)
 			return B_BAD_ADDRESS;
 
 		buffer = (void *)((uint8 *)buffer + size);
 		length -= size;
+		bytesRead += size;
 		offset = 0;
 	} else
 		offset -= sizeof(wav_header);
@@ -1565,11 +1563,14 @@ cdda_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t offset,
 		// read actual CD data
 		offset += inode->StartFrame() * kFrameSize;
 
-		status = read_cdda_data(volume->Device(), offset, buffer, length,
+		status = read_cdda_data(volume->Device(),
+			inode->StartFrame() + inode->FrameCount(), offset, buffer, length,
 			cookie->buffer_offset, cookie->buffer, volume->BufferSize());
+
+		bytesRead += length;
 	}
 	if (status == B_OK)
-		*_length = length;
+		*_length = bytesRead;
 
 	return status;
 }

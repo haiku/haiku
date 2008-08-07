@@ -602,7 +602,7 @@ read_table_of_contents(int fd, scsi_toc_toc *toc, size_t length)
 
 
 status_t
-read_cdda_data(int fd, off_t offset, void *data, size_t length,
+read_cdda_data(int fd, off_t endFrame, off_t offset, void *data, size_t length,
 	off_t bufferOffset, void *buffer, size_t bufferSize)
 {
 	if (bufferOffset >= 0 && bufferOffset <= offset + length
@@ -627,12 +627,14 @@ read_cdda_data(int fd, off_t offset, void *data, size_t length,
 
 			length -= bytes;
 		}
-		// we don't handle the case we would need to split the request
+		// we don't handle the case where we would need to split the request
 	}
 
 	while (length > 0) {
 		off_t frame = offset / kFrameSize;
 		uint32 count = bufferSize / kFrameSize;
+		if (frame + count > endFrame)
+			count = endFrame - frame;
 
 		status_t status = read_frames(fd, frame, (uint8 *)buffer, count);
 		if (status < B_OK)
