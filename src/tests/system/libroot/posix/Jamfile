@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src tests system libroot posix ;
 
-UsePrivateHeaders syslog_daemon ;
+UsePrivateHeaders libroot syslog_daemon ;
 
 SimpleTest SyslogTest
 	: SyslogTest.cpp syslog.cpp
@@ -8,6 +8,10 @@ SimpleTest SyslogTest
 
 SimpleTest clearenv
 	: clearenv.cpp
+;
+
+SimpleTest dirent_test
+	: dirent_test.cpp
 ;
 
 SimpleTest flock_test
