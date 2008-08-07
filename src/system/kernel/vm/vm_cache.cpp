@@ -796,14 +796,17 @@ VMCache::Resize(off_t newSize)
 }
 
 
+/*!	You have to call this function with the VMCache lock held. */
 status_t
 VMCache::FlushAndRemoveAllPages()
 {
+	ASSERT_LOCKED_MUTEX(&fLock);
+
 	while (page_count > 0) {
 		// write back modified pages
-		status_t error = WriteModified();
-		if (error != B_OK)
-			return error;
+		status_t status = vm_page_write_modified_pages(this);
+		if (status != B_OK)
+			return status;
 
 		// remove pages
 		for (VMCachePagesTree::Iterator it = pages.GetIterator();
