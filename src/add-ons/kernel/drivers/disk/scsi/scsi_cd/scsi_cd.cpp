@@ -939,6 +939,12 @@ cd_init_driver(device_node *node, void **cookie)
 
 	memset(info, 0, sizeof(*info));
 
+	info->dma_resource = new(std::nothrow) DMAResource;
+	if (info->dma_resource == NULL) {
+		free(info);
+		return B_NO_MEMORY;
+	}
+
 	info->node = node;
 	info->removable = removable;
 
