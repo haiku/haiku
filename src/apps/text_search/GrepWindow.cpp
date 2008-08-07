@@ -50,6 +50,13 @@ using std::nothrow;
 
 static const bigtime_t kChangesPulseInterval = 500000;
 
+#define TRACE_NODE_MONITORING
+#ifdef TRACE_NODE_MONITORING
+# define TRACE_NM(x...) printf(x)
+#else
+# define TRACE_NM(x...)
+#endif
+
 
 GrepWindow::GrepWindow(BMessage* message)
 	: BWindow(BRect(0, 0, 1, 1), NULL, B_DOCUMENT_WINDOW, 0),
@@ -691,7 +698,7 @@ GrepWindow::_StartNodeMonitoring()
 	// watch the top level folder
 	BPath path(&fModel->fDirectory);
 	if (path.InitCheck() == B_OK) {
-//printf("start monitoring root folder: %s\n", path.Path());
+		TRACE_NM("start monitoring root folder: %s\n", path.Path());
 		BPrivate::BPathMonitor::StartWatching(path.Path(), dirFlags, messenger);
 	}
 
@@ -703,13 +710,13 @@ GrepWindow::_StartNodeMonitoring()
 		if (entry.IsDirectory()) {
 			// subfolder
 			if (iterator.FollowSubdir(entry)) {
-//printf("start monitoring folder: %s\n", path.Path());
+				TRACE_NM("start monitoring folder: %s\n", path.Path());
 				BPrivate::BPathMonitor::StartWatching(path.Path(),
 					dirFlags | B_WATCH_RECURSIVELY, messenger);
 			}
 		} else {
 			// regular file
-//printf("start monitoring file: %s\n", path.Path());
+			TRACE_NM("start monitoring file: %s\n", path.Path());
 			BPrivate::BPathMonitor::StartWatching(path.Path(), fileFlags,
 				messenger);
 		}
@@ -850,6 +857,8 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 		case B_ENTRY_CREATED:
 		case B_ENTRY_REMOVED:
 		{
+			TRACE_NM("%s\n", opCode == B_ENTRY_CREATED ? "B_ENTRY_CREATED"
+				: "B_ENTRY_REMOVED");
 			const char* name;
 			BString path;
 			if (message->FindString("path", &path) == B_OK
@@ -859,25 +868,40 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 					fChangesIterator->EntryAdded(path.String());
 				else
 					fChangesIterator->EntryRemoved(path.String());
+			} else {
+				#ifdef TRACE_NODE_MONITORING
+					printf("B_ENTRY_CREATED/REMOVED - incompatible message:\n");
+					message->PrintToStream();
+				#endif
 			}
 			break;
 		}
 		case B_ENTRY_MOVED:
-printf("B_ENTRY_MOVED\n");
-message->PrintToStream();
+			#ifdef TRACE_NODE_MONITORING
+				printf("B_ENTRY_MOVED\n");
+				message->PrintToStream();
+			#endif
 			// TODO: If the path is now outside the folder hierarchy, it's just
 			// a "removed" entry. If the move happened within the hierarchy,
 			// it should be a combined removed/added event.
 			break;
 		case B_STAT_CHANGED:
 		{
+			TRACE_NM("B_STAT_CHANGED\n");
 			BString path;
 			if (message->FindString("path", &path) == B_OK)
 				fChangesIterator->EntryChanged(path.String());
+			else {
+				#ifdef TRACE_NODE_MONITORING
+					printf("incompatible message:\n");
+					message->PrintToStream();
+				#endif
+			}
 			break;
 		}
 
 		default:
+			TRACE_NM("unkown op code\n");
 			break;
 	}
 
