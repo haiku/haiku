@@ -1072,8 +1072,6 @@ Transaction::Start(Volume* volume, off_t refBlock)
 void
 Transaction::AddInode(Inode* inode)
 {
-	if (GetVolume()->IsInitializing())
-		return;
 	if (fJournal == NULL)
 		panic("Transaction is not running!");
 
@@ -1085,7 +1083,8 @@ Transaction::AddInode(Inode* inode)
 		}
 	}
 
-	acquire_vnode(GetVolume()->FSVolume(), inode->ID());
+	if (!GetVolume()->IsInitializing())
+		acquire_vnode(GetVolume()->FSVolume(), inode->ID());
 	rw_lock_write_lock(&inode->fLock);
 	fLockedInodes.Add(inode);
 }
@@ -1096,7 +1095,8 @@ Transaction::_UnlockInodes()
 {
 	while (Inode* inode = fLockedInodes.RemoveHead()) {
 		rw_lock_write_unlock(&inode->fLock);
-		put_vnode(GetVolume()->FSVolume(), inode->ID());
+		if (!GetVolume()->IsInitializing())
+			put_vnode(GetVolume()->FSVolume(), inode->ID());
 	}
 }
 
