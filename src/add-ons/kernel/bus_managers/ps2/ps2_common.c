@@ -128,20 +128,20 @@ ps2_setup_command_byte()
 {
 	status_t res;
 	uint8 cmdbyte;
-	
+
 	res = ps2_command(PS2_CTRL_READ_CMD, NULL, 0, &cmdbyte, 1);
 	TRACE("ps2: get command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
 	if (res != B_OK)
 		cmdbyte = 0x47;
-		
+
 	cmdbyte |= PS2_BITS_TRANSLATE_SCANCODES | PS2_BITS_KEYBOARD_INTERRUPT
 		| PS2_BITS_AUX_INTERRUPT;
 	cmdbyte &= ~(PS2_BITS_KEYBOARD_DISABLED | PS2_BITS_MOUSE_DISABLED);
-		
+
 	res = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
 	TRACE("ps2: set command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
-	
-	return res;	
+
+	return res;
 }
 
 
@@ -172,7 +172,7 @@ ps2_setup_active_multiplexing(bool *enabled)
 	res = ps2_command(0xd3, &out, 1, &in, 1);
 	if (res)
 		goto fail;
-	// Step 3, if the controller doesn't support active multiplexing, 
+	// Step 3, if the controller doesn't support active multiplexing,
 	// then in data does match out data (0xa4), else it's version number.
 	if (in == out)
 		goto no_support;
@@ -189,7 +189,7 @@ ps2_setup_active_multiplexing(bool *enabled)
 	*enabled = true;
 	goto done;
 
-no_support:	
+no_support:
 	TRACE("ps2: active multiplexing not supported\n");
 	*enabled = false;
 
@@ -207,7 +207,7 @@ done:
 fail:
 	TRACE("ps2: testing for active multiplexing failed\n");
 	*enabled = false;
-	// this should revert the controller into legacy mode, 
+	// this should revert the controller into legacy mode,
 	// just in case it has switched to multiplexed mode
 	return ps2_selftest();
 }
@@ -218,7 +218,7 @@ ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 {
 	status_t res;
 	int i;
-		
+
 	acquire_sem(gControllerSem);
 	atomic_add(&sIgnoreInterrupts, 1);
 
@@ -231,7 +231,7 @@ ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 	res = ps2_wait_write();
 	if (res == B_OK)
 		ps2_write_ctrl(cmd);
-	
+
 	for (i = 0; res == B_OK && i < outCount; i++) {
 		res = ps2_wait_write();
 		if (res == B_OK)
@@ -256,7 +256,7 @@ ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 
 	atomic_add(&sIgnoreInterrupts, -1);
 	release_sem(gControllerSem);
-	
+
 	return res;
 }
 
@@ -264,23 +264,23 @@ ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 //	#pragma mark -
 
 
-static int32 
+static int32
 ps2_interrupt(void* cookie)
 {
 	uint8 ctrl;
 	uint8 data;
 	bool error;
 	ps2_dev *dev;
-	
+
 	ctrl = ps2_read_ctrl();
 	if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
 		return B_UNHANDLED_INTERRUPT;
-		
+
 	if (atomic_get(&sIgnoreInterrupts)) {
 		TRACE("ps2: ps2_interrupt ignoring, ctrl 0x%02x (%s)\n", ctrl, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
 		return B_HANDLED_INTERRUPT;
 	}
-	
+
 	data = ps2_read_data();
 
 	if (ctrl & PS2_STATUS_AUX_DATA) {
@@ -304,7 +304,7 @@ ps2_interrupt(void* cookie)
 		if (data == 88)
 			panic("keyboard requested halt.\n");
 	}
-	
+
 	dev->history[1] = dev->history[0];
 	dev->history[0].time = system_time();
 	dev->history[0].data = data;
@@ -329,7 +329,7 @@ ps2_init(void)
 		return status;
 
 	gControllerSem = create_sem(1, "ps/2 keyb ctrl");
-	
+
 	ps2_flush();
 
 	status = ps2_dev_init();
@@ -344,7 +344,7 @@ ps2_init(void)
 		NULL, 0);
 	if (status)
 		goto err3;
-	
+
 	status = install_io_interrupt_handler(INT_PS2_MOUSE, &ps2_interrupt, NULL,
 		0);
 	if (status)
@@ -388,7 +388,7 @@ ps2_init(void)
 
 err5:
 	remove_io_interrupt_handler(INT_PS2_MOUSE, &ps2_interrupt, NULL);
-err4:	
+err4:
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 err3:
 	ps2_service_exit();
