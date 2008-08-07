@@ -1672,11 +1672,10 @@ cdda_open_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 
 static status_t
 cdda_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	struct dirent *dirent, size_t bufferSize, uint32 *_num)
+	struct dirent *buffer, size_t bufferSize, uint32 *_num)
 {
 	Volume *volume = (Volume *)_volume->private_volume;
 	Inode *inode = (Inode *)_node->private_node;
-	status_t status = 0;
 
 	TRACE(("cdda_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %ld, num = %p\n", _node, _cookie, dirent, bufferSize,_num));
 
@@ -1690,48 +1689,62 @@ cdda_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	const char *name = NULL;
 	Inode *nextChildNode = NULL;
 	int nextState = cookie->state;
+	uint32 max = *_num;
+	uint32 count = 0;
 
-	switch (cookie->state) {
-		case ITERATION_STATE_DOT:
-			childNode = inode;
-			name = ".";
-			nextChildNode = volume->FirstEntry();
-			nextState = cookie->state + 1;
+	while (count < max && bufferSize > sizeof(dirent)) {
+		switch (cookie->state) {
+			case ITERATION_STATE_DOT:
+				childNode = inode;
+				name = ".";
+				nextChildNode = volume->FirstEntry();
+				nextState = cookie->state + 1;
+				break;
+			case ITERATION_STATE_DOT_DOT:
+				childNode = inode; // parent of the root node is the root node
+				name = "..";
+				nextChildNode = volume->FirstEntry();
+				nextState = cookie->state + 1;
+				break;
+			default:
+				childNode = cookie->current;
+				if (childNode) {
+					name = childNode->Name();
+					nextChildNode = childNode->Next();
+				}
+				break;
+		}
+
+		if (childNode == NULL) {
+			// we're at the end of the directory
 			break;
-		case ITERATION_STATE_DOT_DOT:
-			childNode = inode; // parent of the root node is the root node
-			name = "..";
-			nextChildNode = volume->FirstEntry();
-			nextState = cookie->state + 1;
+		}
+
+		struct dirent entry;
+		entry.d_dev = volume->FSVolume()->id;
+		entry.d_ino = childNode->ID();
+		entry.d_reclen = strlen(name) + sizeof(struct dirent);
+
+		if (entry.d_reclen > bufferSize) {
+			if (count == 0)
+				return ENOBUFS;
+
 			break;
-		default:
-			childNode = cookie->current;
-			if (childNode) {
-				name = childNode->Name();
-				nextChildNode = childNode->Next();
-			}
-			break;
+		}
+
+		if (user_memcpy(buffer, &entry, sizeof(struct dirent) - 1) != B_OK
+			|| user_strlcpy(buffer->d_name, name, bufferSize) < B_OK)
+			return B_BAD_ADDRESS;
+
+		buffer = (struct dirent*)((uint8*)buffer + entry.d_reclen);
+		bufferSize -= entry.d_reclen;
+		count++;
+
+		cookie->current = nextChildNode;
+		cookie->state = nextState;
 	}
 
-	if (!childNode) {
-		// we're at the end of the directory
-		*_num = 0;
-		return B_OK;
-	}
-
-	dirent->d_dev = volume->FSVolume()->id;
-	dirent->d_ino = inode->ID();
-	dirent->d_reclen = strlen(name) + sizeof(struct dirent);
-
-	if (dirent->d_reclen > bufferSize)
-		return ENOBUFS;
-
-	status = user_strlcpy(dirent->d_name, name, bufferSize);
-	if (status < B_OK)
-		return status;
-
-	cookie->current = nextChildNode;
-	cookie->state = nextState;
+	*_num = count;
 	return B_OK;
 }
 
