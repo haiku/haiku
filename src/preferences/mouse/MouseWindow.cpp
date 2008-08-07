@@ -161,7 +161,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
 				// slow = 8192, fast = 524287
-				fSettings.SetMouseSpeed((int32)pow(2, value * 6 / 1000) * 8192);
+				fSettings.SetMouseSpeed((int32)pow(2, (double)value * 6 / 1000) * 8192);
 				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 				fRevertButton->SetEnabled(true);
 			}
