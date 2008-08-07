@@ -70,7 +70,7 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 		// mode. Right now, the write operation bellow is a no-op.
 
 		// Write controller control register (0x40).
-		pci->WriteConfig(domain, bus, device, 1, 0x40, 4, val);
+		pci->WriteConfig(domain, bus, device, function, 0x40, 4, val);
 	}
 }
 
