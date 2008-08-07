@@ -153,12 +153,13 @@ BLooper::~BLooper()
 	RemoveHandler(this);
 
 	// Remove all the "child" handlers
-	BHandler* child;
-	while (CountHandlers()) {
-		child = HandlerAt(0);
-		if (child)
-			RemoveHandler(child);
+	int32 count = fHandlers.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BHandler* handler = (BHandler*)fHandlers.ItemAtFast(i);
+		handler->SetNextHandler(NULL);
+		handler->SetLooper(NULL);
 	}
+	fHandlers.MakeEmpty();
 
 	Unlock();
 	gLooperList.RemoveLooper(this);
