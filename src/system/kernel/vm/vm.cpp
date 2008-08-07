@@ -4113,10 +4113,13 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 // fault and someone is already waiting for a write lock on the same address
 // space. This thread will then try to acquire the semaphore again and will
 // be queued after the writer.
-			dprintf("vm_page_fault: sending team \"%s\" 0x%lx SIGSEGV, ip %#lx (\"%s\" +%#lx)\n",
-				thread_get_current_thread()->team->name,
-				thread_get_current_thread()->team->id, faultAddress,
-				area ? area->name : "???", faultAddress - (area ? area->base : 0x0));
+			struct thread *thread = thread_get_current_thread();
+			dprintf("vm_page_fault: thread \"%s\" (%ld) in team \"%s\" (%ld) "
+				"tried to %s address %#lx, ip %#lx (\"%s\" +%#lx)\n",
+				thread->name, thread->id, thread->team->name, thread->team->id,
+				isWrite ? "write" : "read", address, faultAddress,
+				area ? area->name : "???",
+				faultAddress - (area ? area->base : 0x0));
 
 			// We can print a stack trace of the userland thread here.
 #if 1
@@ -4171,12 +4174,21 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			rw_lock_read_unlock(&addressSpace->lock);
 #endif
 
-			struct thread *thread = thread_get_current_thread();
 			// TODO: the fault_callback is a temporary solution for vm86
 			if (thread->fault_callback == NULL
 				|| thread->fault_callback(address, faultAddress, isWrite)) {
-				if (user_debug_exception_occurred(B_SEGMENT_VIOLATION, SIGSEGV))
-					send_signal(team_get_current_team_id(), SIGSEGV);
+				// If the thread has a signal handler for SIGSEGV we simply send
+				// it the signal. Otherwise we notify the user debugger. If
+				// anything goes wrong, we kill the team.
+				struct sigaction action;
+				if (sigaction(SIGSEGV, NULL, &action) == 0
+					&& action.sa_handler != SIG_DFL
+					&& action.sa_handler != SIG_IGN) {
+					send_signal(thread->id, SIGSEGV);
+				} else if (user_debug_exception_occurred(B_SEGMENT_VIOLATION,
+						SIGSEGV)) {
+					send_signal(team_get_current_team_id(), SIGKILL);
+				}
 			}
 		}
 	}
