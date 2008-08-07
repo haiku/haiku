@@ -717,7 +717,7 @@ IORequest::Wait(uint32 flags, bigtime_t timeout)
 
 	locker.Unlock();
 
-	status_t error = entry.Wait(B_CAN_INTERRUPT);
+	status_t error = entry.Wait(flags, timeout);
 	if (error != B_OK)
 		return error;
 
