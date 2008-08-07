@@ -283,11 +283,11 @@ SettingsView::UpdateFromSettings()
 		// slow = 1000000, fast = 0
 	fClickSpeedSlider->SetValue(value);
 
-	value = int32((log(fSettings.MouseSpeed() / 8192) / log(2)) * 1000 / 6);  
+	value = int32((log(fSettings.MouseSpeed() / 8192.0) / log(2)) * 1000 / 6);  
 		// slow = 8192, fast = 524287
 	fMouseSpeedSlider->SetValue(value);
 
-	value = int32(sqrt(fSettings.AccelerationFactor() / 16384) * 1000 / 4);
+	value = int32(sqrt(fSettings.AccelerationFactor() / 16384.0) * 1000 / 4);
 		// slow = 0, fast = 262144
 	fAccelerationSlider->SetValue(value);
 
