@@ -272,7 +272,7 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 status_t
 init_hardware(void)
-{	
+{
 	return B_OK;
 }
 
@@ -289,7 +289,7 @@ find_device(const char *name)
 {
 	return &b57_hooks;
 }
-	
+
 
 status_t
 init_driver(void)
@@ -356,7 +356,7 @@ init_driver(void)
 void
 uninit_driver(void)
 {
-	struct be_b57_dev *pUmDevice; 
+	struct be_b57_dev *pUmDevice;
 	int i, j;
 
 	for (j = 0; j < cards_found; j++) {
@@ -525,7 +525,7 @@ b57_ioctl(void *cookie,uint32 op,void *data,size_t len)
 			state.media |= (pUmDevice->lm_dev.DuplexMode
 				== LM_DUPLEX_MODE_FULL ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX);
 			state.quality = 1000;
-			
+
 			return user_memcpy(data, &state, sizeof(ether_link_state_t));
 		}
 		case ETHER_SET_LINK_STATE_SEM:
@@ -734,7 +734,7 @@ MM_ReadConfig16(PLM_DEVICE_BLOCK pDevice, LM_UINT32 Offset,
 		(uchar)Offset, sizeof(LM_UINT16));
 	return LM_STATUS_SUCCESS;
 }
-    	
+
 
 LM_STATUS
 MM_WriteConfig16(PLM_DEVICE_BLOCK pDevice, LM_UINT32 Offset,
@@ -834,7 +834,7 @@ tx_cleanup_thread(void *us)
 	struct B_UM_PACKET *pUmPacket;
 	cpu_status cpu;
 
-	while (1) { 
+	while (1) {
 		cpu = disable_interrupts();
 		acquire_spinlock(&pUmDevice->lock);
 
@@ -857,12 +857,12 @@ tx_cleanup_thread(void *us)
 	}
 	return LM_STATUS_SUCCESS;
 }
-	
+
 /*LM_STATUS MM_StartTxDma(PLM_DEVICE_BLOCK pDevice, PLM_PACKET pPacket);
 LM_STATUS MM_CompleteTxDma(PLM_DEVICE_BLOCK pDevice, PLM_PACKET pPacket);*/
 
 LM_STATUS
-MM_AllocateMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize, 
+MM_AllocateMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
 	PLM_VOID *pMemoryBlockVirt)
 {
 	struct be_b57_dev *dev = (struct be_b57_dev *)(pDevice);
@@ -873,7 +873,7 @@ MM_AllocateMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
 	*pMemoryBlockVirt = dev->mem_list[(dev->mem_list_num)++] = (void *)malloc(BlockSize);
 	return LM_STATUS_SUCCESS;
 }
-    
+
 
 LM_STATUS
 MM_AllocateSharedMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
@@ -888,7 +888,7 @@ MM_AllocateSharedMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
 	dev = (struct be_b57_dev *)(pDevice);
 	area_desc = dev->lockmem_list[dev->lockmem_list_num++] = create_area("broadcom_shared_mem",
 		&pvirt, B_ANY_KERNEL_ADDRESS, ROUND_UP_TO_PAGE(BlockSize),
-		B_CONTIGUOUS | B_FULL_LOCK, 0);
+		B_CONTIGUOUS, 0);
 
 	if (area_desc < B_OK)
 		return LM_STATUS_FAILURE;
@@ -920,7 +920,7 @@ MM_GetConfig(PLM_DEVICE_BLOCK pDevice)
 	pDevice->RxCoalescingTicks = DEFAULT_RX_COALESCING_TICKS;
 	pDevice->TxCoalescingTicks = DEFAULT_TX_COALESCING_TICKS;
 	pDevice->StatsCoalescingTicks = DEFAULT_STATS_COALESCING_TICKS;
-	pDevice->TaskToOffload = LM_TASK_OFFLOAD_NONE; 
+	pDevice->TaskToOffload = LM_TASK_OFFLOAD_NONE;
 
 	return LM_STATUS_SUCCESS;
 }
@@ -931,7 +931,7 @@ MM_IndicateStatus(PLM_DEVICE_BLOCK pDevice, LM_STATUS Status)
 {
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	struct be_b57_dev *pUmDevice = (struct be_b57_dev *)pDevice;
-	
+
 	if (pUmDevice->linkChangeSem != -1)
 		release_sem_etc(pUmDevice->linkChangeSem, 1,
 			B_DO_NOT_RESCHEDULE);

@@ -184,7 +184,7 @@ init_hardware(void) {
 	long		pci_index = 0;
 	pci_info	pcii;
 	bool		found_one = FALSE;
-	
+
 	/* choke if we can't find the PCI bus */
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
 		return B_ERROR;
@@ -192,7 +192,7 @@ init_hardware(void) {
 	/* while there are more pci devices */
 	while ((*pci_bus->get_nth_pci_info)(pci_index, &pcii) == B_NO_ERROR) {
 		int vendor = 0;
-		
+
 		/* if we match a supported vendor */
 		while (SupportedDevices[vendor].vendor) {
 			if (SupportedDevices[vendor].vendor == pcii.vendor_id) {
@@ -201,7 +201,7 @@ init_hardware(void) {
 				while (*devices) {
 					/* if we match a supported device */
 					if (*devices == pcii.device_id ) {
-						
+
 						found_one = TRUE;
 						goto done;
 					}
@@ -351,7 +351,7 @@ static status_t map_device(device_info *di)
  	{
  		si->use_clone_bugfix = 0;
  	}
- 
+
 	/* work out a name for the register mapping */
 	sprintf(buffer, DEVICE_FORMAT " regs",
 		di->pcii.vendor_id, di->pcii.device_id,
@@ -475,7 +475,7 @@ static status_t map_device(device_info *di)
 //			&si->dma_buffer,
 //			B_ANY_ADDRESS,
 //			G400_DMA_BUFFER_SIZE,
-//			B_FULL_LOCK|B_CONTIGUOUS,
+//			B_CONTIGUOUS,
 //			B_READ_AREA|B_WRITE_AREA);
 
 		/* if there was an error, delete our other areas and pass on error*/
@@ -489,7 +489,7 @@ static status_t map_device(device_info *di)
 
 		/*find where it is in real memory*/
 //		get_memory_map(si->dma_buffer,4,physical_memory,1);
-//		si->dma_buffer_pci = physical_memory[0].address; /*addr from PCI space*/ 
+//		si->dma_buffer_pci = physical_memory[0].address; /*addr from PCI space*/
 	}
 
 	/* work out a name for the framebuffer mapping*/
@@ -516,7 +516,7 @@ static status_t map_device(device_info *di)
 			B_READ_AREA | B_WRITE_AREA,
 			&(si->framebuffer));
 	}
-		
+
 	/* if there was an error, delete our other areas and pass on error*/
 	if (si->fb_area < 0)
 	{
@@ -537,7 +537,7 @@ static status_t map_device(device_info *di)
 	si->framebuffer_pci = (void *) di->pcii.u.h0.base_registers_pci[frame_buffer];
 
 	// remember settings for use here and in accelerant
-	si->settings = current_settings; 
+	si->settings = current_settings;
 
 	/* in any case, return the result */
 	return si->fb_area;
@@ -739,7 +739,7 @@ gx00_interrupt(void *data)
 	atomic_and(flags, ~SKD_HANDLER_INSTALLED);
 
 exit0:
-	return handled;				
+	return handled;
 }
 
 static status_t open_hook (const char* name, uint32 flags, void** cookie) {
@@ -771,8 +771,8 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 	/* create this area with NO user-space read or write permissions, to prevent accidental dammage */
-	di->shared_area = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS, 
-		((sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK, 
+	di->shared_area = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS,
+		((sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK,
 		B_USER_CLONEABLE_AREA);
 	if (di->shared_area < 0) {
 		/* return the error */
@@ -850,7 +850,7 @@ mark_as_open:
 
 	/* send the cookie to the opener */
 	*cookie = di;
-	
+
 	goto done;
 
 
@@ -917,7 +917,7 @@ free_hook (void* dev) {
 
 	/* disable and clear any pending interrupts */
 	disable_vbi(regs);
-	
+
 	if (si->ps.int_assigned)
 	{
 		/* remove interrupt handler */
@@ -960,7 +960,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			strcpy(sig, current_settings.accelerant);
 			result = B_OK;
 		} break;
-		
+
 		/* PRIVATE ioctl from here on */
 		case GX00_GET_PRIVATE_DATA: {
 			gx00_get_private_data *gpd = (gx00_get_private_data *)buf;

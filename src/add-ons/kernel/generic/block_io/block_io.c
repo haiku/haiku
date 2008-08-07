@@ -431,9 +431,8 @@ block_io_init_device(void *_data, void **cookie)
 	// (else, we may be on the paging path and have no S/G entries at hand)
 	device->phys_vecs_pool = locked_pool->create(
 		params.max_sg_blocks * sizeof(physical_entry),
-		sizeof( physical_entry ) - 1,
-		0, 16*1024, 32, 1, "block io sg lists", B_FULL_LOCK | B_CONTIGUOUS,
-		NULL, NULL, NULL);
+		sizeof( physical_entry ) - 1, 0, 16*1024, 32, 1, "block io sg lists",
+		B_CONTIGUOUS, NULL, NULL, NULL);
 
 //	free(tmp_name);
 
@@ -492,7 +491,7 @@ block_io_init_buffer(void)
 
 	res = block_io_buffer_area = create_area("block_io_buffer",
 		(void **)&block_io_buffer, B_ANY_KERNEL_ADDRESS,
-		block_io_buffer_size, B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+		block_io_buffer_size, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (res < 0)
 		goto err2;
 

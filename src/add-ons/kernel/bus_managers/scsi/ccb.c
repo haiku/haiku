@@ -99,7 +99,7 @@ scsi_init_ccb_alloc(scsi_bus_info *bus)
 	// the bus is not ready yet so the CCB cannot be initialized
 	// correctly
 	bus->ccb_pool = locked_pool->create(sizeof(scsi_ccb), sizeof(uint32) - 1, 0,
-		CCB_CHUNK_SIZE, CCB_NUM_MAX, 0, "scsi_ccb_pool", B_FULL_LOCK | B_CONTIGUOUS,
+		CCB_CHUNK_SIZE, CCB_NUM_MAX, 0, "scsi_ccb_pool", B_CONTIGUOUS,
 		ccb_low_alloc_hook, ccb_low_free_hook, bus);
 
 	if (bus->ccb_pool == NULL)

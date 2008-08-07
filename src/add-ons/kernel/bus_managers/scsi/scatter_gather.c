@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -50,20 +50,20 @@ fill_temp_sg(scsi_ccb *ccb)
 
 	if (dma_boundary != ~0UL || ccb->data_length > max_sg_block_size) {
 		// S/G list may not be controller-compatible:
-		// we have to split offending entries		
-		SHOW_FLOW(3, "Checking violation of dma boundary 0x%x and entry size 0x%x", 
+		// we have to split offending entries
+		SHOW_FLOW(3, "Checking violation of dma boundary 0x%x and entry size 0x%x",
 			(int)dma_boundary, (int)max_sg_block_size);
 
 		for (cur_idx = 0; cur_idx < num_entries; ++cur_idx) {
 			addr_t max_len;
 
 			// calculate space upto next dma boundary crossing
-			max_len = (dma_boundary + 1) - 
+			max_len = (dma_boundary + 1) -
 				((addr_t)temp_sg[cur_idx].address & dma_boundary);
 			// restrict size per sg item
 			max_len = min(max_len, max_sg_block_size);
 
-			SHOW_FLOW(4, "addr=%p, size=%x, max_len=%x, idx=%d, num=%d", 
+			SHOW_FLOW(4, "addr=%p, size=%x, max_len=%x, idx=%d, num=%d",
 				temp_sg[cur_idx].address, (int)temp_sg[cur_idx].size,
 				(int)max_len, (int)cur_idx, (int)num_entries);
 
@@ -72,7 +72,7 @@ fill_temp_sg(scsi_ccb *ccb)
 				if (++num_entries > max_sg_blocks)
 					goto too_complex;
 
-				memmove(&temp_sg[cur_idx + 1], &temp_sg[cur_idx], 
+				memmove(&temp_sg[cur_idx + 1], &temp_sg[cur_idx],
 					(num_entries - 1 - cur_idx) * sizeof(physical_entry));
 
 				temp_sg[cur_idx].size = max_len;
@@ -84,7 +84,7 @@ fill_temp_sg(scsi_ccb *ccb)
 
 	ccb->sg_count = num_entries;
 
-	return true;	
+	return true;
 
 too_complex:
 	SHOW_ERROR( 2, "S/G list to complex for IO request (max %d entries)",
@@ -147,7 +147,7 @@ cleanup_tmp_sg(scsi_ccb *ccb)
 {
 	status_t res;
 
-	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%d", 
+	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%d",
 		ccb, ccb->data, (int)ccb->data_length);
 
 	res = unlock_memory(ccb->data, ccb->data_length, B_DMA_IO
@@ -170,12 +170,11 @@ cleanup_tmp_sg(scsi_ccb *ccb)
 int
 init_temp_sg(void)
 {
-	temp_sg_pool = locked_pool->create( 
+	temp_sg_pool = locked_pool->create(
 		MAX_TEMP_SG_FRAGMENTS * sizeof(physical_entry),
 		sizeof(physical_entry) - 1, 0,
-		B_PAGE_SIZE, MAX_TEMP_SG_LISTS, 1, 
-		"scsi_temp_sg_pool", B_FULL_LOCK | B_CONTIGUOUS,
-		NULL, NULL, NULL);
+		B_PAGE_SIZE, MAX_TEMP_SG_LISTS, 1,
+		"scsi_temp_sg_pool", B_CONTIGUOUS, NULL, NULL, NULL);
 
 	if (temp_sg_pool == NULL)
 		return B_NO_MEMORY;

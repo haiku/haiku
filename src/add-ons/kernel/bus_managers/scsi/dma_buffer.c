@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -213,8 +213,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 
 		buffer->area = create_area("DMA buffer",
 			(void **)&dma_buffer_address_unaligned,
-			B_ANY_KERNEL_ADDRESS, size,
-			B_FULL_LOCK | B_CONTIGUOUS, 0 );
+			B_ANY_KERNEL_ADDRESS, size, B_CONTIGUOUS, 0);
 		if (buffer->area < 0) {
 			SHOW_ERROR(2, "Cannot create contignous DMA buffer of %d bytes",
 				(int)size);

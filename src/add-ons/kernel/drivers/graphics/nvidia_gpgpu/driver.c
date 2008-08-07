@@ -116,7 +116,7 @@ static struct {
 	{0x0000, NULL}
 };
 
-static nv_settings sSettings = { // see comments in nvidia_gpgpu.settings 
+static nv_settings sSettings = { // see comments in nvidia_gpgpu.settings
 	/* for driver */
 	DRIVER_PREFIX ".accelerant",
 	"none",					// primary
@@ -294,7 +294,7 @@ map_device(device_info *di)
  	{
  		si->use_clone_bugfix = 0;
  	}
- 
+
 	/* work out a name for the register mapping */
 	sprintf(buffer, DEVICE_FORMAT " regs",
 		di->pcii.vendor_id, di->pcii.device_id,
@@ -310,7 +310,7 @@ map_device(device_info *di)
 		B_USER_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
 		(void **)&(di->regs));
 	si->clone_bugfix_regs = (uint32 *) di->regs;
-		
+
 	/* if mapping registers to vmem failed then pass on error */
 	if (si->regs_area < 0) return si->regs_area;
 
@@ -431,7 +431,7 @@ map_device(device_info *di)
 	si->framebuffer_pci = (void *) di->pcii.u.h0.base_registers_pci[frame_buffer];
 
 	// remember settings for use here and in accelerant
-	si->settings = sSettings; 
+	si->settings = sSettings;
 
 	/* in any case, return the result */
 	return si->fb_area;
@@ -580,7 +580,7 @@ nv_interrupt(void *data)
 	atomic_and(flags, ~SKD_HANDLER_INSTALLED);
 
 exit0:
-	return handled;				
+	return handled;
 }
 
 
@@ -645,7 +645,7 @@ open_hook(const char* name, uint32 flags, void** cookie)
 			(void **)&unaligned_dma_buffer,
 			B_ANY_KERNEL_ADDRESS,
 			2 * net_buf_size, /* take twice the net size so we can have MTRR-WC even on old systems */
-			B_FULL_LOCK | B_CONTIGUOUS, /* both properties needed: GPU always needs access */
+			B_CONTIGUOUS, /* GPU always needs access */
 			B_USER_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA);
 	/* on error, abort */
 	if (si->unaligned_dma_area < 0)
@@ -777,7 +777,7 @@ mark_as_open:
 
 	/* send the cookie to the opener */
 	*cookie = di;
-	
+
 	goto done;
 
 
@@ -1064,7 +1064,7 @@ init_hardware(void)
 	/* while there are more pci devices */
 	while ((*pci_bus->get_nth_pci_info)(index, &pcii) == B_NO_ERROR) {
 		int vendor = 0;
-		
+
 		/* if we match a supported vendor */
 		while (SupportedDevices[vendor].vendor) {
 			if (SupportedDevices[vendor].vendor == pcii.vendor_id) {
@@ -1073,7 +1073,7 @@ init_hardware(void)
 				while (*devices) {
 					/* if we match a supported device */
 					if (*devices == pcii.device_id ) {
-						
+
 						found = true;
 						goto done;
 					}

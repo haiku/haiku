@@ -211,7 +211,7 @@ controller_probe(device_node *parent)
 		};
 		device_attr attrs[] = {
 			// properties of this controller for ide bus manager
-			// there are always max. 2 devices 
+			// there are always max. 2 devices
 			// (unless this is a Compact Flash Card with a built-in IDE controller,
 			//  which has exactly 1 device)
 			{ IDE_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: kASICData[asicIndex].channel_count }},
@@ -221,9 +221,9 @@ controller_probe(device_node *parent)
 			{ IDE_CONTROLLER_CAN_CQ_ITEM, B_UINT8_TYPE, { ui8: true }},
 			// choose any name here
 			{ IDE_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: CONTROLLER_NAME }},
-	
+
 			// DMA properties
-			// data must be word-aligned; 
+			// data must be word-aligned;
 			// warning: some controllers are more picky!
 			{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1}},
 			// one S/G block must not cross 64K boundary
@@ -232,7 +232,7 @@ controller_probe(device_node *parent)
 			{ B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, B_UINT32_TYPE, { ui32: 0x10000 }},
 			// see definition of MAX_SG_COUNT
 			{ B_BLOCK_DEVICE_MAX_SG_BLOCKS, B_UINT32_TYPE, { ui32: IDE_ADAPTER_MAX_SG_COUNT }},
-	
+
 			// private data to find controller
 			{ "silicon_image_3112/asic_index", B_UINT32_TYPE, { ui32: asicIndex }},
 			{ "silicon_image_3112/mmio_base", B_UINT32_TYPE, { ui32: mmioBase }},
@@ -248,7 +248,7 @@ controller_probe(device_node *parent)
 }
 
 
-static status_t 
+static status_t
 controller_init(device_node *node, void **_controllerCookie)
 {
 	controller_data *controller;
@@ -263,9 +263,9 @@ controller_init(device_node *node, void **_controllerCookie)
 	status_t res;
 	uint32 temp;
 	int i;
-	
+
 	TRACE("controller_init\n");
-	
+
 	if (dm->get_attr_uint32(node, "silicon_image_3112/asic_index", &asicIndex, false) != B_OK)
 		return B_ERROR;
 	if (dm->get_attr_uint32(node, "silicon_image_3112/mmio_base", &mmioBase, false) != B_OK)
@@ -277,10 +277,10 @@ controller_init(device_node *node, void **_controllerCookie)
 	if (!controller)
 		return B_NO_MEMORY;
 
-	FLOW("controller %p\n", controller);	
+	FLOW("controller %p\n", controller);
 
 	mmioArea = map_physical_memory("Silicon Image SATA regs",
-		(void *)mmioBase, kASICData[asicIndex].mmio_bar_size, 
+		(void *)mmioBase, kASICData[asicIndex].mmio_bar_size,
 		B_ANY_KERNEL_ADDRESS, 0, (void **)&mmioAddr);
 	if (mmioArea < B_OK) {
 		TRACE("controller_init: mapping memory failed\n");
@@ -320,7 +320,7 @@ controller_init(device_node *node, void **_controllerCookie)
 	for (i = 0; i < kASICData[asicIndex].channel_count; i++)
 		*(volatile uint32 *)(mmioAddr + kControllerChannelData[i].sien) = 0;
 	*(volatile uint32 *)(mmioAddr + kControllerChannelData[0].sien); // flush
-	
+
 	// install interrupt handler
 	res = install_io_interrupt_handler(interruptNumber, handle_interrupt,
 		controller, 0);
@@ -336,7 +336,7 @@ controller_init(device_node *node, void **_controllerCookie)
 	temp &= (asicIndex == ASIC_SI3114) ? (~SI_MASK_4PORT) : (~SI_MASK_2PORT);
 	*(volatile uint32 *)(mmioAddr + SI_SYSCFG) = temp;
 	*(volatile uint32 *)(mmioAddr + SI_SYSCFG); // flush
-	
+
 	*_controllerCookie = controller;
 
 	TRACE("controller_init success\n");
@@ -418,9 +418,9 @@ channel_init(device_node *node, void **_channelCookie)
 	physical_entry entry;
 	size_t prdtSize;
 	uint32 channelIndex;
-	
+
 	TRACE("channel_init enter\n");
-	
+
 	channel = malloc(sizeof(channel_data));
 	if (!channel)
 		return B_NO_MEMORY;
@@ -445,18 +445,19 @@ channel_init(device_node *node, void **_channelCookie)
 	TRACE("channel_index %ld\n", channelIndex);
 	TRACE("channel name: %s\n", kControllerChannelData[channelIndex].name);
 
-	TRACE("channel %p\n", channel);	
+	TRACE("channel %p\n", channel);
 
 	parent = dm->get_parent_node(node);
 	dm->get_driver(parent, NULL, (void **)&controller);
 	dm->put_node(parent);
 
-	TRACE("controller %p\n", controller);	
+	TRACE("controller %p\n", controller);
 	TRACE("mmio_addr %p\n", (void *)controller->mmio_addr);
 
-	// PRDT must be contiguous, dword-aligned and must not cross 64K boundary 
+	// PRDT must be contiguous, dword-aligned and must not cross 64K boundary
 	prdtSize = (IDE_ADAPTER_MAX_SG_COUNT * sizeof(prd_entry) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
-	channel->prd_area = create_area("prd", (void **)&channel->prdt, B_ANY_KERNEL_ADDRESS, prdtSize, B_FULL_LOCK | B_CONTIGUOUS, 0);
+	channel->prd_area = create_area("prd", (void **)&channel->prdt,
+		B_ANY_KERNEL_ADDRESS, prdtSize, B_CONTIGUOUS, 0);
 	if (channel->prd_area < B_OK) {
 		TRACE("creating prd_area failed\n");
 		goto err;
@@ -543,7 +544,7 @@ task_file_write(void *channelCookie, ide_task_file *tf, ide_reg_mask mask)
 	int i;
 
 	FLOW("task_file_write\n");
-	
+
 	if (channel->lost)
 		return B_ERROR;
 
@@ -552,14 +553,14 @@ task_file_write(void *channelCookie, ide_task_file *tf, ide_reg_mask mask)
 			FLOW("%x->HI(%x)\n", tf->raw.r[i + 7], i );
 			channel->task_file[i] = tf->raw.r[i + 7];
 		}
-		
+
 		if (((1 << i) & mask) != 0) {
 			FLOW("%x->LO(%x)\n", tf->raw.r[i], i );
 			channel->task_file[i] = tf->raw.r[i];
 		}
 	}
 	*channel->dev_ctrl; // read altstatus to flush
-	
+
 	return B_OK;
 }
 
@@ -581,7 +582,7 @@ task_file_read(void *channelCookie, ide_task_file *tf, ide_reg_mask mask)
 			FLOW("%x: %x\n", i, (int)tf->raw.r[i] );
 		}
 	}
-	
+
 	return B_OK;
 }
 
@@ -600,19 +601,19 @@ altstatus_read(void *channelCookie)
 }
 
 
-static status_t 
+static status_t
 device_control_write(void *channelCookie, uint8 val)
 {
 	channel_data *channel = channelCookie;
 
 	FLOW("device_control_write 0x%x\n", val);
-	
+
 	if (channel->lost)
 		return B_ERROR;
 
 	*channel->dev_ctrl = val;
 	*channel->dev_ctrl; // read altstatus to flush
-	
+
 	return B_OK;
 }
 
@@ -635,12 +636,12 @@ pio_write(void *channelCookie, uint16 *data, int count, bool force_16bit)
 	} else {
 		volatile uint32 * base = (volatile uint32 *)channel->command_block;
 		uint32 *cur_data = (uint32 *)data;
-		
+
 		for ( ; count > 0; count -= 2 )
 			*base = *(cur_data++);
 	}
 	*channel->dev_ctrl; // read altstatus to flush
-	
+
 	return B_OK;
 }
 
@@ -653,7 +654,7 @@ pio_read(void *channelCookie, uint16 *data, int count, bool force_16bit)
 		return B_ERROR;
 
 	FLOW("pio_read force_16bit = %d, (count & 1) = %d\n", force_16bit, (count & 1));
-	
+
 	// The data port is only 8 bit wide in the command register block.
 	// We are memory mapped and read using 16 or 32 bit access from this 8 bit location.
 
@@ -664,11 +665,11 @@ pio_read(void *channelCookie, uint16 *data, int count, bool force_16bit)
 	} else {
 		volatile uint32 * base = (volatile uint32 *)channel->command_block;
 		uint32 *cur_data = (uint32 *)data;
-		
+
 		for ( ; count > 0; count -= 2 )
 			*(cur_data++) = *base;
 	}
-	
+
 	return B_OK;
 }
 
@@ -745,9 +746,9 @@ dma_start(void *channelCookie)
 	*channel->bm_command_reg = command;
 
 	*channel->dev_ctrl; // read altstatus to flush
-	
+
 	FLOW("dma_start leave\n");
-	
+
 	return B_OK;
 }
 
@@ -772,7 +773,7 @@ dma_finish(void *channelCookie)
 		| IDE_BM_STATUS_ERROR;
 
 	*channel->dev_ctrl; // read altstatus to flush
-	
+
 	if ((status & IDE_BM_STATUS_ERROR) != 0) {
 		FLOW("dma_finish: failed\n");
 		return B_ERROR;
@@ -851,7 +852,7 @@ static ide_controller_interface sChannelInterface = {
 			0,
 			NULL
 		},
-		
+
 		.supports_device			= NULL,
 		.register_device			= NULL,
 		.init_driver				= &channel_init,

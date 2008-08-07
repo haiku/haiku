@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Copyright 2003-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -282,7 +282,7 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 	void *logAddress;
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 	area_id area = create_area(name, &logAddress, B_ANY_KERNEL_ADDRESS, size,
-		B_FULL_LOCK | B_CONTIGUOUS, 0);
+		B_CONTIGUOUS, 0);
 
 	if (area < B_OK) {
 		TRACE_ERROR(("USB Stack: couldn't allocate area %s\n", name));

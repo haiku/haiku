@@ -89,10 +89,10 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 		dprintf("hda: stream status %x\n", status);
 		return;
 	}
-	
+
 	position = stream->Read32(HDAC_STREAM_POSITION);
 	bufferSize = ALIGN(stream->sample_size * stream->num_channels * stream->buffer_length, 128);
-	
+
 	// Buffer Completed Interrupt
 	acquire_spinlock(&stream->lock);
 
@@ -101,7 +101,7 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 	stream->buffer_cycle = 1 - (position / bufferSize);
 
 	release_spinlock(&stream->lock);
-	
+
 	release_sem_etc(stream->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
@@ -121,7 +121,7 @@ hda_interrupt_handler(hda_controller* controller)
 		uint8 rirbStatus = controller->Read8(HDAC_RIRB_STATUS);
 		uint8 corbStatus = controller->Read8(HDAC_CORB_STATUS);
 
-		/* Check for incoming responses */			
+		/* Check for incoming responses */
 		if (rirbStatus) {
 			controller->Write8(HDAC_RIRB_STATUS, rirbStatus);
 
@@ -156,7 +156,7 @@ hda_interrupt_handler(hda_controller* controller)
 					codec->responses[codec->response_count++] = response;
 					release_sem_etc(codec->response_sem, 1, B_DO_NOT_RESCHEDULE);
 					handled = B_INVOKE_SCHEDULER;
-				}			
+				}
 			}
 
 			if ((rirbStatus & RIRB_STATUS_OVERRUN) != 0)
@@ -317,7 +317,7 @@ init_corb_rirb_pos(hda_controller* controller)
 	/* Allocate memory area */
 	controller->corb_rirb_pos_area = create_area("hda corb/rirb/pos",
 		(void**)&controller->corb, B_ANY_KERNEL_ADDRESS, memSize,
-		B_FULL_LOCK | B_CONTIGUOUS, 0);
+		B_CONTIGUOUS, 0);
 	if (controller->corb_rirb_pos_area < 0)
 		return controller->corb_rirb_pos_area;
 
@@ -501,7 +501,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		stream->buffer_descriptors_area = B_ERROR;
 	}
 
-	/* Calculate size of buffer (aligned to 128 bytes) */		
+	/* Calculate size of buffer (aligned to 128 bytes) */
 	bufferSize = stream->sample_size * stream->num_channels
 		* stream->buffer_length;
 	bufferSize = ALIGN(bufferSize, 128);
@@ -515,7 +515,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	/* Allocate memory for buffers */
 	stream->buffer_area = create_area("hda buffers", (void**)&buffer,
-		B_ANY_KERNEL_ADDRESS, alloc, B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+		B_ANY_KERNEL_ADDRESS, alloc, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (stream->buffer_area < B_OK)
 		return stream->buffer_area;
 
@@ -525,13 +525,13 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		delete_area(stream->buffer_area);
 		return rc;
 	}
-	
+
 	bufferPhysicalAddress = (uint32)pe.address;
 
 	dprintf("%s(%s): Allocated %lu bytes for %ld buffers\n", __func__, desc,
 		alloc, stream->num_buffers);
 
-	/* Store pointers (both virtual/physical) */	
+	/* Store pointers (both virtual/physical) */
 	for (index = 0; index < stream->num_buffers; index++) {
 		stream->buffers[index] = buffer + (index * bufferSize);
 		stream->physical_buffers[index] = bufferPhysicalAddress
@@ -544,7 +544,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	stream->buffer_descriptors_area = create_area("hda buffer descriptors",
 		(void**)&bufferDescriptors, B_ANY_KERNEL_ADDRESS, alloc,
-		B_FULL_LOCK | B_CONTIGUOUS, 0);
+		B_CONTIGUOUS, 0);
 	if (stream->buffer_descriptors_area < B_OK) {
 		delete_area(stream->buffer_area);
 		return stream->buffer_descriptors_area;
@@ -563,7 +563,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, stream->num_buffers);
 
-	/* Setup buffer descriptor list (BDL) entries */	
+	/* Setup buffer descriptor list (BDL) entries */
 	for (index = 0; index < stream->num_buffers; index++, bufferDescriptors++) {
 		bufferDescriptors->lower = stream->physical_buffers[index];
 		bufferDescriptors->upper = 0;
@@ -597,7 +597,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld\n", __func__, stream->id,
 		stream->rate, stream->bps);
-	
+
 	stream->Write16(HDAC_STREAM_FORMAT, format);
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_LOWER,
 		stream->physical_buffer_descriptors);
@@ -676,7 +676,7 @@ hda_hw_init(hda_controller* controller)
 	uint16 capabilities, stateStatus, cmd;
 	status_t status;
 	uint8 tcsel;
-	
+
 	/* Map MMIO registers */
 	controller->regs_area = map_physical_memory("hda_hw_regs",
 		(void*)controller->pci_info.u.h0.base_registers[0],
@@ -687,15 +687,15 @@ hda_hw_init(hda_controller* controller)
 		goto error;
 	}
 
-	cmd = (gPci->read_pci_config)(controller->pci_info.bus, 
+	cmd = (gPci->read_pci_config)(controller->pci_info.bus,
 		controller->pci_info.device, controller->pci_info.function, PCI_command, 2);
 	if (!(cmd & PCI_command_master)) {
-		(gPci->write_pci_config)(controller->pci_info.bus, 
-			controller->pci_info.device, controller->pci_info.function, 
+		(gPci->write_pci_config)(controller->pci_info.bus,
+			controller->pci_info.device, controller->pci_info.function,
 				PCI_command, 2, cmd | PCI_command_master);
 		dprintf("hda: enabling PCI bus mastering\n");
 	}
-	
+
 	/* Absolute minimum hw is online; we can now install interrupt handler */
 	controller->irq = controller->pci_info.u.h0.interrupt_line;
 	status = install_io_interrupt_handler(controller->irq,
@@ -704,19 +704,19 @@ hda_hw_init(hda_controller* controller)
 		goto no_irq;
 
 	/* TCSEL is reset to TC0 (clear 0-2 bits) */
-	tcsel = (gPci->read_pci_config)(controller->pci_info.bus, 
+	tcsel = (gPci->read_pci_config)(controller->pci_info.bus,
 		controller->pci_info.device, controller->pci_info.function, PCI_HDA_TCSEL, 1);
-	(gPci->write_pci_config)(controller->pci_info.bus, 
-		controller->pci_info.device, controller->pci_info.function, 
+	(gPci->write_pci_config)(controller->pci_info.bus,
+		controller->pci_info.device, controller->pci_info.function,
 		PCI_HDA_TCSEL, 1, tcsel & 0xf8);
-	
+
 	capabilities = controller->Read16(HDAC_GLOBAL_CAP);
 	controller->num_input_streams = GLOBAL_CAP_INPUT_STREAMS(capabilities);
 	controller->num_output_streams = GLOBAL_CAP_OUTPUT_STREAMS(capabilities);
 	controller->num_bidir_streams = GLOBAL_CAP_BIDIR_STREAMS(capabilities);
 
 	/* show some hw features */
-	dprintf("hda: HDA v%d.%d, O:%ld/I:%ld/B:%ld, #SDO:%d, 64bit:%s\n", 
+	dprintf("hda: HDA v%d.%d, O:%ld/I:%ld/B:%ld, #SDO:%d, 64bit:%s\n",
 		controller->Read8(HDAC_VERSION_MAJOR),
 		controller->Read8(HDAC_VERSION_MINOR),
 		controller->num_output_streams, controller->num_input_streams,

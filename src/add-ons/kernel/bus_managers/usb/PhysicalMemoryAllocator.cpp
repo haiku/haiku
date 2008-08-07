@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku Inc. All rights reserved.
+ * Copyright 2006-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -69,7 +69,7 @@ PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 	roundedSize = (roundedSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
 	fArea = create_area(fName, &fLogicalBase, B_ANY_KERNEL_ADDRESS,
-		roundedSize, B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+		roundedSize, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (fArea < B_OK) {
 		TRACE_ERROR(("PMA: failed to create memory area\n"));
 		return;

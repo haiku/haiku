@@ -22,35 +22,44 @@ spinlock slock = 0;
 
 uint32 round_to_pagesize(uint32 size);
 
-cpu_status lock(void)
+
+cpu_status
+lock(void)
 {
 	cpu_status status = disable_interrupts();
 	acquire_spinlock(&slock);
 	return status;
 }
 
-void unlock(cpu_status status)
+
+void
+unlock(cpu_status status)
 {
 	release_spinlock(&slock);
 	restore_interrupts(status);
 }
 
-uint32 round_to_pagesize(uint32 size)
+
+uint32
+round_to_pagesize(uint32 size)
 {
 	return (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 }
 
-area_id alloc_mem(void **phy, void **log, size_t size, const char *name)
+
+area_id
+alloc_mem(void **phy, void **log, size_t size, const char *name)
 {
 	physical_entry pe;
 	void * logadr;
 	area_id areaid;
 	status_t rv;
-	
+
 	TRACE_ICE(("allocating %#08 bytes for %s\n",size,name));
 
 	size = round_to_pagesize(size);
-	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS,size,B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size,
+		B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (areaid < B_OK) {
 		TRACE_ICE(("couldn't allocate area %s\n",name));
 		return B_ERROR;

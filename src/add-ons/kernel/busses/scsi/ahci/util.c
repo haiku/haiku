@@ -13,24 +13,28 @@
 #define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
 #define ERROR(a...) dprintf("\33[34mahci:\33[0m " a)
 
+
 static inline uint32
 round_to_pagesize(uint32 size)
 {
 	return (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 }
 
+
 area_id
-alloc_mem(void **virt, void **phy, size_t size, uint32 protection, const char *name)
+alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
+	const char *name)
 {
 	physical_entry pe;
 	void * virtadr;
 	area_id areaid;
 	status_t rv;
-	
+
 	TRACE("allocating %ld bytes for %s\n", size, name);
 
 	size = round_to_pagesize(size);
-	areaid = create_area(name, &virtadr, B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK | B_CONTIGUOUS, protection);
+	areaid = create_area(name, &virtadr, B_ANY_KERNEL_ADDRESS, size,
+		B_CONTIGUOUS, protection);
 	if (areaid < B_OK) {
 		ERROR("couldn't allocate area %s\n", name);
 		return B_ERROR;
@@ -49,8 +53,10 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection, const char *n
 	return areaid;
 }
 
+
 area_id
-map_mem(void **virt, void *phy, size_t size, uint32 protection, const char *name)
+map_mem(void **virt, void *phy, size_t size, uint32 protection,
+	const char *name)
 {
 	uint32 offset;
 	void *phyadr;
@@ -62,34 +68,37 @@ map_mem(void **virt, void *phy, size_t size, uint32 protection, const char *name
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
 	phyadr = (char *)phy - offset;
 	size = round_to_pagesize(size + offset);
-	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS, protection, &mapadr);
+	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS,
+		protection, &mapadr);
 	if (area < B_OK) {
 		ERROR("mapping '%s' failed, error 0x%lx (%s)\n", name, area, strerror(area));
 		return area;
 	}
-	
+
 	*virt = (char *)mapadr + offset;
 
 	TRACE("physical = %p, virtual = %p, offset = %ld, phyadr = %p, mapadr = %p, size = %ld, area = 0x%08lx\n",
 		phy, *virt, offset, phyadr, mapadr, size, area);
-	
+
 	return area;
 }
 
 
 status_t
-sg_memcpy(const physical_entry *sgTable, int sgCount, const void *data, size_t dataSize)
+sg_memcpy(const physical_entry *sgTable, int sgCount, const void *data,
+	size_t dataSize)
 {
 	int i;
 	for (i = 0; i < sgCount && dataSize > 0; i++) {
 		size_t size = min_c(dataSize, sgTable[i].size);
 		addr_t address;
 
-		if (vm_get_physical_page((addr_t)sgTable[i].address, &address, PHYSICAL_PAGE_CAN_WAIT) < B_OK)
+		if (vm_get_physical_page((addr_t)sgTable[i].address, &address,
+				PHYSICAL_PAGE_CAN_WAIT) < B_OK)
 			return B_ERROR;
 
 		TRACE("sg_memcpy phyAddr %p, addr %p, size %lu\n", sgTable[i].address, (void *)address, size);
-		
+
 		memcpy((void *)address, data, size);
 		vm_put_physical_page(address);
 

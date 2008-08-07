@@ -4,24 +4,24 @@
  * Copyright (c) 2002, Marcus Overhagen <marcus@overhagen.de>
  *
  * All rights reserved.
- * Redistribution and use in source and binary forms, with or without modification, 
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
+ * - Redistributions of source code must retain the above copyright notice,
  *   this list of conditions and the following disclaimer.
  * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation 
+ *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR 
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS 
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -35,35 +35,44 @@ spinlock slock = 0;
 
 uint32 round_to_pagesize(uint32 size);
 
-cpu_status lock(void)
+
+cpu_status
+lock(void)
 {
 	cpu_status status = disable_interrupts();
 	acquire_spinlock(&slock);
 	return status;
 }
 
-void unlock(cpu_status status)
+
+void
+unlock(cpu_status status)
 {
 	release_spinlock(&slock);
 	restore_interrupts(status);
 }
 
-uint32 round_to_pagesize(uint32 size)
+
+uint32
+round_to_pagesize(uint32 size)
 {
 	return (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 }
 
-area_id alloc_mem(void **log, void **phy, size_t size, const char *name)
+
+area_id
+alloc_mem(void **log, void **phy, size_t size, const char *name)
 {
 	physical_entry pe;
 	void * logadr;
 	area_id areaid;
 	status_t rv;
-	
+
 	dprintf("dp83815: allocating %ld bytes for %s\n",size,name);
 
 	size = round_to_pagesize(size);
-	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS,size,B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size,
+		B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (areaid < B_OK) {
 		dprintf("couldn't allocate area %s\n",name);
 		return B_ERROR;
@@ -83,12 +92,14 @@ area_id alloc_mem(void **log, void **phy, size_t size, const char *name)
 	return areaid;
 }
 
+
 /* This is not the most advanced method to map physical memory for io access.
  * Perhaps using B_ANY_KERNEL_ADDRESS instead of B_ANY_KERNEL_BLOCK_ADDRESS
  * makes the whole offset calculation and relocation obsolete. But the code
  * below does work, and I can't test if using B_ANY_KERNEL_ADDRESS also works.
  */
-area_id map_mem(void **log, void *phy, size_t size, const char *name)
+area_id
+map_mem(void **log, void *phy, size_t size, const char *name)
 {
 	uint32 offset;
 	void *phyadr;
@@ -105,6 +116,6 @@ area_id map_mem(void **log, void *phy, size_t size, const char *name)
 
 	dprintf("physical = %p, logical = %p, offset = %#lx, phyadr = %p, mapadr = %p, size = %#lx, area = %#lx\n",
 		phy, *log, offset, phyadr, mapadr, size, area);
-	
+
 	return area;
 }

@@ -921,7 +921,7 @@ IPW2100::AllocateContiguous(const char *name, void **logicalAddress,
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 	void *virtualAddress = NULL;
 	area_id area = create_area(name, &virtualAddress, B_ANY_KERNEL_ADDRESS,
-		size, B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+		size, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (area < B_OK) {
 		TRACE_ALWAYS(("IPW2100: allocating contiguous area failed\n"));
 		return area;
