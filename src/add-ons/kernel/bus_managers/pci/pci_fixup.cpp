@@ -40,7 +40,6 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 	if (!(val & (1 << 30))) {
 		// IDE controller at function 1 is configured in IDE mode (as opposed
 		// to AHCI or RAID). So we want to handle it.
-
 		dprintf("jmicron_fixup_ahci: PATA controller in IDE mode.\n");
 
 		// TODO(bga): It seems that with recent BIOS revisions no special code
@@ -60,6 +59,18 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 		// Maybe fixing this would be as simple as changing the device class to
 		// Serial ATA Controller instead of IDE Controller (even in AHCI mode
 		// it reports being a standard IDE controller)?
+		dprintf("jmicron_fixup_ahci: PATA controller in AHCI or RAID mode.\n");
+		
+		// Read controller control register (0x40). This should contain all the
+		// bits we need to change.
+		val = pci->ReadConfig(domain, bus, device, function, 0x40, 4);
+		dprintf("jmicron_fixup_ahci: Register 0x40 : %0x%08lx\n", val);
+
+		// TODO(bga): Do some bit shuffling here to set the controller to split
+		// mode. Right now, the write operation bellow is a no-op.
+
+		// Write controller control register (0x40).
+		pci->WriteConfig(domain, bus, device, 1, 0x40, 4, val);
 	}
 }
 
