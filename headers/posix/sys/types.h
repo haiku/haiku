@@ -1,5 +1,6 @@
 /*
- * Distributed under the terms of the OpenBeOS license
+ * Copyright 2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_TYPES_H
 #define _SYS_TYPES_H
