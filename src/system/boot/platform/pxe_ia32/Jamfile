@@ -17,7 +17,7 @@ UsePrivateHeaders [ FDirName storage ] ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
 }
 
-local bios_ia32_src = 
+local bios_ia32_src =
 	start.c
 	debug.c
 	bios.S
@@ -27,13 +27,14 @@ local bios_ia32_src =
 	menu.cpp
 	mmu.cpp
 	cpu.cpp
+	acpi.cpp
 	smp.cpp
 	support.S
 	video.cpp
 	apm.cpp
 ;
 
-local bios_ia32_edid_src = 
+local bios_ia32_edid_src =
 	decode_edid.c
 	dump_edid.c
 ;
