@@ -624,6 +624,7 @@ dump_page_stats(int argc, char **argv)
 		counter[PAGE_STATE_FREE], counter[PAGE_STATE_CLEAR]);
 	kprintf("reserved pages: %lu\n", sReservedPages);
 	kprintf("page deficit: %lu\n", sPageDeficit);
+	kprintf("mapped pages: %lu\n", gMappedPagesCount);
 
 	kprintf("\nfree queue: %p, count = %ld\n", &sFreePageQueue,
 		sFreePageQueue.count);
