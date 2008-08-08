@@ -18,6 +18,10 @@ SimpleTest flock_test
 	: flock_test.cpp
 ;
 
+SimpleTest mprotect_test
+	: mprotect_test.cpp
+;
+
 SimpleTest realtime_sem_test1
 	: realtime_sem_test1.cpp
 ;
