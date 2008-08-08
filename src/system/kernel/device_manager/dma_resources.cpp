@@ -444,14 +444,15 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 		// We do already have physical addresses.
 		locker.Unlock();
 		vecs = buffer->Vecs();
-		segmentCount = min_c(buffer->VecCount(),
+		segmentCount = min_c(buffer->VecCount() - vecIndex,
 			fRestrictions.max_segment_count);
 	}
 
 #ifdef TRACE_DMA_RESOURCE
 	TRACE("  physical count %lu\n", segmentCount);
 	for (uint32 i = 0; i < segmentCount; i++) {
-		TRACE("    [%lu] %p, %lu\n", i, vecs[i].iov_base, vecs[i].iov_len);
+		TRACE("    [%lu] %p, %lu\n", i, vecs[vecIndex + i].iov_base,
+			vecs[vecIndex + i].iov_len);
 	}
 #endif
 
@@ -488,7 +489,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 			"%lu\n", offset, length);
 	}
 
-	for (uint32 i = vecIndex; i < segmentCount;) {
+	for (uint32 i = vecIndex; i < vecIndex + segmentCount;) {
 		if (dmaBuffer->VecCount() >= fRestrictions.max_segment_count)
 			break;
 
