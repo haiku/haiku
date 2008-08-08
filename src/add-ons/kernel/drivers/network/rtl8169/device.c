@@ -1,7 +1,7 @@
 /* Realtek RTL8169 Family Driver
  * Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
  *
- * Permission to use, copy, modify and distribute this software and its 
+ * Permission to use, copy, modify and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
  * that the above copyright notice appear in all copies, and that both the
  * copyright notice and this permission notice appear in supporting documentation.
@@ -16,6 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 #include <KernelExport.h>
 #include <Errors.h>
 #include <stdlib.h>
@@ -39,11 +40,11 @@ read_settings(rtl8169_device *device)
 	void *handle;
 	const char *param;
 	int mtu, count;
-	
+
 	handle = load_driver_settings("rtl8169");
 	if (!handle)
 		return;
-	
+
 	param = get_driver_parameter(handle, "mtu", "-1", "-1");
 	mtu = atoi(param);
 	if (mtu >= 50 && mtu <= 1500)
@@ -126,8 +127,8 @@ phy_config(rtl8169_device *device)
 		// see IEE 802.3-2002 (is also uses decimal numbers when refering
 		// to the registers, as do we). Added a little documentation
 		write_phy_reg(device, 31, 0x0001); // vendor specific (enter programming mode?)
-		write_phy_reg(device, 21, 0x1000); // vendor specific	
-		write_phy_reg(device, 24, 0x65c7); // vendor specific	
+		write_phy_reg(device, 21, 0x1000); // vendor specific
+		write_phy_reg(device, 24, 0x65c7); // vendor specific
 		write_phy_reg_bit(device, 4, 11, 0); // reset T (T=toggle) bit in reg 4 (ability)
 		val = read_phy_reg(device, 4) & 0x0fff;	// get only the message code fields
 		write_phy_reg(device, 4, val); // and write them back. this clears the page and makes it unformatted (see 37.2.4.3.1)
@@ -171,7 +172,7 @@ phy_config(rtl8169_device *device)
 		write_phy_reg_bit(device, 4, 11, 1); // set toggle bit high
 		write_phy_reg_bit(device, 4, 11, 0); // set toggle bit low => this is a toggle
 		write_phy_reg(device, 31, 0x0000); // vendor specific (leave programming mode?)
-	}	
+	}
 
 	write_phy_reg(device, 4, 0x01e1); // 10/100 capability
 	write_phy_reg(device, 9, 0x0200); // 1000 capability
@@ -261,7 +262,7 @@ print_debug_info(void *cookie)
 		device->intTxCurrentCount,
 		device->intTimerTotalCount,
 		device->intTimerCurrentCount);
-		
+
 	device->intTotalCountOld = device->intTotalCount;
 	device->intCurrentCount = 0;
 	device->intRxCurrentCount = 0;
@@ -280,21 +281,27 @@ init_buf_desc(rtl8169_device *device)
 	void *rx_buf_virt, *rx_buf_phy;
 	int i;
 
-	device->txBufArea = alloc_mem(&tx_buf_virt, &tx_buf_phy, device->txBufferCount * FRAME_SIZE, 0, "rtl8169 tx buf");
-	device->rxBufArea = alloc_mem(&rx_buf_virt, &rx_buf_phy, device->rxBufferCount * FRAME_SIZE, 0, "rtl8169 rx buf");
-	device->txDescArea = alloc_mem(&tx_buf_desc_virt, &tx_buf_desc_phy, device->txBufferCount * sizeof(buf_desc), 0, "rtl8169 tx desc");
-	device->rxDescArea = alloc_mem(&rx_buf_desc_virt, &rx_buf_desc_phy, device->rxBufferCount * sizeof(buf_desc), 0, "rtl8169 rx desc");
-	if (device->txBufArea < B_OK || device->rxBufArea < B_OK || device->txDescArea < B_OK || device->rxDescArea < B_OK)
+	device->txBufArea = alloc_mem(&tx_buf_virt, &tx_buf_phy,
+		device->txBufferCount * FRAME_SIZE, 0, "rtl8169 tx buf");
+	device->rxBufArea = alloc_mem(&rx_buf_virt, &rx_buf_phy,
+		device->rxBufferCount * FRAME_SIZE, 0, "rtl8169 rx buf");
+	device->txDescArea = alloc_mem(&tx_buf_desc_virt, &tx_buf_desc_phy,
+		device->txBufferCount * sizeof(buf_desc), 0, "rtl8169 tx desc");
+	device->rxDescArea = alloc_mem(&rx_buf_desc_virt, &rx_buf_desc_phy,
+		device->rxBufferCount * sizeof(buf_desc), 0, "rtl8169 rx desc");
+	if (device->txBufArea < B_OK || device->rxBufArea < B_OK
+		|| device->txDescArea < B_OK || device->rxDescArea < B_OK)
 		return B_NO_MEMORY;
-	
-	device->txDesc = (buf_desc *) tx_buf_desc_virt;
-	device->rxDesc = (buf_desc *) rx_buf_desc_virt;
+
+	device->txDesc = (buf_desc *)tx_buf_desc_virt;
+	device->rxDesc = (buf_desc *)rx_buf_desc_virt;
 
 	// setup transmit descriptors
 	for (i = 0; i < device->txBufferCount; i++) {
 		device->txBuf[i] = (char *)tx_buf_virt + (i * FRAME_SIZE);
 		device->txDesc[i].stat_len = TX_DESC_FS | TX_DESC_LS;
-		device->txDesc[i].buf_low  = (uint32)((char *)tx_buf_phy + (i * FRAME_SIZE));
+		device->txDesc[i].buf_low
+			= (uint32)((char *)tx_buf_phy + (i * FRAME_SIZE));
 		device->txDesc[i].buf_high = 0;
 	}
 	device->txDesc[i - 1].stat_len |= TX_DESC_EOR;
@@ -303,11 +310,12 @@ init_buf_desc(rtl8169_device *device)
 	for (i = 0; i < device->rxBufferCount; i++) {
 		device->rxBuf[i] = (char *)rx_buf_virt + (i * FRAME_SIZE);
 		device->rxDesc[i].stat_len = RX_DESC_OWN | FRAME_SIZE;
-		device->rxDesc[i].buf_low  = (uint32)((char *)rx_buf_phy + (i * FRAME_SIZE));
+		device->rxDesc[i].buf_low
+			= (uint32)((char *)rx_buf_phy + (i * FRAME_SIZE));
 		device->rxDesc[i].buf_high = 0;
 	}
 	device->rxDesc[i - 1].stat_len |= RX_DESC_EOR;
-	
+
 	write32(REG_RDSAR_LOW, (uint32)rx_buf_desc_phy);
 	write32(REG_RDSAR_HIGH, 0);
 	write32(REG_TNPDS_LOW, (uint32)tx_buf_desc_phy);
@@ -350,7 +358,7 @@ rtl8169_rx_int(rtl8169_device *device)
 {
 	int32 limit;
 	int32 count;
-	
+
 	acquire_spinlock(&device->rxSpinlock);
 
 	for (count = 0, limit = device->rxFree; limit > 0; limit--) {
@@ -361,7 +369,7 @@ rtl8169_rx_int(rtl8169_device *device)
 	}
 
 //	dprintf("rx int, rxFree %d, count %d\n", device->rxFree, count);
-	
+
 	device->rxFree -= count;
 
 	release_spinlock(&device->rxSpinlock);
@@ -381,13 +389,13 @@ rtl8169_int(void *data)
 	stat = read16(REG_INT_STAT);
 	if (stat == 0 || stat == 0xffff)
 		return B_UNHANDLED_INTERRUPT;
-	
+
 	write16(REG_INT_STAT, stat);
 	ret = B_HANDLED_INTERRUPT;
 
 	PROFILING_ONLY(device->intTotalCount++);
 	PROFILING_ONLY(device->intCurrentCount++);
-	
+
 	if (stat & INT_FOVW) {
 		TRACE("INT_FOVW\n");
 	}
@@ -429,36 +437,36 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	int dev_id;
 	int mask;
 	int i;
-	
+
 	TRACE("rtl8169_open()\n");
 
 	for (dev_id = 0; (deviceName = gDevNameList[dev_id]) != NULL; dev_id++) {
 		if (!strcmp(name, deviceName))
 			break;
-	}		
+	}
 	if (deviceName == NULL) {
 		ERROR("invalid device name\n");
 		return B_ERROR;
 	}
-	
+
 	// allow only one concurrent access
 	mask = 1 << dev_id;
 	if (atomic_or(&gOpenMask, mask) & mask)
 		return B_BUSY;
-		
+
 	*cookie = device = (rtl8169_device *)malloc(sizeof(rtl8169_device));
 	if (!device) {
 		atomic_and(&gOpenMask, ~(1 << dev_id));
 		return B_NO_MEMORY;
 	}
-	
+
 	memset(device, 0, sizeof(*device));
 
 	device->devId = dev_id;
 	device->pciInfo = gDevList[dev_id];
 	device->nonblocking = (flags & O_NONBLOCK) ? true : false;
 	device->closed = false;
-	
+
 	// setup defaults
 	device->maxframesize  = 1514; // not FRAME_SIZE
 	device->txBufferCount = DEFAULT_TX_BUF_COUNT;
@@ -473,7 +481,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	device->rxFree = device->rxBufferCount;
 	device->rxReadySem = create_sem(0, "rtl8169 rx ready");
 	set_sem_owner(device->rxReadySem, B_SYSTEM_TEAM);
-	
+
 	device->txBuf = (void **)malloc(sizeof(void *) * device->txBufferCount);
 	B_INITIALIZE_SPINLOCK(&device->txSpinlock);
 	device->txNextIndex = 0;
@@ -481,18 +489,23 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	device->txUsed = 0;
 	device->txFreeSem = create_sem(device->txBufferCount, "rtl8169 tx free");
 	set_sem_owner(device->txFreeSem, B_SYSTEM_TEAM);
-	
+
 	// enable busmaster and memory mapped access, disable io port access
-	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, PCI_command, 2);
+	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device,
+		device->pciInfo->function, PCI_command, 2);
 	val = PCI_PCICMD_BME | PCI_PCICMD_MSE | (val & ~PCI_PCICMD_IOS);
-	gPci->write_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, PCI_command, 2, val);
+	gPci->write_pci_config(device->pciInfo->bus, device->pciInfo->device,
+		device->pciInfo->function, PCI_command, 2, val);
 
 	// adjust PCI latency timer
 	TRACE("changing PCI latency to 0x40\n");
-	gPci->write_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, PCI_latency, 1, 0x40);
+	gPci->write_pci_config(device->pciInfo->bus, device->pciInfo->device,
+		device->pciInfo->function, PCI_latency, 1, 0x40);
 
 	// get IRQ
-	device->irq = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, PCI_interrupt_line, 1);
+	device->irq = gPci->read_pci_config(device->pciInfo->bus,
+		device->pciInfo->device, device->pciInfo->function, PCI_interrupt_line,
+		1);
 	if (device->irq == 0 || device->irq == 0xff) {
 		ERROR("no IRQ assigned\n");
 		goto err;
@@ -501,15 +514,17 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	TRACE("IRQ %d\n", device->irq);
 
 	// map registers into memory
-	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, 0x18, 4);
+	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device,
+		device->pciInfo->function, 0x14, 4);
 	val &= PCI_address_memory_32_mask;
 	TRACE("hardware register address %p\n", (void *) val);
-	device->regArea = map_mem(&device->regAddr, (void *)val, 256, 0, "rtl8169 register");
+	device->regArea = map_mem(&device->regAddr, (void *)val, 256, 0,
+		"rtl8169 register");
 	if (device->regArea < B_OK) {
 		ERROR("can't map hardware registers\n");
 		goto err;
 	}
-		
+
 	TRACE("mapped registers to %p\n", device->regAddr);
 
 	// disable receiver & transmitter XXX might be removed
@@ -527,7 +542,8 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	TRACE("reset done\n");
 
 	// get MAC hardware version
-	device->mac_version = ((read32(REG_TX_CONFIG) & 0x7c000000) >> 25) | ((read32(REG_TX_CONFIG) & 0x00800000) >> 23);
+	device->mac_version = ((read32(REG_TX_CONFIG) & 0x7c000000) >> 25)
+		| ((read32(REG_TX_CONFIG) & 0x00800000) >> 23);
 	TRACE("8169 Mac Version %d\n", device->mac_version);
 	if (device->mac_version > 0) { // this is a RTL8169s single chip
 		// get PHY hardware version
@@ -538,35 +554,38 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 		device->phy_version = 0;
 		TRACE("8169 Phy Version unknown\n");
 	}
-	
+
 	if (device->mac_version == 1) {
 		// as it's done by the BSD driver...
 		TRACE("Setting MAC Reg C+CR 0x82h = 0x01h\n");
 		write8(0x82, 0x01); // don't know what this does
 		TRACE("Setting PHY Reg 0x0bh = 0x00h\n");
-		write_phy_reg(device, 0x0b, 0x0000); // 0xb is a reserved (vendor specific register), don't know what this does
+		write_phy_reg(device, 0x0b, 0x0000);
+			// 0xb is a reserved (vendor specific register), don't know what
+			// this does
 	}
-	
+
 	// configure PHY
 	phy_config(device);
-	
+
 	dump_phy_stat(device);
 	print_link_status(device);
 
-	// initialize MAC address	
+	// initialize MAC address
 	for (i = 0; i < 6; i++)
 		device->macaddr[i] = read8(i);
-		
+
 	TRACE("MAC %02x:%02x:%02x:%02x:%02x:%02x\n",
 		device->macaddr[0], device->macaddr[1], device->macaddr[2],
 		device->macaddr[3], device->macaddr[4], device->macaddr[5]);
-	
+
 	// setup interrupt handler
-	if (install_io_interrupt_handler(device->irq, rtl8169_int, device, 0) < B_OK) {
+	if (install_io_interrupt_handler(device->irq, rtl8169_int, device, 0)
+			< B_OK) {
 		ERROR("can't install interrupt handler\n");
 		goto err;
 	}
-	
+
 	#ifdef PROFILING
 		device->intTotalCount = 0;
 		device->intTotalCountOld = 0;
@@ -577,16 +596,19 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 		device->intRxCurrentCount = 0;
 		device->intTxCurrentCount = 0;
 		device->intTimerCurrentCount = 0;
-	  	device->timer = create_timer(print_debug_info, device, 1000000, B_PERIODIC_TIMER);
+	  	device->timer = create_timer(print_debug_info, device, 1000000,
+	  		B_PERIODIC_TIMER);
 	#endif // PROFILING
-	
+
 	write16(0xe0, read16(0xe0)); // write CR+ command
 
-	write16(0xe0, read16(0xe0) | 0x0003); // don't know what this does, BSD says "enable C+ Tx/Rx"
+	write16(0xe0, read16(0xe0) | 0x0003);
+		// don't know what this does, BSD says "enable C+ Tx/Rx"
 
 	if (device->mac_version == 1) {
 		TRACE("Setting Reg C+CR bit 3 and bit 14 to 1\n");
-		// bit 3 is PCI multiple read/write enable (max Tx/Rx DMA burst size setting is no longer valid then)
+		// bit 3 is PCI multiple read/write enable (max Tx/Rx DMA burst size
+		// setting is no longer valid then)
 		// bit 14 ??? (need more docs)
 		write16(0xe0, read16(0xe0) | 0x4008);
 	}
@@ -599,36 +621,39 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 
 	// enable receiver & transmitter
 	write8(REG_CR, read8(REG_CR) | CR_RE | CR_TE);
-	
+
 	write8(REG_9346CR, 0xc0);	// enable config access
 	write8(REG_CONFIG1, read8(REG_CONFIG1) & ~1);	// disable power management
 	write8(REG_9346CR, 0x00);	// disable config access
-	
+
 	write8(0xec, 0x3f); 		// disable early transmit treshold
 	write16(0xda, FRAME_SIZE);	// receive packet maximum size
 
 	write16(0x5c, read16(0x5c) & 0xf000); // disable early receive interrupts
-	
+
 	write32(0x4c, 0); // RxMissed ???
 
 	// setup receive config, can only be done when receiver is enabled!
 	// 1024 byte FIFO treshold, 1024 DMA burst
 	write32(REG_RX_CONFIG, (read32(REG_RX_CONFIG) & RX_CONFIG_MASK)
 		| (0x6 << RC_CONFIG_RXFTH_Shift) | (0x6 << RC_CONFIG_MAXDMA_Shift)
-		| RX_CONFIG_AcceptBroad | RX_CONFIG_AcceptMulti | RX_CONFIG_AcceptMyPhys);
+		| RX_CONFIG_AcceptBroad | RX_CONFIG_AcceptMulti
+		| RX_CONFIG_AcceptMyPhys);
 
 	write32(0x8, 0); // multicast filter
 	write32(0xc, 0); // multicast filter
 
-	// setup transmit config, can only be done when transmitter is enabled!	
+	// setup transmit config, can only be done when transmitter is enabled!
 	// append CRC, 1024 DMA burst
-	write32(REG_TX_CONFIG, (read32(REG_TX_CONFIG) & ~(0x10000 | (1 << 8))) | (0x6 << 8));
-	
+	write32(REG_TX_CONFIG, (read32(REG_TX_CONFIG) & ~(0x10000 | (1 << 8)))
+		| (0x6 << 8));
+
   	// clear pending interrupt status
   	write16(REG_INT_STAT, 0xffff);
-  	
+
   	// enable used interrupts
- 	write16(REG_INT_MASK, INT_FOVW | INT_PUN | INT_TER | INT_TOK | INT_RER | INT_ROK);
+ 	write16(REG_INT_MASK, INT_FOVW | INT_PUN | INT_TER | INT_TOK | INT_RER
+ 		| INT_ROK);
 
 	return B_OK;
 
@@ -653,7 +678,7 @@ rtl8169_close(void* cookie)
 {
 	rtl8169_device *device = (rtl8169_device *)cookie;
 	TRACE("rtl8169_close()\n");
-	
+
 	device->closed = true;
 	release_sem(device->rxReadySem);
 	release_sem(device->txFreeSem);
@@ -673,9 +698,9 @@ rtl8169_free(void* cookie)
 
 	// disable interrupts
   	write16(REG_INT_MASK, 0);
-  	
+
 	PROFILING_ONLY(delete_timer(device->timer));
-  	
+
   	// well...
   	remove_io_interrupt_handler (device->irq, rtl8169_int, device);
 
@@ -695,27 +720,30 @@ rtl8169_free(void* cookie)
 
 
 status_t
-rtl8169_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
+rtl8169_read(void* cookie, off_t position, void *buf, size_t* numBytes)
 {
 	rtl8169_device *device = (rtl8169_device *)cookie;
 	cpu_status cpu;
 	status_t stat;
 	int len;
 	TRACE("rtl8169_read() enter\n");
-	
+
 	if (device->closed) {
 		TRACE("rtl8169_read() interrupted 1\n");
 		return B_INTERRUPTED;
 	}
 retry:
-	stat = acquire_sem_etc(device->rxReadySem, 1, B_CAN_INTERRUPT | (device->nonblocking ? B_TIMEOUT : 0), 0);
+	stat = acquire_sem_etc(device->rxReadySem, 1,
+		B_CAN_INTERRUPT | (device->nonblocking ? B_TIMEOUT : 0), 0);
 	if (device->closed) {
-		// TRACE("rtl8169_read() interrupted 2\n"); // net_server will crash if we print this (race condition in net_server?)
+		// TRACE("rtl8169_read() interrupted 2\n");
+			// net_server will crash if we print this
+			// (race condition in net_server?)
 		return B_INTERRUPTED;
 	}
 	if (stat == B_WOULD_BLOCK) {
 		TRACE("rtl8169_read() would block (OK 0 bytes)\n");
-		*num_bytes = 0;
+		*numBytes = 0;
 		return B_OK;
 	}
 	if (stat != B_OK) {
@@ -732,39 +760,41 @@ retry:
 	len -= 4; // remove CRC that Realtek always appends
 	if (len < 0)
 		len = 0;
-	if (len > (int)*num_bytes)
-		len = *num_bytes;
+	if (len > (int)*numBytes)
+		len = *numBytes;
 
 	memcpy(buf, device->rxBuf[device->rxNextIndex], len);
-	*num_bytes = len;
+	*numBytes = len;
 
 	cpu = disable_interrupts();
 	acquire_spinlock(&device->rxSpinlock);
 
-	device->rxDesc[device->rxNextIndex].stat_len = RX_DESC_OWN | FRAME_SIZE | (device->rxDesc[device->rxNextIndex].stat_len & RX_DESC_EOR);
+	device->rxDesc[device->rxNextIndex].stat_len = RX_DESC_OWN | FRAME_SIZE
+		| (device->rxDesc[device->rxNextIndex].stat_len & RX_DESC_EOR);
 	device->rxFree++;
 
 	release_spinlock(&device->rxSpinlock);
 	restore_interrupts(cpu);
-	
+
 	device->rxNextIndex = (device->rxNextIndex + 1) % device->rxBufferCount;
-	
+
 	TRACE("rtl8169_read() leave\n");
 	return B_OK;
 }
 
 
 status_t
-rtl8169_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+rtl8169_write(void* cookie, off_t position, const void* buffer,
+	size_t* numBytes)
 {
 	rtl8169_device *device = (rtl8169_device *)cookie;
 	cpu_status cpu;
 	status_t stat;
 	int len;
-	
+
 	TRACE("rtl8169_write() enter\n");
 
-	len = *num_bytes;
+	len = *numBytes;
 	if (len > FRAME_SIZE) {
 		TRACE("rtl8169_write() buffer too large\n");
 		return B_ERROR;
@@ -775,14 +805,15 @@ rtl8169_write(void* cookie, off_t position, const void* buffer, size_t* num_byte
 		return B_INTERRUPTED;
 	}
 retry:
-	stat = acquire_sem_etc(device->txFreeSem, 1, B_CAN_INTERRUPT | B_TIMEOUT, device->nonblocking ? 0 : TX_TIMEOUT);
+	stat = acquire_sem_etc(device->txFreeSem, 1, B_CAN_INTERRUPT | B_TIMEOUT,
+		device->nonblocking ? 0 : TX_TIMEOUT);
 	if (device->closed) {
 		TRACE("rtl8169_write() interrupted 2\n");
 		return B_INTERRUPTED;
 	}
 	if (stat == B_WOULD_BLOCK) {
 		TRACE("rtl8169_write() would block (OK 0 bytes)\n");
-		*num_bytes = 0;
+		*numBytes = 0;
 		return B_OK;
 	}
 	if (stat == B_TIMED_OUT) {
@@ -793,7 +824,7 @@ retry:
 		TRACE("rtl8169_write() error\n");
 		return B_ERROR;
 	}
-	
+
 	if (device->txDesc[device->txNextIndex].stat_len & TX_DESC_OWN) {
 		ERROR("rtl8169_write() buffer still in use\n");
 		goto retry;
@@ -805,13 +836,15 @@ retry:
 	acquire_spinlock(&device->txSpinlock);
 
 	device->txUsed++;
-	device->txDesc[device->txNextIndex].stat_len = (device->txDesc[device->txNextIndex].stat_len & RX_DESC_EOR) | TX_DESC_OWN | TX_DESC_FS | TX_DESC_LS | len;
+	device->txDesc[device->txNextIndex].stat_len
+		= (device->txDesc[device->txNextIndex].stat_len & RX_DESC_EOR)
+			| TX_DESC_OWN | TX_DESC_FS | TX_DESC_LS | len;
 
 	release_spinlock(&device->txSpinlock);
 	restore_interrupts(cpu);
 
 	device->txNextIndex = (device->txNextIndex + 1) % device->txBufferCount;
-	
+
 	write8(REG_TPPOLL, read8(REG_TPPOLL) | TPPOLL_NPQ); // set queue polling bit
 
 	TRACE("rtl8169_write() leave\n");
@@ -828,12 +861,12 @@ rtl8169_control(void *cookie, uint32 op, void *arg, size_t len)
 		case ETHER_INIT:
 			TRACE("rtl8169_control() ETHER_INIT\n");
 			return B_OK;
-		
+
 		case ETHER_GETADDR:
 			TRACE("rtl8169_control() ETHER_GETADDR\n");
 			memcpy(arg, &device->macaddr, sizeof(device->macaddr));
 			return B_OK;
-			
+
 		case ETHER_NONBLOCK:
 			if (*(int32 *)arg) {
 				TRACE("non blocking mode on\n");
@@ -852,20 +885,22 @@ rtl8169_control(void *cookie, uint32 op, void *arg, size_t len)
 		case ETHER_ADDMULTI:
 			TRACE("rtl8169_control() ETHER_ADDMULTI\n");
 			break;
-		
+
 		case ETHER_REMMULTI:
 			TRACE("rtl8169_control() ETHER_REMMULTI\n");
 			return B_OK;
-		
+
 		case ETHER_SETPROMISC:
 			if (*(int32 *)arg) {
 				TRACE("promiscuous mode on\n");
-				write32(REG_RX_CONFIG, read32(REG_RX_CONFIG) | RX_CONFIG_AcceptAllPhys);
+				write32(REG_RX_CONFIG, read32(REG_RX_CONFIG)
+					| RX_CONFIG_AcceptAllPhys);
 				write32(0x8, 0xffffffff); // multicast filter
 				write32(0xc, 0xffffffff); // multicast filter
 			} else {
 				TRACE("promiscuous mode off\n");
-				write32(REG_RX_CONFIG, read32(REG_RX_CONFIG) & ~RX_CONFIG_AcceptAllPhys);
+				write32(REG_RX_CONFIG, read32(REG_RX_CONFIG)
+					& ~RX_CONFIG_AcceptAllPhys);
 				write32(0x8, 0); // multicast filter
 				write32(0xc, 0); // multicast filter
 			}
@@ -875,12 +910,12 @@ rtl8169_control(void *cookie, uint32 op, void *arg, size_t len)
 			TRACE("rtl8169_control() ETHER_GETFRAMESIZE, framesize = %d (MTU = %d)\n", device->maxframesize,  device->maxframesize - 14);
 			*(uint32*)arg = device->maxframesize;
 			return B_OK;
-			
+
 		default:
 			TRACE("rtl8169_control() Invalid command\n");
 			break;
 	}
-	
+
 	return B_ERROR;
 }
 
