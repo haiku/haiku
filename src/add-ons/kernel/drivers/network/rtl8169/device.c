@@ -499,9 +499,9 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	}
 
 	TRACE("IRQ %d\n", device->irq);
-	
+
 	// map registers into memory
-	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, 0x14, 4);
+	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, 0x18, 4);
 	val &= PCI_address_memory_32_mask;
 	TRACE("hardware register address %p\n", (void *) val);
 	device->regArea = map_mem(&device->regAddr, (void *)val, 256, 0, "rtl8169 register");
