@@ -2797,7 +2797,7 @@ vm_remove_all_page_mappings(vm_page *page, uint32 *_flags)
 		accumulatedFlags |= flags;
 	}
 
-	if (page->wired_count == 0)
+	if (page->wired_count == 0 && !queue.IsEmpty())
 		atomic_add(&gMappedPagesCount, -1);
 
 	locker.Unlock();
