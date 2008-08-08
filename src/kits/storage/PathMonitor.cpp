@@ -58,20 +58,20 @@ namespace BPrivate {
 	typedef set<node_ref> FileSet;
 #endif
 
-struct watched_directory {
-	node_ref	node;
-	bool		contained;
+struct WatchedDirectory {
+	node_ref		node;
+	bool			contained;
 };
-typedef set<watched_directory> DirectorySet;
+typedef set<WatchedDirectory> DirectorySet;
 
 
 class PathHandler;
 typedef map<BString, PathHandler*> HandlerMap;
 
-struct watcher {
+struct Watcher {
 	HandlerMap handlers;
 };
-typedef map<BMessenger, watcher*> WatcherMap;
+typedef map<BMessenger, Watcher*> WatcherMap;
 
 class PathHandler : public BHandler {
 	public:
@@ -154,7 +154,7 @@ operator<(const node_ref& a, const node_ref& b)
 
 
 bool
-operator<(const watched_directory& a, const watched_directory& b)
+operator<(const WatchedDirectory& a, const WatchedDirectory& b)
 {
 	return a.node < b.node;
 }
@@ -209,8 +209,29 @@ PathHandler::InitCheck() const
 void
 PathHandler::Quit()
 {
-	BMessenger me(this);
-	me.SendMessage(B_QUIT_REQUESTED);
+	// We are not allowed to lock the BLooper, or we could deadlock!
+	// So we will remove the handler from the looper in it's own thread
+	// and also delete us there by sending ourself a message. But this
+	// handler may possibly not be attached to it's looper any more. The
+	// BMessenger can check this in a thread safe way without locking
+	// the looper.
+	status_t status;
+	BMessenger toSelf(this, NULL, &status);
+	if (status == B_OK)
+		status = toSelf.SendMessage(B_QUIT_REQUESTED);
+
+	// TODO: Could there still be a race condition? What if the
+	// looper was right in it's destructor, sending the message may
+	// succeed, but it may still not arrive. The worst that happens
+	// though is that this object is leaked. But I do anticipate this
+	// case to only happen during the shutdown of an application, in
+	// which case the point is moot... Also note - one could introduce a
+	// reply for this message to know whether it arrived, but in the case
+	// the reply is wrong (default reply), one would still not know at
+	// which time the BLooper removes this handler without locking it.
+
+	if (status != B_OK)
+		delete this;
 }
 
 
@@ -541,7 +562,7 @@ bool
 PathHandler::_HasDirectory(const node_ref& nodeRef,
 	bool* _contained /* = NULL */) const
 {
-	watched_directory directory;
+	WatchedDirectory directory;
 	directory.node = nodeRef;
 
 	DirectorySet::const_iterator iterator = fDirectories.find(directory);
@@ -579,7 +600,7 @@ PathHandler::_NotifyTarget(BMessage* message) const
 status_t
 PathHandler::_AddDirectory(BEntry& entry)
 {
-	watched_directory directory;
+	WatchedDirectory directory;
 	status_t status = entry.GetNodeRef(&directory.node);
 	if (status != B_OK)
 		return status;
@@ -643,7 +664,7 @@ PathHandler::_RemoveDirectory(const node_ref& nodeRef, ino_t directoryNode)
 {
 	TRACE(("  REMOVE DIRECTORY %ld:%Ld\n", nodeRef.device, nodeRef.node));
 
-	watched_directory directory;
+	WatchedDirectory directory;
 	directory.node = nodeRef;
 
 	DirectorySet::iterator iterator = fDirectories.find(directory);
@@ -833,7 +854,7 @@ BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target,
 	BAutolock _(sLocker);
 
 	WatcherMap::iterator iterator = sWatchers.find(target);
-	struct watcher* watcher = NULL;
+	Watcher* watcher = NULL;
 	if (iterator != sWatchers.end())
 		watcher = iterator->second;
 
@@ -846,7 +867,7 @@ BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target,
 		return status;
 
 	if (watcher == NULL) {
-		watcher = new (nothrow) BPrivate::watcher;
+		watcher = new (nothrow) BPrivate::Watcher;
 		if (watcher == NULL)
 			return B_NO_MEMORY;
 		sWatchers[target] = watcher;
@@ -869,7 +890,7 @@ BPathMonitor::StopWatching(const char* path, BMessenger target)
 	if (iterator == sWatchers.end())
 		return B_BAD_VALUE;
 
-	struct watcher* watcher = iterator->second;
+	Watcher* watcher = iterator->second;
 	HandlerMap::iterator i = watcher->handlers.find(path);
 
 	if (i == watcher->handlers.end())
@@ -901,7 +922,7 @@ BPathMonitor::StopWatching(BMessenger target)
 	if (iterator == sWatchers.end())
 		return B_BAD_VALUE;
 
-	struct watcher* watcher = iterator->second;
+	Watcher* watcher = iterator->second;
 	while (!watcher->handlers.empty()) {
 		HandlerMap::iterator i = watcher->handlers.begin();
 		PathHandler* handler = i->second;
