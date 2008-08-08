@@ -301,6 +301,7 @@ struct vm_area {
 	off_t				cache_offset;
 	uint32				cache_type;
 	vm_area_mappings	mappings;
+	uint8				*page_protections;
 
 	struct vm_address_space *address_space;
 	struct vm_area		*address_space_next;

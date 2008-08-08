@@ -143,9 +143,24 @@ munmap(void* address, size_t length)
 
 
 int
+mprotect(void* address, size_t length, int protection)
+{
+	RETURN_AND_SET_ERRNO(_kern_set_memory_protection(address, length,
+		protection));
+}
+
+
+int
 msync(void* address, size_t length, int flags)
 {
 	RETURN_AND_SET_ERRNO(_kern_sync_memory(address, length, flags));
+}
+
+
+int
+posix_madvise(void* address, size_t length, int advice)
+{
+	RETURN_AND_SET_ERRNO(_kern_memory_advice(address, length, advice));
 }
 
 

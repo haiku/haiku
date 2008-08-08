@@ -327,10 +327,14 @@ extern status_t		_kern_reserve_heap_address_range(addr_t* _address, uint32 addre
 						addr_t size);
 
 extern area_id		_kern_map_file(const char *name, void **address,
-						int addressSpec, addr_t size, int protection,
+						int addressSpec, size_t size, int protection,
 						int mapping, int fd, off_t offset);
-extern status_t		_kern_unmap_memory(void *address, addr_t size);
-extern status_t		_kern_sync_memory(void *address, addr_t size, int flags);
+extern status_t		_kern_unmap_memory(void *address, size_t size);
+extern status_t		_kern_set_memory_protection(void *address, size_t size,
+						int protection);
+extern status_t		_kern_sync_memory(void *address, size_t size, int flags);
+extern status_t		_kern_memory_advice(void *address, size_t size,
+						int advice);
 
 /* kernel port functions */
 extern port_id		_kern_create_port(int32 queue_length, const char *name);

@@ -9,7 +9,8 @@
 #include <sys/types.h>
 
 
-/* memory protection for mmap() and others */
+/* memory protection for mmap() and others; assignment compatible with
+   B_{READ,WRITE,EXECUTE}_AREA */
 #define PROT_READ		0x01
 #define PROT_WRITE		0x02
 #define PROT_EXEC		0x04
@@ -30,6 +31,13 @@
 #define MS_SYNC			0x02
 #define MS_INVALIDATE	0x04
 
+/* posix_madvise() values */
+#define POSIX_MADV_NORMAL		1
+#define POSIX_MADV_SEQUENTIAL	2
+#define POSIX_MADV_RANDOM		3
+#define POSIX_MADV_WILLNEED		4
+#define POSIX_MADV_DONTNEED		5
+
 
 __BEGIN_DECLS
 
@@ -37,7 +45,10 @@ void*	mmap(void* address, size_t length, int protection, int flags,
 			int fd, off_t offset);
 int		munmap(void* address, size_t length);
 
+int		mprotect(void* address, size_t length, int protection);
 int		msync(void* address, size_t length, int flags);
+
+int		posix_madvise(void* address, size_t length, int advice);
 
 int		shm_open(const char* name, int openMode, mode_t permissions);
 int		shm_unlink(const char* name);

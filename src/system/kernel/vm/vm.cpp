@@ -878,6 +878,7 @@ create_area_struct(vm_address_space *addressSpace, const char *name,
 	area->cache_next = area->cache_prev = NULL;
 	area->hash_next = NULL;
 	new (&area->mappings) vm_area_mappings;
+	area->page_protections = NULL;
 
 	return area;
 }
@@ -1223,6 +1224,37 @@ insert_area(vm_address_space *addressSpace, void **_address,
 	}
 
 	return status;
+}
+
+
+static inline void
+set_area_page_protection(vm_area* area, addr_t pageAddress, uint32 protection)
+{
+	protection &= B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA;
+	uint32 pageIndex = (pageAddress - area->base) / B_PAGE_SIZE;
+	uint8& entry = area->page_protections[pageIndex / 2];
+	if (pageIndex % 2 == 0)
+		entry = entry & 0xf0 | protection;
+	else
+		entry = entry & 0x0f | (protection << 4);
+}
+
+
+static inline uint32
+get_area_page_protection(vm_area* area, addr_t pageAddress)
+{
+	if (area->page_protections == NULL)
+		return area->protection;
+
+	uint32 pageIndex = (pageAddress - area->base) / B_PAGE_SIZE;
+	uint32 protection = area->page_protections[pageIndex / 2];
+	if (pageIndex % 2 == 0)
+		protection &= 0x0f;
+	else
+		protection >>= 4;
+
+	return protection | B_KERNEL_READ_AREA
+		| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
 }
 
 
@@ -2340,6 +2372,7 @@ delete_area(vm_address_space *addressSpace, vm_area *area)
 	area->cache->RemoveArea(area);
 	area->cache->ReleaseRef();
 
+	free(area->page_protections);
 	free(area->name);
 	free(area);
 }
@@ -4603,11 +4636,13 @@ vm_soft_fault(vm_address_space *addressSpace, addr_t originalAddress,
 	}
 
 	// check permissions
-	if (isUser && (area->protection & B_USER_PROTECTION) == 0) {
+	uint32 protection = get_area_page_protection(area, address);
+	if (isUser && (protection & B_USER_PROTECTION) == 0) {
 		dprintf("user access on kernel area 0x%lx at %p\n", area->id, (void *)originalAddress);
 		return B_PERMISSION_DENIED;
 	}
-	if (isWrite && (area->protection & (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
+	if (isWrite && (protection
+			& (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
 		dprintf("write access attempted on read-only area 0x%lx at %p\n",
 			area->id, (void *)originalAddress);
 		return B_PERMISSION_DENIED;
@@ -4678,7 +4713,7 @@ vm_soft_fault(vm_address_space *addressSpace, addr_t originalAddress,
 
 		// If the page doesn't reside in the area's cache, we need to make sure it's
 		// mapped in read-only, so that we cannot overwrite someone else's data (copy-on-write)
-		uint32 newProtection = area->protection;
+		uint32 newProtection = protection;
 		if (page->cache != topCache && !isWrite)
 			newProtection &= ~(B_WRITE_AREA | B_KERNEL_WRITE_AREA);
 
@@ -5797,7 +5832,7 @@ _user_delete_area(area_id area)
 
 area_id
 _user_map_file(const char *userName, void **userAddress, int addressSpec,
-	addr_t size, int protection, int mapping, int fd, off_t offset)
+	size_t size, int protection, int mapping, int fd, off_t offset)
 {
 	char name[B_OS_NAME_LENGTH];
 	void *address;
@@ -5834,7 +5869,7 @@ _user_map_file(const char *userName, void **userAddress, int addressSpec,
 
 
 status_t
-_user_unmap_memory(void *_address, addr_t size)
+_user_unmap_memory(void *_address, size_t size)
 {
 	addr_t address = (addr_t)_address;
 
@@ -5857,7 +5892,142 @@ _user_unmap_memory(void *_address, addr_t size)
 
 
 status_t
-_user_sync_memory(void *_address, addr_t size, int flags)
+_user_set_memory_protection(void* _address, size_t size, int protection)
+{
+	// check address range
+	addr_t address = (addr_t)_address;
+	size = PAGE_ALIGN(size);
+
+	if ((address % B_PAGE_SIZE) != 0)
+		return B_BAD_VALUE;
+	if ((addr_t)address + size < (addr_t)address || !IS_USER_ADDRESS(address)
+		|| !IS_USER_ADDRESS((addr_t)address + size)) {
+		// weird error code required by POSIX
+		return ENOMEM;
+	}
+
+	// extend and check protection
+	protection &= B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA;
+	uint32 actualProtection = protection | B_KERNEL_READ_AREA
+		| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
+
+	if (!arch_vm_supports_protection(actualProtection))
+		return B_NOT_SUPPORTED;
+
+	// We need to write lock the address space, since we're going to play with
+	// the areas.
+	AddressSpaceWriteLocker locker;
+	status_t status = locker.SetTo(team_get_current_team_id());
+	if (status != B_OK)
+		return status;
+
+	// First round: Check whether the whole range is covered by areas and we are
+	// allowed to modify them.
+	addr_t currentAddress = address;
+	size_t sizeLeft = size;
+	while (sizeLeft > 0) {
+		vm_area* area = vm_area_lookup(locker.AddressSpace(), currentAddress);
+		if (area == NULL)
+			return B_NO_MEMORY;
+
+		if ((area->protection & B_KERNEL_AREA) != 0)
+			return B_NOT_ALLOWED;
+
+		// TODO: For (shared) mapped files we should check whether the new
+		// protections are compatible with the file permissions. We don't have
+		// a way to do that yet, though.
+
+		addr_t offset = currentAddress - area->base;
+		size_t rangeSize = min_c(area->size - offset, sizeLeft);
+
+		currentAddress += rangeSize;
+		sizeLeft -= rangeSize;
+	}
+
+	// Second round: If the protections differ from that of the area, create a
+	// page protection array and re-map mapped pages.
+	vm_translation_map* map = &locker.AddressSpace()->translation_map;
+	currentAddress = address;
+	sizeLeft = size;
+	while (sizeLeft > 0) {
+		vm_area* area = vm_area_lookup(locker.AddressSpace(), currentAddress);
+		if (area == NULL)
+			return B_NO_MEMORY;
+
+		addr_t offset = currentAddress - area->base;
+		size_t rangeSize = min_c(area->size - offset, sizeLeft);
+
+		currentAddress += rangeSize;
+		sizeLeft -= rangeSize;
+
+		if (area->page_protections == NULL) {
+			if (area->protection == actualProtection)
+				continue;
+
+			// In the page protections we store only the three user protections,
+			// so we use 4 bits per page.
+			uint32 bytes = (area->size / B_PAGE_SIZE + 1) / 2;
+			area->page_protections = (uint8*)malloc(bytes);
+			if (area->page_protections == NULL)
+				return B_NO_MEMORY;
+
+			// init the page protections for all pages to that of the area
+			uint32 areaProtection = area->protection
+				& (B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA);
+			memset(area->page_protections,
+				areaProtection | (areaProtection << 4), bytes);
+		}
+
+		for (addr_t pageAddress = area->base + offset;
+				pageAddress < currentAddress; pageAddress += B_PAGE_SIZE) {
+			map->ops->lock(map);
+
+			set_area_page_protection(area, pageAddress, protection);
+
+			addr_t physicalAddress;
+			uint32 flags;
+
+			status_t error = map->ops->query(map, pageAddress, &physicalAddress,
+				&flags);
+			if (error != B_OK || (flags & PAGE_PRESENT) == 0) {
+				map->ops->unlock(map);
+				continue;
+			}
+
+			vm_page *page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+			if (page == NULL) {
+				panic("area %p looking up page failed for pa 0x%lx\n", area,
+					physicalAddress);
+				map->ops->unlock(map);
+				return B_ERROR;;
+			}
+
+			// If the page is not in the topmost cache and write access is
+			// requested, we have to unmap it. Otherwise we can re-map it with
+			// the new protection.
+			bool unmapPage = page->cache != area->cache
+				&& (protection & B_WRITE_AREA) != 0;
+
+			if (!unmapPage) {
+				map->ops->unmap(map, pageAddress,
+					pageAddress + B_PAGE_SIZE - 1);
+				map->ops->map(map, pageAddress, physicalAddress,
+					actualProtection);
+			}
+
+			map->ops->unlock(map);
+
+			if (unmapPage)
+				vm_unmap_pages(area, pageAddress, B_PAGE_SIZE, true);
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+_user_sync_memory(void *_address, size_t size, int flags)
 {
 	addr_t address = (addr_t)_address;
 	size = PAGE_ALIGN(size);
@@ -5932,5 +6102,13 @@ _user_sync_memory(void *_address, addr_t size, int flags)
 	// synchronize multiple mappings of the same file. In our VM they never get
 	// out of sync, though, so we don't have to do anything.
 
+	return B_OK;
+}
+
+
+status_t
+_user_memory_advice(void* address, size_t size, int advice)
+{
+	// TODO: Implement!
 	return B_OK;
 }
