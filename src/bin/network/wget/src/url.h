@@ -1,11 +1,12 @@
 /* Declarations for url.c.
-   Copyright (C) 1995, 1996, 1997 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,18 +15,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #ifndef URL_H
 #define URL_H
@@ -34,6 +35,14 @@ so, delete this exception statement from your version.  */
 #define DEFAULT_HTTP_PORT 80
 #define DEFAULT_FTP_PORT 21
 #define DEFAULT_HTTPS_PORT 443
+
+/* Specifies how, or whether, user auth information should be included
+ * in URLs regenerated from URL parse structures. */
+enum url_auth_mode {
+  URL_AUTH_SHOW,
+  URL_AUTH_HIDE_PASSWD,
+  URL_AUTH_HIDE
+};
 
 /* Note: the ordering here is related to the order of elements in
    `supported_schemes' in url.c.  */
@@ -73,28 +82,30 @@ struct url
 
 /* Function declarations */
 
-char *url_escape PARAMS ((const char *));
+char *url_escape (const char *);
 
-struct url *url_parse PARAMS ((const char *, int *));
-const char *url_error PARAMS ((int));
-char *url_full_path PARAMS ((const struct url *));
-void url_set_dir PARAMS ((struct url *, const char *));
-void url_set_file PARAMS ((struct url *, const char *));
-void url_free PARAMS ((struct url *));
+struct url *url_parse (const char *, int *);
+const char *url_error (int);
+char *url_full_path (const struct url *);
+void url_set_dir (struct url *, const char *);
+void url_set_file (struct url *, const char *);
+void url_free (struct url *);
 
-enum url_scheme url_scheme PARAMS ((const char *));
-int url_has_scheme PARAMS ((const char *));
-int scheme_default_port PARAMS ((enum url_scheme));
-void scheme_disable PARAMS ((enum url_scheme));
+enum url_scheme url_scheme (const char *);
+bool url_has_scheme (const char *);
+int scheme_default_port (enum url_scheme);
+void scheme_disable (enum url_scheme);
 
-char *url_string PARAMS ((const struct url *, int));
-char *url_file_name PARAMS ((const struct url *));
+char *url_string (const struct url *, enum url_auth_mode);
+char *url_file_name (const struct url *);
 
-char *uri_merge PARAMS ((const char *, const char *));
+char *uri_merge (const char *, const char *);
 
-int mkalldirs PARAMS ((const char *));
+int mkalldirs (const char *);
 
-char *rewrite_shorthand_url PARAMS ((const char *));
-int schemes_are_similar_p PARAMS ((enum url_scheme a, enum url_scheme b));
+char *rewrite_shorthand_url (const char *);
+bool schemes_are_similar_p (enum url_scheme a, enum url_scheme b);
+
+bool are_urls_equal (const char *u1, const char *u2);
 
 #endif /* URL_H */

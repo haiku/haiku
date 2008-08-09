@@ -1,0 +1,46 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use HTTPTest;
+
+
+###############################################################################
+
+my $dummyfile = <<EOF;
+Don't care.
+EOF
+
+# code, msg, headers, content
+my %urls = (
+    '/dummy.txt' => {
+        code => "200",
+        msg => "Dontcare",
+        headers => {
+            "Content-type" => "text/plain",
+        },
+        content => $dummyfile
+    },
+);
+
+my $cmdline = $WgetTest::WGETPATH . " -O out http://localhost:8080/dummy.txt";
+
+my $expected_error_code = 0;
+
+my %expected_downloaded_files = (
+    'out' => {
+        content => $dummyfile,
+    }
+);
+
+###############################################################################
+
+my $the_test = HTTPTest->new (name => "Test-O",
+                              input => \%urls, 
+                              cmdline => $cmdline, 
+                              errcode => $expected_error_code, 
+                              output => \%expected_downloaded_files);
+exit $the_test->run();
+
+# vim: et ts=4 sw=4
+

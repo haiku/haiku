@@ -1,3 +1,182 @@
+2008-06-29  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <Contributors>: Added Joao Ferreira.
+
+	* version.texi: Bumped version to 1.11.4.
+
+2008-05-28  Micah Cowan  <micah@cowan.name>
+
+	* version.texi: Bumped version to 1.11.3.
+
+2008-05-12  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Download Options): -N with -O downgraded to a
+	warning.
+
+2008-04-30  Micah Cowan  <micah@cowan.name>
+
+	* version.texi: Bumped version to 1.11.2.
+
+2008-04-27  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Download Options) <-O>: Elaborate on why certain
+	options make poor combinations with -O.
+
+2008-04-11  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <Contributors>: Added Julien Buty, Alexander
+	Dergachev, and Rabin Vincent.
+
+2008-03-24  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <Types of Fields>: Mentioned various caveats in the
+	behavior of accept/reject lists, deprecate current
+	always-download-HTML feature. Added @noindent to a couple of
+	appropriate spots.
+
+2008-03-17  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <Directory-Based Limits>: Mention importance of
+	trailing slashes to --no-parents.
+
+2008-02-14  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in: Install manpage from source dir, rather than
+	build dir.
+
+2008-02-10  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <HTTP Options>: Added documentation of
+	--auth-no-challenge.
+
+2008-02-06  Micah Cowan  <micah@cowan.name>
+
+	* wget.ṫexi <Overview>: Remove references to no-longer-supported
+	socks library.
+
+2008-01-30  Micah Cowan  <micah@cowan.name>
+
+	* version.texi: Bumped version to 1.11.1-devel.
+	* wget.texi: Ensure that license info appears in the info
+	version of the manual.
+
+2008-01-25  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: Update the "last updated" setting.
+	* Makefile.in, wget.texi: Updated copyright year.
+	* Makefile.in: Mark wget.pod as secondary, to avoid regeneration
+	because of wget.1's dependency upon it.
+	* version.texi: Bumped version to 1.11.
+
+2007-12-10  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: Document the --content-disposition option (and not
+	just the .wgetrc setting).
+
+2007-12-06  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: "the the" -> "the"
+
+2007-12-05  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <Wgetrc Commands>: Explicitly mention that
+	--content-disposition has known issues.
+
+2007-10-13  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <Mailing Lists>: Replaced mention of no-longer
+	included PATCHES file with link to relevant Wgiki page.
+	* wget.texi <Internet Relay Chat>: Added new section.
+
+2007-10-10  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <Wgetrc Commands>: Fixed "doewnloads" typo.
+
+2007-10-03  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <Wgetrc Commands>: Cleaned up alphabetization,
+	more consistent use of underscores. Added a description of the
+	content_disposition wgetrc command.
+
+2007-10-01  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: Updated information in Mailing Lists, Reporting
+	Bugs. Added Web Site section, and add information about Mac OS
+	X, MS-DOS, and VMS in Portability.
+
+2007-09-27  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: Removed "for more details" from parenthesese
+	enclosing @pxref{}s, so that texi2pod.pl knows to remove the
+	whole reference. Made some gramattical improvements, and
+	strengthened the recommendation to use the info manual instead.
+	* texi2pod.pl: Brought in some updates from the GCC version. Not
+	an entire update, since a couple "fixes" there breaks stuff
+	here.
+
+2007-09-12  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: Expanded the description of -O. Clarified the
+	detection of elements as "patterns" versus "suffixes" in -A,
+	-R. Describe -p in relation to -nc.
+
+2007-07-28  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi <HTTP Options>: Added --max-redirect option.
+
+2007-07-05  Micah Cowan  <micah@cowan.name>
+
+	* fdl.texi:
+	Changed to match the version in gnulib.
+
+	* Makefile.in:
+	* texi2pod.pl:
+	* texinfo.tex:
+	Updated GPL reference to version 3 or later, removed FSF
+	address.
+
+	* wget.texi:
+	Slightly reworded the FDL license invocation. Replaced the
+	maintainer reference. Removed the GPL text from the manual.
+
+	* gpl.texi:
+	Removed due to discontinuation of reference in Wget manual.
+
+2006-07-10  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* wget.texi: Fixed rendering of --no-proxy description in the man
+	page. Added information about current maintainer.
+
+2006-06-28  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* wget.texi: Removed invariant status to the GPL and GFDL sections.
+	Changed UPDATED to Jun 2006. Updated copyright notice to include 2006.
+
+2006-06-26  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* wget.texi (Recursive Accept/Reject Options): Document
+	--ignore-case.
+
+2006-06-20  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* wget.texi (Download Options): Add missing word.
+	Reported by Adrian Knoth.
+
+2006-02-05  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	(Download Options): Changed "a recent article" to "a 2001 article"
+	in the description of --random-wait, since the article in question
+	is not really recent.
+
+2006-02-05  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* wget.texi (Download Options): Document the modified meaning of
+	--random-wait.
+
+2005-11-15  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* wget.texi: Document https_proxy.
+
 2005-09-02  Hrvoje Niksic  <hniksic@xemacs.org>
 
 	* sample.wgetrc: Rewrite the "passive FTP" paragraph to better
@@ -26,7 +205,8 @@
 
 2005-06-23  Hrvoje Niksic  <hniksic@xemacs.org>
 
-	* version.texi: Bump version to 1.10.1.
+	* wget.texi (Contributors): Updated list of principal
+	contributors.
 
 2005-06-22  Hrvoje Niksic  <hniksic@xemacs.org>
 
@@ -44,6 +224,23 @@
 2005-06-22  Hrvoje Niksic  <hniksic@xemacs.org>
 
 	* texinfo.tex: Update with a non-prehistoric version.
+
+2005-06-22  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* texi2pod.pl: Locate perl using the "env" program, so we don't
+	need to modify texi2pod.
+
+	* Makefile.in (wget.pod): Work with texi2pod.pl directly instead
+	of generating it from texi2pod.pl.in.
+
+2005-06-22  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* wget.texi (Wgetrc Commands): Remove the "lockable boolean"
+	feature.
+
+2005-06-20  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* ansi2knr.1: Removed.
 
 2005-06-16  Hrvoje Niksic  <hniksic@xemacs.org>
 

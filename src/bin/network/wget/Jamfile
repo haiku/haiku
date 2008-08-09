@@ -35,6 +35,7 @@ BinCommand wget :
 	res.c
 	retr.c
 	safe-ctype.c
+	spider.c
 	url.c
 	utils.c
 	version.c

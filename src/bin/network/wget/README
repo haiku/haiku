@@ -1,7 +1,7 @@
                                                           -*- text -*-
 GNU Wget
 ========
-                             Current Web home: http://wget.sunsite.dk/
+                  Current Web home: http://www.gnu.org/software/wget/
 
 GNU Wget is a free utility for non-interactive download of files from
 the Web.  It supports HTTP, HTTPS, and FTP protocols, as well as
@@ -50,23 +50,21 @@ resides at <ftp://ftp.gnu.org/pub/gnu/wget/>.
 Please report bugs in Wget to <bug-wget@gnu.org>.
 
 See the file `MAILING-LIST' for information about Wget mailing lists.
-Wget's home page is temporarily at <http://wget.sunsite.dk/>.  It is
-being migrated to <http://www.gnu.org/software/wget/>, where will be
-its permanent home.
+Wget's home page is at <http://www.gnu.org/software/wget/>.
+
+MAINTAINER: Micah Cowan <micah@cowan.name>
+
+Wget was originally written and mainained by Hrvoje Niksic.  Please see
+the file AUTHORS for a list of major contributors, and the ChangeLogs
+for a detailed listing of all contributions.
 
 
-MAINTAINER: Mauro Tortonesi <mauro@ferrara.linux.it>
-
-Wget was originally written by Hrvoje Niksic.  Please see the file
-AUTHORS for a list of major contributors, and the ChangeLogs for a
-detailed listing of all contributions.
-
-
-Copyright (C) 2005 Free Software Foundation, Inc.
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -76,14 +74,16 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+USA.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.

@@ -1,11 +1,12 @@
 /* Miscellaneous declarations.
-   Copyright (C) 1995, 1996, 1997, 1998, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,18 +15,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 /* This file contains declarations that are universally useful and
    those that don't fit elsewhere.  It also includes sysdep.h which
@@ -40,12 +41,9 @@ so, delete this exception statement from your version.  */
 # define NDEBUG
 #endif
 
-#ifndef PARAMS
-# if PROTOTYPES
-#  define PARAMS(args) args
-# else
-#  define PARAMS(args) ()
-# endif
+/* Is OpenSSL or GNUTLS available? */
+#if defined HAVE_LIBSSL || defined HAVE_LIBGNUTLS
+# define HAVE_SSL
 #endif
 
 /* `gettext (FOO)' is long to write, so we use `_(FOO)'.  If NLS is
@@ -59,7 +57,18 @@ so, delete this exception statement from your version.  */
 # endif /* not HAVE_LIBINTL_H */
 #else  /* not HAVE_NLS */
 # define _(string) (string)
+# define ngettext(sing, plur, num)  ((num) == 1 ? (sing) : (plur))
+# undef HAVE_WCHAR_H
+# undef HAVE_WCWIDTH
+# undef HAVE_MBTOWC
 #endif /* not HAVE_NLS */
+
+#if HAVE_WCWIDTH && HAVE_MBTOWC
+# define USE_NLS_PROGRESS_BAR 1
+#else
+/* Just to be a little paranoid about it. */
+# undef  USE_NLS_PROGRESS_BAR
+#endif
 
 /* A pseudo function call that serves as a marker for the automated
    extraction of messages, but does not call gettext().  The run-time
@@ -106,50 +115,83 @@ so, delete this exception statement from your version.  */
 # define UNLIKELY(exp) (exp)
 #endif
 
-/* Print X if debugging is enabled; a no-op otherwise.  */
+/* Execute the following statement if debugging is both enabled at
+   compile-time and requested at run-time; a no-op otherwise.  */
 
 #ifdef ENABLE_DEBUG
-# define DEBUGP(x) do if (UNLIKELY (opt.debug)) {debug_logprintf x;} while (0)
-#else  /* not ENABLE_DEBUG */
-# define DEBUGP(x) do {} while (0)
-#endif /* not ENABLE_DEBUG */
+# define IF_DEBUG if (UNLIKELY (opt.debug))
+#else
+# define IF_DEBUG if (0)
+#endif
 
-/* Define an integer type that works for file sizes, content lengths,
-   and such.  Normally we could just use off_t, but off_t is always
-   32-bit on Windows.  */
+/* Print ARGS if debugging is enabled and requested, otherwise do
+   nothing.  This must be called with an extra level of parentheses
+   because it's not possible to pass a variable number of arguments to
+   a macro (in portable C89).  ARGS are like arguments to printf.  */
 
-#ifndef WINDOWS
-typedef off_t wgint;
+#define DEBUGP(args) do { IF_DEBUG { debug_logprintf args; } } while (0)
+
+/* Pick an integer type large enough for file sizes, content lengths,
+   and such.  Because today's files can be very large, it should be a
+   signed integer at least 64 bits wide.  This can't be typedeffed to
+   off_t because: a) off_t is always 32-bit on Windows, and b) we
+   don't necessarily want to tie having a 64-bit type for internal
+   calculations to having LFS support.  */
+
+#ifdef WINDOWS
+  /* nothing to do, see mswindows.h */
+#elif SIZEOF_LONG >= 8
+  /* long is large enough, so use it. */
+  typedef long wgint;
+# define SIZEOF_WGINT SIZEOF_LONG
+#elif SIZEOF_LONG_LONG >= 8
+  /* long long is large enough and available, use that */
+  typedef long long wgint;
+# define SIZEOF_WGINT SIZEOF_LONG_LONG
+#elif HAVE_INT64_T
+  typedef int64_t wgint;
+# define SIZEOF_WGINT 8
+#elif SIZEOF_OFF_T >= 8
+  /* In case off_t is typedeffed to a large non-standard type that our
+     tests don't find. */
+  typedef off_t wgint;
 # define SIZEOF_WGINT SIZEOF_OFF_T
+#else
+  /* Fall back to using long, which is always available and in most
+     cases large enough. */
+typedef long off_t;
+# define SIZEOF_WGINT SIZEOF_LONG
 #endif
 
-/* Define a strtol/strtoll clone that works with wgint.  */
-#ifndef str_to_wgint		/* mswindows.h defines its own alias */
-# if SIZEOF_WGINT == SIZEOF_LONG
-#  define str_to_wgint strtol
-#  define WGINT_MAX LONG_MAX
-# else
-#  define WGINT_MAX LLONG_MAX
-#  ifdef HAVE_STRTOLL
-#   define str_to_wgint strtoll
-#  else
-#   ifdef HAVE_STRTOIMAX
-#    define str_to_wgint strtoimax
-#   else
-#    define str_to_wgint strtoll
-#    define NEED_STRTOLL
-#    define strtoll_return long long
-#   endif
-#  endif
+/* Pick a strtol-compatible function that will work with wgint.  The
+   choices are strtol, strtoll, or our own implementation of strtoll
+   in cmpt.c, activated with NEED_STRTOLL.  */
+
+#ifdef WINDOWS
+  /* nothing to do, see mswindows.h */
+#elif SIZEOF_WGINT == SIZEOF_LONG
+# define str_to_wgint strtol
+#elif SIZEOF_WGINT == SIZEOF_LONG_LONG
+# define str_to_wgint strtoll
+# ifndef HAVE_STRTOLL
+#  define NEED_STRTOLL
+#  define strtoll_type long long
 # endif
+#else
+  /* wgint has a strange size; synthesize strtoll and use it. */
+# define str_to_wgint strtoll
+# define NEED_STRTOLL
+# define strtoll_type wgint
 #endif
+
+#define WGINT_MAX TYPE_MAXIMUM (wgint)
 
 /* Declare our strtoll replacement. */
 #ifdef NEED_STRTOLL
-strtoll_return strtoll PARAMS ((const char *, char **, int));
+strtoll_type strtoll (const char *, char **, int);
 #endif
 
-/* Now define a large integral type useful for storing sizes of *sums*
+/* Now define a large numeric type useful for storing sizes of *sums*
    of downloads, such as the value of the --quota option.  This should
    be a type able to hold 2G+ values even on systems without large
    file support.  (It is useful to limit Wget's download quota to say
@@ -160,9 +202,8 @@ strtoll_return strtoll PARAMS ((const char *, char **, int));
    few places in Wget, this is acceptable.)  */
 
 #if SIZEOF_WGINT >= 8
-/* just use wgint, which we already know how to print */
+/* just use wgint */
 typedef wgint SUM_SIZE_INT;
-# define with_thousand_seps_sum with_thousand_seps
 #else
 /* On systems without LFS, use double, which buys us integers up to 2^53. */
 typedef double SUM_SIZE_INT;
@@ -255,14 +296,14 @@ typedef double SUM_SIZE_INT;
     (sizevar) = DR_newsize;						\
   }									\
   if (DR_newsize)							\
-    basevar = (type *)xrealloc (basevar, DR_newsize * sizeof (type));	\
+    basevar = xrealloc (basevar, DR_newsize * sizeof (type));		\
 } while (0)
 
 /* Used to print pointers (usually for debugging).  Print pointers
-   using printf ("%0*lx", PTR_FORMAT (p)).  (%p is too unpredictable;
+   using printf ("0x%0*lx", PTR_FORMAT (p)).  (%p is too unpredictable;
    some implementations prepend 0x, while some don't, and most don't
    0-pad the address.)  */
-#define PTR_FORMAT(p) 2 * sizeof (void *), (unsigned long) (p)
+#define PTR_FORMAT(p) (int) (2 * sizeof (void *)), (unsigned long) (p)
 
 extern const char *exec_name;
 
@@ -283,18 +324,23 @@ enum
    simplified.  */
 typedef enum
 {
+  /*  0  */
   NOCONERROR, HOSTERR, CONSOCKERR, CONERROR, CONSSLERR,
-  CONIMPOSSIBLE, NEWLOCATION, NOTENOUGHMEM, CONPORTERR,
-  CONCLOSED, FTPOK, FTPLOGINC, FTPLOGREFUSED, FTPPORTERR, FTPSYSERR,
-  FTPNSFOD, FTPRETROK, FTPUNKNOWNTYPE, FTPRERR,
-  FTPREXC, FTPSRVERR, FTPRETRINT, FTPRESTFAIL, URLERROR,
-  FOPENERR, FOPEN_EXCL_ERR, FWRITEERR, HOK, HLEXC, HEOF,
+  CONIMPOSSIBLE, NEWLOCATION, NOTENOUGHMEM, CONPORTERR, CONCLOSED, 
+  /* 10  */
+  FTPOK, FTPLOGINC, FTPLOGREFUSED, FTPPORTERR, FTPSYSERR,
+  FTPNSFOD, FTPRETROK, FTPUNKNOWNTYPE, FTPRERR, FTPREXC, 
+  /* 20  */
+  FTPSRVERR, FTPRETRINT, FTPRESTFAIL, URLERROR, FOPENERR, 
+  FOPEN_EXCL_ERR, FWRITEERR, HOK, HLEXC, HEOF,
+  /* 30  */
   HERR, RETROK, RECLEVELEXC, FTPACCDENIED, WRONGCODE,
-  FTPINVPASV, FTPNOPASV,
-  CONTNOTSUPPORTED, RETRUNNEEDED, RETRFINISHED, READERR, TRYLIMEXC,
-  URLBADPATTERN, FILEBADFILE, RANGEERR, RETRBADPATTERN,
-  RETNOTSUP, ROBOTSOK, NOROBOTS, PROXERR, AUTHFAILED,
-  QUOTEXC, WRITEFAILED, SSLINITFAILED
+  FTPINVPASV, FTPNOPASV, CONTNOTSUPPORTED, RETRUNNEEDED, RETRFINISHED, 
+  /* 40  */
+  READERR, TRYLIMEXC, URLBADPATTERN, FILEBADFILE, RANGEERR, 
+  RETRBADPATTERN, RETNOTSUP, ROBOTSOK, NOROBOTS, PROXERR, 
+  /* 50  */
+  AUTHFAILED, QUOTEXC, WRITEFAILED, SSLINITFAILED
 } uerr_t;
 
 #endif /* WGET_H */

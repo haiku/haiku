@@ -1,11 +1,11 @@
 /* Declarations for convert.c
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,23 +14,24 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #ifndef CONVERT_H
 #define CONVERT_H
 
 struct hash_table;		/* forward decl */
+extern struct hash_table *dl_url_file_map;
 extern struct hash_table *downloaded_html_set;
 
 enum convert_options {
@@ -92,15 +93,15 @@ typedef enum
   CHECK_FOR_FILE
 } downloaded_file_t;
 
-downloaded_file_t downloaded_file PARAMS ((downloaded_file_t, const char *));
+downloaded_file_t downloaded_file (downloaded_file_t, const char *);
 
-void register_download PARAMS ((const char *, const char *));
-void register_redirection PARAMS ((const char *, const char *));
-void register_html PARAMS ((const char *, const char *));
-void register_delete_file PARAMS ((const char *));
-void convert_all_links PARAMS ((void));
-void convert_cleanup PARAMS ((void));
+void register_download (const char *, const char *);
+void register_redirection (const char *, const char *);
+void register_html (const char *, const char *);
+void register_delete_file (const char *);
+void convert_all_links (void);
+void convert_cleanup (void);
 
-char *html_quote_string PARAMS ((const char *));
+char *html_quote_string (const char *);
 
 #endif /* CONVERT_H */

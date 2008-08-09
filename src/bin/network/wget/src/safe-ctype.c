@@ -7,7 +7,7 @@ This file is part of the libiberty library.
 Libiberty is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
 License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
+version 3 of the License, or (at your option) any later version.
 
 Libiberty is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,19 +15,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with libiberty; see the file COPYING.LIB.  If
-not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite
-Boston, MA 02111-1307, USA.
+License along with libiberty.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 /* This is a compatible replacement of the standard C library's <ctype.h>
    with the following properties:
@@ -58,20 +57,20 @@ so, delete this exception statement from your version.  */
 #define xd _sch_isxdigit
 
 /* Masks.  */
-#define L  lo|is   |pr	/* lower case letter */
-#define XL lo|is|xd|pr	/* lowercase hex digit */
-#define U  up|is   |pr	/* upper case letter */
-#define XU up|is|xd|pr	/* uppercase hex digit */
-#define D  di   |xd|pr	/* decimal digit */
-#define P  pn      |pr	/* punctuation */
-#define _  pn|is   |pr	/* underscore */
+#define L  lo|is   |pr  /* lower case letter */
+#define XL lo|is|xd|pr  /* lowercase hex digit */
+#define U  up|is   |pr  /* upper case letter */
+#define XU up|is|xd|pr  /* uppercase hex digit */
+#define D  di   |xd|pr  /* decimal digit */
+#define P  pn      |pr  /* punctuation */
+#define _  pn|is   |pr  /* underscore */
 
-#define C           cn	/* control character */
-#define Z  nv      |cn	/* NUL */
-#define M  nv|sp   |cn	/* cursor movement: \f \v */
-#define V  vs|sp   |cn	/* vertical space: \r \n */
-#define T  nv|sp|bl|cn	/* tab */
-#define S  nv|sp|bl|pr	/* space */
+#define C           cn  /* control character */
+#define Z  nv      |cn  /* NUL */
+#define M  nv|sp   |cn  /* cursor movement: \f \v */
+#define V  vs|sp   |cn  /* vertical space: \r \n */
+#define T  nv|sp|bl|cn  /* tab */
+#define S  nv|sp|bl|pr  /* space */
 
 /* Are we ASCII? */
 #if '\n' == 0x0A && ' ' == 0x20 && '0' == 0x30 \

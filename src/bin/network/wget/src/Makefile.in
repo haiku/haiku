@@ -1,9 +1,10 @@
 # Makefile for `wget' utility
-# Copyright (C) 1995, 1996, 1997 Free Software Foundation, Inc.
+# Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+# 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 
 # This program is distributed in the hope that it will be useful,
@@ -12,18 +13,18 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-# In addition, as a special exception, the Free Software Foundation
-# gives permission to link the code of its release of Wget with the
-# OpenSSL project's "OpenSSL" library (or with modified versions of it
-# that use the same license as the "OpenSSL" library), and distribute
-# the linked executables.  You must obey the GNU General Public License
-# in all respects for all of the code used other than "OpenSSL".  If you
-# modify this file, you may extend this exception to your version of the
-# file, but you are not obligated to do so.  If you do not wish to do
-# so, delete this exception statement from your version.
+# Additional permission under GNU GPL version 3 section 7
+
+# If you modify this program, or any covered work, by linking or
+# combining it with the OpenSSL project's OpenSSL library (or a
+# modified version of that library), containing parts covered by the
+# terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+# grants you additional permission to convey the resulting work.
+# Corresponding Source for a non-source form of such a combination
+# shall include the source code for the parts of OpenSSL used as well
+# as that of the covered work.
 
 #
 # Version: @VERSION@
@@ -36,14 +37,13 @@ top_builddir = ..
 top_srcdir = @top_srcdir@
 srcdir     = @srcdir@
 VPATH      = @srcdir@
-ANSI2KNR = @ANSI2KNR@
-o = .@U@o
 
 prefix       = @prefix@
 exec_prefix  = @exec_prefix@
 bindir       = @bindir@
 sysconfdir   = @sysconfdir@
-localedir    = $(prefix)/share/locale
+datadir      = @datadir@
+localedir    = $(datadir)/locale
 
 DESTDIR      =
 
@@ -52,9 +52,9 @@ CPPFLAGS = @CPPFLAGS@
 # The following line is losing on some versions of make!
 DEFS     = @DEFS@ -DSYSTEM_WGETRC=\"$(sysconfdir)/wgetrc\" -DLOCALEDIR=\"$(localedir)\"
 CFLAGS   = @CFLAGS@
-LDFLAGS  = @LDFLAGS@
-LIBS     = @LIBS@ @LIBSSL@
-exeext   = @exeext@
+LDFLAGS  = @LDFLAGS@ 
+LIBS     = @LIBS@ @LIBSSL@ @LIBGNUTLS@
+exeext   = @EXEEXT@
 
 INCLUDES = -I. -I$(srcdir)
 
@@ -73,40 +73,23 @@ NTLM_OBJ   = @NTLM_OBJ@
 SSL_OBJ    = @SSL_OBJ@
 GETOPT_OBJ = @GETOPT_OBJ@
 
-OBJ = $(ALLOCA) cmpt$o connect$o convert$o cookies$o              \
-      ftp$o ftp-basic$o ftp-ls$o $(OPIE_OBJ) $(GETOPT_OBJ) hash$o \
-      host$o html-parse$o html-url$o http$o $(NTLM_OBJ) init$o    \
-      log$o main$o $(MD5_OBJ) netrc$o progress$o ptimer$o recur$o \
-      res$o retr$o safe-ctype$o snprintf$o $(SSL_OBJ) url$o       \
-      utils$o version$o xmalloc$o 
+OBJ = $(ALLOCA) cmpt.o connect.o convert.o cookies.o              \
+      ftp.o ftp-basic.o ftp-ls.o $(OPIE_OBJ) $(GETOPT_OBJ) hash.o \
+      host.o html-parse.o html-url.o http.o $(NTLM_OBJ) init.o    \
+      log.o main.o $(MD5_OBJ) netrc.o progress.o ptimer.o recur.o \
+      res.o retr.o safe-ctype.o snprintf.o spider.o $(SSL_OBJ)    \
+      url.o utils.o version.o xmalloc.o
 
 .SUFFIXES:
-.SUFFIXES: .c .o ._c ._o
+.SUFFIXES: .c .o
 
 .c.o:
 	$(COMPILE) -c $<
-
-.c._c: $(ANSI2KNR)
-	$(ANSI2KNR) $< > $*.tmp && mv $*.tmp $@
-
-._c._o:
-	@echo $(COMPILE) -c $<
-	@rm -f _$*.c
-	@ln $< _$*.c && $(COMPILE) -c _$*.c && mv _$*.o $@ && rm _$*.c
-
-.c._o: $(ANSI2KNR)
-	$(ANSI2KNR) $< > $*.tmp && mv $*.tmp $*._c
-	@echo $(COMPILE) -c $*._c
-	@rm -f _$*.c
-	@ln $*._c _$*.c && $(COMPILE) -c _$*.c && mv _$*.o $@ && rm _$*.c
 
 # Dependencies for building
 
 wget$(exeext): $(OBJ)
 	$(LINK) $(OBJ) $(LIBS)
-
-ansi2knr: ansi2knr.o
-	$(CC) -o ansi2knr ansi2knr.o $(LIBS)
 
 # We make object files depend on every header.  Rather than attempt to
 # track dependencies, everything gets recompiled when a header
@@ -114,12 +97,11 @@ ansi2knr: ansi2knr.o
 # time, and it's a lot safer than attempting to get all the
 # dependencies right.
 
-$(OBJ): $(ANSI2KNR) \
-        config-post.h connect.h convert.h cookies.h ftp.h gen-md5.h \
-        getopt.h gnu-md5.h hash.h host.h html-parse.h http-ntlm.h   \
-        init.h log.h mswindows.h netrc.h options.h progress.h       \
-        ptimer.h recur.h res.h retr.h safe-ctype.h ssl.h sysdep.h   \
-        url.h utils.h wget.h xmalloc.h
+$(OBJ): config-post.h config.h connect.h convert.h cookies.h ftp.h \
+        gen-md5.h getopt.h gnu-md5.h hash.h host.h html-parse.h    \
+        http-ntlm.h init.h log.h mswindows.h netrc.h options.h     \
+        progress.h ptimer.h recur.h res.h retr.h safe-ctype.h      \
+        spider.h ssl.h sysdep.h url.h utils.h wget.h xmalloc.h
 
 #
 # Dependencies for installing
@@ -141,7 +123,7 @@ uninstall.bin:
 #
 
 clean:
-	$(RM) *.o wget$(exeext) *~ *.bak core core.[0-9]* $(ANSI2KNR) *._o *._c
+	$(RM) *.o wget$(exeext) *~ *.bak core core.[0-9]*
 
 distclean: clean
 	$(RM) Makefile config.h

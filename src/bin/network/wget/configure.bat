@@ -1,10 +1,10 @@
 @echo off
 rem Configure batch file for `Wget' utility
-rem Copyright (C) 1995, 1996, 1997 Free Software Foundation, Inc.
+rem Copyright (C) 1995, 1996, 1997, 2007, 2008 Free Software Foundation, Inc.
 
 rem This program is free software; you can redistribute it and/or modify
 rem it under the terms of the GNU General Public License as published by
-rem the Free Software Foundation; either version 2 of the License, or
+rem the Free Software Foundation; either version 3 of the License, or
 rem (at your option) any later version.
 
 rem This program is distributed in the hope that it will be useful,
@@ -13,27 +13,25 @@ rem MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 rem GNU General Public License for more details.
 
 rem You should have received a copy of the GNU General Public License
-rem along with this program; if not, write to the Free Software
-rem Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+rem along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-rem In addition, as a special exception, the Free Software Foundation
-rem gives permission to link the code of its release of Wget with the
-rem OpenSSL project's "OpenSSL" library (or with modified versions of it
-rem that use the same license as the "OpenSSL" library), and distribute
-rem the linked executables.  You must obey the GNU General Public License
-rem in all respects for all of the code used other than "OpenSSL".  If you
-rem modify this file, you may extend this exception to your version of the
-rem file, but you are not obligated to do so.  If you do not wish to do
-rem so, delete this exception statement from your version.
+rem Additional permission under GNU GPL version 3 section 7
+
+rem If you modify this program, or any covered work, by linking or
+rem combining it with the OpenSSL project's OpenSSL library (or a
+rem modified version of that library), containing parts covered by the
+rem terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+rem grants you additional permission to convey the resulting work.
+rem Corresponding Source for a non-source form of such a combination
+rem shall include the source code for the parts of OpenSSL used as well
+rem as that of the covered work.
 
 if .%1 == .--borland goto :borland
 if .%1 == .--mingw goto :mingw
 if .%1 == .--msvc goto :msvc
-if .%1 == .--watcom goto :watcom
 goto :usage
 
 :msvc
-copy windows\config.h.ms src\config.h > nul
 copy windows\Makefile.top Makefile > nul
 copy windows\Makefile.src src\Makefile > nul
 copy windows\Makefile.doc doc\Makefile > nul
@@ -44,7 +42,6 @@ echo and then NMAKE.
 goto :end
 
 :borland
-copy windows\config.h.bor src\config.h > nul
 copy windows\Makefile.top.bor Makefile > nul
 copy windows\Makefile.src.bor src\Makefile > nul
 copy windows\Makefile.doc doc\Makefile > nul
@@ -53,7 +50,6 @@ echo Type MAKE to start compiling.
 goto :end
 
 :mingw
-copy windows\config.h.mingw src\config.h > nul
 copy windows\Makefile.top.mingw Makefile > nul
 copy windows\Makefile.src.mingw src\Makefile > nul
 copy windows\Makefile.doc doc\Makefile > nul
@@ -61,20 +57,9 @@ copy windows\Makefile.doc doc\Makefile > nul
 echo Type mingw32-make to start compiling.
 goto :end
 
-:watcom
-copy windows\config.h.ms src\config.h > nul
-copy windows\Makefile.watcom src\Makefile > nul
-
-@echo Checking environment vars
-@set INCLUDE | find /I "WATCOM"
-@set LIB     | find /I "WATCOM"
-@echo If WATCOM directories were not displayed, you need to
-@echo SET INCLUDE and SET LIB to the Watcom directories
-@echo.
-cd src
-@echo Type WMAKE to build
-goto :end
-
 :usage
-echo "Usage: configure [--borland | --mingw | --msvc | --watcom]"
+echo "Usage: configure [--borland | --mingw | --msvc]"
 :end
+
+copy windows\config.h src\config.h > nul
+copy windows\config-compiler.h src\config-compiler.h > nul

@@ -1,11 +1,12 @@
 /* Various utility functions.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,40 +15,36 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else  /* not HAVE_STRING_H */
-# include <strings.h>
-#endif /* not HAVE_STRING_H */
-#include <sys/types.h>
+#include <string.h>
+#include <time.h>
+#ifdef HAVE_SYS_TIME_H
+# include <sys/time.h>
+#endif
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 #ifdef HAVE_MMAP
 # include <sys/mman.h>
 #endif
-#ifdef HAVE_PWD_H
-# include <pwd.h>
-#endif
-#ifdef HAVE_LIMITS_H
-# include <limits.h>
+#ifdef HAVE_PROCESS_H
+# include <process.h>  /* getpid() */
 #endif
 #ifdef HAVE_UTIME_H
 # include <utime.h>
@@ -56,19 +53,10 @@ so, delete this exception statement from your version.  */
 # include <sys/utime.h>
 #endif
 #include <errno.h>
-#ifdef NeXT
-# include <libc.h>		/* for access() */
-#endif
 #include <fcntl.h>
 #include <assert.h>
-#ifdef WGET_USE_STDARG
-# include <stdarg.h>
-#else
-# include <varargs.h>
-#endif
-#ifdef HAVE_LOCALE_H
-# include <locale.h>
-#endif
+#include <stdarg.h>
+#include <locale.h>
 
 /* For TIOCGWINSZ and friends: */
 #ifdef HAVE_SYS_IOCTL_H
@@ -78,14 +66,9 @@ so, delete this exception statement from your version.  */
 # include <termios.h>
 #endif
 
-/* Needed for run_with_timeout. */
-#undef USE_SIGNAL_TIMEOUT
-#ifdef HAVE_SIGNAL_H
-# include <signal.h>
-#endif
-#ifdef HAVE_SETJMP_H
-# include <setjmp.h>
-#endif
+/* Needed for Unix version of run_with_timeout. */
+#include <signal.h>
+#include <setjmp.h>
 
 #ifndef HAVE_SIGSETJMP
 /* If sigsetjmp is a macro, configure won't pick it up. */
@@ -94,22 +77,17 @@ so, delete this exception statement from your version.  */
 # endif
 #endif
 
-#ifdef HAVE_SIGNAL
-# ifdef HAVE_SIGSETJMP
-#  define USE_SIGNAL_TIMEOUT
-# endif
-# ifdef HAVE_SIGBLOCK
-#  define USE_SIGNAL_TIMEOUT
-# endif
+#if defined HAVE_SIGSETJMP || defined HAVE_SIGBLOCK
+# define USE_SIGNAL_TIMEOUT
 #endif
 
 #include "wget.h"
 #include "utils.h"
 #include "hash.h"
 
-#ifndef errno
-extern int errno;
-#endif
+#ifdef TESTING
+#include "test.h"
+#endif 
 
 /* Utility function: like xstrdup(), but also lowercases S.  */
 
@@ -129,7 +107,7 @@ xstrdup_lower (const char *s)
 char *
 strdupdelim (const char *beg, const char *end)
 {
-  char *res = (char *)xmalloc (end - beg + 1);
+  char *res = xmalloc (end - beg + 1);
   memcpy (res, beg, end - beg);
   res[end - beg] = '\0';
   return res;
@@ -152,68 +130,83 @@ sepstring (const char *s)
   while (*s)
     {
       if (*s == ',')
-	{
-	  res = (char **)xrealloc (res, (i + 2) * sizeof (char *));
-	  res[i] = strdupdelim (p, s);
-	  res[++i] = NULL;
-	  ++s;
-	  /* Skip the blanks following the ','.  */
-	  while (ISSPACE (*s))
-	    ++s;
-	  p = s;
-	}
+        {
+          res = xrealloc (res, (i + 2) * sizeof (char *));
+          res[i] = strdupdelim (p, s);
+          res[++i] = NULL;
+          ++s;
+          /* Skip the blanks following the ','.  */
+          while (ISSPACE (*s))
+            ++s;
+          p = s;
+        }
       else
-	++s;
+        ++s;
     }
-  res = (char **)xrealloc (res, (i + 2) * sizeof (char *));
+  res = xrealloc (res, (i + 2) * sizeof (char *));
   res[i] = strdupdelim (p, s);
   res[i + 1] = NULL;
   return res;
 }
 
-#ifdef WGET_USE_STDARG
-# define VA_START(args, arg1) va_start (args, arg1)
-#else
-# define VA_START(args, ignored) va_start (args)
-#endif
+/* Like sprintf, but prints into a string of sufficient size freshly
+   allocated with malloc, which is returned.  If unable to print due
+   to invalid format, returns NULL.  Inability to allocate needed
+   memory results in abort, as with xmalloc.  This is in spirit
+   similar to the GNU/BSD extension asprintf, but somewhat easier to
+   use.
 
-/* Like sprintf, but allocates a string of sufficient size with malloc
-   and returns it.  GNU libc has a similar function named asprintf,
-   which requires the pointer to the string to be passed.  */
+   Internally the function either calls vasprintf or loops around
+   vsnprintf until the correct size is found.  Since Wget also ships a
+   fallback implementation of vsnprintf, this should be portable.  */
 
 char *
 aprintf (const char *fmt, ...)
 {
-  /* This function is implemented using vsnprintf, which we provide
-     for the systems that don't have it.  Therefore, it should be 100%
-     portable.  */
+#if defined HAVE_VASPRINTF && !defined DEBUG_MALLOC
+  /* Use vasprintf. */
+  int ret;
+  va_list args;
+  char *str;
+  va_start (args, fmt);
+  ret = vasprintf (&str, fmt, args);
+  va_end (args);
+  if (ret < 0 && errno == ENOMEM)
+    abort ();                   /* for consistency with xmalloc/xrealloc */
+  else if (ret < 0)
+    return NULL;
+  return str;
+#else  /* not HAVE_VASPRINTF */
 
+  /* vasprintf is unavailable.  snprintf into a small buffer and
+     resize it as necessary. */
   int size = 32;
   char *str = xmalloc (size);
+
+  /* #### This code will infloop and eventually abort in xrealloc if
+     passed a FMT that causes snprintf to consistently return -1.  */
 
   while (1)
     {
       int n;
       va_list args;
 
-      /* See log_vprintf_internal for explanation why it's OK to rely
-	 on the return value of vsnprintf.  */
-
-      VA_START (args, fmt);
+      va_start (args, fmt);
       n = vsnprintf (str, size, fmt, args);
       va_end (args);
 
       /* If the printing worked, return the string. */
       if (n > -1 && n < size)
-	return str;
+        return str;
 
       /* Else try again with a larger buffer. */
-      if (n > -1)		/* C99 */
-	size = n + 1;		/* precisely what is needed */
+      if (n > -1)               /* C99 */
+        size = n + 1;           /* precisely what is needed */
       else
-	size <<= 1;		/* twice the old size */
+        size <<= 1;             /* twice the old size */
       str = xrealloc (str, size);
     }
+#endif /* not HAVE_VASPRINTF */
 }
 
 /* Concatenate the NULL-terminated list of string arguments into
@@ -223,7 +216,7 @@ char *
 concat_strings (const char *str0, ...)
 {
   va_list args;
-  int saved_lengths[5];		/* inspired by Apache's apr_pstrcat */
+  int saved_lengths[5];         /* inspired by Apache's apr_pstrcat */
   char *ret, *p;
 
   const char *next_str;
@@ -233,12 +226,12 @@ concat_strings (const char *str0, ...)
   /* Calculate the length of and allocate the resulting string. */
 
   argcount = 0;
-  VA_START (args, str0);
+  va_start (args, str0);
   for (next_str = str0; next_str != NULL; next_str = va_arg (args, char *))
     {
       int len = strlen (next_str);
       if (argcount < countof (saved_lengths))
-	saved_lengths[argcount++] = len;
+        saved_lengths[argcount++] = len;
       total_length += len;
     }
   va_end (args);
@@ -247,14 +240,14 @@ concat_strings (const char *str0, ...)
   /* Copy the strings into the allocated space. */
 
   argcount = 0;
-  VA_START (args, str0);
+  va_start (args, str0);
   for (next_str = str0; next_str != NULL; next_str = va_arg (args, char *))
     {
       int len;
       if (argcount < countof (saved_lengths))
-	len = saved_lengths[argcount++];
+        len = saved_lengths[argcount++];
       else
-	len = strlen (next_str);
+        len = strlen (next_str);
       memcpy (p, next_str, len);
       p += len;
     }
@@ -264,77 +257,64 @@ concat_strings (const char *str0, ...)
   return ret;
 }
 
+/* Format the provided time according to the specified format.  The
+   format is a string with format elements supported by strftime.  */
+
+static char *
+fmttime (time_t t, const char *fmt)
+{
+  static char output[32];
+  struct tm *tm = localtime(&t);
+  if (!tm)
+    abort ();
+  if (!strftime(output, sizeof(output), fmt, tm))
+    abort ();
+  return output;
+}
+
 /* Return pointer to a static char[] buffer in which zero-terminated
    string-representation of TM (in form hh:mm:ss) is printed.
 
    If TM is NULL, the current time will be used.  */
 
 char *
-time_str (time_t *tm)
+time_str (time_t t)
 {
-  static char output[15];
-  struct tm *ptm;
-  time_t secs = tm ? *tm : time (NULL);
-
-  if (secs == -1)
-    {
-      /* In case of error, return the empty string.  Maybe we should
-	 just abort if this happens?  */
-      *output = '\0';
-      return output;
-    }
-  ptm = localtime (&secs);
-  sprintf (output, "%02d:%02d:%02d", ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
-  return output;
+  return fmttime(t, "%H:%M:%S");
 }
 
 /* Like the above, but include the date: YYYY-MM-DD hh:mm:ss.  */
 
 char *
-datetime_str (time_t *tm)
+datetime_str (time_t t)
 {
-  static char output[20];	/* "YYYY-MM-DD hh:mm:ss" + \0 */
-  struct tm *ptm;
-  time_t secs = tm ? *tm : time (NULL);
-
-  if (secs == -1)
-    {
-      /* In case of error, return the empty string.  Maybe we should
-	 just abort if this happens?  */
-      *output = '\0';
-      return output;
-    }
-  ptm = localtime (&secs);
-  sprintf (output, "%04d-%02d-%02d %02d:%02d:%02d",
-	   ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
-	   ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
-  return output;
+  return fmttime(t, "%Y-%m-%d %H:%M:%S");
 }
 
 /* The Windows versions of the following two functions are defined in
-   mswindows.c.  */
+   mswindows.c. On MSDOS this function should never be called. */
 
-#ifndef WINDOWS
+#if !defined(WINDOWS) && !defined(MSDOS)
 void
 fork_to_background (void)
 {
   pid_t pid;
   /* Whether we arrange our own version of opt.lfilename here.  */
-  int logfile_changed = 0;
+  bool logfile_changed = false;
 
   if (!opt.lfilename)
     {
       /* We must create the file immediately to avoid either a race
-	 condition (which arises from using unique_name and failing to
-	 use fopen_excl) or lying to the user about the log file name
-	 (which arises from using unique_name, printing the name, and
-	 using fopen_excl later on.)  */
-      FILE *new_log_fp = unique_create (DEFAULT_LOGFILE, 0, &opt.lfilename);
+         condition (which arises from using unique_name and failing to
+         use fopen_excl) or lying to the user about the log file name
+         (which arises from using unique_name, printing the name, and
+         using fopen_excl later on.)  */
+      FILE *new_log_fp = unique_create (DEFAULT_LOGFILE, false, &opt.lfilename);
       if (new_log_fp)
-	{
-	  logfile_changed = 1;
-	  fclose (new_log_fp);
-	}
+        {
+          logfile_changed = true;
+          fclose (new_log_fp);
+        }
     }
   pid = fork ();
   if (pid < 0)
@@ -346,10 +326,10 @@ fork_to_background (void)
   else if (pid != 0)
     {
       /* parent, no error */
-      printf (_("Continuing in background, pid %d.\n"), (int)pid);
+      printf (_("Continuing in background, pid %d.\n"), (int) pid);
       if (logfile_changed)
-	printf (_("Output will be written to `%s'.\n"), opt.lfilename);
-      exit (0);			/* #### should we use _exit()? */
+        printf (_("Output will be written to `%s'.\n"), opt.lfilename);
+      exit (0);                 /* #### should we use _exit()? */
     }
 
   /* child: give up the privileges and keep running. */
@@ -358,7 +338,7 @@ fork_to_background (void)
   freopen ("/dev/null", "w", stdout);
   freopen ("/dev/null", "w", stderr);
 }
-#endif /* not WINDOWS */
+#endif /* !WINDOWS && !MSDOS */
 
 /* "Touch" FILE, i.e. make its mtime ("modified time") equal the time
    specified with TM.  The atime ("access time") is set to the current
@@ -394,8 +374,8 @@ remove_link (const char *file)
       DEBUGP (("Unlinking %s (symlink).\n", file));
       err = unlink (file);
       if (err != 0)
-	logprintf (LOG_VERBOSE, _("Failed to unlink symlink `%s': %s\n"),
-		   file, strerror (errno));
+        logprintf (LOG_VERBOSE, _("Failed to unlink symlink `%s': %s\n"),
+                   file, strerror (errno));
     }
   return err;
 }
@@ -407,7 +387,7 @@ remove_link (const char *file)
    proper way should, of course, be to have a third, error state,
    other than true/false, but that would introduce uncalled-for
    additional complexity to the callers.  */
-int
+bool
 file_exists_p (const char *filename)
 {
 #ifdef HAVE_ACCESS
@@ -420,15 +400,15 @@ file_exists_p (const char *filename)
 
 /* Returns 0 if PATH is a directory, 1 otherwise (any kind of file).
    Returns 0 on error.  */
-int
+bool
 file_non_directory_p (const char *path)
 {
   struct_stat buf;
   /* Use lstat() rather than stat() so that symbolic links pointing to
      directories can be identified correctly.  */
   if (lstat (path, &buf) != 0)
-    return 0;
-  return S_ISDIR (buf.st_mode) ? 0 : 1;
+    return false;
+  return S_ISDIR (buf.st_mode) ? false : true;
 }
 
 /* Return the size of file named by FILENAME, or -1 if it cannot be
@@ -496,7 +476,7 @@ unique_name_1 (const char *prefix)
    (and therefore doesn't need changing).  */
 
 char *
-unique_name (const char *file, int allow_passthrough)
+unique_name (const char *file, bool allow_passthrough)
 {
   /* If the FILE itself doesn't exist, return it without
      modification. */
@@ -514,25 +494,25 @@ unique_name (const char *file, int allow_passthrough)
    opening the file returned by unique_name.  */
 
 FILE *
-unique_create (const char *name, int binary, char **opened_name)
+unique_create (const char *name, bool binary, char **opened_name)
 {
   /* unique file name, based on NAME */
-  char *uname = unique_name (name, 0);
+  char *uname = unique_name (name, false);
   FILE *fp;
   while ((fp = fopen_excl (uname, binary)) == NULL && errno == EEXIST)
     {
       xfree (uname);
-      uname = unique_name (name, 0);
+      uname = unique_name (name, false);
     }
   if (opened_name && fp != NULL)
     {
       if (fp)
-	*opened_name = uname;
+        *opened_name = uname;
       else
-	{
-	  *opened_name = NULL;
-	  xfree (uname);
-	}
+        {
+          *opened_name = NULL;
+          xfree (uname);
+        }
     }
   else
     xfree (uname);
@@ -550,7 +530,7 @@ unique_create (const char *name, int binary, char **opened_name)
    appropriately.  */
    
 FILE *
-fopen_excl (const char *fname, int binary)
+fopen_excl (const char *fname, bool binary)
 {
   int fd;
 #ifdef O_EXCL
@@ -597,21 +577,21 @@ make_directory (const char *directory)
   for (i = (*dir == '/'); 1; ++i)
     {
       for (; dir[i] && dir[i] != '/'; i++)
-	;
+        ;
       if (!dir[i])
-	quit = 1;
+        quit = 1;
       dir[i] = '\0';
       /* Check whether the directory already exists.  Allow creation of
-	 of intermediate directories to fail, as the initial path components
-	 are not necessarily directories!  */
+         of intermediate directories to fail, as the initial path components
+         are not necessarily directories!  */
       if (!file_exists_p (dir))
-	ret = mkdir (dir, 0777);
+        ret = mkdir (dir, 0777);
       else
-	ret = 0;
+        ret = 0;
       if (quit)
-	break;
+        break;
       else
-	dir[i] = '/';
+        dir[i] = '/';
     }
   return ret;
 }
@@ -623,7 +603,7 @@ make_directory (const char *directory)
    file_merge("/foo/bar/", "baz") => "/foo/bar/baz"
    file_merge("foo", "bar")       => "bar"
 
-   In other words, it's a simpler and gentler version of uri_merge_1.  */
+   In other words, it's a simpler and gentler version of uri_merge.  */
 
 char *
 file_merge (const char *base, const char *file)
@@ -634,7 +614,7 @@ file_merge (const char *base, const char *file)
   if (!cut)
     return xstrdup (file);
 
-  result = (char *)xmalloc (cut - base + 1 + strlen (file) + 1);
+  result = xmalloc (cut - base + 1 + strlen (file) + 1);
   memcpy (result, base, cut - base);
   result[cut - base] = '/';
   strcpy (result + (cut - base) + 1, file);
@@ -642,11 +622,35 @@ file_merge (const char *base, const char *file)
   return result;
 }
 
-static int in_acclist PARAMS ((const char *const *, const char *, int));
+/* Like fnmatch, but performs a case-insensitive match.  */
+
+int
+fnmatch_nocase (const char *pattern, const char *string, int flags)
+{
+#ifdef FNM_CASEFOLD
+  /* The FNM_CASEFOLD flag started as a GNU extension, but it is now
+     also present on *BSD platforms, and possibly elsewhere.  */
+  return fnmatch (pattern, string, flags | FNM_CASEFOLD);
+#else
+  /* Turn PATTERN and STRING to lower case and call fnmatch on them. */
+  char *patcopy = (char *) alloca (strlen (pattern) + 1);
+  char *strcopy = (char *) alloca (strlen (string) + 1);
+  char *p;
+  for (p = patcopy; *pattern; pattern++, p++)
+    *p = TOLOWER (*pattern);
+  *p = '\0';
+  for (p = strcopy; *string; string++, p++)
+    *p = TOLOWER (*string);
+  *p = '\0';
+  return fnmatch (patcopy, strcopy, flags);
+#endif
+}
+
+static bool in_acclist (const char *const *, const char *, bool);
 
 /* Determine whether a file is acceptable to be followed, according to
    lists of patterns to accept/reject.  */
-int
+bool
 acceptable (const char *s)
 {
   int l = strlen (s);
@@ -658,144 +662,160 @@ acceptable (const char *s)
   if (opt.accepts)
     {
       if (opt.rejects)
-	return (in_acclist ((const char *const *)opt.accepts, s, 1)
-		&& !in_acclist ((const char *const *)opt.rejects, s, 1));
+        return (in_acclist ((const char *const *)opt.accepts, s, true)
+                && !in_acclist ((const char *const *)opt.rejects, s, true));
       else
-	return in_acclist ((const char *const *)opt.accepts, s, 1);
+        return in_acclist ((const char *const *)opt.accepts, s, true);
     }
   else if (opt.rejects)
-    return !in_acclist ((const char *const *)opt.rejects, s, 1);
-  return 1;
+    return !in_acclist ((const char *const *)opt.rejects, s, true);
+  return true;
 }
 
-/* Compare S1 and S2 frontally; S2 must begin with S1.  E.g. if S1 is
-   `/something', frontcmp() will return 1 only if S2 begins with
-   `/something'.  Otherwise, 0 is returned.  */
-int
-frontcmp (const char *s1, const char *s2)
+/* Check if D2 is a subdirectory of D1.  E.g. if D1 is `/something', subdir_p()
+   will return true if and only if D2 begins with `/something/' or is exactly 
+   '/something'.  */
+bool
+subdir_p (const char *d1, const char *d2)
 {
-  for (; *s1 && *s2 && (*s1 == *s2); ++s1, ++s2);
-  return !*s1;
+  if (*d1 == '\0')
+    return true;
+  if (!opt.ignore_case)
+    for (; *d1 && *d2 && (*d1 == *d2); ++d1, ++d2)
+      ;
+  else
+    for (; *d1 && *d2 && (TOLOWER (*d1) == TOLOWER (*d2)); ++d1, ++d2)
+      ;
+  
+  return *d1 == '\0' && (*d2 == '\0' || *d2 == '/');
 }
 
-/* Iterate through STRLIST, and return the first element that matches
-   S, through wildcards or front comparison (as appropriate).  */
-static char *
-proclist (char **strlist, const char *s, enum accd flags)
+/* Iterate through DIRLIST (which must be NULL-terminated), and return the
+   first element that matches DIR, through wildcards or front comparison (as
+   appropriate).  */
+static bool
+dir_matches_p (char **dirlist, const char *dir)
 {
   char **x;
-  for (x = strlist; *x; x++)
+  int (*matcher) (const char *, const char *, int)
+    = opt.ignore_case ? fnmatch_nocase : fnmatch;
+
+  for (x = dirlist; *x; x++)
     {
-      /* Remove leading '/' if ALLABS */
-      char *p = *x + ((flags & ALLABS) && (**x == '/'));
+      /* Remove leading '/' */
+      char *p = *x + (**x == '/');
       if (has_wildcards_p (p))
-	{
-	  if (fnmatch (p, s, FNM_PATHNAME) == 0)
-	    break;
-	}
+        {
+          if (matcher (p, dir, FNM_PATHNAME) == 0)
+            break;
+        }
       else
-	{
-	  if (frontcmp (p, s))
-	    break;
-	}
+        {
+          if (subdir_p (p, dir))
+            break;
+        }
     }
-  return *x;
+      
+  return *x ? true : false;
 }
 
 /* Returns whether DIRECTORY is acceptable for download, wrt the
    include/exclude lists.
 
-   If FLAGS is ALLABS, the leading `/' is ignored in paths; relative
-   and absolute paths may be freely intermixed.  */
-int
-accdir (const char *directory, enum accd flags)
+   The leading `/' is ignored in paths; relative and absolute paths
+   may be freely intermixed.  */
+
+bool
+accdir (const char *directory)
 {
   /* Remove starting '/'.  */
-  if (flags & ALLABS && *directory == '/')
+  if (*directory == '/')
     ++directory;
   if (opt.includes)
     {
-      if (!proclist (opt.includes, directory, flags))
-	return 0;
+      if (!dir_matches_p (opt.includes, directory))
+        return false;
     }
   if (opt.excludes)
     {
-      if (proclist (opt.excludes, directory, flags))
-	return 0;
+      if (dir_matches_p (opt.excludes, directory))
+        return false;
     }
-  return 1;
+  return true;
 }
 
-/* Return non-zero if STRING ends with TAIL.  For instance:
+/* Return true if STRING ends with TAIL.  For instance:
 
-   match_tail ("abc", "bc", 0)  -> 1
-   match_tail ("abc", "ab", 0)  -> 0
-   match_tail ("abc", "abc", 0) -> 1
+   match_tail ("abc", "bc", false)  -> 1
+   match_tail ("abc", "ab", false)  -> 0
+   match_tail ("abc", "abc", false) -> 1
 
-   If FOLD_CASE_P is non-zero, the comparison will be
-   case-insensitive.  */
+   If FOLD_CASE is true, the comparison will be case-insensitive.  */
 
-int
-match_tail (const char *string, const char *tail, int fold_case_p)
+bool
+match_tail (const char *string, const char *tail, bool fold_case)
 {
   int i, j;
 
   /* We want this to be fast, so we code two loops, one with
      case-folding, one without. */
 
-  if (!fold_case_p)
+  if (!fold_case)
     {
       for (i = strlen (string), j = strlen (tail); i >= 0 && j >= 0; i--, j--)
-	if (string[i] != tail[j])
-	  break;
+        if (string[i] != tail[j])
+          break;
     }
   else
     {
       for (i = strlen (string), j = strlen (tail); i >= 0 && j >= 0; i--, j--)
-	if (TOLOWER (string[i]) != TOLOWER (tail[j]))
-	  break;
+        if (TOLOWER (string[i]) != TOLOWER (tail[j]))
+          break;
     }
 
   /* If the tail was exhausted, the match was succesful.  */
   if (j == -1)
-    return 1;
+    return true;
   else
-    return 0;
+    return false;
 }
 
 /* Checks whether string S matches each element of ACCEPTS.  A list
    element are matched either with fnmatch() or match_tail(),
    according to whether the element contains wildcards or not.
 
-   If the BACKWARD is 0, don't do backward comparison -- just compare
+   If the BACKWARD is false, don't do backward comparison -- just compare
    them normally.  */
-static int
-in_acclist (const char *const *accepts, const char *s, int backward)
+static bool
+in_acclist (const char *const *accepts, const char *s, bool backward)
 {
   for (; *accepts; accepts++)
     {
       if (has_wildcards_p (*accepts))
-	{
-	  /* fnmatch returns 0 if the pattern *does* match the
-	     string.  */
-	  if (fnmatch (*accepts, s, 0) == 0)
-	    return 1;
-	}
+        {
+          int res = opt.ignore_case
+            ? fnmatch_nocase (*accepts, s, 0) : fnmatch (*accepts, s, 0);
+          /* fnmatch returns 0 if the pattern *does* match the string.  */
+          if (res == 0)
+            return true;
+        }
       else
-	{
-	  if (backward)
-	    {
-	      if (match_tail (s, *accepts, 0))
-		return 1;
-	    }
-	  else
-	    {
-	      if (!strcmp (s, *accepts))
-		return 1;
-	    }
-	}
+        {
+          if (backward)
+            {
+              if (match_tail (s, *accepts, opt.ignore_case))
+                return true;
+            }
+          else
+            {
+              int cmp = opt.ignore_case
+                ? strcasecmp (s, *accepts) : strcmp (s, *accepts);
+              if (cmp == 0)
+                return true;
+            }
+        }
     }
-  return 0;
+  return false;
 }
 
 /* Return the location of STR's suffix (file extension).  Examples:
@@ -817,20 +837,21 @@ suffix (const char *str)
     return NULL;
 }
 
-/* Return non-zero if S contains globbing wildcards (`*', `?', `[' or
+/* Return true if S contains globbing wildcards (`*', `?', `[' or
    `]').  */
 
-int
+bool
 has_wildcards_p (const char *s)
 {
   for (; *s; s++)
     if (*s == '*' || *s == '?' || *s == '[' || *s == ']')
-      return 1;
-  return 0;
+      return true;
+  return false;
 }
 
-/* Return non-zero if FNAME ends with a typical HTML suffix.  The
-   following (case-insensitive) suffixes are presumed to be HTML files:
+/* Return true if FNAME ends with a typical HTML suffix.  The
+   following (case-insensitive) suffixes are presumed to be HTML
+   files:
    
      html
      htm
@@ -838,20 +859,20 @@ has_wildcards_p (const char *s)
 
    #### CAVEAT.  This is not necessarily a good indication that FNAME
    refers to a file that contains HTML!  */
-int
+bool
 has_html_suffix_p (const char *fname)
 {
   char *suf;
 
   if ((suf = suffix (fname)) == NULL)
-    return 0;
+    return false;
   if (!strcasecmp (suf, "html"))
-    return 1;
+    return true;
   if (!strcasecmp (suf, "htm"))
-    return 1;
+    return true;
   if (suf[0] && !strcasecmp (suf + 1, "html"))
-    return 1;
-  return 0;
+    return true;
+  return false;
 }
 
 /* Read a line from FP and return the pointer to freshly allocated
@@ -871,18 +892,18 @@ read_whole_line (FILE *fp)
 {
   int length = 0;
   int bufsize = 82;
-  char *line = (char *)xmalloc (bufsize);
+  char *line = xmalloc (bufsize);
 
   while (fgets (line + length, bufsize - length, fp))
     {
       length += strlen (line + length);
       if (length == 0)
-	/* Possible for example when reading from a binary file where
-	   a line begins with \0.  */
-	continue;
+        /* Possible for example when reading from a binary file where
+           a line begins with \0.  */
+        continue;
 
       if (line[length - 1] == '\n')
-	break;
+        break;
 
       /* fgets() guarantees to read the whole line, or to use up the
          space we've given it.  We can double the buffer
@@ -926,14 +947,14 @@ read_file (const char *file)
   int fd;
   struct file_memory *fm;
   long size;
-  int inhibit_close = 0;
+  bool inhibit_close = false;
 
   /* Some magic in the finest tradition of Perl and its kin: if FILE
      is "-", just use stdin.  */
   if (HYPHENP (file))
     {
       fd = fileno (stdin);
-      inhibit_close = 1;
+      inhibit_close = true;
       /* Note that we don't inhibit mmap() in this case.  If stdin is
          redirected from a regular file, mmap() will still work.  */
     }
@@ -954,7 +975,7 @@ read_file (const char *file)
        specify PROT_READ and MAP_SHARED for a marginal gain in
        efficiency, but at some cost to generality.  */
     fm->content = mmap (NULL, fm->length, PROT_READ | PROT_WRITE,
-			MAP_PRIVATE, fd, 0);
+                        MAP_PRIVATE, fd, 0);
     if (fm->content == (char *)MAP_FAILED)
       goto mmap_lose;
     if (!inhibit_close)
@@ -972,41 +993,41 @@ read_file (const char *file)
 #endif /* HAVE_MMAP */
 
   fm->length = 0;
-  size = 512;			/* number of bytes fm->contents can
+  size = 512;                   /* number of bytes fm->contents can
                                    hold at any given time. */
   fm->content = xmalloc (size);
   while (1)
     {
       wgint nread;
       if (fm->length > size / 2)
-	{
-	  /* #### I'm not sure whether the whole exponential-growth
+        {
+          /* #### I'm not sure whether the whole exponential-growth
              thing makes sense with kernel read.  On Linux at least,
              read() refuses to read more than 4K from a file at a
              single chunk anyway.  But other Unixes might optimize it
              better, and it doesn't *hurt* anything, so I'm leaving
              it.  */
 
-	  /* Normally, we grow SIZE exponentially to make the number
+          /* Normally, we grow SIZE exponentially to make the number
              of calls to read() and realloc() logarithmic in relation
              to file size.  However, read() can read an amount of data
              smaller than requested, and it would be unreasonable to
              double SIZE every time *something* was read.  Therefore,
              we double SIZE only when the length exceeds half of the
              entire allocated size.  */
-	  size <<= 1;
-	  fm->content = xrealloc (fm->content, size);
-	}
+          size <<= 1;
+          fm->content = xrealloc (fm->content, size);
+        }
       nread = read (fd, fm->content + fm->length, size - fm->length);
       if (nread > 0)
-	/* Successful read. */
-	fm->length += nread;
+        /* Successful read. */
+        fm->length += nread;
       else if (nread < 0)
-	/* Error. */
-	goto lose;
+        /* Error. */
+        goto lose;
       else
-	/* EOF */
-	break;
+        /* EOF */
+        break;
     }
   if (!inhibit_close)
     close (fd);
@@ -1055,7 +1076,7 @@ free_vec (char **vec)
     {
       char **p = vec;
       while (*p)
-	xfree (*p++);
+        xfree (*p++);
       xfree (vec);
     }
 }
@@ -1079,11 +1100,13 @@ merge_vecs (char **v1, char **v2)
       return v1;
     }
   /* Count v1.  */
-  for (i = 0; v1[i]; i++);
+  for (i = 0; v1[i]; i++)
+    ;
   /* Count v2.  */
-  for (j = 0; v2[j]; j++);
+  for (j = 0; v2[j]; j++)
+    ;
   /* Reallocate v1.  */
-  v1 = (char **)xrealloc (v1, (i + j + 1) * sizeof (char **));
+  v1 = xrealloc (v1, (i + j + 1) * sizeof (char **));
   memcpy (v1 + i, v2, (j + 1) * sizeof (char *));
   xfree (v2);
   return v1;
@@ -1095,12 +1118,12 @@ merge_vecs (char **v1, char **v2)
 char **
 vec_append (char **vec, const char *str)
 {
-  int cnt;			/* count of vector elements, including
-				   the one we're about to append */
+  int cnt;                      /* count of vector elements, including
+                                   the one we're about to append */
   if (vec != NULL)
     {
       for (cnt = 0; vec[cnt]; cnt++)
-	;
+        ;
       ++cnt;
     }
   else
@@ -1142,95 +1165,102 @@ string_set_contains (struct hash_table *ht, const char *s)
   return hash_table_contains (ht, s);
 }
 
-static int
-string_set_to_array_mapper (void *key, void *value_ignored, void *arg)
-{
-  char ***arrayptr = (char ***) arg;
-  *(*arrayptr)++ = (char *) key;
-  return 0;
-}
-
 /* Convert the specified string set to array.  ARRAY should be large
    enough to hold hash_table_count(ht) char pointers.  */
 
 void string_set_to_array (struct hash_table *ht, char **array)
 {
-  hash_table_map (ht, string_set_to_array_mapper, &array);
+  hash_table_iterator iter;
+  for (hash_table_iterate (ht, &iter); hash_table_iter_next (&iter); )
+    *array++ = iter.key;
 }
 
-static int
-string_set_free_mapper (void *key, void *value_ignored, void *arg_ignored)
-{
-  xfree (key);
-  return 0;
-}
+/* Free the string set.  This frees both the storage allocated for
+   keys and the actual hash table.  (hash_table_destroy would only
+   destroy the hash table.)  */
 
 void
 string_set_free (struct hash_table *ht)
 {
-  hash_table_map (ht, string_set_free_mapper, NULL);
+  hash_table_iterator iter;
+  for (hash_table_iterate (ht, &iter); hash_table_iter_next (&iter); )
+    xfree (iter.key);
   hash_table_destroy (ht);
 }
 
-static int
-free_keys_and_values_mapper (void *key, void *value, void *arg_ignored)
-{
-  xfree (key);
-  xfree (value);
-  return 0;
-}
-
-/* Another utility function: call free() on all keys and values of HT.  */
+/* Utility function: simply call xfree() on all keys and values of HT.  */
 
 void
 free_keys_and_values (struct hash_table *ht)
 {
-  hash_table_map (ht, free_keys_and_values_mapper, NULL);
+  hash_table_iterator iter;
+  for (hash_table_iterate (ht, &iter); hash_table_iter_next (&iter); )
+    {
+      xfree (iter.key);
+      xfree (iter.value);
+    }
 }
 
+/* Get digit grouping data for thousand separors by calling
+   localeconv().  The data includes separator string and grouping info
+   and is cached after the first call to the function.
+
+   In locales that don't set a thousand separator (such as the "C"
+   locale), this forces it to be ",".  We are now only showing
+   thousand separators in one place, so this shouldn't be a problem in
+   practice.  */
+
 static void
 get_grouping_data (const char **sep, const char **grouping)
 {
   static const char *cached_sep;
   static const char *cached_grouping;
-  static int initialized;
+  static bool initialized;
   if (!initialized)
     {
-      /* If locale.h is present and defines LC_NUMERIC, assume C89
-	 struct lconv with "thousand_sep" and "grouping" members.  */
-#ifdef LC_NUMERIC
       /* Get the grouping info from the locale. */
-      struct lconv *lconv;
-      const char *oldlocale = setlocale (LC_NUMERIC, NULL);
-      /* Temporarily switch to the current locale */
-      setlocale (LC_NUMERIC, "");
-      lconv = localeconv ();
-      cached_sep = xstrdup (lconv->thousands_sep);
-      cached_grouping = xstrdup (lconv->grouping);
-      /* Restore the locale to previous setting. */
-      setlocale (LC_NUMERIC, oldlocale);
-      if (!*cached_sep)
+      struct lconv *lconv = localeconv ();
+      cached_sep = lconv->thousands_sep;
+      cached_grouping = lconv->grouping;
+#if ! USE_NLS_PROGRESS_BAR
+      /* We can't count column widths, so ensure that the separator
+       * is single-byte only (let check below determine what byte). */
+      if (strlen(cached_sep) > 1)
+        cached_sep = "";
 #endif
-	/* Force separator for locales that specify no separators
-	   ("C", "hr", and probably many more.) */
-	cached_sep = ",", cached_grouping = "\x03";
-      initialized = 1;
+      if (!*cached_sep)
+        {
+          /* Many locales (such as "C" or "hr_HR") don't specify
+             grouping, which we still want to use it for legibility.
+             In those locales set the sep char to ',', unless that
+             character is used for decimal point, in which case set it
+             to ".".  */
+          if (*lconv->decimal_point != ',')
+            cached_sep = ",";
+          else
+            cached_sep = ".";
+          cached_grouping = "\x03";
+        }
+      initialized = true;
     }
   *sep = cached_sep;
   *grouping = cached_grouping;
 }
 
-/* Add thousand separators to a number already in string form.  Used
-   by with_thousand_seps and with_thousand_seps_sum.  */
+/* Return a printed representation of N with thousand separators.
+   This should respect locale settings, with the exception of the "C"
+   locale which mandates no separator, but we use one anyway.
 
-char *
-add_thousand_seps (const char *repr)
+   Unfortunately, we cannot use %'d (in fact it would be %'j) to get
+   the separators because it's too non-portable, and it's hard to test
+   for this feature at configure time.  Besides, it wouldn't display
+   separators in the "C" locale, still used by many Unix users.  */
+
+const char *
+with_thousand_seps (wgint n)
 {
   static char outbuf[48];
   char *p = outbuf + sizeof outbuf;
-
-  const char *in = strchr (repr, '\0');
-  const char *instart = repr + (*repr == '-'); /* don't group sign */
 
   /* Info received from locale */
   const char *grouping, *sep;
@@ -1240,69 +1270,45 @@ add_thousand_seps (const char *repr)
   int i = 0, groupsize;
   const char *atgroup;
 
+  bool negative = n < 0;
+
   /* Initialize grouping data. */
   get_grouping_data (&sep, &grouping);
   seplen = strlen (sep);
   atgroup = grouping;
   groupsize = *atgroup++;
 
+  /* This would overflow on WGINT_MIN, but printing negative numbers
+     is not an important goal of this fuinction.  */
+  if (negative)
+    n = -n;
+
   /* Write the number into the buffer, backwards, inserting the
      separators as necessary.  */
   *--p = '\0';
   while (1)
     {
-      *--p = *--in;
-      if (in == instart)
-	break;
+      *--p = n % 10 + '0';
+      n /= 10;
+      if (n == 0)
+        break;
       /* Prepend SEP to every groupsize'd digit and get new groupsize.  */
       if (++i == groupsize)
-	{
-	  if (seplen == 1)
-	    *--p = *sep;
-	  else
-	    memcpy (p -= seplen, sep, seplen);
-	  i = 0;
-	  if (*atgroup)
-	    groupsize = *atgroup++;
-	}
+        {
+          if (seplen == 1)
+            *--p = *sep;
+          else
+            memcpy (p -= seplen, sep, seplen);
+          i = 0;
+          if (*atgroup)
+            groupsize = *atgroup++;
+        }
     }
-  if (*repr == '-')
+  if (negative)
     *--p = '-';
 
   return p;
 }
-
-/* Return a printed representation of N with thousand separators.
-   This should respect locale settings, with the exception of the "C"
-   locale which mandates no separator, but we use one anyway.
-
-   Unfortunately, we cannot use %'d (in fact it would be %'j) to get
-   the separators because it's too non-portable, and it's hard to test
-   for this feature at configure time.  Besides, it wouldn't work in
-   the "C" locale, which many Unix users still work in.  */
-
-char *
-with_thousand_seps (wgint l)
-{
-  char inbuf[24];
-  /* Print the number into the buffer.  */
-  number_to_string (inbuf, l);
-  return add_thousand_seps (inbuf);
-}
-
-/* When SUM_SIZE_INT is wgint, with_thousand_seps_large is #defined to
-   with_thousand_seps.  The function below is used on non-LFS systems
-   where SUM_SIZE_INT typedeffed to double.  */
-
-#ifndef with_thousand_seps_sum
-char *
-with_thousand_seps_sum (SUM_SIZE_INT l)
-{
-  char inbuf[32];
-  snprintf (inbuf, sizeof (inbuf), "%.0f", l);
-  return add_thousand_seps (inbuf);
-}
-#endif /* not with_thousand_seps_sum */
 
 /* N, a byte quantity, is converted to a human-readable abberviated
    form a la sizes printed by `ls -lh'.  The result is written to a
@@ -1315,24 +1321,23 @@ with_thousand_seps_sum (SUM_SIZE_INT l)
    usually improves readability."
 
    This intentionally uses kilobyte (KB), megabyte (MB), etc. in their
-   original computer science meaning of "powers of 1024".  Powers of
-   1000 would be useless since Wget already displays sizes with
-   thousand separators.  We don't use the "*bibyte" names invented in
-   1998, and seldom used in practice.  Wikipedia's entry on kilobyte
-   discusses this in some detail.  */
+   original computer-related meaning of "powers of 1024".  We don't
+   use the "*bibyte" names invented in 1998, and seldom used in
+   practice.  Wikipedia's entry on "binary prefix" discusses this in
+   some detail.  */
 
 char *
-human_readable (wgint n)
+human_readable (HR_NUMTYPE n)
 {
   /* These suffixes are compatible with those of GNU `ls -lh'. */
   static char powers[] =
     {
-      'K',			/* kilobyte, 2^10 bytes */
-      'M',			/* megabyte, 2^20 bytes */
-      'G',			/* gigabyte, 2^30 bytes */
-      'T',			/* terabyte, 2^40 bytes */
-      'P',			/* petabyte, 2^50 bytes */
-      'E',			/* exabyte,  2^60 bytes */
+      'K',                      /* kilobyte, 2^10 bytes */
+      'M',                      /* megabyte, 2^20 bytes */
+      'G',                      /* gigabyte, 2^30 bytes */
+      'T',                      /* terabyte, 2^40 bytes */
+      'P',                      /* petabyte, 2^50 bytes */
+      'E',                      /* exabyte,  2^60 bytes */
     };
   static char buf[8];
   int i;
@@ -1350,20 +1355,20 @@ human_readable (wgint n)
   for (i = 0; i < countof (powers); i++)
     {
       /* At each iteration N is greater than the *subsequent* power.
-	 That way N/1024.0 produces a decimal number in the units of
-	 *this* power.  */
-      if ((n >> 10) < 1024 || i == countof (powers) - 1)
-	{
-	  double val = n / 1024.0;
-	  /* Print values smaller than 10 with one decimal digits, and
-	     others without any decimals.  */
-	  snprintf (buf, sizeof (buf), "%.*f%c",
-		    val < 10 ? 1 : 0, val, powers[i]);
-	  return buf;
-	}
-      n >>= 10;
+         That way N/1024.0 produces a decimal number in the units of
+         *this* power.  */
+      if ((n / 1024) < 1024 || i == countof (powers) - 1)
+        {
+          double val = n / 1024.0;
+          /* Print values smaller than 10 with one decimal digits, and
+             others without any decimals.  */
+          snprintf (buf, sizeof (buf), "%.*f%c",
+                    val < 10 ? 1 : 0, val, powers[i]);
+          return buf;
+        }
+      n /= 1024;
     }
-  return NULL;			/* unreached */
+  return NULL;                  /* unreached */
 }
 
 /* Count the digits in the provided number.  Used to allocate space
@@ -1374,7 +1379,7 @@ numdigit (wgint number)
 {
   int cnt = 1;
   if (number < 0)
-    ++cnt;			/* accomodate '-' */
+    ++cnt;                      /* accomodate '-' */
   while ((number /= 10) != 0)
     ++cnt;
   return cnt;
@@ -1410,24 +1415,6 @@ numdigit (wgint number)
 #define DIGITS_18(mask) PR (mask), n %= (mask), DIGITS_17 ((mask) / 10)
 #define DIGITS_19(mask) PR (mask), n %= (mask), DIGITS_18 ((mask) / 10)
 
-/* SPRINTF_WGINT is used by number_to_string to handle pathological
-   cases and to portably support strange sizes of wgint.  Ideally this
-   would just use "%j" and intmax_t, but many systems don't support
-   it, so it's used only if nothing else works.  */
-#if SIZEOF_LONG >= SIZEOF_WGINT
-#  define SPRINTF_WGINT(buf, n) sprintf (buf, "%ld", (long) (n))
-#else
-# if SIZEOF_LONG_LONG >= SIZEOF_WGINT
-#   define SPRINTF_WGINT(buf, n) sprintf (buf, "%lld", (long long) (n))
-# else
-#  ifdef WINDOWS
-#   define SPRINTF_WGINT(buf, n) sprintf (buf, "%I64d", (__int64) (n))
-#  else
-#   define SPRINTF_WGINT(buf, n) sprintf (buf, "%j", (intmax_t) (n))
-#  endif
-# endif
-#endif
-
 /* Shorthand for casting to wgint. */
 #define W wgint
 
@@ -1437,15 +1424,15 @@ numdigit (wgint number)
 
    The speedup may make a difference in programs that frequently
    convert numbers to strings.  Some implementations of sprintf,
-   particularly the one in GNU libc, have been known to be extremely
-   slow when converting integers to strings.
+   particularly the one in some versions of GNU libc, have been known
+   to be quite slow when converting integers to strings.
 
    Return the pointer to the location where the terminating zero was
    printed.  (Equivalent to calling buffer+strlen(buffer) after the
    function is done.)
 
-   BUFFER should be big enough to accept as many bytes as you expect
-   the number to take up.  On machines with 64-bit longs the maximum
+   BUFFER should be large enough to accept as many bytes as you expect
+   the number to take up.  On machines with 64-bit wgints the maximum
    needed size is 24 bytes.  That includes the digits needed for the
    largest 64-bit number, the `-' sign in case it's negative, and the
    terminating '\0'.  */
@@ -1456,22 +1443,30 @@ number_to_string (char *buffer, wgint number)
   char *p = buffer;
   wgint n = number;
 
+  int last_digit_char = 0;
+
 #if (SIZEOF_WGINT != 4) && (SIZEOF_WGINT != 8)
-  /* We are running in a strange or misconfigured environment.  Let
-     sprintf cope with it.  */
-  SPRINTF_WGINT (buffer, n);
-  p += strlen (buffer);
+  /* We are running in a very strange environment.  Leave the correct
+     printing to sprintf.  */
+  p += sprintf (buf, "%j", (intmax_t) (n));
 #else  /* (SIZEOF_WGINT == 4) || (SIZEOF_WGINT == 8) */
 
   if (n < 0)
     {
       if (n < -WGINT_MAX)
-	{
-	  /* -n would overflow.  Have sprintf deal with this.  */
-	  SPRINTF_WGINT (buffer, n);
-	  p += strlen (buffer);
-	  return p;
-	}
+        {
+          /* n = -n would overflow because -n would evaluate to a
+             wgint value larger than WGINT_MAX.  Need to make n
+             smaller and handle the last digit separately.  */
+          int last_digit = n % 10;
+          /* The sign of n%10 is implementation-defined. */
+          if (last_digit < 0)
+            last_digit_char = '0' - last_digit;
+          else
+            last_digit_char = '0' + last_digit;
+          /* After n is made smaller, -n will not overflow. */
+          n /= 10;
+        }
 
       *p++ = '-';
       n = -n;
@@ -1494,10 +1489,10 @@ number_to_string (char *buffer, wgint number)
   /* wgint is 32 bits wide: no number has more than 10 digits. */
   else                                   DIGITS_10 (1000000000);
 #else
-  /* wgint is 64 bits wide: handle numbers with more than 9 decimal
-     digits.  Constants are constructed by compile-time multiplication
-     to avoid dealing with different notations for 64-bit constants
-     (nnnL, nnnLL, and nnnI64, depending on the compiler).  */
+  /* wgint is 64 bits wide: handle numbers with 9-19 decimal digits.
+     Constants are constructed by compile-time multiplication to avoid
+     dealing with different notations for 64-bit constants
+     (nL/nLL/nI64, depending on the compiler and architecture).  */
   else if (n < 10*(W)1000000000)         DIGITS_10 (1000000000);
   else if (n < 100*(W)1000000000)        DIGITS_11 (10*(W)1000000000);
   else if (n < 1000*(W)1000000000)       DIGITS_12 (100*(W)1000000000);
@@ -1510,6 +1505,9 @@ number_to_string (char *buffer, wgint number)
   else                                   DIGITS_19 (1000000000*(W)1000000000);
 #endif
 
+  if (last_digit_char)
+    *p++ = last_digit_char;
+
   *p = '\0';
 #endif /* (SIZEOF_WGINT == 4) || (SIZEOF_WGINT == 8) */
 
@@ -1518,6 +1516,7 @@ number_to_string (char *buffer, wgint number)
 
 #undef PR
 #undef W
+#undef SPRINTF_WGINT
 #undef DIGITS_1
 #undef DIGITS_2
 #undef DIGITS_3
@@ -1599,82 +1598,86 @@ determine_screen_width (void)
 
   fd = fileno (stderr);
   if (ioctl (fd, TIOCGWINSZ, &wsz) < 0)
-    return 0;			/* most likely ENOTTY */
+    return 0;                   /* most likely ENOTTY */
 
   return wsz.ws_col;
-#else  /* not TIOCGWINSZ */
-# ifdef WINDOWS
+#elif defined(WINDOWS)
   CONSOLE_SCREEN_BUFFER_INFO csbi;
   if (!GetConsoleScreenBufferInfo (GetStdHandle (STD_ERROR_HANDLE), &csbi))
     return 0;
   return csbi.dwSize.X;
-# else /* neither WINDOWS nor TIOCGWINSZ */
+#else  /* neither TIOCGWINSZ nor WINDOWS */
   return 0;
-#endif /* neither WINDOWS nor TIOCGWINSZ */
-#endif /* not TIOCGWINSZ */
+#endif /* neither TIOCGWINSZ nor WINDOWS */
 }
+
+/* Whether the rnd system (either rand or [dl]rand48) has been
+   seeded.  */
+static int rnd_seeded;
 
 /* Return a random number between 0 and MAX-1, inclusive.
 
-   If MAX is greater than the value of RAND_MAX+1 on the system, the
-   returned value will be in the range [0, RAND_MAX].  This may be
-   fixed in a future release.
-
+   If the system does not support lrand48 and MAX is greater than the
+   value of RAND_MAX+1 on the system, the returned value will be in
+   the range [0, RAND_MAX].  This may be fixed in a future release.
    The random number generator is seeded automatically the first time
    it is called.
 
-   This uses rand() for portability.  It has been suggested that
-   random() offers better randomness, but this is not required for
-   Wget, so I chose to go for simplicity and use rand
-   unconditionally.
-
-   DO NOT use this for cryptographic purposes.  It is only meant to be
-   used in situations where quality of the random numbers returned
-   doesn't really matter.  */
+   This uses lrand48 where available, rand elsewhere.  DO NOT use it
+   for cryptography.  It is only meant to be used in situations where
+   quality of the random numbers returned doesn't really matter.  */
 
 int
 random_number (int max)
 {
-  static int seeded;
+#ifdef HAVE_DRAND48
+  if (!rnd_seeded)
+    {
+      srand48 ((long) time (NULL) ^ (long) getpid ());
+      rnd_seeded = 1;
+    }
+  return lrand48 () % max;
+#else  /* not HAVE_DRAND48 */
+
   double bounded;
   int rnd;
-
-  if (!seeded)
+  if (!rnd_seeded)
     {
-      srand (time (NULL));
-      seeded = 1;
+      srand ((unsigned) time (NULL) ^ (unsigned) getpid ());
+      rnd_seeded = 1;
     }
   rnd = rand ();
 
-  /* On systems that don't define RAND_MAX, assume it to be 2**15 - 1,
-     and enforce that assumption by masking other bits.  */
-#ifndef RAND_MAX
-# define RAND_MAX 32767
-  rnd &= RAND_MAX;
-#endif
+  /* Like rand() % max, but uses the high-order bits for better
+     randomness on architectures where rand() is implemented using a
+     simple congruential generator.  */
 
-  /* This is equivalent to rand() % max, but uses the high-order bits
-     for better randomness on architecture where rand() is implemented
-     using a simple congruential generator.  */
+  bounded = (double) max * rnd / (RAND_MAX + 1.0);
+  return (int) bounded;
 
-  bounded = (double)max * rnd / (RAND_MAX + 1.0);
-  return (int)bounded;
+#endif /* not HAVE_DRAND48 */
 }
 
 /* Return a random uniformly distributed floating point number in the
-   [0, 1) range.  The precision of returned numbers is 9 digits.
-
-   Modify this to use erand48() where available!  */
+   [0, 1) range.  Uses drand48 where available, and a really lame
+   kludge elsewhere.  */
 
 double
 random_float (void)
 {
-  /* We can't rely on any specific value of RAND_MAX, but I'm pretty
-     sure it's greater than 1000.  */
-  int rnd1 = random_number (1000);
-  int rnd2 = random_number (1000);
-  int rnd3 = random_number (1000);
-  return rnd1 / 1000.0 + rnd2 / 1000000.0 + rnd3 / 1000000000.0;
+#ifdef HAVE_DRAND48
+  if (!rnd_seeded)
+    {
+      srand48 ((long) time (NULL) ^ (long) getpid ());
+      rnd_seeded = 1;
+    }
+  return drand48 ();
+#else  /* not HAVE_DRAND48 */
+  return (  random_number (10000) / 10000.0
+          + random_number (10000) / (10000.0 * 10000.0)
+          + random_number (10000) / (10000.0 * 10000.0 * 10000.0)
+          + random_number (10000) / (10000.0 * 10000.0 * 10000.0 * 10000.0));
+#endif /* not HAVE_DRAND48 */
 }
 
 /* Implementation of run_with_timeout, a generic timeout-forcing
@@ -1686,7 +1689,7 @@ random_float (void)
 
 static sigjmp_buf run_with_timeout_env;
 
-static RETSIGTYPE
+static void
 abort_run_with_timeout (int sig)
 {
   assert (sig == SIGALRM);
@@ -1697,7 +1700,7 @@ abort_run_with_timeout (int sig)
 
 static jmp_buf run_with_timeout_env;
 
-static RETSIGTYPE
+static void
 abort_run_with_timeout (int sig)
 {
   assert (sig == SIGALRM);
@@ -1763,8 +1766,8 @@ alarm_cancel (void)
 }
 
 /* Call FUN(ARG), but don't allow it to run for more than TIMEOUT
-   seconds.  Returns non-zero if the function was interrupted with a
-   timeout, zero otherwise.
+   seconds.  Returns true if the function was interrupted with a
+   timeout, false otherwise.
 
    This works by setting up SIGALRM to be delivered in TIMEOUT seconds
    using setitimer() or alarm().  The timeout is enforced by
@@ -1789,7 +1792,7 @@ alarm_cancel (void)
    are normally freed prior to exit from the functions, they will be
    lost in case of timeout.  */
 
-int
+bool
 run_with_timeout (double timeout, void (*fun) (void *), void *arg)
 {
   int saved_errno;
@@ -1797,7 +1800,7 @@ run_with_timeout (double timeout, void (*fun) (void *), void *arg)
   if (timeout == 0)
     {
       fun (arg);
-      return 0;
+      return false;
     }
 
   signal (SIGALRM, abort_run_with_timeout);
@@ -1805,7 +1808,7 @@ run_with_timeout (double timeout, void (*fun) (void *), void *arg)
     {
       /* Longjumped out of FUN with a timeout. */
       signal (SIGALRM, SIG_DFL);
-      return 1;
+      return true;
     }
   alarm_set (timeout);
   fun (arg);
@@ -1816,7 +1819,7 @@ run_with_timeout (double timeout, void (*fun) (void *), void *arg)
   signal (SIGALRM, SIG_DFL);
   errno = saved_errno;
 
-  return 0;
+  return false;
 }
 
 #else  /* not USE_SIGNAL_TIMEOUT */
@@ -1826,11 +1829,11 @@ run_with_timeout (double timeout, void (*fun) (void *), void *arg)
    define it under Windows, because Windows has its own version of
    run_with_timeout that uses threads.  */
 
-int
+bool
 run_with_timeout (double timeout, void (*fun) (void *), void *arg)
 {
   fun (arg);
-  return 0;
+  return false;
 }
 #endif /* not WINDOWS */
 #endif /* not USE_SIGNAL_TIMEOUT */
@@ -1856,25 +1859,22 @@ xsleep (double seconds)
     /* If nanosleep has been interrupted by a signal, adjust the
        sleeping period and return to sleep.  */
     sleep = remaining;
-#else  /* not HAVE_NANOSLEEP */
-#ifdef HAVE_USLEEP
+#elif defined(HAVE_USLEEP)
   /* If usleep is available, use it in preference to select.  */
   if (seconds >= 1)
     {
       /* On some systems, usleep cannot handle values larger than
-	 1,000,000.  If the period is larger than that, use sleep
-	 first, then add usleep for subsecond accuracy.  */
+         1,000,000.  If the period is larger than that, use sleep
+         first, then add usleep for subsecond accuracy.  */
       sleep (seconds);
       seconds -= (long) seconds;
     }
   usleep (seconds * 1000000);
-#else  /* not HAVE_USLEEP */
-#ifdef HAVE_SELECT
-  /* Note that, although Windows supports select, this sleeping
-     strategy doesn't work there because Winsock's select doesn't
-     implement timeout when it is passed NULL pointers for all fd
-     sets.  (But it does work under Cygwin, which implements its own
-     select.)  */
+#else /* fall back select */
+  /* Note that, although Windows supports select, it can't be used to
+     implement sleeping because Winsock's select doesn't implement
+     timeout when it is passed NULL pointers for all fd sets.  (But it
+     does under Cygwin, which implements Unix-compatible select.)  */
   struct timeval sleep;
   sleep.tv_sec = (long) seconds;
   sleep.tv_usec = 1000000 * (seconds - (long) seconds);
@@ -1883,107 +1883,114 @@ xsleep (double seconds)
      interrupted by a signal.  But without knowing how long we've
      actually slept, we can't return to sleep.  Using gettimeofday to
      track sleeps is slow and unreliable due to clock skew.  */
-#else  /* not HAVE_SELECT */
-  sleep (seconds);
-#endif /* not HAVE_SELECT */
-#endif /* not HAVE_USLEEP */
-#endif /* not HAVE_NANOSLEEP */
+#endif
 }
 
 #endif /* not WINDOWS */
 
-/* Encode the string STR of length LENGTH to base64 format and place it
-   to B64STORE.  The output will be \0-terminated, and must point to a
-   writable buffer of at least 1+BASE64_LENGTH(length) bytes.  It
-   returns the length of the resulting base64 data, not counting the
-   terminating zero.
+/* Encode the octets in DATA of length LENGTH to base64 format,
+   storing the result to DEST.  The output will be zero-terminated,
+   and must point to a writable buffer of at least
+   1+BASE64_LENGTH(length) bytes.  The function returns the length of
+   the resulting base64 data, not counting the terminating zero.
 
-   This implementation will not emit newlines after 76 characters of
+   This implementation does not emit newlines after 76 characters of
    base64 data.  */
 
 int
-base64_encode (const char *str, int length, char *b64store)
+base64_encode (const void *data, int length, char *dest)
 {
   /* Conversion table.  */
-  static char tbl[64] = {
-    'A','B','C','D','E','F','G','H',
-    'I','J','K','L','M','N','O','P',
-    'Q','R','S','T','U','V','W','X',
-    'Y','Z','a','b','c','d','e','f',
-    'g','h','i','j','k','l','m','n',
-    'o','p','q','r','s','t','u','v',
-    'w','x','y','z','0','1','2','3',
-    '4','5','6','7','8','9','+','/'
+  static const char tbl[64] = {
+    'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
+    'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
+    'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
+    'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/'
   };
-  int i;
-  const unsigned char *s = (const unsigned char *) str;
-  char *p = b64store;
+  /* Access bytes in DATA as unsigned char, otherwise the shifts below
+     don't work for data with MSB set. */
+  const unsigned char *s = data;
+  /* Theoretical ANSI violation when length < 3. */
+  const unsigned char *end = (const unsigned char *) data + length - 2;
+  char *p = dest;
 
   /* Transform the 3x8 bits to 4x6 bits, as required by base64.  */
-  for (i = 0; i < length; i += 3)
+  for (; s < end; s += 3)
     {
       *p++ = tbl[s[0] >> 2];
       *p++ = tbl[((s[0] & 3) << 4) + (s[1] >> 4)];
       *p++ = tbl[((s[1] & 0xf) << 2) + (s[2] >> 6)];
       *p++ = tbl[s[2] & 0x3f];
-      s += 3;
     }
 
   /* Pad the result if necessary...  */
-  if (i == length + 1)
-    *(p - 1) = '=';
-  else if (i == length + 2)
-    *(p - 1) = *(p - 2) = '=';
-
+  switch (length % 3)
+    {
+    case 1:
+      *p++ = tbl[s[0] >> 2];
+      *p++ = tbl[(s[0] & 3) << 4];
+      *p++ = '=';
+      *p++ = '=';
+      break;
+    case 2:
+      *p++ = tbl[s[0] >> 2];
+      *p++ = tbl[((s[0] & 3) << 4) + (s[1] >> 4)];
+      *p++ = tbl[((s[1] & 0xf) << 2)];
+      *p++ = '=';
+      break;
+    }
   /* ...and zero-terminate it.  */
   *p = '\0';
 
-  return p - b64store;
+  return p - dest;
 }
 
+/* Store in C the next non-whitespace character from the string, or \0
+   when end of string is reached.  */
+#define NEXT_CHAR(c, p) do {                    \
+  c = (unsigned char) *p++;                     \
+} while (ISSPACE (c))
+
 #define IS_ASCII(c) (((c) & 0x80) == 0)
-#define IS_BASE64(c) ((IS_ASCII (c) && base64_char_to_value[c] >= 0) || c == '=')
 
-/* Get next character from the string, except that non-base64
-   characters are ignored, as mandated by rfc2045.  */
-#define NEXT_BASE64_CHAR(c, p) do {			\
-  c = *p++;						\
-} while (c != '\0' && !IS_BASE64 (c))
+/* Decode data from BASE64 (a null-terminated string) into memory
+   pointed to by DEST.  DEST is assumed to be large enough to
+   accomodate the decoded data, which is guaranteed to be no more than
+   3/4*strlen(base64).
 
-/* Decode data from BASE64 (assumed to be encoded as base64) into
-   memory pointed to by TO.  TO should be large enough to accomodate
-   the decoded data, which is guaranteed to be less than
-   strlen(base64).
-
-   Since TO is assumed to contain binary data, it is not
+   Since DEST is assumed to contain binary data, it is not
    NUL-terminated.  The function returns the length of the data
    written to TO.  -1 is returned in case of error caused by malformed
-   base64 input.  */
+   base64 input.
+
+   This function originates from Free Recode.  */
 
 int
-base64_decode (const char *base64, char *to)
+base64_decode (const char *base64, void *dest)
 {
   /* Table of base64 values for first 128 characters.  Note that this
      assumes ASCII (but so does Wget in other places).  */
-  static short base64_char_to_value[128] =
+  static const signed char base64_char_to_value[128] =
     {
-      -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,	/*   0-  9 */
-      -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,	/*  10- 19 */
-      -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,	/*  20- 29 */
-      -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,	/*  30- 39 */
-      -1,  -1,  -1,  62,  -1,  -1,  -1,  63,  52,  53,	/*  40- 49 */
-      54,  55,  56,  57,  58,  59,  60,  61,  -1,  -1,	/*  50- 59 */
-      -1,  -1,  -1,  -1,  -1,  0,   1,   2,   3,   4,	/*  60- 69 */
-      5,   6,   7,   8,   9,   10,  11,  12,  13,  14,	/*  70- 79 */
-      15,  16,  17,  18,  19,  20,  21,  22,  23,  24,	/*  80- 89 */
-      25,  -1,  -1,  -1,  -1,  -1,  -1,  26,  27,  28,	/*  90- 99 */
-      29,  30,  31,  32,  33,  34,  35,  36,  37,  38,	/* 100-109 */
-      39,  40,  41,  42,  43,  44,  45,  46,  47,  48,	/* 110-119 */
-      49,  50,  51,  -1,  -1,  -1,  -1,  -1		/* 120-127 */
+      -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  /*   0-  9 */
+      -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  /*  10- 19 */
+      -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  /*  20- 29 */
+      -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  /*  30- 39 */
+      -1,  -1,  -1,  62,  -1,  -1,  -1,  63,  52,  53,  /*  40- 49 */
+      54,  55,  56,  57,  58,  59,  60,  61,  -1,  -1,  /*  50- 59 */
+      -1,  -1,  -1,  -1,  -1,  0,   1,   2,   3,   4,   /*  60- 69 */
+      5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  /*  70- 79 */
+      15,  16,  17,  18,  19,  20,  21,  22,  23,  24,  /*  80- 89 */
+      25,  -1,  -1,  -1,  -1,  -1,  -1,  26,  27,  28,  /*  90- 99 */
+      29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  /* 100-109 */
+      39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  /* 110-119 */
+      49,  50,  51,  -1,  -1,  -1,  -1,  -1             /* 120-127 */
     };
+#define BASE64_CHAR_TO_VALUE(c) ((int) base64_char_to_value[c])
+#define IS_BASE64(c) ((IS_ASCII (c) && BASE64_CHAR_TO_VALUE (c) >= 0) || c == '=')
 
   const char *p = base64;
-  char *q = to;
+  char *q = dest;
 
   while (1)
     {
@@ -1991,64 +1998,69 @@ base64_decode (const char *base64, char *to)
       unsigned long value;
 
       /* Process first byte of a quadruplet.  */
-      NEXT_BASE64_CHAR (c, p);
+      NEXT_CHAR (c, p);
       if (!c)
-	break;
-      if (c == '=')
-	return -1;		/* illegal '=' while decoding base64 */
-      value = base64_char_to_value[c] << 18;
+        break;
+      if (c == '=' || !IS_BASE64 (c))
+        return -1;              /* illegal char while decoding base64 */
+      value = BASE64_CHAR_TO_VALUE (c) << 18;
 
-      /* Process scond byte of a quadruplet.  */
-      NEXT_BASE64_CHAR (c, p);
+      /* Process second byte of a quadruplet.  */
+      NEXT_CHAR (c, p);
       if (!c)
-	return -1;		/* premature EOF while decoding base64 */
-      if (c == '=')
-	return -1;		/* illegal `=' while decoding base64 */
-      value |= base64_char_to_value[c] << 12;
+        return -1;              /* premature EOF while decoding base64 */
+      if (c == '=' || !IS_BASE64 (c))
+        return -1;              /* illegal char while decoding base64 */
+      value |= BASE64_CHAR_TO_VALUE (c) << 12;
       *q++ = value >> 16;
 
       /* Process third byte of a quadruplet.  */
-      NEXT_BASE64_CHAR (c, p);
+      NEXT_CHAR (c, p);
       if (!c)
-	return -1;		/* premature EOF while decoding base64 */
+        return -1;              /* premature EOF while decoding base64 */
+      if (!IS_BASE64 (c))
+        return -1;              /* illegal char while decoding base64 */
 
       if (c == '=')
-	{
-	  NEXT_BASE64_CHAR (c, p);
-	  if (!c)
-	    return -1;		/* premature EOF while decoding base64 */
-	  if (c != '=')
-	    return -1;		/* padding `=' expected but not found */
-	  continue;
-	}
+        {
+          NEXT_CHAR (c, p);
+          if (!c)
+            return -1;          /* premature EOF while decoding base64 */
+          if (c != '=')
+            return -1;          /* padding `=' expected but not found */
+          continue;
+        }
 
-      value |= base64_char_to_value[c] << 6;
+      value |= BASE64_CHAR_TO_VALUE (c) << 6;
       *q++ = 0xff & value >> 8;
 
       /* Process fourth byte of a quadruplet.  */
-      NEXT_BASE64_CHAR (c, p);
+      NEXT_CHAR (c, p);
       if (!c)
-	return -1;		/* premature EOF while decoding base64 */
+        return -1;              /* premature EOF while decoding base64 */
       if (c == '=')
-	continue;
+        continue;
+      if (!IS_BASE64 (c))
+        return -1;              /* illegal char while decoding base64 */
 
-      value |= base64_char_to_value[c];
+      value |= BASE64_CHAR_TO_VALUE (c);
       *q++ = 0xff & value;
     }
+#undef IS_BASE64
+#undef BASE64_CHAR_TO_VALUE
 
-  return q - to;
+  return q - (char *) dest;
 }
 
 #undef IS_ASCII
-#undef IS_BASE64
-#undef NEXT_BASE64_CHAR
+#undef NEXT_CHAR
 
 /* Simple merge sort for use by stable_sort.  Implementation courtesy
    Zeljko Vrba with additional debugging by Nenad Barbutov.  */
 
 static void
 mergesort_internal (void *base, void *temp, size_t size, size_t from, size_t to,
-		    int (*cmpfun) PARAMS ((const void *, const void *)))
+                    int (*cmpfun) (const void *, const void *))
 {
 #define ELT(array, pos) ((char *)(array) + (pos) * size)
   if (from < to)
@@ -2060,16 +2072,16 @@ mergesort_internal (void *base, void *temp, size_t size, size_t from, size_t to,
       i = from;
       j = mid + 1;
       for (k = from; (i <= mid) && (j <= to); k++)
-	if (cmpfun (ELT (base, i), ELT (base, j)) <= 0)
-	  memcpy (ELT (temp, k), ELT (base, i++), size);
-	else
-	  memcpy (ELT (temp, k), ELT (base, j++), size);
+        if (cmpfun (ELT (base, i), ELT (base, j)) <= 0)
+          memcpy (ELT (temp, k), ELT (base, i++), size);
+        else
+          memcpy (ELT (temp, k), ELT (base, j++), size);
       while (i <= mid)
-	memcpy (ELT (temp, k++), ELT (base, i++), size);
+        memcpy (ELT (temp, k++), ELT (base, i++), size);
       while (j <= to)
-	memcpy (ELT (temp, k++), ELT (base, j++), size);
+        memcpy (ELT (temp, k++), ELT (base, j++), size);
       for (k = from; k <= to; k++)
-	memcpy (ELT (base, k), ELT (temp, k), size);
+        memcpy (ELT (base, k), ELT (temp, k), size);
     }
 #undef ELT
 }
@@ -2080,7 +2092,7 @@ mergesort_internal (void *base, void *temp, size_t size, size_t from, size_t to,
 
 void
 stable_sort (void *base, size_t nmemb, size_t size,
-	     int (*cmpfun) PARAMS ((const void *, const void *)))
+             int (*cmpfun) (const void *, const void *))
 {
   if (size > 1)
     {
@@ -2088,3 +2100,103 @@ stable_sort (void *base, size_t nmemb, size_t size,
       mergesort_internal (base, temp, size, 0, nmemb - 1, cmpfun);
     }
 }
+
+/* Print a decimal number.  If it is equal to or larger than ten, the
+   number is rounded.  Otherwise it is printed with one significant
+   digit without trailing zeros and with no more than three fractional
+   digits total.  For example, 0.1 is printed as "0.1", 0.035 is
+   printed as "0.04", 0.0091 as "0.009", and 0.0003 as simply "0".
+
+   This is useful for displaying durations because it provides
+   order-of-magnitude information without unnecessary clutter --
+   long-running downloads are shown without the fractional part, and
+   short ones still retain one significant digit.  */
+
+const char *
+print_decimal (double number)
+{
+  static char buf[32];
+  double n = number >= 0 ? number : -number;
+
+  if (n >= 9.95)
+    /* Cut off at 9.95 because the below %.1f would round 9.96 to
+       "10.0" instead of "10".  OTOH 9.94 will print as "9.9".  */
+    snprintf (buf, sizeof buf, "%.0f", number);
+  else if (n >= 0.95)
+    snprintf (buf, sizeof buf, "%.1f", number);
+  else if (n >= 0.001)
+    snprintf (buf, sizeof buf, "%.1g", number);
+  else if (n >= 0.0005)
+    /* round [0.0005, 0.001) to 0.001 */
+    snprintf (buf, sizeof buf, "%.3f", number);
+  else
+    /* print numbers close to 0 as 0, not 0.000 */
+    strcpy (buf, "0");
+
+  return buf;
+}
+
+#ifdef TESTING
+
+const char *
+test_subdir_p()
+{
+  int i;
+  struct {
+    char *d1;
+    char *d2;
+    bool result;
+  } test_array[] = {
+    { "/somedir", "/somedir", true },
+    { "/somedir", "/somedir/d2", true },
+    { "/somedir/d1", "/somedir", false },
+  };
+  
+  for (i = 0; i < countof(test_array); ++i) 
+    {
+      bool res = subdir_p (test_array[i].d1, test_array[i].d2);
+
+      mu_assert ("test_subdir_p: wrong result", 
+                 res == test_array[i].result);
+    }
+
+  return NULL;
+}
+
+const char *
+test_dir_matches_p()
+{
+  int i;
+  struct {
+    char *dirlist[3];
+    char *dir;
+    bool result;
+  } test_array[] = {
+    { { "/somedir", "/someotherdir", NULL }, "somedir", true },
+    { { "/somedir", "/someotherdir", NULL }, "anotherdir", false },
+    { { "/somedir", "/*otherdir", NULL }, "anotherdir", true },
+    { { "/somedir/d1", "/someotherdir", NULL }, "somedir/d1", true },
+    { { "*/*d1", "/someotherdir", NULL }, "somedir/d1", true },
+    { { "/somedir/d1", "/someotherdir", NULL }, "d1", false },
+    { { "!COMPLETE", NULL, NULL }, "!COMPLETE", true },
+    { { "*COMPLETE", NULL, NULL }, "!COMPLETE", true },
+    { { "*/!COMPLETE", NULL, NULL }, "foo/!COMPLETE", true },
+    { { "*COMPLETE", NULL, NULL }, "foo/!COMPLETE", false },
+    { { "*/*COMPLETE", NULL, NULL }, "foo/!COMPLETE", true },
+    { { "/dir with spaces", NULL, NULL }, "dir with spaces", true },
+    { { "/dir*with*spaces", NULL, NULL }, "dir with spaces", true },
+  };
+  
+  for (i = 0; i < countof(test_array); ++i) 
+    {
+      bool res = dir_matches_p (test_array[i].dirlist, test_array[i].dir);
+      
+      mu_assert ("test_dir_matches_p: wrong result", 
+                 res == test_array[i].result);
+    }
+
+  return NULL;
+}
+
+#endif /* TESTING */
+

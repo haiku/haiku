@@ -1,11 +1,12 @@
 /* Conversion of links to local files.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006, 2007,
+   2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,34 +15,29 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif /* HAVE_STRING_H */
+#include <string.h>
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif /* HAVE_UNISTD_H */
 #include <errno.h>
 #include <assert.h>
-#include <sys/types.h>
 
 #include "wget.h"
 #include "convert.h"
@@ -50,6 +46,7 @@ so, delete this exception statement from your version.  */
 #include "utils.h"
 #include "hash.h"
 #include "ptimer.h"
+#include "res.h"
 
 static struct hash_table *dl_file_url_map;
 struct hash_table *dl_url_file_map;
@@ -58,7 +55,7 @@ struct hash_table *dl_url_file_map;
    conversion after Wget is done.  */
 struct hash_table *downloaded_html_set;
 
-static void convert_links PARAMS ((const char *, struct urlpos *));
+static void convert_links (const char *, struct urlpos *);
 
 /* This function is called when the retrieval is done to convert the
    links that have been downloaded.  It has to be called at the end of
@@ -91,7 +88,7 @@ convert_all_links (void)
   if (downloaded_html_set)
     cnt = hash_table_count (downloaded_html_set);
   if (cnt == 0)
-    return;
+    goto cleanup;
   file_array = alloca_array (char *, cnt);
   string_set_to_array (downloaded_html_set, file_array);
 
@@ -102,13 +99,13 @@ convert_all_links (void)
       char *file = file_array[i];
 
       /* Determine the URL of the HTML file.  get_urls_html will need
-	 it.  */
+         it.  */
       url = hash_table_get (dl_file_url_map, file);
       if (!url)
-	{
-	  DEBUGP (("Apparently %s has been removed.\n", file));
-	  continue;
-	}
+        {
+          DEBUGP (("Apparently %s has been removed.\n", file));
+          continue;
+        }
 
       DEBUGP (("Scanning %s (from %s)\n", file, url));
 
@@ -120,48 +117,48 @@ convert_all_links (void)
          links that have been followed from other files.  */
 
       for (cur_url = urls; cur_url; cur_url = cur_url->next)
-	{
-	  char *local_name;
-	  struct url *u = cur_url->url;
+        {
+          char *local_name;
+          struct url *u = cur_url->url;
 
-	  if (cur_url->link_base_p)
-	    {
-	      /* Base references have been resolved by our parser, so
-		 we turn the base URL into an empty string.  (Perhaps
-		 we should remove the tag entirely?)  */
-	      cur_url->convert = CO_NULLIFY_BASE;
-	      continue;
-	    }
+          if (cur_url->link_base_p)
+            {
+              /* Base references have been resolved by our parser, so
+                 we turn the base URL into an empty string.  (Perhaps
+                 we should remove the tag entirely?)  */
+              cur_url->convert = CO_NULLIFY_BASE;
+              continue;
+            }
 
-	  /* We decide the direction of conversion according to whether
-	     a URL was downloaded.  Downloaded URLs will be converted
-	     ABS2REL, whereas non-downloaded will be converted REL2ABS.  */
-	  local_name = hash_table_get (dl_url_file_map, u->url);
+          /* We decide the direction of conversion according to whether
+             a URL was downloaded.  Downloaded URLs will be converted
+             ABS2REL, whereas non-downloaded will be converted REL2ABS.  */
+          local_name = hash_table_get (dl_url_file_map, u->url);
 
-	  /* Decide on the conversion type.  */
-	  if (local_name)
-	    {
-	      /* We've downloaded this URL.  Convert it to relative
+          /* Decide on the conversion type.  */
+          if (local_name)
+            {
+              /* We've downloaded this URL.  Convert it to relative
                  form.  We do this even if the URL already is in
                  relative form, because our directory structure may
                  not be identical to that on the server (think `-nd',
                  `--cut-dirs', etc.)  */
-	      cur_url->convert = CO_CONVERT_TO_RELATIVE;
-	      cur_url->local_name = xstrdup (local_name);
-	      DEBUGP (("will convert url %s to local %s\n", u->url, local_name));
-	    }
-	  else
-	    {
-	      /* We haven't downloaded this URL.  If it's not already
+              cur_url->convert = CO_CONVERT_TO_RELATIVE;
+              cur_url->local_name = xstrdup (local_name);
+              DEBUGP (("will convert url %s to local %s\n", u->url, local_name));
+            }
+          else
+            {
+              /* We haven't downloaded this URL.  If it's not already
                  complete (including a full host name), convert it to
                  that form, so it can be reached while browsing this
                  HTML locally.  */
-	      if (!cur_url->link_complete_p)
-		cur_url->convert = CO_CONVERT_TO_COMPLETE;
-	      cur_url->local_name = NULL;
-	      DEBUGP (("will convert url %s to complete\n", u->url));
-	    }
-	}
+              if (!cur_url->link_complete_p)
+                cur_url->convert = CO_CONVERT_TO_COMPLETE;
+              cur_url->local_name = NULL;
+              DEBUGP (("will convert url %s to complete\n", u->url));
+            }
+        }
 
       /* Convert the links in the file.  */
       convert_links (file, urls);
@@ -171,19 +168,19 @@ convert_all_links (void)
       free_urlpos (urls);
     }
 
-  secs = ptimer_measure (timer) / 1000;
+  secs = ptimer_measure (timer);
+  logprintf (LOG_VERBOSE, _("Converted %d files in %s seconds.\n"),
+             file_count, print_decimal (secs));
+cleanup:
   ptimer_destroy (timer);
-  logprintf (LOG_VERBOSE, _("Converted %d files in %.*f seconds.\n"),
-	     file_count, secs < 10 ? 3 : 1, secs);
 }
 
-static void write_backup_file PARAMS ((const char *, downloaded_file_t));
-static const char *replace_attr PARAMS ((const char *, int, FILE *,
-					 const char *));
-static const char *replace_attr_refresh_hack PARAMS ((const char *, int, FILE *,
-						      const char *, int));
-static char *local_quote_string PARAMS ((const char *));
-static char *construct_relative PARAMS ((const char *, const char *));
+static void write_backup_file (const char *, downloaded_file_t);
+static const char *replace_attr (const char *, int, FILE *, const char *);
+static const char *replace_attr_refresh_hack (const char *, int, FILE *,
+                                              const char *, int);
+static char *local_quote_string (const char *);
+static char *construct_relative (const char *, const char *);
 
 /* Change the links in one HTML file.  LINKS is a list of links in the
    document, along with their positions and the desired direction of
@@ -209,11 +206,11 @@ convert_links (const char *file, struct urlpos *links)
     struct urlpos *dry;
     for (dry = links; dry; dry = dry->next)
       if (dry->convert != CO_NOCONVERT)
-	++dry_count;
+        ++dry_count;
     if (!dry_count)
       {
-	logputs (LOG_VERBOSE, _("nothing to do.\n"));
-	return;
+        logputs (LOG_VERBOSE, _("nothing to do.\n"));
+        return;
       }
   }
 
@@ -221,7 +218,7 @@ convert_links (const char *file, struct urlpos *links)
   if (!fm)
     {
       logprintf (LOG_NOTQUIET, _("Cannot convert links in %s: %s\n"),
-		 file, strerror (errno));
+                 file, strerror (errno));
       return;
     }
 
@@ -236,7 +233,7 @@ convert_links (const char *file, struct urlpos *links)
   if (unlink (file) < 0 && errno != ENOENT)
     {
       logprintf (LOG_NOTQUIET, _("Unable to delete `%s': %s\n"),
-		 file, strerror (errno));
+                 file, strerror (errno));
       read_file_free (fm);
       return;
     }
@@ -245,7 +242,7 @@ convert_links (const char *file, struct urlpos *links)
   if (!fp)
     {
       logprintf (LOG_NOTQUIET, _("Cannot convert links in %s: %s\n"),
-		 file, strerror (errno));
+                 file, strerror (errno));
       read_file_free (fm);
       return;
     }
@@ -258,16 +255,16 @@ convert_links (const char *file, struct urlpos *links)
       char *url_start = fm->content + link->pos;
 
       if (link->pos >= fm->length)
-	{
-	  DEBUGP (("Something strange is going on.  Please investigate."));
-	  break;
-	}
+        {
+          DEBUGP (("Something strange is going on.  Please investigate."));
+          break;
+        }
       /* If the URL is not to be converted, skip it.  */
       if (link->convert == CO_NOCONVERT)
-	{
-	  DEBUGP (("Skipping %s at position %d.\n", link->url->url, link->pos));
-	  continue;
-	}
+        {
+          DEBUGP (("Skipping %s at position %d.\n", link->url->url, link->pos));
+          continue;
+        }
 
       /* Echo the file contents, up to the offending URL's opening
          quote, to the outfile.  */
@@ -275,52 +272,52 @@ convert_links (const char *file, struct urlpos *links)
       p = url_start;
 
       switch (link->convert)
-	{
-	case CO_CONVERT_TO_RELATIVE:
-	  /* Convert absolute URL to relative. */
-	  {
-	    char *newname = construct_relative (file, link->local_name);
-	    char *quoted_newname = local_quote_string (newname);
+        {
+        case CO_CONVERT_TO_RELATIVE:
+          /* Convert absolute URL to relative. */
+          {
+            char *newname = construct_relative (file, link->local_name);
+            char *quoted_newname = local_quote_string (newname);
 
-	    if (!link->link_refresh_p)
-	      p = replace_attr (p, link->size, fp, quoted_newname);
-	    else
-	      p = replace_attr_refresh_hack (p, link->size, fp, quoted_newname,
-					     link->refresh_timeout);
+            if (!link->link_refresh_p)
+              p = replace_attr (p, link->size, fp, quoted_newname);
+            else
+              p = replace_attr_refresh_hack (p, link->size, fp, quoted_newname,
+                                             link->refresh_timeout);
 
-	    DEBUGP (("TO_RELATIVE: %s to %s at position %d in %s.\n",
-		     link->url->url, newname, link->pos, file));
-	    xfree (newname);
-	    xfree (quoted_newname);
-	    ++to_file_count;
-	    break;
-	  }
-	case CO_CONVERT_TO_COMPLETE:
-	  /* Convert the link to absolute URL. */
-	  {
-	    char *newlink = link->url->url;
-	    char *quoted_newlink = html_quote_string (newlink);
+            DEBUGP (("TO_RELATIVE: %s to %s at position %d in %s.\n",
+                     link->url->url, newname, link->pos, file));
+            xfree (newname);
+            xfree (quoted_newname);
+            ++to_file_count;
+            break;
+          }
+        case CO_CONVERT_TO_COMPLETE:
+          /* Convert the link to absolute URL. */
+          {
+            char *newlink = link->url->url;
+            char *quoted_newlink = html_quote_string (newlink);
 
-	    if (!link->link_refresh_p)
-	      p = replace_attr (p, link->size, fp, quoted_newlink);
-	    else
-	      p = replace_attr_refresh_hack (p, link->size, fp, quoted_newlink,
-					     link->refresh_timeout);
+            if (!link->link_refresh_p)
+              p = replace_attr (p, link->size, fp, quoted_newlink);
+            else
+              p = replace_attr_refresh_hack (p, link->size, fp, quoted_newlink,
+                                             link->refresh_timeout);
 
-	    DEBUGP (("TO_COMPLETE: <something> to %s at position %d in %s.\n",
-		     newlink, link->pos, file));
-	    xfree (quoted_newlink);
-	    ++to_url_count;
-	    break;
-	  }
-	case CO_NULLIFY_BASE:
-	  /* Change the base href to "". */
-	  p = replace_attr (p, link->size, fp, "");
-	  break;
-	case CO_NOCONVERT:
-	  abort ();
-	  break;
-	}
+            DEBUGP (("TO_COMPLETE: <something> to %s at position %d in %s.\n",
+                     newlink, link->pos, file));
+            xfree (quoted_newlink);
+            ++to_url_count;
+            break;
+          }
+        case CO_NULLIFY_BASE:
+          /* Change the base href to "". */
+          p = replace_attr (p, link->size, fp, "");
+          break;
+        case CO_NOCONVERT:
+          abort ();
+          break;
+        }
     }
 
   /* Output the rest of the file. */
@@ -363,7 +360,7 @@ construct_relative (const char *basefile, const char *linkfile)
   for (b = basefile, l = linkfile; *b == *l && *b != '\0'; ++b, ++l)
     {
       if (*b == '/')
-	start = (b - basefile) + 1;
+        start = (b - basefile) + 1;
     }
   basefile += start;
   linkfile += start;
@@ -384,11 +381,11 @@ construct_relative (const char *basefile, const char *linkfile)
   for (b = basefile; *b; b++)
     {
       if (*b == '/')
-	++basedirs;
+        ++basedirs;
     }
 
   /* Construct LINK as explained above. */
-  link = (char *)xmalloc (3 * basedirs + strlen (linkfile) + 1);
+  link = xmalloc (3 * basedirs + strlen (linkfile) + 1);
   for (i = 0; i < basedirs; i++)
     memcpy (link + 3 * i, "../", 3);
   strcpy (link + 3 * i, linkfile);
@@ -414,12 +411,12 @@ write_backup_file (const char *file, downloaded_file_t downloaded_file_return)
   if (downloaded_file_return == FILE_DOWNLOADED_AND_HTML_EXTENSION_ADDED)
     {
       /* Just write "orig" over "html".  We need to do it this way
-	 because when we're checking to see if we've downloaded the
-	 file before (to see if we can skip downloading it), we don't
-	 know if it's a text/html file.  Therefore we don't know yet
-	 at that stage that -E is going to cause us to tack on
-	 ".html", so we need to compare vs. the original URL plus
-	 ".orig", not the original URL plus ".html.orig". */
+         because when we're checking to see if we've downloaded the
+         file before (to see if we can skip downloading it), we don't
+         know if it's a text/html file.  Therefore we don't know yet
+         at that stage that -E is going to cause us to tack on
+         ".html", so we need to compare vs. the original URL plus
+         ".orig", not the original URL plus ".html.orig". */
       filename_plus_orig_suffix = alloca (filename_len + 1);
       strcpy (filename_plus_orig_suffix, file);
       strcpy ((filename_plus_orig_suffix + filename_len) - 4, "orig");
@@ -444,42 +441,41 @@ write_backup_file (const char *file, downloaded_file_t downloaded_file_return)
     {
       /* Rename <file> to <file>.orig before former gets written over. */
       if (rename (file, filename_plus_orig_suffix) != 0)
-	logprintf (LOG_NOTQUIET, _("Cannot back up %s as %s: %s\n"),
-		   file, filename_plus_orig_suffix, strerror (errno));
+        logprintf (LOG_NOTQUIET, _("Cannot back up %s as %s: %s\n"),
+                   file, filename_plus_orig_suffix, strerror (errno));
 
       /* Remember that we've already written a .orig backup for this file.
-	 Note that we never free this memory since we need it till the
-	 convert_all_links() call, which is one of the last things the
-	 program does before terminating.  BTW, I'm not sure if it would be
-	 safe to just set 'converted_file_ptr->string' to 'file' below,
-	 rather than making a copy of the string...  Another note is that I
-	 thought I could just add a field to the urlpos structure saying
-	 that we'd written a .orig file for this URL, but that didn't work,
-	 so I had to make this separate list.
-	 -- Dan Harkless <wget@harkless.org>
+         Note that we never free this memory since we need it till the
+         convert_all_links() call, which is one of the last things the
+         program does before terminating.  BTW, I'm not sure if it would be
+         safe to just set 'converted_file_ptr->string' to 'file' below,
+         rather than making a copy of the string...  Another note is that I
+         thought I could just add a field to the urlpos structure saying
+         that we'd written a .orig file for this URL, but that didn't work,
+         so I had to make this separate list.
+         -- Dan Harkless <wget@harkless.org>
 
          This [adding a field to the urlpos structure] didn't work
          because convert_file() is called from convert_all_links at
          the end of the retrieval with a freshly built new urlpos
          list.
-	 -- Hrvoje Niksic <hniksic@xemacs.org>
+         -- Hrvoje Niksic <hniksic@xemacs.org>
       */
       string_set_add (converted_files, file);
     }
 }
 
-static int find_fragment PARAMS ((const char *, int, const char **,
-				  const char **));
+static bool find_fragment (const char *, int, const char **, const char **);
 
 /* Replace an attribute's original text with NEW_TEXT. */
 
 static const char *
 replace_attr (const char *p, int size, FILE *fp, const char *new_text)
 {
-  int quote_flag = 0;
-  char quote_char = '\"';	/* use "..." for quoting, unless the
-				   original value is quoted, in which
-				   case reuse its quoting char. */
+  bool quote_flag = false;
+  char quote_char = '\"';       /* use "..." for quoting, unless the
+                                   original value is quoted, in which
+                                   case reuse its quoting char. */
   const char *frag_beg, *frag_end;
 
   /* Structure of our string is:
@@ -492,9 +488,9 @@ replace_attr (const char *p, int size, FILE *fp, const char *new_text)
   if (*p == '\"' || *p == '\'')
     {
       quote_char = *p;
-      quote_flag = 1;
+      quote_flag = true;
       ++p;
-      size -= 2;		/* disregard opening and closing quote */
+      size -= 2;                /* disregard opening and closing quote */
     }
   putc (quote_char, fp);
   fputs (new_text, fp);
@@ -516,13 +512,13 @@ replace_attr (const char *p, int size, FILE *fp, const char *new_text)
 
 static const char *
 replace_attr_refresh_hack (const char *p, int size, FILE *fp,
-			   const char *new_text, int timeout)
+                           const char *new_text, int timeout)
 {
   /* "0; URL=..." */
   char *new_with_timeout = (char *)alloca (numdigit (timeout)
-					   + 6 /* "; URL=" */
-					   + strlen (new_text)
-					   + 1);
+                                           + 6 /* "; URL=" */
+                                           + strlen (new_text)
+                                           + 1);
   sprintf (new_with_timeout, "%d; URL=%s", timeout, new_text);
 
   return replace_attr (p, size, fp, new_with_timeout);
@@ -530,36 +526,36 @@ replace_attr_refresh_hack (const char *p, int size, FILE *fp,
 
 /* Find the first occurrence of '#' in [BEG, BEG+SIZE) that is not
    preceded by '&'.  If the character is not found, return zero.  If
-   the character is found, return 1 and set BP and EP to point to the
-   beginning and end of the region.
+   the character is found, return true and set BP and EP to point to
+   the beginning and end of the region.
 
    This is used for finding the fragment indentifiers in URLs.  */
 
-static int
+static bool
 find_fragment (const char *beg, int size, const char **bp, const char **ep)
 {
   const char *end = beg + size;
-  int saw_amp = 0;
+  bool saw_amp = false;
   for (; beg < end; beg++)
     {
       switch (*beg)
-	{
-	case '&':
-	  saw_amp = 1;
-	  break;
-	case '#':
-	  if (!saw_amp)
-	    {
-	      *bp = beg;
-	      *ep = end;
-	      return 1;
-	    }
-	  /* fallthrough */
-	default:
-	  saw_amp = 0;
-	}
+        {
+        case '&':
+          saw_amp = true;
+          break;
+        case '#':
+          if (!saw_amp)
+            {
+              *bp = beg;
+              *ep = end;
+              return true;
+            }
+          /* fallthrough */
+        default:
+          saw_amp = false;
+        }
     }
-  return 0;
+  return false;
 }
 
 /* Quote FILE for use as local reference to an HTML file.
@@ -593,26 +589,26 @@ local_quote_string (const char *file)
     switch (*from)
       {
       case '%':
-	*to++ = '%';
-	*to++ = '2';
-	*to++ = '5';
-	break;
+        *to++ = '%';
+        *to++ = '2';
+        *to++ = '5';
+        break;
       case '#':
-	*to++ = '%';
-	*to++ = '2';
-	*to++ = '3';
-	break;
+        *to++ = '%';
+        *to++ = '2';
+        *to++ = '3';
+        break;
       case '?':
-	if (opt.html_extension)
-	  {
-	    *to++ = '%';
-	    *to++ = '3';
-	    *to++ = 'F';
-	    break;
-	  }
-	/* fallthrough */
+        if (opt.html_extension)
+          {
+            *to++ = '%';
+            *to++ = '3';
+            *to++ = 'F';
+            break;
+          }
+        /* fallthrough */
       default:
-	*to++ = *from;
+        *to++ = *from;
       }
   *to = '\0';
 
@@ -623,16 +619,16 @@ local_quote_string (const char *file)
    downloaded_html_list, and downloaded_html_set.  Other code calls
    these functions to let us know that a file has been downloaded.  */
 
-#define ENSURE_TABLES_EXIST do {			\
-  if (!dl_file_url_map)					\
-    dl_file_url_map = make_string_hash_table (0);	\
-  if (!dl_url_file_map)					\
-    dl_url_file_map = make_string_hash_table (0);	\
+#define ENSURE_TABLES_EXIST do {                        \
+  if (!dl_file_url_map)                                 \
+    dl_file_url_map = make_string_hash_table (0);       \
+  if (!dl_url_file_map)                                 \
+    dl_url_file_map = make_string_hash_table (0);       \
 } while (0)
 
-/* Return 1 if S1 and S2 are the same, except for "/index.html".  The
-   three cases in which it returns one are (substitute any substring
-   for "foo"):
+/* Return true if S1 and S2 are the same, except for "/index.html".
+   The three cases in which it returns one are (substitute any
+   substring for "foo"):
 
    m("foo/index.html", "foo/")  ==> 1
    m("foo/", "foo/index.html")  ==> 1
@@ -640,7 +636,7 @@ local_quote_string (const char *file)
    m("foo", "foo/"              ==> 1
    m("foo", "foo")              ==> 1  */
 
-static int
+static bool
 match_except_index (const char *s1, const char *s2)
 {
   int i;
@@ -653,14 +649,14 @@ match_except_index (const char *s1, const char *s2)
     /* Strings differ at the very beginning -- bail out.  We need to
        check this explicitly to avoid `lng - 1' reading outside the
        array.  */
-    return 0;
+    return false;
 
   if (!*s1 && !*s2)
     /* Both strings hit EOF -- strings are equal. */
-    return 1;
+    return true;
   else if (*s1 && *s2)
     /* Strings are randomly different, e.g. "/foo/bar" and "/foo/qux". */
-    return 0;
+    return false;
   else if (*s1)
     /* S1 is the longer one. */
     lng = s1;
@@ -679,7 +675,7 @@ match_except_index (const char *s1, const char *s2)
   if (*lng == '/' && *(lng + 1) == '\0')
     /* foo  */
     /* foo/ */
-    return 1;
+    return true;
 
   return 0 == strcmp (lng, "/index.html");
 }
@@ -707,8 +703,9 @@ dissociate_urls_from_file_mapper (void *key, void *value, void *arg)
 static void
 dissociate_urls_from_file (const char *file)
 {
-  hash_table_map (dl_url_file_map, dissociate_urls_from_file_mapper,
-		  (char *)file);
+  /* Can't use hash_table_iter_* because the table mutates while mapping.  */
+  hash_table_for_each (dl_url_file_map, dissociate_urls_from_file_mapper,
+                       (char *) file);
 }
 
 /* Register that URL has been successfully downloaded to FILE.  This
@@ -731,29 +728,29 @@ register_download (const char *url, const char *file)
   if (hash_table_get_pair (dl_file_url_map, file, &old_file, &old_url))
     {
       if (0 == strcmp (url, old_url))
-	/* We have somehow managed to download the same URL twice.
-	   Nothing to do.  */
-	return;
+        /* We have somehow managed to download the same URL twice.
+           Nothing to do.  */
+        return;
 
       if (match_except_index (url, old_url)
-	  && !hash_table_contains (dl_url_file_map, url))
-	/* The two URLs differ only in the "index.html" ending.  For
-	   example, one is "http://www.server.com/", and the other is
-	   "http://www.server.com/index.html".  Don't remove the old
-	   one, just add the new one as a non-canonical entry.  */
-	goto url_only;
+          && !hash_table_contains (dl_url_file_map, url))
+        /* The two URLs differ only in the "index.html" ending.  For
+           example, one is "http://www.server.com/", and the other is
+           "http://www.server.com/index.html".  Don't remove the old
+           one, just add the new one as a non-canonical entry.  */
+        goto url_only;
 
       hash_table_remove (dl_file_url_map, file);
       xfree (old_file);
       xfree (old_url);
 
       /* Remove all the URLs that point to this file.  Yes, there can
-	 be more than one such URL, because we store redirections as
-	 multiple entries in dl_url_file_map.  For example, if URL1
-	 redirects to URL2 which gets downloaded to FILE, we map both
-	 URL1 and URL2 to FILE in dl_url_file_map.  (dl_file_url_map
-	 only points to URL2.)  When another URL gets loaded to FILE,
-	 we want both URL1 and URL2 dissociated from it.
+         be more than one such URL, because we store redirections as
+         multiple entries in dl_url_file_map.  For example, if URL1
+         redirects to URL2 which gets downloaded to FILE, we map both
+         URL1 and URL2 to FILE in dl_url_file_map.  (dl_file_url_map
+         only points to URL2.)  When another URL gets loaded to FILE,
+         we want both URL1 and URL2 dissociated from it.
 
          This is a relatively expensive operation because it performs
          a linear search of the whole hash table, but it should be
@@ -837,7 +834,7 @@ register_html (const char *url, const char *file)
   string_set_add (downloaded_html_set, file);
 }
 
-static void downloaded_files_free PARAMS ((void));
+static void downloaded_files_free (void);
 
 /* Cleanup the data structures associated with this file.  */
 
@@ -924,10 +921,10 @@ downloaded_file (downloaded_file_t mode, const char *file)
   if (mode == CHECK_FOR_FILE)
     {
       if (!downloaded_files_hash)
-	return FILE_NOT_ALREADY_DOWNLOADED;
+        return FILE_NOT_ALREADY_DOWNLOADED;
       ptr = hash_table_get (downloaded_files_hash, file);
       if (!ptr)
-	return FILE_NOT_ALREADY_DOWNLOADED;
+        return FILE_NOT_ALREADY_DOWNLOADED;
       return *ptr;
     }
 
@@ -939,16 +936,9 @@ downloaded_file (downloaded_file_t mode, const char *file)
     return *ptr;
 
   ptr = downloaded_mode_to_ptr (mode);
-  hash_table_put (downloaded_files_hash, xstrdup (file), &ptr);
+  hash_table_put (downloaded_files_hash, xstrdup (file), ptr);
 
   return FILE_NOT_ALREADY_DOWNLOADED;
-}
-
-static int
-df_free_mapper (void *key, void *value, void *ignored)
-{
-  xfree (key);
-  return 0;
 }
 
 static void
@@ -956,7 +946,11 @@ downloaded_files_free (void)
 {
   if (downloaded_files_hash)
     {
-      hash_table_map (downloaded_files_hash, df_free_mapper, NULL);
+      hash_table_iterator iter;
+      for (hash_table_iterate (downloaded_files_hash, &iter);
+           hash_table_iter_next (&iter);
+           )
+        xfree (iter.key);
       hash_table_destroy (downloaded_files_hash);
       downloaded_files_hash = NULL;
     }
@@ -984,52 +978,57 @@ html_quote_string (const char *s)
   for (i = 0; *s; s++, i++)
     {
       if (*s == '&')
-	i += 4;			/* `amp;' */
+        i += 4;                 /* `amp;' */
       else if (*s == '<' || *s == '>')
-	i += 3;			/* `lt;' and `gt;' */
+        i += 3;                 /* `lt;' and `gt;' */
       else if (*s == '\"')
-	i += 5;			/* `quot;' */
+        i += 5;                 /* `quot;' */
       else if (*s == ' ')
-	i += 4;			/* #32; */
+        i += 4;                 /* #32; */
     }
-  res = (char *)xmalloc (i + 1);
+  res = xmalloc (i + 1);
   s = b;
   for (p = res; *s; s++)
     {
       switch (*s)
-	{
-	case '&':
-	  *p++ = '&';
-	  *p++ = 'a';
-	  *p++ = 'm';
-	  *p++ = 'p';
-	  *p++ = ';';
-	  break;
-	case '<': case '>':
-	  *p++ = '&';
-	  *p++ = (*s == '<' ? 'l' : 'g');
-	  *p++ = 't';
-	  *p++ = ';';
-	  break;
-	case '\"':
-	  *p++ = '&';
-	  *p++ = 'q';
-	  *p++ = 'u';
-	  *p++ = 'o';
-	  *p++ = 't';
-	  *p++ = ';';
-	  break;
-	case ' ':
-	  *p++ = '&';
-	  *p++ = '#';
-	  *p++ = '3';
-	  *p++ = '2';
-	  *p++ = ';';
-	  break;
-	default:
-	  *p++ = *s;
-	}
+        {
+        case '&':
+          *p++ = '&';
+          *p++ = 'a';
+          *p++ = 'm';
+          *p++ = 'p';
+          *p++ = ';';
+          break;
+        case '<': case '>':
+          *p++ = '&';
+          *p++ = (*s == '<' ? 'l' : 'g');
+          *p++ = 't';
+          *p++ = ';';
+          break;
+        case '\"':
+          *p++ = '&';
+          *p++ = 'q';
+          *p++ = 'u';
+          *p++ = 'o';
+          *p++ = 't';
+          *p++ = ';';
+          break;
+        case ' ':
+          *p++ = '&';
+          *p++ = '#';
+          *p++ = '3';
+          *p++ = '2';
+          *p++ = ';';
+          break;
+        default:
+          *p++ = *s;
+        }
     }
   *p = '\0';
   return res;
 }
+
+/*
+ * vim: et ts=2 sw=2
+ */
+

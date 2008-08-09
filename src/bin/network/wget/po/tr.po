@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wget 1.10.1-b1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-08 08:08-0400\n"
+"POT-Creation-Date: 2008-06-29 18:27-0700\n"
 "PO-Revision-Date: 2005-07-16 19:09+0300\n"
 "Last-Translator: Nilgün Belma Bugüner <nilgun@superonline.com>\n"
 "Language-Team: Turkish <gnu-tr-u12a@lists.sourceforge.net>\n"
@@ -16,17 +16,17 @@ msgstr ""
 "X-Generator: KBabel 1.9.1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/connect.c:199
+#: src/connect.c:200
 #, c-format
 msgid "%s: unable to resolve bind address `%s'; disabling bind.\n"
 msgstr "%s: `%s' adresi çözümlenemiyor; işlem iptal edildi.\n"
 
-#: src/connect.c:271
+#: src/connect.c:272
 #, c-format
 msgid "Connecting to %s|%s|:%d... "
 msgstr "%s[%s]:%d bağlanılıyor... "
 
-#: src/connect.c:274
+#: src/connect.c:275
 #, c-format
 msgid "Connecting to %s:%d... "
 msgstr "%s:%d bağlanılıyor..."
@@ -35,187 +35,187 @@ msgstr "%s:%d bağlanılıyor..."
 msgid "connected.\n"
 msgstr "bağlantı kuruldu.\n"
 
-#: src/connect.c:347 src/host.c:789 src/host.c:818
+#: src/connect.c:347 src/host.c:754 src/host.c:783
 #, c-format
 msgid "failed: %s.\n"
 msgstr "olmadı: %s.\n"
 
-#: src/convert.c:176
-#, c-format
-msgid "Converted %d files in %.*f seconds.\n"
+#: src/connect.c:371 src/http.c:1645
+#, fuzzy, c-format
+msgid "%s: unable to resolve host address `%s'\n"
+msgstr "%s: `%s' adresi çözümlenemiyor; işlem iptal edildi.\n"
+
+#: src/convert.c:172
+#, fuzzy, c-format
+msgid "Converted %d files in %s seconds.\n"
 msgstr "%d dosya %.*f saniyede dönüştürüldü.\n"
 
-#: src/convert.c:202
+#: src/convert.c:199
 #, c-format
 msgid "Converting %s... "
 msgstr "%s dönüştürülüyor..."
 
-#: src/convert.c:215
+#: src/convert.c:212
 msgid "nothing to do.\n"
 msgstr "birşey yapılmadı.\n"
 
-#: src/convert.c:223 src/convert.c:247
+#: src/convert.c:220 src/convert.c:244
 #, c-format
 msgid "Cannot convert links in %s: %s\n"
 msgstr "%s deki bağlar dönüştürülemiyor: %s\n"
 
-#: src/convert.c:238
+#: src/convert.c:235
 #, c-format
 msgid "Unable to delete `%s': %s\n"
 msgstr "`%s' silinemiyor: %s\n"
 
-#: src/convert.c:447
+#: src/convert.c:444
 #, c-format
 msgid "Cannot back up %s as %s: %s\n"
 msgstr "%s, %s olarak yedeklenemiyor: %s\n"
 
-#: src/cookies.c:619
-#, c-format
-msgid "Error in Set-Cookie, field `%s'"
-msgstr "Set-Cookie, `%s' alanında hata"
-
-#: src/cookies.c:643
+#: src/cookies.c:445
 #, c-format
 msgid "Syntax error in Set-Cookie: %s at position %d.\n"
 msgstr "Set-Cookie'de sözdizimi hatası: %2$d. konumda %1$s.\n"
 
-#: src/cookies.c:881
+#: src/cookies.c:687
 #, c-format
 msgid "Cookie coming from %s attempted to set domain to %s\n"
 msgstr "%s adresinden gelen çerez alan adını %s yapmaya çalıştı\n"
 
-#: src/cookies.c:1328 src/cookies.c:1477
+#: src/cookies.c:1134 src/cookies.c:1252
 #, c-format
 msgid "Cannot open cookies file `%s': %s\n"
 msgstr "Çerezler dosyası `%s' açılamıyor: %s\n"
 
-#: src/cookies.c:1489
+#: src/cookies.c:1289
 #, c-format
 msgid "Error writing to `%s': %s\n"
 msgstr "`%s' yazılırken hata: %s\n"
 
-#: src/cookies.c:1492
+#: src/cookies.c:1292
 #, c-format
 msgid "Error closing `%s': %s\n"
 msgstr "`%s' kapatılırken hata: %s\n"
 
-#: src/ftp-ls.c:841
+#: src/ftp-ls.c:838
 msgid "Unsupported listing type, trying Unix listing parser.\n"
 msgstr "Desteklenmeyen listeleme türü, Unix liste çözümleyici deneniyor.\n"
 
-#: src/ftp-ls.c:887 src/ftp-ls.c:889
+#: src/ftp-ls.c:884 src/ftp-ls.c:886
 #, c-format
 msgid "Index of /%s on %s:%d"
 msgstr "%2$s:%3$d üstünde /%1$s indeksi"
 
-#: src/ftp-ls.c:912
+#: src/ftp-ls.c:910
 #, c-format
 msgid "time unknown       "
 msgstr "zaman bilinmiyor    "
 
-#: src/ftp-ls.c:916
+#: src/ftp-ls.c:914
 #, c-format
 msgid "File        "
 msgstr "Dosya       "
 
-#: src/ftp-ls.c:919
+#: src/ftp-ls.c:917
 #, c-format
 msgid "Directory   "
 msgstr "Dizin       "
 
-#: src/ftp-ls.c:922
+#: src/ftp-ls.c:920
 #, c-format
 msgid "Link        "
 msgstr "Bağ         "
 
-#: src/ftp-ls.c:925
+#: src/ftp-ls.c:923
 #, c-format
 msgid "Not sure    "
 msgstr "Kesin değil "
 
-#: src/ftp-ls.c:943
+#: src/ftp-ls.c:941
 #, c-format
 msgid " (%s bytes)"
 msgstr " (%s bayt)"
 
-#: src/ftp.c:226
+#: src/ftp.c:215
 #, c-format
 msgid "Length: %s"
 msgstr "Uzunluk: %s"
 
-#: src/ftp.c:232 src/http.c:1861
+#: src/ftp.c:221 src/http.c:2198
 #, c-format
 msgid ", %s (%s) remaining"
 msgstr ", %s (%s) kalan"
 
-#: src/ftp.c:236 src/http.c:1865
+#: src/ftp.c:225 src/http.c:2202
 #, c-format
 msgid ", %s remaining"
 msgstr ", %s kalan"
 
-#: src/ftp.c:239
+#: src/ftp.c:228
 msgid " (unauthoritative)\n"
 msgstr " (yetkin değil)\n"
 
 #. Second: Login with proper USER/PASS sequence.
-#: src/ftp.c:314
+#: src/ftp.c:304
 #, c-format
 msgid "Logging in as %s ... "
 msgstr "%s olarak oturuma giriliyor ... "
 
-#: src/ftp.c:327 src/ftp.c:373 src/ftp.c:402 src/ftp.c:454 src/ftp.c:566
-#: src/ftp.c:612 src/ftp.c:640 src/ftp.c:698 src/ftp.c:759 src/ftp.c:819
-#: src/ftp.c:866
+#: src/ftp.c:317 src/ftp.c:363 src/ftp.c:392 src/ftp.c:444 src/ftp.c:556
+#: src/ftp.c:602 src/ftp.c:631 src/ftp.c:688 src/ftp.c:749 src/ftp.c:809
+#: src/ftp.c:856
 msgid "Error in server response, closing control connection.\n"
 msgstr "Sunucu yanıtında hata, kontrol bağlantısı kapatılıyor.\n"
 
-#: src/ftp.c:334
+#: src/ftp.c:324
 msgid "Error in server greeting.\n"
 msgstr "Sunucu karşılama iletisinde hata.\n"
 
-#: src/ftp.c:341 src/ftp.c:462 src/ftp.c:574 src/ftp.c:648 src/ftp.c:708
-#: src/ftp.c:769 src/ftp.c:829 src/ftp.c:876
+#: src/ftp.c:331 src/ftp.c:452 src/ftp.c:564 src/ftp.c:639 src/ftp.c:698
+#: src/ftp.c:759 src/ftp.c:819 src/ftp.c:866
 msgid "Write failed, closing control connection.\n"
 msgstr "Yazma başarısız, kontrol bağlantısı kapatılıyor.\n"
 
-#: src/ftp.c:347
+#: src/ftp.c:337
 msgid "The server refuses login.\n"
 msgstr "Sunucu oturum açmayı reddetti.\n"
 
-#: src/ftp.c:353
+#: src/ftp.c:343
 msgid "Login incorrect.\n"
 msgstr "Oturum açma başarısız.\n"
 
-#: src/ftp.c:359
+#: src/ftp.c:349
 msgid "Logged in!\n"
 msgstr "Oturum açıldı!\n"
 
-#: src/ftp.c:381
+#: src/ftp.c:371
 msgid "Server error, can't determine system type.\n"
 msgstr "Sunucu hatası, sistem türü saptanamadı.\n"
 
-#: src/ftp.c:390 src/ftp.c:685 src/ftp.c:742 src/ftp.c:785
+#: src/ftp.c:380 src/ftp.c:675 src/ftp.c:732 src/ftp.c:775
 msgid "done.    "
 msgstr "tamam.   "
 
-#: src/ftp.c:442 src/ftp.c:591 src/ftp.c:624 src/ftp.c:849 src/ftp.c:895
+#: src/ftp.c:432 src/ftp.c:581 src/ftp.c:614 src/ftp.c:839 src/ftp.c:885
 msgid "done.\n"
 msgstr "tamam.\n"
 
-#: src/ftp.c:469
+#: src/ftp.c:459
 #, c-format
 msgid "Unknown type `%c', closing control connection.\n"
 msgstr "Tür `%c' bilinmiyor, kontrol bağlantısı kapatılıyor.\n"
 
-#: src/ftp.c:481
+#: src/ftp.c:471
 msgid "done.  "
 msgstr "tamam.  "
 
-#: src/ftp.c:487
+#: src/ftp.c:477
 msgid "==> CWD not needed.\n"
 msgstr "==> CWD gereksiz.\n"
 
-#: src/ftp.c:580
+#: src/ftp.c:570
 #, c-format
 msgid ""
 "No such directory `%s'.\n"
@@ -225,33 +225,33 @@ msgstr ""
 "\n"
 
 #. do not CWD
-#: src/ftp.c:595
+#: src/ftp.c:585
 msgid "==> CWD not required.\n"
 msgstr "==> CWD gerekli değil.\n"
 
-#: src/ftp.c:654
+#: src/ftp.c:645
 msgid "Cannot initiate PASV transfer.\n"
 msgstr "PASV aktarımı başlatılamadı.\n"
 
-#: src/ftp.c:658
+#: src/ftp.c:649
 msgid "Cannot parse PASV response.\n"
 msgstr "PASV yanıtı çözümlenemedi.\n"
 
-#: src/ftp.c:676
+#: src/ftp.c:666
 #, c-format
 msgid "couldn't connect to %s port %d: %s\n"
 msgstr "bağlanılamadı: %s:%d: %s\n"
 
-#: src/ftp.c:724
+#: src/ftp.c:714
 #, c-format
 msgid "Bind error (%s).\n"
 msgstr "Bağlanma hatası (%s).\n"
 
-#: src/ftp.c:730
+#: src/ftp.c:720
 msgid "Invalid PORT.\n"
 msgstr "PORT geçersiz.\n"
 
-#: src/ftp.c:776
+#: src/ftp.c:766
 msgid ""
 "\n"
 "REST failed, starting from scratch.\n"
@@ -259,7 +259,7 @@ msgstr ""
 "\n"
 "REST başarısız, baştan başlanıyor.\n"
 
-#: src/ftp.c:837
+#: src/ftp.c:827
 #, c-format
 msgid ""
 "No such file `%s'.\n"
@@ -268,7 +268,7 @@ msgstr ""
 "`%s' diye bir dosya yok.\n"
 "\n"
 
-#: src/ftp.c:884
+#: src/ftp.c:874
 #, c-format
 msgid ""
 "No such file or directory `%s'.\n"
@@ -281,40 +281,41 @@ msgstr ""
 #. what functions like unique_create typically do)
 #. because we told the user we'd use this name.
 #. Instead, return and retry the download.
-#: src/ftp.c:946 src/http.c:1922
+#: src/ftp.c:936 src/http.c:2260
 #, c-format
 msgid "%s has sprung into existence.\n"
 msgstr "%s birden ortaya çıktı.\n"
 
-#: src/ftp.c:1008
+#: src/ftp.c:988
 #, c-format
 msgid "%s: %s, closing control connection.\n"
 msgstr "%s: %s, kontrol bağlantısı kapatılıyor.\n"
 
-#: src/ftp.c:1016
+#: src/ftp.c:997
 #, c-format
 msgid "%s (%s) - Data connection: %s; "
 msgstr "%s (%s) - Veri bağlantısı: %s; "
 
-#: src/ftp.c:1031
+#: src/ftp.c:1012
 msgid "Control connection closed.\n"
 msgstr "Kontrol bağlantısı kapatıldı.\n"
 
-#: src/ftp.c:1049
+#: src/ftp.c:1030
 msgid "Data transfer aborted.\n"
 msgstr "Veri aktarımı kesildi.\n"
 
-#: src/ftp.c:1117
+#. Check if output file exists; if it does, exit.
+#: src/ftp.c:1100 src/main.c:906
 #, c-format
 msgid "File `%s' already there; not retrieving.\n"
 msgstr "`%s' dosyası zaten var; alınmayacak.\n"
 
-#: src/ftp.c:1185 src/http.c:2142
+#: src/ftp.c:1170 src/http.c:2440
 #, c-format
 msgid "(try:%2d)"
 msgstr "(deneme: %2d)"
 
-#: src/ftp.c:1255 src/http.c:2421
+#: src/ftp.c:1240 src/http.c:2772
 #, c-format
 msgid ""
 "%s (%s) - `%s' saved [%s]\n"
@@ -323,29 +324,29 @@ msgstr ""
 "%s (%s) - `%s' kaydedildi [%s]\n"
 "\n"
 
-#: src/ftp.c:1297 src/main.c:948 src/recur.c:376 src/retr.c:844
+#: src/ftp.c:1282 src/main.c:1025 src/recur.c:379 src/retr.c:861
 #, c-format
 msgid "Removing %s.\n"
 msgstr "%s kaldırılıyor.\n"
 
-#: src/ftp.c:1339
+#: src/ftp.c:1324
 #, c-format
 msgid "Using `%s' as listing tmp file.\n"
 msgstr "Listeleme için geçici dosya olarak `%s' kullanılıyor.\n"
 
-#: src/ftp.c:1354
+#: src/ftp.c:1339
 #, c-format
 msgid "Removed `%s'.\n"
 msgstr "`%s' kaldırıldı.\n"
 
-#: src/ftp.c:1389
+#: src/ftp.c:1372
 #, c-format
 msgid "Recursion depth %d exceeded max. depth %d.\n"
 msgstr "Yineleme derinliği %d aşıldı. En fazla derinlik %d.\n"
 
 #. Remote file is older, file sizes can be compared and
 #. are both equal.
-#: src/ftp.c:1459
+#: src/ftp.c:1442
 #, c-format
 msgid "Remote file no newer than local file `%s' -- not retrieving.\n"
 msgstr ""
@@ -353,7 +354,7 @@ msgstr ""
 "\n"
 
 #. Remote file is newer or sizes cannot be matched
-#: src/ftp.c:1466
+#: src/ftp.c:1449
 #, c-format
 msgid ""
 "Remote file is newer than local file `%s' -- retrieving.\n"
@@ -363,7 +364,7 @@ msgstr ""
 "\n"
 
 #. Sizes do not match
-#: src/ftp.c:1473
+#: src/ftp.c:1456
 #, c-format
 msgid ""
 "The sizes do not match (local %s) -- retrieving.\n"
@@ -372,11 +373,11 @@ msgstr ""
 "Uzunlukları aynı değil (bizdeki %s), -- alınıyor.\n"
 "\n"
 
-#: src/ftp.c:1491
+#: src/ftp.c:1474
 msgid "Invalid name of the symlink, skipping.\n"
 msgstr "Sembolik bağın ismi geçersiz, atlanıyor.\n"
 
-#: src/ftp.c:1508
+#: src/ftp.c:1491
 #, c-format
 msgid ""
 "Already have correct symlink %s -> %s\n"
@@ -385,242 +386,257 @@ msgstr ""
 "Zaten doğru sembolik bağ var: %s -> %s\n"
 "\n"
 
-#: src/ftp.c:1516
+#: src/ftp.c:1499
 #, c-format
 msgid "Creating symlink %s -> %s\n"
 msgstr "Sembolik bağ oluşturuluyor: %s -> %s\n"
 
-#: src/ftp.c:1526
+#: src/ftp.c:1509
 #, c-format
 msgid "Symlinks not supported, skipping symlink `%s'.\n"
 msgstr "Sembolik bağ desteklenmiyor. `%s' sembolik bağı atlanıyor.\n"
 
-#: src/ftp.c:1538
+#: src/ftp.c:1521
 #, c-format
 msgid "Skipping directory `%s'.\n"
 msgstr "`%s' dizini atlanıyor.\n"
 
-#: src/ftp.c:1547
+#: src/ftp.c:1530
 #, c-format
 msgid "%s: unknown/unsupported file type.\n"
 msgstr "%s: bilinmeyen/desteklenmeyen dosya türü.\n"
 
-#: src/ftp.c:1574
+#: src/ftp.c:1557
 #, c-format
 msgid "%s: corrupt time-stamp.\n"
 msgstr "%s: zaman damgası bozuk.\n"
 
-#: src/ftp.c:1602
+#: src/ftp.c:1585
 #, c-format
 msgid "Will not retrieve dirs since depth is %d (max %d).\n"
 msgstr "%d derinliğindeki dizinler alınamayacak (en çok %d)\n"
 
-#: src/ftp.c:1652
+#: src/ftp.c:1635
 #, c-format
 msgid "Not descending to `%s' as it is excluded/not-included.\n"
 msgstr "Dışlanan/izin-verilmeyen olarak `%s' e inilmiyor.\n"
 
-#: src/ftp.c:1718 src/ftp.c:1732
+#: src/ftp.c:1701 src/ftp.c:1715
 #, c-format
 msgid "Rejecting `%s'.\n"
 msgstr "`%s' reddediliyor.\n"
 
+#: src/ftp.c:1738
+#, fuzzy, c-format
+msgid "Error matching %s against %s: %s\n"
+msgstr "`%s' yazılırken hata: %s\n"
+
 #. No luck.
 #. #### This message SUCKS.  We should see what was the
 #. reason that nothing was retrieved.
-#: src/ftp.c:1778
+#: src/ftp.c:1779
 #, c-format
 msgid "No matches on pattern `%s'.\n"
 msgstr "`%s' kalıbına uygun sonuç gelmedi.\n"
 
-#: src/ftp.c:1844
+#: src/ftp.c:1845
 #, c-format
 msgid "Wrote HTML-ized index to `%s' [%s].\n"
 msgstr "HTMLeştirilmiş indeks `%s' e yazıldı [%s].\n"
 
-#: src/ftp.c:1849
+#: src/ftp.c:1850
 #, c-format
 msgid "Wrote HTML-ized index to `%s'.\n"
 msgstr "HTMLeştirilmiş indeks `%s' e yazıldı.\n"
 
-#: src/getopt.c:675
+#: src/getopt.c:670
 #, c-format
 msgid "%s: option `%s' is ambiguous\n"
 msgstr "%s: seçenek `%s' belirsiz\n"
 
-#: src/getopt.c:700
+#: src/getopt.c:695
 #, c-format
 msgid "%s: option `--%s' doesn't allow an argument\n"
 msgstr "%s: seçenek `--%s' argümansız kullanılır\n"
 
-#: src/getopt.c:705
+#: src/getopt.c:700
 #, c-format
 msgid "%s: option `%c%s' doesn't allow an argument\n"
 msgstr "%s: seçenek `%c%s' argümansız kullanılır\n"
 
-#: src/getopt.c:723 src/getopt.c:896
+#: src/getopt.c:718 src/getopt.c:891
 #, c-format
 msgid "%s: option `%s' requires an argument\n"
 msgstr "%s: seçenek `%s' bir argümanla kullanılır\n"
 
 #. --option
-#: src/getopt.c:752
+#: src/getopt.c:747
 #, c-format
 msgid "%s: unrecognized option `--%s'\n"
 msgstr "%s: `--%s' seçeneği bilinmiyor\n"
 
 #. +option or -option
-#: src/getopt.c:756
+#: src/getopt.c:751
 #, c-format
 msgid "%s: unrecognized option `%c%s'\n"
 msgstr "%s: `%c%s' seçeneği bilinmiyor\n"
 
 #. 1003.2 specifies the format of this message.
-#: src/getopt.c:782
+#: src/getopt.c:777
 #, c-format
 msgid "%s: illegal option -- %c\n"
 msgstr "%s: kuraldışı seçenek -- %c\n"
 
-#: src/getopt.c:785
+#: src/getopt.c:780
 #, c-format
 msgid "%s: invalid option -- %c\n"
 msgstr "%s: geçersiz seçenek -- %c\n"
 
 #. 1003.2 specifies the format of this message.
-#: src/getopt.c:815 src/getopt.c:945
+#: src/getopt.c:810 src/getopt.c:940
 #, c-format
 msgid "%s: option requires an argument -- %c\n"
 msgstr "%s: seçenek bir argümanla kullanılır -- %c\n"
 
-#: src/getopt.c:862
+#: src/getopt.c:857
 #, c-format
 msgid "%s: option `-W %s' is ambiguous\n"
 msgstr "%s: seçenek `-W %s' belirsiz\n"
 
-#: src/getopt.c:880
+#: src/getopt.c:875
 #, c-format
 msgid "%s: option `-W %s' doesn't allow an argument\n"
 msgstr "%s: seçenek `-W %s' argümansız kullanılır\n"
 
-#: src/host.c:366
+#: src/host.c:349
 msgid "Unknown host"
 msgstr "Bilinmeyen makine"
 
 #. Message modeled after what gai_strerror returns in similar
 #. circumstances.
-#: src/host.c:370
+#: src/host.c:353
 msgid "Temporary failure in name resolution"
 msgstr "İsim çözümlemesinde geçici bir hata oluştu"
 
-#: src/host.c:372
+#: src/host.c:355
 msgid "Unknown error"
 msgstr "Hata anlaşılamadı"
 
-#: src/host.c:751
+#: src/host.c:716
 #, c-format
 msgid "Resolving %s... "
 msgstr "%s çözümleniyor... "
 
-#: src/host.c:798
+#: src/host.c:763
 msgid "failed: No IPv4/IPv6 addresses for host.\n"
 msgstr "olmadı: Makinenin bir IPv4/IPv6 adresi yok.\n"
 
-#: src/host.c:821
+#: src/host.c:786
 msgid "failed: timed out.\n"
 msgstr "olmadı: zamanaşımı.\n"
 
-#: src/html-url.c:298
+#: src/html-url.c:290
 #, c-format
 msgid "%s: Cannot resolve incomplete link %s.\n"
 msgstr "%s: İçi boş %s bağı çözümlenemez.\n"
 
-#: src/html-url.c:705
+#: src/html-url.c:697
 #, c-format
 msgid "%s: Invalid URL %s: %s\n"
 msgstr "%s: URL `%s' geçersiz: %s\n"
 
-#: src/http.c:373
+#: src/http.c:369
 #, c-format
 msgid "Failed writing HTTP request: %s.\n"
 msgstr "HTTP isteğini yazma başarısız: %s.\n"
 
-#: src/http.c:687
+#: src/http.c:746
 msgid "No headers, assuming HTTP/0.9"
 msgstr "Başlıklar eksik, HTTP/0.9 olduğu varsayılıyor"
 
-#: src/http.c:1204
+#: src/http.c:1430
 msgid "Disabling SSL due to encountered errors.\n"
 msgstr "Ne olduğu belirsiz hatalardan dolayı SSL iptal ediliyor.\n"
 
-#: src/http.c:1374
+#: src/http.c:1548
 #, c-format
 msgid "POST data file `%s' missing: %s\n"
 msgstr "POST veri dosyası `%s' kayıp: %s\n"
 
-#: src/http.c:1423
+#: src/http.c:1632
 #, c-format
 msgid "Reusing existing connection to %s:%d.\n"
 msgstr "Bağlantı tekrar kullanılıyor: %s:%d.\n"
 
-#: src/http.c:1492
+#: src/http.c:1700
 #, c-format
 msgid "Failed reading proxy response: %s\n"
 msgstr "Vekilin yanıtı okunamadı: %s\n"
 
-#: src/http.c:1512
+#: src/http.c:1720
 #, c-format
 msgid "Proxy tunneling failed: %s"
 msgstr "Vekil tünellenemedi: %s"
 
-#: src/http.c:1557
+#: src/http.c:1765
 #, c-format
 msgid "%s request sent, awaiting response... "
 msgstr "%s isteği gönderildi, yanıt bekleniyor... "
 
-#: src/http.c:1568
+#: src/http.c:1776
 msgid "No data received.\n"
 msgstr "Hiçbir veri alınmadı.\n"
 
-#: src/http.c:1575
+#: src/http.c:1783
 #, c-format
 msgid "Read error (%s) in headers.\n"
 msgstr "Başlıklar okunurken hata (%s).\n"
 
+#. If opt.noclobber is turned on and file already exists, do not
+#. retrieve the file. But if the output_document was given, then this
+#. test was already done and the file didn't exist. Hence the !opt.output_document
+#: src/http.c:1830 src/http.c:2384
+#, c-format
+msgid ""
+"File `%s' already there; not retrieving.\n"
+"\n"
+msgstr "`%s' dosyası zaten var; alınmayacak.\n"
+
 #. If the authentication header is missing or
 #. unrecognized, there's no sense in retrying.
-#: src/http.c:1660
+#: src/http.c:1984
 msgid "Unknown authentication scheme.\n"
 msgstr "Kimlik tanımlama şeması bilinmiyor.\n"
 
-#: src/http.c:1684
+#: src/http.c:2015
 msgid "Authorization failed.\n"
 msgstr "Yetkilendirme başarısız.\n"
 
-#: src/http.c:1698
+#: src/http.c:2029
 msgid "Malformed status line"
 msgstr "Durum satırı bozuk"
 
-#: src/http.c:1700
+#: src/http.c:2031
 msgid "(no description)"
 msgstr "(açıklama yok)"
 
-#: src/http.c:1763
+#: src/http.c:2097
 #, c-format
 msgid "Location: %s%s\n"
 msgstr "Yer: %s%s\n"
 
-#: src/http.c:1764 src/http.c:1871
+#: src/http.c:2098 src/http.c:2208
 msgid "unspecified"
 msgstr "belirtilmeyen"
 
-#: src/http.c:1765
+#: src/http.c:2099
 msgid " [following]"
 msgstr " [izleyen]"
 
 #. If `-c' is in use and the file has been fully downloaded (or
 #. the remote file has shrunk), Wget effectively requests bytes
 #. after the end of file and the server response with 416.
-#: src/http.c:1821
+#: src/http.c:2155
 msgid ""
 "\n"
 "    The file is already fully retrieved; nothing to do.\n"
@@ -633,56 +649,60 @@ msgstr ""
 #. No need to print this output if the body won't be
 #. downloaded at all, or if the original server response is
 #. printed.
-#: src/http.c:1851
+#: src/http.c:2188
 msgid "Length: "
 msgstr "Uzunluk: "
 
-#: src/http.c:1871
+#: src/http.c:2208
 msgid "ignored"
 msgstr "yoksayıldı"
 
-#: src/http.c:2019
+#: src/http.c:2279
+#, fuzzy, c-format
+msgid "Saving to: `%s'\n"
+msgstr "`%s' dizini atlanıyor.\n"
+
+#: src/http.c:2360
 msgid "Warning: wildcards not supported in HTTP.\n"
 msgstr "Uyarı: HTTP ile genel arama karakterleri kullanılamaz.\n"
 
-#. If opt.noclobber is turned on and file already exists, do not
-#. retrieve the file
-#: src/http.c:2054
-#, c-format
-msgid ""
-"File `%s' already there; not retrieving.\n"
-"\n"
-msgstr "`%s' dosyası zaten var; alınmayacak.\n"
+#: src/http.c:2429
+msgid "Spider mode enabled. Check if remote file exists.\n"
+msgstr ""
 
-#: src/http.c:2244
+#: src/http.c:2514
 #, c-format
 msgid "Cannot write to `%s' (%s).\n"
 msgstr "`%s'e yazılamadı (%s).\n"
 
 #. Another fatal error.
-#: src/http.c:2251
+#: src/http.c:2523
 msgid "Unable to establish SSL connection.\n"
 msgstr "SSL bağlantısı kurulamıyor.\n"
 
-#: src/http.c:2260
+#: src/http.c:2531
 #, c-format
 msgid "ERROR: Redirection (%d) without location.\n"
 msgstr "HATA: Yönlendirmede (%d) yer belirtilmemiş.\n"
 
-#: src/http.c:2290
+#: src/http.c:2577
+msgid "Remote file does not exist -- broken link!!!\n"
+msgstr ""
+
+#: src/http.c:2582
 #, c-format
 msgid "%s ERROR %d: %s.\n"
 msgstr "%s HATA %d: %s.\n"
 
-#: src/http.c:2303
+#: src/http.c:2598
 msgid "Last-modified header missing -- time-stamps turned off.\n"
 msgstr "Last-modified başlığı kayıp -- zaman damgası kapatıldı.\n"
 
-#: src/http.c:2311
+#: src/http.c:2606
 msgid "Last-modified header invalid -- time-stamp ignored.\n"
 msgstr "Last-modified başlığı geçersiz -- zaman damgası yoksayıldı.\n"
 
-#: src/http.c:2334
+#: src/http.c:2636
 #, c-format
 msgid ""
 "Server file no newer than local file `%s' -- not retrieving.\n"
@@ -691,16 +711,49 @@ msgstr ""
 "Sunucudaki dosya yerel dosya %s'den daha yeni değil -- alınmayacak.\n"
 "\n"
 
-#: src/http.c:2342
+#: src/http.c:2644
 #, c-format
 msgid "The sizes do not match (local %s) -- retrieving.\n"
 msgstr "Uzunlukları aynı değil (bizdeki %s), -- alınıyor.\n"
 
-#: src/http.c:2347
+#: src/http.c:2651
 msgid "Remote file is newer, retrieving.\n"
 msgstr "Uzak dosya daha yeni, alınıyor.\n"
 
-#: src/http.c:2389 src/http.c:2455
+#: src/http.c:2667
+#, fuzzy
+msgid ""
+"Remote file exists and could contain links to other resources -- "
+"retrieving.\n"
+"\n"
+msgstr ""
+"Uzak dosya bizdeki %s dosyasından daha yeni  -- alınıyor.\n"
+"\n"
+
+#: src/http.c:2672
+#, fuzzy
+msgid ""
+"Remote file exists but does not contain any link -- not retrieving.\n"
+"\n"
+msgstr ""
+"Uzak dosya bizdeki %s dosyasından daha yeni değil -- alınmayacak.\n"
+"\n"
+
+#: src/http.c:2682
+msgid ""
+"Remote file exists and could contain further links,\n"
+"but recursion is disabled -- not retrieving.\n"
+"\n"
+msgstr ""
+
+#: src/http.c:2688
+#, fuzzy
+msgid ""
+"Remote file exists.\n"
+"\n"
+msgstr "Uzak dosya daha yeni, alınıyor.\n"
+
+#: src/http.c:2741
 #, c-format
 msgid ""
 "%s (%s) - `%s' saved [%s/%s]\n"
@@ -709,111 +762,101 @@ msgstr ""
 "%s (%s) - `%s' kaydedildi [%s/%s]\n"
 "\n"
 
-#: src/http.c:2446
+#: src/http.c:2796
 #, c-format
 msgid "%s (%s) - Connection closed at byte %s. "
 msgstr "%s (%s) - %s baytta bağlantı kesildi. "
 
-#: src/http.c:2481
-#, c-format
-msgid "%s (%s) - Connection closed at byte %s/%s. "
-msgstr "%s (%s) -  %s/%s baytta bağlantı kesildi. "
-
-#: src/http.c:2495
+#: src/http.c:2819
 #, c-format
 msgid "%s (%s) - Read error at byte %s (%s)."
 msgstr "%s (%s) - %s. baytta okuma hatası (%s)."
 
-#: src/http.c:2505
+#: src/http.c:2828
 #, c-format
 msgid "%s (%s) - Read error at byte %s/%s (%s). "
 msgstr "%s (%s) - %s/%s baytta okuma hatası (%s). "
 
-#: src/init.c:369
+#: src/init.c:390
 #, c-format
 msgid "%s: WGETRC points to %s, which doesn't exist.\n"
 msgstr "%s: WGETRC olmayan %s dosyasını gösteriyor.\n"
 
-#: src/init.c:433 src/netrc.c:277
+#: src/init.c:453 src/netrc.c:268
 #, c-format
 msgid "%s: Cannot read %s (%s).\n"
 msgstr "%s: %s okunamadı (%s).\n"
 
-#: src/init.c:451
+#: src/init.c:471
 #, c-format
 msgid "%s: Error in %s at line %d.\n"
 msgstr "%s: %s dosyasının %d. satırında hata.\n"
 
-#: src/init.c:457
+#: src/init.c:477
 #, c-format
 msgid "%s: Syntax error in %s at line %d.\n"
 msgstr "%s: %s dosyasının %d. satırında sözdizimi hatası.\n"
 
-#: src/init.c:462
+#: src/init.c:482
 #, c-format
 msgid "%s: Unknown command `%s' in %s at line %d.\n"
 msgstr "%1$s: %3$s:%4$d: `%2$s' komutu bilinmiyor.\n"
 
-#: src/init.c:507
+#: src/init.c:527
 #, c-format
 msgid "%s: Warning: Both system and user wgetrc point to `%s'.\n"
-msgstr "%s: Uyarı: Sistem ve kullanıcı wgetrc dosyalarının her ikisi de %s gösteriyor.\n"
+msgstr ""
+"%s: Uyarı: Sistem ve kullanıcı wgetrc dosyalarının her ikisi de %s "
+"gösteriyor.\n"
 
-#: src/init.c:661
+#: src/init.c:680
 #, c-format
 msgid "%s: Invalid --execute command `%s'\n"
 msgstr "%s: --execute ile verilen `%s' komutu geçersiz.\n"
 
-#: src/init.c:707
+#: src/init.c:725
 #, c-format
 msgid "%s: %s: Invalid boolean `%s'; use `on' or `off'.\n"
 msgstr "%s: %s: `%s' mantıken geçersiz; `on' ya da `off' kullanın.\n"
 
-#: src/init.c:759
-#, c-format
-msgid ""
-"%s: %s: Invalid extended boolean `%s';\n"
-"use one of `on', `off', `always', or `never'.\n"
-msgstr ""
-"%s: %s: `%s' mantıken geçersiz;\n"
-"`always', `on', `off' veya `never' kullanın.\n"
-
-#: src/init.c:777
+#: src/init.c:742
 #, c-format
 msgid "%s: %s: Invalid number `%s'.\n"
 msgstr "%s: %s: `%s' sayı olarak geçersiz.\n"
 
-#: src/init.c:1008 src/init.c:1027
+#: src/init.c:973 src/init.c:992
 #, c-format
 msgid "%s: %s: Invalid byte value `%s'\n"
 msgstr "%s: %s: `%s' bayt değer olarak geçersiz.\n"
 
-#: src/init.c:1052
+#: src/init.c:1017
 #, c-format
 msgid "%s: %s: Invalid time period `%s'\n"
 msgstr "%s: %s: `%s'süre olarak geçersiz.\n"
 
-#: src/init.c:1106 src/init.c:1196 src/init.c:1291 src/init.c:1316
+#: src/init.c:1071 src/init.c:1161 src/init.c:1264 src/init.c:1289
 #, c-format
 msgid "%s: %s: Invalid value `%s'.\n"
 msgstr "%s: %s: `%s' değer olarak geçersiz.\n"
 
-#: src/init.c:1143
+#: src/init.c:1108
 #, c-format
 msgid "%s: %s: Invalid header `%s'.\n"
 msgstr "%s: %s: `%s' başlok olarak geçersiz.\n"
 
-#: src/init.c:1208
+#: src/init.c:1174
 #, c-format
 msgid "%s: %s: Invalid progress type `%s'.\n"
 msgstr "%s: %s: İşlem türü `%s' geçersiz.\n"
 
-#: src/init.c:1259
-#, c-format
-msgid "%s: %s: Invalid restriction `%s', use `unix' or `windows'.\n"
+#: src/init.c:1233
+#, fuzzy, c-format
+msgid ""
+"%s: %s: Invalid restriction `%s', use [unix|windows],[lowercase|uppercase],"
+"[nocontrol].\n"
 msgstr "%s: %s: `%s' sınırlaması geçersiz, `unix' ya da `windows' kullanın.\n"
 
-#: src/log.c:806
+#: src/log.c:785
 #, c-format
 msgid ""
 "\n"
@@ -824,7 +867,7 @@ msgstr ""
 
 #. Eek!  Opening the alternate log file has failed.  Nothing we
 #. can do but disable printing completely.
-#: src/log.c:816
+#: src/log.c:795
 #, c-format
 msgid ""
 "\n"
@@ -833,17 +876,17 @@ msgstr ""
 "\n"
 "%s alındı.\n"
 
-#: src/log.c:817
+#: src/log.c:796
 #, c-format
 msgid "%s: %s; disabling logging.\n"
 msgstr "%s: %s; giriş iptalediliyor.\n"
 
-#: src/main.c:375
+#: src/main.c:360
 #, c-format
 msgid "Usage: %s [OPTION]... [URL]...\n"
 msgstr "Kullanımı: %s [SEÇENEK]... [URL]...\n"
 
-#: src/main.c:387
+#: src/main.c:372
 msgid ""
 "Mandatory arguments to long options are mandatory for short options too.\n"
 "\n"
@@ -851,556 +894,680 @@ msgstr ""
 "Uzun seçeneklerdeki zorunlu argümanlar kısa seçeneklerde de zorunludur.\n"
 "\n"
 
-#: src/main.c:389
+#: src/main.c:374
 msgid "Startup:\n"
 msgstr "Başlangıç:\n"
 
-#: src/main.c:391
+#: src/main.c:376
 msgid "  -V,  --version           display the version of Wget and exit.\n"
 msgstr "  -V,  --version              Wget sürümünü gösterir ve çıkar.\n"
 
-#: src/main.c:393
+#: src/main.c:378
 msgid "  -h,  --help              print this help.\n"
 msgstr "  -h,  --help                 bu yardım metnini basar.\n"
 
-#: src/main.c:395
+#: src/main.c:380
 msgid "  -b,  --background        go to background after startup.\n"
 msgstr "  -b,  --background           artalanda başlatılır.\n"
 
-#: src/main.c:397
+#: src/main.c:382
 msgid "  -e,  --execute=COMMAND   execute a `.wgetrc'-style command.\n"
-msgstr "  -e,  --execute=KOMUT        `.wgetrc' tarzı bir komut çalıştırmak için.\n"
+msgstr ""
+"  -e,  --execute=KOMUT        `.wgetrc' tarzı bir komut çalıştırmak için.\n"
 
-#: src/main.c:401
+#: src/main.c:386
 msgid "Logging and input file:\n"
 msgstr "Günlük kaydı ve girdi dosyası:\n"
 
-#: src/main.c:403
+#: src/main.c:388
 msgid "  -o,  --output-file=FILE    log messages to FILE.\n"
 msgstr "  -o,  --output-file=DOSYA    Günlük kayıtları DOSYAya yazılır.\n"
 
-#: src/main.c:405
+#: src/main.c:390
 msgid "  -a,  --append-output=FILE  append messages to FILE.\n"
 msgstr "  -a,  --append-output=DOSYA  iletiler DOSYAya eklenir.\n"
 
-#: src/main.c:408
+#: src/main.c:393
 msgid "  -d,  --debug               print lots of debugging information.\n"
 msgstr "  -d,  --debug                hata ayıklama bilgileri basılır.\n"
 
-#: src/main.c:411
-msgid "  -q,  --quiet               quiet (no output).\n"
-msgstr "  -q,  --quiet                hiçbir bilgi verilmez (sessiz çalışma).\n"
+#: src/main.c:397
+#, fuzzy
+msgid "       --wdebug              print Watt-32 debug output.\n"
+msgstr "  -d,  --debug                hata ayıklama bilgileri basılır.\n"
 
-#: src/main.c:413
+#: src/main.c:400
+msgid "  -q,  --quiet               quiet (no output).\n"
+msgstr ""
+"  -q,  --quiet                hiçbir bilgi verilmez (sessiz çalışma).\n"
+
+#: src/main.c:402
 msgid "  -v,  --verbose             be verbose (this is the default).\n"
 msgstr "  -v,  --verbose              ayrıtılı bilgi verilir (öntanımlıdır).\n"
 
-#: src/main.c:415
-msgid "  -nv, --no-verbose          turn off verboseness, without being quiet.\n"
+#: src/main.c:404
+msgid ""
+"  -nv, --no-verbose          turn off verboseness, without being quiet.\n"
 msgstr "  -nv, --no-verbose           daha az ayrıntılı bilgi verilir.\n"
 
-#: src/main.c:417
+#: src/main.c:406
 msgid "  -i,  --input-file=FILE     download URLs found in FILE.\n"
 msgstr "  -i,  --input-file=DOSYA     DOSYAda kayıtlı adresler indirilir.\n"
 
-#: src/main.c:419
+#: src/main.c:408
 msgid "  -F,  --force-html          treat input file as HTML.\n"
-msgstr "  -F,  --force-html           girdi dosyasının HTML olduğu varsayılır.\n"
+msgstr ""
+"  -F,  --force-html           girdi dosyasının HTML olduğu varsayılır.\n"
 
-#: src/main.c:421
-msgid "  -B,  --base=URL            prepends URL to relative links in -F -i file.\n"
+#: src/main.c:410
+msgid ""
+"  -B,  --base=URL            prepends URL to relative links in -F -i file.\n"
 msgstr ""
 "  -B,  --base=ADRES            -F -i DOSYA kullanımındaki göreli bağların\n"
 "                                önüne konacak ADRES\n"
 
-#: src/main.c:425
+#: src/main.c:414
 msgid "Download:\n"
 msgstr "İndirme:\n"
 
-#: src/main.c:427
-msgid "  -t,  --tries=NUMBER            set number of retries to NUMBER (0 unlimits).\n"
+#: src/main.c:416
+msgid ""
+"  -t,  --tries=NUMBER            set number of retries to NUMBER (0 "
+"unlimits).\n"
 msgstr "  -t,  --tries=SAYI           yineleme SAYIsı (0: sınırsız).\n"
 
-#: src/main.c:429
+#: src/main.c:418
 msgid "       --retry-connrefused       retry even if connection is refused.\n"
-msgstr "       --retry-connrefused       bağlantı reddedilse bile yeniden dener.\n"
+msgstr ""
+"       --retry-connrefused       bağlantı reddedilse bile yeniden dener.\n"
 
-#: src/main.c:431
+#: src/main.c:420
 msgid "  -O,  --output-document=FILE    write documents to FILE.\n"
 msgstr ""
 "  -O,  --output-document=DOSYA\n"
 "                               belgeler DOSYAya yazılır.\n"
 
-#: src/main.c:433
+#: src/main.c:422
 msgid ""
 "  -nc, --no-clobber              skip downloads that would download to\n"
 "                                 existing files.\n"
 msgstr "  -nc, --no-clobber           Mevcut dosyalar tekrar indirilmez.\n"
 
-#: src/main.c:436
-msgid "  -c,  --continue                resume getting a partially-downloaded file.\n"
+#: src/main.c:425
+msgid ""
+"  -c,  --continue                resume getting a partially-downloaded "
+"file.\n"
 msgstr ""
 "  -c,  --continue             dosya yarım kalmışsa kaldığı yerden devam\n"
 "                              ettirilir.\n"
 
-#: src/main.c:438
+#: src/main.c:427
 msgid "       --progress=TYPE           select progress gauge type.\n"
 msgstr "       --progress=TÜR         süreç göstergesi TÜRü.\n"
 
-#: src/main.c:440
+#: src/main.c:429
 msgid ""
 "  -N,  --timestamping            don't re-retrieve files unless newer than\n"
 "                                 local.\n"
-msgstr "  -N,  --timestamping         mevcuttan daha yeni olmayan dosyalar indirilmez.\n"
+msgstr ""
+"  -N,  --timestamping         mevcuttan daha yeni olmayan dosyalar "
+"indirilmez.\n"
 
-#: src/main.c:443
+#: src/main.c:432
 msgid "  -S,  --server-response         print server response.\n"
 msgstr "  -S,  --server-response      sunucunun yanıtını basar.\n"
 
-#: src/main.c:445
+#: src/main.c:434
 msgid "       --spider                  don't download anything.\n"
-msgstr "       --spider               hiçbir şey indirilmez (araştırma kipi).\n"
+msgstr ""
+"       --spider               hiçbir şey indirilmez (araştırma kipi).\n"
 
-#: src/main.c:447
+#: src/main.c:436
 msgid "  -T,  --timeout=SECONDS         set all timeout values to SECONDS.\n"
 msgstr "  -T,  --timeout=SÜRE         saniye cinsinden zamanaşımı SÜREsi.\n"
 
-#: src/main.c:449
+#: src/main.c:438
 msgid "       --dns-timeout=SECS        set the DNS lookup timeout to SECS.\n"
-msgstr "       --dns-timeout=SÜRE      saniye cinsinden isim çözümleme SÜREsi.\n"
+msgstr ""
+"       --dns-timeout=SÜRE      saniye cinsinden isim çözümleme SÜREsi.\n"
 
-#: src/main.c:451
+#: src/main.c:440
 msgid "       --connect-timeout=SECS    set the connect timeout to SECS.\n"
-msgstr "       --connect-timeout=SÜRE saniye cinsinden bağlantı zamanaşımı SÜREsi\n"
+msgstr ""
+"       --connect-timeout=SÜRE saniye cinsinden bağlantı zamanaşımı SÜREsi\n"
 
-#: src/main.c:453
+#: src/main.c:442
 msgid "       --read-timeout=SECS       set the read timeout to SECS.\n"
-msgstr "       --read-timeout=SÜRE    saniye cinsinden okuma zamanaşımı SÜREsi\n"
+msgstr ""
+"       --read-timeout=SÜRE    saniye cinsinden okuma zamanaşımı SÜREsi\n"
 
-#: src/main.c:455
+#: src/main.c:444
 msgid "  -w,  --wait=SECONDS            wait SECONDS between retrievals.\n"
 msgstr ""
 "  -w,  --wait=SÜRE            saniye cinsinden alımlar arasındaki bekleme\n"
 "                              SÜREsi\n"
 
-#: src/main.c:457
-msgid "       --waitretry=SECONDS       wait 1..SECONDS between retries of a retrieval.\n"
+#: src/main.c:446
+msgid ""
+"       --waitretry=SECONDS       wait 1..SECONDS between retries of a "
+"retrieval.\n"
 msgstr ""
 "       --waitretry=BSÜRE      saniye cinsinden alımın yinelenmesini bekleme\n"
 "                              SÜREsi\n"
 
-#: src/main.c:459
-msgid "       --random-wait             wait from 0...2*WAIT secs between retrievals.\n"
+#: src/main.c:448
+msgid ""
+"       --random-wait             wait from 0...2*WAIT secs between "
+"retrievals.\n"
 msgstr ""
-"       --random-wait          alımlar arasında 0 ile 2*BSÜRE saniye arasında\n"
+"       --random-wait          alımlar arasında 0 ile 2*BSÜRE saniye "
+"arasında\n"
 "                              bekleme yapar.\n"
 
-#: src/main.c:461
-msgid "  -Y,  --proxy                   explicitly turn on proxy.\n"
-msgstr "  -Y,  --proxy                vekili etkinleştirir.\n"
-
-#: src/main.c:463
+#: src/main.c:450
 msgid "       --no-proxy                explicitly turn off proxy.\n"
 msgstr "       --no-proxy             vekil kullanılmaz.\n"
 
-#: src/main.c:465
+#: src/main.c:452
 msgid "  -Q,  --quota=NUMBER            set retrieval quota to NUMBER.\n"
 msgstr "  -Q,  --quota=SAYI           alım kotasını SAYIya ayarlar.\n"
 
-#: src/main.c:467
-msgid "       --bind-address=ADDRESS    bind to ADDRESS (hostname or IP) on local host.\n"
+#: src/main.c:454
+msgid ""
+"       --bind-address=ADDRESS    bind to ADDRESS (hostname or IP) on local "
+"host.\n"
 msgstr ""
 "       --bind-address=ADRES   makinenizin adresi (isim ya da IP) olarak bu\n"
 "                              ADRES gösterilir.\n"
 
-#: src/main.c:469
+#: src/main.c:456
 msgid "       --limit-rate=RATE         limit download rate to RATE.\n"
 msgstr "       --limit-rate=HIZ         indirme HIZ sınırı.\n"
 
-#: src/main.c:471
+#: src/main.c:458
 msgid "       --no-dns-cache            disable caching DNS lookups.\n"
 msgstr "       --no-dns-cache         isim çözümlemesi kayıtları tutulmaz.\n"
 
-#: src/main.c:473
-msgid "       --restrict-file-names=OS  restrict chars in file names to ones OS allows.\n"
+#: src/main.c:460
+msgid ""
+"       --restrict-file-names=OS  restrict chars in file names to ones OS "
+"allows.\n"
 msgstr ""
 "       --restrict-file-names=İŞLETİM-SİSTEMİ\n"
 "                              dosya ismi uzunluğunu İŞLETİM-SİSTEMİnin izin\n"
 "                              verdiği uzunluğa ayarlar.\n"
 
-#: src/main.c:476
+#: src/main.c:462
+#, fuzzy
+msgid ""
+"       --ignore-case             ignore case when matching files/"
+"directories.\n"
+msgstr ""
+"       --ignore-length        `Content-Length' başlık alanı yoksayılır.\n"
+
+#: src/main.c:465
 msgid "  -4,  --inet4-only              connect only to IPv4 addresses.\n"
 msgstr "  -4,  --inet4-only           sadece IPv4 adreslere bağlanılır.\n"
 
-#: src/main.c:478
+#: src/main.c:467
 msgid "  -6,  --inet6-only              connect only to IPv6 addresses.\n"
 msgstr "  -6,  --inet6-only           sadece IPv6 adreslere bağlanılır.\n"
 
-#: src/main.c:480
+#: src/main.c:469
 msgid ""
-"       --prefer-family=FAMILY    connect first to addresses of specified family,\n"
+"       --prefer-family=FAMILY    connect first to addresses of specified "
+"family,\n"
 "                                 one of IPv6, IPv4, or none.\n"
 msgstr ""
-"       --prefer-family=AİLE   ilk bağlantı belirtilen AİLEdeki adrese yapılır.\n"
+"       --prefer-family=AİLE   ilk bağlantı belirtilen AİLEdeki adrese "
+"yapılır.\n"
 "                              IPv6, IPv4 ya da none belirtilebilir.\n"
 
-#: src/main.c:484
+#: src/main.c:473
 msgid "       --user=USER               set both ftp and http user to USER.\n"
 msgstr ""
 "       --user=İSİM            ftp ve http kullanıcı ismi olarak bu İSİM\n"
 "                              kullanılır.\n"
 
-#: src/main.c:486
-msgid "       --password=PASS           set both ftp and http password to PASS.\n"
+#: src/main.c:475
+msgid ""
+"       --password=PASS           set both ftp and http password to PASS.\n"
 msgstr ""
 "       --password=PAROLA      ftp ve http kullanıcı parolası olarak bu\n"
 "                              PAROLA kullanılır.\n"
 
-#: src/main.c:490
+#: src/main.c:479
 msgid "Directories:\n"
 msgstr "Dizinler:\n"
 
-#: src/main.c:492
+#: src/main.c:481
 msgid "  -nd, --no-directories           don't create directories.\n"
 msgstr "  -nd, --no-directories    dizin oluşturulmaz.\n"
 
-#: src/main.c:494
+#: src/main.c:483
 msgid "  -x,  --force-directories        force creation of directories.\n"
 msgstr "  -x,  --force-directories mutlaka dizin oluşturulur.\n"
 
-#: src/main.c:496
+#: src/main.c:485
 msgid "  -nH, --no-host-directories      don't create host directories.\n"
 msgstr ""
 "  -nH, --no-host-directories\n"
 "                           karşı tarafın dizin yapısına uyulmaz.\n"
 
-#: src/main.c:498
+#: src/main.c:487
 msgid "       --protocol-directories     use protocol name in directories.\n"
 msgstr ""
 "       --protocol-directories\n"
 "                           dizinlerde protokol ismi kullanılır.\n"
 
-#: src/main.c:500
+#: src/main.c:489
 msgid "  -P,  --directory-prefix=PREFIX  save files to PREFIX/...\n"
-msgstr "  -P,  --directory-prefix=DİZİN  dosyalar belirtilen DİZİN altına kaydedilir.\n"
+msgstr ""
+"  -P,  --directory-prefix=DİZİN  dosyalar belirtilen DİZİN altına "
+"kaydedilir.\n"
 
-#: src/main.c:502
-msgid "       --cut-dirs=NUMBER          ignore NUMBER remote directory components.\n"
-msgstr "       --cut-dirs=SAYI        belirtilen SAYIda uzak dizin bileşeni yoksayılır\n"
+#: src/main.c:491
+msgid ""
+"       --cut-dirs=NUMBER          ignore NUMBER remote directory "
+"components.\n"
+msgstr ""
+"       --cut-dirs=SAYI        belirtilen SAYIda uzak dizin bileşeni "
+"yoksayılır\n"
 
-#: src/main.c:506
+#: src/main.c:495
 msgid "HTTP options:\n"
 msgstr "HTTP seçenekleri:\n"
 
-#: src/main.c:508
+#: src/main.c:497
 msgid "       --http-user=USER        set http user to USER.\n"
 msgstr "       --http-user=İSİM       http kullanıcı İSMİ.\n"
 
-#: src/main.c:510
+#: src/main.c:499
 msgid "       --http-password=PASS    set http password to PASS.\n"
 msgstr "       --http-password=PAROLA http kullanıcı PAROLASI.\n"
 
-#: src/main.c:512
+#: src/main.c:501
 msgid "       --no-cache              disallow server-cached data.\n"
-msgstr "       --no-cache             sunucu-arabellekli veriye izin verilmez.\n"
+msgstr ""
+"       --no-cache             sunucu-arabellekli veriye izin verilmez.\n"
 
-#: src/main.c:514
-msgid "  -E,  --html-extension        save HTML documents with `.html' extension.\n"
-msgstr "  -E,  --html-extension       HTML belgeler `.html' uzantılı kaydedilir.\n"
+#: src/main.c:503
+msgid ""
+"  -E,  --html-extension        save HTML documents with `.html' extension.\n"
+msgstr ""
+"  -E,  --html-extension       HTML belgeler `.html' uzantılı kaydedilir.\n"
 
-#: src/main.c:516
+#: src/main.c:505
 msgid "       --ignore-length         ignore `Content-Length' header field.\n"
-msgstr "       --ignore-length        `Content-Length' başlık alanı yoksayılır.\n"
+msgstr ""
+"       --ignore-length        `Content-Length' başlık alanı yoksayılır.\n"
 
-#: src/main.c:518
+#: src/main.c:507
 msgid "       --header=STRING         insert STRING among the headers.\n"
 msgstr "       --header=DİZGE         başlık yerine DİZGE konur.\n"
 
-#: src/main.c:520
+#: src/main.c:509
+msgid "       --max-redirect          maximum redirections allowed per page.\n"
+msgstr ""
+
+#: src/main.c:511
 msgid "       --proxy-user=USER       set USER as proxy username.\n"
 msgstr "       --proxy-user=İSİM      vekil kullanıcı İSMİ.\n"
 
-#: src/main.c:522
+#: src/main.c:513
 msgid "       --proxy-password=PASS   set PASS as proxy password.\n"
 msgstr ""
 "       --proxy-password=PAROLA\n"
 "                              vekil kullanıcı PAROLASI.\n"
 
-#: src/main.c:524
-msgid "       --referer=URL           include `Referer: URL' header in HTTP request.\n"
+#: src/main.c:515
+msgid ""
+"       --referer=URL           include `Referer: URL' header in HTTP "
+"request.\n"
 msgstr ""
 "       --referer=ADRES        HTTP isteğinde `Referer: ADRES' başlığı\n"
 "                              kullanılır.\n"
 
-#: src/main.c:526
+#: src/main.c:517
 msgid "       --save-headers          save the HTTP headers to file.\n"
 msgstr "       --save-headers         HTTP başlıkları dosyaya kaydedilir.\n"
 
-#: src/main.c:528
-msgid "  -U,  --user-agent=AGENT      identify as AGENT instead of Wget/VERSION.\n"
+#: src/main.c:519
+msgid ""
+"  -U,  --user-agent=AGENT      identify as AGENT instead of Wget/VERSION.\n"
 msgstr "  -U,  --user-agent=AJAN      Wget/SÜRÜM yerine AJAN kullanılır.\n"
 
-#: src/main.c:530
-msgid "       --no-http-keep-alive    disable HTTP keep-alive (persistent connections).\n"
-msgstr "       --no-http-keep-alive   HTTP keep-alive (sürekli bağlantı) iptal edilir.\n"
+#: src/main.c:521
+msgid ""
+"       --no-http-keep-alive    disable HTTP keep-alive (persistent "
+"connections).\n"
+msgstr ""
+"       --no-http-keep-alive   HTTP keep-alive (sürekli bağlantı) iptal "
+"edilir.\n"
 
-#: src/main.c:532
+#: src/main.c:523
 msgid "       --no-cookies            don't use cookies.\n"
 msgstr "       --no-cookies           çerezler kullanılmaz.\n"
 
-#: src/main.c:534
+#: src/main.c:525
 msgid "       --load-cookies=FILE     load cookies from FILE before session.\n"
-msgstr "       --load-cookies=DOSYA   çerezler oturumdan önce DOSYAdan yüklenir.\n"
+msgstr ""
+"       --load-cookies=DOSYA   çerezler oturumdan önce DOSYAdan yüklenir.\n"
 
-#: src/main.c:536
+#: src/main.c:527
 msgid "       --save-cookies=FILE     save cookies to FILE after session.\n"
-msgstr "       --save-cookies=DOSYA   çerezler oturumdan sonra DOSYAya kaydedilir.\n"
+msgstr ""
+"       --save-cookies=DOSYA   çerezler oturumdan sonra DOSYAya kaydedilir.\n"
 
-#: src/main.c:538
-msgid "       --keep-session-cookies  load and save session (non-permanent) cookies.\n"
-msgstr "       --keep-session-cookies çerezleri sadece oturum için yükler ve kaydeder\n"
+#: src/main.c:529
+msgid ""
+"       --keep-session-cookies  load and save session (non-permanent) "
+"cookies.\n"
+msgstr ""
+"       --keep-session-cookies çerezleri sadece oturum için yükler ve "
+"kaydeder\n"
 
-#: src/main.c:540
-msgid "       --post-data=STRING      use the POST method; send STRING as the data.\n"
+#: src/main.c:531
+msgid ""
+"       --post-data=STRING      use the POST method; send STRING as the "
+"data.\n"
 msgstr ""
 "       --post-data=DİZGE      POST yöntemi kullanılır; veri olarak DİZGE\n"
 "                              gönderilir.\n"
 
-#: src/main.c:542
-msgid "       --post-file=FILE        use the POST method; send contents of FILE.\n"
+#: src/main.c:533
+msgid ""
+"       --post-file=FILE        use the POST method; send contents of FILE.\n"
 msgstr ""
 "       --post-file=DOSYA      POST yöntemi kullanılır; veri olarak DOSYA\n"
 "                              içeriği gönderilir\n"
 
-#: src/main.c:547
+#: src/main.c:535
+msgid ""
+"       --content-disposition   honor the Content-Disposition header when\n"
+"                               choosing local file names (EXPERIMENTAL).\n"
+msgstr ""
+
+#: src/main.c:538
+msgid ""
+"       --auth-no-challenge     Send Basic HTTP authentication information\n"
+"                               without first waiting for the server's\n"
+"                               challenge.\n"
+msgstr ""
+
+#: src/main.c:545
 msgid "HTTPS (SSL/TLS) options:\n"
 msgstr "HTTPS (SSL/TLS) seçenekleri:\n"
 
-#: src/main.c:549
+#: src/main.c:547
 msgid ""
 "       --secure-protocol=PR     choose secure protocol, one of auto, SSLv2,\n"
 "                                SSLv3, and TLSv1.\n"
 msgstr ""
 "       --secure-protocol=PR   güvenlik protokolü belirtilir;\n"
-"                               auto, SSLv2, SSLv3 veya TLSv1 belirtilebilir.\n"
+"                               auto, SSLv2, SSLv3 veya TLSv1 "
+"belirtilebilir.\n"
 
-#: src/main.c:552
-msgid "       --no-check-certificate   don't validate the server's certificate.\n"
+#: src/main.c:550
+msgid ""
+"       --no-check-certificate   don't validate the server's certificate.\n"
 msgstr "       --no-check-certificate sunucu sertifikası doğrulatılmaz.\n"
 
-#: src/main.c:554
+#: src/main.c:552
 msgid "       --certificate=FILE       client certificate file.\n"
 msgstr "       --certificate=DOSYA    istemci sertifika DOSYAsı.\n"
 
-#: src/main.c:556
+#: src/main.c:554
 msgid "       --certificate-type=TYPE  client certificate type, PEM or DER.\n"
 msgstr "       --certificate-type=TÜR istemci sertifika TÜRü; PEM veya DER.\n"
 
-#: src/main.c:558
+#: src/main.c:556
 msgid "       --private-key=FILE       private key file.\n"
 msgstr "       --private-key=DOSYA    gizli anahtar DOSYAsı.\n"
 
-#: src/main.c:560
+#: src/main.c:558
 msgid "       --private-key-type=TYPE  private key type, PEM or DER.\n"
 msgstr "       --private-key-type=TÜR gizli anahtar TÜRü; PEM veya DER.\n"
 
-#: src/main.c:562
+#: src/main.c:560
 msgid "       --ca-certificate=FILE    file with the bundle of CA's.\n"
-msgstr "       --ca-certificate=DOSYA sertifika yetkilisinin (CA) bohçası için DOSYA.\n"
+msgstr ""
+"       --ca-certificate=DOSYA sertifika yetkilisinin (CA) bohçası için "
+"DOSYA.\n"
+
+#: src/main.c:562
+msgid ""
+"       --ca-directory=DIR       directory where hash list of CA's is "
+"stored.\n"
+msgstr ""
+"       --ca-directory=DİZİN   sertifika yetkilisinin (CA) çırpılarının "
+"yeri.\n"
 
 #: src/main.c:564
-msgid "       --ca-directory=DIR       directory where hash list of CA's is stored.\n"
-msgstr "       --ca-directory=DİZİN   sertifika yetkilisinin (CA) çırpılarının yeri.\n"
-
-#: src/main.c:566
-msgid "       --random-file=FILE       file with random data for seeding the SSL PRNG.\n"
+msgid ""
+"       --random-file=FILE       file with random data for seeding the SSL "
+"PRNG.\n"
 msgstr ""
 "       --random-file=DOSYA    SSL PRNG'sini tohumlamak için rasgele veri\n"
 "                              içeren DOSYA.\n"
 
-#: src/main.c:568
-msgid "       --egd-file=FILE          file naming the EGD socket with random data.\n"
+#: src/main.c:566
+msgid ""
+"       --egd-file=FILE          file naming the EGD socket with random "
+"data.\n"
 msgstr ""
 "       --egd-file=DOSYA       EGD soketini isimlendirmek için rasgele veri\n"
 "                              içeren DOSYA.\n"
 
-#: src/main.c:573
+#: src/main.c:571
 msgid "FTP options:\n"
 msgstr "FTP seçenekleri:\n"
 
-#: src/main.c:575
+#: src/main.c:573
 msgid "       --ftp-user=USER         set ftp user to USER.\n"
 msgstr "       --ftp-user=İSİM        ftp kullanıcı İSMİ.\n"
 
-#: src/main.c:577
+#: src/main.c:575
 msgid "       --ftp-password=PASS     set ftp password to PASS.\n"
 msgstr "       --ftp-password=PAROLA  ftp kullanıcı PAROLAsı.\n"
 
-#: src/main.c:579
+#: src/main.c:577
 msgid "       --no-remove-listing     don't remove `.listing' files.\n"
 msgstr "       --no-remove-listing    `.listing' uzantılı dosyalar silinmez.\n"
 
-#: src/main.c:581
+#: src/main.c:579
 msgid "       --no-glob               turn off FTP file name globbing.\n"
-msgstr "       --no-glob              FTP dosya ismi arama kalıpları kullanılmaz.\n"
+msgstr ""
+"       --no-glob              FTP dosya ismi arama kalıpları kullanılmaz.\n"
 
-#: src/main.c:583
+#: src/main.c:581
 msgid "       --no-passive-ftp        disable the \"passive\" transfer mode.\n"
 msgstr "       --no-passive-ftp       \"passive\" aktarım kipini iptal eder.\n"
 
-#: src/main.c:585
-msgid "       --retr-symlinks         when recursing, get linked-to files (not dir).\n"
+#: src/main.c:583
+msgid ""
+"       --retr-symlinks         when recursing, get linked-to files (not "
+"dir).\n"
 msgstr ""
 "       --retr-symlinks        alt dizinlerdeki sembolik bağlı dosyalar\n"
 "                              (dizinler değil) alınır.\n"
 
-#: src/main.c:587
+#: src/main.c:585
 msgid "       --preserve-permissions  preserve remote file permissions.\n"
 msgstr "       --preserve-permissions uzak dosya izinleri korunur.\n"
 
-#: src/main.c:591
+#: src/main.c:589
 msgid "Recursive download:\n"
 msgstr "Ne varsa indirme seçenekleri:\n"
 
-#: src/main.c:593
+#: src/main.c:591
 msgid "  -r,  --recursive          specify recursive download.\n"
 msgstr "  -r,  --recursive            ne varsa indirilir.\n"
 
-#: src/main.c:595
-msgid "  -l,  --level=NUMBER       maximum recursion depth (inf or 0 for infinite).\n"
+#: src/main.c:593
+msgid ""
+"  -l,  --level=NUMBER       maximum recursion depth (inf or 0 for "
+"infinite).\n"
 msgstr ""
 "  -l,  --level=SAYI           inilecek azami dizin derinliği\n"
 "                              (sonsuz için inf veya 0 belirtin).\n"
 
-#: src/main.c:597
-msgid "       --delete-after       delete files locally after downloading them.\n"
+#: src/main.c:595
+msgid ""
+"       --delete-after       delete files locally after downloading them.\n"
 msgstr ""
 "       --delete-after       indirilen dosyaları indirdikten sonra siler.\n"
 "                            (tabii ki yerel)\n"
 
-#: src/main.c:599
-msgid "  -k,  --convert-links      make links in downloaded HTML point to local files.\n"
+#: src/main.c:597
+msgid ""
+"  -k,  --convert-links      make links in downloaded HTML point to local "
+"files.\n"
 msgstr ""
 "  -k,  --convert-links        sembolik bağlar değil bağ ismiyle hedefin\n"
 "                              içeriği indirilir.\n"
 
-#: src/main.c:601
-msgid "  -K,  --backup-converted   before converting file X, back up as X.orig.\n"
+#: src/main.c:599
+msgid ""
+"  -K,  --backup-converted   before converting file X, back up as X.orig.\n"
 msgstr ""
 "  -K,  --backup-converted     dosyayı dönüştürmeden önce .orig uzantılı\n"
 "                              yedeğini alır.\n"
 
-#: src/main.c:603
-msgid "  -m,  --mirror             shortcut for -N -r -l inf --no-remove-listing.\n"
-msgstr "  -m,  --mirror             -N -r -l inf--no-remove-listing için kısayol.\n"
+#: src/main.c:601
+msgid ""
+"  -m,  --mirror             shortcut for -N -r -l inf --no-remove-listing.\n"
+msgstr ""
+"  -m,  --mirror             -N -r -l inf--no-remove-listing için kısayol.\n"
 
-#: src/main.c:605
-msgid "  -p,  --page-requisites    get all images, etc. needed to display HTML page.\n"
+#: src/main.c:603
+msgid ""
+"  -p,  --page-requisites    get all images, etc. needed to display HTML "
+"page.\n"
 msgstr ""
 "  -p,  --page-requisites    HTML sayfada gösterilmesi gerekli herşeyi\n"
 "                            (resimler, v.s.) indirir.\n"
 
-#: src/main.c:607
-msgid "       --strict-comments    turn on strict (SGML) handling of HTML comments.\n"
-msgstr "       --strict-comments      HTML açıklama alanlarında belirtime uyulur.\n"
+#: src/main.c:605
+msgid ""
+"       --strict-comments    turn on strict (SGML) handling of HTML "
+"comments.\n"
+msgstr ""
+"       --strict-comments      HTML açıklama alanlarında belirtime uyulur.\n"
 
-#: src/main.c:611
+#: src/main.c:609
 msgid "Recursive accept/reject:\n"
 msgstr "Ne varsa indirmede kabul/red seçenekleri:\n"
 
-#: src/main.c:613
-msgid "  -A,  --accept=LIST               comma-separated list of accepted extensions.\n"
+#: src/main.c:611
+msgid ""
+"  -A,  --accept=LIST               comma-separated list of accepted "
+"extensions.\n"
 msgstr ""
-"  -A,  --accept=LISTE         izin verilecek dosya uzatılarının virgül ayraçlı\n"
+"  -A,  --accept=LISTE         izin verilecek dosya uzatılarının virgül "
+"ayraçlı\n"
+"                              listesi\n"
+
+#: src/main.c:613
+msgid ""
+"  -R,  --reject=LIST               comma-separated list of rejected "
+"extensions.\n"
+msgstr ""
+"  -R,  --reject=LISTE         reddedilecek dosya uzatılarının virgül "
+"ayraçlı\n"
 "                              listesi\n"
 
 #: src/main.c:615
-msgid "  -R,  --reject=LIST               comma-separated list of rejected extensions.\n"
+msgid ""
+"  -D,  --domains=LIST              comma-separated list of accepted "
+"domains.\n"
 msgstr ""
-"  -R,  --reject=LISTE         reddedilecek dosya uzatılarının virgül ayraçlı\n"
+"  -D,  --domains=LISTE        izin verilecek alan isimlerinin virgül "
+"ayraçlı\n"
 "                              listesi\n"
 
 #: src/main.c:617
-msgid "  -D,  --domains=LIST              comma-separated list of accepted domains.\n"
-msgstr ""
-"  -D,  --domains=LISTE        izin verilecek alan isimlerinin virgül ayraçlı\n"
-"                              listesi\n"
-
-#: src/main.c:619
-msgid "       --exclude-domains=LIST      comma-separated list of rejected domains.\n"
+msgid ""
+"       --exclude-domains=LIST      comma-separated list of rejected "
+"domains.\n"
 msgstr ""
 "       --exclude-domains=LISTE\n"
 "                              reddedilecek alan isimlerinin virgül ayraçlı\n"
 "                              listesi\n"
 
-#: src/main.c:621
-msgid "       --follow-ftp                follow FTP links from HTML documents.\n"
+#: src/main.c:619
+msgid ""
+"       --follow-ftp                follow FTP links from HTML documents.\n"
 msgstr "       --follow-ftp           HTML belgelerdeki FTP bağları izlenir.\n"
 
-#: src/main.c:623
-msgid "       --follow-tags=LIST          comma-separated list of followed HTML tags.\n"
+#: src/main.c:621
+msgid ""
+"       --follow-tags=LIST          comma-separated list of followed HTML "
+"tags.\n"
 msgstr ""
 "       --follow-tags=LISTE    izin verilen HTML etiketlerinin virgül\n"
 "                              ayraçlı listesi.\n"
 
-#: src/main.c:625
-msgid "       --ignore-tags=LIST          comma-separated list of ignored HTML tags.\n"
+#: src/main.c:623
+msgid ""
+"       --ignore-tags=LIST          comma-separated list of ignored HTML "
+"tags.\n"
 msgstr ""
 "       --ignore-tags=LISTE    yoksayılacak HTML etiketlerinin virgül\n"
 "                              ayraçlı listesi.\n"
 
-#: src/main.c:627
-msgid "  -H,  --span-hosts                go to foreign hosts when recursive.\n"
-msgstr "  -H,  --span-hosts        rastlandıkça başka makinelerdekilerde alınır.\n"
+#: src/main.c:625
+msgid ""
+"  -H,  --span-hosts                go to foreign hosts when recursive.\n"
+msgstr ""
+"  -H,  --span-hosts        rastlandıkça başka makinelerdekilerde alınır.\n"
 
-#: src/main.c:629
+#: src/main.c:627
 msgid "  -L,  --relative                  follow relative links only.\n"
 msgstr "  -L,  --relative          sadece göreli bağlar izlenir.\n"
 
-#: src/main.c:631
+#: src/main.c:629
 msgid "  -I,  --include-directories=LIST  list of allowed directories.\n"
 msgstr ""
 "  -I,  --include-directories=LISTE\n"
 "                           izin verilen dizinlerin listesi.\n"
 
-#: src/main.c:633
+#: src/main.c:631
 msgid "  -X,  --exclude-directories=LIST  list of excluded directories.\n"
 msgstr ""
 "  -X,  --exclude-directories=LISTE\n"
 "                           dışlanacak dizinlerin listesi.\n"
 
-#: src/main.c:635
-msgid "  -np, --no-parent                 don't ascend to the parent directory.\n"
+#: src/main.c:633
+msgid ""
+"  -np, --no-parent                 don't ascend to the parent directory.\n"
 msgstr "  -np, --no-parent         üst dizine çıkılmaz.\n"
 
-#: src/main.c:639
+#: src/main.c:637
 msgid "Mail bug reports and suggestions to <bug-wget@gnu.org>.\n"
 msgstr ""
 "Yazılım hatalarını ve önerilerinizi <bug-wget@gnu.org> adresine\n"
 "çeviri hatalarını   <gnu-tr@belgeler.org>  adresine bildiriniz.\n"
 
-#: src/main.c:644
+#: src/main.c:642
 #, c-format
 msgid "GNU Wget %s, a non-interactive network retriever.\n"
 msgstr "GNU Wget %s, bir etkileşimsiz dosya/dizin indirme aracı.\n"
 
-#: src/main.c:658
-msgid "Copyright (C) 2005 Free Software Foundation, Inc.\n"
+#: src/main.c:682
+#, fuzzy
+msgid "Copyright (C) 2008 Free Software Foundation, Inc.\n"
 msgstr "Telif Hakkı © 2005 Free Software Foundation, Inc.\n"
 
-#: src/main.c:660
+#: src/main.c:684
 msgid ""
-"This program is distributed in the hope that it will be useful,\n"
-"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-"GNU General Public License for more details.\n"
+"License GPLv3+: GNU GPL version 3 or later\n"
+"<http://www.gnu.org/licenses/gpl.html>.\n"
+"This is free software: you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
-"Bu program faydalı olacağı umularak dağıtılmaktadır. Hiçbir\n"
-"GARANTİSİ YOKTUR;  SATILABİLİRLİĞİ hatta HERHANGİ BİR AMACA\n"
-"UYGUNLUĞU  için bile garanti verilmez.  Ayrıntılar için GNU\n"
-"Genel Kamu Lisansına bakınız.\n"
 
-#: src/main.c:665
+#: src/main.c:689
 msgid ""
 "\n"
 "Originally written by Hrvoje Niksic <hniksic@xemacs.org>.\n"
@@ -1408,96 +1575,122 @@ msgstr ""
 "\n"
 "Özgün olarak Hrvoje Niksic <hniksic@xemacs.org> tarafından yazıldı.\n"
 
+#: src/main.c:691
+msgid "Currently maintained by Micah Cowan <micah@cowan.name>.\n"
+msgstr ""
+
 #. #### Something nicer should be printed here -- similar to the
 #. pre-1.5 `--help' page.
-#: src/main.c:711 src/main.c:780 src/main.c:859
+#: src/main.c:738 src/main.c:807 src/main.c:919
 #, c-format
 msgid "Try `%s --help' for more options.\n"
 msgstr "Daha fazla seçenek için `%s --help' yazın.\n"
 
-#: src/main.c:777
+#: src/main.c:804
 #, c-format
 msgid "%s: illegal option -- `-n%c'\n"
 msgstr "%s: seçenek uygun değil -- `-n%c'\n"
 
-#: src/main.c:830
+#: src/main.c:859
 #, c-format
 msgid "Can't be verbose and quiet at the same time.\n"
 msgstr "Hem çok detaylı hem de sessiz olmaz.\n"
 
-#: src/main.c:836
+#: src/main.c:865
 #, c-format
 msgid "Can't timestamp and not clobber old files at the same time.\n"
 msgstr "Eski dosyaları hem zaman damgalamak hem de dokunmamak olmaz.\n"
 
-#: src/main.c:844
+#: src/main.c:873
 #, c-format
 msgid "Cannot specify both --inet4-only and --inet6-only.\n"
 msgstr "Hem --inet4-only hem de --inet6-only olmaz.\n"
 
+#: src/main.c:883
+msgid ""
+"Cannot specify both -k and -O if multiple URLs are given, or in combination\n"
+"with -p or -r. See the manual for details.\n"
+"\n"
+msgstr ""
+
+#: src/main.c:892
+msgid ""
+"WARNING: combining -O with -r or -p will mean that all downloaded content\n"
+"will be placed in the single file you specified.\n"
+"\n"
+msgstr ""
+
+#: src/main.c:898
+msgid ""
+"WARNING: timestamping does nothing in combination with -O. See the manual\n"
+"for details.\n"
+"\n"
+msgstr ""
+
 #. No URL specified.
-#: src/main.c:854
+#: src/main.c:914
 #, c-format
 msgid "%s: missing URL\n"
 msgstr "%s: URL kayıp\n"
 
-#: src/main.c:963
+#: src/main.c:1040
 #, c-format
 msgid "No URLs found in %s.\n"
 msgstr "%s de URL yok.\n"
 
-#: src/main.c:972
-#, c-format
+#: src/main.c:1058
+#, fuzzy, c-format
 msgid ""
-"\n"
 "FINISHED --%s--\n"
-"Downloaded: %s bytes in %d files\n"
+"Downloaded: %d files, %s in %s (%s)\n"
 msgstr ""
 "\n"
 "BİTTİ --%s--\n"
 "İndirilen: %s bayt, %d dosya\n"
 
-#: src/main.c:979
-#, c-format
-msgid "Download quota (%s bytes) EXCEEDED!\n"
+#: src/main.c:1067
+#, fuzzy, c-format
+msgid "Download quota of %s EXCEEDED!\n"
 msgstr "İndirme kotası (%s bayt) AŞILDI! \n"
 
-#: src/mswindows.c:235
+#: src/mswindows.c:99
 #, c-format
 msgid "Continuing in background.\n"
 msgstr "Ardalanda sürüyor.\n"
 
-#: src/mswindows.c:427
+#: src/mswindows.c:292
 #, c-format
 msgid "Continuing in background, pid %lu.\n"
 msgstr "İşlem PID %lu ile artalanda sürüyor.\n"
 
-#: src/mswindows.c:429 src/utils.c:351
+#: src/mswindows.c:294 src/utils.c:331
 #, c-format
 msgid "Output will be written to `%s'.\n"
 msgstr "Çıktı `%s'e yazılmış olacak.\n"
 
-#: src/mswindows.c:597 src/mswindows.c:604
+#: src/mswindows.c:462 src/mswindows.c:469
 #, c-format
 msgid "%s: Couldn't find usable socket driver.\n"
 msgstr "%s: Kullanılabilir soket sürücü bulunamadı.\n"
 
-#: src/netrc.c:385
+#: src/netrc.c:376
 #, c-format
 msgid "%s: %s:%d: warning: \"%s\" token appears before any machine name\n"
-msgstr "%s: %s:%d: uyarı: herhangi bir makina isminden önce \"%s\" dizgeciği görünüyor\n"
+msgstr ""
+"%s: %s:%d: uyarı: herhangi bir makina isminden önce \"%s\" dizgeciği "
+"görünüyor\n"
 
-#: src/netrc.c:416
+#: src/netrc.c:407
 #, c-format
 msgid "%s: %s:%d: unknown token \"%s\"\n"
 msgstr "%s: %s:%d: bilinmeyen dizgecik \"%s\"\n"
 
-#: src/netrc.c:480
+#: src/netrc.c:471
 #, c-format
 msgid "Usage: %s NETRC [HOSTNAME]\n"
 msgstr "Kullanım: %s NETRC [MAKİNA-ADI]\n"
 
-#: src/netrc.c:490
+#: src/netrc.c:481
 #, c-format
 msgid "%s: cannot stat %s: %s\n"
 msgstr "%s: %s durumlanamadı: %s\n"
@@ -1506,98 +1699,131 @@ msgstr "%s: %s durumlanamadı: %s\n"
 #. nor EGD were available.  Try to seed OpenSSL's PRNG with libc
 #. PRNG.  This is cryptographically weak and defeats the purpose
 #. of using OpenSSL, which is why it is highly discouraged.
-#: src/openssl.c:121
+#: src/openssl.c:114
 msgid "WARNING: using a weak random seed.\n"
 msgstr "DİKKAT: rasgele sayı üreteci yeterli değil.\n"
 
-#: src/openssl.c:181
+#: src/openssl.c:174
 msgid "Could not seed PRNG; consider using --random-file.\n"
 msgstr "Rasgele sayı üreteci tohumlanamadı; --random-file kullanılabilir.\n"
 
 #. If the user has specified --no-check-cert, we still want to warn
 #. him about problems with the server's certificate.
-#: src/openssl.c:419
+#: src/openssl.c:489
 msgid "ERROR"
 msgstr "HATA"
 
-#: src/openssl.c:419
+#: src/openssl.c:489
 msgid "WARNING"
 msgstr "DİKKAT"
 
-#: src/openssl.c:427
+#: src/openssl.c:498
 #, c-format
 msgid "%s: No certificate presented by %s.\n"
 msgstr "%s: %s tarafından sunulun böyle bir sertifika yok.\n"
 
-#: src/openssl.c:458
-#, c-format
-msgid "%s: Certificate verification error for %s: %s\n"
-msgstr "%s: %s için sertifika doğrulama hatası: %s\n"
+#: src/openssl.c:519
+#, fuzzy, c-format
+msgid "%s: cannot verify %s's certificate, issued by `%s':\n"
+msgstr "%s: %s tarafından sunulun böyle bir sertifika yok.\n"
 
-#: src/openssl.c:485
-#, c-format
-msgid "%s: certificate common name `%s' doesn't match requested host name `%s'.\n"
-msgstr "%s: sertifikadaki isim (`%s') istenen makine ismiyle (`%s') uyuşmuyor.\n"
+#: src/openssl.c:527
+msgid "  Unable to locally verify the issuer's authority.\n"
+msgstr ""
 
-#: src/openssl.c:498
+#: src/openssl.c:531
+msgid "  Self-signed certificate encountered.\n"
+msgstr ""
+
+#: src/openssl.c:534
+msgid "  Issued certificate not yet valid.\n"
+msgstr ""
+
+#: src/openssl.c:537
+msgid "  Issued certificate has expired.\n"
+msgstr ""
+
+#: src/openssl.c:569
+#, c-format
+msgid ""
+"%s: certificate common name `%s' doesn't match requested host name `%s'.\n"
+msgstr ""
+"%s: sertifikadaki isim (`%s') istenen makine ismiyle (`%s') uyuşmuyor.\n"
+
+#: src/openssl.c:582
 #, c-format
 msgid "To connect to %s insecurely, use `--no-check-certificate'.\n"
-msgstr "%s adresine güvenliği gözardı ederek bağlanmak için `--no-check-certificate' seçeneğini kullanın.\n"
+msgstr ""
+"%s adresine güvenliği gözardı ederek bağlanmak için `--no-check-certificate' "
+"seçeneğini kullanın.\n"
 
 #. Align the [ skipping ... ] line with the dots.  To do
 #. that, insert the number of spaces equal to the number of
 #. digits in the skipped amount in K.
 #: src/progress.c:243
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "\n"
-"%*s[ skipping %dK ]"
+"%*s[ skipping %sK ]"
 msgstr ""
 "\n"
 "%*s[ %dK atlanıyor ]"
 
-#: src/progress.c:410
+#: src/progress.c:457
 #, c-format
 msgid "Invalid dot style specification `%s'; leaving unchanged.\n"
 msgstr "`%s' gösterge türü geçersiz; değiştirilmedi.\n"
 
+#. Translation note: "ETA" is English-centric, but this must
+#. be short, ideally 3 chars.  Abbreviate if necessary.
+#: src/progress.c:806
+#, c-format
+msgid "  eta %s"
+msgstr ""
+
+#. Note to translators: this should not take up more room than
+#. available here.  Abbreviate if necessary.
+#: src/progress.c:1051
+msgid "   in "
+msgstr ""
+
 #. If no clock was found, it means that clock_getres failed for
 #. the realtime clock.
-#: src/ptimer.c:176
+#: src/ptimer.c:161
 #, c-format
 msgid "Cannot get REALTIME clock frequency: %s\n"
 msgstr "RTC saptanamadı: %s\n"
 
-#: src/recur.c:377
+#: src/recur.c:380
 #, c-format
 msgid "Removing %s since it should be rejected.\n"
 msgstr "Reddedileceğinden %s kaldırılıyor.\n"
 
-#: src/res.c:394
+#: src/res.c:393
 #, c-format
 msgid "Cannot open %s: %s"
 msgstr "%s açılamıyor: %s"
 
-#: src/res.c:544
+#: src/res.c:545
 msgid "Loading robots.txt; please ignore errors.\n"
 msgstr "robots.txt yükleniyor; lütfen hataları yoksayın.\n"
 
-#: src/retr.c:645
+#: src/retr.c:653
 #, c-format
 msgid "Error parsing proxy URL %s: %s.\n"
 msgstr "Vekil URLsi %s çözümlenirken hata: %s\n"
 
-#: src/retr.c:653
+#: src/retr.c:661
 #, c-format
 msgid "Error in proxy URL %s: Must be HTTP.\n"
 msgstr "Vekil URLsi %s: HTTP olmalı.\n"
 
-#: src/retr.c:740
+#: src/retr.c:747
 #, c-format
 msgid "%d redirections exceeded.\n"
 msgstr "%d yönlendirme geçildi.\n"
 
-#: src/retr.c:865
+#: src/retr.c:882
 msgid ""
 "Giving up.\n"
 "\n"
@@ -1605,7 +1831,7 @@ msgstr ""
 "Vazgeçiliyor.\n"
 "\n"
 
-#: src/retr.c:865
+#: src/retr.c:882
 msgid ""
 "Retrying.\n"
 "\n"
@@ -1613,53 +1839,105 @@ msgstr ""
 "Tekrarlanıyor.\n"
 "\n"
 
-#: src/url.c:626
+#: src/spider.c:75
+msgid ""
+"Found no broken links.\n"
+"\n"
+msgstr ""
+
+#: src/spider.c:82
+#, c-format
+msgid ""
+"Found %d broken link.\n"
+"\n"
+msgid_plural ""
+"Found %d broken links.\n"
+"\n"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/spider.c:92
+#, c-format
+msgid "%s\n"
+msgstr ""
+
+#: src/url.c:621
 msgid "No error"
 msgstr "Hata yok"
 
-#: src/url.c:628
+#: src/url.c:623
 msgid "Unsupported scheme"
 msgstr "Şema desteklenmiyor"
 
-#: src/url.c:630
+#: src/url.c:625
 msgid "Invalid host name"
 msgstr "Makine ismi geçersiz"
 
-#: src/url.c:632
+#: src/url.c:627
 msgid "Bad port number"
 msgstr "Port numarası hatalı"
 
-#: src/url.c:634
+#: src/url.c:629
 msgid "Invalid user name"
 msgstr "Kullanıcı ismi geçersiz"
 
-#: src/url.c:636
+#: src/url.c:631
 msgid "Unterminated IPv6 numeric address"
 msgstr "IPv6 sayısal adresi sonlandırılmamış"
 
-#: src/url.c:638
+#: src/url.c:633
 msgid "IPv6 addresses not supported"
 msgstr "IPv6 adresler desteklenmiyor"
 
-#: src/url.c:640
+#: src/url.c:635
 msgid "Invalid IPv6 numeric address"
 msgstr "IPv6 sayısal adresi geçersiz"
 
 #. parent, no error
-#: src/utils.c:349
+#: src/utils.c:329
 #, c-format
 msgid "Continuing in background, pid %d.\n"
 msgstr "Ardalanda sürüyor, pid %d.\n"
 
-#: src/utils.c:397
+#: src/utils.c:377
 #, c-format
 msgid "Failed to unlink symlink `%s': %s\n"
 msgstr "`%s' sembolik bağ asıl dosyaya dönüştürülürken başarısız: %s\n"
 
-#: src/xmalloc.c:72
+#: src/xmalloc.c:64
 #, c-format
 msgid "%s: %s: Failed to allocate %ld bytes; memory exhausted.\n"
 msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir.\n"
+
+#~ msgid "Error in Set-Cookie, field `%s'"
+#~ msgstr "Set-Cookie, `%s' alanında hata"
+
+#~ msgid "%s (%s) - Connection closed at byte %s/%s. "
+#~ msgstr "%s (%s) -  %s/%s baytta bağlantı kesildi. "
+
+#~ msgid ""
+#~ "%s: %s: Invalid extended boolean `%s';\n"
+#~ "use one of `on', `off', `always', or `never'.\n"
+#~ msgstr ""
+#~ "%s: %s: `%s' mantıken geçersiz;\n"
+#~ "`always', `on', `off' veya `never' kullanın.\n"
+
+#~ msgid "  -Y,  --proxy                   explicitly turn on proxy.\n"
+#~ msgstr "  -Y,  --proxy                vekili etkinleştirir.\n"
+
+#~ msgid ""
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ msgstr ""
+#~ "Bu program faydalı olacağı umularak dağıtılmaktadır. Hiçbir\n"
+#~ "GARANTİSİ YOKTUR;  SATILABİLİRLİĞİ hatta HERHANGİ BİR AMACA\n"
+#~ "UYGUNLUĞU  için bile garanti verilmez.  Ayrıntılar için GNU\n"
+#~ "Genel Kamu Lisansına bakınız.\n"
+
+#~ msgid "%s: Certificate verification error for %s: %s\n"
+#~ msgstr "%s: %s için sertifika doğrulama hatası: %s\n"
 
 #~ msgid "Failed writing to proxy: %s.\n"
 #~ msgstr "Vekile yazılamadı: %s.\n"
@@ -1747,7 +2025,8 @@ msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir
 #~ "  -nv, --non-verbose          turn off verboseness, without being quiet.\n"
 #~ "  -i,  --input-file=FILE      download URLs found in FILE.\n"
 #~ "  -F,  --force-html           treat input file as HTML.\n"
-#~ "  -B,  --base=URL             prepends URL to relative links in -F -i file.\n"
+#~ "  -B,  --base=URL             prepends URL to relative links in -F -i "
+#~ "file.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Oturum açma ve girdi dosyası:\n"
@@ -1765,13 +2044,17 @@ msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir
 
 #~ msgid ""
 #~ "Download:\n"
-#~ "  -t,  --tries=NUMBER           set number of retries to NUMBER (0 unlimits).\n"
+#~ "  -t,  --tries=NUMBER           set number of retries to NUMBER (0 "
+#~ "unlimits).\n"
 #~ "       --retry-connrefused      retry even if connection is refused.\n"
 #~ "  -O   --output-document=FILE   write documents to FILE.\n"
-#~ "  -nc, --no-clobber             don't clobber existing files or use .# suffixes.\n"
-#~ "  -c,  --continue               resume getting a partially-downloaded file.\n"
+#~ "  -nc, --no-clobber             don't clobber existing files or use .# "
+#~ "suffixes.\n"
+#~ "  -c,  --continue               resume getting a partially-downloaded "
+#~ "file.\n"
 #~ "       --progress=TYPE          select progress gauge type.\n"
-#~ "  -N,  --timestamping           don't re-retrieve files unless newer than local.\n"
+#~ "  -N,  --timestamping           don't re-retrieve files unless newer than "
+#~ "local.\n"
 #~ "  -S,  --server-response        print server response.\n"
 #~ "       --spider                 don't download anything.\n"
 #~ "  -T,  --timeout=SECONDS        set all timeout values to SECONDS.\n"
@@ -1779,41 +2062,52 @@ msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir
 #~ "       --connect-timeout=SECS   set the connect timeout to SECS.\n"
 #~ "       --read-timeout=SECS      set the read timeout to SECS.\n"
 #~ "  -w,  --wait=SECONDS           wait SECONDS between retrievals.\n"
-#~ "       --waitretry=SECONDS      wait 1...SECONDS between retries of a retrieval.\n"
-#~ "       --random-wait            wait from 0...2*WAIT secs between retrievals.\n"
+#~ "       --waitretry=SECONDS      wait 1...SECONDS between retries of a "
+#~ "retrieval.\n"
+#~ "       --random-wait            wait from 0...2*WAIT secs between "
+#~ "retrievals.\n"
 #~ "  -Y,  --proxy=on/off           turn proxy on or off.\n"
 #~ "  -Q,  --quota=NUMBER           set retrieval quota to NUMBER.\n"
-#~ "       --bind-address=ADDRESS   bind to ADDRESS (hostname or IP) on local host.\n"
+#~ "       --bind-address=ADDRESS   bind to ADDRESS (hostname or IP) on local "
+#~ "host.\n"
 #~ "       --limit-rate=RATE        limit download rate to RATE.\n"
 #~ "       --dns-cache=off          disable caching DNS lookups.\n"
-#~ "       --restrict-file-names=OS restrict chars in file names to ones OS allows.\n"
+#~ "       --restrict-file-names=OS restrict chars in file names to ones OS "
+#~ "allows.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "İndirme:\n"
 #~ "  -t,  --tries=SAYI             tekrar SAYIsı (0 sınırsız).\n"
 #~ "       --retry-connrefused      bağlantı reddedilse bile dener.\n"
 #~ "  -O   --output-document=DOSYA  belgeleri DOSYAya yazar.\n"
-#~ "  -nc, --no-clobber             mevcut dosyaların üstüne yazılmaz ve .# öneki\n"
+#~ "  -nc, --no-clobber             mevcut dosyaların üstüne yazılmaz ve .# "
+#~ "öneki\n"
 #~ "                                kullanılır.\n"
 #~ "  -c,  --continue               yarım kalan bir dosyaya devam edilir.\n"
 #~ "       --progress=TÜRÜ          işlemin gösterge türü belirtilir.\n"
-#~ "  -N,  --timestamping           yerel dosyadan daha eskiyse işleme başlamaz.\n"
+#~ "  -N,  --timestamping           yerel dosyadan daha eskiyse işleme "
+#~ "başlamaz.\n"
 #~ "  -S,  --server-response        sunucu cevabını gösterir.\n"
 #~ "       --spider                 hiçbir şey indirilmez.\n"
 #~ "  -T,  --timeout=SANİYE         okuma SANİYE sonra zamanaşımına uğrar.\n"
-#~ "       --dns-timeout=SANİYE     DNS araması SANİYE sonra zamanaşımına uğrar.\n"
-#~ "       --connect-timeout=SANİYE bağlantı SANİYE sonra zamanaşımına uğrar.\n"
+#~ "       --dns-timeout=SANİYE     DNS araması SANİYE sonra zamanaşımına "
+#~ "uğrar.\n"
+#~ "       --connect-timeout=SANİYE bağlantı SANİYE sonra zamanaşımına "
+#~ "uğrar.\n"
 #~ "       --read-timeout=SANİYE    okuma SANİYE sonra zamanaşımına uğrar.\n"
-#~ "  -w,  --wait=SANİYE            işlemler arasında 1...SANİYE kadar bekler.\n"
+#~ "  -w,  --wait=SANİYE            işlemler arasında 1...SANİYE kadar "
+#~ "bekler.\n"
 #~ "       --waitretry=SANİYE       işlem tekrarları arasında SANİYE bekler\n"
-#~ "       --random-wait            işlemler arasında 0...2*WAIT saniye bekler.\n"
+#~ "       --random-wait            işlemler arasında 0...2*WAIT saniye "
+#~ "bekler.\n"
 #~ "  -Y,  --proxy=on/off           vekil bağlantısını açar ya da kapatır.\n"
 #~ "  -Q,  --quota=SAYI             işlem kotasını SAYIya ayarlar.\n"
 #~ "       --bind-address=ADRES     ADRESe (makina adı ya da IP) bağlanır.\n"
 #~ "       --limit-rate=HIZ         indirme HIZını sınırlar.\n"
 #~ "       --dns-cache=off          önbellekleyen DNS aramaları kapatılır.\n"
 #~ "       --restrict-file-names=unix|windows\n"
-#~ "                                dosya isimleri işletim sistemine uygun alınır\n"
+#~ "                                dosya isimleri işletim sistemine uygun "
+#~ "alınır\n"
 #~ "                                 (unix dosya isimlerinde tüm karakterler\n"
 #~ "                                kullanılabilir).\n"
 #~ "\n"
@@ -1824,7 +2118,8 @@ msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir
 #~ "  -x,  --force-directories         force creation of directories.\n"
 #~ "  -nH, --no-host-directories       don't create host directories.\n"
 #~ "  -P,  --directory-prefix=PREFIX   save files to PREFIX/...\n"
-#~ "       --cut-dirs=NUMBER           ignore NUMBER remote directory components.\n"
+#~ "       --cut-dirs=NUMBER           ignore NUMBER remote directory "
+#~ "components.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Dizinler:\n"
@@ -1839,20 +2134,25 @@ msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir
 #~ "HTTP options:\n"
 #~ "       --http-user=USER      set http user to USER.\n"
 #~ "       --http-passwd=PASS    set http password to PASS.\n"
-#~ "  -C,  --cache=on/off        (dis)allow server-cached data (normally allowed).\n"
-#~ "  -E,  --html-extension      save all text/html documents with .html extension.\n"
+#~ "  -C,  --cache=on/off        (dis)allow server-cached data (normally "
+#~ "allowed).\n"
+#~ "  -E,  --html-extension      save all text/html documents with .html "
+#~ "extension.\n"
 #~ "       --ignore-length       ignore `Content-Length' header field.\n"
 #~ "       --header=STRING       insert STRING among the headers.\n"
 #~ "       --proxy-user=USER     set USER as proxy username.\n"
 #~ "       --proxy-passwd=PASS   set PASS as proxy password.\n"
-#~ "       --referer=URL         include `Referer: URL' header in HTTP request.\n"
+#~ "       --referer=URL         include `Referer: URL' header in HTTP "
+#~ "request.\n"
 #~ "  -s,  --save-headers        save the HTTP headers to file.\n"
 #~ "  -U,  --user-agent=AGENT    identify as AGENT instead of Wget/VERSION.\n"
-#~ "       --no-http-keep-alive  disable HTTP keep-alive (persistent connections).\n"
+#~ "       --no-http-keep-alive  disable HTTP keep-alive (persistent "
+#~ "connections).\n"
 #~ "       --cookies=off         don't use cookies.\n"
 #~ "       --load-cookies=FILE   load cookies from FILE before session.\n"
 #~ "       --save-cookies=FILE   save cookies to FILE after session.\n"
-#~ "       --post-data=STRING    use the POST method; send STRING as the data.\n"
+#~ "       --post-data=STRING    use the POST method; send STRING as the "
+#~ "data.\n"
 #~ "       --post-file=FILE      use the POST method; send contents of FILE.\n"
 #~ "\n"
 #~ msgstr ""
@@ -1864,15 +2164,19 @@ msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir
 #~ "       --header=DiZGE         başlıkların arasına DiZGEyi yerleştirir.\n"
 #~ "       --proxy-user=KULLANICI Vekil makina için KULLANICI.\n"
 #~ "       --proxy-passwd=PAROLA  Vekil makina için PAROLA.\n"
-#~ "       --referer=URL          http isteğinde `Referer: URL' başlığını içerir.\n"
+#~ "       --referer=URL          http isteğinde `Referer: URL' başlığını "
+#~ "içerir.\n"
 #~ "  -s,  --save-headers         HTTP başlıklarını dosyaya kaydeder.\n"
-#~ "  -U,  --user-agent=İSTEMCİ   Wget/SÜRÜM yerine İSTEMCİ olarak tanıtılır.\n"
+#~ "  -U,  --user-agent=İSTEMCİ   Wget/SÜRÜM yerine İSTEMCİ olarak "
+#~ "tanıtılır.\n"
 #~ "       --no-http-keep-alive   HTTP sürekli bağlantısı etkisizleştirilir.\n"
 #~ "       --cookies=off          çerezler kabul edilmez.\n"
 #~ "       --load-cookies=DOSYA   çerezler oturum öncesi DOSYAdan yüklenir.\n"
 #~ "       --save-cookies=DOSYA   çerezler oturum sonrası DOSYAya yazılır.\n"
-#~ "       --post-data=DİZGE      POST yöntemi ile veri olarak DIZGE gönderilir.\n"
-#~ "       --post-file=DOSYA      POST yöntemi ile içerik DOSYAya gönderilir.\n"
+#~ "       --post-data=DİZGE      POST yöntemi ile veri olarak DIZGE "
+#~ "gönderilir.\n"
+#~ "       --post-file=DOSYA      POST yöntemi ile içerik DOSYAya "
+#~ "gönderilir.\n"
 #~ "\n"
 
 #~ msgid ""
@@ -1882,7 +2186,8 @@ msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir
 #~ "       --egd-file=FILE        file name of the EGD socket.\n"
 #~ "       --sslcadir=DIR         dir where hash list of CA's are stored.\n"
 #~ "       --sslcafile=FILE       file with bundle of CA's\n"
-#~ "       --sslcerttype=0/1      Client-Cert type 0=PEM (default) / 1=ASN1 (DER)\n"
+#~ "       --sslcerttype=0/1      Client-Cert type 0=PEM (default) / 1=ASN1 "
+#~ "(DER)\n"
 #~ "       --sslcheckcert=0/1     Check the server cert agenst given CA\n"
 #~ "       --sslprotocol=0-3      choose SSL protocol; 0=automatic,\n"
 #~ "                              1=SSLv2 2=SSLv3 3=TLSv1\n"
@@ -1906,12 +2211,14 @@ msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir
 #~ "  -nr, --dont-remove-listing   don't remove `.listing' files.\n"
 #~ "  -g,  --glob=on/off           turn file name globbing on or off.\n"
 #~ "       --passive-ftp           use the \"passive\" transfer mode.\n"
-#~ "       --retr-symlinks         when recursing, get linked-to files (not dirs).\n"
+#~ "       --retr-symlinks         when recursing, get linked-to files (not "
+#~ "dirs).\n"
 #~ "\n"
 #~ msgstr ""
 #~ "FTP seçenekleri:\n"
 #~ "  -nr, --dont-remove-listing   `.listing' dosyaları silinmez.\n"
-#~ "  -g,  --glob=on/off           dosya ismi genellemelerini  açar ya da kapar.\n"
+#~ "  -g,  --glob=on/off           dosya ismi genellemelerini  açar ya da "
+#~ "kapar.\n"
 #~ "       --passive-ftp           \"pasif\" aktarım kipi kullanılır.\n"
 #~ "       --retr-symlinks         özyineleme sırasında, dizinlere değil,\n"
 #~ "                               dosyalara bağı olanlar alınır.\n"
@@ -1920,55 +2227,77 @@ msgstr "%s: %s: %ld baytı ayırmak mümkün olmadı; bellek tükenmiş olabilir
 #~ msgid ""
 #~ "Recursive retrieval:\n"
 #~ "  -r,  --recursive          recursive download.\n"
-#~ "  -l,  --level=NUMBER       maximum recursion depth (inf or 0 for infinite).\n"
+#~ "  -l,  --level=NUMBER       maximum recursion depth (inf or 0 for "
+#~ "infinite).\n"
 #~ "       --delete-after       delete files locally after downloading them.\n"
 #~ "  -k,  --convert-links      convert non-relative links to relative.\n"
 #~ "  -K,  --backup-converted   before converting file X, back up as X.orig.\n"
-#~ "  -m,  --mirror             shortcut option equivalent to -r -N -l inf -nr.\n"
-#~ "  -p,  --page-requisites    get all images, etc. needed to display HTML page.\n"
-#~ "       --strict-comments    turn on strict (SGML) handling of HTML comments.\n"
+#~ "  -m,  --mirror             shortcut option equivalent to -r -N -l inf -"
+#~ "nr.\n"
+#~ "  -p,  --page-requisites    get all images, etc. needed to display HTML "
+#~ "page.\n"
+#~ "       --strict-comments    turn on strict (SGML) handling of HTML "
+#~ "comments.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Özyinelemeli işlemler:\n"
-#~ "  -r,  --recursive            özyinelemeli web-emme -- dikkatli kullanın!.\n"
-#~ "  -l,  --level=SAYI           en çok özyineleme derinliği (0 veya inf:sınırsız).\n"
+#~ "  -r,  --recursive            özyinelemeli web-emme -- dikkatli "
+#~ "kullanın!.\n"
+#~ "  -l,  --level=SAYI           en çok özyineleme derinliği (0 veya inf:"
+#~ "sınırsız).\n"
 #~ "       --delete-after         indirdikten sonra yerel dosyaları siler.\n"
 #~ "  -k,  --convert-links        göreceli olmayan bağları göreceli yapar.\n"
 #~ "  -K,  --backup-converted     X dosyasını çevirmeden önce X.orig olarak\n"
 #~ "                              kopyalar\n"
-#~ "  -m,  --mirror               -r -N -l inf -nr seçenekleri için kısaltma.\n"
-#~ "  -p,  --page-requisites      HTML sayfasının gösterilebilmesi için gerekli\n"
+#~ "  -m,  --mirror               -r -N -l inf -nr seçenekleri için "
+#~ "kısaltma.\n"
+#~ "  -p,  --page-requisites      HTML sayfasının gösterilebilmesi için "
+#~ "gerekli\n"
 #~ "                              tüm resim dosyalarını alır.\n"
 #~ "       --strict-comments      HTML açıklamalarını SGML uyumlu yapar.\n"
 #~ "\n"
 
 #~ msgid ""
 #~ "Recursive accept/reject:\n"
-#~ "  -A,  --accept=LIST                comma-separated list of accepted extensions.\n"
-#~ "  -R,  --reject=LIST                comma-separated list of rejected extensions.\n"
-#~ "  -D,  --domains=LIST               comma-separated list of accepted domains.\n"
-#~ "       --exclude-domains=LIST       comma-separated list of rejected domains.\n"
-#~ "       --follow-ftp                 follow FTP links from HTML documents.\n"
-#~ "       --follow-tags=LIST           comma-separated list of followed HTML tags.\n"
-#~ "  -G,  --ignore-tags=LIST           comma-separated list of ignored HTML tags.\n"
+#~ "  -A,  --accept=LIST                comma-separated list of accepted "
+#~ "extensions.\n"
+#~ "  -R,  --reject=LIST                comma-separated list of rejected "
+#~ "extensions.\n"
+#~ "  -D,  --domains=LIST               comma-separated list of accepted "
+#~ "domains.\n"
+#~ "       --exclude-domains=LIST       comma-separated list of rejected "
+#~ "domains.\n"
+#~ "       --follow-ftp                 follow FTP links from HTML "
+#~ "documents.\n"
+#~ "       --follow-tags=LIST           comma-separated list of followed HTML "
+#~ "tags.\n"
+#~ "  -G,  --ignore-tags=LIST           comma-separated list of ignored HTML "
+#~ "tags.\n"
 #~ "  -H,  --span-hosts                 go to foreign hosts when recursive.\n"
 #~ "  -L,  --relative                   follow relative links only.\n"
 #~ "  -I,  --include-directories=LIST   list of allowed directories.\n"
 #~ "  -X,  --exclude-directories=LIST   list of excluded directories.\n"
-#~ "  -np, --no-parent                  don't ascend to the parent directory.\n"
+#~ "  -np, --no-parent                  don't ascend to the parent "
+#~ "directory.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Özyinelemeli kabul/red:\n"
-#~ "  -A,  --accept=LİSTE               kabul edilen uzantıların virgüllü LİSTEsi\n"
-#~ "  -R,  --reject=LİSTE               reddedilen uzantıların virgüllü LİSTEsi.\n"
-#~ "  -D,  --domains=LİSTE              kabul edilen alanların virgüllü LİSTEsi.\n"
-#~ "       --exclude-domains=LİSTE      reddedilen alanların virgüllü LİSTEsi.\n"
+#~ "  -A,  --accept=LİSTE               kabul edilen uzantıların virgüllü "
+#~ "LİSTEsi\n"
+#~ "  -R,  --reject=LİSTE               reddedilen uzantıların virgüllü "
+#~ "LİSTEsi.\n"
+#~ "  -D,  --domains=LİSTE              kabul edilen alanların virgüllü "
+#~ "LİSTEsi.\n"
+#~ "       --exclude-domains=LİSTE      reddedilen alanların virgüllü "
+#~ "LİSTEsi.\n"
 #~ "       --follow-ftp                 HTML belgelerdeki FTP bağları izler.\n"
 #~ "       --follow-tags=LİSTE          izlenecek HTML adreslerinin virgüllü\n"
 #~ "                                    LİSTEsi\n"
-#~ "  -G,  --ignore-tags=LİSTE          izlenmeyecek HTML adreslerinin virgüllü\n"
+#~ "  -G,  --ignore-tags=LİSTE          izlenmeyecek HTML adreslerinin "
+#~ "virgüllü\n"
 #~ "                                    LİSTEsi\n"
-#~ "  -H,  --span-hosts                 özyinelerken diğer makinalara da gider.\n"
+#~ "  -H,  --span-hosts                 özyinelerken diğer makinalara da "
+#~ "gider.\n"
 #~ "  -L,  --relative                   sadece göreceli bağları izler.\n"
 #~ "  -i,  --include-directories=LİSTE  izin verilen dizinlerin LİSTEsi.\n"
 #~ "  -X,  --exclude-directories=LİSTE  dışlanan dizinlerin LİSTEsi.\n"

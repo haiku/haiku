@@ -1,0 +1,287 @@
+2008-04-26  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in, Test-proxied-https-auth.px: Added a test for
+	accessing password-protected HTTPS URLs through a proxy (via
+	CONNECT).
+
+2008-04-10  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in, Test-proxy-auth-basic.px: Added a test for
+	accessing password-protected URLs through a proxy.
+
+2008-01-25  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in: Updated copyright year.
+
+2007-11-28  Micah Cowan <micah@cowan.name>
+
+	* Makefile.in: Updated license exception for OpenSSL, per the
+	SFLC.
+
+2007-09-25  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in: Use EXEEXT instead of exeext.
+
+2007-08-21  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* WgetTest.pm.in: Added support for timestamping of pre-existing
+	files.
+
+	* Test-N-current.px: Fixed broken test logic.
+
+	* Makefile.in: Updated list of automatically run tests.
+
+	* Test-HTTP-Content-Disposition.px: Added -e contentdisposition=on
+	option, since now HTTP Content-Disposition header support is turned
+	off by default.
+
+	* Test-HTTP-Content-Disposition-1.px: Ditto.
+
+2007-08-10  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* Test--spider--no-content-disposition-trivial.px: Added new tests for
+	validation of HTTP Content-Disposition header support logic. In
+	particular, these tests check wget's behavior for every combination of
+	--spider [-r] and -e contentdisposition=on/off options.
+
+	* Test--spider-r-HTTP-Content-Disposition.px: Ditto.
+
+	* Test--spider-HTTP-Content-Disposition.px: Ditto.
+
+	* Test--spider--no-content-disposition.px: Ditto.
+
+	* Test--spider-r--no-content-disposition-trivial.px: Ditto.
+
+	* Test--spider-r--no-content-disposition.px: Ditto.
+
+2007-07-25  Micah Cowan  <micah@cowan.name>
+
+	* HTTPServer.pm (run, send_response): Farmed out some logic from
+	the run method into a separate one named send_response, which
+	was then modified to handle simple authentication testing.
+	(handle_auth): Added to handle simple authentication testing.
+	(verify_auth_basic): Checks to make sure Basic credentials are
+	valid.
+	(verify_auth_digest): Stub added; always fails test.
+	* Makefile.in: Added Test-auth-basic.px to list of automatically
+	run tests.
+	* Test-auth-basic: Simple basic authentication test; mainly just
+	lets the server do its testing. Its current purpose is just to
+	ensure that correct basic creds are sent, but never until a
+	challenge has been sent.
+
+2007-07-10  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* Test--no-content-disposition.px: Added new tests for validation of
+	HTTP Content-Disposition header support logic. In particular, these
+	tests check wget's behavior for every combination of -N/-O and -e
+	contentdisposition=on/off options.
+
+	* Test--no-content-disposition-trivial.px: Ditto.
+
+	* Test-N-HTTP-Content-Disposition.px: Ditto.
+
+	* Test-N--no-content-disposition.px: Ditto.
+
+	* Test-N--no-content-disposition-trivial.px: Ditto.
+
+	* Test-O-HTTP-Content-Disposition.px: Ditto.
+
+	* Test-O--no-content-disposition.px: Ditto.
+
+	* Test-O--no-content-disposition-trivial.px: Ditto.
+
+2007-07-05  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in:
+	Updated GPL reference to version 3 or later, removed FSF
+	address.
+
+2007-06-14  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* FTPServer.pm: Added FTP testing support.
+
+	* FTPTest.pm: Ditto.
+
+	* Test-ftp.px: Ditto.
+
+2006-12-22  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* HTTPTest.pm: Don't ignore initial '/' character in requested URLs.
+
+2006-11-10  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* Test-np.px: Added test for -np.
+
+	* HTTPTest.pm: Ignore initial '/' character in requested URLs.
+	
+2006-10-12  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* Test1.px: Renamed to Test-noop.px.
+
+	* Test-noop.px: Ditto.
+
+	* Test2.px: Renamed to Test-N.px.
+
+	* Test-N.px: Ditto.
+
+	* Test3.px: Renamed to Test-nonexisting-quiet.px.
+
+	* Test-nonexisting-quiet.px: Ditto.
+
+	* Test4.px: Renamed to Test-O-nonexisting.px.
+
+	* Test-O-nonexisting.px: Ditto.
+
+	* Test5.px: Renamed to Test-HTTP-Content-Disposition.px.
+	
+	* Test-HTTP-Content-Disposition.px: Ditto.
+	
+	* Test6.px: Renamed to Test-HTTP-Content-Disposition-1.px.
+	
+	* Test-HTTP-Content-Disposition-1.px: Ditto.
+	
+	* Test7.px: Renamed to Test-HTTP-Content-Disposition-2.px.
+
+	* Test-HTTP-Content-Disposition-2.px: Ditto.
+
+	* Test8.px: Replaced by Test--spider-r.px.
+
+	* Test9.px: Renamed to Test-Restrict-Lowercase.px.
+
+	* Test-Restrict-Lowercase.px: Ditto.
+
+	* Test10.px: Renamed to Test-Restrict-Uppercase.px.
+	
+	* Test-Restrict-Uppercase.px: Ditto.
+
+	* Test--spider.px: Added test for spider mode.
+	
+	* Test--spider-fail.px: Added failing test for spider mode.
+	
+	* Test--spider-r.px: Added test for recursive spider mode.
+
+	* Test-c.px: Added test for --continue mode.
+
+	* Test-c-full.px: Added test for --continue mode.
+
+	* Test-c-partial.px: Added test for --continue mode.
+
+	* Test-O.px: Added test for -O.
+
+	* Test-N-current.px: Added test for -N.
+	
+	* Test-N-old.px: Added test for -N.
+
+	* Test-E-k.px: Added test for -E -k.
+
+	* Test-E-k-K.px: Added test for -E -k -K.
+
+2006-08-17  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* HTTPServer.pm: Added support for Range header.
+
+2006-07-14  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* Test4.px: Fixed wrong expected behaviour.
+
+2006-06-13  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* Test9.px: Added test for --restrict-file-names=lowercase option.
+	
+	* Test10.px: Added test for --restrict-file-names=uppercase option.
+
+2006-05-26  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* HTTPServer.pm: Added synchronization between client and server
+	processes to prevent the test to start before the server is ready.
+
+	* HTTPTest.pm: Ditto.
+
+	* Test.pm: Ditto.
+
+	* Test1.px: Removed unneeded ../src/ from command line.
+
+	* Test2.px: Ditto.
+	
+	* Test3.px: Ditto.
+	
+	* Test4.px: Ditto.
+
+	* Test5.px: Ditto.
+
+	* Test6.px: Ditto.
+
+	* Test7.px: Ditto.
+
+	* Test8.px: Added test for recursive spider mode.
+
+2006-05-26  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* HTTPServer.pm: Fixed bug when returning 404. Improved logging. 
+
+	* Test.pm: Added support for command lines which use an absolute path
+	for the Wget binary.
+
+2006-04-28  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* Test5.px: Added test for HTTP Content-Disposition support.
+
+	* Test6.px: Ditto.
+	
+	* Test7.px: Ditto.
+
+2006-04-27  Mauro Tortonesi  <mauro@ferrara.linux.it>
+	
+	* HTTPServer.pm: Serve index.html if no filename is given.
+
+	* Test.pm: Added support for pre-existing files.
+	
+2006-01-24  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* HTTPServer.pm: Enhanced logging support.
+
+	* HTTPTest.pm: Updated to new test format.
+	
+	* Test.pm: Improved test setup, verification and cleanup. Major 
+	refactoring.
+	
+	* Test1.px: Updated to new test format.
+
+	* Test2.px: Updated to new test format.
+
+	* Test3.px: Added new test for quiet download of nonexistent URL.
+
+	* Test4.px: Added new test for quiet download of nonexistent URL with
+	--output-document option.
+	
+2005-12-05  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* HTTPServer.pm: Refactored as a subclass of HTTP::Daemon. 
+	Removed the old run method and renamed the old run_daemon 
+	method to run.  Added support for partial 
+	
+	* Testing.pm: Renamed to HTTPTest.pm.
+	
+	* HTTPTest.pm: Refactored as a subclass of Test.  Renamed 
+	Run_HTTP_Test to run, verify_download to _verify_download 
+	and added support for timestamp checking.
+
+	* Test.pm: Added Test class as the super class of every 
+	testcase.
+
+	* test1: Renamed to Test1.px.
+	
+	* Test1.px: Refactored as an instance of the HTTPTest class.
+	
+	* Test2.px: Added -N HTTP test.
+
+2005-11-02  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* HTTPServer.pm: Added basic support for HTTP testing.
+	
+	* Testing.pm: Added basic support for feature testing (only HTTP
+	testing is supported at the moment).
+
+	* test1: Added basic HTTP test.
+

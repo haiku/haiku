@@ -1,48 +1,33 @@
-                                                                -*- text -*-
+Mailing List
+================
 
-		      WGET-RELATED MAILING LISTS
+There are several Wget-related mailing lists.  The general discussion
+list is at <wget@sunsite.dk>.  It is the preferred place for support
+requests and suggestions, as well as for discussion of development.
+You are invited to subscribe.
 
-There are several mailing lists related to GNU Wget, all of them
-hosted by dotsrc.org, previously known as SunSITE.dk.
+   To subscribe, simply send mail to <wget-subscribe@sunsite.dk> and
+follow the instructions.  Unsubscribe by mailing to
+<wget-unsubscribe@sunsite.dk>.  The mailing list is archived at
+`http://www.mail-archive.com/wget%40sunsite.dk/' and at
+`http://news.gmane.org/gmane.comp.web.wget.general'.
 
-wget@sunsite.dk:
+   Another mailing list is at <wget-patches@sunsite.dk>, and is used to
+submit patches for review by Wget developers.  A "patch" is a textual
+representation of change to source code, readable by both humans and
+programs.  The file `PATCHES' that comes with Wget covers the creation
+and submitting of patches in detail.  Please don't send general
+suggestions or bug reports to `wget-patches'; use it only for patch
+submissions.
 
-    The mailing list for users and developers.  This is the preferred
-    place to post bug reports and suggestions, as well as discuss
-    development-related matters.
+   Subscription is the same as above for <wget@sunsite.dk>, except that
+you send to <wget-patches-subscribe@sunsite.dk>, instead.  The mailing
+list is archived at `http://news.gmane.org/gmane.comp.web.wget.patches'.
 
-    To post to the list, send mail to <wget@sunsite.dk>.  To
-    subscribe, send mail to <wget-subscribe@sunsite.dk>.
-
-    NOTE: The list allows posts from non-subscribers.  This is
-    intentional; I hate having to subscribe to a list only to ask a
-    single question.  However, to protect the list members from spam,
-    non-subscribers must confirm messages they send to the list.
-
-    If you're not subscribed to the list and ask something, don't
-    forget to request that the responses be Cc'ed to you.
-
-    The list is archived at:
-
-	http://www.mail-archive.com/wget%40sunsite.dk/
-        http://news.gmane.org/gmane.comp.web.wget.general
-
-wget-patches@sunsite.dk:
-
-    The mailing list for patch submission.  Please see the PATCHES
-    file for a detailed description of how to send patches to this
-    list.
-
-    This is list is also open to non-subscribers, but it is *not* a
-    discussion list.  It only ever distribute patches and immediate
-    responses to a patch.  If you wish to take very active part in
-    development, you might wish to subscribe to it anyway, and receive
-    the new patches.  To do that, send mail to
-    <wget-patches-subscribe@sunsite.dk>.
-
-    The list is archived at:
-
-        http://news.gmane.org/gmane.comp.web.wget.patches
-
-As of this writing, the mail alias <bug-wget@gnu.org> is an alias for
-<wget@sunsite.dk>.
+   Finally, there is the <wget-notify@addictivecode.org> mailing list.
+This is a non-discussion list that receives commit notifications from
+the source repository, and also bug report-change notifications.  This
+is the highest-traffic list for Wget, and is recommended only for
+people who are seriously interested in ongoing Wget development.
+Subscription is through the `mailman' interface at
+`http://addictivecode.org/mailman/listinfo/wget-notify'.

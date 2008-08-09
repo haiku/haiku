@@ -1,18 +1,293 @@
+2008-06-29  Micah Cowan  <micah@cowan.name>
+
+	* po/*.po: Sync with TP.
+
+2008-05-12  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in (dist): Create wget.pot first.
+
+	* NEWS: Translations and -N/-O.
+
+2008-04-30  Micah Cowan  <micah@cowan.name>
+
+	* NEWS: Added documentation for changes made in 1.11.2 so far.
+	* po/*.po: Sync with TP.
+
+2008-03-24  Micah Cowan  <micah@cowan.name>
+
+	* NEWS: Added documentation change re: --no-parents, and various
+	caveats on accept/reject lists behavior. Rearranged some items in
+	order of priority.
+	* po/*.po: Ensure synchronization with the TP, resync with
+	sources.
+
+2008-02-14  Micah Cowan  <micah@cowan.name>
+
+	* po/*.po: Updates from the Translation Project, resync with
+	sources.
+
+2008-02-10  Micah Cowan  <micah@cowan.name>
+
+	* NEWS: Added note re interrupted files resulting in renames,
+	and new --auth-no-challenge option.
+
+2008-02-06  Micah Cowan  <micah@cowan.name>
+
+	* configure.in (AC_CHECK_FUNCS): Added check for mbtowc.
+	* NEWS: Added notes regarding fixes for the localized progress
+	bar and --no-clobber wasted GET request.
+
+2008-02-03  Micah Cowan  <micah@cowan.name>
+
+	* configure.in: Add checks for wchar.h, wcwidth function (to
+	support column-counting in progress.c).
+	* NEWS: Added line for 1.11.1.
+
+2008-01-26  Micah Cowan  <micah@cowan.name>
+
+	* util/README, util/dist-wget, util/download-netscape.html,
+	util/download.html, util/update_po_files.sh, util/wget.spec:
+	Removed (obsolete and/or incomplete).
+	* DISTFILES: Removed the above entries from the dist.
+
+2008-01-25  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in, NEWS, README, autogen.sh, configure.bat,
+	configure.in, m4/wget.m4, po/POTFILES.in, util/Makefile.in,
+	util/dist-wget, util/rmold.pl: Update copyright year.
+	* DISTFILES: Added wget.pod, to avoid regeneration as a
+	dependency of wget.1, on systems that lack Perl.
+
+2007-12-14  Micah Cowan  <micah@cowan.name>
+
+	* po/cs.po, po/ja.po, po/nl.po, po/pt.po, po/sk.po: Updates from
+	the Translation Project.
+
+2007-12-10  Micah Cowan  <micah@cowan.name>
+
+	* NEWS: Removed developer-only notices (Autoconf, TODO, PATCHES,
+	GNUTLS).
+
+2007-12-06  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in, DISTFILES: Ensure that info and man pages are
+	included in the distribution.
+
+2007-12-05  Micah Cowan  <micah@cowan.name>
+
+	* NEWS: Reword warnings regarding --content-disposition.
+
+2007-11-28  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in, README, autogen.sh, configure.bat, configure.in,
+	m4/wget.m4, util/Makefile.in, util/dist-wget: Updated license
+	exception for OpenSSL, per the SFLC.
+
+2007-11-19  Micah Cowan  <micah@cowan.name>
+
+	* po/fi.po, po/hu.po, po/pt.po: Update from the Translation
+	Project.
+
+2007-11-08  Micah Cowan  <micah@cowan.name>
+
+	* po/be.po: Added new language support from the Translation
+	Project.
+	* DISTFILES: Added po/be.po.
+
+2007-10-30  Micah Cowan  <micah@cowan.name>
+
+	* po/it.po: Update from the Translation project.
+
+2007-10-24  Micah Cowan  <micah@schmendrick>
+
+	* po/vi.po, po/ga.po: Update from the Translation project.
+
+2007-10-23  Micah Cowan  <micah@schmendrick>
+
+	* po/de.po, po/ja.po: Update from the Translation Project.
+
+2007-10-22  Micah Cowan  <micah@cowan.name>
+
+	* po/*: Update from the Translation Project, and synced
+	against current source.
+
+2007-10-13  Micah Cowan  <micah@cowan.name>
+
+	* DISTFILES: Now hard-coded (just for 1.11; we use Automake for
+	1.12+.
+	* Makefile.in: Removed DISTFILES target, "make distclean" in
+	distdir (no Makefile is included in the distribution). Handle
+	".hg" dirs in addition to ".svn".
+
+2007-10-12  Micah Cowan  <micah@cowan.name>
+
+	* PATCHES: Removed.
+	* NEWS: Updated info about source repositories, removal of
+	PATCHES file.
+
+2007-10-03  Micah Cowan  <micah@cowan.name>
+
+	* NEWS: Note missing functionality from GnuTLS support. Call out
+	attention to content_disposition's experimental status.
+
+2007-09-25  Micah Cowan  <micah@cowan.name>
+
+	* configure.in: Remove unnecessary heuristic to generate exeext
+	variable, since AC_PROG_CC and others automatically set EXEEXT.
+	Pointed out by Steve Kenton <skenton@ou.edu>.
+
+2007-09-12  Micah Cowan  <micah@cowan.name>
+
+	* AUTHORS: Added... me...
+	* TODO: file removed, bugtracker is authoritative source for
+	planned changes.
+
+2007-08-26  Micah Cowan  <micah@cowan.name>
+
+	* po/POTFILES.in: Added spider.c.
+
+2007-08-24  Micah Cowan  <micah@cowan.name>
+
+	* po/no.po: removed; replaced by nb.po (per the translation
+	project coordinator, Benno Schulenberg).
+
+2007-08-22  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.in: Exclude .svn directories and below from
+	distribution.
+
+2007-08-09  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* m4/wget.m4 (WGET_PROCESS_PO, AM_PATH_PROG_WITH_TEST): Add
+	missing M4 quotation.  Delete serial number.
+
+2007-08-09  Micah Cowan  <micah@cowan.name>
+
+	* NEWS: Timestamping from most recent response.
+
+2007-08-08  Micah Cowan  <micah@cowan.name>
+
+	* NEWS: Call attention to the fact that Content-Disposition is
+	not enabled by default.
+
+2007-08-07  Micah Cowan  <micah@cowan.name>
+
+	* configure.in: Fix --with-libssl-prefix failure by replacing
+	usage of sh "if" statement with "AS_IF" macros, to force
+	AC_REQUIRE'd macros to be expanded before the conditional
+	statement body.
+	* NEWS: Note that configure.in now requires autoconf >= 2.61,
+	to support AS_IF and its expansion of AC_REQUIREs.
+
+2007-07-29  Micah Cowan  <micah@cowan.name>
+
+	* NEWS: No more auth before challenge. No more auth info in
+	Referer. New --max-redirect option.
+
+2007-07-09  Micah Cowan  <micah@cowan.name>
+
+	* README, util/wget.spec: Removed references to wget.sunsite.dk.
+
+2007-07-05  Micah Cowan  <micah@cowan.name>
+
+	* AUTHORS:
+	Draw attention to previous maintainers.
+
+	* autogen.sh, config.guess, config.sub, configure.bat:
+	* configure.in, m4/wget.m4, Makefile.in, util/dist-wget:
+	* util/Makefile.in, util/rmold.pl:
+	Updated GPL reference to version 3 or later, removed FSF
+	address.
+
+	* README:
+	Updated reference to maintainer, and updated GPL reference to
+	version 3 or later.
+
+	* COPYING:
+	Replaced with verson 3.
+
+2006-08-28  Noèl Köthe <noel@debian.org>
+
+	* Makefile.in: Fixed a DESTDIR-related bug.
+
+2006-07-17  Daniel Richard G.  <skunk@iSKUNK.ORG>
+
+	* Makefile.in: Added DESTDIR='$(DESTDIR)' to MAKEDEFS. 
+
+2006-07-14  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* configure.in: Check for intptr_t.
+
+2006-06-27  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: We're no longer using strtoimax.
+
+2006-02-28  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Check for memrchr.
+
+2005-11-19  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Check for uintptr_t.
+
+2005-11-02  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* Makefile.in: Improved support for unit testing.
+	
+	* configure.in: Ditto.
+	
+2005-10-27  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* Makefile.in: Added basic support for unit testing.
+	
 2005-08-26  Stepan Kasal  <kasal@ucw.cz>
 
-	* configure.in: Abort if --with-ssl given and OpenSSL unavailable.
+	* configure.in: Abort configure if --with-ssl given but SSL
+	unavailable.  Use HAVE_LIBSSL and HAVE_LIBGNUTLS symbols provided
+	by AC_LIB_HAVE_LINKFLAGS instead of inventing new ones.
 
 2005-08-11  Hrvoje Niksic  <hniksic@xemacs.org>
 
 	* configure.in: Check for strtoll and strtoimax.
 
+2005-07-08  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Remove -Wno-implicit from default GCC warning
+	flags.
+
+2005-07-08  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Don't check for symlink, which is expected to
+	exist.  Check for asprintf.
+
+2005-07-07  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.bat: Copy the common config.h and config-compiler.h.
+
+2005-07-06  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Don't check for setjmp.h.
+
+2005-07-06  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* Makefile.in: Also use @LIBGNUTLS@ to build LIBS.
+
 2005-07-05  Hrvoje Niksic  <hniksic@xemacs.org>
 
-	* configure.in: Check for timegm.
+	* configure.in: Add check for GnuTLS if --with-ssl=gnutls is used.
 
 2005-07-03  Hrvoje Niksic  <hniksic@xemacs.org>
 
 	* po/POTFILES.in: Include src/ptimer.c.
+
+2005-07-01  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Mention in message that the "GNU" md5
+	implementation is in fact built-in to Wget.
+
+2005-06-29  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* m4/wget.m4 (WGET_WITH_NLS): Don't check for locale.h.
 
 2005-06-29  Hrvoje Niksic  <hniksic@xemacs.org>
 
@@ -23,10 +298,77 @@
 
 	* configure.in: Require Autoconf 2.59.
 
-2005-06-27  Hrvoje Niksic  <hniksic@xemacs.org>
+2005-06-29  Hrvoje Niksic  <hniksic@xemacs.org>
 
-	* configure.in: Replace libtool with AC_LIB_HAVE_LINKFLAGS.
-	Modify makefiles accordingly.  (Imported from the trunk.)
+	* configure.in: Check for drand48.
+
+2005-06-26  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* m4/wget.m4: Use proper GPL header.
+
+2005-06-25  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* Makefile.in: No need to clean .libs.
+
+2005-06-25  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* Makefile.in (DISTFILES): Don't split the sed invocation across
+	several lines, Solaris make passes the backslashes to sed literally.
+
+2005-06-25  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* Makefile.in: Instead of creating configure.bat from
+	configure.bat.in, simply make sure the correct EOL style in
+	checked out of the repository.
+
+2005-06-24  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Move the large file check further up.  Only check
+	for endianness if GNU md5 is used (it being the only file that
+	needs endianness information).
+
+2005-06-24  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Don't indent #include lines.
+
+2005-06-24  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Enable the user to turn off SSL autodetection and
+	disable SSL using --without-ssl.
+
+	* Makefile.in ($(srcdir)/stamp-h.in): Remove the aclocal.m4
+	dependencies.
+
+2005-06-24  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Include m4/*.m4.
+
+	* aclocal.m4: Renamed to m4/wget.m4.
+
+2005-06-24  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Use AC_LIB_HAVE_LINKFLAGS instead of
+	AC_LIB_LINKFLAGS when checking for library functions.
+
+	* configure.in: Don't waste time checking for headers and
+	functions we know must be there.  But manually AC_DEFINE the
+	functions that might be missing from non-Unix systems.
+
+2005-06-23  Mauro Tortonesi  <mauro@ferrara.linux.it>
+
+	* libtool.m4, ltmain.sh: Deleted.
+
+	* configure.in: Replaced ugly libtool-based check for OpenSSL libs
+	with a simpler config.rpath-based approach.
+
+	* Makefile.in, src/Makefile.in: Removed libtool support.
+
+	* m4/lib-link.m4, m4/lib-prefix.m4, m4/lib-ld.m4, config.rpath:
+	config.rpath macros taken from gettext 0.14.5.
+
+2005-06-23  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Don't check for strpbrk and mktime.
 
 2005-06-23  Hrvoje Niksic  <hniksic@xemacs.org>
 
@@ -46,6 +388,15 @@
 
 2005-06-22  Hrvoje Niksic  <hniksic@xemacs.org>
 
+	* configure.in: Don't check for signal.h.  Remove the
+	AC_HEADER_TIME check.  Remove the test for ANSI C prototypes.
+
+2005-06-22  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Check for C99 conformant stdbool.h.
+
+2005-06-22  Hrvoje Niksic  <hniksic@xemacs.org>
+
 	* MAILING-LIST: Remove reference to the obsolete `wget-cvs'
 	mailing list.
 
@@ -53,11 +404,30 @@
 
 	* config.sub, config.guess: Updated from canonical location.
 
+2005-06-22  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Assume existence of gettimeofday and select.
+	gettimeofday exists on all platforms we care about (except for
+	Windows where Windows-specific functions are used instead), and
+	select exists virtually everywhere.
+
+	* configure.in: Assume existence of strerror, signal, strstr, and
+	memmove, which are all required by ANSI C.
+
 2005-06-21  Hrvoje Niksic  <hniksic@xemacs.org>
 
 	* Makefile.cvs: Renamed to Makefile.svn.
 
 	* README.cvs: Renamed to README.svn.
+
+2005-06-20  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* configure.in: Don't check for the return type of signal
+	handlers; C89 requires it to be void.
+
+2005-06-19  Hrvoje Niksic  <hniksic@xemacs.org>
+
+	* aclocal.m4: Remove support for K&R compilers.
 
 2005-05-10  Hrvoje Niksic  <hniksic@xemacs.org>
 

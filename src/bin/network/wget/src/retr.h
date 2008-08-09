@@ -1,11 +1,12 @@
 /* Declarations for retr.c.
-   Copyright (C) 1995, 1996, 1997 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,21 +15,28 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #ifndef RETR_H
 #define RETR_H
+
+/* These global vars should be made static to retr.c and exported via
+   functions! */
+extern SUM_SIZE_INT total_downloaded_bytes;
+extern double total_download_time;
+extern FILE *output_stream;
+extern bool output_stream_regular;
 
 /* Flags for fd_read_body. */
 enum {
@@ -36,33 +44,24 @@ enum {
   rb_skip_startpos = 2
 };
 
-int fd_read_body PARAMS ((int, FILE *, wgint, wgint, wgint *, wgint *, double *,
-                          int));
+int fd_read_body (int, FILE *, wgint, wgint, wgint *, wgint *, double *, int);
 
-typedef const char *(*hunk_terminator_t) PARAMS ((const char *, int, int));
+typedef const char *(*hunk_terminator_t) (const char *, const char *, int);
 
-char *fd_read_hunk PARAMS ((int, hunk_terminator_t, long, long));
-char *fd_read_line PARAMS ((int));
+char *fd_read_hunk (int, hunk_terminator_t, long, long);
+char *fd_read_line (int);
 
-uerr_t retrieve_url PARAMS ((const char *, char **, char **,
-			     const char *, int *));
-uerr_t retrieve_from_file PARAMS ((const char *, int, int *));
+uerr_t retrieve_url (const char *, char **, char **, const char *, int *, bool);
+uerr_t retrieve_from_file (const char *, bool, int *);
 
-char *retr_rate PARAMS ((wgint, double, int));
-double calc_rate PARAMS ((wgint, double, int *));
-void printwhat PARAMS ((int, int));
+const char *retr_rate (wgint, double);
+double calc_rate (wgint, double, int *);
+void printwhat (int, int);
 
-void sleep_between_retrievals PARAMS ((int));
+void sleep_between_retrievals (int);
 
-void rotate_backups PARAMS ((const char *));
+void rotate_backups (const char *);
 
-/* Because there's no http.h. */
-
-struct url;
-
-uerr_t http_loop PARAMS ((struct url *, char **, char **, const char *,
-			  int *, struct url *));
-void save_cookies PARAMS ((void));
-
+bool url_uses_proxy (const char *);
 
 #endif /* RETR_H */

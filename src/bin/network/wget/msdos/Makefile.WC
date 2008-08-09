@@ -1,0 +1,49 @@
+#
+# Makefile for Wget / DOS32A / OpenWatcom
+# by G. Vanem <gvanem@broadpark.no> 2007
+#
+
+COMPILE = *wcc386 -mf -3r -w6 -d2 -zq -zm -of -I. -I$(%watt_root)\inc &
+            -I..\msdos -fr=nul -bt=dos -s -dHAVE_CONFIG_H -dENABLE_DEBUG &
+            -dSIZEOF_INT=4
+
+LINK = *wlink option quiet, map, verbose, eliminate, caseexact, stack=100k &
+        debug all system dos32a
+
+OBJ_DIR = Watcom.obj
+
+OBJECTS = $(OBJ_DIR)\cmpt.obj      $(OBJ_DIR)\connect.obj    &
+          $(OBJ_DIR)\convert.obj   $(OBJ_DIR)\cookies.obj    &
+          $(OBJ_DIR)\ftp-basic.obj $(OBJ_DIR)\ftp-ls.obj     &
+          $(OBJ_DIR)\ftp-opie.obj  $(OBJ_DIR)\ftp.obj        &
+          $(OBJ_DIR)\gen-md5.obj   $(OBJ_DIR)\getopt.obj     &
+          $(OBJ_DIR)\gnu-md5.obj   $(OBJ_DIR)\hash.obj       &
+          $(OBJ_DIR)\host.obj      $(OBJ_DIR)\html-parse.obj &
+          $(OBJ_DIR)\html-url.obj  $(OBJ_DIR)\http.obj       &
+          $(OBJ_DIR)\init.obj      $(OBJ_DIR)\log.obj        &
+          $(OBJ_DIR)\main.obj      $(OBJ_DIR)\netrc.obj      &
+          $(OBJ_DIR)\progress.obj  $(OBJ_DIR)\ptimer.obj     &
+          $(OBJ_DIR)\recur.obj     $(OBJ_DIR)\res.obj        &
+          $(OBJ_DIR)\retr.obj      $(OBJ_DIR)\safe-ctype.obj &
+          $(OBJ_DIR)\spider.obj    $(OBJ_DIR)\url.obj        &
+          $(OBJ_DIR)\utils.obj     $(OBJ_DIR)\version.obj    &
+          $(OBJ_DIR)\xmalloc.obj
+
+all: $(OBJ_DIR) wget.exe .SYMBOLIC
+	@echo 'Welcome to Wget / Watcom'
+
+$(OBJ_DIR):
+	- mkdir $^@
+
+.ERASE
+.c{$(OBJ_DIR)}.obj:
+	*$(COMPILE) $[@ -fo=$@
+
+wget.exe: $(OBJECTS)
+      $(LINK) name $@ file { $(OBJECTS) } library $(%watt_root)\lib\wattcpwf.lib
+
+
+clean: .SYMBOLIC
+	- rm $(OBJ_DIR)\*.obj wget.exe wget.map
+	- rmdir $(OBJ_DIR)
+

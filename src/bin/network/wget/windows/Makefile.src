@@ -1,9 +1,10 @@
 # Makefile for `wget' utility for MSVC
-# Copyright (C) 1995, 1996, 1997, 2004 Free Software Foundation, Inc.
+# Copyright (C) 1995, 1996, 1997, 2004, 2006, 2007,
+# 2008 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 
 # This program is distributed in the hope that it will be useful,
@@ -12,19 +13,18 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# In addition, as a special exception, the Free Software Foundation
-# gives permission to link the code of its release of Wget with the
-# OpenSSL project's "OpenSSL" library (or with modified versions of it
-# that use the same license as the "OpenSSL" library), and distribute
-# the linked executables.  You must obey the GNU General Public License
-# in all respects for all of the code used other than "OpenSSL".  If you
-# modify this file, you may extend this exception to your version of the
-# file, but you are not obligated to do so.  If you do not wish to do
-# so, delete this exception statement from your version.
+# Additional permission under GNU GPL version 3 section 7
 
+# If you modify this program, or any covered work, by linking or
+# combining it with the OpenSSL project's OpenSSL library (or a
+# modified version of that library), containing parts covered by the
+# terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+# grants you additional permission to convey the resulting work.
+# Corresponding Source for a non-source form of such a combination
+# shall include the source code for the parts of OpenSSL used as well
+# as that of the covered work.
 
 # SSL (https) support requires the OpenSSL library (see http://www.openssl.org/).
 # If you do not have OpenSSL installed or wish to build Wget without SSL
@@ -67,10 +67,10 @@ LDFLAGS	= $(LDFLAGS) /ltcg:status
 !endif
 
 OBJ = cmpt$o safe-ctype$o convert$o connect$o host$o http$o netrc$o \
-      ftp-basic$o ftp$o ftp-ls$o ftp-opie$o getopt$o hash$o \
-      html-parse$o html-url$o progress$o retr$o recur$o res$o url$o cookies$o \
-      init$o utils$o main$o ptimer$o version$o xmalloc$o mswindows$o \
-      gen-md5$o gnu-md5$o log$o $(SSLOBJ)
+      ftp-basic$o ftp$o ftp-ls$o ftp-opie$o getopt$o hash$o         \
+      html-parse$o html-url$o progress$o retr$o recur$o res$o url$o \
+      cookies$o init$o utils$o main$o ptimer$o version$o xmalloc$o  \
+      mswindows$o gen-md5$o gnu-md5$o log$o $(SSLOBJ) spider$o
 
 .SUFFIXES: .c .obj
 
@@ -84,11 +84,11 @@ wget.exe: $(OBJ)
 	$(LD) @<< $(LDFLAGS) /out:$@ $(OBJ) $(LIBS)
 <<
 
-$(OBJ): config-post.h connect.h convert.h cookies.h ftp.h gen-md5.h \
-        getopt.h gnu-md5.h hash.h host.h html-parse.h http-ntlm.h   \
-        init.h log.h mswindows.h netrc.h options.h progress.h       \
-        ptimer.h recur.h res.h retr.h safe-ctype.h ssl.h sysdep.h   \
-        url.h utils.h wget.h xmalloc.h
+$(OBJ): config-post.h config.h connect.h convert.h cookies.h ftp.h \
+        gen-md5.h getopt.h gnu-md5.h hash.h host.h html-parse.h    \
+        http-ntlm.h init.h log.h mswindows.h netrc.h options.h     \
+        progress.h ptimer.h recur.h res.h retr.h safe-ctype.h      \
+        spider.h ssl.h sysdep.h url.h utils.h wget.h xmalloc.h
 
 #
 # Dependencies for cleanup

@@ -1,11 +1,12 @@
 /* Dirty system-dependent hacks.
-   Copyright (C) 1995, 1996, 1997, 1998, 2000 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or (at
+the Free Software Foundation; either version 3 of the License, or (at
 your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,18 +15,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 /* This file is included by wget.h.  Random .c files need not include
    it.  */
@@ -33,18 +34,8 @@ so, delete this exception statement from your version.  */
 #ifndef SYSDEP_H
 #define SYSDEP_H
 
-/* We need these to be playing with various stuff.  */
-#ifdef TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else /* not TIME_WITH_SYS_TIME_H */
-#ifdef HAVE_SYS_TIME_H
-# include <sys/time.h>
-#else /* not HAVE_SYS_TIME_H */
-# include <time.h>
-#endif /* HAVE_SYS_TIME_H */
-#endif /* TIME_WITH_SYS_TIME_H */
-
+/* Must include these, so we can test for the missing stat macros and
+   define them as necessary.  */
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -53,42 +44,49 @@ so, delete this exception statement from your version.  */
 #endif
 
 #ifdef WINDOWS
-/* Windows doesn't have some functions.  Include mswindows.h so we get
-   their declarations, as well as some additional declarations and
-   macros.  This must come first, so it can set things up.  */
-#include <mswindows.h>
-#endif /* WINDOWS */
-
-/* Watcom-specific stuff.  In practice this is probably specific to
-   Windows, although Watcom exists under other OS's too.  For that
-   reason, we keep this here.  */
-
-#ifdef __WATCOMC__
-/* Watcom has its own alloca() defined in malloc.h malloc.h needs to
-   be included in the sources to prevent 'undefined external' errors
-   at the link phase. */
-# include <malloc.h>
-/* io.h defines unlink() and chmod().  We put this here because it's
-   way too obscure to require all the .c files to observe.  */
-# include <io.h>
-#endif /* __WATCOMC__ */
-
-/* Needed for compilation under OS/2: */
-#ifdef __EMX__
-#ifndef S_ISLNK
-# define S_ISLNK(m) 0
+/* Windows doesn't have some functions normally found on Unix-like
+   systems, such as strcasecmp, strptime, etc.  Include mswindows.h so
+   we get the declarations for their replacements in mswindows.c, as
+   well as to pick up Windows-specific includes and constants.  To be
+   able to test for such features, the file must be included as early
+   as possible.  */
+# include "mswindows.h"
 #endif
-#ifndef lstat
-# define lstat stat
+
+/* Provide support for C99-type boolean type "bool".  This blurb comes
+   straight from the Autoconf 2.59 manual. */
+#if HAVE_STDBOOL_H
+# include <stdbool.h>
+#else
+# if ! HAVE__BOOL
+#  ifdef __cplusplus
+typedef bool _Bool;
+#  else
+typedef unsigned char _Bool;
+#  endif
+# endif
+# define bool _Bool
+# define false 0
+# define true 1
+# define __bool_true_false_are_defined 1
 #endif
-#endif /* __EMX__ */
+
+/* Needed for compilation under OS/2 and MSDOS */
+#if defined(__EMX__) || defined(MSDOS)
+# ifndef S_ISLNK
+#  define S_ISLNK(m) 0
+# endif
+# ifndef lstat
+#  define lstat stat
+# endif
+#endif /* __EMX__ || MSDOS */
 
 /* Reportedly, stat() macros are broken on some old systems.  Those
    systems will have to fend for themselves, as I will not introduce
    new code to handle it.
 
    However, I will add code for *missing* macros, and the following
-   are missing from many systems.  */
+   are reportedly missing from many systems.  */
 #ifndef S_ISLNK
 # define S_ISLNK(m) (((m) & S_IFMT) == S_IFLNK)
 #endif
@@ -97,15 +95,6 @@ so, delete this exception statement from your version.  */
 #endif
 #ifndef S_ISREG
 # define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
-#endif
-
-/* Bletch!  SPARC compiler doesn't define sparc (needed by
-   arpa/nameser.h) when in -Xc mode.  Luckily, it always defines
-   __sparc.  */
-#ifdef __sparc
-#ifndef sparc
-#define sparc
-#endif
 #endif
 
 /* These are needed so we can #define struct_stat to struct _stati64
@@ -117,72 +106,43 @@ so, delete this exception statement from your version.  */
 # define struct_fstat struct stat
 #endif
 
-#ifdef HAVE_LIMITS_H
-# include <limits.h>
-#endif
+/* For CHAR_BIT, LONG_MAX, etc. */
+#include <limits.h>
 
 #ifndef CHAR_BIT
 # define CHAR_BIT 8
 #endif
 
-#ifndef LONG_MAX
-# define LONG_MAX ((long) ~((unsigned long)1 << (CHAR_BIT * sizeof (long) - 1)))
-#endif
-#ifndef LLONG_MAX
-# define LLONG_MAX ((long long) ~((unsigned long long)1 << (CHAR_BIT * sizeof (long long) - 1)))
-#endif
+/* From gnulib, simplified to assume a signed type. */
+#define TYPE_MAXIMUM(t) ((t) (~ (~ (t) 0 << (sizeof (t) * CHAR_BIT - 1))))
 
-/* These are defined in cmpt.c if missing, therefore it's generally
-   safe to declare their parameters.  */
-#ifndef HAVE_STRERROR
-char *strerror ();
-#endif
+/* These are defined in cmpt.c if missing, so we must declare
+   them.  */
 #ifndef HAVE_STRCASECMP
 int strcasecmp ();
 #endif
 #ifndef HAVE_STRNCASECMP
 int strncasecmp ();
 #endif
-#ifndef HAVE_STRSTR
-char *strstr ();
-#endif
 #ifndef HAVE_STRPTIME
 char *strptime ();
 #endif
+#ifndef HAVE_TIMEGM
+# include <time.h>
+time_t timegm (struct tm *);
+#endif
+#ifndef HAVE_MEMRCHR
+void *memrchr (const void *, int, size_t);
+#endif
+
+/* These are defined in snprintf.c.  It would be nice to have an
+   snprintf.h, though.  */
 #ifndef HAVE_SNPRINTF
 int snprintf ();
 #endif
 #ifndef HAVE_VSNPRINTF
 int vsnprintf ();
 #endif
-#ifndef HAVE_MEMMOVE
-void *memmove ();
-#endif
-#ifndef HAVE_TIMEGM
-time_t timegm (struct tm *);
-#endif
-
-/* SunOS brain damage -- for some reason, SunOS header files fail to
-   declare the functions below, which causes all kinds of problems,
-   most notably compilation errors when using pointer arithmetic on
-   their return values.
-
-   This used to be only within `#ifdef STDC_HEADERS', but it got
-   tripped on other systems (AIX), thus causing havoc.  Fortunately,
-   SunOS appears to be the only system braindamaged that badly, so I
-   added an extra `#ifdef sun' guard.  */
-#ifndef STDC_HEADERS
-#ifdef sun
-#ifndef __SVR4			/* exclude Solaris */
-char *strstr ();
-char *strchr ();
-char *strrchr ();
-char *strtok ();
-char *strdup ();
-void *memcpy ();
-#endif /* not __SVR4 */
-#endif /* sun */
-#endif /* not STDC_HEADERS */
 
 /* Some systems (Linux libc5, "NCR MP-RAS 3.0", and others) don't
    provide MAP_FAILED, a symbolic constant for the value returned by
@@ -194,19 +154,12 @@ void *memcpy ();
 # define MAP_FAILED ((void *) -1)
 #endif
 
-/* Enable system fnmatch only on systems where fnmatch.h is usable and
-   which are known to have a non-broken fnmatch implementation.
-   Currently those include glibc-based systems and Solaris.  One could
-   add more, but fnmatch is not that large, so it might be better to
-   play it safe.  */
+/* Enable system fnmatch only on systems where fnmatch.h is usable.
+   If the fnmatch on your system is buggy, undef this symbol and a
+   replacement implementation will be used instead.  */
 #ifdef HAVE_WORKING_FNMATCH_H
-# if defined __GLIBC__ && __GLIBC__ >= 2
-#  define SYSTEM_FNMATCH
-# endif
-# ifdef solaris
-#  define SYSTEM_FNMATCH
-# endif
-#endif /* HAVE_WORKING_FNMATCH_H */
+# define SYSTEM_FNMATCH
+#endif
 
 #ifdef SYSTEM_FNMATCH
 # include <fnmatch.h>
@@ -223,8 +176,7 @@ void *memcpy ();
 # define FNM_PERIOD	(1 << 2) /* Leading `.' is matched only explicitly.  */
 # define FNM_NOMATCH	1
 
-/* Declare the function minimally. */
-int fnmatch ();
+int fnmatch (const char *, const char *, int);
 #endif
 
 /* Provide sig_atomic_t if the system doesn't.  */
@@ -252,6 +204,16 @@ typedef unsigned short uint32_t;
 #   endif
 #  endif
 # endif
+#endif
+
+/* If uintptr_t isn't defined, simply typedef it to unsigned long. */
+#ifndef HAVE_UINTPTR_T
+typedef unsigned long uintptr_t;
+#endif
+
+/* If intptr_t isn't defined, simply typedef it to long. */
+#ifndef HAVE_INTPTR_T
+typedef long intptr_t;
 #endif
 
 #endif /* SYSDEP_H */

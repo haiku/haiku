@@ -1,11 +1,12 @@
 /* Handling of recursive HTTP retrieving.
-   Copyright (C) 1995, 1996, 1997, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,34 +15,29 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif /* HAVE_STRING_H */
+#include <string.h>
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif /* HAVE_UNISTD_H */
 #include <errno.h>
 #include <assert.h>
-#include <sys/types.h>
 
 #include "wget.h"
 #include "url.h"
@@ -53,27 +49,18 @@ so, delete this exception statement from your version.  */
 #include "hash.h"
 #include "res.h"
 #include "convert.h"
-
-#ifndef errno
-extern int errno;
-#endif
-
-extern char *version_string;
-extern SUM_SIZE_INT total_downloaded_bytes;
-
-extern struct hash_table *dl_url_file_map;
-extern struct hash_table *downloaded_html_set;
+#include "spider.h"
 
 /* Functions for maintaining the URL queue.  */
 
 struct queue_element {
-  const char *url;		/* the URL to download */
-  const char *referer;		/* the referring document */
-  int depth;			/* the depth */
-  unsigned int html_allowed :1;	/* whether the document is allowed to
-				   be treated as HTML. */
+  const char *url;              /* the URL to download */
+  const char *referer;          /* the referring document */
+  int depth;                    /* the depth */
+  bool html_allowed;            /* whether the document is allowed to
+                                   be treated as HTML. */
 
-  struct queue_element *next;	/* next element in queue */
+  struct queue_element *next;   /* next element in queue */
 };
 
 struct url_queue {
@@ -105,7 +92,7 @@ url_queue_delete (struct url_queue *queue)
 
 static void
 url_enqueue (struct url_queue *queue,
-	     const char *url, const char *referer, int depth, int html_allowed)
+             const char *url, const char *referer, int depth, bool html_allowed)
 {
   struct queue_element *qel = xnew (struct queue_element);
   qel->url = url;
@@ -129,18 +116,18 @@ url_enqueue (struct url_queue *queue,
     queue->head = queue->tail;
 }
 
-/* Take a URL out of the queue.  Return 1 if this operation succeeded,
-   or 0 if the queue is empty.  */
+/* Take a URL out of the queue.  Return true if this operation
+   succeeded, or false if the queue is empty.  */
 
-static int
+static bool
 url_dequeue (struct url_queue *queue,
-	     const char **url, const char **referer, int *depth,
-	     int *html_allowed)
+             const char **url, const char **referer, int *depth,
+             bool *html_allowed)
 {
   struct queue_element *qel = queue->head;
 
   if (!qel)
-    return 0;
+    return false;
 
   queue->head = queue->head->next;
   if (!queue->head)
@@ -157,13 +144,13 @@ url_dequeue (struct url_queue *queue,
   DEBUGP (("Queue count %d, maxcount %d.\n", queue->count, queue->maxcount));
 
   xfree (qel);
-  return 1;
+  return true;
 }
 
-static int download_child_p PARAMS ((const struct urlpos *, struct url *, int,
-				     struct url *, struct hash_table *));
-static int descend_redirect_p PARAMS ((const char *, const char *, int,
-				       struct url *, struct hash_table *));
+static bool download_child_p (const struct urlpos *, struct url *, int,
+                              struct url *, struct hash_table *);
+static bool descend_redirect_p (const char *, const char *, int,
+                                struct url *, struct hash_table *);
 
 
 /* Retrieve a part of the web beginning with START_URL.  This used to
@@ -185,7 +172,7 @@ static int descend_redirect_p PARAMS ((const char *, const char *, int,
 
        7. if the URL is not one of those downloaded before, and if it
           satisfies the criteria specified by the various command-line
-	  options, add it to the queue. */
+          options, add it to the queue. */
 
 uerr_t
 retrieve_tree (const char *start_url)
@@ -205,7 +192,7 @@ retrieve_tree (const char *start_url)
   if (!start_url_parsed)
     {
       logprintf (LOG_NOTQUIET, "%s: %s.\n", start_url,
-		 url_error (up_error_code));
+                 url_error (up_error_code));
       return URLERROR;
     }
 
@@ -214,172 +201,189 @@ retrieve_tree (const char *start_url)
 
   /* Enqueue the starting URL.  Use start_url_parsed->url rather than
      just URL so we enqueue the canonical form of the URL.  */
-  url_enqueue (queue, xstrdup (start_url_parsed->url), NULL, 0, 1);
+  url_enqueue (queue, xstrdup (start_url_parsed->url), NULL, 0, true);
   string_set_add (blacklist, start_url_parsed->url);
 
   while (1)
     {
-      int descend = 0;
+      bool descend = false;
       char *url, *referer, *file = NULL;
-      int depth, html_allowed;
-      int dash_p_leaf_HTML = 0;
+      int depth;
+      bool html_allowed;
+      bool dash_p_leaf_HTML = false;
 
       if (opt.quota && total_downloaded_bytes > opt.quota)
-	break;
+        break;
       if (status == FWRITEERR)
-	break;
+        break;
 
       /* Get the next URL from the queue... */
 
       if (!url_dequeue (queue,
-			(const char **)&url, (const char **)&referer,
-			&depth, &html_allowed))
-	break;
+                        (const char **)&url, (const char **)&referer,
+                        &depth, &html_allowed))
+        break;
 
       /* ...and download it.  Note that this download is in most cases
-	 unconditional, as download_child_p already makes sure a file
-	 doesn't get enqueued twice -- and yet this check is here, and
-	 not in download_child_p.  This is so that if you run `wget -r
-	 URL1 URL2', and a random URL is encountered once under URL1
-	 and again under URL2, but at a different (possibly smaller)
-	 depth, we want the URL's children to be taken into account
-	 the second time.  */
+         unconditional, as download_child_p already makes sure a file
+         doesn't get enqueued twice -- and yet this check is here, and
+         not in download_child_p.  This is so that if you run `wget -r
+         URL1 URL2', and a random URL is encountered once under URL1
+         and again under URL2, but at a different (possibly smaller)
+         depth, we want the URL's children to be taken into account
+         the second time.  */
       if (dl_url_file_map && hash_table_contains (dl_url_file_map, url))
-	{
-	  file = xstrdup (hash_table_get (dl_url_file_map, url));
+        {
+          file = xstrdup (hash_table_get (dl_url_file_map, url));
 
-	  DEBUGP (("Already downloaded \"%s\", reusing it from \"%s\".\n",
-		   url, file));
+          DEBUGP (("Already downloaded \"%s\", reusing it from \"%s\".\n",
+                   url, file));
 
-	  if (html_allowed
-	      && downloaded_html_set
-	      && string_set_contains (downloaded_html_set, file))
-	    descend = 1;
-	}
+          if (html_allowed
+              && downloaded_html_set
+              && string_set_contains (downloaded_html_set, file))
+            descend = true;
+        }
       else
-	{
-	  int dt = 0;
-	  char *redirected = NULL;
-	  int oldrec = opt.recursive;
+        {
+          int dt = 0;
+          char *redirected = NULL;
 
-	  opt.recursive = 0;
-	  status = retrieve_url (url, &file, &redirected, referer, &dt);
-	  opt.recursive = oldrec;
+          status = retrieve_url (url, &file, &redirected, referer, &dt, false);
 
-	  if (html_allowed && file && status == RETROK
-	      && (dt & RETROKF) && (dt & TEXTHTML))
-	    descend = 1;
+          if (html_allowed && file && status == RETROK
+              && (dt & RETROKF) && (dt & TEXTHTML))
+            descend = true;
 
-	  if (redirected)
-	    {
-	      /* We have been redirected, possibly to another host, or
-		 different path, or wherever.  Check whether we really
-		 want to follow it.  */
-	      if (descend)
-		{
-		  if (!descend_redirect_p (redirected, url, depth,
-					   start_url_parsed, blacklist))
-		    descend = 0;
-		  else
-		    /* Make sure that the old pre-redirect form gets
-		       blacklisted. */
-		    string_set_add (blacklist, url);
-		}
+          if (redirected)
+            {
+              /* We have been redirected, possibly to another host, or
+                 different path, or wherever.  Check whether we really
+                 want to follow it.  */
+              if (descend)
+                {
+                  if (!descend_redirect_p (redirected, url, depth,
+                                           start_url_parsed, blacklist))
+                    descend = false;
+                  else
+                    /* Make sure that the old pre-redirect form gets
+                       blacklisted. */
+                    string_set_add (blacklist, url);
+                }
 
-	      xfree (url);
-	      url = redirected;
-	    }
-	}
+              xfree (url);
+              url = redirected;
+            }
+        }
+
+      if (opt.spider)
+        {
+          visited_url (url, referer);
+        }
 
       if (descend
-	  && depth >= opt.reclevel && opt.reclevel != INFINITE_RECURSION)
-	{
-	  if (opt.page_requisites
-	      && (depth == opt.reclevel || depth == opt.reclevel + 1))
-	    {
-	      /* When -p is specified, we are allowed to exceed the
-		 maximum depth, but only for the "inline" links,
-		 i.e. those that are needed to display the page.
-		 Originally this could exceed the depth at most by
-		 one, but we allow one more level so that the leaf
-		 pages that contain frames can be loaded
-		 correctly.  */
-	      dash_p_leaf_HTML = 1;
-	    }
-	  else
-	    {
-	      /* Either -p wasn't specified or it was and we've
-		 already spent the two extra (pseudo-)levels that it
-		 affords us, so we need to bail out. */
-	      DEBUGP (("Not descending further; at depth %d, max. %d.\n",
-		       depth, opt.reclevel));
-	      descend = 0;
-	    }
-	}
+          && depth >= opt.reclevel && opt.reclevel != INFINITE_RECURSION)
+        {
+          if (opt.page_requisites
+              && (depth == opt.reclevel || depth == opt.reclevel + 1))
+            {
+              /* When -p is specified, we are allowed to exceed the
+                 maximum depth, but only for the "inline" links,
+                 i.e. those that are needed to display the page.
+                 Originally this could exceed the depth at most by
+                 one, but we allow one more level so that the leaf
+                 pages that contain frames can be loaded
+                 correctly.  */
+              dash_p_leaf_HTML = true;
+            }
+          else
+            {
+              /* Either -p wasn't specified or it was and we've
+                 already spent the two extra (pseudo-)levels that it
+                 affords us, so we need to bail out. */
+              DEBUGP (("Not descending further; at depth %d, max. %d.\n",
+                       depth, opt.reclevel));
+              descend = false;
+            }
+        }
 
       /* If the downloaded document was HTML, parse it and enqueue the
-	 links it contains. */
+         links it contains. */
 
       if (descend)
-	{
-	  int meta_disallow_follow = 0;
-	  struct urlpos *children
-	    = get_urls_html (file, url, &meta_disallow_follow);
+        {
+          bool meta_disallow_follow = false;
+          struct urlpos *children
+            = get_urls_html (file, url, &meta_disallow_follow);
 
-	  if (opt.use_robots && meta_disallow_follow)
-	    {
-	      free_urlpos (children);
-	      children = NULL;
-	    }
+          if (opt.use_robots && meta_disallow_follow)
+            {
+              free_urlpos (children);
+              children = NULL;
+            }
 
-	  if (children)
-	    {
-	      struct urlpos *child = children;
-	      struct url *url_parsed = url_parsed = url_parse (url, NULL);
-	      assert (url_parsed != NULL);
+          if (children)
+            {
+              struct urlpos *child = children;
+              struct url *url_parsed = url_parsed = url_parse (url, NULL);
+              char *referer_url = url;
+              bool strip_auth = (url_parsed != NULL
+                                 && url_parsed->user != NULL);
+              assert (url_parsed != NULL);
 
-	      for (; child; child = child->next)
-		{
-		  if (child->ignore_when_downloading)
-		    continue;
-		  if (dash_p_leaf_HTML && !child->link_inline_p)
-		    continue;
-		  if (download_child_p (child, url_parsed, depth, start_url_parsed,
-					blacklist))
-		    {
-		      url_enqueue (queue, xstrdup (child->url->url),
-				   xstrdup (url), depth + 1,
-				   child->link_expect_html);
-		      /* We blacklist the URL we have enqueued, because we
-			 don't want to enqueue (and hence download) the
-			 same URL twice.  */
-		      string_set_add (blacklist, child->url->url);
-		    }
-		}
+              /* Strip auth info if present */
+              if (strip_auth)
+                referer_url = url_string (url_parsed, URL_AUTH_HIDE);
 
-	      url_free (url_parsed);
-	      free_urlpos (children);
-	    }
-	}
+              for (; child; child = child->next)
+                {
+                  if (child->ignore_when_downloading)
+                    continue;
+                  if (dash_p_leaf_HTML && !child->link_inline_p)
+                    continue;
+                  if (download_child_p (child, url_parsed, depth, start_url_parsed,
+                                        blacklist))
+                    {
+                      url_enqueue (queue, xstrdup (child->url->url),
+                                   xstrdup (referer_url), depth + 1,
+                                   child->link_expect_html);
+                      /* We blacklist the URL we have enqueued, because we
+                         don't want to enqueue (and hence download) the
+                         same URL twice.  */
+                      string_set_add (blacklist, child->url->url);
+                    }
+                }
 
-      if (opt.delete_after || (file && !acceptable (file)))
-	{
-	  /* Either --delete-after was specified, or we loaded this
-	     otherwise rejected (e.g. by -R) HTML file just so we
-	     could harvest its hyperlinks -- in either case, delete
-	     the local file. */
-	  DEBUGP (("Removing file due to %s in recursive_retrieve():\n",
-		   opt.delete_after ? "--delete-after" :
-		   "recursive rejection criteria"));
-	  logprintf (LOG_VERBOSE,
-		     (opt.delete_after
-		      ? _("Removing %s.\n")
-		      : _("Removing %s since it should be rejected.\n")),
-		     file);
-	  if (unlink (file))
-	    logprintf (LOG_NOTQUIET, "unlink: %s\n", strerror (errno));
-	  register_delete_file (file);
-	}
+              if (strip_auth)
+                xfree (referer_url);
+              url_free (url_parsed);
+              free_urlpos (children);
+            }
+        }
+
+      if (file 
+          && (opt.delete_after 
+              || opt.spider /* opt.recursive is implicitely true */
+              || !acceptable (file)))
+        {
+          /* Either --delete-after was specified, or we loaded this
+             (otherwise unneeded because of --spider or rejected by -R) 
+             HTML file just to harvest its hyperlinks -- in either case, 
+             delete the local file. */
+          DEBUGP (("Removing file due to %s in recursive_retrieve():\n",
+                   opt.delete_after ? "--delete-after" :
+                   (opt.spider ? "--spider" : 
+                    "recursive rejection criteria")));
+          logprintf (LOG_VERBOSE,
+                     (opt.delete_after || opt.spider
+                      ? _("Removing %s.\n")
+                      : _("Removing %s since it should be rejected.\n")),
+                     file);
+          if (unlink (file))
+            logprintf (LOG_NOTQUIET, "unlink: %s\n", strerror (errno));
+          logputs (LOG_VERBOSE, "\n");
+          register_delete_file (file);
+        }
 
       xfree (url);
       xfree_null (referer);
@@ -390,12 +394,13 @@ retrieve_tree (const char *start_url)
      now.  */
   {
     char *d1, *d2;
-    int d3, d4;
+    int d3;
+    bool d4;
     while (url_dequeue (queue,
-			(const char **)&d1, (const char **)&d2, &d3, &d4))
+                        (const char **)&d1, (const char **)&d2, &d3, &d4))
       {
-	xfree (d1);
-	xfree_null (d2);
+        xfree (d1);
+        xfree_null (d2);
       }
   }
   url_queue_delete (queue);
@@ -420,18 +425,25 @@ retrieve_tree (const char *start_url)
    by storing these URLs to BLACKLIST.  This may or may not help.  It
    will help if those URLs are encountered many times.  */
 
-static int
+static bool
 download_child_p (const struct urlpos *upos, struct url *parent, int depth,
-		  struct url *start_url_parsed, struct hash_table *blacklist)
+                  struct url *start_url_parsed, struct hash_table *blacklist)
 {
   struct url *u = upos->url;
   const char *url = u->url;
-  int u_scheme_like_http;
+  bool u_scheme_like_http;
 
   DEBUGP (("Deciding whether to enqueue \"%s\".\n", url));
 
   if (string_set_contains (blacklist, url))
     {
+      if (opt.spider) 
+        {
+          char *referrer = url_string (parent, URL_AUTH_HIDE_PASSWD);
+          DEBUGP (("download_child_p: parent->url is: `%s'\n", parent->url));
+          visited_url (url, referrer);
+          xfree (referrer);
+        }
       DEBUGP (("Already on the black list.\n"));
       goto out;
     }
@@ -472,8 +484,8 @@ download_child_p (const struct urlpos *upos, struct url *parent, int depth,
   if (u_scheme_like_http)
     if (opt.relative_only && !upos->link_relative_p)
       {
-	DEBUGP (("It doesn't really look like a relative link.\n"));
-	goto out;
+        DEBUGP (("It doesn't really look like a relative link.\n"));
+        goto out;
       }
 
   /* 3. If its domain is not to be accepted/looked-up, chuck it
@@ -495,12 +507,12 @@ download_child_p (const struct urlpos *upos, struct url *parent, int depth,
       && u->port == start_url_parsed->port
       && !(opt.page_requisites && upos->link_inline_p))
     {
-      if (!frontcmp (start_url_parsed->dir, u->dir))
-	{
-	  DEBUGP (("Going to \"%s\" would escape \"%s\" with no_parent on.\n",
-		   u->dir, start_url_parsed->dir));
-	  goto out;
-	}
+      if (!subdir_p (start_url_parsed->dir, u->dir))
+        {
+          DEBUGP (("Going to \"%s\" would escape \"%s\" with no_parent on.\n",
+                   u->dir, start_url_parsed->dir));
+          goto out;
+        }
     }
 
   /* 5. If the file does not match the acceptance list, or is on the
@@ -508,11 +520,11 @@ download_child_p (const struct urlpos *upos, struct url *parent, int depth,
      exclusion and inclusion lists.  */
   if (opt.includes || opt.excludes)
     {
-      if (!accdir (u->dir, ALLABS))
-	{
-	  DEBUGP (("%s (%s) is excluded/not-included.\n", url, u->dir));
-	  goto out;
-	}
+      if (!accdir (u->dir))
+        {
+          DEBUGP (("%s (%s) is excluded/not-included.\n", url, u->dir));
+          goto out;
+        }
     }
 
   /* 6. Check for acceptance/rejection rules.  We ignore these rules
@@ -522,31 +534,31 @@ download_child_p (const struct urlpos *upos, struct url *parent, int depth,
      necesary, overstep the maximum depth to get the page requisites.)  */
   if (u->file[0] != '\0'
       && !(has_html_suffix_p (u->file)
-	   /* The exception only applies to non-leaf HTMLs (but -p
-	      always implies non-leaf because we can overstep the
-	      maximum depth to get the requisites): */
-	   && (/* non-leaf */
-	       opt.reclevel == INFINITE_RECURSION
-	       /* also non-leaf */
-	       || depth < opt.reclevel - 1
-	       /* -p, which implies non-leaf (see above) */
-	       || opt.page_requisites)))
+           /* The exception only applies to non-leaf HTMLs (but -p
+              always implies non-leaf because we can overstep the
+              maximum depth to get the requisites): */
+           && (/* non-leaf */
+               opt.reclevel == INFINITE_RECURSION
+               /* also non-leaf */
+               || depth < opt.reclevel - 1
+               /* -p, which implies non-leaf (see above) */
+               || opt.page_requisites)))
     {
       if (!acceptable (u->file))
-	{
-	  DEBUGP (("%s (%s) does not match acc/rej rules.\n",
-		   url, u->file));
-	  goto out;
-	}
+        {
+          DEBUGP (("%s (%s) does not match acc/rej rules.\n",
+                   url, u->file));
+          goto out;
+        }
     }
 
   /* 7. */
   if (schemes_are_similar_p (u->scheme, parent->scheme))
     if (!opt.spanhost && 0 != strcasecmp (parent->host, u->host))
       {
-	DEBUGP (("This is not the same hostname as the parent's (%s and %s).\n",
-		 u->host, parent->host));
-	goto out;
+        DEBUGP (("This is not the same hostname as the parent's (%s and %s).\n",
+                 u->host, parent->host));
+        goto out;
       }
 
   /* 8. */
@@ -554,43 +566,43 @@ download_child_p (const struct urlpos *upos, struct url *parent, int depth,
     {
       struct robot_specs *specs = res_get_specs (u->host, u->port);
       if (!specs)
-	{
-	  char *rfile;
-	  if (res_retrieve_file (url, &rfile))
-	    {
-	      specs = res_parse_from_file (rfile);
-	      xfree (rfile);
-	    }
-	  else
-	    {
-	      /* If we cannot get real specs, at least produce
-		 dummy ones so that we can register them and stop
-		 trying to retrieve them.  */
-	      specs = res_parse ("", 0);
-	    }
-	  res_register_specs (u->host, u->port, specs);
-	}
+        {
+          char *rfile;
+          if (res_retrieve_file (url, &rfile))
+            {
+              specs = res_parse_from_file (rfile);
+              xfree (rfile);
+            }
+          else
+            {
+              /* If we cannot get real specs, at least produce
+                 dummy ones so that we can register them and stop
+                 trying to retrieve them.  */
+              specs = res_parse ("", 0);
+            }
+          res_register_specs (u->host, u->port, specs);
+        }
 
       /* Now that we have (or don't have) robots.txt specs, we can
-	 check what they say.  */
+         check what they say.  */
       if (!res_match_path (specs, u->path))
-	{
-	  DEBUGP (("Not following %s because robots.txt forbids it.\n", url));
-	  string_set_add (blacklist, url);
-	  goto out;
-	}
+        {
+          DEBUGP (("Not following %s because robots.txt forbids it.\n", url));
+          string_set_add (blacklist, url);
+          goto out;
+        }
     }
 
   /* The URL has passed all the tests.  It can be placed in the
      download queue. */
   DEBUGP (("Decided to load it.\n"));
 
-  return 1;
+  return true;
 
  out:
   DEBUGP (("Decided NOT to load it.\n"));
 
-  return 0;
+  return false;
 }
 
 /* This function determines whether we will consider downloading the
@@ -598,13 +610,13 @@ download_child_p (const struct urlpos *upos, struct url *parent, int depth,
    possibly to another host, etc.  It is needed very rarely, and thus
    it is merely a simple-minded wrapper around download_child_p.  */
 
-static int
+static bool
 descend_redirect_p (const char *redirected, const char *original, int depth,
-		    struct url *start_url_parsed, struct hash_table *blacklist)
+                    struct url *start_url_parsed, struct hash_table *blacklist)
 {
   struct url *orig_parsed, *new_parsed;
   struct urlpos *upos;
-  int success;
+  bool success;
 
   orig_parsed = url_parse (original, NULL);
   assert (orig_parsed != NULL);
@@ -616,7 +628,7 @@ descend_redirect_p (const char *redirected, const char *original, int depth,
   upos->url = new_parsed;
 
   success = download_child_p (upos, orig_parsed, depth,
-			      start_url_parsed, blacklist);
+                              start_url_parsed, blacklist);
 
   url_free (orig_parsed);
   url_free (new_parsed);
@@ -627,3 +639,5 @@ descend_redirect_p (const char *redirected, const char *original, int depth,
 
   return success;
 }
+
+/* vim:set sts=2 sw=2 cino+={s: */

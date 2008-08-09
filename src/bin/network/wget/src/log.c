@@ -1,11 +1,12 @@
 /* Messages logging.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,33 +15,25 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
 #include <stdio.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
+#include <string.h>
 #include <stdlib.h>
-#ifdef WGET_USE_STDARG
-# include <stdarg.h>
-#else
-# include <varargs.h>
-#endif
+#include <stdarg.h>
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
@@ -50,10 +43,6 @@ so, delete this exception statement from your version.  */
 #include "wget.h"
 #include "utils.h"
 #include "log.h"
-
-#ifndef errno
-extern int errno;
-#endif
 
 /* This file impplement support for "logging".  Logging means printing
    output, plus several additional features:
@@ -80,18 +69,18 @@ extern int errno;
    logging is inhibited, logfp is set back to NULL. */
 static FILE *logfp;
 
-/* If non-zero, it means logging is inhibited, i.e. nothing is printed
-   or stored.  */
-static int inhibit_logging;
+/* If true, it means logging is inhibited, i.e. nothing is printed or
+   stored.  */
+static bool inhibit_logging;
 
 /* Whether the last output lines are stored for use as context.  */
-static int save_context_p;
+static bool save_context_p;
 
 /* Whether the log is flushed after each command. */
-static int flush_log_p = 1;
+static bool flush_log_p = true;
 
 /* Whether any output has been received while flush_log_p was 0. */
-static int needs_flushing;
+static bool needs_flushing;
 
 /* In the event of a hang-up, and if its output was on a TTY, Wget
    redirects its output to `wget-log'.
@@ -120,9 +109,9 @@ static int needs_flushing;
 static struct log_ln {
   char static_line[STATIC_LENGTH + 1]; /* statically allocated
                                           line. */
-  char *malloced_line;		/* malloc'ed line, for lines of output
+  char *malloced_line;          /* malloc'ed line, for lines of output
                                    larger than 80 characters. */
-  char *content;		/* this points either to malloced_line
+  char *content;                /* this points either to malloced_line
                                    or to the appropriate static_line.
                                    If this is NULL, it means the line
                                    has not yet been used. */
@@ -135,13 +124,13 @@ static int log_line_current = -1;
    finish with \n.  This is an important piece of information because
    the code is always careful to append data to trailing lines, rather
    than create new ones.  */
-static int trailing_line;
+static bool trailing_line;
 
-static void check_redirect_output PARAMS ((void));
+static void check_redirect_output (void);
 
-#define ROT_ADVANCE(num) do {			\
-  if (++num >= SAVED_LOG_LINES)			\
-    num = 0;					\
+#define ROT_ADVANCE(num) do {                   \
+  if (++num >= SAVED_LOG_LINES)                 \
+    num = 0;                                    \
 } while (0)
 
 /* Free the log line index with NUM.  This calls free on
@@ -179,21 +168,21 @@ saved_append_1 (const char *start, const char *end)
       struct log_ln *ln;
 
       if (log_line_current == -1)
-	log_line_current = 0;
+        log_line_current = 0;
       else
-	free_log_line (log_line_current);
+        free_log_line (log_line_current);
       ln = log_lines + log_line_current;
       if (len > STATIC_LENGTH)
-	{
-	  ln->malloced_line = strdupdelim (start, end);
-	  ln->content = ln->malloced_line;
-	}
+        {
+          ln->malloced_line = strdupdelim (start, end);
+          ln->content = ln->malloced_line;
+        }
       else
-	{
-	  memcpy (ln->static_line, start, len);
-	  ln->static_line[len] = '\0';
-	  ln->content = ln->static_line;
-	}
+        {
+          memcpy (ln->static_line, start, len);
+          ln->static_line[len] = '\0';
+          ln->content = ln->static_line;
+        }
     }
   else
     {
@@ -204,38 +193,38 @@ saved_append_1 (const char *start, const char *end)
          convert it to malloc(). */
       struct log_ln *ln = log_lines + log_line_current;
       if (ln->malloced_line)
-	{
-	  /* Resize malloc'ed line and append. */
-	  int old_len = strlen (ln->malloced_line);
-	  ln->malloced_line = xrealloc (ln->malloced_line, old_len + len + 1);
-	  memcpy (ln->malloced_line + old_len, start, len);
-	  ln->malloced_line[old_len + len] = '\0';
-	  /* might have changed due to realloc */
-	  ln->content = ln->malloced_line;
-	}
+        {
+          /* Resize malloc'ed line and append. */
+          int old_len = strlen (ln->malloced_line);
+          ln->malloced_line = xrealloc (ln->malloced_line, old_len + len + 1);
+          memcpy (ln->malloced_line + old_len, start, len);
+          ln->malloced_line[old_len + len] = '\0';
+          /* might have changed due to realloc */
+          ln->content = ln->malloced_line;
+        }
       else
-	{
-	  int old_len = strlen (ln->static_line);
-	  if (old_len + len > STATIC_LENGTH)
-	    {
-	      /* Allocate memory and concatenate the old and the new
+        {
+          int old_len = strlen (ln->static_line);
+          if (old_len + len > STATIC_LENGTH)
+            {
+              /* Allocate memory and concatenate the old and the new
                  contents. */
-	      ln->malloced_line = (char *)xmalloc (old_len + len + 1);
-	      memcpy (ln->malloced_line, ln->static_line,
-		      old_len);
-	      memcpy (ln->malloced_line + old_len, start, len);
-	      ln->malloced_line[old_len + len] = '\0';
-	      ln->content = ln->malloced_line;
-	    }
-	  else
-	    {
-	      /* Just append to the old, statically allocated
+              ln->malloced_line = xmalloc (old_len + len + 1);
+              memcpy (ln->malloced_line, ln->static_line,
+                      old_len);
+              memcpy (ln->malloced_line + old_len, start, len);
+              ln->malloced_line[old_len + len] = '\0';
+              ln->content = ln->malloced_line;
+            }
+          else
+            {
+              /* Just append to the old, statically allocated
                  contents.  */
-	      memcpy (ln->static_line + old_len, start, len);
-	      ln->static_line[old_len + len] = '\0';
-	      ln->content = ln->static_line;
-	    }
-	}
+              memcpy (ln->static_line + old_len, start, len);
+              ln->static_line[old_len + len] = '\0';
+              ln->content = ln->static_line;
+            }
+        }
     }
   trailing_line = !(end[-1] == '\n');
   if (!trailing_line)
@@ -254,9 +243,9 @@ saved_append (const char *s)
     {
       const char *end = strchr (s, '\n');
       if (!end)
-	end = s + strlen (s);
+        end = s + strlen (s);
       else
-	++end;
+        ++end;
       saved_append_1 (s, end);
       s = end;
     }
@@ -272,22 +261,22 @@ saved_append (const char *s)
    * LOG_NONVERBOSE - print the message if opt.verbose is zero;
 
    * LOG_VERBOSE - print the message if opt.verbose is non-zero.  */
-#define CHECK_VERBOSE(x)			\
-  switch (x)					\
-    {						\
-    case LOG_ALWAYS:				\
-      break;					\
-    case LOG_NOTQUIET:				\
-      if (opt.quiet)				\
-	return;					\
-      break;					\
-    case LOG_NONVERBOSE:			\
-      if (opt.verbose || opt.quiet)		\
-	return;					\
-      break;					\
-    case LOG_VERBOSE:				\
-      if (!opt.verbose)				\
-	return;					\
+#define CHECK_VERBOSE(x)                        \
+  switch (x)                                    \
+    {                                           \
+    case LOG_ALWAYS:                            \
+      break;                                    \
+    case LOG_NOTQUIET:                          \
+      if (opt.quiet)                            \
+        return;                                 \
+      break;                                    \
+    case LOG_NONVERBOSE:                        \
+      if (opt.verbose || opt.quiet)             \
+        return;                                 \
+      break;                                    \
+    case LOG_VERBOSE:                           \
+      if (!opt.verbose)                         \
+        return;                                 \
     }
 
 /* Returns the file descriptor for logging.  This is LOGFP, except if
@@ -325,7 +314,7 @@ logputs (enum log_options o, const char *s)
   if (flush_log_p)
     logflush ();
   else
-    needs_flushing = 1;
+    needs_flushing = true;
 }
 
 struct logvprintf_state {
@@ -348,9 +337,9 @@ struct logvprintf_state {
    (An alternative approach would be to use va_copy, but that's not
    portable.)  */
 
-static int
+static bool
 log_vprintf_internal (struct logvprintf_state *state, const char *fmt,
-		      va_list args)
+                      va_list args)
 {
   char smallmsg[128];
   char *write_ptr = smallmsg;
@@ -381,30 +370,30 @@ log_vprintf_internal (struct logvprintf_state *state, const char *fmt,
   numwritten = vsnprintf (write_ptr, available_size, fmt, args);
 
   /* vsnprintf() will not step over the limit given by available_size.
-     If it fails, it will return either -1 (POSIX?) or the number of
-     characters that *would have* been written, if there had been
-     enough room (C99).  In the former case, we double the
-     available_size and malloc to get a larger buffer, and try again.
-     In the latter case, we use the returned information to build a
-     buffer of the correct size.  */
+     If it fails, it returns either -1 (older implementations) or the
+     number of characters (not counting the terminating \0) that
+     *would have* been written if there had been enough room (C99).
+     In the former case, we double available_size and malloc to get a
+     larger buffer, and try again.  In the latter case, we use the
+     returned information to build a buffer of the correct size.  */
 
   if (numwritten == -1)
     {
       /* Writing failed, and we don't know the needed size.  Try
-	 again with doubled size. */
+         again with doubled size. */
       int newsize = available_size << 1;
       state->bigmsg = xrealloc (state->bigmsg, newsize);
       state->allocated = newsize;
-      return 0;
+      return false;
     }
   else if (numwritten >= available_size)
     {
       /* Writing failed, but we know exactly how much space we
-	 need. */
+         need. */
       int newsize = numwritten + 1;
       state->bigmsg = xrealloc (state->bigmsg, newsize);
       state->allocated = newsize;
-      return 0;
+      return false;
     }
 
   /* Writing succeeded. */
@@ -417,9 +406,9 @@ log_vprintf_internal (struct logvprintf_state *state, const char *fmt,
   if (flush_log_p)
     logflush ();
   else
-    needs_flushing = 1;
+    needs_flushing = true;
 
-  return 1;
+  return true;
 }
 
 /* Flush LOGFP.  Useful while flushing is disabled.  */
@@ -429,28 +418,28 @@ logflush (void)
   FILE *fp = get_log_fp ();
   if (fp)
     fflush (fp);
-  needs_flushing = 0;
+  needs_flushing = false;
 }
 
 /* Enable or disable log flushing. */
 void
-log_set_flush (int flush)
+log_set_flush (bool flush)
 {
   if (flush == flush_log_p)
     return;
 
-  if (flush == 0)
+  if (flush == false)
     {
       /* Disable flushing by setting flush_log_p to 0. */
-      flush_log_p = 0;
+      flush_log_p = false;
     }
   else
     {
       /* Reenable flushing.  If anything was printed in no-flush mode,
-	 flush the log now.  */
+         flush the log now.  */
       if (needs_flushing)
-	logflush ();
-      flush_log_p = 1;
+        logflush ();
+      flush_log_p = true;
     }
 }
 
@@ -458,23 +447,13 @@ log_set_flush (int flush)
    status of storing, with which this function can be called again to
    reestablish storing. */
 
-int
-log_set_save_context (int savep)
+bool
+log_set_save_context (bool savep)
 {
-  int old = save_context_p;
+  bool old = save_context_p;
   save_context_p = savep;
   return old;
 }
-
-/* Handle difference in va_start between pre-ANSI and ANSI C.  Note
-   that we always use `...' in function definitions and let ansi2knr
-   convert it for us.  */
-
-#ifdef WGET_USE_STDARG
-# define VA_START(args, arg1) va_start (args, arg1)
-#else
-# define VA_START(args, ignored) va_start (args)
-#endif
 
 /* Print a message to the screen or to the log.  The first argument
    defines the verbosity of the message, and the rest are as in
@@ -485,7 +464,7 @@ logprintf (enum log_options o, const char *fmt, ...)
 {
   va_list args;
   struct logvprintf_state lpstate;
-  int done;
+  bool done;
 
   check_redirect_output ();
   if (inhibit_logging)
@@ -495,7 +474,7 @@ logprintf (enum log_options o, const char *fmt, ...)
   xzero (lpstate);
   do
     {
-      VA_START (args, fmt);
+      va_start (args, fmt);
       done = log_vprintf_internal (&lpstate, fmt, args);
       va_end (args);
     }
@@ -504,7 +483,7 @@ logprintf (enum log_options o, const char *fmt, ...)
 
 #ifdef ENABLE_DEBUG
 /* The same as logprintf(), but does anything only if opt.debug is
-   non-zero.  */
+   true.  */
 void
 debug_logprintf (const char *fmt, ...)
 {
@@ -512,19 +491,19 @@ debug_logprintf (const char *fmt, ...)
     {
       va_list args;
       struct logvprintf_state lpstate;
-      int done;
+      bool done;
 
       check_redirect_output ();
       if (inhibit_logging)
-	return;
+        return;
 
       xzero (lpstate);
       do
-	{
-	  VA_START (args, fmt);
-	  done = log_vprintf_internal (&lpstate, fmt, args);
-	  va_end (args);
-	}
+        {
+          va_start (args, fmt);
+          done = log_vprintf_internal (&lpstate, fmt, args);
+          va_end (args);
+        }
       while (!done);
     }
 }
@@ -533,16 +512,16 @@ debug_logprintf (const char *fmt, ...)
 /* Open FILE and set up a logging stream.  If FILE cannot be opened,
    exit with status of 1.  */
 void
-log_init (const char *file, int appendp)
+log_init (const char *file, bool appendp)
 {
   if (file)
     {
       logfp = fopen (file, appendp ? "a" : "w");
       if (!logfp)
-	{
-	  fprintf (stderr, "%s: %s: %s\n", exec_name, file, strerror (errno));
-	  exit (1);
-	}
+        {
+          fprintf (stderr, "%s: %s: %s\n", exec_name, file, strerror (errno));
+          exit (1);
+        }
     }
   else
     {
@@ -556,16 +535,16 @@ log_init (const char *file, int appendp)
 
       if (1
 #ifdef HAVE_ISATTY
-	  && isatty (fileno (logfp))
+          && isatty (fileno (logfp))
 #endif
-	  )
-	{
-	  /* If the output is a TTY, enable save context, i.e. store
-	     the most recent several messages ("context") and dump
-	     them to a log file in case SIGHUP or SIGUSR1 is received
-	     (or Ctrl+Break is pressed under Windows).  */
-	  save_context_p = 1;
-	}
+          )
+        {
+          /* If the output is a TTY, enable save context, i.e. store
+             the most recent several messages ("context") and dump
+             them to a log file in case SIGHUP or SIGUSR1 is received
+             (or Ctrl+Break is pressed under Windows).  */
+          save_context_p = true;
+        }
     }
 }
 
@@ -579,13 +558,13 @@ log_close (void)
   if (logfp)
     fclose (logfp);
   logfp = NULL;
-  inhibit_logging = 1;
-  save_context_p = 0;
+  inhibit_logging = true;
+  save_context_p = false;
 
   for (i = 0; i < SAVED_LOG_LINES; i++)
     free_log_line (i);
   log_line_current = -1;
-  trailing_line = 0;
+  trailing_line = false;
 }
 
 /* Dump saved lines to logfp. */
@@ -605,7 +584,7 @@ log_dump_context (void)
     {
       struct log_ln *ln = log_lines + num;
       if (ln->content)
-	fputs (ln->content, fp);
+        fputs (ln->content, fp);
       ROT_ADVANCE (num);
     }
   while (num != log_line_current);
@@ -666,26 +645,26 @@ copy_and_escape (const char *source, char *dest, char escape, int base)
     {
     case 8:
       while ((c = *from++) != '\0')
-	if (ISPRINT (c))
-	  *to++ = c;
-	else
-	  {
-	    *to++ = escape;
-	    *to++ = '0' + (c >> 6);
-	    *to++ = '0' + ((c >> 3) & 7);
-	    *to++ = '0' + (c & 7);
-	  }
+        if (ISPRINT (c))
+          *to++ = c;
+        else
+          {
+            *to++ = escape;
+            *to++ = '0' + (c >> 6);
+            *to++ = '0' + ((c >> 3) & 7);
+            *to++ = '0' + (c & 7);
+          }
       break;
     case 16:
       while ((c = *from++) != '\0')
-	if (ISPRINT (c))
-	  *to++ = c;
-	else
-	  {
-	    *to++ = escape;
-	    *to++ = XNUM_TO_DIGIT (c >> 4);
-	    *to++ = XNUM_TO_DIGIT (c & 0xf);
-	  }
+        if (ISPRINT (c))
+          *to++ = c;
+        else
+          {
+            *to++ = escape;
+            *to++ = XNUM_TO_DIGIT (c >> 4);
+            *to++ = XNUM_TO_DIGIT (c & 0xf);
+          }
       break;
     default:
       abort ();
@@ -698,12 +677,12 @@ struct ringel {
   char *buffer;
   int size;
 };
-static struct ringel ring[RING_SIZE];	/* ring data */
+static struct ringel ring[RING_SIZE];   /* ring data */
 
 static const char *
 escnonprint_internal (const char *str, char escape, int base)
 {
-  static int ringpos;		        /* current ring position */
+  static int ringpos;                   /* current ring position */
   int nprcnt;
 
   assert (base == 8 || base == 16);
@@ -729,8 +708,8 @@ escnonprint_internal (const char *str, char escape, int base)
        (re)allocate it.  */
     if (r->buffer == NULL || r->size < needed_size)
       {
-	r->buffer = xrealloc (r->buffer, needed_size);
-	r->size = needed_size;
+        r->buffer = xrealloc (r->buffer, needed_size);
+        r->size = needed_size;
       }
 
     copy_and_escape (str, r->buffer, escape, base);
@@ -791,7 +770,7 @@ log_cleanup (void)
 
 /* When SIGHUP or SIGUSR1 are received, the output is redirected
    elsewhere.  Such redirection is only allowed once. */
-enum { RR_NONE, RR_REQUESTED, RR_DONE } redirect_request = RR_NONE;
+static enum { RR_NONE, RR_REQUESTED, RR_DONE } redirect_request = RR_NONE;
 static const char *redirect_request_signal_name;
 
 /* Redirect output to `wget-log'.  */
@@ -800,11 +779,11 @@ static void
 redirect_output (void)
 {
   char *logfile;
-  logfp = unique_create (DEFAULT_LOGFILE, 0, &logfile);
+  logfp = unique_create (DEFAULT_LOGFILE, false, &logfile);
   if (logfp)
     {
       fprintf (stderr, _("\n%s received, redirecting output to `%s'.\n"),
-	       redirect_request_signal_name, logfile);
+               redirect_request_signal_name, logfile);
       xfree (logfile);
       /* Dump the context output to the newly opened log.  */
       log_dump_context ();
@@ -815,10 +794,10 @@ redirect_output (void)
          can do but disable printing completely. */
       fprintf (stderr, _("\n%s received.\n"), redirect_request_signal_name);
       fprintf (stderr, _("%s: %s; disabling logging.\n"),
-	       logfile, strerror (errno));
-      inhibit_logging = 1;
+               logfile, strerror (errno));
+      inhibit_logging = true;
     }
-  save_context_p = 0;
+  save_context_p = false;
 }
 
 /* Check whether a signal handler requested the output to be

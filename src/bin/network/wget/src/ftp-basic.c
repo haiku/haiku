@@ -1,11 +1,12 @@
 /* Basic FTP routines.
-   Copyright (C) 1995, 1996, 1997, 1998, 2000 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,18 +15,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
@@ -34,15 +35,10 @@ so, delete this exception statement from your version.  */
 #include <stdlib.h>
 #include <errno.h>
 
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
+#include <string.h>
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
-#include <sys/types.h>
 
 #include "wget.h"
 #include "utils.h"
@@ -71,30 +67,30 @@ ftp_response (int fd, char **ret_line)
       char *p;
       char *line = fd_read_line (fd);
       if (!line)
-	return FTPRERR;
+        return FTPRERR;
 
       /* Strip trailing CRLF before printing the line, so that
-	 escnonprint doesn't include bogus \012 and \015. */
+         escnonprint doesn't include bogus \012 and \015. */
       p = strchr (line, '\0');
       if (p > line && p[-1] == '\n')
-	*--p = '\0';
+        *--p = '\0';
       if (p > line && p[-1] == '\r')
-	*--p = '\0';
+        *--p = '\0';
 
       if (opt.server_response)
-	logprintf (LOG_NOTQUIET, "%s\n", escnonprint (line));
+        logprintf (LOG_NOTQUIET, "%s\n", escnonprint (line));
       else
         DEBUGP (("%s\n", escnonprint (line)));
 
       /* The last line of output is the one that begins with "ddd ". */
       if (ISDIGIT (line[0]) && ISDIGIT (line[1]) && ISDIGIT (line[2])
-	  && line[3] == ' ')
-	{
-	  strncpy (ftp_last_respline, line, sizeof (ftp_last_respline));
-	  ftp_last_respline[sizeof (ftp_last_respline) - 1] = '\0';
-	  *ret_line = line;
-	  return FTPOK;
-	}
+          && line[3] == ' ')
+        {
+          strncpy (ftp_last_respline, line, sizeof (ftp_last_respline));
+          ftp_last_respline[sizeof (ftp_last_respline) - 1] = '\0';
+          *ret_line = line;
+          return FTPOK;
+        }
       xfree (line);
     }
 }
@@ -109,23 +105,23 @@ ftp_request (const char *command, const char *value)
   if (value)
     {
       /* Check for newlines in VALUE (possibly injected by the %0A URL
-	 escape) making the callers inadvertently send multiple FTP
-	 commands at once.  Without this check an attacker could
-	 intentionally redirect to ftp://server/fakedir%0Acommand.../
-	 and execute arbitrary FTP command on a remote FTP server.  */
+         escape) making the callers inadvertently send multiple FTP
+         commands at once.  Without this check an attacker could
+         intentionally redirect to ftp://server/fakedir%0Acommand.../
+         and execute arbitrary FTP command on a remote FTP server.  */
       if (strpbrk (value, "\r\n"))
-	{
-	  /* Copy VALUE to the stack and modify CR/LF to space. */
-	  char *defanged, *p;
-	  STRDUP_ALLOCA (defanged, value);
-	  for (p = defanged; *p; p++)
-	    if (*p == '\r' || *p == '\n')
-	      *p = ' ';
-	  DEBUGP (("\nDetected newlines in %s \"%s\"; changing to %s \"%s\"\n",
-		   command, escnonprint (value), command, escnonprint (defanged)));
-	  /* Make VALUE point to the defanged copy of the string. */
-	  value = defanged;
-	}
+        {
+          /* Copy VALUE to the stack and modify CR/LF to space. */
+          char *defanged, *p;
+          STRDUP_ALLOCA (defanged, value);
+          for (p = defanged; *p; p++)
+            if (*p == '\r' || *p == '\n')
+              *p = ' ';
+          DEBUGP (("\nDetected newlines in %s \"%s\"; changing to %s \"%s\"\n",
+                   command, escnonprint (value), command, escnonprint (defanged)));
+          /* Make VALUE point to the defanged copy of the string. */
+          value = defanged;
+        }
       res = concat_strings (command, " ", value, "\r\n", (char *) 0);
     }
   else
@@ -164,7 +160,7 @@ ftp_login (int csock, const char *acc, const char *pass)
   xfree (respline);
   /* Send USER username.  */
   request = ftp_request ("USER", acc);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -198,29 +194,29 @@ ftp_login (int csock, const char *acc, const char *pass)
 
     for (i = 0; i < countof (skey_head); i++)
       {
-	int l = strlen (skey_head[i]);
+        int l = strlen (skey_head[i]);
         if (0 == strncasecmp (skey_head[i], respline, l))
-	  {
-	    seed = respline + l;
-	    break;
-	  }
+          {
+            seed = respline + l;
+            break;
+          }
       }
     if (seed)
       {
         int skey_sequence = 0;
 
-	/* Extract the sequence from SEED.  */
-	for (; ISDIGIT (*seed); seed++)
-	  skey_sequence = 10 * skey_sequence + *seed - '0';
-	if (*seed == ' ')
-	  ++seed;
+        /* Extract the sequence from SEED.  */
+        for (; ISDIGIT (*seed); seed++)
+          skey_sequence = 10 * skey_sequence + *seed - '0';
+        if (*seed == ' ')
+          ++seed;
         else
           {
             xfree (respline);
             return FTPLOGREFUSED;
           }
-	/* Replace the password with the SKEY response to the
-	   challenge.  */
+        /* Replace the password with the SKEY response to the
+           challenge.  */
         pass = skey_response (skey_sequence, seed, pass);
       }
   }
@@ -228,7 +224,7 @@ ftp_login (int csock, const char *acc, const char *pass)
   xfree (respline);
   /* Send PASS password.  */
   request = ftp_request ("PASS", pass);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -255,13 +251,11 @@ ip_address_to_port_repr (const ip_address *addr, int port, char *buf,
 {
   unsigned char *ptr;
 
-  assert (addr != NULL);
-  assert (addr->type == IPV4_ADDRESS);
-  assert (buf != NULL);
+  assert (addr->family == AF_INET);
   /* buf must contain the argument of PORT (of the form a,b,c,d,e,f). */
   assert (buflen >= 6 * 4);
 
-  ptr = ADDRESS_IPV4_DATA (addr);
+  ptr = IP_INADDR_DATA (addr);
   snprintf (buf, buflen, "%d,%d,%d,%d,%d,%d", ptr[0], ptr[1],
             ptr[2], ptr[3], (port & 0xff00) >> 8, port & 0xff);
   buf[buflen - 1] = '\0';
@@ -285,7 +279,7 @@ ftp_port (int csock, int *local_sock)
   if (!socket_ip_address (csock, &addr, ENDPOINT_LOCAL))
     return FTPSYSERR;
 
-  assert (addr.type == IPV4_ADDRESS);
+  assert (addr.family == AF_INET);
 
   /* Setting port to 0 lets the system choose a free port.  */
   port = 0;
@@ -300,7 +294,7 @@ ftp_port (int csock, int *local_sock)
 
   /* Send PORT request.  */
   request = ftp_request ("PORT", bytes);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -331,32 +325,29 @@ static void
 ip_address_to_lprt_repr (const ip_address *addr, int port, char *buf, 
                          size_t buflen)
 {
-  unsigned char *ptr;
+  unsigned char *ptr = IP_INADDR_DATA (addr);
 
-  assert (addr != NULL);
-  assert (addr->type == IPV4_ADDRESS || addr->type == IPV6_ADDRESS);
-  assert (buf != NULL);
   /* buf must contain the argument of LPRT (of the form af,n,h1,h2,...,hn,p1,p2). */
   assert (buflen >= 21 * 4);
 
   /* Construct the argument of LPRT (of the form af,n,h1,h2,...,hn,p1,p2). */
-  switch (addr->type) 
+  switch (addr->family) 
     {
-      case IPV4_ADDRESS: 
-	ptr = ADDRESS_IPV4_DATA (addr);
-        snprintf (buf, buflen, "%d,%d,%d,%d,%d,%d,%d,%d,%d", 4, 4, 
-                  ptr[0], ptr[1], ptr[2], ptr[3], 2,
-                  (port & 0xff00) >> 8, port & 0xff);
-        buf[buflen - 1] = '\0';
-        break;
-      case IPV6_ADDRESS: 
-	ptr = ADDRESS_IPV6_DATA (addr);
-	snprintf (buf, buflen, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-	          6, 16, ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7], 
-		  ptr[8], ptr[9], ptr[10], ptr[11], ptr[12], ptr[13], ptr[14], ptr[15], 2,
-		  (port & 0xff00) >> 8, port & 0xff);
-	buf[buflen - 1] = '\0';
-	break;
+    case AF_INET: 
+      snprintf (buf, buflen, "%d,%d,%d,%d,%d,%d,%d,%d,%d", 4, 4, 
+                ptr[0], ptr[1], ptr[2], ptr[3], 2,
+                (port & 0xff00) >> 8, port & 0xff);
+      break;
+    case AF_INET6: 
+      snprintf (buf, buflen,
+                "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+                6, 16,
+                ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7], 
+                ptr[8], ptr[9], ptr[10], ptr[11], ptr[12], ptr[13], ptr[14], ptr[15],
+                2, (port & 0xff00) >> 8, port & 0xff);
+      break;
+    default:
+      abort ();
     }
 }
 
@@ -378,7 +369,7 @@ ftp_lprt (int csock, int *local_sock)
   if (!socket_ip_address (csock, &addr, ENDPOINT_LOCAL))
     return FTPSYSERR;
 
-  assert (addr.type == IPV4_ADDRESS || addr.type == IPV6_ADDRESS);
+  assert (addr.family == AF_INET || addr.family == AF_INET6);
 
   /* Setting port to 0 lets the system choose a free port.  */
   port = 0;
@@ -393,7 +384,7 @@ ftp_lprt (int csock, int *local_sock)
 
   /* Send PORT request.  */
   request = ftp_request ("LPRT", bytes);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -424,17 +415,14 @@ ip_address_to_eprt_repr (const ip_address *addr, int port, char *buf,
 {
   int afnum;
 
-  assert (addr != NULL);
-  assert (addr->type == IPV4_ADDRESS || addr->type == IPV6_ADDRESS);
-  assert (buf != NULL);
   /* buf must contain the argument of EPRT (of the form |af|addr|port|). 
    * 4 chars for the | separators, INET6_ADDRSTRLEN chars for addr  
    * 1 char for af (1-2) and 5 chars for port (0-65535) */
   assert (buflen >= 4 + INET6_ADDRSTRLEN + 1 + 5); 
 
   /* Construct the argument of EPRT (of the form |af|addr|port|). */
-  afnum = (addr->type == IPV4_ADDRESS ? 1 : 2);
-  snprintf (buf, buflen, "|%d|%s|%d|", afnum, pretty_print_address (addr), port);
+  afnum = (addr->family == AF_INET ? 1 : 2);
+  snprintf (buf, buflen, "|%d|%s|%d|", afnum, print_address (addr), port);
   buf[buflen - 1] = '\0';
 }
 
@@ -458,8 +446,6 @@ ftp_eprt (int csock, int *local_sock)
   if (!socket_ip_address (csock, &addr, ENDPOINT_LOCAL))
     return FTPSYSERR;
 
-  assert (addr.type == IPV4_ADDRESS || addr.type == IPV6_ADDRESS);
-
   /* Setting port to 0 lets the system choose a free port.  */
   port = 0;
 
@@ -473,7 +459,7 @@ ftp_eprt (int csock, int *local_sock)
 
   /* Send PORT request.  */
   request = ftp_request ("EPRT", bytes);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -518,7 +504,7 @@ ftp_pasv (int csock, ip_address *addr, int *port)
   /* Form the request.  */
   request = ftp_request ("PASV", NULL);
   /* And send it.  */
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -536,7 +522,8 @@ ftp_pasv (int csock, ip_address *addr, int *port)
     }
   /* Parse the request.  */
   s = respline;
-  for (s += 4; *s && !ISDIGIT (*s); s++);
+  for (s += 4; *s && !ISDIGIT (*s); s++)
+    ;
   if (!*s)
     return FTPINVPASV;
   for (i = 0; i < 6; i++)
@@ -555,8 +542,8 @@ ftp_pasv (int csock, ip_address *addr, int *port)
     }
   xfree (respline);
 
-  addr->type = IPV4_ADDRESS;
-  memcpy (ADDRESS_IPV4_DATA (addr), tmp, 4);
+  addr->family = AF_INET;
+  memcpy (IP_INADDR_DATA (addr), tmp, 4);
   *port = ((tmp[4] << 8) & 0xff00) + tmp[5];
 
   return FTPOK;
@@ -584,7 +571,7 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
   request = ftp_request ("LPSV", NULL);
 
   /* And send it.  */
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -604,7 +591,8 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
 
   /* Parse the response.  */
   s = respline;
-  for (s += 4; *s && !ISDIGIT (*s); s++);
+  for (s += 4; *s && !ISDIGIT (*s); s++)
+    ;
   if (!*s)
     return FTPINVPASV;
 
@@ -700,10 +688,10 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
 
   if (af == 4)
     {
-      addr->type = IPV4_ADDRESS;
-      memcpy (ADDRESS_IPV4_DATA (addr), tmp, 4);
+      addr->family = AF_INET;
+      memcpy (IP_INADDR_DATA (addr), tmp, 4);
       *port = ((tmpprt[0] << 8) & 0xff00) + tmpprt[1];
-      DEBUGP (("lpsv addr is: %s\n", pretty_print_address(addr)));
+      DEBUGP (("lpsv addr is: %s\n", print_address(addr)));
       DEBUGP (("tmpprt[0] is: %d\n", tmpprt[0]));
       DEBUGP (("tmpprt[1] is: %d\n", tmpprt[1]));
       DEBUGP (("*port is: %d\n", *port));
@@ -711,10 +699,10 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
   else
     {
       assert (af == 6);
-      addr->type = IPV6_ADDRESS;
-      memcpy (ADDRESS_IPV6_DATA (addr), tmp, 16);
+      addr->family = AF_INET6;
+      memcpy (IP_INADDR_DATA (addr), tmp, 16);
       *port = ((tmpprt[0] << 8) & 0xff00) + tmpprt[1];
-      DEBUGP (("lpsv addr is: %s\n", pretty_print_address(addr)));
+      DEBUGP (("lpsv addr is: %s\n", print_address(addr)));
       DEBUGP (("tmpprt[0] is: %d\n", tmpprt[0]));
       DEBUGP (("tmpprt[1] is: %d\n", tmpprt[1]));
       DEBUGP (("*port is: %d\n", *port));
@@ -743,10 +731,10 @@ ftp_epsv (int csock, ip_address *ip, int *port)
 
   /* Form the request.  */
   /* EPSV 1 means that we ask for IPv4 and EPSV 2 means that we ask for IPv6. */
-  request = ftp_request ("EPSV", (ip->type == IPV4_ADDRESS ? "1" : "2"));
+  request = ftp_request ("EPSV", (ip->family == AF_INET ? "1" : "2"));
 
   /* And send it.  */
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -843,7 +831,7 @@ ftp_type (int csock, int type)
   stype[1] = 0;
   /* Send TYPE request.  */
   request = ftp_request ("TYPE", stype);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -875,7 +863,7 @@ ftp_cwd (int csock, const char *dir)
 
   /* Send CWD request.  */
   request = ftp_request ("CWD", dir);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -910,7 +898,7 @@ ftp_rest (int csock, wgint offset)
   uerr_t err;
 
   request = ftp_request ("REST", number_to_static_string (offset));
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -941,7 +929,7 @@ ftp_retr (int csock, const char *file)
 
   /* Send RETR request.  */
   request = ftp_request ("RETR", file);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -975,33 +963,45 @@ ftp_list (int csock, const char *file)
   char *request, *respline;
   int nwritten;
   uerr_t err;
+  bool ok = false;
+  int i = 0;
+  /* Try `LIST -a' first and revert to `LIST' in case of failure.  */
+  const char *list_commands[] = { "LIST -a", 
+                                  "LIST" };
 
-  /* Send LIST request.  */
-  request = ftp_request ("LIST", file);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
-  if (nwritten < 0)
-    {
-      xfree (request);
-      return WRITEFAILED;
-    }
-  xfree (request);
-  /* Get appropriate respone.  */
-  err = ftp_response (csock, &respline);
-  if (err != FTPOK)
-    return err;
-  if (*respline == '5')
-    {
-      xfree (respline);
-      return FTPNSFOD;
-    }
-  if (*respline != '1')
-    {
-      xfree (respline);
-      return FTPRERR;
-    }
-  xfree (respline);
-  /* All OK.  */
-  return FTPOK;
+  do {
+    /* Send request.  */
+    request = ftp_request (list_commands[i], file);
+    nwritten = fd_write (csock, request, strlen (request), -1);
+    if (nwritten < 0)
+      {
+        xfree (request);
+        return WRITEFAILED;
+      }
+    xfree (request);
+    /* Get appropriate response.  */
+    err = ftp_response (csock, &respline);
+    if (err == FTPOK)
+      {
+        if (*respline == '5')
+          {
+            err = FTPNSFOD;
+          }
+        else if (*respline == '1')
+          {
+            err = FTPOK;
+            ok = true;
+          }
+        else 
+          {
+            err = FTPRERR;
+          }
+        xfree (respline);
+      }
+    ++i;
+  } while (i < countof (list_commands) && !ok);
+  
+  return err;
 }
 
 /* Sends the SYST command to the server. */
@@ -1014,7 +1014,7 @@ ftp_syst (int csock, enum stype *server_type)
 
   /* Send SYST request.  */
   request = ftp_request ("SYST", NULL);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -1039,12 +1039,14 @@ ftp_syst (int csock, enum stype *server_type)
      first word of the server response)?  */
   request = strtok (NULL, " ");
 
-  if (!strcasecmp (request, "VMS"))
+  if (request == NULL)
+    *server_type = ST_OTHER;
+  else if (!strcasecmp (request, "VMS"))
     *server_type = ST_VMS;
   else if (!strcasecmp (request, "UNIX"))
     *server_type = ST_UNIX;
   else if (!strcasecmp (request, "WINDOWS_NT")
-	   || !strcasecmp (request, "WINDOWS2000"))
+           || !strcasecmp (request, "WINDOWS2000"))
     *server_type = ST_WINNT;
   else if (!strcasecmp (request, "MACOS"))
     *server_type = ST_MACOS;
@@ -1068,7 +1070,7 @@ ftp_pwd (int csock, char **pwd)
 
   /* Send PWD request.  */
   request = ftp_request ("PWD", NULL);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);
@@ -1116,7 +1118,7 @@ ftp_size (int csock, const char *file, wgint *size)
 
   /* Send PWD request.  */
   request = ftp_request ("SIZE", file);
-  nwritten = fd_write (csock, request, strlen (request), -1.0);
+  nwritten = fd_write (csock, request, strlen (request), -1);
   if (nwritten < 0)
     {
       xfree (request);

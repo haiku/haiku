@@ -1,11 +1,12 @@
 /* Declarations for utils.c.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,25 +15,21 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #ifndef UTILS_H
 #define UTILS_H
-
-enum accd {
-   ALLABS = 1
-};
 
 struct hash_table;
 
@@ -44,85 +41,89 @@ struct file_memory {
 
 #define HYPHENP(x) (*(x) == '-' && !*((x) + 1))
 
-char *time_str PARAMS ((time_t *));
-char *datetime_str PARAMS ((time_t *));
+char *time_str (time_t);
+char *datetime_str (time_t);
 
 #ifdef DEBUG_MALLOC
 void print_malloc_debug_stats ();
 #endif
 
-char *xstrdup_lower PARAMS ((const char *));
+char *xstrdup_lower (const char *);
 
-char *strdupdelim PARAMS ((const char *, const char *));
-char **sepstring PARAMS ((const char *));
-int frontcmp PARAMS ((const char *, const char *));
-void fork_to_background PARAMS ((void));
+char *strdupdelim (const char *, const char *);
+char **sepstring (const char *);
+bool subdir_p (const char *, const char *);
+void fork_to_background (void);
 
-#ifdef WGET_USE_STDARG
-char *aprintf PARAMS ((const char *, ...))
-     GCC_FORMAT_ATTR (1, 2);
-char *concat_strings PARAMS ((const char *, ...));
-#else  /* not WGET_USE_STDARG */
-char *aprintf ();
-char *concat_strings ();
-#endif /* not WGET_USE_STDARG */
+char *aprintf (const char *, ...) GCC_FORMAT_ATTR (1, 2);
+char *concat_strings (const char *, ...);
 
-void touch PARAMS ((const char *, time_t));
-int remove_link PARAMS ((const char *));
-int file_exists_p PARAMS ((const char *));
-int file_non_directory_p PARAMS ((const char *));
-wgint file_size PARAMS ((const char *));
-int make_directory PARAMS ((const char *));
-char *unique_name PARAMS ((const char *, int));
-FILE *unique_create PARAMS ((const char *, int, char **));
-FILE *fopen_excl PARAMS ((const char *, int));
-char *file_merge PARAMS ((const char *, const char *));
+void touch (const char *, time_t);
+int remove_link (const char *);
+bool file_exists_p (const char *);
+bool file_non_directory_p (const char *);
+wgint file_size (const char *);
+int make_directory (const char *);
+char *unique_name (const char *, bool);
+FILE *unique_create (const char *, bool, char **);
+FILE *fopen_excl (const char *, bool);
+char *file_merge (const char *, const char *);
 
-int acceptable PARAMS ((const char *));
-int accdir PARAMS ((const char *s, enum accd));
-char *suffix PARAMS ((const char *s));
-int match_tail PARAMS ((const char *, const char *, int));
-int has_wildcards_p PARAMS ((const char *));
+int fnmatch_nocase (const char *, const char *, int);
+bool acceptable (const char *);
+bool accdir (const char *s);
+char *suffix (const char *s);
+bool match_tail (const char *, const char *, bool);
+bool has_wildcards_p (const char *);
 
-int has_html_suffix_p PARAMS ((const char *));
+bool has_html_suffix_p (const char *);
 
-char *read_whole_line PARAMS ((FILE *));
-struct file_memory *read_file PARAMS ((const char *));
-void read_file_free PARAMS ((struct file_memory *));
+char *read_whole_line (FILE *);
+struct file_memory *read_file (const char *);
+void read_file_free (struct file_memory *);
 
-void free_vec PARAMS ((char **));
-char **merge_vecs PARAMS ((char **, char **));
-char **vec_append PARAMS ((char **, const char *));
+void free_vec (char **);
+char **merge_vecs (char **, char **);
+char **vec_append (char **, const char *);
 
-void string_set_add PARAMS ((struct hash_table *, const char *));
-int string_set_contains PARAMS ((struct hash_table *, const char *));
-void string_set_to_array PARAMS ((struct hash_table *, char **));
-void string_set_free PARAMS ((struct hash_table *));
-void free_keys_and_values PARAMS ((struct hash_table *));
+void string_set_add (struct hash_table *, const char *);
+int string_set_contains (struct hash_table *, const char *);
+void string_set_to_array (struct hash_table *, char **);
+void string_set_free (struct hash_table *);
+void free_keys_and_values (struct hash_table *);
 
-char *with_thousand_seps PARAMS ((wgint));
-#ifndef with_thousand_seps_sum
-char *with_thousand_seps_sum PARAMS ((SUM_SIZE_INT));
+const char *with_thousand_seps (wgint);
+
+/* human_readable must be able to accept wgint and SUM_SIZE_INT
+   arguments.  On machines where wgint is 32-bit, declare it to accept
+   double.  */
+#if SIZEOF_WGINT >= 8
+# define HR_NUMTYPE wgint
+#else
+# define HR_NUMTYPE double
 #endif
-char *human_readable PARAMS ((wgint));
-int numdigit PARAMS ((wgint));
-char *number_to_string PARAMS ((char *, wgint));
-char *number_to_static_string PARAMS ((wgint));
+char *human_readable (HR_NUMTYPE);
 
-int determine_screen_width PARAMS ((void));
-int random_number PARAMS ((int));
-double random_float PARAMS ((void));
 
-int run_with_timeout PARAMS ((double, void (*) (void *), void *));
-void xsleep PARAMS ((double));
+int numdigit (wgint);
+char *number_to_string (char *, wgint);
+char *number_to_static_string (wgint);
+
+int determine_screen_width (void);
+int random_number (int);
+double random_float (void);
+
+bool run_with_timeout (double, void (*) (void *), void *);
+void xsleep (double);
 
 /* How many bytes it will take to store LEN bytes in base64.  */
 #define BASE64_LENGTH(len) (4 * (((len) + 2) / 3))
 
-int base64_encode PARAMS ((const char *, int, char *));
-int base64_decode PARAMS ((const char *, char *));
+int base64_encode (const void *, int, char *);
+int base64_decode (const char *, void *);
 
-void stable_sort PARAMS ((void *, size_t, size_t,
-                          int (*) (const void *, const void *)));
+void stable_sort (void *, size_t, size_t, int (*) (const void *, const void *));
+
+const char *print_decimal (double);
 
 #endif /* UTILS_H */

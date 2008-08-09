@@ -10,5 +10,7 @@ Please note that Wget has more than one ChangeLog file:
 
     windows/ChangeLog: documents only changes to files in the windows directory
 
+    msdos/ChangeLog: documents only changes to files in the msdos directory
+
 When checking to see if a patch you sent in has been applied, please
 look in the appropriate ChangeLog(s).

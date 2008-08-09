@@ -1,9 +1,10 @@
 dnl Wget-specific Autoconf macros.
-dnl Copyright (C) 1996-2005 Free Software Foundation, Inc.
+dnl Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+dnl 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
-dnl the Free Software Foundation; either version 2 of the License, or
+dnl the Free Software Foundation; either version 3 of the License, or
 dnl (at your option) any later version.
 
 dnl This program is distributed in the hope that it will be useful,
@@ -12,18 +13,18 @@ dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 dnl GNU General Public License for more details.
 
 dnl You should have received a copy of the GNU General Public License
-dnl along with this program; if not, write to the Free Software
-dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-dnl In addition, as a special exception, the Free Software Foundation
-dnl gives permission to link the code of its release of Wget with the
-dnl OpenSSL project's "OpenSSL" library (or with modified versions of it
-dnl that use the same license as the "OpenSSL" library), and distribute
-dnl the linked executables.  You must obey the GNU General Public License
-dnl in all respects for all of the code used other than "OpenSSL".  If you
-dnl modify this file, you may extend this exception to your version of the
-dnl file, but you are not obligated to do so.  If you do not wish to do
-dnl so, delete this exception statement from your version.
+dnl Additional permission under GNU GPL version 3 section 7
+
+dnl If you modify this program, or any covered work, by linking or
+dnl combining it with the OpenSSL project's OpenSSL library (or a
+dnl modified version of that library), containing parts covered by the
+dnl terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+dnl grants you additional permission to convey the resulting work.
+dnl Corresponding Source for a non-source form of such a combination
+dnl shall include the source code for the parts of OpenSSL used as well
+dnl as that of the covered work.
 
 dnl
 dnl Check for `struct utimbuf'.
@@ -135,63 +136,6 @@ AC_DEFUN([WGET_NSL_SOCKET], [
     AC_CHECK_LIB(nsl, $wget_check_in_nsl)
   fi
   AC_CHECK_LIB(socket, socket)
-])
-
-
-# serial 1
-
-# @defmac AC_PROG_CC_STDC
-# @maindex PROG_CC_STDC
-# @ovindex CC
-# If the C compiler in not in ANSI C mode by default, try to add an option
-# to output variable @code{CC} to make it so.  This macro tries various
-# options that select ANSI C on some system or another.  It considers the
-# compiler to be in ANSI C mode if it defines @code{__STDC__} to 1 and
-# handles function prototypes correctly.
-#
-# If you use this macro, you should check after calling it whether the C
-# compiler has been set to accept ANSI C; if not, the shell variable
-# @code{am_cv_prog_cc_stdc} is set to @samp{no}.  If you wrote your source
-# code in ANSI C, you can make an un-ANSIfied copy of it by using the
-# program @code{ansi2knr}, which comes with Ghostscript.
-# @end defmac
-
-AC_DEFUN(AM_PROG_CC_STDC,
-[AC_REQUIRE([AC_PROG_CC])
-AC_MSG_CHECKING([for ${CC-cc} option to accept ANSI C])
-AC_CACHE_VAL(am_cv_prog_cc_stdc,
-[am_cv_prog_cc_stdc=no
-ac_save_CC="$CC"
-# Don't try gcc -ansi; that turns off useful extensions and
-# breaks some systems' header files.
-# AIX			-qlanglvl=ansi
-# Ultrix and OSF/1	-std1
-# HP-UX			-Aa -D_HPUX_SOURCE
-for ac_arg in "" -qlanglvl=ansi -std1 "-Aa -D_HPUX_SOURCE"
-do
-  CC="$ac_save_CC $ac_arg"
-  AC_TRY_COMPILE(
-[#if !defined(__STDC__)
-choke me
-#endif
-/* DYNIX/ptx V4.1.3 can't compile sys/stat.h with -Xc -D__EXTENSIONS__. */
-#ifdef _SEQUENT_
-# include <sys/types.h>
-# include <sys/stat.h>
-#endif
-], [
-int test (int i, double x);
-struct s1 {int (*f) (int a);};
-struct s2 {int (*f) (double a);};],
-[am_cv_prog_cc_stdc="$ac_arg"; break])
-done
-CC="$ac_save_CC"
-])
-AC_MSG_RESULT($am_cv_prog_cc_stdc)
-case "x$am_cv_prog_cc_stdc" in
-  x|xno) ;;
-  *) CC="$CC $am_cv_prog_cc_stdc" ;;
-esac
 ])
 
 
@@ -336,7 +280,7 @@ AC_DEFUN([WGET_WITH_NLS],
 	fi
       fi
 
-      AC_CHECK_HEADERS(locale.h libintl.h)
+      AC_CHECK_HEADERS(libintl.h)
 
       dnl Prefer gettext found in -lintl to the one in libc.
       dnl Otherwise it can happen that we include libintl.h from
@@ -390,7 +334,7 @@ dnl
 dnl This is not strictly an Autoconf macro, because it is run from
 dnl within `config.status' rather than from within configure.  This
 dnl is why special rules must be applied for it.
-AC_DEFUN(WGET_PROCESS_PO,
+AC_DEFUN([WGET_PROCESS_PO],
   [
    dnl I wonder what the following several lines do...
    if test "x$srcdir" != "x."; then
@@ -422,11 +366,9 @@ AC_DEFUN(WGET_PROCESS_PO,
 # functionality.  Please note that the actual code is *not* freely
 # available.
 
-# serial 1
-
 dnl AM_PATH_PROG_WITH_TEST(VARIABLE, PROG-TO-CHECK-FOR,
 dnl   TEST-PERFORMED-ON-FOUND_PROGRAM [, VALUE-IF-NOT-FOUND [, PATH]])
-AC_DEFUN(AM_PATH_PROG_WITH_TEST,
+AC_DEFUN([AM_PATH_PROG_WITH_TEST],
 [# Extract the first word of "$2", so it can be a program name with args.
 set dummy $2; ac_word=[$]2
 AC_MSG_CHECKING([for $ac_word])
@@ -461,3 +403,4 @@ else
 fi
 AC_SUBST($1)dnl
 ])
+

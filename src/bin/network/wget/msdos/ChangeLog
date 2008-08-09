@@ -1,0 +1,23 @@
+2008-01-25  Micah Cowan  <micah@cowan.name>
+
+	* config.h: Updated copyright year.
+
+2007-11-28  Micah Cowan <micah@cowan.name>
+
+	* config.h: Updated license exception for OpenSSL, per the SFLC.
+
+2007-10-02  Gisle Vanem  <gvanem@broadpark.no>
+
+	* config.h: Removed unused defines, added needed 'HAVE_*' defines.
+
+	* Makefile.DJ: rewritten to be used from './src' directory.
+	Added '-DOPENSSL_NO_KRB5' for OpenSSL build. Target is
+	now wget.exe.
+
+	* Makefile.WC: Added for building with OpenWatcom targeting
+	32-bit DOS (DOS32A extender). 
+
+2007-09-24  Gisle Vanem  <giva@bgnett.no>
+
+	* Makefile.DJ, config.h: Added to support building on MS-DOS via
+	DJGPP.

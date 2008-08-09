@@ -1,11 +1,12 @@
 /* Collect URLs from HTML source.
-   Copyright (C) 1998, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,27 +15,23 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
 #include <stdio.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
+#include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
@@ -45,19 +42,14 @@ so, delete this exception statement from your version.  */
 #include "utils.h"
 #include "hash.h"
 #include "convert.h"
-#include "recur.h"		/* declaration of get_urls_html */
-
-#ifndef errno
-extern int errno;
-#endif
+#include "recur.h"              /* declaration of get_urls_html */
 
 struct map_context;
 
-typedef void (*tag_handler_t) PARAMS ((int, struct taginfo *,
-				       struct map_context *));
+typedef void (*tag_handler_t) (int, struct taginfo *, struct map_context *);
 
-#define DECLARE_TAG_HANDLER(fun)					\
-  static void fun PARAMS ((int, struct taginfo *, struct map_context *))
+#define DECLARE_TAG_HANDLER(fun)                                \
+  static void fun (int, struct taginfo *, struct map_context *)
 
 DECLARE_TAG_HANDLER (tag_find_urls);
 DECLARE_TAG_HANDLER (tag_handle_base);
@@ -97,28 +89,28 @@ static struct known_tag {
   const char *name;
   tag_handler_t handler;
 } known_tags[] = {
-  { TAG_A,	 "a",		tag_find_urls },
-  { TAG_APPLET,	 "applet",	tag_find_urls },
-  { TAG_AREA,	 "area",	tag_find_urls },
-  { TAG_BASE,	 "base",	tag_handle_base },
-  { TAG_BGSOUND, "bgsound",	tag_find_urls },
-  { TAG_BODY,	 "body",	tag_find_urls },
-  { TAG_EMBED,	 "embed",	tag_find_urls },
-  { TAG_FIG,	 "fig",		tag_find_urls },
-  { TAG_FORM,	 "form",	tag_handle_form },
-  { TAG_FRAME,	 "frame",	tag_find_urls },
-  { TAG_IFRAME,	 "iframe",	tag_find_urls },
-  { TAG_IMG,	 "img",		tag_find_urls },
-  { TAG_INPUT,	 "input",	tag_find_urls },
-  { TAG_LAYER,	 "layer",	tag_find_urls },
-  { TAG_LINK,	 "link",	tag_handle_link },
-  { TAG_META,	 "meta",	tag_handle_meta },
-  { TAG_OBJECT,  "object",	tag_find_urls },
-  { TAG_OVERLAY, "overlay",	tag_find_urls },
-  { TAG_SCRIPT,	 "script",	tag_find_urls },
-  { TAG_TABLE,	 "table",	tag_find_urls },
-  { TAG_TD,	 "td",		tag_find_urls },
-  { TAG_TH,	 "th",		tag_find_urls }
+  { TAG_A,       "a",           tag_find_urls },
+  { TAG_APPLET,  "applet",      tag_find_urls },
+  { TAG_AREA,    "area",        tag_find_urls },
+  { TAG_BASE,    "base",        tag_handle_base },
+  { TAG_BGSOUND, "bgsound",     tag_find_urls },
+  { TAG_BODY,    "body",        tag_find_urls },
+  { TAG_EMBED,   "embed",       tag_find_urls },
+  { TAG_FIG,     "fig",         tag_find_urls },
+  { TAG_FORM,    "form",        tag_handle_form },
+  { TAG_FRAME,   "frame",       tag_find_urls },
+  { TAG_IFRAME,  "iframe",      tag_find_urls },
+  { TAG_IMG,     "img",         tag_find_urls },
+  { TAG_INPUT,   "input",       tag_find_urls },
+  { TAG_LAYER,   "layer",       tag_find_urls },
+  { TAG_LINK,    "link",        tag_handle_link },
+  { TAG_META,    "meta",        tag_handle_meta },
+  { TAG_OBJECT,  "object",      tag_find_urls },
+  { TAG_OVERLAY, "overlay",     tag_find_urls },
+  { TAG_SCRIPT,  "script",      tag_find_urls },
+  { TAG_TABLE,   "table",       tag_find_urls },
+  { TAG_TD,      "td",          tag_find_urls },
+  { TAG_TH,      "th",          tag_find_urls }
 };
 
 /* tag_url_attributes documents which attributes of which tags contain
@@ -129,14 +121,14 @@ static struct known_tag {
 /* The link is "inline", i.e. needs to be retrieved for this document
    to be correctly rendered.  Inline links include inlined images,
    stylesheets, children frames, etc.  */
-#define ATTR_INLINE	1
+#define ATTR_INLINE     1
 
 /* The link is expected to yield HTML contents.  It's important not to
    try to follow HTML obtained by following e.g. <img src="...">
    regardless of content-type.  Doing this causes infinite loops for
    "images" that return non-404 error pages with links to the same
    image.  */
-#define ATTR_HTML	2
+#define ATTR_HTML       2
 
 /* For tags handled by tag_find_urls: attributes that contain URLs to
    download. */
@@ -145,42 +137,42 @@ static struct {
   const char *attr_name;
   int flags;
 } tag_url_attributes[] = {
-  { TAG_A,		"href",		ATTR_HTML },
-  { TAG_APPLET,		"code",		ATTR_INLINE },
-  { TAG_AREA,		"href",		ATTR_HTML },
-  { TAG_BGSOUND,	"src",		ATTR_INLINE },
-  { TAG_BODY,		"background",	ATTR_INLINE },
-  { TAG_EMBED,		"href",		ATTR_HTML },
-  { TAG_EMBED,		"src",		ATTR_INLINE | ATTR_HTML },
-  { TAG_FIG,		"src",		ATTR_INLINE },
-  { TAG_FRAME,		"src",		ATTR_INLINE | ATTR_HTML },
-  { TAG_IFRAME,		"src",		ATTR_INLINE | ATTR_HTML },
-  { TAG_IMG,		"href",		ATTR_INLINE },
-  { TAG_IMG,		"lowsrc",	ATTR_INLINE },
-  { TAG_IMG,		"src",		ATTR_INLINE },
-  { TAG_INPUT,		"src",		ATTR_INLINE },
-  { TAG_LAYER,		"src",		ATTR_INLINE | ATTR_HTML },
-  { TAG_OBJECT,		"data",		ATTR_INLINE },
-  { TAG_OVERLAY,	"src",		ATTR_INLINE | ATTR_HTML },
-  { TAG_SCRIPT,		"src",		ATTR_INLINE },
-  { TAG_TABLE,		"background",	ATTR_INLINE },
-  { TAG_TD,		"background",	ATTR_INLINE },
-  { TAG_TH,		"background",	ATTR_INLINE }
+  { TAG_A,              "href",         ATTR_HTML },
+  { TAG_APPLET,         "code",         ATTR_INLINE },
+  { TAG_AREA,           "href",         ATTR_HTML },
+  { TAG_BGSOUND,        "src",          ATTR_INLINE },
+  { TAG_BODY,           "background",   ATTR_INLINE },
+  { TAG_EMBED,          "href",         ATTR_HTML },
+  { TAG_EMBED,          "src",          ATTR_INLINE | ATTR_HTML },
+  { TAG_FIG,            "src",          ATTR_INLINE },
+  { TAG_FRAME,          "src",          ATTR_INLINE | ATTR_HTML },
+  { TAG_IFRAME,         "src",          ATTR_INLINE | ATTR_HTML },
+  { TAG_IMG,            "href",         ATTR_INLINE },
+  { TAG_IMG,            "lowsrc",       ATTR_INLINE },
+  { TAG_IMG,            "src",          ATTR_INLINE },
+  { TAG_INPUT,          "src",          ATTR_INLINE },
+  { TAG_LAYER,          "src",          ATTR_INLINE | ATTR_HTML },
+  { TAG_OBJECT,         "data",         ATTR_INLINE },
+  { TAG_OVERLAY,        "src",          ATTR_INLINE | ATTR_HTML },
+  { TAG_SCRIPT,         "src",          ATTR_INLINE },
+  { TAG_TABLE,          "background",   ATTR_INLINE },
+  { TAG_TD,             "background",   ATTR_INLINE },
+  { TAG_TH,             "background",   ATTR_INLINE }
 };
 
 /* The lists of interesting tags and attributes are built dynamically,
    from the information above.  However, some places in the code refer
    to the attributes not mentioned here.  We add them manually.  */
 static const char *additional_attributes[] = {
-  "rel",			/* used by tag_handle_link */
-  "http-equiv",			/* used by tag_handle_meta */
-  "name",			/* used by tag_handle_meta */
-  "content",			/* used by tag_handle_meta */
-  "action"			/* used by tag_handle_form */
+  "rel",                        /* used by tag_handle_link */
+  "http-equiv",                 /* used by tag_handle_meta */
+  "name",                       /* used by tag_handle_meta */
+  "content",                    /* used by tag_handle_meta */
+  "action"                      /* used by tag_handle_form */
 };
 
-struct hash_table *interesting_tags;
-struct hash_table *interesting_attributes;
+static struct hash_table *interesting_tags;
+static struct hash_table *interesting_attributes;
 
 static void
 init_interesting (void)
@@ -207,23 +199,23 @@ init_interesting (void)
     {
       char **ignored;
       for (ignored = opt.ignore_tags; *ignored; ignored++)
-	hash_table_remove (interesting_tags, *ignored);
+        hash_table_remove (interesting_tags, *ignored);
     }
 
   /* If --follow-tags is specified, use only those tags.  */
   if (opt.follow_tags)
     {
       /* Create a new table intersecting --follow-tags and known_tags,
-	 and use it as interesting_tags.  */
+         and use it as interesting_tags.  */
       struct hash_table *intersect = make_nocase_string_hash_table (0);
       char **followed;
       for (followed = opt.follow_tags; *followed; followed++)
-	{
-	  struct known_tag *t = hash_table_get (interesting_tags, *followed);
-	  if (!t)
-	    continue;		/* ignore unknown --follow-tags entries. */
-	  hash_table_put (intersect, *followed, t);
-	}
+        {
+          struct known_tag *t = hash_table_get (interesting_tags, *followed);
+          if (!t)
+            continue;           /* ignore unknown --follow-tags entries. */
+          hash_table_put (intersect, *followed, t);
+        }
       hash_table_destroy (interesting_tags);
       interesting_tags = intersect;
     }
@@ -234,7 +226,7 @@ init_interesting (void)
     hash_table_put (interesting_attributes, additional_attributes[i], "1");
   for (i = 0; i < countof (tag_url_attributes); i++)
     hash_table_put (interesting_attributes,
-		    tag_url_attributes[i].attr_name, "1");
+                    tag_url_attributes[i].attr_name, "1");
 }
 
 /* Find the value of attribute named NAME in the taginfo TAG.  If the
@@ -248,24 +240,24 @@ find_attr (struct taginfo *tag, const char *name, int *attrind)
   for (i = 0; i < tag->nattrs; i++)
     if (!strcasecmp (tag->attrs[i].name, name))
       {
-	if (attrind)
-	  *attrind = i;
-	return tag->attrs[i].value;
+        if (attrind)
+          *attrind = i;
+        return tag->attrs[i].value;
       }
   return NULL;
 }
 
 struct map_context {
-  char *text;			/* HTML text. */
-  char *base;			/* Base URI of the document, possibly
-				   changed through <base href=...>. */
-  const char *parent_base;	/* Base of the current document. */
-  const char *document_file;	/* File name of this document. */
-  int nofollow;			/* whether NOFOLLOW was specified in a
+  char *text;                   /* HTML text. */
+  char *base;                   /* Base URI of the document, possibly
+                                   changed through <base href=...>. */
+  const char *parent_base;      /* Base of the current document. */
+  const char *document_file;    /* File name of this document. */
+  bool nofollow;                /* whether NOFOLLOW was specified in a
                                    <meta name=robots> tag. */
 
-  struct urlpos *head, *tail;	/* List of URLs that is being
-				   built. */
+  struct urlpos *head, *tail;   /* List of URLs that is being
+                                   built. */
 };
 
 /* Append LINK_URI to the urlpos structure that is being built.
@@ -276,7 +268,7 @@ struct map_context {
 
 static struct urlpos *
 append_url (const char *link_uri,
-	    struct taginfo *tag, int attrind, struct map_context *ctx)
+            struct taginfo *tag, int attrind, struct map_context *ctx)
 {
   int link_has_scheme = url_has_scheme (link_uri);
   struct urlpos *newel;
@@ -286,47 +278,47 @@ append_url (const char *link_uri,
   if (!base)
     {
       DEBUGP (("%s: no base, merge will use \"%s\".\n",
-	       ctx->document_file, link_uri));
+               ctx->document_file, link_uri));
 
       if (!link_has_scheme)
-	{
-	  /* Base URL is unavailable, and the link does not have a
-	     location attached to it -- we have to give up.  Since
-	     this can only happen when using `--force-html -i', print
-	     a warning.  */
-	  logprintf (LOG_NOTQUIET,
-		     _("%s: Cannot resolve incomplete link %s.\n"),
-		     ctx->document_file, link_uri);
-	  return NULL;
-	}
+        {
+          /* Base URL is unavailable, and the link does not have a
+             location attached to it -- we have to give up.  Since
+             this can only happen when using `--force-html -i', print
+             a warning.  */
+          logprintf (LOG_NOTQUIET,
+                     _("%s: Cannot resolve incomplete link %s.\n"),
+                     ctx->document_file, link_uri);
+          return NULL;
+        }
 
       url = url_parse (link_uri, NULL);
       if (!url)
-	{
-	  DEBUGP (("%s: link \"%s\" doesn't parse.\n",
-		   ctx->document_file, link_uri));
-	  return NULL;
-	}
+        {
+          DEBUGP (("%s: link \"%s\" doesn't parse.\n",
+                   ctx->document_file, link_uri));
+          return NULL;
+        }
     }
   else
     {
       /* Merge BASE with LINK_URI, but also make sure the result is
-	 canonicalized, i.e. that "../" have been resolved.
-	 (parse_url will do that for us.) */
+         canonicalized, i.e. that "../" have been resolved.
+         (parse_url will do that for us.) */
 
       char *complete_uri = uri_merge (base, link_uri);
 
       DEBUGP (("%s: merge(\"%s\", \"%s\") -> %s\n",
-	       ctx->document_file, base, link_uri, complete_uri));
+               ctx->document_file, base, link_uri, complete_uri));
 
       url = url_parse (complete_uri, NULL);
       if (!url)
-	{
-	  DEBUGP (("%s: merged link \"%s\" doesn't parse.\n",
-		   ctx->document_file, complete_uri));
-	  xfree (complete_uri);
-	  return NULL;
-	}
+        {
+          DEBUGP (("%s: merged link \"%s\" doesn't parse.\n",
+                   ctx->document_file, complete_uri));
+          xfree (complete_uri);
+          return NULL;
+        }
       xfree (complete_uri);
     }
 
@@ -370,10 +362,10 @@ tag_find_urls (int tagid, struct taginfo *tag, struct map_context *ctx)
   for (i = 0; i < countof (tag_url_attributes); i++)
     if (tag_url_attributes[i].tagid == tagid)
       {
-	/* We've found the index of tag_url_attributes where the
-	   attributes of our tag begin.  */
-	first = i;
-	break;
+        /* We've found the index of tag_url_attributes where the
+           attributes of our tag begin.  */
+        first = i;
+        break;
       }
   assert (first != -1);
 
@@ -389,30 +381,30 @@ tag_find_urls (int tagid, struct taginfo *tag, struct map_context *ctx)
   for (attrind = 0; attrind < tag->nattrs; attrind++)
     {
       /* Find whether TAG/ATTRIND is a combination that contains a
-	 URL. */
+         URL. */
       char *link = tag->attrs[attrind].value;
       const int size = countof (tag_url_attributes);
 
       /* If you're cringing at the inefficiency of the nested loops,
-	 remember that they both iterate over a very small number of
-	 items.  The worst-case inner loop is for the IMG tag, which
-	 has three attributes.  */
+         remember that they both iterate over a very small number of
+         items.  The worst-case inner loop is for the IMG tag, which
+         has three attributes.  */
       for (i = first; i < size && tag_url_attributes[i].tagid == tagid; i++)
-	{
-	  if (0 == strcasecmp (tag->attrs[attrind].name,
-			       tag_url_attributes[i].attr_name))
-	    {
-	      struct urlpos *up = append_url (link, tag, attrind, ctx);
-	      if (up)
-		{
-		  int flags = tag_url_attributes[i].flags;
-		  if (flags & ATTR_INLINE)
-		    up->link_inline_p = 1;
-		  if (flags & ATTR_HTML)
-		    up->link_expect_html = 1;
-		}
-	    }
-	}
+        {
+          if (0 == strcasecmp (tag->attrs[attrind].name,
+                               tag_url_attributes[i].attr_name))
+            {
+              struct urlpos *up = append_url (link, tag, attrind, ctx);
+              if (up)
+                {
+                  int flags = tag_url_attributes[i].flags;
+                  if (flags & ATTR_INLINE)
+                    up->link_inline_p = 1;
+                  if (flags & ATTR_HTML)
+                    up->link_expect_html = 1;
+                }
+            }
+        }
     }
 }
 
@@ -452,7 +444,7 @@ tag_handle_form (int tagid, struct taginfo *tag, struct map_context *ctx)
     {
       struct urlpos *up = append_url (action, tag, attrind, ctx);
       if (up)
-	up->ignore_when_downloading = 1;
+        up->ignore_when_downloading = 1;
     }
 }
 
@@ -475,17 +467,17 @@ tag_handle_link (int tagid, struct taginfo *tag, struct map_context *ctx)
     {
       struct urlpos *up = append_url (href, tag, attrind, ctx);
       if (up)
-	{
-	  char *rel = find_attr (tag, "rel", NULL);
-	  if (rel
-	      && (0 == strcasecmp (rel, "stylesheet")
-		  || 0 == strcasecmp (rel, "shortcut icon")))
-	    up->link_inline_p = 1;
-	  else
-	    /* The external ones usually point to HTML pages, such as
-	       <link rel="next" href="..."> */
-	    up->link_expect_html = 1;
-	}
+        {
+          char *rel = find_attr (tag, "rel", NULL);
+          if (rel
+              && (0 == strcasecmp (rel, "stylesheet")
+                  || 0 == strcasecmp (rel, "shortcut icon")))
+            up->link_inline_p = 1;
+          else
+            /* The external ones usually point to HTML pages, such as
+               <link rel="next" href="..."> */
+            up->link_expect_html = 1;
+        }
     }
 }
 
@@ -501,13 +493,13 @@ tag_handle_meta (int tagid, struct taginfo *tag, struct map_context *ctx)
   if (http_equiv && 0 == strcasecmp (http_equiv, "refresh"))
     {
       /* Some pages use a META tag to specify that the page be
-	 refreshed by a new page after a given number of seconds.  The
-	 general format for this is:
+         refreshed by a new page after a given number of seconds.  The
+         general format for this is:
 
-	   <meta http-equiv=Refresh content="NUMBER; URL=index2.html">
+           <meta http-equiv=Refresh content="NUMBER; URL=index2.html">
 
-	 So we just need to skip past the "NUMBER; URL=" garbage to
-	 get to the URL.  */
+         So we just need to skip past the "NUMBER; URL=" garbage to
+         get to the URL.  */
 
       struct urlpos *entry;
       int attrind;
@@ -516,57 +508,57 @@ tag_handle_meta (int tagid, struct taginfo *tag, struct map_context *ctx)
 
       char *refresh = find_attr (tag, "content", &attrind);
       if (!refresh)
-	return;
+        return;
 
       for (p = refresh; ISDIGIT (*p); p++)
-	timeout = 10 * timeout + *p - '0';
+        timeout = 10 * timeout + *p - '0';
       if (*p++ != ';')
-	return;
+        return;
 
       while (ISSPACE (*p))
-	++p;
+        ++p;
       if (!(   TOUPPER (*p)       == 'U'
-	    && TOUPPER (*(p + 1)) == 'R'
-	    && TOUPPER (*(p + 2)) == 'L'
-	    &&          *(p + 3)  == '='))
-	return;
+            && TOUPPER (*(p + 1)) == 'R'
+            && TOUPPER (*(p + 2)) == 'L'
+            &&          *(p + 3)  == '='))
+        return;
       p += 4;
       while (ISSPACE (*p))
-	++p;
+        ++p;
 
       entry = append_url (p, tag, attrind, ctx);
       if (entry)
-	{
-	  entry->link_refresh_p = 1;
-	  entry->refresh_timeout = timeout;
-	  entry->link_expect_html = 1;
-	}
+        {
+          entry->link_refresh_p = 1;
+          entry->refresh_timeout = timeout;
+          entry->link_expect_html = 1;
+        }
     }
   else if (name && 0 == strcasecmp (name, "robots"))
     {
       /* Handle stuff like:
-	 <meta name="robots" content="index,nofollow"> */
+         <meta name="robots" content="index,nofollow"> */
       char *content = find_attr (tag, "content", NULL);
       if (!content)
-	return;
+        return;
       if (!strcasecmp (content, "none"))
-	ctx->nofollow = 1;
+        ctx->nofollow = true;
       else
-	{
-	  while (*content)
-	    {
-	      /* Find the next occurrence of ',' or the end of
-		 the string.  */
-	      char *end = strchr (content, ',');
-	      if (end)
-		++end;
-	      else
-		end = content + strlen (content);
-	      if (!strncasecmp (content, "nofollow", end - content))
-		ctx->nofollow = 1;
-	      content = end;
-	    }
-	}
+        {
+          while (*content)
+            {
+              /* Find the next occurrence of ',' or the end of
+                 the string.  */
+              char *end = strchr (content, ',');
+              if (end)
+                ++end;
+              else
+                end = content + strlen (content);
+              if (!strncasecmp (content, "nofollow", end - content))
+                ctx->nofollow = true;
+              content = end;
+            }
+        }
     }
 }
 
@@ -591,7 +583,7 @@ collect_tags_mapper (struct taginfo *tag, void *arg)
    <base href=...> and does the right thing.  */
 
 struct urlpos *
-get_urls_html (const char *file, const char *url, int *meta_disallow_follow)
+get_urls_html (const char *file, const char *url, bool *meta_disallow_follow)
 {
   struct file_memory *fm;
   struct map_context ctx;
@@ -611,7 +603,7 @@ get_urls_html (const char *file, const char *url, int *meta_disallow_follow)
   ctx.base = NULL;
   ctx.parent_base = url ? url : opt.base_href;
   ctx.document_file = file;
-  ctx.nofollow = 0;
+  ctx.nofollow = false;
 
   if (!interesting_tags)
     init_interesting ();
@@ -628,7 +620,7 @@ get_urls_html (const char *file, const char *url, int *meta_disallow_follow)
     flags |= MHT_STRICT_COMMENTS;
 
   map_html_tags (fm->content, fm->length, collect_tags_mapper, &ctx, flags,
-		 interesting_tags, interesting_attributes);
+                 interesting_tags, interesting_attributes);
 
   DEBUGP (("no-follow in %s: %d\n", file, ctx.nofollow));
   if (meta_disallow_follow)
@@ -671,52 +663,51 @@ get_urls_file (const char *file)
       const char *line_beg = text;
       const char *line_end = memchr (text, '\n', text_end - text);
       if (!line_end)
-	line_end = text_end;
+        line_end = text_end;
       else
-	++line_end;
+        ++line_end;
       text = line_end;
 
       /* Strip whitespace from the beginning and end of line. */
       while (line_beg < line_end && ISSPACE (*line_beg))
-	++line_beg;
+        ++line_beg;
       while (line_end > line_beg && ISSPACE (*(line_end - 1)))
-	--line_end;
+        --line_end;
 
       if (line_beg == line_end)
-	continue;
+        continue;
 
       /* The URL is in the [line_beg, line_end) region. */
 
       /* We must copy the URL to a zero-terminated string, and we
-	 can't use alloca because we're in a loop.  *sigh*.  */
+         can't use alloca because we're in a loop.  *sigh*.  */
       url_text = strdupdelim (line_beg, line_end);
 
       if (opt.base_href)
-	{
-	  /* Merge opt.base_href with URL. */
-	  char *merged = uri_merge (opt.base_href, url_text);
-	  xfree (url_text);
-	  url_text = merged;
-	}
+        {
+          /* Merge opt.base_href with URL. */
+          char *merged = uri_merge (opt.base_href, url_text);
+          xfree (url_text);
+          url_text = merged;
+        }
 
       url = url_parse (url_text, &up_error_code);
       if (!url)
-	{
-	  logprintf (LOG_NOTQUIET, _("%s: Invalid URL %s: %s\n"),
-		     file, url_text, url_error (up_error_code));
-	  xfree (url_text);
-	  continue;
-	}
+        {
+          logprintf (LOG_NOTQUIET, _("%s: Invalid URL %s: %s\n"),
+                     file, url_text, url_error (up_error_code));
+          xfree (url_text);
+          continue;
+        }
       xfree (url_text);
 
       entry = xnew0 (struct urlpos);
-      entry->next = NULL;
       entry->url = url;
 
       if (!head)
-	head = entry;
+        head = entry;
       else
-	tail->next = entry;
+        tail->next = entry;
       tail = entry;
     }
   read_file_free (fm);

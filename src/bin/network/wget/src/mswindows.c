@@ -1,12 +1,12 @@
 /* mswindows.c -- Windows-specific support
-   Copyright (C) 1995, 1996, 1997, 1998, 2004
-   Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -15,18 +15,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
@@ -37,26 +37,11 @@ so, delete this exception statement from your version.  */
 #include <errno.h>
 #include <math.h>
 
-#ifdef HACK_BCC_UTIME_BUG
-# include <io.h>
-# include <fcntl.h>
-# ifdef HAVE_UTIME_H
-#  include <utime.h>
-# endif
-# ifdef HAVE_SYS_UTIME_H
-#  include <sys/utime.h>
-# endif
-#endif
-
 #define INHIBIT_WRAP /* avoid wrapping of socket, bind, ... */
 
 #include "wget.h"
 #include "utils.h"
 #include "url.h"
-
-#ifndef errno
-extern int errno;
-#endif
 
 #ifndef ES_SYSTEM_REQUIRED
 #define ES_SYSTEM_REQUIRED  0x00000001
@@ -68,7 +53,7 @@ extern int errno;
 
 
 /* Defined in log.c.  */
-void log_request_redirect_output PARAMS ((const char *));
+void log_request_redirect_output (const char *);
 
 /* Windows version of xsleep in utils.c.  */
 
@@ -82,14 +67,14 @@ xsleep (double seconds)
       sleep (seconds);
       seconds -= (long) seconds;
     }
-  usleep (seconds * 1000000L);
+  usleep (seconds * 1000000);
 #else  /* not HAVE_USLEEP */
   SleepEx ((DWORD) (seconds * 1000 + .5), FALSE);
 #endif /* not HAVE_USLEEP */
 }
 
 void
-windows_main (int *argc, char **argv, char **exec_name)
+windows_main (char **exec_name)
 {
   char *p;
 
@@ -103,9 +88,11 @@ windows_main (int *argc, char **argv, char **exec_name)
 static void
 ws_cleanup (void)
 {
+  xfree ((char*)exec_name);
   WSACleanup ();
 }
 
+#if defined(CTRLBREAK_BACKGND) || defined(CTRLC_BACKGND)
 static void
 ws_hangup (const char *reason)
 {
@@ -119,6 +106,7 @@ ws_hangup (const char *reason)
      gesture as the parent will wait for us to terminate before resuming.  */
   FreeConsole ();
 }
+#endif
 
 /* Construct the name for a named section (a.k.a. `file mapping') object.
    The returned string is dynamically allocated and needs to be xfree()'d.  */
@@ -133,7 +121,7 @@ make_section_name (DWORD pid)
 struct fake_fork_info
 {
   HANDLE event;
-  int logfile_changed;
+  bool logfile_changed;
   char lfilename[MAX_PATH + 1];
 };
 
@@ -168,18 +156,18 @@ fake_fork_child (void)
 
   event = info->event;
 
-  info->logfile_changed = 0;
+  info->logfile_changed = false;
   if (!opt.lfilename)
     {
       /* See utils:fork_to_background for explanation. */
-      FILE *new_log_fp = unique_create (DEFAULT_LOGFILE, 0, &opt.lfilename);
+      FILE *new_log_fp = unique_create (DEFAULT_LOGFILE, false, &opt.lfilename);
       if (new_log_fp)
-	{
-	  info->logfile_changed = 1;
-	  strncpy (info->lfilename, opt.lfilename, sizeof (info->lfilename));
-	  info->lfilename[sizeof (info->lfilename) - 1] = '\0';
-	  fclose (new_log_fp);
-	}
+        {
+          info->logfile_changed = true;
+          strncpy (info->lfilename, opt.lfilename, sizeof (info->lfilename));
+          info->lfilename[sizeof (info->lfilename) - 1] = '\0';
+          fclose (new_log_fp);
+        }
     }
 
   UnmapViewOfFile (info);
@@ -380,7 +368,7 @@ ws_changetitle (const char *url)
 {
   xfree_null (title_buf);
   xfree_null (curr_url);
-  title_buf = (char *)xmalloc (strlen (url) + 20);
+  title_buf = xmalloc (strlen (url) + 20);
   curr_url = xstrdup (url);
   old_percentage = -1;
   sprintf (title_buf, "Wget %s", curr_url);
@@ -472,14 +460,14 @@ ws_startup (void)
   if (err != 0)
     {
       fprintf (stderr, _("%s: Couldn't find usable socket driver.\n"),
-	       exec_name);
+               exec_name);
       exit (1);
     }
 
   if (data.wVersion < requested)
     {
       fprintf (stderr, _("%s: Couldn't find usable socket driver.\n"),
-	       exec_name);
+               exec_name);
       WSACleanup ();
       exit (1);
     }
@@ -488,34 +476,6 @@ ws_startup (void)
   set_sleep_mode ();
   SetConsoleCtrlHandler (ws_handler, TRUE);
 }
-
-/* Replacement utime function for buggy Borland C++Builder 5.5 compiler.
-   (The Borland utime function only works on Windows NT.)  */
-
-#ifdef HACK_BCC_UTIME_BUG
-int
-borland_utime (const char *path, const struct utimbuf *times)
-{
-  int fd;
-  int res;
-  struct ftime ft;
-  struct tm *ptr_tm;
-
-  if ((fd = open (path, O_RDWR)) < 0)
-    return -1;
-
-  ptr_tm = localtime (&times->modtime);
-  ft.ft_tsec = ptr_tm->tm_sec >> 1;
-  ft.ft_min = ptr_tm->tm_min;
-  ft.ft_hour = ptr_tm->tm_hour;
-  ft.ft_day = ptr_tm->tm_mday;
-  ft.ft_month = ptr_tm->tm_mon + 1;
-  ft.ft_year = ptr_tm->tm_year - 80;
-  res = setftime (fd, &ft);
-  close (fd);
-  return res;
-}
-#endif
 
 /* run_with_timeout Windows implementation.  */
 
@@ -558,19 +518,19 @@ thread_helper (void *arg)
 }
 
 /* Call FUN(ARG), but don't allow it to run for more than TIMEOUT
-   seconds.  Returns non-zero if the function was interrupted with a
-   timeout, zero otherwise.
+   seconds.  Returns true if the function was interrupted with a
+   timeout, false otherwise.
 
    This works by running FUN in a separate thread and terminating the
    thread if it doesn't finish in the specified time.  */
 
-int
+bool
 run_with_timeout (double seconds, void (*fun) (void *), void *arg)
 {
-  static HANDLE thread_hnd = NULL;
+  HANDLE thread_hnd;
   struct thread_data thread_arg;
   DWORD thread_id;
-  int rc;
+  bool rc;
 
   DEBUGP (("seconds %.2f, ", seconds));
 
@@ -578,20 +538,18 @@ run_with_timeout (double seconds, void (*fun) (void *), void *arg)
     {
     blocking_fallback:
       fun (arg);
-      return 0;
+      return false;
     }
-
-  /* Should never happen, but test for recursivety anyway.  */
-  assert (thread_hnd == NULL);
 
   thread_arg.fun = fun;
   thread_arg.arg = arg;
   thread_arg.ws_error = WSAGetLastError ();
   thread_hnd = CreateThread (NULL, THREAD_STACK_SIZE, thread_helper,
-			     &thread_arg, 0, &thread_id);
+                             &thread_arg, 0, &thread_id);
   if (!thread_hnd)
     {
-      DEBUGP (("CreateThread() failed; %s\n", strerror (GetLastError ())));
+      DEBUGP (("CreateThread() failed; [%#lx]\n",
+               (unsigned long) GetLastError ()));
       goto blocking_fallback;
     }
 
@@ -599,18 +557,18 @@ run_with_timeout (double seconds, void (*fun) (void *), void *arg)
       == WAIT_OBJECT_0)
     {
       /* Propagate error state (which is per-thread) to this thread,
-	 so the caller can inspect it.  */
+         so the caller can inspect it.  */
       WSASetLastError (thread_arg.ws_error);
       DEBUGP (("Winsock error: %d\n", WSAGetLastError ()));
-      rc = 0;
+      rc = false;
     }
   else
     {
       TerminateThread (thread_hnd, 1);
-      rc = 1;
+      rc = true;
     }
 
-  CloseHandle (thread_hnd);	/* Clear-up after TerminateThread().  */
+  CloseHandle (thread_hnd);     /* Clear-up after TerminateThread().  */
   thread_hnd = NULL;
   return rc;
 }
@@ -624,11 +582,11 @@ run_with_timeout (double seconds, void (*fun) (void *), void *arg)
 /* Define a macro that creates a function definition that wraps FUN into
    a function that sets errno the way the rest of the code expects. */
 
-#define WRAP(fun, decl, call) int wrapped_##fun decl {	\
-  int retval = fun call;				\
-  if (retval < 0)					\
-    errno = WSAGetLastError ();				\
-  return retval;					\
+#define WRAP(fun, decl, call) int wrapped_##fun decl {  \
+  int retval = fun call;                                \
+  if (retval < 0)                                       \
+    errno = WSAGetLastError ();                         \
+  return retval;                                        \
 }
 
 WRAP (socket, (int domain, int type, int protocol), (domain, type, protocol))
@@ -731,3 +689,45 @@ windows_strerror (int err)
       return buf;
     }
 }
+
+#ifdef ENABLE_IPV6
+/* An inet_ntop implementation that uses WSAAddressToString.
+   Prototype complies with POSIX 1003.1-2004.  This is only used under
+   IPv6 because Wget prints IPv4 addresses using inet_ntoa.  */
+
+const char *
+inet_ntop (int af, const void *src, char *dst, socklen_t cnt)
+{
+  /* struct sockaddr can't accomodate struct sockaddr_in6. */
+  union {
+    struct sockaddr_in6 sin6;
+    struct sockaddr_in sin;
+  } sa;
+  DWORD dstlen = cnt;
+  size_t srcsize;
+
+  xzero (sa);
+  switch (af)
+    {
+    case AF_INET:
+      sa.sin.sin_family = AF_INET;
+      sa.sin.sin_addr = *(struct in_addr *) src;
+      srcsize = sizeof (sa.sin);
+      break;
+    case AF_INET6:
+      sa.sin6.sin6_family = AF_INET6;
+      sa.sin6.sin6_addr = *(struct in6_addr *) src;
+      srcsize = sizeof (sa.sin6);
+      break;
+    default:
+      abort ();
+    }
+
+  if (WSAAddressToString ((struct sockaddr *) &sa, srcsize, NULL, dst, &dstlen) != 0)
+    {
+      errno = WSAGetLastError();
+      return NULL;
+    }
+  return (const char *) dst;
+}
+#endif

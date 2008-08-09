@@ -1,12 +1,13 @@
 /* xmalloc.c declarations.
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006, 2007,
+   2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,18 +15,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #ifndef XMALLOC_H
 #define XMALLOC_H
@@ -56,11 +57,11 @@ so, delete this exception statement from your version.  */
 #define xstrdup  checking_strdup
 #define xfree    checking_free
 
-void *checking_malloc PARAMS ((size_t));
-void *checking_malloc0 PARAMS ((size_t));
-void *checking_realloc PARAMS ((void *, size_t));
-char *checking_strdup PARAMS ((const char *));
-void checking_free PARAMS ((void *));
+void *checking_malloc (size_t);
+void *checking_malloc0 (size_t);
+void *checking_realloc (void *, size_t);
+char *checking_strdup (const char *);
+void checking_free (void *);
 
 #else  /* DEBUG_MALLOC */
 
@@ -70,11 +71,11 @@ void checking_free PARAMS ((void *));
 #define xstrdup(p)     debugging_strdup (p, __FILE__, __LINE__)
 #define xfree(p)       debugging_free (p, __FILE__, __LINE__)
 
-void *debugging_malloc PARAMS ((size_t, const char *, int));
-void *debugging_malloc0 PARAMS ((size_t, const char *, int));
-void *debugging_realloc PARAMS ((void *, size_t, const char *, int));
-char *debugging_strdup PARAMS ((const char *, const char *, int));
-void debugging_free PARAMS ((void *, const char *, int));
+void *debugging_malloc (size_t, const char *, int);
+void *debugging_malloc0 (size_t, const char *, int);
+void *debugging_realloc (void *, size_t, const char *, int);
+char *debugging_strdup (const char *, const char *, int);
+void debugging_free (void *, const char *, int);
 
 #endif /* DEBUG_MALLOC */
 
@@ -83,10 +84,10 @@ void debugging_free PARAMS ((void *, const char *, int));
    necessary in standard C, but Wget performs them anyway for the sake
    of pre-standard environments and possibly C++.  */
 
-#define xnew(type) ((type *) xmalloc (sizeof (type)))
-#define xnew0(type) ((type *) xmalloc0 (sizeof (type)))
-#define xnew_array(type, len) ((type *) xmalloc ((len) * sizeof (type)))
-#define xnew0_array(type, len) ((type *) xmalloc0 ((len) * sizeof (type)))
+#define xnew(type) (xmalloc (sizeof (type)))
+#define xnew0(type) (xmalloc0 (sizeof (type)))
+#define xnew_array(type, len) (xmalloc ((len) * sizeof (type)))
+#define xnew0_array(type, len) (xmalloc0 ((len) * sizeof (type)))
 
 #define alloca_array(type, size) ((type *) alloca ((size) * sizeof (type)))
 

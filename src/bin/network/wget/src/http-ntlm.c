@@ -1,12 +1,12 @@
 /* NTLM code.
-   Copyright (C) 2005 Free Software Foundation, Inc.
-   Donated by Daniel Stenberg.
+   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Contributed by Daniel Stenberg.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -15,18 +15,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
@@ -37,17 +37,13 @@ so, delete this exception statement from your version.  */
 
 */
 
-/* -- WIN32 approved -- */
 #include <stdio.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
+#include <string.h>
 #include <stdlib.h>
 
 #include <openssl/des.h>
 #include <openssl/md4.h>
+#include <openssl/opensslv.h>
 
 #include "wget.h"
 #include "utils.h"
@@ -118,12 +114,12 @@ so, delete this exception statement from your version.  */
      beginning of the NTLM message, in bytes.
 */
 
-/* return 1 on success, 0 otherwise */
-int
+/* return true on success, false otherwise */
+bool
 ntlm_input (struct ntlmdata *ntlm, const char *header)
 {
   if (0 != strncmp (header, "NTLM", 4))
-    return 0;
+    return false;
 
   header += 4;
   while (*header && ISSPACE(*header))
@@ -151,7 +147,7 @@ ntlm_input (struct ntlmdata *ntlm, const char *header)
 
       size = base64_decode (header, buffer);
       if (size < 0)
-	return 0;		/* malformed base64 from server */
+        return false;           /* malformed base64 from server */
 
       ntlm->state = NTLMSTATE_TYPE2; /* we got a type-2 */
 
@@ -164,16 +160,16 @@ ntlm_input (struct ntlmdata *ntlm, const char *header)
   else
     {
       if (ntlm->state >= NTLMSTATE_TYPE1)
-	{
-	  DEBUGP (("Unexpected empty NTLM message.\n"));
-	  return 0; /* this is an error */
-	}
+        {
+          DEBUGP (("Unexpected empty NTLM message.\n"));
+          return false; /* this is an error */
+        }
 
       DEBUGP (("Empty NTLM message, starting transaction.\n"));
       ntlm->state = NTLMSTATE_TYPE1; /* we should sent away a type-1 */
     }
 
-  return 1;
+  return true;
 }
 
 /*
@@ -182,7 +178,7 @@ ntlm_input (struct ntlmdata *ntlm, const char *header)
  */
 static void
 setup_des_key(unsigned char *key_56,
-	      DES_key_schedule DESKEYARG(ks))
+              DES_key_schedule DESKEYARG(ks))
 {
   DES_cblock key;
 
@@ -227,8 +223,8 @@ calc_resp(unsigned char *keys, unsigned char *plaintext, unsigned char *results)
  */
 static void
 mkhash(const char *password,
-       unsigned char *nonce,	/* 8 bytes */
-       unsigned char *lmresp	/* must fit 0x18 bytes */
+       unsigned char *nonce,    /* 8 bytes */
+       unsigned char *lmresp    /* must fit 0x18 bytes */
 #ifdef USE_NTRESPONSES
        , unsigned char *ntresp  /* must fit 0x18 bytes */
 #endif
@@ -304,7 +300,7 @@ mkhash(const char *password,
 /* this is for creating ntlm header output */
 char *
 ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
-	     int *ready)
+             bool *ready)
 {
   const char *domain=""; /* empty */
   const char *host=""; /* empty */
@@ -320,7 +316,7 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
      server, which is for a plain host or for a HTTP proxy */
   char *output;
 
-  *ready = 0;
+  *ready = false;
 
   /* not set means empty */
   if(!user)
@@ -348,41 +344,38 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
     24    Supplied Workstation security buffer(*)
     32    start of data block
 
-    Format string (merged for pre-ANSI compilers):
-      "NTLMSSP%c"
-      "\x01%c%c%c" 32-bit type = 1
-      "%c%c%c%c"   32-bit NTLM flag field
-      "%c%c"  domain length
-      "%c%c"  domain allocated space
-      "%c%c"  domain name offset
-      "%c%c"  2 zeroes
-      "%c%c"  host length
-      "%c%c"  host allocated space
-      "%c%c"  host name offset
-      "%c%c"  2 zeroes
-      "%s"    host name
-      "%s"   domain string
     */
 
-    snprintf(ntlmbuf, sizeof(ntlmbuf),
-	     "NTLMSSP%c\001%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%s%s",
-             0,     /* trailing zero */
-             0,0,0, /* part of type-1 long */
+    snprintf (ntlmbuf, sizeof(ntlmbuf), "NTLMSSP%c"
+              "\x01%c%c%c" /* 32-bit type = 1 */
+              "%c%c%c%c"   /* 32-bit NTLM flag field */
+              "%c%c"  /* domain length */
+              "%c%c"  /* domain allocated space */
+              "%c%c"  /* domain name offset */
+              "%c%c"  /* 2 zeroes */
+              "%c%c"  /* host length */
+              "%c%c"  /* host allocated space */
+              "%c%c"  /* host name offset */
+              "%c%c"  /* 2 zeroes */
+              "%s"   /* host name */
+              "%s",  /* domain string */
+              0,     /* trailing zero */
+              0,0,0, /* part of type-1 long */
 
-             LONGQUARTET(
-               NTLMFLAG_NEGOTIATE_OEM|      /*   2 */
-               NTLMFLAG_NEGOTIATE_NTLM_KEY  /* 200 */
-               /* equals 0x0202 */
-               ),
-             SHORTPAIR(domlen),
-             SHORTPAIR(domlen),
-             SHORTPAIR(domoff),
-             0,0,
-             SHORTPAIR(hostlen),
-             SHORTPAIR(hostlen),
-             SHORTPAIR(hostoff),
-             0,0,
-             host, domain);
+              LONGQUARTET(
+                NTLMFLAG_NEGOTIATE_OEM|      /*   2 */
+                NTLMFLAG_NEGOTIATE_NTLM_KEY  /* 200 */
+                /* equals 0x0202 */
+                ),
+              SHORTPAIR(domlen),
+              SHORTPAIR(domlen),
+              SHORTPAIR(domoff),
+              0,0,
+              SHORTPAIR(hostlen),
+              SHORTPAIR(hostlen),
+              SHORTPAIR(hostoff),
+              0,0,
+              host, domain);
 
     /* initial packet length */
     size = 32 + hostlen + domlen;
@@ -449,78 +442,84 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
     lmrespoff = hostoff + hostlen;
     ntrespoff = lmrespoff + 0x18;
 
-    /* Create the big type-3 message binary blob:
-	 "NTLMSSP%c"
-	 "\x03%c%c%c"  type-3, 32 bits 
+    /* Create the big type-3 message binary blob */
 
-	 "%c%c%c%c"  LanManager length + allocated space 
-	 "%c%c"      LanManager offset 
-	 "%c%c"      2 zeroes 
+    size = snprintf (ntlmbuf, sizeof(ntlmbuf),
+                     "NTLMSSP%c"
+                     "\x03%c%c%c" /* type-3, 32 bits */
 
-	 "%c%c"  NT-response length 
-	 "%c%c"  NT-response allocated space 
-	 "%c%c"  NT-response offset 
-	 "%c%c"  2 zeroes 
+                     "%c%c%c%c" /* LanManager length + allocated space */
+                     "%c%c" /* LanManager offset */
+                     "%c%c" /* 2 zeroes */
 
-	 "%c%c"  domain length 
-	 "%c%c"  domain allocated space 
-	 "%c%c"  domain name offset 
-	 "%c%c"  2 zeroes 
+                     "%c%c" /* NT-response length */
+                     "%c%c" /* NT-response allocated space */
+                     "%c%c" /* NT-response offset */
+                     "%c%c" /* 2 zeroes */
 
-	 "%c%c"  user length 
-	 "%c%c"  user allocated space 
-	 "%c%c"  user offset 
-	 "%c%c"  2 zeroes 
-
-	 "%c%c"  host length 
-	 "%c%c"  host allocated space 
-	 "%c%c"  host offset 
-	 "%c%c%c%c%c%c" 6 zeroes 
-
-	 "\xff\xff"   message length 
-	 "%c%c"   2 zeroes 
-
-	 "\x01\x82"  flags 
-	 "%c%c"   2 zeroes */
-
-    size = snprintf(ntlmbuf, sizeof(ntlmbuf),
-		    "NTLMSSP%c\003%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\377\377%c%c\001\202%c%c",
-                    0, /* zero termination */
-                    0,0,0, /* type-3 long, the 24 upper bits */
-
-                    SHORTPAIR(0x18),  /* LanManager response length, twice */
-                    SHORTPAIR(0x18),
-                    SHORTPAIR(lmrespoff),
-                    0x0, 0x0,
+                     "%c%c"  /* domain length */
+                     "%c%c"  /* domain allocated space */
+                     "%c%c"  /* domain name offset */
+                     "%c%c"  /* 2 zeroes */
                     
+                     "%c%c"  /* user length */
+                     "%c%c"  /* user allocated space */
+                     "%c%c"  /* user offset */
+                     "%c%c"  /* 2 zeroes */
+                    
+                     "%c%c"  /* host length */
+                     "%c%c"  /* host allocated space */
+                     "%c%c"  /* host offset */
+                     "%c%c%c%c%c%c"  /* 6 zeroes */
+                    
+                     "\xff\xff"  /* message length */
+                     "%c%c"  /* 2 zeroes */
+                    
+                     "\x01\x82" /* flags */
+                     "%c%c"  /* 2 zeroes */
+
+                     /* domain string */
+                     /* user string */
+                     /* host string */
+                     /* LanManager response */
+                     /* NT response */
+                     ,
+                     0, /* zero termination */
+                     0,0,0, /* type-3 long, the 24 upper bits */
+
+                     SHORTPAIR(0x18),  /* LanManager response length, twice */
+                     SHORTPAIR(0x18),
+                     SHORTPAIR(lmrespoff),
+                     0x0, 0x0,
+
 #ifdef USE_NTRESPONSES
-                    SHORTPAIR(0x18),  /* NT-response length, twice */
-                    SHORTPAIR(0x18),
+                     SHORTPAIR(0x18),  /* NT-response length, twice */
+                     SHORTPAIR(0x18),
 #else
-                    0x0, 0x0,
-                    0x0, 0x0,
+                     0x0, 0x0,
+                     0x0, 0x0,
 #endif
-                    SHORTPAIR(ntrespoff),
-                    0x0, 0x0,
+                     SHORTPAIR(ntrespoff),
+                     0x0, 0x0,
 
-                    SHORTPAIR(domlen),
-                    SHORTPAIR(domlen),
-                    SHORTPAIR(domoff),
-                    0x0, 0x0,
+                     SHORTPAIR(domlen),
+                     SHORTPAIR(domlen),
+                     SHORTPAIR(domoff),
+                     0x0, 0x0,
 
-                    SHORTPAIR(userlen),
-                    SHORTPAIR(userlen),
-                    SHORTPAIR(useroff),
-                    0x0, 0x0,
-                    
-                    SHORTPAIR(hostlen),
-                    SHORTPAIR(hostlen),
-                    SHORTPAIR(hostoff),
-                    0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-             
-                    0x0, 0x0,
+                     SHORTPAIR(userlen),
+                     SHORTPAIR(userlen),
+                     SHORTPAIR(useroff),
+                     0x0, 0x0,
 
-                    0x0, 0x0);
+                     SHORTPAIR(hostlen),
+                     SHORTPAIR(hostlen),
+                     SHORTPAIR(hostoff),
+                     0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+
+                     0x0, 0x0,
+
+                     0x0, 0x0);
 
     /* size is now 64 */
     size=64;
@@ -560,14 +559,14 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
     output = concat_strings ("NTLM ", base64, (char *) 0);
 
     ntlm->state = NTLMSTATE_TYPE3; /* we sent a type-3 */
-    *ready = 1;
+    *ready = true;
   }
   break;
 
   case NTLMSTATE_TYPE3:
     /* connection is already authenticated,
      * don't send a header in future requests */
-    *ready = 1;
+    *ready = true;
     output = NULL;
     break;
   }

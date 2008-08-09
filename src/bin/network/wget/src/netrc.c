@@ -1,11 +1,11 @@
 /* Read and parse the .netrc file to get hosts, accounts, and passwords.
-   Copyright (C) 1996, Free Software Foundation, Inc.
+   Copyright (C) 1996, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,18 +14,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 /* This file used to be kept in synch with the code in Fetchmail, but
    the latter has diverged since.  */
@@ -36,12 +36,7 @@ so, delete this exception statement from your version.  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
-#include <sys/types.h>
+#include <string.h>
 #include <errno.h>
 
 #include "wget.h"
@@ -49,15 +44,11 @@ so, delete this exception statement from your version.  */
 #include "netrc.h"
 #include "init.h"
 
-#ifndef errno
-extern int errno;
-#endif
-
 #define NETRC_FILE_NAME ".netrc"
 
 acc_t *netrc_list;
 
-static acc_t *parse_netrc PARAMS ((const char *));
+static acc_t *parse_netrc (const char *);
 
 /* Return the correct user and password, given the host, user (as
    given in the URL), and password (as given in the URL).  May return
@@ -67,7 +58,7 @@ static acc_t *parse_netrc PARAMS ((const char *));
    You will typically turn it off for HTTP.  */
 void
 search_netrc (const char *host, const char **acc, const char **passwd,
-	      int slack_default)
+              int slack_default)
 {
   acc_t *l;
   static int processed_netrc;
@@ -82,17 +73,17 @@ search_netrc (const char *host, const char **acc, const char **passwd,
       netrc_list = NULL;
       processed_netrc = 1;
       if (home)
-	{
-	  int err;
-	  struct_stat buf;
-	  char *path = (char *)alloca (strlen (home) + 1
-				       + strlen (NETRC_FILE_NAME) + 1);
-	  sprintf (path, "%s/%s", home, NETRC_FILE_NAME);
-	  xfree (home);
-	  err = stat (path, &buf);
-	  if (err == 0)
-	    netrc_list = parse_netrc (path);
-	}
+        {
+          int err;
+          struct_stat buf;
+          char *path = (char *)alloca (strlen (home) + 1
+                                       + strlen (NETRC_FILE_NAME) + 1);
+          sprintf (path, "%s/%s", home, NETRC_FILE_NAME);
+          xfree (home);
+          err = stat (path, &buf);
+          if (err == 0)
+            netrc_list = parse_netrc (path);
+        }
     }
   /* If nothing to do...  */
   if (!netrc_list)
@@ -104,44 +95,44 @@ search_netrc (const char *host, const char **acc, const char **passwd,
   for (l = netrc_list; l; l = l->next)
     {
       if (!l->host)
-	continue;
+        continue;
       else if (!strcasecmp (l->host, host))
-	break;
+        break;
     }
   if (l)
     {
       if (*acc)
-	{
-	  /* Looking for password in .netrc.  */
-	  if (!strcmp (l->acc, *acc))
-	    *passwd = l->passwd; /* usernames match; password OK */
-	  else
-	    *passwd = NULL;     /* usernames don't match */
-	}
-      else			/* NOT *acc */
-	{
-	  /* If password was given, use it.  The account is l->acc.  */
-	  *acc = l->acc;
-	  if (l->passwd)
-	    *passwd = l->passwd;
-	}
+        {
+          /* Looking for password in .netrc.  */
+          if (!strcmp (l->acc, *acc))
+            *passwd = l->passwd; /* usernames match; password OK */
+          else
+            *passwd = NULL;     /* usernames don't match */
+        }
+      else                      /* NOT *acc */
+        {
+          /* If password was given, use it.  The account is l->acc.  */
+          *acc = l->acc;
+          if (l->passwd)
+            *passwd = l->passwd;
+        }
       return;
     }
   else
     {
       if (!slack_default)
-	return;
+        return;
       if (*acc)
-	return;
+        return;
       /* Try looking for the default account.  */
       for (l = netrc_list; l; l = l->next)
-	if (!l->host)
-	  break;
+        if (!l->host)
+          break;
       if (!l)
-	return;
+        return;
       *acc = l->acc;
       if (!*passwd)
-	*passwd = l->passwd;
+        *passwd = l->passwd;
       return;
     }
 }
@@ -173,14 +164,14 @@ read_whole_line (FILE *fp)
 {
   int length = 0;
   int bufsize = 81;
-  char *line = (char *)xmalloc (bufsize);
+  char *line = xmalloc (bufsize);
 
   while (fgets (line + length, bufsize - length, fp))
     {
       length += strlen (line + length);
       assert (length > 0);
       if (line[length - 1] == '\n')
-	break;
+        break;
       /* fgets() guarantees to read the whole line, or to use up the
          space we've given it.  We can double the buffer
          unconditionally.  */
@@ -222,14 +213,14 @@ maybe_add_to_list (acc_t **newentry, acc_t **list)
   else
     {
       if (a)
-	{
-	  /* Add the current machine into our list.  */
-	  a->next = l;
-	  l = a;
-	}
+        {
+          /* Add the current machine into our list.  */
+          a->next = l;
+          l = a;
+        }
 
       /* Allocate a new acc_t structure.  */
-      a = (acc_t *)xmalloc (sizeof (acc_t));
+      a = xmalloc (sizeof (acc_t));
     }
 
   /* Zero the structure, so that it is ready to use.  */
@@ -275,7 +266,7 @@ parse_netrc (const char *path)
   if (!fp)
     {
       fprintf (stderr, _("%s: Cannot read %s (%s).\n"), exec_name,
-	       path, strerror (errno));
+               path, strerror (errno));
       return retval;
     }
 
@@ -294,129 +285,129 @@ parse_netrc (const char *path)
 
       /* Skip leading whitespace.  */
       while (*p && ISSPACE (*p))
-	p ++;
+        p ++;
 
       /* If the line is empty, then end any macro definition.  */
       if (last_token == tok_macdef && !*p)
-	/* End of macro if the line is empty.  */
-	last_token = tok_nothing;
+        /* End of macro if the line is empty.  */
+        last_token = tok_nothing;
 
       /* If we are defining macros, then skip parsing the line.  */
       while (*p && last_token != tok_macdef)
-	{
-	  /* Skip any whitespace.  */
-	  while (*p && ISSPACE (*p))
-	    p ++;
+        {
+          /* Skip any whitespace.  */
+          while (*p && ISSPACE (*p))
+            p ++;
 
-	  /* Discard end-of-line comments; also, stop processing if
-	     the above `while' merely skipped trailing whitespace.  */
-	  if (*p == '#' || !*p)
-	    break;
+          /* Discard end-of-line comments; also, stop processing if
+             the above `while' merely skipped trailing whitespace.  */
+          if (*p == '#' || !*p)
+            break;
 
-	  /* If the token starts with quotation mark, note this fact,
-	     and squash the quotation character */
-	  if (*p == '"'){
-	    quote = 1;
-	    shift_left (p);
-	  }
+          /* If the token starts with quotation mark, note this fact,
+             and squash the quotation character */
+          if (*p == '"'){
+            quote = 1;
+            shift_left (p);
+          }
 
-	  tok = p;
+          tok = p;
 
-	  /* Find the end of the token, handling quotes and escapes.  */
-	  while (*p && (quote ? *p != '"' : !ISSPACE (*p))){
-	    if (*p == '\\')
-	      shift_left (p);
-	    p ++;
-	  }
+          /* Find the end of the token, handling quotes and escapes.  */
+          while (*p && (quote ? *p != '"' : !ISSPACE (*p))){
+            if (*p == '\\')
+              shift_left (p);
+            p ++;
+          }
 
-	  /* If field was quoted, squash the trailing quotation mark
-	     and reset quote flag.  */
-	  if (quote)
-	    {
-	      shift_left (p);
-	      quote = 0;
-	    }
+          /* If field was quoted, squash the trailing quotation mark
+             and reset quote flag.  */
+          if (quote)
+            {
+              shift_left (p);
+              quote = 0;
+            }
 
-	  /* Null-terminate the token, if it isn't already.  */
-	  if (*p)
-	    *p ++ = '\0';
+          /* Null-terminate the token, if it isn't already.  */
+          if (*p)
+            *p ++ = '\0';
 
-	  switch (last_token)
-	    {
-	    case tok_login:
-	      if (current)
-		current->acc = xstrdup (tok);
-	      else
-		premature_token = "login";
-	      break;
+          switch (last_token)
+            {
+            case tok_login:
+              if (current)
+                current->acc = xstrdup (tok);
+              else
+                premature_token = "login";
+              break;
 
-	    case tok_machine:
-	      /* Start a new machine entry.  */
-	      maybe_add_to_list (&current, &retval);
-	      current->host = xstrdup (tok);
-	      break;
+            case tok_machine:
+              /* Start a new machine entry.  */
+              maybe_add_to_list (&current, &retval);
+              current->host = xstrdup (tok);
+              break;
 
-	    case tok_password:
-	      if (current)
-		current->passwd = xstrdup (tok);
-	      else
-		premature_token = "password";
-	      break;
+            case tok_password:
+              if (current)
+                current->passwd = xstrdup (tok);
+              else
+                premature_token = "password";
+              break;
 
-	      /* We handle most of tok_macdef above.  */
-	    case tok_macdef:
-	      if (!current)
-		premature_token = "macdef";
-	      break;
+              /* We handle most of tok_macdef above.  */
+            case tok_macdef:
+              if (!current)
+                premature_token = "macdef";
+              break;
 
-	      /* We don't handle the account keyword at all.  */
-	    case tok_account:
-	      if (!current)
-		premature_token = "account";
-	      break;
+              /* We don't handle the account keyword at all.  */
+            case tok_account:
+              if (!current)
+                premature_token = "account";
+              break;
 
-	      /* We handle tok_nothing below this switch.  */
-	    case tok_nothing:
-	      break;
-	    }
+              /* We handle tok_nothing below this switch.  */
+            case tok_nothing:
+              break;
+            }
 
-	  if (premature_token)
-	    {
-	      fprintf (stderr, _("\
+          if (premature_token)
+            {
+              fprintf (stderr, _("\
 %s: %s:%d: warning: \"%s\" token appears before any machine name\n"),
-		       exec_name, path, ln, premature_token);
-	      premature_token = NULL;
-	    }
+                       exec_name, path, ln, premature_token);
+              premature_token = NULL;
+            }
 
-	  if (last_token != tok_nothing)
-	    /* We got a value, so reset the token state.  */
-	    last_token = tok_nothing;
-	  else
-	    {
-	      /* Fetch the next token.  */
-	      if (!strcmp (tok, "account"))
-		last_token = tok_account;
-	      else if (!strcmp (tok, "default"))
-		{
-		  maybe_add_to_list (&current, &retval);
-		}
-	      else if (!strcmp (tok, "login"))
-		last_token = tok_login;
+          if (last_token != tok_nothing)
+            /* We got a value, so reset the token state.  */
+            last_token = tok_nothing;
+          else
+            {
+              /* Fetch the next token.  */
+              if (!strcmp (tok, "account"))
+                last_token = tok_account;
+              else if (!strcmp (tok, "default"))
+                {
+                  maybe_add_to_list (&current, &retval);
+                }
+              else if (!strcmp (tok, "login"))
+                last_token = tok_login;
 
-	      else if (!strcmp (tok, "macdef"))
-		last_token = tok_macdef;
+              else if (!strcmp (tok, "macdef"))
+                last_token = tok_macdef;
 
-	      else if (!strcmp (tok, "machine"))
-		last_token = tok_machine;
+              else if (!strcmp (tok, "machine"))
+                last_token = tok_machine;
 
-	      else if (!strcmp (tok, "password"))
-		last_token = tok_password;
+              else if (!strcmp (tok, "password"))
+                last_token = tok_password;
 
-	      else
-		fprintf (stderr, _("%s: %s:%d: unknown token \"%s\"\n"),
-			 exec_name, path, ln, tok);
-	    }
-	}
+              else
+                fprintf (stderr, _("%s: %s:%d: unknown token \"%s\"\n"),
+                         exec_name, path, ln, tok);
+            }
+        }
 
       xfree (line);
     }
@@ -488,7 +479,7 @@ main (int argc, char **argv)
   if (stat (file, &sb))
     {
       fprintf (stderr, _("%s: cannot stat %s: %s\n"), argv[0], file,
-	       strerror (errno));
+               strerror (errno));
       exit (1);
     }
 
@@ -498,37 +489,37 @@ main (int argc, char **argv)
     {
       /* Skip if we have a target and this isn't it.  */
       if (target && a->host && strcmp (target, a->host))
-	{
-	  a = a->next;
-	  continue;
-	}
+        {
+          a = a->next;
+          continue;
+        }
 
       if (!target)
-	{
-	  /* Print the host name if we have no target.  */
-	  if (a->host)
-	    fputs (a->host, stdout);
-	  else
-	    fputs ("DEFAULT", stdout);
+        {
+          /* Print the host name if we have no target.  */
+          if (a->host)
+            fputs (a->host, stdout);
+          else
+            fputs ("DEFAULT", stdout);
 
-	  fputc (' ', stdout);
-	}
+          fputc (' ', stdout);
+        }
 
       /* Print the account name.  */
       fputs (a->acc, stdout);
 
       if (a->passwd)
-	{
-	  /* Print the password, if there is any.  */
-	  fputc (' ', stdout);
-	  fputs (a->passwd, stdout);
-	}
+        {
+          /* Print the password, if there is any.  */
+          fputc (' ', stdout);
+          fputs (a->passwd, stdout);
+        }
 
       fputc ('\n', stdout);
 
       /* Exit if we found the target.  */
       if (target)
-	exit (0);
+        exit (0);
       a = a->next;
     }
 

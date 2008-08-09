@@ -1,0 +1,72 @@
+#
+# GNU Makefile for wget / djgpp / MSDOS.
+# By Gisle Vanem <giva@bgnett.no> 2007.
+#
+# `cd' to `./src' and issue the command:
+#   make -f ../msdos/Makefile.dj
+#
+.SUFFIXES: .exe
+
+USE_OPENSSL = 0
+USE_IPV6    = 1
+
+#
+# Change to suite.
+#
+OPENSSL_ROOT = e:/net/OpenSSL.099
+ZLIB_ROOT    = e:/djgpp/contrib/zlib
+
+OBJ_DIR = djgpp.obj
+CC      = gcc
+CFLAGS  = -O2 -g -Wall -Wcast-align -I. -I../msdos -I/dev/env/WATT_ROOT/inc \
+          -DHAVE_CONFIG_H -DENABLE_DEBUG
+
+# LDFLAGS = -s
+
+ifeq ($(USE_OPENSSL),1)
+  CFLAGS  += -DHAVE_OPENSSL -DHAVE_SSL -DOPENSSL_NO_KRB5 -I$(OPENSSL_ROOT)
+  EX_LIBS += $(OPENSSL_ROOT)/lib/libssl.a $(OPENSSL_ROOT)/lib/libcrypt.a \
+             $(ZLIB_ROOT)/libz.a
+  SOURCES += openssl.c http-ntlm.c
+endif
+
+ifeq ($(USE_IPV6),1)
+  CFLAGS += -DENABLE_IPV6
+endif
+
+EX_LIBS += /dev/env/WATT_ROOT/lib/libwatt.a
+
+SOURCES += cmpt.c connect.c cookies.c ftp.c ftp-basic.c ftp-ls.c \
+           ftp-opie.c getopt.c hash.c host.c html-parse.c html-url.c \
+           http.c init.c log.c main.c gen-md5.c gnu-md5.c netrc.c \
+           progress.c recur.c res.c retr.c safe-ctype.c url.c utils.c \
+           version.c convert.c xmalloc.c ptimer.c spider.c
+
+OBJECTS = $(addprefix $(OBJ_DIR)/, $(SOURCES:.c=.o))
+
+all: $(OBJ_DIR) wget.exe
+	@echo 'Welcome to Wget'
+
+$(OBJ_DIR):
+	mkdir $(OBJ_DIR)
+
+wget.exe: $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(EX_LIBS)
+
+clean:
+	rm -f $(OBJECTS) $(MAPFILE)
+
+vclean realclean: clean
+	rm -f wget.exe depend.dj
+	- rmdir $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o: %.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+	@echo
+
+depend:
+	$(CC) -MM $(CFLAGS) $(SOURCES) | \
+        sed -e 's/^\([a-zA-Z0-9_-]*\.o:\)/$$(OBJ_DIR)\/\1/' > depend.dj
+
+-include depend.dj
+

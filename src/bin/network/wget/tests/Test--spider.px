@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use HTTPTest;
+
+
+###############################################################################
+
+my $mainpage = <<EOF;
+<html>
+<head>
+  <title>Main Page</title>
+</head>
+<body>
+  <p>
+    Some text.
+  </p>
+</body>
+</html>
+EOF
+
+# code, msg, headers, content
+my %urls = (
+    '/index.html' => {
+        code => "200",
+        msg => "Dontcare",
+        headers => {
+            "Content-type" => "text/html",
+        },
+        content => $mainpage,
+    },
+);
+
+my $cmdline = $WgetTest::WGETPATH . " --spider http://localhost:8080/index.html";
+
+my $expected_error_code = 256;
+
+my %expected_downloaded_files = (
+);
+
+###############################################################################
+
+my $the_test = HTTPTest->new (name => "Test--spider",
+                              input => \%urls, 
+                              cmdline => $cmdline, 
+                              errcode => $expected_error_code, 
+                              output => \%expected_downloaded_files);
+exit $the_test->run();
+
+# vim: et ts=4 sw=4
+

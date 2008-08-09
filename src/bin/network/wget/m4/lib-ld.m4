@@ -1,5 +1,6 @@
 # lib-ld.m4 serial 3 (gettext-0.13)
-dnl Copyright (C) 1996-2003 Free Software Foundation, Inc.
+dnl Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+dnl 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.

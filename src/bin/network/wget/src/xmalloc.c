@@ -1,12 +1,13 @@
 /* Wrappers around malloc and memory debugging support.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006, 2007,
+   2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,39 +15,30 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else  /* not HAVE_STRING_H */
-# include <strings.h>
-#endif /* not HAVE_STRING_H */
-#include <sys/types.h>
+#include <string.h>
 #include <errno.h>
 #include <assert.h>
 
 #include "wget.h"
 #include "xmalloc.h"
-#include "hash.h"		/* for hash_pointer */
-
-#ifndef errno
-extern int errno;
-#endif
+#include "hash.h"               /* for hash_pointer */
 
 /* This file implements several wrappers around the basic allocation
    routines.  This is done for two reasons: first, so that the callers
@@ -67,10 +59,10 @@ memfatal (const char *context, long attempted_size)
 {
   /* Make sure we don't try to store part of the log line, and thus
      call malloc.  */
-  log_set_save_context (0);
+  log_set_save_context (false);
   logprintf (LOG_ALWAYS,
-	     _("%s: %s: Failed to allocate %ld bytes; memory exhausted.\n"),
-	     exec_name, context, attempted_size);
+             _("%s: %s: Failed to allocate %ld bytes; memory exhausted.\n"),
+             exec_name, context, attempted_size);
   exit (1);
 }
 
@@ -218,8 +210,8 @@ static int malloc_count, free_count;
 
 /* Home-grown hash table of mallocs: */
 
-#define SZ 100003		/* Prime just over 100,000.  Increase
-				   it to debug larger Wget runs.  */
+#define SZ 100003               /* Prime just over 100,000.  Increase
+                                   it to debug larger Wget runs.  */
 
 static struct {
   const void *ptr;
@@ -261,15 +253,15 @@ register_ptr (const void *ptr, const char *file, int line)
   malloc_table[i].line = line;
 }
 
-/* Unregister PTR from malloc_table.  Return 0 if PTR is not present
-   in malloc_table.  */
+/* Unregister PTR from malloc_table.  Return false if PTR is not
+   present in malloc_table.  */
 
-static int
+static bool
 unregister_ptr (void *ptr)
 {
   int i = ptr_position (ptr);
   if (malloc_table[i].ptr == NULL)
-    return 0;
+    return false;
   malloc_table[i].ptr = NULL;
 
   /* Relocate malloc_table entries immediately following PTR. */
@@ -279,16 +271,16 @@ unregister_ptr (void *ptr)
       /* Find the new location for the key. */
       int j = hash_pointer (ptr2) % SZ;
       for (; malloc_table[j].ptr != NULL; j = (j + 1) % SZ)
-	if (ptr2 == malloc_table[j].ptr)
-	  /* No need to relocate entry at [i]; it's already at or near
-	     its hash position. */
-	  goto cont_outer;
+        if (ptr2 == malloc_table[j].ptr)
+          /* No need to relocate entry at [i]; it's already at or near
+             its hash position. */
+          goto cont_outer;
       malloc_table[j] = malloc_table[i];
       malloc_table[i].ptr = NULL;
     cont_outer:
       ;
     }
-  return 1;
+  return true;
 }
 
 /* Print the malloc debug stats gathered from the above information.
@@ -301,11 +293,11 @@ print_malloc_debug_stats (void)
 {
   int i;
   printf ("\nMalloc:  %d\nFree:    %d\nBalance: %d\n\n",
-	  malloc_count, free_count, malloc_count - free_count);
+          malloc_count, free_count, malloc_count - free_count);
   for (i = 0; i < SZ; i++)
     if (malloc_table[i].ptr != NULL)
       printf ("0x%0*lx: %s:%d\n", PTR_FORMAT (malloc_table[i].ptr),
-	      malloc_table[i].file, malloc_table[i].line);
+              malloc_table[i].file, malloc_table[i].line);
 }
 
 void *
@@ -361,13 +353,13 @@ debugging_free (void *ptr, const char *source_file, int source_line)
   if (ptr == NULL)
     {
       fprintf (stderr, "%s: xfree(NULL) at %s:%d\n",
-	       exec_name, source_file, source_line);
+               exec_name, source_file, source_line);
       abort ();
     }
   if (!unregister_ptr (ptr))
     {
       fprintf (stderr, "%s: bad xfree(0x%0*lx) at %s:%d\n",
-	       exec_name, PTR_FORMAT (ptr), source_file, source_line);
+               exec_name, PTR_FORMAT (ptr), source_file, source_line);
       abort ();
     }
   ++free_count;

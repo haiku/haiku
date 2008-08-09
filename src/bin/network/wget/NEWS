@@ -1,11 +1,120 @@
 GNU Wget NEWS -- history of user-visible changes.
 
-Copyright (C) 2005 Free Software Foundation, Inc.
+Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+2006, 2007, 2008 Free Software Foundation, Inc.
 See the end for copying conditions.
 
 Please send GNU Wget bug reports to <bug-wget@gnu.org>.
 
-* Wget 1.10.1 is a bugfix release with no user-visible changes.
+* Changes in Wget 1.11.4
+
+** Fixed an issue (apparently a regression) where -O would refuse to
+download when -nc was given, even though the file didn't exist.
+
+** Fixed a situation where Wget could abort with --continue if the
+remote server gives a content-length of zero when the file exists
+locally with content.
+
+** Fixed a crash on some systems, due to Wget casting a pointer-to-long
+to a pointer-to-time_t.
+
+** Translation updates for Catalan.
+
+* Changes in Wget 1.11.3
+
+** Downgraded -N with -O to a warning, rather than an error.
+
+** Translation updates
+
+* Changes in Wget 1.11.2
+
+** Fixed a problem in authenticating over HTTPS through a proxy.
+(Regression in 1.11 over 1.10.2.)
+
+** The combination of -r or -p with -O, which was disallowed in 1.11,
+has been downgraded to a warning in 1.11.2. (-O and -N, which was never
+meaningful, is still an error.)
+
+** Further improvements to progress bar displays in non-English locales
+(too many spaces could be inserted, causing the display to scroll).
+
+** Successive invocations of Wget on FTP URLS, with --no-remove-listing
+and --continue, was causing Wget to append, rather than replace,
+information in the .listing file, and thereby download the same files
+multiple times. This has been fixed in 1.11.2.
+
+** Wget 1.11 no longer allowed ".." to persist at the beginning of URLs,
+for improved conformance with RFC 3986. However, this behavior presents
+problems for some FTP setups, and so they are now preserved again, for
+FTP URLs only.
+
+* Changes in Wget 1.11.1.
+
+** Interrupted downloads no longer result in renaming the file
+(regression in 1.11 over 1.10.2).
+
+** Progress bar now displays correctly in non-English locales (and a
+related assertion failure was fixed).
+
+** Wget no longer issues a GET request over HTTP for files it should
+know it's not going to download (regression in 1.11 over 1.10.2).
+
+** Added option --auth-no-challenge, to support broken pre-1.11
+authentication-before-server-challenge, which turns out to still be
+useful for some limited cases.
+
+** Documentation of accept/reject lists in the manual's "Types of
+Files" section now explains various aspects of their behavior that may
+be surprising, and notes that they may change in the future.
+
+** Documentation of --no-parents now explains how a trailing slash, or
+lack thereof, in the specified URL, will affect behavior.
+
+* Changes in Wget 1.11.
+
+** Timestamping now uses the value from the most recent HTTP response,
+rather than the first one it got.
+
+** Authentication information is no longer sent as part of the Referer
+header in recursive fetches.
+
+** No authentication credentials are sent until a challenge is issued,
+for improved security. Authentication handling is still not
+RFC-compliant, as once a Basic challenge has been received, it will
+assume it can send credentials to any URL at that same host, and not
+just the ones at or below the original authenticated location.
+Credentials for Digest authentication are still never saved or issued
+automatically, and continue to require a challenge for each resource.
+
+** Added --max-redirect option, allowing the user to specify what should
+be the maximum number of HTTP redirects to follow.
+
+** Wget now supports saving HTTP downloads using file names specified by
+the `Content-Disposition' header.  This is a standard way of specifying
+the file name used by many web dynamically generated pages. However, the
+current implementation is inefficient, and known to have bugs. It is
+EXPERIMENTAL only, and not enabled by default. Use --content-disposition
+to enable it.
+
+** The new option `--ignore-case' makes Wget ignore case when
+matching files, directories, and wildcards.  This affects the -X, -I,
+-A, and -R options, as well as globbing in FTP URLs.
+
+** ETA projection is now displayed in "dot" progress output as well as
+in the default progress bar.  (The dot progress is used by default when
+logging Wget's output to file using the `-o' option.)
+
+** The "lockable boolean" argument type is no longer supported.  It
+was only used by the passive_ftp .wgetrc setting.  If you're running
+broken scripts or Perl modules that unconditionally specify
+`--passive-ftp' and your firewall disallows it, you can override them
+by replacing wget with a script that execs wget "$@" --no-passive-ftp.
+
+** The source code has been migrated to Mercurial. The repositories are
+available at http://hg.addictivecode.org/. Prior to this, the source
+code was hosted on Subversion (migrated from the original CVS); you can
+still get access to older tags and branches for Wget in the Subversion
+repository at http://addictivecode.org/svn/wget/.
 
 * Changes in Wget 1.10.
 
@@ -551,7 +660,7 @@ geturl -vo log http://fly.cc.fer.hr/
 ----------------------------------------------------------------------
 Copyright information:
 
-Copyright (C) 2005 Free Software Foundation, Inc.
+Copyright (C) 1997-2005 Free Software Foundation, Inc.
 
    Permission is granted to anyone to make or distribute verbatim
    copies of this document as received, in any medium, provided that

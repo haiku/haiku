@@ -1,24 +1,12 @@
 /* Some autoconf-unrelated preprocessor magic that needs to be done
-   before including the system includes and therefore cannot belong in
-   sysdep.h.  This file is included at the bottom of config.h.  */
+   *before* including the system includes and therefore cannot belong
+   in sysdep.h.
 
-/* Alloca-related defines, straight out of the Autoconf manual. */
+   Everything else related to system tweaking belongs to sysdep.h.
 
-/* AIX requires this to be the first thing in the file.  */
-#ifndef __GNUC__
-# if HAVE_ALLOCA_H
-#  include <alloca.h>
-# else
-#  ifdef _AIX
- #pragma alloca
-#  else
-#   ifndef alloca /* predefined by HP cc +Olibcalls */
-void *alloca ();
-#   endif
-#  endif
-# endif
-#endif
+   This file is included at the bottom of config.h.  */
 
+/* Testing for __sun is not enough because it's also defined on SunOS.  */
 #ifdef __sun
 # ifdef __SVR4
 #  define solaris
@@ -59,17 +47,33 @@ void *alloca ();
 #define _SVID_SOURCE
 #define _BSD_SOURCE
 
+/* Under glibc-based systems we want all GNU extensions as well.  This
+   declares some unnecessary cruft, but also useful functions such as
+   timegm, FNM_CASEFOLD extension to fnmatch, memrchr, etc.  */
+#define _GNU_SOURCE
+
 #endif /* NAMESPACE_TWEAKS */
 
-/* Determine whether to use stdarg.  Use it only if the compiler
-   supports ANSI C and stdarg.h is present.  We check for both because
-   there are configurations where stdarg.h exists, but doesn't work.
-   This check cannot be in sysdep.h because we use it to choose which
-   system headers to include.  */
-#ifndef WGET_USE_STDARG
-# ifdef __STDC__
-#  ifdef HAVE_STDARG_H
-#   define WGET_USE_STDARG
-#  endif
+
+/* Alloca declaration, based on recommendation in the Autoconf manual.
+   These have to be after the above namespace tweaks, but before any
+   non-preprocessor code.  */
+
+#if HAVE_ALLOCA_H
+# include <alloca.h>
+#elif defined WINDOWS
+# include <malloc.h>
+# ifndef alloca
+#  define alloca _alloca
 # endif
-#endif /* not WGET_USE_STDARG */
+#elif defined __GNUC__
+# define alloca __builtin_alloca
+#elif defined _AIX
+# define alloca __alloca
+#else
+# include <stddef.h>
+# ifdef  __cplusplus
+extern "C"
+# endif
+void *alloca (size_t);
+#endif

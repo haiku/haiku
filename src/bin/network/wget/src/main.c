@@ -1,11 +1,12 @@
 /* Command line parsing.
-   Copyright (C) 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,18 +15,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 #include <config.h>
 
@@ -34,26 +35,14 @@ so, delete this exception statement from your version.  */
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif /* HAVE_UNISTD_H */
-#include <sys/types.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif /* HAVE_STRING_H */
-#ifdef HAVE_SIGNAL_H
-# include <signal.h>
-#endif
+#include <string.h>
+#include <signal.h>
 #ifdef HAVE_NLS
-#ifdef HAVE_LOCALE_H
 # include <locale.h>
-#endif /* HAVE_LOCALE_H */
-#endif /* HAVE_NLS */
-#include <assert.h>
-
-#include <errno.h>
-#ifndef errno
-extern int errno;
 #endif
+#include <assert.h>
+#include <errno.h>
+#include <time.h>
 
 #include "wget.h"
 #include "utils.h"
@@ -62,8 +51,10 @@ extern int errno;
 #include "recur.h"
 #include "host.h"
 #include "url.h"
-#include "progress.h"		/* for progress_handle_sigwinch */
+#include "progress.h"           /* for progress_handle_sigwinch */
 #include "convert.h"
+#include "spider.h"
+#include "http.h"               /* for save_cookies */
 
 /* On GNU system this will include system-wide getopt.h. */
 #include "getopt.h"
@@ -74,15 +65,15 @@ extern int errno;
 
 struct options opt;
 
-extern SUM_SIZE_INT total_downloaded_bytes;
 extern char *version_string;
 
-extern struct cookie_jar *wget_cookie_jar;
-
-static RETSIGTYPE redirect_output_signal PARAMS ((int));
+#if defined(SIGHUP) || defined(SIGUSR1)
+static void redirect_output_signal (int);
+#endif
 
 const char *exec_name;
 
+#ifndef TESTING
 /* Initialize I18N/L10N.  That amounts to invoking setlocale, and
    setting up gettext's message catalog using bindtextdomain and
    textdomain.  Does nothing if NLS is disabled or missing.  */
@@ -93,20 +84,7 @@ i18n_initialize (void)
   /* HAVE_NLS implies existence of functions invoked here.  */
 #ifdef HAVE_NLS
   /* Set the current locale.  */
-  /* Where possible, sets only LC_MESSAGES and LC_CTYPE.  Other
-     categories, such as numeric, time, or collation, break code that
-     parses data received from the network and relies on C-locale
-     behavior of libc functions.  For example, Solaris strptime fails
-     to recognize English month names in non-English locales, which
-     breaks http_atotm.  Some implementations of fnmatch perform
-     unwanted case folding in non-C locales.  ctype macros, while they
-     were used, provided another example against LC_ALL.  */
-#if defined(LC_MESSAGES) && defined(LC_CTYPE)
-  setlocale (LC_MESSAGES, "");
-  setlocale (LC_CTYPE, "");	/* safe because we use safe-ctype */
-#else
   setlocale (LC_ALL, "");
-#endif
   /* Set the text message domain.  */
   bindtextdomain ("wget", LOCALEDIR);
   textdomain ("wget");
@@ -115,8 +93,8 @@ i18n_initialize (void)
 
 /* Definition of command-line options. */
 
-static void print_help PARAMS ((void));
-static void print_version PARAMS ((void));
+static void print_help (void);
+static void print_version (void);
 
 #ifdef HAVE_SSL
 # define IF_SSL(x) x
@@ -125,9 +103,9 @@ static void print_version PARAMS ((void));
 #endif
 
 #ifdef ENABLE_DEBUG
-# define IF_DEBUG(x) x
+# define WHEN_DEBUG(x) x
 #else
-# define IF_DEBUG(x) NULL
+# define WHEN_DEBUG(x) NULL
 #endif
 
 struct cmdline_option {
@@ -146,14 +124,15 @@ struct cmdline_option {
     OPT__NO,
     OPT__PARENT
   } type;
-  const void *data;		/* for standard options */
-  int argtype;			/* for non-standard options */
+  const void *data;             /* for standard options */
+  int argtype;                  /* for non-standard options */
 };
 
-struct cmdline_option option_data[] =
+static struct cmdline_option option_data[] =
   {
     { "accept", 'A', OPT_VALUE, "accept", -1 },
     { "append-output", 'a', OPT__APPEND_OUTPUT, NULL, required_argument },
+    { "auth-no-challenge", 0, OPT_BOOLEAN, "authnochallenge", -1 },
     { "background", 'b', OPT_BOOLEAN, "background", -1 },
     { "backup-converted", 'K', OPT_BOOLEAN, "backupconverted", -1 },
     { "backups", 0, OPT_BOOLEAN, "backups", -1 },
@@ -169,9 +148,10 @@ struct cmdline_option option_data[] =
     { "connect-timeout", 0, OPT_VALUE, "connecttimeout", -1 },
     { "continue", 'c', OPT_BOOLEAN, "continue", -1 },
     { "convert-links", 'k', OPT_BOOLEAN, "convertlinks", -1 },
+    { "content-disposition", 0, OPT_BOOLEAN, "contentdisposition", -1 },
     { "cookies", 0, OPT_BOOLEAN, "cookies", -1 },
     { "cut-dirs", 0, OPT_VALUE, "cutdirs", -1 },
-    { IF_DEBUG ("debug"), 'd', OPT_BOOLEAN, "debug", -1 },
+    { WHEN_DEBUG ("debug"), 'd', OPT_BOOLEAN, "debug", -1 },
     { "delete-after", 0, OPT_BOOLEAN, "deleteafter", -1 },
     { "directories", 0, OPT_BOOLEAN, "dirstruct", -1 },
     { "directory-prefix", 'P', OPT_VALUE, "dirprefix", -1 },
@@ -200,6 +180,7 @@ struct cmdline_option option_data[] =
     { "http-passwd", 0, OPT_VALUE, "httppassword", -1 }, /* deprecated */
     { "http-password", 0, OPT_VALUE, "httppassword", -1 },
     { "http-user", 0, OPT_VALUE, "httpuser", -1 },
+    { "ignore-case", 0, OPT_BOOLEAN, "ignorecase", -1 },
     { "ignore-length", 0, OPT_BOOLEAN, "ignorelength", -1 },
     { "ignore-tags", 0, OPT_VALUE, "ignoretags", -1 },
     { "include-directories", 'I', OPT_VALUE, "includedirectories", -1 },
@@ -212,6 +193,7 @@ struct cmdline_option option_data[] =
     { "level", 'l', OPT_VALUE, "reclevel", -1 },
     { "limit-rate", 0, OPT_VALUE, "limitrate", -1 },
     { "load-cookies", 0, OPT_VALUE, "loadcookies", -1 },
+    { "max-redirect", 0, OPT_VALUE, "maxredirect", -1 },
     { "mirror", 'm', OPT_BOOLEAN, "mirror", -1 },
     { "no", 'n', OPT__NO, NULL, required_argument },
     { "no-clobber", 0, OPT_BOOLEAN, "noclobber", -1 },
@@ -265,9 +247,12 @@ struct cmdline_option option_data[] =
     { "version", 'V', OPT_FUNCALL, (void *) print_version, no_argument },
     { "wait", 'w', OPT_VALUE, "wait", -1 },
     { "waitretry", 0, OPT_VALUE, "waitretry", -1 },
+#ifdef MSDOS
+    { "wdebug", 0, OPT_BOOLEAN, "wdebug", -1 },
+#endif
   };
 
-#undef IF_DEBUG
+#undef WHEN_DEBUG
 #undef IF_SSL
 
 /* Return a string that contains S with "no-" prepended.  The string
@@ -315,51 +300,51 @@ init_switches (void)
       struct option *longopt;
 
       if (!opt->long_name)
-	/* The option is disabled. */
-	continue;
+        /* The option is disabled. */
+        continue;
 
       longopt = &long_options[o++];
       longopt->name = opt->long_name;
       longopt->val = i;
       if (opt->short_name)
-	{
-	  *p++ = opt->short_name;
-	  optmap[opt->short_name - 32] = longopt - long_options;
-	}
+        {
+          *p++ = opt->short_name;
+          optmap[opt->short_name - 32] = longopt - long_options;
+        }
       switch (opt->type)
-	{
-	case OPT_VALUE:
-	  longopt->has_arg = required_argument;
+        {
+        case OPT_VALUE:
+          longopt->has_arg = required_argument;
           if (opt->short_name)
-	    *p++ = ':';
-	  break;
-	case OPT_BOOLEAN:
-	  /* Specify an optional argument for long options, so that
-	     --option=off works the same as --no-option, for
-	     compatibility with pre-1.10 Wget.  However, don't specify
-	     optional arguments short-option booleans because they
-	     prevent combining of short options.  */
-	  longopt->has_arg = optional_argument;
-	  /* For Boolean options, add the "--no-FOO" variant, which is
-	     identical to "--foo", except it has opposite meaning and
-	     it doesn't allow an argument.  */
-	  longopt = &long_options[o++];
-	  longopt->name = no_prefix (opt->long_name);
-	  longopt->has_arg = no_argument;
-	  /* Mask the value so we'll be able to recognize that we're
-	     dealing with the false value.  */
-	  longopt->val = i | BOOLEAN_NEG_MARKER;
-	  break;
-	default:
-	  assert (opt->argtype != -1);
-	  longopt->has_arg = opt->argtype;
-	  if (opt->short_name)
-	    {
-	      if (longopt->has_arg == required_argument)
-		*p++ = ':';
-	      /* Don't handle optional_argument */
-	    }
-	}
+            *p++ = ':';
+          break;
+        case OPT_BOOLEAN:
+          /* Specify an optional argument for long options, so that
+             --option=off works the same as --no-option, for
+             compatibility with pre-1.10 Wget.  However, don't specify
+             optional arguments short-option booleans because they
+             prevent combining of short options.  */
+          longopt->has_arg = optional_argument;
+          /* For Boolean options, add the "--no-FOO" variant, which is
+             identical to "--foo", except it has opposite meaning and
+             it doesn't allow an argument.  */
+          longopt = &long_options[o++];
+          longopt->name = no_prefix (opt->long_name);
+          longopt->has_arg = no_argument;
+          /* Mask the value so we'll be able to recognize that we're
+             dealing with the false value.  */
+          longopt->val = i | BOOLEAN_NEG_MARKER;
+          break;
+        default:
+          assert (opt->argtype != -1);
+          longopt->has_arg = opt->argtype;
+          if (opt->short_name)
+            {
+              if (longopt->has_arg == required_argument)
+                *p++ = ':';
+              /* Don't handle optional_argument */
+            }
+        }
     }
   /* Terminate short_options. */
   *p = '\0';
@@ -407,6 +392,10 @@ Logging and input file:\n"),
 #ifdef ENABLE_DEBUG
     N_("\
   -d,  --debug               print lots of debugging information.\n"),
+#endif
+#ifdef MSDOS
+    N_("\
+       --wdebug              print Watt-32 debug output.\n"),
 #endif
     N_("\
   -q,  --quiet               quiet (no output).\n"),
@@ -459,8 +448,6 @@ Download:\n"),
     N_("\
        --random-wait             wait from 0...2*WAIT secs between retrievals.\n"),
     N_("\
-  -Y,  --proxy                   explicitly turn on proxy.\n"),
-    N_("\
        --no-proxy                explicitly turn off proxy.\n"),
     N_("\
   -Q,  --quota=NUMBER            set retrieval quota to NUMBER.\n"),
@@ -472,6 +459,8 @@ Download:\n"),
        --no-dns-cache            disable caching DNS lookups.\n"),
     N_("\
        --restrict-file-names=OS  restrict chars in file names to ones OS allows.\n"),
+    N_("\
+       --ignore-case             ignore case when matching files/directories.\n"),
 #ifdef ENABLE_IPV6
     N_("\
   -4,  --inet4-only              connect only to IPv4 addresses.\n"),
@@ -518,6 +507,8 @@ HTTP options:\n"),
     N_("\
        --header=STRING         insert STRING among the headers.\n"),
     N_("\
+       --max-redirect          maximum redirections allowed per page.\n"),
+    N_("\
        --proxy-user=USER       set USER as proxy username.\n"),
     N_("\
        --proxy-password=PASS   set PASS as proxy password.\n"),
@@ -541,6 +532,13 @@ HTTP options:\n"),
        --post-data=STRING      use the POST method; send STRING as the data.\n"),
     N_("\
        --post-file=FILE        use the POST method; send contents of FILE.\n"),
+    N_("\
+       --content-disposition   honor the Content-Disposition header when\n\
+                               choosing local file names (EXPERIMENTAL).\n"),
+    N_("\
+       --auth-no-challenge     Send Basic HTTP authentication information\n\
+                               without first waiting for the server's\n\
+                               challenge.\n"),
     "\n",
 
 #ifdef HAVE_SSL
@@ -642,7 +640,7 @@ Recursive accept/reject:\n"),
   int i;
 
   printf (_("GNU Wget %s, a non-interactive network retriever.\n"),
-	  version_string);
+          version_string);
   print_usage ();
 
   for (i = 0; i < countof (help); i++)
@@ -651,29 +649,58 @@ Recursive accept/reject:\n"),
   exit (0);
 }
 
+/* Return a human-readable printed representation of INTERVAL,
+   measured in seconds.  */
+
+static char *
+secs_to_human_time (double interval)
+{
+  static char buf[32];
+  int secs = (int) (interval + 0.5);
+  int hours, mins, days;
+
+  days = secs / 86400, secs %= 86400;
+  hours = secs / 3600, secs %= 3600;
+  mins = secs / 60, secs %= 60;
+
+  if (days)
+    sprintf (buf, "%dd %dh %dm %ds", days, hours, mins, secs);
+  else if (hours)
+    sprintf (buf, "%dh %dm %ds", hours, mins, secs);
+  else if (mins)
+    sprintf (buf, "%dm %ds", mins, secs);
+  else
+    sprintf (buf, "%ss", print_decimal (interval));
+
+  return buf;
+}
+
 static void
 print_version (void)
 {
   printf ("GNU Wget %s\n\n", version_string);
   fputs (_("\
-Copyright (C) 2005 Free Software Foundation, Inc.\n"), stdout);
+Copyright (C) 2008 Free Software Foundation, Inc.\n"), stdout);
   fputs (_("\
-This program is distributed in the hope that it will be useful,\n\
-but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-GNU General Public License for more details.\n"), stdout);
+License GPLv3+: GNU GPL version 3 or later\n\
+<http://www.gnu.org/licenses/gpl.html>.\n\
+This is free software: you are free to change and redistribute it.\n\
+There is NO WARRANTY, to the extent permitted by law.\n"), stdout);
   fputs (_("\nOriginally written by Hrvoje Niksic <hniksic@xemacs.org>.\n"),
-	 stdout);
+         stdout);
+  fputs (_("Currently maintained by Micah Cowan <micah@cowan.name>.\n"),
+         stdout);
   exit (0);
 }
 
+
 int
 main (int argc, char *const *argv)
 {
   char **url, **t;
   int i, ret, longindex;
   int nurl, status;
-  int append_to_log = 0;
+  bool append_to_log = false;
 
   i18n_initialize ();
 
@@ -686,7 +713,7 @@ main (int argc, char *const *argv)
 
 #ifdef WINDOWS
   /* Drop extension (typically .EXE) from executable filename. */
-  windows_main (&argc, (char **) argv, (char **) &exec_name);
+  windows_main ((char **) &exec_name);
 #endif
 
   /* Set option defaults; read the system wgetrc and ~/.wgetrc.  */
@@ -695,115 +722,117 @@ main (int argc, char *const *argv)
   init_switches ();
   longindex = -1;
   while ((ret = getopt_long (argc, argv,
-			     short_options, long_options, &longindex)) != -1)
+                             short_options, long_options, &longindex)) != -1)
     {
       int val;
       struct cmdline_option *opt;
 
       /* If LONGINDEX is unchanged, it means RET is referring a short
-	 option.  */
+         option.  */
       if (longindex == -1)
-	{
-	  if (ret == '?')
-	    {
-	      print_usage ();
-	      printf ("\n");
-	      printf (_("Try `%s --help' for more options.\n"), exec_name);
-	      exit (2);
-	    }
-	  /* Find the short option character in the mapping.  */
-	  longindex = optmap[ret - 32];
-	}
+        {
+          if (ret == '?')
+            {
+              print_usage ();
+              printf ("\n");
+              printf (_("Try `%s --help' for more options.\n"), exec_name);
+              exit (2);
+            }
+          /* Find the short option character in the mapping.  */
+          longindex = optmap[ret - 32];
+        }
       val = long_options[longindex].val;
 
       /* Use the retrieved value to locate the option in the
-	 option_data array, and to see if we're dealing with the
-	 negated "--no-FOO" variant of the boolean option "--foo".  */
+         option_data array, and to see if we're dealing with the
+         negated "--no-FOO" variant of the boolean option "--foo".  */
       opt = &option_data[val & ~BOOLEAN_NEG_MARKER];
       switch (opt->type)
-	{
-	case OPT_VALUE:
-	  setoptval (opt->data, optarg, opt->long_name);
-	  break;
-	case OPT_BOOLEAN:
-	  if (optarg)
-	    /* The user has specified a value -- use it. */
-	    setoptval (opt->data, optarg, opt->long_name);
-	  else
-	    {
-	      /* NEG is true for `--no-FOO' style boolean options. */
-	      int neg = val & BOOLEAN_NEG_MARKER;
-	      setoptval (opt->data, neg ? "0" : "1", opt->long_name);
-	    }
-	  break;
-	case OPT_FUNCALL:
-	  {
-	    void (*func) PARAMS ((void)) = (void (*) PARAMS ((void))) opt->data;
-	    func ();
-	  }
-	  break;
-	case OPT__APPEND_OUTPUT:
-	  setoptval ("logfile", optarg, opt->long_name);
-	  append_to_log = 1;
-	  break;
-	case OPT__EXECUTE:
-	  run_command (optarg);
-	  break;
-	case OPT__NO:
-	  {
-	    /* We support real --no-FOO flags now, but keep these
-	       short options for convenience and backward
-	       compatibility.  */
-	    char *p;
-	    for (p = optarg; *p; p++)
-	      switch (*p)
-		{
-		case 'v':
-		  setoptval ("verbose", "0", opt->long_name);
-		  break;
-		case 'H':
-		  setoptval ("addhostdir", "0", opt->long_name);
-		  break;
-		case 'd':
-		  setoptval ("dirstruct", "0", opt->long_name);
-		  break;
-		case 'c':
-		  setoptval ("noclobber", "1", opt->long_name);
-		  break;
-		case 'p':
-		  setoptval ("noparent", "1", opt->long_name);
-		  break;
-		default:
-		  printf (_("%s: illegal option -- `-n%c'\n"), exec_name, *p);
-		  print_usage ();
-		  printf ("\n");
-		  printf (_("Try `%s --help' for more options.\n"), exec_name);
-		  exit (1);
-		}
-	    break;
-	  }
-	case OPT__PARENT:
-	case OPT__CLOBBER:
-	  {
-	    /* The wgetrc commands are named noparent and noclobber,
-	       so we must revert the meaning of the cmdline options
-	       before passing the value to setoptval.  */
-	    int flag = 1;
-	    if (optarg)
-	      flag = (*optarg == '1' || TOLOWER (*optarg) == 'y'
-		      || (TOLOWER (optarg[0]) == 'o'
-			  && TOLOWER (optarg[1]) == 'n'));
-	    setoptval (opt->type == OPT__PARENT ? "noparent" : "noclobber",
-		       flag ? "0" : "1", opt->long_name);
-	    break;
-	  }
-	case OPT__DONT_REMOVE_LISTING:
-	  setoptval ("removelisting", "0", opt->long_name);
-	  break;
-	}
+        {
+        case OPT_VALUE:
+          setoptval (opt->data, optarg, opt->long_name);
+          break;
+        case OPT_BOOLEAN:
+          if (optarg)
+            /* The user has specified a value -- use it. */
+            setoptval (opt->data, optarg, opt->long_name);
+          else
+            {
+              /* NEG is true for `--no-FOO' style boolean options. */
+              bool neg = !!(val & BOOLEAN_NEG_MARKER);
+              setoptval (opt->data, neg ? "0" : "1", opt->long_name);
+            }
+          break;
+        case OPT_FUNCALL:
+          {
+            void (*func) (void) = (void (*) (void)) opt->data;
+            func ();
+          }
+          break;
+        case OPT__APPEND_OUTPUT:
+          setoptval ("logfile", optarg, opt->long_name);
+          append_to_log = true;
+          break;
+        case OPT__EXECUTE:
+          run_command (optarg);
+          break;
+        case OPT__NO:
+          {
+            /* We support real --no-FOO flags now, but keep these
+               short options for convenience and backward
+               compatibility.  */
+            char *p;
+            for (p = optarg; *p; p++)
+              switch (*p)
+                {
+                case 'v':
+                  setoptval ("verbose", "0", opt->long_name);
+                  break;
+                case 'H':
+                  setoptval ("addhostdir", "0", opt->long_name);
+                  break;
+                case 'd':
+                  setoptval ("dirstruct", "0", opt->long_name);
+                  break;
+                case 'c':
+                  setoptval ("noclobber", "1", opt->long_name);
+                  break;
+                case 'p':
+                  setoptval ("noparent", "1", opt->long_name);
+                  break;
+                default:
+                  printf (_("%s: illegal option -- `-n%c'\n"), exec_name, *p);
+                  print_usage ();
+                  printf ("\n");
+                  printf (_("Try `%s --help' for more options.\n"), exec_name);
+                  exit (1);
+                }
+            break;
+          }
+        case OPT__PARENT:
+        case OPT__CLOBBER:
+          {
+            /* The wgetrc commands are named noparent and noclobber,
+               so we must revert the meaning of the cmdline options
+               before passing the value to setoptval.  */
+            bool flag = true;
+            if (optarg)
+              flag = (*optarg == '1' || TOLOWER (*optarg) == 'y'
+                      || (TOLOWER (optarg[0]) == 'o'
+                          && TOLOWER (optarg[1]) == 'n'));
+            setoptval (opt->type == OPT__PARENT ? "noparent" : "noclobber",
+                       flag ? "0" : "1", opt->long_name);
+            break;
+          }
+        case OPT__DONT_REMOVE_LISTING:
+          setoptval ("removelisting", "0", opt->long_name);
+          break;
+        }
 
       longindex = -1;
     }
+
+  nurl = argc - optind;
 
   /* All user options have now been processed, so it's now safe to do
      interoption dependency checks. */
@@ -814,11 +843,11 @@ main (int argc, char *const *argv)
   if (opt.page_requisites && !opt.recursive)
     {
       /* Don't set opt.recursive here because it would confuse the FTP
-	 code.  Instead, call retrieve_tree below when either
-	 page_requisites or recursive is requested.  */
+         code.  Instead, call retrieve_tree below when either
+         page_requisites or recursive is requested.  */
       opt.reclevel = 0;
       if (!opt.no_dirstruct)
-	opt.dirstruct = 1;	/* normally handled by cmd_spec_recursive() */
+        opt.dirstruct = 1;      /* normally handled by cmd_spec_recursive() */
     }
 
   if (opt.verbose == -1)
@@ -846,8 +875,39 @@ Can't timestamp and not clobber old files at the same time.\n"));
       exit (1);
     }
 #endif
+  if (opt.output_document)
+    {
+      if (opt.convert_links 
+          && (nurl > 1 || opt.page_requisites || opt.recursive))
+        {
+          fputs (_("\
+Cannot specify both -k and -O if multiple URLs are given, or in combination\n\
+with -p or -r. See the manual for details.\n\n"), stdout);
+          print_usage ();
+          exit (1);
+        }
+      if (opt.page_requisites
+          || opt.recursive)
+        {
+          logprintf (LOG_NOTQUIET, "%s", _("\
+WARNING: combining -O with -r or -p will mean that all downloaded content\n\
+will be placed in the single file you specified.\n\n"));
+        }
+      if (opt.timestamping)
+        {
+          logprintf (LOG_NOTQUIET, "%s", _("\
+WARNING: timestamping does nothing in combination with -O. See the manual\n\
+for details.\n\n"));
+          opt.timestamping = false;
+        }
+      if (opt.noclobber && file_exists_p(opt.output_document)) 
+           { 
+              /* Check if output file exists; if it does, exit. */
+              logprintf (LOG_VERBOSE, _("File `%s' already there; not retrieving.\n"), opt.output_document);
+              exit(1);
+           }  
+    }
 
-  nurl = argc - optind;
   if (!nurl && !opt.input_filename)
     {
       /* No URL specified.  */
@@ -855,13 +915,19 @@ Can't timestamp and not clobber old files at the same time.\n"));
       print_usage ();
       printf ("\n");
       /* #### Something nicer should be printed here -- similar to the
-	 pre-1.5 `--help' page.  */
+         pre-1.5 `--help' page.  */
       printf (_("Try `%s --help' for more options.\n"), exec_name);
       exit (1);
     }
 
+#ifdef MSDOS
+  if (opt.wdebug)
+     dbug_init();
+  sock_init();
+#else
   if (opt.background)
     fork_to_background ();
+#endif
 
   /* Initialize progress.  Have to do this after the options are
      processed so we know where the log file is.  */
@@ -874,9 +940,9 @@ Can't timestamp and not clobber old files at the same time.\n"));
     {
       char *rewritten = rewrite_shorthand_url (argv[optind]);
       if (rewritten)
-	url[i] = rewritten;
+        url[i] = rewritten;
       else
-	url[i] = xstrdup (argv[optind]);
+        url[i] = xstrdup (argv[optind]);
     }
   url[i] = NULL;
 
@@ -884,52 +950,53 @@ Can't timestamp and not clobber old files at the same time.\n"));
   log_init (opt.lfilename, append_to_log);
 
   DEBUGP (("DEBUG output created by Wget %s on %s.\n\n", version_string,
-	   OS_TYPE));
+           OS_TYPE));
 
   /* Open the output filename if necessary.  */
   if (opt.output_document)
     {
-      extern FILE *output_stream;
-      extern int output_stream_regular;
-
       if (HYPHENP (opt.output_document))
-	output_stream = stdout;
+        output_stream = stdout;
       else
-	{
-	  struct_fstat st;
-	  output_stream = fopen (opt.output_document,
-				 opt.always_rest ? "ab" : "wb");
-	  if (output_stream == NULL)
-	    {
-	      perror (opt.output_document);
-	      exit (1);
-	    }
-	  if (fstat (fileno (output_stream), &st) == 0 && S_ISREG (st.st_mode))
-	    output_stream_regular = 1;
-	}
+        {
+          struct_fstat st;
+          output_stream = fopen (opt.output_document,
+                                 opt.always_rest ? "ab" : "wb");
+          if (output_stream == NULL)
+            {
+              perror (opt.output_document);
+              exit (1);
+            }
+          if (fstat (fileno (output_stream), &st) == 0 && S_ISREG (st.st_mode))
+            output_stream_regular = true;
+        }
     }
 
 #ifdef WINDOWS
   ws_startup ();
 #endif
 
+#ifdef SIGHUP
   /* Setup the signal handler to redirect output when hangup is
      received.  */
-#ifdef HAVE_SIGNAL
   if (signal(SIGHUP, SIG_IGN) != SIG_IGN)
     signal(SIGHUP, redirect_output_signal);
+#endif
   /* ...and do the same for SIGUSR1.  */
+#ifdef SIGUSR1
   signal (SIGUSR1, redirect_output_signal);
+#endif
+#ifdef SIGPIPE
   /* Writing to a closed socket normally signals SIGPIPE, and the
      process exits.  What we want is to ignore SIGPIPE and just check
      for the return value of write().  */
   signal (SIGPIPE, SIG_IGN);
+#endif
 #ifdef SIGWINCH
   signal (SIGWINCH, progress_handle_sigwinch);
 #endif
-#endif /* HAVE_SIGNAL */
 
-  status = RETROK;		/* initialize it, just-in-case */
+  status = RETROK;              /* initialize it, just-in-case */
   /* Retrieve the URLs from argument list.  */
   for (t = url; *t; t++)
     {
@@ -937,18 +1004,28 @@ Can't timestamp and not clobber old files at the same time.\n"));
       int dt;
 
       if ((opt.recursive || opt.page_requisites)
-	  && url_scheme (*t) != SCHEME_FTP)
-	status = retrieve_tree (*t);
+          && (url_scheme (*t) != SCHEME_FTP || url_uses_proxy (*t)))
+        {
+          int old_follow_ftp = opt.follow_ftp;
+
+          /* Turn opt.follow_ftp on in case of recursive FTP retrieval */
+          if (url_scheme (*t) == SCHEME_FTP) 
+            opt.follow_ftp = 1;
+          
+          status = retrieve_tree (*t);
+
+          opt.follow_ftp = old_follow_ftp;
+        }
       else
-	status = retrieve_url (*t, &filename, &redirected_URL, NULL, &dt);
+        status = retrieve_url (*t, &filename, &redirected_URL, NULL, &dt, opt.recursive);
 
       if (opt.delete_after && file_exists_p(filename))
-	{
-	  DEBUGP (("Removing file due to --delete-after in main():\n"));
-	  logprintf (LOG_VERBOSE, _("Removing %s.\n"), filename);
-	  if (unlink (filename))
-	    logprintf (LOG_NOTQUIET, "unlink: %s\n", strerror (errno));
-	}
+        {
+          DEBUGP (("Removing file due to --delete-after in main():\n"));
+          logprintf (LOG_VERBOSE, _("Removing %s.\n"), filename);
+          if (unlink (filename))
+            logprintf (LOG_NOTQUIET, "unlink: %s\n", strerror (errno));
+        }
 
       xfree_null (redirected_URL);
       xfree_null (filename);
@@ -960,24 +1037,35 @@ Can't timestamp and not clobber old files at the same time.\n"));
       int count;
       status = retrieve_from_file (opt.input_filename, opt.force_html, &count);
       if (!count)
-	logprintf (LOG_NOTQUIET, _("No URLs found in %s.\n"),
-		   opt.input_filename);
+        logprintf (LOG_NOTQUIET, _("No URLs found in %s.\n"),
+                   opt.input_filename);
     }
+
+  /* Print broken links. */
+  if (opt.recursive && opt.spider)
+    {
+      print_broken_links();
+    }
+  
   /* Print the downloaded sum.  */
-  if (opt.recursive || opt.page_requisites
-      || nurl > 1
-      || (opt.input_filename && total_downloaded_bytes != 0))
+  if ((opt.recursive || opt.page_requisites
+       || nurl > 1
+       || (opt.input_filename && total_downloaded_bytes != 0))
+      &&
+      total_downloaded_bytes != 0)
     {
       logprintf (LOG_NOTQUIET,
-		 _("\nFINISHED --%s--\nDownloaded: %s bytes in %d files\n"),
-		 time_str (NULL),
-		 with_thousand_seps_sum (total_downloaded_bytes),
-		 opt.numurls);
+                 _("FINISHED --%s--\nDownloaded: %d files, %s in %s (%s)\n"),
+                 datetime_str (time (NULL)),
+                 opt.numurls,
+                 human_readable (total_downloaded_bytes),
+                 secs_to_human_time (total_download_time),
+                 retr_rate (total_downloaded_bytes, total_download_time));
       /* Print quota warning, if exceeded.  */
       if (opt.quota && total_downloaded_bytes > opt.quota)
-	logprintf (LOG_NOTQUIET,
-		   _("Download quota (%s bytes) EXCEEDED!\n"),
-		   with_thousand_seps_sum (opt.quota));
+        logprintf (LOG_NOTQUIET,
+                   _("Download quota of %s EXCEEDED!\n"),
+                   human_readable (opt.quota));
     }
 
   if (opt.cookies_output)
@@ -999,24 +1087,34 @@ Can't timestamp and not clobber old files at the same time.\n"));
   else
     return 1;
 }
+#endif /* TESTING */
 
-#ifdef HAVE_SIGNAL
+#if defined(SIGHUP) || defined(SIGUSR1)
+
+/* So the signal_name check doesn't blow when only one is available. */
+#ifndef SIGHUP
+# define SIGHUP -1
+#endif
+#ifndef SIGUSR1
+# define SIGUSR1 -1
+#endif
+
 /* Hangup signal handler.  When wget receives SIGHUP or SIGUSR1, it
    will proceed operation as usual, trying to write into a log file.
-   If that is impossible, the output will be turned off.
+   If that is impossible, the output will be turned off.  */
 
-   #### It is unsafe to do call libc functions from a signal handler.
-   What we should do is, set a global variable, and have the code in
-   log.c pick it up.  */
-
-static RETSIGTYPE
+static void
 redirect_output_signal (int sig)
 {
   const char *signal_name = (sig == SIGHUP ? "SIGHUP" :
-			     (sig == SIGUSR1 ? "SIGUSR1" :
-			      "WTF?!"));
+                             (sig == SIGUSR1 ? "SIGUSR1" :
+                              "WTF?!"));
   log_request_redirect_output (signal_name);
   progress_schedule_redirect ();
   signal (sig, redirect_output_signal);
 }
-#endif /* HAVE_SIGNAL */
+#endif
+
+/*
+ * vim: et ts=2 sw=2
+ */

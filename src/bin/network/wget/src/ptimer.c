@@ -1,11 +1,11 @@
 /* Portable timers.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
 GNU Wget is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 GNU Wget is distributed in the hope that it will be useful,
@@ -14,18 +14,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, as a special exception, the Free Software Foundation
-gives permission to link the code of its release of Wget with the
-OpenSSL project's "OpenSSL" library (or with modified versions of it
-that use the same license as the "OpenSSL" library), and distribute
-the linked executables.  You must obey the GNU General Public License
-in all respects for all of the code used other than "OpenSSL".  If you
-modify this file, you may extend this exception to your version of the
-file, but you are not obligated to do so.  If you do not wish to do
-so, delete this exception statement from your version.  */
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this program, or any covered work, by linking or
+combining it with the OpenSSL project's OpenSSL library (or a
+modified version of that library), containing parts covered by the
+terms of the OpenSSL or SSLeay licenses, the Free Software Foundation
+grants you additional permission to convey the resulting work.
+Corresponding Source for a non-source form of such a combination
+shall include the source code for the parts of OpenSSL used as well
+as that of the covered work.  */
 
 /* This file implements "portable timers" (ptimers), objects that
    measure elapsed time using the primitives most appropriate for the
@@ -34,37 +34,35 @@ so, delete this exception statement from your version.  */
      ptimer_new     -- creates a timer.
      ptimer_reset   -- resets the timer's elapsed time to zero.
      ptimer_measure -- measure and return the time elapsed since
-		       creation or last reset.
+                       creation or last reset.
      ptimer_read    -- reads the last measured elapsed value.
      ptimer_destroy -- destroy the timer.
      ptimer_granularity -- returns the approximate granularity of the timers.
 
-   Timers measure time in milliseconds, but the timings they return
-   are floating point numbers, so they can carry as much precision as
-   the underlying system timer supports.  For example, to measure the
-   time it takes to run a loop, you can use something like:
+   Timers measure time in seconds, returning the timings as floating
+   point numbers, so they can carry as much precision as the
+   underlying system timer supports.  For example, to measure the time
+   it takes to run a loop, you can use something like:
 
      ptimer *tmr = ptimer_new ();
      while (...)
        ... loop ...
-     double msecs = ptimer_measure ();
-     printf ("The loop took %.2f ms\n", msecs);  */
+     double secs = ptimer_measure ();
+     printf ("The loop took %.2fs\n", secs);  */
 
 #include <config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else  /* not HAVE_STRING_H */
-# include <strings.h>
-#endif /* not HAVE_STRING_H */
-#include <sys/types.h>
+#include <string.h>
 #include <errno.h>
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
-#include <assert.h>
+#include <time.h>
+#ifdef HAVE_SYS_TIME_H
+# include <sys/time.h>
+#endif
 
 /* Cygwin currently (as of 2005-04-08, Cygwin 1.5.14) lacks clock_getres,
    but still defines _POSIX_TIMERS!  Because of that we simply use the
@@ -76,31 +74,19 @@ so, delete this exception statement from your version.  */
 #include "wget.h"
 #include "ptimer.h"
 
-#ifndef errno
-extern int errno;
-#endif
-
-/* Depending on the OS and availability of gettimeofday(), one and
-   only one of PTIMER_POSIX, PTIMER_GETTIMEOFDAY, PTIMER_WINDOWS, or
-   PTIMER_TIME will be defined.  */
+/* Depending on the OS, one and only one of PTIMER_POSIX,
+   PTIMER_GETTIMEOFDAY, or PTIMER_WINDOWS will be defined.  */
 
 #undef PTIMER_POSIX
 #undef PTIMER_GETTIMEOFDAY
-#undef PTIMER_TIME
 #undef PTIMER_WINDOWS
 
 #if defined(WINDOWS) || defined(__CYGWIN__)
-# define PTIMER_WINDOWS		/* use Windows timers */
+# define PTIMER_WINDOWS         /* use Windows timers */
+#elif _POSIX_TIMERS - 0 > 0
+# define PTIMER_POSIX           /* use POSIX timers (clock_gettime) */
 #else
-# if _POSIX_TIMERS - 0 > 0
-#  define PTIMER_POSIX		/* use POSIX timers (clock_gettime) */
-# else
-#  ifdef HAVE_GETTIMEOFDAY
-#   define PTIMER_GETTIMEOFDAY	/* use gettimeofday */
-#  else
-#   define PTIMER_TIME
-#  endif
-# endif
+# define PTIMER_GETTIMEOFDAY    /* use gettimeofday */
 #endif
 
 #ifdef PTIMER_POSIX
@@ -122,8 +108,8 @@ typedef struct timespec ptimer_system_time;
    CLOCK_MONOTONIC where available, CLOCK_REALTIME otherwise.  */
 static int posix_clock_id;
 
-/* Resolution of the clock, in milliseconds. */
-static double posix_millisec_resolution;
+/* Resolution of the clock, initialized in posix_init. */
+static double posix_clock_resolution;
 
 /* Decide which clock_id to use.  */
 
@@ -157,27 +143,26 @@ posix_init (void)
     {
       struct timespec r;
       if (clocks[i].sysconf_name != NO_SYSCONF_CHECK)
-	if (sysconf (clocks[i].sysconf_name) < 0)
-	  continue;		/* sysconf claims this clock is unavailable */
+        if (sysconf (clocks[i].sysconf_name) < 0)
+          continue;             /* sysconf claims this clock is unavailable */
       if (clock_getres (clocks[i].id, &r) < 0)
-	continue;		/* clock_getres doesn't work for this clock */
+        continue;               /* clock_getres doesn't work for this clock */
       posix_clock_id = clocks[i].id;
-      posix_millisec_resolution = r.tv_sec * 1000.0 + r.tv_nsec / 1000000.0;
-      /* Guard against broken clock_getres returning nonsensical
-	 values.  */
-      if (posix_millisec_resolution == 0)
-	posix_millisec_resolution = 1;
+      posix_clock_resolution = (double) r.tv_sec + r.tv_nsec / 1e9;
+      /* Guard against nonsense returned by a broken clock_getres.  */
+      if (posix_clock_resolution == 0)
+        posix_clock_resolution = 1e-3;
       break;
     }
   if (i == countof (clocks))
     {
       /* If no clock was found, it means that clock_getres failed for
-	 the realtime clock.  */
+         the realtime clock.  */
       logprintf (LOG_NOTQUIET, _("Cannot get REALTIME clock frequency: %s\n"),
-		 strerror (errno));
+                 strerror (errno));
       /* Use CLOCK_REALTIME, but invent a plausible resolution. */
       posix_clock_id = CLOCK_REALTIME;
-      posix_millisec_resolution = 1;
+      posix_clock_resolution = 1e-3;
     }
 }
 
@@ -190,16 +175,16 @@ posix_measure (ptimer_system_time *pst)
 static inline double
 posix_diff (ptimer_system_time *pst1, ptimer_system_time *pst2)
 {
-  return ((pst1->tv_sec - pst2->tv_sec) * 1000.0
-	  + (pst1->tv_nsec - pst2->tv_nsec) / 1000000.0);
+  return ((pst1->tv_sec - pst2->tv_sec)
+          + (pst1->tv_nsec - pst2->tv_nsec) / 1e9);
 }
 
 static inline double
 posix_resolution (void)
 {
-  return posix_millisec_resolution;
+  return posix_clock_resolution;
 }
-#endif	/* PTIMER_POSIX */
+#endif  /* PTIMER_POSIX */
 
 #ifdef PTIMER_GETTIMEOFDAY
 /* Elapsed time measurement using gettimeofday: system time is held in
@@ -223,8 +208,8 @@ gettimeofday_measure (ptimer_system_time *pst)
 static inline double
 gettimeofday_diff (ptimer_system_time *pst1, ptimer_system_time *pst2)
 {
-  return ((pst1->tv_sec - pst2->tv_sec) * 1000.0
-	  + (pst1->tv_usec - pst2->tv_usec) / 1000.0);
+  return ((pst1->tv_sec - pst2->tv_sec)
+          + (pst1->tv_usec - pst2->tv_usec) / 1e6);
 }
 
 static inline double
@@ -235,40 +220,7 @@ gettimeofday_resolution (void)
      than 1ms.  Assume 100 usecs.  */
   return 0.1;
 }
-#endif	/* PTIMER_GETTIMEOFDAY */
-
-#ifdef PTIMER_TIME
-/* Elapsed time measurement using the time(2) call: system time is
-   held in time_t, retrieved using time, and resolution is 1 second.
-
-   This method is a catch-all for non-Windows systems without
-   gettimeofday -- e.g. DOS or really old or non-standard Unix
-   systems.  */
-
-typedef time_t ptimer_system_time;
-
-#define IMPL_measure time_measure
-#define IMPL_diff time_diff
-#define IMPL_resolution time_resolution
-
-static inline void
-time_measure (ptimer_system_time *pst)
-{
-  time (pst);
-}
-
-static inline double
-time_diff (ptimer_system_time *pst1, ptimer_system_time *pst2)
-{
-  return 1000.0 * (*pst1 - *pst2);
-}
-
-static inline double
-time_resolution (void)
-{
-  return 1;
-}
-#endif	/* PTIMER_TIME */
+#endif  /* PTIMER_GETTIMEOFDAY */
 
 #ifdef PTIMER_WINDOWS
 /* Elapsed time measurement on Windows: where high-resolution timers
@@ -290,12 +242,12 @@ typedef union {
 
 /* Whether high-resolution timers are used.  Set by ptimer_initialize_once
    the first time ptimer_new is called. */
-static int windows_hires_timers;
+static bool windows_hires_timers;
 
 /* Frequency of high-resolution timers -- number of updates per
-   millisecond.  Calculated the first time ptimer_new is called
-   provided that high-resolution timers are available. */
-static double windows_hires_msfreq;
+   second.  Calculated the first time ptimer_new is called provided
+   that high-resolution timers are available. */
+static double windows_hires_freq;
 
 static void
 windows_init (void)
@@ -305,8 +257,8 @@ windows_init (void)
   QueryPerformanceFrequency (&freq);
   if (freq.QuadPart != 0)
     {
-      windows_hires_timers = 1;
-      windows_hires_msfreq = (double) freq.QuadPart / 1000.0;
+      windows_hires_timers = true;
+      windows_hires_freq = (double) freq.QuadPart;
     }
 }
 
@@ -328,7 +280,7 @@ static inline double
 windows_diff (ptimer_system_time *pst1, ptimer_system_time *pst2)
 {
   if (windows_hires_timers)
-    return (pst1->hires.QuadPart - pst2->hires.QuadPart) / windows_hires_msfreq;
+    return (pst1->hires.QuadPart - pst2->hires.QuadPart) / windows_hires_freq;
   else
     return pst1->lores - pst2->lores;
 }
@@ -337,11 +289,11 @@ static double
 windows_resolution (void)
 {
   if (windows_hires_timers)
-    return 1.0 / windows_hires_msfreq;
+    return 1.0 / windows_hires_freq;
   else
-    return 10;			/* according to MSDN */
+    return 10;                  /* according to MSDN */
 }
-#endif	/* PTIMER_WINDOWS */
+#endif  /* PTIMER_WINDOWS */
 
 /* The code below this point is independent of timer implementation. */
 
@@ -350,8 +302,7 @@ struct ptimer {
      time, yields elapsed time. */
   ptimer_system_time start;
 
-  /* The most recent elapsed time, calculated by ptimer_measure().
-     Measured in milliseconds.  */
+  /* The most recent elapsed time, calculated by ptimer_measure().  */
   double elapsed_last;
 
   /* Approximately, the time elapsed between the true start of the
@@ -367,10 +318,10 @@ ptimer_new (void)
 {
   struct ptimer *pt = xnew0 (struct ptimer);
 #ifdef IMPL_init
-  static int init_done;
+  static bool init_done;
   if (!init_done)
     {
-      init_done = 1;
+      init_done = true;
       IMPL_init ();
     }
 #endif
@@ -388,8 +339,8 @@ ptimer_destroy (struct ptimer *pt)
 }
 
 /* Reset timer PT.  This establishes the starting point from which
-   ptimer_measure() will return the number of elapsed milliseconds.
-   It is allowed to reset a previously used timer.  */
+   ptimer_measure() will return the elapsed time in seconds.  It is
+   allowed to reset a previously used timer.  */
 
 void
 ptimer_reset (struct ptimer *pt)
@@ -402,9 +353,8 @@ ptimer_reset (struct ptimer *pt)
 
 /* Measure the elapsed time since timer creation/reset.  This causes
    the timer to internally call clock_gettime (or gettimeofday, etc.) 
-   to update its idea of current time.  The time in milliseconds is
-   returned, but is also stored for later access through
-   ptimer_read().
+   to update its idea of current time.  The time is returned, but is
+   also stored for later access through ptimer_read().
 
    This function handles clock skew, i.e. time that moves backwards is
    ignored.  */
@@ -445,9 +395,9 @@ ptimer_measure (struct ptimer *pt)
   return elapsed;
 }
 
-/* Return the most recent elapsed time in milliseconds, as measured
-   with ptimer_measure.  If ptimer_measure has not yet been called
-   since the timer was created or reset, this returns 0.  */
+/* Return the most recent elapsed time measured with ptimer_measure.
+   If ptimer_measure has not yet been called since the timer was
+   created or reset, this returns 0.  */
 
 double
 ptimer_read (const struct ptimer *pt)
@@ -456,8 +406,8 @@ ptimer_read (const struct ptimer *pt)
 }
 
 /* Return the assessed resolution of the timer implementation, in
-   milliseconds.  This is used by code that tries to substitute a
-   better value for timers that have returned zero.  */
+   seconds.  This is used by code that tries to substitute a better
+   value for timers that have returned zero.  */
 
 double
 ptimer_resolution (void)

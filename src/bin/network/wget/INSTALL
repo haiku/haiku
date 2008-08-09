@@ -151,9 +151,9 @@ report it as a bug.
 --------------
 
 To compile GNU Wget after it has been configured, simply type make.
-If your compiler is too old to handle function prototypes, Wget will
-try to K&R-ize its sources on the fly.  This should make GNU Wget
-compilable on almost any Unix-like system you are likely to encounter.
+Wget requires a compiler and standard library compliant with the 1990
+ISO C standard, which includes the vast majority of compilation
+environments present on systems in use today.
 
 After the compilation a ready-to-use `wget' executable should reside
 in the src directory.  At this point there is no formal test suite for

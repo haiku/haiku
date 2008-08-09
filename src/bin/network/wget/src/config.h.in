@@ -23,9 +23,6 @@
 /* Define if you want the Opie support for FTP compiled in. */
 #undef ENABLE_OPIE
 
-/* Define to 1 if you have the `access' function. */
-#undef HAVE_ACCESS
-
 /* Define to 1 if you have `alloca', as a function or macro. */
 #undef HAVE_ALLOCA
 
@@ -33,11 +30,14 @@
    */
 #undef HAVE_ALLOCA_H
 
-/* Define to use built-in MD5. */
+/* Define when using built-in MD5. */
 #undef HAVE_BUILTIN_MD5
 
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
+
+/* Define to 1 if you have the `drand48' function. */
+#undef HAVE_DRAND48
 
 /* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
 #undef HAVE_FSEEKO
@@ -57,11 +57,14 @@
 /* Define to 1 if you have the `gettext' function. */
 #undef HAVE_GETTEXT
 
-/* Define to 1 if you have the `gettimeofday' function. */
-#undef HAVE_GETTIMEOFDAY
-
 /* Define to 1 if you have the `inet_ntoa' function. */
 #undef HAVE_INET_NTOA
+
+/* Define to 1 if the system has the type `int64_t'. */
+#undef HAVE_INT64_T
+
+/* Define to 1 if the system has the type `intptr_t'. */
+#undef HAVE_INTPTR_T
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -71,6 +74,9 @@
 
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
+
+/* Define if you have the gnutls library. */
+#undef HAVE_LIBGNUTLS
 
 /* Define to 1 if you have the <libintl.h> header file. */
 #undef HAVE_LIBINTL_H
@@ -87,23 +93,17 @@
 /* Define if you have the ssl library. */
 #undef HAVE_LIBSSL
 
-/* Define to 1 if you have the <limits.h> header file. */
-#undef HAVE_LIMITS_H
-
-/* Define to 1 if you have the <locale.h> header file. */
-#undef HAVE_LOCALE_H
+/* Define to 1 if you have the `mbtowc' function. */
+#undef HAVE_MBTOWC
 
 /* Define if we're compiling support for MD5. */
 #undef HAVE_MD5
 
-/* Define to 1 if you have the `memmove' function. */
-#undef HAVE_MEMMOVE
-
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define to 1 if you have the `mktime' function. */
-#undef HAVE_MKTIME
+/* Define to 1 if you have the `memrchr' function. */
+#undef HAVE_MEMRCHR
 
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
@@ -114,26 +114,14 @@
 /* Define this if you want the NLS support. */
 #undef HAVE_NLS
 
-/* Define to use OpenSSL MD5. */
+/* Define when using OpenSSL MD5. */
 #undef HAVE_OPENSSL_MD5
 
 /* Define to 1 if you have the <pwd.h> header file. */
 #undef HAVE_PWD_H
 
-/* Define to 1 if you have the `select' function. */
-#undef HAVE_SELECT
-
-/* Define to 1 if you have the <setjmp.h> header file. */
-#undef HAVE_SETJMP_H
-
 /* Define to 1 if you have the `sigblock' function. */
 #undef HAVE_SIGBLOCK
-
-/* Define to 1 if you have the `signal' function. */
-#undef HAVE_SIGNAL
-
-/* Define to 1 if you have the <signal.h> header file. */
-#undef HAVE_SIGNAL_H
 
 /* Define to 1 if you have the `sigsetjmp' function. */
 #undef HAVE_SIGSETJMP
@@ -147,14 +135,11 @@
 /* Define if struct sockaddr_in6 has the sin6_scope_id member */
 #undef HAVE_SOCKADDR_IN6_SCOPE_ID
 
-/* Define to use Solaris MD5. */
+/* Define when using Solaris MD5. */
 #undef HAVE_SOLARIS_MD5
 
-/* Define if SSL support is being compiled in. */
-#undef HAVE_SSL
-
-/* Define to 1 if you have the <stdarg.h> header file. */
-#undef HAVE_STDARG_H
+/* Define to 1 if stdbool.h conforms to C99. */
+#undef HAVE_STDBOOL_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -168,9 +153,6 @@
 /* Define to 1 if you have the `strdup' function. */
 #undef HAVE_STRDUP
 
-/* Define to 1 if you have the `strerror' function. */
-#undef HAVE_STRERROR
-
 /* Define to 1 if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H
 
@@ -180,17 +162,8 @@
 /* Define to 1 if you have the `strncasecmp' function. */
 #undef HAVE_STRNCASECMP
 
-/* Define to 1 if you have the `strpbrk' function. */
-#undef HAVE_STRPBRK
-
 /* Define to 1 if you have the `strptime' function. */
 #undef HAVE_STRPTIME
-
-/* Define to 1 if you have the `strstr' function. */
-#undef HAVE_STRSTR
-
-/* Define to 1 if you have the `strtoimax' function. */
-#undef HAVE_STRTOIMAX
 
 /* Define to 1 if you have the `strtoll' function. */
 #undef HAVE_STRTOLL
@@ -234,6 +207,9 @@
 /* Define to 1 if the system has the type `uint32_t'. */
 #undef HAVE_UINT32_T
 
+/* Define to 1 if the system has the type `uintptr_t'. */
+#undef HAVE_UINTPTR_T
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
@@ -243,11 +219,23 @@
 /* Define to 1 if you have the <utime.h> header file. */
 #undef HAVE_UTIME_H
 
+/* Define to 1 if you have the `vasprintf' function. */
+#undef HAVE_VASPRINTF
+
 /* Define to 1 if you have the `vsnprintf' function. */
 #undef HAVE_VSNPRINTF
 
+/* Define to 1 if you have the <wchar.h> header file. */
+#undef HAVE_WCHAR_H
+
+/* Define to 1 if you have the `wcwidth' function. */
+#undef HAVE_WCWIDTH
+
 /* Define if fnmatch.h can be included. */
 #undef HAVE_WORKING_FNMATCH_H
+
+/* Define to 1 if the system has the type `_Bool'. */
+#undef HAVE__BOOL
 
 /* Define to be the name of the operating system. */
 #undef OS_TYPE
@@ -267,30 +255,27 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define to 1 if the C compiler supports function prototypes. */
-#undef PROTOTYPES
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#undef RETSIGTYPE
-
-/* The size of a `int', as computed by sizeof. */
+/* The size of `int', as computed by sizeof. */
 #undef SIZEOF_INT
 
-/* The size of a `long', as computed by sizeof. */
+/* The size of `long', as computed by sizeof. */
 #undef SIZEOF_LONG
 
-/* The size of a `long long', as computed by sizeof. */
+/* The size of `long long', as computed by sizeof. */
 #undef SIZEOF_LONG_LONG
 
-/* The size of a `off_t', as computed by sizeof. */
+/* The size of `off_t', as computed by sizeof. */
 #undef SIZEOF_OFF_T
 
-/* The size of a `short', as computed by sizeof. */
+/* The size of `short', as computed by sizeof. */
 #undef SIZEOF_SHORT
+
+/* The size of `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
 
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
-   automatically deduced at run-time.
+   automatically deduced at runtime.
 	STACK_DIRECTION > 0 => grows toward higher addresses
 	STACK_DIRECTION < 0 => grows toward lower addresses
 	STACK_DIRECTION = 0 => direction of growth unknown */
@@ -298,9 +283,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-#undef TIME_WITH_SYS_TIME
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
@@ -322,9 +304,6 @@
 /* Define for large files, on AIX-style hosts. */
 #undef _LARGE_FILES
 
-/* Define like PROTOTYPES; this can be used by system headers. */
-#undef __PROTOTYPES
-
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
@@ -337,7 +316,7 @@
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t
 
 /* Define to int or size_t on systems without socklen_t. */

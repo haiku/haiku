@@ -1,9 +1,10 @@
 # Makefile for `wget' utility
-# Copyright (C) 1995, 1996, 1997 Free Software Foundation, Inc.
+# Copyright (C) 1995, 1996, 1997, 2007,
+# 2008 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 
 # This program is distributed in the hope that it will be useful,
@@ -12,8 +13,7 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #
 # Version: @VERSION@
@@ -48,7 +48,7 @@ INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 RM = rm -f
 
-TEXI2POD     = texi2pod.pl
+TEXI2POD     = $(srcdir)/texi2pod.pl
 POD2MAN      = @POD2MAN@
 MAN          = wget.$(manext)
 WGETRC       = $(sysconfdir)/wgetrc
@@ -68,12 +68,9 @@ $(SAMPLERCTEXI): $(srcdir)/sample.wgetrc
 wget.info: $(srcdir)/wget.texi $(SAMPLERCTEXI) $(srcdir)/version.texi
 	$(MAKEINFO) -I$(srcdir) $(srcdir)/wget.texi
 
-$(TEXI2POD): $(srcdir)/$(TEXI2POD).in
-	sed 's,^#! /usr/bin/perl,#! @PERL@,' $? > $@
-	chmod u+x $@
-
-wget.pod: $(srcdir)/wget.texi $(TEXI2POD) $(srcdir)/version.texi
-	./$(TEXI2POD) $(srcdir)/wget.texi $@
+.SECONDARY: wget.pod
+wget.pod: $(srcdir)/wget.texi $(srcdir)/version.texi
+	$(TEXI2POD) $(srcdir)/wget.texi $@
 
 $(MAN): wget.pod
 	$(POD2MAN) --center="GNU Wget" --release="GNU Wget @VERSION@" $? > $@
@@ -127,7 +124,7 @@ install.info: wget.info
 # install man page, creating install directory if necessary
 install.man: $(MAN)
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(mandir)/man$(manext)
-	$(INSTALL_DATA) $(MAN) $(DESTDIR)$(mandir)/man$(manext)/$(MAN)
+	$(INSTALL_DATA) $(srcdir)/$(MAN) $(DESTDIR)$(mandir)/man$(manext)/$(MAN)
 
 # install sample.wgetrc
 install.wgetrc: $(srcdir)/sample.wgetrc
@@ -166,7 +163,7 @@ clean:
 
 distclean: clean
 	$(RM) Makefile
-	$(RM) $(MAN) $(TEXI2POD)
+	$(RM) $(MAN)
 
 realclean: distclean
 	$(RM) wget.info*

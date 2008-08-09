@@ -7,8 +7,10 @@ compiler you intend to use to build Wget and follow the (brief)
 instructions printed on the screen.  The instructions bellow are for
 building Wget with Microsoft Visual C++ (MSVC); you may need to make
 appropriate substitutions for your compiler and build environment; 
-currently wget can be built at least with Visual Studio/.Net, free 
-Borland or Watcom compilers, and the free cygnus and mingw environments.
+currently wget can be built at least with Visual Studio/.Net, the free 
+Borland compiler, and the free mingw environment.  The instructions do
+*not* apply to the Cygwin environment, on which Wget is built with the
+procedure described in the INSTALL file in the top-level directory.
 
 To build Wget with MSVC run configure.bat (in the main Wget directory)
 with the argument --msvc, and then run nmake.  At a certain point in time
@@ -54,7 +56,7 @@ Windows contributors:
   port;
 
 * Tim Charron <tcharron@interlog.com> -- additional cleanup and
-  contribution of the Watcom makefile;
+  contribution of the (now retired) Watcom makefile;
 
 * John Burden <john@futuresguide.com> -- cleanup of the VC++ makefile
   to get a clean build with VC++ 5.0 on Windows 95;
