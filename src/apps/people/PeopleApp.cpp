@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc.
+ * Copyright 2005 - 2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -43,7 +43,7 @@ struct people_field gFields[] = {
 	{ "META:email", 120, "E-mail" },
 	{ "META:url", 120, "URL" },
 	{ "META:group", 120, "Group" },
-	{ NULL, NULL }
+	{ NULL, 0, NULL }
 };
 
 
