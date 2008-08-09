@@ -12,7 +12,7 @@ int
 disasm_command(int argc, char **argv)
 {
 	uint64 pc;
-	size_t len = 10;
+	size_t count = 10;
 
 	if (argc < 2) {
 		kprintf("Usage: dis addr [count]\n");
@@ -23,8 +23,9 @@ disasm_command(int argc, char **argv)
 	// TODO: autoincrement
 	pc = parse_expression(argv[1]);
 	if (argc > 2)
-		len = (size_t)parse_expression(argv[2]);
-	disasm_arch_dump_insns((addr_t)pc, 200, 10);
+		count = (size_t)parse_expression(argv[2]);
+	count = MIN(count, 50);
+	disasm_arch_dump_insns((addr_t)pc, 200, count);
 	return 0;
 }
 
