@@ -37,9 +37,9 @@ as that of the covered work.  */
 # include <netdb.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
-#ifndef __BEOS__
-# include <arpa/inet.h>
-#endif
+# ifdef HAVE_ARPA_INET_H
+#  include <arpa/inet.h>
+# endif
 #endif
 
 struct url;

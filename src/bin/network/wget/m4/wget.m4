@@ -117,6 +117,8 @@ AC_DEFUN([WGET_POSIX_CLOCK], [
 
 dnl Check whether we need to link with -lnsl and -lsocket, as is the
 dnl case on e.g. Solaris.
+dnl BeOS (BONE) needs libbind as well
+dnl Haiku needs libnetwork
 
 AC_DEFUN([WGET_NSL_SOCKET], [
   dnl On Solaris, -lnsl is needed to use gethostbyname.  But checking
@@ -136,6 +138,8 @@ AC_DEFUN([WGET_NSL_SOCKET], [
     AC_CHECK_LIB(nsl, $wget_check_in_nsl)
   fi
   AC_CHECK_LIB(socket, socket)
+  AC_CHECK_LIB(bind, gethostbyname)
+  AC_CHECK_LIB(network, gethostbyname)
 ])
 
 

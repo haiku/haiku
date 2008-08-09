@@ -163,6 +163,7 @@ AC_HEADER_STDBOOL
 AC_CHECK_HEADERS(unistd.h sys/time.h)
 AC_CHECK_HEADERS(termios.h sys/ioctl.h sys/select.h utime.h sys/utime.h)
 AC_CHECK_HEADERS(stdint.h inttypes.h pwd.h wchar.h)
+AC_CHECK_HEADERS(arpa/inet.h)
 
 dnl
 dnl Check sizes of integer types.  These are used to find n-bit

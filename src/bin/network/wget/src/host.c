@@ -38,7 +38,7 @@ as that of the covered work.  */
 #ifndef WINDOWS
 # include <sys/socket.h>
 # include <netinet/in.h>
-# ifndef __BEOS__
+# ifdef HAVE_ARPA_INET_H
 #  include <arpa/inet.h>
 # endif
 # include <netdb.h>
