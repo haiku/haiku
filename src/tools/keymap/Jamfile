@@ -5,7 +5,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin keymap ] ;
 USES_BE_API on <build>keymap = true ;
 
 local reSources ;
-if $(HOST_PLATFORM) = cygwin {
+if $(HOST_PLATFORM) = cygwin || $(HOST_PLATFORM) = sunos {
 	reSources = regex.c ;
 }
 

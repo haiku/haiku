@@ -29,10 +29,16 @@
 #include "rdef.h"
 
 
+#ifndef HAIKU_HOST_PLATFORM_SUNOS
 extern const char *__progname;
+#endif
 
 static const char *kTitle = "Haiku Resource Compiler 1.1";
+#ifdef HAIKU_HOST_PLATFORM_SUNOS
+static const char *kProgramName = "rc";
+#else
 static const char *kProgramName = __progname;
+#endif
 
 
 static bool sQuiet = false;

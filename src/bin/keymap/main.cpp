@@ -15,8 +15,12 @@
 #include "Keymap.h"
 
 
+#ifdef HAIKU_HOST_PLATFORM_SUNOS
+static const char *sProgramName = "keymap";
+#else
 extern char *__progname;
 static const char *sProgramName = __progname;
+#endif
 
 
 static void

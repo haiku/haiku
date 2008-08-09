@@ -466,7 +466,8 @@ SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
 	: linux freebsd darwin sunos cygwin ;
 
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
-	|| $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = cygwin {
+	|| $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = cygwin
+	|| $(HOST_PLATFORM) = sunos {
 	# don't use lex: otherwise rc will not work correctly
 	if $(LEX) = lex {
 		LEX = flex ;
@@ -696,6 +697,10 @@ if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	HOST_NETWORK_LIBS = net ;
 	HOST_NETAPI_LIB = netapi ;
 	HOST_SELECT_UNAME_ETC_LIB = net ;
+} else if $(HOST_PLATFORM) = "sunos" {
+	HOST_NETWORK_LIBS = xnet ;
+	HOST_NETAPI_LIB = ;
+	HOST_SELECT_UNAME_ETC_LIB = ;
 } else {
 	# Linux,...
 	HOST_NETWORK_LIBS = ;
@@ -838,7 +843,8 @@ switch $(TARGET_PLATFORM) {
 	case linux		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LINUX ;
 	case freebsd	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_FREEBSD ;
 	case darwin		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_DARWIN ;
-	case cygwin	: TARGET_DEFINES += HAIKU_TARGET_PLATFORM_CYGWIN ;
+	case cygwin		: TARGET_DEFINES += HAIKU_TARGET_PLATFORM_CYGWIN ;
+	case sunos		: TARGET_DEFINES += HAIKU_TARGET_PLATFORM_SUNOS ;
 	case libbe_test	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LIBBE_TEST ;
 }
 
@@ -851,7 +857,8 @@ switch $(HOST_PLATFORM) {
 	case linux		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
 	case freebsd	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_FREEBSD ;
 	case darwin		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DARWIN ;
-	case cygwin	: HOST_DEFINES += HAIKU_HOST_PLATFORM_CYGWIN ;
+	case cygwin		: HOST_DEFINES += HAIKU_HOST_PLATFORM_CYGWIN ;
+	case sunos		: HOST_DEFINES += HAIKU_HOST_PLATFORM_SUNOS ;
 }
 
 

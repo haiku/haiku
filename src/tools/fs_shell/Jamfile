@@ -18,15 +18,17 @@ local defines = [ FDefines FS_SHELL=1 ] ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 
-# platform specific sources
+# platform specific sources/libraries
 local fsShellCommandSources ;
 local externalCommandsSources ;
+local fsShellCommandLibs ;
 if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	fsShellCommandSources = fs_shell_command_beos.cpp ;
 	externalCommandsSources = external_commands_beos.cpp ;
 } else {
 	fsShellCommandSources = fs_shell_command_unix.cpp ;
 	externalCommandsSources = external_commands_unix.cpp ;
+	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
 }
 
 BuildPlatformStaticLibrary <build>fs_shell.a :
@@ -72,4 +74,5 @@ SEARCH on [ FGristFiles rootfs.cpp ]
 
 BuildPlatformMain <build>fs_shell_command
 	: fs_shell_command.cpp $(fsShellCommandSources)
-	: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
+	: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(fsShellCommandLibs) ;
+

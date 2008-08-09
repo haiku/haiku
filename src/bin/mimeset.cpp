@@ -12,8 +12,12 @@
 #include <string.h>
 
 
+#ifdef HAIKU_HOST_PLATFORM_SUNOS
+static const char *sProgramName = "mimeset";
+#else
 extern const char *__progname;
 static const char *sProgramName = __progname;
+#endif
 
 // options
 bool gFiles = true;

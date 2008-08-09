@@ -27,7 +27,7 @@ if $(HOST_PLATFORM) != darwin {
 	strlSources = strlcpy.c strlcat.c ;
 }
 
-if $(HOST_PLATFORM) = cygwin {
+if $(HOST_PLATFORM) = cygwin || $(HOST_PLATFORM) = sunos {
 	strlSources += stpcpy.c strcasestr.c ;
 }
 

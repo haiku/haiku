@@ -5,7 +5,9 @@
 #ifndef __addr_t_defined
 #define __addr_t_defined
 #endif
+#endif
 
+#if defined(HAIKU_HOST_PLATFORM_CYGWIN) || defined(HAIKU_HOST_PLATFORM_SUNOS)
 #ifndef DEFFILEMODE
 #define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
 #endif
@@ -15,6 +17,13 @@
 #endif
 
 #include <ctype.h>
+#endif
+
+#ifdef HAIKU_HOST_PLATFORM_SUNOS
+#	include <limits.h>
+#	ifndef NAME_MAX
+#		define NAME_MAX	MAXNAMELEN
+#	endif
 #endif
 
 typedef unsigned long haiku_build_addr_t;
@@ -43,7 +52,7 @@ extern size_t	strlcat(char *dest, const char *source, size_t length);
 extern size_t	strnlen(const char *string, size_t length);
 #endif
 
-#if defined(HAIKU_HOST_PLATFORM_CYGWIN)
+#if defined(HAIKU_HOST_PLATFORM_CYGWIN) || defined(HAIKU_HOST_PLATFORM_SUNOS)
 extern char * stpcpy(char *dest, const char *src);
 extern char * strcasestr(const char *s, const char *find);
 #endif
