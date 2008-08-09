@@ -1,54 +1,40 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//
-//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _UDF_DIRECTORY_ITERATOR_H
 #define _UDF_DIRECTORY_ITERATOR_H
 
-/*! \file DirectoryIterator.h
-*/
+/*! \file DirectoryIterator.h */
 
-#ifndef _IMPEXP_KERNEL
-#	define _IMPEXP_KERNEL
-#endif
-#ifdef COMPILE_FOR_R5
-extern "C" {
-#endif
-	#include "fsproto.h"
-#ifdef COMPILE_FOR_R5
-}
-#endif
-
-#include "kernel_cpp.h"
 #include "UdfDebug.h"
 
-namespace Udf {
+#include <util/kernel_cpp.h>
 
 class Icb;
 
 class DirectoryIterator {
 public:
 
-	status_t GetNextEntry(char *name, uint32 *length, ino_t *id);
-	void Rewind();
-	
-	Icb* Parent() { return fParent; }
-	const Icb* Parent() const { return fParent; }
-	
+	status_t						GetNextEntry(char *name, uint32 *length,
+										ino_t *id);
+
+	Icb								*Parent() { return fParent; }
+	const Icb						*Parent() const { return fParent; }
+
+	void							Rewind();
+
 private:
-	friend class Icb;
+friend class 						Icb;
 
-	DirectoryIterator();				// unimplemented
-	DirectoryIterator(Icb *parent);		// called by Icb::GetDirectoryIterator()
-	void Invalidate();					// called by Icb::~Icb() 
+	/* The following is called by Icb::GetDirectoryIterator() */
+									DirectoryIterator(Icb *parent);
+	/* The following is called by Icb::~Icb() */
+	void							_Invalidate() { fParent = NULL; }
 
-	Icb *fParent;
-	off_t fPosition;
-	bool fAtBeginning;
+	bool							fAtBeginning;
+	Icb								*fParent;
+	off_t							fPosition;
 };
-
-};	// namespace Udf
 
 #endif	// _UDF_DIRECTORY_ITERATOR_H

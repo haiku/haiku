@@ -53,17 +53,16 @@ private:
 	void					_Rewind();
 	void					_WalkContinuationChain(Descriptor *descriptor);
 
+	Accessor 				fAccessor;
 	CachedBlock				fAdditionalDescriptors;
+	off_t					fBlockIndex;
+	int32					fDescriptorIndex;
+	int32					fDescriptorNumber;
 	Icb						*fIcb;
 	Descriptor				*fIcbDescriptors;
 	int32					fIcbDescriptorsSize;
 	bool					fReadFromIcb;
 	Volume					*fVolume;
-
-	Accessor 				fAccessor;
-	int32					fDescriptorIndex;
-	int32					fDescriptorNumber;
-	off_t					fBlockIndex;
 };
 
 
@@ -74,10 +73,10 @@ AllocationDescriptorList<Accessor>::AllocationDescriptorList(Icb *icb,
 		fAccessor(accessor),
 		fAdditionalDescriptors(icb->GetVolume()),
 		fBlockIndex(0),
-		fIcb(icb),
-		fIcbDescriptors((Descriptor *)icb->AllocationDescriptors()),
 		fDescriptorIndex(0),
 		fDescriptorNumber(0),
+		fIcb(icb),
+		fIcbDescriptors((Descriptor *)icb->AllocationDescriptors()),
 		fIcbDescriptorsSize(icb->AllocationDescriptorsSize()),
 		fReadFromIcb(true),
 		fVolume(icb->GetVolume())
