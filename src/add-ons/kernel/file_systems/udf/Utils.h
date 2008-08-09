@@ -1,47 +1,20 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//
-//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _UDF_UTILS_H
 #define _UDF_UTILS_H
 
-/*! \file Utils.h
-
-	Miscellaneous Udf utility functions.
-*/
-
-#ifndef _IMPEXP_KERNEL
-#	define _IMPEXP_KERNEL
-#endif
-#ifdef COMPILE_FOR_R5
-extern "C" {
-#endif
-	#include "fsproto.h"
-#ifdef COMPILE_FOR_R5
-}
-#endif
+/*! \file Utils.h - Miscellaneous Udf utility functions. */
 
 #include "UdfStructures.h"
 
-namespace Udf {
-
-long_address to_long_address(ino_t id, uint32 length = 0);
-
-ino_t to_vnode_id(long_address address);
-
-time_t make_time(timestamp &timestamp);
-
-status_t get_block_shift(uint32 blockSize, uint32 &blockShift);
-
-const char* bool_to_string(bool value);
-
-status_t check_size_error(ssize_t bytesReturned, ssize_t bytesExpected);
-
-uint16 calculate_crc(uint8 *data, uint16 length);
-
-} // namespace Udf
+const char		*bool_to_string(bool value);
+uint16			calculate_crc(uint8 *data, uint16 length);
+status_t		check_size_error(ssize_t bytesReturned, ssize_t bytesExpected);
+status_t		get_block_shift(uint32 blockSize, uint32 &blockShift);
+time_t			make_time(timestamp &timestamp);
+long_address 	to_long_address(ino_t id, uint32 length = 0);
+ino_t			to_vnode_id(long_address address);
 
 #endif	// _UDF_UTILS_H
-
