@@ -34,7 +34,7 @@ round_to_pagesize(uint32 size)
 
 
 area_id
-alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
+alloc_contiguous(void **virt, void **phy, size_t size, uint32 protection,
 	const char *name)
 {
 	physical_entry pe;
@@ -81,7 +81,7 @@ map_mem(void **virt, void *phy, size_t size, uint32 protection,
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
 	phyadr = (char *)phy - offset;
 	size = round_to_pagesize(size + offset);
-	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS,
+	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_ADDRESS,
 		protection, &mapadr);
 	if (area < B_OK) {
 		ERROR("mapping '%s' failed, error 0x%lx (%s)\n", name, area, strerror(area));

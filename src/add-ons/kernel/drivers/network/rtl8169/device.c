@@ -281,13 +281,13 @@ init_buf_desc(rtl8169_device *device)
 	void *rx_buf_virt, *rx_buf_phy;
 	int i;
 
-	device->txBufArea = alloc_mem(&tx_buf_virt, &tx_buf_phy,
+	device->txBufArea = alloc_contiguous(&tx_buf_virt, &tx_buf_phy,
 		device->txBufferCount * FRAME_SIZE, 0, "rtl8169 tx buf");
-	device->rxBufArea = alloc_mem(&rx_buf_virt, &rx_buf_phy,
+	device->rxBufArea = alloc_contiguous(&rx_buf_virt, &rx_buf_phy,
 		device->rxBufferCount * FRAME_SIZE, 0, "rtl8169 rx buf");
-	device->txDescArea = alloc_mem(&tx_buf_desc_virt, &tx_buf_desc_phy,
+	device->txDescArea = alloc_contiguous(&tx_buf_desc_virt, &tx_buf_desc_phy,
 		device->txBufferCount * sizeof(buf_desc), 0, "rtl8169 tx desc");
-	device->rxDescArea = alloc_mem(&rx_buf_desc_virt, &rx_buf_desc_phy,
+	device->rxDescArea = alloc_contiguous(&rx_buf_desc_virt, &rx_buf_desc_phy,
 		device->rxBufferCount * sizeof(buf_desc), 0, "rtl8169 rx desc");
 	if (device->txBufArea < B_OK || device->rxBufArea < B_OK
 		|| device->txDescArea < B_OK || device->rxDescArea < B_OK)
@@ -433,6 +433,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 {
 	rtl8169_device *device;
 	char *deviceName;
+	int mmioIndex;
 	uint32 val;
 	int dev_id;
 	int mask;
@@ -480,7 +481,6 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	device->rxIntIndex = 0;
 	device->rxFree = device->rxBufferCount;
 	device->rxReadySem = create_sem(0, "rtl8169 rx ready");
-	set_sem_owner(device->rxReadySem, B_SYSTEM_TEAM);
 
 	device->txBuf = (void **)malloc(sizeof(void *) * device->txBufferCount);
 	B_INITIALIZE_SPINLOCK(&device->txSpinlock);
@@ -488,7 +488,6 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	device->txIntIndex = 0;
 	device->txUsed = 0;
 	device->txFreeSem = create_sem(device->txBufferCount, "rtl8169 tx free");
-	set_sem_owner(device->txFreeSem, B_SYSTEM_TEAM);
 
 	// enable busmaster and memory mapped access, disable io port access
 	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device,
@@ -503,9 +502,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 		device->pciInfo->function, PCI_latency, 1, 0x40);
 
 	// get IRQ
-	device->irq = gPci->read_pci_config(device->pciInfo->bus,
-		device->pciInfo->device, device->pciInfo->function, PCI_interrupt_line,
-		1);
+	device->irq = device->pciInfo->u.h0.interrupt_line;
 	if (device->irq == 0 || device->irq == 0xff) {
 		ERROR("no IRQ assigned\n");
 		goto err;
@@ -514,11 +511,17 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	TRACE("IRQ %d\n", device->irq);
 
 	// map registers into memory
-	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device,
-		device->pciInfo->function, 0x14, 4);
-	val &= PCI_address_memory_32_mask;
-	TRACE("hardware register address %p\n", (void *) val);
-	device->regArea = map_mem(&device->regAddr, (void *)val, 256, 0,
+
+	if (device->pciInfo->device == 0x8168)
+		mmioIndex = 0;
+	else
+		mmioIndex = 1;
+
+	TRACE("hardware register address %p\n",
+		(void *)device->pciInfo->u.h0.base_registers[mmioIndex]);
+
+	device->regArea = map_mem(&device->regAddr,
+		(void *)device->pciInfo->u.h0.base_registers[mmioIndex], 256, 0,
 		"rtl8169 register");
 	if (device->regArea < B_OK) {
 		ERROR("can't map hardware registers\n");
