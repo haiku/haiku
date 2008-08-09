@@ -427,6 +427,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 					vecs[segmentCount].iov_len = entry.size;
 
 					transferLeft -= entry.size;
+					base += entry.size;
 					size -= entry.size;
 					segmentCount++;
 				}
