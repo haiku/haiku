@@ -8,18 +8,22 @@
 
 #include <KernelExport.h>
 
-/* The Jmicron AHCI controller has a mode that combines IDE and AHCI
- * functionality into a single PCI device at function 0. This happens when the
- * controller is set in the BIOS to "basic" or "IDE" mode (but not in "RAID" or
- * "AHCI" mode). To avoid needing two drivers to handle a single PCI device, we
- * switch to the multifunction (split device) AHCI mode. This will set PCI
- * device at function 0 to AHCI, and PCI device at function 1 to IDE controller.
+
+/*
+ * We need to force controllers that have both SATA and PATA controllers to use
+ * the split mode with the SATA controller at function 0 and the PATA
+ * controller at function 1. This way the SATA controller will be picked up by
+ * the AHCI driver and the IDE controller by the generic IDE driver.
+ *
+ * TODO(bga): This does not work when the SATA controller is configured for IDE
+ * mode but this seems to be a problem with the device manager (it tries to load
+ * the IDE driver for the AHCI controller for some reason).
  */
 static void
 jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 	uint8 function, uint16 deviceId)
 {
-	// We only care about devices with function 0.
+	// We only care about function 0.
 	if (function != 0)
 		return;
 
@@ -36,42 +40,40 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device,
 	dprintf("jmicron_fixup_ahci: domain %u, bus %u, device %u, function %u, "
 		"deviceId 0x%04x\n", domain, bus, device, function, deviceId);
 
-	uint32 val = pci->ReadConfig(domain, bus, device, function, 0xdc, 4);
-	if (!(val & (1 << 30))) {
-		// IDE controller at function 1 is configured in IDE mode (as opposed
-		// to AHCI or RAID). So we want to handle it.
-		dprintf("jmicron_fixup_ahci: PATA controller in IDE mode.\n");
+	// Read controller control register (0x40).
+	uint32 val = pci->ReadConfig(domain, bus, device, function, 0x40, 4);
+	dprintf("jmicron_fixup_ahci: Register 0x40 : 0x%08lx\n", val);
 
-		// TODO(bga): It seems that with recent BIOS revisions no special code
-		// is needed here. We still want to handle IRQ assignment as seen
-		// below.
+	// Clear bits.
+	val &= ~(1 << 1);
+	val &= ~(1 << 9);
+	val &= ~(1 << 13);
+	val &= ~(1 << 15);
+	val &= ~(1 << 16);
+	val &= ~(1 << 17);
+	val &= ~(1 << 18);
+	val &= ~(1 << 19);
+	val &= ~(1 << 22);
 
-		// Read IRQ from controller at function 0 and assign this IRQ to the
-		// controller at function 1.
-		uint8 irq = pci->ReadConfig(domain, bus, device, function, 0x3c, 1);
-		pci->WriteConfig(domain, bus, device, 1, 0x3c, 1, irq);
-	} else {
-		// TODO(bga): If the PATA controller is set to AHCI mode, the IDE
-		// driver will try to pick it up and will fail either because there is
-		// no assigned IRQ or, if we assign an IRQ, because it errors-out when
-		// detecting devices (probably because of the AHCI mode). Then the AHCI
-		// driver picks the device up but fail to find the attached devices.
-		// Maybe fixing this would be as simple as changing the device class to
-		// Serial ATA Controller instead of IDE Controller (even in AHCI mode
-		// it reports being a standard IDE controller)?
-		dprintf("jmicron_fixup_ahci: PATA controller in AHCI or RAID mode.\n");
-		
-		// Read controller control register (0x40). This should contain all the
-		// bits we need to change.
-		val = pci->ReadConfig(domain, bus, device, function, 0x40, 4);
-		dprintf("jmicron_fixup_ahci: Register 0x40 : %0x%08lx\n", val);
+	//Set bits.
+	val |= (1 << 0);
+	val |= (1 << 4);
+	val |= (1 << 5);
+	val |= (1 << 7);
+	val |= (1 << 8);
+	val |= (1 << 12);
+	val |= (1 << 14);
+	val |= (1 << 23);
 
-		// TODO(bga): Do some bit shuffling here to set the controller to split
-		// mode. Right now, the write operation bellow is a no-op.
+	dprintf("jmicron_fixup_ahci: Register 0x40 : 0x%08lx\n", val);
+	pci->WriteConfig(domain, bus, device, function, 0x40, 4, val);
 
-		// Write controller control register (0x40).
-		pci->WriteConfig(domain, bus, device, function, 0x40, 4, val);
-	}
+	// Read IRQ from controller at function 0 and assign this IRQ to the
+	// controller at function 1.
+	uint8 irq = pci->ReadConfig(domain, bus, device, function, 0x3c, 1);
+	dprintf("jmicron_fixup_ahci: Assigning IRQ %d at device "
+		"function 1.\n", irq);
+	pci->WriteConfig(domain, bus, device, 1, 0x3c, 1, irq);
 }
 
 
