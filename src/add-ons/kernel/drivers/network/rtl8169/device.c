@@ -512,12 +512,12 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 
 	// map registers into memory
 
-	if (device->pciInfo->device == 0x8168)
-		mmioIndex = 0;
+	if (device->pciInfo->device_id == 0x8168)
+		mmioIndex = 2;
 	else
 		mmioIndex = 1;
 
-	TRACE("hardware register address %p\n",
+	TRACE("hardware register address [%i] %p\n", mmioIndex,
 		(void *)device->pciInfo->u.h0.base_registers[mmioIndex]);
 
 	device->regArea = map_mem(&device->regAddr,
