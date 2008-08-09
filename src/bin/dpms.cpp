@@ -19,7 +19,7 @@ int usage(char *prog)
 
 int main(int argc, char **argv)
 {
-	BApplication app("application/x-vnd.mmu_man.dpms");
+	BApplication app("application/x-vnd.Haiku.dpms");
 	BScreen bs;
 	if (argc < 2)
 		return usage(argv[0]);

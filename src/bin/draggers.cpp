@@ -12,7 +12,7 @@
 int main(int argc, char **argv)
 {
 	int i;
-	BApplication app("application/x-vnd.OBOS-draggers");
+	BApplication app("application/x-vnd.Haiku-draggers");
 	if (argc < 2) {
 		printf("%s\n", BDragger::AreDraggersDrawn()?"shown":"hidden");
 		return 0;
