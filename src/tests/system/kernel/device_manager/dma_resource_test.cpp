@@ -805,6 +805,20 @@ run_tests_segment_restrictions(TestSuiteContext& context)
 			.AddTarget(2048, 1024, false)
 			.AddTarget(3072, 1024, false);
 
+	suite.AddTest(0, 2560, false, B_PHYSICAL_IO_REQUEST)
+		.AddSource(0, 512)
+		.AddSource(1024, 512)
+		.AddSource(2048, 512)
+		.AddSource(3072, 512)
+		.AddSource(4096, 512)
+		.NextResult(0, false, false)
+			.AddTarget(0, 512, false)
+			.AddTarget(1024, 512, false)
+			.AddTarget(2048, 512, false)
+			.AddTarget(3072, 512, false)
+		.NextResult(2048, false, false)
+			.AddTarget(4096, 512, false);
+
 	suite.Run();
 }
 
