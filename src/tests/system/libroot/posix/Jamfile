@@ -69,7 +69,7 @@ SEARCH on [ FGristFiles
 		syslog.cpp
 	] = [ FDirName $(HAIKU_TOP) src system libroot posix ] ;
 
-SubInclude HAIKU_TOP src tests system libroot posix bonnie ;
+SubInclude HAIKU_TOP src tests system libroot posix bonnie++-1.03d ;
 SubInclude HAIKU_TOP src tests system libroot posix math ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite ;
 SubInclude HAIKU_TOP src tests system libroot posix string ;
