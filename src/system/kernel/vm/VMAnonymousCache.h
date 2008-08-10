@@ -17,6 +17,15 @@
 typedef page_num_t swap_addr_t;
 struct swap_block;
 
+extern "C" {
+	void swap_init(void);
+	void swap_init_post_modules(void);
+	bool swap_free_page_swap_space(vm_page *page);
+	uint32 swap_available_pages(void);
+	uint32 swap_total_swap_pages(void);
+}
+
+
 class VMAnonymousCache : public VMCache {
 public:
 	virtual				~VMAnonymousCache();
@@ -43,6 +52,8 @@ private:
 			status_t	_Commit(off_t size);
 
 private:
+	friend bool swap_free_page_swap_space(vm_page *page);
+
 	bool	fCanOvercommit;
 	bool	fHasPrecommitted;
 	uint8	fPrecommittedPages;
@@ -50,12 +61,6 @@ private:
 	off_t   fCommittedSwapSize;
 	off_t   fAllocatedSwapSize;
 };
-
-
-extern "C" {
-	void swap_init(void);
-	void swap_init_post_modules();
-}
 
 #endif	// ENABLE_SWAP_SUPPORT
 

@@ -141,6 +141,18 @@ static mutex sAvailSwapSpaceLock;
 
 VMAnonymousCache::~VMAnonymousCache()
 {
+	// free allocated swap space and swap block
+	for (off_t offset = virtual_base, toFree = fAllocatedSwapSize;
+			offset < virtual_end && toFree > 0; offset += B_PAGE_SIZE) {
+		swap_addr_t pageIndex = _SwapBlockGetAddress(offset >> PAGE_SHIFT);
+		if (pageIndex == SWAP_PAGE_NONE)
+			continue;
+
+		swap_page_dealloc(pageIndex, 1);
+		_SwapBlockFree(offset >> PAGE_SHIFT);
+		toFree -= B_PAGE_SIZE;
+	}
+
 	swap_space_unreserve(fCommittedSwapSize);
 	vm_unreserve_memory(committed_size);
 }
@@ -234,10 +246,24 @@ status_t
 VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 	size_t *_numBytes)
 {
-	if (fAllocatedSwapSize + count * PAGE_SIZE > fCommittedSwapSize)
+	offset >>= PAGE_SHIFT;
+
+	Lock();
+	for (uint32 i = 0; i < count; i++) {
+		swap_addr_t pageIndex = _SwapBlockGetAddress(offset + i);
+		if (pageIndex != SWAP_PAGE_NONE) {
+			swap_page_dealloc(pageIndex, 1);
+			_SwapBlockFree(offset + i);
+			fAllocatedSwapSize -= B_PAGE_SIZE;
+		}
+	}
+
+	if (fAllocatedSwapSize + count * B_PAGE_SIZE > fCommittedSwapSize)
 		return B_ERROR;
 
-	offset >>= PAGE_SHIFT;
+	fAllocatedSwapSize += count * B_PAGE_SIZE;
+	Unlock();
+
 	uint32 n = count;
 	for (uint32 i = 0; i < count; i += n) {
 		swap_addr_t pageIndex;
@@ -248,22 +274,26 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 		if (pageIndex == SWAP_PAGE_NONE)
 			panic("can't allocate swap space\n");
 
-		fAllocatedSwapSize += n * PAGE_SIZE;
-
-		for (uint32 j = 0; j < n; j++)
-			_SwapBlockBuild(offset + i + j, pageIndex + j);
-
 		swap_file *swapFile = find_swap_file(pageIndex);
 		if (swapFile == NULL) {
 			panic("can't find swap file for page index %ld\n", pageIndex);
 			return B_ERROR;
 		}
 
-		off_t pos = (pageIndex - swapFile->first_page) * PAGE_SIZE;
+		off_t pos = (pageIndex - swapFile->first_page) * B_PAGE_SIZE;
 		status_t status = vfs_write_pages(swapFile->vnode, NULL, pos, vecs + i,
 				n, 0, _numBytes);
-		if (status != B_OK)
+		if (status != B_OK) {
+			Lock();
+			fAllocatedSwapSize -= n * B_PAGE_SIZE;
+			Unlock();
+
+			swap_page_dealloc(pageIndex, n);
 			return status;
+		}
+
+		for (uint32 j = 0; j < n; j++)
+			_SwapBlockBuild(offset + i + j, pageIndex + j);
 	}
 
 	return B_OK;
@@ -332,29 +362,32 @@ VMAnonymousCache::MergeStore(VMCache* _source)
 	// TODO: iterate over swap blocks
 	for (off_t offset = source->virtual_base; offset < source->virtual_end;
 			offset += PAGE_SIZE) {
-		swap_addr_t sourceSwapIndex = source->_SwapBlockGetAddress(offset);
+		off_t cacheOffset = offset >> PAGE_SHIFT;
+		swap_addr_t sourceSwapIndex = source->_SwapBlockGetAddress(cacheOffset);
 
 		if (sourceSwapIndex == SWAP_PAGE_NONE)
 			// this page is not swapped out
 			continue;
 
-		if (LookupPage(offset))
+		if (LookupPage(offset)) {
 			// this page is shadowed and we can find it in the new cache,
 			// free the swap space
 			swap_page_dealloc(sourceSwapIndex, 1);
-		else {
-			swap_addr_t swapIndex = _SwapBlockGetAddress(offset);
+		} else {
+			swap_addr_t swapIndex = _SwapBlockGetAddress(cacheOffset);
 
 			if (swapIndex == SWAP_PAGE_NONE) {
 				// the page is not shadowed,
 				// assign the swap address to the new cache
-				_SwapBlockBuild(offset, sourceSwapIndex);
+				_SwapBlockBuild(cacheOffset, sourceSwapIndex);
+				fAllocatedSwapSize += B_PAGE_SIZE;
 			} else {
 				// the page is shadowed and is also swapped out
 				swap_page_dealloc(sourceSwapIndex, 1);
 			}
 		}
-		source->_SwapBlockFree(offset);
+		source->fAllocatedSwapSize -= B_PAGE_SIZE;
+		source->_SwapBlockFree(cacheOffset);
 	}
 }
 
@@ -400,7 +433,6 @@ VMAnonymousCache::_SwapBlockFree(off_t cacheOffset)
 	mutex_lock(&sSwapHashLock);
 
 	swap_hash_key key = { this, cacheOffset };
-
 	swap_block *swap = sSwapHashTable.Lookup(key);
 	if (swap != NULL) {
 		swap_addr_t pageIndex = swap->swap_pages[cacheOffset & SWAP_BLOCK_MASK];
@@ -504,6 +536,52 @@ find_swap_file(swap_addr_t pageIndex)
 }
 
 
+// used by page daemon to free swap space
+bool
+swap_free_page_swap_space(vm_page *page)
+{
+	VMAnonymousCache *cache = dynamic_cast<VMAnonymousCache *>(page->cache);
+	if (cache == NULL)
+		return false;
+
+	swap_addr_t pageIndex = cache->_SwapBlockGetAddress(page->cache_offset);
+	if (pageIndex == SWAP_PAGE_NONE)
+		return false;
+
+	swap_page_dealloc(pageIndex, 1);
+	cache->fAllocatedSwapSize -= B_PAGE_SIZE;
+	cache->_SwapBlockFree(page->cache_offset);
+	return true;
+}
+
+
+uint32
+swap_available_pages()
+{
+	mutex_lock(&sAvailSwapSpaceLock);
+	uint32 avail = sAvailSwapSpace >> PAGE_SHIFT;
+	mutex_unlock(&sAvailSwapSpaceLock);
+
+	return avail;
+}
+
+
+uint32
+swap_total_swap_pages()
+{
+	mutex_lock(&sSwapFileListLock);
+
+	uint32 totalSwapPages = 0;
+	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
+			swap_file *swapFile = it.Next();)
+		totalSwapPages += swapFile->last_page - swapFile->first_page;
+
+	mutex_unlock(&sSwapFileListLock);
+
+	return totalSwapPages;
+}
+
+
 static swap_addr_t
 swap_page_alloc(uint32 npages)
 {
@@ -567,6 +645,9 @@ swap_page_alloc(uint32 npages)
 static void
 swap_page_dealloc(swap_addr_t pageIndex, uint32 npages)
 {
+	if (pageIndex == SWAP_PAGE_NONE)
+		return;
+
 	mutex_lock(&sSwapFileListLock);
 	swap_file *swapFile = find_swap_file(pageIndex);
 
@@ -772,10 +853,11 @@ swap_init_post_modules()
 
 	struct stat stat;
 	stat.st_size = size;
-	if (_kern_write_stat(fd, NULL, false, &stat, sizeof(struct stat),
-			B_STAT_SIZE | B_STAT_SIZE_INSECURE) != B_OK) {
+	status_t error = _kern_write_stat(fd, NULL, false, &stat,
+		sizeof(struct stat), B_STAT_SIZE | B_STAT_SIZE_INSECURE);
+	if (error != B_OK) {
 		dprintf("Failed to resize /var/swap to %lld bytes: %s\n", size,
-			strerror(errno));
+			strerror(error));
 	}
 
 	close(fd);
