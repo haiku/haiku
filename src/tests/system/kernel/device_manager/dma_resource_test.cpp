@@ -750,6 +750,12 @@ run_tests_alignment_restrictions(TestSuiteContext& context)
 		.NextResult(0, false, false)
 			.AddTarget(0, 1024, true);
 
+	suite.AddTest(0, 2559, true, B_PHYSICAL_IO_REQUEST)
+		.AddSource(0, 2559)
+		.NextResult(0, false, true)
+			.AddTarget(0, 2048, false)
+			.AddTarget(0, 512, true);
+
 	suite.Run();
 }
 
