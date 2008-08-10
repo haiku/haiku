@@ -52,9 +52,9 @@ static BMessage* BorderWidthMessage(uint32 what, float width)
 
 
 AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
-	: HWindow(BRect(0, 0, 400, 180), "Advanced Settings", B_TITLED_WINDOW_LOOK,
- 		B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 		B_NOT_ZOOMABLE),
+	: HWindow(BRect(0, 0, 450, 180), "Advanced Settings", B_TITLED_WINDOW_LOOK,
+		B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
+		B_NOT_ZOOMABLE),
 	 fSettings(settings)
 {
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
