@@ -152,7 +152,7 @@ bfs_mount(fs_volume* _volume, const char* device, uint32 flags,
 	_volume->ops = &gBFSVolumeOps;
 	*_rootID = volume->ToVnode(volume->Root());
 
-	INFORM(("mounted \"%s\" (root node at %Ld, device = %s)\n",
+	INFORM(("mounted \"%s\" (root node at %lld, device = %s)\n",
 		volume->Name(), *_rootID, device));
 	return B_OK;
 }
