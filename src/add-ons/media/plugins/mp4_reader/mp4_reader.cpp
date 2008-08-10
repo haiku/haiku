@@ -38,7 +38,7 @@
 #include <string.h>
 
 
-//#define TRACE_MP4_READER
+#define TRACE_MP4_READER
 #ifdef TRACE_MP4_READER
 #	define TRACE printf
 #else
@@ -185,7 +185,8 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		}
 		codecID = B_BENDIAN_TO_HOST_INT32(audio_format->compression);
 
-		cookie->frame_count = theFileReader->getFrameCount(cookie->stream);
+		// frame_count is actually sample_count for audio - makes media_player happy but david sad
+		cookie->frame_count = theFileReader->getFrameCount(cookie->stream) * audio_format->FrameSize;
 		cookie->duration = theFileReader->getAudioDuration(cookie->stream);
 		
 		cookie->audio = true;
@@ -310,7 +311,7 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			
 					// Average BitRate = (TotalBytes * 8 * (SampleRate / FrameSize)) / TotalFrames
 					// Setting a bitrate seems to cause more problems than it solves
-					format->u.encoded_audio.bit_rate = audio_format->BitRate;	// usually 128000 for AAC
+					format->u.encoded_audio.bit_rate = audio_format->BitRate;	// Should be 64000 * channelcount
 
 					TRACE("Audio NoOfChannels %d, SampleSize %d, SampleRate %f, FrameSize %ld\n",audio_format->NoOfChannels, audio_format->SampleSize, audio_format->SampleRate, audio_format->FrameSize);
 
@@ -340,6 +341,7 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		size = audio_format->DecoderConfigSize;
 		data = audio_format->theDecoderConfig;
 		if (size > 0) {
+			TRACE("Audio Decoder Config Found Size is %ld\n",size);
 			if (format->SetMetaData(data, size) != B_OK) {
 				ERROR("Failed to set Decoder Config\n");
 				delete cookie;
@@ -460,7 +462,7 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		size = video_format->DecoderConfigSize;
 		data = video_format->theDecoderConfig;
 		if (size > 0) {
-			TRACE("Decoder Config Found Size is %ld\n",size);
+			TRACE("Video Decoder Config Found Size is %ld\n",size);
 			if (format->SetMetaData(data, size) != B_OK) {
 				ERROR("Failed to set Decoder Config\n");
 				delete cookie;
@@ -508,19 +510,23 @@ mp4Reader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 {
 	mp4_cookie *cookie = (mp4_cookie *)_cookie;
 
-	*frameCount = cookie->frame_count;
-	*duration = cookie->duration;
-	*format = cookie->format;
+	if (cookie) {
+		*frameCount = cookie->frame_count;
+		*duration = cookie->duration;
+		*format = cookie->format;
 
-	// Copy metadata to infoBuffer
-	if (theFileReader->IsVideo(cookie->stream)) {
-		const VideoMetaData *video_format = theFileReader->VideoFormat(cookie->stream);
-		*infoBuffer = video_format->theDecoderConfig;
-		*infoSize = video_format->DecoderConfigSize;
-	} else {
-		const AudioMetaData *audio_format = theFileReader->AudioFormat(cookie->stream);
-		*infoBuffer = audio_format->theDecoderConfig;
-		*infoSize = audio_format->DecoderConfigSize;
+		// Copy metadata to infoBuffer
+		if (theFileReader->IsVideo(cookie->stream)) {
+			const VideoMetaData *video_format = theFileReader->VideoFormat(cookie->stream);
+			*infoBuffer = video_format->theDecoderConfig;
+			*infoSize = video_format->DecoderConfigSize;
+		} else if (theFileReader->IsAudio(cookie->stream)) {
+			const AudioMetaData *audio_format = theFileReader->AudioFormat(cookie->stream);
+			*infoBuffer = audio_format->theDecoderConfig;
+			*infoSize = audio_format->DecoderConfigSize;
+		} else {
+			printf("No stream Info for stream %d\n",cookie->stream);
+		}
 	}
 	return B_OK;
 }
