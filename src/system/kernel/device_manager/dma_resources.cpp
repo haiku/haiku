@@ -574,21 +574,45 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 	// If we're writing partially, we always need to have a block sized bounce
 	// buffer (or else we would overwrite memory to be written on the read in
 	// the first phase).
-	if (request->IsWrite() && (dmaLength & (fBlockSize - 1)) != 0) {
-		size_t diff = dmaLength  & (fBlockSize - 1);
-		TRACE("  partial end write: %lu, diff %lu\n", dmaLength, diff);
+	off_t requestEnd = request->Offset() + request->Length();
+	if (request->IsWrite()) {
+		size_t diff = dmaLength & (fBlockSize - 1);
 
-		_CutBuffer(*dmaBuffer, physicalBounceBuffer, bounceLeft, diff);
-		dmaLength -= diff;
+		// If the transfer length is block aligned and we're writing past the
+		// end of the given data, we still have to check the whether the last
+		// vec is a bounce buffer segment shorter than the block size. If so, we
+		// have to cut back the complete block and use a bounce buffer for it
+		// entirely.
+		if (diff == 0 && offset + dmaLength > requestEnd) {
+			const iovec& dmaVec = dmaBuffer->VecAt(dmaBuffer->VecCount() - 1);
+			ASSERT((addr_t)dmaVec.iov_base >= dmaBuffer->PhysicalBounceBuffer()
+				&& (addr_t)dmaVec.iov_base
+					< dmaBuffer->PhysicalBounceBuffer() + fBounceBufferSize);
+				// We can be certain that the last vec is a bounce buffer vec,
+				// since otherwise the DMA buffer couldn't exceed the end of the
+				// request data.
+			if (dmaVec.iov_len < fBlockSize)
+				diff = fBlockSize;
+		}
 
-		if (_AddBounceBuffer(*dmaBuffer, physicalBounceBuffer,
-				bounceLeft, fBlockSize, true) == 0) {
-			// If we cannot write anything, we can't process the request at all
-			TRACE("  adding bounce buffer failed!!!\n");
-			if (dmaLength == 0)
-				return B_BAD_VALUE;
-		} else
-			dmaLength += fBlockSize;
+		if (diff != 0) {
+			// Not yet block aligned -- cut back to the previous block and add
+			// a block-sized bounce buffer segment.
+			TRACE("  partial end write: %lu, diff %lu\n", dmaLength, diff);
+
+			_CutBuffer(*dmaBuffer, physicalBounceBuffer, bounceLeft, diff);
+			dmaLength -= diff;
+
+			if (_AddBounceBuffer(*dmaBuffer, physicalBounceBuffer,
+					bounceLeft, fBlockSize, true) == 0) {
+				// If we cannot write anything, we can't process the request at
+				// all.
+				TRACE("  adding bounce buffer failed!!!\n");
+				if (dmaLength == 0)
+					return B_BAD_VALUE;
+			} else
+				dmaLength += fBlockSize;
+		}
 	}
 
 	// If total length not block aligned, use bounce buffer for padding (read
@@ -637,8 +661,6 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 			dmaLength += length;
 		}
 	}
-
-	off_t requestEnd = request->Offset() + request->Length();
 
 	operation->SetBuffer(dmaBuffer);
 	operation->SetBlockSize(fBlockSize);
