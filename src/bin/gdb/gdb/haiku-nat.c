@@ -1245,7 +1245,7 @@ TRACE(("haiku_child_wait_internal(): B_APP_IMAGE created, reprocess -> exec\n"))
 
 		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
 			haiku_remove_image(teamDebugInfo,
-				event->data.image_created.info.id);
+				event->data.image_deleted.info.id);
 
 			// send TARGET_WAITKIND_LOADED here too, it causes the shared
 			// object list to be updated
