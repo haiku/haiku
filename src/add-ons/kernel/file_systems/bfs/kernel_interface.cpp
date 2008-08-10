@@ -455,9 +455,6 @@ bfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-#ifndef BFS_SHELL
-ktrace_printf("bfs_io(): inode: %p, request: %p", inode, request);
-#endif
 	// We lock the node here and will unlock it in the "finished" hook.
 	rw_lock_read_lock(&inode->Lock());
 
