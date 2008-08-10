@@ -89,6 +89,8 @@ ChunkCache::NeedsRefill()
 status_t
 ChunkCache::GetNextChunk(const void **chunkBuffer, size_t *chunkSize, media_header *mediaHeader)
 {
+uint8 retry_count = 0;
+
 //	printf("ChunkCache::GetNextChunk: %p fEmptyChunkCount %ld, fReadyChunkCount %ld\n", fNextGet, fEmptyChunkCount, fReadyChunkCount);
 retry:
 	acquire_sem(fGetWaitSem);
@@ -97,6 +99,11 @@ retry:
 	if (fReadyChunkCount == 0) {
 		fLocker->Unlock();
 		printf("ChunkCache::GetNextChunk: %p retrying\n", fNextGet);
+		// Limit to 5 retries
+		retry_count++;
+		if (retry_count > 4) {
+			return B_ERROR;
+		}
 		goto retry;
 	}
 	fEmptyChunkCount++;
