@@ -27,20 +27,28 @@ public:
 							TestSuiteContext();
 							~TestSuiteContext();
 
-			status_t		Init(size_t size);
+			status_t		Init(size_t size, bool contiguous = true);
 
 			addr_t			DataBase() const { return fDataBase; }
 			addr_t			PhysicalDataBase() const
 								{ return fPhysicalDataBase; }
+			addr_t			SecondPhysicalDataBase() const
+								{ return fSecondPhysicalDataBase; }
+
+			bool			IsContiguous() const
+								{ return fSecondPhysicalDataBase == 0; }
 
 			addr_t			CompareBase() const { return fCompareBase; }
 
 			size_t			Size() const { return fSize; }
 
 private:
+			void			_Uninit();
+
 			area_id			fDataArea;
 			addr_t			fDataBase;
 			addr_t			fPhysicalDataBase;
+			addr_t			fSecondPhysicalDataBase;
 			area_id			fCompareArea;
 			addr_t			fCompareBase;
 			size_t			fSize;
@@ -145,6 +153,9 @@ public:
 
 	addr_t DataBase() const { return fContext.DataBase(); }
 	addr_t PhysicalDataBase() const { return fContext.PhysicalDataBase(); }
+	addr_t SecondPhysicalDataBase() const
+		{ return fContext.SecondPhysicalDataBase(); }
+	bool IsContiguous() const { return fContext.IsContiguous(); }
 	addr_t CompareBase() const { return fContext.CompareBase(); }
 	size_t Size() const { return fContext.Size(); }
 
@@ -219,25 +230,67 @@ TestSuiteContext::TestSuiteContext()
 
 TestSuiteContext::~TestSuiteContext()
 {
+	_Uninit();
+}
+
+
+void
+TestSuiteContext::_Uninit()
+{
 	delete_area(fDataArea);
 	delete_area(fCompareArea);
 }
 
 
 status_t
-TestSuiteContext::Init(size_t size)
+TestSuiteContext::Init(size_t size, bool contiguous)
 {
-	fDataArea = create_area("data buffer", (void**)&fDataBase,
-		B_ANY_KERNEL_ADDRESS, size, B_CONTIGUOUS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (fDataArea < B_OK)
-		return fDataArea;
+	if (!contiguous) {
+		// we can't force this, so we have to try and see
 
-	physical_entry entry;
-	get_memory_map((void*)fDataBase, size, &entry, 1);
+		if (size != B_PAGE_SIZE * 2)
+			return B_NOT_SUPPORTED;
 
-	dprintf("DMA Test area %p, physical %p\n", (void*)fDataBase, entry.address);
-	fPhysicalDataBase = (addr_t)entry.address;
+		while (true) {
+			fDataArea = create_area("data buffer", (void**)&fDataBase,
+				B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK,
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			if (fDataArea < B_OK)
+				return fDataArea;
+
+			// get memory map to see if we succeeded
+
+			physical_entry entry[2];
+			get_memory_map((void*)fDataBase, 2 * B_PAGE_SIZE, entry, 2);
+
+			if (entry[0].size == B_PAGE_SIZE) {
+				fPhysicalDataBase = (addr_t)entry[0].address;
+				fSecondPhysicalDataBase = (addr_t)entry[1].address;
+
+				dprintf("DMA Test area %p, physical %p, second physical %p\n",
+					(void*)fDataBase, entry[0].address, entry[1].address);
+				break;
+			}
+
+			// try again
+			delete_area(fDataArea);
+		}
+	} else {
+		fDataArea = create_area("data buffer", (void**)&fDataBase,
+			B_ANY_KERNEL_ADDRESS, size, B_CONTIGUOUS,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (fDataArea < B_OK)
+			return fDataArea;
+
+		physical_entry entry;
+		get_memory_map((void*)fDataBase, B_PAGE_SIZE, &entry, 1);
+
+		fPhysicalDataBase = (addr_t)entry.address;
+		fSecondPhysicalDataBase = 0;
+
+		dprintf("DMA Test area %p, physical %p\n", (void*)fDataBase,
+			entry.address);
+	}
 
 	fCompareArea = create_area("compare buffer", (void**)&fCompareBase,
 		B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK,
@@ -270,9 +323,15 @@ Test::Test(TestSuite& suite, off_t offset, size_t length, bool isWrite,
 Test&
 Test::AddSource(addr_t address, size_t length)
 {
-	fSourceVecs[fSourceCount].iov_base
-		= (void*)(((fFlags & B_PHYSICAL_IO_REQUEST) == 0
-			? fSuite.DataBase() : fSuite.PhysicalDataBase()) + address);
+	if (fSuite.IsContiguous() || (fFlags & B_PHYSICAL_IO_REQUEST) != 0
+		|| address < B_PAGE_SIZE) {
+		fSourceVecs[fSourceCount].iov_base
+			= (void*)(((fFlags & B_PHYSICAL_IO_REQUEST) == 0
+				? fSuite.DataBase() : fSuite.PhysicalDataBase()) + address);
+	} else {
+		fSourceVecs[fSourceCount].iov_base
+			= (void*)(fSuite.SecondPhysicalDataBase() + address);
+	}
 	fSourceVecs[fSourceCount].iov_len = length;
 	fSourceCount++;
 
@@ -310,8 +369,12 @@ Test::AddTarget(addr_t base, size_t length, bool usesBounceBuffer)
 addr_t
 Test::_SourceToVirtual(addr_t source)
 {
-	if ((fFlags & B_PHYSICAL_IO_REQUEST) != 0)
+	if ((fFlags & B_PHYSICAL_IO_REQUEST) != 0) {
+		if (!fSuite.IsContiguous() && source >= B_PAGE_SIZE)
+			return source - fSuite.SecondPhysicalDataBase() + fSuite.DataBase();
+
 		return source - fSuite.PhysicalDataBase() + fSuite.DataBase();
+	}
 
 	return source;
 }
@@ -320,8 +383,14 @@ Test::_SourceToVirtual(addr_t source)
 addr_t
 Test::_SourceToCompare(addr_t source)
 {
-	if ((fFlags & B_PHYSICAL_IO_REQUEST) != 0)
+	if ((fFlags & B_PHYSICAL_IO_REQUEST) != 0) {
+		if (!fSuite.IsContiguous() && source >= B_PAGE_SIZE) {
+			return source - fSuite.SecondPhysicalDataBase()
+				+ fSuite.CompareBase();
+		}
+
 		return source - fSuite.PhysicalDataBase() + fSuite.CompareBase();
+	}
 
 	return source - fSuite.DataBase() + fSuite.CompareBase();
 }
@@ -548,8 +617,12 @@ Test::Run(DMAResource& resource)
 			if (target.uses_bounce_buffer) {
 				address = (void*)(target.address
 					+ (addr_t)buffer->PhysicalBounceBuffer());
-			} else
+			} else if (fSuite.IsContiguous() || target.address < B_PAGE_SIZE) {
 				address = (void*)(target.address + fSuite.PhysicalDataBase());
+			} else {
+				address = (void*)(target.address - B_PAGE_SIZE
+					+ fSuite.SecondPhysicalDataBase());
+			}
 
 			if (address != vec.iov_base) {
 				_Panic("[%lu] address differs: %p, should be %p", i,
@@ -959,6 +1032,33 @@ run_tests_mean_restrictions(TestSuiteContext& context)
 
 
 static void
+run_tests_non_contiguous_no_restrictions(TestSuiteContext& context)
+{
+	const dma_restrictions restrictions = {
+		0x0,	// low
+		0x0,	// high
+		0,		// alignment
+		0,		// boundary
+		0,		// max transfer
+		0,		// max segment count
+		0,		// max segment size
+		0		// flags
+	};
+
+	TestSuite suite(context, "non contiguous, no restrictions", restrictions,
+		512);
+
+	suite.AddTest(0, 8192, false, 0)
+		.AddSource(0, 8192)
+		.NextResult(0, false, false)
+			.AddTarget(0, 4096, false)
+			.AddTarget(4096, 4096, false);
+
+	suite.Run();
+}
+
+
+static void
 run_test()
 {
 	TestSuiteContext context;
@@ -974,6 +1074,14 @@ run_test()
 	run_tests_transfer_restrictions(context);
 	run_tests_interesting_restrictions(context);
 	run_tests_mean_restrictions(context);
+
+	// physical non-contiguous
+
+	status = context.Init(2 * B_PAGE_SIZE, false);
+	if (status != B_OK)
+		return;
+
+	run_tests_non_contiguous_no_restrictions(context);
 
 	dprintf("All tests passed!\n");
 }
