@@ -335,11 +335,13 @@ mkvReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 						 media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	mkv_cookie *cookie = (mkv_cookie *)_cookie;
-	*frameCount = cookie->frame_count;
-	*duration = cookie->duration;
-	*format = cookie->format;
-	*infoBuffer = 0;
-	*infoSize = 0;
+	if (cookie) {
+		*frameCount = cookie->frame_count;
+		*duration = cookie->duration;
+		*format = cookie->format;
+		*infoBuffer = 0;
+		*infoSize = 0;
+	}
 	return B_OK;
 }
 
