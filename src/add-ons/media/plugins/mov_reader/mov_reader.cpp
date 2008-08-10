@@ -442,21 +442,23 @@ movReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 {
 	mov_cookie *cookie = (mov_cookie *)_cookie;
 
-	*frameCount = cookie->frame_count;
-	*duration = cookie->duration;
-	*format = cookie->format;
+	if (cookie) {
+		*frameCount = cookie->frame_count;
+		*duration = cookie->duration;
+		*format = cookie->format;
 	
-	// Copy metadata to infoBuffer
-	if (theFileReader->IsVideo(cookie->stream)) {
-		const VideoMetaData *video_format = theFileReader->VideoFormat(cookie->stream);
-		*infoBuffer = video_format->theVOL;
-		*infoSize = video_format->VOLSize;
-	} else {
-		const AudioMetaData *audio_format = theFileReader->AudioFormat(cookie->stream);
-		*infoBuffer = audio_format->theVOL;
-		*infoSize = audio_format->VOLSize;
+		// Copy metadata to infoBuffer
+		if (theFileReader->IsVideo(cookie->stream)) {
+			const VideoMetaData *video_format = theFileReader->VideoFormat(cookie->stream);
+			*infoBuffer = video_format->theVOL;
+			*infoSize = video_format->VOLSize;
+		} else {
+			const AudioMetaData *audio_format = theFileReader->AudioFormat(cookie->stream);
+			*infoBuffer = audio_format->theVOL;
+			*infoSize = audio_format->VOLSize;
+		}
 	}
-
+	
 	return B_OK;
 }
 
