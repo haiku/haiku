@@ -1914,6 +1914,10 @@ lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 		return B_ENTRY_NOT_FOUND;
 	}
 
+//	ktrace_printf("lookup_dir_entry(): dir: %p (%ld, %lld), name: \"%s\" -> "
+//		"%p (%ld, %lld)", dir, dir->mount->id, dir->id, name, *_vnode,
+//		(*_vnode)->mount->id, (*_vnode)->id);
+
 	return B_OK;
 }
 
