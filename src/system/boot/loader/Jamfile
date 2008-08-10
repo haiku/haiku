@@ -34,6 +34,7 @@ UsePrivateHeaders shared storage ;
 KernelStaticLibrary boot_loader :
 	main.cpp
 	vfs.cpp
+	FileMapDisk.cpp
 	RootFileSystem.cpp
 	partitions.cpp
 	heap.cpp
