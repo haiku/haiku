@@ -1,10 +1,11 @@
+/*
+ * Copyright 2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SYS_RESOURCE_H
 #define _SYS_RESOURCE_H
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
-
+#include <sys/cdefs.h>
 #include <sys/time.h>
 
 
@@ -53,9 +54,7 @@ struct rusage {
 #define PRIO_USER		2
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 extern int getrusage(int who, struct rusage *rusage);
 
@@ -66,8 +65,6 @@ extern int setrlimit(int resource, const struct rlimit * rlp);
  * int getpriority(int which, id_t who);
  * int setpriority(int which, id_t who, int priority); */
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif	/* _SYS_RESOURCE_H */
