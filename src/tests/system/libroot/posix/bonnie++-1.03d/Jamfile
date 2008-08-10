@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src tests system libroot posix bonnie++-1.03d ;
+
+SimpleTest bonnie++ :
+	bon_io.cpp
+	bon_file.cpp
+	bon_time.cpp
+	semaphore.cpp
+	forkit.cpp
+	bon_suid.cpp
+
+	bonnie++.cpp
+;
+
+SimpleTest zcav :
+	bon_suid.cpp
+	zcav.cpp
+;
