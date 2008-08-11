@@ -1526,7 +1526,14 @@ fork_team(void)
 	forkArgs->sig_block_mask = parentThread->sig_block_mask;
 	arch_store_fork_frame(&forkArgs->arch_info);
 
-	// ToDo: copy image list
+	// copy image list
+	image_info imageInfo;
+	cookie = 0;
+	while (get_next_image_info(parentTeam->id, &cookie, &imageInfo) == B_OK) {
+		image_id image = register_image(team, &imageInfo, sizeof(imageInfo));
+		if (image < 0)
+			goto err5;
+	}
 
 	// create a kernel thread under the context of the new team
 	threadID = spawn_kernel_thread_etc(fork_team_thread_start,
@@ -1534,7 +1541,7 @@ fork_team(void)
 		team->id, team->id);
 	if (threadID < 0) {
 		status = threadID;
-		goto err4;
+		goto err5;
 	}
 
 	// notify the debugger
@@ -1545,6 +1552,8 @@ fork_team(void)
 	resume_thread(threadID);
 	return threadID;
 
+err5:
+	remove_images(team);
 err4:
 	vm_delete_address_space(team->address_space);
 err3:
