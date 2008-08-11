@@ -180,6 +180,7 @@ Grepper::_GrepperThread()
 	tempFile.SetTo(fileName);
 
 	while (!fMustQuit && fIterator->GetNextName(fileName)) {
+
 		message.MakeEmpty();
 		message.what = MSG_REPORT_FILE_NAME;
 		message.AddString("filename", fileName);
@@ -190,14 +191,15 @@ Grepper::_GrepperThread()
 		message.AddString("filename", fileName);
 
 		BEntry entry(fileName);
+		entry_ref ref;
+		entry.GetRef(&ref);
+		message.AddRef("ref", &ref);
+
 		if (!entry.Exists()) {
 			if (fIterator->NotifyNegatives())
 				fTarget.SendMessage(&message);
 			continue;
 		}
-		entry_ref ref;
-		entry.GetRef(&ref);
-		message.AddRef("ref", &ref);
 
 		if (!_EscapeSpecialChars(fileName, B_PATH_NAME_LENGTH)) {
 			sprintf(tempString, "%s: Not enough room to escape the filename.",
