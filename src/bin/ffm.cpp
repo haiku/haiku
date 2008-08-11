@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[])
 {
-	BApplication app("application/x.vnd.Haiku-ffm");
+	BApplication app("application/x-vnd.Haiku-ffm");
 	bool follow;
 
 	if (argc == 2) {
