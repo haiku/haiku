@@ -14,6 +14,7 @@
 #include <vm_priv.h>
 #include <vm_cache.h>
 #include <vm_page.h>
+#include "VMAnonymousCache.h"
 
 
 const static uint32 kMinScanPagesCount = 512;
@@ -154,13 +155,37 @@ check_page_activation(int32 index)
 }
 
 
-static status_t 
+#if ENABLE_SWAP_SUPPORT
+static bool
+free_page_swap_space(int32 index)
+{
+	vm_page *page = vm_page_at_index(index);
+	PageCacheLocker locker(page);
+	if (!locker.IsLocked())
+		return false;
+
+	if (page->cache->temporary && page->wired_count == 0
+			&& page->cache->HasPage(page->cache_offset << PAGE_SHIFT)
+			&& page->usage_count > 0) {
+		// TODO: how to judge a page is highly active?
+		return swap_free_page_swap_space(page);
+	}
+	return false;
+}
+#endif
+
+
+static status_t
 page_daemon(void* /*unused*/)
 {
 	bigtime_t scanWaitInterval = kMaxScanWaitInterval;
 	uint32 scanPagesCount = kMinScanPagesCount;
 	uint32 clearPage = 0;
 	uint32 checkPage = sNumPages / 2;
+
+#if ENABLE_SWAP_SUPPORT
+	uint32 swapPage = 0;
+#endif
 
 	while (true) {
 		acquire_sem_etc(sPageDaemonSem, 1, B_RELATIVE_TIMEOUT,
@@ -198,7 +223,25 @@ dprintf("wait interval %Ld, scan pages %lu, free %lu, target %lu\n",
 			if (++checkPage == sNumPages)
 				checkPage = 0;
 		}
+
+#if ENABLE_SWAP_SUPPORT
+		uint32 availableSwapPages = swap_available_pages();
+		if (swap_total_swap_pages() > 0 && availableSwapPages < sNumPages / 8) {
+			uint32 swapPagesToFree = sNumPages / 8 - availableSwapPages;
+			uint32 swapScanCount = kMaxScanPagesCount
+				- (kMaxScanPagesCount - kMinScanPagesCount)
+				* availableSwapPages / (sNumPages / 8);
+
+			for (uint32 i = 0; i < swapScanCount && swapPagesToFree > 0; i++) {
+				if (free_page_swap_space(swapPage))
+					swapPagesToFree--;
+				if (++swapPage == sNumPages)
+					swapPage = 0;
+			}
+		}
+#endif
 	}
+
 	return B_OK;
 }
 
