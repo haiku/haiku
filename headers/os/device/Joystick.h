@@ -16,8 +16,6 @@
 #include <SupportDefs.h>
 #include <OS.h>
 
-#define DEBUG
-
 class BList;
 class BString;
 struct entry_ref;
@@ -57,7 +55,7 @@ virtual				~BJoystick();
 		bool		button2;
 
 		int32		CountDevices();
-		status_t	GetDeviceName(int32 n, char * name, 
+		status_t	GetDeviceName(int32 n, char * name,
 						size_t bufSize = B_OS_NAME_LENGTH);
 
 		/* if you care about more than just the first two axes/buttons, here's where you go */
@@ -130,7 +128,7 @@ virtual	status_t	_Reserved_Joystick_6(void *, ...);
 		uint32		_reserved_Joystick_[10];
 #endif
 
-#ifdef DEBUG
+#if DEBUG
 public:
 	static FILE *sLogFile;
 #endif

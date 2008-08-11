@@ -3,11 +3,11 @@
  * All rights reserved.
  * Distributed under the terms of the MIT License.
  */
- 
+
 /*
 joystick preference app
 	JoyCalib::JoyCalib(BRect, BJoystick &, BWindow *):
-__8JoyCalibG5BRectR9BJoystickP7BWindow: 
+__8JoyCalibG5BRectR9BJoystickP7BWindow:
 */
 
 #include <List.h>
@@ -25,14 +25,22 @@ __8JoyCalibG5BRectR9BJoystickP7BWindow:
 
 #include "Joystick.h"
 
-#ifdef DEBUG
-        inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
-                fputs(buf, BJoystick::sLogFile); fflush(BJoystick::sLogFile); }
-        #define LOG_ERR(text...) LOG(text)
+#if DEBUG
+inline void
+LOG(const char *fmt, ...)
+{
+	char buf[1024];
+	va_list ap;
+	va_start(ap, fmt);
+	vsprintf(buf, fmt, ap);
+	va_end(ap);
+	fputs(buf, BJoystick::sLogFile); fflush(BJoystick::sLogFile);
+}
+#	define LOG_ERR(text...) LOG(text)
 FILE *BJoystick::sLogFile = NULL;
 #else
-        #define LOG(text...) 
-        #define LOG_ERR(text...) fprintf(stderr, text)
+#	define LOG(text...)
+#	define LOG_ERR(text...) fprintf(stderr, text)
 #endif
 
 #define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
@@ -40,28 +48,29 @@ FILE *BJoystick::sLogFile = NULL;
 #include "JoystickTweaker.h"
 
 BJoystick::BJoystick()
-	: _mBeBoxMode(false)
-	, _fDevices(new BList)
-	, m_info(new _joystick_info())
-{		
-#ifdef DEBUG
+	:
+	_mBeBoxMode(false),
+	_fDevices(new BList),
+	m_info(new _joystick_info())
+{
+#if DEBUG
 	sLogFile = fopen("/var/log/libdevice.log", "a");
-#endif	
+#endif
 	//ScanDevices();
 }
 
 
 BJoystick::~BJoystick()
-{	
+{
 	if (ffd >= 0)
 		close(ffd);
-	
+
 	for (int32 count = _fDevices->CountItems() - 1; count >= 0; count--) {
 		free(_fDevices->RemoveItem(count));
 	}
-	
+
 	delete _fDevices;
-	delete m_info;	
+	delete m_info;
 }
 
 
@@ -78,49 +87,49 @@ BJoystick::Open(const char *portName, bool enter_enhanced)
 {
 	CALLED();
 	char buf[64];
-	
+
 	if(!enter_enhanced)
 		_mBeBoxMode = !enter_enhanced;
-	
+
 	if (portName == NULL)
 		return B_BAD_VALUE;
-		
-	if (portName[0] != '/') 
+
+	if (portName[0] != '/')
 		snprintf(buf, 64, DEVICEPATH"/%s", portName);
 	else
 		snprintf(buf, 64, "%s", portName);
-		
+
 	if (ffd >= 0)
 		close(ffd);
- 
+
 	// TODO: BeOS don't use O_EXCL, and this seems to lead to some issues. I
-	// added this flag having read some comments by Marco Nelissen on the 
+	// added this flag having read some comments by Marco Nelissen on the
 	// annotated BeBook. I think BeOS uses O_RDWR|O_NONBLOCK here.
-	ffd = open(buf, O_RDWR | O_NONBLOCK | O_EXCL); 
-	
+	ffd = open(buf, O_RDWR | O_NONBLOCK | O_EXCL);
+
 	if (ffd >= 0) {
-		// we used open() with O_NONBLOCK flag to let it return immediately, 
-		// but we want read/write operations to block if needed, so we clear 
+		// we used open() with O_NONBLOCK flag to let it return immediately,
+		// but we want read/write operations to block if needed, so we clear
 		// that bit here.
 		int flags = fcntl(ffd, F_GETFL);
 		fcntl(ffd, F_SETFL, flags & ~O_NONBLOCK);
-				
+
 		//DriverControl();
 	}
-	// TODO: I wonder why the return type is a status_t, 
-	// since we (as BeOS does) return the descriptor number for the device... 
-	
+	// TODO: I wonder why the return type is a status_t,
+	// since we (as BeOS does) return the descriptor number for the device...
+
 	//Read the Joystick Description file for this port/joystick
 	_BJoystickTweaker jt(*this);
 	jt.get_info(m_info, portName);
-	
+
 	LOG("ioctl - %d\n", m_info->num_buttons);
 	ioctl(ffd, B_JOYSTICK_SET_DEVICE_MODULE, m_info);
 	ioctl(ffd, B_JOYSTICK_GET_DEVICE_MODULE, m_info);
 	LOG("ioctl - %d\n", m_info->num_buttons);
 	if (ffd >= 0) {
 		return ffd;
-	} else		
+	} else
 		return errno;
 }
 
@@ -151,13 +160,13 @@ BJoystick::CountDevices()
 {
 	CALLED();
 	int32 count = 0;
-	
+
 	// Refresh devices list
 	ScanDevices(true);
-	
+
 	if (_fDevices != NULL)
 		count = _fDevices->CountItems();
-	
+
 	LOG("Count = %d\n", count);
 	return count;
 }
@@ -196,8 +205,8 @@ BJoystick::EnterEnhancedMode(const entry_ref *ref)
 
 int32
 BJoystick::CountSticks()
-{	
-	CALLED();	
+{
+	CALLED();
 	return m_info->num_sticks;
 }
 
@@ -222,7 +231,7 @@ int32
 BJoystick::CountButtons()
 {
 	CALLED();
-	return m_info->num_buttons;	
+	return m_info->num_buttons;
 }
 
 status_t
@@ -232,7 +241,7 @@ BJoystick::GetControllerModule(BString *out_name)
 	if (m_info != NULL && ffd >= 0) {
 		out_name->SetTo(m_info->module_name);
 		return B_OK;
-	} else 
+	} else
 		return B_ERROR;
 
 }
@@ -245,7 +254,7 @@ BJoystick::GetControllerName(BString *out_name)
 	if (m_info != NULL && ffd >= 0) {
 		out_name->SetTo(m_info->controller_name);
 		return B_OK;
-	} else 
+	} else
 		return B_ERROR;
 }
 
@@ -254,7 +263,7 @@ bool
 BJoystick::IsCalibrationEnabled()
 {
 	CALLED();
-	return m_info->calibration_enable;	
+	return m_info->calibration_enable;
 }
 
 
@@ -363,7 +372,7 @@ BJoystick::save_config(const entry_ref *ref)
 }
 
 
-/* These functions are here to maintain Binary Compatibility */ 
+/* These functions are here to maintain Binary Compatibility */
 void BJoystick::_ReservedJoystick1() {CALLED();}
 void BJoystick::_ReservedJoystick2() {CALLED();}
 void BJoystick::_ReservedJoystick3() {CALLED();}

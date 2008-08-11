@@ -1,14 +1,13 @@
 /*
- * Copyright 2008, Haiku.
+ * Copyright 2008, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Fredrik Modeen 
- *
+ *		Fredrik Modeen
  */
- 
+
 #include "joystick_driver.h"
- 
+
 #include <List.h>
 #include <Entry.h>
 #include <Path.h>
@@ -21,8 +20,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
-
-#define DEBUG
 
 #define DEVICEPATH "/dev/joystick/"
 #define JOYSTICKPATH "/boot/home/config/settings/joysticks/"
@@ -47,8 +44,8 @@ private:
 		status_t	save_config(const entry_ref * ref = NULL);
 		status_t	get_info();
 		BJoystick* fJoystick;
-#ifdef DEBUG
+#if DEBUG
 public:
 	static FILE *sLogFile;
-#endif		
+#endif
 };

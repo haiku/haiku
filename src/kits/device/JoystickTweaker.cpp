@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Fredrik Modeen 
+ *		Fredrik Modeen
  *
  */
 #include "JoystickTweaker.h"
@@ -18,13 +18,13 @@
 
 #include <UTF8.h>
 
-#ifdef DEBUG
+#if DEBUG
         inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
                 fputs(buf, _BJoystickTweaker::sLogFile); fflush(_BJoystickTweaker::sLogFile); }
         #define LOG_ERR(text...) LOG(text)
 FILE *_BJoystickTweaker::sLogFile = NULL;
 #else
-        #define LOG(text...) 
+        #define LOG(text...)
         #define LOG_ERR(text...) fprintf(stderr, text)
 #endif
 
@@ -33,19 +33,19 @@ FILE *_BJoystickTweaker::sLogFile = NULL;
 _BJoystickTweaker::_BJoystickTweaker()
 {
 	CALLED();
-#ifdef DEBUG
+#if DEBUG
 	sLogFile = fopen("/var/log/libdevice.log", "a");
-#endif		
+#endif
 }
 
 
 _BJoystickTweaker::_BJoystickTweaker(BJoystick &stick)
 {
 	CALLED();
-#ifdef DEBUG
+#if DEBUG
 	sLogFile = fopen("/var/log/libdevice.log", "a");
-#endif		
-	
+#endif
+
 	fJoystick = &stick;
 }
 
@@ -65,7 +65,7 @@ _BJoystickTweaker::save_config(const entry_ref *ref)
 
 status_t
 _BJoystickTweaker::scan_including_disabled(const char* rootPath, BList *list,
-						BEntry *rootEntry)
+	BEntry *rootEntry)
 {
 	BDirectory root;
 
@@ -75,9 +75,9 @@ _BJoystickTweaker::scan_including_disabled(const char* rootPath, BList *list,
 		root.SetTo(rootPath);
 	else
 		return B_ERROR;
-		
+
 	BEntry entry;
-	
+
 	ASSERT(list != NULL);
 	while ((root.GetNextEntry(&entry)) > B_ERROR ) {
 		if (entry.IsDirectory()) {
@@ -85,7 +85,7 @@ _BJoystickTweaker::scan_including_disabled(const char* rootPath, BList *list,
 		} else {
 			BPath path;
 			entry.GetPath(&path);
-			
+
 			BString *str = new BString(path.Path());
 			str->RemoveFirst(rootPath);
 			list->AddItem(str);
@@ -95,7 +95,7 @@ _BJoystickTweaker::scan_including_disabled(const char* rootPath, BList *list,
 }
 
 
-void 
+void
 _BJoystickTweaker::scan_including_disabled()
 {
 	CALLED();
@@ -116,14 +116,14 @@ _BJoystickTweaker::get_info()
 
 
 status_t
-_BJoystickTweaker::get_info(_joystick_info* info, 
+_BJoystickTweaker::get_info(_joystick_info* info,
 	const char * ref)
 {
 	CALLED();
 	status_t err = B_ERROR;
 	BString str(JOYSTICKPATH);
 	str.Append(ref);
-	
+
 	FILE *file = fopen(str.String(), "r");
 	if (file != NULL) {
 		char line [STRINGLENGTHCPY];
@@ -135,20 +135,20 @@ _BJoystickTweaker::get_info(_joystick_info* info,
 		}
 		fclose(file);
 	}
-	
+
 	err = B_OK;
 	return err;
 }
 
 
-void 
+void
 _BJoystickTweaker::BuildFromJoystickDesc(char *string, _joystick_info* info)
 {
 	BString str(string);
 	str.RemoveAll("\"");
-	
+
 	if (str.IFindFirst("module") != -1) {
-		str.RemoveFirst("module = ");	
+		str.RemoveFirst("module = ");
 		strncpy(info->module_name, str.String(), STRINGLENGTHCPY);
 	} else if (str.IFindFirst("gadget") != -1) {
 		str.RemoveFirst("gadget = ");
