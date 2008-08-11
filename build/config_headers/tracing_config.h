@@ -32,6 +32,7 @@
 #define NET_BUFFER_TRACING						0
 #define NET_BUFFER_TRACING_STACK_TRACE			0	/* stack trace depth */
 #define RUNTIME_LOADER_TRACING					0
+#define SCHEDULER_TRACING						0
 #define SIGNAL_TRACING							0
 #define SYSCALL_TRACING							0
 #define SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT	1

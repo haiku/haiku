@@ -19,6 +19,7 @@
 #include <smp.h>
 #include <cpu.h>
 #include <debug.h>
+#include <tracing.h>
 #include <util/khash.h>
 
 
@@ -27,6 +28,98 @@
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
+#endif
+
+
+#if SCHEDULER_TRACING
+namespace SchedulerTracing {
+
+class EnqueueThread : public AbstractTraceEntry {
+public:
+	EnqueueThread(struct thread* thread, struct thread* previous,
+			struct thread* next)
+		:
+		fID(thread->id),
+		fPreviousID(-1),
+		fNextID(-1),
+		fPriority(thread->priority)
+	{
+		if (previous != NULL)
+			fPreviousID = previous->id;
+		if (next != NULL)
+			fNextID = next->id;
+		fName = alloc_tracing_buffer_strcpy(thread->name, B_OS_NAME_LENGTH,
+			false);
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("scheduler enqueue %ld \"%s\", priority %d (previous %ld, "
+			"next %ld)", fID, fName, fPriority, fPreviousID, fNextID);
+	}
+
+private:
+	thread_id			fID;
+	thread_id			fPreviousID;
+	thread_id			fNextID;
+	char*				fName;
+	uint8				fPriority;
+};
+
+class RemoveThread : public AbstractTraceEntry {
+public:
+	RemoveThread(struct thread* thread)
+		:
+		fID(thread->id),
+		fPriority(thread->priority)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("scheduler remove %ld, priority %d", fID, fPriority);
+	}
+
+private:
+	thread_id			fID;
+	uint8				fPriority;
+};
+
+class ScheduleThread : public AbstractTraceEntry {
+public:
+	ScheduleThread(struct thread* thread, struct thread* previous)
+		:
+		fID(thread->id),
+		fPreviousID(previous->id),
+		fCPU(previous->cpu->cpu_num),
+		fPriority(thread->priority)
+	{
+		fName = alloc_tracing_buffer_strcpy(thread->name, B_OS_NAME_LENGTH,
+			false);
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("schedule %ld \"%s\", priority %d (from %ld, CPU %ld)", fID,
+			fName, fPriority, fPreviousID, fCPU);
+	}
+
+private:
+	thread_id			fID;
+	thread_id			fPreviousID;
+	int32				fCPU;
+	char*				fName;
+	uint8				fPriority;
+};
+
+}	// namespace SchedulerTracing
+
+#	define T(x) new(std::nothrow) SchedulerTracing::x;
+#else
+#	define T(x) ;
 #endif
 
 
@@ -94,6 +187,8 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 			prev = sRunQueue;
 	}
 
+	T(EnqueueThread(thread, prev, curr));
+
 	thread->queue_next = curr;
 	if (prev)
 		prev->queue_next = thread;
@@ -111,6 +206,8 @@ void
 scheduler_remove_from_run_queue(struct thread *thread)
 {
 	struct thread *item, *prev;
+
+	T(RemoveThread(thread));
 
 	// find thread in run queue
 	for (item = sRunQueue, prev = NULL; item && item != thread;
@@ -245,6 +342,8 @@ scheduler_reschedule(void)
 		prevThread->queue_next = nextThread->queue_next;
 	else
 		sRunQueue = nextThread->queue_next;
+
+	T(ScheduleThread(nextThread, oldThread));
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
