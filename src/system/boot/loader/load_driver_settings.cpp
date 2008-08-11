@@ -1,5 +1,6 @@
 /*
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,6 +17,16 @@
 
 #include <string.h>
 #include <unistd.h>
+
+static driver_settings_file *
+find_driver_settings_file(const char *name)
+{
+	for (driver_settings_file *file = gKernelArgs.driver_settings; file != NULL; file = file->next) 
+		if (!strcmp(file->name, name))
+			return file;
+
+	return NULL;
+}
 
 
 static status_t
@@ -80,6 +91,34 @@ load_driver_settings(stage2_args */*args*/, Directory *volume)
 		}
 
 		settings->Close(cookie);
+	}
+
+	// check if a kernel settings file exists
+	// if it does, prepend it to the safe mode settings. This allows the 
+	// settings from the kernel file to take effect while still allowing 
+	// overrides by safe mode since the settings are searched
+	// in reverse order. This allows us to permanently set things like 
+	// disable_smp
+	driver_settings_file *kern_file = find_driver_settings_file("kernel");
+	if (kern_file != NULL) {
+		driver_settings_file *safemode_file = 
+			find_driver_settings_file(B_SAFEMODE_DRIVER_SETTINGS);
+		if (safemode_file != NULL) {
+			char *tmp_buffer = (char *)kernel_args_malloc(
+				safemode_file->size + kern_file->size + 1);
+			if (tmp_buffer != NULL) {
+				memcpy(tmp_buffer, kern_file->buffer, 
+					kern_file->size);
+				memcpy(tmp_buffer + kern_file->size, 
+					safemode_file->buffer, 
+					safemode_file->size);
+				tmp_buffer[safemode_file->size + 
+					kern_file->size] = '\0';
+				kernel_args_free(safemode_file->buffer);
+				safemode_file->buffer = tmp_buffer;
+			} 
+		} else 
+			add_safe_mode_settings(kern_file->buffer);
 	}
 
 	return B_OK;
