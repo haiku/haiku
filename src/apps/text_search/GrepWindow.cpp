@@ -48,14 +48,35 @@
 
 using std::nothrow;
 
-static const bigtime_t kChangesPulseInterval = 500000;
+static const bigtime_t kChangesPulseInterval = 150000;
 
-#define TRACE_NODE_MONITORING
+//#define TRACE_NODE_MONITORING
 #ifdef TRACE_NODE_MONITORING
 # define TRACE_NM(x...) printf(x)
 #else
 # define TRACE_NM(x...)
 #endif
+
+//#define TRACE_FUNCTIONS
+#ifdef TRACE_FUNCTIONS
+	class FunctionTracer {
+	public:
+		FunctionTracer(const char* functionName)
+			: fName(functionName)
+		{
+			printf("%s - enter\n", fName.String());
+		}
+		~FunctionTracer()
+		{
+			printf("%s - exit\n", fName.String());
+		}
+	private:
+		BString	fName;
+	};
+# define CALLED()	FunctionTracer functionTracer(__PRETTY_FUNCTION__)
+#else
+# define CALLED()
+#endif // TRACE_FUNCTIONS
 
 
 GrepWindow::GrepWindow(BMessage* message)
@@ -234,6 +255,10 @@ void GrepWindow::MessageReceived(BMessage *message)
 			_OnSearchFinished();
 			break;
 
+		case MSG_START_NODE_MONITORING:
+			_StartNodeMonitoring();
+			break;
+
 		case B_PATH_MONITOR:
 			_OnNodeMonitorEvent(message);
 			break;
@@ -314,6 +339,8 @@ void GrepWindow::MessageReceived(BMessage *message)
 void
 GrepWindow::Quit()
 {
+	CALLED();
+
 	_StopNodeMonitoring();
 	_SavePrefs();
 
@@ -689,37 +716,21 @@ GrepWindow::_SavePrefs()
 void
 GrepWindow::_StartNodeMonitoring()
 {
+	CALLED();
+
 	_StopNodeMonitoring();
 
 	BMessenger messenger(this);
-	uint32 fileFlags = B_WATCH_NAME | B_WATCH_STAT;
-	uint32 dirFlags = B_WATCH_DIRECTORY | B_WATCH_NAME;
+	uint32 fileFlags = B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR;
 
-	// watch the top level folder
+
+	// watch the top level folder only, rest should be done through filtering
+	// the node monitor notifications
 	BPath path(&fModel->fDirectory);
 	if (path.InitCheck() == B_OK) {
 		TRACE_NM("start monitoring root folder: %s\n", path.Path());
-		BPrivate::BPathMonitor::StartWatching(path.Path(), dirFlags, messenger);
-	}
-
-	InitialIterator iterator(fModel);
-
-	BEntry entry;
-	while (iterator.GetTopEntry(entry)) {
-		path.SetTo(&entry);
-		if (entry.IsDirectory()) {
-			// subfolder
-			if (iterator.FollowSubdir(entry)) {
-				TRACE_NM("start monitoring folder: %s\n", path.Path());
-				BPrivate::BPathMonitor::StartWatching(path.Path(),
-					dirFlags | B_WATCH_RECURSIVELY, messenger);
-			}
-		} else {
-			// regular file
-			TRACE_NM("start monitoring file: %s\n", path.Path());
-			BPrivate::BPathMonitor::StartWatching(path.Path(), fileFlags,
-				messenger);
-		}
+		BPrivate::BPathMonitor::StartWatching(path.Path(),
+			fileFlags | B_WATCH_RECURSIVELY | B_WATCH_FILES_ONLY, messenger);
 	}
 
 	if (fChangesPulse == NULL) {
@@ -733,6 +744,11 @@ GrepWindow::_StartNodeMonitoring()
 void
 GrepWindow::_StopNodeMonitoring()
 {
+	if (fChangesPulse == NULL)
+		return;
+
+	CALLED();
+
 	BPrivate::BPathMonitor::StopWatching(BMessenger(this));
 	delete fChangesIterator;
 	fChangesIterator = NULL;
@@ -747,6 +763,8 @@ GrepWindow::_StopNodeMonitoring()
 void
 GrepWindow::_OnStartCancel()
 {
+	CALLED();
+
 	_StopNodeMonitoring();
 
 	if (fModel->fState == STATE_IDLE) {
@@ -815,8 +833,6 @@ GrepWindow::_OnSearchFinished()
 {
 	fModel->fState = STATE_IDLE;
 
-	_StartNodeMonitoring();
-
 	delete fGrepper;
 	fGrepper = NULL;
 
@@ -835,6 +851,8 @@ GrepWindow::_OnSearchFinished()
 	fSearchText->SetText(fOldPattern.String());
 	fSearchText->TextView()->SelectAll();
 	fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
+
+	PostMessage(MSG_START_NODE_MONITORING);
 }
 
 
@@ -859,21 +877,19 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 		{
 			TRACE_NM("%s\n", opCode == B_ENTRY_CREATED ? "B_ENTRY_CREATED"
 				: "B_ENTRY_REMOVED");
-			const char* name;
 			BString path;
-			if (message->FindString("path", &path) == B_OK
-				&& message->FindString("name", &name) == B_OK) {
-				path << '/' << name;
+			if (message->FindString("path", &path) == B_OK) {
 				if (opCode == B_ENTRY_CREATED)
 					fChangesIterator->EntryAdded(path.String());
 				else
 					fChangesIterator->EntryRemoved(path.String());
 			} else {
 				#ifdef TRACE_NODE_MONITORING
-					printf("B_ENTRY_CREATED/REMOVED - incompatible message:\n");
+					printf("incompatible message:\n");
 					message->PrintToStream();
 				#endif
 			}
+			TRACE_NM("path: %s\n", path.String());
 			break;
 		}
 		case B_ENTRY_MOVED:
@@ -886,17 +902,25 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 			// it should be a combined removed/added event.
 			break;
 		case B_STAT_CHANGED:
+		case B_ATTR_CHANGED:
 		{
-			TRACE_NM("B_STAT_CHANGED\n");
+			TRACE_NM("%s\n", opCode == B_STAT_CHANGED ? "B_STAT_CHANGED"
+				: "B_ATTR_CHANGED");
+			// For directly watched files, the path will include the
+			// name. When the event occurs for a file in a watched directory,
+			// the message will have an extra name field for the respective
+			// file.
 			BString path;
-			if (message->FindString("path", &path) == B_OK)
+			if (message->FindString("path", &path) == B_OK) {
 				fChangesIterator->EntryChanged(path.String());
-			else {
+			} else {
 				#ifdef TRACE_NODE_MONITORING
 					printf("incompatible message:\n");
 					message->PrintToStream();
 				#endif
 			}
+			TRACE_NM("path: %s\n", path.String());
+//message->PrintToStream();
 			break;
 		}
 
@@ -912,7 +936,7 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 void
 GrepWindow::_OnNodeMonitorPulse()
 {
-	if (fChangesIterator == NULL)
+	if (fChangesIterator == NULL || fChangesIterator->IsEmpty())
 		return;
 
 	if (system_time() - fLastNodeMonitorEvent < kChangesPulseInterval) {
@@ -929,6 +953,10 @@ GrepWindow::_OnNodeMonitorPulse()
 	}
 
 	fOldPattern = fSearchText->Text();
+
+#ifdef TRACE_NODE_MONITORING
+	fChangesIterator->PrintToStream();
+#endif
 
 	fGrepper = new (nothrow) Grepper(fOldPattern.String(), fModel,
 		this, fChangesIterator);
@@ -961,6 +989,8 @@ GrepWindow::_OnReportFileName(BMessage* message)
 void
 GrepWindow::_OnReportResult(BMessage* message)
 {
+	CALLED();
+
 	entry_ref ref;
 	if (message->FindRef("ref", &ref) != B_OK)
 		return;
@@ -1205,6 +1235,8 @@ GrepWindow::_OnInvokeItem()
 void
 GrepWindow::_OnSearchText()
 {
+	CALLED();
+
 	bool enabled = fSearchText->TextView()->TextLength() != 0;
 	fButton->SetEnabled(enabled);
 	fSearch->SetEnabled(enabled);
@@ -1551,6 +1583,8 @@ GrepWindow::_OnNewWindow()
 void
 GrepWindow::_ModelChanged()
 {
+	CALLED();
+
 	_StopNodeMonitoring();
 	_SavePrefs();
 }
