@@ -12,7 +12,6 @@
 
 #include <ObjectList.h>
 
-#include <Application.h>
 #include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -29,33 +28,40 @@
 #undef TRACE
 //#define TRACE_PATH_MONITOR
 #ifdef TRACE_PATH_MONITOR
-#	define TRACE(x) printf x
+#	define TRACE(x...) printf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 using namespace BPrivate;
 using namespace std;
 using std::nothrow; // TODO: Remove this line if the above line is enough.
 
+// TODO: Use optimizations where stuff is already known to avoid iterating
+// the watched directory and files set too often.
 
 #define WATCH_NODE_FLAG_MASK	0x00ff
 
 namespace BPrivate {
 
+struct FileEntry {
+	entry_ref	ref;
+	ino_t		node;
+};
+
 #if __GNUC__ > 3
-	bool operator<(const node_ref& a, const node_ref& b);
-	class node_ref_less : public binary_function<node_ref, node_ref, bool> 
+	bool operator<(const FileEntry& a, const FileEntry& b);
+	class FileEntryLess : public binary_function<FileEntry, FileEntry, bool> 
 	{
 		public:
-		bool operator() (const node_ref& a, const node_ref& b) const
+		bool operator() (const FileEntry& a, const FileEntry& b) const
 		{
 			return a < b;
 		}
 	};
-	typedef set<node_ref,node_ref_less> FileSet;
+	typedef set<FileEntry, FileEntryLess> FileSet;
 #else
-	typedef set<node_ref> FileSet;
+	typedef set<FileEntry> FileSet;
 #endif
 
 struct WatchedDirectory {
@@ -91,16 +97,24 @@ class PathHandler : public BHandler {
 	private:
 		status_t _GetClosest(const char* path, bool updatePath,
 			node_ref& nodeRef);
-		bool _WatchRecursively();
-		bool _WatchFilesOnly();
+
+		bool _WatchRecursively() const;
+		bool _WatchFilesOnly() const;
+		bool _WatchFoldersOnly() const;
+
 		void _EntryCreated(BMessage* message);
 		void _EntryRemoved(BMessage* message);
 		void _EntryMoved(BMessage* message);
+
 		bool _IsContained(const node_ref& nodeRef) const;
 		bool _IsContained(BEntry& entry) const;
-		bool _HasDirectory(const node_ref& nodeRef, bool* _contained = NULL) const;
+		bool _HasDirectory(const node_ref& nodeRef,
+			bool* _contained = NULL) const;
 		bool _CloserToPath(BEntry& entry) const;
+
 		void _NotifyTarget(BMessage* message) const;
+		void _NotifyTarget(BMessage* message, const node_ref& nodeRef) const;
+
 		status_t _AddDirectory(BEntry& entry);
 		status_t _AddDirectory(node_ref& nodeRef);
 		status_t _RemoveDirectory(const node_ref& nodeRef, ino_t directoryNode);
@@ -127,7 +141,7 @@ static BLooper* sLooper = NULL;
 
 
 static status_t
-set_entry(node_ref& nodeRef, const char* name, BEntry& entry)
+set_entry(const node_ref& nodeRef, const char* name, BEntry& entry)
 {
 	entry_ref ref;
 	ref.device = nodeRef.device;
@@ -142,11 +156,23 @@ set_entry(node_ref& nodeRef, const char* name, BEntry& entry)
 
 
 bool
+operator<(const FileEntry& a, const FileEntry& b)
+{
+	if (a.ref.device == b.ref.device && a.node < b.node)
+		return true;
+	if (a.ref.device < b.ref.device)
+		return true;
+
+	return false;
+}
+
+
+bool
 operator<(const node_ref& a, const node_ref& b)
 {
-	if (a.device < b.device)
-		return true;
 	if (a.device == b.device && a.node < b.node)
+		return true;
+	if (a.device < b.device)
 		return true;
 
 	return false;
@@ -209,29 +235,12 @@ PathHandler::InitCheck() const
 void
 PathHandler::Quit()
 {
-	// We are not allowed to lock the BLooper, or we could deadlock!
-	// So we will remove the handler from the looper in it's own thread
-	// and also delete us there by sending ourself a message. But this
-	// handler may possibly not be attached to it's looper any more. The
-	// BMessenger can check this in a thread safe way without locking
-	// the looper.
-	status_t status;
-	BMessenger toSelf(this, NULL, &status);
-	if (status == B_OK)
-		status = toSelf.SendMessage(B_QUIT_REQUESTED);
-
-	// TODO: Could there still be a race condition? What if the
-	// looper was right in it's destructor, sending the message may
-	// succeed, but it may still not arrive. The worst that happens
-	// though is that this object is leaked. But I do anticipate this
-	// case to only happen during the shutdown of an application, in
-	// which case the point is moot... Also note - one could introduce a
-	// reply for this message to know whether it arrived, but in the case
-	// the reply is wrong (default reply), one would still not know at
-	// which time the BLooper removes this handler without locking it.
-
-	if (status != B_OK)
-		delete this;
+	if (sLooper->Lock()) {
+		stop_watching(this);
+		sLooper->RemoveHandler(this);
+		sLooper->Unlock();
+	}
+	delete this;
 }
 
 
@@ -250,7 +259,7 @@ PathHandler::Dump()
 
 	FileSet::iterator j = fFiles.begin();
 	for (; j != fFiles.end(); j++) {
-		printf("  %ld:%Ld\n", j->device, j->node);
+		printf("  %ld:%Ld\n", j->ref.device, j->node);
 	}
 }
 #endif
@@ -294,16 +303,23 @@ PathHandler::_GetClosest(const char* path, bool updatePath, node_ref& nodeRef)
 
 
 bool
-PathHandler::_WatchRecursively()
+PathHandler::_WatchRecursively() const
 {
 	return (fFlags & B_WATCH_RECURSIVELY) != 0;
 }
 
 
 bool
-PathHandler::_WatchFilesOnly()
+PathHandler::_WatchFilesOnly() const
 {
 	return (fFlags & B_WATCH_FILES_ONLY) != 0;
+}
+
+
+bool
+PathHandler::_WatchFoldersOnly() const
+{
+	return (fFlags & B_WATCH_FOLDERS_ONLY) != 0;
 }
 
 
@@ -314,12 +330,16 @@ PathHandler::_EntryCreated(BMessage* message)
 	node_ref nodeRef;
 	if (message->FindInt32("device", &nodeRef.device) != B_OK
 		|| message->FindInt64("directory", &nodeRef.node) != B_OK
-		|| message->FindString("name", &name) != B_OK)
+		|| message->FindString("name", &name) != B_OK) {
+		TRACE("PathHandler::_EntryCreated() - malformed message!\n");
 		return;
+	}
 
 	BEntry entry;
-	if (set_entry(nodeRef, name, entry) != B_OK)
+	if (set_entry(nodeRef, name, entry) != B_OK) {
+		TRACE("PathHandler::_EntryCreated() - set_entry failed!\n");
 		return;
+	}
 
 	bool parentContained = false;
 	bool entryContained = _IsContained(entry);
@@ -331,8 +351,8 @@ PathHandler::_EntryCreated(BMessage* message)
 		// ignore the directory if it's already known
 		if (entry.GetNodeRef(&nodeRef) == B_OK
 			&& _HasDirectory(nodeRef)) {
-			TRACE(("    WE ALREADY HAVE DIR %s, %ld:%Ld\n",
-				name, nodeRef.device, nodeRef.node));
+			TRACE("    WE ALREADY HAVE DIR %s, %ld:%Ld\n",
+				name, nodeRef.device, nodeRef.node);
 			return;
 		}
 
@@ -342,14 +362,19 @@ PathHandler::_EntryCreated(BMessage* message)
 			|| _AddDirectory(entry) != B_OK
 			|| _WatchFilesOnly())
 			notify = parentContained;
+		// NOTE: entry is now toast after _AddDirectory() was called!
+		// Does not matter right now, but if it's a problem, use the node_ref
+		// version...
 	} else if (entryContained) {
-		TRACE(("  NEW ENTRY PARENT CONTAINED: %d\n", parentContained));
+		TRACE("  NEW ENTRY PARENT CONTAINED: %d\n", parentContained);
 		_AddFile(entry);
 	}
 
 	if (notify && entryContained) {
 		message->AddBool("added", true);
-		_NotifyTarget(message);
+		// nodeRef is pointing to the parent directory
+		entry.GetNodeRef(&nodeRef);
+		_NotifyTarget(message, nodeRef);
 	}
 }
 
@@ -364,21 +389,18 @@ PathHandler::_EntryRemoved(BMessage* message)
 		|| message->FindInt64("node", &nodeRef.node) != B_OK)
 		return;
 
-	bool notify = false;
-
-	if (_HasDirectory(nodeRef, &notify)) {
+	bool contained;
+	if (_HasDirectory(nodeRef, &contained)) {
 		// the directory has been removed, so we remove it as well
 		_RemoveDirectory(nodeRef, directoryNode);
-		if (_WatchFilesOnly())
-			notify = false;
+		if (contained && !_WatchFilesOnly()) {
+			message->AddBool("removed", true);
+			_NotifyTarget(message, nodeRef);
+		}
 	} else if (_HasFile(nodeRef)) {
-		_RemoveFile(nodeRef);
-		notify = true;
-	}
-
-	if (notify) {
 		message->AddBool("removed", true);
-		_NotifyTarget(message);
+		_NotifyTarget(message, nodeRef);
+		_RemoveFile(nodeRef);
 	}
 }
 
@@ -413,18 +435,19 @@ PathHandler::_EntryMoved(BMessage* message)
 		// something has been added to our watched directories
 
 		nodeRef.node = node;
-		TRACE(("    ADDED TO PARENT (%d), has entry %d/%d, entry %d %d\n",
+		TRACE("    ADDED TO PARENT (%d), has entry %d/%d, entry %d %d\n",
 			parentContained, _HasDirectory(nodeRef), _HasFile(nodeRef),
-			entryContained, _CloserToPath(entry)));
+			entryContained, _CloserToPath(entry));
 
 		if (entry.IsDirectory()) {
 			if (!_HasDirectory(nodeRef)
 				&& (entryContained || _CloserToPath(entry))) {
 				// there is a new directory to watch for us
 				if (entryContained
-					|| parentContained && !_WatchRecursively())
+					|| parentContained && !_WatchRecursively()) {
 					_AddDirectory(entry);
-				else if (_GetClosest(fPath.Path(), false,
+					// NOTE: entry is toast now!
+				} else if (_GetClosest(fPath.Path(), false,
 						nodeRef) == B_OK) {
 					// the new directory might put us even
 					// closer to the path we are after
@@ -464,7 +487,7 @@ PathHandler::_EntryMoved(BMessage* message)
 		if (wasRemoved)
 			message->AddBool("removed", true);
 
-		_NotifyTarget(message);
+		_NotifyTarget(message, nodeRef);
 	}
 }
 
@@ -499,28 +522,14 @@ PathHandler::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case B_QUIT_REQUESTED:
-		{
-			// Obviously the looper is still valid and running
-			// when we receive the message here, it is also currently
-			// locked, because it is processing the message.
-			BLooper* looper = Looper();
-
-			stop_watching(this);
-			looper->RemoveHandler(this);
-			delete this;
-
-			return;
-		}
-
 		default:
 			BHandler::MessageReceived(message);
 			break;
 	}
 
-#ifdef TRACE_PATH_MONITOR
-	Dump();
-#endif
+//#ifdef TRACE_PATH_MONITOR
+//	Dump();
+//#endif
 }
 
 
@@ -589,9 +598,51 @@ PathHandler::_CloserToPath(BEntry& entry) const
 void
 PathHandler::_NotifyTarget(BMessage* message) const
 {
+	// NOTE: This version is only used for B_STAT_CHANGED and B_ATTR_CHANGED
+	node_ref nodeRef;
+	if (message->FindInt32("device", &nodeRef.device) != B_OK
+		|| message->FindInt64("node", &nodeRef.node) != B_OK)
+		return;
+	_NotifyTarget(message, nodeRef);
+}
+
+
+void
+PathHandler::_NotifyTarget(BMessage* message, const node_ref& nodeRef) const
+{
 	BMessage update(*message);
 	update.what = B_PATH_MONITOR;
-	update.AddString("path", fPath.Path());
+
+	WatchedDirectory directory;
+	directory.node = nodeRef;
+
+	DirectorySet::const_iterator iterator = fDirectories.find(directory);
+	if (iterator != fDirectories.end()) {
+		if (_WatchFilesOnly()) {
+			// stat or attr notification for a directory
+			return;
+		}
+		BDirectory nodeDirectory(&nodeRef);
+		BEntry entry;
+		if (nodeDirectory.GetEntry(&entry) == B_OK) {
+			BPath path(&entry);
+			update.AddString("path", path.Path());
+		}
+	} else {
+		if (_WatchFoldersOnly()) {
+			// this is bound to be a notification for a file
+			return;
+		}
+		FileEntry setEntry;
+		setEntry.ref.device = nodeRef.device;
+		setEntry.node = nodeRef.node;
+			// name does not need to be set, since it's not used for comparing
+		FileSet::const_iterator i = fFiles.find(setEntry);
+		if (i != fFiles.end()) {
+			BPath path(&(i->ref));
+			update.AddString("path", path.Path());
+		}
+	}
 
 	fTarget.SendMessage(&update);
 }
@@ -615,6 +666,11 @@ PathHandler::_AddDirectory(BEntry& entry)
 
 	// check if we are already know this directory
 
+	// TODO: It should be possible to ommit this check if we know it
+	// can't be the case (for example when adding subfolders recursively,
+	// although in that case, the API user may still have added this folder
+	// independently, so for now, it should be the safest to perform this
+	// check in all cases.)
 	if (_HasDirectory(directory.node))
 		return B_OK;
 
@@ -631,6 +687,20 @@ PathHandler::_AddDirectory(BEntry& entry)
 		return status;
 
 	fDirectories.insert(directory);
+
+	if (_WatchRecursively()) {
+		BDirectory dir(&directory.node);
+		while (dir.GetNextEntry(&entry) == B_OK) {
+			if (entry.IsDirectory()) {
+				// and here is the recursion:
+				if (_AddDirectory(entry) != B_OK)
+					break;
+			} else if (!_WatchFoldersOnly()) {
+				if (_AddFile(entry) != B_OK)
+					break;
+			}
+		}
+	}
 
 #if 0
 	BEntry parent;
@@ -662,7 +732,7 @@ PathHandler::_AddDirectory(node_ref& nodeRef)
 status_t
 PathHandler::_RemoveDirectory(const node_ref& nodeRef, ino_t directoryNode)
 {
-	TRACE(("  REMOVE DIRECTORY %ld:%Ld\n", nodeRef.device, nodeRef.node));
+	TRACE("  REMOVE DIRECTORY %ld:%Ld\n", nodeRef.device, nodeRef.node);
 
 	WatchedDirectory directory;
 	directory.node = nodeRef;
@@ -686,6 +756,10 @@ PathHandler::_RemoveDirectory(const node_ref& nodeRef, ino_t directoryNode)
 	}
 
 	fDirectories.erase(iterator);
+
+	// TODO: stop watching subdirectories and their files when in recursive
+	// mode!
+
 	return B_OK;
 }
 
@@ -705,7 +779,11 @@ PathHandler::_RemoveDirectory(BEntry& entry, ino_t directoryNode)
 bool
 PathHandler::_HasFile(const node_ref& nodeRef) const
 {
-	FileSet::const_iterator iterator = fFiles.find(nodeRef);
+	FileEntry setEntry;
+	setEntry.ref.device = nodeRef.device;
+	setEntry.node = nodeRef.node;
+		// name does not need to be set, since it's not used for comparing
+	FileSet::const_iterator iterator = fFiles.find(setEntry);
 	return iterator != fFiles.end();
 }
 
@@ -730,6 +808,11 @@ PathHandler::_AddFile(BEntry& entry)
 
 	// check if we are already know this file
 
+	// TODO: It should be possible to ommit this check if we know it
+	// can't be the case (for example when adding subfolders recursively,
+	// although in that case, the API user may still have added this file
+	// independently, so for now, it should be the safest to perform this
+	// check in all cases.)
 	if (_HasFile(nodeRef))
 		return B_OK;
 
@@ -737,7 +820,11 @@ PathHandler::_AddFile(BEntry& entry)
 	if (status != B_OK)
 		return status;
 
-	fFiles.insert(nodeRef);
+	FileEntry setEntry;
+	entry.GetRef(&setEntry.ref);
+	setEntry.node = nodeRef.node;
+
+	fFiles.insert(setEntry);
 	return B_OK;
 }
 
@@ -745,9 +832,13 @@ PathHandler::_AddFile(BEntry& entry)
 status_t
 PathHandler::_RemoveFile(const node_ref& nodeRef)
 {
-	TRACE(("  REMOVE FILE %ld:%Ld\n", nodeRef.device, nodeRef.node));
+	TRACE("  REMOVE FILE %ld:%Ld\n", nodeRef.device, nodeRef.node);
 
-	FileSet::iterator iterator = fFiles.find(nodeRef);
+	FileEntry setEntry;
+	setEntry.ref.device = nodeRef.device;
+	setEntry.node = nodeRef.node;
+		// name does not need to be set, since it's not used for comparing
+	FileSet::iterator iterator = fFiles.find(setEntry);
 	if (iterator == fFiles.end())
 		return B_ENTRY_NOT_FOUND;
 
@@ -829,27 +920,16 @@ BPathMonitor::_InitLooperIfNeeded()
 
 
 /*static*/ status_t
-BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target,
-	BLooper* looper)
+BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target)
 {
 	status_t status = _InitLockerIfNeeded();
 	if (status != B_OK)
 		return status;
 
-	// Check which BLooper should be used to receive node monitoring messages.
-	// If no looper is given, prefer the BApplication if it is running,
-	// otherwise use a global BLooper just for node monitoring.
-	if (looper == NULL) {
-		if (be_app)
-			looper = be_app;
-		else {
-			// only use the global looper if no BApplication is running
-			status = _InitLooperIfNeeded();
-			if (status < B_OK)
-				return status;
-			looper = sLooper;
-		}
-	}
+	// use the global looper for receiving node monitor notifications
+	status = _InitLooperIfNeeded();
+	if (status < B_OK)
+		return status;
 
 	BAutolock _(sLocker);
 
@@ -859,7 +939,7 @@ BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target,
 		watcher = iterator->second;
 
 	PathHandler* handler = new (nothrow) PathHandler(path, flags, target,
-		looper);
+		sLooper);
 	if (handler == NULL)
 		return B_NO_MEMORY;
 	status = handler->InitCheck();
