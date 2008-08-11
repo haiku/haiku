@@ -28,6 +28,9 @@ public:
 			void				EntryRemoved(const char* path);
 			void				EntryChanged(const char* path);
 
+			bool				IsEmpty() const;
+			void				PrintToStream() const;
+
 private:
 	typedef HashMap<HashString, uint32> PathMap;
 	enum {
