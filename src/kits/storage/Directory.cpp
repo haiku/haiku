@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc.
+ * Copyright 2002-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -82,7 +82,7 @@ BDirectory::BDirectory(const BEntry *entry)
 // constructor
 /*! \brief Creates a BDirectory and initializes it to the directory referred
 	to by the supplied path name.
-	\param path the directory's path name 
+	\param path the directory's path name
 */
 BDirectory::BDirectory(const char *path)
 	:
@@ -175,7 +175,7 @@ BDirectory::SetTo(const entry_ref *ref)
 status_t
 BDirectory::SetTo(const node_ref *nref)
 {
-	Unset();	
+	Unset();
 	status_t error = (nref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		entry_ref ref(nref->device, nref->node, ".");
@@ -230,7 +230,7 @@ BDirectory::SetTo(const BEntry *entry)
 // SetTo
 /*! \brief Re-initializes the BDirectory to the directory referred to by the
 	supplied path name.
-	\param path the directory's path name 
+	\param path the directory's path name
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a path.
@@ -426,7 +426,7 @@ BDirectory::FindEntry(const char *path, BEntry *entry, bool traverse) const
 	If the BDirectory is not properly initialized, the method returns \c false.
 	A non-absolute path is considered relative to the current directory.
 
-	\note R5's implementation always returns \c true given an absolute path or 
+	\note R5's implementation always returns \c true given an absolute path or
 	an unitialized directory. This implementation is not compatible with that
 	behavior. Instead it converts the path into a BEntry and passes it to the
 	other version of Contains().
@@ -486,41 +486,29 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 	if (entry == NULL || !entry->Exists() || InitCheck() != B_OK)
 		return false;
 
-	bool result = true;
-
-	// test the node kind
-	switch (nodeFlags) {
-		case B_FILE_NODE:
+	if (nodeFlags != B_ANY_NODE) {
+		// test the node kind
+		bool result = false;
+		if ((nodeFlags & B_FILE_NODE) != 0)
 			result = entry->IsFile();
-			break;
-		case B_DIRECTORY_NODE:
+		if (!result && (nodeFlags & B_DIRECTORY_NODE) != 0)
 			result = entry->IsDirectory();
-			break;
-		case B_SYMLINK_NODE:
+		if (!result && (nodeFlags & B_SYMLINK_NODE) != 0)
 			result = entry->IsSymLink();
-			break;
-		case B_ANY_NODE:
-			break;
-
-		default:
-			result = false;
-			break;
+		if (!result)
+			return false;
 	}
 
 	// If the directory is initialized, get the canonical paths of the dir and
 	// the entry and check, if the latter is a prefix of the first one.
-	if (result) {
-		BPath dirPath(this, ".", true);
-		BPath entryPath(entry);
-		if (dirPath.InitCheck() == B_OK && entryPath.InitCheck() == B_OK) {
-			result = !strncmp(dirPath.Path(), entryPath.Path(),
-				strlen(dirPath.Path()));
-		} else
-			result = false;
-	}
+	BPath dirPath(this, ".", true);
+	BPath entryPath(entry);
+	if (dirPath.InitCheck() == B_OK && entryPath.InitCheck() != B_OK)
+		return false;
 
-	return result;
+	return !strncmp(dirPath.Path(), entryPath.Path(), strlen(dirPath.Path()));
 }
+
 
 // GetStatFor
 /*!	\brief Returns the stat structure of the entry referred to by the supplied
