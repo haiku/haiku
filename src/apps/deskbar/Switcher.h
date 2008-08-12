@@ -46,7 +46,7 @@ class TIconView;
 class TBox;
 class TWindowView;
 class TSwitcherWindow;
-struct window_info;
+struct client_window_info;
 
 class TSwitchManager : public BHandler {
 	public:
@@ -65,11 +65,11 @@ class TSwitchManager : public BHandler {
 
 		void QuitApp();
 		void HideApp();
-		void CycleApp(bool forward, bool activate = false);	
-		void CycleWindow(bool forward, bool wrap = true);	
-		void SwitchToApp(int32 prevIndex, int32 newIndex, bool forward);	
+		void CycleApp(bool forward, bool activate = false);
+		void CycleWindow(bool forward, bool wrap = true);
+		void SwitchToApp(int32 prevIndex, int32 newIndex, bool forward);
 
-		window_info *WindowInfo(int32 groupIndex, int32 wdIndex);
+		client_window_info* WindowInfo(int32 groupIndex, int32 windowIndex);
 		int32 CountWindows(int32 groupIndex, bool inCurrentWorkspace = false);
 		TTeamGroup *FindTeam(team_id, int32 *index);
 
@@ -80,11 +80,16 @@ class TSwitchManager : public BHandler {
 		void SwitchWindow(team_id team, bool forward, bool activate);
 		bool ActivateApp(bool forceShow, bool allowWorkspaceSwitch);
 		void ActivateWindow(int32 windowID = -1);
+#ifdef __HAIKU__
+		void _SortApps();
+		status_t _GetSortedWindowTokens(int32** _tokens, int32* _count);
+#endif
 
 		TSwitcherWindow	*fWindow;
 		sem_id fMainMonitor;
 		bool fBlock;
 		bigtime_t fSkipUntil;
+		bigtime_t fLastSwitch;
 		BList fGroupList;
 		int32 fCurrentIndex;
 		int32 fCurrentWindow;

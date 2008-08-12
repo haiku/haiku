@@ -69,8 +69,11 @@ TWindowMenu::WindowShouldBeListed(uint32 behavior)
 
 
 TWindowMenu::TWindowMenu(const BList *team, const char *signature)
-	:	BMenu("Deskbar Team Menu"), fTeam(team), 
-		fApplicationSignature(signature), fExpanded(false), fExpandedIndex(0)
+	: BMenu("Deskbar Team Menu"),
+	fTeam(team),
+	fApplicationSignature(signature),
+	fExpanded(false),
+	fExpandedIndex(0)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -80,11 +83,11 @@ void
 TWindowMenu::AttachedToWindow()
 {
 	SetFont(be_plain_font);
-	
+
 	RemoveItems(0, CountItems(), true);
-	
+
 	int32 miniCount = 0;
-	
+
 	bool dragging = false;
 	TBarView *barview =(static_cast<TBarApp *>(be_app))->BarView();
 	if (barview && barview->LockLooper()) {
@@ -92,7 +95,7 @@ TWindowMenu::AttachedToWindow()
 		//		invoke in MouseEnter in ExpandoMenuBar
 		dragging = barview->Dragging();
 		if (dragging) {
-			// We don't want to show the menu when dragging, but it's not 
+			// We don't want to show the menu when dragging, but it's not
 			// possible to remove a submenu once it exists, so we simply hide it
 			// Don't call BMenu::Hide(), it causes the menu to pop up every now
 			// and then.
@@ -106,24 +109,24 @@ TWindowMenu::AttachedToWindow()
 		}
 		barview->UnlockLooper();
 	}
-	
+
 	int32 parentMenuItems = 0;
-	
+
 	int32 numTeams = fTeam->CountItems();
 	for (int32 i = 0; i < numTeams; i++) {
 		team_id	theTeam = (team_id)fTeam->ItemAt(i);
 		int32 count = 0;
 		int32 *tokens = get_token_list(theTeam, &count);
-		
+
 		for (int32 j = 0; j < count; j++) {
-			window_info *wInfo = get_window_info(tokens[j]);
+			client_window_info *wInfo = get_window_info(tokens[j]);
 			if (wInfo == NULL)
 				continue;
 
-			if (WindowShouldBeListed(wInfo->w_type)
+			if (WindowShouldBeListed(wInfo->feel)
 				&& (wInfo->show_hide_level <= 0 || wInfo->is_mini)) {
-				// Don't add new items if we're expanded. We've already done this,
-				// they've just been moved.
+				// Don't add new items if we're expanded. We've already done
+				// this, they've just been moved.
 				int32 numItems = CountItems();
 				int32 addIndex = 0;
 				for (; addIndex < numItems; addIndex++)
@@ -131,8 +134,9 @@ TWindowMenu::AttachedToWindow()
 						break;
 
 				if (!fExpanded) {
-					TWindowMenuItem *item = new TWindowMenuItem(wInfo->name, wInfo->id, 
-						wInfo->is_mini, ((1 << current_workspace()) & wInfo->workspaces) != 0,
+					TWindowMenuItem *item = new TWindowMenuItem(wInfo->name,
+						wInfo->server_token, wInfo->is_mini,
+						((1 << current_workspace()) & wInfo->workspaces) != 0,
 						dragging);
 
 					// disable app's window dropping for now
@@ -141,14 +145,18 @@ TWindowMenu::AttachedToWindow()
 
 					AddItem(item, addIndex);
 				} else {
-					TTeamMenuItem *parentItem = static_cast<TTeamMenuItem *>(Superitem());
-					if (parentItem->ExpandedWindowItem(wInfo->id)) {
-						TWindowMenuItem *item = parentItem->ExpandedWindowItem(wInfo->id);
+					TTeamMenuItem *parentItem
+						= static_cast<TTeamMenuItem *>(Superitem());
+					if (parentItem->ExpandedWindowItem(wInfo->server_token)) {
+						TWindowMenuItem *item = parentItem->ExpandedWindowItem(
+							wInfo->server_token);
 						if (item == NULL)
 							continue;
 
-						item->SetTo(wInfo->name, wInfo->id, wInfo->is_mini,
-							((1 << current_workspace()) & wInfo->workspaces) != 0, dragging);
+						item->SetTo(wInfo->name, wInfo->server_token,
+							wInfo->is_mini,
+							((1 << current_workspace()) & wInfo->workspaces)
+								!= 0, dragging);
 						parentMenuItems++;
 					}
 				}
@@ -186,12 +194,12 @@ TWindowMenu::AttachedToWindow()
 				new TShowHideMenuItem("Show All", fTeam, B_BRING_TO_FRONT);
 			TShowHideMenuItem* close =
 				new TShowHideMenuItem("Close All", fTeam, B_QUIT_REQUESTED);
-	
+
 			if (miniCount == itemCount)
 				hide->SetEnabled(false);
 			else if (miniCount == 0)
 				show->SetEnabled(false);
-			
+
 			if (!parentMenuItems)
 				AddSeparatorItem();
 			AddItem(hide);
@@ -199,7 +207,7 @@ TWindowMenu::AttachedToWindow()
 			AddItem(close);
 		}
 	}
-	
+
 	BMenu::AttachedToWindow();
 }
 
@@ -211,12 +219,12 @@ TWindowMenu::DetachedFromWindow()
 	// thus, it needs to be called from here
 	TBarView *barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
 	if (barview && barview->Expando() && barview->Dragging() && barview->LockLooper()) {
-		// We changed the show level in AttachedToWindow().  Undo it.			
+		// We changed the show level in AttachedToWindow().  Undo it.
 		Window()->Show();
-		barview->DragStop();	
+		barview->DragStop();
 		barview->UnlockLooper();
 	}
-	
+
 	BMenu::DetachedFromWindow();
 }
 

@@ -42,6 +42,9 @@ All rights reserved.
 #include <MenuItem.h>
 #include <String.h>
 
+#ifdef __HAIKU__
+#	include <WindowInfo.h>
+#endif
 
 class BBitmap;
 
@@ -68,7 +71,7 @@ class TWindowMenuItem : public BMenuItem {
 		virtual status_t Invoke(BMessage *message = NULL);
 		virtual void Draw();
 
-	private: 
+	private:
 		int32			fID;
 		bool			fMini;
 		bool			fCurrentWorkSpace;
@@ -83,6 +86,7 @@ class TWindowMenuItem : public BMenuItem {
 		BString			fFullTitle;
 };
 
+#ifndef __HAIKU__
 /****************************************************************************
 ** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING **
 **                                                                         **
@@ -105,9 +109,9 @@ class TWindowMenuItem : public BMenuItem {
 ****************************************************************************/
 
 // from interface_defs.h
-struct window_info {
+struct client_window_info {
 	team_id		team;
-	int32   	id;	  		  /* window's token */
+	int32   	server_token;
 
 	int32		thread;
 	int32		client_token;
@@ -115,8 +119,8 @@ struct window_info {
 	uint32		workspaces;
 
 	int32		layer;
-	uint32	  	w_type;		/* B_TITLED_WINDOW, etc. */
-	uint32		flags;	  	  /* B_WILL_FLOAT, etc. */
+	uint32	  	feel;
+	uint32		flags;
 	int32		window_left;
 	int32		window_top;
 	int32		window_right;
@@ -133,12 +137,12 @@ enum window_action {
 };
 
 // from interface_misc.h
-void		do_window_action(int32 window_id, int32 action, 
-							 BRect zoomRect, bool zoom);
-window_info	*get_window_info(int32 a_token);
-int32		*get_token_list(team_id app, int32 *count);
+void do_window_action(int32 window_id, int32 action, BRect zoomRect, bool zoom);
+client_window_info *get_window_info(int32 token);
+int32* get_token_list(team_id app, int32 *count);
 void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
 void do_bring_to_front_team(BRect zoomRect, team_id app, bool zoom);
 
+#endif	// !__HAIKU__
 
-#endif /* WINDOWMENUITEM_H */
+#endif	/* WINDOWMENUITEM_H */

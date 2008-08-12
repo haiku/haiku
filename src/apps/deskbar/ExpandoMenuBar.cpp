@@ -85,7 +85,7 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView *bar, BRect frame, const char *name,
 	fLastClickTime = 0;
 #endif
 
-	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);	
+	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 	SetFont(be_plain_font);
 	SetMaxContentWidth(kMinimumWindowWidth);
 }
@@ -109,13 +109,13 @@ TExpandoMenuBar::AttachedToWindow()
 	float height = -1.0f;
 
 	// top or bottom mode, add be menu and sep for menubar tracking consistency
-	if (!fVertical) {	
+	if (!fVertical) {
 		TBeMenu *beMenu = new TBeMenu(fBarView);
 		TBarWindow::SetBeMenu(beMenu);
  		fBeMenuItem = new TBarMenuTitle(kBeMenuWidth, Frame().Height(),
  			AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_BeLogoIcon), beMenu, true);
 		AddItem(fBeMenuItem);
-		
+
 		fSeparatorItem = new TTeamMenuItem(kSepItemWidth, height, fVertical);
 		AddItem(fSeparatorItem);
 		fSeparatorItem->SetEnabled(false);
@@ -126,7 +126,7 @@ TExpandoMenuBar::AttachedToWindow()
 	}
 
 	desk_settings *settings = ((TBarApp *)be_app)->Settings();
-	
+
 	if (settings->sortRunningApps)
 		teamList.SortItems(CompareByName);
 
@@ -137,11 +137,11 @@ TExpandoMenuBar::AttachedToWindow()
 			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
 			if (settings->trackerAlwaysFirst
 				&& !strcmp(barInfo->sig, kTrackerSignature)) {
-				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon, 
+				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
 					barInfo->name, barInfo->sig, width, height,
 					fDrawLabel, fVertical), fFirstApp);
 			} else {
-				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon, 
+				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon,
 					barInfo->name, barInfo->sig, width, height,
 					fDrawLabel, fVertical));
 			}
@@ -151,7 +151,7 @@ TExpandoMenuBar::AttachedToWindow()
 			barInfo->name = NULL;
 			barInfo->sig = NULL;
 		}
-		
+
 		delete barInfo;
 	}
 
@@ -262,8 +262,8 @@ TExpandoMenuBar::MessageReceived(BMessage *message)
 				break;
 
 			TShowHideMenuItem::TeamShowHideCommon(B_MINIMIZE_WINDOW,
-				item->Teams(), 
-				item->Menu()->ConvertToScreen(item->Frame()), 
+				item->Teams(),
+				item->Menu()->ConvertToScreen(item->Frame()),
 				true);
 			break;
 		}
@@ -318,7 +318,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 				}
 
 				return;
-			}		
+			}
 		}
 	}
 
@@ -331,8 +331,8 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		if (item->Frame().Contains(where)) {
 			bigtime_t clickSpeed = 0;
 			get_click_speed(&clickSpeed);
-			if ( (fLastClickItem == i) && 
-				 (clickSpeed > (system_time() - fLastClickTime)) ) {
+			if (fLastClickItem == i
+				&& clickSpeed > system_time() - fLastClickTime) {
 				// bring this team's window to the front
 				BMessage showMessage(M_BRING_TEAM_TO_FRONT);
 				showMessage.AddInt32("itemIndex", i);
@@ -379,7 +379,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 				item->Draw();
 
 				// Absorb the message.
-				return; 
+				return;
 			}
 		}
 	}
@@ -390,7 +390,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 
 void
 TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
-{		
+{
 	if (!message) {
 		//	force a cleanup
 		fBarView->DragStop(true);
@@ -443,7 +443,7 @@ TExpandoMenuBar::InBeMenu(BPoint loc) const
 				}
 				return inBeMenu;
 			}
-		}					
+		}
 	}
 
 	return false;
@@ -527,7 +527,7 @@ TExpandoMenuBar::AddTeam(BList *team, BBitmap *icon, char *name, char *signature
 			item->ToggleExpandState(false);
 
 		fBarView->SizeWindow(BScreen(Window()).Frame());
-	} else 
+	} else
 		CheckItemSizes(1);
 
 	Window()->UpdateIfNeeded();
@@ -548,7 +548,7 @@ TExpandoMenuBar::AddTeam(team_id team, const char *signature)
 				break;
 			}
 		}
-	}	
+	}
 }
 
 
@@ -666,9 +666,9 @@ TExpandoMenuBar::DrawBackground(BRect)
 	int32 last = CountItems() - 1;
 	float start;
 
-	if (last >= 0) 
+	if (last >= 0)
 		start = ItemAt(last)->Frame().right + 1;
-	else 
+	else
 		start = 0;
 
 	if (!fVertical) {
@@ -689,9 +689,9 @@ void
 TExpandoMenuBar::CheckForSizeOverrun()
 {
 	BRect screenFrame = (BScreen(Window())).Frame();
-	if (fVertical) 
-		fIsScrolling = Window()->Frame().bottom > screenFrame.bottom;									
-	else 
+	if (fVertical)
+		fIsScrolling = Window()->Frame().bottom > screenFrame.bottom;
+	else
 		fIsScrolling = false;
 }
 
@@ -701,7 +701,7 @@ TExpandoMenuBar::SizeWindow()
 {
 	if (fVertical)
 		fBarView->SizeWindow(BScreen(Window()).Frame());
-	else 
+	else
 		CheckItemSizes(1);
 }
 
@@ -745,16 +745,20 @@ TExpandoMenuBar::monitor_team_windows(void *arg)
 						int32 *tokens = get_token_list(theTeam, &count);
 
 						for (int32 k = 0; k < count; k++) {
-							window_info *wInfo = get_window_info(tokens[k]);
+							client_window_info *wInfo
+								= get_window_info(tokens[k]);
 							if (wInfo == NULL)
 								continue;
 
-							if (TWindowMenu::WindowShouldBeListed(wInfo->w_type)
-								&& (wInfo->show_hide_level <= 0 || wInfo->is_mini)) {
+							if (TWindowMenu::WindowShouldBeListed(wInfo->feel)
+								&& (wInfo->show_hide_level <= 0
+									|| wInfo->is_mini)) {
 								// Check if we have a matching window item...
-								item = teamItem->ExpandedWindowItem(wInfo->id);
+								item = teamItem->ExpandedWindowItem(
+									wInfo->server_token);
 								if (item) {
-									item->SetTo(wInfo->name, wInfo->id, wInfo->is_mini,
+									item->SetTo(wInfo->name,
+										wInfo->server_token, wInfo->is_mini,
 										((1 << current_workspace()) & wInfo->workspaces) != 0);
 
 									if (strcmp(wInfo->name, item->Label()) != 0)
@@ -764,8 +768,8 @@ TExpandoMenuBar::monitor_team_windows(void *arg)
 										itemModified = true;
 								} else if (teamItem->IsExpanded()) {
 									// Add the item
-									item = new TWindowMenuItem(wInfo->name, wInfo->id, 
-										wInfo->is_mini,
+									item = new TWindowMenuItem(wInfo->name,
+										wInfo->server_token, wInfo->is_mini,
 										((1 << current_workspace()) & wInfo->workspaces) != 0,
 										false);
 									item->ExpandedItem(true);
@@ -775,11 +779,11 @@ TExpandoMenuBar::monitor_team_windows(void *arg)
 							}
 							free(wInfo);
 						}
-						free(tokens);							
+						free(tokens);
 					}
 				}
 			}
-	
+
 			// Remove any remaining items which require an update.
 			for (int32 i = 0; i < totalItems; i++) {
 				if (!teamMenu->SubmenuAt(i)){
@@ -788,19 +792,19 @@ TExpandoMenuBar::monitor_team_windows(void *arg)
 						item = static_cast<TWindowMenuItem *>(teamMenu->RemoveItem(i));
 						delete item;
 						totalItems--;
-	
+
 						resize = true;
 					}
 				}
 			}
-	
+
 			// If any of the WindowMenuItems changed state, we need to force a repaint.
 			if (itemModified || resize) {
 				teamMenu->Invalidate();
 				if (resize)
 					teamMenu->SizeWindow();
 			}
-	
+
 			teamMenu->Window()->Unlock();
 		}
 

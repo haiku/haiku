@@ -3,9 +3,7 @@ SubDir HAIKU_TOP src apps deskbar ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders app ;
-UsePrivateHeaders shared ;
-UsePrivateHeaders tracker ;
+UsePrivateHeaders app interface shared tracker ;
 SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 AddResources Deskbar : Deskbar.rdef icon-freelogo.rdef icons.rdef ;
