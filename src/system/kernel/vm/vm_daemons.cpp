@@ -168,7 +168,12 @@ free_page_swap_space(int32 index)
 			&& page->cache->HasPage(page->cache_offset << PAGE_SHIFT)
 			&& page->usage_count > 0) {
 		// TODO: how to judge a page is highly active?
-		return swap_free_page_swap_space(page);
+		if (swap_free_page_swap_space(page)) {
+			// We need to mark the page modified, since otherwise it could be
+			// stolen and we'd lose its data.
+			vm_page_set_state(page, PAGE_STATE_MODIFIED);
+			return true;
+		}
 	}
 	return false;
 }
