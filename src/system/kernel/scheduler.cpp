@@ -34,12 +34,27 @@
 #if SCHEDULER_TRACING
 namespace SchedulerTracing {
 
-class EnqueueThread : public AbstractTraceEntry {
+class SchedulerTraceEntry : public AbstractTraceEntry {
+public:
+	SchedulerTraceEntry(struct thread* thread)
+		:
+		fID(thread->id)
+	{
+	}
+
+	thread_id ThreadID() const	{ return fID; }
+
+protected:
+	thread_id			fID;
+};
+
+
+class EnqueueThread : public SchedulerTraceEntry {
 public:
 	EnqueueThread(struct thread* thread, struct thread* previous,
 			struct thread* next)
 		:
-		fID(thread->id),
+		SchedulerTraceEntry(thread),
 		fPreviousID(-1),
 		fNextID(-1),
 		fPriority(thread->priority)
@@ -60,18 +75,18 @@ public:
 	}
 
 private:
-	thread_id			fID;
 	thread_id			fPreviousID;
 	thread_id			fNextID;
 	char*				fName;
 	uint8				fPriority;
 };
 
-class RemoveThread : public AbstractTraceEntry {
+
+class RemoveThread : public SchedulerTraceEntry {
 public:
 	RemoveThread(struct thread* thread)
 		:
-		fID(thread->id),
+		SchedulerTraceEntry(thread),
 		fPriority(thread->priority)
 	{
 		Initialized();
@@ -83,15 +98,15 @@ public:
 	}
 
 private:
-	thread_id			fID;
 	uint8				fPriority;
 };
 
-class ScheduleThread : public AbstractTraceEntry {
+
+class ScheduleThread : public SchedulerTraceEntry {
 public:
 	ScheduleThread(struct thread* thread, struct thread* previous)
 		:
-		fID(thread->id),
+		SchedulerTraceEntry(thread),
 		fPreviousID(previous->id),
 		fCPU(previous->cpu->cpu_num),
 		fPriority(thread->priority)
@@ -107,8 +122,9 @@ public:
 			fName, fPriority, fPreviousID, fCPU);
 	}
 
+	thread_id PreviousThreadID() const	{ return fPreviousID; }
+
 private:
-	thread_id			fID;
 	thread_id			fPreviousID;
 	int32				fCPU;
 	char*				fName;
@@ -159,6 +175,214 @@ dump_run_queue(int argc, char **argv)
 
 	return 0;
 }
+
+
+#if SCHEDULER_TRACING
+
+static int
+cmd_scheduler(int argc, char** argv)
+{
+	using namespace SchedulerTracing;
+
+	int64 threadID;
+	if (argc != 2
+		|| !evaluate_debug_expression(argv[1], (uint64*)&threadID, true)) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	if (threadID <= 0) {
+		kprintf("Invalid thread ID: %lld\n", threadID);
+		return 0;
+	}
+
+	enum ScheduleState {
+		RUNNING,
+		STILL_RUNNING,
+		PREEMPTED,
+		READY,
+		WAITING,
+		UNKNOWN
+	};
+
+	ScheduleState state = UNKNOWN;
+	bigtime_t lastTime = 0;
+
+	int64 runs = 0;
+	bigtime_t totalRunTime = 0;
+	bigtime_t minRunTime = -1;
+	bigtime_t maxRunTime = -1;
+
+	int64 latencies = 0;
+	bigtime_t totalLatency = 0;
+	bigtime_t minLatency = -1;
+	bigtime_t maxLatency = -1;
+	int32 maxLatencyEntry = -1;
+
+	int64 reruns = 0;
+	bigtime_t totalRerunTime = 0;
+	bigtime_t minRerunTime = -1;
+	bigtime_t maxRerunTime = -1;
+	int32 maxRerunEntry = -1;
+
+	int64 preemptions = 0;
+
+	TraceEntryIterator iterator;
+	while (TraceEntry* _entry = iterator.Next()) {
+		if (dynamic_cast<SchedulerTraceEntry*>(_entry) == NULL)
+			continue;
+
+		if (ScheduleThread* entry = dynamic_cast<ScheduleThread*>(_entry)) {
+			if (entry->ThreadID() == threadID) {
+				// thread scheduled
+				bigtime_t diffTime = entry->Time() - lastTime;
+
+				if (state == READY) {
+					// thread scheduled after having been woken up
+					latencies++;
+					totalLatency += diffTime;
+					if (minLatency < 0 || diffTime < minLatency)
+						minLatency = diffTime;
+					if (diffTime > maxLatency) {
+						maxLatency = diffTime;
+						maxLatencyEntry = iterator.Index();
+					}
+				} else if (state == PREEMPTED) {
+					// thread scheduled after having been preempted before
+					reruns++;
+					totalRerunTime += diffTime;
+					if (minRerunTime < 0 || diffTime < minRerunTime)
+						minRerunTime = diffTime;
+					if (diffTime > maxRerunTime) {
+						maxRerunTime = diffTime;
+						maxRerunEntry = iterator.Index();
+					}
+				}
+
+				if (state == STILL_RUNNING) {
+					// Thread was running and continues to run.
+					state = RUNNING;
+				}
+
+				if (state != RUNNING) {
+					lastTime = entry->Time();
+					state = RUNNING;
+				}
+			} else if (entry->PreviousThreadID() != threadID) {
+				// thread unscheduled
+				bigtime_t diffTime = entry->Time() - lastTime;
+
+				if (state == STILL_RUNNING) {
+					// thread preempted
+					state = PREEMPTED;
+
+					runs++;
+					preemptions++;
+					totalRunTime += diffTime;
+					if (minRunTime < 0 || diffTime < minRunTime)
+						minRunTime = diffTime;
+					if (diffTime > maxRunTime)
+						maxRunTime = diffTime;
+				} else if (state == RUNNING) {
+					// thread starts waiting (it hadn't been added to the run
+					// queue before being unscheduled)
+					bigtime_t diffTime = entry->Time() - lastTime;
+					runs++;
+					totalRunTime += diffTime;
+					if (minRunTime < 0 || diffTime < minRunTime)
+						minRunTime = diffTime;
+					if (diffTime > maxRunTime)
+						maxRunTime = diffTime;
+
+					state = WAITING;
+				}
+			}
+		} else if (EnqueueThread* entry
+				= dynamic_cast<EnqueueThread*>(_entry)) {
+			if (entry->ThreadID() != threadID)
+				continue;
+
+			// thread enqueued in run queue
+
+			if (state == RUNNING || state == STILL_RUNNING) {
+				// Thread was running and is reentered into the run queue. This
+				// is done by the scheduler, if the next thread remains ready.
+				state = STILL_RUNNING;
+			} else {
+				// Thread was waiting and is ready now.
+				lastTime = entry->Time();
+				state = READY;
+			}
+		} else if (RemoveThread* entry = dynamic_cast<RemoveThread*>(_entry)) {
+			if (entry->ThreadID() != threadID)
+				continue;
+
+			// thread removed from run queue
+
+			// This really only happens when the thread priority is changed
+			// while the thread is ready.
+
+			if (state == RUNNING) {
+				// This should never happen.
+				bigtime_t diffTime = entry->Time() - lastTime;
+				runs++;
+				totalRunTime += diffTime;
+				if (minRunTime < 0 || diffTime < minRunTime)
+					minRunTime = diffTime;
+				if (diffTime > maxRunTime)
+					maxRunTime = diffTime;
+			}
+
+			state = WAITING;
+		}
+	}
+
+	// print results
+	if (runs == 0) {
+		kprintf("thread %lld never ran.\n", threadID);
+		return 0;
+	}
+
+	kprintf("scheduling statistics for thread %lld:\n", threadID);
+	kprintf("runs:\n");
+	kprintf("  total #: %lld\n", runs);
+	kprintf("  total:   %lld us\n", totalRunTime);
+	kprintf("  average: %#.2f us\n", (double)totalRunTime / runs);
+	kprintf("  min:     %lld us\n", minRunTime);
+	kprintf("  max:     %lld us\n", maxRunTime);
+
+	if (latencies > 0) {
+		kprintf("scheduling latency after wake up:\n");
+		kprintf("  total #: %lld\n", latencies);
+		kprintf("  total:   %lld us\n", totalLatency);
+		kprintf("  average: %#.2f us\n", (double)totalLatency / latencies);
+		kprintf("  min:     %lld us\n", minLatency);
+		kprintf("  max:     %lld us\n", maxLatency);
+		kprintf("  max:     %lld us (at tracing entry %ld)\n", maxLatency,
+			maxLatencyEntry);
+	} else
+		kprintf("thread was never run after having been woken up\n");
+
+	if (reruns > 0) {
+		kprintf("scheduling latency after preemption:\n");
+		kprintf("  total #: %lld\n", reruns);
+		kprintf("  total:   %lld us\n", totalRerunTime);
+		kprintf("  average: %#.2f us\n", (double)totalRerunTime / reruns);
+		kprintf("  min:     %lld us\n", minRerunTime);
+		kprintf("  max:     %lld us (at tracing entry %ld)\n", maxRerunTime,
+			maxRerunEntry);
+	} else
+		kprintf("thread was never rerun after preemption\n");
+
+	if (preemptions > 0)
+		kprintf("thread was preempted %lld times\n", preemptions);
+	else
+		kprintf("thread was never preempted\n");
+
+	return 0;
+}
+
+#endif	// SCHEDULER_TRACING
 
 
 /*!	Enqueues the thread into the run queue.
@@ -386,7 +610,16 @@ scheduler_reschedule(void)
 void
 scheduler_init(void)
 {
-	add_debugger_command("run_queue", &dump_run_queue, "list threads in run queue");
+	add_debugger_command_etc("run_queue", &dump_run_queue,
+		"List threads in run queue", "\nLists threads in run queue", 0);
+
+#if SCHEDULER_TRACING
+	add_debugger_command_etc("scheduler", &cmd_scheduler,
+		"Analyze scheduler tracing information",
+		"<thread>\n"
+		"Analyzes scheduler tracing information for a given thread.\n"
+		"  <thread>  - ID of the thread.\n", 0);
+#endif
 }
 
 
@@ -404,5 +637,3 @@ scheduler_start(void)
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 }
-
-
