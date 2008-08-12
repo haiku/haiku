@@ -1240,7 +1240,7 @@ dump_thread_list(int argc, char **argv)
 				{
 					sem_id sem = (sem_id)(addr_t)thread->wait.object;
 					if (sem == thread->msg.read_sem)
-						kprintf("                     ");
+						kprintf("                    ");
 					else
 						kprintf("sem  %12ld   ", sem);
 					break;
@@ -1251,7 +1251,7 @@ dump_thread_list(int argc, char **argv)
 					break;
 
 				case THREAD_BLOCK_TYPE_SNOOZE:
-					kprintf("                   ");
+					kprintf("                    ");
 					break;
 
 				case THREAD_BLOCK_TYPE_SIGNAL:
