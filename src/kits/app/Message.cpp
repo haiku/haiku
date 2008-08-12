@@ -2355,30 +2355,30 @@ BMessage::AddRef(const char *name, const entry_ref *ref)
 status_t
 BMessage::AddMessage(const char *name, const BMessage *message)
 {
-	/* ToDo: This and the following functions waste time by allocating and
-	copying an extra buffer. Functions can be added that return a direct
-	pointer into the message. */
+	if (message == NULL)
+		return B_BAD_VALUE;
+
+	// TODO: This and the following functions waste time by allocating and
+	// copying an extra buffer. Functions can be added that return a direct
+	// pointer into the message.
 
 	char stackBuffer[16384];
 	ssize_t size = message->FlattenedSize();
 
-	bool freeBuffer = false;
 	char* buffer;
 	if (size > (ssize_t)sizeof(stackBuffer)) {
-		freeBuffer = true;
 		buffer = static_cast<char*>(malloc(size));
 		if (buffer == NULL)
 			return B_NO_MEMORY;
-	} else {
+	} else
 		buffer = stackBuffer;
-	}
 
 	status_t error = message->Flatten(buffer, size);
 
 	if (error >= B_OK)
 		error = AddData(name, B_MESSAGE_TYPE, buffer, size, false);
 
-	if (freeBuffer)
+	if (buffer != stackBuffer)
 		free(buffer);
 
 	return error;
@@ -2388,13 +2388,27 @@ BMessage::AddMessage(const char *name, const BMessage *message)
 status_t
 BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 {
+	if (object == NULL)
+		return B_BAD_VALUE;
+
+	char stackBuffer[16384];
 	ssize_t size = object->FlattenedSize();
-	char buffer[size];
+
+	char* buffer;
+	if (size > (ssize_t)sizeof(stackBuffer)) {
+		buffer = static_cast<char*>(malloc(size));
+		if (buffer == NULL)
+			return B_NO_MEMORY;
+	} else
+		buffer = stackBuffer;
 
 	status_t error = object->Flatten(buffer, size);
 
 	if (error >= B_OK)
 		error = AddData(name, object->TypeCode(), &buffer, size, false);
+
+	if (buffer != stackBuffer)
+		free(buffer);
 
 	return error;
 }
@@ -2425,6 +2439,9 @@ BMessage::FindString(const char *name, BString *string) const
 status_t
 BMessage::FindString(const char *name, int32 index, BString *string) const
 {
+	if (string == NULL)
+		return B_BAD_VALUE;
+
 	const char *cstr;
 	status_t error = FindString(name, index, &cstr);
 	if (error < B_OK)
@@ -2445,6 +2462,9 @@ BMessage::FindPointer(const char *name, void **pointer) const
 status_t
 BMessage::FindPointer(const char *name, int32 index, void **pointer) const
 {
+	if (pointer == NULL)
+		return B_BAD_VALUE;
+
 	void **data = NULL;
 	ssize_t size = 0;
 	status_t error = FindData(name, B_POINTER_TYPE, index,
@@ -2470,6 +2490,9 @@ status_t
 BMessage::FindMessenger(const char *name, int32 index, BMessenger *messenger)
 	const
 {
+	if (messenger == NULL)
+		return B_BAD_VALUE;
+
 	void *data = NULL;
 	ssize_t size = 0;
 	status_t error = FindData(name, B_MESSENGER_TYPE, index,
@@ -2494,6 +2517,9 @@ BMessage::FindRef(const char *name, entry_ref *ref) const
 status_t
 BMessage::FindRef(const char *name, int32 index, entry_ref *ref) const
 {
+	if (ref == NULL)
+		return B_BAD_VALUE;
+
 	void *data = NULL;
 	ssize_t size = 0;
 	status_t error = FindData(name, B_REF_TYPE, index,
@@ -2518,6 +2544,9 @@ BMessage::FindMessage(const char *name, BMessage *message) const
 status_t
 BMessage::FindMessage(const char *name, int32 index, BMessage *message) const
 {
+	if (message == NULL)
+		return B_BAD_VALUE;
+
 	void *data = NULL;
 	ssize_t size = 0;
 	status_t error = FindData(name, B_MESSAGE_TYPE, index,
@@ -2542,6 +2571,9 @@ BMessage::FindFlat(const char *name, BFlattenable *object) const
 status_t
 BMessage::FindFlat(const char *name, int32 index, BFlattenable *object) const
 {
+	if (object == NULL)
+		return B_BAD_VALUE;
+
 	void *data = NULL;
 	ssize_t numBytes = 0;
 	status_t error = FindData(name, object->TypeCode(), index,
@@ -2565,6 +2597,9 @@ BMessage::FindData(const char *name, type_code type, const void **data,
 status_t
 BMessage::ReplaceString(const char *name, const char *string)
 {
+	if (string == NULL)
+		return B_BAD_VALUE;
+
 	return ReplaceData(name, B_STRING_TYPE, 0, string, strlen(string) + 1);
 }
 
@@ -2572,6 +2607,9 @@ BMessage::ReplaceString(const char *name, const char *string)
 status_t
 BMessage::ReplaceString(const char *name, int32 index, const char *string)
 {
+	if (string == NULL)
+		return B_BAD_VALUE;
+
 	return ReplaceData(name, B_STRING_TYPE, index, string, strlen(string) + 1);
 }
 
@@ -2654,6 +2692,9 @@ BMessage::ReplaceMessage(const char *name, const BMessage *message)
 status_t
 BMessage::ReplaceMessage(const char *name, int32 index, const BMessage *message)
 {
+	if (message == NULL)
+		return B_BAD_VALUE;
+
 	ssize_t size = message->FlattenedSize();
 	char buffer[size];
 
@@ -2676,6 +2717,9 @@ BMessage::ReplaceFlat(const char *name, BFlattenable *object)
 status_t
 BMessage::ReplaceFlat(const char *name, int32 index, BFlattenable *object)
 {
+	if (object == NULL)
+		return B_BAD_VALUE;
+
 	ssize_t size = object->FlattenedSize();
 	char buffer[size];
 
