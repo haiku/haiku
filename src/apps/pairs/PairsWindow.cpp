@@ -3,10 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "PairsWindow.h"
+
 #include <stdio.h>
 
 #include <Application.h>
-#include <MessageRunner.h> 
+#include <MessageRunner.h>
 #include <Button.h>
 #include <Alert.h>
 #include <TextView.h>
@@ -14,7 +16,6 @@
 
 #include "Pairs.h"
 #include "PairsGlobal.h"
-#include "PairsWindow.h"
 #include "PairsView.h"
 #include "PairsTopButton.h"
 
@@ -50,24 +51,24 @@ void
 PairsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgCardButton:			
+		case kMsgCardButton:
 			if (fIsPairsActive) {
-				fButtonClicks = fButtonClicks + 1;
+				fButtonClicks++;
 
 				int32 num;
 				if (message->FindInt32("ButtonNum", &num) < B_OK)
 					break;
 
-				//look what Icon is behind a button
+				// look what Icon is behind a button
 				for (int h = 0; h < 16; h++) {
 					if (fPairsView->GetIconFromPos(h) == num) {
 						fPairCard = (h % 8);
 						fButton = fPairsView->GetIconFromPos(h);
 						break;
-					} 
+					}
 				}
 
-				//gameplay
+				// gameplay
 				fPairsView->fDeckCard[fButton]->Hide();
 
 				if (fIsFirstClick) {
@@ -84,9 +85,9 @@ PairsWindow::MessageReceived(BMessage* message)
 				}
 
 				fIsFirstClick = !fIsFirstClick;
-			}		
+			}
 			break;
-			
+
 			case kMsgPairComparing:
 				delete fPairComparing;
 				fPairComparing = NULL;
@@ -100,20 +101,20 @@ PairsWindow::MessageReceived(BMessage* message)
 					fPairsView->fDeckCard[fButtonTmp]->Show();
 				}
 
-				//game end and results
+				// game end and results
 				if (fFinishPairs == 8) {
 					BString strAbout;
-					strAbout 
+					strAbout
 						<< "Pairs\n"
 						<< "\twritten by Ralf Schülke\n"
 						<< "\tCopyright 2008, Haiku Inc.\n"
 						<< "\n"
-						<< "You completed the game in " << fButtonClicks + 1
+						<< "You completed the game in " << fButtonClicks
 						<< " clicks.\n";
-						
-					BAlert* alert = new BAlert("about", strAbout.String(), "New game",
-						"Quit game");
-				
+
+					BAlert* alert = new BAlert("about", strAbout.String(),
+						"New game", "Quit game");
+
 					BTextView* view = alert->TextView();
 					BFont font;
 
@@ -124,23 +125,21 @@ PairsWindow::MessageReceived(BMessage* message)
 					font.SetFace(B_BOLD_FACE);
 					view->SetFontAndColor(0, 6, &font);
 					view->ResizeToPreferred();
-				
+
 					if (alert->Go() == 0) {
-						//New game
+						// New game
 						fButtonClicks = 0;
 						fFinishPairs = 0;
 						fPairsView->CreateGameBoard();
 					} else {
-						//Quit game
+						// Quit game
 						be_app->PostMessage(B_QUIT_REQUESTED);
 					}
 				}
 				break;
-			
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
 }
-
-

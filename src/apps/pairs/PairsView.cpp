@@ -2,6 +2,7 @@
  * Copyright 2008, Ralf Schülke, teammaui@web.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 #include "PairsView.h"
 
 #include <stdio.h>
@@ -38,8 +39,8 @@ PairsView::PairsView(BRect frame, const char* name, uint32 resizingMode)
 }
 
 
-void 
-PairsView::CreateGameBoard() 
+void
+PairsView::CreateGameBoard()
 {
 	// Show hidden buttons
 	for (int32 i = 0; i < CountChildren(); i++) {
@@ -47,7 +48,7 @@ PairsView::CreateGameBoard()
 		if (child->IsHidden())
 			child->Show();
 	}
-	_GenarateCardPos();
+	_GenerateCardPos();
 }
 
 
@@ -55,7 +56,7 @@ PairsView::~PairsView()
 {
 	for (int i = 0; i < 8; i++)
 		delete fCard[i];
-			
+
 	for (int i = 0; i < 16; i++)
 		delete fDeckCard[i];
 }
@@ -133,8 +134,8 @@ PairsView::_ReadRandomIcons()
 		}
 	}
 
-	// pick eight random bitmaps from the ones we got in the list	
-	srand((unsigned)time(0)); 
+	// pick eight random bitmaps from the ones we got in the list
+	srand((unsigned)time(0));
 
 	for (int i = 0; i < 8; i++) {
 		int32 index = rand() % bitmaps.CountItems();
@@ -156,40 +157,40 @@ PairsView::_ReadRandomIcons()
 
 void
 PairsView::_SetPairsBoard()
-{	
+{
 	for (int i = 0; i < 16; i++) {
 		fButtonMessage = new BMessage(kMsgCardButton);
 		fButtonMessage->AddInt32("ButtonNum", i);
-		
+
 		int x =  i % 4 * (kBitmapSize + 10) + 10;
 		int y =  i / 4 * (kBitmapSize + 10) + 10;
-		
+
 		fDeckCard[i] = new TopButton(x, y, fButtonMessage);
 		AddChild(fDeckCard[i]);
-	}	
+	}
 }
 
 
 void
-PairsView::_GenarateCardPos()
+PairsView::_GenerateCardPos()
 {
 	_ReadRandomIcons();
 
-	srand((unsigned)time(0)); 
-	
-	int positions[16];	
+	srand((unsigned)time(0));
+
+	int positions[16];
 	for (int i = 0; i < 16; i++)
 		positions[i] = i;
-	
+
 	for (int i = 16; i >= 1; i--) {
 		int index = rand() % i;
 
 		fRandPos[16-i] = positions[index];
-		
+
 		for (int j = index; j < i - 1; j++)
 			positions[j] = positions[j + 1];
 	}
-	
+
 	for (int i = 0; i < 16; i++) {
 		fPosX[i] = (fRandPos[i]) % 4 * (kBitmapSize + 10) + 10;
 		fPosY[i] = (fRandPos[i]) / 4 * (kBitmapSize + 10) + 10;
@@ -201,17 +202,15 @@ void
 PairsView::Draw(BRect updateRect)
 {
 	SetDrawingMode(B_OP_ALPHA);
-	
+
 	// draw rand pair 1 & 2
 	for (int i = 0; i < 16; i++)
-		DrawBitmap(fCard[i % 8], BPoint(fPosX[i], fPosY[i]));	
+		DrawBitmap(fCard[i % 8], BPoint(fPosX[i], fPosY[i]));
 }
 
 
 int
 PairsView::GetIconFromPos(int pos)
-{	
-	return fRandPos[pos]; 
+{
+	return fRandPos[pos];
 }
-
-
