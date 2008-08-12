@@ -558,7 +558,13 @@ PathHandler::_IsContained(BEntry& entry) const
 	bool contained = strncmp(path.Path(), fPath.Path(), fPathLength) == 0;
 	if (!contained)
 		return false;
-	
+
+	// Prevent the case that the entry is in another folder which happens
+	// to have the same substring for fPathLength chars, like:
+	// /path/we/are/watching
+	// /path/we/are/watching-not/subfolder/entry
+	// NOTE: We wouldn't be here if path.Path() was shorter than fPathLength,
+	// strncmp() catches that case.
 	const char* last = &path.Path()[fPathLength];
 	if (last[0] && last[0] != '/')
 		return false;
