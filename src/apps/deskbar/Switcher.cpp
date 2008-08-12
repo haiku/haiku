@@ -2312,7 +2312,7 @@ TWindowView::Draw(BRect update)
 
 		if (stringWidth > maxWidth) {
 			// window title is too long, need to truncate
-			TruncateString(&title, B_TRUNCATE_END, maxWidth);
+			TruncateString(&title, B_TRUNCATE_MIDDLE, maxWidth);
 			stringWidth = maxWidth;
 		}
 

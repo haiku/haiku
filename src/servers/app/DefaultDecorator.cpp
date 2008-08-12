@@ -158,8 +158,8 @@ DefaultDecorator::SetTitle(const char* string, BRegion* updateRegion)
 
 
 void
-DefaultDecorator::SetLook(DesktopSettings& settings,
-	window_look look, BRegion* updateRegion)
+DefaultDecorator::SetLook(DesktopSettings& settings, window_look look,
+	BRegion* updateRegion)
 {
 	// TODO: we could be much smarter about the update region
 
@@ -350,7 +350,8 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 
 		if (fLook != kLeftTitledWindowLook && tabSize != fTabRect.Width()) {
 			fTabRect.right = fTabRect.left + tabSize;
-		} else if (fLook == kLeftTitledWindowLook && tabSize != fTabRect.Height()) {
+		} else if (fLook == kLeftTitledWindowLook
+			&& tabSize != fTabRect.Height()) {
 			fTabRect.bottom = fTabRect.top + tabSize;
 		}
 
@@ -387,7 +388,8 @@ DefaultDecorator::SetTabLocation(float location, BRegion* updateRegion)
 	if (location < 0)
 		location = 0;
 
-	float maxLocation = fRightBorder.right - fLeftBorder.left - fTabRect.Width();
+	float maxLocation
+		= fRightBorder.right - fLeftBorder.left - fTabRect.Width();
 	if (location > maxLocation)
 		location = maxLocation;
 
@@ -467,17 +469,21 @@ DefaultDecorator::Draw()
 
 void
 DefaultDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
-								int32* maxWidth, int32* maxHeight) const
+	int32* maxWidth, int32* maxHeight) const
 {
-	if (fTabRect.IsValid())
-		*minWidth = (int32)roundf(max_c(*minWidth, fMinTabSize - 2 * fBorderWidth));
-	if (fResizeRect.IsValid())
-		*minHeight = (int32)roundf(max_c(*minHeight, fResizeRect.Height() - fBorderWidth));
+	if (fTabRect.IsValid()) {
+		*minWidth = (int32)roundf(max_c(*minWidth,
+			fMinTabSize - 2 * fBorderWidth));
+	}
+	if (fResizeRect.IsValid()) {
+		*minHeight = (int32)roundf(max_c(*minHeight,
+			fResizeRect.Height() - fBorderWidth));
+	}
 }
 
 
 void
-DefaultDecorator::GetFootprint(BRegion *region)
+DefaultDecorator::GetFootprint(BRegion* region)
 {
 	STRACE(("DefaultDecorator: Get Footprint\n"));
 	// This function calculates the decorator's footprint in coordinates
@@ -556,8 +562,8 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 				|| fLook == B_FLOATING_WINDOW_LOOK
 				|| fLook == B_MODAL_WINDOW_LOOK
 				|| fLook == kLeftTitledWindowLook)) {
-			BRect temp(BPoint(fBottomBorder.right - 18, fBottomBorder.bottom - 18),
-				fBottomBorder.RightBottom());
+			BRect temp(BPoint(fBottomBorder.right - 18,
+				fBottomBorder.bottom - 18), fBottomBorder.RightBottom());
 			if (temp.Contains(pt))
 				return DEC_RESIZE;
 		}
@@ -1032,7 +1038,7 @@ DefaultDecorator::_DrawTitle(BRect r)
 		titlePos);
 }
 
-// _DrawZoom
+
 void
 DefaultDecorator::_DrawZoom(BRect rect)
 {
@@ -1050,7 +1056,7 @@ DefaultDecorator::_DrawZoom(BRect rect)
 	_DrawButtonBitmap(bitmap, rect);
 }
 
-// _SetFocus
+
 void
 DefaultDecorator::_SetFocus()
 {
@@ -1088,7 +1094,7 @@ DefaultDecorator::_SetColors()
 
 
 void
-DefaultDecorator::_DrawButtonBitmap(ServerBitmap *bitmap, BRect rect)
+DefaultDecorator::_DrawButtonBitmap(ServerBitmap* bitmap, BRect rect)
 {
 	if (bitmap == NULL)
 		return;
@@ -1108,7 +1114,7 @@ DefaultDecorator::_DrawButtonBitmap(ServerBitmap *bitmap, BRect rect)
 	\param down The rectangle should be drawn recessed or not
 */
 void
-DefaultDecorator::_DrawBlendedRect(DrawingEngine *engine, BRect rect,
+DefaultDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
 	bool down, bool focus)
 {
 	// Actually just draws a blended square
@@ -1153,7 +1159,7 @@ DefaultDecorator::_DrawBlendedRect(DrawingEngine *engine, BRect rect,
 		focus ? fFocusFrameColors[1] : fNonFocusFrameColors[1]);
 }
 
-// _GetButtonSizeAndOffset
+
 void
 DefaultDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
 	float* _size, float* _inset) const
@@ -1174,7 +1180,7 @@ DefaultDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
 	*_size = tabSize - 2 * *_offset + *_inset;
 }
 
-// _LayoutTabItems
+
 void
 DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 {
@@ -1220,14 +1226,14 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 		size = (fZoomRect.top - fCloseRect.bottom) - fTextOffset * 2 + inset;
 
 	fTruncatedTitle = Title();
-	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, size);
+	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_MIDDLE, size);
 	fTruncatedTitleLength = fTruncatedTitle.Length();
 }
 
 
-ServerBitmap *
+ServerBitmap*
 DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
-	int32 width, int32 height, DefaultDecorator *object)
+	int32 width, int32 height, DefaultDecorator* object)
 {
 	// TODO: the list of shared bitmaps is never freed
 	struct decorator_bitmap {
@@ -1236,16 +1242,16 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 		bool				focus;
 		int32				width;
 		int32				height;
-		UtilityBitmap *		bitmap;
-		decorator_bitmap *	next;
+		UtilityBitmap*		bitmap;
+		decorator_bitmap*	next;
 	};
 
 	static BLocker sBitmapListLock("decorator lock", true);
-	static decorator_bitmap *sBitmapList = NULL;
+	static decorator_bitmap* sBitmapList = NULL;
 	BAutolock locker(sBitmapListLock);
 
 	// search our list for a matching bitmap
-	decorator_bitmap *current = sBitmapList;
+	decorator_bitmap* current = sBitmapList;
 	while (current) {
 		if (current->item == item && current->down == down
 			&& current->focus == focus && current->width == width
@@ -1256,7 +1262,7 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 		current = current->next;
 	}
 
-	static BitmapDrawingEngine *sBitmapDrawingEngine = NULL;
+	static BitmapDrawingEngine* sBitmapDrawingEngine = NULL;
 
 	// didn't find any bitmap, create a new one
 	if (sBitmapDrawingEngine == NULL)
@@ -1294,13 +1300,13 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 		}
 	}
 
-	UtilityBitmap *bitmap = sBitmapDrawingEngine->ExportToBitmap(width, height,
+	UtilityBitmap* bitmap = sBitmapDrawingEngine->ExportToBitmap(width, height,
 		B_RGB32);
 	if (bitmap == NULL)
 		return NULL;
 
 	// bitmap ready, put it into the list
-	decorator_bitmap *entry = new(std::nothrow) decorator_bitmap;
+	decorator_bitmap* entry = new(std::nothrow) decorator_bitmap;
 	if (entry == NULL) {
 		delete bitmap;
 		return NULL;
