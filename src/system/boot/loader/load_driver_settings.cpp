@@ -1,6 +1,6 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2008, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,12 +18,14 @@
 #include <string.h>
 #include <unistd.h>
 
+
 static driver_settings_file *
 find_driver_settings_file(const char *name)
 {
-	for (driver_settings_file *file = gKernelArgs.driver_settings; file != NULL; file = file->next) 
+	for (driver_settings_file *file = gKernelArgs.driver_settings; file != NULL; file = file->next) {
 		if (!strcmp(file->name, name))
 			return file;
+	}
 
 	return NULL;
 }
@@ -99,26 +101,26 @@ load_driver_settings(stage2_args */*args*/, Directory *volume)
 	// overrides by safe mode since the settings are searched
 	// in reverse order. This allows us to permanently set things like 
 	// disable_smp
-	driver_settings_file *kern_file = find_driver_settings_file("kernel");
-	if (kern_file != NULL) {
-		driver_settings_file *safemode_file = 
+	driver_settings_file *kernelFile = find_driver_settings_file("kernel");
+	if (kernelFile != NULL) {
+		driver_settings_file *safemodeFile = 
 			find_driver_settings_file(B_SAFEMODE_DRIVER_SETTINGS);
-		if (safemode_file != NULL) {
-			char *tmp_buffer = (char *)kernel_args_malloc(
-				safemode_file->size + kern_file->size + 1);
-			if (tmp_buffer != NULL) {
-				memcpy(tmp_buffer, kern_file->buffer, 
-					kern_file->size);
-				memcpy(tmp_buffer + kern_file->size, 
-					safemode_file->buffer, 
-					safemode_file->size);
-				tmp_buffer[safemode_file->size + 
-					kern_file->size] = '\0';
-				kernel_args_free(safemode_file->buffer);
-				safemode_file->buffer = tmp_buffer;
+		if (safemodeFile != NULL) {
+			char *buffer = (char *)kernel_args_malloc(
+				safemodeFile->size + kernelFile->size + 1);
+			if (buffer != NULL) {
+				memcpy(buffer, kernelFile->buffer, 
+					kernelFile->size);
+				memcpy(buffer + kernelFile->size, 
+					safemodeFile->buffer, 
+					safemodeFile->size);
+				buffer[safemodeFile->size + 
+					kernelFile->size] = '\0';
+				kernel_args_free(safemodeFile->buffer);
+				safemodeFile->buffer = buffer;
 			} 
 		} else 
-			add_safe_mode_settings(kern_file->buffer);
+			add_safe_mode_settings(kernelFile->buffer);
 	}
 
 	return B_OK;
