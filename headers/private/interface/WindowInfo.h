@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,7 +21,7 @@ struct window_info {
 	int32		client_port;
 	uint32		workspaces;
 
-	int32		layer;			// whatever this is...
+	int32		layer;	// see ServerWindow::GetInfo()
     uint32	  	feel;
     uint32      flags;
 	int32		window_left;
