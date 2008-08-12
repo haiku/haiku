@@ -644,6 +644,10 @@ PathHandler::_NotifyTarget(BMessage* message, const node_ref& nodeRef) const
 		}
 	}
 
+	// This is in case the target is interested in figuring out which
+	// BPathMonitor::StartWatching() call the message is resulting from.
+	update.AddString("watched_path", fPath.Path());
+
 	fTarget.SendMessage(&update);
 }
 
