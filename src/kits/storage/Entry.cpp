@@ -76,7 +76,9 @@ entry_ref::entry_ref()
 	\param name the leaf name of the entry, which is not required to exist
 */
 entry_ref::entry_ref(dev_t dev, ino_t dir, const char *name)
-		 : device(dev), directory(dir), name(NULL)
+		 : device(dev),
+		   directory(dir),
+		   name(NULL)
 {
 	set_name(name);
 }
@@ -105,7 +107,8 @@ entry_ref::~entry_ref()
 	\param name pointer to a null-terminated string containing the new name for
 	the entry. May be \c NULL.
 */
-status_t entry_ref::set_name(const char *name)
+status_t
+entry_ref::set_name(const char *name)
 {
 	free(this->name);
 	
