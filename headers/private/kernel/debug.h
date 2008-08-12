@@ -16,8 +16,8 @@
 #define KDEBUG 1
 
 #if DEBUG
-/* 
- * The kernel debug level. 
+/*
+ * The kernel debug level.
  * Level 1 is usual asserts, > 1 should be used for very expensive runtime checks
  */
 #	define KDEBUG 1
@@ -37,7 +37,7 @@
 #if KDEBUG
 #	define ASSERT(x)					ASSERT_ALWAYS(x)
 #	define ASSERT_PRINT(x, format...)	ASSERT_ALWAYS_PRINT(x, format)
-#else 
+#else
 #	define ASSERT(x)					do { } while(0)
 #	define ASSERT_PRINT(x, format...)	do { } while(0)
 #endif
@@ -69,6 +69,18 @@ struct debugger_module_info {
 
 extern int dbg_register_file[B_MAX_CPU_COUNT][14];
 
+typedef struct debug_page_fault_info {
+	addr_t	fault_address;
+	addr_t	pc;
+	uint32	flags;
+} debug_page_fault_info;
+
+// debug_page_fault_info::flags
+#define DEBUG_PAGE_FAULT_WRITE		0x01	/* write fault */
+#define DEBUG_PAGE_FAULT_NO_INFO	0x02	/* fault address and read/write
+											   unknown */
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,6 +95,9 @@ extern void debug_puts(const char *s, int32 length);
 extern bool debug_debugger_running(void);
 extern bool debug_screen_output_enabled(void);
 extern void debug_stop_screen_debug_output(void);
+extern void debug_set_page_fault_info(addr_t faultAddress, addr_t pc,
+				uint32 flags);
+extern debug_page_fault_info* debug_get_page_fault_info();
 
 extern void	kputs(const char *string);
 extern void	kputs_unfiltered(const char *string);
@@ -109,10 +124,10 @@ extern status_t	add_debugger_command_alias(const char* newName,
 					const char* oldName, const char* description);
 extern bool		print_debugger_command_usage(const char* command);
 
-extern void		_user_debug_output(const char *userString);
-
 extern void debug_set_demangle_hook(const char *(*hook)(const char *));
 extern const char *debug_demangle(const char *);
+
+extern void		_user_debug_output(const char *userString);
 
 #ifdef __cplusplus
 }

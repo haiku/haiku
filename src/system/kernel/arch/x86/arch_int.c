@@ -222,7 +222,7 @@ x86_set_task_gate(int32 n, int32 segment)
 
 
 /**	Tests if the interrupt in-service register of the responsible
- *	PIC is set for interrupts 7 and 15, and if that's not the case, 
+ *	PIC is set for interrupts 7 and 15, and if that's not the case,
  *	it must assume it's a spurious interrupt.
  */
 
@@ -838,6 +838,8 @@ page_fault_exception(struct iframe* frame)
 	if (kernelDebugger) {
 		// if this thread has a fault handler, we're allowed to be here
 		if (thread && thread->fault_handler != 0) {
+			debug_set_page_fault_info(cr2, frame->eip,
+				(frame->error_code & 0x2) != 0 ? DEBUG_PAGE_FAULT_WRITE : 0);
 			frame->eip = thread->fault_handler;
 			return;
 		}

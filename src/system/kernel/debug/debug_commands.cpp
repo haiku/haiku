@@ -299,8 +299,19 @@ error:
 				INVOKE_COMMAND_FAULT);
 
 		case INVOKE_COMMAND_FAULT:
-			kprintf_unfiltered("\n[*** READ/WRITE FAULT ***]\n");
+		{
+			debug_page_fault_info* info = debug_get_page_fault_info();
+			if ((info->flags & DEBUG_PAGE_FAULT_NO_INFO) == 0) {
+				kprintf_unfiltered("\n[*** %s FAULT at %#lx, pc: %#lx ***]\n",
+					(info->flags & DEBUG_PAGE_FAULT_NO_INFO) != 0
+						? "WRITE" : "READ",
+					info->fault_address, info->pc);
+			} else {
+				kprintf_unfiltered("\n[*** READ/WRITE FAULT (?), "
+					"pc: %#lx ***]\n", info->pc);
+			}
 			break;
+		}
 		case INVOKE_COMMAND_ERROR:
 			// command aborted (no page fault)
 			break;

@@ -49,6 +49,8 @@ extern "C" int kgets(char *buffer, int length);
 int dbg_register_file[B_MAX_CPU_COUNT][14];
 	/* XXXmpetit -- must be made generic */
 
+static debug_page_fault_info sPageFaultInfo;
+
 static bool sSerialDebugEnabled = true;
 static bool sSyslogOutputEnabled = true;
 static bool sBlueScreenEnabled = false;
@@ -1132,6 +1134,22 @@ debug_init_post_modules(struct kernel_args *args)
 }
 
 
+void
+debug_set_page_fault_info(addr_t faultAddress, addr_t pc, uint32 flags)
+{
+	sPageFaultInfo.fault_address = faultAddress;
+	sPageFaultInfo.pc = pc;
+	sPageFaultInfo.flags = flags;
+}
+
+
+debug_page_fault_info*
+debug_get_page_fault_info()
+{
+	return &sPageFaultInfo;
+}
+
+
 //	#pragma mark - public API
 
 
@@ -1392,6 +1410,22 @@ kprintf_unfiltered(const char *format, ...)
 }
 
 
+extern void
+debug_set_demangle_hook(const char *(*hook)(const char *))
+{
+	sDemangleHook = hook;
+}
+
+
+extern const char *
+debug_demangle(const char *sym)
+{
+	if (sDemangleHook)
+		return sDemangleHook(sym);
+	return sym;
+}
+
+
 //	#pragma mark -
 //	userland syscalls
 
@@ -1451,20 +1485,3 @@ dump_block(const char *buffer, int size, const char *prefix)
 		dprintf("\n");
 	}
 }
-
-
-extern void
-debug_set_demangle_hook(const char *(*hook)(const char *))
-{
-	sDemangleHook = hook;
-}
-
-
-extern const char *
-debug_demangle(const char *sym)
-{
-	if (sDemangleHook)
-		return sDemangleHook(sym);
-	return sym;
-}
-
