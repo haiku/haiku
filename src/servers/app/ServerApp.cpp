@@ -470,6 +470,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_GET_WINDOW_ORDER:
+		{
+			int32 workspace;
+			if (link.Read<int32>(&workspace) == B_OK)
+				fDesktop->WriteWindowOrder(workspace, fLink.Sender());
+			break;
+		}
+
+		case AS_GET_APPLICATION_ORDER:
+		{
+			int32 workspace;
+			if (link.Read<int32>(&workspace) == B_OK)
+				fDesktop->WriteApplicationOrder(workspace, fLink.Sender());
+			break;
+		}
+
 		case AS_MINIMIZE_TEAM:
 		{
 			team_id team;
@@ -2576,7 +2592,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_SET_SUBPIXEL_AVERAGE_WEIGHT:
 		{
 			uint8 averageWeight;
@@ -2596,7 +2612,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_SET_SUBPIXEL_ORDERING:
 		{
 			bool subpixelOrdering;

@@ -42,4 +42,23 @@ enum window_action {
 	B_BRING_TO_FRONT
 };
 
+
+// Private BeOS compatible window API
+
+void do_window_action(int32 window_id, int32 action, BRect zoomRect, bool zoom);
+client_window_info* get_window_info(int32 token);
+int32* get_token_list(team_id app, int32 *count);
+void do_bring_to_front_team(BRect zoomRect, team_id app, bool zoom);
+void do_minimize_team(BRect zoomRect, team_id app, bool zoom);
+
+// Haiku additions
+
+namespace BPrivate {
+
+status_t get_application_order(int32 workspace, team_id** _apps, int32* _count);
+status_t get_window_order(int32 workspace, int32** _tokens, int32* _count);
+
+}	// namespace BPrivate
+
+
 #endif	// _WINDOW_INFO_H_

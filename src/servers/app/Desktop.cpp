@@ -2492,6 +2492,113 @@ Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 
 
 void
+Desktop::WriteWindowOrder(int32 workspace, BPrivate::LinkSender& sender)
+{
+	LockSingleWindow();
+
+	if (workspace < 0)
+		workspace = fCurrentWorkspace;
+	else if (workspace >= kMaxWorkspaces) {
+		sender.StartMessage(B_BAD_VALUE);
+		sender.Flush();
+		UnlockSingleWindow();
+		return;
+	}
+
+	// compute the number of windows
+
+	int32 count = 0;
+
+	for (Window *window = _Windows(workspace).LastWindow(); window != NULL;
+			window = window->PreviousWindow(workspace)) {
+		count++;
+	}
+
+	// write list
+
+	sender.StartMessage(B_OK);
+	sender.Attach<int32>(count);
+
+	for (Window *window = _Windows(workspace).LastWindow(); window != NULL;
+			window = window->PreviousWindow(workspace)) {
+		sender.Attach<int32>(window->ServerWindow()->ServerToken());
+	}
+
+	sender.Flush();
+
+	UnlockSingleWindow();
+}
+
+
+void
+Desktop::WriteApplicationOrder(int32 workspace, BPrivate::LinkSender& sender)
+{
+	fApplicationsLock.Lock();
+	LockSingleWindow();
+
+	int32 maxCount = fApplications.CountItems();
+
+	fApplicationsLock.Unlock();
+		// as long as we hold the window lock, no new window can appear
+
+	if (workspace < 0)
+		workspace = fCurrentWorkspace;
+	else if (workspace >= kMaxWorkspaces) {
+		sender.StartMessage(B_BAD_VALUE);
+		sender.Flush();
+		UnlockSingleWindow();
+		return;
+	}
+
+	// compute the list of applications on this workspace
+
+	team_id* teams = (team_id*)malloc(maxCount * sizeof(team_id));
+	if (teams == NULL) {
+		sender.StartMessage(B_NO_MEMORY);
+		sender.Flush();
+		UnlockSingleWindow();
+		return;
+	}
+
+	int32 count = 0;
+
+	for (Window *window = _Windows(workspace).LastWindow(); window != NULL;
+			window = window->PreviousWindow(workspace)) {
+		team_id team = window->ServerWindow()->ClientTeam();
+		if (count > 1) {
+			// see if we already have this team
+			bool found = false;
+			for (int32 i = 0; i < count; i++) {
+				if (teams[i] == team) {
+					found = true;
+					break;
+				}
+			}
+			if (found)
+				continue;
+		}
+
+		ASSERT(count < maxCount);
+		teams[count++] = team;
+	}
+
+	UnlockSingleWindow();
+
+	// write list
+
+	sender.StartMessage(B_OK);
+	sender.Attach<int32>(count);
+
+	for (int32 i = 0; i < count; i++) {
+		sender.Attach<int32>(teams[i]);
+	}
+
+	sender.Flush();
+	free(teams);
+}
+
+
+void
 Desktop::MarkDirty(BRegion& region)
 {
 	if (region.CountRects() == 0)

@@ -210,6 +210,10 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									BPrivate::LinkSender& sender);
 		void					WriteWindowInfo(int32 serverToken,
 									BPrivate::LinkSender& sender);
+		void					WriteApplicationOrder(int32 workspace,
+									BPrivate::LinkSender& sender);
+		void					WriteWindowOrder(int32 workspace,
+									BPrivate::LinkSender& sender);
 
 	private:
 		void					_LaunchInputServer();

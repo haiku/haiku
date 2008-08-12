@@ -311,21 +311,21 @@ set_screen_space(int32 index, uint32 space, bool stick)
 	uint32 depth;
 	if (!BPrivate::get_mode_parameter(space, width, height, depth))
 		return B_BAD_VALUE;
-		
+
 	BScreen screen(B_MAIN_SCREEN_ID);
 	display_mode mode;
-	
+
 	// TODO: What about refresh rate ?
 	// currently we get it from the current video mode, but
 	// this might be not so wise.
 	status_t status = screen.GetMode(index, &mode);
 	if (status < B_OK)
 		return status;
-	
+
 	mode.virtual_width = width;
 	mode.virtual_height = height;
 	mode.space = depth;
-	
+
 	return screen.SetMode(index, &mode, stick);
 }
 
@@ -358,10 +358,10 @@ set_scroll_bar_info(scroll_bar_info *info)
 
 	BPrivate::AppServerLink link;
 	int32 code;
-	
+
 	link.StartMessage(AS_SET_SCROLLBAR_INFO);
 	link.Attach<scroll_bar_info>(*info);
-	
+
 	if (link.FlushWithReply(code) == B_OK
 		&& code == B_OK)
 		return B_OK;
@@ -375,12 +375,12 @@ get_mouse_type(int32 *type)
 {
 	BMessage command(IS_GET_MOUSE_TYPE);
 	BMessage reply;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindInt32("mouse_type", type) != B_OK)
 		return B_ERROR;
-	
+
 	return B_OK;
 }
 
@@ -403,14 +403,14 @@ get_mouse_map(mouse_map *map)
 	BMessage reply;
 	const void *data = 0;
 	ssize_t count;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindData("mousemap", B_RAW_TYPE, &data, &count) != B_OK)
 		return B_ERROR;
-	
+
 	memcpy(map, data, count);
-	
+
 	return B_OK;
 }
 
@@ -420,7 +420,7 @@ set_mouse_map(mouse_map *map)
 {
 	BMessage command(IS_SET_MOUSE_MAP);
 	BMessage reply;
-	
+
 	command.AddData("mousemap", B_RAW_TYPE, map, sizeof(mouse_map));
 	return _control_input_server_(&command, &reply);
 }
@@ -431,12 +431,12 @@ get_click_speed(bigtime_t *speed)
 {
 	BMessage command(IS_GET_CLICK_SPEED);
 	BMessage reply;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindInt64("speed", speed) != B_OK)
 		*speed = 500000;
-	
+
 	return B_OK;
 }
 
@@ -456,12 +456,12 @@ get_mouse_speed(int32 *speed)
 {
 	BMessage command(IS_GET_MOUSE_SPEED);
 	BMessage reply;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindInt32("speed", speed) != B_OK)
 		*speed = 65536;
-	
+
 	return B_OK;
 }
 
@@ -481,12 +481,12 @@ get_mouse_acceleration(int32 *speed)
 {
 	BMessage command(IS_GET_MOUSE_ACCELERATION);
 	BMessage reply;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindInt32("speed", speed) != B_OK)
 		*speed = 65536;
-	
+
 	return B_OK;
 }
 
@@ -506,9 +506,9 @@ get_key_repeat_rate(int32 *rate)
 {
 	BMessage command(IS_GET_KEY_REPEAT_RATE);
 	BMessage reply;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindInt32("rate", rate) != B_OK)
 		*rate = 250000;
 
@@ -531,12 +531,12 @@ get_key_repeat_delay(bigtime_t *delay)
 {
 	BMessage command(IS_GET_KEY_REPEAT_DELAY);
 	BMessage reply;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindInt64("delay", delay) != B_OK)
 		*delay = 200;
-	
+
 	return B_OK;
 }
 
@@ -557,12 +557,12 @@ modifiers()
 	BMessage command(IS_GET_MODIFIERS);
 	BMessage reply;
 	int32 err, modifier;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindInt32("status", &err) != B_OK)
 		return 0;
-	
+
 	if (reply.FindInt32("modifiers", &modifier) != B_OK)
 		return 0;
 
@@ -578,15 +578,15 @@ get_key_info(key_info *info)
 	const void *data = 0;
 	int32 err;
 	ssize_t count;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindInt32("status", &err) != B_OK)
 		return B_ERROR;
-	
+
 	if (reply.FindData("key_info", B_ANY_TYPE, &data, &count) != B_OK)
 		return B_ERROR;
-	
+
 	memcpy(info, data, count);
 	return B_OK;
 }
@@ -608,19 +608,19 @@ _get_key_map(key_map **map, char **key_buffer, ssize_t *key_buffer_size)
 	const void *map_array = 0, *key_array = 0;
 	if (key_buffer_size == NULL)
 		key_buffer_size = &key_count;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	if (reply.FindData("keymap", B_ANY_TYPE, &map_array, &map_count) != B_OK) {
 		*map = 0; *key_buffer = 0;
 		return;
 	}
-	
+
 	if (reply.FindData("key_buffer", B_ANY_TYPE, &key_array, key_buffer_size) != B_OK) {
 		*map = 0; *key_buffer = 0;
 		return;
 	}
-	
+
 	*map = (key_map *)malloc(map_count);
 	memcpy(*map, map_array, map_count);
 	*key_buffer = (char *)malloc(*key_buffer_size);
@@ -634,12 +634,12 @@ get_keyboard_id(uint16 *id)
 	BMessage command(IS_GET_KEYBOARD_ID);
 	BMessage reply;
 	uint16 kid;
-	
+
 	_control_input_server_(&command, &reply);
-	
+
 	reply.FindInt16("id", (int16 *)&kid);
 	*id = kid;
-	
+
 	return B_OK;
 }
 
@@ -649,7 +649,7 @@ set_modifier_key(uint32 modifier, uint32 key)
 {
 	BMessage command(IS_SET_MODIFIER_KEY);
 	BMessage reply;
-	
+
 	command.AddInt32("modifier", modifier);
 	command.AddInt32("key", key);
 	_control_input_server_(&command, &reply);
@@ -661,7 +661,7 @@ set_keyboard_locks(uint32 modifiers)
 {
 	BMessage command(IS_SET_KEYBOARD_LOCKS);
 	BMessage reply;
-	
+
 	command.AddInt32("locks", modifiers);
 	_control_input_server_(&command, &reply);
 }
@@ -673,7 +673,7 @@ _restore_key_map_()
 	BMessage message(IS_RESTORE_KEY_MAP);
 	BMessage reply;
 
-	return _control_input_server_(&message, &reply);	
+	return _control_input_server_(&message, &reply);
 }
 
 
@@ -717,7 +717,7 @@ current_workspace()
 	int32 index = 0;
 
 	BPrivate::AppServerLink link;
-	link.StartMessage(AS_CURRENT_WORKSPACE);	
+	link.StartMessage(AS_CURRENT_WORKSPACE);
 
 	int32 status;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK)
@@ -758,7 +758,7 @@ run_select_printer_panel()
 {
 	if (be_roster == NULL)
 		return;
-		
+
 	// Launches the Printer prefs app via the Roster
 	be_roster->Launch(PRNT_SIGNATURE_TYPE);
 }
@@ -767,12 +767,12 @@ run_select_printer_panel()
 void
 run_add_printer_panel()
 {
-	// Launches the Printer prefs app via the Roster and asks it to 
+	// Launches the Printer prefs app via the Roster and asks it to
 	// add a printer
 	run_select_printer_panel();
 
 	BMessenger printerPanelMessenger(PRNT_SIGNATURE_TYPE);
-	printerPanelMessenger.SendMessage(PRINTERS_ADD_PRINTER);	
+	printerPanelMessenger.SendMessage(PRINTERS_ADD_PRINTER);
 }
 
 
@@ -814,14 +814,14 @@ mouse_mode()
 {
 	// Gets the focus-follows-mouse style, such as normal, B_WARP_MOUSE, etc.
 	mode_mouse mode = B_NORMAL_MOUSE;
-	
+
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_MOUSE_MODE);
 
 	int32 code;
 	if (link.FlushWithReply(code) == B_OK && code == B_OK)
 		link.Read<mode_mouse>(&mode);
-	
+
 	return mode;
 }
 
@@ -914,7 +914,7 @@ _init_interface_kit_()
 	_init_global_fonts_();
 
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
-	
+
 	status = get_menu_info(&BMenu::sMenuInfo);
 
 	general_info.background_color = ui_color(B_PANEL_BACKGROUND_COLOR);
@@ -933,7 +933,7 @@ extern "C" status_t
 _fini_interface_kit_()
 {
 	//TODO: Implement ?
-	
+
 	return B_OK;
 }
 
@@ -946,7 +946,7 @@ _fini_interface_kit_()
 	Note, we don't have to be compatible here, and could just change
 	the Deskbar not to use this anymore
 	\param theme The theme to choose
-	
+
 	- \c 0: BeOS
 	- \c 1: AmigaOS
 	- \c 2: Win95
@@ -978,14 +978,14 @@ count_decorators(void)
 	int32 count = -1;
 	if (link.FlushWithReply(code) == B_OK && code == B_OK)
 		link.Read<int32>(&count);
-	
+
 	return count;
 }
 
 /*!
 	\brief queries the server for the index of the current decorators
 	\return the current decorator's index
-	
+
 	If for some bizarre reason this function fails, it returns -1
 */
 int32
@@ -1034,7 +1034,7 @@ get_decorator_name(const int32 &index, BString &name)
 	\param index The index of the decorator to get the name for
 	\param bitmap BBitmap to receive the preview
 	\return B_OK if successful, B_ERROR if not.
-	
+
 	This is currently unimplemented.
 */
 status_t
@@ -1048,7 +1048,7 @@ get_decorator_preview(const int32 &index, BBitmap *bitmap)
 /*!
 	\brief Private function which sets the window decorator for the system.
 	\param index Index of the decorator to set
-	
+
 	If the index is invalid, this function and the server do nothing
 */
 status_t
@@ -1067,30 +1067,73 @@ set_decorator(const int32 &index)
 }
 
 
+status_t
+get_application_order(int32 workspace, team_id** _applications,
+	int32* _count)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_APPLICATION_ORDER);
+	link.Attach<int32>(workspace);
+
+	int32 code;
+	status_t status = link.FlushWithReply(code);
+	if (status != B_OK)
+		return status;
+	if (code != B_OK)
+		return code;
+
+	int32 count;
+	link.Read<int32>(&count);
+
+	*_applications = (team_id*)malloc(count * sizeof(team_id));
+	if (*_applications == NULL)
+		return B_NO_MEMORY;
+
+	link.Read(*_applications, count * sizeof(team_id));
+	*_count = count;
+	return B_OK;
+}
+
+
+status_t
+get_window_order(int32 workspace, int32** _tokens, int32* _count)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_WINDOW_ORDER);
+	link.Attach<int32>(workspace);
+
+	int32 code;
+	status_t status = link.FlushWithReply(code);
+	if (status != B_OK)
+		return status;
+	if (code != B_OK)
+		return code;
+
+	int32 count;
+	link.Read<int32>(&count);
+
+	*_tokens = (int32*)malloc(count * sizeof(int32));
+	if (*_tokens == NULL)
+		return B_NO_MEMORY;
+
+	link.Read(*_tokens, count * sizeof(int32));
+	*_count = count;
+	return B_OK;
+}
+
+
 }	// namespace BPrivate
 
 // These methods were marked with "Danger, will Robinson!" in
 // the OpenTracker source, so we might not want to be compatible
 // here.
-// In any way, we would need to update Deskbar to use our 
+// In any way, we would need to update Deskbar to use our
 // replacements, so we could as well just implement them...
-//
-// They are defined (also the complete window_info structure) in
-// src/apps/deskbar/WindowMenuItem.h
 
-struct window_info;
-
-void do_window_action(int32 window_id, int32 action, 
-		BRect zoomRect, bool zoom);
-window_info	*get_window_info(int32 a_token);
-int32 *get_token_list(team_id app, int32 *count);
-void do_bring_to_front_team(BRect zoomRect, team_id app, bool zoom);
-void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
-
-
-void 
-do_window_action(int32 windowToken, int32 action, 
-	BRect zoomRect, bool zoom)
+void
+do_window_action(int32 windowToken, int32 action, BRect zoomRect, bool zoom)
 {
 	BPrivate::AppServerLink link;
 
@@ -1103,11 +1146,11 @@ do_window_action(int32 windowToken, int32 action,
 }
 
 
-window_info	*
+client_window_info*
 get_window_info(int32 serverToken)
 {
 	BPrivate::AppServerLink link;
-	
+
 	link.StartMessage(AS_GET_WINDOW_INFO);
 	link.Attach<int32>(serverToken);
 
@@ -1117,7 +1160,7 @@ get_window_info(int32 serverToken)
 
 	int32 size;
 	link.Read<int32>(&size);
-	
+
 	client_window_info* info = (client_window_info*)malloc(size);
 	if (info == NULL)
 		return NULL;
@@ -1127,8 +1170,8 @@ get_window_info(int32 serverToken)
 }
 
 
-int32 *
-get_token_list(team_id team, int32 *_count)
+int32*
+get_token_list(team_id team, int32* _count)
 {
 	BPrivate::AppServerLink link;
 
@@ -1321,7 +1364,7 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 		strcpy(dest, "");
 		return true;
 	}
-	
+
 	// see if the gap between left/right is smaller than the ellipsis
 
 	float totalWidth = rightWidth + leftWidth;
@@ -1339,7 +1382,7 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 
 	// The ellipsis now definitely fits, but let's
 	// see if we can add another character
-	
+
 	totalWidth = ellipsisWidth + rightWidth + leftWidth;
 
 	if (left > numChars - right) {
