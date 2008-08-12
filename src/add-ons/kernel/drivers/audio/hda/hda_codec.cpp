@@ -140,6 +140,52 @@ dump_widget_amplifier_capabilities(hda_widget& widget, bool input)
 }
 
 
+static void
+dump_widget_pm_support(hda_widget& widget)
+{
+	dprintf("\tSupported power states: %s%s%s%s\n",
+		widget.pm & POWER_STATE_D0 ? "D0 " : "",
+		widget.pm & POWER_STATE_D1 ? "D1 " : "",
+		widget.pm & POWER_STATE_D2 ? "D2 " : "",
+		widget.pm & POWER_STATE_D3 ? "D3 " : "");
+}
+
+
+static void
+dump_audiogroup_widgets(hda_audio_group* audioGroup)
+{
+	dprintf("\tAudiogroup:\n");
+	/* Iterate over all Widgets and collect info */
+	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
+		hda_widget& widget = audioGroup->widgets[i];
+		uint32 nodeID = audioGroup->widget_start + i;
+
+		dprintf("%ld: %s\n", nodeID, get_widget_type_name(widget.type));
+
+		switch (widget.type) {
+			case WT_AUDIO_OUTPUT:
+			case WT_AUDIO_INPUT:
+				break;
+
+			case WT_PIN_COMPLEX:
+				dprintf("\t%s%s\n", widget.d.pin.input ? "[Input] " : "",
+					widget.d.pin.output ? "[Output]" : "");
+				
+				break;
+
+			default:
+				break;
+		}
+
+		dump_widget_pm_support(widget);
+		dump_widget_audio_capabilities(widget.capabilities.audio);
+		dump_widget_amplifier_capabilities(widget, true);
+		dump_widget_amplifier_capabilities(widget, false);
+		dump_widget_inputs(widget);
+	}
+}
+
+
 //	#pragma mark -
 
 
@@ -153,13 +199,6 @@ hda_get_pm_support(hda_codec* codec, uint32 nodeID, uint32* pm)
 
 	if ((rc = hda_send_verbs(codec, &verb, &response, 1)) == B_OK) {
 		*pm = response & 0xf;
-#if 0
-		/* FIXME: Define constants for powermanagement modes */
-		if (resp & (1 << 0))	;
-		if (resp & (1 << 1))	;
-		if (resp & (1 << 2))	;
-		if (resp & (1 << 3))	;
-#endif
 	}
 
 	return rc;
@@ -483,8 +522,8 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 				verbs[0] = MAKE_VERB(audioGroup->codec->addr, nodeID,
 					VID_GET_PARAMETER, PID_PIN_CAP);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
-					widget.d.pin.input = resp[0] & (1 << 5);
-					widget.d.pin.output = resp[0] & (1 << 4);
+					widget.d.pin.input = resp[0] & PIN_CAP_IN;
+					widget.d.pin.output = resp[0] & PIN_CAP_OUT;
 
 					dprintf("\t%s%s\n", widget.d.pin.input ? "[Input] " : "",
 						widget.d.pin.output ? "[Output]" : "");
@@ -512,6 +551,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		hda_widget_get_pm_support(audioGroup, &widget);
 		hda_widget_get_connections(audioGroup, &widget);
 
+		dump_widget_pm_support(widget);
 		dump_widget_audio_capabilities(capabilities);
 		dump_widget_amplifier_capabilities(widget, true);
 		dump_widget_amplifier_capabilities(widget, false);
@@ -539,6 +579,10 @@ dprintf("      %*soutput: added output widget %ld\n", (int)depth * 2, "", widget
 		case WT_AUDIO_MIXER:
 		case WT_AUDIO_SELECTOR:
 		{
+			// already used
+			if (widget->flags & WIDGET_FLAG_OUTPUT_PATH)
+				return false;
+			
 			// search for output in this path
 			bool found = false;
 			for (uint32 i = 0; i < widget->num_inputs; i++) {
@@ -564,6 +608,58 @@ if (!found) dprintf("      %*soutput: not added mixer/selector widget %ld\n", (i
 	}
 }
 
+
+/*! Find input path for widget */
+static bool
+hda_widget_find_input_path(hda_audio_group* audioGroup, hda_widget* widget,
+	uint32 depth)
+{
+	if (widget == NULL || depth > 16)
+		return false;
+
+	switch (widget->type) {
+		case WT_PIN_COMPLEX:
+			if (widget->d.pin.input
+				&& (widget->d.pin.device == PIN_DEV_CD
+					|| widget->d.pin.device == PIN_DEV_LINE_IN
+					|| widget->d.pin.device == PIN_DEV_MIC_IN)) {
+				widget->flags |= WIDGET_FLAG_INPUT_PATH;
+dprintf("      %*sinput: added input widget %ld\n", (int)depth * 2, "", widget->node_id);
+				return true;
+			}
+			return false;
+		case WT_AUDIO_INPUT:
+		case WT_AUDIO_MIXER:
+		case WT_AUDIO_SELECTOR:
+		{
+			// already used
+			if (widget->flags & WIDGET_FLAG_INPUT_PATH)
+				return false;
+			
+			// search for pin complex in this path
+			bool found = false;
+			for (uint32 i = 0; i < widget->num_inputs; i++) {
+				hda_widget* inputWidget = hda_audio_group_get_widget(audioGroup,
+					widget->inputs[i]);
+
+				if (hda_widget_find_input_path(audioGroup, inputWidget,
+						depth + 1)) {
+					if (widget->active_input == -1)
+						widget->active_input = i;
+
+					widget->flags |= WIDGET_FLAG_INPUT_PATH;
+dprintf("      %*sinput: added mixer/selector widget %ld\n", (int)depth * 2, "", widget->node_id);
+					found = true;
+				}
+			}
+if (!found) dprintf("      %*sinput: not added mixer/selector widget %ld\n", (int)depth * 2, "", widget->node_id);
+			return found;
+		}
+
+		default:
+			return false;
+	}
+}
 
 static bool
 hda_audio_group_build_output_tree(hda_audio_group* audioGroup, bool useMixer)
@@ -599,6 +695,44 @@ dprintf("    add pin widget %ld\n", widget.node_id);
 					widget.active_input = j;
 				widget.flags |= WIDGET_FLAG_OUTPUT_PATH;
 				found = true;
+				break;
+			}
+		}
+	}
+
+	return found;
+}
+
+
+static bool
+hda_audio_group_build_input_tree(hda_audio_group* audioGroup)
+{
+	bool found = false;
+
+dprintf("build input tree\n");
+	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
+		hda_widget& widget = audioGroup->widgets[i];
+
+		if (widget.type != WT_AUDIO_INPUT)
+			continue;
+
+dprintf("  look at input widget %ld (%ld inputs)\n", widget.node_id, widget.num_inputs);
+		for (uint32 j = 0; j < widget.num_inputs; j++) {
+			hda_widget* inputWidget = hda_audio_group_get_widget(audioGroup,
+				widget.inputs[j]);
+dprintf("    try widget %ld: %p\n", widget.inputs[j], inputWidget);
+			if (inputWidget == NULL)
+				continue;
+			
+dprintf("    widget %ld is candidate\n", inputWidget->node_id);
+
+			if (hda_widget_find_input_path(audioGroup, inputWidget, 0)) {
+dprintf("    add pin widget %ld\n", widget.node_id);
+				if (widget.active_input == -1)
+					widget.active_input = j;
+				widget.flags |= WIDGET_FLAG_INPUT_PATH;
+				found = true;
+				break;
 			}
 		}
 	}
@@ -617,9 +751,12 @@ dprintf("try without mixer!\n");
 			return ENODEV;
 	}
 
-dprintf("build tree!\n");
-	// TODO: input path!
+	if (!hda_audio_group_build_input_tree(audioGroup)) {
+		dprintf("hda: build input tree failed\n");
+	}	
 
+dprintf("build tree!\n");
+	
 	// select active connections
 
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
@@ -637,6 +774,8 @@ dprintf("build tree!\n");
 				widget.active_input, widget.node_id);
 		}
 	}
+
+	dump_audiogroup_widgets(audioGroup);
 
 	return B_OK;
 }
@@ -683,7 +822,9 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 		goto err;
 
 	audioGroup->playback_stream = hda_stream_new(audioGroup, STREAM_PLAYBACK);
-	//audioGroup->record_stream = hda_stream_new(audioGroup, STREAM_RECORD);
+	audioGroup->record_stream = hda_stream_new(audioGroup, STREAM_RECORD);
+	dprintf("hda: streams playback %p, record %p\n", audioGroup->playback_stream,
+		audioGroup->record_stream);
 
 	if (audioGroup->playback_stream != NULL
 		|| audioGroup->record_stream != NULL) {
@@ -731,7 +872,9 @@ dprintf("ENABLE pin widget %ld\n", widget.node_id);
 				uint32 verb = MAKE_VERB(audioGroup->codec->addr,
 					widget.node_id,
 					VID_SET_PIN_WIDGET_CONTROL,
-					PIN_ENABLE_HEAD_PHONE | PIN_ENABLE_OUTPUT);
+					flags == WIDGET_FLAG_OUTPUT_PATH ? 
+						PIN_ENABLE_HEAD_PHONE | PIN_ENABLE_OUTPUT
+						: PIN_ENABLE_INPUT);
 				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 			}
 

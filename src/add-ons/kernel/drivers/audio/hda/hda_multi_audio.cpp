@@ -107,7 +107,7 @@ get_description(hda_audio_group* audioGroup, multi_description* data)
 	data->input_formats = audioGroup->supported_formats;
 	data->lock_sources = B_MULTI_LOCK_INTERNAL;
 	data->timecode_sources = 0;
-	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK /* | B_MULTI_INTERFACE_RECORD */;
+	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;
 	data->start_latency = 30000;
 
 	strcpy(data->control_panel, "");
@@ -247,7 +247,7 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 	/* ... from here on, we can assume again that a reasonable request is
 	   being made */
 
-	data->flags = B_MULTI_BUFFER_PLAYBACK;
+	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD;
 
 	/* Copy the settings into the streams */
 
@@ -323,7 +323,7 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 {
 	static int debug_buffers_exchanged = 0;
 	cpu_status status;
-	status_t rc;
+	status_t err;
 
 	// TODO: support recording!
 	if (audioGroup->playback_stream == NULL)
@@ -333,14 +333,18 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 		hda_stream_start(audioGroup->codec->controller,
 			audioGroup->playback_stream);
 	}
+	if (audioGroup->record_stream && !audioGroup->record_stream->running) {
+		hda_stream_start(audioGroup->codec->controller,
+			audioGroup->record_stream);
+	}
 
 	/* do playback */
-	rc = acquire_sem_etc(audioGroup->playback_stream->buffer_ready_sem,
+	err = acquire_sem_etc(audioGroup->playback_stream->buffer_ready_sem,
 		1, B_CAN_INTERRUPT, 0);
-	if (rc != B_OK) {
+	if (err != B_OK) {
 		dprintf("%s: Error waiting for playback buffer to finish (%s)!\n", __func__,
-			strerror(rc));
-		return rc;
+			strerror(err));
+		return err;
 	}
 
 	status = disable_interrupts();
@@ -351,6 +355,15 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	data->played_frames_count = audioGroup->playback_stream->frames_count;
 
 	release_spinlock(&audioGroup->playback_stream->lock);
+
+	if (audioGroup->record_stream) {
+		acquire_spinlock(&audioGroup->record_stream->lock);
+		data->record_buffer_cycle = audioGroup->record_stream->buffer_cycle;
+		data->recorded_real_time = audioGroup->record_stream->real_time;
+		data->recorded_frames_count = audioGroup->record_stream->frames_count;
+		release_spinlock(&audioGroup->record_stream->lock);
+	}
+
 	restore_interrupts(status);
 
 	debug_buffers_exchanged++;
@@ -369,6 +382,10 @@ buffer_force_stop(hda_audio_group* audioGroup)
 		hda_stream_stop(audioGroup->codec->controller,
 			audioGroup->playback_stream);
 	}
+	if (audioGroup->record_stream != NULL) {
+		hda_stream_stop(audioGroup->codec->controller,
+			audioGroup->record_stream);
+	}	
 	//hda_stream_stop(audioGroup->codec->controller, audioGroup->record_stream);
 
 	return B_OK;

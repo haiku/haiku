@@ -163,6 +163,15 @@ enum pin_dev_type {
 #define AMP_CAP_NUM_STEPS_SHIFT			8
 #define AMP_CAP_OFFSET_MASK				0x0000007f
 
+/* Pin capabilities */
+#define PIN_CAP_IMP_SENSE				(1L << 0)
+#define PIN_CAP_TRIGGER_REQ				(1L << 1)
+#define PIN_CAP_PRES_DETECT				(1L << 2)
+#define PIN_CAP_HP_DRIVE				(1L << 3)
+#define PIN_CAP_OUT						(1L << 4)
+#define PIN_CAP_IN						(1L << 5)
+#define PIN_CAP_BALANCE					(1L << 6)
+
 /* PCM support */
 #define PCM_8_BIT						(1L << 16)
 #define PCM_16_BIT						(1L << 17)
@@ -198,5 +207,11 @@ enum pin_dev_type {
 #define PIN_ENABLE_OUTPUT				(1L << 6)
 #define PIN_ENABLE_INPUT				(1L << 5)
 #define PIN_ENABLE_VOLTAGE_REF_MASK		0x3
+
+/* Supported power states */
+#define POWER_STATE_D0					(1L << 0)
+#define POWER_STATE_D1					(1L << 1)
+#define POWER_STATE_D2					(1L << 2)
+#define POWER_STATE_D3					(1L << 3)
 
 #endif /* HDA_CODEC_H */

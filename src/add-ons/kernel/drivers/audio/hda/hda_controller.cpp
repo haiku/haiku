@@ -98,7 +98,7 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 
 	stream->real_time = system_time();
 	stream->frames_count += stream->buffer_length;
-	stream->buffer_cycle = 1 - (position / bufferSize);
+	stream->buffer_cycle = 1 - (position / (bufferSize + 1)); // added 1 to avoid having 2
 
 	release_spinlock(&stream->lock);
 
@@ -410,13 +410,11 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 		case STREAM_PLAYBACK:
 			stream->id = 1;
 			stream->offset = HDAC_OUTPUT_STREAM_OFFSET(controller, 0);
-			controller->streams[controller->num_input_streams] = stream;
 			break;
 
 		case STREAM_RECORD:
 			stream->id = 2;
 			stream->offset = HDAC_INPUT_STREAM_OFFSET(controller, 0);
-			controller->streams[0] = stream;
 			break;
 
 		default:
@@ -427,9 +425,21 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 
 	// find I/O and Pin widgets for this stream
 
-	if (hda_audio_group_get_widgets(audioGroup, stream) == B_OK)
-		return stream;
+	if (hda_audio_group_get_widgets(audioGroup, stream) == B_OK) {
+		switch (type) {
+			case STREAM_PLAYBACK:
+				controller->streams[controller->num_input_streams] = stream;
+				break;
+			case STREAM_RECORD:
+				controller->streams[0] = stream;
+				break;
+		}
 
+		return stream;
+	}
+
+	dprintf("hda: hda_audio_group_get_widgets failed\n");
+	
 	free(stream);
 	return NULL;
 }
@@ -441,6 +451,7 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 status_t
 hda_stream_start(hda_controller* controller, hda_stream* stream)
 {
+	dprintf("hda_stream_start() offset %lx\n", stream->offset);
 	stream->buffer_ready_sem = create_sem(0, stream->type == STREAM_PLAYBACK
 		? "hda_playback_sem" : "hda_record_sem");
 	if (stream->buffer_ready_sem < B_OK)
@@ -463,6 +474,7 @@ hda_stream_start(hda_controller* controller, hda_stream* stream)
 status_t
 hda_stream_stop(hda_controller* controller, hda_stream* stream)
 {
+	dprintf("hda_stream_stop()\n");
 	stream->Write8(HDAC_STREAM_CONTROL0, stream->Read8(HDAC_STREAM_CONTROL0)
 		& ~(CONTROL0_BUFFER_COMPLETED_INTR | CONTROL0_FIFO_ERROR_INTR
 			| CONTROL0_DESCRIPTOR_ERROR_INTR | CONTROL0_RUN));
@@ -606,20 +618,34 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	/* total cyclic buffer size in _bytes_ */
 	stream->Write32(HDAC_STREAM_BUFFER_SIZE, bufferSize
 		* stream->num_buffers);
-	stream->Write8(HDAC_STREAM_CONTROL2, stream->id << 4);
+	stream->Write8(HDAC_STREAM_CONTROL2, stream->id << CONTROL2_STREAM_SHIFT);
 
 	stream->controller->Write32(HDAC_DMA_POSITION_BASE_LOWER,
 		stream->controller->Read32(HDAC_DMA_POSITION_BASE_LOWER)
 		| DMA_POSITION_ENABLED);
 
+	dprintf("hda: stream: %ld num_io_widgets: %ld\n", stream->id, stream->num_io_widgets);
+	dprintf("hda: widgets: ");
+
 	hda_codec* codec = audioGroup->codec;
+	uint32 channelNum = 0;
 	for (uint32 i = 0; i < stream->num_io_widgets; i++) {
 		verb[0] = MAKE_VERB(codec->addr, stream->io_widgets[i],
 			VID_SET_CONVERTER_FORMAT, format);
+		uint32 val = stream->id << 4;
+		if (stream->type == STREAM_RECORD) {
+			if (channelNum < stream->num_channels)
+				val |= channelNum;
+			else
+				val = 0;
+		}
 		verb[1] = MAKE_VERB(codec->addr, stream->io_widgets[i],
-			VID_SET_CONVERTER_STREAM_CHANNEL, stream->id << 4);
+			VID_SET_CONVERTER_STREAM_CHANNEL, val);
 		hda_send_verbs(codec, verb, response, 2);
+		channelNum += 2; // TODO stereo widget ?
+		dprintf("%ld ", stream->io_widgets[i]);
 	}
+	dprintf("\n");
 
 	snooze(1000);
 	return B_OK;
