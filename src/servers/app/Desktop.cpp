@@ -667,9 +667,25 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 status_t
 Desktop::_ActivateApp(team_id team)
 {
-	status_t status = B_BAD_TEAM_ID;
+	// search for an unhidden window in the current workspace
+
+	LockSingleWindow();
+
+	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
+			window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (!window->IsHidden() && window->IsNormal()
+			&& window->ServerWindow()->ClientTeam() == team) {
+			ActivateWindow(window);
+			UnlockSingleWindow();
+			return B_OK;
+		}
+	}
+
+	UnlockSingleWindow();
 
 	// search for an unhidden window to give focus to
+
+	AutoWriteLocker locker(fWindowLock);
 
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
@@ -682,7 +698,7 @@ Desktop::_ActivateApp(team_id team)
 		}
 	}
 
-	return status;
+	return B_BAD_VALUE;
 }
 
 
