@@ -697,119 +697,97 @@ TraceFilterParser TraceFilterParser::sParser;
 #if ENABLE_TRACING
 
 
-class TraceEntryIterator {
-public:
-	TraceEntryIterator()
-		:
- 		fEntry(NULL),
-		fIndex(0)
-	{
+TraceEntry*
+TraceEntryIterator::Next()
+{
+	if (fIndex == 0) {
+		fEntry = _NextNonBufferEntry(sFirstEntry);
+		fIndex = 1;
+	} else if (fEntry != NULL) {
+		fEntry = _NextNonBufferEntry(next_entry(fEntry));
+		fIndex++;
 	}
 
-	void Reset()
-	{
+	return Current();
+}
+
+
+TraceEntry*
+TraceEntryIterator::Previous()
+{
+	if (fIndex == (int32)sEntries + 1)
+		fEntry = sAfterLastEntry;
+
+	if (fEntry != NULL) {
+		fEntry = _PreviousNonBufferEntry(previous_entry(fEntry));
+		fIndex--;
+	}
+
+	return Current();
+}
+
+
+TraceEntry*
+TraceEntryIterator::MoveTo(int32 index)
+{
+	if (index == fIndex)
+		return Current();
+
+	if (index <= 0 || index > (int32)sEntries) {
+		fIndex = (index <= 0 ? 0 : sEntries + 1);
+		fEntry = NULL;
+		return NULL;
+	}
+
+	// get the shortest iteration path
+	int32 distance = index - fIndex;
+	int32 direction = distance < 0 ? -1 : 1;
+	distance *= direction;
+
+	if (index < distance) {
+		distance = index;
+		direction = 1;
 		fEntry = NULL;
 		fIndex = 0;
 	}
-
-	int32 Index() const
-	{
-		return fIndex;
+	if ((int32)sEntries + 1 - fIndex < distance) {
+		distance = sEntries + 1 - fIndex;
+		direction = -1;
+		fEntry = NULL;
+		fIndex = sEntries + 1;
 	}
 
-	TraceEntry* Current() const
-	{
-		return TraceEntry::FromTraceEntry(fEntry);
+	// iterate to the index
+	if (direction < 0) {
+		while (fIndex != index)
+			Previous();
+	} else {
+		while (fIndex != index)
+			Next();
 	}
 
-	TraceEntry* Next()
-	{
-		if (fIndex == 0) {
-			fEntry = _NextNonBufferEntry(sFirstEntry);
-			fIndex = 1;
-		} else if (fEntry != NULL) {
-			fEntry = _NextNonBufferEntry(next_entry(fEntry));
-			fIndex++;
-		}
+	return Current();
+}
 
-		return Current();
-	}
 
-	TraceEntry* Previous()
-	{
-		if (fIndex == (int32)sEntries + 1)
-			fEntry = sAfterLastEntry;
+trace_entry*
+TraceEntryIterator::_NextNonBufferEntry(trace_entry* entry)
+{
+	while (entry != NULL && (entry->flags & BUFFER_ENTRY) != 0)
+		entry = next_entry(entry);
 
-		if (fEntry != NULL) {
-			fEntry = _PreviousNonBufferEntry(previous_entry(fEntry));
-			fIndex--;
-		}
+	return entry;
+}
 
-		return Current();
-	}
 
-	TraceEntry* MoveTo(int32 index)
-	{
-		if (index == fIndex)
-			return Current();
+trace_entry*
+TraceEntryIterator::_PreviousNonBufferEntry(trace_entry* entry)
+{
+	while (entry != NULL && (entry->flags & BUFFER_ENTRY) != 0)
+		entry = previous_entry(entry);
 
-		if (index <= 0 || index > (int32)sEntries) {
-			fIndex = (index <= 0 ? 0 : sEntries + 1);
-			fEntry = NULL;
-			return NULL;
-		}
-
-		// get the shortest iteration path
-		int32 distance = index - fIndex;
-		int32 direction = distance < 0 ? -1 : 1;
-		distance *= direction;
-
-		if (index < distance) {
-			distance = index;
-			direction = 1;
-			fEntry = NULL;
-			fIndex = 0;
-		}
-		if ((int32)sEntries + 1 - fIndex < distance) {
-			distance = sEntries + 1 - fIndex;
-			direction = -1;
-			fEntry = NULL;
-			fIndex = sEntries + 1;
-		}
-
-		// iterate to the index
-		if (direction < 0) {
-			while (fIndex != index)
-				Previous();
-		} else {
-			while (fIndex != index)
-				Next();
-		}
-
-		return Current();
-	}
-
-private:
-	trace_entry* _NextNonBufferEntry(trace_entry* entry)
-	{
-		while (entry != NULL && (entry->flags & BUFFER_ENTRY) != 0)
-			entry = next_entry(entry);
-
-		return entry;
-	}
-
-	trace_entry* _PreviousNonBufferEntry(trace_entry* entry)
-	{
-		while (entry != NULL && (entry->flags & BUFFER_ENTRY) != 0)
-			entry = previous_entry(entry);
-
-		return entry;
-	}
-
-private:
-	trace_entry*	fEntry;
-	int32			fIndex;
-};
+	return entry;
+}
 
 
 int

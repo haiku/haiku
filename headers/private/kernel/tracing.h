@@ -63,6 +63,7 @@ class TraceOutput {
 		bigtime_t	fLastEntryTime;
 };
 
+
 class TraceEntry {
 	public:
 		TraceEntry();
@@ -89,6 +90,7 @@ class TraceEntry {
 		}
 };
 
+
 class AbstractTraceEntry : public TraceEntry {
 	public:
 		AbstractTraceEntry();
@@ -108,6 +110,7 @@ class AbstractTraceEntry : public TraceEntry {
 		bigtime_t	fTime;
 };
 
+
 class LazyTraceOutput : public TraceOutput {
 public:
 	LazyTraceOutput(char* buffer, size_t bufferSize, uint32 flags)
@@ -125,6 +128,7 @@ public:
 		return Buffer();
 	}
 };
+
 
 class TraceFilter {
 public:
@@ -145,10 +149,51 @@ public:
 	};
 };
 
+
 class WrapperTraceFilter : public TraceFilter {
 public:
 	virtual void Init(TraceFilter* filter, int direction, bool continued) = 0;
 };
+
+
+class TraceEntryIterator {
+public:
+	TraceEntryIterator()
+		:
+ 		fEntry(NULL),
+		fIndex(0)
+	{
+	}
+
+	void Reset()
+	{
+		fEntry = NULL;
+		fIndex = 0;
+	}
+
+	int32 Index() const
+	{
+		return fIndex;
+	}
+
+	TraceEntry* Current() const
+	{
+		return fEntry != NULL ? TraceEntry::FromTraceEntry(fEntry) : NULL;
+	}
+
+	TraceEntry* Next();
+	TraceEntry* Previous();
+	TraceEntry* MoveTo(int32 index);
+
+private:
+	trace_entry* _NextNonBufferEntry(trace_entry* entry);
+	trace_entry* _PreviousNonBufferEntry(trace_entry* entry);
+
+private:
+	trace_entry*	fEntry;
+	int32			fIndex;
+};
+
 
 #endif	// __cplusplus
 
