@@ -1324,7 +1324,8 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 {
 	// find visual center
 
-	ellipsisWidth /= size;	// test if this is as accurate as escapementArray * size
+	ellipsisWidth /= size;
+		// test if this is as accurate as escapementArray * size
 	width /= size;
 
 	float halfWidth = (width - ellipsisWidth) / 2.0;
@@ -1344,6 +1345,16 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 		// string is smaller than half of the maximum width
 		return false;
 	}
+
+	// check if the whole string fits in
+
+	float stringWidth = leftWidth;
+	uint32 i = left;
+	for (; i < numChars && stringWidth < width; i++) {
+		stringWidth += escapementArray[i];
+	}
+	if (stringWidth < width)
+		return false;
 
 	// coming from right...
 
@@ -1426,13 +1437,13 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 }
 
 
-// ToDo: put into BPrivate namespace
+// TODO: put into BPrivate namespace
 void
 truncate_string(const char* string, uint32 mode, float width,
 	char* result, const float* escapementArray, float fontSize,
 	float ellipsisWidth, int32 length, int32 numChars)
 {
-	// ToDo: that's actually not correct: the string could be smaller than ellipsisWidth
+	// TODO: that's actually not correct: the string could be smaller than ellipsisWidth
 	if (string == NULL /*|| width < ellipsisWidth*/) {
 		// we don't have room for a single glyph
 		strcpy(result, "");
