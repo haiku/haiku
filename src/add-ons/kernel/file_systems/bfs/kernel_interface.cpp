@@ -16,6 +16,10 @@
 #include "bfs_control.h"
 #include "bfs_disk_system.h"
 
+// TODO: temporary solution as long as there is no public I/O requests API
+#ifndef BFS_SHELL
+#	include "io_requests.h"
+#endif
 
 #define BFS_IO_SIZE	65536
 
@@ -449,8 +453,10 @@ bfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	if (volume->IsReadOnly())
+#ifndef BFS_SHELL
+	if (request->IsWrite() && volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
+#endif
 
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);

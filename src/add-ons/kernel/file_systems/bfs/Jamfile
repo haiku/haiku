@@ -28,6 +28,9 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders shared storage ;
 
+# TODO: temporary solution as long as there is no public I/O requests API
+SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
+
 KernelAddon bfs :
 	bfs_disk_system.cpp
 	BlockAllocator.cpp
