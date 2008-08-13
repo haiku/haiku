@@ -263,8 +263,8 @@ ServerApp::_HasWindowUnderMouse()
 	\brief Sets the ServerApp's active status
 	\param value The new status of the ServerApp.
 
-	This changes an internal flag and also sets the current cursor to the one specified by
-	the application
+	This changes an internal flag and also sets the current cursor to the one
+	specified by the application
 */
 void
 ServerApp::Activate(bool value)

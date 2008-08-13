@@ -217,31 +217,31 @@ DefaultDecorator::SetFlags(uint32 flags, BRegion* updateRegion)
 
 
 void
-DefaultDecorator::MoveBy(BPoint pt)
+DefaultDecorator::MoveBy(BPoint offset)
 {
-	STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y));
+	STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n", offset.x, offset.y));
 	// Move all internal rectangles the appropriate amount
-	fFrame.OffsetBy(pt);
-	fCloseRect.OffsetBy(pt);
-	fTabRect.OffsetBy(pt);
-	fResizeRect.OffsetBy(pt);
-	fZoomRect.OffsetBy(pt);
-	fBorderRect.OffsetBy(pt);
+	fFrame.OffsetBy(offset);
+	fCloseRect.OffsetBy(offset);
+	fTabRect.OffsetBy(offset);
+	fResizeRect.OffsetBy(offset);
+	fZoomRect.OffsetBy(offset);
+	fBorderRect.OffsetBy(offset);
 
-	fLeftBorder.OffsetBy(pt);
-	fRightBorder.OffsetBy(pt);
-	fTopBorder.OffsetBy(pt);
-	fBottomBorder.OffsetBy(pt);
+	fLeftBorder.OffsetBy(offset);
+	fRightBorder.OffsetBy(offset);
+	fTopBorder.OffsetBy(offset);
+	fBottomBorder.OffsetBy(offset);
 }
 
 
 void
-DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
+DefaultDecorator::ResizeBy(BPoint offset, BRegion* dirty)
 {
-	STRACE(("DefaultDecorator: Resize By (%.1f, %.1f)\n", pt.x, pt.y));
+	STRACE(("DefaultDecorator: Resize By (%.1f, %.1f)\n", offset.x, offset.y));
 	// Move all internal rectangles the appropriate amount
-	fFrame.right += pt.x;
-	fFrame.bottom += pt.y;
+	fFrame.right += offset.x;
+	fFrame.bottom += offset.y;
 
 	// handle invalidation of resize rect
 	if (dirty && !(fFlags & B_NOT_RESIZABLE)) {
@@ -251,7 +251,7 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 				realResizeRect = fResizeRect;
 				// resize rect at old location
 				dirty->Include(realResizeRect);
-				realResizeRect.OffsetBy(pt);
+				realResizeRect.OffsetBy(offset);
 				// resize rect at new location
 				dirty->Include(realResizeRect);
 				break;
@@ -263,7 +263,7 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 					fRightBorder.right - 22, fBottomBorder.bottom - 1);
 				// resize rect at old location
 				dirty->Include(realResizeRect);
-				realResizeRect.OffsetBy(pt);
+				realResizeRect.OffsetBy(offset);
 				// resize rect at new location
 				dirty->Include(realResizeRect);
 
@@ -271,7 +271,7 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 					fRightBorder.right - 1, fBottomBorder.bottom - 22);
 				// resize rect at old location
 				dirty->Include(realResizeRect);
-				realResizeRect.OffsetBy(pt);
+				realResizeRect.OffsetBy(offset);
 				// resize rect at new location
 				dirty->Include(realResizeRect);
 				break;
@@ -280,42 +280,42 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 		}
 	}
 
-	fResizeRect.OffsetBy(pt);
+	fResizeRect.OffsetBy(offset);
 
-	fBorderRect.right	+= pt.x;
-	fBorderRect.bottom	+= pt.y;
+	fBorderRect.right += offset.x;
+	fBorderRect.bottom += offset.y;
 
-	fLeftBorder.bottom	+= pt.y;
-	fTopBorder.right	+= pt.x;
+	fLeftBorder.bottom += offset.y;
+	fTopBorder.right += offset.x;
 
-	fRightBorder.OffsetBy(pt.x, 0.0);
-	fRightBorder.bottom	+= pt.y;
+	fRightBorder.OffsetBy(offset.x, 0.0);
+	fRightBorder.bottom	+= offset.y;
 
-	fBottomBorder.OffsetBy(0.0, pt.y);
-	fBottomBorder.right	+= pt.x;
+	fBottomBorder.OffsetBy(0.0, offset.y);
+	fBottomBorder.right	+= offset.x;
 
 	if (dirty) {
-		if (pt.x > 0.0) {
-			BRect t(fRightBorder.left - pt.x, fTopBorder.top,
-					fRightBorder.right, fTopBorder.bottom);
+		if (offset.x > 0.0) {
+			BRect t(fRightBorder.left - offset.x, fTopBorder.top,
+				fRightBorder.right, fTopBorder.bottom);
 			dirty->Include(t);
-			t.Set(fRightBorder.left - pt.x, fBottomBorder.top,
+			t.Set(fRightBorder.left - offset.x, fBottomBorder.top,
 				fRightBorder.right, fBottomBorder.bottom);
 			dirty->Include(t);
 			dirty->Include(fRightBorder);
-		} else if (pt.x < 0.0) {
+		} else if (offset.x < 0.0) {
 			dirty->Include(BRect(fRightBorder.left, fTopBorder.top,
 				fRightBorder.right, fBottomBorder.bottom));
 		}
-		if (pt.y > 0.0) {
-			BRect t(fLeftBorder.left, fLeftBorder.bottom - pt.y,
-					fLeftBorder.right, fLeftBorder.bottom);
+		if (offset.y > 0.0) {
+			BRect t(fLeftBorder.left, fLeftBorder.bottom - offset.y,
+				fLeftBorder.right, fLeftBorder.bottom);
 			dirty->Include(t);
-			t.Set(fRightBorder.left, fRightBorder.bottom - pt.y,
+			t.Set(fRightBorder.left, fRightBorder.bottom - offset.y,
 				fRightBorder.right, fRightBorder.bottom);
 			dirty->Include(t);
 			dirty->Include(fBottomBorder);
-		} else if (pt.y < 0.0) {
+		} else if (offset.y < 0.0) {
 			dirty->Include(fBottomBorder);
 		}
 	}
@@ -516,44 +516,46 @@ DefaultDecorator::GetFootprint(BRegion* region)
 
 
 click_type
-DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
+DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 {
 #ifdef DEBUG_DECORATOR
 	printf("DefaultDecorator: Clicked\n");
-	printf("\tPoint: (%.1f,%.1f)\n", pt.x,pt.y);
+	printf("\tPoint: (%.1f,%.1f)\n", point.x, point.y);
 	printf("\tButtons: %ld, Modifiers: 0x%lx\n", buttons, modifiers);
 #endif // DEBUG_DECORATOR
 
-	// TODO: have a real double-click mechanism, ie. take user settings into account
+	// TODO: have a real double-click mechanism, ie. take user settings into
+	// account
 	bigtime_t now = system_time();
 	if (buttons != 0) {
 		fWasDoubleClick = now - fLastClicked < 200000;
 		fLastClicked = now;
 	}
 
-	// In checking for hit test stuff, we start with the smallest rectangles the user might
-	// be clicking on and gradually work our way out into larger rectangles.
-	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(pt))
+	// In checking for hit test stuff, we start with the smallest rectangles
+	// the user might be clicking on and gradually work our way out into larger
+	// rectangles.
+	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(point))
 		return DEC_CLOSE;
 
-	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(pt))
+	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(point))
 		return DEC_ZOOM;
 
-	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(pt))
+	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(point))
 		return DEC_RESIZE;
 
 	bool clicked = false;
 
 	// Clicking in the tab?
-	if (fTabRect.Contains(pt)) {
+	if (fTabRect.Contains(point)) {
 		// tab sliding in any case if either shift key is held down
 		// except sliding up-down by moving mouse left-right would look strange
 		if ((modifiers & B_SHIFT_KEY) && (fLook != kLeftTitledWindowLook))
 			return DEC_SLIDETAB;
 
 		clicked = true;
-	} else if (fLeftBorder.Contains(pt) || fRightBorder.Contains(pt)
-		|| fTopBorder.Contains(pt) || fBottomBorder.Contains(pt)) {
+	} else if (fLeftBorder.Contains(point) || fRightBorder.Contains(point)
+		|| fTopBorder.Contains(point) || fBottomBorder.Contains(point)) {
 		// Clicked on border
 
 		// check resize area
@@ -564,7 +566,7 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 				|| fLook == kLeftTitledWindowLook)) {
 			BRect temp(BPoint(fBottomBorder.right - 18,
 				fBottomBorder.bottom - 18), fBottomBorder.RightBottom());
-			if (temp.Contains(pt))
+			if (temp.Contains(point))
 				return DEC_RESIZE;
 		}
 
@@ -572,8 +574,9 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	}
 
 	if (clicked) {
-		// NOTE: On R5, windows are not moved to back if clicked inside the resize area
-		// with the second mouse button. So we check this after the check above
+		// NOTE: On R5, windows are not moved to back if clicked inside the
+		// resize area with the second mouse button. So we check this after
+		// the check above
 		if (buttons == B_SECONDARY_MOUSE_BUTTON)
 			return DEC_MOVETOBACK;
 
@@ -671,7 +674,8 @@ DefaultDecorator::_DoLayout()
 			fMaxTabSize += fTextOffset;
 		fMaxTabSize += fMinTabSize;
 
-		float tabSize = fLook != kLeftTitledWindowLook ? fFrame.Width() : fFrame.Height();
+		float tabSize = fLook != kLeftTitledWindowLook
+			? fFrame.Width() : fFrame.Height();
 		if (tabSize < fMinTabSize)
 			tabSize = fMinTabSize;
 		if (tabSize > fMaxTabSize)
@@ -716,7 +720,7 @@ DefaultDecorator::_DoLayout()
 
 	// calculate resize rect
 	fResizeRect.Set(fBottomBorder.right - 18.0, fBottomBorder.bottom - 18.0,
-					fBottomBorder.right, fBottomBorder.bottom);
+		fBottomBorder.right, fBottomBorder.bottom);
 
 	if (hasTab) {
 		// make sure fTabOffset is within limits and apply it to
@@ -1065,7 +1069,7 @@ DefaultDecorator::_SetFocus()
 
 	if (IsFocus()
 		|| ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
-		&& (fFlags & B_AVOID_FOCUS) != 0)) {
+			&& (fFlags & B_AVOID_FOCUS) != 0)) {
 		fTabColor = fFocusTabColor;
 		fTextColor = fFocusTextColor;
 		fFrameColors[2] = fFocusFrameColors[0];
@@ -1081,8 +1085,7 @@ DefaultDecorator::_SetFocus()
 
 	fTabColorLight = tint_color(fTabColor,
 		(B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2);
-	fTabColorShadow = tint_color(fTabColor,
-		B_DARKEN_2_TINT);
+	fTabColorShadow = tint_color(fTabColor, B_DARKEN_2_TINT);
 }
 
 
@@ -1217,7 +1220,7 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	}
 
 	// calculate room for title
-	// ToDo: the +2 is there because the title often appeared
+	// TODO: the +2 is there because the title often appeared
 	//	truncated for no apparent reason - OTOH the title does
 	//	also not appear perfectly in the middle
 	if (fLook != kLeftTitledWindowLook)
@@ -1289,13 +1292,15 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 			BRect zoomRect(rect);
 			zoomRect.left += inset;
 			zoomRect.top += inset;
-			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down, focus);
+			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down,
+				focus);
 
 			inset = floorf(width / 2.1);
 			zoomRect = rect;
 			zoomRect.right -= inset;
 			zoomRect.bottom -= inset;
-			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down, focus);
+			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down,
+				focus);
 			break;
 		}
 	}

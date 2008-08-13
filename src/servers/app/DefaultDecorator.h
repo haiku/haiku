@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,7 +17,7 @@ class Desktop;
 class ServerBitmap;
 
 class DefaultDecorator: public Decorator {
- public:
+public:
 								DefaultDecorator(DesktopSettings& settings,
 									BRect frame, window_look look,
 									uint32 flags);
@@ -54,7 +54,7 @@ class DefaultDecorator: public Decorator {
 	virtual	click_type			Clicked(BPoint pt, int32 buttons,
 									int32 modifiers);
 
- protected:
+protected:
 	virtual void				_DoLayout();
 
 	virtual void				_DrawFrame(BRect r);
@@ -67,8 +67,8 @@ class DefaultDecorator: public Decorator {
 	virtual void				_SetFocus();
 	virtual void				_SetColors();
 
- private:
- 			void				_DrawButtonBitmap(ServerBitmap *bitmap,
+private:
+ 			void				_DrawButtonBitmap(ServerBitmap* bitmap,
  									BRect rect);
 			void				_DrawBlendedRect(DrawingEngine *engine,
 									BRect rect, bool down, bool focus);
@@ -77,9 +77,9 @@ class DefaultDecorator: public Decorator {
 									float* inset) const;
 			void				_LayoutTabItems(const BRect& tabRect);
 
-static		ServerBitmap *		_GetBitmapForButton(int32 item, bool down,
+	static	ServerBitmap*		_GetBitmapForButton(int32 item, bool down,
 									bool focus, int32 width, int32 height,
-									DefaultDecorator *object);
+									DefaultDecorator* object);
 
 			rgb_color			fButtonHighColor;
 			rgb_color			fButtonLowColor;
