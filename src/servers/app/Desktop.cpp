@@ -669,23 +669,18 @@ Desktop::_ActivateApp(team_id team)
 {
 	// search for an unhidden window in the current workspace
 
-	LockSingleWindow();
+	AutoWriteLocker locker(fWindowLock);
 
 	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (!window->IsHidden() && window->IsNormal()
 			&& window->ServerWindow()->ClientTeam() == team) {
 			ActivateWindow(window);
-			UnlockSingleWindow();
 			return B_OK;
 		}
 	}
 
-	UnlockSingleWindow();
-
 	// search for an unhidden window to give focus to
-
-	AutoWriteLocker locker(fWindowLock);
 
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
@@ -698,6 +693,10 @@ Desktop::_ActivateApp(team_id team)
 		}
 	}
 
+	// TODO: we cannot maximize minimized windows here (with the window lock
+	// write locked). To work-around this, we could forward the request to
+	// the ServerApp of this team - it maintains its own window list, and can
+	// therefore call ActivateWindow() without holding the window lock.
 	return B_BAD_VALUE;
 }
 
@@ -2505,14 +2504,7 @@ Desktop::WriteWindowOrder(int32 workspace, BPrivate::LinkSender& sender)
 		return;
 	}
 
-	// compute the number of windows
-
-	int32 count = 0;
-
-	for (Window *window = _Windows(workspace).LastWindow(); window != NULL;
-			window = window->PreviousWindow(workspace)) {
-		count++;
-	}
+	int32 count = _Windows(workspace).Count();
 
 	// write list
 

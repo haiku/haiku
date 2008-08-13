@@ -23,14 +23,18 @@ public:
 
 			void	SetIndex(int32 index);
 			int32	Index() const { return fIndex; }
-	
-			Window*	FirstWindow() { return fFirstWindow; }
-			Window*	LastWindow() { return fLastWindow; }
-	
+
+			Window*	FirstWindow() const { return fFirstWindow; }
+			Window*	LastWindow() const { return fLastWindow; }
+
 			void	AddWindow(Window* window, Window* before = NULL);
 			void	RemoveWindow(Window* window);
-	
+
 			bool	HasWindow(Window* window) const;
+			bool	ValidateWindow(Window* window) const;
+
+			int32	Count() const;
+						// O(n)
 
 private:
 	int32			fIndex;
