@@ -109,7 +109,7 @@ is_white_space(uint32 charCode)
 //	#pragma mark -
 
 
-/*! 
+/*!
 	\brief Constructor
 	\param style Style object to which the ServerFont belongs
 	\param size Character size in points
@@ -145,7 +145,7 @@ ServerFont::ServerFont()
 }
 
 
-/*! 
+/*!
 	\brief Copy Constructor
 	\param font ServerFont to copy
 */
@@ -157,7 +157,7 @@ ServerFont::ServerFont(const ServerFont &font)
 }
 
 
-/*! 
+/*!
 	\brief Removes itself as a dependency of its owning style.
 */
 ServerFont::~ServerFont()
@@ -166,7 +166,7 @@ ServerFont::~ServerFont()
 }
 
 
-/*! 
+/*!
 	\brief Returns a copy of the specified font
 	\param The font to copy from.
 	\return A copy of the specified font
@@ -183,7 +183,7 @@ ServerFont::operator=(const ServerFont& font)
 		fSpacing = font.fSpacing;
 		fEncoding = font.fEncoding;
 		fBounds = font.fBounds;
-	
+
 		SetStyle(font.fStyle);
 	}
 
@@ -191,7 +191,7 @@ ServerFont::operator=(const ServerFont& font)
 }
 
 
-/*! 
+/*!
 	\brief Returns the number of strikes in the font
 	\return The number of strikes in the font
 */
@@ -202,7 +202,7 @@ ServerFont::CountTuned()
 }
 
 
-/*! 
+/*!
 	\brief Returns the file format of the font.
 	\return Mostly B_TRUETYPE_WINDOWS :)
 */
@@ -287,7 +287,7 @@ ServerFont::SetFamilyAndStyle(uint32 fontID)
 {
 	uint16 style = fontID & 0xFFFF;
 	uint16 family = (fontID & 0xFFFF0000) >> 16;
-	
+
 	return SetFamilyAndStyle(family, style);
 }
 
@@ -363,7 +363,7 @@ ServerFont::GetTransformedFace(bool rotate, bool shear) const
 		rmatrix.yy = (FT_Fixed)( rotationAngle.Cosine() * 0x10000);
 
 		Angle shearAngle(fShear);
-		smatrix.xx = (FT_Fixed)(0x10000); 
+		smatrix.xx = (FT_Fixed)(0x10000);
 		smatrix.xy = (FT_Fixed)(-shearAngle.Cosine() * 0x10000);
 		smatrix.yx = (FT_Fixed)(0);
 		smatrix.yy = (FT_Fixed)(0x10000);
@@ -515,7 +515,7 @@ ServerFont::GetEdges(const char* string, int32 numBytes,
 //		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
 //		edgeArray[i].left = float(face->glyph->metrics.horiBearingX)
 //			/ 64 / fSize;
-//		edgeArray[i].right = float(face->glyph->metrics.horiBearingX 
+//		edgeArray[i].right = float(face->glyph->metrics.horiBearingX
 //			+ face->glyph->metrics.width - face->glyph->metrics.horiAdvance)
 //			/ 64 / fSize;
 //	}
@@ -819,7 +819,7 @@ ServerFont::StringWidth(const char *string, int32 numBytes,
 }
 
 
-/*! 
+/*!
 	\brief Returns a BRect which encloses the entire font
 	\return A BRect which encloses the entire font
 */
@@ -831,7 +831,7 @@ ServerFont::BoundingBox()
 }
 
 
-/*! 
+/*!
 	\brief Obtains the height values for characters in the font in its current state
 	\param fh pointer to a font_height object to receive the values for the font
 */
@@ -849,18 +849,18 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 		return;
 
 	// the width of the "…" glyph
-	float ellipsisWidth = StringWidth(B_UTF8_ELLIPSIS, 1);
-	const char *string = inOut->String();
+	float ellipsisWidth = StringWidth(B_UTF8_ELLIPSIS, strlen(B_UTF8_ELLIPSIS));
+	const char* string = inOut->String();
 	int32 length = inOut->Length();
 
 	// temporary array to hold result
-	char *result = new char[length + 3];
+	char* result = new char[length + 3];
 
 	// count the individual glyphs
 	int32 numChars = UTF8CountChars(string, -1);
 
 	// get the escapement of each glyph in font units
-	float *escapementArray = new float[numChars];
+	float* escapementArray = new float[numChars];
 	static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
 	if (GetEscapements(string, length, numChars, delta, escapementArray)
 			== B_OK) {
