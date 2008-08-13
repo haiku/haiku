@@ -1,10 +1,11 @@
-/* File System volume functions
- *
- * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
+/*
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_VOLUME_H
 #define	_FS_VOLUME_H
+
+//!	File System volume functions
 
 #include <OS.h>
 
@@ -22,7 +23,8 @@ extern "C" {
 #endif
 
 extern dev_t	fs_mount_volume(const char *where, const char *device,
-					const char *filesystem, uint32 flags, const char *parameters);
+					const char *filesystem, uint32 flags,
+					const char *parameters);
 extern status_t	fs_unmount_volume(const char *path, uint32 flags);
 
 #ifdef  __cplusplus
