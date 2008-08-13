@@ -94,7 +94,7 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 	AddFilesToHaikuImage beos system servers : bluetooth_server ;
 	AddFilesToHaikuImage beos system lib : libbluetooth.so ;
 	AddFilesToHaikuImage beos bin : bt_dev_info bt_discovery ;
-	
+
 	if [ IsOptionalHaikuImagePackageAdded Development ] {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/libbluetooth.so ;
 	}
@@ -124,6 +124,9 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 	AddFilesToHaikuImage develop lib x86
 		: <src!system!glue!arch!x86>crti.o <src!system!glue!arch!x86>crtn.o
 		  <src!system!glue>init_term_dyn.o <src!system!glue>start_dyn.o ;
+
+	# kernel
+	AddFilesToHaikuImage develop lib x86 : kernel.so : _KERNEL_ ;
 
 	# library symlinks
 	local lib ;
