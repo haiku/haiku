@@ -1,11 +1,14 @@
 /*
-** Copyright 2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Copyright 2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #ifdef _BOOT_MODE
-#include <boot/arch.h>
+#	include <boot/arch.h>
 #endif
 
 #include <KernelExport.h>
@@ -39,27 +42,40 @@ static const char *kRelocations[] = {
 #endif
 
 
+#ifndef _BOOT_MODE
+static bool
+is_in_image(struct elf_image_info *image, addr_t address)
+{
+	return (address >= image->text_region.start
+			&& address < image->text_region.start + image->text_region.size)
+		|| (address >= image->data_region.start
+			&& address < image->data_region.start + image->data_region.size);
+}
+#endif	// !_BOOT_MODE
+
+
 #ifdef _BOOT_MODE
 status_t
 boot_arch_elf_relocate_rel(struct preloaded_image *image,
-	struct Elf32_Rel *rel, int rel_len)
+	struct Elf32_Rel *rel, int relLength)
 #else
 int
-arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
-	struct elf_image_info *resolve_image, struct Elf32_Rel *rel, int rel_len)
+arch_elf_relocate_rel(struct elf_image_info *image, const char *prepend,
+	struct elf_image_info *resolveImage, struct Elf32_Rel *rel, int relLength)
 #endif
 {
-	struct Elf32_Sym *sym;
 	addr_t S;
 	addr_t A;
 	addr_t P;
-	addr_t final_val;
+	addr_t finalAddress;
+	addr_t *resolveAddress;
 	int i;
 
 	S = A = P = 0;
 
-	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < rel_len; i++) {
-		TRACE(("looking at rel type %s, offset 0x%lx\n", kRelocations[ELF32_R_TYPE(rel[i].r_info)], rel[i].r_offset));
+	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < relLength; i++) {
+		TRACE(("looking at rel type %s, offset 0x%lx\n",
+			kRelocations[ELF32_R_TYPE(rel[i].r_info)], rel[i].r_offset));
 
 		// calc S
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
@@ -69,18 +85,20 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 			case R_386_JMP_SLOT:
 			case R_386_GOTOFF:
 			{
-				int vlErr;
+				struct Elf32_Sym *symbol;
+				status_t status;
 
-				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
+				symbol = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 
 #ifdef _BOOT_MODE
-				vlErr = boot_elf_resolve_symbol(image, sym, &S);
+				status = boot_elf_resolve_symbol(image, symbol, &S);
 #else
-				vlErr = elf_resolve_symbol(image, sym, resolve_image, sym_prepend, &S);
+				status = elf_resolve_symbol(image, symbol, resolveImage,
+					prepend, &S);
 #endif
-				if (vlErr < 0)
-					return vlErr;
-				TRACE(("S %p (%s)\n", (void *)S, SYMNAME(image, sym)));
+				if (status < B_OK)
+					return status;
+				TRACE(("S %p (%s)\n", (void *)S, SYMNAME(image, symbol)));
 			}
 		}
 		// calc A
@@ -111,26 +129,37 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 			case R_386_NONE:
 				continue;
 			case R_386_32:
-				final_val = S + A;
+				finalAddress = S + A;
 				break;
 			case R_386_PC32:
-				final_val = S + A - P;
+				finalAddress = S + A - P;
 				break;
 			case R_386_RELATIVE:
 				// B + A;
-				final_val = image->text_region.delta + A;
+				finalAddress = image->text_region.delta + A;
 				break;
 			case R_386_JMP_SLOT:
 			case R_386_GLOB_DAT:
-				final_val = S;
+				finalAddress = S;
 				break;
 
 			default:
-				dprintf("arch_elf_relocate_rel: unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info));
+				dprintf("arch_elf_relocate_rel: unhandled relocation type %d\n",
+					ELF32_R_TYPE(rel[i].r_info));
 				return EPERM;
 		}
-		*(addr_t *)(image->text_region.delta + rel[i].r_offset) = final_val;
-		TRACE(("-> offset %p = %p\n", (void *)(image->text_region.delta + rel[i].r_offset), (void *)final_val));
+
+		resolveAddress = (addr_t *)(image->text_region.delta + rel[i].r_offset);
+#ifndef _BOOT_MODE
+		if (!is_in_image(image, (addr_t)resolveAddress)) {
+			dprintf("arch_elf_relocate_rel: invalid offset %#lx\n",
+				rel[i].r_offset);
+			return B_BAD_ADDRESS;
+		}
+#endif
+		*resolveAddress = finalAddress;
+		TRACE(("-> offset %#lx = %#lx\n",
+			(image->text_region.delta + rel[i].r_offset), finalAddress));
 	}
 
 	return B_NO_ERROR;
@@ -140,11 +169,11 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 #ifdef _BOOT_MODE
 status_t
 boot_arch_elf_relocate_rela(struct preloaded_image *image,
-	struct Elf32_Rela *rel, int rel_len)
+	struct Elf32_Rela *rel, int relLength)
 #else
 int
-arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
-	struct elf_image_info *resolve_image, struct Elf32_Rela *rel, int rel_len)
+arch_elf_relocate_rela(struct elf_image_info *image, const char *prepend,
+	struct elf_image_info *resolveImage, struct Elf32_Rela *rel, int relLength)
 #endif
 {
 	dprintf("arch_elf_relocate_rela: not supported on x86\n");
