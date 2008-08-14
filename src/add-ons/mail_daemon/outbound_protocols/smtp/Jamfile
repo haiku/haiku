@@ -11,9 +11,14 @@ UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-if $(USESSL) {
-	SubDirC++Flags -DUSESSL ;
-	SubDirHdrs [ FDirName / boot home config include ] ;
+if $(USE_SSL) {
+	SubDirC++Flags -DUSE_SSL ;
+	if ! $(SSL_DIR) {
+		sslDir = [ FDirName $(HAIKU_OUTPUT_DIR) cross-ssl config ] ;
+	} else {
+		sslDir = $(SSL_DIR) ;
+	}
+	SubDirSysHdrs [ FDirName $(sslDir) include ] ;
 }
 
 Addon SMTP :
@@ -22,8 +27,8 @@ Addon SMTP :
 
 LinkAgainst SMTP : be libmail.so $(TARGET_NETWORK_LIBS) ;
 
-if $(USESSL) {
-	LinkAgainst SMTP : ssl crypto ;
+if $(USE_SSL) {
+	LinkAgainst SMTP : $(sslDir)/lib/libssl.so $(sslDir)/lib/libcrypto.so ;
 }
 
 Package haiku-maildaemon-cvs :

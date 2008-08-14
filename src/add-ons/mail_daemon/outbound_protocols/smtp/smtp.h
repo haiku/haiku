@@ -1,19 +1,22 @@
+/*
+ * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef ZOIDBERG_SMTP_H
 #define ZOIDBERG_SMTP_H
-/* SMTPProtocol - implementation of the SMTP protocol
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
 
 
 #include <String.h>
 
 #include <MailAddon.h>
 
-#ifdef USESSL
-	#include <openssl/ssl.h>
-	#include <openssl/rand.h>
+#ifdef USE_SSL
+#	include <openssl/ssl.h>
+#	include <openssl/rand.h>
 #endif
+
 
 class SMTPProtocol : public BMailFilter {
 	public:
@@ -41,14 +44,14 @@ class SMTPProtocol : public BMailFilter {
 		BMessage *fSettings;
 		BMailChainRunner *runner;
 		int32 fAuthType;
-                
-                #ifdef USESSL
-			SSL_CTX *ctx;
-			SSL *ssl;
-			BIO *sbio;
-			
-			bool use_ssl;
-		#endif
+
+#ifdef USE_SSL
+		SSL_CTX *ctx;
+		SSL *ssl;
+		BIO *sbio;
+
+		bool use_ssl;
+#endif
 
 		status_t fStatus;
 		BString fServerName;		// required for DIGEST-MD5

@@ -1,7 +1,11 @@
-/* SMTPProtocol - implementation of the SMTP protocol
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+//!	implementation of the SMTP protocol
 
 #include <DataIO.h>
 #include <Message.h>
@@ -19,8 +23,8 @@
 #include <sys/time.h>
 #include <sys/socket.h>
 #ifndef HAIKU_TARGET_PLATFORM_BEOS // These headers don't exist in BeOS R5.
-	#include <arpa/inet.h>
-	#include <sys/select.h>
+#	include <arpa/inet.h>
+#	include <sys/select.h>
 #endif
 
 #include <status.h>
@@ -34,8 +38,10 @@
 #include <map>
 
 #include "smtp.h"
-#ifndef USESSL
-#include "md5.h"
+#ifdef USE_SSL
+#	include <openssl/md5.h>
+#else
+#	include "md5.h"
 #endif
 
 #include <MDRLanguage.h>
@@ -167,7 +173,7 @@ void MD5Digest (char* hexdigest, unsigned char *text, int text_len) {
 	int i;
 	unsigned char digest[17];
 	unsigned char c;
-	
+
 	MD5Sum((char*)digest, text, text_len);
 
   	for (i = 0;  i < 16;  i++) {
@@ -207,7 +213,7 @@ SplitChallengeIntoMap(BString str, map<BString,BString>& m)
 				if (*s == 0)
 					return false;
 				s++;
-			}			
+			}
 			*s++ = '\0';
 		} else {
 			val = s;
@@ -350,19 +356,19 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 {
 	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE ("Connecting to server...","接続中..."));
 
-        #ifdef USESSL
+        #ifdef USE_SSL
 		use_ssl = (fSettings->FindInt32("flavor") == 1);
 		ssl = NULL;
 		ctx = NULL;
 	#endif
 
         if (port <= 0)
-		#ifdef USESSL
+		#ifdef USE_SSL
 			port = use_ssl ? 465 : 25;
 		#else
 			port = 25;
 		#endif
-	
+
 	uint32 hostIP = inet_addr(address);  // first see if we can parse it as a numeric address
 	if ((hostIP == 0)||(hostIP == (uint32)-1)) {
 		struct hostent * he = gethostbyname(address);
@@ -371,7 +377,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
 	if (hostIP == 0)
 		return EHOSTUNREACH;
-		
+
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 #else
@@ -397,7 +403,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 		return errno;
 	}
 
-#ifdef USESSL
+#ifdef USE_SSL
 	if (use_ssl) {
 		SSL_library_init();
     	SSL_load_error_strings();
@@ -405,12 +411,12 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
     	/*--- Because we're an add-on loaded at an unpredictable time, all
     	      the memory addresses and things contained in ourself are
     	      esssentially random. */
-    	
+
     	ctx = SSL_CTX_new(SSLv23_method());
     	ssl = SSL_new(ctx);
     	sbio=BIO_new_socket(_fd,BIO_NOCLOSE);
     	SSL_set_bio(ssl,sbio,sbio);
-    	
+
     	if (SSL_connect(ssl) <= 0) {
     		BString error;
 			error << "Could not connect to SMTP server " << fSettings->FindString("server");
@@ -429,18 +435,18 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 			return B_OK;
 		}
 	}
-	
+
     #endif
 
 	BString line;
 	ReceiveResponse(line);
-	
+
 	char localhost[255];
 	gethostname(localhost,255);
-	
+
 	if (localhost[0] == 0)
 		strcpy(localhost,"namethisbebox");
-	
+
 	char *cmd = new char[::strlen(localhost)+8];
 	if (!esmtp)
 		::sprintf(cmd,"HELO %s"CRLF, localhost);
@@ -749,7 +755,7 @@ SMTPProtocol::Close()
 		// Error
 	}
 
-#ifdef USESSL
+#ifdef USE_SSL
         if (use_ssl)  {
                 if (ssl)
                         SSL_shutdown(ssl);
@@ -844,7 +850,7 @@ SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
 			if (data[i] == '\r' && data[i+1] == '\n' && data[i+2] == '.') {
 				foundCRLFPeriod = true;
 				// Send data up to the CRLF, and include the period too.
-                        #ifdef USESSL
+                        #ifdef USE_SSL
                                 if (use_ssl) {
                                         if (SSL_write(ssl,data,i + 3) < 0) {
                                             amountUnread = 0; // Stop when an error happens.
@@ -870,7 +876,7 @@ SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
 		if (!foundCRLFPeriod) {
 			if (amountUnread <= 0) { // No more data, all we have is in the buffer.
 				if (bufferLen > 0) {
-                            #ifdef USESSL
+                            #ifdef USE_SSL
                                     if (use_ssl)
                                             SSL_write(ssl,data,bufferLen);
                                     else
@@ -887,7 +893,7 @@ SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
 			// Send most of the buffer, except a few characters to overlap with
 			// the next read, in case the CRLFPeriod is split between reads.
 			if (bufferLen > 3) {
-                        #ifdef USESSL
+                        #ifdef USE_SSL
                             if (use_ssl) {
                                     if (SSL_write(ssl,data,bufferLen - 3) < 0)
                                         break;
@@ -927,20 +933,20 @@ SMTPProtocol::ReceiveResponse(BString &out)
 	bool gotCode = false;
 	int32 errCode;
 	BString searchStr = "";
-	
+
 	struct timeval tv;
 	struct fd_set fds;
 
 	tv.tv_sec = long(timeout / 1e6);
 	tv.tv_usec = long(timeout-(tv.tv_sec * 1e6));
-	
+
 	/* Initialize (clear) the socket mask. */
 	FD_ZERO(&fds);
-	
+
 	/* Set the socket in the mask. */
 	FD_SET(_fd, &fds);
         int result = -1;
-#ifdef USESSL
+#ifdef USE_SSL
         if ((use_ssl) && (SSL_pending(ssl)))
             result = 1;
         else
@@ -948,10 +954,10 @@ SMTPProtocol::ReceiveResponse(BString &out)
             result = select(32, &fds, NULL, NULL, &tv);
 	if (result < 0)
 		return errno;
-	
+
 	if (result > 0) {
 		while (1) {
-                 #ifdef USESSL
+                 #ifdef USE_SSL
 			if (use_ssl)
 				r = SSL_read(ssl,buf,SMTP_RESPONSE_SIZE - 1);
 			else
@@ -959,7 +965,7 @@ SMTPProtocol::ReceiveResponse(BString &out)
 			r = recv(_fd,buf, SMTP_RESPONSE_SIZE - 1,0);
 			if (r <= 0)
 				break;
-			
+
 			if (!gotCode)
 			{
 				if (buf[3] == ' ' || buf[3] == '-')
@@ -967,12 +973,12 @@ SMTPProtocol::ReceiveResponse(BString &out)
 					errCode = atol(buf);
 					gotCode = true;
 					searchStr << errCode << ' ';
-				}		
+				}
 			}
 
 			len += r;
 			out.Append(buf, r);
-			
+
 			if (strstr(buf, CRLF) && (out.FindFirst(searchStr) != B_ERROR))
 				break;
 		}
@@ -991,7 +997,7 @@ SMTPProtocol::SendCommand(const char *cmd)
 {
 	D(bug("C:%s\n", cmd));
 
-#ifdef USESSL
+#ifdef USE_SSL
 	if (use_ssl && ssl) {
 		if (SSL_write(ssl,cmd,::strlen(cmd)) < 0)
                     return B_ERROR;
@@ -1039,8 +1045,8 @@ instantiate_mailfilter(BMessage *settings, BMailChainRunner *status)
 BView *
 instantiate_config_panel(BMessage *settings, BMessage *)
 {
-	#ifdef USESSL
-	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS | 
+	#ifdef USE_SSL
+	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS |
 																B_MAIL_PROTOCOL_HAS_USERNAME |
 																B_MAIL_PROTOCOL_HAS_PASSWORD |
 																B_MAIL_PROTOCOL_HAS_HOSTNAME |
@@ -1048,7 +1054,7 @@ instantiate_config_panel(BMessage *settings, BMessage *)
 	view->AddFlavor("Unencrypted");
 	view->AddFlavor("SSL");
 	#else
-	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS | 
+	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS |
 																B_MAIL_PROTOCOL_HAS_USERNAME |
 																B_MAIL_PROTOCOL_HAS_PASSWORD |
 																B_MAIL_PROTOCOL_HAS_HOSTNAME);
@@ -1060,7 +1066,7 @@ instantiate_config_panel(BMessage *settings, BMessage *)
 
 	BTextControl *control = (BTextControl *)(view->FindView("host"));
 	control->SetLabel(MDR_DIALECT_CHOICE ("SMTP Server: ","SMTPサーバ: "));
-	
+
 	// Reset the dividers after changing one
 	float widestLabel=0;
 	for (int32 i = view->CountChildren(); i-- > 0;) {

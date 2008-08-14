@@ -1,6 +1,6 @@
-/* 
+/*
+ * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2007, Haiku Inc. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -19,16 +19,16 @@
 
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
 	// These headers don't exist in BeOS R5.
-	#include <arpa/inet.h>
-	#include <sys/select.h>
+#	include <arpa/inet.h>
+#	include <sys/select.h>
 #endif
 
-#if USESSL
-	#include <openssl/ssl.h>
-	#include <openssl/rand.h>
-	#include <openssl/md5.h>
+#if USE_SSL
+#	include <openssl/ssl.h>
+#	include <openssl/rand.h>
+#	include <openssl/md5.h>
 #else
-	#include "md5.h"
+#	include "md5.h"
 #endif
 
 #include <DataIO.h>
@@ -51,7 +51,7 @@ POP3Protocol::POP3Protocol(BMessage *settings, BMailChainRunner *status)
 	fNumMessages(-1),
 	fMailDropSize(0)
 {
-#ifdef USESSL
+#ifdef USE_SSL
 	fUseSSL = (settings->FindInt32("flavor") == 1);
 #endif
 	Init();
@@ -60,12 +60,12 @@ POP3Protocol::POP3Protocol(BMessage *settings, BMailChainRunner *status)
 
 POP3Protocol::~POP3Protocol()
 {
-#ifdef USESSL
+#ifdef USE_SSL
 	if (!fUseSSL || fSSL)
 #endif
 	SendCommand("QUIT" CRLF);
 
-#ifdef USESSL
+#ifdef USE_SSL
 	if (fUseSSL) {
 		if (fSSL)
 			SSL_shutdown(fSSL);
@@ -76,7 +76,7 @@ POP3Protocol::~POP3Protocol()
 
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
 	close(fSocket);
-#else	
+#else
 	closesocket(fSocket);
 #endif
 }
@@ -89,7 +89,7 @@ POP3Protocol::Open(const char *server, int port, int)
 		"POP3サーバに接続しています..."));
 
 	if (port <= 0) {
-#ifdef USESSL
+#ifdef USE_SSL
 		port = fUseSSL ? 995 : 110;
 #else
 		port = 110;
@@ -149,7 +149,7 @@ POP3Protocol::Open(const char *server, int port, int)
 		return B_ERROR;
 	}
 
-#ifdef USESSL
+#ifdef USE_SSL
 	if (fUseSSL) {
 		SSL_library_init();
 		SSL_load_error_strings();
@@ -400,7 +400,7 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 
 	if (SendCommand(command) != B_OK)
 		return B_ERROR;
-	
+
 	struct timeval tv;
 	tv.tv_sec = POP3_RETRIEVAL_TIMEOUT / 1000000;
 	tv.tv_usec = POP3_RETRIEVAL_TIMEOUT % 1000000;
@@ -412,7 +412,7 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 	while (cont) {
 		int result = 0;
 
-#ifdef USESSL
+#ifdef USE_SSL
 		if (fUseSSL && SSL_pending(fSSL))
 			result = 1;
 		else
@@ -426,7 +426,7 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		}
 		if (amountToReceive > bufSize - 1 - amountInBuffer)
 			amountToReceive = bufSize - 1 - amountInBuffer;
-#ifdef USESSL
+#ifdef USE_SSL
 		if (fUseSSL) {
 			amountReceived = SSL_read(fSSL, buf + amountInBuffer,
 				amountToReceive);
@@ -594,7 +594,7 @@ POP3Protocol::ReceiveLine(BString &line)
 	FD_SET(fSocket, &readSet);
 
 	int result;
-#ifdef USESSL
+#ifdef USE_SSL
 	if (fUseSSL && SSL_pending(fSSL))
 		result = 1;
 	else
@@ -606,7 +606,7 @@ POP3Protocol::ReceiveLine(BString &line)
 			// Hope there's an end of line out there else this gets stuck.
 			int32 bytesReceived;
 			uint8 c = 0;
-#ifdef USESSL
+#ifdef USE_SSL
 			if (fUseSSL)
 				bytesReceived = SSL_read(fSSL, (char*)&c, 1);
 			else
@@ -647,7 +647,7 @@ POP3Protocol::SendCommand(const char *cmd)
 	// Flush any accumulated garbage data before we send our command, so we
 	// don't misinterrpret responses from previous commands (that got left over
 	// due to bugs) as being from this command.
-	
+
 	struct timeval tv;
 	tv.tv_sec = 0;
 	tv.tv_usec = 1000;
@@ -657,7 +657,7 @@ POP3Protocol::SendCommand(const char *cmd)
 	FD_ZERO(&readSet);
 	FD_SET(fSocket, &readSet);
 	int result;
-#ifdef USESSL
+#ifdef USE_SSL
 	if (fUseSSL && SSL_pending(fSSL))
 		result = 1;
 	else
@@ -667,7 +667,7 @@ POP3Protocol::SendCommand(const char *cmd)
 	if (result > 0) {
 		int amountReceived;
 		char tempString [1025];
-#ifdef USESSL
+#ifdef USE_SSL
 		if (fUseSSL)
 			amountReceived = SSL_read(fSSL, tempString, sizeof(tempString) - 1);
 		else
@@ -683,7 +683,7 @@ POP3Protocol::SendCommand(const char *cmd)
 		//	break;
 	}
 
-#ifdef USESSL
+#ifdef USE_SSL
 	if (fUseSSL) {
 		SSL_write(fSSL, cmd,::strlen(cmd));
 	} else
@@ -723,10 +723,10 @@ POP3Protocol::SendCommand(const char *cmd)
 
 void
 POP3Protocol::MD5Digest(unsigned char *in, char *asciiDigest)
-{	
+{
 	unsigned char digest[16];
 
-#ifdef USESSL
+#ifdef USE_SSL
 	MD5(in, ::strlen((char*)in), digest);
 #else
 	MD5_CTX context;
@@ -761,14 +761,14 @@ instantiate_config_panel(BMessage *settings, BMessage *)
 		B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_AUTH_METHODS
 		| B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
 		| B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
-#if USESSL
+#if USE_SSL
 		| B_MAIL_PROTOCOL_HAS_FLAVORS
 #endif
 		);
 	view->AddAuthMethod("Plain Text");
 	view->AddAuthMethod("APOP");
 
-#if USESSL
+#if USE_SSL
 	view->AddFlavor("No Encryption");
 	view->AddFlavor("SSL");
 #endif

@@ -1,6 +1,6 @@
-/* 
+/*
+ * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2007, Haiku Inc. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -9,6 +9,10 @@
 
 
 #include <map>
+
+#ifdef USE_SSL
+#	include <openssl/ssl.h>
+#endif
 
 #include <List.h>
 #include <String.h>
@@ -20,7 +24,7 @@ class POP3Protocol : public SimpleMailProtocol {
 public:
   	POP3Protocol(BMessage *settings, BMailChainRunner *status);
   	~POP3Protocol();
-  
+
 	status_t Open(const char *server, int port, int protocol);
 	status_t Login(const char *uid, const char *password, int method);
 	status_t UniqueIDs();
@@ -47,7 +51,7 @@ private:
 	size_t			fMailDropSize;
 	BList			fSizes;
 
-#ifdef USESSL
+#ifdef USE_SSL
 	SSL_CTX*		fSSLContext;
 	SSL*			fSSL;
 	BIO*			fSSLBio;

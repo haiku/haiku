@@ -1,3 +1,10 @@
+/*
+ * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <RemoteStorageProtocol.h>
 #include <E-mail.h>
 #include <netdb.h>
@@ -22,13 +29,13 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #ifndef HAIKU_TARGET_PLATFORM_BEOS // These headers don't exist in BeOS R5.
-	#include <arpa/inet.h>
-	#include <sys/select.h>
+#	include <arpa/inet.h>
+#	include <sys/select.h>
 #endif
 
-#ifdef USESSL
-	#include <openssl/ssl.h>
-	#include <openssl/rand.h>
+#ifdef USE_SSL
+#	include <openssl/ssl.h>
+#	include <openssl/rand.h>
 #endif
 
 #include "NestedString.h"
@@ -51,13 +58,13 @@ class IMAP4Client : public BRemoteMailStorageProtocol {
 	public:
 		IMAP4Client(BMessage *settings, BMailChainRunner *run);
 		virtual ~IMAP4Client();
-		
+
 		virtual status_t GetMessage(const char *mailbox, const char *message, BPositionIO **, BMessage *headers);
 		virtual status_t AddMessage(const char *mailbox, BPositionIO *data, BString *id);
-		
+
 		virtual status_t DeleteMessage(const char *mailbox, const char *message);
 		virtual status_t CopyMessage(const char *mailbox, const char *to_mailbox, BString *message);
-		
+
 		virtual status_t CreateMailbox(const char *mailbox);
 		virtual status_t DeleteMailbox(const char *mailbox);
 
@@ -67,43 +74,43 @@ class IMAP4Client : public BRemoteMailStorageProtocol {
 			BPath* out_folder_location) { return BRemoteMailStorageProtocol::GetMessage(uid, out_file, out_headers, out_folder_location); }
 
 		virtual status_t DeleteMessage(const char* uid) { return BRemoteMailStorageProtocol::DeleteMessage(uid); }
-		
+
 		void GetUniqueIDs();
-		
+
 		status_t ReceiveLine(BString &out);
 		status_t SendCommand(const char *command);
-		
+
 		status_t Select(const char *mb, bool force_reselect = false, bool queue_new_messages = true, bool noop = true, bool no_command = false, bool ignore_forced_reselect = false);
 		status_t Close();
-		
+
 		virtual status_t InitCheck(BString *) { if (net < 0 && err == B_OK) return net; return err; }
-		
+
 		int GetResponse(BString &tag, NestedString *parsed_response, bool report_literals = false, bool recursion_flag = false);
 		bool WasCommandOkay(BString &response);
-		
+
 		void InitializeMailboxes();
-	
+
 	private:
 		friend class NoopWorker;
 		friend class IMAP4PartialReader;
-		
+
 		NoopWorker *noop;
 		BMessageRunner *nooprunner;
-		
+
 		int32 commandCount;
 		int net;
 		BString selected_mb, inbox_name, hierarchy_delimiter, mb_root;
 		BList box_info;
 		status_t err;
-		
-		#ifdef USESSL
+
+		#ifdef USE_SSL
 			SSL_CTX *ctx;
 			SSL *ssl;
 			BIO *sbio;
-			
+
 			bool use_ssl;
 		#endif
-		
+
 		bool force_reselect;
 };
 
@@ -113,10 +120,10 @@ class NoopWorker : public BHandler {
 		void MessageReceived(BMessage *msg) {
 			if (msg->what != 'impn' /* IMaP Noop */)
 				return;
-				
+
 			if ((time(NULL) - last_run) < 9)
 				return;
-							
+
 			us->Select(us->inbox_name.String());
 			last_run = time(NULL);
 		}
@@ -127,32 +134,32 @@ class NoopWorker : public BHandler {
 
 IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMailStorageProtocol(settings,run), noop(NULL), commandCount(0), net(-1), selected_mb(""), force_reselect(false) {
 	err = B_OK;
-	
+
 	mb_root = settings->FindString("root");
-	#ifdef USESSL
+	#ifdef USE_SSL
 		use_ssl = (settings->FindInt32("flavor") == 1);
 		ssl = NULL;
 		ctx = NULL;
 	#endif
-	
+
 	int port = settings->FindInt32("port");
-	
+
 	if (port <= 0)
-		#ifdef USESSL
+		#ifdef USE_SSL
 			port = use_ssl ? 993 : 143;
 		#else
 			port = 143;
 		#endif
 
-//-----Open TCP link	
+//-----Open TCP link
 	runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Opening connection...","接続中..."));
-	
+
 	uint32 hostIP = inet_addr(settings->FindString("server"));  // first see if we can parse it as a numeric address
 	if ((hostIP == 0)||(hostIP == (uint32)-1)) {
 		struct hostent * he = gethostbyname(settings->FindString("server"));
 		hostIP = he ? *((uint32*)he->h_addr) : 0;
 	}
-   
+
 	if (hostIP == 0) {
 		BString error;
 		error << "Could not connect to IMAP server " << settings->FindString("server");
@@ -163,7 +170,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		runner->Stop(true);
 		return;
 	}
-	
+
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
 	net = socket(AF_INET, SOCK_STREAM, 0);
 #else
@@ -203,8 +210,8 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		runner->Stop(true);
 		return;
 	}
-	
-#ifdef USESSL
+
+#ifdef USE_SSL
 	if (use_ssl) {
 		SSL_library_init();
     	SSL_load_error_strings();
@@ -212,12 +219,12 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
     	/*--- Because we're an add-on loaded at an unpredictable time, all
     	      the memory addresses and things contained in ourself are
     	      esssentially random. */
-    	
+
     	ctx = SSL_CTX_new(SSLv23_method());
     	ssl = SSL_new(ctx);
     	sbio=BIO_new_socket(net,BIO_NOCLOSE);
     	SSL_set_bio(ssl,sbio,sbio);
-    	
+
     	if (SSL_connect(ssl) <= 0) {
     		BString error;
 			error << "Could not connect to IMAP server " << settings->FindString("server");
@@ -236,16 +243,16 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 			return;
 		}
 	}
-	
+
 	#endif
-	
+
 //-----Wait for welcome message
 	BString response;
 	ReceiveLine(response);
 
 //-----Log in
 	runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Authenticating...","認証中..."));
-	
+
 	const char *password = settings->FindString("password");
 	{
 		char *passwd = get_passwd(settings,"cpasswd");
@@ -265,30 +272,30 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		runner->Stop(true);
 		return;
 	}
-	
+
 	runner->ReportProgress(0,0,"Logged in");
-	
+
 	InitializeMailboxes();
 	GetUniqueIDs();
-	
+
 	BStringList to_dl;
 	unique_ids->NotThere(*manifest,&to_dl);
-	
+
 	noop = new NoopWorker(this);
 	runner->AddHandler(noop);
 	nooprunner = new BMessageRunner(BMessenger(noop,runner),new BMessage('impn'),10e6);
-	
+
 	if (to_dl.CountItems() > 0)
 		runner->GetMessages(&to_dl,-1);
 }
 
 IMAP4Client::~IMAP4Client() {
-	if (net > 0) { 
+	if (net > 0) {
 		if (selected_mb != "")
 			SendCommand("CLOSE");
 		SendCommand("LOGOUT");
-	
-	#ifdef USESSL
+
+	#ifdef USE_SSL
 		if (use_ssl)  {
 			if (ssl)
 				SSL_shutdown(ssl);
@@ -296,7 +303,7 @@ IMAP4Client::~IMAP4Client() {
 				SSL_CTX_free(ctx);
 		}
 	#endif
-		
+
 	#ifndef HAIKU_TARGET_PLATFORM_BEOS
 		close(net);
 	#else
@@ -307,16 +314,16 @@ IMAP4Client::~IMAP4Client() {
 
 	for (int32 i = 0; i < box_info.CountItems(); i++)
 		delete (struct mailbox_info *)(box_info.ItemAt(i));
-	
+
 	delete noop;
 }
 
 void IMAP4Client::InitializeMailboxes() {
 	BString command;
 	command << "LSUB \"" << mb_root << "\" \"*\"";
-	
+
 	SendCommand(command.String());
-	
+
 	BString tag;
 	char expected[255];
 	::sprintf(expected,"a%.7ld",commandCount);
@@ -328,10 +335,10 @@ void IMAP4Client::InitializeMailboxes() {
 		val = GetResponse(tag,&response);
 		if (val != NOT_COMMAND_RESPONSE)
 			break;
-				
+
 		if (tag == expected)
 			break;
-		
+
 		if (response[3]()[0] != '.') {
 			struct mailbox_info *info = new struct mailbox_info;
 			info->exists = -1;
@@ -341,7 +348,7 @@ void IMAP4Client::InitializeMailboxes() {
 			BString parsed_name = response[3]();
 			if ((mb_root != "") &&  (strncmp(mb_root.String(),parsed_name.String(),mb_root.Length()) == 0))
 				parsed_name.Remove(0,mb_root.Length());
-			
+
 			if (strcasecmp(response[2](),"NIL")) {
 				hierarchy_delimiter = response[2]();
 				if (strcmp(response[2](),"/")) {
@@ -349,24 +356,24 @@ void IMAP4Client::InitializeMailboxes() {
 						parsed_name.ReplaceAll('/','\\');
 					else
 						parsed_name.ReplaceAll('/','-');
-						
+
 					parsed_name.ReplaceAll(response[2](),"/");
 				}
 			}
 			if (parsed_name.ByteAt(0) == '/')
 				parsed_name.Remove(0,1);
-				
+
 			mailboxes += parsed_name.String();
 			if (strcasecmp(parsed_name.String(),"INBOX") == 0)
 				inbox_name = parsed_name;
-				
+
 			BPath blorp(path);
 			blorp.Append(parsed_name.String());
 			create_directory(blorp.Path(),0777);
 		}
 	} while (1);
-	
-	
+
+
 	if (hierarchy_delimiter == "" || hierarchy_delimiter == "NIL") {
 		SendCommand("LIST \"\" \"\"");
 		NestedString dem;
@@ -375,8 +382,8 @@ void IMAP4Client::InitializeMailboxes() {
 		if (hierarchy_delimiter == "" || hierarchy_delimiter == "NIL")
 			hierarchy_delimiter = "/";
 	}
-	
-	if (mb_root.ByteAt(mb_root.Length() - 1) != hierarchy_delimiter.ByteAt(0)) {	
+
+	if (mb_root.ByteAt(mb_root.Length() - 1) != hierarchy_delimiter.ByteAt(0)) {
 		command = "SELECT ";
 		command << mb_root;
 		SendCommand(command.String());
@@ -385,10 +392,10 @@ void IMAP4Client::InitializeMailboxes() {
 			info->exists = -1;
 			info->next_uid = -1;
 			info->server_mb_name = mb_root;
-			
+
 			mailboxes += "";
 			box_info.AddItem(info);
-			
+
 			if (strcasecmp(mb_root.String(),"INBOX") == 0)
 				inbox_name = "";
 			SendCommand("CLOSE");
@@ -403,21 +410,21 @@ void IMAP4Client::InitializeMailboxes() {
 
 status_t IMAP4Client::AddMessage(const char *mailbox, BPositionIO *data, BString *id) {
 	Select(mailbox); //---Update info
-	
+
 	const int32 box_index = mailboxes.IndexOf(mailbox);
 	char expected[255];
 	BString tag;
-	
+
 	BString command = "APPEND \"";
 	off_t size;
 	data->Seek(0,SEEK_END);
 	size = data->Position();
-	
+
 	BString attributes = "\\Seen";
-	
+
 	{
 		BNode *node = dynamic_cast<BNode *>(data);
-		
+
 		if (node != NULL) {
 			BString status;
 			node->ReadAttrString(B_MAIL_ATTR_STATUS,&status);
@@ -429,68 +436,68 @@ status_t IMAP4Client::AddMessage(const char *mailbox, BPositionIO *data, BString
 				attributes += " \\Answered";
 		}
 	}
-		
-	
+
+
 	command << ((struct mailbox_info *)(box_info.ItemAt(box_index)))->server_mb_name << "\" (" << attributes << ") {" << size << '}';
 	SendCommand(command.String());
 	status_t err = ReceiveLine(command);
 	if (err < B_OK)
 		return err;
-		
+
 	char *buffer = new char[size];
 	data->ReadAt(0,buffer,size);
-#ifdef USESSL
+#ifdef USE_SSL
 	if (use_ssl) {
 		SSL_write(ssl,buffer,size);
 		SSL_write(ssl,"\r\n",2);
-	} else 
+	} else
 #endif
 	{
 		send(net,buffer,size,0);
 		send(net,"\r\n",2,0);
 	}
 	Select(mailbox,false,false,false,true);
-	
+
 	if (((struct mailbox_info *)(box_info.ItemAt(box_index)))->next_uid <= 0) {
 		command = "FETCH ";
 		command << ((struct mailbox_info *)(box_info.ItemAt(box_index)))->exists << " UID";
-		
+
 		SendCommand(command.String());
 		::sprintf(expected,"a%.7ld",commandCount);
 		*id = "";
 		while (1) {
 			NestedString response;
 			GetResponse(tag,&response);
-						
+
 			if (tag == expected)
 				break;
-			
+
 			*id = response[2][1]();
 		}
 	} else {
 		*id = "";
 		*id << (((struct mailbox_info *)(box_info.ItemAt(box_index)))->next_uid - 1);
 	}
-	
+
 	return B_OK;
 }
 
 status_t IMAP4Client::DeleteMessage(const char *mailbox, const char *message) {
 	BString command = "UID STORE ";
 	command << message << " +FLAGS.SILENT (\\Deleted)";
-	
+
 	if (Select(mailbox,false,true,true,false,true) < B_OK)
 		return B_ERROR;
-	
+
 	SendCommand(command.String());
 	if (!WasCommandOkay(command)) {
 		command.Prepend("Error while deleting message: ");
 		runner->ShowError(command.String());
 		return B_ERROR;
 	}
-	
+
 	force_reselect = true;
-	
+
 	return B_OK;
 }
 
@@ -498,44 +505,44 @@ status_t IMAP4Client::CopyMessage(const char *mailbox, const char *to_mailbox, B
 	struct mailbox_info *to_mb = (struct mailbox_info *)(box_info.ItemAt(mailboxes.IndexOf(to_mailbox)));
 	char expected[255];
 	BString tag;
-	
+
 	Select(mailbox);
-	
+
 	BString command = "UID COPY ";
 	command << *message << " \"" << to_mb->server_mb_name << '\"';
 	SendCommand(command.String());
 	if (!WasCommandOkay(command))
 		return B_ERROR;
-	
+
 	Select(to_mailbox,false,false,true); //---Update mailbox info
-	
+
 	if (to_mb->next_uid <= 0) {
 		command = "FETCH ";
 		command << to_mb->exists << " UID";
-		
+
 		SendCommand(command.String());
 		::sprintf(expected,"a%.7ld",commandCount);
 		*message = "";
 		while (1) {
 			NestedString response;
 			GetResponse(tag,&response);
-						
+
 			if (tag == expected)
 				break;
-			
+
 			*message = response[2][1]();
 		}
 	} else {
 		*message = "";
 		*message << (to_mb->next_uid - 1);
 	}
-	
+
 	return B_OK;
 }
 
 status_t IMAP4Client::CreateMailbox(const char *mailbox) {
 	Close();
-	
+
 	struct mailbox_info *info = new struct mailbox_info;
 	info->exists = -1;
 	info->next_uid = -1;
@@ -543,20 +550,20 @@ status_t IMAP4Client::CreateMailbox(const char *mailbox) {
 	info->server_mb_name.ReplaceAll("/",hierarchy_delimiter.String());
 	if ((mb_root.ByteAt(mb_root.Length() - 1) != hierarchy_delimiter.ByteAt(0)) && (mb_root.Length() > 0))
 		info->server_mb_name.Prepend(hierarchy_delimiter);
-		
+
 	info->server_mb_name.Prepend(mb_root.String());
-	
+
 	BString command;
 	command << "CREATE \"" << info->server_mb_name << '\"';
 	SendCommand(command.String());
 	BString response;
 	WasCommandOkay(response);
 	//--- Deliberately ignore errors in the case of extant, but unsubscribed, mailboxes
-	
+
 	command = "SUBSCRIBE \"";
 	command << info->server_mb_name << '\"';
 	SendCommand(command.String());
-	
+
 	if (!WasCommandOkay(response)) {
 		command = "Error creating mailbox ";
 		command << mailbox << ". The server said: \n" << response << "\nThis may mean you can't create a new mailbox in this location.";
@@ -564,40 +571,40 @@ status_t IMAP4Client::CreateMailbox(const char *mailbox) {
 		delete info;
 		return B_ERROR;
 	}
-	
+
 	box_info.AddItem(info);
-	
+
 	return B_OK;
 }
 
 status_t IMAP4Client::DeleteMailbox(const char *mailbox) {
 	Close();
-	
+
 	if (!mailboxes.HasItem(mailbox))
 		return B_ERROR;
-	
+
 	BString command;
-	
+
 	command = "UNSUBSCRIBE \"";
 	command << ((struct mailbox_info *)(box_info.ItemAt(mailboxes.IndexOf(mailbox))))->server_mb_name << '\"';
 	SendCommand(command.String());
 	WasCommandOkay(command);
 	//---If this fails, that's fine.
-	
+
 	command = "DELETE \"";
 	command << ((struct mailbox_info *)(box_info.ItemAt(mailboxes.IndexOf(mailbox))))->server_mb_name << '\"';
-	
+
 	SendCommand(command.String());
 	if (!WasCommandOkay(command)) {
 		command = "Error deleting mailbox ";
 		command << mailbox << '.';
 		runner->ShowError(command.String());
-		
+
 		return B_ERROR;
 	}
-	
+
 	delete ((struct mailbox_info *)(box_info.RemoveItem(mailboxes.IndexOf(mailbox))));
-	
+
 	return B_OK;
 }
 
@@ -607,28 +614,28 @@ void IMAP4Client::GetUniqueIDs() {
 	BString tag;
 	BString uid;
 	struct mailbox_info *info;
-	
+
 	runner->ReportProgress(0,0,"Getting Unique IDs");
-	
+
 	for (int32 i = 0; i < mailboxes.CountItems(); i++) {
 		Select(mailboxes[i],true,false /* We queue them as a group */);
-		
+
 		info = (struct mailbox_info *)(box_info.ItemAt(i));
 		if (info->exists <= 0)
 			continue;
-		
+
 		command = "FETCH 1:";
 		command << info->exists << " UID";
-		SendCommand(command.String()); 
-		
+		SendCommand(command.String());
+
 		::sprintf(expected,"a%.7ld",commandCount);
 		while(1) {
 			NestedString response;
 			GetResponse(tag,&response);
-						
+
 			if (tag == expected)
 				break;
-			
+
 			uid = mailboxes[i];
 			uid << '/' << response[2][1]();
 			unique_ids->AddItem(uid.String());
@@ -642,31 +649,31 @@ status_t IMAP4Client::Close() {
 		SendCommand("CLOSE");
 		if (!WasCommandOkay(worthless))
 			return B_ERROR;
-			
+
 		selected_mb = "";
 	}
-	
+
 	return B_OK;
 }
 
 status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messages, bool noop, bool no_command, bool ignore_forced_reselect) {
 	if (net < 0)
 		return B_NO_INIT;
-	
+
 	if (force_reselect && !ignore_forced_reselect) {
 		reselect = true;
 		force_reselect = false;
 	}
-	
+
 	if (reselect)
 		Close();
-	
+
 	struct mailbox_info *info = (struct mailbox_info *)(box_info.ItemAt(mailboxes.IndexOf(mb)));
 	if (info == NULL)
 		return B_NAME_NOT_FOUND;
 
 	const char *real_mb = info->server_mb_name.String();
-	
+
 	if ((selected_mb != real_mb) || (noop) || (no_command)) {
 		if ((selected_mb != "")  && (selected_mb != real_mb)){
 			BString trash;
@@ -680,35 +687,35 @@ status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messa
 			cmd = "NOOP";
 		else
 			cmd << "SELECT \"" << real_mb << '\"';
-			
+
 		if (!no_command)
 			if (SendCommand(cmd.String()) < B_OK)
 				return B_ERROR;
-		
+
 		char expected[255];
 		BString tag;
 		::sprintf(expected,"a%.7ld",commandCount);
-		
+
 		int32 new_exists(-1), new_next_uid(-1), recent(-1);
-		
+
 		while(1) {
 			NestedString response;
 			if (GetResponse(tag,&response) < B_OK)
 				return B_ERROR;
-			
+
 			if (tag == expected)
 				break;
-			
+
 			if ((response.CountItems() > 1) && (strcasecmp(response[1](),"EXISTS") == 0))
 				new_exists = atoi(response[0]());
-			
+
 			if (response[0].CountItems() == 2 && strcasecmp(response[0][0](),"UIDNEXT") == 0)
 				new_next_uid = atol(response[0][1]());
-				
+
 			if ((response.CountItems() > 1) && (strcasecmp(response[1](),"RECENT") == 0))
 				recent = atoi(response[0]());
 		}
-		
+
 		if ((queue_new_messages) && (recent > 0)) {
 			BString command = "FETCH ";
 			command << new_exists - recent + 1 << ':' << new_exists << " UID";
@@ -720,31 +727,31 @@ status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messa
 				NestedString response;
 				if (GetResponse(tag,&response) < 0)
 					return B_ERROR;
-							
+
 				if (tag == expected)
 					break;
-				
+
 				if (strcmp(response[2][0](),"UID") != 0)
 					continue; //--- Courier IMAP blows. Hard.
-				
+
 				uid = mb;
 				uid << '/' << response[2][1]();
 				if (!unique_ids->HasItem(uid.String()))
 					list.AddItem(uid.String());
 			}
-			
+
 			if (list.CountItems() > 0) {
 				(*unique_ids) += list;
 				runner->GetMessages(&list,-1);
 			}
 		}
-		
+
 		info->exists = new_exists;
 		info->next_uid = new_next_uid;
-		
+
 		selected_mb = real_mb;
 	}
-		
+
 	return B_OK;
 }
 
@@ -757,7 +764,7 @@ class IMAP4PartialReader : public BPositionIO {
 			delete slave;
 			us->runner->ReportProgress(0,1);
 		}
-		off_t Seek(off_t position, uint32 seek_mode) {			
+		off_t Seek(off_t position, uint32 seek_mode) {
 			if (seek_mode == SEEK_END) {
 				if (!done) {
 					slave->Seek(0,SEEK_END);
@@ -792,9 +799,9 @@ class IMAP4PartialReader : public BPositionIO {
 			NestedString response;
 			if (us->GetResponse(command,&response) != NOT_COMMAND_RESPONSE && command == cmd)
 				return;
-			
+
 			//response.PrintToStream();
-			
+
 			us->WasCommandOkay(command);
 			for (int32 i = 0; (i+1) < response[2].CountItems(); i++) {
 				if (strcmp(response[2][i](),part) == 0) {
@@ -802,16 +809,16 @@ class IMAP4PartialReader : public BPositionIO {
 					break;
 				}
 			}
-			
+
 		}
-			
+
 		IMAP4Client *us;
 		char unique[25];
 		BPositionIO *slave;
 		bool done;
 };
 
-status_t IMAP4Client::GetMessage(const char *mailbox, const char *message, BPositionIO **data, BMessage *headers) {	
+status_t IMAP4Client::GetMessage(const char *mailbox, const char *message, BPositionIO **data, BMessage *headers) {
 	{
 		//--- Error reporting for non-existant messages often simply doesn't exist. So we have to check first...
 		BString uid = mailbox;
@@ -823,21 +830,21 @@ status_t IMAP4Client::GetMessage(const char *mailbox, const char *message, BPosi
 			return B_NAME_NOT_FOUND;
 		}
 	}
-	
+
 	Select(mailbox);
-	
-	if (headers->FindBool("ENTIRE_MESSAGE")) {				
+
+	if (headers->FindBool("ENTIRE_MESSAGE")) {
 		BString command = "UID FETCH ";
 		command << message << " (FLAGS RFC822)";
-		
+
 		SendCommand(command.String());
 		static char cmd[255];
 		::sprintf(cmd,"a%.7ld"CRLF,commandCount);
 		NestedString response;
-				
+
 		if (GetResponse(command,&response,true) != NOT_COMMAND_RESPONSE && command == cmd)
 			return B_ERROR;
-				
+
 		for (int32 i = 0; i < response[2][1].CountItems(); i++) {
 			if (strcmp(response[2][1][i](),"\\Seen") == 0) {
 				headers->AddString("STATUS","Read");
@@ -855,7 +862,7 @@ status_t IMAP4Client::GetMessage(const char *mailbox, const char *message, BPosi
 					headers->AddString("STATUS","Replied");
 			}
 		}
-		
+
 		WasCommandOkay(command);
 		(*data)->WriteAt(0,response[2][5](),strlen(response[2][5]()));
 		runner->ReportProgress(0,1);
@@ -869,9 +876,9 @@ status_t IMAP4Client::GetMessage(const char *mailbox, const char *message, BPosi
 		NestedString response;
 		if (GetResponse(command,&response) != NOT_COMMAND_RESPONSE && command == cmd)
 			return B_ERROR;
-				
+
 		WasCommandOkay(command);
-		
+
 		for (int32 i = 0; i < response[2].CountItems(); i++) {
 			if (strcmp(response[2][i](),"RFC822.SIZE") == 0) {
 				i++;
@@ -891,7 +898,7 @@ status_t IMAP4Client::GetMessage(const char *mailbox, const char *message, BPosi
 				(*data)->Write(response[2][i](),strlen(response[2][i]()));
 			}
 		}
-		
+
 		*data = new IMAP4PartialReader(this,*data,message);
 		return B_OK;
 	}
@@ -902,10 +909,10 @@ IMAP4Client::SendCommand(const char* command)
 {
 	if (net < 0)
 		return B_ERROR;
-		
+
 	static char cmd[255];
 	::sprintf(cmd,"a%.7ld %s"CRLF,++commandCount,command);
-#ifdef USESSL
+#ifdef USE_SSL
 	if (use_ssl)
 		SSL_write(ssl,cmd,strlen(cmd));
 	else
@@ -913,7 +920,7 @@ IMAP4Client::SendCommand(const char* command)
 		send(net,cmd,strlen(cmd),0);
 
 	PRINT(("C: %s",cmd));
-	
+
 	return B_OK;
 }
 
@@ -922,38 +929,38 @@ IMAP4Client::ReceiveLine(BString &out)
 {
 	if (net < 0)
 		return net;
-		
+
 	uint8 c = 0;
 	int32 len = 0,r;
 	out = "";
-	
-	struct timeval tv;
-	struct fd_set fds; 
 
-	tv.tv_sec = long(kIMAP4ClientTimeout / 1e6); 
-	tv.tv_usec = long(kIMAP4ClientTimeout-(tv.tv_sec * 1e6)); 
-	
-	/* Initialize (clear) the socket mask. */ 
+	struct timeval tv;
+	struct fd_set fds;
+
+	tv.tv_sec = long(kIMAP4ClientTimeout / 1e6);
+	tv.tv_usec = long(kIMAP4ClientTimeout-(tv.tv_sec * 1e6));
+
+	/* Initialize (clear) the socket mask. */
 	FD_ZERO(&fds);
-	
-	/* Set the socket in the mask. */ 
+
+	/* Set the socket in the mask. */
 	FD_SET(net, &fds);
 	int result;
-#ifdef USESSL
+#ifdef USE_SSL
 	if ((use_ssl) && (SSL_pending(ssl)))
 		result = 1;
 	else
 #endif
 		result = select(32, &fds, NULL, NULL, &tv);
-	
+
 	if (result < 0)
 		return errno;
-	
+
 	if(result > 0)
 	{
 		while(c != '\n' && c != xEOF)
 		{
-		  #ifdef USESSL
+		  #ifdef USE_SSL
 			if (use_ssl)
 				r = SSL_read(ssl,&c,1);
 			else
@@ -962,7 +969,7 @@ IMAP4Client::ReceiveLine(BString &out)
 			if(r <= 0) {
 				BString error;
 					error << "Connection to " << settings->FindString("server") << " lost.";
-			#ifdef USESSL
+			#ifdef USE_SSL
 				if (use_ssl) {
 					if (ssl)
 						SSL_shutdown(ssl);
@@ -980,7 +987,7 @@ IMAP4Client::ReceiveLine(BString &out)
 				runner->ShowError(error.String());
 				return -1;
 			}
-	
+
 			out += (char)c;
 			len += r;
 		}
@@ -997,7 +1004,7 @@ IMAP4Client::ReceiveLine(BString &out)
 int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool report_literals, bool internal_flag) {
 	if (net < 0)
 		return net;
-	
+
 	uint8 c = 0;
 	int32 r;
 	int8 delimiters_passed = internal_flag ? 2 : 0;
@@ -1006,30 +1013,30 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 	bool in_quote = false;
 	bool was_cr = false;
 	int result;
-	
+
 	{
 		struct timeval tv;
-		struct fd_set fds; 
-	
-		tv.tv_sec = long(kIMAP4ClientTimeout / 1e6); 
-		tv.tv_usec = long(kIMAP4ClientTimeout-(tv.tv_sec * 1e6)); 
-		
-		/* Initialize (clear) the socket mask. */ 
+		struct fd_set fds;
+
+		tv.tv_sec = long(kIMAP4ClientTimeout / 1e6);
+		tv.tv_usec = long(kIMAP4ClientTimeout-(tv.tv_sec * 1e6));
+
+		/* Initialize (clear) the socket mask. */
 		FD_ZERO(&fds);
-		
-		/* Set the socket in the mask. */ 
+
+		/* Set the socket in the mask. */
 		FD_SET(net, &fds);
-#ifdef USESSL
+#ifdef USE_SSL
 		if ((use_ssl) && (SSL_pending(ssl)))
 			result = 1;
 		else
 #endif
 			result = select(32, &fds, NULL, NULL, &tv);
 	}
-	
+
 	if (result < 0)
 		return errno;
-	
+
 	if (!internal_flag)
 		PRINT(("S: "));
 
@@ -1037,7 +1044,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 	{
 		while(c != '\n' && c != xEOF)
 		{
-#ifdef USESSL
+#ifdef USE_SSL
 			if (use_ssl)
 				r = SSL_read(ssl,&c,1);
 			else
@@ -1046,7 +1053,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 			if(r <= 0) {
 				BString error;
 				error << "Connection to " << settings->FindString("server") << " lost.";
-			#ifdef USESSL
+			#ifdef USE_SSL
 				if (use_ssl) {
 					if (ssl)
 						SSL_shutdown(ssl);
@@ -1064,11 +1071,11 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 				runner->ShowError(error.String());
 				return -1;
 			}
-			
+
 			#if DEBUG
 				putchar(c);
 			#endif
-			
+
 			if ((isspace(c) || (internal_flag && (c == ')' || c == ']'))) && !in_quote) {
 				if (delimiters_passed == 0) {
 					tag = out;
@@ -1077,7 +1084,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 					continue;
 				}
 				if (delimiters_passed == 1) {
-					
+
 					if (out == "NO")
 						answer = NO;
 					else if (out == "BAD")
@@ -1086,12 +1093,12 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 						answer = OK;
 					else if (parsed_response != NULL && out != "")
 						*parsed_response += out;
-					
+
 					out = "";
 					delimiters_passed ++;
 					continue;
 				}
-				
+
 				if (c == '\r') {
 					was_cr = true;
 					continue;
@@ -1110,7 +1117,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 						int read_octets = 0;
 						int nibble_size;
 						while (read_octets < octets_to_read) {
-						  #ifdef USESSL
+						  #ifdef USE_SSL
 							if (use_ssl)
 								nibble_size = SSL_read(ssl,buffer + read_octets,octets_to_read - read_octets);
 							else
@@ -1120,32 +1127,32 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 							if (report_literals)
 								runner->ReportProgress(nibble_size,0);
 						}
-						
+
 						if (parsed_response != NULL)
 							parsed_response->AdoptAndAdd(buffer);
 						else
 							delete [] buffer;
-							
+
 						c = ' ';
 						continue;
 					}
 				}
-				
+
 				if (internal_flag && (c == ')' || c == ']')) {
 					if (parsed_response != NULL && out != "")
 						(*parsed_response) += out;
 					break;
 				}
-				
+
 				was_cr = false;
 				if (parsed_response != NULL && out != "")
 					(*parsed_response) += out;
 				out = "";
 				continue;
 			}
-			
+
 			was_cr = false;
-			
+
 			if (c == '\"') {
 				in_quote = !in_quote;
 				continue;
@@ -1153,12 +1160,12 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 			if (c == '(' || c == '[') {
 				if (parsed_response != NULL)
 					(*parsed_response) += NULL;
-					
+
 				BString trash;
 				GetResponse(trash,&((*parsed_response)[parsed_response->CountItems() - 1]),report_literals,true);
 				continue;
 			}
-			
+
 			out += (char)c;
 		}
 	}else{
@@ -1178,20 +1185,20 @@ bool IMAP4Client::WasCommandOkay(BString &response) {
 			return false;
 		}
 	} while (response[0] == '*');
-		
+
 	bool to_ret = false;
 	static char cmd[255];
 	::sprintf(cmd,"a%.7ld OK",commandCount);
 	if (strncmp(response.String(),cmd,strlen(cmd)) == 0)
 		to_ret = true;
-	
+
 	int32 i = response.FindFirst(' ');
 	i = response.FindFirst(' ',i+1);
 	response.Remove(0,i+1);
 	response.ReplaceAll("\r\n","\n");
 	for (int32 i = response.Length()-1; response.String()[i] == '\n'; i--)
 		response.Truncate(i);
-	
+
 	return to_ret;
 }
 
