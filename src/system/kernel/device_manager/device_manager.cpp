@@ -2207,6 +2207,8 @@ device_manager_init(struct kernel_args* args)
 {
 	TRACE(("device manager init\n"));
 
+	vip_io_request_allocator_init();
+
 	dm_init_id_generator();
 	dm_init_io_resources();
 

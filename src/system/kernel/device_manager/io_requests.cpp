@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+#include <heap.h>
 #include <kernel.h>
 #include <team.h>
 #include <util/AutoLock.h>
@@ -24,12 +25,19 @@
 #endif
 
 
+#define VIP_HEAP_SIZE	1024 * 1024
+
 // partial I/O operation phases
 enum {
 	PHASE_READ_BEGIN	= 0,
 	PHASE_READ_END		= 1,
 	PHASE_DO_ALL		= 2
 };
+
+heap_allocator* sVIPHeap;
+
+
+// #pragma mark -
 
 
 IORequestChunk::IORequestChunk()
@@ -1142,6 +1150,64 @@ IORequest::Dump() const
 }
 
 
+// #pragma mark - allocator
+
+
+void*
+vip_io_request_malloc(size_t size)
+{
+	return heap_memalign(sVIPHeap, 0, size);
+}
+
+
+void
+vip_io_request_free(void* address)
+{
+	heap_free(sVIPHeap, address);
+}
+
+
+void
+io_request_free(void* address)
+{
+	if (heap_free(sVIPHeap, address) != B_OK)
+		free(address);
+}
+
+
+void
+vip_io_request_allocator_init()
+{
+	static const heap_class heapClass = {
+		"VIP I/O",					/* name */
+		100,						/* initial percentage */
+		B_PAGE_SIZE / 8,			/* max allocation size */
+		B_PAGE_SIZE,				/* page size */
+		8,							/* min bin size */
+		4,							/* bin alignment */
+		8,							/* min count per page */
+		16							/* max waste per page */
+	};
+
+	void* address = NULL;
+	area_id area = create_area("VIP I/O heap", &address, B_ANY_KERNEL_ADDRESS,
+		VIP_HEAP_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < B_OK) {
+		panic("vip_io_request_allocator_init(): couldn't allocate VIP I/O "
+			"heap area");
+		return;
+	}
+
+	sVIPHeap = heap_create_allocator("VIP I/O heap", (addr_t)address,
+		VIP_HEAP_SIZE, &heapClass);
+	if (sVIPHeap == NULL) {
+		panic("vip_io_request_allocator_init(): failed to create VIP I/O "
+			"heap\n");
+		return;
+	}
+}
+
+
 // #pragma mark -
 
 
@@ -1246,3 +1312,4 @@ delete_io_request(io_request* request)
 }
 
 #endif	// 0
+
