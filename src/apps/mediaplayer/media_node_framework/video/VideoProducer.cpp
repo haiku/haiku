@@ -715,7 +715,7 @@ VideoProducer::_FrameGeneratorThread()
 					"Terminating video producer frame generator thread.\n");
 				TRACE("_FrameGeneratorThread: frame generator thread done.\n");
 				// do not access any member variables, since this could
-				// also me the Node has been deleted
+				// also mean the Node has been deleted
 				return B_OK;
 		}
 
@@ -739,7 +739,7 @@ VideoProducer::_FrameGeneratorThread()
 					// nothing to do
 				} else if (nextWaitUntil < system_time()) {
 					// Drop frame if it's at least a frame late.
-					//printf("VideoProducer: dropped frame (%ld)\n", fFrame);
+					printf("VideoProducer: dropped frame (%Ld)\n", fFrame);
 					if (fManager->LockWithTimeout(10000) == B_OK) {
 						fManager->FrameDropped();
 						fManager->Unlock();

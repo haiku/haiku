@@ -126,6 +126,7 @@ Controller::~Controller()
 int64
 Controller::Duration()
 {
+	// This should really be total frames (video frames at that)
 	// TODO: It is not so nice that the MediaPlayer still measures
 	// in video frames if only playing audio. Here for example, it will
 	// return a duration of 0 if the audio clip happens to be shorter than
@@ -221,12 +222,19 @@ Controller::SetTo(const entry_ref &ref)
 		BMediaTrack* t = mf->TrackAt(i);
 		media_format f;
 		err = t->EncodedFormat(&f);
-		if (err != B_OK || t->Duration() <= 0) {
+		if (err != B_OK) {
 			printf("Controller::SetTo: EncodedFormat failed for track index %d, error 0x%08lx (%s)\n",
 				i, err, strerror(err));
 			mf->ReleaseTrack(t);
 			continue;
 		}
+		
+		if (t->Duration() <= 0) {
+			printf("Controller::SetTo: track index %d has no duration\n",i);
+			mf->ReleaseTrack(t);
+			continue;
+		}
+		
 		if (f.IsAudio()) {
 			if (!fAudioTrackList.AddItem(t))
 				return B_NO_MEMORY;

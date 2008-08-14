@@ -321,7 +321,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	if ((which & INFO_STATS) && fController->HasFile()) {
 		fLabelsView->Insert("Duration\n");
 		BString s;
-		bigtime_t d = fController->Duration();
+		bigtime_t d = fController->TimeDuration();
 		bigtime_t v;
 
 		//s << d << "µs; ";
