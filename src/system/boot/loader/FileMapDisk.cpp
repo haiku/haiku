@@ -15,6 +15,13 @@
 #include <SupportDefs.h>
 
 
+#define TRACE_FILEMAPDISK
+#ifdef TRACE_FILEMAPDISK
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 // constructor
 FileMapDisk::FileMapDisk()
 {
@@ -29,6 +36,7 @@ FileMapDisk::~FileMapDisk()
 status_t
 FileMapDisk::Init(Node *node/*, Partition *partition, FileMap *map, off_t imageSize*/)
 {
+	TRACE(("FileMapDisk::FileMapDisk(%p)\n", node));
 	fNode = node;
 	/*
 	fPartition = partition;
@@ -52,6 +60,7 @@ FileMapDisk::Init(Node *node/*, Partition *partition, FileMap *map, off_t imageS
 status_t
 FileMapDisk::Open(void **_cookie, int mode)
 {
+	TRACE(("FileMapDisk::Open(, 0x%08x)\n", mode));
 	if (!fNode)
 		return B_NO_INIT;
 
@@ -62,6 +71,7 @@ FileMapDisk::Open(void **_cookie, int mode)
 status_t
 FileMapDisk::Close(void *cookie)
 {
+	TRACE(("FileMapDisk::Close(%p)\n", cookie));
 	if (!fNode)
 		return B_NO_INIT;
 
@@ -74,6 +84,7 @@ ssize_t
 FileMapDisk::ReadAt(void *cookie, off_t pos, void *_buffer,
 	size_t bufferSize)
 {
+	TRACE(("FileMapDisk::ReadAt(%p, %lld, , %ld)\n", cookie, pos, bufferSize));
 	if (!fNode)
 		return B_NO_INIT;
 
@@ -127,13 +138,21 @@ FileMapDisk::GetFileMap(FileMap **map)
 FileMapDisk *
 FileMapDisk::FindAnyFileMapDisk(Directory *volume)
 {
+	TRACE(("FileMapDisk::FindAnyFileMapDisk(%p)\n", volume));
 	Node *node;
 	status_t error;
 
 	if (!volume)
 		return NULL;
 
-	node = volume->Lookup(FMAP_FOLDER_NAME "/" FMAP_IMAGE_NAME, true);
+	//XXX: check lower/mixed case as well
+	Node *dirnode;
+	Directory *dir;
+	dirnode = volume->Lookup(FMAP_FOLDER_NAME, true);
+	if (!dirnode || !S_ISDIR(dirnode->Type()))
+		return NULL;
+	dir = (Directory *)dirnode;
+	node = dir->Lookup(FMAP_IMAGE_NAME, true);
 	if (!node)
 		return NULL;
 

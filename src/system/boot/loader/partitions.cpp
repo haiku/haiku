@@ -6,6 +6,7 @@
 
 #include "RootFileSystem.h"
 
+#include <boot/FileMapDisk.h>
 #include <boot/partitions.h>
 #include <boot/vfs.h>
 #include <boot/platform.h>
@@ -234,6 +235,15 @@ Partition::_Mount(file_system_module_info *module, Directory **_fileSystem)
 		fModuleName = module->module_name;
 
 		fIsFileSystem = true;
+
+		// see if it contains an image file we could mount in turn
+		// XXX: avoid recursing too much
+		FileMapDisk *disk = FileMapDisk::FindAnyFileMapDisk(fileSystem);
+		if (disk) {
+			TRACE(("%p Partition::_Mount: found FileMapDisk\n", this));
+			add_partitions_for(disk, true, false);
+		}
+
 		return B_OK;
 	}
 
