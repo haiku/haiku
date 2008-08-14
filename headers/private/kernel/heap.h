@@ -20,6 +20,20 @@
 #define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
 
 
+typedef struct heap_class_s {
+	const char *name;
+	uint32		initial_percentage;
+	size_t		max_allocation_size;
+	size_t		page_size;
+	size_t		min_bin_size;
+	size_t		bin_alignment;
+	uint32		min_count_per_page;
+	size_t		max_waste_per_page;
+} heap_class;
+
+typedef struct heap_allocator_s heap_allocator;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,6 +49,11 @@ void deferred_free(void* block);
 void* malloc_referenced(size_t size);
 void* malloc_referenced_acquire(void* data);
 void malloc_referenced_release(void* data);
+
+heap_allocator*	heap_create_allocator(const char* name, addr_t base,
+	size_t size, const heap_class* heapClass);
+void* heap_memalign(heap_allocator* heap, size_t alignment, size_t size);
+status_t heap_free(heap_allocator* heap, void* address);
 
 status_t heap_init(addr_t heapBase, size_t heapSize);
 status_t heap_init_post_sem();

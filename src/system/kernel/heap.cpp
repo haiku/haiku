@@ -100,11 +100,10 @@ typedef struct heap_bin_s {
 	heap_page *	page_list; // sorted so that the desired page is always first
 } heap_bin;
 
-typedef struct heap_allocator_s {
+struct heap_allocator_s {
 	mutex		lock;
 
 	const char *name;
-	uint32		heap_class;
 	uint32		bin_count;
 	uint32		page_size;
 
@@ -115,18 +114,7 @@ typedef struct heap_allocator_s {
 	heap_bin *	bins;
 	heap_area *	areas; // sorted so that the desired area is always first
 	heap_area *	all_areas; // all areas including full ones
-} heap_allocator;
-
-typedef struct heap_class_s {
-	const char *name;
-	uint32		initial_percentage;
-	size_t		max_allocation_size;
-	size_t		page_size;
-	size_t		min_bin_size;
-	size_t		bin_alignment;
-	uint32		min_count_per_page;
-	size_t		max_waste_per_page;
-} heap_class;
+};
 
 static const uint32 kAreaAllocationMagic = 'AAMG';
 typedef struct area_allocation_info_s {
@@ -958,17 +946,15 @@ heap_remove_area(heap_allocator *heap, heap_area *area, bool locked)
 }
 
 
-static heap_allocator *
+heap_allocator *
 heap_create_allocator(const char *name, addr_t base, size_t size,
-	uint32 heapClassIndex)
+	const heap_class *heapClass)
 {
-	heap_class *heapClass = &sHeapClasses[heapClassIndex];
 	heap_allocator *heap = (heap_allocator *)base;
 	base += sizeof(heap_allocator);
 	size -= sizeof(heap_allocator);
 
 	heap->name = name;
-	heap->heap_class = heapClassIndex;
 	heap->page_size = heapClass->page_size;
 	heap->total_pages = heap->total_free_pages = heap->empty_areas = 0;
 	heap->areas = heap->all_areas = NULL;
@@ -1257,7 +1243,7 @@ heap_should_grow(heap_allocator *heap)
 }
 
 
-static void *
+void *
 heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 {
 	TRACE(("memalign(alignment = %lu, size = %lu)\n", alignment, size));
@@ -1317,7 +1303,7 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 }
 
 
-static status_t
+status_t
 heap_free(heap_allocator *heap, void *address)
 {
 	if (address == NULL)
@@ -1667,7 +1653,8 @@ heap_init(addr_t base, size_t size)
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
 		size_t partSize = size * sHeapClasses[i].initial_percentage / 100;
-		sHeaps[i] = heap_create_allocator(sHeapClasses[i].name, base, partSize, i);
+		sHeaps[i] = heap_create_allocator(sHeapClasses[i].name, base, partSize,
+			&sHeapClasses[i]);
 		sLastGrowRequest[i] = sLastHandledGrowRequest[i] = 0;
 		base += partSize;
 	}
@@ -1732,7 +1719,7 @@ heap_init_post_thread()
 	}
 
 	sGrowHeap = heap_create_allocator("grow", (addr_t)address,
-		HEAP_DEDICATED_GROW_SIZE, 0);
+		HEAP_DEDICATED_GROW_SIZE, &sHeapClasses[0]);
 	if (sGrowHeap == NULL) {
 		panic("heap_init_post_thread(): failed to create dedicated grow heap\n");
 		return B_ERROR;
