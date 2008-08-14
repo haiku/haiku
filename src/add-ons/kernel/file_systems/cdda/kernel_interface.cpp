@@ -568,6 +568,10 @@ Volume::Mount(const char* device)
 		return status;
 	}
 
+	// add CD:cddbid attribute.
+	fRootNode->AddAttribute("CD:cddbid", B_UINT32_TYPE, true,
+		(const uint8 *)&fDiscID, 4); 
+
 	cdtext text;
 	if (read_cdtext(fDevice, text) < B_OK)
 		dprintf("CDDA: no CD-Text found.\n");
@@ -595,14 +599,14 @@ Volume::Mount(const char* device)
 
 		if (text.titles[i] != NULL) {
 			if (text.artists[i] != NULL) {
-				snprintf(title, sizeof(title), "%02ld. %s - %s.wav", track,
+				snprintf(title, sizeof(title), "%02ld. %s - %s", track,
 					text.artists[i], text.titles[i]);
 			} else {
-				snprintf(title, sizeof(title), "%02ld. %s.wav", track,
+				snprintf(title, sizeof(title), "%02ld. %s", track,
 					text.titles[i]);
 			}
 		} else
-			snprintf(title, sizeof(title), "%02ld.wav", track);
+			snprintf(title, sizeof(title), "Track %02ld", track);
 
 		// remove '/' and '\n' from title
 		for (int32 j = 0; title[j]; j++) {
