@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -18,7 +18,6 @@
 
 
 #include <bus/SCSI.h>
-#include <block_io.h>
 #include <scsi_cmds.h>
 #include <Drivers.h>
 

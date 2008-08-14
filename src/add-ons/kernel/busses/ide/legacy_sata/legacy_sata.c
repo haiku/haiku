@@ -9,7 +9,6 @@
 #include <device_manager.h>
 #include <bus/IDE.h>
 #include <ide_adapter.h>
-#include <block_io.h>
 
 
 #define DRIVER_PRETTY_NAME	"Legacy SATA"

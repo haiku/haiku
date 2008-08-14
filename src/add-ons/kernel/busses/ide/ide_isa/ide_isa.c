@@ -20,7 +20,6 @@
 #include <bus/IDE.h>
 #include <ide_types.h>
 #include <device_manager.h>
-#include <block_io.h>
 
 
 //#define TRACE_IDE_ISA
@@ -78,7 +77,7 @@ publish_channel(device_node *parent, uint16 command_block_base,
 		// DMA properties; the 16 bit alignment is not necessary as
 		// the ide bus manager handles that very efficiently, but why
 		// not use the block device manager for doing that?
-		{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1 }},
+		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1 }},
 
 		// private data to identify device
 		{ IDE_ISA_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { ui16: command_block_base }},

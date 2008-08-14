@@ -441,7 +441,7 @@ das_register_device(device_node *node)
 		return B_ERROR;
 
 	// get block limit of underlying hardware to lower it (if necessary)
-	if (sDeviceManager->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM,
+	if (sDeviceManager->get_attr_uint32(node, B_DMA_MAX_TRANSFER_BLOCKS,
 			&maxBlocks, true) != B_OK)
 		maxBlocks = INT_MAX;
 
@@ -455,7 +455,7 @@ das_register_device(device_node *node)
 		// tell block_io whether the device is removable
 		{"removable", B_UINT8_TYPE, {ui8: deviceInquiry->removable_medium}},
 		// impose own max block restriction
-		{B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, {ui32: maxBlocks}},
+		{B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, {ui32: maxBlocks}},
 		{ NULL }
 	};
 

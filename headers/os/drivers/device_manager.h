@@ -150,6 +150,14 @@ struct driver_module_info {
 #define B_FIND_MULTIPLE_CHILDREN	0x02
 #define B_KEEP_DRIVER_LOADED		0x04
 
+/* DMA attributes */
+#define B_DMA_LOW_ADDRESS			"dma/low_address"
+#define B_DMA_HIGH_ADDRESS			"dma/high_address"
+#define B_DMA_ALIGNMENT				"dma/alignment"
+#define B_DMA_BOUNDARY				"dma/boundary"
+#define B_DMA_MAX_TRANSFER_BLOCKS	"dma/max_transfer_blocks"
+#define B_DMA_MAX_SEGMENT_BLOCKS	"dma/max_segment_blocks"
+#define B_DMA_MAX_SEGMENT_COUNT		"dma/max_segment_count"
 
 /* interface of device */
 

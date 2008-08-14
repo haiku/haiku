@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <block_io.h>
-
 
 #define TRACE(a...) dprintf("\33[35mahci:\33[0m " a)
 #define FLOW(a...)	dprintf("ahci: " a)
@@ -148,7 +146,7 @@ register_sim(device_node *parent)
 
 			{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE,
 				{ string: AHCI_DEVICE_MODULE_NAME }},
-			{ B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: 255 }},
+			{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: 255 }},
 			{ AHCI_ID_ITEM, B_UINT32_TYPE, { ui32: id }},
 //			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE,
 //				{ string: AHCI_ID_GENERATOR }},
@@ -237,16 +235,12 @@ ahci_register_device(device_node *parent)
 
 		// DMA properties
 		// data must be word-aligned;
-		{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE,
-			{ ui32: 1 }},
+		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1 }},
 		// one S/G block must not cross 64K boundary
-		{ B_BLOCK_DEVICE_DMA_BOUNDARY, B_UINT32_TYPE,
-			{ ui32: 0xffff }},
+		{ B_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: 0xffff }},
 		// max size of S/G block is 16 bits with zero being 64K
-		{ B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, B_UINT32_TYPE,
-			{ ui32: 0x10000 }},
-		// see definition of MAX_SG_COUNT
-		{ B_BLOCK_DEVICE_MAX_SG_BLOCKS, B_UINT32_TYPE,
+		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: 0x10000 }},
+		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
 			{ ui32: 32 /* whatever... */ }},
 		{ NULL }
 	};

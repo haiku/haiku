@@ -6,7 +6,7 @@
 
 #include "dma_resources.h"
 
-#include <block_io.h>
+#include <device_manager.h>
 
 #include <kernel.h>
 #include <util/AutoLock.h>
@@ -124,23 +124,23 @@ DMAResource::Init(device_node* node, size_t blockSize, uint32 bufferCount)
 
 	uint32 value;
 	if (gDeviceManagerModule.get_attr_uint32(node,
-			B_BLOCK_DEVICE_DMA_ALIGNMENT, &value, true) == B_OK)
+			B_DMA_ALIGNMENT, &value, true) == B_OK)
 		restrictions.alignment = value + 1;
 
 	if (gDeviceManagerModule.get_attr_uint32(node,
-			B_BLOCK_DEVICE_DMA_BOUNDARY, &value, true) == B_OK)
+			B_DMA_BOUNDARY, &value, true) == B_OK)
 		restrictions.boundary = value + 1;
 
 	if (gDeviceManagerModule.get_attr_uint32(node,
-			B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, &value, true) == B_OK)
-		restrictions.max_segment_size = value;
+			B_DMA_MAX_SEGMENT_BLOCKS, &value, true) == B_OK)
+		restrictions.max_segment_size = value * blockSize;
 
 	if (gDeviceManagerModule.get_attr_uint32(node,
-			B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &value, true) == B_OK)
+			B_DMA_MAX_TRANSFER_BLOCKS, &value, true) == B_OK)
 		restrictions.max_transfer_size = value * blockSize;
 
 	if (gDeviceManagerModule.get_attr_uint32(node,
-			B_BLOCK_DEVICE_MAX_SG_BLOCKS, &value, true) == B_OK)
+			B_DMA_MAX_SEGMENT_COUNT, &value, true) == B_OK)
 		restrictions.max_segment_count = value;
 
 	return Init(restrictions, blockSize, bufferCount);

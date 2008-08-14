@@ -674,7 +674,7 @@ cd_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 
 
 static status_t
-cd_io(void *cookie, io_request *request)
+cd_io(void* cookie, io_request* request)
 {
 	cd_handle* handle = (cd_handle*)cookie;
 
@@ -797,7 +797,7 @@ cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 
 static void
-cd_set_capacity(cd_driver_info *info, uint64 capacity, uint32 blockSize)
+cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 {
 	TRACE("cd_set_capacity(info = %p, capacity = %Ld, blockSize = %ld)\n",
 		info, capacity, blockSize);
@@ -838,7 +838,7 @@ cd_set_capacity(cd_driver_info *info, uint64 capacity, uint32 blockSize)
 
 
 static void
-cd_media_changed(cd_driver_info *info, scsi_ccb *request)
+cd_media_changed(cd_driver_info* info, scsi_ccb* request)
 {
 	// do a capacity check
 	// TBD: is this a good idea (e.g. if this is an empty CD)?
@@ -856,9 +856,9 @@ scsi_periph_callbacks callbacks = {
 
 
 static float
-cd_supports_device(device_node *parent)
+cd_supports_device(device_node* parent)
 {
-	const char *bus;
+	const char* bus;
 	uint8 deviceType;
 
 	// make sure parent is really the SCSI bus manager
@@ -883,20 +883,20 @@ cd_supports_device(device_node *parent)
 	server by the block_io module
 */
 static status_t
-cd_register_device(device_node *node)
+cd_register_device(device_node* node)
 {
-	const scsi_res_inquiry *deviceInquiry = NULL;
+	const scsi_res_inquiry* deviceInquiry = NULL;
 	size_t inquiryLength;
 	uint32 maxBlocks;
 
 	// get inquiry data
 	if (sDeviceManager->get_attr_raw(node, SCSI_DEVICE_INQUIRY_ITEM,
-			(const void **)&deviceInquiry, &inquiryLength, true) != B_OK
+			(const void**)&deviceInquiry, &inquiryLength, true) != B_OK
 		|| inquiryLength < sizeof(deviceInquiry))
 		return B_ERROR;
 
 	// get block limit of underlying hardware to lower it (if necessary)
-	if (sDeviceManager->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM,
+	if (sDeviceManager->get_attr_uint32(node, B_DMA_MAX_TRANSFER_BLOCKS,
 			&maxBlocks, true) != B_OK)
 		maxBlocks = INT_MAX;
 
@@ -907,10 +907,8 @@ cd_register_device(device_node *node)
 
 	// ready to register
 	device_attr attrs[] = {
-		// tell block_io whether the device is removable
 		{"removable", B_UINT8_TYPE, {ui8: deviceInquiry->removable_medium}},
-		// impose own max block restriction
-		{B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, {ui32: maxBlocks}},
+		{B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, {ui32: maxBlocks}},
 		{ NULL }
 	};
 
@@ -920,24 +918,21 @@ cd_register_device(device_node *node)
 
 
 static status_t
-cd_init_driver(device_node *node, void **cookie)
+cd_init_driver(device_node* node, void** _cookie)
 {
-	cd_driver_info *info;
-	status_t status;
-	uint8 removable;
-
 	TRACE("cd_init_driver");
 
-	status = sDeviceManager->get_attr_uint8(node, "removable",
+	uint8 removable;
+	status_t status = sDeviceManager->get_attr_uint8(node, "removable",
 		&removable, false);
 	if (status != B_OK)
 		return status;
 
-	info = (cd_driver_info *)malloc(sizeof(*info));
+	cd_driver_info* info = (cd_driver_info*)malloc(sizeof(cd_driver_info));
 	if (info == NULL)
 		return B_NO_MEMORY;
 
-	memset(info, 0, sizeof(*info));
+	memset(info, 0, sizeof(cd_driver_info));
 
 	info->dma_resource = new(std::nothrow) DMAResource;
 	if (info->dma_resource == NULL) {
@@ -956,8 +951,8 @@ cd_init_driver(device_node *node, void **cookie)
 		&info->device_type, true);
 
 	device_node *parent = sDeviceManager->get_parent_node(node);
-	sDeviceManager->get_driver(parent, (driver_module_info **)&info->scsi,
-		(void **)&info->scsi_device);
+	sDeviceManager->get_driver(parent, (driver_module_info**)&info->scsi,
+		(void**)&info->scsi_device);
 	sDeviceManager->put_node(parent);
 
 	status = sSCSIPeripheral->register_device((periph_device_cookie)info,
@@ -968,15 +963,15 @@ cd_init_driver(device_node *node, void **cookie)
 		return status;
 	}
 
-	*cookie = info;
+	*_cookie = info;
 	return B_OK;
 }
 
 
 static void
-cd_uninit_driver(void *_cookie)
+cd_uninit_driver(void* _cookie)
 {
-	cd_driver_info *info = (cd_driver_info *)_cookie;
+	cd_driver_info* info = (cd_driver_info*)_cookie;
 
 	sSCSIPeripheral->unregister_device(info->scsi_periph_device);
 	free(info);
@@ -984,17 +979,15 @@ cd_uninit_driver(void *_cookie)
 
 
 static status_t
-cd_register_child_devices(void *_cookie)
+cd_register_child_devices(void* _cookie)
 {
-	cd_driver_info *info = (cd_driver_info *)_cookie;
-	status_t status;
-	char *name;
+	cd_driver_info* info = (cd_driver_info*)_cookie;
 
-	name = sSCSIPeripheral->compose_device_name(info->node, "disk/scsi");
+	char* name = sSCSIPeripheral->compose_device_name(info->node, "disk/scsi");
 	if (name == NULL)
 		return B_ERROR;
 
-	status = sDeviceManager->publish_device(info->node, name,
+	status_t status = sDeviceManager->publish_device(info->node, name,
 		SCSI_CD_DEVICE_MODULE_NAME);
 
 	free(name);

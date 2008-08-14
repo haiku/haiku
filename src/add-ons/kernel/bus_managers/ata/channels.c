@@ -16,8 +16,6 @@
 #include <string.h>
 #include <malloc.h>
 
-#include <block_io.h>
-
 #define TRACE dprintf
 
 
@@ -30,7 +28,7 @@ ide_channel_added(device_node *parent)
 
 	TRACE("ide_channel_added, parent is %p\n", parent);
 
-	if (pnp->get_attr_string(parent, IDE_CONTROLLER_CONTROLLER_NAME_ITEM, 
+	if (pnp->get_attr_string(parent, IDE_CONTROLLER_CONTROLLER_NAME_ITEM,
 			&controller_name, true) != B_OK) {
 		dprintf("ide: ignored controller - controller name missing\n");
 		goto err;
@@ -61,7 +59,7 @@ ide_channel_added(device_node *parent)
 			//     which should be sufficient)
 			// Note: to fix specific drive bugs, use ide_sim_get_restrictions()
 			// in ide_sim.c!
-			{ B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: 255 }},
+			{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: 255 }},
 			{ IDE_CHANNEL_ID_ITEM, B_UINT32_TYPE, { ui32: channel_id }},
 //			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE, { string: IDE_CHANNEL_ID_GENERATOR }},
 //			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: channel_id }},

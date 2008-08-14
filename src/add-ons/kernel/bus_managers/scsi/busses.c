@@ -18,7 +18,6 @@
 
 #include <string.h>
 #include <malloc.h>
-#include <block_io.h>
 
 
 // bus service should hurry up a bit - good controllers don't take much time
@@ -198,19 +197,23 @@ scsi_init_bus(device_node *node, void **cookie)
 		return B_NO_MEMORY;
 
 	// extract controller/protocoll restrictions from node
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_DMA_ALIGNMENT, &bus->dma_params.alignment, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_DMA_ALIGNMENT, &bus->dma_params.alignment,
+			true) != B_OK)
 		bus->dma_params.alignment = 0;
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &bus->dma_params.max_blocks, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_DMA_MAX_TRANSFER_BLOCKS,
+			&bus->dma_params.max_blocks, true) != B_OK)
 		bus->dma_params.max_blocks = 0xffffffff;
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_DMA_BOUNDARY, &bus->dma_params.dma_boundary, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_DMA_BOUNDARY,
+			&bus->dma_params.dma_boundary, true) != B_OK)
 		bus->dma_params.dma_boundary = ~0;
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, &bus->dma_params.max_sg_block_size, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_DMA_MAX_SEGMENT_BLOCKS,
+			&bus->dma_params.max_sg_block_size, true) != B_OK)
 		bus->dma_params.max_sg_block_size = 0xffffffff;
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_SG_BLOCKS, &bus->dma_params.max_sg_blocks, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_DMA_MAX_SEGMENT_COUNT,
+			&bus->dma_params.max_sg_blocks, true) != B_OK)
 		bus->dma_params.max_sg_blocks = ~0;
 
 	// do some sanity check:
-	// (see blkman.c)
 	bus->dma_params.max_sg_block_size &= ~bus->dma_params.alignment;
 
 	if (bus->dma_params.alignment > B_PAGE_SIZE) {

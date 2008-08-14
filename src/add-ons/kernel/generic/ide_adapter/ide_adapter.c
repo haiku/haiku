@@ -19,7 +19,6 @@
 #include <bus/IDE.h>
 #include <ide_types.h>
 #include <ide_adapter.h>
-#include <block_io.h>
 #include <lendian_bitfield.h>
 
 #define debug_level_flow 0
@@ -656,18 +655,20 @@ ide_adapter_publish_controller(device_node *parent, uint16 bus_master_base,
 		// command queuing always works (unless controller is buggy)
 		{ IDE_CONTROLLER_CAN_CQ_ITEM, B_UINT8_TYPE, { ui8: can_cq }},
 		// choose any name here
-		{ IDE_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: controller_name }},
+		{ IDE_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE,
+			{ string: controller_name }},
 
 		// DMA properties
 		// data must be word-aligned;
 		// warning: some controllers are more picky!
-		{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: dma_alignment /*1*/}},
+		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: dma_alignment /*1*/}},
 		// one S/G block must not cross 64K boundary
-		{ B_BLOCK_DEVICE_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: dma_boundary/*0xffff*/ }},
+		{ B_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: dma_boundary/*0xffff*/ }},
 		// max size of S/G block is 16 bits with zero being 64K
-		{ B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, B_UINT32_TYPE, { ui32: max_sg_block_size/*0x10000*/ }},
-		// see definition of MAX_SG_COUNT
-		{ B_BLOCK_DEVICE_MAX_SG_BLOCKS, B_UINT32_TYPE, { ui32: IDE_ADAPTER_MAX_SG_COUNT }},
+		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE,
+			{ ui32: max_sg_block_size/*0x10000*/ }},
+		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
+			{ ui32: IDE_ADAPTER_MAX_SG_COUNT }},
 
 		// private data to find controller
 		{ IDE_ADAPTER_BUS_MASTER_BASE, B_UINT16_TYPE, { ui16: bus_master_base }},

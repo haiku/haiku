@@ -12,7 +12,6 @@
 #include <string.h>
 
 #include <bus/ide/ide_adapter.h>
-#include <block_io.h>
 
 #define debug_level_flow 0
 #define debug_level_error 3
@@ -95,7 +94,7 @@ inthand(void *arg)
 	if (channel->dmaing) {
 		// in DMA mode, there is a safe test
 		// in PIO mode, this doesn't work
-		*(uint8 *)&bm_status = pci->read_io_8( device, 
+		*(uint8 *)&bm_status = pci->read_io_8( device,
 			channel->bus_master_base + ide_bm_status_reg );
 
 		if (!bm_status.interrupt)
@@ -179,7 +178,7 @@ controller_removed(device_node_handle node, ide_adapter_controller_info *control
 // publish node of ide controller
 
 static status_t
-publish_controller(device_node_handle parent, uint16 bus_master_base, uint8 intnum, 
+publish_controller(device_node_handle parent, uint16 bus_master_base, uint8 intnum,
 	io_resource_handle *resources, device_node_handle *node)
 {
 	device_attr attrs[] = {
@@ -199,13 +198,13 @@ publish_controller(device_node_handle parent, uint16 bus_master_base, uint8 intn
 		// DMA properties
 		// some say it must be dword-aligned, others that it can be byte-aligned;
 		// stay on the safe side
-		{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 3 }},
+		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 3 }},
 		// one S/G block must not cross 64K boundary
-		{ B_BLOCK_DEVICE_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: 0xffff }},
+		{ B_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: 0xffff }},
 		// size of S/G block is 16 bits with zero being 64K
-		{ B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, B_UINT32_TYPE, { ui32: 0x10000 }},
-		// see definition of MAX_SG_COUNT
-		{ B_BLOCK_DEVICE_MAX_SG_BLOCKS, B_UINT32_TYPE, { ui32: IDE_ADAPTER_MAX_SG_COUNT }},
+		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: 0x10000 }},
+		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
+			{ ui32: IDE_ADAPTER_MAX_SG_COUNT }},
 
 		// private data to find controller
 		{ IDE_ADAPTER_BUS_MASTER_BASE, B_UINT16_TYPE, { ui16: bus_master_base }},
@@ -249,7 +248,7 @@ detect_controller(pci_device_module_info *pci, pci_device pci_device,
 	return publish_controller(parent, bus_master_base, intnum, resource_handles, node);
 }
 
-	
+
 static status_t
 probe_controller(device_node_handle parent)
 {
@@ -284,14 +283,14 @@ probe_controller(device_node_handle parent)
 	if (res != B_OK || controller_node == NULL)
 		goto err;
 
-	ide_adapter->detect_channel(pci, device, controller_node, 
+	ide_adapter->detect_channel(pci, device, controller_node,
 		PROMISE_TX2_CHANNEL_MODULE_NAME, true,
 		command_block_base[0], control_block_base[0], bus_master_base, intnum,
 		0, "Primary Channel", &channels[0], false);
 
-	ide_adapter->detect_channel(pci, device, controller_node, 
-		PROMISE_TX2_CHANNEL_MODULE_NAME, true, 
-		command_block_base[1], control_block_base[1], bus_master_base, intnum, 
+	ide_adapter->detect_channel(pci, device, controller_node,
+		PROMISE_TX2_CHANNEL_MODULE_NAME, true,
+		command_block_base[1], control_block_base[1], bus_master_base, intnum,
 		1, "Secondary Channel", &channels[1], false);
 
 	pnp->uninit_driver(parent);
@@ -299,7 +298,7 @@ probe_controller(device_node_handle parent)
 	return B_OK;
 
 err:
-	pnp->uninit_driver(parent);	
+	pnp->uninit_driver(parent);
 	return res;
 }
 

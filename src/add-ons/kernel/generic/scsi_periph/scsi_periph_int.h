@@ -10,7 +10,6 @@
 #include <stddef.h>
 
 #include <scsi_periph.h>
-#include <block_io.h>
 #include <device_manager.h>
 
 #include "io_requests.h"

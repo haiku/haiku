@@ -7,7 +7,6 @@
 #define _SCSI_CD_H
 
 
-#include <block_io.h>
 #include <device_manager.h>
 #include <scsi_periph.h>
 #include <scsi.h>
