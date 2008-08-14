@@ -80,13 +80,14 @@ struct openpic_info : interrupt_controller_info {
 
 		// uninit parent node driver
 		if (pci)
-			sDeviceManager->uninit_driver(sDeviceManager->get_parent(node));
+			//XXX do I mean it ?
+			sDeviceManager->put_node(sDeviceManager->get_parent_node(node));
 	}
 
 	openpic_supported_device	*supported_device;
-	device_node_handle			node;
+	device_node			*node;
 	pci_device_module_info		*pci;
-	pci_device					device;
+	pci_device					*device;
 
 	addr_t						physical_registers;	// physical registers base
 	addr_t						virtual_registers;	// virtual (mapped)
@@ -278,23 +279,22 @@ openpic_std_ops(int32 op, ...)
 
 
 static float
-openpic_supports_device(device_node_handle parent, bool *_noConnection)
+openpic_supports_device(device_node *parent)
 {
-	char *bus;
+	const char *bus;
 	uint16 vendorID;
 	uint16 deviceID;
 
 	// get the bus (should be PCI)
-	if (sDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus, false)
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false)
 			!= B_OK) {
 		return B_ERROR;
 	}
-	MemoryDeleter _(bus);
 
 	// get vendor and device ID
-	if (sDeviceManager->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM,
+	if (sDeviceManager->get_attr_uint16(parent, B_DEVICE_VENDOR_ID,
 			&vendorID, false) != B_OK
-		|| sDeviceManager->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM,
+		|| sDeviceManager->get_attr_uint16(parent, B_DEVICE_ID,
 			&deviceID, false) != B_OK) {
 		return B_ERROR;
 	}
@@ -310,35 +310,46 @@ openpic_supports_device(device_node_handle parent, bool *_noConnection)
 
 
 static status_t
-openpic_register_device(device_node_handle parent)
+openpic_register_device(device_node *parent)
 {
-	// get interface to PCI device
-	pci_device_module_info *pci;
-	pci_device device;
-	status_t error = sDeviceManager->init_driver(parent, NULL,
-		(driver_module_info**)&pci, (void**)&device);
-	if (error != B_OK)
-		return error;
-
-	sDeviceManager->uninit_driver(parent);
-
-	device_attr attrs[] = {
-		// info about ourself
-		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: OPENPIC_MODULE_NAME }},
-		{ B_DRIVER_DEVICE_TYPE, B_STRING_TYPE,
-			{ string: B_INTERRUPT_CONTROLLER_DRIVER_TYPE }},
-
-		{}
-	};
-
-	return sDeviceManager->register_device(parent, attrs, NULL, NULL);
+#if 0 //XXX: what do I do ?
+  // get interface to PCI device
+  pci_device_module_info *pci;
+  pci_device *device;
+  driver_module_info *driver;
+  void *cookie;
+  status_t error;
+  error = sDeviceManager->get_driver(parent, &driver, &cookie);
+  if (error < B_OK)
+    return error;
+  error = driver->init_driver(parent, cookie);
+  // (driver_module_info**)&pci, (void**)&device); // wtf?
+  if (error != B_OK)
+    return error;
+  
+  sDeviceManager->uninit_driver(parent);
+#endif
+  device_node *newNode;
+  device_attr attrs[] = {
+    // info about ourself
+    //{ B_DRIVER_MODULE, B_STRING_TYPE, { string: OPENPIC_MODULE_NAME }},
+    //XXX: that's inconsistent with the header!
+    //{ B_DEVICE_TYPE, B_STRING_TYPE,
+    //	{ string: B_INTERRUPT_CONTROLLER_DRIVER_TYPE }},
+    
+    {}
+  };
+  
+  // HACK: to get it compiled, I will break anything.
+  return sDeviceManager->register_node(parent, NULL, attrs, NULL, &newNode);
 }
 
 
 static status_t
-openpic_init_driver(device_node_handle node, void *user_cookie, 
-	void **cookie)
+openpic_init_driver(device_node *node, void **cookie)
 {
+	// OK, this module is broken for now. But it compiles.
+	return B_ERROR;
 	openpic_info *info = new(nothrow) openpic_info;
 	if (!info)
 		return B_NO_MEMORY;
@@ -347,17 +358,25 @@ openpic_init_driver(device_node_handle node, void *user_cookie,
 	info->node = node;
 
 	// get interface to PCI device
-	status_t error = sDeviceManager->init_driver(
+	void *aCookie;
+	void *anotherCookie; // possibly the same cookie.
+	driver_module_info *driver;
+	status_t status = sDeviceManager->get_driver(sDeviceManager->get_parent_node(node),
+												 &driver, &aCookie);
+	if (status != B_OK)
+		return status;
+
+	driver->init_driver(node, &anotherCookie);
+
+	/* status = sDeviceManager->init_driver(
 		sDeviceManager->get_parent(node), NULL,
 		(driver_module_info**)&info->pci, (void**)&info->device);
-	if (error != B_OK)
-		return error;
+		if (status != B_OK)
+		return status; */
 
 	// get the pci info for the device
 	pci_info pciInfo;
-	error = info->pci->get_pci_info(info->device, &pciInfo);
-	if (error != B_OK)
-		return error;
+	info->pci->get_pci_info(info->device, &pciInfo);
 
 	// find supported device info
 	info->supported_device = openpic_check_supported_device(pciInfo.vendor_id,
@@ -397,9 +416,9 @@ openpic_init_driver(device_node_handle node, void *user_cookie,
 	info->virtual_registers = (addr_t)virtualRegisterBase;
 
 	// init the controller
-	error = openpic_init(info);
-	if (error != B_OK)
-		return error;
+	status = openpic_init(info);
+	if (status != B_OK)
+		return status;
 
 	// keep the info
 	infoDeleter.Detach();
@@ -411,26 +430,25 @@ openpic_init_driver(device_node_handle node, void *user_cookie,
 }
 
 
-static status_t
+static void
 openpic_uninit_driver(void *cookie)
 {
 	openpic_info *info = (openpic_info*)cookie;
 
 	delete info;
-
-	return B_OK;
 }
 
 
 static void
-openpic_device_removed(device_node_handle node, void *cookie)
+openpic_device_removed(void *driverCookie)
 {
 	// TODO: ...
 }
 
 
-static void
-openpic_get_paths(const char ***_bus, const char ***_device)
+// FIXME: I don't think this is needed...
+/*static void
+openpic_get_paths(const char **_bus, const char **_device)
 {
 	static const char *kBus[] = { "pci", NULL };
 //	static const char *kDevice[] = { "drivers/dev/disk/ide", NULL };
@@ -438,7 +456,7 @@ openpic_get_paths(const char ***_bus, const char ***_device)
 	*_bus = kBus;
 //	*_device = kDevice;
 	*_device = NULL;
-}
+}*/
 
 
 // #pragma mark - interrupt_controller interface
@@ -512,9 +530,11 @@ static interrupt_controller_module_info sControllerModuleInfo = {
 		openpic_register_device,
 		openpic_init_driver,
 		openpic_uninit_driver,
+		NULL, // HACK: register_child_devices
+		NULL, // HACK: rescan_child_devices
 		openpic_device_removed,
-		NULL,	// cleanup
-		openpic_get_paths,
+		NULL,	// suspend
+		NULL // resume
 	},
 
 	openpic_get_controller_info,
