@@ -345,6 +345,8 @@ static int
 dump_heap_list(int argc, char **argv)
 {
 	if (argc == 2) {
+		uint64 heapAddress;
+
 		if (strcmp(argv[1], "grow") == 0) {
 			// only dump dedicated grow heap info
 			dprintf("dedicated grow heap:\n");
@@ -352,6 +354,8 @@ dump_heap_list(int argc, char **argv)
 		} else if (strcmp(argv[1], "stats") == 0) {
 			for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
 				dump_allocator(sHeaps[i], false, false);
+		} else if (evaluate_debug_expression(argv[1], &heapAddress, true)) {
+			dump_allocator((heap_allocator*)(addr_t)heapAddress, true, true);
 		} else
 			print_debugger_command_usage(argv[0]);
 
@@ -1661,10 +1665,13 @@ heap_init(addr_t base, size_t size)
 
 	// set up some debug commands
 	add_debugger_command_etc("heap", &dump_heap_list,
-		"Dump infos about the kernel heap(s)", "[(\"grow\" | \"stats\")]\n"
+		"Dump infos about the kernel heap(s)",
+		"[(\"grow\" | \"stats\" | <heap>)]\n"
 		"Dump infos about the kernel heap(s). If \"grow\" is specified, only\n"
 		"infos about the dedicated grow heap are printed. If \"stats\" is\n"
-		"given as the argument, currently only the heap count is printed\n", 0);
+		"given as the argument, currently only the heap count is printed.\n"
+		"If <heap> is given, it is interpreted as the address of the heap to\n"
+		"print infos about.\n", 0);
 #if KERNEL_HEAP_LEAK_CHECK
 	add_debugger_command_etc("allocations", &dump_allocations,
 		"Dump current allocations",
