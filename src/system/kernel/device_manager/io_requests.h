@@ -8,6 +8,8 @@
 
 #include <sys/uio.h>
 
+#include <new>
+
 #include <SupportDefs.h>
 
 #include <condition_variable.h>
@@ -28,7 +30,7 @@ typedef struct IOOperation io_operation;
 
 class IOBuffer : public DoublyLinkedListLinkImpl<IOBuffer> {
 public:
-	static	IOBuffer*			Create(size_t count);
+	static	IOBuffer*			Create(uint32 count, bool vip);
 			void				Delete();
 
 			bool				IsVirtual() const { return !fPhysical; }
@@ -66,6 +68,7 @@ private:
 
 			bool				fUser;
 			bool				fPhysical;
+			bool				fVIP;
 			size_t				fLength;
 			size_t				fVecCount;
 			size_t				fCapacity;
@@ -89,6 +92,8 @@ public:
 
 			DoublyLinkedListLink<IORequestChunk>*
 									ListLink()	{ return &fListLink; }
+
+			void				operator delete(void* address, size_t size);
 
 protected:
 			void				SetStatus(status_t status)
@@ -249,6 +254,7 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			bool				IsWrite() const	{ return fIsWrite; }
 			bool				IsRead() const	{ return !fIsWrite; }
 			team_id				Team() const	{ return fTeam; }
+			uint32				Flags() const	{ return fFlags; }
 
 			IOBuffer*			Buffer() const	{ return fBuffer; }
 			off_t				Offset() const	{ return fOffset; }
@@ -329,6 +335,24 @@ void io_request_free(void* address);
 	// malloc()
 
 void vip_io_request_allocator_init();
+
+
+static const struct vip_io_alloc_t {
+} vip_io_alloc = {};
+
+
+inline void*
+operator new(size_t size, const vip_io_alloc_t& vip_io_alloc) throw ()
+{
+	return vip_io_request_malloc(size);
+}
+
+
+inline void*
+operator new[](size_t size, const vip_io_alloc_t& vip_io_alloc) throw ()
+{
+	return vip_io_request_malloc(size);
+}
 
 
 #endif	// IO_REQUESTS_H

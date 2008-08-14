@@ -53,14 +53,22 @@ IORequestChunk::~IORequestChunk()
 }
 
 
+void
+IORequestChunk::operator delete(void* address, size_t size)
+{
+	io_request_free(address);
+}
+
+
 //	#pragma mark -
 
 
 IOBuffer*
-IOBuffer::Create(size_t count)
+IOBuffer::Create(uint32 count, bool vip)
 {
-	IOBuffer* buffer = (IOBuffer*)malloc(
-		sizeof(IOBuffer) + sizeof(iovec) * (count - 1));
+	size_t size = sizeof(IOBuffer) + sizeof(iovec) * (count - 1);
+	IOBuffer* buffer
+		= (IOBuffer*)(vip ? vip_io_request_malloc(size) : malloc(size));
 	if (buffer == NULL)
 		return NULL;
 
@@ -68,6 +76,7 @@ IOBuffer::Create(size_t count)
 	buffer->fVecCount = 0;
 	buffer->fUser = false;
 	buffer->fPhysical = false;
+	buffer->fVIP = vip;
 
 	return buffer;
 }
@@ -76,7 +85,10 @@ IOBuffer::Create(size_t count)
 void
 IOBuffer::Delete()
 {
-	free(this);
+	if (fVIP)
+		vip_io_request_free(this);
+	else
+		free(this);
 }
 
 
@@ -589,7 +601,7 @@ status_t
 IORequest::Init(off_t offset, size_t firstVecOffset, const iovec* vecs,
 	size_t count, size_t length, bool write, uint32 flags)
 {
-	fBuffer = IOBuffer::Create(count);
+	fBuffer = IOBuffer::Create(count, (flags & B_VIP_IO_REQUEST) != 0);
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
 
@@ -651,8 +663,8 @@ IORequest::CreateSubRequest(off_t parentOffset, off_t offset, size_t length,
 	}
 
 	// create subrequest
-	IORequest* subRequest = new(std::nothrow) IORequest;
-		// TODO: Heed B_VIP_IO_REQUEST!
+	IORequest* subRequest = (fFlags & B_VIP_IO_REQUEST) != 0
+		? new(vip_io_alloc) IORequest : new(std::nothrow) IORequest;
 	if (subRequest == NULL)
 		return B_NO_MEMORY;
 
@@ -1205,6 +1217,9 @@ vip_io_request_allocator_init()
 			"heap\n");
 		return;
 	}
+
+	dprintf("vip_io_request_allocator_init(): created VIP I/O heap: %p\n",
+		sVIPHeap);
 }
 
 
