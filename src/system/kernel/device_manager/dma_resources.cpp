@@ -115,7 +115,7 @@ DMAResource::~DMAResource()
 
 
 status_t
-DMAResource::Init(device_node* node, size_t blockSize)
+DMAResource::Init(device_node* node, size_t blockSize, uint32 bufferCount)
 {
 	dma_restrictions restrictions;
 	memset(&restrictions, 0, sizeof(dma_restrictions));
@@ -139,10 +139,9 @@ DMAResource::Init(device_node* node, size_t blockSize)
 			B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &value, true) == B_OK)
 		restrictions.max_transfer_size = value * blockSize;
 
-	uint32 bufferCount;
 	if (gDeviceManagerModule.get_attr_uint32(node,
-			B_BLOCK_DEVICE_MAX_SG_BLOCKS, &bufferCount, true) != B_OK)
-		bufferCount = 16;
+			B_BLOCK_DEVICE_MAX_SG_BLOCKS, &value, true) == B_OK)
+		restrictions.max_segment_count = value;
 
 	return Init(restrictions, blockSize, bufferCount);
 }

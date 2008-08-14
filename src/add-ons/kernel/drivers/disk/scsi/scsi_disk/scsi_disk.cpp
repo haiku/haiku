@@ -363,7 +363,7 @@ das_set_capacity(das_driver_info* info, uint64 capacity, uint32 blockSize)
 		}
 
 		// TODO: we need to replace the DMAResource in our IOScheduler
-		status_t status = info->dma_resource->Init(info->node, blockSize);
+		status_t status = info->dma_resource->Init(info->node, blockSize, 32);
 		if (status != B_OK)
 			panic("initializing DMAResource failed: %s", strerror(status));
 
