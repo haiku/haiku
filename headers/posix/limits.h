@@ -41,6 +41,8 @@
 #define PAGESIZE				(4096)
 #define PATH_MAX				(1024)
 #define PIPE_MAX				(512)
+#define PTHREAD_KEYS_MAX		256
+#define PTHREAD_STACK_MIN		4096
 #define SSIZE_MAX		  		(2147483647L)
 #define TTY_NAME_MAX			(256)
 #define TZNAME_MAX		  		(32)

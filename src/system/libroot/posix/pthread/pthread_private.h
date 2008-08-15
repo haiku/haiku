@@ -47,7 +47,6 @@ struct pthread_key_data {
 	void		*value;
 };
 
-#define PTHREAD_KEYS_MAX		256
 #define PTHREAD_UNUSED_SEQUENCE	0
 
 typedef struct _pthread_thread {

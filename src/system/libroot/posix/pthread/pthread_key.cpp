@@ -6,6 +6,7 @@
 
 #include "pthread_private.h"
 
+#include <limits.h>
 #include <stdlib.h>
 
 

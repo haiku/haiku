@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include "pthread_private.h"
 
+#include <limits.h>
 #include <stdlib.h>
 
 #include <thread_defs.h>
@@ -102,7 +103,7 @@ pthread_attr_setstacksize(pthread_attr_t *_attr, size_t stacksize)
 	if (_attr == NULL || (attr = *_attr) == NULL)
 		return B_BAD_VALUE;
 
-	if (stacksize < MIN_USER_STACK_SIZE || stacksize > MAX_USER_STACK_SIZE)
+	if (stacksize < PTHREAD_STACK_MIN || stacksize > MAX_USER_STACK_SIZE)
 		return B_BAD_VALUE;
 
 	attr->stack_size = stacksize;
