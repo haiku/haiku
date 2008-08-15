@@ -234,6 +234,10 @@ rule CopySetHaikuRevision target : source
 		local svnEntries = <haiku-rootdir-svn>entries ;
 		SEARCH on $(svnEntries) = [ FDirName $(HAIKU_TOP) .svn ] ;
 		Depends $(target) : $(svnEntries) ;
+	} else if [ Glob [ FDirName $(HAIKU_TOP) .git ] : index ] {
+		local gitIndex = <haiku-rootdir-git>index ;
+		SEARCH on $(gitIndex) = [ FDirName $(HAIKU_TOP) .git ] ;
+		Depends $(target) : $(gitIndex) ;
 	}
 
 	HAIKU_INCLUDE_IN_IMAGE on $(target)
@@ -247,7 +251,12 @@ rule CopySetHaikuRevision target : source
 actions CopySetHaikuRevision1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	revision=`(LC_ALL=C LANG=C svn info $(HAIKU_TOP) 2> /dev/null || echo Revision: 0) |
+	revision=`(LC_ALL=C LANG=C svn info $(HAIKU_TOP) 2> /dev/null ||
+		(cd $(HAIKU_TOP) && LC_ALL=C LANG=C git svn info) 2> /dev/null ||
+		(git log --max-count=1 --grep="git-svn-id:" 2> /dev/null |
+			grep git-svn-id: | cut -d '@' -f 2 |
+			awk '{printf "Revision: " $1}') 2> /dev/null ||
+		echo Revision: 0) |
 		grep Revision | awk '{printf $2}'`
 	$(2[1]) --data $(2[3]) $(1) &&
 	$(2[2]) $(1) ${revision}
