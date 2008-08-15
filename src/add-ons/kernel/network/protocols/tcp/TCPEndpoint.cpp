@@ -406,7 +406,8 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 		this);
 	gStackModule->init_timer(&fDelayedAcknowledgeTimer,
 		TCPEndpoint::_DelayedAcknowledgeTimer, this);
-	gStackModule->init_timer(&fTimeWaitTimer, TCPEndpoint::_TimeWaitTimer, this);
+	gStackModule->init_timer(&fTimeWaitTimer, TCPEndpoint::_TimeWaitTimer,
+		this);
 }
 
 
@@ -424,8 +425,11 @@ TCPEndpoint::~TCPEndpoint()
 
 	mutex_destroy(&fLock);
 
-	// TODO: we need to wait for all timers to return
-	//_WaitForTimers();
+	// we need to wait for all timers to return
+	gStackModule->wait_for_timer(&fRetransmitTimer);
+	gStackModule->wait_for_timer(&fPersistTimer);
+	gStackModule->wait_for_timer(&fDelayedAcknowledgeTimer);
+	gStackModule->wait_for_timer(&fTimeWaitTimer);
 }
 
 
