@@ -599,14 +599,14 @@ Volume::Mount(const char* device)
 
 		if (text.titles[i] != NULL) {
 			if (text.artists[i] != NULL) {
-				snprintf(title, sizeof(title), "%02ld. %s - %s", track,
+				snprintf(title, sizeof(title), "%02ld. %s - %s.wav", track,
 					text.artists[i], text.titles[i]);
 			} else {
-				snprintf(title, sizeof(title), "%02ld. %s", track,
+				snprintf(title, sizeof(title), "%02ld. %s.wav", track,
 					text.titles[i]);
 			}
 		} else
-			snprintf(title, sizeof(title), "Track %02ld", track);
+			snprintf(title, sizeof(title), "Track %02ld.wav", track);
 
 		// remove '/' and '\n' from title
 		for (int32 j = 0; title[j]; j++) {
