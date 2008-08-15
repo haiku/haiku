@@ -250,7 +250,7 @@ chain::Acquire()
 	for (int32 i = 0; modules[i] != NULL; i++) {
 		if (get_module(modules[i], &infos[i]) < B_OK) {
 			flags |= CHAIN_MISSING_MODULE;
-			
+
 			// put already opened modules
 			while (i-- > 0) {
 				put_module(modules[i]);
@@ -494,7 +494,7 @@ put_domain_protocols(net_socket *socket)
 
 	uninit_domain_protocols(socket);
 	chain->Release();
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -582,7 +582,7 @@ put_domain_datalink_protocols(net_interface *_interface)
 
 	uninit_domain_datalink_protocols(interface);
 	chain->Release();
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -628,7 +628,7 @@ put_domain_receiving_protocol(net_domain *_domain, uint32 type)
 	}
 
 	chain->Release();
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -641,7 +641,7 @@ register_domain_protocols(int family, int type, int protocol, ...)
 	}
 
 	MutexLocker locker(&sChainLock);
-	
+
 	struct chain *chain = chain::Lookup(sProtocolChains, family, type, protocol);
 	if (chain != NULL)
 		return B_OK;
@@ -850,7 +850,7 @@ uninit_stack()
 	hash_uninit(sDatalinkProtocolChains);
 	hash_uninit(sReceivingProtocolChains);
 	hash_uninit(sFamilies);
-	
+
 	return B_OK;
 }
 
@@ -913,6 +913,7 @@ net_stack_module_info gNetStackModule = {
 	init_timer,
 	set_timer,
 	cancel_timer,
+	wait_for_timer,
 	is_timer_active,
 
 	is_syscall,

@@ -7,26 +7,63 @@
  */
 
 
-#include "stack_private.h"
 #include "utility.h"
 
+#include <ByteOrder.h>
+#include <KernelExport.h>
+
+#include <condition_variable.h>
 #include <net_buffer.h>
 #include <syscall_restart.h>
 #include <util/AutoLock.h>
 
-#include <ByteOrder.h>
-#include <KernelExport.h>
+#include "stack_private.h"
+
+
+#define TIMER_IS_RUNNING	0x80000000
+
+// internal Fifo class which doesn't maintain it's own lock
+// TODO: do we need this one for anything?
+class Fifo {
+public:
+	Fifo(const char* name, size_t maxBytes);
+	~Fifo();
+
+	status_t InitCheck() const;
+
+	status_t Enqueue(net_buffer* buffer);
+	status_t EnqueueAndNotify(net_buffer* _buffer, net_socket* socket,
+		uint8 event);
+	status_t Wait(mutex* lock, bigtime_t timeout);
+	net_buffer* Dequeue(bool clone);
+	status_t Clear();
+
+	void WakeAll();
+
+	bool IsEmpty() const { return current_bytes == 0; }
+
+//private:
+	// these field names are kept so we can use templatized
+	// functions together with net_fifo
+	sem_id		notify;
+	int32		waiting;
+	size_t		max_bytes;
+	size_t		current_bytes;
+	struct list	buffers;
+};
+
 
 
 static struct list sTimers;
 static mutex sTimerLock;
 static sem_id sTimerWaitSem;
+static ConditionVariable sWaitForTimerCondition;
 static thread_id sTimerThread;
 static bigtime_t sTimerTimeout;
 
 
 static inline void
-fifo_notify_one_reader(int32 &waiting, sem_id sem)
+fifo_notify_one_reader(int32& waiting, sem_id sem)
 {
 	if (waiting > 0) {
 		waiting--;
@@ -36,7 +73,7 @@ fifo_notify_one_reader(int32 &waiting, sem_id sem)
 
 
 template<typename FifoType> static inline status_t
-base_fifo_init(FifoType *fifo, const char *name, size_t maxBytes)
+base_fifo_init(FifoType* fifo, const char* name, size_t maxBytes)
 {
 	fifo->notify = create_sem(0, name);
 	fifo->max_bytes = maxBytes;
@@ -49,9 +86,10 @@ base_fifo_init(FifoType *fifo, const char *name, size_t maxBytes)
 
 
 template<typename FifoType> static inline status_t
-base_fifo_enqueue_buffer(FifoType *fifo, net_buffer *buffer)
+base_fifo_enqueue_buffer(FifoType* fifo, net_buffer* buffer)
 {
-	if (fifo->max_bytes > 0 && fifo->current_bytes + buffer->size > fifo->max_bytes)
+	if (fifo->max_bytes > 0
+		&& fifo->current_bytes + buffer->size > fifo->max_bytes)
 		return ENOBUFS;
 
 	list_add_item(&fifo->buffers, buffer);
@@ -63,10 +101,10 @@ base_fifo_enqueue_buffer(FifoType *fifo, net_buffer *buffer)
 
 
 template<typename FifoType> static inline status_t
-base_fifo_clear(FifoType *fifo)
+base_fifo_clear(FifoType* fifo)
 {
 	while (true) {
-		net_buffer *buffer = (net_buffer *)list_remove_head_item(&fifo->buffers);
+		net_buffer* buffer = (net_buffer*)list_remove_head_item(&fifo->buffers);
 		if (buffer == NULL)
 			break;
 
@@ -81,8 +119,8 @@ base_fifo_clear(FifoType *fifo)
 //	#pragma mark -
 
 
-void *
-UserBuffer::Copy(void *source, size_t length)
+void*
+UserBuffer::Copy(void* source, size_t length)
 {
 	if (fStatus != B_OK)
 		return NULL;
@@ -100,7 +138,7 @@ UserBuffer::Copy(void *source, size_t length)
 	memcpy(fBuffer, source, length);
 #endif
 
-	void *current = fBuffer;
+	void* current = fBuffer;
 
 	fAvailable -= length;
 	fBuffer += length;
@@ -110,9 +148,9 @@ UserBuffer::Copy(void *source, size_t length)
 
 
 uint16
-compute_checksum(uint8 *_buffer, size_t length)
+compute_checksum(uint8* _buffer, size_t length)
 {
-	uint16 *buffer = (uint16 *)_buffer;
+	uint16* buffer = (uint16*)_buffer;
 	uint32 sum = 0;
 
 	// TODO: unfold loop for speed
@@ -125,12 +163,12 @@ compute_checksum(uint8 *_buffer, size_t length)
 	if (length) {
 		// give the last byte it's proper endian-aware treatment
 #if B_HOST_IS_LENDIAN
-		sum += *(uint8 *)buffer;
+		sum += *(uint8*)buffer;
 #else
 		uint8 ordered[2];
-		ordered[0] = *(uint8 *)buffer;
+		ordered[0] = *(uint8*)buffer;
 		ordered[1] = 0;
-		sum += *(uint16 *)ordered;
+		sum += *(uint16*)ordered;
 #endif
 	}
 
@@ -143,7 +181,7 @@ compute_checksum(uint8 *_buffer, size_t length)
 
 
 uint16
-checksum(uint8 *buffer, size_t length)
+checksum(uint8* buffer, size_t length)
 {
 	return ~compute_checksum(buffer, length);
 }
@@ -153,7 +191,7 @@ checksum(uint8 *buffer, size_t length)
 
 
 status_t
-notify_socket(net_socket *socket, uint8 event, int32 value)
+notify_socket(net_socket* socket, uint8 event, int32 value)
 {
 	return gNetSocketModule.notify(socket, event, value);
 }
@@ -162,7 +200,7 @@ notify_socket(net_socket *socket, uint8 event, int32 value)
 //	#pragma mark - FIFOs
 
 
-Fifo::Fifo(const char *name, size_t maxBytes)
+Fifo::Fifo(const char* name, size_t maxBytes)
 {
 	base_fifo_init(this, name, maxBytes);
 }
@@ -183,14 +221,14 @@ Fifo::InitCheck() const
 
 
 status_t
-Fifo::Enqueue(net_buffer *buffer)
+Fifo::Enqueue(net_buffer* buffer)
 {
 	return base_fifo_enqueue_buffer(this, buffer);
 }
 
 
 status_t
-Fifo::EnqueueAndNotify(net_buffer *_buffer, net_socket *socket, uint8 event)
+Fifo::EnqueueAndNotify(net_buffer* _buffer, net_socket* socket, uint8 event)
 {
 	net_buffer *buffer = gNetBufferModule.clone(_buffer, false);
 	if (buffer == NULL)
@@ -207,7 +245,7 @@ Fifo::EnqueueAndNotify(net_buffer *_buffer, net_socket *socket, uint8 event)
 
 
 status_t
-Fifo::Wait(mutex *lock, bigtime_t timeout)
+Fifo::Wait(mutex* lock, bigtime_t timeout)
 {
 	waiting++;
 	mutex_unlock(lock);
@@ -218,10 +256,10 @@ Fifo::Wait(mutex *lock, bigtime_t timeout)
 }
 
 
-net_buffer *
+net_buffer*
 Fifo::Dequeue(bool clone)
 {
-	net_buffer *buffer = (net_buffer *)list_get_first_item(&buffers);
+	net_buffer* buffer = (net_buffer*)list_get_first_item(&buffers);
 
 	// assert(buffer != NULL);
 
@@ -256,7 +294,7 @@ Fifo::WakeAll()
 
 
 status_t
-init_fifo(net_fifo *fifo, const char *name, size_t maxBytes)
+init_fifo(net_fifo* fifo, const char* name, size_t maxBytes)
 {
 	mutex_init_etc(&fifo->lock, name, MUTEX_FLAG_CLONE_NAME);
 
@@ -269,7 +307,7 @@ init_fifo(net_fifo *fifo, const char *name, size_t maxBytes)
 
 
 void
-uninit_fifo(net_fifo *fifo)
+uninit_fifo(net_fifo* fifo)
 {
 	clear_fifo(fifo);
 
@@ -279,15 +317,14 @@ uninit_fifo(net_fifo *fifo)
 
 
 status_t
-fifo_enqueue_buffer(net_fifo *fifo, net_buffer *buffer)
+fifo_enqueue_buffer(net_fifo* fifo, net_buffer* buffer)
 {
 	MutexLocker locker(fifo->lock);
 	return base_fifo_enqueue_buffer(fifo, buffer);
 }
 
 
-/*!
-	Gets the first buffer from the FIFO. If there is no buffer, it
+/*!	Gets the first buffer from the FIFO. If there is no buffer, it
 	will wait depending on the \a flags and \a timeout.
 	The following flags are supported (the rest is ignored):
 		MSG_DONTWAIT - ignores the timeout and never wait for a buffer; if your
@@ -297,15 +334,15 @@ fifo_enqueue_buffer(net_fifo *fifo, net_buffer *buffer)
 			in the FIFO.
 */
 ssize_t
-fifo_dequeue_buffer(net_fifo *fifo, uint32 flags, bigtime_t timeout,
-	net_buffer **_buffer)
+fifo_dequeue_buffer(net_fifo* fifo, uint32 flags, bigtime_t timeout,
+	net_buffer** _buffer)
 {
 	MutexLocker locker(fifo->lock);
 	bool dontWait = (flags & MSG_DONTWAIT) != 0 || timeout == 0;
 	status_t status;
 
 	while (true) {
-		net_buffer *buffer = (net_buffer *)list_get_first_item(&fifo->buffers);
+		net_buffer* buffer = (net_buffer*)list_get_first_item(&fifo->buffers);
 		if (buffer != NULL) {
 			if ((flags & MSG_PEEK) != 0) {
 				// we need to clone the buffer for inspection; we can't give a
@@ -352,7 +389,7 @@ fifo_dequeue_buffer(net_fifo *fifo, uint32 flags, bigtime_t timeout,
 
 
 status_t
-clear_fifo(net_fifo *fifo)
+clear_fifo(net_fifo* fifo)
 {
 	MutexLocker locker(fifo->lock);
 	return base_fifo_clear(fifo);
@@ -360,8 +397,8 @@ clear_fifo(net_fifo *fifo)
 
 
 status_t
-fifo_socket_enqueue_buffer(net_fifo *fifo, net_socket *socket, uint8 event,
-	net_buffer *_buffer)
+fifo_socket_enqueue_buffer(net_fifo* fifo, net_socket* socket, uint8 event,
+	net_buffer* _buffer)
 {
 	net_buffer *buffer = gNetBufferModule.clone(_buffer, false);
 	if (buffer == NULL)
@@ -383,7 +420,7 @@ fifo_socket_enqueue_buffer(net_fifo *fifo, net_socket *socket, uint8 event,
 
 
 static status_t
-timer_thread(void * /*data*/)
+timer_thread(void* /*data*/)
 {
 	status_t status = B_OK;
 
@@ -392,12 +429,11 @@ timer_thread(void * /*data*/)
 
 		if (status == B_TIMED_OUT || status == B_OK) {
 			// scan timers for new timeout and/or execute a timer
-			if (mutex_lock(&sTimerLock) < B_OK)
-				return B_OK;
+			mutex_lock(&sTimerLock);
 
-			struct net_timer *timer = NULL;
+			struct net_timer* timer = NULL;
 			while (true) {
-				timer = (net_timer *)list_get_next_item(&sTimers, timer);
+				timer = (net_timer*)list_get_next_item(&sTimers, timer);
 				if (timer == NULL)
 					break;
 
@@ -405,11 +441,14 @@ timer_thread(void * /*data*/)
 					// execute timer
 					list_remove_item(&sTimers, timer);
 					timer->due = -1;
+					timer->flags |= TIMER_IS_RUNNING;
 
 					mutex_unlock(&sTimerLock);
 					timer->hook(timer, timer->data);
 					mutex_lock(&sTimerLock);
 
+					timer->flags &= ~TIMER_IS_RUNNING;
+					sWaitForTimerCondition.NotifyAll();
 					timer = NULL;
 						// restart scanning as we unlocked the list
 				} else {
@@ -431,7 +470,7 @@ timer_thread(void * /*data*/)
 			// B_TIMED_OUT - look for timers to be executed
 			// B_BAD_SEM_ID - we are asked to quit
 	} while (status != B_BAD_SEM_ID);
-	
+
 	return B_OK;
 }
 
@@ -441,11 +480,12 @@ timer_thread(void * /*data*/)
 	a timer later on, but make sure you have canceled it before using set_timer().
 */
 void
-init_timer(net_timer *timer, net_timer_func hook, void *data)
+init_timer(net_timer* timer, net_timer_func hook, void* data)
 {
 	timer->hook = hook;
 	timer->data = data;
 	timer->due = 0;
+	timer->flags = 0;
 }
 
 
@@ -458,7 +498,7 @@ init_timer(net_timer *timer, net_timer_func hook, void *data)
 	making any changes.
 */
 void
-set_timer(net_timer *timer, bigtime_t delay)
+set_timer(net_timer* timer, bigtime_t delay)
 {
 	MutexLocker locker(sTimerLock);
 
@@ -483,7 +523,7 @@ set_timer(net_timer *timer, bigtime_t delay)
 
 
 bool
-cancel_timer(struct net_timer *timer)
+cancel_timer(struct net_timer* timer)
 {
 	MutexLocker locker(sTimerLock);
 
@@ -497,21 +537,41 @@ cancel_timer(struct net_timer *timer)
 }
 
 
+void
+wait_for_timer(struct net_timer* timer)
+{
+	while (true) {
+		MutexLocker locker(sTimerLock);
+
+		if (timer->due <= 0 && (timer->flags & TIMER_IS_RUNNING) == 0)
+			return;
+
+		// we actually need to wait for this timer
+		ConditionVariableEntry entry;
+		sWaitForTimerCondition.Add(&entry);
+
+		locker.Unlock();
+
+		entry.Wait();
+	}
+}
+
+
 bool
-is_timer_active(net_timer *timer)
+is_timer_active(net_timer* timer)
 {
 	return timer->due > 0;
 }
 
 
 static int
-dump_timer(int argc, char **argv)
+dump_timer(int argc, char** argv)
 {
 	kprintf("timer       hook        data        due in\n");
 
-	struct net_timer *timer = NULL;
+	struct net_timer* timer = NULL;
 	while (true) {
-		timer = (net_timer *)list_get_next_item(&sTimers, timer);
+		timer = (net_timer*)list_get_next_item(&sTimers, timer);
 		if (timer == NULL)
 			break;
 
@@ -545,6 +605,8 @@ init_timers(void)
 		goto err2;
 	}
 
+	sWaitForTimerCondition.Init(NULL, "wait for net timer");
+
 	add_debugger_command("net_timer", dump_timer,
 		"Lists all active network timer");
 
@@ -561,8 +623,10 @@ err2:
 void
 uninit_timers(void)
 {
-	mutex_destroy(&sTimerLock);
 	delete_sem(sTimerWaitSem);
+	mutex_lock(&sTimerLock);
+
+	mutex_destroy(&sTimerLock);
 
 	status_t status;
 	wait_for_thread(sTimerThread, &status);
