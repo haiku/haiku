@@ -126,7 +126,7 @@ static const char *kAGMSBayesBeepGenuineName = "SpamFilter-Genuine";
 static const char *kAGMSBayesBeepSpamName = "SpamFilter-Spam";
 static const char *kAGMSBayesBeepUncertainName = "SpamFilter-Uncertain";
 
-static const char *kServerSignature = "application/x-vnd.agmsmith.spamdbm";
+static const char *kServerSignature = "application/x-vnd.agmsmith.AGMSBayesianSpamServer";
 
 
 AGMSBayesianSpamFilter::AGMSBayesianSpamFilter (BMessage *settings)
@@ -222,6 +222,7 @@ AGMSBayesianSpamFilter::ProcessMailMessage (
 	// inbetween messages.  This code used to be in InitCheck, but apparently
 	// that isn't called.
 
+	printf("Checking for Spam Server.\n");
 	if (fLaunchAttemptCount == 0 || !fMessengerToServer.IsValid ()) {
 		if (fLaunchAttemptCount > 3)
 			goto ErrorExit; // Don't try to start the server too many times.
@@ -236,7 +237,7 @@ AGMSBayesianSpamFilter::ProcessMailMessage (
 				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
 				for (int32 i = 0; i < 2; i++) {
 					find_directory(places[i],&path);
-					path.Append("spamdbm");
+					path.Append("AGMSBayesianSpamServer");
 					if (!BEntry(path.Path()).Exists())
 						continue;
 					get_ref_for_path(path.Path(),&ref);
