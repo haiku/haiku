@@ -18,6 +18,7 @@
 #include <StringView.h>
 #include <String.h>
 
+#include <IconUtils.h>
 #include <FindDirectory.h>
 #include <Resources.h>
 #include <File.h>
@@ -64,7 +65,8 @@ AlertView::AlertView(BRect frame, char *name)
 	if (width < Bounds().Width())
 		width = Bounds().Width();
 
-	float height = fCountdownView->Frame().bottom + 24 + button->Bounds().Height();
+	float height
+		= fCountdownView->Frame().bottom + 24 + button->Bounds().Height();
 	ResizeTo(width, height);
 
 	keepButton->MoveTo(Bounds().Width() - 8 - keepButton->Bounds().Width(),
@@ -79,7 +81,8 @@ AlertView::AlertView(BRect frame, char *name)
 void
 AlertView::AttachedToWindow()
 {
-	// the view displays a decrementing counter (until the user must take action)
+	// the view displays a decrementing counter
+	// (until the user must take action)
 	Window()->SetPulseRate(1000000);
 		// every second
 
@@ -90,7 +93,8 @@ AlertView::AttachedToWindow()
 void
 AlertView::Draw(BRect updateRect)
 {
-	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT);
+	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_1_TINT);
 	SetHighColor(dark);
 
 	FillRect(BRect(0.0, 0.0, 30.0, Bounds().bottom));
@@ -121,7 +125,7 @@ AlertView::KeyDown(const char* bytes, int32 numBytes)
 }
 
 
-void 
+void
 AlertView::UpdateCountdownView()
 {
 	BString string;
@@ -142,13 +146,16 @@ AlertView::InitIcon()
 		BFile file;
 		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
 			&& resources.SetTo(&file) == B_OK) {
-			// Load the raw icon data
 			size_t size;
-			const void* data = resources.LoadResource(B_LARGE_ICON_TYPE, "warn", &size);
+			const void* data = resources.LoadResource(B_VECTOR_ICON_TYPE,
+				"warn", &size);
 			if (data) {
-				// Now build the bitmap
-				icon = new BBitmap(BRect(0, 0, 31, 31), 0, B_CMAP8);
-				icon->SetBits(data, size, 0, B_CMAP8);
+				icon = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+				if (BIconUtils::GetVectorIcon((const uint8*)data, size, icon)
+						!= B_OK) {
+					delete icon;
+					icon = NULL;
+				}
 			}
 		}
 	}

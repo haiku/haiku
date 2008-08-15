@@ -6,6 +6,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
+UseLibraryHeaders icon ;
 UsePrivateHeaders media ;
 
 Preference Media :
