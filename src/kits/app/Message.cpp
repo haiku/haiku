@@ -2405,7 +2405,7 @@ BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 	status_t error = object->Flatten(buffer, size);
 
 	if (error >= B_OK)
-		error = AddData(name, object->TypeCode(), &buffer, size, false);
+		error = AddData(name, object->TypeCode(), buffer, size, false);
 
 	if (buffer != stackBuffer)
 		free(buffer);
