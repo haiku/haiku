@@ -9,25 +9,26 @@
 #include <stdio.h>
 
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/bluetooth_util.h>
 
 namespace Bluetooth {
 
 class bdaddrUtils {
 
 public:
-	static inline bdaddr_t NullAddress() 
+	static inline bdaddr_t NullAddress()
 	{
 		return ((bdaddr_t) {{0, 0, 0, 0, 0, 0}});
 	}
 
 
-	static inline bdaddr_t LocalAddress() 
+	static inline bdaddr_t LocalAddress()
 	{
 		return ((bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}});
 	}
 
 
-	static inline bdaddr_t BroadcastAddress() 
+	static inline bdaddr_t BroadcastAddress()
 	{
 		return ((bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}});
 	}
@@ -35,11 +36,11 @@ public:
 
 	static bool Compare(bdaddr_t *ba1, bdaddr_t *ba2)
 	{
-		return (memcmp(ba1, ba2, sizeof(bdaddr_t)) == 0);
+		return (bacmp(ba1, ba2) == 0);
 	}
 
 
-	static char* ToString(const bdaddr_t bdaddr) 
+	static char* ToString(const bdaddr_t bdaddr)
 	{
 		// TODO: not safe
 		static char str[18];
@@ -64,7 +65,7 @@ public:
 		}
 
 		return NullAddress();
-	}	
+	}
 
 };
 

@@ -6,6 +6,7 @@
 #define _BLUETOOTH_UTIL_H
 
 #include <bluetooth/bluetooth.h>
+#include <string.h>
 
 /* BD Address management */
 static inline int bacmp(bdaddr_t* ba1, bdaddr_t* ba2)
