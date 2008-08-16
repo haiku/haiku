@@ -16,6 +16,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <fs_info.h>
+#include <image.h>
 #include <Resources.h>
 #include <TypeConstants.h>
 
@@ -106,17 +107,27 @@ print_usage_and_exit(bool error)
 
 // read_boot_code_data
 static uint8 *
-read_boot_code_data(const char* programPath)
+read_boot_code_data(void)
 {
-	// open our executable
+	image_info info;
+	int32 cookie = 0;
 	BFile executableFile;
-	status_t error = executableFile.SetTo(programPath, B_READ_ONLY);
-	if (error != B_OK) {
-		fprintf(stderr, "Error: Failed to open my executable file (\"%s\": "
-			"%s\n", programPath, strerror(error));
+
+	status_t error = get_next_image_info(0, &cookie, &info);
+	if (error == B_OK) {
+		// open our executable
+		error = executableFile.SetTo(info.name, B_READ_ONLY);
+		if (error != B_OK) {
+				fprintf(stderr, "Error: Failed to open my executable file (\"%s\": "
+					"%s\n", info.name, strerror(error));
+				exit(1);
+		}
+	} else {
+		fprintf(stderr, "Error: Failed to get image info for executable file, "
+			"error: %s\n", strerror(error));
 		exit(1);
 	}
-
+	
 	uint8 *bootCodeData = new uint8[kBootCodeSize];
 
 	// open our resources
@@ -225,7 +236,7 @@ main(int argc, const char *const *argv)
 		print_usage_and_exit(true);
 
 	// read the boot code
-	uint8 *bootCodeData = read_boot_code_data(argv[0]);
+	uint8 *bootCodeData = read_boot_code_data();
 	if (!bootCodeData) {
 		fprintf(stderr, "Error: Failed to read ");
 		exit(1);
