@@ -35,7 +35,9 @@
 
 #	include "PartitionMap.h"
 #	include "PartitionMapParser.h"
-#elif HAIKU_HOST_PLATFORM_HAIKU
+#endif
+
+#ifdef __HAIKU__
 #	include <image.h>
 #endif
 
@@ -228,7 +230,7 @@ main(int argc, const char *const *argv)
 
 	// read the boot code
 	uint8 *bootCodeData = NULL;
-#ifndef HAIKU_HOST_PLATFORM_HAIKU
+#ifndef __HAIKU__
 	bootCodeData = read_boot_code_data(argv[0]);
 #else
 	image_info info;
