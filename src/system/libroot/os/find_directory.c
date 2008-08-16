@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2007, François Revol.
+ * Copyright (c) 2004-2008, François Revol.
  * Distributed under the terms of the MIT license.
  */
 
@@ -31,26 +31,27 @@
 /* Haiku system directories */
 
 /* os root dir; just stick to 'beos' for now */
-#define OS "beos"
-//#define OS "haiku" // :)
-//#define OS "os"
+#define SYSTEM "beos"
+//#define SYSTEM "haiku" // :)
+//#define SYSTEM "os"
 
-static const char *os_dirs[] = {
-	OS,										// B_BEOS_DIRECTORY
-	OS "/system",
-	OS "/system/add-ons",
-	OS "/system/boot",
-	OS "/etc/fonts",
-	OS "/system/lib",
-	OS "/system/servers",
-	OS "/apps",
-	OS "/bin",
-	OS "/etc",
-	OS "/documentation",
-	OS "/preferences",
-	OS "/system/add-ons/Translators",
-	OS "/system/add-ons/media",
-	OS "/etc/sounds",
+static const char *kSystemDirectories[] = {
+	SYSTEM,										// B_BEOS_DIRECTORY
+	SYSTEM "/system",
+	SYSTEM "/system/add-ons",
+	SYSTEM "/system/boot",
+	SYSTEM "/etc/fonts",
+	SYSTEM "/system/lib",
+	SYSTEM "/system/servers",
+	SYSTEM "/apps",
+	SYSTEM "/bin",
+	SYSTEM "/etc",
+	SYSTEM "/documentation",
+	SYSTEM "/preferences",
+	SYSTEM "/system/add-ons/Translators",
+	SYSTEM "/system/add-ons/media",
+	SYSTEM "/etc/sounds",
+	SYSTEM "/etc",
 };
 
 /* Common directories, shared among users */
@@ -59,7 +60,7 @@ static const char *os_dirs[] = {
 	// ToDo: this is for now and might be changed back to "home"
 	//	(or even something else) later
 
-static const char *common_dirs[] = {
+static const char *kCommonDirectories[] = {
 	COMMON "",								// B_COMMON_DIRECTORY
 	COMMON "",								// B_COMMON_SYSTEM_DIRECTORY
 	COMMON "/add-ons",
@@ -79,13 +80,14 @@ static const char *common_dirs[] = {
 	COMMON "/add-ons/Translators",
 	COMMON "/add-ons/media",
 	COMMON "/sounds",
+	COMMON "/data",
 };
 
 /* User directories */
 
 #define HOME "$h"
 
-static const char *user_dirs[] = {
+static const char *kUserDirectories[] = {
 	HOME "",								// B_USER_DIRECTORY
 	HOME "/config",							// B_USER_CONFIG_DIRECTORY
 	HOME "/config/add-ons",
@@ -98,6 +100,8 @@ static const char *user_dirs[] = {
 	HOME "/config/add-ons/Translators",
 	HOME "/config/add-ons/media",
 	HOME "/config/sounds",
+	HOME "/config/data",
+	HOME "/config/cache",
 };
 
 
@@ -219,7 +223,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_BEOS_TRANSLATORS_DIRECTORY:
 		case B_BEOS_MEDIA_NODES_DIRECTORY:
 		case B_BEOS_SOUNDS_DIRECTORY:
-			template = os_dirs[which - B_BEOS_DIRECTORY];
+		case B_BEOS_DATA_DIRECTORY:
+			template = kSystemDirectories[which - B_BEOS_DIRECTORY];
 			break;
 
 		/* Common directories, shared among users */
@@ -242,7 +247,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_COMMON_TRANSLATORS_DIRECTORY:
 		case B_COMMON_MEDIA_NODES_DIRECTORY:
 		case B_COMMON_SOUNDS_DIRECTORY:
-			template = common_dirs[which - B_COMMON_DIRECTORY];
+		case B_COMMON_DATA_DIRECTORY:
+			template = kCommonDirectories[which - B_COMMON_DIRECTORY];
 			break;
 
 		/* User directories */
@@ -258,7 +264,9 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_USER_TRANSLATORS_DIRECTORY:
 		case B_USER_MEDIA_NODES_DIRECTORY:
 		case B_USER_SOUNDS_DIRECTORY:
-			template = user_dirs[which - B_USER_DIRECTORY];
+		case B_USER_DATA_DIRECTORY:
+		case B_USER_CACHE_DIRECTORY:
+			template = kUserDirectories[which - B_USER_DIRECTORY];
 			break;
 
 		/* Global directories */
@@ -276,7 +284,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 			free(buffer);
 			return EINVAL;
 	}
-	
+
 	err = B_OK;
 	if (template) {
 		if (!strncmp(template, "$h", 2)) {
