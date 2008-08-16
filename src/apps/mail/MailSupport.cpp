@@ -88,7 +88,8 @@ int32 	gDictCount = 0;
 
 // int32			level = L_BEGINNER;
 
-const char* kSpamServerSignature = "application/x-vnd.agmsmith.spamdbm";
+const char* kSpamServerSignature =
+	"application/x-vnd.agmsmith.AGMSBayesianSpamServer";
 const char* kDraftPath = "mail/draft";
 const char* kDraftType = "text/x-vnd.Be-MailDraft";
 const char* kMailFolder = "mail";

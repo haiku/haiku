@@ -2593,7 +2593,7 @@ TMailWindow::TrainMessageAs(const char *CommandWord)
 				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
 				for (int32 i = 0; i < 2; i++) {
 					find_directory(places[i],&path);
-					path.Append("spamdbm");
+					path.Append("AGMSBayesianSpamServer");
 					if (!BEntry(path.Path()).Exists())
 						continue;
 					get_ref_for_path(path.Path(),&ref);
