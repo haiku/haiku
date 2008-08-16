@@ -179,6 +179,24 @@ write_boot_code_part(const char *fileName, int fd, off_t imageOffset,
 }
 
 
+#ifdef __HAIKU__
+static status_t
+find_own_image(image_info *info)
+{
+	int32 cookie = 0;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, info) == B_OK) {
+		if (((uint32)info->text <= (uint32)find_own_image 
+			&& (uint32)info->text + info->text_size > 
+			(uint32)find_own_image)) {
+			return B_OK;
+		}
+	}
+
+	return B_NAME_NOT_FOUND;
+}
+#endif
+
+
 // main
 int
 main(int argc, const char *const *argv)
@@ -234,8 +252,7 @@ main(int argc, const char *const *argv)
 	bootCodeData = read_boot_code_data(argv[0]);
 #else
 	image_info info;
-	int32 cookie = 0;
-	if (get_next_image_info(0, &cookie, &info) == B_OK)
+	if (find_own_image(&info) == B_OK)	
 		bootCodeData = read_boot_code_data(info.name);
 #endif
 	if (!bootCodeData) {
