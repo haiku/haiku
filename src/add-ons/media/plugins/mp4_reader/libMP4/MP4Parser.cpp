@@ -1747,7 +1747,6 @@ void HDLRAtom::OnProcessMetaData()
 
 char *HDLRAtom::OnGetAtomName()
 {
-	printf("%s %s:",(char *)&(theHeader.handler_type),name);
 	return "MPEG-4 Handler Reference Atom ";
 }
 

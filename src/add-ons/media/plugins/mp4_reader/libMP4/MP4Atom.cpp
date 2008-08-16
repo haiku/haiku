@@ -118,7 +118,7 @@ void	AtomBase::DisplayAtoms()
 void	AtomBase::DisplayAtoms(uint32 pindent)
 {
 	Indent(pindent);
-	printf("%s\n",getAtomName());
+	printf("(%s)\n",getAtomName());
 }
 
 void	AtomBase::Indent(uint32 pindent)
@@ -278,7 +278,7 @@ AtomContainer::~AtomContainer()
 void	AtomContainer::DisplayAtoms(uint32 pindent)
 {
 	Indent(pindent);
-	printf("%ld:%s\n",TotalChildren,getAtomName());
+	printf("%ld:(%s)\n",TotalChildren,getAtomName());
 	pindent++;
 	// for each child
 	for (uint32 i = 0;i < TotalChildren;i++) {
