@@ -107,17 +107,24 @@ load_driver_settings(stage2_args */*args*/, Directory *volume)
 			find_driver_settings_file(B_SAFEMODE_DRIVER_SETTINGS);
 		if (safemodeFile != NULL) {
 			char *buffer = (char *)kernel_args_malloc(
-				safemodeFile->size + kernelFile->size + 1);
+				safemodeFile->size + kernelFile->size + 2);
 			if (buffer != NULL) {
 				memcpy(buffer, kernelFile->buffer, 
 					kernelFile->size);
-				memcpy(buffer + kernelFile->size, 
+
+				// insert a newline just in case the kernel settings file
+				// doesn't end with one
+				buffer[kernelFile->size] = '\n';
+
+				memcpy(buffer + kernelFile->size + 1, 
 					safemodeFile->buffer, 
 					safemodeFile->size);
-				buffer[safemodeFile->size + 
-					kernelFile->size] = '\0';
+
 				kernel_args_free(safemodeFile->buffer);
 				safemodeFile->buffer = buffer;
+				safemodeFile->size = safemodeFile->size + 
+					kernelFile->size + 1;
+				buffer[safemodeFile->size] = '\0';
 			} 
 		} else 
 			add_safe_mode_settings(kernelFile->buffer);
