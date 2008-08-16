@@ -151,6 +151,9 @@ int64
 MediaExtractor::CountFrames(int32 stream) const
 {
 	CALLED();
+	if (fStreamInfo[stream].status != B_OK)
+		return 0LL;
+
 	int64 frameCount;
 	bigtime_t duration;
 	media_format format;
@@ -168,6 +171,10 @@ bigtime_t
 MediaExtractor::Duration(int32 stream) const
 {
 	CALLED();
+
+	if (fStreamInfo[stream].status != B_OK)
+		return 0LL;
+
 	int64 frameCount;
 	bigtime_t duration;
 	media_format format;
