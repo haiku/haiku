@@ -703,7 +703,7 @@ create_team_struct(const char *name, bool kernel)
 	team->io_context = NULL;
 	team->address_space = NULL;
 	team->realtime_sem_context = NULL;
-	team->xsi_sem_undo_requests = 0;
+	team->xsi_sem_context = NULL;
 	team->thread_list = NULL;
 	team->main_thread = NULL;
 	team->loading_info = NULL;
@@ -1327,7 +1327,7 @@ exec_team(const char *path, char**& _flatArgs, size_t flatArgsSize,
 
 	delete_team_user_data(team);
 	vm_delete_areas(team->address_space);
-	xsi_sem_undo(team->id, team->xsi_sem_undo_requests);
+	xsi_sem_undo(team);
 	delete_owned_ports(team->id);
 	sem_delete_owned_sems(team->id);
 	remove_images(team);
@@ -2353,7 +2353,7 @@ team_delete_team(struct team *team)
 
 	vfs_free_io_context(team->io_context);
 	delete_realtime_sem_context(team->realtime_sem_context);
-	xsi_sem_undo(team->id, team->xsi_sem_undo_requests);
+	xsi_sem_undo(team);
 	delete_owned_ports(teamID);
 	sem_delete_owned_sems(teamID);
 	remove_images(team);

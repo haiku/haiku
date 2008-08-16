@@ -17,7 +17,7 @@
 __BEGIN_DECLS
 
 extern void xsi_ipc_init();
-extern void xsi_sem_undo(team_id teamID, int32 numberOfUndos);
+extern void xsi_sem_undo(struct team *team);
 
 /* user calls */
 int _user_xsi_semget(key_t key, int numberOfSemaphores, int flags);

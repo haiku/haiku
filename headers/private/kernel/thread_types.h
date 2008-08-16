@@ -67,6 +67,7 @@ struct image;					// defined in image.c
 struct realtime_sem_context;	// defined in realtime_sem.cpp
 struct select_info;
 struct user_thread;				// defined in libroot/user_thread.h
+struct xsi_sem_context;			// defined in xsi_semaphore.cpp
 
 struct death_entry {
 	struct list_link	link;
@@ -183,7 +184,7 @@ struct team {
 	int32			flags;
 	void			*io_context;
 	struct realtime_sem_context	*realtime_sem_context;
-	int32			xsi_sem_undo_requests;
+	struct xsi_sem_context *xsi_sem_context;
 	sem_id			death_sem;		// semaphore to wait on for dying threads
 	struct list		dead_threads;
 	int				dead_threads_count;
