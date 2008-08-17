@@ -1,46 +1,46 @@
+/*
+ * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DRIVERS_DRIVERS_H
 #define _DRIVERS_DRIVERS_H
 
-#include <BeBuild.h>
+
 #include <sys/types.h>
 #include <sys/uio.h>
-#include <SupportDefs.h>
+
+#include <BeBuild.h>
 #include <Select.h>
+#include <SupportDefs.h>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* ---
-	these hooks are how the kernel accesses the device
---- */
-
-typedef status_t (*device_open_hook) (const char *name, uint32 flags, void **cookie);
-typedef status_t (*device_close_hook) (void *cookie);
-typedef status_t (*device_free_hook) (void *cookie);
-typedef status_t (*device_control_hook) (void *cookie, uint32 op, void *data,
-                                         size_t len);
-typedef status_t  (*device_read_hook) (void *cookie, off_t position, void *data,
-                                      size_t *numBytes);
-typedef status_t  (*device_write_hook) (void *cookie, off_t position,
-                                       const void *data, size_t *numBytes);
-typedef status_t (*device_select_hook) (void *cookie, uint8 event, uint32 ref,
-                                        selectsync *sync);
-typedef status_t (*device_deselect_hook) (void *cookie, uint8 event,
-                                          selectsync *sync);
-typedef status_t (*device_read_pages_hook)(void *cookie, off_t position, const iovec *vec,
-					size_t count, size_t *_numBytes);
-typedef status_t (*device_write_pages_hook) (void *cookie, off_t position, const iovec *vec,
-					size_t count, size_t *_numBytes);
+/* These hooks are how the kernel accesses legacy devices */
+typedef status_t (*device_open_hook)(const char *name, uint32 flags,
+	void **cookie);
+typedef status_t (*device_close_hook)(void *cookie);
+typedef status_t (*device_free_hook)(void *cookie);
+typedef status_t (*device_control_hook)(void *cookie, uint32 op, void *data,
+	size_t len);
+typedef status_t  (*device_read_hook)(void *cookie, off_t position, void *data,
+	size_t *numBytes);
+typedef status_t  (*device_write_hook)(void *cookie, off_t position,
+	const void *data, size_t *numBytes);
+typedef status_t (*device_select_hook)(void *cookie, uint8 event, uint32 ref,
+	selectsync *sync);
+typedef status_t (*device_deselect_hook)(void *cookie, uint8 event,
+	selectsync *sync);
+typedef status_t (*device_read_pages_hook)(void *cookie, off_t position,
+	const iovec *vec, size_t count, size_t *_numBytes);
+typedef status_t (*device_write_pages_hook)(void *cookie, off_t position,
+	const iovec *vec, size_t count, size_t *_numBytes);
 
 #define	B_CUR_DRIVER_API_VERSION	2
 
-/* ---
-	the device_hooks structure is a descriptor for the device, giving its
-	entry points.
---- */
-
+/* Legacy driver device hooks */
 typedef struct {
 	device_open_hook		open;			/* called to open the device */
 	device_close_hook		close;			/* called to close the device */
@@ -50,55 +50,43 @@ typedef struct {
 	device_write_hook		write;			/* writes to the device */
 	device_select_hook		select;			/* start select */
 	device_deselect_hook	deselect;		/* stop select */
-	device_read_pages_hook	read_pages;		/* scatter-gather physical read from the device */
-	device_write_pages_hook	write_pages;	/* scatter-gather physical write to the device */
+	device_read_pages_hook	read_pages;
+		/* scatter-gather physical read from the device */
+	device_write_pages_hook	write_pages;
+		/* scatter-gather physical write to the device */
 } device_hooks;
 
+/* Driver functions needed to be exported by legacy drivers */
 status_t		init_hardware(void);
-const char	  **publish_devices(void);
-device_hooks	*find_device(const char *name);
+const char**	publish_devices(void);
+device_hooks*	find_device(const char* name);
 status_t		init_driver(void);
-void			uninit_driver(void);	
+void			uninit_driver(void);
 
 extern int32	api_version;
 
 enum {
-	B_GET_DEVICE_SIZE = 1,			/* get # bytes */
-									/*   returns size_t in *data */
-
-	B_SET_DEVICE_SIZE,				/* set # bytes */
-									/*   passed size_t in *data */
-
+	B_GET_DEVICE_SIZE = 1,			/* get # bytes - returns size_t in *data */
+	B_SET_DEVICE_SIZE,				/* set # bytes - passes size_t in *data */
 	B_SET_NONBLOCKING_IO,			/* set to non-blocking i/o */
-
 	B_SET_BLOCKING_IO,				/* set to blocking i/o */
-
 	B_GET_READ_STATUS,				/* check if can read w/o blocking */
-									/*   returns bool in *data */
-
+									/* returns bool in *data */
 	B_GET_WRITE_STATUS,				/* check if can write w/o blocking */
-									/*   returns bool in *data */
-
+									/* returns bool in *data */
 	B_GET_GEOMETRY,					/* get info about device geometry */
-									/*   returns struct geometry in *data */
-
-	B_GET_DRIVER_FOR_DEVICE,		/* get the path of the executable serving that device */
-
+									/* returns struct geometry in *data */
+	B_GET_DRIVER_FOR_DEVICE,		/* get the path of the executable serving */
+									/* that device */
 	B_GET_PARTITION_INFO,			/* get info about a device partition */
-									/*   returns struct partition_info in *data */
-
-	B_SET_PARTITION,				/* create a user-defined partition */
-
+									/* returns struct partition_info in *data */
+	B_SET_PARTITION,				/* obsolete, will be removed */
 	B_FORMAT_DEVICE,				/* low-level device format */
-
 	B_EJECT_DEVICE,					/* eject the media if supported */
-
 	B_GET_ICON,						/* return device icon (see struct below) */
-
 	B_GET_BIOS_GEOMETRY,			/* get info about device geometry */
 									/* as reported by the bios */
 									/*   returns struct geometry in *data */
-
 	B_GET_MEDIA_STATUS,				/* get status of media. */
 									/* return status_t in *data: */
 									/* B_NO_ERROR: media ready */
@@ -109,21 +97,18 @@ enum {
 									/* B_DEV_MEDIA_CHANGE_REQUESTED: user */
 									/*  pressed button on drive */
 									/* B_DEV_DOOR_OPEN: door open */
-	
 	B_LOAD_MEDIA,					/* load the media if supported */
-	
 	B_GET_BIOS_DRIVE_ID,			/* get bios id for this device */
-
 	B_SET_UNINTERRUPTABLE_IO,		/* prevent cntl-C from interrupting i/o */
 	B_SET_INTERRUPTABLE_IO,			/* allow cntl-C to interrupt i/o */
-
 	B_FLUSH_DRIVE_CACHE,			/* flush drive cache */
-
 	B_GET_PATH_FOR_DEVICE,			/* get the absolute path of the device */
+	B_GET_ICON_NAME,				/* get an icon name identifier */
+	B_GET_VECTOR_ICON,				/* retrieves the device's vector icon */
 
-	B_GET_NEXT_OPEN_DEVICE = 1000,	/* iterate through open devices */
-	B_ADD_FIXED_DRIVER,				/* private */
-	B_REMOVE_FIXED_DRIVER,			/* private */
+	B_GET_NEXT_OPEN_DEVICE = 1000,	/* obsolete, will be removed */
+	B_ADD_FIXED_DRIVER,				/* obsolete, will be removed */
+	B_REMOVE_FIXED_DRIVER,			/* obsolete, will be removed */
 
 	B_AUDIO_DRIVER_BASE = 8000,		/* base for codes in audio_driver.h */
 	B_MIDI_DRIVER_BASE = 8100,		/* base for codes in midi_driver.h */
@@ -133,10 +118,7 @@ enum {
 	B_DEVICE_OP_CODES_END = 9999	/* end of Be-defined contol id's */
 };
 
-/* ---
-	geometry structure for the B_GET_GEOMETRY opcode
---- */
-
+/* B_GET_GEOMETRY data structure */
 typedef struct {
 	uint32	bytes_per_sector;		/* sector size in bytes */
 	uint32	sectors_per_track;		/* # sectors per track */
@@ -147,12 +129,6 @@ typedef struct {
 	bool	read_only;				/* non-zero if read only */
 	bool	write_once;				/* non-zero if write-once */
 } device_geometry;
-
-
-/* ---
-	Be-defined device types returned by B_GET_GEOMETRY.  Use these if it makes
-	sense for your device.
---- */
 
 enum {
 	B_DISK = 0,						/* Hard disks, floppy disks, etc. */
@@ -168,10 +144,7 @@ enum {
 };
 
 
-/* ---
-	partition_info structure used by B_GET_PARTITION_INFO and B_SET_PARTITION
---- */
-
+/* B_GET_PARTITION_INFO data structure */
 typedef struct {
 	off_t	offset;					/* offset (in bytes) */
 	off_t	size;					/* size (in bytes) */
@@ -181,30 +154,17 @@ typedef struct {
 	char	device[256];			/* path to the physical device */
 } partition_info;
 
-/* ---
-	driver_path structure returned by the B_GET_DRIVER_FOR_DEVICE
---- */
 
+/* B_GET_DRIVER_FOR_DEVICE data structure */
 typedef char	driver_path[256];
 
 
-/* ---
-	open_device_iterator structure used by the B_GET_NEXT_OPEN_DEVICE opcode
---- */
-
+/* B_GET_ICON, and B_GET_VECTOR_ICON data structure */
 typedef struct {
-	uint32		cookie;			/* must be set to 0 before iterating */
-	char		device[256];	/* device path */	
-} open_device_iterator;
-
-
-/* ---
-	icon structure for the B_GET_ICON opcode
---- */
-
-typedef struct {
-	int32	icon_size;			/* icon size requested */
-	void	*icon_data;			/* where to put 'em (usually BBitmap->Bits()) */
+	int32	icon_size;
+		/* B_GET_VECTOR_ICON: size of the data buffer in icon_data */
+		/* B_GET_ICON: size of the icon in pixels */
+	void	*icon_data;
 } device_icon;
 
 

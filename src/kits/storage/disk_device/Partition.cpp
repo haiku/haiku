@@ -384,29 +384,58 @@ BPartition::GetVolume(BVolume* volume) const
 status_t
 BPartition::GetIcon(BBitmap* icon, icon_size which) const
 {
-/*
-	status_t error = (icon ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		if (IsMounted()) {
-			// mounted: get the icon from the volume
-			BVolume volume;
-			error = GetVolume(&volume);
+	if (icon == NULL)
+		return B_BAD_VALUE;
+
+	status_t error;
+
+	if (IsMounted()) {
+		// mounted: get the icon from the volume
+		BVolume volume;
+		error = GetVolume(&volume);
+		if (error == B_OK)
+			error = volume.GetIcon(icon, which);
+	} else {
+		// not mounted: retrieve the icon ourselves
+		if (BDiskDevice* device = Device()) {
+			BPath path;
+			error = device->GetPath(&path);
+			// get the icon
 			if (error == B_OK)
-				error = volume.GetIcon(icon, which);
-		} else {
-			// not mounted: retrieve the icon ourselves
-			if (BDiskDevice* device = Device()) {
-				// get the icon
-				if (error == B_OK)
-					error = get_device_icon(device->Path(), icon, which);
-			} else 
-				error = B_ERROR;
-		}
+				error = get_device_icon(path.Path(), icon, which);
+		} else
+			error = B_ERROR;
 	}
 	return error;
-*/
-	// not implemented
-	return B_ERROR;
+}
+
+
+status_t
+BPartition::GetIcon(uint8** _data, size_t* _size, type_code* _type) const
+{
+	if (_data == NULL || _size == NULL || _type == NULL)
+		return B_BAD_VALUE;
+
+	status_t error;
+
+	if (IsMounted()) {
+		// mounted: get the icon from the volume
+		BVolume volume;
+		error = GetVolume(&volume);
+		if (error == B_OK)
+			error = volume.GetIcon(_data, _size, _type);
+	} else {
+		// not mounted: retrieve the icon ourselves
+		if (BDiskDevice* device = Device()) {
+			BPath path;
+			error = device->GetPath(&path);
+			// get the icon
+			if (error == B_OK)
+				error = get_device_icon(path.Path(), _data, _size, _type);
+		} else
+			error = B_ERROR;
+	}
+	return error;
 }
 
 
@@ -1168,7 +1197,7 @@ BPartition::CanCreateChild() const
 
 // GetChildCreationParameterEditor
 status_t
-BPartition::GetChildCreationParameterEditor(const char* type,	
+BPartition::GetChildCreationParameterEditor(const char* type,
 	BDiskDeviceParameterEditor** editor) const
 {
 	if (!fDelegate)

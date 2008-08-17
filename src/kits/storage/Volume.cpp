@@ -1,11 +1,12 @@
-// ----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  File Name:		Volume.cpp
-//
-//	Description:	BVolume class
-// ----------------------------------------------------------------------
+/*
+ * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold
+ */
+
 /*!
 	\file Volume.h
 	BVolume implementation.
@@ -25,17 +26,14 @@
 #include <syscalls.h>
 
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-#include <fs_interface.h>
+#	include <fs_interface.h>
 #endif
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
 
 /*!
 	\class BVolume
 	\brief Represents a disk volume
-	
+
 	Provides an interface for querying information about a volume.
 
 	The class is a simple wrapper for a \c dev_t and the function
@@ -44,7 +42,7 @@ namespace OpenBeOS {
 
 	\author Vincent Dominguez
 	\author <a href='mailto:bonefish@users.sf.net'>Ingo Weinhold</a>
-	
+
 	\version 0.0.0
 */
 
@@ -115,7 +113,7 @@ BVolume::~BVolume()
 */
 status_t
 BVolume::InitCheck(void) const
-{	
+{
 	return fCStatus;
 }
 
@@ -140,7 +138,7 @@ BVolume::SetTo(dev_t device)
 			error = errno;
 	}
 	// set the new value
-	if (error == B_OK)	
+	if (error == B_OK)
 		fDevice = device;
 	// set the init status variable
 	fCStatus = error;
@@ -163,7 +161,7 @@ BVolume::Unset()
 			or -1, if the object is not properly initialized.
 */
 dev_t
-BVolume::Device() const 
+BVolume::Device() const
 {
 	return fDevice;
 }
@@ -334,18 +332,36 @@ status_t
 BVolume::GetIcon(BBitmap *icon, icon_size which) const
 {
 	// check initialization
-	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
-	// get FS stat
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	// get FS stat for the device name
 	fs_info info;
-	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
-		error = errno;
+	if (fs_stat_dev(fDevice, &info) != 0)
+		return errno;
+
 	// get the icon
-	if (error == B_OK)
-		error = get_device_icon(info.device_name, icon, which);
-	return error;
+	return get_device_icon(info.device_name, icon, which);
 }
 
-// IsRemovable
+
+status_t
+BVolume::GetIcon(uint8** _data, size_t* _size, type_code* _type) const
+{
+	// check initialization
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	// get FS stat for the device name
+	fs_info info;
+	if (fs_stat_dev(fDevice, &info) != 0)
+		return errno;
+
+	// get the icon
+	return get_device_icon(info.device_name, _data, _size, _type);
+}
+
+
 /*!	\brief Returns whether the volume is removable.
 	\return \c true, when the object is properly initialized and the
 	referred to volume is removable, \c false otherwise.
@@ -516,16 +532,12 @@ BVolume::operator=(const BVolume &volume)
 }
 
 
-// FBC 
-void BVolume::_TurnUpTheVolume1() {} 
-void BVolume::_TurnUpTheVolume2() {} 
-void BVolume::_TurnUpTheVolume3() {} 
-void BVolume::_TurnUpTheVolume4() {} 
-void BVolume::_TurnUpTheVolume5() {} 
-void BVolume::_TurnUpTheVolume6() {} 
-void BVolume::_TurnUpTheVolume7() {} 
+// FBC
+void BVolume::_TurnUpTheVolume1() {}
+void BVolume::_TurnUpTheVolume2() {}
+void BVolume::_TurnUpTheVolume3() {}
+void BVolume::_TurnUpTheVolume4() {}
+void BVolume::_TurnUpTheVolume5() {}
+void BVolume::_TurnUpTheVolume6() {}
+void BVolume::_TurnUpTheVolume7() {}
 void BVolume::_TurnUpTheVolume8() {}
-
-#ifdef USE_OPENBEOS_NAMESPACE
-}
-#endif

@@ -1,37 +1,18 @@
-/* 
- * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
+/*
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-
-/*!
-	\file Mime.h
-	Mime type C functions interface declarations.
-*/
 #ifndef _MIME_H
 #define _MIME_H
 
-#ifndef _BE_BUILD_H
-#include <BeBuild.h>
-#endif
+
 #include <sys/types.h>
+
 #include <SupportDefs.h>
 #include <StorageDefs.h>
 
-// C functions
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int update_mime_info(const char *path, int recursive, int synchronous,
-					 int force);
-
-status_t create_app_meta_mime(const char *path, int recursive, int synchronous,
-							  int force);
-
-status_t get_device_icon(const char *dev, void *icon, int32 size);
-
-static const uint32 B_MIME_STRING_TYPE	= 'MIMS';
+static const uint32 B_MIME_STRING_TYPE = 'MIMS';
 
 enum icon_size {
 	B_LARGE_ICON	= 32,
@@ -45,22 +26,32 @@ enum {
 	B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL	= 2,
 };
 
+
+// C functions
+
 #ifdef __cplusplus
-}
+extern "C" {
 #endif
 
-// Haiku only!
+int update_mime_info(const char* path, int recursive, int synchronous,
+	int force);
+status_t create_app_meta_mime(const char* path, int recursive, int synchronous,
+	int force);
+status_t get_device_icon(const char* device, void* icon, int32 size);
+
 #ifdef __cplusplus
+}
+
+// C++ functions, Haiku only!
 
 class BBitmap;
 
-status_t get_device_icon(const char *dev, BBitmap *icon, icon_size which);
+status_t get_device_icon(const char* device, BBitmap* icon, icon_size which);
+status_t get_device_icon(const char* device, uint8** _data, size_t* _size,
+	type_code* _type);
 
-#endif
-
-// include the C++ API
-#ifdef __cplusplus
-#include <MimeType.h>
-#endif
+// include MimeType.h for convenience
+#	include <MimeType.h>
+#endif	// __cplusplus
 
 #endif	// _MIME_H

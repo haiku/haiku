@@ -126,7 +126,7 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 
 	// get icon
 	BBitmap *icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
-		B_CMAP8);
+		B_RGBA32);
 	if (partition->GetIcon(icon, B_MINI_ICON) != B_OK) {
 		delete icon;
 		icon = NULL;

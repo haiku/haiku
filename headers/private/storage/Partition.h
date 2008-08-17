@@ -38,7 +38,7 @@ public:
 			uint32				BlockSize() const;
 			int32				Index() const;		// 0 for devices
 			uint32				Status() const;
-	
+
 			bool				ContainsFileSystem() const;
 			bool				ContainsPartitioningSystem() const;
 
@@ -47,8 +47,8 @@ public:
 			bool				IsMounted() const;
 			bool				IsBusy() const;
 
-			uint32				Flags() const;		
-	
+			uint32				Flags() const;
+
 			const char*			Name() const;
 			const char*			ContentName() const;
 			const char*			Type() const;			// See DiskDeviceTypes.h
@@ -58,10 +58,12 @@ public:
 			const char*			ContentParameters() const;
 
 			status_t			GetDiskSystem(BDiskSystem* diskSystem) const;
-	
+
 	virtual	status_t			GetPath(BPath* path) const;
 			status_t			GetVolume(BVolume* volume) const;
 			status_t			GetIcon(BBitmap* icon, icon_size which) const;
+			status_t			GetIcon(uint8** _data, size_t* _size,
+									type_code* _type) const;
 			status_t			GetMountPoint(BPath* mountPoint) const;
 
 			dev_t				Mount(const char* mountPoint = NULL,
@@ -80,7 +82,7 @@ public:
 
 			status_t			GetPartitioningInfo(
 									BPartitioningInfo* info) const;
-	
+
 			BPartition*			VisitEachChild(BDiskDeviceVisitor* visitor)
 									const;
 	virtual BPartition*			VisitEachDescendant(
@@ -90,7 +92,7 @@ public:
 
 			bool				CanDefragment(bool* whileMounted = NULL) const;
 			status_t			Defragment() const;
-	
+
 			bool				CanRepair(bool checkOnly,
 									bool* whileMounted = NULL) const;
 			status_t			Repair(bool checkOnly) const;
@@ -149,14 +151,14 @@ public:
 
 			bool				CanInitialize(const char* diskSystem) const;
 			status_t			GetInitializationParameterEditor(
-									const char* system,       
+									const char* system,
 									BDiskDeviceParameterEditor** editor) const;
 			status_t			ValidateInitialize(const char* diskSystem,
 									BString* name, const char* parameters);
 			status_t			Initialize(const char* diskSystem,
 									const char* name, const char* parameters);
 			status_t			Uninitialize();
-	
+
 	// Modification of child partitions
 
 			bool				CanCreateChild() const;
@@ -170,10 +172,10 @@ public:
 									const char* type, const char* name,
 									const char* parameters,
 									BPartition** child = NULL);
-	
+
 			bool				CanDeleteChild(int32 index) const;
 			status_t			DeleteChild(int32 index);
-	
+
 private:
 			class Delegate;
 

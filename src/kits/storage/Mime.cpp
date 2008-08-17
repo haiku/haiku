@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Tyler Dauwalder
  *		Ingo Weinhold, bonefish@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 /*!
@@ -12,11 +13,18 @@
 	Mime type C functions implementation.
 */
 
+#include <errno.h>
+#include <new>
+#include <stdlib.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
 #include <fs_attr.h>
 #include <fs_info.h>
 #include <Bitmap.h>
 #include <Drivers.h>
 #include <Entry.h>
+#include <IconUtils.h>
 #include <Mime.h>
 #include <MimeType.h>
 #include <mime/database_access.h>
@@ -24,9 +32,6 @@
 #include <RegistrarDefs.h>
 #include <Roster.h>
 #include <RosterPrivate.h>
-
-#include <unistd.h>
-#include <sys/ioctl.h>
 
 using namespace BPrivate;
 
@@ -42,7 +47,7 @@ do_mime_update(int32 what, const char *path, int recursive,
 {
 	BEntry root;
 	entry_ref ref;
-		
+
 	status_t err = root.SetTo(path ? path : "/");
 	if (!err)
 		err = root.GetRef(&ref);
@@ -50,7 +55,7 @@ do_mime_update(int32 what, const char *path, int recursive,
 		BMessage msg(what);
 		BMessage reply;
 		status_t result;
-		
+
 		// Build and send the message, read the reply
 		if (!err)
 			err = msg.AddRef("entry", &ref);
@@ -60,13 +65,13 @@ do_mime_update(int32 what, const char *path, int recursive,
 			err = msg.AddBool("synchronous", synchronous);
 		if (!err)
 			err = msg.AddInt32("force", force);
-		if (!err) 
+		if (!err)
 			err = BRoster::Private().SendTo(&msg, &reply, true);
 		if (!err)
 			err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
 		if (!err)
 			err = reply.FindInt32("result", &result);
-		if (!err) 
+		if (!err)
 			err = result;
 	}
 	return err;
@@ -106,7 +111,7 @@ update_mime_info(const char *path, int recursive, int synchronous, int force)
 		recursive = true;
 
 	return do_mime_update(B_REG_MIME_UPDATE_MIME_INFO, path, recursive,
-		synchronous, force);	
+		synchronous, force);
 }
 
 // create_app_meta_mime
@@ -139,50 +144,44 @@ create_app_meta_mime(const char *path, int recursive, int synchronous,
 		synchronous, force);
 }
 
-// get_device_icon
+
 /*!	Retrieves an icon associated with a given device.
 	\param dev The path to the device.
 	\param icon A pointer to a buffer the icon data shall be written to.
 	\param size The size of the icon. Currently the sizes 16 (small, i.e
 	            \c B_MINI_ICON) and 32 (large, 	i.e. \c B_LARGE_ICON) are
 	            supported.
-	            
+
 	\todo The mounted directories for volumes can also have META:X:STD_ICON
 		  attributes. Should those attributes override the icon returned
 		  by ioctl(,B_GET_ICON,)?
-		  
+
 	\return
 	- \c B_OK: Everything went fine.
 	- An error code otherwise.
 */
 status_t
-get_device_icon(const char *dev, void *icon, int32 size)
+get_device_icon(const char *device, void *icon, int32 size)
 {
-	status_t err = dev && icon && (size == B_LARGE_ICON || size == B_MINI_ICON)
-		? B_OK : B_BAD_VALUE;
+	if (device == NULL || icon == NULL
+		|| (size != B_LARGE_ICON && size != B_MINI_ICON))
+		return B_BAD_VALUE;
 
-	int fd = -1;
+	int fd = open(device, O_RDONLY);
+	if (fd < 0)
+		return errno;
 
-	if (!err) {
-		fd = open(dev, O_RDONLY);
-		err = fd != -1 ? B_OK : B_BAD_VALUE;
+	device_icon iconData = {size, icon};
+	if (ioctl(fd, B_GET_ICON, &iconData) != 0) {
+		close(fd);
+		return errno;
 	}
-	if (!err) {
-		device_icon iconData = { size, icon };
-		err = ioctl(fd, B_GET_ICON, &iconData);
-	}
-	if (fd != -1) {
-		// If the file descriptor was open()ed, we need to close it
-		// regardless. Only if we haven't yet encountered any errors
-		// do we make note close()'s return value, however.
-		status_t error = close(fd);
-		if (!err)
-			err = error;
-	}
-	return err;	
+
+	close(fd);
+	return B_OK;
 }
 
-// get_device_icon
+
 /*!	Retrieves an icon associated with a given device.
 	\param dev The path to the device.
 	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
@@ -190,38 +189,118 @@ get_device_icon(const char *dev, void *icon, int32 size)
 		   large icon).
 	\param which Specifies the size of the icon to be retrieved:
 		   \c B_MINI_ICON for the mini and \c B_LARGE_ICON for the large icon.
-	            
+
 	\todo The mounted directories for volumes can also have META:X:STD_ICON
 		  attributes. Should those attributes override the icon returned
 		  by ioctl(,B_GET_ICON,)?
-		  
+
 	\return
 	- \c B_OK: Everything went fine.
 	- An error code otherwise.
 */
 status_t
-get_device_icon(const char *dev, BBitmap *icon, icon_size which)
+get_device_icon(const char *device, BBitmap *icon, icon_size which)
 {
 	// check parameters
-	status_t error = (dev && icon ? B_OK : B_BAD_VALUE);
+	if (device == NULL || icon == NULL)
+		return B_BAD_VALUE;
+
 	BRect rect;
-	if (error == B_OK) {
-		if (which == B_MINI_ICON)
-			rect.Set(0, 0, 15, 15);
-		else if (which == B_LARGE_ICON)
-			rect.Set(0, 0, 31, 31);
-		else
-			error = B_BAD_VALUE;
+	if (which == B_MINI_ICON)
+		rect.Set(0, 0, 15, 15);
+	else if (which == B_LARGE_ICON)
+		rect.Set(0, 0, 31, 31);
+	else
+		return B_BAD_VALUE;
+
+	if (icon->Bounds() != rect)
+		return B_BAD_VALUE;
+
+	uint8* data;
+	size_t size;
+	type_code type;
+	status_t status = get_device_icon(device, &data, &size, &type);
+	if (status == B_OK) {
+		status = BIconUtils::GetVectorIcon(data, size, icon);
+		delete[] data;
+		return status;
 	}
+
+	// Vector icon was not available, try old one
+
 	// check whether icon size and bitmap dimensions do match
-	if (error == B_OK
-		&& (icon->Bounds() != rect || icon->ColorSpace() != B_CMAP8)) {
-		error = B_BAD_VALUE;
+	if (icon->Bounds() != rect || icon->ColorSpace() != B_CMAP8)
+		return B_BAD_VALUE;
+
+	void* iconData = icon->Bits();
+	size_t iconSize = icon->BitsLength();
+
+	if (icon->ColorSpace() != B_CMAP8) {
+		iconSize = (size_t)which * (size_t)which;
+		iconData = malloc(iconSize);
+		if (iconData == NULL)
+			return B_NO_MEMORY;
 	}
-	// TODO: support bitmap with other color spaces!
+
 	// get the icon
-	if (error == B_OK)
-		error = get_device_icon(dev, icon->Bits(), which);
-	return error;
+	status = get_device_icon(device, iconData, which);
+	if (status == B_OK && iconData != icon->Bits())
+		icon->SetBits(iconData, iconSize, 0, B_CMAP8);
+
+	if (iconData != icon->Bits())
+		free(iconData);
+
+	return status;
 }
 
+
+status_t
+get_device_icon(const char *device, uint8** _data, size_t* _size,
+	type_code* _type)
+{
+	if (device == NULL || _data == NULL || _size == NULL || _type == NULL)
+		return B_BAD_VALUE;
+
+	int fd = open(device, O_RDONLY);
+	if (fd < 0)
+		return errno;
+
+	// TODO: support B_GET_ICON_NAME!
+#if 0
+	char name[B_FILE_NAME_LENGTH];
+	if (ioctl(fd, B_GET_ICON_NAME, name) == 0) {
+		close(fd);
+		return B_OK;
+	}
+#endif
+
+	uint8 data[8192];
+	device_icon iconData = {sizeof(data), data};
+	status_t status = ioctl(fd, B_GET_VECTOR_ICON, &iconData,
+		sizeof(device_icon));
+	if (status != 0)
+		status = errno;
+
+	if (status == B_OK) {
+		*_data = new(std::nothrow) uint8[iconData.icon_size];
+		if (*_data == NULL)
+			status = B_NO_MEMORY;
+	}
+
+	if (status == B_OK) {
+		if (iconData.icon_size > (int32)sizeof(data)) {
+			iconData.icon_data = *_data;
+			status = ioctl(fd, B_GET_VECTOR_ICON, &iconData,
+				sizeof(device_icon));
+			if (status != 0)
+				status = errno;
+		} else
+			memcpy(*_data, data, iconData.icon_size);
+
+		*_size = iconData.icon_size;
+		*_type = B_VECTOR_ICON_TYPE;
+	}
+
+	close(fd);
+	return status;
+}
