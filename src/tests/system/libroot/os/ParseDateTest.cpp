@@ -64,6 +64,7 @@ main(int argc, char **argv)
 		"-15 minutes",
 		"3:33pm GMT",
 		"Mon, June 10th, 1993 10:00:03 am GMT",
+		"Sat, 16 Aug   Ìîñêîâñêîå âðåìÿ (çèìà)",
 		NULL
 	};
 
