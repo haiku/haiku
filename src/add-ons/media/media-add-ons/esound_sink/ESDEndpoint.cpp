@@ -46,6 +46,7 @@
 #include <Debug.h>
 #include "ESDEndpoint.h"
 
+
 ESDEndpoint::ESDEndpoint()
  : BDataIO()
  , fHost(NULL)
@@ -56,6 +57,7 @@ ESDEndpoint::ESDEndpoint()
 	Reset();
 }
 
+
 ESDEndpoint::~ESDEndpoint()
 {
 	CALLED();
@@ -64,8 +66,18 @@ ESDEndpoint::~ESDEndpoint()
 	fSocket = -1;
 }
 
-void ESDEndpoint::Reset()
+
+status_t
+ESDEndpoint::InitCheck() const
 {
+	return fInitStatus;
+}
+
+
+void
+ESDEndpoint::Reset()
+{
+	fInitStatus = B_NO_INIT;
 	fDefaultCommand = ESD_PROTO_STREAM_PLAY;
 	fDefaultCommandSent = false;
 	fDefaultFormat = ESD_BITS8 | ESD_MONO;
@@ -73,7 +85,9 @@ void ESDEndpoint::Reset()
 	fLatency = 0LL;
 }
 
-status_t ESDEndpoint::SendAuthKey()
+
+status_t
+ESDEndpoint::SendAuthKey()
 {
 	CALLED();
 	BPath kfPath;
@@ -106,13 +120,49 @@ status_t ESDEndpoint::SendAuthKey()
 	return write(fSocket, fAuthKey, ESD_MAX_KEY);
 }
 
-status_t ESDEndpoint::Connect(const char *host, uint16 port)
+
+bool
+ESDEndpoint::Connected() const
 {
+	return (fInitStatus == B_OK);
+}
+
+
+status_t
+ESDEndpoint::Connect(const char *host, uint16 port)
+{
+	status_t err;
+	// set up connection asynchronously
+	fHost = host;
+	fPort = port;
+
+	err = fConnectThread = spawn_thread(_ConnectThread, "ESDEndpoint Connection", B_LOW_PRIORITY, this);
+	if (err < B_OK)
+		return err;
+	err = resume_thread(fConnectThread);
+
+	// TODO: return now instead and move Connect() call
+	wait_for_thread(fConnectThread, &err);
+
+	return err;
+}
+
+
+int32
+ESDEndpoint::_ConnectThread(void *_arg)
+{
+	ESDEndpoint *_this = (ESDEndpoint *)_arg;
+	return _this->ConnectThread();
+}
+
+int32
+ESDEndpoint::ConnectThread(void)
+{
+	const char *host = fHost.String();
+	uint16 port = fPort;
 	status_t err;
 	int flag;
 	CALLED();
-	fHost = host;
-	fPort = port;
 	
 	struct hostent *he;
 	struct sockaddr_in sin;
@@ -140,7 +190,7 @@ status_t ESDEndpoint::Connect(const char *host, uint16 port)
 	*/
 	
 	err = connect(fSocket, (struct sockaddr *) &sin, sizeof(sin));
-	PRINT(("connect: %s\n", strerror(err)));
+	PRINT(("connect: %ld, %s\n", err, strerror(errno)));
 	if (err < 0)
 		return errno;
 	
@@ -220,17 +270,17 @@ status_t ESDEndpoint::Connect(const char *host, uint16 port)
 	setsockopt(fSocket, SOL_SOCKET, SO_SNDBUF, &flag, sizeof(flag));
 	*/
 	
-//	read(fSocket, &ok, sizeof(uint32));
-// connect
-// auth
-// ask server latency
-// calc network latency (time (send+recv) / 2) ?
-// get default format
+
+
+	// TODO: get default format
+
+	fInitStatus = B_OK;
 
 	return B_OK;
 }
 
-status_t ESDEndpoint::Disconnect()
+status_t
+ESDEndpoint::Disconnect()
 {
 	CALLED();
 	if (fSocket > -1)
@@ -239,7 +289,8 @@ status_t ESDEndpoint::Disconnect()
 	return B_OK;
 }
 
-status_t ESDEndpoint::SetCommand(esd_command_t cmd)
+status_t
+ESDEndpoint::SetCommand(esd_command_t cmd)
 {
 	CALLED();
 	if (fDefaultCommandSent)
@@ -248,7 +299,8 @@ status_t ESDEndpoint::SetCommand(esd_command_t cmd)
 	return B_OK;
 }
 
-status_t ESDEndpoint::SetFormat(int bits, int channels, float rate)
+status_t
+ESDEndpoint::SetFormat(int bits, int channels, float rate)
 {
 	esd_format_t fmt = 0;
 	CALLED();
@@ -282,7 +334,8 @@ status_t ESDEndpoint::SetFormat(int bits, int channels, float rate)
 	return B_OK;
 }
 
-status_t ESDEndpoint::GetServerInfo()
+status_t
+ESDEndpoint::GetServerInfo()
 {
 	CALLED();
 	struct serverinfo {
@@ -298,19 +351,22 @@ status_t ESDEndpoint::GetServerInfo()
 	return B_OK;
 }
 
-bool ESDEndpoint::CanSend()
+bool
+ESDEndpoint::CanSend()
 {
 	CALLED();
 	return fDefaultCommandSent;
 }
 
-ssize_t ESDEndpoint::Read(void *buffer, size_t size)
+ssize_t
+ESDEndpoint::Read(void *buffer, size_t size)
 {
 	CALLED();
 	return EINVAL;
 }
 
-ssize_t ESDEndpoint::Write(const void *buffer, size_t size)
+ssize_t
+ESDEndpoint::Write(const void *buffer, size_t size)
 {
 	status_t err = B_OK;
 	CALLED();
@@ -336,7 +392,8 @@ ssize_t ESDEndpoint::Write(const void *buffer, size_t size)
 	return err;
 }
 
-status_t ESDEndpoint::SendCommand(esd_command_t cmd, const uint8 *obuf, size_t olen, uint8 *ibuf, size_t ilen)
+status_t
+ESDEndpoint::SendCommand(esd_command_t cmd, const uint8 *obuf, size_t olen, uint8 *ibuf, size_t ilen)
 {
 	status_t err;
 	CALLED();
@@ -358,7 +415,8 @@ status_t ESDEndpoint::SendCommand(esd_command_t cmd, const uint8 *obuf, size_t o
 	return err;
 }
 
-status_t ESDEndpoint::SendDefaultCommand()
+status_t
+ESDEndpoint::SendDefaultCommand()
 {
 	status_t err;
 	struct {

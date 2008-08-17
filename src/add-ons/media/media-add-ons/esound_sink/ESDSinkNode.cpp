@@ -133,9 +133,11 @@ ESDSinkNode::ESDSinkNode(BMediaAddOn *addon, char* name, BMessage * config)
 		config->FindString("hostname", &fHostname);
 	}
 	if (fHostname.Length() < 1)
-		fHostname = "192.168.0.253";
+		fHostname = "192.168.0.1";
+	fPort = ESD_DEFAULT_PORT;
 	
 	fDevice = new ESDEndpoint();
+	/*
 	if (fDevice) {
 		if (fDevice->Connect(fHostname.String()) >= 0) {
 			fDevice->SetCommand();
@@ -144,6 +146,10 @@ ESDSinkNode::ESDSinkNode(BMediaAddOn *addon, char* name, BMessage * config)
 			fInitCheckStatus = fDevice->SendDefaultCommand();
 		}
 	}
+	*/
+	if (!fDevice)
+		return;
+	fInitCheckStatus = B_OK;
 }
 
 status_t ESDSinkNode::InitCheck(void) const
@@ -432,6 +438,15 @@ status_t ESDSinkNode::Connected(
 		return B_MEDIA_BAD_DESTINATION;
 	}
 	
+	// 
+	if (fDevice) {
+		if (fDevice->Connect(fHostname.String(), fPort) >= 0) {
+			fDevice->SetCommand();
+			//fDevice->GetServerInfo();
+			fDevice->SetFormat(ESD_FMT, 2);
+			fInitCheckStatus = fDevice->SendDefaultCommand();
+		}
+	}
 	// use one buffer length latency
 	fInternalLatency = with_format.u.raw_audio.buffer_size * 10000 / 2
 			/ ( (with_format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
@@ -1076,18 +1091,27 @@ ESDSinkNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value, si
 	if (!fDevice)
 		return B_ERROR;
 	//PRINT(("id : %i\n", id));
-	if (id == fWebHostId) {
-		BString s = fDevice->Host();
-		*ioSize = MIN(*ioSize, s.Length());
-		memcpy(value, s.String(), *ioSize);
-		return B_OK;
-	}
-	if (id == fWebPortId) {
-		BString s;
-		s << fDevice->Port();
-		*ioSize = MIN(*ioSize, s.Length());
-		memcpy(value, s.String(), *ioSize);
-		return B_OK;
+	switch (id) {
+		case PARAM_ENABLED:
+			// XXX
+			break;
+		case PARAM_HOST:
+		{
+			BString s = fDevice->Host();
+			*ioSize = MIN(*ioSize, s.Length());
+			memcpy(value, s.String(), *ioSize);
+			return B_OK;
+		}
+		case PARAM_PORT:
+		{
+			BString s;
+			s << fDevice->Port();
+			*ioSize = MIN(*ioSize, s.Length());
+			memcpy(value, s.String(), *ioSize);
+			return B_OK;
+		}
+		default:
+			break;
 	}
 #if 0
 	BParameter *parameter = NULL;
@@ -1098,78 +1122,6 @@ ESDSinkNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value, si
 	}
 #endif
 	
-#if 0
-	if(!parameter) {
-		// Hmmm, we were asked for a parameter that we don't actually
-		// support.  Report an error back to the caller.
-		PRINT(("\terror - asked for illegal parameter %ld\n", id));
-		return B_ERROR;
-	}
-	
-	multi_mix_value_info MMVI;
-	multi_mix_value MMV[2];
-	int rval;
-	MMVI.values = MMV;
-	id = id - 100;
-	MMVI.item_count = 0;
-	
-	if (*ioSize < sizeof(float))
-		return B_ERROR;
-	
-	if(parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
-		MMVI.item_count = 1;
-		MMV[0].id = id;
-		
-		if(parameter->CountChannels() == 2) {
-			if (*ioSize < 2*sizeof(float))
-				return B_ERROR;
-			MMVI.item_count = 2;
-			MMV[1].id = id + 1;
-		}
-		
-	} else if(parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
-		MMVI.item_count = 1;
-		MMV[0].id = id;
-	}
-	
-	if(MMVI.item_count > 0) {
-		rval = fDevice->DoGetMix(&MMVI);
-			
-		if (B_OK != rval) {	
-			fprintf(stderr, "Failed on DRIVER_GET_MIX\n");
-		} else {
-			
-			if(parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
-				((float*)value)[0] = MMV[0].gain;
-				*ioSize = sizeof(float); 
-				
-				if(parameter->CountChannels() == 2) {
-					((float*)value)[1] = MMV[1].gain;
-					*ioSize = 2*sizeof(float); 
-				}
-				
-				for(uint32 i=0; i < (*ioSize/sizeof(float)); i++) {
-					PRINT(("B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
-				}
-			} else if(parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
-			
-				BDiscreteParameter *dparameter = (BDiscreteParameter*) parameter;
-				if(dparameter->CountItems()<=2) {
-					((int32*)value)[0] = (MMV[0].enable) ? 1 : 0;
-				} else {
-					((int32*)value)[0] = MMV[0].mux;
-				}
-				*ioSize = sizeof(int32);
-				
-				for(uint32 i=0; i < (*ioSize/sizeof(int32)); i++) {
-					PRINT(("B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
-				}
-			}
-		
-		}
-	}
-	return B_OK;
-#endif
 return EINVAL;
 }
 
@@ -1184,70 +1136,40 @@ ESDSinkNode::SetParameterValue(int32 id, bigtime_t performance_time, const void*
 		if(parameter->ID() == id)
 			break;
 	}
-	if (id == fWebHostId) {
-		fprintf(stderr, "set HOST: %s\n", (const char *)value);
-		BString host = (const char *)value;
-		uint16 port = fDevice->Port();
-		fDevice->Connect(host.String(), port);
-		return;
-	}
-	if (id == fWebPortId) {
-		fprintf(stderr, "set PORT: %s\n", (const char *)value);
-		BString host = fDevice->Host();
-		uint16 port = atoi((const char *)value);
-		fDevice->Connect(host.String(), port);
-		return;
-	}
-#if 0
-	if(parameter) {
-		multi_mix_value_info MMVI;
-		multi_mix_value MMV[2];
-		int rval;
-		MMVI.values = MMV;
-		id = id - 100;
-		MMVI.item_count = 0;
-		
-		if(parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
-			for(uint32 i=0; i < (size/sizeof(float)); i++) {
-				PRINT(("B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
+	switch (id) {
+		case PARAM_ENABLED:
+			break;
+		case PARAM_HOST:
+		{
+			fprintf(stderr, "set HOST: %s\n", (const char *)value);
+			fHostname = (const char *)value;
+			if (fDevice && fDevice->Connected()) {
+				if (fDevice->Connect(fHostname.String(), fPort) >= 0) {
+					fDevice->SetCommand();
+					fDevice->SetFormat(ESD_FMT, 2);
+					//fDevice->GetServerInfo();
+					fInitCheckStatus = fDevice->SendDefaultCommand();
+				}
 			}
-			MMVI.item_count = 1;
-			MMV[0].id = id;
-			MMV[0].gain = ((float*)value)[0];
-			
-			if(parameter->CountChannels() == 2) {
-				MMVI.item_count = 2;
-				MMV[1].id = id + 1;
-				MMV[1].gain = ((float*)value)[1];
-			}
-			
-		} else if(parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
-			for(uint32 i=0; i < (size/sizeof(int32)); i++) {
-				PRINT(("B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
-			}
-			BDiscreteParameter *dparameter = (BDiscreteParameter*) parameter;
-			
-			if(dparameter->CountItems()<=2) {
-				MMVI.item_count = 1;
-				MMV[0].id = id;
-				MMV[0].enable = (((int32*)value)[0] == 1) ? true : false;
-			} else {
-				MMVI.item_count = 1;
-				MMV[0].id = id;
-				MMV[0].mux = ((uint32*)value)[0];
-			}
+			return;
 		}
-		
-		if(MMVI.item_count > 0) {
-			rval = fDevice->DoSetMix(&MMVI);
-				
-			if (B_OK != rval)
-			{	
-				fprintf(stderr, "Failed on DRIVER_SET_MIX\n");
+		case PARAM_PORT:
+		{
+			fprintf(stderr, "set PORT: %s\n", (const char *)value);
+			fPort = atoi((const char *)value);
+			if (fDevice && fDevice->Connected()) {
+				if (fDevice->Connect(fHostname.String(), fPort) >= 0) {
+					fDevice->SetCommand();
+					fDevice->SetFormat(ESD_FMT, 2);
+					//fDevice->GetServerInfo();
+					fInitCheckStatus = fDevice->SendDefaultCommand();
+				}
 			}
+			return;
 		}
+		default:
+			break;
 	}
-#endif	
 }
 
 BParameterWeb* 
@@ -1276,12 +1198,12 @@ ESDSinkNode::MakeParameterWeb()
 	int id = 0;
 	BParameterGroup *group = web->MakeGroup("Server");
 	BParameter *p;
-	fWebHostId = fWebPortId = -1;
+	// XXX: use B_MEDIA_UNKNOWN_TYPE or _NO_TYPE ?
+	// keep in sync with enum { PARAM_* } !
+	p = group->MakeDiscreteParameter(PARAM_ENABLED, B_MEDIA_RAW_AUDIO, "Enable", B_ENABLE);
 #if defined(B_BEOS_VERSION_DANO) || defined(__HAIKU__)
-	fWebHostId = id++;
-	p = group->MakeTextParameter(fWebHostId, B_MEDIA_RAW_AUDIO, "Hostname", B_GENERIC, 128);
-	fWebPortId = id++;
-	p = group->MakeTextParameter(fWebPortId, B_MEDIA_RAW_AUDIO, "Port", B_GENERIC, 16);
+	p = group->MakeTextParameter(PARAM_HOST, B_MEDIA_RAW_AUDIO, "Hostname", B_GENERIC, 128);
+	p = group->MakeTextParameter(PARAM_PORT, B_MEDIA_RAW_AUDIO, "Port", B_GENERIC, 16);
 #endif
 	return web;
 }

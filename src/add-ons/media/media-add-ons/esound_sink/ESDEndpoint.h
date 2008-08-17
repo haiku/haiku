@@ -44,8 +44,11 @@ public:
 	~ESDEndpoint();
 	
 	/*  */
+status_t	InitCheck() const;
 void		Reset();
 status_t	SendAuthKey();
+
+bool		Connected() const;
 status_t	Connect(const char *host, uint16 port=ESD_DEFAULT_PORT);
 status_t	Disconnect();
 	
@@ -71,7 +74,12 @@ virtual ssize_t		Write(const void *buffer, size_t size);
 	status_t	SendCommand(esd_command_t cmd, const uint8 *obuf, size_t olen, uint8 *ibuf, size_t ilen);
 	status_t	SendDefaultCommand();
 private:
-	
+
+	static int32	_ConnectThread(void *_arg);
+	int32			ConnectThread(void);
+
+	status_t		fInitStatus;
+	thread_id		fConnectThread;
 	BString			fHost;
 	uint16			fPort;
 	int				fSocket;

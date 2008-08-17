@@ -52,6 +52,13 @@
 						const media_format & producer_format,
 						const media_format & consumer_format);*/
 
+
+enum {
+	PARAM_ENABLED,
+	PARAM_HOST,
+	PARAM_PORT
+};
+
 class ESDSinkNode :
     public BBufferConsumer,
 #if ENABLE_INPUT
@@ -345,6 +352,7 @@ private:
 		thread_id			fThread;
 		
 		BString				fHostname;
+		uint16				fPort;
 		ESDEndpoint		 	*fDevice;
 		
 		//multi_description	MD;
@@ -357,8 +365,6 @@ private:
 		bool 				fTimeSourceStarted;
 		
 		BParameterWeb		*fWeb;
-		int32				fWebHostId;
-		int32				fWebPortId;
 		
 		BMessage			fConfig;
 };
