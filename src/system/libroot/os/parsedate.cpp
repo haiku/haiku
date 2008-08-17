@@ -1,21 +1,22 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-#include <OS.h>
 #include <parsedate.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <OS.h>
 
 
-#define TRACE_PARSEDATE 0
+#define TRACE_PARSEDATE 1
 #if TRACE_PARSEDATE
-#	define TRACE(x) printf x ;
+#	define TRACE(x) debug_printf x ;
 #else
 #	define TRACE(x) ;
 #endif
@@ -106,11 +107,11 @@ static const char * const kFormatsTable[] = {
 	"H [p]",
 	NULL
 };
-static const char * const *sFormatsTable = kFormatsTable;
+static const char* const* sFormatsTable = kFormatsTable;
 
 
 enum field_type {
-	TYPE_UNKNOWN	= 0,
+	TYPE_UNKNOWN = 0,
 
 	TYPE_DAY,
 	TYPE_MONTH,
@@ -173,14 +174,21 @@ struct known_identifier {
 };
 
 static const known_identifier kIdentifiers[] = {
-	{"today",		NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE, UNIT_DAY, 0},
-	{"tomorrow",	NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE, UNIT_DAY, 1},
-	{"yesterday",	NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE, UNIT_DAY, -1},
-	{"now",			NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE | FLAG_NOW, 0},
+	{"today",		NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE,
+		UNIT_DAY, 0},
+	{"tomorrow",	NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE,
+		UNIT_DAY, 1},
+	{"yesterday",	NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE,
+		UNIT_DAY, -1},
+	{"now",			NULL,	TYPE_UNIT,
+		FLAG_RELATIVE | FLAG_NOT_MODIFIABLE | FLAG_NOW, 0},
 
-	{"this",		NULL,	TYPE_MODIFIER, FLAG_NEXT_LAST_THIS, UNIT_NONE, MODIFY_THIS},
-	{"next",		NULL,	TYPE_MODIFIER, FLAG_NEXT_LAST_THIS, UNIT_NONE, MODIFY_NEXT},
-	{"last",		NULL,	TYPE_MODIFIER, FLAG_NEXT_LAST_THIS, UNIT_NONE, MODIFY_LAST},
+	{"this",		NULL,	TYPE_MODIFIER, FLAG_NEXT_LAST_THIS, UNIT_NONE,
+		MODIFY_THIS},
+	{"next",		NULL,	TYPE_MODIFIER, FLAG_NEXT_LAST_THIS, UNIT_NONE,
+		MODIFY_NEXT},
+	{"last",		NULL,	TYPE_MODIFIER, FLAG_NEXT_LAST_THIS, UNIT_NONE,
+		MODIFY_LAST},
 
 	{"years",		"year",	TYPE_UNIT, FLAG_RELATIVE, UNIT_YEAR, 1},
 	{"months",		"month",TYPE_UNIT, FLAG_RELATIVE, UNIT_MONTH, 1},
@@ -194,7 +202,8 @@ static const known_identifier kIdentifiers[] = {
 	{"minutes",		"mins",	TYPE_UNIT, FLAG_RELATIVE, UNIT_SECOND, 60},
 
 	{"am",			NULL,	TYPE_MERIDIAN, FLAG_NOT_MODIFIABLE, UNIT_SECOND, 0},
-	{"pm",			NULL,	TYPE_MERIDIAN, FLAG_NOT_MODIFIABLE, UNIT_SECOND, 12 * 60 * 60},
+	{"pm",			NULL,	TYPE_MERIDIAN, FLAG_NOT_MODIFIABLE, UNIT_SECOND,
+		12 * 60 * 60},
 
 	{"sunday",		"sun",	TYPE_WEEKDAY, FLAG_NONE, UNIT_DAY, 0},
 	{"monday",		"mon",	TYPE_WEEKDAY, FLAG_NONE, UNIT_DAY, 1},
@@ -218,7 +227,7 @@ static const known_identifier kIdentifiers[] = {
 	{"december",	"dec",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 12},
 
 	{"GMT",			NULL,	TYPE_TIME_ZONE,	FLAG_NONE, UNIT_SECOND, 0},
-		// ToDo: add more time zones
+		// TODO: add more time zones
 
 	{NULL}
 };
@@ -230,7 +239,7 @@ class DateMask {
 		DateMask() : fMask(0UL) {}
 
 		void Set(uint8 type) { fMask |= Flag(type); }
-		bool IsSet(uint8 type) { return fMask & Flag(type); }
+		bool IsSet(uint8 type) { return (fMask & Flag(type)) != 0; }
 
 		bool HasTime();
 		bool IsComplete();
@@ -250,16 +259,16 @@ struct parsed_element {
 	uint8		value_type;
 	int8		modifier;
 	bigtime_t	value;
-	
+
 	void SetCharType(uint8 fieldType, int8 modify = MODIFY_NONE);
 
-	void Adopt(const known_identifier &identifier);
-	void AdoptUnit(const known_identifier &identifier);
+	void Adopt(const known_identifier& identifier);
+	void AdoptUnit(const known_identifier& identifier);
 	bool IsNextLastThis();
 };
 
 
-void 
+void
 parsed_element::SetCharType(uint8 fieldType, int8 modify)
 {
 	base_type = type = fieldType;
@@ -268,13 +277,13 @@ parsed_element::SetCharType(uint8 fieldType, int8 modify)
 }
 
 
-void 
-parsed_element::Adopt(const known_identifier &identifier)
+void
+parsed_element::Adopt(const known_identifier& identifier)
 {
 	base_type = type = identifier.type;
 	flags = identifier.flags;
 	unit = identifier.unit;
-	
+
 	if (identifier.type == TYPE_MODIFIER)
 		modifier = identifier.value;
 
@@ -283,8 +292,8 @@ parsed_element::Adopt(const known_identifier &identifier)
 }
 
 
-void 
-parsed_element::AdoptUnit(const known_identifier &identifier)
+void
+parsed_element::AdoptUnit(const known_identifier& identifier)
 {
 	base_type = type = TYPE_UNIT;
 	flags = identifier.flags;
@@ -297,31 +306,31 @@ inline bool
 parsed_element::IsNextLastThis()
 {
 	return base_type == TYPE_MODIFIER
-		&& (modifier == MODIFY_NEXT || modifier == MODIFY_LAST || modifier == MODIFY_THIS);
+		&& (modifier == MODIFY_NEXT || modifier == MODIFY_LAST
+			|| modifier == MODIFY_THIS);
 }
 
 
 //	#pragma mark -
 
 
-bool 
+bool
 DateMask::HasTime()
 {
-	// this will cause 
+	// this will cause
 	return IsSet(TYPE_HOUR);
 }
 
 
-/** This method checks if the date mask is complete in the
- *	sense that it doesn't need to have a prefilled "struct tm"
- *	when its time value is computed.
- */
-
-bool 
+/*!	This method checks if the date mask is complete in the
+	sense that it doesn't need to have a prefilled "struct tm"
+	when its time value is computed.
+*/
+bool
 DateMask::IsComplete()
 {
 	// mask must be absolute, at last
-	if (fMask & Flag(TYPE_UNIT))
+	if ((fMask & Flag(TYPE_UNIT)) != 0)
 		return false;
 
 	// minimal set of flags to have a complete set
@@ -332,8 +341,8 @@ DateMask::IsComplete()
 //	#pragma mark -
 
 
-status_t
-preparseDate(const char *dateString, parsed_element *elements)
+static status_t
+preparseDate(const char* dateString, parsed_element* elements)
 {
 	int32 index = 0, modify = MODIFY_NONE;
 	char c;
@@ -385,11 +394,12 @@ preparseDate(const char *dateString, parsed_element *elements)
 			// skip number
 			while (isdigit(dateString[1]))
 				dateString++;
-			
+
 			// check for "1st", "2nd, "3rd", "4th", ...
-			
-			const char *suffixes[] = {"th", "st", "nd", "rd"};
-			const char *validSuffix = elements[index].value > 3 ? "th" : suffixes[elements[index].value];
+
+			const char* suffixes[] = {"th", "st", "nd", "rd"};
+			const char* validSuffix = elements[index].value > 3
+				? "th" : suffixes[elements[index].value];
 			if (!strncasecmp(dateString + 1, validSuffix, 2)
 				&& !isalpha(dateString[3])) {
 				// for now, just ignore the suffix - but we might be able
@@ -400,7 +410,7 @@ preparseDate(const char *dateString, parsed_element *elements)
 		} else if (isalpha(c)) {
 			// fetch whole string
 
-			const char *string = dateString;
+			const char* string = dateString;
 			while (isalpha(dateString[1]))
 				dateString++;
 			int32 length = dateString + 1 - string;
@@ -408,7 +418,7 @@ preparseDate(const char *dateString, parsed_element *elements)
 			// compare with known strings
 			// ToDo: should understand other languages as well...
 
-			const known_identifier *identifier = kIdentifiers;
+			const known_identifier* identifier = kIdentifiers;
 			for (; identifier->string; identifier++) {
 				if (!strncasecmp(identifier->string, string, length)
 					&& !identifier->string[length])
@@ -486,7 +496,7 @@ preparseDate(const char *dateString, parsed_element *elements)
 
 
 static void
-computeRelativeUnit(parsed_element &element, struct tm &tm, int *_flags)
+computeRelativeUnit(parsed_element& element, struct tm& tm, int* _flags)
 {
 	// set the relative start depending on unit
 
@@ -504,7 +514,7 @@ computeRelativeUnit(parsed_element &element, struct tm &tm, int *_flags)
 
 	// adjust value
 
-	if (element.flags & FLAG_RELATIVE) {
+	if ((element.flags & FLAG_RELATIVE) != 0) {
 		if (element.unit == UNIT_MONTH)
 			tm.tm_mon += element.value;
 		else if (element.unit == UNIT_DAY)
@@ -536,17 +546,17 @@ computeRelativeUnit(parsed_element &element, struct tm &tm, int *_flags)
 }
 
 
-/**	Uses the format assignment (through "format", and "optional") for the parsed elements
- *	and calculates the time value with respect to "now".
- *	Will also set the day/minute relative flags in "_flags".
- */
-
+/*!	Uses the format assignment (through "format", and "optional") for the
+	parsed elements and calculates the time value with respect to "now".
+	Will also set the day/minute relative flags in "_flags".
+*/
 static time_t
-computeDate(const char *format, bool *optional, parsed_element *elements, time_t now, DateMask dateMask, int *_flags)
+computeDate(const char* format, bool* optional, parsed_element* elements,
+	time_t now, DateMask dateMask, int* _flags)
 {
 	TRACE(("matches: %s\n", format));
 
-	parsed_element *element = elements;
+	parsed_element* element = elements;
 	uint32 position = 0;
 	struct tm tm;
 
@@ -641,8 +651,9 @@ computeDate(const char *format, bool *optional, parsed_element *elements, time_t
 						tm.tm_sec += element->value - timezone;
 						break;
 					case 'T':	// time unit
-						if (element->flags & FLAG_NOW) {
-							*_flags = PARSEDATE_MINUTE_RELATIVE_TIME | PARSEDATE_RELATIVE_TIME;
+						if ((element->flags & FLAG_NOW) != 0) {
+							*_flags = PARSEDATE_MINUTE_RELATIVE_TIME
+								| PARSEDATE_RELATIVE_TIME;
 							break;
 						}
 
@@ -666,10 +677,10 @@ computeDate(const char *format, bool *optional, parsed_element *elements, time_t
 
 
 time_t
-parsedate_etc(const char *dateString, time_t now, int *_flags)
+parsedate_etc(const char* dateString, time_t now, int* _flags)
 {
 	// preparse date string so that it can be easily compared to our formats
-	
+
 	parsed_element elements[MAX_ELEMENTS];
 
 	if (preparseDate(dateString, elements) < B_OK) {
@@ -681,10 +692,10 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 	for (int32 index = 0; elements[index].type != TYPE_END; index++) {
 		parsed_element e = elements[index];
 
-		printf("  %ld: type = %ld, base_type = %ld, unit = %ld, flags = %ld, value = %Ld (%s)\n",
-			index, e.type, e.base_type, e.unit, e.flags, e.value,
-			e.value_type == VALUE_NUMERICAL ? "numerical" :
-			(e.value_type == VALUE_STRING ? "string" : "char"));
+		printf("  %ld: type = %u, base_type = %u, unit = %u, flags = %u, "
+			"value = %Ld (%s)\n", index, e.type, e.base_type, e.unit, e.flags,
+			e.value, e.value_type == VALUE_NUMERICAL
+			? "numerical" : (e.value_type == VALUE_STRING ? "string" : "char"));
 	}
 #endif
 
@@ -692,12 +703,12 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 
 	for (int32 index = 0; sFormatsTable[index]; index++) {
 		// test if this format matches our date string
-		
-		const char *format = sFormatsTable[index];
+
+		const char* format = sFormatsTable[index];
 		uint32 position = 0;
 		DateMask dateMask;
 
-		parsed_element *element = elements;
+		parsed_element* element = elements;
 		while (element->type != TYPE_END) {
 			// skip whitespace
 			while (isspace(format[0]))
@@ -744,7 +755,7 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 						case 'd':
 							if (element->value > 31)
 								goto next_format;
-							
+
 							dateMask.Set(TYPE_DAY);
 							break;
 						case 'm':
@@ -775,7 +786,7 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 							dateMask.Set(TYPE_UNIT);
 							break;
 						case '-':
-							if (element->flags & FLAG_HAS_DASH) {
+							if ((element->flags & FLAG_HAS_DASH) != 0) {
 								element--;	// consider this element again
 								break;
 							}
@@ -784,7 +795,7 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 							goto next_format;
 					}
 					break;
-				
+
 				case VALUE_STRING:
 					switch (format[0]) {
 						case 'a':	// weekday
@@ -833,14 +844,15 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 			// one is only optional (in which case we can continue)
 			if (!optional[position])
 				goto skip_format;
-				
+
 			optional[position] = false;
 			format += 2;
 			position++;
 				// skip the closing ']'
 		}
 
-		// check if the format is already empty (since we reached our last element)
+		// check if the format is already empty (since we reached our last
+		// element)
 		while (format[0]) {
 			if (format[0] == '[')
 				format += 3;
@@ -854,7 +866,8 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 
 		// made it here? then we seem to have found our guy
 
-		return computeDate(sFormatsTable[index], optional, elements, now, dateMask, _flags);
+		return computeDate(sFormatsTable[index], optional, elements, now,
+			dateMask, _flags);
 
 	skip_format:
 		// check if the next format has the same beginning as the skipped one,
@@ -873,24 +886,24 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 
 
 time_t
-parsedate(const char *dateString, time_t now)
+parsedate(const char* dateString, time_t now)
 {
 	int flags = 0;
-	
+
 	return parsedate_etc(dateString, now, &flags);
 }
 
 
 void
-set_dateformats(const char **table)
+set_dateformats(const char** table)
 {
 	sFormatsTable = table ? table : kFormatsTable;
 }
 
 
-const char **
+const char**
 get_dateformats(void)
 {
-	return const_cast<const char **>(sFormatsTable);
+	return const_cast<const char**>(sFormatsTable);
 }
 
