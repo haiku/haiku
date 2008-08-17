@@ -20,16 +20,19 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include <fs_attr.h>
-#include <fs_info.h>
 #include <Bitmap.h>
 #include <Drivers.h>
 #include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <fs_attr.h>
+#include <fs_info.h>
 #include <IconUtils.h>
 #include <Mime.h>
 #include <MimeType.h>
 #include <mime/database_access.h>
 #include <Node.h>
+#include <Path.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
 #include <RosterPrivate.h>
@@ -266,14 +269,18 @@ get_device_icon(const char *device, uint8** _data, size_t* _size,
 	if (fd < 0)
 		return errno;
 
-	// TODO: support B_GET_ICON_NAME!
-#if 0
+	// Try to get the icon by name first
+
 	char name[B_FILE_NAME_LENGTH];
-	if (ioctl(fd, B_GET_ICON_NAME, name) == 0) {
-		close(fd);
-		return B_OK;
+	if (ioctl(fd, B_GET_ICON_NAME, name) >= 0) {
+		status_t status = get_named_icon(name, _data, _size, _type);
+		if (status == B_OK) {
+			close(fd);
+			return B_OK;
+		}
 	}
-#endif
+
+	// Getting the named icon failed, try vector icon next
 
 	uint8 data[8192];
 	device_icon iconData = {sizeof(data), data};
@@ -302,6 +309,91 @@ get_device_icon(const char *device, uint8** _data, size_t* _size,
 		*_type = B_VECTOR_ICON_TYPE;
 	}
 
+	// TODO: also support getting the old icon?
 	close(fd);
 	return status;
+}
+
+
+status_t
+get_named_icon(const char* name, BBitmap* icon, icon_size which)
+{
+	// check parameters
+	if (name == NULL || icon == NULL)
+		return B_BAD_VALUE;
+
+	BRect rect;
+	if (which == B_MINI_ICON)
+		rect.Set(0, 0, 15, 15);
+	else if (which == B_LARGE_ICON)
+		rect.Set(0, 0, 31, 31);
+	else
+		return B_BAD_VALUE;
+
+	if (icon->Bounds() != rect)
+		return B_BAD_VALUE;
+
+	uint8* data;
+	size_t size;
+	type_code type;
+	status_t status = get_named_icon(name, &data, &size, &type);
+	if (status == B_OK)
+		status = BIconUtils::GetVectorIcon(data, size, icon);
+
+	delete[] data;
+	return status;
+}
+
+
+status_t
+get_named_icon(const char* name, uint8** _data, size_t* _size, type_code* _type)
+{
+	if (name == NULL || _data == NULL || _size == NULL || _type == NULL)
+		return B_BAD_VALUE;
+
+	directory_which kWhich[] = {
+		B_USER_DATA_DIRECTORY,
+		B_COMMON_DATA_DIRECTORY,
+		B_BEOS_DATA_DIRECTORY,
+	};
+
+	status_t status = B_ENTRY_NOT_FOUND;
+	BFile file;
+	off_t size;
+
+	for (uint32 i = 0; i < sizeof(kWhich) / sizeof(kWhich[0]); i++) {
+		BPath path;
+		if (find_directory(kWhich[i], &path) != B_OK)
+			continue;
+
+		path.Append("icons");
+		path.Append(name);
+
+		status = file.SetTo(path.Path(), B_READ_ONLY);
+		if (status == B_OK) {
+			status = file.GetSize(&size);
+			if (size > 1024 * 1024)
+				status = B_ERROR;
+		}
+		if (status == B_OK)
+			break;
+	}
+
+	if (status != B_OK)
+		return status;
+
+	*_data = new(std::nothrow) uint8[size];
+	if (*_data == NULL)
+		return B_NO_MEMORY;
+
+	if (file.Read(*_data, size) != size) {
+		delete[] *_data;
+		return B_ERROR;
+	}
+
+	*_size = size;
+	*_type = B_VECTOR_ICON_TYPE;
+		// TODO: for now
+
+	return B_OK;
 }

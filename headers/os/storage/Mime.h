@@ -50,6 +50,10 @@ status_t get_device_icon(const char* device, BBitmap* icon, icon_size which);
 status_t get_device_icon(const char* device, uint8** _data, size_t* _size,
 	type_code* _type);
 
+status_t get_named_icon(const char* name, BBitmap* icon, icon_size which);
+status_t get_named_icon(const char* name, uint8** _data, size_t* _size,
+	type_code* _type);
+
 // include MimeType.h for convenience
 #	include <MimeType.h>
 #endif	// __cplusplus
