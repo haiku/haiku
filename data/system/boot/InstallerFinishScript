@@ -15,5 +15,5 @@ fi
 
 mkdir -p "$mount/var/tmp"
 
-/bin/makebootable $mount
+makebootable $mount
 
