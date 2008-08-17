@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,8 +8,7 @@
 //	least they should only be used when compiling for GCC 2.95.3, though.
 #if __GNUC__ < 30
 
-// This file includes some known R5 syscalls
-// ToDo: maybe they should indeed do something...
+//!	This file includes some known R5 syscalls
 
 #include <SupportDefs.h>
 #include <fs_info.h>
@@ -24,6 +23,7 @@
 int _kset_mon_limit_(int num);
 int _kset_fd_limit_(int num);
 int _klock_node_(int fd);
+int _kunlock_node_(int fd);
 int _kget_cpu_state_(int cpuNum);
 int _kset_cpu_state_(int cpuNum, int state);
 int _kstatfs_(dev_t device, void *whatever, int fd, const char *path, fs_info *info);
@@ -61,6 +61,13 @@ int
 _klock_node_(int fd)
 {
 	return _kern_lock_node(fd);
+}
+
+
+int
+_kunlock_node_(int fd)
+{
+	return _kern_unlock_node(fd);
 }
 
 
