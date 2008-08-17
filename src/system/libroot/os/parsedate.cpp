@@ -14,9 +14,9 @@
 #include <OS.h>
 
 
-#define TRACE_PARSEDATE 1
+#define TRACE_PARSEDATE 0
 #if TRACE_PARSEDATE
-#	define TRACE(x) debug_printf x ;
+#	define TRACE(x) printf x ;
 #else
 #	define TRACE(x) ;
 #endif
@@ -482,7 +482,8 @@ preparseDate(const char* dateString, parsed_element* elements)
 			index++;
 		}
 
-		memset(&elements[index], 0, sizeof(parsed_element));
+		if (index < MAX_ELEMENTS)
+			memset(&elements[index], 0, sizeof(parsed_element));
 	}
 
 	// were there any elements?
