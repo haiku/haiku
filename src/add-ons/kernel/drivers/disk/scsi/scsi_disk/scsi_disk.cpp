@@ -347,7 +347,8 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_GET_ICON_NAME:
 			// TODO: take device type into account!
-			return user_strlcpy((char*)buffer, "device-harddisk",
+			return user_strlcpy((char*)buffer, info->removable
+				? "devices/drive-removable-media" : "devices/drive-harddisk",
 				B_FILE_NAME_LENGTH);
 
 		case B_GET_VECTOR_ICON:

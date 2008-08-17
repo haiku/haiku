@@ -740,7 +740,8 @@ cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 		}
 
 		case B_GET_ICON_NAME:
-			return user_strlcpy((char*)buffer, "device-cd", B_FILE_NAME_LENGTH);
+			return user_strlcpy((char*)buffer, "devices/drive-optical",
+				B_FILE_NAME_LENGTH);
 
 		case B_GET_VECTOR_ICON:
 		{
@@ -759,10 +760,6 @@ cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			iconData.icon_size = sizeof(kCDIcon);
 			return user_memcpy(buffer, &iconData, sizeof(device_icon));
 		}
-
-		case B_GET_ICON:
-			return sSCSIPeripheral->get_icon(icon_type_cd,
-				(device_icon *)buffer);
 
 		case B_SCSI_GET_TOC:
 			// TODO: we pass a user buffer here!
