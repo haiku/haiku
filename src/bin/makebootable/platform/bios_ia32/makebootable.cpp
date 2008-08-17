@@ -185,9 +185,9 @@ find_own_image(image_info *info)
 {
 	int32 cookie = 0;
 	while (get_next_image_info(B_CURRENT_TEAM, &cookie, info) == B_OK) {
-		if (((uint32)info->text <= (uint32)find_own_image 
-			&& (uint32)info->text + info->text_size > 
-			(uint32)find_own_image)) {
+		if (((addr_t)info->text <= (addr_t)find_own_image 
+			&& (addr_t)info->text + info->text_size 
+				> (addr_t)find_own_image)) {
 			return B_OK;
 		}
 	}
