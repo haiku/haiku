@@ -279,8 +279,9 @@ vm_create_address_space(team_id id, addr_t base, addr_t size,
 	if (addressSpace == NULL)
 		return B_NO_MEMORY;
 
-	TRACE(("vm_create_aspace: team %ld (%skernel): %lx bytes starting at 0x%lx => %p\n",
-			id, kernel?"!":"", size, base, addressSpace));
+	TRACE(("vm_create_aspace: team %ld (%skernel):"
+			" %lx bytes starting at 0x%lx => %p\n",
+			id, kernel ? "!" : "", size, base, addressSpace));
 
 	addressSpace->base = base;
 	addressSpace->size = size;
