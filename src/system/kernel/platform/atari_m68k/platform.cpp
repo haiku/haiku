@@ -329,6 +329,7 @@ M68KAtari::BlueScreenGetChar()
 		if ((status & IKBD_STATUS_READ_BUFFER_FULL) == 0) {
 			// no data in keyboard buffer
 			spin(200);
+			//kprintf("no key\n");
 			continue;
 		}
 
@@ -431,7 +432,8 @@ char
 M68KAtari::SerialDebugGetChar()
 {
 	//WRITEME
-	return 0;
+	return BlueScreenGetChar();
+	//return 0;
 }
 
 
