@@ -13,7 +13,7 @@
 # dontClearImage
 # isVMwareImage
 # optionalPackageDescriptions
-# 
+#
 # addattr
 # bfsShell
 # copyattr
@@ -48,7 +48,7 @@ if [ $isImage ]; then
 	tPrefix=/myfs/
 	cd="$fsShellCommand cd"
 	scd="$fsShellCommand cd"
-	cp="$fsShellCommand cp"
+	cp="$fsShellCommand cp -f"
 	copyAttrs="$fsShellCommand cp -a"
 	ln="$fsShellCommand ln"
 	mkdir="$fsShellCommand mkdir"
