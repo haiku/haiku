@@ -829,6 +829,19 @@ run_tests_alignment_restrictions(TestSuiteContext& context)
 			.AddTarget(0, 2048, false)
 			.AddTarget(0, 512, true);
 
+	suite.AddTest(0, 51, true, B_PHYSICAL_IO_REQUEST)
+		.AddSource(0, 4096)
+		.NextResult(0, false, true)
+			.AddTarget(0, 512, true);
+
+	suite.AddTest(32, 51, true, B_PHYSICAL_IO_REQUEST)
+		.AddSource(0, 4096)
+		.NextResult(0, true, false)
+			.AddTarget(0, 512, true);
+			// Note: The operation has actually both partial begin and end, but
+			// our Test is not clever enough to realize that it is only one
+			// block and thus only one read phase is needed.
+
 	suite.Run();
 }
 
