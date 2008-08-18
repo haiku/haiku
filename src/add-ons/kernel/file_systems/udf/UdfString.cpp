@@ -45,7 +45,7 @@ unicode_to_utf8(uint32 c, char **out)
 	\param in Pointer to a C-String from which utf8 characters
 	          will be read. *in will be incremented to reflect
 	          the number of characters read, similarly to the
-	          \c out parameter for Udf::unicode_to_utf8().
+	          \c out parameter for unicode_to_utf8().
 	          
 	\return The 4-byte unicode character, or **in if passed an
 	        invalid character, or 0 if passed any NULL pointers.
@@ -91,35 +91,34 @@ utf8_to_unicode(const char **in)
 	return c;
 }
 
-using namespace Udf;
 
 /*! \brief Creates an empty string object.
 */
-String::String()
+UdfString::UdfString()
 	: fCs0String(NULL)
 	, fUtf8String(NULL)
 {
 }
 
-/*! \brief Creates a new String object from the given Utf8 string.
+/*! \brief Creates a new UdfString object from the given Utf8 string.
 */
-String::String(const char *utf8)
+UdfString::UdfString(const char *utf8)
 	: fCs0String(NULL)
 	, fUtf8String(NULL)
 {
 	SetTo(utf8);
 }
 
-/*! \brief Creates a new String object from the given Cs0 string.
+/*! \brief Creates a new UdfString object from the given Cs0 string.
 */
-String::String(const char *cs0, uint32 length)
+UdfString::UdfString(const char *cs0, uint32 length)
 	: fCs0String(NULL)
 	, fUtf8String(NULL)
 {
 	SetTo(cs0, length);
 }
 
-String::~String()
+UdfString::~UdfString()
 {
 	DEBUG_INIT("String");	
 
@@ -129,9 +128,9 @@ String::~String()
 /*! \brief Assignment from a Utf8 string.
 */
 void
-String::SetTo(const char *utf8)
+UdfString::SetTo(const char *utf8)
 {
-	DEBUG_INIT_ETC("String", ("utf8: `%s', strlen(utf8): %ld", utf8,
+	DEBUG_INIT_ETC("UdfString", ("utf8: `%s', strlen(utf8): %ld", utf8,
 	               utf8 ? strlen(utf8) : 0));	
 	_Clear();
 	if (!utf8) {
@@ -221,9 +220,9 @@ String::SetTo(const char *utf8)
 /*! \brief Assignment from a Cs0 string.
 */
 void
-String::SetTo(const char *cs0, uint32 length)
+UdfString::SetTo(const char *cs0, uint32 length)
 {
-	DEBUG_INIT_ETC("String", ("cs0: %p, length: %ld", cs0, length));	
+	DEBUG_INIT_ETC("UdfString", ("cs0: %p, length: %ld", cs0, length));	
 
 	_Clear();
 	if (length == 0)
@@ -301,9 +300,9 @@ String::SetTo(const char *cs0, uint32 length)
 }
 
 void
-String::_Clear()
+UdfString::_Clear()
 {
-	DEBUG_INIT("String");	
+	DEBUG_INIT("UdfString");	
 
 	delete [] fCs0String;
 	fCs0String = NULL;
