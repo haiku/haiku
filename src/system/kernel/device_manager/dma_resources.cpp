@@ -483,13 +483,21 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 
 		dmaLength += length;
 
-		vecOffset += length - partialBegin;
+		size_t transferred = length - partialBegin;
+		vecOffset += transferred;
 		offset -= partialBegin;
+
+		if (transferLeft > transferred)
+			transferLeft -= transferred;
+		else
+			transferLeft = 0;
+
 		TRACE("  partial begin, using bounce buffer: offset: %lld, length: "
 			"%lu\n", offset, length);
 	}
 
-	for (uint32 i = vecIndex; i < vecIndex + segmentCount;) {
+	for (uint32 i = vecIndex;
+			i < vecIndex + segmentCount && transferLeft > 0;) {
 		if (dmaBuffer->VecCount() >= fRestrictions.max_segment_count)
 			break;
 
@@ -501,9 +509,10 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 		}
 
 		addr_t base = (addr_t)vec.iov_base + vecOffset;
-		size_t length = vec.iov_len - vecOffset;
-		if (length > transferLeft)
-			length = transferLeft;
+		size_t maxLength = vec.iov_len - vecOffset;
+		if (maxLength > transferLeft)
+			maxLength = transferLeft;
+		size_t length = maxLength;
 
 		// Cut the vec according to transfer size, segment size, and boundary.
 
@@ -540,7 +549,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 
 		// If length is 0, use bounce buffer for complete vec.
 		if (length == 0) {
-			length = vec.iov_len - vecOffset;
+			length = maxLength;
 			useBounceBufferSize = length;
 			TRACE("  vec %lu: 0 length, using bounce buffer: %lu\n", i,
 				useBounceBufferSize);
@@ -567,7 +576,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 
 		dmaLength += length;
 		vecOffset += length;
-		transferLeft -= length;
+		transferLeft -= min_c(length, transferLeft);
 	}
 
 	// If we're writing partially, we always need to have a block sized bounce
