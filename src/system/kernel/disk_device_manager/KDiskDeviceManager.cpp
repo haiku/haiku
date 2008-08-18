@@ -396,25 +396,33 @@ KDiskDeviceManager::FindFileDevice(const char *filePath)
 	return NULL;
 }
 
-// RegisterDevice
-KDiskDevice *
-KDiskDeviceManager::RegisterDevice(const char *path)
+
+KDiskDevice*
+KDiskDeviceManager::RegisterDevice(const char* path)
 {
 	if (ManagerLocker locker = this) {
-		if (KDiskDevice *device = FindDevice(path)) {
-			device->Register();
-			return device;
+		for (int32 i = 0; i < 2; i++) {
+			if (KDiskDevice* device = FindDevice(path)) {
+				device->Register();
+				return device;
+			}
+
+			// if the device is not known yet, create it and try again
+			const char* leaf = strrchr(path, '/');
+			if (i == 0 && !strncmp(path, "/dev/disk", 9)
+				&& !strcmp(leaf + 1, "raw") && CreateDevice(path) < B_OK)
+				break;
 		}
 	}
 	return NULL;
 }
 
-// RegisterDevice
-KDiskDevice *
+
+KDiskDevice*
 KDiskDeviceManager::RegisterDevice(partition_id id, bool deviceOnly)
 {
 	if (ManagerLocker locker = this) {
-		if (KDiskDevice *device = FindDevice(id, deviceOnly)) {
+		if (KDiskDevice* device = FindDevice(id, deviceOnly)) {
 			device->Register();
 			return device;
 		}
@@ -422,14 +430,15 @@ KDiskDeviceManager::RegisterDevice(partition_id id, bool deviceOnly)
 	return NULL;
 }
 
-// RegisterNextDevice
-KDiskDevice *
-KDiskDeviceManager::RegisterNextDevice(int32 *cookie)
+
+KDiskDevice*
+KDiskDeviceManager::RegisterNextDevice(int32* cookie)
 {
 	if (!cookie)
 		return NULL;
+
 	if (ManagerLocker locker = this) {
-		if (KDiskDevice *device = NextDevice(cookie)) {
+		if (KDiskDevice* device = NextDevice(cookie)) {
 			device->Register();
 			return device;
 		}
@@ -437,25 +446,33 @@ KDiskDeviceManager::RegisterNextDevice(int32 *cookie)
 	return NULL;
 }
 
-// RegisterPartition
-KPartition *
-KDiskDeviceManager::RegisterPartition(const char *path)
+
+KPartition*
+KDiskDeviceManager::RegisterPartition(const char* path)
 {
 	if (ManagerLocker locker = this) {
-		if (KPartition *partition = FindPartition(path)) {
-			partition->Register();
-			return partition;
+		for (int32 i = 0; i < 2; i++) {
+			if (KPartition* partition = FindPartition(path)) {
+				partition->Register();
+				return partition;
+			}
+
+			// if the device is not known yet, create it and try again
+			const char* leaf = strrchr(path, '/');
+			if (i == 0 && !strncmp(path, "/dev/disk", 9)
+				&& !strcmp(leaf + 1, "raw") && CreateDevice(path) < B_OK)
+				break;
 		}
 	}
 	return NULL;
 }
 
-// RegisterPartition
-KPartition *
+
+KPartition*
 KDiskDeviceManager::RegisterPartition(partition_id id)
 {
 	if (ManagerLocker locker = this) {
-		if (KPartition *partition = FindPartition(id)) {
+		if (KPartition* partition = FindPartition(id)) {
 			partition->Register();
 			return partition;
 		}
