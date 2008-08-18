@@ -64,10 +64,14 @@ public:
 								void** _cookie);
 	virtual	status_t		Select(void* cookie, uint8 event, selectsync* sync);
 
+			bool			Republished() const { return fRepublished; }
+			void			SetRepublished(bool republished)
+								{ fRepublished = republished; }
 private:
 	legacy_driver*			fDriver;
 	const char*				fPath;
 	device_hooks*			fHooks;
+	bool					fRepublished;
 };
 
 typedef DoublyLinkedList<LegacyDevice> DeviceList;
@@ -213,21 +217,6 @@ driver_entry_compare(void *_driver, const void *_key)
 }
 
 
-static LegacyDevice*
-get_device_for_path(legacy_driver* driver, const char* path)
-{
-	DeviceList::Iterator iterator = driver->devices.GetIterator();
-	while (iterator.HasNext()) {
-		LegacyDevice* device = iterator.Next();
-
-		if (!strcmp(device->Path(), path))
-			return device;
-	}
-
-	return NULL;
-}
-
-
 /*!	Collects all published devices of a driver, compares them to what the
 	driver would publish now, and then publishes/unpublishes the devices
 	as needed.
@@ -241,59 +230,42 @@ republish_driver(legacy_driver* driver)
 		return load_driver(driver);
 	}
 
-	// build the list of currently present devices of this driver
+	// mark all devices
 	DeviceList::Iterator iterator = driver->devices.GetIterator();
-	DoublyLinkedList<path_entry> currentNodes;
-	while (iterator.HasNext()) {
-		LegacyDevice* device = iterator.Next();
-
-		path_entry* entry = new(std::nothrow) path_entry;
-		if (entry == NULL) {
-			while ((entry = currentNodes.RemoveHead()))
-				delete entry;
-			return B_NO_MEMORY;
-		}
-
-		strlcpy(entry->path, device->Path(), sizeof(entry->path));
-		currentNodes.Add(entry);
+	while (LegacyDevice* device = iterator.Next()) {
+		device->SetRepublished(false);
 	}
 
 	// now ask the driver for it's currently published devices
-	const char **devicePaths = driver->publish_devices();
+	const char** devicePaths = driver->publish_devices();
 
 	int32 exported = 0;
 	for (; devicePaths != NULL && devicePaths[0]; devicePaths++) {
-		bool present = false;
-		path_entry *entry = currentNodes.Head();
-		while (entry) {
-			if (strncmp(entry->path, devicePaths[0], B_PATH_NAME_LENGTH) == 0) {
-				// this device was present before and still is -> no republish
-				currentNodes.Remove(entry);
-				delete entry;
+		LegacyDevice* device;
+
+		iterator = driver->devices.GetIterator();
+		while ((device = iterator.Next()) != NULL) {
+			if (!strncmp(device->Path(), devicePaths[0], B_PATH_NAME_LENGTH)) {
+				// mark device as republished
+				device->SetRepublished(true);
 				exported++;
-				present = true;
 				break;
 			}
-
-			entry = currentNodes.GetNext(entry);
 		}
 
-		device_hooks *hooks = driver->find_device(devicePaths[0]);
+		device_hooks* hooks = driver->find_device(devicePaths[0]);
 		if (hooks == NULL)
 			continue;
 
-		if (present) {
+		if (device != NULL) {
 			// update hooks
-			LegacyDevice* device = get_device_for_path(driver, devicePaths[0]);
-			if (device != NULL)
-				device->SetHooks(hooks);
+			device->SetHooks(hooks);
 			continue;
 		}
 
 		// the device was not present before -> publish it now
 		TRACE(("devfs: publishing new device \"%s\"\n", devicePaths[0]));
-		LegacyDevice* device = new(std::nothrow) LegacyDevice(driver,
-			devicePaths[0], hooks);
+		device = new(std::nothrow) LegacyDevice(driver, devicePaths[0], hooks);
 		if (device != NULL && device->InitCheck() == B_OK
 			&& devfs_publish_device(devicePaths[0], device) == B_OK) {
 			driver->devices.Add(device);
@@ -302,24 +274,22 @@ republish_driver(legacy_driver* driver)
 			delete device;
 	}
 
-	// what's left in currentNodes was present but is not anymore -> unpublish
-	while (true) {
-		path_entry *entry = currentNodes.RemoveHead();
-		if (entry == NULL)
-			break;
+	// remove all devices that weren't republished
+	iterator = driver->devices.GetIterator();
+	while (LegacyDevice* device = iterator.Next()) {
+		if (device->Republished())
+			continue;
 
-		TRACE(("devfs: unpublishing no more present \"%s\"\n", entry->path));
-		LegacyDevice* device = get_device_for_path(driver, entry->path);
-		if (device != NULL)
-			driver->devices.Remove(device);
+		TRACE(("devfs: unpublishing no more present \"%s\"\n", device->Path()));
+		iterator.Remove();
 
-		devfs_unpublish_device(entry->path, true);
+		devfs_unpublish_device(device, true);
 		delete device;
-		delete entry;
 	}
 
 	if (exported == 0) {
-		TRACE(("devfs: driver \"%s\" does not publish any more nodes and is unloaded\n", driver->path));
+		TRACE(("devfs: driver \"%s\" does not publish any more nodes and is "
+			"unloaded\n", driver->path));
 		unload_driver(driver);
 	}
 
@@ -458,8 +428,8 @@ static void
 unpublish_driver(legacy_driver *driver)
 {
 	while (LegacyDevice* device = driver->devices.RemoveHead()) {
-		devfs_unpublish_device(device, true);
-		delete device;
+		if (devfs_unpublish_device(device, true) == B_OK)
+			delete device;
 	}
 }
 
@@ -550,7 +520,7 @@ add_driver(const char *path, image_id image)
 			// isn't the same anymore so rescanning of drivers will work in
 			// case this driver was loaded so early that it has a boot module
 			// path and not a proper driver path
-			free((char *)driver->path);
+			free((char*)driver->path);
 			driver->path = strdup(path);
 			driver->name = get_leaf(driver->path);
 			driver->binary_updated = true;
@@ -652,7 +622,7 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 	RecursiveLocker locker(sLock);
 
 	while (true) {
-		path_entry *path = sDriversToAdd.RemoveHead();
+		path_entry* path = sDriversToAdd.RemoveHead();
 		if (path == NULL)
 			break;
 
@@ -679,17 +649,17 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 
 
 static void
-driver_added(const char *path)
+driver_added(const char* path)
 {
 	int32 priority = get_priority(path);
 	RecursiveLocker locker(sLock);
 
-	legacy_driver *driver = (legacy_driver *)hash_lookup(sDriverHash,
+	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
 		get_leaf(path));
 
 	if (driver == NULL) {
 		// Add the driver to our list
-		path_entry *entry = new(std::nothrow) path_entry;
+		path_entry* entry = new(std::nothrow) path_entry;
 		if (entry == NULL)
 			return;
 
@@ -1155,7 +1125,8 @@ probe_for_drivers(const char *type)
 LegacyDevice::LegacyDevice(legacy_driver* driver, const char* path,
 		device_hooks* hooks)
 	:
-	fDriver(driver)
+	fDriver(driver),
+	fRepublished(true)
 {
 	fDeviceModule = (device_module_info*)malloc(sizeof(device_module_info));
 	if (fDeviceModule != NULL)
