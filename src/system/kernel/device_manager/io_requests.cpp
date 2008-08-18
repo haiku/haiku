@@ -586,6 +586,13 @@ IORequest::~IORequest()
 }
 
 
+/* static */ IORequest*
+IORequest::Create(bool vip)
+{
+	return vip ? new(vip_io_alloc) IORequest : new(std::nothrow) IORequest;
+}
+
+
 status_t
 IORequest::Init(off_t offset, void* buffer, size_t length, bool write,
 	uint32 flags)
@@ -663,13 +670,12 @@ IORequest::CreateSubRequest(off_t parentOffset, off_t offset, size_t length,
 	}
 
 	// create subrequest
-	IORequest* subRequest = (fFlags & B_VIP_IO_REQUEST) != 0
-		? new(vip_io_alloc) IORequest : new(std::nothrow) IORequest;
+	IORequest* subRequest = Create((fFlags & B_VIP_IO_REQUEST) != 0);
 	if (subRequest == NULL)
 		return B_NO_MEMORY;
 
 	status_t error = subRequest->Init(offset, vecOffset, vecs + startVec,
-		endVec - startVec + 1, length, fIsWrite, fFlags);
+		endVec - startVec + 1, length, fIsWrite, fFlags & ~B_DELETE_IO_REQUEST);
 	if (error != B_OK) {
 		delete subRequest;
 		return error;
@@ -781,6 +787,7 @@ IORequest::NotifyFinished()
 	status_t status = fStatus;
 	size_t lastTransferredOffset = fRelativeParentOffset + fTransferSize;
 	bool partialTransfer = status != B_OK || fPartialTransfer;
+	bool deleteRequest = (fFlags & B_DELETE_IO_REQUEST) != 0;
 
 	// unblock waiters
 	fFinishedCondition.NotifyAll();
@@ -798,6 +805,9 @@ IORequest::NotifyFinished()
 		parent->SubRequestFinished(this, status, partialTransfer,
 			lastTransferredOffset);
 	}
+
+	if (deleteRequest)
+		delete this;
 }
 
 

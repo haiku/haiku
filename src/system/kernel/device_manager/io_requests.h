@@ -22,6 +22,7 @@
 #define B_PHYSICAL_IO_REQUEST	0x01	/* buffer points to physical memory */
 #define B_VIP_IO_REQUEST		0x02	/* used by the page writer -- make sure
 										   allocations won't fail */
+#define B_DELETE_IO_REQUEST		0x04	/* delete request when finished */
 
 struct DMABuffer;
 struct IOOperation;
@@ -193,6 +194,7 @@ typedef struct IORequest io_request;
 typedef status_t (*io_request_finished_callback)(void* data,
 			io_request* request, status_t status, bool partialTransfer,
 			size_t transferEndOffset);
+			// TODO: Return type: status_t -> void
 typedef status_t (*io_request_iterate_callback)(void* data,
 			io_request* request, bool* _partialTransfer);
 
@@ -200,6 +202,8 @@ typedef status_t (*io_request_iterate_callback)(void* data,
 struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 								IORequest();
 	virtual						~IORequest();
+
+	static	IORequest*			Create(bool vip);
 
 			status_t			Init(off_t offset, void* buffer, size_t length,
 									bool write, uint32 flags);
