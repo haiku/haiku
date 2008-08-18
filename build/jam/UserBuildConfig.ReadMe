@@ -16,7 +16,7 @@ Exit You must NOT copy UserBuildConfig.ReadMe directly but use parts of it! ;
 AddSymlinkToHaikuImage home config settings
 	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
 
-AddFilesToHaikuImage home config settings : <keymap>US-International 
+AddFilesToHaikuImage home config settings : <keymap>US-International
 	: Key_map ;
 
 
@@ -216,7 +216,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 # jam command line prefixed by an "@" character, the profile will be selected.
 # The second parameter specifies the action to be performed, further optional
 # parameters may follow. Jam command line examples:
-# 
+#
 # jam -q @disk build
 #	-> Equivalent to running "jam -q haiku-image" with the settings for the
 #      "disk" profile. "build" is the default action, so it could even be
@@ -281,8 +281,3 @@ DeferredSubInclude HAIKU_TOP src tests add-ons kernel file_systems
 # usual). Omitting this parameter or specifying "global" will cause the given
 # name to be used recursively.
 DeferredSubInclude HAIKU_TOP src 3rdparty myproject : Jamfile.haiku : local ;
-
-
-# Copy the posix test suite onto the image (or on the installation) into 
-# "home/posixtestsuite" directory, including the run script.
-HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE = 1 ;
