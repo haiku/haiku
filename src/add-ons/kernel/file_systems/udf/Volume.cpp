@@ -1,11 +1,9 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
-//  Mad props to Axel Dörfler and his BFS implementation, from which
-//  this UDF implementation draws much influence (and a little code :-P).
-//----------------------------------------------------------------------
+/*
+ * Copyright 2008, Salvatore Benedetto, salvatore.benedetto@gmail.com
+ * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "Volume.h"
 
 #include "Icb.h"
@@ -13,19 +11,19 @@
 #include "PhysicalPartition.h"
 #include "Recognition.h"
 
-using namespace Udf;
 
-/*! \brief Creates an unmounted volume with the given id.
-*/
-Volume::Volume(nspace_id id)
-	: fId(id)
-	, fDevice(-1)
-	, fMounted(false)
-	, fOffset(0)
-	, fLength(0)
-	, fBlockSize(0)
-	, fBlockShift(0)
-	, fRootIcb(NULL)
+/*! \brief Creates an unmounted volume with the given id. */
+Volume::Volume(fs_volume *fsVolume)
+	:
+	fBlockCache(NULL),
+	fBlockShift(0),
+	fBlockSize(0),
+	fDevice(-1),
+	fFSVolume(fsVolume),
+	fLength(0),
+	fMounted(false),
+	fOffset(0),
+	fRootIcb(NULL)
 {
 	for (int i = 0; i < UDF_MAX_PARTITION_MAPS; i++)
 		fPartitions[i] = NULL;
@@ -39,15 +37,15 @@ Volume::~Volume()
 /*! \brief Attempts to mount the given device.
 
 	\param volumeStart The block on the given device whereat the volume begins.
-	\param volumeLength The block length of the volume on the given device.
+	\param volumeLength The block numBlocks of the volume on the given device.
 */
 status_t
-Volume::Mount(const char *deviceName, off_t offset, off_t length,
-              uint32 blockSize, uint32 flags)
+Volume::Mount(const char *deviceName, off_t offset, off_t numBlocks,
+	uint32 blockSize, uint32 flags)
 {
 	DEBUG_INIT_ETC("Volume",
-	               ("deviceName: `%s', offset: %Ld, length: %Ld, blockSize: %ld, "
-                   "flags: %ld", deviceName, offset, length, blockSize, flags));
+	               ("deviceName: `%s', offset: %Ld, numBlocks: %Ld, blockSize: %ld, "
+                   "flags: %ld", deviceName, offset, numBlocks, blockSize, flags));
 	if (!deviceName)
 		RETURN(B_BAD_VALUE);
 	if (Mounted()) {
@@ -64,7 +62,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 	
 	// If the device is actually a normal file, try to disable the cache
 	// for the file in the parent filesystem
-#if _KERNEL_MODE
+#if 0 //  _KERNEL_MODE
 	struct stat stat;
 	error = fstat(device, &stat) < 0 ? B_ERROR : B_OK;
 	if (!error) {
@@ -75,19 +73,19 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 #endif
 
 	logical_volume_descriptor logicalVolumeDescriptor;
-	partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
+	partition_descriptor partitionDescriptors[kMaxPartitionDescriptors];
 	uint8 partitionDescriptorCount;
 	uint32 blockShift;
 
 	// Run through the volume recognition and descriptor sequences to
 	// see if we have a potentially valid UDF volume on our hands
-	error = udf_recognize(device, offset, length, blockSize, blockShift,
-	                               logicalVolumeDescriptor, partitionDescriptors,
-	                               partitionDescriptorCount);
+	//error = udf_recognize(device, offset, numBlocks, blockSize, blockShift,
+	//			logicalVolumeDescriptor, partitionDescriptors,
+	//			partitionDescriptorCount);
 
 	// Set up the block cache
 	if (!error)
-		error = init_cache_for_device(device, length);
+		fBlockCache = block_cache_create(device, numBlocks, blockSize, IsReadOnly());
 		
 	int physicalCount = 0;
 	int virtualCount = 0;
@@ -128,7 +126,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 					error = partition ? B_OK : B_NO_MEMORY;
 					if (!error) {
 						PRINT(("Adding PhysicalPartition(number: %d, start: %ld, "
-						       "length: %ld)\n", map->partition_number(),
+						       "numBlocks: %ld)\n", map->partition_number(),
 						       descriptor->start(), descriptor->length()));						       
 						error = _SetPartition(i, partition);
 						if (!error)
@@ -197,7 +195,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 	if (!error) {
 		fDevice = device;	
 		fOffset = offset;
-		fLength = length;	
+		fLength = numBlocks;	
 		fBlockSize = blockSize;
 		fBlockShift = blockShift;
 	}
@@ -242,7 +240,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 					error = fRootIcb ? fRootIcb->InitCheck() : B_NO_MEMORY;
 				}
 				if (!error) {
-					error = new_vnode(Id(), RootIcb()->Id(), (void*)RootIcb());
+					//error = new_vnode(fFSVolume->Id(), RootIcb()->Id(), (void*)RootIcb());
 					if (error) {
 						PRINT(("Error creating vnode for root icb! "
 						       "error = 0x%lx, `%s'\n", error,
@@ -301,9 +299,9 @@ void
 Volume::_Unset()
 {
 	DEBUG_INIT("Volume");
-	fId = 0;
+	fFSVolume->id = 0;
 	if (fDevice >= 0) {
-		remove_cached_device_blocks(fDevice, NO_WRITES);	
+		block_cache_delete(fBlockCache, true);	
 		close(fDevice);
 	}
 	fDevice = -1;
@@ -340,10 +338,9 @@ Volume::_SetPartition(uint number, Partition *partition)
 /*! \brief Returns the partition associated with the given number, or
 	NULL if no such partition exists or the number is invalid.
 */
-Udf::Partition*
+Partition*
 Volume::_GetPartition(uint number)
 {
 	return (number < UDF_MAX_PARTITION_MAPS)
 	       ? fPartitions[number] : NULL;
 }
-
