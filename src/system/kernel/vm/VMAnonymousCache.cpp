@@ -376,7 +376,7 @@ VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 status_t
 VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes)
+	uint32 flags, size_t *_numBytes)
 {
 	off_t pageIndex = offset >> PAGE_SHIFT;
 
@@ -410,7 +410,7 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 		off_t pos = (swapAddr - swapFile->first_page) * B_PAGE_SIZE;
 
 		status_t status = vfs_write_pages(swapFile->vnode, NULL, pos, vecs + i,
-				n, 0, _numBytes);
+				n, flags, _numBytes);
 		if (status != B_OK) {
 			Lock();
 			fAllocatedSwapSize -= n * B_PAGE_SIZE;

@@ -73,9 +73,18 @@ VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 status_t
 VMVnodeCache::Write(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes)
+	uint32 flags, size_t *_numBytes)
 {
-	return vfs_write_pages(fVnode, NULL, offset, vecs, count, 0, _numBytes);
+	return vfs_write_pages(fVnode, NULL, offset, vecs, count, flags, _numBytes);
+}
+
+
+status_t
+VMVnodeCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
+	size_t numBytes, uint32 flags, AsyncIOCallback* callback)
+{
+	return vfs_asynchronous_write_pages(fVnode, NULL, offset, vecs, count,
+		numBytes, flags, callback);
 }
 
 

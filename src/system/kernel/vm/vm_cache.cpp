@@ -21,6 +21,7 @@
 #include <tracing.h>
 #include <util/khash.h>
 #include <util/AutoLock.h>
+#include <vfs.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
@@ -867,9 +868,25 @@ VMCache::Read(off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 
 
 status_t
-VMCache::Write(off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+VMCache::Write(off_t offset, const iovec *vecs, size_t count, uint32 flags,
+	size_t *_numBytes)
 {
 	return B_ERROR;
+}
+
+
+status_t
+VMCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
+	size_t numBytes, uint32 flags, AsyncIOCallback* callback)
+{
+	// Not supported, fall back to the synchronous hook.
+	size_t transferred = numBytes;
+	status_t error = Write(offset, vecs, count, flags, &transferred);
+
+	if (callback != NULL)
+		callback->IOFinished(error, transferred != numBytes, transferred);
+
+	return error;
 }
 
 

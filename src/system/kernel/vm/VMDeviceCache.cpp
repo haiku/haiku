@@ -36,7 +36,7 @@ VMDeviceCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 status_t
 VMDeviceCache::Write(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes)
+	uint32 flags, size_t *_numBytes)
 {
 	// no place to write, this will cause the page daemon to skip this store
 	return B_OK;

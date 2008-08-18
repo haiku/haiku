@@ -37,6 +37,7 @@
 
 #include <util/SplayTree.h>
 
+class AsyncIOCallback;
 struct vm_page_mapping;
 struct VMCache;
 typedef DoublyLinkedListLink<vm_page_mapping> vm_page_mapping_link;
@@ -224,7 +225,10 @@ public:
 	virtual	status_t	Read(off_t offset, const iovec *vecs, size_t count,
 							size_t *_numBytes);
 	virtual	status_t	Write(off_t offset, const iovec *vecs, size_t count,
-							size_t *_numBytes);
+							uint32 flags, size_t *_numBytes);
+	virtual	status_t	WriteAsync(off_t offset, const iovec* vecs,
+							size_t count, size_t numBytes, uint32 flags,
+							AsyncIOCallback* callback);
 
 	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
 

@@ -23,6 +23,7 @@
 #include <thread.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
+#include <vfs.h>
 #include <vm.h>
 #include <vm_address_space.h>
 #include <vm_priv.h>
@@ -30,6 +31,7 @@
 #include <vm_cache.h>
 
 #include "PageCacheLocker.h"
+#include "io_requests.h"
 
 
 //#define TRACE_VM_PAGE
@@ -853,30 +855,27 @@ page_scrubber(void *unused)
 
 
 static status_t
-write_page(vm_page *page)
+write_page(vm_page *page, uint32 flags, AsyncIOCallback* callback)
 {
-	size_t length = B_PAGE_SIZE;
-	status_t status;
-	iovec vecs[1];
-
 	TRACE(("write_page(page = %p): offset = %Ld\n", page, (off_t)page->cache_offset << PAGE_SHIFT));
 
-	status = vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
-		(addr_t *)&vecs[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
-	if (status < B_OK)
-		panic("could not map page!");
+	off_t offset = (off_t)page->cache_offset << PAGE_SHIFT;
+
+	iovec vecs[1];
+	vecs->iov_base = (void*)(addr_t)(page->physical_page_number * B_PAGE_SIZE);
 	vecs->iov_len = B_PAGE_SIZE;
 
-	status = page->cache->Write((off_t)page->cache_offset << PAGE_SHIFT,
-		vecs, 1, &length);
-
-	vm_put_physical_page((addr_t)vecs[0].iov_base);
-#if 0
-	if (status < B_OK) {
-		dprintf("write_page(page = %p): offset = %lx, status = %ld\n",
-			page, page->cache_offset, status);
+	if (callback != NULL) {
+		// asynchronous I/O
+		return page->cache->WriteAsync(offset, vecs, 1, B_PAGE_SIZE,
+			flags | B_PHYSICAL_IO_REQUEST, callback);
 	}
-#endif
+
+	// synchronous I/0
+	size_t length = B_PAGE_SIZE;
+	status_t status = page->cache->Write(offset, vecs, 1,
+		flags | B_PHYSICAL_IO_REQUEST, &length);
+
 	if (status == B_OK && length == 0)
 		status = B_ERROR;
 
@@ -947,6 +946,168 @@ next_modified_page(struct vm_page &marker)
 }
 
 
+class PageWriterCallback;
+
+
+class PageWriterRun {
+public:
+	status_t Init(uint32 maxPages);
+
+	void PrepareNextRun();
+	void AddPage(vm_page* page);
+	void Go();
+
+	void PageWritten(PageWriterCallback* callback, status_t status,
+		bool partialTransfer, size_t bytesTransferred);
+
+private:
+	uint32				fMaxPages;
+	uint32				fPageCount;
+	vint32				fPendingPages;
+	PageWriterCallback*	fCallbacks;
+	ConditionVariable	fAllFinishedCondition;
+};
+
+
+class PageWriterCallback : public AsyncIOCallback {
+public:
+	void SetTo(PageWriterRun* run, vm_page* page)
+	{
+		fRun = run;
+		fPage = page;
+		fCache = page->cache;
+		fStatus = B_OK;
+		fBusyCondition.Publish(page, "page");
+	}
+
+	vm_page* Page() const	{ return fPage; }
+	VMCache* Cache() const	{ return fCache; }
+	status_t Status() const	{ return fStatus; }
+
+	ConditionVariable& BusyCondition()	{ return fBusyCondition; }
+
+	virtual void IOFinished(status_t status, bool partialTransfer,
+		size_t bytesTransferred)
+	{
+		fStatus = status == B_OK && bytesTransferred == 0 ? B_ERROR : status;
+		fRun->PageWritten(this, status, partialTransfer, bytesTransferred);
+	}
+
+private:
+	PageWriterRun*		fRun;
+	vm_page*			fPage;
+	VMCache*			fCache;
+	status_t			fStatus;
+	ConditionVariable	fBusyCondition;
+};
+
+
+status_t
+PageWriterRun::Init(uint32 maxPages)
+{
+	fMaxPages = maxPages;
+	fPageCount = 0;
+	fPendingPages = 0;
+
+	fCallbacks = new(std::nothrow) PageWriterCallback[maxPages];
+	if (fCallbacks == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+void
+PageWriterRun::PrepareNextRun()
+{
+	fPageCount = 0;
+	fPendingPages = 0;
+}
+
+
+void
+PageWriterRun::AddPage(vm_page* page)
+{
+	page->state = PAGE_STATE_BUSY;
+	page->busy_writing = true;
+
+	fCallbacks[fPageCount].SetTo(this, page);
+	fPageCount++;
+}
+
+
+void
+PageWriterRun::Go()
+{
+	fPendingPages = fPageCount;
+
+	fAllFinishedCondition.Init(this, "page writer wait for I/O");
+	ConditionVariableEntry waitEntry;
+	fAllFinishedCondition.Add(&waitEntry);
+
+	// schedule writes
+	for (uint32 i = 0; i < fPageCount; i++) {
+		PageWriterCallback& callback = fCallbacks[i];
+		write_page(callback.Page(), B_VIP_IO_REQUEST, &callback);
+	}
+
+	// wait until all pages have been written
+	waitEntry.Wait();
+
+	// mark pages depending on whether they could be written or not
+
+	for (uint32 i = 0; i < fPageCount; i++) {
+		PageWriterCallback& callback = fCallbacks[i];
+		vm_page* page = callback.Page();
+		vm_cache* cache = callback.Cache();
+		cache->Lock();
+
+		if (callback.Status() == B_OK) {
+			// put it into the active queue
+			InterruptsSpinLocker locker(sPageLock);
+			move_page_to_active_or_inactive_queue(page, true);
+			page->busy_writing = false;
+		} else {
+			// We don't have to put the PAGE_MODIFIED bit back, as it's
+			// still in the modified pages list.
+			{
+				InterruptsSpinLocker locker(sPageLock);
+				page->state = PAGE_STATE_MODIFIED;
+				enqueue_page(&sModifiedPageQueue, page);
+			}
+			if (!page->busy_writing) {
+				// someone has cleared the busy_writing flag which tells
+				// us our page has gone invalid
+				cache->RemovePage(page);
+			} else
+				page->busy_writing = false;
+		}
+
+		callback.BusyCondition().Unpublish();
+
+		cache->Unlock();
+	}
+
+	for (uint32 i = 0; i < fPageCount; i++) {
+		vm_cache* cache = fCallbacks[i].Cache();
+
+		// We release the cache references after all pages were made
+		// unbusy again - otherwise releasing a vnode could deadlock.
+		cache->ReleaseStoreRef();
+		cache->ReleaseRef();
+	}
+}
+
+
+void
+PageWriterRun::PageWritten(PageWriterCallback* callback, status_t status,
+	bool partialTransfer, size_t bytesTransferred)
+{
+	if (atomic_add(&fPendingPages, -1) == 1)
+		fAllFinishedCondition.NotifyAll();
+}
+
+
 /*!	The page writer continuously takes some pages from the modified
 	queue, writes them back, and moves them back to the active queue.
 	It runs in its own thread, and is only there to keep the number
@@ -956,6 +1117,16 @@ next_modified_page(struct vm_page &marker)
 status_t
 page_writer(void* /*unused*/)
 {
+	// TODO: once the I/O scheduler is there, we should write
+	// a lot more pages back.
+	const uint32 kNumPages = 32;
+
+	PageWriterRun run;
+	if (run.Init(kNumPages) != B_OK) {
+		panic("page writer: Failed to init PageWriterRun!");
+		return B_ERROR;
+	}
+
 	vm_page marker;
 	marker.type = PAGE_TYPE_DUMMY;
 	marker.cache = NULL;
@@ -972,16 +1143,9 @@ page_writer(void* /*unused*/)
 				// all 3 seconds when no one triggers us
 		}
 
-		const uint32 kNumPages = 32;
-		ConditionVariable busyConditions[kNumPages];
-		union {
-			vm_page *pages[kNumPages];
-			vm_cache *caches[kNumPages];
-		} u;
 		uint32 numPages = 0;
+		run.PrepareNextRun();
 
-		// TODO: once the I/O scheduler is there, we should write
-		// a lot more pages back.
 		// TODO: make this laptop friendly, too (ie. only start doing
 		// something if someone else did something or there is really
 		// enough to do).
@@ -1023,77 +1187,29 @@ page_writer(void* /*unused*/)
 
 			// state might have change while we were locking the cache
 			if (page->state != PAGE_STATE_MODIFIED) {
-				// release the cache reference first
+				// release the cache reference
+				locker.Unlock();
 				cache->ReleaseStoreRef();
 				continue;
 			}
 
 			remove_page_from_queue(&sModifiedPageQueue, page);
-			page->state = PAGE_STATE_BUSY;
-			page->busy_writing = true;
 
-			busyConditions[numPages].Publish(page, "page");
+			run.AddPage(page);
 
 			locker.Unlock();
 
 			//dprintf("write page %p, cache %p (%ld)\n", page, page->cache, page->cache->ref_count);
 			vm_clear_map_flags(page, PAGE_MODIFIED);
 			cache->AcquireRefLocked();
-			u.pages[numPages++] = page;
+			numPages++;
 		}
 
 		if (numPages == 0)
 			continue;
 
-		// write pages to disk
-
-		// TODO: put this as requests into the I/O scheduler
-		status_t writeStatus[kNumPages];
-		for (uint32 i = 0; i < numPages; i++) {
-			writeStatus[i] = write_page(u.pages[i]);
-		}
-
-		// mark pages depending on whether they could be written or not
-
-		for (uint32 i = 0; i < numPages; i++) {
-			vm_cache *cache = u.pages[i]->cache;
-			cache->Lock();
-
-			if (writeStatus[i] == B_OK) {
-				// put it into the active queue
-				InterruptsSpinLocker locker(sPageLock);
-				move_page_to_active_or_inactive_queue(u.pages[i], true);
-				u.pages[i]->busy_writing = false;
-			} else {
-				// We don't have to put the PAGE_MODIFIED bit back, as it's
-				// still in the modified pages list.
-				{
-					InterruptsSpinLocker locker(sPageLock);
-					u.pages[i]->state = PAGE_STATE_MODIFIED;
-					enqueue_page(&sModifiedPageQueue, u.pages[i]);
-				}
-				if (!u.pages[i]->busy_writing) {
-					// someone has cleared the busy_writing flag which tells
-					// us our page has gone invalid
-					cache->RemovePage(u.pages[i]);
-				} else
-					u.pages[i]->busy_writing = false;
-			}
-
-			busyConditions[i].Unpublish();
-
-			u.caches[i] = cache;
-			cache->Unlock();
-		}
-
-		for (uint32 i = 0; i < numPages; i++) {
-			vm_cache *cache = u.caches[i];
-
-			// We release the cache references after all pages were made
-			// unbusy again - otherwise releasing a vnode could deadlock.
-			cache->ReleaseStoreRef();
-			cache->ReleaseRef();
-		}
+		// write pages to disk and do all the cleanup
+		run.Go();
 	}
 
 	remove_page_marker(marker);
@@ -1336,7 +1452,7 @@ vm_page_write_modified_page_range(struct VMCache *cache, uint32 firstPage,
 		vm_clear_map_flags(page, PAGE_MODIFIED);
 
 		cache->Unlock();
-		status_t status = write_page(page);
+		status_t status = write_page(page, 0, NULL);
 		cache->Lock();
 
 		InterruptsSpinLocker locker(&sPageLock);
