@@ -1,16 +1,16 @@
 /*
  * Copyright 2006-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
  */
+#ifndef _ICON_UTILS_H
+#define _ICON_UTILS_H
 
-#ifndef ICON_UTILS_H
-#define ICON_UTILS_H
 
 #include <Mime.h>
 
 class BBitmap;
 class BNode;
+
 
 // This class is a little different from many other classes.
 // You don't create an instance of it; you just call its various
@@ -65,6 +65,8 @@ public:
 	// to make any sense).
 	static	status_t			ConvertFromCMAP8(BBitmap* source,
 									BBitmap* result);
+	static	status_t			ConvertToCMAP8(BBitmap* source,
+									BBitmap* result);
 
 	static	status_t			ConvertFromCMAP8(const uint8* data,
 									uint32 width, uint32 height,
@@ -75,4 +77,4 @@ public:
 									uint32 bytesPerRow, BBitmap* result);
 };
 
-#endif // ICON_UTILS_H
+#endif	// _ICON_UTILS_H

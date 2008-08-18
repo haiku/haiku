@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku. All rights reserved.
+ * Copyright 2006-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,14 +33,79 @@ using namespace BPrivate::Icon;
 using std::nothrow;
 
 
-// GetIcon
+static void
+scale_bilinear(uint8* bits, int32 srcWidth, int32 srcHeight, int32 dstWidth,
+	int32 dstHeight, uint32 bpr)
+{
+	// first pass: scale bottom to top
+
+	uint8* dst = bits + (dstHeight - 1) * bpr;
+		// offset to bottom left pixel in target size
+	for (int32 x = 0; x < srcWidth; x++) {
+		uint8* d = dst;
+		for (int32 y = dstHeight - 1; y >= 0; y--) {
+			int32 lineF = y * 256 * (srcHeight - 1) / (dstHeight - 1);
+			int32 lineI = lineF >> 8;
+			uint8 weight = (uint8)(lineF & 0xff);
+			uint8* s1 = bits + lineI * bpr + 4 * x;
+			if (weight == 0) {
+				d[0] = s1[0];
+				d[1] = s1[1];
+				d[2] = s1[2];
+				d[3] = s1[3];
+			} else {
+				uint8* s2 = s1 + bpr;
+
+				d[0] = (((s2[0] - s1[0]) * weight) + (s1[0] << 8)) >> 8;
+				d[1] = (((s2[1] - s1[1]) * weight) + (s1[1] << 8)) >> 8;
+				d[2] = (((s2[2] - s1[2]) * weight) + (s1[2] << 8)) >> 8;
+				d[3] = (((s2[3] - s1[3]) * weight) + (s1[3] << 8)) >> 8;
+			}
+
+			d -= bpr;
+		}
+		dst += 4;
+	}
+
+	// second pass: scale right to left
+
+	dst = bits + (dstWidth - 1) * 4;
+		// offset to top left pixel in target size
+	for (int32 y = 0; y < dstWidth; y++) {
+		uint8* d = dst;
+		for (int32 x = dstWidth - 1; x >= 0; x--) {
+			int32 columnF = x * 256 * (srcWidth - 1) / (dstWidth - 1);
+			int32 columnI = columnF >> 8;
+			uint8 weight = (uint8)(columnF & 0xff);
+			uint8* s1 = bits + y * bpr + 4 * columnI;
+			if (weight == 0) {
+				d[0] = s1[0];
+				d[1] = s1[1];
+				d[2] = s1[2];
+				d[3] = s1[3];
+			} else {
+				uint8* s2 = s1 + 4;
+
+				d[0] = (((s2[0] - s1[0]) * weight) + (s1[0] << 8)) >> 8;
+				d[1] = (((s2[1] - s1[1]) * weight) + (s1[1] << 8)) >> 8;
+				d[2] = (((s2[2] - s1[2]) * weight) + (s1[2] << 8)) >> 8;
+				d[3] = (((s2[3] - s1[3]) * weight) + (s1[3] << 8)) >> 8;
+			}
+
+			d -= 4;
+		}
+		dst += bpr;
+	}
+}
+
+
+//	#pragma mark -
+
+
 status_t
-BIconUtils::GetIcon(BNode* node,
-					const char* vectorIconAttrName,
-					const char* smallIconAttrName,
-					const char* largeIconAttrName,
-					icon_size size,
-					BBitmap* result)
+BIconUtils::GetIcon(BNode* node, const char* vectorIconAttrName,
+	const char* smallIconAttrName, const char* largeIconAttrName,
+	icon_size size, BBitmap* result)
 {
 	if (!result || result->InitCheck())
 		return B_BAD_VALUE;
@@ -62,24 +127,20 @@ BIconUtils::GetIcon(BNode* node,
 				else
 					size = B_MINI_ICON;
 
-				ret = GetCMAP8Icon(node,
-								   smallIconAttrName,
-								   largeIconAttrName,
-								   size, result);
+				ret = GetCMAP8Icon(node, smallIconAttrName, largeIconAttrName,
+					size, result);
 			}
 			break;
 
 		case B_CMAP8:
 			// prefer old B_CMAP8 icons
-			ret = GetCMAP8Icon(node,
-							   smallIconAttrName,
-							   largeIconAttrName,
-							   size, result);
+			ret = GetCMAP8Icon(node, smallIconAttrName, largeIconAttrName,
+				size, result);
 			if (ret < B_OK) {
 				// try to fallback to vector icon
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-				BBitmap temp(result->Bounds(),
-							 B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+				BBitmap temp(result->Bounds(), B_BITMAP_NO_SERVER_LINK,
+					B_RGBA32);
 #else
 				BBitmap temp(result->Bounds(), B_RGBA32);
 #endif
@@ -92,8 +153,8 @@ BIconUtils::GetIcon(BNode* node,
 				uint32 width = temp.Bounds().IntegerWidth() + 1;
 				uint32 height = temp.Bounds().IntegerHeight() + 1;
 				uint32 bytesPerRow = temp.BytesPerRow();
-				ret = ConvertToCMAP8((uint8*)temp.Bits(),
-									 width, height, bytesPerRow, result);
+				ret = ConvertToCMAP8((uint8*)temp.Bits(), width, height,
+					bytesPerRow, result);
 			}
 			break;
 		default:
@@ -104,12 +165,12 @@ BIconUtils::GetIcon(BNode* node,
 	return ret;
 }
 
+
 // #pragma mark -
 
-// GetVectorIcon
+
 status_t
-BIconUtils::GetVectorIcon(BNode* node, const char* attrName,
-						  BBitmap* result)
+BIconUtils::GetVectorIcon(BNode* node, const char* attrName, BBitmap* result)
 {
 	if (!node || node->InitCheck() < B_OK || !attrName)
 		return B_BAD_VALUE;
@@ -154,10 +215,9 @@ printf("read: %lld, import: %lld\n", importTime - startTime, finishTime - import
 	return B_OK;
 }
 
-// GetVectorIcon
+
 status_t
-BIconUtils::GetVectorIcon(const uint8* buffer, size_t size,
-						  BBitmap* result)
+BIconUtils::GetVectorIcon(const uint8* buffer, size_t size, BBitmap* result)
 {
 	if (!result)
 		return B_BAD_VALUE;
@@ -211,14 +271,13 @@ BIconUtils::GetVectorIcon(const uint8* buffer, size_t size,
 	return ret;
 }
 
+
 // #pragma mark -
 
+
 status_t
-BIconUtils::GetCMAP8Icon(BNode* node,
-						 const char* smallIconAttrName,
-						 const char* largeIconAttrName,
-						 icon_size size,
-						 BBitmap* icon)
+BIconUtils::GetCMAP8Icon(BNode* node, const char* smallIconAttrName,
+	const char* largeIconAttrName, icon_size size, BBitmap* icon)
 {
 	// check parameters and initialization
 	if (!icon || icon->InitCheck() != B_OK
@@ -279,7 +338,7 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 	// read the attribute
 	if (ret == B_OK) {
 		bool tempBuffer = (icon->ColorSpace() != B_CMAP8
-						   || icon->Bounds() != bounds);
+			|| icon->Bounds() != bounds);
 		uint8* buffer = NULL;
 		ssize_t read;
 		if (tempBuffer) {
@@ -288,12 +347,11 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 			if (!buffer) {
 				ret = B_NO_MEMORY;
 			} else {
-				read = node->ReadAttr(attribute, attrType, 0, buffer,
-									  attrSize);
+				read = node->ReadAttr(attribute, attrType, 0, buffer, attrSize);
 			}
 		} else {
-			read = node->ReadAttr(attribute, attrType, 0, icon->Bits(), 
-								  attrSize);
+			read = node->ReadAttr(attribute, attrType, 0, icon->Bits(),
+				attrSize);
 		}
 		if (ret == B_OK) {
 			if (read < 0)
@@ -304,9 +362,8 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 		if (tempBuffer) {
 			// other color space than stored in attribute
 			if (ret == B_OK) {
-				ret = ConvertFromCMAP8(buffer,
-									   (uint32)size, (uint32)size,
-									   (uint32)size, icon);
+				ret = ConvertFromCMAP8(buffer, (uint32)size, (uint32)size,
+					(uint32)size, icon);
 			}
 			delete[] buffer;
 		}
@@ -314,21 +371,23 @@ BIconUtils::GetCMAP8Icon(BNode* node,
 	return ret;
 }
 
+
 // #pragma mark -
 
-// ConvertFromCMAP8
+
 status_t
 BIconUtils::ConvertFromCMAP8(BBitmap* source, BBitmap* result)
 {
-	if (!source)
+	if (source == NULL || source->ColorSpace() != B_CMAP8)
 		return B_BAD_VALUE;
 
-	status_t ret = source->InitCheck();
-	if (ret < B_OK)
-		return ret;
+	status_t status = source->InitCheck();
+	if (status < B_OK)
+		return status;
 
-	if (source->ColorSpace() != B_CMAP8)
-		return B_BAD_VALUE;
+	status = result->InitCheck();
+	if (status < B_OK)
+		return status;
 
 	uint8* src = (uint8*)source->Bits();
 	uint32 srcBPR = source->BytesPerRow();
@@ -338,78 +397,34 @@ BIconUtils::ConvertFromCMAP8(BBitmap* source, BBitmap* result)
 	return ConvertFromCMAP8(src, width, height, srcBPR, result);
 }
 
-// scale_bilinear
-static void
-scale_bilinear(uint8* bits, int32 srcWidth, int32 srcHeight,
-			   int32 dstWidth, int32 dstHeight, uint32 bpr)
+
+status_t
+BIconUtils::ConvertToCMAP8(BBitmap* source, BBitmap* result)
 {
-	// first pass: scale bottom to top
+	if (source == NULL || source->ColorSpace() != B_RGBA32
+		|| result->ColorSpace() != B_CMAP8)
+		return B_BAD_VALUE;
 
-	uint8* dst = bits + (dstHeight - 1) * bpr;
-		// offset to bottom left pixel in target size
-	for (int32 x = 0; x < srcWidth; x++) {
-		uint8* d = dst;
-		for (int32 y = dstHeight - 1; y >= 0; y--) {
-			int32 lineF = y * 256 * (srcHeight - 1) / (dstHeight - 1);
-			int32 lineI = lineF >> 8;
-			uint8 weight = (uint8)(lineF & 0xff);
-			uint8* s1 = bits + lineI * bpr + 4 * x;
-			if (weight == 0) {
-				d[0] = s1[0];
-				d[1] = s1[1];
-				d[2] = s1[2];
-				d[3] = s1[3];
-			} else {
-				uint8* s2 = s1 + bpr;
-				
-				d[0] = (((s2[0] - s1[0]) * weight) + (s1[0] << 8)) >> 8;
-				d[1] = (((s2[1] - s1[1]) * weight) + (s1[1] << 8)) >> 8;
-				d[2] = (((s2[2] - s1[2]) * weight) + (s1[2] << 8)) >> 8;
-				d[3] = (((s2[3] - s1[3]) * weight) + (s1[3] << 8)) >> 8;
-			}
+	status_t status = source->InitCheck();
+	if (status < B_OK)
+		return status;
 
-			d -= bpr;
-		}
-		dst += 4;
-	}
+	status = result->InitCheck();
+	if (status < B_OK)
+		return status;
 
-	// second pass: scale right to left
+	uint8* src = (uint8*)source->Bits();
+	uint32 srcBPR = source->BytesPerRow();
+	uint32 width = source->Bounds().IntegerWidth() + 1;
+	uint32 height = source->Bounds().IntegerHeight() + 1;
 
-	dst = bits + (dstWidth - 1) * 4;
-		// offset to top left pixel in target size
-	for (int32 y = 0; y < dstWidth; y++) {
-		uint8* d = dst;
-		for (int32 x = dstWidth - 1; x >= 0; x--) {
-			int32 columnF = x * 256 * (srcWidth - 1) / (dstWidth - 1);
-			int32 columnI = columnF >> 8;
-			uint8 weight = (uint8)(columnF & 0xff);
-			uint8* s1 = bits + y * bpr + 4 * columnI;
-			if (weight == 0) {
-				d[0] = s1[0];
-				d[1] = s1[1];
-				d[2] = s1[2];
-				d[3] = s1[3];
-			} else {
-				uint8* s2 = s1 + 4;
-				
-				d[0] = (((s2[0] - s1[0]) * weight) + (s1[0] << 8)) >> 8;
-				d[1] = (((s2[1] - s1[1]) * weight) + (s1[1] << 8)) >> 8;
-				d[2] = (((s2[2] - s1[2]) * weight) + (s1[2] << 8)) >> 8;
-				d[3] = (((s2[3] - s1[3]) * weight) + (s1[3] << 8)) >> 8;
-			}
-
-			d -= 4;
-		}
-		dst += bpr;
-	}
+	return ConvertToCMAP8(src, width, height, srcBPR, result);
 }
 
 
-// ConvertFromCMAP8
 status_t
-BIconUtils::ConvertFromCMAP8(const uint8* src,
-							 uint32 width, uint32 height, uint32 srcBPR,
-							 BBitmap* result)
+BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
+	uint32 srcBPR, BBitmap* result)
 {
 	if (!src || !result || srcBPR == 0)
 		return B_BAD_VALUE;
@@ -460,8 +475,8 @@ BIconUtils::ConvertFromCMAP8(const uint8* src,
 
 	if (dstWidth > width || dstHeight > height) {
 		// up scaling
-		scale_bilinear((uint8*)result->Bits(), width, height,
-					   dstWidth, dstHeight, dstBPR);
+		scale_bilinear((uint8*)result->Bits(), width, height, dstWidth,
+			dstHeight, dstBPR);
 	}
 
 	return B_OK;
@@ -469,11 +484,10 @@ BIconUtils::ConvertFromCMAP8(const uint8* src,
 //#endif // __HAIKU__
 }
 
-// ConvertToCMAP8
+
 status_t
-BIconUtils::ConvertToCMAP8(const uint8* src,
-						   uint32 width, uint32 height, uint32 srcBPR,
-						   BBitmap* result)
+BIconUtils::ConvertToCMAP8(const uint8* src, uint32 width, uint32 height,
+	uint32 srcBPR, BBitmap* result)
 {
 	if (!src || !result || srcBPR == 0)
 		return B_BAD_VALUE;
@@ -534,7 +548,9 @@ memset(result->Bits(), 255, result->BitsLength());
 //#endif // __HAIKU__
 }
 
+
 // #pragma mark - forbidden
+
 
 BIconUtils::BIconUtils() {}
 BIconUtils::~BIconUtils() {}
