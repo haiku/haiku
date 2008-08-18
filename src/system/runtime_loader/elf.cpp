@@ -96,7 +96,7 @@ dprintf(const char *format, ...)
 
 	va_list list;
 	va_start(list, format);
-	
+
 	vsnprintf(buffer, sizeof(buffer), format, list);
 	_kern_debug_output(buffer);
 
@@ -1131,7 +1131,7 @@ register_image(image_t *image, int fd, const char *path)
 	info.init_order = 0;
 	info.init_routine = (void (*)())image->init_routine;
 	info.term_routine = (void (*)())image->term_routine;
-	
+
 	if (_kern_read_stat(fd, NULL, false, &stat, sizeof(struct stat)) == B_OK) {
 		info.device = stat.st_dev;
 		info.node = stat.st_ino;
@@ -1154,7 +1154,8 @@ relocate_image(image_t *rootImage, image_t *image)
 {
 	status_t status = arch_relocate_image(rootImage, image);
 	if (status < B_OK) {
-		FATAL("troubles relocating: 0x%lx (image: %s)\n", status, image->name);
+		FATAL("troubles relocating: 0x%lx (image: %s, %s)\n", status,
+			image->path, image->name);
 		return status;
 	}
 
@@ -1762,7 +1763,7 @@ unload_library(image_id imageID, bool addOn)
 
 			dequeue_image(&sDisposableImages, image);
 			unmap_image(image);
-	
+
 			delete_image(image);
 		}
 	}
@@ -1816,7 +1817,7 @@ get_nth_symbol(image_id imageID, int32 num, char *nameBuffer, int32 *_nameLength
 		}
 	}
 out:
-	rld_unlock();	
+	rld_unlock();
 
 	if (num != count)
 		return B_BAD_INDEX;
