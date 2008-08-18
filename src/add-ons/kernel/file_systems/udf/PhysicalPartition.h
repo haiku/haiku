@@ -10,12 +10,10 @@
 /*! \file PhysicalPartition.h
 */
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 
 #include "Partition.h"
 #include "UdfDebug.h"
-
-namespace Udf {
 
 /*! \brief Standard type 1 physical partition
 
@@ -38,7 +36,5 @@ private:
 	uint32 fStart;
 	uint32 fLength;
 };
-
-};	// namespace Udf
 
 #endif	// _UDF_PHYSICAL_PARTITION_H

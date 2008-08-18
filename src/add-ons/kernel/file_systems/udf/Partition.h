@@ -12,8 +12,6 @@
 
 #include <SupportDefs.h>
 
-namespace Udf {
-
 /*! \brief Abstract base class for various UDF partition types.
 */
 class Partition {
@@ -23,7 +21,5 @@ public:
 //	virtual status_t MapExtent(uint32 logicalBlock, uint32 logicalLength,
 //	                           uint32 &physicalBlock, uint32 &physicalLength) = 0;
 };
-
-};	// namespace Udf
 
 #endif	// _UDF_PARTITION_H

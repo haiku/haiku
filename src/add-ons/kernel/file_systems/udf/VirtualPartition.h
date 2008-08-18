@@ -10,13 +10,11 @@
 /*! \file VirtualPartition.h
 */
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 
 #include "Partition.h"
 #include "PhysicalPartition.h"
 #include "UdfDebug.h"
-
-namespace Udf {
 
 /*! \brief Type 2 virtual partition
 
@@ -40,7 +38,5 @@ public:
 private:
 	PhysicalPartition fPhysicalPartition;
 };
-
-};	// namespace Udf
 
 #endif	// _UDF_VIRTUAL_PARTITION_H

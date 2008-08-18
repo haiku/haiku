@@ -10,13 +10,11 @@
 /*! \file SparablePartition.h
 */
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 
 #include "UdfStructures.h"
 #include "Partition.h"
 #include "UdfDebug.h"
-
-namespace Udf {
 
 /*! \brief Type 2 sparable partition
 
@@ -57,7 +55,5 @@ private:
 	uint32 fTableLocations[kMaxSparingTableCount];
 	status_t fInitStatus;
 };
-
-};	// namespace Udf
 
 #endif	// _UDF_SPARABLE_PARTITION_H
