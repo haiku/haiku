@@ -80,7 +80,6 @@ struct legacy_driver {
 	ino_t			node;
 	time_t			last_modified;
 	image_id		image;
-	uint32			devices_published;
 	uint32			devices_used;
 	bool			binary_updated;
 	int32			priority;
@@ -454,42 +453,14 @@ unload_driver(legacy_driver *driver)
 }
 
 
-/*!	Collects all devices belonging to the \a driver and unpublishs them.
-*/
+/*!	Unpublishes all devices belonging to the \a driver. */
 static void
 unpublish_driver(legacy_driver *driver)
 {
-	// Iterate through all nodes until all devices of this driver have
-	// been unpublished
-
-dprintf("IMPLEMENT unpublish_driver()!\n");
-#if 0
-	while (driver->devices_published > 0) {
-		struct hash_iterator i;
-		hash_open(sDeviceFileSystem->vnode_hash, &i);
-
-		while (true) {
-			devfs_vnode *vnode = (devfs_vnode *)hash_next(
-				sDeviceFileSystem->vnode_hash, &i);
-			if (vnode == NULL)
-				break;
-
-			if (S_ISCHR(vnode->stream.type)
-				&& vnode->stream.u.dev.driver == driver) {
-				void *dummy;
-				get_vnode(sDeviceFileSystem->volume, vnode->id, &dummy);
-					// We need to get/put the node, so that it is
-					// actually removed
-
-				unpublish_node(sDeviceFileSystem, vnode, S_IFCHR);
-				put_vnode(sDeviceFileSystem->volume, vnode->id);
-				break;
-			}
-		}
-
-		hash_close(sDeviceFileSystem->vnode_hash, &i, false);
+	while (LegacyDevice* device = driver->devices.RemoveHead()) {
+		devfs_unpublish_device(device, true);
+		delete device;
 	}
-#endif
 }
 
 
@@ -618,7 +589,6 @@ add_driver(const char *path, image_id image)
 	driver->node = stat.st_ino;
 	driver->image = image;
 	driver->last_modified = stat.st_mtime;
-	driver->devices_published = 0;
 	driver->devices_used = 0;
 	driver->binary_updated = false;
 	driver->priority = priority;
@@ -708,6 +678,51 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 }
 
 
+static void
+driver_added(const char *path)
+{
+	int32 priority = get_priority(path);
+	RecursiveLocker locker(sLock);
+
+	legacy_driver *driver = (legacy_driver *)hash_lookup(sDriverHash,
+		get_leaf(path));
+
+	if (driver == NULL) {
+		// Add the driver to our list
+		path_entry *entry = new(std::nothrow) path_entry;
+		if (entry == NULL)
+			return;
+
+		strlcpy(entry->path, path, sizeof(entry->path));
+		sDriversToAdd.Add(entry);
+	} else {
+		// Update the driver if it is affected by the new entry
+		if (priority < driver->priority)
+			return;
+
+		driver->binary_updated = true;
+	}
+
+	atomic_add(&sDriverEvents, 1);
+}
+
+
+static void
+driver_removed(const char* path)
+{
+	int32 priority = get_priority(path);
+	RecursiveLocker locker(sLock);
+
+	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
+		get_leaf(path));
+	if (driver == NULL || priority < driver->priority)
+		return;
+
+	driver->binary_updated = true;
+	atomic_add(&sDriverEvents, 1);
+}
+
+
 //	#pragma mark - DriverWatcher
 
 
@@ -737,7 +752,7 @@ DriverWatcher::EventOccured(NotificationService& service,
 		return;
 
 	driver->binary_updated = true;
-//dprintf("%s: devices published %ld, used %ld\n", driver->name, driver->devices_published, driver->devices_used);
+
 	if (driver->devices_used == 0) {
 		// trigger a reload of the driver
 		atomic_add(&sDriverEvents, 1);
@@ -764,7 +779,7 @@ dump_driver(int argc, char** argv)
 
 			kprintf("%p  %5ld %3ld %5ld %c %3ld %s\n", driver,
 				driver->image < 0 ? -1 : driver->image,
-				driver->devices_used, driver->devices_published,
+				driver->devices_used, driver->devices.Size(),
 				driver->binary_updated ? 'U' : ' ', driver->priority,
 				driver->name);
 		}
@@ -792,7 +807,7 @@ dump_driver(int argc, char** argv)
 	kprintf(" node:           %Ld\n", driver->node);
 	kprintf(" last modified:  %ld\n", driver->last_modified);
 	kprintf(" devs used:      %ld\n", driver->devices_used);
-	kprintf(" devs published: %ld\n", driver->devices_published);
+	kprintf(" devs published: %ld\n", driver->devices.Size());
 	kprintf(" binary updated: %d\n", driver->binary_updated);
 	kprintf(" priority:       %ld\n", driver->priority);
 	kprintf(" api version:    %ld\n", driver->api_version);
@@ -988,16 +1003,14 @@ DirectoryWatcher::EventOccured(NotificationService& service,
 	dprintf("driver \"%s\" %s\n", path.Leaf(),
 		opcode == B_ENTRY_CREATED ? "added" : "removed");
 
-#if 0
 	switch (opcode) {
 		case B_ENTRY_CREATED:
-			devfs_driver_added(path.Path());
+			driver_added(path.Path());
 			break;
 		case B_ENTRY_REMOVED:
-			devfs_driver_removed(path.Path());
+			driver_removed(path.Path());
 			break;
 	}
-#endif
 }
 
 
@@ -1303,51 +1316,6 @@ extern "C" status_t
 legacy_driver_add(const char* path)
 {
 	return add_driver(path, -1);
-}
-
-
-extern "C" void
-devfs_driver_added(const char *path)
-{
-	int32 priority = get_priority(path);
-	RecursiveLocker locker(sLock);
-
-	legacy_driver *driver = (legacy_driver *)hash_lookup(sDriverHash,
-		get_leaf(path));
-
-	if (driver == NULL) {
-		// Add the driver to our list
-		path_entry *entry = new(std::nothrow) path_entry;
-		if (entry == NULL)
-			return;
-
-		strlcpy(entry->path, path, sizeof(entry->path));
-		sDriversToAdd.Add(entry);
-	} else {
-		// Update the driver if it is affected by the new entry
-		if (priority < driver->priority)
-			return;
-
-		driver->binary_updated = true;
-	}
-
-	atomic_add(&sDriverEvents, 1);
-}
-
-
-extern "C" void
-devfs_driver_removed(const char* path)
-{
-	int32 priority = get_priority(path);
-	RecursiveLocker locker(sLock);
-
-	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
-		get_leaf(path));
-	if (driver == NULL || priority < driver->priority)
-		return;
-
-	driver->binary_updated = true;
-	atomic_add(&sDriverEvents, 1);
 }
 
 

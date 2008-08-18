@@ -14,6 +14,9 @@ public:
 							BaseDevice();
 	virtual					~BaseDevice();
 
+			void			SetID(ino_t id) { fID = id; }
+			ino_t			ID() const { return fID; }
+
 			device_node*	Node() const { return fNode; }
 
 	virtual	status_t		InitDevice();
@@ -50,6 +53,7 @@ public:
 			status_t		Free(void* cookie);
 
 protected:
+	ino_t					fID;
 	device_node*			fNode;
 	int32					fInitialized;
 	device_module_info*		fDeviceModule;

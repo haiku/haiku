@@ -1156,35 +1156,23 @@ device_node::~device_node()
 	}
 
 	// Delete children
-	NodeList::Iterator nodeIterator = fChildren.GetIterator();
-	while (nodeIterator.HasNext()) {
-		device_node* child = nodeIterator.Next();
-		nodeIterator.Remove();
+	while (device_node* child = fChildren.RemoveHead()) {
 		delete child;
 	}
 
 	// Delete devices
-	DeviceList::Iterator deviceIterator = fDevices.GetIterator();
-	while (deviceIterator.HasNext()) {
-		Device* device = deviceIterator.Next();
-		deviceIterator.Remove();
-		// TODO: unpublish!
+	while (Device* device = fDevices.RemoveHead()) {
+		devfs_unpublish_device(device, true);
 		delete device;
 	}
 
 	// Delete attributes
-	AttributeList::Iterator attrIterator = fAttributes.GetIterator();
-	while (attrIterator.HasNext()) {
-		device_attr_private* attr = attrIterator.Next();
-		attrIterator.Remove();
+	while (device_attr_private* attr = fAttributes.RemoveHead()) {
 		delete attr;
 	}
 
 	// Delete resources
-	ResourceList::Iterator resourceIterator = fResources.GetIterator();
-	while (resourceIterator.HasNext()) {
-		io_resource_private* resource = resourceIterator.Next();
-		resourceIterator.Remove();
+	while (io_resource_private* resource = fResources.RemoveHead()) {
 		delete resource;
 	}
 

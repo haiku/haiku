@@ -483,13 +483,6 @@ unpublish_node(struct devfs *fs, devfs_vnode *node, mode_t type)
 
 	status = remove_vnode(fs->volume, node->id);
 
-#if 0
-	if (status == B_OK && S_ISCHR(node->stream.type)
-		&& node->stream.u.dev.driver != NULL) {
-		node->stream.u.dev.driver->devices_published--;
-	}
-#endif
-
 out:
 	recursive_lock_unlock(&fs->lock);
 	return status;
@@ -2082,10 +2075,32 @@ devfs_unpublish_device(const char* path, bool disconnect)
 }
 
 
+//	#pragma mark - device_manager private API
+
+
 status_t
 devfs_publish_device(const char* path, BaseDevice* device)
 {
 	return publish_device(sDeviceFileSystem, path, device);
+}
+
+
+status_t
+devfs_unpublish_device(BaseDevice* device, bool disconnect)
+{
+	devfs_vnode* node;
+	status_t status = get_vnode(sDeviceFileSystem->volume, device->ID(),
+		(void**)&node);
+	if (status != B_OK)
+		return status;
+
+	status = unpublish_node(sDeviceFileSystem, node, S_IFCHR);
+
+	if (status == B_OK && disconnect)
+		vfs_disconnect_vnode(sDeviceFileSystem->id, node->id);
+
+	put_vnode(sDeviceFileSystem->volume, node->id);
+	return status;
 }
 
 
