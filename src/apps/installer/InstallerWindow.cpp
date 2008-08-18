@@ -192,7 +192,6 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			break;
 		case START_SCAN:
 			StartScan();
-			fBeginButton->SetEnabled(true);
 			break;
 		case BEGIN_MESSAGE:
 			switch (fInstallStatus) {
@@ -203,10 +202,10 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					fPackagesView->GetPackagesToInstall(list, &size);
 					fCopyEngine->SetPackagesList(list);
 					fCopyEngine->SetSpaceRequired(size);
+					fInstallStatus = kInstalling;
 					BMessenger(fCopyEngine).SendMessage(ENGINE_START);
 					fBeginButton->SetLabel("Stop");
 					DisableInterface(true);
-					fInstallStatus = kInstalling;
 					break;
 				}
 				case kInstalling:
@@ -397,6 +396,8 @@ InstallerWindow::AdjustMenus()
 	sprintf(message, "Press the Begin button to install from '%s' onto '%s'",
 		item1 ? item1->Name() : "null", item2 ? item2->Name() : "null");
 	SetStatusMessage(message);
+	if (item1 && item2)
+		fBeginButton->SetEnabled(true);
 }
 
 

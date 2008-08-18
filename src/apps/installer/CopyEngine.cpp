@@ -72,15 +72,7 @@ CopyEngine::MessageReceived(BMessage*msg)
 	switch (msg->what) {
 		case ENGINE_START:
 		{
-			status_t err = Start(fWindow->GetSourceMenu(),
-				fWindow->GetTargetMenu());
-			if (err != B_OK) {
-				ERR("Start failed");
-				SetStatusMessage("Installation aborted.");
-				BMessenger(fWindow).SendMessage(RESET_INSTALL);
-			} else {
-				BMessenger(fWindow).SendMessage(INSTALL_FINISHED);
-			}
+			Start(fWindow->GetSourceMenu(), fWindow->GetTargetMenu());
 			break;
 		}
 	}
@@ -124,28 +116,29 @@ CopyEngine::LaunchFinishScript(BPath &path)
 }
 
 
-status_t
+void
 CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 {
 	CALLED();
 
+	BPath targetDirectory, srcDirectory;
+	BDirectory targetDir, srcDir;
+	BDiskDevice device;
+	BPartition *partition;
+	BVolume targetVolume;
+	status_t err = B_OK;
+	
 	fControl->Reset();
 
-	status_t err = B_OK;
 	PartitionMenuItem *targetItem = (PartitionMenuItem *)targetMenu->FindMarked();
 	PartitionMenuItem *srcItem = (PartitionMenuItem *)srcMenu->FindMarked();
 	if (!srcItem || !targetItem) {
 		ERR("bad menu items\n");
-		return B_BAD_VALUE;
+		goto error;
 	}
 
 	// check if target is initialized
 	// ask if init or mount as is
-
-	BPath targetDirectory;
-	BDiskDevice device;
-	BPartition *partition;
-	BVolume targetVolume;
 
 	if (fDDRoster.GetPartitionWithID(targetItem->ID(), &device, &partition) == B_OK) {
 		if (!partition->IsMounted()) {
@@ -153,16 +146,16 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 				SetStatusMessage("The disk can't be mounted. Please choose a "
 					"different disk.");
 				ERR("BPartition::Mount");
-				return err;
+				goto error;
 			}
 		}
 		if ((err = partition->GetVolume(&targetVolume)) != B_OK) {
 			ERR("BPartition::GetVolume");
-			return err;
+			goto error;
 		}
 		if ((err = partition->GetMountPoint(&targetDirectory)) != B_OK) {
 			ERR("BPartition::GetMountPoint");
-			return err;
+			goto error;
 		}
 	} else if (fDDRoster.GetDeviceWithID(targetItem->ID(), &device) == B_OK) {
 		if (!device.IsMounted()) {
@@ -170,19 +163,19 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 				SetStatusMessage("The disk can't be mounted. Please choose a "
 					"different disk.");
 				ERR("BDiskDevice::Mount");
-				return err;
+				goto error;
 			}
 		}
 		if ((err = device.GetVolume(&targetVolume)) != B_OK) {
 			ERR("BDiskDevice::GetVolume");
-			return err;
+			goto error;
 		}
 		if ((err = device.GetMountPoint(&targetDirectory)) != B_OK) {
 			ERR("BDiskDevice::GetMountPoint");
-			return err;
+			goto error;
 		}
 	} else
-		return B_ERROR; // shouldn't happen
+		goto error; // shouldn't happen
 
 	// check if target has enough space
 	if ((fSpaceRequired > 0 && targetVolume.FreeBytes() < fSpaceRequired)
@@ -190,30 +183,27 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 			"Try choosing a different disk or choose to not install optional "
 			"items.", "Try installing anyway", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
-		BMessenger(fWindow).SendMessage(RESET_INSTALL);
-		return B_OK;
+		goto error;
 	}
 
-	BPath srcDirectory;
 	if (fDDRoster.GetPartitionWithID(srcItem->ID(), &device, &partition) == B_OK) {
 		if ((err = partition->GetMountPoint(&srcDirectory)) != B_OK) {
 			ERR("BPartition::GetMountPoint");
-			return err;
+			goto error;
 		}
 	} else if (fDDRoster.GetDeviceWithID(srcItem->ID(), &device) == B_OK) {
 		if ((err = device.GetMountPoint(&srcDirectory)) != B_OK) {
 			ERR("BDiskDevice::GetMountPoint");
-			return err;
+			goto error;
 		}
 	} else
-		return B_ERROR; // shouldn't happen
+		goto error; // shouldn't happen
 
 	// check not installing on itself
 	if (strcmp(srcDirectory.Path(), targetDirectory.Path()) == 0) {
 		SetStatusMessage("You can't install the contents of a disk onto "
 			"itself. Please choose a different disk.");
-		BMessenger(fWindow).SendMessage(RESET_INSTALL);
-		return B_OK;
+		goto error;
 	}
 
 	// check not installing on boot volume
@@ -223,19 +213,18 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 			"machine if you proceed.", "OK", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		SetStatusMessage("Installation stopped.");
-		BMessenger(fWindow).SendMessage(RESET_INSTALL);
-		return B_OK;
+		goto error;
 	}
 
 	LaunchInitScript(targetDirectory);
 
 	// copy source volume
-	BDirectory targetDir(targetDirectory.Path());
-	BDirectory srcDir(srcDirectory.Path());
+	targetDir.SetTo(targetDirectory.Path());
+	srcDir.SetTo(srcDirectory.Path());
 	err = CopyFolder(srcDir, targetDir);
-
-	if (err != B_OK)
-		return err;
+	
+	if (err != B_OK || fControl->CheckUserCanceled())
+		goto error;
 
 	// copy selected packages
 	if (fPackages) {
@@ -244,25 +233,24 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 		BDirectory packageDir;
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
-			if (fControl->CheckUserCanceled())
-				return B_CANCELED;
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
 			packageDir.SetTo(&srcDir, p->Folder());
 			err = CopyFolder(packageDir, targetDir);
-			if (err != B_OK)
-				break;
+			if (err != B_OK || fControl->CheckUserCanceled())
+				goto error;
 		}
 	}
 
-	if (err != B_OK)
-		return err;
-
-	if (fControl->CheckUserCanceled())
-		return B_CANCELED;
-	
 	LaunchFinishScript(targetDirectory);
 
-	return B_OK;
+	BMessenger(fWindow).SendMessage(INSTALL_FINISHED);
+
+	return;
+error:
+	if (err == B_CANCELED || fControl->CheckUserCanceled())
+		SetStatusMessage("Installation canceled.");
+	ERR("Start failed");
+	BMessenger(fWindow).SendMessage(RESET_INSTALL);
 }
 
 

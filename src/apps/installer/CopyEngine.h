@@ -23,8 +23,6 @@ class CopyEngine : public BLooper {
 	public:
 		CopyEngine(InstallerWindow *window);
 		void MessageReceived(BMessage *msg);
-		void SetStatusMessage(char *status);
-		status_t Start(BMenu *srcMenu, BMenu *targetMenu);
 		void ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu);
 		void SetPackagesList(BList *list);
 		void SetSpaceRequired(off_t bytes) { fSpaceRequired = bytes; };
@@ -32,6 +30,8 @@ class CopyEngine : public BLooper {
 	private:
 		void LaunchInitScript(BPath &path);
 		void LaunchFinishScript(BPath &path);
+		void SetStatusMessage(char *status);
+		void Start(BMenu *srcMenu, BMenu *targetMenu);
 		status_t CopyFolder(BDirectory &srcDir, BDirectory &targetDir);
 
 		InstallerWindow *fWindow;
