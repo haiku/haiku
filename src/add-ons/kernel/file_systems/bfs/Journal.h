@@ -121,8 +121,8 @@ public:
 	void Done()
 	{
 		if (fJournal != NULL) {
-			fJournal->Unlock(this, true);
 			_UnlockInodes();
+			fJournal->Unlock(this, true);
 		}
 		fJournal = NULL;
 	}
