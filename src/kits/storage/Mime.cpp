@@ -209,17 +209,6 @@ get_device_icon(const char *device, BBitmap *icon, icon_size which)
 	if (device == NULL || icon == NULL)
 		return B_BAD_VALUE;
 
-	BRect rect;
-	if (which == B_MINI_ICON)
-		rect.Set(0, 0, 15, 15);
-	else if (which == B_LARGE_ICON)
-		rect.Set(0, 0, 31, 31);
-	else
-		return B_BAD_VALUE;
-
-	if (icon->Bounds() != rect)
-		return B_BAD_VALUE;
-
 	uint8* data;
 	size_t size;
 	type_code type;
@@ -230,11 +219,20 @@ get_device_icon(const char *device, BBitmap *icon, icon_size which)
 		return status;
 	}
 
-	// Vector icon was not available, try old one
+	// Vector icon was not available, try old one, also checking the icon_size
+	// parameter
+
+	BRect rect;
+	if (which == B_MINI_ICON)
+		rect.Set(0, 0, 15, 15);
+	else if (which == B_LARGE_ICON)
+		rect.Set(0, 0, 31, 31);
+	else
+		return B_BAD_VALUE;
 
 	// check whether icon size and bitmap dimensions do match
-	if (icon->Bounds() != rect || icon->ColorSpace() != B_CMAP8)
-		return B_BAD_VALUE;
+	if (icon->Bounds() != rect)
+		return B_MISMATCHED_VALUES;
 
 	void* iconData = icon->Bits();
 	size_t iconSize = icon->BitsLength();
@@ -246,7 +244,7 @@ get_device_icon(const char *device, BBitmap *icon, icon_size which)
 			return B_NO_MEMORY;
 	}
 
-	// get the icon
+	// get the icon, convert temporary data into bitmap if necessary
 	status = get_device_icon(device, iconData, which);
 	if (status == B_OK && iconData != icon->Bits())
 		icon->SetBits(iconData, iconSize, 0, B_CMAP8);
@@ -282,6 +280,12 @@ get_device_icon(const char *device, uint8** _data, size_t* _size,
 
 	// Getting the named icon failed, try vector icon next
 
+	// NOTE: The actual icon size is unknown as of yet. After the first call
+	// to B_GET_VECTOR_ICON, the actual size is known and the final buffer
+	// is allocated with the correct size. If the buffer needed to be
+	// larger, then the temporary buffer above will not yet contain the
+	// valid icon data. In that case, a second call to B_GET_VECTOR_ICON
+	// retrieves it into the final buffer.
 	uint8 data[8192];
 	device_icon iconData = {sizeof(data), data};
 	status_t status = ioctl(fd, B_GET_VECTOR_ICON, &iconData,
@@ -297,6 +301,7 @@ get_device_icon(const char *device, uint8** _data, size_t* _size,
 
 	if (status == B_OK) {
 		if (iconData.icon_size > (int32)sizeof(data)) {
+			// the stack buffer does not contain the data, see NOTE above
 			iconData.icon_data = *_data;
 			status = ioctl(fd, B_GET_VECTOR_ICON, &iconData,
 				sizeof(device_icon));
