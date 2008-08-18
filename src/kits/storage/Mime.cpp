@@ -219,38 +219,39 @@ get_device_icon(const char *device, BBitmap *icon, icon_size which)
 		return status;
 	}
 
-	// Vector icon was not available, try old one, also checking the icon_size
-	// parameter
+	// Vector icon was not available, try old one
 
 	BRect rect;
 	if (which == B_MINI_ICON)
 		rect.Set(0, 0, 15, 15);
 	else if (which == B_LARGE_ICON)
 		rect.Set(0, 0, 31, 31);
-	else
-		return B_BAD_VALUE;
 
-	// check whether icon size and bitmap dimensions do match
-	if (icon->Bounds() != rect)
-		return B_MISMATCHED_VALUES;
+	BBitmap* bitmap = icon;
+	int32 iconSize = which;
 
-	void* iconData = icon->Bits();
-	size_t iconSize = icon->BitsLength();
+	if (icon->ColorSpace() != B_CMAP8
+		|| (which != B_MINI_ICON && which != B_LARGE_ICON)) {
+		if (which < B_LARGE_ICON)
+			iconSize = B_MINI_ICON;
+		else
+			iconSize = B_LARGE_ICON;
 
-	if (icon->ColorSpace() != B_CMAP8) {
-		iconSize = (size_t)which * (size_t)which;
-		iconData = malloc(iconSize);
-		if (iconData == NULL)
+		bitmap = new(std::nothrow) BBitmap(
+			BRect(0, 0, iconSize - 1, iconSize -1), B_CMAP8);
+		if (bitmap == NULL || bitmap->InitCheck() != B_OK) {
+			delete bitmap;
 			return B_NO_MEMORY;
+		}
 	}
 
 	// get the icon, convert temporary data into bitmap if necessary
-	status = get_device_icon(device, iconData, which);
-	if (status == B_OK && iconData != icon->Bits())
-		icon->SetBits(iconData, iconSize, 0, B_CMAP8);
+	status = get_device_icon(device, bitmap->Bits(), iconSize);
+	if (status == B_OK && icon != bitmap)
+		status = BIconUtils::ConvertFromCMAP8(bitmap, icon);
 
-	if (iconData != icon->Bits())
-		free(iconData);
+	if (icon != bitmap)
+		delete bitmap;
 
 	return status;
 }
