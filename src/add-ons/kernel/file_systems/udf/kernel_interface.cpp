@@ -16,7 +16,6 @@
 #include <KernelExport.h>
 #include <util/kernel_cpp.h>
 
-#include "DirectoryIterator.h"
 #include "Icb.h"
 #include "Recognition.h"
 #include "Utils.h"
