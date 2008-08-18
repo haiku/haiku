@@ -105,10 +105,6 @@ status_t periph_simple_exec(scsi_periph_device_info *device, void *cdb,
 	uchar cdb_len, void *data, size_t data_len, int ccb_flags);
 
 
-// device_icons.c
-
-status_t periph_get_icon(icon_type type, device_icon *data);
-
 // sync.c
 
 err_res periph_synchronize_cache(scsi_periph_device_info *device,

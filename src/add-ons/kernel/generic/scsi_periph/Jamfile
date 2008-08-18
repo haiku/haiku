@@ -10,7 +10,6 @@ if $(DEBUG) = 0 {
 
 KernelAddon scsi_periph :
 	block.cpp
-	device_icons.cpp
 	device.cpp
 	error_handling.cpp
 	handle.cpp

@@ -370,10 +370,6 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			return user_memcpy(buffer, &iconData, sizeof(device_icon));
 		}
 
-		case B_GET_ICON:
-			return sSCSIPeripheral->get_icon(info->removable
-				? icon_type_floppy : icon_type_disk, (device_icon *)buffer);
-
 		case B_EJECT_DEVICE:
 		case B_SCSI_EJECT:
 			return load_eject(info, false);

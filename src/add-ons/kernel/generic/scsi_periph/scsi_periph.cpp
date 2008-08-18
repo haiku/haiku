@@ -139,11 +139,9 @@ static scsi_periph_interface sSCSIPeripheralModule = {
 	periph_check_error,
 	periph_send_start_stop,
 	periph_get_media_status,
+	periph_synchronize_cache,
 
-	periph_compose_device_name,
-	periph_get_icon,
-
-	periph_synchronize_cache
+	periph_compose_device_name
 };
 
 scsi_periph_interface *modules[] = {
