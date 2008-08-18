@@ -177,7 +177,37 @@ get_device_icon(const char *device, void *icon, int32 size)
 
 	device_icon iconData = {size, icon};
 	if (ioctl(fd, B_GET_ICON, &iconData) != 0) {
+		// legacy icon was not available, try vector icon
 		close(fd);
+
+		uint8* data;
+		size_t size;
+		type_code type;
+		status_t status = get_device_icon(device, &data, &size, &type);
+		if (status == B_OK) {
+			BBitmap* icon = new(std::nothrow) BBitmap(
+				BRect(0, 0, size - 1, size - 1), B_BITMAP_NO_SERVER_LINK,
+				B_RGBA32);
+			BBitmap* target = new(std::nothrow) BBitmap(
+				BRect(0, 0, size - 1, size - 1), B_BITMAP_NO_SERVER_LINK,
+				B_CMAP8);
+			if (icon == NULL || icon->InitCheck() != B_OK || target == NULL
+				|| target->InitCheck() != B_OK) {
+				delete icon;
+				delete target;
+				return B_NO_MEMORY;
+			}
+			status = BIconUtils::GetVectorIcon(data, size, icon);
+			if (status == B_OK)
+				status = BIconUtils::ConvertToCMAP8(icon, target);
+			if (status == B_OK)
+				memcpy(icon, target->Bits(), target->BitsLength());
+
+			delete icon;
+			delete target;
+			delete[] data;
+			return status;
+		}
 		return errno;
 	}
 
@@ -238,7 +268,8 @@ get_device_icon(const char *device, BBitmap *icon, icon_size which)
 			iconSize = B_LARGE_ICON;
 
 		bitmap = new(std::nothrow) BBitmap(
-			BRect(0, 0, iconSize - 1, iconSize -1), B_CMAP8);
+			BRect(0, 0, iconSize - 1, iconSize -1), B_BITMAP_NO_SERVER_LINK,
+			B_CMAP8);
 		if (bitmap == NULL || bitmap->InitCheck() != B_OK) {
 			delete bitmap;
 			return B_NO_MEMORY;
