@@ -39,21 +39,20 @@ extern fs_vnode_ops gUDFVnodeOps;
 
 //	#pragma mark - fs_volume_ops fuctions
 
+
 static float
 udf_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
 	TRACE(("udf_identify_partition: fd = %d\n", fd));
 	logical_volume_descriptor logicalVolumeDescriptor;
 	partition_descriptor partitionDescriptors[kMaxPartitionDescriptors];
-	uint8 partitionDescriptorCount;
+	uint8 descriptorCount = kMaxPartitionDescriptors;
 	uint32 blockShift;
 	status_t error = udf_recognize(fd, partition->offset, partition->size, 2048, blockShift,
-		logicalVolumeDescriptor, partitionDescriptors, partitionDescriptorCount);
+		logicalVolumeDescriptor, partitionDescriptors, descriptorCount);
+	if (error != B_OK)
+		return -1;
 
-	if (!error) {
-		UdfString name(logicalVolumeDescriptor.logical_volume_identifier());
-		strcpy(partition->name, name.Utf8());
-	}
 	return 0.8f;
 }
 
@@ -63,6 +62,10 @@ udf_scan_partition(int fd, partition_data *partition, void *_cookie)
 {
 	TRACE(("udf_scan_partition: fd = %d\n", fd));
 
+#if 0
+	UdfString name(logicalVolumeDescriptor.logical_volume_identifier());
+	partition->content_name = strdup(name.Utf8());
+#endif
 	return B_ERROR;
 }
 
@@ -160,7 +163,7 @@ udf_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 		status = dir->Find(file, vnodeID);
 		if (status == B_OK) {
 			Icb *icb;
-			status = get_vnode(volume->FSVolume(), *vnodeID, 
+			status = get_vnode(volume->FSVolume(), *vnodeID,
 				(void **)&icb);
 			if (status != B_OK)
 				return B_ENTRY_NOT_FOUND;
@@ -168,7 +171,7 @@ udf_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 	}
 	TRACE(("udf_lookup: vnodeId: %Ld\n", *vnodeID));
 
-	return status;	
+	return status;
 }
 
 
@@ -179,7 +182,7 @@ udf_put_vnode(fs_volume *volume, fs_vnode *node, bool reenter)
 // rare circumstances.
 #if !DEBUG_TO_FILE
 	DEBUG_INIT_ETC(NULL, ("node: %p", node));
-#endif	
+#endif
 	Icb *icb = reinterpret_cast<Icb*>(node);
 	delete icb;
 #if !DEBUG_TO_FILE
@@ -229,8 +232,8 @@ static status_t
 udf_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	void *buffer, size_t *length)
 {
-	TRACE(("udf_read: ID = %d, pos = %d, length = %d\n",
-		((Volume *)volume->private_volume)->ID(), pos, length));
+	TRACE(("udf_read: ID = %ld, pos = %lld, length = %lu\n",
+		((Volume *)volume->private_volume)->ID(), pos, *length));
 
 	Icb *icb = (Icb *)vnode->private_node;
 
@@ -247,7 +250,7 @@ static status_t
 udf_open_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 {
 	DEBUG_INIT_ETC(NULL, ("node: %p, cookie: %p", node, cookie));
-	
+
 	if (!volume || !vnode || !cookie)
 		RETURN(B_BAD_VALUE);
 
@@ -259,15 +262,15 @@ udf_open_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 		DirectoryIterator *iterator = NULL;
 		status = dir->GetDirectoryIterator(&iterator);
 		if (!status) {
-			*cookie = reinterpret_cast<void*>(iterator);	
+			*cookie = reinterpret_cast<void*>(iterator);
 		} else {
 			PRINT(("Error getting directory iterator: 0x%lx, `%s'\n", status, strerror(error)));
-		}	
+		}
 	} else {
 		PRINT(("Given icb is not a directory (type: %d)\n", dir->Type()));
 		status = B_BAD_VALUE;
 	}
-	
+
 	RETURN(status);
 }
 
@@ -282,7 +285,7 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 	if (!_volume || !vnode || !cookie || !_num || bufferSize < sizeof(dirent))
 		RETURN(B_BAD_VALUE);
 
-	Volume *volume = (Volume *)_volume->private_volume;	
+	Volume *volume = (Volume *)_volume->private_volume;
 	Icb *dir = (Icb *)vnode->private_node;
 	DirectoryIterator *iterator = reinterpret_cast<DirectoryIterator*>(cookie);
 
@@ -291,7 +294,7 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 		       iterator->Parent()));
 		return B_BAD_VALUE;
 	}
-	
+
 	uint32 nameLength = bufferSize - sizeof(dirent) + 1;
 	ino_t id;
 	status_t status = iterator->GetNextEntry(dirent->d_name, &nameLength, &id);
@@ -306,7 +309,7 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 		if (status == B_ENTRY_NOT_FOUND)
 			status = B_OK;
 	}
-	
+
 	RETURN(status);
 }
 
@@ -316,7 +319,7 @@ udf_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	DEBUG_INIT_ETC(NULL,
 		       ("dir: %p, iterator: %p", node, cookie));
-		       
+
 	if (!volume || !vnode || !cookie)
 		RETURN(B_BAD_VALUE);
 
@@ -335,7 +338,7 @@ udf_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 }
 
 
-//	#pragma mark - 
+//	#pragma mark -
 
 
 /*! \brief mount
@@ -386,8 +389,8 @@ udf_mount(fs_volume *_volume, const char *_device, uint32 flags,
 		// Finally, if that also fails, we're probably stuck with trying to mount
 		// a regular file, so we just stat() it to get the device size.
 		//
-		// If that fails, you're just SOL. 
-		
+		// If that fails, you're just SOL.
+
 		if (ioctl(device, B_GET_PARTITION_INFO, &info) == 0) {
 			PRINT(("partition_info:\n"));
 			PRINT(("  offset:             %Ld\n", info.offset));
@@ -420,7 +423,7 @@ udf_mount(fs_volume *_volume, const char *_device, uint32 flags,
 		// Close the device
 		close(device);
 	}
-	
+
 	// Create and mount the volume
 	volume = new(std::nothrow) Volume(_volume);
 	status = volume->Mount(_device, deviceOffset, numBlock, 2048, flags);
@@ -578,7 +581,7 @@ static file_system_module_info sUDFFileSystem = {
 	NULL,
 };
 
-module_info *module[] = {
+module_info *modules[] = {
 	(module_info *)&sUDFFileSystem,
 	NULL,
 };
