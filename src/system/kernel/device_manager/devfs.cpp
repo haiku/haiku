@@ -707,6 +707,7 @@ publish_device(struct devfs* fs, const char* path, BaseDevice* device)
 	// all went fine, let's initialize the node
 	node->stream.type = S_IFCHR | 0644;
 	node->stream.u.dev.device = device;
+	device->SetID(node->id);
 
 	// the node is now fully valid and we may insert it into the dir
 	publish_node(fs, dirNode, node);
