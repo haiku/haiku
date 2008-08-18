@@ -40,8 +40,7 @@
 struct gl_program_parameter_list *
 _mesa_new_parameter_list(void)
 {
-   return (struct gl_program_parameter_list *)
-      _mesa_calloc(sizeof(struct gl_program_parameter_list));
+   return CALLOC_STRUCT(gl_program_parameter_list);
 }
 
 

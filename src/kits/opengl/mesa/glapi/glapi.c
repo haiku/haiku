@@ -724,7 +724,7 @@ add_function_name( const char * funcName )
  * \returns
  * The offset in the dispatch table of the named function.  A pointer to the
  * driver's implementation of the named function should be stored at
- * \c dispatch_table[\c offset].
+ * \c dispatch_table[\c offset].  Return -1 if error/problem.
  *
  * \sa glXGetProcAddress
  *
@@ -773,7 +773,7 @@ _glapi_add_dispatch( const char * const * function_names,
        */
 
       if (!function_names[i] || function_names[i][0] != 'g' || function_names[i][1] != 'l')
-	return GL_FALSE;
+         return -1;
    
       /* Determine if the named function already exists.  If the function does
        * exist, it must have the same parameter signature as the function

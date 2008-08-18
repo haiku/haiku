@@ -131,7 +131,7 @@ static void vbo_bind_vertex_list( GLcontext *ctx,
       break;
    }
 
-   for (attr = 0; attr < VBO_ATTRIB_MAX; attr++) {
+   for (attr = 0; attr < VERT_ATTRIB_MAX; attr++) {
       GLuint src = map[attr];
 
       if (node->attrsz[src]) {
@@ -146,7 +146,7 @@ static void vbo_bind_vertex_list( GLcontext *ctx,
 	 
 	 assert(arrays[attr].BufferObj->Name);
 
-	 data += node->attrsz[attr] * sizeof(GLfloat);
+	 data += node->attrsz[src] * sizeof(GLfloat);
       }
    }
 }

@@ -713,8 +713,8 @@ gluSphere(GLUquadric *qobj, GLdouble radius, GLint slices, GLint stacks)
     GLfloat cosCache3b[CACHE_SIZE];
     GLfloat angle;
     GLfloat zLow, zHigh;
-    GLfloat sintemp1, sintemp2, sintemp3 = 0.0, sintemp4 = 0.0;
-    GLfloat costemp1, costemp2 = 0.0, costemp3 = 0.0, costemp4 = 0.0;
+    GLfloat sintemp1 = 0.0, sintemp2 = 0.0, sintemp3 = 0.0, sintemp4 = 0.0;
+    GLfloat costemp1 = 0.0, costemp2 = 0.0, costemp3 = 0.0, costemp4 = 0.0;
     GLboolean needCache2, needCache3;
     GLint start, finish;
 

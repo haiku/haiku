@@ -205,6 +205,7 @@ typedef struct
     * on some systems.
     */
    SWspanarrays *SpanArrays;
+   SWspanarrays *ZoomedArrays;  /**< For pixel zooming */
 
    /**
     * Used to buffer N GL_POINTS, instead of rendering one by one.

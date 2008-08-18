@@ -88,7 +88,7 @@ _swrast_Bitmap( GLcontext *ctx, GLint px, GLint py,
    _swrast_span_default_secondary_color(ctx, &span);
    if (ctx->Depth.Test)
       _swrast_span_default_z(ctx, &span);
-   if (swrast->_FogEnabled)
+   if (SPAN_NEEDS_FOG(ctx))
       _swrast_span_default_fog(ctx, &span);
    if (ctx->Texture._EnabledCoordUnits)
       _swrast_span_default_texcoords(ctx, &span);

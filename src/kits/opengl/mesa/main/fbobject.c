@@ -1464,7 +1464,12 @@ _mesa_GetFramebufferAttachmentParameterivEXT(GLenum target, GLenum attachment,
       return;
    case GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE_EXT:
       if (att->Type == GL_TEXTURE) {
-	 *params = GL_TEXTURE_CUBE_MAP_POSITIVE_X + att->CubeMapFace;
+         if (att->Texture && att->Texture->Target == GL_TEXTURE_CUBE_MAP) {
+            *params = GL_TEXTURE_CUBE_MAP_POSITIVE_X + att->CubeMapFace;
+         }
+         else {
+            *params = 0;
+         }
       }
       else {
 	 _mesa_error(ctx, GL_INVALID_ENUM,
@@ -1473,7 +1478,12 @@ _mesa_GetFramebufferAttachmentParameterivEXT(GLenum target, GLenum attachment,
       return;
    case GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_EXT:
       if (att->Type == GL_TEXTURE) {
-	 *params = att->Zoffset;
+         if (att->Texture && att->Texture->Target == GL_TEXTURE_3D) {
+            *params = att->Zoffset;
+         }
+         else {
+            *params = 0;
+         }
       }
       else {
 	 _mesa_error(ctx, GL_INVALID_ENUM,

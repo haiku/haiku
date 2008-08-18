@@ -113,13 +113,13 @@ int __constructor(const float f)
 bool __constructor(const int i)
 {
    const float zero = 0.0;
-   __asm vec4_seq __retVal, i, zero;
+   __asm vec4_sne __retVal, i, zero;
 }
 
 bool __constructor(const float f)
 {
    const float zero = 0.0;
-   __asm vec4_seq __retVal, i, zero;
+   __asm vec4_sne __retVal, f, zero;
 }
 
 int __constructor(const bool b)
@@ -341,14 +341,27 @@ bvec2 __constructor(const bool b)
 bvec2 __constructor(const float f)
 {
    const vec2 zero = vec2(0.0, 0.0);
-   __asm vec4_seq __retVal.xy, f.xx, zero;
+   __asm vec4_sne __retVal.xy, f.xx, zero;
 }
 
 bvec2 __constructor(const int i)
 {
    const ivec2 zero = ivec2(0, 0);
-   __asm vec4_seq __retVal.xy, i.xx, zero;
+   __asm vec4_sne __retVal.xy, i.xx, zero;
 }
+
+bvec2 __constructor(const vec2 v)
+{
+   const vec2 zero = vec2(0.0, 0.0);
+   __asm vec4_sne __retVal.xy, v, zero;
+}
+
+bvec2 __constructor(const ivec2 v)
+{
+   const ivec2 zero = ivec2(0, 0);
+   __asm vec4_sne __retVal.xy, v, zero;
+}
+
 
 
 //// bvec3 constructors
@@ -368,14 +381,27 @@ bvec3 __constructor(const bool b)
 bvec3 __constructor(const float f)
 {
    const vec3 zero = vec3(0.0, 0.0, 0.0);
-   __asm vec4_seq __retVal.xyz, f.xxx, zero;
+   __asm vec4_sne __retVal.xyz, f.xxx, zero;
 }
 
 bvec3 __constructor(const int i)
 {
    const ivec3 zero = ivec3(0, 0, 0);
-   __asm vec4_seq __retVal.xyz, i.xxx, zero;
+   __asm vec4_sne __retVal.xyz, i.xxx, zero;
 }
+
+bvec3 __constructor(const vec3 v)
+{
+   const vec3 zero = vec3(0.0, 0.0, 0.0);
+   __asm vec4_sne __retVal.xyz, v, zero;
+}
+
+bvec3 __constructor(const ivec3 v)
+{
+   const ivec3 zero = ivec3(0, 0, 0);
+   __asm vec4_sne __retVal.xyz, v, zero;
+}
+
 
 
 //// bvec4 constructors
@@ -396,13 +422,25 @@ bvec4 __constructor(const bool b)
 bvec4 __constructor(const float f)
 {
    const vec4 zero = vec4(0.0, 0.0, 0.0, 0.0);
-   __asm vec4_seq __retVal, f.xxxx, zero;
+   __asm vec4_sne __retVal, f.xxxx, zero;
 }
 
 bvec4 __constructor(const int i)
 {
    const ivec4 zero = ivec4(0, 0, 0, 0);
-   __asm vec4_seq __retVal, i.xxxx, zero;
+   __asm vec4_sne __retVal, i.xxxx, zero;
+}
+
+bvec4 __constructor(const vec4 v)
+{
+   const vec4 zero = vec4(0.0, 0.0, 0.0, 0.0);
+   __asm vec4_sne __retVal, v, zero;
+}
+
+bvec4 __constructor(const ivec4 v)
+{
+   const ivec4 zero = ivec4(0, 0, 0, 0);
+   __asm vec4_sne __retVal, v, zero;
 }
 
 
@@ -1180,6 +1218,7 @@ void __operator /= (inout int a, const int b)
    float invB;
    __asm float_rcp invB, b;
    __asm vec4_multiply a, a, invB;
+   __asm float_to_int __retVal, a;
 }
 
 
@@ -1472,7 +1511,7 @@ void __operator /= (inout vec2 v, const float a)
 {
    float invA;
    __asm float_rcp invA, a;
-   __asm vec4_multiply v.xy, v.xy, a.xx;
+   __asm vec4_multiply v.xy, v.xy, invA.xx;
 }
 
 
@@ -1497,7 +1536,7 @@ void __operator /= (inout vec3 v, const float a)
 {
    float invA;
    __asm float_rcp invA, a;
-   __asm vec4_multiply v.xyz, v.xyz, a.xxx;
+   __asm vec4_multiply v.xyz, v.xyz, invA.xxx;
 }
 
 
@@ -1522,7 +1561,7 @@ void __operator /= (inout vec4 v, const float a)
 {
    float invA;
    __asm float_rcp invA, a;
-   __asm vec4_multiply v, v, a.xxxx;
+   __asm vec4_multiply v, v, invA.xxxx;
 }
 
 

@@ -42,7 +42,8 @@ fetch_texel( GLcontext *ctx, const GLfloat texcoord[4], GLfloat lambda,
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
    const struct gl_texture_object *texObj = ctx->Texture.Unit[unit]._Current;
 
-   lambda = CLAMP(lambda, texObj->MinLod, texObj->MaxLod);
+   if (texObj)
+      lambda = CLAMP(lambda, texObj->MinLod, texObj->MaxLod);
 
    /* XXX use a float-valued TextureSample routine here!!! */
    swrast->TextureSample[unit](ctx, texObj, 1, (const GLfloat (*)[4]) texcoord,
@@ -65,20 +66,23 @@ fetch_texel_deriv( GLcontext *ctx, const GLfloat texcoord[4],
 {
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
    const struct gl_texture_object *texObj = ctx->Texture.Unit[unit]._Current;
-   const struct gl_texture_image *texImg = texObj->Image[0][texObj->BaseLevel];
-   const GLfloat texW = (GLfloat) texImg->WidthScale;
-   const GLfloat texH = (GLfloat) texImg->HeightScale;
+   GLfloat lambda;
    GLchan rgba[4];
 
-   GLfloat lambda
-      = _swrast_compute_lambda(texdx[0], texdy[0], /* ds/dx, ds/dy */
-                               texdx[1], texdy[1], /* dt/dx, dt/dy */
-                               texdx[3], texdy[2], /* dq/dx, dq/dy */
-                               texW, texH,
-                               texcoord[0], texcoord[1], texcoord[3],
-                               1.0F / texcoord[3]) + lodBias;
+   if (texObj) {
+      const struct gl_texture_image *texImg = texObj->Image[0][texObj->BaseLevel];
+      const GLfloat texW = (GLfloat) texImg->WidthScale;
+      const GLfloat texH = (GLfloat) texImg->HeightScale;
 
-   lambda = CLAMP(lambda, texObj->MinLod, texObj->MaxLod);
+      lambda = _swrast_compute_lambda(texdx[0], texdy[0], /* ds/dx, ds/dy */
+                                      texdx[1], texdy[1], /* dt/dx, dt/dy */
+                                      texdx[3], texdy[2], /* dq/dx, dq/dy */
+                                      texW, texH,
+                                      texcoord[0], texcoord[1], texcoord[3],
+                                      1.0F / texcoord[3]) + lodBias;
+
+      lambda = CLAMP(lambda, texObj->MinLod, texObj->MaxLod);
+   }
 
    swrast->TextureSample[unit](ctx, texObj, 1, (const GLfloat (*)[4]) texcoord,
                                &lambda, &rgba);

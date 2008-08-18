@@ -342,8 +342,9 @@ _mesa_Bitmap( GLsizei width, GLsizei height,
 
    if (ctx->RenderMode == GL_RENDER) {
       /* Truncate, to satisfy conformance tests (matches SGI's OpenGL). */
-      GLint x = IFLOOR(ctx->Current.RasterPos[0] - xorig);
-      GLint y = IFLOOR(ctx->Current.RasterPos[1] - yorig);
+      const GLfloat epsilon = 0.0001;
+      GLint x = IFLOOR(ctx->Current.RasterPos[0] + epsilon - xorig);
+      GLint y = IFLOOR(ctx->Current.RasterPos[1] + epsilon - yorig);
       ctx->Driver.Bitmap( ctx, x, y, width, height, &ctx->Unpack, bitmap );
    }
 #if _HAVE_FULL_GL

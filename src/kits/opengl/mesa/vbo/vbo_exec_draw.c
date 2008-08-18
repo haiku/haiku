@@ -187,7 +187,7 @@ static void vbo_exec_bind_arrays( GLcontext *ctx )
 	 arrays[attr].BufferObj = exec->vtx.bufferobj; /* NullBufferObj */
 	 arrays[attr]._MaxElement = count; /* ??? */
 
-	 data += exec->vtx.attrsz[attr] * sizeof(GLfloat);
+	 data += exec->vtx.attrsz[src] * sizeof(GLfloat);
       }
    }
 }

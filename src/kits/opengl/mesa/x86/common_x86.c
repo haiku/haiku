@@ -38,9 +38,14 @@
 #if defined(USE_SSE_ASM) && defined(__linux__)
 #include <linux/version.h>
 #endif
-#if defined(USE_SSE_ASM) && defined(__FreeBSD__)
+#if defined(USE_SSE_ASM) && (defined(__FreeBSD__) || defined(__DragonFly__))
 #include <sys/types.h>
 #include <sys/sysctl.h>
+#endif
+#if defined(USE_SSE_ASM) && defined(__OpenBSD__)
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#include <machine/cpu.h>
 #endif
 
 #include "common_x86_asm.h"
@@ -104,12 +109,33 @@ static LONG WINAPI ExceptionFilter(LPEXCEPTION_POINTERS exp)
 
 static void check_os_sse_support( void )
 {
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__DragonFly__)
    {
       int ret, enabled;
       unsigned int len;
       len = sizeof(enabled);
       ret = sysctlbyname("hw.instruction_sse", &enabled, &len, NULL, 0);
+      if (ret || !enabled)
+         _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
+   }
+#elif defined (__NetBSD__)
+   {
+      int ret, enabled;
+      size_t len = sizeof(enabled);
+      ret = sysctlbyname("machdep.sse", &enabled, &len, (void *)NULL, 0);
+      if (ret || !enabled)
+         _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
+   }
+#elif defined(__OpenBSD__)
+   {
+      int mib[2];
+      int ret, enabled;
+      size_t len = sizeof(enabled);
+
+      mib[0] = CTL_MACHDEP;
+      mib[1] = CPU_SSE;
+
+      ret = sysctl(mib, 2, &enabled, &len, NULL, 0);
       if (ret || !enabled)
          _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
    }

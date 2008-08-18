@@ -368,11 +368,14 @@ index_aa_tri(GLcontext *ctx,
  * Compute mipmap level of detail.
  * XXX we should really include the R coordinate in this computation
  * in order to do 3-D texture mipmapping.
+ * \param cx, cy  fragment center position
+ * \param unit  texture unit
  */
 static INLINE GLfloat
-compute_lambda(const GLfloat sPlane[4], const GLfloat tPlane[4],
+compute_lambda(GLcontext *ctx,
+               const GLfloat sPlane[4], const GLfloat tPlane[4],
                const GLfloat qPlane[4], GLfloat cx, GLfloat cy,
-               GLfloat invQ, GLfloat texWidth, GLfloat texHeight)
+               GLfloat invQ, GLuint unit)
 {
    const GLfloat s = solve_plane(cx, cy, sPlane);
    const GLfloat t = solve_plane(cx, cy, tPlane);
@@ -387,6 +390,15 @@ compute_lambda(const GLfloat sPlane[4], const GLfloat tPlane[4],
    GLfloat dtdx = t_x1 * invQ_x1 - t * invQ;
    GLfloat dtdy = t_y1 * invQ_y1 - t * invQ;
    GLfloat maxU, maxV, rho, lambda;
+   GLfloat texWidth = 1.0, texHeight = 1.0;
+   const struct gl_texture_object *obj = ctx->Texture.Unit[unit]._Current;
+   if (obj) {
+      const struct gl_texture_image *texImage = obj->Image[0][obj->BaseLevel];
+      if (texImage){
+         texWidth = (GLfloat) texImage->Width;
+         texHeight = (GLfloat) texImage->Height;
+      }
+   }
    dsdx = FABSF(dsdx);
    dsdy = FABSF(dsdy);
    dtdx = FABSF(dtdx);

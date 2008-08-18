@@ -79,7 +79,7 @@ new_subroutine(slang_emit_info *emitInfo, GLuint *id)
       _mesa_realloc(emitInfo->Subroutines,
                     n * sizeof(struct gl_program),
                     (n + 1) * sizeof(struct gl_program));
-   emitInfo->Subroutines[n] = _mesa_new_program(ctx, emitInfo->prog->Target, 0);
+   emitInfo->Subroutines[n] = ctx->Driver.NewProgram(ctx, emitInfo->prog->Target, 0);
    emitInfo->Subroutines[n]->Parameters = emitInfo->prog->Parameters;
    emitInfo->NumSubroutines++;
    *id = n;
@@ -465,6 +465,12 @@ emit_arith(slang_emit_info *emitInfo, slang_ir_node *n)
    const slang_ir_info *info = _slang_ir_info(n->Opcode);
    char *srcAnnot[3], *dstAnnot;
    GLuint i;
+   slang_ir_node *temps[3];
+
+   /* we'll save pointers to nodes/storage to free in temps[] until
+    * the very end.
+    */
+   temps[0] = temps[1] = temps[2] = NULL;
 
    assert(info);
    assert(info->InstOpcode != OPCODE_NOP);
@@ -485,9 +491,9 @@ emit_arith(slang_emit_info *emitInfo, slang_ir_node *n)
       storage_to_src_reg(&inst->SrcReg[0], n->Children[0]->Children[0]->Store);
       storage_to_src_reg(&inst->SrcReg[1], n->Children[0]->Children[1]->Store);
       storage_to_src_reg(&inst->SrcReg[2], n->Children[1]->Store);
-      free_temp_storage(emitInfo->vt, n->Children[0]->Children[0]);
-      free_temp_storage(emitInfo->vt, n->Children[0]->Children[1]);
-      free_temp_storage(emitInfo->vt, n->Children[1]);
+      temps[0] = n->Children[0]->Children[0];
+      temps[1] = n->Children[0]->Children[1];
+      temps[2] = n->Children[1];
    }
    else if (info->NumParams == 2 &&
             n->Opcode == IR_ADD && n->Children[1]->Opcode == IR_MUL) {
@@ -501,9 +507,9 @@ emit_arith(slang_emit_info *emitInfo, slang_ir_node *n)
       storage_to_src_reg(&inst->SrcReg[0], n->Children[1]->Children[0]->Store);
       storage_to_src_reg(&inst->SrcReg[1], n->Children[1]->Children[1]->Store);
       storage_to_src_reg(&inst->SrcReg[2], n->Children[0]->Store);
-      free_temp_storage(emitInfo->vt, n->Children[1]->Children[0]);
-      free_temp_storage(emitInfo->vt, n->Children[1]->Children[1]);
-      free_temp_storage(emitInfo->vt, n->Children[0]);
+      temps[0] = n->Children[1]->Children[0];
+      temps[1] = n->Children[1]->Children[1];
+      temps[2] = n->Children[0];
    }
    else
 #endif
@@ -528,23 +534,30 @@ emit_arith(slang_emit_info *emitInfo, slang_ir_node *n)
       for (i = 0; i < info->NumParams; i++)
          srcAnnot[i] = storage_annotation(n->Children[i], emitInfo->prog);
 
-      /* free temps */
+      /* record (potential) temps to free */
       for (i = 0; i < info->NumParams; i++)
-         free_temp_storage(emitInfo->vt, n->Children[i]);
+         temps[i] = n->Children[i];
    }
 
    /* result storage */
    if (!n->Store) {
-      /* XXX this size isn't correct, it depends on the operands */
-      if (!alloc_temp_storage(emitInfo, n, info->ResultSize))
+      GLint size = n->Children[0]->Store
+         ? n->Children[0]->Store->Size : info->ResultSize;
+      if (!alloc_temp_storage(emitInfo, n, size))
          return NULL;
    }
+
    storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
 
    dstAnnot = storage_annotation(n, emitInfo->prog);
 
    inst->Comment = instruction_annotation(inst->Opcode, dstAnnot, srcAnnot[0],
                                           srcAnnot[1], srcAnnot[2]);
+
+   /* really free temps now */
+   for (i = 0; i < 3; i++)
+      if (temps[i])
+         free_temp_storage(emitInfo->vt, temps[i]);
 
    /*_mesa_print_instruction(inst);*/
    return inst;
@@ -1644,6 +1657,9 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
    case IR_COS:
    case IR_DDX:
    case IR_DDY:
+   case IR_EXP:
+   case IR_EXP2:
+   case IR_LOG2:
    case IR_NOISE1:
    case IR_NOISE2:
    case IR_NOISE3:
@@ -1664,8 +1680,6 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
    case IR_SLE:
    case IR_SLT:
    case IR_POW:
-   case IR_EXP:
-   case IR_EXP2:
    /* trinary operators */
    case IR_LRP:
       return emit_arith(emitInfo, n);

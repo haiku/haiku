@@ -151,6 +151,10 @@ extern void
 _mesa_get_uniformfv(GLcontext *ctx, GLuint program, GLint location,
                     GLfloat *params);
 
+extern void
+_mesa_get_uniformiv(GLcontext *ctx, GLuint program, GLint location,
+                    GLint *params);
+
 extern GLint
 _mesa_get_uniform_location(GLcontext *ctx, GLuint program, const GLchar *name);
 

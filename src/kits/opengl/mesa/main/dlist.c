@@ -3246,6 +3246,36 @@ save_StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
 
 
 static void GLAPIENTRY
+save_StencilFuncSeparateATI(GLenum frontfunc, GLenum backfunc, GLint ref,
+                            GLuint mask)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   Node *n;
+   ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
+   /* GL_FRONT */
+   n = ALLOC_INSTRUCTION(ctx, OPCODE_STENCIL_FUNC_SEPARATE, 4);
+   if (n) {
+      n[1].e = GL_FRONT;
+      n[2].e = frontfunc;
+      n[3].i = ref;
+      n[4].ui = mask;
+   }
+   /* GL_BACK */
+   n = ALLOC_INSTRUCTION(ctx, OPCODE_STENCIL_FUNC_SEPARATE, 4);
+   if (n) {
+      n[1].e = GL_BACK;
+      n[2].e = backfunc;
+      n[3].i = ref;
+      n[4].ui = mask;
+   }
+   if (ctx->ExecuteFlag) {
+      CALL_StencilFuncSeparate(ctx->Exec, (GL_FRONT, frontfunc, ref, mask));
+      CALL_StencilFuncSeparate(ctx->Exec, (GL_BACK, backfunc, ref, mask));
+   }
+}
+
+
+static void GLAPIENTRY
 save_StencilMaskSeparate(GLenum face, GLuint mask)
 {
    GET_CURRENT_CONTEXT(ctx);
@@ -7869,6 +7899,9 @@ _mesa_init_dlist_table(struct _glapi_table *table)
    SET_StencilFuncSeparate(table, save_StencilFuncSeparate);
    SET_StencilMaskSeparate(table, save_StencilMaskSeparate);
    SET_StencilOpSeparate(table, save_StencilOpSeparate);
+
+   /* ATI_separate_stencil */ 
+   SET_StencilFuncSeparateATI(table, save_StencilFuncSeparateATI);
 
    /* GL_ARB_imaging */
    /* Not all are supported */

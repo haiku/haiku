@@ -128,9 +128,16 @@ _mesa_free_shader_program_data(GLcontext *ctx,
    for (i = 0; i < shProg->NumShaders; i++) {
       _mesa_reference_shader(ctx, &shProg->Shaders[i], NULL);
    }
+   shProg->NumShaders = 0;
+
    if (shProg->Shaders) {
       _mesa_free(shProg->Shaders);
       shProg->Shaders = NULL;
+   }
+
+   if (shProg->InfoLog) {
+      _mesa_free(shProg->InfoLog);
+      shProg->InfoLog = NULL;
    }
 }
 
@@ -142,10 +149,7 @@ void
 _mesa_free_shader_program(GLcontext *ctx, struct gl_shader_program *shProg)
 {
    _mesa_free_shader_program_data(ctx, shProg);
-   if (shProg->Shaders) {
-      _mesa_free(shProg->Shaders);
-      shProg->Shaders = NULL;
-   }
+
    _mesa_free(shProg);
 }
 
@@ -380,6 +384,17 @@ sizeof_glsl_type(GLenum type)
    case GL_BOOL:
    case GL_FLOAT:
    case GL_INT:
+   case GL_SAMPLER_1D:
+   case GL_SAMPLER_2D:
+   case GL_SAMPLER_3D:
+   case GL_SAMPLER_CUBE:
+   case GL_SAMPLER_1D_SHADOW:
+   case GL_SAMPLER_2D_SHADOW:
+   case GL_SAMPLER_2D_RECT_ARB:
+   case GL_SAMPLER_2D_RECT_SHADOW_ARB:
+   case GL_SAMPLER_1D_ARRAY_SHADOW_EXT:
+   case GL_SAMPLER_2D_ARRAY_SHADOW_EXT:
+   case GL_SAMPLER_CUBE_SHADOW_EXT:
       return 1;
    case GL_BOOL_VEC2:
    case GL_FLOAT_VEC2:
@@ -936,19 +951,27 @@ _mesa_get_shader_source(GLcontext *ctx, GLuint shader, GLsizei maxLength,
 {
    struct gl_shader *sh = _mesa_lookup_shader(ctx, shader);
    if (!sh) {
-      _mesa_error(ctx, GL_INVALID_VALUE, "glGetShaderSource(shader)");
+      GLenum err;
+      if (_mesa_lookup_shader_program(ctx, shader))
+         err = GL_INVALID_OPERATION;
+      else
+         err = GL_INVALID_VALUE;
+      _mesa_error(ctx, err, "glGetShaderSource(shader)");
       return;
    }
    copy_string(sourceOut, maxLength, length, sh->Source);
 }
 
 
+#define MAX_UNIFORM_ELEMENTS 16
+
 /**
- * Called via ctx->Driver.GetUniformfv().
+ * Helper for GetUniformfv(), GetUniformiv()
+ * Returns number of elements written to 'params' output.
  */
-void
-_mesa_get_uniformfv(GLcontext *ctx, GLuint program, GLint location,
-                    GLfloat *params)
+static GLuint
+get_uniformfv(GLcontext *ctx, GLuint program, GLint location,
+              GLfloat *params)
 {
    struct gl_shader_program *shProg
       = _mesa_lookup_shader_program(ctx, program);
@@ -984,18 +1007,50 @@ _mesa_get_uniformfv(GLcontext *ctx, GLuint program, GLint location,
             for (c = 0, i = 0; c * 4 < uSize; c++)
                for (r = 0; r < rows; r++, i++)
                   params[i] = shProg->Uniforms->ParameterValues[location + c][r];
+            return i;
          }
-         else
+         else {
             for (i = 0; i < uSize; i++) {
                params[i] = shProg->Uniforms->ParameterValues[location][i];
             }
+            return i;
+         }
       }
       else {
-         _mesa_error(ctx, GL_INVALID_VALUE, "glGetUniformfv(location)");
+         _mesa_error(ctx, GL_INVALID_OPERATION, "glGetUniformfv(location)");
       }
    }
    else {
-      _mesa_error(ctx, GL_INVALID_VALUE, "glGetUniformfv(program)");
+      _mesa_error(ctx, GL_INVALID_OPERATION, "glGetUniformfv(program)");
+   }
+   return 0;
+}
+
+
+/**
+ * Called via ctx->Driver.GetUniformfv().
+ */
+void
+_mesa_get_uniformfv(GLcontext *ctx, GLuint program, GLint location,
+                    GLfloat *params)
+{
+   (void) get_uniformfv(ctx, program, location, params);
+}
+
+
+/**
+ * Called via ctx->Driver.GetUniformiv().
+ */
+void
+_mesa_get_uniformiv(GLcontext *ctx, GLuint program, GLint location,
+                    GLint *params)
+{
+   GLfloat fparams[MAX_UNIFORM_ELEMENTS];
+   GLuint n = get_uniformfv(ctx, program, location, fparams);
+   GLuint i;
+   assert(n <= MAX_UNIFORM_ELEMENTS);
+   for (i = 0; i < n; i++) {
+      params[i] = (GLint) fparams[i];
    }
 }
 
@@ -1053,7 +1108,12 @@ _mesa_shader_source(GLcontext *ctx, GLuint shader, const GLchar *source)
 {
    struct gl_shader *sh = _mesa_lookup_shader(ctx, shader);
    if (!sh) {
-      _mesa_error(ctx, GL_INVALID_VALUE, "glShaderSource(shaderObj)");
+      GLenum err;
+      if (_mesa_lookup_shader_program(ctx, shader))
+         err = GL_INVALID_OPERATION;
+      else
+         err = GL_INVALID_VALUE;
+      _mesa_error(ctx, err, "glShaderSource(shaderObj)");
       return;
    }
 

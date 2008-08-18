@@ -862,6 +862,8 @@ struct dd_function_table {
                            GLsizei *length, GLcharARB *sourceOut);
    void (*GetUniformfv)(GLcontext *ctx, GLuint program, GLint location,
                         GLfloat *params);
+   void (*GetUniformiv)(GLcontext *ctx, GLuint program, GLint location,
+                        GLint *params);
    GLint (*GetUniformLocation)(GLcontext *ctx, GLuint program,
                                const GLcharARB *name);
    GLboolean (*IsProgram)(GLcontext *ctx, GLuint name);

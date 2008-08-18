@@ -3963,7 +3963,7 @@ _mesa_unpack_depth_span( const GLcontext *ctx, GLuint n,
          DEPTH_VALUES(GLuint, UINT_TO_FLOAT);
          break;
       case GL_UNSIGNED_INT_24_8_EXT: /* GL_EXT_packed_depth_stencil */
-         if (dstType == GL_UNSIGNED_INT &&
+         if (dstType == GL_UNSIGNED_INT_24_8_EXT &&
              depthScale == (GLfloat) 0xffffff &&
              ctx->Pixel.DepthScale == 1.0 &&
              ctx->Pixel.DepthBias == 0.0) {

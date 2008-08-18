@@ -203,19 +203,19 @@ float degrees(const float rad)
 
 vec2 degrees(const vec2 rad)
 {
-   const float c = 3.1415926 / 180.0;
+   const float c = 180.0 / 3.1415926;
    __asm vec4_multiply __retVal.xy, rad.xy, c.xx;
 }
 
 vec3 degrees(const vec3 rad)
 {
-   const float c = 3.1415926 / 180.0;
+   const float c = 180.0 / 3.1415926;
    __asm vec4_multiply __retVal.xyz, rad.xyz, c.xxx;
 }
 
 vec4 degrees(const vec4 rad)
 {
-   const float c = 3.1415926 / 180.0;
+   const float c = 180.0 / 3.1415926;
    __asm vec4_multiply __retVal, rad, c.xxxx;
 }
 
@@ -401,16 +401,17 @@ vec4 atan(const vec4 y_over_x)
 
 float atan(const float y, const float x)
 {
-    if (x == 0.0)
-       return 0.0;
-    float z = atan(y / x);
-    if (x < 0.0)
-    {
-        if (y < 0.0)
-            return z - 3.141593;
-        return z + 3.141593;
-    }
-    return z;
+   float r;
+   if (abs(x) > 1.0e-4) {
+      r = atan(y / x);
+      if (x < 0.0) {
+         r = r + sign(y) * 3.141593;
+      }
+   }
+   else {
+      r = sign(y) * 1.5707965;  // pi/2
+   }
+   return r;
 }
 
 vec2 atan(const vec2 u, const vec2 v)
@@ -1496,6 +1497,23 @@ bvec4 equal(const ivec4 u, const ivec4 v)
    __asm vec4_seq __retVal, u, v;
 }
 
+bvec2 equal(const bvec2 u, const bvec2 v)
+{
+   __asm vec4_seq __retVal.xy, u, v;
+}
+
+bvec3 equal(const bvec3 u, const bvec3 v)
+{
+   __asm vec4_seq __retVal.xyz, u, v;
+}
+
+bvec4 equal(const bvec4 u, const bvec4 v)
+{
+   __asm vec4_seq __retVal, u, v;
+}
+
+
+
 
 //// notEqual
 
@@ -1529,6 +1547,22 @@ bvec4 notEqual(const ivec4 u, const ivec4 v)
    __asm vec4_sne __retVal, u, v;
 }
 
+bvec2 notEqual(const bvec2 u, const bvec2 v)
+{
+   __asm vec4_sne __retVal.xy, u, v;
+}
+
+bvec3 notEqual(const bvec3 u, const bvec3 v)
+{
+   __asm vec4_sne __retVal.xyz, u, v;
+}
+
+bvec4 notEqual(const bvec4 u, const bvec4 v)
+{
+   __asm vec4_sne __retVal, u, v;
+}
+
+
 
 //// any
 
@@ -1559,7 +1593,7 @@ bool any(const bvec4 v)
 
 //// all
 
-bool all (const vec2 v)
+bool all (const bvec2 v)
 {
    float prod;
    __asm vec4_multiply prod.x, v.x, v.y;

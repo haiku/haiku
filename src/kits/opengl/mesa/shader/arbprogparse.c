@@ -1123,7 +1123,9 @@ parse_state_single_item (GLcontext * ctx, const GLubyte ** inst,
                          struct arb_program *Program,
                          gl_state_index state_tokens[STATE_LENGTH])
 {
-   switch (*(*inst)++) {
+   GLubyte token = *(*inst)++;
+
+   switch (token) {
       case STATE_MATERIAL_PARSER:
          state_tokens[0] = STATE_MATERIAL;
          state_tokens[1] = parse_face_type (inst);
@@ -1308,7 +1310,6 @@ parse_state_single_item (GLcontext * ctx, const GLubyte ** inst,
 
       case STATE_CLIP_PLANE:
          state_tokens[0] = STATE_CLIPPLANE;
-         state_tokens[1] = parse_integer (inst, Program);
          if (parse_clipplane_num (ctx, inst, Program,
                                   (GLint *) &state_tokens[1]))
             return 1;
@@ -1760,7 +1761,9 @@ parse_param_elements (GLcontext * ctx, const GLubyte ** inst,
    gl_state_index state_tokens[STATE_LENGTH] = {0, 0, 0, 0, 0};
    GLfloat const_values[4];
 
-   switch (*(*inst)++) {
+   GLubyte token = *(*inst)++;
+
+   switch (token) {
       case PARAM_STATE_ELEMENT:
          if (parse_state_single_item (ctx, inst, Program, state_tokens))
             return 1;

@@ -6627,7 +6627,7 @@ typedef void (GLAPIENTRY *TexImage3Dproc)( GLenum target, GLint level,
 
 static TexImage3Dproc pTexImage3D = 0;
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__WIN32__)
 #  include <dlfcn.h>
 #  include <sys/types.h>
 #else
@@ -6642,7 +6642,7 @@ static void gluTexImage3D( GLenum target, GLint level,
 			   const GLvoid *pixels )
 {
    if (!pTexImage3D) {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__WIN32__)
       pTexImage3D = (TexImage3Dproc) wglGetProcAddress("glTexImage3D");
       if (!pTexImage3D)
 	 pTexImage3D = (TexImage3Dproc) wglGetProcAddress("glTexImage3DEXT");

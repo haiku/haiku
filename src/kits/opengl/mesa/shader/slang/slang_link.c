@@ -339,6 +339,9 @@ _slang_resolve_attributes(struct gl_shader_program *shProg,
                   return GL_FALSE;
                }
                _mesa_add_attribute(shProg->Attributes, name, size, attr);
+
+	       /* set the attribute as used */
+	       usedAttributes |= 1<<attr;
             }
 
             inst->SrcReg[j].Index = VERT_ATTRIB_GENERIC0 + attr;
@@ -346,6 +349,36 @@ _slang_resolve_attributes(struct gl_shader_program *shProg,
       }
    }
    return GL_TRUE;
+}
+
+
+/**
+ * Scan program instructions to update the program's NumTemporaries field.
+ * Note: this implemenation relies on the code generator allocating
+ * temps in increasing order (0, 1, 2, ... ).
+ */
+static void
+_slang_count_temporaries(struct gl_program *prog)
+{
+   GLuint i, j;
+   GLint maxIndex = -1;
+
+   for (i = 0; i < prog->NumInstructions; i++) {
+      const struct prog_instruction *inst = prog->Instructions + i;
+      const GLuint numSrc = _mesa_num_inst_src_regs(inst->Opcode);
+      for (j = 0; j < numSrc; j++) {
+         if (inst->SrcReg[j].File == PROGRAM_TEMPORARY) {
+            if (maxIndex < inst->SrcReg[j].Index)
+               maxIndex = inst->SrcReg[j].Index;
+         }
+         if (inst->DstReg.File == PROGRAM_TEMPORARY) {
+            if (maxIndex < inst->DstReg.Index)
+               maxIndex = inst->DstReg.Index;
+         }
+      }
+   }
+
+   prog->NumTemporaries = (GLuint) (maxIndex + 1);
 }
 
 
@@ -494,6 +527,14 @@ _slang_link(GLcontext *ctx,
 
    _mesa_clear_shader_program_data(ctx, shProg);
 
+   /* check that all programs compiled successfully */
+   for (i = 0; i < shProg->NumShaders; i++) {
+      if (!shProg->Shaders[i]->CompileStatus) {
+         link_error(shProg, "linking with uncompiled shader\n");
+         return;
+      }
+   }
+
    shProg->Uniforms = _mesa_new_parameter_list();
    shProg->Varying = _mesa_new_parameter_list();
 
@@ -568,6 +609,7 @@ _slang_link(GLcontext *ctx,
 
    if (shProg->VertexProgram) {
       _slang_update_inputs_outputs(&shProg->VertexProgram->Base);
+      _slang_count_temporaries(&shProg->VertexProgram->Base);
       if (!(shProg->VertexProgram->Base.OutputsWritten & (1 << VERT_RESULT_HPOS))) {
          /* the vertex program did not compute a vertex position */
          link_error(shProg,
@@ -575,8 +617,10 @@ _slang_link(GLcontext *ctx,
          return;
       }
    }
-   if (shProg->FragmentProgram)
+   if (shProg->FragmentProgram) {
       _slang_update_inputs_outputs(&shProg->FragmentProgram->Base);
+      _slang_count_temporaries(&shProg->FragmentProgram->Base);
+   }
 
    /* Check that all the varying vars needed by the fragment shader are
     * actually produced by the vertex shader.

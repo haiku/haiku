@@ -483,6 +483,7 @@ pp_cond_stack_reevaluate (pp_cond_stack *self)
 typedef struct
 {
    GLboolean MESA_shader_debug;        /* GL_MESA_shader_debug enable */
+   GLboolean ARB_texture_rectangle; /* GL_ARB_texture_rectangle enable */
 } pp_ext;
 
 /*
@@ -498,6 +499,7 @@ static GLvoid
 pp_ext_init (pp_ext *self)
 {
    pp_ext_disable_all (self);
+   self->ARB_texture_rectangle = GL_TRUE;
    /* Other initialization code goes here. */
 }
 
@@ -506,6 +508,8 @@ pp_ext_set (pp_ext *self, const char *name, GLboolean enable)
 {
    if (_mesa_strcmp (name, "MESA_shader_debug") == 0)
       self->MESA_shader_debug = enable;
+   else if (_mesa_strcmp (name, "GL_ARB_texture_rectangle") == 0)
+      self->ARB_texture_rectangle = enable;
    /* Next extension name tests go here. */
    else
       return GL_FALSE;

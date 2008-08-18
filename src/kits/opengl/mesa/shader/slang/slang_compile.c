@@ -2124,6 +2124,9 @@ _slang_compile(GLcontext *ctx, struct gl_shader *shader)
       type = SLANG_UNIT_FRAGMENT_SHADER;
    }
 
+   if (!shader->Source)
+      return GL_FALSE;
+
    ctx->Shader.MemPool = _slang_new_mempool(1024*1024);
 
    /* XXX temporary hack */

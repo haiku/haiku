@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  7.1
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2008  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -130,14 +130,21 @@ static void
 zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
            const GLvoid *src, GLenum format )
 {
+   SWcontext *swrast = SWRAST_CONTEXT(ctx);
    SWspan zoomed;
-   SWspanarrays zoomed_arrays;  /* this is big! */
    GLint x0, x1, y0, y1;
    GLint zoomedWidth;
 
    if (!compute_zoomed_bounds(ctx, imgX, imgY, span->x, span->y, span->end,
                               &x0, &x1, &y0, &y1)) {
       return;  /* totally clipped */
+   }
+
+   if (!swrast->ZoomedArrays) {
+      /* allocate on demand */
+      swrast->ZoomedArrays = (SWspanarrays *) CALLOC(sizeof(SWspanarrays));
+      if (!swrast->ZoomedArrays)
+         return;
    }
 
    zoomedWidth = x1 - x0;
@@ -151,22 +158,24 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
    INIT_SPAN(zoomed, GL_BITMAP, 0, 0, 0);
    zoomed.x = x0;
    zoomed.end = zoomedWidth;
-   zoomed.array = &zoomed_arrays;
-   zoomed_arrays.ChanType = span->array->ChanType;
+   zoomed.array = swrast->ZoomedArrays;
+   zoomed.array->ChanType = span->array->ChanType;
    /* XXX temporary */
 #if CHAN_TYPE == GL_UNSIGNED_BYTE
-   zoomed_arrays.rgba = zoomed_arrays.color.sz1.rgba;
-   zoomed_arrays.spec = zoomed_arrays.color.sz1.spec;
+   zoomed.array->rgba = zoomed.array->color.sz1.rgba;
+   zoomed.array->spec = zoomed.array->color.sz1.spec;
 #elif CHAN_TYPE == GL_UNSIGNED_SHORT
-   zoomed_arrays.rgba = zoomed_arrays.color.sz2.rgba;
-   zoomed_arrays.spec = zoomed_arrays.color.sz2.spec;
+   zoomed.array->rgba = zoomed.array->color.sz2.rgba;
+   zoomed.array->spec = zoomed.array->color.sz2.spec;
 #else
-   zoomed_arrays.rgba = zoomed_arrays.attribs[FRAG_ATTRIB_COL0];
-   zoomed_arrays.spec = zoomed_arrays.attribs[FRAG_ATTRIB_COL1];
+   zoomed.array->rgba = zoomed.array->attribs[FRAG_ATTRIB_COL0];
+   zoomed.array->spec = zoomed.array->attribs[FRAG_ATTRIB_COL1];
 #endif
 
+   COPY_4V(zoomed.attrStart[FRAG_ATTRIB_WPOS], span->attrStart[FRAG_ATTRIB_WPOS]);
+   COPY_4V(zoomed.attrStepX[FRAG_ATTRIB_WPOS], span->attrStepX[FRAG_ATTRIB_WPOS]);
+   COPY_4V(zoomed.attrStepY[FRAG_ATTRIB_WPOS], span->attrStepY[FRAG_ATTRIB_WPOS]);
 
-   /* copy fog interp info */
    zoomed.attrStart[FRAG_ATTRIB_FOGC][0] = span->attrStart[FRAG_ATTRIB_FOGC][0];
    zoomed.attrStepX[FRAG_ATTRIB_FOGC][0] = span->attrStepX[FRAG_ATTRIB_FOGC][0];
    zoomed.attrStepY[FRAG_ATTRIB_FOGC][0] = span->attrStepY[FRAG_ATTRIB_FOGC][0];

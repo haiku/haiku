@@ -284,6 +284,7 @@ _mesa_init_glsl_driver_functions(struct dd_function_table *driver)
    driver->GetShaderInfoLog = _mesa_get_shader_info_log;
    driver->GetShaderSource = _mesa_get_shader_source;
    driver->GetUniformfv = _mesa_get_uniformfv;
+   driver->GetUniformiv = _mesa_get_uniformiv;
    driver->GetUniformLocation = _mesa_get_uniform_location;
    driver->IsProgram = _mesa_is_program;
    driver->IsShader = _mesa_is_shader;
