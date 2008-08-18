@@ -20,6 +20,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#include <AutoDeleter.h>
 #include <Bitmap.h>
 #include <Drivers.h>
 #include <Entry.h>
@@ -181,31 +182,35 @@ get_device_icon(const char *device, void *icon, int32 size)
 		close(fd);
 
 		uint8* data;
-		size_t size;
+		size_t dataSize;
 		type_code type;
-		status_t status = get_device_icon(device, &data, &size, &type);
+		status_t status = get_device_icon(device, &data, &dataSize, &type);
 		if (status == B_OK) {
-			BBitmap* icon = new(std::nothrow) BBitmap(
+			BBitmap* icon32 = new(std::nothrow) BBitmap(
 				BRect(0, 0, size - 1, size - 1), B_BITMAP_NO_SERVER_LINK,
 				B_RGBA32);
-			BBitmap* target = new(std::nothrow) BBitmap(
+			BBitmap* icon8 = new(std::nothrow) BBitmap(
 				BRect(0, 0, size - 1, size - 1), B_BITMAP_NO_SERVER_LINK,
 				B_CMAP8);
-			if (icon == NULL || icon->InitCheck() != B_OK || target == NULL
-				|| target->InitCheck() != B_OK) {
-				delete icon;
-				delete target;
+
+			ArrayDeleter<uint8> dataDeleter(data);
+			ObjectDeleter<BBitmap> icon32Deleter(icon32);
+			ObjectDeleter<BBitmap> icon8Deleter(icon8);
+
+			if (icon32 == NULL || icon32->InitCheck() != B_OK || icon8 == NULL
+				|| icon8->InitCheck() != B_OK) {
 				return B_NO_MEMORY;
 			}
-			status = BIconUtils::GetVectorIcon(data, size, icon);
-			if (status == B_OK)
-				status = BIconUtils::ConvertToCMAP8(icon, target);
-			if (status == B_OK)
-				memcpy(icon, target->Bits(), target->BitsLength());
 
-			delete icon;
-			delete target;
-			delete[] data;
+			if (size < icon8->BitsLength())
+				return B_BAD_VALUE;
+
+			status = BIconUtils::GetVectorIcon(data, dataSize, icon32);
+			if (status == B_OK)
+				status = BIconUtils::ConvertToCMAP8(icon32, icon8);
+			if (status == B_OK)
+				memcpy(icon, icon8->Bits(), icon8->BitsLength());
+
 			return status;
 		}
 		return errno;
