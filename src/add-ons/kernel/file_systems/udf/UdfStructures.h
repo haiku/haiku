@@ -12,10 +12,11 @@
 #include <ByteOrder.h>
 #include <SupportDefs.h>
 
-#include "kernel_cpp.h"
 #include "UdfDebug.h"
 
 #include "Array.h"
+
+#include <util/kernel_cpp.h>
 
 /*! \file UdfStructures.h
 
@@ -41,8 +42,6 @@
 	- <a href='http://www.extra.research.philips.com/udf/'>Philips UDF verifier</a>
 	- <a href='http://www.hi-ho.ne.jp/y-komachi/committees/fpro/fpro.htm'>Possible test disc image generator (?)</a>
 */
-
-namespace Udf {
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 1
@@ -615,7 +614,7 @@ public:
 			// crc_length, based off provided descriptor
 			set_crc_length(size - sizeof(descriptor_tag));
 			// crc
-			uint16 crc = Udf::calculate_crc(reinterpret_cast<uint8*>(this)
+			uint16 crc = calculate_crc(reinterpret_cast<uint8*>(this)
 			               + sizeof(descriptor_tag), crc_length());
 			set_crc(crc);
 			// checksum (which depends on the other two values)
@@ -2197,8 +2196,6 @@ private:
 
 };
 		
-
-};	// namespace Udf
 
 #endif	// _UDF_DISK_STRUCTURES_H
 

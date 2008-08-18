@@ -10,12 +10,10 @@
 /*! \file MetadataPartition.h
 */
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 
 #include "Partition.h"
 #include "UdfDebug.h"
-
-namespace Udf {
 
 /*! \brief Type 2 metadata partition
 
@@ -45,7 +43,5 @@ private:
 	bool fMetadataIsDuplicated;
 	status_t fInitStatus;
 };
-
-};	// namespace Udf
 
 #endif	// _UDF_METADATA_PARTITION_H

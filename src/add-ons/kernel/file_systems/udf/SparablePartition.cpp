@@ -2,7 +2,6 @@
 
 #define B_NOT_IMPLEMENTED B_ERROR
 
-using namespace Udf;
 
 /*! \brief Creates a new SparablePartition object.
 */

@@ -14,6 +14,7 @@
 #include "UdfDebug.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <KernelExport.h>
 #include <TLS.h>
 

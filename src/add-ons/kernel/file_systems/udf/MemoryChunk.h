@@ -10,9 +10,7 @@
 
 #include <malloc.h>
 
-#include "kernel_cpp.h"
-
-namespace Udf {
+#include <util/kernel_cpp.h>
 
 /*! Simple class to encapsulate the boring details of allocating
 	and deallocating a chunk of memory.
@@ -66,7 +64,5 @@ public:
 private:
 	uint8 fData[size];
 };
-
-};	// namespace Udf
 
 #endif	// _UDF_MEMORY_CHUNK_H

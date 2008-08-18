@@ -8,12 +8,11 @@
 #ifndef _UDF_ARRAY_H
 #define _UDF_ARRAY_H
 
-#include "kernel_cpp.h"
 
 #include "SupportDefs.h"
 #include "UdfDebug.h"
 
-namespace Udf {
+#include <util/kernel_cpp.h>
 
 /*! \brief Slightly more typesafe static array type than built-in arrays,
 	with array length information stored implicitly (i.e. consuming no
@@ -86,8 +85,5 @@ struct array<char, arrayLength> {
 	uint32 size() const { return arrayLength; }
 	uint8 data[arrayLength];
 };
-
-
-};	// namespace UDF
 
 #endif	// _UDF_ARRAY_H

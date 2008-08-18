@@ -47,7 +47,7 @@ extern "C" int 	vsprintf(char *s, const char *format, va_list arg);
 //#	define __out printf
 #endif
 
-#include "kernel_cpp.h"
+#include <util/kernel_cpp.h>
 
 class DebugHelper;
 
@@ -230,6 +230,7 @@ private:
 #endif	// ifdef DEBUG else
 
 #define TRACE(x) DBG(dprintf x)
+#define TRACE_ERROR(x) DBG(dprintf x)
 
 // These macros turn on or off extensive and generally unnecessary
 // debugging output regarding table of contents parsing
