@@ -47,14 +47,6 @@ typedef struct err_res {
 	res;					\
 })
 
-// device icon type
-typedef enum {
-	icon_type_disk,
-	icon_type_removal,
-	icon_type_floppy,
-	icon_type_cd
-} icon_type;
-
 // cookie issued by driver to identify itself
 //typedef struct periph_info *periph_cookie;
 // cookie issued by driver per device
@@ -133,16 +125,12 @@ typedef struct scsi_periph_interface {
 	// returns: B_OK, B_DEV_MEDIA_CHANGE_REQUESTED, B_NO_MEMORY or
 	// pending error reported by handle_get_error
 	status_t (*get_media_status)(scsi_periph_handle handle);
+	// synchronizes (flush) the device cache
+	err_res(*synchronize_cache)(scsi_periph_device device, scsi_ccb *request);
 
 	// compose device name consisting of prefix and path/target/LUN
 	// (result must be freed by caller)
 	char *(*compose_device_name)(device_node *device_node, const char *prefix);
-
-	// fill data with icon (for B_GET_ICON ioctl)
-	status_t (*get_icon)(icon_type type, device_icon *data);
-
-	// synchronizes (flush) the device cache
-	err_res(*synchronize_cache)(scsi_periph_device device, scsi_ccb *request);
 } scsi_periph_interface;
 
 #define SCSI_PERIPH_MODULE_NAME "generic/scsi_periph/v1"
