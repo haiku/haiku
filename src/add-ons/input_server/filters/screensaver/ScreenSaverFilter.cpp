@@ -347,7 +347,8 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 				fCurrentCorner = fBlankCorner;
 
 				// start screen blanker after one second of inactivity
-				if (fCornerRunner->SetInterval(kCornerDelay) != B_OK)
+				if (fCornerRunner != NULL
+					&& fCornerRunner->SetInterval(kCornerDelay) != B_OK)
 					_Invoke();
 				break;
 			}
