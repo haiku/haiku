@@ -16,9 +16,8 @@ BinCommand gzip :
 	unpack.c
 	unlzh.c
 	crypt.c
+	: be
 ;
-
-LinkAgainst gzip : be ;
 
 {
 	MakeLocatePlatform <bin>zdiff ;
