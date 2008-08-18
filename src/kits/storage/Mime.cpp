@@ -202,9 +202,6 @@ get_device_icon(const char *device, void *icon, int32 size)
 				return B_NO_MEMORY;
 			}
 
-			if (size < icon8->BitsLength())
-				return B_BAD_VALUE;
-
 			status = BIconUtils::GetVectorIcon(data, dataSize, icon32);
 			if (status == B_OK)
 				status = BIconUtils::ConvertToCMAP8(icon32, icon8);
