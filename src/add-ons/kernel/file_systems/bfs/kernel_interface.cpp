@@ -94,11 +94,11 @@ bfs_identify_partition(int fd, partition_data* partition, void** _cookie)
 	disk_super_block superBlock;
 	status_t status = Volume::Identify(fd, &superBlock);
 	if (status != B_OK)
-		return status;
+		return -1;
 
 	identify_cookie* cookie = new(std::nothrow) identify_cookie;
 	if (cookie == NULL)
-		return B_NO_MEMORY;
+		return -1;
 
 	memcpy(&cookie->super_block, &superBlock, sizeof(disk_super_block));
 
