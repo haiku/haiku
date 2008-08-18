@@ -4,7 +4,8 @@
 #include "MemoryChunk.h"
 #include "Utils.h"
 
-using namespace Udf;
+#include <string.h>
+
 
 //------------------------------------------------------------------------------
 // forward declarations
@@ -36,7 +37,7 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 //------------------------------------------------------------------------------
 
 status_t
-Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
+udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
                    uint32 &blockShift, logical_volume_descriptor &logicalVolumeDescriptor,
 				   partition_descriptor partitionDescriptors[],
 				   uint8 &partitionDescriptorCount)
@@ -73,27 +74,6 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 		PRINT(("Block size must be a positive power of two! (blockSize = %ld)\n", blockSize));
 	}
 	
-	RETURN(error);
-}
-
-status_t
-Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
-                   char *volumeName)
-{
-	DEBUG_INIT_ETC(NULL, ("device: %d, offset: %Ld, length: %Ld, "
-	               "blockSize: %ld, volumeName: %p", device, offset, length,
-	               blockSize, volumeName));
-	logical_volume_descriptor logicalVolumeDescriptor;
-	partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
-	uint8 partitionDescriptorCount;
-	uint32 blockShift;
-	status_t error = udf_recognize(device, offset, length, blockSize, blockShift,
-	                               logicalVolumeDescriptor, partitionDescriptors,
-	                               partitionDescriptorCount);
-	if (!error && volumeName) {
-		String name(logicalVolumeDescriptor.logical_volume_identifier());
-		strcpy(volumeName, name.Utf8());
-	}
 	RETURN(error);
 }
 
@@ -344,7 +324,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 						// If we didn't find a duplicate, see if we have any open descriptor
 						// spaces left.
 						if (!foundDuplicate) {
-							if (num < Udf::kMaxPartitionDescriptors) {
+							if (num < kMaxPartitionDescriptors) {
 								// At least one more partition descriptor allowed
 								partitionDescriptors[num] = *partition;
 								uniquePartitions++;
@@ -546,4 +526,3 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 		error = highestMinimumUDFReadRevision <= UDF_MAX_READ_REVISION ? B_OK : B_ERROR;
 	RETURN(error);					
 }
-

@@ -13,16 +13,10 @@
 #include "UdfStructures.h"
 #include "UdfDebug.h"
 
-namespace Udf {
-
 status_t udf_recognize(int device, off_t offset, off_t length,
 					   uint32 blockSize, uint32 &blockShift,
                        logical_volume_descriptor &logicalVolumeDescriptor,
                        partition_descriptor partitionDescriptors[],
                        uint8 &partitionDescriptorCount);
-status_t udf_recognize(int device, off_t offset, off_t length,
-					   uint32 blockSize, char *volumeName);
-
-}	// namespace Udf
 
 #endif	// _UDF_RECOGNITION_H
