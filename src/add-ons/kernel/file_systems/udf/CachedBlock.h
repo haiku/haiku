@@ -1,11 +1,9 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
-//  Based on the CachedBlock class from OpenBFS,
-//  Copyright (c) 2002 Axel Dörfler, axeld@pinc-software.de
-//---------------------------------------------------------------------
+/*
+ * 	Copyright 2008, Salvatore Benedetto, salvatore.benedetto@gmail.com
+ * 	Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net
+ * 	Copyright 2002, Axel Dörfler, axeld@pinc-software.de
+ * 	Distributed under the terms of the MIT License.
+ */
 #ifndef _UDF_CACHED_BLOCK_H
 #define _UDF_CACHED_BLOCK_H
 
@@ -15,86 +13,72 @@
 	Axel Dörfler, axeld@pinc-software.de
 */
 
-#ifdef COMPILE_FOR_R5
-extern "C" {
-#endif
-	#include "fsproto.h"
-#ifdef COMPILE_FOR_R5
-}
-#endif
+#include <fs_cache.h>
+#include <util/kernel_cpp.h>
 
-extern "C" {
-	#ifndef _IMPEXP_KERNEL
-	#	define _IMPEXP_KERNEL
-	#endif
-	
-	#include "lock.h"
-	#include "cache.h"
-}
-
-#include "kernel_cpp.h"
 #include "UdfDebug.h"
-
 #include "UdfStructures.h"
 #include "Volume.h"
 
-namespace Udf {
-
 class CachedBlock {
-	public:
-		CachedBlock(Volume *volume);
-		CachedBlock(Volume *volume, off_t block, bool empty = false);
-		CachedBlock(CachedBlock *cached);
-		~CachedBlock();
+public:
+								CachedBlock(Volume *volume);
+								CachedBlock(Volume *volume, off_t block);
+								CachedBlock(CachedBlock *cached);
+								~CachedBlock();
 
-		inline void Keep();
-		inline void Unset();
-		inline uint8 *SetTo(off_t block, bool empty = false);
-		inline uint8 *SetTo(long_address address, bool empty = false);
-		template <class Accessor, class Descriptor>
-			inline uint8* SetTo(Accessor &accessor, Descriptor &descriptor,
-			bool empty = false);
+	uint8						*Block() const { return fBlock; }
+	off_t						BlockNumber() const { return fBlockNumber; }
+	uint32						BlockSize() const { return fVolume->BlockSize(); }
+	uint32						BlockShift() const { return fVolume->BlockShift(); }
 
-		uint8 *Block() const { return fBlock; }
-		off_t BlockNumber() const { return fBlockNumber; }
-		uint32 BlockSize() const { return fVolume->BlockSize(); }
-		uint32 BlockShift() const { return fVolume->BlockShift(); }
+	inline void					Keep();
+	inline void					Unset();
 
-	private:
-		CachedBlock(const CachedBlock &);				// unimplemented
-		CachedBlock &operator=(const CachedBlock &);	// unimplemented
+	inline uint8				*SetTo(off_t block);
+	inline uint8				*SetTo(off_t block, off_t base, size_t length);
+	inline uint8				*SetTo(long_address address);
+	template <class Accessor, class Descriptor>
+	inline uint8*				SetTo(Accessor &accessor, Descriptor &descriptor);
 
-	protected:
-		Volume	*fVolume;
-		off_t	fBlockNumber;
-		uint8	*fBlock;
+protected:
+	uint8						*fBlock;
+	off_t						fBlockNumber;
+	Volume						*fVolume;
 };
+
 
 inline
 CachedBlock::CachedBlock(Volume *volume)
 	:
-	fVolume(volume),
-	fBlock(NULL)
+	fBlock(NULL),
+	fBlockNumber(0),
+	fVolume(volume)
 {
 }
 
+
 inline
-CachedBlock::CachedBlock(Volume *volume, off_t block, bool empty = false)
+CachedBlock::CachedBlock(Volume *volume, off_t block)
 	:
-	fVolume(volume),
-	fBlock(NULL)
+	fBlock(NULL),
+	fBlockNumber(0),
+	fVolume(volume)
 {
-	SetTo(block, empty);
+	SetTo(block);
 }
+
 
 inline 
 CachedBlock::CachedBlock(CachedBlock *cached)
-	: fVolume(cached->fVolume)
-	, fBlockNumber(cached->BlockNumber())
-	, fBlock(cached->fBlock)
+	:
+	fBlock(cached->fBlock),
+	fBlockNumber(cached->BlockNumber()),
+	fVolume(cached->fVolume)
 {
 	cached->Keep();
 }
+
 
 inline
 CachedBlock::~CachedBlock()
@@ -102,58 +86,60 @@ CachedBlock::~CachedBlock()
 	Unset();
 }
 
+
 inline void
 CachedBlock::Keep()
 {
 	fBlock = NULL;
 }
 
+
 inline void
 CachedBlock::Unset()
 {
-	DEBUG_INIT("CachedBlock");
 	if (fBlock) {
-		PRINT(("releasing block #%Ld\n", BlockNumber()));	
-		release_block(fVolume->Device(), fBlockNumber);
-	} else {
-		PRINT(("no block to release\n"));
+		block_cache_put(fVolume->BlockCache(), fBlockNumber);
+		fBlock = NULL;
 	}
 }
 
-inline uint8 *
-CachedBlock::SetTo(off_t block, bool empty = false)
+
+inline uint8*
+CachedBlock::SetTo(off_t block)
 {
-	DEBUG_INIT_ETC("CachedBlock", ("block: %Ld, empty: %s",
-	               block, (empty ? "true" : "false")));
-	Unset();
-	fBlockNumber = block;
-	PRINT(("getting block #%Ld\n", block));
-	return fBlock = empty ? (uint8 *)get_empty_block(fVolume->Device(), block, BlockSize())
-						  : (uint8 *)get_block(fVolume->Device(), block, BlockSize());
+	return SetTo(block, block, 1);
 }
 
+
+inline uint8*
+CachedBlock::SetTo(off_t block, off_t base, size_t length)
+{
+	Unset();
+	fBlockNumber = block;
+	return fBlock = (uint8 *)block_cache_get_etc(fVolume->BlockCache(),
+		block, base, length);
+}
+
+
 inline uint8 *
-CachedBlock::SetTo(long_address address, bool empty = false)
+CachedBlock::SetTo(long_address address)
 {
 	off_t block;
 	if (fVolume->MapBlock(address, &block) == B_OK)
-		return SetTo(block, empty);
+		return SetTo(block, block, 1);
 	else
 		return NULL;
 }
 
 template <class Accessor, class Descriptor>
 inline uint8*
-CachedBlock::SetTo(Accessor &accessor, Descriptor &descriptor, bool empty = false)
+CachedBlock::SetTo(Accessor &accessor, Descriptor &descriptor)
 {
 	// Make a long_address out of the descriptor and call it a day
 	long_address address;
 	address.set_to(accessor.GetBlock(descriptor),
-                             accessor.GetPartition(descriptor));
-    return SetTo(address, empty);
+		accessor.GetPartition(descriptor));
+    return SetTo(address);
 }
 
-};	// namespace Udf
-
 #endif	// _UDF_CACHED_BLOCK_H
-
