@@ -251,10 +251,44 @@ extern status_t		_user_socketpair(int family, int type, int protocol,
 extern status_t		_user_get_next_socket_stat(int family, uint32 *cookie,
 						struct net_stat *stat);
 
-/* vfs entry points... */
-
 #ifdef __cplusplus
 }
 #endif
+
+
+#ifdef __cplusplus
+
+class AsyncIOCallback {
+public:
+	virtual						~AsyncIOCallback();
+
+	virtual	void				IOFinished(status_t status,
+									bool partialTransfer,
+									size_t bytesTransferred) = 0;
+
+			void				operator delete(void* address, size_t size);
+
+	static	status_t 			IORequestCallback(void* data,
+									io_request* request, status_t status,
+									bool partialTransfer,
+									size_t transferEndOffset);
+};
+
+
+class StackableAsyncIOCallback : public AsyncIOCallback {
+public:
+								StackableAsyncIOCallback(AsyncIOCallback* next);
+
+protected:
+			AsyncIOCallback*	fNextCallback;
+};
+
+
+status_t vfs_asynchronous_write_pages(struct vnode* vnode, void* cookie,
+			off_t pos, const iovec* vecs, size_t count, size_t numBytes,
+			uint32 flags, AsyncIOCallback* callback);
+
+
+#endif	// __cplusplus
 
 #endif	/* _KERNEL_VFS_H */
