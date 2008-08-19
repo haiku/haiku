@@ -17,6 +17,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <fs_attr.h>
 #include <IconEditorProtocol.h>
 #include <Message.h>
 #include <Mime.h>
@@ -368,6 +369,7 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 		REF_NONE = 0,
 		REF_MESSAGE,
 		REF_FLAT,
+		REF_FLAT_ATTR,
 		REF_SVG
 	};
 	uint32 refMode = REF_NONE;
@@ -387,8 +389,47 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 			file.Seek(0, SEEK_SET);
 			SVGImporter svgImporter;
 			ret = svgImporter.Import(icon, &ref);
-			if (ret >= B_OK)
+			if (ret >= B_OK) {
 				refMode = REF_SVG;
+			} else {
+				// fall back to flat icon format but use the icon attribute
+				ret = B_OK;
+				attr_info attrInfo;
+				if (file.GetAttrInfo(kVectorAttrNodeName, &attrInfo) == B_OK) {
+					if (attrInfo.type != B_VECTOR_ICON_TYPE)
+						ret = B_ERROR;
+					// If the attribute is there, we must succeed in reading
+					// an icon! Otherwise we may overwrite an existing icon
+					// when the user saves.
+					uint8* buffer = NULL;
+					if (ret == B_OK) {
+						buffer = new(nothrow) uint8[attrInfo.size];
+						if (buffer == NULL)
+							ret = B_NO_MEMORY;
+					}
+					if (ret == B_OK) {
+						ssize_t bytesRead = file.ReadAttr(kVectorAttrNodeName,
+							B_VECTOR_ICON_TYPE, 0, buffer, attrInfo.size);
+						if (bytesRead != (ssize_t)attrInfo.size) {
+							ret = bytesRead < 0 ? (status_t)bytesRead
+								: B_IO_ERROR;
+						}
+					}
+					if (ret == B_OK) {
+						ret = flatImporter.Import(icon, buffer, attrInfo.size);
+						if (ret == B_OK)
+							refMode = REF_FLAT_ATTR;
+					}
+
+					delete[] buffer;
+				} else {
+					// If there is no icon attribute, simply fall back
+					// to creating an icon for this file. TODO: We may or may
+					// not want to display an alert asking the user if that is
+					// what he wants to do.
+					refMode = REF_FLAT_ATTR;
+				}
+			}
 		}
 	}
 
@@ -430,6 +471,10 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 				fDocument->SetExportSaver(
 					new SimpleFileSaver(new FlatIconExporter(), ref));
 				break;
+			case REF_FLAT_ATTR:
+				fDocument->SetNativeSaver(
+					new AttributeSaver(ref, kVectorAttrNodeName));
+				break;
 			case REF_SVG:
 				fDocument->SetExportSaver(
 					new SimpleFileSaver(new SVGExporter(), ref));
@@ -449,8 +494,8 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 
 // _Open
 void
-IconEditorApp::_Open(const BMessenger& externalObserver,
-					 const uint8* data, size_t size)
+IconEditorApp::_Open(const BMessenger& externalObserver, const uint8* data,
+	size_t size)
 {
 	if (!_CheckSaveIcon(CurrentMessage()))
 		return;
