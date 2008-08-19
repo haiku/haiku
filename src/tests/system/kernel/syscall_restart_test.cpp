@@ -235,7 +235,8 @@ public:
 	virtual status_t Prepare()
 	{
 		fBytesRead = -1;
-		fFDs = (int[2]){-1, -1};
+		fFDs[0] = -1;
+		fFDs[1] = -1;
 
 		if (pipe(fFDs) != 0)
 			return errno;
@@ -288,7 +289,8 @@ public:
 	virtual status_t Prepare()
 	{
 		fBytesWritten = -1;
-		fFDs = (int[2]){-1, -1};
+		fFDs[0] = -1;
+		fFDs[1] = -1;
 
 		if (pipe(fFDs) != 0)
 			return errno;
