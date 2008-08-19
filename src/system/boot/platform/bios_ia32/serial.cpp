@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -34,7 +34,7 @@ static const uint32 kSerialBaudRate = 115200;
 static int32 sSerialEnabled = 0;
 static uint16 sSerialBasePort = 0x3f8;
 
-static char sBuffer[4096];
+static char sBuffer[8192];
 static uint32 sBufferPosition;
 
 
@@ -50,7 +50,7 @@ serial_putc(char c)
 
 
 extern "C" void
-serial_puts(const char *string, size_t size)
+serial_puts(const char* string, size_t size)
 {
 	if (sSerialEnabled <= 0)
 		return;
@@ -110,9 +110,11 @@ extern "C" void
 serial_init(void)
 {
 	// copy the base ports of the optional 4 serial ports to the kernel args
-	// 0x0000:0x0400 is the location of that information in the BIOS data segment
-	uint16 *ports = (uint16 *)0x400;
-	memcpy(gKernelArgs.platform_args.serial_base_ports, ports, sizeof(uint16) * MAX_SERIAL_PORTS);
+	// 0x0000:0x0400 is the location of that information in the BIOS data
+	// segment
+	uint16* ports = (uint16*)0x400;
+	memcpy(gKernelArgs.platform_args.serial_base_ports, ports,
+		sizeof(uint16) * MAX_SERIAL_PORTS);
 
 	// only use the port if we could find one, else use the standard port
 	if (gKernelArgs.platform_args.serial_base_ports[0] != 0)
@@ -120,10 +122,12 @@ serial_init(void)
 
 	uint16 divisor = uint16(115200 / kSerialBaudRate);
 
-	out8(0x80, sSerialBasePort + SERIAL_LINE_CONTROL);	/* set divisor latch access bit */
+	out8(0x80, sSerialBasePort + SERIAL_LINE_CONTROL);
+		// set divisor latch access bit
 	out8(divisor & 0xf, sSerialBasePort + SERIAL_DIVISOR_LATCH_LOW);
 	out8(divisor >> 8, sSerialBasePort + SERIAL_DIVISOR_LATCH_HIGH);
-	out8(3, sSerialBasePort + SERIAL_LINE_CONTROL);		/* 8N1 */
+	out8(3, sSerialBasePort + SERIAL_LINE_CONTROL);
+		// 8N1
 
 #ifdef ENABLE_SERIAL
 	serial_enable();
