@@ -135,6 +135,37 @@ static mutex sAvailSwapSpaceLock;
 static object_cache *sSwapBlockCache;
 
 
+static int
+dump_swap_info(int argc, char** argv)
+{
+	swap_addr_t totalSwapPages = 0;
+	swap_addr_t usedSwapPages = 0;
+
+	kprintf("swap files:\n");
+
+	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
+			swap_file* file = it.Next();) {
+		swap_addr_t total = file->last_slot - file->first_slot;
+		kprintf("  vnode: %p, pages: total: %lu, used: %lu\n",
+			file->vnode, total, file->used);
+
+		totalSwapPages += total;
+		usedSwapPages += file->used;
+	}
+
+	kprintf("\n");
+	kprintf("swap space in pages:\n");
+	kprintf("total:     %9lu\n", totalSwapPages);
+	kprintf("available: %9llu\n", sAvailSwapSpace / B_PAGE_SIZE);
+	kprintf("reserved:  %9llu\n",
+		totalSwapPages - sAvailSwapSpace / B_PAGE_SIZE);
+	kprintf("used:      %9lu\n", usedSwapPages);
+	kprintf("free:      %9lu\n", totalSwapPages - usedSwapPages);
+
+	return 0;
+}
+
+
 static swap_addr_t
 swap_slot_alloc(uint32 count)
 {
@@ -388,7 +419,8 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 {
 	off_t pageIndex = offset >> PAGE_SHIFT;
 
-	Lock();
+	AutoLocker<VMCache> locker(this);
+
 	for (uint32 i = 0; i < count; i++) {
 		swap_addr_t slotIndex = _SwapBlockGetAddress(pageIndex + i);
 		if (slotIndex != SWAP_SLOT_NONE) {
@@ -402,7 +434,7 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 		return B_ERROR;
 
 	fAllocatedSwapSize += count * B_PAGE_SIZE;
-	Unlock();
+	locker.Unlock();
 
 	uint32 n = count;
 	for (uint32 i = 0; i < count; i += n) {
@@ -420,9 +452,9 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 		status_t status = vfs_write_pages(swapFile->vnode, NULL, pos, vecs + i,
 				n, flags, _numBytes);
 		if (status != B_OK) {
-			Lock();
+			locker.Lock();
 			fAllocatedSwapSize -= n * B_PAGE_SIZE;
-			Unlock();
+			locker.Unlock();
 
 			swap_slot_dealloc(slotIndex, n);
 			return status;
@@ -625,7 +657,7 @@ VMAnonymousCache::_Commit(off_t size)
 	// we always try to reserve as much as possible of the final commitment
 	// in the swap space.
 	if (size > fCommittedSwapSize) {
-		fCommittedSwapSize += swap_space_reserve(size - committed_size);
+		fCommittedSwapSize += swap_space_reserve(size - fCommittedSwapSize);
 		committed_size = fCommittedSwapSize + committedMemory;
 	}
 
@@ -797,6 +829,11 @@ swap_init(void)
 	// init available swap space
 	mutex_init(&sAvailSwapSpaceLock, "avail swap space");
 	sAvailSwapSpace = 0;
+
+	add_debugger_command_etc("swap", &dump_swap_info,
+		"Print infos about the swap usage",
+		"\n"
+		"Print infos about the swap usage.\n", 0);
 }
 
 
@@ -859,10 +896,6 @@ swap_free_page_swap_space(vm_page *page)
 	swap_slot_dealloc(slotIndex, 1);
 	cache->fAllocatedSwapSize -= B_PAGE_SIZE;
 	cache->_SwapBlockFree(page->cache_offset, 1);
-
-	mutex_lock(&sAvailSwapSpaceLock);
-	sAvailSwapSpace += B_PAGE_SIZE;
-	mutex_unlock(&sAvailSwapSpaceLock);
 
   	return true;
 }
