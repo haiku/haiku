@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -771,10 +771,6 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	read_only(readOnly),
 	deleting(false)
 {
-	mutex_lock(&sCachesLock);
-	sCaches.Add(this);
-	mutex_unlock(&sCachesLock);
-
 	condition_variable.Publish(this, "cache transaction sync");
 
 	buffer_cache = create_object_cache_etc("block cache buffers", blockSize,
@@ -793,8 +789,12 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 		return;
 
 	mutex_init(&lock, "block cache");
+
 	register_low_resource_handler(&block_cache::LowMemoryHandler, this,
 		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 0);
+
+	MutexLocker _(sCachesLock);
+	sCaches.Add(this);
 }
 
 
@@ -803,15 +803,15 @@ block_cache::~block_cache()
 {
 	deleting = true;
 
+	mutex_lock(&sCachesLock);
+	sCaches.Remove(this);
+	mutex_unlock(&sCachesLock);
+
 	unregister_low_resource_handler(&block_cache::LowMemoryHandler, this);
 
 	mutex_destroy(&lock);
 
 	condition_variable.Unpublish();
-
-	mutex_lock(&sCachesLock);
-	sCaches.Remove(this);
-	mutex_unlock(&sCachesLock);
 
 	hash_uninit(transaction_hash);
 	hash_uninit(hash);
