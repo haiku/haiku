@@ -57,6 +57,8 @@ public:
 
 			status_t			LockMemory(team_id team, bool isWrite);
 			void				UnlockMemory(team_id team, bool isWrite);
+			bool				IsMemoryLocked() const
+									{ return fMemoryLocked; }
 
 			void				Dump() const;
 
@@ -70,6 +72,7 @@ private:
 			bool				fUser;
 			bool				fPhysical;
 			bool				fVIP;
+			bool				fMemoryLocked;
 			size_t				fLength;
 			size_t				fVecCount;
 			size_t				fCapacity;

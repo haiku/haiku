@@ -77,6 +77,7 @@ IOBuffer::Create(uint32 count, bool vip)
 	buffer->fUser = false;
 	buffer->fPhysical = false;
 	buffer->fVIP = vip;
+	buffer->fMemoryLocked = false;
 
 	return buffer;
 }
@@ -112,6 +113,11 @@ IOBuffer::SetVecs(size_t firstVecOffset, const iovec* vecs, uint32 count,
 status_t
 IOBuffer::LockMemory(team_id team, bool isWrite)
 {
+	if (fMemoryLocked) {
+		panic("memory already locked!");
+		return B_BAD_VALUE;
+	}
+
 	for (uint32 i = 0; i < fVecCount; i++) {
 		status_t status = lock_memory_etc(team, fVecs[i].iov_base,
 			fVecs[i].iov_len, isWrite ? 0 : B_READ_DEVICE);
@@ -121,6 +127,7 @@ IOBuffer::LockMemory(team_id team, bool isWrite)
 		}
 	}
 
+	fMemoryLocked = true;
 	return B_OK;
 }
 
@@ -138,7 +145,13 @@ IOBuffer::_UnlockMemory(team_id team, size_t count, bool isWrite)
 void
 IOBuffer::UnlockMemory(team_id team, bool isWrite)
 {
+	if (!fMemoryLocked) {
+		panic("memory not locked");
+		return;
+	}
+
 	_UnlockMemory(team, fVecCount, isWrite);
+	fMemoryLocked = false;
 }
 
 
@@ -690,6 +703,8 @@ IORequest::CreateSubRequest(off_t parentOffset, off_t offset, size_t length,
 
 	fChildren.Add(subRequest);
 	fPendingChildren++;
+	TRACE("IORequest::CreateSubRequest(): request: %p, subrequest: %p\n", this,
+		subRequest);
 
 	return B_OK;
 }
@@ -777,6 +792,15 @@ IORequest::NotifyFinished()
 			fPartialTransfer = true;
 		}
 	}
+
+	ASSERT(fPendingChildren == 0);
+	ASSERT(fChildren.IsEmpty()
+		|| dynamic_cast<IOOperation*>(fChildren.Head()) == NULL);
+
+	// unlock the memory
+	if (fBuffer->IsMemoryLocked())
+		fBuffer->UnlockMemory(fTeam, fIsWrite);
+
 
 	// Cache the callbacks before we unblock waiters and unlock. Any of the
 	// following could delete this request, so we don't want to touch it
@@ -870,12 +894,6 @@ IORequest::OperationFinished(IOOperation* operation, status_t status,
 	// set status, if not done yet
 	if (fStatus == 1)
 		fStatus = B_OK;
-
-	// unlock the memory
-	// TODO: That should only happen for the request that locked the memory,
-	// not for its ancestors.
-	if (fBuffer->IsVirtual())
-		fBuffer->UnlockMemory(fTeam, fIsWrite);
 }
 
 
@@ -966,6 +984,7 @@ void
 IORequest::AddOperation(IOOperation* operation)
 {
 	MutexLocker locker(fLock);
+	TRACE("IORequest::AddOperation(%p): request: %p\n", operation, this);
 	fChildren.Add(operation);
 	fPendingChildren++;
 }
