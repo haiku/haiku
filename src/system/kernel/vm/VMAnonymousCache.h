@@ -47,7 +47,7 @@ public:
 
 private:
 			void		_SwapBlockBuild(off_t pageIndex,
-							swap_addr_t swapAddress, uint32 count);
+							swap_addr_t slotIndex, uint32 count);
 			void        _SwapBlockFree(off_t pageIndex, uint32 count);
 			swap_addr_t	_SwapBlockGetAddress(off_t pageIndex);
 			status_t	_Commit(off_t size);
