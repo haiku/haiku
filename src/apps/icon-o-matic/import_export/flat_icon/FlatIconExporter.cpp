@@ -121,7 +121,8 @@ FlatIconExporter::Export(const Icon* icon, BNode* node,
 									  buffer.Buffer(), buffer.SizeUsed());
 	if (written != (ssize_t)buffer.SizeUsed()) {
 		if (written < 0) {
-			printf("failed to write attribute: %s\n", strerror((status_t)written));
+			printf("failed to write attribute: %s\n",
+				strerror((status_t)written));
 			return (status_t)written;
 		}
 		printf("failed to write attribute\n");
