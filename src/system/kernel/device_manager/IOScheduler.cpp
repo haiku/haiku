@@ -209,7 +209,12 @@ IOScheduler::_Finisher()
 
 		// If the request is done, we need to perform its notifications.
 		if (request->IsFinished()) {
-			if (request->HasCallbacks()) {
+			if (request->Status() == B_OK && request->RemainingBytes() > 0) {
+				// The request has been processed OK so far, but it isn't really
+				// finished yet.
+				fUnscheduledRequests.Add(request);
+				fNewRequestCondition.NotifyAll();
+			} else if (request->HasCallbacks()) {
 				// The request has callbacks that may take some time to perform,
 				// so we hand it over to the request notifier.
 				fFinishedRequests.Add(request);
@@ -233,13 +238,13 @@ IOScheduler::_FinisherWorkPending()
 
 
 IOOperation*
-IOScheduler::_GetOperation()
+IOScheduler::_GetOperation(bool wait)
 {
 	while (true) {
 		MutexLocker locker(fLock);
 
 		IOOperation* operation = fUnusedOperations.RemoveHead();
-		if (operation != NULL)
+		if (operation != NULL || !wait)
 			return operation;
 
 		// Wait for new operations. First check whether any finisher work has
@@ -311,16 +316,26 @@ IOScheduler::_Scheduler()
 		TRACE("IOScheduler::_Scheduler(): request: %p\n", request);
 
 		if (fDMAResource != NULL) {
+			IOOperationList operations;
 			while (request->RemainingBytes() > 0) {
-				IOOperation* operation = _GetOperation();
+				IOOperation* operation = _GetOperation(operations.IsEmpty());
+				if (operation == NULL)
+					break;
 
 				status_t status = fDMAResource->TranslateNext(request,
 					operation);
 				if (status != B_OK) {
+// TODO: Handle correctly! E.g. B_BUSY just means that some resource (e.g.
+// DMA buffers) isn't available ATM. We should execute the operations we have
+// so far and wait for resources to become available again.
 					AbortRequest(request, status);
 					break;
 				}
 
+				operations.Add(operation);
+			}
+
+			while (IOOperation* operation = operations.RemoveHead()) {
 				TRACE("IOScheduler::_Scheduler(): calling callback for "
 					"operation: %p\n", operation);
 
@@ -329,9 +344,10 @@ IOScheduler::_Scheduler()
 		} else {
 // TODO: If the device has block size restrictions, we might need to use a
 // bounce buffer.
-			IOOperation* operation = _GetOperation();
+			IOOperation* operation = _GetOperation(true);
 			operation->Prepare(request);
 			operation->SetOriginalRange(request->Offset(), request->Length());
+			request->Advance(request->Length());
 			fIOCallback(fIOCallbackData, operation);
 		}
 	}
