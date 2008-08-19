@@ -325,12 +325,12 @@ BListView::MouseDown(BPoint point)
 
 	if (index > -1) {
 		if (fListType == B_MULTIPLE_SELECTION_LIST) {
-			if (modifiers & B_CONTROL_KEY) {
+			if (modifiers & B_SHIFT_KEY) {
 				// select entire block
 				// TODO: maybe review if we want it like in Tracker (anchor item)
 				Select(min_c(index, fFirstSelected), max_c(index, fLastSelected));
 			} else {
-				if (modifiers & B_SHIFT_KEY) {
+				if (modifiers & B_COMMAND_KEY) {
 					// toggle selection state of clicked item (like in Tracker)
 					// toggle selection state of clicked item
 					if (ItemAt(index)->IsSelected())
@@ -343,13 +343,13 @@ BListView::MouseDown(BPoint point)
 			}
 		} else {
 			// toggle selection state of clicked item
-			if ((modifiers & B_SHIFT_KEY) && ItemAt(index)->IsSelected())
+			if ((modifiers & B_COMMAND_KEY) && ItemAt(index)->IsSelected())
 				Deselect(index);
 			else
 				Select(index);
 		}
 	} else {
-		if (!(modifiers & B_SHIFT_KEY))
+		if (!(modifiers & B_COMMAND_KEY))
 			DeselectAll();
 	}
 }
