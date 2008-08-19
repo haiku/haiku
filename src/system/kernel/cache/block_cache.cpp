@@ -803,13 +803,15 @@ block_cache::~block_cache()
 {
 	deleting = true;
 
-	mutex_lock(&sCachesLock);
-	sCaches.Remove(this);
-	mutex_unlock(&sCachesLock);
+	if (InitCheck() == B_OK) {
+		mutex_lock(&sCachesLock);
+		sCaches.Remove(this);
+		mutex_unlock(&sCachesLock);
 
-	unregister_low_resource_handler(&block_cache::LowMemoryHandler, this);
+		unregister_low_resource_handler(&block_cache::LowMemoryHandler, this);
 
-	mutex_destroy(&lock);
+		mutex_destroy(&lock);
+	}
 
 	condition_variable.Unpublish();
 
