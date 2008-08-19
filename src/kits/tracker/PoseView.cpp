@@ -6276,7 +6276,7 @@ BPoseView::MouseDown(BPoint where)
 		}
 	}
 
-	bool extendSelection = (modifs & B_SHIFT_KEY) && fMultipleSelection;
+	bool extendSelection = (modifs & B_COMMAND_KEY) && fMultipleSelection;
 
 	CommitActivePose();
 
@@ -6996,12 +6996,12 @@ BPoseView::AddRemoveSelectionRange(BPoint where, bool extendSelection, BPose *po
  	if ((pose == fSelectionPivotPose) && !extendSelection)
  		return;
 
-	if ((modifiers() & B_COMMAND_KEY) && fSelectionPivotPose) {
+	if ((modifiers() & B_SHIFT_KEY) && fSelectionPivotPose) {
 		// Multi Pose extend/shrink current selection
 		bool select = !pose->IsSelected() || !extendSelection;
 				// This weird bit of logic causes the selection to always
 				//  center around the pivot point, unless you choose to hold
-				//  down SHIFT, which will unselect between the pivot and
+				//  down COMMAND, which will unselect between the pivot and
 				//  the most recently selected Pose.
 
 		if (!extendSelection) {
