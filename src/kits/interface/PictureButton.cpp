@@ -127,10 +127,17 @@ BPictureButton::Draw(BRect updateRect)
 	rgb_color color = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	if (fBehavior == B_ONE_STATE_BUTTON) {
-		if (Value() == B_CONTROL_ON)
-			DrawPicture(fEnabledOn);
-		else
-			DrawPicture(fEnabledOff);
+		
+		if (IsEnabled()) {
+			if (Value() == B_CONTROL_ON)
+				DrawPicture(fEnabledOn);
+			else
+				DrawPicture(fEnabledOff);
+		} else 					
+			DrawPicture(fDisabledOff);
+				//a disabled one_state_button is always OFF (ie: not pushed) 
+				//since it cannot be pushed while disabled
+		
 	} else {
 		// B_TWO_STATE_BUTTON
 
