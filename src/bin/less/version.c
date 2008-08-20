@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1984-2002  Mark Nudelman
+ * Copyright (C) 1984-2007  Mark Nudelman
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Less License, as specified in the README file.
@@ -646,6 +646,67 @@ v380 11/24/02	Make LINENUM same as POSITION.
 v381 11/28/02	Make -N use 7 columns for line number if possible.
 -----------------------------------------------------------------
 v382   2/3/04	Remove copyrighted code.
+-----------------------------------------------------------------
+v383  2/16/04	Add history file; add -K option; improve UTF-8 handling;
+		fix some signed char bugs (thanks to Christian Biere);
+		fix some upper/lower case bugs (thanks to Bjoern Jacke);
+		add erase2 char (thanks to David Lawrence);
+		add windows charset (thanks to Dimitar Zhekov).
+v384  2/20/04	Improvements in UTF-8 handling.
+v385  2/23/04	Fix UTF-8 output bug.
+-----------------------------------------------------------------
+v386  9/13/05	Improvements to UTF-8 shift & color (thanks to Charles Levert);
+		protect against invalid LESSOPEN and LESSCLOSE values.
+v387  9/14/05	Update Charles Levert's UTF-8 patch.
+v388  9/14/05	Change history behavior; change most sprintf calls to snprintf.
+v389  9/14/05	Fix copy & paste with long lines; improve performance of 
+		expand_linebuf; fix crash in init_mlist; 
+v390  9/15/05	Show search matches in status column even if -G is set.
+-----------------------------------------------------------------
+v391  9/17/05	Fix bugs.
+v392  10/14/05	Fix line wrapping bug.
+v393  10/19/05	Allow multiple attributes per char; fix bold+underline bug
+		(thanks again to Charles Levert).
+v394  11/8/05	Fix prompt bug; fix compile problem in Windows build.
+-----------------------------------------------------------------
+v395  1/12/07	Update Unicode tables (thanks to Charles Levert);
+		don't chmod if LESSHISTFILE = /dev/null;
+		make -f work for directories; support DESTDIR in Makefile;
+		fix sigset_t detection in configure; 
+		make "t" cmd traverse tags in correct order
+v396  1/13/07	Add compatibility with POSIX more.
+v397  3/21/07	Allow decimal point in number for % command;
+		Allow decimal point in number for -j option;
+		Allow n command to fetch last search pattern from history
+		(thanks to arno).
+v398  3/22/07	Don't rewrite history file if not necessary;
+		fix bug when filenames contain "$".
+v399  3/22/07	Don't move to bottom of screen at startup;
+		don't output extraneous newlines.
+v400  3/23/07	Allow search to find pattern after null byte (PCRE and no-regex)
+		(thanks to Michael Constant).
+-----------------------------------------------------------------
+v401  3/24/07	Minor documentation fixes.
+v402  3/30/07	Fix autoconf bug when memcpy etc are inline;
+		fix bug in terminating number following -j option.
+v403  5/25/07	Fix Windows build.
+v404  6/5/07	Fix display bug with F command and long lines.
+v405  6/17/07	Fix display bug when using -w option.
+v406  6/17/07	Fix secure build.
+v407  8/16/07	Fix bugs; support CSI chars.
+v408  10/1/07	Fix bug in -i with non-ASCII chars.
+v409  10/12/07	Fix crash when viewing text with invalid UTF-8 sequences.
+v411  11/6/07	Fix case-insensitive searching with non-ASCII text.
+v412  11/6/07	Use symbolic SEEK constants.
+v413  11/6/07	Fix search highlight bug with non-ASCII text.
+v414  11/6/07	Fix display bug with no-wrap terminals.
+v415  11/14/07	Add --follow-name option.
+v416  11/22/07	Fix crash when searching text with invalid UTF-8 sequences.
+v417  12/31/07	Don't support single-char CSI in UTF-8 mode;
+		fix bug with -R and invalid CSI sequences;
+		fix bug searching text with SGR sequences with -r;
+		emulate SGR sequences in WIN32 build.
+v418  12/31/07	Clean up.
 */
 
-char version[] = "382";
+char version[] = "418";

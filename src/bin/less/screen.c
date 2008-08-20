@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1984-2002  Mark Nudelman
+ * Copyright (C) 1984-2007  Mark Nudelman
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Less License, as specified in the README file.
@@ -38,11 +38,12 @@ extern int fd0;
 
 #else
 
-#if HAVE_TERMIOS_H && HAVE_TERMIOS_FUNCS
-#include <termios.h>
-#if HAVE_SYS_IOCTL_H && !defined(TIOCGWINSZ)
+#if HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
+
+#if HAVE_TERMIOS_H && HAVE_TERMIOS_FUNCS
+#include <termios.h>
 #else
 #if HAVE_TERMIO_H
 #include <termio.h>
@@ -50,10 +51,7 @@ extern int fd0;
 #if HAVE_SGSTAT_H
 #include <sgstat.h>
 #else
-//#include <sgtty.h>
-#endif
-#if HAVE_SYS_IOCTL_H && (defined(TIOCGWINSZ) || defined(TCGETA) || defined(TIOCGETP) || defined(WIOCGETD))
-#include <sys/ioctl.h>
+#include <sgtty.h>
 #endif
 #endif
 #endif
@@ -165,6 +163,7 @@ static char
 	*sc_home,		/* Cursor home */
 	*sc_addline,		/* Add line, scroll down following lines */
 	*sc_lower_left,		/* Cursor to last line, first column */
+	*sc_return,		/* Cursor to beginning of current line */
 	*sc_move,		/* General cursor positioning */
 	*sc_clear,		/* Clear screen */
 	*sc_eol_clear,		/* Clear to end of line */
@@ -189,7 +188,9 @@ static int init_done = 0;
 
 public int auto_wrap;		/* Terminal does \r\n when write past margin */
 public int ignaw;		/* Terminal ignores \n immediately after wrap */
-public int erase_char, kill_char; /* The user's erase and line-kill chars */
+public int erase_char;		/* The user's erase char */
+public int erase2_char;		/* The user's other erase char */
+public int kill_char;		/* The user's line-kill char */
 public int werase_char;		/* The user's word-erase char */
 public int sc_width, sc_height;	/* Height & width of screen */
 public int bo_s_width, bo_e_width;	/* Printing width of boldface seq */
@@ -202,6 +203,7 @@ public int clear_bg;		/* Clear fills with background color */
 public int missing_cap = 0;	/* Some capability is missing */
 
 static int attrmode = AT_NORMAL;
+extern int binattr;
 
 #if !MSDOS_COMPILER
 static char *cheaper();
@@ -230,6 +232,8 @@ extern int sigs;
 extern int wscroll;
 extern int screen_trashed;
 extern int tty;
+extern int top_scroll;
+extern int oldbot;
 #if HILITE_SEARCH
 extern int hilite_search;
 #endif
@@ -257,6 +261,7 @@ raw_mode(on)
 
 	if (on == curr_on)
 		return;
+	erase2_char = '\b'; /* in case OS doesn't know about erase2 */
 #if HAVE_TERMIOS_H && HAVE_TERMIOS_FUNCS
     {
 	struct termios s;
@@ -339,6 +344,9 @@ raw_mode(on)
 		}
 #endif
 		erase_char = s.c_cc[VERASE];
+#ifdef VERASE2
+		erase2_char = s.c_cc[VERASE2];
+#endif
 		kill_char = s.c_cc[VKILL];
 #ifdef VWERASE
 		werase_char = s.c_cc[VWERASE];
@@ -615,7 +623,25 @@ ltget_env(capname)
 	char *capname;
 {
 	char name[16];
+	char *s;
 
+	s = lgetenv("LESS_TERMCAP_DEBUG");
+	if (s != NULL && *s != '\0')
+	{
+		struct env { struct env *next; char *name; char *value; };
+		static struct env *envs = NULL;
+		struct env *p;
+		for (p = envs;  p != NULL;  p = p->next)
+			if (strcmp(p->name, capname) == 0)
+				return p->value;
+		p = (struct env *) ecalloc(1, sizeof(struct env));
+		p->name = save(capname);
+		p->value = (char *) ecalloc(strlen(capname)+3, sizeof(char));
+		sprintf(p->value, "<%s>", capname);
+		p->next = envs;
+		envs = p;
+		return p->value;
+	}
 	strcpy(name, "LESS_TERMCAP_");
 	strcat(name, capname);
 	return (lgetenv(name));
@@ -1121,7 +1147,7 @@ get_term()
  	if ((term = lgetenv("TERM")) == NULL)
  		term = DEFAULT_TERM;
 	hardcopy = 0;
- 	if (tgetent(termbuf, term) <= 0)
+ 	if (tgetent(termbuf, term) != TGETENT_OK)
  		hardcopy = 1;
  	if (ltgetflag("hc"))
 		hardcopy = 1;
@@ -1201,7 +1227,7 @@ get_term()
 	if (below_mem && (sc_eos_clear == NULL || *sc_eos_clear == '\0'))
 	{
 		missing_cap = 1;
-		sc_eol_clear = "";
+		sc_eos_clear = "";
 	}
 
 	sc_clear = ltgetstr("cl", &sp);
@@ -1275,6 +1301,13 @@ get_term()
 		sp += strlen(sp) + 1;
 	}
 	sc_lower_left = cheaper(t1, t2, "\r");
+
+	/*
+	 * Get carriage return string.
+	 */
+	sc_return = ltgetstr("cr", &sp);
+	if (sc_return == NULL)
+		sc_return = "\r";
 
 	/*
 	 * Choose between using "al" or "sr" ("add line" or "scroll reverse")
@@ -1505,6 +1538,19 @@ init()
 		tputs(sc_init, sc_height, putchr);
 	if (!no_keypad)
 		tputs(sc_s_keypad, sc_height, putchr);
+	if (top_scroll) 
+	{
+		int i;
+
+		/*
+		 * This is nice to terminals with no alternate screen,
+		 * but with saved scrolled-off-the-top lines.  This way,
+		 * no previous line is lost, but we start with a whole
+		 * screen to ourself.
+		 */
+		for (i = 1; i < sc_height; i++)
+			putchr('\n');
+	}
 #else
 #if MSDOS_COMPILER==WIN32C
 	if (!no_init)
@@ -1782,6 +1828,37 @@ lower_left()
 }
 
 /*
+ * Move cursor to left position of current line.
+ */
+	public void
+line_left()
+{
+#if !MSDOS_COMPILER
+	tputs(sc_return, 1, putchr);
+#else
+	int row;
+	flush();
+#if MSDOS_COMPILER==WIN32C
+	{
+		CONSOLE_SCREEN_BUFFER_INFO scr;
+		GetConsoleScreenBufferInfo(con_out, &scr);
+		row = scr.dwCursorPosition.Y - scr.srWindow.Top + 1;
+	}
+#else
+#if MSDOS_COMPILER==BORLANDC || MSDOS_COMPILER==DJGPPC
+		row = wherey();
+#else
+	{
+		struct rccoord tpos = _gettextposition();
+		row = tpos.row;
+	}
+#endif
+#endif
+	_settextposition(row, 1);
+#endif
+}
+
+/*
  * Check if the console size has changed and reset internals 
  * (in lieu of SIGWINCH for WIN32).
  */
@@ -1846,12 +1923,12 @@ create_flash()
 	videopages = w.numvideopages;
 	if (videopages < 2)
 	{
-		so_enter();
-		so_exit();
+		at_enter(AT_STANDOUT);
+		at_exit();
 	} else
 	{
 		_setactivepage(1);
-		so_enter();
+		at_enter(AT_STANDOUT);
 		blanks = (char *) ecalloc(w.numtextcols, sizeof(char));
 		for (col = 0;  col < w.numtextcols;  col++)
 			blanks[col] = ' ';
@@ -1860,7 +1937,7 @@ create_flash()
 		_setactivepage(0);
 		_setvisualpage(0);
 		free(blanks);
-		so_exit();
+		at_exit();
 	}
 #else
 #if MSDOS_COMPILER==BORLANDC
@@ -2089,154 +2166,119 @@ clear_bot()
 	 * the mode while we do the clear.  Some terminals fill the
 	 * cleared area with the current attribute.
 	 */
-	lower_left();
-	switch (attrmode)
+	if (oldbot)
+		lower_left();
+	else
+		line_left();
+
+	if (attrmode == AT_NORMAL)
+		clear_eol_bot();
+	else
 	{
-	case AT_STANDOUT:
-		so_exit();
+		int saved_attrmode = attrmode;
+
+		at_exit();
 		clear_eol_bot();
-		so_enter();
-		break;
-	case AT_UNDERLINE:
-		ul_exit();
-		clear_eol_bot();
-		ul_enter();
-		break;
-	case AT_BOLD:
-		bo_exit();
-		clear_eol_bot();
-		bo_enter();
-		break;
-	case AT_BLINK:
-		bl_exit();
-		clear_eol_bot();
-		bl_enter();
-		break;
-	default:
-		clear_eol_bot();
-		break;
+		at_enter(saved_attrmode);
 	}
 }
 
-/*
- * Begin "standout" (bold, underline, or whatever).
- */
 	public void
-so_enter()
+at_enter(attr)
+	int attr;
 {
+	attr = apply_at_specials(attr);
+
 #if !MSDOS_COMPILER
-	tputs(sc_s_in, 1, putchr);
+	/* The one with the most priority is last.  */
+	if (attr & AT_UNDERLINE)
+		tputs(sc_u_in, 1, putchr);
+	if (attr & AT_BOLD)
+		tputs(sc_b_in, 1, putchr);
+	if (attr & AT_BLINK)
+		tputs(sc_bl_in, 1, putchr);
+	if (attr & AT_STANDOUT)
+		tputs(sc_s_in, 1, putchr);
 #else
 	flush();
-	SETCOLORS(so_fg_color, so_bg_color);
+	/* The one with the most priority is first.  */
+	if (attr & AT_STANDOUT)
+	{
+		SETCOLORS(so_fg_color, so_bg_color);
+	} else if (attr & AT_BLINK)
+	{
+		SETCOLORS(bl_fg_color, bl_bg_color);
+	}
+	else if (attr & AT_BOLD)
+	{
+		SETCOLORS(bo_fg_color, bo_bg_color);
+	}
+	else if (attr & AT_UNDERLINE)
+	{
+		SETCOLORS(ul_fg_color, ul_bg_color);
+	}
 #endif
-	attrmode = AT_STANDOUT;
+
+	attrmode = attr;
 }
 
-/*
- * End "standout".
- */
 	public void
-so_exit()
+at_exit()
 {
 #if !MSDOS_COMPILER
-	tputs(sc_s_out, 1, putchr);
+	/* Undo things in the reverse order we did them.  */
+	if (attrmode & AT_STANDOUT)
+		tputs(sc_s_out, 1, putchr);
+	if (attrmode & AT_BLINK)
+		tputs(sc_bl_out, 1, putchr);
+	if (attrmode & AT_BOLD)
+		tputs(sc_b_out, 1, putchr);
+	if (attrmode & AT_UNDERLINE)
+		tputs(sc_u_out, 1, putchr);
 #else
 	flush();
 	SETCOLORS(nm_fg_color, nm_bg_color);
 #endif
+
 	attrmode = AT_NORMAL;
 }
 
-/*
- * Begin "underline" (hopefully real underlining, 
- * otherwise whatever the terminal provides).
- */
 	public void
-ul_enter()
+at_switch(attr)
+	int attr;
 {
-#if !MSDOS_COMPILER
-	tputs(sc_u_in, 1, putchr);
-#else
-	flush();
-	SETCOLORS(ul_fg_color, ul_bg_color);
-#endif
-	attrmode = AT_UNDERLINE;
+	int new_attrmode = apply_at_specials(attr);
+	int ignore_modes = AT_ANSI;
+
+	if ((new_attrmode & ~ignore_modes) != (attrmode & ~ignore_modes))
+	{
+		at_exit();
+		at_enter(attr);
+	}
 }
 
-/*
- * End "underline".
- */
-	public void
-ul_exit()
+	public int
+is_at_equiv(attr1, attr2)
+	int attr1;
+	int attr2;
 {
-#if !MSDOS_COMPILER
-	tputs(sc_u_out, 1, putchr);
-#else
-	flush();
-	SETCOLORS(nm_fg_color, nm_bg_color);
-#endif
-	attrmode = AT_NORMAL;
+	attr1 = apply_at_specials(attr1);
+	attr2 = apply_at_specials(attr2);
+
+	return (attr1 == attr2);
 }
 
-/*
- * Begin "bold"
- */
-	public void
-bo_enter()
+	public int
+apply_at_specials(attr)
+	int attr;
 {
-#if !MSDOS_COMPILER
-	tputs(sc_b_in, 1, putchr);
-#else
-	flush();
-	SETCOLORS(bo_fg_color, bo_bg_color);
-#endif
-	attrmode = AT_BOLD;
-}
+	if (attr & AT_BINARY)
+		attr |= binattr;
+	if (attr & AT_HILITE)
+		attr |= AT_STANDOUT;
+	attr &= ~(AT_BINARY|AT_HILITE);
 
-/*
- * End "bold".
- */
-	public void
-bo_exit()
-{
-#if !MSDOS_COMPILER
-	tputs(sc_b_out, 1, putchr);
-#else
-	flush();
-	SETCOLORS(nm_fg_color, nm_bg_color);
-#endif
-	attrmode = AT_NORMAL;
-}
-
-/*
- * Begin "blink"
- */
-	public void
-bl_enter()
-{
-#if !MSDOS_COMPILER
-	tputs(sc_bl_in, 1, putchr);
-#else
-	flush();
-	SETCOLORS(bl_fg_color, bl_bg_color);
-#endif
-	attrmode = AT_BLINK;
-}
-
-/*
- * End "blink".
- */
-	public void
-bl_exit()
-{
-#if !MSDOS_COMPILER
-	tputs(sc_bl_out, 1, putchr);
-#else
-	flush();
-	SETCOLORS(nm_fg_color, nm_bg_color);
-#endif
-	attrmode = AT_NORMAL;
+	return attr;
 }
 
 #if 0 /* No longer used */
@@ -2425,5 +2467,34 @@ WIN32getch(tty)
 	 */
 	pending_scancode = (ascii == 0x00);
 	return ((char)ascii);
+}
+#endif
+
+#if MSDOS_COMPILER
+/*
+ */
+	public void
+WIN32setcolors(fg, bg)
+	int fg;
+	int bg;
+{
+	SETCOLORS(fg, bg);
+}
+
+/*
+ */
+	public void
+WIN32textout(text, len)
+	char *text;
+	int len;
+{
+#if MSDOS_COMPILER==WIN32C
+	WriteConsole(con_out, text, len, NULL, NULL);
+#else
+	char c = text[len];
+	text[len] = '\0';
+	cputs(text);
+	text[len] = c;
+#endif
 }
 #endif

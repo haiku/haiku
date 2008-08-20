@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1984-2002  Mark Nudelman
+ * Copyright (C) 1984-2007  Mark Nudelman
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Less License, as specified in the README file.
@@ -56,7 +56,7 @@ static int getentry();
  *
  * Use either pattern or line number.
  * findgtag() always uses line number, so pattern is always NULL.
- * findctag() usually either pattern (in which case line number is 0),
+ * findctag() uses either pattern (in which case line number is 0),
  * or line number (in which case pattern is NULL).
  */
 struct taglist {
@@ -75,10 +75,10 @@ struct tag {
 static struct tag *curtag;
 
 #define TAG_INS(tp) \
-	(tp)->next = taglist.tl_first; \
-	(tp)->prev = TAG_END; \
-	taglist.tl_first->prev = (tp); \
-	taglist.tl_first = (tp);
+	(tp)->next = TAG_END; \
+	(tp)->prev = taglist.tl_last; \
+	taglist.tl_last->next = (tp); \
+	taglist.tl_last = (tp);
 
 #define TAG_RM(tp) \
 	(tp)->next->prev = (tp)->prev; \
@@ -418,7 +418,7 @@ ctagsearch()
 		 * starting position of that line in linepos.
 		 */
 		linepos = pos;
-		pos = forw_raw_line(pos, &line);
+		pos = forw_raw_line(pos, &line, (int *)NULL);
 		if (linenum != 0)
 			linenum++;
 
@@ -498,7 +498,7 @@ findgtag(tag, type)
 #if !HAVE_POPEN
 		return TAG_NOFILE;
 #else
-		char command[512];
+		char *command;
 		char *flag;
 		char *qtag;
 		char *cmd = lgetenv("LESSGLOBALTAGS");
@@ -528,10 +528,13 @@ findgtag(tag, type)
 		qtag = shell_quote(tag);
 		if (qtag == NULL)
 			qtag = tag;
+		command = (char *) ecalloc(strlen(cmd) + strlen(flag) +
+				strlen(qtag) + 5, sizeof(char));
 		sprintf(command, "%s -x%s %s", cmd, flag, qtag);
 		if (qtag != tag)
 			free(qtag);
 		fp = popen(command, "r");
+		free(command);
 #endif
 	}
 	if (fp != NULL)
@@ -539,6 +542,7 @@ findgtag(tag, type)
 		while (fgets(buf, sizeof(buf), fp))
 		{
 			char *name, *file, *line;
+			int len;
 
 			if (sigs)
 			{
@@ -548,8 +552,9 @@ findgtag(tag, type)
 #endif
 				return TAG_INTR;
 			}
-			if (buf[strlen(buf) - 1] == '\n')
-				buf[strlen(buf) - 1] = 0;
+			len = strlen(buf);
+			if (len > 0 && buf[len-1] == '\n')
+				buf[len-1] = '\0';
 			else
 			{
 				int c;
@@ -657,7 +662,7 @@ prevgtag()
 /*
  * Position the current file at at what is hopefully the tag that was chosen
  * using either findtag() or one of nextgtag() and prevgtag().  Returns -1
- * if it was unable to position at the tag, 0 if succesful.
+ * if it was unable to position at the tag, 0 if successful.
  */
 	static POSITION
 gtagsearch()
@@ -695,14 +700,6 @@ gtagsearch()
  * The tag, file, and line will each be NUL-terminated pointers
  * into buf.
  */
-
-#ifndef isspace
-#define isspace(c)	((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) == '\r' || (c) == '\f')
-#endif
-#ifndef isdigit
-#define isdigit(c)	((c) >= '0' && (c <= '9'))
-#endif
-
 	static int
 getentry(buf, tag, file, line)
 	char *buf;	/* standard or extended ctags -x format data */
@@ -712,12 +709,12 @@ getentry(buf, tag, file, line)
 {
 	char *p = buf;
 
-	for (*tag = p;  *p && !isspace(*p);  p++)	/* tag name */
+	for (*tag = p;  *p && !IS_SPACE(*p);  p++)	/* tag name */
 		;
 	if (*p == 0)
 		return (-1);
 	*p++ = 0;
-	for ( ;  *p && isspace(*p);  p++)		/* (skip blanks) */
+	for ( ;  *p && IS_SPACE(*p);  p++)		/* (skip blanks) */
 		;
 	if (*p == 0)
 		return (-1);
@@ -725,27 +722,27 @@ getentry(buf, tag, file, line)
 	 * If the second part begin with other than digit,
 	 * it is assumed tag type. Skip it.
 	 */
-	if (!isdigit(*p))
+	if (!IS_DIGIT(*p))
 	{
-		for ( ;  *p && !isspace(*p);  p++)	/* (skip tag type) */
+		for ( ;  *p && !IS_SPACE(*p);  p++)	/* (skip tag type) */
 			;
-		for (;  *p && isspace(*p);  p++)	/* (skip blanks) */
+		for (;  *p && IS_SPACE(*p);  p++)	/* (skip blanks) */
 			;
 	}
-	if (!isdigit(*p))
+	if (!IS_DIGIT(*p))
 		return (-1);
 	*line = p;					/* line number */
-	for (*line = p;  *p && !isspace(*p);  p++)
+	for (*line = p;  *p && !IS_SPACE(*p);  p++)
 		;
 	if (*p == 0)
 		return (-1);
 	*p++ = 0;
-	for ( ; *p && isspace(*p);  p++)		/* (skip blanks) */
+	for ( ; *p && IS_SPACE(*p);  p++)		/* (skip blanks) */
 		;
 	if (*p == 0)
 		return (-1);
 	*file = p;					/* file name */
-	for (*file = p;  *p && !isspace(*p);  p++)
+	for (*file = p;  *p && !IS_SPACE(*p);  p++)
 		;
 	if (*p == 0)
 		return (-1);

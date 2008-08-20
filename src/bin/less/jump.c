@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1984-2002  Mark Nudelman
+ * Copyright (C) 1984-2007  Mark Nudelman
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Less License, as specified in the README file.
@@ -22,6 +22,7 @@ extern int squished;
 extern int screen_trashed;
 extern int sc_width, sc_height;
 extern int show_attn;
+extern int top_scroll;
 
 /*
  * Jump to the end of the file.
@@ -30,6 +31,7 @@ extern int show_attn;
 jump_forw()
 {
 	POSITION pos;
+	POSITION end_pos;
 
 	if (ch_end_seek())
 	{
@@ -41,11 +43,17 @@ jump_forw()
 	 * Go back one line from the end of the file
 	 * to get to the beginning of the last line.
 	 */
-	pos = back_line(ch_tell());
+	pos_clear();
+	end_pos = ch_tell();
+	pos = back_line(end_pos);
 	if (pos == NULL_POSITION)
 		jump_loc((POSITION)0, sc_height-1);
 	else
+	{
 		jump_loc(pos, sc_height-1);
+		if (position(sc_height-1) != end_pos)
+			repaint();
+	}
 }
 
 /*
@@ -101,8 +109,9 @@ repaint()
  * Jump to a specified percentage into the file.
  */
 	public void
-jump_percent(percent)
+jump_percent(percent, fraction)
 	int percent;
+	long fraction;
 {
 	POSITION pos, len;
 
@@ -120,7 +129,7 @@ jump_percent(percent)
 		error("Don't know length of file", NULL_PARG);
 		return;
 	}
-	pos = percent_pos(len, percent);
+	pos = percent_pos(len, percent, fraction);
 	if (pos >= len)
 		pos = len-1;
 
@@ -279,7 +288,10 @@ jump_loc(pos, sline)
 			}
 		}
 		lastmark();
-		clear();
+		if (!top_scroll)
+			clear();
+		else
+			home();
 		screen_trashed = 0;
 		add_back_pos(pos);
 		back(sc_height-1, pos, 1, 0);

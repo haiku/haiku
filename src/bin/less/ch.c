@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1984-2002  Mark Nudelman
+ * Copyright (C) 1984-2007  Mark Nudelman
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Less License, as specified in the README file.
@@ -19,6 +19,12 @@
 #if MSDOS_COMPILER==WIN32C
 #include <errno.h>
 #include <windows.h>
+#endif
+
+#if HAVE_STAT_INO
+#include <sys/stat.h>
+extern dev_t curr_dev;
+extern ino_t curr_ino;
 #endif
 
 typedef POSITION BLOCKNUM;
@@ -98,6 +104,8 @@ static int maxbufs = -1;
 extern int autobuf;
 extern int sigs;
 extern int secure;
+extern int screen_trashed;
+extern int follow_mode;
 extern constant char helpdata[];
 extern constant int size_helpdata;
 extern IFILE curr_ifile;
@@ -127,6 +135,9 @@ fch_get()
 	register int h;
 	POSITION pos;
 	POSITION len;
+
+	if (thisfile == NULL)
+		return (EOI);
 
 	slept = FALSE;
 
@@ -192,7 +203,7 @@ fch_get()
 		 */
 		if (!(ch_flags & CH_CANSEEK))
 			return ('?');
-		if (lseek(ch_file, (off_t)pos, 0) == BAD_LSEEK)
+		if (lseek(ch_file, (off_t)pos, SEEK_SET) == BAD_LSEEK)
 		{
  			error("seek error", NULL_PARG);
 			clear_eol();
@@ -273,6 +284,25 @@ fch_get()
 #endif
 #endif
 			slept = TRUE;
+
+#if HAVE_STAT_INO
+			if (follow_mode == FOLLOW_NAME)
+			{
+				/* See whether the file's i-number has changed.
+				 * If so, force the file to be closed and
+				 * reopened. */
+				struct stat st;
+				int r = stat(get_filename(curr_ifile), &st);
+				if (r == 0 && (st.st_ino != curr_ino ||
+					st.st_dev != curr_dev))
+				{
+					/* screen_trashed=2 causes
+					 * make_display to reopen the file. */
+					screen_trashed = 2;
+					return (EOI);
+				}
+			}
+#endif
 		}
 		if (sigs)
 			return (EOI);
@@ -416,6 +446,9 @@ ch_seek(pos)
 	BLOCKNUM new_block;
 	POSITION len;
 
+	if (thisfile == NULL)
+		return (0);
+
 	len = ch_length();
 	if (pos < ch_zero() || (len != NULL_POSITION && pos > len))
 		return (1);
@@ -449,6 +482,9 @@ ch_seek(pos)
 ch_end_seek()
 {
 	POSITION len;
+
+	if (thisfile == NULL)
+		return (0);
 
 	if (ch_flags & CH_CANSEEK)
 		ch_fsize = filesize(ch_file);
@@ -503,6 +539,8 @@ ch_beg_seek()
 	public POSITION
 ch_length()
 {
+	if (thisfile == NULL)
+		return (NULL_POSITION);
 	if (ignore_eoi)
 		return (NULL_POSITION);
 	if (ch_flags & CH_HELPFILE)
@@ -516,6 +554,8 @@ ch_length()
 	public POSITION
 ch_tell()
 {
+	if (thisfile == NULL)
+		return (NULL_POSITION);
 	return (ch_block * LBUFSIZE) + ch_offset;
 }
 
@@ -527,6 +567,8 @@ ch_forw_get()
 {
 	register int c;
 
+	if (thisfile == NULL)
+		return (EOI);
 	c = ch_get();
 	if (c == EOI)
 		return (EOI);
@@ -546,6 +588,8 @@ ch_forw_get()
 	public int
 ch_back_get()
 {
+	if (thisfile == NULL)
+		return (EOI);
 	if (ch_offset > 0)
 		ch_offset --;
 	else
@@ -585,6 +629,9 @@ ch_setbufspace(bufspace)
 ch_flush()
 {
 	register struct buf *bp;
+
+	if (thisfile == NULL)
+		return;
 
 	if (!(ch_flags & CH_CANSEEK))
 	{
@@ -628,7 +675,7 @@ ch_flush()
 	}
 #endif
 
-	if (lseek(ch_file, (off_t)0, 0) == BAD_LSEEK)
+	if (lseek(ch_file, (off_t)0, SEEK_SET) == BAD_LSEEK)
 	{
 		/*
 		 * Warning only; even if the seek fails for some reason,
@@ -691,7 +738,7 @@ ch_delbufs()
 	while (ch_bufhead != END_OF_CHAIN)
 	{
 		bp = ch_bufhead;
-		bp->next->prev = bp->prev;;
+		bp->next->prev = bp->prev;
 		bp->prev->next = bp->next;
 		free(bp);
 	}
@@ -717,7 +764,7 @@ seekable(f)
 		return (0);
 	}
 #endif
-	return (lseek(f, (off_t)1, 0) != BAD_LSEEK);
+	return (lseek(f, (off_t)1, SEEK_SET) != BAD_LSEEK);
 }
 
 /*
@@ -769,6 +816,9 @@ ch_close()
 {
 	int keepstate = FALSE;
 
+	if (thisfile == NULL)
+		return;
+
 	if (ch_flags & (CH_CANSEEK|CH_POPENED|CH_HELPFILE))
 	{
 		/*
@@ -807,6 +857,8 @@ ch_close()
 	public int
 ch_getflags()
 {
+	if (thisfile == NULL)
+		return (0);
 	return (ch_flags);
 }
 

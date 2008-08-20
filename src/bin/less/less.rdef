@@ -1,11 +1,11 @@
 resource app_version
 {
-	major = 3,
-	middle = 8,
-	minor = 2,
+	major = 4,
+	middle = 1,
+	minor = 8,
 	variety = 5,
 	internal = 0,
-	short_info = "382", 
-    long_info  = "382 ©2004 The Free Software Foundation"
+	short_info = "418", 
+	long_info  = "418 ©2008 The Free Software Foundation"
 };
 

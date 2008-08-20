@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1984-2002  Mark Nudelman
+ * Copyright (C) 1984-2007  Mark Nudelman
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Less License, as specified in the README file.
@@ -30,6 +30,7 @@ extern int linenums;
 extern int hshift;
 extern int sc_height;
 extern int jump_sline;
+extern int less_is_more;
 extern IFILE curr_ifile;
 #if EDITOR
 extern char *editor;
@@ -52,6 +53,8 @@ static constant char h_proto[] =
   "HELP -- ?eEND -- Press g to see it again:Press RETURN for more., or q when done";
 static constant char w_proto[] =
   "Waiting for data";
+static constant char more_proto[] =
+  "--More--(?eEND ?x- Next\\: %x.:?pB%pB\\%:byte %bB?s/%s...%t)";
 
 public char *prproto[3];
 public char constant *eqproto = e_proto;
@@ -68,7 +71,7 @@ static char *mp;
 init_prompt()
 {
 	prproto[0] = save(s_proto);
-	prproto[1] = save(m_proto);
+	prproto[1] = save(less_is_more ? more_proto : m_proto);
 	prproto[2] = save(M_proto);
 	eqproto = save(e_proto);
 	hproto = save(h_proto);
@@ -164,7 +167,7 @@ curr_byte(where)
 	POSITION pos;
 
 	pos = position(where);
-	while (pos == NULL_POSITION && where >= 0 && where < sc_height)
+	while (pos == NULL_POSITION && where >= 0 && where < sc_height-1)
 		pos = position(++where);
 	if (pos == NULL_POSITION)
 		pos = ch_length();
@@ -200,7 +203,7 @@ cond(c, where)
 	case 'd':	/* Same as l */
 		return (linenums);
 	case 'L':	/* Final line number known? */
-	case 'D':	/* Same as L */
+	case 'D':	/* Final page number known? */
 		return (linenums && ch_length() != NULL_POSITION);
 	case 'm':	/* More than one file? */
 #if TAGS
@@ -254,6 +257,9 @@ protochar(c, where, iseditproto)
 	LINENUM last_linenum;
 	IFILE h;
 
+#undef  PAGE_NUM
+#define PAGE_NUM(linenum)  ((((linenum) - 1) / (sc_height - 1)) + 1)
+
 	switch (c)
 	{
 	case 'b':	/* Current byte offset */
@@ -269,17 +275,26 @@ protochar(c, where, iseditproto)
 	case 'd':	/* Current page number */
 		linenum = currline(where);
 		if (linenum > 0 && sc_height > 1)
-			ap_linenum(((linenum - 1) / (sc_height - 1)) + 1);
+			ap_linenum(PAGE_NUM(linenum));
 		else
 			ap_quest();
 		break;
-	case 'D':	/* Last page number */
+	case 'D':	/* Final page number */
+		/* Find the page number of the last byte in the file (len-1). */
 		len = ch_length();
-		if (len == NULL_POSITION || len == ch_zero() ||
-		    (linenum = find_linenum(len)) <= 0)
+		if (len == NULL_POSITION)
 			ap_quest();
+		else if (len == 0)
+			/* An empty file has no pages. */
+			ap_linenum(0);
 		else
-			ap_linenum(((linenum - 1) / (sc_height - 1)) + 1);
+		{
+			linenum = find_linenum(len - 1);
+			if (linenum <= 0)
+				ap_quest();
+			else 
+				ap_linenum(PAGE_NUM(linenum));
+		}
 		break;
 #if EDITOR
 	case 'E':	/* Editor name */
@@ -518,7 +533,7 @@ pr_expand(proto, maxwidth)
 	}
 
 	if (mp == message)
-		return (NULL);
+		return ("");
 	if (maxwidth > 0 && mp >= message + maxwidth)
 	{
 		/*
@@ -549,9 +564,11 @@ eq_message()
 pr_string()
 {
 	char *prompt;
+	int type;
 
+	type = (!less_is_more) ? pr_type : pr_type ? 0 : 1;
 	prompt = pr_expand((ch_getflags() & CH_HELPFILE) ?
-				hproto : prproto[pr_type],
+				hproto : prproto[type],
 			sc_width-so_s_width-so_e_width-2);
 	new_file = 0;
 	return (prompt);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1984-2002  Mark Nudelman
+ * Copyright (C) 1984-2007  Mark Nudelman
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Less License, as specified in the README file.
@@ -33,6 +33,8 @@ extern int lnloop;
 extern int linenums;
 extern int wscroll;
 extern int reading;
+extern int quit_on_intr;
+extern long jump_sline_fraction;
 
 /*
  * Interrupt signal handler.
@@ -152,13 +154,12 @@ init_signals(on)
 #endif
 #ifdef SIGWINCH
 		(void) LSIGNAL(SIGWINCH, winch);
-#else
+#endif
 #ifdef SIGWIND
 		(void) LSIGNAL(SIGWIND, winch);
 #endif
 #ifdef SIGQUIT
 		(void) LSIGNAL(SIGQUIT, SIG_IGN);
-#endif
 #endif
 	} else
 	{
@@ -241,12 +242,15 @@ psignals()
 		if (sc_width != old_width || sc_height != old_height)
 		{
 			wscroll = (sc_height + 1) / 2;
+			calc_jump_sline();
 			screen_trashed = 1;
 		}
 	}
 #endif
 	if (tsignals & S_INTERRUPT)
 	{
+		if (quit_on_intr)
+			quit(QUIT_OK);
 		bell();
 		/*
 		 * {{ You may wish to replace the bell() with 

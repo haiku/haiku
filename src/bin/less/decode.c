@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1984-2002  Mark Nudelman
+ * Copyright (C) 1984-2007  Mark Nudelman
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Less License, as specified in the README file.
@@ -34,7 +34,7 @@
 #include "cmd.h"
 #include "lesskey.h"
 
-extern int erase_char, kill_char;
+extern int erase_char, erase2_char, kill_char;
 extern int secure;
 
 #define SK(k) \
@@ -120,6 +120,7 @@ static unsigned char cmdtable[] =
 	'7',0,				A_DIGIT,
 	'8',0,				A_DIGIT,
 	'9',0,				A_DIGIT,
+	'.',0,				A_DIGIT,
 
 	'=',0,				A_STAT,
 	CONTROL('G'),0,			A_STAT,
@@ -681,7 +682,7 @@ lesskey(filename, sysvar)
 		close(f);
 		return (-1);
 	}
-	if (lseek(f, (off_t)0, 0) == BAD_LSEEK)
+	if (lseek(f, (off_t)0, SEEK_SET) == BAD_LSEEK)
 	{
 		free(buf);
 		close(f);
@@ -754,7 +755,7 @@ editchar(c, flags)
 	 * but give it the edit-commands command table
 	 * This table is constructed to match the user's keyboard.
 	 */
-	if (c == erase_char)
+	if (c == erase_char || c == erase2_char)
 		return (EC_BACKSPACE);
 	if (c == kill_char)
 		return (EC_LINEKILL);
