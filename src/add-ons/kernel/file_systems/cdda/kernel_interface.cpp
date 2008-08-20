@@ -148,6 +148,7 @@ class Attribute : public DoublyLinkedListLinkImpl<Attribute> {
 		uint8* Data() const { return fData; }
 		
 		bool IsProtectedNamespace();
+		static bool IsProtectedNamespace(const char* name);
 
 	private:
 		char*		fName;
@@ -1052,9 +1053,18 @@ Attribute::IsProtectedNamespace()
 {
 	// Check if the attribute is in the restricted namespace. Attributes in
 	// this namespace should not be edited by the user as they are handled
-	// internally by the add-on.
-	return strncmp(kProtectedAttrNamespace, fName,
-		strlen(kProtectedAttrNamespace)) == 0;
+	// internally by the add-on. Calls the static version. 
+	return IsProtectedNamespace(fName);
+}
+
+
+bool
+Attribute::IsProtectedNamespace(const char* name)
+{
+	// Convenience static version of the above method. Usually called when we
+	// don't have a constructed Attribute object handy.
+	return strncmp(kProtectedAttrNamespace, name,
+		strlen(kProtectedAttrNamespace)) == 0;	
 }
 
 
@@ -1932,10 +1942,14 @@ cdda_create_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
 
 	Attribute* attribute = inode->FindAttribute(name);
 	if (attribute == NULL) {
+		if (Attribute::IsProtectedNamespace(name))
+			return B_NOT_ALLOWED;
 		status_t status = inode->AddAttribute(name, type, true, NULL, 0);
 		if (status < B_OK)
 			return status;
 	} else if ((openMode & O_EXCL) == 0) {
+		if (attribute->IsProtectedNamespace())
+			return B_NOT_ALLOWED;
 		attribute->SetType(type);
 		if ((openMode & O_TRUNC) != 0)
 			attribute->Truncate();
