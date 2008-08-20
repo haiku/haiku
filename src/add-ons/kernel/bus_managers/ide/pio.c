@@ -167,7 +167,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 
 		SHOW_FLOW(4, "cur_len=%d", cur_len);
 
-		err = transfer_PIO_virtcont(device, (char *)virtualAddress,
+		err = transfer_PIO_virtcont(device, (uint8 *)virtualAddress,
 			cur_len, write, transferred);
 
 		vm_put_physical_page(virtualAddress);
