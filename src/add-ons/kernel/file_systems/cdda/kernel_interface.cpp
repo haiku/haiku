@@ -146,6 +146,8 @@ class Attribute : public DoublyLinkedListLinkImpl<Attribute> {
 		size_t Size() const { return fSize; }
 		type_code Type() const { return fType; }
 		uint8* Data() const { return fData; }
+		
+		bool IsProtectedNamespace();
 
 	private:
 		char*		fName;
@@ -191,7 +193,8 @@ class Inode {
 						const char* string);
 		status_t	AddAttribute(const char* name, type_code type,
 						uint32 value);
-		status_t	RemoveAttribute(const char* name);
+		status_t	RemoveAttribute(const char* name,
+						bool check_namespace = false);
 
 		void		AddAttrCookie(attr_cookie* cookie);
 		void		RemoveAttrCookie(attr_cookie* cookie);
@@ -246,6 +249,8 @@ struct file_cookie {
 
 static const uint32 kMaxAttributeSize = 65536;
 static const uint32 kMaxAttributes = 64;
+
+static const char* kProtectedAttrNamespace = "CD:";
 
 static const char* kCddbIdAttribute = "CD:cddbid";
 static const char* kDoLookupAttribute = "CD:do_lookup";
@@ -572,12 +577,12 @@ Volume::Mount(const char* device)
 		return status;
 	}
 
-	bool do_lookup = true;
+	bool doLookup = true;
 	cdtext text;
 	if (read_cdtext(fDevice, text) < B_OK)
 		dprintf("CDDA: no CD-Text found.\n");
 	else
-		do_lookup = false;
+		doLookup = false;
 
 	int32 trackCount = toc->last_track + 1 - toc->first_track;
 	off_t totalFrames = 0;
@@ -644,7 +649,7 @@ Volume::Mount(const char* device)
 
 	// Add CD:do_lookup attribute.
 	fRootNode->AddAttribute(kDoLookupAttribute, B_BOOL_TYPE, true,
-		(const uint8*)&do_lookup, sizeof(bool));
+		(const uint8*)&doLookup, sizeof(bool));
 
 	_RestoreSharedAttributes();
 	_RestoreAttributes();
@@ -1042,6 +1047,14 @@ Attribute::SetSize(off_t size)
 }
 
 
+bool
+Attribute::IsProtectedNamespace() {
+	// Check if the attribute is in the restricted namespace. Attributes in
+	// this namespace should not be edited by the user as they are handled
+	// internally by the add-on.
+	return strncmp(kProtectedAttrNamespace, fName,
+		strlen(kProtectedAttrNamespace)) == 0;
+}
 //	#pragma mark - Inode class
 
 
@@ -1201,7 +1214,7 @@ Inode::AddAttribute(const char* name, type_code type, uint32 value)
 
 
 status_t
-Inode::RemoveAttribute(const char* name)
+Inode::RemoveAttribute(const char* name, bool check_namespace)
 {
 	if (name == NULL || !name[0])
 		return B_ENTRY_NOT_FOUND;
@@ -1211,6 +1224,9 @@ Inode::RemoveAttribute(const char* name)
 	while (iterator.HasNext()) {
 		Attribute* attribute = iterator.Next();
 		if (!strcmp(attribute->Name(), name)) {
+			// check for restricted namespace if required.
+			if (check_namespace && attribute->IsProtectedNamespace())
+				return B_NOT_ALLOWED;
 			// look for attribute in cookies
 			AttrCookieList::Iterator i = fAttrCookies.GetIterator();
 			while (i.HasNext()) {
@@ -1395,9 +1411,9 @@ cdda_write_fs_stat(fs_volume* _volume, const struct fs_info* info, uint32 mask)
 			// add-on. Disable CDDB lookups. Note this will usually mean that
 			// the user manually renamed the volume or that cddblinkd (or other
 			// program) did this so we do not want to do it again.
-			bool do_lookup = false;
+			bool doLookup = false;
 			volume->RootNode().AddAttribute(kDoLookupAttribute, B_BOOL_TYPE,
-				true, (const uint8*)&do_lookup, sizeof(bool));
+				true, (const uint8*)&doLookup, sizeof(bool));
 		}
 	}
 
@@ -1667,9 +1683,9 @@ cdda_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 		// add-on. Disable CDDB lookups. Note this will usually mean that the
 		// user manually renamed a track or that cddblinkd (or other program)
 		// did this so we do not want to do it again.
-		bool do_lookup = false;
+		bool doLookup = false;
 		volume->RootNode().AddAttribute(kDoLookupAttribute, B_BOOL_TYPE, true,
-			(const uint8*)&do_lookup, sizeof(bool));
+			(const uint8*)&doLookup, sizeof(bool));
 	}
 
 	return result;
@@ -1997,6 +2013,9 @@ cdda_write_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	if (attribute == NULL)
 		return B_ENTRY_NOT_FOUND;
 
+	if (attribute->IsProtectedNamespace())
+		return B_NOT_ALLOWED;
+
 	return attribute->WriteAt(offset, (uint8*)buffer, _length);
 }
 
@@ -2038,7 +2057,7 @@ cdda_remove_attr(fs_volume* _volume, fs_vnode* _node, const char* name)
 
 	Locker _(volume->Lock());
 
-	return inode->RemoveAttribute(name);
+	return inode->RemoveAttribute(name, true);
 }
 
 
