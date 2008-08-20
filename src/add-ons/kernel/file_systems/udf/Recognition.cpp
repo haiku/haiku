@@ -36,45 +36,54 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 // externally visible functions
 //------------------------------------------------------------------------------
 
+
 status_t
 udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
                    uint32 &blockShift, logical_volume_descriptor &logicalVolumeDescriptor,
 				   partition_descriptor partitionDescriptors[],
 				   uint8 &partitionDescriptorCount)
 {
-	DEBUG_INIT_ETC(NULL, ("device: %d, offset: %Ld, length: %Ld, "
-	               "blockSize: %ld, [...descriptors, etc...]", device, offset,
-	               length, blockSize));
+	TRACE(("udf_recognize: device: = %d, offset = %Ld, length = %Ld, "
+		"blockSize = %ld, [...descriptors, etc...]\n", device, offset,
+		length, blockSize));
 
 	// Check the block size
-	status_t error = get_block_shift(blockSize, blockShift);
-	if (!error) {
-		PRINT(("blockShift: %ld\n", blockShift));
-
-		// Check for a valid volume recognition sequence
-		error = walk_volume_recognition_sequence(device, offset, blockSize, blockShift);
-	
-		// Now hunt down a volume descriptor sequence from one of
-		// the anchor volume pointers (if there are any).
-		if (!error) {
-			error = walk_anchor_volume_descriptor_sequences(device, offset, length,
-			                                                blockSize, blockShift,
-			                                                logicalVolumeDescriptor,
-			                                                partitionDescriptors,
-			                                                partitionDescriptorCount);
-		}
-		
-		// Now walk the integrity sequence and make sure the last integrity
-		// descriptor is a closed descriptor
-		if (!error) {
-			error = walk_integrity_sequence(device, blockSize, blockShift,
-			                                logicalVolumeDescriptor.integrity_sequence_extent());
-		}
-	} else {
-		PRINT(("Block size must be a positive power of two! (blockSize = %ld)\n", blockSize));
+	status_t status = get_block_shift(blockSize, blockShift);
+	if (status != B_OK) {
+		TRACE_ERROR(("udf_recognize: Block size must be a positive power of "
+			"two! (blockSize = %ld)\n", blockSize));
+		return status;
 	}
-	
-	RETURN(error);
+	TRACE(("udf_recognize: blockShift: %ld\n", blockShift));
+
+	// Check for a valid volume recognition sequence
+	status = walk_volume_recognition_sequence(device, offset, blockSize,
+				blockShift);
+	if (status != B_OK) {
+		TRACE_ERROR(("udf_recognize: Invalid sequence. status = %d\n", status));
+		return status;
+	}
+	// Now hunt down a volume descriptor sequence from one of
+	// the anchor volume pointers (if there are any).
+	status = walk_anchor_volume_descriptor_sequences(device, offset, length,
+				blockSize, blockShift, logicalVolumeDescriptor,
+				partitionDescriptors, partitionDescriptorCount);
+	if (status != B_OK) {
+		TRACE_ERROR(("udf_recognize: cannot find volume descriptor. status = %d\n",
+			status));
+		return status;
+	}
+	// Now walk the integrity sequence and make sure the last integrity
+	// descriptor is a closed descriptor
+	status = walk_integrity_sequence(device, blockSize, blockShift,
+				logicalVolumeDescriptor.integrity_sequence_extent());
+	if (status != B_OK) {
+		TRACE_ERROR(("udf_recognize: last integrity descriptor not closed. "
+			"status = %d\n", status));
+		return status;
+	}
+
+	return B_OK;
 }
 
 //------------------------------------------------------------------------------
@@ -85,66 +94,66 @@ static
 status_t
 walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize, uint32 blockShift)
 {
-	DEBUG_INIT(NULL);
 	// vrs starts at block 16. Each volume structure descriptor (vsd)
 	// should be one block long. We're expecting to find 0 or more iso9660
 	// vsd's followed by some ECMA-167 vsd's.
 	MemoryChunk chunk(blockSize);
-	status_t error = chunk.InitCheck();
-	if (!error) {
-		bool foundISO = false;
-		bool foundExtended = false;
-		bool foundECMA167 = false;
-		bool foundECMA168 = false;
-		bool foundBoot = false;
-		for (uint32 block = 16; true; block++) {
-	    	PRINT(("block %ld: ", block))
-			off_t address = (offset + block) << blockShift;
-			ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
-			if (bytesRead == (ssize_t)blockSize)
-		    {
-		    	volume_structure_descriptor_header* descriptor =
-		    	  reinterpret_cast<volume_structure_descriptor_header*>(chunk.Data());
-				if (descriptor->id_matches(kVSDID_ISO)) {
-					SIMPLE_PRINT(("found ISO9660 descriptor\n"));
-					foundISO = true;
-				} else if (descriptor->id_matches(kVSDID_BEA)) {
-					SIMPLE_PRINT(("found BEA descriptor\n"));
-					foundExtended = true;
-				} else if (descriptor->id_matches(kVSDID_TEA)) {
-					SIMPLE_PRINT(("found TEA descriptor\n"));
-					foundExtended = true;
-				} else if (descriptor->id_matches(kVSDID_ECMA167_2)) {
-					SIMPLE_PRINT(("found ECMA-167 rev 2 descriptor\n"));
-					foundECMA167 = true;
-				} else if (descriptor->id_matches(kVSDID_ECMA167_3)) {
-					SIMPLE_PRINT(("found ECMA-167 rev 3 descriptor\n"));
-					foundECMA167 = true;
-				} else if (descriptor->id_matches(kVSDID_BOOT)) {
-					SIMPLE_PRINT(("found boot descriptor\n"));
-					foundBoot = true;
-				} else if (descriptor->id_matches(kVSDID_ECMA168)) {
-					SIMPLE_PRINT(("found ECMA-168 descriptor\n"));
-					foundECMA168 = true;
-				} else {
-					SIMPLE_PRINT(("found invalid descriptor, id = `%.5s'\n", descriptor->id));
-					break;
-				}
+	if (chunk.InitCheck() != B_OK) {
+		TRACE_ERROR(("walk_volume_recognition_sequence: Failed to construct "
+			"MemoryChunk\n"));
+		return B_ERROR;
+	}
+
+	bool foundISO = false;
+	bool foundExtended = false;
+	bool foundECMA167 = false;
+	bool foundECMA168 = false;
+	bool foundBoot = false;
+	for (uint32 block = 16; true; block++) {
+		TRACE(("walk_volume_recognition_sequence: block %ld: ", block));
+		off_t address = (offset + block) << blockShift;
+		ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
+		if (bytesRead == (ssize_t)blockSize)
+		{
+			volume_structure_descriptor_header* descriptor
+				= (volume_structure_descriptor_header *)(chunk.Data());
+			if (descriptor->id_matches(kVSDID_ISO)) {
+				TRACE(("found ISO9660 descriptor\n"));
+				foundISO = true;
+			} else if (descriptor->id_matches(kVSDID_BEA)) {
+				TRACE(("found BEA descriptor\n"));
+				foundExtended = true;
+			} else if (descriptor->id_matches(kVSDID_TEA)) {
+				TRACE(("found TEA descriptor\n"));
+				foundExtended = true;
+			} else if (descriptor->id_matches(kVSDID_ECMA167_2)) {
+				TRACE(("found ECMA-167 rev 2 descriptor\n"));
+				foundECMA167 = true;
+			} else if (descriptor->id_matches(kVSDID_ECMA167_3)) {
+				TRACE(("found ECMA-167 rev 3 descriptor\n"));
+				foundECMA167 = true;
+			} else if (descriptor->id_matches(kVSDID_BOOT)) {
+				TRACE(("found boot descriptor\n"));
+				foundBoot = true;
+			} else if (descriptor->id_matches(kVSDID_ECMA168)) {
+				TRACE(("found ECMA-168 descriptor\n"));
+				foundECMA168 = true;
 			} else {
-				SIMPLE_PRINT(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n", address,
-				        blockSize, bytesRead));
+				TRACE(("found invalid descriptor, id = `%.5s'\n", descriptor->id));
 				break;
 			}
+		} else {
+			TRACE_ERROR(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n", address,
+				blockSize, bytesRead));
+			break;
 		}
-		
-		// If we find an ECMA-167 descriptor, OR if we find a beginning
-		// or terminating extended area descriptor with NO ECMA-168
-		// descriptors, we return B_OK to signal that we should go
-		// looking for valid anchors.
-		error = foundECMA167 || (foundExtended && !foundECMA168) ? B_OK : B_ERROR;	
 	}
-	
-	RETURN(error);
+
+	// If we find an ECMA-167 descriptor, OR if we find a beginning
+	// or terminating extended area descriptor with NO ECMA-168
+	// descriptors, we return B_OK to signal that we should go
+	// looking for valid anchors.
+	return foundECMA167 || (foundExtended && !foundECMA168) ? B_OK : B_ERROR;	
 }
 
 static

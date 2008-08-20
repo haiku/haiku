@@ -229,8 +229,8 @@ private:
 	#define DUMP(x) ;
 #endif	// ifdef DEBUG else
 
-#define TRACE(x) DBG(dprintf x)
-#define TRACE_ERROR(x) DBG(dprintf x)
+#define TRACE(x) dprintf x
+#define TRACE_ERROR(x) dprintf x
 
 // These macros turn on or off extensive and generally unnecessary
 // debugging output regarding table of contents parsing
