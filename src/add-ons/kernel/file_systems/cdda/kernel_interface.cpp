@@ -194,7 +194,7 @@ class Inode {
 		status_t	AddAttribute(const char* name, type_code type,
 						uint32 value);
 		status_t	RemoveAttribute(const char* name,
-						bool check_namespace = false);
+						bool checkNamespace = false);
 
 		void		AddAttrCookie(attr_cookie* cookie);
 		void		RemoveAttrCookie(attr_cookie* cookie);
@@ -1048,13 +1048,16 @@ Attribute::SetSize(off_t size)
 
 
 bool
-Attribute::IsProtectedNamespace() {
+Attribute::IsProtectedNamespace()
+{
 	// Check if the attribute is in the restricted namespace. Attributes in
 	// this namespace should not be edited by the user as they are handled
 	// internally by the add-on.
 	return strncmp(kProtectedAttrNamespace, fName,
 		strlen(kProtectedAttrNamespace)) == 0;
 }
+
+
 //	#pragma mark - Inode class
 
 
@@ -1214,7 +1217,7 @@ Inode::AddAttribute(const char* name, type_code type, uint32 value)
 
 
 status_t
-Inode::RemoveAttribute(const char* name, bool check_namespace)
+Inode::RemoveAttribute(const char* name, bool checkNamespace)
 {
 	if (name == NULL || !name[0])
 		return B_ENTRY_NOT_FOUND;
@@ -1225,7 +1228,7 @@ Inode::RemoveAttribute(const char* name, bool check_namespace)
 		Attribute* attribute = iterator.Next();
 		if (!strcmp(attribute->Name(), name)) {
 			// check for restricted namespace if required.
-			if (check_namespace && attribute->IsProtectedNamespace())
+			if (checkNamespace && attribute->IsProtectedNamespace())
 				return B_NOT_ALLOWED;
 			// look for attribute in cookies
 			AttrCookieList::Iterator i = fAttrCookies.GetIterator();
