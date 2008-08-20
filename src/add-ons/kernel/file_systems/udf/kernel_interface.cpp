@@ -43,13 +43,18 @@ extern fs_vnode_ops gUDFVnodeOps;
 static float
 udf_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-	TRACE(("udf_identify_partition: fd = %d\n", fd));
+	TRACE(("udf_identify_partition: fd = %d, id = %d, offset = %d, size = %d "
+		"content_size = %d, block_size = %d\n", fd, partition->id,
+		partition->offset, partition->size, partition->content_size,
+		partition->block_size));
+
 	logical_volume_descriptor logicalVolumeDescriptor;
 	partition_descriptor partitionDescriptors[kMaxPartitionDescriptors];
 	uint8 descriptorCount = kMaxPartitionDescriptors;
 	uint32 blockShift;
-	status_t error = udf_recognize(fd, partition->offset, partition->size, 2048, blockShift,
-		logicalVolumeDescriptor, partitionDescriptors, descriptorCount);
+	status_t error = udf_recognize(fd, partition->offset, partition->size,
+		partition->block_size, blockShift, logicalVolumeDescriptor,
+		partitionDescriptors, descriptorCount);
 	if (error != B_OK)
 		return -1;
 
@@ -213,7 +218,7 @@ udf_read_stat(fs_volume *_volume, fs_vnode *node, struct stat *stat)
 	stat->st_gid = icb->Gid();
 
 	stat->st_mode = icb->Mode();
-	PRINT(("mode = 0x%lx\n", uint32(icb->Mode())));
+	TRACE(("mode = 0x%lx\n", uint32(icb->Mode())));
 	stat->st_size = icb->Length();
 
 	// File times. For now, treat the modification time as creation
@@ -222,7 +227,7 @@ udf_read_stat(fs_volume *_volume, fs_vnode *node, struct stat *stat)
 	stat->st_atime = icb->AccessTime();
 	stat->st_mtime = stat->st_ctime = stat->st_crtime = icb->ModificationTime();
 
-	PRINT(("stat->st_ino: %Ld\n", stat->st_ino));
+	TRACE(("stat->st_ino: %Ld\n", stat->st_ino));
 
 	RETURN(B_OK);
 }
@@ -392,21 +397,21 @@ udf_mount(fs_volume *_volume, const char *_device, uint32 flags,
 		// If that fails, you're just SOL.
 
 		if (ioctl(device, B_GET_PARTITION_INFO, &info) == 0) {
-			PRINT(("partition_info:\n"));
-			PRINT(("  offset:             %Ld\n", info.offset));
-			PRINT(("  size:               %Ld\n", info.size));
-			PRINT(("  logical_block_size: %ld\n", info.logical_block_size));
-			PRINT(("  session:            %ld\n", info.session));
-			PRINT(("  partition:          %ld\n", info.partition));
-			PRINT(("  device:             `%s'\n", info.device));
+			TRACE(("partition_info:\n"));
+			TRACE(("\toffset:             %Ld\n", info.offset));
+			TRACE(("\tsize:               %Ld\n", info.size));
+			TRACE(("\tlogical_block_size: %ld\n", info.logical_block_size));
+			TRACE(("\tsession:            %ld\n", info.session));
+			TRACE(("\tpartition:          %ld\n", info.partition));
+			TRACE(("\tdevice:             `%s'\n", info.device));
 			_device = info.device;
 			deviceOffset = info.offset / info.logical_block_size;
 			numBlock = deviceOffset + info.size / info.logical_block_size;
 		} else if (ioctl(device, B_GET_GEOMETRY, &geometry) == 0) {
-			PRINT(("geometry_info:\n"));
-			PRINT(("  sectors_per_track: %ld\n", geometry.sectors_per_track));
-			PRINT(("  cylinder_count:    %ld\n", geometry.cylinder_count));
-			PRINT(("  head_count:        %ld\n", geometry.head_count));
+			TRACE(("geometry_info:\n"));
+			TRACE(("\tsectors_per_track: %ld\n", geometry.sectors_per_track));
+			TRACE(("\tcylinder_count:    %ld\n", geometry.cylinder_count));
+			TRACE(("\thead_count:        %ld\n", geometry.head_count));
 			deviceOffset = 0;
 			numBlock = (off_t)geometry.sectors_per_track
 				* geometry.cylinder_count * geometry.head_count;
@@ -414,8 +419,8 @@ udf_mount(fs_volume *_volume, const char *_device, uint32 flags,
 			struct stat stat;
 			status = fstat(device, &stat) < 0 ? B_ERROR : B_OK;
 			if (!status) {
-				PRINT(("stat_info:\n"));
-				PRINT(("  st_size: %Ld\n", stat.st_size));
+				TRACE(("stat_info:\n"));
+				TRACE(("\tst_size: %Ld\n", stat.st_size));
 				deviceOffset = 0;
 				numBlock = stat.st_size / 2048;
 			}
