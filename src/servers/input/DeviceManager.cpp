@@ -242,7 +242,7 @@ DeviceManager::StopMonitoringDevice(_BDeviceAddOn_ *addon,
 	BDirectory directory;
 	BPath path("/dev");
 	if (((err = path.Append(device)) != B_OK)
-		|| ((err = directory.SetTo(path.Path())) != B_OK) 
+		|| ((err = directory.SetTo(path.Path())) != B_OK)
 		|| ((err = directory.GetNodeRef(&nref)) != B_OK))
 		return err;
 		
@@ -263,7 +263,7 @@ DeviceManager::StopMonitoringDevice(_BDeviceAddOn_ *addon,
 			}
 		}
 		if (stillMonitored)
-			break;				
+			break;
 	}
 	
 	// remove from list
@@ -276,6 +276,10 @@ DeviceManager::StopMonitoringDevice(_BDeviceAddOn_ *addon,
 			break;
 		}
 		j++;
+	}
+
+	if (addon->fMonitoredRefs.IsEmpty()) {
+		fDeviceAddons.RemoveItem(addon);
 	}
 	
 	// stop monitoring if needed
