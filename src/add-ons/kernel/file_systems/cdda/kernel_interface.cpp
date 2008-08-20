@@ -248,6 +248,7 @@ static const uint32 kMaxAttributeSize = 65536;
 static const uint32 kMaxAttributes = 64;
 
 static const char* kCddbIdAttribute = "CD:cddbid";
+static const char* kDoLookupAttribute = "CD:do_lookup";
 
 extern fs_volume_ops gCDDAVolumeOps;
 extern fs_vnode_ops gCDDAVnodeOps;
@@ -571,9 +572,12 @@ Volume::Mount(const char* device)
 		return status;
 	}
 
+	bool do_lookup = true;
 	cdtext text;
 	if (read_cdtext(fDevice, text) < B_OK)
 		dprintf("CDDA: no CD-Text found.\n");
+	else
+		do_lookup = false;
 
 	int32 trackCount = toc->last_track + 1 - toc->first_track;
 	off_t totalFrames = 0;
@@ -635,12 +639,15 @@ Volume::Mount(const char* device)
 		inode->AddAttribute("BEOS:TYPE", B_MIME_STRING_TYPE, "audio/x-wav");
 	}
 
+	// Add CD:cddbid attribute.
+	fRootNode->AddAttribute(kCddbIdAttribute, B_UINT32_TYPE, fDiscID);
+
+	// Add CD:do_lookup attribute.
+	fRootNode->AddAttribute(kDoLookupAttribute, B_BOOL_TYPE, true,
+		(const uint8*)&do_lookup, sizeof(bool));
+
 	_RestoreSharedAttributes();
 	_RestoreAttributes();
-
-	// Only add CD:cddbid attribute if it does not exist yet.
-	if (fRootNode->FindAttribute(kCddbIdAttribute) == NULL)
-		fRootNode->AddAttribute(kCddbIdAttribute, B_UINT32_TYPE, fDiscID);
 
 	free(toc);
 
@@ -1381,8 +1388,18 @@ cdda_write_fs_stat(fs_volume* _volume, const struct fs_info* info, uint32 mask)
 
 	status_t status = B_BAD_VALUE;
 
-	if ((mask & FS_WRITE_FSINFO_NAME) != 0)
+	if ((mask & FS_WRITE_FSINFO_NAME) != 0) {
 		status = volume->SetName(info->volume_name);
+		if (status == B_OK) {
+			// The volume had its name changed from outside the filesystem
+			// add-on. Disable CDDB lookups. Note this will usually mean that
+			// the user manually renamed the volume or that cddblinkd (or other
+			// program) did this so we do not want to do it again.
+			bool do_lookup = false;
+			volume->RootNode().AddAttribute(kDoLookupAttribute, B_BOOL_TYPE,
+				true, (const uint8*)&do_lookup, sizeof(bool));
+		}
+	}
 
 	return status;
 }
@@ -1644,7 +1661,18 @@ cdda_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	if (volume->Find(newName) != NULL)
 		return B_NAME_IN_USE;
 
-	return inode->SetName(newName);
+	status_t result = inode->SetName(newName);
+	if (result == B_OK) {
+		// One of the tracks had its name edited from outside the filesystem
+		// add-on. Disable CDDB lookups. Note this will usually mean that the
+		// user manually renamed a track or that cddblinkd (or other program)
+		// did this so we do not want to do it again.
+		bool do_lookup = false;
+		volume->RootNode().AddAttribute(kDoLookupAttribute, B_BOOL_TYPE, true,
+			(const uint8*)&do_lookup, sizeof(bool));
+	}
+
+	return result;
 }
 
 
