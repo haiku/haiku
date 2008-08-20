@@ -1882,7 +1882,7 @@ cdda_create_attr(fs_volume *_volume, fs_vnode *_node, const char *name,
 
 	Attribute *attribute = inode->FindAttribute(name);
 	if (attribute == NULL) {
-		status_t status = inode->AddAttribute(name, type);
+		status_t status = inode->AddAttribute(name, type, "");
 		if (status < B_OK)
 			return status;
 	} else if ((openMode & O_EXCL) == 0) {
