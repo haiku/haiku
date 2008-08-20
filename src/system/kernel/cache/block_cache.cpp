@@ -115,12 +115,11 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 
 	NotificationList pending_notifications;
 	ConditionVariable condition_variable;
-	bool			deleting;
 
 	block_cache(int fd, off_t numBlocks, size_t blockSize, bool readOnly);
 	~block_cache();
 
-	status_t InitCheck();
+	status_t Init();
 
 	void RemoveUnusedBlocks(int32 maxAccessed = LONG_MAX,
 		int32 count = LONG_MAX);
@@ -767,68 +766,50 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	next_transaction_id(1),
 	last_transaction(NULL),
 	transaction_hash(NULL),
+	buffer_cache(NULL),
 	num_dirty_blocks(0),
-	read_only(readOnly),
-	deleting(false)
+	read_only(readOnly)
 {
-	condition_variable.Publish(this, "cache transaction sync");
-
-	buffer_cache = create_object_cache_etc("block cache buffers", blockSize,
-		8, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
-	if (buffer_cache == NULL)
-		return;
-
-	hash = hash_init(1024, offsetof(cached_block, next), &cached_block::Compare,
-		&cached_block::Hash);
-	if (hash == NULL)
-		return;
-
-	transaction_hash = hash_init(16, offsetof(cache_transaction, next),
-		&transaction_compare, &::transaction_hash);
-	if (transaction_hash == NULL)
-		return;
-
-	mutex_init(&lock, "block cache");
-
-	register_low_resource_handler(&block_cache::LowMemoryHandler, this,
-		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 0);
-
-	MutexLocker _(sCachesLock);
-	sCaches.Add(this);
 }
 
 
 /*! Should be called with the cache's lock held. */
 block_cache::~block_cache()
 {
-	deleting = true;
-
-	if (InitCheck() == B_OK) {
-		mutex_lock(&sCachesLock);
-		sCaches.Remove(this);
-		mutex_unlock(&sCachesLock);
-
-		unregister_low_resource_handler(&block_cache::LowMemoryHandler, this);
-
-		mutex_destroy(&lock);
-	}
-
-	condition_variable.Unpublish();
+	unregister_low_resource_handler(&block_cache::LowMemoryHandler, this);
 
 	hash_uninit(transaction_hash);
 	hash_uninit(hash);
 
 	delete_object_cache(buffer_cache);
+
+	mutex_destroy(&lock);
 }
 
 
 status_t
-block_cache::InitCheck()
+block_cache::Init()
 {
-	if (buffer_cache == NULL || hash == NULL || transaction_hash == NULL)
+	condition_variable.Init(this, "cache transaction sync");
+	mutex_init(&lock, "block cache");
+
+	buffer_cache = create_object_cache_etc("block cache buffers", block_size,
+		8, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
+	if (buffer_cache == NULL)
 		return B_NO_MEMORY;
 
-	return B_OK;
+	hash = hash_init(1024, offsetof(cached_block, next), &cached_block::Compare,
+		&cached_block::Hash);
+	if (hash == NULL)
+		return B_NO_MEMORY;
+
+	transaction_hash = hash_init(16, offsetof(cache_transaction, next),
+		&transaction_compare, &::transaction_hash);
+	if (transaction_hash == NULL)
+		return B_NO_MEMORY;
+
+	return register_low_resource_handler(&block_cache::LowMemoryHandler, this,
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 0);
 }
 
 
@@ -1617,23 +1598,11 @@ get_next_locked_block_cache(block_cache *last)
 		cache = sCaches.Head();
 
 	while (cache != NULL) {
-		while (cache != NULL && cache->deleting) {
-			cache = sCaches.GetNext(cache);
-		}
+		cache = sCaches.GetNext(cache);
 		if (cache == NULL)
 			break;
 
-		status_t status = mutex_lock(&cache->lock);
-		if (status != B_OK) {
-			// can only happen if the cache is being deleted right now
-			continue;
-		}
-
-		if (cache->deleting) {
-			mutex_unlock(&cache->lock);
-			continue;
-		}
-
+		mutex_lock(&cache->lock);
 		break;
 	}
 
@@ -1649,7 +1618,7 @@ get_next_locked_block_cache(block_cache *last)
 	Every two seconds, it will also write back up to 64 blocks per cache.
 */
 static status_t
-block_notifier_and_writer(void *)
+block_notifier_and_writer(void */*data*/)
 {
 	const bigtime_t kTimeout = 2000000LL;
 	bigtime_t timeout = kTimeout;
@@ -1762,7 +1731,7 @@ wait_for_notifications(block_cache *cache)
 		cache);
 
 	ConditionVariableEntry entry;
-	entry.Add(cache);
+	cache->condition_variable.Add(&entry);
 
 	add_notification(cache, &notification, TRANSACTION_WRITTEN, false);
 
@@ -2364,6 +2333,10 @@ block_cache_delete(void *_cache, bool allowWrites)
 	if (allowWrites)
 		block_cache_sync(cache);
 
+	mutex_lock(&sCachesLock);
+	sCaches.Remove(cache);
+	mutex_unlock(&sCachesLock);
+
 	mutex_lock(&cache->lock);
 
 	// free all blocks
@@ -2396,10 +2369,13 @@ block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
 	if (cache == NULL)
 		return NULL;
 
-	if (cache->InitCheck() != B_OK) {
+	if (cache->Init() != B_OK) {
 		delete cache;
 		return NULL;
 	}
+
+	MutexLocker _(sCachesLock);
+	sCaches.Add(cache);
 
 	return cache;
 }
