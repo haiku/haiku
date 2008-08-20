@@ -34,7 +34,7 @@ static const uint32 kSerialBaudRate = 115200;
 static int32 sSerialEnabled = 0;
 static uint16 sSerialBasePort = 0x3f8;
 
-static char sBuffer[8192];
+static char sBuffer[16384];
 static uint32 sBufferPosition;
 
 
