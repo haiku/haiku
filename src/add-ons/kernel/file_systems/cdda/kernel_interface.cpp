@@ -247,6 +247,8 @@ struct file_cookie {
 static const uint32 kMaxAttributeSize = 65536;
 static const uint32 kMaxAttributes = 64;
 
+static const char* kCddbIdAttribute = "CD:cddbid";
+
 extern fs_volume_ops gCDDAVolumeOps;
 extern fs_vnode_ops gCDDAVnodeOps;
 
@@ -568,10 +570,6 @@ Volume::Mount(const char* device)
 		return status;
 	}
 
-	// add CD:cddbid attribute.
-	fRootNode->AddAttribute("CD:cddbid", B_UINT32_TYPE, true,
-		(const uint8 *)&fDiscID, 4); 
-
 	cdtext text;
 	if (read_cdtext(fDevice, text) < B_OK)
 		dprintf("CDDA: no CD-Text found.\n");
@@ -638,6 +636,11 @@ Volume::Mount(const char* device)
 
 	_RestoreSharedAttributes();
 	_RestoreAttributes();
+
+	// Only add CD:cddbid attribute if it does not exist yet.	
+	if (fRootNode->FindAttribute(kCddbIdAttribute) == NULL)
+		fRootNode->AddAttribute(kCddbIdAttribute, B_UINT32_TYPE, true,
+			(const uint8 *)&fDiscID, 4); 
 
 	free(toc);
 
