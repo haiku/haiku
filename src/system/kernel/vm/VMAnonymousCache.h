@@ -40,12 +40,18 @@ public:
 							size_t *_numBytes);
 	virtual	status_t	Write(off_t offset, const iovec *vecs, size_t count,
 							uint32 flags, size_t *_numBytes);
+	virtual	status_t	WriteAsync(off_t offset, const iovec* vecs,
+							size_t count, size_t numBytes, uint32 flags,
+							AsyncIOCallback* callback);
 
 	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
 
 	virtual	void		MergeStore(VMCache* source);
 
 private:
+			class WriteCallback;
+			friend class WriteCallback;
+
 			void		_SwapBlockBuild(off_t pageIndex,
 							swap_addr_t slotIndex, uint32 count);
 			void        _SwapBlockFree(off_t pageIndex, uint32 count);

@@ -33,6 +33,8 @@
 #include <vm_page.h>
 #include <vm_priv.h>
 
+#include "io_requests.h"
+
 
 #if	ENABLE_SWAP_SUPPORT
 
@@ -315,6 +317,51 @@ swap_space_unreserve(off_t amount)
 // #pragma mark -
 
 
+class VMAnonymousCache::WriteCallback : public StackableAsyncIOCallback {
+public:
+	WriteCallback(VMAnonymousCache* cache, AsyncIOCallback* callback)
+		:
+		StackableAsyncIOCallback(callback),
+		fCache(cache)
+	{
+	}
+
+	void SetTo(page_num_t pageIndex, swap_addr_t slotIndex, bool newSlot)
+	{
+		fPageIndex = pageIndex;
+		fSlotIndex = slotIndex;
+		fNewSlot = newSlot;
+	}
+
+	virtual void IOFinished(status_t status, bool partialTransfer,
+		size_t bytesTransferred)
+	{
+		if (fNewSlot) {
+			if (status == B_OK) {
+				fCache->_SwapBlockBuild(fPageIndex, fSlotIndex, 1);
+			} else {
+				AutoLocker<VMCache> locker(fCache);
+				fCache->fAllocatedSwapSize -= B_PAGE_SIZE;
+				locker.Unlock();
+
+				swap_slot_dealloc(fSlotIndex, 1);
+			}
+		}
+
+		fNextCallback->IOFinished(status, partialTransfer, bytesTransferred);
+	}
+
+private:
+	VMAnonymousCache*	fCache;
+	page_num_t			fPageIndex;
+	swap_addr_t			fSlotIndex;
+	bool				fNewSlot;
+};
+
+
+// #pragma mark -
+
+
 VMAnonymousCache::~VMAnonymousCache()
 {
 	// free allocated swap space and swap block
@@ -464,6 +511,59 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 	}
 
 	return B_OK;
+}
+
+
+status_t
+VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
+	size_t numBytes, uint32 flags, AsyncIOCallback* _callback)
+{
+	// TODO: Currently this method is only used for single pages. Either make
+	// more flexible use of it or change the interface!
+	// This implementation relies on the current usage!
+	ASSERT(count == 1);
+	ASSERT(numBytes <= B_PAGE_SIZE);
+
+	page_num_t pageIndex = offset >> PAGE_SHIFT;
+	swap_addr_t slotIndex = _SwapBlockGetAddress(pageIndex);
+	bool newSlot = slotIndex == SWAP_SLOT_NONE;
+
+	// If the page doesn't have any swap space yet, allocate it.
+	if (newSlot) {
+		AutoLocker<VMCache> locker(this);
+		if (fAllocatedSwapSize + B_PAGE_SIZE > fCommittedSwapSize)
+			return B_ERROR;
+
+		fAllocatedSwapSize += B_PAGE_SIZE;
+
+		slotIndex = swap_slot_alloc(1);
+	}
+
+	// create our callback
+	WriteCallback* callback = (flags & B_VIP_IO_REQUEST != 0)
+ 		? new(vip_io_alloc) WriteCallback(this, _callback)
+		: new(std::nothrow) WriteCallback(this, _callback);
+	if (callback == NULL) {
+		if (newSlot) {
+			AutoLocker<VMCache> locker(this);
+			fAllocatedSwapSize -= B_PAGE_SIZE;
+			locker.Unlock();
+
+			swap_slot_dealloc(slotIndex, 1);
+		}
+		return B_NO_MEMORY;
+	}
+// TODO: If the page already had swap space assigned, we don't need an own
+// callback.
+
+	callback->SetTo(pageIndex, slotIndex, newSlot);
+
+	// write the page asynchrounously
+	swap_file* swapFile = find_swap_file(slotIndex);
+	off_t pos = (slotIndex - swapFile->first_slot) * B_PAGE_SIZE;
+
+	return vfs_asynchronous_write_pages(swapFile->vnode, NULL, pos, vecs, 1,
+		numBytes, flags, callback);
 }
 
 
