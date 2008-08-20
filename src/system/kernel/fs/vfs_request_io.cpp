@@ -166,10 +166,16 @@ public:
 protected:
 	virtual status_t InternalIO(off_t offset, void* buffer, size_t* length)
 	{
-		if (fWrite)
-			return FS_CALL(fVnode, write, fCookie, offset, buffer, length);
+		iovec vec;
+		vec.iov_base = buffer;
+		vec.iov_len = *length;
 
-		return FS_CALL(fVnode, read, fCookie, offset, buffer, length);
+		if (fWrite) {
+			return FS_CALL(fVnode, write_pages, fCookie, offset, &vec, 1,
+				length);
+		}
+
+		return FS_CALL(fVnode, read_pages, fCookie, offset, &vec, 1, length);
 	}
 
 private:
