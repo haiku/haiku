@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,14 +21,16 @@
 #include "PartitionMap.h"
 #include "PartitionMapParser.h"
 
-#define TRACE_ENABLED
 
+//#define TRACE_ENABLED
 #ifdef TRACE_ENABLED
 #	ifdef _USER_MODE
 #		define TRACE(x) printf x
 #	else
 #		define TRACE(x) dprintf x
 #	endif
+#else
+#	define TRACE(x) ;
 #endif
 
 using std::nothrow;

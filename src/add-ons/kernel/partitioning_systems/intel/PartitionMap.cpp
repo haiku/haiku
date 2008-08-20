@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,6 +18,7 @@
 
 #ifndef _USER_MODE
 #	include <util/kernel_cpp.h>
+#	include <KernelExport.h>
 #else
 #	include <new>
 #endif
@@ -26,20 +27,19 @@
 #else
 #	include <boot/partitions.h>
 #endif
-#ifndef _USER_MODE
-#	include <KernelExport.h>
-#endif
 
 #include "PartitionMap.h"
 
-#define TRACE_ENABLED
 
+//#define TRACE_ENABLED
 #ifdef TRACE_ENABLED
 #	ifdef _USER_MODE
 #		define TRACE(x) printf x
 #	else
 #		define TRACE(x) dprintf x
 #	endif
+#else
+#	define TRACE(x) ;
 #endif
 
 using std::nothrow;
@@ -291,22 +291,24 @@ PartitionType::FindNext()
 
 // constructor
 Partition::Partition()
-	: fPTSOffset(0),
-	  fOffset(0),
-	  fSize(0),
-	  fType(0),
-	  fActive(false)
+	:
+	fPTSOffset(0),
+	fOffset(0),
+	fSize(0),
+	fType(0),
+	fActive(false)
 {
 }
 
 // constructor
 Partition::Partition(const partition_descriptor *descriptor,off_t ptsOffset,
-					 off_t baseOffset)
-	: fPTSOffset(0),
-	  fOffset(0),
-	  fSize(0),
-	  fType(0),
-	  fActive(false)
+		off_t baseOffset)
+	:
+	fPTSOffset(0),
+	fOffset(0),
+	fSize(0),
+	fType(0),
+	fActive(false)
 {
 	SetTo(descriptor, ptsOffset, baseOffset);
 }
@@ -314,9 +316,9 @@ Partition::Partition(const partition_descriptor *descriptor,off_t ptsOffset,
 // SetTo
 void
 Partition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-				 off_t baseOffset)
+	off_t baseOffset)
 {
-TRACE(("Partition::SetTo(): active: %x\n", descriptor->active));
+	TRACE(("Partition::SetTo(): active: %x\n", descriptor->active));
 	SetTo(baseOffset + (off_t)descriptor->start * SECTOR_SIZE,
 		(off_t)descriptor->size * SECTOR_SIZE,
 		descriptor->type,

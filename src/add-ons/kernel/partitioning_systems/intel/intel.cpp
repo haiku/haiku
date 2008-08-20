@@ -37,14 +37,13 @@
 #ifndef _BOOT_MODE
 #	include <DiskDeviceTypes.h>
 #	include "write_support.h"
+#	define TRACE(x) dprintf x
 #else
 #	include <boot/partitions.h>
 #	include <util/kernel_cpp.h>
+#	define TRACE(x) ;
 #endif
 
-
-//#define TRACE(x) ;
-#define TRACE(x) dprintf x
 
 // module names
 #define INTEL_PARTITION_MODULE_NAME "partitioning_systems/intel/map/v1"
