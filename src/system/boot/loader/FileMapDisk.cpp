@@ -15,7 +15,7 @@
 #include <SupportDefs.h>
 
 
-#define TRACE_FILEMAPDISK
+//#define TRACE_FILEMAPDISK
 #ifdef TRACE_FILEMAPDISK
 #	define TRACE(x) dprintf x
 #else

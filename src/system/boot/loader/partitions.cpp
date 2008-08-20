@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -79,21 +79,21 @@ namespace boot {
 	file descriptor upon deconstruction.
 */
 class NodeOpener {
-	public:
-		NodeOpener(Node *node, int mode)
-		{
-			fFD = open_node(node, mode);
-		}
+public:
+	NodeOpener(Node *node, int mode)
+	{
+		fFD = open_node(node, mode);
+	}
 
-		~NodeOpener()
-		{
-			close(fFD);
-		}
+	~NodeOpener()
+	{
+		close(fFD);
+	}
 
-		int Descriptor() const { return fFD; }
+	int Descriptor() const { return fFD; }
 
-	private:
-		int		fFD;
+private:
+	int		fFD;
 };
 
 
@@ -362,7 +362,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		Partition *child = NULL;
 
 		while ((child = (Partition *)iterator.Next()) != NULL) {
-			TRACE(("%p Partition::Scan: *** scan child %p (start = %Ld, size "
+			TRACE(("%p Partition::Scan(): scan child %p (start = %Ld, size "
 				"= %Ld, parent = %p)!\n", this, child, child->offset,
 				child->size, child->Parent()));
 
@@ -479,7 +479,7 @@ get_child_partition(partition_id id, int32 index)
 {
 	//Partition &partition = *(Partition *)id;
 
-	// ToDo: do we really have to implement this?
+	// TODO: do we really have to implement this?
 	//	The intel partition module doesn't really need this for our mission...
 	TRACE(("get_child_partition(id = %lu, index = %ld)\n", id, index));
 
