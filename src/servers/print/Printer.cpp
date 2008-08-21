@@ -126,7 +126,7 @@ Printer::Printer(const BDirectory* node, Resource* res)
 	: Inherited(B_EMPTY_STRING),
 	fPrinter(gLock, be_app, *node),
 	fResource(res),
-	fSinglePrintThread(true),
+	fSinglePrintThread(res->NeedsLocking()),
 	fJob(NULL),
 	fProcessing(0),
 	fAbort(false)
@@ -135,9 +135,6 @@ Printer::Printer(const BDirectory* node, Resource* res)
 		// Set our name to the name of the passed node
 	if (SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name) == B_OK)
 		SetName(name.String());
-
-	if (name == "Preview")
-		fSinglePrintThread = false;
 
 		// Add us to the global list of known printer definitions
 	sPrinters.AddItem(this);

@@ -27,7 +27,15 @@ Resource::~Resource() {
 }
 
 bool Resource::NeedsLocking() {
-	return !(fTransport == "Print to File" || fTransport == "NONE"); 
+	// TODO R2: Provide API to query that information
+	// ATM: Print jobs are not processed sequentially
+	// if the transport add-on is either "Print To File"
+	// or in case of "Preview" printer it
+	// is set on R5 to "NONE" IIRC and the Haiku
+	// preflet sets an empty string.
+	return !(fTransport == "Print To File" 
+		|| fTransport == "NONE"
+		|| fTransport == ""); 
 }
 
 bool Resource::Equals(const char* transport, const char* address, const char* connection) {

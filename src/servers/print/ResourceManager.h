@@ -22,12 +22,11 @@ private:
 	BString  fConnection;
 	sem_id   fResourceAvailable;
 
-	bool NeedsLocking();
-
-
 public:
 	Resource(const char* transport, const char* address, const char* connection);
 	~Resource();
+
+	bool NeedsLocking();
 
 	bool Equals(const char* transport, const char* address, const char* connection);
 
