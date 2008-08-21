@@ -154,9 +154,9 @@ to_vnode_id(long_address address)
 	ino_t result = address.block();
 	result <<= 16;
 	result |= address.partition();
-	PRINT(("block:     %ld, 0x%lx\n", address.block(), address.block())); 
-	PRINT(("partition: %d, 0x%x\n", address.partition(), address.partition())); 
-	PRINT(("length:    %ld, 0x%lx\n", address.length(), address.length()));
-	PRINT(("ino_t:     %Ld, 0x%Lx\n", result, result));
+	TRACE(("block:     %ld, 0x%lx\n", address.block(), address.block())); 
+	TRACE(("partition: %d, 0x%x\n", address.partition(), address.partition())); 
+	TRACE(("length:    %ld, 0x%lx\n", address.length(), address.length()));
+	TRACE(("ino_t:     %Ld, 0x%Lx\n", result, result));
 	return result;
 }

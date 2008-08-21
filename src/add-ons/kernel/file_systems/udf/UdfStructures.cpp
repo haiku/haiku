@@ -30,10 +30,10 @@ const charspec kCs0CharacterSet(0, "OSTA Compressed Unicode");
 //                              };
                               
 // Volume structure descriptor ids 
-const char* kVSDID_BEA 		= "BEA01";
-const char* kVSDID_TEA 		= "TEA01";
+const char* kVSDID_BEA 			= "BEA01";
+const char* kVSDID_TEA 			= "TEA01";
 const char* kVSDID_BOOT 		= "BOOT2";
-const char* kVSDID_ISO 		= "CD001";
+const char* kVSDID_ISO 			= "CD001";
 const char* kVSDID_ECMA167_2 	= "NSR02";
 const char* kVSDID_ECMA167_3 	= "NSR03";
 const char* kVSDID_ECMA168		= "CDW02";
