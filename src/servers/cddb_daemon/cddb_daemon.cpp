@@ -20,12 +20,12 @@ static const char* kCddaFsName = "cdda";
 
 CDDBDaemon::CDDBDaemon()
 	: BApplication("application/x-vnd.Haiku-CDDBDaemon")
-	, _volumeRoster(new BVolumeRoster)
+	, fVolumeRoster(new BVolumeRoster)
 {
-	_volumeRoster->StartWatching();
+	fVolumeRoster->StartWatching();
 	
 	BVolume volume;
-	while (_volumeRoster->GetNextVolume(&volume) == B_OK) {
+	while (fVolumeRoster->GetNextVolume(&volume) == B_OK) {
 		uint32 cddbId;
 		if (CanLookup(volume.Device(), &cddbId)) {
 			printf("CD can be looked up. CDDB id = %lu.\n", cddbId);
@@ -37,8 +37,8 @@ CDDBDaemon::CDDBDaemon()
 
 CDDBDaemon::~CDDBDaemon()
 {
-	_volumeRoster->StopWatching();
-	delete _volumeRoster;
+	fVolumeRoster->StopWatching();
+	delete fVolumeRoster;
 }
 
 

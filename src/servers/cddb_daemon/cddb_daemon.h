@@ -20,7 +20,7 @@ public:
 private:
 	bool CanLookup(const dev_t device, uint32* cddbId) const;
 
-	BVolumeRoster* _volumeRoster;
+	BVolumeRoster* fVolumeRoster;
 };
 
 #endif
