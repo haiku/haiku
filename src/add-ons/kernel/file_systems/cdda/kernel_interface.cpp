@@ -110,6 +110,7 @@ class Volume {
 		int			_OpenAttributes(int mode,
 						enum attr_mode attrMode = kDiscIDAttributes);
 		void		_RestoreAttributes();
+		void		_RestoreAttributes(int fd);
 		void		_StoreAttributes();
 		void		_RestoreSharedAttributes();
 		void		_StoreSharedAttributes();
@@ -580,11 +581,17 @@ Volume::Mount(const char* device)
 
 	bool doLookup = true;
 	cdtext text;
-	if (read_cdtext(fDevice, text) < B_OK)
-		dprintf("CDDA: no CD-Text found.\n");
-	else
-		doLookup = false;
-
+	int fd = _OpenAttributes(O_RDONLY);
+	if (fd < 0) {
+		// We do not seem to have an attribute file so this is probably the
+		// first time this CD is inserted. In this case, try to read CD-Text
+		// data.
+		if (read_cdtext(fDevice, text) < B_OK)
+			dprintf("CDDA: no CD-Text found.\n");
+		else
+			doLookup = false;	 
+	}
+		
 	int32 trackCount = toc->last_track + 1 - toc->first_track;
 	off_t totalFrames = 0;
 	char title[256];
@@ -653,7 +660,8 @@ Volume::Mount(const char* device)
 		(const uint8*)&doLookup, sizeof(bool));
 
 	_RestoreSharedAttributes();
-	_RestoreAttributes();
+	if (fd >= 0)
+		_RestoreAttributes(fd);
 
 	free(toc);
 
@@ -818,12 +826,19 @@ Volume::_RestoreAttributes()
 	int fd = _OpenAttributes(O_RDONLY);
 	if (fd < 0)
 		return;
+		
+	_RestoreAttributes(fd);
+	
+	close(fd);
+}
 
+
+void
+Volume::_RestoreAttributes(int fd)
+{
 	char line[B_FILE_NAME_LENGTH];
-	if (!read_line(fd, line, B_FILE_NAME_LENGTH)) {
-		close(fd);
+	if (!read_line(fd, line, B_FILE_NAME_LENGTH))
 		return;
-	}
 
 	SetName(line);
 
@@ -840,8 +855,6 @@ Volume::_RestoreAttributes()
 				break;
 		}
 	}
-
-	close(fd);
 }
 
 
