@@ -27,6 +27,7 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 #include <vm.h>
+#include <vm_address_space.h>
 
 
 // TODO kMagazineCapacity should be dynamically tuned per cache.
@@ -422,6 +423,7 @@ internal_alloc(size_t size, uint32 flags)
 		return buffer;
 	}
 
+	// TODO: Support CACHE_DONT_SLEEP!
 	return block_alloc(size);
 }
 
@@ -459,8 +461,10 @@ area_allocate_pages(object_cache *cache, void **pages, uint32 flags,
 	// if we are allocating, it is because we need the pages immediatly
 	// so we lock them. when moving the slab to the empty list we should
 	// unlock them, and lock them again when getting one from the empty list.
-	area_id areaId = create_area(cache->name, pages, addressSpec,
-		cache->slab_size, lock, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	area_id areaId = vm_create_anonymous_area(vm_kernel_address_space_id(),
+		cache->name, pages, addressSpec, cache->slab_size, lock,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		(flags & CACHE_DONT_SLEEP) != 0 ? CREATE_AREA_DONT_WAIT : 0, true);
 
 	if (unlockWhileAllocating)
 		cache->Lock();
@@ -559,6 +563,22 @@ object_cache_low_memory(void *_self, uint32 resources, int32 level)
 		cache->pressure = 0;
 		minimumAllowed = 0;
 		break;
+	}
+
+	// If the object cache has minimum object reserve, make sure that we don't
+	// free too many slabs.
+	if (cache->min_object_reserve > 0 && cache->empty_count > 0) {
+		size_t objectsPerSlab = cache->empty.Head()->size;
+		size_t freeObjects = cache->total_objects - cache->used_count;
+
+		if (cache->min_object_reserve + objectsPerSlab >= freeObjects)
+			return;
+
+		size_t slabsToFree = (freeObjects - cache->min_object_reserve)
+			/ objectsPerSlab;
+
+		if (cache->empty_count > minimumAllowed + slabsToFree)
+			minimumAllowed = cache->empty_count - slabsToFree;
 	}
 
 	if (cache->empty_count <= minimumAllowed)
