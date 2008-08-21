@@ -318,11 +318,13 @@ void MenuView::MarkCommandKey(void)
 	
 	get_key_map(&keys, &chars); 
 	
-	altcommand=(keys->left_command_key==0x5d) && (keys->right_command_key==0x5f); 
+	bool altAsShortcut = (keys->left_command_key == 0x5d)
+		&& (keys->left_control_key == 0x5c); 
+		
 	free(chars); 
 	free(keys);
 	
-	if(altcommand)
+	if(altAsShortcut)
 		altcmd->SetValue(B_CONTROL_ON);
 	else
 		ctrlcmd->SetValue(B_CONTROL_ON);
@@ -333,18 +335,14 @@ void MenuView::SetCommandKey(bool use_alt)
 	if(use_alt)
 	{
 		set_modifier_key(B_LEFT_COMMAND_KEY, 0x5d);
-		set_modifier_key(B_RIGHT_COMMAND_KEY, 0x5f);
 		set_modifier_key(B_LEFT_CONTROL_KEY, 0x5c);
-		set_modifier_key(B_RIGHT_OPTION_KEY, 0x60);
 		
 		be_roster->Broadcast(new BMessage(B_MODIFIERS_CHANGED));
 	}
 	else
 	{
 		set_modifier_key(B_LEFT_COMMAND_KEY, 0x5c);
-		set_modifier_key(B_RIGHT_COMMAND_KEY, 0x60);
 		set_modifier_key(B_LEFT_CONTROL_KEY, 0x5d);
-		set_modifier_key(B_RIGHT_OPTION_KEY, 0x5f);
 
 		be_roster->Broadcast(new BMessage(B_MODIFIERS_CHANGED));
 	}

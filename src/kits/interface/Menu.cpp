@@ -348,7 +348,7 @@ BMenu::AttachedToWindow()
 	char *chars = NULL;
 	get_key_map(&keys, &chars);
 	if (keys == NULL || keys->left_command_key != 0x5d
-		|| keys->right_command_key != 0x5f)
+		|| keys->left_control_key != 0x5c)
 		sAltAsCommandKey = false;
 	free(chars);
 	free(keys);

@@ -78,8 +78,9 @@ MenuSettings::AltAsShortcut() const
 	char* chars; 
 	
 	get_key_map(&keys, &chars);
-	bool altAsShortcut = (keys->left_command_key == 0x5d) 
-		&& (keys->right_command_key == 0x5f); 
+
+	bool altAsShortcut = (keys->left_command_key == 0x5d)
+		&& (keys->left_control_key == 0x5c); 
 
 	free(chars);
 	free(keys);
@@ -94,15 +95,11 @@ MenuSettings::SetAltAsShortcut(bool altAsShortcut)
 	if (altAsShortcut) {
 		// This might not be the same for all keyboards
 		set_modifier_key(B_LEFT_COMMAND_KEY, 0x5d);
-		set_modifier_key(B_RIGHT_COMMAND_KEY, 0x5f);
 		set_modifier_key(B_LEFT_CONTROL_KEY, 0x5c);
-		set_modifier_key(B_RIGHT_OPTION_KEY, 0x60);
 	} else {
 		// This might not be the same for all keyboards
 		set_modifier_key(B_LEFT_COMMAND_KEY, 0x5c);
-		set_modifier_key(B_RIGHT_COMMAND_KEY, 0x60);
 		set_modifier_key(B_LEFT_CONTROL_KEY, 0x5d);
-		set_modifier_key(B_RIGHT_OPTION_KEY, 0x5f);
 	}
 	be_roster->Broadcast(new BMessage(B_MODIFIERS_CHANGED));	
 }
