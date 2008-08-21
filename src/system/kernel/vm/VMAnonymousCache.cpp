@@ -678,7 +678,8 @@ VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 {
 	mutex_lock(&sSwapHashLock);
 
-	for (uint32 i = 0; i < count; i++) {
+	uint32 left = count;
+	for (uint32 i = 0, j = 0; i < count; i += j) {
 		off_t pageIndex = startPageIndex + i;
 		swap_addr_t slotIndex = startSlotIndex + i;
 
@@ -704,9 +705,12 @@ VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 		}
 
 		swap_addr_t blockIndex = pageIndex & SWAP_BLOCK_MASK;
-		swap->swap_slots[blockIndex] = slotIndex;
+		for (j = 0; blockIndex < SWAP_BLOCK_PAGES && left > 0; j++) {
+			swap->swap_slots[blockIndex++] = slotIndex + j;
+			left--;
+		}
 
-		swap->used++;
+		swap->used += j;
 	}
 
 	mutex_unlock(&sSwapHashLock);
@@ -718,20 +722,24 @@ VMAnonymousCache::_SwapBlockFree(off_t startPageIndex, uint32 count)
 {
 	mutex_lock(&sSwapHashLock);
 
-	for (uint32 i = 0; i < count; i++) {
+	uint32 left = count;
+	for (uint32 i = 0, j = 0; i < count; i += j) {
 		off_t pageIndex = startPageIndex + i;
 		swap_hash_key key = { this, pageIndex };
 		swap_block *swap = sSwapHashTable.Lookup(key);
-		if (swap != NULL) {
-			swap_addr_t swapAddr = swap->swap_slots[pageIndex & SWAP_BLOCK_MASK];
-			if (swapAddr != SWAP_SLOT_NONE) {
-				swap->swap_slots[pageIndex & SWAP_BLOCK_MASK] = SWAP_SLOT_NONE;
-				swap->used--;
-				if (swap->used == 0) {
-					sSwapHashTable.Remove(swap);
-					object_cache_free(sSwapBlockCache, swap);
-				}
-			}
+
+		ASSERT(swap != NULL);
+
+		swap_addr_t blockIndex = pageIndex & SWAP_BLOCK_MASK;
+		for (j = 0; blockIndex < SWAP_BLOCK_PAGES && left > 0; j++) {
+			swap->swap_slots[blockIndex++] = SWAP_SLOT_NONE;
+			left--;
+		}
+
+		swap->used -= j;
+		if (swap->used == 0) {
+			sSwapHashTable.Remove(swap);
+			object_cache_free(sSwapBlockCache, swap);
 		}
 	}
 
