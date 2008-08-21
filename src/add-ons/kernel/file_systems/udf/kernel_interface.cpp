@@ -174,7 +174,7 @@ udf_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 				return B_ENTRY_NOT_FOUND;
 		}
 	}
-	TRACE(("udf_lookup: vnodeId: %Ld\n", *vnodeID));
+	TRACE(("udf_lookup: vnodeId = %Ld found!\n", *vnodeID));
 
 	return status;
 }
@@ -439,8 +439,9 @@ udf_mount(fs_volume *_volume, const char *_device, uint32 flags,
 
 	_volume->private_volume = volume;
 	_volume->ops = &gUDFVolumeOps;
-	*_rootVnodeID = *(ino_t *)volume->RootIcb();
+	*_rootVnodeID = volume->RootIcb()->Id();
 
+	TRACE(("udf_mount: succefully mounted the partition\n"));
 	return B_OK;
 }
 

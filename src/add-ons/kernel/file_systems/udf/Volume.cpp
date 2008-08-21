@@ -11,6 +11,8 @@
 #include "PhysicalPartition.h"
 #include "Recognition.h"
 
+extern fs_volume_ops gUDFVolumeOps;
+extern fs_vnode_ops gUDFVnodeOps;
 
 /*! \brief Creates an unmounted volume with the given id. */
 Volume::Volume(fs_volume *fsVolume)
@@ -87,9 +89,10 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 				partitionDescriptorCount);
 
 	// Set up the block cache
-	if (!status)
+	if (!status) {
+		TRACE(("Volume::Mount: partition recognized\n"));
 		fBlockCache = block_cache_create(device, length, blockSize, IsReadOnly());
-	else {
+	} else {
 		TRACE_ERROR(("Volume::Mount: failed to recognize partition\n"));
 		return status;
 	}
@@ -98,88 +101,83 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 	int virtualCount = 0;
 	int sparableCount = 0;
 	int metadataCount = 0;
-	
+
 	// Set up the partitions
-	if (!status) {
-		// Set up physical and sparable partitions first
-		int offset = 0;
-		for (uint8 i = 0; i < logicalVolumeDescriptor.partition_map_count()
-		     && !status; i++)
-		{
-			uint8 *maps = logicalVolumeDescriptor.partition_maps();
-			partition_map_header *header =
-				reinterpret_cast<partition_map_header*>(maps+offset);
-			TRACE(("partition map %d (type %d):\n", i, header->type()));
-			if (header->type() == 1) {
-				TRACE(("map type: physical\n"));
-				physical_partition_map* map =
-					reinterpret_cast<physical_partition_map*>(header);
-				// Find the corresponding partition descriptor
-				partition_descriptor *descriptor = NULL;
-				for (uint8 j = 0; j < partitionDescriptorCount; j++) {
-					if (map->partition_number() ==
-					    partitionDescriptors[j].partition_number())
-					{
-						descriptor = &partitionDescriptors[j];
-						break;
-					}
+	// Set up physical and sparable partitions first
+	offset = 0;
+	for (uint8 i = 0; i < logicalVolumeDescriptor.partition_map_count()
+	     && !status; i++)
+	{
+		uint8 *maps = logicalVolumeDescriptor.partition_maps();
+		partition_map_header *header = (partition_map_header *)(maps + offset);
+		TRACE(("Volume::Mount: partition map %d (type %d):\n", i,
+			header->type()));
+		if (header->type() == 1) {
+			TRACE(("Volume::Mount: map type -> physical\n"));
+			physical_partition_map* map = (physical_partition_map *)header;
+			// Find the corresponding partition descriptor
+			partition_descriptor *descriptor = NULL;
+			for (uint8 j = 0; j < partitionDescriptorCount; j++) {
+				if (map->partition_number() ==
+				    partitionDescriptors[j].partition_number()) {
+					descriptor = &partitionDescriptors[j];
+					break;
 				}
-				// Create and add the partition
-				if (descriptor) {
-					PhysicalPartition *partition = new(nothrow) PhysicalPartition(
-					                               map->partition_number(),
-					                               descriptor->start(),
-					                               descriptor->length());
-					status = partition ? B_OK : B_NO_MEMORY;
-					if (!status) {
-						TRACE(("Adding PhysicalPartition(number: %d, start: %ld, "
-						       "length: %ld)\n", map->partition_number(),
-						       descriptor->start(), descriptor->length()));						       
-						status = _SetPartition(i, partition);
-						if (!status)
-							physicalCount++;	
-					}
-				} else {
-					TRACE(("no matching partition descriptor found!\n"));
-					status = B_ERROR;
-				}
-			} else if (header->type() == 2) {
-				// Figure out what kind of type 2 partition map we have based
-				// on the type identifier
-				const entity_id &typeId = header->partition_type_id();
-				DUMP(typeId);
-				DUMP(kSparablePartitionMapId);
-				if (typeId.matches(kVirtualPartitionMapId)) {
-					TRACE(("map type: virtual\n"));
-					virtual_partition_map* map =
-						reinterpret_cast<virtual_partition_map*>(header);
-					virtualCount++;
-					(void)map;	// kill the warning for now
-				} else if (typeId.matches(kSparablePartitionMapId)) {
-					TRACE(("map type: sparable\n"));
-					sparable_partition_map* map =
-						reinterpret_cast<sparable_partition_map*>(header);
-					sparableCount++;
-					(void)map;	// kill the warning for now
-				} else if (typeId.matches(kMetadataPartitionMapId)) {
-					TRACE(("map type: metadata\n"));
-					metadata_partition_map* map =
-						reinterpret_cast<metadata_partition_map*>(header);
-					metadataCount++;
-					(void)map;	// kill the warning for now
-				} else {
-					TRACE(("map type: unrecognized (`%.23s')\n",
-					       typeId.identifier()));
-					status = B_ERROR;				
+			}
+			// Create and add the partition
+			if (descriptor) {
+				PhysicalPartition *partition
+					= new(nothrow) PhysicalPartition(map->partition_number(),
+						descriptor->start(), descriptor->length());
+				status = partition ? B_OK : B_NO_MEMORY;
+				if (!status) {
+					TRACE(("Volume::Mount: adding PhysicalPartition(number: %d, "
+						"start: %ld, length: %ld)\n", map->partition_number(),
+						descriptor->start(), descriptor->length()));
+					status = _SetPartition(i, partition);
+					if (!status)
+						physicalCount++;
 				}
 			} else {
-				TRACE(("Invalid partition type %d found!\n", header->type()));
+				TRACE(("no matching partition descriptor found!\n"));
 				status = B_ERROR;
-			}			    
-			offset += header->length();
-		}
+			}
+		} else if (header->type() == 2) {
+			// Figure out what kind of type 2 partition map we have based
+			// on the type identifier
+			const entity_id &typeId = header->partition_type_id();
+			DUMP(typeId);
+			DUMP(kSparablePartitionMapId);
+			if (typeId.matches(kVirtualPartitionMapId)) {
+				TRACE(("map type: virtual\n"));
+				virtual_partition_map* map =
+					reinterpret_cast<virtual_partition_map*>(header);
+				virtualCount++;
+				(void)map;	// kill the warning for now
+			} else if (typeId.matches(kSparablePartitionMapId)) {
+				TRACE(("map type: sparable\n"));
+				sparable_partition_map* map =
+					reinterpret_cast<sparable_partition_map*>(header);
+				sparableCount++;
+				(void)map;	// kill the warning for now
+			} else if (typeId.matches(kMetadataPartitionMapId)) {
+				TRACE(("map type: metadata\n"));
+				metadata_partition_map* map =
+					reinterpret_cast<metadata_partition_map*>(header);
+				metadataCount++;
+				(void)map;	// kill the warning for now
+			} else {
+				TRACE(("map type: unrecognized (`%.23s')\n",
+				       typeId.identifier()));
+				status = B_ERROR;				
+			}
+		} else {
+			TRACE(("Invalid partition type %d found!\n", header->type()));
+			status = B_ERROR;
+		}			    
+		offset += header->length();
 	}
-		
+
 	// Do some checking as to what sorts of partitions we've actually found.
 	if (!status) {
 		status = (physicalCount == 1 && virtualCount == 0
@@ -211,6 +209,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 	// our partitions are all set up. We now need to investigate the file
 	// set descriptor pointed to by the logical volume descriptor.
 	if (!status) {
+		TRACE(("Volume::Mount: Partition has been set up\n"));
 		MemoryChunk chunk(logicalVolumeDescriptor.file_set_address().length());
 	
 		status = chunk.InitCheck();
@@ -219,16 +218,16 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 			off_t address;
 			// Read in the file set descriptor
 			status = MapBlock(logicalVolumeDescriptor.file_set_address(),
-			 	             &address);
+				&address);
 			if (!status)
 				address <<= blockShift;
 			if (!status) {
-				ssize_t bytesRead = read_pos(device, address, chunk.Data(),
-				                             blockSize);
+				ssize_t bytesRead
+					= read_pos(device, address, chunk.Data(), blockSize);
 				if (bytesRead != ssize_t(blockSize)) {
 					status = B_IO_ERROR;
-					TRACE(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n",
-					       address, blockSize, bytesRead));
+					TRACE_ERROR(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n",
+						address, blockSize, bytesRead));
 				}
 			}
 			// See if it's valid, and if so, create the root icb
@@ -244,12 +243,16 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 				if (!status) {
 					PDUMP(fileSet);
 					fRootIcb = new(nothrow) Icb(this, fileSet->root_directory_icb());
-					status = fRootIcb ? fRootIcb->InitCheck() : B_NO_MEMORY;
+					if (fRootIcb == NULL || fRootIcb->InitCheck() != B_OK)
+						return B_NO_MEMORY;
 				}
+
+				TRACE(("Volume::Mount: Root Node id = %d\n", fRootIcb->Id()));
 				if (!status) {
-					//status = new_vnode(fFSVolume->Id(), RootIcb()->Id(), (void*)RootIcb());
-					if (status) {
-						TRACE(("Error creating vnode for root icb! "
+					status = publish_vnode(fFSVolume, fRootIcb->Id(), fRootIcb,
+						&gUDFVnodeOps, fRootIcb->Mode(), 0);
+					if (status != B_OK) {
+						TRACE_ERROR(("Error creating vnode for root icb! "
 						       "status = 0x%lx, `%s'\n", status,
 						       strerror(status)));
 						// Clean up the icb we created, since _Unset()
@@ -257,11 +260,13 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 						delete fRootIcb;
 						fRootIcb = NULL;
 					}
-				}	
+					TRACE(("Volume::Mount: Root vnode published. Id = %d\n",
+						fRootIcb->Id()));
+				}
 			}
-		}	
+		}
 	}
-	
+
 	// If we've made it this far, we're good to go; set the volume
 	// name and then flag that we're mounted. On the other hand, if
 	// an error occurred, we need to clean things up.
@@ -285,9 +290,8 @@ Volume::Name() const {
 status_t
 Volume::MapBlock(long_address address, off_t *mappedBlock)
 {
-	DEBUG_INIT_ETC("Volume",
-		           ("partition: %d, block: %ld, mappedBlock: %p",
-		           address.partition(), address.block(), mappedBlock));
+	TRACE(("Volume::MapBlock: partition = %d, block = %ld, mappedBlock = %p\n",
+		address.partition(), address.block(), mappedBlock));
 	status_t error = mappedBlock ? B_OK : B_BAD_VALUE;
 	if (!error) {
 		Partition *partition = _GetPartition(address.partition());
