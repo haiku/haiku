@@ -49,7 +49,7 @@ public:
 
 	static const size_t kMinimumSize = 8;
 
-	// we use new [] / delete [] for allocation. If in the future this
+	// we use malloc() / free() for allocation. If in the future this
 	// is revealed to be insufficient we can switch to a template based
 	// allocator. All allocations are of power of 2 lengths.
 
@@ -75,7 +75,7 @@ public:
 
 	~OpenHashTable()
 	{
-		delete [] fTable;
+		free(fTable);
 	}
 
 	status_t Init(size_t initialSize = kMinimumSize)
@@ -116,7 +116,7 @@ public:
 
 	void InsertUnchecked(ValueType *value)
 	{
-		if (CheckDuplicates && _ExaustiveSearch(value))
+		if (CheckDuplicates && _ExhaustiveSearch(value))
 			panic("Hash Table: value already in table.");
 
 		_Insert(fTable, fTableSize, value);
@@ -160,7 +160,7 @@ public:
 		if (slot == NULL)
 			return false;
 
-		if (CheckDuplicates && _ExaustiveSearch(value))
+		if (CheckDuplicates && _ExhaustiveSearch(value))
 			panic("Hash Table: duplicate detected.");
 
 		fItemCount--;
@@ -228,7 +228,8 @@ protected:
 
 	bool _Resize(size_t newSize)
 	{
-		ValueType **newTable = new ValueType *[newSize];
+		ValueType **newTable
+			= (ValueType**)malloc(sizeof(ValueType*) * newSize);
 		if (newTable == NULL)
 			return false;
 
@@ -245,7 +246,7 @@ protected:
 				}
 			}
 
-			delete [] fTable;
+			free(fTable);
 		}
 
 		fTableSize = newSize;
@@ -258,7 +259,7 @@ protected:
 		return fDefinition.GetLink(bucket);
 	}
 
-	bool _ExaustiveSearch(ValueType *value) const
+	bool _ExhaustiveSearch(ValueType *value) const
 	{
 		for (size_t i = 0; i < fTableSize; i++) {
 			ValueType *bucket = fTable[i];
