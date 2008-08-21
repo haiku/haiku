@@ -12,25 +12,26 @@
 //------------------------------------------------------------------------------
 
 static status_t
-walk_volume_recognition_sequence(int device, off_t offset,
-                                 uint32 blockSize,
-                                 uint32 blockShift);
+walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
+	uint32 blockShift);
+
 static status_t
 walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
-                                        uint32 blockSize, uint32 blockShift,
-                                        logical_volume_descriptor &logicalVolumeDescriptor,
-							            partition_descriptor partitionDescriptors[],
-							            uint8 &partitionDescriptorCount);
+	uint32 blockSize, uint32 blockShift,
+	logical_volume_descriptor &logicalVolumeDescriptor,
+	partition_descriptor partitionDescriptors[],
+	uint8 &partitionDescriptorCount);
+
 static status_t
-walk_volume_descriptor_sequence(extent_address descriptorSequence,
-								int device, uint32 blockSize, uint32 blockShift,
-							    logical_volume_descriptor &logicalVolumeDescriptor,
-							    partition_descriptor partitionDescriptors[],
-							    uint8 &partitionDescriptorCount);
-							    
+walk_volume_descriptor_sequence(extent_address descriptorSequence, int device,
+	uint32 blockSize, uint32 blockShift,
+	logical_volume_descriptor &logicalVolumeDescriptor,
+	partition_descriptor partitionDescriptors[],
+	uint8 &partitionDescriptorCount);
+
 static status_t
 walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
-                        extent_address descriptorSequence, uint32 sequenceNumber = 0);
+	extent_address descriptorSequence, uint32 sequenceNumber = 0);
 
 //------------------------------------------------------------------------------
 // externally visible functions
@@ -65,8 +66,8 @@ udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	// Now hunt down a volume descriptor sequence from one of
 	// the anchor volume pointers (if there are any).
 	status = walk_anchor_volume_descriptor_sequences(device, offset, length,
-		blockSize, blockShift, logicalVolumeDescriptor,
-		partitionDescriptors, partitionDescriptorCount);
+		blockSize, blockShift, logicalVolumeDescriptor, partitionDescriptors,
+		partitionDescriptorCount);
 	if (status != B_OK) {
 		TRACE_ERROR(("udf_recognize: cannot find volume descriptor. status = %d\n",
 			status));
@@ -163,26 +164,22 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 static
 status_t
 walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
-                                        uint32 blockSize, uint32 blockShift,
-                                        logical_volume_descriptor &logicalVolumeDescriptor,
-							            partition_descriptor partitionDescriptors[],
-							            uint8 &partitionDescriptorCount)
+	uint32 blockSize, uint32 blockShift, 
+	logical_volume_descriptor &logicalVolumeDescriptor,
+	partition_descriptor partitionDescriptors[],
+	uint8 &partitionDescriptorCount)
 {
 	DEBUG_INIT(NULL);
 	const uint8 avds_location_count = 4;
-	const off_t avds_locations[avds_location_count] = {
-														256,
-	                                                    length-1-256,
-	                                                    length-1,
-	                                                    512,
-	                                                  };
+	const off_t avds_locations[avds_location_count]
+		= { 256, length-1-256, length-1, 512, };
 	bool found_vds = false;		                                                  
 	for (int32 i = 0; i < avds_location_count; i++) {
 		off_t block = avds_locations[i];
 		off_t address = (offset + block) << blockShift;
 		MemoryChunk chunk(blockSize);
 		anchor_volume_descriptor *anchor = NULL;
-			
+
 		status_t anchorErr = chunk.InitCheck();
 		if (!anchorErr) {
 			ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
