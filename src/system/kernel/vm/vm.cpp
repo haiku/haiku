@@ -1628,7 +1628,7 @@ vm_reserve_address_range(team_id team, void **_address, uint32 addressSpec,
 area_id
 vm_create_anonymous_area(team_id team, const char *name, void **address,
 	uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection,
-	bool unmapAddressRange, bool kernel)
+	uint32 flags, bool kernel)
 {
 	vm_area *area;
 	vm_cache *cache;
@@ -1712,7 +1712,8 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 	// won't be able to free anything for us.
 	addr_t reservedMemory = 0;
 	if (doReserveMemory) {
-		if (vm_try_reserve_memory(size, 1000000) != B_OK)
+		bigtime_t timeout = (flags & CREATE_AREA_DONT_WAIT) != 0 ? 0 : 1000000;
+		if (vm_try_reserve_memory(size, timeout) != B_OK)
 			return B_NO_MEMORY;
 		reservedMemory = size;
 		// TODO: We don't reserve the memory for the pages for the page
@@ -1722,18 +1723,28 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 		// can get the VM into trouble in low memory situations.
 	}
 
+	AddressSpaceWriteLocker locker;
+	vm_address_space *addressSpace;
+	status_t status;
+
 	// For full lock areas reserve the pages before locking the address
 	// space. E.g. block caches can't release their memory while we hold the
 	// address space lock.
 	page_num_t reservedPages = reservedMapPages;
 	if (wiring == B_FULL_LOCK)
 		reservedPages += size / B_PAGE_SIZE;
-	if (reservedPages > 0)
-		vm_page_reserve_pages(reservedPages);
+	if (reservedPages > 0) {
+		if ((flags & CREATE_AREA_DONT_WAIT) != 0) {
+			if (!vm_page_try_reserve_pages(reservedPages)) {
+				reservedPages = 0;
+				status = B_WOULD_BLOCK;
+				goto err0;
+			}
+		} else
+			vm_page_reserve_pages(reservedPages);
+	}
 
-	AddressSpaceWriteLocker locker;
-	vm_address_space *addressSpace;
-	status_t status = locker.SetTo(team);
+	status = locker.SetTo(team);
 	if (status != B_OK)
 		goto err0;
 
@@ -1782,7 +1793,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 
 	status = map_backing_store(addressSpace, cache, address, 0, size,
 		addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name,
-		unmapAddressRange, kernel);
+		(flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0, kernel);
 
 	if (status < B_OK) {
 		cache->ReleaseRefAndUnlock();
@@ -2099,8 +2110,10 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 		protection |= B_SHARED_AREA;
 
 	if (fd < 0) {
+		uint32 flags = addressSpec == B_EXACT_ADDRESS
+			? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0;
 		return vm_create_anonymous_area(team, name, _address, addressSpec, size,
-			B_NO_LOCK, protection, addressSpec == B_EXACT_ADDRESS, kernel);
+			B_NO_LOCK, protection, flags, kernel);
 	}
 
 	// get the open flags of the FD
@@ -5564,12 +5577,13 @@ clone_area(const char *name, void **_address, uint32 addressSpec,
 
 area_id
 create_area_etc(team_id team, const char *name, void **address,
-	uint32 addressSpec, uint32 size, uint32 lock, uint32 protection)
+	uint32 addressSpec, uint32 size, uint32 lock, uint32 protection,
+	uint32 flags)
 {
 	fix_protection(&protection);
 
 	return vm_create_anonymous_area(team, (char *)name, address, addressSpec,
-		size, lock, protection, false, true);
+		size, lock, protection, flags, true);
 }
 
 
@@ -5580,7 +5594,7 @@ create_area(const char *name, void **_address, uint32 addressSpec, size_t size, 
 	fix_protection(&protection);
 
 	return vm_create_anonymous_area(vm_kernel_address_space_id(), (char *)name, _address,
-		addressSpec, size, lock, protection, false, true);
+		addressSpec, size, lock, protection, 0, true);
 }
 
 
@@ -5806,8 +5820,7 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 	fix_protection(&protection);
 
 	area_id area = vm_create_anonymous_area(vm_current_user_address_space_id(),
-		(char *)name, &address, addressSpec, size, lock, protection, false,
-		false);
+		(char *)name, &address, addressSpec, size, lock, protection, 0, false);
 
 	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
 		delete_area(area);

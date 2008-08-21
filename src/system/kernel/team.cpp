@@ -816,7 +816,7 @@ create_team_user_data(struct team* team)
 	void* address = (void*)KERNEL_USER_DATA_BASE;
 	size_t size = 4 * B_PAGE_SIZE;
 	team->user_data_area = create_area_etc(team->id, "user area", &address,
-		B_BASE_ADDRESS, size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_BASE_ADDRESS, size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA, 0);
 	if (team->user_data_area < 0)
 		return team->user_data_area;
 
@@ -996,7 +996,7 @@ team_create_thread_start(void *args)
 	sprintf(ustack_name, "%s_main_stack", team->name);
 	t->user_stack_area = create_area_etc(team->id, ustack_name,
 		(void **)&t->user_stack_base, B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK,
-		B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
+		B_READ_AREA | B_WRITE_AREA | B_STACK_AREA, 0);
 	if (t->user_stack_area < 0) {
 		dprintf("team_create_thread_start: could not create default user stack region\n");
 

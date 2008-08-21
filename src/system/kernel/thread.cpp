@@ -508,7 +508,7 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 			thread->user_stack_area = create_area_etc(team->id, stack_name,
 					(void **)&thread->user_stack_base, B_BASE_ADDRESS,
 					thread->user_stack_size + TLS_SIZE, B_NO_LOCK,
-					B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
+					B_READ_AREA | B_WRITE_AREA | B_STACK_AREA, 0);
 			if (thread->user_stack_area < B_OK
 				|| arch_thread_init_tls(thread) < B_OK) {
 				// great, we have a fully running thread without a (usable)

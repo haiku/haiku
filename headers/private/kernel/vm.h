@@ -23,6 +23,11 @@ struct vm_address_space;
 struct vnode;
 
 
+// area creation flags
+#define CREATE_AREA_DONT_WAIT			0x01
+#define CREATE_AREA_UNMAP_ADDRESS_RANGE	0x02
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -48,14 +53,15 @@ void forbid_page_faults(void);
 
 // private kernel only extension (should be moved somewhere else):
 area_id create_area_etc(team_id team, const char *name, void **address,
-			uint32 addressSpec, uint32 size, uint32 lock, uint32 protection);
+			uint32 addressSpec, uint32 size, uint32 lock, uint32 protection,
+			uint32 flags);
 
 status_t vm_unreserve_address_range(team_id team, void *address, addr_t size);
 status_t vm_reserve_address_range(team_id team, void **_address,
 			uint32 addressSpec, addr_t size, uint32 flags);
 area_id vm_create_anonymous_area(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection,
-			bool unmapAddressRange, bool kernel);
+			uint32 flags, bool kernel);
 area_id vm_map_physical_memory(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, addr_t phys_addr);
 area_id vm_map_file(team_id aid, const char *name, void **address,

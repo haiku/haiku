@@ -548,7 +548,7 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 
 	void *address = (void *)0;
 	state->ram_area = create_area_etc(team->id, "dos", &address,
-		B_EXACT_ADDRESS, ramSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_EXACT_ADDRESS, ramSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA, 0);
 	if (state->ram_area < B_OK) {
 		ret = state->ram_area;
 		TRACE("Could not create RAM area\n");
