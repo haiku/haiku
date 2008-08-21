@@ -71,4 +71,5 @@ SubInclude HAIKU_TOP src tests system kernel cache ;
 SubInclude HAIKU_TOP src tests system kernel device_manager ;
 SubInclude HAIKU_TOP src tests system kernel scheduler ;
 SubInclude HAIKU_TOP src tests system kernel slab ;
+SubInclude HAIKU_TOP src tests system kernel swap ;
 SubInclude HAIKU_TOP src tests system kernel util ;
