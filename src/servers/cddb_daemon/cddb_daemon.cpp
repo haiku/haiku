@@ -19,8 +19,8 @@ static const char* kCddaFsName = "cdda";
 
 
 CDDBDaemon::CDDBDaemon()
-	: BApplication("application/x-vnd.Haiku-CDDBDaemon")
-	, fVolumeRoster(new BVolumeRoster)
+	: BApplication("application/x-vnd.Haiku-CDDBDaemon"),
+	  fVolumeRoster(new BVolumeRoster)
 {
 	fVolumeRoster->StartWatching();
 	
