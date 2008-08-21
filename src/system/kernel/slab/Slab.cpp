@@ -11,11 +11,13 @@
 
 #include <algorithm>
 #include <new>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <KernelExport.h>
 
+#include <condition_variable.h>
 #include <Depot.h>
 #include <kernel.h>
 #include <low_resource_manager.h>
@@ -54,12 +56,14 @@ struct object_link {
 
 struct slab : DoublyLinkedListLinkImpl<slab> {
 	void *pages;
-	size_t count, size;
+	size_t size;		// total number of objects
+	size_t count;		// free objects
 	size_t offset;
 	object_link *free;
 };
 
 typedef DoublyLinkedList<slab> SlabList;
+struct ResizeRequest;
 
 struct object_cache : DoublyLinkedListLinkImpl<object_cache> {
 	char name[32];
@@ -67,11 +71,17 @@ struct object_cache : DoublyLinkedListLinkImpl<object_cache> {
 	size_t object_size;
 	size_t cache_color_cycle;
 	SlabList empty, partial, full;
-	size_t used_count, empty_count, pressure;
+	size_t total_objects;		// total number of objects
+	size_t used_count;			// used objects
+	size_t empty_count;			// empty slabs
+	size_t pressure;
+	size_t min_object_reserve;	// minimum number of free objects
 
 	size_t slab_size;
 	size_t usage, maximum;
 	uint32 flags;
+
+	ResizeRequest *resize_request;
 
 	void *cookie;
 	object_cache_constructor constructor;
@@ -79,12 +89,12 @@ struct object_cache : DoublyLinkedListLinkImpl<object_cache> {
 	object_cache_reclaimer reclaimer;
 
 	status_t (*allocate_pages)(object_cache *cache, void **pages,
-		uint32 flags);
+		uint32 flags, bool unlockWhileAllocating);
 	void (*free_pages)(object_cache *cache, void *pages);
 
 	object_depot depot;
 
-	virtual slab *CreateSlab(uint32 flags) = 0;
+	virtual slab *CreateSlab(uint32 flags, bool unlockWhileAllocating) = 0;
 	virtual void ReturnSlab(slab *slab) = 0;
 	virtual slab *ObjectSlab(void *object) const = 0;
 
@@ -95,12 +105,15 @@ struct object_cache : DoublyLinkedListLinkImpl<object_cache> {
 	virtual void UnprepareObject(slab *source, void *object) {}
 
 	virtual ~object_cache() {}
+
+	bool Lock()		{ return mutex_lock(&lock) == B_OK; }
+	void Unlock()	{ mutex_unlock(&lock); }
 };
 
 typedef DoublyLinkedList<object_cache> ObjectCacheList;
 
 struct SmallObjectCache : object_cache {
-	slab *CreateSlab(uint32 flags);
+	slab *CreateSlab(uint32 flags, bool unlockWhileAllocating);
 	void ReturnSlab(slab *slab);
 	slab *ObjectSlab(void *object) const;
 };
@@ -139,7 +152,7 @@ struct HashedObjectCache : object_cache {
 	HashedObjectCache()
 		: hash_table(this) {}
 
-	slab *CreateSlab(uint32 flags);
+	slab *CreateSlab(uint32 flags, bool unlockWhileAllocating);
 	void ReturnSlab(slab *slab);
 	slab *ObjectSlab(void *object) const;
 	status_t PrepareObject(slab *source, void *object);
@@ -162,6 +175,22 @@ struct depot_cpu_store {
 	struct depot_magazine *loaded, *previous;
 };
 
+struct ResizeRequest : DoublyLinkedListLinkImpl<ResizeRequest> {
+	ResizeRequest(object_cache* cache)
+		:
+		cache(cache),
+		pending(false),
+		delete_when_done(false)
+	{
+	}
+
+	object_cache*	cache;
+	bool			pending;
+	bool			delete_when_done;
+};
+
+typedef DoublyLinkedList<ResizeRequest> ResizeRequestQueue;
+
 
 static ObjectCacheList sObjectCaches;
 static mutex sObjectCacheListLock = MUTEX_INITIALIZER("object cache list");
@@ -171,9 +200,14 @@ static kernel_args *sKernelArgs;
 
 
 static status_t object_cache_reserve_internal(object_cache *cache,
-	size_t object_count, uint32 flags);
+	size_t object_count, uint32 flags, bool unlockWhileAllocating);
 static depot_magazine *alloc_magazine();
 static void free_magazine(depot_magazine *magazine);
+
+static mutex sResizeRequestsLock
+	= MUTEX_INITIALIZER("object cache resize requests");
+static ResizeRequestQueue sResizeRequests;
+static ConditionVariable sResizeRequestsCondition;
 
 
 #if OBJECT_CACHE_TRACING
@@ -405,7 +439,8 @@ internal_free(void *_buffer)
 
 
 static status_t
-area_allocate_pages(object_cache *cache, void **pages, uint32 flags)
+area_allocate_pages(object_cache *cache, void **pages, uint32 flags,
+	bool unlockWhileAllocating)
 {
 	TRACE_CACHE(cache, "allocate pages (%lu, 0x0%lx)", cache->slab_size, flags);
 
@@ -418,11 +453,18 @@ area_allocate_pages(object_cache *cache, void **pages, uint32 flags)
 		&& cache->slab_size != B_PAGE_SIZE)
 		addressSpec = B_ANY_KERNEL_BLOCK_ADDRESS;
 
+	if (unlockWhileAllocating)
+		cache->Unlock();
+
 	// if we are allocating, it is because we need the pages immediatly
 	// so we lock them. when moving the slab to the empty list we should
 	// unlock them, and lock them again when getting one from the empty list.
 	area_id areaId = create_area(cache->name, pages, addressSpec,
 		cache->slab_size, lock, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
+	if (unlockWhileAllocating)
+		cache->Lock();
+
 	if (areaId < 0)
 		return areaId;
 
@@ -451,13 +493,20 @@ area_free_pages(object_cache *cache, void *pages)
 
 
 static status_t
-early_allocate_pages(object_cache *cache, void **pages, uint32 flags)
+early_allocate_pages(object_cache *cache, void **pages, uint32 flags,
+	bool unlockWhileAllocating)
 {
 	TRACE_CACHE(cache, "early allocate pages (%lu, 0x0%lx)", cache->slab_size,
 		flags);
 
+	if (unlockWhileAllocating)
+		cache->Unlock();
+
 	addr_t base = vm_allocate_early(sKernelArgs, cache->slab_size,
 		cache->slab_size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
+	if (unlockWhileAllocating)
+		cache->Lock();
 
 	*pages = (void *)base;
 
@@ -558,14 +607,18 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 		cache->object_size);
 
 	cache->cache_color_cycle = 0;
+	cache->total_objects = 0;
 	cache->used_count = 0;
 	cache->empty_count = 0;
 	cache->pressure = 0;
+	cache->min_object_reserve = 0;
 
 	cache->usage = 0;
 	cache->maximum = maximum;
 
 	cache->flags = flags;
+
+	cache->resize_request = NULL;
 
 	// TODO: depot destruction is obviously broken
 	// no gain in using the depot in single cpu setups
@@ -631,6 +684,67 @@ object_cache_commit_pre_pages(object_cache *cache)
 
 	cache->allocate_pages = area_allocate_pages;
 	cache->free_pages = area_free_pages;
+}
+
+
+static status_t
+object_cache_resizer(void*)
+{
+	while (true) {
+		MutexLocker locker(sResizeRequestsLock);
+
+		// wait for the next request
+		while (sResizeRequests.IsEmpty()) {
+			ConditionVariableEntry entry;
+			sResizeRequestsCondition.Add(&entry);
+			locker.Unlock();
+			entry.Wait();
+			locker.Lock();
+		}
+
+		ResizeRequest* request = sResizeRequests.RemoveHead();
+
+		locker.Unlock();
+
+		// resize the cache, if necessary
+
+		object_cache* cache = request->cache;
+
+		MutexLocker cacheLocker(cache->lock);
+
+		size_t freeObjects = cache->total_objects - cache->used_count;
+
+		while (freeObjects < cache->min_object_reserve) {
+			status_t error = object_cache_reserve_internal(cache,
+				cache->min_object_reserve - freeObjects, 0, true);
+			if (error != B_OK) {
+				dprintf("object cache resizer: Failed to resize object cache "
+					"%p!\n", cache);
+				break;
+			}
+
+			freeObjects = cache->total_objects - cache->used_count;
+		}
+
+		request->pending = false;
+
+		if (request->delete_when_done)
+			delete request;
+	}
+}
+
+
+static void
+increase_object_reserve(object_cache* cache)
+{
+	if (cache->resize_request->pending)
+		return;
+
+	cache->resize_request->pending = true;
+
+	MutexLocker locker(sResizeRequestsLock);
+	sResizeRequests.Add(cache->resize_request);
+	sResizeRequestsCondition.NotifyAll();
 }
 
 
@@ -762,6 +876,35 @@ delete_object_cache(object_cache *cache)
 }
 
 
+status_t
+object_cache_set_minimum_reserve(object_cache *cache, size_t objectCount)
+{
+	MutexLocker _(cache->lock);
+
+	if (cache->min_object_reserve == objectCount)
+		return B_OK;
+
+	if (cache->min_object_reserve == 0) {
+		cache->resize_request = new(std::nothrow) ResizeRequest(cache);
+		if (cache->resize_request == NULL)
+			return B_NO_MEMORY;
+	} else if (cache->min_object_reserve == 0) {
+		if (cache->resize_request->pending)
+			cache->resize_request->delete_when_done = true;
+		else
+			delete cache->resize_request;
+
+		cache->resize_request = NULL;
+	}
+
+	cache->min_object_reserve = objectCount;
+
+	increase_object_reserve(cache);
+
+	return B_OK;
+}
+
+
 void *
 object_cache_alloc(object_cache *cache, uint32 flags)
 {
@@ -778,7 +921,7 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 
 	if (cache->partial.IsEmpty()) {
 		if (cache->empty.IsEmpty()) {
-			if (object_cache_reserve_internal(cache, 1, flags) < B_OK) {
+			if (object_cache_reserve_internal(cache, 1, flags, false) < B_OK) {
 				T(Alloc(cache, flags, NULL));
 				return NULL;
 			}
@@ -798,6 +941,9 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 	object_link *link = _pop(source->free);
 	source->count--;
 	cache->used_count++;
+
+	if (cache->total_objects - cache->used_count < cache->min_object_reserve)
+		increase_object_reserve(cache);
 
 	REMOVE_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, source, &link->next,
 		sizeof(void*));
@@ -839,7 +985,9 @@ object_cache_return_to_slab(object_cache *cache, slab *source, void *object)
 	if (source->count == source->size) {
 		cache->partial.Remove(source);
 
-		if (cache->empty_count < cache->pressure) {
+		if (cache->empty_count < cache->pressure
+			&& cache->total_objects - cache->used_count - source->size
+				>= cache->min_object_reserve) {
 			cache->empty_count++;
 			cache->empty.Add(source);
 		} else {
@@ -871,14 +1019,16 @@ object_cache_free(object_cache *cache, void *object)
 
 
 static status_t
-object_cache_reserve_internal(object_cache *cache, size_t object_count,
-	uint32 flags)
+object_cache_reserve_internal(object_cache *cache, size_t objectCount,
+	uint32 flags, bool unlockWhileAllocating)
 {
-	size_t numBytes = object_count * cache->object_size;
+	size_t numBytes = objectCount * cache->object_size;
 	size_t slabCount = ((numBytes - 1) / cache->slab_size) + 1;
+		// TODO: This also counts the unusable space of each slab, which can
+		// sum up.
 
 	while (slabCount > 0) {
-		slab *newSlab = cache->CreateSlab(flags);
+		slab *newSlab = cache->CreateSlab(flags, unlockWhileAllocating);
 		if (newSlab == NULL)
 			return B_NO_MEMORY;
 
@@ -900,7 +1050,7 @@ object_cache_reserve(object_cache *cache, size_t objectCount, uint32 flags)
 	T(Reserve(cache, objectCount, flags));
 
 	MutexLocker _(cache->lock);
-	return object_cache_reserve_internal(cache, objectCount, flags);
+	return object_cache_reserve_internal(cache, objectCount, flags, false);
 }
 
 
@@ -921,6 +1071,7 @@ object_cache::InitSlab(slab *slab, void *pages, size_t byteCount)
 	slab->pages = pages;
 	slab->count = slab->size = byteCount / object_size;
 	slab->free = NULL;
+	total_objects += slab->size;
 
 	size_t spareBytes = byteCount - (slab->size * object_size);
 	slab->offset = cache_color_cycle;
@@ -983,6 +1134,8 @@ object_cache::UninitSlab(slab *slab)
 	if (slab->count != slab->size)
 		panic("cache: destroying a slab which isn't empty.");
 
+	total_objects -= slab->size;
+
 	DELETE_PARANOIA_CHECK_SET(slab);
 
 	uint8 *data = ((uint8 *)slab->pages) + slab->offset;
@@ -1022,14 +1175,14 @@ check_cache_quota(object_cache *cache)
 
 
 slab *
-SmallObjectCache::CreateSlab(uint32 flags)
+SmallObjectCache::CreateSlab(uint32 flags, bool unlockWhileAllocating)
 {
 	if (!check_cache_quota(this))
 		return NULL;
 
 	void *pages;
 
-	if (allocate_pages(this, &pages, flags) < B_OK)
+	if (allocate_pages(this, &pages, flags, unlockWhileAllocating) < B_OK)
 		return NULL;
 
 	return InitSlab(slab_in_pages(pages, slab_size), pages,
@@ -1082,18 +1235,25 @@ free_link(HashedObjectCache::Link *link)
 
 
 slab *
-HashedObjectCache::CreateSlab(uint32 flags)
+HashedObjectCache::CreateSlab(uint32 flags, bool unlockWhileAllocating)
 {
 	if (!check_cache_quota(this))
 		return NULL;
 
+	if (unlockWhileAllocating)
+		Unlock();
+
 	slab *slab = allocate_slab(flags);
+
+	if (unlockWhileAllocating)
+		Lock();
+
 	if (slab == NULL)
 		return NULL;
 
 	void *pages;
 
-	if (allocate_pages(this, &pages, flags) == B_OK) {
+	if (allocate_pages(this, &pages, flags, unlockWhileAllocating) == B_OK) {
 		if (InitSlab(slab, pages, slab_size))
 			return slab;
 
@@ -1474,3 +1634,20 @@ slab_init_post_sem()
 	block_allocator_init_rest();
 }
 
+
+void
+slab_init_post_thread()
+{
+	new(&sResizeRequests) ResizeRequestQueue;
+	sResizeRequestsCondition.Init(&sResizeRequests, "object cache resizer");
+
+	thread_id objectCacheResizer = spawn_kernel_thread(object_cache_resizer,
+		"object cache resizer", B_URGENT_PRIORITY, NULL);
+	if (objectCacheResizer < 0) {
+		panic("slab_init_post_thread(): failed to spawn object cache resizer "
+			"thread\n");
+		return;
+	}
+
+	send_signal_etc(objectCacheResizer, SIGCONT, B_DO_NOT_RESCHEDULE);
+}

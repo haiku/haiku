@@ -40,6 +40,7 @@ addr_t vm_allocate_early(struct kernel_args *args, size_t virtualSize,
 void slab_init(struct kernel_args *args, addr_t initialBase,
 	size_t initialSize);
 void slab_init_post_sem();
+void slab_init_post_thread();
 
 // to protect code regions with interrupts turned on
 void permit_page_faults(void);

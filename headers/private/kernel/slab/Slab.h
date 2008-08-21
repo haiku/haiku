@@ -46,6 +46,9 @@ object_cache *create_object_cache_etc(const char *name, size_t object_size,
 
 void delete_object_cache(object_cache *cache);
 
+status_t object_cache_set_minimum_reserve(object_cache *cache,
+	size_t objectCount);
+
 void *object_cache_alloc(object_cache *cache, uint32 flags);
 void object_cache_free(object_cache *cache, void *object);
 

@@ -4049,6 +4049,7 @@ vm_init_post_thread(kernel_args *args)
 {
 	vm_page_init_post_thread(args);
 	vm_daemon_init();
+	slab_init_post_thread();
 	return heap_init_post_thread();
 }
 
