@@ -256,6 +256,7 @@ static const char* kProtectedAttrNamespace = "CD:";
 
 static const char* kCddbIdAttribute = "CD:cddbid";
 static const char* kDoLookupAttribute = "CD:do_lookup";
+static const char* kTocAttribute = "CD:toc";
 
 extern fs_volume_ops gCDDAVolumeOps;
 extern fs_vnode_ops gCDDAVnodeOps;
@@ -324,8 +325,9 @@ write_attributes(int fd, Inode* inode, attr_mode attrMode = kDiscIDAttributes)
 	uint32 count = 0;
 	while (iterator.HasNext()) {
 		Attribute* attribute = iterator.Next();
-		if (attrMode == kDiscIDAttributes
+		if ((attrMode == kDiscIDAttributes
 			|| is_special_attribute(attribute->Name(), attrMode))
+				&& !attribute->IsProtectedNamespace())
 			count++;
 	}
 
@@ -342,8 +344,9 @@ write_attributes(int fd, Inode* inode, attr_mode attrMode = kDiscIDAttributes)
 
 	while (iterator.HasNext()) {
 		Attribute* attribute = iterator.Next();
-		if (attrMode != kDiscIDAttributes
+		if ((attrMode != kDiscIDAttributes
 			&& !is_special_attribute(attribute->Name(), attrMode))
+				|| attribute->IsProtectedNamespace())
 			continue;
 
 		uint32 type = B_HOST_TO_BENDIAN_INT32(attribute->Type());
@@ -416,6 +419,13 @@ read_attributes(int fd, Inode* inode)
 		name[length] = '\0';
 
 		Attribute* attribute = new Attribute(name, type);
+		if (attribute->IsProtectedNamespace()) {
+			// Attributes in the protected namespace are handled internally
+			// so we do not load them even if they are present in the
+			// attributes file.
+			delete attribute;
+			continue;
+		}
 		if (attribute->SetSize(size) != B_OK
 			|| inode->AddAttribute(attribute, true) != B_OK) {
 			delete attribute;
@@ -554,7 +564,6 @@ Volume::Mount(const char* device)
 		return B_NO_MEMORY;
 
 	status_t status = read_table_of_contents(fDevice, toc, 1024);
-
 	// there has to be at least one audio track
 	if (status == B_OK && count_audio_tracks(toc) == 0)
 		status = B_BAD_TYPE;
@@ -658,6 +667,10 @@ Volume::Mount(const char* device)
 	// Add CD:do_lookup attribute.
 	fRootNode->AddAttribute(kDoLookupAttribute, B_BOOL_TYPE, true,
 		(const uint8*)&doLookup, sizeof(bool));
+		
+	// Add CD:toc attribute.
+	fRootNode->AddAttribute(kTocAttribute, B_RAW_TYPE, true,
+		(const uint8*)toc, B_BENDIAN_TO_HOST_INT16(toc->data_length) + 2); 
 
 	_RestoreSharedAttributes();
 	if (fd >= 0)
