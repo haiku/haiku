@@ -1756,6 +1756,25 @@ vm_page_reserve_pages(uint32 count)
 }
 
 
+bool
+vm_page_try_reserve_pages(uint32 count)
+{
+	if (count == 0)
+		return true;
+
+	InterruptsSpinLocker locker(sPageLock);
+
+	T(ReservePages(count));
+
+	size_t freePages = free_page_queue_count();
+	if (sReservedPages + count > freePages)
+		return false;
+
+	sReservedPages += count;
+	return true;
+}
+
+
 vm_page *
 vm_page_allocate_page(int pageState, bool reserved)
 {
