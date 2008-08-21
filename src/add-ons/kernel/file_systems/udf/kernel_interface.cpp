@@ -234,6 +234,38 @@ udf_read_stat(fs_volume *_volume, fs_vnode *node, struct stat *stat)
 
 
 static status_t
+udf_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
+{
+	TRACE(("udf_open: _volume = %p, _node = %p\n", _volume, _node));
+	return B_OK;
+}
+
+
+static status_t
+udf_close(fs_volume* _volume, fs_vnode* _node, void* _cookie)
+{
+	TRACE(("udf_close: _volume = %p, _node = %p\n", _volume, _node));
+	return B_OK;
+}
+
+
+static status_t
+udf_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
+{	
+	TRACE(("udf_free_cookie: _volume = %p, _node = %p\n", _volume, _node));
+	return B_OK;
+}
+
+
+static status_t
+udf_access(fs_volume* _volume, fs_vnode* _node, int accessMode)
+{	
+	TRACE(("udf_access: _volume = %p, _node = %p\n", _volume, _node));
+	return B_OK;
+}
+
+
+static status_t
 udf_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	void *buffer, size_t *length)
 {
@@ -520,15 +552,15 @@ fs_vnode_ops gUDFVnodeOps = {
 	NULL,	// link
 	NULL,	// unlink
 	NULL,	// rename
-	NULL,	// access
+	&udf_access,
 	&udf_read_stat,
 	NULL,	// write_stat
 
 	/* file operations */
 	NULL,	// create
-	NULL,	// open
-	NULL,	// close
-	NULL,	// free_cockie
+	&udf_open,
+	&udf_close,
+	&udf_free_cookie,
 	&udf_read,
 	NULL,	// write
 
