@@ -8,6 +8,8 @@
 
 #include <string.h>
 
+#include <arch/debug.h>
+#include <debug.h>
 #include <heap.h>
 #include <kernel.h>
 #include <team.h>
@@ -86,6 +88,9 @@ IOBuffer::Create(uint32 count, bool vip)
 void
 IOBuffer::Delete()
 {
+	if (this == NULL)
+		return;
+
 	if (fVIP)
 		vip_io_request_free(this);
 	else
@@ -1194,10 +1199,47 @@ IORequest::Dump() const
 // #pragma mark - allocator
 
 
+#if KERNEL_HEAP_LEAK_CHECK
+static addr_t
+get_caller()
+{
+	// Find the first return address outside of the allocator code. Note, that
+	// this makes certain assumptions about how the code for the functions
+	// ends up in the kernel object.
+	addr_t returnAddresses[5];
+	int32 depth = arch_debug_get_stack_trace(returnAddresses, 5, 1, false);
+
+	// find the first return address inside the VIP allocator
+	int32 i = 0;
+	for (i = 0; i < depth; i++) {
+		if (returnAddresses[i] >= (addr_t)&get_caller
+			&& returnAddresses[i] < (addr_t)&vip_io_request_allocator_init) {
+			break;
+		}
+	}
+
+	// now continue until we have the first one outside
+	for (; i < depth; i++) {
+		if (returnAddresses[i] < (addr_t)&get_caller
+			|| returnAddresses[i] > (addr_t)&vip_io_request_allocator_init) {
+			return returnAddresses[i];
+		}
+	}
+
+	return 0;
+}
+#endif
+
+
 void*
 vip_io_request_malloc(size_t size)
 {
-	return heap_memalign(sVIPHeap, 0, size);
+	void* address = heap_memalign(sVIPHeap, 0, size);
+#if KDEBUG
+	if (address == NULL)
+		panic("vip_io_request_malloc(): VIP heap %p out of memory", sVIPHeap);
+#endif
+	return address;
 }
 
 
@@ -1246,6 +1288,10 @@ vip_io_request_allocator_init()
 			"heap\n");
 		return;
 	}
+
+#if KERNEL_HEAP_LEAK_CHECK
+	heap_set_get_caller(sVIPHeap, &get_caller);
+#endif
 
 	dprintf("vip_io_request_allocator_init(): created VIP I/O heap: %p\n",
 		sVIPHeap);
