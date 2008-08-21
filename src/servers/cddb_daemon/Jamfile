@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src servers cddb_daemon ;
+
+Server cddb_daemon :
+	cddb_daemon.cpp
+	: be
+	;
