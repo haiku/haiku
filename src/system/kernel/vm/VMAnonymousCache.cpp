@@ -45,6 +45,10 @@
 #	define TRACE(x) ;
 #endif
 
+
+// number of free swap blocks the object cache shall minimally have
+#define MIN_SWAP_BLOCK_RESERVE	4096
+
 #define SWAP_BLOCK_PAGES 32
 #define SWAP_BLOCK_SHIFT 5		/* 1 << SWAP_BLOCK_SHIFT == SWAP_BLOCK_PAGES */
 #define SWAP_BLOCK_MASK  (SWAP_BLOCK_PAGES - 1)
@@ -349,6 +353,13 @@ public:
 		}
 
 		fNextCallback->IOFinished(status, partialTransfer, bytesTransferred);
+
+		delete this;
+	}
+
+	void operator delete(void* address, size_t size)
+	{
+		io_request_free(address);
 	}
 
 private:
@@ -531,8 +542,10 @@ VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 	// If the page doesn't have any swap space yet, allocate it.
 	if (newSlot) {
 		AutoLocker<VMCache> locker(this);
-		if (fAllocatedSwapSize + B_PAGE_SIZE > fCommittedSwapSize)
+		if (fAllocatedSwapSize + B_PAGE_SIZE > fCommittedSwapSize) {
+			_callback->IOFinished(B_ERROR, true, 0);
 			return B_ERROR;
+		}
 
 		fAllocatedSwapSize += B_PAGE_SIZE;
 
@@ -551,6 +564,7 @@ VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 
 			swap_slot_dealloc(slotIndex, 1);
 		}
+		_callback->IOFinished(B_NO_MEMORY, true, 0);
 		return B_NO_MEMORY;
 	}
 // TODO: If the page already had swap space assigned, we don't need an own
@@ -917,9 +931,18 @@ swap_init(void)
 	if (sSwapBlockCache == NULL)
 		panic("swap_init(): can't create object cache for swap blocks\n");
 
+	status_t error = object_cache_set_minimum_reserve(sSwapBlockCache,
+		MIN_SWAP_BLOCK_RESERVE);
+	if (error != B_OK) {
+		panic("swap_init(): object_cache_set_minimum_reserve() failed: %s",
+			strerror(error));
+	}
+
 	// init swap hash table
 	sSwapHashTable.Init();
 	mutex_init(&sSwapHashLock, "swaphash");
+// TODO: The hash table needs a special resizing strategy. Otherwise we could
+// deadlock while trying swap pages out.
 
 	// init swap file list
 	mutex_init(&sSwapFileListLock, "swaplist");
