@@ -19,6 +19,9 @@
 // use areas for allocations bigger than 1MB
 #define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
 
+// store size, thread and team info at the end of each allocation block
+#define KERNEL_HEAP_LEAK_CHECK 0
+
 
 typedef struct heap_class_s {
 	const char *name;
@@ -54,6 +57,10 @@ heap_allocator*	heap_create_allocator(const char* name, addr_t base,
 	size_t size, const heap_class* heapClass);
 void* heap_memalign(heap_allocator* heap, size_t alignment, size_t size);
 status_t heap_free(heap_allocator* heap, void* address);
+
+#if KERNEL_HEAP_LEAK_CHECK
+void heap_set_get_caller(heap_allocator* heap, addr_t (*getCaller)());
+#endif
 
 status_t heap_init(addr_t heapBase, size_t heapSize);
 status_t heap_init_post_sem();

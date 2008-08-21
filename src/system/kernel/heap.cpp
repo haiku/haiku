@@ -38,8 +38,6 @@
 #define PARANOID_KERNEL_FREE 1
 // validate sanity of the heap after each operation (slow!)
 #define PARANOID_HEAP_VALIDATION 0
-// store size, thread and team info at the end of each allocation block
-#define KERNEL_HEAP_LEAK_CHECK 0
 
 #if KERNEL_HEAP_LEAK_CHECK
 typedef struct heap_leak_check_info_s {
@@ -110,6 +108,10 @@ struct heap_allocator_s {
 	uint32		total_pages;
 	uint32		total_free_pages;
 	uint32		empty_areas;
+
+#if KERNEL_HEAP_LEAK_CHECK
+	addr_t		(*get_caller)();
+#endif
 
 	heap_bin *	bins;
 	heap_area *	areas; // sorted so that the desired area is always first
@@ -524,76 +526,39 @@ caller_info_compare_count(const void* _a, const void* _b)
 }
 
 
-static int
-dump_allocations_per_caller(int argc, char **argv)
+static bool
+analyze_allocation_callers(heap_allocator* heap)
 {
-	bool sortBySize = true;
+	// go through all the pages in all the areas
+	heap_area *area = heap->all_areas;
+	while (area) {
+		heap_leak_check_info *info = NULL;
+		for (uint32 i = 0; i < area->page_count; i++) {
+			heap_page *page = &area->page_table[i];
+			if (!page->in_use)
+				continue;
 
-	for (int32 i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-c") == 0) {
-			sortBySize = false;
-		} else {
-			print_debugger_command_usage(argv[0]);
-			return 0;
-		}
-	}
-
-	sCallerInfoCount = 0;
-
-	for (uint32 classIndex = 0; classIndex < HEAP_CLASS_COUNT; classIndex++) {
-		heap_allocator *heap = sHeaps[classIndex];
-
-		// go through all the pages in all the areas
-		heap_area *area = heap->all_areas;
-		while (area) {
-			heap_leak_check_info *info = NULL;
-			for (uint32 i = 0; i < area->page_count; i++) {
-				heap_page *page = &area->page_table[i];
-				if (!page->in_use)
-					continue;
-
-				addr_t base = area->base + i * heap->page_size;
-				if (page->bin_index < heap->bin_count) {
-					// page is used by a small allocation bin
-					uint32 elementCount = page->empty_index;
-					size_t elementSize = heap->bins[page->bin_index].element_size;
-					for (uint32 j = 0; j < elementCount; j++, base += elementSize) {
-						// walk the free list to see if this element is in use
-						bool elementInUse = true;
-						for (addr_t *temp = page->free_list; temp != NULL;
-							temp = (addr_t *)*temp) {
-							if ((addr_t)temp == base) {
-								elementInUse = false;
-								break;
-							}
+			addr_t base = area->base + i * heap->page_size;
+			if (page->bin_index < heap->bin_count) {
+				// page is used by a small allocation bin
+				uint32 elementCount = page->empty_index;
+				size_t elementSize = heap->bins[page->bin_index].element_size;
+				for (uint32 j = 0; j < elementCount; j++, base += elementSize) {
+					// walk the free list to see if this element is in use
+					bool elementInUse = true;
+					for (addr_t *temp = page->free_list; temp != NULL;
+						temp = (addr_t *)*temp) {
+						if ((addr_t)temp == base) {
+							elementInUse = false;
+							break;
 						}
-
-						if (!elementInUse)
-							continue;
-
-						info = (heap_leak_check_info *)(base + elementSize
-							- sizeof(heap_leak_check_info));
-
-						caller_info* callerInfo = get_caller_info(info->caller);
-						if (callerInfo == NULL) {
-							kprintf("out of space for caller infos\n");
-							return 0;
-						}
-
-						callerInfo->count++;
-						callerInfo->size += info->size;
 					}
-				} else {
-					// page is used by a big allocation, find the page count
-					uint32 pageCount = 1;
-					while (i + pageCount < area->page_count
-						&& area->page_table[i + pageCount].in_use
-						&& area->page_table[i + pageCount].bin_index == heap->bin_count
-						&& area->page_table[i + pageCount].allocation_id == page->allocation_id)
-						pageCount++;
 
-					info = (heap_leak_check_info *)(base + pageCount
-						* heap->page_size - sizeof(heap_leak_check_info));
+					if (!elementInUse)
+						continue;
+
+					info = (heap_leak_check_info *)(base + elementSize
+						- sizeof(heap_leak_check_info));
 
 					caller_info* callerInfo = get_caller_info(info->caller);
 					if (callerInfo == NULL) {
@@ -603,13 +568,77 @@ dump_allocations_per_caller(int argc, char **argv)
 
 					callerInfo->count++;
 					callerInfo->size += info->size;
-
-					// skip the allocated pages
-					i += pageCount - 1;
 				}
+			} else {
+				// page is used by a big allocation, find the page count
+				uint32 pageCount = 1;
+				while (i + pageCount < area->page_count
+					&& area->page_table[i + pageCount].in_use
+					&& area->page_table[i + pageCount].bin_index
+						== heap->bin_count
+					&& area->page_table[i + pageCount].allocation_id
+						== page->allocation_id) {
+					pageCount++;
+				}
+
+				info = (heap_leak_check_info *)(base + pageCount
+					* heap->page_size - sizeof(heap_leak_check_info));
+
+				caller_info* callerInfo = get_caller_info(info->caller);
+				if (callerInfo == NULL) {
+					kprintf("out of space for caller infos\n");
+					return false;
+				}
+
+				callerInfo->count++;
+				callerInfo->size += info->size;
+
+				// skip the allocated pages
+				i += pageCount - 1;
+			}
+		}
+
+		area = area->all_next;
+	}
+
+	return true;
+}
+
+
+static int
+dump_allocations_per_caller(int argc, char **argv)
+{
+	bool sortBySize = true;
+	heap_allocator* heap = NULL;
+
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-c") == 0) {
+			sortBySize = false;
+		} else if (strcmp(argv[i], "-h") == 0) {
+			uint64 heapAddress;
+			if (++i >= argc
+				|| !evaluate_debug_expression(argv[i], &heapAddress, true)) {
+				print_debugger_command_usage(argv[0]);
+				return 0;
 			}
 
-			area = area->all_next;
+			heap = (heap_allocator*)(addr_t)heapAddress;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	sCallerInfoCount = 0;
+
+	if (heap != NULL) {
+		if (!analyze_allocation_callers(heap))
+			return 0;
+	} else {
+		for (uint32 classIndex = 0; classIndex < HEAP_CLASS_COUNT;
+				classIndex++) {
+			if (!analyze_allocation_callers(sHeaps[classIndex]))
+				return 0;
 		}
 	}
 
@@ -964,6 +993,10 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 	heap->areas = heap->all_areas = NULL;
 	heap->bins = (heap_bin *)base;
 
+#if KERNEL_HEAP_LEAK_CHECK
+	heap->get_caller = &get_caller;
+#endif
+
 	heap->bin_count = 0;
 	size_t binSize = 0, lastSize = 0;
 	uint32 count = heap->page_size / heapClass->min_bin_size;
@@ -1203,7 +1236,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		info->size = size - sizeof(heap_leak_check_info);
 		info->thread = (gKernelStartup ? 0 : thread_get_current_thread_id());
 		info->team = (gKernelStartup ? 0 : team_get_current_team_id());
-		info->caller = get_caller();
+		info->caller = heap->get_caller();
 #endif
 		return address;
 	}
@@ -1223,7 +1256,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 	info->size = size - sizeof(heap_leak_check_info);
 	info->thread = (gKernelStartup ? 0 : thread_get_current_thread_id());
 	info->team = (gKernelStartup ? 0 : team_get_current_team_id());
-	info->caller = get_caller();
+	info->caller = heap->get_caller();
 #endif
 	return (void *)(firstPage->area->base + firstPage->index * heap->page_size);
 }
@@ -1457,6 +1490,15 @@ heap_free(heap_allocator *heap, void *address)
 }
 
 
+#if KERNEL_HEAP_LEAK_CHECK
+extern "C" void
+heap_set_get_caller(heap_allocator* heap, addr_t (*getCaller)())
+{
+	heap->get_caller = getCaller;
+}
+#endif
+
+
 static status_t
 heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	size_t newSize)
@@ -1685,10 +1727,11 @@ heap_init(addr_t base, size_t size)
 	add_debugger_command_etc("allocations_per_caller",
 		&dump_allocations_per_caller,
 		"Dump current allocations summed up per caller",
-		"[ \"-c\" ]\n"
+		"[ \"-c\" ] [ -h <heap> ]\n"
 		"The current allocations will by summed up by caller (their count and\n"
 		"size) printed in decreasing order by size or, if \"-c\" is\n"
-		"specified, by allocation count.\n", 0);
+		"specified, by allocation count. If given <heap> specifies the\n"
+		"address of the heap for which to print the allocations.\n", 0);
 #endif
 	return B_OK;
 }
