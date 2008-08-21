@@ -275,6 +275,8 @@ dump_symbol(int argc, char **argv)
 	struct hash_iterator iterator;
 	const char *pattern = argv[1];
 
+	void* symbolAddress = NULL;
+
 	hash_open(sImagesHash, &iterator);
 	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
 			!= NULL) {
@@ -285,9 +287,10 @@ dump_symbol(int argc, char **argv)
 				const char *name = image->debug_string_table + symbol->st_name;
 
 				if (symbol->st_value > 0 && strstr(name, pattern) != 0) {
-					kprintf("%p %5lu %s:%s\n",
-						(void *)(symbol->st_value + image->text_region.delta),
-						symbol->st_size, image->name, name);
+					symbolAddress
+						= (void*)(symbol->st_value + image->text_region.delta);
+					kprintf("%p %5lu %s:%s\n", symbolAddress, symbol->st_size,
+						image->name, name);
 				}
 			}
 		} else {
@@ -299,8 +302,9 @@ dump_symbol(int argc, char **argv)
 					const char *name = SYMNAME(image, symbol);
 
 					if (symbol->st_value > 0 && strstr(name, pattern) != 0) {
-						kprintf("%p %5lu %s:%s\n", (void *)(symbol->st_value
-								+ image->text_region.delta),
+						symbolAddress = (void*)(symbol->st_value
+							+ image->text_region.delta);
+						kprintf("%p %5lu %s:%s\n", symbolAddress,
 							symbol->st_size, image->name, name);
 					}
 				}
@@ -308,6 +312,10 @@ dump_symbol(int argc, char **argv)
 		}
 	}
 	hash_close(sImagesHash, &iterator, false);
+
+	if (symbolAddress != NULL)
+		set_debug_variable("_", (addr_t)symbolAddress);
+
 	return 0;
 }
 
