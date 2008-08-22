@@ -2,3 +2,7 @@
 resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "multipart";
+
+resource(2, "META:L:DESC") #'MLDC' "Generic multipart file";
+
+resource(3, "META:S:DESC") #'MSDC' "Multipart file";

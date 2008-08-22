@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "image";
 
-resource(2, "META:L:DESC") #'MLDC' "Generic text file";
+resource(2, "META:L:DESC") #'MLDC' "Generic image file";
 
-resource(3, "META:S:DESC") #'MSDC' "Text file";
+resource(3, "META:S:DESC") #'MSDC' "Image file";
 
 resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.haiku-showimage";
 
