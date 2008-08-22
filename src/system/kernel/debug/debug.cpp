@@ -93,6 +93,8 @@ static int32 sCurrentLine = 0;
 
 static const char *(*sDemangleHook)(const char *) = NULL;
 
+static struct thread* sDebuggedThread;
+
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
 
 
@@ -1216,6 +1218,8 @@ kernel_debugger(const char *message)
 
 	sDebugOutputFilter = &gDefaultDebugOutputFilter;
 
+	sDebuggedThread = NULL;
+
 	if (message)
 		kprintf("PANIC: %s\n", message);
 
@@ -1423,6 +1427,23 @@ debug_demangle(const char *sym)
 	if (sDemangleHook)
 		return sDemangleHook(sym);
 	return sym;
+}
+
+
+struct thread*
+debug_set_debugged_thread(struct thread* thread)
+{
+	struct thread* previous = sDebuggedThread;
+	sDebuggedThread = thread;
+	return previous;
+}
+
+
+struct thread*
+debug_get_debugged_thread()
+{
+	return sDebuggedThread != NULL
+		? sDebuggedThread : thread_get_current_thread();
 }
 
 
