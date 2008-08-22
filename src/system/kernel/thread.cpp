@@ -1032,8 +1032,79 @@ state_to_text(struct thread *thread, int32 state)
 
 
 static void
-_dump_thread_info(struct thread *thread)
+print_thread_list_table_head()
 {
+	kprintf("thread         id  state     wait for   object  cpu pri  stack    "
+		"  team  name\n");
+}
+
+
+static void
+_dump_thread_info(struct thread *thread, bool shortInfo)
+{
+	if (shortInfo) {
+		kprintf("%p %6ld  %-10s", thread, thread->id, state_to_text(thread,
+			thread->state));
+
+		// does it block on a semaphore or a condition variable?
+		if (thread->state == B_THREAD_WAITING) {
+			switch (thread->wait.type) {
+				case THREAD_BLOCK_TYPE_SEMAPHORE:
+				{
+					sem_id sem = (sem_id)(addr_t)thread->wait.object;
+					if (sem == thread->msg.read_sem)
+						kprintf("                    ");
+					else
+						kprintf("sem  %12ld   ", sem);
+					break;
+				}
+
+				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
+					kprintf("cvar   %p   ", thread->wait.object);
+					break;
+
+				case THREAD_BLOCK_TYPE_SNOOZE:
+					kprintf("                    ");
+					break;
+
+				case THREAD_BLOCK_TYPE_SIGNAL:
+					kprintf("signal              ");
+					break;
+
+				case THREAD_BLOCK_TYPE_MUTEX:
+					kprintf("mutex  %p   ", thread->wait.object);
+					break;
+
+				case THREAD_BLOCK_TYPE_RW_LOCK:
+					kprintf("rwlock %p   ", thread->wait.object);
+					break;
+
+				case THREAD_BLOCK_TYPE_OTHER:
+					kprintf("other               ");
+					break;
+
+				default:
+					kprintf("???    %p   ", thread->wait.object);
+					break;
+			}
+		} else
+			kprintf("        -           ");
+
+		// on which CPU does it run?
+		if (thread->cpu)
+			kprintf("%2d", thread->cpu->cpu_num);
+		else
+			kprintf(" -");
+
+		kprintf("%4ld  %p%5ld  %s\n", thread->priority,
+			(void *)thread->kernel_stack_base, thread->team->id,
+			thread->name != NULL ? thread->name : "<NULL>");
+
+		return;
+	}
+
+	// print the long info
+
 	struct death_entry *death = NULL;
 
 	kprintf("THREAD: %p\n", thread);
@@ -1129,44 +1200,48 @@ _dump_thread_info(struct thread *thread)
 static int
 dump_thread_info(int argc, char **argv)
 {
-	const char *name = NULL;
-	struct thread *thread;
-	int32 id = -1;
-	struct hash_iterator i;
-	bool found = false;
+	bool shortInfo = false;
+	int argi = 1;
+	if (argi < argc && strcmp(argv[argi], "-s") == 0) {
+		shortInfo = true;
+		print_thread_list_table_head();
+		argi++;
+	}
 
-	if (argc > 2) {
-		print_debugger_command_usage(argv[0]);
+	if (argi == argc) {
+		_dump_thread_info(thread_get_current_thread(), shortInfo);
 		return 0;
 	}
 
-	if (argc == 1) {
-		_dump_thread_info(thread_get_current_thread());
-		return 0;
-	} else {
-		name = argv[1];
-		id = strtoul(argv[1], NULL, 0);
+	for (; argi < argc; argi++) {
+		const char *name = argv[argi];
+		int32 id = strtoul(name, NULL, 0);
 
 		if (IS_KERNEL_ADDRESS(id)) {
 			// semi-hack
-			_dump_thread_info((struct thread *)id);
-			return 0;
+			_dump_thread_info((struct thread *)id, shortInfo);
+			continue;
 		}
+
+		// walk through the thread list, trying to match name or id
+		bool found = false;
+		struct hash_iterator i;
+		hash_open(sThreadHash, &i);
+		struct thread *thread;
+		while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
+			if ((name != NULL && !strcmp(name, thread->name))
+				|| thread->id == id) {
+				_dump_thread_info(thread, shortInfo);
+				found = true;
+				break;
+			}
+		}
+		hash_close(sThreadHash, &i, false);
+
+		if (!found)
+			kprintf("thread \"%s\" (%ld) doesn't exist!\n", name, id);
 	}
 
-	// walk through the thread list, trying to match name or id
-	hash_open(sThreadHash, &i);
-	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
-		if ((name != NULL && !strcmp(name, thread->name)) || thread->id == id) {
-			_dump_thread_info(thread);
-			found = true;
-			break;
-		}
-	}
-	hash_close(sThreadHash, &i, false);
-
-	if (!found)
-		kprintf("thread \"%s\" (%ld) doesn't exist!\n", argv[1], id);
 	return 0;
 }
 
@@ -1216,8 +1291,7 @@ dump_thread_list(int argc, char **argv)
 			kprintf("ignoring invalid team argument.\n");
 	}
 
-	kprintf("thread         id  state     wait for   object  cpu pri  stack    "
-		"  team  name\n");
+	print_thread_list_table_head();
 
 	hash_open(sThreadHash, &i);
 	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
@@ -1230,62 +1304,7 @@ dump_thread_list(int argc, char **argv)
 			|| (realTimeOnly && thread->priority < B_REAL_TIME_DISPLAY_PRIORITY))
 			continue;
 
-		kprintf("%p %6ld  %-10s", thread, thread->id, state_to_text(thread,
-			thread->state));
-
-		// does it block on a semaphore or a condition variable?
-		if (thread->state == B_THREAD_WAITING) {
-			switch (thread->wait.type) {
-				case THREAD_BLOCK_TYPE_SEMAPHORE:
-				{
-					sem_id sem = (sem_id)(addr_t)thread->wait.object;
-					if (sem == thread->msg.read_sem)
-						kprintf("                    ");
-					else
-						kprintf("sem  %12ld   ", sem);
-					break;
-				}
-
-				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
-					kprintf("cvar   %p   ", thread->wait.object);
-					break;
-
-				case THREAD_BLOCK_TYPE_SNOOZE:
-					kprintf("                    ");
-					break;
-
-				case THREAD_BLOCK_TYPE_SIGNAL:
-					kprintf("signal              ");
-					break;
-
-				case THREAD_BLOCK_TYPE_MUTEX:
-					kprintf("mutex  %p   ", thread->wait.object);
-					break;
-
-				case THREAD_BLOCK_TYPE_RW_LOCK:
-					kprintf("rwlock %p   ", thread->wait.object);
-					break;
-
-				case THREAD_BLOCK_TYPE_OTHER:
-					kprintf("other               ");
-					break;
-
-				default:
-					kprintf("???    %p   ", thread->wait.object);
-					break;
-			}
-		} else
-			kprintf("        -           ");
-
-		// on which CPU does it run?
-		if (thread->cpu)
-			kprintf("%2d", thread->cpu->cpu_num);
-		else
-			kprintf(" -");
-
-		kprintf("%4ld  %p%5ld  %s\n", thread->priority,
-			(void *)thread->kernel_stack_base, thread->team->id,
-			thread->name != NULL ? thread->name : "<NULL>");
+		_dump_thread_info(thread, true);
 	}
 	hash_close(sThreadHash, &i, false);
 	return 0;
@@ -2053,9 +2072,10 @@ thread_init(kernel_args *args)
 		"Prints a list of all threads with realtime priority.\n", 0);
 	add_debugger_command_etc("thread", &dump_thread_info,
 		"Dump info about a particular thread",
-		"[ <id> | <address> | <name> ]\n"
+		"[ -s ] ( <id> | <address> | <name> )*\n"
 		"Prints information about the specified thread. If no argument is\n"
 		"given the current thread is selected.\n"
+		"  -s         - Print info in compact table form (like \"threads\").\n"
 		"  <id>       - The ID of the thread.\n"
 		"  <address>  - The address of the thread structure.\n"
 		"  <name>     - The thread's name.\n", 0);
