@@ -373,9 +373,10 @@ module_image_compare(void* _module, const void* _key)
 }
 
 
-/*!	Try to load the module image at the specified location.
-	If it could be loaded, it returns B_OK, and stores a pointer
-	to the module_image object in "_moduleImage".
+/*!	Try to load the module image at the specified \a path.
+	If it could be loaded, it returns \c B_OK, and stores a pointer
+	to the module_image object in \a _moduleImage.
+	Needs to be called with the sModulesLock held.
 */
 static status_t
 load_module_image(const char* path, module_image** _moduleImage)
@@ -385,6 +386,7 @@ load_module_image(const char* path, module_image** _moduleImage)
 	image_id image;
 
 	TRACE(("load_module_image(path = \"%s\", _image = %p)\n", path, _moduleImage));
+	ASSERT_LOCKED_RECURSIVE(&sModulesLock);
 	ASSERT(_moduleImage != NULL);
 
 	image = load_kernel_add_on(path);
@@ -437,19 +439,14 @@ err:
 }
 
 
+/*!	Unloads the module's kernel add-on. The \a image will be freed.
+	Needs to be called with the sModulesLock held.
+*/
 static status_t
-unload_module_image(module_image* moduleImage, const char* path)
+unload_module_image(module_image* moduleImage, bool remove)
 {
-	TRACE(("unload_module_image(image = %p, path = %s)\n", moduleImage, path));
-
-	RecursiveLocker locker(sModulesLock);
-
-	if (moduleImage == NULL) {
-		// if no image was specified, lookup it up in the hash table
-		moduleImage = (module_image*)hash_lookup(sModuleImagesHash, path);
-		if (moduleImage == NULL)
-			return B_ENTRY_NOT_FOUND;
-	}
+	TRACE(("unload_module_image(image %p, remove %d)\n", moduleImage, remove));
+	ASSERT_LOCKED_RECURSIVE(&sModulesLock);
 
 	if (moduleImage->ref_count != 0) {
 		FATAL(("Can't unload %s due to ref_cnt = %ld\n", moduleImage->path,
@@ -457,8 +454,8 @@ unload_module_image(module_image* moduleImage, const char* path)
 		return B_ERROR;
 	}
 
-	hash_remove(sModuleImagesHash, moduleImage);
-	locker.Unlock();
+	if (remove)
+		hash_remove(sModuleImagesHash, moduleImage);
 
 	unload_kernel_add_on(moduleImage->image);
 	free(moduleImage->path);
@@ -471,6 +468,8 @@ unload_module_image(module_image* moduleImage, const char* path)
 static void
 put_module_image(module_image* image)
 {
+	RecursiveLocker locker(sModulesLock);
+
 	int32 refCount = atomic_add(&image->ref_count, -1);
 	ASSERT(refCount > 0);
 
@@ -478,7 +477,7 @@ put_module_image(module_image* image)
 	// (because chances are that we will never be able to access it again)
 
 	if (refCount == 1 && !image->keep_loaded && gBootDevice > 0)
-		unload_module_image(image, NULL);
+		unload_module_image(image, true);
 }
 
 
@@ -562,18 +561,22 @@ create_module(module_info* info, const char* file, int offset, module** _module)
 }
 
 
-/*!	Loads the file at "path" and scans all modules contained therein.
-	Returns B_OK if "searchedName" could be found under those modules,
-	B_ENTRY_NOT_FOUND if not.
+/*!	Loads the file at \a path and scans all modules contained therein.
+	Returns \c B_OK if \a searchedName could be found under those modules,
+	and will return the referenced image in \a _moduleImage.
+	Returns \c B_ENTRY_NOT_FOUND if the module could not be found.
+
 	Must only be called for files that haven't been scanned yet.
-	"searchedName" is allowed to be NULL (if all modules should be scanned)
+	\a searchedName is allowed to be \c NULL (if all modules should be scanned)
 */
 static status_t
-check_module_image(const char* path, const char* searchedName)
+check_module_image(const char* path, const char* searchedName,
+	module_image** _moduleImage)
 {
+	status_t status = B_ENTRY_NOT_FOUND;
 	module_image* image;
 	module_info** info;
-	int index = 0, match = B_ENTRY_NOT_FOUND;
+	int index = 0;
 
 	TRACE(("check_module_image(path = \"%s\", searchedName = \"%s\")\n", path,
 		searchedName));
@@ -586,22 +589,18 @@ check_module_image(const char* path, const char* searchedName)
 		// name matches if it was a new entry
 		if (create_module(*info, path, index++, NULL) == B_OK) {
 			if (searchedName && !strcmp((*info)->name, searchedName))
-				match = B_OK;
+				status = B_OK;
 		}
 	}
 
-	// The module we looked for couldn't be found, so we can unload the
-	// loaded module at this point
-	if (match != B_OK) {
-		TRACE(("check_module_file: unloading module file \"%s\" (not used yet)\n",
-			path));
-		unload_module_image(image, path);
+	if (status != B_OK) {
+		// decrement the ref we got in get_module_image
+		put_module_image(image);
+		return status;
 	}
 
-	// decrement the ref we got in get_module_image
-	put_module_image(image);
-
-	return match;
+	*_moduleImage = image;
+	return B_OK;
 }
 
 
@@ -609,7 +608,7 @@ check_module_image(const char* path, const char* searchedName)
 	saves us some extra checking here :)
 */
 static module*
-search_module(const char* name)
+search_module(const char* name, module_image** _moduleImage)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
 	uint32 i;
@@ -635,7 +634,7 @@ search_module(const char* name)
 			path.BufferSize());
 		if (status == B_OK) {
 			path.UnlockBuffer();
-			status = check_module_image(path.Path(), name);
+			status = check_module_image(path.Path(), name, _moduleImage);
 			if (status == B_OK)
 				break;
 		}
@@ -1850,8 +1849,10 @@ module_init_post_boot_device(void)
 		if (image == NULL)
 			break;
 
-		if (image->ref_count == 0 && !image->keep_loaded)
-			unload_module_image(image, NULL);
+		if (image->ref_count == 0 && !image->keep_loaded) {
+			hash_remove_current(sModuleImagesHash, &iterator);
+			unload_module_image(image, false);
+		}
 	}
 
 	return B_OK;
@@ -2076,7 +2077,7 @@ get_next_loaded_module_name(uint32* _cookie, char* buffer, size_t* _bufferSize)
 status_t
 get_module(const char* path, module_info** _info)
 {
-	module_image* moduleImage;
+	module_image* moduleImage = NULL;
 	module* module;
 	status_t status;
 
@@ -2091,7 +2092,7 @@ get_module(const char* path, module_info** _info)
 
 	// if we don't have it cached yet, search for it
 	if (module == NULL) {
-		module = search_module(path);
+		module = search_module(path, &moduleImage);
 		if (module == NULL) {
 			FATAL(("module: Search for %s failed.\n", path));
 			return B_ENTRY_NOT_FOUND;
@@ -2099,14 +2100,15 @@ get_module(const char* path, module_info** _info)
 	}
 
 	if ((module->flags & B_BUILT_IN_MODULE) == 0) {
-		/* We now need to find the module_image for the module. This should
+		/* We now need to find the module_image for the module. This will
 		 * be in memory if we have just run search_module(), but may not be
 		 * if we are using cached information.
 		 * We can't use the module->module_image pointer, because it is not
 		 * reliable at this point (it won't be set to NULL when the module_image
 		 * is unloaded).
 		 */
-		if (get_module_image(module->file, &moduleImage) < B_OK)
+		if (moduleImage == NULL
+			&& get_module_image(module->file, &moduleImage) < B_OK)
 			return B_ENTRY_NOT_FOUND;
 
 		// (re)set in-memory data for the loaded module
