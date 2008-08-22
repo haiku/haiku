@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "video";
 
-resource(2, "META:L:DESC") #'MLDC' "generic video";
+resource(2, "META:L:DESC") #'MLDC' "Generic video file";
 
-resource(3, "META:S:DESC") #'MSDC' "generic video";
+resource(3, "META:S:DESC") #'MSDC' "Video file";
 
 resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-MediaPlayer";
 
