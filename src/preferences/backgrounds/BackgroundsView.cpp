@@ -360,11 +360,12 @@ BackgroundsView::MessageReceived(BMessage *msg)
 			fImageMenu->FindItem(kMsgNoImage)->SetLabel("None");
 			fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked());
-			if (!fCurrent->IsDesktop()) {
+			if (fCurrent && fCurrent->IsDesktop()) {
+				UpdateButtons();
+			} else {
 				fPreview->SetDesktop(true);
 				LoadDesktopFolder();
-			} else
-				UpdateButtons();
+			}
 			break;
 
 		case kMsgDefaultFolder:
