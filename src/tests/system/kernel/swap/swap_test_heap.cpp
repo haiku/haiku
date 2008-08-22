@@ -32,6 +32,7 @@ main(int argc, const char* const* argv)
 
 	allocationSize *= 1024 * 1024;
 	size_t elementCount = allocationSize / 4;
+	size_t pageCount = elementCount / PAGE_ELEMENT_COUNT;
 
 	// allocate memory
 	uint32_t* allocation = (uint32_t*)malloc(allocationSize);
@@ -44,10 +45,17 @@ main(int argc, const char* const* argv)
 		(unsigned long)allocationSize / 1024 / 1024, allocation);
 
 	// fill the pages
-	for (size_t i = 0; i < elementCount; i++)
+	for (size_t i = 0; i < elementCount; i++) {
 		allocation[i] = i;
+		if ((i + 1) % (PAGE_ELEMENT_COUNT * 32) == 0) {
+			printf("\rfilled %9lu/%9lu pages",
+				(unsigned long)(i + 1) / PAGE_ELEMENT_COUNT,
+				(unsigned long)pageCount);
+			fflush(stdout);
+		}
+	}
 
-	printf("Done filled the allocation. Starting test iterations...\n");
+	printf("\rDone filling the allocation. Starting test iterations...\n");
 
 	for (int testIteration = 0; testIteration < 5; testIteration++) {
 		sleep(1);
