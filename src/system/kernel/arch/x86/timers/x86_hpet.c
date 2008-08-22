@@ -6,6 +6,7 @@
 
 #include <timer.h>
 #include <arch/x86/timer.h>
+#include <arch/x86/arch_hpet.h>
 
 #include "hpet.h"
 
