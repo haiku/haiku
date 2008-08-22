@@ -551,6 +551,62 @@ is_calling(struct thread *thread, addr_t eip, const char *pattern,
 }
 
 
+static int
+cmd_in_context(int argc, char** argv)
+{
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	// get the thread ID
+	const char* commandLine = argv[1];
+	char threadIDString[16];
+	if (parse_next_debug_command_argument(&commandLine, threadIDString,
+			sizeof(threadIDString)) != B_OK) {
+		kprintf("Failed to parse thread ID.\n");
+		return 0;
+	}
+
+	if (commandLine == NULL) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	uint64 threadID;
+	if (!evaluate_debug_expression(threadIDString, &threadID, false))
+		return 0;
+
+	// get the thread
+	struct thread* thread = thread_get_thread_struct_locked(threadID);
+	if (thread == NULL) {
+		kprintf("Could not find thread with ID \"%s\".\n", threadIDString);
+		return 0;
+	}
+
+	// switch the page directory, if necessary
+	addr_t oldPageDirectory = 0;
+	if (thread != thread_get_current_thread()) {
+		addr_t newPageDirectory = (addr_t)x86_next_page_directory(
+			thread_get_current_thread(), thread);
+
+		if (newPageDirectory != 0) {
+			read_cr3(oldPageDirectory);
+			write_cr3(newPageDirectory);
+		}
+	}
+
+	// execute the command
+	evaluate_debug_command(commandLine);
+
+	// reset the page directory
+	if (oldPageDirectory)
+		write_cr3(oldPageDirectory);
+
+	return 0;
+}
+
+
 //	#pragma mark -
 
 
@@ -656,6 +712,11 @@ arch_debug_init(kernel_args *args)
 	add_debugger_command("iframe", &dump_iframes,
 		"Dump iframes for the specified thread");
 	add_debugger_command("call", &show_call, "Show call with arguments");
+	add_debugger_command_etc("in_context", &cmd_in_context,
+		"Executes a command in the context of a given thread",
+		"<thread ID> <command> ...\n"
+		"Executes a command in the context of a given thread.\n",
+		B_KDEBUG_DONT_PARSE_ARGUMENTS);
 
 	return B_NO_ERROR;
 }
