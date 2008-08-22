@@ -23,6 +23,7 @@
 #include <driver_settings.h>
 #include <fs_interface.h>
 #include <heap.h>
+#include <kernel_daemon.h>
 #include <slab/Slab.h>
 #include <syscalls.h>
 #include <util/AutoLock.h>
@@ -48,6 +49,11 @@
 
 // number of free swap blocks the object cache shall minimally have
 #define MIN_SWAP_BLOCK_RESERVE	4096
+
+// interval the has resizer is triggered (in 0.1s)
+#define SWAP_HASH_RESIZE_INTERVAL	5
+
+#define INITIAL_SWAP_HASH_SIZE		1024
 
 #define SWAP_BLOCK_PAGES 32
 #define SWAP_BLOCK_SHIFT 5		/* 1 << SWAP_BLOCK_SHIFT == SWAP_BLOCK_PAGES */
@@ -315,6 +321,31 @@ swap_space_unreserve(off_t amount)
 	mutex_lock(&sAvailSwapSpaceLock);
 	sAvailSwapSpace += amount;
 	mutex_unlock(&sAvailSwapSpaceLock);
+}
+
+
+static void
+swap_hash_resizer(void*, int)
+{
+	MutexLocker locker(sSwapHashLock);
+
+	size_t size;
+	void* allocation;
+
+	do {
+		size = sSwapHashTable.ResizeNeeded();
+		if (size == 0)
+			return;
+
+		locker.Unlock();
+
+		allocation = malloc(size);
+		if (allocation == NULL)
+			return;
+
+		locker.Lock();
+
+	} while (!sSwapHashTable.Resize(allocation, size));
 }
 
 
@@ -701,7 +732,7 @@ VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 			for (uint32 i = 0; i < SWAP_BLOCK_PAGES; i++)
 				swap->swap_slots[i] = SWAP_SLOT_NONE;
 
-			sSwapHashTable.Insert(swap);
+			sSwapHashTable.InsertUnchecked(swap);
 		}
 
 		swap_addr_t blockIndex = pageIndex & SWAP_BLOCK_MASK;
@@ -738,7 +769,7 @@ VMAnonymousCache::_SwapBlockFree(off_t startPageIndex, uint32 count)
 
 		swap->used -= j;
 		if (swap->used == 0) {
-			sSwapHashTable.Remove(swap);
+			sSwapHashTable.RemoveUnchecked(swap);
 			object_cache_free(sSwapBlockCache, swap);
 		}
 	}
@@ -947,10 +978,15 @@ swap_init(void)
 	}
 
 	// init swap hash table
-	sSwapHashTable.Init();
+	sSwapHashTable.Init(INITIAL_SWAP_HASH_SIZE);
 	mutex_init(&sSwapHashLock, "swaphash");
-// TODO: The hash table needs a special resizing strategy. Otherwise we could
-// deadlock while trying swap pages out.
+
+	error = register_resource_resizer(swap_hash_resizer, NULL,
+		SWAP_HASH_RESIZE_INTERVAL);
+	if (error != B_OK) {
+		panic("swap_init(): Failed to register swap hash resizer: %s",
+			strerror(error));
+	}
 
 	// init swap file list
 	mutex_init(&sSwapFileListLock, "swaplist");
