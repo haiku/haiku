@@ -31,6 +31,7 @@ extern status_t load_module(const char *path, module_info ***_modules);
 
 extern status_t module_init(struct kernel_args *args);
 extern status_t module_init_post_threads(void);
+extern status_t module_init_post_boot_device(void);
 
 #ifdef __cplusplus
 }

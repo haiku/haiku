@@ -1836,6 +1836,28 @@ module_init_post_threads(void)
 }
 
 
+status_t
+module_init_post_boot_device(void)
+{
+	RecursiveLocker locker(sModulesLock);
+
+	hash_iterator iterator;
+	hash_open(sModuleImagesHash, &iterator);
+
+	while (true) {
+		struct module_image* image
+			= (struct module_image*)hash_next(sModuleImagesHash, &iterator);
+		if (image == NULL)
+			break;
+
+		if (image->ref_count == 0 && !image->keep_loaded)
+			unload_module_image(image, NULL);
+	}
+
+	return B_OK;
+}
+
+
 //	#pragma mark - Exported Kernel API (public part)
 
 

@@ -294,6 +294,8 @@ main2(void *unused)
 	TRACE("device_manager_init_post_modules\n");
 	device_manager_init_post_modules(&sKernelArgs);
 
+	module_init_post_boot_device();
+
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_7_RUN_BOOT_SCRIPT);
 	boot_splash_uninit();
 		// NOTE: We could introduce a syscall to draw more icons indicating
