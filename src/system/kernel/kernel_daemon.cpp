@@ -33,46 +33,90 @@ struct daemon : DoublyLinkedListLinkImpl<struct daemon> {
 
 typedef DoublyLinkedList<struct daemon> DaemonList;
 
-static mutex sDaemonMutex = MUTEX_INITIALIZER("kernel daemon");
-static DaemonList sDaemons;
+
+class KernelDaemon {
+public:
+			status_t			Init(const char* name);
+
+			status_t			Register(daemon_hook function, void* arg,
+									int frequency);
+			status_t			Unregister(daemon_hook function, void* arg);
+
+private:
+	static	status_t			_DaemonThreadEntry(void* data);
+			status_t			_DaemonThread();
+
+private:
+			mutex				fLock;
+			DaemonList			fDaemons;
+			thread_id			fThread;
+};
 
 
-static status_t
-kernel_daemon(void* data)
+static KernelDaemon sKernelDaemon;
+static KernelDaemon sResourceResizer;
+
+
+status_t
+KernelDaemon::Init(const char* name)
 {
-	int32 iteration = 0;
+	new(&fDaemons) DaemonList;
+	mutex_init(&fLock, name);
 
-	while (true) {
-		mutex_lock(&sDaemonMutex);
+	fThread = spawn_kernel_thread(&_DaemonThreadEntry, name, B_LOW_PRIORITY,
+		this);
+	if (fThread < 0)
+		return fThread;
 
-		DaemonList::Iterator iterator = sDaemons.GetIterator();
-
-		// iterate through the list and execute each daemon if needed
-		while (iterator.HasNext()) {
-			struct daemon* daemon = iterator.Next();
-
-			if (((iteration + daemon->offset) % daemon->frequency) == 0)
-				daemon->function(daemon->arg, iteration);
-		}
-		mutex_unlock(&sDaemonMutex);
-
-		iteration++;
-		snooze(100000);	// 0.1 seconds
-	}
+	send_signal_etc(fThread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	return B_OK;
 }
 
 
-//	#pragma mark -
-
-
-extern "C" status_t
-unregister_kernel_daemon(daemon_hook function, void* arg)
+status_t
+KernelDaemon::Register(daemon_hook function, void* arg, int frequency)
 {
-	MutexLocker _(sDaemonMutex);
+	if (function == NULL || frequency < 1)
+		return B_BAD_VALUE;
 
-	DaemonList::Iterator iterator = sDaemons.GetIterator();
+	struct daemon* daemon = new(std::nothrow) struct ::daemon;
+	if (daemon == NULL)
+		return B_NO_MEMORY;
+
+	daemon->function = function;
+	daemon->arg = arg;
+	daemon->frequency = frequency;
+
+	MutexLocker _(fLock);
+
+	if (frequency > 1) {
+		// we try to balance the work-load for each daemon run
+		// (beware, it's a very simple algorithm, yet effective)
+
+		DaemonList::Iterator iterator = fDaemons.GetIterator();
+		int32 num = 0;
+
+		while (iterator.HasNext()) {
+			if (iterator.Next()->frequency == frequency)
+				num++;
+		}
+
+		daemon->offset = num % frequency;
+	} else
+		daemon->offset = 0;
+
+	fDaemons.Add(daemon);
+	return B_OK;
+}
+
+
+status_t
+KernelDaemon::Unregister(daemon_hook function, void* arg)
+{
+	MutexLocker _(fLock);
+
+	DaemonList::Iterator iterator = fDaemons.GetIterator();
 
 	// search for the daemon and remove it from the list
 	while (iterator.HasNext()) {
@@ -90,51 +134,81 @@ unregister_kernel_daemon(daemon_hook function, void* arg)
 }
 
 
+/*static*/ status_t
+KernelDaemon::_DaemonThreadEntry(void* data)
+{
+	return ((KernelDaemon*)data)->_DaemonThread();
+}
+
+
+status_t
+KernelDaemon::_DaemonThread()
+{
+	int32 iteration = 0;
+
+	while (true) {
+		mutex_lock(&fLock);
+
+		DaemonList::Iterator iterator = fDaemons.GetIterator();
+
+		// iterate through the list and execute each daemon if needed
+		while (iterator.HasNext()) {
+			struct daemon* daemon = iterator.Next();
+
+			if (((iteration + daemon->offset) % daemon->frequency) == 0)
+				daemon->function(daemon->arg, iteration);
+		}
+		mutex_unlock(&fLock);
+
+		iteration++;
+		snooze(100000);	// 0.1 seconds
+	}
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
 extern "C" status_t
 register_kernel_daemon(daemon_hook function, void* arg, int frequency)
 {
-	if (function == NULL || frequency < 1)
-		return B_BAD_VALUE;
+	return sKernelDaemon.Register(function, arg, frequency);
+}
 
-	struct daemon* daemon = new(std::nothrow) struct daemon();
-	if (daemon == NULL)
-		return B_NO_MEMORY;
 
-	daemon->function = function;
-	daemon->arg = arg;
-	daemon->frequency = frequency;
+extern "C" status_t
+unregister_kernel_daemon(daemon_hook function, void* arg)
+{
+	return sKernelDaemon.Unregister(function, arg);
+}
 
-	MutexLocker _(sDaemonMutex);
-	
-	if (frequency > 1) {
-		// we try to balance the work-load for each daemon run
-		// (beware, it's a very simple algorithm, yet effective)
 
-		DaemonList::Iterator iterator = sDaemons.GetIterator();
-		int32 num = 0;
+extern "C" status_t
+register_resource_resizer(daemon_hook function, void* arg, int frequency)
+{
+	return sResourceResizer.Register(function, arg, frequency);
+}
 
-		while (iterator.HasNext()) {
-			if (iterator.Next()->frequency == frequency)
-				num++;
-		}
 
-		daemon->offset = num % frequency;
-	} else
-		daemon->offset = 0;
-
-	sDaemons.Add(daemon);
-	return B_OK;
+extern "C" status_t
+unregister_resource_resizer(daemon_hook function, void* arg)
+{
+	return sResourceResizer.Unregister(function, arg);
 }
 
 
 extern "C" status_t
 kernel_daemon_init(void)
 {
-	new(&sDaemons) DaemonList;
+	new(&sKernelDaemon) KernelDaemon;
+	if (sKernelDaemon.Init("kernel daemon") != B_OK)
+		panic("kernel_daemon_init(): failed to init kernel daemon");
 
-	thread_id thread = spawn_kernel_thread(&kernel_daemon, "kernel daemon",
-		B_LOW_PRIORITY, NULL);
-	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	new(&sResourceResizer) KernelDaemon;
+	if (sResourceResizer.Init("resource resizer") != B_OK)
+		panic("kernel_daemon_init(): failed to init resource resizer");
 
 	return B_OK;
 }

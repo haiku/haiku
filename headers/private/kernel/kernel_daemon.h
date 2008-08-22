@@ -6,12 +6,21 @@
 #define _KERNEL_DAEMON_H
 
 
-#include <OS.h>
+#include <KernelExport.h>
 
 
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
+
+status_t register_resource_resizer(daemon_hook function, void* arg,
+			int frequency);
+status_t unregister_resource_resizer(daemon_hook function, void* arg);
+
 status_t kernel_daemon_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KERNEL_DAEMON_H */
