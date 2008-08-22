@@ -92,84 +92,92 @@ utf8_to_unicode(const char **in)
 }
 
 
-/*! \brief Creates an empty string object.
-*/
+/*! \brief Creates an empty string object. */
 UdfString::UdfString()
-	: fCs0String(NULL)
-	, fUtf8String(NULL)
+	:
+	fCs0String(NULL),
+	fUtf8String(NULL)
 {
 }
 
-/*! \brief Creates a new UdfString object from the given Utf8 string.
-*/
+
+/*! \brief Creates a new UdfString object from the given Utf8 string. */
 UdfString::UdfString(const char *utf8)
-	: fCs0String(NULL)
-	, fUtf8String(NULL)
+	:
+	fCs0String(NULL),
+	fUtf8String(NULL)
 {
 	SetTo(utf8);
 }
 
-/*! \brief Creates a new UdfString object from the given Cs0 string.
-*/
+
+/*! \brief Creates a new UdfString object from the given Cs0 string. */
 UdfString::UdfString(const char *cs0, uint32 length)
-	: fCs0String(NULL)
-	, fUtf8String(NULL)
+	:
+	fCs0String(NULL),
+	fUtf8String(NULL)
 {
 	SetTo(cs0, length);
 }
 
+
 UdfString::~UdfString()
 {
-	DEBUG_INIT("String");	
-
 	_Clear();
 }
 
-/*! \brief Assignment from a Utf8 string.
-*/
+
+/*! \brief Assignment from a Utf8 string. */
 void
 UdfString::SetTo(const char *utf8)
 {
-	DEBUG_INIT_ETC("UdfString", ("utf8: `%s', strlen(utf8): %ld", utf8,
-	               utf8 ? strlen(utf8) : 0));	
+	TRACE(("UdfString::SetTo: utf8 = `%s', strlen(utf8) = %ld\n",
+		utf8, utf8 ? strlen(utf8) : 0));
 	_Clear();
-	if (!utf8) {
-		PRINT(("passed NULL utf8 string\n"));
-		return;
-	}		
-	uint32 length = strlen(utf8);
-	// First copy the utf8 string
-	fUtf8String = new(nothrow) char[length+1];
-	if (!fUtf8String){
-		PRINT(("new fUtf8String[%ld] allocation failed\n", length+1));
+
+	if (utf8 == NULL) {
+		TRACE_ERROR(("UdfString::SetTo: passed NULL utf8 string\n"));
 		return;
 	}
-	memcpy(fUtf8String, utf8, length+1);
+
+	uint32 length = strlen(utf8);
+	// First copy the utf8 string
+	fUtf8String = new(nothrow) char[length + 1];
+	if (fUtf8String == NULL) {
+		TRACE_ERROR(("UdfString::SetTo: fUtf8String[%ld] allocation failed\n",
+			length + 1));
+		return;
+	}
+
+	memcpy(fUtf8String, utf8, length + 1);
 	// Next convert to raw 4-byte unicode. Then we'll do some
 	// analysis to figure out if we have any invalid characters,
 	// and whether we can get away with compressed 8-bit unicode,
 	// or have to use burly 16-bit unicode.
 	uint32 *raw = new(nothrow) uint32[length];
-	if (!raw) {
-		PRINT(("new uint32 raw[%ld] temporary string allocation failed\n", length));
+	if (raw == NULL) {
+		TRACE_ERROR(("UdfString::SetTo: uint32 raw[%ld] temporary string "
+			"allocation failed\n", length));
 		_Clear();
 		return;
 	}
+
 	const char *in = utf8;
 	uint32 rawLength = 0;
-	for (uint32 i = 0; i < length && uint32(in-utf8) < length; i++, rawLength++) 
-		raw[i] = utf8_to_unicode(&in);			
+	for (uint32 i = 0; i < length && uint32(in - utf8) < length; i++, rawLength++) 
+		raw[i] = utf8_to_unicode(&in);
+
 	// Check for invalids. 
 	uint32 mask = 0xffff0000;
 	for (uint32 i = 0; i < rawLength; i++) {
 		if (raw[i] & mask) {
-			PRINT(("WARNING: utf8 string contained a multi-byte sequence which "
+			TRACE(("WARNING: utf8 string contained a multi-byte sequence which "
 			       "was converted into a unicode character larger than 16-bits; "
 			       "character will be converted to an underscore character for "
 			       "safety.\n"));
 			raw[i] = '_';
 		}
-	}	
+	}
 	// See if we can get away with 8-bit compressed unicode
 	mask = 0xffffff00;
 	bool canUse8bit = true;
@@ -178,22 +186,23 @@ UdfString::SetTo(const char *utf8)
 			canUse8bit = false;
 			break;
 		}
-	}	
+	}
 	// Build our cs0 string
 	if (canUse8bit) {
-		fCs0Length = rawLength+1;
+		fCs0Length = rawLength + 1;
 		fCs0String = new(nothrow) char[fCs0Length];
 		if (fCs0String) {
 			fCs0String[0] = '\x08';	// 8-bit compressed unicode
 			for (uint32 i = 0; i < rawLength; i++)
-				fCs0String[i+1] = raw[i] % 256;
+				fCs0String[i + 1] = raw[i] % 256;
 		} else {
-			PRINT(("new fCs0String[%ld] allocation failed\n", fCs0Length));
+			TRACE_ERROR(("UdfString::SetTo: fCs0String[%ld] allocation failed\n",
+				fCs0Length));
 			_Clear();			
 			return;
 		}
 	} else {
-		fCs0Length = rawLength*2+1;	
+		fCs0Length = rawLength * 2 + 1;	
 		fCs0String = new(nothrow) char[fCs0Length];
 		if (fCs0String) {
 			uint32 pos = 0;
@@ -207,8 +216,9 @@ UdfString::SetTo(const char *utf8)
 				fCs0String[pos++] = low;
 			}
 		} else {
-			PRINT(("new fCs0String[%ld] allocation failed\n", fCs0Length));
-			_Clear();			
+			TRACE_ERROR(("UdfString::SetTo: fCs0String[%ld] allocation failed\n",
+				fCs0Length));
+			_Clear();
 			return;
 		}
 	}
@@ -217,8 +227,8 @@ UdfString::SetTo(const char *utf8)
 	raw = NULL;	
 }
 
-/*! \brief Assignment from a Cs0 string.
-*/
+
+/*! \brief Assignment from a Cs0 string. */
 void
 UdfString::SetTo(const char *cs0, uint32 length)
 {
@@ -231,7 +241,7 @@ UdfString::SetTo(const char *cs0, uint32 length)
 		PRINT(("passed NULL cs0 string\n"));
 		return;
 	}		
-	
+
 	// First copy the Cs0 string and length
 	fCs0String = new(nothrow) char[length];
 	if (fCs0String) {

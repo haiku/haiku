@@ -61,8 +61,7 @@ UdfString::UdfString(const array<char, length> &dString)
 	: fCs0String(NULL)
 	, fUtf8String(NULL)
 {
-	DEBUG_INIT_ETC("UdfString", ("dString.length(): %ld", dString.length()));
-	
+	TRACE(("UdfString::UdfString: dString.length(): %ld", dString.length()));
 	SetTo(dString);
 }
 
@@ -76,16 +75,14 @@ void
 UdfString::SetTo(const array<char, length> &dString)
 {
 	uint8 dataLength = dString.length() == 0
-	                   ? 0
-	                   : reinterpret_cast<const uint8*>(dString.data)[dString.length()-1];
-	if (dataLength == 0
-        || dataLength == 1 /* technically illegal, but... */)
-	{
+		? 0 : reinterpret_cast<const uint8 *>(dString.data)[dString.length() - 1];
+	if (dataLength == 0 
+		|| dataLength == 1 /* technically illegal, but... */) {
 		SetTo(NULL);
 	} else {
-		if (dataLength > dString.length()-1)
-			dataLength = dString.length()-1;
-		SetTo(reinterpret_cast<const char*>(dString.data), dataLength);
+		if (dataLength > dString.length() - 1)
+			dataLength = dString.length() - 1;
+		SetTo(reinterpret_cast<const char *>(dString.data), dataLength);
 	}
 }
 

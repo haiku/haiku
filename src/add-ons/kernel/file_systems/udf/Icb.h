@@ -143,7 +143,7 @@ template <class DescriptorList>
 status_t
 Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint32 *block)
 {
-	TRACE(("Icb::_Read(): list: %p, pos: %Ld, buffer: %p, length: (%p)->%ld",
+	TRACE(("Icb::_Read(): list: %p, pos: %Ld, buffer: %p, length: (%p)->%ld\n",
 		&list, pos, _buffer, length, (length ? *length : 0)));
 
 	uint64 bytesLeftInFile = uint64(pos) > Length() ? 0 : Length() - pos;

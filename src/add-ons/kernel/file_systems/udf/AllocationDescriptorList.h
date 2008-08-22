@@ -81,7 +81,7 @@ AllocationDescriptorList<Accessor>::AllocationDescriptorList(Icb *icb,
 		fReadFromIcb(true),
 		fVolume(icb->GetVolume())
 {
-	DEBUG_INIT("AllocationDescriptorList<>");
+	TRACE(("AllocationDescriptorList<>\n"));
 	_WalkContinuationChain(_CurrentDescriptor());
 }
 
@@ -101,7 +101,7 @@ AllocationDescriptorList<Accessor>::FindExtent(off_t start,
 	long_address *extent, bool *isEmpty)
 {
 	TRACE(("UDF: AllocationDescriptorList<>::FindExtent: start: %Ld, "
-		"extent: %p, isEmpty: %p", start, extent, isEmpty));
+		"extent: %p, isEmpty: %p\n", start, extent, isEmpty));
 
 	off_t startBlock = start >> fVolume->BlockShift();
 
@@ -147,15 +147,18 @@ template<class Accessor>
 AllocationDescriptorList<Accessor>::Descriptor*
 AllocationDescriptorList<Accessor>::_CurrentDescriptor() const
 {
-	DEBUG_INIT("AllocationDescriptorList<>");
-	PRINT(("(_DescriptorIndex()+1)*sizeof(Descriptor) = %ld\n", (_DescriptorIndex()+1)*sizeof(Descriptor)));
-	PRINT(("_DescriptorArraySize() = %ld\n", _DescriptorArraySize()));
-	PRINT(("_DescriptorArray() = %p\n", _DescriptorArray()));
+	TRACE(("AllocationDescriptorList<>::_CurrentDescriptor: "
+		"_DescriptorIndex() + 1) * sizeof(Descriptor) = %ld\n",
+		"\t_DescriptorArraySize() = %ld\n\t_DescriptorArray() = %p\n",
+		(_DescriptorIndex() + 1) * sizeof(Descriptor), _DescriptorArraySize(),
+		_DescriptorArray()));
+
 	return ((_DescriptorIndex() + 1) * sizeof(Descriptor)
 		<= _DescriptorArraySize())
 		? &(_DescriptorArray()[_DescriptorIndex()])
 		: NULL;
 }
+
 
 template<class Accessor>
 status_t
