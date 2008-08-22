@@ -3248,7 +3248,7 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 			BMenu* levelTwoMenu = CreateMimeMenu(mimeType, false, levelOneMenu, start,
 				count);
 			if (levelTwoMenu) {
-				// And also a one for the main MIME type. Adde them to the menu
+				// And also one for the main MIME type. Adde them to the menu
 				// hierarchy.
 				BMessage *message1 = new BMessage(kMIMETypeItem);
 				message1->AddString("mimetype", mimeType.Type());
@@ -3264,6 +3264,11 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 				if (levelOneMenu->CountItems() == 0) {
 					// Our supertype menu is empty, so we remove it now.
 					delete levelOneMenu;
+				} else {
+					BMessage *message2 = new BMessage(kMIMETypeItem);
+					message2->AddString("mimetype", superType.Type());
+					menu->AddItem(new IconMenuItem(levelOneMenu, message2,
+					superType.Type(), B_MINI_ICON));		
 				}
 			}
 		}
