@@ -23,6 +23,7 @@ status_t arch_debug_init(kernel_args *args);
 void *arch_debug_get_caller(void);
 int32 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		int32 skipFrames, bool userOnly);
+void *arch_debug_get_interrupt_pc();
 bool arch_debug_contains_call(struct thread *thread, const char *symbol,
 		addr_t start, addr_t end);
 void arch_debug_save_registers(int *);

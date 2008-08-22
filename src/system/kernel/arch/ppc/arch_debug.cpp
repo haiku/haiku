@@ -286,6 +286,14 @@ arch_debug_get_caller(void)
 }
 
 
+void*
+arch_debug_get_interrupt_pc()
+{
+	// TODO: Implement!
+	return NULL;
+}
+
+
 status_t
 arch_debug_init(kernel_args *args)
 {

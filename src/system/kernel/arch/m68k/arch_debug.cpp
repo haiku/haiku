@@ -339,6 +339,14 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 }
 
 
+void*
+arch_debug_get_interrupt_pc()
+{
+	// TODO: Implement!
+	return NULL;
+}
+
+
 status_t
 arch_debug_init(kernel_args *args)
 {

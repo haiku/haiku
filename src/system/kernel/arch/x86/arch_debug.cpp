@@ -596,8 +596,12 @@ cmd_in_context(int argc, char** argv)
 		}
 	}
 
+	struct thread* previousThread = debug_set_debugged_thread(thread);
+
 	// execute the command
 	evaluate_debug_command(commandLine);
+
+	debug_set_debugged_thread(previousThread);
 
 	// reset the page directory
 	if (oldPageDirectory)
@@ -697,6 +701,20 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	}
 
 	return count;
+}
+
+/*!	Returns the program counter of this thread where the innermost interrupts
+	happened. Returns \c NULL, if there's none or a problem occurred retrieving
+	it.
+*/
+void*
+arch_debug_get_interrupt_pc()
+{
+	struct iframe* frame = i386_get_current_iframe();
+	if (frame == NULL)
+		return NULL;
+
+	return (void*)(addr_t)frame->eip;
 }
 
 
