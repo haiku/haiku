@@ -46,6 +46,8 @@ void thread_exit(void);
 int32 thread_max_threads(void);
 int32 thread_used_threads(void);
 
+const char* thread_state_to_text(struct thread* thread, int32 state);
+
 #define thread_get_current_thread arch_thread_get_current_thread
 
 struct thread *thread_get_thread_struct(thread_id id);

@@ -1003,16 +1003,18 @@ state_to_text(struct thread *thread, int32 state)
 
 		case B_THREAD_WAITING:
 		{
-			switch (thread->wait.type) {
-				case THREAD_BLOCK_TYPE_SNOOZE:
-					return "zzz";
+			if (thread != NULL) {
+				switch (thread->wait.type) {
+					case THREAD_BLOCK_TYPE_SNOOZE:
+						return "zzz";
 
-				case THREAD_BLOCK_TYPE_SEMAPHORE:
-				{
-					sem_id sem = (sem_id)(addr_t)thread->wait.object;
-					if (sem == thread->msg.read_sem)
-						return "receive";
-					break;
+					case THREAD_BLOCK_TYPE_SEMAPHORE:
+					{
+						sem_id sem = (sem_id)(addr_t)thread->wait.object;
+						if (sem == thread->msg.read_sem)
+							return "receive";
+						break;
+					}
 				}
 			}
 
@@ -1979,6 +1981,13 @@ int32
 thread_used_threads(void)
 {
 	return sUsedThreads;
+}
+
+
+const char*
+thread_state_to_text(struct thread* thread, int32 state)
+{
+	return state_to_text(thread, state);
 }
 
 
