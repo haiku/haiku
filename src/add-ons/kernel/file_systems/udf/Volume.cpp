@@ -139,7 +139,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 						physicalCount++;
 				}
 			} else {
-				TRACE(("no matching partition descriptor found!\n"));
+				TRACE_ERROR(("Volume::Mount: no matching partition descriptor found!\n"));
 				status = B_ERROR;
 			}
 		} else if (header->type() == 2) {
@@ -204,7 +204,9 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 		fBlockSize = blockSize;
 		fBlockShift = blockShift;
 	}
-	
+	TRACE(("Volume::Mount: device = %d, offset = %d, length = %ld, "
+		"blockSize = %d, blockShift = %d\n", device, offset, length,
+		blockSize, blockShift));
 	// At this point we've found a valid set of volume descriptors and
 	// our partitions are all set up. We now need to investigate the file
 	// set descriptor pointed to by the logical volume descriptor.

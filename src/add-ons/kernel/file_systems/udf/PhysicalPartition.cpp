@@ -27,14 +27,15 @@ PhysicalPartition::~PhysicalPartition()
 status_t
 PhysicalPartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 {
-	TRACE(("PhysicalPartition::MapBlock: %ld", logicalBlock));
+	TRACE(("PhysicalPartition::MapBlock: %ld\n", logicalBlock));
 	if (logicalBlock >= fLength) {
-		TRACE_ERROR(("invalid logical block: %ld, length: %ld\n",
-			logicalBlock, fLength));
+		TRACE_ERROR(("PhysicalPartition::MapBlock: block %ld invalid,
+			length = %ld\n", logicalBlock, fLength));
 		return B_BAD_ADDRESS;
 	} else {
 		physicalBlock = fStart + logicalBlock;
-		TRACE(("mapped %ld to %Ld\n", logicalBlock, physicalBlock));
+		TRACE(("PhysicalPartition::MapBlock: block %ld mapped to %Ld\n",
+			logicalBlock, physicalBlock));
 		return B_OK;
 	}
 }

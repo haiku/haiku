@@ -137,7 +137,8 @@ make_time(timestamp &timestamp)
 long_address
 to_long_address(ino_t id, uint32 length)
 {
-	DEBUG_INIT_ETC(NULL, ("ino_t: %Ld (0x%Lx), length: %ld", id, id, length));
+	TRACE(("udf_to_long_address: ino_t = %Ld (0x%Lx), length = %ld",
+		id, id, length));
 	long_address result;
 	result.set_block((id >> 16) & 0xffffffff);
 	result.set_partition(id & 0xffff);
