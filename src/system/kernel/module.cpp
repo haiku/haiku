@@ -2104,8 +2104,7 @@ get_module(const char* path, module_info** _info)
 		status = B_OK;
 
 	if (status == B_OK) {
-		if (module->ref_count < 0)
-			panic("argl %s", path);
+		ASSERT(module->ref_count >= 0);
 		module->ref_count++;
 		*_info = module->info;
 	} else if ((module->flags & B_BUILT_IN_MODULE) == 0
@@ -2138,7 +2137,8 @@ put_module(const char* path)
 	if ((module->flags & B_KEEP_LOADED) == 0) {
 		if (--module->ref_count == 0)
 			uninit_module(module);
-	} else if ((module->flags & B_BUILT_IN_MODULE) == 0)
+	}
+	if ((module->flags & B_BUILT_IN_MODULE) == 0)
 		put_module_image(module->module_image);
 
 	return B_OK;
