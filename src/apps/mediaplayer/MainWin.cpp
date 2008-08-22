@@ -949,9 +949,9 @@ MainWin::_CreateMenu()
 		new BMessage(M_TOGGLE_NO_CONTROLS), 'C'));
 	fSettingsMenu->AddItem(new BMenuItem("Always on Top",
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T'));
-//	fSettingsMenu->AddSeparatorItem();
-//	fSettingsMenu->AddItem(new BMenuItem("Settings"B_UTF8_ELLIPSIS,
-//		new BMessage(M_SETTINGS), 'S'));
+	fSettingsMenu->AddSeparatorItem();
+	fSettingsMenu->AddItem(new BMenuItem("Settings"B_UTF8_ELLIPSIS,
+		new BMessage(M_SETTINGS), 'S'));
 
 //	fDebugMenu->AddItem(new BMenuItem("pixel aspect ratio 1.00000:1",
 //		new BMessage(M_ASPECT_100000_1)));

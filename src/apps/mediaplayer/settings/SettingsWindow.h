@@ -16,24 +16,35 @@
 #include "Settings.h"
 
 class SettingsWindow : public BWindow {
-	public:
-							SettingsWindow(BRect frame);
-		virtual				~SettingsWindow();
-		void				SetSettings();
-		virtual	bool		QuitRequested();
-		virtual	void		MessageReceived(BMessage* message);
-	private:
-		Settings*			fSettingsObj;
-		mpSettings 			fSettings;
+public:
+								SettingsWindow(BRect frame);
+		virtual					~SettingsWindow();
+
+		virtual	void			Show();
+		virtual	bool			QuitRequested();
+		virtual	void			MessageReceived(BMessage* message);
+
+		void					AdoptSettings();
+		void					ApplySettings();
+		void					Revert();
+		bool					IsRevertable();
+
+private:
+		mpSettings 				fSettings;
+		mpSettings 				fLastSettings;
 		
-		BCheckBox* 			fChkboxAutostart; 
-		BCheckBox*			fChkBoxCloseWindowMovies; 
-		BCheckBox*			fChkBoxCloseWindowSounds; 
-		BCheckBox*			fChkBoxLoopMovie;
-		BCheckBox*			fChkBoxLoopSounds;
-		BRadioButton*		fRdbtnfullvolume; 
-		BRadioButton*		fRdbtnhalfvolume; 
-		BRadioButton*		fRdbtnmutevolume;
+		BCheckBox* 				fAutostartCB; 
+		BCheckBox*				fCloseWindowMoviesCB; 
+		BCheckBox*				fCloseWindowSoundsCB; 
+		BCheckBox*				fLoopMoviesCB;
+		BCheckBox*				fLoopSoundsCB;
+
+		BCheckBox*				fUseOverlaysCB;
+		BCheckBox*				fScaleBilinearCB;
+
+		BRadioButton*			fFullVolumeBGMoviesRB; 
+		BRadioButton*			fHalfVolumeBGMoviesRB; 
+		BRadioButton*			fMutedVolumeBGMoviesRB;
 };
 
 #endif

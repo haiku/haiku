@@ -84,13 +84,13 @@ Application MediaPlayer :
 	CommandStack.cpp
 	Event.cpp
 	EventQueue.cpp
+	FileReadWrite.cpp
 	Listener.cpp
 	ListenerAdapter.cpp
 	MessageEvent.cpp
 	Notifier.cpp
 	RWLocker.cpp
-	FileReadWrite.cpp
-	TPreferences.cpp
+	SettingsMessage.cpp
 
 	# .
 	Controller.cpp

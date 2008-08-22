@@ -263,7 +263,7 @@ Playlist::GetRefAt(int32 index, entry_ref* _ref) const
 
 
 
-// #pragma mark -
+// #pragma mark - navigation
 
 
 void

@@ -6,33 +6,46 @@
  *		Fredrik Modéen <fredrik@modeen.se>
  */
  
-#ifndef __SETTINGS_H__
-#define __SETTINGS_H__
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
-#include <Message.h>
-#include <Path.h>
+#include <Locker.h>
 
-#include "TPreferences.h"
+#include "SettingsMessage.h"
 
 struct mpSettings {
-	int8 
-	autostart, closeWhenDonePlayingMovie, closeWhenDonePlayingSound, 
-	loopMovie, loopSound, fullVolume, halfVolume, mute;
+	bool	autostart;
+	bool	closeWhenDonePlayingMovie;
+	bool	closeWhenDonePlayingSound;
+	bool	loopMovie;
+	bool	loopSound;
+	bool	useOverlays;
+	bool	scaleBilinear;
+	enum {
+		BG_MOVIES_FULL_VOLUME = 0,
+		BG_MOVIES_HALF_VLUME = 1,
+		BG_MOVIES_MUTED = 2
+	};
+	uint32	backgroundMovieVolumeMode;
 };
 
-#define SETTINGSFILENAME "MediaPlayerSettings"
+#define SETTINGS_FILENAME "MediaPlayerSettings"
 
-class Settings {
-	public:
-		Settings(const char *filename = SETTINGSFILENAME);
-		
-		void LoadSettings(mpSettings &settings);
-		void SaveSettings(const mpSettings &settings);
-	
-	private:
-		void _SetDefault(mpSettings &settings);
-				
-		TPreferences 	fTPreferences;
+class Settings : public BLocker {
+public:
+								Settings(
+									const char* filename = SETTINGS_FILENAME);
+
+			void				LoadSettings(mpSettings& settings) const;
+			void				SaveSettings(const mpSettings& settings);
+
+	static	mpSettings			CurrentSettings();
+	static	Settings*			Default();
+
+private:
+			SettingsMessage		fSettingsMessage;
+
+	static	Settings			sGlobalInstance;
 };
 
-#endif  // __SETTINGS_H__
+#endif  // SETTINGS_H
