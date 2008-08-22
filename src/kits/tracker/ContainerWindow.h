@@ -77,7 +77,7 @@ class BContainerWindow : public BWindow {
 		BContainerWindow(LockingList<BWindow> *windowList,
 			uint32 containerWindowFlags,
 			window_look look = B_DOCUMENT_WINDOW_LOOK,
-			window_feel feel = B_NORMAL_WINDOW_FEEL, 
+			window_feel feel = B_NORMAL_WINDOW_FEEL,
 			uint32 flags = B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION,
 			uint32 workspace = B_CURRENT_WORKSPACE);
 
@@ -152,9 +152,9 @@ class BContainerWindow : public BWindow {
 		void AddMimeTypesToMenu();
 		virtual	void MarkAttributeMenu(BMenu *);
 		void MarkAttributeMenu();
-		BMenuItem *NewAttributeMenuItem(const char *label, const char *name, 
+		BMenuItem *NewAttributeMenuItem(const char *label, const char *name,
 			int32 type, float width, int32 align, bool editable, bool statField);
-		BMenuItem *NewAttributeMenuItem(const char *label, const char *name, 
+		BMenuItem *NewAttributeMenuItem(const char *label, const char *name,
 			int32 type, const char* displayAs, float width, int32 align,
 			bool editable, bool statField);
 		virtual	void NewAttributeMenu(BMenu *);
@@ -344,7 +344,7 @@ int CompareLabels(const BMenuItem *, const BMenuItem *);
 
 // inlines ---------
 
-inline BNavigator * 
+inline BNavigator *
 BContainerWindow::Navigator() const
 {
 	return fNavigator;
@@ -368,13 +368,13 @@ BContainerWindow::InTrash() const
 	return fInTrash;
 }
 
-inline bool 
+inline bool
 BContainerWindow::IsPrintersDir() const
 {
 	return fIsPrinters;
 }
 
-inline void 
+inline void
 BContainerWindow::SetUpDiskMenu(BMenu *)
 {
 	// nothing at this level
@@ -386,7 +386,7 @@ BContainerWindow::ContextMenu()
 	return fContextMenu;
 }
 
-inline bool 
+inline bool
 BContainerWindow::Dragging() const
 {
 	return fDragMessage && fCachedTypesList;
@@ -404,7 +404,7 @@ BContainerWindow::SaveStateIsEnabled() const
 	return fSaveStateIsEnabled;
 }
 
-inline 
+inline
 void
 BContainerWindow::SetSaveStateEnabled(bool value)
 {
