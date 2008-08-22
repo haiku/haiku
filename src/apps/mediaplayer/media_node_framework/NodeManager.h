@@ -40,10 +40,11 @@ class NodeManager : public PlaybackManager {
 
 			status_t			Init(BRect videoBounds, float videoFrameRate,
 									color_space preferredVideoFormat,
-									int32 loopingMode = LOOPING_ALL,
-									bool loopingEnabled = true,
-									float speed = 1.0,
-									uint32 enabledNodes = AUDIO_AND_VIDEO);
+									int32 loopingMode,
+									bool loopingEnabled,
+									float speed,
+									uint32 enabledNodes,
+									bool useOverlays);
 			status_t			InitCheck();
 								// only call this if the
 								// media_server has died!
@@ -52,7 +53,8 @@ class NodeManager : public PlaybackManager {
 			status_t			FormatChanged(BRect videoBounds,
 									float videoFrameRate,
 									color_space preferredVideoFormat,
-									uint32 enabledNodes = AUDIO_AND_VIDEO,
+									uint32 enabledNodes,
+									bool useOverlays,
 									bool force = false);
 	virtual	void				SetPlayMode(int32 mode,
 									bool continuePlaying = true);
@@ -74,9 +76,10 @@ class NodeManager : public PlaybackManager {
 
  private:
 			status_t			_SetUpNodes(color_space preferredVideoFormat,
-									uint32 enabledNodes);
+									uint32 enabledNodes, bool useOverlays);
 			status_t			_SetUpVideoNodes(
-									color_space preferredVideoFormat);
+									color_space preferredVideoFormat,
+									bool useOverlays);
 			status_t			_SetUpAudioNodes();
 			status_t			_TearDownNodes(bool disconnect = true);
 			status_t			_StartNodes();

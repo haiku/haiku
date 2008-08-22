@@ -110,7 +110,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 	fMutedVolumeBGMoviesRB = new BRadioButton("rdbtnfullvolume",
 		"Muted", new BMessage(M_START_MUTE_VOLUME));
 
-	BButton* revertButton = new BButton("revert", "Revert", 
+	fRevertB = new BButton("revert", "Revert", 
 		new BMessage(M_SETTINGS_REVERT));
 
 	BButton* cancelButton = new BButton("cancel", "Cancel", 
@@ -167,7 +167,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 			.SetInsets(5, 5, 15, 5)
 		)
 		.Add(BGroupLayoutBuilder(buttonLayout)
-			.Add(revertButton)
+			.Add(fRevertB)
 			.AddGlue()
 			.Add(cancelButton)
 			.Add(okButton)
@@ -175,9 +175,8 @@ SettingsWindow::SettingsWindow(BRect frame)
 		)
 	);
 
-
-
 #else
+
 	frame = Bounds();
 	BView* view = new BView(frame,"SettingsView",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
 	view->SetViewColor(216, 216, 216);
@@ -251,8 +250,16 @@ SettingsWindow::SettingsWindow(BRect frame)
 #endif
 
 	// disable currently unsupported features
+	fAutostartCB->SetEnabled(false);
+	fCloseWindowMoviesCB->SetEnabled(false);
+	fCloseWindowSoundsCB->SetEnabled(false);
+
 	fLoopMoviesCB->SetEnabled(false);
 	fLoopSoundsCB->SetEnabled(false);
+
+	fFullVolumeBGMoviesRB->SetEnabled(false);
+	fHalfVolumeBGMoviesRB->SetEnabled(false);
+	fMutedVolumeBGMoviesRB->SetEnabled(false);
 }
 
 
@@ -339,6 +346,8 @@ SettingsWindow::AdoptSettings()
 		== mpSettings::BG_MOVIES_HALF_VLUME);
 	fMutedVolumeBGMoviesRB->SetValue(fSettings.backgroundMovieVolumeMode
 		== mpSettings::BG_MOVIES_MUTED);
+
+	fRevertB->SetEnabled(IsRevertable());
 }
 
 
@@ -368,6 +377,8 @@ SettingsWindow::ApplySettings()
 	}
 
 	Settings::Default()->SaveSettings(fSettings);
+
+	fRevertB->SetEnabled(IsRevertable());
 }
 
 
@@ -377,5 +388,12 @@ SettingsWindow::Revert()
 	fSettings = fLastSettings;
 	AdoptSettings();
 	Settings::Default()->SaveSettings(fSettings);
+}
+
+
+bool
+SettingsWindow::IsRevertable() const
+{
+	return fSettings != fLastSettings;
 }
 

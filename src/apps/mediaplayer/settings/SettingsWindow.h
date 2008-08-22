@@ -27,7 +27,7 @@ public:
 		void					AdoptSettings();
 		void					ApplySettings();
 		void					Revert();
-		bool					IsRevertable();
+		bool					IsRevertable() const;
 
 private:
 		mpSettings 				fSettings;
@@ -45,6 +45,8 @@ private:
 		BRadioButton*			fFullVolumeBGMoviesRB; 
 		BRadioButton*			fHalfVolumeBGMoviesRB; 
 		BRadioButton*			fMutedVolumeBGMoviesRB;
+
+		BButton*				fRevertB;
 };
 
 #endif

@@ -67,7 +67,7 @@ NodeManager::~NodeManager()
 status_t
 NodeManager::Init(BRect videoBounds, float videoFrameRate,
 	color_space preferredVideoFormat, int32 loopingMode,
-	bool loopingEnabled, float speed, uint32 enabledNodes)
+	bool loopingEnabled, float speed, uint32 enabledNodes, bool useOverlays)
 {
 	// init base class
 	PlaybackManager::Init(videoFrameRate, loopingMode, loopingEnabled, speed);
@@ -83,7 +83,7 @@ NodeManager::Init(BRect videoBounds, float videoFrameRate,
 		fAudioSupplier = CreateAudioSupplier();
 
 	return FormatChanged(videoBounds, videoFrameRate, preferredVideoFormat,
-		enabledNodes, true);
+		enabledNodes, useOverlays, true);
 }
 
 // InitCheck
@@ -118,7 +118,8 @@ NodeManager::CleanupNodes()
 // FormatChanged
 status_t
 NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
-	color_space preferredVideoFormat, uint32 enabledNodes, bool force)
+	color_space preferredVideoFormat, uint32 enabledNodes, bool useOverlays,
+	bool force)
 {
 	TRACE("NodeManager::FormatChanged()\n");
 
@@ -142,7 +143,8 @@ NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
 
 	SetVideoBounds(videoBounds);
 
-	status_t ret = _SetUpNodes(preferredVideoFormat, enabledNodes);
+	status_t ret = _SetUpNodes(preferredVideoFormat, enabledNodes,
+		useOverlays);
 	if (ret == B_OK)
 		_StartNodes();
 	else
@@ -250,7 +252,8 @@ NodeManager::SetPeakListener(BHandler* handler)
 
 // _SetUpNodes
 status_t
-NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes)
+NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes,
+	bool useOverlays)
 {
 	TRACE("NodeManager::_SetUpNodes()\n");
 
@@ -275,7 +278,7 @@ NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes)
 
 	// setup the video nodes
 	if (enabledNodes != AUDIO_ONLY) {
-		fStatus = _SetUpVideoNodes(preferredVideoFormat);
+		fStatus = _SetUpVideoNodes(preferredVideoFormat, useOverlays);
 		if (fStatus != B_OK) {
 			print_error("Error setting up video nodes", fStatus);
 			fMediaRoster->Unlock();
@@ -307,7 +310,8 @@ fNoAudio = true;
 
 // _SetUpVideoNodes
 status_t
-NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat)
+NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
+	bool useOverlays)
 {
 	// create the video producer node
 	fVideoProducer = new VideoProducer(NULL, "MediaPlayer Video Out", 0,
@@ -381,7 +385,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat)
 	format.u.raw_video = videoFormat;
 	
 	// connect video producer to consumer (hopefully using overlays)
-	fVideoConsumer->SetTryOverlay(true);
+	fVideoConsumer->SetTryOverlay(useOverlays);
 	fStatus = fMediaRoster->Connect(videoOutput.source, videoInput.destination,
 		&format, &videoOutput, &videoInput);
 

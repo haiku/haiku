@@ -11,6 +11,20 @@
 #include <Autolock.h>
 
 
+bool
+mpSettings::operator!=(const mpSettings& other) const
+{
+	return autostart != other.autostart
+		|| closeWhenDonePlayingMovie != other.closeWhenDonePlayingMovie
+		|| closeWhenDonePlayingSound != other.closeWhenDonePlayingSound
+		|| loopMovie != other.loopMovie
+		|| loopSound != other.loopSound
+		|| useOverlays != other.useOverlays
+		|| scaleBilinear != other.scaleBilinear
+		|| backgroundMovieVolumeMode != other.backgroundMovieVolumeMode;
+}
+
+
 Settings::Settings(const char* filename)
 	: BLocker("settings lock"),
 	  fSettingsMessage(B_USER_CONFIG_DIRECTORY, filename)
@@ -36,7 +50,7 @@ Settings::LoadSettings(mpSettings& settings) const
 
 	settings.backgroundMovieVolumeMode
 		= fSettingsMessage.GetValue("bgMovieVolumeMode",
-			(uint32)mpSettings::BG_MOVIES_MUTED);
+			(uint32)mpSettings::BG_MOVIES_FULL_VOLUME);
 }
 
 
@@ -63,6 +77,8 @@ Settings::SaveSettings(const mpSettings& settings)
 	// this will make sure the settings are saved even when the player
 	// crashes.
 	fSettingsMessage.Save();
+
+	Notify();
 }
 
 

@@ -11,6 +11,7 @@
 
 #include <Locker.h>
 
+#include "Notifier.h"
 #include "SettingsMessage.h"
 
 struct mpSettings {
@@ -27,11 +28,13 @@ struct mpSettings {
 		BG_MOVIES_MUTED = 2
 	};
 	uint32	backgroundMovieVolumeMode;
+
+	bool operator!=(const mpSettings& other) const;
 };
 
 #define SETTINGS_FILENAME "MediaPlayerSettings"
 
-class Settings : public BLocker {
+class Settings : public BLocker, public Notifier {
 public:
 								Settings(
 									const char* filename = SETTINGS_FILENAME);
@@ -44,6 +47,7 @@ public:
 
 private:
 			SettingsMessage		fSettingsMessage;
+			BList				fListeners;
 
 	static	Settings			sGlobalInstance;
 };

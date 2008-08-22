@@ -101,6 +101,7 @@ Controller::Controller()
  ,	fDuration(0)
  ,	fVideoFrameRate(25.0)
  ,	fSeekFrame(-1)
+ ,	fLastSeekEventTime(LONGLONG_MIN)
 
  ,	fAutoplay(true)
  ,	fPauseAtEndOfStream(false)
@@ -269,6 +270,8 @@ Controller::SetTo(const entry_ref &ref)
 	fVideoView->DisableOverlay();
 
 	// get video properties (if there is video at all)
+	bool useOverlays = fVideoView ? fVideoView->UseOverlays() : true;
+
 	int width;
 	int height;
 	GetSize(&width, &height);
@@ -288,10 +291,11 @@ Controller::SetTo(const entry_ref &ref)
 
 	if (InitCheck() != B_OK) {
 		Init(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
-			preferredVideoFormat, LOOPING_ALL, false, 1.0, enabledNodes);
+			preferredVideoFormat, LOOPING_ALL, false, 1.0, enabledNodes,
+			useOverlays);
 	} else {
 		FormatChanged(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
-			preferredVideoFormat, enabledNodes);
+			preferredVideoFormat, enabledNodes, useOverlays);
 	}
 
 	_NotifyFileChanged();
@@ -578,9 +582,10 @@ Controller::SetPosition(float value)
 
 	fSeekFrame = (int32)(Duration() * value);
 	int32 currentFrame = CurrentFrame();
-	if (fSeekFrame != currentFrame)
+	if (fSeekFrame != currentFrame) {
 		SetCurrentFrame(fSeekFrame);
-	else
+		fLastSeekEventTime = system_time();
+	} else
 		fSeekFrame = -1;
 
 	// TODO: What was this used for in the old framework?
@@ -916,8 +921,10 @@ Controller::NotifyCurrentFrameChanged(int32 frame) const
 {
 	// check if we are still waiting to reach the seekframe,
 	// don't pass the event on to the listeners in that case
-	if (fSeekFrame >= 0 && frame != fSeekFrame)
+	if ((system_time() - fLastSeekEventTime) < 1000000
+		&& fSeekFrame >= 0 && frame != fSeekFrame) {
 		return;
+	}
 	fSeekFrame = -1;
 
 	float position = 0.0;

@@ -8,6 +8,7 @@
 
 #include <View.h>
 
+#include "ListenerAdapter.h"
 #include "VideoTarget.h"
 
 
@@ -19,6 +20,7 @@ public:
 
 	// BView interface
 	virtual	void				Draw(BRect updateRect);
+	virtual	void				MessageReceived(BMessage* message);
 
 	// VideoTarget interface
 	virtual	void				SetBitmap(const BBitmap* bitmap);
@@ -30,13 +32,21 @@ public:
 			void				OverlayScreenshotPrepare();
 			void				OverlayScreenshotCleanup();
 
+			bool				UseOverlays() const;
 			bool				IsOverlayActive();
 			void				DisableOverlay();
 
 private:
+			void				_DrawBitmap(const BBitmap* bitmap);
+			void				_AdoptGlobalSettings();
+
 			bool				fOverlayMode;
 			overlay_restrictions fOverlayRestrictions;
 			rgb_color			fOverlayKeyColor;
+
+			ListenerAdapter		fGlobalSettingsListener;
+			bool				fUseOverlays;
+			bool				fUseBilinearScaling;
 };
 
 #endif // VIDEO_VIEW_H

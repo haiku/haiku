@@ -8,10 +8,13 @@
 
 #include <Bitmap.h>
 
+#include "Settings.h"
+
 
 VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	: BView(frame, name, resizeMask, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	  fOverlayMode(false)
+	  fOverlayMode(false),
+	  fGlobalSettingsListener(this)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 		// might be reset to overlay key color if overlays are used
@@ -22,11 +25,15 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	fOverlayRestrictions.max_width_scale = 8.0;
 	fOverlayRestrictions.min_height_scale = 0.25;
 	fOverlayRestrictions.max_height_scale = 8.0;
+
+	Settings::Default()->AddListener(&fGlobalSettingsListener);
+	_AdoptGlobalSettings();
 }
 
 
 VideoView::~VideoView()
 {
+	Settings::Default()->RemoveListener(&fGlobalSettingsListener);
 }
 
 
@@ -36,17 +43,31 @@ VideoView::Draw(BRect updateRect)
 	bool fillBlack = true;
 
 	if (LockBitmap()) {
-		BRect r(Bounds());
 		if (const BBitmap* bitmap = GetBitmap()) {
 			fillBlack = false;
 			if (!fOverlayMode)
-				DrawBitmap(bitmap, bitmap->Bounds(), r);
+				_DrawBitmap(bitmap);
 		}
 		UnlockBitmap();
 	}
 
 	if (fillBlack)
 		FillRect(updateRect);
+}
+
+
+void
+VideoView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_OBJECT_CHANGED:
+			// TODO: find out which object, if we ever watch more than
+			// the global settings instance...
+			_AdoptGlobalSettings();
+			break;
+		default:
+			BView::MessageReceived(message);
+	}
 }
 
 
@@ -60,8 +81,7 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 	// -> Window).
 	if (bitmap && LockLooperWithTimeout(10000) == B_OK) {
 		if (LockBitmap()) {
-//			if (fOverlayMode || bitmap->Flags() & B_BITMAP_WILL_OVERLAY) {
-			if (fOverlayMode || bitmap->ColorSpace() == B_YCbCr422) {
+			if (fOverlayMode || (bitmap->Flags() & B_BITMAP_WILL_OVERLAY)) {
 				if (!fOverlayMode) {
 					// init overlay
 					rgb_color key;
@@ -104,7 +124,7 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 				SetViewColor(B_TRANSPARENT_COLOR);
 			}
 			if (!fOverlayMode)
-				DrawBitmap(bitmap, bitmap->Bounds(), Bounds());
+				_DrawBitmap(bitmap);
 
 			UnlockBitmap();
 		}
@@ -141,6 +161,13 @@ VideoView::OverlayScreenshotCleanup()
 
 
 bool
+VideoView::UseOverlays() const
+{
+	return fUseOverlays;
+}
+
+
+bool
 VideoView::IsOverlayActive()
 {
 	bool active = false;
@@ -165,5 +192,30 @@ VideoView::DisableOverlay()
 	snooze(20000);
 	Sync();
 	fOverlayMode = false;
+}
+
+
+// #pragma mark -
+
+
+void
+VideoView::_DrawBitmap(const BBitmap* bitmap)
+{
+#ifdef __HAIKU__
+	uint32 options = fUseBilinearScaling ? B_FILTER_BITMAP_BILINEAR : 0;
+	DrawBitmap(bitmap, bitmap->Bounds(), Bounds(), options);
+#else
+	DrawBitmap(bitmap, bitmap->Bounds(), Bounds());
+#endif
+}
+
+
+void
+VideoView::_AdoptGlobalSettings()
+{
+	mpSettings settings = Settings::CurrentSettings();
+
+	fUseOverlays = settings.useOverlays;
+	fUseBilinearScaling = settings.scaleBilinear;
 }
 
