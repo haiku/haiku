@@ -70,8 +70,10 @@ Stack::Stack()
 			continue;
 
 		TRACE(("USB Stack: adding module %s\n", moduleNames[i]));
-		if (module->add_to(this) < B_OK)
+		if (module->add_to(this) < B_OK) {
+			put_module(moduleNames[i]);
 			continue;
+		}
 
 		TRACE(("USB Stack: module %s successfully loaded\n", moduleNames[i]));
 	}
