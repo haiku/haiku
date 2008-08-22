@@ -169,6 +169,9 @@ PartitionRecorder::FirstOffset() const
 bool
 PartitionRecorder::_Record(BPartition* partition)
 {
+	if (!partition->ContainsFileSystem())
+		return false;
+	
 	BPath partitionPath;
 	partition->GetPath(&partitionPath);
 
