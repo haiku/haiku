@@ -11,6 +11,7 @@
 #include "smp.h"
 #include "mmu.h"
 #include "acpi.h"
+#include "hpet.h"
 
 #include <KernelExport.h>
 

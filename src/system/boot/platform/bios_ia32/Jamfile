@@ -35,6 +35,7 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	support.S
 	video.cpp
 	apm.cpp
+	hpet.cpp
 	
 	# generic
 	text_menu.cpp

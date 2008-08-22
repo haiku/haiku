@@ -138,6 +138,7 @@ _start(void)
 	apm_init();
 	acpi_init();
 	smp_init();
+	//hpet_init(); // TODO: Not yet
 	main(&args);
 }
 
