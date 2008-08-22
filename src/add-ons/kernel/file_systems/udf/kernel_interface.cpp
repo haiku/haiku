@@ -116,13 +116,14 @@ static status_t
 udf_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 	uint32 *_flags, bool reenter)
 {
-	TRACE(("udf_get_vnode: id = %Ld, reenter = %s\n",
-		id, (reenter ? "true" : "false")));
+	TRACE(("udf_get_vnode: _volume = %p, _node = %p, reenter = %s\n",
+		_volume, _node, (reenter ? "true" : "false")));
 
 	Volume *volume = (Volume *)_volume->private_volume;
 
 	// Convert the given vnode id to an address, and create
 	// and return a corresponding Icb object for it.
+	TRACE(("udf_get_vnode: id = %d, blockSize = %d\n", id, volume->BlockSize()));
 	Icb *icb = new(std::nothrow) Icb(volume,
 		to_long_address(id, volume->BlockSize()));
 	if (icb) {
@@ -166,17 +167,17 @@ udf_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 			return B_ENTRY_NOT_FOUND;
 	} else {
 		status = dir->Find(file, vnodeID);
-		if (status == B_OK) {
-			Icb *icb;
-			status = get_vnode(volume->FSVolume(), *vnodeID,
-				(void **)&icb);
-			if (status != B_OK)
-				return B_ENTRY_NOT_FOUND;
-		}
+		if (status != B_OK)
+			return status;
+
+		Icb *icb;
+		status = get_vnode(volume->FSVolume(), *vnodeID, (void **)&icb);
+		if (status != B_OK)
+			return B_ENTRY_NOT_FOUND;
 	}
 	TRACE(("udf_lookup: vnodeId = %Ld found!\n", *vnodeID));
 
-	return status;
+	return B_OK;
 }
 
 
@@ -201,24 +202,26 @@ udf_put_vnode(fs_volume *volume, fs_vnode *node, bool reenter)
 static status_t
 udf_read_stat(fs_volume *_volume, fs_vnode *node, struct stat *stat)
 {
-	DEBUG_INIT(NULL);
+	TRACE(("udf_read_stat: _volume = %p, node = %p\n", _volume, node));
 
 	if (!_volume || !node || !stat)
-		RETURN(B_BAD_VALUE);
+		return B_BAD_VALUE;
 
 	Volume *volume = (Volume *)_volume->private_volume;
-	Icb *icb = reinterpret_cast<Icb*>(node);
+	Icb *icb = (Icb *)node->private_node;
 
-	//stat->st_dev = volume->Id();
+	stat->st_dev = volume->ID();
 	stat->st_ino = icb->Id();
 	stat->st_nlink = icb->FileLinkCount();
 	stat->st_blksize = volume->BlockSize();
+
+	TRACE(("udf_read_stat: st_dev = %d, st_ino = %d, st_blksize = %d\n",
+		stat->st_dev, stat->st_ino, stat->st_blksize));
 
 	stat->st_uid = icb->Uid();
 	stat->st_gid = icb->Gid();
 
 	stat->st_mode = icb->Mode();
-	TRACE(("mode = 0x%lx\n", uint32(icb->Mode())));
 	stat->st_size = icb->Length();
 
 	// File times. For now, treat the modification time as creation
@@ -227,9 +230,10 @@ udf_read_stat(fs_volume *_volume, fs_vnode *node, struct stat *stat)
 	stat->st_atime = icb->AccessTime();
 	stat->st_mtime = stat->st_ctime = stat->st_crtime = icb->ModificationTime();
 
-	TRACE(("stat->st_ino: %Ld\n", stat->st_ino));
+	TRACE(("udf_read_stat: mode = 0x%lx, st_ino: %Ld\n", stat->st_mode,
+		stat->st_ino));
 
-	RETURN(B_OK);
+	return B_OK;
 }
 
 
@@ -286,29 +290,46 @@ udf_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 static status_t
 udf_open_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 {
-	DEBUG_INIT_ETC(NULL, ("node: %p, cookie: %p", node, cookie));
+	TRACE(("udf_open_dir: volume = %p, vnode = %p\n", volume, vnode));
 
 	if (!volume || !vnode || !cookie)
 		RETURN(B_BAD_VALUE);
 
 	Icb *dir = (Icb *)vnode->private_node;
 
-	status_t status = B_OK;
-
-	if (dir->IsDirectory()) {
-		DirectoryIterator *iterator = NULL;
-		status = dir->GetDirectoryIterator(&iterator);
-		if (!status) {
-			*cookie = reinterpret_cast<void*>(iterator);
-		} else {
-			PRINT(("Error getting directory iterator: 0x%lx, `%s'\n", status, strerror(error)));
-		}
-	} else {
-		PRINT(("Given icb is not a directory (type: %d)\n", dir->Type()));
-		status = B_BAD_VALUE;
+	if (!dir->IsDirectory()) {
+		TRACE_ERROR(("udf_open_dir: given Icb is not a directory (type: %d)\n",
+			dir->Type()));
+		return B_BAD_VALUE;
 	}
 
-	RETURN(status);
+	DirectoryIterator *iterator = NULL;
+	status_t status = dir->GetDirectoryIterator(&iterator);
+	if (status != B_OK) {
+		TRACE_ERROR(("udf_open_dir: error getting directory iterator: 0x%lx, "
+			"`%s'\n", status, strerror(error)));
+		return status;
+	}
+	*cookie = (void *)iterator;
+	TRACE(("udf_open_dir: *cookie = %p\n", *cookie));
+
+	return B_OK;
+}
+
+
+static status_t
+udf_close_dir(fs_volume *_volume, fs_vnode *node, void *_cookie)
+{
+	TRACE(("udf_close_dir: _volume = %p, node = %p\n", _volume, node));
+	return B_OK;
+}
+
+
+static status_t
+udf_free_dir_cookie(fs_volume *_volume, fs_vnode *node, void *_cookie)
+{
+	TRACE(("udf_free_dir_cookie: _volume = %p, node = %p\n", _volume, node));
+	return B_OK;
 }
 
 
@@ -316,19 +337,19 @@ static status_t
 udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
-	DEBUG_INIT_ETC(NULL,
-		       ("dir: %p, iterator: %p, bufferSize: %ld", node, cookie, bufferSize));
+	TRACE(("udf_read_dir: _volume = %p, vnode = %p, bufferSize = %ld\n",
+		_volume, vnode, bufferSize));
 
 	if (!_volume || !vnode || !cookie || !_num || bufferSize < sizeof(dirent))
-		RETURN(B_BAD_VALUE);
+		return B_BAD_VALUE;
 
 	Volume *volume = (Volume *)_volume->private_volume;
 	Icb *dir = (Icb *)vnode->private_node;
-	DirectoryIterator *iterator = reinterpret_cast<DirectoryIterator*>(cookie);
+	DirectoryIterator *iterator = (DirectoryIterator *)cookie;
 
 	if (dir != iterator->Parent()) {
-		PRINT(("Icb does not match parent Icb of given DirectoryIterator! (iterator->Parent = %p)\n",
-		       iterator->Parent()));
+		TRACE_ERROR(("udf_read_dir: Icb does not match parent Icb of given "
+			"DirectoryIterator! (iterator->Parent = %p)\n", iterator->Parent()));
 		return B_BAD_VALUE;
 	}
 
@@ -568,8 +589,8 @@ fs_vnode_ops gUDFVnodeOps = {
 	NULL,	// create_dir
 	NULL,	// remove_dir
 	&udf_open_dir,
-	NULL,	// close_dir
-	NULL,	// free_dir_cookie
+	&udf_close_dir,
+	&udf_free_dir_cookie,
 	&udf_read_dir,
 	&udf_rewind_dir,
 
