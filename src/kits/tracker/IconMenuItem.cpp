@@ -142,10 +142,10 @@ void
 ModelMenuItem::DrawIcon()
 {
 	Menu()->PushState();
-	
+
 	BPoint where(ContentLocation());
 	// center icon with text.
-	
+
 	float deltaHeight = fHeightDelta < 0 ? -fHeightDelta : 0;
 	where.y += ceil(deltaHeight / 2);
 
@@ -181,12 +181,12 @@ ModelMenuItem::GetContentSize(float *width, float *height)
 }
 
 
-status_t 
+status_t
 ModelMenuItem::Invoke(BMessage *message)
 {
 	if (!Menu())
 		return B_ERROR;
-	
+
 	if (!IsEnabled())
 		return B_ERROR;
 
@@ -225,7 +225,7 @@ SpecialModelMenuItem::SpecialModelMenuItem(const Model *model, BMenu *menu)
 }
 
 
-void 
+void
 SpecialModelMenuItem::DrawContent()
 {
 	Menu()->PushState();
@@ -289,7 +289,7 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 	fDeviceIcon(NULL),
 	fHeightDelta(0)
 {
-	BMimeType mime(iconType);	
+	BMimeType mime(iconType);
 #ifdef __HAIKU__
 	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_RGBA32);
 #else
@@ -297,8 +297,12 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 #endif
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
-		delete fDeviceIcon;
-		fDeviceIcon = NULL;
+		BMimeType super;
+		mime.GetSupertype(&super);
+		if (super.GetIcon(fDeviceIcon, which) != B_OK) {
+			delete fDeviceIcon;
+			fDeviceIcon = NULL;
+		}
 	}
 
 	// IconMenuItem is used in synchronously invoked menus, make sure
@@ -321,8 +325,12 @@ IconMenuItem::IconMenuItem(BMenu *submenu, BMessage *message,
 #endif
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
-		delete fDeviceIcon;
-		fDeviceIcon = NULL;
+		BMimeType super;
+		mime.GetSupertype(&super);
+		if (super.GetIcon(fDeviceIcon, which) != B_OK) {
+			delete fDeviceIcon;
+			fDeviceIcon = NULL;
+		}
 	}
 
 	// IconMenuItem is used in synchronously invoked menus, make sure
@@ -374,12 +382,12 @@ IconMenuItem::DrawContent()
 			Menu()->SetDrawingMode(B_OP_ALPHA);
 			Menu()->SetHighColor(0, 0, 0, 64);
 			Menu()->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
-		}		
+		}
 #else
 			Menu()->SetDrawingMode(B_OP_OVER);
 		else
-			Menu()->SetDrawingMode(B_OP_BLEND);	
-#endif		
+			Menu()->SetDrawingMode(B_OP_BLEND);
+#endif
 		Menu()->DrawBitmapAsync(fDeviceIcon, where);
 	}
 
