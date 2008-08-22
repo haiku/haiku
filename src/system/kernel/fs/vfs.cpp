@@ -5156,12 +5156,15 @@ fix_dirent(struct vnode *parent, struct dirent *userEntry,
 	struct dirent* entry;
 
 	if (IS_USER_ADDRESS(userEntry)) {
-		unsigned short length;
 		entry = (struct dirent*)buffer;
-		if (user_memcpy(&length, &userEntry->d_reclen, sizeof(length)) != B_OK
-			|| user_memcpy(entry, userEntry, length) != B_OK)
+		if (user_memcpy(entry, userEntry, sizeof(struct dirent) - 1) != B_OK)
 			return B_BAD_ADDRESS;
 
+		ASSERT(entry->d_reclen >= sizeof(struct dirent));
+
+		if (user_memcpy(entry->d_name, userEntry->d_name,
+				entry->d_reclen - sizeof(struct dirent)) != B_OK)
+			return B_BAD_ADDRESS;
 	} else
 		entry = userEntry;
 
