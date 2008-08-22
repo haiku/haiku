@@ -131,6 +131,7 @@ CachedBlock::SetTo(long_address address)
 		return NULL;
 }
 
+
 template <class Accessor, class Descriptor>
 inline uint8*
 CachedBlock::SetTo(Accessor &accessor, Descriptor &descriptor)

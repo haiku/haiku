@@ -1,9 +1,7 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
-//---------------------------------------------------------------------
+/*
+ * Copyright, 2003, Tyler Dauwalder, tyler@dauwalder.net.
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef _UDF_ARRAY_H
 #define _UDF_ARRAY_H
@@ -36,8 +34,8 @@ public:
 	DataType data[arrayLength];
 };
 
-/*! \brief \c uint8 specialization of the \c array template struct.
-*/
+
+/*! \brief \c uint8 specialization of the \c array template struct. */
 template<uint32 arrayLength>
 struct array<uint8, arrayLength> {
 	void dump() const
@@ -50,19 +48,20 @@ struct array<uint8, arrayLength> {
 		
 		for (uint32 i = 0; i < arrayLength; i++) {
 			if (i % bytesPerRow == 0)
-				PRINT(("[%ld:%ld]: ", i, i+bytesPerRow-1));
+				PRINT(("[%ld:%ld]: ", i, i + bytesPerRow - 1));
 			SIMPLE_PRINT(("0x%.2x ", data[i]));
-			if ((i+1) % bytesPerRow == 0 || i+1 == arrayLength)
+			if ((i + 1) % bytesPerRow == 0 || i + 1 == arrayLength)
 				SIMPLE_PRINT(("\n"));
 		}
 	}
+
 	uint32 length() const { return arrayLength; }
 	uint32 size() const { return arrayLength; }
 	uint8 data[arrayLength];
 };
 
-/*! \brief \c char specialization of the \c array template struct.
-*/
+
+/*! \brief \c char specialization of the \c array template struct. */
 template<uint32 arrayLength>
 struct array<char, arrayLength> {
 	void dump() const
@@ -70,17 +69,18 @@ struct array<char, arrayLength> {
 		const uint8 bytesPerRow = 8;
 		char classname[40];
 		sprintf(classname, "array<uint8, %ld>", arrayLength);
-		
+
 		DUMP_INIT(classname);
-		
+
 		for (uint32 i = 0; i < arrayLength; i++) {
 			if (i % bytesPerRow == 0)
-				PRINT(("[%ld:%ld]: ", i, i+bytesPerRow-1));
+				PRINT(("[%ld:%ld]: ", i, i + bytesPerRow - 1));
 			SIMPLE_PRINT(("0x%.2x ", data[i]));
-			if ((i+1) % bytesPerRow == 0 || i+1 == arrayLength)
+			if ((i + 1) % bytesPerRow == 0 || i + 1 == arrayLength)
 				SIMPLE_PRINT(("\n"));
 		}
 	}
+
 	uint32 length() const { return arrayLength; }
 	uint32 size() const { return arrayLength; }
 	uint8 data[arrayLength];

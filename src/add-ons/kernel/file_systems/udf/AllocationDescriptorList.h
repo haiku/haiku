@@ -85,6 +85,7 @@ AllocationDescriptorList<Accessor>::AllocationDescriptorList(Icb *icb,
 	_WalkContinuationChain(_CurrentDescriptor());
 }
 
+
 /*! \brief Finds the extent for the given address in the stream,
 	returning it in the address pointed to by \a blockRun.
 
@@ -130,7 +131,7 @@ AllocationDescriptorList<Accessor>::FindExtent(off_t start,
 				_MoveToNextDescriptor();
 			}
 		} else {
-			TRACE_ERROR(("UDF: AllocationDescriptorList<>::FindExtent: "
+			TRACE_ERROR(("AllocationDescriptorList<>::FindExtent: "
 				"Descriptor #%ld found NULL\n", _DescriptorNumber()));
 			status = B_ERROR;
 			break;
@@ -142,6 +143,7 @@ AllocationDescriptorList<Accessor>::FindExtent(off_t start,
 
 
 //	#pragma - Private methods
+
 
 template<class Accessor>
 AllocationDescriptorList<Accessor>::Descriptor*
@@ -242,6 +244,7 @@ AllocationDescriptorList<Accessor>::_DescriptorArraySize() const
 
 //	pragma - Accessors
 
+
 class ShortDescriptorAccessor {
 public:
 	ShortDescriptorAccessor(uint16 partition)
@@ -303,4 +306,3 @@ public:
 };
 
 #endif	// _UDF_ALLOCATION_DESCRIPTOR_LIST_H
-
