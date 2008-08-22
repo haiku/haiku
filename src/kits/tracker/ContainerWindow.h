@@ -240,7 +240,7 @@ class BContainerWindow : public BWindow {
 		virtual void UpdateMenu(BMenu *menu, UpdateMenuContext context);
 
 		BMenu* AddMimeMenu(const BMimeType& mimeType, bool isSuperType,
-			BMenu* menu, int32 start, int32& count);
+			BMenu* menu, int32 start);
 
 		BHandler *ResolveSpecifier(BMessage *, int32, BMessage *, int32,
 			const char *);

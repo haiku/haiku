@@ -3115,13 +3115,10 @@ BContainerWindow::AddMimeTypesToMenu()
 */
 BMenu*
 BContainerWindow::AddMimeMenu(const BMimeType& mimeType, bool isSuperType,
-	BMenu* menu, int32 start, int32& count)
+	BMenu* menu, int32 start)
 {
 	// Check if we already have an entry for this MIME type in the menu.
-	for (int32 i = start; i < count; i++) {
-		BMenuItem* item = menu->ItemAt(i);
-		if (item == NULL)
-			continue;
+	for (int32 i = start; BMenuItem* item = menu->ItemAt(i); i++) {
 		BMessage* message = item->Message();
 		if (message == NULL)
 			continue;
@@ -3200,7 +3197,6 @@ BContainerWindow::AddMimeMenu(const BMimeType& mimeType, bool isSuperType,
 	message->AddString("mimetype", mimeType.Type());
 	menu->AddItem(new IconMenuItem(mimeMenu, message, mimeType.Type(),
 		B_MINI_ICON));
-	count++;
 
 	return mimeMenu;
 }
@@ -3212,24 +3208,16 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 	if (!menu)
 		return;
 
-	// find start of mime types in menu
-	int32 count = menu->CountItems();
-	int32 start;
-
-	for (start = 0; start < count; start++) {
-		if (menu->ItemAt(start)->Submenu())
-			break;
-	}
-
-	// Remove old mime menu:
-	int32 removeIndex = count - 1;
-	while (menu->ItemAt(removeIndex)->Submenu() != NULL) {
-		delete menu->RemoveItem(removeIndex);
-		removeIndex--;
+	// Remove old mime type menus
+	int32 start = menu->CountItems();
+	while (start > 0 && menu->ItemAt(start - 1)->Submenu() != NULL) {
+		delete menu->RemoveItem(start - 1);
+		start--;
 	}
 
 	// Add a separator item if there is none yet
-	if (dynamic_cast<BSeparatorItem *>(menu->ItemAt(removeIndex)) == NULL)
+	if (start > 0
+		&& dynamic_cast<BSeparatorItem *>(menu->ItemAt(start - 1)) == NULL)
 		menu->AddSeparatorItem();
 
 	// Add MIME type in case we're a default query type window
@@ -3245,6 +3233,8 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 		}
 	}
 
+	// Add MIME type menus
+
 	int32 typeCount = PoseView()->CountMimeTypes();
 
 	for (int32 index = 0; index < typeCount; index++) {
@@ -3252,23 +3242,41 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 		BMimeType superType;
 		mimeType.GetSupertype(&superType);
 
-		BMenu* superMenu = AddMimeMenu(superType, true, menu, start, count);
+		BMenu* superMenu = AddMimeMenu(superType, true, menu, start);
 		if (superMenu != NULL) {
 			// We have a supertype menu.
-			int32 subCount = superMenu->CountItems();
-			AddMimeMenu(mimeType, false, superMenu, 0, subCount);
+			AddMimeMenu(mimeType, false, superMenu, 0);
 		}
 	}
 
-	// remove empty super menus
+	// remove empty super menus, promote sub-types if needed
 
 	for (int32 index = 0; index < typeCount; index++) {
 		BMimeType mimeType(PoseView()->MimeTypeAt(index));
 		BMimeType superType;
 		mimeType.GetSupertype(&superType);
 
-		BMenu* superMenu = AddMimeMenu(superType, true, menu, start, count);
-		if (superMenu != NULL && superMenu->ItemAt(0) == NULL) {
+		BMenu* superMenu = AddMimeMenu(superType, true, menu, start);
+		if (superMenu == NULL)
+			continue;
+
+		int32 itemsFound = 0;
+		int32 menusFound = 0;
+		for (int32 i = 0; BMenuItem* item = superMenu->ItemAt(i); i++) {
+			if (item->Submenu() != NULL)
+				menusFound++;
+			else
+				itemsFound++;
+		}
+
+		if (itemsFound == 0) {
+			if (menusFound != 0) {
+				// promote types to the top level
+				while (BMenuItem* item = superMenu->RemoveItem((int32)0)) {
+					menu->AddItem(item);
+				}
+			}
+
 			menu->RemoveItem(superMenu->Superitem());
 			delete superMenu->Superitem();
 		}
