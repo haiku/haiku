@@ -152,6 +152,12 @@ i386_get_user_iframe(void)
 }
 
 
+struct iframe *
+i386_get_current_iframe(void)
+{
+	return get_current_iframe();
+}
+
 void *
 x86_next_page_directory(struct thread *from, struct thread *to)
 {
