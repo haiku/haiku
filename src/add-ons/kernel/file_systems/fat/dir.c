@@ -1215,9 +1215,9 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_readdir") ||
-		check_vnode_magic(dir, "dosfs_readdir") ||
-		check_dircookie_magic(cookie, "dosfs_readdir")) {
+	if (check_nspace_magic(vol, "dosfs_readdir")
+		|| check_vnode_magic(dir, "dosfs_readdir")
+		|| check_dircookie_magic(cookie, "dosfs_readdir")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -1232,10 +1232,10 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 		} else {
 			if (cookie->current_index++ == 0) {
 				strcpy(entry->d_name, ".");
-				entry->d_reclen = 2;
+				entry->d_reclen = sizeof(struct dirent) + 1;
 			} else {
 				strcpy(entry->d_name, "..");
-				entry->d_reclen = 3;
+				entry->d_reclen = sizeof(struct dirent) + 2;
 			}
 			*num = 1;
 			entry->d_ino = vol->root_vnode.vnid;
@@ -1253,8 +1253,10 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 		result = B_NO_ERROR;
 		goto bi;
 	}
-	result = get_next_dirent(vol, dir, &diri, &(entry->d_ino), entry->d_name,
+
+	result = get_next_dirent(vol, dir, &diri, &entry->d_ino, entry->d_name,
 		bufsize - sizeof(struct dirent) - 1);
+
 	cookie->current_index = diri.current_index;
 	diri_free(&diri);
 
@@ -1264,7 +1266,7 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 	if (result == B_NO_ERROR) {
 		*num = 1;
 		entry->d_dev = vol->id;
-		entry->d_reclen = strlen(entry->d_name) + 1;
+		entry->d_reclen = sizeof(struct dirent) + strlen(entry->d_name);
 		DPRINTF(0, ("dosfs_readdir: found file %s\n", entry->d_name));
 	} else if (result == ENOENT) {
 		// When you get to the end, don't return an error, just return 0
