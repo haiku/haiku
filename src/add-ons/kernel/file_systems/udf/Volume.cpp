@@ -40,8 +40,7 @@ Volume::~Volume()
 
 /*! \brief Attempts to mount the given device.
 
-	\param volumeStart The block on the given device whereat the volume begins.
-	\param volumeLength The block length of the volume on the given device.
+	\param lenght The length of the device in number of blocks
 */
 status_t
 Volume::Mount(const char *deviceName, off_t offset, off_t length,
@@ -281,6 +280,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 
 	RETURN(status);
 }
+
 
 const char*
 Volume::Name() const {
