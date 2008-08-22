@@ -116,6 +116,8 @@ extern void		unset_all_debug_variables();
 extern bool		evaluate_debug_expression(const char* expression,
 					uint64* result, bool silent);
 extern int		evaluate_debug_command(const char* command);
+extern status_t	parse_next_debug_command_argument(const char** expressionString,
+					char* buffer, size_t bufferSize);
 
 extern status_t	add_debugger_command_etc(const char* name,
 					debugger_command_hook func, const char* description,

@@ -329,7 +329,7 @@ public:
 					_QuotedString();
 					break;
 				}
-			
+
 				default:
 				{
 					fCurrentChar--;
@@ -472,6 +472,9 @@ class ExpressionParser {
 			uint64				EvaluateCommand(
 									const char* expressionString,
 									int& returnCode);
+			status_t			ParseNextCommandArgument(
+									const char** expressionString, char* buffer,
+									size_t bufferSize);
 
  private:
 			uint64				_ParseExpression();
@@ -547,6 +550,35 @@ ExpressionParser::EvaluateCommand(const char* expressionString,
 		parse_exception("parse error", token.position);
 
 	return value;
+}
+
+
+status_t
+ExpressionParser::ParseNextCommandArgument(const char** expressionString,
+	char* buffer, size_t bufferSize)
+{
+	fTokenizer.SetTo(*expressionString);
+	fTokenizer.SetCommandMode(true);
+
+	if (fTokenizer.NextToken().type == TOKEN_END_OF_LINE)
+		return B_ENTRY_NOT_FOUND;
+
+	fTokenizer.RewindToken();
+
+	char* argv[2];
+	int argc = 0;
+	if (!_ParseArgument(argc, argv))
+		return B_BAD_VALUE;
+
+	strlcpy(buffer, argv[0], bufferSize);
+
+	const Token& token = fTokenizer.NextToken();
+	if (token.type == TOKEN_END_OF_LINE)
+		*expressionString = NULL;
+	else
+		*expressionString += token.position;
+
+	return B_OK;
 }
 
 
@@ -1099,4 +1131,40 @@ evaluate_debug_command(const char* commandLine)
 	free_temp_storage(temporaryStorageMark);
 
 	return returnCode;
+}
+
+
+status_t
+parse_next_debug_command_argument(const char** expressionString, char* buffer,
+	size_t bufferSize)
+{
+	if (sNextJumpBufferIndex >= kJumpBufferCount) {
+		kprintf_unfiltered("parse_next_debug_command_argument(): Out of jump "
+			"buffers for exception handling\n");
+		return B_ERROR;
+	}
+
+	status_t error;
+	void* temporaryStorageMark = allocate_temp_storage(0);
+		// get a temporary storage mark, so we can cleanup everything that
+		// is allocated during the evaluation
+
+	if (setjmp(sJumpBuffers[sNextJumpBufferIndex++]) == 0) {
+		error = ExpressionParser().ParseNextCommandArgument(expressionString,
+			buffer, bufferSize);
+	} else {
+		if (sExceptionPosition >= 0) {
+			kprintf_unfiltered("%s, at position: %d, in command line: %s\n",
+				sExceptionMessage, sExceptionPosition, *expressionString);
+		} else
+			kprintf_unfiltered("%s", sExceptionMessage);
+		error = B_BAD_VALUE;
+	}
+
+	sNextJumpBufferIndex--;
+
+	// cleanup temp allocations
+	free_temp_storage(temporaryStorageMark);
+
+	return error;
 }
