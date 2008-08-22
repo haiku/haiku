@@ -16,18 +16,22 @@ BPictureButton::BPictureButton(BRect frame, const char* name,
 		BPicture *off, BPicture *on, BMessage *message, 
 		uint32 behavior, uint32 resizeMask, uint32 flags)
 	: BControl(frame, name, "", message, resizeMask, flags),
+	fDisabledOff(NULL),
+	fDisabledOn(NULL),
 	fOutlined(false),
 	fBehavior(behavior)
 {
 	fEnabledOff = new BPicture(*off);
 	fEnabledOn = new BPicture(*on);
-	fDisabledOff = NULL;
-	fDisabledOn = NULL;
 }
 
 
 BPictureButton::BPictureButton(BMessage *data)
-	: BControl(data)
+	: BControl(data),
+	fEnabledOff(NULL),
+	fEnabledOn(NULL),
+	fDisabledOff(NULL),
+	fDisabledOn(NULL)
 {
 	BMessage pictureArchive;
 
@@ -42,14 +46,11 @@ BPictureButton::BPictureButton(BMessage *data)
 	if (data->FindMessage("_e_off", &pictureArchive) == B_OK)
 		fEnabledOff = new BPicture(&pictureArchive);
 
-	if (fBehavior == B_TWO_STATE_BUTTON) {
-		if (data->FindMessage("_d_on", &pictureArchive) == B_OK)
-			fDisabledOn = new BPicture(&pictureArchive);
+	if (data->FindMessage("_d_on", &pictureArchive) == B_OK)
+		fDisabledOn = new BPicture(&pictureArchive);
 
-		if (data->FindMessage("_d_off", &pictureArchive) == B_OK)
-			fDisabledOff = new BPicture(&pictureArchive);
-	} else
-		fDisabledOn = fDisabledOff = NULL;
+	if (data->FindMessage("_d_off", &pictureArchive) == B_OK)
+		fDisabledOff = new BPicture(&pictureArchive);
 }
 
 
@@ -95,19 +96,16 @@ BPictureButton::Archive(BMessage *data, bool deep) const
 				return err;
 		}
 
-		// Do we add messages for pictures that don't exist?
-		if (fBehavior == B_TWO_STATE_BUTTON) {
-			if (fDisabledOn->Archive(&pictureArchive, deep) == B_OK) {
-				err = data->AddMessage("_d_on", &pictureArchive);
-				if (err != B_OK)
-					return err;
-			}
+		if (fDisabledOn && fDisabledOn->Archive(&pictureArchive, deep) == B_OK) {
+			err = data->AddMessage("_d_on", &pictureArchive);
+			if (err != B_OK)
+				return err;
+		}
 
-			if (fDisabledOff->Archive(&pictureArchive, deep) == B_OK) {
-				err = data->AddMessage("_d_off", &pictureArchive);
-				if (err != B_OK)
-					return err;
-			}
+		if (fDisabledOff && fDisabledOff->Archive(&pictureArchive, deep) == B_OK) {
+			err = data->AddMessage("_d_off", &pictureArchive);
+			if (err != B_OK)
+				return err;
 		}
 	}
 
@@ -120,46 +118,24 @@ BPictureButton::Draw(BRect updateRect)
 {
 	BRect rect = Bounds();
 
-	// Need to check if TWO_STATE, if setEnabled=false, and if diabled picture is null
-	// If so, and in debug, bring up an Alert, if so, and not in debug, output to stdout
-
 	// We should request the view's base color which normaly is (216,216,216)
 	rgb_color color = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-	if (fBehavior == B_ONE_STATE_BUTTON) {
-		
-		if (IsEnabled()) {
-			if (Value() == B_CONTROL_ON)
-				DrawPicture(fEnabledOn);
-			else
-				DrawPicture(fEnabledOff);
-		} else 					
-			DrawPicture(fDisabledOff);
-				//a disabled one_state_button is always OFF (ie: not pushed) 
-				//since it cannot be pushed while disabled
-		
+	if (IsEnabled()) {
+		if (Value() == B_CONTROL_ON)
+			DrawPicture(fEnabledOn);
+		else
+			DrawPicture(fEnabledOff);
 	} else {
-		// B_TWO_STATE_BUTTON
-
-		if (IsEnabled()) {
-			if (Value() == B_CONTROL_ON)
-				DrawPicture(fEnabledOn);
-			else
-				DrawPicture(fEnabledOff);
-		} else {
-			// disabled
-			if (Value() == B_CONTROL_ON) {
-				if (fDisabledOn == NULL)
-					debugger("Need to set the 'disabled' pictures for this BPictureButton ");
-
-				DrawPicture(fDisabledOn);
-			} else {
-				if (fDisabledOn == NULL)
-					debugger("Need to set the 'disabled' pictures for this BPictureButton ");
-
-				DrawPicture(fDisabledOff);
-			}
-		}
+		
+		if (fDisabledOff == NULL
+			|| (fDisabledOn == NULL && fBehavior == B_TWO_STATE_BUTTON))
+			debugger("Need to set the 'disabled' pictures for this BPictureButton ");
+		
+		if (Value() == B_CONTROL_ON)
+			DrawPicture(fDisabledOn);
+		else
+			DrawPicture(fDisabledOff);
 	}
 
 	if (IsFocus()) {
@@ -398,9 +374,7 @@ BPictureButton::GetSupportedSuites(BMessage *data)
 void
 BPictureButton::ResizeToPreferred()
 {
-	float width, height;
-	GetPreferredSize(&width, &height);
-	BControl::ResizeTo(width, height);
+	BControl::ResizeToPreferred();
 }
 
 
@@ -434,10 +408,9 @@ BPictureButton::AllDetached()
 
 
 status_t
-BPictureButton::Perform (perform_code d, void *arg)
+BPictureButton::Perform(perform_code d, void *arg)
 {
-	// Really clutching at straws here....
-	return B_ERROR;
+	return BControl::Perform(d, arg);
 }
 
 
