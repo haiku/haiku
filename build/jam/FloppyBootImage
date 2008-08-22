@@ -48,7 +48,7 @@ AddFilesToFloppyBootArchive beos system add-ons kernel console : vga_text ;
 AddFilesToFloppyBootArchive beos system add-ons kernel file_systems
 	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToFloppyBootArchive beos system add-ons kernel generic
-	: block_io ide_adapter locked_pool scsi_periph ;
+	: ide_adapter locked_pool scsi_periph ;
 AddFilesToFloppyBootArchive beos system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToFloppyBootArchive beos system add-ons kernel interrupt_controllers
@@ -98,7 +98,7 @@ AddFilesToFloppyBootArchive beos system add-ons kernel network protocols
 AddBootModuleSymlinksToFloppyBootArchive
 	$(BEOS_ADD_ONS_BUS_MANAGERS)
 	$(PPC_ONLY)openpic
-	block_io ide_adapter locked_pool scsi_periph
+	ide_adapter locked_pool scsi_periph
 	$(X86_ONLY)generic_x86
 	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211
 	<usb>uhci <usb>ohci <usb>ehci
