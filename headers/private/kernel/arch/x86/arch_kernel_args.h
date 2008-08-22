@@ -39,6 +39,9 @@ typedef struct {
 	uint32	cpu_apic_id[MAX_BOOT_CPUS];
 	uint32	cpu_os_id[MAX_BOOT_CPUS];
 	uint32	cpu_apic_version[MAX_BOOT_CPUS];
+	// hpet stuff
+	uint32	hpet_phys;
+	uint32	*hpet;
 } arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_x86_KERNEL_ARGS_H */
