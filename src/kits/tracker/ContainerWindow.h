@@ -146,8 +146,6 @@ class BContainerWindow : public BWindow {
 			// calls for inheriting window size, attribute layout, etc.
 			// deprecated
 
-		BMenu* CreateMimeMenu(const BMimeType& mimeType, bool isSuperType,
-			BMenu* menu, int32 start, int32 count);
 		virtual	void AddMimeTypesToMenu(BMenu *);
 		void AddMimeTypesToMenu();
 		virtual	void MarkAttributeMenu(BMenu *);
@@ -240,6 +238,9 @@ class BContainerWindow : public BWindow {
 		};
 
 		virtual void UpdateMenu(BMenu *menu, UpdateMenuContext context);
+
+		BMenu* AddMimeMenu(const BMimeType& mimeType, bool isSuperType,
+			BMenu* menu, int32 start, int32& count);
 
 		BHandler *ResolveSpecifier(BMessage *, int32, BMessage *, int32,
 			const char *);
