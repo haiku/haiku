@@ -184,18 +184,27 @@ udf_lookup(fs_volume *_volume, fs_vnode *_directory, const char *file,
 static status_t
 udf_put_vnode(fs_volume *volume, fs_vnode *node, bool reenter)
 {
+	TRACE(("udf_put_vnode: volume = %p, node = %p\n", volume, node));
 // No debug-to-file in release_vnode; can cause a deadlock in
 // rare circumstances.
 #if !DEBUG_TO_FILE
 	DEBUG_INIT_ETC(NULL, ("node: %p", node));
 #endif
-	Icb *icb = reinterpret_cast<Icb*>(node);
+	Icb *icb = (Icb *)node->private_node;
 	delete icb;
 #if !DEBUG_TO_FILE
 	RETURN(B_OK);
 #else
 	return B_OK;
 #endif
+}
+
+
+static status_t
+udf_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
+{
+	TRACE(("udf_remove_vnode: _volume = %p, _node = %p\n", _volume, _node));
+	return B_ERROR;
 }
 
 
@@ -353,14 +362,15 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 		return B_BAD_VALUE;
 	}
 
-	uint32 nameLength = bufferSize - sizeof(dirent) + 1;
+	uint32 nameLength = bufferSize - sizeof(struct dirent) + 1;
 	ino_t id;
 	status_t status = iterator->GetNextEntry(dirent->d_name, &nameLength, &id);
+	TRACE(("udf_read_dir: dirent->d_name = %s, length = %ld\n", dirent->d_name, nameLength));
 	if (!status) {
 		*_num = 1;
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
-		dirent->d_reclen = sizeof(dirent) + nameLength - 1;
+		dirent->d_reclen = sizeof(struct dirent) + nameLength - 1;
 	} else {
 		*_num = 0;
 		// Clear the status for end of directory
@@ -375,24 +385,24 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 status_t
 udf_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
-	DEBUG_INIT_ETC(NULL,
-		       ("dir: %p, iterator: %p", node, cookie));
+	TRACE(("udf_rewind_dir: volume = %p, vnode = %p, cookie = %p\n",
+		volume, vnode, cookie));
 
 	if (!volume || !vnode || !cookie)
 		RETURN(B_BAD_VALUE);
 
 	Icb *dir = (Icb *)vnode->private_node;
-	DirectoryIterator *iterator = reinterpret_cast<DirectoryIterator*>(cookie);
+	DirectoryIterator *iterator = (DirectoryIterator *)cookie;
 
 	if (dir != iterator->Parent()) {
-		PRINT(("Icb does not match parent Icb of given DirectoryIterator! (iterator->Parent = %p)\n",
-		       iterator->Parent()));
+		PRINT(("udf_rewind_dir: icb does not match parent Icb of given "
+			"DirectoryIterator! (iterator->Parent = %p)\n", iterator->Parent()));
 		return B_BAD_VALUE;
 	}
 
 	iterator->Rewind();
 
-	RETURN(B_OK);
+	return B_OK;
 }
 
 
@@ -548,7 +558,7 @@ fs_vnode_ops gUDFVnodeOps = {
 	&udf_lookup,
 	NULL,	// get_vnode_name
 	&udf_put_vnode,
-	NULL,	// remove_vnode
+	&udf_remove_vnode,
 
 	/* VM file access */
 	NULL,	// can_page

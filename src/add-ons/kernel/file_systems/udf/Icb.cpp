@@ -16,8 +16,8 @@
 status_t
 DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 {
-	TRACE(("DirectoryIterator::GetNextEntry: name = %p, length = %p, id = %p\n",
-		name, length, id));
+	TRACE(("DirectoryIterator::GetNextEntry: name = %s, length = %ld, id = %p\n",
+		name, *length, id));
 
 	if (!id || !name || !length)
 		return B_BAD_VALUE;
@@ -27,6 +27,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 
 	status_t status = B_OK;
 	if (fAtBeginning) {
+		TRACE(("DirectoryIterator::GetNextEntry: .\n"));
 		sprintf(name, ".");
 		*length = 2;
 		*id = Parent()->Id();
@@ -52,14 +53,16 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 			offset += entry->total_length();
 
 			if (entry->is_parent()) {
+				TRACE(("DirectoryIterator::GetNextEntry: ..\n"));
 				sprintf(name, "..");
 				*length = 3;
 			} else {
+				TRACE(("DirectoryIterator::GetNextEntry: UfdString\n"));
 				UdfString string(entry->id(), entry->id_length());
 				TRACE(("\tid == `%s'\n", string.Utf8()));
 				DUMP(entry->icb());
 				sprintf(name, "%s", string.Utf8());
-				*length = string.Utf8Length();
+				*length = string.Utf8Length() + 1;
 			}
 			*id = to_vnode_id(entry->icb());
 		}
@@ -172,7 +175,7 @@ Icb::ModificationTime()
 status_t
 Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 {
-	TRACE(("Icb::Read: pos = %Ld, buffer = %p, length = (%p)->%ld",
+	TRACE(("Icb::Read: pos = %Ld, buffer = %p, length = (%p)->%ld\n",
 		pos, buffer, length, (length ? *length : 0)));
 
 	if (!buffer || !length || pos < 0)
