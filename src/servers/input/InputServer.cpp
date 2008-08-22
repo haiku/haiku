@@ -1711,8 +1711,11 @@ InputServer::_FilterEvent(BInputServerFilter* filter, EventList& events,
 		delete event;
 
 		if (result == B_DISPATCH_MESSAGE) {
+			EventList addedEvents;
+			addedEvents.AsBList()->AddList(&newEvents);
+			_SanitizeEvents(addedEvents);
 			// add the new events - but don't methodize them again
-			events.AsBList()->AddList(&newEvents, index);
+			events.AddList(&addedEvents, index);
 			index += newEvents.CountItems();
 			count = events.CountItems();
 		} else
