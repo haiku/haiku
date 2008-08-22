@@ -3110,6 +3110,92 @@ BContainerWindow::AddMimeTypesToMenu()
 }
 
 
+// Create a menu for a specific MIME type.
+BMenu*
+BContainerWindow::CreateMimeMenu(const BMimeType& mimeType, bool isSuperType,
+	BMenu* menu, int32 start, int32 count)
+{
+	// Check if we already have an entry for this MIME type in the menu.
+	for (int32 subindex = start; subindex < count; subindex++) {
+		BMenuItem *item = menu->ItemAt(subindex);
+		if (!item)
+			continue;
+		BMessage *message = item->Message();
+		if (!message)
+			continue;
+		const char *str;
+		if (message->FindString("mimetype", &str) == B_OK
+			&& strcmp(mimeType.Type(), str) == 0) {
+			return NULL;
+		}
+	}
+
+	BMessage attrInfo;
+	char description[B_MIME_TYPE_LENGTH];
+	const char *nameToAdd = mimeType.Type();
+
+	if (!mimeType.IsInstalled()) 
+		return NULL;		
+
+	// only add things to menu which have "user-visible" data
+	if (mimeType.GetAttrInfo(&attrInfo) != B_OK) 
+		return NULL;
+
+	if (mimeType.GetShortDescription(description) == B_OK
+		&& description[0])
+		nameToAdd = description;
+
+	// go through each field in meta mime and add it to a menu
+	BMenu *localMenu = NULL;
+	int32 index = -1;
+	const char *str;
+
+	if (isSuperType) {
+		// If it is a supertype, we create the menu anyway as it may have
+		// submenus later on.
+		localMenu = new BMenu(nameToAdd);
+		BFont font;
+		menu->GetFont(&font);
+		localMenu->SetFont(&font);		
+	}
+
+	while (attrInfo.FindString("attr:public_name", ++index, &str) == B_OK) {
+		if (!attrInfo.FindBool("attr:viewable", index)) {
+			// don't add if attribute not viewable
+			continue;
+		}
+
+		int32 type;
+		int32 align;
+		int32 width;
+		bool editable;
+		const char *attrName;
+
+		if (attrInfo.FindString("attr:name", index, &attrName) != B_OK
+			|| attrInfo.FindInt32("attr:type", index, &type) != B_OK
+			|| attrInfo.FindBool("attr:editable", index, &editable) != B_OK
+			|| attrInfo.FindInt32("attr:width", index, &width) != B_OK
+			|| attrInfo.FindInt32("attr:alignment", index, &align) != B_OK)
+			continue;
+
+		BString displayAs;
+		attrInfo.FindString("attr:display_as", index, &displayAs);
+
+		if (!localMenu) {
+			// do a lazy allocation of the menu
+			localMenu = new BMenu(nameToAdd);
+			BFont font;
+			menu->GetFont(&font);
+			localMenu->SetFont(&font);
+		}
+		localMenu->AddItem(NewAttributeMenuItem(str, attrName, type,
+			displayAs.String(), width, align, editable, false));
+	}
+	
+	return localMenu;
+}
+
+
 void
 BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 {
@@ -3152,83 +3238,33 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 	int32 typeCount = PoseView()->CountMimeTypes();
 
 	for (int32 index = 0; index < typeCount; index++) {
-		bool shouldAdd = true;
-		const char *signature = PoseView()->MimeTypeAt(index);
+		BMimeType mimeType(PoseView()->MimeTypeAt(index));
+		BMimeType superType;
+		mimeType.GetSupertype(&superType);
 
-		for (int32 subindex = start; subindex < count; subindex++) {
-			BMenuItem *item = menu->ItemAt(subindex);
-			if (!item)
-				continue;
-			BMessage *message = item->Message();
-			if (!message)
-				continue;
-			const char *str;
-			if (message->FindString("mimetype", &str) == B_OK
-				&& strcmp(signature, str) == 0) {
-				shouldAdd = false;
-				break;
-			}
-		}
-
-		if (shouldAdd) {
-			BMessage attrInfo;
-			char description[B_MIME_TYPE_LENGTH];
-			const char *nameToAdd = signature;
-
-			BMimeType mimetype(signature);
-
-			if (!mimetype.IsInstalled()) 
-				continue;
-
-			// only add things to menu which have "user-visible" data
-			if (mimetype.GetAttrInfo(&attrInfo) != B_OK) 
-				continue;
-
-			if (mimetype.GetShortDescription(description) == B_OK
-				&& description[0])
-				nameToAdd = description;
-
-			// go through each field in meta mime and add it to a menu
-			BMenu *localMenu = 0;
-			int32 index = -1;
-			const char *str;
-
-			while (attrInfo.FindString("attr:public_name", ++index, &str) == B_OK) {
-				if (!attrInfo.FindBool("attr:viewable", index)) {
-					// don't add if attribute not viewable
-					continue;
+		BMenu* levelOneMenu = CreateMimeMenu(superType, true, menu, start, count);
+		if (levelOneMenu) {
+			// We have a supertype menu.
+			BMenu* levelTwoMenu = CreateMimeMenu(mimeType, false, levelOneMenu, start,
+				count);
+			if (levelTwoMenu) {
+				// And also a one for the main MIME type. Adde them to the menu
+				// hierarchy.
+				BMessage *message1 = new BMessage(kMIMETypeItem);
+				message1->AddString("mimetype", mimeType.Type());
+				levelOneMenu->AddItem(new IconMenuItem(levelTwoMenu, message1,
+					mimeType.Type(), B_MINI_ICON));
+					
+				BMessage *message2 = new BMessage(kMIMETypeItem);
+				message2->AddString("mimetype", superType.Type());
+				menu->AddItem(new IconMenuItem(levelOneMenu, message2,
+					superType.Type(), B_MINI_ICON));
+	
+			} else {
+				if (levelOneMenu->CountItems() == 0) {
+					// Our supertype menu is empty, so we remove it now.
+					delete levelOneMenu;
 				}
-
-				int32 type;
-				int32 align;
-				int32 width;
-				bool editable;
-				const char *attrName;
-
-				if (attrInfo.FindString("attr:name", index, &attrName) != B_OK
-					|| attrInfo.FindInt32("attr:type", index, &type) != B_OK
-					|| attrInfo.FindBool("attr:editable", index, &editable) != B_OK
-					|| attrInfo.FindInt32("attr:width", index, &width) != B_OK
-					|| attrInfo.FindInt32("attr:alignment", index, &align) != B_OK)
-					continue;
-
-				BString displayAs;
-				attrInfo.FindString("attr:display_as", index, &displayAs);
-
-				if (!localMenu) {
-					// do a lazy allocation of the menu
-					localMenu = new BMenu(nameToAdd);
-					BFont font;
-					menu->GetFont(&font);
-					localMenu->SetFont(&font);
-				}
-				localMenu->AddItem(NewAttributeMenuItem(str, attrName, type,
-					displayAs.String(), width, align, editable, false));
-			}
-			if (localMenu) {
-				BMessage *message = new BMessage(kMIMETypeItem);
-				message->AddString("mimetype", signature);
-				menu->AddItem(new IconMenuItem(localMenu, message, signature, B_MINI_ICON));
 			}
 		}
 	}
