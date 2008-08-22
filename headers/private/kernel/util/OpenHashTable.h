@@ -167,6 +167,49 @@ public:
 		return true;
 	}
 
+	/*!	If the table needs resizing, the number of bytes for the required
+		allocation is returned. If no resizing is needed, 0 is returned.
+	*/
+	size_t ResizeNeeded() const
+	{
+		size_t size = fTableSize;
+		if (size == 0 || fItemCount >= (size * 200 / 256)) {
+			// grow table
+			if (size == 0)
+				size = kMinimumSize;
+			while (fItemCount >= size * 200 / 256)
+				size <<= 1;
+		} else if (size > kMinimumSize && fItemCount < size * 50 / 256) {
+			// shrink table
+			while (fItemCount < size * 50 / 256)
+				size >>= 1;
+			if (size < kMinimumSize)
+				size = kMinimumSize;
+		}
+
+		if (size == fTableSize)
+			return 0;
+
+		return size * sizeof(ValueType*);
+	}
+
+	/*!	Resizes the table using the given allocation. The allocation must not
+		be \c NULL. It must be of size \a size, which must a value returned
+		earlier by ResizeNeeded(). If the size requirements have changed in the
+		meantime, the method free()s the given allocation and returns \c false.
+		Otherwise \c true is returned.
+	*/
+	bool Resize(void* allocation, size_t size)
+	{
+		if (size != ResizeNeeded()) {
+			free(allocation);
+			return false;
+		}
+
+		_Resize((ValueType**)allocation, size / sizeof(ValueType*));
+		return true;
+	}
+
 	class Iterator {
 	public:
 		Iterator(const HashTable *table)
@@ -228,11 +271,17 @@ protected:
 
 	bool _Resize(size_t newSize)
 	{
-		ValueType **newTable
+		ValueType** newTable
 			= (ValueType**)malloc(sizeof(ValueType*) * newSize);
 		if (newTable == NULL)
 			return false;
 
+		_Resize(newTable, newSize);
+		return true;
+	}
+
+	void _Resize(ValueType** newTable, size_t newSize)
+	{
 		for (size_t i = 0; i < newSize; i++)
 			newTable[i] = NULL;
 
@@ -251,7 +300,6 @@ protected:
 
 		fTableSize = newSize;
 		fTable = newTable;
-		return true;
 	}
 
 	HashTableLink<ValueType> *_Link(ValueType *bucket) const
