@@ -37,9 +37,9 @@ extern timer_info gAPICTimer;
 extern timer_info gHPETTimer;
 
 static timer_info *sTimers[] = {
-	&gPITTimer,
+//	&gHPETTimer,
 	&gAPICTimer,
-	&gHPETTimer,
+	&gPITTimer,
 	NULL
 };
 
@@ -70,13 +70,17 @@ arch_init_timer(kernel_args *args)
 	cpu_status state = disable_interrupts();
 
 	for (i = 0; (timer = sTimers[i]) != NULL; i++) {
-		int priority;
+		int priority = timer->get_priority();
+
+		if (priority < bestPriority) {
+			TRACE(("arch_init_timer: Skipping %s because there is a higher priority timer (%s) initialized.\n", timer->name, sTimer->name));
+			continue;
+		}
+
 		if (timer->init(args) != B_OK) {
 			TRACE(("arch_init_timer: %s failed init. Skipping.\n", timer->name));
 			continue;
 		}
-
-		priority = timer->get_priority();
 
 		if (priority > bestPriority) {
 			bestPriority = priority;
