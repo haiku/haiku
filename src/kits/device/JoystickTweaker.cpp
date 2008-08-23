@@ -7,25 +7,37 @@
  *
  */
 #include "JoystickTweaker.h"
-#include "Joystick.h"
-
-#include <Font.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <Path.h>
+#include <Directory.h>
+#include <String.h>
+#include <Debug.h>
+
+#include "Joystick.h"
 
 #define STRINGLENGTHCPY 64
 
 #include <UTF8.h>
 
 #if DEBUG
-        inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
-                fputs(buf, _BJoystickTweaker::sLogFile); fflush(_BJoystickTweaker::sLogFile); }
-        #define LOG_ERR(text...) LOG(text)
-FILE *_BJoystickTweaker::sLogFile = NULL;
+inline void
+LOG(const char *fmt, ...)
+{
+	char buf[1024];
+	va_list ap;
+	va_start(ap, fmt);
+	vsprintf(buf, fmt, ap);
+	va_end(ap);
+	fputs(buf, BJoystick::sLogFile); fflush(BJoystick::sLogFile);
+}
+#	define LOG_ERR(text...) LOG(text)
+FILE *BJoystick::sLogFile = NULL;
 #else
-        #define LOG(text...)
-        #define LOG_ERR(text...) fprintf(stderr, text)
+#	define LOG(text...)
+#	define LOG_ERR(text...) fprintf(stderr, text)
 #endif
 
 #define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
@@ -64,7 +76,7 @@ _BJoystickTweaker::save_config(const entry_ref *ref)
 
 
 status_t
-_BJoystickTweaker::scan_including_disabled(const char* rootPath, BList *list,
+_BJoystickTweaker::_ScanIncludingDisabled(const char* rootPath, BList *list,
 	BEntry *rootEntry)
 {
 	BDirectory root;
@@ -81,7 +93,7 @@ _BJoystickTweaker::scan_including_disabled(const char* rootPath, BList *list,
 	ASSERT(list != NULL);
 	while ((root.GetNextEntry(&entry)) > B_ERROR ) {
 		if (entry.IsDirectory()) {
-			scan_including_disabled(rootPath, list, &entry);
+			_ScanIncludingDisabled(rootPath, list, &entry);
 		} else {
 			BPath path;
 			entry.GetPath(&path);
@@ -100,10 +112,16 @@ _BJoystickTweaker::scan_including_disabled()
 {
 	CALLED();
 	// First, we empty the list
-	for (int32 count = fJoystick->_fDevices->CountItems() - 1; count >= 0; count--)
-		free(fJoystick->_fDevices->RemoveItem(count));
+	_EmpyList(fJoystick->fDevices);
+	_ScanIncludingDisabled(DEVICEPATH, fJoystick->fDevices);
+}
 
-	scan_including_disabled(DEVICEPATH, fJoystick->_fDevices);
+
+void
+_BJoystickTweaker::_EmpyList(BList *list)
+{
+	for (int32 count = list->CountItems() - 1; count >= 0; count--)
+		free(list->RemoveItem(count));
 }
 
 
@@ -116,8 +134,8 @@ _BJoystickTweaker::get_info()
 
 
 status_t
-_BJoystickTweaker::get_info(_joystick_info* info,
-	const char * ref)
+_BJoystickTweaker::GetInfo(_joystick_info* info,
+						const char * ref)
 {
 	CALLED();
 	status_t err = B_ERROR;
@@ -131,7 +149,7 @@ _BJoystickTweaker::get_info(_joystick_info* info,
 			int len = strlen(line);
     		if (len > 0 && line[len-1] == '\n')
         		line[len-1] = '\0';
-			BuildFromJoystickDesc(line, info);
+			_BuildFromJoystickDesc(line, info);
 		}
 		fclose(file);
 	}
@@ -142,7 +160,7 @@ _BJoystickTweaker::get_info(_joystick_info* info,
 
 
 void
-_BJoystickTweaker::BuildFromJoystickDesc(char *string, _joystick_info* info)
+_BJoystickTweaker::_BuildFromJoystickDesc(char *string, _joystick_info* info)
 {
 	BString str(string);
 	str.RemoveAll("\"");
@@ -155,22 +173,18 @@ _BJoystickTweaker::BuildFromJoystickDesc(char *string, _joystick_info* info)
 		strncpy(info->controller_name, str.String(), STRINGLENGTHCPY);
 	} else if (str.IFindFirst("num_axes") != -1) {
 		str.RemoveFirst("num_axes = ");
-		//info->num_axes = atoi(str.String());
-		//LOG("%s\n", str.String());
+		info->num_axes = atoi(str.String());		
 	} else if (str.IFindFirst("num_hats") != -1) {
 		str.RemoveFirst("num_hats = ");
-		//info->num_hats = atoi(str.String());
-		//LOG("%s\n", str.String());
+		info->num_hats = atoi(str.String());
 	} else if (str.IFindFirst("num_buttons") != -1) {
 		str.RemoveFirst("num_buttons = ");
-		//info->num_buttons = atoi(str.String());
-		//LOG("%s\n", str.String());
+		info->num_buttons = atoi(str.String());
 	} else if (str.IFindFirst("num_sticks") != -1) {
 		str.RemoveFirst("num_sticks = ");
-		//info->num_sticks = atoi(str.String());
-		//LOG("%s\n", str.String());
+		info->num_sticks = atoi(str.String());
 	} else {
-	//	LOG("Path = %s\n", str->String());
+		LOG("Path = %s\n", str->String());
 	}
 }
 
@@ -180,19 +194,19 @@ _BJoystickTweaker::SendIOCT(uint32 op)
 {
 	status_t err = B_ERROR;
 	switch (op) {
-	case B_JOYSTICK_SET_DEVICE_MODULE:
-		break;
+		case B_JOYSTICK_SET_DEVICE_MODULE:
+				break;
 
-	case B_JOYSTICK_GET_DEVICE_MODULE:
-		break;
+		case B_JOYSTICK_GET_DEVICE_MODULE:
+				break;
 
-	case B_JOYSTICK_GET_SPEED_COMPENSATION:
-	case B_JOYSTICK_SET_SPEED_COMPENSATION:
-	case B_JOYSTICK_GET_MAX_LATENCY:
-	case B_JOYSTICK_SET_MAX_LATENCY:
-	case B_JOYSTICK_SET_RAW_MODE:
-	default:
-		break;
+		case B_JOYSTICK_GET_SPEED_COMPENSATION:
+		case B_JOYSTICK_SET_SPEED_COMPENSATION:
+		case B_JOYSTICK_GET_MAX_LATENCY:
+		case B_JOYSTICK_SET_MAX_LATENCY:
+		case B_JOYSTICK_SET_RAW_MODE:
+		default:
+				break;
 	}
 	return err;
 }
