@@ -15,15 +15,13 @@
 
 status_t
 DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
-{
-	TRACE(("DirectoryIterator::GetNextEntry: name = %s, length = %ld, id = %p\n",
-		name, *length, id));
-
+{	
 	if (!id || !name || !length)
 		return B_BAD_VALUE;
 
-	TRACE(("\tfPosition:          %Ld\n", fPosition));
-	TRACE(("\tParent()->Length(): %Ld\n", Parent()->Length()));
+	TRACE(("DirectoryIterator::GetNextEntry: name = %s, length = %ld, "
+		"id = %p, position = %Ld, parent length = %Ld\n", name, *length, id,
+		fPosition, Parent()->Length()));
 
 	status_t status = B_OK;
 	if (fAtBeginning) {
@@ -57,12 +55,12 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 				sprintf(name, "..");
 				*length = 3;
 			} else {
-				TRACE(("DirectoryIterator::GetNextEntry: UfdString\n"));
 				UdfString string(entry->id(), entry->id_length());
-				TRACE(("\tid == `%s'\n", string.Utf8()));
+				TRACE(("DirectoryIterator::GetNextEntry: UfdString id == `%s', "
+				"length = %d\n", string.Utf8(), string.Utf8Length()));
 				DUMP(entry->icb());
 				sprintf(name, "%s", string.Utf8());
-				*length = string.Utf8Length() + 1;
+				*length = string.Utf8Length();
 			}
 			*id = to_vnode_id(entry->icb());
 		}

@@ -81,7 +81,7 @@ AllocationDescriptorList<Accessor>::AllocationDescriptorList(Icb *icb,
 		fReadFromIcb(true),
 		fVolume(icb->GetVolume())
 {
-	TRACE(("AllocationDescriptorList<>\n"));
+	TRACE(("AllocationDescriptorList<>::AllocationDescriptorList\n"));
 	_WalkContinuationChain(_CurrentDescriptor());
 }
 
@@ -101,7 +101,7 @@ status_t
 AllocationDescriptorList<Accessor>::FindExtent(off_t start,
 	long_address *extent, bool *isEmpty)
 {
-	TRACE(("UDF: AllocationDescriptorList<>::FindExtent: start: %Ld, "
+	TRACE(("AllocationDescriptorList<>::FindExtent: start: %Ld, "
 		"extent: %p, isEmpty: %p\n", start, extent, isEmpty));
 
 	off_t startBlock = start >> fVolume->BlockShift();
@@ -149,11 +149,12 @@ template<class Accessor>
 AllocationDescriptorList<Accessor>::Descriptor*
 AllocationDescriptorList<Accessor>::_CurrentDescriptor() const
 {
-	TRACE(("AllocationDescriptorList<>::_CurrentDescriptor: "
-		"_DescriptorIndex() + 1) * sizeof(Descriptor) = %ld\n",
-		"\t_DescriptorArraySize() = %ld\n\t_DescriptorArray() = %p\n",
-		(_DescriptorIndex() + 1) * sizeof(Descriptor), _DescriptorArraySize(),
-		_DescriptorArray()));
+	TRACE(("AllocationDescriptorList<>::_CurrentDescriptor:\n"
+		"\t_DescriptorIndex() + 1 * sizeof(Descriptor) = %ld\n"
+		"\t_DescriptorArraySize() = %ld\n"
+		"\t_DescriptorArray() = %p\n",
+		(_DescriptorIndex() + 1) * sizeof(Descriptor),
+		_DescriptorArraySize(), _DescriptorArray()));
 
 	return ((_DescriptorIndex() + 1) * sizeof(Descriptor)
 		<= _DescriptorArraySize())
@@ -196,6 +197,8 @@ template<class Accessor>
 void
 AllocationDescriptorList<Accessor>::_WalkContinuationChain(Descriptor *descriptor)
 {
+	TRACE(("AllocationDescriptorList<>::_WalkContinuationChain: descriptor = %p\n",
+		descriptor));
 	if (descriptor
 		&& fAccessor.GetType(*descriptor) == EXTENT_TYPE_CONTINUATION) {
 		// Load the new block, make sure we're not trying
