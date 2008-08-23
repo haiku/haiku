@@ -236,6 +236,11 @@ class Painter {
 												agg::rendering_buffer& srcBuffer,
 												int32 xOffset, int32 yOffset,
 												BRect viewRect) const;
+			void				_DrawBitmapNearestNeighborCopy32(
+												agg::rendering_buffer& srcBuffer,
+												double xOffset, double yOffset,
+												double xScale, double yScale,
+												BRect viewRect) const;
 			void				_DrawBitmapBilinearCopy32(
 												agg::rendering_buffer& srcBuffer,
 												double xOffset, double yOffset,
