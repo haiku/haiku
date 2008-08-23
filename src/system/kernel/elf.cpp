@@ -156,9 +156,19 @@ dump_address_info(int argc, char **argv)
 
 	address = strtoul(argv[1], NULL, 16);
 
-	if (elf_debug_lookup_symbol_address(address, &baseAddress, &symbol,
-			&imageName, &exactMatch) == B_OK) {
-		kprintf("%p = %s + 0x%lx (%s)%s\n", (void *)address, symbol,
+	status_t error;
+
+	if (IS_KERNEL_ADDRESS(address)) {
+		error = elf_debug_lookup_symbol_address(address, &baseAddress, &symbol,
+			&imageName, &exactMatch);
+	} else {
+		error = elf_debug_lookup_user_symbol_address(
+			debug_get_debugged_thread()->team, address, &baseAddress, &symbol,
+			&imageName, &exactMatch);
+	}
+
+	if (error == B_OK) {
+		kprintf("%p = %s + 0x%lx (%s)%s\n", (void*)address, symbol,
 			address - baseAddress, imageName, exactMatch ? "" : " (nearest)");
 	} else
 		kprintf("There is no image loaded at this address!\n");
