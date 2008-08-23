@@ -8,6 +8,8 @@
 
 #include <signal.h>
 
+#include <algorithm>
+
 #include <OS.h>
 
 #include <vm.h>
@@ -15,6 +17,9 @@
 #include <vm_cache.h>
 #include <vm_page.h>
 #include "VMAnonymousCache.h"
+
+
+//#define TRACK_PAGE_USAGE_STATS	1
 
 
 const static uint32 kMinScanPagesCount = 512;
@@ -25,6 +30,14 @@ const static bigtime_t kMaxScanWaitInterval = 1000000LL;	// 1 sec
 static uint32 sLowPagesCount;
 static sem_id sPageDaemonSem;
 static uint32 sNumPages;
+
+#ifdef TRACK_PAGE_USAGE_STATS
+static page_num_t sPageUsageArrays[512];
+static page_num_t* sPageUsage = sPageUsageArrays;
+static page_num_t sPageUsagePageCount;
+static page_num_t* sNextPageUsage = sPageUsageArrays + 256;
+static page_num_t sNextPageUsagePageCount;
+#endif
 
 
 PageCacheLocker::PageCacheLocker(vm_page* page, bool dontWait)
@@ -90,6 +103,67 @@ PageCacheLocker::Unlock()
 //	#pragma mark -
 
 
+#ifdef TRACK_PAGE_USAGE_STATS
+
+static void
+track_page_usage(vm_page* page)
+{
+	if (page->wired_count == 0) {
+		sNextPageUsage[(int32)page->usage_count + 128]++;
+		sNextPageUsagePageCount++;
+	}
+}
+
+
+static void
+update_page_usage_stats()
+{
+	std::swap(sPageUsage, sNextPageUsage);
+	sPageUsagePageCount = sNextPageUsagePageCount;
+
+	memset(sNextPageUsage, 0, sizeof(page_num_t) * 256);
+	sNextPageUsagePageCount = 0;
+
+	// compute average
+	if (sPageUsagePageCount > 0) {
+		int64 sum = 0;
+		for (int32 i = 0; i < 256; i++)
+			sum += (int64)sPageUsage[i] * (i - 128);
+
+		dprintf("average page usage: %f (%lu pages)\n",
+			(float)sum / sPageUsagePageCount, sPageUsagePageCount);
+	}
+}
+
+
+static int
+dump_page_usage_stats(int argc, char** argv)
+{
+	kprintf("distribution of page usage counts (%lu pages):",
+		sPageUsagePageCount);
+
+	int64 sum = 0;
+	for (int32 i = 0; i < 256; i++) {
+		if (i % 8 == 0)
+			kprintf("\n%4ld:", i - 128);
+
+		int64 count = sPageUsage[i];
+		sum += count * (i - 128);
+
+		kprintf("  %9llu", count);
+	}
+
+	kprintf("\n\n");
+
+	kprintf("average usage count: %f\n",
+		sPageUsagePageCount > 0 ? (float)sum / sPageUsagePageCount : 0);
+
+	return 0;
+}
+
+#endif
+
+
 static void
 clear_page_activation(int32 index)
 {
@@ -128,11 +202,19 @@ check_page_activation(int32 index)
 		} else if (page->usage_count < 127)
 			page->usage_count++;
 
+#ifdef TRACK_PAGE_USAGE_STATS
+		track_page_usage(page);
+#endif
+
 		return false;
 	}
 
 	if (page->usage_count > -128)
 		page->usage_count--;
+
+#ifdef TRACK_PAGE_USAGE_STATS
+		track_page_usage(page);
+#endif
 
 	if (page->usage_count < 0) {
 		uint32 flags;
@@ -216,8 +298,12 @@ dprintf("wait interval %Ld, scan pages %lu, free %lu, target %lu\n",
 		for (uint32 i = 0; i < scanPagesCount && leftToFree > 0; i++) {
 			if (clearPage == 0)
 				dprintf("clear through\n");
-			if (checkPage == 0)
+			if (checkPage == 0) {
 				dprintf("check through\n");
+#ifdef TRACK_PAGE_USAGE_STATS
+				update_page_usage_stats();
+#endif
+			}
 			clear_page_activation(clearPage);
 
 			if (check_page_activation(checkPage))
@@ -261,6 +347,14 @@ vm_schedule_page_scanner(uint32 target)
 status_t
 vm_daemon_init()
 {
+#ifdef TRACK_PAGE_USAGE_STATS
+	add_debugger_command_etc("page_usage", &dump_page_usage_stats,
+		"Dumps statistics about page usage counts",
+		"\n"
+		"Dumps statistics about page usage counts.\n",
+		B_KDEBUG_DONT_PARSE_ARGUMENTS);
+#endif
+
 	sPageDaemonSem = create_sem(0, "page daemon");
 
 	sNumPages = vm_page_num_pages();
