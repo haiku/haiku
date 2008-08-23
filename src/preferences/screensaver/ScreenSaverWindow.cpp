@@ -354,6 +354,7 @@ ModulesView::MessageReceived(BMessage* message)
 			SaveState();
 			_CloseSaver();
 			_OpenSaver();
+			fSettings.Save();
 			break;
 		}
 
