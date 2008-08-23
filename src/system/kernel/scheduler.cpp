@@ -12,6 +12,7 @@
 
 #include <OS.h>
 
+#include <arch/debug.h>
 #include <kscheduler.h>
 #include <thread.h>
 #include <timer.h>
@@ -109,17 +110,64 @@ public:
 		SchedulerTraceEntry(thread),
 		fPreviousID(previous->id),
 		fCPU(previous->cpu->cpu_num),
-		fPriority(thread->priority)
+		fPriority(thread->priority),
+		fPreviousState(previous->state),
+		fPreviousWaitObjectType(previous->wait.type)
 	{
 		fName = alloc_tracing_buffer_strcpy(thread->name, B_OS_NAME_LENGTH,
 			false);
+
+#if SCHEDULER_TRACING >= 2
+		if (fPreviousState == B_THREAD_READY)
+			fPreviousPC = arch_debug_get_interrupt_pc();
+		else
+#endif
+			fPreviousWaitObject = previous->wait.object;
+
 		Initialized();
 	}
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("schedule %ld \"%s\", priority %d (from %ld, CPU %ld)", fID,
-			fName, fPriority, fPreviousID, fCPU);
+		out.Print("schedule %ld \"%s\", priority %d, CPU %ld, "
+			"previous thread: %ld (", fID, fName, fPriority, fCPU, fPreviousID);
+		if (fPreviousState == B_THREAD_WAITING) {
+			switch (fPreviousWaitObjectType) {
+				case THREAD_BLOCK_TYPE_SEMAPHORE:
+					out.Print("sem %ld", (sem_id)(addr_t)fPreviousWaitObject);
+					break;
+				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
+					out.Print("cvar %p", fPreviousWaitObject);
+					break;
+				case THREAD_BLOCK_TYPE_SNOOZE:
+					out.Print("snooze()");
+					break;
+				case THREAD_BLOCK_TYPE_SIGNAL:
+					out.Print("signal");
+					break;
+				case THREAD_BLOCK_TYPE_MUTEX:
+					out.Print("mutex %p", fPreviousWaitObject);
+					break;
+				case THREAD_BLOCK_TYPE_RW_LOCK:
+					out.Print("rwlock %p", fPreviousWaitObject);
+					break;
+				case THREAD_BLOCK_TYPE_OTHER:
+					out.Print("other (%p)", fPreviousWaitObject);
+						// We could print the string, but it might come from a
+						// kernel module that has already been unloaded.
+					break;
+				default:
+					out.Print("unknown (%p)", fPreviousWaitObject);
+					break;
+			}
+#if SCHEDULER_TRACING >= 2
+		} else if (fPreviousState == B_THREAD_READY) {
+			out.Print("ready at %p", fPreviousPC);
+#endif
+		} else
+			out.Print("%s", thread_state_to_text(NULL, fPreviousState));
+
+		out.Print(")");
 	}
 
 	thread_id PreviousThreadID() const	{ return fPreviousID; }
@@ -129,6 +177,12 @@ private:
 	int32				fCPU;
 	char*				fName;
 	uint8				fPriority;
+	uint8				fPreviousState;
+	uint16				fPreviousWaitObjectType;
+	union {
+		const void*		fPreviousWaitObject;
+		void*			fPreviousPC;
+	};
 };
 
 }	// namespace SchedulerTracing
