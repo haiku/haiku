@@ -34,6 +34,7 @@
 #define RUNTIME_LOADER_TRACING					0
 #define SCHEDULER_TRACING						0
 #define SIGNAL_TRACING							0
+#define SWAP_TRACING							0
 #define SYSCALL_TRACING							0
 #define SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT	1
 #define TCP_TRACING								0

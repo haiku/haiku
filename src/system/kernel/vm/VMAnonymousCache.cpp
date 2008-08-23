@@ -26,6 +26,7 @@
 #include <kernel_daemon.h>
 #include <slab/Slab.h>
 #include <syscalls.h>
+#include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
@@ -145,6 +146,78 @@ static off_t sAvailSwapSpace = 0;
 static mutex sAvailSwapSpaceLock;
 
 static object_cache *sSwapBlockCache;
+
+
+#if SWAP_TRACING
+namespace SwapTracing {
+
+class SwapTraceEntry : public AbstractTraceEntry {
+public:
+	SwapTraceEntry(VMAnonymousCache* cache)
+		:
+		fCache(cache)
+	{
+	}
+
+protected:
+	VMAnonymousCache*	fCache;
+};
+
+
+class ReadPage : public SwapTraceEntry {
+public:
+	ReadPage(VMAnonymousCache* cache, page_num_t pageIndex,
+			swap_addr_t swapSlotIndex)
+		:
+		SwapTraceEntry(cache),
+		fPageIndex(pageIndex),
+		fSwapSlotIndex(swapSlotIndex)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("swap read:  cache %p, page index: %lu <- swap slot: %lu",
+			fCache, fPageIndex, fSwapSlotIndex);
+	}
+
+private:
+	page_num_t		fPageIndex;
+	swap_addr_t		fSwapSlotIndex;
+};
+
+
+class WritePage : public SwapTraceEntry {
+public:
+	WritePage(VMAnonymousCache* cache, page_num_t pageIndex,
+			swap_addr_t swapSlotIndex)
+		:
+		SwapTraceEntry(cache),
+		fPageIndex(pageIndex),
+		fSwapSlotIndex(swapSlotIndex)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("swap write: cache %p, page index: %lu -> swap slot: %lu",
+			fCache, fPageIndex, fSwapSlotIndex);
+	}
+
+private:
+	page_num_t		fPageIndex;
+	swap_addr_t		fSwapSlotIndex;
+};
+
+}	// namespace SwapTracing
+
+#	define T(x) new(std::nothrow) SwapTracing::x;
+#else
+#	define T(x) ;
+#endif
+
 
 
 static int
@@ -488,6 +561,9 @@ VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
 				break;
 		}
 
+		T(ReadPage(this, pageIndex, startSlotIndex));
+			// TODO: Assumes that only one page is read.
+
 		swap_file *swapFile = find_swap_file(startSlotIndex);
 
 		off_t pos = (startSlotIndex - swapFile->first_slot) * B_PAGE_SIZE;
@@ -533,6 +609,9 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 			n >>= 1;
 		if (slotIndex == SWAP_SLOT_NONE)
 			panic("VMAnonymousCache::Write(): can't allocate swap space\n");
+
+		T(WritePage(this, pageIndex, slotIndex));
+			// TODO: Assumes that only one page is written.
 
 		swap_file *swapFile = find_swap_file(slotIndex);
 
@@ -602,6 +681,8 @@ VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 // callback.
 
 	callback->SetTo(pageIndex, slotIndex, newSlot);
+
+	T(WritePage(this, pageIndex, slotIndex));
 
 	// write the page asynchrounously
 	swap_file* swapFile = find_swap_file(slotIndex);
