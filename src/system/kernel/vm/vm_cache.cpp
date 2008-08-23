@@ -898,8 +898,42 @@ VMCache::Fault(struct vm_address_space *aspace, off_t offset)
 
 
 void
-VMCache::MergeStore(VMCache* source)
+VMCache::Merge(VMCache* source)
 {
+	for (VMCachePagesTree::Iterator it = source->pages.GetIterator();
+			vm_page* page = it.Next();) {
+		// Note: Removing the current node while iterating through a
+		// IteratableSplayTree is safe.
+		vm_page* consumerPage = LookupPage(
+			(off_t)page->cache_offset << PAGE_SHIFT);
+		if (consumerPage != NULL && consumerPage->state == PAGE_STATE_BUSY
+			&& consumerPage->type == PAGE_TYPE_DUMMY) {
+			// the page is currently busy taking a read fault - IOW,
+			// vm_soft_fault() has mapped our page so we can just
+			// move it up
+			//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
+			RemovePage(consumerPage);
+			consumerPage->state = PAGE_STATE_INACTIVE;
+			((vm_dummy_page*)consumerPage)->busy_condition.Unpublish();
+			consumerPage = NULL;
+		}
+
+		if (consumerPage == NULL) {
+			// the page is not yet in the consumer cache - move it upwards
+			source->RemovePage(page);
+			InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
+#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+		} else {
+			page->debug_flags = 0;
+			if (consumerPage->state == PAGE_STATE_BUSY)
+				page->debug_flags |= 0x1;
+			if (consumerPage->type == PAGE_TYPE_DUMMY)
+				page->debug_flags |= 0x2;
+			page->collided_page = consumerPage;
+			consumerPage->collided_page = page;
+#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
+		}
+	}
 }
 
 
@@ -936,43 +970,8 @@ VMCache::_MergeWithOnlyConsumer()
 
 	T(Merge(this, consumer));
 
-	for (VMCachePagesTree::Iterator it = pages.GetIterator();
-			vm_page* page = it.Next();) {
-		// Note: Removing the current node while iterating through a
-		// IteratableSplayTree is safe.
-		vm_page* consumerPage = consumer->LookupPage(
-			(off_t)page->cache_offset << PAGE_SHIFT);
-		if (consumerPage == NULL) {
-			// the page is not yet in the consumer cache - move it upwards
-			RemovePage(page);
-			consumer->InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
-		} else if (consumerPage->state == PAGE_STATE_BUSY
-			&& consumerPage->type == PAGE_TYPE_DUMMY) {
-			// the page is currently busy taking a read fault - IOW,
-			// vm_soft_fault() has mapped our page so we can just
-			// move it up
-			//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
-			consumer->RemovePage(consumerPage);
-			consumerPage->state = PAGE_STATE_INACTIVE;
-			((vm_dummy_page*)consumerPage)->busy_condition.Unpublish();
-
-			RemovePage(page);
-			consumer->InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
-#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
-		} else {
-			page->debug_flags = 0;
-			if (consumerPage->state == PAGE_STATE_BUSY)
-				page->debug_flags |= 0x1;
-			if (consumerPage->type == PAGE_TYPE_DUMMY)
-				page->debug_flags |= 0x2;
-			page->collided_page = consumerPage;
-			consumerPage->collided_page = page;
-#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
-		}
-	}
-
-	// merge the backing store
-	consumer->MergeStore(this);
+	// merge the cache
+	consumer->Merge(this);
 
 	// The remaining consumer has got a new source.
 	if (source != NULL) {

@@ -46,7 +46,7 @@ public:
 
 	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
 
-	virtual	void		MergeStore(VMCache* source);
+	virtual	void		Merge(VMCache* source);
 
 private:
 			class WriteCallback;

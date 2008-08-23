@@ -733,7 +733,7 @@ VMAnonymousCache::Fault(struct vm_address_space *aspace, off_t offset)
 
 
 void
-VMAnonymousCache::MergeStore(VMCache* _source)
+VMAnonymousCache::Merge(VMCache* _source)
 {
 	VMAnonymousCache* source = dynamic_cast<VMAnonymousCache*>(_source);
 	if (source == NULL) {
@@ -752,34 +752,147 @@ VMAnonymousCache::MergeStore(VMCache* _source)
 	if (committed_size > actualSize)
 		_Commit(actualSize);
 
-	for (off_t offset = source->virtual_base; offset < source->virtual_end;
-			offset += B_PAGE_SIZE) {
-		off_t pageIndex = offset >> PAGE_SHIFT;
-		swap_addr_t sourceSlotIndex = source->_SwapBlockGetAddress(pageIndex);
+	// Move all not shadowed pages from the source to the consumer cache.
 
-		if (sourceSlotIndex == SWAP_SLOT_NONE)
-			// this page is not swapped out
+	for (VMCachePagesTree::Iterator it = source->pages.GetIterator();
+			vm_page* page = it.Next();) {
+		// Note: Removing the current node while iterating through a
+		// IteratableSplayTree is safe.
+		vm_page* consumerPage = LookupPage(
+			(off_t)page->cache_offset << PAGE_SHIFT);
+		swap_addr_t consumerSwapSlot = _SwapBlockGetAddress(page->cache_offset);
+		if (consumerPage != NULL && consumerPage->state == PAGE_STATE_BUSY
+			&& consumerPage->type == PAGE_TYPE_DUMMY
+			&& consumerSwapSlot == SWAP_SLOT_NONE) {
+			// the page is currently busy taking a read fault - IOW,
+			// vm_soft_fault() has mapped our page so we can just
+			// move it up
+			//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
+			RemovePage(consumerPage);
+			consumerPage->state = PAGE_STATE_INACTIVE;
+			((vm_dummy_page*)consumerPage)->busy_condition.Unpublish();
+			consumerPage = NULL;
+		}
+
+		if (consumerPage == NULL && consumerSwapSlot == SWAP_SLOT_NONE) {
+			// the page is not yet in the consumer cache - move it upwards
+			source->RemovePage(page);
+			InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
+
+			// If the moved-up page has a swap page associated, we mark it, so
+			// that the swap page is moved upwards, too. We would lose if the
+			// page was modified and written to swap, and is now not marked
+			// modified.
+			if (source->_SwapBlockGetAddress(page->cache_offset)
+					!= SWAP_SLOT_NONE) {
+				page->merge_swap = true;
+			}
+#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+		} else {
+			page->debug_flags = 0;
+			if (consumerPage->state == PAGE_STATE_BUSY)
+				page->debug_flags |= 0x1;
+			if (consumerPage->type == PAGE_TYPE_DUMMY)
+				page->debug_flags |= 0x2;
+			page->collided_page = consumerPage;
+			consumerPage->collided_page = page;
+#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
+		}
+	}
+
+	// Move all not shadowed swap pages from the source to the consumer cache.
+
+	for (off_t offset = source->virtual_base
+				& ~(off_t)(B_PAGE_SIZE * SWAP_BLOCK_PAGES - 1);
+			offset < source->virtual_end;
+			offset += B_PAGE_SIZE * SWAP_BLOCK_PAGES) {
+
+		MutexLocker locker(sSwapHashLock);
+
+		page_num_t swapBlockPageIndex = offset >> PAGE_SHIFT;
+		swap_hash_key key = { source, swapBlockPageIndex };
+		swap_block* sourceSwapBlock = sSwapHashTable.Lookup(key);
+
+		if (sourceSwapBlock == NULL)
 			continue;
 
-		if (LookupPage(offset)) {
-			// this page is shadowed and we can find it in the new cache,
-			// free the swap space
-			swap_slot_dealloc(sourceSlotIndex, 1);
-		} else {
-			swap_addr_t slotIndex = _SwapBlockGetAddress(pageIndex);
+		// remove the source swap block -- we will either take over the swap
+		// space (and the block) or free it
+		sSwapHashTable.RemoveUnchecked(sourceSwapBlock);
 
-			if (slotIndex == SWAP_SLOT_NONE) {
-				// the page is not shadowed,
-				// assign the swap address to the new cache
-				_SwapBlockBuild(pageIndex, sourceSlotIndex, 1);
-				fAllocatedSwapSize += B_PAGE_SIZE;
+		key.cache = this;
+		swap_block* swapBlock = sSwapHashTable.Lookup(key);
+
+		locker.Unlock();
+
+		for (uint32 i = 0; i < SWAP_BLOCK_PAGES; i++) {
+			off_t pageIndex = swapBlockPageIndex + i;
+			swap_addr_t sourceSlotIndex = sourceSwapBlock->swap_slots[i];
+
+			if (sourceSlotIndex == SWAP_SLOT_NONE)
+				// this page is not swapped out
+				continue;
+
+			vm_page* page = LookupPage(pageIndex << PAGE_SHIFT);
+
+			bool keepSwapPage = true;
+			if (page != NULL && !page->merge_swap) {
+				// The consumer already has a page at this index and it wasn't
+				// one taken over from the source. So we can simply free the
+				// swap space.
+				keepSwapPage = false;
 			} else {
-				// the page is shadowed and is also swapped out
-				swap_slot_dealloc(sourceSlotIndex, 1);
+				if (page != NULL) {
+					// The page was taken over from the source cache. Clear the
+					// indicator flag. We'll take over the swap page too.
+					page->merge_swap = false;
+				} else if (swapBlock != NULL
+						&& swapBlock->swap_slots[i] != SWAP_SLOT_NONE) {
+					// There's no page in the consumer cache, but a swap page.
+					// Free the source swap page.
+					keepSwapPage = false;
+				}
 			}
+
+			if (!keepSwapPage) {
+				swap_slot_dealloc(sourceSlotIndex, 1);
+				sourceSwapBlock->swap_slots[i] = SWAP_SLOT_NONE;
+				sourceSwapBlock->used--;
+			}
+
+			// We've either freed the source swap page or are going to move it
+			// to the consumer. At any rate, the source cache doesn't own it
+			// anymore.
+			source->fAllocatedSwapSize -= B_PAGE_SIZE;
 		}
-		source->fAllocatedSwapSize -= B_PAGE_SIZE;
-		source->_SwapBlockFree(pageIndex, 1);
+
+		// All source swap pages that have not been freed yet are taken over by
+		// by the consumer.
+		fAllocatedSwapSize += B_PAGE_SIZE * sourceSwapBlock->used;
+
+		if (sourceSwapBlock->used == 0) {
+			// All swap pages have been freed -- we can discard the source swap
+			// block.
+			object_cache_free(sSwapBlockCache, sourceSwapBlock);
+		} else if (swapBlock == NULL) {
+			// We need to take over some of the source's swap pages and there's
+			// no swap block in the consumer cache. Just take over the source
+			// swap block.
+			sourceSwapBlock->key.cache = this;
+			locker.Lock();
+			sSwapHashTable.InsertUnchecked(sourceSwapBlock);
+			locker.Unlock();
+		} else {
+			// We need to take over some of the source's swap pages and there's
+			// already swap block in the consumer cache. Copy the respective
+			// swap addresses and discard the source swap block.
+			for (uint32 i = 0; i < SWAP_BLOCK_PAGES; i++) {
+				if (sourceSwapBlock->swap_slots[i] != SWAP_SLOT_NONE)
+					swapBlock->swap_slots[i] = sourceSwapBlock->swap_slots[i];
+			}
+
+			object_cache_free(sSwapBlockCache, sourceSwapBlock);
+		}
 	}
 }
 
