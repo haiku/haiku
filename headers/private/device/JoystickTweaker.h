@@ -10,16 +10,6 @@
 
 #include <List.h>
 #include <Entry.h>
-#include <Path.h>
-#include <Directory.h>
-#include <File.h>
-
-#include <String.h>
-#include <Debug.h>
-
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
 
 #define DEVICEPATH "/dev/joystick/"
 #define JOYSTICKPATH "/boot/home/config/settings/joysticks/"
@@ -33,17 +23,22 @@ class _BJoystickTweaker {
 public:
 					_BJoystickTweaker();
 					_BJoystickTweaker(BJoystick &stick);
-virtual				~_BJoystickTweaker();
+		virtual		~_BJoystickTweaker();
 		status_t	SendIOCT(uint32 op);
-		void		scan_including_disabled();
-		status_t	get_info(_joystick_info* info, const char * ref);
-protected:
-private:
-		void 		BuildFromJoystickDesc(char *string, _joystick_info* info);
-		status_t	scan_including_disabled(const char* rootPath, BList *list, BEntry *rootEntry = NULL);
+		status_t	GetInfo(_joystick_info* info, const char * ref);
+		
+		// BeOS R5's joystick pref need these
 		status_t	save_config(const entry_ref * ref = NULL);
+		void		scan_including_disabled();
 		status_t	get_info();
-		BJoystick* fJoystick;
+		
+private:
+		void 		_BuildFromJoystickDesc(char *string, _joystick_info* info);
+		status_t	_ScanIncludingDisabled(const char* rootPath, BList *list, 
+						BEntry *rootEntry = NULL);
+						
+		void		_EmpyList(BList *list);		
+		BJoystick* 	fJoystick;
 #if DEBUG
 public:
 	static FILE *sLogFile;
