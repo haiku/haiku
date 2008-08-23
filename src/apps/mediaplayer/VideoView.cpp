@@ -14,6 +14,7 @@
 VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	: BView(frame, name, resizeMask, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	  fOverlayMode(false),
+	  fIsPlaying(false),
 	  fGlobalSettingsListener(this)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -21,6 +22,7 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	SetHighColor(0, 0, 0);
 
 	// create some hopefully sensible default overlay restrictions
+	// they will be adjusted when overlays are actually used
 	fOverlayRestrictions.min_width_scale = 0.25;
 	fOverlayRestrictions.max_width_scale = 8.0;
 	fOverlayRestrictions.min_height_scale = 0.25;
@@ -61,6 +63,7 @@ VideoView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_OBJECT_CHANGED:
+			// received from fGlobalSettingsListener
 			// TODO: find out which object, if we ever watch more than
 			// the global settings instance...
 			_AdoptGlobalSettings();
@@ -195,6 +198,14 @@ VideoView::DisableOverlay()
 }
 
 
+void
+VideoView::SetPlaying(bool playing)
+{
+	printf("VideoView::SetPlaying(%d)\n", playing);
+	fIsPlaying = playing;
+}
+
+
 // #pragma mark -
 
 
@@ -214,8 +225,12 @@ void
 VideoView::_AdoptGlobalSettings()
 {
 	mpSettings settings = Settings::CurrentSettings();
+		// thread safe
 
 	fUseOverlays = settings.useOverlays;
 	fUseBilinearScaling = settings.scaleBilinear;
+
+	if (!fIsPlaying && !fOverlayMode)
+		Invalidate();
 }
 

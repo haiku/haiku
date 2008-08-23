@@ -36,6 +36,8 @@ public:
 			bool				IsOverlayActive();
 			void				DisableOverlay();
 
+			void				SetPlaying(bool playing);
+
 private:
 			void				_DrawBitmap(const BBitmap* bitmap);
 			void				_AdoptGlobalSettings();
@@ -43,6 +45,7 @@ private:
 			bool				fOverlayMode;
 			overlay_restrictions fOverlayRestrictions;
 			rgb_color			fOverlayKeyColor;
+			bool				fIsPlaying;
 
 			ListenerAdapter		fGlobalSettingsListener;
 			bool				fUseOverlays;

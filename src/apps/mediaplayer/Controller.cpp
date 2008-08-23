@@ -888,7 +888,10 @@ Controller::_NotifyMutedChanged(bool muted) const
 void
 Controller::NotifyPlayModeChanged(int32 mode) const
 {
-	_NotifyPlaybackStateChanged(_PlaybackState(mode));
+	uint32 state = _PlaybackState(mode);
+	if (fVideoView)
+		fVideoView->SetPlaying(state == PLAYBACK_STATE_PLAYING);
+	_NotifyPlaybackStateChanged(state);
 }
 
 
