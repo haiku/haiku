@@ -632,7 +632,12 @@ Inode::_RemoveSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 		return B_ENTRY_NOT_FOUND;
 
 	nodeGetter.MakeWritable(transaction);
-	status_t status = _RemoveSmallData(node, item, index);
+
+	// TODO(bga): It seems that the first item in the small data section is not
+	// a nomela attribute (for example, it does not have a name). We take this
+	// into account and decrement index before passing it along. Although this
+	// fix one bug, it may be as well just masking out a different bug. 
+	status_t status = _RemoveSmallData(node, item, index - 1);
 	if (status == B_OK)
 		status = WriteBack(transaction);
 
