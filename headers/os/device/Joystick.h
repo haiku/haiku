@@ -31,103 +31,78 @@ typedef struct _joystick_info {
 	uint32		num_sticks;
 	bool		calibration_enable;
 	bigtime_t	max_latency;
+	BList		name_axis;
+	BList		name_hat;
+	BList		name_button;
+//	BList		name_
 } joystick_info;
 
 /* -----------------------------------------------------------------------*/
 class BJoystick {
-
 public:
 					BJoystick();
 virtual				~BJoystick();
 
-		status_t	Open(const char *portName);	/* always goes for enhanced mode */
-		status_t	Open(const char *portName, bool enter_enhanced);
+		status_t	Open(const char *portName);
+		status_t	Open(const char *portName, bool enter_enhanced = true);
 		void		Close(void);
 
 		status_t	Update(void);
-		status_t	SetMaxLatency(
-						bigtime_t max_latency);
+		status_t	SetMaxLatency(bigtime_t max_latency);
 
 		bigtime_t	timestamp;
 		int16		horizontal;
 		int16		vertical;
-		bool		button1;	/* NOTE: true == off */
+		
+		/* NOTE: true == off */
+		bool		button1;
 		bool		button2;
 
 		int32		CountDevices();
 		status_t	GetDeviceName(int32 n, char * name,
 						size_t bufSize = B_OS_NAME_LENGTH);
 
-		/* if you care about more than just the first two axes/buttons, here's where you go */
-		bool		EnterEnhancedMode(
-						const entry_ref * ref = NULL);
+		bool		EnterEnhancedMode(const entry_ref * ref = NULL);
+
 		int32		CountSticks();
+
+		status_t	GetControllerModule(BString * out_name);
+		status_t	GetControllerName(BString * out_name);
+
+		bool		IsCalibrationEnabled();
+		status_t	EnableCalibration(bool calibrates = true);
+
 		int32		CountAxes();
+		status_t	GetAxisValues(int16 * out_values, int32 for_stick = 0);
+		status_t	GetAxisNameAt(int32 index, BString * out_name);
+		
 		int32		CountHats();
+		status_t	GetHatValues(uint8 * out_hats, int32 for_stick = 0);
+		status_t	GetHatNameAt(int32 index, BString * out_name);
+		
 		int32		CountButtons();
-		status_t	GetAxisValues(
-						int16 * out_values,
-						int32 for_stick = 0);	/* CountAxes() elements */
-		status_t	GetHatValues(
-						uint8 * out_hats,
-						int32 for_stick = 0);
-		uint32		ButtonValues(
-						int32 for_stick = 0);		/* NOTE: Buttons() are 1 == on */
-		status_t	GetAxisNameAt(
-						int32 index,
-						BString * out_name);
-		status_t	GetHatNameAt(
-						int32 index,
-						BString * out_name);
-		status_t	GetButtonNameAt(
-						int32 index,
-						BString * out_name);
-		status_t	GetControllerModule(
-						BString * out_name);
-		status_t	GetControllerName(
-						BString * out_name);
-
-		bool			IsCalibrationEnabled();
-		status_t	EnableCalibration(
-						bool calibrates = true);
-
+		/* NOTE: Buttons() are 1 == on */
+		uint32		ButtonValues(int32 for_stick = 0);
+		status_t	GetButtonNameAt(int32 index, BString * out_name);
 /* -----------------------------------------------------------------------*/
 
 protected:
 
-virtual	void			Calibrate(
-						struct _extended_joystick * reading);
+virtual	void		Calibrate(struct _extended_joystick * reading);
 
 private:
 friend class _BJoystickTweaker;
-//friend class JoyCalib; //Added from Zeta
 
-//		struct _joystick_info;
-
-		void		ScanDevices(
-						bool use_disabled = false);
-		status_t	gather_enhanced_info(
-						const entry_ref * ref = NULL);
-		status_t	save_config(
-						const entry_ref * ref = NULL);
-
-		void		_ReservedJoystick1();
-virtual	void		_ReservedJoystick2();
-virtual	void		_ReservedJoystick3();
-
-		bool		_mBeBoxMode;
-		bool		_mReservedBool;
-		int			ffd;
-		BList *		_fDevices;
-		_joystick_info * m_info;
-		char * m_dev_name;
-#if !_PR3_COMPATIBLE_		//if statment added from Zeta
-virtual	status_t	_Reserved_Joystick_4(void *, ...);
-virtual	status_t	_Reserved_Joystick_5(void *, ...);
-virtual	status_t	_Reserved_Joystick_6(void *, ...);
-		uint32		_reserved_Joystick_[10];
-#endif
-
+		void		ScanDevices(bool use_disabled = false);
+		status_t	GatherEnhanced_info(const entry_ref * ref = NULL);
+		status_t	SaveConfig(const entry_ref * ref = NULL);
+		
+		bool			fBeBoxMode;
+		bool			fReservedBool;
+		int				ffd;
+		BList*			fDevices;
+		_joystick_info* fJoystickInfo;
+		char* 			fDevName;
 #if DEBUG
 public:
 	static FILE *sLogFile;
