@@ -1682,6 +1682,12 @@ Painter::_DrawBitmapNearestNeighborCopy32(agg::rendering_buffer& srcBuffer,
 		// handle cropped source bitmap
 		yIndices[i] += yBitmapShift;
 	}
+//printf("X: %d ... %d, %d (%ld or %f)\n",
+//	xIndices[0], xIndices[dstWidth - 2], xIndices[dstWidth - 1], dstWidth,
+//	srcWidth * xScale);
+//printf("Y: %d ... %d, %d (%ld or %f)\n",
+//	yIndices[0], yIndices[dstHeight - 2], yIndices[dstHeight - 1], dstHeight,
+//	srcHeight * yScale);
 
 	const int32 left = (int32)viewRect.left;
 	const int32 top = (int32)viewRect.top;
@@ -1708,10 +1714,10 @@ Painter::_DrawBitmapNearestNeighborCopy32(agg::rendering_buffer& srcBuffer,
 
 		// x and y are needed as indeces into the wheight arrays, so the
 		// offset into the target buffer needs to be compensated
-		const int32 xIndexL = x1 - (int32)xOffset;
-		const int32 xIndexR = x2 - (int32)xOffset;
-		y1 -= (int32)yOffset;
-		y2 -= (int32)yOffset;
+		const int32 xIndexL = x1 - left;
+		const int32 xIndexR = x2 - left;
+		y1 -= top;
+		y2 -= top;
 
 //printf("x: %ld - %ld\n", xIndexL, xIndexR);
 //printf("y: %ld - %ld\n", y1, y2);
@@ -1846,10 +1852,10 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 
 		// x and y are needed as indeces into the wheight arrays, so the
 		// offset into the target buffer needs to be compensated
-		const int32 xIndexL = x1 - (int32)xOffset;
-		const int32 xIndexR = x2 - (int32)xOffset;
-		y1 -= (int32)yOffset;
-		y2 -= (int32)yOffset;
+		const int32 xIndexL = x1 - left;
+		const int32 xIndexR = x2 - left;
+		y1 -= top;
+		y2 -= top;
 
 //printf("x: %ld - %ld\n", xIndexL, xIndexR);
 //printf("y: %ld - %ld\n", y1, y2);
@@ -1931,7 +1937,17 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 			// In this mode we anticipate many pixels wich need filtering,
 			// there are no special cases for direct hit pixels except for the
 			// last column/row and the right/bottom corner pixel.
-			for (; y1 < y2; y1++) {
+
+			// The last column/row handling does not need to be performed
+			// for all clipping rects!
+			int32 yMax = y2;
+			if (yWeights[yMax].weight == 255)
+				yMax--;
+			int32 xIndexMax = xIndexR;
+			if (xWeights[xIndexMax].weight == 255)
+				xIndexMax--;
+
+			for (; y1 <= yMax; y1++) {
 				// cache the weight of the top and bottom row
 				const uint16 wTop = yWeights[y1].weight;
 				const uint16 wBottom = 255 - yWeights[y1].weight;
@@ -1942,7 +1958,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 				// buffer handle for destination to be incremented per pixel
 				register uint8* d = dst;
 
-				for (int32 x = xIndexL; x < xIndexR; x++) {
+				for (int32 x = xIndexL; x <= xIndexMax; x++) {
 					const uint8* s = src + xWeights[x].index;
 					// calculate the weighted sum of all four 
 					// interpolated pixels
@@ -1963,36 +1979,41 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 					d[2] = t2 >> 16;
 					d += 4;
 				}
-				// last column of pixels
-				const uint8* s = src + xWeights[xIndexR].index;
-				const uint8* sBottom = s + srcBPR;
-				d[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
-				d[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
-				d[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
+				// last column of pixels if necessary
+				if (xIndexMax < xIndexR) {
+					const uint8* s = src + xWeights[xIndexR].index;
+					const uint8* sBottom = s + srcBPR;
+					d[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
+					d[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
+					d[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
+				}
 
 				dst += dstBPR;
 			}
 
-			// last row of pixels
-
+			// last row of pixels if necessary
 			// buffer offset into source (bottom row)
 			register const uint8* src = srcBuffer.row_ptr(yWeights[y2].index);
 			// buffer handle for destination to be incremented per pixel
 			register uint8* d = dst;
 
-			for (int32 x = xIndexL; x < xIndexR; x++) {
-				const uint8* s = src + xWeights[x].index;
-				const uint16 wLeft = xWeights[x].weight;
-				const uint16 wRight = 255 - wLeft;
-				d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
-				d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
-				d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
-				d += 4;
+			if (yMax < y2) {
+				for (int32 x = xIndexL; x <= xIndexMax; x++) {
+					const uint8* s = src + xWeights[x].index;
+					const uint16 wLeft = xWeights[x].weight;
+					const uint16 wRight = 255 - wLeft;
+					d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
+					d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
+					d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
+					d += 4;
+				}
 			}
 
-			// pixel in bottom right corner
-			const uint8* s = src + xWeights[xIndexR].index;
-			*(uint32*)d = *(uint32*)s;
+			// pixel in bottom right corner if necessary
+			if (yMax < y2 && xIndexMax < xIndexR) {
+				const uint8* s = src + xWeights[xIndexR].index;
+				*(uint32*)d = *(uint32*)s;
+			}
 		}
 	} while (fBaseRenderer.next_clip_box());
 
