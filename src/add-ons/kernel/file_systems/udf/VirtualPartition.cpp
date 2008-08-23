@@ -13,14 +13,16 @@
 VirtualPartition::VirtualPartition(PhysicalPartition &physicalPartition)
 	: fPhysicalPartition(physicalPartition)
 {
+	TRACE_ERROR(("VirtualPartition::VirtualPartition: not implemented!\n"));
 	// Find VAT
 }
 
-/*! \brief Destroys the VirtualPartition object.
-*/
+
+/*! \brief Destroys the VirtualPartition object. */
 VirtualPartition::~VirtualPartition()
 {
 }
+
 
 /*! \brief Maps the given logical block to a physical block on disc.
 
@@ -34,8 +36,8 @@ VirtualPartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 	return B_NOT_IMPLEMENTED;
 }
 
-/*! Returns the initialization status of the object.
-*/
+
+/*! Returns the initialization status of the object. */
 status_t
 VirtualPartition::InitCheck()
 {

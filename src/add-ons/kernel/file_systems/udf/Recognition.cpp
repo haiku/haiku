@@ -161,8 +161,8 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 	return foundECMA167 || (foundExtended && !foundECMA168) ? B_OK : B_ERROR;	
 }
 
-static
-status_t
+
+static status_t
 walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 	uint32 blockSize, uint32 blockShift, 
 	logical_volume_descriptor &logicalVolumeDescriptor,
@@ -188,10 +188,10 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 				PRINT(("block %Ld: read_pos(pos:%Ld, len:%ld) failed with error 0x%lx\n",
 				       block, address, blockSize, bytesRead));
 			}
-		}			
+		}
 		if (!anchorErr) {
 			anchor = reinterpret_cast<anchor_volume_descriptor*>(chunk.Data());
-			anchorErr = anchor->tag().init_check(block+offset);
+			anchorErr = anchor->tag().init_check(block + offset);
 			if (anchorErr) {
 				PRINT(("block %Ld: invalid anchor\n", block));
 			} else {
@@ -203,17 +203,14 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 			PDUMP(anchor);
 			// Found an avds, so try the main sequence first, then
 			// the reserve sequence if the main one fails.
-			anchorErr = walk_volume_descriptor_sequence(anchor->main_vds(), device,
-														blockSize, blockShift,
-			                                            logicalVolumeDescriptor,
-			                                            partitionDescriptors,
-			                                            partitionDescriptorCount);
+			anchorErr = walk_volume_descriptor_sequence(anchor->main_vds(),
+				device, blockSize, blockShift, logicalVolumeDescriptor,
+				partitionDescriptors, partitionDescriptorCount);
+
 			if (anchorErr)
-				anchorErr = walk_volume_descriptor_sequence(anchor->reserve_vds(), device,
-															blockSize, blockShift,
-			                                            	logicalVolumeDescriptor,
-			                                            	partitionDescriptors,
-			                                            	partitionDescriptorCount);				
+				anchorErr = walk_volume_descriptor_sequence(anchor->reserve_vds(),
+					device,	blockSize, blockShift, logicalVolumeDescriptor,
+					partitionDescriptors, partitionDescriptorCount);				
 		}
 		if (!anchorErr) {
 			PRINT(("block %Ld: found valid vds\n", avds_locations[i]));
@@ -231,10 +228,10 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 static
 status_t
 walk_volume_descriptor_sequence(extent_address descriptorSequence,
-								int device, uint32 blockSize, uint32 blockShift,
-							    logical_volume_descriptor &logicalVolumeDescriptor,
-							    partition_descriptor partitionDescriptors[],
-							    uint8 &partitionDescriptorCount)
+	int device, uint32 blockSize, uint32 blockShift,
+	logical_volume_descriptor &logicalVolumeDescriptor,
+	partition_descriptor partitionDescriptors[],
+	uint8 &partitionDescriptorCount)
 {
 	DEBUG_INIT_ETC(NULL, ("descriptorSequence.loc:%ld, descriptorSequence.len:%ld",
 	           descriptorSequence.location(), descriptorSequence.length()));
@@ -273,7 +270,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 			switch (tag->id()) {
 				case TAGID_UNDEFINED:
 					break;
-					
+
 				case TAGID_PRIMARY_VOLUME_DESCRIPTOR:
 				{
 					primary_volume_descriptor *primary = reinterpret_cast<primary_volume_descriptor*>(tag);
@@ -281,7 +278,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 					(void)primary;	// kill the warning		
 					break;
 				}
-				
+
 				case TAGID_ANCHOR_VOLUME_DESCRIPTOR_POINTER:
 					break;
 					

@@ -11,13 +11,17 @@ PhysicalPartition::PhysicalPartition(uint16 number, uint32 start, uint32 length)
 	fStart(start),
 	fLength(length)
 {
+	TRACE(("PhysicalPartition::PhysicalPartition: number = %d, start = %d,
+		length = %d\n", number, start, length));
 }
+
 
 /*! \brief Destroys the PhysicalPartition object.
 */
 PhysicalPartition::~PhysicalPartition()
 {
 }
+
 
 /*! \brief Maps the given logical block to a physical block on disc.
 
