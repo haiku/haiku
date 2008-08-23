@@ -44,6 +44,10 @@
 #define SCRUB_SIZE 16
 	// this many pages will be cleared at once in the page scrubber thread
 
+// for debugging: limit the amount of available RAM (in MB)
+//#define LIMIT_AVAILABLE_MEMORY	256
+
+
 typedef struct page_queue {
 	vm_page *head;
 	vm_page *tail;
@@ -605,6 +609,8 @@ dump_page_queue(int argc, char **argv)
 static int
 dump_page_stats(int argc, char **argv)
 {
+	page_num_t swappableModified = 0;
+	page_num_t swappableModifiedInactive = 0;
 	uint32 counter[8];
 	addr_t i;
 
@@ -615,9 +621,17 @@ dump_page_stats(int argc, char **argv)
 			panic("page %li at %p has invalid state!\n", i, &sPages[i]);
 
 		counter[sPages[i].state]++;
+
+		if (sPages[i].state == PAGE_STATE_MODIFIED && sPages[i].cache != NULL
+			&& sPages[i].cache->temporary && sPages[i].wired_count == 0) {
+			swappableModified++;
+			if (sPages[i].usage_count < 0)
+				swappableModifiedInactive++;
+		}
 	}
 
 	kprintf("page stats:\n");
+	kprintf("total: %lu\n", sNumPages);
 	kprintf("active: %lu\ninactive: %lu\nbusy: %lu\nunused: %lu\n",
 		counter[PAGE_STATE_ACTIVE], counter[PAGE_STATE_INACTIVE],
 		counter[PAGE_STATE_BUSY], counter[PAGE_STATE_UNUSED]);
@@ -632,8 +646,9 @@ dump_page_stats(int argc, char **argv)
 		sFreePageQueue.count);
 	kprintf("clear queue: %p, count = %ld\n", &sClearPageQueue,
 		sClearPageQueue.count);
-	kprintf("modified queue: %p, count = %ld (%ld temporary)\n",
-		&sModifiedPageQueue, sModifiedPageQueue.count, sModifiedTemporaryPages);
+	kprintf("modified queue: %p, count = %ld (%ld temporary, %lu swappable, "
+		"inactive: %lu)\n", &sModifiedPageQueue, sModifiedPageQueue.count,
+		sModifiedTemporaryPages, swappableModified, swappableModifiedInactive);
 	kprintf("active queue: %p, count = %ld\n", &sActivePageQueue,
 		sActivePageQueue.count);
 	kprintf("inactive queue: %p, count = %ld\n", &sInactivePageQueue,
@@ -1120,6 +1135,8 @@ page_writer(void* /*unused*/)
 	// TODO: once the I/O scheduler is there, we should write
 	// a lot more pages back.
 	const uint32 kNumPages = 32;
+	uint32 writtenPages = 0;
+	bigtime_t lastWrittenTime = 0;
 
 	PageWriterRun run;
 	if (run.Init(kNumPages) != B_OK) {
@@ -1151,6 +1168,10 @@ page_writer(void* /*unused*/)
 		// enough to do).
 
 		// collect pages to be written
+#if ENABLE_SWAP_SUPPORT
+		bool lowOnPages = low_resource_state(B_KERNEL_RESOURCE_PAGES)
+			!= B_NO_LOW_RESOURCE;
+#endif
 
 		while (numPages < kNumPages) {
 			vm_page *page = next_modified_page(marker);
@@ -1164,12 +1185,12 @@ page_writer(void* /*unused*/)
 			vm_cache *cache = page->cache;
 
 			// Don't write back wired (locked) pages and don't write RAM pages
-			// until we're low on pages.
+			// until we're low on pages. Also avoid writing temporary pages that
+			// are active.
 			if (page->wired_count > 0
 				|| cache->temporary
 #if ENABLE_SWAP_SUPPORT
-					&& low_resource_state(B_KERNEL_RESOURCE_PAGES)
-							== B_NO_LOW_RESOURCE
+					&& (!lowOnPages /*|| page->usage_count > 0*/)
 #endif
 				) {
 				continue;
@@ -1210,6 +1231,16 @@ page_writer(void* /*unused*/)
 
 		// write pages to disk and do all the cleanup
 		run.Go();
+
+		// debug output only...
+		writtenPages += numPages;
+		if (writtenPages >= 1024) {
+			bigtime_t now = system_time();
+			dprintf("page writer: wrote 1024 pages (%llu ms)\n",
+				(now - lastWrittenTime) / 1000);
+			writtenPages -= 1024;
+			lastWrittenTime = now;
+		}
 	}
 
 	remove_page_marker(marker);
@@ -1362,19 +1393,6 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 			count++;
 			continue;
 		}
-		if (tried) {
-			// We tried all potential pages, but one or more couldn't be stolen
-			// at that time (likely because their cache was locked). No one
-			// else will have any better luck, so we'll just retry a little
-			// later.
-			// TODO: Think about better strategies. E.g. if our condition
-			// variables had timeouts, we could just wait with timeout on
-			// the free page queue condition variable, which could might
-			// succeed earlier.
-			locker.Unlock();
-			snooze(10000);
-			continue;
-		}
 
 		// we need to wait for pages to become inactive
 
@@ -1383,11 +1401,19 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 		freeConditionEntry.Add(&sFreePageQueue);
 		locker.Unlock();
 
-		low_resource(B_KERNEL_RESOURCE_PAGES, count, B_RELATIVE_TIMEOUT, 0);
-		//snooze(50000);
-			// sleep for 50ms
+		if (tried) {
+			// We tried all potential pages, but one or more couldn't be stolen
+			// at that time (likely because their cache was locked). No one
+			// else will have any better luck, so we'll just retry a little
+			// later.
+			freeConditionEntry.Wait(B_RELATIVE_TIMEOUT, 10000);
+		} else {
+			low_resource(B_KERNEL_RESOURCE_PAGES, count, B_RELATIVE_TIMEOUT, 0);
+			//snooze(50000);
+				// sleep for 50ms
 
-		freeConditionEntry.Wait();
+			freeConditionEntry.Wait();
+		}
 
 		locker.Lock();
 		sPageDeficit--;
@@ -1556,6 +1582,11 @@ vm_page_init_num_pages(kernel_args *args)
 		physicalPagesEnd));
 
 	sNumPages = physicalPagesEnd - sPhysicalPageOffset;
+
+#ifdef LIMIT_AVAILABLE_MEMORY
+	if (sNumPages > LIMIT_AVAILABLE_MEMORY * 256)
+		sNumPages = LIMIT_AVAILABLE_MEMORY * 256;
+#endif
 }
 
 
@@ -1580,6 +1611,7 @@ vm_page_init(kernel_args *args)
 		sPages[i].wired_count = 0;
 		sPages[i].usage_count = 0;
 		sPages[i].busy_writing = false;
+		sPages[i].merge_swap = false;
 		sPages[i].cache = NULL;
 		#ifdef DEBUG_PAGE_QUEUE
 			sPages[i].queue = NULL;
