@@ -710,10 +710,19 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 void*
 arch_debug_get_interrupt_pc()
 {
-	struct iframe* frame = i386_get_current_iframe();
-	if (frame == NULL)
-		return NULL;
+	struct thread* thread = debug_get_debugged_thread();
 
+	if (thread == thread_get_current_thread()) {
+		struct iframe* frame = i386_get_current_iframe();
+		if (frame == NULL)
+			return NULL;
+
+		return (void*)(addr_t)frame->eip;
+	}
+
+	addr_t ebp = thread->arch_info.current_stack.esp[2];
+		// NOTE: This doesn't work, if the thread is running (on another CPU).
+	struct iframe* frame = find_previous_iframe(thread, ebp);
 	return (void*)(addr_t)frame->eip;
 }
 
