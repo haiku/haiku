@@ -74,16 +74,28 @@
 		( HAS_FS_CALL(vnode, op) ? \
 			vnode->ops->op(vnode->mount->volume, vnode, params) \
 			: (panic("FS_CALL op " #op " is NULL"), 0))
+#	define FS_CALL_NO_PARAMS(vnode, op) \
+		( HAS_FS_CALL(vnode, op) ? \
+			vnode->ops->op(vnode->mount->volume, vnode) \
+			: (panic("FS_CALL_NO_PARAMS op " #op " is NULL"), 0))
+#	define FS_MOUNT_CALL(mount, op, params...) \
+		( HAS_FS_MOUNT_CALL(mount, op) ? \
+			mount->volume->ops->op(mount->volume, params) \
+			: (panic("FS_MOUNT_CALL op " #op " is NULL"), 0))
+#	define FS_MOUNT_CALL_NO_PARAMS(mount, op) \
+		( HAS_FS_MOUNT_CALL(mount, op) ? \
+			mount->volume->ops->op(mount->volume) \
+			: (panic("FS_MOUNT_CALL_NO_PARAMS op " #op " is NULL"), 0))
 #else
 #	define FS_CALL(vnode, op, params...) \
 			vnode->ops->op(vnode->mount->volume, vnode, params)
-#endif
-#define FS_CALL_NO_PARAMS(vnode, op) \
+#	define FS_CALL_NO_PARAMS(vnode, op) \
 			vnode->ops->op(vnode->mount->volume, vnode)
-#define FS_MOUNT_CALL(mount, op, params...) \
+#	define FS_MOUNT_CALL(mount, op, params...) \
 			mount->volume->ops->op(mount->volume, params)
-#define FS_MOUNT_CALL_NO_PARAMS(mount, op) \
+#	define FS_MOUNT_CALL_NO_PARAMS(mount, op) \
 			mount->volume->ops->op(mount->volume)
+#endif
 
 
 const static uint32 kMaxUnusedVnodes = 8192;
