@@ -8,7 +8,7 @@
 #include "disasm_arch.h"
 
 status_t
-disasm_arch_dump_insns(addr_t where, size_t length, int count)
+disasm_arch_dump_insns(addr_t where, int count)
 {
 	return ENOENT;
 }
