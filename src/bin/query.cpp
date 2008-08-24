@@ -85,7 +85,7 @@ perform_query(BVolume &volume, const char *predicate)
 		}
 
 		printf("%s\n", sEscapeMetaChars ? 
-			BString().CharacterEscape(path.Path(), " ()?*&\"'[]^\\~|;!<>*$", '\\').String()
+			BString().CharacterEscape(path.Path(), " ()?*&\"'[]^\\~|;!<>*$\t", '\\').String()
 			: path.Path());
 	}
 }
