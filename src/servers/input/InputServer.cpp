@@ -298,6 +298,8 @@ InputServer::_LoadKeymap()
 		return B_BAD_VALUE;
 
 	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
+	if (fCharsSize <= 0)
+		return B_BAD_VALUE;
 
 	delete[] fChars;
 	fChars = new (nothrow) char[fCharsSize];
