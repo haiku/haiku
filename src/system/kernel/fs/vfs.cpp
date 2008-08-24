@@ -69,8 +69,15 @@
 #define HAS_FS_CALL(vnode, op)			(vnode->ops->op != NULL)
 #define HAS_FS_MOUNT_CALL(mount, op)	(mount->volume->ops->op != NULL)
 
-#define FS_CALL(vnode, op, params...) \
+#ifdef KDEBUG
+#	define FS_CALL(vnode, op, params...) \
+		( HAS_FS_CALL(vnode, op) ? \
+			vnode->ops->op(vnode->mount->volume, vnode, params) \
+			: (panic("FS_CALL op " #op " is NULL"), 0))
+#else
+#	define FS_CALL(vnode, op, params...) \
 			vnode->ops->op(vnode->mount->volume, vnode, params)
+#endif
 #define FS_CALL_NO_PARAMS(vnode, op) \
 			vnode->ops->op(vnode->mount->volume, vnode)
 #define FS_MOUNT_CALL(mount, op, params...) \
