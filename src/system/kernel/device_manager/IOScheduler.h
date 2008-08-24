@@ -48,7 +48,10 @@ private:
 			void				_Finisher();
 			bool				_FinisherWorkPending();
 			IOOperation*		_GetOperation(bool wait);
-			IORequest*			_GetNextUnscheduledRequest();
+			IORequest*			_GetNextUnscheduledRequest(bool wait);
+			bool				_PrepareRequestOperations(IORequest* request,
+									IOOperationList& operations,
+									int32& operationsPrepared);
 			status_t			_Scheduler();
 	static	status_t			_SchedulerThread(void* self);
 			status_t			_RequestNotifier();

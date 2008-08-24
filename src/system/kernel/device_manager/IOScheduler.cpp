@@ -272,13 +272,13 @@ IOScheduler::_GetOperation(bool wait)
 
 
 IORequest*
-IOScheduler::_GetNextUnscheduledRequest()
+IOScheduler::_GetNextUnscheduledRequest(bool wait)
 {
 	while (true) {
 		MutexLocker locker(fLock);
 		IORequest* request = fUnscheduledRequests.RemoveHead();
 
-		if (request != NULL)
+		if (request != NULL || !wait)
 			return request;
 
 		// Wait for new requests. First check whether any finisher work has
@@ -306,48 +306,78 @@ IOScheduler::_GetNextUnscheduledRequest()
 }
 
 
+bool
+IOScheduler::_PrepareRequestOperations(IORequest* request,
+	IOOperationList& operations, int32& operationsPrepared)
+{
+	if (fDMAResource != NULL) {
+		while (request->RemainingBytes() > 0) {
+			IOOperation* operation = _GetOperation(operations.IsEmpty());
+			if (operation == NULL)
+				return false;
+
+			status_t status = fDMAResource->TranslateNext(request,
+				operation);
+			if (status != B_OK) {
+				operation->SetParent(NULL);
+				MutexLocker locker(fLock);
+				fUnusedOperations.Add(operation);
+
+				// B_BUSY means some resource (DMABuffers or
+				// DMABounceBuffers) was temporarily unavailable. That's OK,
+				// we'll retry later.
+				if (status == B_BUSY)
+					return false;
+
+				AbortRequest(request, status);
+				return true;
+			}
+
+			operations.Add(operation);
+			operationsPrepared++;
+		}
+	} else {
+// TODO: If the device has block size restrictions, we might need to use a
+// bounce buffer.
+		IOOperation* operation = _GetOperation(true);
+// TODO: Prepare() can fail!
+		operation->Prepare(request);
+		operation->SetOriginalRange(request->Offset(), request->Length());
+		request->Advance(request->Length());
+		operationsPrepared++;
+	}
+
+	return true;
+}
+
+
 status_t
 IOScheduler::_Scheduler()
 {
 // TODO: This is a no-op scheduler. Implement something useful!
 	while (true) {
-		IORequest* request = _GetNextUnscheduledRequest();
+		IOOperationList operations;
+		int32 operationCount = 0;
 
-		TRACE("IOScheduler::_Scheduler(): request: %p\n", request);
+		while (IORequest* request
+				= _GetNextUnscheduledRequest(operationCount == 0)) {
+			TRACE("IOScheduler::_Scheduler(): request: %p\n", request);
 
-		if (fDMAResource != NULL) {
-			IOOperationList operations;
-			while (request->RemainingBytes() > 0) {
-				IOOperation* operation = _GetOperation(operations.IsEmpty());
-				if (operation == NULL)
-					break;
-
-				status_t status = fDMAResource->TranslateNext(request,
-					operation);
-				if (status != B_OK) {
-// TODO: Handle correctly! E.g. B_BUSY just means that some resource (e.g.
-// DMA buffers) isn't available ATM. We should execute the operations we have
-// so far and wait for resources to become available again.
-					AbortRequest(request, status);
-					break;
-				}
-
-				operations.Add(operation);
+			int32 requestOperations = 0;
+			if (!_PrepareRequestOperations(request, operations,
+					requestOperations) && requestOperations == 0) {
+				// no operation prepared at all -- re-add the request for the
+				// next round
+				MutexLocker locker(fLock);
+				fUnscheduledRequests.Add(request, false);
 			}
+			operationCount += requestOperations;
+		}
 
-			while (IOOperation* operation = operations.RemoveHead()) {
-				TRACE("IOScheduler::_Scheduler(): calling callback for "
-					"operation: %p\n", operation);
+		while (IOOperation* operation = operations.RemoveHead()) {
+			TRACE("IOScheduler::_Scheduler(): calling callback for "
+				"operation: %p\n", operation);
 
-				fIOCallback(fIOCallbackData, operation);
-			}
-		} else {
-// TODO: If the device has block size restrictions, we might need to use a
-// bounce buffer.
-			IOOperation* operation = _GetOperation(true);
-			operation->Prepare(request);
-			operation->SetOriginalRange(request->Offset(), request->Length());
-			request->Advance(request->Length());
 			fIOCallback(fIOCallbackData, operation);
 		}
 	}
