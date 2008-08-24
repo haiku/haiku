@@ -12,7 +12,8 @@ extern "C" {
 extern status_t disasm_arch_init();
 extern status_t disasm_arch_fini();
 
-extern status_t disasm_arch_dump_insns(addr_t where, int count);
+extern status_t disasm_arch_dump_insns(addr_t where, int count,
+	addr_t baseAddress, int backCount);
 
 #ifdef __cplusplus
 }

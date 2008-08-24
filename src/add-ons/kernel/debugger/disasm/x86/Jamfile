@@ -7,7 +7,7 @@ DEFINES += __UD_STANDALONE__ ;
 DEFINES += assert=disasm_arch_assert ;
 DEFINES += __assert_fail=disasm_arch_assert ;
 
-local libUdis86Sources = 
+local libUdis86Sources =
 	decode.c
 	input.c
 	itab.c
