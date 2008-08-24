@@ -16,8 +16,9 @@
 #include "IOScheduler.h"
 
 
-#define DMA_TEST_BLOCK_SIZE		512
-#define DMA_TEST_BUFFER_COUNT	10
+#define DMA_TEST_BLOCK_SIZE				512
+#define DMA_TEST_BUFFER_COUNT			10
+#define DMA_TEST_BOUNCE_BUFFER_COUNT	128
 
 
 class TestSuite;
@@ -120,7 +121,7 @@ public:
 			restrictions.max_segment_count, restrictions.max_segment_size,
 			restrictions.flags);
 
-		status_t status = fDMAResource.Init(restrictions, blockSize, 10);
+		status_t status = fDMAResource.Init(restrictions, blockSize, 10, 10);
 		if (status != B_OK)
 			panic("initializing DMA resource failed: %s\n", strerror(status));
 	}
@@ -589,8 +590,8 @@ Test::Run(DMAResource& resource)
 			operation.Offset(), operation.Length(), operation.OriginalOffset(),
 			operation.OriginalLength());
 		dprintf("  DMABuffer %p, %lu vecs, bounce buffer: %p (%p) %s\n", buffer,
-			buffer->VecCount(), buffer->BounceBuffer(),
-			(void*)buffer->PhysicalBounceBuffer(),
+			buffer->VecCount(), buffer->BounceBufferAddress(),
+			(void*)buffer->PhysicalBounceBufferAddress(),
 			operation.UsesBounceBuffer() ? "used" : "unused");
 		for (uint32 i = 0; i < buffer->VecCount(); i++) {
 			dprintf("    [%lu] base %p, length %lu%s\n", i,
@@ -616,7 +617,7 @@ Test::Run(DMAResource& resource)
 			void* address;
 			if (target.uses_bounce_buffer) {
 				address = (void*)(target.address
-					+ (addr_t)buffer->PhysicalBounceBuffer());
+					+ (addr_t)buffer->PhysicalBounceBufferAddress());
 			} else if (fSuite.IsContiguous() || target.address < B_PAGE_SIZE) {
 				address = (void*)(target.address + fSuite.PhysicalDataBase());
 			} else {
@@ -1183,7 +1184,7 @@ dma_test_init_device(void *driverCookie, void **_deviceCookie)
 		return B_NO_MEMORY;
 
 	status_t status = sDMAResource->Init(restrictions, DMA_TEST_BLOCK_SIZE,
-		DMA_TEST_BUFFER_COUNT);
+		DMA_TEST_BUFFER_COUNT, DMA_TEST_BOUNCE_BUFFER_COUNT);
 	if (status != B_OK) {
 		delete sDMAResource;
 		return status;

@@ -236,8 +236,8 @@ IOOperation::Finish()
 	if (fParent->IsRead() && UsesBounceBuffer()) {
 		TRACE("  read with bounce buffer\n");
 		// copy the bounce buffer segments to the final location
-		uint8* bounceBuffer = (uint8*)fDMABuffer->BounceBuffer();
-		addr_t bounceBufferStart = fDMABuffer->PhysicalBounceBuffer();
+		uint8* bounceBuffer = (uint8*)fDMABuffer->BounceBufferAddress();
+		addr_t bounceBufferStart = fDMABuffer->PhysicalBounceBufferAddress();
 		addr_t bounceBufferEnd = bounceBufferStart
 			+ fDMABuffer->BounceBufferSize();
 
@@ -308,8 +308,9 @@ IOOperation::Prepare(IORequest* request)
 		// which will be copied after their respective read phase.
 		if (UsesBounceBuffer()) {
 			TRACE("  write with bounce buffer\n");
-			uint8* bounceBuffer = (uint8*)fDMABuffer->BounceBuffer();
-			addr_t bounceBufferStart = fDMABuffer->PhysicalBounceBuffer();
+			uint8* bounceBuffer = (uint8*)fDMABuffer->BounceBufferAddress();
+			addr_t bounceBufferStart
+				= fDMABuffer->PhysicalBounceBufferAddress();
 			addr_t bounceBufferEnd = bounceBufferStart
 				+ fDMABuffer->BounceBufferSize();
 
@@ -522,10 +523,10 @@ IOOperation::_CopyPartialBegin(bool isWrite, bool& singleBlockOnly)
 
 	if (isWrite) {
 		return fParent->CopyData(OriginalOffset(),
-			(uint8*)fDMABuffer->BounceBuffer() + relativeOffset, length);
+			(uint8*)fDMABuffer->BounceBufferAddress() + relativeOffset, length);
 	} else {
 		return fParent->CopyData(
-			(uint8*)fDMABuffer->BounceBuffer() + relativeOffset,
+			(uint8*)fDMABuffer->BounceBufferAddress() + relativeOffset,
 			OriginalOffset(), length);
 	}
 }
@@ -538,8 +539,9 @@ IOOperation::_CopyPartialEnd(bool isWrite)
 
 	const iovec& lastVec = fDMABuffer->VecAt(fDMABuffer->VecCount() - 1);
 	off_t lastVecPos = fOffset + fLength - fBlockSize;
-	uint8* base = (uint8*)fDMABuffer->BounceBuffer() + ((addr_t)lastVec.iov_base
-		+ lastVec.iov_len - fBlockSize - fDMABuffer->PhysicalBounceBuffer());
+	uint8* base = (uint8*)fDMABuffer->BounceBufferAddress()
+		+ ((addr_t)lastVec.iov_base + lastVec.iov_len - fBlockSize
+		- fDMABuffer->PhysicalBounceBufferAddress());
 		// NOTE: this won't work if we don't use the bounce buffer contiguously
 		// (because of boundary alignments).
 	size_t length = OriginalOffset() + OriginalLength() - lastVecPos;

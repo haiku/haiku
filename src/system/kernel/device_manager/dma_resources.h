@@ -29,11 +29,18 @@ struct dma_restrictions {
 };
 
 
+struct DMABounceBuffer : public DoublyLinkedListLinkImpl<DMABounceBuffer> {
+	void*	address;
+	addr_t	physical_address;
+	size_t	size;
+};
+
+typedef DoublyLinkedList<DMABounceBuffer> DMABounceBufferList;
+
+
 class DMABuffer : public DoublyLinkedListLinkImpl<DMABuffer> {
 public:
-	static	DMABuffer*			Create(size_t count, void* bounceBuffer,
-									addr_t physicalBounceBuffer,
-									size_t bounceBufferSize);
+	static	DMABuffer*			Create(size_t count);
 
 			iovec*				Vecs() { return fVecs; }
 			iovec&				VecAt(size_t index) { return fVecs[index]; }
@@ -42,21 +49,27 @@ public:
 
 			void				AddVec(void* base, size_t size);
 
-			void*				BounceBuffer() const { return fBounceBuffer; }
-			addr_t				PhysicalBounceBuffer() const
-									{ return fPhysicalBounceBuffer; }
+			void				SetBounceBuffer(DMABounceBuffer* bounceBuffer)
+									{ fBounceBuffer = bounceBuffer; }
+			DMABounceBuffer*	BounceBuffer() const { return fBounceBuffer; }
+
+			void*				BounceBufferAddress() const
+									{ return fBounceBuffer
+										? fBounceBuffer->address : NULL; }
+			addr_t				PhysicalBounceBufferAddress() const
+									{ return fBounceBuffer
+										? fBounceBuffer->physical_address
+										: 0; }
 			size_t				BounceBufferSize() const
-									{ return fBounceBufferSize; }
+									{ return fBounceBuffer
+										? fBounceBuffer->size : 0; }
 
 			bool				UsesBounceBufferAt(uint32 index);
-			void				SetToBounceBuffer(size_t length);
 
 			void				Dump() const;
 
 private:
-			void*				fBounceBuffer;
-			addr_t				fPhysicalBounceBuffer;
-			size_t				fBounceBufferSize;
+			DMABounceBuffer*	fBounceBuffer;
 			uint32				fVecCount;
 			iovec				fVecs[1];
 };
@@ -71,13 +84,14 @@ public:
 								~DMAResource();
 
 			status_t			Init(const dma_restrictions& restrictions,
-									size_t blockSize, uint32 bufferCount);
+									size_t blockSize, uint32 bufferCount,
+									uint32 bounceBufferCount);
 			status_t			Init(device_node* node, size_t blockSize,
-									uint32 bufferCount);
+									uint32 bufferCount,
+									uint32 bounceBufferCount);
 
-			status_t			CreateBuffer(DMABuffer** _buffer)
-									{ return CreateBuffer(0, _buffer); }
-			status_t			CreateBuffer(size_t size, DMABuffer** _buffer);
+			status_t			CreateBuffer(DMABuffer** _buffer);
+			status_t			CreateBounceBuffer(DMABounceBuffer** _buffer);
 
 			status_t			TranslateNext(IORequest* request,
 									IOOperation* operation);
@@ -101,8 +115,10 @@ private:
 			dma_restrictions	fRestrictions;
 			size_t				fBlockSize;
 			uint32				fBufferCount;
+			uint32				fBounceBufferCount;
 			size_t				fBounceBufferSize;
 			DMABufferList		fDMABuffers;
+			DMABounceBufferList	fBounceBuffers;
 			iovec*				fScratchVecs;
 };
 

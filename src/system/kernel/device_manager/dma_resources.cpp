@@ -28,17 +28,13 @@ const size_t kMaxBounceBufferSize = 4 * B_PAGE_SIZE;
 
 
 DMABuffer*
-DMABuffer::Create(size_t count, void* bounceBuffer, addr_t physicalBounceBuffer,
-	size_t bounceBufferSize)
+DMABuffer::Create(size_t count)
 {
 	DMABuffer* buffer = (DMABuffer*)malloc(
 		sizeof(DMABuffer) + sizeof(iovec) * (count - 1));
 	if (buffer == NULL)
 		return NULL;
 
-	buffer->fBounceBuffer = bounceBuffer;
-	buffer->fPhysicalBounceBuffer = physicalBounceBuffer;
-	buffer->fBounceBufferSize = bounceBufferSize;
 	buffer->fVecCount = count;
 
 	return buffer;
@@ -61,24 +57,15 @@ DMABuffer::AddVec(void* base, size_t size)
 }
 
 
-void
-DMABuffer::SetToBounceBuffer(size_t length)
-{
-	fVecs[0].iov_base = (void*)fPhysicalBounceBuffer;
-	fVecs[0].iov_len = length;
-	fVecCount = 1;
-}
-
-
 bool
 DMABuffer::UsesBounceBufferAt(uint32 index)
 {
-	if (index >= fVecCount)
+	if (index >= fVecCount || fBounceBuffer == NULL)
 		return false;
 
-	return (addr_t)fVecs[index].iov_base >= fPhysicalBounceBuffer
+	return (addr_t)fVecs[index].iov_base >= fBounceBuffer->physical_address
 		&& (addr_t)fVecs[index].iov_base
-				< fPhysicalBounceBuffer + fBounceBufferSize;
+				< fBounceBuffer->physical_address + fBounceBuffer->size;
 }
 
 
@@ -87,9 +74,9 @@ DMABuffer::Dump() const
 {
 	kprintf("DMABuffer at %p\n", this);
 
-	kprintf("  bounce buffer:      %p (physical %#lx)\n", fBounceBuffer,
-		fPhysicalBounceBuffer);
-	kprintf("  bounce buffer size: %lu\n", fBounceBufferSize);
+	kprintf("  bounce buffer:      %p (physical %#lx)\n",
+		fBounceBuffer->address, fBounceBuffer->physical_address);
+	kprintf("  bounce buffer size: %lu\n", fBounceBuffer->size);
 	kprintf("  vecs:               %lu\n", fVecCount);
 
 	for (uint32 i = 0; i < fVecCount; i++) {
@@ -111,11 +98,14 @@ DMAResource::~DMAResource()
 {
 	mutex_destroy(&fLock);
 	free(fScratchVecs);
+
+// TODO: Delete DMABuffers and BounceBuffers!
 }
 
 
 status_t
-DMAResource::Init(device_node* node, size_t blockSize, uint32 bufferCount)
+DMAResource::Init(device_node* node, size_t blockSize, uint32 bufferCount,
+	uint32 bounceBufferCount)
 {
 	dma_restrictions restrictions;
 	memset(&restrictions, 0, sizeof(dma_restrictions));
@@ -143,17 +133,18 @@ DMAResource::Init(device_node* node, size_t blockSize, uint32 bufferCount)
 			B_DMA_MAX_SEGMENT_COUNT, &value, true) == B_OK)
 		restrictions.max_segment_count = value;
 
-	return Init(restrictions, blockSize, bufferCount);
+	return Init(restrictions, blockSize, bufferCount, bounceBufferCount);
 }
 
 
 status_t
 DMAResource::Init(const dma_restrictions& restrictions, size_t blockSize,
-	uint32 bufferCount)
+	uint32 bufferCount, uint32 bounceBufferCount)
 {
 	fRestrictions = restrictions;
 	fBlockSize = blockSize == 0 ? 1 : blockSize;
 	fBufferCount = bufferCount;
+	fBounceBufferCount = bounceBufferCount;
 	fBounceBufferSize = 0;
 
 	if (fRestrictions.high_address == 0)
@@ -188,14 +179,23 @@ DMAResource::Init(const dma_restrictions& restrictions, size_t blockSize,
 	if (fScratchVecs == NULL)
 		return B_NO_MEMORY;
 
-	// TODO: create bounce buffers in as few areas as feasible
 	for (size_t i = 0; i < fBufferCount; i++) {
 		DMABuffer* buffer;
-		status_t error = CreateBuffer(fBounceBufferSize, &buffer);
+		status_t error = CreateBuffer(&buffer);
 		if (error != B_OK)
 			return error;
 
 		fDMABuffers.Add(buffer);
+	}
+
+	// TODO: create bounce buffers in as few areas as feasible
+	for (size_t i = 0; i < fBounceBufferCount; i++) {
+		DMABounceBuffer* buffer;
+		status_t error = CreateBounceBuffer(&buffer);
+		if (error != B_OK)
+			return error;
+
+		fBounceBuffers.Add(buffer);
 	}
 
 	return B_OK;
@@ -203,48 +203,60 @@ DMAResource::Init(const dma_restrictions& restrictions, size_t blockSize,
 
 
 status_t
-DMAResource::CreateBuffer(size_t size, DMABuffer** _buffer)
+DMAResource::CreateBuffer(DMABuffer** _buffer)
+{
+	DMABuffer* buffer = DMABuffer::Create(fRestrictions.max_segment_count);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	*_buffer = buffer;
+	return B_OK;
+}
+
+
+status_t
+DMAResource::CreateBounceBuffer(DMABounceBuffer** _buffer)
 {
 	void* bounceBuffer = NULL;
 	addr_t physicalBase = 0;
 	area_id area = -1;
+	size_t size = ROUNDUP(fBounceBufferSize, B_PAGE_SIZE);
 
-	if (size != 0) {
-		if (fRestrictions.alignment > B_PAGE_SIZE)
-			dprintf("dma buffer restrictions not yet implemented: alignment %lu\n", fRestrictions.alignment);
-		if (fRestrictions.boundary > B_PAGE_SIZE)
-			dprintf("dma buffer restrictions not yet implemented: boundary %lu\n", fRestrictions.boundary);
+	if (fRestrictions.alignment > B_PAGE_SIZE)
+		dprintf("dma buffer restrictions not yet implemented: alignment %lu\n", fRestrictions.alignment);
+	if (fRestrictions.boundary > B_PAGE_SIZE)
+		dprintf("dma buffer restrictions not yet implemented: boundary %lu\n", fRestrictions.boundary);
 
-		size = ROUNDUP(size, B_PAGE_SIZE);
-
-		bounceBuffer = (void*)fRestrictions.low_address;
+	bounceBuffer = (void*)fRestrictions.low_address;
 // TODO: We also need to enforce the boundary restrictions.
-		area = create_area("dma buffer", &bounceBuffer, B_PHYSICAL_BASE_ADDRESS,
-			size, B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if (area < B_OK)
-			return area;
+	area = create_area("dma buffer", &bounceBuffer, B_PHYSICAL_BASE_ADDRESS,
+		size, B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < B_OK)
+		return area;
 
-		physical_entry entry;
-		if (get_memory_map(bounceBuffer, size, &entry, 1) != B_OK) {
-			panic("get_memory_map() failed.");
-			delete_area(area);
-			return B_ERROR;
-		}
-
-		physicalBase = (addr_t)entry.address;
-
-		if (fRestrictions.high_address < physicalBase + size) {
-			delete_area(area);
-			return B_NO_MEMORY;
-		}
+	physical_entry entry;
+	if (get_memory_map(bounceBuffer, size, &entry, 1) != B_OK) {
+		panic("get_memory_map() failed.");
+		delete_area(area);
+		return B_ERROR;
 	}
 
-	DMABuffer* buffer = DMABuffer::Create(fRestrictions.max_segment_count,
-		bounceBuffer, physicalBase, fBounceBufferSize);
+	physicalBase = (addr_t)entry.address;
+
+	if (fRestrictions.high_address < physicalBase + size) {
+		delete_area(area);
+		return B_NO_MEMORY;
+	}
+
+	DMABounceBuffer* buffer = new(std::nothrow) DMABounceBuffer;
 	if (buffer == NULL) {
 		delete_area(area);
 		return B_NO_MEMORY;
 	}
+
+	buffer->address = bounceBuffer;
+	buffer->physical_address = physicalBase;
+	buffer->size = size;
 
 	*_buffer = buffer;
 	return B_OK;
@@ -458,8 +470,18 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 
 	// check alignment, boundaries, etc. and set vecs in DMA buffer
 
+	// Fetch a bounce buffer we can use for the DMABuffer.
+	// TODO: We should do that lazily when needed!
+	DMABounceBuffer* bounceBuffer = NULL;
+	if (_NeedsBoundsBuffers()) {
+		bounceBuffer = fBounceBuffers.Head();
+		if (bounceBuffer == NULL)
+			return B_BUSY;
+	}
+	dmaBuffer->SetBounceBuffer(bounceBuffer);
+
 	size_t dmaLength = 0;
-	addr_t physicalBounceBuffer = dmaBuffer->PhysicalBounceBuffer();
+	addr_t physicalBounceBuffer = dmaBuffer->PhysicalBounceBufferAddress();
 	size_t bounceLeft = fBounceBufferSize;
 	size_t transferLeft = totalLength;
 
@@ -593,9 +615,11 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 		// entirely.
 		if (diff == 0 && offset + dmaLength > requestEnd) {
 			const iovec& dmaVec = dmaBuffer->VecAt(dmaBuffer->VecCount() - 1);
-			ASSERT((addr_t)dmaVec.iov_base >= dmaBuffer->PhysicalBounceBuffer()
+			ASSERT((addr_t)dmaVec.iov_base
+					>= dmaBuffer->PhysicalBounceBufferAddress()
 				&& (addr_t)dmaVec.iov_base
-					< dmaBuffer->PhysicalBounceBuffer() + fBounceBufferSize);
+					< dmaBuffer->PhysicalBounceBufferAddress()
+						+ fBounceBufferSize);
 				// We can be certain that the last vec is a bounce buffer vec,
 				// since otherwise the DMA buffer couldn't exceed the end of the
 				// request data.
@@ -647,7 +671,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 				// and hit the max segment count. In this case we just use the
 				// bounce buffer for as much as possible of the total length.
 				dmaBuffer->SetVecCount(0);
-				addr_t base = dmaBuffer->PhysicalBounceBuffer();
+				addr_t base = dmaBuffer->PhysicalBounceBufferAddress();
 				dmaLength = min_c(totalLength, fBounceBufferSize)
 					& ~(max_c(fBlockSize, fRestrictions.alignment) - 1);
 				_RestrictBoundaryAndSegmentSize(base, dmaLength);
@@ -676,7 +700,14 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 		min_c(offset + dmaLength, requestEnd) - originalOffset);
 	operation->SetRange(offset, dmaLength);
 	operation->SetPartial(partialBegin != 0, offset + dmaLength > requestEnd);
+
+	// If we don't need the bounce buffer, we put it back, otherwise
 	operation->SetUsesBounceBuffer(bounceLeft < fBounceBufferSize);
+	if (operation->UsesBounceBuffer())
+		fBounceBuffers.RemoveHead();
+	else
+		dmaBuffer->SetBounceBuffer(NULL);
+
 
 	status_t error = operation->Prepare(request);
 	if (error != B_OK)
@@ -696,6 +727,10 @@ DMAResource::RecycleBuffer(DMABuffer* buffer)
 
 	MutexLocker _(fLock);
 	fDMABuffers.Add(buffer);
+	if (buffer->BounceBuffer() != NULL) {
+		fBounceBuffers.Add(buffer->BounceBuffer());
+		buffer->SetBounceBuffer(NULL);
+	}
 }
 
 
