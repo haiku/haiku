@@ -294,6 +294,30 @@ arch_debug_get_interrupt_pc()
 }
 
 
+bool
+arch_is_debug_variable_defined(const char* variableName)
+{
+	// TODO: Implement!
+	return false;
+}
+
+
+status_t
+arch_set_debug_variable(const char* variableName, uint64 value)
+{
+	// TODO: Implement!
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+arch_get_debug_variable(const char* variableName, uint64* value)
+{
+	// TODO: Implement!
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 status_t
 arch_debug_init(kernel_args *args)
 {

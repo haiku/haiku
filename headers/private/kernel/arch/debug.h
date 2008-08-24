@@ -28,6 +28,10 @@ bool arch_debug_contains_call(struct thread *thread, const char *symbol,
 		addr_t start, addr_t end);
 void arch_debug_save_registers(int *);
 
+bool arch_is_debug_variable_defined(const char* variableName);
+status_t arch_set_debug_variable(const char* variableName, uint64 value);
+status_t arch_get_debug_variable(const char* variableName, uint64* value);
+
 #ifdef __cplusplus
 }
 #endif

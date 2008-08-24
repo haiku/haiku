@@ -9,6 +9,7 @@
 
 #include <KernelExport.h>
 
+#include <arch/debug.h>
 #include <debug.h>
 #include <util/DoublyLinkedList.h>
 
@@ -16,7 +17,9 @@
 static const int kVariableCount				= 64;
 static const int kTemporaryVariableCount	= 32;
 static const char kTemporaryVariablePrefix	= '_';
-static const char* const kCommandReturnValueVariable	= "_";
+static const char kArchSpecificVariablePrefix = '$';
+static const char* const kCommandReturnValueVariable = "_";
+
 
 struct Variable {
 	char	name[MAX_DEBUG_VARIABLE_NAME_LEN];
@@ -57,6 +60,13 @@ static inline bool
 is_temporary_variable(const char* variableName)
 {
 	return variableName[0] == kTemporaryVariablePrefix;
+}
+
+
+static inline bool
+is_arch_specific_variable(const char* variableName)
+{
+	return variableName[0] == kArchSpecificVariablePrefix;
 }
 
 
@@ -117,7 +127,7 @@ get_variable(const char* variableName, bool create)
 		// temporary variable
 		for (int i = 0; i < kTemporaryVariableCount; i++) {
 			TemporaryVariable* variable = sTemporaryVariables + i;
-	
+
 			if (!variable->IsUsed()) {
 				if (freeSlot == NULL)
 					freeSlot = variable;
@@ -131,7 +141,7 @@ get_variable(const char* variableName, bool create)
 		// persistent variable
 		for (int i = 0; i < kVariableCount; i++) {
 			Variable* variable = sVariables + i;
-	
+
 			if (!variable->IsUsed()) {
 				if (freeSlot == NULL)
 					freeSlot = variable;
@@ -226,13 +236,20 @@ cmd_variables(int argc, char **argv)
 bool
 is_debug_variable_defined(const char* variableName)
 {
-	return get_variable(variableName, false) != NULL;
+	if (get_variable(variableName, false) != NULL)
+		return true;
+
+	return is_arch_specific_variable(variableName)
+		&& arch_is_debug_variable_defined(variableName + 1);
 }
 
 
 bool
 set_debug_variable(const char* variableName, uint64 value)
 {
+	if (is_arch_specific_variable(variableName))
+		return arch_set_debug_variable(variableName + 1, value) == B_OK;
+
 	if (Variable* variable = get_variable(variableName, true)) {
 		variable->value = value;
 		touch_variable(variable);
@@ -249,6 +266,12 @@ get_debug_variable(const char* variableName, uint64 defaultValue)
 	if (Variable* variable = get_variable(variableName, false)) {
 		touch_variable(variable);
 		return variable->value;
+	}
+
+	uint64 value;
+	if (is_arch_specific_variable(variableName)
+		&& arch_get_debug_variable(variableName + 1, &value) == B_OK) {
+		return value;
 	}
 
 	return defaultValue;

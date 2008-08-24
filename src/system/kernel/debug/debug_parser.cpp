@@ -278,9 +278,11 @@ public:
 				TOKEN_CONSTANT);
 			fCurrentToken.value = strtoull(fCurrentToken.string, NULL, 0);
 
-		} else if (isalpha(*fCurrentChar) || *fCurrentChar == '_') {
+		} else if (isalpha(*fCurrentChar) || *fCurrentChar == '_'
+				|| *fCurrentChar == '$') {
 			// identifier
 			const char* begin = fCurrentChar;
+			fCurrentChar++;
 			while (*fCurrentChar != 0
 				&& (isalpha(*fCurrentChar) || *fCurrentChar == '_'
 					|| isdigit(*fCurrentChar))) {

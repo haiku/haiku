@@ -271,6 +271,88 @@ get_previous_iframe(struct thread* thread, struct iframe* frame)
 }
 
 
+static struct iframe*
+get_current_iframe(struct thread* thread)
+{
+	if (thread == thread_get_current_thread())
+		return i386_get_current_iframe();
+
+	addr_t ebp = thread->arch_info.current_stack.esp[2];
+		// NOTE: This doesn't work, if the thread is running (on another CPU).
+	return find_previous_iframe(thread, ebp);
+}
+
+
+uint32*
+find_debug_variable(const char* variableName, bool& settable)
+{
+	struct iframe* frame = get_current_iframe(debug_get_debugged_thread());
+	if (frame == NULL)
+		return NULL;
+
+	settable = false;
+
+	if (strcmp(variableName, "gs") == 0) {
+		return &frame->gs;
+	} else if (strcmp(variableName, "fs") == 0) {
+		return &frame->fs;
+	} else if (strcmp(variableName, "es") == 0) {
+		return &frame->es;
+	} else if (strcmp(variableName, "ds") == 0) {
+		return &frame->ds;
+	} else if (strcmp(variableName, "cs") == 0) {
+		return &frame->cs;
+	} else if (strcmp(variableName, "edi") == 0) {
+		settable = true;
+		return &frame->edi;
+	} else if (strcmp(variableName, "esi") == 0) {
+		settable = true;
+		return &frame->esi;
+	} else if (strcmp(variableName, "ebp") == 0) {
+		settable = true;
+		return &frame->ebp;
+	} else if (strcmp(variableName, "esp") == 0) {
+		settable = true;
+		return &frame->esp;
+	} else if (strcmp(variableName, "ebx") == 0) {
+		settable = true;
+		return &frame->ebx;
+	} else if (strcmp(variableName, "edx") == 0) {
+		settable = true;
+		return &frame->edx;
+	} else if (strcmp(variableName, "ecx") == 0) {
+		settable = true;
+		return &frame->ecx;
+	} else if (strcmp(variableName, "eax") == 0) {
+		settable = true;
+		return &frame->eax;
+	} else if (strcmp(variableName, "orig_eax") == 0) {
+		settable = true;
+		return &frame->orig_eax;
+	} else if (strcmp(variableName, "orig_edx") == 0) {
+		settable = true;
+		return &frame->orig_edx;
+	} else if (strcmp(variableName, "eip") == 0) {
+		settable = true;
+		return &frame->eip;
+	} else if (strcmp(variableName, "eflags") == 0) {
+		settable = true;
+		return &frame->flags;
+	}
+
+	if (IFRAME_IS_USER(frame)) {
+		if (strcmp(variableName, "user_esp") == 0) {
+			settable = true;
+			return &frame->user_esp;
+		} else if (strcmp(variableName, "user_ss") == 0) {
+			return &frame->user_ss;
+		}
+	}
+
+	return NULL;
+}
+
+
 static int
 stack_trace(int argc, char **argv)
 {
@@ -703,27 +785,56 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	return count;
 }
 
-/*!	Returns the program counter of this thread where the innermost interrupts
-	happened. Returns \c NULL, if there's none or a problem occurred retrieving
-	it.
+
+/*!	Returns the program counter of the currently debugged (respectively this)
+	thread where the innermost interrupts happened. Returns \c NULL, if there's
+	none or a problem occurred retrieving it.
 */
 void*
 arch_debug_get_interrupt_pc()
 {
-	struct thread* thread = debug_get_debugged_thread();
+	struct iframe* frame = get_current_iframe(debug_get_debugged_thread());
+	if (frame == NULL)
+		return NULL;
 
-	if (thread == thread_get_current_thread()) {
-		struct iframe* frame = i386_get_current_iframe();
-		if (frame == NULL)
-			return NULL;
-
-		return (void*)(addr_t)frame->eip;
-	}
-
-	addr_t ebp = thread->arch_info.current_stack.esp[2];
-		// NOTE: This doesn't work, if the thread is running (on another CPU).
-	struct iframe* frame = find_previous_iframe(thread, ebp);
 	return (void*)(addr_t)frame->eip;
+}
+
+
+bool
+arch_is_debug_variable_defined(const char* variableName)
+{
+	bool settable;
+	return find_debug_variable(variableName, settable);
+}
+
+
+status_t
+arch_set_debug_variable(const char* variableName, uint64 value)
+{
+	bool settable;
+	uint32* variable = find_debug_variable(variableName, settable);
+	if (variable == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	if (!settable)
+		return B_NOT_ALLOWED;
+
+	*variable = (uint32)value;
+	return B_OK;
+}
+
+
+status_t
+arch_get_debug_variable(const char* variableName, uint64* value)
+{
+	bool settable;
+	uint32* variable = find_debug_variable(variableName, settable);
+	if (variable == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	*value = *variable;
+	return B_OK;
 }
 
 
