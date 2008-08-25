@@ -492,7 +492,8 @@ VMAnonymousCache::~VMAnonymousCache()
 	}
 
 	swap_space_unreserve(fCommittedSwapSize);
-	vm_unreserve_memory(committed_size);
+	if (committed_size > fCommittedSwapSize)
+		vm_unreserve_memory(committed_size - fCommittedSwapSize);
 }
 
 
@@ -911,13 +912,16 @@ VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 		swap_hash_key key = { this, pageIndex };
 
 		swap_block *swap = sSwapHashTable.Lookup(key);
-		if (swap == NULL) {
+		while (swap == NULL) {
 			swap = (swap_block *)object_cache_alloc(sSwapBlockCache,
-					CACHE_DONT_SLEEP);
+				CACHE_DONT_SLEEP);
 			if (swap == NULL) {
-				// TODO: wait until memory can be allocated
+				// Wait a short time until memory is available again.
 				mutex_unlock(&sSwapHashLock);
-				return;
+				snooze(10000);
+				mutex_lock(&sSwapHashLock);
+				swap = sSwapHashTable.Lookup(key);
+				continue;
 			}
 
 			swap->key.cache = this;
