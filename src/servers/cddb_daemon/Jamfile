@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src servers cddb_daemon ;
 
+UsePrivateHeaders drivers ;
+
 Server cddb_daemon :
 	cddb_daemon.cpp
 	: be

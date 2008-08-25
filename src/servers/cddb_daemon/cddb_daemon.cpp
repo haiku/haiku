@@ -13,9 +13,11 @@
 #include <Volume.h>
 
 #include <fs_info.h>
+#include <stdlib.h>
 
 
 static const char* kCddaFsName = "cdda";
+static const int kMaxTocSize = 1024;
 
 
 CDDBDaemon::CDDBDaemon()
@@ -26,11 +28,16 @@ CDDBDaemon::CDDBDaemon()
 	
 	BVolume volume;
 	while (fVolumeRoster->GetNextVolume(&volume) == B_OK) {
+		scsi_toc_toc* toc = (scsi_toc_toc *)malloc(kMaxTocSize);
+		if (toc == NULL)
+			continue;
+
 		uint32 cddbId;
-		if (CanLookup(volume.Device(), &cddbId)) {
+		if (CanLookup(volume.Device(), &cddbId, toc)) {
 			printf("CD can be looked up. CDDB id = %lu.\n", cddbId);
 			// TODO(bga): Implement and enable CDDB database lookup.
 		}
+		free(toc);
 	}
 }
 
@@ -52,12 +59,19 @@ CDDBDaemon::MessageReceived(BMessage* message)
 				if (opcode == B_DEVICE_MOUNTED) {
 					dev_t device;
 					if (message->FindInt32("new device", &device) == B_OK) {
+						scsi_toc_toc* toc =
+							(scsi_toc_toc *)malloc(kMaxTocSize);
+						if (toc == NULL)
+							break;
+							
 						uint32 cddbId;
-						if (CanLookup(device, &cddbId)) {
+						if (CanLookup(device, &cddbId, toc)) {
 							printf("CD can be looked up. CDDB id = %lu.\n",
 								cddbId);
-							// TODO(bga): Implement and enable CDDB database lookup.
+							// TODO(bga): Implement and enable CDDB
+							// database lookup.
 						}
+						free(toc);
 					}
 				}		
 			}
@@ -69,16 +83,20 @@ CDDBDaemon::MessageReceived(BMessage* message)
 
 
 bool
-CDDBDaemon::CanLookup(const dev_t device, uint32* cddbId) const
+CDDBDaemon::CanLookup(const dev_t _device, uint32* _cddbId,
+	scsi_toc_toc* _toc) const
 {
+	if (_cddbId == NULL || _toc == NULL)
+		return false;
+
 	// Is it an Audio disk?
 	fs_info info;
-	fs_stat_dev(device, &info);
+	fs_stat_dev(_device, &info);
 	if (strncmp(info.fsh_name, kCddaFsName, strlen(kCddaFsName)) != 0)
 		return false;
 	
 	// Does it have the CD:do_lookup attribute and is it true?
-	BVolume volume(device);
+	BVolume volume(_device);
 	BDirectory directory;
 	volume.GetRootDirectory(&directory);
 
@@ -88,10 +106,15 @@ CDDBDaemon::CanLookup(const dev_t device, uint32* cddbId) const
 		return false;
 	
 	// Does it have the CD:cddbid attribute?
-	if (directory.ReadAttr("CD:cddbid", B_UINT32_TYPE, 0, (void *)cddbId,
+	if (directory.ReadAttr("CD:cddbid", B_UINT32_TYPE, 0, (void *)_cddbId,
 		sizeof(uint32)) < B_OK)
 		return false;		
 
+	// Does it have the CD:toc attribute?
+	if (directory.ReadAttr("CD:toc", B_RAW_TYPE, 0, (void *)_toc,
+		kMaxTocSize) < B_OK)
+		return false;
+	
 	return true;
 }
 

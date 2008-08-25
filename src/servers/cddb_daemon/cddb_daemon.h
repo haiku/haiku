@@ -9,6 +9,8 @@
 #include <Message.h>
 #include <VolumeRoster.h>
 
+#include <scsi_cmds.h>
+
 class CDDBDaemon : public BApplication
 {
 public:
@@ -18,7 +20,8 @@ public:
 	virtual void MessageReceived(BMessage* message);
 
 private:
-	bool CanLookup(const dev_t device, uint32* cddbId) const;
+	bool CanLookup(const dev_t _device, uint32* _cddbId,
+		scsi_toc_toc* _toc) const;
 
 	BVolumeRoster* fVolumeRoster;
 };
