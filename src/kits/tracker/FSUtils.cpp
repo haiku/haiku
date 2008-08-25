@@ -3437,8 +3437,8 @@ WellKnowEntryList::WellKnowEntryList()
 	
 	AddOne((directory_which)B_USER_PEOPLE_DIRECTORY, B_USER_DIRECTORY, "people", "people");
 	
-	AddOne((directory_which)B_USER_DOWNLOADS_DIRECTORY, B_USER_DIRECTORY, "Downloads",
-		"Downloads");
+	AddOne((directory_which)B_USER_DOWNLOADS_DIRECTORY, B_USER_DIRECTORY, "downloads",
+		"downloads");
 }
 
 WellKnowEntryList *WellKnowEntryList::self = NULL;
