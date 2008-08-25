@@ -633,11 +633,7 @@ Inode::_RemoveSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 
 	nodeGetter.MakeWritable(transaction);
 
-	// TODO(bga): It seems that the first item in the small data section is not
-	// a nomela attribute (for example, it does not have a name). We take this
-	// into account and decrement index before passing it along. Although this
-	// fix one bug, it may be as well just masking out a different bug. 
-	status_t status = _RemoveSmallData(node, item, index - 1);
+	status_t status = _RemoveSmallData(node, item, index);
 	if (status == B_OK)
 		status = WriteBack(transaction);
 
@@ -2680,8 +2676,11 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 void
 AttributeIterator::Update(uint16 index, int8 change)
 {
-	// fCurrentSmallData points already to the next item
-	if (index < fCurrentSmallData)
+	// fCurrentSmallData points already to the next item. OTOH, index is always
+	// the position when considering the special name attribute while the
+	// attribute iterators do ignore that (they always start at the second
+	// position in the small data section, not the first).
+	if (index <= fCurrentSmallData)
 		fCurrentSmallData += change;
 }
 
