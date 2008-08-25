@@ -54,14 +54,17 @@ class ShapePainter : public BShapeIterator {
 		stack<BPoint> fPtStack;
 };
 
+
 ShapePainter::ShapePainter()
 	:	BShapeIterator()
 {
 }
 
+
 ShapePainter::~ShapePainter()
 {
 }
+
 
 status_t
 ShapePainter::Iterate(const BShape *shape)
@@ -69,6 +72,7 @@ ShapePainter::Iterate(const BShape *shape)
 	// this class doesn't modify the shape data
 	return BShapeIterator::Iterate(const_cast<BShape *>(shape));
 }
+
 
 status_t
 ShapePainter::IterateMoveTo(BPoint *point)
@@ -79,26 +83,29 @@ ShapePainter::IterateMoveTo(BPoint *point)
 	return B_OK;
 }
 
+
 status_t
 ShapePainter::IterateLineTo(int32 lineCount, BPoint *linePts)
 {
 	fOpStack.push(OP_LINETO | lineCount);
-	for(int32 i = 0;i < lineCount;i++)
+	for (int32 i = 0; i < lineCount; i++)
 		fPtStack.push(linePts[i]);
 	
 	return B_OK;
 }
+
 
 status_t
 ShapePainter::IterateBezierTo(int32 bezierCount, BPoint *bezierPts)
 {
 	bezierCount *= 3;
 	fOpStack.push(OP_BEZIERTO | bezierCount);
-	for(int32 i = 0;i < bezierCount;i++)
+	for (int32 i = 0; i < bezierCount; i++)
 		fPtStack.push(bezierPts[i]);
 
 	return B_OK;
 }
+
 
 status_t
 ShapePainter::IterateClose(void)
@@ -108,27 +115,32 @@ ShapePainter::IterateClose(void)
 	return B_OK;
 }
 
+
 void
 ShapePainter::Draw(View *view, BRect frame, bool filled)
 {
 	// We're going to draw the currently iterated shape.
-	int32 opCount, ptCount;
-	opCount = fOpStack.size();
-	ptCount = fPtStack.size();
+	int32 opCount = fOpStack.size();
+	int32 ptCount = fPtStack.size();
 
-	uint32 *opList;
-	BPoint *ptList;
-	if(opCount > 0 && ptCount > 0) {
+	if (opCount > 0 && ptCount > 0) {
 		int32 i;
-		opList = new uint32[opCount];
-		ptList = new BPoint[ptCount];
+		uint32 *opList = new (std::nothrow) uint32[opCount];
+		if (opList == NULL)
+			return;	
+			
+		BPoint *ptList = new (std::nothrow) BPoint[ptCount];
+		if (ptList == NULL) {
+			delete[] opList;
+			return;
+		}
 
-		for(i = (opCount - 1);i >= 0;i--) {
+		for (i = (opCount - 1); i >= 0; i--) {
 			opList[i] = fOpStack.top();
 			fOpStack.pop();
 		}
 
-		for(i = (ptCount - 1);i >= 0;i--) {
+		for (i = (ptCount - 1); i >= 0; i--) {
 			ptList[i] = fPtStack.top();
 			fPtStack.pop();
 			view->ConvertToScreenForDrawing(&ptList[i]);
@@ -136,6 +148,9 @@ ShapePainter::Draw(View *view, BRect frame, bool filled)
 
 		view->Window()->GetDrawingEngine()->DrawShape(frame, opCount, opList, ptCount, ptList,
 				filled);
+
+		delete[] opList;
+		delete[] ptList;
 	}
 }
 
