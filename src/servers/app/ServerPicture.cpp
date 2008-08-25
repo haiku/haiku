@@ -490,7 +490,7 @@ pop_state(View *view)
 	BPoint p(0, 0);
 	view->ConvertToScreenForDrawing(&p);
 	view->Window()->GetDrawingEngine()->SetDrawState(
-		view->CurrentState(), p.x, p.y);
+		view->CurrentState(), (int32)p.x, (int32)p.y);
 }
 
 
