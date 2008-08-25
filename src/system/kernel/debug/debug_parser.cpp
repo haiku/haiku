@@ -23,15 +23,17 @@
 
 	commandLine	:= commandPipe | ( "(" expression ")" )
 	expression	:= term | assignment
-	assignment	:= variable ( "=" | "+=" | "-=" | "*=" | "/=" | "%=" )
+	assignment	:= lhs ( "=" | "+=" | "-=" | "*=" | "/=" | "%=" )
 				   expression
+	lhs			:= variable | dereference
 	term		:= sum
 	sum			:= product ( ( "+" | "-" ) product )*
 	product		:= unary ( ( "*" | "/" | "%" ) unary )*
-	unary		:= atom | ( ( "-" | "*" [ "{" expression "}" ] ) unary )
+	unary		:= atom | ( "-"  unary ) | dereference
+	dereference	:= "*" [ "{" expression "}" ] unary
 	atom		:= variable | ( "(" expression ")" ) | ( "[" command "]" )
 	variable	:= identifier
-	identifier	:= ( "_" | "a" - "z" | "A" - "Z" )
+	identifier	:= ( "$" | "_" | "a" - "z" | "A" - "Z" )
 				   ( "_" | "a" - "z" | "A" - "Z" | "0" - "9" )*
 	commandPipe	:= command ( "|" command )*
 	command		:= identifier argument*
@@ -479,7 +481,7 @@ class ExpressionParser {
 									size_t bufferSize);
 
  private:
-			uint64				_ParseExpression();
+			uint64				_ParseExpression(bool expectAssignment = false);
 			uint64				_ParseCommandPipe(int& returnCode);
 			void				_ParseCommand(
 									debugger_command_pipe_segment& segment);
@@ -487,10 +489,12 @@ class ExpressionParser {
 			void				_GetUnparsedArgument(int& argc, char** argv);
 			void				_AddArgument(int& argc, char** argv,
 									const char* argument, int32 length = -1);
-			uint64				_ParseSum();
+			uint64				_ParseSum(bool useValue, uint64 value);
 			uint64				_ParseProduct();
 			uint64				_ParsePower();
 			uint64				_ParseUnary();
+			uint64				_ParseDereference(void** _address,
+									uint32* _size);
 			uint64				_ParseAtom();
 
 			const Token&		_EatToken(int32 type);
@@ -525,28 +529,36 @@ ExpressionParser::EvaluateExpression(const char* expressionString)
 
 
 uint64
-ExpressionParser::EvaluateCommand(const char* expressionString,
-	int& returnCode)
+ExpressionParser::EvaluateCommand(const char* expressionString, int& returnCode)
 {
 	fTokenizer.SetTo(expressionString);
 
-	// Allowed is not only a command, but also an assignment. Either starts with
-	// an identifier.
-	_EatToken(TOKEN_IDENTIFIER);
-
-	uint64 value;
+	// Allowed are command or assignment. A command always starts with an
+	// identifier, an assignment either with an identifier (variable name) or
+	// a dereferenced address.
 	const Token& token = fTokenizer.NextToken();
-	if (token.type & TOKEN_ASSIGN_FLAG) {
-		// an assignment
+	uint64 value = 0;
+
+	if (token.type == TOKEN_IDENTIFIER) {
+		fTokenizer.NextToken();
+		if (token.type & TOKEN_ASSIGN_FLAG) {
+			// an assignment
+			fTokenizer.SetTo(expressionString);
+			value =  _ParseExpression(true);
+			returnCode = 0;
+		} else {
+			// no assignment, so let's assume it's a command
+			fTokenizer.SetTo(expressionString);
+			fTokenizer.SetCommandMode(true);
+			value = _ParseCommandPipe(returnCode);
+		}
+	} else if (token.type == TOKEN_STAR) {
+		// dereferenced address -- assignment
 		fTokenizer.SetTo(expressionString);
-		value =  _ParseExpression();
+		value =  _ParseExpression(true);
 		returnCode = 0;
-	} else {
-		// no assignment, so let's assume it's a command
-		fTokenizer.SetTo(expressionString);
-		fTokenizer.SetCommandMode(true);
-		value = _ParseCommandPipe(returnCode);
-	}
+	} else
+		parse_exception("expected command or assignment", 0);
 
 	if (token.type != TOKEN_END_OF_LINE)
 		parse_exception("parse error", token.position);
@@ -585,7 +597,7 @@ ExpressionParser::ParseNextCommandArgument(const char** expressionString,
 
 
 uint64
-ExpressionParser::_ParseExpression()
+ExpressionParser::_ParseExpression(bool expectAssignment)
 {
 	const Token& token = fTokenizer.NextToken();
 	int32 position = token.position;
@@ -646,18 +658,92 @@ ExpressionParser::_ParseExpression()
 					variableValue %= rhs;
 					break;
 				default:
-					fTokenizer.SetPosition(position);
-					return _ParseSum();
+					parse_exception("internal error: unknown assignment token",
+						position);
+					break;
 			}
 
 			set_debug_variable(variable, variableValue);
 			return variableValue;
 		}
+	} else if (token.type == TOKEN_STAR) {
+		void* address;
+		uint32 size;
+		uint64 value = _ParseDereference(&address, &size);
+
+		int32 assignmentType = fTokenizer.NextToken().type;
+		if (assignmentType & TOKEN_ASSIGN_FLAG) {
+			// an assignment
+			uint64 rhs = _ParseExpression();
+
+			// check for division by zero for the respective assignment types
+			if ((assignmentType == TOKEN_SLASH_ASSIGN
+					|| assignmentType == TOKEN_MODULO_ASSIGN)
+				&& rhs == 0) {
+				parse_exception("division by zero", position);
+			}
+
+			// compute the new value
+			switch (assignmentType) {
+				case TOKEN_ASSIGN:
+					value = rhs;
+					break;
+				case TOKEN_PLUS_ASSIGN:
+					value += rhs;
+					break;
+				case TOKEN_MINUS_ASSIGN:
+					value -= rhs;
+					break;
+				case TOKEN_STAR_ASSIGN:
+					value *= rhs;
+					break;
+				case TOKEN_SLASH_ASSIGN:
+					value /= rhs;
+					break;
+				case TOKEN_MODULO_ASSIGN:
+					value %= rhs;
+					break;
+				default:
+					parse_exception("internal error: unknown assignment token",
+						position);
+					break;
+			}
+
+			// convert the value for writing to the address
+			uint64 buffer = 0;
+			switch (size) {
+				case 1:
+					*(uint8*)&buffer = value;
+					break;
+				case 2:
+					*(uint16*)&buffer = value;
+					break;
+				case 4:
+					*(uint32*)&buffer = value;
+					break;
+				case 8:
+					value = buffer;
+					break;
+			}
+
+			if (user_memcpy(address, &buffer, size) != B_OK) {
+				snprintf(sTempBuffer, sizeof(sTempBuffer),
+					"failed to write to address %p", address);
+				parse_exception(sTempBuffer, position);
+			}
+
+			return value;
+		}
+	}
+
+	if (expectAssignment) {
+		parse_exception("expected assignment",
+			fTokenizer.CurrentToken().position);
 	}
 
 	// no assignment -- reset to the identifier position and parse a sum
 	fTokenizer.SetPosition(position);
-	return _ParseSum();
+	return _ParseSum(false, 0);
 }
 
 
@@ -877,9 +963,10 @@ ExpressionParser::_AddArgument(int& argc, char** argv, const char* argument,
 
 
 uint64
-ExpressionParser::_ParseSum()
+ExpressionParser::_ParseSum(bool useValue, uint64 value)
 {
-	uint64 value = _ParseProduct();
+	if (!useValue)
+		value = _ParseProduct();
 
 	while (true) {
 		const Token& token = fTokenizer.NextToken();
@@ -941,54 +1028,7 @@ ExpressionParser::_ParseUnary()
 			return -_ParseUnary();
 
 		case TOKEN_STAR:
-		{
-			int32 starPosition = fTokenizer.CurrentToken().position;
-
-			// optional "{ ... }" specifying the size to read
-			uint64 size = 4;
-			if (fTokenizer.NextToken().type == TOKEN_OPENING_BRACE) {
-				int32 position = fTokenizer.CurrentToken().position;
-				size = _ParseExpression();
-
-				if (size != 1 && size != 2 && size != 4 && size != 8) {
-					snprintf(sTempBuffer, sizeof(sTempBuffer),
-						"invalid size (%llu) for unary * operator", size);
-					parse_exception(sTempBuffer, position);
-				}
-
-				_EatToken(TOKEN_CLOSING_BRACE);
-			} else
-				fTokenizer.RewindToken();
-
-			const void* address = (const void*)(addr_t)_ParseUnary();
-
-			// read bytes from address into a tempory buffer
-			uint64 buffer;
-			if (user_memcpy(&buffer, address, size) != B_OK) {
-				snprintf(sTempBuffer, sizeof(sTempBuffer),
-					"failed to dereference address %p", address);
-				parse_exception(sTempBuffer, starPosition);
-			}
-
-			// convert the value to uint64
-			uint64 value = 0;
-			switch (size) {
-				case 1:
-					value = *(uint8*)&buffer;
-					break;
-				case 2:
-					value = *(uint16*)&buffer;
-					break;
-				case 4:
-					value = *(uint32*)&buffer;
-					break;
-				case 8:
-					value = buffer;
-					break;
-			}
-
-			return value;
-		}
+			return _ParseDereference(NULL, NULL);
 
 		default:
 			fTokenizer.RewindToken();
@@ -996,6 +1036,63 @@ ExpressionParser::_ParseUnary()
 	}
 
 	return 0;
+}
+
+
+uint64
+ExpressionParser::_ParseDereference(void** _address, uint32* _size)
+{
+	int32 starPosition = fTokenizer.CurrentToken().position;
+
+	// optional "{ ... }" specifying the size to read
+	uint64 size = 4;
+	if (fTokenizer.NextToken().type == TOKEN_OPENING_BRACE) {
+		int32 position = fTokenizer.CurrentToken().position;
+		size = _ParseExpression();
+
+		if (size != 1 && size != 2 && size != 4 && size != 8) {
+			snprintf(sTempBuffer, sizeof(sTempBuffer),
+				"invalid size (%llu) for unary * operator", size);
+			parse_exception(sTempBuffer, position);
+		}
+
+		_EatToken(TOKEN_CLOSING_BRACE);
+	} else
+		fTokenizer.RewindToken();
+
+	const void* address = (const void*)(addr_t)_ParseUnary();
+
+	// read bytes from address into a tempory buffer
+	uint64 buffer;
+	if (user_memcpy(&buffer, address, size) != B_OK) {
+		snprintf(sTempBuffer, sizeof(sTempBuffer),
+			"failed to dereference address %p", address);
+		parse_exception(sTempBuffer, starPosition);
+	}
+
+	// convert the value to uint64
+	uint64 value = 0;
+	switch (size) {
+		case 1:
+			value = *(uint8*)&buffer;
+			break;
+		case 2:
+			value = *(uint16*)&buffer;
+			break;
+		case 4:
+			value = *(uint32*)&buffer;
+			break;
+		case 8:
+			value = buffer;
+			break;
+	}
+
+	if (_address != NULL)
+		*_address = (void*)address;
+	if (_size != NULL)
+		*_size = size;
+
+	return value;
 }
 
 
