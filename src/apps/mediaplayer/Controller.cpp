@@ -81,33 +81,33 @@ void Controller::Listener::MutedChanged(bool) {}
 
 
 Controller::Controller()
- :	NodeManager()
- ,	fVideoView(NULL)
- ,	fVolume(1.0)
- ,	fMuted(false)
+ :	NodeManager(),
+ 	fVideoView(NULL),
+ 	fVolume(1.0),
+ 	fMuted(false),
 
- ,	fRef()
- ,	fMediaFile(NULL)
+	fRef(),
+	fMediaFile(NULL),
 
- ,	fVideoSupplier(new ProxyVideoSupplier())
- ,	fAudioSupplier(new ProxyAudioSupplier(this))
- ,	fVideoTrackSupplier(NULL)
- ,	fAudioTrackSupplier(NULL)
+	fVideoSupplier(new ProxyVideoSupplier()),
+	fAudioSupplier(new ProxyAudioSupplier(this)),
+	fVideoTrackSupplier(NULL),
+	fAudioTrackSupplier(NULL),
 
- ,	fAudioTrackList(4)
- ,	fVideoTrackList(2)
+	fAudioTrackList(4),
+	fVideoTrackList(2),
 
- ,	fPosition(0)
- ,	fDuration(0)
- ,	fVideoFrameRate(25.0)
- ,	fSeekFrame(-1)
- ,	fLastSeekEventTime(LONGLONG_MIN)
+	fPosition(0),
+	fDuration(0),
+	fVideoFrameRate(25.0),
+	fSeekFrame(-1),
+	fLastSeekEventTime(LONGLONG_MIN),
 
- ,	fAutoplay(true)
- ,	fPauseAtEndOfStream(false)
- ,	fSeekToStartAfterPause(false)
+	fAutoplay(true),
+	fPauseAtEndOfStream(false),
+	fSeekToStartAfterPause(false),
 
- ,	fListeners(4)
+	fListeners(4)
 {
 	fStopped = fAutoplay ? false : true;
 }

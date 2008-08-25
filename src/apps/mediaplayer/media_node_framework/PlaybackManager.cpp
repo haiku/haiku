@@ -371,8 +371,11 @@ PlaybackManager::SetCurrentFrame(int64 frame)
 void
 PlaybackManager::SetPlayMode(int32 mode, bool continuePlaying)
 {
+	PlayingState* lastState = _LastState();
+	if (lastState == NULL)
+		return;
 //printf("PlaybackManager::SetPlayMode(%ld, %d)\n", mode, continuePlaying);
-	PlayingState* newState = new PlayingState(*_LastState());
+	PlayingState* newState = new PlayingState(*lastState);
 	newState->play_mode = mode;
 	// Jump to the playing start frame if we should not continue, where we
 	// stop.
