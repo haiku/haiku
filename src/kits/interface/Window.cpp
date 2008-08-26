@@ -2317,8 +2317,24 @@ BWindow::ResizeTo(float width, float height)
 void
 BWindow::Show()
 {
-	if (!fRunCalled) {
-		// this is the fist time Show() is called, which implicitly runs the looper
+	bool runCalled = true;
+	if (Lock()) {
+		fShowLevel++;
+
+		if (fShowLevel == 1) {
+			fLink->StartMessage(AS_SHOW_WINDOW);
+			fLink->Flush();
+		}
+
+		runCalled = fRunCalled;
+
+		Unlock();
+	}
+
+	if (!runCalled) {
+		// This is the fist time Show() is called, which implicitly runs the
+		// looper. NOTE: The window is still locked if it has not been
+		// run yet, so accessing members is safe.
 		if (fLink->SenderPort() < B_OK) {
 			// We don't have valid app_server connection; there is no point
 			// in starting our looper
@@ -2326,18 +2342,6 @@ BWindow::Show()
 			return;
 		} else
 			Run();
-	}
-
-	if (Lock()) {
-		fShowLevel++;
-
-		if (fShowLevel == 1) {
-			STRACE(("BWindow(%s): sending AS_SHOW_WINDOW message...\n", Name()));
-			fLink->StartMessage(AS_SHOW_WINDOW);
-			fLink->Flush();
-		}
-
-		Unlock();
 	}
 }
 
@@ -2348,7 +2352,9 @@ BWindow::Hide()
 	if (!Lock())
 		return;
 
-	if (--fShowLevel == 0) {
+	fShowLevel--;
+
+	if (fShowLevel == 0) {
 		fLink->StartMessage(AS_HIDE_WINDOW);
 		fLink->Flush();
 	}
