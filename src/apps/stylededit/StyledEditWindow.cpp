@@ -1065,19 +1065,15 @@ StyledEditWindow::PageSetup(const char* documentName)
 void
 StyledEditWindow::Print(const char* documentName)
 {
-	status_t result;
-
-	if (fPrintSettings == NULL) {
-		result = PageSetup(documentName);
-		if (result != B_OK)
-			return;
-	}
-
 	BPrintJob printJob(documentName);
-	printJob.SetSettings(new BMessage(*fPrintSettings));
-	result = printJob.ConfigJob();
-	if (result != B_OK)
-		return;
+	if (fPrintSettings)
+		printJob.SetSettings(new BMessage(*fPrintSettings));
+
+	if (printJob.ConfigJob() != B_OK)
+ 		return;
+
+	delete fPrintSettings;
+	fPrintSettings = printJob.Settings();
 
 	// information from printJob
 	BRect printableRect = printJob.PrintableRect();
