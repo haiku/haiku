@@ -480,7 +480,8 @@ Controller::TogglePlaying()
 
 	BAutolock _(this);
 
-	NodeManager::TogglePlaying();
+	if (InitCheck() == B_OK)
+		NodeManager::TogglePlaying();
 }
 
 
