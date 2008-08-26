@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,27 +13,17 @@
 
 #include "PrintOptionsWindow.h"
 
-#include <FilePanel.h>
-#include <Menu.h>
-#include <String.h>
-#include <TranslationDefs.h>
+
 #include <Window.h>
 
+
+class BFilePanel;
+class BMenu;
+class BMenuBar;
+class BMenuItem;
 class ShowImageView;
 class ShowImageStatusView;
 
-// BMessage field names used in Save messages
-#define TRANSLATOR_FLD "be:translator"
-#define TYPE_FLD "be:type"
-
-class RecentDocumentsMenu : public BMenu {
-	public:
-		RecentDocumentsMenu(const char *title, menu_layout layout = B_ITEMS_IN_COLUMN);	
-		bool AddDynamicItem(add_state addState);
-
-	private:
-		void UpdateRecentDocumentsMenu();
-};
 
 class ShowImageWindow : public BWindow {
 	public:
@@ -55,18 +45,20 @@ class ShowImageWindow : public BWindow {
 		void WindowRedimension(BBitmap *bitmap);
 
 	private:
+		class RecentDocumentsMenu;
+
 		void BuildViewMenu(BMenu *menu, bool popupMenu);
-		BMenuItem *AddItemMenu(BMenu *menu, char *caption,
-			uint32 command, char shortcut, uint32 modifier,
-			char target, bool enabled);
-		BMenuItem* AddDelayItem(BMenu *menu, char *caption, float value);
+		BMenuItem *AddItemMenu(BMenu *menu, const char *label,
+			uint32 what, const char shortcut, uint32 modifier,
+			const BHandler *target, bool enabled = true);
+		BMenuItem* AddDelayItem(BMenu *menu, const char *label, float value);
 
 		bool ToggleMenuItem(uint32 what);
 		void EnableMenuItem(BMenu *menu, uint32 what, bool enable);
 		void MarkMenuItem(BMenu *menu, uint32 what, bool marked);
 		void MarkSlideShowDelay(float value);
 		void ResizeToWindow(bool shrink, uint32 what);
-			
+
 		void SaveAs(BMessage *message);
 			// Handle Save As submenu choice
 		void SaveToFile(BMessage *message);
@@ -78,7 +70,7 @@ class ShowImageWindow : public BWindow {
 		bool PageSetup();
 		void PrepareForPrint();
 		void Print(BMessage *msg);
-		
+
 		void OpenResizerWindow(int32 width, int32 height);
 		void UpdateResizerWindow(int32 width, int32 height);
 		void CloseResizerWindow();
