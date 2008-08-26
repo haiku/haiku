@@ -151,9 +151,9 @@ display_device(device_node_cookie *node, uint8 level)
 	int bus = 0;
 
 	// PCI attributes
-	uint16 pci_class_base_id = 0;
-	uint16 pci_class_sub_id = 0;
-	uint16 pci_class_api_id = 0;
+	uint8 pci_class_base_id = 0;
+	uint8 pci_class_sub_id = 0;
+	uint8 pci_class_api_id = 0;
 	uint16 pci_vendor_id = 0;
 	uint16 pci_device_id = 0;
 	uint16 pci_subsystem_vendor_id = 0;
@@ -185,13 +185,13 @@ display_device(device_node_cookie *node, uint8 level)
 			scsi_path_id = attr.value.ui8;
 		} else if (!strcmp(attr.name, B_DEVICE_TYPE)
 			&& attr.type == B_UINT16_TYPE) 
-			pci_class_base_id = attr.value.ui16;
+			pci_class_base_id = attr.value.ui8;
 		else if (!strcmp(attr.name, B_DEVICE_SUB_TYPE)
 			&& attr.type == B_UINT16_TYPE)
-			pci_class_sub_id = attr.value.ui16;
+			pci_class_sub_id = attr.value.ui8;
 		else if (!strcmp(attr.name, B_DEVICE_INTERFACE)
 			&& attr.type == B_UINT16_TYPE)
-			pci_class_api_id = attr.value.ui16;
+			pci_class_api_id = attr.value.ui8;
 		else if (!strcmp(attr.name, B_DEVICE_VENDOR_ID)
 			&& attr.type == B_UINT16_TYPE)
 			pci_vendor_id = attr.value.ui16;
