@@ -509,12 +509,12 @@ Window::SetTopView(View* topView)
 		// fFrame as if it had
 
 		// make sure the location of the top view on screen matches ours
-		fTopView->MoveBy(fFrame.left - fTopView->Frame().left,
-			fFrame.top - fTopView->Frame().top, NULL);
+		fTopView->MoveBy((int32)(fFrame.left - fTopView->Frame().left),
+			(int32)(fFrame.top - fTopView->Frame().top), NULL);
 
 		// make sure the size of the top view matches ours
-		fTopView->ResizeBy(fFrame.Width() - fTopView->Frame().Width(),
-			fFrame.Height() - fTopView->Frame().Height(), NULL);
+		fTopView->ResizeBy((int32)(fFrame.Width() - fTopView->Frame().Width()),
+			(int32)(fFrame.Height() - fTopView->Frame().Height()), NULL);
 
 		fTopView->AttachedToWindow(this);
 	}
@@ -2061,7 +2061,7 @@ Window::_ObeySizeLimits()
 	if (fDesktop)
 		fDesktop->ResizeWindowBy(this, xDiff, yDiff);
 	else
-		ResizeBy(xDiff, yDiff, NULL);
+		ResizeBy((int32)xDiff, (int32)yDiff, NULL);
 }
 
 
