@@ -79,6 +79,8 @@ public:
 
 	// Controller
 			status_t			SetTo(const entry_ref &ref);
+			void				PlayerActivated(bool active);
+
 			void				GetSize(int *width, int *height);
 
 			int					AudioTrackCount();
@@ -99,7 +101,7 @@ public:
 			bigtime_t			TimeDuration();
 			bigtime_t			TimePosition();
 
-	virtual	void				SetVolume(float percent);
+	virtual	void				SetVolume(float factor);
 			float				Volume();
 			void				VolumeUp();
 			void				VolumeDown();

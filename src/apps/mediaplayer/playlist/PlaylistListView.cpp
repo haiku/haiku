@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -140,7 +140,7 @@ PlaylistItem::Draw(BView* owner, BRect frame, const font_height& fh,
 #else
 		rgb_color lightGreen = tint_color(green, B_LIGHTEN_2_TINT);
 		rgb_color darkGreen = tint_color(green, B_DARKEN_2_TINT);
- 		owner->BeginLineArray( 6 );
+ 		owner->BeginLineArray(6);
 			// black outline
 			owner->AddLine(arrow[0], arrow[1], black);
 			owner->AddLine(BPoint(arrow[1].x + 1.0, arrow[1].y - 1.0),

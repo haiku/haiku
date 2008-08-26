@@ -48,7 +48,6 @@
 #include "PlaylistObserver.h"
 #include "PlaylistWindow.h"
 #include "Settings.h"
-#include "SettingsWindow.h"
 
 #define NAME "MediaPlayer"
 #define MIN_WIDTH 250
@@ -77,7 +76,6 @@ enum {
 	M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS,
 	M_TOGGLE_ALWAYS_ON_TOP,
 	M_TOGGLE_KEEP_ASPECT_RATIO,
-	M_SETTINGS,
 	M_VOLUME_UP,
 	M_VOLUME_DOWN,
 	M_SKIP_NEXT,
@@ -106,7 +104,6 @@ MainWin::MainWin()
 	  fFilePanel(NULL),
 	  fInfoWin(NULL),
 	  fPlaylistWindow(NULL),
-	  fSettingsWindow(NULL),
 	  fHasFile(false),
 	  fHasVideo(false),
 	  fHasAudio(false),
@@ -184,11 +181,6 @@ MainWin::MainWin()
 
 	_SetupWindow();
 
-	// setup the settings window now, we need to have it 
-	fSettingsWindow = new SettingsWindow(BRect(150, 150, 450, 520));
-	fSettingsWindow->Hide();
-	fSettingsWindow->Show();
-
 	// setup the playlist window now, we need to have it 
 	// running for the undo/redo playlist editing
 	fPlaylistWindow = new PlaylistWindow(BRect(150, 150, 500, 600), fPlaylist,
@@ -209,6 +201,7 @@ MainWin::~MainWin()
 {
 	printf("MainWin::~MainWin\n");
 
+	Settings::Default()->RemoveListener(&fGlobalSettingsListener);
 	fPlaylist->RemoveListener(fPlaylistObserver);
 	fController->RemoveListener(fControllerObserver);
 	fController->SetPeakListener(NULL);
@@ -218,20 +211,12 @@ MainWin::~MainWin()
 	fBackground->RemoveSelf();
 	delete fBackground;
 
-	if (fInfoWin) {
-		fInfoWin->Lock();
+	if (fInfoWin && fInfoWin->Lock())
 		fInfoWin->Quit();
-	}
-	if (fPlaylistWindow) {
-		fPlaylistWindow->Lock();
-		fPlaylistWindow->Quit();
-	}
-	
-	if (fSettingsWindow) {
-		fSettingsWindow->Lock();
-		fSettingsWindow->Quit();
-	}
 
+	if (fPlaylistWindow && fPlaylistWindow->Lock())
+		fPlaylistWindow->Quit();
+	
 	delete fPlaylist;
 	delete fFilePanel;
 
@@ -247,56 +232,56 @@ MainWin::~MainWin()
 
 
 void
-MainWin::FrameResized(float new_width, float new_height)
+MainWin::FrameResized(float newWidth, float newHeight)
 {
-	if (new_width != Bounds().Width() || new_height != Bounds().Height()) {
+	if (newWidth != Bounds().Width() || newHeight != Bounds().Height()) {
 		debugger("size wrong\n");
 	}
-	
-	bool no_menu = fNoMenu || fIsFullscreen;
-	bool no_controls = fNoControls || fIsFullscreen;
-	
-	printf("FrameResized enter: new_width %.0f, new_height %.0f\n",
-		new_width, new_height);
-	
-	int max_video_width  = int(new_width) + 1;
-	int max_video_height = int(new_height) + 1
-		- (no_menu  ? 0 : fMenuBarHeight)
-		- (no_controls ? 0 : fControlsHeight);
 
-	ASSERT(max_video_height >= 0);
-	
+	bool noMenu = fNoMenu || fIsFullscreen;
+	bool noControls = fNoControls || fIsFullscreen;
+
+	printf("FrameResized enter: newWidth %.0f, newHeight %.0f\n",
+		newWidth, newHeight);
+
+	int maxVideoWidth  = int(newWidth) + 1;
+	int maxVideoHeight = int(newHeight) + 1
+		- (noMenu  ? 0 : fMenuBarHeight)
+		- (noControls ? 0 : fControlsHeight);
+
+	ASSERT(maxVideoHeight >= 0);
+
 	int y = 0;
-	
-	if (no_menu) {
+
+	if (noMenu) {
 		if (!fMenuBar->IsHidden())
 			fMenuBar->Hide();
 	} else {
 //		fMenuBar->MoveTo(0, y);
-		fMenuBar->ResizeTo(new_width, fMenuBarHeight - 1);
+		fMenuBar->ResizeTo(newWidth, fMenuBarHeight - 1);
 		if (fMenuBar->IsHidden())
 			fMenuBar->Show();
 		y += fMenuBarHeight;
 	}
-	
-	if (max_video_height == 0) {
-		if (!fVideoView->IsHidden())
+
+	if (maxVideoHeight == 0) {
+		bool hidden = fVideoView->IsHidden();
+printf("  video view hidden: %d\n", hidden);
+		if (!hidden)
 			fVideoView->Hide();
 	} else {
-//		fVideoView->MoveTo(0, y);
-//		fVideoView->ResizeTo(max_video_width - 1, max_video_height - 1);
-		_ResizeVideoView(0, y, max_video_width, max_video_height);
+		_ResizeVideoView(0, y, maxVideoWidth, maxVideoHeight);
 		if (fVideoView->IsHidden())
 			fVideoView->Show();
-		y += max_video_height;
+		y += maxVideoHeight;
 	}
 	
-	if (no_controls) {
+	if (noControls) {
 		if (!fControls->IsHidden())
 			fControls->Hide();
 	} else {
 		fControls->MoveTo(0, y);
-		fControls->ResizeTo(new_width, fControlsHeight - 1);
+		fControls->ResizeTo(newWidth, fControlsHeight - 1);
 		if (fControls->IsHidden())
 			fControls->Show();
 //		y += fControlsHeight;
@@ -654,9 +639,6 @@ MainWin::MessageReceived(BMessage *msg)
 			VideoFormatChange(544, 576, 1.41176, 1.0);
 			break;
 
-		case M_SETTINGS:
-			ShowSettingsWindow();
-			break;
 /*			
 		default:
 			if (msg->what >= M_SELECT_CHANNEL
@@ -701,23 +683,25 @@ MainWin::WindowActivated(bool active)
 		float diffX = 0.0;
 		float diffY = 0.0;
 
-		// If the frame if off the edge of the screen at all
+		// If the frame is off the edge of the screen at all
 		// we will move it so all the window is on the screen.
-		if (frame.left < screenFrame.left)
-			// Move right
-			diffX = screenFrame.left - frame.left; 
-		if (frame.top < screenFrame.top)
-			// Move down
-			diffY = screenFrame.top - frame.top; 
 		if (frame.right > screenFrame.right)
 			// Move left
 			diffX = screenFrame.right - frame.right; 
 		if (frame.bottom > screenFrame.bottom)
 			// Move up
 			diffY = screenFrame.bottom - frame.bottom; 
+		if (frame.left < screenFrame.left)
+			// Move right
+			diffX = screenFrame.left - frame.left; 
+		if (frame.top < screenFrame.top)
+			// Move down
+			diffY = screenFrame.top - frame.top; 
 
 		MoveBy(diffX, diffY);
 	}
+
+	fController->PlayerActivated(active || gMainApp->PlayerCount() <= 1);
 }
 
 
@@ -799,19 +783,6 @@ MainWin::ShowPlaylistWindow()
 		else
 			fPlaylistWindow->Activate();
 		fPlaylistWindow->Unlock();
-	}
-}
-
-
-void
-MainWin::ShowSettingsWindow()
-{
-	if (fSettingsWindow->Lock()) {
-		if (fSettingsWindow->IsHidden())
-			fSettingsWindow->Show();
-		else
-			fSettingsWindow->Activate();
-		fSettingsWindow->Unlock();
 	}
 }
 
@@ -976,8 +947,10 @@ MainWin::_CreateMenu()
 	fSettingsMenu->AddItem(new BMenuItem("Always on Top",
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T'));
 	fSettingsMenu->AddSeparatorItem();
-	fSettingsMenu->AddItem(new BMenuItem("Settings"B_UTF8_ELLIPSIS,
-		new BMessage(M_SETTINGS), 'S'));
+	item = new BMenuItem("Settings"B_UTF8_ELLIPSIS,
+		new BMessage(M_SETTINGS), 'S');
+	fSettingsMenu->AddItem(item);
+	item->SetTarget(be_app);
 
 //	fDebugMenu->AddItem(new BMenuItem("pixel aspect ratio 1.00000:1",
 //		new BMessage(M_ASPECT_100000_1)));
@@ -1056,15 +1029,15 @@ void
 MainWin::_ResizeWindow(int percent)
 {
 	// Get required window size
-	int video_width = lround(fSourceWidth * fWidthScale);
-	int video_height = lround(fSourceHeight * fHeightScale);
+	int videoWidth = lround(fSourceWidth * fWidthScale);
+	int videoHeight = lround(fSourceHeight * fHeightScale);
 	
-	video_width = (video_width * percent) / 100;
-	video_height = (video_height * percent) / 100;
+	videoWidth = (videoWidth * percent) / 100;
+	videoHeight = (videoHeight * percent) / 100;
 	
 	// Calculate and set the initial window size
-	int width = max_c(fControlsWidth, video_width);
-	int height = (fNoControls ? 0 : fControlsHeight) + video_height;
+	int width = max_c(fControlsWidth, videoWidth);
+	int height = (fNoControls ? 0 : fControlsHeight) + videoHeight;
 	if (!fNoMenu) {
 		width = max_c(width, fMenuBarWidth);
 		height += fMenuBarHeight;
@@ -1083,21 +1056,21 @@ MainWin::_ResizeVideoView(int x, int y, int width, int height)
 	if (fKeepAspectRatio) {
 		// Keep aspect ratio, place video view inside
 		// the background area (may create black bars).
-		float scaled_width  = fSourceWidth * fWidthScale;
-		float scaled_height = fSourceHeight * fHeightScale;
-		float factor = min_c(width / scaled_width, height / scaled_height);
-		int render_width = lround(scaled_width * factor);
-		int render_height = lround(scaled_height * factor);
-		if (render_width > width)
-			render_width = width;
-		if (render_height > height)
-			render_height = height;
+		float scaledWidth  = fSourceWidth * fWidthScale;
+		float scaledHeight = fSourceHeight * fHeightScale;
+		float factor = min_c(width / scaledWidth, height / scaledHeight);
+		int renderWidth = lround(scaledWidth * factor);
+		int renderHeight = lround(scaledHeight * factor);
+		if (renderWidth > width)
+			renderWidth = width;
+		if (renderHeight > height)
+			renderHeight = height;
 
-		int x_ofs = x + (width - render_width) / 2;
-		int y_ofs = y + (height - render_height) / 2;
+		int xOffset = x + (width - renderWidth) / 2;
+		int yOffset = y + (height - renderHeight) / 2;
 
-		fVideoView->MoveTo(x_ofs, y_ofs);
-		fVideoView->ResizeTo(render_width - 1, render_height - 1);
+		fVideoView->MoveTo(xOffset, yOffset);
+		fVideoView->ResizeTo(renderWidth - 1, renderHeight - 1);
 
 	} else {
 		fVideoView->MoveTo(x, y);

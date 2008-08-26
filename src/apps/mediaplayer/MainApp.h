@@ -26,10 +26,13 @@
 
 enum  {
 	M_PLAYER_QUIT				= 'plqt',
+	M_SETTINGS					= 'stng',
 
 	M_MEDIA_SERVER_STARTED		= 'msst',
 	M_MEDIA_SERVER_QUIT			= 'msqt'
 };
+
+class SettingsWindow;
 
 class MainApp : public BApplication {
 public:
@@ -37,19 +40,23 @@ public:
 	virtual						~MainApp();
 
 			BWindow*			NewWindow();
+			int32				PlayerCount() const;
 
 private:
+	virtual	bool				QuitRequested();
 	virtual	void				ReadyToRun();
 	virtual	void				RefsReceived(BMessage* message);
 	virtual	void				ArgvReceived(int32 argc, char** argv);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AboutRequested();
 
+private:
+			void				_ShowSettingsWindow();
 			void				_BroadcastMessage(const BMessage& message);
 
-private:
 			int32				fPlayerCount;
 			BWindow*			fFirstWindow;
+			SettingsWindow*		fSettingsWindow;
 
 			bool				fMediaServerRunning;
 			bool				fMediaAddOnServerRunning;

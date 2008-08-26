@@ -328,6 +328,31 @@ Controller::SetTo(const entry_ref &ref)
 
 
 void
+Controller::PlayerActivated(bool active)
+{
+	BAutolock _(this);
+
+	if (active) {
+		if (fActiveVolume != fVolume)
+			SetVolume(fActiveVolume);
+	} else {
+		fActiveVolume = fVolume;
+		switch (fBackgroundMovieVolumeMode) {
+			case mpSettings::BG_MOVIES_MUTED:
+				SetVolume(0.0);
+				break;
+			case mpSettings::BG_MOVIES_HALF_VLUME:
+				SetVolume(fVolume * 0.25);
+				break;
+			case mpSettings::BG_MOVIES_FULL_VOLUME:
+			default:
+				break;
+		}
+	}
+}
+
+
+void
 Controller::GetSize(int *width, int *height)
 {
 	BAutolock _(this);

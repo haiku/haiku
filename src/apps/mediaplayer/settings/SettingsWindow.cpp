@@ -47,8 +47,8 @@ enum {
 #define BUTTONHEIGHT 20
 
 SettingsWindow::SettingsWindow(BRect frame)
- 	: BWindow(frame, "MediaPlayer Settings", B_TITLED_WINDOW_LOOK,
- 		B_NORMAL_WINDOW_FEEL,
+ 	: BWindow(frame, "MediaPlayer Settings", B_FLOATING_WINDOW_LOOK,
+ 		B_FLOATING_APP_WINDOW_FEEL,
  		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 #ifdef __HAIKU__
  			| B_AUTO_UPDATE_SIZE_LIMITS)
@@ -70,7 +70,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 	BStringView* viewOptionsLabel = new BStringView("stringViewViewOpions", 
 		"View options");
 	BStringView* bgMoviesModeLabel = new BStringView("stringViewPlayBackg", 
-		"Play background movies at");
+		"Play background clips at");
 	BAlignment alignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER);
 	playModeLabel->SetExplicitAlignment(alignment);
 	playModeLabel->SetFont(be_bold_font);
@@ -105,7 +105,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 		"Full volume", new BMessage(M_START_FULL_VOLUME));
 	
 	fHalfVolumeBGMoviesRB = new BRadioButton("rdbtnhalfvolume", 
-		"Half volume", new BMessage(M_START_HALF_VOLUME));
+		"Low volume", new BMessage(M_START_HALF_VOLUME));
 	
 	fMutedVolumeBGMoviesRB = new BRadioButton("rdbtnfullvolume",
 		"Muted", new BMessage(M_START_MUTE_VOLUME));
@@ -228,7 +228,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 
 	rect.OffsetBy(0, rect.Height() + SPACE + SPACEING);
 	bbox->AddChild(new BStringView(rect, "stringViewPlayBackg", 
-		"Play backgrounds movies at:"));
+		"Play backgrounds clips at:"));
 	
 	rect.OffsetBy(SPACE, rect.Height() + SPACEING);
 	fFullVolumeBGMoviesRB = new BRadioButton(rect, "rdbtnfullvolume", 
@@ -237,7 +237,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 	
 	rect.OffsetBy(0, rect.Height() + SPACEING);
 	fHalfVolumeBGMoviesRB = new BRadioButton(rect, "rdbtnhalfvolume", 
-		"Half Volume", new BMessage(M_START_HALF_VOLUME));
+		"Low Volume", new BMessage(M_START_HALF_VOLUME));
 	bbox->AddChild(fHalfVolumeBGMoviesRB);
 	
 	rect.OffsetBy(0, rect.Height() + SPACEING);
@@ -252,10 +252,6 @@ SettingsWindow::SettingsWindow(BRect frame)
 	// disable currently unsupported features
 	fLoopMoviesCB->SetEnabled(false);
 	fLoopSoundsCB->SetEnabled(false);
-
-	fFullVolumeBGMoviesRB->SetEnabled(false);
-	fHalfVolumeBGMoviesRB->SetEnabled(false);
-	fMutedVolumeBGMoviesRB->SetEnabled(false);
 }
 
 

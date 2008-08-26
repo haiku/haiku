@@ -37,7 +37,6 @@
 class ControllerObserver;
 class PlaylistObserver;
 class PlaylistWindow;
-class SettingsWindow;
 
 class MainWin : public BWindow {
 public:
@@ -106,7 +105,6 @@ private:
 			ControllerView*		fControls;
 			InfoWin*			fInfoWin;
 			PlaylistWindow*		fPlaylistWindow;
-			SettingsWindow*		fSettingsWindow;
 		
 			BMenu*				fFileMenu;
 			BMenu*				fAudioMenu;

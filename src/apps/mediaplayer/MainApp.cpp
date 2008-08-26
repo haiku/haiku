@@ -32,6 +32,7 @@
 #include <unistd.h>
 
 #include "EventQueue.h"
+#include "SettingsWindow.h"
 
 
 MainApp *gMainApp;
@@ -45,6 +46,7 @@ MainApp::MainApp()
 	: BApplication(kAppSig),
 	  fPlayerCount(0),
 	  fFirstWindow(NewWindow()),
+	  fSettingsWindow(NULL),
 
 	  fMediaServerRunning(false),
 	  fMediaAddOnServerRunning(false)
@@ -57,7 +59,21 @@ MainApp::~MainApp()
 }
 
 
-BWindow *
+bool
+MainApp::QuitRequested()
+{
+	// TODO: When doing this in the destructor, the MainApp does not
+	// quit properly. Is this a Haiku bug? (SettingsWindow::QuitRequested()
+	// returns "false" always.)
+	if (fSettingsWindow && fSettingsWindow->Lock())
+		fSettingsWindow->Quit();
+	fSettingsWindow = NULL;
+
+	return BApplication::QuitRequested();
+}
+
+
+BWindow*
 MainApp::NewWindow()
 {
 	BAutolock _(this);
@@ -66,9 +82,25 @@ MainApp::NewWindow()
 }
 
 
+int32
+MainApp::PlayerCount() const
+{
+	BAutolock _(const_cast<MainApp*>(this));
+	return fPlayerCount;
+}
+
+
+// #pragma mark -
+
+
 void
 MainApp::ReadyToRun()
 {
+	// setup the settings window now, we need to have it 
+	fSettingsWindow = new SettingsWindow(BRect(150, 150, 450, 520));
+	fSettingsWindow->Hide();
+	fSettingsWindow->Show();
+
 	// Now tell the application roster, that we're interested
 	// in getting notifications of apps being launched or quit.
 	// In this way we are going to detect a media_server restart.
@@ -193,6 +225,9 @@ MainApp::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case M_SETTINGS:
+			_ShowSettingsWindow();
+			break;
 
 		default:
 			BApplication::MessageReceived(message);
@@ -214,6 +249,19 @@ MainApp::_BroadcastMessage(const BMessage& _message)
 	for (int32 i = 0; BWindow* window = WindowAt(i); i++) {
 		BMessage message(_message);
 		window->PostMessage(&message);
+	}
+}
+
+
+void
+MainApp::_ShowSettingsWindow()
+{
+	if (fSettingsWindow->Lock()) {
+		if (fSettingsWindow->IsHidden())
+			fSettingsWindow->Show();
+		else
+			fSettingsWindow->Activate();
+		fSettingsWindow->Unlock();
 	}
 }
 
