@@ -72,7 +72,7 @@ public:
 		//	bool				HasRef(const entry_ref& ref) const;
 
 			// navigating current ref
-			void				SetCurrentRefIndex(int32 index);
+			bool				SetCurrentRefIndex(int32 index);
 			int32				CurrentRefIndex() const;
 		
 			void				GetSkipInfo(bool* canSkipPrevious,

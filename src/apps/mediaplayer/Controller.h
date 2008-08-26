@@ -29,6 +29,7 @@
 #include <Locker.h>
 #include <String.h>
 
+#include "ListenerAdapter.h"
 #include "NodeManager.h"
 
 class AudioTrackSupplier;
@@ -68,6 +69,7 @@ public:
 	virtual 					~Controller();
 
 	// PlaybackManager interface
+	virtual	void				MessageReceived(BMessage* message);
 	virtual	int64				Duration();
 
 	// NodeManager interface
@@ -125,6 +127,8 @@ public:
 			void				RemoveListener(Listener* listener);
 
 private:
+			void				_AdoptGlobalSettings();
+
 			uint32				_PlaybackState(int32 playingMode) const;
 
 			void				_NotifyFileChanged() const;
@@ -155,9 +159,8 @@ private:
 
 
 			VideoView*			fVideoView;
-	volatile bool				fPaused;
-	volatile bool				fStopped;
 			float				fVolume;
+			float				fActiveVolume;
 			bool				fMuted;
 
 			entry_ref			fRef;
@@ -177,9 +180,11 @@ private:
 	mutable	int32				fSeekFrame;
 			bigtime_t			fLastSeekEventTime;
 
+			ListenerAdapter		fGlobalSettingsListener;
 			bool 				fAutoplay;
-	volatile bool				fPauseAtEndOfStream;
-	volatile bool				fSeekToStartAfterPause;
+			bool				fLoopMovies;
+			bool				fLoopSounds;
+			uint32				fBackgroundMovieVolumeMode;
 	
 			BList				fListeners;
 };

@@ -250,10 +250,6 @@ SettingsWindow::SettingsWindow(BRect frame)
 #endif
 
 	// disable currently unsupported features
-	fAutostartCB->SetEnabled(false);
-	fCloseWindowMoviesCB->SetEnabled(false);
-	fCloseWindowSoundsCB->SetEnabled(false);
-
 	fLoopMoviesCB->SetEnabled(false);
 	fLoopSoundsCB->SetEnabled(false);
 

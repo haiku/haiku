@@ -26,11 +26,13 @@
 #include <Button.h>
 #include <Slider.h>
 #include <FilePanel.h>
+
 #include "Controller.h"
 #include "ControllerView.h"
 #include "InfoWin.h"
-#include "VideoView.h"
+#include "ListenerAdapter.h"
 #include "Playlist.h"
+#include "VideoView.h"
 
 class ControllerObserver;
 class PlaylistObserver;
@@ -94,7 +96,9 @@ private:
 			void				_RemovePlaylistItem(int32 index);
 			void				_MarkPlaylistItem(int32 index);
 			void				_MarkSettingsItem(uint32 command, bool mark);
-		
+
+			void				_AdoptGlobalSettings();
+
 			BMenuBar*			fMenuBar;
 			BView*				fBackground;
 			VideoView*			fVideoView;
@@ -139,6 +143,10 @@ private:
 			bool				fMouseDownTracking;
 			BPoint				fMouseDownMousePos;
 			BPoint				fMouseDownWindowPos;
+
+			ListenerAdapter		fGlobalSettingsListener;
+			bool				fCloseWhenDonePlayingMovie;
+			bool				fCloseWhenDonePlayingSound;
 };
 
 #endif // __MAIN_WIN_H

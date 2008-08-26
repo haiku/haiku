@@ -47,6 +47,7 @@
 #include "PeakView.h"
 #include "PlaylistObserver.h"
 #include "PlaylistWindow.h"
+#include "Settings.h"
 #include "SettingsWindow.h"
 
 #define NAME "MediaPlayer"
@@ -100,33 +101,34 @@ enum {
 
 
 MainWin::MainWin()
- :	BWindow(BRect(100,100,400,300), NAME, B_TITLED_WINDOW,
- 		B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
- ,  fFilePanel(NULL)
- ,	fInfoWin(NULL)
- ,	fPlaylistWindow(NULL)
- ,	fSettingsWindow(NULL)
- ,	fHasFile(false)
- ,	fHasVideo(false)
- ,	fHasAudio(false)
- ,	fPlaylist(new Playlist)
- ,	fPlaylistObserver(new PlaylistObserver(this))
- ,	fController(new Controller)
- ,	fControllerObserver(new ControllerObserver(this,
- 		OBSERVE_FILE_CHANGES | OBSERVE_TRACK_CHANGES
- 			| OBSERVE_PLAYBACK_STATE_CHANGES | OBSERVE_POSITION_CHANGES
- 			| OBSERVE_VOLUME_CHANGES))
- ,	fIsFullscreen(false)
- ,	fKeepAspectRatio(true)
- ,	fAlwaysOnTop(false)
- ,	fNoMenu(false)
- ,	fNoBorder(false)
- ,	fNoControls(false)
- ,	fSourceWidth(-1)
- ,	fSourceHeight(-1)
- ,	fWidthScale(1.0)
- ,	fHeightScale(1.0)
- ,	fMouseDownTracking(false)
+	: BWindow(BRect(100,100,400,300), NAME, B_TITLED_WINDOW,
+ 		B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */),
+	  fFilePanel(NULL),
+	  fInfoWin(NULL),
+	  fPlaylistWindow(NULL),
+	  fSettingsWindow(NULL),
+	  fHasFile(false),
+	  fHasVideo(false),
+	  fHasAudio(false),
+	  fPlaylist(new Playlist),
+	  fPlaylistObserver(new PlaylistObserver(this)),
+	  fController(new Controller),
+	  fControllerObserver(new ControllerObserver(this,
+		OBSERVE_FILE_CHANGES | OBSERVE_TRACK_CHANGES
+			| OBSERVE_PLAYBACK_STATE_CHANGES | OBSERVE_POSITION_CHANGES
+			| OBSERVE_VOLUME_CHANGES)),
+	  fIsFullscreen(false),
+	  fKeepAspectRatio(true),
+	  fAlwaysOnTop(false),
+	  fNoMenu(false),
+	  fNoBorder(false),
+	  fNoControls(false),
+	  fSourceWidth(-1),
+	  fSourceHeight(-1),
+	  fWidthScale(1.0),
+	  fHeightScale(1.0),
+	  fMouseDownTracking(false),
+	  fGlobalSettingsListener(this)
 {
 	static int pos = 0;
 	MoveBy(pos * 25, pos * 25);
@@ -195,6 +197,9 @@ MainWin::MainWin()
 	fPlaylistWindow->Show();
 		// this makes sure the window thread is running without
 		// showing the window just yet
+
+	Settings::Default()->AddListener(&fGlobalSettingsListener);
+	_AdoptGlobalSettings();
 
 	Show();
 }
@@ -369,10 +374,12 @@ MainWin::MessageReceived(BMessage *msg)
 			break;
 
 		case M_MEDIA_SERVER_STARTED:
+			printf("TODO: implement M_MEDIA_SERVER_STARTED\n");
 			// fController->...
 			break;
 
 		case M_MEDIA_SERVER_QUIT:
+			printf("TODO: implement M_MEDIA_SERVER_QUIT\n");
 			// fController->...
 			break;
 
@@ -411,8 +418,20 @@ MainWin::MessageReceived(BMessage *msg)
 
 		// ControllerObserver messages
 		case MSG_CONTROLLER_FILE_FINISHED:
-			fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
+		{
+			bool hadNext = fPlaylist->SetCurrentRefIndex(
+				fPlaylist->CurrentRefIndex() + 1);
+			if (!hadNext) {
+				if (fHasVideo) {
+					if (fCloseWhenDonePlayingMovie)
+						PostMessage(B_QUIT_REQUESTED);
+				} else {
+					if (fCloseWhenDonePlayingSound)
+						PostMessage(B_QUIT_REQUESTED);
+				}
+			}
 			break;
+		}
 		case MSG_CONTROLLER_FILE_CHANGED:
 			// TODO: move all other GUI changes as a reaction to this
 			// notification
@@ -657,6 +676,13 @@ MainWin::MessageReceived(BMessage *msg)
 				fPlaylist->SetCurrentRefIndex(index);
 			break;
 		}
+
+		case MSG_OBJECT_CHANGED:
+			// received from fGlobalSettingsListener
+			// TODO: find out which object, if we ever watch more than
+			// the global settings instance...
+			_AdoptGlobalSettings();
+			break;
 
 		default:
 			// let BWindow handle the rest
@@ -1605,6 +1631,17 @@ MainWin::_MarkSettingsItem(uint32 command, bool mark)
 {
 	if (BMenuItem* item = fSettingsMenu->FindItem(command))
 		item->SetMarked(mark);
+}
+
+
+void
+MainWin::_AdoptGlobalSettings()
+{
+	mpSettings settings = Settings::CurrentSettings();
+		// thread safe
+
+	fCloseWhenDonePlayingMovie = settings.closeWhenDonePlayingMovie;
+	fCloseWhenDonePlayingSound = settings.closeWhenDonePlayingSound;
 }
 
 

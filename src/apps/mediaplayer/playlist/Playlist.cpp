@@ -266,14 +266,21 @@ Playlist::GetRefAt(int32 index, entry_ref* _ref) const
 // #pragma mark - navigation
 
 
-void
+bool
 Playlist::SetCurrentRefIndex(int32 index)
 {
+	bool result = true;
+	if (index >= CountItems() || index < 0) {
+		index = -1;
+		result = false;
+	}
+
 	if (index == fCurrentIndex)
-		return;
+		return result;
 
 	fCurrentIndex = index;
 	_NotifyCurrentRefChanged(fCurrentIndex);
+	return result;
 }
 
 

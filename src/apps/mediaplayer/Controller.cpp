@@ -36,6 +36,7 @@
 #include "AutoDeleter.h"
 #include "ControllerView.h"
 #include "PlaybackState.h"
+#include "Settings.h"
 #include "VideoView.h"
 
 // suppliers
@@ -81,40 +82,44 @@ void Controller::Listener::MutedChanged(bool) {}
 
 
 Controller::Controller()
- :	NodeManager(),
- 	fVideoView(NULL),
- 	fVolume(1.0),
- 	fMuted(false),
+	: NodeManager(),
+	  fVideoView(NULL),
+	  fVolume(1.0),
+	  fActiveVolume(1.0),
+		// TODO: Implement background volume for inactive players,
+		// but use only if there are multiple players running at all!
+	  fMuted(false),
 
-	fRef(),
-	fMediaFile(NULL),
+	  fRef(),
+	  fMediaFile(NULL),
 
-	fVideoSupplier(new ProxyVideoSupplier()),
-	fAudioSupplier(new ProxyAudioSupplier(this)),
-	fVideoTrackSupplier(NULL),
-	fAudioTrackSupplier(NULL),
+	  fVideoSupplier(new ProxyVideoSupplier()),
+	  fAudioSupplier(new ProxyAudioSupplier(this)),
+	  fVideoTrackSupplier(NULL),
+	  fAudioTrackSupplier(NULL),
 
-	fAudioTrackList(4),
-	fVideoTrackList(2),
+	  fAudioTrackList(4),
+	  fVideoTrackList(2),
 
-	fPosition(0),
-	fDuration(0),
-	fVideoFrameRate(25.0),
-	fSeekFrame(-1),
-	fLastSeekEventTime(LONGLONG_MIN),
+	  fPosition(0),
+	  fDuration(0),
+	  fVideoFrameRate(25.0),
+	  fSeekFrame(-1),
+	  fLastSeekEventTime(LONGLONG_MIN),
 
-	fAutoplay(true),
-	fPauseAtEndOfStream(false),
-	fSeekToStartAfterPause(false),
+	  fGlobalSettingsListener(this),
 
-	fListeners(4)
+	  fListeners(4)
 {
-	fStopped = fAutoplay ? false : true;
+	Settings::Default()->AddListener(&fGlobalSettingsListener);
+	_AdoptGlobalSettings();
 }
 
 
 Controller::~Controller()
 {
+	Settings::Default()->RemoveListener(&fGlobalSettingsListener);
+
 	if (fMediaFile)
 		fMediaFile->ReleaseAllTracks();
 	delete fMediaFile;
@@ -122,6 +127,22 @@ Controller::~Controller()
 
 
 // #pragma mark - NodeManager interface
+
+
+void
+Controller::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_OBJECT_CHANGED:
+			// received from fGlobalSettingsListener
+			// TODO: find out which object, if we ever watch more than
+			// the global settings instance...
+			_AdoptGlobalSettings();
+			break;
+		default:
+			NodeManager::MessageReceived(message);
+	}
+}
 
 
 int64
@@ -195,8 +216,6 @@ Controller::SetTo(const entry_ref &ref)
 	fVideoTrackSupplier = NULL;
 	fAudioTrackSupplier = NULL;
 
-	fPauseAtEndOfStream = false;
-	fSeekToStartAfterPause = false;
 	fDuration = 0;
 	fVideoFrameRate = 25.0;
 
@@ -452,12 +471,6 @@ Controller::Play()
 
 	BAutolock _(this);
 	
-	if (fSeekToStartAfterPause) {
-printf("seeking to start after pause\n");
-		SetPosition(0);
-		fSeekToStartAfterPause = false;
-	}
-
 	StartPlaying();
 }
 
@@ -588,9 +601,6 @@ Controller::SetPosition(float value)
 		fLastSeekEventTime = system_time();
 	} else
 		fSeekFrame = -1;
-
-	// TODO: What was this used for in the old framework?
-	fSeekToStartAfterPause = false;
 }
 
 
@@ -739,6 +749,20 @@ Controller::RemoveListener(Listener* listener)
 
 
 // #pragma mark - Private
+
+
+void
+Controller::_AdoptGlobalSettings()
+{
+	mpSettings settings = Settings::CurrentSettings();
+		// thread safe
+
+	fAutoplay = settings.autostart;
+	// not yet used:
+	fLoopMovies = settings.loopMovie;
+	fLoopSounds = settings.loopSound;
+	fBackgroundMovieVolumeMode = settings.backgroundMovieVolumeMode;
+}
 
 
 uint32
