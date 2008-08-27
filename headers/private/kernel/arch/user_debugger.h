@@ -5,14 +5,16 @@
 #ifndef KERNEL_ARCH_USER_DEBUGGER_H
 #define KERNEL_ARCH_USER_DEBUGGER_H
 
+// Enable this to get support for kernel breakpoints.
+//#define KERNEL_BREAKPOINTS 1
+
+#ifndef _ASSEMBLER
+
 #include <debugger.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// Enable this to get support for kernel breakpoints.
-//#define KERNEL_BREAKPOINTS 1
 
 struct arch_team_debug_info;
 struct arch_thread_debug_info;
@@ -45,5 +47,7 @@ status_t arch_clear_kernel_watchpoint(void *address);
 #endif
 
 #include <arch_user_debugger.h>
+
+#endif	// _ASSEMBLER
 
 #endif	// KERNEL_ARCH_USER_DEBUGGER_H
