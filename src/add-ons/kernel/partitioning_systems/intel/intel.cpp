@@ -76,7 +76,7 @@ get_type_for_content_type(const char *contentType, char *type)
 {
 	TRACE(("intel: get_type_for_content_type(%s)\n",
 		   contentType));
-	
+
 	if (!contentType || !type)
 		return B_BAD_VALUE;
 
@@ -159,6 +159,9 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 		return 0.5;
 	}
 
+// NOTE: It seems supporting nested partition maps makes more trouble than it
+// has useful applications ATM. So it is disabled for the time being.
+#if 0
 	// We have a parent. That's a very unlikely setup.
 	if (hasChildren)
 		return 0.4;
@@ -166,6 +169,8 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 	// No children. Extremely unlikely, that this is desired. But if no one
 	// else claims the partition, we take it anyway.
 	return 0.1;
+#endif
+	return -1;
 }
 
 // pm_scan_partition
@@ -179,7 +184,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 	TRACE(("intel: pm_scan_partition(%d, %ld: %lld, %lld, %ld)\n", fd,
 		   partition->id, partition->offset, partition->size,
 		   partition->block_size));
-	
+
 	PartitionMapCookie *map = (PartitionMapCookie*)cookie;
 	// fill in the partition_data structure
 	partition->status = B_PARTITION_VALID;
@@ -336,7 +341,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	// (no content_name and content_parameters)
 	// (content_type is set by the system)
 	partition->block_size = SECTOR_SIZE;
-	
+
 	partition->content_cookie = primary;
 	// children
 	status_t error = B_OK;
