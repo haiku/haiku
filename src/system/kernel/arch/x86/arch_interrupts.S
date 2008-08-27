@@ -7,6 +7,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+#include <arch/user_debugger.h>
 #include <arch/x86/arch_cpu.h>
 #include <arch/x86/arch_kernel.h>
 #include <arch/x86/descriptors.h>
@@ -98,11 +99,16 @@
 						   original eax/edx values */				\
 	iret
 
-#define DISABLE_BREAKPOINTS()											\
-	testl	$THREAD_FLAGS_BREAKPOINTS_INSTALLED, THREAD_flags(%edi);	\
-	jz		1f;															\
-	call	x86_exit_user_debug_at_kernel_entry;						\
-  1:
+#if KERNEL_BREAKPOINTS
+#	define DISABLE_BREAKPOINTS()											\
+		call	x86_exit_user_debug_at_kernel_entry;
+#else
+#	define DISABLE_BREAKPOINTS()											\
+		testl	$THREAD_FLAGS_BREAKPOINTS_INSTALLED, THREAD_flags(%edi);	\
+		jz		1f;															\
+		call	x86_exit_user_debug_at_kernel_entry;						\
+	  1:
+#endif	// KERNEL_BREAKPOINTS
 
 #define COPY_SYSCALL_PARAMETERS()										\
 	/* make room for the syscall params */								\
@@ -306,10 +312,14 @@ int_bottom_user:
 	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)
 	jne		1f
 
+#if KERNEL_BREAKPOINTS
+	jmp		kernel_exit_work
+#else
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
 			, THREAD_flags(%edi)
 	jnz		kernel_exit_work
+#endif
 1:
 
 	cli								// disable interrupts
@@ -411,12 +421,16 @@ handle_syscall:
 
 	TRACE_POST_SYSCALL()
 
+#if KERNEL_BREAKPOINTS
+	jmp		post_syscall_work
+#else
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
 			| THREAD_FLAGS_64_BIT_SYSCALL_RETURN \
 			| THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_SYSCALL_RESTARTED) \
 			, THREAD_flags(%edi)
 	jnz		post_syscall_work
+#endif
 
 	cli								// disable interrupts
 
@@ -489,8 +503,10 @@ handle_syscall:
   1:
 
 	// install breakpoints, if defined
+#if !KERNEL_BREAKPOINTS
 	testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%edi)
 	jz		1f
+#endif
 	push	%ebp
 	call	x86_init_user_debug_at_kernel_exit
   1:
