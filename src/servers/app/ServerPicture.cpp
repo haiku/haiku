@@ -30,6 +30,7 @@
 #include <List.h>
 #include <Shape.h>
 
+#include <new>
 #include <stdio.h>
 #include <stack>
 
@@ -976,37 +977,27 @@ ServerPicture::DataLength() const
 }
 
 
-#define BUFFER_SIZE 4096
-
-
 status_t
 ServerPicture::ImportData(BPrivate::LinkReceiver &link)
 {	
 	int32 size = 0;
 	link.Read<int32>(&size);
 
-	if (size >= 65536) {
-		//TODO: Pass via an area.
-		// Ideally the Link** api would allow to write partial messages,
-		// so that a big picture could be written in chunks of 4096 bytes
-		// or so
-		return B_ERROR;
-	}
-
 	off_t oldPosition = fData->Position();
 	fData->Seek(0, SEEK_SET);
 
-	// TODO: Oh yeah... 65kb on the stack...
-	char buffer[size];
-	status_t read = link.Read(buffer, size);
-	if (read < B_OK)
-		return (status_t)read;		
-	
-	fData->Write(buffer, size);	
+	status_t status = B_NO_MEMORY;
+	char* buffer = new(std::nothrow) char[size];
+	if (buffer) {
+		status = B_OK;
+		ssize_t read = link.Read(buffer, size);
+		if (read < B_OK || fData->Write(buffer, size) < B_OK)
+			status = B_ERROR;
+		delete [] buffer;
+	}
 
 	fData->Seek(oldPosition, SEEK_SET);
-	
-	return B_OK;
+	return status;
 }
 
 
@@ -1032,27 +1023,24 @@ ServerPicture::ExportData(BPrivate::PortLink &link)
 	off_t size = 0;
 	fData->GetSize(&size);
 	link.Attach<int32>((int32)size);
-	if (size >= 65536) {
-		//TODO: Pass via an area
+
+	status_t status = B_NO_MEMORY;
+	char* buffer = new(std::nothrow) char[size];
+	if (buffer) {
+		status = B_OK;
+		ssize_t read = fData->Read(buffer, size);
+		if (read < B_OK || link.Attach(buffer, read) < B_OK)
+			status = B_ERROR;
+		delete [] buffer;
+	}
+
+	if (status < B_OK) {
 		link.CancelMessage();
 		link.StartMessage(B_ERROR);
-		return B_ERROR;
 	}
-	// TODO: Oh yeah... 65kb on the stack...
-	char buffer[size];
-	ssize_t read = fData->Read(buffer, size);
-	if (read < B_OK)
-		return (status_t)read;		
-	if (link.Attach(buffer, read) < B_OK) {
-		//
-		link.CancelMessage();
-		link.StartMessage(B_ERROR);	
-	};
 
-	
 	fData->Seek(oldPosition, SEEK_SET);
-
-	return B_OK;
+	return status;
 }
 
 

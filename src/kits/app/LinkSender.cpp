@@ -129,8 +129,11 @@ LinkSender::CancelMessage()
 
 
 status_t
-LinkSender::Attach(const void *data, size_t size)
+LinkSender::Attach(const void *passedData, size_t passedSize)
 {
+	size_t size = passedSize;
+	const void* data = passedData;
+
 	if (fCurrentStatus < B_OK)
 		return fCurrentStatus;
 
@@ -140,12 +143,32 @@ LinkSender::Attach(const void *data, size_t size)
 	if (fCurrentEnd == fCurrentStart)
 		return B_NO_INIT;	// need to call StartMessage() first
 
+	bool useArea = false;
+	if (size >= kMaxBufferSize) {
+		useArea = true;
+		size = sizeof(area_id);
+	}
+
 	if (SpaceLeft() < size) {
 		// we have to make space for the data
 
 		status_t status = FlushCompleted(size + CurrentMessageSize());
 		if (status < B_OK)
 			return fCurrentStatus = status;
+	}
+
+	area_id senderArea = -1;
+	if (useArea) {
+		void* address = NULL;
+		off_t alignedSize = (passedSize + B_PAGE_SIZE) & ~(B_PAGE_SIZE - 1);
+		senderArea = create_area("LinkSenderArea", &address, B_ANY_ADDRESS,
+			alignedSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+
+		if (senderArea < B_OK)
+			return senderArea;
+
+		data = &senderArea;
+		memcpy(address, passedData, passedSize);
 	}
 
 	memcpy(fBuffer + fCurrentEnd, data, size);

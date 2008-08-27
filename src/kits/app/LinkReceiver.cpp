@@ -21,7 +21,7 @@
 #include <Region.h>
 
 #include "link_message.h"
-
+#include "syscalls.h"
 
 //#define DEBUG_BPORTLINK
 #ifdef DEBUG_BPORTLINK
@@ -245,9 +245,11 @@ LinkReceiver::ReadFromPort(bigtime_t timeout)
 
 
 status_t
-LinkReceiver::Read(void *data, ssize_t size)
+LinkReceiver::Read(void *data, ssize_t passedSize)
 {
 //	STRACE(("info: LinkReceiver Read()ing %ld bytes...\n", size));
+	ssize_t size = passedSize;
+
 	if (fReadError < B_OK)
 		return fReadError;
 
@@ -259,13 +261,49 @@ LinkReceiver::Read(void *data, ssize_t size)
 	if (fDataSize == 0 || fReplySize == 0)
 		return B_NO_INIT;	// need to call GetNextReply() first
 
+	bool useArea = false;
+	if ((size_t)size >= kMaxBufferSize) {
+		useArea = true;
+		size = sizeof(area_id);
+	}
+
 	if (fRecvPosition + size > fRecvStart + fReplySize) {
 		// reading past the end of current message
 		fReadError = B_BAD_VALUE;
 		return B_BAD_VALUE;
 	}
 
-	memcpy(data, fRecvBuffer + fRecvPosition, size);
+	if (useArea) {
+		area_id sourceArea;
+		memcpy((void*)&sourceArea, fRecvBuffer + fRecvPosition, size);
+
+		area_info areaInfo;
+		if (get_area_info(sourceArea, &areaInfo) < B_OK)
+			fReadError = B_BAD_VALUE;
+
+		if (fReadError >= B_OK) {
+			thread_info threadInfo;
+			get_thread_info(find_thread(NULL), &threadInfo);
+
+			void* areaAddress = NULL;
+			if (areaInfo.team != threadInfo.team) {
+				sourceArea = _kern_transfer_area(sourceArea, &areaAddress,
+					B_ANY_ADDRESS, threadInfo.team);
+		
+				if (sourceArea < B_OK)
+					fReadError = sourceArea;
+			} else {
+				areaAddress = areaInfo.address;
+			}
+			
+			if (areaAddress && sourceArea >= B_OK) {
+				memcpy(data, areaAddress, passedSize);
+				delete_area(sourceArea);
+			}
+		}
+	} else {
+		memcpy(data, fRecvBuffer + fRecvPosition, size);
+	}
 	fRecvPosition += size;
 	return fReadError;
 }
