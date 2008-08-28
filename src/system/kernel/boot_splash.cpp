@@ -37,9 +37,33 @@ static struct frame_buffer_boot_info *sInfo;
 static uint8 *sUncompressedIcons;
 
 static void
+blit8_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
+	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
+	uint16 left, uint16 top)
+{
+	data += (imageWidth * imageTop + imageLeft);
+	uint8* start = (uint8*)(sInfo->frame_buffer
+		+ sInfo->bytes_per_row * (top + imageTop) + 1 * (left + imageLeft));
+
+	for (int32 y = imageTop; y < imageBottom; y++) {
+		const uint8* src = data;
+		uint8* dst = start;
+		for (int32 x = imageLeft; x < imageRight; x++) {
+			dst[0] = src[0];
+			dst++;
+			src++;
+		}
+
+		data += imageWidth;
+		start = (uint8*)((addr_t)start + sInfo->bytes_per_row);
+	}
+}
+
+
+static void
 blit15_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
-	const uint8 *palette, uint16 left, uint16 top)
+	uint16 left, uint16 top)
 {
 	data += (imageWidth * imageTop + imageLeft) * 3;
 	uint16* start = (uint16*)(sInfo->frame_buffer
@@ -67,7 +91,7 @@ blit15_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 static void
 blit16_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
-	const uint8 *palette, uint16 left, uint16 top)
+	uint16 left, uint16 top)
 {
 	data += (imageWidth * imageTop + imageLeft) * 3;
 	uint16* start = (uint16*)(sInfo->frame_buffer
@@ -94,7 +118,7 @@ blit16_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 static void
 blit24_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
-	const uint8 *palette, uint16 left, uint16 top)
+	uint16 left, uint16 top)
 {
 	data += (imageWidth * imageTop + imageLeft) * 3;
 	uint8* start = (uint8*)(sInfo->frame_buffer
@@ -120,7 +144,7 @@ blit24_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 static void
 blit32_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
-	const uint8 *palette, uint16 left, uint16 top)
+	uint16 left, uint16 top)
 {
 	data += (imageWidth * imageTop + imageLeft) * 3;
 	uint32* start = (uint32*)(sInfo->frame_buffer
@@ -142,26 +166,30 @@ blit32_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 
 
 static void
-blit_cropped(const uint8* data, const uint8* indexedData,
-	uint16 imageLeft, uint16 imageTop, uint16 imageRight, uint16 imageBottom,
-	uint16 imageWidth, const uint8 *palette, uint16 left, uint16 top)
+blit_cropped(const uint8* data, uint16 imageLeft, uint16 imageTop,
+	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
+	uint16 left, uint16 top)
 {
 	switch (sInfo->depth) {
+		case 8:
+			blit8_cropped(data, imageLeft, imageTop, imageRight, imageBottom,
+				imageWidth, left, top);
+			return;
 		case 15:
 			blit15_cropped(data, imageLeft, imageTop, imageRight, imageBottom,
-				imageWidth, palette, left, top);
+				imageWidth, left, top);
 			return;
 		case 16:
 			blit16_cropped(data, imageLeft, imageTop, imageRight, imageBottom,
-				imageWidth, palette, left, top);
+				imageWidth, left, top);
 			return;
 		case 24:
 			blit24_cropped(data, imageLeft, imageTop, imageRight, imageBottom,
-				imageWidth, palette, left, top);
+				imageWidth, left, top);
 			return;
 		case 32:
 			blit32_cropped(data, imageLeft, imageTop, imageRight, imageBottom,
-				imageWidth, palette, left, top);
+				imageWidth, left, top);
 			return;
 	}
 }
@@ -213,7 +241,7 @@ boot_splash_set_stage(int stage)
 	int stageRightEdge = width * (stage + 1) / BOOT_SPLASH_STAGE_MAX;
 
 	height = min_c(iconsHalfHeight, sInfo->height);
-	blit_cropped(sUncompressedIcons, NULL, stageLeftEdge, 0, stageRightEdge,
-		height, kSplashIconsWidth, NULL, x, y);
+	blit_cropped(sUncompressedIcons, stageLeftEdge, 0, stageRightEdge,
+		height, kSplashIconsWidth, x, y);
 }
 

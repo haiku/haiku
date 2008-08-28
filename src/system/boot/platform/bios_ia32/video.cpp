@@ -781,16 +781,15 @@ blit4(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
 
 
 static void
-blit_image(const uint8 *data, const uint8* indexedData, uint16 width,
-	uint16 height, uint16 imageWidth, const uint8 *palette, uint16 left,
-	uint16 top)
+blit_image(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
+	const uint8 *palette, uint16 left, uint16 top)
 {
 	switch (gKernelArgs.frame_buffer.depth) {
 		case 4:
-			return blit4(indexedData, width, height, imageWidth, palette,
+			return blit4(data, width, height, imageWidth, palette,
 				left, top);
 		case 8:
-			return blit8(indexedData, width, height, imageWidth, palette,
+			return blit8(data, width, height, imageWidth, palette,
 				left, top);
 		case 15:
 			return blit15(data, width, height, imageWidth, left, top);
@@ -805,7 +804,7 @@ blit_image(const uint8 *data, const uint8* indexedData, uint16 width,
 
 
 static void
-uncompress_RLE(const uint8 compressed[], uint8 *uncompressed)
+uncompress_24bit_RLE(const uint8 compressed[], uint8 *uncompressed)
 {
 	uint32 cursorUncompressed = 0;
 	uint32 cursorCompressed = 0;
@@ -841,6 +840,39 @@ uncompress_RLE(const uint8 compressed[], uint8 *uncompressed)
 		cursorCompressed++;
 	}
 }
+
+static void
+uncompress_8Bit_RLE(const uint8 compressed[], uint8 *uncompressed)
+{
+	uint32 cursorUncompressed = 0;
+	uint32 cursorCompressed = 0;
+	uint8 count = 0;
+	uint8 item = 0;
+	int i = 0;
+
+	while (compressed[cursorCompressed]) {
+		// at the end of the channel there is a terminating 0,
+		// so the loop will end... (ref: generate_boot_screen.cpp)
+		count = compressed[cursorCompressed++];
+		if (count < 128) {
+			// regular run, repeat "item" "count" times...
+			item = compressed[cursorCompressed++];
+			for (i = count - 1; i >= 0; --i) {
+				uncompressed[cursorUncompressed] = item;
+				cursorUncompressed++;
+			}
+		} else {
+			// enumeration, just write the next "count" items as is...
+			count = count - 128;
+			for (i = count - 1; i >= 0; --i) {
+				uncompressed[cursorUncompressed]
+					= compressed[cursorCompressed++];
+				cursorUncompressed++;
+			}
+		}
+	}
+}
+
 
 //	#pragma mark -
 
@@ -916,13 +948,27 @@ fallback:
 	memset((void *)sFrameBuffer, 0,
 		gKernelArgs.frame_buffer.physical_buffer.size);
 
-	uint8 *uncompressedLogo = (uint8 *)kernel_args_malloc(kSplashLogoWidth
-		* kSplashLogoHeight * 3);
-	if (uncompressedLogo == NULL)
-		return;
-	uncompress_RLE(kSplashLogoCompressedImage, uncompressedLogo);
+	uint8 *uncompressedLogo = NULL;
+	switch (gKernelArgs.frame_buffer.depth) {
+		case 8:
+			uncompressedLogo = (uint8 *)kernel_args_malloc(kSplashLogoWidth
+				* kSplashLogoHeight);
+			if (uncompressedLogo == NULL)
+				return;
+			uncompress_8Bit_RLE(kSplashLogo8BitCompressedImage,
+				uncompressedLogo);
+		break;
+		default:
+			uncompressedLogo = (uint8 *)kernel_args_malloc(kSplashLogoWidth
+				* kSplashLogoHeight * 3);
+			if (uncompressedLogo == NULL)
+				return;
+			uncompress_24bit_RLE(kSplashLogo24BitCompressedImage,
+				uncompressedLogo);
+		break;
+	}
 
-	// TODO: support indexed versions of the images!
+	// TODO: support 4-bit indexed version of the images!
 
 	// render splash logo
 	uint16 iconsHalfHeight = kSplashIconsHeight / 2;
@@ -937,16 +983,39 @@ fallback:
 	int y = (gKernelArgs.frame_buffer.height - height) * placementY / 100;
 
 	height = min_c(kSplashLogoHeight, gKernelArgs.frame_buffer.height);
-	blit_image(uncompressedLogo, NULL, width, height, kSplashLogoWidth,
-		NULL, x, y);
+	blit_image(uncompressedLogo, width, height, kSplashLogoWidth,
+		k8BitPalette, x, y);
 
 	kernel_args_free(uncompressedLogo);
 
-	gKernelArgs.boot_splash = (uint8 *)kernel_args_malloc(kSplashIconsWidth
-		* kSplashIconsHeight * 3);
-	if (gKernelArgs.boot_splash == NULL)
-		return;
-	uncompress_RLE(kSplashIconsCompressedImage, gKernelArgs.boot_splash );
+	const uint8* lowerHalfIconImage;
+
+	switch (gKernelArgs.frame_buffer.depth) {
+		case 8:
+			// pointer into the lower half of the icons image data
+			gKernelArgs.boot_splash
+				= (uint8 *)kernel_args_malloc(kSplashIconsWidth
+					* kSplashIconsHeight);
+			if (gKernelArgs.boot_splash == NULL)
+				return;
+			uncompress_8Bit_RLE(kSplashIcons8BitCompressedImage,
+				gKernelArgs.boot_splash );
+			lowerHalfIconImage = gKernelArgs.boot_splash
+				+ (kSplashIconsWidth * iconsHalfHeight);
+		break;
+		default:
+			// pointer into the lower half of the icons image data
+			gKernelArgs.boot_splash
+				= (uint8 *)kernel_args_malloc(kSplashIconsWidth
+					* kSplashIconsHeight * 3);
+			if (gKernelArgs.boot_splash == NULL)
+				return;
+			uncompress_24bit_RLE(kSplashIcons24BitCompressedImage,
+				gKernelArgs.boot_splash );
+			lowerHalfIconImage = gKernelArgs.boot_splash
+				+ (kSplashIconsWidth * iconsHalfHeight) * 3;
+		break;
+	}
 
 	// render initial (grayed out) icons
 	// the grayed out version is the lower half of the icons image
@@ -961,12 +1030,9 @@ fallback:
 	y = kSplashLogoHeight + (gKernelArgs.frame_buffer.height - height)
 		* placementY / 100;
 
-	// pointer into the lower half of the icons image data
-	const uint8* lowerHalfIconImage = gKernelArgs.boot_splash
-		+ (kSplashIconsWidth * iconsHalfHeight) * 3;
 	height = min_c(iconsHalfHeight, gKernelArgs.frame_buffer.height);
-	blit_image(lowerHalfIconImage, NULL, width, height,
-		kSplashIconsWidth, NULL, x, y);
+	blit_image(lowerHalfIconImage, width, height, kSplashIconsWidth,
+		k8BitPalette, x, y);
 }
 
 

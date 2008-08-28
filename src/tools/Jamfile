@@ -39,7 +39,11 @@ BuildPlatformMain <build>copyattr : copyattr.cpp
 BuildPlatformMain <build>data_to_source : data_to_source.cpp
 	: $(HOST_LIBSUPC++) ;
 
-BuildPlatformMain <build>generate_boot_screen : generate_boot_screen.cpp
+UsePrivateObjectHeaders generate_boot_screen.cpp : shared : : true ;
+UsePrivateObjectHeaders ColorQuantizer.cpp : shared : : true ;
+BuildPlatformMain <build>generate_boot_screen :
+	generate_boot_screen.cpp
+	ColorQuantizer.cpp
 	: $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) png z ;
 
 BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
@@ -87,6 +91,10 @@ SEARCH on [ FGristFiles
 SEARCH on [ FGristFiles
 		UpdateMimeInfoThread.cpp MimeUpdateThread.cpp database_support.cpp
 	] = [ FDirName $(HAIKU_TOP) src build libbe storage mime ] ;
+
+SEARCH on [ FGristFiles
+		ColorQuantizer.cpp
+	] = [ FDirName $(HAIKU_TOP) src kits shared ] ;
 
 SubInclude HAIKU_TOP src tools addattr ;
 SubInclude HAIKU_TOP src tools bfs_shell ;
