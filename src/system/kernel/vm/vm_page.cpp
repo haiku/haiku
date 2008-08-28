@@ -1132,9 +1132,7 @@ PageWriterRun::PageWritten(PageWriterCallback* callback, status_t status,
 status_t
 page_writer(void* /*unused*/)
 {
-	// TODO: once the I/O scheduler is there, we should write
-	// a lot more pages back.
-	const uint32 kNumPages = 32;
+	const uint32 kNumPages = 256;
 	uint32 writtenPages = 0;
 	bigtime_t lastWrittenTime = 0;
 
