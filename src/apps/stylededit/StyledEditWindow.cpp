@@ -1,12 +1,11 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Mattias Sundblad
  *		Andrew Bachmann
  */
-
 
 #include "Constants.h"
 #include "ColorMenuItem.h"
@@ -15,6 +14,7 @@
 #include "StyledEditApp.h"
 #include "StyledEditView.h"
 #include "StyledEditWindow.h"
+
 
 #include <Alert.h>
 #include <Autolock.h>
@@ -34,8 +34,6 @@
 #include <TextControl.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
-
-#include <stdlib.h>
 
 
 using namespace BPrivate;
@@ -733,33 +731,22 @@ StyledEditWindow::Quit()
 bool
 StyledEditWindow::QuitRequested()
 {
-	int32 buttonIndex = 0;
-
 	if (fClean)
 		return true;
 
-	BAlert *saveAlert;
-	BString alertText;
-	alertText.SetTo("Save changes to the document \"");
-	alertText<< Title();
-	alertText<<"\"? ";
-	saveAlert = new BAlert("savealert",alertText.String(), "Cancel", "Don't Save","Save",
-		B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
-	saveAlert->SetShortcut(0, B_ESCAPE);
-	saveAlert->SetShortcut(1, 'd');
-	saveAlert->SetShortcut(2, 's');
-	buttonIndex = saveAlert->Go();
+	BString alertText("Save changes to the document \"");
+	alertText<< Title() <<"\"? ";
+	int32 index = _ShowAlert(alertText, "Cancel", "Don't Save", "Save",
+		B_WARNING_ALERT);
 
-	if (buttonIndex == 0) {
-		// "cancel": dont save, dont close the window
-		return false;
-	} else if (buttonIndex == 1) {
-		// "don't save": just close the window
-		return true;
-	} else if (!fSaveMessage) {
-		// save as
-		BMessage* message = new BMessage(SAVE_THEN_QUIT);
-		SaveAs(message);
+	if (index == 0)
+		return false;	// "cancel": dont save, dont close the window
+	
+	if (index == 1)
+		return true;	// "don't save": just close the window
+	
+	if (!fSaveMessage) {
+		SaveAs(new BMessage(SAVE_THEN_QUIT));
 		return false;
 	}
 
@@ -770,55 +757,39 @@ StyledEditWindow::QuitRequested()
 status_t
 StyledEditWindow::Save(BMessage *message)
 {
-	status_t err = B_OK;
-
-	if (!message){
+	if (!message)
 		message = fSaveMessage;
-		if (!message)
-			return B_ERROR;
-	}
+	
+	if (!message)
+		return B_ERROR;
 
 	entry_ref dirRef;
-	err = message->FindRef("directory", &dirRef);
-	if (err!= B_OK)
-		return err;
-
 	const char* name;
-	err = message->FindString("name", &name);
-	if (err!= B_OK)
-		return err;
+	if (message->FindRef("directory", &dirRef) != B_OK
+		|| message->FindString("name", &name) != B_OK)
+		return B_BAD_VALUE;
 
 	BDirectory dir(&dirRef);
-	err = dir.InitCheck();
-	if (err != B_OK)
-		return err;
-
 	BEntry entry(&dir, name);
-	err = entry.InitCheck();
-	if (err != B_OK)
-		return err;
-
-	BFile file(&entry, B_READ_WRITE | B_CREATE_FILE);
-	err = file.InitCheck();
-	if (err != B_OK)
-		return err;
-
-	err = fTextView->WriteStyledEditFile(&file);
-	if (err != B_OK) {
-		BAlert *saveFailedAlert;
+	
+	status_t status = B_ERROR;
+	if (dir.InitCheck() == B_OK && entry.InitCheck() == B_OK) {
+		BFile file(&entry, B_READ_WRITE | B_CREATE_FILE);
+		if (file.InitCheck() == B_OK)
+			status = fTextView->WriteStyledEditFile(&file);
+	}
+	
+	if (status != B_OK) {
 		BString alertText;
-		if (err == B_TRANSLATION_ERROR_BASE)
+		if (status == B_TRANSLATION_ERROR_BASE)
 			alertText.SetTo("Translation error saving \"");
 		else
 			alertText.SetTo("Unknown error saving \"");
 
-		alertText << name;
-		alertText << "\".";
-		saveFailedAlert = new BAlert("saveFailedAlert", alertText.String(), "Bummer",
-			0, 0, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_STOP_ALERT);
-		saveFailedAlert->SetShortcut(0, B_ESCAPE);
-		saveFailedAlert->Go();
-		return err;
+		alertText << name << "\".";
+		_ShowAlert(alertText, "OK", "", "", B_STOP_ALERT);
+
+		return status;
 	}
 
 	SetTitle(name);
@@ -838,7 +809,7 @@ StyledEditWindow::Save(BMessage *message)
 	fUndoCleans = false;
 	fRedoCleans = false;
 	fClean = true;
-	return err;
+	return status;
 }
 
 
@@ -853,7 +824,8 @@ StyledEditWindow::SaveAs(BMessage *message)
 				directory = new entry_ref(dirRef);
 		}
 
-		fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this),
+		BMessenger target(this);
+		fSavePanel = new BFilePanel(B_SAVE_PANEL, &target,
 			directory, B_FILE_NODE, false);
 
 		BMenuBar* menuBar = dynamic_cast<BMenuBar*>(
@@ -919,13 +891,10 @@ StyledEditWindow::_LoadFile(entry_ref* ref)
 		if (entry.GetName(name) != B_OK)
 			strcpy(name, "???");
 
-		char text[B_PATH_NAME_LENGTH + 100];
-		snprintf(text, sizeof(text), "Error loading \"%s\":\n\t%s", name,
-			strerror(status));
+		BString text("Error loading \"");
+		text << name << "\":\n\t" << strerror(status);
 
-		BAlert* alert = new BAlert("StyledEdit Load Failed", text,
-			"Bummer", 0, 0, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_STOP_ALERT);
-		alert->Go();
+		_ShowAlert(text, "OK", "", "", B_STOP_ALERT);
 		return status;
 	}
 
@@ -990,40 +959,23 @@ StyledEditWindow::RevertToSaved()
 	BEntry entry;
 	if (status == B_OK)
 		status = entry.SetTo(&dir, name);
+
 	if (status == B_OK)
 		status = entry.GetRef(&ref);
+
 	if (status != B_OK || !entry.Exists()) {
-		BAlert *vanishedAlert;
-		BString alertText;
-		alertText.SetTo("Cannot revert, file not found: \"");
-		alertText << name;
-		alertText << "\".";
-		vanishedAlert = new BAlert("vanishedAlert", alertText.String(), "Bummer", 0, 0,
-			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_STOP_ALERT);
-		vanishedAlert->SetShortcut(0, B_ESCAPE);
-		vanishedAlert->Go();
+		BString alertText("Cannot revert, file not found: \"");
+		alertText << name << "\".";
+		_ShowAlert(alertText, "OK", "", "", B_STOP_ALERT);
 		return;
 	}
 
-	int32 buttonIndex = 0;
-	BAlert* revertAlert;
-	BString alertText;
-	alertText.SetTo("Revert to the last version of \"");
-	alertText << Title();
-	alertText << "\"? ";
-	revertAlert= new BAlert("revertAlert", alertText.String(), "Cancel", "OK", 0,
-		B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
-	revertAlert->SetShortcut(0, B_ESCAPE);
-	revertAlert->SetShortcut(1, 'o');
-	buttonIndex = revertAlert->Go();
-
-	if (buttonIndex != 1) {
-		// some sort of cancel, don't revert
+	BString alertText("Revert to the last version of \"");
+	alertText << Title() << "\"? ";
+	if (_ShowAlert(alertText, "Cancel", "OK", "", B_WARNING_ALERT) != 1)
 		return;
-	}
 
 	fTextView->Reset();
-
 	if (_LoadFile(&ref) != B_OK)
 		return;
 
@@ -1341,6 +1293,7 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 	_UpdateCleanUndoRedoSaveRevert();
 }
 
+
 void
 StyledEditWindow::_UpdateCleanUndoRedoSaveRevert()
 {
@@ -1355,3 +1308,25 @@ StyledEditWindow::_UpdateCleanUndoRedoSaveRevert()
 	fCanRedo = false;
 }
 
+
+int32
+StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
+	const BString& label2, const BString& label3, alert_type type) const
+{
+	const char* button2 = NULL;
+	if (label2.Length() > 0)
+		button2 = label2.String();
+	
+	const char* button3 = NULL;
+	button_spacing spacing = B_EVEN_SPACING;
+	if (label3.Length() > 0) {
+		button3 = label3.String();
+		spacing = B_OFFSET_SPACING;
+	}
+	
+	BAlert* alert = new BAlert("Alert", text.String(), label.String(), button2,
+		button3, B_WIDTH_AS_USUAL, spacing, type);
+	alert->SetShortcut(0, B_ESCAPE);
+
+	return alert->Go();
+}

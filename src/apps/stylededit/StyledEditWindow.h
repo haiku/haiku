@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,7 @@
 #define STYLED_EDIT_WINDOW_H
 
 
+#include <Alert.h>
 #include <Window.h>
 #include <String.h>
 #include <Message.h>
@@ -57,6 +58,9 @@ class StyledEditWindow : public BWindow {
 		status_t		_LoadFile(entry_ref* ref);
 		void			RevertToSaved();
 		void			_UpdateCleanUndoRedoSaveRevert();
+		int32			_ShowAlert(const BString& text, const BString& label,
+							const BString& label2, const BString& label3,
+							alert_type type) const;
 
 		BMenuBar		*fMenuBar;
 		BMessage		*fPrintSettings;
