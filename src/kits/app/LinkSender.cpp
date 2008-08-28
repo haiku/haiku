@@ -64,11 +64,13 @@ status_t
 LinkSender::StartMessage(int32 code, size_t minSize)
 {
 	// end previous message
-	if (EndMessage() < B_OK)	
+	if (EndMessage() < B_OK)
 		CancelMessage();
 
-	if (minSize > kMaxBufferSize - sizeof(message_header))
-		return fCurrentStatus = B_BUFFER_OVERFLOW;
+	if (minSize >= kMaxBufferSize) {
+		// we will handle this case in Attach, using an area
+		minSize = sizeof(area_id);
+	}
 
 	minSize += sizeof(message_header);
 
