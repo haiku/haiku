@@ -3239,13 +3239,16 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 
 	for (int32 index = 0; index < typeCount; index++) {
 		BMimeType mimeType(PoseView()->MimeTypeAt(index));
-		BMimeType superType;
-		mimeType.GetSupertype(&superType);
-
-		BMenu* superMenu = AddMimeMenu(superType, true, menu, start);
-		if (superMenu != NULL) {
-			// We have a supertype menu.
-			AddMimeMenu(mimeType, false, superMenu, 0);
+		if (mimeType.InitCheck() == B_OK) {
+			BMimeType superType;
+			mimeType.GetSupertype(&superType);
+			if (superType.InitCheck() == B_OK) {
+				BMenu* superMenu = AddMimeMenu(superType, true, menu, start);
+				if (superMenu != NULL) {
+					// We have a supertype menu.
+					AddMimeMenu(mimeType, false, superMenu, 0);
+				}
+			}
 		}
 	}
 
