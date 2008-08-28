@@ -81,6 +81,7 @@ private:
 
 
 class IORequest;
+class IORequestOwner;
 
 
 class IORequestChunk {
@@ -219,6 +220,10 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 									const iovec* vecs, size_t count,
 									size_t length, bool write, uint32 flags);
 
+			void				SetOwner(IORequestOwner* owner)
+									{ fOwner = owner; }
+			IORequestOwner*		Owner() const	{ return fOwner; }
+
 			status_t			CreateSubRequest(off_t parentOffset,
 									off_t offset, size_t length,
 									IORequest*& subRequest);
@@ -248,6 +253,7 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			void				SubRequestFinished(IORequest* request,
 									status_t status, bool partialTransfer,
 									size_t transferEndOffset);
+			void				SetUnfinished();
 
 			size_t				RemainingBytes() const
 									{ return fRemainingBytes; }
@@ -299,6 +305,7 @@ private:
 									size_t size, team_id team, bool copyIn);
 
 			mutex				fLock;
+			IORequestOwner*		fOwner;
 			IOBuffer*			fBuffer;
 			off_t				fOffset;
 			size_t				fLength;

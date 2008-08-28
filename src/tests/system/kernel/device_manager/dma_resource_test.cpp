@@ -577,7 +577,7 @@ Test::Run(DMAResource& resource)
 		if (resultIndex >= fResultCount)
 			_Panic("no results left");
 
-		status_t status = resource.TranslateNext(&request, &operation);
+		status_t status = resource.TranslateNext(&request, &operation, 0);
 		if (status != B_OK) {
 			_Panic("DMAResource::TranslateNext() failed: %s\n",
 				strerror(status));

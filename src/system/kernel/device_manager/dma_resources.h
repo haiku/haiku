@@ -94,9 +94,11 @@ public:
 			status_t			CreateBounceBuffer(DMABounceBuffer** _buffer);
 
 			status_t			TranslateNext(IORequest* request,
-									IOOperation* operation);
+									IOOperation* operation,
+									size_t maxOperationLength);
 			void				RecycleBuffer(DMABuffer* buffer);
 
+			size_t				BlockSize() const	{ return fBlockSize; }
 			uint32				BufferCount() const { return fBufferCount; }
 
 private:

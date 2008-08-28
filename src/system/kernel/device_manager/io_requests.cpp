@@ -634,6 +634,7 @@ IORequest::Init(off_t offset, size_t firstVecOffset, const iovec* vecs,
 
 	fBuffer->SetVecs(firstVecOffset, vecs, count, length, flags);
 
+	fOwner = NULL;
 	fOffset = offset;
 	fLength = length;
 	fRelativeParentOffset = 0;
@@ -938,6 +939,14 @@ IORequest::SubRequestFinished(IORequest* request, status_t status,
 
 
 void
+IORequest::SetUnfinished()
+{
+	MutexLocker _(fLock);
+	ResetStatus();
+}
+
+
+void
 IORequest::SetTransferredBytes(bool partialTransfer, size_t transferredBytes)
 {
 	TRACE("%p->IORequest::SetTransferredBytes(%d, %lu)\n", this,
@@ -1162,6 +1171,7 @@ IORequest::Dump() const
 {
 	kprintf("io_request at %p\n", this);
 
+	kprintf("  owner:             %p\n", fOwner);
 	kprintf("  parent:            %p\n", fParent);
 	kprintf("  status:            %s\n", strerror(fStatus));
 	kprintf("  mutex:             %p\n", &fLock);

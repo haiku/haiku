@@ -11,6 +11,7 @@
 #include <condition_variable.h>
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
+#include <util/OpenHashTable.h>
 
 #include "dma_resources.h"
 #include "io_requests.h"
@@ -22,6 +23,24 @@ public:
 };
 
 typedef status_t (*io_callback)(void* data, io_operation* operation);
+
+
+struct IORequestOwner : DoublyLinkedListLinkImpl<IORequestOwner>,
+		HashTableLink<IORequestOwner> {
+	team_id			team;
+	thread_id		thread;
+	int32			priority;
+	IORequestList	requests;
+	IORequestList	completed_requests;
+	IOOperationList	operations;
+
+			bool				IsActive() const
+									{ return !requests.IsEmpty()
+										|| !completed_requests.IsEmpty()
+										|| !operations.IsEmpty(); }
+
+			void				Dump() const;
+};
 
 
 class IOScheduler {
@@ -44,18 +63,37 @@ public:
 									// has been completed successfully or failed
 									// for some reason
 
+			void				Dump() const;
+
 private:
+			typedef DoublyLinkedList<IORequestOwner> RequestOwnerList;
+
+			struct RequestOwnerHashDefinition;
+			struct RequestOwnerHashTable;
+
 			void				_Finisher();
 			bool				_FinisherWorkPending();
-			IOOperation*		_GetOperation(bool wait);
-			IORequest*			_GetNextUnscheduledRequest(bool wait);
+			off_t				_ComputeRequestOwnerBandwidth(
+									int32 priority) const;
+			void				_NextActiveRequestOwner(IORequestOwner*& owner,
+									off_t& quantum);
 			bool				_PrepareRequestOperations(IORequest* request,
 									IOOperationList& operations,
 									int32& operationsPrepared);
+			bool				_PrepareRequestOperations(IORequest* request,
+									IOOperationList& operations,
+									int32& operationsPrepared, off_t quantum,
+									off_t& usedBandwidth);
+			void				_SortOperations(IOOperationList& operations,
+									off_t& lastOffset);
 			status_t			_Scheduler();
 	static	status_t			_SchedulerThread(void* self);
 			status_t			_RequestNotifier();
 	static	status_t			_RequestNotifierThread(void* self);
+
+			void				_AddRequestOwner(IORequestOwner* owner);
+			IORequestOwner*		_GetRequestOwner(team_id team, thread_id thread,
+									bool allocate);
 
 	static	status_t			_IOCallbackWrapper(void* data,
 									io_operation* operation);
@@ -73,9 +111,19 @@ private:
 			ConditionVariable	fNewRequestCondition;
 			ConditionVariable	fFinishedOperationCondition;
 			ConditionVariable	fFinishedRequestCondition;
+			IOOperation**		fOperationArray;
 			IOOperationList		fUnusedOperations;
 			IOOperationList		fCompletedOperations;
-			bool				fWaiting;
+			IORequestOwner*		fAllocatedRequestOwners;
+			int32				fAllocatedRequestOwnerCount;
+			RequestOwnerList	fActiveRequestOwners;
+			RequestOwnerList	fUnusedRequestOwners;
+			RequestOwnerHashTable* fRequestOwners;
+			size_t				fBlockSize;
+			int32				fPendingOperations;
+			off_t				fIterationBandwidth;
+			off_t				fMinOwnerBandwidth;
+			off_t				fMaxOwnerBandwidth;
 };
 
 #endif	// IO_SCHEDULER_H

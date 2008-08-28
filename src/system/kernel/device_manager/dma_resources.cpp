@@ -379,18 +379,25 @@ DMAResource::_AddBounceBuffer(DMABuffer& buffer, addr_t& physicalBounceBuffer,
 
 
 status_t
-DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
+DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
+	size_t maxOperationLength)
 {
 	IOBuffer* buffer = request->Buffer();
 	off_t originalOffset = request->Offset() + request->Length()
 		- request->RemainingBytes();
 	off_t offset = originalOffset;
+	size_t partialBegin = offset & (fBlockSize - 1);
 
 	// current iteration state
 	uint32 vecIndex = request->VecIndex();
 	uint32 vecOffset = request->VecOffset();
 	size_t totalLength = min_c(request->RemainingBytes(),
 		fRestrictions.max_transfer_size);
+
+	if (maxOperationLength > 0
+		&& maxOperationLength < totalLength + partialBegin) {
+		totalLength = maxOperationLength - partialBegin;
+	}
 
 	MutexLocker locker(fLock);
 
@@ -403,7 +410,6 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation)
 	iovec* vecs = NULL;
 	uint32 segmentCount = 0;
 
-	size_t partialBegin = offset & (fBlockSize - 1);
 	TRACE("  offset %Ld, remaining size: %lu, block size %lu -> partial: %lu\n",
 		offset, request->RemainingBytes(), fBlockSize, partialBegin);
 
