@@ -2732,8 +2732,7 @@ BView::StrokePolygon(const BPoint *ptArray, int32 numPoints, BRect bounds,
 
 		_FlushIfNotInTransaction();
 	} else {
-		// TODO: send via an area
-		fprintf(stderr, "ERROR: polygon to big for BPortLink!\n");
+		fprintf(stderr, "ERROR: Can't send polygon to app_server!\n");
 	}
 }
 
@@ -2759,8 +2758,7 @@ BView::FillPolygon(const BPolygon *polygon, ::pattern pattern)
 
 		_FlushIfNotInTransaction();
 	} else {
-		// TODO: send via an area
-		fprintf(stderr, "ERROR: polygon to big for BPortLink!\n");
+		fprintf(stderr, "ERROR: Can't send polygon to app_server!\n");
 	}
 }
 
@@ -2878,8 +2876,6 @@ BView::FillRegion(BRegion *region, ::pattern pattern)
 
 	fOwner->fLink->StartMessage(AS_FILL_REGION);
 	fOwner->fLink->AttachRegion(*region);
-		// TODO: make this automatically chose
-		// to send over area or handle failure here?
 
 	_FlushIfNotInTransaction();
 }
@@ -3044,19 +3040,14 @@ BView::StrokeShape(BShape *shape, ::pattern pattern)
 	_CheckLockAndSwitchCurrent();
 	_UpdatePattern(pattern);
 
-	if ((sd->opCount * sizeof(uint32)) + (sd->ptCount * sizeof(BPoint))
-			< MAX_ATTACHMENT_SIZE) {
-		fOwner->fLink->StartMessage(AS_STROKE_SHAPE);
-		fOwner->fLink->Attach<BRect>(shape->Bounds());
-		fOwner->fLink->Attach<int32>(sd->opCount);
-		fOwner->fLink->Attach<int32>(sd->ptCount);
-		fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(uint32));
-		fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
+	fOwner->fLink->StartMessage(AS_STROKE_SHAPE);
+	fOwner->fLink->Attach<BRect>(shape->Bounds());
+	fOwner->fLink->Attach<int32>(sd->opCount);
+	fOwner->fLink->Attach<int32>(sd->ptCount);
+	fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(uint32));
+	fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
 
-		_FlushIfNotInTransaction();
-	} else {
-		// TODO: send via an area
-	}
+	_FlushIfNotInTransaction();
 }
 
 
@@ -3073,20 +3064,14 @@ BView::FillShape(BShape *shape, ::pattern pattern)
 	_CheckLockAndSwitchCurrent();
 	_UpdatePattern(pattern);
 
-	if ((sd->opCount * sizeof(uint32)) + (sd->ptCount * sizeof(BPoint))
-			< MAX_ATTACHMENT_SIZE) {
-		fOwner->fLink->StartMessage(AS_FILL_SHAPE);
-		fOwner->fLink->Attach<BRect>(shape->Bounds());
-		fOwner->fLink->Attach<int32>(sd->opCount);
-		fOwner->fLink->Attach<int32>(sd->ptCount);
-		fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(int32));
-		fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
+	fOwner->fLink->StartMessage(AS_FILL_SHAPE);
+	fOwner->fLink->Attach<BRect>(shape->Bounds());
+	fOwner->fLink->Attach<int32>(sd->opCount);
+	fOwner->fLink->Attach<int32>(sd->ptCount);
+	fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(int32));
+	fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
 
-		_FlushIfNotInTransaction();
-	} else {
-		// TODO: send via an area
-		// BTW, in a perfect world, the fLink API would take care of that -- axeld.
-	}
+	_FlushIfNotInTransaction();
 }
 
 
