@@ -2429,6 +2429,9 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int8>(&drawingMode);
 
 			picture->WriteSetDrawingMode((drawing_mode)drawingMode);
+
+			fCurrentView->CurrentState()->SetDrawingMode((drawing_mode)drawingMode);
+			fWindow->GetDrawingEngine()->SetDrawingMode((drawing_mode)drawingMode);
 			break;
 		}
 
@@ -2438,6 +2441,8 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 			picture->WriteSetPenLocation(BPoint(x, y));
+
+			fCurrentView->CurrentState()->SetPenLocation(BPoint(x, y));
 			break;
 		}
 		case AS_VIEW_SET_PEN_SIZE:
@@ -2445,6 +2450,10 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			float penSize;
 			link.Read<float>(&penSize);
 			picture->WriteSetPenSize(penSize);
+
+			fCurrentView->CurrentState()->SetPenSize(penSize);
+			fWindow->GetDrawingEngine()->SetPenSize(
+				fCurrentView->CurrentState()->PenSize());
 			break;
 		}
 
@@ -2459,6 +2468,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			picture->WriteSetLineMode((cap_mode)lineCap, (join_mode)lineJoin, miterLimit);
 
+			fCurrentView->CurrentState()->SetLineCapMode((cap_mode)lineCap);
+			fCurrentView->CurrentState()->SetLineJoinMode((join_mode)lineJoin);
+			fCurrentView->CurrentState()->SetMiterLimit(miterLimit);
+
+			fWindow->GetDrawingEngine()->SetStrokeMode((cap_mode)lineCap,
+				(join_mode)lineJoin, miterLimit);
 			break;
 		}
 		case AS_VIEW_SET_SCALE:
@@ -2466,6 +2481,9 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			float scale;
 			link.Read<float>(&scale);
 			picture->WriteSetScale(scale);
+
+			fCurrentView->SetScale(scale);
+			_UpdateDrawState(fCurrentView);
 			break;
 		}
 
@@ -2641,12 +2659,16 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			rgb_color color;
 			link.Read(&color, sizeof(rgb_color));
 
-			if (code == AS_VIEW_SET_HIGH_COLOR)
+			if (code == AS_VIEW_SET_HIGH_COLOR) {
 				picture->WriteSetHighColor(color);
-			else
+				fCurrentView->CurrentState()->SetHighColor(color);
+				fWindow->GetDrawingEngine()->SetHighColor(color);
+			} else {
 				picture->WriteSetLowColor(color);
-			break;
-		}
+				fCurrentView->CurrentState()->SetLowColor(color);
+				fWindow->GetDrawingEngine()->SetLowColor(color);
+			}
+		}	break;
 
 		case AS_DRAW_STRING:
 		case AS_DRAW_STRING_WITH_DELTA:
@@ -2815,6 +2837,10 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->AddInt16((int16)alphaFunc);
 			picture->EndOp();
 
+			fCurrentView->CurrentState()->SetBlendingMode((source_alpha)srcAlpha,
+				(alpha_function)alphaFunc);
+			fWindow->GetDrawingEngine()->SetBlendingMode((source_alpha)srcAlpha,
+				(alpha_function)alphaFunc);
 			break;
 		}*/
 		default:
