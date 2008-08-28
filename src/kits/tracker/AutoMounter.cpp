@@ -68,6 +68,7 @@ static const char *kAutoMounterSettings = "automounter_settings";
 //	#pragma mark - Haiku Disk Device API
 
 static const uint32 kMsgInitialScan = 'insc';
+static const char* kMountFlagsKeyExtension = " mount flags";
 
 
 AutoMounter::AutoMounter()
@@ -132,10 +133,10 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 					|| !partition->ContainsFileSystem())
 					return false;
 
+				BPath path;
 				if (mode == kRestorePreviousVolumes) {
 					// mount all volumes that were stored in the settings file
 					const char *volumeName = NULL;
-					BPath path;
 					if (partition->GetPath(&path) != B_OK
 						|| partition->ContentName() == NULL
 						|| fPrevious.FindString(path.Path(), &volumeName)
@@ -148,8 +149,15 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 						return false;
 				}
 
-				BPath path;
-				if (partition->Mount() == B_OK
+				uint32 mountFlags;
+				BString mountFlagsKey(path.Path());
+				mountFlagsKey << kMountFlagsKeyExtension;
+				if (fPrevious.FindInt32(mountFlagsKey.String(),
+						(int32*)&mountFlags) < B_OK) {
+					mountFlags = 0;
+				}
+
+				if (partition->Mount(NULL, mountFlags) == B_OK
 					&& partition->GetMountPoint(&path) == B_OK) {
 					// notify Tracker that a new volume has been started
 					BMessage note(kVolumeMounted);
@@ -187,11 +195,39 @@ AutoMounter::_MountVolume(BMessage *message)
 	if (roster.GetPartitionWithID(id, &device, &partition) != B_OK)
 		return;
 
-	status_t status = partition->Mount();
+	uint32 mountFlags = 0;
+	if (partition->ContentType() == NULL
+		|| strcmp(partition->ContentType(), kPartitionTypeBFS) != 0) {
+		// not a BFS volume, suggest to the user to mount read-only
+		// until Haiku is more mature.
+		// TODO: would be nice to skip this for file systems which don't have
+		// support for writing anyways.
+		BString string;
+		// TODO: Use distro name instead of "Haiku"...
+		string << "The file system on this volume is not the Haiku file "
+			"system. It is strongly suggested to mount it in read-only mode."
+			"This will prevent unintentional data loss because of errors "
+			"in Haiku.";
+		BAlert* alert = new BAlert("Mount Warning", string.String(),
+			"Mount Read/Write", "Cancel", "Mount Read-only",
+			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+		int32 choice = alert->Go();
+		switch (choice) {
+			case 0:
+				break;
+			case 1:
+				return;
+			case 2:
+				mountFlags |= B_MOUNT_READ_ONLY;
+				break;
+		}
+	}
+
+	status_t status = partition->Mount(NULL, mountFlags);
 	if (status < B_OK) {
 		BString string;
 		string << "Error mounting volume. (" << strerror(status) << ")";
-			(new BAlert("", string.String(), "OK"))->Go(0);
+			(new BAlert("", string.String(), "Ok"))->Go(NULL);
 	}
 }
 
@@ -459,8 +495,16 @@ AutoMounter::GetSettings(BMessage *message)
 	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
         fs_info info;
         if (fs_stat_dev(volume.Device(), &info) == 0
-			&& info.flags & (B_FS_IS_REMOVABLE | B_FS_IS_PERSISTENT))
+			&& info.flags & (B_FS_IS_REMOVABLE | B_FS_IS_PERSISTENT)) {
 			message->AddString(info.device_name, info.volume_name);
+			
+			BString mountFlagsKey(info.device_name);
+			mountFlagsKey << kMountFlagsKeyExtension;
+			uint32 mountFlags = 0;
+			if (volume.IsReadOnly())
+				mountFlags |= B_MOUNT_READ_ONLY;
+			message->AddInt32(mountFlagsKey.String(), mountFlags);
+		}
 	}
 }
 
