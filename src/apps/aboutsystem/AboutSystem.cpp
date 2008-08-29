@@ -443,6 +443,7 @@ AboutView::AboutView(const BRect &rect)
 		"Marc Flerackers\n"
 		"Daniel Furrer\n"
 		"Matthijs Hollemans\n"
+		"Mathew Hounsell\n"
 		"Morgan Howe\n"
 		"Erik Jaesler\n"
 		"Carwyn Jones\n"
