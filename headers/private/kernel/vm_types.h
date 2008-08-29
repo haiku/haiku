@@ -31,7 +31,7 @@
 //#define DEBUG_CACHE_LIST 1
 
 // uncomment to build in swap support
-//#define ENABLE_SWAP_SUPPORT 1
+#define ENABLE_SWAP_SUPPORT 1
 
 #ifdef __cplusplus
 
