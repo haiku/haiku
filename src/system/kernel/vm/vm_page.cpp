@@ -13,6 +13,8 @@
 #include <KernelExport.h>
 #include <OS.h>
 
+#include <AutoDeleter.h>
+
 #include <arch/cpu.h>
 #include <arch/vm_translation_map.h>
 #include <block_cache.h>
@@ -1308,6 +1310,7 @@ steal_page(vm_page *page, bool stealActive)
 		return false;
 
 	AutoLocker<VMCache> cacheLocker(page->cache, true, false);
+	MethodDeleter<VMCache> _2(page->cache, &VMCache::ReleaseRefLocked);
 
 	// check again if that page is still a candidate
 	if (page->state != PAGE_STATE_INACTIVE
