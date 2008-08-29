@@ -8,11 +8,17 @@
  */
 
 #include "BaseView.h"
-#include "DateTime.h"
 #include "TimeMessages.h"
 
 
+#include <DateTime.h>
 #include <OS.h>
+
+
+using BPrivate::BDate;
+using BPrivate::BTime;
+using BPrivate::BDateTime;
+using BPrivate::B_LOCAL_TIME;
 
 
 TTimeBaseView::TTimeBaseView(BRect frame, const char *name)
@@ -95,7 +101,7 @@ void
 TTimeBaseView::_SendNotices()
 {
 	fMessage.MakeEmpty();
-	
+
 	BDate date = BDate::CurrentDate(B_LOCAL_TIME);
 	fMessage.AddInt32("day", date.Day());
 	fMessage.AddInt32("year", date.Year());

@@ -16,6 +16,9 @@
 #include <String.h>
 
 
+using BPrivate::B_LOCAL_TIME;
+
+
 TTimeEdit::TTimeEdit(BRect frame, const char *name, uint32 sections)
 	: TSectionEdit(frame, name, sections)
 {

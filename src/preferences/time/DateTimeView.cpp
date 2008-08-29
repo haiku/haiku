@@ -11,14 +11,14 @@
 
 #include "DateTimeView.h"
 #include "AnalogClock.h"
-#include "CalendarView.h"
 #include "DateTimeEdit.h"
 #include "TimeMessages.h"
-#include "DateTime.h"
 #include "TimeWindow.h"
 
 
+#include <CalendarView.h>
 #include <CheckBox.h>
+#include <DateTime.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -29,6 +29,11 @@
 #include <StringView.h>
 #include <Window.h>
 #include <time.h>
+
+
+using BPrivate::BCalendarView;
+using BPrivate::BDateTime;
+using BPrivate::B_LOCAL_TIME;
 
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -133,7 +138,7 @@ DateTimeView::MessageReceived(BMessage *message)
 		case kMsgRevert:
 			_Revert();
 			break;
-	
+
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -159,7 +164,7 @@ DateTimeView::CheckCanRevert()
 void
 DateTimeView::_Revert()
 {
-	// Set the clock and calendar as they were at launch time + 
+	// Set the clock and calendar as they were at launch time +
 	// time ellapsed since application launch.
 
 	fUseGmtTime = fOldUseGmtTime;
@@ -180,10 +185,10 @@ DateTimeView::_Revert()
 	BDate date = dateTime.Date();
 	time.SetTime(timeInfo->tm_hour, timeInfo->tm_min, timeInfo->tm_sec % 60);
 	date.SetDate(timeInfo->tm_year + 1900, timeInfo->tm_mon + 1,
-		timeInfo->tm_mday); 
+		timeInfo->tm_mday);
 	dateTime.SetTime(time);
 	dateTime.SetDate(date);
-	
+
 	set_real_time_clock(dateTime.Time_t());
 }
 
@@ -200,7 +205,7 @@ DateTimeView::_InitView()
 {
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
-	float textHeight = fontHeight.descent + fontHeight.ascent 
+	float textHeight = fontHeight.descent + fontHeight.ascent
 		+ fontHeight.leading + 6.0;	// 6px border
 
 	// left side
@@ -232,6 +237,8 @@ DateTimeView::_InitView()
 
 	fClock = new TAnalogClock(bounds, "analogClock");
 	AddChild(fClock);
+	BTime time(BTime::CurrentTime(B_LOCAL_TIME));
+	fClock->SetTime(time.Hour(), time.Minute(), time.Second());
 
 	// clock radio buttons
 	bounds.top = fClock->Frame().bottom + 10.0;
@@ -241,7 +248,7 @@ DateTimeView::_InitView()
 
 	bounds.left += 10.0f;
 	bounds.top = text->Frame().bottom;
-	fLocalTime = new BRadioButton(bounds, "localTime", "Local Time", 
+	fLocalTime = new BRadioButton(bounds, "localTime", "Local Time",
 		new BMessage(kRTCUpdate));
 	AddChild(fLocalTime);
 	fLocalTime->ResizeToPreferred();
@@ -251,7 +258,7 @@ DateTimeView::_InitView()
 		new BMessage(kRTCUpdate));
 	AddChild(fGmtTime);
 	fGmtTime->ResizeToPreferred();
-	
+
 	if (fUseGmtTime)
 		fGmtTime->SetValue(B_CONTROL_ON);
 	else
@@ -271,7 +278,7 @@ DateTimeView::_ReadRTCSettings()
 		return;
 
 	path.Append("RTC_time_settings");
-	
+
 	BEntry entry(path.Path());
 	if (entry.Exists()) {
 		BFile file(&entry, B_READ_ONLY);

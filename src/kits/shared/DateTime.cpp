@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,9 @@
 
 
 #include <time.h>
+
+
+namespace BPrivate {
 
 
 BTime::BTime()
@@ -199,7 +202,7 @@ BDate::WeekNumber() const
 	/*
 		This algorithm is taken from:
 		Frequently Asked Questions about Calendars
-        Version 2.8 Claus Tøndering 15 December 2005
+		Version 2.8 Claus Tøndering 15 December 2005
 
 		Note: it will work only within the Gregorian Calendar
 	*/
@@ -207,40 +210,40 @@ BDate::WeekNumber() const
 	if (!IsValid())
 		return 0;
 
-    int32 a;
-    int32 b;
-    int32 s;
-    int32 e;
-    int32 f;
+	int32 a;
+	int32 b;
+	int32 s;
+	int32 e;
+	int32 f;
 
 	if (fMonth > 0 && fMonth < 3) {
-        a = fYear - 1;
-        b = (a / 4) - (a / 100) + (a / 400);
-        int32 c = ((a - 1) / 4) - ((a - 1) / 100) + ((a -1) / 400);
-        s = b - c;
-        e = 0;
-        f = fDay - 1 + 31 * (fMonth - 1);
-    } else if (fMonth >= 3 && fMonth <= 12) {
-        a = fYear;
-        b = (a / 4) - (a / 100) + (a / 400);
-        int32 c = ((a - 1) / 4) - ((a - 1) / 100) + ((a -1) / 400);
-        s = b - c;
-        e = s + 1;
-        f = fDay + ((153 * (fMonth - 3) + 2) / 5) + 58 + s;
-    } else
-        return 0;
+		a = fYear - 1;
+		b = (a / 4) - (a / 100) + (a / 400);
+		int32 c = ((a - 1) / 4) - ((a - 1) / 100) + ((a -1) / 400);
+		s = b - c;
+		e = 0;
+		f = fDay - 1 + 31 * (fMonth - 1);
+	} else if (fMonth >= 3 && fMonth <= 12) {
+		a = fYear;
+		b = (a / 4) - (a / 100) + (a / 400);
+		int32 c = ((a - 1) / 4) - ((a - 1) / 100) + ((a -1) / 400);
+		s = b - c;
+		e = s + 1;
+		f = fDay + ((153 * (fMonth - 3) + 2) / 5) + 58 + s;
+	} else
+		return 0;
 
-    int32 g = (a + b) % 7;
-    int32 d = (f + g - e) % 7;
-    int32 n = f + 3 - d;
+	int32 g = (a + b) % 7;
+	int32 d = (f + g - e) % 7;
+	int32 n = f + 3 - d;
 
-    int32 weekNumber;
-    if (n < 0)
-        weekNumber = 53 - (g -s) / 5;
-    else if (n > 364 + s)
-        weekNumber = 1;
-    else
-        weekNumber = n / 7 + 1;
+	int32 weekNumber;
+	if (n < 0)
+		weekNumber = 53 - (g -s) / 5;
+	else if (n > 364 + s)
+		weekNumber = 1;
+	else
+		weekNumber = n / 7 + 1;
 
 	return weekNumber;
 }
@@ -252,7 +255,7 @@ BDate::DayOfWeek() const
 	/*
 		This algorithm is taken from:
 		Frequently Asked Questions about Calendars
-        Version 2.8 Claus Tøndering 15 December 2005
+		Version 2.8 Claus Tøndering 15 December 2005
 
 		Note: it will work only within the Gregorian Calendar
 	*/
@@ -276,15 +279,15 @@ BDate::DayOfYear() const
 		Note: this function might fail for 1582...
 
 		http://en.wikipedia.org/wiki/Gregorian_calendar:
-			  The last day of the Julian calendar was Thursday October 4, 1582 
+			  The last day of the Julian calendar was Thursday October 4, 1582
 			  and this was followed by the first day of the Gregorian calendar,
 			  Friday October 15, 1582 (the cycle of weekdays was not affected).
 	*/
 
 	if (!IsValid())
-    	return -1;
+		return -1;
 
-    const int kFirstDayOfMonth[2][12] = {
+	const int kFirstDayOfMonth[2][12] = {
 		{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 },
 		{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 }
 	};
@@ -292,7 +295,7 @@ BDate::DayOfYear() const
 	if (IsLeapYear(fYear))
 		return kFirstDayOfMonth[1][fMonth -1] + fDay;
 
-    return kFirstDayOfMonth[0][fMonth -1] + fDay;
+	return kFirstDayOfMonth[0][fMonth -1] + fDay;
 }
 
 
@@ -481,3 +484,5 @@ BDateTime::Time_t() const
 	// return secs_since_jan1_1970 or -1 on error
 	return uint32(mktime(&tm_struct));
 }
+
+}	//namespace BPrivate

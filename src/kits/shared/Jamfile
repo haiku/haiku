@@ -7,7 +7,9 @@ UsePrivateHeaders shared ;
 
 StaticLibrary libshared.a :
 	AboutWindow.cpp
+	CalendarView.cpp
 	ColorQuantizer.cpp
 	CommandPipe.cpp
+	DateTime.cpp
 	HashString.cpp
 ;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DATE_TIME_H_
@@ -7,6 +7,9 @@
 
 
 #include <String.h>
+
+
+namespace BPrivate {
 
 
 enum time_type {
@@ -96,5 +99,9 @@ class BDateTime {
 		BDate				fDate;
 		BTime				fTime;
 };
+
+
+}	// namespace BPrivate
+
 
 #endif	// _DATE_TIME_H_

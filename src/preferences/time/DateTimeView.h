@@ -17,9 +17,14 @@
 
 class TDateEdit;
 class TTimeEdit;
-class BCalendarView;
 class BRadioButton;
 class TAnalogClock;
+
+
+namespace BPrivate {
+	class BCalendarView;
+}
+using BPrivate::BCalendarView;
 
 
 class DateTimeView : public BView {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CALENDAR_VIEW_H_
@@ -16,6 +16,9 @@
 
 
 class BMessage;
+
+
+namespace BPrivate {
 
 
 enum week_start {
@@ -50,7 +53,7 @@ class BCalendarView : public BView, public BInvoker {
 		virtual void			FrameResized(float width, float height);
 
 		virtual void			Draw(BRect updateRect);
-		
+
 		virtual void			DrawDay(BView *owner, BRect frame, const char *text,
 									bool isSelected = false, bool isEnabled = true,
 									bool focus = false);
@@ -66,14 +69,14 @@ class BCalendarView : public BView, public BInvoker {
 		uint32					InvocationCommand() const;
 		BMessage*				InvocationMessage() const;
 		virtual void			SetInvocationMessage(BMessage *message);
-		
+
 		virtual void			WindowActivated(bool state);
 		virtual void			MakeFocus(bool state = true);
-		virtual status_t		Invoke(BMessage* message = NULL);		
+		virtual status_t		Invoke(BMessage* message = NULL);
 
 		virtual void			MouseUp(BPoint point);
 		virtual void			MouseDown(BPoint where);
-		virtual void			MouseMoved(BPoint point, uint32 code, 
+		virtual void			MouseMoved(BPoint point, uint32 code,
 									const BMessage *dragMessage);
 
 		virtual void			KeyDown(const char *bytes, int32 numBytes);
@@ -89,7 +92,7 @@ class BCalendarView : public BView, public BInvoker {
 		int32					Day() const;
 		int32					Year() const;
 		int32					Month() const;
-		
+
 		BDate					Date() const;
 		bool					SetDate(const BDate &date);
 		bool					SetDate(int32 year, int32 month, int32 day);
@@ -105,7 +108,7 @@ class BCalendarView : public BView, public BInvoker {
 
 	private:
 		void					_InitObject();
-		
+
 		void					_SetToDay();
 		void					_GetYearMonth(int32 *year, int32 *month) const;
 		void					_GetPreferredSize(float *width, float *height);
@@ -119,16 +122,17 @@ class BCalendarView : public BView, public BInvoker {
 		void					_DrawDayHeader();
 		void					_DrawWeekHeader();
 		void					_DrawDay(int32 curRow, int32 curColumn,
-									int32 row, int32 column, int32 counter, 
+									int32 row, int32 column, int32 counter,
 									BRect frame, const char *text, bool focus = false);
 		void					_DrawItem(BView *owner, BRect frame, const char *text,
-									bool isSelected = false, bool isEnabled = true, 
+									bool isSelected = false, bool isEnabled = true,
 									bool focus = false);
 
 		void					_UpdateSelection();
 		BRect					_FirstCalendarItemFrame() const;
 		BRect					_SetNewSelectedDay(const BPoint &where);
 
+								BCalendarView(const BCalendarView &view);
 		BCalendarView&			operator=(const BCalendarView &view);
 
 	private:
@@ -175,5 +179,9 @@ class BCalendarView : public BView, public BInvoker {
 		BString					fWeekNumbers[6];
 		BString					fDayNumbers[6][7];
 };
+
+
+}	// namespace BPrivate
+
 
 #endif	// _CALENDAR_VIEW_H_

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,9 @@
 
 
 #include <stdlib.h>
+
+
+namespace BPrivate {
 
 
 namespace {
@@ -225,7 +228,6 @@ BCalendarView::Draw(BRect updateRect)
 			_UpdateSelection();
 			UnlockLooper();
 			return;
-
 		}
 
 		_DrawDays();
@@ -334,7 +336,7 @@ BCalendarView::MakeFocus(bool state)
 		return;
 
 	BView::MakeFocus(state);
-	
+
 	fFocusChanged = true;
 	Draw(_RectOfDay(fFocusedDay));
 	fFocusChanged = false;
@@ -408,7 +410,7 @@ BCalendarView::MouseDown(BPoint where)
 
 	// try to set to new day
 	frame = _SetNewSelectedDay(where);
-	
+
 	// on success
 	if (fSelectedDay != fNewSelectedDay) {
 		// update focus
@@ -428,7 +430,7 @@ BCalendarView::MouseDown(BPoint where)
 	}
 
 	int32 clicks;
-	// on double click invoke 
+	// on double click invoke
 	BMessage *message = Looper()->CurrentMessage();
 	if (message->FindInt32("clicks", &clicks) == B_OK && clicks > 1)
 		Invoke();
@@ -637,7 +639,7 @@ BCalendarView::SetDate(int32 year, int32 month, int32 day)
 		if (fWeekNumberHeaderVisible)
 			frame.left += frame.Width() / 8 - 1.0;
 
-		Invalidate(frame.InsetBySelf(4.0, 4.0));
+		Draw(frame.InsetBySelf(4.0, 4.0));
 	}
 
 	return true;
@@ -913,22 +915,22 @@ BCalendarView::_SetupWeekNumbers()
 		return;
 
 	date.SetDate(fYear, fMonth, 1);
-	int32 firstDay = date.DayOfWeek();
-	if (fWeekStart == B_WEEK_START_MONDAY)
-		firstDay -= 1;
+	fWeekNumbers[0].SetTo("");
+	fWeekNumbers[0] << date.WeekNumber();
 
-	const int32 kWeekNumber = date.WeekNumber();
-	int32 dateWeekNumber = kWeekNumber;
-	if (kWeekNumber == 52 && firstDay == 0)
-		dateWeekNumber = 1;
-
-	for (int32 row = 0; row < 6; ++row) {
-		int32 weekNumber = dateWeekNumber + row;
-		if (kWeekNumber == 52 && firstDay != 0 || kWeekNumber == 53)
-			dateWeekNumber = 0;
+	for (int32 row = 1; row < 5; ++row) {
+		date.SetDate(fYear, fMonth, date.Day() + 7);
 		fWeekNumbers[row].SetTo("");
-		fWeekNumbers[row] << weekNumber;
+		fWeekNumbers[row] << date.WeekNumber();
 	}
+
+	if (fMonth == 12)
+		date.SetDate(fYear + 1, 1, 5);
+	else
+		date.SetDate(fYear, fMonth + 1, 7);
+
+	fWeekNumbers[5].SetTo("");
+	fWeekNumbers[5] << date.WeekNumber();
 }
 
 
@@ -981,7 +983,7 @@ BCalendarView::_DrawDays()
 			const char *day = fDayNumbers[row][column].String();
 			bool focus = isFocus && focusRow == row && focusColumn == column;
 			_DrawDay(currRow, currColumn, row, column, counter, tmp, day, focus);
-			
+
 			tmp.OffsetBy(tmp.Width(), 0.0);
 		}
 		frame.OffsetBy(0.0, frame.Height());
@@ -1086,9 +1088,9 @@ BCalendarView::_DrawItem(BView *owner, BRect frame, const char *text,
 {
 	rgb_color lColor = LowColor();
 	rgb_color highColor = HighColor();
-	
+
 	rgb_color lowColor = { 255, 255, 255, 255 };
-	
+
 	if (isSelected) {
 		SetHighColor(tint_color(lowColor, B_DARKEN_2_TINT));
 		SetLowColor(HighColor());
@@ -1227,8 +1229,4 @@ BCalendarView::_RectOfDay(const Selection &selection) const
 }
 
 
-BCalendarView&
-BCalendarView::operator=(const BCalendarView &view)
-{
-	return *this;
-}
+}	// namespace BPrivate
