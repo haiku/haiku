@@ -599,6 +599,9 @@ BCalendarView::Date() const
 bool
 BCalendarView::SetDate(const BDate &date)
 {
+	if (!date.IsValid())
+		return false;
+
 	return SetDate(date.Year(), date.Month(), date.Day());
 }
 
@@ -910,29 +913,27 @@ BCalendarView::_SetupDayNumbers()
 void
 BCalendarView::_SetupWeekNumbers()
 {
-	BDate date(fYear, fMonth, fDay);
+	BDate date(fYear, fMonth, 1);
 	if (!date.IsValid())
 		return;
 
-	date.SetDate(fYear, fMonth, 1);
-	fWeekNumbers[0].SetTo("");
-	fWeekNumbers[0] << date.WeekNumber();
+	int32 weekNumber = date.WeekNumber();
 
-	for (int32 row = 1; row < 5; ++row) {
-		date.SetDate(fYear, fMonth, date.Day() + 7);
-		if (date.Day() > date.DaysInMonth())
-			date.SetDate(fYear, fMonth, date.DaysInMonth());
+	for (int32 row = 0; row < 6; ++row) {
 		fWeekNumbers[row].SetTo("");
-		fWeekNumbers[row] << date.WeekNumber();
+		fWeekNumbers[row] << weekNumber++;
 	}
 
-	if (fMonth == 12)
-		date.SetDate(fYear + 1, 1, 5);
-	else
-		date.SetDate(fYear, fMonth + 1, 7);
+	if (fMonth == 12) {
+		date.SetDate(fYear, fMonth, 29);
+		weekNumber = date.WeekNumber();
 
-	fWeekNumbers[5].SetTo("");
-	fWeekNumbers[5] << date.WeekNumber();
+		fWeekNumbers[4].SetTo("");
+		fWeekNumbers[5].SetTo("");
+
+		fWeekNumbers[4] << weekNumber;
+		fWeekNumbers[5] << ((weekNumber != 1) ? 1L : 2L);
+	}
 }
 
 
