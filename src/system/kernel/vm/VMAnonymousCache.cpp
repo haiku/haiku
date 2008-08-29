@@ -697,7 +697,7 @@ VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 status_t
 VMAnonymousCache::Fault(struct vm_address_space *aspace, off_t offset)
 {
-	if (fCanOvercommit) {
+	if (fCanOvercommit && LookupPage(offset) == NULL && !HasPage(offset)) {
 		if (fGuardedSize > 0) {
 			uint32 guardOffset;
 
