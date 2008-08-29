@@ -21,6 +21,7 @@
 
 #include <arch_config.h>
 #include <driver_settings.h>
+#include <fs/fd.h>
 #include <fs_interface.h>
 #include <heap.h>
 #include <kernel_daemon.h>
@@ -80,7 +81,9 @@
 // anymore.
 
 struct swap_file : DoublyLinkedListLinkImpl<swap_file> {
+	int				fd;
 	struct vnode	*vnode;
+	void			*cookie;
 	swap_addr_t		first_slot;
 	swap_addr_t		last_slot;
 	swap_addr_t		used;   // # of slots used
@@ -569,8 +572,8 @@ VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 		off_t pos = (startSlotIndex - swapFile->first_slot) * B_PAGE_SIZE;
 
-		status_t status = vfs_read_pages(swapFile->vnode, NULL, pos, vecs + i,
-				j - i, 0, _numBytes);
+		status_t status = vfs_read_pages(swapFile->vnode, swapFile->cookie, pos,
+			vecs + i, j - i, 0, _numBytes);
 		if (status != B_OK)
 			return status;
 	}
@@ -618,8 +621,8 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 
 		off_t pos = (slotIndex - swapFile->first_slot) * B_PAGE_SIZE;
 
-		status_t status = vfs_write_pages(swapFile->vnode, NULL, pos, vecs + i,
-				n, flags, _numBytes);
+		status_t status = vfs_write_pages(swapFile->vnode, swapFile->cookie,
+			pos, vecs + i, n, flags, _numBytes);
 		if (status != B_OK) {
 			locker.Lock();
 			fAllocatedSwapSize -= n * B_PAGE_SIZE;
@@ -689,8 +692,8 @@ VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 	swap_file* swapFile = find_swap_file(slotIndex);
 	off_t pos = (slotIndex - swapFile->first_slot) * B_PAGE_SIZE;
 
-	return vfs_asynchronous_write_pages(swapFile->vnode, NULL, pos, vecs, 1,
-		numBytes, flags, callback);
+	return vfs_asynchronous_write_pages(swapFile->vnode, swapFile->cookie, pos,
+		vecs, 1, numBytes, flags, callback);
 }
 
 
@@ -1054,32 +1057,48 @@ VMAnonymousCache::_Commit(off_t size)
 status_t
 swap_file_add(char *path)
 {
-	vnode *node = NULL;
-	status_t status = vfs_get_vnode_from_path(path, true, &node);
-	if (status != B_OK)
-		return status;
+	// open the file
+	int fd = open(path, O_RDWR | O_NOCACHE, S_IRUSR | S_IWUSR);
+	if (fd < 0)
+		return errno;
 
+	// fstat() it and check whether we can use it
+	struct stat st;
+	if (fstat(fd, &st) < 0) {
+		close(fd);
+		return errno;
+	}
+
+	if (!(S_ISREG(st.st_mode) || S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode))) {
+		close(fd);
+		return B_BAD_VALUE;
+	}
+
+	if (st.st_size < B_PAGE_SIZE) {
+		close(fd);
+		return B_BAD_VALUE;
+	}
+
+	// get file descriptor, vnode, and cookie
+	file_descriptor* descriptor = get_fd(get_current_io_context(true), fd);
+	put_fd(descriptor);
+
+	vnode *node = fd_vnode(descriptor);
+	if (node == NULL) {
+		close(fd);
+		return B_BAD_VALUE;
+	}
+
+	// do the allocations and prepare the swap_file structure
 	swap_file *swap = (swap_file *)malloc(sizeof(swap_file));
 	if (swap == NULL) {
-		vfs_put_vnode(node);
+		close(fd);
 		return B_NO_MEMORY;
 	}
 
+	swap->fd = fd;
 	swap->vnode = node;
-
-	struct stat st;
-	status = vfs_stat_vnode(node, &st);
-	if (status != B_OK) {
-		free(swap);
-		vfs_put_vnode(node);
-		return status;
-    }
-
-	if (!(S_ISREG(st.st_mode) || S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode))) {
-		free(swap);
-		vfs_put_vnode(node);
-		return B_ERROR;
-	}
+	swap->cookie = descriptor->cookie;
 
 	int32 pageCount = st.st_size >> PAGE_SHIFT;
 	swap->used = 0;
@@ -1087,7 +1106,7 @@ swap_file_add(char *path)
 	swap->maps = (uint32 *)malloc((pageCount + 7) / 8);
 	if (swap->maps == NULL) {
 		free(swap);
-		vfs_put_vnode(node);
+		close(fd);
 		return B_NO_MEMORY;
 	}
 	memset(swap->maps, 0, (pageCount + 7) / 8);
@@ -1095,6 +1114,7 @@ swap_file_add(char *path)
 
 	// set slot index and add this file to swap file list
 	mutex_lock(&sSwapFileListLock);
+	// TODO: Also check whether the swap file is already registered!
 	if (sSwapFileList.IsEmpty()) {
 		swap->first_slot = 0;
 		swap->last_slot = pageCount;
@@ -1151,7 +1171,7 @@ swap_file_delete(char *path)
 	sAvailSwapSpace -= (swapFile->last_slot - swapFile->first_slot) * PAGE_SIZE;
 	mutex_unlock(&sAvailSwapSpaceLock);
 
-	vfs_put_vnode(swapFile->vnode);
+	close(swapFile->fd);
 	free(swapFile->maps);
 	free(swapFile);
 
@@ -1239,10 +1259,10 @@ swap_init_post_modules()
 	}
 
 	close(fd);
-		// TODO: if we don't keep the file open, O_NOCACHE is going to be
-		// removed - we must not do this while we're using the swap file
 
-	swap_file_add("/var/swap");
+	error = swap_file_add("/var/swap");
+	if (error != B_OK)
+		dprintf("Failed to add swap file /var/swap: %s\n", strerror(error));
 }
 
 
