@@ -920,6 +920,8 @@ BCalendarView::_SetupWeekNumbers()
 
 	for (int32 row = 1; row < 5; ++row) {
 		date.SetDate(fYear, fMonth, date.Day() + 7);
+		if (date.Day() > date.DaysInMonth())
+			date.SetDate(fYear, fMonth, date.DaysInMonth());
 		fWeekNumbers[row].SetTo("");
 		fWeekNumbers[row] << date.WeekNumber();
 	}
