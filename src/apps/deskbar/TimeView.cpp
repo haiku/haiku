@@ -39,6 +39,10 @@ All rights reserved.
 #	include "CalendarMenuItem.h"
 #endif
 
+#ifdef _SHOW_CALENDAR_MENU_WINDOW
+#	include "CalendarMenuWindow.h"
+#endif
+
 #include <Debug.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -157,7 +161,7 @@ void
 TTimeView::GetPreferredSize(float *width, float *height)
 {
 	*height = fHeight;
-	
+
 	GetCurrentTime();
 	GetCurrentDate();
 
@@ -166,13 +170,13 @@ TTimeView::GetPreferredSize(float *width, float *height)
 	// overlap the bevels in the parent view.
 	if (ShowingDate())
 		*width = fOrientation ?
-			 min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fDateStr)) 
-			 : kHMargin + StringWidth(fDateStr); 
-	else {		
+			 min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fDateStr))
+			 : kHMargin + StringWidth(fDateStr);
+	else {
 		*width = fOrientation ?
 			 min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fTimeStr))
-			 : kHMargin + StringWidth(fTimeStr);		
-	}	
+			 : kHMargin + StringWidth(fTimeStr);
+	}
 }
 
 
@@ -360,6 +364,32 @@ TTimeView::MouseDown(BPoint point)
 
 		snooze(15000);
 	}
+#elif _SHOW_CALENDAR_MENU_WINDOW
+	bigtime_t startTime = system_time();
+
+	// use the doubleClickSpeed as a treshold
+	bigtime_t doubleClickSpeed;
+	get_click_speed(&doubleClickSpeed);
+
+	while (buttons) {
+		BPoint where;
+		GetMouse(&where, &buttons, false);
+
+		if ((system_time() - startTime) > doubleClickSpeed) {
+			where.y = Bounds().bottom + 4.0;
+			ConvertToScreen(&where);
+
+			if (where.y >= BScreen().Frame().bottom)
+				where.y -= (Bounds().Height() + 4.0);
+
+			CalendarMenuWindow* window = new CalendarMenuWindow(where, fEuroDate);
+			window->Show();
+
+			return;
+		}
+
+		snooze(15000);
+	}
 #endif
 }
 
@@ -402,7 +432,7 @@ TTimeView::Pulse()
 
 		Draw(Bounds());
 		fNeedToUpdate = false;
-	}	
+	}
 }
 
 
@@ -489,22 +519,22 @@ TTimeView::CalculateTextPlacement()
 	BRect bounds(Bounds());
 
 	fDateLocation.x = 0.0;
-	fTimeLocation.x = 0.0;	
-	
+	fTimeLocation.x = 0.0;
+
 	BFont font;
-	GetFont(&font); 	
+	GetFont(&font);
 	const char* stringArray[1];
 	stringArray[0] = fTimeStr;
 	BRect rectArray[1];
 	escapement_delta delta = { 0.0, 0.0 };
 	font.GetBoundingBoxesForStrings(stringArray, 1, B_SCREEN_METRIC, &delta,
 		 rectArray);
-	
+
 	fTimeLocation.y = fDateLocation.y = ceilf((bounds.Height() -
-		rectArray[0].Height() + 1.0) / 2.0 - rectArray[0].top);	
+		rectArray[0].Height() + 1.0) / 2.0 - rectArray[0].top);
 }
 
-		
+
 void
 TTimeView::ShowClockOptions(BPoint point)
 {

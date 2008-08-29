@@ -11,8 +11,18 @@ AddResources Deskbar : Deskbar.rdef icon-freelogo.rdef icons.rdef ;
 SubDirC++Flags -DDB_ADDONS -DOPEN_TRACKER=1
 	-D_INCLUDES_CLASS_DEVICE_MAP=1
 	-D_SUPPORTS_RESOURCES=1
-	-D_SUPPORTS_FEATURE_SCRIPTING=1
-	-D_SHOW_CALENDAR_MENU_ITEM=1 ;
+	-D_SUPPORTS_FEATURE_SCRIPTING=1 ;
+
+local targetLib ;
+local targetSource ;
+
+if $(TARGET_PLATFORM) = haiku {
+targetLib = libshared.a ;
+targetSource = CalendarMenuWindow.cpp ;
+SubDirC++Flags -D_SHOW_CALENDAR_MENU_WINDOW=1 ;
+} else {
+SubDirC++Flags -D_SHOW_CALENDAR_MENU_ITEM=1 ;
+}
 
 Application Deskbar :
 	BarApp.cpp
@@ -34,7 +44,8 @@ Application Deskbar :
 	WindowMenuItem.cpp
 	ResourceSet.cpp
 	Switcher.cpp
-	: be tracker
+	$(targetSource)
+	: be tracker $(targetLib)
 	;
 
 if $(TARGET_PLATFORM) = libbe_test {
