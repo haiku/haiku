@@ -917,7 +917,12 @@ BCalendarView::_SetupWeekNumbers()
 		return;
 
 	// date on Thursday determines week number (ISO 8601)
-	date.AddDays(4 - date.DayOfWeek());
+	int dayOfWeek = date.DayOfWeek();
+	// adjust weekday if Monday is week start,
+	// then Sunday is last day in week
+	if (fWeekStart == B_WEEK_START_MONDAY && dayOfWeek == 0)
+			dayOfWeek = 7;
+	date.AddDays(4 - dayOfWeek);
 	
 	for (int32 row = 0; row < 6; ++row) {
 		fWeekNumbers[row].SetTo("");
