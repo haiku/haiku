@@ -67,7 +67,7 @@ LinkSender::StartMessage(int32 code, size_t minSize)
 	if (EndMessage() < B_OK)
 		CancelMessage();
 
-	if (minSize >= kMaxBufferSize) {
+	if (minSize > kMaxBufferSize - sizeof(message_header) {
 		// we will handle this case in Attach, using an area
 		minSize = sizeof(area_id);
 	}
@@ -117,7 +117,7 @@ LinkSender::EndMessage(bool needsReply)
 	STRACE(("info: LinkSender EndMessage() of size %ld.\n", header->size));
 
 	// bump to start of next message
-	fCurrentStart = fCurrentEnd;	
+	fCurrentStart = fCurrentEnd;
 	return B_OK;
 }
 
@@ -220,7 +220,7 @@ LinkSender::AdjustBuffer(size_t newSize, char **_oldBuffer)
 		return B_BUFFER_OVERFLOW;
 	else if (newSize > kInitialBufferSize)
 		newSize = (newSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
-	
+
 	if (newSize == fBufferSize) {
 		// keep existing buffer
 		if (_oldBuffer)
