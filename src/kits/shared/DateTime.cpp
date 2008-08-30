@@ -175,6 +175,33 @@ BDate::SetDate(int32 year, int32 month, int32 day)
 }
 
 
+void
+BDate::AddDays(int32 days)
+{
+	days += Day();
+	if (days > 0) {
+		while (days > DaysInMonth()) {
+			days -= DaysInMonth();
+			fMonth ++;
+			if (fMonth == 13) {
+				fMonth = 1;
+				fYear ++;
+			}
+		}
+	} else {
+		while (days <= 0) {
+			fMonth --;
+			if (fMonth == 0) {
+				fMonth = 12;
+				fYear --;
+			}
+			days += DaysInMonth();
+		}
+	}
+	fDay = days;
+}
+
+
 int32
 BDate::Day() const
 {

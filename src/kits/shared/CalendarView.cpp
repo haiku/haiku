@@ -909,7 +909,6 @@ BCalendarView::_SetupDayNumbers()
 	}
 }
 
-
 void
 BCalendarView::_SetupWeekNumbers()
 {
@@ -917,22 +916,13 @@ BCalendarView::_SetupWeekNumbers()
 	if (!date.IsValid())
 		return;
 
-	int32 weekNumber = date.WeekNumber();
-
+	// date on Thursday determines week number (ISO 8601)
+	date.AddDays(4 - date.DayOfWeek());
+	
 	for (int32 row = 0; row < 6; ++row) {
 		fWeekNumbers[row].SetTo("");
-		fWeekNumbers[row] << weekNumber++;
-	}
-
-	if (fMonth == 12) {
-		date.SetDate(fYear, fMonth, 29);
-		weekNumber = date.WeekNumber();
-
-		fWeekNumbers[4].SetTo("");
-		fWeekNumbers[5].SetTo("");
-
-		fWeekNumbers[4] << weekNumber;
-		fWeekNumbers[5] << ((weekNumber != 1) ? 1L : 2L);
+		fWeekNumbers[row] << date.WeekNumber();
+		date.AddDays(7);
 	}
 }
 
