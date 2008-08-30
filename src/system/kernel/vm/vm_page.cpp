@@ -1137,6 +1137,8 @@ page_writer(void* /*unused*/)
 	const uint32 kNumPages = 256;
 	uint32 writtenPages = 0;
 	bigtime_t lastWrittenTime = 0;
+	bigtime_t pageCollectionTime = 0;
+	bigtime_t pageWritingTime = 0;
 
 	PageWriterRun run;
 	if (run.Init(kNumPages) != B_OK) {
@@ -1172,6 +1174,8 @@ page_writer(void* /*unused*/)
 		bool lowOnPages = low_resource_state(B_KERNEL_RESOURCE_PAGES)
 			!= B_NO_LOW_RESOURCE;
 #endif
+
+		pageCollectionTime -= system_time();
 
 		while (numPages < kNumPages) {
 			vm_page *page = next_modified_page(marker);
@@ -1226,20 +1230,28 @@ page_writer(void* /*unused*/)
 			numPages++;
 		}
 
+		pageCollectionTime += system_time();
+
 		if (numPages == 0)
 			continue;
 
 		// write pages to disk and do all the cleanup
+		pageWritingTime -= system_time();
 		run.Go();
+		pageWritingTime += system_time();
 
 		// debug output only...
 		writtenPages += numPages;
 		if (writtenPages >= 1024) {
 			bigtime_t now = system_time();
-			dprintf("page writer: wrote 1024 pages (%llu ms)\n",
-				(now - lastWrittenTime) / 1000);
+			dprintf("page writer: wrote 1024 pages (total: %llu ms, "
+				"collect: %llu ms, write: %llu ms)\n",
+				(now - lastWrittenTime) / 1000,
+				pageCollectionTime / 1000, pageWritingTime / 1000);
 			writtenPages -= 1024;
 			lastWrittenTime = now;
+			pageCollectionTime = 0;
+			pageWritingTime = 0;
 		}
 	}
 
