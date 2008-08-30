@@ -97,7 +97,7 @@ extern void file_map_set_size(void *_map, off_t size);
 extern void file_map_invalidate(void *_map, off_t offset, off_t size);
 extern status_t file_map_set_mode(void *_map, uint32 mode);
 extern status_t file_map_translate(void *_map, off_t offset, size_t size,
-					struct file_io_vec *vecs, size_t *_count);
+					struct file_io_vec *vecs, size_t *_count, size_t align);
 
 #ifdef __cplusplus
 }

@@ -48,7 +48,8 @@ public:
 			void			SetSize(fssh_off_t size);
 
 			fssh_status_t	Translate(fssh_off_t offset, fssh_size_t size,
-								fssh_file_io_vec* vecs, fssh_size_t* _count);
+								fssh_file_io_vec* vecs, fssh_size_t* _count,
+								fssh_size_t align);
 
 			file_extent*	ExtentAt(uint32_t index);
 
@@ -354,18 +355,25 @@ FileMap::SetMode(uint32_t mode)
 
 fssh_status_t
 FileMap::Translate(fssh_off_t offset, fssh_size_t size, fssh_file_io_vec* vecs,
-	fssh_size_t* _count)
+	fssh_size_t* _count, fssh_size_t align)
 {
 	MutexLocker _(fLock);
 
 	fssh_size_t maxVecs = *_count;
+	fssh_size_t padLastVec = 0;
 
 	if (offset >= Size()) {
 		*_count = 0;
 		return FSSH_B_OK;
 	}
-	if (offset + size > fSize)
+	if (offset + size > fSize) {
+		if (align > 1) {
+			fssh_off_t alignedSize = (fSize + align - 1) & ~(off_t)(align - 1);
+			if (offset + size >= alignedSize)
+				padLastVec = alignedSize - fSize;
+		}
 		size = fSize - offset;
+	}
 
 	// First, we need to make sure that we have already cached all file
 	// extents needed for this request.
@@ -385,8 +393,7 @@ FileMap::Translate(fssh_off_t offset, fssh_size_t size, fssh_file_io_vec* vecs,
 	vecs[0].length = fileExtent->disk.length - offset;
 
 	if (vecs[0].length >= size) {
-		if (vecs[0].length > size)
-			vecs[0].length = size;
+		vecs[0].length = size + padLastVec;
 		*_count = 1;
 		return FSSH_B_OK;
 	}
@@ -402,8 +409,7 @@ FileMap::Translate(fssh_off_t offset, fssh_size_t size, fssh_file_io_vec* vecs,
 		vecs[vecIndex++] = fileExtent->disk;
 
 		if (size <= fileExtent->disk.length) {
-			if (size < fileExtent->disk.length)
-				vecs[vecIndex - 1].length = size;
+			vecs[vecIndex - 1].length = size + padLastVec;
 			break;
 		}
 
@@ -490,7 +496,7 @@ fssh_file_map_set_mode(void* _map, uint32_t mode)
 
 extern "C" fssh_status_t
 fssh_file_map_translate(void* _map, fssh_off_t offset, fssh_size_t size,
-	fssh_file_io_vec* vecs, fssh_size_t* _count)
+	fssh_file_io_vec* vecs, fssh_size_t* _count, fssh_size_t align)
 {
 	TRACE(("file_map_translate(map %p, offset %Ld, size %ld)\n",
 		_map, offset, size));
@@ -499,6 +505,6 @@ fssh_file_map_translate(void* _map, fssh_off_t offset, fssh_size_t size,
 	if (map == NULL)
 		return FSSH_B_BAD_VALUE;
 
-	return map->Translate(offset, size, vecs, _count);
+	return map->Translate(offset, size, vecs, _count, align);
 }
 

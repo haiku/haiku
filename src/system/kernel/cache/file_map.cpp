@@ -63,7 +63,8 @@ public:
 			void			SetSize(off_t size);
 
 			status_t		Translate(off_t offset, size_t size,
-								file_io_vec* vecs, size_t* _count);
+								file_io_vec* vecs, size_t* _count,
+								size_t align);
 
 			file_extent*	ExtentAt(uint32 index);
 
@@ -383,18 +384,26 @@ FileMap::SetMode(uint32 mode)
 
 
 status_t
-FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
+FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count,
+	size_t align)
 {
 	MutexLocker _(fLock);
 
 	size_t maxVecs = *_count;
+	size_t padLastVec = 0;
 
 	if (offset >= Size()) {
 		*_count = 0;
 		return B_OK;
 	}
-	if (offset + size > fSize)
+	if (offset + size > fSize) {
+		if (align > 1) {
+			off_t alignedSize = (fSize + align - 1) & ~(off_t)(align - 1);
+			if (offset + size >= alignedSize)
+				padLastVec = alignedSize - fSize;
+		}
 		size = fSize - offset;
+	}
 
 	// First, we need to make sure that we have already cached all file
 	// extents needed for this request.
@@ -414,8 +423,7 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 	vecs[0].length = fileExtent->disk.length - offset;
 
 	if (vecs[0].length >= size) {
-		if (vecs[0].length > size)
-			vecs[0].length = size;
+		vecs[0].length = size + padLastVec;
 		*_count = 1;
 		return B_OK;
 	}
@@ -431,8 +439,7 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count)
 		vecs[vecIndex++] = fileExtent->disk;
 
 		if (size <= fileExtent->disk.length) {
-			if (size < fileExtent->disk.length)
-				vecs[vecIndex - 1].length = size;
+			vecs[vecIndex - 1].length = size + padLastVec;
 			break;
 		}
 
@@ -627,7 +634,7 @@ file_map_set_mode(void* _map, uint32 mode)
 
 extern "C" status_t
 file_map_translate(void* _map, off_t offset, size_t size, file_io_vec* vecs,
-	size_t* _count)
+	size_t* _count, size_t align)
 {
 	TRACE(("file_map_translate(map %p, offset %Ld, size %ld)\n",
 		_map, offset, size));
@@ -636,6 +643,6 @@ file_map_translate(void* _map, off_t offset, size_t size, file_io_vec* vecs,
 	if (map == NULL)
 		return B_BAD_VALUE;
 
-	return map->Translate(offset, size, vecs, _count);
+	return map->Translate(offset, size, vecs, _count, align);
 }
 

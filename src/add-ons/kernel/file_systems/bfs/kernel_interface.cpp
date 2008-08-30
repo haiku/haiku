@@ -64,7 +64,9 @@ iterative_io_get_vecs_hook(void* cookie, io_request* request, off_t offset,
 	size_t size, struct file_io_vec* vecs, size_t* _count)
 {
 	Inode* inode = (Inode*)cookie;
-	return file_map_translate(inode->Map(), offset, size, vecs, _count);
+	return file_map_translate(inode->Map(), offset, size, vecs, _count, 512);
+		// TODO: Use the actual block size of the underlying device for the
+		// alignment!
 }
 
 
@@ -382,7 +384,7 @@ bfs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		uint32 fileVecCount = 8;
 
 		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
-			&fileVecCount);
+			&fileVecCount, 0);
 		if (status != B_OK && status != B_BUFFER_OVERFLOW)
 			break;
 
@@ -427,7 +429,7 @@ bfs_write_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		uint32 fileVecCount = 8;
 
 		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
-			&fileVecCount);
+			&fileVecCount, 0);
 		if (status != B_OK && status != B_BUFFER_OVERFLOW)
 			break;
 

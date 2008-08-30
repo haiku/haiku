@@ -1533,7 +1533,7 @@ dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 		size_t bytes = bytesLeft;
 
 		status = file_map_translate(node->file_map, pos, bytesLeft, fileVecs,
-			&fileVecCount);
+			&fileVecCount, 0);
 		if (status != B_OK && status != B_BUFFER_OVERFLOW)
 			break;
 
@@ -1586,7 +1586,7 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 		size_t bytes = bytesLeft;
 
 		status = file_map_translate(node->file_map, pos, bytesLeft, fileVecs,
-			&fileVecCount);
+			&fileVecCount, 0);
 		if (status != B_OK && status != B_BUFFER_OVERFLOW)
 			break;
 

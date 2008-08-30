@@ -219,7 +219,7 @@ ext2_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		uint32 fileVecCount = 8;
 
 		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
-			&fileVecCount);
+			&fileVecCount, 0);
 		if (status != B_OK && status != B_BUFFER_OVERFLOW)
 			break;
 

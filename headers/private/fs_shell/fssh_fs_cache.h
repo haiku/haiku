@@ -118,7 +118,7 @@ extern void				fssh_file_map_invalidate(void *_map, fssh_off_t offset,
 extern fssh_status_t	fssh_file_map_set_mode(void *_map, uint32_t mode);
 extern fssh_status_t	fssh_file_map_translate(void *_map, fssh_off_t offset,
 							fssh_size_t size, struct fssh_file_io_vec *vecs,
-							fssh_size_t *_count);
+							fssh_size_t *_count, fssh_size_t align);
 
 #ifdef __cplusplus
 }
