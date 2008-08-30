@@ -67,7 +67,7 @@ LinkSender::StartMessage(int32 code, size_t minSize)
 	if (EndMessage() < B_OK)
 		CancelMessage();
 
-	if (minSize > kMaxBufferSize - sizeof(message_header) {
+	if (minSize > kMaxBufferSize - sizeof(message_header)) {
 		// we will handle this case in Attach, using an area
 		minSize = sizeof(area_id);
 	}
