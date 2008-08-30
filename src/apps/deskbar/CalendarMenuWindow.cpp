@@ -79,12 +79,14 @@ enum {
 
 CalendarMenuWindow::CalendarMenuWindow(BPoint where, bool euroDate)
 	: BWindow(BRect(0.0, 0.0, 100.0, 130.0), "", B_BORDERED_WINDOW,
-		B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS | B_CLOSE_ON_ESCAPE),
+		B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS | B_CLOSE_ON_ESCAPE |
+		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE),
 	  fYearLabel(NULL),
 	  fMonthLabel(NULL),
 	  fCalendarView(NULL),
 	  fSuppressFirstClose(true)
 {
+	RemoveShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY);
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
 	fYearLabel = new BStringView("year", "");
