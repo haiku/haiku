@@ -85,6 +85,7 @@ TBarWindow::TBarWindow()
 		settings->ampmMode, settings->state, settings->width, settings->showTime);
 	AddChild(fBarView);
 
+	RemoveShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY);
 	AddShortcut('F', B_COMMAND_KEY, new BMessage(kFindButton));
 }
 
