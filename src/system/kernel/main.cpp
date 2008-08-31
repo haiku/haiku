@@ -169,7 +169,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		arch_platform_init_post_thread(&sKernelArgs);
 		TRACE("init POSIX semaphores\n");
 		realtime_sem_init();
-		xsi_ipc_init();
+		xsi_sem_init();
 
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);

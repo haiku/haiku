@@ -22,7 +22,6 @@
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
-#include <util/Vector.h>
 
 
 //#define TRACE_XSI_SEM
@@ -581,13 +580,6 @@ public:
 		fSemaphoreSetId = semaphoreSet->ID();
 	}
 
-	bool HasSemaphoreSet()
-	{
-		if (fSemaphoreSetId != -1)
-			return true;
-		return false;
-	}
-
 	HashTableLink<Ipc>* Link()
 	{
 		return &fLink;
@@ -626,7 +618,7 @@ struct IpcHashTableDefinition {
 };
 
 // Arbitrary limit
-#define MAX_XSI_SEMAPHORE		512
+#define MAX_XSI_SEMAPHORE		2048
 static OpenHashTable<IpcHashTableDefinition> sIpcHashTable;
 static OpenHashTable<SemaphoreHashTableDefinition> sSemaphoreHashTable;
 
@@ -664,18 +656,18 @@ XsiSemaphoreSet::UnsetID()
 
 
 void
-xsi_ipc_init()
+xsi_sem_init()
 {
 	// Initialize hash tables
 	status_t status = sIpcHashTable.Init();
 	if (status != B_OK)
-		panic("xsi_ipc_init() failed to initialized ipc hash table\n");
+		panic("xsi_sem_init() failed to initialize ipc hash table\n");
 	status =  sSemaphoreHashTable.Init();
 	if (status != B_OK)
-		panic("xsi_ipc_init() failed to initialized semaphore hash table\n");
+		panic("xsi_sem_init() failed to initialize semaphore hash table\n");
 
-	mutex_init(&sIpcLock, "global Posix IPC table");
-	mutex_init(&sXsiSemaphoreSetLock, "global Posix xsi sem table");
+	mutex_init(&sIpcLock, "global POSIX semaphore IPC table");
+	mutex_init(&sXsiSemaphoreSetLock, "global POSIX xsi sem table");
 }
 
 
@@ -738,11 +730,11 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 	MutexLocker _(sIpcLock);
 	if (key != IPC_PRIVATE) {
 		isPrivate = false;
-		// Check if key already has a semaphore associated with it
+		// Check if key already exist, if it does it already has a semaphore
+		// set associated with it
 		ipcKey = sIpcHashTable.Lookup(key);
 		if (ipcKey == NULL) {
-			// The ipc key have probably just been created
-			// by the caller, add it to the system
+			// The ipc key does not exist. Create it and add it to the system
 			if (!(flags & IPC_CREAT)) {
 				TRACE_ERROR(("xsi_semget: key %d does not exist, but the "
 					"caller did not ask for creation\n",(int)key));
@@ -755,7 +747,7 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 				return ENOMEM;
 			}
 			sIpcHashTable.Insert(ipcKey);
-		} else if (ipcKey->HasSemaphoreSet()) {
+		} else {
 			// The IPC key exist and it already has a semaphore
 			if ((flags & IPC_CREAT) && (flags & IPC_EXCL)) {
 				TRACE_ERROR(("xsi_semget: key %d already exist\n", (int)key));
@@ -768,27 +760,18 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 			if (!semaphoreSet->HasPermission()) {
 				TRACE_ERROR(("xsi_semget: calling process has not permission "
 					"on semaphore %d, key %d\n", semaphoreSet->ID(),
-					(int)semaphoreSet->IpcKey()));
+					(int)key));
 				return EACCES;
 			}
 			if (numberOfSemaphores > semaphoreSet->NumberOfSemaphores()
 				&& numberOfSemaphores != 0) {
 				TRACE_ERROR(("xsi_semget: numberOfSemaphores greater than the "
 					"one associated with semaphore %d, key %d\n",
-					semaphoreSet->ID(), (int)semaphoreSet->IpcKey()));
+					semaphoreSet->ID(), (int)key));
 				return EINVAL;
 			}
 			create = false;
-		} else {
-			// The IPC key exist but it has not semaphore associated with it
-			if (!(flags & IPC_CREAT)) {
-				TRACE_ERROR(("xsi_semget: key %d has not semaphore associated "
-					"with it and caller did not ask for creation\n",(int)key));
-				return ENOENT;
-			}
 		}
-	} else {
-		// TODO: Handle case of private key
 	}
 
 	if (create) {

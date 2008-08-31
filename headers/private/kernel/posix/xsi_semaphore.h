@@ -16,7 +16,7 @@
 
 __BEGIN_DECLS
 
-extern void xsi_ipc_init();
+extern void xsi_sem_init();
 extern void xsi_sem_undo(struct team *team);
 
 /* user calls */
