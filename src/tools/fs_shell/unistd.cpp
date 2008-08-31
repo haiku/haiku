@@ -42,6 +42,10 @@
 #	endif
 #endif
 
+#ifdef HAIKU_HOST_PLATFORM_LINUX
+#	include <stropts.h>
+#endif
+
 
 #ifndef __BEOS__
 	// Defined in libroot_build.so.
