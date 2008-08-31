@@ -144,6 +144,7 @@ IOScheduler::Init(const char* name)
 		IORequestOwner& owner = fAllocatedRequestOwners[i];
 		owner.team = -1;
 		owner.thread = -1;
+		owner.priority = B_IDLE_PRIORITY;
 		fUnusedRequestOwners.Add(&owner);
 	}
 
@@ -217,8 +218,7 @@ IOScheduler::ScheduleRequest(IORequest* request)
 
 	MutexLocker locker(fLock);
 
-	struct thread* thread = thread_get_current_thread();
-	IORequestOwner* owner = _GetRequestOwner(thread->team->id, thread->id,
+	IORequestOwner* owner = _GetRequestOwner(request->Team(), request->Thread(),
 		true);
 	if (owner == NULL) {
 		panic("IOScheduler: Out of request owners!\n");
@@ -231,8 +231,10 @@ IOScheduler::ScheduleRequest(IORequest* request)
 	bool wasActive = owner->IsActive();
 	request->SetOwner(owner);
 	owner->requests.Add(request);
-	owner->priority = thread->priority;
-		// TODO: Use the I/O priority instead!
+
+	int32 priority = thread_get_io_priority(request->Thread());
+	if (priority >= 0)
+		owner->priority = priority;
 //dprintf("  request %p -> owner %p (thread %ld, active %d)\n", request, owner, owner->thread, wasActive);
 
 	if (!wasActive)
@@ -753,6 +755,7 @@ IOScheduler::_GetRequestOwner(team_id team, thread_id thread, bool allocate)
 				fRequestOwners->RemoveUnchecked(owner);
 			owner->team = team;
 			owner->thread = thread;
+			owner->priority = B_IDLE_PRIORITY;
 			fRequestOwners->InsertUnchecked(owner);
 			break;
 		}

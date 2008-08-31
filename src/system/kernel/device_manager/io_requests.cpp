@@ -12,7 +12,7 @@
 #include <debug.h>
 #include <heap.h>
 #include <kernel.h>
-#include <team.h>
+#include <thread.h>
 #include <util/AutoLock.h>
 #include <vm.h>
 
@@ -640,7 +640,9 @@ IORequest::Init(off_t offset, size_t firstVecOffset, const iovec* vecs,
 	fRelativeParentOffset = 0;
 	fTransferSize = 0;
 	fFlags = flags;
-	fTeam = team_get_current_team_id();
+	struct thread* thread = thread_get_current_thread();
+	fTeam = thread->team->id;
+	fThread = thread->id;
 	fIsWrite = write;
 	fPartialTransfer = 0;
 
@@ -703,6 +705,8 @@ IORequest::CreateSubRequest(off_t parentOffset, off_t offset, size_t length,
 	}
 
 	subRequest->fRelativeParentOffset = parentOffset - fOffset;
+	subRequest->fTeam = fTeam;
+	subRequest->fThread = fThread;
 
 	_subRequest = subRequest;
 	subRequest->SetParent(this);
@@ -1183,6 +1187,7 @@ IORequest::Dump() const
 	kprintf("  pending children:  %ld\n", fPendingChildren);
 	kprintf("  flags:             %#lx\n", fFlags);
 	kprintf("  team:              %ld\n", fTeam);
+	kprintf("  thread:            %ld\n", fThread);
 	kprintf("  r/w:               %s\n", fIsWrite ? "write" : "read");
 	kprintf("  partial transfer:  %s\n", fPartialTransfer ? "yes" : "no");
 	kprintf("  finished cvar:     %p\n", &fFinishedCondition);

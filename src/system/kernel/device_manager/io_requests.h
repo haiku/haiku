@@ -267,6 +267,7 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			bool				IsWrite() const	{ return fIsWrite; }
 			bool				IsRead() const	{ return !fIsWrite; }
 			team_id				Team() const	{ return fTeam; }
+			thread_id			Thread() const	{ return fThread; }
 			uint32				Flags() const	{ return fFlags; }
 
 			IOBuffer*			Buffer() const	{ return fBuffer; }
@@ -321,6 +322,7 @@ private:
 			int32				fPendingChildren;
 			uint32				fFlags;
 			team_id				fTeam;
+			thread_id			fThread;
 			bool				fIsWrite;
 			bool				fPartialTransfer;
 
