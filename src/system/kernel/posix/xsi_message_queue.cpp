@@ -198,13 +198,6 @@ public:
 		fMessageQueueId = messageQueue->ID();
 	}
 
-	bool HasMessageQueue()
-	{
-		if (fMessageQueueId != -1)
-			return true;
-		return false;
-	}
-
 	HashTableLink<Ipc>* Link()
 	{
 		return &fLink;
