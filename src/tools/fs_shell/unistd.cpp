@@ -28,9 +28,9 @@
 #		ifndef HAIKU_HOST_PLATFORM_DARWIN
 #			include <sys/disklabel.h>
 #		endif
-#elif defined(HAIKU_HOST_PLATFORM_CYGWIN)
-#	include <sys/ioctl.h>
-#	include <sys/stat.h>
+#	elif defined(HAIKU_HOST_PLATFORM_CYGWIN)
+#		include <sys/ioctl.h>
+#		include <sys/stat.h>
 #	else
 		// the (POSIX) correct place of definition for ioctl()
 #		include <stropts.h>
@@ -40,10 +40,6 @@
 #		include <linux/hdreg.h>
 #		include <linux/fs.h>
 #	endif
-#endif
-
-#ifdef HAIKU_HOST_PLATFORM_LINUX
-#	include <stropts.h>
 #endif
 
 
