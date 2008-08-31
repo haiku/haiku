@@ -120,11 +120,18 @@ cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex, bigtime_t timeout)
 static status_t
 cond_signal(pthread_cond_t *cond, bool broadcast)
 {
+	int32 waiterCount;
+
 	if (cond == NULL)
 		return B_BAD_VALUE;
 
-	atomic_add((vint32*)&cond->event_counter, 1);
-	return release_sem_etc(cond->sem, broadcast ? cond->waiter_count : 1, 0);
+	waiterCount = cond->waiter_count;
+	if (waiterCount > 0) {
+		atomic_add((vint32*)&cond->event_counter, 1);
+		return release_sem_etc(cond->sem, broadcast ? waiterCount : 1, 0);
+	}
+
+	return 0;
 }
 
 
