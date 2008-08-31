@@ -65,7 +65,8 @@ static const float kHMargin = 2.0;
 enum {
 	kMsgShowClock,
 	kMsgChangeClock,
-	kMsgHide
+	kMsgHide,
+	kMsgLongClick
 };
 
 
@@ -82,7 +83,8 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds, bool milTim
 	fEuroDate(euroDate),
 	fMaxWidth(maxWidth),
 	fHeight(height),
-	fOrientation(true)
+	fOrientation(true),
+	fLongClickTracker(this, kMsgLongClick)
 {
 	fShowingDate = false;
 	fTime = fLastTime = time(NULL);
@@ -154,6 +156,8 @@ TTimeView::AttachedToWindow()
 
 	ResizeToPreferred();
 	CalculateTextPlacement();
+	
+	fLongClickTracker.Start();
 }
 
 
@@ -230,6 +234,49 @@ TTimeView::MessageReceived(BMessage* message)
 		case 'time':
 			Window()->PostMessage(message, Parent());
 			break;
+			
+		case kMsgLongClick:
+		{
+			BPoint where;
+			message->FindPoint("where", &where);			
+			
+			//TODO: do nothing if the calendar is already shown			
+
+#ifdef _SHOW_CALENDAR_MENU_ITEM
+
+			BPopUpMenu *menu = new BPopUpMenu("", false, false);
+			menu->SetFont(be_plain_font);
+
+			menu->AddItem(new CalendarMenuItem());
+			menu->ResizeToPreferred();			
+			
+			BPoint point = where;
+			BScreen screen;
+			where.y = Bounds().bottom + 4;
+
+			// make sure the menu is visible and doesn't hide the date
+			ConvertToScreen(&where);
+			if (where.y + menu->Bounds().Height() > screen.Frame().bottom)
+				where.y -= menu->Bounds().Height() + 2 * Bounds().Height();
+
+			ConvertToScreen(&point);
+			menu->Go(where, true, true, BRect(point.x - 4, point.y - 4,
+				point.x + 4, point.y + 4), true);
+				
+#elif _SHOW_CALENDAR_MENU_WINDOW
+
+			where.y = Bounds().bottom + 4.0;
+			ConvertToScreen(&where);
+
+			if (where.y >= BScreen().Frame().bottom)
+				where.y -= (Bounds().Height() + 4.0);
+
+			CalendarMenuWindow* window = new CalendarMenuWindow(where, fEuroDate);
+			window->Show();			
+#endif		
+				
+			break;
+		}
 
 		default:
 			BView::MessageReceived(message);
@@ -326,71 +373,6 @@ TTimeView::MouseDown(BPoint point)
 	fLastDateStr[0] = '\0';
 	fLastTimeStr[0] = '\0';
 	Pulse();
-
-#ifdef _SHOW_CALENDAR_MENU_ITEM
-	// see if the user holds down the button long enough to show him the calendar
-
-	bigtime_t startTime = system_time();
-
-	// use the doubleClickSpeed as a treshold
-	bigtime_t doubleClickSpeed;
-	get_click_speed(&doubleClickSpeed);
-
-	while (buttons) {
-		BPoint where;
-		GetMouse(&where, &buttons, false);
-
-		if ((system_time() - startTime) > doubleClickSpeed) {
-			BPopUpMenu *menu = new BPopUpMenu("", false, false);
-			menu->SetFont(be_plain_font);
-
-			menu->AddItem(new CalendarMenuItem());
-			menu->ResizeToPreferred();
-
-			point = where;
-			BScreen screen;
-			where.y = Bounds().bottom + 4;
-
-			// make sure the menu is visible at doesn't hide the date
-			ConvertToScreen(&where);
-			if (where.y + menu->Bounds().Height() > screen.Frame().bottom)
-				where.y -= menu->Bounds().Height() + 2 * Bounds().Height();
-
-			ConvertToScreen(&point);
-			menu->Go(where, true, true, BRect(point.x - 4, point.y - 4,
-				point.x + 4, point.y + 4), true);
-			return;
-		}
-
-		snooze(15000);
-	}
-#elif _SHOW_CALENDAR_MENU_WINDOW
-	bigtime_t startTime = system_time();
-
-	// use the doubleClickSpeed as a treshold
-	bigtime_t doubleClickSpeed;
-	get_click_speed(&doubleClickSpeed);
-
-	while (buttons) {
-		BPoint where;
-		GetMouse(&where, &buttons, false);
-
-		if ((system_time() - startTime) > doubleClickSpeed) {
-			where.y = Bounds().bottom + 4.0;
-			ConvertToScreen(&where);
-
-			if (where.y >= BScreen().Frame().bottom)
-				where.y -= (Bounds().Height() + 4.0);
-
-			CalendarMenuWindow* window = new CalendarMenuWindow(where, fEuroDate);
-			window->Show();
-
-			return;
-		}
-
-		snooze(15000);
-	}
-#endif
 }
 
 

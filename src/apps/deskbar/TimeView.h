@@ -34,10 +34,9 @@ All rights reserved.
 #ifndef TIME_VIEW_H
 #define TIME_VIEW_H
 
-
 #include <OS.h>
 #include <View.h>
-
+#include "LongClickTracker.h"
 
 const uint32 kMsgShowSeconds = 'ShSc';
 const uint32 kMsgMilTime = 'MilT';
@@ -124,6 +123,8 @@ class TTimeView : public BView {
 		bool		fOrientation;		// vertical = true
 		BPoint		fTimeLocation;
 		BPoint		fDateLocation;
+		
+		LongClickTracker fLongClickTracker;
 };
 
 
