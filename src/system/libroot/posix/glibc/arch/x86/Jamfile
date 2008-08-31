@@ -60,7 +60,7 @@ local genericSources =
 	s_modf.c s_modff.c # s_modfl.c
 	s_nan.c s_nanf.c
 	s_nextafter.c
-	s_signbit.c s_signbitl.c
+	s_signbit.c s_signbitf.c s_signbitl.c
 	s_round.c s_roundf.c # s_roundl.c
 	s_signgam.c
 	s_tanh.c s_tanhf.c
