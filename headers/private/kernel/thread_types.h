@@ -240,6 +240,7 @@ struct thread {
 	char			name[B_OS_NAME_LENGTH];
 	int32			priority;
 	int32			next_priority;
+	int32			io_priority;
 	int32			state;
 	int32			next_state;
 	struct cpu_ent	*cpu;

@@ -234,6 +234,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->team_next = NULL;
 	thread->queue_next = NULL;
 	thread->priority = thread->next_priority = -1;
+	thread->io_priority = -1;
 	thread->args1 = NULL;  thread->args2 = NULL;
 	thread->alarm.period = 0;
 	reset_signals(thread);
@@ -1988,6 +1989,37 @@ const char*
 thread_state_to_text(struct thread* thread, int32 state)
 {
 	return state_to_text(thread, state);
+}
+
+
+int32
+thread_get_io_priority(thread_id id)
+{
+	// take a shortcut, if it is the current thread
+	struct thread* thread = thread_get_current_thread();
+	int32 priority;
+	if (id == thread->id) {
+		int32 priority = thread->io_priority;
+		return priority < 0 ? thread->priority : priority;
+	}
+
+	// not the current thread -- get it
+	InterruptsSpinLocker locker(gThreadSpinlock);
+
+	thread = thread_get_thread_struct_locked(id);
+	if (thread == NULL)
+		return B_BAD_THREAD_ID;
+
+	priority = thread->io_priority;
+	return priority < 0 ? thread->priority : priority;
+}
+
+
+void
+thread_set_io_priority(int32 priority)
+{
+	struct thread* thread = thread_get_current_thread();
+	thread->io_priority = priority;
 }
 
 

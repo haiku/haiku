@@ -48,6 +48,9 @@ int32 thread_used_threads(void);
 
 const char* thread_state_to_text(struct thread* thread, int32 state);
 
+int32 thread_get_io_priority(thread_id id);
+void thread_set_io_priority(int32 priority);
+
 #define thread_get_current_thread arch_thread_get_current_thread
 
 struct thread *thread_get_thread_struct(thread_id id);
