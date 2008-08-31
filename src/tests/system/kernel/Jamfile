@@ -45,6 +45,8 @@ SetSupportedPlatformsForTarget syscall_time
 	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
 SimpleTest syscall_time : syscall_time.cpp ;
 
+SimpleTest time_stats : time_stats.cpp ;
+
 SimpleTest transfer_area_test : transfer_area_test.cpp ;
 
 SimpleTest wait_test_1 : wait_test_1.c ;
