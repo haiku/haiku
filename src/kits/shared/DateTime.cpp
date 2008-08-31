@@ -202,6 +202,47 @@ BDate::AddDays(int32 days)
 }
 
 
+void
+BDate::AddYears(int32 years)
+{
+	fYear += years;
+	fDay = min_c(fDay, DaysInMonth());
+}
+
+
+void
+BDate::AddMonths(int32 months)
+{
+	if (months == 0)
+		return;
+
+	if (months > 0) {
+		while (months > 0) {
+			fYear++;
+			months -= 12;
+		}
+
+		fMonth += months;
+		if (fMonth < 1) {
+			fYear--;
+			fMonth += 12;
+		}
+	} else {
+		while (months < 0) {
+			fYear--;
+			months += 12;
+		}
+
+		fMonth += months;
+		if (fMonth > 12) {
+			fYear++;
+			fMonth -= 12;
+		}
+	}
+	fDay = min_c(fDay, DaysInMonth());
+}
+
+
 int32
 BDate::Day() const
 {

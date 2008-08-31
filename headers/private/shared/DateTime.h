@@ -50,8 +50,10 @@ class BDate {
 
 		static BDate	CurrentDate(time_type type);
 		bool			SetDate(int32 year, int32 month, int32 day);
-		
+
 		void			AddDays(int32 days);
+		void			AddYears(int32 years);
+		void			AddMonths(int32 months);
 
 		int32			Day() const;
 		int32			Year() const;
