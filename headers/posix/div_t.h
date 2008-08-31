@@ -1,8 +1,9 @@
+/*
+ * Copyright 2002-2005, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DIV_T_H_
 #define _DIV_T_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 typedef struct {
 	int	quot;
