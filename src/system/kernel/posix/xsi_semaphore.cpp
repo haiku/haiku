@@ -846,7 +846,11 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 		setLocker.SetTo(&semaphoreSet->Lock(), false);
 		setHashLocker.Unlock();
 		ipcHashLocker.Unlock();
-	}
+	} else
+		// We are about to delete the set along with its mutex, so
+		// we can't use the MutexLocker class, as the mutex itself
+		// won't exist on function exit
+		mutex_lock(&semaphoreSet->Lock());
 
 	int result = 0;
 	XsiSemaphore *semaphore = semaphoreSet->Semaphore(semaphoreNumber);
@@ -1005,8 +1009,9 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 		case IPC_RMID: {
 			// If this was the command, we are still holding
 			// the semaphore set hash table lock along with the
-			// ipc hash table lock, but not the semaphore set
-			// itself lock as it would be useless in this case
+			// ipc hash table lock and the semaphore set lock
+			// itself, this way we are sure there is not
+			// one waiting in the queue of the mutex.
 			if (!semaphoreSet->HasPermission()) {
 				TRACE_ERROR(("xsi_semctl: calling process has not "
 					"permission on semaphore %d, key %d\n",
