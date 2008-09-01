@@ -98,6 +98,8 @@ MergeObject posix_gnu_libio.o :
 #	fwscanf.c
 	getwc.c
 	getwc_u.c
+	getwchar.c
+	iofgetws.c
 	iofputws.c
 	iofputws_u.c
 	iogetwline.c
