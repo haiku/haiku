@@ -26,11 +26,11 @@ local genericSources =
 	mul.c mul_n.c
 	e_cosh.c e_coshf.c # e_coshl.c
 	e_sinh.c e_sinhf.c # e_sinhl.c
-	e_gamma_r.c e_gammaf_r.c
+	e_gamma_r.c e_gammaf_r.c e_gammal_r.c
 	e_j0.c e_j0f.c
 	e_j1.c e_j1f.c
 	e_jn.c e_jnf.c
-	e_lgamma_r.c e_lgammaf_r.c
+	e_lgamma_r.c e_lgammaf_r.c e_lgammal_r.c
 	k_cos.c k_cosf.c
 	k_sin.c k_sinf.c
 	k_tan.c k_tanf.c
@@ -90,7 +90,7 @@ local genericSources =
 	w_scalb.c w_scalbf.c # w_scalbl.c
 	w_sinh.c w_sinhf.c # w_sinhl.c
 	w_sqrt.c w_sqrtf.c # w_sqrtl.c
-	w_tgamma.c w_tgammaf.c # w_tgammal.c
+	w_tgamma.c w_tgammaf.c w_tgammal.c
 ;
 
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
