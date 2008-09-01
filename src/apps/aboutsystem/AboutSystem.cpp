@@ -411,7 +411,6 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert(
 		"Phil Greenway\n"
 		"Gavin James\n"
-		"Jorge G. Mare\n"
 		"Urias McCullough\n"
 		"Niels Sascha Reedijk\n"
 		"Jonathan Yoder\n"
