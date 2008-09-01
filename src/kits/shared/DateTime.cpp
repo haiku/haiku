@@ -191,7 +191,7 @@ BDate::Date() const
 bool
 BDate::SetDate(const BDate& date)
 {
-	return _SetDate(date.fYear, fMonth, fDay);
+	return _SetDate(date.fYear, date.fMonth, date.fDay);
 }
 
 
