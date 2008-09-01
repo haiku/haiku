@@ -7,7 +7,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include "DateTime.h"
+#include <DateTime.h>
 
 
 #include <time.h>
@@ -104,7 +104,7 @@ BTime::Second() const
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BDate
 
 
 BDate::BDate()
@@ -116,10 +116,8 @@ BDate::BDate()
 
 
 BDate::BDate(int32 year, int32 month, int32 day)
-	: fDay(day),
-	  fYear(year),
-	  fMonth(month)
 {
+	_SetDate(year, month, day);
 }
 
 
@@ -131,15 +129,34 @@ BDate::~BDate()
 bool
 BDate::IsValid() const
 {
-	// fail if the year goes less 1583
-	// 10/15/1582 start of Gregorian calendar
-	if (fYear < 1583)
+	return IsValid(fYear, fMonth, fDay);
+}
+
+
+bool
+BDate::IsValid(const BDate& date) const
+{
+	return IsValid(date.fYear, date.fMonth, date.fDay);
+}
+
+
+bool
+BDate::IsValid(int32 year, int32 month, int32 day) const
+{
+	// no year 0 in Julian and we can't handle nothing before 1.1.4713 BC
+	if (year == 0 || year < -4713
+		|| (year == -4713 && month < 1)
+		|| (year == -4713 && month < 1 && day < 1))
 		return false;
 
-	if (fMonth < 1 || fMonth > 12)
+	// 'missing' days between switch julian - gregorian
+	if (year == 1582 && month == 10 && day > 4 && day < 15)
 		return false;
 
-	if (fDay < 1 || fDay > DaysInMonth())
+	if (month < 1 || month > 12)
+		return false;
+
+	if (day < 1 || day > _DaysInMonth(year, month))
 		return false;
 
 	return true;
@@ -164,41 +181,45 @@ BDate::CurrentDate(time_type type)
 }
 
 
+BDate
+BDate::Date() const
+{
+	return BDate(fYear, fMonth, fDay);
+}
+
+
+bool
+BDate::SetDate(const BDate& date)
+{
+	return _SetDate(date.fYear, fMonth, fDay);
+}
+
+
 bool
 BDate::SetDate(int32 year, int32 month, int32 day)
 {
-	fDay = day;
-	fYear = year;
-	fMonth = month;
+	return _SetDate(year, month, day);
+}
 
-	return IsValid();
+
+void
+BDate::GetDate(int32* year, int32* month, int32* day)
+{
+	if (year)
+		*year = fYear;
+
+	if (month)
+		*month = fMonth;
+
+	if (day)
+		*day = fDay;
 }
 
 
 void
 BDate::AddDays(int32 days)
 {
-	days += Day();
-	if (days > 0) {
-		while (days > DaysInMonth()) {
-			days -= DaysInMonth();
-			fMonth ++;
-			if (fMonth == 13) {
-				fMonth = 1;
-				fYear ++;
-			}
-		}
-	} else {
-		while (days <= 0) {
-			fMonth --;
-			if (fMonth == 0) {
-				fMonth = 12;
-				fYear --;
-			}
-			days += DaysInMonth();
-		}
-	}
-	fDay = days;
+	*this = JulianDayToDate(DateToJulianDay() + days);
 }
 
 
@@ -206,38 +227,22 @@ void
 BDate::AddYears(int32 years)
 {
 	fYear += years;
-	fDay = min_c(fDay, DaysInMonth());
+	fDay = min_c(fDay, _DaysInMonth(fYear, fMonth));
 }
 
 
 void
 BDate::AddMonths(int32 months)
 {
-	if (months == 0)
-		return;
+	fYear += months / 12;
+	fMonth +=  months % 12;
 
-	if (months > 0) {
-		while (months > 0) {
-			fYear++;
-			months -= 12;
-		}
-
-		fMonth += months;
-		if (fMonth < 1) {
-			fYear--;
-			fMonth += 12;
-		}
-	} else {
-		while (months < 0) {
-			fYear--;
-			months += 12;
-		}
-
-		fMonth += months;
-		if (fMonth > 12) {
-			fYear++;
-			fMonth -= 12;
-		}
+	if (fMonth > 12) {
+		fYear++;
+		fMonth -= 12;
+	} else if (fMonth < 1) {
+		fYear--;
+		fMonth += 12;
 	}
 	fDay = min_c(fDay, DaysInMonth());
 }
@@ -265,6 +270,13 @@ BDate::Month() const
 
 
 int32
+BDate::Difference(const BDate& date) const
+{
+	return DateToJulianDay() - date.DateToJulianDay();
+}
+
+
+int32
 BDate::WeekNumber() const
 {
 	/*
@@ -275,7 +287,9 @@ BDate::WeekNumber() const
 		Note: it will work only within the Gregorian Calendar
 	*/
 
-	if (!IsValid())
+	if (!IsValid() || fYear < 1582
+		|| (fYear == 1582 && fMonth < 10)
+		|| (fYear == 1582 && fMonth == 10 && fDay < 15))
 		return 0;
 
 	int32 a;
@@ -320,56 +334,25 @@ BDate::WeekNumber() const
 int32
 BDate::DayOfWeek() const
 {
-	/*
-		This algorithm is taken from:
-		Frequently Asked Questions about Calendars
-		Version 2.8 Claus Tøndering 15 December 2005
-
-		Note: it will work only within the Gregorian Calendar
-	*/
-
-	if (!IsValid())
-		return -1;
-
-	int32 a = (14 - fMonth) / 12;
-	int32 y = fYear - a;
-	int32 m = fMonth + 12 * a - 2;
-	int32 d = (fDay + y + (y / 4) - (y / 100) + (y / 400) + ((31 * m) / 12)) % 7;
-
-	return d;
+	// http://en.wikipedia.org/wiki/Julian_day#Calculation
+	return (DateToJulianDay() % 7) + 1;
 }
 
 
 int32
 BDate::DayOfYear() const
 {
-	/*
-		Note: this function might fail for 1582...
-
-		http://en.wikipedia.org/wiki/Gregorian_calendar:
-			  The last day of the Julian calendar was Thursday October 4, 1582
-			  and this was followed by the first day of the Gregorian calendar,
-			  Friday October 15, 1582 (the cycle of weekdays was not affected).
-	*/
-
-	if (!IsValid())
-		return -1;
-
-	const int kFirstDayOfMonth[2][12] = {
-		{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 },
-		{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 }
-	};
-
-	if (IsLeapYear(fYear))
-		return kFirstDayOfMonth[1][fMonth -1] + fDay;
-
-	return kFirstDayOfMonth[0][fMonth -1] + fDay;
+	return DateToJulianDay() - _DateToJulianDay(fYear, 1, 1) + 1;
 }
 
 
 bool
 BDate::IsLeapYear(int32 year) const
 {
+	if (year < 1582) {
+		if (year < 0) year++;
+		return (year % 4) == 0;
+	}
 	return year % 400 == 0 || year % 4 == 0 && year % 100 != 0;
 }
 
@@ -387,13 +370,7 @@ BDate::DaysInYear() const
 int32
 BDate::DaysInMonth() const
 {
-	if (fMonth == 2 && IsLeapYear(fYear))
-		return 29;
-
-	const int32 daysInMonth[12] =
-		{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-	return daysInMonth[fMonth -1];
+	return _DaysInMonth(fYear, fMonth);
 }
 
 
@@ -465,7 +442,153 @@ BDate::LongMonthName(int32 month) const
 }
 
 
-//	#pragma mark -
+int32
+BDate::DateToJulianDay() const
+{
+	return _DateToJulianDay(fYear, fMonth, fDay);
+}
+
+
+BDate
+BDate::JulianDayToDate(int32 julianDay)
+{
+	BDate date;
+	const int32 kGregorianCalendarStart = 2299161;
+	if (julianDay >= kGregorianCalendarStart) {
+		// http://en.wikipedia.org/wiki/Julian_day#Gregorian_calendar_from_Julian_day_number
+		int32 j = julianDay + 32044;
+		int32 dg = j % 146097;
+		int32 c = (dg / 36524 + 1) * 3 / 4;
+		int32 dc = dg - c * 36524;
+		int32 db = dc % 1461;
+		int32 a = (db / 365 + 1) * 3 / 4;
+		int32 da = db - a * 365;
+		int32 m = (da * 5 + 308) / 153 - 2;
+		date.fYear = ((j / 146097) * 400 + c * 100 + (dc / 1461) * 4 + a) - 4800 +
+			(m + 2) / 12;
+		date.fMonth = (m + 2) % 12 + 1;
+		date.fDay = int32((da - (m + 4) * 153 / 5 + 122) + 1.5);
+	} else {
+		// http://en.wikipedia.org/wiki/Julian_day#Calculation
+		julianDay += 32082;
+		int32 d = (4 * julianDay + 3) / 1461;
+		int32 e = julianDay - (1461 * d) / 4;
+		int32 m = ((5 * e) + 2) / 153;
+		date.fDay = e - (153 * m + 2) / 5 + 1;
+		date.fMonth = m + 3 - 12 * (m / 10);
+		int32 year = d - 4800 + (m / 10);
+		if (year <= 0)
+			year--;
+		date.fYear = year;
+	}
+	return date;
+}
+
+
+bool
+BDate::operator!=(const BDate& date) const
+{
+	return DateToJulianDay() != date.DateToJulianDay();
+}
+
+
+bool
+BDate::operator==(const BDate& date) const
+{
+	return DateToJulianDay() == date.DateToJulianDay();
+}
+
+
+bool
+BDate::operator<(const BDate& date) const
+{
+	return DateToJulianDay() < date.DateToJulianDay();
+}
+
+
+bool
+BDate::operator<=(const BDate& date) const
+{
+	return DateToJulianDay() <= date.DateToJulianDay();
+}
+
+
+bool
+BDate::operator>(const BDate& date) const
+{
+	return DateToJulianDay() > date.DateToJulianDay();
+}
+
+
+bool
+BDate::operator>=(const BDate& date) const
+{
+	return DateToJulianDay() >= date.DateToJulianDay();
+}
+
+
+bool
+BDate::_SetDate(int32 year, int32 month, int32 day)
+{
+	fDay = -1;
+	fYear = -1;
+	fMonth = -1;
+
+	bool valid = IsValid(year, month, day);
+	if (valid) {
+		fDay = day;
+		fYear = year;
+		fMonth = month;
+	}
+
+	return valid;
+}
+
+
+int32
+BDate::_DaysInMonth(int32 year, int32 month) const
+{
+	if (month == 2 && IsLeapYear(year))
+		return 29;
+
+	const int32 daysInMonth[12] =
+		{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+	return daysInMonth[month -1];
+}
+
+
+int32
+BDate::_DateToJulianDay(int32 _year, int32 month, int32 day) const
+{
+	int32 year = _year;
+	if (year < 0) year++;
+
+	int32 a = (14 - month) / 12;
+	int32 y = year + 4800 - a;
+	int32 m = month + (12 * a) - 3;
+
+	// http://en.wikipedia.org/wiki/Julian_day#Calculation
+	if (year > 1582
+		|| (year == 1582 && month > 10)
+		|| (year == 1582 && month == 10 && day >= 15)) {
+		return day + (((153 * m) + 2) / 5) + (365 * y) + (y / 4) -
+					(y / 100) + (y / 400) - 32045;
+	} else if (year < 1582
+		|| (year == 1582 && month < 10)
+		|| (year == 1582 && month == 10 && day <= 4)) {
+		return day + (((153 * m) + 2) / 5) + (365 * y) + (y / 4) - 32083;
+	}
+
+	// http://en.wikipedia.org/wiki/Gregorian_calendar:
+	//		The last day of the Julian calendar was Thursday October 4, 1582
+	//		and this was followed by the first day of the Gregorian calendar,
+	//		Friday October 15, 1582 (the cycle of weekdays was not affected).
+	return -1;
+}
+
+
+//	#pragma mark - BDateTime
 
 
 BDateTime::BDateTime(const BDate &date, const BTime &time)

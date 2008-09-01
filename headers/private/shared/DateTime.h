@@ -47,9 +47,16 @@ class BDate {
 						~BDate();
 
 		bool			IsValid() const;
+		bool			IsValid(const BDate& date) const;
+		bool			IsValid(int32 year, int32 month, int32 day) const;
 
 		static BDate	CurrentDate(time_type type);
+
+		BDate			Date() const;
+		bool			SetDate(const BDate& date);
+
 		bool			SetDate(int32 year, int32 month, int32 day);
+		void			GetDate(int32* year, int32* month, int32* day);
 
 		void			AddDays(int32 days);
 		void			AddYears(int32 years);
@@ -58,6 +65,7 @@ class BDate {
 		int32			Day() const;
 		int32			Year() const;
 		int32			Month() const;
+		int32			Difference(const BDate& date) const;
 
 		int32			DayOfWeek() const;
 		int32			DayOfYear() const;
@@ -73,6 +81,23 @@ class BDate {
 
 		BString			LongDayName(int32 day) const;
 		BString			LongMonthName(int32 month) const;
+
+		int32			DateToJulianDay() const;
+		static BDate	JulianDayToDate(int32 julianDay);
+
+		bool			operator!=(const BDate& date) const;
+		bool			operator==(const BDate& date) const;
+
+		bool			operator<(const BDate& date) const;
+		bool			operator<=(const BDate& date) const;
+
+		bool			operator>(const BDate& date) const;
+		bool			operator>=(const BDate& date) const;
+
+	private:
+		int32			_DaysInMonth(int32 year, int32 month) const;
+		bool			_SetDate(int32 year, int32 month, int32 day);
+		int32			_DateToJulianDay(int32 year, int32 month, int32 day) const;
 
 	private:
 		int32			fDay;
