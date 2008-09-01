@@ -14,6 +14,7 @@
 
 #include "ide_sim.h"
 #include "ide_cmds.h"
+#include "ata_tracing.h"
 
 #define TRACE dprintf
 #define FLOW dprintf
@@ -30,6 +31,8 @@ ata_select_device(ide_bus_info *bus, int device)
 {
 	ide_task_file tf;
 
+	T2(bus, device, "ata_select_device");
+
 //	FLOW("ata_select_device device %d\n", device);
 
 	tf.chs.head = 0;
@@ -42,14 +45,18 @@ ata_select_device(ide_bus_info *bus, int device)
 
 	// for debugging only
 	bus->controller->read_command_block_regs(bus->channel_cookie, &tf, ide_mask_device_head);
-	if (tf.chs.device != device)
+	if (tf.chs.device != device) {
+		T2(bus, device, "ata_select_device failed, device not selected. head 0x%x, mode 0x%x, device %d", tf.chs.head, tf.chs.mode, tf.chs.device);
 		TRACE("ata_select_device result: device %d not selected! head 0x%x, mode 0x%x, device %d\n", device, tf.chs.head, tf.chs.mode, tf.chs.device);
+	}
 }
 
 
 void
 ata_select(ide_device_info *device)
 {
+	T(device, "ata_select");
+
 	ASSERT(device->is_device1 == device->tf.chs.device);
 	ata_select_device(device->bus, device->is_device1);
 }
@@ -63,6 +70,9 @@ bool
 ata_is_device_present(ide_bus_info *bus, int device)
 {
 	ide_task_file tf;
+	bool present;
+
+	T2(bus, device, "ata_is_device_present ?");
 
 	ata_select_device(bus, device);
 
@@ -76,7 +86,11 @@ ata_is_device_present(ide_bus_info *bus, int device)
 	bus->controller->read_command_block_regs(bus->channel_cookie, &tf,
 		ide_mask_sector_count | ide_mask_LBA_low);
 
-	return tf.lba.sector_count == 0xaa && tf.lba.lba_0_7 == 0x55;
+	present = tf.lba.sector_count == 0xaa && tf.lba.lba_0_7 == 0x55;
+
+	T2(bus, device, "ata_is_device_present present=%d", present);
+
+	return present; 
 }
 
 
@@ -1117,7 +1131,7 @@ ata_identify_device(ide_device_info *device, bool isAtapi)
 		return B_ERROR;
 	}
 
-	if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, isAtapi ? 3000000 : 500000) != B_OK) {
+	if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, isAtapi ? 20000000 : 500000) != B_OK) {
 		TRACE("ata_identify_device: wait failed\n");
 		return B_ERROR;
 	}
