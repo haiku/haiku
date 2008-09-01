@@ -201,7 +201,7 @@ AboutView::AboutView(const BRect &rect)
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
 
-	char string[256];
+	char string[1024];
 	strcpy(string, "Unknown");
 
 	// the version is stored in the BEOS:APP_VERSION attribute of libbe.so
@@ -354,43 +354,69 @@ AboutView::AboutView(const BRect &rect)
 		B_PLAIN_BORDER);
 	AddChild(creditsScroller);
 
+	// Haiku copyright
 	BFont font(be_bold_font);
 	font.SetSize(font.Size() + 4);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert("Haiku\n");
 
-	font.SetSize(be_bold_font->Size());
-	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
-
 	time_t time = ::time(NULL);
 	struct tm* tm = localtime(&time);
 	int32 year = tm->tm_year + 1900;
-	if (year < 2007)
-		year = 2007;
+	if (year < 2008)
+		year = 2008;
 	snprintf(string, sizeof(string),
-		"Copyright " B_UTF8_COPYRIGHT "2001-%ld Haiku, Inc.\n", year);
+		"Copyright " B_UTF8_COPYRIGHT " 2001-%ld The Haiku project.", year);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(string);
 
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert("The copyright to the Haiku code is property of "
+		"Haiku, Inc. or of the respective authors where expressly noted "
+		"in the source."
+		"\n\n");
+
+
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
-	fCreditsView->InsertHyperText("http://haiku-os.org",
-		new URLAction("http://haiku-os.org"));
+	fCreditsView->InsertHyperText("http://www.haiku-os.org",
+		new URLAction("http://www.haiku-os.org"));
 	fCreditsView->Insert("\n\n");
 
+	font.SetSize(be_bold_font->Size());
+	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Team Leads:\n");
+	fCreditsView->Insert("Most influential developers:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Axel Dörfler\n"
-		"Phil Greenway\n"
-		"Philippe Houdoin\n"
-		"Marcus Overhagen\n"
 		"Ingo Weinhold\n"
+		"Stephan Aßmus\n"
+		"Jérôme Duval\n"
+		"Stefano Ceccherini\n"
+		"François Revol\n"
+		"Marcus Overhagen\n"
+		"Michael Lotz\n"
+		"Rudolf Cornelissen\n"
+		"\n");
+
+
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
+	fCreditsView->Insert("Website, Marketing & Documention:\n");
+
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(
+		"Phil Greenway\n"
+		"Gavin James\n"
+		"Jorge G. Mare\n"
+		"Urias McCullough\n"
+		"Niels Sascha Reedijk\n"
 		"Jonathan Yoder\n"
 		"\n");
+
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Developers:\n");
@@ -399,26 +425,23 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert(
 		"Ithamar R. Adema\n"
 		"Bruno G. Albuquerque\n"
-		"Stephan Aßmus\n"
 		"Andrew Bachmann\n"
 		"Salvatore Benedetto\n"
-		"Stefano Ceccherini\n"
-		"Rudolf Cornelissen\n"
 		"Alexandre Deckner\n"
 		"Oliver Ruiz Dorantes\n"
-		"Jérôme Duval\n"
 		"Andre Alves Garzia\n"
 		"René Gollent\n"
 		"Karsten Heimrich\n"
+		"Philippe Houdoin\n"
+		"Maurice Kalinowski\n"
 		"Euan Kirkhope\n"
 		"Waldemar Kornewald\n"
 		"Ryan Leavengood\n"
-		"Michael Lotz\n"
 		"David McPaul\n"
+		"Fredrik Modéen\n"
 		"Michael Pfeiffer\n"
-		"Niels Sascha Reedijk\n"
-		"François Revol\n"
 		"Hugo Santos\n"
+		"Andrej Spielmann\n"
 		"Jonas Sundström\n"
 		"Gerasim Troeglazov\n"
 		"Bryan Varner\n"
@@ -447,7 +470,6 @@ AboutView::AboutView(const BRect &rect)
 		"Morgan Howe\n"
 		"Erik Jaesler\n"
 		"Carwyn Jones\n"
-		"Maurice Kalinowski\n"
 		"Vasilis Kaoutsis\n"
 		"James Kim\n"
 		"Shintaro Kinugawa\n"
@@ -471,12 +493,10 @@ AboutView::AboutView(const BRect &rect)
 		"Christopher ML Zumwalt May\n"
 		"Andrew McCall\n"
 		"Scott McCreary\n"
-		"Urias McCullough\n"
 		"Michele (zuMi)\n"
 		"Marius Middelthon\n"
 		"Marco Minutoli\n"
 		"Misza\n"
-		"Fredrik Modéen\n"
 		"MrSiggler\n"
 		"Alan Murta\n"
 		"Frans Van Nispen\n"
@@ -484,6 +504,7 @@ AboutView::AboutView(const BRect &rect)
 		"Pahtz\n"
 		"Michael Paine\n"
 		"Michael Phipps\n"
+		"David Powell\n"
 		"Jeremy Rand\n"
 		"Hartmut Reh\n"
 		"David Reid\n"
@@ -727,6 +748,11 @@ AboutView::AboutView(const BRect &rect)
 		"Copyright " B_UTF8_COPYRIGHT " 2002-2003 Steve Lhomme. "
 		"All rights reserved.",
 		"http://www.matroska.org");
+
+	// BColorQuantizer (originally CQuantizer code)
+	AddCopyrightEntry("CQuantizer",
+		"Copyright " B_UTF8_COPYRIGHT " 1996-1997 Jeff Prosise. "
+		"All rights reserved.");
 
 // OpenSound
 //	AddCopyrightEntry("OpenSound",
