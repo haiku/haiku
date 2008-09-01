@@ -482,7 +482,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		r.Set(h, v, h+INSTANT_LOAD-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
 		fInstantLoad = new InstantView(r);
 		fTopView->AddChild(fInstantLoad);
-		fInstantLoad->SetViewColor(0.0, 0.0, 0.0);
+		fInstantLoad->SetViewColor(0, 0, 0);
 
 	h += INSTANT_LOAD+H_BORDER;
 
@@ -1209,10 +1209,10 @@ ChartWindow::OpenRefresh(BPoint here)
 							 B_FLOATING_APP_WINDOW_FEEL,
 							 B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK);
 		frame.OffsetTo(0.0, 0.0);
-		slider = new BSlider(frame, "", NULL, new BMessage(REFRESH_RATE_MSG), 0.0, 1000.0);
+		slider = new BSlider(frame, "", NULL, new BMessage(REFRESH_RATE_MSG), 0, 1000);
 		slider->SetViewColor(background_color);
 		slider->SetTarget(NULL, this);
-		slider->SetValue(1000.0*log(fCurrentSettings.refresh_rate/REFRESH_RATE_MIN)/log(REFRESH_RATE_MAX/REFRESH_RATE_MIN));
+		slider->SetValue(1000*log(fCurrentSettings.refresh_rate/REFRESH_RATE_MIN)/log(REFRESH_RATE_MAX/REFRESH_RATE_MIN));
 		slider->SetModificationMessage(new BMessage(REFRESH_RATE_MSG));
 		slider->SetLimitLabels(" 0.6 f/s  (logarythmic scale)", "600.0 f/s");
 		slider->ResizeToPreferred();
@@ -1255,18 +1255,21 @@ ChartWindow::DrawInstantLoad(float frame_per_second)
 	/* the new level is higher than the previous. We need to draw more
 	   colored bars. */	
 	if (level > fInstantLoadLevel) {
-		for (i=fInstantLoadLevel; i<level; i++) {
-			if (i<fInstantLoad->step) fInstantLoad->SetHighColor(255.0, 90.0, 90.0);
-			else if ((i/fInstantLoad->step) & 1) fInstantLoad->SetHighColor(90.0, 255.0, 90.0);
-			else fInstantLoad->SetHighColor(40.0, 200.0, 40.0);
-			fInstantLoad->FillRect(BRect(3+i*4, 2, 5+i*4, 19));
+		for (i = fInstantLoadLevel; i < level; i++) {
+			if (i < fInstantLoad->step)
+				fInstantLoad->SetHighColor(255, 90, 90);
+			else if ((i / fInstantLoad->step) & 1)
+				fInstantLoad->SetHighColor(90, 255, 90);
+			else
+				fInstantLoad->SetHighColor(40, 200, 40);
+			fInstantLoad->FillRect(BRect(3 + i * 4, 2, 5 + i * 4, 19));
 		}
 	}
 	/* the level is lower than before, we need to erase some bars. */
 	else {
-		fInstantLoad->SetHighColor(0.0, 0.0, 0.0);
-		for (i=level; i< fInstantLoadLevel; i++)
-			fInstantLoad->FillRect(BRect(3+i*4, 2, 5+i*4, 19));
+		fInstantLoad->SetHighColor(0, 0, 0);
+		for (i = level; i < fInstantLoadLevel; i++)
+			fInstantLoad->FillRect(BRect(3 + i * 4, 2, 5 +i * 4, 19));
 	}
 	/* we want that drawing to be completed as soon as possible */
 	Flush();
