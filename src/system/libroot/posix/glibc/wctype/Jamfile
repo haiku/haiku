@@ -12,6 +12,7 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 MergeObject posix_gnu_wctype.o :
 	iswctype.c
+	towctrans.c
 	wcfuncs.c
 	wctrans.c
 	wctype.c
