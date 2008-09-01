@@ -21,6 +21,8 @@
 #include <MenuPrivate.h>
 #include <TokenSpace.h>
 
+#include "BMCPrivate.h"
+
 using BPrivate::gDefaultTokens;
 
 
@@ -470,7 +472,11 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 		if (Window() == NULL || !window->Lock())
 			break;
 
-		BMenuItem *menuItem = _HitTestItems(where, B_ORIGIN);
+		BMenuItem* menuItem = NULL;
+		if (dynamic_cast<_BMCMenuBar_*>(this))
+			menuItem = ItemAt(0);
+		else
+			menuItem = _HitTestItems(where, B_ORIGIN);
 		if (_OverSubmenu(fSelected, ConvertToScreen(where))) {
 			// call _Track() from the selected sub-menu when the mouse cursor
 			// is over its window
