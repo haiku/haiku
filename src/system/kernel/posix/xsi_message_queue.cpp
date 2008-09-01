@@ -78,6 +78,9 @@ struct queued_message : DoublyLinkedListLinkImpl<queued_message> {
 
 typedef DoublyLinkedList<queued_message> MessageQueue;
 
+// Arbitrary limit
+#define MAX_BYTES_PER_QUEUE		2048
+
 class XsiMessageQueue {
 public:
 	XsiMessageQueue(int flags)
@@ -85,11 +88,26 @@ public:
 		mutex_init(&fLock, "XsiMessageQueue private mutex");
 		SetIpcKey((key_t)-1);
 		SetPermissions(flags);
+		// Initialize all fields to zero
+		memset((void *)&fMessageQueue, 0, sizeof(struct msqid_ds));
+		fMessageQueue.msg_ctime = (time_t)real_time_clock();
+		fMessageQueue.msg_qbytes = MAX_BYTES_PER_QUEUE;
 	}
 
 	~XsiMessageQueue()
 	{
 		mutex_destroy(&fLock);
+		UnsetID();
+		// TODO: free up all messages
+	}
+
+	void DoIpcSet(struct msqid_ds *result)
+	{
+		fMessageQueue.msg_perm.uid = result->msg_perm.uid;
+		fMessageQueue.msg_perm.gid = result->msg_perm.gid;
+		fMessageQueue.msg_perm.mode = (fMessageQueue.msg_perm.mode & ~0x01ff)
+			| (result->msg_perm.mode & 0x01ff);
+		fMessageQueue.msg_ctime = (time_t)real_time_clock();
 	}
 
 	bool HasPermission() const
@@ -110,9 +128,35 @@ public:
 		return false;
 	}
 
+	bool HasReadPermission() const
+	{
+		// TODO: fix this
+		return HasPermission();
+	}
+
 	int ID() const
 	{
 		return fID;
+	}
+
+	key_t IpcKey() const
+	{
+		return fMessageQueue.msg_perm.key;
+	}
+
+	mutex &Lock()
+	{
+		return fLock;
+	}
+
+	msglen_t MaxBytes() const
+	{
+		return fMessageQueue.msg_qbytes;
+	}
+
+	struct msqid_ds &GetMessageQueue()
+	{
+		return fMessageQueue;
 	}
 
 	// Implemented after sMessageQueueHashTable is declared
@@ -129,6 +173,9 @@ public:
 		fMessageQueue.msg_perm.gid = fMessageQueue.msg_perm.cgid = getegid();
 		fMessageQueue.msg_perm.mode = (flags & 0x01ff);
 	}
+
+	// Implemented after sMessageQueueHashTable is declared
+	void UnsetID();
 
 	HashTableLink<XsiMessageQueue>* Link()
 	{
@@ -261,6 +308,12 @@ XsiMessageQueue::SetID()
 	fID = sNextAvailableID++;
 }
 
+void
+XsiMessageQueue::UnsetID()
+{
+	sNextAvailableID = fID;
+}
+
 
 //	#pragma mark - Kernel exported API
 
@@ -286,8 +339,101 @@ xsi_msg_init()
 
 int _user_xsi_msgctl(int messageQueueID, int command, struct msqid_ds *buffer)
 {
-	// TODO
-	return B_ERROR;
+	TRACE(("xsi_msgctl: messageQueueID = %d, command = %d\n", messageQueueID, command));
+	MutexLocker ipcHashLocker(sIpcLock);
+	MutexLocker messageQueueHashLocker(sXsiMessageQueueLock);
+	XsiMessageQueue *messageQueue = sMessageQueueHashTable.Lookup(messageQueueID);
+	if (messageQueue == NULL) {
+		TRACE_ERROR(("xsi_msgctl: message queue id %d not valid\n", messageQueueID));
+		return EINVAL;
+	}
+	if (!IS_USER_ADDRESS(buffer)) {
+		TRACE_ERROR(("xsi_msgctl: buffer address is not valid\n"));
+		return B_BAD_ADDRESS;
+	}
+
+	// Lock the message queue itself and release both the ipc hash table lock
+	// and the message queue hash table lock _only_ if the command it's not
+	// IPC_RMID, this prevents undesidered situation from happening while
+	// (hopefully) improving the concurrency.
+	MutexLocker messageQueueLocker;
+	if (command != IPC_RMID) {
+		messageQueueLocker.SetTo(&messageQueue->Lock(), false);
+		messageQueueHashLocker.Unlock();
+		ipcHashLocker.Unlock();
+	}
+
+	switch (command) {
+		case IPC_STAT: {
+			if (!messageQueue->HasReadPermission()) {
+				TRACE_ERROR(("xsi_msgctl: calling process has not read "
+					"permission on message queue %d, key %d\n", messageQueueID,
+					(int)messageQueue->IpcKey()));
+				return EACCES;
+			}
+			struct msqid_ds msg = messageQueue->GetMessageQueue();
+			if (user_memcpy(buffer, &msg, sizeof(struct msqid_ds)) < B_OK) {
+				TRACE_ERROR(("xsi_msgctl: user_memcpy failed\n"));
+				return B_BAD_ADDRESS;
+			}
+			break;
+		}
+
+		case IPC_SET: {
+			if (!messageQueue->HasPermission()) {
+				TRACE_ERROR(("xsi_msgctl: calling process has not permission "
+					"on message queue %d, key %d\n", messageQueueID,
+					(int)messageQueue->IpcKey()));
+				return EPERM;
+			}
+			struct msqid_ds msg;
+			if (user_memcpy(&msg, buffer, sizeof(struct msqid_ds)) < B_OK) {
+				TRACE_ERROR(("xsi_msgctl: user_memcpy failed\n"));
+				return B_BAD_ADDRESS;
+			}
+			if (msg.msg_qbytes > messageQueue->MaxBytes() && getuid() != 0) {
+				TRACE_ERROR(("xsi_msgctl: user does not have permission to "
+					"increase the maximum number of bytes allowed on queue\n"));
+				return EPERM;
+			}
+			messageQueue->DoIpcSet(&msg);
+			break;
+		}
+
+		case IPC_RMID: {
+			// If this was the command, we are still holding the message
+			// queue hash table lock along with the ipc one, but not the
+			// message queue lock itself. This prevents other process
+			// to try and acquire a destroyed mutex
+			if (!messageQueue->HasPermission()) {
+				TRACE_ERROR(("xsi_msgctl: calling process has not permission "
+					"on message queue %d, key %d\n", messageQueueID,
+					(int)messageQueue->IpcKey()));
+				return EPERM;
+			}
+			key_t key = messageQueue->IpcKey();
+			Ipc *ipcKey = NULL;
+			if (key != -1) {
+				ipcKey = sIpcHashTable.Lookup(key);
+				sIpcHashTable.Remove(ipcKey);
+			}
+			sMessageQueueHashTable.Remove(messageQueue);
+			// Wake up of any threads waiting on this
+			// queue happens in destructor
+			if (key != -1)
+				delete ipcKey;
+			atomic_add(&sXsiMessageQueueCount, -1);
+
+			delete messageQueue;
+			break;
+		}
+
+		default:
+			TRACE_ERROR(("xsi_semctl: command %d not valid\n", command));
+			return EINVAL;
+	}
+
+	return B_OK;
 }
 
 
