@@ -394,13 +394,13 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert(
 		"Axel Dörfler\n"
 		"Ingo Weinhold\n"
-		"Stephan Aßmus\n"
 		"Jérôme Duval\n"
-		"Stefano Ceccherini\n"
-		"François Revol\n"
+		"Stephan Aßmus\n"
 		"Marcus Overhagen\n"
-		"Michael Lotz\n"
+		"Stefano Ceccherini\n"
 		"Rudolf Cornelissen\n"
+		"François Revol\n"
+		"Michael Lotz\n"
 		"\n");
 
 
