@@ -368,7 +368,7 @@ FileMap::Translate(fssh_off_t offset, fssh_size_t size, fssh_file_io_vec* vecs,
 	}
 	if (offset + size > fSize) {
 		if (align > 1) {
-			fssh_off_t alignedSize = (fSize + align - 1) & ~(off_t)(align - 1);
+			fssh_off_t alignedSize = (fSize + align - 1) & ~(fssh_off_t)(align - 1);
 			if (offset + size >= alignedSize)
 				padLastVec = alignedSize - fSize;
 		}
