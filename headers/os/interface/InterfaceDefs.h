@@ -197,8 +197,8 @@ struct scroll_bar_info {
 
 enum alignment {
 	B_ALIGN_LEFT,
-    B_ALIGN_RIGHT,
-    B_ALIGN_CENTER,
+	B_ALIGN_RIGHT,
+	B_ALIGN_CENTER,
 
 	B_ALIGN_HORIZONTAL_CENTER	= B_ALIGN_CENTER,
 
