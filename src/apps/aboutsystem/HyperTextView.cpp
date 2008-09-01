@@ -5,6 +5,7 @@
 
 #include "HyperTextView.h"
 
+#include <Cursor.h>
 #include <Message.h>
 #include <Region.h>
 #include <Window.h>
@@ -22,6 +23,13 @@ HyperTextAction::HyperTextAction()
 
 HyperTextAction::~HyperTextAction()
 {
+}
+
+
+void
+HyperTextAction::MouseOver(HyperTextView* view, BPoint where, BMessage* message)
+{
+	view->SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 }
 
 
@@ -106,19 +114,27 @@ HyperTextView::MouseUp(BPoint where)
 {
 	BMessage* message = Window()->CurrentMessage();
 
-	int32 offset = OffsetAt(where);
+	HyperTextAction* action = _ActionAt(where);
+	if (action != NULL)
+		action->Clicked(this, where, message);
+}
 
-	ActionInfo pointer(offset, offset + 1, NULL);
 
-    const ActionInfo* action = fActionInfos->BinarySearch(pointer,
-			ActionInfo::CompareEqualIfIntersecting);
-	if (action != NULL) {
-		// verify that the text region was hit
-		BRegion textRegion;
-		GetTextRegion(action->startOffset, action->endOffset, &textRegion);
-		if (textRegion.Contains(where))
-			action->action->Clicked(this, where, message);
+void
+HyperTextView::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+	BMessage* message = Window()->CurrentMessage();
+
+	uint32 buttons;
+	HyperTextAction* action;
+	if (message->FindInt32("buttons", (int32*)&buttons) == B_OK
+		&& buttons == 0 && (action = _ActionAt(where)) != NULL) {
+		action->MouseOver(this, where, message);
+		return;
 	}
+
+	BTextView::MouseMoved(where, transit, dragMessage);
 }
 
 
@@ -160,3 +176,25 @@ HyperTextView::InsertHyperText(const char* inText, int32 inLength,
 
 	AddHyperTextAction(startOffset, endOffset, action);
 }
+
+
+HyperTextAction*
+HyperTextView::_ActionAt(const BPoint& where) const
+{
+	int32 offset = OffsetAt(where);
+
+	ActionInfo pointer(offset, offset + 1, NULL);
+
+    const ActionInfo* action = fActionInfos->BinarySearch(pointer,
+			ActionInfo::CompareEqualIfIntersecting);
+	if (action != NULL) {
+		// verify that the text region was hit
+		BRegion textRegion;
+		GetTextRegion(action->startOffset, action->endOffset, &textRegion);
+		if (textRegion.Contains(where))
+			return action->action;
+	}
+
+	return NULL;
+}
+
