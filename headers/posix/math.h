@@ -104,7 +104,7 @@ extern float	log10f(float x);
 extern float	log1pf(float x);
 extern float	logbf(float x);
 extern float	logf(float x);
-extern long		lroundf(float x);
+extern long	lroundf(float x);
 extern float	modff(float x, float *y);
 extern float	powf(float x, float y);
 extern float	roundf(float x);
@@ -129,9 +129,10 @@ extern double	fmod(double x, double y);
 extern double	frexp(double x, int *_exponent);
 extern double	gamma(double x);
 extern double	ldexp(double x, int exponent);
+extern double	lgamma(double x);
 extern double	log(double x);
 extern double	log10(double x);
-extern long		lround(double x);
+extern long	lround(double x);
 extern double	modf(double x, double *y);
 extern double	pow(double x, double y);
 extern double	round(double x);
@@ -143,11 +144,9 @@ extern double	tanh(double x);
 extern double	trunc(double x);
 
 /* long double math functions */
+extern long double	lgammal(long double x);
 extern long double	roundl(long double x);
 extern long		lroundl(long double x);
-
-/* TODO: add and fix those! */
-extern /*long*/ double	lgamma(/*long*/ double x);
 
 /* some BSD non-ANSI or POSIX math functions */
 extern double	acosh(double x);

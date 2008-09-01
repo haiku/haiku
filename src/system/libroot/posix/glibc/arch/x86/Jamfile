@@ -144,6 +144,7 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_s.o :
 	s_fabs.S s_fabsf.S s_fabsl.S
 	s_finite.S s_finitef.S s_finitel.S
 	s_floor.S s_floorf.S s_floorl.S
+	s_fpclassifyl.c
 	s_frexp.S s_frexpf.S s_frexpl.S
 	s_ilogb.S s_ilogbf.S
 	s_isinfl.c
