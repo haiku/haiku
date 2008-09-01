@@ -27,6 +27,7 @@ MergeObject posix_gnu_stdlib.o :
 	mrand48_r.c
 	nrand48.c
 	nrand48_r.c
+	random_r.c
 	seed48.c
 	seed48_r.c
 	srand48.c
