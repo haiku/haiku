@@ -66,7 +66,8 @@ enum {
 	kMsgShowClock,
 	kMsgChangeClock,
 	kMsgHide,
-	kMsgLongClick
+	kMsgLongClick,
+	kMsgShowCalendar
 };
 
 
@@ -238,49 +239,63 @@ TTimeView::MessageReceived(BMessage* message)
 		case kMsgLongClick:
 		{
 			BPoint where;
-			message->FindPoint("where", &where);			
-			
-			//TODO: do nothing if the calendar is already shown			
-
-#ifdef _SHOW_CALENDAR_MENU_ITEM
-
-			BPopUpMenu *menu = new BPopUpMenu("", false, false);
-			menu->SetFont(be_plain_font);
-
-			menu->AddItem(new CalendarMenuItem());
-			menu->ResizeToPreferred();			
-			
-			BPoint point = where;
-			BScreen screen;
-			where.y = Bounds().bottom + 4;
-
-			// make sure the menu is visible and doesn't hide the date
-			ConvertToScreen(&where);
-			if (where.y + menu->Bounds().Height() > screen.Frame().bottom)
-				where.y -= menu->Bounds().Height() + 2 * Bounds().Height();
-
-			ConvertToScreen(&point);
-			menu->Go(where, true, true, BRect(point.x - 4, point.y - 4,
-				point.x + 4, point.y + 4), true);
-				
-#elif _SHOW_CALENDAR_MENU_WINDOW
-
-			where.y = Bounds().bottom + 4.0;
-			ConvertToScreen(&where);
-
-			if (where.y >= BScreen().Frame().bottom)
-				where.y -= (Bounds().Height() + 4.0);
-
-			CalendarMenuWindow* window = new CalendarMenuWindow(where, fEuroDate);
-			window->Show();			
-#endif		
-				
+			message->FindPoint("where", &where);
+			ShowCalendar(where);
 			break;
 		}
-
+		
+		case kMsgShowCalendar:
+		{
+			BRect bounds(Bounds());
+			BPoint center(bounds.LeftTop());
+			center += BPoint(bounds.Width() / 2, bounds.Height() / 2);
+			ShowCalendar(center);
+			break;
+		}
+		
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+void
+TTimeView::ShowCalendar(BPoint where)
+{
+	//TODO: do nothing if the calendar is already shown			
+
+#ifdef _SHOW_CALENDAR_MENU_ITEM
+
+	BPopUpMenu *menu = new BPopUpMenu("", false, false);
+	menu->SetFont(be_plain_font);
+
+	menu->AddItem(new CalendarMenuItem());
+	menu->ResizeToPreferred();			
+	
+	BPoint point = where;
+	BScreen screen;
+	where.y = Bounds().bottom + 4;
+
+	// make sure the menu is visible and doesn't hide the date
+	ConvertToScreen(&where);
+	if (where.y + menu->Bounds().Height() > screen.Frame().bottom)
+		where.y -= menu->Bounds().Height() + 2 * Bounds().Height();
+
+	ConvertToScreen(&point);
+	menu->Go(where, true, true, BRect(point.x - 4, point.y - 4,
+		point.x + 4, point.y + 4), true);
+		
+#elif _SHOW_CALENDAR_MENU_WINDOW
+
+	where.y = Bounds().bottom + 4.0;
+	ConvertToScreen(&where);
+
+	if (where.y >= BScreen().Frame().bottom)
+		where.y -= (Bounds().Height() + 4.0);
+
+	CalendarMenuWindow* window = new CalendarMenuWindow(where, fEuroDate);
+	window->Show();			
+#endif	
 }
 
 
@@ -530,6 +545,11 @@ TTimeView::ShowClockOptions(BPoint point)
 	item = new BMenuItem("Hide Time", new BMessage('time'));
 	menu->AddItem(item);
 
+#if defined(_SHOW_CALENDAR_MENU_ITEM) || defined(_SHOW_CALENDAR_MENU_WINDOW)
+	item = new BMenuItem("Show Calendar" B_UTF8_ELLIPSIS, new BMessage(kMsgShowCalendar));
+	menu->AddItem(item);
+#endif
+	
 	menu->SetTargetForItems(this);
 	// Changed to accept screen coord system point;
 	// not constrained to this view now

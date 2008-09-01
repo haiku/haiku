@@ -81,6 +81,7 @@ class TTimeView : public BView {
 		void		AllowFullDate(bool);
 		bool		ShowingEuroDate()	{return fEuroDate; }
 		void		ShowEuroDate(bool);
+		void		ShowCalendar(BPoint where);
 
 		bool		Orientation() const;
 		void		SetOrientation(bool o);
