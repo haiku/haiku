@@ -20,6 +20,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network marvell_yukon ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network nforce ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network pcnet ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network syskonnect ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network attansic_l2 ;
 
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm440x ;
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm570x ;
