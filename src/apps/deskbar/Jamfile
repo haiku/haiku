@@ -34,7 +34,6 @@ Application Deskbar :
 	CalendarMenuItem.cpp
 	DeskBarUtils.cpp
 	ExpandoMenuBar.cpp
-	LongClickTracker.cpp
 	ShowHideMenuItem.cpp
 	StatusView.cpp
 	StatusViewShelf.cpp

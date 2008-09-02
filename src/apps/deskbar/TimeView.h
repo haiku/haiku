@@ -36,13 +36,13 @@ All rights reserved.
 
 #include <OS.h>
 #include <View.h>
-#include "LongClickTracker.h"
 
 const uint32 kMsgShowSeconds = 'ShSc';
 const uint32 kMsgMilTime = 'MilT';
 const uint32 kMsgFullDate = 'FDat';
 const uint32 kMsgEuroDate = 'EDat';
 
+class BMessageRunner;
 
 #ifdef AS_REPLICANT
 class _EXPORT	TTimeView;
@@ -67,6 +67,7 @@ class TTimeView : public BView {
 		void		FrameMoved(BPoint);
 		void		MessageReceived(BMessage*);
 		void		MouseDown(BPoint where);
+		void		MouseUp(BPoint where);
 		void		Pulse();
 
 		bool		ShowingSeconds() 	{ return fShowSeconds; }
@@ -125,7 +126,7 @@ class TTimeView : public BView {
 		BPoint		fTimeLocation;
 		BPoint		fDateLocation;
 		
-		LongClickTracker fLongClickTracker;
+		BMessageRunner*	fLongClickMessageRunner;		
 };
 
 

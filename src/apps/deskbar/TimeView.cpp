@@ -45,6 +45,7 @@ All rights reserved.
 
 #include <Debug.h>
 #include <MenuItem.h>
+#include <MessageRunner.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <Window.h>
@@ -85,7 +86,7 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds, bool milTim
 	fMaxWidth(maxWidth),
 	fHeight(height),
 	fOrientation(true),
-	fLongClickTracker(this, kMsgLongClick)
+	fLongClickMessageRunner(NULL)
 {
 	fShowingDate = false;
 	fTime = fLastTime = time(NULL);
@@ -157,8 +158,6 @@ TTimeView::AttachedToWindow()
 
 	ResizeToPreferred();
 	CalculateTextPlacement();
-	
-	fLongClickTracker.Start();
 }
 
 
@@ -376,6 +375,17 @@ TTimeView::MouseDown(BPoint point)
 	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		ShowClockOptions(ConvertToScreen(point));
 		return;
+	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {		
+		BMessage * longClickMessage = new BMessage(kMsgLongClick);
+		longClickMessage->AddPoint("where", point);
+		
+		bigtime_t longClickThreshold;
+		get_click_speed(&longClickThreshold);
+			// use the doubleClickSpeed as a threshold
+			
+		delete fLongClickMessageRunner;
+		fLongClickMessageRunner = new BMessageRunner(BMessenger(this),
+			 longClickMessage, longClickThreshold, 1);			
 	}
 
 	//	flip to/from showing date or time
@@ -388,6 +398,14 @@ TTimeView::MouseDown(BPoint point)
 	fLastDateStr[0] = '\0';
 	fLastTimeStr[0] = '\0';
 	Pulse();
+}
+
+
+void
+TTimeView::MouseUp(BPoint point)
+{
+	delete fLongClickMessageRunner;
+	fLongClickMessageRunner = NULL;	
 }
 
 
