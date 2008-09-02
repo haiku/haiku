@@ -83,6 +83,8 @@ class TTimeView : public BView {
 		bool		ShowingEuroDate()	{return fEuroDate; }
 		void		ShowEuroDate(bool);
 		void		ShowCalendar(BPoint where);
+		void		StartLongClickNotifier(BPoint where);
+		void		StopLongClickNotifier();
 
 		bool		Orientation() const;
 		void		SetOrientation(bool o);

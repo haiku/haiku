@@ -114,6 +114,7 @@ TTimeView::TTimeView(BMessage *data)
 
 TTimeView::~TTimeView()
 {
+	StopLongClickNotifier();
 }
 
 
@@ -237,6 +238,7 @@ TTimeView::MessageReceived(BMessage* message)
 			
 		case kMsgLongClick:
 		{
+			StopLongClickNotifier();
 			BPoint where;
 			message->FindPoint("where", &where);
 			ShowCalendar(where);
@@ -295,6 +297,31 @@ TTimeView::ShowCalendar(BPoint where)
 	CalendarMenuWindow* window = new CalendarMenuWindow(where, fEuroDate);
 	window->Show();			
 #endif	
+}
+
+
+void
+TTimeView::StartLongClickNotifier(BPoint where)
+{
+	StopLongClickNotifier();
+	
+	BMessage longClickMessage(kMsgLongClick);
+	longClickMessage.AddPoint("where", where);
+	
+	bigtime_t longClickThreshold;
+	get_click_speed(&longClickThreshold);
+		// use the doubleClickSpeed as a threshold
+		
+	fLongClickMessageRunner = new BMessageRunner(BMessenger(this),
+		 &longClickMessage, longClickThreshold, 1);	
+}
+
+
+void
+TTimeView::StopLongClickNotifier()
+{
+	delete fLongClickMessageRunner;
+	fLongClickMessageRunner = NULL;		
 }
 
 
@@ -376,16 +403,7 @@ TTimeView::MouseDown(BPoint point)
 		ShowClockOptions(ConvertToScreen(point));
 		return;
 	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {		
-		BMessage longClickMessage(kMsgLongClick);
-		longClickMessage.AddPoint("where", point);
-		
-		bigtime_t longClickThreshold;
-		get_click_speed(&longClickThreshold);
-			// use the doubleClickSpeed as a threshold
-			
-		delete fLongClickMessageRunner;
-		fLongClickMessageRunner = new BMessageRunner(BMessenger(this),
-			 &longClickMessage, longClickThreshold, 1);			
+		StartLongClickNotifier(point);
 	}
 
 	//	flip to/from showing date or time
@@ -404,8 +422,7 @@ TTimeView::MouseDown(BPoint point)
 void
 TTimeView::MouseUp(BPoint point)
 {
-	delete fLongClickMessageRunner;
-	fLongClickMessageRunner = NULL;	
+	StopLongClickNotifier();
 }
 
 
