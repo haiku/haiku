@@ -1,3 +1,7 @@
+/*
+ * Copyright 2008, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #include <tracing.h>
 #include <string.h>
 
@@ -11,30 +15,26 @@ class ATATraceEntry : public AbstractTraceEntry {
 		ATATraceEntry(int bus, int device, const char *info)
 		: fBus(bus)
 		, fDevice(device)
+		, fInfo(alloc_tracing_buffer_strcpy(info, 666, false))
 		{
-			strlcpy(fInfo, info, sizeof(fInfo));
 			Initialized();
 		}
 
-		void AddDump(TraceOutput& out, const char* name)
+		void AddDump(TraceOutput& out)
 		{
-			out.Print("ata");
-			out.Print(" - %s - ", name);
-			out.Print("bus %d", fBus);
-			out.Print("device %d", fDevice);			
-			out.Print("%s", fInfo);			
+			out.Print("ata %d:%d %s", fBus, fDevice, fInfo);
 		}
 
 		int fBus;
 		int fDevice;
- 		char fInfo[200];
+ 		char *fInfo;
 };
 
 
 extern "C" void 
 __ata_trace_device(ide_device_info *dev, const char *fmt, ...)
 {
-	char info[200];
+	char info[120];
 	va_list ap; 
 
 	va_start(ap, fmt); 
@@ -48,7 +48,7 @@ __ata_trace_device(ide_device_info *dev, const char *fmt, ...)
 extern "C" void 
 __ata_trace_bus_device(ide_bus_info *bus, int dev, const char *fmt, ...)
 {
-	char info[200];
+	char info[120];
 	va_list ap; 
 
 	va_start(ap, fmt); 
