@@ -14,6 +14,7 @@
 
 enum {
 	MSG_THIRD_ITEM			= '3rdi',
+	MSG_CHILD_MENU			= 'chmn',
 	MSG_CHANGE_ITEM_TEXT	= 'chit'
 };
 
@@ -29,6 +30,7 @@ MenuBarTest::MenuBarTest()
 	fMenuBar->AddItem(fFirstItem = new BMenuItem("Menu item 1", NULL));
 	fMenuBar->AddItem(new BMenuItem("Menu item 2", NULL));
 	fThirdItem = new BMenuItem("Menu item 3", NULL);
+	fChildMenu = new BMenu("Child menu");
 }
 
 
@@ -52,6 +54,11 @@ MenuBarTest::ActivateTest(View* controls)
 	fThirdItemCheckBox = new LabeledCheckBox("Third item",
 		new BMessage(MSG_THIRD_ITEM), this);
 	group->AddChild(fThirdItemCheckBox);
+
+	// child menu
+	fChildMenuCheckBox = new LabeledCheckBox("Child menu",
+		new BMessage(MSG_CHILD_MENU), this);
+	group->AddChild(fChildMenuCheckBox);
 
 	// long text
 	fLongTextCheckBox = new LabeledCheckBox("Long label text",
@@ -80,6 +87,9 @@ MenuBarTest::MessageReceived(BMessage* message)
 		case MSG_THIRD_ITEM:
 			UpdateThirdItem();
 			break;
+		case MSG_CHILD_MENU:
+			UpdateChildMenu();
+			break;
 		case MSG_CHANGE_ITEM_TEXT:
 			UpdateLongText();
 			break;
@@ -104,6 +114,23 @@ MenuBarTest::UpdateThirdItem()
 		fMenuBar->AddItem(fThirdItem);
 	else
 		fMenuBar->RemoveItem(fThirdItem);
+}
+
+
+// UpdateChildMenu
+void
+MenuBarTest::UpdateChildMenu()
+{
+	if (!fChildMenuCheckBox || !fMenuBar)
+		return;
+
+	if (fChildMenuCheckBox->IsSelected() == (fChildMenu->Supermenu() != NULL))
+		return;
+
+	if (fChildMenuCheckBox->IsSelected())
+		fMenuBar->AddItem(fChildMenu);
+	else
+		fMenuBar->RemoveItem(fChildMenu);
 }
 
 

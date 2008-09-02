@@ -9,6 +9,7 @@
 #include "Test.h"
 
 
+class BMenu;
 class BMenuBar;
 class BMenuItem;
 class LabeledCheckBox;
@@ -27,13 +28,16 @@ public:
 
 private:
 			void				UpdateThirdItem();
+			void				UpdateChildMenu();
 			void				UpdateLongText();
 
 private:
 			BMenuBar*			fMenuBar;
 			BMenuItem*			fFirstItem;
 			BMenuItem*			fThirdItem;
+			BMenu*				fChildMenu;
 			LabeledCheckBox*	fThirdItemCheckBox;
+			LabeledCheckBox*	fChildMenuCheckBox;
 			LabeledCheckBox*	fLongTextCheckBox;
 };
 
