@@ -376,8 +376,8 @@ TTimeView::MouseDown(BPoint point)
 		ShowClockOptions(ConvertToScreen(point));
 		return;
 	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {		
-		BMessage * longClickMessage = new BMessage(kMsgLongClick);
-		longClickMessage->AddPoint("where", point);
+		BMessage longClickMessage(kMsgLongClick);
+		longClickMessage.AddPoint("where", point);
 		
 		bigtime_t longClickThreshold;
 		get_click_speed(&longClickThreshold);
@@ -385,7 +385,7 @@ TTimeView::MouseDown(BPoint point)
 			
 		delete fLongClickMessageRunner;
 		fLongClickMessageRunner = new BMessageRunner(BMessenger(this),
-			 longClickMessage, longClickThreshold, 1);			
+			 &longClickMessage, longClickThreshold, 1);			
 	}
 
 	//	flip to/from showing date or time

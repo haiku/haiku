@@ -79,8 +79,9 @@ PairsWindow::MessageReceived(BMessage* message)
 						// message of message runner might not have arrived
 						// yet, so it is deleted here to prevent any leaking
 						// just in case
+					BMessage message(kMsgPairComparing);
 					fPairComparing = new BMessageRunner(BMessenger(this),
-						new BMessage(kMsgPairComparing),  5 * 100000L, 1);
+						&message,  5 * 100000L, 1);
 					fIsPairsActive = false;
 				}
 
