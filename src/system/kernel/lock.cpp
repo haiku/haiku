@@ -19,6 +19,7 @@
 #include <debug.h>
 #include <int.h>
 #include <kernel.h>
+#include <scheduling_analysis.h>
 #include <thread.h>
 #include <util/AutoLock.h>
 
@@ -223,6 +224,8 @@ rw_lock_init(rw_lock* lock, const char* name)
 	lock->writer_count = 0;
 	lock->owner_count = 0;
 	lock->flags = 0;
+
+	T_SCHEDULING_ANALYSIS(InitRWLock(lock, name));
 }
 
 
@@ -236,6 +239,8 @@ rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags)
 	lock->writer_count = 0;
 	lock->owner_count = 0;
 	lock->flags = flags & RW_LOCK_FLAG_CLONE_NAME;
+
+	T_SCHEDULING_ANALYSIS(InitRWLock(lock, name));
 }
 
 
@@ -430,6 +435,8 @@ mutex_init(mutex* lock, const char *name)
 	lock->count = 0;
 #endif
 	lock->flags = 0;
+
+	T_SCHEDULING_ANALYSIS(InitMutex(lock, name));
 }
 
 
@@ -444,6 +451,8 @@ mutex_init_etc(mutex* lock, const char *name, uint32 flags)
 	lock->count = 0;
 #endif
 	lock->flags = flags & MUTEX_FLAG_CLONE_NAME;
+
+	T_SCHEDULING_ANALYSIS(InitMutex(lock, name));
 }
 
 

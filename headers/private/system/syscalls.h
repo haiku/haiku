@@ -27,6 +27,7 @@ struct iovec;
 struct net_stat;
 struct pollfd;
 struct rlimit;
+struct scheduling_analysis;
 struct sigaction;
 struct stat;
 struct _sem_t;
@@ -394,6 +395,9 @@ extern int64		_kern_atomic_get64(vint64 *value);
 
 /* System informations */
 extern status_t		_kern_get_system_info(system_info *info, size_t size);
+extern status_t		_kern_analyze_scheduling(bigtime_t from, bigtime_t until,
+						void* buffer, size_t size,
+						struct scheduling_analysis* analysis);
 
 /* Debug output */
 extern void			_kern_debug_output(const char *message);

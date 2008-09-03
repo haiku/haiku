@@ -20,6 +20,7 @@
 #include <int.h>
 #include <arch/int.h>
 #include <debug.h>
+#include <scheduling_analysis.h>
 #include <thread.h>
 #include <team.h>
 #include <util/AutoLock.h>
@@ -429,6 +430,8 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 
 		KTRACE("create_sem_etc(count: %ld, name: %s, owner: %ld) -> %ld",
 			count, name, owner, id);
+
+		T_SCHEDULING_ANALYSIS(CreateSemaphore(id, name));
 	}
 
 	RELEASE_SEM_LIST_LOCK();

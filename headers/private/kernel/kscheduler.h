@@ -6,6 +6,10 @@
 #define KERNEL_SCHEDULER_H
 
 
+#include <SupportDefs.h>
+
+
+struct scheduling_analysis;
 struct thread;
 
 
@@ -19,6 +23,9 @@ void scheduler_reschedule(void);
 
 void scheduler_init(void);
 void scheduler_start(void);
+
+status_t _user_analyze_scheduling(bigtime_t from, bigtime_t until, void* buffer,
+	size_t size, struct scheduling_analysis* analysis);
 
 #ifdef __cplusplus
 }
