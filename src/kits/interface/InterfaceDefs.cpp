@@ -1360,12 +1360,12 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 		// try right letter first
 		if (escapementArray[right - 1] * size <= gap) {
 			right--;
-		} else if (escapementArray[left + 1] * size <= gap) {
+		} else if (escapementArray[left] * size <= gap) {
 			left++;
 		}
 	} else {
 		// try left letter first
-		if (escapementArray[left + 1] * size <= gap) {
+		if (escapementArray[left] * size <= gap) {
 			left++;
 		} else if (escapementArray[right - 1] * size <= gap) {
 			right--;
