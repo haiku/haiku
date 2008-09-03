@@ -80,7 +80,10 @@ void
 InputDeviceListItem::Start()
 {
 	PRINT(("  Starting: %s\n", fDevice.name));
-	fServerDevice->Start(fDevice.name, fDevice.cookie);
+	status_t err = fServerDevice->Start(fDevice.name, fDevice.cookie);
+	if (err != B_OK) {
+		PRINTERR(("      error: %s (%lx)\n", strerror(err), err));
+	}
 	fRunning = true;
 }
 
