@@ -31,14 +31,13 @@
 #	elif defined(HAIKU_HOST_PLATFORM_CYGWIN)
 #		include <sys/ioctl.h>
 #		include <sys/stat.h>
+#	elif defined(HAIKU_HOST_PLATFORM_LINUX)
+#		include <linux/hdreg.h>
+#		include <linux/fs.h>
+#		include <sys/ioctl.h>
 #	else
 		// the (POSIX) correct place of definition for ioctl()
 #		include <stropts.h>
-#	endif
-
-#	if defined(HAIKU_HOST_PLATFORM_LINUX)
-#		include <linux/hdreg.h>
-#		include <linux/fs.h>
 #	endif
 #endif
 
