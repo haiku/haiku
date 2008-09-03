@@ -145,7 +145,7 @@ OffsetFile::SetSize(off_t size)
 
 // GetSize
 status_t
-OffsetFile::GetSize(off_t *size)
+OffsetFile::GetSize(off_t *size) const
 {
 	status_t error = (size ? B_OK : B_BAD_VALUE );
 	if (error == B_OK)

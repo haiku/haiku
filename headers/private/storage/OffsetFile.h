@@ -49,7 +49,7 @@ public:
 	off_t Position() const;
 
 	status_t SetSize(off_t size);
-	status_t GetSize(off_t *size);
+	status_t GetSize(off_t *size) const;
 
 	off_t Offset() const;
 
