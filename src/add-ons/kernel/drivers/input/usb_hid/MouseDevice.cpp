@@ -46,7 +46,7 @@ MouseDevice::Control(uint32 op, void *buffer, size_t length)
 				// released in the callback function
 				status_t result = acquire_sem_etc(fTransferNotifySem, 1,
 					B_CAN_INTERRUPT, 0);
-				if (result == B_INTERRUPTED)
+				if (result == B_INTERRUPTED && IsOpen())
 					continue;
 				else if (result != B_OK)
 					return result;

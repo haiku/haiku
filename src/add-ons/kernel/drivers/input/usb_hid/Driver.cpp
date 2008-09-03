@@ -191,7 +191,8 @@ usb_hid_free(void *cookie)
 	HIDDevice *device = (HIDDevice *)cookie;
 	mutex_lock(&sDriverLock);
 	status_t status = device->Free();
-	if (gDeviceList->RemoveDevice(NULL, device) == B_OK) {
+	if (device->IsRemoved() 
+		&& gDeviceList->RemoveDevice(NULL, device) == B_OK) {
 		// the device is removed already but as it was open the removed hook
 		// has not deleted the object
 		delete device;
