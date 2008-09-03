@@ -388,21 +388,66 @@ AboutView::AboutView(const BRect &rect)
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Most influential developers:\n");
+	fCreditsView->Insert("Current Maintainers:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
-		"Axel Dörfler\n"
-		"Ingo Weinhold\n"
-		"Jérôme Duval\n"
+		"Ithamar R. Adema\n"
+		"Bruno G. Albuquerque\n"
 		"Stephan Aßmus\n"
-		"Marcus Overhagen\n"
+		"Salvatore Benedetto\n"
 		"Stefano Ceccherini\n"
 		"Rudolf Cornelissen\n"
-		"François Revol\n"
+		"Alexandre Deckner\n"
+		"Oliver Ruiz Dorantes\n"
+		"Axel Dörfler\n"
+		"Jérôme Duval\n"
+		"René Gollent\n"
+		"Karsten Heimrich\n"
+		"Philippe Houdoin\n"
+		"Maurice Kalinowski\n"
+		"Euan Kirkhope\n"
+		"Ryan Leavengood\n"
 		"Michael Lotz\n"
+		"David McPaul\n"
+		"Fredrik Modéen\n"
+		"Marcus Overhagen\n"
+		"Michael Pfeiffer\n"
+		"François Revol\n"
+		"Andrej Spielmann\n"
+		"Oliver Tappe\n"
+		"Gerasim Troeglazov\n"
+		"Ingo Weinhold\n"
+		"Siarzhuk Zharski\n"
 		"\n");
 
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
+	fCreditsView->Insert("Past Maintainers:\n");
+
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(
+		"Andrew Bachmann\n"
+		"Tyler Dauwalder\n"
+		"Daniel Furrer\n"
+		"Andre Alves Garzia\n"
+		"Erik Jaesler\n"
+		"Marcin Konicki\n"
+		"Waldemar Kornewald\n"
+		"Thomas Kurschel\n"
+		"Frans Van Nispen\n"
+		"Adi Oanca\n"
+		"Michael Phipps\n"
+		"Niels Sascha Reedijk\n"
+		"David Reid\n"
+		"Hugo Santos\n"
+		"Alexander G. M. Smith\n"
+		"Jonas Sundström\n"
+		"Bryan Varner\n"
+		"Nathan Whitehorn\n"
+		"Michael Wilber\n"
+		"Jonathan Yoder\n"
+		"Gabe Yoder\n"
+		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Website, Marketing & Documention:\n");
@@ -416,37 +461,6 @@ AboutView::AboutView(const BRect &rect)
 		"Jonathan Yoder\n"
 		"\n");
 
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Developers:\n");
-
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Ithamar R. Adema\n"
-		"Bruno G. Albuquerque\n"
-		"Andrew Bachmann\n"
-		"Salvatore Benedetto\n"
-		"Alexandre Deckner\n"
-		"Oliver Ruiz Dorantes\n"
-		"Andre Alves Garzia\n"
-		"René Gollent\n"
-		"Karsten Heimrich\n"
-		"Philippe Houdoin\n"
-		"Maurice Kalinowski\n"
-		"Euan Kirkhope\n"
-		"Waldemar Kornewald\n"
-		"Ryan Leavengood\n"
-		"David McPaul\n"
-		"Fredrik Modéen\n"
-		"Michael Pfeiffer\n"
-		"Hugo Santos\n"
-		"Andrej Spielmann\n"
-		"Jonas Sundström\n"
-		"Gerasim Troeglazov\n"
-		"Bryan Varner\n"
-		"Siarzhuk Zharski\n"
-		"\n");
-
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Contributors:\n");
 
@@ -456,29 +470,23 @@ AboutView::AboutView(const BRect &rect)
 		"Andre Braga\n"
 		"Bruce Cameron\n"
 		"Greg Crain\n"
-		"Tyler Dauwalder\n"
 		"David Dengg\n"
 		"John Drinkwater\n"
 		"Cian Duffy\n"
 		"Christian Fasshauer\n"
 		"Andreas Färber\n"
 		"Marc Flerackers\n"
-		"Daniel Furrer\n"
 		"Matthijs Hollemans\n"
 		"Mathew Hounsell\n"
 		"Morgan Howe\n"
-		"Erik Jaesler\n"
 		"Carwyn Jones\n"
 		"Vasilis Kaoutsis\n"
 		"James Kim\n"
 		"Shintaro Kinugawa\n"
 		"Jan Klötzke\n"
-		"Marcin Konicki\n"
 		"Kurtis Kopf\n"
-		"Waldemar Kornewald\n"
 		"Tomáš Kučera\n"
 		"Luboš Kulič\n"
-		"Thomas Kurschel\n"
 		"Elad Lahav\n"
 		"Anthony Lee\n"
 		"Santiago Lema\n"
@@ -498,42 +506,35 @@ AboutView::AboutView(const BRect &rect)
 		"Misza\n"
 		"MrSiggler\n"
 		"Alan Murta\n"
-		"Frans Van Nispen\n"
-		"Adi Oanca\n"
 		"Pahtz\n"
 		"Michael Paine\n"
-		"Michael Phipps\n"
 		"David Powell\n"
 		"Jeremy Rand\n"
 		"Hartmut Reh\n"
-		"David Reid\n"
 		"Daniel Reinhold\n"
 		"Samuel Rodriguez Perez\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
 		"Philippe Saint-Pierre\n"
+		"Ralf Schülke\n"
 		"Reznikov Sergei\n"
 		"Zousar Shaker\n"
-		"Alexander G. M. Smith\n"
 		"Daniel Switkin\n"
 		"Atsushi Takamatsu\n"
-		"Oliver Tappe\n"
 		"James Urquhart\n"
 		"Jason Vandermark\n"
 		"Sandor Vroemisse\n"
 		"Denis Washington\n"
-		"Nathan Whitehorn\n"
-		"Michael Wilber\n"
 		"Ulrich Wimboeck\n"
 		"James Woodcock\n"
 		"Artur Wyszynski\n"
-		"Gabe Yoder\n"
 		"Gerald Zajac\n"
 		"Łukasz Zemczak\n"
 		"JiSheng Zhang\n"
 		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention "
 		"(sorry!)"
 		"\n\n");
+
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Special Thanks To:\n");
