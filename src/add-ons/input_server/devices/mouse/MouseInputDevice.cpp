@@ -175,6 +175,9 @@ MouseDevice::Start()
 void
 MouseDevice::Stop()
 {
+	close(fDevice);
+	fDevice = -1;
+
 	fActive = false;
 		// this will stop the thread as soon as it reads the next packet
 
@@ -186,8 +189,6 @@ MouseDevice::Stop()
 		status_t dummy;
 		wait_for_thread(fThread, &dummy);
 	}
-
-	close(fDevice);
 }
 
 
@@ -251,9 +252,9 @@ MouseDevice::_Run()
 		_ComputeAcceleration(movements, deltaX, deltaY);
 
 		LOG("%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld, wheel_x:%ld, wheel_y:%ld\n",
-			device->device_ref.name, movements.buttons, movements.xdelta, movements.ydelta,
+			fDeviceRef.name, movements.buttons, movements.xdelta, movements.ydelta,
 			movements.clicks, movements.wheel_xdelta, movements.wheel_ydelta);
-		LOG("%s: x: %ld, y: %ld\n", device->device_ref.name, deltaX, deltaY);
+		LOG("%s: x: %ld, y: %ld\n", fDeviceRef.name, deltaX, deltaY);
 
 		BMessage *message = NULL;
 

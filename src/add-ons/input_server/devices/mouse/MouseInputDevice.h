@@ -13,13 +13,15 @@
 #include <InterfaceDefs.h>
 #include <List.h>
 
+#include <stdio.h>
+
 
 class MouseDevice;
 
 class MouseInputDevice : public BInputServerDevice {
 	public:
 		MouseInputDevice();
-		~MouseInputDevice();
+		virtual ~MouseInputDevice();
 
 		virtual status_t InitCheck();
 
