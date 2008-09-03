@@ -1233,6 +1233,16 @@ write_ellipsis(char* dst)
 }
 
 
+static bool
+optional_char_fits(float escapement, float fontSize, float gap)
+{
+	const float size = escapement * fontSize;
+	if (size <= gap || fabs(size - gap) <= 0.0001)
+		return true;
+	return false;
+}
+
+
 bool
 truncate_end(const char* source, char* dest, uint32 numChars,
 	const float* escapementArray, float width, float ellipsisWidth, float size)
@@ -1358,16 +1368,16 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 	float gap = width - (leftWidth + ellipsisWidth + rightWidth);
 	if (left > numChars - right) {
 		// try right letter first
-		if (escapementArray[right - 1] * size <= gap) {
+		if (optional_char_fits(escapementArray[right - 1], size, gap)) {
 			right--;
-		} else if (escapementArray[left] * size <= gap) {
+		} else if (optional_char_fits(escapementArray[left], size, gap)) {
 			left++;
 		}
 	} else {
 		// try left letter first
-		if (escapementArray[left] * size <= gap) {
+		if (optional_char_fits(escapementArray[left], size, gap)) {
 			left++;
-		} else if (escapementArray[right - 1] * size <= gap) {
+		} else if (optional_char_fits(escapementArray[right - 1], size, gap)) {
 			right--;
 		}
 	}
