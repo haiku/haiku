@@ -108,7 +108,7 @@ get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 		case B_8_BIT_640x480:
 		case B_8_BIT_800x600:
 		case B_8_BIT_1024x768:
-   		case B_8_BIT_1152x900:
+		case B_8_BIT_1152x900:
 		case B_8_BIT_1280x1024:
 		case B_8_BIT_1600x1200:
 			colorSpace = B_CMAP8;
@@ -117,16 +117,16 @@ get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 		case B_15_BIT_640x480:
 		case B_15_BIT_800x600:
 		case B_15_BIT_1024x768:
-   		case B_15_BIT_1152x900:
+		case B_15_BIT_1152x900:
 		case B_15_BIT_1280x1024:
 		case B_15_BIT_1600x1200:
-   			colorSpace = B_RGB15;
-   			break;
+			colorSpace = B_RGB15;
+			break;
 
 		case B_16_BIT_640x480:
 		case B_16_BIT_800x600:
 		case B_16_BIT_1024x768:
-   		case B_16_BIT_1152x900:
+		case B_16_BIT_1152x900:
 		case B_16_BIT_1280x1024:
 		case B_16_BIT_1600x1200:
 			colorSpace = B_RGB16;
@@ -135,7 +135,7 @@ get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 		case B_32_BIT_640x480:
 		case B_32_BIT_800x600:
 		case B_32_BIT_1024x768:
-   		case B_32_BIT_1152x900:
+		case B_32_BIT_1152x900:
 		case B_32_BIT_1280x1024:
 		case B_32_BIT_1600x1200:
 			colorSpace = B_RGB32;
@@ -167,12 +167,12 @@ get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 			width = 1024; height = 768;
 			break;
 
-   		case B_8_BIT_1152x900:
-   		case B_15_BIT_1152x900:
-   		case B_16_BIT_1152x900:
-   		case B_32_BIT_1152x900:
-   			width = 1152; height = 900;
-   			break;
+		case B_8_BIT_1152x900:
+		case B_15_BIT_1152x900:
+		case B_16_BIT_1152x900:
+		case B_32_BIT_1152x900:
+			width = 1152; height = 900;
+			break;
 
 		case B_8_BIT_1280x1024:
 		case B_15_BIT_1280x1024:
@@ -1322,92 +1322,54 @@ bool
 truncate_middle(const char* source, char* dest, uint32 numChars,
 	const float* escapementArray, float width, float ellipsisWidth, float size)
 {
-	// find visual center
+	float mid = (width - ellipsisWidth) / 2.0;
 
-	ellipsisWidth /= size;
-		// test if this is as accurate as escapementArray * size
-	width /= size;
+	uint32 left = 0;
+	float leftWidth = 0.0;
+	while (left < numChars && (leftWidth + (escapementArray[left] * size)) < mid)
+		leftWidth += (escapementArray[left++] * size);
 
-	float halfWidth = (width - ellipsisWidth) / 2.0;
-	float leftWidth = 0.0, rightWidth = 0.0;
-	uint32 left, right;
-
-	// coming from left...
-
-	for (left = 0; left < numChars; left++) {
-		if (leftWidth + escapementArray[left] > halfWidth)
-			break;
-
-		leftWidth += escapementArray[left];
-	}
-
-	if (left == numChars) {
-		// string is smaller than half of the maximum width
-		return false;
-	}
-
-	// check if the whole string fits in
-
-	float stringWidth = leftWidth;
-	uint32 i = left;
-	for (; i < numChars && stringWidth < width; i++) {
-		stringWidth += escapementArray[i];
-	}
-	if (stringWidth < width)
+	if (left == numChars)
 		return false;
 
-	// coming from right...
+	float rightWidth = 0.0;
+	uint32 right = numChars;
+	while (right > left && (rightWidth + (escapementArray[right - 1] * size)) < mid)
+		rightWidth += (escapementArray[--right] * size);
 
-	for (right = numChars; right-- > left; ) {
-		if (rightWidth + escapementArray[right] > halfWidth)
-			break;
-
-		rightWidth += escapementArray[right];
-	}
-
-	if (left >= right) {
-		// string is smaller than the maximum width
+	if (left >= right)
 		return false;
-	}
 
-	if (left == 0 || right >= numChars - 1) {
-		// there is no space for the ellipsis
+	float stringWidth = leftWidth + rightWidth;
+	for (uint32 i = left; i < right; ++i)
+		stringWidth += (escapementArray[i] * size);
+
+	if (stringWidth <= width)
+		return false;
+
+	// if there is no space for the ellipsis
+	if (width < ellipsisWidth) {
 		strcpy(dest, "");
 		return true;
 	}
 
-	// see if the gap between left/right is smaller than the ellipsis
-
-	float totalWidth = rightWidth + leftWidth;
-
-	for (uint32 i = left; i < right; i++) {
-		totalWidth += escapementArray[i];
-		if (totalWidth > width)
-			break;
-	}
-
-	if (totalWidth <= width) {
-		// the whole string fits!
-		return false;
-	}
-
 	// The ellipsis now definitely fits, but let's
 	// see if we can add another character
-
-	totalWidth = ellipsisWidth + rightWidth + leftWidth;
-
+	float gap = width - (leftWidth + ellipsisWidth + rightWidth);
 	if (left > numChars - right) {
 		// try right letter first
-		if (escapementArray[right] + totalWidth <= width)
+		if (escapementArray[right - 1] * size <= gap) {
 			right--;
-		else if (escapementArray[left] + totalWidth <= width)
+		} else if (escapementArray[left + 1] * size <= gap) {
 			left++;
+		}
 	} else {
 		// try left letter first
-		if (escapementArray[left] + totalWidth <= width)
+		if (escapementArray[left + 1] * size <= gap) {
 			left++;
-		else if (escapementArray[right] + totalWidth <= width)
+		} else if (escapementArray[right - 1] * size <= gap) {
 			right--;
+		}
 	}
 
 	// copy characters
