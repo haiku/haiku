@@ -4,9 +4,12 @@
  */
 
 #include <errno.h>
+#include <fcntl.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -14,8 +17,31 @@
 
 #include <OS.h>
 
+#include <AutoDeleter.h>
+
+#include <scheduler_defs.h>
+#include <syscalls.h>
+#include <thread_defs.h>
+
 
 #define MAX_THREADS	4096
+
+#define SCHEDULING_ANALYSIS_BUFFER_SIZE	10 * 1024 * 1024
+
+
+extern const char* __progname;
+
+static const char* kUsage =
+	"Usage: %s [ -h ] [ -o <output> ] [ -s ] <command line>\n"
+;
+
+
+static void
+print_usage_and_exit(bool error)
+{
+    fprintf(error ? stderr : stdout, kUsage, __progname);
+    exit(error ? 1 : 0);
+}
 
 
 struct UsageInfoThreadComparator {
@@ -53,29 +79,19 @@ get_usage_infos(thread_info* infos)
 }
 
 
-int
-main(int argc, const char* const* argv)
+static pid_t
+run_child(int argc, const char* const* argv)
 {
-	if (argc < 2) {
-		fprintf(stderr, "Usage:...\n");
-		exit(1);
-	}
-
-	// gather initial usage info
-	thread_info initialUsage[MAX_THREADS];
-	int32 initialUsageCount = get_usage_infos(initialUsage);
-
 	// fork
-	bigtime_t startTime = system_time();
 	pid_t child = fork();
 	if (child < 0) {
-		fprintf(stderr, "fork() failed: %s\n", strerror(errno));
+		fprintf(stderr, "Error: fork() failed: %s\n", strerror(errno));
 		exit(1);
 	}
 
 	// exec child process
 	if (child == 0) {
-		execvp(argv[1], (char**)(argv + 1));
+		execvp(argv[0], (char**)argv);
 		exit(1);
 	}
 
@@ -83,8 +99,128 @@ main(int argc, const char* const* argv)
 	int childStatus;
 	while (wait(&childStatus) < 0);
 
+	return child;
+}
+
+
+static const char*
+wait_object_to_string(scheduling_analysis_wait_object* waitObject, char* buffer)
+{
+	uint32 type = waitObject->type;
+	void* object = waitObject->object;
+
+	switch (type) {
+		case THREAD_BLOCK_TYPE_SEMAPHORE:
+			sprintf(buffer, "sem %ld (%s)", (sem_id)(addr_t)object,
+				waitObject->name);
+			break;
+		case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
+			sprintf(buffer, "cvar %p (%s %p)", object, waitObject->name,
+				waitObject->referenced_object);
+			break;
+		case THREAD_BLOCK_TYPE_SNOOZE:
+			strcpy(buffer, "snooze");
+			break;
+		case THREAD_BLOCK_TYPE_SIGNAL:
+			strcpy(buffer, "signal");
+			break;
+		case THREAD_BLOCK_TYPE_MUTEX:
+			sprintf(buffer, "mutex %p (%s)", object, waitObject->name);
+			break;
+		case THREAD_BLOCK_TYPE_RW_LOCK:
+			sprintf(buffer, "rwlock %p (%s)", object, waitObject->name);
+			break;
+		case THREAD_BLOCK_TYPE_OTHER:
+			sprintf(buffer, "other %p", object);
+			break;
+		default:
+			sprintf(buffer, "unknown %p", object);
+			break;
+	}
+
+	return buffer;
+}
+
+
+static void
+do_scheduling_analysis(bigtime_t startTime, bigtime_t endTime)
+{
+	printf("\n");
+
+	// allocate a chunk of memory for the scheduling analysis
+	void* buffer = malloc(SCHEDULING_ANALYSIS_BUFFER_SIZE);
+	if (buffer == NULL) {
+		fprintf(stderr, "Error: Failed to allocate memory for the scheduling "
+			"analysis.\n");
+		exit(1);
+	}
+	MemoryDeleter _(buffer);
+
+	// do the scheduling analysis
+	scheduling_analysis analysis;
+	status_t error = _kern_analyze_scheduling(startTime, endTime, buffer,
+		SCHEDULING_ANALYSIS_BUFFER_SIZE, &analysis);
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Scheduling analysis failed: %s\n",
+			strerror(error));
+		exit(1);
+	}
+
+	printf("scheduling analysis: %lu threads, %llu wait objects, "
+		"%llu thread wait objects\n", analysis.thread_count,
+		analysis.wait_object_count, analysis.thread_wait_object_count);
+
+	for (uint32 i = 0; i < analysis.thread_count; i++) {
+		scheduling_analysis_thread* thread = analysis.threads[i];
+
+		// compute total wait time
+		bigtime_t waitTime = 0;
+		scheduling_analysis_thread_wait_object* threadWaitObject
+			= thread->wait_objects;
+		while (threadWaitObject != NULL) {
+			waitTime += threadWaitObject->wait_time;
+			threadWaitObject = threadWaitObject->next_in_list;
+		}
+
+		printf("\nthread %ld \"%s\":\n", thread->id, thread->name);
+		printf("  run time:    %lld us (%lld runs)\n", thread->total_run_time,
+			thread->runs);
+		printf("  wait time:   %lld us\n", waitTime);
+		printf("  latencies:   %lld us (%lld)\n", thread->total_latency,
+			thread->latencies);
+		printf("  preemptions: %lld us (%lld)\n", thread->total_rerun_time,
+			thread->reruns);
+		printf("  unspecified: %lld us\n", thread->unspecified_wait_time);
+		printf("  waited on:\n");
+		threadWaitObject = thread->wait_objects;
+		while (threadWaitObject != NULL) {
+			scheduling_analysis_wait_object* waitObject
+				= threadWaitObject->wait_object;
+			char buffer[1024];
+			wait_object_to_string(waitObject, buffer);
+			printf("    %s: %lld us\n", buffer, threadWaitObject->wait_time);
+
+			threadWaitObject = threadWaitObject->next_in_list;
+		}
+	}
+}
+
+
+static void
+do_timing_analysis(int argc, const char* const* argv, bool schedulingAnalysis,
+	int outFD)
+{
+	// gather initial usage info
+	thread_info initialUsage[MAX_THREADS];
+	int32 initialUsageCount = get_usage_infos(initialUsage);
+
+	// exec child process
+	bigtime_t startTime = system_time();
+	pid_t child = run_child(argc, argv);
+
 	// get child usage info
-	bigtime_t runTime = system_time() - startTime;
+	bigtime_t endTime = system_time();
+	bigtime_t runTime = endTime - startTime;
 	team_usage_info childUsage;
 	get_team_usage_info(B_CURRENT_TEAM, B_TEAM_USAGE_CHILDREN, &childUsage);
 
@@ -154,6 +290,10 @@ main(int argc, const char* const* argv)
 	std::sort(sortedThreads, sortedThreads + sortedThreadCount,
 		UsageInfoTimeComparator());
 
+	// redirect output, if requested
+	if (outFD >= 0)
+		dup2(outFD, STDOUT_FILENO);
+
 	// print results
 	printf("\nTotal run time: %lld us\n", runTime);
 	printf("Thread time statistics in us:\n\n");
@@ -185,6 +325,63 @@ main(int argc, const char* const* argv)
 		const thread_info& info = goneThreads[i];
 		printf("%7ld  %-32s  <gone>\n", info.thread, info.name);
 	}
+
+	if (schedulingAnalysis)
+		do_scheduling_analysis(startTime, endTime);
+}
+
+
+int
+main(int argc, const char* const* argv)
+{
+	const char* outputFile = NULL;
+	bool schedulingAnalysis = false;
+
+	while (true) {
+		static struct option sLongOptions[] = {
+			{ "help", no_argument, 0, 'h' },
+			{ "output", required_argument, 0, 'o' },
+			{ 0, 0, 0, 0 }
+		};
+
+		opterr = 0; // don't print errors
+		int c = getopt_long(argc, (char**)argv, "ho:s", sLongOptions, NULL);
+		if (c == -1)
+			break;
+
+		switch (c) {
+			case 'h':
+				print_usage_and_exit(false);
+				break;
+			case 'o':
+				outputFile = optarg;
+				break;
+			case 's':
+				schedulingAnalysis = true;
+				break;
+
+			default:
+				print_usage_and_exit(true);
+				break;
+		}
+	}
+
+	if (optind >= argc)
+		print_usage_and_exit(true);
+
+	// open output file, if specified
+	int outFD = -1;
+	if (outputFile != NULL) {
+		outFD = open(outputFile, O_WRONLY | O_CREAT | O_TRUNC,
+			S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP| S_IROTH | S_IWOTH);
+		if (outFD < 0) {
+			fprintf(stderr, "Error: Failed to open \"%s\": %s\n", outputFile,
+				strerror(errno));
+			exit(1);
+		}
+	}
+
+	do_timing_analysis(argc - optind, argv + optind, schedulingAnalysis, outFD);
 
 	return 0;
 }

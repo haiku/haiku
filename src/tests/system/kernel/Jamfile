@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src tests system kernel ;
 
 UsePrivateKernelHeaders ;
+UsePrivateHeaders shared ;
 
 SimpleTest advisory_locking_test : advisory_locking_test.cpp ;
 
