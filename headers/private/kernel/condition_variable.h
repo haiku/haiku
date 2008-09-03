@@ -65,7 +65,8 @@ public:
 									// all-in one, i.e. doesn't need a
 									// ConditionVariableEntry
 
-			const void*			Object() const	{ return fObject; }
+			const void*			Object() const		{ return fObject; }
+			const char*			ObjectType() const	{ return fObjectType; }
 
 	static	void				ListAll();
 			void				Dump() const;
