@@ -24,6 +24,21 @@
 						- USER_STACK_GUARD_PAGES * B_PAGE_SIZE)		// 16 MB
 
 
+// The type of object a thread blocks on (thread::wait::type, set by
+// thread_prepare_to_block()).
+enum {
+	THREAD_BLOCK_TYPE_SEMAPHORE				= 0,
+	THREAD_BLOCK_TYPE_CONDITION_VARIABLE	= 1,
+	THREAD_BLOCK_TYPE_SNOOZE				= 2,
+	THREAD_BLOCK_TYPE_SIGNAL				= 3,
+	THREAD_BLOCK_TYPE_MUTEX					= 4,
+	THREAD_BLOCK_TYPE_RW_LOCK				= 5,
+
+	THREAD_BLOCK_TYPE_OTHER					= 9999,
+	THREAD_BLOCK_TYPE_USER_BASE				= 10000
+};
+
+
 struct thread_creation_attributes {
 	int32 (*entry)(thread_func, void *);
 	const char*	name;

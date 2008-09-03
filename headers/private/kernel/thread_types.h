@@ -49,20 +49,6 @@ typedef enum job_control_state {
 	JOB_CONTROL_STATE_DEAD
 } job_control_state;
 
-// The type of object a thread blocks on (thread::wait::type, set by
-// thread_prepare_to_block()).
-enum {
-	THREAD_BLOCK_TYPE_SEMAPHORE				= 0,
-	THREAD_BLOCK_TYPE_CONDITION_VARIABLE	= 1,
-	THREAD_BLOCK_TYPE_SNOOZE				= 2,
-	THREAD_BLOCK_TYPE_SIGNAL				= 3,
-	THREAD_BLOCK_TYPE_MUTEX					= 4,
-	THREAD_BLOCK_TYPE_RW_LOCK				= 5,
-
-	THREAD_BLOCK_TYPE_OTHER					= 9999,
-	THREAD_BLOCK_TYPE_USER_BASE				= 10000
-};
-
 struct image;					// defined in image.c
 struct realtime_sem_context;	// defined in realtime_sem.cpp
 struct select_info;
