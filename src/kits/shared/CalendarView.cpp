@@ -105,9 +105,7 @@ BCalendarView::BCalendarView(BMessage *archive)
 		|| archive->FindInt32("_month", &fMonth) != B_OK
 		|| archive->FindInt32("_year", &fYear) != B_OK) {
 			BDate date = BDate::CurrentDate(B_LOCAL_TIME);
-			fDay = date.Day();
-			fMonth = date.Month();
-			fYear = date.Year();
+			date.GetDate(&fYear, &fMonth, &fDay);
 	}
 
 	int32 start;
@@ -712,9 +710,7 @@ void
 BCalendarView::_InitObject()
 {
 	BDate date = BDate::CurrentDate(B_LOCAL_TIME);
-	fDay = date.Day();
-	fYear = date.Year();
-	fMonth = date.Month();
+	date.GetDate(&fYear, &fMonth, &fDay);
 
 	_SetupDayNames();
 	_SetupDayNumbers();
@@ -923,7 +919,7 @@ BCalendarView::_SetupWeekNumbers()
 	if (fWeekStart == B_WEEK_START_MONDAY && dayOfWeek == 0)
 			dayOfWeek = 7;
 	date.AddDays(4 - dayOfWeek);
-	
+
 	for (int32 row = 0; row < 6; ++row) {
 		fWeekNumbers[row].SetTo("");
 		fWeekNumbers[row] << date.WeekNumber();
