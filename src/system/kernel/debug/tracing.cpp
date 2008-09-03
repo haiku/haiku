@@ -1179,6 +1179,24 @@ dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 }
 
 
+void
+lock_tracing_buffer()
+{
+#if ENABLE_TRACING
+	acquire_spinlock(&sLock);
+#endif
+}
+
+
+void
+unlock_tracing_buffer()
+{
+#if ENABLE_TRACING
+	release_spinlock(&sLock);
+#endif
+}
+
+
 extern "C" status_t
 tracing_init(void)
 {

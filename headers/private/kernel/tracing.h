@@ -208,6 +208,8 @@ char* alloc_tracing_buffer_strcpy(const char* source, size_t maxSize,
 tracing_stack_trace* capture_tracing_stack_trace(int32 maxCount,
 			int32 skipFrames, bool userOnly);
 int dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter);
+void lock_tracing_buffer();
+void unlock_tracing_buffer();
 status_t tracing_init(void);
 
 void _user_ktrace_output(const char *message);
