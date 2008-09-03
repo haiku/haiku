@@ -480,8 +480,8 @@ InputServer::MessageReceived(BMessage* message)
 	BMessage reply;
 	status_t status = B_OK;
 
-	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what >> 24,
-		message->what >> 16, message->what >> 8, message->what));
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, (char)(message->what >> 24),
+		(char)(message->what >> 16), (char)(message->what >> 8), (char)message->what));
 
 	switch (message->what) {
 		case IS_SET_METHOD:
@@ -973,8 +973,8 @@ status_t
 InputServer::EnqueueMethodMessage(BMessage* message)
 {
 	CALLED();
-	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what >> 24,
-		message->what >> 16, message->what >> 8, message->what));
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, (char)(message->what >> 24),
+		(char)(message->what >> 16), (char)(message->what >> 8), (char)message->what));
 
 #ifdef DEBUG
 	if (message->what == 'IMEV') {
@@ -1327,7 +1327,7 @@ InputServer::_StartEventLoop()
 	CALLED();
 	fEventLooperPort = create_port(100, "input server events");
 	if (fEventLooperPort < 0) {
-		PRINTERR(("InputServer: create_port error: (0x%x) %s\n",
+		PRINTERR(("InputServer: create_port error: (0x%lx) %s\n",
 			fEventLooperPort, strerror(fEventLooperPort)));
 		return fEventLooperPort;
 	}
@@ -1460,8 +1460,8 @@ InputServer::_SanitizeEvents(EventList& events)
 				int32 x, y;
 				float absX, absY;
 
-	    		if (event->FindInt32("x", &x) == B_OK
-	    			&& event->FindInt32("y", &y) == B_OK) {
+				if (event->FindInt32("x", &x) == B_OK
+					&& event->FindInt32("y", &y) == B_OK) {
 					fMousePos.x += x;
 					fMousePos.y -= y;
 					fMousePos.ConstrainTo(fFrame);
@@ -1474,23 +1474,23 @@ InputServer::_SanitizeEvents(EventList& events)
 
 					PRINT(("new position: %f, %f, %ld, %ld\n",
 						fMousePos.x, fMousePos.y, x, y));
-	    		} else if (event->FindFloat("x", &absX) == B_OK
-	    			&& event->FindFloat("y", &absY) == B_OK) {
-	    			// device gives us absolute screen coords
-	    			// in range 0..1
-	    			// convert to absolute screen pos
-	    			// (the message is supposed to contain the original
-	    			// absolute coordinates as "be:tablet_x/y")
-		   			fMousePos.x = absX * fFrame.Width();
-		   			fMousePos.y = absY * fFrame.Height();
+				} else if (event->FindFloat("x", &absX) == B_OK
+					&& event->FindFloat("y", &absY) == B_OK) {
+				// device gives us absolute screen coords
+				// in range 0..1
+				// convert to absolute screen pos
+				// (the message is supposed to contain the original
+				// absolute coordinates as "be:tablet_x/y")
+					fMousePos.x = absX * fFrame.Width();
+					fMousePos.y = absY * fFrame.Height();
 					fMousePos.ConstrainTo(fFrame);
 
 					event->RemoveName("x"); 
 					event->RemoveName("y");
 					event->AddPoint("where", fMousePos);
 					PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
-		   		} else if (event->FindPoint("where", &where) == B_OK) {
-		   			fMousePos = where;
+				} else if (event->FindPoint("where", &where) == B_OK) {
+					fMousePos = where;
 					fMousePos.ConstrainTo(fFrame);
 
 					event->ReplacePoint("where", fMousePos);
@@ -1531,7 +1531,7 @@ InputServer::_SanitizeEvents(EventList& events)
 				// to next input method
 				// (pressing "shift" will let us switch to the previous method)
 
-				PRINT(("SanitizeEvents: %lx, %lx\n", fKeyInfo.modifiers,
+				PRINT(("SanitizeEvents: %lx, %x\n", fKeyInfo.modifiers,
 					fKeyInfo.key_states[KEY_Spacebar >> 3]));
 
 				uint8 byte;
