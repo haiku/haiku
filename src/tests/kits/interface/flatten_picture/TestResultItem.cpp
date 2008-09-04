@@ -73,6 +73,12 @@ TestResultItem::DrawItem(BView *owner, BRect itemRect, bool drawEverthing)
 		owner->DrawBitmap(fArchivedBitmap);
 	}
 	owner->MovePenBy(fBitmapSize.Width() + distance, 0);
+	
+	owner->DrawBitmap(fDirectBitmap);
+	owner->SetDrawingMode(B_OP_SUBTRACT);
+	owner->DrawBitmap(fOriginalBitmap);
+
+	owner->MovePenBy(fBitmapSize.Width() + distance, 0);
 
 	owner->SetDrawingMode(B_OP_OVER);	
 	BFont font;
