@@ -6,6 +6,7 @@
  *		Michael Pfeiffer
  */
 
+#include <GraphicsDefs.h>
 #include <InterfaceKit.h>
 #include <String.h>
 
@@ -202,8 +203,19 @@ PictureTest::Test(draw_func* func, BRect frame)
 	fBitmapFromRestoredPicture = CreateBitmap(archivedPicture, frame);
 	TEST_AND_RETURN(fBitmapFromRestoredPicture == NULL, "Could not create bitmap from archived picture!", false);
 	
-	TEST_AND_RETURN(!IsSame(fDirectBitmap, fBitmapFromPicture), "Bitmap from picture differs from direct drawing bitmap", false);
-	TEST_AND_RETURN(!IsSame(fDirectBitmap, fBitmapFromRestoredPicture), "Bitmap from picture differs from direct drawing bitmap", false);
+	BString reason;
+	if (!IsSame(fDirectBitmap, fBitmapFromPicture, reason)) {
+		BString message("Bitmap from picture differs from direct drawing bitmap: ");
+		message += reason;
+		SetErrorMessage(message.String());
+		return false;
+	}
+	if (!IsSame(fDirectBitmap, fBitmapFromRestoredPicture, reason)) {
+		BString message("Bitmap from restored picture differs from direct drawing bitmap: ");
+		message += reason;
+		SetErrorMessage(message.String());
+		return false;
+	}
 	return true;
 }
 
@@ -247,16 +259,69 @@ PictureTest::CreateBitmap(BPicture *picture, BRect frame)
 }
 
 
-bool
-PictureTest::IsSame(BBitmap *bitmap1, BBitmap *bitmap2)
+static void setMismatchReason(int32 x, int32 y, uint8 *pixel1, uint8 *pixel2, 
+	int32 bpp, BString &reason)
 {
-	if (bitmap1->ColorSpace() != bitmap2->ColorSpace())
-		return false;
+	char buffer1[32];
+	char buffer2[32];
+	uint32 color1 = 0;
+	uint32 color2 = 0;
+	memcpy(&color1, pixel1, bpp);
+	memcpy(&color2, pixel2, bpp);
+	sprintf(buffer1, "0x%8.8x", (int)color1);
+	sprintf(buffer2, "0x%8.8x", (int)color2);
 	
-	if (bitmap1->BitsLength() != bitmap2->BitsLength())
+	reason = "Pixel at ";
+	reason << x << ", " << y << " differs: " << buffer1 << " != " << buffer2;
+	// TODO remove when scrolling horizontally works in result list
+	fprintf(stderr, "%s\n", reason.String());
+}
+
+
+bool
+PictureTest::IsSame(BBitmap *bitmap1, BBitmap *bitmap2, BString &reason)
+{
+	if (bitmap1->ColorSpace() != bitmap2->ColorSpace()) {
+		reason = "ColorSpace() differs";
 		return false;
+	}
 	
-	return memcmp(bitmap1->Bits(), bitmap2->Bits(), bitmap1->BitsLength()) == 0;
+	if (bitmap1->BitsLength() != bitmap2->BitsLength()) {
+		reason = "BitsLength() differs";
+		return false;
+	}
+	
+	size_t rowAlignment;
+	size_t pixelChunk;
+	size_t pixelsPerChunk;
+	if (get_pixel_size_for(bitmap1->ColorSpace(), &rowAlignment, &pixelChunk, 
+		&pixelsPerChunk) != B_OK) {
+		reason = "get_pixel_size_for() not supported for this color space";
+		return false;
+	}
+	if (pixelsPerChunk != 1) {
+		reason = "Unsupported color_space; IsSame(...) supports 1 pixels per chunk only";
+		return false;
+	}
+	int32 bpp = (int32)pixelChunk;
+	uint8* row1 = (uint8*)bitmap1->Bits();
+	uint8* row2 = (uint8*)bitmap2->Bits();
+	int32 bpr = bitmap1->BytesPerRow();
+	int32 width = bitmap1->Bounds().IntegerWidth() + 1;
+	int32 height = bitmap1->Bounds().IntegerHeight() + 1;
+	for (int y = 0; y < height; y ++, row1 += bpr, row2 += bpr) {
+		uint8* pixel1 = row1;
+		uint8* pixel2 = row2;
+		for (int x = 0; x < width; x ++, pixel1 += bpp, pixel2 += bpp) {
+			if (memcmp(pixel1, pixel2, bpp) != 0) {
+				setMismatchReason(x, y, pixel1, pixel2, bpp, reason);
+				return false;
+			}
+		}
+	}
+
+	reason = "";
+	return true;
 }
 
 

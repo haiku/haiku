@@ -43,7 +43,7 @@ private:
 	BBitmap *CreateBitmap(draw_func* func, BRect frame);
 	BBitmap *CreateBitmap(BPicture *picture, BRect frame);
 
-	bool IsSame(BBitmap *bitmap1, BBitmap *bitmap2);
+	bool IsSame(BBitmap *bitmap1, BBitmap *bitmap2, BString &reason);
 
 	color_space fColorSpace;
 
