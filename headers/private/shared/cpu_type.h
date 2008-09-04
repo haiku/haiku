@@ -107,6 +107,8 @@ get_cpu_model_string(system_info *info)
 		case B_CPU_INTEL_PENTIUM_M:
 		case B_CPU_INTEL_PENTIUM_M_MODEL_13:
 			return "Pentium M";
+		case B_CPU_INTEL_ATOM:
+			return "Atom";
 		case B_CPU_INTEL_PENTIUM_CORE:
 			return "Core";
 		case B_CPU_INTEL_PENTIUM_CORE_2:
