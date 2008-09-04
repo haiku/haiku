@@ -62,7 +62,7 @@ struct queued_message : DoublyLinkedListLinkImpl<queued_message> {
 			return;
 
 		if (user_memcpy(&type, _message, sizeof(long)) != B_OK
-			|| user_memcpy(message, (void *)((long *)_message + sizeof(long)),
+			|| user_memcpy(message, (void *)((char *)_message + sizeof(long)),
 			_length) != B_OK) {
 			free(message);
 			return;
@@ -79,7 +79,7 @@ struct queued_message : DoublyLinkedListLinkImpl<queued_message> {
 	status_t copy_to_user_buffer(void *_message, ssize_t _length)
 	{
 		if (user_memcpy(_message, &type, sizeof(long)) != B_OK
-			|| user_memcpy((void *)((long *)_message + sizeof(long)), message,
+			|| user_memcpy((void *)((char *)_message + sizeof(long)), message,
 			_length) != B_OK)
 			return B_ERROR;
 		return B_OK;
@@ -376,7 +376,7 @@ XsiMessageQueue::Insert(queued_message *message)
 	MutexLocker _(sXsiMessageCountLock);
 	if (fBytesInQueue == fMessageQueue.msg_qbytes
 		|| fBytesInQueue + message->length > fMessageQueue.msg_qbytes
-		|| sXsiMessageCount <= MAX_XSI_MESSAGE)
+		|| sXsiMessageCount >= MAX_XSI_MESSAGE)
 		return true;
 
 	fMessage.Add(message);
