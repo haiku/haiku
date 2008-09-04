@@ -115,7 +115,7 @@ _thread_do_exit_notification(void)
 {
 	callback_node *node = tls_get(TLS_ON_EXIT_THREAD_SLOT);
 	callback_node *next;
-	
+
 	while (node != NULL) {
 		next = node->next;
 
@@ -179,6 +179,10 @@ send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 int32
 receive_data(thread_id *_sender, void *buffer, size_t bufferSize)
 {
+	if (_sender == NULL) {
+		thread_id id;
+		return _kern_receive_data(&id, buffer, bufferSize);
+	}
 	return _kern_receive_data(_sender, buffer, bufferSize);
 }
 
