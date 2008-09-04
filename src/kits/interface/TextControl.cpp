@@ -759,10 +759,10 @@ BTextControl::_InitData(const char* label, const char* initialText,
 void
 BTextControl::_ValidateLayout()
 {
-	float width, height;
-	BTextControl::GetPreferredSize(&width, &height);
+	float height;
+	BTextControl::GetPreferredSize(NULL, &height);
 
-	ResizeTo(width, height);
+	ResizeTo(Bounds().Width(), height);
 
 	_LayoutTextView();
 
