@@ -684,12 +684,24 @@ static void testSetFontSize(BView *view, BRect frame)
 
 static void testSetDrawingMode(BView *view, BRect frame)
 {
+	frame.InsetBy(2, 2);
 	view->StrokeLine(frame.LeftTop(), frame.RightBottom());
 	view->StrokeLine(frame.LeftBottom(), frame.RightTop());
 	view->SetDrawingMode(B_OP_ALPHA);
 	rgb_color color = kRed;
 	color.alpha = 127;	
 	view->SetHighColor(color);
+	view->FillRect(frame, B_SOLID_HIGH);
+}
+
+static void testPushPopState(BView *view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	view->SetHighColor(kGreen);
+	view->PushState();
+	view->SetHighColor(kRed);
+	view->PopState();
+	
 	view->FillRect(frame, B_SOLID_HIGH);
 }
 
@@ -757,6 +769,7 @@ TestCase gTestCases[] = {
 	{ "Test SetOriginAndScale5", testSetOriginAndScale5 },
 	{ "Test SetFontSize", testSetFontSize },
 	{ "Test SetDrawingMode", testSetDrawingMode },
+	{ "Test PushPopState", testPushPopState },
 	{ NULL, NULL }
 };
 
