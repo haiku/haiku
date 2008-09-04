@@ -179,7 +179,7 @@ BListView::Draw(BRect updateRect)
 	if (count == 0)
 		return;
 
-	BRect itemFrame(Bounds().left, 0, Bounds().right, -1);
+	BRect itemFrame(0, 0, Bounds().right, -1);
 	for (int i = 0; i < count; i++) {
 		BListItem* item = ItemAt(i);
 		itemFrame.bottom = itemFrame.top + ceilf(item->Height()) - 1;
@@ -800,9 +800,9 @@ BListView::ScrollToSelection()
 		return;
 
 	if (itemFrame.top < Bounds().top)
-		ScrollTo(0, itemFrame.top);
+		ScrollTo(itemFrame.left, itemFrame.top);
 	else
-		ScrollTo(0, itemFrame.bottom - Bounds().Height());
+		ScrollTo(itemFrame.left, itemFrame.bottom - Bounds().Height());
 }
 
 
@@ -1023,7 +1023,6 @@ BListView::ItemFrame(int32 index)
 		frame.bottom = -1;
 	} else {
 		BListItem* item = ItemAt(index);
-		frame.left = 0.0;
 		frame.top = item->Top();
 		frame.bottom = item->Bottom();
 	}
