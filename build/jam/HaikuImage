@@ -423,6 +423,9 @@ AddFilesToHaikuImage beos system add-ons Screen\ Savers
 AddFilesToHaikuImage beos system add-ons disk_systems
 	: <disk_system>intel <disk_system>bfs ;
 
+AddDirectoryToHaikuImage home config add-ons input_server devices ;
+AddDirectoryToHaikuImage home config add-ons input_server filters ;
+AddDirectoryToHaikuImage home config add-ons input_server methods ;
 AddDirectoryToHaikuImage home config add-ons Tracker ;
 AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
 AddDirectoryToHaikuImage home config add-ons Translators ;
