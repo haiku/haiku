@@ -159,10 +159,10 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 	if ((uint32)tableEntries < kOpsTableSize) {
 #if DEBUG
-		fprintf(file, "A smaller than needed function table was supplied.\n");
+		fprintf(file, "PicturePlayer: A smaller than needed function table was supplied.\n");
 #endif
 		functionTable = dummyTable;
-		memcpy(functionTable, callBackTable, (kOpsTableSize - tableEntries) * sizeof(void *));		
+		memcpy(functionTable, callBackTable, tableEntries * sizeof(void *));		
 	}
 
 	const char *data = reinterpret_cast<const char *>(fData);
@@ -352,9 +352,10 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			case B_PIC_SET_CLIPPING_RECTS:
 			{
 				// TODO: Not sure if it's compatible with R5's BPicture version
-				((fnc_PBRecti)functionTable[20])(userData,
-					reinterpret_cast<const BRect *>(data + sizeof(uint32)),
-					*reinterpret_cast<const uint32 *>(data));
+				const uint32 numRects = *reinterpret_cast<const uint32 *>(data);
+				const BRect *rects = reinterpret_cast<const BRect *>(data + sizeof(uint32));
+				((fnc_PBRecti)functionTable[20])(userData, rects, numRects);
+				
 				break;
 			}
 
