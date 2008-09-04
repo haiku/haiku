@@ -120,7 +120,7 @@ BTextControl::BTextControl(BMessage* archive)
 
 	if (archive->HasInt32("_a_text"))
 		archive->FindInt32("_a_text", &textAlignment);
-	
+
 	SetAlignment((alignment)labelAlignment, (alignment)textAlignment);
 
 	if (archive->HasFloat("_divide"))
@@ -432,11 +432,12 @@ BTextControl::GetPreferredSize(float *_width, float *_height)
 	}
 
 	if (_width) {
-		// TODO: this one I need to find out
-		float width = 20.0f + ceilf(StringWidth(Label()));
-		if (width < Bounds().Width())
-			width = Bounds().Width();
-		*_width = width;
+		*_width = Bounds().Width();
+		const char* label = Label();
+		if (label) {
+			float width = ceilf(StringWidth(label));
+			*_width = (width * 1.3) + width + 4.0;
+		}
 	}
 }
 
@@ -444,8 +445,14 @@ BTextControl::GetPreferredSize(float *_width, float *_height)
 void
 BTextControl::ResizeToPreferred()
 {
-	// TODO: change divider?
 	BView::ResizeToPreferred();
+
+	fDivider = 0.0;
+	const char* label = Label();
+	if (label)
+		fDivider = ceil(StringWidth(label)) + 2.0;
+
+	_LayoutTextView();
 }
 
 
@@ -752,10 +759,10 @@ BTextControl::_InitData(const char* label, const char* initialText,
 void
 BTextControl::_ValidateLayout()
 {
-	float height;
-	BTextControl::GetPreferredSize(NULL, &height);
+	float width, height;
+	BTextControl::GetPreferredSize(&width, &height);
 
-	ResizeTo(Bounds().Width(), height);
+	ResizeTo(width, height);
 
 	_LayoutTextView();
 
