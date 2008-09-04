@@ -682,8 +682,19 @@ static void testSetFontSize(BView *view, BRect frame)
 	view->DrawString("Haiku");	
 }
 
+static void testSetDrawingMode(BView *view, BRect frame)
+{
+	view->StrokeLine(frame.LeftTop(), frame.RightBottom());
+	view->StrokeLine(frame.LeftBottom(), frame.RightTop());
+	view->SetDrawingMode(B_OP_ALPHA);
+	rgb_color color = kRed;
+	color.alpha = 127;	
+	view->SetHighColor(color);
+	view->FillRect(frame, B_SOLID_HIGH);
+}
+
+
 // TODO
-// - drawing mode
 // - blending mode
 // - line mode
 // - push/pop state
@@ -745,6 +756,7 @@ TestCase gTestCases[] = {
 	{ "Test SetOriginAndScale4", testSetOriginAndScale4 },
 	{ "Test SetOriginAndScale5", testSetOriginAndScale5 },
 	{ "Test SetFontSize", testSetFontSize },
+	{ "Test SetDrawingMode", testSetDrawingMode },
 	{ NULL, NULL }
 };
 
