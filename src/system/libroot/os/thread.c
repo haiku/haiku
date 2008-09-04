@@ -179,10 +179,6 @@ send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 int32
 receive_data(thread_id *_sender, void *buffer, size_t bufferSize)
 {
-	if (_sender == NULL) {
-		thread_id id;
-		return _kern_receive_data(&id, buffer, bufferSize);
-	}
 	return _kern_receive_data(_sender, buffer, bufferSize);
 }
 

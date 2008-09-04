@@ -2855,15 +2855,16 @@ _user_receive_data(thread_id *_userSender, void *buffer, size_t bufferSize)
 	thread_id sender;
 	status_t code;
 
-	if (!IS_USER_ADDRESS(_userSender)
+	if ((!IS_USER_ADDRESS(_userSender) && _userSender != NULL)
 		|| !IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
 	code = receive_data_etc(&sender, buffer, bufferSize, B_KILL_CAN_INTERRUPT);
 		// supports userland buffers
 
-	if (user_memcpy(_userSender, &sender, sizeof(thread_id)) < B_OK)
-		return B_BAD_ADDRESS;
+	if (_userSender != NULL)
+		if (user_memcpy(_userSender, &sender, sizeof(thread_id)) < B_OK)
+			return B_BAD_ADDRESS;
 
 	return code;
 }
