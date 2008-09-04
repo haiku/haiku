@@ -273,8 +273,6 @@ static void setMismatchReason(int32 x, int32 y, uint8 *pixel1, uint8 *pixel2,
 	
 	reason = "Pixel at ";
 	reason << x << ", " << y << " differs: " << buffer1 << " != " << buffer2;
-	// TODO remove when scrolling horizontally works in result list
-	fprintf(stderr, "%s\n", reason.String());
 }
 
 
