@@ -49,6 +49,7 @@ struct scheduling_analysis_thread_wait_object {
 	thread_id								thread;
 	scheduling_analysis_wait_object*		wait_object;
 	bigtime_t								wait_time;
+	int64									waits;
 	scheduling_analysis_thread_wait_object*	next_in_list;
 };
 

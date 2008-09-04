@@ -897,6 +897,7 @@ struct ThreadWaitObject : HashObject, scheduling_analysis_thread_wait_object {
 		this->thread = thread;
 		wait_object = waitObject;
 		wait_time = 0;
+		waits = 0;
 		next_in_list = NULL;
 	}
 
@@ -1467,6 +1468,7 @@ analyze_scheduling(bigtime_t from, bigtime_t until,
 				bigtime_t diffTime = entry->Time() - thread->lastTime;
 				if (thread->waitObject != NULL) {
 					thread->waitObject->wait_time += diffTime;
+					thread->waitObject->waits++;
 					thread->waitObject = NULL;
 				} else if (thread->state != UNKNOWN)
 					thread->unspecified_wait_time += diffTime;
