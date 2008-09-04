@@ -19,7 +19,7 @@ namespace Layout {
 class SimpleLayouter : public Layouter {
 public:
 								SimpleLayouter(int32 elementCount,
-									int32 spacing);
+									float spacing);
 	virtual						~SimpleLayouter();
 
 	virtual	void				AddConstraints(int32 element, int32 length,

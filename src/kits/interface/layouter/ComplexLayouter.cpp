@@ -157,9 +157,9 @@ struct ComplexLayouter::SumItemBackup {
 
 
 // constructor
-ComplexLayouter::ComplexLayouter(int32 elementCount, int32 spacing)
+ComplexLayouter::ComplexLayouter(int32 elementCount, float spacing)
 	: fElementCount(elementCount),
-	  fSpacing(spacing),
+	  fSpacing((int32)spacing),
 	  fConstraints(new(nothrow) Constraint*[elementCount]),
 	  fWeights(new(nothrow) float[elementCount]),
 	  fSums(new(nothrow) SumItem[elementCount + 1]),

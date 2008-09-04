@@ -113,9 +113,9 @@ public:
 
 
 // constructor
-SimpleLayouter::SimpleLayouter(int32 elementCount, int32 spacing)
+SimpleLayouter::SimpleLayouter(int32 elementCount, float spacing)
 	: fElementCount(elementCount),
-	  fSpacing(spacing),
+	  fSpacing((int32)spacing),
 	  fMin(0),
 	  fMax(B_SIZE_UNLIMITED),
 	  fPreferred(0),

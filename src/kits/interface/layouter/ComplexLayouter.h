@@ -20,7 +20,7 @@ class LayoutOptimizer;
 class ComplexLayouter : public Layouter {
 public:
 								ComplexLayouter(int32 elementCount,
-									int32 spacing);
+									float spacing);
 	virtual						~ComplexLayouter();
 
 	virtual	status_t			InitCheck() const;
