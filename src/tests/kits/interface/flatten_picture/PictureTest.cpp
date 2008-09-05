@@ -292,7 +292,7 @@ PictureTest::IsSame(BBitmap *bitmap1, BBitmap *bitmap2, BString &reason)
 	size_t rowAlignment;
 	size_t pixelChunk;
 	size_t pixelsPerChunk;
-	if (get_pixel_size_for(bitmap1->ColorSpace(), &rowAlignment, &pixelChunk, 
+	if (get_pixel_size_for(bitmap1->ColorSpace(), &pixelChunk, &rowAlignment, 
 		&pixelsPerChunk) != B_OK) {
 		reason = "get_pixel_size_for() not supported for this color space";
 		return false;
