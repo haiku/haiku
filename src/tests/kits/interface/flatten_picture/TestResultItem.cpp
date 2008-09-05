@@ -34,20 +34,13 @@ void
 TestResultItem::DrawItem(BView *owner, BRect itemRect, bool drawEverthing)
 {
 	owner->SetDrawingMode(B_OP_COPY);
+	
 	owner->PushState();
 	if (IsSelected()) {
-		owner->SetHighColor(128, 128, 128);
+		rgb_color lowColor = owner->LowColor();
+		owner->SetHighColor(tint_color(lowColor, B_DARKEN_2_TINT));
 	}
-	else {
-		owner->SetHighColor(255, 255, 255);
-	}
-	owner->StrokeRect(itemRect);
-	owner->PopState();
-	
-	itemRect.InsetBy(1, 1);
-	
-	owner->PushState();
-	if (fOk) {
+	else if (fOk) {
 		// green background color on success
 		owner->SetHighColor(200, 255, 200);
 	}
@@ -57,6 +50,8 @@ TestResultItem::DrawItem(BView *owner, BRect itemRect, bool drawEverthing)
 	}
 	owner->FillRect(itemRect);
 	owner->PopState();
+
+	itemRect.InsetBy(1, 1);
 	
 	owner->MovePenTo(itemRect.left+1, itemRect.top+1);
 	if (fDirectBitmap != NULL) {
