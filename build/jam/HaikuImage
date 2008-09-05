@@ -64,7 +64,7 @@ BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 	ScreenSaver Sounds Time VirtualMemory
 ;
 BEOS_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
-	$(X86_ONLY)GLDirectMode $(X86_ONLY)GLTeapot Mandelbrot Pairs PictureTest
+	$(X86_ONLY)GLDirectMode $(X86_ONLY)GLTeapot Mandelbrot Pairs
 	Playground Pulse Sudoku
 ;
 BEOS_SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
@@ -292,11 +292,6 @@ spellFiles = $(spellFiles:G=spell) ;
 SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToHaikuImage beos etc word_dictionary : $(spellFiles) ;
-
-local svgFiles = "lion.svg" ;
-SEARCH on $(svgFiles)
-	= [ FDirName $(HAIKU_TOP) src tests kits interface picture ] ;
-AddFilesToHaikuImage beos etc artwork : $(svgFiles) ;
 
 local etcFiles = inputrc profile teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
