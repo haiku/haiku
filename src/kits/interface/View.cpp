@@ -3410,10 +3410,14 @@ BView::Invalidate(BRect invalRect)
 	fOwner->fLink->StartMessage(AS_VIEW_INVALIDATE_RECT);
 	fOwner->fLink->Attach<BRect>(invalRect);
 
+// TODO: determine why this check isn't working correctly.
+#if 0
 	if (!fOwner->fUpdateRequested) {
 		fOwner->fLink->Flush();
 		fOwner->fUpdateRequested = true;
 	}
+#endif
+	fOwner->fLink->Flush();
 }
 
 
