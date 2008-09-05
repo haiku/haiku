@@ -6,6 +6,8 @@
 #include "pci.h"
 #include "pci_fixup.h"
 
+#include <arch/int.h>
+
 #include <KernelExport.h>
 
 
@@ -153,6 +155,37 @@ intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function,
 }
 
 
+static void
+ati_fixup_ixp(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, uint16 deviceId)
+{
+#ifdef __INTEL__
+	/* ATI Technologies Inc, IXP chipset:
+	 * This chipset seems broken, at least on my laptop I must force 
+	 * the timer IRQ trigger mode, else no interrupt comes in.
+	 * mmu_man.
+	 */
+	// XXX: should I use host or isa bridges for detection ??
+	switch (deviceId) {
+		// Host bridges
+		case 0x5950:	// RS480 Host Bridge
+		case 0x5830:
+			break;
+		// ISA bridges
+		case 0x4377:	// IXP SB400 PCI-ISA Bridge 
+		default:
+			return;
+	}
+	dprintf("ati_fixup_ixp: domain %u, bus %u, device %u, function %u, deviceId 0x%04x\n",
+		domain, bus, device, function, deviceId);
+
+	dprintf("ati_fixup_ixp: found IXP chipset, forcing IRQ 0 as level triggered.\n");
+	// XXX: maybe use pic_*() ?
+	arch_int_configure_io_interrupt(0, B_LEVEL_TRIGGERED);
+
+#endif
+}
+
+
 void
 pci_fixup_device(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function)
 {
@@ -171,6 +204,10 @@ pci_fixup_device(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function)
 
 		case 0x8086:
 			intel_fixup_ahci(pci, domain, bus, device, function, deviceId);
+			break;
+
+		case 0x1002:
+			ati_fixup_ixp(pci, domain, bus, device, function, deviceId);
 			break;
 	}
 }
