@@ -116,9 +116,12 @@ extern float	tanhf(float x);
 
 /* double math functions */
 extern double	acos(double x);
+extern double	acosh(double x);
 extern double	asin(double x);
+extern double	asinh(double x);
 extern double	atan(double x);
 extern double	atan2(double x, double y);
+extern double	atanh(double x);
 extern double	ceil(double x);
 extern double	cos(double x);
 extern double	cosh(double x);
@@ -144,14 +147,17 @@ extern double	tanh(double x);
 extern double	trunc(double x);
 
 /* long double math functions */
+extern long double 	acosl(long double x);
+extern long double 	acoshl(long double x);
+extern long double 	asinl(long double x);
+extern long double 	atanl(long double x);
+extern long double 	atanhl(long double x);
+extern long double 	atan2l(long double y, long double x);
 extern long double	lgammal(long double x);
 extern long double	roundl(long double x);
 extern long		lroundl(long double x);
 
 /* some BSD non-ANSI or POSIX math functions */
-extern double	acosh(double x);
-extern double	asinh(double x);
-extern double	atanh(double x);
 extern double	cbrt(double x);
 extern double	erf(double x);
 extern double	erfc(double x);
@@ -203,7 +209,9 @@ extern float	nextafterf(float x, float y);
 extern float	remainderf(float x, float y);
 extern float	scalbf(float x, float n);
 extern float	scalbnf(float x, int n);
-extern int		ilogbf(float x);
+extern int	ilogbf(float x);
+
+extern long double 	remainderl(long double x, long double y);
 
 /* prototypes for functions used in the macros below */
 extern int		__fpclassifyf(float value);
