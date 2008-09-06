@@ -178,6 +178,7 @@ extern double	lgamma_r(double x, int *y);
 extern double	log1p(double x);
 extern double	logb(double x);
 extern double	nextafter(double x, double y);
+extern double	nexttoward(double x, long double y);
 extern double	remainder(double x, double y);
 extern double	rint(double x);
 extern double	scalb (double x, double y);
@@ -213,12 +214,16 @@ extern float	gammaf_r(float x, int *y);
 extern float	lgammaf_r(float x, int *y);
 extern float	rintf(float x);
 extern float	nextafterf(float x, float y);
+extern float	nexttowardf(float x, long double y);
 extern float	remainderf(float x, float y);
 extern float	scalbf(float x, float n);
 extern float	scalbnf(float x, int n);
 extern int	ilogbf(float x);
 
+extern long double	nextafterl(long double x, long double y);
+extern long double	nexttowardl(long double x, long double y);
 extern long double	remainderl(long double x, long double y);
+extern long double	rintl(long double x);
 extern long double	scalbnl(long double x, int n);
 extern long double	scalblnl(long double x, long n);
 

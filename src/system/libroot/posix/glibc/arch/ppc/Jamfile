@@ -80,6 +80,7 @@ local genericSources =
 	s_lround.c s_lroundf.c
 	s_modf.c s_modff.c # s_modfl.c
 	s_nan.c s_nanf.c # s_nanl.c
+	# s_nexttoward.c s_nexttowardf.c s_nexttowardl.c
 	s_round.c s_roundf.c # s_roundl.c
 	s_scalbn.c s_scalbnf.c # s_scalbnl.c
 	s_signbit.c s_signbitf.c # s_signbitl.c
