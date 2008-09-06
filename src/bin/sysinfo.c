@@ -495,10 +495,15 @@ dump_cpus(system_info *info)
 {
 	const char *vendor = get_cpu_vendor_string(info->cpu_type);
 	const char *model = get_cpu_model_string(info);
+	char modelString[32];
 	int32 cpu;
 
 	if (model == NULL && vendor == NULL)
 		model = "(Unknown)";
+	else if (model == NULL) {
+		model = modelString;
+		snprintf(modelString, 32, "(Unknown %x)", info->cpu_type);
+	}
 
 	printf("%ld %s%s%s, revision %04lx running at %LdMHz (ID: 0x%08lx 0x%08lx)\n\n",
 		info->cpu_count,
