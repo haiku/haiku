@@ -158,8 +158,8 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	fColorWell->MoveBy(0, delta);
 	fPicker->MoveBy(0, delta);
 	fScrollView->ResizeBy(0, delta);
-	// TODO fix BView::ResizeBy(...): 
-	// the child views should resize with its parent view (fScrollView)
+	// since this view is not attached to a window yet,
+	// we have to resize the fScrollView children too
 	fScrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, delta);
 	fAttrList->ResizeBy(0, delta);
 }
