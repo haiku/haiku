@@ -106,7 +106,9 @@ extern float	logbf(float x);
 extern float	logf(float x);
 extern long	lroundf(float x);
 extern float	modff(float x, float *y);
+extern float	nearbyintf(float x);
 extern float	powf(float x, float y);
+extern float	remquof(float x, float y, int *quo);
 extern float	roundf(float x);
 extern float	sinf(float x);
 extern float	sinhf(float x);
@@ -137,7 +139,9 @@ extern double	log(double x);
 extern double	log10(double x);
 extern long	lround(double x);
 extern double	modf(double x, double *y);
+extern double	nearbyint(double x);
 extern double	pow(double x, double y);
+extern double	remquo(double x, double y, int *quo);
 extern double	round(double x);
 extern double	sin(double x);
 extern double	sinh(double x);
@@ -154,8 +158,10 @@ extern long double 	atanl(long double x);
 extern long double 	atanhl(long double x);
 extern long double 	atan2l(long double y, long double x);
 extern long double	lgammal(long double x);
+extern long double 	nearbyintl(long double x);
 extern long double	roundl(long double x);
 extern long		lroundl(long double x);
+extern long double 	remquol(long double x, long double y, int *quo);
 
 /* some BSD non-ANSI or POSIX math functions */
 extern double	cbrt(double x);
@@ -189,6 +195,7 @@ extern float	copysignf(float x, float y);
 extern int		isnanf(float value);
 extern double	significand(double x);
 extern double	copysign(double x, double y);
+extern double 	scalbln(double x, long n);
 extern double	scalbn(double x, int y);
 extern double	drem(double x, double y);
 extern int		isnan(double x);
@@ -211,7 +218,9 @@ extern float	scalbf(float x, float n);
 extern float	scalbnf(float x, int n);
 extern int	ilogbf(float x);
 
-extern long double 	remainderl(long double x, long double y);
+extern long double	remainderl(long double x, long double y);
+extern long double	scalbnl(long double x, int n);
+extern long double	scalblnl(long double x, long n);
 
 /* prototypes for functions used in the macros below */
 extern int		__fpclassifyf(float value);

@@ -82,6 +82,7 @@ local genericSources =
 	s_lround.c s_lroundf.c
 	s_modf.c s_modff.c # s_modfl.c
 	s_nan.c s_nanf.c # s_nanl.c
+	s_nextafter.c s_nextafterf.c # s_nextafterl.c
 	s_round.c s_roundf.c # s_roundl.c
 	s_scalbn.c s_scalbnf.c # s_scalbnl.c
 	s_signbit.c s_signbitf.c # s_signbitl.c
@@ -143,7 +144,10 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
 #	s_fabs.S s_fabsf.S # s_fabsl.S
 	# s_fpclassifyl.c
 #	s_isnan.c s_isnanf.S
+	s_nearbyint.c s_nearbyintf.c # s_nearbyintl.c
+	s_remquo.c s_remquof.c # s_remquol.c
 	s_rint.c s_rintf.c # s_rintl.c
+	s_scalbln.c s_scalblnf.c # s_scalblnl.c
 #	t_sqrt.c
 #	w_sqrt.c w_sqrtf.c # w_sqrtl.c
 ;

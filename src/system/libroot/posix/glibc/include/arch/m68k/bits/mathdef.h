@@ -31,6 +31,9 @@ typedef long double float_t;	/* `float' expressions are evaluated as
 typedef long double double_t;	/* `double' expressions are evaluated as
 				   `long double'.  */
 
+/* Signal that types are long double */
+# define FLT_EVAL_METHOD      2
+
 /* Define `INFINITY' as value of type `float'.  */
 # define INFINITY	HUGE_VALF
 
