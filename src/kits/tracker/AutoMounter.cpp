@@ -182,8 +182,64 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 }
 
 
+bool
+AutoMounter::_SuggestMountFlags(const BPartition* partition,
+	uint32* _flags) const
+{
+	uint32 mountFlags = 0;
+
+	bool askReadOnly = true;
+	bool isBFS = false;
+
+	if (partition->ContentType() != NULL
+		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0) {
+#if 0
+		askReadOnly = false;
+#endif
+		isBFS = true;
+	}
+
+	if (partition->IsReadOnly())
+		askReadOnly = false;
+
+	if (askReadOnly) {
+		// Suggest to the user to mount read-only until Haiku is more mature.
+		// TODO: would be nice to skip this for file systems which don't have
+		// support for writing anyways.
+		BString string;
+		// TODO: Use distro name instead of "Haiku"...
+		if (!isBFS) {
+			string << "The file system on this volume is not the Haiku file "
+				"system. It is strongly suggested to mount it in read-only "
+				"mode. ";
+		} else {
+			string << "It is suggested to mount all additional Haiku volumes "
+				"in read-only mode. ";
+		}
+		string << "This will prevent unintentional data loss because of "
+			"errors in Haiku.";
+		BAlert* alert = new BAlert("Mount Warning", string.String(),
+			"Mount Read/Write", "Cancel", "Mount Read-only",
+			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+		int32 choice = alert->Go();
+		switch (choice) {
+			case 0:
+				break;
+			case 1:
+				return false;
+			case 2:
+				mountFlags |= B_MOUNT_READ_ONLY;
+				break;
+		}
+	}
+
+	*_flags = mountFlags;
+	return true;
+}
+
+
 void
-AutoMounter::_MountVolume(BMessage *message)
+AutoMounter::_MountVolume(const BMessage* message)
 {
 	int32 id;
 	if (message->FindInt32("id", &id) != B_OK)
@@ -195,33 +251,9 @@ AutoMounter::_MountVolume(BMessage *message)
 	if (roster.GetPartitionWithID(id, &device, &partition) != B_OK)
 		return;
 
-	uint32 mountFlags = 0;
-	if (partition->ContentType() == NULL
-		|| strcmp(partition->ContentType(), kPartitionTypeBFS) != 0) {
-		// not a BFS volume, suggest to the user to mount read-only
-		// until Haiku is more mature.
-		// TODO: would be nice to skip this for file systems which don't have
-		// support for writing anyways.
-		BString string;
-		// TODO: Use distro name instead of "Haiku"...
-		string << "The file system on this volume is not the Haiku file "
-			"system. It is strongly suggested to mount it in read-only mode."
-			"This will prevent unintentional data loss because of errors "
-			"in Haiku.";
-		BAlert* alert = new BAlert("Mount Warning", string.String(),
-			"Mount Read/Write", "Cancel", "Mount Read-only",
-			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
-		int32 choice = alert->Go();
-		switch (choice) {
-			case 0:
-				break;
-			case 1:
-				return;
-			case 2:
-				mountFlags |= B_MOUNT_READ_ONLY;
-				break;
-		}
-	}
+	uint32 mountFlags;
+	if (!_SuggestMountFlags(partition, &mountFlags))
+		return;
 
 	status_t status = partition->Mount(NULL, mountFlags);
 	if (status < B_OK) {
@@ -237,7 +269,7 @@ AutoMounter::_SuggestForceUnmount(const char* name, status_t error)
 {
 	BString text;
 	text << "Could not unmount disk \"" << name << "\":\n\t" << strerror(error);
-	text << "\n\nShould I force unmounting the disk?\n\n"
+	text << "\n\nShould unmounting be forced?\n\n"
 		"Note: if an application is currently writing to the volume, unmounting"
 		" it now might result in loss of data.\n";
 
@@ -510,7 +542,7 @@ AutoMounter::GetSettings(BMessage *message)
 
 
 void
-AutoMounter::MessageReceived(BMessage *message)
+AutoMounter::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgInitialScan:

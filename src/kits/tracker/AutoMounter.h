@@ -57,49 +57,56 @@ const uint32 kVolumeMounted				= 'vmtd';
 //	#pragma mark - Haiku Disk Device API
 
 class AutoMounter : public BLooper {
-	public:
-		AutoMounter();
-		virtual ~AutoMounter();
+public:
+								AutoMounter();
+	virtual						~AutoMounter();
 
-		virtual bool QuitRequested();
+	virtual	bool				QuitRequested();
 
-		void GetSettings(BMessage* message);
+			void				GetSettings(BMessage* message);
 
-	private:
-		enum mount_mode {
-			kNoVolumes,
-			kOnlyBFSVolumes,
-			kAllVolumes,
-			kRestorePreviousVolumes
-		};
+private:
+			enum mount_mode {
+				kNoVolumes,
+				kOnlyBFSVolumes,
+				kAllVolumes,
+				kRestorePreviousVolumes
+			};
 
-		void _MountVolumes(mount_mode normal, mount_mode removable,
-			bool initialRescan);
-		void _MountVolume(BMessage* message);
-		bool _SuggestForceUnmount(const char* name, status_t error);
-		void _ReportUnmountError(const char* name, status_t error);
-		void _UnmountAndEjectVolume(BPartition* partition, BPath& mountPoint,
-			const char* name);
-		void _UnmountAndEjectVolume(BMessage* message);
+			bool				_SuggestMountFlags(const BPartition* partition,
+									uint32* _flags) const;
+			void				_MountVolumes(mount_mode normal,
+									mount_mode removable, bool initialRescan);
+			void				_MountVolume(const BMessage* message);
+			bool				_SuggestForceUnmount(const char* name,
+									status_t error);
+			void				_ReportUnmountError(const char* name,
+									status_t error);
+			void				_UnmountAndEjectVolume(BPartition* partition,
+									BPath& mountPoint, const char* name);
+			void				_UnmountAndEjectVolume(BMessage* message);
 
-		void _FromMode(mount_mode mode, bool& all, bool& bfs, bool& restore);
-		mount_mode _ToMode(bool all, bool bfs, bool restore = false);
-		void _UpdateSettingsFromMessage(BMessage* message);
-		void _ReadSettings();
-		void _WriteSettings();
+			void				_FromMode(mount_mode mode, bool& all,
+									bool& bfs, bool& restore);
+			mount_mode			_ToMode(bool all, bool bfs,
+									bool restore = false);
 
-		virtual void MessageReceived(BMessage* message);
+			void				_UpdateSettingsFromMessage(BMessage* message);
+			void				_ReadSettings();
+			void				_WriteSettings();
 
-	private:
-		mount_mode fNormalMode;
-		mount_mode fRemovableMode;
+	virtual	void				MessageReceived(BMessage* message);
 
-		BFile fPrefsFile;
-		BMessage fSettings;
+private:
+			mount_mode			fNormalMode;
+			mount_mode			fRemovableMode;
+
+			BFile				fPrefsFile;
+			BMessage			fSettings;
 };
 
 #else	// !__HAIKU__
-//	#pragma mark - R5 DeviceMap API
+// #pragma mark - R5 DeviceMap API
 
 const uint32 kSuspendAutomounter 		= 'amsp';
 const uint32 kResumeAutomounter	 		= 'amsr';
