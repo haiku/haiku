@@ -7,10 +7,10 @@
  */
 #include "ColorWell.h"
 
-ColorWell::ColorWell(BRect frame, BMessage *msg, bool is_rectangle)
- :	BView(frame,"ColorWell", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW)
+ColorWell::ColorWell(BRect frame, BMessage *msg, uint32 resizingMode, uint32 flags)
+ :	BView(frame,"ColorWell", resizingMode, flags | B_WILL_DRAW)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(0,0,0);
 	invoker=new BInvoker(msg,this);
 	disabledcol.red=128;
@@ -18,7 +18,7 @@ ColorWell::ColorWell(BRect frame, BMessage *msg, bool is_rectangle)
 	disabledcol.blue=128;
 	disabledcol.alpha=255;
 	is_enabled=true;
-	is_rect=is_rectangle;
+	is_rect = true;
 }
 
 ColorWell::~ColorWell(void)
@@ -84,20 +84,20 @@ ColorWell::SetEnabled(bool value)
 void
 ColorWell::Draw(BRect update)
 {
-	if(is_enabled)
-		SetHighColor(currentcol);
+	rgb_color color;
+	if (is_enabled)
+		color = currentcol;
 	else
-		SetHighColor(disabledcol);
-
+		color = disabledcol;
+	
 	if(is_rect) {
-		FillRect(Bounds());
 		if(is_enabled) {
 			BRect r(Bounds());
 			SetHighColor(184,184,184);
 			StrokeRect(r);
 			
 			SetHighColor(255,255,255);
-			StrokeLine(BPoint(r.right,r.top+1), r.RightBottom());
+			StrokeLine(BPoint(r.right, r.top+1), r.RightBottom());
 			
 			r.InsetBy(1,1);
 			
@@ -107,10 +107,21 @@ ColorWell::Draw(BRect update)
 			SetHighColor(96,96,96);
 			StrokeLine(r.LeftTop(), r.RightTop());
 			StrokeLine(r.LeftTop(), r.LeftBottom());
-
+			
+			r.InsetBy(1, 1);
+			SetHighColor(color);
+			FillRect(r);
+		} else {
+			SetHighColor(color);
+			FillRect(Bounds());
 		}
 	}
 	else {
+		// fill background
+		SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		FillRect(update);
+		
+		SetHighColor(color);		
 		FillEllipse(Bounds());
 		if(is_enabled)
 			StrokeEllipse(Bounds(),B_SOLID_LOW);

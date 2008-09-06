@@ -122,10 +122,10 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	rect.bottom = rect.top + 75;
 	fAttrList = new BListView(rect,"AttributeList", B_SINGLE_SELECTION_LIST,
-							B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+							B_FOLLOW_ALL_SIDES);
 	
-	fScrollView = new BScrollView("ScrollView",fAttrList, B_FOLLOW_LEFT_RIGHT | 
-									B_FOLLOW_TOP, 0, false, true);
+	fScrollView = new BScrollView("ScrollView",fAttrList, B_FOLLOW_ALL_SIDES, 
+		0, false, true);
 	AddChild(fScrollView);
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
@@ -137,23 +137,31 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 		printf("Adding color item for which: %ld\n", sColorConsts[i]);
 		fAttrList->AddItem(new ColorWhichItem((color_which)sColorConsts[i]));
 	}
-
-	BRect wellrect(0,0,50,50);
-	wellrect.OffsetTo(rect.right + 30, rect.top +
-					(fScrollView->Bounds().Height() - wellrect.Height())/2 );
-
-	fColorWell = new ColorWell(wellrect,new BMessage(COLOR_DROPPED),true);
-	AddChild(fColorWell);
-	
-	// Center the list and color well
 	
 	rect = fScrollView->Frame();
-	rect.right = wellrect.right;
-	rect.OffsetTo((Bounds().Width()-rect.Width())/2,rect.top);
+	BRect wellrect(0, 0, 50, 50);
+	wellrect.OffsetBy(rect.left, rect.bottom + kBorderSpace);
+	fColorWell = new ColorWell(wellrect, new BMessage(COLOR_DROPPED), 
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	AddChild(fColorWell);
 	
-	fPicker = new BColorControl(BPoint(fScrollView->Frame().left,fScrollView->Frame().bottom+kBorderSpace),B_CELLS_32x8,5.0,"fPicker",
-								new BMessage(UPDATE_COLOR));
+	fPicker = new BColorControl(BPoint(wellrect.right + kBorderSpace, wellrect.top),
+			B_CELLS_32x8, 5.0, "fPicker", new BMessage(UPDATE_COLOR));
+	fPicker->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(fPicker);	
+	
+	// bottom align ColorWell and ColorPicker
+	float bottom = Bounds().bottom - kBorderSpace;
+	float colorWellBottom = fColorWell->Frame().bottom;
+	float pickerBottom = fPicker->Frame().bottom;
+	float delta = bottom - max_c(colorWellBottom, pickerBottom);
+	fColorWell->MoveBy(0, delta);
+	fPicker->MoveBy(0, delta);
+	fScrollView->ResizeBy(0, delta);
+	// TODO fix BView::ResizeBy(...): 
+	// the child views should resize with its parent view (fScrollView)
+	fScrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, delta);
+	fAttrList->ResizeBy(0, delta);
 }
 
 APRView::~APRView(void)

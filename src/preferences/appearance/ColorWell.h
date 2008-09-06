@@ -15,7 +15,9 @@
 class ColorWell : public BView
 {
 public:
-	ColorWell(BRect frame, BMessage *msg, bool is_rectangle=false);
+	ColorWell(BRect frame, BMessage *msg, 
+		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+		uint32 flags = B_WILL_DRAW);
 	~ColorWell(void);
 	void SetColor(rgb_color col);
 	rgb_color Color(void) const;
