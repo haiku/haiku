@@ -44,17 +44,15 @@ public:
 
 protected:
 
-	void	UpdateControlsFromAttr(const char *string);
-	void	UpdateCurrentColor();
+	void	SetCurrentColor(rgb_color color);
+	void	UpdateControls();
 	void	UpdateAllColors();
 	
 	BColorControl	*fPicker;
 	
 	BListView		*fAttrList;
 	
-	color_which		fAttribute;
-	
-	BString			fAttrString;
+	color_which		fWhich;
 	
 	BScrollView		*fScrollView;
 	
@@ -62,6 +60,7 @@ protected:
 
 	ColorSet		fCurrentSet;
 	ColorSet		fPrevSet;
+	ColorSet		fDefaultSet;
 	
 	BMenu			*fDecorMenu;
 };

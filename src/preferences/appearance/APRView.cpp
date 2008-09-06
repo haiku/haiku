@@ -24,46 +24,9 @@
 #include "ColorWhichItem.h"
 #include "ColorSet.h"
 
-//#define DEBUG_APRVIEW
-
-#ifdef DEBUG_APRVIEW
-	#define STRACE(a) printf a
-#else
-	#define STRACE(A) /* nothing */
-#endif
 
 #define COLOR_DROPPED 'cldp'
 #define DECORATOR_CHANGED 'dcch'
-
-int32 sColorConsts[] = {
-	B_PANEL_BACKGROUND_COLOR,
-	B_PANEL_TEXT_COLOR,
-	B_DOCUMENT_BACKGROUND_COLOR,
-	B_DOCUMENT_TEXT_COLOR,
-	B_CONTROL_BACKGROUND_COLOR,
-	B_CONTROL_TEXT_COLOR,
-	B_CONTROL_BORDER_COLOR,
-	B_CONTROL_HIGHLIGHT_COLOR,
-	B_NAVIGATION_BASE_COLOR,
-	B_NAVIGATION_PULSE_COLOR,
-	B_SHINE_COLOR,
-	B_SHADOW_COLOR,
-	B_MENU_BACKGROUND_COLOR,
-	B_MENU_SELECTED_BACKGROUND_COLOR,
-	B_MENU_ITEM_TEXT_COLOR,
-	B_MENU_SELECTED_ITEM_TEXT_COLOR,
-	B_MENU_SELECTED_BORDER_COLOR,
-	B_TOOLTIP_BACKGROUND_COLOR,
-	B_TOOLTIP_TEXT_COLOR,
-	B_SUCCESS_COLOR,
-	B_FAILURE_COLOR,
-	B_WINDOW_TAB_COLOR,
-	B_WINDOW_TEXT_COLOR,
-	B_WINDOW_INACTIVE_TAB_COLOR,
-	B_WINDOW_INACTIVE_TEXT_COLOR,
-};
-
-const uint32 sColorCount = sizeof(sColorConsts) / sizeof(int32);
 
 namespace BPrivate
 {
@@ -76,6 +39,7 @@ namespace BPrivate
 
 APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags)
  :	BView(frame,name,resize,flags),
+ 	fDefaultSet(ColorSet::DefaultColorSet()),
  	fDecorMenu(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -131,11 +95,11 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	
 	fAttrList->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 
-	printf("Color count: %lu\n", sColorCount);
-
-	for (uint32 i = 0; i < sColorCount; i++) {
-		printf("Adding color item for which: %ld\n", sColorConsts[i]);
-		fAttrList->AddItem(new ColorWhichItem((color_which)sColorConsts[i]));
+	for (int32 i = 0; i < color_description_count(); i++) {
+		const ColorDescription& description = *get_color_description(i); 
+		const char* text = description.text;
+		color_which which = description.which;
+		fAttrList->AddItem(new ColorWhichItem(text, which));
 	}
 	
 	rect = fScrollView->Frame();
@@ -166,7 +130,6 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 APRView::~APRView(void)
 {
-	ColorSet::SaveColorSet("/boot/home/config/settings/app_server/system_colors",fCurrentSet);
 }
 
 void
@@ -176,8 +139,6 @@ APRView::AttachedToWindow(void)
 	fAttrList->SetTarget(this);
 	fColorWell->SetTarget(this);
 
-	fPicker->SetValue(fCurrentSet.StringToColor(fAttrString.String()));
-	
 	if (fDecorMenu)
 		fDecorMenu->SetTargetForItems(BMessenger(this));
 
@@ -189,14 +150,11 @@ void
 APRView::MessageReceived(BMessage *msg)
 {
 	if (msg->WasDropped()) {
-		rgb_color *col;
+		rgb_color *color;
 		ssize_t size;
 		
-		if (msg->FindData("RGBColor",(type_code)'RGBC',(const void**)&col,&size)==B_OK) {
-			fPicker->SetValue(*col);
-			fColorWell->SetColor(*col);
-			fColorWell->Invalidate();
-			UpdateCurrentColor();
+		if (msg->FindData("RGBColor", (type_code)'RGBC', (const void**)&color, &size) == B_OK) {
+			SetCurrentColor(*color);
 		}
 	}
 
@@ -211,15 +169,8 @@ APRView::MessageReceived(BMessage *msg)
 		}
 		case UPDATE_COLOR: {
 			// Received from the color fPicker when its color changes
-			
-			rgb_color col=fPicker->ValueAsColor();
-
-			fColorWell->SetColor(col);
-			fColorWell->Invalidate();
-				
-			// Update current fAttribute in the settings
-			fCurrentSet.SetColor(fAttribute, col);
-			UpdateCurrentColor();	
+			rgb_color color = fPicker->ValueAsColor();
+			SetCurrentColor(color);	
 						
 			Window()->PostMessage(kMsgUpdate);
 			break;
@@ -227,21 +178,23 @@ APRView::MessageReceived(BMessage *msg)
 		case ATTRIBUTE_CHOSEN: {
 			// Received when the user chooses a GUI fAttribute from the list
 			
-			ColorWhichItem *whichitem = (ColorWhichItem*)
+			ColorWhichItem *item = (ColorWhichItem*)
 										fAttrList->ItemAt(fAttrList->CurrentSelection());
 			
-			if (!whichitem)
+			if (item == NULL)
 				break;
 			
-			fAttrString=whichitem->Text();
-			UpdateControlsFromAttr(whichitem->Text());
+			fWhich = item->ColorWhich();
+			rgb_color color = fCurrentSet.GetColor(fWhich);
+			SetCurrentColor(color);
 			
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 		case REVERT_SETTINGS: {
-			fCurrentSet=fPrevSet;
-			UpdateControlsFromAttr(fAttrString.String());
+			fCurrentSet = fPrevSet;
+			
+			UpdateControls();
 			UpdateAllColors();
 			
 			Window()->PostMessage(kMsgUpdate);
@@ -250,7 +203,7 @@ APRView::MessageReceived(BMessage *msg)
 		case DEFAULT_SETTINGS: {
 			fCurrentSet = ColorSet::DefaultColorSet();
 			
-			UpdateControlsFromAttr(fAttrString.String());
+			UpdateControls();
 			UpdateAllColors();
 
 			BMenuItem *item = fDecorMenu->FindItem("Default");
@@ -272,43 +225,43 @@ APRView::MessageReceived(BMessage *msg)
 
 void APRView::LoadSettings(void)
 {
-	printf("Max colors: %lu\n", sColorCount);
-	for (uint32 i = 0; i < sColorCount; i++) {
-		printf("getting ui_color for index %lu, constant: %ld\n", i, sColorConsts[i]);
-		fCurrentSet.SetColor((color_which)sColorConsts[i], ui_color((color_which)sColorConsts[i]));
+	for (int32 i = 0; i < color_description_count(); i++) {
+		color_which which = get_color_description(i)->which; 
+		fCurrentSet.SetColor(which, ui_color(which));
 	}
-
-	fCurrentSet.PrintToStream();
 
 	fPrevSet = fCurrentSet;
 }
 
 bool APRView::IsDefaultable(void)
 {
-	return fCurrentSet.IsDefaultable();
+	return fCurrentSet != fDefaultSet;
 }
 
 void APRView::UpdateAllColors(void)
 {
-	for (uint32 i = 0; i < sColorCount; i++)
-		set_ui_color((color_which)sColorConsts[i], 
-			fCurrentSet.AttributeToColor((color_which)sColorConsts[i]));
+	for (int32 i = 0; i < color_description_count(); i++) {
+		color_which which = get_color_description(i)->which; 
+		rgb_color color = fCurrentSet.GetColor(which);
+		set_ui_color(which, color);
+	}
 }
 
-void APRView::UpdateCurrentColor(void)
+
+void 
+APRView::SetCurrentColor(rgb_color color)
 {
-	rgb_color col=fPicker->ValueAsColor();
-	ColorWhichItem *whichitem = (ColorWhichItem *)fAttrList->ItemAt(fAttrList->CurrentSelection());
-	set_ui_color(whichitem->GetAttribute(), col);
+	fCurrentSet.SetColor(fWhich, color);
+	set_ui_color(fWhich, color);
+	UpdateControls();
 }
 
-void APRView::UpdateControlsFromAttr(const char *string)
-{
-	if (!string)
-		return;
-	STRACE(("Update color for %s\n",string));
 
-	fPicker->SetValue(fCurrentSet.StringToColor(string));
-	fColorWell->SetColor(fPicker->ValueAsColor());
+void 
+APRView::UpdateControls()
+{
+	rgb_color color = fCurrentSet.GetColor(fWhich);
+	fPicker->SetValue(color);
+	fColorWell->SetColor(color);
 	fColorWell->Invalidate();
 }

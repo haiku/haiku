@@ -17,6 +17,16 @@
 
 #include <map>
 
+typedef struct 
+{
+	color_which which;
+	const char* text;	
+} ColorDescription;
+
+const ColorDescription* get_color_description(int32 index);
+int32 color_description_count(void);
+
+
 /*!
 	\class ColorSet ColorSet.h
 	\brief Encapsulates GUI system colors
@@ -27,33 +37,22 @@ class ColorSet : public BLocker {
 					ColorSet(const ColorSet &cs);
 					ColorSet & operator=(const ColorSet &cs);
 
-		void		SetColors(const ColorSet &cs);
-		void		PrintToStream(void) const;
-
-		bool		ConvertToMessage(BMessage *msg) const;
-		bool		ConvertFromMessage(const BMessage *msg);
-
-		bool		IsDefaultable(void);
-
-		rgb_color 	StringToColor(const char *string) const;
-		rgb_color	AttributeToColor(int32 which);
-
-		status_t	SetColor(color_which which, rgb_color value);
-
-		static status_t LoadColorSet(const char *path, ColorSet *set);
-		static status_t SaveColorSet(const char *path, const ColorSet &set);
+		rgb_color	GetColor(int32 which);
+		void		SetColor(color_which which, rgb_color value);
 		
 		static ColorSet	DefaultColorSet(void);
-		static std::map<color_which, BString> DefaultColorNames(void);
 	
 		inline bool operator==(const ColorSet &other)
 		{
-			return (fColors == other.fColors);
+			return fColors == other.fColors;
+		}
+
+		inline bool operator!=(const ColorSet &other)
+		{
+			return fColors != other.fColors;
 		}
 
 	private:
-		color_which	StringToWhich(const char *string) const;
-		void		PrintMember(color_which which) const;
 		std::map<color_which, rgb_color> fColors;
 };
 
