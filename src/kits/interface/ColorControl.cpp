@@ -398,9 +398,10 @@ BColorControl::Draw(BRect updateRect)
 		fBitmap->Unlock();
 		_DrawSelectors(this);
 		
-	} else
+	} else {
 		_DrawColorArea(this, updateRect);
 		_DrawSelectors(this);
+	}
 }
 
 
