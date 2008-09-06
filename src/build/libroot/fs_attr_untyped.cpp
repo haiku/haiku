@@ -1,3 +1,12 @@
+/*
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+/*!	Emulation BeOS-style attributes by mapping them to untyped attributes of
+	the host platform (xattr on Linux, extattr on FreeBSD).
+*/
+
 
 #ifdef BUILDING_FS_SHELL
 #	include "compat.h"
@@ -23,21 +32,26 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include <attr/xattr.h>
-
 #include <map>
 #include <string>
 
 #include <fs_attr.h>
 
+
+// Include the interface to the host platform attributes support.
+#if defined(HAIKU_HOST_PLATFORM_LINUX)
+#	include "fs_attr_xattr.h"
+#elif defined(HAIKU_HOST_PLATFORM_FREEBSD)
+#	include "fs_attr_extattr.h"
+#else
+#	error No attribute support for this host platform!
+#endif
+
+
 namespace BPrivate {}
 using namespace BPrivate;
 using std::map;
 using std::string;
-
-// the namespace all attributes live in
-static const char* kAttributeNamespace = "user.haiku.";
-static const int kAttributeNamespaceLen = 11;
 
 // the maximum length of an attribute listing we support
 static const int kMaxAttributeListingLength = 10240;
@@ -270,13 +284,8 @@ private:
 		char listing[kMaxAttributeListingLength];
 
 		// get the listing
-		ssize_t length;
-		if (fFileFD >= 0) {
-			length = flistxattr(fFileFD, listing, kMaxAttributeListingLength);
-		} else {
-			length = llistxattr(fPath.c_str(), listing,
-				kMaxAttributeListingLength);
-		}
+		ssize_t length = list_attributes(fFileFD, fPath.c_str(), listing,
+			kMaxAttributeListingLength);
 		if (length < 0)
 			return errno;
 
@@ -487,11 +496,11 @@ fs_read_attr(int fd, const char *_attribute, uint32 type, off_t pos,
 	ssize_t bytesRead = min_c((size_t)kMaxAttributeLength, readBytes)
 		+ sizeof(AttributeHeader);
 	if (localFD.Path()) {
-		bytesRead = lgetxattr(localFD.Path(), attribute.c_str(),
+		bytesRead = get_attribute(-1, localFD.Path(), attribute.c_str(),
 			attributeBuffer, bytesRead);
 	} else {
-		bytesRead = fgetxattr(localFD.FD(), attribute.c_str(), attributeBuffer,
-			bytesRead);
+		bytesRead = get_attribute(localFD.FD(), NULL, attribute.c_str(),
+			attributeBuffer, bytesRead);
 	}
 	if (bytesRead < 0) {
 		// Make sure, the error code is B_ENTRY_NOT_FOUND, if the attribute
@@ -554,16 +563,16 @@ fs_write_attr(int fd, const char *_attribute, uint32 type, off_t pos,
 	ssize_t toWrite = sizeof(AttributeHeader) + pos + writeBytes;
 	int result;
 	if (localFD.Path()) {
-		result = lsetxattr(localFD.Path(), attribute.c_str(), attributeBuffer,
-			toWrite, 0);
+		result = set_attribute(-1, localFD.Path(), attribute.c_str(),
+			attributeBuffer, toWrite);
 	} else {
-		result = fsetxattr(localFD.FD(), attribute.c_str(), attributeBuffer,
-			toWrite, 0);
+		result = set_attribute(localFD.FD(), NULL, attribute.c_str(),
+			attributeBuffer, toWrite);
 	}
 	if (result < 0) {
-		// Setting user attributes on symlinks is not allowed. So, if this is
-		// a symlink and we're only supposed to write a "BEOS:TYPE" attribute
-		// we silently pretend to have succeeded.
+		// Setting user attributes on symlinks is not allowed (xattr). So, if
+		// this is a symlink and we're only supposed to write a "BEOS:TYPE"
+		// attribute we silently pretend to have succeeded.
 		if (localFD.IsSymlink() && strcmp(_attribute, "BEOS:TYPE") == 0)
 			return writeBytes;
 		return -1;
@@ -596,9 +605,9 @@ fs_remove_attr(int fd, const char *_attribute)
 	// remove attribute
 	int result;
 	if (localFD.Path())
-		result = lremovexattr(localFD.Path(), attribute.c_str());
+		result = remove_attribute(-1, localFD.Path(), attribute.c_str());
 	else
-		result = fremovexattr(localFD.FD(), attribute.c_str());
+		result = remove_attribute(localFD.FD(), NULL, attribute.c_str());
 
 	if (result < 0) {
 		// Make sure, the error code is B_ENTRY_NOT_FOUND, if the attribute
@@ -634,11 +643,11 @@ fs_stat_attr(int fd, const char *_attribute, struct attr_info *attrInfo)
 	char attributeBuffer[sizeof(AttributeHeader) + kMaxAttributeLength];
 	ssize_t bytesRead = sizeof(AttributeHeader) + kMaxAttributeLength;
 	if (localFD.Path()) {
-		bytesRead = lgetxattr(localFD.Path(), attribute.c_str(),
+		bytesRead = get_attribute(-1, localFD.Path(), attribute.c_str(),
 			attributeBuffer, bytesRead);
 	} else {
-		bytesRead = fgetxattr(localFD.FD(), attribute.c_str(), attributeBuffer,
-			bytesRead);
+		bytesRead = get_attribute(localFD.FD(), NULL, attribute.c_str(),
+			attributeBuffer, bytesRead);
 	}
 	if (bytesRead < 0) {
 		// Make sure, the error code is B_ENTRY_NOT_FOUND, if the attribute
@@ -696,8 +705,8 @@ _kern_open_attr_dir(int fd, const char *path)
 
 	if (!dir)
 		return errno;
-	
-	// create descriptor	
+
+	// create descriptor
 	AttrDirDescriptor *descriptor = new AttrDirDescriptor(dir, ref);
 	return add_descriptor(descriptor);
 }
