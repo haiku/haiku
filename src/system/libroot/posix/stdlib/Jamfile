@@ -6,19 +6,19 @@ UsePrivateSystemHeaders ;
 MergeObject posix_stdlib.o :
 	abs.c
 	atfork.c
-	atof.c 
-	atoi.c 
+	atof.c
+	atoi.c
 	bsearch.c
-	div.c 
-	env.c
+	div.c
+	env.cpp
 	exit.c
-	heapsort.c 
+	heapsort.c
 	merge.c
 	mktemp.c
 	pty.cpp
-	qsort.c 
-	radixsort.c 
-	rand.c 
+	qsort.c
+	radixsort.c
+	rand.c
 	random.c
 	realpath.c
 	strtod.c

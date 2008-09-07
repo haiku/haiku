@@ -4,15 +4,16 @@
  */
 
 
-#include <OS.h>
-
-#include <libroot_private.h>
-#include <user_runtime.h>
-
+#include <errno.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+
+#include <OS.h>
+
+#include <libroot_lock.h>
+#include <libroot_private.h>
+#include <user_runtime.h>
 
 
 #define RETURN_AND_SET_ERRNO(err) \
@@ -23,8 +24,7 @@
 	return err;
 
 
-// TODO: Use benaphore!
-static sem_id sEnvLock;
+static benaphore sEnvLock;
 static char **sManagedEnviron;
 
 char **environ = NULL;
@@ -33,15 +33,14 @@ char **environ = NULL;
 static inline void
 lock_variables(void)
 {
-	while (acquire_sem(sEnvLock) == B_INTERRUPTED)
-		;
+	benaphore_lock(&sEnvLock);
 }
 
 
 static inline void
 unlock_variables(void)
 {
-	release_sem(sEnvLock);
+	benaphore_unlock(&sEnvLock);
 }
 
 
@@ -81,7 +80,7 @@ static int32
 add_variable(void)
 {
 	int32 count = count_variables() + 1;
-	char **newEnviron = realloc(environ, (count + 1) * sizeof(char *));
+	char **newEnviron = (char**)realloc(environ, (count + 1) * sizeof(char *));
 	if (newEnviron == NULL)
 		return B_NO_MEMORY;
 
@@ -133,7 +132,7 @@ copy_environ_to_heap_if_needed(void)
 	// free previously used "environ" if it has been changed by an application
 	free_variables();
 
-	sManagedEnviron = malloc((count_variables() + 1) * sizeof(char *));
+	sManagedEnviron = (char**)malloc((count_variables() + 1) * sizeof(char *));
 	if (sManagedEnviron == NULL)
 		return B_NO_MEMORY;
 
@@ -177,7 +176,7 @@ update_variable(const char *name, int32 length, const char *value,
 	}
 
 	if (update) {
-		environ[index] = malloc(length + 2 + strlen(value));
+		environ[index] = (char*)malloc(length + 2 + strlen(value));
 		if (environ[index] == NULL)
 			return B_NO_MEMORY;
 
@@ -193,7 +192,7 @@ update_variable(const char *name, int32 length, const char *value,
 static void
 environ_fork_hook(void)
 {
-	sEnvLock = create_sem(1, "env lock");
+	benaphore_init(&sEnvLock, "env lock");
 }
 
 
@@ -206,7 +205,7 @@ __init_env(const struct user_space_program_args *args)
 	// Following POSIX, there is no need to make any of the environment
 	// functions thread-safe - but we do it anyway as much as possible to
 	// protect our implementation
-	sEnvLock = create_sem(1, "env lock");
+	benaphore_init(&sEnvLock, "env lock");
 	environ = args->env;
 	sManagedEnviron = NULL;
 
