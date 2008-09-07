@@ -263,8 +263,7 @@ MixerCore::ApplyOutputFormat()
 	fResampler = new Resampler * [fMixBufferChannelCount];
 	for (int i = 0; i < fMixBufferChannelCount; i++)
 		fResampler[i] = new Resampler(media_raw_audio_format::B_AUDIO_FLOAT, 
-										format.format,
-										format.valid_bits);
+										format.format);
 	
 	TRACE("MixerCore::OutputFormatChanged:\n");
 	TRACE("  fMixBufferFrameRate %ld\n", fMixBufferFrameRate);

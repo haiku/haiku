@@ -204,6 +204,9 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
+
+	if (bitsPerSample == 24)
+		bitsPerSample = 32;
 	
 	if ((stream->channels == channels) &&
 		(stream->bitsPerSample == bitsPerSample) && 

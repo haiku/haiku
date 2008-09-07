@@ -67,7 +67,7 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrame
 	// create resamplers
 	fResampler = new Resampler * [fInputChannelCount];
 	for (int i = 0; i < fInputChannelCount; i++)
-		fResampler[i] = new Resampler(fInput.format.u.raw_audio.format, media_raw_audio_format::B_AUDIO_FLOAT, 0);
+		fResampler[i] = new Resampler(fInput.format.u.raw_audio.format, media_raw_audio_format::B_AUDIO_FLOAT);
 	
 	// fMixerChannelInfo and fMixerChannelCount will be initialized by UpdateInputChannelDestinations()
 	SetMixBufferFormat((int32)mixFrameRate, mixFrameCount);
