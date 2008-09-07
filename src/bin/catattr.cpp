@@ -14,10 +14,10 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <malloc.h>
-#include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 
 /** Used to present the characters in the raw data view */
@@ -66,7 +66,7 @@ dumpRawData(const char *buffer, size_t size)
 		}
 		printf("'\n");
 	}
-} 
+}
 
 
 static status_t
@@ -219,7 +219,7 @@ main(int argc, char *argv[])
 	} else {
 		// Issue usage message
 		fprintf(stderr, "usage: %s [--raw|-r] attr_name file1 [file2...]\n", program);
-		// Be's original version -only- returned 1 if the 
+		// Be's original version -only- returned 1 if the
 		// amount of parameters was wrong, not if the file
 		// or attribute couldn't be found (!)
 		// In all other cases it returned 0
