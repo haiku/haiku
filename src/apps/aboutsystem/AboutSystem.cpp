@@ -450,7 +450,7 @@ AboutView::AboutView(const BRect &rect)
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Website, Marketing & Documention:\n");
+	fCreditsView->Insert("Website, Marketing & Documentation:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
