@@ -31,6 +31,7 @@
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
+#include <util/RadixBitmap.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_page.h>
@@ -61,34 +62,13 @@
 #define SWAP_BLOCK_SHIFT 5		/* 1 << SWAP_BLOCK_SHIFT == SWAP_BLOCK_PAGES */
 #define SWAP_BLOCK_MASK  (SWAP_BLOCK_PAGES - 1)
 
-#define SWAP_SLOT_NONE (~(swap_addr_t)0)
-
-// bitmap allocation macros
-#define NUM_BYTES_PER_WORD 4
-#define NUM_BITS_PER_WORD  (8 * NUM_BYTES_PER_WORD)
-#define MAP_SHIFT  5     // 1 << MAP_SHIFT == NUM_BITS_PER_WORD
-
-#define TESTBIT(map, i) \
-	(((map)[(i) >> MAP_SHIFT] & (1 << (i) % NUM_BITS_PER_WORD)))
-#define SETBIT(map, i) \
-	(((map)[(i) >> MAP_SHIFT] |= (1 << (i) % NUM_BITS_PER_WORD)))
-#define CLEARBIT(map, i) \
-	(((map)[(i) >> MAP_SHIFT] &= ~(1 << (i) % NUM_BITS_PER_WORD)))
-
-// The stack functionality looks like a good candidate to put into its own
-// store. I have not done this because once we have a swap file backing up
-// the memory, it would probably not be a good idea to separate this
-// anymore.
-
 struct swap_file : DoublyLinkedListLinkImpl<swap_file> {
 	int				fd;
 	struct vnode	*vnode;
 	void			*cookie;
 	swap_addr_t		first_slot;
 	swap_addr_t		last_slot;
-	swap_addr_t		used;   // # of slots used
-	uint32			*maps;  // bitmap for the slots
-	swap_addr_t		hint;   // next free slot
+	radix_bitmap    *bmp;
 };
 
 struct swap_hash_key {
@@ -96,7 +76,8 @@ struct swap_hash_key {
 	off_t				page_index;  // page index in the cache
 };
 
-// Each swap block contains SWAP_BLOCK_PAGES pages
+// Each swap block contains swap address information for
+// SWAP_BLOCK_PAGES continuous pages from the same cache
 struct swap_block : HashTableLink<swap_block> {
 	swap_hash_key	key;
 	uint32			used;
@@ -222,23 +203,22 @@ private:
 #endif
 
 
-
 static int
 dump_swap_info(int argc, char** argv)
 {
 	swap_addr_t totalSwapPages = 0;
-	swap_addr_t usedSwapPages = 0;
+	swap_addr_t freeSwapPages = 0;
 
 	kprintf("swap files:\n");
 
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
 			swap_file* file = it.Next();) {
 		swap_addr_t total = file->last_slot - file->first_slot;
-		kprintf("  vnode: %p, pages: total: %lu, used: %lu\n",
-			file->vnode, total, file->used);
+		kprintf("  vnode: %p, pages: total: %lu, free: %lu\n",
+			file->vnode, total, file->bmp->free_slots);
 
 		totalSwapPages += total;
-		usedSwapPages += file->used;
+		freeSwapPages += file->bmp->free_slots;
 	}
 
 	kprintf("\n");
@@ -247,8 +227,8 @@ dump_swap_info(int argc, char** argv)
 	kprintf("available: %9llu\n", sAvailSwapSpace / B_PAGE_SIZE);
 	kprintf("reserved:  %9llu\n",
 		totalSwapPages - sAvailSwapSpace / B_PAGE_SIZE);
-	kprintf("used:      %9lu\n", usedSwapPages);
-	kprintf("free:      %9lu\n", totalSwapPages - usedSwapPages);
+	kprintf("used:      %9lu\n", totalSwapPages - freeSwapPages);
+	kprintf("free:      %9lu\n", freeSwapPages);
 
 	return 0;
 }
@@ -265,76 +245,43 @@ swap_slot_alloc(uint32 count)
 		return SWAP_SLOT_NONE;
 	}
 
-	// compute how many pages are free in all swap files
-	uint32 freeSwapPages = 0;
-	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
-			swap_file *file = it.Next();)
-		freeSwapPages += file->last_slot - file->first_slot - file->used;
-
-	if (freeSwapPages < count) {
+	// since radix bitmap could not handle more than 32 pages, we return
+	// SWAP_SLOT_NONE, this forces Write() adjust allocation amount
+	if (count > BITMAP_RADIX) {
 		mutex_unlock(&sSwapFileListLock);
-		panic("swap_slot_alloc(): swap space exhausted!\n");
 		return SWAP_SLOT_NONE;
 	}
 
-	swap_addr_t hint = 0;
-	swap_addr_t j;
+	swap_addr_t j, addr = SWAP_SLOT_NONE;
 	for (j = 0; j < sSwapFileCount; j++) {
 		if (sSwapFileAlloc == NULL)
 			sSwapFileAlloc = sSwapFileList.First();
 
-		hint = sSwapFileAlloc->hint;
-		swap_addr_t pageCount = sSwapFileAlloc->last_slot
-			- sSwapFileAlloc->first_slot;
-
-		swap_addr_t i = 0;
-		while (i < count && (hint + count) <= pageCount) {
-			if (TESTBIT(sSwapFileAlloc->maps, hint + i)) {
-				hint++;
-				i = 0;
-			} else
-				i++;
-		}
-
-		if (i == count)
+		addr = radix_bitmap_alloc(sSwapFileAlloc->bmp, count);
+		if (addr != SWAP_SLOT_NONE) {
+			addr += sSwapFileAlloc->first_slot;
 			break;
+		}
 
 		// this swap_file is full, find another
 		sSwapFileAlloc = sSwapFileList.GetNext(sSwapFileAlloc);
 	}
 
-	// no swap file can alloc so many pages, we return SWAP_SLOT_NONE
-	// and VMAnonymousCache::Write() will adjust allocation amount
 	if (j == sSwapFileCount) {
 		mutex_unlock(&sSwapFileListLock);
+		panic("swap_slot_alloc: swap space exhausted!\n");
 		return SWAP_SLOT_NONE;
 	}
 
-	swap_addr_t slotIndex = sSwapFileAlloc->first_slot + hint;
-
-	for (uint32 i = 0; i < count; i++)
-		SETBIT(sSwapFileAlloc->maps, hint + i);
-	if (hint == sSwapFileAlloc->hint) {
-		sSwapFileAlloc->hint += count;
-		swap_addr_t pageCount = sSwapFileAlloc->last_slot
-			- sSwapFileAlloc->first_slot;
-		while (TESTBIT(sSwapFileAlloc->maps, sSwapFileAlloc->hint)
-			&& sSwapFileAlloc->hint < pageCount) {
-			sSwapFileAlloc->hint++;
-		}
-	}
-
-	sSwapFileAlloc->used += count;
-
-	// if this swap file has used more than 90% percent of its slots
+	// if this swap file has used more than 90% percent of its space
 	// switch to another
-    if (sSwapFileAlloc->used
-			> 9 * (sSwapFileAlloc->last_slot - sSwapFileAlloc->first_slot) / 10)
+    if (sSwapFileAlloc->bmp->free_slots
+			< (sSwapFileAlloc->last_slot - sSwapFileAlloc->first_slot) / 10)
 		sSwapFileAlloc = sSwapFileList.GetNext(sSwapFileAlloc);
 
 	mutex_unlock(&sSwapFileListLock);
 
-	return slotIndex;
+	return addr;
 }
 
 
@@ -361,16 +308,8 @@ swap_slot_dealloc(swap_addr_t slotIndex, uint32 count)
 
 	mutex_lock(&sSwapFileListLock);
 	swap_file *swapFile = find_swap_file(slotIndex);
-
 	slotIndex -= swapFile->first_slot;
-
-	for (uint32 i = 0; i < count; i++)
-		CLEARBIT(swapFile->maps, slotIndex + i);
-
-	if (swapFile->hint > slotIndex)
-		swapFile->hint = slotIndex;
-
-	swapFile->used -= count;
+	radix_bitmap_dealloc(swapFile->bmp, slotIndex, count);
 	mutex_unlock(&sSwapFileListLock);
 }
 
@@ -1101,16 +1040,12 @@ swap_file_add(char *path)
 	swap->cookie = descriptor->cookie;
 
 	int32 pageCount = st.st_size >> PAGE_SHIFT;
-	swap->used = 0;
-
-	swap->maps = (uint32 *)malloc((pageCount + 7) / 8);
-	if (swap->maps == NULL) {
+	swap->bmp = radix_bitmap_create(pageCount);
+	if (swap->bmp == NULL) {
 		free(swap);
 		close(fd);
 		return B_NO_MEMORY;
 	}
-	memset(swap->maps, 0, (pageCount + 7) / 8);
-	swap->hint = 0;
 
 	// set slot index and add this file to swap file list
 	mutex_lock(&sSwapFileListLock);
@@ -1160,7 +1095,7 @@ swap_file_delete(char *path)
 	// if this file is currently used, we can't delete
 	// TODO: mark this swap file deleting, and remove it after releasing
 	// all the swap space
-	if (swapFile->used > 0)
+	if (swapFile->bmp->free_slots < swapFile->last_slot - swapFile->first_slot)
 		return B_ERROR;
 
 	sSwapFileList.Remove(swapFile);
@@ -1172,7 +1107,7 @@ swap_file_delete(char *path)
 	mutex_unlock(&sAvailSwapSpaceLock);
 
 	close(swapFile->fd);
-	free(swapFile->maps);
+	radix_bitmap_destroy(swapFile->bmp);
 	free(swapFile);
 
 	return B_OK;

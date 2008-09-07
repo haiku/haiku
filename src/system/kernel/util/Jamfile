@@ -10,6 +10,7 @@ KernelMergeObject kernel_util.o :
 	list.c
 	queue.c
 	ring_buffer.cpp
+	RadixBitmap.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS) -DUSING_LIBGCC
 ;
