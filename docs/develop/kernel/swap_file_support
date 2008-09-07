@@ -72,14 +72,12 @@ swap file is: 0-99, 101-200, 202-301) Why leave a page gap between swap files?
 Because in this way, we can easily tell if two adjacent pages are in a same 
 swap file. (See the code in VMAnonymousCache::Read()).
 
-	Each swap file has a linear bitmap, and all pages in the swap file are 
-associated with a bit in the bitmap. When the page is used, the corresponding 
-bit is set to 1 and when free, it is set to 0. The linear bitmap is different 
-from FreeBSD. FreeBSD uses a radix bitmap and it's more efficient than linear 
-bitmap especially when swap space is fragmented. The reason why I did not use 
-a radix bitmap is I do not get a total understanding of radix tree structure 
-currently. But I will replace the linear bitmap with radix bitmap in the 
-future.
+	The efficiency of the FreeBSD swap system lies in a special data structure:
+radix bitmap(i.e. bitmap using radix tree for hinting.) It can operate well no
+matter how much fragmentation there is and no matter how large a bitmap is 
+used. I have ported the radix bitmap structure to Haiku, so our swap system 
+will have a good performance. More information on radix bitmap, please look 
+at the source code.
 
 	Swap space allocation takes place when we swap anonymous pages out.
 In order to make the allocation less probable to fail, anonymous cache will
