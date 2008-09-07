@@ -123,6 +123,9 @@ init_error_map()
 	ADD_ERROR(ELOOP);
 	ADD_ERROR(ENOEXEC);
 	ADD_ERROR(EPIPE);
+	#ifdef ENOATTR
+		ADD_ERROR(ENOATTR);
+	#endif
 
 	sErrorMapsInitialized = true;
 }
