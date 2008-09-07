@@ -48,6 +48,7 @@ format2size(uint32 format)
 			return 2;
 
 		case B_FMT_18BIT:
+		case B_FMT_20BIT:
 		case B_FMT_24BIT:
 		case B_FMT_32BIT:
 		case B_FMT_FLOAT:
