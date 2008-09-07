@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps diskusage ;
+
+Application DiskUsage :
+	App.cpp
+	Common.cpp
+	ControlsView.cpp
+	InfoWindow.cpp
+	MainWindow.cpp
+	PieView.cpp
+	Scanner.cpp
+	Snapshot.cpp
+	StatusView.cpp
+	: be $(TARGET_LIBSTDC++)
+	: DiskUsage.rdef
+;
+

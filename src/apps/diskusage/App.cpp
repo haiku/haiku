@@ -1,0 +1,109 @@
+/*
+ * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT/X11 license.
+ *
+ * Copyright (c) 1999 Mike Steed. You are free to use and distribute this software
+ * as long as it is accompanied by it's documentation and this copyright notice.
+ * The software comes with no warranty, etc.
+ */
+#include "App.h"
+
+#include <stdio.h>
+
+#include <File.h>
+#include <FindDirectory.h>
+#include <Node.h>
+#include <Path.h>
+
+#include "Common.h"
+#include "MainWindow.h"
+
+
+App::App()
+	: BApplication(kAppSignature),
+	  fResources(read_resources(kAppSignature)),
+	  fMainWindow(NULL)
+{
+}
+
+
+App::~App()
+{
+	delete fResources;
+}
+
+
+void
+App::ArgvReceived(int32 argc, char** argv)
+{
+	BMessage refsReceived(B_REFS_RECEIVED);
+	for (int32 i = 1; i < argc; i++) {
+		BEntry entry(argv[i], true);
+		entry_ref ref;
+		if (entry.GetRef(&ref) == B_OK)
+			refsReceived.AddRef("refs", &ref);
+	}
+	if (refsReceived.HasRef("refs"))
+		PostMessage(&refsReceived);
+}
+
+
+void
+App::RefsReceived(BMessage* message)
+{
+	fMainWindow->PostMessage(message);
+}
+
+
+void
+App::ReadyToRun()
+{
+	BRect frame;
+
+	BPath path;
+	BFile settingsFile;
+	BMessage settings;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK
+		|| path.Append("DiskUsage") != B_OK
+		|| settingsFile.SetTo(path.Path(), B_READ_ONLY) != B_OK
+		|| settings.Unflatten(&settingsFile) != B_OK
+		|| settings.FindRect("window frame", &frame) != B_OK) {
+		// use default window frame
+		frame.Set(0, 0, kDefaultPieSize, kDefaultPieSize);
+		frame.OffsetTo(50, 50);
+	}
+
+	fMainWindow = new MainWindow(frame);
+}
+
+
+bool
+App::QuitRequested()
+{
+	// Save the settings.
+	BPath path;
+	BFile settingsFile;
+	BMessage settings;
+	if (settings.AddRect("window frame", fMainWindow->Frame()) != B_OK
+		|| find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK
+		|| path.Append("DiskUsage") != B_OK
+		|| settingsFile.SetTo(path.Path(), B_WRITE_ONLY) != B_OK
+		|| settings.Flatten(&settingsFile) != B_OK) {
+		fprintf(stderr, "Failed to write application settings.\n");
+	}
+
+	return BApplication::QuitRequested();
+}
+
+
+// #pragma mark -
+
+
+int
+main()
+{
+	App app;
+	app.Run();
+	return 0;
+}
+

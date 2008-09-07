@@ -1,0 +1,22 @@
+---Bugs---
+	Why doesn't drag-and-drop on the icon work the same as dropping on the
+		open view? (e.g., multiple volumes don't work; floppy isn't accepted.)
+
+---Notes---
+	Remember to change the alpha component of RGB colors to 0xff with
+		DiskProbe, if you use Resourcer.  They live in block 6.
+
+---Future/maybe/bloat---
+	Display unavailable files in a distinct color (maybe gray)?
+	Find a way to do redrawing more efficiently (BPicture?)
+	Add <- and -> buttons to traverse the zoom history.
+	Display pie in grayscale+patterns / color?
+	Display an icon somewhere while volumes are being scanned.  Check out the
+		barber shop icon in the Tracker during queries!
+	Handle the special case where the volume is full: the volume display is
+		the same as the root directory display except for the colors!
+	When scanning all volumes, scan different physical devices in parallel,
+		and multiple partitions on a device in sequence.
+	Add a cancel button during scanning?
+	A button to cycle colors?  (Useless toy).
+
