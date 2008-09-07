@@ -32,7 +32,16 @@
 extern const char* __progname;
 
 static const char* kUsage =
-	"Usage: %s [ -h ] [ -o <output> ] [ -s ] <command line>\n"
+	"Usage: %s [ <options> ] <command line>\n"
+	"Executes the given command line <command line> and print an analysis of\n"
+	"the user and kernel times of all threads that ran during that time.\n"
+	"\n"
+	"Options:\n"
+	"  -h, --help   - Print this usage info.\n"
+	"  -o <output>  - Print the results to file <output>.\n"
+	"  -s           - Also perform a scheduling analysis over the time the\n"
+	"                 child process ran. This requires that scheduler kernel\n"
+	"                 tracing had been enabled at compile time.\n"
 ;
 
 
@@ -487,7 +496,7 @@ main(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "ho:s", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+ho:s", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
