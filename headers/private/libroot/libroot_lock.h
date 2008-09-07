@@ -42,6 +42,8 @@ benaphore_init(benaphore *ben, const char *name)
 static inline status_t
 benaphore_lock_etc(benaphore *ben, uint32 flags, bigtime_t timeout)
 {
+// TODO: This function really shouldn't be used, since timeouts screw the
+// benaphore behavior.
 	if (atomic_add(&ben->count, -1) <= 0)
 		return acquire_sem_etc(ben->sem, 1, flags, timeout);
 
@@ -52,8 +54,14 @@ benaphore_lock_etc(benaphore *ben, uint32 flags, bigtime_t timeout)
 static inline status_t
 benaphore_lock(benaphore *ben)
 {
-	if (atomic_add(&ben->count, -1) <= 0)
-		return acquire_sem(ben->sem);
+	if (atomic_add(&ben->count, -1) <= 0) {
+		status_t error;
+		do {
+			error = acquire_sem(ben->sem);
+		} while (error == B_INTERRUPTED);
+
+		return error;
+	}
 
 	return B_OK;
 }
