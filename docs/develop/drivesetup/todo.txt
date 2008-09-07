@@ -1,5 +1,0 @@
-TODO:
-
-	* make the unmount menu build off of the selected drive,
-	rather than all mounted partitions
-	
