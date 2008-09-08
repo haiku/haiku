@@ -846,6 +846,10 @@
 #define file_map_invalidate				fssh_file_map_invalidate
 #define file_map_translate				fssh_file_map_translate
 
+/* entry cache */
+#define entry_cache_add					fssh_entry_cache_add
+#define entry_cache_remove				fssh_entry_cache_remove
+
 ////////////////////////////////////////////////////////////////////////////////
 // #pragma mark - fssh_fs_index.h
 

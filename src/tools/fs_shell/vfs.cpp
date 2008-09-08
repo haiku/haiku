@@ -2238,6 +2238,23 @@ fssh_write_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 }
 
 
+extern "C" fssh_status_t
+fssh_entry_cache_add(fssh_dev_t mountID, fssh_ino_t dirID, const char* name,
+	fssh_ino_t nodeID)
+{
+	// We don't implement an entry cache in the FS shell.
+	return FSSH_B_OK;
+}
+
+
+extern "C" fssh_status_t
+fssh_entry_cache_remove(fssh_dev_t mountID, fssh_ino_t dirID, const char* name)
+{
+	// We don't implement an entry cache in the FS shell.
+	return FSSH_B_ENTRY_NOT_FOUND;
+}
+
+
 //	#pragma mark - private VFS API
 //	Functions the VFS exports for other parts of the kernel
 

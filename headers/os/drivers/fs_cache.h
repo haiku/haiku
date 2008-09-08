@@ -99,6 +99,12 @@ extern status_t file_map_set_mode(void *_map, uint32 mode);
 extern status_t file_map_translate(void *_map, off_t offset, size_t size,
 					struct file_io_vec *vecs, size_t *_count, size_t align);
 
+/* entry cache */
+extern status_t entry_cache_add(dev_t mountID, ino_t dirID, const char* name,
+					ino_t nodeID);
+extern status_t entry_cache_remove(dev_t mountID, ino_t dirID,
+					const char* name);
+
 #ifdef __cplusplus
 }
 #endif

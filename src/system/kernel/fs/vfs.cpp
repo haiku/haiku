@@ -44,8 +44,10 @@
 #include <syscalls.h>
 #include <syscall_restart.h>
 #include <tracing.h>
-#include <util/AutoLock.h>
 #include <util/atomic.h>
+#include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
+#include <util/OpenHashTable.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_cache.h>
@@ -105,6 +107,163 @@ const static uint32 kMaxUnusedVnodes = 8192;
 	// It may be chosen with respect to the available memory or enhanced
 	// by some timestamp/frequency heurism.
 
+const static uint32 kMaxEntryCacheEntryCount = 8192;
+	// Maximum number of entries per entry cache. It's a hard limit ATM.
+
+struct EntryCacheKey {
+	EntryCacheKey(ino_t dirID, const char* name)
+		:
+		dir_id(dirID),
+		name(name)
+	{
+	}
+
+	ino_t		dir_id;
+	const char*	name;
+};
+
+
+struct EntryCacheEntry : HashTableLink<EntryCacheEntry>,
+		DoublyLinkedListLinkImpl<EntryCacheEntry> {
+	ino_t	node_id;
+	ino_t	dir_id;
+	char	name[1];
+};
+
+
+struct EntryCacheHashDefinition {
+	typedef EntryCacheKey	KeyType;
+	typedef EntryCacheEntry	ValueType;
+
+	uint32 HashKey(const EntryCacheKey& key) const
+	{
+		return (uint32)key.dir_id ^ (uint32)(key.dir_id >> 32)
+			^ hash_hash_string(key.name);
+	}
+
+	size_t Hash(const EntryCacheEntry* value) const
+	{
+		return (uint32)value->dir_id ^ (uint32)(value->dir_id >> 32)
+			^ hash_hash_string(value->name);
+	}
+
+	bool Compare(const EntryCacheKey& key, const EntryCacheEntry* value) const
+	{
+		return value->dir_id == key.dir_id
+			&& strcmp(value->name, key.name) == 0;
+	}
+
+	HashTableLink<EntryCacheEntry>* GetLink(EntryCacheEntry* value) const
+	{
+		return value;
+	}
+};
+
+
+class EntryCache {
+public:
+	// Note: Constructor and destructor are never invoked, since instances of
+	// this class are member of the fs_mount C structure. Hence we do all
+	// initialization/uninitialization in Init()/Uninit() explicitly.
+
+	status_t Init()
+	{
+		mutex_init(&fLock, "entry cache");
+
+		new(&fEntries) EntryTable;
+		new(&fUsedEntries) EntryList;
+		fEntryCount = 0;
+
+		return fEntries.Init();
+	}
+
+	void Uninit()
+	{
+		while (EntryCacheEntry* entry = fUsedEntries.Head())
+			_Remove(entry);
+
+		fEntries.~EntryTable();
+
+		mutex_destroy(&fLock);
+	}
+
+	status_t Add(ino_t dirID, const char* name, ino_t nodeID)
+	{
+		MutexLocker _(fLock);
+
+		EntryCacheEntry* entry = fEntries.Lookup(EntryCacheKey(dirID, name));
+		if (entry != NULL) {
+			entry->node_id = nodeID;
+			return B_OK;
+		}
+
+		if (fEntryCount >= kMaxEntryCacheEntryCount)
+			_Remove(fUsedEntries.Head());
+
+		entry = (EntryCacheEntry*)malloc(sizeof(EntryCacheEntry)
+			+ strlen(name));
+		if (entry == NULL)
+			return B_NO_MEMORY;
+
+		entry->node_id = nodeID;
+		entry->dir_id = dirID;
+		strcpy(entry->name, name);
+
+		fEntries.Insert(entry);
+		fUsedEntries.Add(entry);
+		fEntryCount++;
+
+		return B_OK;
+	}
+
+	status_t Remove(ino_t dirID, const char* name)
+	{
+		MutexLocker _(fLock);
+
+		EntryCacheEntry* entry = fEntries.Lookup(EntryCacheKey(dirID, name));
+		if (entry == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		_Remove(entry);
+
+		return B_OK;
+	}
+
+	bool Lookup(ino_t dirID, const char* name, ino_t& nodeID)
+	{
+		MutexLocker _(fLock);
+
+		EntryCacheEntry* entry = fEntries.Lookup(EntryCacheKey(dirID, name));
+		if (entry == NULL)
+			return false;
+
+		// requeue at the end
+		fUsedEntries.Remove(entry);
+		fUsedEntries.Add(entry);
+
+		nodeID = entry->node_id;
+		return true;
+	}
+
+	void _Remove(EntryCacheEntry* entry)
+	{
+		fEntries.Remove(entry);
+		fUsedEntries.Remove(entry);
+		free(entry);
+		fEntryCount--;
+	}
+
+private:
+	typedef OpenHashTable<EntryCacheHashDefinition> EntryTable;
+	typedef DoublyLinkedList<EntryCacheEntry> EntryList;
+
+	mutex		fLock;
+	EntryTable	fEntries;
+	EntryList	fUsedEntries;	// LRU queue (LRU entry at the head)
+	uint32		fEntryCount;
+};
+
+
 struct vnode : fs_vnode {
 	struct vnode	*next;
 	vm_cache		*cache;
@@ -154,6 +313,7 @@ struct fs_mount {
 	struct vnode	*covers_vnode;
 	KPartition		*partition;
 	struct list		vnodes;
+	EntryCache		entry_cache;
 	bool			unmounting;
 	bool			owns_file_device;
 };
@@ -1919,6 +2079,10 @@ static status_t
 lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 {
 	ino_t id;
+
+	if (dir->mount->entry_cache.Lookup(dir->id, name, id))
+		return get_vnode(dir->device, id, _vnode, true, false);
+
 	status_t status = FS_CALL(dir, lookup, name, &id);
 	if (status < B_OK)
 		return status;
@@ -3514,6 +3678,36 @@ write_file_io_vec_pages(int fd, const file_io_vec *fileVecs, size_t fileVecCount
 
 	put_fd(descriptor);
 	return status;
+}
+
+
+extern "C" status_t
+entry_cache_add(dev_t mountID, ino_t dirID, const char* name, ino_t nodeID)
+{
+	// lookup mount -- the caller is required to make sure that the mount
+	// won't go away
+	MutexLocker locker(sMountMutex);
+	struct fs_mount* mount = find_mount(mountID);
+	if (mount == NULL)
+		return B_BAD_VALUE;
+	locker.Unlock();
+
+	return mount->entry_cache.Add(dirID, name, nodeID);
+}
+
+
+extern "C" status_t
+entry_cache_remove(dev_t mountID, ino_t dirID, const char* name)
+{
+	// lookup mount -- the caller is required to make sure that the mount
+	// won't go away
+	MutexLocker locker(sMountMutex);
+	struct fs_mount* mount = find_mount(mountID);
+	if (mount == NULL)
+		return B_BAD_VALUE;
+	locker.Unlock();
+
+	return mount->entry_cache.Remove(dirID, name);
 }
 
 
@@ -6572,6 +6766,10 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	mount->device_name = strdup(device);
 		// "device" can be NULL
 
+	status = mount->entry_cache.Init();
+	if (status != B_OK)
+		goto err2;
+
 	mount->fs = get_file_system(fsName);
 	if (mount->fs == NULL) {
 		status = ENODEV;
@@ -6698,6 +6896,8 @@ err5:
 	put_file_system(mount->fs);
 	free(mount->device_name);
 err3:
+	mount->entry_cache.Uninit();
+err2:
 	free(mount->fs_name);
 err1:
 	free(mount->volume);
@@ -6883,6 +7083,8 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 			KDiskDeviceManager::Default()->DeleteFileDevice(partition->ID());
 		partition->Unregister();
 	}
+
+	mount->entry_cache.Uninit();
 
 	free(mount->device_name);
 	free(mount->fs_name);

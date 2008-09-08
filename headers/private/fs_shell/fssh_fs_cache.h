@@ -120,6 +120,13 @@ extern fssh_status_t	fssh_file_map_translate(void *_map, fssh_off_t offset,
 							fssh_size_t size, struct fssh_file_io_vec *vecs,
 							fssh_size_t *_count, fssh_size_t align);
 
+/* entry cache */
+extern fssh_status_t	fssh_entry_cache_add(fssh_dev_t mountID,
+							fssh_ino_t dirID, const char* name,
+							fssh_ino_t nodeID);
+extern fssh_status_t	fssh_entry_cache_remove(fssh_dev_t mountID,
+							fssh_ino_t dirID, const char* name);
+
 #ifdef __cplusplus
 }
 #endif
