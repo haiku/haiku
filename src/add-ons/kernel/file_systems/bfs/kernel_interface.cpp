@@ -549,6 +549,8 @@ bfs_lookup(fs_volume* _volume, fs_vnode* _directory, const char* file,
 		return status;
 	}
 
+	entry_cache_add(volume->ID(), directory->ID(), file, *_vnodeID);
+
 	locker.Unlock();
 
 	Inode* inode;
@@ -827,6 +829,8 @@ bfs_create(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	}
 
 	if (status >= B_OK) {
+		entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
+
 		transaction.Done();
 
 		// register the cookie
@@ -896,6 +900,8 @@ bfs_create_symlink(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	put_vnode(volume->FSVolume(), id);
 
 	if (status == B_OK) {
+		entry_cache_add(volume->ID(), directory->ID(), name, id);
+
 		transaction.Done();
 
 		notify_entry_created(volume->ID(), directory->ID(), name, id);
@@ -935,6 +941,8 @@ bfs_unlink(fs_volume* _volume, fs_vnode* _directory, const char* name)
 
 	off_t id;
 	if ((status = directory->Remove(transaction, name, &id)) == B_OK) {
+		entry_cache_remove(volume->ID(), directory->ID(), name);
+
 		transaction.Done();
 
 		notify_entry_removed(volume->ID(), directory->ID(), name, id);
@@ -1055,6 +1063,8 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 		if (status < B_OK)
 			return status;
 
+		entry_cache_remove(volume->ID(), newDirectory->ID(), newName);
+
 		notify_entry_removed(volume->ID(), newDirectory->ID(), newName,
 			clobber);
 
@@ -1097,6 +1107,9 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 				status = inode->WriteBack(transaction);
 
 			if (status == B_OK) {
+				entry_cache_remove(volume->ID(), oldDirectory->ID(), oldName);
+				entry_cache_add(volume->ID(), newDirectory->ID(), newName, id);
+
 				transaction.Done();
 
 				notify_entry_moved(volume->ID(), oldDirectory->ID(), oldName,
@@ -1423,6 +1436,9 @@ bfs_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	if (status == B_OK) {
 		*_newVnodeID = id;
 		put_vnode(volume->FSVolume(), id);
+
+		entry_cache_add(volume->ID(), directory->ID(), name, id);
+
 		transaction.Done();
 
 		notify_entry_created(volume->ID(), directory->ID(), name, id);
@@ -1445,6 +1461,8 @@ bfs_remove_dir(fs_volume* _volume, fs_vnode* _directory, const char* name)
 	off_t id;
 	status_t status = directory->Remove(transaction, name, &id, true);
 	if (status == B_OK) {
+		entry_cache_remove(volume->ID(), directory->ID(), name);
+
 		transaction.Done();
 
 		notify_entry_removed(volume->ID(), directory->ID(), name, id);
@@ -1807,6 +1825,9 @@ bfs_create_special_node(fs_volume* _volume, fs_vnode* _directory,
 		_superVnode->private_node = inode;
 		_superVnode->ops = &gBFSVnodeOps;
 		*_nodeID = id;
+
+		entry_cache_add(volume->ID(), directory->ID(), name, id);
+
 		transaction.Done();
 
 		notify_entry_created(volume->ID(), directory->ID(), name, id);
