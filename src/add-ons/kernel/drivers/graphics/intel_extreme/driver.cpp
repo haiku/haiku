@@ -48,6 +48,7 @@ const struct supported_device {
 	{0x2592, INTEL_TYPE_91x, "i915GM"},
 	{0x2772, INTEL_TYPE_945, "i945G"},
 	{0x27a2, INTEL_TYPE_945, "i945GM"},
+	{0x27ae, INTEL_TYPE_945, "i945GME"},
 	{0x29a2, INTEL_TYPE_965, "i965G"},
 	{0x2a02, INTEL_TYPE_965, "i965GM"},
 	{0x29b2, INTEL_TYPE_G33, "G33G"},
