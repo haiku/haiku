@@ -11,7 +11,7 @@ actions piecemeal together existing Clean
 }
 
 #-------------------------------------------------------------------------------
-# Link rule/action are overwritten as they don't handle linking files who's name 
+# Link rule/action are overwritten as they don't handle linking files who's name
 # contain spaces very well. Also adds resources and version to executable.
 #-------------------------------------------------------------------------------
 rule Link
@@ -29,7 +29,7 @@ rule Link
 
  	NEEDLIBS on $(1) = [ on $(1) return $(NEEDLIBS) ] ;
  	LINKLIBS on $(1) = [ on $(1) return $(LINKLIBS) ] ;
-		
+
 	MODE on $(<) = $(EXEMODE) ;
 	on $(1) XRes $(1) : $(RESFILES) ;
 	if ! [ on $(1) return $(DONT_USE_BEOS_RULES) ] {
@@ -46,9 +46,24 @@ rule Link
 	Chmod $(<) ;
 }
 
-actions Link bind NEEDLIBS LINK_BEGIN_GLUE LINK_END_GLUE
-{
-	$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) "$(LINK_BEGIN_GLUE)" "$(2)" "$(NEEDLIBS)" $(LINKLIBS) "$(LINK_END_GLUE)" ;
+# When using "real" attributes (i.e. BeOS attributes or xattr/extattr) on the
+# host platform, unlinking the main target by gcc will also automatically get
+# rid of the attributes. When using the generic attribute emulation, which
+# uses separate files, we need to remove the target explicitely first, so that
+# the attributes won't be "leaked".
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) || $(HAIKU_HOST_USE_XATTR) = 1 {
+	actions Link bind NEEDLIBS LINK_BEGIN_GLUE LINK_END_GLUE
+	{
+		$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) "$(LINK_BEGIN_GLUE)" "$(2)" \
+			"$(NEEDLIBS)" $(LINKLIBS) "$(LINK_END_GLUE)" ;
+	}
+} else {
+	actions Link bind NEEDLIBS LINK_BEGIN_GLUE LINK_END_GLUE
+	{
+		$(RM) "$(1)"
+		$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) "$(LINK_BEGIN_GLUE)" "$(2)" \
+			"$(NEEDLIBS)" $(LINKLIBS) "$(LINK_END_GLUE)" ;
+	}
 }
 
 rule Object
@@ -57,7 +72,7 @@ rule Object
 	local headers ;
 	local sysHeaders ;
 	local defines ;
-	
+
 	on $(1) { # use on $(1) variable values
 		if ! $(PLATFORM) in $(SUPPORTED_PLATFORMS) {
 			return ;
@@ -77,11 +92,11 @@ rule Object
 		if $(PLATFORM) = host {
 			sysHeaders += $(HOST_HDRS) ;
 			defines += $(HOST_DEFINES) ;
-	
+
 			if $(USES_BE_API) {
 				sysHeaders += $(HOST_BE_API_HEADERS) ;
 			}
-	
+
 		} else {
 			sysHeaders += $(TARGET_HDRS) ;
 			defines += $(TARGET_DEFINES) ;
@@ -102,12 +117,12 @@ rule Object
 	# the regexp pattern $(HDRSCAN) and then invokes $(HDRRULE)
 	# with the scanned file as the target and the found headers
 	# as the sources.  HDRSEARCH is the value of SEARCH used for
-	# the found header files.  Finally, if jam must deal with 
+	# the found header files.  Finally, if jam must deal with
 	# header files of the same name in different directories,
 	# they can be distinguished with HDRGRIST.
 
-	# $(SEARCH_SOURCE:E) is where cc first looks for #include 
-	# "foo.h" files.  If the source file is in a distant directory, 
+	# $(SEARCH_SOURCE:E) is where cc first looks for #include
+	# "foo.h" files.  If the source file is in a distant directory,
 	# look there.  Else, look in "" (the current directory).
 
 	HDRRULE on $(>) = HdrRule ;
@@ -162,7 +177,7 @@ rule As
 	local systemIncludesOption ;
 	if [ on $(1) return $(PLATFORM) ] = host {
 		flags = [ on $(1) return $(HOST_ASFLAGS) $(ASFLAGS) ] ;
-	
+
 		CC on $(1) = $(HOST_CC) ;
 
 		includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
@@ -171,7 +186,7 @@ rule As
 
 	} else {
 		flags = [ on $(1) return $(TARGET_ASFLAGS) $(ASFLAGS) ] ;
-	
+
 		CC on $(1) = $(TARGET_CC) ;
 
 		includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
@@ -292,7 +307,7 @@ rule Cc
 	}
 }
 
-actions Cc 
+actions Cc
 {
 	$(CC) $(CCFLAGS) -c "$(2)" $(CCDEFS) $(CCHDRS) -o "$(1)" ;
 }
@@ -306,30 +321,30 @@ rule C++
 		local includesSeparator ;
 		local localIncludesOption ;
 		local systemIncludesOption ;
-	
+
 		# optimization flags
 		if $(DEBUG) = 0 {
 			flags += $(OPTIM) ;
 		} else {
 			flags += -O0 ;
 		}
-	
+
 		if $(PLATFORM) = host {
 			# warning flags
 			if $(WARNINGS) != 0 {
 				flags += $(HOST_WARNING_C++FLAGS) ;
 			}
-	
+
 			# debug and other flags
 			flags += $(HOST_C++FLAGS) $(HOST_DEBUG_$(DEBUG)_C++FLAGS)
 				$(SUBDIRC++FLAGS) $(C++FLAGS) ;
-		
+
 			if $(USES_BE_API) {
 				flags += $(HOST_BE_API_C++FLAGS) ;
 			}
-	
+
 			C++ on $(1) = $(HOST_C++) ;
-		
+
 			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
@@ -339,18 +354,18 @@ rule C++
 			if $(WARNINGS) != 0 {
 				flags += $(TARGET_WARNING_C++FLAGS) ;
 			}
-	
+
 			# debug and other flags
 			flags += $(TARGET_C++FLAGS) $(TARGET_DEBUG_$(DEBUG)_C++FLAGS)
 				$(SUBDIRC++FLAGS) $(C++FLAGS) ;
-	
+
 			C++ on $(1) = $(TARGET_C++) ;
 
 			includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
 			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
 		}
-	
+
 		C++FLAGS on $(<) = $(flags) ;
 		CCHDRS on $(<) = [ FIncludes $(HDRS) : $(localIncludesOption) ]
 			$(includesSeparator)
@@ -403,21 +418,21 @@ rule LibraryFromObjects
 			AR on $(_l) = $(TARGET_AR) $(TARGET_ARFLAGS) ;
 			RANLIB on $(_l) = $(TARGET_RANLIB) ;
 		}
-		
+
 		# library depends on its member objects
-	
+
 		if $(KEEPOBJS)
 		{
 			LocalDepends obj : $(_s) ;
 		}
-	
+
 		LocalDepends lib : $(_l) ;
-	
+
 		# Set LOCATE for the library and its contents.  The bound
 		# value shows up as $(NEEDLIBS) on the Link actions.
 		# For compatibility, we only do this if the library doesn't
 		# already have a path.
-	
+
 		if ! $(_l:D)
 		{
 			# locate the library only, if it hasn't been located yet
@@ -430,13 +445,13 @@ rule LibraryFromObjects
 			}
 			MakeLocate $(_l)($(_s:BS)) : $(dir) ;
 		}
-	
-		if $(NOARSCAN) 
-		{ 
+
+		if $(NOARSCAN)
+		{
 			# If we can't scan the library to timestamp its contents,
 			# we have to just make the library depend directly on the
-			# on-disk object files.  
-	
+			# on-disk object files.
+
 			Depends $(_l) : $(_s) ;
 		}
 		else
@@ -444,26 +459,26 @@ rule LibraryFromObjects
 			# If we can scan the library, we make the library depend
 			# on its members and each member depend on the on-disk
 			# object file.
-	
+
 			Depends $(_l) : $(_l)($(_s:BS)) ;
-	
+
 			for _i in $(_s)
 			{
 			Depends $(_l)($(_i:BS)) : $(_i) ;
 			}
 		}
-	
+
 		LocalClean clean : $(_l) ;
-	
+
 		# bonefish: Not needed on the supported platforms. Maybe later...
 		# if $(CRELIB) { CreLib $(_l) : $(_s[1]) ; }
-	
+
 		Archive $(_l) : $(_s) ;
-	
+
 		if $(RANLIB) { Ranlib $(_l) ; }
-	
+
 		# If we can't scan the library, we have to leave the .o's around.
-	
+
 		if ! ( $(KEEPOBJS) || $(NOARSCAN) || $(NOARUPDATE) ) {
 			RmTemps $(_l) : $(_s) ;
 		}
@@ -549,7 +564,7 @@ rule MkDir
 		local s ;
 
 		# Cheesy gate to prevent multiple invocations on same dir
-		# MkDir1 has the actions 
+		# MkDir1 has the actions
 		# Arrange for jam dirs
 
 		$(dir:G=)-mkdir = true ;
@@ -560,7 +575,7 @@ rule MkDir
 		# $(dir:P) = $(dir)'s parent, & we recurse until root
 
 		s = $(dir:P) ;	# parent keeps grist
-	
+
 		if $(s:G=) && $(s) != $(dir) {
 			Depends $(dir) : $(s) ;
 			dir = $(s) ;
