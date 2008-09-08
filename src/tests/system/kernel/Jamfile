@@ -18,6 +18,8 @@ SimpleTest lock_node_test :
 
 SimpleTest page_fault_cache_merge_test : page_fault_cache_merge_test.cpp ;
 
+SimpleTest path_resolution_test : path_resolution_test.cpp ;
+
 SimpleTest port_close_test_1 : port_close_test_1.cpp ;
 SimpleTest port_close_test_2 : port_close_test_2.cpp ;
 
