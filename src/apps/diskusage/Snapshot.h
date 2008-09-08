@@ -18,11 +18,14 @@
 class BMimeType;
 class BVolume;
 
+using std::string;
+using std::vector;
+
 struct FileInfo {
 								FileInfo();
 								~FileInfo();
 
-			void				GetPath(string& path) const;
+			void				GetPath(std::string& path) const;
 			FileInfo*			FindChild(const char* name) const;
 			BMimeType*			Type() const;
 
@@ -31,7 +34,7 @@ struct FileInfo {
 			off_t				size;
 			int					count;
 			FileInfo*			parent;
-			vector<FileInfo*>	children;
+			std::vector<FileInfo*>	children;
 };
 
 
@@ -39,7 +42,7 @@ struct VolumeSnapshot {
 								VolumeSnapshot(const BVolume* volume);
 								~VolumeSnapshot();
 
-			string				name;
+			std::string			name;
 			off_t				capacity;
 			off_t				freeBytes;
 			FileInfo*			rootDir;

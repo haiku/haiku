@@ -12,6 +12,7 @@
 
 #include "Common.h"
 
+using std::vector;
 
 Scanner::Scanner(BVolume *v, BHandler *handler)
 	: BLooper(),

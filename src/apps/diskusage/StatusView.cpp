@@ -20,8 +20,8 @@
 #include "Scanner.h"
 
 
-StatusView::StatusView(BRect r)
-	: BView(r, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW),
+StatusView::StatusView(BRect rect)
+	: BView(rect, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW),
 	  fCurrentFileInfo(NULL)
 {
 	SetViewColor(kWindowColor);
@@ -33,7 +33,7 @@ StatusView::StatusView(BRect r)
 	float fixedHeight = ceilf(fh.ascent) + ceilf(fh.descent)
 		+ ceilf(fh.leading);
 	ResizeTo(Bounds().Width(),
-		2.0 * kSmallVMargin + max(plainHeight, fixedHeight));
+		2.0 * kSmallVMargin + max_c(plainHeight, fixedHeight));
 
 	BRect r = Bounds();
 	r.top += kSmallVMargin;

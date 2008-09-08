@@ -20,6 +20,8 @@
 #include "Common.h"
 #include "Snapshot.h"
 
+using std::string;
+using std::vector;
 
 LeftView::LeftView(BRect frame, BBitmap* icon)
 	: BView(frame, NULL, B_FOLLOW_NONE, B_WILL_DRAW),
@@ -115,9 +117,9 @@ InfoWin::InfoWin(BPoint p, FileInfo *f, BWindow* parent)
 	InfoList::iterator i = info.begin();
 	while (i != info.end()) {
 		float w = smallFont.StringWidth((*i).first.c_str()) + 2.0 * kSmallHMargin;
-		leftWidth = max(leftWidth, w);
+		leftWidth = max_c(leftWidth, w);
 		w = smallFont.StringWidth((*i).second.c_str()) + 2.0 * kSmallHMargin;
-		rightWidth = max(rightWidth, w);
+		rightWidth = max_c(rightWidth, w);
 		i++;
 	}
 

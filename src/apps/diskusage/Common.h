@@ -93,10 +93,6 @@ EXTERN bool kFoundHelpFile;
 #define kScanProgress				'gSPR'
 #define kScanDone					'gSDN'
 
-// support functions
-#define max(x, y) ((x) > (y) ? (x) : (y))
-#define min(x, y) ((x) < (y) ? (x) : (y))
-
 #define deg2rad(x) (2.0 * M_PI * (x) / 360.0)
 #define rad2deg(x) (360.0 * (x) / (2.0 * M_PI))
 

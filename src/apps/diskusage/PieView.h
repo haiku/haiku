@@ -25,6 +25,9 @@ struct FileInfo;
 class Scanner;
 class MainWindow;
 
+using std::map;
+using std::vector;
+
 class PieView: public BView {
 public:
 								PieView(BRect frame, MainWindow* window);

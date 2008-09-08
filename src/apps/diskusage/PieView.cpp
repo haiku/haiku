@@ -94,7 +94,7 @@ AppMenuItem::GetContentSize(float* _width, float* _height)
 		be_plain_font->GetHeight(&fh);
 		float fontHeight = ceilf(fh.ascent) + ceilf(fh.descent)
 			+ ceilf(fh.leading);
-		*_height = max(fontHeight, fIcon->Bounds().Height());
+		*_height = max_c(fontHeight, fIcon->Bounds().Height());
 	}
 }
 

@@ -14,6 +14,7 @@
 #include <MenuItem.h>
 #include <NodeMonitor.h>
 #include <PopUpMenu.h>
+#include <SupportDefs.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 #include <Window.h>
@@ -72,7 +73,7 @@ VolumeMenuItem::GetContentSize(float* width, float* height)
 	be_plain_font->GetHeight(&fh);
 	float fontHeight = fh.ascent + fh.descent + fh.leading;
 	if (fIcon) {
-		*height = max(fontHeight, fIcon->Bounds().Height());
+		*height = max_c(fontHeight, fIcon->Bounds().Height());
 		*width += fIcon->Bounds().Width() + kSmallHMargin;
 	} else
 		*height = fontHeight;
@@ -260,7 +261,7 @@ ControlsView::ControlsView(BRect r)
 
 	r.right = r.left - kSmallHMargin;
 	buttonWidth = kButtonMargin + StringWidth(kStrRescan);
-	r.left = r.right - max(kMinButtonWidth, buttonWidth);
+	r.left = r.right - max_c(kMinButtonWidth, buttonWidth);
 	fRescanButton = new BButton(r, NULL, kStrRescan, new BMessage(kBtnRescan),
 		B_FOLLOW_RIGHT);
 

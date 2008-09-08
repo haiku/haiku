@@ -21,6 +21,8 @@
 
 class BDirectory;
 
+using std::string;
+
 class Scanner: public BLooper {
 public:
 								Scanner(BVolume* volume, BHandler* handler);
