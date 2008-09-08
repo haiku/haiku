@@ -19,6 +19,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
  */
+
+// NOTE: This code is the same in DiskUsge. Maybe it could be made
+// into some kind of common base class?
+
 #include "GrepApp.h"
 
 #include <AppFileInfo.h>
@@ -58,9 +62,7 @@ process_refs(entry_ref dirRef, BMessage *message, void* /*reserved*/)
 	// get the path of the Tracker add-on
 	image_info image;
 	int32 cookie = 0;
-	status_t status = B_OK;
-
-	status = get_next_image_info(0, &cookie, &image);
+	status_t status = get_next_image_info(0, &cookie, &image);
 
 	while (status == B_OK) {
 		if (((char*)process_refs >= (char*)image.text
