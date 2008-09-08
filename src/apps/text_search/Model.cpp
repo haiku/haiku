@@ -33,6 +33,9 @@
 #include <List.h>
 #include <MenuItem.h>
 #include <Path.h>
+#include <Roster.h>
+
+#include "GlobalDefs.h"
 
 
 using std::nothrow;
@@ -64,6 +67,12 @@ Model::Model()
 		fFilePanelPath = path.Path();
 	else
 		fFilePanelPath = "/boot/home";
+
+	entry_ref dummy;
+	if (be_roster->FindApp(PE_SIGNATURE, &dummy) == B_OK) {
+		// Pe is installed, change the default settings
+		fInvokePe = true;
+	}
 }
 
 
