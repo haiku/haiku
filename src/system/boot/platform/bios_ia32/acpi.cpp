@@ -79,7 +79,7 @@ acpi_find_table(char *signature)
 			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n", signature, header->signature));
 			continue;
 		}
-		TRACE(("acpi: Found '%.4s' @ %p\n", signature));
+		TRACE(("acpi: Found '%.4s' @ %p\n", signature, pointer));
 		return header;
 	}
 
