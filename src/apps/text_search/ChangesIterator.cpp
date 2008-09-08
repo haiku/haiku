@@ -100,18 +100,9 @@ ChangesIterator::EntryRemoved(const char* path)
 {
 	HashString key(path);
 	if (fPathMap.ContainsKey(key)) {
-		uint32 mode = fPathMap.Get(key);
-		if (mode == ENTRY_ADDED) {
-			TRACE("ignoring: %s\n", path);
-			fPathMap.Remove(key);
-			return;
-		} else if (mode == ENTRY_REMOVED)
-			return;
+		TRACE("ignoring: %s\n", path);
+		fPathMap.Remove(key);
 	}
-
-	TRACE("removed: %s\n", path);
-
-	fPathMap.Put(key, ENTRY_REMOVED);
 }
 
 

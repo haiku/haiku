@@ -50,7 +50,7 @@ using std::nothrow;
 
 static const bigtime_t kChangesPulseInterval = 150000;
 
-//#define TRACE_NODE_MONITORING
+#define TRACE_NODE_MONITORING
 #ifdef TRACE_NODE_MONITORING
 # define TRACE_NM(x...) printf(x)
 #else
@@ -881,8 +881,15 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 			if (message->FindString("path", &path) == B_OK) {
 				if (opCode == B_ENTRY_CREATED)
 					fChangesIterator->EntryAdded(path.String());
-				else
+				else {
+					// in order to remove temporary files
 					fChangesIterator->EntryRemoved(path.String());
+					// remove from the list view already
+					BEntry entry(path.String());
+					entry_ref ref;
+					if (entry.GetRef(&ref) == B_OK)
+						fSearchResults->RemoveResults(ref, true);
+				}
 			} else {
 				#ifdef TRACE_NODE_MONITORING
 					printf("incompatible message:\n");
@@ -893,14 +900,47 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 			break;
 		}
 		case B_ENTRY_MOVED:
-			#ifdef TRACE_NODE_MONITORING
-				printf("B_ENTRY_MOVED\n");
-				message->PrintToStream();
-			#endif
-			// TODO: If the path is now outside the folder hierarchy, it's just
-			// a "removed" entry. If the move happened within the hierarchy,
-			// it should be a combined removed/added event.
+		{
+			TRACE_NM("B_ENTRY_MOVED\n");
+
+			BString path;
+			if (message->FindString("path", &path) != B_OK) {
+				#ifdef TRACE_NODE_MONITORING
+					printf("incompatible message:\n");
+					message->PrintToStream();
+				#endif
+				break;
+			}
+
+			bool added;
+			if (message->FindBool("added", &added) != B_OK)
+				added = false;
+			bool removed;
+			if (message->FindBool("removed", &removed) != B_OK)
+				removed = false;
+
+			if (added) {
+				// new files
+			} else if (removed) {
+				// remove files
+			} else {
+				// files changed location, but are still within the search
+				// path!
+				BEntry entry(path.String());
+				entry_ref ref;
+				if (entry.GetRef(&ref) == B_OK) {
+					int32 index;
+					ResultItem* item = fSearchResults->FindItem(ref, &index);
+					item->SetText(path.String());
+					// take care of invalidation, the index is currently
+					// the full list index, but needs to be the visible
+					// items index for this
+					index = fSearchResults->IndexOf(item);
+					fSearchResults->InvalidateItem(index);
+				}
+			}
 			break;
+		}
 		case B_STAT_CHANGED:
 		case B_ATTR_CHANGED:
 		{
@@ -1001,27 +1041,9 @@ GrepWindow::_OnReportResult(BMessage* message)
 
 	BStringItem* item = NULL;
 	if (fModel->fState == STATE_UPDATE) {
-		int32 index;
-		item = fSearchResults->FindItem(ref, &index);
-		if (item) {
-			// remove any sub items
-			while (true) {
-				BListItem* subItem = fSearchResults->FullListItemAt(index + 1);
-				if (subItem && subItem->OutlineLevel() > 0)
-					delete fSearchResults->RemoveItem(index + 1);
-				else
-					break;
-			}
-		}
-		if (count == 0) {
-			// During updates because of node monitor events, negatives are
-			// also reported (count == 0).
-			if (item) {
-				// remove file item itself
-				delete fSearchResults->RemoveItem(index);
-			}
-			return;
-		}
+		// During updates because of node monitor events, negatives are
+		// also reported (count == 0).
+		item = fSearchResults->RemoveResults(ref, count == 0);
 	}
 	if (item == NULL) {
 		item = new ResultItem(ref);
