@@ -9,7 +9,7 @@
 #define APP_SIGNATURE "application/x-vnd.mahlzeit.trackergrep"
 #define APP_NAME "TextSearch"
 
-#define PREFS_FILE			"TextSearchSettings"
+#define PREFS_FILE			"TextSearch"
 #define HISTORY_LIMIT		20
 
 #define TRACKER_SIGNATURE	"application/x-vnd.Be-TRAK"
