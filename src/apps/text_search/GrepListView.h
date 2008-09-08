@@ -41,6 +41,9 @@ public:
 
 			ResultItem*			FindItem(const entry_ref& ref,
 									int32* _index) const;
+
+			ResultItem*			RemoveResults(const entry_ref& ref,
+									bool completeItem);
 };
 
 #endif // GREP_LIST_VIEW_H

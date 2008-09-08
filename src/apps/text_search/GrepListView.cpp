@@ -58,3 +58,31 @@ GrepListView::FindItem(const entry_ref& ref, int32* _index) const
 	*_index = -1;
 	return NULL;
 }
+
+
+ResultItem*
+GrepListView::RemoveResults(const entry_ref& ref, bool completeItem)
+{
+	int32 index;
+	ResultItem* item = FindItem(ref, &index);
+	if (item == NULL)
+		return NULL;
+
+	// remove all the sub items
+	while (true) {
+		BListItem* subItem = FullListItemAt(index + 1);
+		if (subItem && subItem->OutlineLevel() > 0)
+			delete RemoveItem(index + 1);
+		else
+			break;
+	}
+
+	if (completeItem) {
+		// remove file item itself
+		delete RemoveItem(index);
+		item = NULL;
+	}
+
+	return item;
+}
+
