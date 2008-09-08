@@ -889,16 +889,18 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n",
 				Title(), xResizeBy, yResizeBy));
 
-			if (fWindow->IsResizing()) {
+			// comment this code for the time being, as some apps rely
+			// on the programmatically resize behavior during user resize
+//			if (fWindow->IsResizing()) {
 				// While the user resizes the window, we ignore
 				// pragmatically set window bounds
-				fLink.StartMessage(B_BUSY);
-			} else {
+//				fLink.StartMessage(B_BUSY);
+//			} else {
 //fDesktop->UnlockSingleWindow();
 				fDesktop->ResizeWindowBy(fWindow, xResizeBy, yResizeBy);
 //fDesktop->LockSingleWindow();
 				fLink.StartMessage(B_OK);
-			}
+//			}
 			fLink.Flush();
 			break;
 		}
@@ -2198,13 +2200,13 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_TRIANGLE\n", Title()));
 
- 			BPoint pts[3];
+			BPoint pts[3];
 			BRect rect;
 
- 			for (int32 i = 0; i < 3; i++) {
+			for (int32 i = 0; i < 3; i++) {
 				link.Read<BPoint>(&(pts[i]));
 				fCurrentView->ConvertToScreenForDrawing(&pts[i]);
- 			}
+			}
 
 			link.Read<BRect>(&rect);
 
