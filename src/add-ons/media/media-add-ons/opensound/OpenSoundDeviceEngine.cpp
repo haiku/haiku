@@ -35,7 +35,7 @@ OpenSoundDeviceEngine::OpenSoundDeviceEngine(oss_audioinfo *info)
 	CALLED();
 	fInitCheckStatus = B_NO_INIT;
 	memcpy(&fAudioInfo, info, sizeof(oss_audioinfo));
-	
+
 	// XXX:REMOVEME
 	// set default format
 /*
@@ -96,37 +96,28 @@ status_t OpenSoundDeviceEngine::Open(int mode)
 		return EIO;
 	}
 
-	// set latency policy = fragment size and total driver buffer size
+	// set driver buffer size by using the "fragments" API
 	// TODO: export this setting as a BParameter?
 
-	// NOTE stippi: 4 means 2048 bytes driver buffer in my tests on a C-Media
-	// This latency is long enough for playback on BeOS. On Haiku, testing on
-	// HD Audio hardware, it is too short. However, I seem to remember the
-	// HD Audio supports 32 bit sample width (while C-Media supports "only"
-	// 16). If OSS uses the same 2048 bytes even for 32 bit/sample, then I
-	// could see how that would be asking for too much, since that would
-	// effectively half the latency.
+	// NOTE stippi: 2048 bytes driver buffer is long enough for playback on
+	// BeOS. On Haiku, testing on HD Audio hardware, it is too short. However,
+	// I seem to remember the HD Audio supports 32 bit sample width (while
+	// C-Media supports "only" 16). If OSS uses the same 2048 bytes even for
+	// 32 bit/sample, then I could see how that would be asking for too much,
+	// since that would effectively half the latency.
+
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	v = 5;
+	uint32 bufferCount = 6;
+	uint32 bufferSize = 0x000b; // 1024 bytes
 #else
-	v = 4;
+	uint32 bufferCount = 4;
+	uint32 bufferSize = 0x000a; // 512 bytes
 #endif
-	if (ioctl(fFD, SNDCTL_DSP_POLICY, &v, sizeof(int)) < 0) {
-		if (errno != EIO && errno != EINVAL) {
-			fInitCheckStatus = errno;
-			Close();
-			return EIO;
-		}
-		// TODO: use this older API as fallback:
-#if 0
-		// set fragments
-		v = 0x7fff0000 | 0x000b; // unlimited * 2048
-		if (ioctl(fFD, SNDCTL_DSP_SETFRAGMENT, &v, sizeof(int)) < 0) {
-			fInitCheckStatus = errno;
-			Close();
-			return EIO;
-		}
-#endif
+	v = (bufferCount << 16) | bufferSize;
+	if (ioctl(fFD, SNDCTL_DSP_SETFRAGMENT, &v, sizeof(int)) < 0) {
+		fInitCheckStatus = errno;
+		Close();
+		return EIO;
 	}
 
 	fDriverBufferSize = 2048;
@@ -180,7 +171,7 @@ OpenSoundDeviceEngine::UpdateInfo()
 
 	if (fFD < 0)
 		return ENODEV;
-	
+
 	if (ioctl(fFD, SNDCTL_ENGINEINFO, &fAudioInfo, sizeof(oss_audioinfo)) < 0)
 		return errno;
 
@@ -216,7 +207,7 @@ int OpenSoundDeviceEngine::GetChannels(void)
 	int chans = -1;
 	CALLED();
 	if (ioctl(fFD, SNDCTL_DSP_CHANNELS, &chans, sizeof(int)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_CHANNELS", strerror(errno)));
 		return -1;
 	}
@@ -227,7 +218,7 @@ status_t OpenSoundDeviceEngine::SetChannels(int chans)
 {
 	CALLED();
 	if (ioctl(fFD, SNDCTL_DSP_CHANNELS, &chans, sizeof(int)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_CHANNELS", strerror(errno)));
 		return EIO;
 	}
@@ -241,7 +232,7 @@ int OpenSoundDeviceEngine::GetFormat(void)
 	int fmt = -1;
 	CALLED();
 	if (ioctl(fFD, SNDCTL_DSP_GETFMTS, &fmt, sizeof(int)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_GETFMTS", strerror(errno)));
 		return -1;
 	}
@@ -252,7 +243,7 @@ status_t OpenSoundDeviceEngine::SetFormat(int fmt)
 {
 	CALLED();
 	if (ioctl(fFD, SNDCTL_DSP_SETFMT, &fmt, sizeof(int)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_SETFMT", strerror(errno)));
 		return EIO;
 	}
@@ -265,7 +256,7 @@ int OpenSoundDeviceEngine::GetSpeed(void)
 	int speed = -1;
 	CALLED();
 	if (ioctl(fFD, SNDCTL_DSP_SPEED, &speed, sizeof(int)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_SPEED", strerror(errno)));
 		return -1;
 	}
@@ -276,7 +267,7 @@ status_t OpenSoundDeviceEngine::SetSpeed(int speed)
 {
 	CALLED();
 	if (ioctl(fFD, SNDCTL_DSP_SPEED, &speed, sizeof(int)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_SPEED", strerror(errno)));
 		return EIO;
 	}
@@ -295,7 +286,7 @@ size_t OpenSoundDeviceEngine::GetISpace(audio_buf_info *info)
 	if (!(fOpenMode & OPEN_READ))
 		return 0;
 	if (ioctl(fFD, SNDCTL_DSP_GETISPACE, info, sizeof(audio_buf_info)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_GETISPACE", strerror(errno)));
 		return EIO;
 	}
@@ -314,7 +305,7 @@ size_t OpenSoundDeviceEngine::GetOSpace(audio_buf_info *info)
 	if (!(fOpenMode & OPEN_WRITE))
 		return 0;
 	if (ioctl(fFD, SNDCTL_DSP_GETOSPACE, info, sizeof(audio_buf_info)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_GETOSPACE", strerror(errno)));
 		return EIO;
 	}
@@ -335,12 +326,12 @@ OpenSoundDeviceEngine::GetCurrentIPtr(int32 *fifoed, oss_count_t *info)
 	if (!(fOpenMode & OPEN_READ))
 		return 0;
 	if (ioctl(fFD, SNDCTL_DSP_CURRENT_IPTR, info, sizeof(oss_count_t)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_CURRENT_IPTR", strerror(errno)));
 		//return EIO;
 		// fallback: try GET*PTR
 		if (ioctl(fFD, SNDCTL_DSP_GETIPTR, &cinfo, sizeof(count_info)) < 0) {
-			PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+			PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 					__FUNCTION__, "SNDCTL_DSP_GETIPTR", strerror(errno)));
 			return 0;
 		}
@@ -371,7 +362,7 @@ OpenSoundDeviceEngine::GetCurrentOPtr(int32* fifoed, size_t* fragmentPos)
 	memset(&info, 0, sizeof(oss_count_t));
 
 	if (ioctl(fFD, SNDCTL_DSP_CURRENT_OPTR, &info, sizeof(oss_count_t)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_CURRENT_OPTR", strerror(errno)));
 
 		return 0;
@@ -380,7 +371,7 @@ OpenSoundDeviceEngine::GetCurrentOPtr(int32* fifoed, size_t* fragmentPos)
 	if (fragmentPos != NULL) {
 		count_info cinfo;
 		if (ioctl(fFD, SNDCTL_DSP_GETOPTR, &cinfo, sizeof(count_info)) < 0) {
-			PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+			PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 					__FUNCTION__, "SNDCTL_DSP_GETOPTR", strerror(errno)));
 			return 0;
 		}
@@ -405,7 +396,7 @@ OpenSoundDeviceEngine::GetIOverruns()
 	if (!(fOpenMode & OPEN_WRITE))
 		return 0;
 	if (ioctl(fFD, SNDCTL_DSP_GETERROR, &info, sizeof(info)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_GETERROR", strerror(errno)));
 		return 0;
 	}
@@ -423,7 +414,7 @@ OpenSoundDeviceEngine::GetOUnderruns()
 	if (!(fOpenMode & OPEN_WRITE))
 		return 0;
 	if (ioctl(fFD, SNDCTL_DSP_GETERROR, &info, sizeof(info)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_GETERROR", strerror(errno)));
 		return 0;
 	}
@@ -446,12 +437,12 @@ status_t OpenSoundDeviceEngine::StartRecording(void)
 	group.id = 0;
 	group.mode = PCM_ENABLE_INPUT;
 	if (ioctl(fFD, SNDCTL_DSP_SYNCGROUP, &group, sizeof(group)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_SYNCGROUP", strerror(errno)));
 		return EIO;
 	}
 	if (ioctl(fFD, SNDCTL_DSP_SYNCSTART, &group.id, sizeof(group.id)) < 0) {
-		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_SYNCSTART", strerror(errno)));
 		return EIO;
 	}
@@ -546,14 +537,14 @@ status_t OpenSoundDeviceEngine::AcceptFormatFor(int fmt, media_format &format, b
 	err = WildcardFormatFor(fmt, wc);
 	if (err < B_OK)
 		return err;
-	
+
 	err = Open(rec ? OPEN_READ : OPEN_WRITE);
 	if (err < B_OK)
 		return err;
-	
+
 	if (format.type == B_MEDIA_RAW_AUDIO) {
 		media_multi_audio_format &raw = format.u.raw_audio;
-		
+
 		// channel count
 		raw.channel_count = MAX((unsigned)(Info()->min_channels), MIN((unsigned)(Info()->max_channels), raw.channel_count));
 		err = SetChannels(raw.channel_count);
@@ -586,10 +577,10 @@ status_t OpenSoundDeviceEngine::AcceptFormatFor(int fmt, media_format &format, b
 			Close();
 			return err;
 		}
-		
+
 		// endianness
 		raw.byte_order = OpenSoundDevice::convert_oss_format_to_endian(afmt);
-		
+
 		// sample rate
 		raw.frame_rate = OpenSoundDevice::select_oss_rate(Info(), raw.frame_rate);		// measured in Hertz
 		//raw.frame_rate = OpenSoundDevice::convert_oss_rate_to_media_rate(Info()->max_rate);		// measured in Hertz
@@ -648,14 +639,14 @@ status_t OpenSoundDeviceEngine::SpecializeFormatFor(int fmt, media_format &forma
 	err = WildcardFormatFor(fmt, wc);
 	if (err < B_OK)
 		return err;
-	
+
 	err = Open(rec ? OPEN_READ : OPEN_WRITE);
 	if (err < B_OK)
 		return err;
-	
+
 	if (format.type == B_MEDIA_RAW_AUDIO) {
 		media_multi_audio_format &raw = format.u.raw_audio;
-		
+
 		PRINT(("%s:step1  fmt=0x%08x, raw.format=0x%08lx\n", __FUNCTION__, fmt, raw.format));
 		// select the best as default
 		if (!raw.format) {
@@ -686,7 +677,7 @@ status_t OpenSoundDeviceEngine::SpecializeFormatFor(int fmt, media_format &forma
 			Close();
 			return err;
 		}
-		
+
 		// endianness
 		if (!raw.byte_order)
 			raw.byte_order = OpenSoundDevice::convert_oss_format_to_endian(afmt);
@@ -694,7 +685,7 @@ status_t OpenSoundDeviceEngine::SpecializeFormatFor(int fmt, media_format &forma
 			Close();
 			return B_MEDIA_BAD_FORMAT;
 		}
-		
+
 		// channel count
 		if (raw.channel_count == 0)
 			raw.channel_count = (unsigned)Info()->min_channels;
@@ -716,7 +707,7 @@ status_t OpenSoundDeviceEngine::SpecializeFormatFor(int fmt, media_format &forma
 			Close();
 			return err;
 		}
-		
+
 #if 0
 		raw.buffer_size = DEFAULT_BUFFER_SIZE
 						* (raw.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
@@ -724,7 +715,7 @@ status_t OpenSoundDeviceEngine::SpecializeFormatFor(int fmt, media_format &forma
 #endif
 		audio_buf_info abinfo;
 		if (ioctl(fFD, rec?SNDCTL_DSP_GETISPACE:SNDCTL_DSP_GETOSPACE, &abinfo, sizeof(abinfo)) < 0) {
-			PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+			PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n",
 				__FUNCTION__, "SNDCTL_DSP_GET?SPACE", strerror(errno)));
 			return -1;
 		}
