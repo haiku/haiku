@@ -272,7 +272,7 @@ ControlsView::ControlsView(BRect r)
 	ResizeTo(Bounds().Width(), height + 6.0);
 
 	// Horizontal divider
-	BRect r = Bounds();
+	r = Bounds();
 	r.top = r.bottom - 1.0;
 	r.left -= 5.0; r.right += 5.0;
 	BBox* divider = new BBox(r, NULL, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW);
