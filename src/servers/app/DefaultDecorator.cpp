@@ -580,7 +580,7 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 		if (buttons == B_SECONDARY_MOUSE_BUTTON)
 			return DEC_MOVETOBACK;
 
-		if (fWasDoubleClick)
+		if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))
 			return DEC_MINIMIZE;
 
 		return DEC_DRAG;
