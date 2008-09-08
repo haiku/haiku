@@ -22,7 +22,8 @@
 App::App()
 	: BApplication(kAppSignature),
 	  fResources(read_resources(kAppSignature)),
-	  fMainWindow(NULL)
+	  fMainWindow(NULL),
+	  fSavedRefsReceived(NULL)
 {
 }
 
@@ -30,6 +31,7 @@ App::App()
 App::~App()
 {
 	delete fResources;
+	delete fSavedRefsReceived;
 }
 
 
@@ -51,7 +53,13 @@ App::ArgvReceived(int32 argc, char** argv)
 void
 App::RefsReceived(BMessage* message)
 {
-	fMainWindow->PostMessage(message);
+	if (fMainWindow == NULL) {
+		// ReadyToRun() has not been called yet, this happens when someone
+		// launches us with a B_REFS_RECEIVED message.
+		delete fSavedRefsReceived;
+		fSavedRefsReceived = new BMessage(*message);
+	} else
+		fMainWindow->PostMessage(message);
 }
 
 
@@ -74,6 +82,13 @@ App::ReadyToRun()
 	}
 
 	fMainWindow = new MainWindow(frame);
+
+	if (fSavedRefsReceived) {
+		// RefsReceived() was called earlier than ReadyToRun()
+		fMainWindow->PostMessage(fSavedRefsReceived);
+		delete fSavedRefsReceived;
+		fSavedRefsReceived = NULL;
+	}
 }
 
 
@@ -87,23 +102,11 @@ App::QuitRequested()
 	if (settings.AddRect("window frame", fMainWindow->Frame()) != B_OK
 		|| find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK
 		|| path.Append("DiskUsage") != B_OK
-		|| settingsFile.SetTo(path.Path(), B_WRITE_ONLY) != B_OK
+		|| settingsFile.SetTo(path.Path(),
+			B_CREATE_FILE | B_WRITE_ONLY | B_ERASE_FILE) != B_OK
 		|| settings.Flatten(&settingsFile) != B_OK) {
 		fprintf(stderr, "Failed to write application settings.\n");
 	}
 
 	return BApplication::QuitRequested();
 }
-
-
-// #pragma mark -
-
-
-int
-main()
-{
-	App app;
-	app.Run();
-	return 0;
-}
-

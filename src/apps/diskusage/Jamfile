@@ -4,6 +4,7 @@ Application DiskUsage :
 	App.cpp
 	Common.cpp
 	ControlsView.cpp
+	DiskUsage.cpp
 	InfoWindow.cpp
 	MainWindow.cpp
 	PieView.cpp

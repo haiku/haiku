@@ -28,6 +28,7 @@ public:
 private:
 			BResources*			fResources;
 			MainWindow*			fMainWindow;
+			BMessage*			fSavedRefsReceived;
 };
 
 #endif // APP_H
