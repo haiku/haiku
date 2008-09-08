@@ -2087,6 +2087,33 @@ vm_create_vnode_cache(struct vnode *vnode, struct VMCache **cache)
 }
 
 
+/*!	\a cache must be locked. The area's address space must be read-locked.
+*/
+static void
+pre_map_area_pages(vm_area* area, VMCache* cache)
+{
+	addr_t baseAddress = area->base;
+	addr_t cacheOffset = area->cache_offset;
+	page_num_t firstPage = cacheOffset / B_PAGE_SIZE;
+	page_num_t endPage = firstPage + area->size / B_PAGE_SIZE;
+
+	for (VMCachePagesTree::Iterator it
+				= cache->pages.GetIterator(firstPage, true, true);
+			vm_page *page = it.Next();) {
+		if (page->cache_offset >= endPage)
+			break;
+
+		// skip inactive pages
+		if (page->state == PAGE_STATE_BUSY || page->usage_count <= 0)
+			continue;
+
+		vm_map_page(area, page,
+			baseAddress + (page->cache_offset * B_PAGE_SIZE - cacheOffset),
+			B_READ_AREA | B_KERNEL_READ_AREA);
+	}
+}
+
+
 /*!	Will map the file specified by \a fd to an area in memory.
 	The file will be mirrored beginning at the specified \a offset. The
 	\a offset and \a size arguments have to be page aligned.
@@ -2139,6 +2166,38 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 		return status;
 	CObjectDeleter<struct vnode> vnodePutter(vnode, vfs_put_vnode);
 
+	// If we're going to pre-map pages, we need to reserve the pages needed by
+	// the mapping backend upfront.
+	page_num_t reservedPreMapPages = 0;
+	if ((protection & B_READ_AREA) != 0) {
+		AddressSpaceWriteLocker locker;
+		status = locker.SetTo(team);
+		if (status != B_OK)
+			return status;
+
+		vm_translation_map *map = &locker.AddressSpace()->translation_map;
+		reservedPreMapPages = map->ops->map_max_pages_need(map, 0, size - 1);
+
+		locker.Unlock();
+
+		vm_page_reserve_pages(reservedPreMapPages);
+	}
+
+	struct PageUnreserver {
+		PageUnreserver(page_num_t count)
+			: fCount(count)
+		{
+		}
+
+		~PageUnreserver()
+		{
+			if (fCount > 0)
+				vm_page_unreserve_pages(fCount);
+		}
+
+		page_num_t	fCount;
+	} pageUnreserver(reservedPreMapPages);
+
 	AddressSpaceWriteLocker locker(team);
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
@@ -2160,6 +2219,9 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 		// map_backing_store() cannot know we no longer need the ref
 		cache->ReleaseRefLocked();
 	}
+
+	if (status == B_OK && (protection & B_READ_AREA) != 0)
+		pre_map_area_pages(area, cache);
 
 	cache->Unlock();
 
