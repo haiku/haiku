@@ -61,8 +61,6 @@ using std::nothrow;
 #	define BVTRACE ;
 #endif
 
-#define MAX_ATTACHMENT_SIZE 49152
-
 
 static property_info sViewPropInfo[] = {
 	{ "Frame", { B_GET_PROPERTY, 0 },
@@ -4400,7 +4398,10 @@ BView::_ClipToPicture(BPicture *picture, BPoint where,
 
 #if 1
 	// TODO: Move the implementation to the server!!!
-
+	// This implementation is pretty slow, since just creating an offscreen bitmap
+	// takes a lot of time. That's the main reason why it should be moved
+	// to the server.
+	
 	// Here the idea is to get rid of the padding bytes in the bitmap,
 	// as padding complicates and slows down the iteration.
 	// TODO: Maybe it's not so nice as it assumes BBitmaps to be aligned
@@ -4433,7 +4434,7 @@ BView::_ClipToPicture(BPicture *picture, BPoint where,
 		for (int32 y = 0; y < height; y++) {
 			for (int32 x = 0; x < width; x++) {		
 				bit = *bits++;	
-				if (bit != (uint32)-1) {
+				if (bit != 0xFFFFFFFF) {
 					rect.left = x;
 					rect.right = rect.left;
 					rect.top = rect.bottom = y;
