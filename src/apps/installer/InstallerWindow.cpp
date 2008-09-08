@@ -69,7 +69,7 @@ LogoView::Draw(BRect update)
 
 InstallerWindow::InstallerWindow(BRect frame_rect)
 	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE),
 	fDriveSetupLaunched(false),
 	fInstallStatus(kReadyForInstall),
 	fLastSrcItem(NULL),
