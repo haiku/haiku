@@ -118,7 +118,7 @@ private:
 	thread_id	control_thread;
 
 	BLocker *fLocker;
-	
+
 	virtual void MessageReceived(BMessage *msg);
 	virtual void ReadyToRun();
 	typedef BApplication inherited;
@@ -151,7 +151,7 @@ void ServerApp::ReadyToRun()
 	TerminateAddonServer();
 	// and start a new one
 	StartAddonServer();
-	
+
 	gAddOnManager->LoadState();
 }
 
@@ -219,14 +219,14 @@ void ServerApp::StartAddonServer()
 	BEntry entry;
 	BDirectory dir;
 	entry_ref ref;
-	
+
 	err = GetAppInfo(&info);
 	err |= entry.SetTo(&info.ref);
 	err |= entry.GetParent(&entry);
 	err |= dir.SetTo(&entry);
 	err |= entry.SetTo(&dir, "media_addon_server");
 	err |= entry.GetRef(&ref);
-	
+
 	if (err == B_OK)
 		be_roster->Launch(&ref);
 	if (err == B_OK)
@@ -236,7 +236,7 @@ void ServerApp::StartAddonServer()
 	err = be_roster->Launch(B_MEDIA_ADDON_SERVER_SIGNATURE);
 	if (err == B_OK)
 		return;
-	
+
 	(new BAlert("media_server", "Launching media_addon_server failed.\n\n"
 		"media_server will terminate", "OK"))->Go();
 	fprintf(stderr, "Launching media_addon_server (%s) failed: %s\n",
@@ -264,14 +264,14 @@ void ServerApp::TerminateAddonServer()
 				"(%s)\n", err, strerror(err));
 		}
 	}
-	
+
 	// wait 5 seconds for it to terminate
 	for (int i = 0; i < 50; i++) {
 		if (!be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
 			return;
 		snooze(100000); // 100 ms
 	}
-	
+
 	// try to kill it (or many of them), up to 10 seconds
 	for (int i = 0; i < 50; i++) {
 		team_id id = be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE);
@@ -287,7 +287,7 @@ void ServerApp::TerminateAddonServer()
 }
 
 
-void 
+void
 ServerApp::HandleMessage(int32 code, void *data, size_t size)
 {
 	status_t rv;
@@ -317,7 +317,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			gNodeManager->RescanDefaultNodes();
 			break;
 		}
-	
+
 		case SERVER_REGISTER_APP:
 		{
 			const server_register_app_request *request
@@ -338,7 +338,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-	
+
 		case SERVER_GET_MEDIAADDON_REF:
 		{
 			server_get_mediaaddon_ref_request *msg
@@ -360,7 +360,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_GET_LIVE_NODE_INFO:
 		{
 			const server_get_live_node_info_request *request
@@ -372,7 +372,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_GET_LIVE_NODES:
 		{
 			const server_get_live_nodes_request *request
@@ -419,7 +419,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			}
 			break;
 		}
-		
+
 		case SERVER_GET_NODE_FOR:
 		{
 			const server_get_node_for_request *request
@@ -430,7 +430,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_RELEASE_NODE:
 		{
 			const server_release_node_request *request
@@ -440,7 +440,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_REGISTER_NODE:
 		{
 			const server_register_node_request *request
@@ -452,7 +452,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_UNREGISTER_NODE:
 		{
 			const server_unregister_node_request *request
@@ -493,7 +493,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_PUBLISH_OUTPUTS:
 		{
 			const server_publish_outputs_request *request
@@ -544,7 +544,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_GET_DORMANT_NODE_FOR:
 		{
 			const server_get_dormant_node_for_request *request
@@ -585,7 +585,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			write_port(msg->reply_port, 0, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_UNREGISTER_MEDIAADDON:
 		{
 			server_unregister_mediaaddon_command *msg
@@ -593,7 +593,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			gNodeManager->UnregisterAddon(msg->addonid);
 			break;
 		}
-		
+
 		case SERVER_REGISTER_DORMANT_NODE:
 		{
 			xfer_server_register_dormant_node *msg
@@ -603,10 +603,10 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				gNodeManager->InvalidateDormantFlavorInfo(msg->purge_id);
 			rv = dfi.Unflatten(msg->dfi_type, &(msg->dfi), msg->dfi_size);
 			ASSERT(rv == B_OK);
-			gNodeManager->AddDormantFlavorInfo(dfi);	
+			gNodeManager->AddDormantFlavorInfo(dfi);
 			break;
 		}
-		
+
 		case SERVER_GET_DORMANT_NODES:
 		{
 			xfer_server_get_dormant_nodes *msg
@@ -615,7 +615,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			dormant_node_info * infos = new dormant_node_info[msg->maxcount];
 			reply.count = msg->maxcount;
 			reply.result = gNodeManager->GetDormantNodes(
-				infos, 
+				infos,
 				&reply.count,
 				msg->has_input ? &msg->inputformat : NULL,
 				msg->has_output ? &msg->outputformat : NULL,
@@ -631,7 +631,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			delete [] infos;
 			break;
 		}
-		
+
 		case SERVER_GET_DORMANT_FLAVOR_INFO:
 		{
 			xfer_server_get_dormant_flavor_info *msg
@@ -684,7 +684,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(B_OK, &reply, sizeof(reply));
 			break;
 		}
-				
+
 		case SERVER_REGISTER_BUFFER:
 		{
 			const server_register_buffer_request *request
@@ -693,9 +693,9 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			server_register_buffer_reply reply;
 			status_t status;
 			if (request->info.buffer == 0) {
-				reply.info = request->info; 
+				reply.info = request->info;
 				// size, offset, flags, area is kept
-				// get a new beuffer id into reply.info.buffer 
+				// get a new beuffer id into reply.info.buffer
 				status = gBufferManager->RegisterBuffer(request->team,
 					request->info.size, request->info.flags,
 					request->info.offset, request->info.area,
@@ -718,15 +718,15 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			gBufferManager->UnregisterBuffer(cmd->team, cmd->bufferid);
 			break;
 		}
-		
+
 		case SERVER_REWINDTYPES:
 		{
 			const server_rewindtypes_request *request
 				= reinterpret_cast<const server_rewindtypes_request *>(data);
 			server_rewindtypes_reply reply;
-			
+
 			BString **types = NULL;
-			
+
 			rv = gMMediaFilesManager->RewindTypes(
 					&types, &reply.count);
 			if(reply.count>0) {
@@ -750,25 +750,25 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 					}
 				}
 			}
-			
-			delete types;
-			
+
+			delete[] types;
+
 			rv = request->SendReply(rv, &reply, sizeof(reply));
 			if (rv != B_OK) {
 				// if we couldn't send the message, delete the area
-				delete_area(reply.area); 
+				delete_area(reply.area);
 			}
 			break;
 		}
-		
+
 		case SERVER_REWINDREFS:
 		{
 			const server_rewindrefs_request *request
 				= reinterpret_cast<const server_rewindrefs_request *>(data);
 			server_rewindrefs_reply reply;
-			
+
 			BString **items = NULL;
-			
+
 			rv = gMMediaFilesManager->RewindRefs(request->type,
 					&items, &reply.count);
 			// we create an area here, and pass it to the library,
@@ -792,8 +792,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 					}
 				}
 			}
-			
-			delete items;
+
+			delete[] items;
 
 			rv = request->SendReply(rv, &reply, sizeof(reply));
 			if (rv != B_OK) {
@@ -802,7 +802,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			}
 			break;
 		}
-		
+
 		case SERVER_GETREFFOR:
 		{
 			const server_getreffor_request *request
@@ -818,33 +818,33 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_SETREFFOR:
 		{
 			const server_setreffor_request *request
 				= reinterpret_cast<const server_setreffor_request *>(data);
 			server_setreffor_reply reply;
 			entry_ref ref = request->ref;
-			
+
 			rv = gMMediaFilesManager->SetRefFor(request->type, request->item,
 				ref);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_REMOVEREFFOR:
 		{
 			const server_removereffor_request *request
 				= reinterpret_cast<const server_removereffor_request *>(data);
 			server_removereffor_reply reply;
 			entry_ref ref = request->ref;
-			
+
 			rv = gMMediaFilesManager->RemoveRefFor(request->type,
 				request->item, ref);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		case SERVER_REMOVEITEM:
 		{
 			const server_removeitem_request *request
@@ -874,11 +874,11 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 					const server_get_decoder_for_format_request *>(data);
 			server_get_decoder_for_format_reply reply;
 			rv = gAddOnManager->GetDecoderForFormat(&reply.ref,
-				request->format);						 
+				request->format);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
+
 		default:
 			printf("media_server: received unknown message code %#08lx\n",
 				code);
@@ -893,7 +893,7 @@ ServerApp::controlthread(void *arg)
 	ServerApp *app;
 	ssize_t size;
 	int32 code;
-	
+
 	app = (ServerApp *)arg;
 	while ((size = read_port_etc(app->control_port, &code, data, sizeof(data),
 		0, 0)) > 0) {
@@ -903,7 +903,7 @@ ServerApp::controlthread(void *arg)
 	return 0;
 }
 
-void 
+void
 ServerApp::MessageReceived(BMessage *msg)
 {
 	TRACE("ServerApp::MessageReceived %lx enter\n", msg->what);
@@ -917,7 +917,7 @@ ServerApp::MessageReceived(BMessage *msg)
 		case MMEDIAFILESMANAGER_SAVE_TIMER:
 			gMMediaFilesManager->TimerMessage();
 			break;
-		
+
 		case MEDIA_SERVER_GET_FORMATS:
 			gFormatManager->GetFormats(*msg);
 			break;
@@ -925,7 +925,7 @@ ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_MAKE_FORMAT_FOR:
 			gFormatManager->MakeFormatFor(*msg);
 			break;
-		
+
 		case MEDIA_SERVER_ADD_SYSTEM_BEEP_EVENT:
 			gMMediaFilesManager->HandleAddSystemBeepEvent(msg);
 			break;
