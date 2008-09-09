@@ -1055,16 +1055,6 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	fInitError = error;
 
 	if (fInitError == B_OK) {
-		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
-			fWindow = new(std::nothrow) BWindow(Bounds(), fServerToken);
-			if (fWindow) {
-				// A BWindow starts life locked and is unlocked
-				// in Show(), but this window is never shown and
-				// it's message loop is never started.
-				fWindow->Unlock();
-			} else
-				fInitError = B_NO_MEMORY;
-		}
 		// clear to white if the flags say so.
 		if (flags & (B_BITMAP_CLEAR_TO_WHITE | B_BITMAP_ACCEPTS_VIEWS)) {
 			if (fColorSpace == B_CMAP8) {
@@ -1075,6 +1065,20 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				// should work for most colorspaces
 				memset(fBasePointer, 0xff, fSize);
 			}
+		}
+		// TODO: Creating an offscreen window with a non32 bit bitmap
+		// copies the current content of the bitmap to a back buffer.
+		// So at this point the bitmap has to be already cleared to white.
+		// Better move the above code to the server so the problem looks more clear. 
+		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
+	        	fWindow = new(std::nothrow) BWindow(Bounds(), fServerToken);
+       			if (fWindow) {
+               			// A BWindow starts life locked and is unlocked
+                		// in Show(), but this window is never shown and
+                		// it's message loop is never started.
+                		fWindow->Unlock();
+        		} else
+                		fInitError = B_NO_MEMORY;
 		}
 	}
 }
