@@ -29,7 +29,6 @@
 #include "HWInterface.h"
 #include "InputManager.h"
 #include "OffscreenServerWindow.h"
-#include "RAMLinkMsgReader.h"
 #include "Screen.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
