@@ -117,6 +117,10 @@ find_video_mode(int32 width, int32 height, bool allowPalette)
 }
 
 
+/*! Returns the VESA mode closest to the one specified, with a width less or
+	equal as specified.
+	The height as well as the depth may vary in both directions, though.
+*/
 static video_mode *
 closest_video_mode(int32 width, int32 height, int32 depth)
 {
@@ -126,6 +130,12 @@ closest_video_mode(int32 width, int32 height, int32 depth)
 	video_mode *mode = NULL;
 	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode))
 			!= NULL) {
+		if (mode->width > width) {
+			// Only choose modes with a width less or equal than the searched
+			// one; or else it might well be that the monitor cannot keep up.
+			continue;
+		}
+
 		uint32 diff = 2 * abs(mode->width - width) + abs(mode->height - height)
 			+ abs(mode->bits_per_pixel - depth);
 
@@ -173,7 +183,7 @@ find_edid_mode(edid1_info &info, bool allowPalette)
 		}
 	}
 
-	return NULL;
+	return mode;
 }
 
 
@@ -1097,7 +1107,7 @@ platform_init_video(void)
 		// mode
 		video_mode *defaultMode = find_edid_mode(info, false);
 		if (defaultMode == NULL)
-			find_edid_mode(info, true);
+			defaultMode = find_edid_mode(info, true);
 
 		if (defaultMode != NULL) {
 			// We found a new default mode to use!
