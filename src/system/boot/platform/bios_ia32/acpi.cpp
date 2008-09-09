@@ -12,11 +12,12 @@
 #include "acpi.h"
 #include "mmu.h"
 
+#include <string.h>
+
 #include <KernelExport.h>
 
 #include <arch/x86/arch_acpi.h>
 
-#include <string.h>
 
 //#define TRACE_ACPI
 #ifdef TRACE_ACPI
@@ -44,7 +45,7 @@ acpi_check_rsdt(acpi_rsdp *rsdp)
 	acpi_descriptor_header *rsdt
 		= (acpi_descriptor_header *)mmu_map_physical_memory(
 		rsdp->rsdt_address, B_PAGE_SIZE, kDefaultPageFlags);
-	if (!rsdt || strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
+	if (rsdt == NULL || strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
 		TRACE(("acpi: invalid root system description table\n"));
 		return B_ERROR;
 	}
@@ -57,11 +58,11 @@ acpi_check_rsdt(acpi_rsdp *rsdp)
 acpi_descriptor_header *
 acpi_find_table(char *signature)
 {
-	if (sAcpiRsdt == NULL) {
+	if (sAcpiRsdt == NULL)
 		return NULL;
-	}
 
-	// Tried to keep numEntries a static variable; kept turning up 0 on table scan
+	// Tried to keep numEntries a static variable; kept turning up 0 on table
+	// scan
 	// TODO: This calculates numEntries for every acpi probe.
 	int32 numEntries = (sAcpiRsdt->length - sizeof(acpi_descriptor_header)) / 4;
 	if (numEntries <= 0) {
@@ -69,14 +70,19 @@ acpi_find_table(char *signature)
 		return NULL;
 	}
 
-	TRACE(("acpi: searching %ld entries for table '%.4s'\n", numEntries, signature));
-	uint32 *pointer = (uint32 *)((uint8 *)sAcpiRsdt + sizeof(acpi_descriptor_header));
+	TRACE(("acpi: searching %ld entries for table '%.4s'\n", numEntries,
+		signature));
+
+	uint32 *pointer = (uint32 *)((uint8 *)sAcpiRsdt
+		+ sizeof(acpi_descriptor_header));
+
 	for (int32 j = 0; j < numEntries; j++, pointer++) {
 		acpi_descriptor_header *header = (acpi_descriptor_header *)
 			mmu_map_physical_memory(*pointer, B_PAGE_SIZE, kDefaultPageFlags);
-		if (!header || strncmp(header->signature, signature, 4) != 0) {
+		if (header == NULL || strncmp(header->signature, signature, 4) != 0) {
 			// not interesting for us
-			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n", signature, header->signature));
+			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n", signature,
+				header->signature));
 			continue;
 		}
 		TRACE(("acpi: Found '%.4s' @ %p\n", signature, pointer));
@@ -91,21 +97,22 @@ acpi_find_table(char *signature)
 void
 acpi_init(void)
 {
-	acpi_rsdp *rsdp = NULL;
 	// Try to find the ACPI RSDP.
 	for (int32 i = 0; acpi_scan_spots[i].length > 0; i++) {
-		char *pointer;
-		TRACE(("acpi_init: entry base 0x%lx, limit 0x%lx\n", acpi_scan_spots[i].start,
-			acpi_scan_spots[i].stop));
-		for (pointer = (char *)acpi_scan_spots[i].start;
+		acpi_rsdp *rsdp = NULL;
+
+		TRACE(("acpi_init: entry base 0x%lx, limit 0x%lx\n",
+			acpi_scan_spots[i].start, acpi_scan_spots[i].stop));
+
+		for (char *pointer = (char *)acpi_scan_spots[i].start;
 		     (uint32)pointer < acpi_scan_spots[i].stop; pointer += 16) {
 			if (strncmp(pointer, ACPI_RSDP_SIGNATURE, 8) == 0) {
 				TRACE(("acpi_init: found ACPI RSDP signature at %p\n", pointer));
 				rsdp = (acpi_rsdp *)pointer;
 			}
 		}
-		if (acpi_check_rsdt(rsdp) == B_OK)
+
+		if (rsdp != NULL && acpi_check_rsdt(rsdp) == B_OK)
 			break;
 	}
-
 }
