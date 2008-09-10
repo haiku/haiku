@@ -35,28 +35,34 @@ struct partition_table_sector;
 */
 class PartitionMapWriter {
 public:
-	PartitionMapWriter(int deviceFD, off_t sessionOffset, off_t sessionSize);
-	~PartitionMapWriter();
+								PartitionMapWriter(int deviceFD,
+									off_t sessionOffset, off_t sessionSize);
+								~PartitionMapWriter();
 
-	status_t WriteMBR(const PartitionMap *map, bool clearSectors);
-	status_t WriteLogical(partition_table_sector *pts,
-		const LogicalPartition *partition);
-	status_t WriteExtendedHead(partition_table_sector *pts,
-		const LogicalPartition *first_partition);
-
-private:
-	status_t _WritePrimary(partition_table_sector *pts);
-	status_t _WriteExtended(partition_table_sector *pts,
-		const LogicalPartition *partition, const LogicalPartition *next);
-	status_t _ReadPTS(off_t offset, partition_table_sector *pts = NULL);
-	status_t _WriteSector(off_t offset, const void* pts = NULL);
+			status_t			WriteMBR(const PartitionMap* map,
+									bool clearSectors);
+			status_t			WriteLogical(partition_table_sector* pts,
+									const LogicalPartition* partition);
+			status_t			WriteExtendedHead(partition_table_sector* pts,
+									const LogicalPartition* firstPartition);
 
 private:
-	int						fDeviceFD;
-	off_t					fSessionOffset;
-	off_t					fSessionSize;
-	partition_table_sector	*fPTS;	// while writing
-	const PartitionMap		*fMap;
+			status_t			_WritePrimary(partition_table_sector* pts);
+			status_t			_WriteExtended(partition_table_sector* pts,
+									const LogicalPartition* partition,
+									const LogicalPartition* next);
+
+			status_t			_ReadSector(off_t offset,
+									partition_table_sector* pts);
+			status_t			_WriteSector(off_t offset,
+									const partition_table_sector* pts);
+
+private:
+			int					fDeviceFD;
+			off_t				fSessionOffset;
+			off_t				fSessionSize;
+
+			const PartitionMap* fMap; // while writing
 };
 
 #endif	// PARTITION_MAP_WRITER_H

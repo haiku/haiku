@@ -45,7 +45,6 @@ PartitionMapWriter::PartitionMapWriter(int deviceFD, off_t sessionOffset,
 	: fDeviceFD(deviceFD),
 	  fSessionOffset(sessionOffset),
 	  fSessionSize(sessionSize),
-	  fPTS(NULL),
 	  fMap(NULL)
 {
 }
@@ -82,19 +81,19 @@ PartitionMapWriter::WriteMBR(const PartitionMap *map, bool clearSectors)
 	if (clearSectors)
 		memset(sector, 0, SECTOR_SIZE);
 	else
-		error = _ReadPTS(0, pts);
+		error = _ReadSector(0, pts);
 
 	if (error == B_OK) {
 		error = _WritePrimary(pts);
 		if (error == B_OK)
-			error = _WriteSector(0, sector);
+			error = _WriteSector(0, pts);
 	}
 
 	// Clear the second sector, if desired. We do that to make the partition
 	// unrecognizable by BFS.
 	if (error == B_OK && clearSectors) {
 		memset(sector, 0, SECTOR_SIZE);
-		error = _WriteSector(SECTOR_SIZE, sector);
+		error = _WriteSector(SECTOR_SIZE, pts);
 	}
 
 	fMap = NULL;
@@ -108,35 +107,34 @@ PartitionMapWriter::WriteMBR(const PartitionMap *map, bool clearSectors)
 		disk.
 
 	This function ensures that the connection of the following linked list
-	of logical partitions will be correct. It do nothing with the connection of
-	previous logical partitions (call this function on previous logical
+	of logical partitions will be correct. It does nothing with the connection
+	of previous logical partitions (call this function on previous logical
 	partition to ensure it).
 
 	\param pts Pointer to \c partition_table_sector.
 	\param partition Pointer to the logical partition.
 */
 status_t
-PartitionMapWriter::WriteLogical(partition_table_sector *pts,
-	const LogicalPartition *partition)
+PartitionMapWriter::WriteLogical(partition_table_sector* pts,
+	const LogicalPartition* partition)
 {
-	status_t error = (partition ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		if (pts) {
-			error = _WriteExtended(pts, partition, partition->Next());
-			if (error == B_OK)
-				error = _WriteSector(partition->PTSOffset(), pts);
-		} else {
-			partition_table_sector _pts;
-			pts = &_pts;
-			error = _ReadPTS(partition->PTSOffset(), pts);
-			if (error == B_OK) {
-				error = _WriteExtended(pts, partition, partition->Next());
-				if (error == B_OK)
-					error = _WriteSector(partition->PTSOffset(), pts);
-			}
-		}
+	if (partition == NULL)
+		return B_BAD_VALUE;
+
+	partition_table_sector _pts;
+	if (pts == NULL) {
+		// no PTS given, use stack based PTS and read from disk first
+		pts = &_pts;
+		status_t error = _ReadSector(partition->PTSOffset(), pts);
+		if (error != B_OK)
+			return error;
 	}
-	return error;
+
+	status_t error = _WriteExtended(pts, partition, partition->Next());
+	if (error != B_OK)
+		return error;
+
+	return _WriteSector(partition->PTSOffset(), pts);
 }
 
 // WriteExtendedHead
@@ -146,40 +144,41 @@ PartitionMapWriter::WriteLogical(partition_table_sector *pts,
 
 	Writes the head of linked list describing logical partitions.
 
-	If the \a first_partition is not specified, it only initializes EBR and the
+	If the \a firstPartition is not specified, it only initializes EBR and the
 	linked list contains no logical partitions.
 
 	\param pts Pointer to \c partition_table_sector.
-	\param first_partition Pointer to the first logical partition.
+	\param firstPartition Pointer to the first logical partition.
 */
 status_t
-PartitionMapWriter::WriteExtendedHead(partition_table_sector *pts,
-	const LogicalPartition *first_partition)
+PartitionMapWriter::WriteExtendedHead(partition_table_sector* pts,
+	const LogicalPartition* firstPartition)
 {
 	LogicalPartition partition;
-	if (first_partition)
-		partition.SetPrimaryPartition(first_partition->GetPrimaryPartition());
-	status_t error = B_OK;
-	if (pts) {
-		error = _WriteExtended(pts, &partition, first_partition);
-		if (error == B_OK)
-			error = _WriteSector(0, pts);
-	} else {
-		partition_table_sector _pts;
+	if (firstPartition != NULL)
+		partition.SetPrimaryPartition(firstPartition->GetPrimaryPartition());
+
+	partition_table_sector _pts;
+	if (pts == NULL) {
+		// no PTS given, use stack based PTS and read from disk first
 		pts = &_pts;
-		error = _ReadPTS(0, pts);
-		if (error == B_OK) {
-			error = _WriteExtended(pts, &partition, first_partition);
-			if (error == B_OK)
-				error = _WriteSector(0, pts);
-		}
+		status_t error = _ReadSector(0, pts);
+		if (error != B_OK)
+			return error;
 	}
-	return error;
+
+	status_t error = _WriteExtended(pts, &partition, firstPartition);
+	if (error != B_OK)
+		return error;
+
+	return _WriteSector(0, pts);
 }
+
+// #pragma mark - fill a PTS in memory
 
 // _WritePrimary
 status_t
-PartitionMapWriter::_WritePrimary(partition_table_sector *pts)
+PartitionMapWriter::_WritePrimary(partition_table_sector* pts)
 {
 	if (pts == NULL)
 		return B_BAD_VALUE;
@@ -210,7 +209,7 @@ status_t
 PartitionMapWriter::_WriteExtended(partition_table_sector *pts,
 	const LogicalPartition *partition, const LogicalPartition *next)
 {
-	if (!pts || !partition)
+	if (pts == NULL || partition == NULL)
 		return B_BAD_VALUE;
 
 	// write the signature
@@ -252,58 +251,68 @@ PartitionMapWriter::_WriteExtended(partition_table_sector *pts,
 	return B_OK;
 }
 
-// _ReadPTS
+// #pragma mark - to/from disk
+
+// _ReadSector
 /*! \brief Reads the sector from the disk.
 */
 status_t
-PartitionMapWriter::_ReadPTS(off_t offset, partition_table_sector *pts)
+PartitionMapWriter::_ReadSector(off_t offset, partition_table_sector* pts)
 {
-	status_t error = B_OK;
-	if (!pts)
-		pts = fPTS;
 	int32 toRead = sizeof(partition_table_sector);
+		// same as SECTOR_SIZE actually
+
 	// check the offset
 	if (offset < 0 || offset + toRead > fSessionSize) {
-		error = B_BAD_VALUE;
-		TRACE(("intel: _ReadPTS(): bad offset: %Ld\n", offset));
+		TRACE(("intel: _ReadSector(): bad offset: %Ld\n", offset));
+		return B_BAD_VALUE;
+	}
+
 	// read
-	} else if (read_pos(fDeviceFD, fSessionOffset + offset, pts, toRead)
-						!= toRead) {
+	offset += fSessionOffset;
+	if (read_pos(fDeviceFD, offset, pts, toRead) != toRead) {
 #ifndef _BOOT_MODE
-		error = errno;
+		status_t error = errno;
 		if (error == B_OK)
 			error = B_IO_ERROR;
 #else
-		error = B_IO_ERROR;
+		status_t error = B_IO_ERROR;
 #endif
-		TRACE(("intel: _ReadPTS(): reading the PTS failed: %lx\n", error));
+		TRACE(("intel: _ReadSector(): reading the PTS failed: %lx\n", error));
+		return error;
 	}
-	return error;
+
+	return B_OK;
 }
 
 // _WriteSector
 /*! \brief Writes the sector to the disk.
 */
 status_t
-PartitionMapWriter::_WriteSector(off_t offset, const void* pts)
+PartitionMapWriter::_WriteSector(off_t offset,
+	const partition_table_sector* pts)
 {
-	status_t error = B_OK;
-
-	int32 toWrite = SECTOR_SIZE;
+	int32 toWrite = sizeof(partition_table_sector);
+		// same as SECTOR_SIZE actually
 
 	// check the offset
 	if (offset < 0 || offset + toWrite > fSessionSize) {
-		error = B_BAD_VALUE;
 		TRACE(("intel: _WriteSector(): bad offset: %Ld\n", offset));
+		return B_BAD_VALUE;
+	}
+
+	offset += fSessionOffset;
+
 	// write
-	} else if (write_pos(fDeviceFD, fSessionOffset + offset, pts, toWrite)
-						!= toWrite) {
-		error = errno;
+	if (write_pos(fDeviceFD, offset, pts, toWrite) != toWrite) {
+		status_t error = errno;
 		if (error == B_OK)
 			error = B_IO_ERROR;
 
 		TRACE(("intel: _WriteSector(): writing the PTS failed: %lx\n", error));
+		return error;
 	}
-	return error;
+
+	return B_OK;
 }
 
