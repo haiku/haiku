@@ -350,7 +350,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		if (fPenSize == 1.0 && !fSubpixelPrecise) {
 			if (fClippingRegion->Contains(a)) {
 				agg::rgba8 dummyColor;
-				fPixelFormat.blend_pixel(a.x, a.y, dummyColor, 255);
+				fPixelFormat.blend_pixel((int)a.x, (int)a.y, dummyColor, 255);
 			}
 		} else {
 			fPath.move_to(a.x, a.y);
@@ -1459,17 +1459,17 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 		if (format == B_CMAP8) {
 			if (fDrawingMode == B_OP_COPY) {
 				_DrawBitmapNoScale32(copy_bitmap_row_cmap8_copy, 1,
-					srcBuffer, xOffset, yOffset, viewRect);
+					srcBuffer, (int32)xOffset, (int32)yOffset, viewRect);
 				return;
 			} else if (fDrawingMode == B_OP_OVER) {
 				_DrawBitmapNoScale32(copy_bitmap_row_cmap8_over, 1,
-					srcBuffer, xOffset, yOffset, viewRect);
+					srcBuffer, (int32)xOffset, (int32)yOffset, viewRect);
 				return;
 			}
 		} else if (format == B_RGB32) {
 			if (fDrawingMode == B_OP_OVER) {
 				_DrawBitmapNoScale32(copy_bitmap_row_bgr32_over, 4,
-					srcBuffer, xOffset, yOffset, viewRect);
+					srcBuffer, (int32)xOffset, (int32)yOffset, viewRect);
 				return;
 			}
 		}
@@ -1548,14 +1548,14 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	if (xScale == 1.0 && yScale == 1.0) {
 		if (fDrawingMode == B_OP_COPY) {
 			_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4, srcBuffer,
-				xOffset, yOffset, viewRect);
+				(int32)xOffset, (int32)yOffset, viewRect);
 			return;
 		} else if (fDrawingMode == B_OP_OVER
 			|| (fDrawingMode == B_OP_ALPHA
 				 && fAlphaSrcMode == B_PIXEL_ALPHA
 				 && fAlphaFncMode == B_ALPHA_OVERLAY)) {
 			_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4, srcBuffer,
-				xOffset, yOffset, viewRect);
+				(int32)xOffset, (int32)yOffset, viewRect);
 			return;
 		}
 	}

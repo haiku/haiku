@@ -175,8 +175,8 @@ class AGGTextRenderer::StringRenderer {
 		// it is therefor yet "untransformed" in case there is an
 		// embedded transformation.
 		const agg::rect_i& r = glyph->bounds;
-		IntRect glyphBounds(r.x1 + x, r.y1 + y - 1,
-			r.x2 + x + 1, r.y2 + y + 1);
+		IntRect glyphBounds(int32(r.x1 + x), int32(r.y1 + y - 1),
+			int32(r.x2 + x + 1), int32(r.y2 + y + 1));
 			// NOTE: "-1"/"+1" converts the glyph bounding box from pixel
 			// indices to pixel area coordinates
 
@@ -215,8 +215,8 @@ class AGGTextRenderer::StringRenderer {
 					fRenderer.fGray8Adaptor,
 					fRenderer.fPathAdaptor);
 
-				float falseBoldWidth = fRenderer.fContour.width();
-				if (falseBoldWidth != 0.0)
+				int32 falseBoldWidth = (int32)fRenderer.fContour.width();
+				if (falseBoldWidth != 0)
 					glyphBounds.InsetBy(-falseBoldWidth, -falseBoldWidth);
 				// TODO: not correct! this is later used for clipping,
 				// but it doesn't get the rect right
