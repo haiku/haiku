@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -71,6 +71,10 @@ class BScrollBar : public BView {
 		virtual void		AllDetached();
 		virtual status_t	GetSupportedSuites(BMessage *data);
 
+		virtual	BSize		MinSize();
+		virtual	BSize		MaxSize();
+		virtual	BSize		PreferredSize();
+
 		virtual status_t	Perform(perform_code d, void *arg);
 
 #if DISABLES_ON_WINDOW_DEACTIVATION
@@ -105,6 +109,8 @@ class BScrollBar : public BView {
 								bool doubleArrows, BRect frame,
 								const BRect& updateRect,
 								bool enabled, bool down);
+
+				BSize		_MinSize() const;
 
 				float		fMin;
 				float		fMax;

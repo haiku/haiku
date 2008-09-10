@@ -12,6 +12,7 @@
 
 #include <ScrollBar.h>
 
+#include <LayoutUtils.h>
 #include <Message.h>
 #include <OS.h>
 #include <Shape.h>
@@ -1083,6 +1084,37 @@ BScrollBar::GetSupportedSuites(BMessage *message)
 }
 
 
+BSize
+BScrollBar::MinSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), _MinSize());
+}
+
+
+BSize
+BScrollBar::MaxSize()
+{
+	BSize maxSize = _MinSize();
+	if (fOrientation == B_HORIZONTAL)	
+		maxSize.width = B_SIZE_UNLIMITED;
+	else
+		maxSize.height = B_SIZE_UNLIMITED;
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), maxSize);
+}
+
+
+BSize
+BScrollBar::PreferredSize()
+{
+	BSize preferredSize = _MinSize();
+	if (fOrientation == B_HORIZONTAL)	
+		preferredSize.width = 2 * preferredSize.width;
+	else
+		preferredSize.height = 2 * preferredSize.height;
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), preferredSize);
+}
+
+
 status_t
 BScrollBar::Perform(perform_code d, void* arg)
 {
@@ -1641,5 +1673,22 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 				BPoint(r.right, r.bottom - 1), dark);
 	}
 	EndLineArray();
+}
+
+
+BSize
+BScrollBar::_MinSize() const
+{
+	BSize minSize;
+	if (fOrientation == B_HORIZONTAL) {
+		minSize.width = 2 * B_V_SCROLL_BAR_WIDTH
+			+ 2 * fPrivateData->fScrollBarInfo.min_knob_size;
+		minSize.height = B_H_SCROLL_BAR_HEIGHT;
+	} else {
+		minSize.width = B_V_SCROLL_BAR_WIDTH;
+		minSize.height = 2 * B_H_SCROLL_BAR_HEIGHT
+			+ 2 * fPrivateData->fScrollBarInfo.min_knob_size;
+	}
+	return minSize;
 }
 
