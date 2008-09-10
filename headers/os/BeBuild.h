@@ -21,11 +21,13 @@
 #	define _PRINTFLIKE(_format_, _args_) \
 		__attribute__((format(__printf__, _format_, _args_)))
 #	define _EXPORT
+#	define _IMPORT
 #else
 #	define _UNUSED(argument) argument
 #	error Define _PACKED for your compiler
 #	define _PRINTFLIKE(format, args)
 #	define _EXPORT
+#	define _IMPORT
 #endif
 
 #endif	/* _BE_BUILD_H */
