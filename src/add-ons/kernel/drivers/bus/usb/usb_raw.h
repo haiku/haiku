@@ -9,6 +9,7 @@
 #include <USB3.h>
 
 #define B_USB_RAW_PROTOCOL_VERSION	0x0015
+#define B_USB_RAW_ACTIVE_ALTERNATE	0xffffffff
 
 typedef enum {
 	B_USB_RAW_COMMAND_GET_VERSION = 0x1000,
@@ -20,7 +21,10 @@ typedef enum {
 	B_USB_RAW_COMMAND_GET_STRING_DESCRIPTOR,
 	B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR,
 	B_USB_RAW_COMMAND_GET_ALT_INTERFACE_COUNT,
-	B_USB_RAW_COMMAND_GET_ALT_INTERFACE_DESCRIPTOR,
+	B_USB_RAW_COMMAND_GET_ACTIVE_ALT_INTERFACE_INDEX,
+	B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR_ETC,
+	B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR_ETC,
+	B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR_ETC,
 
 	B_USB_RAW_COMMAND_SET_CONFIGURATION = 0x3000,
 	B_USB_RAW_COMMAND_SET_FEATURE,
@@ -72,6 +76,13 @@ typedef union {
 
 	struct {
 		status_t						status;
+		uint32							alternate_info;
+		uint32							config_index;
+		uint32							interface_index;
+	} alternate;
+
+	struct {
+		status_t						status;
 		usb_interface_descriptor		*descriptor;
 		uint32							config_index;
 		uint32							interface_index;
@@ -79,12 +90,11 @@ typedef union {
 
 	struct {
 		status_t						status;
-		uint32							*alternate_count;
 		usb_interface_descriptor		*descriptor;
 		uint32							config_index;
 		uint32							interface_index;
 		uint32							alternate_index;
-	} alternate;
+	} interface_etc;
 
 	struct {
 		status_t						status;
@@ -96,10 +106,12 @@ typedef union {
 
 	struct {
 		status_t						status;
-		usb_string_descriptor			*descriptor;
-		uint32							string_index;
-		size_t							length;
-	} string;
+		usb_endpoint_descriptor			*descriptor;
+		uint32							config_index;
+		uint32							interface_index;
+		uint32							alternate_index;
+		uint32							endpoint_index;
+	} endpoint_etc;
 
 	struct {
 		status_t						status;
@@ -109,6 +121,23 @@ typedef union {
 		uint32							generic_index;
 		size_t							length;
 	} generic;
+
+	struct {
+		status_t						status;
+		usb_descriptor					*descriptor;
+		uint32							config_index;
+		uint32							interface_index;
+		uint32							alternate_index;
+		uint32							generic_index;
+		size_t							length;
+	} generic_etc;
+
+	struct {
+		status_t						status;
+		usb_string_descriptor			*descriptor;
+		uint32							string_index;
+		size_t							length;
+	} string;
 
 	struct {
 		status_t						status;

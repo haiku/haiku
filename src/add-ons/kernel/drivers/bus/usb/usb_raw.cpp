@@ -124,6 +124,58 @@ usb_raw_device_removed(void *cookie)
 //
 
 
+static const usb_configuration_info *
+usb_raw_get_configuration(raw_device *device, uint32 configIndex,
+	status_t *status)
+{
+	const usb_configuration_info *result = gUSBModule->get_nth_configuration(
+		device->device, configIndex);
+	if (result == NULL) {
+		*status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
+		return NULL;
+	}
+
+	return result;
+}
+
+
+static const usb_interface_info *
+usb_raw_get_interface(raw_device *device, uint32 configIndex,
+	uint32 interfaceIndex, uint32 alternateIndex, status_t *status)
+{
+	const usb_configuration_info *configurationInfo
+		= usb_raw_get_configuration(device, configIndex, status);
+	if (configurationInfo == NULL)
+		return NULL;
+
+	if (interfaceIndex >= configurationInfo->interface_count) {
+		*status = B_USB_RAW_STATUS_INVALID_INTERFACE;
+		return NULL;
+	}
+
+	const usb_interface_info *result = NULL;
+	if (alternateIndex == B_USB_RAW_ACTIVE_ALTERNATE)
+		result = configurationInfo->interface[interfaceIndex].active;
+	else {
+		const usb_interface_list *interfaceList =
+			&configurationInfo->interface[interfaceIndex];
+		if (alternateIndex >= interfaceList->alt_count) {
+			*status = B_USB_RAW_STATUS_INVALID_INTERFACE;
+			return NULL;
+		}
+
+		result = &interfaceList->alt[alternateIndex];
+	}
+
+	return result;
+}
+
+
+//
+//#pragma mark -
+//
+
+
 static status_t
 usb_raw_open(const char *name, uint32 flags, void **cookie)
 {
@@ -211,10 +263,11 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	TRACE((DRIVER_NAME": ioctl\n"));
 	raw_device *device = (raw_device *)cookie;
-	usb_raw_command *command = (usb_raw_command *)buffer;
-
 	if (device->device == 0)
 		return B_DEV_NOT_READY;
+
+	usb_raw_command *command = (usb_raw_command *)buffer;
+	command->version.status = B_USB_RAW_STATUS_ABORTED;
 
 	switch (op) {
 		case B_USB_RAW_COMMAND_GET_VERSION: {
@@ -225,10 +278,8 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case B_USB_RAW_COMMAND_GET_DEVICE_DESCRIPTOR: {
 			const usb_device_descriptor *deviceDescriptor =
 				gUSBModule->get_device_descriptor(device->device);
-			if (!deviceDescriptor) {
-				command->device.status = B_USB_RAW_STATUS_ABORTED;
+			if (!deviceDescriptor)
 				return B_OK;
-			}
 
 			memcpy(command->device.descriptor, deviceDescriptor,
 				sizeof(usb_device_descriptor));
@@ -238,12 +289,10 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR: {
 			const usb_configuration_info *configurationInfo =
-				gUSBModule->get_nth_configuration(device->device,
-				command->config.config_index);
-			if (!configurationInfo) {
-				command->config.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
+				usb_raw_get_configuration(device, command->config.config_index,
+					&command->config.status);
+			if (configurationInfo == NULL)
 				return B_OK;
-			}
 
 			memcpy(command->config.descriptor, configurationInfo->descr,
 				sizeof(usb_configuration_descriptor));
@@ -251,26 +300,58 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			return B_OK;
 		}
 
-		case B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR: {
+		case B_USB_RAW_COMMAND_GET_ALT_INTERFACE_COUNT:
+		case B_USB_RAW_COMMAND_GET_ACTIVE_ALT_INTERFACE_INDEX: {
 			const usb_configuration_info *configurationInfo =
-				gUSBModule->get_nth_configuration(device->device,
-				command->interface.config_index);
-			if (!configurationInfo) {
-				command->interface.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
+				usb_raw_get_configuration(device,
+					command->alternate.config_index,
+					&command->alternate.status);
+			if (configurationInfo == NULL)
+				return B_OK;
+
+			if (command->alternate.interface_index
+				>= configurationInfo->interface_count) {
+				command->alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
 				return B_OK;
 			}
 
-			if (command->interface.interface_index >= configurationInfo->interface_count) {
-				command->interface.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				return B_OK;
+			const usb_interface_list *interfaceList
+				= &configurationInfo->interface[
+					command->alternate.interface_index];
+			if (op == B_USB_RAW_COMMAND_GET_ALT_INTERFACE_COUNT) {
+				command->alternate.alternate_info = interfaceList->alt_count;
+			} else {
+				for (size_t i = 0; i < interfaceList->alt_count; i++) {
+					if (&interfaceList->alt[i] == interfaceList->active) {
+						command->alternate.alternate_info = i;
+						break;
+					}
+				}
 			}
 
-			const usb_interface_info *interfaceInfo =
-				configurationInfo->interface[command->interface.interface_index].active;
-			if (!interfaceInfo) {
-				command->interface.status = B_USB_RAW_STATUS_ABORTED;
-				return B_OK;
+			command->alternate.status = B_USB_RAW_STATUS_SUCCESS;
+			return B_OK;
+		}
+
+		case B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR:
+		case B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR_ETC: {
+			const usb_interface_info *interfaceInfo = NULL;
+			if (op == B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR) {
+				interfaceInfo = usb_raw_get_interface(device,
+					command->interface.config_index,
+					command->interface.interface_index,
+					B_USB_RAW_ACTIVE_ALTERNATE,
+					&command->interface.status);
+			} else {
+				interfaceInfo = usb_raw_get_interface(device,
+					command->interface_etc.config_index,
+					command->interface_etc.interface_index,
+					command->interface_etc.alternate_index,
+					&command->interface_etc.status);
 			}
+
+			if (interfaceInfo == NULL)
+				return B_OK;
 
 			memcpy(command->interface.descriptor, interfaceInfo->descr,
 				sizeof(usb_interface_descriptor));
@@ -278,128 +359,83 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			return B_OK;
 		}
 
-		case B_USB_RAW_COMMAND_GET_ALT_INTERFACE_COUNT: {
-			const usb_configuration_info *configurationInfo =
-				gUSBModule->get_nth_configuration(device->device,
-				command->alternate.config_index);
-			if (!configurationInfo) {
-				command->alternate.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
-				return B_OK;
+		case B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR:
+		case B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR_ETC: {
+			uint32 endpointIndex = 0;
+			const usb_interface_info *interfaceInfo = NULL;
+			if (op == B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR) {
+				interfaceInfo = usb_raw_get_interface(device,
+					command->endpoint.config_index,
+					command->endpoint.interface_index,
+					B_USB_RAW_ACTIVE_ALTERNATE,
+					&command->endpoint.status);
+				endpointIndex = command->endpoint.endpoint_index;
+			} else {
+				interfaceInfo = usb_raw_get_interface(device,
+					command->endpoint_etc.config_index,
+					command->endpoint_etc.interface_index,
+					command->endpoint_etc.alternate_index,
+					&command->endpoint_etc.status);
+				endpointIndex = command->endpoint_etc.endpoint_index;
 			}
 
-			if (command->alternate.interface_index >= configurationInfo->interface_count) {
-				command->alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
+			if (!interfaceInfo)
 				return B_OK;
-			}
 
-			*command->alternate.alternate_count
-				= configurationInfo->interface[command->alternate.interface_index].alt_count;
-			command->alternate.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
-		}
-
-		case B_USB_RAW_COMMAND_GET_ALT_INTERFACE_DESCRIPTOR: {
-			const usb_configuration_info *configurationInfo =
-				gUSBModule->get_nth_configuration(device->device,
-				command->alternate.config_index);
-			if (!configurationInfo) {
-				command->alternate.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
-				return B_OK;
-			}
-
-			if (command->alternate.interface_index >= configurationInfo->interface_count) {
-				command->alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				return B_OK;
-			}
-
-			const usb_interface_list *interfaceList =
-				&configurationInfo->interface[command->alternate.interface_index];
-			if (command->alternate.alternate_index >= interfaceList->alt_count) {
-				command->alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				return B_OK;
-			}
-
-			memcpy(command->alternate.descriptor,
-				&interfaceList->alt[command->alternate.alternate_index],
-				sizeof(usb_interface_descriptor));
-			command->alternate.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
-		}
-
-		case B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR: {
-			const usb_configuration_info *configurationInfo =
-				gUSBModule->get_nth_configuration(device->device,
-				command->endpoint.config_index);
-			if (!configurationInfo) {
-				command->endpoint.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
-				return B_OK;
-			}
-
-			if (command->endpoint.interface_index >= configurationInfo->interface_count) {
-				command->endpoint.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				return B_OK;
-			}
-
-			const usb_interface_info *interfaceInfo =
-				configurationInfo->interface[command->endpoint.interface_index].active;
-			if (!interfaceInfo) {
-				command->endpoint.status = B_USB_RAW_STATUS_ABORTED;
-				return B_OK;
-			}
-
-			if (command->endpoint.endpoint_index >= interfaceInfo->endpoint_count) {
+			if (endpointIndex >= interfaceInfo->endpoint_count) {
 				command->endpoint.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
 				return B_OK;
 			}
 
 			memcpy(command->endpoint.descriptor,
-				interfaceInfo->endpoint[command->endpoint.endpoint_index].descr,
+				interfaceInfo->endpoint[endpointIndex].descr,
 				sizeof(usb_endpoint_descriptor));
 			command->endpoint.status = B_USB_RAW_STATUS_SUCCESS;
 			return B_OK;
 		}
 
-		case B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR: {
-			const usb_configuration_info *configurationInfo =
-				gUSBModule->get_nth_configuration(device->device,
-				command->generic.config_index);
-			if (!configurationInfo) {
-				command->generic.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
+		case B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR:
+		case B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR_ETC: {
+			uint32 genericIndex = 0;
+			size_t genericLength = 0;
+			const usb_interface_info *interfaceInfo = NULL;
+			if (op == B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR) {
+				interfaceInfo = usb_raw_get_interface(device,
+					command->generic.config_index,
+					command->generic.interface_index,
+					B_USB_RAW_ACTIVE_ALTERNATE,
+					&command->generic.status);
+				genericIndex = command->generic.generic_index;
+				genericLength = command->generic.length;
+			} else {
+				interfaceInfo = usb_raw_get_interface(device,
+					command->generic_etc.config_index,
+					command->generic_etc.interface_index,
+					command->generic_etc.alternate_index,
+					&command->generic_etc.status);
+				genericIndex = command->generic_etc.generic_index;
+				genericLength = command->generic_etc.length;
+			}
+
+			if (!interfaceInfo)
+				return B_OK;
+
+			if (genericIndex >= interfaceInfo->generic_count) {
+				command->endpoint.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
 				return B_OK;
 			}
 
-			if (command->generic.interface_index >= configurationInfo->interface_count) {
-				command->generic.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
+			usb_descriptor *descriptor = interfaceInfo->generic[genericIndex];
+			if (!descriptor)
 				return B_OK;
-			}
-
-			const usb_interface_info *interfaceInfo =
-				configurationInfo->interface[command->generic.interface_index].active;
-			if (!interfaceInfo) {
-				command->generic.status = B_USB_RAW_STATUS_ABORTED;
-				return B_OK;
-			}
-
-			if (command->generic.generic_index >= interfaceInfo->generic_count) {
-				// ToDo: add B_USB_RAW_STATUS_INVALID_GENERIC
-				command->generic.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
-				return B_OK;
-			}
-
-			usb_descriptor *descriptor = interfaceInfo->generic[command->generic.generic_index];
-			if (!descriptor) {
-				command->generic.status = B_USB_RAW_STATUS_ABORTED;
-				return B_OK;
-			}
-
-			if (descriptor->generic.length > command->generic.length) {
-				command->generic.status = B_USB_RAW_STATUS_NO_MEMORY;
-				return B_OK;
-			}
 
 			memcpy(command->generic.descriptor, descriptor,
-				descriptor->generic.length);
-			command->generic.status = B_USB_RAW_STATUS_SUCCESS;
+				min_c(genericLength, descriptor->generic.length));
+
+			if (descriptor->generic.length > genericLength)
+				command->generic.status = B_USB_RAW_STATUS_NO_MEMORY;
+			else
+				command->generic.status = B_USB_RAW_STATUS_SUCCESS;
 			return B_OK;
 		}
 
@@ -485,12 +521,10 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case B_USB_RAW_COMMAND_SET_CONFIGURATION: {
 			const usb_configuration_info *configurationInfo =
-				gUSBModule->get_nth_configuration(device->device,
-				command->config.config_index);
-			if (!configurationInfo) {
-				command->config.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
+				usb_raw_get_configuration(device, command->config.config_index,
+					&command->config.status);
+			if (configurationInfo == NULL)
 				return B_OK;
-			}
 
 			if (gUSBModule->set_configuration(device->device,
 				configurationInfo) < B_OK) {
@@ -504,27 +538,27 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case B_USB_RAW_COMMAND_SET_ALT_INTERFACE: {
 			const usb_configuration_info *configurationInfo =
-				gUSBModule->get_nth_configuration(device->device,
-				command->alternate.config_index);
-			if (!configurationInfo) {
-				command->alternate.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
+				usb_raw_get_configuration(device,
+					command->alternate.config_index,
+					&command->alternate.status);
+			if (configurationInfo == NULL)
 				return B_OK;
-			}
 
-			if (command->alternate.interface_index >= configurationInfo->interface_count) {
+			if (command->alternate.interface_index
+				>= configurationInfo->interface_count) {
 				command->alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
 				return B_OK;
 			}
 
 			const usb_interface_list *interfaceList =
 				&configurationInfo->interface[command->alternate.interface_index];
-			if (command->alternate.alternate_index >= interfaceList->alt_count) {
+			if (command->alternate.alternate_info >= interfaceList->alt_count) {
 				command->alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
 				return B_OK;
 			}
 
 			if (gUSBModule->set_alt_interface(device->device,
-				&interfaceList->alt[command->alternate.alternate_index]) < B_OK) {
+				&interfaceList->alt[command->alternate.alternate_info]) < B_OK) {
 				command->alternate.status = B_USB_RAW_STATUS_FAILED;
 				return B_OK;
 			}

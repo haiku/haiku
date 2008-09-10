@@ -15,11 +15,15 @@
 #include <unistd.h>
 
 
-BUSBInterface::BUSBInterface(BUSBConfiguration *config, uint32 index, int rawFD)
+BUSBInterface::BUSBInterface(BUSBConfiguration *config, uint32 index,
+	uint32 alternate, int rawFD)
 	:	fConfiguration(config),
 		fIndex(index),
+		fAlternate(alternate),
 		fRawFD(rawFD),
 		fEndpoints(NULL),
+		fAlternateCount(0),
+		fAlternates(NULL),
 		fInterfaceString(NULL)
 {
 	_UpdateDescriptorAndEndpoints();
@@ -29,9 +33,18 @@ BUSBInterface::BUSBInterface(BUSBConfiguration *config, uint32 index, int rawFD)
 BUSBInterface::~BUSBInterface()
 {
 	delete[] fInterfaceString;
-	for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
-		delete fEndpoints[i];
-	delete[] fEndpoints;
+
+	if (fEndpoints != NULL) {
+		for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
+			delete fEndpoints[i];
+		delete[] fEndpoints;
+	}
+
+	if (fAlternates != NULL) {
+		for (uint32 i = 0; i < fAlternateCount; i++)
+			delete fAlternates[i];
+		delete[] fAlternates;
+	}
 }
 
 
@@ -39,6 +52,15 @@ uint32
 BUSBInterface::Index() const
 {
 	return fIndex;
+}
+
+
+uint32
+BUSBInterface::AlternateIndex() const
+{
+	if (fAlternate == B_USB_RAW_ACTIVE_ALTERNATE)
+		return ActiveAlternateIndex();
+	return fAlternate;
 }
 
 
@@ -87,10 +109,8 @@ BUSBInterface::InterfaceString() const
 		return fInterfaceString;
 
 	fInterfaceString = Device()->DecodeStringDescriptor(fDescriptor.interface);
-	if (!fInterfaceString) {
-		fInterfaceString = new char[1];
-		fInterfaceString[0] = 0;
-	}
+	if (fInterfaceString == NULL)
+		return "";
 
 	return fInterfaceString;
 }
@@ -111,11 +131,12 @@ BUSBInterface::OtherDescriptorAt(uint32 index, usb_descriptor *descriptor,
 		return B_BAD_VALUE;
 
 	usb_raw_command command;
-	command.generic.descriptor = descriptor;
-	command.generic.config_index = fConfiguration->Index();
-	command.generic.interface_index = fIndex;
-	command.generic.length = length;
-	command.generic.generic_index = index;
+	command.generic_etc.descriptor = descriptor;
+	command.generic_etc.config_index = fConfiguration->Index();
+	command.generic_etc.interface_index = fIndex;
+	command.generic_etc.alternate_index = fAlternate;
+	command.generic_etc.generic_index = index;
+	command.generic_etc.length = length;
 	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR, &command,
 		sizeof(command)) || command.generic.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
@@ -134,7 +155,7 @@ BUSBInterface::CountEndpoints() const
 const BUSBEndpoint *
 BUSBInterface::EndpointAt(uint32 index) const
 {
-	if (index >= fDescriptor.num_endpoints)
+	if (index >= fDescriptor.num_endpoints && fEndpoints != NULL)
 		return NULL;
 
 	return fEndpoints[index];
@@ -144,39 +165,56 @@ BUSBInterface::EndpointAt(uint32 index) const
 uint32
 BUSBInterface::CountAlternates() const
 {
-	uint32 alternateCount;
 	usb_raw_command command;
-	command.alternate.alternate_count = &alternateCount;
 	command.alternate.config_index = fConfiguration->Index();
 	command.alternate.interface_index = fIndex;
 	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_ALT_INTERFACE_COUNT, &command,
 		sizeof(command)) || command.alternate.status != B_USB_RAW_STATUS_SUCCESS)
 		return 1;
 
-	return alternateCount;
+	return command.alternate.alternate_info;
 }
 
 
-usb_interface_descriptor *
-BUSBInterface::AlternateAt(uint32 alternateIndex)
+const BUSBInterface *
+BUSBInterface::AlternateAt(uint32 alternateIndex) const
 {
-	usb_interface_descriptor *descriptor
-		= new(std::nothrow) usb_interface_descriptor;
-	if (descriptor == NULL)
-		return NULL;
+	if (fAlternateCount > 0 && fAlternates != NULL) {
+		if (alternateIndex >= fAlternateCount)
+			return NULL;
 
-	usb_raw_command command;
-	command.alternate.descriptor = descriptor;
-	command.alternate.config_index = fConfiguration->Index();
-	command.alternate.interface_index = fIndex;
-	command.alternate.alternate_index = alternateIndex;
-	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_ALT_INTERFACE_DESCRIPTOR, &command,
-		sizeof(command)) || command.alternate.status != B_USB_RAW_STATUS_SUCCESS) {
-		delete descriptor;
-		return NULL;
+		return fAlternates[alternateIndex];
 	}
 
-	return descriptor;
+	if (fAlternateCount == 0)
+		fAlternateCount = CountAlternates();
+	if (alternateIndex >= fAlternateCount)
+		return NULL;
+
+	fAlternates = new(std::nothrow) BUSBInterface *[fAlternateCount];
+	if (fAlternates == NULL)
+		return NULL;
+
+	for (uint32 i = 0; i < fAlternateCount; i++) {
+		fAlternates[i] = new(std::nothrow) BUSBInterface(fConfiguration, fIndex,
+			i, fRawFD);
+	}
+
+	return fAlternates[alternateIndex];
+}
+
+
+uint32
+BUSBInterface::ActiveAlternateIndex() const
+{
+	usb_raw_command command;
+	command.alternate.config_index = fConfiguration->Index();
+	command.alternate.interface_index = fIndex;
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_ACTIVE_ALT_INTERFACE_INDEX, &command,
+		sizeof(command)) || command.alternate.status != B_USB_RAW_STATUS_SUCCESS)
+		return 0;
+
+	return command.alternate.alternate_info;
 }
 
 
@@ -184,9 +222,9 @@ status_t
 BUSBInterface::SetAlternate(uint32 alternateIndex)
 {
 	usb_raw_command command;
+	command.alternate.alternate_info = alternateIndex;
 	command.alternate.config_index = fConfiguration->Index();
 	command.alternate.interface_index = fIndex;
-	command.alternate.alternate_index = alternateIndex;
 	if (ioctl(fRawFD, B_USB_RAW_COMMAND_SET_ALT_INTERFACE, &command,
 		sizeof(command)) || command.alternate.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
@@ -200,21 +238,25 @@ void
 BUSBInterface::_UpdateDescriptorAndEndpoints()
 {
 	usb_raw_command command;
-	command.interface.descriptor = &fDescriptor;
-	command.interface.config_index = fConfiguration->Index();
-	command.interface.interface_index = fIndex;
-	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR, &command,
+	command.interface_etc.descriptor = &fDescriptor;
+	command.interface_etc.config_index = fConfiguration->Index();
+	command.interface_etc.interface_index = fIndex;
+	command.interface_etc.alternate_index = fAlternate;
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR_ETC, &command,
 		sizeof(command)) || command.interface.status != B_USB_RAW_STATUS_SUCCESS)
 		memset(&fDescriptor, 0, sizeof(fDescriptor));
 
-	if (fEndpoints) {
+	if (fEndpoints != NULL) {
 		// Delete old endpoints
 		for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
 			delete fEndpoints[i];
 		delete fEndpoints;
 	}
 
-	fEndpoints = new BUSBEndpoint *[fDescriptor.num_endpoints];
+	fEndpoints = new(std::nothrow) BUSBEndpoint *[fDescriptor.num_endpoints];
+	if (fEndpoints == NULL)
+		return;
+
 	for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
-		fEndpoints[i] = new BUSBEndpoint(this, i, fRawFD);
+		fEndpoints[i] = new(std::nothrow) BUSBEndpoint(this, i, fRawFD);
 }

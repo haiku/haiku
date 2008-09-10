@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku Inc. All rights reserved.
+ * Copyright 2007-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,9 +8,10 @@
 
 #include <USBKit.h>
 #include <usb_raw.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <malloc.h>
+#include <new>
 
 
 BUSBDevice::BUSBDevice(const char *path)
@@ -69,9 +70,15 @@ BUSBDevice::SetTo(const char *path)
 		return B_ERROR;
 	}
 
-	fConfigurations = new BUSBConfiguration *[fDescriptor.num_configurations];
-	for (uint32 i = 0; i < fDescriptor.num_configurations; i++)
-		fConfigurations[i] = new BUSBConfiguration(this, i, fRawFD);
+	fConfigurations = new(std::nothrow) BUSBConfiguration *[
+		fDescriptor.num_configurations];
+	if (fConfigurations == NULL)
+		return B_NO_MEMORY;
+
+	for (uint32 i = 0; i < fDescriptor.num_configurations; i++) {
+		fConfigurations[i] = new(std::nothrow) BUSBConfiguration(this, i,
+			fRawFD);
+	}
 
 	return B_OK;
 }
@@ -92,10 +99,14 @@ BUSBDevice::Unset()
 	delete[] fSerialNumberString;
 	fManufacturerString = fProductString = fSerialNumberString = NULL;
 
-	for (int32 i = 0; i < fDescriptor.num_configurations; i++)
-		delete fConfigurations[i];
+	if (fConfigurations != NULL) {
+		for (int32 i = 0; i < fDescriptor.num_configurations; i++)
+			delete fConfigurations[i];
 
-	delete[] fConfigurations;
+		delete[] fConfigurations;
+		fConfigurations = NULL;
+	}
+
 	memset(&fDescriptor, 0, sizeof(fDescriptor));
 }
 
@@ -183,10 +194,8 @@ BUSBDevice::ManufacturerString() const
 		return fManufacturerString;
 
 	fManufacturerString = DecodeStringDescriptor(fDescriptor.manufacturer);
-	if (!fManufacturerString) {
-		fManufacturerString = new char[1];
-		fManufacturerString[0] = 0;
-	}
+	if (fManufacturerString == NULL)
+		return "";
 
 	return fManufacturerString;
 }
@@ -202,10 +211,8 @@ BUSBDevice::ProductString() const
 		return fProductString;
 
 	fProductString = DecodeStringDescriptor(fDescriptor.product);
-	if (!fProductString) {
-		fProductString = new char[1];
-		fProductString[0] = 0;
-	}
+	if (fProductString == NULL)
+		return "";
 
 	return fProductString;
 }
@@ -221,10 +228,8 @@ BUSBDevice::SerialNumberString() const
 		return fSerialNumberString;
 
 	fSerialNumberString = DecodeStringDescriptor(fDescriptor.serial_number);
-	if (!fSerialNumberString) {
-		fSerialNumberString = new char[1];
-		fSerialNumberString[0] = 0;
-	}
+	if (fSerialNumberString == NULL)
+		return "";
 
 	return fSerialNumberString;
 }
@@ -272,7 +277,10 @@ BUSBDevice::DecodeStringDescriptor(uint32 index) const
 
 	// pseudo convert unicode string
 	stringLength = (stringLength - 2) / 2;
-	char *result = new char[stringLength + 1];
+	char *result = new(std::nothrow) char[stringLength + 1];
+	if (result == NULL)
+		return NULL;
+
 	for (size_t i = 0; i < stringLength; i++)
 		result[i] = stringDescriptor->string[i * 2];
 	result[stringLength] = 0;
@@ -312,7 +320,7 @@ BUSBDevice::CountConfigurations() const
 const BUSBConfiguration *
 BUSBDevice::ConfigurationAt(uint32 index) const
 {
-	if (index >= fDescriptor.num_configurations)
+	if (index >= fDescriptor.num_configurations && fConfigurations != NULL)
 		return NULL;
 
 	return fConfigurations[index];
@@ -322,6 +330,9 @@ BUSBDevice::ConfigurationAt(uint32 index) const
 const BUSBConfiguration *
 BUSBDevice::ActiveConfiguration() const
 {
+	if (fConfigurations == NULL)
+		return NULL;
+
 	return fConfigurations[fActiveConfiguration];
 }
 

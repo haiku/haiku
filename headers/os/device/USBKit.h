@@ -52,7 +52,7 @@ virtual	void						_ReservedUSBRoster3();
 virtual	void						_ReservedUSBRoster4();
 virtual	void						_ReservedUSBRoster5();
 
-		void						*fLooper;
+		void *						fLooper;
 		uint32						fReserved[10];
 };
 
@@ -77,7 +77,7 @@ virtual	status_t					InitCheck();
 		void						Unset();
 
 		// Returns the location on the bus represented as hub/device sequence
-		const char					*Location() const;
+		const char *				Location() const;
 		bool						IsHub() const;
 
 		// These are direct accessors to descriptor fields
@@ -94,11 +94,12 @@ virtual	status_t					InitCheck();
 		// descriptor data. The strings are decoded to normal 0 terminated
 		// c strings and are cached and owned by the object.
 		// If a string is not available an empty string is returned.
-		const char					*ManufacturerString() const;
-		const char					*ProductString() const;
-		const char					*SerialNumberString() const;
+		const char *				ManufacturerString() const;
+		const char *				ProductString() const;
+		const char *				SerialNumberString() const;
 
-		const usb_device_descriptor	*Descriptor() const;
+		const usb_device_descriptor *
+									Descriptor() const;
 
 		// GetStringDescriptor() can be used to retrieve the raw
 		// usb_string_descriptor with a given index. The strings contained
@@ -111,7 +112,7 @@ virtual	status_t					InitCheck();
 		// 0-terminated c string for a given string index. Note that this
 		// will allocate the string as "new char[];" and needs to be deleted
 		// like "delete[] string;" by the caller.
-		char						*DecodeStringDescriptor(uint32 index) const;
+		char *						DecodeStringDescriptor(uint32 index) const;
 
 		size_t						GetDescriptor(uint8 type, uint8 index,
 										uint16 languageID, void *data,
@@ -124,9 +125,9 @@ virtual	status_t					InitCheck();
 		// Use the returned object as an argument to SetConfiguration() to
 		// change the active configuration of a device.
 		uint32						CountConfigurations() const;
-		const BUSBConfiguration		*ConfigurationAt(uint32 index) const;
+		const BUSBConfiguration *	ConfigurationAt(uint32 index) const;
 
-		const BUSBConfiguration		*ActiveConfiguration() const;
+		const BUSBConfiguration *	ActiveConfiguration() const;
 		status_t					SetConfiguration(
 										const BUSBConfiguration *configuration);
 
@@ -143,16 +144,16 @@ virtual	void						_ReservedUSBDevice3();
 virtual	void						_ReservedUSBDevice4();
 virtual	void						_ReservedUSBDevice5();
 
-		char						*fPath;
+		char *						fPath;
 		int							fRawFD;
 
 		usb_device_descriptor		fDescriptor;
-		BUSBConfiguration			**fConfigurations;
+		BUSBConfiguration **		fConfigurations;
 		uint32						fActiveConfiguration;
 
-mutable	char						*fManufacturerString;
-mutable	char						*fProductString;
-mutable	char						*fSerialNumberString;
+mutable	char *						fManufacturerString;
+mutable	char *						fProductString;
+mutable	char *						fSerialNumberString;
 
 		uint32						fReserved[10];
 };
@@ -171,14 +172,14 @@ public:
 		// configuration is located at the index returned by Index() within
 		// that parent device.
 		uint32						Index() const;
-		const BUSBDevice			*Device() const;
+		const BUSBDevice *			Device() const;
 
 		// Gets a describing string of this configuration if available.
 		// Otherwise an empty string is returned.
-		const char					*ConfigurationString() const;
+		const char *				ConfigurationString() const;
 
-		const usb_configuration_descriptor
-									*Descriptor() const;
+		const usb_configuration_descriptor *
+									Descriptor() const;
 
 		// With CountInterfaces() and InterfaceAt() you can iterate through
 		// the child interfaces of this configuration. It is the only valid
@@ -186,7 +187,7 @@ public:
 		// Note that the interface objects retrieved using InterfaceAt() will
 		// be invalid and deleted as soon as this configuration gets deleted.
 		uint32						CountInterfaces() const;
-		const BUSBInterface			*InterfaceAt(uint32 index) const;
+		const BUSBInterface *		InterfaceAt(uint32 index) const;
 
 private:
 friend	class BUSBDevice;
@@ -194,14 +195,14 @@ friend	class BUSBDevice;
 										uint32 index, int rawFD);
 									~BUSBConfiguration();
 
-		BUSBDevice					*fDevice;
+		BUSBDevice *				fDevice;
 		uint32						fIndex;
 		int							fRawFD;
 
 		usb_configuration_descriptor fDescriptor;
-		BUSBInterface				**fInterfaces;
+		BUSBInterface **			fInterfaces;
 
-mutable	char						*fConfigurationString;
+mutable	char *						fConfigurationString;
 
 		uint32						fReserved[10];
 };
@@ -215,12 +216,14 @@ class BUSBInterface {
 public:
 		// Configuration() returns the parent configuration of this interface.
 		// This interface is located at the index returned by Index() in that
-		// parent configuration.
+		// parent configuration and represents the alternate interface returned
+		// by AlternateIndex().
 		// Device() is a convenience function to directly reach the parent
 		// device of this interface instead of going through the configuration.
 		uint32						Index() const;
-		const BUSBConfiguration		*Configuration() const;
-		const BUSBDevice			*Device() const;
+		uint32						AlternateIndex() const;
+		const BUSBConfiguration *	Configuration() const;
+		const BUSBDevice *			Device() const;
 
 		// These are accessors to descriptor fields. InterfaceString() tries
 		// to return a describing string of this interface. If no string is
@@ -228,10 +231,10 @@ public:
 		uint8						Class() const;
 		uint8						Subclass() const;
 		uint8						Protocol() const;
-		const char					*InterfaceString() const;
+		const char *				InterfaceString() const;
 
-		const usb_interface_descriptor
-									*Descriptor() const;
+		const usb_interface_descriptor *
+									Descriptor() const;
 
 		// Use OtherDescriptorAt() to get generic descriptors of an interface.
 		// These are usually vendor or device specific extensions.
@@ -244,7 +247,7 @@ public:
 		// valid way to get BUSBEndpoint object. Note that these objects will
 		// get invalid and deleted as soon as the parent interface is deleted.
 		uint32						CountEndpoints() const;
-		const BUSBEndpoint			*EndpointAt(uint32 index) const;
+		const BUSBEndpoint *		EndpointAt(uint32 index) const;
 
 		// Using CountAlternates() you can retrieve the number of alternate
 		// interfaces for this interface. Note that this interface itself
@@ -252,39 +255,47 @@ public:
 		// that you are currently using the sole interface present.
 		// AlternateAt() returns the interface descriptor of the alternate
 		// interface with the specified index. Using that you can peek at the
-		// information contained in the descriptor without having to switch
-		// to this alternate interface. Note that the alternate index set in
-		// the interface descriptor returned is not necessarily the same index
-		// you used to get the descriptor. Always use the zero based index you
-		// used to get the information with and not the values of the returned
-		// descriptor as the stack will handle that translation internally.
-		// The interface descriptor returned was allocated by new and is yours.
-		// You need to delete it when you're done with it.
+		// attributes of that alternate (including endpoints) without having to
+		// switch to this alternate interface.
+		// Note that you cannot use any endpoint you retrieve through an
+		// interface you get through AlternateAt(). Even if you switch to that
+		// alternate later on, you cannot use an interface returned by
+		// AlternateAt(). Instead switch to that alternate using the interface
+		// you got from the configuration and then use this switched interface
+		// to enumerate the endpoints.
+		// ActiveAlternateIndex() returns the index of the currently active
+		// alternate interface.
 		// With SetAlternate() you can switch this BUSBInterface object to the
 		// alternate interface at the specified index. Note that all endpoints
 		// retrieved through EndpointAt() will become invalid and will be
 		// deleted as soon as you set an alternate interface (even if the
 		// resulting interface is the same you were using before).
 		uint32						CountAlternates() const;
-		usb_interface_descriptor	*AlternateAt(uint32 alternateIndex);
+		uint32						ActiveAlternateIndex() const;
+		const BUSBInterface *		AlternateAt(uint32 alternateIndex) const;
 		status_t					SetAlternate(uint32 alternateIndex);
 
 private:
 friend	class BUSBConfiguration;
 									BUSBInterface(BUSBConfiguration *config,
-										uint32 index, int rawFD);
+										uint32 index, uint32 alternate,
+										int rawFD);
 									~BUSBInterface();
 
 		void						_UpdateDescriptorAndEndpoints();
 
-		BUSBConfiguration			*fConfiguration;
+		BUSBConfiguration *			fConfiguration;
 		uint32						fIndex;
+		uint32						fAlternate;
 		int							fRawFD;
 
 		usb_interface_descriptor	fDescriptor;
-		BUSBEndpoint				**fEndpoints;
+		BUSBEndpoint **				fEndpoints;
 
-mutable	char						*fInterfaceString;
+mutable	uint32						fAlternateCount;
+mutable	BUSBInterface **			fAlternates;
+
+mutable	char *						fInterfaceString;
 
 		uint32						fReserved[10];
 };
@@ -302,9 +313,9 @@ public:
 		// reach the parent configuration or device of this endpoint instead
 		// of going through the parent objects.
 		uint32						Index() const;
-		const BUSBInterface			*Interface() const;
-		const BUSBConfiguration		*Configuration() const;
-		const BUSBDevice			*Device() const;
+		const BUSBInterface *		Interface() const;
+		const BUSBConfiguration *	Configuration() const;
+		const BUSBDevice *			Device() const;
 
 		// These methods can be used to check for endpoint characteristics.
 		bool						IsBulk() const;
@@ -318,8 +329,8 @@ public:
 		uint16						MaxPacketSize() const;
 		uint8						Interval() const;
 
-		const usb_endpoint_descriptor
-									*Descriptor() const;
+		const usb_endpoint_descriptor *
+									Descriptor() const;
 
 		// These methods initiate transfers to or from the endpoint. All
 		// transfers are synchronous and the actually transfered amount of
@@ -343,13 +354,14 @@ public:
 		// send the corresponding requests.
 		bool						IsStalled() const;
 		status_t					ClearStall() const;
+
 private:
 friend	class BUSBInterface;
 									BUSBEndpoint(BUSBInterface *interface,
 										uint32 index, int rawFD);
 									~BUSBEndpoint();
 
-		BUSBInterface				*fInterface;
+		BUSBInterface *				fInterface;
 		uint32						fIndex;
 		int							fRawFD;
 

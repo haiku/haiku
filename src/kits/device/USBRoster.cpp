@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku Inc. All rights reserved.
+ * Copyright 2007-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,6 +16,7 @@
 #include <Path.h>
 #include <stdio.h>
 #include <string.h>
+#include <new>
 
 
 class WatchedEntry {
@@ -28,15 +29,15 @@ public:
 		bool				EntryRemoved(ino_t node);
 
 private:
-		BUSBRoster			*fRoster;
-		BMessenger			*fMessenger;
+		BUSBRoster *		fRoster;
+		BMessenger *		fMessenger;
 
 		node_ref			fNode;
 		bool				fIsDirectory;
-		BUSBDevice			*fDevice;
+		BUSBDevice *		fDevice;
 
-		WatchedEntry		*fEntries;
-		WatchedEntry		*fLink;
+		WatchedEntry *		fEntries;
+		WatchedEntry *		fLink;
 };
 
 
@@ -49,9 +50,9 @@ public:
 virtual	void				MessageReceived(BMessage *message);
 
 private:
-		BUSBRoster			*fRoster;
-		WatchedEntry		*fRoot;
-		BMessenger			*fMessenger;
+		BUSBRoster *		fRoster;
+		WatchedEntry *		fRoot;
+		BMessenger *		fMessenger;
 };
 
 
@@ -75,7 +76,11 @@ WatchedEntry::WatchedEntry(BUSBRoster *roster, BMessenger *messenger,
 			if (entry.GetRef(ref) < B_OK)
 				continue;
 
-			WatchedEntry *child = new WatchedEntry(fRoster, fMessenger, ref);
+			WatchedEntry *child = new(std::nothrow) WatchedEntry(fRoster,
+				fMessenger, ref);
+			if (child == NULL)
+				continue;
+
 			child->fLink = fEntries;
 			fEntries = child;
 		}
@@ -88,10 +93,12 @@ WatchedEntry::WatchedEntry(BUSBRoster *roster, BMessenger *messenger,
 
 		BPath path;
 		entry.GetPath(&path);
-		fDevice = new BUSBDevice(path.Path());
-		if (fRoster->DeviceAdded(fDevice) != B_OK) {
-			delete fDevice;
-			fDevice = NULL;
+		fDevice = new(std::nothrow) BUSBDevice(path.Path());
+		if (fDevice != NULL) {
+			if (fRoster->DeviceAdded(fDevice) != B_OK) {
+				delete fDevice;
+				fDevice = NULL;
+			}
 		}
 	}
 }
@@ -132,7 +139,11 @@ WatchedEntry::EntryCreated(entry_ref *ref)
 		return false;
 	}
 
-	WatchedEntry *child = new WatchedEntry(fRoster, fMessenger, ref);
+	WatchedEntry *child = new(std::nothrow) WatchedEntry(fRoster, fMessenger,
+		ref);
+	if (child == NULL)
+		return false;
+
 	child->fLink = fEntries;
 	fEntries = child;
 	return true;
@@ -181,12 +192,14 @@ RosterLooper::RosterLooper(BUSBRoster *roster)
 	}
 
 	Run();
-	fMessenger = new BMessenger(this);
+	fMessenger = new(std::nothrow) BMessenger(this);
+	if (fMessenger == NULL)
+		return;
 
 	if (Lock()) {
 		entry_ref ref;
 		entry.GetRef(&ref);
-		fRoot = new WatchedEntry(fRoster, fMessenger, &ref);
+		fRoot = new(std::nothrow) WatchedEntry(fRoster, fMessenger, &ref);
 		Unlock();
 	}
 }
@@ -253,7 +266,7 @@ BUSBRoster::Start()
 	if (fLooper)
 		return;
 
-	fLooper = new RosterLooper(this);
+	fLooper = new(std::nothrow) RosterLooper(this);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku Inc. All rights reserved.
+ * Copyright 2007-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,11 +18,12 @@ BUSBEndpoint::BUSBEndpoint(BUSBInterface *interface, uint32 index, int rawFD)
 		fRawFD(rawFD)
 {
 	usb_raw_command command;
-	command.endpoint.descriptor = &fDescriptor;
-	command.endpoint.config_index = fInterface->Configuration()->Index();
-	command.endpoint.interface_index = fInterface->Index();
-	command.endpoint.endpoint_index = fIndex;
-	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR, &command,
+	command.endpoint_etc.descriptor = &fDescriptor;
+	command.endpoint_etc.config_index = fInterface->Configuration()->Index();
+	command.endpoint_etc.interface_index = fInterface->Index();
+	command.endpoint_etc.alternate_index = fInterface->AlternateIndex();
+	command.endpoint_etc.endpoint_index = fIndex;
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR_ETC, &command,
 		sizeof(command)) || command.config.status != B_USB_RAW_STATUS_SUCCESS)
 		memset(&fDescriptor, 0, sizeof(fDescriptor));
 }
@@ -64,42 +65,48 @@ BUSBEndpoint::Device() const
 bool
 BUSBEndpoint::IsBulk() const
 {
-	return (fDescriptor.attributes & USB_ENDPOINT_ATTR_MASK) == USB_ENDPOINT_ATTR_BULK;
+	return (fDescriptor.attributes & USB_ENDPOINT_ATTR_MASK)
+		== USB_ENDPOINT_ATTR_BULK;
 }
 
 
 bool
 BUSBEndpoint::IsInterrupt() const
 {
-	return (fDescriptor.attributes & USB_ENDPOINT_ATTR_MASK) == USB_ENDPOINT_ATTR_INTERRUPT;
+	return (fDescriptor.attributes & USB_ENDPOINT_ATTR_MASK)
+		== USB_ENDPOINT_ATTR_INTERRUPT;
 }
 
 
 bool
 BUSBEndpoint::IsIsochronous() const
 {
-	return (fDescriptor.attributes & USB_ENDPOINT_ATTR_MASK) == USB_ENDPOINT_ATTR_ISOCHRONOUS;
+	return (fDescriptor.attributes & USB_ENDPOINT_ATTR_MASK)
+		== USB_ENDPOINT_ATTR_ISOCHRONOUS;
 }
 
 
 bool
 BUSBEndpoint::IsControl() const
 {
-	return (fDescriptor.attributes & USB_ENDPOINT_ATTR_MASK) == USB_ENDPOINT_ATTR_CONTROL;
+	return (fDescriptor.attributes & USB_ENDPOINT_ATTR_MASK)
+		== USB_ENDPOINT_ATTR_CONTROL;
 }
 
 
 bool
 BUSBEndpoint::IsInput() const
 {
-	return (fDescriptor.endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) == USB_ENDPOINT_ADDR_DIR_IN;
+	return (fDescriptor.endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
+		== USB_ENDPOINT_ADDR_DIR_IN;
 }
 
 
 bool
 BUSBEndpoint::IsOutput() const
 {
-	return (fDescriptor.endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) == USB_ENDPOINT_ADDR_DIR_OUT;
+	return (fDescriptor.endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
+		== USB_ENDPOINT_ADDR_DIR_OUT;
 }
 
 
