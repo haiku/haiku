@@ -27,12 +27,15 @@
 
 
 class BScrollBar : public BView {
-	public:
-							BScrollBar(BRect frame, const char *name, BView *target,
+public:
+							BScrollBar(BRect frame, const char* name,
+								BView* target, float min, float max,
+								orientation direction);
+							BScrollBar(const char* name, BView* target,
 								float min, float max, orientation direction);
-							BScrollBar(BMessage *data);
+							BScrollBar(BMessage* data);
 		virtual				~BScrollBar();
-		static	BArchivable	*Instantiate(BMessage *data);
+		static	BArchivable	*Instantiate(BMessage* data);
 		virtual	status_t	Archive(BMessage *data, bool deep = true) const;
 
 		virtual	void		AttachedToWindow();

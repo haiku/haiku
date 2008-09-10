@@ -207,6 +207,31 @@ BScrollBar::BScrollBar(BRect frame, const char* name, BView *target,
 }
 
 
+BScrollBar::BScrollBar(const char* name, BView *target,
+		float min, float max, orientation direction)
+	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	fMin(min),
+	fMax(max),
+	fSmallStep(1),
+	fLargeStep(10),
+	fValue(0),
+	fProportion(0.0),
+	fTarget(NULL),
+	fOrientation(direction),
+	fTargetName(NULL)
+{
+	SetViewColor(B_TRANSPARENT_COLOR);
+
+	fPrivateData = new BScrollBar::Private(this);
+
+	SetTarget(target);
+	SetEventMask(B_NO_POINTER_HISTORY);
+
+	_UpdateThumbFrame();
+	_UpdateArrowButtons();
+}
+
+
 BScrollBar::BScrollBar(BMessage* data)
 	: BView(data),
 	fTarget(NULL),
@@ -1108,9 +1133,9 @@ BScrollBar::PreferredSize()
 {
 	BSize preferredSize = _MinSize();
 	if (fOrientation == B_HORIZONTAL)	
-		preferredSize.width = 2 * preferredSize.width;
+		preferredSize.width *= 2;
 	else
-		preferredSize.height = 2 * preferredSize.height;
+		preferredSize.height *= 2;
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), preferredSize);
 }
 
