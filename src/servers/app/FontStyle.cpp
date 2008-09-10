@@ -140,6 +140,8 @@ FontStyle::Flags() const
 
 	if (IsFixedWidth())
 		flags |= B_IS_FIXED;
+	if (IsFullAndHalfFixed())
+		flags |= B_PRIVATE_FONT_IS_FULL_AND_HALF_FIXED;
 	if (TunedCount() > 0)
 		flags |= B_HAS_TUNED_FONT;
 	if (HasKerning())

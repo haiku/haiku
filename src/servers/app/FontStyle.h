@@ -74,6 +74,14 @@ class FontStyle : public ReferenceCounting, public Hashable/*, public BLocker*/ 
 */
 		bool			IsFixedWidth() const
 							{ return fFreeTypeFace->face_flags & FT_FACE_FLAG_FIXED_WIDTH; }
+
+/*	\fn bool FontStyle::IsFullAndHalfFixed()
+	\brief Determines whether the font has 2 different, fixed, widths.
+	\return false (for now)
+*/
+		bool			IsFullAndHalfFixed() const
+							{ return false; };
+
 /*!
 	\fn bool FontStyle::IsScalable(void)
 	\brief Determines whether the font can be scaled to any size
