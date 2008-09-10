@@ -966,6 +966,7 @@ pm_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 
 // TODO: The partition is not supposed to be locked here!
 	PartitionMapWriter writer(fd, 0, partition->size);
+		// TODO: disk size?
 	status_t error = writer.WriteMBR(map, false);
 	if (error != B_OK) {
 		// putting into previous state
@@ -1136,6 +1137,7 @@ pm_move_child(int fd, partition_id partitionID, partition_id childID,
 	primary->SetOffset(validatedOffset);
 
 	PartitionMapWriter writer(fd, 0, partition->size);
+		// TODO: disk size?
 	error = writer.WriteMBR(map, false);
 	if (error != B_OK)
 		// something went wrong - this is fatal (partition has been moved)
@@ -1193,6 +1195,7 @@ pm_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 
 // TODO: The partition is not supposed to be locked at this point!
 	PartitionMapWriter writer(fd, 0, partition->size);
+		// TODO: disk size?
 	status_t error = writer.WriteMBR(map, false);
 	if (error != B_OK) {
 		// something went wrong - putting into previous state
@@ -1229,6 +1232,7 @@ pm_initialize(int fd, partition_id partitionID, const char *name,
 
 	// write the sector to disk
 	PartitionMapWriter writer(fd, 0, partitionSize);
+		// TODO: disk size or 2 * SECTOR_SIZE?
 	status_t error = writer.WriteMBR(&map, true);
 	if (error != B_OK)
 		return error;
@@ -1306,6 +1310,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	
 	// write changes to disk
 	PartitionMapWriter writer(fd, 0, partition->size);
+		// TODO: disk size or 2 * SECTOR_SIZE?
 // TODO: The partition is not supposed to be locked at this point!
 	status_t error = writer.WriteMBR(map, false);
 	if (error != B_OK) {
@@ -1367,6 +1372,7 @@ pm_delete_child(int fd, partition_id partitionID, partition_id childID,
 
 	// write changes to disk
 	PartitionMapWriter writer(fd, 0, partition->size);
+		// TODO: disk size or 2 * SECTOR_SIZE?
 // TODO: The partition is not supposed to be locked at this point!
 	status_t error = writer.WriteMBR(map, false);
 	if (error != B_OK)
@@ -1835,9 +1841,9 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID,
 	status_t error = B_OK;
 	// move partition with its header (PTS table)
 	off_t pts_offset = logical->Offset() - logical->PTSOffset();
-	error = move_partition(fd, child->offset - pts_offset, validatedOffset - pts_offset,
-						   child->size + pts_offset, buffer,
-						   allocated * SECTOR_SIZE, job);
+	error = move_partition(fd, child->offset - pts_offset,
+		validatedOffset - pts_offset, child->size + pts_offset, buffer,
+		allocated * SECTOR_SIZE, job);
 	delete[] buffer;
 	if (error != B_OK)
 		return error;
@@ -1849,6 +1855,8 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID,
 	logical->SetPTSOffset(logical->PTSOffset() + diffOffset);
 
 	PartitionMapWriter writer(fd, partition->offset, partition->size);
+		// TODO: If partition->offset is > prev->offset, then writing
+		// the previous logical partition table will fail!
 // TODO: The partition is not supposed to be locked here!
 	error = writer.WriteLogical(NULL, logical);
 	if (error != B_OK)
@@ -2049,6 +2057,7 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 
 	// write changes to disk
 	PartitionMapWriter writer(fd, partition->offset, partition->size);
+		// TODO: wrong offset range, writing prev will fail
 // TODO: The partition is not supposed to be locked here!
 	status_t error = writer.WriteLogical(&pts, logical);
 	if (error != B_OK) {
@@ -2126,6 +2135,8 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 
 	// write changes to disk
 	PartitionMapWriter writer(fd, partition->offset, partition->size);
+		// TODO: Check offset range! Writing "prev/next_logical"?
+		// Should be parent->offset and parent->size?
 // TODO: The partition is not supposed to be locked here!
 	status_t error = prev_logical ? writer.WriteLogical(NULL, prev_logical)
 		: writer.WriteExtendedHead(NULL, next_logical);
