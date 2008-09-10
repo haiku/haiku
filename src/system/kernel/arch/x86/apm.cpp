@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -256,7 +256,12 @@ apm_shutdown(void)
 	if (!sAPMEnabled)
 		return B_NOT_SUPPORTED;
 
-	return apm_set_state(APM_ALL_DEVICES, APM_POWER_STATE_OFF);
+	cpu_status state = disable_interrupts();
+
+	status_t status = apm_set_state(APM_ALL_DEVICES, APM_POWER_STATE_OFF);
+
+	restore_interrupts(state);
+	return status;
 }
 
 

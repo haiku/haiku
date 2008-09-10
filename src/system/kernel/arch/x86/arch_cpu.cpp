@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <ACPI.h>
+
 #include <boot_device.h>
 #include <commpage.h>
 #include <smp.h>
@@ -63,7 +65,7 @@ struct set_mtrr_parameter {
 };
 
 
-extern void reboot(void);
+extern "C" void reboot(void);
 	// from arch_x86.S
 
 void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
@@ -81,17 +83,32 @@ static uint32 sDoubleFaultStack[10240];
 static x86_cpu_module_info *sCpuModule;
 
 
-extern void	memcpy_generic(void* dest, const void* source, size_t count);
-extern int	memcpy_generic_end;
+extern "C" void memcpy_generic(void* dest, const void* source, size_t count);
+extern int memcpy_generic_end;
 
 x86_optimized_functions gOptimizedFunctions = {
-	.memcpy		= memcpy_generic,
-	.memcpy_end	= &memcpy_generic_end
+	memcpy_generic,
+	&memcpy_generic_end
 };
 
 
-/**	Disable CPU caches, and invalidate them. */
+static status_t
+acpi_shutdown(void)
+{
+	acpi_module_info* acpi;
+	if (get_module(B_ACPI_MODULE_NAME, (module_info**)&acpi) != B_OK)
+		return B_NOT_SUPPORTED;
 
+	status_t status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
+	if (status == B_OK)
+		status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
+
+	put_module(B_ACPI_MODULE_NAME);
+	return status;
+}
+
+
+/*!	Disable CPU caches, and invalidate them. */
 static void
 disable_caches()
 {
@@ -101,8 +118,7 @@ disable_caches()
 }
 
 
-/**	Invalidate CPU caches, and enable them. */
-
+/*!	Invalidate CPU caches, and enable them. */
 static void
 enable_caches()
 {
@@ -341,7 +357,6 @@ detect_cpu(int currentCPU)
 	cpu_ent *cpu = get_cpu_struct();
 	char vendorString[17];
 	cpuid_info cpuid;
-	int i;
 
 	// clear out the cpu info data
 	cpu->arch.vendor = VENDOR_UNKNOWN;
@@ -374,14 +389,16 @@ detect_cpu(int currentCPU)
 
 	// figure out what vendor we have here
 
-	for (i = 0; i < VENDOR_NUM; i++) {
-		if (vendor_info[i].ident_string[0] && !strcmp(vendorString, vendor_info[i].ident_string[0])) {
-			cpu->arch.vendor = i;
+	for (int32 i = 0; i < VENDOR_NUM; i++) {
+		if (vendor_info[i].ident_string[0]
+			&& !strcmp(vendorString, vendor_info[i].ident_string[0])) {
+			cpu->arch.vendor = (x86_vendors)i;
 			cpu->arch.vendor_name = vendor_info[i].vendor;
 			break;
 		}
-		if (vendor_info[i].ident_string[1] && !strcmp(vendorString, vendor_info[i].ident_string[1])) {
-			cpu->arch.vendor = i;
+		if (vendor_info[i].ident_string[1]
+			&& !strcmp(vendorString, vendor_info[i].ident_string[1])) {
+			cpu->arch.vendor = (x86_vendors)i;
 			cpu->arch.vendor_name = vendor_info[i].vendor;
 			break;
 		}
@@ -404,11 +421,11 @@ detect_cpu(int currentCPU)
 		memcpy(cpu->arch.model_name + 32, cpuid.as_chars, sizeof(cpuid.as_chars));
 
 		// some cpus return a right-justified string
-		for (i = 0; cpu->arch.model_name[i] == ' '; i++)
-			;
+		int32 i = 0;
+		while (cpu->arch.model_name[i] == ' ')
+			i++;
 		if (i > 0) {
-			memmove(cpu->arch.model_name,
-				&cpu->arch.model_name[i],
+			memmove(cpu->arch.model_name, &cpu->arch.model_name[i],
 				strlen(&cpu->arch.model_name[i]) + 1);
 		}
 
@@ -693,14 +710,15 @@ error:
 status_t
 arch_cpu_shutdown(bool rebootSystem)
 {
-	cpu_status state = disable_interrupts();
-
 	if (!rebootSystem) {
-		status_t status = apm_shutdown();
+		status_t status = acpi_shutdown();
+		if (status != B_OK)
+			status = apm_shutdown();
 
-		restore_interrupts(state);
 		return status;
 	}
+
+	cpu_status state = disable_interrupts();
 
 	// try to reset the system using the keyboard controller
 	out8(0xfe, 0x64);

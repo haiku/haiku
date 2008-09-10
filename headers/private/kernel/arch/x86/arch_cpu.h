@@ -222,7 +222,7 @@ enum x86_vendors {
 typedef struct arch_cpu_info {
 	// saved cpu info
 	enum x86_vendors vendor;
-	enum x86_feature_type feature[FEATURE_NUM];
+	uint32 feature[FEATURE_NUM];
 	char model_name[49];
 	const char *vendor_name;
 	int type;

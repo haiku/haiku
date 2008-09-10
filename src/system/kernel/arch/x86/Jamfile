@@ -14,7 +14,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
 
 KernelMergeObject kernel_arch_x86.o :
 	arch_commpage.cpp
-	arch_cpu.c
+	arch_cpu.cpp
 	arch_debug.cpp
 	arch_debug_console.c
 	arch_elf.c
