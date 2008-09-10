@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/pci/if_rlreg.h,v 1.67 2007/07/24 01:24:03 yongari Exp $
+ * $FreeBSD: src/sys/pci/if_rlreg.h,v 1.67.2.2 2007/12/15 02:57:18 yongari Exp $
  */
 
 /*
@@ -156,6 +156,7 @@
 #define RL_HWREV_8100E		0x30800000
 #define RL_HWREV_8101E		0x34000000
 #define RL_HWREV_8168_SPIN2	0x38000000
+#define RL_HWREV_8168_SPIN3	0x38400000
 #define RL_HWREV_8139		0x60000000
 #define RL_HWREV_8139A		0x70000000
 #define RL_HWREV_8139AG		0x70800000
@@ -915,6 +916,11 @@ struct rl_softc {
  * Planex Communications, Inc. vendor ID
  */
 #define PLANEX_VENDORID				0x14ea
+
+/*
+ * Planex FNW-3603-TX device ID
+ */
+#define PLANEX_DEVICEID_FNW3603TX		0xab06
 
 /*
  * Planex FNW-3800-TX device ID

@@ -31,7 +31,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/pci/if_rl.c,v 1.170 2007/07/24 01:24:03 yongari Exp $");
+__FBSDID("$FreeBSD: src/sys/pci/if_rl.c,v 1.170.2.1 2007/12/02 08:38:31 remko Exp $");
 
 /*
  * RealTek 8129/8139 PCI NIC driver
@@ -166,6 +166,8 @@ static struct rl_type rl_devs[] = {
 		"Corega FEtherII CB-TXD" },
 	{ PEPPERCON_VENDORID, PEPPERCON_DEVICEID_ROLF, RL_8139,
 		"Peppercon AG ROL-F" },
+	{ PLANEX_VENDORID, PLANEX_DEVICEID_FNW3603TX, RL_8139,
+		"Planex FNW-3603-TX" },
 	{ PLANEX_VENDORID, PLANEX_DEVICEID_FNW3800TX, RL_8139,
 		"Planex FNW-3800-TX" },
 	{ CP_VENDORID, RT_DEVICEID_8139, RL_8139,
