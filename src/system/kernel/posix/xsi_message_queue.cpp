@@ -133,6 +133,7 @@ public:
 		fMessageQueue.msg_perm.gid = result->msg_perm.gid;
 		fMessageQueue.msg_perm.mode = (fMessageQueue.msg_perm.mode & ~0x01ff)
 			| (result->msg_perm.mode & 0x01ff);
+		fMessageQueue.msg_qbytes = result->msg_qbytes;
 		fMessageQueue.msg_ctime = (time_t)real_time_clock();
 	}
 
@@ -249,7 +250,8 @@ public:
 				thread_unblock_locked(entry->thread, 0);
 			}
 		} else {
-			while (queued_thread *entry = fWaitingToSend.RemoveHead()) {
+			// Wake up only one thread waiting to send
+			if (queued_thread *entry = fWaitingToSend.RemoveHead()) {
 				entry->queued = false;
 				fThreadsWaitingToSend--;
 				thread_unblock_locked(entry->thread, 0);
@@ -587,6 +589,11 @@ _user_xsi_msgctl(int messageQueueID, int command, struct msqid_ds *buffer)
 					"increase the maximum number of bytes allowed on queue\n"));
 				return EPERM;
 			}
+			if (msg.msg_qbytes == 0) {
+				TRACE_ERROR(("xsi_msgctl: can't set msg_qbytes to 0!\n"));
+				return EINVAL;
+			}
+
 			messageQueue->DoIpcSet(&msg);
 			break;
 		}
