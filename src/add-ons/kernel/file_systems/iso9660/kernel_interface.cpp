@@ -570,8 +570,8 @@ fs_open_dir(fs_volume *_vol, fs_vnode *_node, void **cookie)
 
 
 static status_t
-fs_read_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buffer,
-	size_t bufferSize, uint32 *num)
+fs_read_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
+	struct dirent *buffer, size_t bufferSize, uint32 *num)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
 	dircookie *dirCookie = (dircookie *)_cookie;

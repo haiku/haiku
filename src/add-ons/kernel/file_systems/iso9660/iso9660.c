@@ -315,45 +315,37 @@ ISOMount(const char *path, const int flags, nspace **newVol, bool allow_joliet)
 }
 
 
-/**	Reads in a single directory entry and fills in the values in the
- *	dirent struct. Uses the cookie to keep track of the current block
- *	and position within the block. Also uses the cookie to determine when
- *	it has reached the end of the directory file.
- *
- *	NOTE: If your file sytem seems to work ok from the command line, but
- *	the tracker doesn't seem to like it, check what you do here closely;
- *	in particular, if the d_ino in the stat struct isn't correct, the tracker
- *	will not display the entry.
- */
-
+/*!	Reads in a single directory entry and fills in the values in the
+	dirent struct. Uses the cookie to keep track of the current block
+	and position within the block. Also uses the cookie to determine when
+	it has reached the end of the directory file.
+*/
 int
-ISOReadDirEnt(nspace *ns, dircookie *cookie, struct dirent *dirent, size_t bufsize)
+ISOReadDirEnt(nspace *ns, dircookie *cookie, struct dirent *dirent,
+	size_t bufsize)
 {
-	off_t totalRead = cookie->pos + ((cookie->block - cookie->startBlock) *
-			ns->logicalBlkSize[FS_DATA_FORMAT]);
+	off_t totalRead = cookie->pos + ((cookie->block - cookie->startBlock)
+		* ns->logicalBlkSize[FS_DATA_FORMAT]);
 	off_t cacheBlock;
 	char *blockData;
 	int	result = B_NO_ERROR;
 	int bytesRead = 0;
-	bool block_out = false;
 
 	TRACE(("ISOReadDirEnt - ENTER\n"));	
 
 	// If we're at the end of the data in a block, move to the next block.	
-	while (1) {
-		blockData = (char *)block_cache_get_etc(ns->fBlockCache, cookie->block, 0,
-							ns->logicalBlkSize[FS_DATA_FORMAT]);
-		block_out = true;
+	while (true) {
+		blockData = (char *)block_cache_get_etc(ns->fBlockCache, cookie->block,
+			0, ns->logicalBlkSize[FS_DATA_FORMAT]);
 
 		if (blockData != NULL && *(blockData + cookie->pos) == 0) {
-			//NULL data, move to next block.
+			// NULL data, move to next block.
 			block_cache_put(ns->fBlockCache, cookie->block);
-			block_out = false;
+			blockData = NULL;
 			totalRead += ns->logicalBlkSize[FS_DATA_FORMAT] - cookie->pos;
 			cookie->pos = 0;
 			cookie->block++;
-		}
-		else
+		} else
 			break;
 
 		if (totalRead >= cookie->totalSize)
@@ -363,37 +355,39 @@ ISOReadDirEnt(nspace *ns, dircookie *cookie, struct dirent *dirent, size_t bufsi
 	cacheBlock = cookie->block;
 	if (blockData != NULL && totalRead < cookie->totalSize) {
 		vnode node;
-
-		if ((result = InitNode(&node, blockData + cookie->pos, &bytesRead, ns->joliet_level)) == 
-						B_NO_ERROR)
-		{
-			int nameBufSize = (bufsize - (2 * sizeof(dev_t) + 2* sizeof(ino_t) +
-					sizeof(unsigned short)));
+		result = InitNode(&node, blockData + cookie->pos, &bytesRead,
+			ns->joliet_level);
+		if (result == B_NO_ERROR) {
+			int nameBufSize = (bufsize - (2 * sizeof(dev_t) + 2* sizeof(ino_t)
+				+ sizeof(unsigned short)));
 
 			dirent->d_ino = (cookie->block << 30) + (cookie->pos & 0xFFFFFFFF);
-			dirent->d_reclen = node.fileIDLen;
+			dirent->d_reclen = sizeof(struct dirent) + node.fileIDLen + 1;
 
 			if (node.fileIDLen <= nameBufSize) {
 				// need to do some size checking here.
-				strncpy(dirent->d_name, node.fileIDString, node.fileIDLen +1);
-				TRACE(("ISOReadDirEnt  - success, name is %s\n", dirent->d_name));
+				strlcpy(dirent->d_name, node.fileIDString, node.fileIDLen + 1);
+				TRACE(("ISOReadDirEnt  - success, name is %s\n",
+					dirent->d_name));
 			} else {
-				TRACE(("ISOReadDirEnt - ERROR, name %s does not fit in buffer of size %d\n", node.fileIDString, nameBufSize));
+				TRACE(("ISOReadDirEnt - ERROR, name %s does not fit in buffer "
+					"of size %d\n", node.fileIDString, nameBufSize));
 				result = EINVAL;
 			}
 			cookie->pos += bytesRead;
 		}
-	} else  {
+	} else {
 		if (totalRead >= cookie->totalSize)
 			result = ENOENT;
 		else
 			result = ENOMEM;
 	}
 
-	if (block_out)
+	if (blockData != NULL)
 		block_cache_put(ns->fBlockCache, cacheBlock);
 
-	TRACE(("ISOReadDirEnt - EXIT, result is %s, vnid is %Lu\n", strerror(result), dirent->d_ino));
+	TRACE(("ISOReadDirEnt - EXIT, result is %s, vnid is %Lu\n",
+		strerror(result), dirent->d_ino));
 	return result;
 }
 
