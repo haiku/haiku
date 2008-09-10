@@ -531,10 +531,12 @@ void
 BShelf::MessageReceived(BMessage *msg)
 {
 	if (msg->what == kDeleteReplicant) {
-		BView *replicant = NULL;
-		if (msg->FindPointer("_target", (void **)&replicant) == B_OK && replicant != NULL)
-			DeleteReplicant(replicant);
-		
+		BHandler *replicant = NULL;
+		if (msg->FindPointer("_target", (void **)&replicant) == B_OK) {
+			BView *view = dynamic_cast<BView *>(replicant);
+			if (view != NULL)
+				DeleteReplicant(view);
+		}
 		return;
 	}
 
@@ -1152,10 +1154,12 @@ BShelf::_DeleteReplicant(replicant_data* item)
 		delete item->dragger;
 	}
 
-	if (loadedImage && item->image >= 0)
-		unload_add_on(item->image);
+	image_id image = item->image;
 
 	delete item;
+
+	if (loadedImage && image >= 0)
+		unload_add_on(image);
 
 
 	return B_OK;
