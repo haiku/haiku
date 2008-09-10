@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src apps installedpackages ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders shared interface ;
+SubDirHdrs $(HAIKU_TOP) src apps packageinstaller ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps packageinstaller ] ;
+
+Application InstalledPackages :
+	InstalledPackageInfo.cpp
+	main.cpp
+	UninstallWindow.cpp
+	UninstallView.cpp
+	: be tracker
+;
