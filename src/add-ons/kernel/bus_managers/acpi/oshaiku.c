@@ -133,7 +133,7 @@
 extern pci_module_info *gPCIManager;
 #include <dpc.h>
 extern dpc_module_info *gDPC;
-extern void *gDPChandle;
+extern void *gDPCHandle;
 #endif
 
 #include "acpi.h"
@@ -171,7 +171,7 @@ AcpiOsInitialize (void)
 #else
 	AcpiGbl_OutputFile = NULL;
 #endif
-	
+
     return AE_OK;
 }
 
@@ -456,10 +456,10 @@ AcpiOsGetLine (
     char                    *Buffer)
 {
     UINT32                  i = 0;
-    
+
 #ifndef _KERNEL_MODE
     UINT8                   Temp;
-    
+
     for (i = 0; ; i++)
     {
         scanf ("%1c", &Temp);
@@ -537,7 +537,7 @@ AcpiOsUnmapMemory (
     void                    *where,
     ACPI_SIZE               length)
 {
-	
+
 	delete_area(area_for(where));
 	return;
 }
@@ -636,7 +636,7 @@ AcpiOsDeleteSemaphore (
     }
 
 	delete_sem((sem_id)(Handle));
-	
+
     return AE_OK;
 }
 
@@ -704,10 +704,10 @@ ACPI_STATUS
 AcpiOsCreateLock (
     ACPI_HANDLE             *OutHandle)
 {
-	
+
     *OutHandle = (ACPI_HANDLE)malloc(sizeof(spinlock));
     *((spinlock *)(*OutHandle)) = 1;
-    
+
     return AE_OK;
 }
 
@@ -724,22 +724,22 @@ AcpiOsAcquireLock (
     ACPI_HANDLE             Handle)
 {
 	/*cpu_status cpu;
-	
+
 	if (Flags == ACPI_NOT_ISR)
 		cpu = disable_interrupts();
-		
+
     acquire_spinlock ((spinlock *)(Handle));
-    
+
     if (Flags == ACPI_NOT_ISR)
     	restore_interrupts(cpu);*/
-    	
+
     /* Why aren't we using real spinlocks? Well, they seem to cause
        kernel hangs at boot, at least on Dano. I don't really know
        why, as they should be equivalent to this. Maybe in sysinit2
        interrupts are already off, and the double disable interrupts
        call is hanging the system? I'm not sure how to detect that
        though. Anyway, this works, even if it's stupid. */
-    	
+
     while (_atomic_test_and_set(((spinlock *)(Handle)),0,1) <= 0);
     return (0);
 }
@@ -751,15 +751,15 @@ AcpiOsReleaseLock (
     ACPI_CPU_FLAGS          Flags)
 {
     /*cpu_status cpu;
-		
+
 	if (Flags == ACPI_NOT_ISR)
 		cpu = disable_interrupts();
-		
+
     release_spinlock ((spinlock *)(Handle));
-    
+
     if (Flags == ACPI_NOT_ISR)
     	restore_interrupts(cpu);*/
-    
+
     atomic_add(((spinlock *)(Handle)),1);
 }
 
@@ -787,7 +787,7 @@ AcpiOsInstallInterruptHandler (
 {
 
 #ifdef _KERNEL_MODE
-	
+
 	install_io_interrupt_handler(InterruptNumber,(interrupt_handler)ServiceRoutine,Context,0);
 		/* It so happens that the Haiku and ACPI-CA interrupt handler routines
 		   return the same values with the same meanings */
@@ -820,7 +820,7 @@ dprintf("AcpiOsRemoveInterruptHandler()\n");
 	remove_io_interrupt_handler(InterruptNumber,(interrupt_handler)ServiceRoutine,NULL);
 		/* Crap. We don't get the Context argument back. */
 	#warning Sketchy code!
-	
+
 #endif
 
     return AE_OK;
@@ -859,8 +859,8 @@ AcpiOsExecute (
 			break;
 	}
 
-	err = gDPC->queue_dpc(gDPChandle, Function, Context);
-	
+	err = gDPC->queue_dpc(gDPCHandle, Function, Context);
+
 	if (err != B_OK)
 		return AE_ERROR;
 	return AE_OK;
@@ -1053,7 +1053,7 @@ AcpiOsReadPciConfiguration (
 		case 2: *(UINT16*)Value = val;
 		case 4: *(UINT32*)Value = val;
 	}
-#endif  
+#endif
 
     return (AE_OK);
 }
@@ -1083,10 +1083,10 @@ AcpiOsWritePciConfiguration (
 {
 
 #ifdef _KERNEL_MODE
-	gPCIManager->write_pci_config( 
+	gPCIManager->write_pci_config(
 		PciId->Bus, PciId->Device, PciId->Function, Register, Width/8, Value);
 #endif
-    
+
     return (AE_OK);
 }
 
@@ -1121,7 +1121,7 @@ AcpiOsReadPort (
     UINT32                  *Value,
     UINT32                  Width)
 {
-	
+
 #ifdef _KERNEL_MODE
 
     switch (Width)
@@ -1138,7 +1138,7 @@ AcpiOsReadPort (
         *Value = gPCIManager->read_io_32(Address);
         break;
     }
-    
+
 #endif
 
     return (AE_OK);
@@ -1212,7 +1212,7 @@ AcpiOsReadMemory (
 #ifdef _KERNEL_MODE
 
     memcpy(Value, gPCIManager->ram_address(ACPI_TO_POINTER(Address)), Width/8);
-    
+
 #endif
 
     return (AE_OK);

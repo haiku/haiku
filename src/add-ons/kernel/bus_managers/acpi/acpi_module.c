@@ -43,29 +43,29 @@ acpi_module_supports_device(device_node *parent)
 
 	if (strcmp(bus, "root"))
 		return 0.0;
-	
+
 	return 1.0;
 }
 
 
-static status_t 
+static status_t
 acpi_module_register_device(device_node *parent)
 {
 
 	device_attr attrs[] = {
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "ACPI" }},
-		
+
 		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_KEEP_DRIVER_LOADED }},
 		{}
 	};
 
 	io_resource *resources = NULL;
-	
+
 	return gDeviceManager->register_node(parent, ACPI_ROOT_MODULE_NAME, attrs, resources, NULL);
 }
 
 
-static status_t 
+static status_t
 acpi_enumerate_child_devices(device_node *node, const char *root)
 {
 	char result[255];
@@ -86,25 +86,25 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 			acpi_enumerate_child_devices(node, result);
 			continue;
 		}
-		
+
 		switch (type) {
 		case ACPI_TYPE_DEVICE: {
 			char hid[9] = "";
 			device_attr attrs[] = {
 				// info about device
 				{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
-				
+
 				// location on ACPI bus
 				{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
-				
+
 				// info about the device
 				{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: hid }},
 				{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
-				
+
 				// consumer specification
-				/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string: 
+				/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string:
 					"hid_%" ACPI_DEVICE_HID_ITEM "%" }},
-				{ B_DRIVER_MAPPING "/0", B_STRING_TYPE, { string: 
+				{ B_DRIVER_MAPPING "/0", B_STRING_TYPE, { string:
 					"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},*/
 				{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_CHILD_ON_DEMAND|B_FIND_MULTIPLE_CHILDREN }},
 				{ NULL }
@@ -122,20 +122,20 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 			device_attr attrs[] = {
 				// info about device
 				{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
-				
+
 				// location on ACPI bus
 				{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
-				
+
 				// info about the device
 				{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
-				
+
 				// consumer specification
-				/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string: 
+				/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string:
 					"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},*/
 				{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_CHILD_ON_DEMAND|B_FIND_MULTIPLE_CHILDREN }},
 				{ NULL }
 			};
-			
+
 			if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs, NULL, &deviceNode) == B_OK)
 				acpi_enumerate_child_devices(deviceNode, result);
 			break;
@@ -151,12 +151,12 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 }
 
 
-static status_t 
+static status_t
 acpi_module_register_child_devices(void *cookie)
 {
 	status_t err;
 	device_node *node = cookie;
-	
+
 	err = gDeviceManager->publish_device(node, "acpi/namespace", ACPI_NS_DUMP_DEVICE_MODULE_NAME);
 	if (err != B_OK) {
 		return err;
@@ -195,11 +195,11 @@ apci_module_std_ops(int32 op, ...)
 			return put_module(B_ACPI_MODULE_NAME);
 	}
 
-	return B_BAD_VALUE;	
+	return B_BAD_VALUE;
 }
 
 
-static struct acpi_root_info sACPIModule = {
+static struct acpi_root_info sACPIRootModule = {
 	{
 		{
 			ACPI_ROOT_MODULE_NAME,
@@ -230,13 +230,12 @@ static struct acpi_root_info sACPIModule = {
 	get_object_typed,
 	evaluate_object,
 	evaluate_method,
-
 };
 
 _EXPORT module_info *modules[] = {
-	(module_info *) &acpi_module,
-	(module_info *) &sACPIModule,
-	(module_info *) &acpi_ns_dump_module,
-	(module_info *) &gACPIDeviceModule,
+	(module_info *)&gACPIModule,
+	(module_info *)&sACPIRootModule,
+	(module_info *)&acpi_ns_dump_module,
+	(module_info *)&gACPIDeviceModule,
 	NULL
 };
