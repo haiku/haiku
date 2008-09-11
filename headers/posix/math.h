@@ -189,7 +189,6 @@ extern double	yn(int x, double y);
 /* other stuff as defined in BeOS */
 extern int		isinff(float value);
 extern int		finitef(float value);
-extern float	infnanf(int error);
 extern float	dremf(float x, float y);
 extern float	significandf(float x);
 extern float	copysignf(float x, float y);
