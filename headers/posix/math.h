@@ -198,8 +198,6 @@ extern double	copysign(double x, double y);
 extern double 	scalbln(double x, long n);
 extern double	scalbn(double x, int y);
 extern double	drem(double x, double y);
-extern int		isnan(double x);
-extern int		isfinite(double x);
 extern int		finite(double x);
 extern float	j0f(float x);
 extern float	j1f(float x);
