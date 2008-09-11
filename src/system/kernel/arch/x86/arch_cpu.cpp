@@ -600,7 +600,7 @@ arch_cpu_init_post_modules(kernel_args *args)
 	}
 
 	// put the optimized functions into the commpage
-	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY, gOptimizedFunctions.memcpy,
+	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY, (const void *)gOptimizedFunctions.memcpy,
 		(addr_t)gOptimizedFunctions.memcpy_end
 			- (addr_t)gOptimizedFunctions.memcpy);
 
