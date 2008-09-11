@@ -110,7 +110,7 @@ StdBinCommands
 BinCommand "[" : lbracket.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand ls : 
-	ls.c ls-dir.c : libfetish.a : $(coreutils_rsrc) ;
+	ls.c ls-ls.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand rm : 
 	rm.c remove.c : libfetish.a libroot.so : $(coreutils_rsrc) ;
@@ -138,6 +138,9 @@ BinCommand sha512sum : md5sum-sha512sum.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand vdir : 
 	[ FGristFiles ls.o ] ls-vdir.c : libfetish.a : $(coreutils_rsrc) ;
+
+BinCommand dir :
+	[ FGristFiles ls.o ] ls-dir.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand <bin>install : install.c [ FGristFiles copy.o cp-hash.o ]
 	: libfetish.a : $(coreutils_rsrc) ;
