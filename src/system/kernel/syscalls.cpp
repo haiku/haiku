@@ -17,6 +17,7 @@
 #include <vm.h>
 #include <thread.h>
 #include <posix/realtime_sem.h>
+#include <posix/xsi_message_queue.h>
 #include <posix/xsi_semaphore.h>
 #include <sem.h>
 #include <port.h>

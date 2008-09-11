@@ -24,6 +24,7 @@ struct fd_info;
 struct fd_set;
 struct fs_info;
 struct iovec;
+struct msqid_ds;
 struct net_stat;
 struct pollfd;
 struct rlimit;
@@ -100,6 +101,16 @@ extern int			_kern_xsi_semctl(int semID, int semNumber, int command,
 						union semun* args);
 extern status_t		_kern_xsi_semop(int semID, struct sembuf *semOps,
 						size_t numSemOps);
+
+/* POSIX XSI message queue syscalls */
+extern int			_kern_xsi_msgctl(int messageQueueID, int command,
+						struct msqid_ds *buffer);
+extern int			_kern_xsi_msgget(key_t key, int messageQueueFlags);
+extern ssize_t		_kern_xsi_msgrcv(int messageQueueID, void *messagePointer,
+						size_t messageSize, long messageType, int messageFlags);
+extern int			_kern_xsi_msgsnd(int messageQueueID,
+						const void *messagePointer, size_t messageSize,
+						int messageFlags);
 
 /* team & thread syscalls */
 extern thread_id	_kern_load_image(const char* const* flatArgs,

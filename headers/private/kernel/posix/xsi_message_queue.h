@@ -15,6 +15,8 @@
 
 __BEGIN_DECLS
 
+extern void xsi_msg_init();
+
 /* user calls */
 int _user_xsi_msgctl(int messageQueueID, int command, struct msqid_ds *buffer);
 int _user_xsi_msgget(key_t key, int messageQueueFlags);
