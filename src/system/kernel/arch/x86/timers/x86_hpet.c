@@ -41,7 +41,7 @@ hpet_get_prio(void)
 
 
 static int32
-hpet_timer_interrupt(struct hpet_timer *timer)
+hpet_timer_interrupt(void *arg)
 {
 	return timer_interrupt();
 }
@@ -141,7 +141,7 @@ hpet_init(struct kernel_args *args)
 		}
 	}
 
-	TRACE(("hpet_init: HPET is at %x. Vendor ID: %x.\n", sHPETRegs, HPET_GET_VENDOR_ID(sHPETRegs)));
+	TRACE(("hpet_init: HPET is at %p. Vendor ID: %lx.\n", sHPETRegs, HPET_GET_VENDOR_ID(sHPETRegs)));
 
 	/* There is no hpet legacy support, so error out on init */
 	if (!HPET_IS_LEGACY_CAPABLE(sHPETRegs)) {
@@ -151,7 +151,7 @@ hpet_init(struct kernel_args *args)
 
 	hpet_set_legacy(sHPETRegs, true);
 	TRACE(("hpet_init: HPET does%s support legacy mode.\n", HPET_IS_LEGACY_CAPABLE(sHPETRegs) ? "" : " not"));
-	TRACE(("hpet_init: HPET supports %d timers, and is %s bits wide.\n", HPET_GET_NUM_TIMERS(sHPETRegs) + 1, HPET_IS_64BIT(sHPETRegs) ? "64" : "32"));
+	TRACE(("hpet_init: HPET supports %lu timers, and is %s bits wide.\n", HPET_GET_NUM_TIMERS(sHPETRegs) + 1, HPET_IS_64BIT(sHPETRegs) ? "64" : "32"));
 
 	if (HPET_GET_NUM_TIMERS(sHPETRegs) < 2) {
 		dprintf("hpet_init: HPET does not have at least 3 timers. Skipping.\n");
