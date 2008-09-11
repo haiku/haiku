@@ -24,5 +24,6 @@ MergeObject posix_sys.o :
  	uname.c
  	utimes.c
 	wait.c
+	xsi_msg_queue.cpp
 	xsi_sem.cpp
 ;
