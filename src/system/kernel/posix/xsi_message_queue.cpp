@@ -78,6 +78,9 @@ struct queued_message : DoublyLinkedListLinkImpl<queued_message> {
 
 	status_t copy_to_user_buffer(void *_message, ssize_t _length)
 	{
+		if (_length > length)
+			_length = length;
+
 		if (user_memcpy(_message, &type, sizeof(long)) != B_OK
 			|| user_memcpy((void *)((char *)_message + sizeof(long)), message,
 			_length) != B_OK)
@@ -788,7 +791,7 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 			return ENOMSG;
 		} else {
 			// Message received correctly (so far)
-			if ((ssize_t)messageSize > message->length
+			if ((ssize_t)messageSize < message->length
 				&& !(messageFlags & MSG_NOERROR)) {
 				TRACE_ERROR(("xsi_msgrcv: message too big!\n"));
 				// Put the message back inside. Since we hold the
@@ -855,6 +858,7 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 	}
 
 	bool notSent = true;
+	status_t result = B_OK;
 	while (notSent) {
 		bool goToSleep = messageQueue->Insert(message);
 
@@ -867,8 +871,7 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 			uint32 sequenceNumber = messageQueue->SequenceNumber();
 
 			TRACE(("xsi_msgsnd: thread %d going to sleep\n", (int)thread->id));
-			status_t result
-				= messageQueue->BlockAndUnlock(thread, &messageQueueLocker);
+			result = messageQueue->BlockAndUnlock(thread, &messageQueueLocker);
 			TRACE(("xsi_msgsnd: thread %d back to life\n", (int)thread->id));
 
 			messageQueueHashLocker.Lock();
@@ -895,7 +898,8 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 		} else if (goToSleep) {
 			// We did not send the message and we can't wait
 			delete message;
-			return EAGAIN;
+			notSent = false;
+			result = EAGAIN;
 		} else {
 			// Message delivered correctly
 			TRACE(("xsi_msgsnd: message sent correctly\n"));
@@ -903,5 +907,5 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 		}
 	}
 
-	return B_OK;
+	return result;
 }
