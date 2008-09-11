@@ -233,10 +233,14 @@ BApplication::~BApplication()
 
 #ifndef RUN_WITHOUT_APP_SERVER
 	// tell app_server we're quitting...
-	BPrivate::AppServerLink link;
-	link.StartMessage(B_QUIT_REQUESTED);
-	link.Flush();
-
+	if (be_app) {
+		// be_app can be NULL here if the application fails to initialize
+		// correctly. For example, if it's already running and it's set to
+		// exclusive launch.
+		BPrivate::AppServerLink link;
+		link.StartMessage(B_QUIT_REQUESTED);
+		link.Flush();
+	}
 	delete_port(fServerLink->SenderPort());
 	delete_port(fServerLink->ReceiverPort());
 	delete fServerLink;
