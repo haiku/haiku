@@ -24,7 +24,10 @@
 #include <string.h>
 
 
-// constructor
+extern mode_t __gUmask;
+	// declared in sys/umask.c
+
+
 //! Creates an uninitialized BDirectory object.
 BDirectory::BDirectory()
 	:
@@ -32,9 +35,9 @@ BDirectory::BDirectory()
 {
 }
 
-// copy constructor
-//! Creates a copy of the supplied BDirectory.
-/*!	\param dir the BDirectory object to be copied
+
+/*!	\brief Creates a copy of the supplied BDirectory.
+	\param dir the BDirectory object to be copied
 */
 BDirectory::BDirectory(const BDirectory &dir)
 	:
@@ -43,7 +46,7 @@ BDirectory::BDirectory(const BDirectory &dir)
 	*this = dir;
 }
 
-// constructor
+
 /*! \brief Creates a BDirectory and initializes it to the directory referred
 	to by the supplied entry_ref.
 	\param ref the entry_ref referring to the directory
@@ -55,7 +58,7 @@ BDirectory::BDirectory(const entry_ref *ref)
 	SetTo(ref);
 }
 
-// constructor
+
 /*! \brief Creates a BDirectory and initializes it to the directory referred
 	to by the supplied node_ref.
 	\param nref the node_ref referring to the directory
@@ -67,7 +70,7 @@ BDirectory::BDirectory(const node_ref *nref)
 	SetTo(nref);
 }
 
-// constructor
+
 /*! \brief Creates a BDirectory and initializes it to the directory referred
 	to by the supplied BEntry.
 	\param entry the BEntry referring to the directory
@@ -79,7 +82,7 @@ BDirectory::BDirectory(const BEntry *entry)
 	SetTo(entry);
 }
 
-// constructor
+
 /*! \brief Creates a BDirectory and initializes it to the directory referred
 	to by the supplied path name.
 	\param path the directory's path name
@@ -91,7 +94,7 @@ BDirectory::BDirectory(const char *path)
 	SetTo(path);
 }
 
-// constructor
+
 /*! \brief Creates a BDirectory and initializes it to the directory referred
 	to by the supplied path name relative to the specified BDirectory.
 	\param dir the BDirectory, relative to which the directory's path name is
@@ -105,8 +108,7 @@ BDirectory::BDirectory(const BDirectory *dir, const char *path)
 	SetTo(dir, path);
 }
 
-// destructor
-//! Frees all allocated resources.
+
 /*! If the BDirectory is properly initialized, the directory's file descriptor
 	is closed.
 */
@@ -120,7 +122,7 @@ BDirectory::~BDirectory()
 	close_fd();
 }
 
-// SetTo
+
 /*! \brief Re-initializes the BDirectory to the directory referred to by the
 	supplied entry_ref.
 	\param ref the entry_ref referring to the directory
@@ -157,7 +159,7 @@ BDirectory::SetTo(const entry_ref *ref)
 	return B_OK;
 }
 
-// SetTo
+
 /*! \brief Re-initializes the BDirectory to the directory referred to by the
 	supplied node_ref.
 	\param nref the node_ref referring to the directory
@@ -185,7 +187,7 @@ BDirectory::SetTo(const node_ref *nref)
 	return error;
 }
 
-// SetTo
+
 /*! \brief Re-initializes the BDirectory to the directory referred to by the
 	supplied BEntry.
 	\param entry the BEntry referring to the directory
@@ -227,7 +229,7 @@ BDirectory::SetTo(const BEntry *entry)
 	return B_OK;
 }
 
-// SetTo
+
 /*! \brief Re-initializes the BDirectory to the directory referred to by the
 	supplied path name.
 	\param path the directory's path name
@@ -266,7 +268,7 @@ BDirectory::SetTo(const char *path)
 	return B_OK;
 }
 
-// SetTo
+
 /*! \brief Re-initializes the BDirectory to the directory referred to by the
 	supplied path name relative to the specified BDirectory.
 	\param dir the BDirectory, relative to which the directory's path name is
@@ -323,9 +325,9 @@ BDirectory::SetTo(const BDirectory *dir, const char *path)
 	return B_OK;
 }
 
-// GetEntry
-//! Returns a BEntry referring to the directory represented by this object.
-/*!	If the initialization of \a entry fails, it is Unset().
+
+/*!	\brief Returns a BEntry referring to the directory represented by this object.
+	If the initialization of \a entry fails, it is Unset().
 	\param entry a pointer to the entry that shall be set to refer to the
 		   directory
 	\return
@@ -349,7 +351,7 @@ BDirectory::GetEntry(BEntry *entry) const
 	return entry->SetTo(this, ".", false);
 }
 
-// IsRootDirectory
+
 /*!	\brief Returns whether the directory represented by this BDirectory is a
 	root directory of a volume.
 	\return
@@ -369,7 +371,7 @@ BDirectory::IsRootDirectory() const
 	return result;
 }
 
-// FindEntry
+
 /*! \brief Finds an entry referred to by a path relative to the directory
 	represented by this BDirectory.
 	\a path may be absolute. If the BDirectory is not properly initialized,
@@ -418,7 +420,7 @@ BDirectory::FindEntry(const char *path, BEntry *entry, bool traverse) const
 	return error;
 }
 
-// Contains
+
 /*!	\brief Returns whether this directory or any of its subdirectories
 	at any level contain the entry referred to by the supplied path name.
 	Only entries that match the node flavor specified by \a nodeFlags are
@@ -463,7 +465,7 @@ BDirectory::Contains(const char *path, int32 nodeFlags) const
 	return Contains(&entry, nodeFlags);
 }
 
-// Contains
+
 /*!	\brief Returns whether this directory or any of its subdirectories
 	at any level contain the entry referred to by the supplied BEntry.
 	Only entries that match the node flavor specified by \a nodeFlags are
@@ -510,7 +512,6 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 }
 
 
-// GetStatFor
 /*!	\brief Returns the stat structure of the entry referred to by the supplied
 	path name.
 	\param path the entry's path name. May be relative to this directory or
@@ -536,19 +537,18 @@ BDirectory::GetStatFor(const char *path, struct stat *st) const
 		return B_BAD_VALUE;
 	if (InitCheck() != B_OK)
 		return B_NO_INIT;
-	status_t error = B_OK;
-	if (path) {
-		if (strlen(path) == 0)
+
+	if (path != NULL) {
+		if (path[0] == '\0')
 			return B_ENTRY_NOT_FOUND;
-		error = _kern_read_stat(fDirFd, path, false, st, sizeof(struct stat));
-	} else
-		error = GetStat(st);
-	return error;
+		return _kern_read_stat(fDirFd, path, false, st, sizeof(struct stat));
+	}
+	return GetStat(st);
 }
 
-// GetNextEntry
-//! Returns the BDirectory's next entry as a BEntry.
-/*!	Unlike GetNextDirents() this method ignores the entries "." and "..".
+
+/*!	\brief Returns the BDirectory's next entry as a BEntry.
+	Unlike GetNextDirents() this method ignores the entries "." and "..".
 	\param entry a pointer to a BEntry to be initialized to the found entry
 	\param traverse specifies whether to follow it, if the found entry
 		   is a symbolic link.
@@ -578,9 +578,9 @@ BDirectory::GetNextEntry(BEntry *entry, bool traverse)
 	return error;
 }
 
-// GetNextRef
-//! Returns the BDirectory's next entry as an entry_ref.
-/*!	Unlike GetNextDirents() this method ignores the entries "." and "..".
+
+/*!	\brief Returns the BDirectory's next entry as an entry_ref.
+	Unlike GetNextDirents() this method ignores the entries "." and "..".
 	\param ref a pointer to an entry_ref to be filled in with the data of the
 		   found entry
 	\param traverse specifies whether to follow it, if the found entry
@@ -612,7 +612,7 @@ BDirectory::GetNextRef(entry_ref *ref)
 				error = B_ENTRY_NOT_FOUND;
 			} else {
 				next = (!strcmp(entry.d_name, ".")
-						|| !strcmp(entry.d_name, ".."));
+					|| !strcmp(entry.d_name, ".."));
 			}
 		}
 		if (error == B_OK) {
@@ -624,9 +624,9 @@ BDirectory::GetNextRef(entry_ref *ref)
 	return error;
 }
 
-// GetNextDirents
-//! Returns the BDirectory's next entries as dirent structures.
-/*!	Unlike GetNextEntry() and GetNextRef(), this method returns also
+
+/*!	\brief Returns the BDirectory's next entries as dirent structures.
+	Unlike GetNextEntry() and GetNextRef(), this method returns also
 	the entries "." and "..".
 	\param buf a pointer to a buffer to be filled with dirent structures of
 		   the found entries
@@ -655,9 +655,9 @@ BDirectory::GetNextDirents(dirent *buf, size_t bufSize, int32 count)
 	return _kern_read_dir(fDirFd, buf, bufSize, count);
 }
 
-// Rewind
-//!	Rewinds the directory iterator.
-/*!	\return
+
+/*!	\brief Rewinds the directory iterator.
+	\return
 	- \c B_OK: Everything went fine.
 	- \c B_PERMISSION_DENIED: Directory permissions didn't allow operation.
 	- \c B_NO_MEMORY: Insufficient memory for operation.
@@ -675,9 +675,9 @@ BDirectory::Rewind()
 	return _kern_rewind_dir(fDirFd);
 }
 
-// CountEntries
-//!	Returns the number of entries in this directory.
-/*!	CountEntries() uses the directory iterator also used by GetNextEntry(),
+
+/*!	\brief Returns the number of entries in this directory.
+	CountEntries() uses the directory iterator also used by GetNextEntry(),
 	GetNextRef() and GetNextDirents(). It does a Rewind(), iterates through
 	the entries and Rewind()s again. The entries "." and ".." are not counted.
 	\return
@@ -708,9 +708,9 @@ BDirectory::CountEntries()
 	return (error == B_OK ? count : error);
 }
 
-// CreateDirectory
-//! Creates a new directory.
-/*! If an entry with the supplied name does already exist, the method fails.
+
+/*! \brief Creates a new directory.
+	If an entry with the supplied name does already exist, the method fails.
 	\param path the new directory's path name. May be relative to this
 		   directory or absolute.
 	\param dir a pointer to a BDirectory to be initialized to the newly
@@ -732,23 +732,26 @@ BDirectory::CreateDirectory(const char *path, BDirectory *dir)
 {
 	if (!path)
 		return B_BAD_VALUE;
+
 	// create the dir
 	status_t error = _kern_create_dir(fDirFd, path,
-		S_IRWXU | S_IRWXG | S_IRWXO);
+		(S_IRWXU | S_IRWXG | S_IRWXO) & ~__gUmask);
 	if (error != B_OK)
 		return error;
-	if (!dir)
+
+	if (dir == NULL)
 		return B_OK;
+
 	// init the supplied BDirectory
 	if (InitCheck() != B_OK || BPrivate::Storage::is_absolute_path(path))
 		return dir->SetTo(path);
-	else
-		return dir->SetTo(this, path);
+
+	return dir->SetTo(this, path);
 }
 
-// CreateFile
-//! Creates a new file.
-/*!	If a file with the supplied name does already exist, the method fails,
+
+/*! \brief Creates a new file.
+	If a file with the supplied name does already exist, the method fails,
 	unless it is passed \c false to \a failIfExists -- in that case the file
 	is truncated to zero size. The new BFile will operate in \c B_READ_WRITE
 	mode.
@@ -782,7 +785,7 @@ BDirectory::CreateFile(const char *path, BFile *file, bool failIfExists)
 	uint32 openMode = B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE
 		| (failIfExists ? B_FAIL_IF_EXISTS : 0);
 	BFile tmpFile;
-	BFile *realFile = (file ? file : &tmpFile);
+	BFile *realFile = file ? file : &tmpFile;
 	status_t error = B_OK;
 	if (InitCheck() == B_OK && !BPrivate::Storage::is_absolute_path(path))
 		error = realFile->SetTo(this, path, openMode);
@@ -793,9 +796,9 @@ BDirectory::CreateFile(const char *path, BFile *file, bool failIfExists)
 	return error;
 }
 
-// CreateSymLink
-//! Creates a new symbolic link.
-/*! If an entry with the supplied name does already exist, the method fails.
+
+/*! \brief Creates a new symbolic link.
+	If an entry with the supplied name does already exist, the method fails.
 	\param path the new symbolic link's path name. May be relative to this
 		   directory or absolute.
 	\param linkToPath the path the symbolic link shall point to.
@@ -815,27 +818,30 @@ BDirectory::CreateFile(const char *path, BFile *file, bool failIfExists)
 */
 status_t
 BDirectory::CreateSymLink(const char *path, const char *linkToPath,
-						  BSymLink *link)
+	BSymLink *link)
 {
 	if (!path || !linkToPath)
 		return B_BAD_VALUE;
+
 	// create the symlink
 	status_t error = _kern_create_symlink(fDirFd, path, linkToPath,
-		S_IRWXU | S_IRWXG | S_IRWXO);
+		(S_IRWXU | S_IRWXG | S_IRWXO) & ~__gUmask);
 	if (error != B_OK)
 		return error;
-	if (!link)
+
+	if (link == NULL)
 		return B_OK;
+
 	// init the supplied BSymLink
 	if (InitCheck() != B_OK || BPrivate::Storage::is_absolute_path(path))
 		return link->SetTo(path);
-	else
-		return link->SetTo(this, path);
+
+	return link->SetTo(this, path);
 }
 
-// =
-//! Assigns another BDirectory to this BDirectory.
-/*!	If the other BDirectory is uninitialized, this one wi'll be too. Otherwise
+
+/*!	\brief Assigns another BDirectory to this BDirectory.
+	If the other BDirectory is uninitialized, this one wi'll be too. Otherwise
 	it will refer to the same directory, unless an error occurs.
 	\param dir the original BDirectory
 	\return a reference to this BDirectory
@@ -860,7 +866,7 @@ void BDirectory::_ErectorDirectory4() {}
 void BDirectory::_ErectorDirectory5() {}
 void BDirectory::_ErectorDirectory6() {}
 
-// close_fd
+
 //! Closes the BDirectory's file descriptor.
 void
 BDirectory::close_fd()
@@ -872,8 +878,9 @@ BDirectory::close_fd()
 	BNode::close_fd();
 }
 
-//! Returns the BDirectory's file descriptor.
-/*!	To be used instead of accessing the BDirectory's private \c fDirFd member
+
+/*!	\brief Returns the BDirectory's file descriptor.
+	To be used instead of accessing the BDirectory's private \c fDirFd member
 	directly.
 	\return the file descriptor, or -1, if not properly initialized.
 */
@@ -884,11 +891,11 @@ BDirectory::get_fd() const
 }
 
 
-// C functions
+//	#pragma mark - C functions
 
-// create_directory
-//! Creates all missing directories along a given path.
-/*!	\param path the directory path name.
+
+/*!	\brief Creates all missing directories along a given path.
+	\param path the directory path name.
 	\param mode a permission specification, which shall be used for the
 		   newly created directories.
 	\return

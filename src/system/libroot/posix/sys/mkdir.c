@@ -1,5 +1,5 @@
-/* 
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
