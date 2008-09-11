@@ -517,16 +517,16 @@ public:
 	}
 
 private:
-	bool						fInitOK;
 	int							fID;					// semaphore set id
+	bool						fInitOK;
 	time_t						fLastSemctlTime;		// sem_ctime
 	time_t						fLastSemopTime;			// sem_otime
+	mutex 						fLock;					// private lock
 	ushort						fNumberOfSemaphores;	// sem_nsems
 	struct ipc_perm				fPermissions;			// sem_perm
-	uint32						fSequenceNumber;		// used as a second id
 	XsiSemaphore				*fSemaphores;			// array of semaphores
+	uint32						fSequenceNumber;		// used as a second id
 	UndoList					fUndoList;				// undo list requests
-	mutex 						fLock;					// private lock
 
 	::HashTableLink<XsiSemaphoreSet> fLink;
 };
