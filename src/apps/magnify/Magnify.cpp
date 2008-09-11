@@ -515,12 +515,6 @@ void
 TWindow::FrameResized(float w, float h)
 {
 	CalcViewablePixels();
-
-	float width;
-	float height;
-	GetPreferredSize(&width, &height);
-	ResizeTo(width, height);
-
 	fFatBits->InitBuffers(fHPixelCount, fVPixelCount, fPixelSize, ShowGrid());
 }
 
