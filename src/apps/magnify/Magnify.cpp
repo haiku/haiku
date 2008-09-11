@@ -8,7 +8,6 @@
  * This file may be used under the terms of the Be Sample Code License.
  */
 
-
 #include "Magnify.h"
 
 #include <Alert.h>
@@ -91,13 +90,13 @@ const int32 kBorderSize = 10;
 static float
 FontHeight(BView* target, bool full)
 {
-	font_height finfo;		
+	font_height finfo;
 	target->GetFontHeight(&finfo);
 	float h = ceil(finfo.ascent) + ceil(finfo.descent);
 
 	if (full)
 		h += ceil(finfo.leading);
-	
+
 	return h;
 }
 
@@ -167,7 +166,7 @@ BuildInfoMenu(BMenu *menu)
 	menuItem = new BMenuItem("Freeze/Unfreeze image", new BMessage(msg_freeze),'F');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
-	
+
 	menuItem = new BMenuItem("Make Square", new BMessage(msg_make_square),'/');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem("Decrease Window Size", new BMessage(msg_shrink),'-');
@@ -177,7 +176,7 @@ BuildInfoMenu(BMenu *menu)
 	menuItem = new BMenuItem("Decrease Pixel Size", new BMessage(msg_shrink_pixel),',');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem("Increase Pixel Size", new BMessage(msg_grow_pixel),'.');
-	menu->AddItem(menuItem);	
+	menu->AddItem(menuItem);
 }
 
 
@@ -244,7 +243,7 @@ TWindow::TWindow(int32 pixelCount)
 	if (InfoIsShowing())
 		fbRect.OffsetBy(10, fInfoHeight);
 	fFatBits = new TMagnify(fbRect, this);
-	fInfo->AddChild(fFatBits);	
+	fInfo->AddChild(fFatBits);
 
 	fFatBits->SetSelection(fShowInfo);
 	fInfo->SetMagView(fFatBits);
@@ -276,26 +275,26 @@ void
 TWindow::MessageReceived(BMessage* m)
 {
 	bool active = fFatBits->Active();
-	
+
 	switch (m->what) {
 		case B_ABOUT_REQUESTED:
 			be_app->MessageReceived(m);
 			break;
-			
+
 		case msg_help:
 			ShowHelp();
 			break;
-			
+
 		case msg_show_info:
 			if (active)
 				ShowInfo(!fShowInfo);
 			break;
-			
+
 		case msg_toggle_grid:
 			if (active)
 				SetGrid(!fShowGrid);
 			break;
-			
+
 		case msg_grow:
 			if (active)
 				ResizeWindow(true);
@@ -312,7 +311,7 @@ TWindow::MessageReceived(BMessage* m)
 				ResizeWindow(big, big);
 			}
 			break;
-			
+
 		case msg_shrink_pixel:
 			if (active)
 				SetPixelSize(false);
@@ -321,7 +320,7 @@ TWindow::MessageReceived(BMessage* m)
 			if (active)
 				SetPixelSize(true);
 			break;
-			
+
 		case msg_add_cross_hair:
 			if (active && fShowInfo)
 				AddCrossHair();
@@ -343,7 +342,7 @@ TWindow::MessageReceived(BMessage* m)
 		case msg_save:
 			// freeze the image here, unfreeze after dump or cancel
 			fFatBits->StartSave();
-			
+
 			fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(NULL, this),
 				0, 0, false, new BMessage(msg_dump));
 			fSavePanel->SetSaveText("Bitmaps.h");
@@ -352,12 +351,12 @@ TWindow::MessageReceived(BMessage* m)
 		case msg_dump:
 			{
 				delete fSavePanel;
-				
+
 				entry_ref dirRef;
 				char* name;
 				m->FindRef("directory", &dirRef);
 				m->FindString((const char*)"name",(const char**) &name);
-				
+
 				fFatBits->SaveImage(&dirRef, name);
 			}
 			break;
@@ -365,14 +364,14 @@ TWindow::MessageReceived(BMessage* m)
 			//	image is frozen before the FilePanel is shown
 			fFatBits->EndSave();
 			break;
-			
+
 		case msg_copy_image:
 			fFatBits->CopyImage();
 			break;
 		default:
 			BWindow::MessageReceived(m);
 			break;
-	}	
+	}
 }
 
 
@@ -459,7 +458,7 @@ ALMOST_DONE:	//	clean up and try to position the window
 			if (haveLoc && BScreen(B_MAIN_SCREEN_ID).Frame().Contains(loc)) {
 				MoveTo(loc);
 				goto DONE;
-			}			
+			}
 		}
 	}
 
@@ -501,7 +500,7 @@ TWindow::SetPrefs()
 			CrossHairsShowing(&ch1, &ch2);
 			write(ref, &ch1, sizeof(bool));
 			write(ref, &ch2, sizeof(bool));
-			
+
 			write(ref, &fHPixelCount, sizeof(int32));
 			write(ref, &fVPixelCount, sizeof(int32));
 			write(ref, &fPixelSize, sizeof(int32));
@@ -516,12 +515,12 @@ void
 TWindow::FrameResized(float w, float h)
 {
 	CalcViewablePixels();
-	
+
 	float width;
 	float height;
-	GetPreferredSize(&width, &height);		
+	GetPreferredSize(&width, &height);
 	ResizeTo(width, height);
-	
+
 	fFatBits->InitBuffers(fHPixelCount, fVPixelCount, fPixelSize, ShowGrid());
 }
 
@@ -555,14 +554,14 @@ TWindow::CalcViewablePixels()
 {
 	float w = Bounds().Width();
 	float h = Bounds().Height();
-	
+
 	if (InfoIsShowing()) {
 		w -= 20;							// remove the gutter
 		h = h-fInfoHeight-10;				// remove info and gutter
 	}
 
 	bool ch1, ch2;
-	fFatBits->CrossHairsShowing(&ch1, &ch2);	
+	fFatBits->CrossHairsShowing(&ch1, &ch2);
 	if (ch1)
 		h -= fFontHeight;
 	if (ch2)
@@ -584,16 +583,16 @@ TWindow::GetPreferredSize(float* width, float* height)
 	*width = fHPixelCount * fPixelSize;			// calc window width
 	*height = fVPixelCount * fPixelSize;		// calc window height
 	if (InfoIsShowing()) {
-		*width += 20;			
+		*width += 20;
 		*height += fInfoHeight + 10;
 	}
-		
+
 	bool ch1, ch2;
-	fFatBits->CrossHairsShowing(&ch1, &ch2);	
+	fFatBits->CrossHairsShowing(&ch1, &ch2);
 	if (ch1)
 		*height += fFontHeight;
 	if (ch2)
-		*height += fFontHeight + 5;		
+		*height += fFontHeight + 5;
 }
 
 
@@ -602,10 +601,10 @@ TWindow::ResizeWindow(int32 hPixelCount, int32 vPixelCount)
 {
 	fHPixelCount = hPixelCount;
 	fVPixelCount = vPixelCount;
-			
+
 	float width, height;
 	GetPreferredSize(&width, &height);
-	
+
 	ResizeTo(width, height);
 }
 
@@ -615,7 +614,7 @@ TWindow::ResizeWindow(bool direction)
 {
 	int32 x = fHPixelCount;
 	int32 y = fVPixelCount;
-	
+
 	if (direction) {
 		x += 4;
 		y += 4;
@@ -630,7 +629,7 @@ TWindow::ResizeWindow(bool direction)
 	if (y < 4)
 		y = 4;
 
-	ResizeWindow(x, y);	
+	ResizeWindow(x, y);
 }
 
 
@@ -639,7 +638,7 @@ TWindow::SetGrid(bool s)
 {
 	if (s == fShowGrid)
 		return;
-	
+
 	fShowGrid = s;
 	fFatBits->SetUpdate(true);
 }
@@ -657,7 +656,7 @@ TWindow::ShowInfo(bool i)
 {
 	if (i == fShowInfo)
 		return;
-		
+
 	fShowInfo = i;
 
 	if (fShowInfo)
@@ -692,7 +691,7 @@ TWindow::AddCrossHair()
 	fFatBits->AddCrossHair();
 
 	// crosshair info needs to be added
-	// window resizes accordingly		
+	// window resizes accordingly
 	float width;
 	float height;
 	GetPreferredSize(&width, &height);
@@ -704,9 +703,9 @@ void
 TWindow::RemoveCrossHair()
 {
 	fFatBits->RemoveCrossHair();
-			
+
 	//	crosshair info needs to be removed
-	//	window resizes accordingly		
+	//	window resizes accordingly
 	float width;
 	float height;
 	GetPreferredSize(&width, &height);
@@ -734,7 +733,7 @@ TWindow::SetPixelSize(int32 s)
 {
 	if (s == fPixelSize)
 		return;
-		
+
 	fPixelSize = s;
 	// resize window
 	// tell info that size has changed
@@ -762,7 +761,7 @@ TWindow::SetPixelSize(bool d)
 	float h = Bounds().Height();
 	CalcViewablePixels();
 	ResizeWindow(fHPixelCount, fVPixelCount);
-	
+
 	//	the window might not actually change in size
 	//	in that case force the buffers to the new dimension
 	if (w == Bounds().Width() && h == Bounds().Height())
@@ -811,7 +810,7 @@ TWindow::ShowHelp()
 	text->Insert("Info:\n");
 	text->Insert("  hide/show info - hides/shows all these new features\n");
 	text->Insert("    note: when showing, a red square will appear which signifies\n");
-	text->Insert("      which pixel's rgb values will be displayed\n");      		
+	text->Insert("      which pixel's rgb values will be displayed\n");
 	text->Insert("  add/remove crosshairs - 2 crosshairs can be added (or removed)\n");
 	text->Insert("    to aid in the alignment and placement of objects.\n");
 	text->Insert("    The crosshairs are represented by blue squares and blue lines.\n");
@@ -836,7 +835,7 @@ TWindow::ShowHelp()
 	text->Insert("  option-arrow key - moves the mouse location 1 pixel at a time\n");
 	text->Insert("  x marks the selection - the current selection has an 'x' in it\n");
 
-	CenterWindowOnScreen(w);	
+	CenterWindowOnScreen(w);
 	w->Show();
 }
 
@@ -857,12 +856,12 @@ TInfoView::TInfoView(BRect frame)
 		B_NO_BORDER)
 {
 	SetFont(be_plain_font);
-	fFontHeight = FontHeight(this, true);	
+	fFontHeight = FontHeight(this, true);
 	fMagView = NULL;
-	
+
 	fSelectionColor = kBlack;
 	fCH1Loc.x = fCH1Loc.y = fCH2Loc.x = fCH2Loc.y = 0;
-	
+
 	fInfoStr[0] = 0;
 	fRGBStr[0] = 0;
 	fCH1Str[0] = 0;
@@ -881,9 +880,9 @@ TInfoView::AttachedToWindow()
 	BBox::AttachedToWindow();
 
 	dynamic_cast<TWindow*>(Window())->PixelCount(&fHPixelCount, &fVPixelCount);
-	fPixelSize = dynamic_cast<TWindow*>(Window())->PixelSize();	
+	fPixelSize = dynamic_cast<TWindow*>(Window())->PixelSize();
 
-	AddMenu();	
+	AddMenu();
 }
 
 
@@ -927,14 +926,14 @@ TInfoView::Draw(BRect updateRect)
 	SetHighColor(0,0,0,255);
 	strcpy(fRGBStr,str);
 	DrawString(fRGBStr);
-		
+
 	bool ch1Showing, ch2Showing;
 	dynamic_cast<TWindow*>(Window())->CrossHairsShowing(&ch1Showing, &ch2Showing);
-	
+
 	if (fMagView) {
 		BPoint pt1(fMagView->CrossHair1Loc());
 		BPoint pt2(fMagView->CrossHair2Loc());
-		
+
 		float h = Bounds().Height();
 		if (ch2Showing) {
 			MovePenTo(10, h-12);
@@ -947,7 +946,7 @@ TInfoView::Draw(BRect updateRect)
 			strcpy(fCH2Str,str);
 			DrawString(fCH2Str);
 		}
-	
+
 		if (ch1Showing && ch2Showing) {
 			MovePenTo(10, h-10-fFontHeight-2);
 			sprintf(str, "1) x: %li  y: %li   x: %i", (int32)pt1.x, (int32)pt1.y,
@@ -969,7 +968,7 @@ TInfoView::Draw(BRect updateRect)
 			DrawString(fCH1Str);
 		}
 	}
-	
+
 	PopState();
 }
 
@@ -1016,7 +1015,7 @@ TMenu::~TMenu()
 }
 
 
-void 
+void
 TMenu::AttachedToWindow()
 {
 	bool state = true;
@@ -1251,7 +1250,7 @@ TMagnify::MouseDown(BPoint where)
 			BPopUpMenu *menu = new BPopUpMenu("Info");
 			menu->SetFont(be_plain_font);
 			BuildInfoMenu(menu);
-			
+
 			BMenuItem *selected = menu->Go(ConvertToScreen(where));
 			if (selected)
 				Window()->PostMessage(selected->Message()->what);
@@ -1261,13 +1260,13 @@ TMagnify::MouseDown(BPoint where)
 
 		// add a mousedown looper here
 
-		int32 pixelSize = PixelSize();	
+		int32 pixelSize = PixelSize();
 		float x = where.x / pixelSize;
 		float y = where.y / pixelSize;
 
 		MoveSelectionTo(x, y);
 
-		// draw the frozen image	
+		// draw the frozen image
 		// update the info region
 
 		fNeedToUpdate = true;
@@ -1290,7 +1289,7 @@ TMagnify::SetSelection(bool state)
 {
 	if (fShowSelection == state)
 		return;
-		
+
 	fShowSelection = state;
 	fSelection = 0;
 	Invalidate();
@@ -1659,10 +1658,10 @@ TMagnify::SaveImage(entry_ref* ref, char* name, bool selectionOnly)
 	BFile file;
 	BDirectory parentDir(ref);
 	parentDir.CreateFile(name, &file);
-	
+
 	// write off the bitmaps bits to the file
 	SaveBits(&file, fImageView->Bitmap(), "Data");
-	
+
 	// unfreeze the image, image was frozen before invoke of FilePanel
 	EndSave();
 }
@@ -1672,7 +1671,7 @@ void
 TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, char* name) const
 {
 	int32 bytesPerPixel;
-	const char *kColorSpaceName;	
+	const char *kColorSpaceName;
 
 	switch (bitmap->ColorSpace()) {
 		case B_GRAY8:
@@ -1773,7 +1772,7 @@ TOSMagnify::TOSMagnify(BRect r, TMagnify* parent, color_space space)
 			fBytesPerPixel = 1;
 			break;
 		case B_RGB15:
- 		case B_RGBA15:
+		case B_RGBA15:
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
 		case B_RGB16:
@@ -1880,7 +1879,7 @@ TOSMagnify::CreateImage(BPoint mouseLoc, bool force)
 
 			DrawBitmap(fBitmap, srcRect, destRect);
 
-			DrawGrid(width, height, destRect, pixelSize);		
+			DrawGrid(width, height, destRect, pixelSize);
 			DrawSelection();
 
 			Sync();
@@ -1931,7 +1930,7 @@ TOSMagnify::DrawGrid(int32 width, int32 height, BRect destRect, int32 pixelSize)
 		// horizontal lines
 		for (int32 i = pixelSize; i < (height * pixelSize); i += pixelSize)
 			AddLine(BPoint(0, i), BPoint(destRect.right, i), kGridGray);
-			
+
 		// vertical lines
 		for (int32 i = pixelSize; i < (width * pixelSize); i += pixelSize)
 			AddLine(BPoint(i, 0), BPoint(i, destRect.bottom), kGridGray);
@@ -1968,7 +1967,7 @@ TOSMagnify::DrawSelection()
 	if (selection == 0) {
 		StrokeLine(BPoint(x,y), BPoint(x+squareSize,y+squareSize));
 		StrokeLine(BPoint(x,y+squareSize), BPoint(x+squareSize,y));
-	}	
+	}
 
 	bool ch1Showing, ch2Showing;
 	fParent->CrossHairsShowing(&ch1Showing, &ch2Showing);
@@ -1992,7 +1991,7 @@ TOSMagnify::DrawSelection()
 		if (selection == 1) {
 			StrokeLine(BPoint(x,y), BPoint(x+squareSize,y+squareSize));
 			StrokeLine(BPoint(x,y+squareSize), BPoint(x+squareSize,y));
-		}	
+		}
 	}
 	if (ch2Showing) {
 		SetHighColor(kBlueColor);
@@ -2014,7 +2013,7 @@ TOSMagnify::DrawSelection()
 		if (selection == 2) {
 			StrokeLine(BPoint(x,y), BPoint(x+squareSize,y+squareSize));
 			StrokeLine(BPoint(x,y+squareSize), BPoint(x+squareSize,y));
-		}	
+		}
 	}
 
 	PopState();
@@ -2023,7 +2022,7 @@ TOSMagnify::DrawSelection()
 
 rgb_color
 TOSMagnify::ColorAtSelection()
-{			
+{
 	float x, y;
 	fParent->SelectionLoc(&x, &y);
 	BRect srcRect(x, y, x, y);
@@ -2033,7 +2032,7 @@ TOSMagnify::ColorAtSelection()
 	fPixelView->Sync();
 	fPixel->Unlock();
 
-	uint32 pixel = *((uint32*)fPixel->Bits());	
+	uint32 pixel = *((uint32*)fPixel->Bits());
 	rgb_color c;
 	c.alpha = pixel >> 24;
 	c.red = (pixel >> 16) & 0xFF;
@@ -2073,6 +2072,6 @@ main(long argc, char* argv[])
 	}
 
 	TApp app(pixelCount);
-	app.Run();	
+	app.Run();
 	return 0;
 }
