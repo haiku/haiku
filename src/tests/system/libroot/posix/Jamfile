@@ -60,6 +60,10 @@ SimpleTest init_rld_after_fork_test
 	: init_rld_after_fork_test.cpp
 ;
 
+SimpleTest xsi_msg_queue_test1
+	: xsi_msg_queue_test1.cpp
+;
+
 SimpleTest xsi_sem_test1
 	: xsi_sem_test1.cpp
 ;
