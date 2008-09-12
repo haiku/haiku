@@ -313,7 +313,7 @@ GenericThread::GetName(void)
 {
 	thread_info	t_thread_info;
 	GetInfo(& t_thread_info);
-	return (t_thread_info.name);
+	return strdup(t_thread_info.name);
 }
 
 thread_state
