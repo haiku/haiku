@@ -20,7 +20,6 @@ BAboutWindow::BAboutWindow(char *appName, int32 firstCopyrightYear,
 	const char **authors, char *extraInfo)
 {
 	fAppName = new BString(appName);
-	fText = new BString();
 
 	// Get current year
 	time_t tp;
@@ -42,13 +41,14 @@ BAboutWindow::BAboutWindow(char *appName, int32 firstCopyrightYear,
 		text << "\n" << extraInfo << "\n";
 	}
 
-	fText->Adopt(text);
+	fText = new BString(text);
 }
 
 
 BAboutWindow::~BAboutWindow()
 {
 	delete fText;
+	delete fAppName;
 }
 
 
