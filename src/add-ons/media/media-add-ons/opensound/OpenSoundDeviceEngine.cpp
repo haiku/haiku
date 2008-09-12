@@ -105,7 +105,6 @@ status_t OpenSoundDeviceEngine::Open(int mode)
 	// C-Media supports "only" 16). If OSS uses the same 2048 bytes even for
 	// 32 bit/sample, then I could see how that would be asking for too much,
 	// since that would effectively half the latency.
-
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	uint32 bufferCount = 6;
 	uint32 bufferSize = 0x000b; // 1024 bytes

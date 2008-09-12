@@ -136,7 +136,7 @@ public:
 		for (int32 i = 0; i < frames; i ++) {
 			// convert sample rate from 48000 to connected format
 			uint32 p = (uint32)((fTestTonePhase * sampleRate) / 48000);
-	
+
 			// prevent phase from integer overflow
 			fTestTonePhase = (fTestTonePhase + 1) % 4800;
 			for (int32 k = 0; k < channels; k++)
@@ -255,16 +255,16 @@ public:
 	{
 		if (fBufferGroup == NULL)
 			return NULL;
-		
+
 		BBuffer* buffer = fBufferGroup->RequestBuffer(
 			fOutput.format.u.raw_audio.buffer_size, bufferDuration);
-	
+
 		// if we fail to get a buffer (for example, if the request times out),
 		// we skip this buffer and go on to the next, to avoid locking up the
 		// control thread
 		if (!buffer)
 			return NULL;
-		
+
 		// now fill it with data
 		ssize_t sizeUsed = fRealEngine->Read(buffer->Data(),
 			fOutput.format.u.raw_audio.buffer_size);
@@ -296,7 +296,7 @@ public:
 		// AFMT_* flags for this output
 	media_output			fOutput;
 	media_format 			fPreferredFormat;
-	
+
 	thread_id				fThread;
 	BBufferGroup*			fBufferGroup;
 	bool					fUsingOwnBufferGroup;
@@ -323,19 +323,19 @@ OpenSoundNode::OpenSoundNode(BMediaAddOn* addon, const char* name,
 	  fTimeSourceStartTime(0),
 
 	  fWeb(NULL),
-	  fConfig(*config)
+	  fConfig(0UL)
 {
 	CALLED();
-	
+
 	if (fDevice == NULL)
 		return;
-		
+
 	fAddOn = addon;
 	fId = internal_id;
-	
+
 	AddNodeKind(B_PHYSICAL_OUTPUT);
 	AddNodeKind(B_PHYSICAL_INPUT);
-		
+
 	// initialize our preferred format object
 	// TODO: this should go away! should use engine's preferred for each afmt.
 #if 1
@@ -359,15 +359,17 @@ OpenSoundNode::OpenSoundNode(BMediaAddOn* addon, const char* name,
 	}
 
 	// TODO: Use the OSS suggested buffer size via SNDCTL_DSP_GETBLKSIZE ?
-	fPreferredFormat.u.raw_audio.buffer_size = DEFAULT_BUFFER_SIZE 
+	fPreferredFormat.u.raw_audio.buffer_size = DEFAULT_BUFFER_SIZE
 		* (fPreferredFormat.u.raw_audio.format
 			& media_raw_audio_format::B_AUDIO_SIZE_MASK)
 		* fPreferredFormat.u.raw_audio.channel_count;
 #endif
-	
-	if (config)
-		PRINT_OBJECT(*config);
-		
+
+	if (config != NULL) {
+		fConfig = *config;
+		PRINT_OBJECT(fConfig);
+	}
+
 	fInitCheckStatus = B_OK;
 }
 
@@ -386,8 +388,8 @@ OpenSoundNode::~OpenSoundNode()
 		delete (NodeOutput*)fOutputs.ItemAtFast(i);
 
 	BMediaEventLooper::Quit();
-		
-	fWeb = NULL;	
+
+	fWeb = NULL;
 }
 
 
@@ -438,16 +440,16 @@ void
 OpenSoundNode::NodeRegistered()
 {
 	CALLED();
-	
+
 	if (fInitCheckStatus != B_OK) {
 		ReportError(B_NODE_IN_DISTRESS);
 		return;
 	}
-	
+
 	SetPriority(B_REAL_TIME_PRIORITY);
-	
+
 	Run();
-	
+
 	TRACE("NodeRegistered: %d engines\n", fDevice->CountEngines());
 	for (int32 i = 0; i < fDevice->CountEngines(); i++) {
 		OpenSoundDeviceEngine* engine = fDevice->EngineAt(i);
@@ -486,7 +488,7 @@ OpenSoundNode::NodeRegistered()
 				prefix = "S/PDIF ";
 			sprintf(mediaInput.name, "%sOutput %ld (%s)", prefix,
 				mediaInput.destination.id, gSupportedFormatsNames[f]);
-					
+
 			NodeInput* input = new (nothrow) NodeInput(mediaInput, i, fmt,
 				this);
 			if (input == NULL || !fInputs.AddItem(input)) {
@@ -495,7 +497,7 @@ OpenSoundNode::NodeRegistered()
 			}
 		}
 	}
-	
+
 	for (int32 i = 0; i < fDevice->CountEngines(); i++) {
 		OpenSoundDeviceEngine* engine = fDevice->EngineAt(i);
 		if (engine == NULL)
@@ -516,7 +518,7 @@ OpenSoundNode::NodeRegistered()
 				continue;
 			TRACE("NodeRegistered() : creating an output for engine %i, "
 				"format[%i]\n", i, f);
-			
+
 			media_format preferredFormat;
 			status_t err = engine->PreferredFormatFor(fmt, preferredFormat);
 			if (err < B_OK)
@@ -534,7 +536,7 @@ OpenSoundNode::NodeRegistered()
 				prefix = "S/PDIF ";
 			sprintf(mediaOutput.name, "%sInput %ld (%s)", prefix,
 				mediaOutput.source.id, gSupportedFormatsNames[f]);
-					
+
 			NodeOutput* output = new (nothrow) NodeOutput(mediaOutput,
 				preferredFormat);
 			if (output == NULL || !fOutputs.AddItem(output)) {
@@ -549,11 +551,11 @@ OpenSoundNode::NodeRegistered()
 			output->fNode = this;
 		}
 	}
-		
+
 	// set up our parameter web
 	fWeb = MakeParameterWeb();
 	SetParameterWeb(fWeb);
-	
+
 	// apply configuration
 #ifdef PRINTING
 	bigtime_t start = system_time();
@@ -570,7 +572,7 @@ OpenSoundNode::NodeRegistered()
 		}
 		index++;
 	}
-	
+
 	TRACE("apply configuration in : %lldµs\n", system_time() - start);
 }
 
@@ -605,16 +607,16 @@ OpenSoundNode::AcceptFormat(const media_destination& dest,
 	// any wildcards corresponding to our requirements.
 
 	CALLED();
-	
+
 	NodeInput* channel = _FindInput(dest);
-	
+
 	if (channel == NULL) {
 		fprintf(stderr, "OpenSoundNode::AcceptFormat()"
 			" - B_MEDIA_BAD_DESTINATION");
 		return B_MEDIA_BAD_DESTINATION;
 			// we only have one input so that better be it
 	}
-	
+
 	if (format == NULL) {
 		fprintf(stderr, "OpenSoundNode::AcceptFormat() - B_BAD_VALUE\n");
 		return B_BAD_VALUE;
@@ -629,41 +631,41 @@ OpenSoundNode::AcceptFormat(const media_destination& dest,
 	fprintf(stderr,"\n");*/
 	// Be's format_is_compatible doesn't work.
 //	if (!format_is_compatible(*format,*myFormat)) {
-	
+
 	BAutolock L(fDevice->Locker());
-	
+
 	OpenSoundDeviceEngine* engine = fDevice->NextFreeEngineAt(
 		channel->fEngineIndex, false);
 	if (!engine)
 		return B_BUSY;
-	
+
 	status_t err = engine->AcceptFormatFor(channel->fOSSFormatFlags, *format,
 		false);
 	if (err < B_OK)
 		return err;
-	
+
 	channel->fRealEngine = engine;
-	
+
 /*
 	if ( format->type != B_MEDIA_RAW_AUDIO ) {
 		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
-	}	
+	}
 */
-	
+
 	//channel->fInput.format = channel->fPreferredFormat;
 	channel->fInput.format = *format;
-	
+
 	/*if(format->u.raw_audio.format == media_raw_audio_format::B_AUDIO_FLOAT
 		&& channel->fPreferredFormat.u.raw_audio.format
 			== media_raw_audio_format::B_AUDIO_SHORT)
 		format->u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	else*/ 
+	else*/
 /*
 	format->u.raw_audio.format = channel->fPreferredFormat.u.raw_audio.format;
 	format->u.raw_audio.valid_bits
 		= channel->fPreferredFormat.u.raw_audio.valid_bits;
-	
+
 	format->u.raw_audio.frame_rate
 		= channel->fPreferredFormat.u.raw_audio.frame_rate;
 	format->u.raw_audio.channel_count
@@ -677,7 +679,7 @@ OpenSoundNode::AcceptFormat(const media_destination& dest,
 				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
 			* format->u.raw_audio.channel_count;
 */
-	
+
 //	media_format myFormat;
 //	GetFormat(&myFormat);
 //	if (!format_is_acceptible(*format,myFormat)) {
@@ -685,7 +687,7 @@ OpenSoundNode::AcceptFormat(const media_destination& dest,
 //		return B_MEDIA_BAD_FORMAT;
 //	}
 
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -700,10 +702,10 @@ OpenSoundNode::GetNextInput(int32* cookie, media_input* out_input)
 		fprintf(stderr,"OpenSoundNode::GetNextInput() - B_BAD_VALUE\n");
 		return B_BAD_VALUE;
 	}
-		
+
 	if (*cookie >= fInputs.CountItems() || *cookie < 0)
 		return B_BAD_INDEX;
-		
+
 	NodeInput* channel = (NodeInput*)fInputs.ItemAt(*cookie);
 	*out_input = channel->fInput;
 	*cookie += 1;
@@ -736,7 +738,7 @@ OpenSoundNode::BufferReceived(BBuffer* buffer)
 //				fprintf(stderr, "ApplyParameterData() in "
 //					"OpenSoundNode::BufferReceived() failed: %s\n",
 //					strerror(status));
-//			}			
+//			}
 //			buffer->Recycle();
 //			break;
 //		}
@@ -745,7 +747,7 @@ OpenSoundNode::BufferReceived(BBuffer* buffer)
 				fprintf(stderr, "OpenSoundNode::BufferReceived() - "
 					"B_SMALL_BUFFER not implemented\n");
 				// TODO: implement this part
-				buffer->Recycle();			
+				buffer->Recycle();
 			} else {
 				media_timed_event event(buffer->Header()->start_time,
 					BTimedEventQueue::B_HANDLE_BUFFER, buffer,
@@ -759,7 +761,7 @@ OpenSoundNode::BufferReceived(BBuffer* buffer)
 				}
 			}
 			break;
-		default: 
+		default:
 			fprintf(stderr, "OpenSoundNode::BufferReceived() - unexpected "
 				"buffer type\n");
 			buffer->Recycle();
@@ -773,22 +775,22 @@ OpenSoundNode::ProducerDataStatus(const media_destination& for_whom,
 	int32 status, bigtime_t at_performance_time)
 {
 	CALLED();
-	
+
 	NodeInput* channel = _FindInput(for_whom);
-	
+
 	if (channel == NULL) {
 		fprintf(stderr,"OpenSoundNode::ProducerDataStatus() - "
 			"invalid destination\n");
 		return;
 	}
-	
+
 //	TRACE("************ ProducerDataStatus: queuing event ************\n");
 //	TRACE("************ status=%d ************\n", status);
-	
+
 	media_timed_event event(at_performance_time,
 		BTimedEventQueue::B_DATA_STATUS, &channel->fInput,
 		BTimedEventQueue::B_NO_CLEANUP, status, 0, NULL);
-	EventQueue()->AddEvent(event);	
+	EventQueue()->AddEvent(event);
 }
 
 
@@ -802,9 +804,9 @@ OpenSoundNode::GetLatencyFor(const media_destination& for_whom,
 		fprintf(stderr,"OpenSoundNode::GetLatencyFor() - B_BAD_VALUE\n");
 		return B_BAD_VALUE;
 	}
-	
+
 	NodeInput* channel = _FindInput(for_whom);
-	
+
 	if (channel == NULL || channel->fRealEngine == NULL) {
 		fprintf(stderr,"OpenSoundNode::GetLatencyFor() - "
 			"B_MEDIA_BAD_DESTINATION\n");
@@ -864,10 +866,10 @@ OpenSoundNode::Connected(const media_source& producer,
 	channel->fInput.format = with_format;
 
 	*out_input = channel->fInput;
-	
+
 	// we are sure the thread is started
 	_StartPlayThread(channel);
-	
+
 	return B_OK;
 }
 
@@ -912,7 +914,7 @@ OpenSoundNode::FormatChanged(const media_source& producer,
 {
 	CALLED();
 	NodeInput* channel = _FindInput(consumer);
-	
+
 	if (channel == NULL) {
 		fprintf(stderr,"OpenSoundNode::FormatChanged() - "
 			"B_MEDIA_BAD_DESTINATION\n");
@@ -925,7 +927,7 @@ OpenSoundNode::FormatChanged(const media_source& producer,
 		return B_MEDIA_BAD_SOURCE;
 	}
 
-	// currently not supported, TODO: implement?	
+	// currently not supported, TODO: implement?
 	return B_ERROR;
 }
 
@@ -952,7 +954,7 @@ OpenSoundNode::SeekTagRequested(const media_destination& destination,
 //	negotiation process; it's simply an interrogation -- the caller wants
 //	to see what the node's preferred data format is, given a suggestion by
 //	the caller.
-status_t 
+status_t
 OpenSoundNode::FormatSuggestionRequested(media_type type, int32 /*quality*/,
 	media_format* format)
 {
@@ -982,13 +984,13 @@ OpenSoundNode::FormatSuggestionRequested(media_type type, int32 /*quality*/,
 //!	FormatProposal() is the first stage in the BMediaRoster::Connect()
 //	process.  We hand out a suggested format, with wildcards for any
 //	variations we support.
-status_t 
+status_t
 OpenSoundNode::FormatProposal(const media_source& output, media_format* format)
 {
 	CALLED();
 
 	NodeOutput* channel = _FindOutput(output);
-	
+
 	// is this a proposal for our select output?
 	if (channel == NULL) {
 		fprintf(stderr, "OpenSoundNode::FormatProposal returning "
@@ -1020,13 +1022,13 @@ OpenSoundNode::FormatProposal(const media_source& output, media_format* format)
 			"B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	
+
 	// raw audio or wildcard type, either is okay by us
 	return B_OK;
 }
 
 
-status_t 
+status_t
 OpenSoundNode::FormatChangeRequested(const media_source& source,
 	const media_destination& destination, media_format* io_format,
 	int32* _deprecated_)
@@ -1039,7 +1041,7 @@ OpenSoundNode::FormatChangeRequested(const media_source& source,
 }
 
 
-status_t 
+status_t
 OpenSoundNode::GetNextOutput(int32* cookie, media_output* out_output)
 {
 	CALLED();
@@ -1054,7 +1056,7 @@ OpenSoundNode::GetNextOutput(int32* cookie, media_output* out_output)
 }
 
 
-status_t 
+status_t
 OpenSoundNode::DisposeOutputCookie(int32 cookie)
 {
 	CALLED();
@@ -1063,14 +1065,14 @@ OpenSoundNode::DisposeOutputCookie(int32 cookie)
 }
 
 
-status_t 
+status_t
 OpenSoundNode::SetBufferGroup(const media_source& for_source,
 	BBufferGroup* newGroup)
 {
 	CALLED();
 
 	NodeOutput* channel = _FindOutput(for_source);
-	
+
 	// is this our output?
 	if (channel == NULL) {
 		fprintf(stderr, "OpenSoundNode::SetBufferGroup() returning "
@@ -1107,7 +1109,7 @@ OpenSoundNode::SetBufferGroup(const media_source& for_source,
 //	changed the proposed format.  It may also have left wildcards in the
 //	format.  PrepareToConnect() *must* fully specialize the format before
 //	returning!
-status_t 
+status_t
 OpenSoundNode::PrepareToConnect(const media_source& what,
 	const media_destination& where, media_format* format,
 	media_source* out_source, char* out_name)
@@ -1116,7 +1118,7 @@ OpenSoundNode::PrepareToConnect(const media_source& what,
 
 	status_t err;
 	NodeOutput *channel = _FindOutput(what);
-	
+
 	// is this our output?
 	if (channel == NULL) {
 		fprintf(stderr, "OpenSoundNode::PrepareToConnect returning "
@@ -1142,13 +1144,13 @@ OpenSoundNode::PrepareToConnect(const media_source& what,
 		fprintf(stderr, "\tnon-raw-audio format?!\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	
+
 	// !!! validate all other fields except for buffer_size here, because the
 	// consumer might have supplied different values from AcceptFormat()?
 	err = engine->SpecializeFormatFor(channel->fOSSFormatFlags, *format, true);
 	if (err < B_OK)
 		return err;
-	
+
 	channel->fRealEngine = engine;
 
 #if 0
@@ -1174,15 +1176,15 @@ OpenSoundNode::PrepareToConnect(const media_source& what,
 }
 
 
-void 
+void
 OpenSoundNode::Connect(status_t error, const media_source& source,
 	const media_destination& destination, const media_format& format,
 	char* io_name)
 {
 	CALLED();
-	
+
 	NodeOutput *channel = _FindOutput(source);
-	
+
 	// is this our output?
 	if (channel == NULL) {
 		fprintf(stderr, "OpenSoundNode::Connect returning (cause : "
@@ -1193,7 +1195,7 @@ OpenSoundNode::Connect(status_t error, const media_source& source,
 	OpenSoundDeviceEngine *engine = channel->fRealEngine;
 	if (engine == NULL)
 		return;
-	
+
 	// If something earlier failed, Connect() might still be called, but with
 	// a non-zero error code.  When that happens we simply unreserve the
 	// connection and do nothing else.
@@ -1216,11 +1218,11 @@ OpenSoundNode::Connect(status_t error, const media_source& source,
 		* 10000
 		/ ( (channel->fOutput.format.u.raw_audio.format
 				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
-			* channel->fOutput.format.u.raw_audio.channel_count) 
+			* channel->fOutput.format.u.raw_audio.channel_count)
 		/ ((int32)(channel->fOutput.format.u.raw_audio.frame_rate / 100));
-	
+
 	SetBufferDuration(duration);
-	
+
 	// Now that we're connected, we can determine our downstream latency.
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
@@ -1232,7 +1234,7 @@ OpenSoundNode::Connect(status_t error, const media_source& source,
 		fInternalLatency);
 	//SetEventLatency(fLatency + fInternalLatency);
 
-	// Set up the buffer group for our connection, as long as nobody handed us 
+	// Set up the buffer group for our connection, as long as nobody handed us
 	// a buffer group (via SetBufferGroup()) prior to this.  That can happen,
 	// for example, if the consumer calls SetOutputBuffersFor() on us from
 	// within its Connected() method.
@@ -1240,20 +1242,20 @@ OpenSoundNode::Connect(status_t error, const media_source& source,
 		channel->AllocateBuffers(BufferDuration(), fLatency);
 
 	engine->StartRecording();
-	
+
 	// we are sure the thread is started
 	_StartRecThread(channel);
 }
 
 
-void 
+void
 OpenSoundNode::Disconnect(const media_source& what,
 	const media_destination& where)
 {
 	CALLED();
-	
+
 	NodeOutput *channel = _FindOutput(what);
-	
+
 	// is this our output?
 	if (channel == NULL) {
 		fprintf(stderr, "OpenSoundNode::Disconnect() returning (cause : "
@@ -1264,9 +1266,9 @@ OpenSoundNode::Disconnect(const media_source& what,
 	_StopRecThread(channel);
 
 	BAutolock L(fDevice->Locker());
-	
+
 	OpenSoundDeviceEngine* engine = channel->fRealEngine;
-	
+
 	// Make sure that our connection is the one being disconnected
 	if (where == channel->fOutput.destination
 		&& what == channel->fOutput.source) {
@@ -1284,12 +1286,12 @@ OpenSoundNode::Disconnect(const media_source& what,
 }
 
 
-void 
+void
 OpenSoundNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 	bigtime_t performance_time)
 {
 	CALLED();
-	
+
 	// is this our output?
 	NodeOutput *channel = _FindOutput(what);
 	if (channel == NULL)
@@ -1327,7 +1329,7 @@ OpenSoundNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 }
 
 
-void 
+void
 OpenSoundNode::EnableOutput(const media_source& what, bool enabled,
 	int32* _deprecated_)
 {
@@ -1338,14 +1340,14 @@ OpenSoundNode::EnableOutput(const media_source& what, bool enabled,
 	// node only has one output, so I just make sure the given source matches, then set
 	// the enable state accordingly.
 	NodeOutput *channel = _FindOutput(what);
-	
+
 	if (channel != NULL)
 	{
 		channel->fOutputEnabled = enabled;
 	}
 }
 
-void 
+void
 OpenSoundNode::AdditionalBufferRequested(const media_source& source,
 	media_buffer_id prev_buffer, bigtime_t prev_time,
 	const media_seek_tag* prev_tag)
@@ -1413,22 +1415,22 @@ OpenSoundNode::HandleBuffer(const media_timed_event* event,
 		fprintf(stderr,"OpenSoundNode::HandleBuffer() - B_BAD_VALUE\n");
 		return B_BAD_VALUE;
 	}
-	
+
 	NodeInput *channel = _FindInput(buffer->Header()->destination);
 //	TRACE("buffer->Header()->destination : %i\n",
 //		buffer->Header()->destination);
-	
+
 	if (channel == NULL) {
 		buffer->Recycle();
 		fprintf(stderr,"OpenSoundNode::HandleBuffer() - "
 			"B_MEDIA_BAD_DESTINATION\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
-	
+
 	media_header* hdr = buffer->Header();
 	bigtime_t now = TimeSource()->Now();
 	bigtime_t perf_time = hdr->start_time;
-	
+
 	// the how_early calculated here doesn't include scheduling latency
 	// because we've already been scheduled to handle the buffer
 	bigtime_t how_early = perf_time - EventLatency() - now;
@@ -1471,7 +1473,7 @@ OpenSoundNode::HandleDataStatus(const media_timed_event* event,
 {
 //	CALLED();
 
-	// TODO: this is called mostly whenever the system mixer 
+	// TODO: this is called mostly whenever the system mixer
 	// switches from not sending us buffers (no client connected)
 	// to sending buffers, and vice versa. In a Terminal, this
 	// can be nicely demonstrated by provoking a system beep while
@@ -1527,7 +1529,7 @@ OpenSoundNode::HandleSeek(const media_timed_event* event, bigtime_t lateness,
 	return B_OK;
 }
 
-				
+
 status_t
 OpenSoundNode::HandleWarp(const media_timed_event* event,
 	bigtime_t lateness, bool realTimeEvent)
@@ -1581,10 +1583,10 @@ OpenSoundNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 			if (RunState() != BMediaEventLooper::B_STARTED) {
 				fTimeSourceStarted = true;
 				fTimeSourceStartTime = RealTime();
-			
+
 				media_timed_event startEvent(0, BTimedEventQueue::B_START);
 				EventQueue()->AddEvent(startEvent);
-			}	
+			}
 			break;
 		case B_TIMESOURCE_STOP:
 			TRACE("TimeSourceOp op B_TIMESOURCE_STOP\n");
@@ -1620,7 +1622,7 @@ printf("TimeSourceOp op B_TIMESOURCE_SEEK, real %lld, "
 // #pragma mark - BControllable
 
 
-status_t 
+status_t
 OpenSoundNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 	size_t* ioSize)
 {
@@ -1628,13 +1630,13 @@ OpenSoundNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 
 	int channelCount = 1;
 	int sliderShift = 8;
-	
+
 	OpenSoundDeviceMixer* mixer = fDevice->MixerAt(0);
 	if (!mixer)
 		return ENODEV;
 
 	TRACE("id : %i, *ioSize=%d\n", id, *ioSize);
-	
+
 	oss_mixext mixext;
 	status_t err = mixer->GetExtInfo(id, &mixext);
 	if (err < B_OK)
@@ -1643,11 +1645,11 @@ OpenSoundNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 	oss_mixer_value mixval;
 	mixval.ctrl = mixext.ctrl;
 	mixval.timestamp = mixext.timestamp;
-	
+
 	err = mixer->GetMixerValue(&mixval);
 	if (err < B_OK)
 		return err;
-	
+
 	if (!(mixext.flags & MIXF_READABLE))
 		return EINVAL;
 
@@ -1664,7 +1666,7 @@ OpenSoundNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 	TRACE("%s: value = 0x%08x\n", __FUNCTION__, mixval.value);
 
 	*last_change = system_time();//??
-	
+
 	switch (mixext.type) {
 	case MIXT_DEVROOT:
 	case MIXT_GROUP:
@@ -1694,7 +1696,7 @@ OpenSoundNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 			return EINVAL;
 		if (parameter->Type() != BParameter::B_CONTINUOUS_PARAMETER)
 			return EINVAL;
-		if (mixext.type == MIXT_STEREOSLIDER16 || 
+		if (mixext.type == MIXT_STEREOSLIDER16 ||
 			mixext.type == MIXT_MONOSLIDER16)
 			sliderShift = 16;
 		*ioSize = channelCount * sizeof(float);
@@ -1744,7 +1746,7 @@ OpenSoundNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 }
 
 
-void 
+void
 OpenSoundNode::SetParameterValue(int32 id, bigtime_t performance_time,
 	const void* value, size_t size)
 {
@@ -1752,11 +1754,11 @@ OpenSoundNode::SetParameterValue(int32 id, bigtime_t performance_time,
 
 	TRACE("id : %i, performance_time : %lld, size : %i\n", id,
 		performance_time, size);
-	
+
 	OpenSoundDeviceMixer *mixer = fDevice->MixerAt(0);
 	if (mixer == NULL)
 		return;
-	
+
 	oss_mixext mixext;
 	if (mixer->GetExtInfo(id, &mixext) < B_OK)
 		return;
@@ -1766,14 +1768,14 @@ OpenSoundNode::SetParameterValue(int32 id, bigtime_t performance_time,
 	oss_mixer_value mixval;
 	mixval.ctrl = mixext.ctrl;
 	mixval.timestamp = mixext.timestamp;
-	
+
 	status_t err = mixer->GetMixerValue(&mixval);
 	if (err < B_OK)
 		return;
 
 	mixval.ctrl = mixext.ctrl;
 	mixval.timestamp = mixext.timestamp;
-	
+
 	BParameter *parameter = NULL;
 	for(int32 i=0; i<fWeb->CountParameters(); i++) {
 		parameter = fWeb->ParameterAt(i);
@@ -1803,7 +1805,7 @@ OpenSoundNode::SetParameterValue(int32 id, bigtime_t performance_time,
 			// XXX: find something better, doesn't work correctly here.
 			// XXX: try a timed event ?
 			_PropagateParameterChanges(mixext.ctrl, mixext.type, mixext.id);
-			
+
 			return;
 		case MIXT_ENUM:
 			if (size < sizeof(int32))
@@ -1823,22 +1825,22 @@ OpenSoundNode::SetParameterValue(int32 id, bigtime_t performance_time,
 				return;
 			if (parameter->Type() != BParameter::B_CONTINUOUS_PARAMETER)
 				return;
-			if (mixext.type == MIXT_STEREOSLIDER16 || 
+			if (mixext.type == MIXT_STEREOSLIDER16 ||
 				mixext.type == MIXT_MONOSLIDER16)
 				sliderShift = 16;
 			mixval.value = 0;
-	
+
 			TRACE("-------- sliderShift=%d, v = %08x, v & %08x = %08x\n",
 				sliderShift, mixval.value, ((1 << sliderShift) - 1),
 				mixval.value & ((1 << sliderShift) - 1));
-	
+
 			mixval.value |= ((int)(((float *)value)[0]))
 				& ((1 << sliderShift) - 1);
 			if (channelCount > 1) {
 				mixval.value |= (((int)(((float *)value)[1]))
 					& ((1 << sliderShift) - 1)) << sliderShift;
 			}
-	
+
 			TRACE("%s: value = 0x%08x\n", __FUNCTION__, mixval.value);
 			mixer->SetMixerValue(&mixval);
 			return;
@@ -1875,23 +1877,23 @@ OpenSoundNode::SetParameterValue(int32 id, bigtime_t performance_time,
 			TRACE("OpenSoundNode::%s: unknown mixer control type %d\n",
 				__FUNCTION__, mixext.type);
 	}
-	
+
 	return;
 }
 
 
-BParameterWeb* 
+BParameterWeb*
 OpenSoundNode::MakeParameterWeb()
 {
 	CALLED();
 	BParameterWeb* web = new BParameterWeb;
-	
-	// TODO: the card might change the mixer controls at some point, 
+
+	// TODO: the card might change the mixer controls at some point,
 	// we should detect it (poll) and recreate the parameter web and
-	// re-set it. 
-	
+	// re-set it.
+
 	// TODO: cache mixext[...] and poll for changes in their update_counter.
-	
+
 	OpenSoundDeviceMixer* mixer = fDevice->MixerAt(0);
 	if (mixer == NULL) {
 		// some cards don't have a mixer, just put a placeholder then
@@ -1900,7 +1902,7 @@ OpenSoundNode::MakeParameterWeb()
 			B_GENERIC);
 		return web;
 	}
-	
+
 	int mixext_count = mixer->CountExtInfos();
 	TRACE("OpenSoundNode::MakeParameterWeb %i ExtInfos\n", mixext_count);
 
@@ -1908,7 +1910,7 @@ OpenSoundNode::MakeParameterWeb()
 		oss_mixext mixext;
 		if (mixer->GetExtInfo(i, &mixext) < B_OK)
 			continue;
-		
+
 		if (mixext.type == MIXT_DEVROOT) {
 			oss_mixext_root* extroot = (oss_mixext_root*)mixext.data;
 			TRACE("OpenSoundNode: mixext[%d]: ROOT\n", i);
@@ -1927,7 +1929,7 @@ OpenSoundNode::MakeParameterWeb()
 // #pragma mark - OpenSoundNode specific
 
 
-void 
+void
 OpenSoundNode::_ProcessGroup(BParameterGroup *group, int32 index,
 	int32& nbParameters)
 {
@@ -1943,7 +1945,7 @@ OpenSoundNode::_ProcessGroup(BParameterGroup *group, int32 index,
 		// only keep direct children of that group
 		if (mixext.parent != index)
 			continue;
-		
+
 		int32 nb = 1;
 
 		TRACE("OpenSoundNode: mixext[%d]: { %s/%s, type=%d, parent=%d, "
@@ -1955,19 +1957,19 @@ OpenSoundNode::_ProcessGroup(BParameterGroup *group, int32 index,
 			mixext.minvalue, mixext.maxvalue,
 			mixext.flags, mixext.control_no,
 			mixext.desc, mixext.update_counter);
-		
+
 		// should actually rename the whole group but it's too late there.
 		const char *childName = mixext.extname;
 		if (mixext.flags & MIXF_MAINVOL)
 			childName = "Master Gain";
-		
+
 		const char *sliderUnit = "";//"(linear)";
 		if (mixext.flags & MIXF_HZ)
 			sliderUnit = "Hz";
-		
+
 		const char *continuousKind = B_GAIN;
 		BParameterGroup* child;
-		
+
 		switch (mixext.type) {
 		case MIXT_DEVROOT:
 			// root item, should be done already
@@ -1998,7 +2000,7 @@ OpenSoundNode::_ProcessGroup(BParameterGroup *group, int32 index,
 		case MIXT_ENUM:
 		{
 			TRACE("OpenSoundNode: mixext[%d]: ENUM\n", i);
-			BDiscreteParameter *parameter = 
+			BDiscreteParameter *parameter =
 				group->MakeDiscreteParameter(i, B_MEDIA_RAW_AUDIO, childName,
 					B_INPUT_MUX);
 			if (nbParameters > 0) {
@@ -2021,7 +2023,7 @@ OpenSoundNode::_ProcessGroup(BParameterGroup *group, int32 index,
 			// fall through
 		case MIXT_STEREOSLIDER:
 			TRACE("OpenSoundNode: mixext[%d]: [MONO|STEREO]SLIDER\n", i);
-			
+
 			if (mixext.flags & MIXF_MAINVOL)
 				continuousKind = B_MASTER_GAIN;
 
@@ -2030,23 +2032,23 @@ OpenSoundNode::_ProcessGroup(BParameterGroup *group, int32 index,
 //				true;//step size
 //			if (mixext.flags & MIXF_DECIBEL)
 //				true;//step size
-			
+
 			group->MakeContinuousParameter(i, B_MEDIA_RAW_AUDIO, childName,
 				continuousKind,  sliderUnit, mixext.minvalue, mixext.maxvalue,
 				/*TODO: should be "granularity"*/1);
-			
-			if (mixext.type == MIXT_STEREOSLIDER || 
-				mixext.type == MIXT_STEREOSLIDER16 || 
+
+			if (mixext.type == MIXT_STEREOSLIDER ||
+				mixext.type == MIXT_STEREOSLIDER16 ||
 				mixext.type == MIXT_STEREODB)
 				group->ParameterAt(nbParameters)->SetChannelCount(2);
-			
+
 			TRACE("nb parameters : %d\n", nbParameters);
 			if (nbParameters > 0) {
 				(group->ParameterAt(nbParameters - 1))->AddOutput(
 					group->ParameterAt(nbParameters));
 				nbParameters++;
 			}
-			
+
 			break;
 		case MIXT_MESSAGE:
 			break;
@@ -2091,7 +2093,7 @@ OpenSoundNode::_ProcessGroup(BParameterGroup *group, int32 index,
 }
 
 
-void 
+void
 OpenSoundNode::_ProcessMux(BDiscreteParameter* parameter, int32 index)
 {
 	CALLED();
@@ -2112,7 +2114,7 @@ OpenSoundNode::_ProcessMux(BDiscreteParameter* parameter, int32 index)
 		}
 		return;
 	}
-	
+
 	for (int32 i = 0; i < enuminfo.nvalues; i++) {
 		parameter->AddItem(i, &enuminfo.strings[enuminfo.strindex[i]]);
 	}
@@ -2120,7 +2122,7 @@ OpenSoundNode::_ProcessMux(BDiscreteParameter* parameter, int32 index)
 }
 
 
-status_t 
+status_t
 OpenSoundNode::_PropagateParameterChanges(int from, int type, const char* id)
 {
 	CALLED();
@@ -2131,38 +2133,38 @@ OpenSoundNode::_PropagateParameterChanges(int from, int type, const char* id)
 	OpenSoundDeviceMixer* mixer = fDevice->MixerAt(0);
 	if (mixer == NULL)
 		return ENODEV;
-	
+
 // TODO: Cortex doesn't like that!
 // try timed event
 // try checking update_counter+caching
 return B_OK;
-	
+
 //	char oldValues[128];
 	char newValues[128];
 	size_t oldValuesSize;
 	size_t newValuesSize;
-	
+
 	for (int i = 0; i < mixer->CountExtInfos(); i++) {
 		oss_mixext mixext;
 		status_t err = mixer->GetExtInfo(i, &mixext);
 		if (err < B_OK)
 			continue;
-		
+
 		// skip the caller
 		//if (mixext.ctrl == from)
 		//	continue;
-		
+
 		if (!(mixext.flags & MIXF_READABLE))
 			continue;
-		
+
 		// match type ?
 		if (type > -1 && mixext.type != type)
 			continue;
-		
+
 		// match internal ID string
 		if (id && strncmp(mixext.id, id, 16))
 			continue;
-		
+
 //		BParameter *parameter = NULL;
 //		for(int32 i=0; i<fWeb->CountParameters(); i++) {
 //			parameter = fWeb->ParameterAt(i);
@@ -2208,7 +2210,7 @@ OpenSoundNode::_PlayThread(NodeInput* input)
 	if (!engine || !engine->InUse())
 		return B_NO_INIT;
 	// skip unconnected or non-busy engines
-	if (input->fInput.source == media_source::null 
+	if (input->fInput.source == media_source::null
 		&& input->fEngineIndex == 0)
 		return B_NO_INIT;
 	// must be open for write
@@ -2387,7 +2389,7 @@ OpenSoundNode::_StartPlayThread(NodeInput* input)
 	// the thread is already started ?
 	if (input->fThread > B_OK)
 		return B_OK;
-	
+
 	//allocate buffer free semaphore
 //	int bufferCount = MAX(fDevice->fFragments.fragstotal, 2); // XXX
 
@@ -2395,7 +2397,7 @@ OpenSoundNode::_StartPlayThread(NodeInput* input)
 //		"multi_audio out buffer free");
 //	fBufferAvailableSem = create_sem(bufferCount - 1,
 //		"OpenSound out buffer free");
-	
+
 //	if (fBufferAvailableSem < B_OK)
 //		return B_ERROR;
 
@@ -2441,15 +2443,15 @@ OpenSoundNode::_StartRecThread(NodeOutput* output)
 	// the thread is already started ?
 	if (output->fThread > B_OK)
 		return B_OK;
-	
+
 	//allocate buffer free semaphore
 //	int bufferCount = MAX(fDevice->fFragments.fragstotal, 2); // XXX
-	
+
 //	fBufferAvailableSem = create_sem(fDevice->MBL.return_playback_buffers - 1,
 //		"multi_audio out buffer free");
 //	fBufferAvailableSem = create_sem(bufferCount - 1,
 //		"OpenSound out buffer free");
-	
+
 //	if (fBufferAvailableSem < B_OK)
 //		return B_ERROR;
 
@@ -2511,7 +2513,7 @@ OpenSoundNode::_FillNextBuffer(audio_buf_info* abinfo, NodeOutput& channel)
 	BBuffer* buffer = channel.FillNextBuffer(BufferDuration());
 	if (!buffer)
 		return NULL;
-	
+
 	if (fDevice == NULL)
 		fprintf(stderr, "OpenSoundNode::_FillNextBuffer() - fDevice NULL\n");
 	if (buffer->Header() == NULL) {
@@ -2522,7 +2524,7 @@ OpenSoundNode::_FillNextBuffer(audio_buf_info* abinfo, NodeOutput& channel)
 		fprintf(stderr, "OpenSoundNode::_FillNextBuffer() - "
 			"TimeSource() NULL\n");
 	}
-	
+
 	// fill in the buffer header
 	media_header* hdr = buffer->Header();
 	if (hdr != NULL) {
@@ -2530,7 +2532,7 @@ OpenSoundNode::_FillNextBuffer(audio_buf_info* abinfo, NodeOutput& channel)
 		// TODO: should be system_time() - latency_as_per(abinfo)
 		hdr->start_time = PerformanceTimeFor(system_time());
 	}
-	
+
 	return buffer;
 }
 
@@ -2551,7 +2553,7 @@ OpenSoundNode::GetConfigurationFor(BMessage* into_message)
 		if (parameter->Type() != BParameter::B_CONTINUOUS_PARAMETER
 			&& parameter->Type() != BParameter::B_DISCRETE_PARAMETER)
 			continue;
-			
+
 		TRACE("getting parameter %i\n", parameter->ID());
 		size = 128;
 		bigtime_t last_change;
@@ -2562,7 +2564,7 @@ OpenSoundNode::GetConfigurationFor(BMessage* into_message)
 			free(buffer);
 			buffer = malloc(size);
 		}
-		
+
 		if (err == B_OK && size > 0) {
 			into_message->AddInt32("parameterID", parameter->ID());
 			into_message->AddData("parameterData", B_RAW_TYPE, buffer, size,
@@ -2669,7 +2671,7 @@ OpenSoundNode::GetFlavor(flavor_info* outInfo, int32 id)
 	outInfo->name = "OpenSoundNode Node";
 	outInfo->info = "The OpenSoundNode outputs to OpenSound System v4 "
 		"drivers.";
-	outInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_TIME_SOURCE 
+	outInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_TIME_SOURCE
 		| B_PHYSICAL_OUTPUT | B_PHYSICAL_INPUT | B_CONTROLLABLE;
 	// TODO: If the OSS engine supports outputing encoded audio,
 	// we would need to setup a B_MEDIA_ENCODED_AUDIO format here
@@ -2678,7 +2680,7 @@ OpenSoundNode::GetFlavor(flavor_info* outInfo, int32 id)
 	media_format * informats = new media_format[outInfo->in_format_count];
 	GetFormat(&informats[0]);
 	outInfo->in_formats = informats;
-	
+
 	outInfo->out_format_count = 1;
 		// 1 output
 	media_format * outformats = new media_format[outInfo->out_format_count];
@@ -2696,6 +2698,6 @@ OpenSoundNode::GetFormat(media_format* outFormat)
 
 	outFormat->type = B_MEDIA_RAW_AUDIO;
 	outFormat->require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-	outFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;	
+	outFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 	outFormat->u.raw_audio = media_raw_audio_format::wildcard;
 }
