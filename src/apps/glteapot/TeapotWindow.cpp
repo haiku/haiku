@@ -7,6 +7,7 @@
 #include <InterfaceKit.h>
 #include <Rect.h>
 #include <Point.h>
+#include <new>
 
 #include "TeapotWindow.h"
 
@@ -34,9 +35,8 @@ TeapotWindow::TeapotWindow(BRect rect, char* name, window_type wt, ulong somethi
 	AddChild(subView);
 	
 	bounds = subView->Bounds();
-	fObjectView = new ObjectView(bounds, "objectView", B_FOLLOW_ALL_SIDES, type);
-	subView->AddChild(fObjectView);
-	fObjectView = fObjectView;
+	fObjectView = new(std::nothrow) ObjectView(bounds, "objectView", B_FOLLOW_ALL_SIDES, type);
+	subView->AddChild(fObjectView);	
 	
 	BMenuItem*	item;
 	msg.AddInt32("num", 256);
@@ -163,8 +163,9 @@ TeapotWindow::TeapotWindow(BRect rect, char* name, window_type wt, ulong somethi
 bool
 TeapotWindow::QuitRequested()
 {
-//	printf("closing \n");
-	fObjectView->EnableDirectMode(false);
+	if (fObjectView != NULL)
+		fObjectView->EnableDirectMode(false);
+		
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
@@ -173,9 +174,10 @@ TeapotWindow::QuitRequested()
 void
 TeapotWindow::DirectConnected(direct_buffer_info* info)
 {
-	if (fObjectView)
+	if (fObjectView != NULL) {
 		fObjectView->DirectConnected(info);	
-	fObjectView->EnableDirectMode(true);
+		fObjectView->EnableDirectMode(true);
+	}
 }
 
 
