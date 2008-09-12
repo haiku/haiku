@@ -212,7 +212,7 @@ MediaTrackAudioSupplier::_InitFromTrack()
 int64
 MediaTrackAudioSupplier::_FramesPerBuffer() const
 {
-	int64 sampleSize = fFormat.u.raw_audio.format 
+	int64 sampleSize = fFormat.u.raw_audio.format
 		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	int64 frameSize = sampleSize * fFormat.u.raw_audio.channel_count;
 	return fFormat.u.raw_audio.buffer_size / frameSize;
@@ -229,7 +229,7 @@ MediaTrackAudioSupplier::_CopyFrames(void* source, int64 sourceOffset,
 							  void* target, int64 targetOffset,
 							  int64 position, int64 frames) const
 {
-	int64 sampleSize = fFormat.u.raw_audio.format 
+	int64 sampleSize = fFormat.u.raw_audio.format
 					   & media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	int64 frameSize = sampleSize * fFormat.u.raw_audio.channel_count;
 	source = (char*)source + frameSize * (position - sourceOffset);
@@ -266,6 +266,8 @@ MediaTrackAudioSupplier::_AllocateBuffers()
 		Buffer* buffer = new (nothrow) Buffer;
 		if (!buffer || !fBuffers.AddItem(buffer)) {
 			delete buffer;
+			if (fBuffers.CountItems() == 0)
+				delete[] data;
 			return;
 		}
 		buffer->data = data;
@@ -521,7 +523,7 @@ MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
 		}
 	}
 	// Ensure that all frames up to the next key frame are cached.
-	// This avoids, that each read 
+	// This avoids, that each read
 	if (error == B_OK) {
 		int64 nextKeyFrame = currentPos;
 		if (_FindKeyFrameForward(nextKeyFrame) == B_OK) {
