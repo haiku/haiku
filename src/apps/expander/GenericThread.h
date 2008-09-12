@@ -7,11 +7,11 @@
 class GenericThread
 {
 	public:
-		GenericThread(const char * a_thread_name = "generic_thread", int32 a_priority = B_NORMAL_PRIORITY, BMessage * a_message = NULL);
+		GenericThread(const char * thread_name = "generic_thread", int32 a_priority = B_NORMAL_PRIORITY, BMessage * message = NULL);
 		virtual	~GenericThread(void);
 
 		BMessage *	GetDataStore(void);
-		void		SetDataStore(BMessage * a_message);
+		void		SetDataStore(BMessage * message);
 
 		status_t	Start(void);
 		status_t	Pause(bool a_do_block = TRUE, bigtime_t a_timeout = 0);
@@ -39,7 +39,7 @@ class GenericThread
 		void		SnoozeUntil(bigtime_t a_microseconds, int a_timebase = B_SYSTEM_TIMEBASE);
 
 
-		status_t		GetInfo(thread_info * a_thread_info);
+		status_t		GetInfo(thread_info * thread_info);
 		thread_id		GetThread(void);
 		team_id			GetTeam(void);
 		char	*		GetName(void);
@@ -65,18 +65,18 @@ class GenericThread
 		void		BeginUnit(void);	// acquire m_execute_cycle
 		void		EndUnit(void);	// release m_execute_cycle
 
-		BMessage	 *		m_thread_data_store;
+		BMessage	 *		fThreadDataStore;
 
 	private:
 
 		static status_t	private_thread_function(void * a_simple_thread_ptr);
 
-		thread_id		m_thread_id;
+		thread_id		fThreadId;
 
-		sem_id			m_execute_unit;	// acq./relase within tread_function.. For Pause()
+		sem_id			fExecuteUnit;	// acq./relase within tread_function.. For Pause()
 
-		bool			m_quit_requested;
-		bool			m_thread_is_paused;
+		bool			fQuitRequested;
+		bool			fThreadIsPaused;
 
 };
 
