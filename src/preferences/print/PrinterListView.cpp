@@ -252,21 +252,22 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
 
 	if (sIcon && sIcon->IsValid() && sSelectedIcon == NULL) {
 		BBitmap *checkMark = LoadBitmap("check_mark_icon", 'BBMP');
-		sSelectedIcon = new BBitmap(rect, B_RGBA32, true);
-		if (checkMark && checkMark->IsValid()
-			&& sSelectedIcon && sSelectedIcon->IsValid()) {
-			// draw check mark at bottom left over printer icon
-			BView *view = new BView(rect, "offscreen", B_FOLLOW_ALL, B_WILL_DRAW);
-			float y = rect.Height() - checkMark->Bounds().Height();
-			sSelectedIcon->Lock();
-			sSelectedIcon->AddChild(view);
-			view->DrawBitmap(sIcon);
-			view->SetDrawingMode(B_OP_ALPHA);
-			view->DrawBitmap(checkMark, BPoint(0, y));
-			view->Sync();
-			view->RemoveSelf();
-			sSelectedIcon->Unlock();
-			delete view;
+		if (checkMark && checkMark->IsValid()) {
+			sSelectedIcon = new BBitmap(rect, B_RGBA32, true);
+			if (sSelectedIcon && sSelectedIcon->IsValid()) {
+				// draw check mark at bottom left over printer icon
+				BView *view = new BView(rect, "offscreen", B_FOLLOW_ALL, B_WILL_DRAW);
+				float y = rect.Height() - checkMark->Bounds().Height();
+				sSelectedIcon->Lock();
+				sSelectedIcon->AddChild(view);
+				view->DrawBitmap(sIcon);
+				view->SetDrawingMode(B_OP_ALPHA);
+				view->DrawBitmap(checkMark, BPoint(0, y));
+				view->Sync();
+				view->RemoveSelf();
+				sSelectedIcon->Unlock();
+				delete view;
+			}
 			delete checkMark;
 		}
 	}
