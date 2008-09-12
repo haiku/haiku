@@ -7,6 +7,7 @@
 #include <kernel_cpp.h>
 #include <stdlib.h>
 #include <string.h>
+#include <new>
 
 struct device_list_entry {
 	char *				name;
@@ -40,7 +41,7 @@ DeviceList::~DeviceList()
 status_t
 DeviceList::AddDevice(const char *name, void *device)
 {
-	device_list_entry *entry = new device_list_entry;
+	device_list_entry *entry = new(std::nothrow) device_list_entry;
 	if (entry == NULL)
 		return B_NO_MEMORY;
 

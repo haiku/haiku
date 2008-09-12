@@ -16,6 +16,8 @@
 #include "BeOSCompatibility.h" // for pseudo mutex
 #endif
 
+#include <new>
+
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 usb_module_info *gUSBModule = NULL;
@@ -68,9 +70,9 @@ usb_hid_device_added(usb_device device, void **cookie)
 		const usb_interface_info *interface = config->interface[i].active;
 		uint8 interfaceClass = interface->descr->interface_class;
 		uint8 interfaceSubclass = interface->descr->interface_subclass;
-		uint8 interfaceProtocol = interface->descr->interface_protocol;
 		TRACE("interface %lu: class: %u; subclass: %u; protocol: %u\n",
-			i, interfaceClass, interfaceSubclass, interfaceProtocol);
+			i, interfaceClass, interfaceSubclass,
+			interface->descr->interface_protocol);
 
 		if (interfaceClass == USB_INTERFACE_CLASS_HID
 			&& interfaceSubclass == USB_INTERFACE_SUBCLASS_HID_BOOT) {
@@ -221,7 +223,7 @@ init_driver()
 	if (get_module(B_USB_MODULE_NAME, (module_info **)&gUSBModule) != B_OK)
 		return B_ERROR;
 
-	gDeviceList = new DeviceList();
+	gDeviceList = new(std::nothrow) DeviceList();
 	if (gDeviceList == NULL) {
 		put_module(B_USB_MODULE_NAME);
 		return B_NO_MEMORY;

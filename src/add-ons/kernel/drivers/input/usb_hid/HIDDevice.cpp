@@ -8,6 +8,7 @@
 #include <usb/USB_hid.h>
 #include <stdio.h>
 #include <string.h>
+#include <new>
 
 // includes for the different device types
 #include "KeyboardDevice.h"
@@ -181,11 +182,14 @@ HIDDevice::MakeHIDDevice(usb_device device,
 
 	// determine device type and create the device object
 	if (deviceType == USB_HID_DEVICE_TYPE_KEYBOARD) {
-		return new KeyboardDevice(device, interruptPipe, interfaceIndex,
-			finalInstructions, instructionCount, totalReportSize);
-	} else if (deviceType == USB_HID_DEVICE_TYPE_MOUSE) {
-		return new MouseDevice(device, interruptPipe, interfaceIndex,
-			finalInstructions, instructionCount, totalReportSize);
+		return new(std::nothrow) KeyboardDevice(device, interruptPipe,
+			interfaceIndex, finalInstructions, instructionCount,
+			totalReportSize);
+	} else if (deviceType == USB_HID_DEVICE_TYPE_MOUSE
+		|| deviceType == 0x01250015) {
+		return new(std::nothrow) MouseDevice(device, interruptPipe,
+			interfaceIndex, finalInstructions, instructionCount,
+			totalReportSize);
 	}
 
 	TRACE_ALWAYS("unsupported device type 0x%08lx\n", deviceType);
