@@ -1407,7 +1407,7 @@ BMenu::_Track(int *action, long start)
 		fSuper->fState = MENU_STATE_TRACKING_SUBMENU;
 
 	BPoint location;
-	uint32 buttons;
+	uint32 buttons = 0;
 	if (LockLooper()) {
 		GetMouse(&location, &buttons);
 		UnlockLooper();
