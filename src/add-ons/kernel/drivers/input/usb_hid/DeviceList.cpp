@@ -45,8 +45,10 @@ DeviceList::AddDevice(const char *name, void *device)
 		return B_NO_MEMORY;
 
 	entry->name = strdup(name);
-	if (entry->name == NULL)
+	if (entry->name == NULL) {
+		delete entry;
 		return B_NO_MEMORY;
+	}
 
 	entry->device = device;
 	entry->next = NULL;
