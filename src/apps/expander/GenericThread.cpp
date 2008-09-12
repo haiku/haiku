@@ -3,6 +3,8 @@
 
 #include "GenericThread.h"
 
+#include <string.h>
+
 GenericThread::GenericThread(const char * a_thread_name, int32 a_priority, BMessage * a_message)
 	:
 	m_thread_data_store(a_message),
