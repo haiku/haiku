@@ -4385,8 +4385,9 @@ BTextView::_GetProperty(BMessage *specifier, int32 form, const char *property, B
 
 		reply->what = B_REPLY;
 		reply->AddString("result", buffer);
-		delete buffer;
 		reply->AddInt32("error", B_OK);
+
+		delete[] buffer;
 
 		return true;
 	} else if (strcmp(property, "text_run_array") == 0)
