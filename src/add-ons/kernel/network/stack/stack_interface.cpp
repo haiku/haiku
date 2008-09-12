@@ -99,7 +99,8 @@ stack_interface_recvfrom(net_socket* socket, void* data, size_t length,
 	if (error != B_OK)
 		return error;
 
-	*_addressLength = message.msg_namelen;
+	if (_addressLength != NULL)
+		*_addressLength = message.msg_namelen;
 	return B_OK;
 }
 
