@@ -703,7 +703,8 @@ ApplicationTypeWindow::_Save()
 		SupportedTypeItem* item = dynamic_cast<SupportedTypeItem*>(
 			fTypeListView->ItemAt(i));
 
-		supportedTypes.AddString("types", item->Type());
+		if (item != NULL)
+			supportedTypes.AddString("types", item->Type());
 	}
 
 	version_info versionInfo;
@@ -735,7 +736,8 @@ ApplicationTypeWindow::_Save()
 		SupportedTypeItem* item = dynamic_cast<SupportedTypeItem*>(
 			fTypeListView->ItemAt(i));
 
-		item->Icon().CopyTo(info, item->Type(), true);
+		if (item != NULL)
+			item->Icon().CopyTo(info, item->Type(), true);
 	}
 }
 

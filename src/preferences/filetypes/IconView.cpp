@@ -574,8 +574,8 @@ IconView::MessageReceived(BMessage* message)
 	if (message->WasDropped() && message->ReturnAddress() != BMessenger(this)
 		&& AcceptsDrag(message)) {
 		// set icon from message
-		BBitmap* mini = NULL;
-		BBitmap* large = NULL;
+		BBitmap *mini = NULL;
+		BBitmap *large = NULL;
 		const uint8* data = NULL;
 		ssize_t size = 0;
 
@@ -591,10 +591,15 @@ IconView::MessageReceived(BMessage* message)
 
 		if (large != NULL || mini != NULL || (data != NULL && size > 0))
 			_SetIcon(large, mini, data, size);
-
-		entry_ref ref;
-		if (message->FindRef("refs", &ref) == B_OK)
-			_SetIcon(&ref);
+		else {
+			entry_ref ref;
+			if (message->FindRef("refs", &ref) == B_OK)
+				_SetIcon(&ref);
+		}
+			
+		delete(large);
+		delete(mini);
+		delete(data);
 
 		return;
 	}
