@@ -56,17 +56,18 @@ scan_directory(const char *directory, BList *list)
 	- Blocking mode
 */
 BSerialPort::BSerialPort()
-	:	ffd(-1),
-		fBaudRate(B_19200_BPS),
-		fDataBits(B_DATA_BITS_8),
-		fStopBits(B_STOP_BIT_1),
-		fParityMode(B_NO_PARITY),
-		fFlow(B_HARDWARE_CONTROL),
-		fTimeout(B_INFINITE_TIMEOUT),
-		fBlocking(true),
-		_fDevices(new(std::nothrow) BList)
+	:
+	ffd(-1),
+	fBaudRate(B_19200_BPS),
+	fDataBits(B_DATA_BITS_8),
+	fStopBits(B_STOP_BIT_1),
+	fParityMode(B_NO_PARITY),
+	fFlow(B_HARDWARE_CONTROL),
+	fTimeout(B_INFINITE_TIMEOUT),
+	fBlocking(true),
+	fDevices(new(std::nothrow) BList)
 {
-	ScanDevices();
+	_ScanDevices();
 }
 
 
@@ -78,10 +79,11 @@ BSerialPort::~BSerialPort()
 	if (ffd >= 0)
 		close(ffd);
 	
-	for (int32 count = _fDevices->CountItems() - 1; count >= 0; count--)
-		free(_fDevices->RemoveItem(count));
-	
-	delete _fDevices;
+	if (fDevices != NULL) {
+		for (int32 count = fDevices->CountItems() - 1; count >= 0; count--)
+			free(fDevices->RemoveItem(count));
+		delete fDevices;
+	}	
 }
 
 
@@ -122,7 +124,7 @@ BSerialPort::Open(const char *portName)
 		int flags = fcntl(ffd, F_GETFL);
 		fcntl(ffd, F_SETFL, flags & ~O_NONBLOCK);
 				
-		DriverControl();
+		_DriverControl();
 	}
 	// TODO: I wonder why the return type is a status_t, 
 	// since we (as BeOS does) return the descriptor number for the device... 
@@ -175,7 +177,7 @@ void
 BSerialPort::SetBlocking(bool Blocking)
 {
 	fBlocking = Blocking;
-	DriverControl();
+	_DriverControl();
 }
 
 
@@ -193,7 +195,7 @@ BSerialPort::SetTimeout(bigtime_t microSeconds)
 	
 	if (microSeconds == B_INFINITE_TIMEOUT || microSeconds <= 25000000) {
 		fTimeout = microSeconds;
-		DriverControl();
+		_DriverControl();
 		err = B_OK;
 	}
 	return err;
@@ -232,7 +234,7 @@ BSerialPort::SetDataRate(data_rate bitsPerSecond)
 {
 	fBaudRate = bitsPerSecond;
 	
-	return DriverControl();
+	return _DriverControl();
 }
 
 
@@ -253,7 +255,7 @@ void
 BSerialPort::SetDataBits(data_bits numBits)
 {
 	fDataBits = numBits;
-	DriverControl();
+	_DriverControl();
 }
 
 
@@ -277,7 +279,7 @@ void
 BSerialPort::SetStopBits(stop_bits numBits)
 {
 	fStopBits = numBits;
-	DriverControl();
+	_DriverControl();
 }
 
 
@@ -302,7 +304,7 @@ void
 BSerialPort::SetParityMode(parity_mode which)
 {
 	fParityMode = which;
-	DriverControl();
+	_DriverControl();
 }
 
 
@@ -345,7 +347,7 @@ void
 BSerialPort::SetFlowControl(uint32 method)
 {
 	fFlow = method;
-	DriverControl();
+	_DriverControl();
 }
 
 
@@ -484,10 +486,10 @@ BSerialPort::CountDevices()
 	int32 count = 0;
 	
 	// Refresh devices list
-	ScanDevices();
+	_ScanDevices();
 	
-	if (_fDevices != NULL)
-		count = _fDevices->CountItems();
+	if (fDevices != NULL)
+		count = fDevices->CountItems();
 	
 	return count;	
 }
@@ -507,8 +509,8 @@ BSerialPort::GetDeviceName(int32 n, char *name, size_t bufSize)
 	status_t result = B_ERROR;
 	const char *dev = NULL;
 	
-	if (_fDevices != NULL)
-		dev = static_cast<char*>(_fDevices->ItemAt(n));
+	if (fDevices != NULL)
+		dev = static_cast<char*>(fDevices->ItemAt(n));
 
 	if (dev != NULL && name != NULL) {
 		strncpy(name, dev, bufSize);
@@ -526,14 +528,16 @@ BSerialPort::GetDeviceName(int32 n, char *name, size_t bufSize)
 	and build a list of them. 
 */
 void
-BSerialPort::ScanDevices()
+BSerialPort::_ScanDevices()
 {
 	// First, we empty the list
-	for (int32 count = _fDevices->CountItems() - 1; count >= 0; count--)
-		free(_fDevices->RemoveItem(count));
-	
-	// Add devices to the list
-	scan_directory(SERIAL_DIR, _fDevices);	
+	if (fDevices != NULL) {
+		for (int32 count = fDevices->CountItems() - 1; count >= 0; count--)
+			free(fDevices->RemoveItem(count));
+		
+		// Add devices to the list
+		scan_directory(SERIAL_DIR, fDevices);	
+	}
 }
 
 
@@ -543,7 +547,7 @@ BSerialPort::ScanDevices()
 	- an error code if something goes wrong.
 */
 int
-BSerialPort::DriverControl()
+BSerialPort::_DriverControl()
 {
 	struct termios options;
 	int err;
