@@ -165,14 +165,14 @@ status_t
 BJoystick::GetDeviceName(int32 n, char *name, size_t bufSize)
 {
 	CALLED();
-	BString *temp = new BString();
+	BString *temp = NULL;
 	if (fDevices != NULL && fDevices->CountItems() > n)
 		temp = static_cast<BString*>(fDevices->ItemAt(n));
 	else
 		return B_BAD_INDEX;
 
 	if (temp != NULL && name != NULL) {
-		if(temp->Length() > bufSize)
+		if(temp->Length() > (int32)bufSize)
 			return B_NAME_TOO_LONG;
 		strncpy(name, temp->String(), bufSize);
 		name[bufSize - 1] = '\0';
