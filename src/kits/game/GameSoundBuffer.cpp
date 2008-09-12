@@ -250,7 +250,7 @@ GameSoundBuffer::SetAttributes(gs_attribute * attributes,
 void
 GameSoundBuffer::Play(void * data, int64 frames)
 {
-	float * pan = new float[1];
+	float *pan = new float[2];
 	pan[0] = fPanRight;
 	pan[1] = fPanLeft;
 	
