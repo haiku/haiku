@@ -10,6 +10,7 @@
 #include <List.h>
 #include <SerialPort.h>
 
+#include <new>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -17,6 +18,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <termios.h>
+
 
 /* The directory where the serial driver publishes its devices */ 
 #define SERIAL_DIR "/dev/ports" 
@@ -62,7 +64,7 @@ BSerialPort::BSerialPort()
 		fFlow(B_HARDWARE_CONTROL),
 		fTimeout(B_INFINITE_TIMEOUT),
 		fBlocking(true),
-		_fDevices(new BList)
+		_fDevices(new(std::nothrow) BList)
 {
 	ScanDevices();
 }
@@ -479,9 +481,15 @@ BSerialPort::WaitForInput(void)
 int32
 BSerialPort::CountDevices()
 {
+	int32 count = 0;
+	
 	// Refresh devices list
 	ScanDevices();
-	return _fDevices->CountItems();	
+	
+	if (_fDevices != NULL)
+		count = _fDevices->CountItems();
+	
+	return count;	
 }
 
 
