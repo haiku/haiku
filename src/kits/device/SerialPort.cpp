@@ -479,15 +479,9 @@ BSerialPort::WaitForInput(void)
 int32
 BSerialPort::CountDevices()
 {
-	int32 count = 0;
-	
 	// Refresh devices list
 	ScanDevices();
-	
-	if (_fDevices != NULL)
-		count = _fDevices->CountItems();
-	
-	return count;
+	return _fDevices->CountItems();	
 }
 
 
