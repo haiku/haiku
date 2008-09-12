@@ -181,20 +181,21 @@ HIDDevice::MakeHIDDevice(usb_device device,
 	}
 
 	// determine device type and create the device object
+	HIDDevice *hidDevice = NULL;
 	if (deviceType == USB_HID_DEVICE_TYPE_KEYBOARD) {
-		return new(std::nothrow) KeyboardDevice(device, interruptPipe,
+		hidDevice = new(std::nothrow) KeyboardDevice(device, interruptPipe,
 			interfaceIndex, finalInstructions, instructionCount,
 			totalReportSize);
-	} else if (deviceType == USB_HID_DEVICE_TYPE_MOUSE
-		|| deviceType == 0x01250015) {
-		return new(std::nothrow) MouseDevice(device, interruptPipe,
+	} else if (deviceType == USB_HID_DEVICE_TYPE_MOUSE) {
+		hidDevice = new(std::nothrow) MouseDevice(device, interruptPipe,
 			interfaceIndex, finalInstructions, instructionCount,
 			totalReportSize);
-	}
+	} else
+		TRACE_ALWAYS("unsupported device type 0x%08lx\n", deviceType);
 
-	TRACE_ALWAYS("unsupported device type 0x%08lx\n", deviceType);
-	free(finalInstructions);
-	return NULL;
+	if (hidDevice == NULL)
+		free(finalInstructions);
+	return hidDevice;
 }
 
 
