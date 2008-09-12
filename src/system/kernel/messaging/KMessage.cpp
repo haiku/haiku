@@ -630,7 +630,7 @@ KMessage::Dump(void (*printFunc)(const char*, ...)) const
 		if (field.CountElements() != 1)
 			printFunc("\n");
 
-		int32 size;
+		int32 size = 0;
 		for (int i = 0; const void* data = field.ElementAt(i, &size); i++) {
 			if (field.CountElements() != 1)
 				printFunc("    [%2d] ", i);
