@@ -293,6 +293,8 @@ VideoConsumer::CreateBuffers(const media_format& format)
 		}
 	} else
 		ERROR("VideoConsumer::CreateBuffers ERROR IN GET BUFFER LIST\n");
+
+	delete[] buffList;
 		
 	FUNCTION("VideoConsumer::CreateBuffers - EXIT\n");
 	return status;
