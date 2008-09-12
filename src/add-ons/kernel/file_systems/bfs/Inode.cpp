@@ -2613,9 +2613,9 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 			strncpy(name, item->Name(), B_FILE_NAME_LENGTH);
 			*_type = item->Type();
 			*_length = item->NameSize();
-			*_id = (ino_t)fCurrentSmallData;
+			*_id = (ino_t)index;
 
-			fCurrentSmallData = index;
+			fCurrentSmallData = index + 1;
 			return B_OK;
 		}
 
