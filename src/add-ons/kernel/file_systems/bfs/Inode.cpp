@@ -2599,16 +2599,13 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 
 		RecursiveLocker _(&fInode->SmallDataLock());
 
-		int32 i = 0;
-		for (;;item = item->Next()) {
-			if (item->IsLast(node))
-				break;
-
+		int32 index = 0;
+		for (; !item->IsLast(node); item = item->Next(), index++) {
 			if (item->NameSize() == FILE_NAME_NAME_LENGTH
 				&& *item->Name() == FILE_NAME_NAME)
 				continue;
 
-			if (i++ == fCurrentSmallData)
+			if (index >= fCurrentSmallData)
 				break;
 		}
 
@@ -2618,15 +2615,12 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 			*_length = item->NameSize();
 			*_id = (ino_t)fCurrentSmallData;
 
-			fCurrentSmallData = i;
-		}
-		else {
-			// stop traversing the small_data section
-			fCurrentSmallData = -1;
+			fCurrentSmallData = index;
+			return B_OK;
 		}
 
-		if (fCurrentSmallData != -1)
-			return B_OK;
+		// stop traversing the small_data section
+		fCurrentSmallData = -1;
 	}
 
 	// read attributes out of the attribute directory
@@ -2641,7 +2635,7 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 		if (get_vnode(volume->FSVolume(), volume->ToVnode(fInode->Attributes()),
 				(void**)&fAttributes) != B_OK) {
 			FATAL(("get_vnode() failed in AttributeIterator::GetNext(ino_t"
-				" = %Ld,name = \"%s\")\n",fInode->ID(),name));
+				" = %Ld,name = \"%s\")\n", fInode->ID(), name));
 			return B_ENTRY_NOT_FOUND;
 		}
 
@@ -2649,7 +2643,7 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 		if (fAttributes->GetTree(&tree) < B_OK
 			|| (fIterator = new TreeIterator(tree)) == NULL) {
 			FATAL(("could not get tree in AttributeIterator::GetNext(ino_t"
-				" = %Ld,name = \"%s\")\n",fInode->ID(),name));
+				" = %Ld,name = \"%s\")\n", fInode->ID(), name));
 			return B_ENTRY_NOT_FOUND;
 		}
 	}
@@ -2661,7 +2655,7 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 	if (status < B_OK)
 		return status;
 
-	Vnode vnode(volume,id);
+	Vnode vnode(volume, id);
 	Inode* attribute;
 	if ((status = vnode.Get(&attribute)) == B_OK) {
 		*_type = attribute->Type();
@@ -2676,11 +2670,8 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 void
 AttributeIterator::Update(uint16 index, int8 change)
 {
-	// fCurrentSmallData points already to the next item. OTOH, index is always
-	// the position when considering the special name attribute while the
-	// attribute iterators do ignore that (they always start at the second
-	// position in the small data section, not the first).
-	if (index <= fCurrentSmallData)
+	// fCurrentSmallData points already to the next item
+	if (index < fCurrentSmallData)
 		fCurrentSmallData += change;
 }
 
