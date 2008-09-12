@@ -1733,8 +1733,10 @@ GrepWindow::_AreAllFoldersOpenInTracker(BList *folderList)
 		if (status == B_OK)
 			windowList.AddItem(static_cast<void*>(tracker_ref));
 		
-		if (status != B_OK)
+		if (status != B_OK) {
+			delete tracker_ref;
 			break;
+		}
 	}
 
 	int32 folderCount = folderList->CountItems();
@@ -1830,8 +1832,10 @@ GrepWindow::_SelectFilesInTracker(BList* folderList, BMessage* refsMessage)
 		entry_ref *windowRef = new entry_ref;
 		status = windowReplyMessage.FindRef("result", windowRef);
 
-		if (status != B_OK)
+		if (status != B_OK) {
+			delete windowRef;
 			break;
+		}
 
 		int32 folderCount = folderList->CountItems();
 
