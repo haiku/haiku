@@ -268,8 +268,8 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
 				sSelectedIcon->Unlock();
 				delete view;
 			}
-			delete checkMark;
 		}
+		delete checkMark;
 	}
 
 	// Get Name of printer
