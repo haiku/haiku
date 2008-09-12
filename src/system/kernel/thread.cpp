@@ -1218,31 +1218,32 @@ dump_thread_info(int argc, char **argv)
 
 	for (; argi < argc; argi++) {
 		const char *name = argv[argi];
-		int32 id = strtoul(name, NULL, 0);
+		if (name != NULL) {
+			int32 id = strtoul(name, NULL, 0);
 
-		if (IS_KERNEL_ADDRESS(id)) {
-			// semi-hack
-			_dump_thread_info((struct thread *)id, shortInfo);
-			continue;
-		}
-
-		// walk through the thread list, trying to match name or id
-		bool found = false;
-		struct hash_iterator i;
-		hash_open(sThreadHash, &i);
-		struct thread *thread;
-		while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
-			if ((name != NULL && !strcmp(name, thread->name))
-				|| thread->id == id) {
-				_dump_thread_info(thread, shortInfo);
-				found = true;
-				break;
+			if (IS_KERNEL_ADDRESS(id)) {
+				// semi-hack
+				_dump_thread_info((struct thread *)id, shortInfo);
+				continue;
 			}
-		}
-		hash_close(sThreadHash, &i, false);
 
-		if (!found)
-			kprintf("thread \"%s\" (%ld) doesn't exist!\n", name, id);
+			// walk through the thread list, trying to match name or id
+			bool found = false;
+			struct hash_iterator i;
+			hash_open(sThreadHash, &i);
+			struct thread *thread;
+			while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
+				if (!strcmp(name, thread->name) || thread->id == id) {
+					_dump_thread_info(thread, shortInfo);
+					found = true;
+					break;
+				}
+			}
+			hash_close(sThreadHash, &i, false);
+
+			if (!found)
+				kprintf("thread \"%s\" (%ld) doesn't exist!\n", name, id);
+		}
 	}
 
 	return 0;
