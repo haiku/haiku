@@ -33,6 +33,11 @@ Stack::Stack()
 
 	size_t objectArraySize = fObjectMaxCount * sizeof(Object *);
 	fObjectArray = (Object **)malloc(objectArraySize);
+	if (fObjectArray == NULL) {
+		TRACE_ERROR(("USB Stack: failed to allocate object array\n"));
+		return;
+	}
+
 	memset(fObjectArray, 0, objectArraySize);
 
 	fAllocator = new(std::nothrow) PhysicalMemoryAllocator("USB Stack Allocator",
@@ -113,6 +118,7 @@ Stack::~Stack()
 	}
 
 	delete fAllocator;
+	free(fObjectArray);
 }
 
 
