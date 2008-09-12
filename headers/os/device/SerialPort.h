@@ -84,8 +84,8 @@ virtual				~BSerialPort();
 
 private:
 
-		void		ScanDevices();
-
+		void		_ScanDevices();
+		int 		_DriverControl();
 virtual	void		_ReservedSerialPort1();
 virtual	void		_ReservedSerialPort2();
 virtual	void		_ReservedSerialPort3();
@@ -98,12 +98,9 @@ virtual	void		_ReservedSerialPort4();
 		parity_mode	fParityMode;
 		uint32		fFlow;
 		bigtime_t	fTimeout;
-		bool		fBlocking;
-
-		int			DriverControl();
-
-		BList *		_fDevices;
-		uint32		_fReserved[3];
+		bool		fBlocking;		
+		BList *		fDevices;
+		uint32		fReserved[3];
 };
 
 #endif
