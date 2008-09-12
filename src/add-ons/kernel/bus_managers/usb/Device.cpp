@@ -467,6 +467,13 @@ Device::InitEndpoints(int32 interfaceIndex)
 					break;
 			}
 
+			if (pipe == NULL) {
+				TRACE_ERROR(("USB Device %d: failed to allocate pipe\n",
+					fDeviceAddress));
+				endpoint->handle = 0;
+				continue;
+			}
+
 			pipe->InitCommon(fDeviceAddress,
 				endpoint->descr->endpoint_address & 0x0f,
 				fSpeed, direction, endpoint->descr->max_packet_size,
