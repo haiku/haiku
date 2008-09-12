@@ -95,6 +95,7 @@ DeviceList::RemoveDevice(const char *name, void *device)
 			return B_OK;
 		}
 
+		previous = current;
 		current = current->next;
 	}
 
