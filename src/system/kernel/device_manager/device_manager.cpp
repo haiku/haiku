@@ -461,7 +461,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			NodeList::ConstIterator iterator = last->Parent()->Children().GetIterator();
 
 			// skip those we already traversed
-			while (iterator.HasNext() && last != NULL) {
+			while (iterator.HasNext()) {
 				device_node* node = iterator.Next();
 
 				if (node == last)
