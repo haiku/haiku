@@ -124,13 +124,14 @@ BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	TRACE(("USB BusManager: setting device address to %d\n", deviceAddress));
 	ControlPipe *defaultPipe = _GetDefaultPipe(speed);
-	defaultPipe->SetHubInfo(hubAddress, hubPort);
 
 	if (!defaultPipe) {
 		TRACE_ERROR(("USB BusManager: error getting the default pipe for speed %d\n", (int)speed));
 		FreeAddress(deviceAddress);
 		return NULL;
 	}
+
+	defaultPipe->SetHubInfo(hubAddress, hubPort);
 
 	status_t result = B_ERROR;
 	for (int32 i = 0; i < 3; i++) {
