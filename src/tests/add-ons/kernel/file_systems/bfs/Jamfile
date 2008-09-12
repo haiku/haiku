@@ -1,5 +1,9 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs ;
 
+SimpleTest bfs_attribute_iterator_test :
+	bfs_attribute_iterator_test.cpp
+	: be ;
+
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs array ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs bufferPool ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs bfs_shell ;
