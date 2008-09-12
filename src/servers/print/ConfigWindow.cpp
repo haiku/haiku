@@ -480,10 +480,9 @@ void ConfigWindow::UpdateUI()
 			fJobSetupText->ResizeToPreferred();
 		}
 	}
-	if (fPageFormatText) {
-		if (fOk->Frame().right < fPageFormatText->Frame().right)
-			ResizeTo(fPageFormatText->Frame().right + 10, Bounds().bottom);
-	}
+
+	if (fOk->Frame().right < fPageFormatText->Frame().right)
+		ResizeTo(fPageFormatText->Frame().right + 10, Bounds().bottom);
 
 	if (fJobSetupText) {
 		if (fOk->Frame().right < fJobSetupText->Frame().right)
