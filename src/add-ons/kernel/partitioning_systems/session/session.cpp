@@ -52,8 +52,10 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 		Disc *disc = new Disc(fd);
 		if (disc && disc->InitCheck() == B_OK) {
 			*cookie = static_cast<void*>(disc);
-			result = 0.7;		
-		} 	
+			result = 0.7;
+		}
+
+		delete disc;
 	}
 	PRINT(("returning %ld\n", int32(result * 10000)));
 	return result;
@@ -89,6 +91,7 @@ scan_partition(int fd, partition_data *partition, void *cookie)
 		child->block_size = session->BlockSize();
 		child->flags |= session->Flags();
 		child->type = strdup(session->Type());
+		delete session;
 		if (!child->type) {
 			error = B_NO_MEMORY;
 			break;
@@ -130,4 +133,3 @@ partition_module_info *modules[] = {
 	&sSessionModule,
 	NULL
 };
-
