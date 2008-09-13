@@ -498,6 +498,9 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 	if (!_IsValidMode(mode))
 		return B_BAD_VALUE;
 
+	if (fFrontBuffer == NULL)
+		return B_NO_INIT;
+
 	// just try to set the mode - we let the graphics driver
 	// approve or deny the request, as it should know best
 
@@ -822,8 +825,11 @@ AccelerantHWInterface::GetPreferredMode(display_mode* preferredMode)
 		if (version != EDID_VERSION_1)
 			return B_NOT_SUPPORTED;
 
-		if (fModeList == NULL)
-			_UpdateModeList();
+		if (fModeList == NULL) {
+			status = _UpdateModeList();
+			if (status != B_OK)
+				return status;
+		}
 
 		status = B_NOT_SUPPORTED;
 		display_mode bestMode;
