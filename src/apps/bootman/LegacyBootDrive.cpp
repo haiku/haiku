@@ -382,7 +382,7 @@ LegacyBootDrive::SaveMasterBootRecord(BMessage* settings, BFile* file)
 		return B_IO_ERROR;
 	
 	ssize_t size = kBlockSize * kNumberOfBootLoaderBlocks;
-	uint8* buffer = new uint8[size];
+	uint8* buffer = new(std::nothrow) uint8[size];
 	if (buffer == NULL) {
 		close(fd);		
 		return B_NO_MEMORY;
@@ -391,20 +391,20 @@ LegacyBootDrive::SaveMasterBootRecord(BMessage* settings, BFile* file)
 	status_t status = _ReadBlocks(fd, buffer, size);
 	if (status != B_OK) {
 		close(fd);
-		delete buffer;
+		delete[] buffer;
 		return B_IO_ERROR;
 	}		
 
 	MasterBootRecord* mbr = (MasterBootRecord*)buffer;
 	if (!_IsValid(mbr)) {
 		close(fd);
-		delete buffer;
+		delete[] buffer;
 		return B_BAD_VALUE;
 	}
 
 	if (file->Write(buffer, size) != size)
 		status = B_IO_ERROR;
-	delete buffer;		
+	delete[] buffer;		
 	close(fd);
 	return status;
 }
@@ -434,7 +434,7 @@ LegacyBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 	lseek(fd, 0, SEEK_SET);	
 	
 	size_t size = kBlockSize * kNumberOfBootLoaderBlocks;
-	uint8* buffer = new uint8[size];
+	uint8* buffer = new(std::nothrow) uint8[size];
 	if (buffer == NULL) {
 		close(fd);		
 		return B_NO_MEMORY;
@@ -442,21 +442,21 @@ LegacyBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 
 	if (file->Read(buffer, size) != (ssize_t)size) {
 		close(fd);
-		delete buffer;
+		delete[] buffer;
 		return B_IO_ERROR;
 	}		
 
 	MasterBootRecord* newMBR = (MasterBootRecord*)buffer;
 	if (!_IsValid(newMBR)) {
 		close(fd);
-		delete buffer;
+		delete[] buffer;
 		return B_BAD_VALUE;
 	}
 	
 	_CopyPartitionTable(newMBR, &oldMBR);
 
 	status_t status = _WriteBlocks(fd, buffer, size);
-	delete buffer;		
+	delete[] buffer;		
 	close(fd);
 	return status;
 }
