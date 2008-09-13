@@ -783,7 +783,7 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 	recursive_lock_init(&map->lock, "translation map");
 
 	map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
-	if (map == NULL) {
+	if (map->arch_data == NULL) {
 		recursive_lock_destroy(&map->lock);
 		return B_NO_MEMORY;
 	}
