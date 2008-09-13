@@ -293,7 +293,7 @@ periph_io(scsi_periph_device_info *device, io_operation *operation,
 
 	// peripheral layer only created "read" error, so we have to
 	// map them to "write" errors if this was a write request
-	if (res.error_code == B_DEV_READ_ERROR && write)
+	if (res.error_code == B_DEV_READ_ERROR && operation->IsWrite())
 		return B_DEV_WRITE_ERROR;
 
 	return res.error_code;
