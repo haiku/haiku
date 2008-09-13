@@ -16,7 +16,7 @@ namespace Storage {
 
 // constructor
 OffsetFile::OffsetFile()
-	: fFile(),
+	: fFile(NULL),
 	  fOffset(0),
 	  fCurrentPosition(0)
 {
@@ -169,7 +169,3 @@ OffsetFile::Offset() const
 
 };	// namespace Storage
 };	// namespace BPrivate
-
-
-
-
