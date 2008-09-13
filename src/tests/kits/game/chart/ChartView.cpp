@@ -27,6 +27,9 @@ void
 ChartView::Draw(BRect rect)
 {
 	ChartWindow *window = dynamic_cast<ChartWindow *>(Window());
+	if (window == NULL)
+		return;
+
 	if ((window->fOffscreen != 0) && (window->fCurrentSettings.display == DISPLAY_BITMAP))
 		DrawBitmap(window->fOffscreen, rect, rect);
 }
@@ -58,6 +61,9 @@ void
 InstantView::Draw(BRect rect)
 {
 	ChartWindow *window = dynamic_cast<ChartWindow *>(Window());
+	if (window == NULL)
+		return;
+
 	for (int32 i = 0; i < window->fInstantLoadLevel; i++) {
 		if (i < step)
 			SetHighColor(255, 90, 90);
