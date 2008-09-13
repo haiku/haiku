@@ -529,10 +529,10 @@ intel_set_display_mode(display_mode *mode)
 {
 	TRACE(("intel_set_display_mode()\n"));
 
-	display_mode target = *mode;
-
 	if (mode == NULL || intel_propose_display_mode(&target, mode, mode))
 		return B_BAD_VALUE;
+
+	display_mode target = *mode;
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
