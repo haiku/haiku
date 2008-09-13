@@ -534,7 +534,7 @@ KDiskDeviceManager::ReadLockPartition(partition_id id)
 			device->Register();
 	}
 	// lock the device
-	if (device->ReadLock()) {
+	if (device && device->ReadLock()) {
 		// final check, if the partition still belongs to the device
 		if (partition->Device() == device)
 			return partition;
@@ -563,7 +563,7 @@ KDiskDeviceManager::WriteLockPartition(partition_id id)
 			device->Register();
 	}
 	// lock the device
-	if (device->WriteLock()) {
+	if (device && device->WriteLock()) {
 		// final check, if the partition still belongs to the device
 		if (partition->Device() == device)
 			return partition;
