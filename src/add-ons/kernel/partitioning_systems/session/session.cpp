@@ -53,9 +53,8 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 		if (disc && disc->InitCheck() == B_OK) {
 			*cookie = static_cast<void*>(disc);
 			result = 0.7;
-		}
-
-		delete disc;
+		} else
+			delete disc;
 	}
 	PRINT(("returning %ld\n", int32(result * 10000)));
 	return result;
