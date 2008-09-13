@@ -952,6 +952,9 @@ ChartWindow::MessageReceived(BMessage *message)
 			break;
 		case FULL_SCREEN_MSG :
 			check_box = dynamic_cast<BCheckBox*>(handler);
+			if (check_box == NULL)
+				break;
+
 			if (check_box->Value())
 				fNextSettings.fullscreen_mode = FULLSCREEN_MODE;
 			else
@@ -968,6 +971,9 @@ ChartWindow::MessageReceived(BMessage *message)
 			break;
 		case SECOND_THREAD_MSG :
 			check_box = dynamic_cast<BCheckBox*>(handler);
+			if (check_box == NULL)
+				break;
+
 			fNextSettings.second_thread =  (check_box->Value()?true:false);
 			break;
 		case COLORS_RED_MSG :
@@ -979,6 +985,9 @@ ChartWindow::MessageReceived(BMessage *message)
 		case COLORS_WHITE_MSG :
 			index = message->what - COLORS_RED_MSG;
 			check_box = dynamic_cast<BCheckBox*>(handler);
+			if (check_box == NULL)
+				break;
+
 			fNextSettings.colors[index] = (check_box->Value()?true:false);
 			break;
 		case SPECIAL_NONE_MSG :
@@ -996,10 +1005,16 @@ ChartWindow::MessageReceived(BMessage *message)
 			break;
 		case STAR_DENSITY_MSG :
 			slider = dynamic_cast<BSlider*>(handler);
+			if (slider == NULL)
+				break;
+
 			fNextSettings.star_density = slider->Value();
 			break;
 		case REFRESH_RATE_MSG :
 			slider = dynamic_cast<BSlider*>(handler);
+			if (slider == NULL)
+				break;
+
 			fNextSettings.refresh_rate = exp(slider->Value()*0.001*(log(REFRESH_RATE_MAX/REFRESH_RATE_MIN)))*
 									REFRESH_RATE_MIN;
 			break;
