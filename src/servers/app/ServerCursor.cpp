@@ -173,6 +173,7 @@ ServerCursor::ServerCursor(const ServerCursor* cursor)
 //!	Frees the heap space allocated for the cursor's image data
 ServerCursor::~ServerCursor()
 {
+	delete fCursorData;
 }
 
 
