@@ -323,7 +323,7 @@ BufferQueue::Get(size_t bytes, bool remove, net_buffer **_buffer)
 	status_t status = B_OK;
 	while (bytesLeft > 0 && (source = iterator.Next()) != NULL) {
 		size_t size = min_c(source->size, bytesLeft);
-		status_t status = gBufferModule->append_cloned(buffer, source, 0, size);
+		status = gBufferModule->append_cloned(buffer, source, 0, size);
 		if (status < B_OK)
 			break;
 
