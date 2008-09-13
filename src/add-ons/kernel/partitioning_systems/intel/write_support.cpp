@@ -168,7 +168,7 @@ bool
 pm_validate_resize(partition_data *partition, off_t *size)
 {
 	TRACE(("intel: pm_validate_resize\n"));
-	
+
 	if (!partition || !size)
 		return false;
 
@@ -315,7 +315,7 @@ pm_validate_resize_child(partition_data *partition, partition_data *child,
 	off_t *size)
 {
 	TRACE(("intel: pm_validate_resize_child\n"));
-	
+
 	if (!partition || !child || !size)
 		return false;
 
@@ -328,7 +328,7 @@ bool
 pm_validate_move(partition_data *partition, off_t *start)
 {
 	TRACE(("intel: pm_validate_move\n"));
-	
+
 	if (!partition || !start)
 		return false;
 	// nothing to do here
@@ -383,7 +383,7 @@ pm_validate_move_child(partition_data *partition, partition_data *child,
 	off_t *start)
 {
 	TRACE(("intel: pm_validate_move_child\n"));
-	
+
 	if (!partition || !child || !start)
 		return false;
 	if (*start == child->offset)
@@ -428,10 +428,10 @@ bool
 pm_validate_set_type(partition_data *partition, const char *type)
 {
 	TRACE(("intel: pm_validate_set_type\n"));
-	
+
 	if (!partition || !type)
 		return false;
-	
+
 	partition_data *father = get_parent_partition(partition->id);
 	if (!father)
 		return false;
@@ -449,7 +449,7 @@ pm_validate_initialize(partition_data *partition, char *name,
 	const char *parameters)
 {
 	TRACE(("intel: pm_validate_initialize\n"));
-	
+
 	if (!partition || !(pm_get_supported_operations(partition)
 			& B_DISK_SYSTEM_SUPPORTS_INITIALIZING)) {
 		return false;
@@ -490,13 +490,13 @@ validate_create_child_partition(partition_data *partition, off_t *start,
 
 	getSiblingPartitions(partition, NULL, *start, &previousSibling,
 		&nextSibling, &previousOffset, &previousSize, &nextOffset, &nextSize);
-	
+
 	// position check of the new partition
 	if (previousSibling && (previousOffset + previousSize > *start)) {
 		*start = previousOffset + previousSize;
 		*start = sector_align_up(*start);
 	}
-	
+
 	if (nextSibling && (nextOffset < *start + *size))
 		*size = nextOffset - *start;
 	*size = sector_align(*size);
@@ -515,7 +515,7 @@ pm_validate_create_child(partition_data *partition, off_t *start, off_t *size,
 	const char *type, const char *parameters, int32 *index)
 {
 	TRACE(("intel: pm_validate_create_child\n"));
-	
+
 	if (!partition || !(pm_get_supported_operations(partition)
 			& B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD)
 		|| !start || !size || !type || !index) {
@@ -624,7 +624,7 @@ get_partitionable_spaces(partition_data *partition,
 	// sort the array
 	qsort(positions, partition_count, sizeof(PartitionPosition),
 		cmp_partition_position);
-	
+
 	// first sektor is MBR or EBR
 	off_t offset = startOffset + headerSize;
 	off_t size = 0;
@@ -677,7 +677,7 @@ pm_get_partitionable_spaces(partition_data *partition,
 	partitionable_space_data *buffer, int32 count, int32 *actualCount)
 {
 	TRACE(("intel: pm_get_partitionable_spaces\n"));
-	
+
 	if (!partition || !partition->content_type
 		|| strcmp(partition->content_type, kPartitionTypeIntel)
 		|| !actualCount) {
@@ -697,7 +697,7 @@ pm_get_next_supported_type(partition_data *partition, int32 *cookie,
 	char *_type)
 {
 	TRACE(("intel: pm_get_next_supported_type\n"));
-	
+
 	if (!partition || !partition->content_type
 		|| strcmp(partition->content_type, kPartitionTypeIntel)
 		|| !cookie || !_type) {
@@ -735,7 +735,7 @@ pm_shadow_changed(partition_data *partition, partition_data *child,
 {
 	TRACE(("intel: pm_shadow_changed(%p, %p, %lu)\n", partition, child,
 		operation));
-	
+
 	switch (operation) {
 		case B_PARTITION_SHADOW:
 		{
@@ -897,14 +897,14 @@ status_t
 pm_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 {
 	TRACE(("intel: pm_resize\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
 	if (!locker.IsLocked())
 		return B_ERROR;
-	
+
 	// get out partition
 	partition_data *partition = get_partition(partitionID);
 	if (!partition)
@@ -934,7 +934,7 @@ status_t
 pm_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 {
 	TRACE(("intel: pm_resize_child\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -987,7 +987,7 @@ status_t
 pm_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 {
 	TRACE(("intel: pm_move\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -1087,7 +1087,7 @@ pm_move_child(int fd, partition_id partitionID, partition_id childID,
 	off_t offset, disk_job_id job)
 {
 	TRACE(("intel: pm_move_child\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -1155,7 +1155,7 @@ status_t
 pm_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 {
 	TRACE(("intel: pm_set_type\n"));
-	
+
 	if (fd < 0 || !type)
 		return B_BAD_VALUE;
 
@@ -1221,7 +1221,7 @@ pm_initialize(int fd, partition_id partitionID, const char *name,
 	const char *parameters, off_t partitionSize, disk_job_id job)
 {
 	TRACE(("intel: pm_initialize\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -1258,7 +1258,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	// parameter -- -1 to be ignored
 {
 	TRACE(("intel: pm_create_child\n"));
-	
+
 	if (fd < 0 || !childID)
 		return B_BAD_VALUE;
 
@@ -1279,7 +1279,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	off_t validatedOffset = offset;
 	off_t validatedSize = size;
 	int32 index = 0;
-	
+
 	if (!pm_validate_create_child(partition, &validatedOffset, &validatedSize,
 			type, parameters, &index)) {
 		return B_BAD_VALUE;
@@ -1307,7 +1307,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	primary->SetType(ptype.Type());
 	// TODO: correctly fill active parameter
 	primary->SetActive(false);
-	
+
 	// write changes to disk
 	PartitionMapWriter writer(fd, 0, partition->size);
 		// TODO: disk size or 2 * SECTOR_SIZE?
@@ -1346,7 +1346,7 @@ pm_delete_child(int fd, partition_id partitionID, partition_id childID,
 	disk_job_id job)
 {
 	TRACE(("intel: pm_delete_child\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -1358,7 +1358,7 @@ pm_delete_child(int fd, partition_id partitionID, partition_id childID,
 	partition_data *child = get_partition(childID);
 	if (!partition || !child)
 		return B_BAD_VALUE;
-	
+
 	PartitionMap *map = (PartitionMap*)partition->content_cookie;
 	PrimaryPartition *primary = (PrimaryPartition*)child->cookie;
 	if (!map || !primary)
@@ -1433,15 +1433,17 @@ ep_get_supported_child_operations(partition_data* partition,
 bool
 ep_is_sub_system_for(partition_data *partition)
 {
+	if (partition == NULL)
+		return false;
+
 	TRACE(("intel: ep_is_sub_system_for(%ld: %lld, %lld, %ld, %s)\n",
 		partition->id, partition->offset, partition->size,
 		partition->block_size, partition->content_type));
-	
-	
+
 	// Intel Extended Partition can live in child partition of Intel Partition
 	// Map
-	return (partition && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntel));
+	return partition->content_type
+		&& !strcmp(partition->content_type, kPartitionTypeIntel);
 }
 
 
@@ -1453,7 +1455,7 @@ bool
 ep_validate_resize(partition_data *partition, off_t *size)
 {
 	TRACE(("intel: ep_validate_resize\n"));
-	
+
 	if (!partition || !size)
 		return false;
 
@@ -1466,7 +1468,7 @@ ep_validate_resize_child(partition_data *partition, partition_data *child,
 	off_t *_size)
 {
 	TRACE(("intel: ep_validate_resize_child\n"));
-	
+
 	if (!partition || !child || !_size)
 		return false;
 
@@ -1485,7 +1487,7 @@ bool
 ep_validate_move(partition_data *partition, off_t *start)
 {
 	TRACE(("intel: ep_validate_move\n"));
-	
+
 	if (!partition || !start)
 		return false;
 	// nothing to do here
@@ -1498,7 +1500,7 @@ ep_validate_move_child(partition_data *partition, partition_data *child,
 					   off_t *_start)
 {
 	TRACE(("intel: ep_validate_move_child\n"));
-	
+
 	if (!partition || !child || !_start)
 		return false;
 	if (*_start == child->offset)
@@ -1529,10 +1531,10 @@ bool
 ep_validate_set_type(partition_data *partition, const char *type)
 {
 	TRACE(("intel: ep_validate_set_type\n"));
-	
+
 	if (!partition || !type)
 		return false;
-	
+
 	// validity check of the type
 	return is_type_valid_ep(type);
 }
@@ -1543,7 +1545,7 @@ ep_validate_initialize(partition_data *partition, char *name,
 	const char *parameters)
 {
 	TRACE(("intel: ep_validate_initialize\n"));
-	
+
 	if (!partition || !(ep_get_supported_operations(partition)
 			& B_DISK_SYSTEM_SUPPORTS_INITIALIZING)) {
 		return false;
@@ -1561,7 +1563,7 @@ ep_validate_create_child(partition_data *partition, off_t *_start, off_t *_size,
 	// index - returns position of the new partition (the last one)
 {
 	TRACE(("intel: ep_validate_create_child\n"));
-	
+
 	if (!partition || !(ep_get_supported_operations(partition)
 			& B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD)
 		|| !_start || !_size || !type || !index) {
@@ -1601,7 +1603,7 @@ ep_get_partitionable_spaces(partition_data *partition,
 	partitionable_space_data *buffer, int32 count, int32 *actualCount)
 {
 	TRACE(("intel: ep_get_partitionable_spaces\n"));
-	
+
 	if (!partition || !partition->content_type
 		|| strcmp(partition->content_type, kPartitionTypeIntelExtended)
 		|| !actualCount) {
@@ -1623,7 +1625,7 @@ ep_get_next_supported_type(partition_data *partition, int32 *cookie,
 	char *_type)
 {
 	TRACE(("intel: ep_get_next_supported_type\n"));
-	
+
 	if (!partition || !partition->content_type
 		|| strcmp(partition->content_type, kPartitionTypeIntelExtended)
 		|| !cookie || !_type) {
@@ -1663,7 +1665,7 @@ ep_shadow_changed(partition_data *partition, partition_data *child,
 	uint32 operation)
 {
 	TRACE(("intel: ep_shadow_changed\n"));
-	
+
 	if (!partition)
 		return B_BAD_VALUE;
 
@@ -1680,14 +1682,14 @@ status_t
 ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 {
 	TRACE(("intel: ep_resize\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
 	if (!locker.IsLocked())
 		return B_ERROR;
-	
+
 	// get out partition
 	partition_data *partition = get_partition(partitionID);
 	if (!partition)
@@ -1701,7 +1703,7 @@ ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 
 	// update data stuctures
 	update_disk_device_job_progress(job, 0.0);
-	
+
 // TODO: partition->size is not supposed to be touched.
 	partition->size = validatedSize;
 	partition->content_size = validatedSize;
@@ -1717,7 +1719,7 @@ status_t
 ep_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 {
 	TRACE(("intel: ep_resize_child\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -1774,7 +1776,7 @@ status_t
 ep_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 {
 	TRACE(("intel: ep_move\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -1802,7 +1804,7 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID,
 	off_t offset, disk_job_id job)
 {
 	TRACE(("intel: ep_move_child\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -1881,7 +1883,7 @@ status_t
 ep_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 {
 	TRACE(("intel: ep_set_type\n"));
-	
+
 	if (fd < 0 || !type)
 		return B_BAD_VALUE;
 
@@ -1943,7 +1945,7 @@ ep_initialize(int fd, partition_id partitionID, const char *name,
 	const char *parameters, off_t partitionSize, disk_job_id job)
 {
 	TRACE(("intel: ep_initialize\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -1971,7 +1973,7 @@ ep_initialize(int fd, partition_id partitionID, const char *name,
 	// (no content_name and content_parameters)
 	// (content_type is set by the system)
 	partition->content_cookie = primary;
-	
+
 	// we delete code area in EBR - nothing should be there
 	partition_table_sector pts;
 	pts.clear_code_area();
@@ -1999,7 +2001,7 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	partition_id *childID)
 {
 	TRACE(("intel: ep_create_child\n"));
-	
+
 	if (fd < 0 || !childID)
 		return B_BAD_VALUE;
 
@@ -2021,7 +2023,7 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	off_t validatedOffset = offset;
 	off_t validatedSize = size;
 	int32 index = 0;
-	
+
 	if (!ep_validate_create_child(partition, &validatedOffset, &validatedSize,
 			type, parameters, &index)) {
 		return B_BAD_VALUE;
@@ -2105,7 +2107,7 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 	disk_job_id job)
 {
 	TRACE(("intel: ep_delete_child\n"));
-	
+
 	if (fd < 0)
 		return B_ERROR;
 
@@ -2117,7 +2119,7 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 	partition_data *child = get_partition(childID);
 	if (!partition || !child)
 		return B_BAD_VALUE;
-	
+
 	PrimaryPartition *primary = (PrimaryPartition*)partition->cookie;
 	LogicalPartition *logical = (LogicalPartition*)child->cookie;
 	if (!primary || !logical)
