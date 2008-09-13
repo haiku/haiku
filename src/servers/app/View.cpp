@@ -249,7 +249,7 @@ View::AddChild(View* view)
 bool
 View::RemoveChild(View* view)
 {
-	if (view->fParent != this) {
+	if (view == NULL || view->fParent != this) {
 		printf("View::RemoveChild(%p - %s) - View is not child of "
 			"this (%p) view!\n", view, view ? view->Name() : NULL, this);
 		return false;
