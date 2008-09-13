@@ -196,10 +196,11 @@ void
 iso9660_info::_SetString(char **string, const char *newString,
 	uint32 newLength)
 {
-	TRACE(("iso9660_info::set_string(%p ('%s'), '%s', %ld)\n", string,
-		*string, newString, newLength));
 	if (string == NULL)
 		return;
+
+	TRACE(("iso9660_info::set_string(%p ('%s'), '%s', %ld)\n", string,
+		*string, newString, newLength));
 
 	char *&oldString = *string; 
 	free(oldString);
