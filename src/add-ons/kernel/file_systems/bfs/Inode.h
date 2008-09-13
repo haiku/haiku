@@ -140,12 +140,13 @@ public:
 			status_t		SetFileSize(Transaction& transaction, off_t size);
 			status_t		Append(Transaction& transaction, off_t bytes);
 			status_t		TrimPreallocation(Transaction& transaction);
-			bool			NeedsTrimming();
+			bool			NeedsTrimming() const;
 
 			status_t		Free(Transaction& transaction);
 			status_t		Sync();
 
 			bfs_inode&		Node() { return fNode; }
+			const bfs_inode& Node() const { return fNode; }
 
 			// create/remove inodes
 			status_t		Remove(Transaction& transaction, const char* name,
@@ -164,6 +165,10 @@ public:
 									= Node().LastModifiedTime(); }
 			off_t			OldSize() { return fOldSize; }
 			off_t			OldLastModified() { return fOldLastModified; }
+
+			bool			InNameIndex() const;
+			bool			InSizeIndex() const;
+			bool			InLastModifiedIndex() const;
 
 			// file cache
 			void*			FileCache() const { return fCache; }

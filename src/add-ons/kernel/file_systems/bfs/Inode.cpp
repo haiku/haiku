@@ -2063,18 +2063,19 @@ Inode::Append(Transaction& transaction, off_t bytes)
 }
 
 
-/*!	Checks wether or not this inode's data stream needs to be trimmed
+/*!	Checks whether or not this inode's data stream needs to be trimmed
 	because of an earlier preallocation.
 	Returns true if there are any blocks to be trimmed.
 */
 bool
-Inode::NeedsTrimming()
+Inode::NeedsTrimming() const
 {
 	// We never trim preallocated index blocks to make them grow as smooth as
 	// possible. There are only few indices anyway, so this doesn't hurt.
 	// Also, if an inode is already in deleted state, we don't bother trimming
 	// it.
-	if (IsIndex() || IsDeleted())
+	if (IsIndex() || IsDeleted()
+		|| (IsSymLink() && (Flags() & INODE_LONG_SYMLINK) == 0))
 		return false;
 
 	off_t roundedSize = round_up(Size(), fVolume->BlockSize());
@@ -2301,36 +2302,36 @@ Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	// are updated here (name, size, & last_modified)
 
 	Index index(fVolume);
-	if (inode->IsRegularNode()) {
+	if (inode->InNameIndex()) {
 		index.RemoveName(transaction, name, inode);
 			// If removing from the index fails, it is not regarded as a
 			// fatal error and will not be reported back!
 			// Deleted inodes won't be visible in queries anyway.
 	}
 
-	if (inode->IsFile() || inode->IsSymLink()) {
-		if (inode->IsFile())
-			index.RemoveSize(transaction, inode);
+	if (inode->InSizeIndex())
+		index.RemoveSize(transaction, inode);
+	if (inode->InLastModifiedIndex())
 		index.RemoveLastModified(transaction, inode);
-	}
 
 	return inode->WriteBack(transaction);
 }
 
 
-/*!	Creates the inode with the specified parent directory, and automatically
+/*!	Creates the inode with the specified \a parent directory, and automatically
 	adds the created inode to that parent directory. If an attribute directory
-	is created, it will also automatically  be added to the parent inode as
+	is created, it will also automatically  be added to the \a parent inode as
 	such. However, the indices root node, and the regular root node won't be
 	added to the super block.
 	It will also create the initial B+tree for the inode if it's a directory
 	of any kind.
+	\a name may be \c NULL, but only if no \a parent is given.
 	If the "_id" or "_inode" variable is given and non-NULL to store the
 	inode's ID, the inode stays locked - you have to call put_vnode() if you
 	don't use it anymore.
-	If the node already exists, this method will fail if O_EXCL is set, or it's
-	a directory or a symlink. Otherwise, it will just be returned. If O_TRUNC
-	has been specified, the file will also be truncated.
+	If the node already exists, this method will fail if \c O_EXCL is set, or
+	it's a directory or a symlink. Otherwise, it will just be returned.
+	If \c O_TRUNC has been specified, the file will also be truncated.
 */
 status_t
 Inode::Create(Transaction& transaction, Inode* parent, const char* name,
@@ -2495,7 +2496,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	// (live queries might want to access us after this)
 
 	Index index(volume);
-	if (inode->IsRegularNode() && name != NULL) {
+	if (inode->InNameIndex() && name != NULL) {
 		// the name index only contains regular files
 		// (but not the root node where name == NULL)
 		status = index.InsertName(transaction, name, inode);
@@ -2514,14 +2515,13 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 
 	inode->UpdateOldLastModified();
 
-	// The "size" & "last_modified" indices don't contain directories
-	if (inode->IsFile() || inode->IsSymLink()) {
-		// if adding to these indices fails, the inode creation will not be
-		//  harmed; they are considered less important than the "name" index
-		if (inode->IsFile())
-			index.InsertSize(transaction, inode);
+	// The "size" & "last_modified" indices don't contain directories.
+	// If adding to these indices fails, the inode creation will not be
+	// harmed; they are considered less important than the "name" index.
+	if (inode->InSizeIndex())
+		index.InsertSize(transaction, inode);
+	if (inode->InLastModifiedIndex())
 		index.InsertLastModified(transaction, inode);
-	}
 
 	if (inode->IsFile() || inode->IsAttribute()) {
 		inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(),
@@ -2546,6 +2546,30 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 		put_vnode(volume->FSVolume(), inode->ID());
 
 	return B_OK;
+}
+
+
+/*!	Checks whether or not this node should be part of the name index */
+bool
+Inode::InNameIndex() const
+{
+	return IsRegularNode();
+}
+
+
+/*!	Checks whether or not this node should be part of the size index */
+bool
+Inode::InSizeIndex() const
+{
+	return IsFile();
+}
+
+
+/*!	Checks whether or not this node should be part of the last modified index */
+bool
+Inode::InLastModifiedIndex() const
+{
+	return IsFile() || IsSymLink();
 }
 
 

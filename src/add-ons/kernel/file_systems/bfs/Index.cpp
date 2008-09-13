@@ -321,7 +321,7 @@ Index::UpdateName(Transaction &transaction, const char* oldName,
 status_t
 Index::InsertSize(Transaction &transaction, Inode* inode)
 {
-	ASSERT(inode->IsFile());
+	ASSERT(inode->InSizeIndex());
 
 	off_t size = inode->Size();
 	return Update(transaction, "size", B_INT64_TYPE, NULL, 0, (uint8*)&size,
@@ -332,7 +332,7 @@ Index::InsertSize(Transaction &transaction, Inode* inode)
 status_t
 Index::RemoveSize(Transaction &transaction, Inode* inode)
 {
-	ASSERT(inode->IsFile());
+	ASSERT(inode->InSizeIndex());
 
 	// Inode::OldSize() is the size that's in the index
 	off_t size = inode->OldSize();
@@ -344,7 +344,7 @@ Index::RemoveSize(Transaction &transaction, Inode* inode)
 status_t
 Index::UpdateSize(Transaction &transaction, Inode* inode)
 {
-	ASSERT(inode->IsFile());
+	ASSERT(inode->InSizeIndex());
 
 	off_t oldSize = inode->OldSize();
 	off_t newSize = inode->Size();
@@ -362,7 +362,7 @@ Index::UpdateSize(Transaction &transaction, Inode* inode)
 status_t
 Index::InsertLastModified(Transaction &transaction, Inode* inode)
 {
-	ASSERT(inode->IsFile() || inode->IsSymLink());
+	ASSERT(inode->InLastModifiedIndex());
 
 	off_t modified = inode->LastModified();
 	return Update(transaction, "last_modified", B_INT64_TYPE, NULL, 0,
@@ -373,7 +373,7 @@ Index::InsertLastModified(Transaction &transaction, Inode* inode)
 status_t
 Index::RemoveLastModified(Transaction &transaction, Inode* inode)
 {
-	ASSERT(inode->IsFile() || inode->IsSymLink());
+	ASSERT(inode->InLastModifiedIndex());
 
 	// Inode::OldLastModified() is the value which is in the index
 	off_t modified = inode->OldLastModified();
@@ -386,7 +386,7 @@ status_t
 Index::UpdateLastModified(Transaction &transaction, Inode* inode,
 	off_t modified)
 {
-	ASSERT(inode->IsFile() || inode->IsSymLink());
+	ASSERT(inode->InLastModifiedIndex());
 
 	off_t oldModified = inode->OldLastModified();
 	if (modified == -1)

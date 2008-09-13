@@ -723,12 +723,14 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 
 	bfs_inode& node = inode->Node();
 
-	if (mask & B_STAT_SIZE) {
+	if ((mask & B_STAT_SIZE) != 0) {
 		// Since WSTAT_SIZE is the only thing that can fail directly, we
 		// do it first, so that the inode state will still be consistent
 		// with the on-disk version
 		if (inode->IsDirectory())
 			return B_IS_A_DIRECTORY;
+		if (!inode->IsFile())
+			return B_BAD_VALUE;
 
 		if (inode->Size() != stat->st_size) {
 			off_t oldSize = inode->Size();
@@ -751,19 +753,19 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 		}
 	}
 
-	if (mask & B_STAT_MODE) {
+	if ((mask & B_STAT_MODE) != 0) {
 		PRINT(("original mode = %ld, stat->st_mode = %d\n", node.Mode(), stat->st_mode));
 		node.mode = HOST_ENDIAN_TO_BFS_INT32((node.Mode() & ~S_IUMSK)
 			| (stat->st_mode & S_IUMSK));
 	}
 
-	if (mask & B_STAT_UID)
+	if ((mask & B_STAT_UID) != 0)
 		node.uid = HOST_ENDIAN_TO_BFS_INT32(stat->st_uid);
-	if (mask & B_STAT_GID)
+	if ((mask & B_STAT_GID) != 0)
 		node.gid = HOST_ENDIAN_TO_BFS_INT32(stat->st_gid);
 
-	if (mask & B_STAT_MODIFICATION_TIME) {
-		if (inode->IsDirectory()) {
+	if ((mask & B_STAT_MODIFICATION_TIME) != 0) {
+		if (!inode->InLastModifiedIndex()) {
 			// directory modification times are not part of the index
 			node.last_modified_time = HOST_ENDIAN_TO_BFS_INT64(
 				(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
@@ -774,7 +776,7 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 				(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
 		}
 	}
-	if (mask & B_STAT_CREATION_TIME) {
+	if ((mask & B_STAT_CREATION_TIME) != 0) {
 		node.create_time = HOST_ENDIAN_TO_BFS_INT64(
 			(bigtime_t)stat->st_crtime << INODE_TIME_SHIFT);
 	}
@@ -1296,7 +1298,10 @@ bfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 			&& !inode->IsDeleted()
 			&& (needsTrimming
 				|| inode->OldLastModified() != inode->LastModified()
-				|| inode->OldSize() != inode->Size())) {
+				|| (inode->InSizeIndex()
+					// TODO: this can prevent the size update notification
+					// for nodes not in the index!
+					&& inode->OldSize() != inode->Size()))) {
 			locker.Unlock();
 			transaction.Start(volume, inode->BlockNumber());
 		}
@@ -1323,11 +1328,15 @@ bfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 			}
 		}
 		if (inode->OldSize() != inode->Size()) {
-			index.UpdateSize(transaction, inode);
+			if (inode->InSizeIndex())
+				index.UpdateSize(transaction, inode);
 			changedSize = true;
 		}
 		if (inode->OldLastModified() != inode->LastModified()) {
-			index.UpdateLastModified(transaction, inode, inode->LastModified());
+			if (inode->InLastModifiedIndex()) {
+				index.UpdateLastModified(transaction, inode,
+					inode->LastModified());
+			}
 			changedTime = true;
 
 			// updating the index doesn't write back the inode
@@ -1385,7 +1394,7 @@ bfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
 	if (!inode->IsSymLink())
 		RETURN_ERROR(B_BAD_VALUE);
 
-	if (inode->Flags() & INODE_LONG_SYMLINK) {
+	if ((inode->Flags() & INODE_LONG_SYMLINK) != 0) {
 		if (inode->Size() < *_bufferSize)
 			*_bufferSize = inode->Size();
 
