@@ -4,6 +4,7 @@
  *
  * DrawingMode implementing B_OP_SELECT on B_RGBA32.
  *
+ 
  */
 
 #ifndef DRAWING_MODE_SELECT_H
@@ -194,7 +195,7 @@ blend_color_hspan_select(int x, int y, unsigned len,
 		} else if (cover) {
 			do {
 				if (colors->a > 0 && compare(p, high, low, &color)) {
-					BLEND_SELECT(p, color.red, color.green, color.blue, *covers);
+					BLEND_SELECT(p, color.red, color.green, color.blue, cover);
 				}
 				p += 4;
 				++colors;
