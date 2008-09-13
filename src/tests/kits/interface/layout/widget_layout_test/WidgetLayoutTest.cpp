@@ -17,6 +17,7 @@
 #include "MenuBarTest.h"
 #include "MenuFieldTest.h"
 #include "MenuTest.h"
+#include "ScrollBarTest.h"
 #include "SliderTest.h"
 #include "StringView.h"
 #include "Test.h"
@@ -46,6 +47,7 @@ const test_info kTestInfos[] = {
 	{ "BMenu",			MenuTest::CreateTest },
 	{ "BMenuBar",		MenuBarTest::CreateTest },
 	{ "BMenuField",		MenuFieldTest::CreateTest },
+	{ "BScrollBar",		ScrollBarTest::CreateTest },
 	{ "BSlider",		SliderTest::CreateTest },
 	{ NULL, NULL }
 };
