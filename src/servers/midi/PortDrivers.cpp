@@ -100,6 +100,10 @@ int32 MidiPortProducer::GetData()
 		if (read(fd, &next, 1) != 1)
 		{
 			perror("Error reading data from driver");
+			if (haveSysEx)
+			{
+				free(sysexBuf);
+			}
 			return B_ERROR;
 		}
 
