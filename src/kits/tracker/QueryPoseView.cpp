@@ -522,6 +522,7 @@ QueryEntryListCollection::FetchOneQuery(const BQuery *copyThis,
 	status_t result = query->Fetch();
 	if (result != B_OK) {
 		PRINT(("fetch error %s\n", strerror(result)));
+		delete query;
 		return result;
 	}
 	list->AddItem(query);
