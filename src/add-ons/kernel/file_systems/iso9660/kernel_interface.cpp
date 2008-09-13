@@ -328,8 +328,10 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 	TRACE(("fs_read_vnode - block = %ld, pos = %ld, raw = %Lu node 0x%x\n",
 		block, pos, vnodeID, newNode));
 
-	if (pos > ns->logicalBlkSize[FS_DATA_FORMAT])
+	if (pos > ns->logicalBlkSize[FS_DATA_FORMAT]) {
+		free(newNode);
 		return B_BAD_VALUE;
+	}
 
 	char *data = (char *)block_cache_get_etc(ns->fBlockCache,
 		block, 0, ns->logicalBlkSize[FS_DATA_FORMAT]);
