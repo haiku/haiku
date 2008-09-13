@@ -21,6 +21,7 @@
 #include "SliderTest.h"
 #include "StringView.h"
 #include "Test.h"
+#include "TextControlTest.h"
 #include "TwoDimensionalSliderView.h"
 #include "View.h"
 #include "ViewContainer.h"
@@ -49,6 +50,7 @@ const test_info kTestInfos[] = {
 	{ "BMenuField",		MenuFieldTest::CreateTest },
 	{ "BScrollBar",		ScrollBarTest::CreateTest },
 	{ "BSlider",		SliderTest::CreateTest },
+	{ "BTextControl",	TextControlTest::CreateTest },
 	{ NULL, NULL }
 };
 
