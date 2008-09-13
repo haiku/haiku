@@ -187,8 +187,12 @@ KFileDiskDevice::_UnregisterDevice(const char *_device)
 status_t
 KFileDiskDevice::_GetDirectoryPath(partition_id id, KPath *path)
 {
-	if (!path || path->InitCheck() != B_OK)
+	if (path == NULL)
+		return B_BAD_VALUE;
+
+	if (path->InitCheck() != B_OK)
 		return path->InitCheck();
+
 	status_t error = path->SetPath(kFileDevicesDir);
 	if (error == B_OK) {
 		char idBuffer[12];
