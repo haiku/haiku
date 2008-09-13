@@ -1177,7 +1177,7 @@ BSlider::BarFrame() const
 
 	if (Orientation() == B_HORIZONTAL) {
 		frame.left = thumbInset;
-		frame.top = 6.0 + (Label() ? textHeight + 4.0 : 0.0);
+		frame.top = 6.0 + (Label() || fUpdateText ? textHeight + 4.0 : 0.0);
 		frame.right -= thumbInset;
 		frame.bottom = frame.top + fBarThickness;
 	} else {
@@ -1241,7 +1241,7 @@ BSlider::ThumbFrame() const
 		if (Orientation() == B_HORIZONTAL) {
 			frame.left = floorf(Position() * (_MaxPosition()
 				- _MinPosition()) + _MinPosition()) - 8;
-			frame.top = 2 + (Label() ? textHeight + 4 : 0);
+			frame.top = 2 + (Label() || fUpdateText ? textHeight + 4 : 0);
 			frame.right = frame.left + 17;
 			frame.bottom = frame.top + fBarThickness + 7;
 		} else {
@@ -1487,6 +1487,9 @@ BSlider::Orientation() const
 void
 BSlider::SetOrientation(orientation posture)
 {
+	if (fOrientation == posture)
+		return;
+
 	fOrientation = posture;
 	InvalidateLayout();
 	Invalidate();
