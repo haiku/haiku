@@ -88,8 +88,10 @@ NetStack::CreateDefault()
 		return B_NO_MEMORY;
 
 	status_t error = netStack->Init();
-	if (error != B_OK)
+	if (error != B_OK) {
 		delete netStack;
+		return error;
+	}
 
 	sNetStack = netStack;
 	return B_OK;
