@@ -563,6 +563,18 @@ BScrollBar::Target() const
 }
 
 
+void
+BScrollBar::SetOrientation(enum orientation orientation)
+{
+	if (fOrientation == orientation)
+		return;
+
+	fOrientation = orientation;
+	InvalidateLayout();
+	Invalidate();
+}
+
+
 orientation
 BScrollBar::Orientation() const
 {
@@ -1610,27 +1622,29 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 	}
 
 	BPoint tri1, tri2, tri3;
-	r.InsetBy(4, 4);
+	float hInset = r.Width() / 3;
+	float vInset = r.Height() / 3;
+	r.InsetBy(hInset, vInset);
 
 	switch (direction) {
 		case ARROW_LEFT:
 			tri1.Set(r.right, r.top);
-			tri2.Set(r.left + 1, (r.top + r.bottom + 1) /2 );
+			tri2.Set(r.right - r.Width() / 1.33, (r.top + r.bottom + 1) /2 );
 			tri3.Set(r.right, r.bottom + 1);
 			break;
 		case ARROW_RIGHT:
 			tri1.Set(r.left, r.bottom + 1);
-			tri2.Set(r.right - 1, (r.top + r.bottom + 1) / 2);
+			tri2.Set(r.left + r.Width() / 1.33, (r.top + r.bottom + 1) / 2);
 			tri3.Set(r.left, r.top);
 			break;
 		case ARROW_UP:
 			tri1.Set(r.left, r.bottom);
-			tri2.Set((r.left + r.right + 1) / 2, r.top + 1);
+			tri2.Set((r.left + r.right + 1) / 2, r.bottom - r.Height() / 1.33);
 			tri3.Set(r.right + 1, r.bottom);
 			break;
 		default:
 			tri1.Set(r.left, r.top);
-			tri2.Set((r.left + r.right + 1) / 2, r.bottom - 1);
+			tri2.Set((r.left + r.right + 1) / 2, r.top + r.Height() / 1.33);
 			tri3.Set(r.right + 1, r.top);
 			break;
 	}
@@ -1642,7 +1656,7 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 		tri3 = tri3 + offset;
 	}
 
-	r.InsetBy(-3, -3);
+	r.InsetBy(-(hInset - 1), -(vInset - 1));
 	SetHighColor(normal);
 	FillRect(r);
 
@@ -1652,7 +1666,7 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 	arrowShape.LineTo(tri3);
 
 	SetHighColor(arrow);
-	SetPenSize(2.0);
+	SetPenSize(ceilf(hInset / 2.0));
 	StrokeShape(&arrowShape);
 	SetPenSize(1.0);
 
