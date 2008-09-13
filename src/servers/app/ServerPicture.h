@@ -16,6 +16,8 @@
 
 class ServerApp;
 class View;
+class BFile;
+
 namespace BPrivate {
 	class LinkReceiver;
 	class PortLink;
@@ -53,6 +55,7 @@ friend class	ServerApp;
 		~ServerPicture();
 
 		int32		fToken;
+		BFile		*fFile;
 		BPositionIO	*fData;
 		// DrawState	*fState;
 		BList		*fPictures;

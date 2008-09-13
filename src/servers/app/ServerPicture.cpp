@@ -754,6 +754,7 @@ const static void *kTableEntries[] = {
 ServerPicture::ServerPicture()
 	:
 	PictureDataWriter(),
+	fFile(NULL),
 	fData(NULL),
 	fPictures(NULL),
 	fUsurped(NULL)
@@ -768,6 +769,7 @@ ServerPicture::ServerPicture()
 ServerPicture::ServerPicture(const ServerPicture &picture)
 	:
 	PictureDataWriter(),
+	fFile(NULL),
 	fData(NULL),
 	fPictures(NULL),
 	fUsurped(NULL)
@@ -793,19 +795,25 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
 	:
 	PictureDataWriter(),
+	fFile(NULL),
 	fData(NULL),
 	fPictures(NULL),
 	fUsurped(NULL)
 {
-	BPrivate::Storage::OffsetFile *file =
-		new BPrivate::Storage::OffsetFile(new BFile(fileName, B_READ_WRITE), (off_t)offset);
-
-	if (file == NULL || file->InitCheck() != B_OK)
+	fFile = new (std::nothrow) BFile(fileName, B_READ_WRITE);
+	if (fFile == NULL)
 		return;
-	
-	fData = file;
+
+	BPrivate::Storage::OffsetFile *offsetFile =
+		new (std::nothrow) BPrivate::Storage::OffsetFile(fFile, (off_t)offset);
+	if (offsetFile == NULL || offsetFile->InitCheck() != B_OK) {
+		delete offsetFile;
+		return;
+	}
+
+	fData = offsetFile;
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
-	
+
 	PictureDataWriter::SetTo(fData);
 }
 
@@ -813,6 +821,7 @@ ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
 ServerPicture::~ServerPicture()
 {
 	delete fData;
+	delete fFile;
 	gTokenSpace.RemoveToken(fToken);
 	
 	// We only delete the subpictures list, not the subpictures themselves,
@@ -1044,5 +1053,3 @@ ServerPicture::ExportData(BPrivate::PortLink &link)
 	fData->Seek(oldPosition, SEEK_SET);
 	return status;
 }
-
-
