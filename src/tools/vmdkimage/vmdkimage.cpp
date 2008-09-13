@@ -48,24 +48,24 @@ main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	while (1) { 
+	while (1) {
 		int c;
-		static struct option long_options[] = 
-		{ 
-		 	{"headersize", required_argument, 0, 'h'}, 
-			{"imagesize", required_argument, 0, 'i'}, 
-			{"file", required_argument, 0, 'f'}, 
-			{"clear-image", no_argument, 0, 'c'}, 
-			{"header-only", no_argument, 0, 'H'}, 
-			{0, 0, 0, 0} 
+		static struct option long_options[] =
+		{
+		 	{"headersize", required_argument, 0, 'h'},
+			{"imagesize", required_argument, 0, 'i'},
+			{"file", required_argument, 0, 'f'},
+			{"clear-image", no_argument, 0, 'c'},
+			{"header-only", no_argument, 0, 'H'},
+			{0, 0, 0, 0}
 		};
 
 		opterr = 0; /* don't print errors */
-		c = getopt_long(argc, argv, "h:i:cHf:", long_options, NULL); 
-		if (c == -1) 
-			break; 
+		c = getopt_long(argc, argv, "h:i:cHf:", long_options, NULL);
+		if (c == -1)
+			break;
 
-		switch (c) { 
+		switch (c) {
 			case 'h':
 				headersize = strtoull(optarg, NULL, 10);
 				if (strchr(optarg, 'G') || strchr(optarg, 'g'))
@@ -74,7 +74,7 @@ main(int argc, char *argv[])
 					headersize *= 1024 * 1024;
 				else if (strchr(optarg, 'K') || strchr(optarg, 'k'))
 					headersize *= 1024;
-				break; 
+				break;
 
 			case 'i':
 				imagesize = strtoull(optarg, NULL, 10);
@@ -84,24 +84,24 @@ main(int argc, char *argv[])
 					imagesize *= 1024 * 1024;
 				else if (strchr(optarg, 'K') || strchr(optarg, 'k'))
 					imagesize *= 1024;
-				break; 
+				break;
 
 			case 'f':
 				file = optarg;
-				break; 
+				break;
 
 			case 'c':
 				clearImage = true;
-				break; 
+				break;
 
 			case 'H':
 				headerOnly = true;
-				break; 
+				break;
 
-			default: 
+			default:
 				print_usage();
-		} 
-	} 
+		}
+	}
 
 	if (file == NULL && optind == argc - 1)
 		file = argv[optind];
@@ -181,7 +181,7 @@ main(int argc, char *argv[])
 	header.doubleEndLineChar1 = '\r';
 	header.doubleEndLineChar2 = '\n';
 
-	strcat(desc, 
+	strcat(desc,
 		"# Disk Descriptor File\n"
 		"version=1\n"
 		"CID=fffffffe\n"
@@ -191,7 +191,7 @@ main(int argc, char *argv[])
 		"# Extent Description\n"
 		"RW %llu FLAT \"%s\" %llu\n",
 		actualImageSize / 512, name, headersize / 512);
-	sprintf(desc + strlen(desc), 
+	sprintf(desc + strlen(desc),
 		"# Disk Data Base\n"
 		"ddb.toolsVersion = \"0\"\n"
 		"ddb.virtualHWVersion = \"3\"\n"
@@ -200,7 +200,7 @@ main(int argc, char *argv[])
 		"ddb.geometry.heads = \"%llu\"\n"
 		"ddb.geometry.cylinders = \"%llu\"\n",
 		sectors, heads, cylinders);
-	
+
 	int fd = open(file, O_RDWR | O_CREAT, 0666);
 	if (fd < 0) {
 		fprintf(stderr, "Error: couldn't open file %s (%s)\n", file,
@@ -212,9 +212,8 @@ main(int argc, char *argv[])
 
 	if (sizeof(desc) != write(fd, desc, sizeof(desc)))
 		goto write_err;
-	
-	headersize--;
-	if (headersize != (uint64)lseek(fd, headersize, SEEK_SET))
+
+	if (headersize - 1 != (uint64)lseek(fd, headersize - 1, SEEK_SET))
 		goto write_err;
 
 	if (1 != write(fd, "", 1))
@@ -222,7 +221,7 @@ main(int argc, char *argv[])
 
 	if (!headerOnly) {
 		if (clearImage && ftruncate(fd, headersize) != 0
-			|| ftruncate(fd, actualImageSize + headersize)  != 0) {
+			|| ftruncate(fd, actualImageSize + headersize) != 0) {
 			fprintf(stderr, "Error: resizing file %s failed (%s)\n", file,
 				strerror(errno));
 			exit(EXIT_FAILURE);
