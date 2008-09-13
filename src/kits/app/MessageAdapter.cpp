@@ -679,14 +679,17 @@ MessageAdapter::_UnflattenDanoMessage(uint32 format, BMessage *into,
 
 		ssize_t fieldSize = sectionHeader.size - sizeof(dano_section_header);
 		uint8 *fieldBuffer = NULL;
-		if (fieldSize > 0) {
+		if (fieldSize <= 0) {
 			// there may be no data. we shouldn't fail because of that
-			fieldBuffer = (uint8 *)malloc(fieldSize);
-			if (fieldBuffer == NULL)
-				throw (status_t)B_NO_MEMORY;
-
-			reader(fieldBuffer, fieldSize);
+			offset += sectionHeader.size;
+			continue;
 		}
+
+		fieldBuffer = (uint8 *)malloc(fieldSize);
+		if (fieldBuffer == NULL)
+			throw (status_t)B_NO_MEMORY;
+
+		reader(fieldBuffer, fieldSize);
 
 		switch (sectionHeader.code) {
 			case SECTION_OFFSET_TABLE:
