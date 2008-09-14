@@ -116,6 +116,7 @@ _BMCMenuBar_::AttachedToWindow()
 {
 	fMenuField = static_cast<BMenuField *>(Parent());
 
+	// Don't cause the KeyMenuBar to change by being attached
 	BMenuBar *menuBar = Window()->KeyMenuBar();
 	BMenuBar::AttachedToWindow();
 	if (fFixedSize)
@@ -236,7 +237,7 @@ _BMCMenuBar_::FrameResized(float width, float height)
 	if (fFixedSize)
 		diff = width - fPreviousWidth;
 	else
-		diff = Frame().right - fMenuField->Bounds().right;
+		diff = Frame().right - (fMenuField->Bounds().right - 2);
 
 	fPreviousWidth = width;
 
@@ -272,7 +273,7 @@ _BMCMenuBar_::FrameResized(float width, float height)
 		// of the size of the parent menu field as well
 		// NOTE: no worries about follow mode, we follow left and top
 		// in autosize mode
-		fMenuField->ResizeBy(diff + 2, 0.0);
+		fMenuField->ResizeBy(diff, 0.0);
 	}
 	BMenuBar::FrameResized(width, height);
 }
