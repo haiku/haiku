@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -115,7 +115,7 @@ protected:
 			void			DrawLabel(BRect bounds, BRect update);
 	static	void			InitMenu(BMenu* menu);
 	
-			int32		_MenuTask();
+			int32			_MenuTask();
 	static	int32			_thread_entry(void *arg);
 	
 			void			_UpdateFrame();
@@ -123,6 +123,7 @@ protected:
 								BRect frame, bool fixedSize);
 
 			void			_ValidateLayoutData();
+			float			_MenuBarWidthDiff() const;
 
 			char*			fLabel;
 			BMenu*			fMenu;

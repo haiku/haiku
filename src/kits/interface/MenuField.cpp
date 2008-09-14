@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku, Inc.
+ * Copyright 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,6 +18,21 @@
 #include <Message.h>
 #include <BMCPrivate.h>
 #include <Window.h>
+
+
+//#define TRACE_MENU_FIELD
+#ifdef TRACE_MENU_FIELD
+#	include <FunctionTracer.h>
+	static int32 sFunctionDepth = -1;
+#	define CALLED(x...)	FunctionTracer _ft("BMenuField", __FUNCTION__, \
+							sFunctionDepth)
+#	define TRACE(x...)	{ BString _to; \
+							_to.Append(' ', (sFunctionDepth + 1) * 2); \
+							printf("%s", _to.String()); printf(x); }
+#else
+#	define CALLED(x...)
+#	define TRACE(x...)
+#endif
 
 
 class BMenuField::LabelLayoutItem : public BAbstractLayoutItem {
@@ -98,6 +113,10 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 	BMenu *menu, uint32 resize, uint32 flags)
 	: BView(frame, name, resize, flags)
 {
+	CALLED();
+
+	TRACE("frame.width: %.2f, height: %.2f\n", frame.Width(), frame.Height());
+
 	InitObject(label);
 
 	frame.OffsetTo(B_ORIGIN);
@@ -280,6 +299,8 @@ BMenuField::Draw(BRect update)
 void
 BMenuField::AttachedToWindow()
 {
+	CALLED();
+
 	BView* parent = Parent();
 	if (parent != NULL) {
 		// inherit the color from parent
@@ -296,8 +317,14 @@ BMenuField::AttachedToWindow()
 void
 BMenuField::AllAttached()
 {
+	CALLED();
+
+	TRACE("width: %.2f, height: %.2f\n", Frame().Width(), Frame().Height());
+
 	ResizeTo(Bounds().Width(),
 		fMenuBar->Bounds().Height() + kVMargin + kVMargin);
+
+	TRACE("width: %.2f, height: %.2f\n", Frame().Width(), Frame().Height());
 }
 
 
@@ -592,18 +619,26 @@ BMenuField::GetSupportedSuites(BMessage *data)
 void
 BMenuField::ResizeToPreferred()
 {
+	CALLED();
+
+	TRACE("fMenuBar->Frame().width: %.2f, height: %.2f\n",
+		fMenuBar->Frame().Width(), fMenuBar->Frame().Height());
+
 	fMenuBar->ResizeToPreferred();
+
+	TRACE("fMenuBar->Frame().width: %.2f, height: %.2f\n",
+		fMenuBar->Frame().Width(), fMenuBar->Frame().Height());
 
 	BView::ResizeToPreferred();
 
 	if (fFixedSizeMB) {
-		// we have let the menubar resize itsself, but
+		// we have let the menubar resize itself, but
 		// in fixed size mode, the menubar is supposed to
 		// be at the right end of the view always. Since
 		// the menu bar is in follow left/right mode then,
 		// resizing ourselfs might have caused the menubar
 		// to be outside now
-		fMenuBar->ResizeTo(Bounds().Width() - fDivider - 2,
+		fMenuBar->ResizeTo(Bounds().Width() - _MenuBarWidthDiff(),
 			fMenuBar->Frame().Height());
 	}
 }
@@ -612,6 +647,8 @@ BMenuField::ResizeToPreferred()
 void
 BMenuField::GetPreferredSize(float *_width, float *_height)
 {
+	CALLED();
+
 	_ValidateLayoutData();
 
 	if (_width)
@@ -625,6 +662,8 @@ BMenuField::GetPreferredSize(float *_width, float *_height)
 BSize
 BMenuField::MinSize()
 {
+	CALLED();
+
 	_ValidateLayoutData();
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), fLayoutData->min);
 }
@@ -633,6 +672,8 @@ BMenuField::MinSize()
 BSize
 BMenuField::MaxSize()
 {
+	CALLED();
+
 	_ValidateLayoutData();
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), fLayoutData->min);
 }
@@ -641,6 +682,8 @@ BMenuField::MaxSize()
 BSize
 BMenuField::PreferredSize()
 {
+	CALLED();
+
 	_ValidateLayoutData();
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), fLayoutData->min);
 }
@@ -649,6 +692,8 @@ BMenuField::PreferredSize()
 void
 BMenuField::InvalidateLayout(bool descendants)
 {
+	CALLED();
+
 	fLayoutData->valid = false;
 
 	BView::InvalidateLayout(descendants);
@@ -686,6 +731,8 @@ BMenuField::DoLayout()
 	// Bail out, if we shan't do layout.
 	if (!(Flags() & B_SUPPORTS_LAYOUT))
 		return;
+
+	CALLED();
 
 	// If the user set a layout, we let the base class version call its
 	// hook.
@@ -747,6 +794,8 @@ BMenuField::operator=(const BMenuField &)
 void
 BMenuField::InitObject(const char *label)
 {
+	CALLED();
+
 	fLabel = NULL;
 	fMenu = NULL;
 	fMenuBar = NULL;
@@ -773,14 +822,17 @@ BMenuField::InitObject(const char *label)
 void
 BMenuField::InitObject2()
 {
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
+	CALLED();
 
-	// TODO: fix this calculation
-	float height = floorf(fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading) + 7;
+	float height;
+	fMenuBar->GetPreferredSize(NULL, &height);
+	fMenuBar->ResizeTo(Bounds().Width() - _MenuBarWidthDiff(), height);
 
-	fMenuBar->ResizeTo(Bounds().Width() - fDivider - 2, height);
+	TRACE("frame(%.1f, %.1f, %.1f, %.1f) (%.2f, %.2f)\n",
+		fMenuBar->Frame().left, fMenuBar->Frame().top,
+		fMenuBar->Frame().right, fMenuBar->Frame().bottom,
+		fMenuBar->Frame().Width(), fMenuBar->Frame().Height());
+
 	fMenuBar->AddFilter(new _BMCFilter_(this, B_MOUSE_DOWN));
 }
 
@@ -788,6 +840,8 @@ BMenuField::InitObject2()
 void
 BMenuField::DrawLabel(BRect bounds, BRect update)
 {
+	CALLED();
+
 	_ValidateLayoutData();
 	font_height& fh = fLayoutData->font_info;
 
@@ -880,6 +934,8 @@ BMenuField::_MenuTask()
 void
 BMenuField::_UpdateFrame()
 {
+	CALLED();
+
 	if (fLayoutData->label_layout_item && fLayoutData->menu_bar_layout_item) {
 		BRect labelFrame = fLayoutData->label_layout_item->Frame();
 		BRect menuFrame = fLayoutData->menu_bar_layout_item->Frame();
@@ -905,12 +961,21 @@ BMenuField::_UpdateFrame()
 void
 BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 {
+	CALLED();
+
 	fMenu = menu;
 	InitMenu(menu);
 
-	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1,
-		frame.top + kVMargin, frame.right - 2, frame.bottom - kVMargin),
-		fixedSize, this);
+	frame.left = fDivider + 1;
+	frame.top = kVMargin;
+	frame.right -= kVMargin;
+	frame.bottom -= kVMargin;
+
+	TRACE("frame(%.1f, %.1f, %.1f, %.1f) (%.2f, %.2f)\n",
+		frame.left, frame.top, frame.right, frame.bottom,
+		frame.Width(), frame.Height());
+
+	fMenuBar = new _BMCMenuBar_(frame, fixedSize, this);
 
 	// by default align the menu bar left in the available space
 	fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
@@ -926,6 +991,8 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 void
 BMenuField::_ValidateLayoutData()
 {
+	CALLED();
+
 	if (fLayoutData->valid)
 		return;
 
@@ -946,11 +1013,17 @@ BMenuField::_ValidateLayoutData()
 		divider = max_c(divider, fDivider);
 
 	// get the minimal (== preferred) menu bar size
+	// TODO: BMenu::MinSize() is using the ResizeMode() to decide the
+	// minimum width. If the mode is B_FOLLOW_LEFT_RIGHT, it will use the
+	// parent's frame width or window's frame width. So at least the returned
+	// size is wrong, but appearantly it doesn't have much bad effect.
 	fLayoutData->menu_bar_min = fMenuBar->MinSize();
 
+	TRACE("menu bar min width: %.2f\n", fLayoutData->menu_bar_min.width);
+
 	// compute our minimal (== preferred) size
-	// TODO: The layout is a bit broken. A one pixel wide border is draw around
-	// the menu bar to give it it's look. When the view has the focus,
+	// TODO: The layout is a bit broken. A one pixel wide border is drawn
+	// around the menu bar to give it it's look. When the view has the focus,
 	// additionally a one pixel wide blue frame is drawn around it. In order
 	// to be able to easily visually align the menu bar with the text view of
 	// a text control, the divider must ignore the focus frame, though. Hence
@@ -959,14 +1032,24 @@ BMenuField::_ValidateLayoutData()
 	min.width += 2 * kVMargin - 1;
 	min.height += 2 * kVMargin;
 
-	if (fLayoutData->label_width > 0)
-		min.width += fLayoutData->label_width + 5;
+	if (divider > 0)
+		min.width += divider;
 	if (fLayoutData->label_height > min.height)
 		min.height = fLayoutData->label_height;
 
 	fLayoutData->min = min;
 
 	fLayoutData->valid = true;
+
+
+	TRACE("width: %.2f, height: %.2f\n", min.width, min.height);
+}
+
+
+float
+BMenuField::_MenuBarWidthDiff() const
+{
+	return fDivider + kVMargin + 1;
 }
 
 
