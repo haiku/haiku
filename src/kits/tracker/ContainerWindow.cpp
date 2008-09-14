@@ -2137,7 +2137,7 @@ BContainerWindow::SetUpEditQueryItem(BMenu *menu)
 	if (!poseViewIsQuery && !queryInSelection && item)
 		item->Menu()->RemoveItem(item);
 
-	else if ((poseViewIsQuery || queryInSelection) && menu && !item) {
+	else if ((poseViewIsQuery || queryInSelection) && !item) {
 
 		// add edit query item after Open
 		item = menu->FindItem(kOpenSelection);
