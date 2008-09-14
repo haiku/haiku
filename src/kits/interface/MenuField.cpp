@@ -143,8 +143,7 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 
 BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
 					   BMessage* message, uint32 flags)
-	: BView(BRect(0, 0, -1, -1), name, B_FOLLOW_NONE,
-			flags | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+	: BView(name, flags | B_FRAME_EVENTS)
 {
 	InitObject(label);
 
@@ -156,8 +155,7 @@ BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
 
 BMenuField::BMenuField(const char* label,
 					   BMenu* menu, BMessage* message)
-	: BView(BRect(0, 0, -1, -1), NULL, B_FOLLOW_NONE,
-			B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+	: BView(NULL, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS)
 {
 	InitObject(label);
 
