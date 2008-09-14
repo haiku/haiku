@@ -1242,8 +1242,8 @@ AttributeView::MouseDown(BPoint point)
 		if (((modifiers() & B_CONTROL_KEY) != 0) || (buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
 			// Show contextual menu
 			BPopUpMenu *contextMenu = new BPopUpMenu("FileContext", false, false);
-			BuildContextMenu(contextMenu);
 			if (contextMenu) {
+				BuildContextMenu(contextMenu);
 				contextMenu->SetAsyncAutoDestruct(true);
 				contextMenu->Go(ConvertToScreen(point), true, true, ConvertToScreen(fIconRect));
 			}
