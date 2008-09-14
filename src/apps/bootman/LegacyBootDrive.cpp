@@ -170,7 +170,7 @@ PartitionRecorder::FirstOffset() const
 bool
 PartitionRecorder::_Record(BPartition* partition)
 {
-	if (!partition->ContainsFileSystem())
+	if (partition->ContainsPartitioningSystem())
 		return false;
 	
 	BPath partitionPath;
