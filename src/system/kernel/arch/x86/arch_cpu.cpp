@@ -17,6 +17,7 @@
 
 #include <boot_device.h>
 #include <commpage.h>
+#include <debug.h>
 #include <smp.h>
 #include <tls.h>
 #include <vm.h>
@@ -95,13 +96,19 @@ x86_optimized_functions gOptimizedFunctions = {
 static status_t
 acpi_shutdown(void)
 {
+	if (debug_debugger_running())
+		return B_ERROR;
+
 	acpi_module_info* acpi;
 	if (get_module(B_ACPI_MODULE_NAME, (module_info**)&acpi) != B_OK)
 		return B_NOT_SUPPORTED;
 
 	status_t status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
-	if (status == B_OK)
+	if (status == B_OK) {
+		cpu_status state = disable_interrupts();
 		status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
+		restore_interrupts(state);
+	}
 
 	put_module(B_ACPI_MODULE_NAME);
 	return status;
