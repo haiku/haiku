@@ -826,52 +826,48 @@ InitNode(iso9660_inode* node, char* buffer, size_t* _bytesRead,
 	// on joliet discs, buffer[0] can be 0 for Unicoded filenames,
 	// so I've added a check here to test explicitely for
 	// directories (which have length 1)
-	if (node->name_length == 1) {
-		// Take care of "." and "..", the first two dirents are
-		// these in iso.
-		if (buffer[0] == 0) {
-			node->name = strdup(".");
-			node->name_length = 1;
-		} else if (buffer[0] == 1) {
-			node->name = strdup("..");
-			node->name_length = 2;
+	// Take care of "." and "..", the first two dirents are
+	// these in iso.
+	if (node->name_length == 1 && buffer[0] == 0) {
+		node->name = strdup(".");
+		node->name_length = 1;
+	} else if (node->name_length == 1 && buffer[0] == 1) {
+		node->name = strdup("..");
+		node->name_length = 2;
+	} else if (jolietLevel > 0) {
+		// JOLIET extension: convert Unicode16 string to UTF8
+		// Assume that the unicode->utf8 conversion produces 4 byte
+		// utf8 characters, and allocate that much space
+		node->name = (char*)malloc(node->name_length * 2 + 1);
+		if (node->name == NULL)
+			return B_NO_MEMORY;
+
+		int32 sourceLength = node->name_length;
+		int32 destLength = node->name_length * 2;
+
+		status_t status = unicode_to_utf8(buffer, &sourceLength,
+			node->name, &destLength);
+		if (status < B_OK) {
+			dprintf("iso9660: error converting unicode->utf8\n");
+			return status;
 		}
+
+		node->name[destLength] = '\0';
+		node->name_length = destLength;
+
+		sanitize_iso_name(node, false);
 	} else {
-		if (jolietLevel > 0) {
-			// JOLIET extension: convert Unicode16 string to UTF8
-			// Assume that the unicode->utf8 conversion produces 4 byte
-			// utf8 characters, and allocate that much space
-			node->name = (char*)malloc(node->name_length * 2 + 1);
-			if (node->name == NULL)
-				return B_NO_MEMORY;
+		node->name = (char*)malloc(node->name_length + 1);
+		if (node->name == NULL)
+			return B_NO_MEMORY;
 
-			int32 sourceLength = node->name_length;
-			int32 destLength = node->name_length * 2;
-
-			status_t status = unicode_to_utf8(buffer, &sourceLength,
-				node->name, &destLength);
-			if (status < B_OK) {
-				dprintf("iso9660: error converting unicode->utf8\n");
-				return status;
-			}
-
-			node->name[destLength] = '\0';
-			node->name_length = destLength;
-
-			sanitize_iso_name(node, false);
-		} else {
-			node->name = (char*)malloc(node->name_length + 1);
-			if (node->name == NULL)
-				return B_NO_MEMORY;
-
-			// convert all characters to lower case
-			for (uint32 i = 0; i < node->name_length; i++) {
-				node->name[i] = tolower(buffer[i]);
-			}
-			node->name[node->name_length] = '\0';
-
-			sanitize_iso_name(node, true);
+		// convert all characters to lower case
+		for (uint32 i = 0; i < node->name_length; i++) {
+			node->name[i] = tolower(buffer[i]);
 		}
+		node->name[node->name_length] = '\0';
+
+		sanitize_iso_name(node, true);
 	}
 
 	if (node->name == NULL) {
