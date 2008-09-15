@@ -1723,18 +1723,13 @@ GrepWindow::_AreAllFoldersOpenInTracker(BList *folderList)
 		sendMessage.AddSpecifier("Window", count);
 
 		status = trackerMessenger.SendMessage(&sendMessage, &replyMessage);
-
 		if (status != B_OK)
 			return false;
 	
-		entry_ref *tracker_ref = new entry_ref;
-		status = replyMessage.FindRef("result", tracker_ref);
-		
-		if (status == B_OK)
-			windowList.AddItem(static_cast<void*>(tracker_ref));
-		
-		if (status != B_OK) {
-			delete tracker_ref;
+		entry_ref* trackerRef = new (nothrow) entry_ref;
+		status = replyMessage.FindRef("result", trackerRef);
+		if (status != B_OK || !windowList.AddItem(trackerRef)) {
+			delete trackerRef;
 			break;
 		}
 	}
@@ -1747,11 +1742,13 @@ GrepWindow::_AreAllFoldersOpenInTracker(BList *folderList)
 	entry_ref* windowRef;
 	BString folderString;
 	BString windowString;
+	bool result = false;
 
-	if (folderCount > windowCount) 
+	if (folderCount > windowCount) {
 		// at least one folder is not open in Tracker
-		return false;
-	
+		goto out;
+	}
+
 	// Loop over the two lists and see if all folders exist as window
 	for (int32 x = 0; x < folderCount; x++) {
 		for (int32 y = 0; y < windowCount; y++) {
@@ -1782,16 +1779,14 @@ GrepWindow::_AreAllFoldersOpenInTracker(BList *folderList)
 		}
 	}
 
+	result = found == folderCount;
+
+out:
 	// delete list of window entry_refs
 	for (int32 x = 0; x < windowCount; x++)
 		delete static_cast<entry_ref*>(windowList.ItemAt(x));
 
-	windowList.MakeEmpty();
-
-	if (found == folderCount)
-		return true;
-
-	return false;
+	return result;
 }
 
 
@@ -1829,13 +1824,10 @@ GrepWindow::_SelectFilesInTracker(BList* folderList, BMessage* refsMessage)
 		if (status != B_OK)
 			return status;
 
-		entry_ref *windowRef = new entry_ref;
-		status = windowReplyMessage.FindRef("result", windowRef);
-
-		if (status != B_OK) {
-			delete windowRef;
+		entry_ref windowRef;
+		status = windowReplyMessage.FindRef("result", &windowRef);
+		if (status != B_OK)
 			break;
-		}
 
 		int32 folderCount = folderList->CountItems();
 
@@ -1851,7 +1843,7 @@ GrepWindow::_SelectFilesInTracker(BList* folderList, BMessage* refsMessage)
 			BPath windowPath;
 			BString windowString;
 
-			status = windowEntry.SetTo(windowRef);
+			status = windowEntry.SetTo(&windowRef);
 			if (status != B_OK)
 				break;
 
@@ -1877,7 +1869,7 @@ GrepWindow::_SelectFilesInTracker(BList* folderList, BMessage* refsMessage)
 					if (status != B_OK)
 						break;
 
-					BDirectory directory(windowRef);
+					BDirectory directory(&windowRef);
 					BEntry entry(&ref);
 					if (directory.Contains(&entry))
 						selectionSendMessage.AddRef("data", &ref);
