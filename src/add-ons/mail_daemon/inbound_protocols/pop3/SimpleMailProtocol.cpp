@@ -43,7 +43,7 @@ SimpleMailProtocol::Init()
 		password = passwd;
 
 	error = Login(settings->FindString("username"), password, settings->FindInt32("auth_method"));
-	delete passwd;
+	delete[] passwd;
 
 	if (error < B_OK) {
 		runner->Stop();
