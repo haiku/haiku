@@ -147,8 +147,9 @@ GameSoundBuffer::SetGain(float gain, bigtime_t duration)
 	if (gain < 0.0 || gain > 1.0)	
 		return B_BAD_VALUE;
 	
-	if (fGainRamp) delete fGainRamp;
-		
+	delete fGainRamp;
+	fGainRamp = NULL;
+	
 	if (duration > 100000)
 		fGainRamp  = InitRamp(&fGain, gain, fFormat.frame_rate, duration);
 	else 
@@ -171,9 +172,9 @@ GameSoundBuffer::SetPan(float pan, bigtime_t duration)
 	if (pan < -1.0 || pan > 1.0)
 		return B_BAD_VALUE;
 	
-	if (fPanRamp) 
-		delete fPanRamp;
-	
+	delete fPanRamp;
+	fPanRamp = NULL;
+
 	if (duration < 100000) {
 		fPan = pan;
 		
