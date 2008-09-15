@@ -456,7 +456,7 @@ AttributeStreamMemoryNode::BufferingGet(const char *name, uint32 type, off_t siz
 {
 	char *newBuffer = new char[size];
 	if (!fReadFrom->Fill(newBuffer)) {
-		delete newBuffer;
+		delete[] newBuffer;
 		return NULL;
 	}
 
