@@ -1,6 +1,6 @@
 /*
- * Floating point AAN DCT
- * Copyright (c) 2003 Michael Niedermayer <michaelni@gmx.at>
+ * Floating point AAN IDCT
+ * Copyright (c) 2008 Michael Niedermayer <michaelni@gmx.at>
  *
  * This file is part of FFmpeg.
  *
@@ -19,21 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file faandct.h
- * @brief
- *     Floating point AAN DCT
- * @author Michael Niedermayer <michaelni@gmx.at>
- */
+#ifndef FFMPEG_FAANIDCT_H
+#define FFMPEG_FAANIDCT_H
 
-#ifndef FFMPEG_FAANDCT_H
-#define FFMPEG_FAANDCT_H
-
+#include <stdint.h>
 #include "dsputil.h"
 
-#define FAAN_POSTSCALE
+void ff_faanidct(DCTELEM block[64]);
+void ff_faanidct_add(uint8_t *dest, int line_size, DCTELEM block[64]);
+void ff_faanidct_put(uint8_t *dest, int line_size, DCTELEM block[64]);
 
-void ff_faandct(DCTELEM * data);
-void ff_faandct248(DCTELEM * data);
-
-#endif /* FFMPEG_FAANDCT_H */
+#endif /* FFMPEG_FAANIDCT_H */
