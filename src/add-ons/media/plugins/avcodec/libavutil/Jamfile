@@ -4,6 +4,8 @@ SubDir HAIKU_TOP src add-ons media plugins avcodec libavutil ;
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
 
+SubDirHdrs [ FDirName $(SUBDIR) ../libavcodec ] ;
+
 SubDirCcFlags -fomit-frame-pointer -DPIC ;
 SubDirCcFlags -DHAVE_AV_CONFIG_H=1 ;
 
