@@ -1,0 +1,35 @@
+SubDir HAIKU_TOP src add-ons media plugins avcodec libavutil ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
+
+SubDirCcFlags -fomit-frame-pointer -DPIC ;
+SubDirCcFlags -DHAVE_AV_CONFIG_H=1 ;
+
+StaticLibrary libavutil.a :
+	adler32.c
+	aes.c
+	base64.c
+	crc.c
+	des.c
+	fifo.c
+	integer.c
+	intfloat_readwrite.c
+	lfg.c
+	lls.c
+	log.c
+	lzo.c
+	mathematics.c
+	md5.c
+	mem.c
+	pca.c
+	random.c
+	rational.c
+	rc4.c
+	sha1.c
+	softfloat.c
+	string.c
+	tree.c
+	utils.c
+;
