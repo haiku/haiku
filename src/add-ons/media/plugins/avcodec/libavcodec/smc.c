@@ -2,20 +2,21 @@
  * Quicktime Graphics (SMC) Video Decoder
  * Copyright (C) 2003 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
@@ -32,9 +33,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
-#include "dsputil.h"
 
 #define CPAIR 2
 #define CQUAD 4
@@ -45,10 +44,9 @@
 typedef struct SmcContext {
 
     AVCodecContext *avctx;
-    DSPContext dsp;
     AVFrame frame;
 
-    unsigned char *buf;
+    const unsigned char *buf;
     int size;
 
     /* SMC color tables */
@@ -58,11 +56,6 @@ typedef struct SmcContext {
 
 } SmcContext;
 
-#define BE_16(x)  ((((uint8_t*)(x))[0] << 8) | ((uint8_t*)(x))[1])
-#define BE_32(x)  ((((uint8_t*)(x))[0] << 24) | \
-                   (((uint8_t*)(x))[1] << 16) | \
-                   (((uint8_t*)(x))[2] << 8) | \
-                    ((uint8_t*)(x))[3])
 #define GET_BLOCK_COUNT() \
   (opcode & 0x10) ? (1 + s->buf[stream_ptr++]) : 1 + (opcode & 0x0F);
 
@@ -77,7 +70,7 @@ typedef struct SmcContext {
     total_blocks--; \
     if (total_blocks < 0) \
     { \
-        printf("warning: block counter just went negative (this should not happen)\n"); \
+        av_log(s->avctx, AV_LOG_INFO, "warning: block counter just went negative (this should not happen)\n"); \
         return; \
     } \
 }
@@ -123,27 +116,27 @@ static void smc_decode_stream(SmcContext *s)
         s->avctx->palctrl->palette_changed = 0;
     }
 
-    chunk_size = BE_32(&s->buf[stream_ptr]) & 0x00FFFFFF;
+    chunk_size = AV_RB32(&s->buf[stream_ptr]) & 0x00FFFFFF;
     stream_ptr += 4;
     if (chunk_size != s->size)
-        printf("warning: MOV chunk size != encoded chunk size (%d != %d); using MOV chunk size\n",
+        av_log(s->avctx, AV_LOG_INFO, "warning: MOV chunk size != encoded chunk size (%d != %d); using MOV chunk size\n",
             chunk_size, s->size);
 
     chunk_size = s->size;
-    total_blocks = (s->avctx->width * s->avctx->height) / (4 * 4);
+    total_blocks = ((s->avctx->width + 3) / 4) * ((s->avctx->height + 3) / 4);
 
     /* traverse through the blocks */
     while (total_blocks) {
         /* sanity checks */
         /* make sure stream ptr hasn't gone out of bounds */
         if (stream_ptr > chunk_size) {
-            printf("SMC decoder just went out of bounds (stream ptr = %d, chunk size = %d)\n",
+            av_log(s->avctx, AV_LOG_INFO, "SMC decoder just went out of bounds (stream ptr = %d, chunk size = %d)\n",
                 stream_ptr, chunk_size);
             return;
         }
         /* make sure the row pointer hasn't gone wild */
         if (row_ptr >= image_size) {
-            printf("SMC decoder just went out of bounds (row ptr = %d, height = %d)\n",
+            av_log(s->avctx, AV_LOG_INFO, "SMC decoder just went out of bounds (row ptr = %d, height = %d)\n",
                 row_ptr, image_size);
             return;
         }
@@ -166,14 +159,14 @@ static void smc_decode_stream(SmcContext *s)
 
             /* sanity check */
             if ((row_ptr == 0) && (pixel_ptr == 0)) {
-                printf("encountered repeat block opcode (%02X) but no blocks rendered yet\n",
+                av_log(s->avctx, AV_LOG_INFO, "encountered repeat block opcode (%02X) but no blocks rendered yet\n",
                     opcode & 0xF0);
                 break;
             }
 
             /* figure out where the previous block started */
             if (pixel_ptr == 0)
-                prev_block_ptr1 = 
+                prev_block_ptr1 =
                     (row_ptr - s->avctx->width * 4) + s->avctx->width - 4;
             else
                 prev_block_ptr1 = row_ptr + pixel_ptr - 4;
@@ -200,14 +193,14 @@ static void smc_decode_stream(SmcContext *s)
 
             /* sanity check */
             if ((row_ptr == 0) && (pixel_ptr < 2 * 4)) {
-                printf("encountered repeat block opcode (%02X) but not enough blocks rendered yet\n",
+                av_log(s->avctx, AV_LOG_INFO, "encountered repeat block opcode (%02X) but not enough blocks rendered yet\n",
                     opcode & 0xF0);
                 break;
             }
 
             /* figure out where the previous 2 blocks started */
             if (pixel_ptr == 0)
-                prev_block_ptr1 = (row_ptr - s->avctx->width * 4) + 
+                prev_block_ptr1 = (row_ptr - s->avctx->width * 4) +
                     s->avctx->width - 4 * 2;
             else if (pixel_ptr == 4)
                 prev_block_ptr1 = (row_ptr - s->avctx->width * 4) + row_inc;
@@ -281,7 +274,7 @@ static void smc_decode_stream(SmcContext *s)
                 color_table_index = CPAIR * s->buf[stream_ptr++];
 
             while (n_blocks--) {
-                color_flags = BE_16(&s->buf[stream_ptr]);
+                color_flags = AV_RB16(&s->buf[stream_ptr]);
                 stream_ptr += 2;
                 flag_mask = 0x8000;
                 block_ptr = row_ptr + pixel_ptr;
@@ -324,14 +317,14 @@ static void smc_decode_stream(SmcContext *s)
                 color_table_index = CQUAD * s->buf[stream_ptr++];
 
             while (n_blocks--) {
-                color_flags = BE_32(&s->buf[stream_ptr]);
+                color_flags = AV_RB32(&s->buf[stream_ptr]);
                 stream_ptr += 4;
                 /* flag mask actually acts as a bit shift count here */
                 flag_mask = 30;
                 block_ptr = row_ptr + pixel_ptr;
                 for (pixel_y = 0; pixel_y < 4; pixel_y++) {
                     for (pixel_x = 0; pixel_x < 4; pixel_x++) {
-                        pixel = color_table_index + 
+                        pixel = color_table_index +
                             ((color_flags >> flag_mask) & 0x03);
                         flag_mask -= 2;
                         pixels[block_ptr++] = s->color_quads[pixel];
@@ -399,7 +392,7 @@ static void smc_decode_stream(SmcContext *s)
                         flag_mask = 21;
                     }
                     for (pixel_x = 0; pixel_x < 4; pixel_x++) {
-                        pixel = color_table_index + 
+                        pixel = color_table_index +
                             ((color_flags >> flag_mask) & 0x07);
                         flag_mask -= 3;
                         pixels[block_ptr++] = s->color_octets[pixel];
@@ -427,20 +420,18 @@ static void smc_decode_stream(SmcContext *s)
             break;
 
         case 0xF0:
-            printf("0xF0 opcode seen in SMC chunk (xine developers would like to know)\n");
+            av_log(s->avctx, AV_LOG_INFO, "0xF0 opcode seen in SMC chunk (contact the developers)\n");
             break;
         }
     }
 }
 
-static int smc_decode_init(AVCodecContext *avctx)
+static av_cold int smc_decode_init(AVCodecContext *avctx)
 {
-    SmcContext *s = (SmcContext *)avctx->priv_data;
+    SmcContext *s = avctx->priv_data;
 
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
-    avctx->has_b_frames = 0;
-    dsputil_init(&s->dsp, avctx);
 
     s->frame.data[0] = NULL;
 
@@ -449,22 +440,18 @@ static int smc_decode_init(AVCodecContext *avctx)
 
 static int smc_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
-                             uint8_t *buf, int buf_size)
+                             const uint8_t *buf, int buf_size)
 {
-    SmcContext *s = (SmcContext *)avctx->priv_data;
-
-    /* no supplementary picture */
-    if (buf_size == 0)
-        return 0;
+    SmcContext *s = avctx->priv_data;
 
     s->buf = buf;
     s->size = buf_size;
 
     s->frame.reference = 1;
-    s->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | 
+    s->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE |
                             FF_BUFFER_HINTS_REUSABLE | FF_BUFFER_HINTS_READABLE;
     if (avctx->reget_buffer(avctx, &s->frame)) {
-        printf ("reget_buffer() failed\n");
+        av_log(s->avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
         return -1;
     }
 
@@ -477,9 +464,9 @@ static int smc_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int smc_decode_end(AVCodecContext *avctx)
+static av_cold int smc_decode_end(AVCodecContext *avctx)
 {
-    SmcContext *s = (SmcContext *)avctx->priv_data;
+    SmcContext *s = avctx->priv_data;
 
     if (s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);
@@ -497,4 +484,5 @@ AVCodec smc_decoder = {
     smc_decode_end,
     smc_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("QuickTime Graphics (SMC)"),
 };

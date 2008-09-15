@@ -1,37 +1,37 @@
-#ifndef SVQ1_VLC_H
-#define SVQ1_VLC_H
+/*
+ * copyright (C) 2003 the ffmpeg project
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+#ifndef FFMPEG_SVQ1_VLC_H
+#define FFMPEG_SVQ1_VLC_H
+
+#include <stdint.h>
 
 /* values in this table range from 0..3; adjust retrieved value by +0 */
-static const uint8_t svq1_block_type_vlc[4][2] = {
+const uint8_t ff_svq1_block_type_vlc[4][2] = {
  /* { code, length } */
     { 0x1, 1 },  { 0x1, 2 },  { 0x1, 3 },  { 0x0, 3 }
-    
-};
 
-/* values in this table range from -32..32; adjust retrieved value by -32 */
-static const uint16_t svq1_motion_component_vlc[65][2] = {
- /* { code, length } */
-    { 0x5, 13 },  { 0x7, 13 },  { 0x5, 12 },  { 0x7, 12 },
-    { 0x9, 12 },  { 0xB, 12 },  { 0xD, 12 },  { 0xF, 12 },
-    { 0x9, 11 },  { 0xB, 11 },  { 0xD, 11 },  { 0xF, 11 },
-    { 0x11, 11 },  { 0x13, 11 },  { 0x15, 11 },  { 0x17, 11 },
-    { 0x19, 11 },  { 0x1B, 11 },  { 0x1D, 11 },  { 0x1F, 11 },
-    { 0x21, 11 },  { 0x23, 11 },  { 0x13, 10 },  { 0x15, 10 },
-    { 0x17, 10 },  { 0x7, 8 },  { 0x9, 8 },  { 0xB, 8 },
-    { 0x7, 7 },  { 0x3, 5 },  { 0x3, 4 },  { 0x3, 3 },
-    { 0x1, 1 },  { 0x2, 3 },  { 0x2, 4 },  { 0x2, 5 },
-    { 0x6, 7 },  { 0xA, 8 },  { 0x8, 8 },  { 0x6, 8 },
-    { 0x16, 10 },  { 0x14, 10 },  { 0x12, 10 },  { 0x22, 11 },
-    { 0x20, 11 },  { 0x1E, 11 },  { 0x1C, 11 },  { 0x1A, 11 },
-    { 0x18, 11 },  { 0x16, 11 },  { 0x14, 11 },  { 0x12, 11 },
-    { 0x10, 11 },  { 0xE, 11 },  { 0xC, 11 },  { 0xA, 11 },
-    { 0x8, 11 },  { 0xE, 12 },  { 0xC, 12 },  { 0xA, 12 },
-    { 0x8, 12 },  { 0x6, 12 },  { 0x4, 12 },  { 0x6, 13 },
-    { 0x4, 13 }  
 };
 
 /* values in this table range from -1..6; adjust retrieved value by -1 */
-static const uint8_t svq1_intra_multistage_vlc[6][8][2] = {
+const uint8_t ff_svq1_intra_multistage_vlc[6][8][2] = {
  /* { code, length } */
 {
     { 0x1, 5 },  { 0x1, 1 },  { 0x3, 3 },  { 0x2, 3 },
@@ -55,7 +55,7 @@ static const uint8_t svq1_intra_multistage_vlc[6][8][2] = {
 };
 
 /* values in this table range from -1..6; adjust retrieved value by -1 */
-static const uint8_t svq1_inter_multistage_vlc[6][8][2] = {
+const uint8_t ff_svq1_inter_multistage_vlc[6][8][2] = {
  /* { code, length } */
 {
     { 0x3, 2 },  { 0x5, 3 },  { 0x4, 3 },  { 0x3, 3 },
@@ -79,7 +79,7 @@ static const uint8_t svq1_inter_multistage_vlc[6][8][2] = {
 };
 
 /* values in this table range from 0..255; adjust retrieved value by +0 */
-static const uint16_t svq1_intra_mean_vlc[256][2] = {
+const uint16_t ff_svq1_intra_mean_vlc[256][2] = {
  /* { code, length } */
     { 0x37, 6 },  { 0x56, 7 },  { 0x1, 17 },  { 0x1, 20 },
     { 0x2, 20 },  { 0x3, 20 },  { 0x0, 20 },  { 0x4, 20 },
@@ -148,7 +148,7 @@ static const uint16_t svq1_intra_mean_vlc[256][2] = {
 };
 
 /* values in this table range from -256..255; adjust retrieved value by -256 */
-static const uint16_t svq1_inter_mean_vlc[512][2] = {
+const uint16_t ff_svq1_inter_mean_vlc[512][2] = {
  /* { code, length } */
     { 0x5A, 22 },  { 0xD4, 22 },  { 0xD5, 22 },  { 0xD6, 22 },
     { 0xD7, 22 },  { 0xD8, 22 },  { 0xD9, 22 },  { 0xDA, 22 },
@@ -280,4 +280,4 @@ static const uint16_t svq1_inter_mean_vlc[512][2] = {
     { 0x3, 22 },  { 0x2, 22 },  { 0x1, 22 },  { 0x0, 22 }
 };
 
-#endif
+#endif /* FFMPEG_SVQ1_VLC_H */
