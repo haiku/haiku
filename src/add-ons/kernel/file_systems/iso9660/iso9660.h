@@ -22,7 +22,7 @@
 // Size of primary volume descriptor for ISO9660
 #define ISO_PVD_SIZE 882
 
-// ISO structure has both msb and lsb first data. These let you do a 
+// ISO structure has both msb and lsb first data. These let you do a
 // compile-time switch for different platforms.
 
 enum {
@@ -62,34 +62,24 @@ typedef struct ISORecDate {
 	int8	offsetGMT;
 } ISORecDate;
 
-/* This next section is data structure to hold the data found in the rock ridge extensions. */
-typedef struct RRAttr {
+// This next section is data structure to hold the data found in the
+// rock ridge extensions.
+struct rock_ridge_attributes {
 	char*			slName;
 	struct stat		stat[2];
 	uint8			nmVer;
 	uint8			pxVer;
 	uint8			slVer;
-} RRAttr;
+};
 
-/* For each item on the disk (directory, file, etc), your filesystem should allocate a vnode struct and 
-	pass it back to the kernel when fs_read_vnode is called. This struct is then passed back in to 
-	your file system by functions that reference an item on the disk. You'll need to be able to
-	create a vnode from a vnode id, either by hashing the id number or encoding the information needed
-	to create the vnode in the vnode id itself. Vnode ids are assigned by your file system when the
-	filesystem walk function is called. For this driver, the block number is encoded in the upper bits
-	of the vnode id, and the offset within the block in the lower, allowing me to just read the info
-	to fill in the vnode struct from the disk. When the kernel is done with a vnode, it will call 
-	fs_write_vnode (somewhat of a misnomer) where you should deallocate the struct.
-*/
-
-typedef struct vnode {
+struct iso9660_inode {
 	/* Most drivers will probably want the first things defined here. */
-	ino_t		id; 
+	ino_t		id;
 	ino_t	 	parID;		// parent vnode ID.
 	void		*cache;		// for file cache
-	
+
 	// End of members other drivers will definitely want.
-	
+
 	/* The rest of this struct is very ISO-specific. You should replace the rest of this
 		definition with the stuff your file system needs.
 	*/
@@ -97,7 +87,7 @@ typedef struct vnode {
 	uint32		startLBN[2];			// Logical block # of start of file/directory data
 	uint32		dataLen[2];				// Length of file section in bytes
 	ISORecDate	recordDate;				// Date file was recorded.
-	
+
 										// BIT MEANING
 										// --- -----------------------------
 	uint8		flags;					// 0 - is hidden
@@ -109,25 +99,25 @@ typedef struct vnode {
 										// 5 - Reserved
 										// 6 - Reserved
 										// 7 - File has more that one directory record
-									
+
 	uint8		fileUnitSize;			// Interleave only
 	uint8		interleaveGapSize;		// Interleave only
 	uint32		volSeqNum;				// Volume sequence number of volume
-	uint8		fileIDLen;				// Length of volume "ID" (name)
-	char*		fileIDString;			// Volume "ID" (name)
+	char*		name;
+	uint32		name_length;
 
 	// The rest is Rock Ridge extensions. I suggest www.leo.org for spec info.
-	RRAttr		attr;
-} vnode;
+	rock_ridge_attributes attr;
+};
 
-// These go with the flags member of the nspace struct.
+// These go with the flags member of the iso9660_volume struct.
 enum {
-	ISO_ISHIDDEN = 0,
+	ISO_ISHIDDEN	= 0,
 	ISO_ISDIR		= 2,
-	ISO_ISASSOCFILE = 4,
-	ISO_EXTATTR = 8,
-	ISO_EXTPERM = 16,
-	ISO_MOREDIRS = 128
+	ISO_ISASSOCFILE	= 4,
+	ISO_EXTATTR		= 8,
+	ISO_EXTPERM		= 16,
+	ISO_MOREDIRS	= 128
 };
 
 
@@ -137,7 +127,7 @@ enum {
 /* Structure used for directory "cookie". When you are asked
  	to open a directory, you are asked to create a cookie for it
  	and pass it back. The cookie should contain the information you
- 	need to determine where you are at in reading the directory 
+ 	need to determine where you are at in reading the directory
  	entries, incremented every time readdir is called, until finally
  	the end is reached, when readdir returns NULL. */
 typedef struct dircookie {
@@ -147,8 +137,8 @@ typedef struct dircookie {
 	off_t totalSize;		// Size of directory file
 	off_t id;
 } dircookie;
- 
-/* You may also need to define a cookie for files, which again is 
+
+/* You may also need to define a cookie for files, which again is
 	allocated every time a file is opened and freed when the free
 	cookie function is called. For ISO, we didn't need one.
 */
@@ -158,12 +148,8 @@ typedef struct attrfilemap {
 	off_t offset;
 } attrfilemap;
 
-/* This is the global volume nspace struct. When mount is called , this struct should
-	be allocated. It is passed back into the functions so that you can get at any
-	global information you need. You'll need to change this struct to suit your purposes.
-*/
-
-typedef struct nspace {
+// This is the global volume iso9660_volume struct.
+struct iso9660_volume {
 	// Start of members other drivers will definitely want.
 	fs_volume		*volume;			// volume passed fo fs_mount
 	dev_t			id;
@@ -171,10 +157,10 @@ typedef struct nspace {
 	int				fdOfSession;	// File descriptor of the (mounted) session
 	//unsigned int 	blockSize;  	// usually need this, but it's part of ISO
 	void                            *fBlockCache;
-		
+
 	char			devicePath[127];
 	//off_t			numBlocks;		// May need this, but it's part of ISO
-	
+
 	// End of members other drivers will definitely want.
 
 	// attribute extensions
@@ -204,7 +190,7 @@ typedef struct nspace {
 	uint16			optLPathTblLoc[2];	// Loc (Logical block #) of optional Type L path tbl		byte145-148
 	uint16			mPathTblLoc[2];		// Loc (Logical block #) of "Type M" path table		byte149-152
 	uint16			optMPathTblLoc[2];		// Loc (Logical block #) of optional Type M path tbl	byte153-156
-	vnode			rootDirRec;			// Directory record for root directory					byte157-190
+	iso9660_inode			rootDirRec;			// Directory record for root directory					byte157-190
 	char			volSetIDString[29];	// Name of multi-volume set where vol is member		byte191-318
 	char			pubIDString[129];	// Name of publisher									byte319-446
 	char			dataPreparer[129];	// Name of data preparer								byte447-574
@@ -217,23 +203,17 @@ typedef struct nspace {
 	ISOVolDate		modDate;			// Modification date
 	ISOVolDate		expireDate;			// Data expiration date
 	ISOVolDate		effectiveDate;		// Data effective data
-	
+
 	uint8			fileStructVers;		// File structure version								byte882
-} nspace;
+};
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-int ISOMount(const char *path, const int flags, nspace** newVolume,
+status_t ISOMount(const char *path, uint32 flags, iso9660_volume** _newVolume,
 	bool allowJoliet);
-int	ISOReadDirEnt(nspace* ns, dircookie* cookie, struct dirent* buffer,
-	size_t bufferSize);
-int	InitNode(vnode* rec, char* buf, int* bytesRead, uint8 jolietLevel);
-int	ConvertRecDate(ISORecDate* inDate, time_t* outDate);
-
-#ifdef __cplusplus
-}
-#endif 
+status_t ISOReadDirEnt(iso9660_volume* ns, dircookie* cookie,
+	struct dirent* buffer, size_t bufferSize);
+status_t InitNode(iso9660_inode* rec, char* buf, size_t* bytesRead,
+	uint8 jolietLevel);
+status_t ConvertRecDate(ISORecDate* inDate, time_t* outDate);
 
 #endif	/* ISO_9660_H */

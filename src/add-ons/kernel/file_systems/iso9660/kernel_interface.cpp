@@ -104,7 +104,7 @@ fs_mount(fs_volume *_volume, const char *device, uint32 flags,
 	const char *args, ino_t *_rootID)
 {
 	bool allowJoliet = true;
-	nspace *volume;
+	iso9660_volume *volume;
 
 	// Check for a 'nojoliet' parm
 	// all we check for is the existance of 'nojoliet' in the parms.
@@ -152,7 +152,7 @@ static status_t
 fs_unmount(fs_volume *_vol)
 {
 	status_t result = B_NO_ERROR;
-	nspace *ns = (nspace *)_vol->private_volume;
+	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
 
 	TRACE(("fs_unmount - ENTER\n"));
 
@@ -173,7 +173,7 @@ fs_unmount(fs_volume *_vol)
 static status_t
 fs_read_fs_stat(fs_volume *_vol, struct fs_info *fss)
 {
-	nspace *ns = (nspace *)_vol->private_volume;
+	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
 	int i;
 
 	fss->flags = B_FS_IS_PERSISTENT | B_FS_IS_READONLY;
@@ -203,9 +203,9 @@ fs_read_fs_stat(fs_volume *_vol, struct fs_info *fss)
 static status_t
 fs_get_vnode_name(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t bufferSize)
 {
-	vnode *node = (vnode*)_node->private_node;
+	iso9660_inode *node = (iso9660_inode*)_node->private_node;
 
-	strlcpy(buffer, node->fileIDString, bufferSize);
+	strlcpy(buffer, node->name, bufferSize);
 	return B_OK;
 }
 
@@ -213,11 +213,11 @@ fs_get_vnode_name(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t bufferS
 static status_t
 fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 {
-	nspace *ns = (nspace *)_vol->private_volume;
-	vnode *baseNode = (vnode*)_base->private_node;
-	vnode *newNode = NULL;
+	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
+	iso9660_inode *baseNode = (iso9660_inode*)_base->private_node;
+	iso9660_inode *newNode = NULL;
 
-	TRACE(("fs_walk - looking for %s in dir file of length %d\n", file,
+	TRACE(("fs_walk - looking for %s in dir file of length %ld\n", file,
 		baseNode->dataLen[FS_DATA_FORMAT]));
 
 	if (strcmp(file, ".") == 0)  {
@@ -235,28 +235,24 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 	// look up file in the directory
 	uint32 dataLength = baseNode->dataLen[FS_DATA_FORMAT];
 	status_t result = ENOENT;
-	uint32 totalRead = 0;
+	size_t totalRead = 0;
 	off_t block = baseNode->startLBN[FS_DATA_FORMAT];
 	bool done = false;
 
 	while (totalRead < dataLength && !done) {
 		off_t cachedBlock = block;
-		char *blockData = (char *)block_cache_get_etc(ns->fBlockCache, block, 0,
-			ns->logicalBlkSize[FS_DATA_FORMAT]);
+		char* blockData = (char*)block_cache_get(ns->fBlockCache, block);
 		if (blockData != NULL) {
-			int bytesRead = 0;
+			size_t bytesRead = 0;
 			off_t blockBytesRead = 0;
-			vnode node;
+			iso9660_inode node;
 			int initResult;
 
-			TRACE(("fs_walk - read buffer from disk at LBN %Ld into buffer 0x%x.\n",
-				block, blockData));
+			TRACE(("fs_walk - read buffer from disk at LBN %Ld into buffer "
+				"%p.\n", block, blockData));
 
 			// Move to the next 2-block set if necessary
 			// Don't go over end of buffer, if dir record sits on boundary.
-
-			node.fileIDString = NULL;
-			node.attr.slName = NULL;
 
 			while (blockBytesRead < 2 * ns->logicalBlkSize[FS_DATA_FORMAT]
 				&& totalRead + blockBytesRead < dataLength
@@ -264,10 +260,12 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 				&& !done) {
 				initResult = InitNode(&node, blockData, &bytesRead,
 					ns->joliet_level);
-				TRACE(("fs_walk - InitNode returned %s, filename %s, %d bytes read\n", strerror(initResult), node.fileIDString, bytesRead));
+				TRACE(("fs_walk - InitNode returned %s, filename %s, %lu bytes "
+					"read\n", strerror(initResult), node.name,
+					bytesRead));
 
 				if (initResult == B_OK) {
-					if (!strcmp(node.fileIDString, file)) {
+					if (!strcmp(node.name, file)) {
 						TRACE(("fs_walk - success, found vnode at block %Ld, pos %Ld\n", block, blockBytesRead));
 						*_vnodeID = (block << 30)
 							+ (blockBytesRead & 0xffffffff);
@@ -280,10 +278,8 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 							done = true;
 						}
 					} else {
-						free(node.fileIDString);
-						node.fileIDString = NULL;
+						free(node.name);
 						free(node.attr.slName);
-						node.attr.slName = NULL;
 					}
 				} else {
 					result = initResult;
@@ -293,13 +289,15 @@ fs_walk(fs_volume *_vol, fs_vnode *_base, const char *file, ino_t *_vnodeID)
 				blockData += bytesRead;
 				blockBytesRead += bytesRead;
 
-				TRACE(("fs_walk - Adding %d bytes to blockBytes read (total %Ld/%Ld).\n",
-					bytesRead, blockBytesRead, baseNode->dataLen[FS_DATA_FORMAT]));
+				TRACE(("fs_walk - Adding %lu bytes to blockBytes read (total "
+					"%Ld/%lu).\n", bytesRead, blockBytesRead,
+					baseNode->dataLen[FS_DATA_FORMAT]));
 			}
 			totalRead += ns->logicalBlkSize[FS_DATA_FORMAT];
 			block++;
 
-			TRACE(("fs_walk - moving to next block %Ld, total read %Ld\n", block, totalRead));
+			TRACE(("fs_walk - moving to next block %Ld, total read %lu\n",
+				block, totalRead));
 			block_cache_put(ns->fBlockCache, cachedBlock);
 
 		} else
@@ -316,16 +314,16 @@ static status_t
 fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 	int *_type, uint32 *_flags, bool reenter)
 {
-	nspace *ns = (nspace*)_vol->private_volume;
+	iso9660_volume *ns = (iso9660_volume*)_vol->private_volume;
 
-	vnode *newNode = (vnode*)calloc(sizeof(vnode), 1);
+	iso9660_inode *newNode = (iso9660_inode*)calloc(sizeof(iso9660_inode), 1);
 	if (newNode == NULL)
 		return B_NO_MEMORY;
 
 	uint32 pos = vnodeID & 0x3fffffff;
 	uint32 block = vnodeID >> 30;
 
-	TRACE(("fs_read_vnode - block = %ld, pos = %ld, raw = %Lu node 0x%x\n",
+	TRACE(("fs_read_vnode - block = %ld, pos = %ld, raw = %Lu node %p\n",
 		block, pos, vnodeID, newNode));
 
 	if (pos > ns->logicalBlkSize[FS_DATA_FORMAT]) {
@@ -333,8 +331,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 		return B_BAD_VALUE;
 	}
 
-	char *data = (char *)block_cache_get_etc(ns->fBlockCache,
-		block, 0, ns->logicalBlkSize[FS_DATA_FORMAT]);
+	char *data = (char *)block_cache_get(ns->fBlockCache, block);
 	if (data == NULL) {
 		free(newNode);
 		return B_IO_ERROR;
@@ -364,31 +361,24 @@ fs_read_vnode(fs_volume *_vol, ino_t vnodeID, fs_vnode *_node,
 
 
 static status_t
-fs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
+fs_release_vnode(fs_volume* /*_volume*/, fs_vnode* _node, bool /*reenter*/)
 {
-	status_t result = B_NO_ERROR;
-	vnode *node = (vnode*)_node->private_node;
+	iso9660_inode* node = (iso9660_inode*)_node->private_node;
 
-	(void)_vol;
-	(void)reenter;
+	TRACE(("fs_release_vnode - ENTER (%p)\n", node));
 
-	TRACE(("fs_release_vnode - ENTER (0x%x)\n", node));
+	if (node->id != ISO_ROOTNODE_ID) {
+		free(node->name);
+		free(node->attr.slName);
 
-	if (node != NULL) {
-		if (node->id != ISO_ROOTNODE_ID) {
-			if (node->fileIDString != NULL)
-				free (node->fileIDString);
-			if (node->attr.slName != NULL)
-				free (node->attr.slName);
-			if (node->cache != NULL)
-				file_cache_delete(node->cache);
+		if (node->cache != NULL)
+			file_cache_delete(node->cache);
 
-			free(node);
-		}
+		free(node);
 	}
 
 	TRACE(("fs_release_vnode - EXIT\n"));
-	return result;
+	return B_OK;
 }
 
 
@@ -396,8 +386,8 @@ static status_t
 fs_read_pages(fs_volume *_vol, fs_vnode *_node, void * _cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *_numBytes)
 {
-	nspace *ns = (nspace *)_vol->private_volume;
-	vnode *node = (vnode *)_node->private_node;
+	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
+	iso9660_inode *node = (iso9660_inode *)_node->private_node;
 
 	uint32 fileSize = node->dataLen[FS_DATA_FORMAT];
 	size_t bytesLeft = *_numBytes;
@@ -426,8 +416,8 @@ fs_read_pages(fs_volume *_vol, fs_vnode *_node, void * _cookie, off_t pos,
 static status_t
 fs_read_stat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 {
-	nspace *ns = (nspace*)_vol->private_volume;
-	vnode *node = (vnode*)_node->private_node;
+	iso9660_volume *ns = (iso9660_volume*)_vol->private_volume;
+	iso9660_inode *node = (iso9660_inode*)_node->private_node;
 	status_t result = B_NO_ERROR;
 	time_t time;
 
@@ -474,7 +464,7 @@ static status_t
 fs_read(fs_volume *_vol, fs_vnode *_node, void *cookie, off_t pos, void *buffer,
 	size_t *_length)
 {
-	vnode *node = (vnode *)_node->private_node;
+	iso9660_inode *node = (iso9660_inode *)_node->private_node;
 
 	if (node->flags & ISO_ISDIR)
 		return EISDIR;
@@ -529,7 +519,7 @@ fs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 static status_t
 fs_read_link(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t *_bufferSize)
 {
-	vnode *node = (vnode *)_node->private_node;
+	iso9660_inode *node = (iso9660_inode *)_node->private_node;
 
 	if (!S_ISLNK(node->attr.stat[FS_DATA_FORMAT].st_mode))
 		return B_BAD_VALUE;
@@ -547,16 +537,16 @@ fs_read_link(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t *_bufferSize
 
 
 static status_t
-fs_open_dir(fs_volume *_vol, fs_vnode *_node, void **cookie)
+fs_open_dir(fs_volume* /*_volume*/, fs_vnode* _node, void** _cookie)
 {
-	vnode *node = (vnode *)_node->private_node;
+	iso9660_inode *node = (iso9660_inode *)_node->private_node;
 
-	TRACE(("fs_open_dir - node is 0x%x\n", _node));
+	TRACE(("fs_open_dir - node is %p\n", node));
 
 	if (!(node->flags & ISO_ISDIR))
 		return B_NOT_A_DIRECTORY;
 
-	dircookie *dirCookie = (dircookie *)malloc(sizeof(dircookie));
+	dircookie* dirCookie = (dircookie*)malloc(sizeof(dircookie));
 	if (dirCookie == NULL)
 		return B_NO_MEMORY;
 
@@ -565,7 +555,7 @@ fs_open_dir(fs_volume *_vol, fs_vnode *_node, void **cookie)
 	dirCookie->totalSize = node->dataLen[FS_DATA_FORMAT];
 	dirCookie->pos = 0;
 	dirCookie->id = node->id;
-	*cookie = (void *)dirCookie;
+	*_cookie = (void*)dirCookie;
 
 	return B_OK;
 }
@@ -575,7 +565,7 @@ static status_t
 fs_read_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	struct dirent *buffer, size_t bufferSize, uint32 *num)
 {
-	nspace *ns = (nspace *)_vol->private_volume;
+	iso9660_volume *ns = (iso9660_volume *)_vol->private_volume;
 	dircookie *dirCookie = (dircookie *)_cookie;
 
 	TRACE(("fs_read_dir - ENTER\n"));
@@ -591,7 +581,7 @@ fs_read_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	// When you get to the end, don't return an error, just return
 	// a zero in *num.
 
-	if (result == ENOENT)
+	if (result == B_ENTRY_NOT_FOUND)
 		result = B_OK;
 
 	TRACE(("fs_read_dir - EXIT, result is %s\n", strerror(result)));
