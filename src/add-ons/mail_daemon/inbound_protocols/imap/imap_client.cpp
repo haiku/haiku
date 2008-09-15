@@ -290,6 +290,9 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 }
 
 IMAP4Client::~IMAP4Client() {
+
+	delete nooprunner;	
+	
 	if (net > 0) {
 		if (selected_mb != "")
 			SendCommand("CLOSE");
