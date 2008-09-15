@@ -301,6 +301,11 @@ thread_kthread_entry(void)
 {
 	struct thread *thread = thread_get_current_thread();
 
+	// The thread is new and has been scheduled the first time. Notify the user
+	// debugger code.
+	if ((thread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
+		user_debug_thread_scheduled(thread);
+
 	// simulates the thread spinlock release that would occur if the thread had been
 	// rescheded from. The resched didn't happen because the thread is new.
 	RELEASE_THREAD_LOCK();
@@ -386,7 +391,7 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 	thread->next_state = B_THREAD_SUSPENDED;
 
 	// init debug structure
-	clear_thread_debug_info(&thread->debug_info, false);
+	init_thread_debug_info(&thread->debug_info);
 
 	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_kstack", attributes.name,
 		thread->id);
@@ -577,12 +582,6 @@ undertaker(void* /*args*/)
 
 		if (entry.deathSem >= 0)
 			release_sem_etc(entry.deathSem, 1, B_DO_NOT_RESCHEDULE);
-
-		// notify the debugger
-		if (entry.teamID >= 0
-			&& entry.teamID != team_get_kernel_team_id()) {
-			user_debug_thread_deleted(entry.teamID, thread->id);
-		}
 
 		// free the thread structure
 		thread_enqueue(thread, &dead_q);
@@ -1353,6 +1352,8 @@ thread_exit(void)
 	struct death_entry* threadDeathEntry = NULL;
 
 	if (team != team_get_kernel_team()) {
+		user_debug_thread_exiting(thread);
+
 		if (team->main_thread == thread) {
 			// this was the main thread in this team, so we will delete that as well
 			deleteTeam = true;
@@ -1530,6 +1531,10 @@ thread_exit(void)
 
 		delete_sem(cachedExitSem);
 	}
+
+	// notify the debugger
+	if (teamID != team_get_kernel_team_id())
+		user_debug_thread_deleted(teamID, thread->id);
 
 	// enqueue in the undertaker list and reschedule for the last time
 	UndertakerEntry undertakerEntry(thread, teamID, cachedDeathSem);

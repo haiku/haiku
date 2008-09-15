@@ -146,6 +146,9 @@ typedef enum {
 										// handed over to another debugger;
 										// the new debugger can just invoke
 										// install_team_debugger()
+
+	B_DEBUG_START_PROFILER,				// start/stop sampling
+	B_DEBUG_STOP_PROFILER				//
 } debug_nub_message;
 
 // messages sent to the debugger
@@ -167,6 +170,9 @@ typedef enum {
 	B_DEBUGGER_MESSAGE_THREAD_DELETED,		// a thread has been deleted
 	B_DEBUGGER_MESSAGE_IMAGE_CREATED,		// an image has been created
 	B_DEBUGGER_MESSAGE_IMAGE_DELETED,		// an image has been deleted
+
+	B_DEBUGGER_MESSAGE_PROFILER_STOPPED,	// a profiled thread is going to
+											// exit
 
 	B_DEBUGGER_MESSAGE_HANDED_OVER,			// the debugged team has been
 											// handed over to another debugger
@@ -346,6 +352,35 @@ typedef struct {
 
 // no parameters, no reply
 
+// B_DEBUG_START_PROFILER
+
+struct debug_profile_function {
+	addr_t			base;	// function base address
+	size_t			size;	// function size
+};
+
+typedef struct {
+	port_id				reply_port;		// port to send the reply to
+	thread_id			thread;			// thread to profile
+	bigtime_t			interval;		// sample interval
+	int32				function_count;	// number of functions we count hits for
+	struct debug_profile_function functions[1];
+		// functions that shall be tracked
+} debug_nub_start_profiler;
+
+typedef struct {
+	status_t			error;
+} debug_nub_start_profiler_reply;
+
+// B_DEBUG_STOP_PROFILER
+
+typedef struct {
+	port_id				reply_port;		// port to send the reply to
+	thread_id			thread;			// thread to profile
+} debug_nub_stop_profiler;
+
+// reply is debug_profiler_stopped
+
 // union of all messages structures sent to the debug nub thread
 typedef union {
 	debug_nub_read_memory			read_memory;
@@ -363,6 +398,8 @@ typedef union {
 	debug_nub_get_signal_masks		get_signal_masks;
 	debug_nub_set_signal_handler	set_signal_handler;
 	debug_nub_get_signal_handler	get_signal_handler;
+	debug_nub_start_profiler		start_profiler;
+	debug_nub_stop_profiler			stop_profiler;
 } debug_nub_message_data;
 
 
@@ -495,6 +532,18 @@ typedef struct {
 	image_info		info;			// info for the image
 } debug_image_deleted;
 
+// B_DEBUGGER_MESSAGE_PROFILER_STOPPED
+
+typedef struct {
+	debug_origin		origin;
+	int32				function_count;
+	bigtime_t			interval;			// actual sample interval (might
+											// differ from the requested one)
+	int64				total_ticks;		// total number of sample ticks
+	int64				missed_ticks;		// ticks that didn't hit a function
+	int64				function_ticks[1];	// number of hits for each function
+} debug_profiler_stopped;
+
 // B_DEBUGGER_MESSAGE_HANDED_OVER
 
 typedef struct {
@@ -521,6 +570,7 @@ typedef union {
 	debug_thread_deleted			thread_deleted;
 	debug_image_created				image_created;
 	debug_image_deleted				image_deleted;
+	debug_profiler_stopped			profiler_stopped;	// dynamic size!
 	debug_handed_over				handed_over;
 
 	debug_origin					origin;	// for convenience (no real message)

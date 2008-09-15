@@ -26,6 +26,7 @@
 #include <thread.h>
 #include <timer.h>
 #include <tracing.h>
+#include <user_debugger.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
 
@@ -539,11 +540,20 @@ scheduler_remove_from_run_queue(struct thread *thread)
 static void
 context_switch(struct thread *fromThread, struct thread *toThread)
 {
+	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
+		user_debug_thread_unscheduled(fromThread);
+
 	toThread->cpu = fromThread->cpu;
 	fromThread->cpu = NULL;
 
 	arch_thread_set_current_thread(toThread);
 	arch_thread_context_switch(fromThread, toThread);
+
+	// Looks weird, but is correct. fromThread had been unscheduled earlier,
+	// but is back now. The notification for a thread scheduled the first time
+	// happens in thread.cpp:thread_kthread_entry().
+	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
+		user_debug_thread_scheduled(fromThread);
 }
 
 

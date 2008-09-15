@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,12 +8,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <algorithm>
+
+#include <arch/debug.h>
+#include <arch/user_debugger.h>
+#include <cpu.h>
 #include <debugger.h>
 #include <kernel.h>
 #include <KernelExport.h>
 #include <kscheduler.h>
 #include <ksignal.h>
 #include <ksyscalls.h>
+#include <port.h>
 #include <sem.h>
 #include <team.h>
 #include <thread.h>
@@ -21,8 +27,8 @@
 #include <user_debugger.h>
 #include <vm.h>
 #include <vm_types.h>
-#include <arch/user_debugger.h>
 
+#include <AutoDeleter.h>
 #include <util/AutoLock.h>
 
 //#define TRACE_USER_DEBUGGER
@@ -33,21 +39,31 @@
 #endif
 
 
+struct function_profile_info : debug_profile_function {
+	int32	index;
+};
+
+
 static port_id sDefaultDebuggerPort = -1;
 	// accessed atomically
 
+static timer sProfilingTimers[B_MAX_CPU_COUNT];
+	// a profiling timer for each CPU -- used when a profiled thread is running
+	// on that CPU
 
+
+static int32 profiling_event(timer* unused);
 static status_t ensure_debugger_installed(team_id teamID, port_id *port = NULL);
 static void get_team_debug_info(team_debug_info &teamDebugInfo);
 
 
-static ssize_t
-kill_interruptable_read_port(port_id port, int32 *code, void *buffer,
-	size_t bufferSize)
-{
-	return read_port_etc(port, code, buffer, bufferSize,
-		B_KILL_CAN_INTERRUPT, 0);
-}
+struct ProfileFunctionComparator {
+	inline bool operator()(const function_profile_info& a,
+		const function_profile_info& b) const
+	{
+		return a.base < b.base;
+	}
+};
 
 
 static status_t
@@ -272,15 +288,41 @@ destroy_team_debug_info(struct team_debug_info *info)
 
 
 void
+init_thread_debug_info(struct thread_debug_info *info)
+{
+	if (info) {
+		arch_clear_thread_debug_info(&info->arch_info);
+		info->flags = B_THREAD_DEBUG_DEFAULT_FLAGS;
+		info->debug_port = -1;
+		info->ignore_signals = 0;
+		info->ignore_signals_once = 0;
+		info->profile.functions = NULL;
+		info->profile.result = NULL;
+		info->profile.installed_timer = NULL;
+	}
+}
+
+
+/*!	Invoked with thread lock being held.
+*/
+void
 clear_thread_debug_info(struct thread_debug_info *info, bool dying)
 {
 	if (info) {
+		// cancel profiling timer
+		if (info->profile.installed_timer != NULL) {
+			cancel_timer(info->profile.installed_timer);
+			info->profile.installed_timer = NULL;
+		}
+
 		arch_clear_thread_debug_info(&info->arch_info);
 		atomic_set(&info->flags,
 			B_THREAD_DEBUG_DEFAULT_FLAGS | (dying ? B_THREAD_DEBUG_DYING : 0));
 		info->debug_port = -1;
 		info->ignore_signals = 0;
 		info->ignore_signals_once = 0;
+		info->profile.functions = NULL;
+		info->profile.result = NULL;
 	}
 }
 
@@ -289,6 +331,9 @@ void
 destroy_thread_debug_info(struct thread_debug_info *info)
 {
 	if (info) {
+		free(info->profile.functions);
+		free(info->profile.result);
+
 		arch_destroy_thread_debug_info(&info->arch_info);
 
 		if (info->debug_port >= 0) {
@@ -510,8 +555,10 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 			// read a command from the debug port
 			int32 command;
 			debugged_thread_message_data commandMessage;
-			ssize_t commandMessageSize = kill_interruptable_read_port(port,
-				&command, &commandMessage, sizeof(commandMessage));
+			ssize_t commandMessageSize = read_port_etc(port, &command,
+				&commandMessage, sizeof(commandMessage), B_KILL_CAN_INTERRUPT,
+				0);
+
 			if (commandMessageSize < 0) {
 				error = commandMessageSize;
 				TRACE(("thread_hit_debug_event(): thread: %ld, failed "
@@ -929,6 +976,58 @@ user_debug_thread_deleted(team_id teamID, thread_id threadID)
 
 
 void
+user_debug_thread_exiting(struct thread* thread)
+{
+	InterruptsLocker interruptsLocker;
+	SpinLocker teamLocker(gTeamSpinlock);
+
+	struct team* team = thread->team;
+
+	GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+	int32 teamDebugFlags = atomic_get(&team->debug_info.flags);
+	port_id debuggerPort = team->debug_info.debugger_port;
+
+	RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+	teamLocker.Unlock();
+
+	// check, if a debugger is installed
+	if ((teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) == 0
+		|| debuggerPort < 0) {
+		return;
+	}
+
+	// detach the profile info and mark the thread dying
+	SpinLocker threadLocker(gThreadSpinlock);
+
+	thread_debug_info& threadDebugInfo = thread->debug_info;
+	if (threadDebugInfo.profile.functions == NULL)
+		return;
+
+	int32 functionCount = threadDebugInfo.profile.function_count;
+	function_profile_info* profileFunctions = threadDebugInfo.profile.functions;
+	debug_profiler_stopped* profileResult = threadDebugInfo.profile.result;
+	threadDebugInfo.profile.functions = NULL;
+	threadDebugInfo.profile.result = NULL;
+
+	atomic_or(&threadDebugInfo.flags, B_THREAD_DEBUG_DYING);
+
+	threadLocker.Unlock();
+	interruptsLocker.Unlock();
+
+	// notify the debugger
+	size_t messageSize = sizeof(debug_profiler_stopped)
+		+ 8 * (functionCount - 1);
+	debugger_write(debuggerPort, B_DEBUGGER_MESSAGE_PROFILER_STOPPED,
+		profileResult, messageSize, false);
+
+	free(profileFunctions);
+	free(profileResult);
+}
+
+
+void
 user_debug_image_created(const image_info *imageInfo)
 {
 	// check, if a debugger is installed and is interested in image events
@@ -1032,6 +1131,105 @@ user_debug_single_stepped()
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_SINGLE_STEP, &message,
 		sizeof(message), true);
+}
+
+
+static void
+schedule_profiling_timer(struct thread* thread, bigtime_t interval)
+{
+	struct timer* timer = &sProfilingTimers[thread->cpu->cpu_num];
+	thread->debug_info.profile.installed_timer = timer;
+	thread->debug_info.profile.timer_end = system_time() + interval;
+	add_timer(timer, &profiling_event, interval,
+		B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_THREAD_LOCK);
+}
+
+
+static function_profile_info*
+find_profiled_function(const thread_debug_info& debugInfo, addr_t address)
+{
+	// binary search the function
+	function_profile_info* functions = debugInfo.profile.functions;
+	int32 lower = 0;
+	int32 upper = debugInfo.profile.function_count;
+
+	while (lower < upper) {
+		int32 mid = (lower + upper) / 2;
+		if (address >= functions[mid].base + functions[mid].size)
+			lower = mid + 1;
+		else
+			upper = mid;
+	}
+
+	if (lower == debugInfo.profile.function_count)
+		return NULL;
+
+	function_profile_info* function = &functions[lower];
+	if (address >= function->base && address < function->base + function->size)
+		return function;
+	return NULL;
+}
+
+
+static int32
+profiling_event(timer* /*unused*/)
+{
+	struct thread* thread = thread_get_current_thread();
+	thread_debug_info& debugInfo = thread->debug_info;
+
+	if (debugInfo.profile.functions != NULL) {
+		// Find the hit function and increment the tick counter. We
+		addr_t returnAddresses[B_DEBUG_STACK_TRACE_DEPTH];
+		int32 count = arch_debug_get_stack_trace(returnAddresses,
+			B_DEBUG_STACK_TRACE_DEPTH, 1, 0, false);
+
+		function_profile_info* function = NULL;
+		for (int32 i = 0; i < count; i++) {
+			function = find_profiled_function(debugInfo, returnAddresses[i]);
+			if (function != NULL)
+				break;
+		}
+
+		if (function != NULL)
+			debugInfo.profile.result->function_ticks[function->index]++;
+		else
+			debugInfo.profile.result->missed_ticks++;
+		debugInfo.profile.result->total_ticks++;
+
+		// reschedule timer
+		schedule_profiling_timer(thread, debugInfo.profile.interval);
+	} else
+		debugInfo.profile.installed_timer = NULL;
+
+	return B_HANDLED_INTERRUPT;
+}
+
+
+void
+user_debug_thread_unscheduled(struct thread* thread)
+{
+	// if running, cancel the profiling timer
+	struct timer* timer = thread->debug_info.profile.installed_timer;
+	if (timer != NULL) {
+		// track remaining time
+		bigtime_t left = thread->debug_info.profile.timer_end - system_time();
+		thread->debug_info.profile.interval_left = max_c(left, 0);
+		thread->debug_info.profile.installed_timer = NULL;
+
+		// cancel timer
+		cancel_timer(timer);
+	}
+}
+
+
+void
+user_debug_thread_scheduled(struct thread* thread)
+{
+	if (thread->debug_info.profile.functions != NULL) {
+		// install profiling timer
+		schedule_profiling_timer(thread,
+			thread->debug_info.profile.interval_left);
+	}
 }
 
 
@@ -1335,11 +1533,11 @@ debug_nub_thread(void *)
 	while (true) {
 		int32 command;
 		debug_nub_message_data message;
-		ssize_t messageSize = kill_interruptable_read_port(port, &command,
-			&message, sizeof(message));
+		ssize_t messageSize = read_port_etc(port, &command, &message,
+			sizeof(message), B_PEEK_PORT_MESSAGE | B_KILL_CAN_INTERRUPT, 0);
 
 		if (messageSize < 0) {
-			// The port is not longer valid or we were interrupted by a kill
+			// The port is no longer valid or we were interrupted by a kill
 			// signal: If we are still listed in the team's debug info as nub
 			// thread, we need to update that.
 			nub_thread_cleanup(nubThread);
@@ -1359,9 +1557,13 @@ debug_nub_thread(void *)
 			debug_nub_set_watchpoint_reply		set_watchpoint;
 			debug_nub_get_signal_masks_reply	get_signal_masks;
 			debug_nub_get_signal_handler_reply	get_signal_handler;
+			debug_nub_start_profiler_reply		start_profiler;
+			debug_profiler_stopped				stop_profiler;
 		} reply;
+		void* replyToSend = &reply;
 		int32 replySize = 0;
 		port_id replyPort = -1;
+		bool removeCommandMessage = true;
 
 		// process the command
 		switch (command) {
@@ -1901,12 +2103,209 @@ debug_nub_thread(void *)
 
 				break;
 			}
+
+			case B_DEBUG_START_PROFILER:
+			{
+				// get the parameters
+				thread_id threadID = message.start_profiler.thread;
+				replyPort = message.start_profiler.reply_port;
+				int32 functionCount = message.start_profiler.function_count;
+				status_t result = B_OK;
+
+				TRACE(("nub thread %ld: B_DEBUG_START_PROFILER: "
+					"thread: %ld, %ld functions\n", nubThread->id, threadID,
+					functionCount));
+
+				if (functionCount < 1
+					|| functionCount > B_DEBUG_MAX_PROFILE_FUNCTIONS) {
+					result = B_BAD_VALUE;
+				}
+
+				// allocate memory for the complete message
+				debug_nub_start_profiler* profileMessage = NULL;
+				size_t size = 0;
+				if (result == B_OK) {
+					size = (addr_t)&message.start_profiler.functions[
+							functionCount]
+						- (addr_t)&message.start_profiler;
+					profileMessage = (debug_nub_start_profiler*)malloc(size);
+					if (profileMessage == NULL)
+						result = B_NO_MEMORY;
+				}
+				MemoryDeleter profileMessageDeleter(profileMessage);
+
+				// read the complete message from the port
+				if (result == B_OK) {
+					int32 dummy;
+					ssize_t bytesRead = read_port_etc(port, &dummy,
+						profileMessage, size, B_RELATIVE_TIMEOUT, 0);
+					if (bytesRead < 0) {
+						result = bytesRead;
+					} else {
+						removeCommandMessage = false;
+
+						if ((size_t)bytesRead != size)
+							result = B_BAD_VALUE;
+					}
+				}
+
+				// allocate memory for the function infos
+				function_profile_info* profileFunctions = NULL;
+				if (result == B_OK) {
+					profileFunctions = (function_profile_info*)malloc(
+						sizeof(function_profile_info) * functionCount);
+					if (profileFunctions == NULL)
+						result = B_NO_MEMORY;
+				}
+				MemoryDeleter profileFunctionsDeleter(profileFunctions);
+
+				// allocate memory for the reply
+				debug_profiler_stopped* profileResult = NULL;
+				size_t profileResultSize = 0;
+				if (result == B_OK) {
+					profileResultSize = sizeof(debug_profiler_stopped)
+						+ 8 * (functionCount - 1);
+					profileResult
+						= (debug_profiler_stopped*)malloc(profileResultSize);
+					if (profileResult == NULL)
+						result = B_NO_MEMORY;
+				}
+				MemoryDeleter profileResultDeleter(profileResult);
+
+				// transfer the function array from the message
+				if (result == B_OK) {
+					for (int32 i = 0; i < functionCount; i++) {
+						profileFunctions[i].base
+							= profileMessage->functions[i].base;
+						profileFunctions[i].size
+							= profileMessage->functions[i].size;
+						profileFunctions[i].index = i;
+					}
+				}
+
+				// sort the functions and prepare the reply
+				if (result == B_OK) {
+					std::sort(profileFunctions,
+						profileFunctions + functionCount,
+						ProfileFunctionComparator());
+
+					memset(profileResult, 0, profileResultSize);
+					profileResult->origin.thread = threadID;
+					profileResult->origin.team = nubThread->team->id;
+					profileResult->origin.nub_port = -1;
+					profileResult->interval = max_c(profileMessage->interval,
+						B_DEBUG_MIN_PROFILE_INTERVAL);
+					profileResult->function_count = functionCount;
+				}
+
+				// get the thread and set the profile info
+				cpu_status state = disable_interrupts();
+				GRAB_THREAD_LOCK();
+
+				struct thread *thread
+					= thread_get_thread_struct_locked(threadID);
+				if (thread && thread->team == nubThread->team) {
+					thread_debug_info &threadDebugInfo = thread->debug_info;
+					if (threadDebugInfo.profile.functions == NULL) {
+						threadDebugInfo.profile.interval
+							= profileResult->interval;
+						threadDebugInfo.profile.interval_left
+							= threadDebugInfo.profile.interval;
+						threadDebugInfo.profile.function_count = functionCount;
+						threadDebugInfo.profile.functions = profileFunctions;
+						threadDebugInfo.profile.result = profileResult;
+						threadDebugInfo.profile.installed_timer = NULL;
+					} else
+						result = B_BAD_VALUE;
+				} else
+					result = B_BAD_THREAD_ID;
+
+				RELEASE_THREAD_LOCK();
+				restore_interrupts(state);
+
+				// if all went well, keep the allocated structures
+				if (result == B_OK) {
+					profileFunctionsDeleter.Detach();
+					profileResultDeleter.Detach();
+				}
+
+				// send a reply to the debugger
+				reply.start_profiler.error = result;
+				sendReply = true;
+				replySize = sizeof(reply.start_profiler);
+
+				break;
+			}
+
+			case B_DEBUG_STOP_PROFILER:
+			{
+				// get the parameters
+				thread_id threadID = message.stop_profiler.thread;
+				replyPort = message.stop_profiler.reply_port;
+				status_t result = B_OK;
+
+				TRACE(("nub thread %ld: B_DEBUG_STOP_PROFILER: "
+					"thread: %ld\n", nubThread->id, threadID));
+
+				function_profile_info* profileFunctions = NULL;
+				debug_profiler_stopped* profileResult = NULL;
+				int32 functionCount = 0;
+
+				// get the thread and detach the profile info
+				cpu_status state = disable_interrupts();
+				GRAB_THREAD_LOCK();
+
+				struct thread *thread
+					= thread_get_thread_struct_locked(threadID);
+				if (thread && thread->team == nubThread->team) {
+					thread_debug_info &threadDebugInfo = thread->debug_info;
+					if (threadDebugInfo.profile.functions != NULL) {
+						functionCount = threadDebugInfo.profile.function_count;
+						profileFunctions = threadDebugInfo.profile.functions;
+						profileResult = threadDebugInfo.profile.result;
+						threadDebugInfo.profile.functions = NULL;
+						threadDebugInfo.profile.result = NULL;
+					} else
+						result = B_BAD_VALUE;
+				} else
+					result = B_BAD_THREAD_ID;
+
+				RELEASE_THREAD_LOCK();
+				restore_interrupts(state);
+
+				// prepare the reply
+				if (result == B_OK) {
+					replyToSend = profileResult;
+					replySize = sizeof(debug_profiler_stopped)
+						+ 8 * (functionCount - 1);
+				} else {
+					reply.stop_profiler.origin.thread = result;
+					reply.stop_profiler.total_ticks = 0;
+					reply.stop_profiler.missed_ticks = 0;
+					replySize = sizeof(reply.stop_profiler);
+				}
+				sendReply = true;
+
+				free(profileFunctions);
+				// profileResult is the reply to be sent and will be deleted
+				// after sending.
+			}
+		}
+
+		// We only peeked the command message -- unless the command handler did
+		// that already, we need to remove the message from the port.
+		if (removeCommandMessage) {
+			int32 dummy;
+			read_port_etc(port, &dummy, NULL, 0, B_RELATIVE_TIMEOUT, 0);
 		}
 
 		// send the reply, if necessary
 		if (sendReply) {
 			status_t error = kill_interruptable_write_port(replyPort, command,
-				&reply, replySize);
+				replyToSend, replySize);
+
+			if (replyToSend != &reply)
+				free(replyToSend);
 
 			if (error != B_OK) {
 				// The debugger port is either not longer existing or we got

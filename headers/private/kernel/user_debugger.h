@@ -11,6 +11,17 @@
 
 #include <arch/user_debugger.h>
 
+#include <timer.h>
+
+
+// limits
+#define B_DEBUG_MAX_PROFILE_FUNCTIONS	100000
+#define B_DEBUG_MIN_PROFILE_INTERVAL	1000		/* in us */
+#define B_DEBUG_STACK_TRACE_DEPTH		5
+
+
+struct function_profile_info;
+
 // Team related debugging data.
 //
 // Locking policy:
@@ -60,6 +71,28 @@ struct thread_debug_info {
 	sigset_t	ignore_signals_once;
 		// the signals the debugger wishes not to be notified of, when they
 		// occur the next time
+
+	struct {
+		bigtime_t						interval;
+			// sampling interval
+		union {
+			bigtime_t					interval_left;
+				// when unscheduled: the time left of the current sampling
+				// interval
+			bigtime_t					timer_end;
+				// when running: the absolute time the timer is supposed to go
+				// off
+		};
+		int32							function_count;
+			// number of tracked functions
+		struct function_profile_info*	functions;
+			// array of tracked functions
+		debug_profiler_stopped*			result;
+			// the result message to be sent to the debugger when profiling end;
+			// contains the current hit counts for all functions
+		timer*							installed_timer;
+			// when running and being profiled: the CPU's profiling timer
+	} profile;
 
 	struct arch_thread_debug_info	arch_info;
 };
@@ -135,8 +168,8 @@ extern "C" {
 void clear_team_debug_info(struct team_debug_info *info, bool initLock);
 void destroy_team_debug_info(struct team_debug_info *info);
 
-void clear_thread_debug_info(struct thread_debug_info *info,
-		bool dying);
+void init_thread_debug_info(struct thread_debug_info *info);
+void clear_thread_debug_info(struct thread_debug_info *info, bool dying);
 void destroy_thread_debug_info(struct thread_debug_info *info);
 
 void user_debug_prepare_for_exec();
@@ -159,11 +192,15 @@ void user_debug_team_deleted(team_id teamID, port_id debuggerPort);
 void user_debug_update_new_thread_flags(thread_id threadID);
 void user_debug_thread_created(thread_id threadID);
 void user_debug_thread_deleted(team_id teamID, thread_id threadID);
+void user_debug_thread_exiting(struct thread* thread);
 void user_debug_image_created(const image_info *imageInfo);
 void user_debug_image_deleted(const image_info *imageInfo);
 void user_debug_breakpoint_hit(bool software);
 void user_debug_watchpoint_hit();
 void user_debug_single_stepped();
+
+void user_debug_thread_unscheduled(struct thread* thread);
+void user_debug_thread_scheduled(struct thread* thread);
 
 
 // syscalls
