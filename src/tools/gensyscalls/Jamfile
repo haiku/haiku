@@ -102,7 +102,7 @@ MakeLocate <syscalls>syscalls.S.inc : [ FDirName $(dir) system libroot os ] ;
 MakeLocate <syscalls>syscall_dispatcher.h : [ FDirName $(dir) system kernel ] ;
 MakeLocate <syscalls>syscall_numbers.h : [ FDirName $(dir) system kernel ] ;
 MakeLocate <syscalls>syscall_table.h : [ FDirName $(dir) system kernel ] ;
-MakeLocate <syscalls>strace_syscalls.h : [ FDirName $(dir) bin strace ] ;
+MakeLocate <syscalls>strace_syscalls.h : [ FDirName $(dir) bin debug strace ] ;
 
 rule GenSyscallsFile {
 	Depends $(1) : gensyscalls ;

@@ -207,13 +207,15 @@ SubInclude HAIKU_TOP src bin screen_blanker ;
 SubInclude HAIKU_TOP src bin screenmode ;
 SubInclude HAIKU_TOP src bin sed ;
 SubInclude HAIKU_TOP src bin sharutils ;
-SubInclude HAIKU_TOP src bin strace ;
 SubInclude HAIKU_TOP src bin unrar ;
 SubInclude HAIKU_TOP src bin vim ;
 SubInclude HAIKU_TOP src bin zic ;
 
 # RCS commands
 SubInclude HAIKU_TOP src bin rcs ;
+
+# debugging tools
+SubInclude HAIKU_TOP src bin debug ;
 
 # Network command line tools
 SubInclude HAIKU_TOP src bin network ;

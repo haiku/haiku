@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src bin debug ;
+
+UsePrivateHeaders debug ;
+UsePrivateHeaders libroot ;
+UsePrivateHeaders shared ;
+UsePrivateSystemHeaders ;
+
+StaticLibrary <bin>debug_utils.a : debug_utils.cpp ;
+
+BinCommand profile
+	: profile.cpp
+	:
+	<bin>debug_utils.a
+	libdebug.so
+	$(TARGET_LIBSTDC++)
+	be
+;
+
+
+HaikuSubInclude strace ;
