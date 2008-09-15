@@ -95,7 +95,7 @@ convert_encoding(const char* from, const char* to, const char* src,
 							&outputLeft);
 						iconv_close(iso8859_1to);
 					}
-					delete original;
+					delete[] original;
 					break;
 				}
 
