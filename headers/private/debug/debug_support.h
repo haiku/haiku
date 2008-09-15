@@ -55,6 +55,7 @@ status_t debug_get_stack_frame(debug_context *context,
 // symbol lookup support
 
 typedef struct debug_symbol_lookup_context debug_symbol_lookup_context;
+typedef struct debug_symbol_iterator debug_symbol_iterator;
 
 status_t debug_create_symbol_lookup_context(debug_context *debugContext,
 			debug_symbol_lookup_context **lookupContext);
@@ -66,6 +67,14 @@ status_t debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 			int32 symbolNameSize, char *imageName, int32 imageNameSize,
 			bool *exactMatch);
 
+status_t debug_create_image_symbol_iterator(
+			debug_symbol_lookup_context* lookupContext, image_id imageID,
+			debug_symbol_iterator** _iterator);
+void debug_delete_image_symbol_iterator(debug_symbol_iterator* iterator);
+
+status_t debug_next_image_symbol(debug_symbol_iterator* iterator,
+			char* nameBuffer, size_t nameBufferLength, int32* _symbolType,
+			void** _symbolLocation, size_t* _symbolSize);
 
 #ifdef __cplusplus
 }	// extern "C"

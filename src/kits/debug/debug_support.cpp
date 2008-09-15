@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,11 +13,17 @@
 #include "arch_debug_support.h"
 #include "SymbolLookup.h"
 
+
 using std::nothrow;
+
 
 struct debug_symbol_lookup_context {
 	debug_context	context;
 	SymbolLookup	*lookup;
+};
+
+struct debug_symbol_iterator : BPrivate::SymbolIterator {
+	debug_symbol_lookup_context*	lookup_context;
 };
 
 
@@ -317,8 +323,8 @@ debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 	const char *_symbolName;
 	const char *_imageName;
 	try {
-		status_t error = lookup->LookupSymbolAddress((addr_t)address, &_baseAddress,
-			&_symbolName, &_imageName, exactMatch);
+		status_t error = lookup->LookupSymbolAddress((addr_t)address,
+			&_baseAddress, &_symbolName, &_imageName, exactMatch);
 		if (error != B_OK)
 			return error;
 	} catch (BPrivate::Exception exception) {
@@ -348,6 +354,86 @@ debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 			imageNameSize = B_PATH_NAME_LENGTH;
 		strlcpy(imageName, _imageName, imageNameSize);
 	}
+
+	return B_OK;
+}
+
+
+status_t
+debug_create_image_symbol_iterator(debug_symbol_lookup_context* lookupContext,
+	image_id imageID, debug_symbol_iterator** _iterator)
+{
+	if (!lookupContext || !lookupContext->lookup)
+		return B_BAD_VALUE;
+	SymbolLookup *lookup = lookupContext->lookup;
+
+	debug_symbol_iterator* iterator = new(std::nothrow) debug_symbol_iterator;
+	if (iterator == NULL)
+		return B_NO_MEMORY;
+
+	status_t error;
+	try {
+		error = lookup->InitSymbolIterator(imageID, *iterator);
+	} catch (BPrivate::Exception exception) {
+		error = exception.Error();
+	}
+
+	if (error != B_OK) {
+		delete iterator;
+		return error;
+	}
+
+	iterator->lookup_context = lookupContext;
+
+	*_iterator = iterator;
+	return B_OK;
+}
+
+
+void
+debug_delete_image_symbol_iterator(debug_symbol_iterator* iterator)
+{
+	delete iterator;
+}
+
+
+// debug_next_image_symbol
+status_t
+debug_next_image_symbol(debug_symbol_iterator* iterator, char* nameBuffer,
+	size_t nameBufferLength, int32* _symbolType, void** _symbolLocation,
+	size_t* _symbolSize)
+{
+	if (iterator == NULL || iterator->lookup_context == NULL
+		|| iterator->lookup_context->lookup == NULL) {
+		return B_BAD_VALUE;
+	}
+	debug_symbol_lookup_context* lookupContext = iterator->lookup_context;
+
+	const char* symbolName;
+	addr_t symbolLocation;
+
+	try {
+		status_t error = lookupContext->lookup->NextSymbol(
+			*iterator, &symbolName, &symbolLocation, _symbolSize, _symbolType);
+		if (error != B_OK)
+			return error;
+	} catch (BPrivate::Exception exception) {
+		return exception.Error();
+	}
+
+	*_symbolLocation = (void*)symbolLocation;
+
+	// symbolName is a remote address: We read the string from the
+	// remote memory. The reason for not using the cloned area is that
+	// we don't trust that the data therein is valid (i.e. null-terminated)
+	// and thus strlcpy() could segfault when hitting the cloned area end.
+	if (symbolName != NULL) {
+		ssize_t sizeRead = debug_read_string(&lookupContext->context,
+			symbolName, nameBuffer, nameBufferLength);
+		if (sizeRead < 0)
+			return sizeRead;
+	} else
+		nameBuffer[0] = '\0';
 
 	return B_OK;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -278,6 +278,55 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 	return B_OK;
 }
 
+
+// InitSymbolIterator
+status_t
+SymbolLookup::InitSymbolIterator(image_id imageID, SymbolIterator& iterator)
+{
+	// find the image
+	const image_t* image = _FindImageByID(imageID);
+	if (image == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	iterator.image = image;
+	iterator.symbolCount = Read(image->symhash[1]);
+	iterator.textDelta = image->regions->delta;
+	iterator.currentIndex = -1;
+
+	return B_OK;
+}
+
+
+// NextSymbol
+status_t
+SymbolLookup::NextSymbol(SymbolIterator& iterator, const char** _symbolName,
+	addr_t* _symbolAddress, size_t* _symbolSize, int32* _symbolType)
+{
+	const image_t* image = iterator.image;
+
+	while (true) {
+		if (++iterator.currentIndex >= iterator.symbolCount)
+			return B_ENTRY_NOT_FOUND;
+
+		const struct Elf32_Sym* symbol = &Read(image->syms[
+			iterator.currentIndex]);
+		if ((ELF32_ST_TYPE(symbol->st_info) != STT_FUNC
+				&& ELF32_ST_TYPE(symbol->st_info) != STT_OBJECT)
+			|| symbol->st_value == 0) {
+			continue;
+		}
+
+		*_symbolName = SYMNAME(image, symbol);
+		*_symbolAddress = symbol->st_value + iterator.textDelta;
+		*_symbolSize = symbol->st_size;
+		*_symbolType = ELF32_ST_TYPE(symbol->st_info) == STT_FUNC
+			? B_SYMBOL_TYPE_TEXT : B_SYMBOL_TYPE_DATA;
+
+		return B_OK;
+	}
+}
+
+
 // _FindImageAtAddress
 const image_t *
 SymbolLookup::_FindImageAtAddress(addr_t address)
@@ -297,3 +346,18 @@ SymbolLookup::_FindImageAtAddress(addr_t address)
 	return NULL;
 }
 
+
+// _FindImageByID
+const image_t*
+SymbolLookup::_FindImageByID(image_id id)
+{
+	// iterate through the images
+	for (const image_t *image = &Read(*Read(fDebugArea->loaded_images->head));
+		 image;
+		 image = &Read(*image->next)) {
+		if (image->id == id)
+			return image;
+	}
+
+	return NULL;
+}

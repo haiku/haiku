@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,9 +8,11 @@
 
 #include <stdio.h>
 
+#include <image.h>
 #include <OS.h>
 
 #include <util/DoublyLinkedList.h>
+
 
 //#define TRACE_DEBUG_SYMBOL_LOOKUP
 #ifdef TRACE_DEBUG_SYMBOL_LOOKUP
@@ -19,8 +21,10 @@
 #	define TRACE(x) ;
 #endif
 
+
 struct image_t;
 struct runtime_loader_debug_area;
+
 
 namespace BPrivate {
 
@@ -42,6 +46,7 @@ public:
 private:
 	status_t	fError;
 };
+
 
 // Area
 class Area : public DoublyLinkedListLinkImpl<Area> {
@@ -81,6 +86,7 @@ private:
 	int32		fSize;
 };
 
+
 // RemoteMemoryAccessor
 class RemoteMemoryAccessor {
 public:
@@ -111,6 +117,16 @@ private:
 	AreaList	fAreas;
 };
 
+
+// SymbolIterator
+struct SymbolIterator {
+	const image_t*		image;
+	int32				symbolCount;
+	size_t				textDelta;
+	int32				currentIndex;
+};
+
+
 // SymbolLookup
 class SymbolLookup : private RemoteMemoryAccessor {
 public:
@@ -122,8 +138,13 @@ public:
 	status_t LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 		const char **_symbolName, const char **_imageName, bool *_exactMatch);
 
+	status_t InitSymbolIterator(image_id imageID, SymbolIterator& iterator);
+	status_t NextSymbol(SymbolIterator& iterator, const char** _symbolName,
+		addr_t* _symbolAddress, size_t* _symbolSize, int32* _symbolType);
+
 private:
 	const image_t *_FindImageAtAddress(addr_t address);
+	const image_t *_FindImageByID(image_id id);
 
 	const runtime_loader_debug_area	*fDebugArea;
 };
