@@ -20,8 +20,6 @@
 #include "stack_private.h"
 
 
-#define TIMER_IS_RUNNING	0x80000000
-
 // internal Fifo class which doesn't maintain it's own lock
 // TODO: do we need this one for anything?
 class Fifo {
@@ -58,6 +56,7 @@ static struct list sTimers;
 static mutex sTimerLock;
 static sem_id sTimerWaitSem;
 static ConditionVariable sWaitForTimerCondition;
+static net_timer* sCurrentTimer;
 static thread_id sTimerThread;
 static bigtime_t sTimerTimeout;
 
@@ -441,14 +440,15 @@ timer_thread(void* /*data*/)
 					// execute timer
 					list_remove_item(&sTimers, timer);
 					timer->due = -1;
-					timer->flags |= TIMER_IS_RUNNING;
+					sCurrentTimer = timer;
 
 					mutex_unlock(&sTimerLock);
 					timer->hook(timer, timer->data);
 					mutex_lock(&sTimerLock);
 
-					timer->flags &= ~TIMER_IS_RUNNING;
+					sCurrentTimer = NULL;
 					sWaitForTimerCondition.NotifyAll();
+
 					timer = NULL;
 						// restart scanning as we unlocked the list
 				} else {
@@ -543,7 +543,7 @@ wait_for_timer(struct net_timer* timer)
 	while (true) {
 		MutexLocker locker(sTimerLock);
 
-		if (timer->due <= 0 && (timer->flags & TIMER_IS_RUNNING) == 0)
+		if (timer->due <= 0 && sCurrentTimer != timer)
 			return;
 
 		// we actually need to wait for this timer
