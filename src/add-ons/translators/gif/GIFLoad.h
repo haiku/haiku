@@ -44,7 +44,6 @@ class GIFLoad {
 		bool ReadGIFCommentBlock();
 		bool ReadGIFUnknownBlock(unsigned char c);
 		
-		void Init();
 		bool InitFrame(int size);
 		short NextCode();
 		void ResetTable();
