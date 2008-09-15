@@ -587,6 +587,8 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		map<BString,BString> challengeMap;
 		SplitChallengeIntoMap(base, challengeMap);
 
+		delete[] base;
+
 		BString rawResponse = BString("username=") << '"' << login << '"';
 		rawResponse << ",realm=" << '"' << challengeMap["realm"] << '"';
 		rawResponse << ",nonce=" << '"' << challengeMap["nonce"] << '"';
