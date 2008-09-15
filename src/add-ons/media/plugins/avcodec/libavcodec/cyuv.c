@@ -1,42 +1,40 @@
 /*
- *
- * Copyright (C) 2003 the ffmpeg project
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
  * Creative YUV (CYUV) Video Decoder
  *   by Mike Melanson (melanson@pcisys.net)
  * based on "Creative YUV (CYUV) stream format for AVI":
  *   http://www.csse.monash.edu.au/~timf/videocodec/cyuv.txt
  *
+ * Copyright (C) 2003 the ffmpeg project
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
- * @file cyuv.c 
+ * @file cyuv.c
  * Creative YUV (CYUV) Video Decoder.
  */
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
 #include "dsputil.h"
-#include "mpegvideo.h"
 
 
 typedef struct CyuvDecodeContext {
@@ -45,22 +43,24 @@ typedef struct CyuvDecodeContext {
     AVFrame frame;
 } CyuvDecodeContext;
 
-static int cyuv_decode_init(AVCodecContext *avctx)
+static av_cold int cyuv_decode_init(AVCodecContext *avctx)
 {
     CyuvDecodeContext *s = avctx->priv_data;
 
     s->avctx = avctx;
     s->width = avctx->width;
+    /* width needs to be divisible by 4 for this codec to work */
+    if (s->width & 0x3)
+        return -1;
     s->height = avctx->height;
     avctx->pix_fmt = PIX_FMT_YUV411P;
-    avctx->has_b_frames = 0;
 
     return 0;
 }
 
-static int cyuv_decode_frame(AVCodecContext *avctx, 
+static int cyuv_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
-                             uint8_t *buf, int buf_size)
+                             const uint8_t *buf, int buf_size)
 {
     CyuvDecodeContext *s=avctx->priv_data;
 
@@ -72,16 +72,14 @@ static int cyuv_decode_frame(AVCodecContext *avctx,
     int v_ptr;
 
     /* prediction error tables (make it clear that they are signed values) */
-    signed char *y_table = buf +  0;
-    signed char *u_table = buf + 16;
-    signed char *v_table = buf + 32;
+    const signed char *y_table = (const signed char*)buf +  0;
+    const signed char *u_table = (const signed char*)buf + 16;
+    const signed char *v_table = (const signed char*)buf + 32;
 
     unsigned char y_pred, u_pred, v_pred;
     int stream_ptr;
     unsigned char cur_byte;
     int pixel_groups;
-
-    *data_size = 0;
 
     /* sanity check the buffer size: A buffer has 3x16-bytes tables
      * followed by (height) lines each with 3 bytes to represent groups
@@ -100,6 +98,7 @@ static int cyuv_decode_frame(AVCodecContext *avctx,
     if(s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);
 
+    s->frame.buffer_hints = FF_BUFFER_HINTS_VALID;
     s->frame.reference = 0;
     if(avctx->get_buffer(avctx, &s->frame) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
@@ -112,7 +111,7 @@ static int cyuv_decode_frame(AVCodecContext *avctx,
 
     /* iterate through each line in the height */
     for (y_ptr = 0, u_ptr = 0, v_ptr = 0;
-         y_ptr < (s->height * s->frame.linesize[0]); 
+         y_ptr < (s->height * s->frame.linesize[0]);
          y_ptr += s->frame.linesize[0] - s->width,
          u_ptr += s->frame.linesize[1] - s->width / 4,
          v_ptr += s->frame.linesize[2] - s->width / 4) {
@@ -164,7 +163,7 @@ static int cyuv_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int cyuv_decode_end(AVCodecContext *avctx)
+static av_cold int cyuv_decode_end(AVCodecContext *avctx)
 {
 /*    CyuvDecodeContext *s = avctx->priv_data;*/
 
@@ -180,7 +179,8 @@ AVCodec cyuv_decoder = {
     NULL,
     cyuv_decode_end,
     cyuv_decode_frame,
-    0,
-    NULL
+    CODEC_CAP_DR1,
+    NULL,
+    .long_name = NULL_IF_CONFIG_SMALL("Creative YUV (CYUV)"),
 };
 
