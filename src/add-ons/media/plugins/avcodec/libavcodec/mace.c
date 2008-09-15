@@ -2,26 +2,28 @@
  * MACE decoder
  * Copyright (c) 2002 Laszlo Torok <torokl@alpha.dfmk.hu>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
  * @file mace.c
  * MACE decoder.
  */
- 
+
 #include "avcodec.h"
 
 /*
@@ -242,7 +244,8 @@ typedef struct MACEContext {
 static void chomp3(MACEContext *ctx,
             uint8_t val,
             const uint16_t tab1[],
-            const uint16_t tab2[][8])
+            const uint16_t tab2[][8],
+            uint32_t numChannels)
 {
   short current;
 
@@ -252,14 +255,15 @@ static void chomp3(MACEContext *ctx,
   else current+=ctx->lev;
   ctx->lev=current-(current >> 3);
 //  *ctx->outPtr++=current >> 8;
-  *ctx->outPtr++=current;
+  *ctx->outPtr=current;
+  ctx->outPtr+=numChannels;
   if ( ( ctx->index += tab1[val]-(ctx->index>>5) ) < 0 ) ctx->index = 0;
 }
 /* \\\ */
 
 /* /// "Exp1to3()" */
 static void Exp1to3(MACEContext *ctx,
-             uint8_t *inBuffer,
+             const uint8_t *inBuffer,
              void *outBuffer,
              uint32_t cnt,
              uint32_t numChannels,
@@ -281,13 +285,13 @@ static void Exp1to3(MACEContext *ctx,
 
    while (cnt>0) {
      pkt=inBuffer[0];
-     chomp3(ctx, pkt       & 7, MACEtab1, MACEtab2);
-     chomp3(ctx,(pkt >> 3) & 3, MACEtab3, MACEtab4);
-     chomp3(ctx, pkt >> 5     , MACEtab1, MACEtab2);
+     chomp3(ctx, pkt       & 7, MACEtab1, MACEtab2, numChannels);
+     chomp3(ctx,(pkt >> 3) & 3, MACEtab3, MACEtab4, numChannels);
+     chomp3(ctx, pkt >> 5     , MACEtab1, MACEtab2, numChannels);
      pkt=inBuffer[1];
-     chomp3(ctx, pkt       & 7, MACEtab1, MACEtab2);
-     chomp3(ctx,(pkt >> 3) & 3, MACEtab3, MACEtab4);
-     chomp3(ctx, pkt >> 5     , MACEtab1, MACEtab2);
+     chomp3(ctx, pkt       & 7, MACEtab1, MACEtab2, numChannels);
+     chomp3(ctx,(pkt >> 3) & 3, MACEtab3, MACEtab4, numChannels);
+     chomp3(ctx, pkt >> 5     , MACEtab1, MACEtab2, numChannels);
 
      inBuffer+=numChannels*2;
      --cnt;
@@ -306,7 +310,8 @@ static void Exp1to3(MACEContext *ctx,
 static void chomp6(MACEContext *ctx,
             uint8_t val,
             const uint16_t tab1[],
-            const uint16_t tab2[][8])
+            const uint16_t tab2[][8],
+            uint32_t numChannels)
 {
   short current;
 
@@ -329,9 +334,10 @@ static void chomp6(MACEContext *ctx,
 
 //  *ctx->outPtr++=(ctx->previous+ctx->prev2-((ctx->prev2-current) >> 2)) >> 8;
 //  *ctx->outPtr++=(ctx->previous+current+((ctx->prev2-current) >> 2)) >> 8;
-  *ctx->outPtr++=(ctx->previous+ctx->prev2-((ctx->prev2-current) >> 2));
-  *ctx->outPtr++=(ctx->previous+current+((ctx->prev2-current) >> 2));
-
+  *ctx->outPtr=(ctx->previous+ctx->prev2-((ctx->prev2-current) >> 2));
+  ctx->outPtr+=numChannels;
+  *ctx->outPtr=(ctx->previous+current+((ctx->prev2-current) >> 2));
+  ctx->outPtr+=numChannels;
   ctx->prev2=ctx->previous;
   ctx->previous=current;
 
@@ -341,7 +347,7 @@ static void chomp6(MACEContext *ctx,
 
 /* /// "Exp1to6()" */
 static void Exp1to6(MACEContext *ctx,
-             uint8_t *inBuffer,
+             const uint8_t *inBuffer,
              void *outBuffer,
              uint32_t cnt,
              uint32_t numChannels,
@@ -366,9 +372,9 @@ static void Exp1to6(MACEContext *ctx,
    while (cnt>0) {
      pkt=*inBuffer;
 
-     chomp6(ctx, pkt >> 5     , MACEtab1, MACEtab2);
-     chomp6(ctx,(pkt >> 3) & 3, MACEtab3, MACEtab4);
-     chomp6(ctx, pkt       & 7, MACEtab1, MACEtab2);
+     chomp6(ctx, pkt >> 5     , MACEtab1, MACEtab2, numChannels);
+     chomp6(ctx,(pkt >> 3) & 3, MACEtab3, MACEtab4, numChannels);
+     chomp6(ctx, pkt       & 7, MACEtab1, MACEtab2, numChannels);
 
      inBuffer+=numChannels;
      --cnt;
@@ -386,16 +392,17 @@ static void Exp1to6(MACEContext *ctx,
 }
 /* \\\ */
 
-static int mace_decode_init(AVCodecContext * avctx)
+static av_cold int mace_decode_init(AVCodecContext * avctx)
 {
     if (avctx->channels > 2)
         return -1;
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     return 0;
 }
 
 static int mace_decode_frame(AVCodecContext *avctx,
                             void *data, int *data_size,
-                            uint8_t *buf, int buf_size)
+                            const uint8_t *buf, int buf_size)
 {
     short *samples;
     MACEContext *c = avctx->priv_data;
@@ -403,25 +410,20 @@ static int mace_decode_frame(AVCodecContext *avctx,
     samples = (short *)data;
     switch (avctx->codec->id) {
     case CODEC_ID_MACE3:
-#ifdef DEBUG
-puts("mace_decode_frame[3]()");
-#endif
-        Exp1to3(c, buf, samples, buf_size / 2, avctx->channels, 1);
+        dprintf(avctx, "mace_decode_frame[3]()");
+        Exp1to3(c, buf, samples, buf_size / 2 / avctx->channels, avctx->channels, 1);
         if (avctx->channels == 2)
-            Exp1to3(c, buf, samples+1, buf_size / 2, 2, 2);
+            Exp1to3(c, buf, samples+1, buf_size / 2 / 2, 2, 2);
         *data_size = 2 * 3 * buf_size;
         break;
     case CODEC_ID_MACE6:
-#ifdef DEBUG
-puts("mace_decode_frame[6]()");
-#endif
-        Exp1to6(c, buf, samples, buf_size, avctx->channels, 1);
+        dprintf(avctx, "mace_decode_frame[6]()");
+        Exp1to6(c, buf, samples, buf_size / avctx->channels, avctx->channels, 1);
         if (avctx->channels == 2)
-            Exp1to6(c, buf, samples+1, buf_size, 2, 2);
+            Exp1to6(c, buf, samples+1, buf_size / 2, 2, 2);
         *data_size = 2 * 6 * buf_size;
         break;
     default:
-        *data_size = 0;
         return -1;
     }
     return buf_size;
@@ -436,6 +438,7 @@ AVCodec mace3_decoder = {
     NULL,
     NULL,
     mace_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("MACE (Macintosh Audio Compression/Expansion) 3:1"),
 };
 
 AVCodec mace6_decoder = {
@@ -447,5 +450,6 @@ AVCodec mace6_decoder = {
     NULL,
     NULL,
     mace_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("MACE (Macintosh Audio Compression/Expansion) 6:1"),
 };
 
