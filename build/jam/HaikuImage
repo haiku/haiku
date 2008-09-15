@@ -38,19 +38,20 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2 cal cat
 	ideinfo idestatus ifconfig <bin>install installsound iroster isvolume join
 	keymap kill less lessecho lesskey link listarea listattr listimage listdev
 	listport listres listsem ln locate logger login logname ls lsindex m4 make
-	makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex modifiers mount
-	mount_nfs mountvolume mv nc netstat nl nohup od open passwd paste patch
-	pathchk pc ping play playfile playsound playwav pr prio printenv printf ps
-	ptx pwd query quit rc readlink release renice rescan rlog rm rmattr rmindex
-	rmdir roster route safemode screen_blanker screenmode sed setdecor settype setversion
-	setvolume seq sh sha1sum shar shred shuf shutdown sleep sort split stat
-	strace stty su sum sync sysinfo tac tail tar tcpdump tcptester tee telnet
-	telnetd test top touch tput tr traceroute
-	translate true tsort tty uname unchop unexpand unmount uniq unrar unshar
-	unzip unzipsfx <bin>updatedb uptime urlwrapper usb_dev_info useradd uudecode
-	uuencode vdir
-	version vim waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip
-	zipcloak <bin>zipgrep zipnote zipsplit zmore znew
+	makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex modifiers
+	mount mount_nfs mountvolume mv nc netstat nl nohup od open passwd paste
+	patch pathchk pc ping play playfile playsound playwav pr prio printenv
+	printf profile ps ptx pwd query quit rc readlink release renice rescan rlog
+	rm rmattr rmindex rmdir roster route
+	safemode screen_blanker screenmode sed setdecor settype setversion setvolume
+	seq sh sha1sum shar shred shuf shutdown sleep sort split stat strace stty su
+	sum sync sysinfo
+	tac tail tar tcpdump tcptester tee telnet telnetd test top touch tput tr
+	traceroute translate true tsort tty
+	uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx <bin>updatedb
+	uptime urlwrapper usb_dev_info useradd uudecode uuencode
+	vdir version vim waitfor wc wget whoami xargs xres yes
+	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
 BEOS_APPS = AboutSystem ActivityMonitor CodyCam DeskCalc DiskProbe DiskUsage
