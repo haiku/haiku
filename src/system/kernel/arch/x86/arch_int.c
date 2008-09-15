@@ -849,8 +849,19 @@ page_fault_exception(struct iframe* frame)
 			"address %p from eip %p\n", (void *)cr2, (void *)frame->eip);
 		return;
 	} else if ((frame->flags & 0x200) == 0) {
-		// if the interrupts were disabled, and we are not running the kernel startup
-		// the page fault was not allowed to happen and we must panic
+		// interrupts disabled
+
+		// If a page fault handler is installed, we're allowed to be here.
+		// TODO: Now we are generally allowing user_memcpy() with interrupts
+		// disabled, which in most cases is a bug. We should add some thread
+		// flag allowing to explicitly indicate that this handling is desired.
+		if (thread && thread->fault_handler != 0) {
+			frame->eip = thread->fault_handler;
+			return;
+		}
+
+		// If we are not running the kernel startup the page fault was not
+		// allowed to happen and we must panic.
 		panic("page fault, but interrupts were disabled. Touching address "
 			"%p from eip %p\n", (void *)cr2, (void *)frame->eip);
 		return;
