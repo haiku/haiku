@@ -745,8 +745,11 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 			keymap->GetChars(keycode, 0, 0, &rawString, &rawNumBytes);
 
 			BMessage *msg = new BMessage;
-			if (msg == NULL)
+			if (msg == NULL) {
+				free(string);
+				free(rawString);
 				continue;
+			}
 
 			if (numBytes > 0)
 				msg->what = isKeyDown ? B_KEY_DOWN : B_KEY_UP;
