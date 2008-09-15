@@ -2,28 +2,30 @@
  * ATI VCR1 codec
  * Copyright (c) 2003 Michael Niedermayer
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
- 
+
 /**
  * @file vcr1.c
  * ati vcr1 codec.
  */
- 
+
 #include "avcodec.h"
-#include "mpegvideo.h"
+#include "dsputil.h"
 
 //#undef NDEBUG
 //#include <assert.h>
@@ -35,22 +37,15 @@ typedef struct VCR1Context{
     int offset[4];
 } VCR1Context;
 
-static int decode_frame(AVCodecContext *avctx, 
+static int decode_frame(AVCodecContext *avctx,
                         void *data, int *data_size,
-                        uint8_t *buf, int buf_size)
+                        const uint8_t *buf, int buf_size)
 {
     VCR1Context * const a = avctx->priv_data;
     AVFrame *picture = data;
     AVFrame * const p= (AVFrame*)&a->picture;
-    uint8_t *bytestream= buf;
+    const uint8_t *bytestream= buf;
     int i, x, y;
-
-    *data_size = 0;
-
-    /* special case for last picture */
-    if (buf_size == 0) {
-        return 0;
-    }
 
     if(p->data[0])
         avctx->release_buffer(avctx, p);
@@ -60,14 +55,14 @@ static int decode_frame(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
-    p->pict_type= I_TYPE;
+    p->pict_type= FF_I_TYPE;
     p->key_frame= 1;
 
     for(i=0; i<16; i++){
         a->delta[i]= *(bytestream++);
         bytestream++;
     }
-    
+
     for(y=0; y<avctx->height; y++){
         int offset;
         uint8_t *luma= &a->picture.data[0][ y*a->picture.linesize[0] ];
@@ -86,10 +81,10 @@ static int decode_frame(AVCodecContext *avctx,
                 luma[2]=( offset += a->delta[ bytestream[0]&0xF ]);
                 luma[3]=( offset += a->delta[ bytestream[0]>>4  ]);
                 luma += 4;
-                
+
                 *(cb++) = bytestream[3];
                 *(cr++) = bytestream[1];
-                
+
                 bytestream+= 4;
             }
         }else{
@@ -114,7 +109,7 @@ static int decode_frame(AVCodecContext *avctx,
     *data_size = sizeof(AVPicture);
 
     emms_c();
-    
+
     return buf_size;
 }
 
@@ -127,50 +122,45 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
     int mb_x, mb_y;
 
     *p = *pict;
-    p->pict_type= I_TYPE;
+    p->pict_type= FF_I_TYPE;
     p->key_frame= 1;
 
     emms_c();
-    
+
     align_put_bits(&a->pb);
     while(get_bit_count(&a->pb)&31)
         put_bits(&a->pb, 8, 0);
-    
+
     size= get_bit_count(&a->pb)/32;
-    
+
     return size*4;
 }
 #endif
 
-static void common_init(AVCodecContext *avctx){
+static av_cold void common_init(AVCodecContext *avctx){
     VCR1Context * const a = avctx->priv_data;
 
     avctx->coded_frame= (AVFrame*)&a->picture;
     a->avctx= avctx;
 }
 
-static int decode_init(AVCodecContext *avctx){
- 
+static av_cold int decode_init(AVCodecContext *avctx){
+
     common_init(avctx);
-    
+
     avctx->pix_fmt= PIX_FMT_YUV410P;
 
     return 0;
 }
 
-static int encode_init(AVCodecContext *avctx){
- 
+#if 0
+static av_cold int encode_init(AVCodecContext *avctx){
+
     common_init(avctx);
-    
-    return 0;
-}
-
-static int decode_end(AVCodecContext *avctx){
-
-    avcodec_default_free_buffers(avctx);
 
     return 0;
 }
+#endif
 
 AVCodec vcr1_decoder = {
     "vcr1",
@@ -179,9 +169,10 @@ AVCodec vcr1_decoder = {
     sizeof(VCR1Context),
     decode_init,
     NULL,
-    decode_end,
+    NULL,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("ATI VCR1"),
 };
 #if 0
 #ifdef CONFIG_ENCODERS
@@ -194,6 +185,7 @@ AVCodec vcr1_encoder = {
     encode_init,
     encode_frame,
     //encode_end,
+    .long_name = NULL_IF_CONFIG_SMALL("ATI VCR1"),
 };
 
 #endif //CONFIG_ENCODERS

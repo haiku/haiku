@@ -2,27 +2,28 @@
  * Westwood Studios VQA Video Decoder
  * Copyright (C) 2003 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
  * @file vqavideo.c
  * VQA Video Decoder by Mike Melanson (melanson@pcisys.net)
- * For more information about the RPZA format, visit:
- *   http://www.pcisys.net/~melanson/codecs/
+ * For more information about the VQA format, visit:
+ *   http://wiki.multimedia.cx/index.php?title=VQA
  *
  * The VQA video decoder outputs PAL8 or RGB555 colorspace data, depending
  * on the type of data in the file.
@@ -53,7 +54,7 @@
  * file. This is an interesting technique, although it makes random file
  * seeking difficult despite the fact that the frames are all intracoded.
  *
- * V1,2 VQA uses 12-bit codebook indices. If the 12-bit indices were
+ * V1,2 VQA uses 12-bit codebook indexes. If the 12-bit indexes were
  * packed into bytes and then RLE compressed, bytewise, the results would
  * be poor. That is why the coding method divides each index into 2 parts,
  * the top 4 bits and the bottom 8 bits, then RL encodes the 4-bit pieces
@@ -67,9 +68,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
-#include "dsputil.h"
 
 #define PALETTE_COUNT 256
 #define VQA_HEADER_SIZE 0x2A
@@ -82,26 +81,13 @@
 #define MAX_VECTORS (MAX_CODEBOOK_VECTORS + SOLID_PIXEL_VECTORS)
 #define MAX_CODEBOOK_SIZE (MAX_VECTORS * 4 * 4)
 
-#define LE_16(x)  ((((uint8_t*)(x))[1] << 8) | ((uint8_t*)(x))[0])
-#define BE_16(x)  ((((uint8_t*)(x))[0] << 8) | ((uint8_t*)(x))[1])
-#define BE_32(x)  ((((uint8_t*)(x))[0] << 24) | \
-                   (((uint8_t*)(x))[1] << 16) | \
-                   (((uint8_t*)(x))[2] << 8) | \
-                    ((uint8_t*)(x))[3])
-
-#define FOURCC_TAG( ch0, ch1, ch2, ch3 ) \
-        ( (long)(unsigned char)(ch3) | \
-        ( (long)(unsigned char)(ch2) << 8 ) | \
-        ( (long)(unsigned char)(ch1) << 16 ) | \
-        ( (long)(unsigned char)(ch0) << 24 ) )
-
-#define CBF0_TAG FOURCC_TAG('C', 'B', 'F', '0')
-#define CBFZ_TAG FOURCC_TAG('C', 'B', 'F', 'Z')
-#define CBP0_TAG FOURCC_TAG('C', 'B', 'P', '0')
-#define CBPZ_TAG FOURCC_TAG('C', 'B', 'P', 'Z')
-#define CPL0_TAG FOURCC_TAG('C', 'P', 'L', '0')
-#define CPLZ_TAG FOURCC_TAG('C', 'P', 'L', 'Z')
-#define VPTZ_TAG FOURCC_TAG('V', 'P', 'T', 'Z')
+#define CBF0_TAG MKBETAG('C', 'B', 'F', '0')
+#define CBFZ_TAG MKBETAG('C', 'B', 'F', 'Z')
+#define CBP0_TAG MKBETAG('C', 'B', 'P', '0')
+#define CBPZ_TAG MKBETAG('C', 'B', 'P', 'Z')
+#define CPL0_TAG MKBETAG('C', 'P', 'L', '0')
+#define CPLZ_TAG MKBETAG('C', 'P', 'L', 'Z')
+#define VPTZ_TAG MKBETAG('V', 'P', 'T', 'Z')
 
 #define VQA_DEBUG 0
 
@@ -114,13 +100,12 @@ static inline void vqa_debug(const char *format, ...) { }
 typedef struct VqaContext {
 
     AVCodecContext *avctx;
-    DSPContext dsp;
     AVFrame frame;
 
-    unsigned char *buf;
+    const unsigned char *buf;
     int size;
 
-    unsigned int palette[PALETTE_COUNT];
+    uint32_t palette[PALETTE_COUNT];
 
     int width;   /* width of a frame */
     int height;   /* height of a frame */
@@ -142,16 +127,14 @@ typedef struct VqaContext {
 
 } VqaContext;
 
-static int vqa_decode_init(AVCodecContext *avctx)
+static av_cold int vqa_decode_init(AVCodecContext *avctx)
 {
-    VqaContext *s = (VqaContext *)avctx->priv_data;
+    VqaContext *s = avctx->priv_data;
     unsigned char *vqa_header;
-    int i, j, codebook_index;;
+    int i, j, codebook_index;
 
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
-    avctx->has_b_frames = 0;
-    dsputil_init(&s->dsp, avctx);
 
     /* make sure the extradata made it */
     if (s->avctx->extradata_size != VQA_HEADER_SIZE) {
@@ -162,8 +145,12 @@ static int vqa_decode_init(AVCodecContext *avctx)
     /* load up the VQA parameters from the header */
     vqa_header = (unsigned char *)s->avctx->extradata;
     s->vqa_version = vqa_header[0];
-    s->width = LE_16(&vqa_header[6]);
-    s->height = LE_16(&vqa_header[8]);
+    s->width = AV_RL16(&vqa_header[6]);
+    s->height = AV_RL16(&vqa_header[8]);
+    if(avcodec_check_dimensions(avctx, s->width, s->height)){
+        s->width= s->height= 0;
+        return -1;
+    }
     s->vector_width = vqa_header[10];
     s->vector_height = vqa_header[11];
     s->partial_count = s->partial_countdown = vqa_header[13];
@@ -212,7 +199,7 @@ static int vqa_decode_init(AVCodecContext *avctx)
         return; \
     }
 
-static void decode_format80(unsigned char *src, int src_size,
+static void decode_format80(const unsigned char *src, int src_size,
     unsigned char *dest, int dest_size, int check_size) {
 
     int src_index = 0;
@@ -239,9 +226,9 @@ static void decode_format80(unsigned char *src, int src_size,
         if (src[src_index] == 0xFF) {
 
             src_index++;
-            count = LE_16(&src[src_index]);
+            count = AV_RL16(&src[src_index]);
             src_index += 2;
-            src_pos = LE_16(&src[src_index]);
+            src_pos = AV_RL16(&src[src_index]);
             src_index += 2;
             vqa_debug("(1) copy %X bytes from absolute pos %X\n", count, src_pos);
             CHECK_COUNT();
@@ -252,7 +239,7 @@ static void decode_format80(unsigned char *src, int src_size,
         } else if (src[src_index] == 0xFE) {
 
             src_index++;
-            count = LE_16(&src[src_index]);
+            count = AV_RL16(&src[src_index]);
             src_index += 2;
             color = src[src_index++];
             vqa_debug("(2) set %X bytes to %02X\n", count, color);
@@ -263,7 +250,7 @@ static void decode_format80(unsigned char *src, int src_size,
         } else if ((src[src_index] & 0xC0) == 0xC0) {
 
             count = (src[src_index++] & 0x3F) + 3;
-            src_pos = LE_16(&src[src_index]);
+            src_pos = AV_RL16(&src[src_index]);
             src_index += 2;
             vqa_debug("(3) copy %X bytes from absolute pos %X\n", count, src_pos);
             CHECK_COUNT();
@@ -283,7 +270,7 @@ static void decode_format80(unsigned char *src, int src_size,
         } else {
 
             count = ((src[src_index] & 0x70) >> 4) + 3;
-            src_pos = BE_16(&src[src_index]) & 0x0FFF;
+            src_pos = AV_RB16(&src[src_index]) & 0x0FFF;
             src_index += 2;
             vqa_debug("(5) copy %X bytes from relpos %X\n", count, src_pos);
             CHECK_COUNT();
@@ -333,8 +320,8 @@ static void vqa_decode_chunk(VqaContext *s)
     /* first, traverse through the frame and find the subchunks */
     while (index < s->size) {
 
-        chunk_type = BE_32(&s->buf[index]);
-        chunk_size = BE_32(&s->buf[index + 4]);
+        chunk_type = AV_RB32(&s->buf[index]);
+        chunk_size = AV_RB32(&s->buf[index + 4]);
 
         switch (chunk_type) {
 
@@ -398,7 +385,7 @@ static void vqa_decode_chunk(VqaContext *s)
     /* convert the RGB palette into the machine's endian format */
     if (cpl0_chunk != -1) {
 
-        chunk_size = BE_32(&s->buf[cpl0_chunk + 4]);
+        chunk_size = AV_RB32(&s->buf[cpl0_chunk + 4]);
         /* sanity check the palette size */
         if (chunk_size / 3 > 256) {
             av_log(s->avctx, AV_LOG_ERROR, "  VQA video: problem: found a palette chunk with %d colors\n",
@@ -426,7 +413,7 @@ static void vqa_decode_chunk(VqaContext *s)
     /* decompress the full codebook chunk */
     if (cbfz_chunk != -1) {
 
-        chunk_size = BE_32(&s->buf[cbfz_chunk + 4]);
+        chunk_size = AV_RB32(&s->buf[cbfz_chunk + 4]);
         cbfz_chunk += CHUNK_PREAMBLE_SIZE;
         decode_format80(&s->buf[cbfz_chunk], chunk_size,
             s->codebook, s->codebook_size, 0);
@@ -435,7 +422,7 @@ static void vqa_decode_chunk(VqaContext *s)
     /* copy a full codebook */
     if (cbf0_chunk != -1) {
 
-        chunk_size = BE_32(&s->buf[cbf0_chunk + 4]);
+        chunk_size = AV_RB32(&s->buf[cbf0_chunk + 4]);
         /* sanity check the full codebook size */
         if (chunk_size > MAX_CODEBOOK_SIZE) {
             av_log(s->avctx, AV_LOG_ERROR, "  VQA video: problem: CBF0 chunk too large (0x%X bytes)\n",
@@ -455,7 +442,7 @@ static void vqa_decode_chunk(VqaContext *s)
         return;
     }
 
-    chunk_size = BE_32(&s->buf[vptz_chunk + 4]);
+    chunk_size = AV_RB32(&s->buf[vptz_chunk + 4]);
     vptz_chunk += CHUNK_PREAMBLE_SIZE;
     decode_format80(&s->buf[vptz_chunk], chunk_size,
         s->decode_buffer, s->decode_buffer_size, 1);
@@ -465,7 +452,7 @@ static void vqa_decode_chunk(VqaContext *s)
         index_shift = 4;
     else
         index_shift = 3;
-    for (y = 0; y < s->frame.linesize[0] * s->height; 
+    for (y = 0; y < s->frame.linesize[0] * s->height;
         y += s->frame.linesize[0] * s->vector_height) {
 
         for (x = y; x < y + s->width; x += 4, lobytes++, hibytes++) {
@@ -476,9 +463,24 @@ static void vqa_decode_chunk(VqaContext *s)
             switch (s->vqa_version) {
 
             case 1:
-/* still need sample media for this case (only one game, "Legend of 
+/* still need sample media for this case (only one game, "Legend of
  * Kyrandia III : Malcolm's Revenge", is known to use this version) */
-                lines = 0;
+                lobyte = s->decode_buffer[lobytes * 2];
+                hibyte = s->decode_buffer[(lobytes * 2) + 1];
+                vector_index = ((hibyte << 8) | lobyte) >> 3;
+                vector_index <<= index_shift;
+                lines = s->vector_height;
+                /* uniform color fill - a quick hack */
+                if (hibyte == 0xFF) {
+                    while (lines--) {
+                        s->frame.data[0][pixel_ptr + 0] = 255 - lobyte;
+                        s->frame.data[0][pixel_ptr + 1] = 255 - lobyte;
+                        s->frame.data[0][pixel_ptr + 2] = 255 - lobyte;
+                        s->frame.data[0][pixel_ptr + 3] = 255 - lobyte;
+                        pixel_ptr += s->frame.linesize[0];
+                    }
+                    lines=0;
+                }
                 break;
 
             case 2:
@@ -514,7 +516,7 @@ static void vqa_decode_chunk(VqaContext *s)
 
     if (cbp0_chunk != -1) {
 
-        chunk_size = BE_32(&s->buf[cbp0_chunk + 4]);
+        chunk_size = AV_RB32(&s->buf[cbp0_chunk + 4]);
         cbp0_chunk += CHUNK_PREAMBLE_SIZE;
 
         /* accumulate partial codebook */
@@ -526,7 +528,7 @@ static void vqa_decode_chunk(VqaContext *s)
         if (s->partial_countdown == 0) {
 
             /* time to replace codebook */
-            memcpy(s->codebook, s->next_codebook_buffer, 
+            memcpy(s->codebook, s->next_codebook_buffer,
                 s->next_codebook_buffer_index);
 
             /* reset accounting */
@@ -537,7 +539,7 @@ static void vqa_decode_chunk(VqaContext *s)
 
     if (cbpz_chunk != -1) {
 
-        chunk_size = BE_32(&s->buf[cbpz_chunk + 4]);
+        chunk_size = AV_RB32(&s->buf[cbpz_chunk + 4]);
         cbpz_chunk += CHUNK_PREAMBLE_SIZE;
 
         /* accumulate partial codebook */
@@ -549,8 +551,8 @@ static void vqa_decode_chunk(VqaContext *s)
         if (s->partial_countdown == 0) {
 
             /* decompress codebook */
-            decode_format80(s->next_codebook_buffer, 
-                s->next_codebook_buffer_index, 
+            decode_format80(s->next_codebook_buffer,
+                s->next_codebook_buffer_index,
                 s->codebook, s->codebook_size, 0);
 
             /* reset accounting */
@@ -562,9 +564,9 @@ static void vqa_decode_chunk(VqaContext *s)
 
 static int vqa_decode_frame(AVCodecContext *avctx,
                             void *data, int *data_size,
-                            uint8_t *buf, int buf_size)
+                            const uint8_t *buf, int buf_size)
 {
-    VqaContext *s = (VqaContext *)avctx->priv_data;
+    VqaContext *s = avctx->priv_data;
 
     s->buf = buf;
     s->size = buf_size;
@@ -590,9 +592,9 @@ static int vqa_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int vqa_decode_end(AVCodecContext *avctx)
+static av_cold int vqa_decode_end(AVCodecContext *avctx)
 {
-    VqaContext *s = (VqaContext *)avctx->priv_data;
+    VqaContext *s = avctx->priv_data;
 
     av_free(s->codebook);
     av_free(s->next_codebook_buffer);
@@ -614,4 +616,5 @@ AVCodec vqa_decoder = {
     vqa_decode_end,
     vqa_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Westwood Studios VQA (Vector Quantized Animation) video"),
 };
