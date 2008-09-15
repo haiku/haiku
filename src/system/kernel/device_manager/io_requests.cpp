@@ -1224,7 +1224,7 @@ get_caller()
 	// this makes certain assumptions about how the code for the functions
 	// ends up in the kernel object.
 	addr_t returnAddresses[5];
-	int32 depth = arch_debug_get_stack_trace(returnAddresses, 5, 1, false);
+	int32 depth = arch_debug_get_stack_trace(returnAddresses, 5, 0, 1, false);
 
 	// find the first return address inside the VIP allocator
 	int32 i = 0;

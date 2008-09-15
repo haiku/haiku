@@ -286,8 +286,9 @@ arch_debug_get_caller(void)
 
 int32
 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
-	int32 skipFrames, bool userOnly)
+	int32 skipIframes, int32 skipFrames, bool userOnly)
 {
+// TODO: Support skipIframes!
 	struct iframe_stack *frameStack;
 	addr_t framePointer;
 	int32 count = 0;

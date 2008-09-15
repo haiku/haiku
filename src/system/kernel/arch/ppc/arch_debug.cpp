@@ -286,6 +286,15 @@ arch_debug_get_caller(void)
 }
 
 
+int32
+arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
+	int32 skipIframes, int32 skipFrames, bool userOnly)
+{
+	// TODO: Implement!
+	return 0;
+}
+
+
 void*
 arch_debug_get_interrupt_pc()
 {

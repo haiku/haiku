@@ -1158,7 +1158,8 @@ capture_tracing_stack_trace(int32 maxCount, int32 skipFrames, bool userOnly)
 
 	if (stackTrace != NULL) {
 		stackTrace->depth = arch_debug_get_stack_trace(
-			stackTrace->return_addresses, maxCount, skipFrames + 1, userOnly);
+			stackTrace->return_addresses, maxCount, 0, skipFrames + 1,
+			userOnly);
 	}
 
 	return stackTrace;
