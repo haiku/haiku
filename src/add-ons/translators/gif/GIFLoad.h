@@ -31,7 +31,7 @@ const int gl_increment_pass_by[] = {8, 8, 4, 2, 0};
 
 class GIFLoad {
 	public:
-		GIFLoad(BPositionIO *input, BPositionIO *output);
+		GIFLoad(BPositionIO *fInput, BPositionIO *fOutput);
 		~GIFLoad();
 		bool fatalerror;
 		
@@ -53,50 +53,50 @@ class GIFLoad {
 		void MemblockDeleteAll();
 
 		inline bool OutputColor(unsigned char *string, int size) {
-			int bpr = width << 2;
+			int bpr = fWidth << 2;
 			
 			for (int x = 0; x < size; x++) {
-				scanline[scanline_position] = palette->ColorForIndex(string[x]);
-				scanline_position++;
+				fScanLine[fScanlinePosition] = fPalette->ColorForIndex(string[x]);
+				fScanlinePosition++;
 				
-				if (scanline_position >= width) {
-					if (output->WriteAt(32 + (row * bpr), scanline, bpr) < bpr) return false;
-					scanline_position = 0;
-					if (interlaced) {
-						row += gl_increment_pass_by[pass];
-						while (row >= height) {
-							pass++;
-							if (pass > 3) return true;
-							row = gl_pass_starts_at[pass];
+				if (fScanlinePosition >= fWidth) {
+					if (fOutput->WriteAt(32 + (fRow * bpr), fScanLine, bpr) < bpr) return false;
+					fScanlinePosition = 0;
+					if (fInterlaced) {
+						fRow += gl_increment_pass_by[fPass];
+						while (fRow >= fHeight) {
+							fPass++;
+							if (fPass > 3) return true;
+							fRow = gl_pass_starts_at[fPass];
 						}
-					} else row++;
+					} else fRow++;
 				}
 			}
 			return true;
 		}
 		
-		BPositionIO *input, *output;
-		LoadPalette *palette;
-		bool interlaced;
-		int pass, row, width, height;
+		BPositionIO *fInput, *fOutput;
+		LoadPalette *fPalette;
+		bool fInterlaced;
+		int fPass, fRow, fWidth, fHeight;
 		
-		unsigned char old_code[4096];
-		int old_code_length;
-		short new_code;
-		int BITS, max_code, code_size;
-		short clear_code, end_code, next_code;
+		unsigned char fOldCode[4096];
+		int fOldCodeLength;
+		short fNewCode;
+		int fBits, fMaxCode, fCodeSize;
+		short fClearCode, fEndCode, fNextCode;
 		
-		unsigned char *table[4096];
-		short entry_size[4096];
-		Memblock *head_memblock;
+		unsigned char *fTable[4096];
+		short fEntrySize[4096];
+		Memblock *fHeadMemblock;
 		
-		int bit_count;
-		unsigned int bit_buffer;
-		unsigned char byte_count;
-		unsigned char byte_buffer[255];
+		int fBitCount;
+		unsigned int fBitBuffer;
+		unsigned char fByteCount;
+		unsigned char fByteBuffer[255];
 
-		uint32 *scanline;
-		int scanline_position;
+		uint32 *fScanLine;
+		int fScanlinePosition;
 };
 
 #endif
