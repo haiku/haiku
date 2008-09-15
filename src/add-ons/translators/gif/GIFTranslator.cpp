@@ -186,20 +186,18 @@ Translate(BPositionIO *inSource, const translator_info *inInfo,
 	bigtime_t now = system_time();
 	// Going from BBitmap to GIF
 	if (!is_gif) {
-		BBitmap **b = (BBitmap **)malloc(4);
-		*b = NULL;
-		err = GetBitmap(inSource, b);
-		if (err != B_OK) return err;
-		GIFSave *gs = new GIFSave(*b, outDestination);
+		BBitmap *bitmap = NULL;
+		err = GetBitmap(inSource, &bitmap);
+		if (err != B_OK)
+			return err;
+		GIFSave *gs = new GIFSave(bitmap, outDestination);
 		if (gs->fatalerror) {
 			delete gs;
-			if (*b != NULL) delete *b;
-			delete b;
+			delete bitmap;
 			return B_NO_MEMORY;
 		}
 		delete gs;
-		delete *b;
-		delete b;
+		delete bitmap;
 	} else { // GIF to BBitmap
 		GIFLoad *gl = new GIFLoad(inSource, outDestination);
 		if (gl->fatalerror) {
