@@ -22,7 +22,9 @@
 
 extern bool debug;
 
-GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output) {
+
+GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output)
+{
 	fInput = input;
 	fOutput = output;
 	Init();
@@ -90,7 +92,10 @@ GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output) {
 	if (debug) printf("GIFLoad::GIFLoad() - Done\n");
 }
 
-void GIFLoad::Init() {
+
+void
+GIFLoad::Init()
+{
 	fatalerror = false;
 	fScanLine = NULL;
 	fPalette = NULL;
@@ -98,7 +103,10 @@ void GIFLoad::Init() {
 	fHeadMemblock = NULL;
 }
 
-bool GIFLoad::ReadGIFHeader() {
+
+bool
+GIFLoad::ReadGIFHeader()
+{
 	// Standard header
 	unsigned char header[13];
 	if (fInput->Read(header, 13) < 13) return false;
@@ -131,7 +139,10 @@ bool GIFLoad::ReadGIFHeader() {
 	return true;
 }
 
-bool GIFLoad::ReadGIFLoopBlock() {
+
+bool
+GIFLoad::ReadGIFLoopBlock()
+{
 	unsigned char length;
 	if (fInput->Read(&length, 1) < 1) return false;
 	fInput->Seek(length, SEEK_CUR);
@@ -146,7 +157,10 @@ bool GIFLoad::ReadGIFLoopBlock() {
 	return true;
 }
 
-bool GIFLoad::ReadGIFControlBlock() {
+
+bool
+GIFLoad::ReadGIFControlBlock()
+{
 	unsigned char data[6];
 	if (fInput->Read(data, 6) < 6) return false;
 	if (data[1] & 0x01) {
@@ -157,7 +171,10 @@ bool GIFLoad::ReadGIFControlBlock() {
 	return true;
 }
 
-bool GIFLoad::ReadGIFCommentBlock() {
+
+bool 
+GIFLoad::ReadGIFCommentBlock() 
+{
 	if (debug) printf("GIFLoad::ReadGIFCommentBlock() - Found:\n");
 	unsigned char length;
 	char comment_data[256];
@@ -171,7 +188,10 @@ bool GIFLoad::ReadGIFCommentBlock() {
 	return true;
 }
 
-bool GIFLoad::ReadGIFUnknownBlock(unsigned char c) {
+
+bool 
+GIFLoad::ReadGIFUnknownBlock(unsigned char c) 
+{
 	if (debug) printf("GIFLoad::ReadGIFUnknownBlock() - Found: %d\n", c);
 	unsigned char length;
 	do {
@@ -181,7 +201,10 @@ bool GIFLoad::ReadGIFUnknownBlock(unsigned char c) {
 	return true;
 }
 
-bool GIFLoad::ReadGIFImageHeader() {
+
+bool 
+GIFLoad::ReadGIFImageHeader() 
+{
 	unsigned char data[9];
 	if (fInput->Read(data, 9) < 9) return false;
 	
@@ -237,7 +260,10 @@ bool GIFLoad::ReadGIFImageHeader() {
 	return true;
 }
 
-bool GIFLoad::ReadGIFImageData() {
+
+bool
+GIFLoad::ReadGIFImageData() 
+{
 	unsigned char new_entry[4096];
 	
 	unsigned char cs;
@@ -331,7 +357,10 @@ bad_end:
 	return false;
 }
 
-short GIFLoad::NextCode() {
+
+short 
+GIFLoad::NextCode() 
+{
 	while (fBitCount < fBits) {
 		if (fByteCount == 0) {
 			if (fInput->Read(&fByteCount, 1) < 1) return -1;
@@ -349,7 +378,10 @@ short GIFLoad::NextCode() {
 	return s;
 }
 
-void GIFLoad::ResetTable() {
+
+void 
+GIFLoad::ResetTable() 
+{
 	fBits = fCodeSize + 1;
 	fNextCode = fClearCode + 2;
 	fMaxCode = (1 << fBits) - 1;
@@ -365,7 +397,10 @@ void GIFLoad::ResetTable() {
 	}
 }
 
-bool GIFLoad::InitFrame(int size) {
+
+bool 
+GIFLoad::InitFrame(int size) 
+{
 	fCodeSize = size;
 	if (fCodeSize == 1) fCodeSize++;
 	fBits = fCodeSize + 1;
@@ -388,9 +423,12 @@ bool GIFLoad::InitFrame(int size) {
 	return true;
 }
 
+
 // Do 4k mallocs, keep them in a linked list, do a first fit across them
 // when a new request comes along
-uchar *GIFLoad::MemblockAllocate(int size) {
+uchar *
+GIFLoad::MemblockAllocate(int size) 
+{
 	if (fHeadMemblock == NULL) {
 		fHeadMemblock = new Memblock();
 		uchar *value = fHeadMemblock->data;
@@ -419,8 +457,11 @@ uchar *GIFLoad::MemblockAllocate(int size) {
 	}
 }
 
+
 // Delete the linked list
-void GIFLoad::MemblockDeleteAll() {
+void 
+GIFLoad::MemblockDeleteAll() 
+{
 	Memblock *block = NULL;
 	while (fHeadMemblock != NULL) {
 		block = fHeadMemblock->next;
@@ -429,7 +470,9 @@ void GIFLoad::MemblockDeleteAll() {
 	}
 }
 
-GIFLoad::~GIFLoad() {
+
+GIFLoad::~GIFLoad() 
+{
 	delete fPalette;
 }
 
