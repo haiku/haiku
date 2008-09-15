@@ -49,7 +49,8 @@ GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output)
 			} else {
 				if (debug) printf("GIFLoad::GIFLoad() - Found a single image and leaving\n");
 			}
-			if (fScanLine != NULL) free(fScanLine);
+			free(fScanLine);
+			fScanLine = NULL;
 			return;
 		} else if (c == 0x21) {
 			unsigned char d;
