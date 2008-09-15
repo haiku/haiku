@@ -23,6 +23,21 @@
 #include "TextInput.h"
 
 
+//#define TRACE_TEXT_CONTROL
+#ifdef TRACE_TEXT_CONTROL
+#	include <FunctionTracer.h>
+	static int32 sFunctionDepth = -1;
+#	define CALLED(x...)	FunctionTracer _ft("BMenuField", __FUNCTION__, \
+							sFunctionDepth)
+#	define TRACE(x...)	{ BString _to; \
+							_to.Append(' ', (sFunctionDepth + 1) * 2); \
+							printf("%s", _to.String()); printf(x); }
+#else
+#	define CALLED(x...)
+#	define TRACE(x...)
+#endif
+
+
 class BTextControl::LabelLayoutItem : public BAbstractLayoutItem {
 public:
 								LabelLayoutItem(BTextControl* parent);
@@ -83,8 +98,7 @@ BTextControl::BTextControl(BRect frame, const char* name, const char* label,
 
 BTextControl::BTextControl(const char* name, const char* label,
 		const char* text, BMessage* message, uint32 flags)
-	: BControl(BRect(0, 0, -1, -1), name, label, message, B_FOLLOW_NONE,
-		flags | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+	: BControl(name, label, message, flags | B_FRAME_EVENTS)
 {
 	_InitData(label, text);
 	_ValidateLayout();
@@ -93,8 +107,8 @@ BTextControl::BTextControl(const char* name, const char* label,
 
 BTextControl::BTextControl(const char* label, const char* text,
 		BMessage* message)
-	: BControl(BRect(0, 0, -1, -1), NULL, label, message, B_FOLLOW_NONE,
-		B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+	: BControl(NULL, label, message,
+		B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS)
 {
 	_InitData(label, text);
 	_ValidateLayout();
@@ -171,6 +185,8 @@ BTextControl::SetText(const char *text)
 {
 	if (InvokeKind() != B_CONTROL_INVOKED)
 		return;
+
+	CALLED();
 
 	fText->SetText(text);
 
@@ -459,21 +475,19 @@ BTextControl::ResizeToPreferred()
 void
 BTextControl::SetFlags(uint32 flags)
 {
-	if (!fSkipSetFlags) {
-		// If the textview is navigable, set it to not navigable if needed
-		// Else if it is not navigable, set it to navigable if needed
-		if (fText->Flags() & B_NAVIGABLE) {
-			if (!(flags & B_NAVIGABLE))
-				fText->SetFlags(fText->Flags() & ~B_NAVIGABLE);
+	// If the textview is navigable, set it to not navigable if needed
+	// Else if it is not navigable, set it to navigable if needed
+	if (fText->Flags() & B_NAVIGABLE) {
+		if (!(flags & B_NAVIGABLE))
+			fText->SetFlags(fText->Flags() & ~B_NAVIGABLE);
 
-		} else {
-			if (flags & B_NAVIGABLE)
-				fText->SetFlags(fText->Flags() | B_NAVIGABLE);
-		}
-
-		// Don't make this one navigable
-		flags &= ~B_NAVIGABLE;
+	} else {
+		if (flags & B_NAVIGABLE)
+			fText->SetFlags(fText->Flags() | B_NAVIGABLE);
 	}
+
+	// Don't make this one navigable
+	flags &= ~B_NAVIGABLE;
 
 	BView::SetFlags(flags);
 }
@@ -565,6 +579,8 @@ BTextControl::FrameMoved(BPoint newPosition)
 void
 BTextControl::FrameResized(float width, float height)
 {
+	CALLED();
+
 	BControl::FrameResized(width, height);
 
 	// changes in width
@@ -602,6 +618,8 @@ BTextControl::FrameResized(float width, float height)
 
 	fPreviousWidth = uint16(bounds.Width());
 	fPreviousHeight = uint16(bounds.Height());
+
+	TRACE("width: %.2f, height: %.2f\n", bounds.Width(), bounds.Height());
 }
 
 
@@ -709,7 +727,6 @@ BTextControl::_InitData(const char* label, const char* initialText,
 	fPreviousHeight = bounds.Height();
 	fLabelLayoutItem = NULL;
 	fTextViewLayoutItem = NULL;
-	fSkipSetFlags = false;
 
 	int32 flags = 0;
 
@@ -728,11 +745,8 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		fDivider = floorf(bounds.Width() / 2.0f);
 
 	uint32 navigableFlags = Flags() & B_NAVIGABLE;
-	if (navigableFlags != 0) {
-		fSkipSetFlags = true;
-		SetFlags(Flags() & ~B_NAVIGABLE);
-		fSkipSetFlags = false;
-	}
+	if (navigableFlags != 0)
+		BView::SetFlags(Flags() & ~B_NAVIGABLE);
 
 	if (archive)
 		fText = static_cast<BPrivate::_BTextInput_*>(FindView("_input_"));
@@ -745,8 +759,7 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		BRect textRect(frame.OffsetToCopy(B_ORIGIN));
 
 		fText = new BPrivate::_BTextInput_(frame, textRect,
-			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-			B_WILL_DRAW | B_FRAME_EVENTS | navigableFlags);
+			B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | navigableFlags);
 		AddChild(fText);
 
 		SetText(initialText);
@@ -759,6 +772,8 @@ BTextControl::_InitData(const char* label, const char* initialText,
 void
 BTextControl::_ValidateLayout()
 {
+	CALLED();
+
 	float height;
 	BTextControl::GetPreferredSize(NULL, &height);
 
@@ -773,6 +788,8 @@ BTextControl::_ValidateLayout()
 void
 BTextControl::_LayoutTextView()
 {
+	CALLED();
+
 	BRect frame = Bounds();
 	frame.left = fDivider;
 	// we are stroking the frame around the text view, which
@@ -781,6 +798,11 @@ BTextControl::_LayoutTextView()
 	fText->MoveTo(frame.left, frame.top);
 	fText->ResizeTo(frame.Width(), frame.Height());
 	fText->AlignTextRect();
+
+	TRACE("width: %.2f, height: %.2f\n", Frame().Width(), Frame().Height());
+	TRACE("fDivider: %.2f\n", fDivider);
+	TRACE("fText frame: (%.2f, %.2f, %.2f, %.2f)\n",
+		frame.left, frame.top, frame.right, frame.bottom);
 }
 
 

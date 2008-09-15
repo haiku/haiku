@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_TEXT_CONTROL_H
@@ -15,114 +15,111 @@ class _BTextInput_;
 }
 
 class BTextControl : public BControl {
-	public:
-							BTextControl(BRect frame, const char* name,
-								const char* label, const char* initialText,
-								BMessage* message,
-								uint32 resizeMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-								uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
-							BTextControl(const char* name,
-								const char* label, const char* initialText,
-								BMessage* message,
-								uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
-							BTextControl(const char* label,
-								const char* initialText,
-								BMessage* message); 
-		virtual				~BTextControl();
+public:
+								BTextControl(BRect frame, const char* name,
+									const char* label, const char* initialText,
+									BMessage* message,
+									uint32 resizeMode
+										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+								BTextControl(const char* name,
+									const char* label, const char* initialText,
+									BMessage* message,
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+								BTextControl(const char* label,
+									const char* initialText,
+									BMessage* message); 
+	virtual						~BTextControl();
 
-							BTextControl(BMessage* archive);
-		static BArchivable*	Instantiate(BMessage* archive);
-		virtual	status_t	Archive(BMessage* archive, bool deep = true) const;
+								BTextControl(BMessage* archive);
+	static	BArchivable*		Instantiate(BMessage* archive);
+	virtual	status_t			Archive(BMessage* archive,
+									bool deep = true) const;
 
-		virtual	void		SetText(const char* text);
-		const char*			Text() const;
+	virtual	void				SetText(const char* text);
+			const char*			Text() const;
 
-		virtual	void		SetValue(int32 value);
-		virtual	status_t	Invoke(BMessage* message = NULL);
+	virtual	void				SetValue(int32 value);
+	virtual	status_t			Invoke(BMessage* message = NULL);
 
-		BTextView*			TextView() const;
+			BTextView*			TextView() const;
 
-		virtual	void		SetModificationMessage(BMessage* message);
-		BMessage*			ModificationMessage() const;
+	virtual	void				SetModificationMessage(BMessage* message);
+			BMessage*			ModificationMessage() const;
 
-		virtual	void		SetAlignment(alignment label, alignment text);
-		void				GetAlignment(alignment* _label, alignment* _text) const;
-		virtual	void		SetDivider(float position);
-		float				Divider() const;
+	virtual	void				SetAlignment(alignment label, alignment text);
+			void				GetAlignment(alignment* _label,
+									alignment* _text) const;
+	virtual	void				SetDivider(float position);
+			float				Divider() const;
 
-		virtual	void		Draw(BRect updateRect);
-		virtual	void		MouseDown(BPoint where);
-		virtual	void		AttachedToWindow();
-		virtual	void		MakeFocus(bool focus = true);
-		virtual	void		SetEnabled(bool enabled);
-		virtual	void		FrameMoved(BPoint newPosition);
-		virtual	void		FrameResized(float newWidth, float newHeight);
-		virtual	void		WindowActivated(bool active);
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				AttachedToWindow();
+	virtual	void				MakeFocus(bool focus = true);
+	virtual	void				SetEnabled(bool enabled);
+	virtual	void				FrameMoved(BPoint newPosition);
+	virtual	void				FrameResized(float newWidth, float newHeight);
+	virtual	void				WindowActivated(bool active);
 
-		virtual	void		GetPreferredSize(float* _width, float* _height);
-		virtual	void		ResizeToPreferred();
+	virtual	void				GetPreferredSize(float* _width, float* _height);
+	virtual	void				ResizeToPreferred();
 
-		virtual void		MessageReceived(BMessage* message);
-		virtual BHandler*	ResolveSpecifier(BMessage* message, int32 index,
-								BMessage* specifier, int32 what,
-								const char* property);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
+									BMessage* specifier, int32 what,
+									const char* property);
 
-		virtual	void		MouseUp(BPoint point);
-		virtual	void		MouseMoved(BPoint point, uint32 transit,
-								const BMessage* dragMessage);
-		virtual	void		DetachedFromWindow();
+	virtual	void				MouseUp(BPoint point);
+	virtual	void				MouseMoved(BPoint point, uint32 transit,
+									const BMessage* dragMessage);
+	virtual	void				DetachedFromWindow();
 
-		virtual void		AllAttached();
-		virtual void		AllDetached();
-		virtual status_t	GetSupportedSuites(BMessage* data);
-		virtual void		SetFlags(uint32 flags);
+	virtual	void				AllAttached();
+	virtual	void				AllDetached();
+	virtual	status_t			GetSupportedSuites(BMessage* data);
+	virtual	void				SetFlags(uint32 flags);
 
-				BLayoutItem* CreateLabelLayoutItem();
-				BLayoutItem* CreateTextViewLayoutItem();
+			BLayoutItem*		CreateLabelLayoutItem();
+			BLayoutItem*		CreateTextViewLayoutItem();
 
-	private:
-		class LabelLayoutItem;
-		class TextViewLayoutItem;
+private:
+	class LabelLayoutItem;
+	class TextViewLayoutItem;
 
-		friend class _BTextInput_;
-		friend class LabelLayoutItem;
-		friend class TextViewLayoutItem;
+	friend class _BTextInput_;
+	friend class LabelLayoutItem;
+	friend class TextViewLayoutItem;
 
-		virtual status_t	Perform(perform_code d, void* arg);
+	virtual	status_t			Perform(perform_code d, void* arg);
 
-		virtual	void		_ReservedTextControl1();
-		virtual	void		_ReservedTextControl2();
-		virtual	void		_ReservedTextControl3();
-		virtual	void		_ReservedTextControl4();
+	virtual	void				_ReservedTextControl1();
+	virtual	void				_ReservedTextControl2();
+	virtual	void				_ReservedTextControl3();
+	virtual	void				_ReservedTextControl4();
 
-		BTextControl&		operator=(const BTextControl& other);
+			BTextControl&		operator=(const BTextControl& other);
 
-		void				_CommitValue();
-		void				_UpdateTextViewColors(bool enabled);
-		void				_InitData(const char* label, const char* initialText,
-								BMessage* archive = NULL);
-		void				_ValidateLayout();
-		void				_LayoutTextView();
-		void				_UpdateFrame();
+			void				_CommitValue();
+			void				_UpdateTextViewColors(bool enabled);
+			void				_InitData(const char* label, const char* initialText,
+									BMessage* archive = NULL);
+			void				_ValidateLayout();
+			void				_LayoutTextView();
+			void				_UpdateFrame();
 
-	private:
-		BPrivate::_BTextInput_* fText;
-		char*				fLabel;
-		BMessage*			fModificationMessage;
-		alignment			fLabelAlign;
-		float				fDivider;
-		float				fPreviousWidth;
-		float				fPreviousHeight;
-		BLayoutItem*		fLabelLayoutItem;
-		BLayoutItem*		fTextViewLayoutItem;
+private:
+			BPrivate::_BTextInput_* fText;
+			char*				fLabel;
+			BMessage*			fModificationMessage;
+			alignment			fLabelAlign;
+			float				fDivider;
+			float				fPreviousWidth;
+			float				fPreviousHeight;
+			BLayoutItem*		fLabelLayoutItem;
+			BLayoutItem*		fTextViewLayoutItem;
 
-		uint32				_reserved[4];
-
-		bool				fClean;
-		bool				fSkipSetFlags;
-
-		bool				_reserved1;
-		bool				_reserved2;
+			uint32				_reserved[5];
 };
 
 #endif	// _TEXT_CONTROL_H
