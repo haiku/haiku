@@ -2,20 +2,21 @@
  * Interplay MVE Video Decoder
  * Copyright (C) 2003 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
@@ -38,8 +39,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
+#include "bytestream.h"
 #include "dsputil.h"
 
 #define PALETTE_COUNT 256
@@ -47,7 +48,7 @@
 /* debugging support */
 #define DEBUG_INTERPLAY 0
 #if DEBUG_INTERPLAY
-#define debug_interplay printf
+#define debug_interplay(x,...) av_log(NULL, AV_LOG_DEBUG, x, __VA_ARGS__)
 #else
 static inline void debug_interplay(const char *format, ...) { }
 #endif
@@ -59,14 +60,14 @@ typedef struct IpvideoContext {
     AVFrame second_last_frame;
     AVFrame last_frame;
     AVFrame current_frame;
-    unsigned char *decoding_map;
+    const unsigned char *decoding_map;
     int decoding_map_size;
 
-    unsigned char *buf;
+    const unsigned char *buf;
     int size;
 
-    unsigned char *stream_ptr;
-    unsigned char *stream_end;
+    const unsigned char *stream_ptr;
+    const unsigned char *stream_end;
     unsigned char *pixel_ptr;
     int line_inc;
     int stride;
@@ -296,10 +297,8 @@ static int ipvideo_decode_block_opcode_0x7(IpvideoContext *s)
 
         /* need 2 more bytes from the stream */
         CHECK_STREAM_PTR(2);
-        B[0] = *s->stream_ptr++;
-        B[1] = *s->stream_ptr++;
 
-        flags = (B[1] << 8) | B[0];
+        flags = bytestream_get_le16(&s->stream_ptr);
         bitmask = 0x0001;
         for (y = 0; y < 8; y += 2) {
             for (x = 0; x < 8; x += 2, bitmask <<= 1) {
@@ -477,7 +476,6 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
 {
     int x, y;
     unsigned char P[4];
-    unsigned char B[4];
     unsigned int flags = 0;
     int shifter = 0;
     unsigned char pix;
@@ -495,8 +493,7 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
 
         for (y = 0; y < 8; y++) {
             /* get the next set of 8 2-bit flags */
-            flags = (s->stream_ptr[1] << 8) | s->stream_ptr[0];
-            s->stream_ptr += 2;
+            flags = bytestream_get_le16(&s->stream_ptr);
             for (x = 0, shifter = 0; x < 8; x++, shifter += 2) {
                 *s->pixel_ptr++ = P[(flags >> shifter) & 0x03];
             }
@@ -508,11 +505,7 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
         /* 1 of 4 colors for each 2x2 block, need 4 more bytes */
         CHECK_STREAM_PTR(4);
 
-        B[0] = *s->stream_ptr++;
-        B[1] = *s->stream_ptr++;
-        B[2] = *s->stream_ptr++;
-        B[3] = *s->stream_ptr++;
-        flags = (B[3] << 24) | (B[2] << 16) | (B[1] << 8) | B[0];
+        flags = bytestream_get_le32(&s->stream_ptr);
         shifter = 0;
 
         for (y = 0; y < 8; y += 2) {
@@ -534,11 +527,7 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
         for (y = 0; y < 8; y++) {
             /* time to reload flags? */
             if ((y == 0) || (y == 4)) {
-                B[0] = *s->stream_ptr++;
-                B[1] = *s->stream_ptr++;
-                B[2] = *s->stream_ptr++;
-                B[3] = *s->stream_ptr++;
-                flags = (B[3] << 24) | (B[2] << 16) | (B[1] << 8) | B[0];
+                flags = bytestream_get_le32(&s->stream_ptr);
                 shifter = 0;
             }
             for (x = 0; x < 8; x += 2, shifter += 2) {
@@ -557,11 +546,7 @@ static int ipvideo_decode_block_opcode_0x9(IpvideoContext *s)
         for (y = 0; y < 8; y += 2) {
             /* time to reload flags? */
             if ((y == 0) || (y == 4)) {
-                B[0] = *s->stream_ptr++;
-                B[1] = *s->stream_ptr++;
-                B[2] = *s->stream_ptr++;
-                B[3] = *s->stream_ptr++;
-                flags = (B[3] << 24) | (B[2] << 16) | (B[1] << 8) | B[0];
+                flags = bytestream_get_le32(&s->stream_ptr);
                 shifter = 0;
             }
             for (x = 0; x < 8; x++, shifter += 2) {
@@ -819,7 +804,6 @@ static void ipvideo_decode_opcodes(IpvideoContext *s)
     s->line_inc = s->stride - 8;
     s->upper_motion_limit_offset = (s->avctx->height - 8) * s->stride
         + s->avctx->width - 8;
-    s->dsp = s->dsp;
 
     for (y = 0; y < (s->stride * s->avctx->height); y += s->stride * 8) {
         for (x = y; x < y + s->avctx->width; x += 8) {
@@ -846,12 +830,12 @@ static void ipvideo_decode_opcodes(IpvideoContext *s)
     }
     if ((s->stream_ptr != s->stream_end) &&
         (s->stream_ptr + 1 != s->stream_end)) {
-        av_log(s->avctx, AV_LOG_ERROR, " Interplay video: decode finished with %d bytes left over\n",
+        av_log(s->avctx, AV_LOG_ERROR, " Interplay video: decode finished with %td bytes left over\n",
             s->stream_end - s->stream_ptr);
     }
 }
 
-static int ipvideo_decode_init(AVCodecContext *avctx)
+static av_cold int ipvideo_decode_init(AVCodecContext *avctx)
 {
     IpvideoContext *s = avctx->priv_data;
 
@@ -863,7 +847,6 @@ static int ipvideo_decode_init(AVCodecContext *avctx)
     }
 
     avctx->pix_fmt = PIX_FMT_PAL8;
-    avctx->has_b_frames = 0;
     dsputil_init(&s->dsp, avctx);
 
     /* decoding map contains 4 bits of information per 8x8 block */
@@ -895,7 +878,7 @@ static int ipvideo_decode_init(AVCodecContext *avctx)
 
 static int ipvideo_decode_frame(AVCodecContext *avctx,
                                 void *data, int *data_size,
-                                uint8_t *buf, int buf_size)
+                                const uint8_t *buf, int buf_size)
 {
     IpvideoContext *s = avctx->priv_data;
     AVPaletteControl *palette_control = avctx->palctrl;
@@ -936,7 +919,7 @@ static int ipvideo_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int ipvideo_decode_end(AVCodecContext *avctx)
+static av_cold int ipvideo_decode_end(AVCodecContext *avctx)
 {
     IpvideoContext *s = avctx->priv_data;
 
@@ -959,4 +942,5 @@ AVCodec interplay_video_decoder = {
     ipvideo_decode_end,
     ipvideo_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Interplay MVE Video"),
 };

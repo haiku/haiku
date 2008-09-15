@@ -1,27 +1,28 @@
 /*
- * Id Quake II CIN Video Decoder
+ * id Quake II CIN Video Decoder
  * Copyright (C) 2003 the ffmpeg project
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
  * @file idcinvideo.c
- * Id Quake II Cin Video Decoder by Dr. Tim Ferguson
- * For more information about the Id CIN format, visit:
+ * id Quake II Cin Video Decoder by Dr. Tim Ferguson
+ * For more information about the id CIN format, visit:
  *   http://www.csse.monash.edu.au/~timf/
  *
  * This video decoder outputs PAL8 colorspace data. Interacting with this
@@ -31,7 +32,7 @@
  * the demuxer must use the same extradata space to transmit an
  * AVPaletteControl structure.
  *
- * Id CIN video is purely Huffman-coded, intraframe-only codec. It achieves
+ * id CIN video is purely Huffman-coded, intraframe-only codec. It achieves
  * a little more compression by exploiting the fact that adjacent pixels
  * tend to be similar.
  *
@@ -48,9 +49,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
-#include "dsputil.h"
 
 #define HUFFMAN_TABLE_SIZE 64 * 1024
 #define HUF_TOKENS 256
@@ -66,10 +65,9 @@ typedef struct
 typedef struct IdcinContext {
 
     AVCodecContext *avctx;
-    DSPContext dsp;
     AVFrame frame;
 
-    unsigned char *buf;
+    const unsigned char *buf;
     int size;
 
     hnode_t huff_nodes[256][HUF_TOKENS*2];
@@ -115,7 +113,7 @@ static int huff_smallest_node(hnode_t *hnodes, int num_hnodes) {
  *  num_huff_nodes[prev] - contains the index to the root node of the tree.
  *    That is: huff_nodes[prev][num_huff_nodes[prev]] is the root node.
  */
-static void huff_build_tree(IdcinContext *s, int prev) {
+static av_cold void huff_build_tree(IdcinContext *s, int prev) {
     hnode_t *node, *hnodes;
      int num_hnodes, i;
 
@@ -145,20 +143,18 @@ static void huff_build_tree(IdcinContext *s, int prev) {
     s->num_huff_nodes[prev] = num_hnodes - 1;
 }
 
-static int idcin_decode_init(AVCodecContext *avctx)
+static av_cold int idcin_decode_init(AVCodecContext *avctx)
 {
-    IdcinContext *s = (IdcinContext *)avctx->priv_data;
+    IdcinContext *s = avctx->priv_data;
     int i, j, histogram_index = 0;
     unsigned char *histograms;
 
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
-    avctx->has_b_frames = 0;
-    dsputil_init(&s->dsp, avctx);
 
     /* make sure the Huffman tables make it */
     if (s->avctx->extradata_size != HUFFMAN_TABLE_SIZE) {
-        av_log(s->avctx, AV_LOG_ERROR, "  Id CIN video: expected extradata size of %d\n", HUFFMAN_TABLE_SIZE);
+        av_log(s->avctx, AV_LOG_ERROR, "  id CIN video: expected extradata size of %d\n", HUFFMAN_TABLE_SIZE);
         return -1;
     }
 
@@ -192,7 +188,7 @@ static void idcin_decode_vlcs(IdcinContext *s)
 
             while(node_num >= HUF_TOKENS) {
                 if(!bit_pos) {
-                    if(dat_pos > s->size) {
+                    if(dat_pos >= s->size) {
                         av_log(s->avctx, AV_LOG_ERROR, "Huffman decode error.\n");
                         return;
                     }
@@ -213,9 +209,9 @@ static void idcin_decode_vlcs(IdcinContext *s)
 
 static int idcin_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              uint8_t *buf, int buf_size)
+                              const uint8_t *buf, int buf_size)
 {
-    IdcinContext *s = (IdcinContext *)avctx->priv_data;
+    IdcinContext *s = avctx->priv_data;
     AVPaletteControl *palette_control = avctx->palctrl;
 
     s->buf = buf;
@@ -225,7 +221,7 @@ static int idcin_decode_frame(AVCodecContext *avctx,
         avctx->release_buffer(avctx, &s->frame);
 
     if (avctx->get_buffer(avctx, &s->frame)) {
-        av_log(avctx, AV_LOG_ERROR, "  Id CIN Video: get_buffer() failed\n");
+        av_log(avctx, AV_LOG_ERROR, "  id CIN Video: get_buffer() failed\n");
         return -1;
     }
 
@@ -246,9 +242,9 @@ static int idcin_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int idcin_decode_end(AVCodecContext *avctx)
+static av_cold int idcin_decode_end(AVCodecContext *avctx)
 {
-    IdcinContext *s = (IdcinContext *)avctx->priv_data;
+    IdcinContext *s = avctx->priv_data;
 
     if (s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);
@@ -266,5 +262,6 @@ AVCodec idcin_decoder = {
     idcin_decode_end,
     idcin_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("id Quake II CIN video"),
 };
 
