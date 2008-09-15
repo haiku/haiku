@@ -1365,9 +1365,10 @@ TReplicantTray::RealignReplicants(int32 startIndex)
 	BView *view = NULL;
 	for (int32 i = startIndex ; i < count ; i++){
 		fShelf->ReplicantAt(i, &view);
-		BPoint loc = LocationForReplicant(i, view->Frame().Width());
-		if (view && (view->Frame().LeftTop() != loc)) {
-			view->MoveTo(loc);
+		if (view != NULL) {
+			BPoint loc = LocationForReplicant(i, view->Frame().Width());
+			if (view->Frame().LeftTop() != loc)
+				view->MoveTo(loc);
 		}
 	}
 }
