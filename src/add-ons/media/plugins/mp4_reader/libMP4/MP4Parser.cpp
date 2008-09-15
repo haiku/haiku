@@ -1085,6 +1085,9 @@ void	ESDSAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 	uint32 buffer;
 	uint32 temp;
 
+	// remember where the tag 5 starts
+	uint32 extendedAudioConfig = offset;
+
 	switch (ESDSType) {
 		case 64:	// AAC
 		// Attempt to read AAC Header
@@ -1114,10 +1117,14 @@ void	ESDSAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 		// SampleRate is in 16.16 format
 		pAudioDescription->theAudioSampleEntry.SampleRate = aac_sampling_rate[theAACHeader.sampleRateIndex] * 65536 ;
 		pAudioDescription->theAudioSampleEntry.ChannelCount = theAACHeader.totalChannels;
+		
+		// Reset decoder Config memory
+		memcpy(pAudioDescription->theDecoderConfig, &pAudioDescription->theDecoderConfig[extendedAudioConfig], pAudioDescription->DecoderConfigSize-extendedAudioConfig+1);
+		
 		break;
 		
 		case 107:	// MP3
-			pAudioDescription->codecSubType = 'mp3';
+			pAudioDescription->codecSubType = '.mp3';
 			
 			// Only set this for mp3, we calc it normally
 			if (NeededBufferSize > pAudioDescription->BufferSize) {
@@ -1172,7 +1179,6 @@ WAVEAtom::~WAVEAtom()
 
 void WAVEAtom::OnProcessMetaData()
 {
-
 }
 
 char *WAVEAtom::OnGetAtomName()
@@ -1182,8 +1188,8 @@ char *WAVEAtom::OnGetAtomName()
 
 void WAVEAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 {
-	pAudioDescription->codecSubType = 'mp3';
-	pAudioDescription->FrameSize = 0;
+	pAudioDescription->codecSubType = '.mp3';
+	pAudioDescription->FrameSize = 1;
 }
 
 void	WAVEAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
@@ -1196,7 +1202,7 @@ STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, 
 	theHeader.NoEntries = 0;
 	theAudioDescription.codecid = 0;
 	theAudioDescription.codecSubType = 0;
-	theAudioDescription.FrameSize = 0;
+	theAudioDescription.FrameSize = 1;
 	theAudioDescription.BufferSize = 0;
 	theAudioDescription.BitRate = 0;
 	theAudioDescription.theDecoderConfig = NULL;

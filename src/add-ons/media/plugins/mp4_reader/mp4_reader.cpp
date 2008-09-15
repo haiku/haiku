@@ -47,7 +47,6 @@
 
 #define ERROR(a...) fprintf(stderr, a)
 
-
 struct mp4_cookie {
 	unsigned	stream;
 	char *		buffer;
@@ -72,7 +71,6 @@ struct mp4_cookie {
 	uint32		frames_per_sec_scale;
 	uint32		frame_size;
 };
-
 
 mp4Reader::mp4Reader()
  :	theFileReader(0)
@@ -140,7 +138,6 @@ mp4Reader::GetFileFormatInfo(media_file_format *mff)
 	strcpy(mff->pretty_name, "MPEG-4 (MP4) file format");
 }
 
-
 status_t
 mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 {
@@ -184,11 +181,11 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			delete cookie;
 			return B_ERROR;
 		}
-		codecID = B_BENDIAN_TO_HOST_INT32(audio_format->compression);
 
 		// frame_count is actually sample_count for audio - makes media_player happy but david sad
 		cookie->frame_count = theFileReader->getFrameCount(cookie->stream) * audio_format->FrameSize;
 		cookie->duration = theFileReader->getAudioDuration(cookie->stream);
+		cookie->frame_size = audio_format->FrameSize;
 
 		cookie->audio = true;
 
@@ -225,6 +222,8 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			|| audio_format->compression == AUDIO_RAW
 			|| audio_format->compression == AUDIO_TWOS1
 			|| audio_format->compression == AUDIO_TWOS2) {
+			
+			codecID = B_BENDIAN_TO_HOST_INT32(audio_format->compression);
 			description.family = B_BEOS_FORMAT_FAMILY;
 			description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
 			if (B_OK != formats.GetFormatFor(description, format))
@@ -267,13 +266,21 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 
 			format->u.raw_audio.buffer_size = stream_header->suggested_buffer_size;
 		} else {
+			printf("codecid %s codecsubtype %s\n",&audio_format->compression,&audio_format->codecSubType);
+		
 			description.family = B_QUICKTIME_FORMAT_FAMILY;
-			description.u.quicktime.codec = audio_format->compression;
+			
+			if (audio_format->codecSubType != 0) {
+				codecID = audio_format->codecSubType;
+			} else {
+				codecID = audio_format->compression;
+			}
+			description.u.quicktime.codec = codecID;
 			if (B_OK != formats.GetFormatFor(description, format)) {
 				format->type = B_MEDIA_ENCODED_AUDIO;
 			}
 			
-			switch (audio_format->compression) {
+			switch (description.u.quicktime.codec) {
 				case AUDIO_MS_PCM02:
 					TRACE("MS PCM02\n");
 					format->u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
@@ -288,15 +295,28 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
 					break;
 				case AUDIO_MPEG3_CBR:
+				case '.mp3':
 					TRACE("MP3\n");
 					format->u.encoded_audio.bit_rate = 8 * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
 					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
 					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
+					format->u.encoded_audio.output.buffer_size = audio_format->BufferSize;
+					
+					format->u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_SHORT;
+					format->u.encoded_audio.output.byte_order =	B_HOST_IS_LENDIAN ? B_MEDIA_LITTLE_ENDIAN : B_MEDIA_BIG_ENDIAN;
+
+					TRACE("Audio NoOfChannels %d, SampleSize %d, SampleRate %f, FrameSize %ld\n",audio_format->NoOfChannels, audio_format->SampleSize, audio_format->SampleRate, audio_format->FrameSize);
+
+					TRACE("Audio frame_rate %f, channel_count %ld, format %ld, buffer_size %ld, frame_size %ld, bit_rate %f\n",
+						format->u.encoded_audio.output.frame_rate, format->u.encoded_audio.output.channel_count, format->u.encoded_audio.output.format,format->u.encoded_audio.output.buffer_size, format->u.encoded_audio.frame_size, format->u.encoded_audio.bit_rate);
+
+					TRACE("Track %d MP4 Audio FrameCount %ld Duration %Ld\n",cookie->stream,theFileReader->getFrameCount(cookie->stream),cookie->duration);
 					break;
 				case 'mp4a':
-					codecID = B_BENDIAN_TO_HOST_INT32('aac ');
+					codecID = 'aac ';
+				case 'aac ':
 				case 'alac':
-					TRACE("AAC audio (mp4a) or ALAC audio\n");
+					TRACE("AAC audio or ALAC audio\n");
 		
 					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
 					
@@ -309,8 +329,6 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 					// ALAC is 4096 samples per frame
 
 					format->u.encoded_audio.frame_size = audio_format->FrameSize;
-					cookie->frame_size = audio_format->FrameSize;
-					
 					format->u.encoded_audio.output.buffer_size = audio_format->BufferSize;
 			
 					// Average BitRate = (TotalBytes * 8 * (SampleRate / FrameSize)) / TotalFrames
@@ -338,11 +356,12 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 					format->u.encoded_audio.bit_rate = 8 * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
 					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
 					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
+					format->u.encoded_audio.output.buffer_size = audio_format->BufferSize;
 					break;
 			}
 		}
 
-		// Set the DecoderConfigSize
+		// Set the DecoderConfig
 		size = audio_format->DecoderConfigSize;
 		data = audio_format->theDecoderConfig;
 		if (size > 0) {
@@ -357,8 +376,8 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 #ifdef TRACE_MP4_READER
 		if (data) {
 			uint8 *p = (uint8 *)data;
-			TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-				size , p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
+			TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+				size , p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15], p[16], p[17]);
 		}
 #endif
 	
@@ -533,6 +552,8 @@ mp4Reader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 		} else {
 			ERROR("No stream Info for stream %d\n",cookie->stream);
 		}
+		
+		TRACE("GetStreamInfo (%d) fc %Ld duration %Ld extra %ld\n",cookie->stream,*frameCount,*duration,*infoSize);
 	}
 	return B_OK;
 }
