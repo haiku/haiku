@@ -1,6 +1,6 @@
 /******************************************************************************
 /
-/	File:			ffutils.h
+/	File:			gfx_util.h
 /
 /	Description:	utility functions for ffmpeg codec wrappers for BeOs R5.
 /
@@ -18,7 +18,9 @@
 
 // BeOS and libavcodec bitmap formats
 #include <GraphicsDefs.h>
-#include "libavcodec/avcodec.h"
+extern "C" {
+	#include "libavcodec/avcodec.h"
+}
 
 // this function will be used by the wrapper to write into
 // the Media Kit provided buffer from the self-allocated ffmpeg codec buffer

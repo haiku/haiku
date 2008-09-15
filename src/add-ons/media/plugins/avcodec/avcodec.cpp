@@ -13,17 +13,16 @@
 #include <OS.h>
 #include <Bitmap.h>
 #include <string.h>
+
 #include "avcodec.h"
 
-
 #undef TRACE
-//#define TRACE_AV_CODEC
+#define TRACE_AV_CODEC
 #ifdef TRACE_AV_CODEC
 #	define TRACE(x...)	printf(x)
 #else
 #	define TRACE(x...)
 #endif
-
 
 struct wave_format_ex {
 	uint16 format_tag;
@@ -57,7 +56,7 @@ avCodec::avCodec()
 		fBlockAlign(0),
 		fOutputBuffer(0)
 {
-	TRACE("[%c] avCodec::avCodec()\n", isAudio?('a'):('v'));
+	TRACE("avCodec::avCodec()\n");
 
 	// prevent multiple inits
 	static volatile vint32 ff_init_count = 0;
@@ -113,6 +112,7 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 		return B_ERROR;
 		
 	isAudio = (ioEncodedFormat->type == B_MEDIA_ENCODED_AUDIO);
+	TRACE("[%c] avCodec::Setup()\n", isAudio?('a'):('v'));
 
 	if (isAudio && !fOutputBuffer)
 		fOutputBuffer = new char[100000];
@@ -185,6 +185,13 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 							memcpy(fExtraData, wfmt_data + 1, fExtraDataSize);
 						}
 					}
+				} else {
+					TRACE("avCodec: extra data size %ld\n",infoSize);
+					fExtraDataSize = infoSize;
+					if (fExtraDataSize) {
+						fExtraData = new char [fExtraDataSize];
+						memcpy(fExtraData, infoBuffer, fExtraDataSize);
+					}
 				}
 
 				fInputFormat = *ioEncodedFormat;
@@ -216,8 +223,10 @@ avCodec::Seek(uint32 in_towhat,int64 in_requiredFrame, int64 *inout_frame,
 status_t
 avCodec::NegotiateOutputFormat(media_format *inout_format)
 {
-	TRACE("[%c] avCodec::Format()\n", isAudio?('a'):('v'));
+	TRACE("[%c] avCodec::NegotiateOutputFormat()\n", isAudio?('a'):('v'));
 
+	int result;
+	
 #if DEBUG
 	char buffer[1024];
 	string_for_format(*inout_format, buffer, sizeof(buffer));
@@ -242,7 +251,7 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		ffc->sample_rate = (int) fInputFormat.u.encoded_audio.output.frame_rate;
 		ffc->channels = fInputFormat.u.encoded_audio.output.channel_count;
 		ffc->block_align = fBlockAlign;
-		ffc->extradata = fExtraData;
+		ffc->extradata = (uint8_t *)fExtraData;
 		ffc->extradata_size = fExtraDataSize;
 
 		TRACE("bit_rate %d, sample_rate %d, channels %d, block_align %d, "
@@ -256,11 +265,11 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		}
 
 		// open new
-		if (avcodec_open(ffc, fCodec) >= 0)
-			fCodecInitDone = true;
+		result = avcodec_open(ffc, fCodec);
+		fCodecInitDone = (result >= 0);
 
-		TRACE("audio: bit_rate = %d, sample_rate = %d, chans = %d\n",
-			ffc->bit_rate, ffc->sample_rate, ffc->channels);
+		TRACE("audio: bit_rate = %d, sample_rate = %d, chans = %d Init = %d\n",
+			ffc->bit_rate, ffc->sample_rate, ffc->channels, result);
 
 		fStartTime = 0;
 		fOutputFrameSize = 2 * outputAudioFormat.channel_count;
@@ -275,7 +284,12 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		inout_format->require_flags = 0;
 		inout_format->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 
-		return fCodecInitDone ? B_OK : B_ERROR;
+		if (!fCodecInitDone) {
+			TRACE("avcodec_open() failed!\n");
+			return B_ERROR;
+		}
+
+		return B_OK;
 
 	} else {	// VIDEO
 
@@ -283,11 +297,11 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 
 		ffc->width = fOutputVideoFormat.display.line_width;
 		ffc->height = fOutputVideoFormat.display.line_count;
-		ffc->frame_rate = (int)(fOutputVideoFormat.field_rate
-			* ffc->frame_rate_base);
+//		ffc->frame_rate = (int)(fOutputVideoFormat.field_rate
+//			* ffc->frame_rate_base);
 		
 		if (fInputFormat.MetaDataSize() > 0) {
-			ffc->extradata = (void *)fInputFormat.MetaData();
+			ffc->extradata = (uint8_t *)fInputFormat.MetaData();
 			ffc->extradata_size = fInputFormat.MetaDataSize();
 		}
 
