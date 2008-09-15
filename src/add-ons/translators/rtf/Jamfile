@@ -8,6 +8,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+UsePrivateHeaders shared ;
+
 Translator RTF-Translator :
 	# RTFTranslator classes
 	main.cpp

@@ -16,6 +16,8 @@
 #include <Node.h>
 #include <Font.h>
 
+#include <AutoDeleter.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -573,6 +575,8 @@ convert_to_stxt(RTF::Header &header, BDataIO &target)
 		return status;
 	}
 
+	BPrivate::MemoryDeleter _(flattenedRuns);
+
 	// put out styles
 
 	TranslatorStyledTextStyleHeader styleHeader;
@@ -584,7 +588,7 @@ convert_to_stxt(RTF::Header &header, BDataIO &target)
 
 	status = swap_data(B_UINT32_TYPE, &styleHeader, sizeof(styleHeader),
 		B_SWAP_HOST_TO_BENDIAN);
-	if (status != B_OK)
+	if (status != B_OK) 
 		return status;
 
 	written = target.Write(&styleHeader, sizeof(styleHeader));
@@ -595,8 +599,6 @@ convert_to_stxt(RTF::Header &header, BDataIO &target)
 
 	// output actual style information
 	written = target.Write(flattenedRuns, flattenedSize);
-
-	free(flattenedRuns);
 
 	if (written < B_OK)
 		return written;
