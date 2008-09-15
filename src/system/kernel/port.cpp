@@ -23,6 +23,7 @@
 #include <sem.h>
 #include <syscall_restart.h>
 #include <team.h>
+#include <util/AutoLock.h>
 #include <util/list.h>
 #include <wait_for_objects.h>
 
@@ -369,7 +370,7 @@ port_init(kernel_args *args)
 //	#pragma mark - public kernel API
 
 
-port_id		
+port_id
 create_port(int32 queueLength, const char *name)
 {
 	cpu_status state;
@@ -575,7 +576,7 @@ delete_port(port_id id)
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
 
-	// update the first free slot hint in the array	
+	// update the first free slot hint in the array
 	GRAB_PORT_LIST_LOCK();
 	if (slot < sFirstFreeSlot)
 		sFirstFreeSlot = slot;
@@ -959,7 +960,8 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	cpu_status state;
 	sem_id cachedSem;
 	status_t status;
-	bool userCopy = (flags & PORT_FLAG_USE_USER_MEMCPY) > 0;
+	bool userCopy = (flags & PORT_FLAG_USE_USER_MEMCPY) != 0;
+	bool peekOnly = !userCopy && (flags & B_PEEK_PORT_MESSAGE) != 0;
 	port_msg *msg;
 	size_t size;
 	int slot;
@@ -1022,6 +1024,19 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 		RELEASE_PORT_LOCK(sPorts[slot]);
 		restore_interrupts(state);
 		return B_BAD_PORT_ID;
+	}
+
+	if (peekOnly) {
+		size = min_c(bufferSize, msg->size);
+		if (_msgCode != NULL)
+			*_msgCode = msg->code;
+		if (size > 0)
+			cbuf_memcpy_from_chain(msgBuffer, msg->buffer_chain, 0, size);
+		RELEASE_PORT_LOCK(sPorts[slot]);
+		restore_interrupts(state);
+		release_sem_etc(cachedSem, 1, B_DO_NOT_RESCHEDULE);
+			// we only peeked, but didn't grab the message
+		return size;
 	}
 
 	list_remove_link(msg);
@@ -1122,7 +1137,7 @@ writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
 		return B_BAD_PORT_ID;
 	}
 
-	// store sem_id in local variable 
+	// store sem_id in local variable
 	cachedSem = sPorts[slot].write_sem;
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
@@ -1204,7 +1219,7 @@ writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
 
 	notify_port_select_events(slot, B_EVENT_READ);
 
-	// store sem_id in local variable 
+	// store sem_id in local variable
 	cachedSem = sPorts[slot].read_sem;
 
 	RELEASE_PORT_LOCK(sPorts[slot]);

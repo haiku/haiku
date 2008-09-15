@@ -15,6 +15,14 @@ struct select_info;
 
 #define PORT_FLAG_USE_USER_MEMCPY 0x80000000
 
+// port flags
+enum {
+	// read_port_etc() flags
+	B_PEEK_PORT_MESSAGE		= 0x100	// read the message, but don't remove it;
+									// kernel-only; memory must be locked
+};
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,7 +37,8 @@ status_t deselect_port(int32 object, struct select_info *info, bool kernel);
 
 // currently private API
 status_t writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
-			size_t vecCount, size_t bufferSize, uint32 flags, bigtime_t timeout);
+			size_t vecCount, size_t bufferSize, uint32 flags,
+			bigtime_t timeout);
 
 // temp: test
 void port_test(void);
