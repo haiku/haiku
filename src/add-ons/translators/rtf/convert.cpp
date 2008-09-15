@@ -357,7 +357,11 @@ TextOutput::FlattenedRunArray(int32 &_size)
 		delete run;
 	}
 
-	return BTextView::FlattenRunArray(array, &_size);
+	void *flattenedRunArray = BTextView::FlattenRunArray(array, &_size);
+
+	delete array;
+
+	return flattenedRunArray;
 }
 
 
