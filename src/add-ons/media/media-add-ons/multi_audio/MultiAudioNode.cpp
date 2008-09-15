@@ -109,7 +109,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 	fDevice(device),
 	fTimeSourceStarted(false),
 	fWeb(NULL),
-	fConfig(*config)
+	fConfig()
 {
 	CALLED();
 	fInitStatus = B_NO_INIT;
@@ -138,6 +138,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 		* fPreferredFormat.u.raw_audio.channel_count;
 
 	if (config) {
+		fConfig = *config;
 		PRINT_OBJECT(*config);
 	}
 
@@ -990,8 +991,10 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 	//PRINT(("buffer->Header()->destination : %i\n", buffer->Header()->destination));
 
 	node_input* channel = _FindInput(buffer->Header()->destination);
-	if (channel == NULL)
+	if (channel == NULL) {
+		buffer->Recycle();
 		return B_MEDIA_BAD_DESTINATION;
+	}
 
 	bigtime_t now = TimeSource()->Now();
 	bigtime_t performanceTime = buffer->Header()->start_time;
@@ -1019,7 +1022,7 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 			else
 				channel->fBuffer = buffer;
 		} else {
-			//PRINT(("MultiAudioNode::HandleBuffer writing channelId : %li, how_early:%Ld\n", channel->fChannelId, how_early));
+			//PRINT(("MultiAudioNode::HandleBuffer writing channelId : %li, how_early:%Ld\n", channel->fChannelId, howEarly));
 			channel->fBuffer = buffer;
 		}
 	}
@@ -1459,9 +1462,9 @@ MultiAudioNode::_RunThread()
 		fDevice->BufferExchange(&bufferInfo);
 
 		//PRINT(("MultiAudioNode::RunThread: buffer exchanged\n"));
-		//PRINT(("MultiAudioNode::RunThread: played_real_time : %i\n", bufferInfo.played_real_time));
-		//PRINT(("MultiAudioNode::RunThread: played_frames_count : %i\n", bufferInfo.played_frames_count));
-		//PRINT(("MultiAudioNode::RunThread: buffer_cycle : %i\n", bufferInfo.playback_buffer_cycle));
+		//PRINT(("MultiAudioNode::RunThread: played_real_time : %Ld\n", bufferInfo.played_real_time));
+		//PRINT(("MultiAudioNode::RunThread: played_frames_count : %Ld\n", bufferInfo.played_frames_count));
+		//PRINT(("MultiAudioNode::RunThread: buffer_cycle : %li\n", bufferInfo.playback_buffer_cycle));
 
 		for (int32 i = 0; i < fInputs.CountItems(); i++) {
 			node_input* input = (node_input*)fInputs.ItemAt(i);
@@ -1475,7 +1478,7 @@ MultiAudioNode::_RunThread()
 					|| fDevice->BufferList().return_playback_buffers == 1)
 				&& (input->fInput.source != media_source::null 
 					|| input->fChannelId == 0)) {
-				//PRINT(("playback_buffer_cycle ok input : %i %d\n", i, bufferInfo.playback_buffer_cycle));
+				//PRINT(("playback_buffer_cycle ok input : %li %ld\n", i, bufferInfo.playback_buffer_cycle));
 
 				input->fBufferCycle = (bufferInfo.playback_buffer_cycle - 1 
 						+ fDevice->BufferList().return_playback_buffers)
@@ -1507,6 +1510,10 @@ MultiAudioNode::_RunThread()
 				//PRINT(("playback_buffer_cycle non ok input : %i\n", i));
 			}
 		}
+		
+		PRINT(("MultiAudioNode::RunThread: recorded_real_time : %Ld\n", bufferInfo.recorded_real_time));
+		PRINT(("MultiAudioNode::RunThread: recorded_frames_count : %Ld\n", bufferInfo.recorded_frames_count));
+		PRINT(("MultiAudioNode::RunThread: record_buffer_cycle : %li\n", bufferInfo.record_buffer_cycle));
 		
 		for (int32 i = 0; i < fOutputs.CountItems(); i++) {
 			node_output* output = (node_output*)fOutputs.ItemAt(i);
@@ -1854,6 +1861,8 @@ MultiAudioNode::_StartThread()
 	if (fBufferFreeSem < B_OK)
 		return fBufferFreeSem;
 
+	PublishTime(-50, 0, 0);
+
 	fThread = spawn_thread(_run_thread_, "multi_audio audio output",
 		B_REAL_TIME_PRIORITY, this);
 	if (fThread < B_OK) {
@@ -1897,7 +1906,7 @@ MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info,
 	multi_buffer_info& oldInfo, node_input& input)
 {
 	//CALLED();
-	if (!fTimeSourceStarted)
+	if (!fTimeSourceStarted || oldInfo.played_real_time == 0)
 		return;
 
 	bigtime_t performanceTime = (bigtime_t)(info.played_frames_count / 
@@ -1908,7 +1917,7 @@ MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info,
 		/ (info.played_real_time - oldInfo.played_real_time);
 
 	PublishTime(performanceTime, realTime, drift);
-	//PRINT(("_UpdateTimeSource() perf_time : %lli, real_time : %lli, drift : %f\n", perf_time, real_time, drift));
+	//PRINT(("_UpdateTimeSource() perf_time : %lli, real_time : %lli, drift : %f\n", performanceTime, realTime, drift));
 }
 
 
