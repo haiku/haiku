@@ -1,6 +1,7 @@
 /*
- * MPEG Audio common code
- * Copyright (c) 2001, 2002 Fabrice Bellard.
+ * MPEG4 video parser prototypes
+ * Copyright (c) 2003 Fabrice Bellard.
+ * Copyright (c) 2003 Michael Niedermayer.
  *
  * This file is part of FFmpeg.
  *
@@ -19,32 +20,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifndef FFMPEG_MPEG4VIDEO_PARSER_H
+#define FFMPEG_MPEG4VIDEO_PARSER_H
+
+#include "parser.h"
+
 /**
- * @file mpegaudio.c
- * MPEG Audio common code.
+ * finds the end of the current frame in the bitstream.
+ * @return the position of the first byte of the next frame, or -1
  */
+int ff_mpeg4_find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size);
 
-#include "mpegaudio.h"
-
-
-/* bitrate is in kb/s */
-int ff_mpa_l2_select_table(int bitrate, int nb_channels, int freq, int lsf)
-{
-    int ch_bitrate, table;
-
-    ch_bitrate = bitrate / nb_channels;
-    if (!lsf) {
-        if ((freq == 48000 && ch_bitrate >= 56) ||
-            (ch_bitrate >= 56 && ch_bitrate <= 80))
-            table = 0;
-        else if (freq != 48000 && ch_bitrate >= 96)
-            table = 1;
-        else if (freq != 32000 && ch_bitrate <= 48)
-            table = 2;
-        else
-            table = 3;
-    } else {
-        table = 4;
-    }
-    return table;
-}
+#endif /* FFMPEG_MPEG4VIDEO_PARSER_H */

@@ -1,6 +1,6 @@
 /*
- * MPEG Audio common code
- * Copyright (c) 2001, 2002 Fabrice Bellard.
+ * MPEG Audio common tables
+ * copyright (c) 2002 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -20,31 +20,24 @@
  */
 
 /**
- * @file mpegaudio.c
- * MPEG Audio common code.
+ * @file mpegaudiodata.h
+ * mpeg audio layer common tables.
  */
 
-#include "mpegaudio.h"
+#ifndef FFMPEG_MPEGAUDIODATA_H
+#define FFMPEG_MPEGAUDIODATA_H
 
+#include "common.h"
 
-/* bitrate is in kb/s */
-int ff_mpa_l2_select_table(int bitrate, int nb_channels, int freq, int lsf)
-{
-    int ch_bitrate, table;
+#define MODE_EXT_MS_STEREO 2
+#define MODE_EXT_I_STEREO  1
 
-    ch_bitrate = bitrate / nb_channels;
-    if (!lsf) {
-        if ((freq == 48000 && ch_bitrate >= 56) ||
-            (ch_bitrate >= 56 && ch_bitrate <= 80))
-            table = 0;
-        else if (freq != 48000 && ch_bitrate >= 96)
-            table = 1;
-        else if (freq != 32000 && ch_bitrate <= 48)
-            table = 2;
-        else
-            table = 3;
-    } else {
-        table = 4;
-    }
-    return table;
-}
+extern const uint16_t ff_mpa_bitrate_tab[2][3][15];
+extern const uint16_t ff_mpa_freq_tab[3];
+extern const int32_t ff_mpa_enwindow[257];
+extern const int ff_mpa_sblimit_table[5];
+extern const int ff_mpa_quant_steps[17];
+extern const int ff_mpa_quant_bits[17];
+extern const unsigned char * const ff_mpa_alloc_tables[5];
+
+#endif /* FFMPEG_MPEGAUDIODATA_H */
