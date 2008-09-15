@@ -24,17 +24,23 @@ extern bool debug;
 
 
 GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output)
+	:
+	fatalerror(false),
+	fInput(input),
+	fOutput(output),
+	fHeadMemblock(NULL),
+	fPalette(NULL),
+	fScanLine(NULL)
 {
-	fInput = input;
-	fOutput = output;
-	Init();
-	
+	fInput->Seek(0, SEEK_SET);
+
 	if (!ReadGIFHeader()) {
 		fatalerror = true;
 		return;
 	}
 	
-	if (debug) printf("GIFLoad::GIFLoad() - Image dimensions are %d x %d\n", fWidth, fHeight);
+	if (debug)
+		printf("GIFLoad::GIFLoad() - Image dimensions are %d x %d\n", fWidth, fHeight);
 	
 	unsigned char c;
 	if (fInput->Read(&c, 1) < 1) {
@@ -44,10 +50,12 @@ GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output)
 	while (c != 0x3b) {
 		if (c == 0x2c) {
 			if ((!ReadGIFImageHeader()) || (!ReadGIFImageData())) {
-				if (debug) printf("GIFLoad::GIFLoad() - A fatal error occurred\n");
+				if (debug) 
+					printf("GIFLoad::GIFLoad() - A fatal error occurred\n");
 				fatalerror = true;
 			} else {
-				if (debug) printf("GIFLoad::GIFLoad() - Found a single image and leaving\n");
+				if (debug) 
+					printf("GIFLoad::GIFLoad() - Found a single image and leaving\n");
 			}
 			free(fScanLine);
 			fScanLine = NULL;
@@ -90,18 +98,8 @@ GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output)
 			return;
 		}
 	}
-	if (debug) printf("GIFLoad::GIFLoad() - Done\n");
-}
-
-
-void
-GIFLoad::Init()
-{
-	fatalerror = false;
-	fScanLine = NULL;
-	fPalette = NULL;
-	fInput->Seek(0, SEEK_SET);
-	fHeadMemblock = NULL;
+	if (debug)
+		printf("GIFLoad::GIFLoad() - Done\n");
 }
 
 
@@ -118,12 +116,14 @@ GIFLoad::ReadGIFHeader()
 	// Global palette
 	if (header[10] & 0x80) {
 		fPalette->size_in_bits = (header[10] & 0x07) + 1;
-		if (debug) printf("GIFLoad::ReadGIFHeader() - Found %d bit global palette\n", fPalette->size_in_bits);
+		if (debug)
+			printf("GIFLoad::ReadGIFHeader() - Found %d bit global palette\n", fPalette->size_in_bits);
 		int s = 1 << fPalette->size_in_bits;
 		fPalette->size = s;
 
 		unsigned char gp[256 * 3];
-		if (fInput->Read(gp, s * 3) < s * 3) return false;
+		if (fInput->Read(gp, s * 3) < s * 3)
+			return false;
 		for (int x = 0; x < s; x++) {
 			fPalette->SetColor(x, gp[x * 3], gp[x * 3 + 1], gp[x * 3 + 2]);
 		}
@@ -163,11 +163,13 @@ bool
 GIFLoad::ReadGIFControlBlock()
 {
 	unsigned char data[6];
-	if (fInput->Read(data, 6) < 6) return false;
+	if (fInput->Read(data, 6) < 6)
+		return false;
 	if (data[1] & 0x01) {
 		fPalette->usetransparent = true;
 		fPalette->transparentindex = data[4];
-		if (debug) printf("GIFLoad::ReadGIFControlBlock() - Transparency active, using palette index %d\n", data[4]);
+		if (debug)
+			printf("GIFLoad::ReadGIFControlBlock() - Transparency active, using palette index %d\n", data[4]);
 	}
 	return true;
 }
@@ -180,12 +182,16 @@ GIFLoad::ReadGIFCommentBlock()
 	unsigned char length;
 	char comment_data[256];
 	do {
-		if (fInput->Read(&length, 1) < 1) return false;
-		if (fInput->Read(comment_data, length) < length) return false;
+		if (fInput->Read(&length, 1) < 1)
+			return false;
+		if (fInput->Read(comment_data, length) < length)
+			return false;
 		comment_data[length] = 0x00;
-		if (debug) printf("%s", comment_data);
+		if (debug)
+			printf("%s", comment_data);
 	} while (length != 0x00);
-	if (debug) printf("\n");
+	if (debug)
+		printf("\n");
 	return true;
 }
 
@@ -193,10 +199,12 @@ GIFLoad::ReadGIFCommentBlock()
 bool 
 GIFLoad::ReadGIFUnknownBlock(unsigned char c) 
 {
-	if (debug) printf("GIFLoad::ReadGIFUnknownBlock() - Found: %d\n", c);
+	if (debug)
+		printf("GIFLoad::ReadGIFUnknownBlock() - Found: %d\n", c);
 	unsigned char length;
 	do {
-		if (fInput->Read(&length, 1) < 1) return false;
+		if (fInput->Read(&length, 1) < 1)
+			return false;
 		fInput->Seek(length, SEEK_CUR);
 	} while (length != 0x00);
 	return true;
@@ -207,15 +215,17 @@ bool
 GIFLoad::ReadGIFImageHeader() 
 {
 	unsigned char data[9];
-	if (fInput->Read(data, 9) < 9) return false;
+	if (fInput->Read(data, 9) < 9)
+		return false;
 	
-	int local_width = data[4] + (data[5] << 8);
-	int local_height = data[6] + (data[7] << 8);
-	if (fWidth != local_width || fHeight != local_height) {
-		if (debug) printf("GIFLoad::ReadGIFImageHeader() - Local dimensions do not match global, setting to %d x %d\n",
-			local_width, local_height);
-		fWidth = local_width;
-		fHeight = local_height;
+	int localWidth = data[4] + (data[5] << 8);
+	int localHeight = data[6] + (data[7] << 8);
+	if (fWidth != localWidth || fHeight != localHeight) {
+		if (debug)
+			printf("GIFLoad::ReadGIFImageHeader() - Local dimensions do not match global, setting to %d x %d\n",
+			localWidth, localHeight);
+		fWidth = localWidth;
+		fHeight = localHeight;
 	}
 	
 	fScanLine = (uint32 *)malloc(fWidth * 4);
@@ -234,18 +244,21 @@ GIFLoad::ReadGIFImageHeader()
 	header.rowBytes = B_HOST_TO_BENDIAN_INT32(fWidth * 4);
 	header.colors = (color_space)B_HOST_TO_BENDIAN_INT32(B_RGBA32);
 	header.dataSize = B_HOST_TO_BENDIAN_INT32(fWidth * 4 * fHeight);
-	if (fOutput->Write(&header, 32) < 32) return false;
+	if (fOutput->Write(&header, 32) < 32)
+		return false;
 
 	// Has local palette
 	if (data[8] & 0x80) {
 		fPalette->size_in_bits = (data[8] & 0x07) + 1;
 		int s = 1 << fPalette->size_in_bits;
 		fPalette->size = s;
-		if (debug) printf("GIFLoad::ReadGIFImageHeader() - Found %d bit local palette\n",
-			fPalette->size_in_bits);
+		if (debug)
+			printf("GIFLoad::ReadGIFImageHeader() - Found %d bit local palette\n",
+				fPalette->size_in_bits);
 		
 		unsigned char lp[256 * 3];
-		if (fInput->Read(lp, s * 3) < s * 3) return false;
+		if (fInput->Read(lp, s * 3) < s * 3)
+			return false;
 		for (int x = 0; x < s; x++) {
 			fPalette->SetColor(x, lp[x * 3], lp[x * 3 + 1], lp[x * 3 + 2]);
 		}
@@ -253,10 +266,12 @@ GIFLoad::ReadGIFImageHeader()
 	
 	if (data[8] & 0x40) {
 		fInterlaced = true;
-		if (debug) printf("GIFLoad::ReadGIFImageHeader() - Image is interlaced\n");
+		if (debug)
+			printf("GIFLoad::ReadGIFImageHeader() - Image is interlaced\n");
 	} else {
 		fInterlaced = false;
-		if (debug) printf("GIFLoad::ReadGIFImageHeader() - Image is not interlaced\n");
+		if (debug)
+			printf("GIFLoad::ReadGIFImageHeader() - Image is not interlaced\n");
 	}
 	return true;
 }
@@ -265,21 +280,26 @@ GIFLoad::ReadGIFImageHeader()
 bool
 GIFLoad::ReadGIFImageData() 
 {
-	unsigned char new_entry[4096];
+	unsigned char newEntry[4096];
 	
 	unsigned char cs;
 	fInput->Read(&cs, 1);
 	if (cs == fPalette->size_in_bits) {
-		if (!InitFrame(fPalette->size_in_bits)) return false;
+		if (!InitFrame(fPalette->size_in_bits))
+			return false;
 	} else if (cs > fPalette->size_in_bits) {
-		if (debug) printf("GIFLoad::ReadGIFImageData() - Code_size should be %d, not %d, allowing it\n", fCodeSize, cs);
-		if (!InitFrame(cs)) return false;
+		if (debug)
+			printf("GIFLoad::ReadGIFImageData() - Code_size should be %d, not %d, allowing it\n", fCodeSize, cs);
+		if (!InitFrame(cs))
+			return false;
 	} else if (cs < fPalette->size_in_bits) {
-		if (debug) printf("GIFLoad::ReadGIFImageData() - Code_size should be %d, not %d\n", fCodeSize, cs);
+		if (debug)
+			printf("GIFLoad::ReadGIFImageData() - Code_size should be %d, not %d\n", fCodeSize, cs);
 		return false;
 	}
 	
-	if (debug) printf("GIFLoad::ReadGIFImageData() - Starting LZW\n");
+	if (debug)
+		printf("GIFLoad::ReadGIFImageData() - Starting LZW\n");
 	
 	while ((fNewCode = NextCode()) != -1 && fNewCode != fEndCode) {
 		if (fNewCode == fClearCode) {
@@ -289,7 +309,8 @@ GIFLoad::ReadGIFImageData()
 			fOldCodeLength = 1;
 			if (!OutputColor(fOldCode, 1)) goto bad_end;
 			if (fNewCode == -1 || fNewCode == fEndCode) {
-				if (debug) printf("GIFLoad::ReadGIFImageData() - Premature fEndCode or error\n");
+				if (debug)
+					printf("GIFLoad::ReadGIFImageData() - Premature fEndCode or error\n");
 				goto bad_end;
 			}
 			continue;
@@ -299,36 +320,39 @@ GIFLoad::ReadGIFImageData()
 		if (fOldCodeLength == 0) {
 			fOldCode[0] = fNewCode;
 			fOldCodeLength = 1;
-			if (!OutputColor(fOldCode, 1)) goto bad_end;
+			if (!OutputColor(fOldCode, 1))
+				goto bad_end;
 			continue;
 		}
 		
 		if (fTable[fNewCode] != NULL) { // Does exist in table
-			if (!OutputColor(fTable[fNewCode], fEntrySize[fNewCode])) goto bad_end;
+			if (!OutputColor(fTable[fNewCode], fEntrySize[fNewCode]))
+				goto bad_end;
 			
-			//memcpy(new_entry, fOldCode, fOldCodeLength);
+			//memcpy(newEntry, fOldCode, fOldCodeLength);
 			for (int x = 0; x < fOldCodeLength; x++) {
-				new_entry[x] = fOldCode[x];
+				newEntry[x] = fOldCode[x];
 			}
 			
-			//memcpy(new_entry + fOldCodeLength, fTable[fNewCode], 1);
-			new_entry[fOldCodeLength] = *fTable[fNewCode];
+			//memcpy(newEntry + fOldCodeLength, fTable[fNewCode], 1);
+			newEntry[fOldCodeLength] = *fTable[fNewCode];
 		} else { // Does not exist in table
-			//memcpy(new_entry, fOldCode, fOldCodeLength);
+			//memcpy(newEntry, fOldCode, fOldCodeLength);
 			for (int x = 0; x < fOldCodeLength; x++) {
-				new_entry[x] = fOldCode[x];
+				newEntry[x] = fOldCode[x];
 			}
 			
-			//memcpy(new_entry + fOldCodeLength, fOldCode, 1);
-			new_entry[fOldCodeLength] = *fOldCode;
+			//memcpy(newEntry + fOldCodeLength, fOldCode, 1);
+			newEntry[fOldCodeLength] = *fOldCode;
 			
-			if (!OutputColor(new_entry, fOldCodeLength + 1)) goto bad_end;
+			if (!OutputColor(newEntry, fOldCodeLength + 1))
+				goto bad_end;
 		}
 		fTable[fNextCode] = MemblockAllocate(fOldCodeLength + 1);
 
-		//memcpy(fTable[fNextCode], new_entry, fOldCodeLength + 1);
+		//memcpy(fTable[fNextCode], newEntry, fOldCodeLength + 1);
 		for (int x = 0; x < fOldCodeLength + 1; x++) {
-			fTable[fNextCode][x] = new_entry[x];
+			fTable[fNextCode][x] = newEntry[x];
 		}
 		
 		fEntrySize[fNextCode] = fOldCodeLength + 1;
@@ -348,12 +372,15 @@ GIFLoad::ReadGIFImageData()
 	}
 
 	MemblockDeleteAll();
-	if (fNewCode == -1) return false;
-	if (debug) printf("GIFLoad::ReadGIFImageData() - Done\n");
+	if (fNewCode == -1)
+		return false;
+	if (debug)
+		printf("GIFLoad::ReadGIFImageData() - Done\n");
 	return true;
 	
 bad_end:
-	if (debug) printf("GIFLoad::ReadGIFImageData() - Reached a bad end\n");
+	if (debug)
+		printf("GIFLoad::ReadGIFImageData() - Reached a bad end\n");
 	MemblockDeleteAll();
 	return false;
 }
@@ -403,15 +430,18 @@ bool
 GIFLoad::InitFrame(int size) 
 {
 	fCodeSize = size;
-	if (fCodeSize == 1) fCodeSize++;
+	if (fCodeSize == 1)
+		fCodeSize++;
 	fBits = fCodeSize + 1;
 	fClearCode = 1 << fCodeSize;
 	fEndCode = fClearCode + 1;
 	fNextCode = fClearCode + 2;
 	fMaxCode = (1 << fBits) - 1;
 	fPass = 0;
-	if (fInterlaced) fRow = gl_pass_starts_at[0];
-	else fRow = 0;
+	if (fInterlaced)
+		fRow = gl_pass_starts_at[0];
+	else 
+		fRow = 0;
 	
 	fBitCount = 0;
 	fBitBuffer = 0;
