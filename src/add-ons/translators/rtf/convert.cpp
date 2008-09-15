@@ -359,7 +359,7 @@ TextOutput::FlattenedRunArray(int32 &_size)
 
 	void *flattenedRunArray = BTextView::FlattenRunArray(array, &_size);
 
-	delete array;
+	free(array);
 
 	return flattenedRunArray;
 }
