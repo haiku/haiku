@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
 #include <new>
 
 #include <debugger.h>
@@ -40,6 +41,17 @@ public:
 	addr_t	base;
 	size_t	size;
 	BString	name;
+};
+
+
+struct hit_symbol {
+	int64	hits;
+	Symbol*	symbol;
+
+	inline bool operator<(const hit_symbol& other) const
+	{
+		return hits > other.hits;
+	}
 };
 
 
@@ -209,12 +221,10 @@ main(int argc, const char* const* argv)
 		size_t symbolSize;
 		while (debug_next_image_symbol(iterator, symbolName, sizeof(symbolName),
 				&symbolType, &symbolLocation, &symbolSize) == B_OK) {
-//if (symbolSize == 0) {
 //			printf("  %s %p (%6lu) %s\n",
 //				symbolType == B_SYMBOL_TYPE_TEXT ? "text" : "data",
 //				symbolLocation, symbolSize, symbolName);
-//}
-			if (symbolType == B_SYMBOL_TYPE_TEXT) {
+			if (symbolSize > 0 && symbolType == B_SYMBOL_TYPE_TEXT) {
 				Symbol* symbol = new(std::nothrow) Symbol(
 					(addr_t)symbolLocation, symbolSize, symbolName);
 				if (symbol == NULL || !symbols.AddItem(symbol)) {
@@ -248,7 +258,7 @@ main(int argc, const char* const* argv)
 
 	startProfiler->reply_port = debugContext.reply_port;
 	startProfiler->thread = thread;
-	startProfiler->interval = 10;
+	startProfiler->interval = 1000;
 	startProfiler->function_count = symbolCount;
 
 	for (int32 i = 0; i < symbolCount; i++) {
@@ -314,27 +324,54 @@ main(int argc, const char* const* argv)
 
 		switch (code) {
 			case B_DEBUGGER_MESSAGE_PROFILER_STOPPED:
-				printf("B_DEBUGGER_MESSAGE_PROFILER_STOPPED\n");
-				printf("  total ticks: %lld, missed: %lld\n",
-					message->profiler_stopped.total_ticks,
-					message->profiler_stopped.missed_ticks);
+			{
+				int64 totalTicks = message->profiler_stopped.total_ticks;
+				int64 missedTicks = message->profiler_stopped.missed_ticks;
+				bigtime_t interval = message->profiler_stopped.interval;
+
+				printf("\nprofiling results for thread %ld:\n",
+					message->profiler_stopped.origin.thread);
+				printf("  tick interval: %lld us\n", interval);
+				printf("  total ticks:   %lld (%lld us)\n", totalTicks,
+					totalTicks * interval);
+				printf("  missed ticks:  %lld (%lld us, %6.2f%%)\n",
+					missedTicks, missedTicks * interval,
+					100.0 * missedTicks / totalTicks);
+
+				// find and sort the hit symbols
+				hit_symbol hitSymbols[symbolCount];
+				int32 hitSymbolCount = 0;
+
 				for (int32 i = 0; i < symbolCount; i++) {
 					int64 hits = message->profiler_stopped.function_ticks[i];
-					if (hits > 0)
-						printf("%10lld  %s\n", hits, symbols.ItemAt(i)->Name());
+					if (hits > 0) {
+						hit_symbol& hitSymbol = hitSymbols[hitSymbolCount++];
+						hitSymbol.hits = hits;
+						hitSymbol.symbol = symbols.ItemAt(i);
+					}
 				}
 
-				break;
-/*
-typedef struct {
-	debug_origin		origin;
-	int32				function_count;
-	int64				total_ticks;		// total number of sample ticks
-	int64				missed_ticks;		// ticks that didn't hit a function
-	int64				function_ticks[1];	// number of hits for each function
-} debug_profiler_stopped;
-*/
+				if (hitSymbolCount > 1)
+					std::sort(hitSymbols, hitSymbols + hitSymbolCount);
 
+				if (hitSymbolCount > 0) {
+					printf("\n");
+					printf("        hits       in us    in %%  function\n");
+					printf("  -------------------------------------------------"
+						"-----------------------------\n");
+					for (int32 i = 0; i < hitSymbolCount; i++) {
+						const hit_symbol& hitSymbol = hitSymbols[i];
+						const Symbol* symbol = hitSymbol.symbol;
+						printf("  %10lld  %10lld  %6.2f  %s\n", hitSymbol.hits,
+							hitSymbol.hits * interval,
+							100.0 * hitSymbol.hits / totalTicks,
+							symbol->Name());
+					}
+				} else
+					printf("  no functions were hit\n");
+
+				break;
+			}
 
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
@@ -367,37 +404,7 @@ typedef struct {
 			continue_thread(message->origin.nub_port, message->origin.thread);
 	}
 
-
-
 	destroy_debug_context(&debugContext);
-
-//kill_thread(thread);
-//exit(0);
-
-
-/*
-typedef struct {
-	debug_origin		origin;
-	int32				function_count;
-	int64				total_ticks;		// total number of sample ticks
-	int64				missed_ticks;		// ticks that didn't hit a function
-	int64				function_ticks[1];	// number of hits for each function
-} debug_profiler_stopped;
-
-struct debug_profile_function {
-	addr_t			base;	// function base address
-	size_t			size;	// function size
-};
-
-typedef struct {
-	port_id				reply_port;		// port to send the reply to
-	thread_id			thread;			// thread to profile
-	bigtime_t			interval;		// sample interval
-	int32				function_count;	// number of functions we count hits for
-	struct debug_profile_function functions[1];
-		// functions that shall be tracked
-} debug_nub_start_profiler;
-*/
 
 	return 0;
 }
