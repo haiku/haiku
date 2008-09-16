@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku, Inc.
+ * Copyright 2001-2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -21,53 +21,38 @@
 #include <Window.h>
 
 
-
-BRadioButton::BRadioButton(BRect frame, const char *name, const char *label,
-						   BMessage *message, uint32 resizMask, uint32 flags)
-	: BControl(frame, name, label, message, resizMask, flags),
-	fOutlined(false)
+BRadioButton::BRadioButton(BRect frame, const char* name, const char* label,
+		BMessage* message, uint32 resizMask, uint32 flags)
+	: BControl(frame, name, label, message, resizMask, flags | B_FRAME_EVENTS),
+	  fOutlined(false)
 {
-	// Resize to minimum height if needed
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-	float minHeight = ceilf(6.0f + fontHeight.ascent + fontHeight.descent);
+	// Resize to minimum height if needed for BeOS compatibility
+	float minHeight;
+	GetPreferredSize(NULL, &minHeight);
 	if (Bounds().Height() < minHeight)
 		ResizeTo(Bounds().Width(), minHeight);
 }
 
 
-BRadioButton::BRadioButton(const char *name, const char *label,
-						   BMessage *message, uint32 flags)
-	: BControl(BRect(0, 0, -1, -1), name, label, message, B_FOLLOW_NONE,
-		flags | B_SUPPORTS_LAYOUT),
-	fOutlined(false)
+BRadioButton::BRadioButton(const char* name, const char* label,
+		BMessage* message, uint32 flags)
+	: BControl(name, label, message, flags | B_FRAME_EVENTS),
+	  fOutlined(false)
 {
-	// Resize to minimum height if needed
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-	float minHeight = ceilf(6.0f + fontHeight.ascent + fontHeight.descent);
-	if (Bounds().Height() < minHeight)
-		ResizeTo(Bounds().Width(), minHeight);
 }
 
 
-BRadioButton::BRadioButton(const char *label, BMessage *message)
-	: BControl(BRect(0, 0, -1, -1), NULL, label, message, B_FOLLOW_NONE,
-		B_WILL_DRAW | B_NAVIGABLE | B_SUPPORTS_LAYOUT),
-	fOutlined(false)
+BRadioButton::BRadioButton(const char* label, BMessage* message)
+	: BControl(NULL, label, message,
+		B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS),
+	  fOutlined(false)
 {
-	// Resize to minimum height if needed
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-	float minHeight = ceilf(6.0f + fontHeight.ascent + fontHeight.descent);
-	if (Bounds().Height() < minHeight)
-		ResizeTo(Bounds().Width(), minHeight);
 }
 
 
-BRadioButton::BRadioButton(BMessage *archive)
+BRadioButton::BRadioButton(BMessage* archive)
 	: BControl(archive),
-	fOutlined(false)
+	  fOutlined(false)
 {
 }
 
@@ -78,7 +63,7 @@ BRadioButton::~BRadioButton()
 
 
 BArchivable*
-BRadioButton::Instantiate(BMessage *archive)
+BRadioButton::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BRadioButton"))
 		return new BRadioButton(archive);
@@ -88,7 +73,7 @@ BRadioButton::Instantiate(BMessage *archive)
 
 
 status_t
-BRadioButton::Archive(BMessage *archive, bool deep) const
+BRadioButton::Archive(BMessage* archive, bool deep) const
 {
 	return BControl::Archive(archive, deep);
 }
@@ -97,16 +82,17 @@ BRadioButton::Archive(BMessage *archive, bool deep) const
 void
 BRadioButton::Draw(BRect updateRect)
 {
-	// layout the rect for the dot
-	BRect rect = _KnobFrame();
-
 	// its size depends on the text height
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
 
+	// layout the rect for the dot
+	BRect rect = _KnobFrame(fontHeight);
+
 	BPoint labelPos(rect.right + floorf(textHeight / 2.0),
-		floorf((rect.top + rect.bottom + textHeight) / 2.0 - fontHeight.descent + 0.5) + 1.0);
+		floorf((rect.top + rect.bottom + textHeight) / 2.0
+			- fontHeight.descent + 0.5) + 1.0);
 
 	// if the focus is changing, just redraw the focus indicator
 	if (IsFocusChanging()) {
@@ -157,7 +143,8 @@ BRadioButton::Draw(BRect updateRect)
 
 		knob		= tint_color(naviColor, B_LIGHTEN_2_TINT);
 		knobDark	= tint_color(naviColor, B_LIGHTEN_1_TINT);
-		knobLight	= tint_color(naviColor, (B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2.0);
+		knobLight	= tint_color(naviColor, (B_LIGHTEN_2_TINT
+			+ B_LIGHTEN_MAX_TINT) / 2.0);
 	}
 
 	// dot
@@ -167,10 +154,12 @@ BRadioButton::Draw(BRect updateRect)
 		FillEllipse(rect);
 
 		SetHighColor(knob);
-		FillEllipse(BRect(rect.left + 2, rect.top + 2, rect.right - 3, rect.bottom - 3));
+		FillEllipse(BRect(rect.left + 2, rect.top + 2, rect.right - 3,
+			rect.bottom - 3));
 
 		SetHighColor(knobLight);
-		FillEllipse(BRect(rect.left + 3, rect.top + 3, rect.right - 5, rect.bottom - 5));
+		FillEllipse(BRect(rect.left + 3, rect.top + 3, rect.right - 5,
+			rect.bottom - 5));
 	} else {
 		// empty
 		SetHighColor(lightenmax);
@@ -186,18 +175,18 @@ BRadioButton::Draw(BRect updateRect)
 		StrokeEllipse(rect);
 	} else {
 		SetHighColor(darken1);
-		StrokeArc(rect, 45.0f, 180.0f);
+		StrokeArc(rect, 45.0, 180.0);
 		SetHighColor(lightenmax);
-		StrokeArc(rect, 45.0f, -180.0f);
+		StrokeArc(rect, 45.0, -180.0);
 	}
 
 	rect.InsetBy(1, 1);
 
 	// inner circle
 	SetHighColor(darken3);
-	StrokeArc(rect, 45.0f, 180.0f);
+	StrokeArc(rect, 45.0, 180.0);
 	SetHighColor(bg);
-	StrokeArc(rect, 45.0f, -180.0f);
+	StrokeArc(rect, 45.0, -180.0);
 
 	// for faster font rendering, we can restore B_OP_COPY
 	SetDrawingMode(B_OP_COPY);
@@ -267,9 +256,10 @@ BRadioButton::AttachedToWindow()
 
 
 void
-BRadioButton::KeyDown(const char *bytes, int32 numBytes)
+BRadioButton::KeyDown(const char* bytes, int32 numBytes)
 {
-	// TODO add select_next_button functionality
+	// TODO: Add selecting the next button functionality (navigating radio
+	// buttons with the cursor keys)!
 
 	switch (bytes[0]) {
 		case B_RETURN:
@@ -300,18 +290,18 @@ BRadioButton::SetValue(int32 value)
 	if (!value)
 		return;
 
-	BView *parent = Parent();
-	BView *child = NULL;
+	BView* parent = Parent();
+	BView* child = NULL;
 
 	if (parent) {
 		// If the parent is a BBox, the group parent is the parent of the BBox
-		BBox *box = dynamic_cast<BBox*>(parent);
+		BBox* box = dynamic_cast<BBox*>(parent);
 
 		if (box && box->LabelView() == this)
 			parent = box->Parent();
 
 		if (parent) {
-			BBox *box = dynamic_cast<BBox*>(parent);
+			BBox* box = dynamic_cast<BBox*>(parent);
 
 			// If the parent is a BBox, skip the label if there is one
 			if (box && box->LabelView())
@@ -324,13 +314,13 @@ BRadioButton::SetValue(int32 value)
 		child = Window()->ChildAt(0);
 
 	while (child) {
-		BRadioButton *radio = dynamic_cast<BRadioButton*>(child);
+		BRadioButton* radio = dynamic_cast<BRadioButton*>(child);
 
 		if (radio && (radio != this))
 			radio->SetValue(B_CONTROL_OFF);
 		else {
 			// If the child is a BBox, check if the label is a radiobutton
-			BBox *box = dynamic_cast<BBox*>(child);
+			BBox* box = dynamic_cast<BBox*>(child);
 
 			if (box && box->LabelView()) {
 				radio = dynamic_cast<BRadioButton*>(box->LabelView());
@@ -354,7 +344,7 @@ BRadioButton::GetPreferredSize(float* _width, float* _height)
 	GetFontHeight(&fontHeight);
 
 	if (_width) {
-		BRect rect = _KnobFrame();
+		BRect rect = _KnobFrame(fontHeight);
 		float width = rect.right + floorf(ceilf(fontHeight.ascent
 			+ fontHeight.descent) / 2.0);
 
@@ -365,7 +355,7 @@ BRadioButton::GetPreferredSize(float* _width, float* _height)
 	}
 
 	if (_height)
-		*_height = ceilf(fontHeight.ascent + fontHeight.descent) + 6.0f;
+		*_height = ceilf(fontHeight.ascent + fontHeight.descent) + 6.0;
 }
 
 
@@ -377,14 +367,14 @@ BRadioButton::ResizeToPreferred()
 
 
 status_t
-BRadioButton::Invoke(BMessage *message)
+BRadioButton::Invoke(BMessage* message)
 {
 	return BControl::Invoke(message);
 }
 
 
 void
-BRadioButton::MessageReceived(BMessage *message)
+BRadioButton::MessageReceived(BMessage* message)
 {
 	BControl::MessageReceived(message);
 }
@@ -416,7 +406,7 @@ BRadioButton::MouseUp(BPoint point)
 
 
 void
-BRadioButton::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+BRadioButton::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 	if (!IsTracking())
 		return;
@@ -447,14 +437,14 @@ BRadioButton::FrameMoved(BPoint newLocation)
 void
 BRadioButton::FrameResized(float width, float height)
 {
+	Invalidate();
 	BControl::FrameResized(width, height);
 }
 
 
 BHandler*
-BRadioButton::ResolveSpecifier(BMessage *message, int32 index,
-							   BMessage *specifier, int32 what,
-							   const char *property)
+BRadioButton::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
 	return BControl::ResolveSpecifier(message, index, specifier, what,
 		property);
@@ -483,14 +473,14 @@ BRadioButton::AllDetached()
 
 
 status_t
-BRadioButton::GetSupportedSuites(BMessage *message)
+BRadioButton::GetSupportedSuites(BMessage* message)
 {
 	return BControl::GetSupportedSuites(message);
 }
 
 
 status_t
-BRadioButton::Perform(perform_code d, void *arg)
+BRadioButton::Perform(perform_code d, void* arg)
 {
 	return BControl::Perform(d, arg);
 }
@@ -525,7 +515,13 @@ BRadioButton::_KnobFrame() const
 {
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
+	return _KnobFrame(fontHeight);
+}
 
+
+BRect
+BRadioButton::_KnobFrame(const font_height& fontHeight) const
+{
 	// layout the rect for the dot
 	BRect rect(Bounds());
 
