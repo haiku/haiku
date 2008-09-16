@@ -15,7 +15,6 @@
 #include <OS.h>
 #include <fcntl.h>
 #include <image.h>
-#include <malloc.h>
 #include <midi_driver.h>
 #include <string.h>
 

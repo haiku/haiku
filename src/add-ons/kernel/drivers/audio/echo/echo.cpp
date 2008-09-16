@@ -25,7 +25,6 @@
 #include <KernelExport.h>
 #include <Drivers.h>
 #include <driver_settings.h>
-#include <malloc.h>
 #include <unistd.h>
 #include "OsSupportBeOS.h"
 #include "EchoGalsXface.h"

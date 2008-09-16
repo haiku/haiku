@@ -50,7 +50,6 @@
 #include <PCI.h>
 #include <driver_settings.h>
 #include <fcntl.h>
-#include <malloc.h>
 #include <math.h>
 #include <midi_driver.h>
 #include <stdio.h>

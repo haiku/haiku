@@ -38,7 +38,6 @@
 #include "io.h"
 #include <fcntl.h>
 #include <unistd.h>
-#include <malloc.h>
 #include "ac97.h"
 
 status_t init_hardware(void);
