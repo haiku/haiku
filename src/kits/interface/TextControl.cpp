@@ -27,7 +27,7 @@
 #ifdef TRACE_TEXT_CONTROL
 #	include <FunctionTracer.h>
 	static int32 sFunctionDepth = -1;
-#	define CALLED(x...)	FunctionTracer _ft("BMenuField", __FUNCTION__, \
+#	define CALLED(x...)	FunctionTracer _ft("BTextControl", __FUNCTION__, \
 							sFunctionDepth)
 #	define TRACE(x...)	{ BString _to; \
 							_to.Append(' ', (sFunctionDepth + 1) * 2); \
@@ -84,7 +84,34 @@ private:
 };
 
 
+struct BTextControl::LayoutData {
+	LayoutData(float width, float height)
+		: label_layout_item(NULL),
+		  text_view_layout_item(NULL),
+		  previous_width(width),
+		  previous_height(height),
+		  valid(false)
+	{
+	}
+
+	LabelLayoutItem*	label_layout_item;
+	TextViewLayoutItem*	text_view_layout_item;
+	float				previous_width;		// used in FrameResized() for
+	float				previous_height;	// invalidation
+	font_height			font_info;
+	float				label_width;
+	float				label_height;
+	BSize				min;
+	BSize				text_view_min;
+	bool				valid;
+};
+
+
 // #pragma mark -
+
+
+static const int32 kFrameMargin = 2;
+static const int32 kLabelInputSpacing = 3;
 
 
 BTextControl::BTextControl(BRect frame, const char* name, const char* label,
@@ -347,8 +374,8 @@ BTextControl::Draw(BRect updateRect)
 	// label
 
 	if (Label()) {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
+		_ValidateLayoutData();
+		font_height& fontHeight = fLayoutData->font_info;
 
 		float y = Bounds().top + (Bounds().Height() + 1 - fontHeight.ascent
 			- fontHeight.descent) / 2 + fontHeight.ascent;
@@ -357,7 +384,7 @@ BTextControl::Draw(BRect updateRect)
 		float labelWidth = StringWidth(Label());
 		switch (fLabelAlign) {
 			case B_ALIGN_RIGHT:
-				x = fDivider - labelWidth - 3.0;
+				x = fDivider - labelWidth - kLabelInputSpacing;
 				break;
 
 			case B_ALIGN_CENTER:
@@ -371,7 +398,7 @@ BTextControl::Draw(BRect updateRect)
 
 		BRect labelArea(x, Bounds().top, x + labelWidth, Bounds().bottom);
 		if (x < fDivider && updateRect.Intersects(labelArea)) {
-			labelArea.right = fText->Frame().left - 3;
+			labelArea.right = fText->Frame().left - kLabelInputSpacing;
 
 			BRegion clipRegion(labelArea);
 			ConstrainClippingRegion(&clipRegion);
@@ -436,25 +463,15 @@ BTextControl::SetEnabled(bool enabled)
 void
 BTextControl::GetPreferredSize(float *_width, float *_height)
 {
-	if (_height) {
-		// we need enough space for the label and the child text view
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
-		float labelHeight = ceil(fontHeight.ascent + fontHeight.descent
-			+ fontHeight.leading);
-		float textHeight = ceilf(fText->LineHeight(0) + 1.0) + 4.0;
+	CALLED();
 
-		*_height = max_c(labelHeight, textHeight);
-	}
+	_ValidateLayoutData();
 
-	if (_width) {
-		*_width = Bounds().Width();
-		const char* label = Label();
-		if (label) {
-			float width = ceilf(StringWidth(label));
-			*_width = (width * 1.3) + width + 4.0;
-		}
-	}
+	if (_width)
+		*_width = fLayoutData->min.width;
+
+	if (_height)
+		*_height = fLayoutData->min.height;
 }
 
 
@@ -583,41 +600,50 @@ BTextControl::FrameResized(float width, float height)
 
 	BControl::FrameResized(width, height);
 
+	// TODO: this causes flickering still...
+
 	// changes in width
 
 	BRect bounds = Bounds();
-	const float border = 2.0f;
 
-	if (bounds.Width() > fPreviousWidth) {
+	if (bounds.Width() > fLayoutData->previous_width) {
 		// invalidate the region between the old and the new right border
 		BRect rect = bounds;
-		rect.left += fPreviousWidth - border;
+		rect.left += fLayoutData->previous_width - kFrameMargin;
 		rect.right--;
 		Invalidate(rect);
-	} else if (bounds.Width() < fPreviousWidth) {
+	} else if (bounds.Width() < fLayoutData->previous_width) {
 		// invalidate the region of the new right border
 		BRect rect = bounds;
-		rect.left = rect.right - border;
+		rect.left = rect.right - kFrameMargin;
 		Invalidate(rect);
 	}
 
 	// changes in height
 
-	if (bounds.Height() > fPreviousHeight) {
+	if (bounds.Height() > fLayoutData->previous_height) {
 		// invalidate the region between the old and the new bottom border
 		BRect rect = bounds;
-		rect.top += fPreviousHeight - border;
+		rect.top += fLayoutData->previous_height - kFrameMargin;
 		rect.bottom--;
 		Invalidate(rect);
-	} else if (bounds.Height() < fPreviousHeight) {
+		// invalidate label area
+		rect = bounds;
+		rect.right = fDivider;
+		Invalidate(rect);
+	} else if (bounds.Height() < fLayoutData->previous_height) {
 		// invalidate the region of the new bottom border
 		BRect rect = bounds;
-		rect.top = rect.bottom - border;
+		rect.top = rect.bottom - kFrameMargin;
+		Invalidate(rect);
+		// invalidate label area
+		rect = bounds;
+		rect.right = fDivider;
 		Invalidate(rect);
 	}
 
-	fPreviousWidth = uint16(bounds.Width());
-	fPreviousHeight = uint16(bounds.Height());
+	fLayoutData->previous_width = bounds.Width();
+	fLayoutData->previous_height = bounds.Height();
 
 	TRACE("width: %.2f, height: %.2f\n", bounds.Width(), bounds.Height());
 }
@@ -639,28 +665,130 @@ BTextControl::WindowActivated(bool active)
 }
 
 
-status_t
-BTextControl::Perform(perform_code d, void *arg)
+BSize
+BTextControl::MinSize()
 {
-	return BControl::Perform(d, arg);
+	CALLED();
+
+	_ValidateLayoutData();
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), fLayoutData->min);
+}
+
+
+BSize
+BTextControl::MaxSize()
+{
+	CALLED();
+
+	_ValidateLayoutData();
+
+	BSize max = fLayoutData->min;
+	max.width = B_SIZE_UNLIMITED;
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), max);
+}
+
+
+BSize
+BTextControl::PreferredSize()
+{
+	CALLED();
+
+	_ValidateLayoutData();
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), fLayoutData->min);
+}
+
+
+void
+BTextControl::InvalidateLayout(bool descendants)
+{
+	CALLED();
+
+	fLayoutData->valid = false;
+
+	BView::InvalidateLayout(descendants);
 }
 
 
 BLayoutItem*
 BTextControl::CreateLabelLayoutItem()
 {
-	if (!fLabelLayoutItem)
-		fLabelLayoutItem = new LabelLayoutItem(this);
-	return fLabelLayoutItem;
+	if (!fLayoutData->label_layout_item)
+		fLayoutData->label_layout_item = new LabelLayoutItem(this);
+	return fLayoutData->label_layout_item;
 }
 
 
 BLayoutItem*
 BTextControl::CreateTextViewLayoutItem()
 {
-	if (!fTextViewLayoutItem)
-		fTextViewLayoutItem = new TextViewLayoutItem(this);
-	return fTextViewLayoutItem;
+	if (!fLayoutData->text_view_layout_item)
+		fLayoutData->text_view_layout_item = new TextViewLayoutItem(this);
+	return fLayoutData->text_view_layout_item;
+}
+
+
+void
+BTextControl::DoLayout()
+{
+	// Bail out, if we shan't do layout.
+	if (!(Flags() & B_SUPPORTS_LAYOUT))
+		return;
+
+	CALLED();
+
+	// If the user set a layout, we let the base class version call its
+	// hook.
+	if (GetLayout()) {
+		BView::DoLayout();
+		return;
+	}
+
+	_ValidateLayoutData();
+
+	// validate current size
+	BSize size(Bounds().Size());
+	if (size.width < fLayoutData->min.width)
+		size.width = fLayoutData->min.width;
+	if (size.height < fLayoutData->min.height)
+		size.height = fLayoutData->min.height;
+
+	// divider
+	float divider = 0;
+	if (fLayoutData->label_layout_item && fLayoutData->text_view_layout_item) {
+		// We have layout items. They define the divider location.
+		divider = fLayoutData->text_view_layout_item->Frame().left
+			- fLayoutData->label_layout_item->Frame().left;
+	} else {
+		if (fLayoutData->label_width > 0)
+			divider = fLayoutData->label_width + 5;
+	}
+
+	// text view
+	BRect dirty(fText->Frame());
+	BRect textFrame(divider + 1, kFrameMargin, size.width - 2,
+		size.height - kFrameMargin);
+
+	// place the text view and set the divider
+	BLayoutUtils::AlignInFrame(fText, textFrame);
+
+	fDivider = divider;
+
+	// invalidate dirty region
+	dirty = dirty | fText->Frame();
+	dirty.InsetBy(-kFrameMargin, -kFrameMargin);
+
+	Invalidate(dirty);
+}
+
+
+// #pragma mark -
+
+
+status_t
+BTextControl::Perform(perform_code d, void *arg)
+{
+	return BControl::Perform(d, arg);
 }
 
 
@@ -723,10 +851,7 @@ BTextControl::_InitData(const char* label, const char* initialText,
 	fModificationMessage = NULL;
 	fLabelAlign = B_ALIGN_LEFT;
 	fDivider = 0.0f;
-	fPreviousWidth = bounds.Width();
-	fPreviousHeight = bounds.Height();
-	fLabelLayoutItem = NULL;
-	fTextViewLayoutItem = NULL;
+	fLayoutData = new LayoutData(bounds.Width(), bounds.Height());
 
 	int32 flags = 0;
 
@@ -755,7 +880,7 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		BRect frame(fDivider, bounds.top, bounds.right, bounds.bottom);
 		// we are stroking the frame around the text view, which
 		// is 2 pixels wide
-		frame.InsetBy(2.0, 3.0);
+		frame.InsetBy(kFrameMargin, kFrameMargin);
 		BRect textRect(frame.OffsetToCopy(B_ORIGIN));
 
 		fText = new BPrivate::_BTextInput_(frame, textRect,
@@ -774,14 +899,11 @@ BTextControl::_ValidateLayout()
 {
 	CALLED();
 
-	float height;
-	BTextControl::GetPreferredSize(NULL, &height);
+	_ValidateLayoutData();
 
-	ResizeTo(Bounds().Width(), height);
+	ResizeTo(Bounds().Width(), fLayoutData->min.height);
 
 	_LayoutTextView();
-
-	fPreviousHeight = Bounds().Height();
 }
 
 
@@ -809,14 +931,78 @@ BTextControl::_LayoutTextView()
 void
 BTextControl::_UpdateFrame()
 {
-	if (fLabelLayoutItem && fTextViewLayoutItem) {
-		BRect labelFrame = fLabelLayoutItem->Frame();
-		BRect textFrame = fTextViewLayoutItem->Frame();
+	CALLED();
+
+	if (fLayoutData->label_layout_item && fLayoutData->text_view_layout_item) {
+		BRect labelFrame = fLayoutData->label_layout_item->Frame();
+		BRect textFrame = fLayoutData->text_view_layout_item->Frame();
+
+		// update divider
+		fDivider = textFrame.left - labelFrame.left;
+
 		MoveTo(labelFrame.left, labelFrame.top);
+		BSize oldSize = Bounds().Size();
 		ResizeTo(textFrame.left + textFrame.Width() - labelFrame.left,
 			textFrame.top + textFrame.Height() - labelFrame.top);
-		SetDivider(textFrame.left - labelFrame.left);
+		BSize newSize = Bounds().Size();
+
+		// If the size changes, ResizeTo() will trigger a relayout, otherwise
+		// we need to do that explicitly.
+		if (newSize != oldSize)
+			Relayout();
 	}
+}
+
+
+void
+BTextControl::_ValidateLayoutData()
+{
+	CALLED();
+
+	if (fLayoutData->valid)
+		return;
+
+	// cache font height
+	font_height& fh = fLayoutData->font_info;
+	GetFontHeight(&fh);
+
+	if (Label() != NULL) {
+		fLayoutData->label_width = ceilf(StringWidth(Label()));
+		fLayoutData->label_height = ceilf(fh.ascent) + ceilf(fh.descent);
+	} else {
+		fLayoutData->label_width = 0;
+		fLayoutData->label_height = 0;
+	}
+
+	// compute the minimal divider
+	float divider = 0;
+	if (fLayoutData->label_width > 0)
+		divider = fLayoutData->label_width + 5;
+
+	// If we shan't do real layout, we let the current divider take influence.
+	if (!(Flags() & B_SUPPORTS_LAYOUT))
+		divider = max_c(divider, fDivider);
+
+	// get the minimal (== preferred) text view size
+	fLayoutData->text_view_min = fText->MinSize();
+
+	TRACE("text view min width: %.2f\n", fLayoutData->text_view_min.width);
+
+	// compute our minimal (== preferred) size
+	BSize min(fLayoutData->text_view_min);
+	min.width += 2 * kFrameMargin;
+	min.height += 2 * kFrameMargin;
+
+	if (divider > 0)
+		min.width += divider;
+	if (fLayoutData->label_height > min.height)
+		min.height = fLayoutData->label_height;
+
+	fLayoutData->min = min;
+
+	fLayoutData->valid = true;
+
+	TRACE("width: %.2f, height: %.2f\n", min.width, min.height);
 }
 
 
@@ -869,17 +1055,13 @@ BTextControl::LabelLayoutItem::View()
 BSize
 BTextControl::LabelLayoutItem::BaseMinSize()
 {
-// TODO: Cache the info. Might be too expensive for this call.
-	const char* label = fParent->Label();
-	if (!label)
+	fParent->_ValidateLayoutData();
+
+	if (!fParent->Label())
 		return BSize(-1, -1);
 
-	BSize size;
-	fParent->GetPreferredSize(NULL, &size.height);
-
-	size.width = fParent->StringWidth(label) + 2 * 3 - 1;
-
-	return size;
+	return BSize(fParent->fLayoutData->label_width + 5,
+		fParent->fLayoutData->label_height);
 }
 
 
@@ -911,6 +1093,9 @@ BTextControl::TextViewLayoutItem::TextViewLayoutItem(BTextControl* parent)
 	: fParent(parent),
 	  fFrame()
 {
+	// by default the part right of the divider shall have an unlimited maximum
+	// width
+	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 }
 
 
@@ -953,12 +1138,11 @@ BTextControl::TextViewLayoutItem::View()
 BSize
 BTextControl::TextViewLayoutItem::BaseMinSize()
 {
-// TODO: Cache the info. Might be too expensive for this call.
-	BSize size;
-	fParent->GetPreferredSize(NULL, &size.height);
+	fParent->_ValidateLayoutData();
 
-	// mmh, some arbitrary minimal width
-	size.width = 30;
+	BSize size = fParent->fLayoutData->text_view_min;
+	size.width += 2 * kFrameMargin;
+	size.height += 2 * kFrameMargin;
 
 	return size;
 }

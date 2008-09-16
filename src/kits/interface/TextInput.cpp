@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include <InterfaceDefs.h>
+#include <LayoutUtils.h>
 #include <Message.h>
 #include <TextControl.h>
 #include <TextView.h>
@@ -144,6 +145,16 @@ _BTextInput_::MakeFocus(bool state)
 			parent->Invalidate(frame);
 		}
 //	}
+}
+
+
+BSize
+_BTextInput_::MinSize()
+{
+	BSize min;
+	min.height = ceilf(LineHeight(0) + 1.0);
+	min.width = min.height * 3;
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), min);
 }
 
 

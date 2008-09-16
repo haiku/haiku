@@ -34,6 +34,8 @@ virtual	void			FrameResized(float width, float height);
 virtual	void			KeyDown(const char *bytes, int32 numBytes);
 virtual	void			MakeFocus(bool focusState = true);
 
+virtual	BSize			MinSize();
+
 		void			AlignTextRect();
 		void			SetInitialText();
 

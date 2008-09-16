@@ -80,16 +80,26 @@ public:
 	virtual	status_t			GetSupportedSuites(BMessage* data);
 	virtual	void				SetFlags(uint32 flags);
 
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+	virtual	BSize				PreferredSize();
+
+	virtual	void				InvalidateLayout(bool descendants = false);
+
 			BLayoutItem*		CreateLabelLayoutItem();
 			BLayoutItem*		CreateTextViewLayoutItem();
 
-private:
-	class LabelLayoutItem;
-	class TextViewLayoutItem;
+protected:
+	virtual	void				DoLayout();
 
-	friend class _BTextInput_;
-	friend class LabelLayoutItem;
-	friend class TextViewLayoutItem;
+private:
+			class LabelLayoutItem;
+			class TextViewLayoutItem;
+			struct LayoutData;
+
+			friend class _BTextInput_;
+			friend class LabelLayoutItem;
+			friend class TextViewLayoutItem;
 
 	virtual	status_t			Perform(perform_code d, void* arg);
 
@@ -108,18 +118,17 @@ private:
 			void				_LayoutTextView();
 			void				_UpdateFrame();
 
+			void				_ValidateLayoutData();
+
 private:
 			BPrivate::_BTextInput_* fText;
-			char*				fLabel;
 			BMessage*			fModificationMessage;
 			alignment			fLabelAlign;
 			float				fDivider;
-			float				fPreviousWidth;
-			float				fPreviousHeight;
-			BLayoutItem*		fLabelLayoutItem;
-			BLayoutItem*		fTextViewLayoutItem;
 
-			uint32				_reserved[5];
+			LayoutData*			fLayoutData;
+
+			uint32				_reserved[9];
 };
 
 #endif	// _TEXT_CONTROL_H
