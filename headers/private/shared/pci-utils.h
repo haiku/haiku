@@ -80,7 +80,7 @@ get_device_info(uint16 vendorID, uint16 deviceID,
 	for (; i < (int)PCI_DEVTABLE_LEN; i++) {
 		if (PciDevTable[i].VenId != vendorID || PciDevTable[i].DevId != deviceID)
 			break;
-		if (PciDevTable[i].SubVenId == subvendorID && PciDevTable[i].SubDevId == subsystemID ) {
+		if (PciDevTable[i].SubVenId == subvendorID && PciDevTable[i].SubDevId == subsystemID) {
 			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
 			break;
 		}
