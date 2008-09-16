@@ -62,11 +62,13 @@ private:
 	status_t	SetupVideoCookie(mkv_cookie *cookie);
 	status_t	SetupAudioCookie(mkv_cookie *cookie);
 	status_t	SetupTextCookie(mkv_cookie *cookie);
+	int			CreateFakeAACDecoderConfig(const TrackInfo *track);
 
 private:
 	InputStream *		fInputStream;
 	MatroskaFile *		fFile;
 	const SegmentInfo *	fFileInfo;
+	uint8 *				fakeExtraData;
 };
 
 

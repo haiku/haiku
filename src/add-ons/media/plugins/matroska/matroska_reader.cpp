@@ -34,7 +34,7 @@
 #include "matroska_codecs.h"
 #include "matroska_util.h"
 
-//#define TRACE_MKV_READER
+#define TRACE_MKV_READER
 #ifdef TRACE_MKV_READER
   #define TRACE printf
 #else
@@ -58,6 +58,9 @@ struct mkv_cookie
 	unsigned	buffer_size;
 	
 	const TrackInfo	*track_info;
+	
+	int			private_data_size;
+	uint8 *		private_data;
 
 	float		frame_rate;
 	int64		frame_count;
@@ -72,12 +75,45 @@ struct mkv_cookie
 	uint32		line_count;
 };
 
+static uint8 matroska_samplerate_to_samplerateindex(float samplerate)
+{
+	if (samplerate <= 7350.0) {
+		return 12;
+	} else if (samplerate <= 8000.0) {
+		return 11;
+	} else if (samplerate <= 11025.0) {
+		return 10;
+	} else if (samplerate <= 12000.0) {
+		return 9;
+	} else if (samplerate <= 16000.0) {
+		return 8;
+	} else if (samplerate <= 22050.0) {
+		return 7;
+	} else if (samplerate <= 24000.0) {
+		return 6;
+	} else if (samplerate <= 32000.0) {
+		return 5;
+	} else if (samplerate <= 44100.0) {
+		return 4;
+	} else if (samplerate <= 48000.0) {
+		return 3;
+	} else if (samplerate <= 64000.0) {
+		return 2;
+	} else if (samplerate <= 88200.0) {
+		return 1;
+	} else if (samplerate <= 96000.0) {
+		return 0;
+	}
+	
+	return 15;
+}
 
 mkvReader::mkvReader()
  :	fInputStream(0)
  ,	fFile(0)
  ,	fFileInfo(0)
 {
+	fakeExtraData = 0;
 	TRACE("mkvReader::mkvReader\n");
 }
 
@@ -86,15 +122,71 @@ mkvReader::~mkvReader()
 {
 	mkv_Close(fFile);
 	free(fInputStream);
+	if (fakeExtraData) {
+		delete [] fakeExtraData;
+	}
 }
 
+int
+mkvReader::CreateFakeAACDecoderConfig(const TrackInfo *track)
+{
+	// Try to fake up a valid Decoder Config for the AAC decoder to parse
+	TRACE("AAC requires private data (attempting to fake one).\n");
+
+	fakeExtraData = new uint8[8];
+
+    int Profile = 1;
+    
+    if (strstr(track->CodecID,"MAIN")) {
+    	Profile = 1;
+    } else if (strstr(track->CodecID,"LC")) {
+    	Profile = 2;
+    } else if (strstr(track->CodecID,"SSR")) {
+    	Profile = 3;
+	}
+
+    uint8 SampleRateIndex = matroska_samplerate_to_samplerateindex(track->Audio.SamplingFreq);
+    
+    // profile			5 bits
+    // SampleRateIndex	4 bits
+    // Channels			4 Bits
+    fakeExtraData[0] = (Profile << 3) | ((SampleRateIndex & 0x0E) >> 1);
+    fakeExtraData[1] = ((SampleRateIndex & 0x01) << 7) | (track->Audio.Channels << 3);
+    if (strstr(track->CodecID, "SBR")) {
+    	// Sync Extension 0x2b7				11 bits
+		// Extension Audio Object Type 0x5	5 bits
+		// SBR present flag	0x1    			1 bit
+		// SampleRateIndex 					3 bits
+		// if SampleRateIndex = 15
+		// ExtendedSamplingFrequency		24 bits
+    
+		SampleRateIndex = matroska_samplerate_to_samplerateindex(track->Audio.OutputSamplingFreq);
+        fakeExtraData[2] = 0x56;
+        fakeExtraData[3] = 0xE5;
+        if (SampleRateIndex != 15) {
+	        fakeExtraData[4] = 0x80 | (SampleRateIndex << 3);
+   	        return 5;
+        }
+
+		uint32 SampleRate = uint32(track->Audio.OutputSamplingFreq);
+        
+        fakeExtraData[4] = 0x80 | (SampleRateIndex << 3) | ((SampleRate & 0xFFF0 ) >> 4);
+        fakeExtraData[5] = (SampleRate & 0x0FFF) << 4;
+        fakeExtraData[6] = SampleRate << 12;
+        fakeExtraData[7] = SampleRate << 20;
+        return 8;
+    } else {
+    	return 2;
+	}
+	
+	return 0;
+}
       
 const char *
 mkvReader::Copyright()
 {
 	return "Matroska reader, " B_UTF8_COPYRIGHT " by Marcus Overhagen";
 }
-
 	
 status_t
 mkvReader::Sniff(int32 *streamCount)
@@ -236,6 +328,9 @@ mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 		return B_ERROR;
 	}
 	
+	cookie->private_data = (uint8 *)cookie->track_info->CodecPrivate;
+	cookie->private_data_size = cookie->track_info->CodecPrivateSize;
+
 	uint16 width_aspect_ratio;
 	uint16 height_aspect_ratio;
 	get_pixel_aspect_ratio(&width_aspect_ratio, &height_aspect_ratio,
@@ -287,22 +382,33 @@ mkvReader::SetupAudioCookie(mkv_cookie *cookie)
 
 	cookie->frame_rate = cookie->track_info->Audio.SamplingFreq;
 	cookie->duration = get_duration_in_us(fFileInfo->Duration);
-	cookie->frame_count = get_frame_count_by_frame_rate(fFileInfo->Duration, cookie->track_info->Audio.SamplingFreq);
-
+	cookie->frame_count = get_frame_count_by_frame_rate(fFileInfo->Duration, cookie->frame_rate);
+	
 	TRACE("frame_rate: %.6f\n", cookie->frame_rate); 
 	TRACE("duration: %Ld (%.6f)\n", cookie->duration, cookie->duration / 1E6); 
 	TRACE("frame_count: %Ld\n", cookie->frame_count);
 	
-	status_t res;
-	res = GetAudioFormat(&cookie->format, cookie->track_info->CodecID, cookie->track_info->CodecPrivate, cookie->track_info->CodecPrivateSize);
-	if (res != B_OK) {
+	if (B_OK != GetAudioFormat(&cookie->format, cookie->track_info->CodecID, cookie->track_info->CodecPrivate, cookie->track_info->CodecPrivateSize)) {
 		TRACE("mkvReader::SetupAudioCookie: codec not recognized\n");
 		return B_ERROR;
 	}
 
-	cookie->format.u.encoded_audio.bit_rate = cookie->track_info->Audio.BitDepth * cookie->track_info->Audio.Channels * cookie->track_info->Audio.SamplingFreq;
-	cookie->format.u.encoded_audio.output.frame_rate = cookie->track_info->Audio.SamplingFreq;
+	cookie->format.u.encoded_audio.output.frame_rate = cookie->frame_rate;
 	cookie->format.u.encoded_audio.output.channel_count = cookie->track_info->Audio.Channels;
+	cookie->format.u.encoded_audio.bit_rate = cookie->track_info->Audio.BitDepth * cookie->format.u.encoded_audio.output.channel_count * cookie->frame_rate;
+
+	cookie->private_data = (uint8 *)cookie->track_info->CodecPrivate;
+	cookie->private_data_size = cookie->track_info->CodecPrivateSize;
+
+	if (IS_CODEC(cookie->track_info->CodecID, "A_AAC")) {
+		if (cookie->private_data_size == 0) {
+			cookie->private_data_size = CreateFakeAACDecoderConfig(cookie->track_info);
+			cookie->private_data = &fakeExtraData[0];
+		}
+		
+		cookie->format.u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_SHORT;
+		cookie->format.u.encoded_audio.bit_rate = 64000 * cookie->format.u.encoded_audio.output.channel_count;
+	}
 
 	return B_OK;
 }
@@ -339,8 +445,8 @@ mkvReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 		*frameCount = cookie->frame_count;
 		*duration = cookie->duration;
 		*format = cookie->format;
-		*infoBuffer = 0;
-		*infoSize = 0;
+		*infoBuffer = cookie->private_data;
+		*infoSize = cookie->private_data_size;
 	}
 	return B_OK;
 }

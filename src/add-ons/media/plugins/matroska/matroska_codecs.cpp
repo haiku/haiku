@@ -27,7 +27,7 @@
 #include <MediaFormats.h>
 #include "matroska_codecs.h"
 
-//#define TRACE_MATROSKA
+#define TRACE_MATROSKA
 #ifdef TRACE_MATROSKA
   #define TRACE printf
 #else
@@ -35,8 +35,6 @@
 #endif
 
 #define ERROR(a...) fprintf(stderr, a)
-
-#define IS_CODEC(a,b) !memcmp(a, b, strlen(b))
 
 struct bitmap_info_header
 {
@@ -56,11 +54,13 @@ struct bitmap_info_header
 #include "ogg/ogg.h"
 #include <vector>
 
+
+
 status_t
 GetAudioFormat(media_format *format, const char *codec, void *private_data, int private_size)
 {
-	TRACE("GetAudioFormat: codec '%s', private data size %d\n", codec, private_size);
-	
+	TRACE("private_data: codec '%s', private data size %d\n", codec, private_size);
+
 	BMediaFormats formats;
 	media_format_description description;
 	
@@ -115,7 +115,6 @@ GetAudioFormat(media_format *format, const char *codec, void *private_data, int 
 
 		return B_OK;
 	}
-	
 
 	if (IS_CODEC(codec, "A_MPEG/L3")) {
 		media_format_description description;
@@ -127,8 +126,27 @@ GetAudioFormat(media_format *format, const char *codec, void *private_data, int 
 		return B_OK;
 	}
 	
-	
-	if (IS_CODEC(codec, "A_AAC/MPEG4/LC/SBR")) {
+	// The codec name only has to start with A_AAC to be AAC
+	// The rest is some sort of hint for creating the codec specific data
+	if (IS_CODEC(codec, "A_AAC")) {
+		uint64 misc_codec = 'mp4a';
+		media_format_description description;
+		description.family = B_MISC_FORMAT_FAMILY;
+		description.u.misc.file_format = (uint32)(misc_codec >> 32);
+		description.u.misc.codec = (uint32)misc_codec;
+		if (B_OK != formats.GetFormatFor(description, format)) 
+			format->type = B_MEDIA_ENCODED_AUDIO;
+
+		// Set the DecoderConfigSize (Not that haiku seems to use it)
+		if (private_size > 0) {
+			TRACE("AAC private data found, size is %d\n", private_size);
+			if (format->SetMetaData(private_data, private_size) != B_OK) {
+				ERROR("Failed to set Decoder Config\n");
+				return B_ERROR;
+			}
+		}
+
+		return B_OK;
 	}
 	
 	return B_ERROR;
