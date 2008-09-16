@@ -93,7 +93,7 @@ class BMenuField : public BView {
 protected:
 	virtual	void			DoLayout();
 
- private:
+private:
 			class LabelLayoutItem;
 			class MenuBarLayoutItem;
  			struct LayoutData;

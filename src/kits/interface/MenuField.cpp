@@ -673,7 +673,11 @@ BMenuField::MaxSize()
 	CALLED();
 
 	_ValidateLayoutData();
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), fLayoutData->min);
+
+	BSize max = fLayoutData->min;
+	max.width = B_SIZE_UNLIMITED;
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), max);
 }
 
 
@@ -811,9 +815,6 @@ BMenuField::InitObject(const char *label)
 		fDivider = (float)floor(Frame().Width() / 2.0f);
 	else
 		fDivider = 0;
-
-	// default to unlimited maximum width
-	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 }
 
 
@@ -998,8 +999,13 @@ BMenuField::_ValidateLayoutData()
 	font_height& fh = fLayoutData->font_info;
 	GetFontHeight(&fh);
 
-	fLayoutData->label_width = (Label() ? ceilf(StringWidth(Label())) : 0);
-	fLayoutData->label_height = ceilf(fh.ascent) + ceilf(fh.descent);
+	if (Label() != NULL) {
+		fLayoutData->label_width = ceilf(StringWidth(Label()));
+		fLayoutData->label_height = ceilf(fh.ascent) + ceilf(fh.descent);
+	} else {
+		fLayoutData->label_width = 0;
+		fLayoutData->label_height = 0;
+	}
 
 	// compute the minimal divider
 	float divider = 0;
@@ -1138,7 +1144,7 @@ BMenuField::MenuBarLayoutItem::MenuBarLayoutItem(BMenuField* parent)
 	: fParent(parent),
 	  fFrame()
 {
-	// by default the part left of the divider shall have an unlimited maximum
+	// by default the part right of the divider shall have an unlimited maximum
 	// width
 	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 }
