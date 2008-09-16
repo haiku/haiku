@@ -322,16 +322,16 @@ FontManager::_LoadRecentFontMappings()
 		ttfontsPath.Append("ttfonts");
 
 		BPath veraFontPath = ttfontsPath;
-		veraFontPath.Append("Vera.ttf");
-		_AddDefaultMapping("Bitstream Vera Sans", "Roman", veraFontPath.Path());
+		veraFontPath.Append("DejaVuSans.ttf");
+		_AddDefaultMapping("DejaVu Sans", "Book", veraFontPath.Path());
 
 		veraFontPath.SetTo(ttfontsPath.Path());
-		veraFontPath.Append("VeraBd.ttf");
-		_AddDefaultMapping("Bitstream Vera Sans", "Bold", veraFontPath.Path());
+		veraFontPath.Append("DejaVuSans-Bold.ttf");
+		_AddDefaultMapping("DejaVu Sans", "Bold", veraFontPath.Path());
 
 		veraFontPath.SetTo(ttfontsPath.Path());
-		veraFontPath.Append("VeraMono.ttf");
-		_AddDefaultMapping("Bitstream Vera Sans Mono", "Roman", veraFontPath.Path());
+		veraFontPath.Append("DejaVuSansMono.ttf");
+		_AddDefaultMapping("DejaVu Sans Mono", "Book", veraFontPath.Path());
 	}
 
 	return false;
