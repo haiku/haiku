@@ -357,7 +357,6 @@ KeymapWindow::RevertKeymap()
 {
 	//saves previous map to the Key_map file
 	
-	printf("REVERT\n");
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
 		return;

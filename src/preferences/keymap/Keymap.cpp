@@ -19,7 +19,7 @@ print_key(char *chars, int32 offset)
 {
 	int size = chars[offset++];
 	
-	switch(size) {
+	switch (size) {
 	case 0:
 		// Not mapped 
 		printf("N/A"); 
@@ -52,17 +52,17 @@ Keymap::DumpKeymap()
 	// Print a chart of the normal, shift, option, and option+shift 
 	// keys. 
 	printf("Key #\tNormal\tShift\tCaps\tC+S\tOption\tO+S\tO+C\tO+C+S\tControl\n"); 
-	for (int idx = 0; idx < 128; idx++) { 
-		printf(" 0x%x\t", idx ); 
-		print_key(fChars, fKeys.normal_map[idx]); 
-		print_key(fChars, fKeys.shift_map[idx]); 
-		print_key(fChars, fKeys.caps_map[idx]); 
-		print_key(fChars, fKeys.caps_shift_map[idx]); 
-		print_key(fChars, fKeys.option_map[idx]); 
-		print_key(fChars, fKeys.option_shift_map[idx]); 
-		print_key(fChars, fKeys.option_caps_map[idx]); 
-		print_key(fChars, fKeys.option_caps_shift_map[idx]); 
-		print_key(fChars, fKeys.control_map[idx]); 
+	for (int i = 0; i < 128; i++) { 
+		printf(" 0x%x\t", i); 
+		print_key(fChars, fKeys.normal_map[i]); 
+		print_key(fChars, fKeys.shift_map[i]); 
+		print_key(fChars, fKeys.caps_map[i]); 
+		print_key(fChars, fKeys.caps_shift_map[i]); 
+		print_key(fChars, fKeys.option_map[i]); 
+		print_key(fChars, fKeys.option_shift_map[i]); 
+		print_key(fChars, fKeys.option_caps_map[i]); 
+		print_key(fChars, fKeys.option_caps_shift_map[i]); 
+		print_key(fChars, fKeys.control_map[i]); 
 		printf("\n"); 
 	} 
 
