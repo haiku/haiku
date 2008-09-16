@@ -1212,22 +1212,19 @@ ChartWindow::OpenStarDensity(BPoint here)
 void
 ChartWindow::OpenRefresh(BPoint here)
 {
-	BRect frame;
-	BSlider *slider;
-	BWindow *window;
-
-	window = GetAppWindow("Refresh rate");
+	BWindow *window = GetAppWindow("Refresh rate");
 	if (window == NULL) {
-		frame.Set(here.x, here.y, here.x + REFRESH_RATE_H-1, here.y + REFRESH_RATE_V-1);
+		BRect frame(here.x, here.y, here.x + REFRESH_RATE_H-1, here.y + REFRESH_RATE_V-1);
 		window = new BWindow(frame, "Refresh rate",
 							 B_FLOATING_WINDOW_LOOK,
 							 B_FLOATING_APP_WINDOW_FEEL,
 							 B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK);
 		frame.OffsetTo(0.0, 0.0);
-		slider = new BSlider(frame, "", NULL, new BMessage(REFRESH_RATE_MSG), 0, 1000);
+		BSlider *slider = new BSlider(frame, "", NULL, new BMessage(REFRESH_RATE_MSG), 0, 1000);
 		slider->SetViewColor(background_color);
 		slider->SetTarget(NULL, this);
-		slider->SetValue(1000*log(fCurrentSettings.refresh_rate/REFRESH_RATE_MIN)/log(REFRESH_RATE_MAX/REFRESH_RATE_MIN));
+		slider->SetValue((int32)(1000 * log(fCurrentSettings.refresh_rate / REFRESH_RATE_MIN) / 
+						log(REFRESH_RATE_MAX/REFRESH_RATE_MIN)));
 		slider->SetModificationMessage(new BMessage(REFRESH_RATE_MSG));
 		slider->SetLimitLabels(" 0.6 f/s  (logarythmic scale)", "600.0 f/s");
 		slider->ResizeToPreferred();
