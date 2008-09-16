@@ -856,7 +856,7 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 			new BMessage(kMsgScaleChanged), 2, 32);
 		fScaleSlider->SetModificationMessage(new BMessage(kMsgScaleChanged));
 		fScaleSlider->ResizeToPreferred();
-		fScaleSlider->SetValue(8.0);
+		fScaleSlider->SetValue(8);
 		fScaleSlider->SetHashMarks(B_HASH_MARKS_BOTH);
 		fScaleSlider->SetHashMarkCount(15);
 		AddChild(fScaleSlider);
