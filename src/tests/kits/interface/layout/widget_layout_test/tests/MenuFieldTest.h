@@ -27,12 +27,14 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-			void				UpdateLabelText();
-			void				UpdateLabelFont();
+			void				_UpdateLabelText();
+			void				_UpdateMenuText();
+			void				_UpdateLabelFont();
 
 private:
 			BMenuField*			fMenuField;
-			LabeledCheckBox*	fLongTextCheckBox;
+			LabeledCheckBox*	fLongLabelTextCheckBox;
+			LabeledCheckBox*	fLongMenuTextCheckBox;
 			LabeledCheckBox*	fBigFontCheckBox;
 			BFont*				fDefaultFont;
 			BFont*				fBigFont;

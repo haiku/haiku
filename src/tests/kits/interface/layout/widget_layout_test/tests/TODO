@@ -1,6 +1,5 @@
 ChannelSlider
 OptionPopup (covered by MenuField ?)
-RadioButton
 ScrollView
 StringView
 TabView

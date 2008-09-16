@@ -17,14 +17,16 @@
 
 enum {
 	MSG_CHANGE_LABEL_TEXT	= 'chlt',
-	MSG_CHANGE_LABEL_FONT	= 'chlf'
+	MSG_CHANGE_LABEL_FONT	= 'chlf',
+	MSG_CHANGE_MENU_TEXT	= 'chmt'
 };
 
 
 // constructor
 MenuFieldTest::MenuFieldTest()
 	: ControlTest("MenuField"),
-	  fLongTextCheckBox(NULL),
+	  fLongLabelTextCheckBox(NULL),
+	  fLongMenuTextCheckBox(NULL),
 	  fBigFontCheckBox(NULL),
 	  fDefaultFont(NULL),
 	  fBigFont(NULL)
@@ -75,18 +77,23 @@ MenuFieldTest::ActivateTest(View* controls)
 	fMenuField->SetViewColor(background);
 	fMenuField->SetLowColor(background);
 
-	// long text
-	fLongTextCheckBox = new LabeledCheckBox("Long label text",
+	// long label text
+	fLongLabelTextCheckBox = new LabeledCheckBox("Long label text",
 		new BMessage(MSG_CHANGE_LABEL_TEXT), this);
-	group->AddChild(fLongTextCheckBox);
+	group->AddChild(fLongLabelTextCheckBox);
+
+	// long menu text
+	fLongMenuTextCheckBox = new LabeledCheckBox("Long menu text",
+		new BMessage(MSG_CHANGE_MENU_TEXT), this);
+	group->AddChild(fLongMenuTextCheckBox);
 
 	// big font
 	fBigFontCheckBox = new LabeledCheckBox("Big label font",
 		new BMessage(MSG_CHANGE_LABEL_FONT), this);
 	group->AddChild(fBigFontCheckBox);
 
-	UpdateLabelText();
-	UpdateLabelFont();
+	_UpdateLabelText();
+	_UpdateLabelFont();
 
 	group->AddChild(new Glue());
 }
@@ -105,10 +112,13 @@ MenuFieldTest::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_CHANGE_LABEL_TEXT:
-			UpdateLabelText();
+			_UpdateLabelText();
+			break;
+		case MSG_CHANGE_MENU_TEXT:
+			_UpdateMenuText();
 			break;
 		case MSG_CHANGE_LABEL_FONT:
-			UpdateLabelFont();
+			_UpdateLabelFont();
 			break;
 		default:
 			Test::MessageReceived(message);
@@ -117,22 +127,36 @@ MenuFieldTest::MessageReceived(BMessage* message)
 }
 
 
-// UpdateLabelText
+// _UpdateLabelText
 void
-MenuFieldTest::UpdateLabelText()
+MenuFieldTest::_UpdateLabelText()
 {
-	if (!fLongTextCheckBox || !fMenuField)
+	if (!fLongLabelTextCheckBox || !fMenuField)
 		return;
 
-	fMenuField->SetLabel(fLongTextCheckBox->IsSelected()
+	fMenuField->SetLabel(fLongLabelTextCheckBox->IsSelected()
 		? "Pretty long menu field label"
 		: "Short label");
 }
 
 
-// UpdateLabelFont
+// _UpdateMenuText
 void
-MenuFieldTest::UpdateLabelFont()
+MenuFieldTest::_UpdateMenuText()
+{
+	if (!fLongMenuTextCheckBox || !fMenuField)
+		return;
+
+	fMenuField->Menu()->Superitem()->SetLabel(
+		fLongMenuTextCheckBox->IsSelected()
+		? "Pretty long menu field text"
+		: "Short text");
+}
+
+
+// _UpdateLabelFont
+void
+MenuFieldTest::_UpdateLabelFont()
 {
 	if (!fBigFontCheckBox || !fMenuField || !fMenuField->Window())
 		return;

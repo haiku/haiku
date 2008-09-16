@@ -115,7 +115,7 @@ TextControlTest::_UpdateLabelText()
 		return;
 
 	fTextControl->SetLabel(fLongTextCheckBox->IsSelected()
-		? "Pretty long menu field label"
+		? "Pretty long text control label"
 		: "Short label");
 }
 

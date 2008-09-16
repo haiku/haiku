@@ -17,6 +17,7 @@
 #include "MenuBarTest.h"
 #include "MenuFieldTest.h"
 #include "MenuTest.h"
+#include "RadioButtonTest.h"
 #include "ScrollBarTest.h"
 #include "SliderTest.h"
 #include "StringView.h"
@@ -48,6 +49,7 @@ const test_info kTestInfos[] = {
 	{ "BMenu",			MenuTest::CreateTest },
 	{ "BMenuBar",		MenuBarTest::CreateTest },
 	{ "BMenuField",		MenuFieldTest::CreateTest },
+	{ "BRadioButton",	RadioButtonTest::CreateTest },
 	{ "BScrollBar",		ScrollBarTest::CreateTest },
 	{ "BSlider",		SliderTest::CreateTest },
 	{ "BTextControl",	TextControlTest::CreateTest },
