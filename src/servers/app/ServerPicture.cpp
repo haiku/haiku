@@ -774,6 +774,8 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 	fPictures(NULL),
 	fUsurped(NULL)
 {
+	fToken = gTokenSpace.NewToken(kPictureToken, this);
+
 	BMallocIO *mallocIO = new (std::nothrow) BMallocIO();
 	if (mallocIO == NULL)
 		return;
@@ -784,8 +786,6 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 	if (mallocIO->SetSize(size) < B_OK)
 		return;
 	
-	fToken = gTokenSpace.NewToken(kPictureToken, this);
-
 	picture.fData->ReadAt(0, const_cast<void *>(mallocIO->Buffer()), size);
 		
 	PictureDataWriter::SetTo(fData);
@@ -800,6 +800,8 @@ ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
 	fPictures(NULL),
 	fUsurped(NULL)
 {
+	fToken = gTokenSpace.NewToken(kPictureToken, this);
+	
 	fFile = new (std::nothrow) BFile(fileName, B_READ_WRITE);
 	if (fFile == NULL)
 		return;
@@ -812,7 +814,6 @@ ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
 	}
 
 	fData = offsetFile;
-	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
 	PictureDataWriter::SetTo(fData);
 }
