@@ -84,7 +84,7 @@ static property_info sViewPropInfo[] = {
 			"shelf.", 0
 	},
 	{ "View", { B_COUNT_PROPERTIES, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns the number of of child views.", 0,
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns the number of child views.", 0,
 		{ B_INT32_TYPE }
 	},
 	{ "View", { 0 },
