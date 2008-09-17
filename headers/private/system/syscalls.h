@@ -406,6 +406,8 @@ extern int64		_kern_atomic_get64(vint64 *value);
 
 /* System informations */
 extern status_t		_kern_get_system_info(system_info *info, size_t size);
+extern status_t		_kern_get_system_info_etc(int32 id, void *buffer,
+						size_t bufferSize);
 extern status_t		_kern_analyze_scheduling(bigtime_t from, bigtime_t until,
 						void* buffer, size_t size,
 						struct scheduling_analysis* analysis);

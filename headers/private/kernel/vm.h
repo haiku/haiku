@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -16,6 +16,7 @@
 
 struct kernel_args;
 struct team;
+struct system_memory_info;
 struct vm_page;
 struct VMCache;
 struct vm_area;
@@ -93,6 +94,8 @@ status_t vm_map_page(struct vm_area *area, struct vm_page *page, addr_t address,
 status_t vm_get_physical_page(addr_t paddr, addr_t *vaddr, uint32 flags);
 status_t vm_put_physical_page(addr_t vaddr);
 
+void vm_get_info(struct system_memory_info *info);
+uint32 vm_num_page_faults(void);
 off_t vm_available_memory(void);
 off_t vm_available_not_needed_memory(void);
 

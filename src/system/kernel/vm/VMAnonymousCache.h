@@ -16,6 +16,8 @@
 
 typedef page_num_t swap_addr_t;
 struct swap_block;
+struct system_memory_info;
+
 
 extern "C" {
 	void swap_init(void);
@@ -23,6 +25,7 @@ extern "C" {
 	bool swap_free_page_swap_space(vm_page *page);
 	uint32 swap_available_pages(void);
 	uint32 swap_total_swap_pages(void);
+	void swap_get_info(struct system_memory_info *info);
 }
 
 

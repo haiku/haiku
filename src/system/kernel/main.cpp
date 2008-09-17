@@ -33,6 +33,7 @@
 #include <kmodule.h>
 #include <kscheduler.h>
 #include <ksyscalls.h>
+#include <ksystem_info.h>
 #include <lock.h>
 #include <low_resource_manager.h>
 #include <messaging.h>
@@ -44,7 +45,6 @@
 #include <real_time_clock.h>
 #include <sem.h>
 #include <smp.h>
-#include <system_info.h>
 #include <team.h>
 #include <timer.h>
 #include <user_debugger.h>

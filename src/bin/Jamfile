@@ -2,10 +2,7 @@ SubDir HAIKU_TOP src bin ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders app ;
-UsePrivateHeaders shared ;
-UsePrivateHeaders storage ;
-UseLibraryHeaders usb ;
+UsePrivateHeaders app shared storage usb ;
 UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 
@@ -46,6 +43,7 @@ StdBinCommands
 	sysinfo.c
 	unchop.c
 	uptime.cpp
+	vmstat.cpp
 	waitfor.c
 #	whoami.c
 	: : $(haiku-utils_rsrc) ;

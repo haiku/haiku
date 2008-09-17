@@ -27,6 +27,7 @@
 #include <kernel_daemon.h>
 #include <slab/Slab.h>
 #include <syscalls.h>
+#include <system_info.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
@@ -1248,3 +1249,16 @@ swap_total_swap_pages()
 }
 
 #endif	// ENABLE_SWAP_SUPPORT
+
+void
+swap_get_info(struct system_memory_info *info)
+{
+#if ENABLE_SWAP_SUPPORT
+	info->max_swap_space = swap_total_swap_pages() * B_PAGE_SIZE;
+	info->free_swap_space = swap_available_pages() * B_PAGE_SIZE;
+#else
+	info->max_swap_space = 0;
+	info->free_swap_space = 0;
+#endif
+}
+

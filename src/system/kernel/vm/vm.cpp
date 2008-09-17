@@ -34,6 +34,7 @@
 #include <lock.h>
 #include <low_resource_manager.h>
 #include <smp.h>
+#include <system_info.h>
 #include <thread.h>
 #include <team.h>
 #include <util/AutoLock.h>
@@ -42,6 +43,8 @@
 #include <vm_cache.h>
 #include <vm_page.h>
 #include <vm_priv.h>
+
+#include "VMAnonymousCache.h"
 
 
 //#define TRACE_VM
@@ -194,6 +197,7 @@ static mutex sAreaCacheLock = MUTEX_INITIALIZER("area->cache");
 static off_t sAvailableMemory;
 static off_t sNeededMemory;
 static mutex sAvailableMemoryLock = MUTEX_INITIALIZER("available memory lock");
+static uint32 sPageFaults;
 
 #if DEBUG_CACHE_LIST
 
@@ -4158,15 +4162,15 @@ status_t
 vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 	addr_t *newIP)
 {
-	FTRACE(("vm_page_fault: page fault at 0x%lx, ip 0x%lx\n", address, faultAddress));
-
-	*newIP = 0;
+	FTRACE(("vm_page_fault: page fault at 0x%lx, ip 0x%lx\n", address,
+		faultAddress));
 
 	addr_t pageAddress = ROUNDOWN(address, B_PAGE_SIZE);
+	vm_address_space *addressSpace = NULL;
 
 	status_t status = B_OK;
-
-	vm_address_space *addressSpace;
+	*newIP = 0;
+	atomic_add((int32*)&sPageFaults, 1);
 
 	if (IS_KERNEL_ADDRESS(pageAddress)) {
 		addressSpace = vm_get_kernel_address_space();
@@ -4847,6 +4851,27 @@ status_t
 vm_get_physical_page(addr_t paddr, addr_t *_vaddr, uint32 flags)
 {
 	return (*vm_kernel_address_space()->translation_map.ops->get_physical_page)(paddr, _vaddr, flags);
+}
+
+
+void
+vm_get_info(system_memory_info* info)
+{
+	swap_get_info(info);
+
+	info->max_memory = vm_page_num_pages() * B_PAGE_SIZE;
+	info->page_faults = sPageFaults;
+
+	MutexLocker locker(sAvailableMemoryLock);
+	info->free_memory = sAvailableMemory;
+	info->needed_memory = sNeededMemory;
+}
+
+
+uint32
+vm_num_page_faults(void)
+{
+	return sPageFaults;
 }
 
 

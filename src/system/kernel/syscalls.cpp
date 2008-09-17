@@ -4,44 +4,44 @@
  * Distributed under the terms of the MIT License.
  */
 
-/* Big case statement for dispatching syscalls */
+/*!	Big case statement for dispatching syscalls */
 
-#include <kernel.h>
-#include <ksyscalls.h>
-#include <syscalls.h>
-#include <generic_syscall.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <arch_config.h>
+#include <arch/system_info.h>
+#include <cpu.h>
 #include <debug.h>
-#include <int.h>
+#include <disk_device_manager/ddm_userland_interface.h>
 #include <elf.h>
-#include <vfs.h>
-#include <vm.h>
-#include <thread.h>
+#include <frame_buffer_console.h>
+#include <fs/fd.h>
+#include <fs/node_monitor.h>
+#include <generic_syscall.h>
+#include <int.h>
+#include <kernel.h>
+#include <kimage.h>
+#include <ksignal.h>
+#include <ksyscalls.h>
+#include <ksystem_info.h>
+#include <messaging.h>
+#include <port.h>
 #include <posix/realtime_sem.h>
 #include <posix/xsi_message_queue.h>
 #include <posix/xsi_semaphore.h>
-#include <sem.h>
-#include <port.h>
-#include <cpu.h>
-#include <arch_config.h>
-#include <disk_device_manager/ddm_userland_interface.h>
-#include <sys/resource.h>
-#include <fs/fd.h>
-#include <fs/node_monitor.h>
-#include <kimage.h>
-#include <ksignal.h>
 #include <real_time_clock.h>
 #include <safemode.h>
-#include <system_info.h>
+#include <sem.h>
+#include <sys/resource.h>
+#include <syscalls.h>
+#include <thread.h>
 #include <tracing.h>
 #include <user_atomic.h>
-#include <arch/system_info.h>
-#include <messaging.h>
-#include <frame_buffer_console.h>
 #include <usergroup.h>
+#include <vfs.h>
+#include <vm.h>
 #include <wait_for_objects.h>
-
-#include <malloc.h>
-#include <string.h>
 
 #include "syscall_numbers.h"
 

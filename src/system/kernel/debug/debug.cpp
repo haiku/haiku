@@ -16,8 +16,8 @@
 #include <frame_buffer_console.h>
 #include <int.h>
 #include <kernel.h>
+#include <ksystem_info.h>
 #include <smp.h>
-#include <system_info.h>
 #include <thread.h>
 #include <tracing.h>
 #include <vm.h>

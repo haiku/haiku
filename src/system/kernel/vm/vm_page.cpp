@@ -2122,6 +2122,7 @@ vm_page_get_stats(system_info *info)
 	info->used_pages = gMappedPagesCount - blockCachePages;
 	info->cached_pages = sNumPages >= free + info->used_pages
 		? sNumPages - free - info->used_pages : 0;
+	info->page_faults = vm_num_page_faults();
 
 	// TODO: We don't consider pages used for page directories/tables yet.
 }

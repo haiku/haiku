@@ -8,6 +8,7 @@
  */
 
 
+#include <ksystem_info.h>
 #include <system_info.h>
 #include <arch/system_info.h>
 
@@ -16,6 +17,7 @@
 #include <OS.h>
 #include <KernelExport.h>
 
+#include <block_cache.h>
 #include <cpu.h>
 #include <debug.h>
 #include <kernel.h>
@@ -136,4 +138,30 @@ _user_get_system_info(system_info *userInfo, size_t size)
 	}
 
 	return status;
+}
+
+
+status_t
+_user_get_system_info_etc(int32 id, void* userInfo, size_t size)
+{
+	if (userInfo == NULL || !IS_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;
+
+	switch (id) {
+		case B_MEMORY_INFO:
+		{
+			if (size < sizeof(system_memory_info))
+				return B_BAD_VALUE;
+
+			system_memory_info info;
+			vm_get_info(&info);
+
+			info.block_cache_memory = block_cache_used_memory();
+
+			return user_memcpy(userInfo, &info, sizeof(system_memory_info));
+		}
+
+		default:
+			return B_BAD_VALUE;
+	}
 }

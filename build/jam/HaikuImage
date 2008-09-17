@@ -50,7 +50,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2 cal cat
 	traceroute translate true tsort tty
 	uname unchop unexpand unmount uniq unrar unshar unzip unzipsfx <bin>updatedb
 	uptime urlwrapper usb_dev_info useradd uudecode uuencode
-	vdir version vim waitfor wc wget whoami xargs xres yes
+	vdir version vim vmstat waitfor wc wget whoami xargs xres yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
@@ -138,7 +138,7 @@ BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com etherpci $(X86_ONLY)ipro1000
 ;
 #BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
-	config_manager agp_gart usb firewire
+	config_manager agp_gart usb firewire #acpi
 ;
 BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 $(GPL_ONLY)reiserfs ;
 #googlefs nfs $(GPL_ONLY)ntfs ;
