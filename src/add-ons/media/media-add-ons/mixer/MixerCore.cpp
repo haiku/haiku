@@ -434,7 +434,7 @@ MixerCore::MixThread()
 
 	/* We must read from the input buffer at a position (pos) that is always a multiple of fMixBufferFrameCount.
 	 */
-	int64 temp = frames_for_duration(fMixBufferFrameRate, start	);
+	int64 temp = frames_for_duration(fMixBufferFrameRate, start);
 	frame_base = ((temp / fMixBufferFrameCount) + 1) * fMixBufferFrameCount;
 	time_base = duration_for_frames(fMixBufferFrameRate, frame_base);
 	Unlock();
