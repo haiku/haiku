@@ -1513,8 +1513,11 @@ debug_nub_thread(void *)
 
 	GRAB_TEAM_DEBUG_INFO_LOCK(nubThread->team->debug_info);
 
-	if (nubThread->team->debug_info.nub_thread != nubThread->id)
+	if (nubThread->team->debug_info.nub_thread != nubThread->id) {
+		RELEASE_TEAM_DEBUG_INFO_LOCK(nubThread->team->debug_info);
+		restore_interrupts(state);
 		return 0;
+	}
 
 	port_id port = nubThread->team->debug_info.nub_port;
 	sem_id writeLock = nubThread->team->debug_info.debugger_write_lock;
