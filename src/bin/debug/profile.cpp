@@ -55,29 +55,233 @@ struct hit_symbol {
 };
 
 
-struct Team {
-	team_info	info;
-};
+struct Team;
 
 
 struct Thread {
 	thread_info	info;
+	Team*		team;
 
 	thread_id ID() const		{ return info.thread; }
 	const char* Name() const	{ return info.name; }
 };
 
 
+class Team {
+public:
+	Team()
+		:
+		fNubPort(-1),
+		fSymbols(1000, true),
+		fStartProfilerSize(0),
+		fStartProfiler(NULL)
+	{
+		fInfo.team = -1;
+		fDebugContext.nub_port = -1;
+	}
+
+	~Team()
+	{
+		free(fStartProfiler);
+
+		if (fDebugContext.nub_port >= 0)
+			destroy_debug_context(&fDebugContext);
+
+		if (fNubPort >= 0)
+			remove_team_debugger(fInfo.team);
+	}
+
+	status_t Init(team_id teamID, port_id debuggerPort)
+	{
+		// get team info
+		status_t error = get_team_info(teamID, &fInfo);
+		if (error != B_OK)
+			return error;
+
+		// install ourselves as the team debugger
+		fNubPort = install_team_debugger(teamID, debuggerPort);
+		if (fNubPort < 0) {
+			fprintf(stderr, "%s: Failed to install as debugger for team %ld: "
+				"%s\n", kCommandName, teamID, strerror(fNubPort));
+			return fNubPort;
+		}
+
+		// init debug context
+		error = init_debug_context(&fDebugContext, teamID, fNubPort);
+		if (error != B_OK) {
+			fprintf(stderr, "%s: Failed to init debug context for team %ld: "
+				"%s\n", kCommandName, teamID, strerror(error));
+			return error;
+		}
+
+		// create symbol lookup context
+		debug_symbol_lookup_context* lookupContext;
+		error = debug_create_symbol_lookup_context(&fDebugContext,
+			&lookupContext);
+		if (error != B_OK) {
+			fprintf(stderr, "%s: Failed to create symbol lookup context for "
+				"team %ld: %s\n", kCommandName, teamID, strerror(error));
+			return error;
+		}
+
+		error = _LoadSymbols(lookupContext);
+		debug_delete_symbol_lookup_context(lookupContext);
+		if (error != B_OK)
+			return error;
+
+		// prepare the start profiler message
+		int32 symbolCount = fSymbols.CountItems();
+		if (symbolCount == 0) {
+			fprintf(stderr, "%s: Got no symbols at all...\n", kCommandName);
+			return B_ERROR;
+		}
+
+		printf("Found %ld functions.\n", symbolCount);
+
+		fStartProfilerSize = sizeof(debug_nub_start_profiler)
+			+ (symbolCount - 1) * sizeof(debug_profile_function);
+printf("start profiler message size: %lu\n", fStartProfilerSize);
+		fStartProfiler = (debug_nub_start_profiler*)malloc(fStartProfilerSize);
+		if (fStartProfiler == NULL) {
+			fprintf(stderr, "%s: Out of memory\n", kCommandName);
+			exit(1);
+		}
+
+		fStartProfiler->reply_port = fDebugContext.reply_port;
+		fStartProfiler->interval = 1000;
+		fStartProfiler->function_count = symbolCount;
+
+		for (int32 i = 0; i < symbolCount; i++) {
+			Symbol* symbol = fSymbols.ItemAt(i);
+			debug_profile_function& function = fStartProfiler->functions[i];
+			function.base = symbol->base;
+			function.size = symbol->size;
+		}
+
+		// set team debugging flags
+		int32 teamDebugFlags = B_TEAM_DEBUG_THREADS
+			| B_TEAM_DEBUG_TEAM_CREATION;
+		set_team_debugging_flags(fNubPort, teamDebugFlags);
+
+		return B_OK;
+	}
+
+	status_t InitThread(Thread* thread)
+	{
+		// set thread debugging flags and start profiling
+		int32 threadDebugFlags = 0;
+//		if (!traceTeam) {
+//			threadDebugFlags = B_THREAD_DEBUG_POST_SYSCALL
+//				| (traceChildThreads
+//					? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
+//		}
+		set_thread_debugging_flags(fNubPort, thread->ID(), threadDebugFlags);
+
+		// start profiling
+		fStartProfiler->thread = thread->ID();
+		debug_nub_start_profiler_reply reply;
+		status_t error = send_debug_message(&fDebugContext,
+			B_DEBUG_START_PROFILER, fStartProfiler, fStartProfilerSize, &reply,
+			sizeof(reply));
+		if (error != B_OK || (error = reply.error) != B_OK) {
+			fprintf(stderr, "%s: Failed to start profiler for thread %ld: %s\n",
+				kCommandName, thread->ID(), strerror(error));
+			return error;
+		}
+
+		// resume the target thread to be sure, it's running
+		resume_thread(thread->ID());
+
+		thread->team = this;
+
+		return B_OK;
+	}
+
+	team_id ID() const
+	{
+		return fInfo.team;
+	}
+
+	BObjectList<Symbol>& Symbols()
+	{
+		return fSymbols;
+	}
+
+	int32 SymbolCount() const
+	{
+		return fSymbols.CountItems();
+	}
+
+private:
+	status_t _LoadSymbols(debug_symbol_lookup_context* lookupContext)
+	{
+		// iterate through the team's images and collect the symbols
+		image_info imageInfo;
+		int32 cookie = 0;
+		while (get_next_image_info(fInfo.team, &cookie, &imageInfo) == B_OK) {
+			printf("Loading symbols of image \"%s\" (%ld)...\n",
+				imageInfo.name, imageInfo.id);
+
+			// create symbol iterator
+			debug_symbol_iterator* iterator;
+			status_t error = debug_create_image_symbol_iterator(lookupContext,
+				imageInfo.id, &iterator);
+			if (error != B_OK) {
+				printf("Failed to init symbol iterator: %s\n", strerror(error));
+				continue;
+			}
+
+			// iterate through the images
+			char symbolName[1024];
+			int32 symbolType;
+			void* symbolLocation;
+			size_t symbolSize;
+			while (debug_next_image_symbol(iterator, symbolName, sizeof(symbolName),
+					&symbolType, &symbolLocation, &symbolSize) == B_OK) {
+	//			printf("  %s %p (%6lu) %s\n",
+	//				symbolType == B_SYMBOL_TYPE_TEXT ? "text" : "data",
+	//				symbolLocation, symbolSize, symbolName);
+				if (symbolSize > 0 && symbolType == B_SYMBOL_TYPE_TEXT) {
+					Symbol* symbol = new(std::nothrow) Symbol(
+						(addr_t)symbolLocation, symbolSize, symbolName);
+					if (symbol == NULL || !fSymbols.AddItem(symbol)) {
+						delete symbol;
+						fprintf(stderr, "%s: Out of memory\n", kCommandName);
+						debug_delete_image_symbol_iterator(iterator);
+						return B_NO_MEMORY;
+					}
+				}
+			}
+
+			debug_delete_image_symbol_iterator(iterator);
+		}
+
+		return B_OK;
+	}
+
+private:
+	team_info					fInfo;
+	port_id						fNubPort;
+	debug_context				fDebugContext;
+	BObjectList<Symbol>			fSymbols;
+	size_t						fStartProfilerSize;
+	debug_nub_start_profiler*	fStartProfiler;
+};
+
+
 class ThreadManager {
 public:
-	ThreadManager()
+	ThreadManager(port_id debuggerPort)
 		:
 		fTeams(20, true),
-		fThreads(20, true)
+		fThreads(20, true),
+		fDebuggerPort(debuggerPort),
+		fDebuggerMessage(NULL),
+		fMaxDebuggerMessageSize(0)
 	{
 	}
 
-	status_t AddTeam(team_id teamID)
+	status_t AddTeam(team_id teamID, Team** _team = NULL)
 	{
 		if (FindTeam(teamID) != NULL)
 			return B_BAD_VALUE;
@@ -86,13 +290,20 @@ public:
 		if (team == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = get_team_info(teamID, &team->info);
+		status_t error = team->Init(teamID, fDebuggerPort);
+		if (error == B_OK)
+			error = _ReallocateDebuggerMessage(team->SymbolCount());
+
 		if (error != B_OK) {
 			delete team;
 			return error;
 		}
 
 		fTeams.AddItem(team);
+
+		if (_team != NULL)
+			*_team = team;
+
 		return B_OK;
 	}
 
@@ -101,11 +312,22 @@ public:
 		if (FindThread(threadID) != NULL)
 			return B_BAD_VALUE;
 
+		thread_info threadInfo;
+		status_t error = get_thread_info(threadID, &threadInfo);
+		if (error != B_OK)
+			return error;
+
+		Team* team = FindTeam(threadInfo.team);
+		if (team == NULL)
+			return B_BAD_TEAM_ID;
+
 		Thread* thread = new(std::nothrow) Thread;
 		if (thread == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = get_thread_info(threadID, &thread->info);
+		thread->info = threadInfo;
+
+		error = team->InitThread(thread);
 		if (error != B_OK) {
 			delete thread;
 			return error;
@@ -130,7 +352,7 @@ public:
 	Team* FindTeam(team_id teamID) const
 	{
 		for (int32 i = 0; Team* team = fTeams.ItemAt(i); i++) {
-			if (team->info.team == teamID)
+			if (team->ID() == teamID)
 				return team;
 		}
 		return NULL;
@@ -145,9 +367,44 @@ public:
 		return NULL;
 	}
 
+	debug_debugger_message_data* DebuggerMessage() const
+	{
+		return fDebuggerMessage;
+	}
+
+	size_t MaxDebuggerMessageSize() const
+	{
+		return fMaxDebuggerMessageSize;
+	}
+
 private:
-	BObjectList<Team>	fTeams;
-	BObjectList<Thread>	fThreads;
+	status_t _ReallocateDebuggerMessage(int32 symbolCount)
+	{
+		// allocate memory for the reply
+		size_t maxMessageSize = max_c(sizeof(debug_debugger_message_data),
+			sizeof(debug_profiler_stopped) + 8 * symbolCount);
+		if (maxMessageSize <= fMaxDebuggerMessageSize)
+			return B_OK;
+
+		debug_debugger_message_data* message = (debug_debugger_message_data*)
+			realloc(fDebuggerMessage, maxMessageSize);
+		if (message == NULL) {
+			fprintf(stderr, "%s: Out of memory\n", kCommandName);
+			return B_NO_MEMORY;
+		}
+
+		fDebuggerMessage = message;
+		fMaxDebuggerMessageSize = maxMessageSize;
+
+		return B_OK;
+	}
+
+private:
+	BObjectList<Team>				fTeams;
+	BObjectList<Thread>				fThreads;
+	port_id							fDebuggerPort;
+	debug_debugger_message_data*	fDebuggerMessage;
+	size_t							fMaxDebuggerMessageSize;
 };
 
 
@@ -267,151 +524,17 @@ main(int argc, const char* const* argv)
 		exit(1);
 	}
 
-	// install ourselves as the team debugger
-	port_id nubPort = install_team_debugger(teamID, debuggerPort);
-	if (nubPort < 0) {
-		fprintf(stderr, "%s: Failed to install team debugger: %s\n",
-			kCommandName, strerror(nubPort));
+	// add team and thread to the thread manager
+	ThreadManager threadManager(debuggerPort);
+	if (threadManager.AddTeam(teamID) != B_OK
+		|| threadManager.AddThread(threadID) != B_OK) {
 		exit(1);
-	}
-
-	ThreadManager threadManager;
-	threadManager.AddTeam(teamID);
-	threadManager.AddThread(threadID);
-
-	// init debug context
-	debug_context debugContext;
-	status_t error = init_debug_context(&debugContext, teamID, nubPort);
-	if (error != B_OK) {
-		fprintf(stderr, "%s: Failed to init debug context: %s\n",
-			kCommandName, strerror(error));
-		exit(1);
-	}
-
-	// create symbol lookup context
-	debug_symbol_lookup_context* lookupContext;
-	error = debug_create_symbol_lookup_context(&debugContext,
-		&lookupContext);
-	if (error != B_OK) {
-		fprintf(stderr, "%s: Failed to create symbol lookup context: %s\n",
-			kCommandName, strerror(error));
-		exit(1);
-	}
-
-	// iterate through the team's images and collect the symbols
-	BObjectList<Symbol> symbols(1000, true);
-	image_info imageInfo;
-	int32 cookie = 0;
-	while (get_next_image_info(teamID, &cookie, &imageInfo) == B_OK) {
-		printf("Loading symbols of image \"%s\" (%ld)...\n",
-			imageInfo.name, imageInfo.id);
-		// create symbol iterator
-		debug_symbol_iterator* iterator;
-		error = debug_create_image_symbol_iterator(lookupContext, imageInfo.id,
-			&iterator);
-		if (error != B_OK) {
-			printf("Failed to init symbol iterator: %s\n", strerror(error));
-			continue;
-		}
-
-		// iterate through the images
-		char symbolName[1024];
-		int32 symbolType;
-		void* symbolLocation;
-		size_t symbolSize;
-		while (debug_next_image_symbol(iterator, symbolName, sizeof(symbolName),
-				&symbolType, &symbolLocation, &symbolSize) == B_OK) {
-//			printf("  %s %p (%6lu) %s\n",
-//				symbolType == B_SYMBOL_TYPE_TEXT ? "text" : "data",
-//				symbolLocation, symbolSize, symbolName);
-			if (symbolSize > 0 && symbolType == B_SYMBOL_TYPE_TEXT) {
-				Symbol* symbol = new(std::nothrow) Symbol(
-					(addr_t)symbolLocation, symbolSize, symbolName);
-				if (symbol == NULL || !symbols.AddItem(symbol)) {
-					delete symbol;
-					fprintf(stderr, "%s: Out of memory\n", kCommandName);
-					exit(1);
-				}
-			}
-		}
-
-		debug_delete_image_symbol_iterator(iterator);
-	}
-
-	debug_delete_symbol_lookup_context(lookupContext);
-
-	// prepare the start profiler message
-	int32 symbolCount = symbols.CountItems();
-	if (symbolCount == 0) {
-		fprintf(stderr, "%s: Got no symbols at all, exiting...\n",
-			kCommandName);
-		exit(1);
-	}
-
-	printf("Found %ld functions.\n", symbolCount);
-
-	size_t startProfilerSize = sizeof(debug_nub_start_profiler)
-		+ (symbolCount - 1) * sizeof(debug_profile_function);
-printf("start profiler message size: %lu\n", startProfilerSize);
-	debug_nub_start_profiler* startProfiler
-		= (debug_nub_start_profiler*)malloc(startProfilerSize);
-	if (startProfiler == NULL) {
-		fprintf(stderr, "%s: Out of memory\n", kCommandName);
-		exit(1);
-	}
-
-	startProfiler->reply_port = debugContext.reply_port;
-	startProfiler->thread = threadID;
-	startProfiler->interval = 1000;
-	startProfiler->function_count = symbolCount;
-
-	for (int32 i = 0; i < symbolCount; i++) {
-		Symbol* symbol = symbols.ItemAt(i);
-		debug_profile_function& function = startProfiler->functions[i];
-		function.base = symbol->base;
-		function.size = symbol->size;
-	}
-
-	// allocate memory for the reply
-	size_t maxMessageSize = max_c(sizeof(debug_debugger_message_data),
-		sizeof(debug_profiler_stopped) + 8 * symbolCount);
-	debug_debugger_message_data* message = (debug_debugger_message_data*)
-		malloc(maxMessageSize);
-	if (message == NULL) {
-		fprintf(stderr, "%s: Out of memory\n", kCommandName);
-		exit(1);
-	}
-
-	// set team debugging flags
-	int32 teamDebugFlags = B_TEAM_DEBUG_THREADS;
-	set_team_debugging_flags(nubPort, teamDebugFlags);
-
-	// set thread debugging flags and start profiling
-	if (threadID >= 0) {
-		int32 threadDebugFlags = 0;
-//		if (!traceTeam) {
-//			threadDebugFlags = B_THREAD_DEBUG_POST_SYSCALL
-//				| (traceChildThreads
-//					? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
-//		}
-		set_thread_debugging_flags(nubPort, threadID, threadDebugFlags);
-
-		// start profiling
-	 	debug_nub_start_profiler_reply reply;
-		error = send_debug_message(&debugContext, B_DEBUG_START_PROFILER,
-            startProfiler, startProfilerSize, &reply, sizeof(reply));
-		if (error != B_OK || (error = reply.error) != B_OK) {
-			fprintf(stderr, "%s: Failed to start profiler: %s\n",
-				kCommandName, strerror(error));
-			exit(1);
-		}
-
-		// resume the target thread to be sure, it's running
-		resume_thread(threadID);
 	}
 
 	// debug loop
 	while (true) {
+		size_t maxMessageSize = threadManager.MaxDebuggerMessageSize();
+		debug_debugger_message_data* message = threadManager.DebuggerMessage();
 		bool quitLoop = false;
 		int32 code;
 		ssize_t messageSize = read_port(debuggerPort, &code, message,
@@ -433,6 +556,9 @@ printf("start profiler message size: %lu\n", startProfilerSize);
 					message->profiler_stopped.origin.thread);
 				if (thread == NULL)
 					break;
+
+				BObjectList<Symbol>& symbols = thread->team->Symbols();
+				int32 symbolCount = symbols.CountItems();
 
 				int64 totalTicks = message->profiler_stopped.total_ticks;
 				int64 missedTicks = message->profiler_stopped.missed_ticks;
@@ -485,6 +611,20 @@ printf("start profiler message size: %lu\n", startProfilerSize);
 				break;
 			}
 
+			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
+				threadManager.AddTeam(message->team_created.new_team);
+				break;
+			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
+				// a debugged team is gone -- quit, if it is our team
+				quitLoop = message->origin.team == teamID;
+				break;
+			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
+				threadManager.AddThread(message->thread_created.new_thread);
+				break;
+			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
+				threadManager.RemoveThread(message->origin.thread);
+				break;
+
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 			case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
@@ -494,36 +634,8 @@ printf("start profiler message size: %lu\n", startProfilerSize);
 			case B_DEBUGGER_MESSAGE_SINGLE_STEP:
 			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 			case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
-			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
-			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
-			{
-				thread_id newThread = message->thread_created.new_thread;
-				if (threadManager.AddThread(newThread) == B_OK) {
-					// start profiling
-					startProfiler->thread = newThread;
-					debug_nub_start_profiler_reply reply;
-					error = send_debug_message(&debugContext,
-						B_DEBUG_START_PROFILER, startProfiler,
-						startProfilerSize, &reply, sizeof(reply));
-					if (error != B_OK || (error = reply.error) != B_OK) {
-						fprintf(stderr, "%s: Failed to start profiler for "
-							"thread %ld: %s\n", kCommandName, newThread,
-							strerror(error));
-						threadManager.RemoveThread(newThread);
-					}
-				}
-				break;
-			}
-			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
-				threadManager.RemoveThread(message->origin.thread);
-				break;
 			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
 			case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
-				break;
-
-			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
-				// the debugged team is gone
-				quitLoop = true;
 				break;
 		}
 
@@ -535,8 +647,6 @@ printf("start profiler message size: %lu\n", startProfilerSize);
 		if (message->origin.thread >= 0 && message->origin.nub_port >= 0)
 			continue_thread(message->origin.nub_port, message->origin.thread);
 	}
-
-	destroy_debug_context(&debugContext);
 
 	return 0;
 }
