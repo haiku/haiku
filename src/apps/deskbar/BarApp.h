@@ -52,6 +52,7 @@ class BarTeamInfo {
 public:
 	BarTeamInfo(BList *teams, uint32 flags, char *sig, BBitmap *icon,
 				char *name);
+	BarTeamInfo(const BarTeamInfo &info);
 	~BarTeamInfo();
 
 	BList *teams;

@@ -148,11 +148,7 @@ TBarApp::~TBarApp()
 	int32 teamCount = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
 		BarTeamInfo *barInfo = (BarTeamInfo *)sBarTeamInfoList.ItemAt(i);
-		delete barInfo->teams;
-		free(barInfo->sig);
-		delete barInfo->icon;
-		free(barInfo->name);
-		free(barInfo);
+		delete barInfo;
 	}
 
 	int32 subsCount = sSubscribers.CountItems();
@@ -551,11 +547,10 @@ TBarApp::Subscribe(const BMessenger &subscriber, BList *list)
 
 	int32 numTeams = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < numTeams; i++) {
-		BarTeamInfo	*barInfo = (BarTeamInfo *)sBarTeamInfoList.ItemAt(i);
-		BList *tList = new BList(*(barInfo->teams));
-		BBitmap *icon = new BBitmap(barInfo->icon);
-		ASSERT(icon);
-		list->AddItem(new BarTeamInfo(tList, barInfo->flags, strdup(barInfo->sig), icon, strdup(barInfo->name)));
+		BarTeamInfo *barInfo = (BarTeamInfo *)sBarTeamInfoList.ItemAt(i);
+		BarTeamInfo *newBarInfo = new (std::nothrow) BarTeamInfo(*barInfo);
+		if (newBarInfo != NULL)
+			list->AddItem(newBarInfo);
 	}
 
 	int32 subsCount = sSubscribers.CountItems();
@@ -730,6 +725,16 @@ BarTeamInfo::BarTeamInfo(BList *teams, uint32 flags, char *sig, BBitmap *icon, c
 		sig(sig),
 		icon(icon),
 		name(name)
+{
+}
+
+
+BarTeamInfo::BarTeamInfo(const BarTeamInfo &info)
+	:	teams(new BList(*info.teams)),
+		flags(info.flags),
+		sig(strdup(info.sig)),
+		icon(new BBitmap(*info.icon)),
+		name(strdup(info.name))
 {
 }
 
