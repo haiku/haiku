@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src apps screenshot ;
+
+UsePrivateHeaders interface ;
+
+Application Screenshot :
+	main.cpp
+	Screenshot.cpp
+	ScreenshotWindow.cpp
+	: be translation
+	: Screenshot.rdef
+;
+
