@@ -1986,5 +1986,10 @@ elf_reinit_after_fork()
 	if (rld_sem < 0)
 		return rld_sem;
 
+	// TODO: We should also update the IDs of our images. We are the child and
+	// and have cloned images with different IDs. Since in most cases (fork()
+	// + exec*()) this would just increase the fork() overhead with no one
+	// caring, we could do that lazily, when first doing something different.
+
 	return B_OK;
 }
