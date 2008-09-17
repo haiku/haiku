@@ -55,6 +55,102 @@ struct hit_symbol {
 };
 
 
+struct Team {
+	team_info	info;
+};
+
+
+struct Thread {
+	thread_info	info;
+
+	thread_id ID() const		{ return info.thread; }
+	const char* Name() const	{ return info.name; }
+};
+
+
+class ThreadManager {
+public:
+	ThreadManager()
+		:
+		fTeams(20, true),
+		fThreads(20, true)
+	{
+	}
+
+	status_t AddTeam(team_id teamID)
+	{
+		if (FindTeam(teamID) != NULL)
+			return B_BAD_VALUE;
+
+		Team* team = new(std::nothrow) Team;
+		if (team == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = get_team_info(teamID, &team->info);
+		if (error != B_OK) {
+			delete team;
+			return error;
+		}
+
+		fTeams.AddItem(team);
+		return B_OK;
+	}
+
+	status_t AddThread(thread_id threadID)
+	{
+		if (FindThread(threadID) != NULL)
+			return B_BAD_VALUE;
+
+		Thread* thread = new(std::nothrow) Thread;
+		if (thread == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = get_thread_info(threadID, &thread->info);
+		if (error != B_OK) {
+			delete thread;
+			return error;
+		}
+
+		fThreads.AddItem(thread);
+		return B_OK;
+	}
+
+	void RemoveTeam(team_id teamID)
+	{
+		if (Team* team = FindTeam(teamID))
+			fTeams.RemoveItem(team, true);
+	}
+
+	void RemoveThread(thread_id threadID)
+	{
+		if (Thread* thread = FindThread(threadID))
+			fThreads.RemoveItem(thread, true);
+	}
+
+	Team* FindTeam(team_id teamID) const
+	{
+		for (int32 i = 0; Team* team = fTeams.ItemAt(i); i++) {
+			if (team->info.team == teamID)
+				return team;
+		}
+		return NULL;
+	}
+
+	Thread* FindThread(thread_id threadID) const
+	{
+		for (int32 i = 0; Thread* thread = fThreads.ItemAt(i); i++) {
+			if (thread->info.thread == threadID)
+				return thread;
+		}
+		return NULL;
+	}
+
+private:
+	BObjectList<Team>	fTeams;
+	BObjectList<Thread>	fThreads;
+};
+
+
 // TODO: Adjust!
 static const char* kUsage =
 	"Usage: %s [ <options> ] <command line>\n"
@@ -138,29 +234,29 @@ main(int argc, const char* const* argv)
 	int programArgCount = argc - optind;
 
 	// get thread/team to be debugged
-	thread_id thread = -1;
-	team_id team = -1;
+	thread_id threadID = -1;
+	team_id teamID = -1;
 //	if (programArgCount > 1
-//		|| !get_id(*programArgs, (traceTeam ? team : thread))) {
+//		|| !get_id(*programArgs, (traceTeam ? teamID : thread))) {
 		// we've been given an executable and need to load it
-		thread = load_program(programArgs, programArgCount, false);
-		if (thread < 0) {
+		threadID = load_program(programArgs, programArgCount, false);
+		if (threadID < 0) {
 			fprintf(stderr, "%s: Failed to start `%s': %s\n", kCommandName,
-				programArgs[0], strerror(thread));
+				programArgs[0], strerror(threadID));
 			exit(1);
 		}
 //	}
 
 	// get the team ID, if we have none yet
-	if (team < 0) {
+	if (teamID < 0) {
 		thread_info threadInfo;
-		status_t error = get_thread_info(thread, &threadInfo);
+		status_t error = get_thread_info(threadID, &threadInfo);
 		if (error != B_OK) {
 			fprintf(stderr, "%s: Failed to get info for thread %ld: %s\n",
-				kCommandName, thread, strerror(error));
+				kCommandName, threadID, strerror(error));
 			exit(1);
 		}
-		team = threadInfo.team;
+		teamID = threadInfo.team;
 	}
 
 	// create a debugger port
@@ -172,16 +268,20 @@ main(int argc, const char* const* argv)
 	}
 
 	// install ourselves as the team debugger
-	port_id nubPort = install_team_debugger(team, debuggerPort);
+	port_id nubPort = install_team_debugger(teamID, debuggerPort);
 	if (nubPort < 0) {
 		fprintf(stderr, "%s: Failed to install team debugger: %s\n",
 			kCommandName, strerror(nubPort));
 		exit(1);
 	}
 
+	ThreadManager threadManager;
+	threadManager.AddTeam(teamID);
+	threadManager.AddThread(threadID);
+
 	// init debug context
 	debug_context debugContext;
-	status_t error = init_debug_context(&debugContext, team, nubPort);
+	status_t error = init_debug_context(&debugContext, teamID, nubPort);
 	if (error != B_OK) {
 		fprintf(stderr, "%s: Failed to init debug context: %s\n",
 			kCommandName, strerror(error));
@@ -202,7 +302,7 @@ main(int argc, const char* const* argv)
 	BObjectList<Symbol> symbols(1000, true);
 	image_info imageInfo;
 	int32 cookie = 0;
-	while (get_next_image_info(team, &cookie, &imageInfo) == B_OK) {
+	while (get_next_image_info(teamID, &cookie, &imageInfo) == B_OK) {
 		printf("Loading symbols of image \"%s\" (%ld)...\n",
 			imageInfo.name, imageInfo.id);
 		// create symbol iterator
@@ -228,6 +328,7 @@ main(int argc, const char* const* argv)
 				Symbol* symbol = new(std::nothrow) Symbol(
 					(addr_t)symbolLocation, symbolSize, symbolName);
 				if (symbol == NULL || !symbols.AddItem(symbol)) {
+					delete symbol;
 					fprintf(stderr, "%s: Out of memory\n", kCommandName);
 					exit(1);
 				}
@@ -247,8 +348,11 @@ main(int argc, const char* const* argv)
 		exit(1);
 	}
 
+	printf("Found %ld functions.\n", symbolCount);
+
 	size_t startProfilerSize = sizeof(debug_nub_start_profiler)
 		+ (symbolCount - 1) * sizeof(debug_profile_function);
+printf("start profiler message size: %lu\n", startProfilerSize);
 	debug_nub_start_profiler* startProfiler
 		= (debug_nub_start_profiler*)malloc(startProfilerSize);
 	if (startProfiler == NULL) {
@@ -257,7 +361,7 @@ main(int argc, const char* const* argv)
 	}
 
 	startProfiler->reply_port = debugContext.reply_port;
-	startProfiler->thread = thread;
+	startProfiler->thread = threadID;
 	startProfiler->interval = 1000;
 	startProfiler->function_count = symbolCount;
 
@@ -279,18 +383,18 @@ main(int argc, const char* const* argv)
 	}
 
 	// set team debugging flags
-	int32 teamDebugFlags = 0;
+	int32 teamDebugFlags = B_TEAM_DEBUG_THREADS;
 	set_team_debugging_flags(nubPort, teamDebugFlags);
 
 	// set thread debugging flags and start profiling
-	if (thread >= 0) {
+	if (threadID >= 0) {
 		int32 threadDebugFlags = 0;
 //		if (!traceTeam) {
 //			threadDebugFlags = B_THREAD_DEBUG_POST_SYSCALL
 //				| (traceChildThreads
 //					? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
 //		}
-		set_thread_debugging_flags(nubPort, thread, threadDebugFlags);
+		set_thread_debugging_flags(nubPort, threadID, threadDebugFlags);
 
 		// start profiling
 	 	debug_nub_start_profiler_reply reply;
@@ -303,7 +407,7 @@ main(int argc, const char* const* argv)
 		}
 
 		// resume the target thread to be sure, it's running
-		resume_thread(thread);
+		resume_thread(threadID);
 	}
 
 	// debug loop
@@ -325,15 +429,22 @@ main(int argc, const char* const* argv)
 		switch (code) {
 			case B_DEBUGGER_MESSAGE_PROFILER_STOPPED:
 			{
+				Thread* thread = threadManager.FindThread(
+					message->profiler_stopped.origin.thread);
+				if (thread == NULL)
+					break;
+
 				int64 totalTicks = message->profiler_stopped.total_ticks;
 				int64 missedTicks = message->profiler_stopped.missed_ticks;
 				bigtime_t interval = message->profiler_stopped.interval;
 
-				printf("\nprofiling results for thread %ld:\n",
-					message->profiler_stopped.origin.thread);
+				printf("\nprofiling results for thread \"%s\" (%ld):\n",
+					thread->Name(), thread->ID());
 				printf("  tick interval: %lld us\n", interval);
 				printf("  total ticks:   %lld (%lld us)\n", totalTicks,
 					totalTicks * interval);
+				if (totalTicks == 0)
+					totalTicks = 1;
 				printf("  missed ticks:  %lld (%lld us, %6.2f%%)\n",
 					missedTicks, missedTicks * interval,
 					100.0 * missedTicks / totalTicks);
@@ -370,6 +481,7 @@ main(int argc, const char* const* argv)
 				} else
 					printf("  no functions were hit\n");
 
+				threadManager.RemoveThread(thread->ID());
 				break;
 			}
 
@@ -384,7 +496,27 @@ main(int argc, const char* const* argv)
 			case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
+			{
+				thread_id newThread = message->thread_created.new_thread;
+				if (threadManager.AddThread(newThread) == B_OK) {
+					// start profiling
+					startProfiler->thread = newThread;
+					debug_nub_start_profiler_reply reply;
+					error = send_debug_message(&debugContext,
+						B_DEBUG_START_PROFILER, startProfiler,
+						startProfilerSize, &reply, sizeof(reply));
+					if (error != B_OK || (error = reply.error) != B_OK) {
+						fprintf(stderr, "%s: Failed to start profiler for "
+							"thread %ld: %s\n", kCommandName, newThread,
+							strerror(error));
+						threadManager.RemoveThread(newThread);
+					}
+				}
+				break;
+			}
 			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
+				threadManager.RemoveThread(message->origin.thread);
+				break;
 			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
 			case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
 				break;
