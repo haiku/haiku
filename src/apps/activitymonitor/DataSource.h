@@ -98,6 +98,19 @@ public:
 };
 
 
+class SwapSpaceDataSource : public MemoryDataSource {
+public:
+						SwapSpaceDataSource();
+	virtual				~SwapSpaceDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	Label() const;
+	virtual bool		Primary() const;
+};
+
+
 class SemaphoresDataSource : public DataSource {
 public:
 						SemaphoresDataSource();
@@ -212,6 +225,29 @@ public:
 
 private:
 	bigtime_t			fPreviousActive;
+	bigtime_t			fPreviousTime;
+};
+
+
+class PageFaultsDataSource : public DataSource {
+public:
+						PageFaultsDataSource();
+						PageFaultsDataSource(
+							const PageFaultsDataSource& other);
+	virtual				~PageFaultsDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual void		Print(BString& text, int64 value) const;
+	virtual	int64		NextValue(SystemInfo& info);
+
+	virtual const char*	Name() const;
+	virtual const char*	Label() const;
+	virtual bool		AdaptiveScale() const;
+	virtual bool		Primary() const;
+
+private:
+	uint32				fPreviousFaults;
 	bigtime_t			fPreviousTime;
 };
 

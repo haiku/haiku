@@ -8,6 +8,9 @@
 
 #include <OS.h>
 
+#include <system_info.h>
+
+
 class SystemInfoHandler;
 
 
@@ -19,6 +22,11 @@ public:
 			uint64		CachedMemory() const;
 			uint64		UsedMemory() const;
 			uint64		MaxMemory() const;
+
+			uint32		PageFaults() const;
+
+			uint64		MaxSwapSpace() const;
+			uint64		UsedSwapSpace() const;
 
 			uint32		UsedSemaphores() const;
 			uint32		MaxSemaphores() const;
@@ -53,6 +61,7 @@ private:
 			void		_RetrieveNetwork();
 
 	system_info			fSystemInfo;
+	system_memory_info	fMemoryInfo;
 	bigtime_t			fTime;
 	bool				fRetrievedNetwork;
 	uint64				fBytesReceived;

@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src apps activitymonitor ;
 # XXX: Temporary only
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders shared system ;
 
 Application ActivityMonitor :
 	ActivityMonitor.cpp

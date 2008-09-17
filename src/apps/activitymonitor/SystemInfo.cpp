@@ -27,6 +27,8 @@ SystemInfo::SystemInfo(SystemInfoHandler* handler)
 	fMediaBuffers(0)
 {
 	get_system_info(&fSystemInfo);
+	get_system_info_etc(B_MEMORY_INFO, &fMemoryInfo,
+		sizeof(system_memory_info));
 
 	if (handler != NULL) {
 		fRunningApps = handler->RunningApps();
@@ -66,6 +68,27 @@ uint64
 SystemInfo::MaxMemory() const
 {
 	return (uint64)fSystemInfo.max_pages * B_PAGE_SIZE;
+}
+
+
+uint32
+SystemInfo::PageFaults() const
+{
+	return fMemoryInfo.page_faults;
+}
+
+
+uint64
+SystemInfo::UsedSwapSpace() const
+{
+	return fMemoryInfo.max_swap_space - fMemoryInfo.free_swap_space;
+}
+
+
+uint64
+SystemInfo::MaxSwapSpace() const
+{
+	return fMemoryInfo.max_swap_space;
 }
 
 

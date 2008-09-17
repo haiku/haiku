@@ -18,15 +18,17 @@
 const DataSource* kSources[] = {
 	new UsedMemoryDataSource(),
 	new CachedMemoryDataSource(),
+	new SwapSpaceDataSource(),
+	new PageFaultsDataSource(),
+	new CPUUsageDataSource(),
+	new CPUCombinedUsageDataSource(),
+	new NetworkUsageDataSource(true),
+	new NetworkUsageDataSource(false),
 	new SemaphoresDataSource(),
 	new PortsDataSource(),
 	new ThreadsDataSource(),
 	new TeamsDataSource(),
 	new RunningAppsDataSource(),
-	new CPUUsageDataSource(),
-	new CPUCombinedUsageDataSource(),
-	new NetworkUsageDataSource(true),
-	new NetworkUsageDataSource(false),
 	new ClipboardSizeDataSource(false),
 	new ClipboardSizeDataSource(true),
 	new MediaNodesDataSource()
@@ -367,6 +369,51 @@ CachedMemoryDataSource::Label() const
 
 bool
 CachedMemoryDataSource::Primary() const
+{
+	return true;
+}
+
+
+//	#pragma mark -
+
+
+SwapSpaceDataSource::SwapSpaceDataSource()
+{
+	SystemInfo info;
+
+	fColor = (rgb_color){0, 120, 0};
+	fMaximum = info.MaxSwapSpace();
+}
+
+
+SwapSpaceDataSource::~SwapSpaceDataSource()
+{
+}
+
+
+DataSource*
+SwapSpaceDataSource::Copy() const
+{
+	return new SwapSpaceDataSource(*this);
+}
+
+
+int64
+SwapSpaceDataSource::NextValue(SystemInfo& info)
+{
+	return info.UsedSwapSpace();
+}
+
+
+const char*
+SwapSpaceDataSource::Label() const
+{
+	return "Swap Space";
+}
+
+
+bool
+SwapSpaceDataSource::Primary() const
 {
 	return true;
 }
@@ -838,6 +885,97 @@ bool
 CPUCombinedUsageDataSource::Primary() const
 {
 	return true;
+}
+
+
+//	#pragma mark -
+
+
+PageFaultsDataSource::PageFaultsDataSource()
+	:
+	fPreviousFaults(0),
+	fPreviousTime(0)
+{
+	SystemInfo info;
+	NextValue(info);
+
+	fMinimum = 0;
+	fMaximum = 1000000000LL;
+
+	fColor = (rgb_color){200, 0, 150, 0};
+}
+
+
+PageFaultsDataSource::PageFaultsDataSource(const PageFaultsDataSource& other)
+	: DataSource(other)
+{
+	fPreviousFaults = other.fPreviousFaults;
+	fPreviousTime = other.fPreviousTime;
+}
+
+
+PageFaultsDataSource::~PageFaultsDataSource()
+{
+}
+
+
+DataSource*
+PageFaultsDataSource::Copy() const
+{
+	return new PageFaultsDataSource(*this);
+}
+
+
+void
+PageFaultsDataSource::Print(BString& text, int64 value) const
+{
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%.1f faults/s", value / 1024.0);
+
+	text = buffer;
+}
+
+
+int64
+PageFaultsDataSource::NextValue(SystemInfo& info)
+{
+	uint64 faults = info.PageFaults();
+
+	int64 faultsPerSecond = uint64(1024 * double(faults - fPreviousFaults)
+		/ (info.Time() - fPreviousTime) * 1000000.0);
+
+	fPreviousFaults = faults;
+	fPreviousTime = info.Time();
+
+	return faultsPerSecond;
+}
+
+
+const char*
+PageFaultsDataSource::Label() const
+{
+	return "Page Faults";
+}
+
+
+const char*
+PageFaultsDataSource::Name() const
+{
+	return "Page Faults";
+}
+
+
+bool
+PageFaultsDataSource::AdaptiveScale() const
+{
+	return true;
+}
+
+
+bool
+PageFaultsDataSource::Primary() const
+{
+	return false;
 }
 
 
