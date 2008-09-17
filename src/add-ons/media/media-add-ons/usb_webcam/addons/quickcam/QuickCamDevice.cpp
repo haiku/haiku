@@ -119,7 +119,7 @@ QuickCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 status_t
 QuickCamDevice::GetStatusIIC()
 {
-	status_t err;
+	status_t err = B_ERROR;
 	uint8 status = 0;
 #warning WRITEME
 	//dprintf(ID "i2c_status: error 0x%08lx, status = %02x\n", err, status);
