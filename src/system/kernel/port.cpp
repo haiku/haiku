@@ -61,7 +61,7 @@ struct port_entry {
 
 
 #define MAX_QUEUE_LENGTH 4096
-#define PORT_MAX_MESSAGE_SIZE 65536
+#define PORT_MAX_MESSAGE_SIZE (256 * 1024)
 
 // sMaxPorts must be power of 2
 static int32 sMaxPorts = 4096;
