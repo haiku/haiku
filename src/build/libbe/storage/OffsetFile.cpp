@@ -16,7 +16,7 @@ namespace Storage {
 
 // constructor
 OffsetFile::OffsetFile()
-	: fFile(),
+	: fFile(NULL),
 	  fOffset(0),
 	  fCurrentPosition(0)
 {
@@ -145,7 +145,7 @@ OffsetFile::SetSize(off_t size)
 
 // GetSize
 status_t
-OffsetFile::GetSize(off_t *size)
+OffsetFile::GetSize(off_t *size) const
 {
 	status_t error = (size ? B_OK : B_BAD_VALUE );
 	if (error == B_OK)
