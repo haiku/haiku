@@ -1271,6 +1271,7 @@ void
 ActivityView::_Refresh()
 {
 	bigtime_t lastTimeout = system_time() - fRefreshInterval;
+	BMessenger target(this);
 
 	while (true) {
 		status_t status = acquire_sem_etc(fRefreshSem, 1, B_ABSOLUTE_TIMEOUT,
@@ -1297,11 +1298,8 @@ ActivityView::_Refresh()
 
 		bigtime_t now = info.Time();
 		if (fLastRefresh + fDrawInterval <= now) {
-			if (LockLooper()) {
-				Invalidate();
-				UnlockLooper();
-				fLastRefresh = now;
-			}
+			target.SendMessage(B_INVALIDATE);
+			fLastRefresh = now;
 		}
 	}
 }
