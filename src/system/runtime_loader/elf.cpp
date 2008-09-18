@@ -82,6 +82,7 @@ static image_t *sProgramImage;
 static KMessage sErrorMessage;
 static bool sProgramLoaded = false;
 static const char *sSearchPathSubDir = NULL;
+static bool sInvalidImageIDs;
 
 // a recursive lock
 static sem_id rld_sem;
@@ -227,13 +228,52 @@ report_errors()
 }
 
 
+//! Remaps the image ID of \a image after fork.
+static status_t
+update_image_id(image_t *image)
+{
+	int32 cookie = 0;
+	image_info info;
+	while (_kern_get_next_image_info(B_CURRENT_TEAM, &cookie, &info,
+			sizeof(image_info)) == B_OK) {
+		for (uint32 i = 0; i < image->num_regions; i++) {
+			if (image->regions[i].vmstart == (addr_t)info.text) {
+				image->id = info.id;
+				return B_OK;
+			}
+		}
+	}
+
+	FATAL("Could not update image ID %ld after fork()!\n", image->id);
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+//! After fork, we lazily rebuild the image IDs of all loaded images.
+static status_t
+update_image_ids(void)
+{
+	for (image_t *image = sLoadedImages.head; image; image = image->next) {
+		status_t status = update_image_id(image);
+		if (status != B_OK)
+			return status;
+	}
+	for (image_t *image = sDisposableImages.head; image; image = image->next) {
+		status_t status = update_image_id(image);
+		if (status != B_OK)
+			return status;
+	}
+
+	sInvalidImageIDs = false;
+	return B_OK;
+}
+
+
 static image_t *
 find_image_in_queue(image_queue_t *queue, const char *name, bool isPath,
 	uint32 typeMask)
 {
-	image_t *image;
-
-	for (image = queue->head; image; image = image->next) {
+	for (image_t *image = queue->head; image; image = image->next) {
 		const char *imageName = isPath ? image->path : image->name;
 		int length = isPath ? sizeof(image->path) : sizeof(image->name);
 
@@ -250,7 +290,7 @@ find_image_in_queue(image_queue_t *queue, const char *name, bool isPath,
 static image_t *
 find_image(char const *name, uint32 typeMask)
 {
-	bool isPath = (strchr(name, '/') != NULL);
+	bool isPath = strchr(name, '/') != NULL;
 	return find_image_in_queue(&sLoadedImages, name, isPath, typeMask);
 }
 
@@ -258,16 +298,19 @@ find_image(char const *name, uint32 typeMask)
 static image_t *
 find_loaded_image_by_id(image_id id)
 {
-	image_t *image;
+	if (sInvalidImageIDs) {
+		// After fork, we lazily rebuild the image IDs of all loaded images
+		update_image_ids();
+	}
 
-	for (image = sLoadedImages.head; image; image = image->next) {
+	for (image_t *image = sLoadedImages.head; image; image = image->next) {
 		if (image->id == id)
 			return image;
 	}
 
 	// For the termination routine, we need to look into the list of
 	// disposable images as well
-	for (image = sDisposableImages.head; image; image = image->next) {
+	for (image_t *image = sDisposableImages.head; image; image = image->next) {
 		if (image->id == id)
 			return image;
 	}
@@ -373,13 +416,6 @@ count_regions(char const *buff, int phnum, int phentsize)
 }
 
 
-/*
- * create_image() & destroy_image()
- *
- * 	Create and destroy image_t structures. The destroyer makes sure that the
- * 	memory buffers are full of garbage before freeing.
- */
-
 static image_t *
 create_image(const char *name, const char *path, int num_regions)
 {
@@ -420,6 +456,7 @@ delete_image_struct(image_t *image)
 	free(image->needed);
 
 #ifdef DEBUG
+	// overwrite images to make sure they aren't accidently reused anywhere
 	memset(image, 0xa5, size);
 #endif
 	free(image);
@@ -1736,6 +1773,11 @@ unload_library(image_id imageID, bool addOn)
 	rld_lock();
 		// for now, just do stupid simple global locking
 
+	if (sInvalidImageIDs) {
+		// After fork, we lazily rebuild the image IDs of all loaded images
+		update_image_ids();
+	}
+
 	// we only check images that have been already initialized
 
 	for (image = sLoadedImages.head; image; image = image->next) {
@@ -1774,8 +1816,8 @@ unload_library(image_id imageID, bool addOn)
 
 
 status_t
-get_nth_symbol(image_id imageID, int32 num, char *nameBuffer, int32 *_nameLength,
-	int32 *_type, void **_location)
+get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
+	int32 *_nameLength, int32 *_type, void **_location)
 {
 	int32 count = 0, j;
 	uint32 i;
@@ -1827,7 +1869,8 @@ out:
 
 
 status_t
-get_symbol(image_id imageID, char const *symbolName, int32 symbolType, void **_location)
+get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
+	void **_location)
 {
 	status_t status = B_OK;
 	image_t *image;
@@ -1906,8 +1949,7 @@ get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 //	#pragma mark - runtime_loader private exports
 
 
-/** Read and verify the ELF header */
-
+/*! Read and verify the ELF header */
 status_t
 elf_verify_header(void *header, int32 length)
 {
@@ -1916,7 +1958,8 @@ elf_verify_header(void *header, int32 length)
 	if (length < (int32)sizeof(struct Elf32_Ehdr))
 		return B_NOT_AN_EXECUTABLE;
 
-	return parse_elf_header((struct Elf32_Ehdr *)header, &programSize, &sectionSize);
+	return parse_elf_header((struct Elf32_Ehdr *)header, &programSize,
+		&sectionSize);
 }
 
 
@@ -1929,6 +1972,11 @@ terminate_program(void)
 	count = get_sorted_image_list(sProgramImage, &termList, RFLAG_TERMINATED);
 	if (count < B_OK)
 		return;
+
+	if (sInvalidImageIDs) {
+		// After fork, we lazily rebuild the image IDs of all loaded images
+		update_image_ids();
+	}
 
 	TRACE(("%ld: terminate dependencies\n", find_thread(NULL)));
 	for (i = count; i-- > 0;) {
@@ -1980,16 +2028,17 @@ rldelf_init(void)
 
 
 status_t
-elf_reinit_after_fork()
+elf_reinit_after_fork(void)
 {
 	rld_sem = create_sem(1, "rld_lock");
 	if (rld_sem < 0)
 		return rld_sem;
 
-	// TODO: We should also update the IDs of our images. We are the child and
+	// We also need to update the IDs of our images. We are the child and
 	// and have cloned images with different IDs. Since in most cases (fork()
 	// + exec*()) this would just increase the fork() overhead with no one
-	// caring, we could do that lazily, when first doing something different.
+	// caring, we do that lazily, when first doing something different.
+	sInvalidImageIDs = true;
 
 	return B_OK;
 }
