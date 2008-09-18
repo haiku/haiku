@@ -168,7 +168,13 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 
 		// Examine the table, there is exactly one extended and one
 		// non-extended logical partition. All four table entries are
-		// examined though.
+		// examined though. If there is no inner extended partition,
+		// the end of the linked list is reached.
+		// The first PTS describing both an "inner extended" parition and a
+		// "data" partition (non extended and not empty) is the start sector
+		// of the primary extended partition. The next PTS in the linked list
+		// is the start sector of the inner extended partition described in
+		// this PTS.
 		LogicalPartition extended;
 		LogicalPartition nonExtended;
 		for (int32 i = 0; error == B_OK && i < 4; i++) {
@@ -224,7 +230,7 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 				error = B_NO_MEMORY;
 		}
 
-		// prepare to parse next extended partition
+		// prepare to parse next extended/non-extended partition pair
 		if (error == B_OK && !extended.IsEmpty())
 			offset = extended.Offset();
 		else

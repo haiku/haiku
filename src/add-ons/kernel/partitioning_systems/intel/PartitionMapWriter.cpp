@@ -226,23 +226,38 @@ PartitionMapWriter::_WriteExtended(partition_table_sector *pts,
 		return B_BAD_DATA;
 	}
 
+	// NOTE: The OS/2 boot manager needs the first entry to describe the
+	// data partition, while the second entry should describe the "inner
+	// extended" partition.
+
 	// write the table
 	partition_descriptor* descriptor = &(pts->table[0]);
 	partition->GetPartitionDescriptor(descriptor, partition->PTSOffset());
 		// location is relative to this partitions PTS offset
 
-	// setting offset and size of the next partition in the linked list
+	// Set offset and size of the next partition in the linked list.
+	// This is done via a so called "inner extended" partition which is
+	// only used to point to the next PTS location (start sector of the
+	// inner extended partition).
 	descriptor = &(pts->table[1]);
 	LogicalPartition extended;
 	if (next) {
 		extended.SetPTSOffset(partition->PTSOffset());
 		extended.SetOffset(next->PTSOffset());
-		extended.SetSize(next->Size() + next->Offset() - next->PTSOffset());
-			// TODO: The size calculation looks suspicious.
-			// Isn't next->Offset() relative to primary extended patition while
-			// next->PTSOffset() is not?
+
+		// Strictly speaking, the size is not relevant and just needs to
+		// be non-zero. But some operating systems check the size of
+		// inner extended partitions and it needs to include the next data
+		// partition. Therefor the size is the size of the next data partition
+		// plus the offset between the next PTS and the data partition start
+		// offset. This assumes of course that the start offset is behind
+		// the PTS offset, which is actually not dictated by a minimal
+		// specification.
+		extended.SetSize(next->Size() + (next->Offset() - next->PTSOffset()));
+
+		// Use the same extended partition type as the primary extended
+		// partition.
 		extended.SetType(partition->GetPrimaryPartition()->Type());
-			// TODO: Weird.
 
 		extended.GetPartitionDescriptor(descriptor, 0);
 

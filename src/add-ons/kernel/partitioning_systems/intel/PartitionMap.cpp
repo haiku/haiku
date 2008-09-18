@@ -508,17 +508,19 @@ PrimaryPartition::LogicalPartitionAt(int32 index) const
 void
 PrimaryPartition::AddLogicalPartition(LogicalPartition *partition)
 {
-	if (partition) {
-		partition->SetPrimaryPartition(this);
-		partition->SetPrevious(fTail);
-		if (fTail) {
-			fTail->SetNext(partition);
-			fTail = partition;
-		} else
-			fHead = fTail = partition;
-		partition->SetNext(NULL);
-		fLogicalPartitionCount++;
-	}
+	if (!partition)
+		return;
+
+	partition->SetPrimaryPartition(this);
+	partition->SetPrevious(fTail);
+	if (fTail) {
+		fTail->SetNext(partition);
+		fTail = partition;
+	} else
+		fHead = fTail = partition;
+	partition->SetNext(NULL);
+
+	fLogicalPartitionCount++;
 }
 
 // RemoveLogicalPartition
@@ -538,6 +540,7 @@ PrimaryPartition::RemoveLogicalPartition(LogicalPartition *partition)
 		next->SetPrevious(prev);
 	else
 		fTail = prev;
+
 	fLogicalPartitionCount--;
 
 	partition->SetNext(NULL);
