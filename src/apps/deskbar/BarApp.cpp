@@ -624,12 +624,8 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 		new BBitmap(kIconSize, kIconFormat), strdup(ref->name));
 
 	barInfo->teams->AddItem((void *)team);
-	if (appMime.GetIcon(barInfo->icon, B_MINI_ICON) != B_OK) {
-		const BBitmap* generic = AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_GenericAppIcon);
-		if (generic)
-			barInfo->icon->SetBits(generic->Bits(), barInfo->icon->BitsLength(),
-				0, generic->ColorSpace());
-	}
+	if (appMime.GetIcon(barInfo->icon, B_MINI_ICON) != B_OK)
+		appMime.GetTrackerIcon(barInfo->icon, B_MINI_ICON);
 
 	sBarTeamInfoList.AddItem(barInfo);
 
