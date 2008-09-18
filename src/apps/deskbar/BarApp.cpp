@@ -33,7 +33,7 @@ All rights reserved.
 */
 
 #include <Debug.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <AppFileInfo.h>
@@ -576,7 +576,7 @@ TBarApp::Unsubscribe(const BMessenger &subscriber)
 		BMessenger *messenger = (BMessenger *)sSubscribers.ItemAt(i);
 		if (*messenger == subscriber) {
 			sSubscribers.RemoveItem(i);
-			delete (messenger);
+			delete messenger;
 			break;
 		}
 	}
@@ -654,7 +654,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 
 
 void
-TBarApp::RemoveTeam(team_id	team)
+TBarApp::RemoveTeam(team_id team)
 {
 	BAutolock autolock(sSubscriberLock);
 	if (!autolock.IsLocked())
