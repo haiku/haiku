@@ -199,6 +199,7 @@ PartitionMapWriter::_WritePrimary(partition_table_sector* pts)
 		}
 
 		partition->GetPartitionDescriptor(descriptor, 0);
+			// TODO: Should this be fSessionOffset?!
 	}
 
 	return B_OK;
@@ -226,8 +227,9 @@ PartitionMapWriter::_WriteExtended(partition_table_sector *pts,
 	}
 
 	// write the table
-	partition_descriptor *descriptor = &(pts->table[0]);
+	partition_descriptor* descriptor = &(pts->table[0]);
 	partition->GetPartitionDescriptor(descriptor, partition->PTSOffset());
+		// location is relative to this partitions PTS offset
 
 	// setting offset and size of the next partition in the linked list
 	descriptor = &(pts->table[1]);
@@ -236,13 +238,20 @@ PartitionMapWriter::_WriteExtended(partition_table_sector *pts,
 		extended.SetPTSOffset(partition->PTSOffset());
 		extended.SetOffset(next->PTSOffset());
 		extended.SetSize(next->Size() + next->Offset() - next->PTSOffset());
+			// TODO: The size calculation looks suspicious.
+			// Isn't next->Offset() relative to primary extended patition while
+			// next->PTSOffset() is not?
 		extended.SetType(partition->GetPrimaryPartition()->Type());
+			// TODO: Weird.
+
 		extended.GetPartitionDescriptor(descriptor, 0);
+
+		// Unsetting to get an empty descriptor for the remaining slots.
 		extended.Unset();
 	} else
 		extended.GetPartitionDescriptor(descriptor, 0);
 
-	// last two descriptors are empty
+	// last two descriptors are empty ("extended" is unset)
 	for (int32 i = 2; i < 4; i++) {
 		descriptor = &(pts->table[i]);
 		extended.GetPartitionDescriptor(descriptor, 0);
