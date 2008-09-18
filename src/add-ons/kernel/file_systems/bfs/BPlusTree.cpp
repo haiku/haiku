@@ -473,29 +473,28 @@ BPlusTree::SetTo(Inode* stream)
 
 	fNodeSize = fHeader->NodeSize();
 
-	{
-		uint32 toMode[] = {S_STR_INDEX, S_INT_INDEX, S_UINT_INDEX,
-			S_LONG_LONG_INDEX, S_ULONG_LONG_INDEX, S_FLOAT_INDEX,
-			S_DOUBLE_INDEX};
-		uint32 mode = stream->Mode() & (S_STR_INDEX | S_INT_INDEX
-			| S_UINT_INDEX | S_LONG_LONG_INDEX | S_ULONG_LONG_INDEX
-			| S_FLOAT_INDEX | S_DOUBLE_INDEX);
+	// validity check
+	uint32 toMode[] = {S_STR_INDEX, S_INT_INDEX, S_UINT_INDEX,
+		S_LONG_LONG_INDEX, S_ULONG_LONG_INDEX, S_FLOAT_INDEX,
+		S_DOUBLE_INDEX};
+	uint32 mode = stream->Mode() & (S_STR_INDEX | S_INT_INDEX
+		| S_UINT_INDEX | S_LONG_LONG_INDEX | S_ULONG_LONG_INDEX
+		| S_FLOAT_INDEX | S_DOUBLE_INDEX);
 
-		if (fHeader->DataType() > BPLUSTREE_DOUBLE_TYPE
-			|| ((stream->Mode() & S_INDEX_DIR) != 0
-				&& toMode[fHeader->DataType()] != mode)
-			|| !stream->IsContainer()) {
-			D(	dump_bplustree_header(fHeader);
-				dump_inode(&stream->Node());
-			);
-			RETURN_ERROR(fStatus = B_BAD_TYPE);
-		}
-
-		// although it's in stat.h, the S_ALLOW_DUPS flag is obviously unused
-		// in the original BFS code - we will honour it nevertheless
-		fAllowDuplicates = stream->IsIndex()
-			|| (stream->Mode() & S_ALLOW_DUPS) != 0;
+	if (fHeader->DataType() > BPLUSTREE_DOUBLE_TYPE
+		|| ((stream->Mode() & S_INDEX_DIR) != 0
+			&& toMode[fHeader->DataType()] != mode)
+		|| !stream->IsContainer()) {
+		D(	dump_bplustree_header(fHeader);
+			dump_inode(&stream->Node());
+		);
+		RETURN_ERROR(fStatus = B_BAD_TYPE);
 	}
+
+	// although it's in stat.h, the S_ALLOW_DUPS flag is obviously unused
+	// in the original BFS code - we will honour it nevertheless
+	fAllowDuplicates = stream->IsIndex()
+		|| (stream->Mode() & S_ALLOW_DUPS) != 0;
 
 	CachedNode cached(this, fHeader->RootNode());
 	RETURN_ERROR(fStatus = cached.Node() ? B_OK : B_BAD_DATA);
