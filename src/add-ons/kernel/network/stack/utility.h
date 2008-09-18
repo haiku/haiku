@@ -73,7 +73,7 @@ status_t	fifo_socket_enqueue_buffer(net_fifo* fifo, net_socket* socket,
 void		init_timer(net_timer* timer, net_timer_func hook, void* data);
 void		set_timer(net_timer* timer, bigtime_t delay);
 bool		cancel_timer(struct net_timer* timer);
-void		wait_for_timer(struct net_timer* timer);
+status_t	wait_for_timer(struct net_timer* timer);
 bool		is_timer_active(net_timer* timer);
 status_t	init_timers(void);
 void		uninit_timers(void);

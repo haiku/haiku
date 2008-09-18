@@ -141,7 +141,7 @@ struct net_stack_module_info {
 	void (*init_timer)(struct net_timer *timer, net_timer_func hook, void *data);
 	void (*set_timer)(struct net_timer *timer, bigtime_t delay);
 	bool (*cancel_timer)(struct net_timer *timer);
-	void (*wait_for_timer)(struct net_timer *timer);
+	status_t (*wait_for_timer)(struct net_timer *timer);
 	bool (*is_timer_active)(struct net_timer *timer);
 
 	// syscall restart

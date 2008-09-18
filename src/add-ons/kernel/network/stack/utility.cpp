@@ -537,14 +537,19 @@ cancel_timer(struct net_timer* timer)
 }
 
 
-void
+status_t
 wait_for_timer(struct net_timer* timer)
 {
+	if (find_thread(NULL) == sTimerThread) {
+		// let's not wait for ourselves...
+		return B_BAD_VALUE;
+	}
+
 	while (true) {
 		MutexLocker locker(sTimerLock);
 
 		if (timer->due <= 0 && sCurrentTimer != timer)
-			return;
+			return B_OK;
 
 		// we actually need to wait for this timer
 		ConditionVariableEntry entry;
@@ -554,6 +559,8 @@ wait_for_timer(struct net_timer* timer)
 
 		entry.Wait();
 	}
+
+	return B_OK;
 }
 
 
