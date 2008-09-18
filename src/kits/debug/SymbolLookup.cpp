@@ -283,10 +283,39 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 status_t
 SymbolLookup::InitSymbolIterator(image_id imageID, SymbolIterator& iterator)
 {
+	TRACE(("SymbolLookup::InitSymbolIterator(): image ID: %ld\n", imageID));
+
 	// find the image
 	const image_t* image = _FindImageByID(imageID);
-	if (image == NULL)
+	if (image == NULL) {
+		TRACE(("SymbolLookup::InitSymbolIterator() done: image not found\n"));
 		return B_ENTRY_NOT_FOUND;
+	}
+
+	iterator.image = image;
+	iterator.symbolCount = Read(image->symhash[1]);
+	iterator.textDelta = image->regions->delta;
+	iterator.currentIndex = -1;
+
+	return B_OK;
+}
+
+
+// InitSymbolIterator
+status_t
+SymbolLookup::InitSymbolIteratorByAddress(addr_t address,
+	SymbolIterator& iterator)
+{
+	TRACE(("SymbolLookup::InitSymbolIteratorByAddress(): base address: %#lx\n",
+		address));
+
+	// find the image
+	const image_t *image = _FindImageAtAddress(address);
+	if (image == NULL) {
+		TRACE(("SymbolLookup::InitSymbolIteratorByAddress() done: image not "
+			"found\n"));
+		return B_ENTRY_NOT_FOUND;
+	}
 
 	iterator.image = image;
 	iterator.symbolCount = Read(image->symhash[1]);

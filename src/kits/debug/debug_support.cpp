@@ -378,6 +378,26 @@ debug_create_image_symbol_iterator(debug_symbol_lookup_context* lookupContext,
 		error = exception.Error();
 	}
 
+	// Work-around for a runtime loader problem. A freshly fork()ed child does
+	// still have image_t structures with the parent's image ID's, so we
+	// wouldn't find the image in this case.
+	if (error != B_OK) {
+		// Get the image info and re-try looking with the text base address.
+		// Note, that we can't easily check whether the image is part of the
+		// target team at all (there's no image_info::team, we'd have to
+		// iterate through all images).
+		image_info imageInfo;
+		error = get_image_info(imageID, &imageInfo);
+		if (error == B_OK) {
+			try {
+				error = lookup->InitSymbolIteratorByAddress(
+					(addr_t)imageInfo.text, *iterator);
+			} catch (BPrivate::Exception exception) {
+				error = exception.Error();
+			}
+		}
+	}
+
 	if (error != B_OK) {
 		delete iterator;
 		return error;

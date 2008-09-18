@@ -139,6 +139,8 @@ public:
 		const char **_symbolName, const char **_imageName, bool *_exactMatch);
 
 	status_t InitSymbolIterator(image_id imageID, SymbolIterator& iterator);
+	status_t InitSymbolIteratorByAddress(addr_t address,
+		SymbolIterator& iterator);
 	status_t NextSymbol(SymbolIterator& iterator, const char** _symbolName,
 		addr_t* _symbolAddress, size_t* _symbolSize, int32* _symbolType);
 
