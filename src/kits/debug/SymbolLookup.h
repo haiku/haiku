@@ -14,16 +14,9 @@
 #include <util/DoublyLinkedList.h>
 
 
-//#define TRACE_DEBUG_SYMBOL_LOOKUP
-#ifdef TRACE_DEBUG_SYMBOL_LOOKUP
-#	define TRACE(x) printf x
-#else
-#	define TRACE(x) ;
-#endif
-
-
 struct image_t;
 struct runtime_loader_debug_area;
+struct Elf32_Sym;
 
 
 namespace BPrivate {
@@ -76,6 +69,12 @@ public:
 			&& (addr_t)address + size <= (addr_t)fRemoteAddress + fSize);
 	}
 
+	bool ContainsLocalAddress(const void* address) const
+	{
+		return (addr_t)address >= (addr_t)fLocalAddress
+			&& (addr_t)address < (addr_t)fLocalAddress + fSize;
+	}
+
 	const void *PrepareAddress(const void *address);
 
 private:
@@ -95,9 +94,12 @@ public:
 
 	status_t Init();
 
-	const void *PrepareAddress(const void *remoteAddress, int32 size);
+	const void *PrepareAddress(const void *remoteAddress, int32 size) const;
+	const void *PrepareAddressNoThrow(const void *remoteAddress,
+		int32 size) const;
 
-	template<typename Type> inline const Type &Read(const Type &remoteData)
+	template<typename Type> inline const Type &Read(
+		const Type &remoteData) const
 	{
 		const void *remoteAddress = &remoteData;
 		const void *localAddress = PrepareAddress(remoteAddress,
@@ -105,8 +107,11 @@ public:
 		return *(const Type*)localAddress;
 	}
 
+	Area* AreaForLocalAddress(const void* address) const;
+
 private:
-	Area &_FindArea(const void *address, int32 size);
+	Area &_FindArea(const void *address, int32 size) const;
+	Area* _FindAreaNoThrow(const void *address, int32 size) const;
 
 	typedef DoublyLinkedList<Area>	AreaList;
 
@@ -118,9 +123,42 @@ private:
 };
 
 
+// ImageFile
+class ImageFile : public DoublyLinkedListLinkImpl<ImageFile> {
+public:
+	ImageFile(const image_info& info);
+	~ImageFile();
+
+	const image_info& Info() const	{ return fInfo; }
+
+	status_t Load();
+
+	const Elf32_Sym* LookupSymbol(addr_t address, addr_t* _baseAddress,
+		const char** _symbolName, size_t *_symbolNameLen,
+		bool *_exactMatch) const;
+	status_t NextSymbol(int32& iterator, const char** _symbolName,
+		size_t* _symbolNameLen, addr_t* _symbolAddress, size_t* _symbolSize,
+		int32* _symbolType) const;
+
+private:
+	size_t _SymbolNameLen(const char* symbolName) const;
+
+private:
+	image_info			fInfo;
+	int					fFD;
+	off_t				fFileSize;
+	uint8*				fMappedFile;
+	addr_t				fLoadDelta;
+	const Elf32_Sym*	fSymbolTable;
+	const char*			fStringTable;
+	int32				fSymbolCount;
+};
+
+
 // SymbolIterator
 struct SymbolIterator {
 	const image_t*		image;
+	const ImageFile*	imageFile;
 	int32				symbolCount;
 	size_t				textDelta;
 	int32				currentIndex;
@@ -136,19 +174,27 @@ public:
 	status_t Init();
 
 	status_t LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
-		const char **_symbolName, const char **_imageName, bool *_exactMatch);
+		const char **_symbolName, size_t *_symbolNameLen,
+		const char **_imageName, bool *_exactMatch) const;
 
-	status_t InitSymbolIterator(image_id imageID, SymbolIterator& iterator);
+	status_t InitSymbolIterator(image_id imageID,
+		SymbolIterator& iterator) const;
 	status_t InitSymbolIteratorByAddress(addr_t address,
-		SymbolIterator& iterator);
+		SymbolIterator& iterator) const;
 	status_t NextSymbol(SymbolIterator& iterator, const char** _symbolName,
-		addr_t* _symbolAddress, size_t* _symbolSize, int32* _symbolType);
+		size_t* _symbolNameLen, addr_t* _symbolAddress, size_t* _symbolSize,
+		int32* _symbolType) const;
 
 private:
-	const image_t *_FindImageAtAddress(addr_t address);
-	const image_t *_FindImageByID(image_id id);
+	const image_t *_FindImageAtAddress(addr_t address) const;
+	const image_t *_FindImageByID(image_id id) const;
+	ImageFile* _FindImageFileAtAddress(addr_t address) const;
+	ImageFile* _FindImageFileByID(image_id id) const;
+	size_t _SymbolNameLen(const char* address) const;
 
+private:
 	const runtime_loader_debug_area	*fDebugArea;
+	DoublyLinkedList<ImageFile>	fImageFiles;
 };
 
 }	// namespace BPrivate

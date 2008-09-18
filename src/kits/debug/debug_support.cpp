@@ -321,10 +321,12 @@ debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 	// find the symbol
 	addr_t _baseAddress;
 	const char *_symbolName;
+	size_t _symbolNameLen;
 	const char *_imageName;
 	try {
 		status_t error = lookup->LookupSymbolAddress((addr_t)address,
-			&_baseAddress, &_symbolName, &_imageName, exactMatch);
+			&_baseAddress, &_symbolName, &_symbolNameLen, &_imageName,
+			exactMatch);
 		if (error != B_OK)
 			return error;
 	} catch (BPrivate::Exception exception) {
@@ -336,15 +338,9 @@ debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 		*baseAddress = (void*)_baseAddress;
 
 	if (symbolName && symbolNameSize > 0) {
-		// _symbolName is a remote address: We read the string from the
-		// remote memory. The reason for not using the cloned area is that
-		// we don't trust that the data therein is valid (i.e. null-terminated)
-		// and thus strlcpy() could segfault when hitting the cloned area end.
-		if (_symbolName) {
-			ssize_t sizeRead = debug_read_string(&lookupContext->context,
-				_symbolName, symbolName, symbolNameSize);
-			if (sizeRead < 0)
-				return sizeRead;
+		if (_symbolName && _symbolNameLen > 0) {
+			strlcpy(symbolName, _symbolName,
+				min_c((size_t)symbolNameSize, _symbolNameLen + 1));
 		} else
 			symbolName[0] = '\0';
 	}
@@ -430,11 +426,13 @@ debug_next_image_symbol(debug_symbol_iterator* iterator, char* nameBuffer,
 	debug_symbol_lookup_context* lookupContext = iterator->lookup_context;
 
 	const char* symbolName;
+	size_t symbolNameLen;
 	addr_t symbolLocation;
 
 	try {
-		status_t error = lookupContext->lookup->NextSymbol(
-			*iterator, &symbolName, &symbolLocation, _symbolSize, _symbolType);
+		status_t error = lookupContext->lookup->NextSymbol(*iterator,
+			&symbolName, &symbolNameLen, &symbolLocation, _symbolSize,
+			_symbolType);
 		if (error != B_OK)
 			return error;
 	} catch (BPrivate::Exception exception) {
@@ -443,15 +441,9 @@ debug_next_image_symbol(debug_symbol_iterator* iterator, char* nameBuffer,
 
 	*_symbolLocation = (void*)symbolLocation;
 
-	// symbolName is a remote address: We read the string from the
-	// remote memory. The reason for not using the cloned area is that
-	// we don't trust that the data therein is valid (i.e. null-terminated)
-	// and thus strlcpy() could segfault when hitting the cloned area end.
-	if (symbolName != NULL) {
-		ssize_t sizeRead = debug_read_string(&lookupContext->context,
-			symbolName, nameBuffer, nameBufferLength);
-		if (sizeRead < 0)
-			return sizeRead;
+	if (symbolName != NULL && symbolNameLen > 0) {
+		strlcpy(nameBuffer, symbolName,
+			min_c(nameBufferLength, symbolNameLen + 1));
 	} else
 		nameBuffer[0] = '\0';
 
