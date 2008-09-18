@@ -1,3 +1,7 @@
+/*
+ * Copyright 2001-2008, Haiku.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _APPSERVER_CONFIG_H
 #define _APPSERVER_CONFIG_H
 
@@ -5,7 +9,7 @@
 // system keyboard shortcuts. Note that it is possible, though senseless, to place it in
 // regular mode and still use a display driver which depends on the R5 app_server
 #ifndef TEST_MODE
-	#define TEST_MODE 0
+#	define TEST_MODE 0
 #endif
 
 // Define this if you want the display driver to emulate the input server.
@@ -23,20 +27,21 @@
 
 // These definitions provide the server something to use for default
 // system fonts.
-# define DEFAULT_PLAIN_FONT_FAMILY "DejaVu Sans"
-# define FALLBACK_PLAIN_FONT_FAMILY "Swis721 BT"
-# define DEFAULT_PLAIN_FONT_STYLE "Book"
-# define DEFAULT_PLAIN_FONT_SIZE 12.0f
-# define DEFAULT_BOLD_FONT_FAMILY "DejaVu Sans"
-# define FALLBACK_BOLD_FONT_FAMILY "Swis721 BT"
-# define DEFAULT_BOLD_FONT_STYLE "Bold"
-# define DEFAULT_BOLD_FONT_SIZE 12.0f
-# define DEFAULT_FIXED_FONT_FAMILY "DejaVu Sans Mono"
-# define FALLBACK_FIXED_FONT_FAMILY "Courier10 BT"
-# define DEFAULT_FIXED_FONT_STYLE "Book"
-# define DEFAULT_FIXED_FONT_SIZE 12.0f
+#define DEFAULT_PLAIN_FONT_FAMILY "DejaVu Sans"
+#define FALLBACK_PLAIN_FONT_FAMILY "Swis721 BT"
+#define DEFAULT_PLAIN_FONT_STYLE "Book"
+#define DEFAULT_PLAIN_FONT_SIZE 12.0f
+#define DEFAULT_BOLD_FONT_FAMILY "DejaVu Sans"
+#define FALLBACK_BOLD_FONT_FAMILY "Swis721 BT"
+#define DEFAULT_BOLD_FONT_STYLE "Bold"
+#define DEFAULT_BOLD_FONT_SIZE 12.0f
+#define DEFAULT_FIXED_FONT_FAMILY "DejaVu Sans Mono"
+#define FALLBACK_FIXED_FONT_FAMILY "Courier10 BT"
+#define DEFAULT_FIXED_FONT_STYLE "Book"
+#define DEFAULT_FIXED_FONT_SIZE 12.0f
+
 // This is the port capacity for all monitoring objects - ServerApps
 // and ServerWindows
-#define DEFAULT_MONITOR_PORT_SIZE 30
+#define DEFAULT_MONITOR_PORT_SIZE 50
 
 #endif	/* _APPSERVER_CONFIG_H */
