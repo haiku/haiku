@@ -10,6 +10,8 @@
 		   for related classes.
 */
 
+// NOTE: <http://www.win.tue.nl/~aeb/partitions/partition_tables-2.html>
+
 #ifndef _INTEL_PARTITION_MAP_H
 #define _INTEL_PARTITION_MAP_H
 
@@ -55,6 +57,8 @@ fill_buffer(char *buffer, uint32 length, char ch)
 void get_partition_type_string(uint8 type, char *buffer);
 
 // chs
+// NOTE: The CHS cannot express locations within larger disks and is therefor
+// mostly obsolete.
 struct chs {
 	uint8	cylinder;
 	uint16	head_sector;	// head[15:10], sector[9:0]
@@ -64,11 +68,11 @@ struct chs {
 // partition_descriptor
 struct partition_descriptor {
 	uint8	active;
-	chs		begin;
-	uint8	type;
-	chs		end;
-	uint32	start;
-	uint32	size;
+	chs		begin;				// mostly ignored
+	uint8	type;				// empty, filesystem or extended
+	chs		end;				// mostly ignored
+	uint32	start;				// in sectors
+	uint32	size;				// in sectors
 
 	bool is_empty() const		{ return is_empty_type(type); }
 	bool is_extended() const	{ return is_extended_type(type); }
@@ -92,9 +96,9 @@ class LogicalPartition;
 /*!
   \brief Class for validating partition types.
 
-  To this class we can set partition type and then we can check whether
-  this type is valid, empty or if it represents extended partition.
-  We can also retrieve the name of that partition type or find next
+  To this class we can set a partition type and then we can check whether
+  this type is valid, empty or if it represents an extended partition.
+  We can also retrieve the name of that partition type or find the next
   supported type.
 */
 class PartitionType {
@@ -134,15 +138,23 @@ public:
 	bool IsEmpty() const	{ return is_empty_type(fType); }
 	bool IsExtended() const	{ return is_extended_type(fType); }
 
+	// NOTE: Both PTSOffset() and Offset() are absolute with regards to the
+	// session (usually the disk). Ie, for all primary partitions, including
+	// the primary extended partition, the PTSOffset() points to the MBR (0).
+	// For logical partitions, the PTSOffset() is located within the primary
+	// extended partition, but again, the returned values are absolute with
+	// regards to the session. All values are expressed in bytes.
 	off_t PTSOffset() const	{ return fPTSOffset; }
+		// offset of the sector containing the descriptor for this partition
 	off_t Offset() const	{ return fOffset; }
+		// start offset of the partition contents
 	off_t Size() const		{ return fSize; }
 	uint8 Type() const		{ return fType; }
 	bool Active() const		{ return fActive; }
 	void GetTypeString(char *buffer) const
 		{ get_partition_type_string(fType, buffer); }
 	void GetPartitionDescriptor(partition_descriptor *descriptor,
-								off_t baseOffset) const;
+		off_t baseOffset) const;
 
 	void SetPTSOffset(off_t offset)	{ fPTSOffset = offset; }
 	void SetOffset(off_t offset)	{ fOffset = offset; }
