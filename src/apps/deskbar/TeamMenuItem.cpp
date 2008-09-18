@@ -33,9 +33,11 @@ All rights reserved.
 */
 
 #include <Debug.h>
-#include <malloc.h>
+
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 #include <Bitmap.h>
 #include <Font.h>
 #include <Region.h>
@@ -82,12 +84,13 @@ TTeamMenuItem::InitData(BList *team, BBitmap *icon, char *name, char *sig,
 	fIcon = icon;
 	fName = name;
 	fSig = sig;
-	SetLabel(name);
 	if (fName == NULL) {
-		char *tmp = (char *)malloc(32);
-		sprintf(tmp, "team %ld", (int32)team->ItemAt(0));
-		fName = tmp;
+		char temp[32];
+		snprintf(temp, sizeof(temp), "team %ld", (int32)team->ItemAt(0));
+		fName = strdup(temp);
 	}
+
+	SetLabel(fName);
 
 	BFont font(be_plain_font);
 	fLabelWidth = ceilf(font.StringWidth(fName));
@@ -419,8 +422,7 @@ TTeamMenuItem::DrawContentLabel()
 
 	menu->DrawString(label);
 
-	if (truncLabel)
-		free(truncLabel);
+	free(truncLabel);
 }
 
 
