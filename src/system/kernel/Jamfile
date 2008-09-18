@@ -24,7 +24,7 @@ KernelMergeObject kernel_core.o :
 	cpu.c
 	elf.cpp
 	heap.cpp
-	image.c
+	image.cpp
 	int.c
 	kernel_daemon.cpp
 	linkhack.c

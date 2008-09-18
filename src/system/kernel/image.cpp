@@ -16,6 +16,7 @@
 #include <thread.h>
 #include <thread_types.h>
 #include <user_debugger.h>
+#include <util/OpenHashTable.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -31,14 +32,32 @@
 #define ADD_DEBUGGER_COMMANDS
 
 struct image {
-	struct image	*next;
-	struct image	*prev;
-	image_info		info;
+	struct image*			next;
+	struct image*			prev;
+	HashTableLink<image>	hash_link;
+	image_info				info;
+	team_id					team;
 };
+
+
+struct ImageTableDefinition {
+	typedef image_id		KeyType;
+	typedef struct image	ValueType;
+
+	size_t HashKey(image_id key) const { return key; }
+	size_t Hash(struct image* value) const { return value->info.id; }
+	bool Compare(image_id key, struct image* value) const
+		{ return value->info.id == key; }
+	HashTableLink<struct image>* GetLink(struct image* value) const
+		{ return &value->hash_link; }
+};
+
+typedef OpenHashTable<ImageTableDefinition> ImageTable;
 
 
 static image_id sNextImageID = 1;
 static mutex sImageMutex = MUTEX_INITIALIZER("image");
+static ImageTable* sImageTable;
 
 
 /*!	Registers an image with the specified team.
@@ -49,16 +68,18 @@ register_image(struct team *team, image_info *_info, size_t size)
 	image_id id = atomic_add(&sNextImageID, 1);
 	struct image *image;
 
-	image = malloc(sizeof(struct image));
+	image = (struct image*)malloc(sizeof(struct image));
 	if (image == NULL)
 		return B_NO_MEMORY;
 
 	memcpy(&image->info, _info, sizeof(image_info));
+	image->team = team->id;
 
 	mutex_lock(&sImageMutex);
 
 	image->info.id = id;
 	list_add_item(&team->image_list, image);
+	sImageTable->Insert(image);
 
 	mutex_unlock(&sImageMutex);
 
@@ -73,16 +94,14 @@ status_t
 unregister_image(struct team *team, image_id id)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
-	struct image *image = NULL;
 
 	mutex_lock(&sImageMutex);
 
-	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
-		if (image->info.id == id) {
-			list_remove_link(image);
-			status = B_OK;
-			break;
-		}
+	struct image *image = sImageTable->Lookup(id);
+	if (image != NULL && image->team == team->id) {
+		list_remove_link(image);
+		sImageTable->Remove(image);
+		status = B_OK;
 	}
 
 	mutex_unlock(&sImageMutex);
@@ -99,7 +118,7 @@ unregister_image(struct team *team, image_id id)
 
 
 /*!	Counts the registered images from the specified team.
-	The team lock must be hold when you call this function.
+	The team lock must be held when you call this function.
 */
 int32
 count_images(struct team *team)
@@ -107,7 +126,8 @@ count_images(struct team *team)
 	struct image *image = NULL;
 	int32 count = 0;
 
-	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
+	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
+			!= NULL) {
 		count++;
 	}
 
@@ -116,8 +136,7 @@ count_images(struct team *team)
 
 
 /*!	Removes all images from the specified team. Must only be called
-	with the team lock hold or a team that has already been removed
-	from the list (in thread_exit()).
+	with a team that has already been removed from the list (in thread_exit()).
 */
 status_t
 remove_images(struct team *team)
@@ -126,32 +145,31 @@ remove_images(struct team *team)
 
 	ASSERT(team != NULL);
 
-	while ((image = list_remove_head_item(&team->image_list)) != NULL) {
+	mutex_lock(&sImageMutex);
+
+	while ((image = (struct image*)list_remove_head_item(&team->image_list))
+			!= NULL) {
+		sImageTable->Remove(image);
 		free(image);
 	}
+
+	mutex_unlock(&sImageMutex);
+
 	return B_OK;
 }
 
 
-/*!	Unlike in BeOS, this function only returns images that belong to the
-	current team.
-	TODO: we might want to rethink that one day...
-*/
 status_t
 _get_image_info(image_id id, image_info *info, size_t size)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
-	struct team *team = thread_get_current_thread()->team;
-	struct image *image = NULL;
 
 	mutex_lock(&sImageMutex);
 
-	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
-		if (image->info.id == id) {
-			memcpy(info, &image->info, size);
-			status = B_OK;
-			break;
-		}
+	struct image *image = sImageTable->Lookup(id);
+	if (image != NULL) {
+		memcpy(info, &image->info, size);
+		status = B_OK;
 	}
 
 	mutex_unlock(&sImageMutex);
@@ -161,7 +179,8 @@ _get_image_info(image_id id, image_info *info, size_t size)
 
 
 status_t
-_get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t size)
+_get_next_image_info(team_id teamID, int32 *cookie, image_info *info,
+	size_t size)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
 	struct team *team;
@@ -183,7 +202,8 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t siz
 		struct image *image = NULL;
 		int32 count = 0;
 
-		while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
+		while ((image = (struct image*)list_get_next_item(&team->image_list,
+				image)) != NULL) {
 			if (count == *cookie) {
 				memcpy(info, &image->info, size);
 				status = B_OK;
@@ -224,7 +244,8 @@ dump_images_list(int argc, char **argv)
 	kprintf("Registered images of team %ld\n", team->id);
 	kprintf("    ID text       size    data       size    name\n");
 
-	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
+	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
+			!= NULL) {
 		image_info *info = &image->info;
 
 		kprintf("%6ld %p %-7ld %p %-7ld %s\n", info->id, info->text, info->text_size,
@@ -242,10 +263,11 @@ image_debug_lookup_user_symbol_address(struct team *team, addr_t address,
 	bool *_exactMatch)
 {
 	// TODO: work together with ELF reader and runtime_loader
-	
+
 	struct image *image = NULL;
 
-	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
+	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
+			!= NULL) {
 		image_info *info = &image->info;
 
 		if ((address < (addr_t)info->text
@@ -270,6 +292,18 @@ image_debug_lookup_user_symbol_address(struct team *team, addr_t address,
 status_t
 image_init(void)
 {
+	sImageTable = new(std::nothrow) ImageTable;
+	if (sImageTable == NULL) {
+		panic("image_init(): Failed to allocate image table!");
+		return B_NO_MEMORY;
+	}
+
+	status_t error = sImageTable->Init();
+	if (error != B_OK) {
+		panic("image_init(): Failed to init image table: %s", strerror(error));
+		return error;
+	}
+
 #ifdef ADD_DEBUGGER_COMMANDS
 	add_debugger_command("team_images", &dump_images_list, "Dump all registered images from the current team");
 #endif
@@ -335,7 +369,7 @@ image_id
 _user_register_image(image_info *userInfo, size_t size)
 {
 	image_info info;
-	
+
 	if (size != sizeof(image_info))
 		return B_BAD_VALUE;
 
