@@ -576,8 +576,16 @@ LogicalPartition::SetTo(const partition_descriptor *descriptor,
 {
 	Unset();
 	if (descriptor && primary) {
+		// TODO: I am wondering if this is wrong, since it always uses the
+		// offset of the primary partition as base offset, even for
+		// logical partitions that come much later in the chain. For each,
+		// PTS in the chain of logical partitions, there should be one
+		// extended and one non-extended in the four possible table entries.
+		// So baseOffset would be wrong for all but the first three? The
+		// forth logical partition, assuming it's the extended one, would
+		// get a wrong baseOffset.
 		off_t baseOffset = (descriptor->is_extended() ? primary->Offset()
-													  : ptsOffset);
+			: ptsOffset);
 		Partition::SetTo(descriptor, ptsOffset, baseOffset);
 		fPrimary = primary;
 	}
