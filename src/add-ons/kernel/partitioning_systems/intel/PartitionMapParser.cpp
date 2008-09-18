@@ -166,49 +166,51 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 			break;
 		}
 
-		// examine the table
+		// Examine the table, there is exactly one extended and one
+		// non-extended logical partition. All four table entries are
+		// examined though.
 		LogicalPartition extended;
 		LogicalPartition nonExtended;
-		if (error == B_OK) {
-			for (int32 i = 0; error == B_OK && i < 4; i++) {
-				const partition_descriptor *descriptor = &fPTS->table[i];
-				LogicalPartition *partition = NULL;
-				if (!descriptor->is_empty()) {
-					if (descriptor->is_extended()) {
-						if (extended.IsEmpty()) {
-							extended.SetTo(descriptor, offset, primary);
-							partition = &extended;
-						} else {
-							// only one extended partition allowed
-							error = B_BAD_DATA;
-							TRACE(("intel: _ParseExtended(): "
-								   "only one extended partition allowed\n"));
-						}
-					} else {
-						if (nonExtended.IsEmpty()) {
-							nonExtended.SetTo(descriptor, offset, primary);
-							partition = &nonExtended;
-						} else {
-							// only one non-extended partition allowed
-							error = B_BAD_DATA;
-							TRACE(("intel: _ParseExtended(): only one "
-								   "non-extended partition allowed\n"));
-						}
-					}
-#ifdef _BOOT_MODE
-					// work-around potential BIOS problems
-					if (partition)
-						partition->AdjustSize(fSessionSize);
-#endif
-					// check the partition's location
-					if (partition && !partition->CheckLocation(fSessionSize)) {
-						error = B_BAD_DATA;
-						TRACE(("intel: _ParseExtended(): Invalid partition "
-							"location: pts: %lld, offset: %lld, size: %lld\n",
-							partition->PTSOffset(), partition->Offset(),
-							partition->Size()));
-					}
+		for (int32 i = 0; error == B_OK && i < 4; i++) {
+			const partition_descriptor *descriptor = &fPTS->table[i];
+			if (descriptor->is_empty())
+				continue;
+
+			LogicalPartition *partition = NULL;
+			if (descriptor->is_extended()) {
+				if (extended.IsEmpty()) {
+					extended.SetTo(descriptor, offset, primary);
+					partition = &extended;
+				} else {
+					// only one extended partition allowed
+					error = B_BAD_DATA;
+					TRACE(("intel: _ParseExtended(): "
+						   "only one extended partition allowed\n"));
 				}
+			} else {
+				if (nonExtended.IsEmpty()) {
+					nonExtended.SetTo(descriptor, offset, primary);
+					partition = &nonExtended;
+				} else {
+					// only one non-extended partition allowed
+					error = B_BAD_DATA;
+					TRACE(("intel: _ParseExtended(): only one "
+						   "non-extended partition allowed\n"));
+				}
+			}
+			if (partition == NULL)
+				break;
+#ifdef _BOOT_MODE
+			// work-around potential BIOS problems
+			partition->AdjustSize(fSessionSize);
+#endif
+			// check the partition's location
+			if (!partition->CheckLocation(fSessionSize)) {
+				error = B_BAD_DATA;
+				TRACE(("intel: _ParseExtended(): Invalid partition "
+					"location: pts: %lld, offset: %lld, size: %lld\n",
+					partition->PTSOffset(), partition->Offset(),
+					partition->Size()));
 			}
 		}
 
