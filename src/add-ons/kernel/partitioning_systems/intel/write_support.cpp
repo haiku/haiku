@@ -131,35 +131,36 @@ sector_align_up(off_t offset)
 static bool
 validate_resize(partition_data *partition, off_t *size)
 {
-	off_t new_size = *size;
+	off_t newSize = *size;
 	// size remains the same?
-	if (new_size == partition->size)
+	if (newSize == partition->size)
 		return true;
 
-	if (new_size < 0)
-		new_size = 0;
+	if (newSize < 0)
+		newSize = 0;
 	else
-		new_size = sector_align(new_size);
+		newSize = sector_align(newSize);
 
 	// grow partition?
-	if (new_size > partition->size) {
-		*size = new_size;
+	if (newSize > partition->size) {
+		*size = newSize;
 		return true;
 	}
 
 	// shrink partition
 	// no child has to be over the new size of the parent partition
-	// TODO: shouldn't be just: off_t current_end = new_size; ??? probably not
-	off_t current_end = partition->offset + new_size;
+	// TODO: shouldn't be just: off_t currentEnd = newSize; ??? probably not
+	// If child->offset is relative to parent, then yes!
+	off_t currentEnd = partition->offset + newSize;
 	for (int32 i = 0; i < partition->child_count; i++) {
 		partition_data *child = get_child_partition(partition->id, i);
-		if (child && child->offset + child->size > current_end)
-			current_end = child->offset + child->size;
+		if (child && child->offset + child->size > currentEnd)
+			currentEnd = child->offset + child->size;
 	}
-	new_size = current_end - partition->offset;
+	newSize = currentEnd - partition->offset;
 	// make the size a multiple of the block size (greater one)
-	new_size = sector_align_up(new_size);
-	*size = new_size;
+	newSize = sector_align_up(newSize);
+	*size = newSize;
 	return true;
 }
 
