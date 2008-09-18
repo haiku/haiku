@@ -9,6 +9,19 @@
 #include "system_dependencies.h"
 
 
+enum inode_type {
+	S_DIRECTORY		= S_IFDIR,
+	S_FILE			= S_IFREG,
+	S_SYMLINK		= S_IFLNK,
+
+	S_INDEX_TYPES	= (S_STR_INDEX | S_INT_INDEX | S_UINT_INDEX
+						| S_LONG_LONG_INDEX | S_ULONG_LONG_INDEX
+						| S_FLOAT_INDEX | S_DOUBLE_INDEX),
+
+	S_EXTENDED_TYPES = (S_ATTR_DIR | S_ATTR | S_INDEX_DIR)
+};
+
+
 // Simple array, used for the duplicate handling in the B+Tree
 // TODO: this is not endian safe!!!
 
@@ -46,15 +59,16 @@ round_up(const IntType& value, const RoundType& to)
 inline bool
 is_index(int mode)
 {
-	return (mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR;
-		// That's a stupid check, but AFAIK the only possible method...
+	return (mode & (S_EXTENDED_TYPES | 0777)) == S_INDEX_DIR;
+		// That's a stupid check, but the only method to differentiate the
+		// index root from an index.
 }
 
 
 inline bool
 is_directory(int mode)
 {
-	return (mode & (S_INDEX_DIR | S_ATTR_DIR | S_IFDIR)) == S_IFDIR;
+	return (mode & (S_EXTENDED_TYPES | S_IFDIR)) == S_IFDIR;
 }
 
 

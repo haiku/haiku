@@ -410,8 +410,7 @@ BPlusTree::SetTo(Transaction& transaction, Inode* stream, int32 nodeSize)
 	}
 
 	fHeader = header;
-	fAllowDuplicates = ((stream->Mode() & S_INDEX_DIR) == S_INDEX_DIR
-			&& stream->BlockRun() != stream->Parent())
+	fAllowDuplicates = stream->IsIndex()
 		|| (stream->Mode() & S_ALLOW_DUPS) != 0;
 
 	fNodeSize = nodeSize;
@@ -494,8 +493,7 @@ BPlusTree::SetTo(Inode* stream)
 
 		// although it's in stat.h, the S_ALLOW_DUPS flag is obviously unused
 		// in the original BFS code - we will honour it nevertheless
-		fAllowDuplicates = ((stream->Mode() & S_INDEX_DIR) == S_INDEX_DIR
-			&& stream->BlockRun() != stream->Parent())
+		fAllowDuplicates = stream->IsIndex()
 			|| (stream->Mode() & S_ALLOW_DUPS) != 0;
 	}
 
@@ -1713,11 +1711,11 @@ BPlusTree::Remove(Transaction& transaction, const uint8* key, uint16 keyLength,
 				if (fAllowDuplicates) {
 					return _RemoveDuplicate(transaction, node, cached,
 						nodeAndKey.keyIndex, value);
-				} else {
-					FATAL(("dupliate node found where no duplicates are "
-						"allowed!\n"));
-					RETURN_ERROR(B_ERROR);
 				}
+
+				FATAL(("dupliate node found where no duplicates are "
+					"allowed!\n"));
+				RETURN_ERROR(B_ERROR);
 			}
 		}
 

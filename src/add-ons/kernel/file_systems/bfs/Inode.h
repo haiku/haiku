@@ -23,16 +23,6 @@ class InodeReadLocker;
 class NodeGetter;
 class Transaction;
 
-enum inode_type {
-	S_DIRECTORY		= S_IFDIR,
-	S_FILE			= S_IFREG,
-	S_SYMLINK		= S_IFLNK,
-
-	S_INDEX_TYPES	= (S_STR_INDEX | S_INT_INDEX | S_UINT_INDEX
-						| S_LONG_LONG_INDEX | S_ULONG_LONG_INDEX
-						| S_FLOAT_INDEX | S_DOUBLE_INDEX)
-};
-
 
 class Inode : public SinglyLinkedListLinkImpl<Inode> {
 public:
@@ -61,16 +51,16 @@ public:
 								{ return is_index(Mode()); }
 
 			bool			IsAttributeDirectory() const
-								{ return (Mode() & S_ATTR_DIR) != 0; }
+								{ return (Mode() & S_EXTENDED_TYPES)
+									== S_ATTR_DIR; }
 			bool			IsAttribute() const
-								{ return (Mode() & S_ATTR) != 0; }
+								{ return (Mode() & S_EXTENDED_TYPES)
+									== S_ATTR; }
 			bool			IsFile() const
 								{ return (Mode()
-									& (S_IFMT | S_ATTR)) == S_FILE; }
+									& (S_IFMT | S_EXTENDED_TYPES)) == S_FILE; }
 			bool			IsRegularNode() const
-								{ return (Mode()
-									& (S_ATTR_DIR | S_INDEX_DIR | S_ATTR))
-										== 0; }
+								{ return (Mode() & S_EXTENDED_TYPES) == 0; }
 								// a regular node in the standard namespace
 								// (i.e. not an index or attribute)
 			bool			IsSymLink() const { return S_ISLNK(Mode()); }
