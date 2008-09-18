@@ -612,7 +612,10 @@ main(int argc, const char* const* argv)
 			}
 
 			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
-				threadManager.AddTeam(message->team_created.new_team);
+				if (threadManager.AddTeam(message->team_created.new_team)
+						== B_OK) {
+					threadManager.AddThread(message->team_created.new_team);
+				}
 				break;
 			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
 				// a debugged team is gone -- quit, if it is our team
