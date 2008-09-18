@@ -85,9 +85,9 @@ static const char *sSearchPathSubDir = NULL;
 static bool sInvalidImageIDs;
 
 // a recursive lock
-static sem_id rld_sem;
-static thread_id rld_sem_owner;
-static int32 rld_sem_count;
+static sem_id sSem;
+static thread_id sSemOwner;
+static int32 sSemCount;
 
 
 void
@@ -152,9 +152,9 @@ ktrace_printf(const char *format, ...)
 static void
 rld_unlock()
 {
-	if (rld_sem_count-- == 1) {
-		rld_sem_owner = -1;
-		release_sem(rld_sem);
+	if (sSemCount-- == 1) {
+		sSemOwner = -1;
+		release_sem(sSem);
 	}
 }
 
@@ -163,11 +163,11 @@ static void
 rld_lock()
 {
 	thread_id self = find_thread(NULL);
-	if (self != rld_sem_owner) {
-		acquire_sem(rld_sem);
-		rld_sem_owner = self;
+	if (self != sSemOwner) {
+		acquire_sem(sSem);
+		sSemOwner = self;
 	}
-	rld_sem_count++;
+	sSemCount++;
 }
 
 
@@ -1996,9 +1996,9 @@ terminate_program(void)
 void
 rldelf_init(void)
 {
-	rld_sem = create_sem(1, "rld_lock");
-	rld_sem_owner = -1;
-	rld_sem_count = 0;
+	sSem = create_sem(1, "runtime loader");
+	sSemOwner = -1;
+	sSemCount = 0;
 
 	// create the debug area
 	{
@@ -2030,9 +2030,9 @@ rldelf_init(void)
 status_t
 elf_reinit_after_fork(void)
 {
-	rld_sem = create_sem(1, "rld_lock");
-	if (rld_sem < 0)
-		return rld_sem;
+	sSem = create_sem(1, "runtime loader");
+	if (sSem < 0)
+		return sSem;
 
 	// We also need to update the IDs of our images. We are the child and
 	// and have cloned images with different IDs. Since in most cases (fork()
