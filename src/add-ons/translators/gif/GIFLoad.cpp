@@ -28,8 +28,8 @@ GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output)
 	fatalerror(false),
 	fInput(input),
 	fOutput(output),
-	fHeadMemblock(NULL),
 	fPalette(NULL),
+ 	fHeadMemblock(NULL),
 	fScanLine(NULL)
 {
 	fInput->Seek(0, SEEK_SET);
@@ -114,7 +114,7 @@ GIFLoad::ReadGIFHeader()
 	
 	fPalette = new LoadPalette();
 	// Global palette
-	if (header[10] & 0x80) {
+	if (header[10] & GIF_LOCALCOLORMAP) {
 		fPalette->size_in_bits = (header[10] & 0x07) + 1;
 		if (debug)
 			printf("GIFLoad::ReadGIFHeader() - Found %d bit global palette\n", fPalette->size_in_bits);
@@ -248,7 +248,7 @@ GIFLoad::ReadGIFImageHeader()
 		return false;
 
 	// Has local palette
-	if (data[8] & 0x80) {
+	if (data[8] & GIF_LOCALCOLORMAP) {
 		fPalette->size_in_bits = (data[8] & 0x07) + 1;
 		int s = 1 << fPalette->size_in_bits;
 		fPalette->size = s;
@@ -264,13 +264,11 @@ GIFLoad::ReadGIFImageHeader()
 		}
 	}
 	
-	if (data[8] & 0x40) {
-		fInterlaced = true;
-		if (debug)
+	fInterlaced = data[8] & GIF_INTERLACED;
+	if (debug) {
+		if (fInterlaced)
 			printf("GIFLoad::ReadGIFImageHeader() - Image is interlaced\n");
-	} else {
-		fInterlaced = false;
-		if (debug)
+		else
 			printf("GIFLoad::ReadGIFImageHeader() - Image is not interlaced\n");
 	}
 	return true;

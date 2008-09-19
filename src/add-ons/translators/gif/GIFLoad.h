@@ -19,6 +19,10 @@
 #include <DataIO.h>
 #include "LoadPalette.h"
 
+#define GIF_INTERLACED		0x40
+#define GIF_LOCALCOLORMAP	0x80
+
+
 class Memblock {
 	public:
 		uchar data[4096];
@@ -26,12 +30,14 @@ class Memblock {
 		Memblock *next;
 };
 
+
 const int gl_pass_starts_at[] = {0, 4, 2, 1, 0};
 const int gl_increment_pass_by[] = {8, 8, 4, 2, 0};
 
+
 class GIFLoad {
 	public:
-		GIFLoad(BPositionIO *fInput, BPositionIO *fOutput);
+		GIFLoad(BPositionIO *input, BPositionIO *output);
 		~GIFLoad();
 		bool fatalerror;
 		
