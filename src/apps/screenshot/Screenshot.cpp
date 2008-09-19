@@ -110,8 +110,8 @@ Screenshot::_ShowHelp() const
 	printf("..-b, --border          Include the window border with the screenshot\n");
 	printf("..-w, --window          Use active window instead of the entire screen\n");
 	printf("..-d, --delay=seconds   Take screenshot after specified delay [in seconds]\n");
-	printf("..-s, --silent          Saves the screenshot without to application window\n");
-	printf("........................overwrites options, saves to home directory as png\n");
+	printf("..-s, --silent          Saves the screenshot without the application window\n");
+	printf("........................overwrites --options, saves to home directory as png\n");
 	printf("\n");
 	printf("Note: OPTION -b, --border takes only effect when used with -w, --window\n");
 
