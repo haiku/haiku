@@ -5,19 +5,27 @@
 
 #include "ScreenshotWindow.h"
 
+#include "PNGDump.h"
+
+
+#include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
 #include <CardLayout.h>
 #include <CheckBox.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutItem.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
-#include <Screen.h>
+#include <Path.h>
 #include <RadioButton.h>
+#include <Screen.h>
 #include <String.h>
 #include <StringView.h>
 #include <SpaceLayoutItem.h>
@@ -45,24 +53,9 @@ enum {
 };
 
 
-ScreenshotWindow::ScreenshotWindow()
-	: BWindow(BRect(0, 0, 200.0, 100.0), "Save Screenshot", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE |
-		B_AVOID_FRONT | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
-	fScreenshot(NULL),
-	fDelay(0),
-	fIncludeBorder(false),
-	fIncludeCursor(false),
-	fGrabActiveWindow(false),
-	fShowConfigWindow(false)
-{
-	_InitWindow();
-	_CenterAndShow();
-}
-
-
 ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
-	bool includeCursor, bool grabActiveWindow, bool showConfigWindow)
+	bool includeCursor, bool grabActiveWindow, bool showConfigWindow,
+	bool saveScreenshotSilent)
 	: BWindow(BRect(0, 0, 200.0, 100.0), "Take Screenshot", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE |
 		B_AVOID_FRONT | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
@@ -71,7 +64,8 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	fIncludeBorder(includeBorder),
 	fIncludeCursor(includeCursor),
 	fGrabActiveWindow(grabActiveWindow),
-	fShowConfigWindow(showConfigWindow)
+	fShowConfigWindow(showConfigWindow),
+	fSaveScreenshotSilent(saveScreenshotSilent)
 {
 	_InitWindow();
 	_CenterAndShow();
@@ -167,7 +161,7 @@ ScreenshotWindow::_InitWindow()
 void
 ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 {
-	BStringView* stringView = new BStringView("", "Take Screenshot");
+	BStringView* stringView = new BStringView("", "Options");
 	stringView->SetFont(be_bold_font);
 	stringView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
@@ -195,10 +189,6 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 		new BMessage(kShowCursor));
 	fShowCursor->SetValue(fIncludeCursor);
 
-	BStringView* stringView3 = new BStringView("", "Options");
-	stringView3->SetFont(be_bold_font);
-	stringView3->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
@@ -212,31 +202,36 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 		.Add(stringView)
 		.Add(BGridLayoutBuilder()
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(15.0), 0, 0)
-			.Add(fActiveWindow, 1, 0)
+			.Add(fWholeDesktop, 1, 0)
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(15.0), 0, 1)
-			.Add(fWholeDesktop, 1, 1)
-			.SetInsets(0.0, 5.0, 0.0, 5.0))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5.0)
+			.Add(fActiveWindow, 1, 1)
+			.SetInsets(0.0, 5.0, 0.0, 0.0))
+		.AddGroup(B_HORIZONTAL)
+			.AddStrut(30.0)
+			.Add(fWindowBorder)
+			.End()
+		.AddStrut(10.0)
+		.AddGroup(B_HORIZONTAL)
+			.AddStrut(15.0)
+			.Add(fShowCursor)
+			.End()
+		.AddStrut(5.0)
+		.AddGroup(B_HORIZONTAL, 5.0)
 			.AddStrut(10.0)
 			.Add(fDelayControl->CreateLabelLayoutItem())
 			.Add(fDelayControl->CreateTextViewLayoutItem())
-			.Add(stringView2))
+			.Add(stringView2)
+			.End()
 		.AddStrut(10.0)
-		.Add(stringView3)
-		.Add(BGridLayoutBuilder()
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(15.0), 0, 0)
-			.Add(fWindowBorder, 1, 0)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(15.0), 0, 1)
-			.Add(fShowCursor, 1, 1)
-			.SetInsets(0.0, 5.0, 0.0, 5.0))
 		.AddGlue()
 		.Add(divider)
-		.AddStrut(5)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10.0)
+		.AddStrut(10)
+		.AddGroup(B_HORIZONTAL, 10.0)
 			.Add(fBackToSave)
 			.AddGlue()
 			.Add(new BButton("", "Cancel", new BMessage(B_QUIT_REQUESTED)))
-			.Add(fTakeScreenshot))
+			.Add(fTakeScreenshot)
+			.End()
 		.SetInsets(10.0, 10.0, 10.0, 10.0)
 	);
 
@@ -255,7 +250,7 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 	fPreviewBox->SetExplicitMinSize(BSize(200.0, B_SIZE_UNSET));
 	fPreviewBox->SetFlags(fPreviewBox->Flags() | B_FULL_UPDATE_ON_RESIZE);
 
-	fNameControl = new BTextControl("", "Name:", "Screenshot", NULL);
+	fNameControl = new BTextControl("", "Name:", "screenshot", NULL);
 
 	BMessage message(kImageOutputFormat);
 	fTranslatorMenu = new BMenu("Please select");
@@ -286,7 +281,7 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 		.Add(menuField2->CreateMenuBarLayoutItem(), 1, 2);
 	gridLayout->SetMinColumnWidth(1, menuField->StringWidth("SomethingLongHere"));
 
-	fFinishScreenshot = new BButton("", "OK", new BMessage(kFinishScreenshot));
+	fFinishScreenshot = new BButton("", "Save", new BMessage(kFinishScreenshot));
 	fFinishScreenshot->SetEnabled(false);
 
 	layout->AddView(1, BGroupLayoutBuilder(B_VERTICAL)
@@ -296,9 +291,9 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 				.Add(gridLayout->View())
 				.AddGlue()
 				.End())
-		.AddStrut(5)
+		.AddStrut(10)
 		.Add(divider)
-		.AddStrut(5)
+		.AddStrut(10)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10.0)
 			.Add(new BButton("", "Options", new BMessage(kShowOptions)))
 			.AddGlue()
@@ -323,6 +318,12 @@ ScreenshotWindow::_DisallowChar(BTextView* textView)
 void
 ScreenshotWindow::_CenterAndShow()
 {
+	if (fSaveScreenshotSilent) {
+		_SaveScreenshotSilent();
+		be_app_messenger.SendMessage(B_QUIT_REQUESTED);
+		return;
+	}
+
 	BSize size = GetLayout()->PreferredSize();
 	ResizeTo(size.Width(), size.Height());
 
@@ -386,10 +387,10 @@ ScreenshotWindow::_GetActiveWindowFrame(BRect* frame)
 			free(windowInfo);
 
 			if (fIncludeBorder) {
-				// TODO: this is wrong for windows with titlebar, change once
+				// TODO: that's wrong for windows without titlebar, change once
 				//		 we can access the decorator or get it via window info
 				frame->InsetBy(-5.0, -5.0);
-				frame->top -= 17.0;
+				frame->top -= 22.0;
 			}
 
 			BRect screenFrame(BScreen(this).Frame());
@@ -408,4 +409,34 @@ ScreenshotWindow::_GetActiveWindowFrame(BRect* frame)
 	}
 	free(tokens);
 	return status;
+}
+
+
+void
+ScreenshotWindow::_SaveScreenshotSilent() const
+{
+	if (!fScreenshot)
+		return;
+
+	BPath homePath;
+	if (find_directory(B_USER_DIRECTORY, &homePath) != B_OK) {
+		fprintf(stderr, "failed to find user home directory\n");
+		return;
+	}
+
+	BPath path;
+	BEntry entry;
+	int32 index = 1;
+	do {
+		char filename[32];
+		sprintf(filename, "screenshot%ld.png", index++);
+		path = homePath;
+		path.Append(filename);
+		entry.SetTo(path.Path());
+	} while (entry.Exists());
+
+	// Dump to PNG
+	SaveToPNG(path.Path(), fScreenshot->Bounds(), fScreenshot->ColorSpace(),
+		fScreenshot->Bits(), fScreenshot->BitsLength(),
+		fScreenshot->BytesPerRow());
 }

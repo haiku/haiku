@@ -18,10 +18,12 @@ class BTextView;
 
 class ScreenshotWindow : public BWindow {
 public:
-							ScreenshotWindow();
-							ScreenshotWindow(bigtime_t delay, bool includeBorder,
-								bool includeCursor, bool grabActiveWindow,
-								bool showConfigWindow);
+							ScreenshotWindow(bigtime_t delay = 0,
+								bool includeBorder = false,
+								bool includeCursor = false,
+								bool grabActiveWindow = false,
+								bool showConfigWindow = false,
+								bool saveScreenshotSilent = false);
 	virtual					~ScreenshotWindow();
 
 	virtual void			MessageReceived(BMessage* message);
@@ -35,6 +37,8 @@ private:
 
 			void			_TakeScreenshot();
 			status_t		_GetActiveWindowFrame(BRect* frame);
+
+			void			_SaveScreenshotSilent() const;
 
 private:
 			BBox*			fPreviewBox;
@@ -57,6 +61,7 @@ private:
 			bool			fIncludeCursor;
 			bool			fGrabActiveWindow;
 			bool			fShowConfigWindow;
+			bool			fSaveScreenshotSilent;
 
 			int32			fTranslator;
 			int32			fImageFileType;
