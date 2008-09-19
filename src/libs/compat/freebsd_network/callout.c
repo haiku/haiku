@@ -27,6 +27,9 @@ handle_callout(struct net_timer *timer, void *data)
 }
 
 
+//	#pragma mark -
+
+
 void
 callout_init_mtx(struct callout *c, struct mtx *mtx, int flags)
 {
@@ -61,5 +64,19 @@ int
 _callout_stop_safe(struct callout *c, int safe)
 {
 	return gStack->cancel_timer(&c->c_timer) ? 1 : 0;
+}
+
+
+int
+callout_pending(struct callout *c)
+{
+	return gStack->is_timer_active(&c->c_timer);
+}
+
+
+int
+callout_active(struct callout *c)
+{
+	return gStack->is_timer_running(&c->c_timer);
 }
 

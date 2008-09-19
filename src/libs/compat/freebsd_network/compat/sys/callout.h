@@ -22,15 +22,13 @@ struct callout {
 #define CALLOUT_MPSAFE	0x0001
 
 void callout_init_mtx(struct callout *c, struct mtx *mutex, int flags);
-int	callout_reset(struct callout *, int, void (*)(void *), void *);
+int	callout_reset(struct callout *c, int, void (*func)(void *), void *arg);
+int callout_pending(struct callout *c);
+int callout_active(struct callout *c);
 
 #define	callout_drain(c)	_callout_stop_safe(c, 1)
 #define	callout_stop(c)		_callout_stop_safe(c, 0)
 int	_callout_stop_safe(struct callout *, int);
-
-#define	callout_pending(c)	((c)->c_timer.due > 0)
-#define	callout_active(c)	((c)->c_timer.due == -1)
-	// TODO: there is currently no way to find out about this!
 
 
 static inline void
