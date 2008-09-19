@@ -19,6 +19,7 @@ struct callout {
 	int					c_flags;
 };
 
+#define CALLOUT_MPSAFE	0x0001
 
 void callout_init_mtx(struct callout *c, struct mtx *mutex, int flags);
 int	callout_reset(struct callout *, int, void (*)(void *), void *);
