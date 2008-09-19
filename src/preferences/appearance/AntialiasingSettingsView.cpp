@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Stephan Aßmus, <superstippi@gmx.de>
  * Copyright 2008, Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -8,18 +9,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <freetype/config/ftoption.h>
+	// for detected the availablility of subpixel anti-aliasing
+
 #include <Box.h>
+#include <CardLayout.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <Slider.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
-#include <TextControl.h>
+#include <TextView.h>
 
 #include "APRWindow.h"
 
 
-#define INSTANT_UPDATE
-	// if defined, the changes will take place immediately and not only on exit
 //#define DISABLE_HINTING_CONTROL
 	// if defined, the hinting menu is disabled (hinting not properly
 	// implemented)
@@ -27,10 +34,14 @@
 static const int32 kMsgSetAntialiasing = 'anti';
 static const int32 kMsgSetHinting = 'hint';
 static const int32 kMsgSetAverageWeight = 'avrg';
-static const char* kSubpixelLabel = "Subpixel antialiasing";
-static const char* kGrayscaleLabel = "Grayscale antialiasing";
+static const char* kSubpixelLabel = "LCD subpixel";
+static const char* kGrayscaleLabel = "Grayscale";
 static const char* kNoHintingLabel = "Off";
 static const char* kFullHintingLabel = "On";
+
+
+// #pragma mark - private libbe API
+
 
 extern void set_subpixel_antialiasing(bool subpix);
 extern status_t get_subpixel_antialiasing(bool* subpix);
@@ -43,9 +54,10 @@ extern status_t get_average_weight(unsigned char* averageWeight);
 //	#pragma mark -
 
 
-AntialiasingSettingsView::AntialiasingSettingsView(BRect _rect, const char* name)
-	: BView(_rect, name, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW)
+AntialiasingSettingsView::AntialiasingSettingsView(BRect rect, const char* name)
+	: BView(rect, name, B_FOLLOW_ALL, B_SUPPORTS_LAYOUT)
 {
+	// collect the current system settings
 	if (get_subpixel_antialiasing(&fCurrentSubpixelAntialiasing) != B_OK)
 		fCurrentSubpixelAntialiasing = false;
 	fSavedSubpixelAntialiasing = fCurrentSubpixelAntialiasing;
@@ -58,107 +70,92 @@ AntialiasingSettingsView::AntialiasingSettingsView(BRect _rect, const char* name
 		fCurrentAverageWeight = 100;
 	fSavedAverageWeight = fCurrentAverageWeight;
 
-	fDivider = StringWidth("Strength of colours in sbpx AA:") + 5;
-	
-	fAntialiasingMenu = new BPopUpMenu("Antialiasing menu");
-	fHintingMenu = new BPopUpMenu("Hinting menu");
+	// create the controls
 
 	// antialiasing menu
-	BRect rect(Bounds());
-	fAntialiasingMenuField = new BMenuField(rect, "antialiasing",
-		"Antialiasing type:", fAntialiasingMenu, false);
-	fAntialiasingMenuField->SetDivider(fDivider);
-	fAntialiasingMenuField->SetAlignment(B_ALIGN_RIGHT);
-	fAntialiasingMenuField->ResizeToPreferred();
-	AddChild(fAntialiasingMenuField);
 	_BuildAntialiasingMenu();
+	fAntialiasingMenuField = new BMenuField("antialiasing",
+		"Anti-aliasing type:", fAntialiasingMenu, NULL);
 	
-	//Average weight in subpixel filtering
-	float shift = fAntialiasingMenuField->Bounds().Height()+5;
-	rect.top +=shift;
-	rect.bottom += shift;
-	fAverageWeightControl = new BTextControl(rect, "averageWeightControl",
-		"Strength of colours in sbpx AA:", NULL,
-		new BMessage(kMsgSetAverageWeight), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fAverageWeightControl -> SetDivider(fDivider);
-	fAverageWeightControl -> TextView() -> SetMaxBytes(3);
-	fAverageWeightControl -> ResizeToPreferred();
-	AddChild(fAverageWeightControl);
-	for (int i = 0; i < 256; i++) {
-		if (i < '0' || i > '9') {
-			fAverageWeightControl->TextView()->DisallowChar(i);
-			fAverageWeightControl->TextView()->DisallowChar(i);
-		}
-	}
-	fAverageWeightControl -> SetEnabled(false);
+	// "average weight" in subpixel filtering
+	fAverageWeightControl = new BSlider("averageWeightControl",
+		"Reduce colored edges filter strength:",
+		new BMessage(kMsgSetAverageWeight), 0, 255, B_HORIZONTAL);
+	fAverageWeightControl->SetLimitLabels("Off", "Strong");
+	fAverageWeightControl->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fAverageWeightControl->SetHashMarkCount(255 / 15);
+	fAverageWeightControl->SetEnabled(false);
 	
 	// hinting menu
-	shift = fAverageWeightControl->Bounds().Height()+5;
-	rect.top += shift;
-	rect.bottom += shift;
-	fHintingMenuField = new BMenuField(rect, "hinting",
-		"Character hinting:", fHintingMenu, false);
-	fHintingMenuField->SetDivider(fDivider);
-	fHintingMenuField->SetAlignment(B_ALIGN_RIGHT);
-	fHintingMenuField->ResizeToPreferred();
-	AddChild(fHintingMenuField);
 	_BuildHintingMenu();
-	
+	fHintingMenuField = new BMenuField("hinting", "Character hinting:",
+		fHintingMenu, NULL);
+
 #ifdef DISABLE_HINTING_CONTROL
 	fHintingMenuField->SetEnabled(false);
 #endif
-	
+
+	// subpixelAntialiasingDisabledLabel
+	// TODO: Replace with layout friendly constructor once available.
+	BTextView* subpixelAntialiasingDisabledLabel = new BTextView(
+		rect.OffsetToCopy(B_ORIGIN), "unavailable label",
+		rect.OffsetToCopy(B_ORIGIN).InsetBySelf(10, 10),
+		B_FOLLOW_NONE, B_WILL_DRAW | B_SUPPORTS_LAYOUT);
+	subpixelAntialiasingDisabledLabel->SetText("Subpixel based anti-aliasing "
+		"is not available in this build of Haiku to avoid possible patent "
+		"issues. To enable this feature, you have to build Haiku yourself "
+		"and enable certain options in the libfreetype configuration header.");
+	subpixelAntialiasingDisabledLabel->SetViewColor(
+		ui_color(B_PANEL_BACKGROUND_COLOR));
+	subpixelAntialiasingDisabledLabel->MakeEditable(false);
+	subpixelAntialiasingDisabledLabel->MakeSelectable(false);
+
+	BCardLayout* cardLayout = new BCardLayout();
+	SetLayout(cardLayout);
+
+	// controls pane
+	AddChild(BGridLayoutBuilder(10, 10)
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 0, 2)
+
+		.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 1)
+		.Add(fHintingMenuField->CreateMenuBarLayoutItem(), 1, 1)
+
+		.Add(fAntialiasingMenuField->CreateLabelLayoutItem(), 0, 2)
+		.Add(fAntialiasingMenuField->CreateMenuBarLayoutItem(), 1, 2)
+
+		.Add(fAverageWeightControl, 0, 3, 2)
+
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 4, 2)
+
+		.SetInsets(10, 10, 10, 10)
+	);
+
+	// unavailable info pane
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(BSpaceLayoutItem::CreateGlue())
+		.Add(subpixelAntialiasingDisabledLabel)
+		.Add(BSpaceLayoutItem::CreateGlue())
+	);
+
 	_SetCurrentAntialiasing();
 	_SetCurrentHinting();
 	_SetCurrentAverageWeight();
+
+	// TODO: Remove once these two lines once the entire window uses
+	// layout management.
+	MoveTo(rect.LeftTop());
+	ResizeTo(rect.Width(), rect.Height());
+
+#ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+	cardLayout->SetVisibleItem(0L);
+#else
+	cardLayout->SetVisibleItem(1L);
+#endif
 }
 
 
 AntialiasingSettingsView::~AntialiasingSettingsView()
 {
-#ifndef INSTANT_UPDATE
-	set_subpixel_antialiasing(fCurrentSubpixelAntialiasing);
-	set_hinting(fCurrentHinting);
-	set_average_weight(fCurrentAverageWeight);
-#endif
-}
-
-
-void
-AntialiasingSettingsView::GetPreferredSize(float *_width, float *_height)
-{
-	// don't change the width if it is large enough
-	if (_width) {
-		*_width = (StringWidth(kSubpixelLabel) > StringWidth(kGrayscaleLabel) ?
-			StringWidth(kSubpixelLabel) : StringWidth(kGrayscaleLabel))
-			+ fDivider + 30;
-		if (*_width < Bounds().Width())
-			*_width = Bounds().Width();
-	}
-
-	*_height = fHintingMenuField->Frame().bottom;
-}
-
-
-void
-AntialiasingSettingsView::SetDivider(float divider)
-{
-	fAntialiasingMenuField -> SetDivider(divider);
-	fHintingMenuField -> SetDivider(divider);
-	fAverageWeightControl -> SetDivider(divider);
-	fDivider = divider;
-}
-
-
-void
-AntialiasingSettingsView::RelayoutIfNeeded()
-{
-	float width, height;
-	GetPreferredSize(&width, &height);
-
-	if (width > Bounds().Width() || height > Bounds().Height()) {
-		ResizeTo(width, height);
-	}
 }
 
 
@@ -169,9 +166,10 @@ AntialiasingSettingsView::AttachedToWindow()
 		SetViewColor(Parent()->ViewColor());
 	else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fAntialiasingMenu -> SetTargetForItems(this);
-	fHintingMenu -> SetTargetForItems(this);
-	fAverageWeightControl -> SetTarget(this);
+
+	fAntialiasingMenu->SetTargetForItems(this);
+	fHintingMenu->SetTargetForItems(this);
+	fAverageWeightControl->SetTarget(this);
 }
 
 
@@ -186,10 +184,10 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 				|| subpixelAntialiasing == fCurrentSubpixelAntialiasing)
 				break;
 			fCurrentSubpixelAntialiasing = subpixelAntialiasing;
-			fAverageWeightControl -> SetEnabled(fCurrentSubpixelAntialiasing);
-#ifdef INSTANT_UPDATE
+			fAverageWeightControl->SetEnabled(fCurrentSubpixelAntialiasing);
+
 			set_subpixel_antialiasing(fCurrentSubpixelAntialiasing);
-#endif
+
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
@@ -200,32 +198,22 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 				|| hinting == fCurrentHinting)
 				break;
 			fCurrentHinting = hinting;
-#ifdef INSTANT_UPDATE
+
 			set_hinting(fCurrentHinting);
-#endif
+
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
 		case kMsgSetAverageWeight:
 		{
-			int subpixelWeight;
-			unsigned char averageWeight;
-			if (fAverageWeightControl -> Text() != NULL) {
-				subpixelWeight = atoi(fAverageWeightControl -> Text());
-				if (subpixelWeight > 255) {
-					subpixelWeight = 255;
-					BString subpixelWeightString;
-					subpixelWeightString << subpixelWeight;
-					fAverageWeightControl -> SetText(
-						subpixelWeightString.String());
-				}
-				averageWeight = 255 - subpixelWeight;
-				if (averageWeight == fCurrentAverageWeight) break;
-			} else break;
+			int32 averageWeight = fAverageWeightControl->Value();
+			if (averageWeight == fCurrentAverageWeight)
+				break;
+
 			fCurrentAverageWeight = averageWeight;
-#ifdef INSTANT_UPDATE
+
 			set_average_weight(fCurrentAverageWeight);
-#endif
+
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
@@ -238,6 +226,8 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 void
 AntialiasingSettingsView::_BuildAntialiasingMenu()
 {
+	fAntialiasingMenu = new BPopUpMenu("Antialiasing menu");
+
 	BMessage* message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", false);
 
@@ -245,18 +235,20 @@ AntialiasingSettingsView::_BuildAntialiasingMenu()
 
 	fAntialiasingMenu->AddItem(item);
 	
-	BMessage* message2 = new BMessage(kMsgSetAntialiasing);
-	message2->AddBool("antialiasing", true);
+	message = new BMessage(kMsgSetAntialiasing);
+	message->AddBool("antialiasing", true);
 
-	BMenuItem* item2 = new BMenuItem(kSubpixelLabel, message2);
+	item = new BMenuItem(kSubpixelLabel, message);
 
-	fAntialiasingMenu->AddItem(item2);
+	fAntialiasingMenu->AddItem(item);
 }
 
 
 void
 AntialiasingSettingsView::_BuildHintingMenu()
 {
+	fHintingMenu = new BPopUpMenu("Hinting menu");
+
 	BMessage* message = new BMessage(kMsgSetHinting);
 	message->AddBool("hinting", false);
 
@@ -264,12 +256,12 @@ AntialiasingSettingsView::_BuildHintingMenu()
 
 	fHintingMenu->AddItem(item);
 	
-	BMessage* message2 = new BMessage(kMsgSetHinting);
-	message2->AddBool("hinting", true);
+	message = new BMessage(kMsgSetHinting);
+	message->AddBool("hinting", true);
 
-	BMenuItem* item2 = new BMenuItem(kFullHintingLabel, message2);
+	item = new BMenuItem(kFullHintingLabel, message);
 
-	fHintingMenu->AddItem(item2);
+	fHintingMenu->AddItem(item);
 }
 
 
@@ -280,7 +272,8 @@ AntialiasingSettingsView::_SetCurrentAntialiasing()
 		fCurrentSubpixelAntialiasing ? kSubpixelLabel : kGrayscaleLabel);
 	if (item != NULL)
 		item->SetMarked(true);
-	if (fCurrentSubpixelAntialiasing) fAverageWeightControl -> SetEnabled(true);
+	if (fCurrentSubpixelAntialiasing)
+		fAverageWeightControl->SetEnabled(true);
 }
 
 
@@ -297,9 +290,7 @@ AntialiasingSettingsView::_SetCurrentHinting()
 void
 AntialiasingSettingsView::_SetCurrentAverageWeight()
 {
-	BString subpixelWeightString;
-	subpixelWeightString << (255 - fCurrentAverageWeight);
-	fAverageWeightControl -> SetText(subpixelWeightString.String());
+	fAverageWeightControl->SetValue(fCurrentAverageWeight);
 }
 
 
@@ -334,11 +325,11 @@ AntialiasingSettingsView::Revert()
 	fCurrentSubpixelAntialiasing = fSavedSubpixelAntialiasing;
 	fCurrentHinting = fSavedHinting;
 	fCurrentAverageWeight = fSavedAverageWeight;
-#ifdef INSTANT_UPDATE
+
 	set_subpixel_antialiasing(fCurrentSubpixelAntialiasing);
 	set_hinting(fCurrentHinting);
 	set_average_weight(fCurrentAverageWeight);
-#endif
+
 	_SetCurrentAntialiasing();
 	_SetCurrentHinting();
 	_SetCurrentAverageWeight();

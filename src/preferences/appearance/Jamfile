@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src preferences appearance ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders app [ FDirName servers app ] ;
+UseFreeTypeHeaders ;
 
 Preference Appearance :
 	APRMain.cpp

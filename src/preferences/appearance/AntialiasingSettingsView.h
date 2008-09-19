@@ -11,7 +11,7 @@
 class BBox;
 class BMenuField;
 class BPopUpMenu;
-class BTextControl;
+class BSlider;
 
 
 class AntialiasingSettingsView : public BView {
@@ -20,12 +20,8 @@ public:
 								const char* name);
 	virtual					~AntialiasingSettingsView();
 
-	virtual	void			GetPreferredSize(float *_width, float *_height);
-	virtual	void			RelayoutIfNeeded();
 	virtual	void			AttachedToWindow();
-	virtual	void			MessageReceived(BMessage *msg);
-
-			void			SetDivider(float divider);
+	virtual	void			MessageReceived(BMessage* message);
 
 			void			SetDefaults();
 			void			Revert();
@@ -46,7 +42,7 @@ protected:
 			BPopUpMenu*		fAntialiasingMenu;
 			BMenuField*		fHintingMenuField;
 			BPopUpMenu*		fHintingMenu;
-			BTextControl*	fAverageWeightControl;
+			BSlider*		fAverageWeightControl;
 
 			bool			fSavedSubpixelAntialiasing;
 			bool			fCurrentSubpixelAntialiasing;
