@@ -143,6 +143,7 @@ struct net_stack_module_info {
 	bool (*cancel_timer)(struct net_timer *timer);
 	status_t (*wait_for_timer)(struct net_timer *timer);
 	bool (*is_timer_active)(struct net_timer *timer);
+	bool (*is_timer_running)(struct net_timer *timer);
 
 	// syscall restart
 	bool (*is_syscall)(void);

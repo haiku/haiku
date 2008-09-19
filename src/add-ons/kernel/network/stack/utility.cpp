@@ -571,6 +571,13 @@ is_timer_active(net_timer* timer)
 }
 
 
+bool
+is_timer_running(net_timer* timer)
+{
+	return timer == sCurrentTimer;
+}
+
+
 static int
 dump_timer(int argc, char** argv)
 {

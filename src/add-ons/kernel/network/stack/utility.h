@@ -75,6 +75,7 @@ void		set_timer(net_timer* timer, bigtime_t delay);
 bool		cancel_timer(struct net_timer* timer);
 status_t	wait_for_timer(struct net_timer* timer);
 bool		is_timer_active(net_timer* timer);
+bool		is_timer_running(net_timer* timer);
 status_t	init_timers(void);
 void		uninit_timers(void);
 

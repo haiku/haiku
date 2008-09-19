@@ -915,6 +915,7 @@ net_stack_module_info gNetStackModule = {
 	cancel_timer,
 	wait_for_timer,
 	is_timer_active,
+	is_timer_running,
 
 	is_syscall,
 	is_restarted_syscall,
