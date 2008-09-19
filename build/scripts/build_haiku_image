@@ -8,6 +8,7 @@
 # isImage
 # imagePath
 # imageSize
+# imageLabel
 # addBuildCompatibilityLibDir
 # updateOnly
 # dontClearImage
@@ -128,8 +129,8 @@ if [ $isImage ]; then
 				|| exit 1
 		fi
 
-		$bfsShell --initialize $imageOffsetFlags "$imagePath" Haiku \
-			"block_size 2048" || exit 1
+		$bfsShell --initialize $imageOffsetFlags "$imagePath" \
+			"$imageLabel" "block_size 2048" || exit 1
 		$makebootable $imageOffsetFlags "$imagePath"
 	fi
 	$bfsShell -n $imageOffsetFlags "$imagePath" > /dev/null &
