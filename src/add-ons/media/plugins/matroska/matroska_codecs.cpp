@@ -120,7 +120,7 @@ GetAudioFormat(media_format *format, const char *codec, void *private_data, int 
 		media_format_description description;
 		description.family = B_MPEG_FORMAT_FAMILY;
 		description.u.mpeg.id = B_MPEG_1_AUDIO_LAYER_3;
-		if (B_OK != formats.GetFormatFor(description, format)) 
+		if (formats.GetFormatFor(description, format) != B_OK) 
 			format->type = B_MEDIA_ENCODED_AUDIO;
 
 		return B_OK;
@@ -134,7 +134,7 @@ GetAudioFormat(media_format *format, const char *codec, void *private_data, int 
 		description.family = B_MISC_FORMAT_FAMILY;
 		description.u.misc.file_format = (uint32)(misc_codec >> 32);
 		description.u.misc.codec = (uint32)misc_codec;
-		if (B_OK != formats.GetFormatFor(description, format)) 
+		if (formats.GetFormatFor(description, format) != B_OK) 
 			format->type = B_MEDIA_ENCODED_AUDIO;
 
 		// Set the DecoderConfigSize (Not that haiku seems to use it)

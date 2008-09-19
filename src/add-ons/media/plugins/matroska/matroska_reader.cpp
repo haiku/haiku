@@ -60,7 +60,9 @@ struct mkv_cookie
 	const TrackInfo	*track_info;
 	
 	int			private_data_size;
-	uint8 *		private_data;
+	uint8 *		private_data;		// reference
+	
+	uint8 *		fake_private_data;	// created as needed
 
 	float		frame_rate;
 	int64		frame_count;
@@ -75,7 +77,8 @@ struct mkv_cookie
 	uint32		line_count;
 };
 
-static uint8 matroska_samplerate_to_samplerateindex(float samplerate)
+static uint8 
+matroska_samplerate_to_samplerateindex(float samplerate)
 {
 	if (samplerate <= 7350.0) {
 		return 12;
@@ -113,7 +116,6 @@ mkvReader::mkvReader()
  ,	fFile(0)
  ,	fFileInfo(0)
 {
-	fakeExtraData = 0;
 	TRACE("mkvReader::mkvReader\n");
 }
 
@@ -122,37 +124,35 @@ mkvReader::~mkvReader()
 {
 	mkv_Close(fFile);
 	free(fInputStream);
-	if (fakeExtraData) {
-		delete [] fakeExtraData;
-	}
 }
 
 int
-mkvReader::CreateFakeAACDecoderConfig(const TrackInfo *track)
+mkvReader::CreateFakeAACDecoderConfig(const TrackInfo *track, uint8 **fakeExtraData)
 {
 	// Try to fake up a valid Decoder Config for the AAC decoder to parse
-	TRACE("AAC requires private data (attempting to fake one).\n");
+	TRACE("AAC (%s) requires private data (attempting to fake one)\n",track->CodecID);
 
-	fakeExtraData = new uint8[8];
-
-    int Profile = 1;
+    int profile = 1;
     
     if (strstr(track->CodecID,"MAIN")) {
-    	Profile = 1;
+    	profile = 1;
     } else if (strstr(track->CodecID,"LC")) {
-    	Profile = 2;
+    	profile = 2;
     } else if (strstr(track->CodecID,"SSR")) {
-    	Profile = 3;
+    	profile = 3;
 	}
 
-    uint8 SampleRateIndex = matroska_samplerate_to_samplerateindex(track->Audio.SamplingFreq);
+    uint8 sampleRateIndex = matroska_samplerate_to_samplerateindex(track->Audio.SamplingFreq);
+
+	TRACE("Profile %d, SampleRate %f, SampleRateIndex %d\n",profile, track->Audio.SamplingFreq, sampleRateIndex);
     
     // profile			5 bits
     // SampleRateIndex	4 bits
     // Channels			4 Bits
-    fakeExtraData[0] = (Profile << 3) | ((SampleRateIndex & 0x0E) >> 1);
-    fakeExtraData[1] = ((SampleRateIndex & 0x01) << 7) | (track->Audio.Channels << 3);
+    (*fakeExtraData)[0] = (profile << 3) | ((sampleRateIndex & 0x0E) >> 1);
+    (*fakeExtraData)[1] = ((sampleRateIndex & 0x01) << 7) | (track->Audio.Channels << 3);
     if (strstr(track->CodecID, "SBR")) {
+    	TRACE("Extension SBR Needs more configuration\n");
     	// Sync Extension 0x2b7				11 bits
 		// Extension Audio Object Type 0x5	5 bits
 		// SBR present flag	0x1    			1 bit
@@ -160,20 +160,20 @@ mkvReader::CreateFakeAACDecoderConfig(const TrackInfo *track)
 		// if SampleRateIndex = 15
 		// ExtendedSamplingFrequency		24 bits
     
-		SampleRateIndex = matroska_samplerate_to_samplerateindex(track->Audio.OutputSamplingFreq);
-        fakeExtraData[2] = 0x56;
-        fakeExtraData[3] = 0xE5;
-        if (SampleRateIndex != 15) {
-	        fakeExtraData[4] = 0x80 | (SampleRateIndex << 3);
+		sampleRateIndex = matroska_samplerate_to_samplerateindex(track->Audio.OutputSamplingFreq);
+        (*fakeExtraData)[2] = 0x56;
+        (*fakeExtraData)[3] = 0xE5;
+        if (sampleRateIndex != 15) {
+	        (*fakeExtraData)[4] = 0x80 | (sampleRateIndex << 3);
    	        return 5;
         }
 
-		uint32 SampleRate = uint32(track->Audio.OutputSamplingFreq);
+		uint32 sampleRate = uint32(track->Audio.OutputSamplingFreq);
         
-        fakeExtraData[4] = 0x80 | (SampleRateIndex << 3) | ((SampleRate & 0xFFF0 ) >> 4);
-        fakeExtraData[5] = (SampleRate & 0x0FFF) << 4;
-        fakeExtraData[6] = SampleRate << 12;
-        fakeExtraData[7] = SampleRate << 20;
+        (*fakeExtraData)[4] = 0x80 | (sampleRateIndex << 3) | ((sampleRate & 0xFFF0 ) >> 4);
+        (*fakeExtraData)[5] = (sampleRate & 0x0FFF) << 4;
+        (*fakeExtraData)[6] = sampleRate << 12;
+        (*fakeExtraData)[7] = sampleRate << 20;
         return 8;
     } else {
     	return 2;
@@ -388,7 +388,7 @@ mkvReader::SetupAudioCookie(mkv_cookie *cookie)
 	TRACE("duration: %Ld (%.6f)\n", cookie->duration, cookie->duration / 1E6); 
 	TRACE("frame_count: %Ld\n", cookie->frame_count);
 	
-	if (B_OK != GetAudioFormat(&cookie->format, cookie->track_info->CodecID, cookie->track_info->CodecPrivate, cookie->track_info->CodecPrivateSize)) {
+	if (GetAudioFormat(&cookie->format, cookie->track_info->CodecID, cookie->track_info->CodecPrivate, cookie->track_info->CodecPrivateSize) != B_OK) {
 		TRACE("mkvReader::SetupAudioCookie: codec not recognized\n");
 		return B_ERROR;
 	}
@@ -402,8 +402,11 @@ mkvReader::SetupAudioCookie(mkv_cookie *cookie)
 
 	if (IS_CODEC(cookie->track_info->CodecID, "A_AAC")) {
 		if (cookie->private_data_size == 0) {
-			cookie->private_data_size = CreateFakeAACDecoderConfig(cookie->track_info);
-			cookie->private_data = &fakeExtraData[0];
+			// we create our own private data and keep a reference for us to dispose.
+		    cookie->fake_private_data = new uint8[8];
+			cookie->private_data = cookie->fake_private_data;
+
+			cookie->private_data_size = CreateFakeAACDecoderConfig(cookie->track_info, &cookie->private_data);
 		}
 		
 		cookie->format.u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_SHORT;
@@ -430,7 +433,8 @@ mkvReader::FreeCookie(void *_cookie)
 	mkv_Close(cookie->file);
 
 	delete [] cookie->buffer;
-
+	delete [] cookie->fake_private_data;
+	
 	delete cookie;
 	return B_OK;
 }

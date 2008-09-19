@@ -25,7 +25,7 @@
 #ifndef _MATROSKA_CODECS_H
 #define _MATROSKA_CODECS_H
 
-#define IS_CODEC(a,b) !memcmp(a, b, strlen(b))
+#define IS_CODEC(a, b) !memcmp(a, b, strlen(b))
 
 status_t GetAudioFormat(media_format *format, const char *codec, void *private_data, int private_size);
 status_t GetVideoFormat(media_format *format, const char *codec, void *private_data, int private_size);
