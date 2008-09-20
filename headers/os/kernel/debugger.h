@@ -556,6 +556,9 @@ typedef struct {
 	int32				stack_depth;		// number of return addresses per
 											// tick
 	int32				sample_count;		// number of samples in the buffer
+	int32				dropped_ticks;		// number of ticks that had been
+											// dropped, since the buffer was
+											// full
 	bool				stopped;			// if true, the thread is no longer
 											// being profiled
 } debug_profiler_update;

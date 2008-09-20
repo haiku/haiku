@@ -15,9 +15,10 @@
 
 
 // limits
-#define B_DEBUG_MAX_PROFILE_FUNCTIONS	100000
-#define B_DEBUG_MIN_PROFILE_INTERVAL	100			/* in us */
-#define B_DEBUG_STACK_TRACE_DEPTH		5
+#define B_DEBUG_MAX_PROFILE_FUNCTIONS			100000
+#define B_DEBUG_MIN_PROFILE_INTERVAL			100			/* in us */
+#define B_DEBUG_STACK_TRACE_DEPTH				5
+#define	B_DEBUG_PROFILE_BUFFER_FLUSH_THRESHOLD	70			/* in % */
 
 
 struct function_profile_info;
@@ -84,15 +85,18 @@ struct thread_debug_info {
 			// sample buffer
 		int32			max_samples;
 			// maximum number of samples the buffer can hold
+		int32			flush_threshold;
+			// number of sample when the buffer is flushed (if possible)
 		int32			sample_count;
 			// number of samples the buffer currently holds
 		int32			stack_depth;
 			// number of return addresses to record per timer interval
+		int32			dropped_ticks;
+			// number of ticks that had to be dropped when the sample buffer was
+			// full and couldn't be flushed
 		int32			image_event;
 			// number of the image event when the first sample was written into
 			// the buffer
-		int32			disabled;
-			// if > 0, profiling is temporarily disabled for the thread
 		bool			buffer_full;
 			// indicates that the sample buffer is full
 		union {

@@ -54,51 +54,6 @@ static status_t ensure_debugger_installed(team_id teamID, port_id *port = NULL);
 static void get_team_debug_info(team_debug_info &teamDebugInfo);
 
 
-static void
-enable_profiling()
-{
-	struct thread* thread = thread_get_current_thread();
-
-	InterruptsSpinLocker _(gThreadSpinlock);
-
-	if (--thread->debug_info.profile.disabled > 0)
-		return;
-
-	if (thread->debug_info.profile.samples != NULL
-		&& !thread->debug_info.profile.buffer_full) {
-		// install profiling timer
-		schedule_profiling_timer(thread,
-			thread->debug_info.profile.interval_left);
-	}
-}
-
-
-static void
-disable_profiling()
-{
-	struct thread* thread = thread_get_current_thread();
-
-	InterruptsSpinLocker _(gThreadSpinlock);
-
-	if (thread->debug_info.profile.disabled++ > 0) {
-		ASSERT(thread->debug_info.profile.installed_timer == NULL);
-		return;
-	}
-
-	// if running, cancel the profiling timer
-	struct timer* timer = thread->debug_info.profile.installed_timer;
-	if (timer != NULL) {
-		// track remaining time
-		bigtime_t left = thread->debug_info.profile.timer_end - system_time();
-		thread->debug_info.profile.interval_left = max_c(left, 0);
-		thread->debug_info.profile.installed_timer = NULL;
-
-		// cancel timer
-		cancel_timer(timer);
-	}
-}
-
-
 static status_t
 kill_interruptable_write_port(port_id port, int32 code, const void *buffer,
 	size_t bufferSize)
@@ -119,8 +74,6 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 
 	status_t error = B_OK;
 
-	disable_profiling();
-
 	// get the team debug info
 	team_debug_info teamDebugInfo;
 	get_team_debug_info(teamDebugInfo);
@@ -132,7 +85,6 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 		dontWait ? (uint32)B_RELATIVE_TIMEOUT : (uint32)B_KILL_CAN_INTERRUPT, 0);
 	if (error != B_OK) {
 		TRACE(("debugger_write() done1: %lx\n", error));
-		enable_profiling();
 		return error;
 	}
 
@@ -159,7 +111,6 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 
 	TRACE(("debugger_write() done: %lx\n", error));
 
-	enable_profiling();
 	return error;
 }
 
@@ -337,7 +288,6 @@ init_thread_debug_info(struct thread_debug_info *info)
 		info->ignore_signals_once = 0;
 		info->profile.sample_area = -1;
 		info->profile.samples = NULL;
-		info->profile.disabled = 0;
 		info->profile.buffer_full = false;
 		info->profile.installed_timer = NULL;
 	}
@@ -364,7 +314,6 @@ clear_thread_debug_info(struct thread_debug_info *info, bool dying)
 		info->ignore_signals_once = 0;
 		info->profile.sample_area = -1;
 		info->profile.samples = NULL;
-		info->profile.disabled = 0;
 		info->profile.buffer_full = false;
 	}
 }
@@ -735,8 +684,6 @@ static status_t
 thread_hit_debug_event(debug_debugger_message event, const void *message,
 	int32 size, bool requireDebugger)
 {
-	disable_profiling();
-
 	status_t result;
 	bool restart;
 	do {
@@ -744,8 +691,6 @@ thread_hit_debug_event(debug_debugger_message event, const void *message,
 		result = thread_hit_debug_event_internal(event, message, size,
 			requireDebugger, restart);
 	} while (result >= 0 && restart);
-
-	enable_profiling();
 
 	return result;
 }
@@ -1082,11 +1027,11 @@ user_debug_thread_exiting(struct thread* thread)
 
 	area_id sampleArea = threadDebugInfo.profile.sample_area;
 	int32 sampleCount = threadDebugInfo.profile.sample_count;
+	int32 droppedTicks = threadDebugInfo.profile.dropped_ticks;
 	int32 stackDepth = threadDebugInfo.profile.stack_depth;
 	int32 imageEvent = threadDebugInfo.profile.image_event;
 	threadDebugInfo.profile.sample_area = -1;
 	threadDebugInfo.profile.samples = NULL;
-	threadDebugInfo.profile.disabled = 0;
 	threadDebugInfo.profile.buffer_full = false;
 
 	atomic_or(&threadDebugInfo.flags, B_THREAD_DEBUG_DYING);
@@ -1100,6 +1045,7 @@ user_debug_thread_exiting(struct thread* thread)
 	message.origin.team = thread->team->id;
 	message.origin.nub_port = -1;	// asynchronous message
 	message.sample_count = sampleCount;
+	message.dropped_ticks = droppedTicks;
 	message.stack_depth = stackDepth;
 	message.image_event = imageEvent;
 	message.stopped = true;
@@ -1254,9 +1200,19 @@ profiling_do_sample(bool& flushBuffer)
 	int32 imageEvent = thread->team->debug_info.image_event;
 	if (debugInfo.profile.sample_count > 0) {
 		if (debugInfo.profile.image_event < imageEvent
-			|| debugInfo.profile.max_samples - sampleCount < stackDepth) {
-			flushBuffer = true;
-			return true;
+			|| debugInfo.profile.flush_threshold - sampleCount < stackDepth) {
+			if (!IS_KERNEL_ADDRESS(arch_debug_get_interrupt_pc())) {
+				flushBuffer = true;
+				return true;
+			}
+
+			// We can't flush the buffer now, since we interrupted a kernel
+			// function. If the buffer is not full yet, we add the samples,
+			// otherwise we have to drop them.
+			if (debugInfo.profile.max_samples - sampleCount < stackDepth) {
+				debugInfo.profile.dropped_ticks++;
+				return true;
+			}
 		}
 	} else {
 		// first sample -- set the image event
@@ -1291,11 +1247,13 @@ profiling_buffer_full(void*)
 
 	if (debugInfo.profile.samples != NULL && debugInfo.profile.buffer_full) {
 		int32 sampleCount = debugInfo.profile.sample_count;
+		int32 droppedTicks = debugInfo.profile.dropped_ticks;
 		int32 stackDepth = debugInfo.profile.stack_depth;
 		int32 imageEvent = debugInfo.profile.image_event;
 
 		// notify the debugger
 		debugInfo.profile.sample_count = 0;
+		debugInfo.profile.dropped_ticks = 0;
 
 		RELEASE_THREAD_LOCK();
 		enable_interrupts();
@@ -1303,6 +1261,7 @@ profiling_buffer_full(void*)
 		// prepare the message
 		debug_profiler_update message;
 		message.sample_count = sampleCount;
+		message.dropped_ticks = droppedTicks;
 		message.stack_depth = stackDepth;
 		message.image_event = imageEvent;
 		message.stopped = false;
@@ -1333,7 +1292,7 @@ profiling_event(timer* /*unused*/)
 	struct thread* thread = thread_get_current_thread();
 	thread_debug_info& debugInfo = thread->debug_info;
 
-	bool flushBuffer;
+	bool flushBuffer = false;
 	if (profiling_do_sample(flushBuffer)) {
 		if (flushBuffer) {
 			// The sample buffer needs to be flushed; we'll have to notify the
@@ -1355,11 +1314,6 @@ profiling_event(timer* /*unused*/)
 void
 user_debug_thread_unscheduled(struct thread* thread)
 {
-	if (thread->debug_info.profile.disabled > 0) {
-		ASSERT(thread->debug_info.profile.installed_timer == NULL);
-		return;
-	}
-
 	// if running, cancel the profiling timer
 	struct timer* timer = thread->debug_info.profile.installed_timer;
 	if (timer != NULL) {
@@ -1377,9 +1331,6 @@ user_debug_thread_unscheduled(struct thread* thread)
 void
 user_debug_thread_scheduled(struct thread* thread)
 {
-	if (thread->debug_info.profile.disabled > 0)
-		return;
-
 	if (thread->debug_info.profile.samples != NULL
 		&& !thread->debug_info.profile.buffer_full) {
 		// install profiling timer
@@ -2321,7 +2272,12 @@ debug_nub_thread(void *)
 							threadDebugInfo.profile.samples = (addr_t*)samples;
 							threadDebugInfo.profile.max_samples
 								= areaInfo.size / sizeof(addr_t);
+							threadDebugInfo.profile.flush_threshold
+								= threadDebugInfo.profile.max_samples
+									* B_DEBUG_PROFILE_BUFFER_FLUSH_THRESHOLD
+									/ 100;
 							threadDebugInfo.profile.sample_count = 0;
+							threadDebugInfo.profile.dropped_ticks = 0;
 							threadDebugInfo.profile.stack_depth = stackDepth;
 							threadDebugInfo.profile.buffer_full = false;
 							threadDebugInfo.profile.interval_left = interval;
@@ -2369,6 +2325,7 @@ debug_nub_thread(void *)
 				int32 sampleCount = 0;
 				int32 stackDepth = 0;
 				int32 imageEvent = 0;
+				int32 droppedTicks = 0;
 
 				// get the thread and detach the profile info
 				cpu_status state = disable_interrupts();
@@ -2382,11 +2339,13 @@ debug_nub_thread(void *)
 						sampleArea = threadDebugInfo.profile.sample_area;
 						samples = threadDebugInfo.profile.samples;
 						sampleCount = threadDebugInfo.profile.sample_count;
+						droppedTicks = threadDebugInfo.profile.dropped_ticks;
 						stackDepth = threadDebugInfo.profile.stack_depth;
 						imageEvent = threadDebugInfo.profile.image_event;
 						threadDebugInfo.profile.sample_area = -1;
 						threadDebugInfo.profile.samples = NULL;
 						threadDebugInfo.profile.buffer_full = false;
+						threadDebugInfo.profile.dropped_ticks = 0;
 					} else
 						result = B_BAD_VALUE;
 				} else
@@ -2401,6 +2360,7 @@ debug_nub_thread(void *)
 					reply.profiler_update.image_event = imageEvent;
 					reply.profiler_update.stack_depth = stackDepth;
 					reply.profiler_update.sample_count = sampleCount;
+					reply.profiler_update.dropped_ticks = droppedTicks;
 					reply.profiler_update.stopped = true;
 				} else
 					reply.profiler_update.origin.thread = result;
