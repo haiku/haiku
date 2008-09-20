@@ -166,6 +166,7 @@ typedef enum {
 	B_DEBUGGER_MESSAGE_TEAM_CREATED,		// the debugged team created a new
 											// one
 	B_DEBUGGER_MESSAGE_TEAM_DELETED,		// the debugged team is gone
+	B_DEBUGGER_MESSAGE_TEAM_EXEC,			// the debugged team executes exec()
 	B_DEBUGGER_MESSAGE_THREAD_CREATED,		// a thread has been created
 	B_DEBUGGER_MESSAGE_THREAD_DELETED,		// a thread has been deleted
 	B_DEBUGGER_MESSAGE_IMAGE_CREATED,		// an image has been created
@@ -510,6 +511,12 @@ typedef struct {
 									// (asynchronous message)
 } debug_team_deleted;
 
+// B_DEBUGGER_MESSAGE_TEAM_EXEC
+
+typedef struct {
+	debug_origin	origin;
+} debug_team_exec;
+
 // B_DEBUGGER_MESSAGE_THREAD_CREATED
 
 typedef struct {
@@ -575,6 +582,7 @@ typedef union {
 	debug_exception_occurred		exception_occurred;
 	debug_team_created				team_created;
 	debug_team_deleted				team_deleted;
+	debug_team_exec					team_exec;
 	debug_thread_created			thread_created;
 	debug_thread_deleted			thread_deleted;
 	debug_image_created				image_created;

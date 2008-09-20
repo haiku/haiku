@@ -885,6 +885,26 @@ user_debug_team_deleted(team_id teamID, port_id debuggerPort)
 
 
 void
+user_debug_team_exec()
+{
+	// check, if a debugger is installed and is interested in team creation
+	// events
+	struct thread *thread = thread_get_current_thread();
+	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
+	if (~teamDebugFlags
+		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_TEAM_CREATION)) {
+		return;
+	}
+
+	// prepare the message
+	debug_team_created message;
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_TEAM_EXEC, &message,
+		sizeof(message), true);
+}
+
+
+void
 user_debug_update_new_thread_flags(thread_id threadID)
 {
 	// Update thread::flags of the thread.

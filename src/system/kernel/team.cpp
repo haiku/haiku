@@ -1363,6 +1363,8 @@ exec_team(const char *path, char**& _flatArgs, size_t flatArgsSize,
 	// permission.
 	update_set_id_user_and_group(team, path);
 
+	user_debug_team_exec();
+
 	status = team_create_thread_start(teamArgs);
 		// this one usually doesn't return...
 
