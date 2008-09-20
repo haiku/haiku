@@ -18,6 +18,7 @@
 
 #include <debug_support.h>
 #include <ObjectList.h>
+#include <Referenceable.h>
 
 #include <util/DoublyLinkedList.h>
 
@@ -77,7 +78,7 @@ struct HitSymbol {
 };
 
 
-class Image {
+class Image : public Referenceable {
 public:
 	Image(const image_info& info)
 		:
@@ -94,6 +95,11 @@ public:
 				delete fSymbols[i];
 			delete[] fSymbols;
 		}
+	}
+
+	const image_id ID() const
+	{
+		return fInfo.id;
 	}
 
 	const image_info& Info() const
@@ -209,6 +215,12 @@ public:
 		fTotalHits(0),
 		fMissedTicks(0)
 	{
+		fImage->AddReference();
+	}
+
+	~ThreadImage()
+	{
+		fImage->RemoveReference();
 	}
 
 	status_t Init()
@@ -221,6 +233,11 @@ public:
 		memset(fSymbolHits, 0, 8 * symbolCount);
 
 		return B_OK;
+	}
+
+	image_id ID() const
+	{
+		return fImage->ID();
 	}
 
 	bool ContainsAddress(addr_t address) const
@@ -267,7 +284,7 @@ private:
 };
 
 
-class Thread {
+class Thread : public DoublyLinkedListLinkImpl<Thread> {
 public:
 	Thread(const thread_info& info, Team* team)
 		:
@@ -325,6 +342,21 @@ public:
 		fImages.Add(threadImage);
 
 		return B_OK;
+	}
+
+	void ImageRemoved(Image* image)
+	{
+		ImageList::Iterator it = fImages.GetIterator();
+		while (ThreadImage* threadImage = it.Next()) {
+			if (threadImage->GetImage() == image) {
+				fImages.Remove(threadImage);
+				if (threadImage->TotalHits() > 0)
+					fOldImages.Add(threadImage);
+				else
+					delete threadImage;
+				return;
+			}
+		}
 	}
 
 	ThreadImage* FindImage(addr_t address) const
@@ -445,6 +477,7 @@ public:
 	Team()
 		:
 		fNubPort(-1),
+		fThreads(),
 		fImages(20, false)
 	{
 		fInfo.team = -1;
@@ -459,9 +492,8 @@ public:
 		if (fNubPort >= 0)
 			remove_team_debugger(fInfo.team);
 
-// TODO: Just decrement ref-count!
 		for (int32 i = 0; Image* image = fImages.ItemAt(i); i++)
-			delete image;
+			image->RemoveReference();
 	}
 
 	status_t Init(team_id teamID, port_id debuggerPort)
@@ -504,7 +536,7 @@ public:
 
 		// set team debugging flags
 		int32 teamDebugFlags = B_TEAM_DEBUG_THREADS
-			| B_TEAM_DEBUG_TEAM_CREATION;
+			| B_TEAM_DEBUG_TEAM_CREATION | B_TEAM_DEBUG_IMAGES;
 		set_team_debugging_flags(fNubPort, teamDebugFlags);
 
 		return B_OK;
@@ -565,10 +597,63 @@ public:
 		thread->SetInterval(reply.interval);
 //reply.profile_event
 
+		fThreads.Add(thread);
+
 		// resume the target thread to be sure, it's running
 		resume_thread(thread->ID());
 
 		return B_OK;
+	}
+
+	void RemoveThread(Thread* thread)
+	{
+		fThreads.Remove(thread);
+	}
+
+	void Exec()
+	{
+		// remove all images
+		int32 imageCount = fImages.CountItems();
+		for (int32 i = imageCount - 1; i >= 0; i--)
+			_RemoveImage(i);
+	}
+
+	status_t AddImage(const image_info& imageInfo)
+	{
+		// create symbol lookup context
+		debug_symbol_lookup_context* lookupContext;
+		status_t error = debug_create_symbol_lookup_context(&fDebugContext,
+			&lookupContext);
+		if (error != B_OK) {
+			fprintf(stderr, "%s: Failed to create symbol lookup context for "
+				"team %ld: %s\n", kCommandName, ID(), strerror(error));
+			return error;
+		}
+
+		Image* image;
+		error = _LoadImageSymbols(lookupContext, imageInfo, &image);
+		debug_delete_symbol_lookup_context(lookupContext);
+
+// TODO: Remove! The threads must be updated lazily.
+if (error == B_OK) {
+	ThreadList::Iterator it = fThreads.GetIterator();
+	while (Thread* thread = it.Next())
+		thread->AddImage(image);
+}
+
+		return error;
+	}
+
+	status_t RemoveImage(const image_info& imageInfo)
+	{
+		for (int32 i = 0; Image* image = fImages.ItemAt(i); i++) {
+			if (image->ID() == imageInfo.id) {
+				_RemoveImage(i);
+				return B_OK;
+			}
+		}
+
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	team_id ID() const
@@ -583,34 +668,59 @@ private:
 		image_info imageInfo;
 		int32 cookie = 0;
 		while (get_next_image_info(fInfo.team, &cookie, &imageInfo) == B_OK) {
-			printf("Loading symbols of image \"%s\" (%ld)...\n",
-				imageInfo.name, imageInfo.id);
-
-			Image* image = new(std::nothrow) Image(imageInfo);
-			if (image == NULL)
-				return B_NO_MEMORY;
-
-			status_t error = image->LoadSymbols(lookupContext);
-			if (error != B_OK) {
-				delete image;
-				if (error == B_NO_MEMORY)
-					return error;
-				continue;
-			}
-
-			if (!fImages.AddItem(image)) {
-				delete image;
-				return B_NO_MEMORY;
-			}
+			status_t error = _LoadImageSymbols(lookupContext, imageInfo);
+			if (error == B_NO_MEMORY)
+				return error;
 		}
 
 		return B_OK;
 	}
 
+	status_t _LoadImageSymbols(debug_symbol_lookup_context* lookupContext,
+		const image_info& imageInfo, Image** _image = NULL)
+	{
+		Image* image = new(std::nothrow) Image(imageInfo);
+		if (image == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = image->LoadSymbols(lookupContext);
+		if (error != B_OK) {
+			delete image;
+			return error;
+		}
+
+		if (!fImages.AddItem(image)) {
+			delete image;
+			return B_NO_MEMORY;
+		}
+
+		if (_image != NULL)
+			*_image = image;
+
+		return B_OK;
+	}
+
+	void _RemoveImage(int32 index)
+	{
+		Image* image = fImages.RemoveItemAt(index);
+		if (image == NULL)
+			return;
+
+		// notify all threads that the image has been removed
+		ThreadList::Iterator it = fThreads.GetIterator();
+		while (Thread* thread = it.Next())
+			thread->ImageRemoved(image);
+
+		image->RemoveReference();
+	}
+
 private:
+	typedef DoublyLinkedList<Thread> ThreadList;
+
 	team_info					fInfo;
 	port_id						fNubPort;
 	debug_context				fDebugContext;
+	ThreadList					fThreads;
 	BObjectList<Image>			fImages;
 };
 
@@ -684,8 +794,10 @@ public:
 
 	void RemoveThread(thread_id threadID)
 	{
-		if (Thread* thread = FindThread(threadID))
+		if (Thread* thread = FindThread(threadID)) {
+			thread->GetTeam()->RemoveThread(thread);
 			fThreads.RemoveItem(thread, true);
+		}
 	}
 
 	Team* FindTeam(team_id teamID) const
@@ -856,8 +968,6 @@ main(int argc, const char* const* argv)
 		switch (code) {
 			case B_DEBUGGER_MESSAGE_PROFILER_UPDATE:
 			{
-debug_printf("B_DEBUGGER_MESSAGE_PROFILER_UPDATE: thread %ld, %ld samples\n",
-message.profiler_update.origin.thread, message.profiler_update.sample_count);
 				Thread* thread = threadManager.FindThread(
 					message.profiler_update.origin.thread);
 				if (thread == NULL)
@@ -883,12 +993,34 @@ message.profiler_update.origin.thread, message.profiler_update.sample_count);
 				// a debugged team is gone -- quit, if it is our team
 				quitLoop = message.origin.team == teamID;
 				break;
+			case B_DEBUGGER_MESSAGE_TEAM_EXEC:
+				if (Team* team = threadManager.FindTeam(message.origin.team))
+					team->Exec();
+				break;
+
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
 				threadManager.AddThread(message.thread_created.new_thread);
 				break;
 			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
 				threadManager.RemoveThread(message.origin.thread);
 				break;
+
+			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
+{
+const image_info& info = message.image_created.info;
+printf("B_DEBUGGER_MESSAGE_IMAGE_CREATED: %s (%ld)\n", info.name, info.id);
+				if (Team* team = threadManager.FindTeam(message.origin.team))
+					team->AddImage(message.image_created.info);
+				break;
+}
+			case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
+{
+const image_info& info = message.image_deleted.info;
+printf("B_DEBUGGER_MESSAGE_IMAGE_DELETED: %s (%ld)\n", info.name, info.id);
+				if (Team* team = threadManager.FindTeam(message.origin.team))
+					team->RemoveImage(message.image_deleted.info);
+				break;
+}
 
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
@@ -899,8 +1031,6 @@ message.profiler_update.origin.thread, message.profiler_update.sample_count);
 			case B_DEBUGGER_MESSAGE_SINGLE_STEP:
 			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 			case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
-			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
-			case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
 				break;
 		}
 
