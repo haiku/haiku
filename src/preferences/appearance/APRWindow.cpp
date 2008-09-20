@@ -54,19 +54,19 @@ APRWindow::APRWindow(BRect frame)
 	rect = tabView->ContainerView()->Bounds().InsetByCopy(5, 8);
 
 	fAntialiasingSettings = new AntialiasingSettingsView(rect, "Antialiasing");
-	fColorsView = new APRView(rect,"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
+	fColorsView = new APRView(rect, "Colors", B_FOLLOW_ALL, B_WILL_DRAW);
 
 	tabView->AddTab(fColorsView);
 	tabView->AddTab(fAntialiasingSettings);
 		
 	view->AddChild(tabView);
 	fColorsView->ResizeToPreferred();
-	fAntialiasingSettings -> ResizeToPreferred();
+	fAntialiasingSettings->ResizeToPreferred();
 
-	fDefaultsButton -> SetEnabled(fColorsView -> IsDefaultable()
-							|| fAntialiasingSettings -> IsDefaultable());
-	fDefaultsButton -> SetTarget(this);
-	fRevertButton -> SetTarget(this);
+	fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
+		|| fAntialiasingSettings->IsDefaultable());
+	fDefaultsButton->SetTarget(this);
+	fRevertButton->SetTarget(this);
 }
 
 
