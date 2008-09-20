@@ -860,7 +860,7 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 					// if we have no submenu and we're an
 					// item in the top menu below the menubar,
 					// pass the keypress to the menubar
-					// so you can use the keypress to switch menus.				
+					// so you can use the keypress to switch menus.
 					BMessenger msgr(Supermenu());
 					msgr.SendMessage(Window()->CurrentMessage());
 				}
@@ -871,7 +871,7 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 		case B_SPACE:
 			if (fSelected) {
 				_InvokeItem(fSelected);
-				_QuitTracking(false);			
+				_QuitTracking(false);
 			}
 			break;
 
@@ -1263,7 +1263,7 @@ BMenu::_InitData(BMessage* archive)
 
 	fLayoutData = new LayoutData;
 	fLayoutData->lastResizingMode = ResizingMode();
-	
+
 	SetLowColor(sMenuInfo.background_color);
 	SetViewColor(sMenuInfo.background_color);
 
@@ -1285,7 +1285,7 @@ BMenu::_InitData(BMessage* archive)
 		archive->FindFloat("_maxwidth", &fMaxContentWidth);
 
 		BMessage msg;
-       		for (int32 i = 0; archive->FindMessage("_items", i, &msg) == B_OK; i++) {
+			for (int32 i = 0; archive->FindMessage("_items", i, &msg) == B_OK; i++) {
 			BArchivable *object = instantiate_object(&msg);
 			if (BMenuItem *item = dynamic_cast<BMenuItem *>(object)) {
 				BRect bounds;
@@ -1389,7 +1389,7 @@ BMenu::_Hide()
 const static bigtime_t kOpenSubmenuDelay = 225000;
 const static bigtime_t kNavigationAreaTimeout = 1000000;
 const static bigtime_t kHysteresis = 200000; // TODO: Test and reduce if needed.
-const static int32 kMouseMotionThreshold = 15; 
+const static int32 kMouseMotionThreshold = 15;
 	// TODO: Same as above. Actually, we could get rid of the kHysteresis
 
 
@@ -1422,19 +1422,19 @@ BMenu::_Track(int *action, long start)
 
 		if (!LockLooper())
 			break;
-		
+
 		BMenuWindow *window = static_cast<BMenuWindow *>(Window());
 		BPoint screenLocation = ConvertToScreen(location);
 		if (window->CheckForScrolling(screenLocation)) {
-			UnlockLooper();		
+			UnlockLooper();
 			continue;
 		}
-	
+
 		// The order of the checks is important
 		// to be able to handle overlapping menus:
 		// first we check if mouse is inside a submenu,
 		// then if the menu is inside this menu,
-		// then if it's over a super menu. 
+		// then if it's over a super menu.
 		bool overSub = _OverSubmenu(fSelected, screenLocation);
 		item = _HitTestItems(location, B_ORIGIN);
 		if (overSub) {
@@ -1453,21 +1453,21 @@ BMenu::_Track(int *action, long start)
 			// The following call blocks until the submenu
 			// gives control back to us, either because the mouse
 			// pointer goes out of the submenu's bounds, or because
-			// the user closes the menu 
+			// the user closes the menu
 			BMenuItem *submenuItem = submenu->_Track(&submenuAction);
 			if (submenuAction == MENU_STATE_CLOSED) {
 				item = submenuItem;
-				fState = MENU_STATE_CLOSED;			
+				fState = MENU_STATE_CLOSED;
 			}
 			if (!LockLooper())
-				break;			
+				break;
 		} else if (item != NULL) {
 			_UpdateStateOpenSelect(item, location, navAreaRectAbove,
 				navAreaRectBelow, selectedTime, navigationAreaTime);
 			if (!releasedOnce)
-				releasedOnce = true;		
+				releasedOnce = true;
 		} else if (_OverSuper(screenLocation)) {
-			fState = MENU_STATE_TRACKING;			
+			fState = MENU_STATE_TRACKING;
 			UnlockLooper();
 			break;
 		} else {
@@ -1497,13 +1497,13 @@ BMenu::_Track(int *action, long start)
 
 			BPoint newLocation;
 			uint32 newButtons;
-			
+
 			bigtime_t newPollTime = system_time();
-			if (LockLooper()) {	
+			if (LockLooper()) {
 				GetMouse(&newLocation, &newButtons, true);
-				UnlockLooper();		
+				UnlockLooper();
 			}
-			
+
 			// mouseSpeed in px per ms
 			// (actually point_distance returns the square of the distance,
 			// so it's more px^2 per ms)
@@ -1512,14 +1512,14 @@ BMenu::_Track(int *action, long start)
 
 			if (newLocation != location || newButtons != buttons) {
 				if (!releasedOnce && newButtons == 0 && buttons != 0)
-					releasedOnce = true;				
+					releasedOnce = true;
 				location = newLocation;
-				buttons = newButtons;				
+				buttons = newButtons;
 			}
-		
+
 			if (releasedOnce)
 				_UpdateStateClose(item, location, buttons);
-		}	
+		}
 	}
 
 	if (action != NULL)
@@ -1548,7 +1548,7 @@ BMenu::_UpdateNavigationArea(BPoint position, BRect& navAreaRectAbove,
 	// submenus, as the cursor can be moved to submenu items directly instead
 	// of having to move it horizontally into the submenu first. The concept
 	// is illustrated below:
-	// 
+	//
 	// +-------+----+---------+
 	// |       |   /|         |
 	// |       |  /*|         |
@@ -1570,7 +1570,7 @@ BMenu::_UpdateNavigationArea(BPoint position, BRect& navAreaRectAbove,
 	// [3] Lower navigation area rectangle ('navAreaRectBelow')
 	// [4] Upper navigation area
 	// [5] Lower navigation area
-	// [6] Submenu	
+	// [6] Submenu
 	//
 	// The rectangles are used to calculate if the cursor is in the actual
 	// navigation area (see _UpdateStateOpenSelect()).
@@ -1602,7 +1602,7 @@ BMenu::_UpdateNavigationArea(BPoint position, BRect& navAreaRectAbove,
 			navAreaRectBelow.Set(menuBounds.left,
 				position.y, position.x - NAV_AREA_THRESHOLD,
 				submenuBounds.bottom);
-		}	
+		}
 	} else {
 		navAreaRectAbove = BRect();
 		navAreaRectBelow = BRect();
@@ -1855,7 +1855,7 @@ BMenu::_LayoutItems(int32 index)
 BSize
 BMenu::_ValidatePreferredSize()
 {
-	if (!fLayoutData->preferred.IsWidthSet() || ResizingMode() != fLayoutData->lastResizingMode)		
+	if (!fLayoutData->preferred.IsWidthSet() || ResizingMode() != fLayoutData->lastResizingMode)
 		_ComputeLayout(0, true, false, NULL, NULL);
 
 	return fLayoutData->preferred;
@@ -1869,7 +1869,7 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	// TODO: Take "bestFit", "moveItems", "index" into account,
 	// Recalculate only the needed items,
 	// not the whole layout every time
-	
+
 	fLayoutData->lastResizingMode = ResizingMode();
 
 	BRect frame;
@@ -2357,21 +2357,21 @@ BMenuItem *
 BMenu::_NextItem(BMenuItem *item, bool forward) const
 {
 	// go to next item, and skip over disabled items such as separators
- 	int32 index = fItems.IndexOf(item);
+	int32 index = fItems.IndexOf(item);
 	const int32 numItems = fItems.CountItems();
 	if (index < 0) {
 		if (forward)
 			index = -1;
 		else
 			index = numItems;
-	}	
+	}
 	int32 startIndex = index;
 	do {
 		if (forward)
 			index++;
 		else
 			index--;
- 		
+
 		// cycle through menu items
 		if (index < 0)
 			index = numItems - 1;
@@ -2398,7 +2398,7 @@ BMenu::_SetStickyMode(bool on)
 {
 	if (fStickyMode == on)
 		return;
-	
+
 	fStickyMode = on;
 
 	// If we are switching to sticky mode, propagate the status
@@ -2579,7 +2579,7 @@ BMenu::_QuitTracking(bool onlyThis)
 
 	// Close the whole menu hierarchy
 	if (!onlyThis && _IsStickyMode())
-		_SetStickyMode(false);	
+		_SetStickyMode(false);
 
 	_Hide();
 }
@@ -2628,7 +2628,7 @@ get_menu_info(menu_info *info)
 
 // MenuPrivate
 namespace BPrivate {
-	
+
 MenuPrivate::MenuPrivate(BMenu *menu)
 	:
 	fMenu(menu)
@@ -2656,7 +2656,7 @@ MenuPrivate::CacheFontInfo()
 	fMenu->_CacheFontInfo();
 }
 
-	
+
 float
 MenuPrivate::FontHeight() const
 {
@@ -2699,7 +2699,7 @@ MenuPrivate::State(BMenuItem **item) const
 	return fMenu->_State(item);
 }
 
-		
+
 void
 MenuPrivate::Install(BWindow *window)
 {
