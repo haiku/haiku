@@ -371,9 +371,7 @@ typedef struct {
 
 typedef struct {
 	status_t			error;
-	int32				profile_event;	// number of the last event influencing
-										// profiling (e.g. image
-										// created/deleted)
+	int32				image_event;	// number of the last image event
 	bigtime_t			interval;		// actual sample interval (might
 										// differ from the requested one)
 } debug_nub_start_profiler_reply;
@@ -515,6 +513,7 @@ typedef struct {
 
 typedef struct {
 	debug_origin	origin;
+	int32			image_event;	// number of the image event
 } debug_team_exec;
 
 // B_DEBUGGER_MESSAGE_THREAD_CREATED
@@ -535,6 +534,7 @@ typedef struct {
 typedef struct {
 	debug_origin	origin;
 	image_info		info;			// info for the image
+	int32			image_event;	// number of the image event
 } debug_image_created;
 
 // B_DEBUGGER_MESSAGE_IMAGE_DELETED
@@ -542,17 +542,17 @@ typedef struct {
 typedef struct {
 	debug_origin	origin;
 	image_info		info;			// info for the image
+	int32			image_event;	// number of the image event
 } debug_image_deleted;
 
 // B_DEBUGGER_MESSAGE_PROFILER_UPDATE
 
 typedef struct {
 	debug_origin		origin;
-	int32				profile_event;		// number of the last event
-											// influencing profiling (e.g.
-											// image created/deleted); all
-											// samples were recorded after this
-											// event and before the next one
+	int32				image_event;		// number of the last image event;
+											// all samples were recorded after
+											// this event and before the next
+											// one
 	int32				stack_depth;		// number of return addresses per
 											// tick
 	int32				sample_count;		// number of samples in the buffer

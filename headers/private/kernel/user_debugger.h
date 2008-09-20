@@ -54,6 +54,8 @@ struct team_debug_info {
 	sem_id		debugger_write_lock;
 		// synchronizes writes to the debugger port with the setting (but not
 		// clearing) of the B_TEAM_DEBUG_DEBUGGER_HANDOVER flag
+	vint32		image_event;
+		// counter incremented whenever an image is created/deleted
 
 	struct arch_team_debug_info	arch_info;
 };
@@ -86,6 +88,11 @@ struct thread_debug_info {
 			// number of samples the buffer currently holds
 		int32			stack_depth;
 			// number of return addresses to record per timer interval
+		int32			image_event;
+			// number of the image event when the first sample was written into
+			// the buffer
+		int32			disabled;
+			// if > 0, profiling is temporarily disabled for the thread
 		bool			buffer_full;
 			// indicates that the sample buffer is full
 		union {
