@@ -19,6 +19,8 @@
 #include <debug_support.h>
 #include <ObjectList.h>
 
+#include <util/DoublyLinkedList.h>
+
 #include "debug_utils.h"
 
 
@@ -26,10 +28,21 @@ extern const char* __progname;
 static const char* kCommandName = __progname;
 
 
+class Image;
+class Team;
+
+
+enum {
+	SAMPLE_AREA_SIZE	= 128 * 1024,
+	SAMPLE_STACK_DEPTH	= 5
+};
+
+
 class Symbol {
 public:
-	Symbol(addr_t base, size_t size, const char* name)
+	Symbol(Image* image, addr_t base, size_t size, const char* name)
 		:
+		image(image),
 		base(base),
 		size(size),
 		name(name)
@@ -38,32 +51,392 @@ public:
 
 	const char* Name() const	{ return name.String(); }
 
+	Image*	image;
 	addr_t	base;
 	size_t	size;
 	BString	name;
 };
 
 
-struct hit_symbol {
+struct SymbolComparator {
+	inline bool operator()(const Symbol* a, const Symbol* b) const
+	{
+		return a->base < b->base;
+	}
+};
+
+
+struct HitSymbol {
 	int64	hits;
 	Symbol*	symbol;
 
-	inline bool operator<(const hit_symbol& other) const
+	inline bool operator<(const HitSymbol& other) const
 	{
 		return hits > other.hits;
 	}
 };
 
 
-struct Team;
+class Image {
+public:
+	Image(const image_info& info)
+		:
+		fInfo(info),
+		fSymbols(NULL),
+		fSymbolCount(0)
+	{
+	}
+
+	~Image()
+	{
+		if (fSymbols != NULL) {
+			for (int32 i = 0; i < fSymbolCount; i++)
+				delete fSymbols[i];
+			delete[] fSymbols;
+		}
+	}
+
+	const image_info& Info() const
+	{
+		return fInfo;
+	}
+
+	status_t LoadSymbols(debug_symbol_lookup_context* lookupContext)
+	{
+		printf("Loading symbols of image \"%s\" (%ld)...\n", fInfo.name,
+			fInfo.id);
+
+		// create symbol iterator
+		debug_symbol_iterator* iterator;
+		status_t error = debug_create_image_symbol_iterator(lookupContext,
+			fInfo.id, &iterator);
+		if (error != B_OK) {
+			printf("Failed to init symbol iterator: %s\n", strerror(error));
+			return error;
+		}
+
+		// iterate through the symbols
+		BObjectList<Symbol>	symbols(512, true);
+		char symbolName[1024];
+		int32 symbolType;
+		void* symbolLocation;
+		size_t symbolSize;
+		while (debug_next_image_symbol(iterator, symbolName, sizeof(symbolName),
+				&symbolType, &symbolLocation, &symbolSize) == B_OK) {
+//			printf("  %s %p (%6lu) %s\n",
+//				symbolType == B_SYMBOL_TYPE_TEXT ? "text" : "data",
+//				symbolLocation, symbolSize, symbolName);
+			if (symbolSize > 0 && symbolType == B_SYMBOL_TYPE_TEXT) {
+				Symbol* symbol = new(std::nothrow) Symbol(this,
+					(addr_t)symbolLocation, symbolSize, symbolName);
+				if (symbol == NULL || !symbols.AddItem(symbol)) {
+					delete symbol;
+					fprintf(stderr, "%s: Out of memory\n", kCommandName);
+					debug_delete_image_symbol_iterator(iterator);
+					return B_NO_MEMORY;
+				}
+			}
+		}
+
+		debug_delete_image_symbol_iterator(iterator);
+
+		// sort the symbols
+		fSymbolCount = symbols.CountItems();
+		fSymbols = new(std::nothrow) Symbol*[fSymbolCount];
+		if (fSymbols == NULL)
+			return B_NO_MEMORY;
+
+		for (int32 i = fSymbolCount - 1; i >= 0 ; i--)
+			fSymbols[i] = symbols.RemoveItemAt(i);
+
+		std::sort(fSymbols, fSymbols + fSymbolCount, SymbolComparator());
+
+		return B_OK;
+	}
+
+	Symbol** Symbols() const
+	{
+		return fSymbols;
+	}
+
+	int32 SymbolCount() const
+	{
+		return fSymbolCount;
+	}
+
+	bool ContainsAddress(addr_t address) const
+	{
+		return address >= (addr_t)fInfo.text
+			&& address < (addr_t)fInfo.data + fInfo.data_size;
+	}
+
+	int32 FindSymbol(addr_t address) const
+	{
+		// binary search the function
+		int32 lower = 0;
+		int32 upper = fSymbolCount;
+
+		while (lower < upper) {
+			int32 mid = (lower + upper) / 2;
+			if (address >= fSymbols[mid]->base + fSymbols[mid]->size)
+				lower = mid + 1;
+			else
+				upper = mid;
+		}
+
+		if (lower == fSymbolCount)
+			return -1;
+
+		const Symbol* symbol = fSymbols[lower];
+		if (address >= symbol->base && address < symbol->base + symbol->size)
+			return lower;
+		return -1;
+	}
+
+private:
+	image_info			fInfo;
+	Symbol**			fSymbols;
+	int32				fSymbolCount;
+};
 
 
-struct Thread {
-	thread_info	info;
-	Team*		team;
+class ThreadImage : public DoublyLinkedListLinkImpl<ThreadImage> {
+public:
+	ThreadImage(Image* image)
+		:
+		fImage(image),
+		fSymbolHits(NULL),
+		fTotalHits(0),
+		fMissedTicks(0)
+	{
+	}
 
-	thread_id ID() const		{ return info.thread; }
-	const char* Name() const	{ return info.name; }
+	status_t Init()
+	{
+		int32 symbolCount = fImage->SymbolCount();
+		fSymbolHits = new(std::nothrow) int64[symbolCount];
+		if (fSymbolHits == NULL)
+			return B_NO_MEMORY;
+
+		memset(fSymbolHits, 0, 8 * symbolCount);
+
+		return B_OK;
+	}
+
+	bool ContainsAddress(addr_t address) const
+	{
+		return fImage->ContainsAddress(address);
+	}
+
+	void AddHit(addr_t address)
+	{
+		int32 symbolIndex = fImage->FindSymbol(address);
+		if (symbolIndex >= 0)
+			fSymbolHits[symbolIndex]++;
+		else
+			fMissedTicks++;
+
+		fTotalHits++;
+	}
+
+	Image* GetImage() const
+	{
+		return fImage;
+	}
+
+	const int64* SymbolHits() const
+	{
+		return fSymbolHits;
+	}
+
+	int64 TotalHits() const
+	{
+		return fTotalHits;
+	}
+
+	int64 MissedHits() const
+	{
+		return fMissedTicks;
+	}
+
+private:
+	Image*	fImage;
+	int64*	fSymbolHits;
+	int64	fTotalHits;
+	int64	fMissedTicks;
+};
+
+
+class Thread {
+public:
+	Thread(const thread_info& info, Team* team)
+		:
+		fInfo(info),
+		fTeam(team),
+		fSampleArea(-1),
+		fSamples(NULL),
+		fImages(),
+		fOldImages(),
+		fTotalHits(0),
+		fMissedTicks(0),
+		fInterval(1)
+	{
+	}
+
+	~Thread()
+	{
+		while (ThreadImage* image = fImages.RemoveHead())
+			delete image;
+		while (ThreadImage* image = fOldImages.RemoveHead())
+			delete image;
+
+		if (fSampleArea >= 0)
+			delete_area(fSampleArea);
+	}
+
+	thread_id ID() const		{ return fInfo.thread; }
+	const char* Name() const	{ return fInfo.name; }
+	addr_t* Samples() const		{ return fSamples; }
+	Team* GetTeam() const		{ return fTeam; }
+
+	void SetSampleArea(area_id area, addr_t* samples)
+	{
+		fSampleArea = area;
+		fSamples = samples;
+	}
+
+	void SetInterval(bigtime_t interval)
+	{
+		fInterval = interval;
+	}
+
+	status_t AddImage(Image* image)
+	{
+		ThreadImage* threadImage = new(std::nothrow) ThreadImage(image);
+		if (threadImage == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = threadImage->Init();
+		if (error != B_OK) {
+			delete threadImage;
+			return error;
+		}
+
+		fImages.Add(threadImage);
+
+		return B_OK;
+	}
+
+	ThreadImage* FindImage(addr_t address) const
+	{
+		ImageList::ConstIterator it = fImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			if (image->ContainsAddress(address))
+				return image;
+		}
+		return NULL;
+	}
+
+	void AddSamples(int32 count, int32 stackDepth)
+	{
+		count = count / stackDepth * stackDepth;
+
+		for (int32 i = 0; i < count; i += stackDepth) {
+			ThreadImage* image = NULL;
+			for (int32 k = 0; k < stackDepth; k++) {
+				addr_t address = fSamples[i + k];
+				image = FindImage(address);
+				if (image != NULL) {
+					image->AddHit(address);
+					break;
+				}
+			}
+
+			if (image == NULL)
+				fMissedTicks++;
+		}
+
+		fTotalHits += count / stackDepth;
+	}
+
+	void PrintResults() const
+	{
+		printf("total hits: %lld, missed: %lld\n", fTotalHits, fMissedTicks);
+
+		int32 symbolCount = 0;
+
+		ImageList::ConstIterator it = fImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			const image_info& imageInfo = image->GetImage()->Info();
+			printf("  image: %s (%ld): %lld hits, %lld misses\n",
+				imageInfo.name, imageInfo.id, image->TotalHits(),
+				image->MissedHits());
+			symbolCount += image->GetImage()->SymbolCount();
+		}
+
+		// find and sort the hit symbols
+		HitSymbol hitSymbols[symbolCount];
+		int32 hitSymbolCount = 0;
+
+		it = fImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			Symbol** symbols = image->GetImage()->Symbols();
+			const int64* symbolHits = image->SymbolHits();
+			int32 imageSymbolCount = image->GetImage()->SymbolCount();
+			for (int32 i = 0; i < imageSymbolCount; i++) {
+				if (symbolHits[i] > 0) {
+					HitSymbol& hitSymbol = hitSymbols[hitSymbolCount++];
+					hitSymbol.hits = symbolHits[i];
+					hitSymbol.symbol = symbols[i];
+				}
+			}
+		}
+
+		if (hitSymbolCount > 1)
+			std::sort(hitSymbols, hitSymbols + hitSymbolCount);
+
+		int64 totalTicks = fTotalHits;
+		printf("\nprofiling results for thread \"%s\" (%ld):\n", Name(), ID());
+		printf("  tick interval: %lld us\n", fInterval);
+		printf("  total ticks:   %lld (%lld us)\n", totalTicks,
+			totalTicks * fInterval);
+		if (totalTicks == 0)
+			totalTicks = 1;
+		printf("  missed ticks:  %lld (%lld us, %6.2f%%)\n",
+			fMissedTicks, fMissedTicks * fInterval,
+			100.0 * fMissedTicks / totalTicks);
+
+
+		if (hitSymbolCount > 0) {
+			printf("\n");
+			printf("        hits       in us    in %%  function\n");
+			printf("  -------------------------------------------------"
+				"-----------------------------\n");
+			for (int32 i = 0; i < hitSymbolCount; i++) {
+				const HitSymbol& hitSymbol = hitSymbols[i];
+				const Symbol* symbol = hitSymbol.symbol;
+				printf("  %10lld  %10lld  %6.2f  %s\n", hitSymbol.hits,
+					hitSymbol.hits * fInterval,
+					100.0 * hitSymbol.hits / totalTicks,
+					symbol->Name());
+			}
+		} else
+			printf("  no functions were hit\n");
+	}
+
+private:
+	typedef DoublyLinkedList<ThreadImage>	ImageList;
+
+private:
+	thread_info	fInfo;
+	::Team*		fTeam;
+	area_id		fSampleArea;
+	addr_t*		fSamples;
+	ImageList	fImages;
+	ImageList	fOldImages;
+	int64		fTotalHits;
+	int64		fMissedTicks;
+	bigtime_t	fInterval;
 };
 
 
@@ -72,9 +445,7 @@ public:
 	Team()
 		:
 		fNubPort(-1),
-		fSymbols(1000, true),
-		fStartProfilerSize(0),
-		fStartProfiler(NULL)
+		fImages(20, false)
 	{
 		fInfo.team = -1;
 		fDebugContext.nub_port = -1;
@@ -82,13 +453,15 @@ public:
 
 	~Team()
 	{
-		free(fStartProfiler);
-
 		if (fDebugContext.nub_port >= 0)
 			destroy_debug_context(&fDebugContext);
 
 		if (fNubPort >= 0)
 			remove_team_debugger(fInfo.team);
+
+// TODO: Just decrement ref-count!
+		for (int32 i = 0; Image* image = fImages.ItemAt(i); i++)
+			delete image;
 	}
 
 	status_t Init(team_id teamID, port_id debuggerPort)
@@ -129,35 +502,6 @@ public:
 		if (error != B_OK)
 			return error;
 
-		// prepare the start profiler message
-		int32 symbolCount = fSymbols.CountItems();
-		if (symbolCount == 0) {
-			fprintf(stderr, "%s: Got no symbols at all...\n", kCommandName);
-			return B_ERROR;
-		}
-
-		printf("Found %ld functions.\n", symbolCount);
-
-		fStartProfilerSize = sizeof(debug_nub_start_profiler)
-			+ (symbolCount - 1) * sizeof(debug_profile_function);
-printf("start profiler message size: %lu\n", fStartProfilerSize);
-		fStartProfiler = (debug_nub_start_profiler*)malloc(fStartProfilerSize);
-		if (fStartProfiler == NULL) {
-			fprintf(stderr, "%s: Out of memory\n", kCommandName);
-			exit(1);
-		}
-
-		fStartProfiler->reply_port = fDebugContext.reply_port;
-		fStartProfiler->interval = 1000;
-		fStartProfiler->function_count = symbolCount;
-
-		for (int32 i = 0; i < symbolCount; i++) {
-			Symbol* symbol = fSymbols.ItemAt(i);
-			debug_profile_function& function = fStartProfiler->functions[i];
-			function.base = symbol->base;
-			function.size = symbol->size;
-		}
-
 		// set team debugging flags
 		int32 teamDebugFlags = B_TEAM_DEBUG_THREADS
 			| B_TEAM_DEBUG_TEAM_CREATION;
@@ -168,6 +512,29 @@ printf("start profiler message size: %lu\n", fStartProfilerSize);
 
 	status_t InitThread(Thread* thread)
 	{
+		// create the sample area
+		char areaName[B_OS_NAME_LENGTH];
+		snprintf(areaName, sizeof(areaName), "profiling samples %ld",
+			thread->ID());
+		void* samples;
+		area_id sampleArea = create_area(areaName, &samples, B_ANY_ADDRESS,
+			SAMPLE_AREA_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		if (sampleArea < 0) {
+			fprintf(stderr, "%s: Failed to create sample area for thread %ld: "
+				"%s\n", kCommandName, thread->ID(), strerror(sampleArea));
+			return sampleArea;
+		}
+
+		thread->SetSampleArea(sampleArea, (addr_t*)samples);
+
+		// add the current images to the thread
+		int32 imageCount = fImages.CountItems();
+		for (int32 i = 0; i < imageCount; i++) {
+			status_t error = thread->AddImage(fImages.ItemAt(i));
+			if (error != B_OK)
+				return error;
+		}
+
 		// set thread debugging flags and start profiling
 		int32 threadDebugFlags = 0;
 //		if (!traceTeam) {
@@ -178,10 +545,16 @@ printf("start profiler message size: %lu\n", fStartProfilerSize);
 		set_thread_debugging_flags(fNubPort, thread->ID(), threadDebugFlags);
 
 		// start profiling
-		fStartProfiler->thread = thread->ID();
+		debug_nub_start_profiler message;
+		message.reply_port = fDebugContext.reply_port;
+		message.thread = thread->ID();
+		message.interval = 1000;
+		message.sample_area = sampleArea;
+		message.stack_depth = SAMPLE_STACK_DEPTH;
+
 		debug_nub_start_profiler_reply reply;
 		status_t error = send_debug_message(&fDebugContext,
-			B_DEBUG_START_PROFILER, fStartProfiler, fStartProfilerSize, &reply,
+			B_DEBUG_START_PROFILER, &message, sizeof(message), &reply,
 			sizeof(reply));
 		if (error != B_OK || (error = reply.error) != B_OK) {
 			fprintf(stderr, "%s: Failed to start profiler for thread %ld: %s\n",
@@ -189,10 +562,11 @@ printf("start profiler message size: %lu\n", fStartProfilerSize);
 			return error;
 		}
 
+		thread->SetInterval(reply.interval);
+//reply.profile_event
+
 		// resume the target thread to be sure, it's running
 		resume_thread(thread->ID());
-
-		thread->team = this;
 
 		return B_OK;
 	}
@@ -200,16 +574,6 @@ printf("start profiler message size: %lu\n", fStartProfilerSize);
 	team_id ID() const
 	{
 		return fInfo.team;
-	}
-
-	BObjectList<Symbol>& Symbols()
-	{
-		return fSymbols;
-	}
-
-	int32 SymbolCount() const
-	{
-		return fSymbols.CountItems();
 	}
 
 private:
@@ -222,38 +586,22 @@ private:
 			printf("Loading symbols of image \"%s\" (%ld)...\n",
 				imageInfo.name, imageInfo.id);
 
-			// create symbol iterator
-			debug_symbol_iterator* iterator;
-			status_t error = debug_create_image_symbol_iterator(lookupContext,
-				imageInfo.id, &iterator);
+			Image* image = new(std::nothrow) Image(imageInfo);
+			if (image == NULL)
+				return B_NO_MEMORY;
+
+			status_t error = image->LoadSymbols(lookupContext);
 			if (error != B_OK) {
-				printf("Failed to init symbol iterator: %s\n", strerror(error));
+				delete image;
+				if (error == B_NO_MEMORY)
+					return error;
 				continue;
 			}
 
-			// iterate through the images
-			char symbolName[1024];
-			int32 symbolType;
-			void* symbolLocation;
-			size_t symbolSize;
-			while (debug_next_image_symbol(iterator, symbolName, sizeof(symbolName),
-					&symbolType, &symbolLocation, &symbolSize) == B_OK) {
-	//			printf("  %s %p (%6lu) %s\n",
-	//				symbolType == B_SYMBOL_TYPE_TEXT ? "text" : "data",
-	//				symbolLocation, symbolSize, symbolName);
-				if (symbolSize > 0 && symbolType == B_SYMBOL_TYPE_TEXT) {
-					Symbol* symbol = new(std::nothrow) Symbol(
-						(addr_t)symbolLocation, symbolSize, symbolName);
-					if (symbol == NULL || !fSymbols.AddItem(symbol)) {
-						delete symbol;
-						fprintf(stderr, "%s: Out of memory\n", kCommandName);
-						debug_delete_image_symbol_iterator(iterator);
-						return B_NO_MEMORY;
-					}
-				}
+			if (!fImages.AddItem(image)) {
+				delete image;
+				return B_NO_MEMORY;
 			}
-
-			debug_delete_image_symbol_iterator(iterator);
 		}
 
 		return B_OK;
@@ -263,9 +611,7 @@ private:
 	team_info					fInfo;
 	port_id						fNubPort;
 	debug_context				fDebugContext;
-	BObjectList<Symbol>			fSymbols;
-	size_t						fStartProfilerSize;
-	debug_nub_start_profiler*	fStartProfiler;
+	BObjectList<Image>			fImages;
 };
 
 
@@ -275,9 +621,7 @@ public:
 		:
 		fTeams(20, true),
 		fThreads(20, true),
-		fDebuggerPort(debuggerPort),
-		fDebuggerMessage(NULL),
-		fMaxDebuggerMessageSize(0)
+		fDebuggerPort(debuggerPort)
 	{
 	}
 
@@ -291,9 +635,6 @@ public:
 			return B_NO_MEMORY;
 
 		status_t error = team->Init(teamID, fDebuggerPort);
-		if (error == B_OK)
-			error = _ReallocateDebuggerMessage(team->SymbolCount());
-
 		if (error != B_OK) {
 			delete team;
 			return error;
@@ -321,11 +662,9 @@ public:
 		if (team == NULL)
 			return B_BAD_TEAM_ID;
 
-		Thread* thread = new(std::nothrow) Thread;
+		Thread* thread = new(std::nothrow) Thread(threadInfo, team);
 		if (thread == NULL)
 			return B_NO_MEMORY;
-
-		thread->info = threadInfo;
 
 		error = team->InitThread(thread);
 		if (error != B_OK) {
@@ -361,50 +700,16 @@ public:
 	Thread* FindThread(thread_id threadID) const
 	{
 		for (int32 i = 0; Thread* thread = fThreads.ItemAt(i); i++) {
-			if (thread->info.thread == threadID)
+			if (thread->ID() == threadID)
 				return thread;
 		}
 		return NULL;
-	}
-
-	debug_debugger_message_data* DebuggerMessage() const
-	{
-		return fDebuggerMessage;
-	}
-
-	size_t MaxDebuggerMessageSize() const
-	{
-		return fMaxDebuggerMessageSize;
-	}
-
-private:
-	status_t _ReallocateDebuggerMessage(int32 symbolCount)
-	{
-		// allocate memory for the reply
-		size_t maxMessageSize = max_c(sizeof(debug_debugger_message_data),
-			sizeof(debug_profiler_stopped) + 8 * symbolCount);
-		if (maxMessageSize <= fMaxDebuggerMessageSize)
-			return B_OK;
-
-		debug_debugger_message_data* message = (debug_debugger_message_data*)
-			realloc(fDebuggerMessage, maxMessageSize);
-		if (message == NULL) {
-			fprintf(stderr, "%s: Out of memory\n", kCommandName);
-			return B_NO_MEMORY;
-		}
-
-		fDebuggerMessage = message;
-		fMaxDebuggerMessageSize = maxMessageSize;
-
-		return B_OK;
 	}
 
 private:
 	BObjectList<Team>				fTeams;
 	BObjectList<Thread>				fThreads;
 	port_id							fDebuggerPort;
-	debug_debugger_message_data*	fDebuggerMessage;
-	size_t							fMaxDebuggerMessageSize;
 };
 
 
@@ -533,12 +838,11 @@ main(int argc, const char* const* argv)
 
 	// debug loop
 	while (true) {
-		size_t maxMessageSize = threadManager.MaxDebuggerMessageSize();
-		debug_debugger_message_data* message = threadManager.DebuggerMessage();
+		debug_debugger_message_data message;
 		bool quitLoop = false;
 		int32 code;
-		ssize_t messageSize = read_port(debuggerPort, &code, message,
-			maxMessageSize);
+		ssize_t messageSize = read_port(debuggerPort, &code, &message,
+			sizeof(message));
 
 		if (messageSize < 0) {
 			if (messageSize == B_INTERRUPTED)
@@ -550,82 +854,40 @@ main(int argc, const char* const* argv)
 		}
 
 		switch (code) {
-			case B_DEBUGGER_MESSAGE_PROFILER_STOPPED:
+			case B_DEBUGGER_MESSAGE_PROFILER_UPDATE:
 			{
+debug_printf("B_DEBUGGER_MESSAGE_PROFILER_UPDATE: thread %ld, %ld samples\n",
+message.profiler_update.origin.thread, message.profiler_update.sample_count);
 				Thread* thread = threadManager.FindThread(
-					message->profiler_stopped.origin.thread);
+					message.profiler_update.origin.thread);
 				if (thread == NULL)
 					break;
 
-				BObjectList<Symbol>& symbols = thread->team->Symbols();
-				int32 symbolCount = symbols.CountItems();
+				thread->AddSamples(message.profiler_update.sample_count,
+					message.profiler_update.stack_depth);
 
-				int64 totalTicks = message->profiler_stopped.total_ticks;
-				int64 missedTicks = message->profiler_stopped.missed_ticks;
-				bigtime_t interval = message->profiler_stopped.interval;
-
-				printf("\nprofiling results for thread \"%s\" (%ld):\n",
-					thread->Name(), thread->ID());
-				printf("  tick interval: %lld us\n", interval);
-				printf("  total ticks:   %lld (%lld us)\n", totalTicks,
-					totalTicks * interval);
-				if (totalTicks == 0)
-					totalTicks = 1;
-				printf("  missed ticks:  %lld (%lld us, %6.2f%%)\n",
-					missedTicks, missedTicks * interval,
-					100.0 * missedTicks / totalTicks);
-
-				// find and sort the hit symbols
-				hit_symbol hitSymbols[symbolCount];
-				int32 hitSymbolCount = 0;
-
-				for (int32 i = 0; i < symbolCount; i++) {
-					int64 hits = message->profiler_stopped.function_ticks[i];
-					if (hits > 0) {
-						hit_symbol& hitSymbol = hitSymbols[hitSymbolCount++];
-						hitSymbol.hits = hits;
-						hitSymbol.symbol = symbols.ItemAt(i);
-					}
+				if (message.profiler_update.stopped) {
+					thread->PrintResults();
+					threadManager.RemoveThread(thread->ID());
 				}
-
-				if (hitSymbolCount > 1)
-					std::sort(hitSymbols, hitSymbols + hitSymbolCount);
-
-				if (hitSymbolCount > 0) {
-					printf("\n");
-					printf("        hits       in us    in %%  function\n");
-					printf("  -------------------------------------------------"
-						"-----------------------------\n");
-					for (int32 i = 0; i < hitSymbolCount; i++) {
-						const hit_symbol& hitSymbol = hitSymbols[i];
-						const Symbol* symbol = hitSymbol.symbol;
-						printf("  %10lld  %10lld  %6.2f  %s\n", hitSymbol.hits,
-							hitSymbol.hits * interval,
-							100.0 * hitSymbol.hits / totalTicks,
-							symbol->Name());
-					}
-				} else
-					printf("  no functions were hit\n");
-
-				threadManager.RemoveThread(thread->ID());
 				break;
 			}
 
 			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
-				if (threadManager.AddTeam(message->team_created.new_team)
+				if (threadManager.AddTeam(message.team_created.new_team)
 						== B_OK) {
-					threadManager.AddThread(message->team_created.new_team);
+					threadManager.AddThread(message.team_created.new_team);
 				}
 				break;
 			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
 				// a debugged team is gone -- quit, if it is our team
-				quitLoop = message->origin.team == teamID;
+				quitLoop = message.origin.team == teamID;
 				break;
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
-				threadManager.AddThread(message->thread_created.new_thread);
+				threadManager.AddThread(message.thread_created.new_thread);
 				break;
 			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
-				threadManager.RemoveThread(message->origin.thread);
+				threadManager.RemoveThread(message.origin.thread);
 				break;
 
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
@@ -647,8 +909,8 @@ main(int argc, const char* const* argv)
 
 		// tell the thread to continue (only when there is a thread and the
 		// message was synchronous)
-		if (message->origin.thread >= 0 && message->origin.nub_port >= 0)
-			continue_thread(message->origin.nub_port, message->origin.thread);
+		if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
+			continue_thread(message.origin.nub_port, message.origin.thread);
 	}
 
 	return 0;

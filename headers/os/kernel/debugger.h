@@ -171,8 +171,8 @@ typedef enum {
 	B_DEBUGGER_MESSAGE_IMAGE_CREATED,		// an image has been created
 	B_DEBUGGER_MESSAGE_IMAGE_DELETED,		// an image has been deleted
 
-	B_DEBUGGER_MESSAGE_PROFILER_STOPPED,	// a profiled thread is going to
-											// exit
+	B_DEBUGGER_MESSAGE_PROFILER_UPDATE,		// flush the profiling buffer for a
+											// thread
 
 	B_DEBUGGER_MESSAGE_HANDED_OVER,			// the debugged team has been
 											// handed over to another debugger
@@ -363,13 +363,18 @@ typedef struct {
 	port_id				reply_port;		// port to send the reply to
 	thread_id			thread;			// thread to profile
 	bigtime_t			interval;		// sample interval
-	int32				function_count;	// number of functions we count hits for
-	struct debug_profile_function functions[1];
-		// functions that shall be tracked
+	area_id				sample_area;	// area into which the sample will be
+										// written
+	int32				stack_depth;	// number of return address per hit
 } debug_nub_start_profiler;
 
 typedef struct {
 	status_t			error;
+	int32				profile_event;	// number of the last event influencing
+										// profiling (e.g. image
+										// created/deleted)
+	bigtime_t			interval;		// actual sample interval (might
+										// differ from the requested one)
 } debug_nub_start_profiler_reply;
 
 // B_DEBUG_STOP_PROFILER
@@ -379,7 +384,7 @@ typedef struct {
 	thread_id			thread;			// thread to profile
 } debug_nub_stop_profiler;
 
-// reply is debug_profiler_stopped
+// reply is debug_profiler_update
 
 // union of all messages structures sent to the debug nub thread
 typedef union {
@@ -532,17 +537,21 @@ typedef struct {
 	image_info		info;			// info for the image
 } debug_image_deleted;
 
-// B_DEBUGGER_MESSAGE_PROFILER_STOPPED
+// B_DEBUGGER_MESSAGE_PROFILER_UPDATE
 
 typedef struct {
 	debug_origin		origin;
-	int32				function_count;
-	bigtime_t			interval;			// actual sample interval (might
-											// differ from the requested one)
-	int64				total_ticks;		// total number of sample ticks
-	int64				missed_ticks;		// ticks that didn't hit a function
-	int64				function_ticks[1];	// number of hits for each function
-} debug_profiler_stopped;
+	int32				profile_event;		// number of the last event
+											// influencing profiling (e.g.
+											// image created/deleted); all
+											// samples were recorded after this
+											// event and before the next one
+	int32				stack_depth;		// number of return addresses per
+											// tick
+	int32				sample_count;		// number of samples in the buffer
+	bool				stopped;			// if true, the thread is no longer
+											// being profiled
+} debug_profiler_update;
 
 // B_DEBUGGER_MESSAGE_HANDED_OVER
 
@@ -570,7 +579,7 @@ typedef union {
 	debug_thread_deleted			thread_deleted;
 	debug_image_created				image_created;
 	debug_image_deleted				image_deleted;
-	debug_profiler_stopped			profiler_stopped;	// dynamic size!
+	debug_profiler_update			profiler_update;
 	debug_handed_over				handed_over;
 
 	debug_origin					origin;	// for convenience (no real message)

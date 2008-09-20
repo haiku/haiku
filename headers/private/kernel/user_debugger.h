@@ -72,25 +72,29 @@ struct thread_debug_info {
 		// the signals the debugger wishes not to be notified of, when they
 		// occur the next time
 
+	// profiling related part; if samples != NULL, the thread is profiled
 	struct {
-		bigtime_t						interval;
+		bigtime_t		interval;
 			// sampling interval
+		area_id			sample_area;
+			// cloned sample buffer area
+		addr_t*			samples;
+			// sample buffer
+		int32			max_samples;
+			// maximum number of samples the buffer can hold
+		int32			sample_count;
+			// number of samples the buffer currently holds
+		int32			stack_depth;
+			// number of return addresses to record per timer interval
 		union {
-			bigtime_t					interval_left;
+			bigtime_t	interval_left;
 				// when unscheduled: the time left of the current sampling
 				// interval
-			bigtime_t					timer_end;
+			bigtime_t	timer_end;
 				// when running: the absolute time the timer is supposed to go
 				// off
 		};
-		int32							function_count;
-			// number of tracked functions
-		struct function_profile_info*	functions;
-			// array of tracked functions
-		debug_profiler_stopped*			result;
-			// the result message to be sent to the debugger when profiling end;
-			// contains the current hit counts for all functions
-		timer*							installed_timer;
+		timer*			installed_timer;
 			// when running and being profiled: the CPU's profiling timer
 	} profile;
 
