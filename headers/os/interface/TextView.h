@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Haiku, Inc.
+ * Copyright (c) 2007-2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _TEXTVIEW_H
@@ -47,308 +47,340 @@ enum undo_state {
 };
 
 class BTextView : public BView {
-	public:
-		BTextView(BRect frame, const char* name, BRect textRect,
-			uint32 resizeMask, uint32 flags = B_WILL_DRAW | B_PULSE_NEEDED);
-		BTextView(BRect	frame, const char* name, BRect textRect,
-			const BFont* initialFont, const rgb_color* initialColor,
-			uint32 resizeMask, uint32 flags);
-		BTextView(BMessage* data);
-		virtual	~BTextView();
+public:
+								BTextView(BRect frame, const char* name,
+									BRect textRect, uint32 resizeMask,
+									uint32 flags
+										= B_WILL_DRAW | B_PULSE_NEEDED);
+								BTextView(BRect	frame, const char* name,
+									BRect textRect, const BFont* initialFont,
+									const rgb_color* initialColor,
+									uint32 resizeMask, uint32 flags);
+								BTextView(BMessage* data);
 
-		static	BArchivable* Instantiate(BMessage* data);
-		virtual	status_t Archive(BMessage* data, bool deep = true) const;
+	virtual						~BTextView();
 
-		virtual	void AttachedToWindow();
-		virtual	void DetachedFromWindow();
-		virtual	void Draw(BRect inRect);
-		virtual	void MouseDown(BPoint where);
-		virtual void MouseUp(BPoint where);
-		virtual	void MouseMoved(BPoint where, uint32 code,
-			const BMessage* message);
-		virtual	void WindowActivated(bool state);
-		virtual	void KeyDown(const char* bytes, int32 numBytes);
-		virtual	void Pulse();
-		virtual	void FrameResized(float width, float height);
-		virtual	void MakeFocus(bool focusState = true);
-		virtual	void MessageReceived(BMessage* message);
+	static	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
 
-		virtual BHandler* ResolveSpecifier(BMessage* message, int32 index,
-			BMessage* specifier, int32 form, const char* property);
-		virtual status_t GetSupportedSuites(BMessage* data);
-		virtual status_t Perform(perform_code d, void* arg);
+	virtual	void				AttachedToWindow();
+	virtual	void				DetachedFromWindow();
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 code,
+									const BMessage* dragMessage);
+	virtual	void				WindowActivated(bool state);
+	virtual	void				KeyDown(const char* bytes, int32 numBytes);
+	virtual	void				Pulse();
+	virtual	void				FrameResized(float width, float height);
+	virtual	void				MakeFocus(bool focusState = true);
+	virtual	void				MessageReceived(BMessage* message);
 
-		void SetText(const char* inText, const text_run_array* inRuns = NULL);
-		void SetText(const char* inText, int32 inLength,
-			const text_run_array* inRuns = NULL);
-		void SetText(BFile* inFile, int32 startOffset, int32 inLength,
-			const text_run_array* inRuns = NULL);
+	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
+									BMessage* specifier, int32 form,
+									const char* property);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
+	virtual	status_t			Perform(perform_code d, void* arg);
 
-		void Insert(const char* inText, const text_run_array* inRuns = NULL);
-		void Insert(const char* inText, int32 inLength, const text_run_array* inRuns = NULL);
-		void Insert(int32 startOffset, const char* inText, int32 inLength, const text_run_array* inRuns = NULL);
+			void				SetText(const char* inText,
+									const text_run_array* inRuns = NULL);
+			void				SetText(const char* inText, int32 inLength,
+									const text_run_array* inRuns = NULL);
+			void				SetText(BFile* inFile,
+									int32 startOffset, int32 inLength,
+									const text_run_array* inRuns = NULL);
 
-		void Delete();
-		void Delete(int32 startOffset, int32 endOffset);
+			void				Insert(const char* inText,
+									const text_run_array* inRuns = NULL);
+			void				Insert(const char* inText, int32 inLength,
+									const text_run_array* inRuns = NULL);
+			void				Insert(int32 startOffset,
+									const char* inText, int32 inLength,
+									const text_run_array* inRuns = NULL);
 
-		const char*	Text() const;
-		int32 TextLength() const;
-		void GetText(int32 offset, int32 length, char* buffer) const;
-		uint8 ByteAt(int32 offset) const;
+			void				Delete();
+			void				Delete(int32 startOffset, int32 endOffset);
 
-		int32 CountLines() const;
-		int32 CurrentLine() const;
-		void GoToLine(int32 lineNum);
+			const char*			Text() const;
+			int32				TextLength() const;
+			void				GetText(int32 offset, int32 length,
+									char* buffer) const;
+			uint8				ByteAt(int32 offset) const;
 
-		virtual	void Cut(BClipboard* clipboard);
-		virtual	void Copy(BClipboard* clipboard);
-		virtual	void Paste(BClipboard* clipboard);
-		void Clear();
+			int32				CountLines() const;
+			int32				CurrentLine() const;
+			void				GoToLine(int32 lineIndex);
 
-		virtual	bool AcceptsPaste(BClipboard* clipboard);
-		virtual	bool AcceptsDrop(const BMessage* inMessage);
+	virtual	void				Cut(BClipboard* clipboard);
+	virtual	void				Copy(BClipboard* clipboard);
+	virtual	void				Paste(BClipboard* clipboard);
+			void				Clear();
 
-		virtual	void Select(int32 startOffset, int32 endOffset);
-		void SelectAll();
-		void GetSelection(int32* outStart, int32* outEnd) const;
+	virtual	bool				AcceptsPaste(BClipboard* clipboard);
+	virtual	bool				AcceptsDrop(const BMessage* inMessage);
 
-		void SetFontAndColor(const BFont* inFont, uint32 inMode = B_FONT_ALL,
-			const rgb_color* inColor = NULL);
-		void SetFontAndColor(int32 startOffset, int32 endOffset,
-			const BFont* inFont, uint32 inMode = B_FONT_ALL,
-			const rgb_color* inColor = NULL);
+	virtual	void				Select(int32 startOffset, int32 endOffset);
+			void				SelectAll();
+			void				GetSelection(int32* outStart,
+									int32* outEnd) const;
 
-		void GetFontAndColor(int32 inOffset, BFont* outFont,
-			rgb_color* outColor = NULL) const;
-		void GetFontAndColor(BFont* outFont, uint32* sameProperties,
-			rgb_color* outColor = NULL, bool* sameColor = NULL) const;
+			void				SetFontAndColor(const BFont* inFont,
+									uint32 inMode = B_FONT_ALL,
+									const rgb_color* inColor = NULL);
+			void				SetFontAndColor(int32 startOffset,
+									int32 endOffset, const BFont* inFont,
+									uint32 inMode = B_FONT_ALL,
+									const rgb_color* inColor = NULL);
 
-		void SetRunArray(int32 startOffset, int32 endOffset,
-			const text_run_array* inRuns);
-		text_run_array*	RunArray(int32	startOffset, int32	endOffset,
-			int32* outSize = NULL) const;
+			void				GetFontAndColor(int32 inOffset, BFont* outFont,
+									rgb_color* outColor = NULL) const;
+			void				GetFontAndColor(BFont* outFont,
+									uint32* sameProperties,
+									rgb_color* outColor = NULL,
+									bool* sameColor = NULL) const;
 
-		int32 LineAt(int32 offset) const;
-		int32 LineAt(BPoint point) const;
-		BPoint PointAt(int32 inOffset, float* outHeight = NULL) const;
-		int32 OffsetAt(BPoint point) const;
-		int32 OffsetAt(int32 line) const;
+			void				SetRunArray(int32 startOffset, int32 endOffset,
+									const text_run_array* inRuns);
+			text_run_array*		RunArray(int32 startOffset, int32 endOffset,
+									int32* outSize = NULL) const;
 
-		virtual	void FindWord(int32	inOffset, int32* outFromOffset,
-			int32* outToOffset);
+			int32				LineAt(int32 offset) const;
+			int32				LineAt(BPoint point) const;
+			BPoint				PointAt(int32 inOffset,
+									float* outHeight = NULL) const;
+			int32				OffsetAt(BPoint point) const;
+			int32				OffsetAt(int32 line) const;
 
-		virtual	bool CanEndLine(int32 offset);
+	virtual	void				FindWord(int32	inOffset, int32* outFromOffset,
+									int32* outToOffset);
 
-		float LineWidth(int32 lineNum = 0) const;
-		float LineHeight(int32 lineNum = 0) const;
-		float TextHeight(int32 startLine, int32 endLine) const;
+	virtual	bool				CanEndLine(int32 offset);
 
-		void GetTextRegion(int32 startOffset, int32 endOffset,
-			BRegion* outRegion) const;
+			float				LineWidth(int32 lineIndex = 0) const;
+			float				LineHeight(int32 lineIndex = 0) const;
+			float				TextHeight(int32 startLine,
+									int32 endLine) const;
 
-		virtual	void ScrollToOffset(int32 inOffset);
-		void ScrollToSelection();
+			void				GetTextRegion(int32 startOffset,
+									int32 endOffset, BRegion* outRegion) const;
 
-		void Highlight(int32 startOffset, int32 endOffset);	
+	virtual	void				ScrollToOffset(int32 inOffset);
+			void				ScrollToSelection();
 
-		void SetTextRect(BRect rect);
-		BRect TextRect() const;
-		void SetStylable(bool stylable);
-		bool IsStylable() const;
-		void SetTabWidth(float width);
-		float TabWidth() const;
-		void MakeSelectable(bool selectable = true);
-		bool IsSelectable() const;
-		void MakeEditable(bool editable = true);
-		bool IsEditable() const;
-		void SetWordWrap(bool wrap);
-		bool DoesWordWrap() const;
-		void SetMaxBytes(int32 max);
-		int32 MaxBytes() const;
-		void DisallowChar(uint32 aChar);
-		void AllowChar(uint32 aChar);
-		void SetAlignment(alignment flag);
-		alignment Alignment() const;
-		void SetAutoindent(bool state);
-		bool DoesAutoindent() const;
-		void SetColorSpace(color_space colors);
-		color_space ColorSpace() const;
-		void MakeResizable(bool resize, BView* resizeView = NULL);
-		bool IsResizable() const;
-		void SetDoesUndo(bool undo);
-		bool DoesUndo() const;		
-		void HideTyping(bool enabled);
-		bool IsTypingHidden() const;	
+			void				Highlight(int32 startOffset, int32 endOffset);	
 
-		virtual void ResizeToPreferred();
-		virtual void GetPreferredSize(float* _width, float* _height);
-		virtual void AllAttached();
-		virtual void AllDetached();
+			void				SetTextRect(BRect rect);
+			BRect				TextRect() const;
+			void				SetStylable(bool stylable);
+			bool				IsStylable() const;
+			void				SetTabWidth(float width);
+			float				TabWidth() const;
+			void				MakeSelectable(bool selectable = true);
+			bool				IsSelectable() const;
+			void				MakeEditable(bool editable = true);
+			bool				IsEditable() const;
+			void				SetWordWrap(bool wrap);
+			bool				DoesWordWrap() const;
+			void				SetMaxBytes(int32 max);
+			int32				MaxBytes() const;
+			void				DisallowChar(uint32 aChar);
+			void				AllowChar(uint32 aChar);
+			void				SetAlignment(alignment flag);
+			alignment			Alignment() const;
+			void				SetAutoindent(bool state);
+			bool				DoesAutoindent() const;
+			void				SetColorSpace(color_space colors);
+			color_space			ColorSpace() const;
+			void				MakeResizable(bool resize,
+									BView* resizeView = NULL);
+			bool				IsResizable() const;
+			void				SetDoesUndo(bool undo);
+			bool				DoesUndo() const;		
+			void				HideTyping(bool enabled);
+			bool				IsTypingHidden() const;	
 
-		static text_run_array* AllocRunArray(int32 entryCount,
-			int32* outSize = NULL);
-		static text_run_array* CopyRunArray(const text_run_array* orig,
-			int32 countDelta = 0);
-		static void FreeRunArray(text_run_array* array);
-		static void* FlattenRunArray(const text_run_array* inArray,
-			int32* outSize = NULL);
-		static text_run_array* UnflattenRunArray(const void* data,
-			int32* outSize = NULL);
+	virtual	void				ResizeToPreferred();
+	virtual	void				GetPreferredSize(float* _width, float* _height);
+	virtual	void				AllAttached();
+	virtual	void				AllDetached();
 
-	protected:
-		virtual	void InsertText(const char* inText, int32 inLength,
-			int32 inOffset, const text_run_array* inRuns);
-		virtual	void DeleteText(int32 fromOffset, int32 toOffset);
+	static	text_run_array*		AllocRunArray(int32 entryCount,
+									int32* outSize = NULL);
+	static	text_run_array*		CopyRunArray(const text_run_array* orig,
+									int32 countDelta = 0);
+	static	void				FreeRunArray(text_run_array* array);
+	static	void*				FlattenRunArray(const text_run_array* inArray,
+									int32* outSize = NULL);
+	static	text_run_array*		UnflattenRunArray(const void* data,
+									int32* outSize = NULL);
 
-	public:
-		virtual	void Undo(BClipboard* clipboard);
-		undo_state UndoState(bool* isRedo) const;
+protected:
+	virtual	void				InsertText(const char* inText, int32 inLength,
+									int32 inOffset,
+									const text_run_array* inRuns);
+	virtual	void				DeleteText(int32 fromOffset, int32 toOffset);
 
-	protected:
-		virtual	void GetDragParameters(BMessage* drag, BBitmap** _bitmap,
-			BPoint* point, BHandler** _handler);
+public:
+	virtual	void				Undo(BClipboard* clipboard);
+			undo_state			UndoState(bool* isRedo) const;
 
-	private:
-		friend status_t	_init_interface_kit_();
-		friend class _BTextTrackState_;
+protected:
+	virtual	void				GetDragParameters(BMessage* drag,
+									BBitmap** _bitmap, BPoint* point,
+									BHandler** _handler);
 
-		virtual void _ReservedTextView3();
-		virtual void _ReservedTextView4();
-		virtual void _ReservedTextView5();
-		virtual void _ReservedTextView6();
-		virtual void _ReservedTextView7();
-		virtual void _ReservedTextView8();
-		virtual void _ReservedTextView9();
-		virtual void _ReservedTextView10();
-		virtual void _ReservedTextView11();
-		virtual void _ReservedTextView12();
+private:
+	friend status_t	_init_interface_kit_();
+	friend class _BTextTrackState_;
 
-		void _InitObject(BRect textRect, const BFont* initialFont,
-			const rgb_color* initialColor);
+	virtual	void				_ReservedTextView3();
+	virtual	void				_ReservedTextView4();
+	virtual	void				_ReservedTextView5();
+	virtual	void				_ReservedTextView6();
+	virtual	void				_ReservedTextView7();
+	virtual	void				_ReservedTextView8();
+	virtual	void				_ReservedTextView9();
+	virtual	void				_ReservedTextView10();
+	virtual	void				_ReservedTextView11();
+	virtual	void				_ReservedTextView12();
 
-		void _HandleBackspace();
-		void _HandleArrowKey(uint32 inArrowKey);
-		void _HandleDelete();
-		void _HandlePageKey(uint32 inPageKey);
-		void _HandleAlphaKey(const char* bytes, int32 numBytes);
+			void				_InitObject(BRect textRect,
+									const BFont* initialFont,
+									const rgb_color* initialColor);
 
-		void _Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll);
-		void _RecalculateLineBreaks(int32* startLine, int32* endLine);
-		int32 _FindLineBreak(int32 fromOffset, float* outAscent,
-			float* outDescent, float* ioWidth);
+			void				_HandleBackspace();
+			void				_HandleArrowKey(uint32 inArrowKey);
+			void				_HandleDelete();
+			void				_HandlePageKey(uint32 inPageKey);
+			void				_HandleAlphaKey(const char* bytes,
+									int32 numBytes);
 
-		float _StyledWidth(int32 fromOffset, int32 length,
-			float* outAscent = NULL, float* outDescent = NULL) const;
+			void				_Refresh(int32 fromOffset, int32 toOffset,
+									bool erase, bool scroll);
+			void				_RecalculateLineBreaks(int32* startLine,
+									int32* endLine);
+			int32				_FindLineBreak(int32 fromOffset,
+									float* outAscent, float* outDescent,
+									float* ioWidth);
 
-		float _StyledWidthUTF8Safe(int32 fromOffset, int32 numChars,
-			float* outAscent = NULL, float* outDescent = NULL) const;
+			float				_StyledWidth(int32 fromOffset, int32 length,
+									float* outAscent = NULL,
+									float* outDescent = NULL) const;
+			float				_StyledWidthUTF8Safe(int32 fromOffset,
+									int32 numChars, float* outAscent = NULL,
+									float* outDescent = NULL) const;
 
-		float _ActualTabWidth(float location) const;
+			float				_ActualTabWidth(float location) const;
 
-		void _DoInsertText(const char* inText, int32 inLength, int32 inOffset,
-			const text_run_array* inRuns, _BTextChangeResult_* outResult);
+			void				_DoInsertText(const char* inText,
+									int32 inLength, int32 inOffset,
+									const text_run_array* inRuns,
+									_BTextChangeResult_* outResult);
 
-		void _DoDeleteText(int32 fromOffset, int32 toOffset,
-			_BTextChangeResult_* outResult);
+			void				_DoDeleteText(int32 fromOffset, int32 toOffset,
+									_BTextChangeResult_* outResult);
 
-		void _DrawLine(BView* view, const int32 &startLine,
-			const int32& startOffset, const bool& erase, BRect& eraseRect,
-			BRegion& inputRegion);
+			void				_DrawLine(BView* view, const int32 &startLine,
+									const int32& startOffset, const bool& erase,
+									BRect& eraseRect, BRegion& inputRegion);
 
-		void _DrawLines(int32 startLine, int32 endLine, int32 startOffset = -1,
-			bool erase = false);
-		void _DrawCaret(int32 offset);
-		void _ShowCaret();
-		void _HideCaret();		
-		void _InvertCaret();
-		void _DragCaret(int32 offset);
+			void				_DrawLines(int32 startLine, int32 endLine,
+									int32 startOffset = -1, bool erase = false);
+			void				_DrawCaret(int32 offset);
+			void				_ShowCaret();
+			void				_HideCaret();		
+			void				_InvertCaret();
+			void				_DragCaret(int32 offset);
 
-		void _StopMouseTracking();
-		bool _PerformMouseUp(BPoint where);
-		bool _PerformMouseMoved(BPoint where, uint32 code);
+			void				_StopMouseTracking();
+			bool				_PerformMouseUp(BPoint where);
+			bool				_PerformMouseMoved(BPoint where, uint32 code);
 
-		void _TrackMouse(BPoint where, const BMessage* message,
-			bool force = false);
+			void				_TrackMouse(BPoint where,
+									const BMessage* message,
+									bool force = false);
 
-		void _TrackDrag(BPoint where);
-		void _InitiateDrag();
-		bool _MessageDropped(BMessage* inMessage, BPoint where, BPoint offset);
+			void				_TrackDrag(BPoint where);
+			void				_InitiateDrag();
+			bool				_MessageDropped(BMessage* inMessage,
+									BPoint where, BPoint offset);
 
-		void _PerformAutoScrolling();									
-		void _UpdateScrollbars();
-		void _AutoResize(bool doRedraw = true);
+			void				_PerformAutoScrolling();									
+			void				_UpdateScrollbars();
+			void				_AutoResize(bool doRedraw = true);
 
-		void _NewOffscreen(float padding = 0.0F);
-		void _DeleteOffscreen();
+			void				_NewOffscreen(float padding = 0.0);
+			void				_DeleteOffscreen();
 
-		void _Activate();
-		void _Deactivate();
+			void				_Activate();
+			void				_Deactivate();
 
-		void _NormalizeFont(BFont* font);
+			void				_NormalizeFont(BFont* font);
 
-		void _SetRunArray(int32 startOffset, int32 endOffset,
-			const text_run_array* inRuns);
+			void				_SetRunArray(int32 startOffset, int32 endOffset,
+									const text_run_array* inRuns);
 
-		uint32 _CharClassification(int32 offset) const;
-		int32 _NextInitialByte(int32 offset) const;
-		int32 _PreviousInitialByte(int32 offset) const;
+			uint32				_CharClassification(int32 offset) const;
+			int32				_NextInitialByte(int32 offset) const;
+			int32				_PreviousInitialByte(int32 offset) const;
 
-		bool _GetProperty(BMessage* specifier, int32 form, const char* property,
-			BMessage* reply);
+			bool				_GetProperty(BMessage* specifier, int32 form,
+									const char* property, BMessage* reply);
+			bool				_SetProperty(BMessage* specifier, int32 form,
+									const char* property, BMessage* reply);
+			bool				_CountProperties(BMessage* specifier,
+									int32 form, const char* property,
+									BMessage* reply);
 
-		bool _SetProperty(BMessage* specifier, int32 form, const char* property,
-			BMessage* reply);
+			void				_HandleInputMethodChanged(BMessage* message);
+			void				_HandleInputMethodLocationRequest();
+			void				_CancelInputMethod();
 
-		bool _CountProperties(BMessage* specifier, int32 form,
-			const char* property, BMessage* reply);
+	static	void				LockWidthBuffer();
+	static	void				UnlockWidthBuffer();	
 
-		void _HandleInputMethodChanged(BMessage* message);
-		void _HandleInputMethodLocationRequest();
-		void _CancelInputMethod();
+			_BTextGapBuffer_*	fText;
+			_BLineBuffer_*		fLines;
+			_BStyleBuffer_*		fStyles;
+			BRect				fTextRect;
+			float				fMinTextRectWidth;
+			int32				fSelStart;
+			int32				fSelEnd;
+			bool				fCaretVisible;
+			bigtime_t			fCaretTime;
+			int32				fClickOffset;
+			int32				fClickCount;
+			bigtime_t			fClickTime;
+			int32				fDragOffset;
+			uint8				fCursor;
+			bool				fActive;
+			bool				fStylable;
+			float				fTabWidth;
+			bool				fSelectable;
+			bool				fEditable;
+			bool				fWrap;
+			int32				fMaxBytes;
+			BList*				fDisallowedChars;
+			alignment			fAlignment;
+			bool				fAutoindent;
+			BBitmap* 			fOffscreen;
+			color_space			fColorSpace;
+			bool				fResizable;
+			BView*				fContainerView;
+			_BUndoBuffer_*		fUndo;
+			_BInlineInput_*		fInline;
+			BMessageRunner *	fDragRunner;
+			BMessageRunner *	fClickRunner;
+			BPoint				fWhere;
+			_BTextTrackState_*	fTrackingMouse;
+			_BTextChangeResult_* fTextChange;
 
-		static void LockWidthBuffer();
-		static void UnlockWidthBuffer();	
+			uint32				_reserved[8];
 
-		_BTextGapBuffer_*		fText;
-		_BLineBuffer_*			fLines;
-		_BStyleBuffer_*			fStyles;
-		BRect					fTextRect;
-		float					fMinTextRectWidth;
-		int32					fSelStart;
-		int32					fSelEnd;
-		bool					fCaretVisible;
-		bigtime_t				fCaretTime;
-		int32					fClickOffset;
-		int32					fClickCount;
-		bigtime_t				fClickTime;
-		int32					fDragOffset;
-		uint8					fCursor;
-		bool					fActive;
-		bool					fStylable;
-		float					fTabWidth;
-		bool					fSelectable;
-		bool					fEditable;
-		bool					fWrap;
-		int32					fMaxBytes;
-		BList*					fDisallowedChars;
-		alignment				fAlignment;
-		bool					fAutoindent;
-		BBitmap* 				fOffscreen;
-		color_space				fColorSpace;
-		bool					fResizable;
-		BView*					fContainerView;
-		_BUndoBuffer_*			fUndo;
-		_BInlineInput_*			fInline;
-		BMessageRunner *		fDragRunner;
-		BMessageRunner *		fClickRunner;
-		BPoint					fWhere;
-		_BTextTrackState_*		fTrackingMouse;
-		_BTextChangeResult_*	fTextChange;
-		uint32					_reserved[8];
-
-		static _BWidthBuffer_*	sWidths;
-		static sem_id			sWidthSem;
-		static int32			sWidthAtom;
+	static	_BWidthBuffer_*		sWidths;
+	static	sem_id				sWidthSem;
+	static	int32				sWidthAtom;
 };
 
 #endif	// _TEXTVIEW_H
