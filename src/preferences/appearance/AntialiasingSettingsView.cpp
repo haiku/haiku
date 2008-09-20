@@ -13,7 +13,6 @@
 	// for detected the availablility of subpixel anti-aliasing
 
 #include <Box.h>
-#include <CardLayout.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <MenuField.h>
@@ -88,53 +87,55 @@ AntialiasingSettingsView::AntialiasingSettingsView(BRect rect, const char* name)
 	
 	// hinting menu
 	_BuildHintingMenu();
-	fHintingMenuField = new BMenuField("hinting", "Character hinting:",
+	fHintingMenuField = new BMenuField("hinting", "Glyph hinting:",
 		fHintingMenu, NULL);
 
 #ifdef DISABLE_HINTING_CONTROL
 	fHintingMenuField->SetEnabled(false);
 #endif
 
+#ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 	// subpixelAntialiasingDisabledLabel
+	BFont infoFont(*be_plain_font);
+	infoFont.SetFace(B_ITALIC_FACE);
+	rgb_color infoColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_4_TINT);
 	// TODO: Replace with layout friendly constructor once available.
+	BRect textBounds = rect.InsetByCopy(10, 10).OffsetToSelf(B_ORIGIN);
 	BTextView* subpixelAntialiasingDisabledLabel = new BTextView(
-		rect.OffsetToCopy(B_ORIGIN), "unavailable label",
-		rect.OffsetToCopy(B_ORIGIN).InsetBySelf(10, 10),
+		textBounds, "unavailable label", textBounds, &infoFont, &infoColor,
 		B_FOLLOW_NONE, B_WILL_DRAW | B_SUPPORTS_LAYOUT);
 	subpixelAntialiasingDisabledLabel->SetText("Subpixel based anti-aliasing "
-		"is not available in this build of Haiku to avoid possible patent "
-		"issues. To enable this feature, you have to build Haiku yourself "
-		"and enable certain options in the libfreetype configuration header.");
+		"in combination with glyph hinting is not available in this build of "
+		"Haiku to avoid possible patent issues. To enable this feature, you "
+		"have to build Haiku yourself and enable certain options in the "
+		"libfreetype configuration header.");
 	subpixelAntialiasingDisabledLabel->SetViewColor(
 		ui_color(B_PANEL_BACKGROUND_COLOR));
 	subpixelAntialiasingDisabledLabel->MakeEditable(false);
 	subpixelAntialiasingDisabledLabel->MakeSelectable(false);
+#endif // !FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 
-	BCardLayout* cardLayout = new BCardLayout();
-	SetLayout(cardLayout);
+	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	// controls pane
 	AddChild(BGridLayoutBuilder(10, 10)
-		.Add(BSpaceLayoutItem::CreateGlue(), 0, 0, 2)
+		.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 0)
+		.Add(fHintingMenuField->CreateMenuBarLayoutItem(), 1, 0)
 
-		.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 1)
-		.Add(fHintingMenuField->CreateMenuBarLayoutItem(), 1, 1)
+		.Add(fAntialiasingMenuField->CreateLabelLayoutItem(), 0, 1)
+		.Add(fAntialiasingMenuField->CreateMenuBarLayoutItem(), 1, 1)
 
-		.Add(fAntialiasingMenuField->CreateLabelLayoutItem(), 0, 2)
-		.Add(fAntialiasingMenuField->CreateMenuBarLayoutItem(), 1, 2)
+		.Add(fAverageWeightControl, 0, 2, 2)
 
-		.Add(fAverageWeightControl, 0, 3, 2)
-
-		.Add(BSpaceLayoutItem::CreateGlue(), 0, 4, 2)
+#ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+		// hinting+subpixel unavailable info
+		.Add(subpixelAntialiasingDisabledLabel, 0, 3, 2)
+#else
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 3, 2)
+#endif
 
 		.SetInsets(10, 10, 10, 10)
-	);
-
-	// unavailable info pane
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-		.Add(BSpaceLayoutItem::CreateGlue())
-		.Add(subpixelAntialiasingDisabledLabel)
-		.Add(BSpaceLayoutItem::CreateGlue())
 	);
 
 	_SetCurrentAntialiasing();
@@ -145,12 +146,6 @@ AntialiasingSettingsView::AntialiasingSettingsView(BRect rect, const char* name)
 	// layout management.
 	MoveTo(rect.LeftTop());
 	ResizeTo(rect.Width(), rect.Height());
-
-#ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
-	cardLayout->SetVisibleItem(0L);
-#else
-	cardLayout->SetVisibleItem(1L);
-#endif
 }
 
 
