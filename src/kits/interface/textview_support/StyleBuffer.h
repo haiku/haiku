@@ -11,6 +11,7 @@
 #include <Font.h>
 #include <InterfaceDefs.h>
 #include <SupportDefs.h>
+#include <TextView.h>
 
 #include "TextViewSupportBuffer.h"
 
@@ -92,12 +93,10 @@ _BStyleRecordBuffer_::operator[](int32 index) const
 }
 
 
-class _BInlineInput_;
-
-// _BStyleBuffer_ class --------------------------------------------------------
-class _BStyleBuffer_ {
+// StyleBuffer class --------------------------------------------------------
+class BTextView::StyleBuffer {
 	public:
-						_BStyleBuffer_(const BFont *inFont,
+						StyleBuffer(const BFont *inFont,
 							const rgb_color *inColor);
 
 		void			InvalidateNullStyle();
@@ -123,7 +122,8 @@ class _BStyleBuffer_ {
 		void			RemoveStyleRange(int32 fromOffset, int32 toOffset);
 		void			RemoveStyles(int32 index, int32 count = 1);
 		
-		int32			Iterate(int32 fromOffset, int32 length, _BInlineInput_ *,
+		int32			Iterate(int32 fromOffset, int32 length,
+							InlineInput* input,
 							const BFont **outFont = NULL,
 							const rgb_color **outColor = NULL,
 							float *outAscent = NULL,
@@ -147,21 +147,21 @@ class _BStyleBuffer_ {
 
 
 inline int32
-_BStyleBuffer_::NumRuns() const
+BTextView::StyleBuffer::NumRuns() const
 {
 	return fStyleRunDesc.ItemCount();
 }
 
 
 inline const _BStyleRunDescBuffer_&
-_BStyleBuffer_::RunBuffer() const
+BTextView::StyleBuffer::RunBuffer() const
 {
 	return fStyleRunDesc;
 }
 
 
 inline const _BStyleRecordBuffer_&
-_BStyleBuffer_::RecordBuffer() const
+BTextView::StyleBuffer::RecordBuffer() const
 {
 	return fStyleRecord;
 }

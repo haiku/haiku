@@ -6,7 +6,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
-//!	_BUndoBuffer_ and its subclasses handle different types of Undo operations.
+//!	UndoBuffer and its subclasses handle different types of Undo operations.
 
 
 #include "UndoBuffer.h"
@@ -22,10 +22,10 @@
 // TODO: properly document this file
 
 
-//	#pragma mark - _BUndoBuffer_
+//	#pragma mark - UndoBuffer
 
 
-_BUndoBuffer_::_BUndoBuffer_(BTextView *textView, undo_state state)
+BTextView::UndoBuffer::UndoBuffer(BTextView *textView, undo_state state)
 	:
 	fTextView(textView),
 	fTextData(NULL),
@@ -45,7 +45,7 @@ _BUndoBuffer_::_BUndoBuffer_(BTextView *textView, undo_state state)
 }
 
 
-_BUndoBuffer_::~_BUndoBuffer_()
+BTextView::UndoBuffer::~UndoBuffer()
 {
 	free(fTextData);
 	BTextView::FreeRunArray(fRunArray);
@@ -53,7 +53,7 @@ _BUndoBuffer_::~_BUndoBuffer_()
 
 
 void
-_BUndoBuffer_::Undo(BClipboard *clipboard)
+BTextView::UndoBuffer::Undo(BClipboard *clipboard)
 {
 	fRedo ? RedoSelf(clipboard) : UndoSelf(clipboard);
 		
@@ -62,7 +62,7 @@ _BUndoBuffer_::Undo(BClipboard *clipboard)
 
 
 undo_state
-_BUndoBuffer_::State(bool *redo)
+BTextView::UndoBuffer::State(bool *redo)
 {
 	*redo = fRedo;
 
@@ -71,7 +71,7 @@ _BUndoBuffer_::State(bool *redo)
 
 
 void
-_BUndoBuffer_::UndoSelf(BClipboard *clipboard)
+BTextView::UndoBuffer::UndoSelf(BClipboard *clipboard)
 {
 	fTextView->Select(fStart, fStart);
 	fTextView->Insert(fTextData, fTextLength, fRunArray);
@@ -80,7 +80,7 @@ _BUndoBuffer_::UndoSelf(BClipboard *clipboard)
 
 
 void
-_BUndoBuffer_::RedoSelf(BClipboard *clipboard)
+BTextView::UndoBuffer::RedoSelf(BClipboard *clipboard)
 {
 }
 
@@ -89,7 +89,7 @@ _BUndoBuffer_::RedoSelf(BClipboard *clipboard)
 
 
 _BCutUndoBuffer_::_BCutUndoBuffer_(BTextView *textView)
-	: _BUndoBuffer_(textView, B_UNDO_CUT)
+	: BTextView::UndoBuffer(textView, B_UNDO_CUT)
 {
 }
 
@@ -125,7 +125,7 @@ _BCutUndoBuffer_::RedoSelf(BClipboard *clipboard)
 
 _BPasteUndoBuffer_::_BPasteUndoBuffer_(BTextView *textView, const char *text,
 		int32 textLen, text_run_array *runArray, int32 runArrayLen)
-	: _BUndoBuffer_(textView, B_UNDO_PASTE),
+	: BTextView::UndoBuffer(textView, B_UNDO_PASTE),
 	fPasteText(NULL),
 	fPasteTextLength(textLen),
 	fPasteRunArray(NULL)
@@ -169,7 +169,7 @@ _BPasteUndoBuffer_::RedoSelf(BClipboard *clipboard)
 
 
 _BClearUndoBuffer_::_BClearUndoBuffer_(BTextView *textView)
-	: _BUndoBuffer_(textView, B_UNDO_CLEAR)
+	: BTextView::UndoBuffer(textView, B_UNDO_CLEAR)
 {
 }
 
@@ -193,7 +193,7 @@ _BClearUndoBuffer_::RedoSelf(BClipboard *clipboard)
 _BDropUndoBuffer_::_BDropUndoBuffer_(BTextView *textView, char const *text,
 		int32 textLen, text_run_array *runArray, int32 runArrayLen,
 		int32 location, bool internalDrop)
-	: _BUndoBuffer_(textView, B_UNDO_DROP),
+	: BTextView::UndoBuffer(textView, B_UNDO_DROP),
 	fDropText(NULL),
 	fDropTextLength(textLen),
 	fDropRunArray(NULL)
@@ -249,7 +249,7 @@ _BDropUndoBuffer_::RedoSelf(BClipboard *)
 
 
 _BTypingUndoBuffer_::_BTypingUndoBuffer_(BTextView *textView)
-	: _BUndoBuffer_(textView, B_UNDO_TYPING),
+	: BTextView::UndoBuffer(textView, B_UNDO_TYPING),
 	fTypedText(NULL),
 	fTypedStart(fStart),
 	fTypedEnd(fEnd),

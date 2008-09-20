@@ -6,22 +6,15 @@
 #define _TEXTVIEW_H
 
 
-#include <BeBuild.h>
+#include <Locker.h>
 #include <View.h>
 
-class BMessageRunner;
+
 class BBitmap;
 class BClipboard;
 class BFile;
 class BList;
-class _BTextGapBuffer_;
-class _BLineBuffer_;
-class _BStyleBuffer_;
-class _BWidthBuffer_;
-class _BUndoBuffer_;
-class _BInlineInput_;
-class _BTextTrackState_;
-class _BTextChangeResult_;
+class BMessageRunner;
 
 extern "C" status_t	_init_interface_kit_();
 
@@ -46,6 +39,7 @@ enum undo_state {
 	B_UNDO_DROP
 };
 
+
 class BTextView : public BView {
 public:
 								BTextView(BRect frame, const char* name,
@@ -56,6 +50,15 @@ public:
 									BRect textRect, const BFont* initialFont,
 									const rgb_color* initialColor,
 									uint32 resizeMask, uint32 flags);
+
+								BTextView(const char* name,
+									uint32 flags
+										= B_WILL_DRAW | B_PULSE_NEEDED);
+								BTextView(const char* name,
+									const BFont* initialFont,
+									const rgb_color* initialColor,
+									uint32 flags);
+
 								BTextView(BMessage* data);
 
 	virtual						~BTextView();
@@ -172,6 +175,12 @@ public:
 
 			void				SetTextRect(BRect rect);
 			BRect				TextRect() const;
+			void				SetInsets(float _leftInset, float topInset,
+									float rightInset, float bottomInset);
+			void				GetInsets(float* _leftInset, float* _topInset,
+									float* _rightInset,
+									float* _bottomInset) const;
+
 			void				SetStylable(bool stylable);
 			bool				IsStylable() const;
 			void				SetTabWidth(float width);
@@ -231,8 +240,17 @@ protected:
 									BHandler** _handler);
 
 private:
-	friend status_t	_init_interface_kit_();
-	friend class _BTextTrackState_;
+			class InlineInput;
+			struct LayoutData;
+			class LineBuffer;
+			class StyleBuffer;
+			class TextGapBuffer;
+			class TextTrackState;
+			class UndoBuffer;
+			class WidthBuffer;
+
+			friend class TextTrackState;
+			friend status_t	_init_interface_kit_();
 
 	virtual	void				_ReservedTextView3();
 	virtual	void				_ReservedTextView4();
@@ -275,11 +293,9 @@ private:
 
 			void				_DoInsertText(const char* inText,
 									int32 inLength, int32 inOffset,
-									const text_run_array* inRuns,
-									_BTextChangeResult_* outResult);
+									const text_run_array* inRuns);
 
-			void				_DoDeleteText(int32 fromOffset, int32 toOffset,
-									_BTextChangeResult_* outResult);
+			void				_DoDeleteText(int32 fromOffset, int32 toOffset);
 
 			void				_DrawLine(BView* view, const int32 &startLine,
 									const int32& startOffset, const bool& erase,
@@ -337,12 +353,9 @@ private:
 			void				_HandleInputMethodLocationRequest();
 			void				_CancelInputMethod();
 
-	static	void				LockWidthBuffer();
-	static	void				UnlockWidthBuffer();	
-
-			_BTextGapBuffer_*	fText;
-			_BLineBuffer_*		fLines;
-			_BStyleBuffer_*		fStyles;
+			TextGapBuffer*		fText;
+			LineBuffer*			fLines;
+			StyleBuffer*		fStyles;
 			BRect				fTextRect;
 			float				fMinTextRectWidth;
 			int32				fSelStart;
@@ -368,19 +381,16 @@ private:
 			color_space			fColorSpace;
 			bool				fResizable;
 			BView*				fContainerView;
-			_BUndoBuffer_*		fUndo;
-			_BInlineInput_*		fInline;
+			UndoBuffer*			fUndo;
+			InlineInput*		fInline;
 			BMessageRunner *	fDragRunner;
 			BMessageRunner *	fClickRunner;
 			BPoint				fWhere;
-			_BTextTrackState_*	fTrackingMouse;
-			_BTextChangeResult_* fTextChange;
+			TextTrackState*		fTrackingMouse;
 
-			uint32				_reserved[8];
+			uint32				_reserved[9];
 
-	static	_BWidthBuffer_*		sWidths;
-	static	sem_id				sWidthSem;
-	static	int32				sWidthAtom;
+	static	WidthBuffer*		sWidths;
 };
 
 #endif	// _TEXTVIEW_H

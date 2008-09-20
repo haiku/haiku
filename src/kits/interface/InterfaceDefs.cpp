@@ -904,12 +904,7 @@ _init_interface_kit_()
 	if (status < B_OK)
 		return status;
 
-	sem_id widthSem = create_sem(0, "BTextView WidthBuffer Sem");
-	if (widthSem < 0)
-		return widthSem;
-	BTextView::sWidthSem = widthSem;
-	BTextView::sWidthAtom = 0;
-	BTextView::sWidths = new _BWidthBuffer_;
+	BTextView::sWidths = new BTextView::WidthBuffer;
 
 	_init_global_fonts_();
 

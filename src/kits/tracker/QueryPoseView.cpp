@@ -31,6 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
+#include "QueryPoseView.h"
+
+#include <new>
 
 #include <Debug.h>
 #include <NodeMonitor.h>
@@ -47,10 +50,11 @@ All rights reserved.
 #include "FSUtils.h"
 #include "MimeTypeList.h"
 #include "MimeTypes.h"
-#include "QueryPoseView.h"
 #include "Tracker.h"
 
 #include <fs_attr.h>
+
+using std::nothrow;
 
 // Currently filtering out Trash doesn't node monitor too well - if you
 // remove an item from the Trash, it doesn't show up in the query result
@@ -508,7 +512,9 @@ status_t
 QueryEntryListCollection::FetchOneQuery(const BQuery *copyThis,
 	BHandler *target, BObjectList<BQuery> *list, BVolume *volume)
 {
-	BQuery *query = new BQuery;
+	BQuery *query = new (nothrow) BQuery;
+	if (query == NULL)
+		return B_NO_MEMORY;
 	// have to fake a copy constructor here because BQuery doesn't have
 	// a copy constructor
 

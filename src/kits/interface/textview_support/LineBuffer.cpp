@@ -9,33 +9,33 @@
 #include "LineBuffer.h"
 
 
-_BLineBuffer_::_BLineBuffer_()
+BTextView::LineBuffer::LineBuffer()
 	:	_BTextViewSupportBuffer_<STELine>(20, 2)
 {
 }
 
 
-_BLineBuffer_::~_BLineBuffer_()
+BTextView::LineBuffer::~LineBuffer()
 {
 }
 
 
 void
-_BLineBuffer_::InsertLine(STELine *inLine, int32 index)
+BTextView::LineBuffer::InsertLine(STELine *inLine, int32 index)
 {
 	InsertItemsAt(1, index, inLine);
 }
 
 
 void
-_BLineBuffer_::RemoveLines(int32 index, int32 count)
+BTextView::LineBuffer::RemoveLines(int32 index, int32 count)
 {
 	RemoveItemsAt(count, index);
 }
 
 
 void
-_BLineBuffer_::RemoveLineRange(int32 fromOffset, int32 toOffset)
+BTextView::LineBuffer::RemoveLineRange(int32 fromOffset, int32 toOffset)
 {
 	int32 fromLine = OffsetToLine(fromOffset);
 	int32 toLine = OffsetToLine(toOffset);
@@ -49,7 +49,7 @@ _BLineBuffer_::RemoveLineRange(int32 fromOffset, int32 toOffset)
 
 
 int32
-_BLineBuffer_::OffsetToLine(int32 offset) const
+BTextView::LineBuffer::OffsetToLine(int32 offset) const
 {
 	int32 minIndex = 0;
 	int32 maxIndex = fItemCount - 1;
@@ -71,7 +71,7 @@ _BLineBuffer_::OffsetToLine(int32 offset) const
 
 
 int32
-_BLineBuffer_::PixelToLine(float pixel) const
+BTextView::LineBuffer::PixelToLine(float pixel) const
 {
 	int32 minIndex = 0;
 	int32 maxIndex = fItemCount - 1;
@@ -93,7 +93,7 @@ _BLineBuffer_::PixelToLine(float pixel) const
 
 
 void
-_BLineBuffer_::BumpOrigin(float delta, long index)
+BTextView::LineBuffer::BumpOrigin(float delta, long index)
 {	
 	for (long i = index; i < fItemCount; i++)
 		fBuffer[i].origin += delta;
@@ -101,7 +101,7 @@ _BLineBuffer_::BumpOrigin(float delta, long index)
 
 
 void
-_BLineBuffer_::BumpOffset(int32 delta, int32 index)
+BTextView::LineBuffer::BumpOffset(int32 delta, int32 index)
 {
 	for (long i = index; i < fItemCount; i++)
 		fBuffer[i].offset += delta;

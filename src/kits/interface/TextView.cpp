@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2008, Haiku Inc.
+ * Copyright 2001-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Hiroshi Lockheimer (BTextView is based on his STEEngine)
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 /*!	BTextView displays and manages styled text. */
@@ -15,7 +16,8 @@
 // - Consider using BObjectList instead of BList
 // 	 for disallowed characters (it would remove a lot of reinterpret_casts)
 // - Check for correctness and possible optimizations the calls to _Refresh(),
-// 	 to refresh only changed parts of text (currently we often redraw the whole text)
+// 	 to refresh only changed parts of text (currently we often redraw the whole
+//   text)
 
 // Known Bugs:
 // - Double buffering doesn't work well (disabled by default)
@@ -87,30 +89,49 @@ enum {
 };
 
 
-class _BTextTrackState_ {
+class BTextView::TextTrackState {
 public:
-	_BTextTrackState_(BMessenger messenger);
-	~_BTextTrackState_();
+	TextTrackState(BMessenger messenger);
+	~TextTrackState();
 
-	void SimulateMouseMovement(BTextView *view);
+	void SimulateMouseMovement(BTextView* view);
 
-	int32 clickOffset;
-	bool shiftDown;
-	BRect selectionRect;
-
-	int32 anchor;
-	int32 selStart;
-	int32 selEnd;
+public:
+	int32				clickOffset;
+	bool				shiftDown;
+	BRect				selectionRect;
+		
+	int32				anchor;
+	int32				selStart;
+	int32				selEnd;
 
 private:
-	BMessageRunner *fRunner;
+	BMessageRunner*		fRunner;
 };
 
 
+struct BTextView::LayoutData {
+	LayoutData(float leftInset, float topInset, float rightInset,
+			float bottomInset)
+		: leftInset(leftInset),
+		  topInset(topInset),
+		  rightInset(rightInset),
+		  bottomInset(bottomInset),
+		  valid(false)
+	{
+	}
+
+	float				leftInset;
+	float				topInset;
+	float				rightInset;
+	float				bottomInset;
+
+	BSize				min;
+	bool				valid;
+};
+
 // Initialized/finalized by init/fini_interface_kit
-_BWidthBuffer_* BTextView::sWidths = NULL;
-sem_id BTextView::sWidthSem = B_BAD_SEM_ID;
-int32 BTextView::sWidthAtom = 0;
+BTextView::WidthBuffer* BTextView::sWidths = NULL;
 
 
 const static rgb_color kBlackColor = { 0, 0, 0, 255 };
@@ -158,14 +179,16 @@ static property_info sPropertyList[] = {
 		"text_run_array",
 		{ B_GET_PROPERTY, 0 },
 		{ B_RANGE_SPECIFIER, B_REVERSE_RANGE_SPECIFIER, 0 },
-		"Returns the style information for the text in the specified range in the BTextView.", 0,
+		"Returns the style information for the text in the specified range in "
+			"the BTextView.", 0,
 		{ B_RAW_TYPE, 0 },
 	},
 	{
 		"text_run_array",
 		{ B_SET_PROPERTY, 0 },
 		{ B_RANGE_SPECIFIER, B_REVERSE_RANGE_SPECIFIER, 0 },
-		"Sets the style information for the text in the specified range in the BTextView.", 0,
+		"Sets the style information for the text in the specified range in the "
+			"BTextView.", 0,
 		{ B_RAW_TYPE, 0 },
 	},
 	{ 0 }
@@ -176,7 +199,8 @@ static property_info sPropertyList[] = {
 	\param frame The rect which will enclose the BTextView object.
 	\param name The name of the object.
 	\param textRect Determines the area of the text within the BTextView object.
-	\param resizeMask The resizing mask for the BTextView, passed to the BView constructor.
+	\param resizeMask The resizing mask for the BTextView, passed to the BView
+		constructor.
 	\param flags The flags for the BTextView, passed to the BView constructor.
 */
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
@@ -192,9 +216,12 @@ BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 	\param frame The rect which will enclose the BTextView object.
 	\param name The name of the object.
 	\param textRect Determines the area of the text within the BTextView object.
-	\param initialFont The BTextView will display its text using this font, unless otherwise specified.
-	\param initialColor The BTextView will display its text using this color, unless otherwise specified.
-	\param resizeMask The resizing mask for the BTextView, passed to the BView constructor.
+	\param initialFont The BTextView will display its text using this font,
+		unless otherwise specified.
+	\param initialColor The BTextView will display its text using this color,
+		unless otherwise specified.
+	\param resizeMask The resizing mask for the BTextView, passed to the BView
+		constructor.
 	\param flags The flags for the BTextView, passed to the BView constructor.
 */
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
@@ -204,6 +231,35 @@ BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 		flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	_InitObject(textRect, initialFont, initialColor);
+}
+
+
+/*! \brief Creates a BTextView object with the given attributes.
+	\param name The name of the object.
+	\param flags The flags for the BTextView, passed to the BView constructor.
+*/
+BTextView::BTextView(const char* name, uint32 flags)
+	: BView(name, flags | B_FRAME_EVENTS | B_PULSE_NEEDED
+		| B_INPUT_METHOD_AWARE)
+{
+	// TODO: ...
+}
+
+
+/*! \brief Creates a BTextView object with the given attributes.
+	\param name The name of the object.
+	\param initialFont The BTextView will display its text using this font,
+		unless otherwise specified.
+	\param initialColor The BTextView will display its text using this color,
+		unless otherwise specified.
+	\param flags The flags for the BTextView, passed to the BView constructor.
+*/
+BTextView::BTextView(const char* name, const BFont* initialFont,
+	const rgb_color* initialColor, uint32 flags)
+	: BView(name, flags | B_FRAME_EVENTS | B_PULSE_NEEDED
+		| B_INPUT_METHOD_AWARE)
+{
+	// TODO: ...
 }
 
 
@@ -268,15 +324,19 @@ BTextView::BTextView(BMessage *archive)
 		
 		fDisallowedChars = new BList;
 		disallowedCount /= sizeof(int32);
-		for (int32 x = 0; x < disallowedCount; x++)
-			fDisallowedChars->AddItem(reinterpret_cast<void *>(disallowedChars[x]));
+		for (int32 x = 0; x < disallowedCount; x++) {
+			fDisallowedChars->AddItem(
+				reinterpret_cast<void *>(disallowedChars[x]));
+		}
 	}
 	
 	ssize_t runSize = 0;
 	const void *flattenedRun = NULL;
 	
-	if (archive->FindData("_runs", B_RAW_TYPE, &flattenedRun, &runSize) == B_OK) {
-		text_run_array *runArray = UnflattenRunArray(flattenedRun, (int32 *)&runSize);
+	if (archive->FindData("_runs", B_RAW_TYPE, &flattenedRun, &runSize)
+			== B_OK) {
+		text_run_array *runArray = UnflattenRunArray(flattenedRun,
+			(int32*)&runSize);
 		if (runArray) {
 			SetRunArray(0, TextLength(), runArray);
 			FreeRunArray(runArray);
@@ -305,7 +365,8 @@ BTextView::~BTextView()
 }
 
 
-/*! \brief Static function used to istantiate a BTextView object from the given BMessage.
+/*! \brief Static function used to istantiate a BTextView object from the given
+		BMessage.
 	\param archive The BMessage from which the object shall be created.
 	\return A constructed BTextView as a BArchivable object.
 */
@@ -458,7 +519,7 @@ BTextView::MouseDown(BPoint where)
 	_StopMouseTracking();
 	
 	BMessenger messenger(this);
-	fTrackingMouse = new (nothrow) _BTextTrackState_(messenger);
+	fTrackingMouse = new (nothrow) TextTrackState(messenger);
 	if (fTrackingMouse == NULL)
 		return;
 
@@ -477,12 +538,15 @@ BTextView::MouseDown(BPoint where)
 	bigtime_t clickSpeed = 0;
 	get_click_speed(&clickSpeed);
 	bool multipleClick = false;
-	if (clickTime - fClickTime < clickSpeed && fClickOffset == fTrackingMouse->clickOffset)
+	if (clickTime - fClickTime < clickSpeed
+		&& fClickOffset == fTrackingMouse->clickOffset) {
 		multipleClick = true;
+	}
 
 	fWhere = where;	
 
-	SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,	B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+	SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,
+		B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
 	
 	if (fSelStart != fSelEnd && !fTrackingMouse->shiftDown && !multipleClick) {
 		BRegion region;
@@ -518,7 +582,8 @@ BTextView::MouseDown(BPoint where)
 		delete fClickRunner;
 
 		BMessenger messenger(this);
-		fClickRunner = new (nothrow) BMessageRunner(messenger, &message, clickSpeed, 1);
+		fClickRunner = new (nothrow) BMessageRunner(messenger, &message,
+			clickSpeed, 1);
 	}
 
 	
@@ -688,7 +753,8 @@ BTextView::KeyDown(const char *bytes, int32 numBytes)
 		default:
 			// if the character is not allowed, bail out.
 			if (fDisallowedChars
-				&& fDisallowedChars->HasItem(reinterpret_cast<void *>((uint32)keyPressed))) {
+				&& fDisallowedChars->HasItem(
+					reinterpret_cast<void *>((uint32)keyPressed))) {
 				beep();
 				return;
 			}
@@ -805,9 +871,10 @@ BTextView::MessageReceived(BMessage *message)
 					case B_INPUT_METHOD_STARTED:
 					{
 						BMessenger messenger;
-						if (message->FindMessenger("be:reply_to", &messenger) == B_OK) {
+						if (message->FindMessenger("be:reply_to", &messenger)
+								== B_OK) {
 							ASSERT(fInline == NULL);
-							fInline = new _BInlineInput_(messenger);
+							fInline = new InlineInput(messenger);
 						}
 						break;
 					}	
@@ -971,7 +1038,8 @@ BTextView::SetText(const char *inText, const text_run_array *inRuns)
 
 
 void
-BTextView::SetText(const char *inText, int32 inLength, const text_run_array *inRuns)
+BTextView::SetText(const char *inText, int32 inLength,
+	const text_run_array *inRuns)
 {
 	_CancelInputMethod();
 	
@@ -1048,7 +1116,7 @@ void
 BTextView::Insert(const char *inText, const text_run_array *inRuns)
 {
 	if (inText != NULL)
-		_DoInsertText(inText, strlen(inText), fSelStart, inRuns, NULL);
+		_DoInsertText(inText, strlen(inText), fSelStart, inRuns);
 }
 
 
@@ -1058,8 +1126,7 @@ BTextView::Insert(const char *inText, int32 inLength,
 {
 	if (inText != NULL && inLength > 0) {
 		int32 realLength = strlen(inText);
-		_DoInsertText(inText, min_c(inLength, realLength), fSelStart, inRuns,
-			NULL);
+		_DoInsertText(inText, min_c(inLength, realLength), fSelStart, inRuns);
 	}
 }
 
@@ -1073,7 +1140,7 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 	// do we really need to do anything?
 	if (inText != NULL && inLength > 0) {
 		int32 realLength = strlen(inText);
-		_DoInsertText(inText, min_c(inLength, realLength), startOffset, inRuns, NULL);
+		_DoInsertText(inText, min_c(inLength, realLength), startOffset, inRuns);
 	}
 }
 
@@ -1239,8 +1306,8 @@ BTextView::Copy(BClipboard *clipboard)
 			int32 size;
 			if (fStylable) {
 				text_run_array *runArray = RunArray(fSelStart, fSelEnd, &size);
-				clip->AddData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
-					runArray, size);
+				clip->AddData("application/x-vnd.Be-text_run_array",
+					B_MIME_TYPE, runArray, size);
 				FreeRunArray(runArray);
 			}
 			clipboard->Commit();
@@ -1259,35 +1326,38 @@ BTextView::Paste(BClipboard *clipboard)
 	CALLED();
 	_CancelInputMethod();
 	
-	if (clipboard->Lock()) {
-		BMessage *clip = clipboard->Data();
-		if (clip != NULL) {
-			const char *text = NULL;
-			ssize_t len = 0;
+	if (!clipboard->Lock())
+		return;
 
-			if (clip->FindData("text/plain", B_MIME_TYPE,
-					(const void **)&text, &len) == B_OK) {
-				text_run_array *runArray = NULL;
-				ssize_t runLen = 0;
+	BMessage *clip = clipboard->Data();
+	if (clip != NULL) {
+		const char *text = NULL;
+		ssize_t len = 0;
 
-				if (fStylable)
-					clip->FindData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
-						(const void **)&runArray, &runLen);
+		if (clip->FindData("text/plain", B_MIME_TYPE,
+				(const void **)&text, &len) == B_OK) {
+			text_run_array *runArray = NULL;
+			ssize_t runLen = 0;
 
-				if (fUndo) {
-					delete fUndo;
-					fUndo = new _BPasteUndoBuffer_(this, text, len, runArray, runLen);
-				}
+			if (fStylable) {
+				clip->FindData("application/x-vnd.Be-text_run_array",
+					B_MIME_TYPE, (const void **)&runArray, &runLen);
+			}
 
-				if (fSelStart != fSelEnd)
-					Delete();
+			if (fUndo) {
+				delete fUndo;
+				fUndo = new _BPasteUndoBuffer_(this, text, len, runArray,
+					runLen);
+			}
 
-				Insert(text, len, runArray);
-			}		
-		}
+			if (fSelStart != fSelEnd)
+				Delete();
 
-		clipboard->Unlock();
+			Insert(text, len, runArray);
+		}		
 	}
+
+	clipboard->Unlock();
 }
 
 
@@ -1416,8 +1486,10 @@ BTextView::SelectAll()
 
 
 /*! \brief Gets the current selection.
-	\param outStart A pointer to an int32 which will contain the selection start's offset.
-	\param outEnd A pointer to an int32 which will contain the selection end's offset.
+	\param outStart A pointer to an int32 which will contain the selection
+		start's offset.
+	\param outEnd A pointer to an int32 which will contain the selection
+		end's offset.
 */
 void
 BTextView::GetSelection(int32 *outStart, int32 *outEnd) const
@@ -1437,15 +1509,16 @@ BTextView::GetSelection(int32 *outStart, int32 *outEnd) const
 
 
 void
-BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode, const rgb_color *inColor)
+BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
+	const rgb_color *inColor)
 {
 	SetFontAndColor(fSelStart, fSelEnd, inFont, inMode, inColor);
 }
 
 
 void
-BTextView::SetFontAndColor(int32 startOffset, int32 endOffset, const BFont* font,
-	uint32 fontMode, const rgb_color* color)
+BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
+	const BFont* font, uint32 fontMode, const rgb_color* color)
 {
 	CALLED();
 
@@ -1493,21 +1566,25 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset, const BFont* font
 
 
 void
-BTextView::GetFontAndColor(int32 inOffset, BFont *outFont, rgb_color *outColor) const
+BTextView::GetFontAndColor(int32 inOffset, BFont *outFont,
+	rgb_color *outColor) const
 {
 	fStyles->GetStyle(inOffset, outFont, outColor);
 }
 
 
 void
-BTextView::GetFontAndColor(BFont *outFont, uint32 *outMode, rgb_color *outColor, bool *outEqColor) const
+BTextView::GetFontAndColor(BFont *outFont, uint32 *outMode, rgb_color
+	*outColor, bool *outEqColor) const
 {
-	fStyles->ContinuousGetStyle(outFont, outMode, outColor, outEqColor, fSelStart, fSelEnd);
+	fStyles->ContinuousGetStyle(outFont, outMode, outColor, outEqColor,
+		fSelStart, fSelEnd);
 }
 
 
 void
-BTextView::SetRunArray(int32 startOffset, int32 endOffset, const text_run_array *inRuns)
+BTextView::SetRunArray(int32 startOffset, int32 endOffset,
+	const text_run_array *inRuns)
 {
 	CALLED();
 
@@ -1532,7 +1609,8 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset, const text_run_array 
 text_run_array *
 BTextView::RunArray(int32 startOffset, int32 endOffset, int32 *outSize) const
 {
-	STEStyleRange* styleRange = fStyles->GetStyleRange(startOffset, endOffset - 1);
+	STEStyleRange* styleRange = fStyles->GetStyleRange(startOffset,
+		endOffset - 1);
 	if (styleRange == NULL)
 		return NULL;
 
@@ -1575,8 +1653,8 @@ BTextView::LineAt(BPoint point) const
 
 /*! \brief Returns the location of the character at the given offset.
 	\param inOffset The offset of the character.
-	\param outHeight Here the function will put the height of the character at the
-	given offset.
+	\param outHeight Here the function will put the height of the character
+		at the given offset.
 	\return A BPoint which is the location of the character.
 */
 BPoint
@@ -1608,7 +1686,8 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		height = (line + 1)->origin - line->origin;
 	
 		// special case: go down one line if inOffset is a newline
-		if (inOffset == textLength && fText->RealCharAt(inOffset - 1) == B_ENTER) {
+		if (inOffset == textLength && fText->RealCharAt(inOffset - 1)
+				== B_ENTER) {
 			result.y += height;
 			height = LineHeight(CountLines() - 1);
 	
@@ -1694,8 +1773,9 @@ BTextView::OffsetAt(BPoint point) const
 	point.x -= fTextRect.left;
 	point.x = max_c(point.x, 0.0);
 
-	// TODO: The following code isn't very efficient because it always starts from the left end,
-	// so when the point is near the right end it's very slow.
+	// TODO: The following code isn't very efficient, because it always starts
+	// from the left end, so when the point is near the right end it's very
+	// slow.
 	int32 offset = line->offset;
 	const int32 limit = (line + 1)->offset;
 	float location = 0;
@@ -1774,7 +1854,8 @@ BTextView::FindWord(int32 inOffset, int32 *outFromOffset, int32 *outToOffset)
 
 	// check to the right
 	int32 textLen = TextLength();
-	for (offset = inOffset; offset < textLen; offset = _NextInitialByte(offset)) {
+	for (offset = inOffset; offset < textLen;
+			offset = _NextInitialByte(offset)) {
 		if (_CharClassification(offset) != charType)
 			break;
 	}
@@ -1784,7 +1865,8 @@ BTextView::FindWord(int32 inOffset, int32 *outFromOffset, int32 *outToOffset)
 }
 
 
-/*! \brief Returns true if the character at the given offset can be the last character in a line.
+/*! \brief Returns true if the character at the given offset can be the last
+		character in a line.
 	\param offset The offset of the character.
 	\return true if the character can be the last of a line, false if not.
 */
@@ -1899,7 +1981,8 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion)
 }
 
 
-/*! \brief Scrolls the text so that the character at "inOffset" is within the visible range.
+/*! \brief Scrolls the text so that the character at "inOffset" is within the
+		visible range.
 	\param inOffset The offset of the character.
 */
 void
@@ -1938,8 +2021,8 @@ BTextView::ScrollToOffset(int32 inOffset)
 }
 
 
-/*! \brief Scrolls the text so that the character which begins the current selection
-		is within the visible range.
+/*! \brief Scrolls the text so that the character which begins the current
+		selection is within the visible range.
 	\param inOffset The offset of the character.
 */
 void
@@ -1969,7 +2052,8 @@ BTextView::Highlight(int32 startOffset, int32 endOffset)
 }
 
 
-/*! \brief Sets the BTextView's text rectangle to be the same as the passed rect.
+/*! \brief Sets the BTextView's text rectangle to be the same as the passed
+		rect.
 	\param rect A BRect.
 */
 void
@@ -1993,6 +2077,39 @@ BRect
 BTextView::TextRect() const
 {
 	return fTextRect;
+}
+
+
+/*! \brief Sets the insets from the bounds for the BTextView's text rectangle.
+*/
+void
+BTextView::SetInsets(float _leftInset, float topInset, float rightInset,
+	float bottomInset)
+{
+	// TODO:
+	// * store in layout data
+	// * invalidate layout
+	// * invalidate view
+}
+
+
+/*! \brief Returns the insets from the bounds for the BTextView's text
+	rectangle.
+*/
+void
+BTextView::GetInsets(float* _leftInset, float* _topInset, float* _rightInset,
+	float* _bottomInset) const
+{
+	BRect bounds = Bounds();
+
+	if (_leftInset)
+		*_leftInset = fTextRect.left - bounds.left;
+	if (_topInset)
+		*_topInset = fTextRect.top - bounds.top;
+	if (_rightInset)
+		*_rightInset = bounds.right - fTextRect.right;
+	if (_bottomInset)
+		*_bottomInset = bounds.bottom - fTextRect.bottom;
 }
 
 
@@ -2290,12 +2407,14 @@ BTextView::ColorSpace() const
 }
 
 
-/*! \brief Gives to the BTextView the ability to automatically resize itself when needed.
+/*! \brief Gives to the BTextView the ability to automatically resize itself
+		when needed.
 	\param resize If true, the BTextView will automatically resize itself.
-	\param resizeView The BTextView's parent view, it's the view which resizes itself.
-	The resizing mechanism is alternative to the BView resizing. The container view
-	(the one passed to this function) should not automatically resize itself when the parent is
-	resized.
+	\param resizeView The BTextView's parent view, it's the view which resizes
+		itself.
+	The resizing mechanism is alternative to the BView resizing. The container
+	view (the one passed to this function) should not automatically resize
+	itself when the parent is resized.
 */
 void
 BTextView::MakeResizable(bool resize, BView *resizeView)
@@ -2344,7 +2463,7 @@ void
 BTextView::SetDoesUndo(bool undo)
 {
 	if (undo && fUndo == NULL)
-		fUndo = new _BUndoBuffer_(this, B_UNDO_UNAVAILABLE);
+		fUndo = new UndoBuffer(this, B_UNDO_UNAVAILABLE);
 	else if (!undo && fUndo != NULL) {
 		delete fUndo;
 		fUndo = NULL;
@@ -2491,12 +2610,16 @@ BTextView::FlattenRunArray(const text_run_array* runArray, int32* _size)
 	array->count = B_HOST_TO_BENDIAN_INT32(runArray->count);
 
 	for (int32 i = 0; i < runArray->count; i++) {
-		array->styles[i].offset = B_HOST_TO_BENDIAN_INT32(runArray->runs[i].offset);
+		array->styles[i].offset = B_HOST_TO_BENDIAN_INT32(
+			runArray->runs[i].offset);
 		runArray->runs[i].font.GetFamilyAndStyle(&array->styles[i].family,
 			&array->styles[i].style);
-		array->styles[i].size = B_HOST_TO_BENDIAN_FLOAT(runArray->runs[i].font.Size());
-		array->styles[i].shear = B_HOST_TO_BENDIAN_FLOAT(runArray->runs[i].font.Shear());
-		array->styles[i].face = B_HOST_TO_BENDIAN_INT16(runArray->runs[i].font.Face());
+		array->styles[i].size = B_HOST_TO_BENDIAN_FLOAT(
+			runArray->runs[i].font.Size());
+		array->styles[i].shear = B_HOST_TO_BENDIAN_FLOAT(
+			runArray->runs[i].font.Shear());
+		array->styles[i].face = B_HOST_TO_BENDIAN_INT16(
+			runArray->runs[i].font.Face());
 		array->styles[i].red = runArray->runs[i].color.red;
 		array->styles[i].green = runArray->runs[i].color.green;
 		array->styles[i].blue = runArray->runs[i].color.blue;
@@ -2519,7 +2642,8 @@ BTextView::UnflattenRunArray(const void* data, int32* _size)
 	flattened_text_run_array *array = (flattened_text_run_array *)data;
 
 	if (B_BENDIAN_TO_HOST_INT32(array->magic) != kFlattenedTextRunArrayMagic
-		|| B_BENDIAN_TO_HOST_INT32(array->version) != kFlattenedTextRunArrayVersion) {
+		|| B_BENDIAN_TO_HOST_INT32(array->version)
+			!= kFlattenedTextRunArrayVersion) {
 		if (_size)
 			*_size = 0;
 
@@ -2533,15 +2657,18 @@ BTextView::UnflattenRunArray(const void* data, int32* _size)
 		return NULL;
 
 	for (int32 i = 0; i < count; i++) {
-		runArray->runs[i].offset = B_BENDIAN_TO_HOST_INT32(array->styles[i].offset);
+		runArray->runs[i].offset = B_BENDIAN_TO_HOST_INT32(
+			array->styles[i].offset);
 
 		// Set family and style independently from each other, so that
 		// even if the family doesn't exist, we try to preserve the style
 		runArray->runs[i].font.SetFamilyAndStyle(array->styles[i].family, NULL);
 		runArray->runs[i].font.SetFamilyAndStyle(NULL, array->styles[i].style);
 
-		runArray->runs[i].font.SetSize(B_BENDIAN_TO_HOST_FLOAT(array->styles[i].size));
-		runArray->runs[i].font.SetShear(B_BENDIAN_TO_HOST_FLOAT(array->styles[i].shear));
+		runArray->runs[i].font.SetSize(B_BENDIAN_TO_HOST_FLOAT(
+			array->styles[i].size));
+		runArray->runs[i].font.SetShear(B_BENDIAN_TO_HOST_FLOAT(
+			array->styles[i].shear));
 
 		uint16 face = B_BENDIAN_TO_HOST_INT16(array->styles[i].face);
 		if (face != B_REGULAR_FACE) {
@@ -2677,6 +2804,9 @@ void BTextView::_ReservedTextView11() {}
 void BTextView::_ReservedTextView12() {}
 
 
+// #pragma mark -
+
+
 /*! \brief Inits the BTextView object.
 	\param textRect The BTextView's text rect.
 	\param initialFont The font which the BTextView will use.
@@ -2697,14 +2827,19 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	if (initialColor == NULL)
 		initialColor = &kBlackColor;
 
-	fText = new _BTextGapBuffer_;
-	fLines = new _BLineBuffer_;
-	fStyles = new _BStyleBuffer_(&font, initialColor);
+	fText = new TextGapBuffer;
+	fLines = new LineBuffer;
+	fStyles = new StyleBuffer(&font, initialColor);
 	
 	// We put these here instead of in the constructor initializer list
 	// to have less code duplication, and a single place where to do changes
 	// if needed.
 	fTextRect = textRect;
+		// NOTE: The only places where text rect is changed:
+		// * width is possibly adjusted in _AutoResize(),
+		// * height is adjusted in _RecalculateLineBreaks().
+		// When used within the layout management framework, the
+		// text rect is changed to maintain constant insets.
 	fMinTextRectWidth = fTextRect.Width();
 	fSelStart = fSelEnd = 0;
 	fCaretVisible = false;
@@ -2733,7 +2868,6 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	fDragRunner = NULL;
 	fClickRunner = NULL;
 	fTrackingMouse = NULL;
-	fTextChange = NULL;
 }
 
 
@@ -3022,7 +3156,8 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 {		
 	// TODO: block input if not editable (Andrew)
 	if (fUndo) {
-		_BTypingUndoBuffer_ *undoBuffer = dynamic_cast<_BTypingUndoBuffer_ *>(fUndo);
+		_BTypingUndoBuffer_ *undoBuffer
+			= dynamic_cast<_BTypingUndoBuffer_ *>(fUndo);
 		if (!undoBuffer) {
 			delete fUndo;
 			fUndo = undoBuffer = new _BTypingUndoBuffer_(this);
@@ -3047,12 +3182,12 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 			offset++;
 
 		if (start != offset)
-			_DoInsertText(Text() + start, offset - start, fSelStart, NULL, NULL);
+			_DoInsertText(Text() + start, offset - start, fSelStart, NULL);
 
-		_DoInsertText(bytes, numBytes, fSelStart, NULL, NULL);
+		_DoInsertText(bytes, numBytes, fSelStart, NULL);
 
 	} else
-		_DoInsertText(bytes, numBytes, fSelStart, NULL, NULL);
+		_DoInsertText(bytes, numBytes, fSelStart, NULL);
 	
 	fClickOffset = fSelEnd;
 
@@ -3144,7 +3279,8 @@ BTextView::_RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 {
 	// are we insane?
 	*startLine = (*startLine < 0) ? 0 : *startLine;
-	*endLine = (*endLine > fLines->NumLines() - 1) ? fLines->NumLines() - 1 : *endLine;
+	*endLine = (*endLine > fLines->NumLines() - 1) ? fLines->NumLines() - 1
+		: *endLine;
 	
 	int32 textLength = fText->Length();
 	int32 lineIndex = (*startLine > 0) ? *startLine - 1 : 0;
@@ -3253,7 +3389,8 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 		offset += fromOffset;
 		offset = (offset < limit) ? offset + 1 : limit;
 		
-		*ioWidth = _StyledWidth(fromOffset, offset - fromOffset, outAscent, outDescent);
+		*ioWidth = _StyledWidth(fromOffset, offset - fromOffset, outAscent,
+			outDescent);
 		
 		return offset;
 	}
@@ -3393,8 +3530,10 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 /*! \brief Calculate the width of the text within the given limits.
 	\param fromOffset The offset where to start.
 	\param length The length of the text to examine.
-	\param outAscent A pointer to a float which will contain the maximum ascent.
-	\param outDescent A pointer to a float which will contain the maximum descent.
+	\param outAscent A pointer to a float which will contain the maximum
+		ascent.
+	\param outDescent A pointer to a float which will contain the maximum
+		descent.
 	\return The width for the text within the given limits.
 */
 float
@@ -3418,9 +3557,7 @@ BTextView::_StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 #if USE_WIDTHBUFFER
 		// Use _BWidthBuffer_ if possible
 		if (sWidths != NULL) {
-			LockWidthBuffer();
 			result += sWidths->StringWidth(*fText, fromOffset, numChars, font);
-			UnlockWidthBuffer();
 		} else {
 #endif
 			const char* text = fText->GetString(fromOffset, &numChars);
@@ -3471,7 +3608,7 @@ BTextView::_ActualTabWidth(float location) const
 
 void
 BTextView::_DoInsertText(const char *inText, int32 inLength, int32 inOffset,
-	const text_run_array *inRuns, _BTextChangeResult_ *outResult)
+	const text_run_array *inRuns)
 {
 	_CancelInputMethod();
 	
@@ -3502,15 +3639,16 @@ BTextView::_DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 
 
 void
-BTextView::_DoDeleteText(int32 fromOffset, int32 toOffset, _BTextChangeResult_ *outResult)
+BTextView::_DoDeleteText(int32 fromOffset, int32 toOffset)
 {
 	CALLED();
 }
 
 
 void
-BTextView::_DrawLine(BView *view, const int32 &lineNum, const int32 &startOffset,
-			const bool &erase, BRect &eraseRect, BRegion &inputRegion)
+BTextView::_DrawLine(BView *view, const int32 &lineNum,
+	const int32 &startOffset, const bool &erase, BRect &eraseRect,
+	BRegion &inputRegion)
 {
 	STELine *line = (*fLines)[lineNum];
 	float startLeft = fTextRect.left;
@@ -3698,13 +3836,16 @@ BTextView::_DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 	}
 
 	BRegion inputRegion;
-	if (fInline != NULL && fInline->IsActive())
-		GetTextRegion(fInline->Offset(), fInline->Offset() + fInline->Length(), &inputRegion);
+	if (fInline != NULL && fInline->IsActive()) {
+		GetTextRegion(fInline->Offset(), fInline->Offset() + fInline->Length(),
+			&inputRegion);
+	}
 	
 	//BPoint leftTop(startLeft, line->origin);
 	for (int32 lineNum = startLine; lineNum <= endLine; lineNum++) {
 		const bool eraseThisLine = erase && lineNum >= startEraseLine;
-		_DrawLine(view, lineNum, startOffset, eraseThisLine, eraseRect, inputRegion);
+		_DrawLine(view, lineNum, startOffset, eraseThisLine, eraseRect,
+			inputRegion);
 		startOffset = -1;
 			// Set this to -1 so the next iteration will use the line offset
 	}
@@ -3776,8 +3917,8 @@ BTextView::_InvertCaret()
 
 
 /*! \brief Place the dragging caret at the given offset.
-	\param offset The offset (zero based within the object's text) where to place
-	the dragging caret. If it's -1, hide the caret.
+	\param offset The offset (zero based within the object's text) where to
+		place the dragging caret. If it's -1, hide the caret.
 */
 void
 BTextView::_DragCaret(int32 offset)
@@ -3852,13 +3993,16 @@ BTextView::_PerformMouseMoved(BPoint where, uint32 code)
 	switch (fClickCount) {
 		case 0:
 			// triple click, select line by line
-			fTrackingMouse->selStart = (*fLines)[LineAt(fTrackingMouse->selStart)]->offset;
-			fTrackingMouse->selEnd = (*fLines)[LineAt(fTrackingMouse->selEnd) + 1]->offset;
+			fTrackingMouse->selStart
+				= (*fLines)[LineAt(fTrackingMouse->selStart)]->offset;
+			fTrackingMouse->selEnd
+				= (*fLines)[LineAt(fTrackingMouse->selEnd) + 1]->offset;
 			break;
 
 		case 2:
 			// double click, select word by word
-			FindWord(currentOffset, &fTrackingMouse->selStart, &fTrackingMouse->selEnd);
+			FindWord(currentOffset, &fTrackingMouse->selStart,
+				&fTrackingMouse->selEnd);
 			break;
 
 		default:
@@ -3986,16 +4130,18 @@ BTextView::_MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 	
 	ssize_t dataLen = 0;
 	const char *text = NULL;
-	if (inMessage->FindData("text/plain", B_MIME_TYPE, (const void **)&text, &dataLen) == B_OK) {	
+	if (inMessage->FindData("text/plain", B_MIME_TYPE, (const void **)&text,
+			&dataLen) == B_OK) {	
 		text_run_array *runArray = NULL;
 		ssize_t runLen = 0;
 		if (fStylable)
-			inMessage->FindData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
-					(const void **)&runArray, &runLen);
+			inMessage->FindData("application/x-vnd.Be-text_run_array",
+				B_MIME_TYPE, (const void **)&runArray, &runLen);
 		
 		if (fUndo) {
 			delete fUndo;
-			fUndo = new _BDropUndoBuffer_(this, text, dataLen, runArray, runLen, dropOffset, internalDrop);
+			fUndo = new _BDropUndoBuffer_(this, text, dataLen, runArray,
+				runLen, dropOffset, internalDrop);
 		}
 		
 		if (internalDrop) {
@@ -4044,7 +4190,8 @@ BTextView::_PerformAutoScrolling()
 	// Always scroll vertically line by line or by multiples of that
 	// based on the distance of the cursor from the border of the view
 	// TODO: Refine this, I can't even remember how beos works here
-	scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(vertDiff) / lineHeight) : 0;
+	scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(vertDiff)
+		/ lineHeight) : 0;
 	
 	if (bounds.bottom + scrollBy.y > fTextRect.Height())
 		scrollBy.y = fTextRect.Height() - bounds.bottom;
@@ -4112,7 +4259,7 @@ BTextView::_AutoResize(bool redraw)
 		return;
 
 	if (fContainerView != NULL) {
-		// NOTE: This container view thing is only used by Tracker
+		// NOTE: This container view thing is only used by Tracker.
 		// move container view if not left aligned
 		if (fAlignment == B_ALIGN_CENTER) {
 			if (fmod(ceilf(newWidth - oldWidth), 2.0) != 0.0)
@@ -4132,7 +4279,8 @@ BTextView::_AutoResize(bool redraw)
 
 	// erase any potential left over outside the text rect
 	// (can only be on right hand side)
-	BRect dirty(fTextRect.right + 1, fTextRect.top, bounds.right, fTextRect.bottom);
+	BRect dirty(fTextRect.right + 1, fTextRect.top, bounds.right,
+		fTextRect.bottom);
 	if (dirty.IsValid()) {
 		SetLowColor(ViewColor());
 		FillRect(dirty, B_SOLID_LOW);
@@ -4319,7 +4467,8 @@ BTextView::_CharClassification(int32 offset) const
 }
 
 
-/*! \brief Returns the offset of the next UTF8 character within the BTextView's text.
+/*! \brief Returns the offset of the next UTF8 character within the BTextView's
+		text.
 	\param offset The offset where to start looking.
 	\return The offset of the next UTF8 character.
 */
@@ -4337,7 +4486,8 @@ BTextView::_NextInitialByte(int32 offset) const
 }
 
 
-/*! \brief Returns the offset of the previous UTF8 character within the BTextView's text.
+/*! \brief Returns the offset of the previous UTF8 character within the
+		BTextView's text.
 	\param offset The offset where to start looking.
 	\return The offset of the previous UTF8 character.
 */
@@ -4359,7 +4509,8 @@ BTextView::_PreviousInitialByte(int32 offset) const
 
 
 bool
-BTextView::_GetProperty(BMessage *specifier, int32 form, const char *property, BMessage *reply)
+BTextView::_GetProperty(BMessage *specifier, int32 form, const char *property,
+	BMessage *reply)
 {
 	CALLED();
 	if (strcmp(property, "selection") == 0) {
@@ -4470,9 +4621,9 @@ BTextView::_HandleInputMethodChanged(BMessage *message)
 	be_app->ObscureCursor();
 
 	// If we find the "be:confirmed" boolean (and the boolean is true),
-	// it means it's over for now, so the current _BInlineInput_ object
-	// should become inactive. We will probably receive a B_INPUT_METHOD_STOPPED
-	// message after this one.
+	// it means it's over for now, so the current InlineInput object
+	// should become inactive. We will probably receive a
+	// B_INPUT_METHOD_STOPPED message after this one.
 	bool confirmed;
 	if (message->FindBool("be:confirmed", &confirmed) != B_OK)
 		confirmed = false;
@@ -4495,15 +4646,17 @@ BTextView::_HandleInputMethodChanged(BMessage *message)
 	if (!confirmed && !fInline->IsActive())
 		fInline->SetActive(true);
 
-	// Get the clauses, and pass them to the _BInlineInput_ object
-	// TODO: Find out if what we did it's ok, currently we don't consider clauses
-	// at all, while the bebook says we should; though the visual effect we obtained
-	// seems correct. Weird.
+	// Get the clauses, and pass them to the InlineInput object
+	// TODO: Find out if what we did it's ok, currently we don't consider
+	// clauses at all, while the bebook says we should; though the visual
+	// effect we obtained seems correct. Weird.
 	int32 clauseCount = 0;
 	int32 clauseStart;
 	int32 clauseEnd;
-	while (message->FindInt32("be:clause_start", clauseCount, &clauseStart) == B_OK &&
-			message->FindInt32("be:clause_end", clauseCount, &clauseEnd) == B_OK) {
+	while (message->FindInt32("be:clause_start", clauseCount, &clauseStart)
+			== B_OK
+		&& message->FindInt32("be:clause_end", clauseCount, &clauseEnd)
+			== B_OK) {
 		if (!fInline->AddClause(clauseStart, clauseEnd))
 			break;
 		clauseCount++;	
@@ -4566,11 +4719,12 @@ BTextView::_CancelInputMethod()
 	if (!fInline)
 		return;
 
-	_BInlineInput_ *inlineInput = fInline;
+	InlineInput *inlineInput = fInline;
 	fInline = NULL;
 
 	if (inlineInput->IsActive() && Window()) {
-		_Refresh(inlineInput->Offset(), fText->Length() - inlineInput->Offset(), true, false);
+		_Refresh(inlineInput->Offset(), fText->Length() - inlineInput->Offset(),
+			true, false);
 
 		BMessage message(B_INPUT_METHOD_EVENT);
 		message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
@@ -4581,30 +4735,10 @@ BTextView::_CancelInputMethod()
 }
 
 
-/*! \brief Locks the static _BWidthBuffer_ object to be able to access it safely.
-*/
-void
-BTextView::LockWidthBuffer()
-{
-	if (atomic_add(&sWidthAtom, 1) > 0) {
-		while (acquire_sem(sWidthSem) == B_INTERRUPTED)
-			;
-	}
-}
+// #pragma mark - BTextView::TextTrackState
 
 
-/*! \brief Unlocks the static _BWidthBuffer_ object.
-*/
-void
-BTextView::UnlockWidthBuffer()
-{
-	if (atomic_add(&sWidthAtom, -1) > 1)
-		release_sem(sWidthSem);
-}
-
-
-// _BTextTrackState_
-_BTextTrackState_::_BTextTrackState_(BMessenger messenger)
+BTextView::TextTrackState::TextTrackState(BMessenger messenger)
 	:
 	clickOffset(0),
 	shiftDown(false),
@@ -4618,14 +4752,14 @@ _BTextTrackState_::_BTextTrackState_(BMessenger messenger)
 }
 
 
-_BTextTrackState_::~_BTextTrackState_()
+BTextView::TextTrackState::~TextTrackState()
 {
 	delete fRunner;
 }
 
 
 void
-_BTextTrackState_::SimulateMouseMovement(BTextView *textView)
+BTextView::TextTrackState::SimulateMouseMovement(BTextView *textView)
 {
 	BPoint where;
 	ulong buttons;

@@ -23,10 +23,10 @@ struct clause
 };
 
 
-/*! \brief Constructs a _BInlineInput_ object.
+/*! \brief Constructs a InlineInput object.
 	\param messenger The BMessenger of the input server method addon.
 */
-_BInlineInput_::_BInlineInput_(BMessenger messenger)
+BTextView::InlineInput::InlineInput(BMessenger messenger)
 	:
 	fMessenger(messenger),
 	fActive(false),
@@ -42,7 +42,7 @@ _BInlineInput_::_BInlineInput_(BMessenger messenger)
 
 /*! \brief Destructs the object, free the allocated memory.
 */
-_BInlineInput_::~_BInlineInput_()
+BTextView::InlineInput::~InlineInput()
 {
 	ResetClauses();
 }
@@ -52,21 +52,21 @@ _BInlineInput_::~_BInlineInput_()
 	which requested the transaction.
 */
 const BMessenger *
-_BInlineInput_::Method() const
+BTextView::InlineInput::Method() const
 {
 	return &fMessenger;
 }
 
 
 bool
-_BInlineInput_::IsActive() const
+BTextView::InlineInput::IsActive() const
 {
 	return fActive;
 }
 
 
 void
-_BInlineInput_::SetActive(bool active)
+BTextView::InlineInput::SetActive(bool active)
 {
 	fActive = active;
 }
@@ -75,7 +75,7 @@ _BInlineInput_::SetActive(bool active)
 /*! \brief Return the length of the inputted text.
 */
 int32
-_BInlineInput_::Length() const
+BTextView::InlineInput::Length() const
 {
 	return fLength;
 }
@@ -86,7 +86,7 @@ _BInlineInput_::Length() const
 	B_INPUT_METHOD_CHANGED BMessage.
 */
 void
-_BInlineInput_::SetLength(int32 len)
+BTextView::InlineInput::SetLength(int32 len)
 {
 	fLength = len;
 }
@@ -95,7 +95,7 @@ _BInlineInput_::SetLength(int32 len)
 /*! \brief Returns the offset into the BTextView of the text.
 */
 int32
-_BInlineInput_::Offset() const
+BTextView::InlineInput::Offset() const
 {
 	return fOffset;
 }
@@ -105,7 +105,7 @@ _BInlineInput_::Offset() const
 	\param offset The offset where the text has been inserted.
 */
 void
-_BInlineInput_::SetOffset(int32 offset)
+BTextView::InlineInput::SetOffset(int32 offset)
 {
 	fOffset = offset;
 }
@@ -114,7 +114,7 @@ _BInlineInput_::SetOffset(int32 offset)
 /*! \brief Returns the length of the selection, if any.
 */
 int32
-_BInlineInput_::SelectionLength() const
+BTextView::InlineInput::SelectionLength() const
 {
 	return fSelectionLength;
 }
@@ -124,7 +124,7 @@ _BInlineInput_::SelectionLength() const
 	\param length The length of the selection.
 */
 void
-_BInlineInput_::SetSelectionLength(int32 length)
+BTextView::InlineInput::SetSelectionLength(int32 length)
 {
 	fSelectionLength = length;
 }
@@ -133,7 +133,7 @@ _BInlineInput_::SetSelectionLength(int32 length)
 /*! \brief Returns the offset into the method string of the selection.
 */
 int32
-_BInlineInput_::SelectionOffset() const
+BTextView::InlineInput::SelectionOffset() const
 {
 	return fSelectionOffset;
 }
@@ -143,7 +143,7 @@ _BInlineInput_::SelectionOffset() const
 	\param offset The offset where the selection starts.
 */
 void
-_BInlineInput_::SetSelectionOffset(int32 offset)
+BTextView::InlineInput::SetSelectionOffset(int32 offset)
 {
 	fSelectionOffset = offset;
 }
@@ -154,7 +154,7 @@ _BInlineInput_::SetSelectionOffset(int32 offset)
 	\param end The offset into the string where the clause finishes.
 */
 bool
-_BInlineInput_::AddClause(int32 start, int32 end)
+BTextView::InlineInput::AddClause(int32 start, int32 end)
 {
 	void *newData = realloc(fClauses, (fNumClauses + 1) * sizeof(clause));
 	if (newData == NULL)
@@ -175,7 +175,7 @@ _BInlineInput_::AddClause(int32 start, int32 end)
 	\return \c true if the clause exists, \c false if not.
 */
 bool
-_BInlineInput_::GetClause(int32 index, int32 *start, int32 *end) const
+BTextView::InlineInput::GetClause(int32 index, int32 *start, int32 *end) const
 {
 	bool result = false;
 	if (index >= 0 && index < fNumClauses) {
@@ -192,7 +192,7 @@ _BInlineInput_::GetClause(int32 index, int32 *start, int32 *end) const
 
 
 int32
-_BInlineInput_::CountClauses() const
+BTextView::InlineInput::CountClauses() const
 {
 	return fNumClauses;
 }
@@ -201,7 +201,7 @@ _BInlineInput_::CountClauses() const
 /*! \brief Deletes any added clause.
 */
 void
-_BInlineInput_::ResetClauses()
+BTextView::InlineInput::ResetClauses()
 {
 	fNumClauses = 0;
 	free(fClauses);

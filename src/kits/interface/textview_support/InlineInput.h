@@ -10,12 +10,14 @@
 #define __INLINEINPUT_H
 
 #include <Messenger.h>
+#include <TextView.h>
 
 struct clause;
-class _BInlineInput_ {
+
+class BTextView::InlineInput {
 public:
-	_BInlineInput_(BMessenger);
-	~_BInlineInput_();
+	InlineInput(BMessenger);
+	~InlineInput();
 	
 	const BMessenger *Method() const;
 	

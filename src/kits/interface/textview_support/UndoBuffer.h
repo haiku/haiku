@@ -14,10 +14,10 @@
 
 class BClipboard;
 
-class _BUndoBuffer_ {
+class BTextView::UndoBuffer {
 public:
-	_BUndoBuffer_(BTextView *, undo_state);
-	virtual ~_BUndoBuffer_();
+	UndoBuffer(BTextView *, undo_state);
+	virtual ~UndoBuffer();
 
 	void Undo(BClipboard *);
 	undo_state State(bool *);
@@ -43,7 +43,7 @@ private:
 
 
 //  ******** _BCutUndoBuffer_ *******
-class _BCutUndoBuffer_ : public _BUndoBuffer_ {
+class _BCutUndoBuffer_ : public BTextView::UndoBuffer {
 public:
 	_BCutUndoBuffer_(BTextView *textView);
 	~_BCutUndoBuffer_();
@@ -54,7 +54,7 @@ protected:
 
 
 //  ******** _BPasteUndoBuffer_ *******
-class _BPasteUndoBuffer_ : public _BUndoBuffer_ {
+class _BPasteUndoBuffer_ : public BTextView::UndoBuffer {
 public:
 	_BPasteUndoBuffer_(BTextView *, const char *, int32, text_run_array *, int32);
 	~_BPasteUndoBuffer_();
@@ -71,7 +71,7 @@ private:
 
 
 //  ******** _BClearUndoBuffer_ *******
-class _BClearUndoBuffer_ : public _BUndoBuffer_ {
+class _BClearUndoBuffer_ : public BTextView::UndoBuffer {
 public:
 	_BClearUndoBuffer_(BTextView *textView);
 	~_BClearUndoBuffer_();
@@ -82,7 +82,7 @@ protected:
 
 
 //  ******** _BDropUndoBuffer_ ********
-class _BDropUndoBuffer_ : public _BUndoBuffer_ {
+class _BDropUndoBuffer_ : public BTextView::UndoBuffer {
 public:
 	_BDropUndoBuffer_(BTextView *, char const *, int32, text_run_array *, int32, int32, bool);
 	~_BDropUndoBuffer_();
@@ -102,7 +102,7 @@ private:
 
 
 //  ******** _BTypingUndoBuffer_ ********
-class _BTypingUndoBuffer_ : public _BUndoBuffer_ {
+class _BTypingUndoBuffer_ : public BTextView::UndoBuffer {
 public:
 	_BTypingUndoBuffer_(BTextView *);
 	~_BTypingUndoBuffer_();

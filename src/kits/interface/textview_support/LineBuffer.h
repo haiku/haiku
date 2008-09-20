@@ -7,6 +7,8 @@
  */
 
 #include <SupportDefs.h>
+#include <TextView.h>
+
 #include "TextViewSupportBuffer.h"
 
 struct STELine {
@@ -17,12 +19,11 @@ struct STELine {
 };
 
 
-// _BLineBuffer_ class ---------------------------------------------------------
-class _BLineBuffer_ : public _BTextViewSupportBuffer_<STELine> {
+class BTextView::LineBuffer : public _BTextViewSupportBuffer_<STELine> {
 
 public:
-						_BLineBuffer_();
-virtual					~_BLineBuffer_();
+						LineBuffer();
+virtual					~LineBuffer();
 
 		void			InsertLine(STELine *inLine, int32 index);
 		void			RemoveLines(int32 index, int32 count = 1);
@@ -40,14 +41,14 @@ virtual					~_BLineBuffer_();
 
 
 inline int32
-_BLineBuffer_::NumLines() const
+BTextView::LineBuffer::NumLines() const
 {
 	return fItemCount - 1;
 }
 
 
 inline STELine *
-_BLineBuffer_::operator[](int32 index) const
+BTextView::LineBuffer::operator[](int32 index) const
 {
 	return &fBuffer[index];
 }

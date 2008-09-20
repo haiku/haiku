@@ -83,11 +83,11 @@ All rights reserved.
 #include "InfoWindow.h"
 #include "Utilities.h"
 #include "Tests.h"
-#include "TextViewSupport.h"
 #include "Thread.h"
 #include "Tracker.h"
 #include "TrackerString.h"
 #include "WidgetAttributeText.h"
+#include "WidthBuffer.h"
 
 
 using std::min;
@@ -9306,7 +9306,7 @@ TPoseViewFilter::Filter(BMessage *message, BHandler **)
 float BPoseView::sFontHeight = -1;
 font_height BPoseView::sFontInfo = { 0, 0, 0 };
 bigtime_t BPoseView::sLastKeyTime = 0;
-_BWidthBuffer_* BPoseView::sWidthBuffer = new _BWidthBuffer_;
+BTextView::WidthBuffer* BPoseView::sWidthBuffer = new BTextView::WidthBuffer;
 BFont BPoseView::sCurrentFont;
 OffscreenBitmap *BPoseView::sOffscreen = new OffscreenBitmap;
 char BPoseView::sMatchString[] = "";

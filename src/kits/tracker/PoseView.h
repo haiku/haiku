@@ -63,7 +63,8 @@ class BRefFilter;
 class BList;
 
 // TODO: Get rid of this.
-class _BWidthBuffer_;
+#include <TextView.h>
+	// for BTextView::WidthBuffer;
 
 namespace BPrivate {
 
@@ -351,7 +352,7 @@ class BPoseView : public BView {
 			BMessage *specifier, int32 form, const char	*property);
 		virtual status_t GetSupportedSuites(BMessage *);
 
-		// string width calls that use local width caches, faster than usin
+		// string width calls that use local width caches, faster than using
 		// the general purpose BView::StringWidth
 		float StringWidth(const char *) const;
 		float StringWidth(const char *, int32) const;
@@ -664,7 +665,7 @@ class BPoseView : public BView {
 		BRect fDeskbarFrame;
 
 		// TODO: Get rid of this.
-		static _BWidthBuffer_ *sWidthBuffer;
+		static BTextView::WidthBuffer *sWidthBuffer;
 
 		static OffscreenBitmap *sOffscreen;
 

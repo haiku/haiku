@@ -21,16 +21,20 @@
  *
  * File:		WidthBuffer.cpp
  * Author:		Stefano Ceccherini (burton666@libero.it)
- * Description: _BWidthBuffer_ stores charachters widths in a hash table, to be able
+ * Description: WidthBuffer stores charachters widths in a hash table, to be able
  *				to retrieve them without passing through the app server.
  *				Used by BTextView and OpenTracker.
  */
 #ifndef __WIDTHBUFFER_H
 #define __WIDTHBUFFER_H
 
+#include <TextView.h>
+
 #include "TextViewSupportBuffer.h"
 
-class BFont; // forward declaration
+
+class BFont;
+
 
 // TODO: enable this as soon as we are sure opentracker works
 // with our libraries, since using a BFont here (as Dano does) is much better,
@@ -50,16 +54,15 @@ struct _width_table_ {
 };
 
 
-class _BTextGapBuffer_;
-class _BWidthBuffer_ : public _BTextViewSupportBuffer_<_width_table_> {
+class BTextView::WidthBuffer : public _BTextViewSupportBuffer_<_width_table_> {
 public:
-	_BWidthBuffer_();
-	virtual ~_BWidthBuffer_();
+	WidthBuffer();
+	virtual ~WidthBuffer();
 
 	float StringWidth(const char *inText, int32 fromOffset, int32 length,
 		const BFont *inStyle);
-	float StringWidth(_BTextGapBuffer_ &gapBuffer, int32 fromOffset, int32 length,
-		const BFont *inStyle);
+	float StringWidth(BTextView::TextGapBuffer &gapBuffer, int32 fromOffset,
+		int32 length, const BFont *inStyle);
 
 private:
 	bool FindTable(const BFont *font, int32 *outIndex);

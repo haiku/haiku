@@ -13,14 +13,17 @@
 #include "TextGapBuffer.h"
 #include "WidthBuffer.h"
 
+#include <Autolock.h>
 #include <Debug.h>
 #include <Font.h>
+#include <Locker.h>
 
 #include <stdio.h>
 
 
 const static uint32 kTableCount = 128;
 const static uint32 kInvalidCode = 0xFFFFFFFF;
+static BLocker sWidthLocker = BLocker("width buffer lock");
 
 
 struct hashed_escapement {
@@ -56,7 +59,7 @@ CharToCode(const char *text, const int32 charLen)
 
 /*! \brief Initializes the object.
 */
-_BWidthBuffer_::_BWidthBuffer_()
+BTextView::WidthBuffer::WidthBuffer()
 	:
 	_BTextViewSupportBuffer_<_width_table_>(1, 0)
 {
@@ -65,7 +68,7 @@ _BWidthBuffer_::_BWidthBuffer_()
 
 /*! \brief Frees the allocated resources.
 */
-_BWidthBuffer_::~_BWidthBuffer_()
+BTextView::WidthBuffer::~WidthBuffer()
 {
 	for (int32 x = 0; x < fItemCount; x++)
 		delete[] (hashed_escapement *)fBuffer[x].widths;
@@ -80,11 +83,13 @@ _BWidthBuffer_::~_BWidthBuffer_()
 	\return The space (in pixels) required to draw the given string.
 */
 float
-_BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
-		const BFont *inStyle)
+BTextView::WidthBuffer::StringWidth(const char *inText, int32 fromOffset,
+	int32 length, const BFont *inStyle)
 {
 	if (inText == NULL || length == 0)
 		return 0;
+
+	BAutolock _(sWidthLocker);
 
 	int32 index = 0;
 	if (!FindTable(inStyle, &index))
@@ -137,14 +142,14 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 
 
 /*! \brief Returns how much room is required to draw a string in the font.
-	\param inBuffer The _BTextGapBuffer_ to be examined.
-	\param fromOffset The offset in the _BTextGapBuffer_ where to begin the examination.
+	\param inBuffer The BTextView::TextGapBuffer to be examined.
+	\param fromOffset The offset in the BTextView::TextGapBuffer where to begin the examination.
 	\param lenght The amount of bytes to be examined.
 	\param inStyle The font.
 	\return The space (in pixels) required to draw the given string.
 */
 float
-_BWidthBuffer_::StringWidth(_BTextGapBuffer_ &inBuffer, int32 fromOffset, int32 length,
+BTextView::WidthBuffer::StringWidth(BTextView::TextGapBuffer &inBuffer, int32 fromOffset, int32 length,
 		const BFont *inStyle)
 {
 	const char* text = inBuffer.GetString(fromOffset, &length);
@@ -160,7 +165,7 @@ _BWidthBuffer_::StringWidth(_BTextGapBuffer_ &inBuffer, int32 fromOffset, int32 
 		\c false if not.
 */
 bool
-_BWidthBuffer_::FindTable(const BFont *inStyle, int32 *outIndex)
+BTextView::WidthBuffer::FindTable(const BFont *inStyle, int32 *outIndex)
 {
 	if (inStyle == NULL)
 		return false;
@@ -194,7 +199,7 @@ _BWidthBuffer_::FindTable(const BFont *inStyle, int32 *outIndex)
 	\return The index of the newly created table.
 */
 int32
-_BWidthBuffer_::InsertTable(const BFont *font)
+BTextView::WidthBuffer::InsertTable(const BFont *font)
 {
 	_width_table_ table;
 	
@@ -225,7 +230,7 @@ _BWidthBuffer_::InsertTable(const BFont *font)
 		for the given charachter, \c false if not.
 */
 bool 
-_BWidthBuffer_::GetEscapement(uint32 value, int32 index, float *escapement)
+BTextView::WidthBuffer::GetEscapement(uint32 value, int32 index, float *escapement)
 {
 	const _width_table_ &table = fBuffer[index];	
 	const hashed_escapement *widths = static_cast<hashed_escapement *>(table.widths);
@@ -251,7 +256,7 @@ _BWidthBuffer_::GetEscapement(uint32 value, int32 index, float *escapement)
 
 
 uint32
-_BWidthBuffer_::Hash(uint32 val)
+BTextView::WidthBuffer::Hash(uint32 val)
 {
 	uint32 shifted = val >> 24;
 	uint32 result = (val >> 15) + (shifted * 3);	
@@ -275,7 +280,7 @@ _BWidthBuffer_::Hash(uint32 val)
 		the size of the font).
 */
 float
-_BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLen,
+BTextView::WidthBuffer::HashEscapements(const char *inText, int32 numChars, int32 textLen,
 		int32 tableIndex, const BFont *inStyle)
 {
 	ASSERT(inText != NULL);

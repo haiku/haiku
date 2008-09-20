@@ -19,7 +19,7 @@
 #include "TextGapBuffer.h"
 
 
-_BTextGapBuffer_::_BTextGapBuffer_()
+BTextView::TextGapBuffer::TextGapBuffer()
 	:	fExtraCount(2048),
 		fItemCount(0),
 		fBuffer(NULL),
@@ -35,7 +35,7 @@ _BTextGapBuffer_::_BTextGapBuffer_()
 }
 
 
-_BTextGapBuffer_::~_BTextGapBuffer_()
+BTextView::TextGapBuffer::~TextGapBuffer()
 {
 	free(fBuffer);
 	free(fScratchBuffer);
@@ -43,7 +43,7 @@ _BTextGapBuffer_::~_BTextGapBuffer_()
 
 
 void
-_BTextGapBuffer_::InsertText(const char *inText, int32 inNumItems, int32 inAtIndex)
+BTextView::TextGapBuffer::InsertText(const char *inText, int32 inNumItems, int32 inAtIndex)
 {
 	if (inNumItems < 1)
 		return;
@@ -66,7 +66,7 @@ _BTextGapBuffer_::InsertText(const char *inText, int32 inNumItems, int32 inAtInd
 
 
 void
-_BTextGapBuffer_::InsertText(BFile *file, int32 fileOffset, int32 inNumItems, int32 inAtIndex)
+BTextView::TextGapBuffer::InsertText(BFile *file, int32 fileOffset, int32 inNumItems, int32 inAtIndex)
 {
 	off_t fileSize;
 
@@ -102,7 +102,7 @@ _BTextGapBuffer_::InsertText(BFile *file, int32 fileOffset, int32 inNumItems, in
 
 
 void
-_BTextGapBuffer_::RemoveRange(int32 start, int32 end)
+BTextView::TextGapBuffer::RemoveRange(int32 start, int32 end)
 {
 	long inAtIndex = start;
 	long inNumItems = end - start;
@@ -124,7 +124,7 @@ _BTextGapBuffer_::RemoveRange(int32 start, int32 end)
 
 
 void
-_BTextGapBuffer_::MoveGapTo(int32 toIndex)
+BTextView::TextGapBuffer::MoveGapTo(int32 toIndex)
 {
 	if (toIndex == fGapIndex)
 		return;
@@ -153,7 +153,7 @@ _BTextGapBuffer_::MoveGapTo(int32 toIndex)
 
 
 void
-_BTextGapBuffer_::SizeGapTo(long inCount)
+BTextView::TextGapBuffer::SizeGapTo(long inCount)
 {
 	if (inCount == fGapCount)
 		return;
@@ -169,7 +169,7 @@ _BTextGapBuffer_::SizeGapTo(long inCount)
 
 
 const char *
-_BTextGapBuffer_::GetString(int32 fromOffset, int32 *_numBytes)
+BTextView::TextGapBuffer::GetString(int32 fromOffset, int32 *_numBytes)
 {
 	char *result = "";
 	if (_numBytes == NULL)
@@ -226,7 +226,7 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 *_numBytes)
 
 
 bool 
-_BTextGapBuffer_::FindChar(char inChar, long fromIndex, long *ioDelta)
+BTextView::TextGapBuffer::FindChar(char inChar, long fromIndex, long *ioDelta)
 {
 	long numChars = *ioDelta;
 	for (long i = 0; i < numChars; i++) {
@@ -244,7 +244,7 @@ _BTextGapBuffer_::FindChar(char inChar, long fromIndex, long *ioDelta)
 
 
 const char *
-_BTextGapBuffer_::Text()
+BTextView::TextGapBuffer::Text()
 {
 	const char *realText = RealText();
 	
@@ -273,7 +273,7 @@ _BTextGapBuffer_::Text()
 
 
 const char *
-_BTextGapBuffer_::RealText()
+BTextView::TextGapBuffer::RealText()
 {
 	MoveGapTo(fItemCount);
 	fBuffer[fItemCount] = '\0';
@@ -283,7 +283,7 @@ _BTextGapBuffer_::RealText()
 
 
 void
-_BTextGapBuffer_::GetString(int32 offset, int32 length, char *buffer)
+BTextView::TextGapBuffer::GetString(int32 offset, int32 length, char *buffer)
 {
 	if (buffer == NULL)
 		return;
@@ -324,14 +324,14 @@ _BTextGapBuffer_::GetString(int32 offset, int32 length, char *buffer)
 
 
 bool
-_BTextGapBuffer_::PasswordMode() const
+BTextView::TextGapBuffer::PasswordMode() const
 {
 	return fPasswordMode;
 }
 
 
 void
-_BTextGapBuffer_::SetPasswordMode(bool state)
+BTextView::TextGapBuffer::SetPasswordMode(bool state)
 {
 	fPasswordMode = state;
 }
