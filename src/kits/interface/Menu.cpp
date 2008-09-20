@@ -1743,6 +1743,9 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 	if (index < 0 || index > fItems.CountItems())
 		return false;
 
+	if (item->IsMarked())
+		_ItemMarked(item);
+
 	if (!fItems.AddItem(item, index))
 		return false;
 
