@@ -65,6 +65,9 @@ HAIKU_IMAGE_NAME	= walter.image ;
 HAIKU_IMAGE_DIR		= /tmp ;
 HAIKU_IMAGE_SIZE	= 100 ;
 
+# Set image volume label to "Walter". Default label is "Haiku".
+HAIKU_IMAGE_LABEL	= Walter ;
+
 # Name the VMWare image walter.vmdk (in directory $(HAIKU_IMAGE_DIR)).
 HAIKU_VMWARE_IMAGE_NAME	= walter.vmdk ;
 
