@@ -232,7 +232,7 @@ public:
 		fImage(image),
 		fSymbolHits(NULL),
 		fTotalHits(0),
-		fMissedTicks(0)
+		fUnknownHits(0)
 	{
 		fImage->AddReference();
 	}
@@ -270,7 +270,7 @@ public:
 		if (symbolIndex >= 0)
 			fSymbolHits[symbolIndex]++;
 		else
-			fMissedTicks++;
+			fUnknownHits++;
 
 		fTotalHits++;
 	}
@@ -290,16 +290,16 @@ public:
 		return fTotalHits;
 	}
 
-	int64 MissedHits() const
+	int64 UnknownHits() const
 	{
-		return fMissedTicks;
+		return fUnknownHits;
 	}
 
 private:
 	Image*	fImage;
 	int64*	fSymbolHits;
 	int64	fTotalHits;
-	int64	fMissedTicks;
+	int64	fUnknownHits;
 };
 
 
@@ -313,8 +313,9 @@ public:
 		fSamples(NULL),
 		fImages(),
 		fOldImages(),
-		fTotalHits(0),
-		fMissedTicks(0),
+		fTotalTicks(0),
+		fUnkownTicks(0),
+		fDroppedTicks(0),
 		fInterval(1)
 	{
 	}
@@ -395,7 +396,7 @@ public:
 		return NULL;
 	}
 
-	void AddSamples(int32 count, int32 stackDepth, int32 event)
+	void AddSamples(int32 count, int32 dropped, int32 stackDepth, int32 event)
 	{
 		_RemoveObsoleteImages(event);
 
@@ -424,10 +425,11 @@ public:
 			}
 
 			if (image == NULL)
-				fMissedTicks++;
+				fUnkownTicks++;
 		}
 
-		fTotalHits += count / stackDepth;
+		fTotalTicks += count / stackDepth;
+		fDroppedTicks += dropped;
 
 		// re-add the new images
 		fImages.MoveFrom(&newImages);
@@ -445,7 +447,7 @@ public:
 		while (ThreadImage* image = it.Next()) {
 			if (image->TotalHits() > 0) {
 				imageCount++;
-				if (image->TotalHits() > image->MissedHits())
+				if (image->TotalHits() > image->UnknownHits())
 					symbolCount += image->GetImage()->SymbolCount();
 			}
 		}
@@ -454,7 +456,7 @@ public:
 		while (ThreadImage* image = it.Next()) {
 			if (image->TotalHits() > 0) {
 				imageCount++;
-				if (image->TotalHits() > image->MissedHits())
+				if (image->TotalHits() > image->UnknownHits())
 					symbolCount += image->GetImage()->SymbolCount();
 			}
 		}
@@ -480,7 +482,7 @@ public:
 
 		for (int32 k = 0; k < imageCount; k++) {
 			ThreadImage* image = images[k];
-			if (image->TotalHits() > image->MissedHits()) {
+			if (image->TotalHits() > image->UnknownHits()) {
 				Symbol** symbols = image->GetImage()->Symbols();
 				const int64* symbolHits = image->SymbolHits();
 				int32 imageSymbolCount = image->GetImage()->SymbolCount();
@@ -497,16 +499,19 @@ public:
 		if (hitSymbolCount > 1)
 			std::sort(hitSymbols, hitSymbols + hitSymbolCount);
 
-		int64 totalTicks = fTotalHits;
+		int64 totalTicks = fTotalTicks;
 		printf("\nprofiling results for thread \"%s\" (%ld):\n", Name(), ID());
-		printf("  tick interval: %lld us\n", fInterval);
-		printf("  total ticks:   %lld (%lld us)\n", totalTicks,
+		printf("  tick interval:  %lld us\n", fInterval);
+		printf("  total ticks:    %lld (%lld us)\n", totalTicks,
 			totalTicks * fInterval);
 		if (totalTicks == 0)
 			totalTicks = 1;
-		printf("  missed ticks:  %lld (%lld us, %6.2f%%)\n",
-			fMissedTicks, fMissedTicks * fInterval,
-			100.0 * fMissedTicks / totalTicks);
+		printf("  unknown ticks:  %lld (%lld us, %6.2f%%)\n",
+			fUnkownTicks, fUnkownTicks * fInterval,
+			100.0 * fUnkownTicks / totalTicks);
+		printf("  dropped ticks:  %lld (%lld us, %6.2f%%)\n",
+			fDroppedTicks, fDroppedTicks * fInterval,
+			100.0 * fDroppedTicks / totalTicks);
 
 		if (imageCount > 0) {
 			printf("\n");
@@ -517,7 +522,7 @@ public:
 				ThreadImage* image = images[k];
 				const image_info& imageInfo = image->GetImage()->Info();
 				printf("  %10lld  %10lld  %7ld %s\n", image->TotalHits(),
-					image->MissedHits(), imageInfo.id, imageInfo.name);
+					image->UnknownHits(), imageInfo.id, imageInfo.name);
 			}
 		}
 
@@ -577,8 +582,9 @@ private:
 	addr_t*		fSamples;
 	ImageList	fImages;
 	ImageList	fOldImages;
-	int64		fTotalHits;
-	int64		fMissedTicks;
+	int64		fTotalTicks;
+	int64		fUnkownTicks;
+	int64		fDroppedTicks;
 	bigtime_t	fInterval;
 };
 
@@ -1136,6 +1142,7 @@ main(int argc, const char* const* argv)
 					break;
 
 				thread->AddSamples(message.profiler_update.sample_count,
+					message.profiler_update.dropped_ticks,
 					message.profiler_update.stack_depth,
 					message.profiler_update.image_event);
 
