@@ -309,6 +309,9 @@ struct thread {
 	bigtime_t		kernel_time;
 	bigtime_t		last_time;
 
+	void			(*post_interrupt_callback)(void*);
+	void*			post_interrupt_data;
+
 	// architecture dependant section
 	struct arch_thread arch_info;
 };

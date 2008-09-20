@@ -248,6 +248,8 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->exit.signal = 0;
 	list_init(&thread->exit.waiters);
 	thread->select_infos = NULL;
+	thread->post_interrupt_callback = NULL;
+	thread->post_interrupt_data = NULL;
 
 	sprintf(temp, "thread_%ld_retcode_sem", thread->id);
 	thread->exit.sem = create_sem(0, temp);

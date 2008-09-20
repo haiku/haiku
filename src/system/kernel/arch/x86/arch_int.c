@@ -891,6 +891,7 @@ hardware_interrupt(struct iframe* frame)
 	int32 vector = frame->vector - ARCH_INTERRUPT_BASE;
 	bool levelTriggered = false;
 	int ret;
+	struct thread* thread = thread_get_current_thread();
 
 	if (sCurrentPIC->is_spurious_interrupt(vector)) {
 		TRACE(("got spurious interrupt at vector %ld\n", vector));
@@ -916,6 +917,14 @@ hardware_interrupt(struct iframe* frame)
 
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
+	} else if (thread->post_interrupt_callback != NULL) {
+		void (*callback)(void*) = thread->post_interrupt_callback;
+		void* data = thread->post_interrupt_data;
+
+		thread->post_interrupt_callback = NULL;
+		thread->post_interrupt_data = NULL;
+
+		callback(data);
 	}
 }
 
