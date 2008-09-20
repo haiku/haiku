@@ -80,11 +80,13 @@ struct HitSymbol {
 
 class Image : public Referenceable {
 public:
-	Image(const image_info& info)
+	Image(const image_info& info, int32 creationEvent)
 		:
 		fInfo(info),
 		fSymbols(NULL),
-		fSymbolCount(0)
+		fSymbolCount(0),
+		fCreationEvent(creationEvent),
+		fDeletionEvent(-1)
 	{
 	}
 
@@ -107,10 +109,25 @@ public:
 		return fInfo;
 	}
 
+	int32 CreationEvent() const
+	{
+		return fCreationEvent;
+	}
+
+	int32 DeletionEvent() const
+	{
+		return fDeletionEvent;
+	}
+
+	void SetDeletionEvent(int32 event)
+	{
+		fDeletionEvent = event;
+	}
+
 	status_t LoadSymbols(debug_symbol_lookup_context* lookupContext)
 	{
-		printf("Loading symbols of image \"%s\" (%ld)...\n", fInfo.name,
-			fInfo.id);
+//		printf("Loading symbols of image \"%s\" (%ld)...\n", fInfo.name,
+//			fInfo.id);
 
 		// create symbol iterator
 		debug_symbol_iterator* iterator;
@@ -203,6 +220,8 @@ private:
 	image_info			fInfo;
 	Symbol**			fSymbols;
 	int32				fSymbolCount;
+	int32				fCreationEvent;
+	int32				fDeletionEvent;
 };
 
 
@@ -316,6 +335,13 @@ public:
 	addr_t* Samples() const		{ return fSamples; }
 	Team* GetTeam() const		{ return fTeam; }
 
+	void UpdateInfo()
+	{
+		thread_info info;
+		if (get_thread_info(ID(), &info) == B_OK)
+			fInfo = info;
+	}
+
 	void SetSampleArea(area_id area, addr_t* samples)
 	{
 		fSampleArea = area;
@@ -369,8 +395,21 @@ public:
 		return NULL;
 	}
 
-	void AddSamples(int32 count, int32 stackDepth)
+	void AddSamples(int32 count, int32 stackDepth, int32 event)
 	{
+		_RemoveObsoleteImages(event);
+
+		// Temporarily remove images that have been created after the given
+		// event.
+		ImageList newImages;
+		ImageList::Iterator it = fImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			if (image->GetImage()->CreationEvent() > event) {
+				it.Remove();
+				newImages.Add(image);
+			}
+		}
+
 		count = count / stackDepth * stackDepth;
 
 		for (int32 i = 0; i < count; i += stackDepth) {
@@ -389,37 +428,68 @@ public:
 		}
 
 		fTotalHits += count / stackDepth;
+
+		// re-add the new images
+		fImages.MoveFrom(&newImages);
+
+		_SynchronizeImages();
 	}
 
 	void PrintResults() const
 	{
-		printf("total hits: %lld, missed: %lld\n", fTotalHits, fMissedTicks);
-
+		// count images and symbols
+		int32 imageCount = 0;
 		int32 symbolCount = 0;
 
-		ImageList::ConstIterator it = fImages.GetIterator();
+		ImageList::ConstIterator it = fOldImages.GetIterator();
 		while (ThreadImage* image = it.Next()) {
-			const image_info& imageInfo = image->GetImage()->Info();
-			printf("  image: %s (%ld): %lld hits, %lld misses\n",
-				imageInfo.name, imageInfo.id, image->TotalHits(),
-				image->MissedHits());
-			symbolCount += image->GetImage()->SymbolCount();
+			if (image->TotalHits() > 0) {
+				imageCount++;
+				if (image->TotalHits() > image->MissedHits())
+					symbolCount += image->GetImage()->SymbolCount();
+			}
+		}
+
+		it = fImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			if (image->TotalHits() > 0) {
+				imageCount++;
+				if (image->TotalHits() > image->MissedHits())
+					symbolCount += image->GetImage()->SymbolCount();
+			}
+		}
+
+		ThreadImage* images[imageCount];
+		imageCount = 0;
+
+		it = fOldImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			if (image->TotalHits() > 0)
+				images[imageCount++] = image;
+		}
+
+		it = fImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			if (image->TotalHits() > 0)
+				images[imageCount++] = image;
 		}
 
 		// find and sort the hit symbols
 		HitSymbol hitSymbols[symbolCount];
 		int32 hitSymbolCount = 0;
 
-		it = fImages.GetIterator();
-		while (ThreadImage* image = it.Next()) {
-			Symbol** symbols = image->GetImage()->Symbols();
-			const int64* symbolHits = image->SymbolHits();
-			int32 imageSymbolCount = image->GetImage()->SymbolCount();
-			for (int32 i = 0; i < imageSymbolCount; i++) {
-				if (symbolHits[i] > 0) {
-					HitSymbol& hitSymbol = hitSymbols[hitSymbolCount++];
-					hitSymbol.hits = symbolHits[i];
-					hitSymbol.symbol = symbols[i];
+		for (int32 k = 0; k < imageCount; k++) {
+			ThreadImage* image = images[k];
+			if (image->TotalHits() > image->MissedHits()) {
+				Symbol** symbols = image->GetImage()->Symbols();
+				const int64* symbolHits = image->SymbolHits();
+				int32 imageSymbolCount = image->GetImage()->SymbolCount();
+				for (int32 i = 0; i < imageSymbolCount; i++) {
+					if (symbolHits[i] > 0) {
+						HitSymbol& hitSymbol = hitSymbols[hitSymbolCount++];
+						hitSymbol.hits = symbolHits[i];
+						hitSymbol.symbol = symbols[i];
+					}
 				}
 			}
 		}
@@ -438,18 +508,30 @@ public:
 			fMissedTicks, fMissedTicks * fInterval,
 			100.0 * fMissedTicks / totalTicks);
 
+		if (imageCount > 0) {
+			printf("\n");
+			printf("        hits     unknown    image\n");
+			printf("  -------------------------------------------------"
+				"-----------------------------\n");
+			for (int32 k = 0; k < imageCount; k++) {
+				ThreadImage* image = images[k];
+				const image_info& imageInfo = image->GetImage()->Info();
+				printf("  %10lld  %10lld  %7ld %s\n", image->TotalHits(),
+					image->MissedHits(), imageInfo.id, imageInfo.name);
+			}
+		}
 
 		if (hitSymbolCount > 0) {
 			printf("\n");
-			printf("        hits       in us    in %%  function\n");
+			printf("        hits       in us    in %%   image  function\n");
 			printf("  -------------------------------------------------"
 				"-----------------------------\n");
 			for (int32 i = 0; i < hitSymbolCount; i++) {
 				const HitSymbol& hitSymbol = hitSymbols[i];
 				const Symbol* symbol = hitSymbol.symbol;
-				printf("  %10lld  %10lld  %6.2f  %s\n", hitSymbol.hits,
+				printf("  %10lld  %10lld  %6.2f  %6ld  %s\n", hitSymbol.hits,
 					hitSymbol.hits * fInterval,
-					100.0 * hitSymbol.hits / totalTicks,
+					100.0 * hitSymbol.hits / totalTicks, symbol->image->ID(),
 					symbol->Name());
 			}
 		} else
@@ -457,9 +539,38 @@ public:
 	}
 
 private:
-	typedef DoublyLinkedList<ThreadImage>	ImageList;
+	void _SynchronizeImages();
+
+	void _RemoveObsoleteImages(int32 event)
+	{
+		// remove obsolete images
+		ImageList::Iterator it = fImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			int32 deleted = image->GetImage()->DeletionEvent();
+			if (deleted >= 0 && event >= deleted) {
+				it.Remove();
+				if (image->TotalHits() > 0)
+					fOldImages.Add(image);
+				else
+					delete image;
+			}
+		}
+	}
+
+	ThreadImage* _FindImageByID(image_id id) const
+	{
+		ImageList::ConstIterator it = fImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			if (image->ID() == id)
+				return image;
+		}
+
+		return NULL;
+	}
 
 private:
+	typedef DoublyLinkedList<ThreadImage>	ImageList;
+
 	thread_info	fInfo;
 	::Team*		fTeam;
 	area_id		fSampleArea;
@@ -595,7 +706,6 @@ public:
 		}
 
 		thread->SetInterval(reply.interval);
-//reply.profile_event
 
 		fThreads.Add(thread);
 
@@ -610,15 +720,24 @@ public:
 		fThreads.Remove(thread);
 	}
 
-	void Exec()
+	void Exec(int32 event)
 	{
 		// remove all images
 		int32 imageCount = fImages.CountItems();
 		for (int32 i = imageCount - 1; i >= 0; i--)
-			_RemoveImage(i);
+			_RemoveImage(i, event);
+
+		// update the main thread
+		ThreadList::Iterator it = fThreads.GetIterator();
+		while (Thread* thread = it.Next()) {
+			if (thread->ID() == ID()) {
+				thread->UpdateInfo();
+				break;
+			}
+		}
 	}
 
-	status_t AddImage(const image_info& imageInfo)
+	status_t AddImage(const image_info& imageInfo, int32 event)
 	{
 		// create symbol lookup context
 		debug_symbol_lookup_context* lookupContext;
@@ -631,29 +750,46 @@ public:
 		}
 
 		Image* image;
-		error = _LoadImageSymbols(lookupContext, imageInfo, &image);
+		error = _LoadImageSymbols(lookupContext, imageInfo, event, &image);
 		debug_delete_symbol_lookup_context(lookupContext);
 
-// TODO: Remove! The threads must be updated lazily.
-if (error == B_OK) {
-	ThreadList::Iterator it = fThreads.GetIterator();
-	while (Thread* thread = it.Next())
-		thread->AddImage(image);
-}
+		// Although we generally synchronize the threads' images lazily, we have
+		// to add new images at least, since otherwise images could be added
+		// and removed again, and the hits inbetween could never be matched.
+		if (error == B_OK) {
+			ThreadList::Iterator it = fThreads.GetIterator();
+			while (Thread* thread = it.Next())
+				thread->AddImage(image);
+		}
 
 		return error;
 	}
 
-	status_t RemoveImage(const image_info& imageInfo)
+	status_t RemoveImage(const image_info& imageInfo, int32 event)
 	{
 		for (int32 i = 0; Image* image = fImages.ItemAt(i); i++) {
 			if (image->ID() == imageInfo.id) {
-				_RemoveImage(i);
+				_RemoveImage(i, event);
 				return B_OK;
 			}
 		}
 
 		return B_ENTRY_NOT_FOUND;
+	}
+
+	const BObjectList<Image>& Images() const
+	{
+		return fImages;
+	}
+
+	Image* FindImage(image_id id) const
+	{
+		for (int32 i = 0; Image* image = fImages.ItemAt(i); i++) {
+			if (image->ID() == id)
+				return image;
+		}
+
+		return NULL;
 	}
 
 	team_id ID() const
@@ -668,7 +804,7 @@ private:
 		image_info imageInfo;
 		int32 cookie = 0;
 		while (get_next_image_info(fInfo.team, &cookie, &imageInfo) == B_OK) {
-			status_t error = _LoadImageSymbols(lookupContext, imageInfo);
+			status_t error = _LoadImageSymbols(lookupContext, imageInfo, 0);
 			if (error == B_NO_MEMORY)
 				return error;
 		}
@@ -677,9 +813,9 @@ private:
 	}
 
 	status_t _LoadImageSymbols(debug_symbol_lookup_context* lookupContext,
-		const image_info& imageInfo, Image** _image = NULL)
+		const image_info& imageInfo, int32 event, Image** _image = NULL)
 	{
-		Image* image = new(std::nothrow) Image(imageInfo);
+		Image* image = new(std::nothrow) Image(imageInfo, event);
 		if (image == NULL)
 			return B_NO_MEMORY;
 
@@ -700,17 +836,18 @@ private:
 		return B_OK;
 	}
 
-	void _RemoveImage(int32 index)
+	void _RemoveImage(int32 index, int32 event)
 	{
 		Image* image = fImages.RemoveItemAt(index);
 		if (image == NULL)
 			return;
 
-		// notify all threads that the image has been removed
-		ThreadList::Iterator it = fThreads.GetIterator();
-		while (Thread* thread = it.Next())
-			thread->ImageRemoved(image);
+		// Note: We don't tell the threads that the image has been removed. They
+		// will be updated lazily when their next profiler update arrives. This
+		// is necessary, since the update might contain samples hitting that
+		// image.
 
+		image->SetDeletionEvent(event);
 		image->RemoveReference();
 	}
 
@@ -823,6 +960,31 @@ private:
 	BObjectList<Thread>				fThreads;
 	port_id							fDebuggerPort;
 };
+
+
+void
+Thread::_SynchronizeImages()
+{
+	const BObjectList<Image>& teamImages = fTeam->Images();
+
+	// remove obsolete images
+	ImageList::Iterator it = fImages.GetIterator();
+	while (ThreadImage* image = it.Next()) {
+		if (fTeam->FindImage(image->ID()) == NULL) {
+			it.Remove();
+			if (image->TotalHits() > 0)
+				fOldImages.Add(image);
+			else
+				delete image;
+		}
+	}
+
+	// add new images
+	for (int32 i = 0; Image* image = teamImages.ItemAt(i); i++) {
+		if (_FindImageByID(image->ID()) == NULL)
+			AddImage(image);
+	}
+}
 
 
 // TODO: Adjust!
@@ -974,7 +1136,8 @@ main(int argc, const char* const* argv)
 					break;
 
 				thread->AddSamples(message.profiler_update.sample_count,
-					message.profiler_update.stack_depth);
+					message.profiler_update.stack_depth,
+					message.profiler_update.image_event);
 
 				if (message.profiler_update.stopped) {
 					thread->PrintResults();
@@ -995,7 +1158,7 @@ main(int argc, const char* const* argv)
 				break;
 			case B_DEBUGGER_MESSAGE_TEAM_EXEC:
 				if (Team* team = threadManager.FindTeam(message.origin.team))
-					team->Exec();
+					team->Exec(message.team_exec.image_event);
 				break;
 
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
@@ -1006,21 +1169,17 @@ main(int argc, const char* const* argv)
 				break;
 
 			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
-{
-const image_info& info = message.image_created.info;
-printf("B_DEBUGGER_MESSAGE_IMAGE_CREATED: %s (%ld)\n", info.name, info.id);
-				if (Team* team = threadManager.FindTeam(message.origin.team))
-					team->AddImage(message.image_created.info);
+				if (Team* team = threadManager.FindTeam(message.origin.team)) {
+					team->AddImage(message.image_created.info,
+						message.image_created.image_event);
+				}
 				break;
-}
 			case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
-{
-const image_info& info = message.image_deleted.info;
-printf("B_DEBUGGER_MESSAGE_IMAGE_DELETED: %s (%ld)\n", info.name, info.id);
-				if (Team* team = threadManager.FindTeam(message.origin.team))
-					team->RemoveImage(message.image_deleted.info);
+				if (Team* team = threadManager.FindTeam(message.origin.team)) {
+					team->RemoveImage(message.image_deleted.info,
+						message.image_deleted.image_event);
+				}
 				break;
-}
 
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
