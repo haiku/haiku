@@ -86,6 +86,8 @@ struct thread_debug_info {
 			// number of samples the buffer currently holds
 		int32			stack_depth;
 			// number of return addresses to record per timer interval
+		bool			buffer_full;
+			// indicates that the sample buffer is full
 		union {
 			bigtime_t	interval_left;
 				// when unscheduled: the time left of the current sampling

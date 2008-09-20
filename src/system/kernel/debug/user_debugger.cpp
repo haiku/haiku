@@ -284,6 +284,7 @@ init_thread_debug_info(struct thread_debug_info *info)
 		info->ignore_signals_once = 0;
 		info->profile.sample_area = -1;
 		info->profile.samples = NULL;
+		info->profile.buffer_full = false;
 		info->profile.installed_timer = NULL;
 	}
 }
@@ -309,6 +310,7 @@ clear_thread_debug_info(struct thread_debug_info *info, bool dying)
 		info->ignore_signals_once = 0;
 		info->profile.sample_area = -1;
 		info->profile.samples = NULL;
+		info->profile.buffer_full = false;
 	}
 }
 
@@ -1002,6 +1004,7 @@ user_debug_thread_exiting(struct thread* thread)
 	int32 stackDepth = threadDebugInfo.profile.stack_depth;
 	threadDebugInfo.profile.sample_area = -1;
 	threadDebugInfo.profile.samples = NULL;
+	threadDebugInfo.profile.buffer_full = false;
 
 	atomic_or(&threadDebugInfo.flags, B_THREAD_DEBUG_DYING);
 
@@ -1147,6 +1150,47 @@ schedule_profiling_timer(struct thread* thread, bigtime_t interval)
 }
 
 
+static void
+profiling_buffer_full(void*)
+{
+	struct thread* thread = thread_get_current_thread();
+	thread_debug_info& debugInfo = thread->debug_info;
+
+	GRAB_THREAD_LOCK();
+
+	if (debugInfo.profile.samples != NULL && debugInfo.profile.buffer_full) {
+		int32 sampleCount = debugInfo.profile.sample_count;
+		int32 stackDepth = debugInfo.profile.stack_depth;
+		if (debugInfo.profile.max_samples - sampleCount < stackDepth) {
+			// The sample buffer is indeed full; notify the debugger.
+			debugInfo.profile.sample_count = 0;
+
+			RELEASE_THREAD_LOCK();
+			enable_interrupts();
+
+			// prepare the message
+			debug_profiler_update message;
+			message.sample_count = sampleCount;
+			message.stack_depth = stackDepth;
+			message.stopped = false;
+
+			thread_hit_debug_event(B_DEBUGGER_MESSAGE_PROFILER_UPDATE, &message,
+				sizeof(message), false);
+
+			disable_interrupts();
+			GRAB_THREAD_LOCK();
+		}
+
+		if (debugInfo.profile.samples != NULL) {
+			schedule_profiling_timer(thread, debugInfo.profile.interval);
+			debugInfo.profile.buffer_full = false;
+		}
+	}
+
+	RELEASE_THREAD_LOCK();
+}
+
+
 static int32
 profiling_event(timer* /*unused*/)
 {
@@ -1166,30 +1210,15 @@ profiling_event(timer* /*unused*/)
 		debugInfo.profile.sample_count += stackDepth;
 		int32 sampleCount = debugInfo.profile.sample_count;
 		if (debugInfo.profile.max_samples - sampleCount < stackDepth) {
-			// The sample buffer is full; notify the debugger.
-			debugInfo.profile.sample_count = 0;
-
-			RELEASE_THREAD_LOCK();
-			enable_interrupts();
-
-			// prepare the message
-			debug_profiler_update message;
-			message.sample_count = sampleCount;
-			message.stack_depth = stackDepth;
-			message.stopped = true;
-
-			thread_hit_debug_event(B_DEBUGGER_MESSAGE_PROFILER_UPDATE, &message,
-				sizeof(message), false);
-
-			disable_interrupts();
-			GRAB_THREAD_LOCK();
-		}
-	}
-
-	// reschedule timer
-	if (debugInfo.profile.samples != NULL)
-		schedule_profiling_timer(thread, debugInfo.profile.interval);
-	else
+			// The sample buffer is full; we'll have to notify the debugger.
+			// We can't do that right here. Instead we set a post interrupt
+			// callback doing that for us, and don't reschedule the timer yet.
+			thread->post_interrupt_callback = profiling_buffer_full;
+			debugInfo.profile.installed_timer = NULL;
+			debugInfo.profile.buffer_full = true;
+		} else
+			schedule_profiling_timer(thread, debugInfo.profile.interval);
+	} else
 		debugInfo.profile.installed_timer = NULL;
 
 	return B_HANDLED_INTERRUPT;
@@ -1216,7 +1245,8 @@ user_debug_thread_unscheduled(struct thread* thread)
 void
 user_debug_thread_scheduled(struct thread* thread)
 {
-	if (thread->debug_info.profile.samples != NULL) {
+	if (thread->debug_info.profile.samples != NULL
+		&& !thread->debug_info.profile.buffer_full) {
 		// install profiling timer
 		schedule_profiling_timer(thread,
 			thread->debug_info.profile.interval_left);
@@ -2157,6 +2187,7 @@ debug_nub_thread(void *)
 								= areaInfo.size / sizeof(addr_t);
 							threadDebugInfo.profile.sample_count = 0;
 							threadDebugInfo.profile.stack_depth = stackDepth;
+							threadDebugInfo.profile.buffer_full = false;
 							threadDebugInfo.profile.interval_left = interval;
 							threadDebugInfo.profile.installed_timer = NULL;
 						} else
@@ -2216,6 +2247,7 @@ debug_nub_thread(void *)
 						stackDepth = threadDebugInfo.profile.stack_depth;
 						threadDebugInfo.profile.sample_area = -1;
 						threadDebugInfo.profile.samples = NULL;
+						threadDebugInfo.profile.buffer_full = false;
 					} else
 						result = B_BAD_VALUE;
 				} else
