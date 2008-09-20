@@ -2,6 +2,7 @@
  * Copyright Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+#include <String.h>
 #include <Window.h>
 
 
@@ -10,6 +11,7 @@ class BBox;
 class BButton;
 class BCardLayout;
 class BCheckBox;
+class BFilePanel;
 class BMenu;
 class BRadioButton;
 class BTextControl;
@@ -33,11 +35,15 @@ private:
 			void			_SetupFirstLayoutItem(BCardLayout* layout);
 			void			_SetupSecondLayoutItem(BCardLayout* layout);
 			void			_DisallowChar(BTextView* textView);
+			void			_SetupTranslatorMenu(BMenu* translatorMenu);
+			void			_SetupOutputPathMenu(BMenu* outputPathMenu);
+			BString			_FindValidFileName(const char* name) const;
 			void			_CenterAndShow();
 
 			void			_TakeScreenshot();
 			status_t		_GetActiveWindowFrame(BRect* frame);
 
+			void			_SaveScreenshot();
 			void			_SaveScreenshotSilent() const;
 
 private:
@@ -52,8 +58,9 @@ private:
 			BTextControl*	fNameControl;
 			BMenu*			fTranslatorMenu;
 			BMenu*			fOutputPathMenu;
-			BButton*		fFinishScreenshot;
 			BBitmap*		fScreenshot;
+			BFilePanel*		fOutputPathPanel;
+			BMenuItem*		fLastSelectedPath;
 
 			bigtime_t		fDelay;
 

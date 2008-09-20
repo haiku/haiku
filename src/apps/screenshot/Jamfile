@@ -8,7 +8,7 @@ Application Screenshot :
 	PNGDump.cpp
 	Screenshot.cpp
 	ScreenshotWindow.cpp
-	: be translation libpng.so libz.so
+	: be tracker translation libpng.so libz.so
 	: Screenshot.rdef
 ;
 

@@ -11,18 +11,22 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
+#include <BitmapStream.h>
 #include <Button.h>
 #include <CardLayout.h>
 #include <CheckBox.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <File.h>
 #include <FindDirectory.h>
+#include <FilePanel.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutItem.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <NodeInfo.h>
 #include <Path.h>
 #include <RadioButton.h>
 #include <Screen.h>
@@ -32,6 +36,7 @@
 #include <TextControl.h>
 #include <TranslatorFormats.h>
 #include <TranslationUtils.h>
+#include <TranslatorRoster.h>
 #include <View.h>
 #include <WindowInfo.h>
 
@@ -47,10 +52,31 @@ enum {
 	kBackToSave,
 	kTakeScreenshot,
 	kImageOutputFormat,
+	kLocationChanged,
 	kChooseLocation,
 	kFinishScreenshot,
 	kShowOptions
 };
+
+
+const int32 kPNGImageFileType = 1347307296;
+
+
+// #pragma mark - DirectoryRefFilter
+
+
+class DirectoryRefFilter : public BRefFilter {
+public:
+	virtual			~DirectoryRefFilter() {}
+			bool	Filter(const entry_ref* ref, BNode* node, struct stat* stat,
+						const char* filetype)
+					{
+						return node->IsDirectory();
+					}
+};
+
+
+// #pragma mark - ScreenshotWindow
 
 
 ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
@@ -60,6 +86,8 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE |
 		B_AVOID_FRONT | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fScreenshot(NULL),
+	fOutputPathPanel(NULL),
+	fLastSelectedPath(NULL),
 	fDelay(delay),
 	fIncludeBorder(includeBorder),
 	fIncludeCursor(includeCursor),
@@ -74,7 +102,11 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 
 ScreenshotWindow::~ScreenshotWindow()
 {
+	if (fOutputPathPanel)
+		delete fOutputPathPanel->RefFilter();
+
 	delete fScreenshot;
+	delete fOutputPathPanel;
 }
 
 
@@ -111,17 +143,52 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 		}	break;
 
 		case kImageOutputFormat: {
-			fFinishScreenshot->SetEnabled(true);
 			message->FindInt32("be:type", &fImageFileType);
 			message->FindInt32("be:translator", &fTranslator);
 		}	break;
 
-		case kChooseLocation: {
+		case kLocationChanged: {
+			void* source = NULL;
+			if (message->FindPointer("source", &source) == B_OK)
+				fLastSelectedPath = static_cast<BMenuItem*> (source);
 
+			const char* text = fNameControl->Text();
+			fNameControl->SetText(_FindValidFileName(text).String());
+		}	break;
+
+		case kChooseLocation: {
+			if (!fOutputPathPanel) {
+				BMessenger target(this);
+				fOutputPathPanel = new BFilePanel(B_OPEN_PANEL, &target,
+					NULL, B_DIRECTORY_NODE, false, NULL, new DirectoryRefFilter());
+				fOutputPathPanel->Window()->SetTitle("Choose directory");
+				fOutputPathPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
+			}
+			fOutputPathPanel->Show();
+		}	break;
+
+		case B_CANCEL: {
+			fLastSelectedPath->SetMarked(true);
+		}	break;
+
+		case B_REFS_RECEIVED: {
+			entry_ref ref;
+			if (message->FindRef("refs", &ref) == B_OK) {
+				BPath path(&ref);
+				BMessage* message = new BMessage(kLocationChanged);
+				message->AddString("path", path.Path());
+
+				fLastSelectedPath = new BMenuItem(path.Path(), message);
+				fLastSelectedPath->SetMarked(true);
+
+				fOutputPathMenu->AddItem(fLastSelectedPath,
+					fOutputPathMenu->CountItems() - 2);
+			}
 		}	break;
 
 		case kFinishScreenshot: {
-
+			_SaveScreenshot();
+			be_app_messenger.SendMessage(B_QUIT_REQUESTED);
 		}	break;
 
 		case kShowOptions: {
@@ -252,22 +319,13 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 
 	fNameControl = new BTextControl("", "Name:", "screenshot", NULL);
 
-	BMessage message(kImageOutputFormat);
-	fTranslatorMenu = new BMenu("Please select");
-	BTranslationUtils::AddTranslationItems(fTranslatorMenu, B_TRANSLATOR_BITMAP,
-		&message, NULL, NULL, NULL);
+	_SetupTranslatorMenu(new BMenu("Please select"));
 	BMenuField* menuField = new BMenuField("Save as:", fTranslatorMenu);
-	fTranslatorMenu->SetLabelFromMarked(true);
 
-	fOutputPathMenu = new BMenu("Please select");
-	fOutputPathMenu->AddItem(new BMenuItem("Home directory", NULL));
-	fOutputPathMenu->AddItem(new BMenuItem("Artwork directory", NULL));
-	fOutputPathMenu->AddItem(new BSeparatorItem());
-	fOutputPathMenu->AddItem(new BMenuItem("Choose location",
-		new BMessage(kChooseLocation)));
+	_SetupOutputPathMenu(new BMenu("Please select"));
 	BMenuField* menuField2 = new BMenuField("Save in:", fOutputPathMenu);
-	fOutputPathMenu->SetLabelFromMarked(true);
-	fOutputPathMenu->ItemAt(0)->SetMarked(true);
+
+	fNameControl->SetText(_FindValidFileName("screenshot").String());
 
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
@@ -281,9 +339,6 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 		.Add(menuField2->CreateMenuBarLayoutItem(), 1, 2);
 	gridLayout->SetMinColumnWidth(1, menuField->StringWidth("SomethingLongHere"));
 
-	fFinishScreenshot = new BButton("", "Save", new BMessage(kFinishScreenshot));
-	fFinishScreenshot->SetEnabled(false);
-
 	layout->AddView(1, BGroupLayoutBuilder(B_VERTICAL)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10.0)
 			.Add(fPreviewBox)
@@ -294,11 +349,12 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 		.AddStrut(10)
 		.Add(divider)
 		.AddStrut(10)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10.0)
+		.AddGroup(B_HORIZONTAL, 10.0)
 			.Add(new BButton("", "Options", new BMessage(kShowOptions)))
 			.AddGlue()
 			.Add(new BButton("", "Cancel", new BMessage(B_QUIT_REQUESTED)))
-			.Add(fFinishScreenshot))
+			.Add(new BButton("", "Save", new BMessage(kFinishScreenshot)))
+			.End()
 		.SetInsets(10.0, 10.0, 10.0, 10.0)
 	);
 }
@@ -312,6 +368,101 @@ ScreenshotWindow::_DisallowChar(BTextView* textView)
 
 	for (uint32 i = '9' + 1; i < 255; ++i)
 		textView->DisallowChar(i);
+}
+
+
+void
+ScreenshotWindow::_SetupTranslatorMenu(BMenu* translatorMenu)
+{
+	fTranslatorMenu = translatorMenu;
+
+	BMessage message(kImageOutputFormat);
+	fTranslatorMenu = new BMenu("Please select");
+	BTranslationUtils::AddTranslationItems(fTranslatorMenu, B_TRANSLATOR_BITMAP,
+		&message, NULL, NULL, NULL);
+
+	fTranslatorMenu->SetLabelFromMarked(true);
+
+	if (fTranslatorMenu->ItemAt(0))
+		fTranslatorMenu->ItemAt(0)->SetMarked(true);
+
+	for (int32 i = 0; i < fTranslatorMenu->CountItems(); ++i) {
+		BMenuItem* item = fTranslatorMenu->ItemAt(i);
+		if (item && item->Message()) {
+			item->Message()->FindInt32("be:type", &fImageFileType);
+			item->Message()->FindInt32("be:translator", &fTranslator);
+			if (fImageFileType == kPNGImageFileType) {
+				item->SetMarked(true);
+				break;
+			}
+		}
+	}
+}
+
+
+void
+ScreenshotWindow::_SetupOutputPathMenu(BMenu* outputPathMenu)
+{
+	fOutputPathMenu = outputPathMenu;
+
+	BPath path;
+	find_directory(B_USER_DIRECTORY, &path);
+
+	BMessage* message = new BMessage(kLocationChanged);
+	message->AddString("path", path.Path());
+	fOutputPathMenu->AddItem(new BMenuItem("Home directory", message));
+
+	path.Append("Desktop");
+	message = new BMessage(kLocationChanged);
+	message->AddString("path", path.Path());
+	fOutputPathMenu->AddItem(new BMenuItem("Desktop", message), 0);
+
+	find_directory(B_BEOS_ETC_DIRECTORY, &path);
+	path.Append("artwork");
+
+	message = new BMessage(kLocationChanged);
+	message->AddString("path", path.Path());
+	fOutputPathMenu->AddItem(new BMenuItem("Artwork directory", message));
+
+	fOutputPathMenu->AddItem(new BSeparatorItem());
+
+	fOutputPathMenu->AddItem(new BMenuItem("Choose directory...",
+		new BMessage(kChooseLocation)));
+
+	fOutputPathMenu->SetLabelFromMarked(true);
+	fOutputPathMenu->ItemAt(1)->SetMarked(true);
+	fLastSelectedPath = fOutputPathMenu->ItemAt(1);
+}
+
+
+BString
+ScreenshotWindow::_FindValidFileName(const char* name) const
+{
+	BString fileName(name);
+	if (!fLastSelectedPath)
+		return fileName;
+
+	const char* path;
+	BMessage* message = fLastSelectedPath->Message();
+	if (!message || message->FindString("path", &path) != B_OK)
+		return fileName;
+
+	BPath outputPath(path);
+	outputPath.Append(name);
+	if (!BEntry(outputPath.Path()).Exists())
+		return fileName;
+
+	BEntry entry;
+	int32 index = 1;
+	char filename[32];
+	do {
+		sprintf(filename, "%s%ld", name, index++);
+		outputPath.SetTo(path);
+		outputPath.Append(filename);
+		entry.SetTo(outputPath.Path());
+	} while (entry.Exists());
+
+	return BString(filename);
 }
 
 
@@ -409,6 +560,47 @@ ScreenshotWindow::_GetActiveWindowFrame(BRect* frame)
 	}
 	free(tokens);
 	return status;
+}
+
+
+void
+ScreenshotWindow::_SaveScreenshot()
+{
+	if (!fScreenshot || !fLastSelectedPath)
+		return;
+
+	const char* path;
+	BMessage* message = fLastSelectedPath->Message();
+	if (!message || message->FindString("path", &path) != B_OK)
+		return;
+
+	BDirectory dir(path);
+	BFile file(&dir, fNameControl->Text(), B_CREATE_FILE |
+		B_ERASE_FILE | B_WRITE_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
+
+	BBitmapStream bitmapStream(fScreenshot);
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	roster->Translate(&bitmapStream, NULL, NULL, &file, fImageFileType,
+		B_TRANSLATOR_BITMAP);
+	fScreenshot = NULL;
+
+	BNodeInfo nodeInfo(&file);
+	if (nodeInfo.InitCheck() != B_OK)
+		return;
+
+	int32 numFormats;
+	const translation_format *formats = NULL;
+	if (roster->GetOutputFormats(fTranslator, &formats, &numFormats) != B_OK)
+		return;
+
+	for (int32 i = 0; i < numFormats; ++i) {
+		if (formats[i].type == uint32(fImageFileType)) {
+			nodeInfo.SetType(formats[i].MIME);
+			break;
+		}
+	}
 }
 
 
