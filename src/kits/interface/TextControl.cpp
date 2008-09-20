@@ -467,8 +467,15 @@ BTextControl::GetPreferredSize(float *_width, float *_height)
 
 	_ValidateLayoutData();
 
-	if (_width)
-		*_width = fLayoutData->min.width;
+	if (_width) {
+		float minWidth = fLayoutData->min.width;
+		if (Label() == NULL && !(Flags() & B_SUPPORTS_LAYOUT)) {
+			// Indeed, only if there is no label! BeOS backwards compatible
+			// behavior:
+			minWidth = max_c(minWidth, Bounds().Width());
+		}
+		*_width = minWidth;
+	}
 
 	if (_height)
 		*_height = fLayoutData->min.height;
