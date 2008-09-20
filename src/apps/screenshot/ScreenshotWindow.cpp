@@ -59,9 +59,6 @@ enum {
 };
 
 
-const int32 kPNGImageFileType = 1347307296;
-
-
 // #pragma mark - DirectoryRefFilter
 
 
@@ -174,11 +171,14 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 		case B_REFS_RECEIVED: {
 			entry_ref ref;
 			if (message->FindRef("refs", &ref) == B_OK) {
-				BPath path(&ref);
-				BMessage* message = new BMessage(kLocationChanged);
-				message->AddString("path", path.Path());
+				BString path(BPath(&ref).Path());
 
-				fLastSelectedPath = new BMenuItem(path.Path(), message);
+				BMessage* message = new BMessage(kLocationChanged);
+				message->AddString("path", path.String());
+
+				fOutputPathMenu->TruncateString(&path, B_TRUNCATE_MIDDLE,
+					fOutputPathMenu->StringWidth("SomethingLongHere"));
+				fLastSelectedPath = new BMenuItem(path.String(), message);
 				fLastSelectedPath->SetMarked(true);
 
 				fOutputPathMenu->AddItem(fLastSelectedPath,
@@ -391,7 +391,7 @@ ScreenshotWindow::_SetupTranslatorMenu(BMenu* translatorMenu)
 		if (item && item->Message()) {
 			item->Message()->FindInt32("be:type", &fImageFileType);
 			item->Message()->FindInt32("be:translator", &fTranslator);
-			if (fImageFileType == kPNGImageFileType) {
+			if (fImageFileType == B_PNG_FORMAT) {
 				item->SetMarked(true);
 				break;
 			}
@@ -581,7 +581,7 @@ ScreenshotWindow::_SaveScreenshot()
 		return;
 
 	BBitmapStream bitmapStream(fScreenshot);
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	roster->Translate(&bitmapStream, NULL, NULL, &file, fImageFileType,
 		B_TRANSLATOR_BITMAP);
 	fScreenshot = NULL;
@@ -591,7 +591,7 @@ ScreenshotWindow::_SaveScreenshot()
 		return;
 
 	int32 numFormats;
-	const translation_format *formats = NULL;
+	const translation_format* formats = NULL;
 	if (roster->GetOutputFormats(fTranslator, &formats, &numFormats) != B_OK)
 		return;
 
