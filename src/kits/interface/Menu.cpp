@@ -1858,8 +1858,10 @@ BMenu::_LayoutItems(int32 index)
 BSize
 BMenu::_ValidatePreferredSize()
 {
-	if (!fLayoutData->preferred.IsWidthSet() || ResizingMode() != fLayoutData->lastResizingMode)
+	if (!fLayoutData->preferred.IsWidthSet() || ResizingMode()
+			!= fLayoutData->lastResizingMode) {
 		_ComputeLayout(0, true, false, NULL, NULL);
+	}
 
 	return fLayoutData->preferred;
 }
