@@ -438,8 +438,10 @@ status_t
 Stream::_LoadInode(off_t offset)
 {
 	int32* inodeRef = (int32*)malloc(fVolume.BlockSize() + 4);
-	if (inodeRef == NULL)
+	if (inodeRef == NULL) {
+		dprintf("Stream::_LoadInode(): Out of memory!\n");
 		return B_NO_MEMORY;
+	}
 
 	fInode = (bfs_inode*)(inodeRef + 1);
 	*inodeRef = 1;
