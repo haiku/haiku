@@ -15,6 +15,14 @@
 #include <string.h>
 
 
+//#define TRACE_HEAP
+#ifdef TRACE_HEAP
+#	define TRACE(format...)	dprintf(format)
+#else
+#	define TRACE(format...)	do { } while (false)
+#endif
+
+
 /* This is a very simple malloc()/free() implementation - it only
  * manages a free list.
  * After heap_init() is called, all free memory is contained in one
@@ -288,6 +296,7 @@ malloc(size_t size)
 
 	sAvailable -= size + sizeof(uint32);
 
+	TRACE("malloc(%lu) -> %p\n", size, chunk->AllocatedAddress());
 	return chunk->AllocatedAddress();
 }
 
@@ -298,6 +307,7 @@ realloc(void *oldBuffer, size_t newSize)
 	// ToDo: improve this implementation!
 
 	if (newSize == 0) {
+		TRACE("realloc(%p, %lu) -> NULL\n", oldBuffer, newSize);
 		free(oldBuffer);
 		return NULL;
 	}
@@ -316,6 +326,7 @@ realloc(void *oldBuffer, size_t newSize)
 		free(oldBuffer);
 	}
 
+	TRACE("realloc(%p, %lu) -> %p\n", oldBuffer, newSize, newBuffer);
 	return newBuffer;
 }
 
@@ -326,15 +337,17 @@ free(void *allocated)
 	if (allocated == NULL)
 		return;
 
+	TRACE("free(%p)\n", allocated);
+
 	free_chunk *freedChunk = free_chunk::SetToAllocated(allocated);
 
 #ifdef DEBUG_ALLOCATIONS
-	if (freedChunk->size > 65536)
+	if (freedChunk->size > sMaxHeapSize)
 		panic("freed chunk %p clobbered (%lx)!\n", freedChunk, freedChunk->size);
 {
 	free_chunk *chunk = sFreeAnchor.next;
 	while (chunk) {
-		if (chunk->size > 65536 || freedChunk == chunk)
+		if (chunk->size > sMaxHeapSize || freedChunk == chunk)
 			panic("invalid chunk in free list, or double free\n");
 		chunk = chunk->next;
 	}
