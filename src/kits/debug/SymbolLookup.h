@@ -152,6 +152,7 @@ private:
 	const Elf32_Sym*	fSymbolTable;
 	const char*			fStringTable;
 	int32				fSymbolCount;
+	size_t				fStringTableSize;
 };
 
 

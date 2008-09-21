@@ -200,7 +200,8 @@ ImageFile::ImageFile(const image_info& info)
 	fLoadDelta(0),
 	fSymbolTable(NULL),
 	fStringTable(NULL),
-	fSymbolCount(0)
+	fSymbolCount(0),
+	fStringTableSize(0)
 {
 }
 
@@ -300,6 +301,7 @@ ImageFile::Load()
 				= (const Elf32_Sym*)(fMappedFile + sectionHeader->sh_offset);
 			fStringTable = (const char*)(fMappedFile + stringHeader.sh_offset);
 			fSymbolCount = sectionHeader->sh_size / sizeof(Elf32_Sym);
+			fStringTableSize = stringHeader.sh_size;
 
 			return B_OK;
 		}
@@ -392,12 +394,12 @@ size_t
 ImageFile::_SymbolNameLen(const char* symbolName) const
 {
 	if (symbolName == NULL || (addr_t)symbolName < (addr_t)fStringTable
-		|| (addr_t)symbolName >= (addr_t)fMappedFile + fFileSize) {
+		|| (addr_t)symbolName >= (addr_t)fStringTable + fStringTableSize) {
 		return 0;
 	}
 
 	return strnlen(symbolName,
-		(addr_t)fMappedFile + fFileSize - (addr_t)symbolName);
+		(addr_t)fStringTable + fStringTableSize - (addr_t)symbolName);
 }
 
 
