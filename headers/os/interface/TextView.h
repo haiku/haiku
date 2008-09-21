@@ -248,7 +248,7 @@ private:
 			class UndoBuffer;
 			class WidthBuffer;
 
-			// UndoBuffer deratives
+			// UndoBuffer derivatives
 			class CutUndoBuffer;
 			class PasteUndoBuffer;
 			class ClearUndoBuffer;
