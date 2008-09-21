@@ -80,12 +80,16 @@ RemoteMemoryAccessor::~RemoteMemoryAccessor()
 status_t
 RemoteMemoryAccessor::Init()
 {
+	// If the team is the kernel team, we don't try to clone the areas. Only
+	// SymbolLookup's image file functionality will be available.
+	if (fTeam == B_SYSTEM_TEAM)
+		return B_OK;
+
 	// get a list of the team's areas
 	area_info areaInfo;
 	int32 cookie = 0;
 	status_t error;
 	while ((error = get_next_area_info(fTeam, &cookie, &areaInfo)) == B_OK) {
-
 		TRACE(("area %ld: address: %p, size: %ld, name: %s\n", areaInfo.area,
 			areaInfo.address, areaInfo.size, areaInfo.name));
 
@@ -428,39 +432,41 @@ SymbolLookup::Init()
 	if (error != B_OK)
 		return error;
 
-	TRACE(("SymbolLookup::Init(): searching debug area...\n"));
+	if (fTeam != B_SYSTEM_TEAM) {
+		TRACE(("SymbolLookup::Init(): searching debug area...\n"));
 
-	// find the runtime loader debug area
-	runtime_loader_debug_area *remoteDebugArea = NULL;
-	int32 cookie = 0;
-	area_info areaInfo;
-	while (get_next_area_info(fTeam, &cookie, &areaInfo) == B_OK) {
-		if (strcmp(areaInfo.name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0) {
-			remoteDebugArea = (runtime_loader_debug_area*)areaInfo.address;
-			break;
+		// find the runtime loader debug area
+		runtime_loader_debug_area *remoteDebugArea = NULL;
+		int32 cookie = 0;
+		area_info areaInfo;
+		while (get_next_area_info(fTeam, &cookie, &areaInfo) == B_OK) {
+			if (strcmp(areaInfo.name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0) {
+				remoteDebugArea = (runtime_loader_debug_area*)areaInfo.address;
+				break;
+			}
 		}
-	}
 
-	if (!remoteDebugArea) {
-		TRACE(("SymbolLookup::Init(): Couldn't find debug area!\n"));
-		return B_ERROR;
-	}
+		if (!remoteDebugArea) {
+			TRACE(("SymbolLookup::Init(): Couldn't find debug area!\n"));
+			return B_ERROR;
+		}
 
-	TRACE(("SymbolLookup::Init(): found debug area, translating address...\n"));
+		TRACE(("SymbolLookup::Init(): found debug area, translating address...\n"));
 
-	// translate the address
-	try {
-		fDebugArea = &Read(*remoteDebugArea);
+		// translate the address
+		try {
+			fDebugArea = &Read(*remoteDebugArea);
 
-		TRACE(("SymbolLookup::Init(): translated debug area is at: %p, "
-			"loaded_images: %p\n", fDebugArea, fDebugArea->loaded_images));
-	} catch (Exception exception) {
-		return exception.Error();
+			TRACE(("SymbolLookup::Init(): translated debug area is at: %p, "
+				"loaded_images: %p\n", fDebugArea, fDebugArea->loaded_images));
+		} catch (Exception exception) {
+			return exception.Error();
+		}
 	}
 
 	// create a list of the team's images
 	image_info imageInfo;
-	cookie = 0;
+	int32 cookie = 0;
 	while (get_next_image_info(fTeam, &cookie, &imageInfo) == B_OK) {
 		ImageFile* imageFile = new(std::nothrow) ImageFile(imageInfo);
 		if (imageFile == NULL)
@@ -689,6 +695,9 @@ SymbolLookup::_FindImageAtAddress(addr_t address) const
 {
 	TRACE(("SymbolLookup::_FindImageAtAddress(%p)\n", (void*)address));
 
+	if (fDebugArea == NULL)
+		return NULL;
+
 	// iterate through the images
 	for (const image_t *image = &Read(*Read(fDebugArea->loaded_images->head));
 		 image;
@@ -707,6 +716,9 @@ SymbolLookup::_FindImageAtAddress(addr_t address) const
 const image_t*
 SymbolLookup::_FindImageByID(image_id id) const
 {
+	if (fDebugArea == NULL)
+		return NULL;
+
 	// iterate through the images
 	for (const image_t *image = &Read(*Read(fDebugArea->loaded_images->head));
 		 image;
