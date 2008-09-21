@@ -65,7 +65,7 @@ apic_timer_interrupt(void *data)
 }
 
 
-#define MIN_TIMEOUT 1000
+#define MIN_TIMEOUT 1
 
 static status_t
 apic_set_hardware_timer(bigtime_t relativeTimeout)
