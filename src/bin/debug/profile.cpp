@@ -80,9 +80,10 @@ struct HitSymbol {
 
 class Image : public Referenceable {
 public:
-	Image(const image_info& info, int32 creationEvent)
+	Image(const image_info& info, team_id owner, int32 creationEvent)
 		:
 		fInfo(info),
+		fOwner(owner),
 		fSymbols(NULL),
 		fSymbolCount(0),
 		fCreationEvent(creationEvent),
@@ -107,6 +108,11 @@ public:
 	const image_info& Info() const
 	{
 		return fInfo;
+	}
+
+	team_id Owner() const
+	{
+		return fOwner;
 	}
 
 	int32 CreationEvent() const
@@ -218,6 +224,7 @@ public:
 
 private:
 	image_info			fInfo;
+	team_id				fOwner;
 	Symbol**			fSymbols;
 	int32				fSymbolCount;
 	int32				fCreationEvent;
@@ -646,10 +653,33 @@ public:
 			return error;
 		}
 
-		error = _LoadSymbols(lookupContext);
+		// load the team's images and their symbols
+		error = _LoadSymbols(lookupContext, ID());
 		debug_delete_symbol_lookup_context(lookupContext);
 		if (error != B_OK)
 			return error;
+
+		// also try to load the kernel images and symbols
+		{
+			// fake a debug context -- it's not really needed anyway
+			debug_context debugContext;
+			debugContext.team = B_SYSTEM_TEAM;
+			debugContext.nub_port = -1;
+			debugContext.reply_port = -1;
+
+			// create symbol lookup context
+			error = debug_create_symbol_lookup_context(&debugContext,
+				&lookupContext);
+			if (error != B_OK) {
+				fprintf(stderr, "%s: Failed to create symbol lookup context "
+					"for the kernel team: %s\n", kCommandName, strerror(error));
+				return error;
+			}
+
+			// load the kernel's images and their symbols
+			_LoadSymbols(lookupContext, B_SYSTEM_TEAM);
+			debug_delete_symbol_lookup_context(lookupContext);
+		}
 
 		// set team debugging flags
 		int32 teamDebugFlags = B_TEAM_DEBUG_THREADS
@@ -728,10 +758,13 @@ public:
 
 	void Exec(int32 event)
 	{
-		// remove all images
+		// remove all non-kernel images
 		int32 imageCount = fImages.CountItems();
-		for (int32 i = imageCount - 1; i >= 0; i--)
-			_RemoveImage(i, event);
+		for (int32 i = imageCount - 1; i >= 0; i--) {
+			Image* image = fImages.ItemAt(i);
+			if (image->Owner() == ID())
+				_RemoveImage(i, event);
+		}
 
 		// update the main thread
 		ThreadList::Iterator it = fThreads.GetIterator();
@@ -756,7 +789,8 @@ public:
 		}
 
 		Image* image;
-		error = _LoadImageSymbols(lookupContext, imageInfo, event, &image);
+		error = _LoadImageSymbols(lookupContext, imageInfo, ID(), event,
+			&image);
 		debug_delete_symbol_lookup_context(lookupContext);
 
 		// Although we generally synchronize the threads' images lazily, we have
@@ -804,13 +838,15 @@ public:
 	}
 
 private:
-	status_t _LoadSymbols(debug_symbol_lookup_context* lookupContext)
+	status_t _LoadSymbols(debug_symbol_lookup_context* lookupContext,
+		team_id owner)
 	{
 		// iterate through the team's images and collect the symbols
 		image_info imageInfo;
 		int32 cookie = 0;
-		while (get_next_image_info(fInfo.team, &cookie, &imageInfo) == B_OK) {
-			status_t error = _LoadImageSymbols(lookupContext, imageInfo, 0);
+		while (get_next_image_info(owner, &cookie, &imageInfo) == B_OK) {
+			status_t error = _LoadImageSymbols(lookupContext, imageInfo,
+				owner, 0);
 			if (error == B_NO_MEMORY)
 				return error;
 		}
@@ -819,9 +855,10 @@ private:
 	}
 
 	status_t _LoadImageSymbols(debug_symbol_lookup_context* lookupContext,
-		const image_info& imageInfo, int32 event, Image** _image = NULL)
+		const image_info& imageInfo, team_id owner, int32 event,
+		Image** _image = NULL)
 	{
-		Image* image = new(std::nothrow) Image(imageInfo, event);
+		Image* image = new(std::nothrow) Image(imageInfo, owner, event);
 		if (image == NULL)
 			return B_NO_MEMORY;
 
