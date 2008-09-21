@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,114 +14,123 @@
 
 class BClipboard;
 
+
+// UndoBuffer
 class BTextView::UndoBuffer {
 public:
-	UndoBuffer(BTextView *, undo_state);
-	virtual ~UndoBuffer();
+								UndoBuffer(BTextView* view, undo_state state);
+	virtual						~UndoBuffer();
 
-	void Undo(BClipboard *);
-	undo_state State(bool *);
+			void				Undo(BClipboard* clipboard);
+			undo_state			State(bool* _isRedo) const;
 
 protected:
-	virtual void UndoSelf(BClipboard *);
-	virtual void RedoSelf(BClipboard *);
+	virtual	void				UndoSelf(BClipboard* clipboard);
+	virtual	void				RedoSelf(BClipboard* clipboard);
 	
-	BTextView *fTextView;
-	int32 fStart;
-	int32 fEnd;
+			BTextView*			fTextView;
+			int32				fStart;
+			int32				fEnd;
 
-	char *fTextData;
-	int32 fTextLength;
-	text_run_array *fRunArray;
-	int32 fRunArrayLength;
-	
-	bool fRedo;
+			char*				fTextData;
+			int32				fTextLength;
+			text_run_array*		fRunArray;
+			int32				fRunArrayLength;
+
+			bool				fRedo;
 
 private:
-	undo_state fState;
+			undo_state			fState;
 };
 
 
-//  ******** _BCutUndoBuffer_ *******
-class _BCutUndoBuffer_ : public BTextView::UndoBuffer {
+// CutUndoBuffer
+class BTextView::CutUndoBuffer : public BTextView::UndoBuffer {
 public:
-	_BCutUndoBuffer_(BTextView *textView);
-	~_BCutUndoBuffer_();
+								CutUndoBuffer(BTextView* textView);
+	virtual						~CutUndoBuffer();
 
 protected:
-	virtual void RedoSelf(BClipboard *);
+	virtual	void				RedoSelf(BClipboard* clipboard);
 };
 
 
-//  ******** _BPasteUndoBuffer_ *******
-class _BPasteUndoBuffer_ : public BTextView::UndoBuffer {
+// PasteUndoBuffer
+class BTextView::PasteUndoBuffer : public BTextView::UndoBuffer {
 public:
-	_BPasteUndoBuffer_(BTextView *, const char *, int32, text_run_array *, int32);
-	~_BPasteUndoBuffer_();
+								PasteUndoBuffer(BTextView* textView,
+									const char* text, int32 textLength,
+									text_run_array* runArray,
+									int32 runArrayLen);
+	virtual						~PasteUndoBuffer();
 
 protected:
-	virtual void UndoSelf(BClipboard *);
-	virtual void RedoSelf(BClipboard *);
+	virtual	void				UndoSelf(BClipboard* clipboard);
+	virtual	void				RedoSelf(BClipboard* clipboard);
 
 private:
-	char *fPasteText;
-	int32 fPasteTextLength;
-	text_run_array *fPasteRunArray;
+			char*				fPasteText;
+			int32				fPasteTextLength;
+			text_run_array*		fPasteRunArray;
 };
 
 
-//  ******** _BClearUndoBuffer_ *******
-class _BClearUndoBuffer_ : public BTextView::UndoBuffer {
+// ClearUndoBuffer
+class BTextView::ClearUndoBuffer : public BTextView::UndoBuffer {
 public:
-	_BClearUndoBuffer_(BTextView *textView);
-	~_BClearUndoBuffer_();
+								ClearUndoBuffer(BTextView* textView);
+	virtual						~ClearUndoBuffer();
 
 protected:
-	virtual void RedoSelf(BClipboard *);
+	virtual	void				RedoSelf(BClipboard* clipboard);
 };
 
 
-//  ******** _BDropUndoBuffer_ ********
-class _BDropUndoBuffer_ : public BTextView::UndoBuffer {
+// DropUndoBuffer
+class BTextView::DropUndoBuffer : public BTextView::UndoBuffer {
 public:
-	_BDropUndoBuffer_(BTextView *, char const *, int32, text_run_array *, int32, int32, bool);
-	~_BDropUndoBuffer_();
+								DropUndoBuffer(BTextView* textView,
+									char const* text, int32 textLength,
+									text_run_array* runArray,
+									int32 runArrayLength, int32 location,
+									bool internalDrop);
+	virtual						~DropUndoBuffer();
 
 protected:
-	virtual void UndoSelf(BClipboard *);
-	virtual void RedoSelf(BClipboard *);
+	virtual	void				UndoSelf(BClipboard* clipboard);
+	virtual	void				RedoSelf(BClipboard* clipboard);
 
 private:
-	char *fDropText;
-	int32 fDropTextLength;
-	text_run_array *fDropRunArray;
+			char*				fDropText;
+			int32				fDropTextLength;
+			text_run_array*		fDropRunArray;
 	
-	int32 fDropLocation;
-	bool fInternalDrop;
+			int32				fDropLocation;
+			bool				fInternalDrop;
 };
 
 
-//  ******** _BTypingUndoBuffer_ ********
-class _BTypingUndoBuffer_ : public BTextView::UndoBuffer {
+// TypingUndoBuffer
+class BTextView::TypingUndoBuffer : public BTextView::UndoBuffer {
 public:
-	_BTypingUndoBuffer_(BTextView *);
-	~_BTypingUndoBuffer_();
+								TypingUndoBuffer(BTextView* textView);
+	virtual						~TypingUndoBuffer();
 
-	void InputCharacter(int32);
-	void BackwardErase();
-	void ForwardErase();
+			void				InputCharacter(int32 length);
+			void				BackwardErase();
+			void				ForwardErase();
 
 protected:
-	virtual void RedoSelf(BClipboard *);
-	virtual void UndoSelf(BClipboard *);
+	virtual	void				RedoSelf(BClipboard* clipboard);
+	virtual	void				UndoSelf(BClipboard* clipboard);
 
 private:
-	void Reset();
+			void				_Reset();
 	
-	char *fTypedText;
-	int32 fTypedStart;
-	int32 fTypedEnd;
-	int32 fUndone;
+			char*				fTypedText;
+			int32				fTypedStart;
+			int32				fTypedEnd;
+			int32				fUndone;
 };
 
 #endif //__UNDOBUFFER_H

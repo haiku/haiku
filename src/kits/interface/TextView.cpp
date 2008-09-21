@@ -1279,7 +1279,7 @@ BTextView::Cut(BClipboard *clipboard)
 	_CancelInputMethod();
 	if (fUndo) {
 		delete fUndo;
-		fUndo = new _BCutUndoBuffer_(this);
+		fUndo = new CutUndoBuffer(this);
 	}
 	Copy(clipboard);
 	Delete();
@@ -1346,7 +1346,7 @@ BTextView::Paste(BClipboard *clipboard)
 
 			if (fUndo) {
 				delete fUndo;
-				fUndo = new _BPasteUndoBuffer_(this, text, len, runArray,
+				fUndo = new PasteUndoBuffer(this, text, len, runArray,
 					runLen);
 			}
 
@@ -1370,7 +1370,7 @@ BTextView::Clear()
 	// because when fUndo is NULL, undo is deactivated.
 	if (fUndo) {
 		delete fUndo;
-		fUndo = new _BClearUndoBuffer_(this);
+		fUndo = new ClearUndoBuffer(this);
 	}
 
 	Delete();
@@ -2083,8 +2083,7 @@ BTextView::TextRect() const
 /*! \brief Sets the insets from the bounds for the BTextView's text rectangle.
 */
 void
-BTextView::SetInsets(float _leftInset, float topInset, float rightInset,
-	float bottomInset)
+BTextView::SetInsets(float left, float top, float right, float bottom)
 {
 	// TODO:
 	// * store in layout data
@@ -2097,19 +2096,19 @@ BTextView::SetInsets(float _leftInset, float topInset, float rightInset,
 	rectangle.
 */
 void
-BTextView::GetInsets(float* _leftInset, float* _topInset, float* _rightInset,
-	float* _bottomInset) const
+BTextView::GetInsets(float* _left, float* _top, float* _right,
+	float* _bottom) const
 {
 	BRect bounds = Bounds();
 
-	if (_leftInset)
-		*_leftInset = fTextRect.left - bounds.left;
-	if (_topInset)
-		*_topInset = fTextRect.top - bounds.top;
-	if (_rightInset)
-		*_rightInset = bounds.right - fTextRect.right;
-	if (_bottomInset)
-		*_bottomInset = bounds.bottom - fTextRect.bottom;
+	if (_left)
+		*_left = fTextRect.left - bounds.left;
+	if (_top)
+		*_top = fTextRect.top - bounds.top;
+	if (_right)
+		*_right = bounds.right - fTextRect.right;
+	if (_bottom)
+		*_bottom = bounds.bottom - fTextRect.bottom;
 }
 
 
@@ -2877,11 +2876,11 @@ void
 BTextView::_HandleBackspace()
 {
 	if (fUndo) {
-		_BTypingUndoBuffer_ *undoBuffer = dynamic_cast<_BTypingUndoBuffer_ *>(
+		TypingUndoBuffer *undoBuffer = dynamic_cast<TypingUndoBuffer*>(
 			fUndo);
 		if (!undoBuffer) {
 			delete fUndo;
-			fUndo = undoBuffer = new _BTypingUndoBuffer_(this);
+			fUndo = undoBuffer = new TypingUndoBuffer(this);
 		}
 		undoBuffer->BackwardErase();
 	}
@@ -3012,11 +3011,11 @@ void
 BTextView::_HandleDelete()
 {
 	if (fUndo) {
-		_BTypingUndoBuffer_ *undoBuffer = dynamic_cast<_BTypingUndoBuffer_ *>(
+		TypingUndoBuffer *undoBuffer = dynamic_cast<TypingUndoBuffer*>(
 			fUndo);
 		if (!undoBuffer) {
 			delete fUndo;
-			fUndo = undoBuffer = new _BTypingUndoBuffer_(this);
+			fUndo = undoBuffer = new TypingUndoBuffer(this);
 		}
 		undoBuffer->ForwardErase();
 	}	
@@ -3156,11 +3155,10 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 {		
 	// TODO: block input if not editable (Andrew)
 	if (fUndo) {
-		_BTypingUndoBuffer_ *undoBuffer
-			= dynamic_cast<_BTypingUndoBuffer_ *>(fUndo);
+		TypingUndoBuffer *undoBuffer = dynamic_cast<TypingUndoBuffer*>(fUndo);
 		if (!undoBuffer) {
 			delete fUndo;
-			fUndo = undoBuffer = new _BTypingUndoBuffer_(this);
+			fUndo = undoBuffer = new TypingUndoBuffer(this);
 		}
 		undoBuffer->InputCharacter(numBytes);
 	}
@@ -4140,7 +4138,7 @@ BTextView::_MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 		
 		if (fUndo) {
 			delete fUndo;
-			fUndo = new _BDropUndoBuffer_(this, text, dataLen, runArray,
+			fUndo = new DropUndoBuffer(this, text, dataLen, runArray,
 				runLen, dropOffset, internalDrop);
 		}
 		
