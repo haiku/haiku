@@ -175,11 +175,10 @@ public:
 
 			void				SetTextRect(BRect rect);
 			BRect				TextRect() const;
-			void				SetInsets(float _leftInset, float topInset,
-									float rightInset, float bottomInset);
-			void				GetInsets(float* _leftInset, float* _topInset,
-									float* _rightInset,
-									float* _bottomInset) const;
+			void				SetInsets(float left, float top, float right,
+									float bottom);
+			void				GetInsets(float* _left, float* _top,
+									float* _right, float* _bottom) const;
 
 			void				SetStylable(bool stylable);
 			bool				IsStylable() const;
@@ -248,6 +247,13 @@ private:
 			class TextTrackState;
 			class UndoBuffer;
 			class WidthBuffer;
+
+			// UndoBuffer deratives
+			class CutUndoBuffer;
+			class PasteUndoBuffer;
+			class ClearUndoBuffer;
+			class DropUndoBuffer;
+			class TypingUndoBuffer;
 
 			friend class TextTrackState;
 			friend status_t	_init_interface_kit_();
@@ -388,7 +394,9 @@ private:
 			BPoint				fWhere;
 			TextTrackState*		fTrackingMouse;
 
-			uint32				_reserved[9];
+			LayoutData*			fLayoutData;
+
+			uint32				_reserved[8];
 
 	static	WidthBuffer*		sWidths;
 };
