@@ -904,7 +904,7 @@ _init_interface_kit_()
 	if (status < B_OK)
 		return status;
 
-	BTextView::sWidths = new BTextView::WidthBuffer;
+	BTextView::sWidths = new BPrivate::WidthBuffer;
 
 	_init_global_fonts_();
 

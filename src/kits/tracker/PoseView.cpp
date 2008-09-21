@@ -9306,7 +9306,7 @@ TPoseViewFilter::Filter(BMessage *message, BHandler **)
 float BPoseView::sFontHeight = -1;
 font_height BPoseView::sFontInfo = { 0, 0, 0 };
 bigtime_t BPoseView::sLastKeyTime = 0;
-BTextView::WidthBuffer* BPoseView::sWidthBuffer = new BTextView::WidthBuffer;
+BPrivate::WidthBuffer* BPoseView::sWidthBuffer = new BPrivate::WidthBuffer;
 BFont BPoseView::sCurrentFont;
 OffscreenBitmap *BPoseView::sOffscreen = new OffscreenBitmap;
 char BPoseView::sMatchString[] = "";

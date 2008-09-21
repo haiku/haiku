@@ -15,8 +15,9 @@
 
 class BFile;
 
+namespace BPrivate {
 
-class BTextView::TextGapBuffer {
+class TextGapBuffer {
 public:
 					TextGapBuffer();
 virtual				~TextGapBuffer();
@@ -60,16 +61,18 @@ protected:
 
 
 inline int32 
-BTextView::TextGapBuffer::Length() const
+TextGapBuffer::Length() const
 {
 	return fItemCount;
 }
 
 
 inline char 
-BTextView::TextGapBuffer::RealCharAt(long index) const
+TextGapBuffer::RealCharAt(long index) const
 {
 	return (index < fGapIndex) ? fBuffer[index] : fBuffer[index + fGapCount];
 }
+
+} // namespace BPrivate
 
 #endif //__TEXTGAPBUFFER_H

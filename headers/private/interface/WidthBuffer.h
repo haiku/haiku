@@ -41,6 +41,10 @@ class BFont;
 // as fonts can be classified also by spacing mode and other attributes.
 #define USE_DANO_WIDTHBUFFER 0 
 
+namespace BPrivate {
+
+class TextGapBuffer;
+
 struct _width_table_ {
 #if USE_DANO_WIDTHBUFFER
 	BFont font;				// corresponding font
@@ -53,15 +57,14 @@ struct _width_table_ {
 	void *widths;			// width table	
 };
 
-
-class BTextView::WidthBuffer : public _BTextViewSupportBuffer_<_width_table_> {
+class WidthBuffer : public _BTextViewSupportBuffer_<_width_table_> {
 public:
 	WidthBuffer();
 	virtual ~WidthBuffer();
 
 	float StringWidth(const char *inText, int32 fromOffset, int32 length,
 		const BFont *inStyle);
-	float StringWidth(BTextView::TextGapBuffer &gapBuffer, int32 fromOffset,
+	float StringWidth(TextGapBuffer &gapBuffer, int32 fromOffset,
 		int32 length, const BFont *inStyle);
 
 private:
@@ -74,5 +77,7 @@ private:
 	
 	static uint32 Hash(uint32);
 };
+
+} // namespace BPrivate
 
 #endif // __WIDTHBUFFER_H

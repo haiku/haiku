@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+namespace BPrivate {
 
 const static uint32 kTableCount = 128;
 const static uint32 kInvalidCode = 0xFFFFFFFF;
@@ -59,7 +60,7 @@ CharToCode(const char *text, const int32 charLen)
 
 /*! \brief Initializes the object.
 */
-BTextView::WidthBuffer::WidthBuffer()
+WidthBuffer::WidthBuffer()
 	:
 	_BTextViewSupportBuffer_<_width_table_>(1, 0)
 {
@@ -68,7 +69,7 @@ BTextView::WidthBuffer::WidthBuffer()
 
 /*! \brief Frees the allocated resources.
 */
-BTextView::WidthBuffer::~WidthBuffer()
+WidthBuffer::~WidthBuffer()
 {
 	for (int32 x = 0; x < fItemCount; x++)
 		delete[] (hashed_escapement *)fBuffer[x].widths;
@@ -83,7 +84,7 @@ BTextView::WidthBuffer::~WidthBuffer()
 	\return The space (in pixels) required to draw the given string.
 */
 float
-BTextView::WidthBuffer::StringWidth(const char *inText, int32 fromOffset,
+WidthBuffer::StringWidth(const char *inText, int32 fromOffset,
 	int32 length, const BFont *inStyle)
 {
 	if (inText == NULL || length == 0)
@@ -142,14 +143,14 @@ BTextView::WidthBuffer::StringWidth(const char *inText, int32 fromOffset,
 
 
 /*! \brief Returns how much room is required to draw a string in the font.
-	\param inBuffer The BTextView::TextGapBuffer to be examined.
-	\param fromOffset The offset in the BTextView::TextGapBuffer where to begin the examination.
+	\param inBuffer The TextGapBuffer to be examined.
+	\param fromOffset The offset in the TextGapBuffer where to begin the examination.
 	\param lenght The amount of bytes to be examined.
 	\param inStyle The font.
 	\return The space (in pixels) required to draw the given string.
 */
 float
-BTextView::WidthBuffer::StringWidth(BTextView::TextGapBuffer &inBuffer, int32 fromOffset, int32 length,
+WidthBuffer::StringWidth(TextGapBuffer &inBuffer, int32 fromOffset, int32 length,
 		const BFont *inStyle)
 {
 	const char* text = inBuffer.GetString(fromOffset, &length);
@@ -165,7 +166,7 @@ BTextView::WidthBuffer::StringWidth(BTextView::TextGapBuffer &inBuffer, int32 fr
 		\c false if not.
 */
 bool
-BTextView::WidthBuffer::FindTable(const BFont *inStyle, int32 *outIndex)
+WidthBuffer::FindTable(const BFont *inStyle, int32 *outIndex)
 {
 	if (inStyle == NULL)
 		return false;
@@ -199,7 +200,7 @@ BTextView::WidthBuffer::FindTable(const BFont *inStyle, int32 *outIndex)
 	\return The index of the newly created table.
 */
 int32
-BTextView::WidthBuffer::InsertTable(const BFont *font)
+WidthBuffer::InsertTable(const BFont *font)
 {
 	_width_table_ table;
 	
@@ -230,7 +231,7 @@ BTextView::WidthBuffer::InsertTable(const BFont *font)
 		for the given charachter, \c false if not.
 */
 bool 
-BTextView::WidthBuffer::GetEscapement(uint32 value, int32 index, float *escapement)
+WidthBuffer::GetEscapement(uint32 value, int32 index, float *escapement)
 {
 	const _width_table_ &table = fBuffer[index];	
 	const hashed_escapement *widths = static_cast<hashed_escapement *>(table.widths);
@@ -256,7 +257,7 @@ BTextView::WidthBuffer::GetEscapement(uint32 value, int32 index, float *escapeme
 
 
 uint32
-BTextView::WidthBuffer::Hash(uint32 val)
+WidthBuffer::Hash(uint32 val)
 {
 	uint32 shifted = val >> 24;
 	uint32 result = (val >> 15) + (shifted * 3);	
@@ -280,7 +281,7 @@ BTextView::WidthBuffer::Hash(uint32 val)
 		the size of the font).
 */
 float
-BTextView::WidthBuffer::HashEscapements(const char *inText, int32 numChars, int32 textLen,
+WidthBuffer::HashEscapements(const char *inText, int32 numChars, int32 textLen,
 		int32 tableIndex, const BFont *inStyle)
 {
 	ASSERT(inText != NULL);
@@ -359,3 +360,6 @@ BTextView::WidthBuffer::HashEscapements(const char *inText, int32 numChars, int3
 
 	return width;
 }
+
+} // namespace BPrivate
+

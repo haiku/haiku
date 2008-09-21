@@ -150,7 +150,7 @@ struct BTextView::LayoutData {
 };
 
 // Initialized/finalized by init/fini_interface_kit
-BTextView::WidthBuffer* BTextView::sWidths = NULL;
+BPrivate::WidthBuffer* BTextView::sWidths = NULL;
 
 
 const static rgb_color kBlackColor = { 0, 0, 0, 255 };
@@ -3009,7 +3009,7 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	if (initialColor == NULL)
 		initialColor = &kBlackColor;
 
-	fText = new TextGapBuffer;
+	fText = new BPrivate::TextGapBuffer;
 	fLines = new LineBuffer;
 	fStyles = new StyleBuffer(&font, initialColor);
 	

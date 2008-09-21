@@ -40,7 +40,8 @@ enum undo_state {
 };
 
 namespace BPrivate {
-	class BPoseView;
+	class WidthBuffer;
+	class TextGapBuffer;
 } // namespace BPrivate
 
 class BTextView : public BView {
@@ -264,10 +265,8 @@ private:
 			struct LayoutData;
 			class LineBuffer;
 			class StyleBuffer;
-			class TextGapBuffer;
 			class TextTrackState;
 			class UndoBuffer;
-			class WidthBuffer;
 
 			// UndoBuffer derivatives
 			class CutUndoBuffer;
@@ -277,7 +276,6 @@ private:
 			class TypingUndoBuffer;
 
 			friend class TextTrackState;
-			friend class BPrivate::BPoseView;
 			friend status_t	_init_interface_kit_();
 
 	virtual	void				_ReservedTextView3();
@@ -381,7 +379,7 @@ private:
 			void				_HandleInputMethodLocationRequest();
 			void				_CancelInputMethod();
 
-			TextGapBuffer*		fText;
+			BPrivate::TextGapBuffer*	fText;
 			LineBuffer*			fLines;
 			StyleBuffer*		fStyles;
 			BRect				fTextRect;
@@ -420,7 +418,7 @@ private:
 
 			uint32				_reserved[8];
 
-	static	WidthBuffer*		sWidths;
+	static	BPrivate::WidthBuffer*		sWidths;
 };
 
 #endif	// _TEXTVIEW_H

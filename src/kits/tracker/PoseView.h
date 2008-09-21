@@ -665,7 +665,7 @@ class BPoseView : public BView {
 		BRect fDeskbarFrame;
 
 		// TODO: Get rid of this.
-		static BTextView::WidthBuffer *sWidthBuffer;
+		static BPrivate::WidthBuffer *sWidthBuffer;
 
 		static OffscreenBitmap *sOffscreen;
 
