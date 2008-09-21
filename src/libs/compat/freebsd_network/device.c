@@ -159,7 +159,7 @@ compat_write(void *cookie, off_t position, const void *buffer,
 
 	/* if we waited, check after if the ifp is still valid */
 
-	mb->m_len = min_c(*numBytes, (size_t)MCLBYTES);
+	mb->m_pkthdr.len = mb->m_len = min_c(*numBytes, (size_t)MCLBYTES);
 	memcpy(mtod(mb, void *), buffer, mb->m_len);
 
 	return ifp->if_output(ifp, mb, NULL, NULL);
