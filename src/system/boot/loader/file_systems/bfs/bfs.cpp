@@ -45,7 +45,7 @@ Volume::Volume(boot::Partition *partition)
 		// try block 0 again (can only happen on the big endian BFS)
 		if (read_pos(fDevice, 0, &fSuperBlock, sizeof(disk_super_block)) < B_OK)
 			return;
-	
+
 		if (!IsValidSuperBlock())
 			return;
 #else
@@ -55,7 +55,7 @@ Volume::Volume(boot::Partition *partition)
 
 	TRACE(("bfs: we do have a valid super block (name = %s)!\n", fSuperBlock.name));
 
-	fRootNode = new(nothrow) BFS::Directory(*this, Root());
+	fRootNode = new(nothrow) BFS::Directory(*this, NULL, Root());
 	if (fRootNode == NULL)
 		return;
 
@@ -74,7 +74,7 @@ Volume::~Volume()
 }
 
 
-status_t 
+status_t
 Volume::InitCheck()
 {
 	if (fDevice < B_OK)
@@ -118,7 +118,7 @@ Volume::ValidateBlockRun(block_run run)
 }
 
 
-block_run 
+block_run
 Volume::ToBlockRun(off_t block) const
 {
 	block_run run;

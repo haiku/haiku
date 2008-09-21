@@ -106,31 +106,47 @@ CachedBlock::SetTo(block_run run)
 
 Stream::Stream(Volume &volume, block_run run)
 	:
-	fVolume(volume)
+	fVolume(volume),
+	fInode(NULL)
 {
-	if (read_pos(volume.Device(), volume.ToOffset(run), this, sizeof(bfs_inode)) != sizeof(bfs_inode))
-		return;
+	_LoadInode(volume.ToOffset(run));
 }
 
 
 Stream::Stream(Volume &volume, off_t id)
 	:
-	fVolume(volume)
+	fVolume(volume),
+	fInode(NULL)
 {
-	if (read_pos(volume.Device(), volume.ToOffset(id), this, sizeof(bfs_inode)) != sizeof(bfs_inode))
-		return;
+	_LoadInode(volume.ToOffset(id));
+}
+
+
+Stream::Stream(const Stream& other)
+	:
+	fVolume(other.fVolume),
+	fInode(NULL)
+{
+	_UseInode(other.fInode);
 }
 
 
 Stream::~Stream()
 {
+	if (fInode != NULL) {
+		if (--(((int32*)fInode)[-1]) == 0)
+			free((int32*)fInode - 1);
+	}
 }
 
 
 status_t
 Stream::InitCheck()
 {
-	return bfs_inode::InitCheck(&fVolume);
+	if (fInode == NULL)
+		return B_NO_MEMORY;
+
+	return fInode->InitCheck(&fVolume);
 }
 
 
@@ -141,12 +157,12 @@ Stream::GetNextSmallData(const small_data **_smallData) const
 
 	// begin from the start?
 	if (smallData == NULL)
-		smallData = small_data_start;
+		smallData = fInode->small_data_start;
 	else
 		smallData = smallData->Next();
 
 	// is already last item?
-	if (smallData->IsLast(this))
+	if (smallData->IsLast(fInode))
 		return B_ENTRY_NOT_FOUND;
 
 	*_smallData = smallData;
@@ -155,7 +171,7 @@ Stream::GetNextSmallData(const small_data **_smallData) const
 }
 
 
-status_t 
+status_t
 Stream::GetName(char *name, size_t size) const
 {
 	const small_data *smallData = NULL;
@@ -170,17 +186,17 @@ Stream::GetName(char *name, size_t size) const
 }
 
 
-status_t 
+status_t
 Stream::ReadLink(char *buffer, size_t bufferSize)
 {
 	// link in the stream
 
-	if (Flags() & INODE_LONG_SYMLINK)
+	if (fInode->Flags() & INODE_LONG_SYMLINK)
 		return ReadAt(0, (uint8 *)buffer, &bufferSize);
 
 	// link in the inode
 
-	strlcpy(buffer, short_symlink, bufferSize);
+	strlcpy(buffer, fInode->short_symlink, bufferSize);
 	return B_OK;
 }
 
@@ -190,21 +206,25 @@ Stream::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 {
 	// find matching block run
 
-	if (data.MaxDirectRange() > 0 && pos >= data.MaxDirectRange()) {
-		if (data.MaxDoubleIndirectRange() > 0 && pos >= data.MaxIndirectRange()) {
+	if (fInode->data.MaxDirectRange() > 0
+		&& pos >= fInode->data.MaxDirectRange()) {
+		if (fInode->data.MaxDoubleIndirectRange() > 0
+			&& pos >= fInode->data.MaxIndirectRange()) {
 			// access to double indirect blocks
 
 			CachedBlock cached(fVolume);
 
-			off_t start = pos - data.MaxIndirectRange();
-			int32 indirectSize = (1L << (INDIRECT_BLOCKS_SHIFT + cached.BlockShift()))
-				* (fVolume.BlockSize() / sizeof(block_run));
+			off_t start = pos - fInode->data.MaxIndirectRange();
+			int32 indirectSize
+				= (1L << (INDIRECT_BLOCKS_SHIFT + cached.BlockShift()))
+					* (fVolume.BlockSize() / sizeof(block_run));
 			int32 directSize = NUM_ARRAY_BLOCKS << cached.BlockShift();
 			int32 index = start / indirectSize;
 			int32 runsPerBlock = cached.BlockSize() / sizeof(block_run);
 
-			block_run *indirect = (block_run *)cached.SetTo(
-					fVolume.ToBlock(data.double_indirect) + index / runsPerBlock);
+			block_run *indirect = (block_run*)cached.SetTo(
+					fVolume.ToBlock(fInode->data.double_indirect)
+						+ index / runsPerBlock);
 			if (indirect == NULL)
 				return B_ERROR;
 
@@ -213,24 +233,25 @@ Stream::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 
 			int32 current = (start % indirectSize) / directSize;
 
-			indirect = (block_run *)cached.SetTo(
+			indirect = (block_run*)cached.SetTo(
 					fVolume.ToBlock(indirect[index % runsPerBlock]) + current / runsPerBlock);
 			if (indirect == NULL)
 				return B_ERROR;
 
 			run = indirect[current % runsPerBlock];
-			offset = data.MaxIndirectRange() + (index * indirectSize) + (current * directSize);
+			offset = fInode->data.MaxIndirectRange() + (index * indirectSize)
+				+ (current * directSize);
 			//printf("\tfCurrent = %ld, fRunFileOffset = %Ld, fRunBlockEnd = %Ld, fRun = %ld,%d\n",fCurrent,fRunFileOffset,fRunBlockEnd,fRun.allocation_group,fRun.start);
 		} else {
 			// access to indirect blocks
 
 			int32 runsPerBlock = fVolume.BlockSize() / sizeof(block_run);
-			off_t runBlockEnd = data.MaxDirectRange();
+			off_t runBlockEnd = fInode->data.MaxDirectRange();
 
 			CachedBlock cached(fVolume);
-			off_t block = fVolume.ToBlock(data.indirect);
+			off_t block = fVolume.ToBlock(fInode->data.indirect);
 
-			for (int32 i = 0;i < data.indirect.Length();i++) {
+			for (int32 i = 0;i < fInode->data.indirect.Length();i++) {
 				block_run *indirect = (block_run *)cached.SetTo(block + i);
 				if (indirect == NULL)
 					return B_IO_ERROR;
@@ -259,12 +280,13 @@ Stream::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 		int32 current = -1;
 
 		while (++current < NUM_DIRECT_BLOCKS) {
-			if (data.direct[current].IsZero())
+			if (fInode->data.direct[current].IsZero())
 				break;
 
-			runBlockEnd += data.direct[current].Length() << fVolume.BlockShift();
+			runBlockEnd += fInode->data.direct[current].Length()
+				<< fVolume.BlockShift();
 			if (runBlockEnd > pos) {
-				run = data.direct[current];
+				run = fInode->data.direct[current];
 				offset = runBlockEnd - (run.Length() << fVolume.BlockShift());
 				//printf("### run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
 				return fVolume.ValidateBlockRun(run);
@@ -284,15 +306,15 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 	if (pos < 0)
 		return B_BAD_VALUE;
-	if (pos >= data.Size()) {
+	if (pos >= fInode->data.Size()) {
 		*_length = 0;
 		return B_NO_ERROR;
 	}
 
 	size_t length = *_length;
 
-	if (pos + length > data.Size())
-		length = data.Size() - pos;
+	if (pos + length > fInode->data.Size())
+		length = fInode->data.Size() - pos;
 
 	block_run run;
 	off_t offset;
@@ -396,14 +418,14 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 
 Node *
-Stream::NodeFactory(Volume &volume, off_t id)
+Stream::NodeFactory(Volume &volume, ::Directory* parent, off_t id)
 {
 	Stream stream(volume, id);
 	if (stream.InitCheck() != B_OK)
 		return NULL;
 
 	if (stream.IsContainer())
-		return new(nothrow) Directory(stream);
+		return new(nothrow) Directory(parent, stream);
 
 	if (stream.IsSymlink())
 		return new(nothrow) Link(stream);
@@ -412,10 +434,41 @@ Stream::NodeFactory(Volume &volume, off_t id)
 }
 
 
+status_t
+Stream::_LoadInode(off_t offset)
+{
+	int32* inodeRef = (int32*)malloc(fVolume.BlockSize() + 4);
+	if (inodeRef == NULL)
+		return B_NO_MEMORY;
+
+	fInode = (bfs_inode*)(inodeRef + 1);
+	*inodeRef = 1;
+
+	ssize_t bytesRead = read_pos(fVolume.Device(), offset, fInode,
+		fVolume.BlockSize());
+	if (bytesRead >= 0 && (size_t)bytesRead == fVolume.BlockSize())
+		return B_OK;
+
+	free(inodeRef);
+	fInode = NULL;
+
+	return bytesRead < 0 ? bytesRead : B_ERROR;
+}
+
+
+void
+Stream::_UseInode(bfs_inode* inode)
+{
+	fInode = inode;
+	if (fInode != NULL)
+		((int32*)fInode)[-1]++;
+}
+
+
 //	#pragma mark -
 
 
-status_t 
+status_t
 bfs_inode::InitCheck(Volume *volume)
 {
 	if (Flags() & INODE_NOT_READY) {

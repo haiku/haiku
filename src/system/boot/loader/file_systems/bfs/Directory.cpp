@@ -22,24 +22,27 @@ extern Node *get_node_from(int fd);
 
 namespace BFS {
 
-Directory::Directory(Volume &volume, block_run run)
+Directory::Directory(Volume &volume, ::Directory* parent, block_run run)
 	:
+	::Directory(parent),
 	fStream(volume, run),
 	fTree(&fStream)
 {
 }
 
 
-Directory::Directory(Volume &volume, off_t id)
+Directory::Directory(Volume &volume, ::Directory* parent, off_t id)
 	:
+	::Directory(parent),
 	fStream(volume, id),
 	fTree(&fStream)
 {
 }
 
 
-Directory::Directory(const Stream &stream)
+Directory::Directory(::Directory* parent, const Stream &stream)
 	:
+	::Directory(parent),
 	fStream(stream),
 	fTree(&fStream)
 {
@@ -51,14 +54,14 @@ Directory::~Directory()
 }
 
 
-status_t 
+status_t
 Directory::InitCheck()
 {
 	return fStream.InitCheck();
 }
 
 
-status_t 
+status_t
 Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
@@ -71,7 +74,7 @@ Directory::Open(void **_cookie, int mode)
 }
 
 
-status_t 
+status_t
 Directory::Close(void *cookie)
 {
 	_inherited::Close(cookie);
@@ -88,7 +91,7 @@ Directory::Lookup(const char *name, bool traverseLinks)
 	if (fTree.Find((uint8 *)name, strlen(name), &id) < B_OK)
 		return NULL;
 
-	Node *node = Stream::NodeFactory(fStream.GetVolume(), id);
+	Node *node = Stream::NodeFactory(fStream.GetVolume(), this, id);
 	if (!node)
 		return NULL;
 
@@ -117,7 +120,7 @@ Directory::Lookup(const char *name, bool traverseLinks)
 }
 
 
-status_t 
+status_t
 Directory::GetNextEntry(void *cookie, char *name, size_t size)
 {
 	TreeIterator *iterator = (TreeIterator *)cookie;
@@ -128,7 +131,7 @@ Directory::GetNextEntry(void *cookie, char *name, size_t size)
 }
 
 
-status_t 
+status_t
 Directory::GetNextNode(void *cookie, Node **_node)
 {
 	TreeIterator *iterator = (TreeIterator *)cookie;
@@ -140,7 +143,7 @@ Directory::GetNextNode(void *cookie, Node **_node)
 	if (status != B_OK)
 		return status;
 
-	*_node = Stream::NodeFactory(fStream.GetVolume(), id);
+	*_node = Stream::NodeFactory(fStream.GetVolume(), this, id);
 	if (*_node == NULL)
 		return B_ERROR;
 
@@ -148,7 +151,7 @@ Directory::GetNextNode(void *cookie, Node **_node)
 }
 
 
-status_t 
+status_t
 Directory::Rewind(void *cookie)
 {
 	TreeIterator *iterator = (TreeIterator *)cookie;
@@ -157,7 +160,7 @@ Directory::Rewind(void *cookie)
 }
 
 
-bool 
+bool
 Directory::IsEmpty()
 {
 	TreeIterator iterator(&fTree);
@@ -184,7 +187,7 @@ Directory::IsEmpty()
 status_t
 Directory::GetName(char *name, size_t size) const
 {
-	if (fStream.inode_num == fStream.GetVolume().Root()) {
+	if (fStream.InodeNum() == fStream.GetVolume().Root()) {
 		strlcpy(name, fStream.GetVolume().SuperBlock().name, size);
 		return B_OK;
 	}

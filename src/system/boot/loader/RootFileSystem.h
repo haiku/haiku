@@ -17,6 +17,8 @@ class RootFileSystem : public Directory {
 		RootFileSystem();
 		virtual ~RootFileSystem();
 
+		virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
+
 		virtual status_t Open(void **_cookie, int mode);
 		virtual status_t Close(void *cookie);
 

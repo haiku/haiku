@@ -45,7 +45,13 @@ typedef NodeList::Iterator NodeIterator;
 
 class Directory : public Node {
 	public:
-		Directory();
+		Directory(Directory* parent);
+		~Directory();
+
+		Directory* Parent() const;
+		void SetParent(Directory* parent);
+
+		status_t GetPath(const char* entry, char* buffer, size_t bufferSize);
 
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
@@ -58,6 +64,9 @@ class Directory : public Node {
 		virtual status_t GetNextNode(void *cookie, Node **_node) = 0;
 		virtual status_t Rewind(void *cookie) = 0;
 		virtual bool IsEmpty() = 0;
+
+	private:
+		Directory*	fParent;
 };
 
 /** The console based nodes don't need cookies for I/O, they

@@ -96,7 +96,7 @@ class File : public ::Node, public Entry {
 
 class Directory : public ::Directory, public Entry {
 	public:
-		Directory(const char *name);
+		Directory(::Directory* parent, const char* name);
 		virtual ~Directory();
 
 		virtual status_t Open(void **_cookie, int mode);
@@ -181,7 +181,7 @@ bool
 skip_gzip_header(z_stream *stream)
 {
 	uint8 *buffer = (uint8 *)stream->next_in;
-	
+
 	// check magic and skip method
 	if (buffer[0] != 0x1f || buffer[1] != 0x8b)
 		return false;
@@ -306,8 +306,10 @@ TarFS::File::Inode() const
 
 // #pragma mark -
 
-TarFS::Directory::Directory(const char *name)
-	: TarFS::Entry(name)
+TarFS::Directory::Directory(::Directory* parent, const char* name)
+	:
+	::Directory(parent),
+	TarFS::Entry(name)
 {
 }
 
@@ -321,7 +323,7 @@ TarFS::Directory::~Directory()
 }
 
 
-status_t 
+status_t
 TarFS::Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
@@ -336,7 +338,7 @@ TarFS::Directory::Open(void **_cookie, int mode)
 }
 
 
-status_t 
+status_t
 TarFS::Directory::Close(void *cookie)
 {
 	_inherited::Close(cookie);
@@ -395,7 +397,7 @@ TarFS::Directory::Lookup(const char *name, bool traverseLinks)
 }
 
 
-status_t 
+status_t
 TarFS::Directory::GetNextEntry(void *_cookie, char *name, size_t size)
 {
 	EntryIterator *iterator = (EntryIterator *)_cookie;
@@ -410,7 +412,7 @@ TarFS::Directory::GetNextEntry(void *_cookie, char *name, size_t size)
 }
 
 
-status_t 
+status_t
 TarFS::Directory::GetNextNode(void *_cookie, Node **_node)
 {
 	EntryIterator *iterator = (EntryIterator *)_cookie;
@@ -424,12 +426,12 @@ TarFS::Directory::GetNextNode(void *_cookie, Node **_node)
 }
 
 
-status_t 
+status_t
 TarFS::Directory::Rewind(void *_cookie)
 {
 	EntryIterator *iterator = (EntryIterator *)_cookie;
 	*iterator = fEntries.GetIterator();
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -458,7 +460,7 @@ TarFS::Directory::AddDirectory(char *dirName, TarFS::Directory **_dir)
 			return B_ERROR;
 	} else {
 		// doesn't exist yet -- create it
-		dir = new(nothrow) TarFS::Directory(dirName);
+		dir = new(nothrow) TarFS::Directory(this, dirName);
 		if (!dir)
 			return B_NO_MEMORY;
 
@@ -517,7 +519,7 @@ TarFS::Directory::AddFile(tar_header *header)
 }
 
 
-bool 
+bool
 TarFS::Directory::IsEmpty()
 {
 	return fEntries.IsEmpty();
@@ -597,7 +599,7 @@ TarFS::Symlink::Inode() const
 
 
 TarFS::Volume::Volume()
-	: TarFS::Directory("Boot from CD-ROM")
+	: TarFS::Directory(NULL, "Boot from CD-ROM")
 {
 }
 
