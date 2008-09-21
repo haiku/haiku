@@ -4052,8 +4052,6 @@ vm_init(kernel_args *args)
 
 	allocate_kernel_args(args);
 
-	args->kernel_image.name = "kernel";
-		// the lazy boot loader currently doesn't set the kernel's name...
 	create_preloaded_image_areas(&args->kernel_image);
 
 	// allocate areas for preloaded images

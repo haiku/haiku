@@ -126,9 +126,9 @@ load_elf_symbol_table(int fd, preloaded_image *image)
 		status = B_ERROR;
 		goto error1;
 	}
-	
+
 	// find symbol table in section headers
-	
+
 	for (int32 i = 0; i < elfHeader.e_shnum; i++) {
 		if (sectionHeaders[i].sh_type == SHT_SYMTAB) {
 			stringHeader = &sectionHeaders[sectionHeaders[i].sh_link];
@@ -423,7 +423,11 @@ elf_load_image(Directory *directory, const char *path)
 
 	status_t status = elf_load_image(fd, image);
 	if (status == B_OK) {
-		image->name = kernel_args_strdup(path);
+		char tmpPath[B_PATH_NAME_LENGTH];
+		if (directory->GetPath(path, tmpPath, sizeof(tmpPath)) == B_OK)
+			image->name = kernel_args_strdup(tmpPath);
+		else
+			image->name = kernel_args_strdup(path);
 		image->inode = stat.st_ino;
 
 		// insert to kernel args
