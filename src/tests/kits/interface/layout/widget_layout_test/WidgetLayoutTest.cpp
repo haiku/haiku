@@ -23,6 +23,7 @@
 #include "StringView.h"
 #include "Test.h"
 #include "TextControlTest.h"
+#include "TextViewTest.h"
 #include "TwoDimensionalSliderView.h"
 #include "View.h"
 #include "ViewContainer.h"
@@ -53,6 +54,7 @@ const test_info kTestInfos[] = {
 	{ "BScrollBar",		ScrollBarTest::CreateTest },
 	{ "BSlider",		SliderTest::CreateTest },
 	{ "BTextControl",	TextControlTest::CreateTest },
+	{ "BTextView",		TextViewTest::CreateTest },
 	{ NULL, NULL }
 };
 
