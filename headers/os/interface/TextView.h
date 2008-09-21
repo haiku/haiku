@@ -39,6 +39,9 @@ enum undo_state {
 	B_UNDO_DROP
 };
 
+namespace BPrivate {
+	class BPoseView;
+} // namespace BPrivate
 
 class BTextView : public BView {
 public:
@@ -274,6 +277,7 @@ private:
 			class TypingUndoBuffer;
 
 			friend class TextTrackState;
+			friend class BPrivate::BPoseView;
 			friend status_t	_init_interface_kit_();
 
 	virtual	void				_ReservedTextView3();
