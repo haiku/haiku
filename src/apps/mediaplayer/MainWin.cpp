@@ -701,7 +701,7 @@ MainWin::WindowActivated(bool active)
 		MoveBy(diffX, diffY);
 	}
 
-	fController->PlayerActivated(active || gMainApp->PlayerCount() <= 1);
+	fController->PlayerActivated(active);
 }
 
 

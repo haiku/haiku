@@ -35,6 +35,7 @@
 
 #include "AutoDeleter.h"
 #include "ControllerView.h"
+#include "MainApp.h"
 #include "PlaybackState.h"
 #include "Settings.h"
 #include "VideoView.h"
@@ -332,22 +333,23 @@ Controller::PlayerActivated(bool active)
 {
 	BAutolock _(this);
 
-	if (active) {
+	if (active && gMainApp->PlayerCount() > 1) {
 		if (fActiveVolume != fVolume)
 			SetVolume(fActiveVolume);
 	} else {
 		fActiveVolume = fVolume;
-		switch (fBackgroundMovieVolumeMode) {
-			case mpSettings::BG_MOVIES_MUTED:
-				SetVolume(0.0);
-				break;
-			case mpSettings::BG_MOVIES_HALF_VLUME:
-				SetVolume(fVolume * 0.25);
-				break;
-			case mpSettings::BG_MOVIES_FULL_VOLUME:
-			default:
-				break;
-		}
+		if (gMainApp->PlayerCount() > 1)
+			switch (fBackgroundMovieVolumeMode) {
+				case mpSettings::BG_MOVIES_MUTED:
+					SetVolume(0.0);
+					break;
+				case mpSettings::BG_MOVIES_HALF_VLUME:
+					SetVolume(fVolume * 0.25);
+					break;
+				case mpSettings::BG_MOVIES_FULL_VOLUME:
+				default:
+					break;
+			}
 	}
 }
 
