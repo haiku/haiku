@@ -131,13 +131,12 @@ update_thread_user_debug_flag(struct thread* thread)
 
 
 /*!	Updates the thread::flags THREAD_FLAGS_BREAKPOINTS_DEFINED bit of the
-	current thread.
+	given thread.
 	Interrupts must be disabled and the team lock must be held.
 */
 static void
-update_thread_breakpoints_flag()
+update_thread_breakpoints_flag(struct thread* thread)
 {
-	struct thread* thread = thread_get_current_thread();
 	struct team* team = thread->team;
 
 	if (arch_has_breakpoints(&team->debug_info.arch_info))
@@ -170,13 +169,12 @@ update_threads_breakpoints_flag()
 
 
 /*!	Updates the thread::flags B_TEAM_DEBUG_DEBUGGER_INSTALLED bit of the
-	current thread.
+	given thread.
 	Interrupts must be disabled and the team lock must be held.
 */
 static void
-update_thread_debugger_installed_flag()
+update_thread_debugger_installed_flag(struct thread* thread)
 {
-	struct thread* thread = thread_get_current_thread();
 	struct team* team = thread->team;
 
 	if (atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
@@ -917,6 +915,7 @@ user_debug_update_new_thread_flags(thread_id threadID)
 
 	InterruptsLocker interruptsLocker;
 
+	SpinLocker teamLocker(gTeamSpinlock);
 	SpinLocker threadLocker(gThreadSpinlock);
 
 	struct thread *thread = thread_get_thread_struct_locked(threadID);
@@ -924,12 +923,8 @@ user_debug_update_new_thread_flags(thread_id threadID)
 		return;
 
 	update_thread_user_debug_flag(thread);
-
-	threadLocker.Unlock();
-
-	SpinLocker teamLocker(gTeamSpinlock);
-	update_thread_breakpoints_flag();
-	update_thread_debugger_installed_flag();
+	update_thread_breakpoints_flag(thread);
+	update_thread_debugger_installed_flag(thread);
 }
 
 
