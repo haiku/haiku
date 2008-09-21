@@ -22,7 +22,7 @@
  * linked list).
  * When memory is allocated, the smallest free chunk that contains
  * the requested size is split (or taken as a whole if it can't be
- * splitted anymore), and it's lower half will be removed from the 
+ * splitted anymore), and it's lower half will be removed from the
  * free list.
  * The free list is ordered by size, starting with the smallest
  * free chunk available. When a chunk is freed, it will be joint
@@ -117,7 +117,7 @@ free_chunk::Join(free_chunk *chunk)
 }
 
 
-void 
+void
 free_chunk::Remove(free_chunk *previous)
 {
 	if (previous == NULL) {
@@ -138,7 +138,7 @@ free_chunk::Remove(free_chunk *previous)
 }
 
 
-void 
+void
 free_chunk::Enqueue()
 {
 	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
@@ -252,8 +252,10 @@ malloc(size_t size)
 	// align the size requirement to a 4 bytes boundary
 	size = (size + 3) & 0xfffffffc;
 
-	if (size > sAvailable)
+	if (size > sAvailable) {
+		dprintf("malloc(): Out of memory!\n");
 		return NULL;
+	}
 
 	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
 	while (chunk && chunk->Size() < size) {
@@ -263,6 +265,7 @@ malloc(size_t size)
 
 	if (chunk == NULL) {
 		// could not find a free chunk as large as needed
+		dprintf("malloc(): Out of memory!\n");
 		return NULL;
 	}
 
@@ -356,7 +359,7 @@ free(void *allocated)
 			// remove the joined chunk from the list
 			last->next = freedChunk->next;
 			chunk = last;
-			
+
 			if (++joinCount == 2)
 				break;
 		}
@@ -365,7 +368,7 @@ free(void *allocated)
 		chunk = chunk->next;
 	}
 
-	// enqueue the link at the right position; the 
+	// enqueue the link at the right position; the
 	// free link queue is ordered by size
 
 	freedChunk->Enqueue();
