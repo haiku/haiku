@@ -4,6 +4,7 @@
  */
 
 #include <ctype.h>
+#include <errno.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,8 +36,59 @@ class Team;
 
 enum {
 	SAMPLE_AREA_SIZE	= 128 * 1024,
-	SAMPLE_STACK_DEPTH	= 5
 };
+
+
+static const char* kUsage =
+	"Usage: %s [ <options> ] <command line>\n"
+	"Executes the given command line <command line> and periodically samples\n"
+	"all started threads' program counters. When a thread terminates, a list\n"
+	"of the functions where the thread was encountered is printed.\n"
+	"\n"
+	"Options:\n"
+	"  -c             - Don't profile child threads. Default is to\n"
+	"                   recursively profile all threads created by a profiled\n"
+	"                   thread.\n"
+	"  -C             - Don't profile child teams. Default is to recursively\n"
+	"                   profile all teams created by a profiled team.\n"
+	"  -h, --help     - Print this usage info.\n"
+	"  -i <interval>  - Use a tick interval of <interval> microseconds.\n"
+	"                   Default is 1000 (1 ms). On a fast machine, a shorter\n"
+	"                   interval might lead to better results, while it might\n"
+	"                   make them worse on slow machines.\n"
+	"  -k             - Don't check kernel images for hits.\n"
+	"  -l             - Also profile loading the executable.\n"
+	"  -o <output>    - Print the results to file <output>.\n"
+	"  -s <depth>     - Number of return address samples to take from the\n"
+	"                   caller stack per tick. If the topmost address doesn't\n"
+	"                   hit a known image, the next address will be matched\n"
+	"                   (and so on).\n"
+;
+
+
+struct Options {
+	Options()
+		:
+		interval(1000),
+		stack_depth(5),
+		output(NULL),
+		profile_kernel(true),
+		profile_loading(false),
+		profile_teams(true),
+		profile_threads(true)
+	{
+	}
+
+	bigtime_t	interval;
+	int32		stack_depth;
+	FILE*		output;
+	bool		profile_kernel;
+	bool		profile_loading;
+	bool		profile_teams;
+	bool		profile_threads;
+};
+
+static Options sOptions;
 
 
 class Symbol {
@@ -132,15 +184,16 @@ public:
 
 	status_t LoadSymbols(debug_symbol_lookup_context* lookupContext)
 	{
-//		printf("Loading symbols of image \"%s\" (%ld)...\n", fInfo.name,
-//			fInfo.id);
+//		fprintf(sOptions.output, "Loading symbols of image \"%s\" (%ld)...\n",
+//			fInfo.name, fInfo.id);
 
 		// create symbol iterator
 		debug_symbol_iterator* iterator;
 		status_t error = debug_create_image_symbol_iterator(lookupContext,
 			fInfo.id, &iterator);
 		if (error != B_OK) {
-			printf("Failed to init symbol iterator: %s\n", strerror(error));
+			fprintf(stderr, "Failed to init symbol iterator: %s\n",
+				strerror(error));
 			return error;
 		}
 
@@ -507,47 +560,50 @@ public:
 			std::sort(hitSymbols, hitSymbols + hitSymbolCount);
 
 		int64 totalTicks = fTotalTicks;
-		printf("\nprofiling results for thread \"%s\" (%ld):\n", Name(), ID());
-		printf("  tick interval:  %lld us\n", fInterval);
-		printf("  total ticks:    %lld (%lld us)\n", totalTicks,
-			totalTicks * fInterval);
+		fprintf(sOptions.output, "\nprofiling results for thread \"%s\" "
+			"(%ld):\n", Name(), ID());
+		fprintf(sOptions.output, "  tick interval:  %lld us\n", fInterval);
+		fprintf(sOptions.output, "  total ticks:    %lld (%lld us)\n",
+			totalTicks, totalTicks * fInterval);
 		if (totalTicks == 0)
 			totalTicks = 1;
-		printf("  unknown ticks:  %lld (%lld us, %6.2f%%)\n",
+		fprintf(sOptions.output, "  unknown ticks:  %lld (%lld us, %6.2f%%)\n",
 			fUnkownTicks, fUnkownTicks * fInterval,
 			100.0 * fUnkownTicks / totalTicks);
-		printf("  dropped ticks:  %lld (%lld us, %6.2f%%)\n",
+		fprintf(sOptions.output, "  dropped ticks:  %lld (%lld us, %6.2f%%)\n",
 			fDroppedTicks, fDroppedTicks * fInterval,
 			100.0 * fDroppedTicks / totalTicks);
 
 		if (imageCount > 0) {
-			printf("\n");
-			printf("        hits     unknown    image\n");
-			printf("  -------------------------------------------------"
-				"-----------------------------\n");
+			fprintf(sOptions.output, "\n");
+			fprintf(sOptions.output, "        hits     unknown    image\n");
+			fprintf(sOptions.output, "  ---------------------------------------"
+				"---------------------------------------\n");
 			for (int32 k = 0; k < imageCount; k++) {
 				ThreadImage* image = images[k];
 				const image_info& imageInfo = image->GetImage()->Info();
-				printf("  %10lld  %10lld  %7ld %s\n", image->TotalHits(),
-					image->UnknownHits(), imageInfo.id, imageInfo.name);
+				fprintf(sOptions.output, "  %10lld  %10lld  %7ld %s\n",
+					image->TotalHits(), image->UnknownHits(), imageInfo.id,
+					imageInfo.name);
 			}
 		}
 
 		if (hitSymbolCount > 0) {
-			printf("\n");
-			printf("        hits       in us    in %%   image  function\n");
-			printf("  -------------------------------------------------"
-				"-----------------------------\n");
+			fprintf(sOptions.output, "\n");
+			fprintf(sOptions.output, "        hits       in us    in %%   "
+				"image  function\n");
+			fprintf(sOptions.output, "  ---------------------------------------"
+				"---------------------------------------\n");
 			for (int32 i = 0; i < hitSymbolCount; i++) {
 				const HitSymbol& hitSymbol = hitSymbols[i];
 				const Symbol* symbol = hitSymbol.symbol;
-				printf("  %10lld  %10lld  %6.2f  %6ld  %s\n", hitSymbol.hits,
-					hitSymbol.hits * fInterval,
+				fprintf(sOptions.output, "  %10lld  %10lld  %6.2f  %6ld  %s\n",
+					hitSymbol.hits, hitSymbol.hits * fInterval,
 					100.0 * hitSymbol.hits / totalTicks, symbol->image->ID(),
 					symbol->Name());
 			}
 		} else
-			printf("  no functions were hit\n");
+			fprintf(sOptions.output, "  no functions were hit\n");
 	}
 
 private:
@@ -660,7 +716,7 @@ public:
 			return error;
 
 		// also try to load the kernel images and symbols
-		{
+		if (sOptions.profile_kernel) {
 			// fake a debug context -- it's not really needed anyway
 			debug_context debugContext;
 			debugContext.team = B_SYSTEM_TEAM;
@@ -727,9 +783,9 @@ public:
 		debug_nub_start_profiler message;
 		message.reply_port = fDebugContext.reply_port;
 		message.thread = thread->ID();
-		message.interval = 1000;
+		message.interval = sOptions.interval;
 		message.sample_area = sampleArea;
-		message.stack_depth = SAMPLE_STACK_DEPTH;
+		message.stack_depth = sOptions.stack_depth;
 
 		debug_nub_start_profiler_reply reply;
 		status_t error = send_debug_message(&fDebugContext,
@@ -1030,21 +1086,6 @@ Thread::_SynchronizeImages()
 }
 
 
-// TODO: Adjust!
-static const char* kUsage =
-	"Usage: %s [ <options> ] <command line>\n"
-	"Executes the given command line <command line> and print an analysis of\n"
-	"the user and kernel times of all threads that ran during that time.\n"
-	"\n"
-	"Options:\n"
-	"  -h, --help   - Print this usage info.\n"
-	"  -o <output>  - Print the results to file <output>.\n"
-	"  -s           - Also perform a scheduling analysis over the time the\n"
-	"                 child process ran. This requires that scheduler kernel\n"
-	"                 tracing had been enabled at compile time.\n"
-;
-
-
 static void
 print_usage_and_exit(bool error)
 {
@@ -1073,33 +1114,45 @@ get_id(const char *str, int32 &id)
 int
 main(int argc, const char* const* argv)
 {
-//	const char* outputFile = NULL;
-//	bool schedulingAnalysis = false;
+	const char* outputFile = NULL;
 
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
-//			{ "output", required_argument, 0, 'o' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+h", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+cChi:klo:s:", sLongOptions,
+			NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case 'c':
+				sOptions.profile_threads = false;
+				break;
+			case 'C':
+				sOptions.profile_teams = false;
+				break;
 			case 'h':
 				print_usage_and_exit(false);
 				break;
-/*			case 'o':
+			case 'i':
+				sOptions.interval = atol(optarg);
+				break;
+			case 'k':
+				sOptions.profile_kernel = false;
+				break;
+			case 'l':
+				sOptions.profile_loading = true;
+				break;
+			case 'o':
 				outputFile = optarg;
 				break;
 			case 's':
-				schedulingAnalysis = true;
+				sOptions.stack_depth = atol(optarg);
 				break;
-*/
-
 			default:
 				print_usage_and_exit(true);
 				break;
@@ -1112,13 +1165,24 @@ main(int argc, const char* const* argv)
 	const char* const* programArgs = argv + optind;
 	int programArgCount = argc - optind;
 
+	if (outputFile != NULL) {
+		sOptions.output = fopen(outputFile, "w+");
+		if (sOptions.output == NULL) {
+			fprintf(stderr, "%s: Failed to open output file \"%s\": %s\n",
+				kCommandName, outputFile, strerror(errno));
+			exit(1);
+		}
+	} else
+		sOptions.output = stdout;
+
 	// get thread/team to be debugged
 	thread_id threadID = -1;
 	team_id teamID = -1;
 //	if (programArgCount > 1
 //		|| !get_id(*programArgs, (traceTeam ? teamID : thread))) {
 		// we've been given an executable and need to load it
-		threadID = load_program(programArgs, programArgCount, false);
+		threadID = load_program(programArgs, programArgCount,
+			sOptions.profile_loading);
 		if (threadID < 0) {
 			fprintf(stderr, "%s: Failed to start `%s': %s\n", kCommandName,
 				programArgs[0], strerror(threadID));
@@ -1206,6 +1270,9 @@ main(int argc, const char* const* argv)
 				break;
 
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
+				if (!sOptions.profile_threads)
+					break;
+
 				threadManager.AddThread(message.thread_created.new_thread);
 				break;
 			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
@@ -1213,6 +1280,9 @@ main(int argc, const char* const* argv)
 				break;
 
 			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
+				if (!sOptions.profile_teams)
+					break;
+
 				if (Team* team = threadManager.FindTeam(message.origin.team)) {
 					team->AddImage(message.image_created.info,
 						message.image_created.image_event);
