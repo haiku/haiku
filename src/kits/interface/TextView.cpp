@@ -32,6 +32,7 @@
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Input.h>
+#include <LayoutUtils.h>
 #include <MessageRunner.h>
 #include <PropertyInfo.h>
 #include <Region.h>
@@ -48,12 +49,22 @@
 
 using namespace std;
 
-//#define TRACE_TEXTVIEW
-#ifdef TRACE_TEXTVIEW
-#	define CALLED() printf("%s\n", __PRETTY_FUNCTION__)
+#undef TRACE
+#undef CALLED
+//#define TRACE_TEXT_VIEW
+#ifdef TRACE_TEXT_VIEW
+#	include <FunctionTracer.h>
+	static int32 sFunctionDepth = -1;
+#	define CALLED(x...)	FunctionTracer _ft("BTextView", __FUNCTION__, \
+							sFunctionDepth)
+#	define TRACE(x...)	{ BString _to; \
+							_to.Append(' ', (sFunctionDepth + 1) * 2); \
+							printf("%s", _to.String()); printf(x); }
 #else
-#	define CALLED()
+#	define CALLED(x...)
+#	define TRACE(x...)
 #endif
+
 
 #define USE_WIDTHBUFFER 1
 #define USE_DOUBLEBUFFERING 0
@@ -111,14 +122,21 @@ private:
 
 
 struct BTextView::LayoutData {
-	LayoutData(float leftInset, float topInset, float rightInset,
-			float bottomInset)
-		: leftInset(leftInset),
-		  topInset(topInset),
-		  rightInset(rightInset),
-		  bottomInset(bottomInset),
+	LayoutData()
+		: leftInset(0),
+		  topInset(0),
+		  rightInset(0),
+		  bottomInset(0),
 		  valid(false)
 	{
+	}
+
+	void UpdateInsets(const BRect& bounds, const BRect& textRect)
+	{
+		leftInset = textRect.left - bounds.left;
+		topInset = textRect.top - bounds.top;
+		rightInset = bounds.right - textRect.right;
+		bottomInset = bounds.bottom - textRect.bottom;
 	}
 
 	float				leftInset;
@@ -127,6 +145,7 @@ struct BTextView::LayoutData {
 	float				bottomInset;
 
 	BSize				min;
+	BSize				preferred;
 	bool				valid;
 };
 
@@ -242,7 +261,7 @@ BTextView::BTextView(const char* name, uint32 flags)
 	: BView(name, flags | B_FRAME_EVENTS | B_PULSE_NEEDED
 		| B_INPUT_METHOD_AWARE)
 {
-	// TODO: ...
+	_InitObject(Bounds(), NULL, NULL);
 }
 
 
@@ -259,7 +278,7 @@ BTextView::BTextView(const char* name, const BFont* initialFont,
 	: BView(name, flags | B_FRAME_EVENTS | B_PULSE_NEEDED
 		| B_INPUT_METHOD_AWARE)
 {
-	// TODO: ...
+	_InitObject(Bounds(), initialFont, initialColor);
 }
 
 
@@ -362,6 +381,7 @@ BTextView::~BTextView()
 	delete fUndo;
 	delete fClickRunner;
 	delete fDragRunner;	
+	delete fLayoutData;
 }
 
 
@@ -487,14 +507,10 @@ void
 BTextView::Draw(BRect updateRect)
 {
 	// what lines need to be drawn?
-	int32 startLine = LineAt(BPoint(0.0f, updateRect.top));
-	int32 endLine = LineAt(BPoint(0.0f, updateRect.bottom));
+	int32 startLine = LineAt(BPoint(0.0, updateRect.top));
+	int32 endLine = LineAt(BPoint(0.0, updateRect.bottom));
 
-	// TODO: _DrawLines draw the text over and over, causing the text to
-	// antialias against itself. In theory we should use an offscreen bitmap
-	// to draw the text which would eliminate the problem.
-	//_DrawLines(startLine, endLine);
-	_Refresh(OffsetAt(startLine), OffsetAt(endLine + 1), false, false);
+	_DrawLines(startLine, endLine);
 }
 
 
@@ -1555,7 +1571,10 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 	fStyles->SetStyleRange(startOffset, endOffset, fText->Length(),
 		fontMode, &newFont, color);
 
-	if (fontMode & B_FONT_FAMILY_AND_STYLE || fontMode & B_FONT_SIZE) {
+	if ((fontMode & (B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE)) != 0) {
+		// TODO: maybe only invalidate the layout (depending on
+		// B_SUPPORTS_LAYOUT) and have it _Refresh() automatically?
+		InvalidateLayout();
 		// recalc the line breaks and redraw with new style
 		_Refresh(startOffset, endOffset, startOffset != endOffset, false);
 	} else {
@@ -2052,6 +2071,9 @@ BTextView::Highlight(int32 startOffset, int32 endOffset)
 }
 
 
+// #pragma mark - configuration
+
+
 /*! \brief Sets the BTextView's text rectangle to be the same as the passed
 		rect.
 	\param rect A BRect.
@@ -2064,6 +2086,10 @@ BTextView::SetTextRect(BRect rect)
 		
 	fTextRect = rect;
 	fMinTextRectWidth = fTextRect.Width();
+		// used in auto-resizing mode to keep the text rect from
+		// shrinking below a certain value.
+
+	fLayoutData->UpdateInsets(Bounds(), fTextRect);
 
 	if (Window() != NULL)
 		Invalidate();		
@@ -2085,10 +2111,19 @@ BTextView::TextRect() const
 void
 BTextView::SetInsets(float left, float top, float right, float bottom)
 {
-	// TODO:
-	// * store in layout data
-	// * invalidate layout
-	// * invalidate view
+	if (fLayoutData->leftInset == left
+		&& fLayoutData->topInset == top
+		&& fLayoutData->rightInset == right
+		&& fLayoutData->bottomInset == bottom)
+		return;
+
+	fLayoutData->leftInset = left;
+	fLayoutData->topInset = top;
+	fLayoutData->rightInset = right;
+	fLayoutData->bottomInset = bottom;
+
+	InvalidateLayout();
+	Invalidate();
 }
 
 
@@ -2497,20 +2532,168 @@ BTextView::IsTypingHidden() const
 }
 
 
+// #pragma mark -
+
+
 void
 BTextView::ResizeToPreferred()
 {
-	float widht, height;
-	GetPreferredSize(&widht, &height);
-	BView::ResizeTo(widht, height);
+	BView::ResizeToPreferred();
 }
 
 
 void
-BTextView::GetPreferredSize(float *width, float *height)
+BTextView::GetPreferredSize(float* _width, float* _height)
 {
-	BView::GetPreferredSize(width, height);
+	CALLED();
+
+	_ValidateLayoutData();
+
+	if (_width)
+		*_width = fLayoutData->min.width;
+
+	if (_height)
+		*_height = fLayoutData->min.height;
 }
+
+
+BSize
+BTextView::MinSize()
+{
+	CALLED();
+
+	_ValidateLayoutData();
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), fLayoutData->min);
+}
+
+
+BSize
+BTextView::MaxSize()
+{
+	CALLED();
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+}
+
+
+BSize
+BTextView::PreferredSize()
+{
+	CALLED();
+
+	_ValidateLayoutData();
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		fLayoutData->preferred);
+}
+
+
+bool
+BTextView::HasHeightForWidth()
+{
+	// TODO: When not editable and not embedded in a scroll view, we should
+	// assume that all text is supposed to be visible.
+	return BView::HasHeightForWidth();
+}
+
+
+void
+BTextView::GetHeightForWidth(float width, float* min, float* max,
+	float* preferred)
+{
+	// TODO: See above and implement.
+	BView::GetHeightForWidth(width, min, max, preferred);
+}
+
+									
+void
+BTextView::InvalidateLayout(bool descendants)
+{
+	CALLED();
+
+	fLayoutData->valid = false;
+
+	BView::InvalidateLayout(descendants);
+}
+
+
+void
+BTextView::DoLayout()
+{
+	// Bail out, if we shan't do layout.
+	if (!(Flags() & B_SUPPORTS_LAYOUT))
+		return;
+
+	CALLED();
+
+	// If the user set a layout, we let the base class version call its
+	// hook.
+	if (GetLayout()) {
+		BView::DoLayout();
+		return;
+	}
+
+	_ValidateLayoutData();
+
+	// validate current size
+	BSize size(Bounds().Size());
+	if (size.width < fLayoutData->min.width)
+		size.width = fLayoutData->min.width;
+	if (size.height < fLayoutData->min.height)
+		size.height = fLayoutData->min.height;
+
+	// layout text rect
+	BPoint previousLocation = fTextRect.LeftTop();
+	float previousTextWidth = fTextRect.Width();
+
+	fTextRect = Bounds();
+	fTextRect.left += fLayoutData->leftInset;
+	fTextRect.top += fLayoutData->topInset;
+	fTextRect.right -= fLayoutData->rightInset;
+	fTextRect.bottom -= fLayoutData->bottomInset;
+
+	// recalculate linebreaks and invalidate if necessary
+	if (previousTextWidth != fTextRect.Width()
+		|| previousLocation != fTextRect.LeftTop()) {
+		int32 startLine = 0;
+		int32 endLine = fLines->NumLines() - 1;
+		_RecalculateLineBreaks(&startLine, &endLine);
+	}
+
+	Invalidate();
+}
+
+
+void
+BTextView::_ValidateLayoutData()
+{
+	if (fLayoutData->valid)
+		return;
+
+	CALLED();
+
+	float lineHeight = ceilf(LineHeight(0));
+	TRACE("line height: %.2f\n", lineHeight);
+
+	// compute our minimal size
+	BSize min(lineHeight * 3, lineHeight);
+	min.width += fLayoutData->leftInset + fLayoutData->rightInset;
+	min.height += fLayoutData->topInset + fLayoutData->bottomInset;
+
+	fLayoutData->min = min;
+
+	// compute our preferred size
+	fLayoutData->preferred = min;
+	fLayoutData->preferred.width += lineHeight * 6;
+	fLayoutData->preferred.height += lineHeight * 2;
+
+	fLayoutData->valid = true;
+
+	TRACE("width: %.2f, height: %.2f\n", min.width, min.height);
+}
+
+
+// #pragma mark -
 
 
 void
@@ -2840,6 +3023,7 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 		// When used within the layout management framework, the
 		// text rect is changed to maintain constant insets.
 	fMinTextRectWidth = fTextRect.Width();
+		// see SetTextRect()
 	fSelStart = fSelEnd = 0;
 	fCaretVisible = false;
 	fCaretTime = 0;
@@ -2867,6 +3051,9 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	fDragRunner = NULL;
 	fClickRunner = NULL;
 	fTrackingMouse = NULL;
+
+	fLayoutData = new LayoutData;
+	fLayoutData->UpdateInsets(Bounds(), fTextRect);
 }
 
 
@@ -3275,6 +3462,8 @@ BTextView::_Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 void
 BTextView::_RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 {
+	CALLED();
+
 	// are we insane?
 	*startLine = (*startLine < 0) ? 0 : *startLine;
 	*endLine = (*endLine > fLines->NumLines() - 1) ? fLines->NumLines() - 1
@@ -3283,7 +3472,13 @@ BTextView::_RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 	int32 textLength = fText->Length();
 	int32 lineIndex = (*startLine > 0) ? *startLine - 1 : 0;
 	int32 recalThreshold = (*fLines)[*endLine + 1]->offset;
-	float width = fTextRect.Width();
+	float width = max_c(fTextRect.Width(), 10);
+		// TODO: The minimum width of 10 is a work around for the following
+		// problem: If the text rect is too small, we are not calculating any
+		// line heights, not even for the first line. Maybe this is a bug
+		// in the algorithm, but other places in the class rely on at least
+		// the first line to return a valid height. Maybe "10" should really
+		// be the width of the very first glyph instead.
 	STELine* curLine = (*fLines)[lineIndex];
 	STELine* nextLine = curLine + 1;
 

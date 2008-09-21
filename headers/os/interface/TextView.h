@@ -210,6 +210,24 @@ public:
 
 	virtual	void				ResizeToPreferred();
 	virtual	void				GetPreferredSize(float* _width, float* _height);
+
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+	virtual	BSize				PreferredSize();
+
+	virtual	bool				HasHeightForWidth();
+	virtual	void				GetHeightForWidth(float width, float* min,
+									float* max, float* preferred);
+
+	virtual	void				InvalidateLayout(bool descendants = false);
+
+protected:
+	virtual	void				DoLayout();
+
+private:
+			void				_ValidateLayoutData();
+
+public:
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
 
