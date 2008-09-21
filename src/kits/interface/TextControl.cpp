@@ -145,6 +145,7 @@ BTextControl::BTextControl(const char* label, const char* text,
 BTextControl::~BTextControl()
 {
 	SetModificationMessage(NULL);
+	delete fLayoutData;
 }
 
 
