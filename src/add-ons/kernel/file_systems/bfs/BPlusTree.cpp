@@ -474,7 +474,7 @@ BPlusTree::SetTo(Inode* stream)
 	fNodeSize = fHeader->NodeSize();
 
 	// validity check
-	uint32 toMode[] = {S_STR_INDEX, S_INT_INDEX, S_UINT_INDEX,
+	static const uint32 kToMode[] = {S_STR_INDEX, S_INT_INDEX, S_UINT_INDEX,
 		S_LONG_LONG_INDEX, S_ULONG_LONG_INDEX, S_FLOAT_INDEX,
 		S_DOUBLE_INDEX};
 	uint32 mode = stream->Mode() & (S_STR_INDEX | S_INT_INDEX
@@ -483,7 +483,7 @@ BPlusTree::SetTo(Inode* stream)
 
 	if (fHeader->DataType() > BPLUSTREE_DOUBLE_TYPE
 		|| ((stream->Mode() & S_INDEX_DIR) != 0
-			&& toMode[fHeader->DataType()] != mode)
+			&& kToMode[fHeader->DataType()] != mode)
 		|| !stream->IsContainer()) {
 		D(	dump_bplustree_header(fHeader);
 			dump_inode(&stream->Node());
