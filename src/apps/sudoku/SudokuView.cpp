@@ -213,6 +213,7 @@ SudokuView::SetTo(entry_ref& ref)
 	_PushUndo();
 	status = fField->SetTo(_BaseCharacter(), buffer);
 	Invalidate();
+	fclose(file);
 	return status;
 }
 
