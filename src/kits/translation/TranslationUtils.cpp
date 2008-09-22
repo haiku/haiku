@@ -503,7 +503,7 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 	// data to the stream.  I've gathered all of the data that I
 	// need at this point.
 	bool ok = false;
-	while (ok) {
+	while (!ok) {
 		const size_t kStreamHeaderSize =
 			sizeof(TranslatorStyledTextStreamHeader);
 		TranslatorStyledTextStreamHeader stm_header;
