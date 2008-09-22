@@ -1085,25 +1085,32 @@ register_preloaded_module_image(struct preloaded_image* image)
 
 	image->is_module = true;
 
+	if (moduleImage->info[0] == NULL) {
+		status = B_BAD_DATA;
+		goto error;
+	}
+
 	moduleImage->dependencies = NULL;
 	get_image_symbol(image->id, "module_dependencies", B_SYMBOL_TYPE_DATA,
 		(void**)&moduleImage->dependencies);
 		// this is allowed to be NULL
 
-	// Try to recreate the full module path, so that we don't try to load the
-	// image again when asked for a module it does not export (would only be
-	// problematic if it had got replaced and the new file actually exports
-	// that module). Also helpful for recurse_directory().
-	{
-		// ToDo: this is kind of a hack to have the full path in the hash
+	if (image->name[0] != '/') {
+		// Try to recreate the full module path, so that we don't try to load
+		// the image again when asked for a module it does not export (would
+		// only be problematic if it had got replaced and the new file actually
+		// exports that module). Also helpful for recurse_directory().
+
+		// TODO: check if there is a situation (like floppy/network boot) where
+		//	relative paths are still passed in.
+		// TODO: this is kind of a hack to have the full path in the hash
 		//	(it always assumes the preloaded add-ons to be in the system
 		//	directory)
-		char path[B_FILE_NAME_LENGTH];
-		const char* suffix;
-		const char* name;
-		if (moduleImage->info[0]
-			&& (suffix = strstr(name = moduleImage->info[0]->name,
-					image->name)) != NULL) {
+		const char* name = moduleImage->info[0]->name;
+		const char* suffix = strstr(name, image->name);
+		if (suffix != NULL) {
+			char path[B_FILE_NAME_LENGTH];
+
 			// even if strlcpy() is used here, it's by no means safe
 			// against buffer overflows
 			KPath addonsKernelPath;
@@ -1133,7 +1140,9 @@ register_preloaded_module_image(struct preloaded_image* image)
 			}
 		} else
 			moduleImage->path = strdup(image->name);
-	}
+	} else
+		moduleImage->path = strdup(image->name);
+
 	if (moduleImage->path == NULL) {
 		status = B_NO_MEMORY;
 		goto error;
