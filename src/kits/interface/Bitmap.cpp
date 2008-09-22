@@ -626,8 +626,12 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 		return B_BAD_VALUE;
 
 	int32 width = fBounds.IntegerWidth() + 1;
-	if (bpr < 0)
-		bpr = get_bytes_per_row(colorSpace, width);
+	if (bpr <= 0) {
+		if (bpr == B_ANY_BYTES_PER_ROW)
+			bpr = get_bytes_per_row(colorSpace, width);
+		else
+			return B_BAD_VALUE;
+	}
 
 	return BPrivate::ConvertBits(data, (uint8*)fBasePointer + offset, length,
 		fSize - offset, bpr, fBytesPerRow, colorSpace, fColorSpace, width,
@@ -669,8 +673,12 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr,
 	if (!data || length < 0 || width < 0 || height < 0)
 		return B_BAD_VALUE;
 
-	if (bpr < 0)
-		bpr = get_bytes_per_row(colorSpace, fBounds.IntegerWidth() + 1);
+	if (bpr <= 0) {
+		if (bpr == B_ANY_BYTES_PER_ROW)
+			bpr = get_bytes_per_row(colorSpace, fBounds.IntegerWidth() + 1);
+		else
+			return B_BAD_VALUE;
+	}
 
 	return BPrivate::ConvertBits(data, fBasePointer, length, fSize, bpr,
 		fBytesPerRow, colorSpace, fColorSpace, from, to, width, height);
