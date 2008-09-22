@@ -15,9 +15,8 @@
 
 
 // limits
-#define B_DEBUG_MAX_PROFILE_FUNCTIONS			100000
-#define B_DEBUG_MIN_PROFILE_INTERVAL			100			/* in us */
-#define B_DEBUG_STACK_TRACE_DEPTH				5
+#define B_DEBUG_MIN_PROFILE_INTERVAL			10			/* in us */
+#define B_DEBUG_STACK_TRACE_DEPTH				20
 #define	B_DEBUG_PROFILE_BUFFER_FLUSH_THRESHOLD	70			/* in % */
 
 
