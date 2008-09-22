@@ -186,8 +186,10 @@ BMessageRunner::GetInfo(bigtime_t *interval, int32 *count) const
 					*interval = _interval;
 			} else
 				error = B_ERROR;
-		} else
-			reply.FindInt32("error", &error);
+		} else {
+			if (reply.FindInt32("error", &error) != B_OK)
+				error = B_ERROR;
+		}
 	}
 	return error;
 }
@@ -337,8 +339,10 @@ BMessageRunner::_RegisterRunner(BMessenger target, const BMessage *message,
 		if (reply.what == B_REG_SUCCESS) {
 			if (reply.FindInt32("token", &token) != B_OK)
 				error = B_ERROR;
-		} else
-			reply.FindInt32("error", &error);
+		} else {
+			if (reply.FindInt32("error", &error) != B_OK)
+				error = B_ERROR;
+		}
 	}
 
 	if (error == B_OK)
@@ -391,8 +395,10 @@ BMessageRunner::_SetParams(bool resetInterval, bigtime_t interval,
 
 	// evaluate the reply
 	if (error == B_OK) {
-		if (reply.what != B_REG_SUCCESS)
-			reply.FindInt32("error", &error);
+		if (reply.what != B_REG_SUCCESS) {
+			if (reply.FindInt32("error", &error) != B_OK)
+				error = B_ERROR;
+		}
 	}
 	return error;
 }
