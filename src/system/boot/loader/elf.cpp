@@ -6,15 +6,18 @@
 
 #include "elf.h"
 
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include <boot/arch.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <elf32.h>
 #include <kernel.h>
 
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
+#include "loader.h"
+
 
 //#define TRACE_ELF
 #ifdef TRACE_ELF
@@ -423,10 +426,13 @@ elf_load_image(Directory *directory, const char *path)
 
 	status_t status = elf_load_image(fd, image);
 	if (status == B_OK) {
-		char tmpPath[B_PATH_NAME_LENGTH];
-		if (directory->GetPath(path, tmpPath, sizeof(tmpPath)) == B_OK)
-			image->name = kernel_args_strdup(tmpPath);
-		else
+		char tempPath[B_PATH_NAME_LENGTH];
+		if (directory->GetPath(path, tempPath, sizeof(tempPath)) == B_OK) {
+			// Replace the first path component with "boot", as the kernel
+			// will always mount the boot volume there.
+			to_boot_path(tempPath, sizeof(tempPath));
+			image->name = kernel_args_strdup(tempPath);
+		} else
 			image->name = kernel_args_strdup(path);
 		image->inode = stat.st_ino;
 

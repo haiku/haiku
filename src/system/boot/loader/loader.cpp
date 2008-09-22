@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -51,6 +51,31 @@ is_bootable(Directory *volume)
 }
 
 
+/*!	Replace the first path component with "boot", as the kernel will always
+	mount the boot volume there.
+*/
+void
+to_boot_path(char *path, size_t pathSize)
+{
+	const size_t bootLength = strlen("boot");
+
+	if (path[0] != '/' || pathSize < bootLength + 1)
+		return;
+
+	char *second = strchr(path + 1, '/');
+	if (second == NULL)
+		return;
+
+	size_t volumeLength = second - path - 1;
+	if (volumeLength != bootLength) {
+		memmove(path + 1 + bootLength, path + 1 + volumeLength,
+			pathSize - 1 - max_c(volumeLength, bootLength));
+	}
+
+	memcpy(path + 1, "boot", bootLength);
+}
+
+
 status_t
 load_kernel(stage2_args *args, Directory *volume)
 {
@@ -75,10 +100,11 @@ load_kernel(stage2_args *args, Directory *volume)
 		return status;
 	}
 
-	char tmpPath[B_PATH_NAME_LENGTH];
-	if (volume->GetPath(KERNEL_PATH, tmpPath, sizeof(tmpPath)) == B_OK)
-		gKernelArgs.kernel_image.name = kernel_args_strdup(tmpPath);
-	else
+	char tempPath[B_PATH_NAME_LENGTH];
+	if (volume->GetPath(KERNEL_PATH, tempPath, sizeof(tempPath)) == B_OK) {
+		to_boot_path(tempPath, sizeof(tempPath));
+		gKernelArgs.kernel_image.name = kernel_args_strdup(tempPath);
+	} else
 		gKernelArgs.kernel_image.name = kernel_args_strdup("kernel");
 
 	return B_OK;
@@ -117,12 +143,11 @@ load_modules_from(Directory *volume, const char *path)
 }
 
 
-/** Loads a module by module name. This basically works in the same
- *	way as the kernel module loader; it will cut off the last part
- *	of the module name until it could find a module and loads it.
- *	It tests both, kernel and user module directories.
- */
-
+/*!	Loads a module by module name. This basically works in the same
+	way as the kernel module loader; it will cut off the last part
+	of the module name until it could find a module and loads it.
+	It tests both, kernel and user module directories.
+*/
 static status_t
 load_module(Directory *volume, const char *name)
 {
