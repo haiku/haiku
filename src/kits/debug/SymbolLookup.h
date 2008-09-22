@@ -132,6 +132,7 @@ public:
 	const image_info& Info() const	{ return fInfo; }
 
 	status_t Load();
+	status_t LoadKernel();
 
 	const Elf32_Sym* LookupSymbol(addr_t address, addr_t* _baseAddress,
 		const char** _symbolName, size_t *_symbolNameLen,
@@ -149,8 +150,8 @@ private:
 	off_t				fFileSize;
 	uint8*				fMappedFile;
 	addr_t				fLoadDelta;
-	const Elf32_Sym*	fSymbolTable;
-	const char*			fStringTable;
+	Elf32_Sym*			fSymbolTable;
+	char*				fStringTable;
 	int32				fSymbolCount;
 	size_t				fStringTableSize;
 };

@@ -15,6 +15,7 @@
 #include <new>
 
 #include <runtime_loader.h>
+#include <syscalls.h>
 
 
 #undef TRACE
@@ -208,8 +209,12 @@ ImageFile::ImageFile(const image_info& info)
 
 ImageFile::~ImageFile()
 {
-	if (fMappedFile != MAP_FAILED)
+	if (fMappedFile != MAP_FAILED) {
 		munmap(fMappedFile, fFileSize);
+	} else {
+		delete[] fSymbolTable;
+		delete[] fStringTable;
+	}
 
 	if (fFD >= 0)
 		close(fFD);
@@ -297,9 +302,8 @@ ImageFile::Load()
 				return B_BAD_DATA;
 			}
 
-			fSymbolTable
-				= (const Elf32_Sym*)(fMappedFile + sectionHeader->sh_offset);
-			fStringTable = (const char*)(fMappedFile + stringHeader.sh_offset);
+			fSymbolTable = (Elf32_Sym*)(fMappedFile + sectionHeader->sh_offset);
+			fStringTable = (char*)(fMappedFile + stringHeader.sh_offset);
 			fSymbolCount = sectionHeader->sh_size / sizeof(Elf32_Sym);
 			fStringTableSize = stringHeader.sh_size;
 
@@ -308,6 +312,30 @@ ImageFile::Load()
 	}
 
 	return B_BAD_DATA;
+}
+
+
+status_t
+ImageFile::LoadKernel()
+{
+	// get the table sizes
+	fSymbolCount = 0;
+	fStringTableSize = 0;
+	status_t error = _kern_read_kernel_image_symbols(fInfo.id,
+		NULL, &fSymbolCount, NULL, &fStringTableSize, NULL);
+	if (error != B_OK)
+		return error;
+
+	// allocate the tables
+	fSymbolTable = new(std::nothrow) Elf32_Sym[fSymbolCount];
+	fStringTable = new(std::nothrow) char[fStringTableSize];
+	if (fSymbolTable == NULL || fStringTable == NULL)
+		return B_NO_MEMORY;
+
+	// get the info
+	return _kern_read_kernel_image_symbols(fInfo.id,
+		fSymbolTable, &fSymbolCount, fStringTable, &fStringTableSize,
+		&fLoadDelta);
 }
 
 
@@ -474,8 +502,12 @@ SymbolLookup::Init()
 		if (imageFile == NULL)
 			break;
 
-		if (imageFile->Load() != B_OK)
+		error = fTeam == B_SYSTEM_TEAM
+			? imageFile->LoadKernel() : imageFile->Load();
+		if (error != B_OK) {
 			delete imageFile;
+			continue;
+		}
 
 		fImageFiles.Add(imageFile);
 	}
