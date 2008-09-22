@@ -829,7 +829,7 @@ PCI::_CreateBus(PCIDev *parent, int domain, uint8 bus)
 PCIDev *
 PCI::_CreateDevice(PCIBus *parent, uint8 device, uint8 function)
 {
-	FLOW("PCI: CreateDevice, domain %u, bus %u, dev %u, func %u:\n", parent->domain, parent->bus, dev, function);
+	FLOW("PCI: CreateDevice, domain %u, bus %u, dev %u, func %u:\n", parent->domain, parent->bus, device, function);
 
 	PCIDev *newDev = new(std::nothrow) PCIDev;
 	if (newDev == NULL)
@@ -846,7 +846,7 @@ PCI::_CreateDevice(PCIBus *parent, uint8 device, uint8 function)
 	_ReadBasicInfo(newDev);
 
 	FLOW("PCI: CreateDevice, vendor 0x%04x, device 0x%04x, class_base 0x%02x, class_sub 0x%02x\n",
-		newdev->info.vendor_id, newdev->info.device_id, newdev->info.class_base, newdev->info.class_sub);
+		newDev->info.vendor_id, newDev->info.device_id, newDev->info.class_base, newDev->info.class_sub);
 
 	// append
 	if (parent->child == NULL) {
