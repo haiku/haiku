@@ -57,10 +57,11 @@ get_device_dma_mode(ide_device_info *device)
 bool
 configure_dma(ide_device_info *device)
 {
-	device->DMA_enabled = device->DMA_supported = device->bus->can_DMA
-		&& get_device_dma_mode(device) != -1;
+	if ((device->DMA_enabled = device->DMA_supported = device->bus->can_DMA)
+		&& get_device_dma_mode(device) != -1)
+			return true;
 
-	return true;
+	return false;
 }
 
 
