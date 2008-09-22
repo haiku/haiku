@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  *
  * Userland debugger support.
