@@ -34,6 +34,10 @@ status_t elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
 status_t elf_get_image_info_for_address(addr_t address, image_info* info);
 status_t elf_init(struct kernel_args *args);
 
+status_t _user_read_kernel_image_symbols(image_id id,
+			struct Elf32_Sym* symbolTable, int32* _symbolCount,
+			char* stringTable, size_t* _stringTableSize, addr_t* _imageDelta);
+
 #ifdef __cplusplus
 }
 #endif

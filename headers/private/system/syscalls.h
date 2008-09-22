@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 struct dirent;
+struct Elf32_Sym;
 struct fd_info;
 struct fd_set;
 struct fs_info;
@@ -188,6 +189,10 @@ extern void			_kern_image_relocated(image_id id);
 extern void			_kern_loading_app_failed(status_t error);
 extern status_t		_kern_get_image_info(image_id id, image_info *info, size_t size);
 extern status_t		_kern_get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t size);
+extern status_t		_kern_read_kernel_image_symbols(image_id id,
+						struct Elf32_Sym* symbolTable, int32* _symbolCount,
+						char* stringTable, size_t* _stringTableSize,
+						addr_t* _imageDelta);
 
 // VFS functions
 extern dev_t		_kern_mount(const char *path, const char *device,
