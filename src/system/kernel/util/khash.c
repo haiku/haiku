@@ -236,32 +236,34 @@ hash_remove_current(struct hash_table *table, struct hash_iterator *iterator)
 {
 	uint32 index = iterator->bucket;
 	void *element;
+	void *lastElement = NULL;
 
-	if (iterator->current == NULL)
-		panic("hash_remove_current() called too early.");
+	if (iterator->current == NULL || (element = table->table[index]) == NULL) {
+		panic("hash_remove_current(): invalid iteration state");
+		return;
+	}
 
-	for (element = table->table[index]; index < table->table_size; index++) {
-		void *lastElement = NULL;
+	while (element != NULL) {
+		if (element == iterator->current) {
+			iterator->current = lastElement;
 
-		while (element != NULL) {
-			if (element == iterator->current) {
-				iterator->current = lastElement;
-
-				if (lastElement != NULL) {
-					// connect the previous entry with the next one
-					PUT_IN_NEXT(table, lastElement, NEXT(table, element));
-				} else {
-					table->table[index] = (struct hash_element *)NEXT(table,
-						element);
-				}
-
-				table->num_elements--;
-				return;
+			if (lastElement != NULL) {
+				// connect the previous entry with the next one
+				PUT_IN_NEXT(table, lastElement, NEXT(table, element));
+			} else {
+				table->table[index] = (struct hash_element *)NEXT(table,
+					element);
 			}
 
-			element = NEXT(table, element);
+			table->num_elements--;
+			return;
 		}
+
+		lastElement = element;
+		element = NEXT(table, element);
 	}
+
+	panic("hash_remove_current(): current element not found!");
 }
 
 
@@ -407,4 +409,26 @@ hash_count_used_slots(struct hash_table *table)
 	}
 
 	return usedSlots;
+}
+
+
+void
+hash_dump_table(struct hash_table* table)
+{
+	uint32 i;
+
+	dprintf("hash table %p, table size: %lu, elements: %u\n", table,
+		table->table_size, table->num_elements);
+
+	for (i = 0; i < table->table_size; i++) {
+		struct hash_element* element = table->table[i];
+		if (element != NULL) {
+			dprintf("%6lu:", i);
+			while (element != NULL) {
+				dprintf(" %p", element);
+				element = NEXT(table, element);
+			}
+			dprintf("\n");
+		}
+	}
 }

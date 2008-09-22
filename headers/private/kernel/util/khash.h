@@ -41,6 +41,7 @@ void *hash_next(struct hash_table *table, struct hash_iterator *i);
 void hash_rewind(struct hash_table *table, struct hash_iterator *i);
 uint32 hash_count_elements(struct hash_table *table);
 uint32 hash_count_used_slots(struct hash_table *table);
+void hash_dump_table(struct hash_table* table);
 
 /* function pointers must look like this:
  *
