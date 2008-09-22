@@ -21,7 +21,7 @@
 #include <util/KMessage.h>
 
 #define CURRENT_KERNEL_ARGS_VERSION	1
-#define MAX_KERNEL_ARGS_RANGE		32
+#define MAX_KERNEL_ARGS_RANGE		16
 
 // names of common boot_volume fields
 #define BOOT_METHOD						"boot method"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,17 +13,17 @@
 #include <string.h>
 
 
-static const size_t kChunkSize = 4 * B_PAGE_SIZE;
+static const size_t kChunkSize = 8 * B_PAGE_SIZE;
 
 kernel_args gKernelArgs;
 
-static void *sFirstFree;
-static void *sLast;
+static void* sFirstFree;
+static void* sLast;
 static size_t sFree = kChunkSize;
 
 
 static void
-remove_range_index(addr_range *ranges, uint32 &numRanges, uint32 index)
+remove_range_index(addr_range* ranges, uint32& numRanges, uint32 index)
 {
 	if (index + 1 == numRanges) {
 		// remove last range
@@ -31,15 +31,16 @@ remove_range_index(addr_range *ranges, uint32 &numRanges, uint32 index)
 		return;
 	}
 
-	memmove(&ranges[index], &ranges[index + 1], sizeof(addr_range) * (numRanges - 1 - index));
+	memmove(&ranges[index], &ranges[index + 1],
+		sizeof(addr_range) * (numRanges - 1 - index));
 	numRanges--;
 }
 
 
 static status_t
-add_kernel_args_range(void *start, uint32 size)
+add_kernel_args_range(void* start, uint32 size)
 {
-	return insert_address_range(gKernelArgs.kernel_args_range, 
+	return insert_address_range(gKernelArgs.kernel_args_range,
 		&gKernelArgs.num_kernel_args_ranges, MAX_KERNEL_ARGS_RANGE,
 		(addr_t)start, size);
 }
@@ -48,16 +49,15 @@ add_kernel_args_range(void *start, uint32 size)
 //	#pragma mark - addr_range utility
 
 
-/**	Inserts the specified (start, size) pair (aka range) in the
- *	addr_range array.
- *	It will extend existing ranges in order to have as little
- *	ranges in the array as possible.
- *	Returns B_OK on success, or B_ENTRY_NOT_FOUND if there was
- *	no free array entry available anymore.
- */
-
+/*!	Inserts the specified (start, size) pair (aka range) in the
+	addr_range array.
+	It will extend existing ranges in order to have as little
+	ranges in the array as possible.
+	Returns B_OK on success, or B_ENTRY_NOT_FOUND if there was
+	no free array entry available anymore.
+*/
 extern "C" status_t
-insert_address_range(addr_range *ranges, uint32 *_numRanges, uint32 maxRanges,
+insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 	addr_t start, uint32 size)
 {
 	uint32 numRanges = *_numRanges;
@@ -122,7 +122,7 @@ insert_address_range(addr_range *ranges, uint32 *_numRanges, uint32 maxRanges,
 	}
 
 	// no range matched, we need to create a new one
-	
+
 	if (numRanges >= maxRanges)
 		return B_ENTRY_NOT_FOUND;
 
@@ -135,7 +135,7 @@ insert_address_range(addr_range *ranges, uint32 *_numRanges, uint32 maxRanges,
 
 
 extern "C" status_t
-remove_address_range(addr_range *ranges, uint32 *_numRanges, uint32 maxRanges,
+remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 	addr_t start, uint32 size)
 {
 	uint32 numRanges = *_numRanges;
@@ -183,7 +183,7 @@ remove_address_range(addr_range *ranges, uint32 *_numRanges, uint32 maxRanges,
 status_t
 insert_physical_memory_range(addr_t start, uint32 size)
 {
-	return insert_address_range(gKernelArgs.physical_memory_range, 
+	return insert_address_range(gKernelArgs.physical_memory_range,
 		&gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
 		start, size);
 }
@@ -192,16 +192,16 @@ insert_physical_memory_range(addr_t start, uint32 size)
 status_t
 insert_physical_allocated_range(addr_t start, uint32 size)
 {
-	return insert_address_range(gKernelArgs.physical_allocated_range, 
-		&gKernelArgs.num_physical_allocated_ranges, MAX_PHYSICAL_ALLOCATED_RANGE,
-		start, size);
+	return insert_address_range(gKernelArgs.physical_allocated_range,
+		&gKernelArgs.num_physical_allocated_ranges,
+		MAX_PHYSICAL_ALLOCATED_RANGE, start, size);
 }
 
 
 status_t
 insert_virtual_allocated_range(addr_t start, uint32 size)
 {
-	return insert_address_range(gKernelArgs.virtual_allocated_range, 
+	return insert_address_range(gKernelArgs.virtual_allocated_range,
 		&gKernelArgs.num_virtual_allocated_ranges, MAX_VIRTUAL_ALLOCATED_RANGE,
 		start, size);
 }
@@ -210,21 +210,20 @@ insert_virtual_allocated_range(addr_t start, uint32 size)
 //	#pragma mark - kernel_args allocations
 
 
-/** This function can be used to allocate memory that is going
- *	to be passed over to the kernel. For example, the preloaded_image
- *	structures are allocated this way.
- *	The boot loader heap doesn't make it into the kernel!
- */
-
-extern "C" void *
+/*!	This function can be used to allocate memory that is going
+	to be passed over to the kernel. For example, the preloaded_image
+	structures are allocated this way.
+	The boot loader heap doesn't make it into the kernel!
+*/
+extern "C" void*
 kernel_args_malloc(size_t size)
 {
 	//dprintf("kernel_args_malloc(): %ld bytes (%ld bytes left)\n", size, sFree);
 
 	if (sFirstFree != NULL && size <= sFree) {
 		// there is enough space in the current buffer
-		void *address = sFirstFree;
-		sFirstFree = (void *)((addr_t)sFirstFree + size);
+		void* address = sFirstFree;
+		sFirstFree = (void*)((addr_t)sFirstFree + size);
 		sLast = address;
 		sFree -= size;
 
@@ -233,9 +232,9 @@ kernel_args_malloc(size_t size)
 
 	if (size > kChunkSize / 2 && sFree < size) {
 		// the block is so large, we'll allocate a new block for it
-		void *block = NULL;
+		void* block = NULL;
 		if (platform_allocate_region(&block, size, B_READ_AREA | B_WRITE_AREA,
-			false) != B_OK) {
+				false) != B_OK) {
 			return NULL;
 		}
 
@@ -245,13 +244,13 @@ kernel_args_malloc(size_t size)
 	}
 
 	// just allocate a new block and "close" the old one
-	void *block = NULL;
-	if (platform_allocate_region(&block, kChunkSize,
-		B_READ_AREA | B_WRITE_AREA, false) != B_OK) {
+	void* block = NULL;
+	if (platform_allocate_region(&block, kChunkSize, B_READ_AREA | B_WRITE_AREA,
+			false) != B_OK) {
 		return NULL;
 	}
 
-	sFirstFree = (void *)((addr_t)block + size);
+	sFirstFree = (void*)((addr_t)block + size);
 	sLast = block;
 	sFree = kChunkSize - size;
 	if (add_kernel_args_range(block, kChunkSize) != B_OK)
@@ -261,10 +260,9 @@ kernel_args_malloc(size_t size)
 }
 
 
-/** Convenience function that copies strdup() functions for the
- *	kernel args heap.
- */
-
+/*!	Convenience function that copies strdup() functions for the
+	kernel args heap.
+*/
 extern "C" char *
 kernel_args_strdup(const char *string)
 {
@@ -282,11 +280,10 @@ kernel_args_strdup(const char *string)
 }
 
 
-/** This function frees a block allocated via kernel_args_malloc().
- *	It's very simple; it can only free the last allocation. It's
- *	enough for its current usage in the boot loader, though.
- */
-
+/*!	This function frees a block allocated via kernel_args_malloc().
+	It's very simple; it can only free the last allocation. It's
+	enough for its current usage in the boot loader, though.
+*/
 extern "C" void
 kernel_args_free(void *block)
 {
