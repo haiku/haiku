@@ -666,7 +666,7 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr,
 	if (InitCheck() != B_OK)
 		return B_NO_INIT;
 
-	if (!data || length < 0 || bpr < 0 || width < 0 || height < 0)
+	if (!data || length < 0 || width < 0 || height < 0)
 		return B_BAD_VALUE;
 
 	if (bpr < 0)
