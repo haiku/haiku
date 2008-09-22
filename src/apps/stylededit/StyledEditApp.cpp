@@ -145,6 +145,7 @@ StyledEditApp::DispatchMessage(BMessage *msg, BHandler *handler)
 			cwd = "";
 
 		ArgvReceivedEx(argc, argv, cwd);
+		delete[] argv;
 	} else
 		BApplication::DispatchMessage(msg, handler);
 }
