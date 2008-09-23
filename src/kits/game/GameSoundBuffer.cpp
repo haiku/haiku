@@ -356,25 +356,29 @@ status_t
 GameSoundBuffer::Connect(media_node * consumer)
 {
 	BMediaRoster* r = BMediaRoster::Roster();
-	status_t err;
+	status_t err = r->RegisterNode(fNode);
 	
-	err = r->RegisterNode(fNode);
 	if (err != B_OK) 
 		return err;
 	
 	// make sure the Media Roster knows that we're using the node
-	r->GetNodeFor(fNode->Node().node, &fConnection->producer);
+	err = r->GetNodeFor(fNode->Node().node, &fConnection->producer);
 
+	if (err != B_OK)
+        	return err;
+	
 	// connect to the mixer
 	fConnection->consumer = *consumer;
-	if (err != B_OK) 
-		return err;
-	
+
 	// set the producer's time source to be the "default" time source, which
 	// the Mixer uses too.
-	r->GetTimeSource(&fConnection->timeSource);
-	r->SetTimeSourceFor(fConnection->producer.node, fConnection->timeSource.node);
+	err = r->GetTimeSource(&fConnection->timeSource);
+	if (err != B_OK)
+                return err;	
 
+	err = r->SetTimeSourceFor(fConnection->producer.node, fConnection->timeSource.node);
+        if (err != B_OK)
+                return err;
 	// got the nodes; now we find the endpoints of the connection
 	media_input mixerInput;
 	media_output soundOutput;
