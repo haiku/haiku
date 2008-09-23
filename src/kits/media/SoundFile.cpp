@@ -29,6 +29,8 @@ BSoundFile::BSoundFile(const entry_ref *ref,
 BSoundFile::~BSoundFile()
 {
 	delete fSoundFile;
+	delete fMediaFile;
+		// fMediaTrack will be deleted by the BMediaFile destructor
 }
 
 
