@@ -1024,6 +1024,7 @@ user_debug_thread_exiting(struct thread* thread)
 	int32 sampleCount = threadDebugInfo.profile.sample_count;
 	int32 droppedTicks = threadDebugInfo.profile.dropped_ticks;
 	int32 stackDepth = threadDebugInfo.profile.stack_depth;
+	bool variableStackDepth = threadDebugInfo.profile.variable_stack_depth;
 	int32 imageEvent = threadDebugInfo.profile.image_event;
 	threadDebugInfo.profile.sample_area = -1;
 	threadDebugInfo.profile.samples = NULL;
@@ -1042,6 +1043,7 @@ user_debug_thread_exiting(struct thread* thread)
 	message.sample_count = sampleCount;
 	message.dropped_ticks = droppedTicks;
 	message.stack_depth = stackDepth;
+	message.variable_stack_depth = variableStackDepth;
 	message.image_event = imageEvent;
 	message.stopped = true;
 	debugger_write(debuggerPort, B_DEBUGGER_MESSAGE_PROFILER_UPDATE,
@@ -1253,6 +1255,7 @@ profiling_buffer_full(void*)
 		int32 sampleCount = debugInfo.profile.sample_count;
 		int32 droppedTicks = debugInfo.profile.dropped_ticks;
 		int32 stackDepth = debugInfo.profile.stack_depth;
+		bool variableStackDepth = debugInfo.profile.variable_stack_depth;
 		int32 imageEvent = debugInfo.profile.image_event;
 
 		// notify the debugger
@@ -1267,6 +1270,7 @@ profiling_buffer_full(void*)
 		message.sample_count = sampleCount;
 		message.dropped_ticks = droppedTicks;
 		message.stack_depth = stackDepth;
+		message.variable_stack_depth = variableStackDepth;
 		message.image_event = imageEvent;
 		message.stopped = false;
 
@@ -2337,6 +2341,7 @@ debug_nub_thread(void *)
 				addr_t* samples = NULL;
 				int32 sampleCount = 0;
 				int32 stackDepth = 0;
+				bool variableStackDepth = false;
 				int32 imageEvent = 0;
 				int32 droppedTicks = 0;
 
@@ -2354,6 +2359,8 @@ debug_nub_thread(void *)
 						sampleCount = threadDebugInfo.profile.sample_count;
 						droppedTicks = threadDebugInfo.profile.dropped_ticks;
 						stackDepth = threadDebugInfo.profile.stack_depth;
+						variableStackDepth
+							= threadDebugInfo.profile.variable_stack_depth;
 						imageEvent = threadDebugInfo.profile.image_event;
 						threadDebugInfo.profile.sample_area = -1;
 						threadDebugInfo.profile.samples = NULL;
@@ -2372,6 +2379,8 @@ debug_nub_thread(void *)
 					reply.profiler_update.origin.thread = threadID;
 					reply.profiler_update.image_event = imageEvent;
 					reply.profiler_update.stack_depth = stackDepth;
+					reply.profiler_update.variable_stack_depth
+						= variableStackDepth;
 					reply.profiler_update.sample_count = sampleCount;
 					reply.profiler_update.dropped_ticks = droppedTicks;
 					reply.profiler_update.stopped = true;
