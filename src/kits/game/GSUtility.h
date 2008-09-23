@@ -27,17 +27,9 @@
 #ifndef _GAMESOUND_UTILITY_H
 #define _GAMESOUND_UTILITY_H
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
-
-// Project Includes ------------------------------------------------------------
 #include <GameSoundDefs.h>
 #include <MediaDefs.h>
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
 
 struct _gs_ramp 
 {

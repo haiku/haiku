@@ -9,6 +9,8 @@
 #include <GameSoundDefs.h>
 #include <MediaDefs.h>
 
+#include <new>
+
 #include "GSUtility.h"
 
 
@@ -19,19 +21,20 @@ InitRamp(float* value, float set, float frames, bigtime_t duration)
 	bigtime_t sec = bigtime_t(duration / 1000000.0);
 	float inc = diff * 200;
 	
-	_gs_ramp* ramp = new _gs_ramp;
-	ramp->value = value;
+	_gs_ramp* ramp = new (std::nothrow) _gs_ramp;
+	if (ramp != NULL) {
+		ramp->value = value;
 	
-	ramp->frame_total = frames * sec;
-	ramp->frame_inc = int(ramp->frame_total / inc);
+		ramp->frame_total = frames * sec;
+		ramp->frame_inc = int(ramp->frame_total / inc);
 	
-	ramp->inc = (set - *value) / inc;
+		ramp->inc = (set - *value) / inc;
 	
-	ramp->frame_count = 0;
-	ramp->frame_inc_count = 0;
+		ramp->frame_count = 0;
+		ramp->frame_inc_count = 0;
 	
-	ramp->duration = duration;
-	
+		ramp->duration = duration;
+	}
 	return ramp;
 }
 	
@@ -45,8 +48,7 @@ ChangeRamp(_gs_ramp* ramp)
 	if (ramp->frame_inc_count >= ramp->frame_inc) {
 		ramp->frame_inc_count = 0;	
 		*ramp->value += ramp->inc;
-	}
-	else 
+	} else 
 		ramp->frame_inc_count++;
 		
 	ramp->frame_count++;
@@ -80,7 +82,9 @@ get_sample_size(int32 format)
 			sample = sizeof(float);
 			break;
 			
-		default: sample = 0;
+		default:
+			sample = 0;
+			break;
 	}
 	
 	return sample;
