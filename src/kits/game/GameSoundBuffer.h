@@ -1,46 +1,18 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		GameSoundBuffer.h
-//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
-//	Description:	Interface to a single sound, managed by the GameSoundDevice.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2002, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Author:	Christopher ML Zumwalt May (zummy@users.sf.net)
+ */
 
 #ifndef _GAMESOUNDBUFFER_H
 #define _GAMESOUNDBUFFER_H
 
-// Standard Includes -----------------------------------------------------------
 
-// System Includes -------------------------------------------------------------
 #include <GameSoundDefs.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 const int32 kPausedAttribute = B_GS_FIRST_PRIVATE_ATTRIBUTE;
 
 class GameProducer;
@@ -54,9 +26,8 @@ struct Connection
 	media_node timeSource;
 };
 
-// GameSoundBuffer -------------------------------------------------------------
-class GameSoundBuffer
-{
+
+class GameSoundBuffer {
 public:
 
 									GameSoundBuffer(const gs_audio_format* format);
@@ -108,8 +79,7 @@ private:
 };
 
 
-class SimpleSoundBuffer : public GameSoundBuffer
-{
+class SimpleSoundBuffer : public GameSoundBuffer {
 public:
 								SimpleSoundBuffer(const gs_audio_format* format,
 													const void * data,
@@ -129,8 +99,8 @@ private:
 			size_t				fPosition;
 };
 
-class StreamingSoundBuffer : public GameSoundBuffer
-{
+
+class StreamingSoundBuffer : public GameSoundBuffer {
 public:
 								StreamingSoundBuffer(const gs_audio_format * format,
 													 const void * streamHook);
