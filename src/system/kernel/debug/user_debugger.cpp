@@ -2555,6 +2555,11 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 				done = true;
 				result = team->debug_info.nub_port;
 			}
+		} else if ((teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_DISABLED) != 0
+			&& useDefault) {
+			// No debugger yet, disable_debugger() had been invoked, and we
+			// would install the default debugger. Just fail.
+			error = B_BAD_VALUE;
 		}
 
 		// in case of a handover the lock has already been released
@@ -2732,20 +2737,25 @@ _user_disable_debugger(int state)
 {
 	struct team *team = thread_get_current_thread()->team;
 
+	TRACE(("_user_disable_debugger(%d): team: %ld\n", state, team->id));
+
 	cpu_status cpuState = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
 	int32 oldFlags;
-	if (state)
-		oldFlags = atomic_and(&team->debug_info.flags, ~B_TEAM_DEBUG_SIGNALS);
-	else
-		oldFlags = atomic_or(&team->debug_info.flags, B_TEAM_DEBUG_SIGNALS);
+	if (state) {
+		oldFlags = atomic_or(&team->debug_info.flags,
+			B_TEAM_DEBUG_DEBUGGER_DISABLED);
+	} else {
+		oldFlags = atomic_and(&team->debug_info.flags,
+			~B_TEAM_DEBUG_DEBUGGER_DISABLED);
+	}
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 	restore_interrupts(cpuState);
 
 	// TODO: Check, if the return value is really the old state.
-	return !(oldFlags & B_TEAM_DEBUG_SIGNALS);
+	return !(oldFlags & B_TEAM_DEBUG_DEBUGGER_DISABLED);
 }
 
 
