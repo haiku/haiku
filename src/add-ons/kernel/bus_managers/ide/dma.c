@@ -57,11 +57,21 @@ get_device_dma_mode(ide_device_info *device)
 bool
 configure_dma(ide_device_info *device)
 {
-	if ((device->DMA_enabled = device->DMA_supported = device->bus->can_DMA)
-		&& get_device_dma_mode(device) != -1)
-			return true;
+	if (get_device_dma_mode(device) != -1) {
+		device->DMA_enabled = device->DMA_supported = device->bus->can_DMA;
+		if (device->DMA_enabled) {
+			dprintf("IDE: enabling DMA\n");
+		}
+		else {
+			dprintf("IDE: disabling DMA (failsafe option selected)\n");
+		}
+	}
+	else {
+		device->DMA_enabled = false;
+		dprintf("IDE: DMA not possible, disabling\n");
+	}
 
-	return false;
+	return true;
 }
 
 
