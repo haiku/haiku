@@ -245,7 +245,8 @@ BGameSound::SetInitError(status_t in_initError)
 status_t
 BGameSound::Init(gs_id handle)
 {
-	if (fSound < 0) fSound = handle;
+	if (fSound < 0)
+		fSound = handle;
 		 		
 	return B_OK;
 }

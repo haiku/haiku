@@ -87,22 +87,23 @@ GameSoundBuffer::GameSoundBuffer(const gs_audio_format * format)
 	memcpy(&fFormat, format, sizeof(gs_audio_format));
 }
 
+
 // Play must stop before the distructor is called; otherwise, a fatel 
 // error occures if the playback is in a subclass.
 GameSoundBuffer::~GameSoundBuffer()
 {
-	BMediaRoster* r = BMediaRoster::Roster();
+	BMediaRoster* roster = BMediaRoster::Roster();
 	
 	if (fIsConnected) {
 		// Ordinarily we'd stop *all* of the nodes in the chain at this point.  However,
 		// one of the nodes is the System Mixer, and stopping the Mixer is a Bad Idea (tm).
 		// So, we just disconnect from it, and release our references to the nodes that
 		// we're using.  We *are* supposed to do that even for global nodes like the Mixer.
-		r->Disconnect(fConnection->producer.node, fConnection->source,
+		roster->Disconnect(fConnection->producer.node, fConnection->source,
 							fConnection->consumer.node, fConnection->destination);
 		
-		r->ReleaseNode(fConnection->producer);
-		r->ReleaseNode(fConnection->consumer);
+		roster->ReleaseNode(fConnection->producer);
+		roster->ReleaseNode(fConnection->consumer);
 	}
 	
 	delete fGainRamp;
@@ -251,7 +252,7 @@ GameSoundBuffer::SetAttributes(gs_attribute * attributes,
 void
 GameSoundBuffer::Play(void * data, int64 frames)
 {
-	float *pan = new float[2];
+	float pan[2];
 	pan[0] = fPanRight;
 	pan[1] = fPanLeft;
 	
@@ -259,7 +260,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			
 	FillBuffer(buffer, frames);
 	
-	switch(fFormat.format) {
+	switch (fFormat.format) {
 		case gs_audio_format::B_GS_U8:
 		{
 			for (int64 i = 0; i < frames; i++) {
@@ -301,8 +302,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 		}
 	}
 	
-	delete [] buffer;
-	delete [] pan;
+	delete[] buffer;
 }
 
 
@@ -355,14 +355,14 @@ GameSoundBuffer::Reset()
 status_t
 GameSoundBuffer::Connect(media_node * consumer)
 {
-	BMediaRoster* r = BMediaRoster::Roster();
-	status_t err = r->RegisterNode(fNode);
+	BMediaRoster* roster = BMediaRoster::Roster();
+	status_t err = roster->RegisterNode(fNode);
 	
 	if (err != B_OK) 
 		return err;
 	
 	// make sure the Media Roster knows that we're using the node
-	err = r->GetNodeFor(fNode->Node().node, &fConnection->producer);
+	err = roster->GetNodeFor(fNode->Node().node, &fConnection->producer);
 
 	if (err != B_OK)
         	return err;
@@ -372,22 +372,22 @@ GameSoundBuffer::Connect(media_node * consumer)
 
 	// set the producer's time source to be the "default" time source, which
 	// the Mixer uses too.
-	err = r->GetTimeSource(&fConnection->timeSource);
+	err = roster->GetTimeSource(&fConnection->timeSource);
 	if (err != B_OK)
                 return err;	
 
-	err = r->SetTimeSourceFor(fConnection->producer.node, fConnection->timeSource.node);
+	err = roster->SetTimeSourceFor(fConnection->producer.node, fConnection->timeSource.node);
         if (err != B_OK)
                 return err;
 	// got the nodes; now we find the endpoints of the connection
 	media_input mixerInput;
 	media_output soundOutput;
 	int32 count = 1;
-	err = r->GetFreeOutputsFor(fConnection->producer, &soundOutput, 1, &count);
+	err = roster->GetFreeOutputsFor(fConnection->producer, &soundOutput, 1, &count);
 	if (err != B_OK) 
 		return err;
 	count = 1;
-	err = r->GetFreeInputsFor(fConnection->consumer, &mixerInput, 1, &count);
+	err = roster->GetFreeInputsFor(fConnection->consumer, &mixerInput, 1, &count);
 	if (err != B_OK) 
 		return err;
 
@@ -395,7 +395,7 @@ GameSoundBuffer::Connect(media_node * consumer)
 	media_format format;
 	format.type = B_MEDIA_RAW_AUDIO;	
 	format.u.raw_audio = media_raw_audio_format::wildcard;
-	err = r->Connect(soundOutput.source, mixerInput.destination, &format, &soundOutput, &mixerInput);
+	err = roster->Connect(soundOutput.source, mixerInput.destination, &format, &soundOutput, &mixerInput);
 	if (err != B_OK) 
 		return err;
 	
@@ -417,15 +417,15 @@ GameSoundBuffer::StartPlaying()
 	if (fIsPlaying) 
 		return EALREADY;
 	
-	BMediaRoster* r = BMediaRoster::Roster();
-	BTimeSource* ts = r->MakeTimeSourceFor(fConnection->producer);
+	BMediaRoster* roster = BMediaRoster::Roster();
+	BTimeSource* source = roster->MakeTimeSourceFor(fConnection->producer);
 	
 	// make sure we give the producer enough time to run buffers through
 	// the node chain, otherwise it'll start up already late
 	bigtime_t latency = 0;
-	r->GetLatencyFor(fConnection->producer, &latency);
-	r->StartNode(fConnection->producer, ts->Now() + latency);
-	ts->Release();
+	roster->GetLatencyFor(fConnection->producer, &latency);
+	roster->StartNode(fConnection->producer, source->Now() + latency);
+	source->Release();
 	
 	fIsPlaying = true;
 	
@@ -439,8 +439,9 @@ GameSoundBuffer::StopPlaying()
 	if (!fIsPlaying) 
 		return EALREADY;
 	
-	BMediaRoster* r = BMediaRoster::Roster();
-	r->StopNode(fConnection->producer, 0, true);		// synchronous stop
+	BMediaRoster* roster = BMediaRoster::Roster();
+	roster->StopNode(fConnection->producer, 0, true);
+		// synchronous stop
 
 	Reset();
 	fIsPlaying = false;
@@ -515,10 +516,11 @@ SimpleSoundBuffer::FillBuffer(void * data, int64 frames)
 
 // StreamingSoundBuffer ------------------------------------------------------
 StreamingSoundBuffer::StreamingSoundBuffer(const gs_audio_format * format,
-											const void * streamHook)
-		:	GameSoundBuffer(format)
+						const void * streamHook)
+	:
+	GameSoundBuffer(format),
+	fStreamHook(const_cast<void *>(streamHook))	
 {
-	fStreamHook = (void*)streamHook;
 }
 
 
@@ -528,8 +530,7 @@ StreamingSoundBuffer::~StreamingSoundBuffer()
 
 
 void
-StreamingSoundBuffer::FillBuffer(void * buffer,
-									int64 frames)
+StreamingSoundBuffer::FillBuffer(void * buffer, int64 frames)
 {
 	BStreamingGameSound* object = (BStreamingGameSound*)fStreamHook;
 	
