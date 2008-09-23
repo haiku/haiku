@@ -51,6 +51,10 @@ static const char* kUsage =
 	"                   thread.\n"
 	"  -C             - Don't profile child teams. Default is to recursively\n"
 	"                   profile all teams created by a profiled team.\n"
+	"  -f             - Always analyze the full caller stack. The hit count\n"
+	"                   for every encountered function will be incremented.\n"
+	"                   This increases the default for the caller stack depth\n"
+	"                   (\"-s\") to 64.\n"
 	"  -h, --help     - Print this usage info.\n"
 	"  -i <interval>  - Use a tick interval of <interval> microseconds.\n"
 	"                   Default is 1000 (1 ms). On a fast machine, a shorter\n"
@@ -75,7 +79,8 @@ struct Options {
 		profile_kernel(true),
 		profile_loading(false),
 		profile_teams(true),
-		profile_threads(true)
+		profile_threads(true),
+		analyze_full_stack(false)
 	{
 	}
 
@@ -86,6 +91,7 @@ struct Options {
 	bool		profile_loading;
 	bool		profile_teams;
 	bool		profile_threads;
+	bool		analyze_full_stack;
 };
 
 static Options sOptions;
@@ -335,6 +341,16 @@ public:
 		fTotalHits++;
 	}
 
+	void AddSymbolHit(int32 symbolIndex)
+	{
+		fSymbolHits[symbolIndex]++;
+	}
+
+	void AddImageHit()
+	{
+		fTotalHits++;
+	}
+
 	Image* GetImage() const
 	{
 		return fImage;
@@ -376,7 +392,8 @@ public:
 		fTotalTicks(0),
 		fUnkownTicks(0),
 		fDroppedTicks(0),
-		fInterval(1)
+		fInterval(1),
+		fTotalSampleCount(0)
 	{
 	}
 
@@ -456,7 +473,8 @@ public:
 		return NULL;
 	}
 
-	void AddSamples(int32 count, int32 dropped, int32 stackDepth, int32 event)
+	void AddSamples(int32 count, int32 dropped, int32 stackDepth,
+		bool variableStackDepth, int32 event)
 	{
 		_RemoveObsoleteImages(event);
 
@@ -471,24 +489,76 @@ public:
 			}
 		}
 
-		count = count / stackDepth * stackDepth;
+		if (variableStackDepth) {
+			// Variable stack depth means we have full caller stack analyzes
+			// enabled.
+			int32 totalSampleCount = 0;
+			int32 tickCount = 0;
+			addr_t* samples = fSamples;
+			while (count > 0) {
+				int32 sampleCount = *(samples++);
 
-		for (int32 i = 0; i < count; i += stackDepth) {
-			ThreadImage* image = NULL;
-			for (int32 k = 0; k < stackDepth; k++) {
-				addr_t address = fSamples[i + k];
-				image = FindImage(address);
-				if (image != NULL) {
-					image->AddHit(address);
-					break;
+				// Sort the samples. This way hits of the same symbol are
+				// successive and we can avoid incrementing the hit count of the
+				// same symbol twice. Same for images.
+				std::sort(samples, samples + sampleCount);
+
+				int32 unknownSamples = 0;
+				ThreadImage* previousImage = NULL;
+				int32 previousSymbol = -1;
+
+				for (int32 i = 0; i < sampleCount; i++) {
+					addr_t address = samples[i];
+					ThreadImage* image = FindImage(address);
+					int32 symbol = -1;
+					if (image != NULL) {
+						symbol = image->GetImage()->FindSymbol(address);
+						if (symbol < 0) {
+							// TODO: Count unknown image hits?
+						} else if (symbol != previousSymbol)
+							image->AddSymbolHit(symbol);
+
+						if (image != previousImage)
+							image->AddImageHit();
+					} else
+						unknownSamples++;
+
+					previousImage = image;
+					previousSymbol = symbol;
 				}
+
+				if (unknownSamples == sampleCount)
+					fUnkownTicks++;
+
+				samples += sampleCount;
+				count -= sampleCount + 1;
+				tickCount++;
+				totalSampleCount += sampleCount;
 			}
 
-			if (image == NULL)
-				fUnkownTicks++;
+			fTotalTicks += tickCount;
+			fTotalSampleCount += totalSampleCount;
+		} else {
+			count = count / stackDepth * stackDepth;
+
+			for (int32 i = 0; i < count; i += stackDepth) {
+				ThreadImage* image = NULL;
+				for (int32 k = 0; k < stackDepth; k++) {
+					addr_t address = fSamples[i + k];
+					image = FindImage(address);
+					if (image != NULL) {
+						image->AddHit(address);
+						break;
+					}
+				}
+
+				if (image == NULL)
+					fUnkownTicks++;
+			}
+
+			fTotalTicks += count / stackDepth;
 		}
 
-		fTotalTicks += count / stackDepth;
 		fDroppedTicks += dropped;
 
 		// re-add the new images
@@ -573,6 +643,10 @@ public:
 		fprintf(sOptions.output, "  dropped ticks:  %lld (%lld us, %6.2f%%)\n",
 			fDroppedTicks, fDroppedTicks * fInterval,
 			100.0 * fDroppedTicks / totalTicks);
+		if (sOptions.analyze_full_stack) {
+			fprintf(sOptions.output, "  samples/tick:   %.1f\n",
+				(double)fTotalSampleCount / totalTicks);
+		}
 
 		if (imageCount > 0) {
 			fprintf(sOptions.output, "\n");
@@ -649,6 +723,7 @@ private:
 	int64		fUnkownTicks;
 	int64		fDroppedTicks;
 	bigtime_t	fInterval;
+	int64		fTotalSampleCount;
 };
 
 
@@ -786,6 +861,7 @@ public:
 		message.interval = sOptions.interval;
 		message.sample_area = sampleArea;
 		message.stack_depth = sOptions.stack_depth;
+		message.variable_stack_depth = sOptions.analyze_full_stack;
 
 		debug_nub_start_profiler_reply reply;
 		status_t error = send_debug_message(&fDebugContext,
@@ -1114,6 +1190,7 @@ get_id(const char *str, int32 &id)
 int
 main(int argc, const char* const* argv)
 {
+	int32 stackDepth = 0;
 	const char* outputFile = NULL;
 
 	while (true) {
@@ -1123,7 +1200,7 @@ main(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+cChi:klo:s:", sLongOptions,
+		int c = getopt_long(argc, (char**)argv, "+cCfhi:klo:s:", sLongOptions,
 			NULL);
 		if (c == -1)
 			break;
@@ -1134,6 +1211,10 @@ main(int argc, const char* const* argv)
 				break;
 			case 'C':
 				sOptions.profile_teams = false;
+				break;
+			case 'f':
+				sOptions.stack_depth = 64;
+				sOptions.analyze_full_stack = true;
 				break;
 			case 'h':
 				print_usage_and_exit(false);
@@ -1151,7 +1232,7 @@ main(int argc, const char* const* argv)
 				outputFile = optarg;
 				break;
 			case 's':
-				sOptions.stack_depth = atol(optarg);
+				stackDepth = atol(optarg);
 				break;
 			default:
 				print_usage_and_exit(true);
@@ -1161,6 +1242,9 @@ main(int argc, const char* const* argv)
 
 	if (optind >= argc)
 		print_usage_and_exit(true);
+
+	if (stackDepth != 0)
+		sOptions.stack_depth = stackDepth;
 
 	const char* const* programArgs = argv + optind;
 	int programArgCount = argc - optind;
@@ -1245,6 +1329,7 @@ main(int argc, const char* const* argv)
 				thread->AddSamples(message.profiler_update.sample_count,
 					message.profiler_update.dropped_ticks,
 					message.profiler_update.stack_depth,
+					message.profiler_update.variable_stack_depth,
 					message.profiler_update.image_event);
 
 				if (message.profiler_update.stopped) {

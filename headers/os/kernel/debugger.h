@@ -367,6 +367,9 @@ typedef struct {
 	area_id				sample_area;	// area into which the sample will be
 										// written
 	int32				stack_depth;	// number of return address per hit
+	bool				variable_stack_depth;
+										// variable number of samples per hit;
+										// cf. debug_profiler_update
 } debug_nub_start_profiler;
 
 typedef struct {
@@ -549,18 +552,22 @@ typedef struct {
 
 typedef struct {
 	debug_origin		origin;
-	int32				image_event;		// number of the last image event;
-											// all samples were recorded after
-											// this event and before the next
-											// one
-	int32				stack_depth;		// number of return addresses per
-											// tick
-	int32				sample_count;		// number of samples in the buffer
-	int32				dropped_ticks;		// number of ticks that had been
-											// dropped, since the buffer was
-											// full
-	bool				stopped;			// if true, the thread is no longer
-											// being profiled
+	int32				image_event;	// number of the last image event; all
+										// samples were recorded after this
+										// event and before the next one
+	int32				stack_depth;	// number of return addresses per tick
+	int32				sample_count;	// number of samples in the buffer
+	int32				dropped_ticks;	// number of ticks that had been
+										// dropped, since the buffer was full
+	bool				variable_stack_depth;
+										// the number of samples per hit is
+										// variable, i.e. the format for the
+										// samples of a hit in the buffer is
+										//   <n> <sample 1> ... <sample n>
+										// instead of
+										//   <sample 1> ... <sample stack_depth>
+	bool				stopped;		// if true, the thread is no longer
+										// being profiled
 } debug_profiler_update;
 
 // B_DEBUGGER_MESSAGE_HANDED_OVER

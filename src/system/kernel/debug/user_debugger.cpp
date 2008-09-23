@@ -1217,16 +1217,25 @@ profiling_do_sample(bool& flushBuffer)
 	// get the samples
 	addr_t* returnAddresses = debugInfo.profile.samples
 		+ debugInfo.profile.sample_count;
-	if (stackDepth > 1) {
-		int32 count = arch_debug_get_stack_trace(returnAddresses, stackDepth, 1,
-			0, false);
+	if (debugInfo.profile.variable_stack_depth) {
+		// variable sample count per hit
+		*returnAddresses = arch_debug_get_stack_trace(returnAddresses + 1,
+			stackDepth - 1, 1, 0, false);
 
-		for (int32 i = count; i < stackDepth; i++)
-			returnAddresses[i] = 0;
-	} else
-		*returnAddresses = (addr_t)arch_debug_get_interrupt_pc();
+		debugInfo.profile.sample_count += *returnAddresses + 1;
+	} else {
+		// fixed sample count per hit
+		if (stackDepth > 1) {
+			int32 count = arch_debug_get_stack_trace(returnAddresses,
+				stackDepth, 1, 0, false);
 
-	debugInfo.profile.sample_count += stackDepth;
+			for (int32 i = count; i < stackDepth; i++)
+				returnAddresses[i] = 0;
+		} else
+			*returnAddresses = (addr_t)arch_debug_get_interrupt_pc();
+
+		debugInfo.profile.sample_count += stackDepth;
+	}
 
 	return true;
 }
@@ -2214,6 +2223,8 @@ debug_nub_thread(void *)
 				replyPort = message.start_profiler.reply_port;
 				area_id sampleArea = message.start_profiler.sample_area;
 				int32 stackDepth = message.start_profiler.stack_depth;
+				bool variableStackDepth
+					= message.start_profiler.variable_stack_depth;
 				bigtime_t interval = max_c(message.start_profiler.interval,
 					B_DEBUG_MIN_PROFILE_INTERVAL);
 				status_t result = B_OK;
@@ -2226,6 +2237,11 @@ debug_nub_thread(void *)
 					stackDepth = 1;
 				else if (stackDepth > B_DEBUG_STACK_TRACE_DEPTH)
 					stackDepth = B_DEBUG_STACK_TRACE_DEPTH;
+
+				// provision for an extra entry per hit (for the number of
+				// samples), if variable stack depth
+				if (variableStackDepth)
+					stackDepth++;
 
 				// clone the sample area
 				area_info areaInfo;
@@ -2274,6 +2290,8 @@ debug_nub_thread(void *)
 							threadDebugInfo.profile.sample_count = 0;
 							threadDebugInfo.profile.dropped_ticks = 0;
 							threadDebugInfo.profile.stack_depth = stackDepth;
+							threadDebugInfo.profile.variable_stack_depth
+								= variableStackDepth;
 							threadDebugInfo.profile.buffer_full = false;
 							threadDebugInfo.profile.interval_left = interval;
 							threadDebugInfo.profile.installed_timer = NULL;

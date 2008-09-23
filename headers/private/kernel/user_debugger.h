@@ -16,7 +16,7 @@
 
 // limits
 #define B_DEBUG_MIN_PROFILE_INTERVAL			10			/* in us */
-#define B_DEBUG_STACK_TRACE_DEPTH				20
+#define B_DEBUG_STACK_TRACE_DEPTH				128
 #define	B_DEBUG_PROFILE_BUFFER_FLUSH_THRESHOLD	70			/* in % */
 
 
@@ -96,6 +96,8 @@ struct thread_debug_info {
 		int32			image_event;
 			// number of the image event when the first sample was written into
 			// the buffer
+		bool			variable_stack_depth;
+			// record a variable number of samples per hit
 		bool			buffer_full;
 			// indicates that the sample buffer is full
 		union {
