@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -36,6 +36,7 @@ FUNCTION(_longjmp):
 	add		$8, %esp
 
 	ret
+FUNCTION_END(siglongjmp)
 
 
 #pragma weak longjmp=siglongjmp

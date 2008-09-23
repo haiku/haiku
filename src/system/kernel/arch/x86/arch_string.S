@@ -7,9 +7,7 @@
 #	include "asm_offsets.h"
 #endif
 
-
-#define FUNCTION(x) .global x; .type x,@function; x
-#define SYM(x) .global x; x
+#include <asm_defs.h>
 
 
 // We don't need the indirection in the boot loader.
@@ -26,7 +24,7 @@ FUNCTION(memcpy_generic):
 	movl	%edi,%eax	/* save dest ptr as return address */
 	movl	16(%esp),%esi	/* source */
 	movl	20(%esp),%ecx	/* count */
-	
+
 	/* move by words */
 	cld
 	shrl	$2,%ecx
@@ -38,11 +36,11 @@ FUNCTION(memcpy_generic):
 	andl	$3,%ecx
 	rep
 	movsb
-	
+
 	popl	%edi
 	popl	%esi
 	ret
-SYM(memcpy_generic_end):
+SYMBOL(memcpy_generic_end):
 
 
 #if !_BOOT_MODE

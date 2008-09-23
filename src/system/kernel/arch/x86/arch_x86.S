@@ -7,11 +7,12 @@
  * Distributed under the terms of the NewOS License.
  */
 
+#include <asm_defs.h>
+
 #include <arch/x86/descriptors.h>
 
 #include "syscall_numbers.h"
 
-#define FUNCTION(x) .global x; .type x,@function; x
 
 .text
 
@@ -20,30 +21,35 @@ FUNCTION(arch_cpu_user_TLB_invalidate):
 	movl	%cr3,%eax
 	movl	%eax,%cr3
 	ret
+FUNCTION_END(arch_cpu_user_TLB_invalidate)
 
 /* void i386_fnsave(void *fpu_state); */
 FUNCTION(i386_fnsave):
 	movl	4(%esp), %eax
 	fnsave	(%eax)
 	ret
+FUNCTION_END(i386_fnsave)
 
 /* void i386_fxsave(void *fpu_state); */
 FUNCTION(i386_fxsave):
 	movl	4(%esp), %eax
 	fxsave	(%eax)
 	ret
+FUNCTION_END(i386_fxsave)
 
 /* void i386_frstor(const void *fpu_state); */
 FUNCTION(i386_frstor):
 	movl	4(%esp), %eax
 	frstor	(%eax)
 	ret
+FUNCTION_END(i386_frstor)
 
 /* void i386_fxrstor(const void *fpu_state); */
 FUNCTION(i386_fxrstor):
 	movl	4(%esp), %eax
 	fxrstor	(%eax)
 	ret
+FUNCTION_END(i386_fxrstor)
 
 /* void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state); */
 FUNCTION(i386_fnsave_swap):
@@ -52,6 +58,7 @@ FUNCTION(i386_fnsave_swap):
 	movl	8(%esp),%eax
 	frstor	(%eax)
 	ret
+FUNCTION_END(i386_fnsave_swap)
 
 /* void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state); */
 FUNCTION(i386_fxsave_swap):
@@ -60,39 +67,46 @@ FUNCTION(i386_fxsave_swap):
 	movl	8(%esp),%eax
 	fxrstor	(%eax)
 	ret
+FUNCTION_END(i386_fxsave_swap)
 
 /* uint32 x86_read_ebp(); */
 FUNCTION(x86_read_ebp):
 	movl	%ebp, %eax
 	ret
+FUNCTION_END(x86_read_ebp)
 
 /* uint32 x86_read_cr0(); */
 FUNCTION(x86_read_cr0):
 	movl	%cr0, %eax
 	ret
+FUNCTION_END(x86_read_cr0)
 
 /* void x86_write_cr0(uint32 value); */
 FUNCTION(x86_write_cr0):
 	movl	4(%esp), %eax
 	movl	%eax, %cr0
 	ret
+FUNCTION_END(x86_write_cr0)
 
 /* uint32 x86_read_cr4(); */
 FUNCTION(x86_read_cr4):
 	movl	%cr4, %eax
 	ret
+FUNCTION_END(x86_read_cr4)
 
 /* void x86_write_cr4(uint32 value); */
 FUNCTION(x86_write_cr4):
 	movl	4(%esp), %eax
 	movl	%eax, %cr4
 	ret
+FUNCTION_END(x86_write_cr4)
 
 /* uint64 x86_read_msr(uint32 register); */
 FUNCTION(x86_read_msr):
 	movl	4(%esp), %ecx
 	rdmsr
 	ret
+FUNCTION_END(x86_read_msr)
 
 /* void x86_write_msr(uint32 register, uint64 value); */
 FUNCTION(x86_write_msr):
@@ -101,6 +115,7 @@ FUNCTION(x86_write_msr):
 	movl	12(%esp), %edx
 	wrmsr
 	ret
+FUNCTION_END(x86_write_msr)
 
 /* void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr new_pgdir); */
 FUNCTION(i386_context_switch):
@@ -119,12 +134,14 @@ skip_pgdir_swap:
 	lss		(%eax),%esp
 	popa
 	ret
+FUNCTION_END(i386_context_switch)
 
 /* void i386_swap_pgdir(addr new_pgdir); */
 FUNCTION(i386_swap_pgdir):
 	movl	4(%esp),%eax
 	movl	%eax,%cr3
 	ret
+FUNCTION_END(i386_swap_pgdir)
 
 /* thread exit stub - is copied to the userspace stack in arch_thread_enter_uspace() */
 	.align 4
@@ -136,6 +153,7 @@ FUNCTION(x86_userspace_thread_exit):
 	movl	$SYSCALL_EXIT_THREAD, %eax
 	int		$99
 	.align 4
+FUNCTION_END(x86_userspace_thread_exit)
 FUNCTION(x86_end_userspace_thread_exit):
 
 
@@ -157,6 +175,7 @@ FUNCTION(x86_enter_userspace):
 	pushl	$USER_CODE_SEG	// user code segment
 	pushl	%eax			// user IP
 	iret
+FUNCTION_END(x86_enter_userspace)
 
 /* void i386_switch_stack_and_call(addr stack, void (*func)(void *), void *arg); */
 FUNCTION(i386_switch_stack_and_call):
@@ -169,6 +188,7 @@ FUNCTION(i386_switch_stack_and_call):
 	call	*%ecx			// call the target function
 _loop:
 	jmp		_loop
+FUNCTION_END(i386_switch_stack_and_call)
 
 null_idt_descr:
 	.word	0
@@ -179,6 +199,7 @@ FUNCTION(reboot):
 	int		$0
 done:
 	jmp		done
+FUNCTION_END(reboot)
 
 
 FUNCTION(arch_debug_save_registers):
@@ -219,6 +240,7 @@ FUNCTION(arch_debug_save_registers):
 	popl	%eax
 	popl	%esi
 	ret
+FUNCTION_END(arch_debug_save_registers)
 
 /* status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
 FUNCTION(arch_cpu_user_memcpy):
@@ -231,7 +253,7 @@ FUNCTION(arch_cpu_user_memcpy):
 	/* set the fault handler */
 	movl	24(%esp),%edx	/* fault handler */
 	movl	(%edx),%eax
-	movl	$.L_user_memcpy_error, (%edx)	
+	movl	$.L_user_memcpy_error, (%edx)
 
 	/* move by words */
 	cld
@@ -261,4 +283,5 @@ FUNCTION(arch_cpu_user_memcpy):
 	popl	%edi
 	popl	%esi
 	ret
+FUNCTION_END(arch_cpu_user_memcpy)
 

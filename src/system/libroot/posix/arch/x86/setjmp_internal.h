@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -14,6 +14,6 @@
 #define JMP_REGS_ESP	16
 #define JMP_REGS_PC		20
 
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <asm_defs.h>
 
 #endif	/* SETJMP_INTERNAL_H */

@@ -4,7 +4,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "setjmp_internal.h"
 
 
@@ -39,6 +38,7 @@ sigsetjmp_setjmp_entry:
 	mov		%edx, JMP_REGS_PC(%eax)
 
 	jmp		__setjmp_save_sigs
+FUNCTION_END(sigsetjmp)
 
 
 /* int setjmp(jmp_buf buffer) */
@@ -55,6 +55,7 @@ FUNCTION(setjmp):
 	add		$8, %esp
 
 	ret
+FUNCTION_END(setjmp)
 
 
 #pragma weak _setjmp=setjmp

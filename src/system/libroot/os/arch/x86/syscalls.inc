@@ -14,15 +14,15 @@
  * branch to the syscall vector in the commpage
  */
 
+#include <asm_defs.h>
 #include <commpage_defs.h>
 
-#define _SYSCALL(name, n) \
-.globl name; \
-.type name,@function; \
-.align 8; \
-name: \
-	movl	$n,%eax; \
-	jmp	*(USER_COMMPAGE_ADDR + COMMPAGE_ENTRY_X86_SYSCALL * 4)
+#define _SYSCALL(name, n)											\
+	.align 8;														\
+	FUNCTION(name):													\
+		movl	$n,%eax;											\
+		jmp	*(USER_COMMPAGE_ADDR + COMMPAGE_ENTRY_X86_SYSCALL * 4);	\
+	FUNCTION_END(name)
 
 #define SYSCALL0(name, n) _SYSCALL(name, n)
 #define SYSCALL1(name, n) _SYSCALL(name, n)

@@ -3,8 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <asm_defs.h>
 
 
 /* uint16 __swap_int16(uint16 value) */
@@ -13,6 +12,7 @@ FUNCTION(__swap_int16):
 	bswap	%eax
 	shr		$16, %eax
 	ret
+FUNCTION_END(__swap_int16)
 
 /* this one is much faster on a P4, courtesy of Marcus Overhagen,
  * a good candidate for per processor optimizations: */
@@ -28,6 +28,7 @@ FUNCTION(__swap_int32):
 	movl	4(%esp), %eax
 	bswap	%eax
 	ret
+FUNCTION_END(__swap_int32)
 
 /* uint64 __swap_int64(uint64 value) */
 FUNCTION(__swap_int64):
@@ -36,6 +37,7 @@ FUNCTION(__swap_int64):
 	bswap	%eax
 	bswap	%edx
 	ret
+FUNCTION_END(__swap_int64)
 
 /* float __swap_float(float value) */
 FUNCTION(__swap_float):
@@ -44,6 +46,7 @@ FUNCTION(__swap_float):
 	movl	%eax, 4(%esp)
 	fld		4(%esp)
 	ret
+FUNCTION_END(__swap_float)
 
 /* double __swap_double(double value) */
 FUNCTION(__swap_double):
@@ -55,3 +58,4 @@ FUNCTION(__swap_double):
 	movl	%edx, 8(%esp)
 	fldl	4(%esp)
 	ret
+FUNCTION_END(__swap_double)

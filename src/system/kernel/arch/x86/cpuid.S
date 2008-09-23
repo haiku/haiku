@@ -6,8 +6,8 @@
  * Distributed under the terms of the NewOS License.
  */
 
+#include <asm_defs.h>
 
-#define FUNCTION(x) .global x; .type x,@function; x
 
 .text
 
@@ -26,6 +26,7 @@ FUNCTION(get_current_cpuid):
  	popl	%ebx
  	xorl	%eax, %eax		/* return B_OK */
  	ret
+FUNCTION_END(get_current_cpuid)
 
 
 /* unsigned int get_eflags(void) */
@@ -33,6 +34,7 @@ FUNCTION(get_eflags):
  	pushfl
  	popl	%eax
  	ret
+FUNCTION_END(get_eflags)
 
 
 /* void set_eflags(unsigned int val) */
@@ -40,3 +42,4 @@ FUNCTION(set_eflags):
  	pushl	4(%esp)
  	popfl
 	ret
+FUNCTION_END(set_eflags)

@@ -3,7 +3,8 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <asm_defs.h>
+
 
 .text
 
@@ -15,6 +16,7 @@ FUNCTION(__x86_setup_system_time):
 	movl	4(%esp),%eax
 	movl	%eax,cv_factor
 	ret
+FUNCTION_END(__x86_setup_system_time)
 
 /* long long system_time(); */
 FUNCTION(system_time):
@@ -36,3 +38,4 @@ FUNCTION(system_time):
 	popl	%ecx
 	popl	%ebx
 	ret
+FUNCTION_END(system_time)

@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix arch x86 ;
 
+UsePrivateSystemHeaders ;
+
 local genericSources =
 	setjmp_save_sigs.c
 	longjmp_return.c

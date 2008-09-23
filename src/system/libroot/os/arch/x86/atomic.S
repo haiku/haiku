@@ -6,7 +6,8 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <asm_defs.h>
+
 
 .text
 
@@ -17,6 +18,7 @@ FUNCTION(atomic_set):
 	lock
 	xchg		%eax,(%edx)
 	ret
+FUNCTION_END(atomic_set)
 
 /* int32	atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst) */
 FUNCTION(atomic_test_and_set):
@@ -26,6 +28,7 @@ FUNCTION(atomic_test_and_set):
 	lock
 	cmpxchgl	%ecx,(%edx)
 	ret
+FUNCTION_END(atomic_test_and_set)
 
 /* int32	atomic_add(vint32 *value, int32 addValue) */
 FUNCTION(atomic_add):
@@ -34,6 +37,7 @@ FUNCTION(atomic_add):
 	lock
 	xaddl		%eax,(%edx)
 	ret
+FUNCTION_END(atomic_add)
 
 /* int32	atomic_and(vint32 *value, int32 andValue) */
 FUNCTION(atomic_and):
@@ -46,6 +50,7 @@ _atomic_and1:
 	cmpxchgl	%ecx,(%edx)
 	jnz			_atomic_and1
 	ret
+FUNCTION_END(atomic_and)
 
 /* int32	atomic_or(vint32 *value, int32 orValue) */
 FUNCTION(atomic_or):
@@ -58,7 +63,8 @@ _atomic_or1:
 	cmpxchgl	%ecx,(%edx)
 	jnz			_atomic_or1
 	ret
-	
+FUNCTION_END(atomic_or)
+
 /* int32	atomic_get(vint32 *value) */
 FUNCTION(atomic_get):
 	movl		4(%esp), %edx
@@ -69,6 +75,7 @@ _atomic_get1:
 	cmpxchgl	%ecx, (%edx)
 	jnz			_atomic_get1
 	ret
+FUNCTION_END(atomic_get)
 
 /* int64	atomic_set64(vint64 *value, int64 newValue) */
 FUNCTION(atomic_set64):
@@ -86,6 +93,7 @@ _atomic_set64_1:
 	pop			%ebx
 	pop			%ebp
 	ret
+FUNCTION_END(atomic_set64)
 
 /* int64	atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst) */
 FUNCTION(atomic_test_and_set64):
@@ -101,6 +109,7 @@ FUNCTION(atomic_test_and_set64):
 	pop			%ebx
 	pop			%ebp
 	ret
+FUNCTION_END(atomic_test_and_set64)
 
 /* int64	atomic_add64(vint64 *value, int64 addValue) */
 FUNCTION(atomic_add64):
@@ -120,6 +129,7 @@ _atomic_add64_1:
 	pop			%ebx
 	pop			%ebp
 	ret
+FUNCTION_END(atomic_add64)
 
 /* int64	atomic_and64(vint64 *value, int64 andValue) */
 FUNCTION(atomic_and64):
@@ -139,6 +149,7 @@ _atomic_and64_1:
 	pop			%ebx
 	pop			%ebp
 	ret
+FUNCTION_END(atomic_and64)
 
 /* int64	atomic_or64(vint64 *value, int64 orValue) */
 FUNCTION(atomic_or64):
@@ -158,6 +169,7 @@ _atomic_or64_1:
 	pop			%ebx
 	pop			%ebp
 	ret
+FUNCTION_END(atomic_or64)
 
 /* int64	atomic_get64(vint64 *value) */
 FUNCTION(atomic_get64):
@@ -175,3 +187,4 @@ _atomic_get64_1:
 	pop			%ebx
 	pop			%ebp
 	ret
+FUNCTION_END(atomic_get64)

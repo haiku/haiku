@@ -11,6 +11,7 @@
 #include <arch/x86/arch_cpu.h>
 #include <arch/x86/arch_kernel.h>
 #include <arch/x86/descriptors.h>
+#include <asm_defs.h>
 #include <commpage_defs.h>
 #include <thread_types.h>
 
@@ -20,8 +21,6 @@
 #include "syscall_numbers.h"
 #include "syscall_table.h"
 
-
-#define FUNCTION(x) .global x; .type x,@function; x
 
 #define UPDATE_THREAD_USER_TIME_COMMON()					\
 	movl	%eax, %ebx;				/* save for later */	\
@@ -168,23 +167,23 @@
 .text
 
 #define TRAP_ERRC(name, vector) \
-.globl name; \
 .align 8; \
-name: \
+FUNCTION(name): \
 	pushl	$vector; \
 	pushl	$-1; \
 	pushl	$-1; \
-	jmp		int_bottom
+	jmp		int_bottom;	\
+FUNCTION_END(name)
 
 #define TRAP(name, vector) \
-.globl name; \
 .align 8; \
-name: \
+FUNCTION(name): \
 	pushl	$0; \
 	pushl	$vector; \
 	pushl	%edx; \
 	pushl	%eax; \
-	jmp		int_bottom
+	jmp		int_bottom; \
+FUNCTION_END(name)
 
 TRAP(trap0, 0)
 TRAP(trap1, 1)
@@ -195,9 +194,8 @@ TRAP(trap5, 5)
 TRAP(trap6, 6)
 TRAP(trap7, 7)
 
-.globl double_fault;
 .align 8;
-double_fault:
+FUNCTION(double_fault):
 	pushl	$-1;	// user-ss
 	pushl	$-1;	// user-esp
 	pushl	$-1;	// flags
@@ -208,6 +206,7 @@ double_fault:
 	pushl	$-1;
 	pushl	$-1;
 	jmp		int_bottom
+FUNCTION_END(double_fault)
 
 TRAP(trap9, 9)
 TRAP_ERRC(trap10, 10)
@@ -254,8 +253,7 @@ TRAP(trap255, 255)
 
 
 .align 16
-.globl int_bottom
-int_bottom:
+STATIC_FUNCTION(int_bottom):
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
 
 	movl	%esp, %ebp		// frame pointer is the iframe
@@ -282,9 +280,10 @@ int_bottom:
 	call	*gInterruptHandlerTable(, %eax, 4)
 
 	POP_IFRAME_AND_RETURN()
+FUNCTION_END(int_bottom)
 
 
-int_bottom_user:
+STATIC_FUNCTION(int_bottom_user):
 	movl	$KERNEL_DATA_SEG,%eax
 	cld
 	movl	%eax,%ds
@@ -327,9 +326,10 @@ int_bottom_user:
 	// update the thread's kernel time and return
 	UPDATE_THREAD_KERNEL_TIME()
 	POP_IFRAME_AND_RETURN()
+FUNCTION_END(int_bottom_user)
 
 
-int_bottom_vm86:
+STATIC_FUNCTION(int_bottom_vm86):
 	movl	$KERNEL_DATA_SEG,%eax
 	cld
 	movl	%eax,%ds
@@ -354,27 +354,28 @@ int_bottom_vm86:
 	popa;
 	addl	$16,%esp;
 	iret
+FUNCTION_END(int_bottom_vm86)
 
 
 // test interrupt handler for performance measurements
 .align 16
-.globl trap98
-trap98:
+FUNCTION(trap98):
 	iret
+FUNCTION_END(trap98)
 
 
 .align 16
-.globl trap99
-trap99:
+FUNCTION(trap99):
 	// push error, vector, orig_edx, orig_eax, and other registers
 	PUSH_IFRAME_BOTTOM_SYSCALL()
 
 	call	handle_syscall
 
 	POP_IFRAME_AND_RETURN()
+FUNCTION_END(trap99)
 
 
-handle_syscall:
+STATIC_FUNCTION(handle_syscall):
 	// save %eax, the number of the syscall
 	movl	%eax, %esi
 
@@ -440,8 +441,9 @@ handle_syscall:
 	lea		-4(%ebp), %esp			// remove all parameters from the stack
 
 	ret
+FUNCTION_END(handle_syscall)
 
-  do_pre_syscall_debug:
+  STATIC_FUNCTION(do_pre_syscall_debug):
 	movl	%esp, %eax				// syscall parameters
 	push	%eax
 	movl	IFRAME_orig_eax(%ebp), %eax		// syscall number
@@ -449,8 +451,9 @@ handle_syscall:
 	call	user_debug_pre_syscall
 	addl	$8, %esp
 	jmp		pre_syscall_debug_done
+  FUNCTION_END(do_pre_syscall_debug)
 
-  post_syscall_work:
+  STATIC_FUNCTION(post_syscall_work):
 	// clear the 64 bit return value and syscall restarted bits
 	testl	$(THREAD_FLAGS_64_BIT_SYSCALL_RETURN \
 				| THREAD_FLAGS_SYSCALL_RESTARTED), THREAD_flags(%edi)
@@ -481,9 +484,10 @@ handle_syscall:
 	call	user_debug_post_syscall
 	addl	$24, %esp
   1:
+  FUNCTION_END(post_syscall_work)
 
   bad_syscall_number:
-  kernel_exit_work:
+  STATIC_FUNCTION(kernel_exit_work):
 	// if no signals are pending and the thread shall not be debugged, we can
 	// use the quick kernel exit function
 	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD) \
@@ -511,19 +515,22 @@ handle_syscall:
 	call	x86_init_user_debug_at_kernel_exit
   1:
 	POP_IFRAME_AND_RETURN()
+  FUNCTION_END(kernel_exit_work)
 
-  kernel_exit_handle_signals:
+  STATIC_FUNCTION(kernel_exit_handle_signals):
 	// make sure interrupts are enabled (they are, when coming from a syscall
 	// but otherwise they might be disabled)
 	sti
 	call	thread_at_kernel_exit	// also disables interrupts
 	jmp		kernel_exit_work_done
+  FUNCTION_END(kernel_exit_handle_signals)
 
-  bad_syscall_params:
+  STATIC_FUNCTION(bad_syscall_params):
 	// clear the fault handler and exit normally
 	movl	%dr3, %edi
 	movl	$0, THREAD_fault_handler(%edi)
 	jmp		kernel_exit_work
+  FUNCTION_END(bad_syscall_params)
 
 
 /*!	Handler called by the sysenter instruction
@@ -569,6 +576,7 @@ FUNCTION(x86_sysenter):
 	popfl
 
 	sysexit
+FUNCTION_END(x86_sysenter)
 
 
 /*!	Is copied to the signal stack call to restore the original frame when
@@ -586,6 +594,7 @@ FUNCTION(i386_return_from_signal):
 	lea		4(%esp), %edx
 	int		$99
 	ret
+FUNCTION_END(i386_return_from_signal)
 FUNCTION(i386_end_return_from_signal):
 
 
@@ -607,6 +616,7 @@ FUNCTION(i386_restore_frame_from_syscall):
 	// update the thread's kernel time and return
 	UPDATE_THREAD_KERNEL_TIME()
 	POP_IFRAME_AND_RETURN()
+FUNCTION_END(i386_restore_frame_from_syscall)
 
 
 /* status_t x86_vm86_enter(struct vm86_iframe *frame) */
@@ -644,6 +654,7 @@ FUNCTION(x86_vm86_enter):
 	popa
 	addl	$16, %esp
 	iret
+FUNCTION_END(x86_vm86_enter)
 
 
 /* void x86_vm86_return(struct vm86_iframe *frame, status_t retval) */
@@ -679,4 +690,4 @@ FUNCTION(x86_vm86_return):
 	popl %edi
 	popf
 	ret
-
+FUNCTION_END(x86_vm86_return)

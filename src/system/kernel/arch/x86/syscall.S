@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#define FUNCTION(x) .global x; .type x,@function; x
-#define SYM(x) .global x; x
+#include <asm_defs.h>
+
 
 .text
 
@@ -14,7 +14,8 @@
 FUNCTION(_user_syscall_int):
 	int	$99
 	ret
-SYM(_user_syscall_int_end):
+FUNCTION_END(_user_syscall_int)
+SYMBOL(_user_syscall_int_end):
 
 
 // Intel sysenter/sysexit
@@ -24,6 +25,7 @@ FUNCTION(_user_syscall_sysenter):
 	movl	%esp, %ecx
 	sysenter
 	ret
-SYM(_user_syscall_sysenter_end):
+FUNCTION_END(_user_syscall_sysenter)
+SYMBOL(_user_syscall_sysenter_end):
 
 
