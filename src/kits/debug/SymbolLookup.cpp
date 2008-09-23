@@ -238,7 +238,7 @@ ImageFile::Load()
 		return B_NOT_AN_EXECUTABLE;
 
 	// map it
-	fMappedFile = (uint8*)mmap(NULL, fFileSize, PROT_READ, MAP_SHARED, fFD, 0);
+	fMappedFile = (uint8*)mmap(NULL, fFileSize, PROT_READ, MAP_PRIVATE, fFD, 0);
 	if (fMappedFile == MAP_FAILED)
 		return errno;
 
