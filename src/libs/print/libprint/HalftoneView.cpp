@@ -117,7 +117,7 @@ void HalftonePreviewView::preview(float gamma, float min, Halftone::DitherType d
 		dstRow += preview.BytesPerRow();
 	}
 
-	delete buffer;
+	delete[] buffer;
 	
 	SetViewBitmap(&preview);
 	Invalidate();

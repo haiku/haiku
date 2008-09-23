@@ -298,7 +298,7 @@ void PCL6Driver::rasterGraphics(
 		uchar *outBuffer = new uchar[dataSize];
 		pack_bits(outBuffer, buffer, bufferSize);
 		fWriter->Append(outBuffer, dataSize);
-		delete outBuffer;
+		delete[] outBuffer;
 		return;
 	} else if (compressionMethod == PCL6Writer::kDeltaRowCompression) {
 		// use delta row compression

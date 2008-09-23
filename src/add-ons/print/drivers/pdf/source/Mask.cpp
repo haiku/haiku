@@ -125,7 +125,7 @@ bool Mask::Equals(CIDescription* description) const {
 			if (buffer == NULL) return false;
 			bool ok = file.Read(buffer, Length()) == Length() && 
 				memcmp(desc->Mask(), buffer, Length()) == 0;
-			delete buffer;
+			delete[] buffer;
 			return ok;
 		}
 	}

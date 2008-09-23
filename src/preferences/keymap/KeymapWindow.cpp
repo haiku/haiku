@@ -1437,7 +1437,7 @@ MapView::_DrawKey(uint32 keyCode)
 	if (str) {
 		bool hasGlyphs;
 		if (deadKey > 0) {
-			delete str;
+			delete[] str;
 			switch (deadKey) {
 				case 1: str = strdup("'"); break;
 				case 2: str = strdup("`"); break;
@@ -1461,7 +1461,7 @@ MapView::_DrawKey(uint32 keyCode)
 			}
 			DrawString(str, point);
 		}
-		delete str;
+		delete[] str;
 	}	
 }
 
@@ -1570,7 +1570,7 @@ MapView::MessageReceived(BMessage *msg)
 							fTextView->FakeKeyDown(str, numBytes);
 						}
 					}
-					delete str;
+					delete[] str;
 				}
 			}
 			break;
@@ -1611,7 +1611,7 @@ MapView::MouseDown(BPoint point)
 				fCurrentMap->GetChars(fCurrentMouseKey, fOldKeyInfo.modifiers, fActiveDeadKey, &str, &numBytes);
 				if (numBytes > 0) {
 					fTextView->FakeKeyDown(str, numBytes);
-					delete str;
+					delete[] str;
 				}
 				SetTracking(true);
 				SetMouseEventMask(B_POINTER_EVENTS,
@@ -1649,7 +1649,7 @@ MapView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 				fCurrentMap->GetChars(fCurrentMouseKey, fOldKeyInfo.modifiers, fActiveDeadKey, &str, &numBytes);
 				if (numBytes > 0) {
 					fTextView->FakeKeyDown(str, numBytes);
-					delete str;
+					delete[] str;
 				}
 				break;
 			}

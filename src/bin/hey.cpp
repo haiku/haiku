@@ -380,7 +380,7 @@ Hey(BMessenger* target, const char* arg, BMessage* reply)
 	int32 argx = 0;
 	status_t ret = Hey(target, (char **)argv.Items(), &argx, argv.CountItems()-1, reply);
 	  // This used to be "return Hey(...);"---so tokens wasn't delete'd.  -- pfolk@uni.uiuc.edu 1999-11-03
-	delete tokens;
+	delete[] tokens;
 	return ret;
 }
 

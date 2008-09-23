@@ -371,7 +371,7 @@ status_t BNetBuffer::AppendMessage( const BMessage& Msg )
         result = dpush( B_MESSAGE_TYPE, msgLen, msgData );
     }
 
-    delete msgData;
+    delete[] msgData;
     return result;
 }
 

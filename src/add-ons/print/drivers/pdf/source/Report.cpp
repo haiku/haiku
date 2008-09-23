@@ -78,7 +78,7 @@ void Report::Add(kind kind, int32 page, const char* fmt, ...) {
 #endif
 		vsprintf(b, fmt, list);
 		AddItem(new ReportRecord(kind, page, "", b));
-		delete b;
+		delete[] b;
 		va_end(list);
 	}
 }

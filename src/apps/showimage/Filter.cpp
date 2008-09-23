@@ -703,7 +703,7 @@ Scaler::DownScaleBilinear(intType fromRow, int32 toRow)
 		}
 	}
 
-	delete columnData;
+	delete[] columnData;
 }
 
 // Flyod-Steinberg Dithering
@@ -877,7 +877,7 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 		}
 	}
 
-	delete columnData0;
+	delete[] columnData0;
 }
 
 int32

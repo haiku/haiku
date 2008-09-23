@@ -293,10 +293,8 @@ PkgDirectory::_HandleAttributes(BPath *destination, BNode *node,
 				break;
 		}
 
-		if (attrData)
-			delete attrData;
-		if (temp)
-			delete temp;
+		delete[] attrData;
+		delete[] temp;
 	}
 
 	return ret;
@@ -612,10 +610,8 @@ PkgFile::WriteToPath(const char *path, BPath *final)
 				break;
 		}
 
-		if (attrData)
-			delete attrData;
-		if (temp)
-			delete temp;
+		delete[] attrData;
+		delete[] temp;
 	}
 
 	if (final) {

@@ -155,7 +155,7 @@ void BMailProtocolConfigView::SetTo(BMessage *archive) {
 	if (password)
 	{
 		SetTextControl(this,"pass",password);
-		delete password;
+		delete[] password;
 	}
 	else
 		SetTextControl(this,"pass",archive->FindString("password"));

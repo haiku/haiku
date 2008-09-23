@@ -167,7 +167,7 @@ void PrintJobReader::BuildPageIndex()
 			fJobFile.Seek(next_page, SEEK_SET);
 		} else {
 			fNumberOfPages = 0;
-			delete fPageIndex;
+			delete[] fPageIndex;
 			fPageIndex = NULL;
 			return;
 		}
