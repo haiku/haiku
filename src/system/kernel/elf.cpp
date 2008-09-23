@@ -1367,6 +1367,11 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 	if (fd < 0)
 		return fd;
 
+	struct stat st;
+	status = _kern_read_stat(fd, NULL, false, &st, sizeof(st));
+	if (status != B_OK)
+		return status;
+
 	// read and verify the ELF header
 
 	length = _kern_read(fd, 0, &elfHeader, sizeof(elfHeader));
@@ -1428,6 +1433,9 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 
 	// map the program's segments into memory
 
+	image_info imageInfo;
+	memset(&imageInfo, 0, sizeof(image_info));
+
 	for (i = 0; i < elfHeader.e_phnum; i++) {
 		char regionName[B_OS_NAME_LENGTH];
 		char *regionAddress;
@@ -1459,6 +1467,9 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 				status = B_NOT_AN_EXECUTABLE;
 				goto error;
 			}
+
+			imageInfo.data = regionAddress;
+			imageInfo.data_size = memUpperBound;
 
 			// clean garbage brought by mmap (the region behind the file,
 			// at least parts of it are the bss and have to be zeroed)
@@ -1492,9 +1503,11 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 			// assume ro/text segment
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%dro", baseName, i);
 
+			size_t segmentSize = ROUNDUP(programHeaders[i].p_memsz
+				+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
-				B_EXACT_ADDRESS, ROUNDUP(programHeaders[i].p_memsz
-					+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE),
+				B_EXACT_ADDRESS, segmentSize,
 				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP,
 				fd, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
@@ -1502,8 +1515,20 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 				status = B_NOT_AN_EXECUTABLE;
 				goto error;
 			}
+
+			imageInfo.text = regionAddress;
+			imageInfo.text_size = segmentSize;
 		}
 	}
+
+	// register the loaded image
+	imageInfo.type = B_LIBRARY_IMAGE;
+    imageInfo.device = st.st_dev;
+    imageInfo.node = st.st_ino;
+	strlcpy(imageInfo.name, path, sizeof(imageInfo.name));
+
+	register_image(team, &imageInfo, sizeof(image_info));
+		// Don't care, if registering fails. It's not crucial.
 
 	TRACE(("elf_load: done!\n"));
 
