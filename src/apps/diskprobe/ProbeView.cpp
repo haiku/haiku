@@ -1136,7 +1136,6 @@ void
 TypeView::FrameResized(float width, float height)
 {
 	BRect rect = Bounds();
-	BView *fTypeEditorView = fTypeEditorView;
 
 	BPoint point = fTypeEditorView->Frame().LeftTop();
 	if ((fTypeEditorView->ResizingMode() & B_FOLLOW_RIGHT) == 0)
