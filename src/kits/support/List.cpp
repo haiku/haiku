@@ -83,9 +83,11 @@ BList&
 BList::operator =(const BList &list)
 {
 	fBlockSize = list.fBlockSize;
-	_ResizeArray(list.fItemCount);
-	fItemCount = list.fItemCount;
-	memcpy(fObjectList, list.fObjectList, fItemCount * sizeof(void*));
+	if (_ResizeArray(list.fItemCount)) {
+		fItemCount = list.fItemCount;
+		memcpy(fObjectList, list.fObjectList, fItemCount * sizeof(void*));
+	}
+
 	return *this;
 }
 
@@ -451,7 +453,6 @@ void BList::_ReservedList2() {}
 // Resize
 //
 // Resizes fObjectList to be large enough to contain count items.
-// fItemCount is adjusted accordingly.
 bool
 BList::_ResizeArray(int32 count)
 {
