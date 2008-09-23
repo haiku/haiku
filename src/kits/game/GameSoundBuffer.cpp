@@ -198,7 +198,7 @@ GameSoundBuffer::GetAttributes(gs_attribute * attributes,
 							   size_t attributeCount)
 {
 	for (size_t i = 0; i < attributeCount; i++) {
-		switch(attributes[i].attribute) {
+		switch (attributes[i].attribute) {
 			case B_GS_GAIN:
 				attributes[i].value = fGain;
 				if (fGainRamp) 
@@ -209,14 +209,17 @@ GameSoundBuffer::GetAttributes(gs_attribute * attributes,
 				attributes[i].value = fPan;
 				if (fPanRamp) 
 					attributes[i].duration = fGainRamp->duration;
-			
+				break;
+
 			case B_GS_LOOPING:
 				attributes[i].value = (fLooping) ? -1.0 : 0.0;
 				attributes[i].duration = bigtime_t(0);
+				break;		
 			
 			default:
 				attributes[i].value = 0.0;
 				attributes[i].duration = bigtime_t(0);
+				break;
 		}
 	}
 	
@@ -242,6 +245,10 @@ GameSoundBuffer::SetAttributes(gs_attribute * attributes,
 				
 			case B_GS_LOOPING:
 				fLooping = bool(attributes[i].value);
+				break;
+			
+			default:
+				break;
 		}
 	}
 	
@@ -465,9 +472,9 @@ SimpleSoundBuffer::SimpleSoundBuffer(const gs_audio_format * format,
 		  fPosition(0)
 		
 {
-	fBuffer = new char[frames * fFrameSize];
 	fBufferSize = frames * fFrameSize;
-	
+	fBuffer = new char[fBufferSize];
+		
 	memcpy(fBuffer, data, fBufferSize);		 		
 }
 
