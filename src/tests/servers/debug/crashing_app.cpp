@@ -16,6 +16,7 @@ static const char *kUsage =
 	"Crashes in more or less inovative ways.\n"
 	"\n"
 	"Options:\n"
+	"  -d                   - call disable_debugger() first\n"
 	"  -h, --help           - print this info text\n"
 	"  --thread             - crash in a separate thread\n"
 	"\n"
@@ -143,6 +144,7 @@ crashing_thread(void* data)
 	crash_function_t* doCrash = (crash_function_t*)data;
 	snooze(100000);
 	doCrash();
+	return 0;
 }
 
 
@@ -150,6 +152,7 @@ int
 main(int argc, const char* const* argv)
 {
 	bool inThread = false;
+	bool disableDebugger = false;
 	const char* mode = "segv";
 
 	// parse args
@@ -160,6 +163,8 @@ main(int argc, const char* const* argv)
 		if (arg[0] == '-') {
 			if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
 				print_usage_and_exit(false);
+			} else if (strcmp(arg, "-d") == 0) {
+				disableDebugger = true;
 			} else if (strcmp(arg, "--thread") == 0) {
 				inThread = true;
 			} else {
@@ -176,6 +181,9 @@ main(int argc, const char* const* argv)
 		fprintf(stderr, "Invalid mode \"%s\"\n", mode);
 		print_usage_and_exit(true);
 	}
+
+	if (disableDebugger)
+		disable_debugger(true);
 
 	if (inThread) {
 		thread_id thread = spawn_thread(crashing_thread, "crashing thread",
