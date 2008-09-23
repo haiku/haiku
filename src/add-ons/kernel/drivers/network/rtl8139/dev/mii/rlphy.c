@@ -109,7 +109,7 @@ rlphy_probe(device_t dev)
 	int rv;
 
 	rv = mii_phy_dev_probe(dev, rlphys, BUS_PROBE_DEFAULT);
-	if (rv <= 0)
+	if (rv == BUS_PROBE_DEFAULT)
 		return (rv);
 
 	nic = device_get_name(device_get_parent(device_get_parent(dev)));
