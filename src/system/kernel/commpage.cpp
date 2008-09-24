@@ -9,6 +9,7 @@
 
 #include <KernelExport.h>
 
+#include <elf.h>
 #include <vm.h>
 #include <vm_types.h>
 
@@ -18,6 +19,7 @@ static area_id	sUserCommPageArea;
 static addr_t*	sCommPageAddress;
 static addr_t*	sUserCommPageAddress;
 static void*	sFreeCommPageSpace;
+static image_id	sCommPageImage;
 
 
 #define ALIGN_ENTRY(pointer)	(void*)ROUNDUP((addr_t)(pointer), 8)
@@ -44,6 +46,13 @@ fill_commpage_entry(int entry, const void* copyFrom, size_t size)
 }
 
 
+image_id
+get_commpage_image()
+{
+	return sCommPageImage;
+}
+
+
 status_t
 commpage_init(void)
 {
@@ -67,6 +76,13 @@ commpage_init(void)
 
 	// the next slot to allocate space is after the table
 	sFreeCommPageSpace = ALIGN_ENTRY(&sCommPageAddress[COMMPAGE_TABLE_ENTRIES]);
+
+	// create the image for the commpage
+	sCommPageImage = elf_create_memory_image("commpage", USER_COMMPAGE_ADDR,
+		COMMPAGE_SIZE, 0, 0);
+	elf_add_memory_image_symbol(sCommPageImage, "commpage_table",
+		USER_COMMPAGE_ADDR, COMMPAGE_TABLE_ENTRIES * sizeof(addr_t),
+		B_SYMBOL_TYPE_DATA);
 
 	arch_commpage_init();
 

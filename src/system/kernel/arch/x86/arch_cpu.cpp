@@ -18,6 +18,7 @@
 #include <boot_device.h>
 #include <commpage.h>
 #include <debug.h>
+#include <elf.h>
 #include <smp.h>
 #include <tls.h>
 #include <vm.h>
@@ -607,9 +608,16 @@ arch_cpu_init_post_modules(kernel_args *args)
 	}
 
 	// put the optimized functions into the commpage
-	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY, (const void *)gOptimizedFunctions.memcpy,
-		(addr_t)gOptimizedFunctions.memcpy_end
-			- (addr_t)gOptimizedFunctions.memcpy);
+	size_t memcpyLen = (addr_t)gOptimizedFunctions.memcpy_end
+		- (addr_t)gOptimizedFunctions.memcpy;
+	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
+		(const void*)gOptimizedFunctions.memcpy, memcpyLen);
+
+	// add the functions to the commpage image
+	image_id image = get_commpage_image();
+	elf_add_memory_image_symbol(image, "commpage_memcpy",
+		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_MEMCPY], memcpyLen,
+		B_SYMBOL_TYPE_TEXT);
 
 	return B_OK;
 }

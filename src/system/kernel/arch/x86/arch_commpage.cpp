@@ -11,6 +11,7 @@
 #include <KernelExport.h>
 
 #include <cpu.h>
+#include <elf.h>
 #include <smp.h>
 
 
@@ -89,6 +90,12 @@ initialize_commpage_syscall(void)
 	// fill in the table entry
 	size_t len = (size_t)((addr_t)syscallCodeEnd - (addr_t)syscallCode);
 	fill_commpage_entry(COMMPAGE_ENTRY_X86_SYSCALL, syscallCode, len);
+
+	// add syscall to the commpage image
+	image_id image = get_commpage_image();
+	elf_add_memory_image_symbol(image, "commpage_syscall",
+		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_SYSCALL], len,
+		B_SYMBOL_TYPE_TEXT);
 
 	return B_OK;
 }

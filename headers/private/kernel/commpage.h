@@ -5,6 +5,7 @@
 #ifndef _KERNEL_COMMPAGE_H
 #define _KERNEL_COMMPAGE_H
 
+#include <image.h>
 #include <SupportDefs.h>
 
 #include <commpage_defs.h>
@@ -17,6 +18,7 @@ extern "C" {
 status_t	commpage_init(void);
 void*		allocate_commpage_entry(int entry, size_t size);
 void*		fill_commpage_entry(int entry, const void* copyFrom, size_t size);
+image_id	get_commpage_image();
 
 status_t	arch_commpage_init(void);
 	// implemented in the architecture specific part
