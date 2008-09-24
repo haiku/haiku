@@ -39,33 +39,39 @@
 #include "StreamingGameSound.h"
 #include "GSUtility.h"
 
+
 // Sound Buffer Utility functions ----------------------------------------
-inline void ApplyMod(uint8 * data, uint8 * buffer, int64 index, float gain, float * pan)
+inline void
+ApplyMod(uint8 * data, uint8 * buffer, int64 index, float gain, float * pan)
 {
 	data[index*2] += uint8(float(buffer[index*2]) * gain * pan[0]);
 	data[index*2+1] += uint8(float(buffer[index*2+1]) * gain * pan[1]);
 }
 
 
-inline void ApplyMod(int16 * data, int16 * buffer, int32 index, float gain, float * pan)
+inline void
+ApplyMod(int16 * data, int16 * buffer, int32 index, float gain, float * pan)
 {
 	data[index*2] = int16(float(buffer[index*2]) * gain * pan[0]);
 	data[index*2+1] = int16(float(buffer[index*2+1]) * gain * pan[1]);
 }
 
 
-inline void ApplyMod(int32 * data, int32 * buffer, int32 index, float gain, float * pan)
+inline void
+ApplyMod(int32 * data, int32 * buffer, int32 index, float gain, float * pan)
 {
 	data[index*2] += int32(float(buffer[index*2]) * gain * pan[0]);
 	data[index*2+1] += int32(float(buffer[index*2+1]) * gain * pan[1]);
 }
 
 
-inline void ApplyMod(float * data, float * buffer, int32 index, float gain, float * pan)
+inline void
+ApplyMod(float * data, float * buffer, int32 index, float gain, float * pan)
 {
 	data[index*2] += buffer[index*2] * gain * pan[0];
 	data[index*2+1] += buffer[index*2+1] * gain * pan[1];
 }
+
 	
 // GameSoundBuffer -------------------------------------------------------
 GameSoundBuffer::GameSoundBuffer(const gs_audio_format * format)
@@ -352,6 +358,7 @@ GameSoundBuffer::Reset()
 	fPan = 0.0;
 	fPanLeft = 1.0;
 	fPanRight = 1.0;
+	
 	delete fPanRamp;
 	fPanRamp = NULL;
 	
@@ -430,13 +437,14 @@ GameSoundBuffer::StartPlaying()
 	// make sure we give the producer enough time to run buffers through
 	// the node chain, otherwise it'll start up already late
 	bigtime_t latency = 0;
-	roster->GetLatencyFor(fConnection->producer, &latency);
-	roster->StartNode(fConnection->producer, source->Now() + latency);
+	status_t status = roster->GetLatencyFor(fConnection->producer, &latency);
+	if (status == B_OK)
+		status = roster->StartNode(fConnection->producer, source->Now() + latency);
 	source->Release();
 	
 	fIsPlaying = true;
 	
-	return B_OK;
+	return status;
 }
 
 

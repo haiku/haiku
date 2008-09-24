@@ -31,8 +31,7 @@ BSimpleGameSound::BSimpleGameSound(const entry_ref *inFile, BGameSoundDevice *de
 BSimpleGameSound::BSimpleGameSound(const char *inFile, BGameSoundDevice *device)
  		:	BGameSound(device)
 {
-	if (InitCheck() == B_OK)
-	{
+	if (InitCheck() == B_OK) {
 		entry_ref file;
 	
 		if (get_ref_for_path(inFile, &file) != B_OK)
@@ -126,6 +125,7 @@ BSimpleGameSound::IsLooping() const
 	return bool(attribute.value);
 }
 
+
 status_t
 BSimpleGameSound::Init(const entry_ref* inFile)
 {
@@ -148,7 +148,8 @@ BSimpleGameSound::Init(const entry_ref* inFile)
 	mformat.type = B_MEDIA_RAW_AUDIO;
 //	mformat.u.raw_audio.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
 	status_t error = audioStream->DecodedFormat(&mformat);
-	if (error != B_OK) return error;
+	if (error != B_OK) 
+		return error;
 	
 	memset(&gsformat, 0, sizeof(gs_audio_format));
 	media_to_gs_format(&gsformat, &mformat.u.raw_audio); 
