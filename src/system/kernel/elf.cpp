@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#include <AutoDeleter.h>
 #include <debug.h>
 #include <kernel.h>
 #include <kimage.h>
@@ -1867,6 +1868,125 @@ elf_get_image_info_for_address(addr_t address, image_info* info)
     info->data = (void*)elfInfo->data_region.start;
     info->text_size = elfInfo->text_region.size;
     info->data_size = elfInfo->data_region.size;
+
+	return B_OK;
+}
+
+
+image_id
+elf_create_memory_image(const char* imageName, addr_t text, size_t textSize,
+	addr_t data, size_t dataSize)
+{
+	// allocate the image
+	elf_image_info* image = create_image_struct();
+	if (image == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter imageDeleter(image);
+
+	// allocate symbol and string tables -- we allocate an empty symbol table,
+	// so that elf_debug_lookup_symbol_address() won't try the dynamic symbol
+	// table, which we don't have.
+	Elf32_Sym* symbolTable = (Elf32_Sym*)malloc(0);
+	char* stringTable = (char*)malloc(1);
+	MemoryDeleter symbolTableDeleter(symbolTable);
+	MemoryDeleter stringTableDeleter(stringTable);
+	if (symbolTable == NULL || stringTable == NULL)
+		return B_NO_MEMORY;
+
+	// the string table always contains the empty string
+	stringTable[0] = '\0';
+
+	image->debug_symbols = symbolTable;
+	image->num_debug_symbols = 0;
+	image->debug_string_table = stringTable;
+
+	// dup image name
+	image->name = strdup(imageName);
+	if (image->name == NULL)
+		return B_NO_MEMORY;
+
+	// data and text region
+	image->text_region.id = -1;
+	image->text_region.start = text;
+	image->text_region.size = textSize;
+	image->text_region.delta = 0;
+
+	image->data_region.id = -1;
+	image->data_region.start = data;
+	image->data_region.size = dataSize;
+	image->data_region.delta = 0;
+
+	mutex_lock(&sImageMutex);
+	register_elf_image(image);
+	image_id imageID = image->id;
+	mutex_unlock(&sImageMutex);
+
+	// keep the allocated memory
+	imageDeleter.Detach();
+	symbolTableDeleter.Detach();
+	stringTableDeleter.Detach();
+
+	return imageID;
+}
+
+
+status_t
+elf_add_memory_image_symbol(image_id id, const char* name, addr_t address,
+	size_t size, int32 type)
+{
+	MutexLocker _(sImageMutex);
+
+	// get the image
+	struct elf_image_info* image = find_image(id);
+	if (image == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// get the current string table size
+	size_t stringTableSize = 1;
+	if (image->num_debug_symbols > 0) {
+		for (uint32 i = image->num_debug_symbols - 1; i >= 0; i--) {
+			int32 nameIndex = image->debug_symbols[i].st_name;
+			if (nameIndex != 0) {
+				stringTableSize = nameIndex
+					+ strlen(image->debug_string_table + nameIndex) + 1;
+				break;
+			}
+		}
+	}
+
+	// enter the name in the string table
+	char* stringTable = (char*)image->debug_string_table;
+	size_t stringIndex = 0;
+	if (name != NULL) {
+		size_t nameSize = strlen(name) + 1;
+		stringIndex = stringTableSize;
+		stringTableSize += nameSize;
+		stringTable = (char*)realloc((char*)image->debug_string_table,
+			stringTableSize);
+		if (stringTable == NULL)
+			return B_NO_MEMORY;
+		image->debug_string_table = stringTable;
+		memcpy(stringTable + stringIndex, name, nameSize);
+	}
+
+	// resize the symbol table
+	int32 symbolCount = image->num_debug_symbols + 1;
+	Elf32_Sym* symbolTable = (Elf32_Sym*)realloc(
+		(Elf32_Sym*)image->debug_symbols, sizeof(Elf32_Sym) * symbolCount);
+	if (symbolTable == NULL)
+		return B_NO_MEMORY;
+	image->debug_symbols = symbolTable;
+
+	// enter the symbol
+	Elf32_Sym& symbol = symbolTable[symbolCount - 1];
+	uint32 symbolType = type == B_SYMBOL_TYPE_DATA ? STT_OBJECT : STT_FUNC;
+	symbol.st_name = stringIndex;
+	symbol.st_value = address;
+	symbol.st_size = size;
+	symbol.st_info = ELF32_ST_INFO(STB_GLOBAL, symbolType);
+	symbol.st_other = 0;
+	symbol.st_shndx = 0;
+	image->num_debug_symbols++;
 
 	return B_OK;
 }

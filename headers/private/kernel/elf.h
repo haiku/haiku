@@ -12,6 +12,7 @@
 #include <thread.h>
 #include <image.h>
 
+
 struct kernel_args;
 
 
@@ -32,6 +33,10 @@ status_t elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
 			addr_t *_baseAddress, const char **_symbolName,
 			const char **_imageName, bool *_exactMatch);
 status_t elf_get_image_info_for_address(addr_t address, image_info* info);
+image_id elf_create_memory_image(const char* imageName, addr_t text,
+			size_t textSize, addr_t data, size_t dataSize);
+status_t elf_add_memory_image_symbol(image_id id, const char* name,
+			addr_t address, size_t size, int32 type);
 status_t elf_init(struct kernel_args *args);
 
 status_t _user_read_kernel_image_symbols(image_id id,
