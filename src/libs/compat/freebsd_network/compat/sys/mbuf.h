@@ -129,7 +129,7 @@ void m_extadd(struct mbuf *m, caddr_t buffer, u_int size,
     void (*freeHook)(void *, void *), void *args, int flags, int type);
 
 
-#define mtod(m, type)	(type)((m)->m_data)
+#define mtod(m, type)	((type)((m)->m_data))
 
 #define m_tag_delete(mb, tag) \
 	panic("m_tag_delete unsupported.");
@@ -144,6 +144,7 @@ void m_extadd(struct mbuf *m, caddr_t buffer, u_int size,
 
 extern int max_linkhdr;
 extern int max_protohdr;
+extern int max_hdr;
 
 #include <sys/mbuf-fbsd.h>
 

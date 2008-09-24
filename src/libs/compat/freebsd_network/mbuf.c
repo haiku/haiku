@@ -25,6 +25,8 @@ static object_cache *sChunkCache;
 int max_linkhdr = 16;
 int max_protohdr = 40 + 20; /* ip6 + tcp */
 
+/* max_linkhdr + max_protohdr, but that's not allowed by gcc. */
+int max_hdr = 16 + 40 + 20;
 
 static int
 m_to_oc_flags(int how)
