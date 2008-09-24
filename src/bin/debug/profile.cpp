@@ -255,7 +255,7 @@ public:
 	bool ContainsAddress(addr_t address) const
 	{
 		return address >= (addr_t)fInfo.text
-			&& address < (addr_t)fInfo.data + fInfo.data_size;
+			&& address <= (addr_t)fInfo.data + fInfo.data_size - 1;
 	}
 
 	int32 FindSymbol(addr_t address) const
