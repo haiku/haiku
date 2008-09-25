@@ -732,8 +732,10 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 				extendedPoseInfoSize = extendedPoseInfo->Size();
 			}
 
-			if (model->InitCheck() != B_OK)
+			if (model->InitCheck() != B_OK) {
+				delete[] (char *)extendedPoseInfo;
 				continue;
+			}
 
 			ASSERT(model);
 			ASSERT(model->InitCheck() == B_OK);
