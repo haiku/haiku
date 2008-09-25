@@ -1610,10 +1610,10 @@ MapView::MouseDown(BPoint point)
 				char *str = NULL;
 				int32 numBytes;
 				fCurrentMap->GetChars(fCurrentMouseKey, fOldKeyInfo.modifiers, fActiveDeadKey, &str, &numBytes);
-				if (numBytes > 0) {
+				if (numBytes > 0)
 					fTextView->FakeKeyDown(str, numBytes);
-					delete[] str;
-				}
+				
+				delete[] str;
 				SetTracking(true);
 				SetMouseEventMask(B_POINTER_EVENTS,
 					B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
