@@ -239,11 +239,15 @@ ExpanderPreferences::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case MSG_DESTSELECT:
-			if (!fUsePanel)
-				fUsePanel = new DirectoryFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL,
+		{
+			if (!fUsePanel) {
+				BMessenger messenger(this);
+				fUsePanel = new DirectoryFilePanel(B_OPEN_PANEL, &messenger, NULL,
 					B_DIRECTORY_NODE, false, NULL, new DirectoryRefFilter(), true);
+			}
 			fUsePanel->Show();
 			break;
+		}
 		case MSG_DIRECTORY:
 		{
 			entry_ref ref;
@@ -253,8 +257,8 @@ ExpanderPreferences::MessageReceived(BMessage *msg)
 			BPath path(&entry);
 			fDestText->SetText(path.Path());
 			fUsePanel->Hide();
+			break;
 		}
-		break;
 		case B_REFS_RECEIVED:
 			if (msg->FindRef("refs", 0, &fRef) == B_OK) {
 				BEntry entry(&fRef, true);
