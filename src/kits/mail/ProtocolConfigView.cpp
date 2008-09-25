@@ -34,7 +34,7 @@ BTextControl *AddTextField (BRect &rect, const char *name, const char *label);
 BMenuField *AddMenuField (BRect &rect, const char *name, const char *label);
 float FindWidestLabel(BView *view);
 
-static float gItemHeight;
+static float sItemHeight;
 
 inline const char *
 TextControl(BView *parent,const char *name) 
@@ -52,7 +52,7 @@ AddTextField (BRect &rect, const char *name, const char *label)
 {
 	BTextControl *text_control = new BTextControl(rect,name,label,"",NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 //	text_control->SetDivider(be_plain_font->StringWidth(label));
-	rect.OffsetBy(0,gItemHeight);
+	rect.OffsetBy(0,sItemHeight);
 	return text_control;
 }
 
@@ -61,7 +61,7 @@ BMenuField *AddMenuField (BRect &rect, const char *name, const char *label) {
 	BPopUpMenu *menu = new BPopUpMenu("Select");
 	BMenuField *control = new BMenuField(rect,name,label,menu,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	control->SetDivider(be_plain_font->StringWidth(label) + 6);
-	rect.OffsetBy(0,gItemHeight);
+	rect.OffsetBy(0,sItemHeight);
 	return control;
 }
 
@@ -70,7 +70,7 @@ inline BCheckBox *
 AddCheckBox(BRect &rect, const char *name, const char *label, BMessage *msg = NULL) 
 {
 	BCheckBox *control = new BCheckBox(rect,name,label,msg);
-	rect.OffsetBy(0,gItemHeight);
+	rect.OffsetBy(0,sItemHeight);
 	return control;
 }
 
@@ -112,8 +112,8 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask)
 	// determine font height
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-	gItemHeight = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 13;
-	rect.bottom = rect.top - 2 + gItemHeight;
+	sItemHeight = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 13;
+	rect.bottom = rect.top - 2 + sItemHeight;
 
 	if (options_mask & B_MAIL_PROTOCOL_HAS_HOSTNAME)
 		AddChild(AddTextField(rect,"host",MDR_DIALECT_CHOICE ("Mail Server:","サーバ名　：")));
@@ -364,6 +364,6 @@ BMailProtocolConfigView::GetPreferredSize(float *width, float *height)
 	if (minWidth < 250)
 		minWidth = 250;
 	*width = minWidth + 10;
-	*height = (CountChildren() * gItemHeight) + 5;
+	*height = (CountChildren() * sItemHeight) + 5;
 }
 
