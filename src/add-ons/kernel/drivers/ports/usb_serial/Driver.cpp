@@ -15,6 +15,7 @@
 #include "SerialDevice.h"
 #include "USB3.h"
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 static const char *sDeviceBaseName = "ports/usb";
 SerialDevice *gSerialDevices[DEVICES_COUNT];
 char *gDeviceNames[DEVICES_COUNT + 1];
