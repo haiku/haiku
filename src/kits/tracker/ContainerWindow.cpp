@@ -311,8 +311,10 @@ AddMimeTypeString(BObjectList<BString> &list, Model *model)
 		// only add the type if it's not already there
 		for (int32 i = list.CountItems(); i-- > 0;) {
 			BString *string = list.ItemAt(i);
-			if (string != NULL && !string->ICompare(*mimeType))
+			if (string != NULL && !string->ICompare(*mimeType)) {
+				delete mimeType;
 				return;
+			}
 		}
 		list.AddItem(mimeType);
 	}
