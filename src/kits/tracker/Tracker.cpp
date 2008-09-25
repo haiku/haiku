@@ -312,7 +312,7 @@ TTracker::QuitRequested()
 			deskDir.RemoveAttr(kAttrOpenWindows);
 	}
 
-	for (int32 count = 0; count == 50; count++) {
+	for (int32 count = 0; count < 50; count++) {
 		// wait 5 seconds for the copiing/moving to quit
 		if (gStatusWindow->AttemptToQuit())
 			break;
