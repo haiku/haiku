@@ -847,6 +847,7 @@ TFavoritesConfigWindow::PromptForAdd()
 		fAddPanel->Show();
 			//	does an activate on the window
 	else {
+		BMessenger messenger(this, this);
 		//  determine a starting point for where apps are added from
 		char appPath[B_PATH_NAME_LENGTH];
 		
@@ -856,11 +857,10 @@ TFavoritesConfigWindow::PromptForAdd()
 
 			// get reference to application directory
 		    get_ref_for_path(appPath, &ref);
-
-			fAddPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this, this),
+						fAddPanel = new BFilePanel(B_OPEN_PANEL, &messenger,
 				&ref, fFilePanelNodeFlavors, true);
 		} else
-			fAddPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this, this),
+			fAddPanel = new BFilePanel(B_OPEN_PANEL, &messenger,
 				NULL, fFilePanelNodeFlavors, true);
 		
 		fAddPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Add");
