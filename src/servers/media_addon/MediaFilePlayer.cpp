@@ -70,6 +70,8 @@ MediaFilePlayer::MediaFilePlayer(const char *media_type,
 	
 	for (int i=0; i < fPlayFile->CountTracks(); i++) {
 		BMediaTrack *track = fPlayFile->TrackAt(i);
+		if (track == NULL)
+			continue;
 		fPlayFormat.type = B_MEDIA_RAW_AUDIO;
 		fPlayFormat.u.raw_audio.buffer_size = 256;
 		if ((track->DecodedFormat(&fPlayFormat) == B_OK) 
@@ -77,8 +79,7 @@ MediaFilePlayer::MediaFilePlayer(const char *media_type,
 			fPlayTrack = track;
 			break;
 		}
-		if (track)
-			fPlayFile->ReleaseTrack(track);
+		fPlayFile->ReleaseTrack(track);
 	}
 	
 	if (fPlayTrack == NULL) {
