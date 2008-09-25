@@ -78,7 +78,13 @@ register_image(struct team *team, image_info *_info, size_t size)
 	mutex_lock(&sImageMutex);
 
 	image->info.id = id;
-	list_add_item(&team->image_list, image);
+
+	// Add the app image to the head of the list. Some code relies on it being
+	// the first image to be returned by get_next_image_info().
+	if (image->info.type == B_APP_IMAGE)
+		list_add_link_to_head(&team->image_list, image);
+	else
+		list_add_item(&team->image_list, image);
 	sImageTable->Insert(image);
 
 	mutex_unlock(&sImageMutex);
