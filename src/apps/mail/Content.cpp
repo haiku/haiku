@@ -1216,6 +1216,7 @@ TTextView::MessageReceived(BMessage *msg)
 						}
 						if (file.Read(text, size) < B_OK) {
 							puts("could not read from file");
+							free(text);
 							continue;
 						}
 						if (!inserted) {
@@ -2515,8 +2516,7 @@ TTextView::Reader::Run(void *_this)
 
 		 		header = eol;
 	 		}
-	 		if (buffer)
-		 		free(buffer);
+		 	free(buffer);
 	 		reader->Process("\r\n", 2, true);
 	 	}
 	 	else if (!reader->Process(msg, len, true))
@@ -2597,8 +2597,7 @@ done:
 	reader->Unlock();
 
 	delete reader;
-	if (msg)
-		free(msg);
+	free(msg);
 
 	return B_NO_ERROR;
 }
@@ -3120,9 +3119,11 @@ TTextView::AddQuote(int32 start, int32 finish)
 			int32 lineLength = index - lastLine + 1;
 
 			target = (char *)realloc(target, targetLength + lineLength + quoteLength);
-			if (target == NULL)
+			if (target == NULL) {
 				// free the old buffer?
+				free(text);
 				return;
+			}
 
 			// copy the quote sign
 			memcpy(&target[targetLength], QUOTE, quoteLength);
