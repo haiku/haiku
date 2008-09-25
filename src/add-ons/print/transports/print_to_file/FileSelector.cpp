@@ -39,23 +39,23 @@ FileSelector::FileSelector(void)
 	: BWindow(BRect(0,0,320,160), "printtofile", B_TITLED_WINDOW,
 	B_NOT_ZOOMABLE, B_CURRENT_WORKSPACE)
 {
-	m_exit_sem = create_sem(0, "FileSelector");
-	m_result = B_ERROR;
-	m_save_panel = NULL;
+	fExitSem = create_sem(0, "FileSelector");
+	fResult = B_ERROR;
+	fSavePanel = NULL;
 }
 
 
 FileSelector::~FileSelector()
 {
-	delete m_save_panel;
-	delete_sem(m_exit_sem);
+	delete fSavePanel;
+	delete_sem(fExitSem);
 }
 
 
 bool 
 FileSelector::QuitRequested()
 {
-	release_sem(m_exit_sem);
+	release_sem(fExitSem);
 	return BWindow::QuitRequested();
 }
 
@@ -67,11 +67,11 @@ FileSelector::MessageReceived(BMessage * msg)
 		case START_MSG:
 		{
 			BMessenger messenger(this);
-			m_save_panel = new BFilePanel(B_SAVE_PANEL, 
+			fSavePanel = new BFilePanel(B_SAVE_PANEL, 
 							&messenger, NULL, 0, false);
 
-			m_save_panel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
-			m_save_panel->Show();
+			fSavePanel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
+			fSavePanel->Show();
 			break;
 		}
 		case B_SAVE_REQUESTED:
@@ -84,16 +84,16 @@ FileSelector::MessageReceived(BMessage * msg)
 				BDirectory bdir(&dir);
 				if (msg->FindString("name", &name) == B_OK) {
 					if (name != NULL)
-						m_result = m_entry.SetTo(&bdir, name);
+						fResult = fEntry.SetTo(&bdir, name);
 				};
 			};
 
-			release_sem(m_exit_sem);
+			release_sem(fExitSem);
 			break;
 		};
 		
 		case B_CANCEL:
-			release_sem(m_exit_sem);
+			release_sem(fExitSem);
 			break;
 
 		default:
@@ -110,13 +110,13 @@ FileSelector::Go(entry_ref* ref)
 	Hide();
 	Show();
 	PostMessage(START_MSG);
-	acquire_sem(m_exit_sem);
+	acquire_sem(fExitSem);
 
 	// cache result to avoid memory access of deleted window object
 	// after Quit().
-	status_t result = m_result;
+	status_t result = fResult;
 	if (result == B_OK && ref)
-		result = m_entry.GetRef(ref);
+		result = fEntry.GetRef(ref);
 
 	Lock();
 	Quit();

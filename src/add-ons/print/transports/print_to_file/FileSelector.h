@@ -35,8 +35,7 @@
 #include <InterfaceKit.h>
 #include <StorageKit.h>
 
-class FileSelector : public BWindow
-{
+class FileSelector : public BWindow {
 	public:
 		// Constructors, destructors, operators...
 
@@ -59,10 +58,10 @@ class FileSelector : public BWindow
 
 		// From here, it's none of your business! ;-)
 	private:
-		BEntry					m_entry;
-		volatile status_t 		m_result;
-		long 					m_exit_sem;
-		BFilePanel *			m_save_panel;
+		BEntry					fEntry;
+		volatile status_t 		fResult;
+		sem_id 					fExitSem;
+		BFilePanel *			fSavePanel;
 };
 
 #endif // FILESELECTOR_H
