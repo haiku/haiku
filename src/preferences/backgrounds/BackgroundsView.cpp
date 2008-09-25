@@ -283,11 +283,12 @@ BackgroundsView::AllAttached()
 		get_ref_for_path(path.Path(), &ref);
 	}
 
-	fPanel = new ImageFilePanel(B_OPEN_PANEL, new BMessenger(this), &ref,
+	BMessenger messenger(this);
+	fPanel = new ImageFilePanel(B_OPEN_PANEL, &messenger, &ref,
 		B_FILE_NODE, false, NULL, new CustomRefFilter(true));
 	fPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
 
-	fFolderPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL,
+	fFolderPanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL,
 		B_DIRECTORY_NODE, false, NULL, new CustomRefFilter(false));
 	fFolderPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
 
