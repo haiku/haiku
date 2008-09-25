@@ -36,7 +36,9 @@ float FindWidestLabel(BView *view);
 
 static float gItemHeight;
 
-inline const char *TextControl(BView *parent,const char *name) {
+inline const char *
+TextControl(BView *parent,const char *name) 
+{
 	BTextControl *control = (BTextControl *)(parent->FindView(name));
 	if (control != NULL)
 		return control->Text();
@@ -44,12 +46,16 @@ inline const char *TextControl(BView *parent,const char *name) {
 	return "";
 }
 
-BTextControl *AddTextField (BRect &rect, const char *name, const char *label) {
+
+BTextControl *
+AddTextField (BRect &rect, const char *name, const char *label) 
+{
 	BTextControl *text_control = new BTextControl(rect,name,label,"",NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 //	text_control->SetDivider(be_plain_font->StringWidth(label));
 	rect.OffsetBy(0,gItemHeight);
 	return text_control;
 }
+
 
 BMenuField *AddMenuField (BRect &rect, const char *name, const char *label) {
 	BPopUpMenu *menu = new BPopUpMenu("Select");
@@ -59,19 +65,27 @@ BMenuField *AddMenuField (BRect &rect, const char *name, const char *label) {
 	return control;
 }
 
-inline BCheckBox *AddCheckBox(BRect &rect, const char *name, const char *label, BMessage *msg = NULL) {
+
+inline BCheckBox *
+AddCheckBox(BRect &rect, const char *name, const char *label, BMessage *msg = NULL) 
+{
 	BCheckBox *control = new BCheckBox(rect,name,label,msg);
 	rect.OffsetBy(0,gItemHeight);
 	return control;
 }
 
-inline void SetTextControl(BView *parent, const char *name, const char *text) {
+
+inline void 
+SetTextControl(BView *parent, const char *name, const char *text) 
+{
 	BTextControl *control = (BTextControl *)(parent->FindView(name));
 	if (control != NULL)
 		control->SetText(text);
 }
 
-float FindWidestLabel(BView *view)
+
+float 
+FindWidestLabel(BView *view)
 {
 	float width = 0;
 	for (int32 i = view->CountChildren();i-- > 0;) {
@@ -88,7 +102,10 @@ float FindWidestLabel(BView *view)
 
 
 //----------------Real code----------------------
-BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask) : BView (BRect(0,0,100,20), "protocol_config_view", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW) {
+BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask) 
+	:
+	BView (BRect(0,0,100,20), "protocol_config_view", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW) 
+{
 	BRect rect(5,5,245,25);
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -141,9 +158,15 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask) : BView (B
 	}
 }		
 
-BMailProtocolConfigView::~BMailProtocolConfigView() {}
 
-void BMailProtocolConfigView::SetTo(BMessage *archive) {
+BMailProtocolConfigView::~BMailProtocolConfigView() 
+{
+}
+
+
+void 
+BMailProtocolConfigView::SetTo(BMessage *archive) 
+{
 	BString host = archive->FindString("server");
 	if (archive->HasInt32("port"))
 		host << ':' << archive->FindInt32("port");
@@ -152,12 +175,10 @@ void BMailProtocolConfigView::SetTo(BMessage *archive) {
 	SetTextControl(this,"user",archive->FindString("username"));
 
 	char *password = get_passwd(archive,"cpasswd");
-	if (password)
-	{
+	if (password) {
 		SetTextControl(this,"pass",password);
 		delete[] password;
-	}
-	else
+	} else
 		SetTextControl(this,"pass",archive->FindString("password"));
 	
 	if (archive->HasInt32("flavor")) {
@@ -181,9 +202,8 @@ void BMailProtocolConfigView::SetTo(BMessage *archive) {
 		}
 	}
 
-	BCheckBox *box;
-	
-	box = (BCheckBox *)(FindView("leave_mail_remote"));
+		
+	BCheckBox *box = (BCheckBox *)(FindView("leave_mail_remote"));
 	if (box != NULL)
 		box->SetValue(archive->FindBool("leave_mail_on_server") ? B_CONTROL_ON : B_CONTROL_OFF);
 		
@@ -198,7 +218,10 @@ void BMailProtocolConfigView::SetTo(BMessage *archive) {
 	}
 }
 
-void BMailProtocolConfigView::AddFlavor(const char *label) {
+
+void 
+BMailProtocolConfigView::AddFlavor(const char *label) 
+{
 	BMenuField *menu = (BMenuField *)(FindView("flavor"));
 	if (menu != NULL) {
 		menu->Menu()->AddItem(new BMenuItem(label,NULL));
@@ -207,7 +230,10 @@ void BMailProtocolConfigView::AddFlavor(const char *label) {
 	}
 }
 
-void BMailProtocolConfigView::AddAuthMethod(const char *label,bool needUserPassword) {
+
+void 
+BMailProtocolConfigView::AddAuthMethod(const char *label,bool needUserPassword) 
+{
 	BMenuField *menu = (BMenuField *)(FindView("auth_method"));
 	if (menu != NULL) {
 		BMenuItem *item = new BMenuItem(label,new BMessage(needUserPassword ? 'some' : 'none'));
@@ -221,7 +247,10 @@ void BMailProtocolConfigView::AddAuthMethod(const char *label,bool needUserPassw
 	}
 }
 
-void BMailProtocolConfigView::AttachedToWindow() {
+
+void 
+BMailProtocolConfigView::AttachedToWindow() 
+{
 	BMenuField *menu = (BMenuField *)(FindView("auth_method"));
 	if (menu != NULL)
 		menu->Menu()->SetTargetForItems(this);
@@ -231,7 +260,10 @@ void BMailProtocolConfigView::AttachedToWindow() {
 		box->SetTarget(this);
 }
 
-void BMailProtocolConfigView::MessageReceived(BMessage *msg) {
+
+void 
+BMailProtocolConfigView::MessageReceived(BMessage *msg) 
+{
 	switch (msg->what) {
 		case 'some':
 			enable_control("user");
@@ -252,7 +284,10 @@ void BMailProtocolConfigView::MessageReceived(BMessage *msg) {
 	}
 }
 
-status_t BMailProtocolConfigView::Archive(BMessage *into, bool) const {
+
+status_t 
+BMailProtocolConfigView::Archive(BMessage *into, bool) const 
+{
 	const char *host = TextControl((BView *)this,"host");
 	int32 port = -1;
 	BString host_name = host;
@@ -316,8 +351,11 @@ status_t BMailProtocolConfigView::Archive(BMessage *into, bool) const {
 		
 	return B_OK;
 }
+
 	
-void BMailProtocolConfigView::GetPreferredSize(float *width, float *height) {
+void 
+BMailProtocolConfigView::GetPreferredSize(float *width, float *height) 
+{
 	float minWidth = 250;
 	if (BView *view = FindView("delete_remote_when_local")) {
 		float ignore;
@@ -328,3 +366,4 @@ void BMailProtocolConfigView::GetPreferredSize(float *width, float *height) {
 	*width = minWidth + 10;
 	*height = (CountChildren() * gItemHeight) + 5;
 }
+
