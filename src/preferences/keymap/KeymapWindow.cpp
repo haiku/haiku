@@ -96,10 +96,11 @@ KeymapWindow::KeymapWindow()
 	if (userKeymapsDir.InitCheck() != B_OK) {
 		create_directory(path.Path(), S_IRWXU | S_IRWXG | S_IRWXO);
 	}
-	
-	fOpenPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), &ref, 
+
+	BMessenger messenger(this);	
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, &ref, 
 		B_FILE_NODE, false, NULL);
-	fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), &ref, 
+	fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger, &ref, 
 		B_FILE_NODE, false, NULL);
 }
 
