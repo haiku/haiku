@@ -29,27 +29,16 @@
 #ifndef _GAMESOUNDDEVICE_H
 #define _GAMESOUNDDEVICE_H
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <GameSoundDefs.h>
 
-// Project Includes ------------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 class BMediaNode;
 class GameSoundBuffer;
 struct Connection;
 
-// BGameSoundDevice ------------------------------------------------------------
-class BGameSoundDevice 
-{
+class BGameSoundDevice { 
 public:
-									BGameSoundDevice();
+								BGameSoundDevice();
 	virtual							~BGameSoundDevice();
 
 			status_t				InitCheck() const;
@@ -67,7 +56,7 @@ public:
 	
 	virtual status_t				Buffer(gs_id sound,
 											gs_audio_format * format,
-											void * data);
+											void *& data);
 			
 	virtual	bool					IsPlaying(gs_id sound);
 	virtual	status_t				StartPlaying(gs_id sound);

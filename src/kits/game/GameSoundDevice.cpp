@@ -211,19 +211,12 @@ BGameSoundDevice::ReleaseBuffer(gs_id sound)
 	
 
 status_t
-BGameSoundDevice::Buffer(gs_id sound,
-						 gs_audio_format * format,
-						 void * data)
+BGameSoundDevice::Buffer(gs_id sound, gs_audio_format* format, void *& data)
 {
 	if (!format || sound <= 0)
 		return B_BAD_VALUE;
 
 	memcpy(format, &fSounds[sound-1]->Format(), sizeof(gs_audio_format));
-
-	// TODO: This is broken!!!
-	// here we leak the memory allocated by malloc, since data
-	// is not a reference nor a pointer to a pointer.
-	// The caller will never have the chance to access the allocated memory.	
 	if (fSounds[sound-1]->Data()) {
 		data = malloc(format->buffer_size);
 		memcpy(data, fSounds[sound-1]->Data(), format->buffer_size);
