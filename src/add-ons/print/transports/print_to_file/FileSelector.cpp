@@ -39,10 +39,11 @@ FileSelector::FileSelector(void)
 	: BWindow(BRect(0,0,320,160), "printtofile", B_TITLED_WINDOW,
 	B_NOT_ZOOMABLE, B_CURRENT_WORKSPACE)
 {
-	m_exit_sem 		= create_sem(0, "FileSelector");
-	m_result 		= B_ERROR;
-	m_save_panel 	= NULL;
+	m_exit_sem = create_sem(0, "FileSelector");
+	m_result = B_ERROR;
+	m_save_panel = NULL;
 }
+
 
 FileSelector::~FileSelector()
 {
@@ -51,19 +52,20 @@ FileSelector::~FileSelector()
 }
 
 
-bool FileSelector::QuitRequested()
+bool 
+FileSelector::QuitRequested()
 {
 	release_sem(m_exit_sem);
-	return true;
+	return BWindow::QuitRequested();
 }
 
 
-void FileSelector::MessageReceived(BMessage * msg)
+void 
+FileSelector::MessageReceived(BMessage * msg)
 {
-	switch (msg->what)
-		{
+	switch (msg->what) {
 		case START_MSG:
-			{
+		{
 			BMessenger messenger(this);
 			m_save_panel = new BFilePanel(B_SAVE_PANEL, 
 							&messenger, NULL, 0, false);
@@ -71,26 +73,24 @@ void FileSelector::MessageReceived(BMessage * msg)
 			m_save_panel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
 			m_save_panel->Show();
 			break;
-			}
+		}
 		case B_SAVE_REQUESTED:
-			{
-			entry_ref 		dir;
+		{
+			entry_ref dir;
 			
-			if ( msg->FindRef("directory", &dir) == B_OK)
-				{
-				const char *	name;
+			if (msg->FindRef("directory", &dir) == B_OK) {
+				const char* name;
 
 				BDirectory bdir(&dir);
-				if ( msg->FindString("name", &name) == B_OK)
-					{
-					if ( name != NULL )
+				if (msg->FindString("name", &name) == B_OK) {
+					if (name != NULL)
 						m_result = m_entry.SetTo(&bdir, name);
-					};
 				};
+			};
 
 			release_sem(m_exit_sem);
 			break;
-			};
+		};
 		
 		case B_CANCEL:
 			release_sem(m_exit_sem);
@@ -99,11 +99,12 @@ void FileSelector::MessageReceived(BMessage * msg)
 		default:
 			inherited::MessageReceived(msg);
 			break;
-		};
+	};
 }
 			
 
-status_t FileSelector::Go(entry_ref * ref)
+status_t 
+FileSelector::Go(entry_ref* ref)
 {
 	MoveTo(300,300);
 	Hide();
@@ -114,7 +115,7 @@ status_t FileSelector::Go(entry_ref * ref)
 	// cache result to avoid memory access of deleted window object
 	// after Quit().
 	status_t result = m_result;
-	if ( result == B_OK && ref)
+	if (result == B_OK && ref)
 		result = m_entry.GetRef(ref);
 
 	Lock();
@@ -122,6 +123,4 @@ status_t FileSelector::Go(entry_ref * ref)
 
 	return result;
 }
-
-
 			
