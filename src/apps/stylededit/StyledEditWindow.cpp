@@ -820,8 +820,8 @@ StyledEditWindow::SaveAs(BMessage *message)
 		entry_ref* directory = NULL;
 		if (fSaveMessage != NULL) {
 			entry_ref dirRef;
-			if (fSaveMessage->FindRef("directory", &dirRef))
-				directory = new entry_ref(dirRef);
+			if (fSaveMessage->FindRef("directory", &dirRef) == B_OK)
+				directory = &dirRef;
 		}
 
 		BMessenger target(this);
