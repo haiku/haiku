@@ -191,7 +191,8 @@ ExpanderWindow::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 		case MSG_SOURCE:
 			if (!fSourcePanel) {
-				fSourcePanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL,
+				BMessenger messenger(this);
+				fSourcePanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL,
 					B_FILE_NODE, false, NULL, new RuleRefFilter(fRules), true);
 			}
 			fSourcePanel->Show();
@@ -199,7 +200,8 @@ ExpanderWindow::MessageReceived(BMessage *msg)
 
 		case MSG_DEST:
 			if (!fDestPanel) {
-				fDestPanel = new DirectoryFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL,
+				BMessenger messenger(this);
+				fDestPanel = new DirectoryFilePanel(B_OPEN_PANEL, &messenger, NULL,
 					B_DIRECTORY_NODE, false, NULL, new DirectoryRefFilter(), true);
 			}
 			fDestPanel->Show();
