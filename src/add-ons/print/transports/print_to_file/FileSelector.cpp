@@ -63,13 +63,15 @@ void FileSelector::MessageReceived(BMessage * msg)
 	switch (msg->what)
 		{
 		case START_MSG:
+			{
+			BMessenger messenger(this);
 			m_save_panel = new BFilePanel(B_SAVE_PANEL, 
-							new BMessenger(this), NULL, 0, false);
+							&messenger, NULL, 0, false);
 
 			m_save_panel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
 			m_save_panel->Show();
 			break;
-
+			}
 		case B_SAVE_REQUESTED:
 			{
 			entry_ref 		dir;
