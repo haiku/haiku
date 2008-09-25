@@ -318,7 +318,7 @@ status_t BMailProtocolConfigView::Archive(BMessage *into, bool) const {
 }
 	
 void BMailProtocolConfigView::GetPreferredSize(float *width, float *height) {
-	float minWidth;
+	float minWidth = 250;
 	if (BView *view = FindView("delete_remote_when_local")) {
 		float ignore;
 		view->GetPreferredSize(&minWidth,&ignore);
