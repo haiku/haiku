@@ -9,25 +9,26 @@
 
 
 #include "vfs_boot.h"
-#include "vfs_net_boot.h"
 
-#include <vfs.h>
-#include <file_cache.h>
-#include <KPath.h>
-#include <syscalls.h>
+#include <stdio.h>
+
+#include <fs_info.h>
+#include <OS.h>
+
 #include <boot/kernel_args.h>
-#include <util/KMessage.h>
-#include <util/Stack.h>
-
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
 #include <disk_device_manager/KPartitionVisitor.h>
 #include <DiskDeviceTypes.h>
+#include <file_cache.h>
+#include <fs/KPath.h>
+#include <kmodule.h>
+#include <syscalls.h>
+#include <util/KMessage.h>
+#include <util/Stack.h>
+#include <vfs.h>
 
-#include <OS.h>
-#include <fs_info.h>
-
-#include <stdio.h>
+#include "vfs_net_boot.h"
 
 
 //#define TRACE_VFS
@@ -458,6 +459,16 @@ vfs_mount_boot_file_system(kernel_args *args)
 
 		_kern_create_symlink(-1, path, "/boot", 0);
 	}
+
+	// Do post-boot-volume module initialization. The module code wants to know
+	// whether the module images the boot loader has pre-loaded are the same as
+	// on the boot volume. That is the case when booting from hard disk or CD,
+	// but not via network.
+	int32 bootMethodType = args->boot_volume.GetInt32(BOOT_METHOD,
+		BOOT_METHOD_DEFAULT);
+	bool bootingFromBootLoaderVolume = bootMethodType == BOOT_METHOD_HARD_DISK
+		|| bootMethodType == BOOT_METHOD_CD;
+	module_init_post_boot_device(bootingFromBootLoaderVolume);
 
 	file_cache_init_post_boot_device();
 

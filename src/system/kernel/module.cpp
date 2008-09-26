@@ -94,7 +94,6 @@ struct module_image {
 	char*				path;		// the full path for the module
 	image_id			image;
 	int32				ref_count;	// how many ref's to this file
-	bool				keep_loaded;
 };
 
 /* Each known module will have this structure which is put in the
@@ -105,7 +104,6 @@ struct module {
 	struct module*		next;
 	::module_image*		module_image;
 	char*				name;
-	char*				file;
 	int32				ref_count;
 	module_info*		info;		// will only be valid if ref_count > 0
 	int32				offset;		// this is the offset in the headers
@@ -299,11 +297,20 @@ static const uint32 kFirstNonSystemModulePath = 1;
 static ModuleNotificationService sModuleNotificationService;
 static bool sDisableUserAddOns = false;
 
-/* locking scheme: there is a global lock only; having several locks
- * makes trouble if dependent modules get loaded concurrently ->
- * they have to wait for each other, i.e. we need one lock per module;
- * also we must detect circular references during init and not dead-lock
- */
+/*	Locking scheme: There is a global lock only; having several locks
+	makes trouble if dependent modules get loaded concurrently ->
+	they have to wait for each other, i.e. we need one lock per module;
+	also we must detect circular references during init and not dead-lock.
+
+	Reference counting: get_module() increments the ref count of a module,
+	put_module() decrements it. When a B_KEEP_LOADED module is initialized
+	the ref count is incremented once more, so it never gets
+	uninitialized/unloaded. A referenced module, unless it's built-in, has a
+	non-null module_image and owns a reference to the image. When the last
+	module reference is put, the image's reference is released and module_image
+	zeroed (as long as the boot volume has not been mounted, it is not zeroed).
+	An unreferenced module image is unloaded (when the boot volume is mounted).
+*/
 static recursive_lock sModulesLock;
 
 /* We store the loaded modules by directory path, and all known modules
@@ -421,11 +428,8 @@ load_module_image(const char* path, module_image** _moduleImage)
 
 	moduleImage->image = image;
 	moduleImage->ref_count = 0;
-	moduleImage->keep_loaded = false;
 
-	recursive_lock_lock(&sModulesLock);
 	hash_insert(sModuleImagesHash, moduleImage);
-	recursive_lock_unlock(&sModulesLock);
 
 	*_moduleImage = moduleImage;
 	return B_OK;
@@ -476,7 +480,7 @@ put_module_image(module_image* image)
 	// Don't unload anything when there is no boot device yet
 	// (because chances are that we will never be able to access it again)
 
-	if (refCount == 1 && !image->keep_loaded && gBootDevice > 0)
+	if (refCount == 1 && gBootDevice > 0)
 		unload_module_image(image, true);
 }
 
@@ -508,12 +512,12 @@ get_module_image(const char* path, module_image** _image)
 	by "info" and create the entries required for access to it's details.
 */
 static status_t
-create_module(module_info* info, const char* file, int offset, module** _module)
+create_module(module_info* info, int offset, module** _module)
 {
 	module* module;
 
-	TRACE(("create_module(info = %p, file = \"%s\", offset = %d, _module = %p)\n",
-		info, file, offset, _module));
+	TRACE(("create_module(info = %p, offset = %d, _module = %p)\n",
+		info, offset, _module));
 
 	if (!info->name)
 		return B_BAD_VALUE;
@@ -527,18 +531,11 @@ create_module(module_info* info, const char* file, int offset, module** _module)
 	if ((module = (struct module*)malloc(sizeof(struct module))) == NULL)
 		return B_NO_MEMORY;
 
-	TRACE(("create_module: name = \"%s\", file = \"%s\"\n", info->name, file));
+	TRACE(("create_module: name = \"%s\"\n", info->name));
 
 	module->module_image = NULL;
 	module->name = strdup(info->name);
 	if (module->name == NULL) {
-		free(module);
-		return B_NO_MEMORY;
-	}
-
-	module->file = strdup(file);
-	if (module->file == NULL) {
-		free(module->name);
 		free(module);
 		return B_NO_MEMORY;
 	}
@@ -587,10 +584,27 @@ check_module_image(const char* path, const char* searchedName,
 	for (info = image->info; *info; info++) {
 		// try to create a module for every module_info, check if the
 		// name matches if it was a new entry
-		if (create_module(*info, path, index++, NULL) == B_OK) {
-			if (searchedName && !strcmp((*info)->name, searchedName))
-				status = B_OK;
+		bool freshModule = false;
+		struct module* module = (struct module*)hash_lookup(sModulesHash,
+			(*info)->name);
+		if (module != NULL) {
+			// Module does already exist
+			if (module->module_image == NULL && module->ref_count == 0) {
+				module->info = *info;
+				module->offset = index;
+				module->flags = (*info)->flags;
+				module->state = MODULE_QUERIED;
+				freshModule = true;
+			}
+		} else if (create_module(*info, index, NULL) == B_OK)
+			freshModule = true;
+
+		if (freshModule && searchedName != NULL
+			&& strcmp((*info)->name, searchedName) == 0) {
+			status = B_OK;
 		}
+
+		index++;
 	}
 
 	if (status != B_OK) {
@@ -604,9 +618,6 @@ check_module_image(const char* path, const char* searchedName,
 }
 
 
-/*!	This is only called if we fail to find a module already in our cache...
-	saves us some extra checking here :)
-*/
 static module*
 search_module(const char* name, module_image** _moduleImage)
 {
@@ -797,6 +808,7 @@ uninit_module(module* module)
 
 			module->state = MODULE_ERROR;
 			module->flags |= B_KEEP_LOADED;
+			module->ref_count++;
 
 			return status;
 		}
@@ -1052,7 +1064,7 @@ register_builtin_modules(struct module_info** info)
 		(*info)->flags |= B_BUILT_IN_MODULE;
 			// this is an internal flag, it doesn't have to be set by modules itself
 
-		if (create_module(*info, "", -1, NULL) != B_OK)
+		if (create_module(*info, -1, NULL) != B_OK)
 			dprintf("creation of built-in module \"%s\" failed!\n", (*info)->name);
 	}
 }
@@ -1095,54 +1107,7 @@ register_preloaded_module_image(struct preloaded_image* image)
 		(void**)&moduleImage->dependencies);
 		// this is allowed to be NULL
 
-	if (image->name[0] != '/') {
-		// Try to recreate the full module path, so that we don't try to load
-		// the image again when asked for a module it does not export (would
-		// only be problematic if it had got replaced and the new file actually
-		// exports that module). Also helpful for recurse_directory().
-
-		// TODO: check if there is a situation (like floppy/network boot) where
-		//	relative paths are still passed in.
-		// TODO: this is kind of a hack to have the full path in the hash
-		//	(it always assumes the preloaded add-ons to be in the system
-		//	directory)
-		const char* name = moduleImage->info[0]->name;
-		const char* suffix = strstr(name, image->name);
-		if (suffix != NULL) {
-			char path[B_FILE_NAME_LENGTH];
-
-			// even if strlcpy() is used here, it's by no means safe
-			// against buffer overflows
-			KPath addonsKernelPath;
-			status_t status = find_directory(B_BEOS_ADDONS_DIRECTORY,
-				gBootDevice, false, addonsKernelPath.LockBuffer(),
-				addonsKernelPath.BufferSize());
-			if (status != B_OK) {
-				dprintf("register_preloaded_module_image: find_directory() "
-					"failed: %s\n", strerror(status));
-			}
-			addonsKernelPath.UnlockBuffer();
-			if (status == B_OK) {
-				status = addonsKernelPath.Append("kernel/");
-					// KPath does not remove the trailing '/'
-			}
-			if (status == B_OK) {
-				size_t length = strlcpy(path, addonsKernelPath.Path(),
-					sizeof(path));
-				strlcpy(path + length, name, strlen(image->name)
-					+ 1 + (suffix - name));
-
-				moduleImage->path = strdup(path);
-			} else {
-				moduleImage->path = NULL;
-					// this will trigger B_NO_MEMORY, which is the only
-					// reason to get here anyways...
-			}
-		} else
-			moduleImage->path = strdup(image->name);
-	} else
-		moduleImage->path = strdup(image->name);
-
+	moduleImage->path = strdup(image->name);
 	if (moduleImage->path == NULL) {
 		status = B_NO_MEMORY;
 		goto error;
@@ -1150,12 +1115,13 @@ register_preloaded_module_image(struct preloaded_image* image)
 
 	moduleImage->image = image->id;
 	moduleImage->ref_count = 0;
-	moduleImage->keep_loaded = false;
 
 	hash_insert(sModuleImagesHash, moduleImage);
 
 	for (info = moduleImage->info; *info; info++) {
-		create_module(*info, moduleImage->path, index++, NULL);
+		struct module* module = NULL;
+		if (create_module(*info, index++, &module) == B_OK)
+			module->module_image = moduleImage;
 	}
 
 	return B_OK;
@@ -1184,17 +1150,18 @@ dump_modules(int argc, char** argv)
 
 	while ((module = (struct module*)hash_next(sModulesHash, &iterator)) != NULL) {
 		kprintf("%p: \"%s\", \"%s\" (%ld), refcount = %ld, state = %d, mimage = %p\n",
-			module, module->name, module->file, module->offset, module->ref_count,
-			module->state, module->module_image);
+			module, module->name,
+			module->module_image ? module->module_image->path : "",
+			module->offset, module->ref_count, module->state,
+			module->module_image);
 	}
 
 	hash_rewind(sModuleImagesHash, &iterator);
 	kprintf("\n-- loaded module images:\n");
 
 	while ((image = (struct module_image*)hash_next(sModuleImagesHash, &iterator)) != NULL) {
-		kprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld, %s\n", image,
-			image->path, image->image, image->info, image->ref_count,
-			image->keep_loaded ? "keep loaded" : "can be unloaded");
+		kprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld\n", image,
+			image->path, image->image, image->info, image->ref_count);
 	}
 	return 0;
 }
@@ -1845,12 +1812,33 @@ module_init_post_threads(void)
 
 
 status_t
-module_init_post_boot_device(void)
+module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 {
-	RecursiveLocker locker(sModulesLock);
+	// Remove all unused pre-loaded module images. Now that the boot device is
+	// available, we can load an image when we need it.
+	// When the boot volume is also where the boot loader pre-loaded the images
+	// from, we get the actual paths for those images.
 
+	RecursiveLocker _(sModulesLock);
+
+	// First of all, clear all pre-loaded module's module_image, if the module
+	// isn't in use.
 	hash_iterator iterator;
+	hash_open(sModulesHash, &iterator);
+	struct module* module;
+	while ((module = (struct module*)hash_next(sModulesHash, &iterator))
+			!= NULL) {
+		if (module->ref_count == 0 && (module->flags & B_BUILT_IN_MODULE) == 0)
+			module->module_image = NULL;
+	}
+
+	// Now iterate through the images and drop them respectively normalize their
+	// paths.
 	hash_open(sModuleImagesHash, &iterator);
+
+	module_image* imagesToReinsert = NULL;
+		// When renamed, an image is added to this list to be re-entered in the
+		// hash at the end. We can't do that during the iteration.
 
 	while (true) {
 		struct module_image* image
@@ -1858,10 +1846,72 @@ module_init_post_boot_device(void)
 		if (image == NULL)
 			break;
 
-		if (image->ref_count == 0 && !image->keep_loaded) {
+		if (image->ref_count == 0) {
+			// not in use -- unload it
 			hash_remove_current(sModuleImagesHash, &iterator);
 			unload_module_image(image, false);
+		} else if (bootingFromBootLoaderVolume) {
+			bool pathNormalized = false;
+			KPath pathBuffer;
+			if (image->path[0] != '/') {
+				// relative path
+				for (uint32 i = kNumModulePaths; i-- > 0;) {
+					if (sDisableUserAddOns && i >= kFirstNonSystemModulePath)
+						continue;
+
+					if (find_directory(kModulePaths[i], gBootDevice, true,
+							pathBuffer.LockBuffer(), pathBuffer.BufferSize())
+								!= B_OK) {
+						pathBuffer.UnlockBuffer();
+						continue;
+					}
+
+					pathBuffer.UnlockBuffer();
+
+					// Append the relative boot module directory and the
+					// relative image path, normalize the path, and check
+					// whether it exists.
+					struct stat st;
+					if (pathBuffer.Append("kernel/boot") != B_OK
+						|| pathBuffer.Append(image->path) != B_OK
+						|| pathBuffer.Normalize(true) != B_OK
+						|| lstat(pathBuffer.Path(), &st) != 0) {
+						continue;
+					}
+
+					pathNormalized = true;
+					break;
+				}
+			} else {
+				// absolute path -- try to normalize it anyway
+				struct stat st;
+				if (pathBuffer.SetPath(image->path) == B_OK
+					&& pathBuffer.Normalize(true) == B_OK
+					&& lstat(pathBuffer.Path(), &st) == 0) {
+					pathNormalized = true;
+				}
+			}
+
+			if (pathNormalized) {
+				// set the new path
+				free(image->path);
+				size_t pathLen = pathBuffer.Length();
+				image->path = (char*)realloc(pathBuffer.DetachBuffer(),
+					pathLen + 1);
+
+				// remove the image -- its hash value has probably changed,
+				// so we need to re-insert it later
+				hash_remove_current(sModuleImagesHash, &iterator);
+				image->next = imagesToReinsert;
+				imagesToReinsert = image;
+			}
 		}
+	}
+
+	// re-insert the images that have got a new path
+	while (module_image* image = imagesToReinsert) {
+		imagesToReinsert = image->next;
+		hash_insert(sModuleImagesHash, image);
 	}
 
 	return B_OK;
@@ -2100,40 +2150,33 @@ get_module(const char* path, module_info** _info)
 	module = (struct module*)hash_lookup(sModulesHash, path);
 
 	// if we don't have it cached yet, search for it
-	if (module == NULL) {
+	if (module == NULL || (module->flags & B_BUILT_IN_MODULE) == 0
+			&& module->module_image == NULL) {
 		module = search_module(path, &moduleImage);
 		if (module == NULL) {
 			FATAL(("module: Search for %s failed.\n", path));
 			return B_ENTRY_NOT_FOUND;
 		}
-	}
 
-	if ((module->flags & B_BUILT_IN_MODULE) == 0) {
-		/* We now need to find the module_image for the module. This will
-		 * be in memory if we have just run search_module(), but may not be
-		 * if we are using cached information.
-		 * We can't use the module->module_image pointer, because it is not
-		 * reliable at this point (it won't be set to NULL when the module_image
-		 * is unloaded).
-		 */
-		if (moduleImage == NULL
-			&& get_module_image(module->file, &moduleImage) < B_OK)
-			return B_ENTRY_NOT_FOUND;
-
-		// (re)set in-memory data for the loaded module
 		module->info = moduleImage->info[module->offset];
 		module->module_image = moduleImage;
-
-		// the module image must not be unloaded anymore
-		if (module->flags & B_KEEP_LOADED)
-			module->module_image->keep_loaded = true;
+	} else if ((module->flags & B_BUILT_IN_MODULE) == 0 && gBootDevice < 0
+		&& module->ref_count == 0) {
+		// The boot volume isn't available yet. I.e. instead of searching the
+		// right module image, we already know it and just increment the ref
+		// count.
+		atomic_add(&module->module_image->ref_count, 1);
 	}
 
 	// The state will be adjusted by the call to init_module
 	// if we have just loaded the file
-	if (module->ref_count == 0)
+	if (module->ref_count == 0) {
 		status = init_module(module);
-	else
+		// For "keep loaded" modules we increment the ref count here. That will
+		// cause it never to get unloaded.
+		if ((module->flags & B_KEEP_LOADED) != 0)
+			module->ref_count++;
+	} else
 		status = B_OK;
 
 	if (status == B_OK) {
@@ -2141,8 +2184,12 @@ get_module(const char* path, module_info** _info)
 		module->ref_count++;
 		*_info = module->info;
 	} else if ((module->flags & B_BUILT_IN_MODULE) == 0
-		&& (module->flags & B_KEEP_LOADED) == 0)
+		&& module->ref_count == 0) {
+		// initialization failed -- release the image reference
 		put_module_image(module->module_image);
+		if (gBootDevice >= 0)
+			module->module_image = NULL;
+	}
 
 	return status;
 }
@@ -2164,15 +2211,32 @@ put_module(const char* path)
 		return B_BAD_VALUE;
 	}
 
-	if (module->ref_count == 0)
+	if (module->ref_count == 0) {
 		panic("module %s has no references.\n", path);
-
-	if ((module->flags & B_KEEP_LOADED) == 0) {
-		if (--module->ref_count == 0)
-			uninit_module(module);
+		return B_BAD_VALUE;
 	}
-	if ((module->flags & B_BUILT_IN_MODULE) == 0)
-		put_module_image(module->module_image);
+
+	if (--module->ref_count == 0) {
+		if ((module->flags & B_KEEP_LOADED) != 0) {
+			panic("ref count of B_KEEP_LOADED module %s dropped to 0!",
+				module->name);
+			module->ref_count++;
+			return B_BAD_VALUE;
+		}
+
+		uninit_module(module);
+
+		if ((module->flags & B_BUILT_IN_MODULE) == 0
+			&& module->ref_count == 0) {
+				// uninit_module() increments the ref count on failure
+			put_module_image(module->module_image);
+			// Unless we don't have a boot device yet, we clear the module's
+			// image pointer if the ref count dropped to 0. get_module() will
+			// have to reload the image.
+			if (gBootDevice >= 0)
+				module->module_image = NULL;
+		}
+	}
 
 	return B_OK;
 }
