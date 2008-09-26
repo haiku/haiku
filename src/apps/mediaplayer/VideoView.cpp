@@ -6,7 +6,17 @@
 
 #include <stdio.h>
 
+// XXX: Hack for BeOS: REMOVE ME later
+#ifndef __HAIKU__
+#define private public
+#define BitmapFlags(b) ((b)->fFlags)
+#else
+#define BitmapFlags(b) ((b)->Flags())
+#endif
 #include <Bitmap.h>
+#ifndef __HAIKU__
+#undef private
+#endif
 
 #include "Settings.h"
 
@@ -84,7 +94,7 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 	// -> Window).
 	if (bitmap && LockLooperWithTimeout(10000) == B_OK) {
 		if (LockBitmap()) {
-			if (fOverlayMode || (bitmap->Flags() & B_BITMAP_WILL_OVERLAY)) {
+			if (fOverlayMode || (BitmapFlags(bitmap) & B_BITMAP_WILL_OVERLAY)) {
 				if (!fOverlayMode) {
 					// init overlay
 					rgb_color key;
