@@ -2857,6 +2857,91 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 	return fd;
 }
 
+
+/*!	In-place normalizes \a path. It's otherwise semantically equivalent to
+	vfs_normalize_path(). See there for more documentation.
+*/
+static status_t
+normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
+{
+	VNodePutter dirPutter;
+	struct vnode* dir = NULL;
+	status_t error;
+
+	for (int i = 0; i < B_MAX_SYMLINKS; i++) {
+		// get dir vnode + leaf name
+		struct vnode* nextDir;
+		char leaf[B_FILE_NAME_LENGTH];
+		error = vnode_and_path_to_dir_vnode(dir, path, &nextDir, leaf, kernel);
+		if (error != B_OK)
+			return error;
+
+		dir = nextDir;
+		strcpy(path, leaf);
+		dirPutter.SetTo(dir);
+
+		// get file vnode, if we shall resolve links
+		bool fileExists = false;
+		struct vnode* fileVnode;
+		VNodePutter fileVnodePutter;
+		if (traverseLink) {
+			inc_vnode_ref_count(dir);
+			if (vnode_path_to_vnode(dir, path, false, 0, kernel, &fileVnode,
+					NULL) == B_OK) {
+				fileVnodePutter.SetTo(fileVnode);
+				fileExists = true;
+			}
+		}
+
+		if (!fileExists || !traverseLink || !S_ISLNK(fileVnode->type)) {
+			// we're done -- construct the path
+			bool hasLeaf = true;
+			if (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0) {
+				// special cases "." and ".." -- get the dir, forget the leaf
+				inc_vnode_ref_count(dir);
+				error = vnode_path_to_vnode(dir, leaf, false, 0, kernel,
+					&nextDir, NULL);
+				if (error != B_OK)
+					return error;
+				dir = nextDir;
+				dirPutter.SetTo(dir);
+				hasLeaf = false;
+			}
+
+			// get the directory path
+			error = dir_vnode_to_path(dir, path, B_PATH_NAME_LENGTH, kernel);
+			if (error != B_OK)
+				return error;
+
+			// append the leaf name
+			if (hasLeaf) {
+				// insert a directory separator if this is not the file system
+				// root
+				if ((strcmp(path, "/") != 0
+					&& strlcat(path, "/", pathSize) >= pathSize)
+					|| strlcat(path, leaf, pathSize) >= pathSize) {
+					return B_NAME_TOO_LONG;
+				}
+			}
+
+			return B_OK;
+		}
+
+		// read link
+		if (HAS_FS_CALL(fileVnode, read_symlink)) {
+			size_t bufferSize = B_PATH_NAME_LENGTH - 1;
+			error = FS_CALL(fileVnode, read_symlink, path, &bufferSize);
+			if (error != B_OK)
+				return error;
+			path[bufferSize] = '\0';
+		} else
+			return B_BAD_VALUE;
+	}
+
+	return B_LINK_LIMIT;
+}
+
+
 #ifdef ADD_DEBUGGER_COMMANDS
 
 
@@ -4020,6 +4105,7 @@ err:
 	\param buffer The buffer into which the normalized path will be written.
 		   May be the same one as \a path.
 	\param bufferSize The size of \a buffer.
+	\param traverseLink If \c true, the function also resolves leaf symlinks.
 	\param kernel \c true, if the IO context of the kernel shall be used,
 		   otherwise that of the team this thread belongs to. Only relevant,
 		   if the path is relative (to get the CWD).
@@ -4027,64 +4113,17 @@ err:
 */
 status_t
 vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
-	bool kernel)
+	bool traverseLink, bool kernel)
 {
 	if (!path || !buffer || bufferSize < 1)
 		return B_BAD_VALUE;
 
-	TRACE(("vfs_normalize_path(`%s')\n", path));
-
-	// copy the supplied path to the stack, so it can be modified
-	KPath mutablePathBuffer(B_PATH_NAME_LENGTH + 1);
-	if (mutablePathBuffer.InitCheck() != B_OK)
-		return B_NO_MEMORY;
-
-	char *mutablePath = mutablePathBuffer.LockBuffer();
-	if (strlcpy(mutablePath, path, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH)
-		return B_NAME_TOO_LONG;
-
-	// get the dir vnode and the leaf name
-	struct vnode *dirNode;
-	char leaf[B_FILE_NAME_LENGTH];
-	status_t error = path_to_dir_vnode(mutablePath, &dirNode, leaf, kernel);
-	if (error != B_OK) {
-		TRACE(("vfs_normalize_path(): failed to get dir vnode: %s\n", strerror(error)));
-		return error;
+	if (path != buffer) {
+		if (strlcpy(buffer, path, bufferSize) >= bufferSize)
+			return B_BUFFER_OVERFLOW;
 	}
 
-	// if the leaf is "." or "..", we directly get the correct directory
-	// vnode and ignore the leaf later
-	bool isDir = (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0);
-	if (isDir) {
-		error = vnode_path_to_vnode(dirNode, leaf, false, 0, kernel, &dirNode,
-			NULL);
-	}
-	if (error != B_OK) {
-		TRACE(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n",
-			strerror(error)));
-		return error;
-	}
-
-	// get the directory path
-	error = dir_vnode_to_path(dirNode, buffer, bufferSize, kernel);
-	put_vnode(dirNode);
-	if (error < B_OK) {
-		TRACE(("vfs_normalize_path(): failed to get dir path: %s\n", strerror(error)));
-		return error;
-	}
-
-	// append the leaf name
-	if (!isDir) {
-		// insert a directory separator only if this is not the file system root
-		if ((strcmp(buffer, "/") != 0
-			 && strlcat(buffer, "/", bufferSize) >= bufferSize)
-			|| strlcat(buffer, leaf, bufferSize) >= bufferSize) {
-			return B_NAME_TOO_LONG;
-		}
-	}
-
-	TRACE(("vfs_normalize_path() -> `%s'\n", buffer));
-	return B_OK;
+	return normalize_path(buffer, bufferSize, traverseLink, kernel);
 }
 
 
@@ -8184,91 +8223,19 @@ _user_normalize_path(const char* userPath, bool traverseLink, char* buffer)
 	if (user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	// buffer for the leaf part
-	KPath leafBuffer(B_PATH_NAME_LENGTH + 1);
-	if (leafBuffer.InitCheck() != B_OK)
-		return B_NO_MEMORY;
-	char* leaf = leafBuffer.LockBuffer();
+	status_t error = normalize_path(path, pathBuffer.BufferSize(), traverseLink,
+		false);
+	if (error != B_OK)
+		return error;
 
-	VNodePutter dirPutter;
-	struct vnode* dir = NULL;
-	status_t error;
+	// copy back to userland
+	int len = user_strlcpy(buffer, path, B_PATH_NAME_LENGTH);
+	if (len < 0)
+		return len;
+	if (len >= B_PATH_NAME_LENGTH)
+		return B_BUFFER_OVERFLOW;
 
-	for (int i = 0; i < B_MAX_SYMLINKS; i++) {
-		// get dir vnode + leaf name
-		struct vnode* nextDir;
-		error = vnode_and_path_to_dir_vnode(dir, path, &nextDir, leaf, false);
-		if (error != B_OK)
-			return error;
-
-		dir = nextDir;
-		strcpy(path, leaf);
-		dirPutter.SetTo(dir);
-
-		// get file vnode
-		inc_vnode_ref_count(dir);
-		struct vnode* fileVnode;
-		error = vnode_path_to_vnode(dir, path, false, 0, false, &fileVnode,
-			NULL);
-		if (error != B_OK)
-			return error;
-		VNodePutter fileVnodePutter(fileVnode);
-
-		if (!traverseLink || !S_ISLNK(fileVnode->type)) {
-			// we're done -- construct the path
-			bool hasLeaf = true;
-			if (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0) {
-				// special cases "." and ".." -- get the dir, forget the leaf
-				inc_vnode_ref_count(dir);
-				error = vnode_path_to_vnode(dir, leaf, false, 0, false,
-					&nextDir, NULL);
-				if (error != B_OK)
-					return error;
-				dir = nextDir;
-				dirPutter.SetTo(dir);
-				hasLeaf = false;
-			}
-
-			// get the directory path
-			error = dir_vnode_to_path(dir, path, B_PATH_NAME_LENGTH, false);
-			if (error != B_OK)
-				return error;
-
-			// append the leaf name
-			if (hasLeaf) {
-				// insert a directory separator if this is not the file system
-				// root
-				if ((strcmp(path, "/") != 0
-					&& strlcat(path, "/", pathBuffer.BufferSize())
-						>= pathBuffer.BufferSize())
-					|| strlcat(path, leaf, pathBuffer.BufferSize())
-						>= pathBuffer.BufferSize()) {
-					return B_NAME_TOO_LONG;
-				}
-			}
-
-			// copy back to userland
-			int len = user_strlcpy(buffer, path, B_PATH_NAME_LENGTH);
-			if (len < 0)
-				return len;
-			if (len >= B_PATH_NAME_LENGTH)
-				return B_BUFFER_OVERFLOW;
-
-			return B_OK;
-		}
-
-		// read link
-		if (HAS_FS_CALL(fileVnode, read_symlink)) {
-			size_t bufferSize = B_PATH_NAME_LENGTH - 1;
-			error = FS_CALL(fileVnode, read_symlink, path, &bufferSize);
-			if (error != B_OK)
-				return error;
-			path[bufferSize] = '\0';
-		} else
-			return B_BAD_VALUE;
-	}
-
-	return B_LINK_LIMIT;
+	return B_OK;
 }
 
 

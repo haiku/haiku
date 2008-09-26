@@ -128,7 +128,7 @@ status_t vfs_get_module_path(const char *basePath, const char *moduleName,
 
 /* service call for whoever needs a normalized path */
 status_t vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
-			bool kernel);
+			bool traverseLink, bool kernel);
 
 /* service call for whoever wants to create a special node */
 status_t vfs_create_special_node(const char *path, fs_vnode *subVnode,

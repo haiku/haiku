@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2004-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -59,7 +59,8 @@ KPath::~KPath()
 
 
 status_t
-KPath::SetTo(const char* path, bool normalize, size_t bufferSize)
+KPath::SetTo(const char* path, bool normalize, size_t bufferSize,
+	bool traverseLeafLink)
 {
 	if (bufferSize == 0)
 		bufferSize = B_PATH_NAME_LENGTH;
@@ -82,7 +83,7 @@ KPath::SetTo(const char* path, bool normalize, size_t bufferSize)
 		fBufferSize = bufferSize;
 		fBuffer[0] = '\0';
 	}
-	return SetPath(path, normalize);
+	return SetPath(path, normalize, traverseLeafLink);
 }
 
 
@@ -94,7 +95,7 @@ KPath::Adopt(KPath& other)
 	fBuffer = other.fBuffer;
 	fBufferSize = other.fBufferSize;
 
-	other.fBuffer = NULL;	
+	other.fBuffer = NULL;
 }
 
 
@@ -106,7 +107,7 @@ KPath::InitCheck() const
 
 
 status_t
-KPath::SetPath(const char *path, bool normalize)
+KPath::SetPath(const char *path, bool normalize, bool traverseLeafLink)
 {
 	if (!fBuffer)
 		return B_NO_INIT;
@@ -115,6 +116,7 @@ KPath::SetPath(const char *path, bool normalize)
 		if (normalize) {
 			// normalize path
 			status_t error = vfs_normalize_path(path, fBuffer, fBufferSize,
+				traverseLeafLink,
 				team_get_kernel_team_id() == team_get_current_team_id());
 			if (error != B_OK) {
 				SetPath(NULL);
@@ -172,6 +174,22 @@ KPath::UnlockBuffer()
 		fBuffer[fPathLength] = '\0';
 	}
 	_ChopTrailingSlashes();
+}
+
+
+char*
+KPath::DetachBuffer()
+{
+	char* buffer = fBuffer;
+
+	if (fBuffer != NULL) {
+		fBuffer = NULL;
+		fBufferSize = 0;
+		fPathLength = 0;
+		fLocked = false;
+	}
+
+	return buffer;
 }
 
 
@@ -264,6 +282,19 @@ KPath::Append(const char *component, bool isComponent)
 	memcpy(fBuffer + fPathLength, component, componentLength + 1);
 	fPathLength = resultPathLength;
 	return B_OK;
+}
+
+
+status_t
+KPath::Normalize(bool traverseLeafLink)
+{
+	if (fBuffer == NULL)
+		return B_NO_INIT;
+	if (fPathLength == 0)
+		return B_BAD_VALUE;
+
+	return vfs_normalize_path(fBuffer, fBuffer, fBufferSize, traverseLeafLink,
+		team_get_kernel_team_id() == team_get_current_team_id());
 }
 
 
