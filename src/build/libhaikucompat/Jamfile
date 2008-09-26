@@ -4,6 +4,10 @@ SetSubDirSupportedPlatforms libbe_test r5 dano bone ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private system arch
+		$(HOST_ARCH) ] : true ;
+	# for <asm_defs.h>
+
 
 local libbeTestSources ;
 if $(TARGET_PLATFORM) = libbe_test {
@@ -50,7 +54,7 @@ BuildPlatformStaticLibrary libhaikucompat_build.a :
 	strnlen.c
 
 	$(libbePatchSources)
-;	
+;
 
 StaticLibrary libhaikucompat.a :
 	strcasestr.o
