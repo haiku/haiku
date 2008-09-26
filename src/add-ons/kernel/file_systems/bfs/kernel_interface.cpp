@@ -76,12 +76,6 @@ iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
 	bool partialTransfer, size_t bytesTransferred)
 {
 	Inode* inode = (Inode*)cookie;
-#ifndef BFS_SHELL
-ktrace_printf("bfs iterative_io_finished_hook(): inode: %p, request: %p, "
-"status: %#lx, partial: %d, transferred: %lu", inode, request, status,
-partialTransfer, bytesTransferred);
-#endif
-
 	rw_lock_read_unlock(&inode->Lock());
 	return B_OK;
 }
