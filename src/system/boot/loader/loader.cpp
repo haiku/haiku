@@ -51,7 +51,7 @@ is_bootable(Directory *volume)
 }
 
 
-status_t 
+status_t
 load_kernel(stage2_args *args, Directory *volume)
 {
 	int fd = open_from(volume, KERNEL_PATH, O_RDONLY);
@@ -74,6 +74,8 @@ load_kernel(stage2_args *args, Directory *volume)
 		dprintf("relocating kernel failed: %lx!\n", status);
 		return status;
 	}
+
+	gKernelArgs.kernel_image.name = kernel_args_strdup(KERNEL_IMAGE);
 
 	return B_OK;
 }
@@ -162,7 +164,7 @@ load_module(Directory *volume, const char *name)
 }
 
 
-status_t 
+status_t
 load_modules(stage2_args *args, Directory *volume)
 {
 	int32 failed = 0;
