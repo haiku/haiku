@@ -75,7 +75,7 @@ Volume::Volume(boot::Partition *partition)
 		buffer = newBuffer;
 
 	fRootNode.SetTo(buffer, blockSize);
-	fRoot = new(nothrow) Directory(*this, NULL, fRootNode);
+	fRoot = new(nothrow) Directory(*this, fRootNode);
 		// fRoot will free the buffer for us upon destruction
 }
 
@@ -87,7 +87,7 @@ Volume::~Volume()
 }
 
 
-status_t
+status_t 
 Volume::InitCheck()
 {
 	if (fRoot != NULL)

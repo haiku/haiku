@@ -17,9 +17,9 @@ namespace BFS {
 
 class Directory : public ::Directory {
 	public:
-		Directory(Volume &volume, ::Directory* parent, block_run run);
-		Directory(Volume &volume, ::Directory* parent, off_t id);
-		Directory(::Directory* parent, const Stream &stream);
+		Directory(Volume &volume, block_run run);
+		Directory(Volume &volume, off_t id);
+		Directory(const Stream &stream);
 		virtual ~Directory();
 
 		status_t InitCheck();

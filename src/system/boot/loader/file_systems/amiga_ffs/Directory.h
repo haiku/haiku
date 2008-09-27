@@ -17,8 +17,9 @@ class Volume;
 
 class Directory : public ::Directory {
 	public:
-		Directory(Volume &volume, ::Directory* parent, RootBlock &root);
-		Directory(Volume &volume, ::Directory* parent, int32 block);
+		Directory();
+		Directory(Volume &volume, RootBlock &root);
+		Directory(Volume &volume, int32 block);
 		virtual ~Directory();
 
 		status_t InitCheck();

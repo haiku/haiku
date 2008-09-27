@@ -18,9 +18,8 @@
 
 namespace FFS {
 
-Directory::Directory(Volume &volume, ::Directory* parent, int32 block)
+Directory::Directory(Volume &volume, int32 block)
 	:
-	::Directory(parent),
 	fVolume(volume)
 {
 	void *data = malloc(volume.BlockSize());
@@ -32,9 +31,8 @@ Directory::Directory(Volume &volume, ::Directory* parent, int32 block)
 }
 
 
-Directory::Directory(Volume &volume, ::Directory* parent, RootBlock &root)
+Directory::Directory(Volume &volume, RootBlock &root)
 	:
-	::Directory(parent),
 	fVolume(volume)
 {
 	fNode.SetTo(root.BlockData(), root.BlockSize());
@@ -47,14 +45,14 @@ Directory::~Directory()
 }
 
 
-status_t
+status_t 
 Directory::InitCheck()
 {
 	return fNode.ValidateCheckSum();
 }
 
 
-status_t
+status_t 
 Directory::Open(void **_cookie, int mode)
 {
 	_inherited::Open(_cookie, mode);
@@ -73,7 +71,7 @@ Directory::Open(void **_cookie, int mode)
 }
 
 
-status_t
+status_t 
 Directory::Close(void *cookie)
 {
 	_inherited::Close(cookie);
@@ -106,7 +104,7 @@ Directory::Lookup(const char *name, bool traverseLinks)
 			if (node->IsFile())
 				return new(nothrow) File(fVolume, block);
 			if (node->IsDirectory())
-				return new(nothrow) Directory(fVolume, this, block);
+				return new(nothrow) Directory(fVolume, block);
 
 			return NULL;
 		}
@@ -115,7 +113,7 @@ Directory::Lookup(const char *name, bool traverseLinks)
 }
 
 
-status_t
+status_t 
 Directory::GetNextEntry(void *cookie, char *name, size_t size)
 {
 	HashIterator *iterator = (HashIterator *)cookie;
@@ -129,7 +127,7 @@ Directory::GetNextEntry(void *cookie, char *name, size_t size)
 }
 
 
-status_t
+status_t 
 Directory::GetNextNode(void *cookie, Node **_node)
 {
 	return B_ERROR;

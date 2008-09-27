@@ -6,18 +6,15 @@
 
 #include "elf.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 #include <boot/arch.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <elf32.h>
 #include <kernel.h>
 
-#include "loader.h"
-
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 
 //#define TRACE_ELF
 #ifdef TRACE_ELF
@@ -129,9 +126,9 @@ load_elf_symbol_table(int fd, preloaded_image *image)
 		status = B_ERROR;
 		goto error1;
 	}
-
+	
 	// find symbol table in section headers
-
+	
 	for (int32 i = 0; i < elfHeader.e_shnum; i++) {
 		if (sectionHeaders[i].sh_type == SHT_SYMTAB) {
 			stringHeader = &sectionHeaders[sectionHeaders[i].sh_link];
@@ -426,14 +423,7 @@ elf_load_image(Directory *directory, const char *path)
 
 	status_t status = elf_load_image(fd, image);
 	if (status == B_OK) {
-		char tempPath[B_PATH_NAME_LENGTH];
-		if (directory->GetPath(path, tempPath, sizeof(tempPath)) == B_OK) {
-			// Replace the first path component with "boot", as the kernel
-			// will always mount the boot volume there.
-			to_boot_path(tempPath, sizeof(tempPath));
-			image->name = kernel_args_strdup(tempPath);
-		} else
-			image->name = kernel_args_strdup(path);
+		image->name = kernel_args_strdup(path);
 		image->inode = stat.st_ino;
 
 		// insert to kernel args

@@ -14,8 +14,6 @@
 
 
 RootFileSystem::RootFileSystem()
-	:
-	Directory(NULL)
 {
 }
 
@@ -31,16 +29,7 @@ RootFileSystem::~RootFileSystem()
 }
 
 
-status_t
-RootFileSystem::GetName(char *nameBuffer, size_t bufferSize) const
-{
-	if (strlcpy(nameBuffer, "/", bufferSize) >= bufferSize)
-		return B_BUFFER_OVERFLOW;
-	return B_OK;
-}
-
-
-status_t
+status_t 
 RootFileSystem::Open(void **_cookie, int mode)
 {
 	EntryIterator *iterator = new (std::nothrow) EntryIterator(&fList);
@@ -53,7 +42,7 @@ RootFileSystem::Open(void **_cookie, int mode)
 }
 
 
-status_t
+status_t 
 RootFileSystem::Close(void *cookie)
 {
 	delete (EntryIterator *)cookie;
@@ -95,7 +84,7 @@ RootFileSystem::Lookup(const char *name, bool /*traverseLinks*/)
 }
 
 
-status_t
+status_t 
 RootFileSystem::GetNextEntry(void *_cookie, char *name, size_t size)
 {
 	EntryIterator *iterator = (EntryIterator *)_cookie;
@@ -109,7 +98,7 @@ RootFileSystem::GetNextEntry(void *_cookie, char *name, size_t size)
 }
 
 
-status_t
+status_t 
 RootFileSystem::GetNextNode(void *_cookie, Node **_node)
 {
 	EntryIterator *iterator = (EntryIterator *)_cookie;
@@ -124,24 +113,24 @@ RootFileSystem::GetNextNode(void *_cookie, Node **_node)
 }
 
 
-status_t
+status_t 
 RootFileSystem::Rewind(void *_cookie)
 {
 	EntryIterator *iterator = (EntryIterator *)_cookie;
 
 	iterator->Rewind();
-	return B_OK;
+	return B_OK;	
 }
 
 
-bool
+bool 
 RootFileSystem::IsEmpty()
 {
 	return fList.IsEmpty();
 }
 
 
-status_t
+status_t 
 RootFileSystem::AddVolume(Directory *volume, Partition *partition)
 {
 	struct entry *entry = new (std::nothrow) RootFileSystem::entry();
@@ -149,7 +138,6 @@ RootFileSystem::AddVolume(Directory *volume, Partition *partition)
 		return B_NO_MEMORY;
 
 	volume->Acquire();
-	volume->SetParent(this);
 	entry->name = NULL;
 	entry->root = volume;
 	entry->partition = partition;
@@ -177,7 +165,7 @@ RootFileSystem::AddLink(const char *name, Directory *target)
 }
 
 
-status_t
+status_t 
 RootFileSystem::GetPartitionFor(Directory *volume, Partition **_partition)
 {
 	EntryIterator iterator = fList.GetIterator();

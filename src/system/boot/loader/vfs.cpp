@@ -92,21 +92,21 @@ Node::Close(void *cookie)
 }
 
 
-status_t
+status_t 
 Node::GetName(char *nameBuffer, size_t bufferSize) const
 {
 	return B_ERROR;
 }
 
 
-int32
+int32 
 Node::Type() const
 {
 	return 0;
 }
 
 
-off_t
+off_t 
 Node::Size() const
 {
 	return 0LL;
@@ -120,7 +120,7 @@ Node::Inode() const
 }
 
 
-status_t
+status_t 
 Node::Acquire()
 {
 	fRefCount++;
@@ -128,7 +128,7 @@ Node::Acquire()
 	return B_OK;
 }
 
-status_t
+status_t 
 Node::Release()
 {
 	TRACE(("%p::Release(), fRefCount = %ld\n", this, fRefCount));
@@ -168,98 +168,27 @@ ConsoleNode::Write(const void *buffer, size_t bufferSize)
 //	#pragma mark -
 
 
-Directory::Directory(Directory* parent)
-	:
-	Node(),
-	fParent(NULL)
+Directory::Directory()
+	: Node()
 {
-	SetParent(parent);
 }
 
 
-Directory::~Directory()
-{
-	SetParent(NULL);
-}
-
-
-Directory*
-Directory::Parent() const
-{
-	return fParent;
-}
-
-
-void
-Directory::SetParent(Directory* parent)
-{
-	if (fParent != NULL)
-		fParent->Release();
-
-	fParent = parent;
-
-	if (fParent != NULL)
-		fParent->Acquire();
-}
-
-
-status_t
-Directory::GetPath(const char* entry, char* buffer, size_t bufferSize)
-{
-	// get parent path, if any
-	if (fParent != NULL) {
-		status_t error = fParent->GetPath(NULL, buffer, bufferSize);
-		if (error != B_OK)
-			return error;
-
-		size_t len = strlen(buffer);
-		if (len == 0)
-			return B_BAD_VALUE;
-
-		if (buffer[len - 1] != '/') {
-			if (len == bufferSize)
-				return B_BUFFER_OVERFLOW;
-
-			buffer[len++] = '/';
-		}
-
-		buffer += len;
-		bufferSize -= len;
-	}
-
-	// append directory name
-	status_t error = GetName(buffer, bufferSize);
-	if (error != B_OK)
-		return error;
-
-	if (entry == NULL)
-		return B_OK;
-
-	// append entry name
-	if (strlcat(buffer, "/", bufferSize) >= bufferSize
-		|| strlcat(buffer, entry, bufferSize) >= bufferSize) {
-		return B_BUFFER_OVERFLOW;
-	}
-
-	return B_OK;
-}
-
-
-ssize_t
+ssize_t 
 Directory::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	return B_ERROR;
 }
 
 
-ssize_t
+ssize_t 
 Directory::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	return B_ERROR;
 }
 
 
-int32
+int32 
 Directory::Type() const
 {
 	return S_IFDIR;
@@ -336,7 +265,7 @@ Descriptor::~Descriptor()
 }
 
 
-ssize_t
+ssize_t 
 Descriptor::Read(void *buffer, size_t bufferSize)
 {
 	ssize_t bytesRead = fNode->ReadAt(fCookie, fOffset, buffer, bufferSize);
@@ -347,7 +276,7 @@ Descriptor::Read(void *buffer, size_t bufferSize)
 }
 
 
-ssize_t
+ssize_t 
 Descriptor::ReadAt(off_t pos, void *buffer, size_t bufferSize)
 {
 	return fNode->ReadAt(fCookie, pos, buffer, bufferSize);
@@ -422,7 +351,7 @@ status_t
 register_boot_file_system(Directory *volume)
 {
 	gRoot->AddLink("boot", volume);
-
+	
 	Partition *partition;
 	status_t status = gRoot->GetPartitionFor(volume, &partition);
 	if (status != B_OK) {
@@ -647,7 +576,7 @@ open_node(Node *node, int mode)
 		return B_ERROR;
 
 	// get free descriptor
-
+	
 	int fd = 0;
 	for (; fd < MAX_VFS_DESCRIPTORS; fd++) {
 		if (sDescriptors[fd] == NULL)
@@ -659,7 +588,7 @@ open_node(Node *node, int mode)
 	TRACE(("got descriptor %d for node %p\n", fd, node));
 
 	// we got a free descriptor entry, now try to open the node
-
+	
 	void *cookie;
 	status_t status = node->Open(&cookie, mode);
 	if (status < B_OK)
