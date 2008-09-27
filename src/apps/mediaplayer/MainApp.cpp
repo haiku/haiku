@@ -45,12 +45,18 @@ static const char* kMediaServerAddOnSig = "application/x-vnd.Be.addon-host";
 MainApp::MainApp()
 	: BApplication(kAppSig),
 	  fPlayerCount(0),
-	  fFirstWindow(NewWindow()),
+	  //fFirstWindow(NewWindow()),
 	  fSettingsWindow(NULL),
 
 	  fMediaServerRunning(false),
 	  fMediaAddOnServerRunning(false)
 {
+	// XXX: HACK HACK HACK
+	// this works around a locking issue where gMainApp isn't set yet,
+	// while NewWindow() calls Show() which in the window thread calls 
+	// Controller::PlayerActivated() which calls gMainApp->PlayerCount()
+	gMainApp = this;
+	fFirstWindow = NewWindow();
 }
 
 

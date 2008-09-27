@@ -181,8 +181,14 @@ SettingsWindow::SettingsWindow(BRect frame)
 	BView* view = new BView(frame,"SettingsView",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
 	view->SetViewColor(216, 216, 216);
 	
-	BRect btnRect(140.00, frame.bottom - (SPACE + BUTTONHEIGHT), 205.00, 
+	BRect btnRect(80.00, frame.bottom - (SPACE + BUTTONHEIGHT), 145.00, 
 		frame.bottom-SPACE);
+
+	fRevertB = new BButton(btnRect, "revert", "Revert", 
+		new BMessage(M_SETTINGS_REVERT));
+	view->AddChild(fRevertB);
+
+	btnRect.OffsetBy(btnRect.Width() + SPACE, 0);
 	BButton* btn = new BButton(btnRect, "btnCancel", "Cancel", 
 		new BMessage(M_SETTINGS_CANCEL));
 	view->AddChild(btn);
@@ -225,6 +231,14 @@ SettingsWindow::SettingsWindow(BRect frame)
 	rect.OffsetBy(0, rect.Height() + SPACEING);
 	bbox->AddChild(fLoopSoundsCB = new BCheckBox(rect, "chkBoxLoopSounds", "Loop sounds by default",
 		new BMessage(M_LOOP_SOUND)));
+
+	rect.OffsetBy(0, rect.Height() + SPACEING);
+	bbox->AddChild(fUseOverlaysCB = new BCheckBox(rect, "chkBoxUseOverlays", "Use hardware video overlays if available",
+		new BMessage(M_USE_OVERLAYS)));
+
+	rect.OffsetBy(0, rect.Height() + SPACEING);
+	bbox->AddChild(fScaleBilinearCB = new BCheckBox(rect, "chkBoxScaleBilinear", "Scale movies smoothly (non-overlay mode)",
+		new BMessage(M_SCALE_BILINEAR)));
 
 	rect.OffsetBy(0, rect.Height() + SPACE + SPACEING);
 	bbox->AddChild(new BStringView(rect, "stringViewPlayBackg", 
