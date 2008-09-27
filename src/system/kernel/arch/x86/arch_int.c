@@ -756,7 +756,7 @@ unexpected_exception(struct iframe* frame)
 
 		case 13: 	// General Protection Exception (#GP)
 			type = B_GENERAL_PROTECTION_FAULT;
-			signal = SIGKILL;
+			signal = SIGILL;
 			break;
 
 		case 16: 	// x87 FPU Floating-Point Error (#MF)
@@ -780,9 +780,18 @@ unexpected_exception(struct iframe* frame)
 	}
 
 	if (IFRAME_IS_USER(frame)) {
+		struct sigaction action;
+		struct thread* thread = thread_get_current_thread();
+
 		enable_interrupts();
 
-		if (user_debug_exception_occurred(type, signal))
+		// If the thread has a signal handler for the signal, we simply send it
+		// the signal. Otherwise we notify the user debugger first.
+		if (sigaction(signal, NULL, &action) == 0
+			&& action.sa_handler != SIG_DFL
+			&& action.sa_handler != SIG_IGN) {
+			send_signal(thread->id, SIGSEGV);
+		} else if (user_debug_exception_occurred(type, signal))
 			send_signal(team_get_current_team_id(), signal);
 	} else {
 		char name[32];

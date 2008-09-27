@@ -4288,9 +4288,9 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			// TODO: the fault_callback is a temporary solution for vm86
 			if (thread->fault_callback == NULL
 				|| thread->fault_callback(address, faultAddress, isWrite)) {
-				// If the thread has a signal handler for SIGSEGV we simply send
-				// it the signal. Otherwise we notify the user debugger. If
-				// anything goes wrong, we kill the team.
+				// If the thread has a signal handler for SIGSEGV, we simply
+				// send it the signal. Otherwise we notify the user debugger
+				// first.
 				struct sigaction action;
 				if (sigaction(SIGSEGV, NULL, &action) == 0
 					&& action.sa_handler != SIG_DFL
@@ -4298,7 +4298,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 					send_signal(thread->id, SIGSEGV);
 				} else if (user_debug_exception_occurred(B_SEGMENT_VIOLATION,
 						SIGSEGV)) {
-					send_signal(team_get_current_team_id(), SIGKILL);
+					send_signal(thread->id, SIGSEGV);
 				}
 			}
 		}

@@ -383,12 +383,18 @@ handle_signals(struct thread *thread)
 
 					return true;
 
-				case SIGQUIT:
+				case SIGSEGV:
+				case SIGFPE:
 				case SIGILL:
 				case SIGTRAP:
+					// If this is the main thread, we just fall through and let
+					// this signal kill the team. Otherwise we send a SIGKILL to
+					// the main thread first, since the signal will kill this
+					// thread only.
+					if (thread != thread->team->main_thread)
+						send_signal(thread->team->main_thread->id, SIGKILL);
+				case SIGQUIT:
 				case SIGABRT:
-				case SIGFPE:
-				case SIGSEGV:
 				case SIGPOLL:
 				case SIGPROF:
 				case SIGSYS:
