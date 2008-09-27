@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2008, Haiku, Inc. All rights reserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -654,6 +654,9 @@ cd_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 	cd_handle* handle = (cd_handle*)cookie;
 	size_t length = *_length;
 
+	if (handle->info->capacity == 0)
+		return B_DEV_NO_MEDIA;
+
 	IORequest request;
 	status_t status = request.Init(pos, buffer, length, false, 0);
 	if (status != B_OK)
@@ -679,6 +682,9 @@ cd_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 	cd_handle* handle = (cd_handle*)cookie;
 	size_t length = *_length;
 
+	if (handle->info->capacity == 0)
+		return B_DEV_NO_MEDIA;
+
 	IORequest request;
 	status_t status = request.Init(pos, (void*)buffer, length, true, 0);
 	if (status != B_OK)
@@ -703,6 +709,9 @@ cd_io(void* cookie, io_request* request)
 {
 	cd_handle* handle = (cd_handle*)cookie;
 
+	if (handle->info->capacity == 0)
+		return B_DEV_NO_MEDIA;
+
 	return handle->info->io_scheduler->ScheduleRequest(request);
 }
 
@@ -713,7 +722,7 @@ cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	cd_handle* handle = (cd_handle*)cookie;
 	cd_driver_info *info = handle->info;
 
-	TRACE("ioctl(op = %d)\n", op);
+	TRACE("ioctl(op = %lu)\n", op);
 
 	switch (op) {
 		case B_GET_DEVICE_SIZE:
