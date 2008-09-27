@@ -392,7 +392,8 @@ load_module_image(const char* path, module_image** _moduleImage)
 	status_t status;
 	image_id image;
 
-	TRACE(("load_module_image(path = \"%s\", _image = %p)\n", path, _moduleImage));
+	TRACE(("load_module_image(path = \"%s\", _image = %p)\n", path,
+		_moduleImage));
 	ASSERT_LOCKED_RECURSIVE(&sModulesLock);
 	ASSERT(_moduleImage != NULL);
 
@@ -410,7 +411,8 @@ load_module_image(const char* path, module_image** _moduleImage)
 
 	if (get_image_symbol(image, "modules", B_SYMBOL_TYPE_DATA,
 			(void**)&moduleImage->info) != B_OK) {
-		TRACE(("load_module_image: Failed to load \"%s\" due to lack of 'modules' symbol\n", path));
+		TRACE(("load_module_image: Failed to load \"%s\" due to lack of "
+			"'modules' symbol\n", path));
 		status = B_BAD_TYPE;
 		goto err1;
 	}
@@ -430,6 +432,8 @@ load_module_image(const char* path, module_image** _moduleImage)
 	moduleImage->ref_count = 0;
 
 	hash_insert(sModuleImagesHash, moduleImage);
+
+	TRACE(("load_module_image(\"%s\"): image loaded: %p\n", path, moduleImage));
 
 	*_moduleImage = moduleImage;
 	return B_OK;
@@ -524,7 +528,8 @@ create_module(module_info* info, int offset, module** _module)
 
 	module = (struct module*)hash_lookup(sModulesHash, info->name);
 	if (module) {
-		FATAL(("Duplicate module name (%s) detected... ignoring new one\n", info->name));
+		FATAL(("Duplicate module name (%s) detected... ignoring new one\n",
+			info->name));
 		return B_FILE_EXISTS;
 	}
 
@@ -727,7 +732,8 @@ init_module(module* module)
 
 			// init module
 
-			TRACE(("initializing module %s (at %p)... \n", module->name, module->info->std_ops));
+			TRACE(("initializing module %s (at %p)... \n", module->name,
+				module->info->std_ops));
 
 			if (module->info->std_ops != NULL)
 				status = module->info->std_ops(B_MODULE_INIT);
@@ -752,11 +758,13 @@ init_module(module* module)
 			return B_ERROR;
 
 		case MODULE_UNINIT:
-			FATAL(("tried to load module %s which is currently unloading\n", module->name));
+			FATAL(("tried to load module %s which is currently unloading\n",
+				module->name));
 			return B_ERROR;
 
 		case MODULE_ERROR:
-			FATAL(("cannot load module %s because its earlier unloading failed\n", module->name));
+			FATAL(("cannot load module %s because its earlier unloading "
+				"failed\n", module->name));
 			return B_ERROR;
 
 		default:
@@ -778,11 +786,13 @@ uninit_module(module* module)
 			return B_NO_ERROR;
 
 		case MODULE_INIT:
-			panic("Trying to unload module %s which is initializing\n", module->name);
+			panic("Trying to unload module %s which is initializing\n",
+				module->name);
 			return B_ERROR;
 
 		case MODULE_UNINIT:
-			panic("Trying to unload module %s which is un-initializing\n", module->name);
+			panic("Trying to unload module %s which is un-initializing\n",
+				module->name);
 			return B_ERROR;
 
 		case MODULE_READY:
@@ -877,7 +887,8 @@ iterator_get_next_module(module_iterator* iterator, char* buffer,
 	TRACE(("iterator_get_next_module() -- start\n"));
 
 	if (iterator->builtin_modules) {
-		for (int32 i = iterator->module_offset; sBuiltInModules[i] != NULL; i++) {
+		for (int32 i = iterator->module_offset; sBuiltInModules[i] != NULL;
+				i++) {
 			// the module name must fit the prefix
 			if (strncmp(sBuiltInModules[i]->name, iterator->prefix,
 					iterator->prefix_length)
@@ -1062,10 +1073,13 @@ register_builtin_modules(struct module_info** info)
 {
 	for (; *info; info++) {
 		(*info)->flags |= B_BUILT_IN_MODULE;
-			// this is an internal flag, it doesn't have to be set by modules itself
+			// this is an internal flag, it doesn't have to be set by modules
+			// itself
 
-		if (create_module(*info, -1, NULL) != B_OK)
-			dprintf("creation of built-in module \"%s\" failed!\n", (*info)->name);
+		if (create_module(*info, -1, NULL) != B_OK) {
+			dprintf("creation of built-in module \"%s\" failed!\n",
+				(*info)->name);
+		}
 	}
 }
 
@@ -1078,7 +1092,8 @@ register_preloaded_module_image(struct preloaded_image* image)
 	status_t status;
 	int32 index = 0;
 
-	TRACE(("register_preloaded_module_image(image = \"%s\")\n", image->name));
+	TRACE(("register_preloaded_module_image(image = %p, name = \"%s\")\n",
+		image, image->name));
 
 	image->is_module = false;
 
@@ -1148,9 +1163,10 @@ dump_modules(int argc, char** argv)
 	hash_rewind(sModulesHash, &iterator);
 	kprintf("-- known modules:\n");
 
-	while ((module = (struct module*)hash_next(sModulesHash, &iterator)) != NULL) {
-		kprintf("%p: \"%s\", \"%s\" (%ld), refcount = %ld, state = %d, mimage = %p\n",
-			module, module->name,
+	while ((module = (struct module*)hash_next(sModulesHash, &iterator))
+			!= NULL) {
+		kprintf("%p: \"%s\", \"%s\" (%ld), refcount = %ld, state = %d, "
+			"mimage = %p\n", module, module->name,
 			module->module_image ? module->module_image->path : "",
 			module->offset, module->ref_count, module->state,
 			module->module_image);
@@ -1159,9 +1175,10 @@ dump_modules(int argc, char** argv)
 	hash_rewind(sModuleImagesHash, &iterator);
 	kprintf("\n-- loaded module images:\n");
 
-	while ((image = (struct module_image*)hash_next(sModuleImagesHash, &iterator)) != NULL) {
-		kprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld\n", image,
-			image->path, image->image, image->info, image->ref_count);
+	while ((image = (struct module_image*)hash_next(sModuleImagesHash,
+				&iterator)) != NULL) {
+		kprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld\n",
+			image, image->path, image->image, image->info, image->ref_count);
 	}
 	return 0;
 }
@@ -1818,6 +1835,7 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 	// available, we can load an image when we need it.
 	// When the boot volume is also where the boot loader pre-loaded the images
 	// from, we get the actual paths for those images.
+	TRACE(("module_init_post_boot_device(%d)\n", bootingFromBootLoaderVolume));
 
 	RecursiveLocker _(sModulesLock);
 
@@ -1828,8 +1846,12 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 	struct module* module;
 	while ((module = (struct module*)hash_next(sModulesHash, &iterator))
 			!= NULL) {
-		if (module->ref_count == 0 && (module->flags & B_BUILT_IN_MODULE) == 0)
+		if (module->ref_count == 0
+			&& (module->flags & B_BUILT_IN_MODULE) == 0) {
+			TRACE(("  module %p, \"%s\" unused, clearing image\n", module,
+				module->name));
 			module->module_image = NULL;
+		}
 	}
 
 	// Now iterate through the images and drop them respectively normalize their
@@ -1848,6 +1870,8 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 
 		if (image->ref_count == 0) {
 			// not in use -- unload it
+			TRACE(("  module image %p, \"%s\" unused, removing\n", image,
+				image->path));
 			hash_remove_current(sModuleImagesHash, &iterator);
 			unload_module_image(image, false);
 		} else if (bootingFromBootLoaderVolume) {
@@ -1893,6 +1917,9 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 			}
 
 			if (pathNormalized) {
+				TRACE(("  normalized path of module image %p, \"%s\" -> "
+					"\"%s\"\n", image, image->path, pathBuffer.Path()));
+
 				// set the new path
 				free(image->path);
 				size_t pathLen = pathBuffer.Length();
@@ -1904,6 +1931,9 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 				hash_remove_current(sModuleImagesHash, &iterator);
 				image->next = imagesToReinsert;
 				imagesToReinsert = image;
+			} else {
+				dprintf("module_init_post_boot_device() failed to normalize "
+					"path of module image %p, \"%s\"\n", image, image->path);
 			}
 		}
 	}
@@ -1913,6 +1943,8 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 		imagesToReinsert = image->next;
 		hash_insert(sModuleImagesHash, image);
 	}
+
+	TRACE(("module_init_post_boot_device() done\n"));
 
 	return B_OK;
 }
