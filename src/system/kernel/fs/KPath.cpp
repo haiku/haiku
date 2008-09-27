@@ -293,8 +293,18 @@ KPath::Normalize(bool traverseLeafLink)
 	if (fPathLength == 0)
 		return B_BAD_VALUE;
 
-	return vfs_normalize_path(fBuffer, fBuffer, fBufferSize, traverseLeafLink,
+	status_t error = vfs_normalize_path(fBuffer, fBuffer, fBufferSize,
+		traverseLeafLink,
 		team_get_kernel_team_id() == team_get_current_team_id());
+	if (error != B_OK) {
+		// vfs_normalize_path() might have screwed up the previous path -- unset
+		// it completely to avoid weird problems.
+		fBuffer[0] = '\0';
+		fPathLength = 0;
+	}
+
+	fPathLength = strlen(fBuffer);
+	return B_OK;
 }
 
 
