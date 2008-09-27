@@ -1,6 +1,6 @@
 /*
- * ring buffer funcs
- * (c) 2003, François Revol, revol@free.fr
+ * Copyright 2004-2008, FranÃ§ois Revol, <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
  */
 
 #define _BUILDING_fs 1

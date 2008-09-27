@@ -1,6 +1,10 @@
 /*
- * googlefs - 
- * (c) 2004, 2005, François Revol, revol@free.fr
+ * Copyright 2004-2008, François Revol, <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
+
+/*
+ * googlefs - a bookmark-populated virtual filesystem using Google results.
  */
 
 #define _BUILDING_fs 1

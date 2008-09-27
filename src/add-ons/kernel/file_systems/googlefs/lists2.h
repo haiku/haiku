@@ -1,6 +1,8 @@
+/*
+ * Copyright 2004-2008, François Revol, <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
 /* good old single linked list stuff */
-/* revol@free.fr */
-
 #ifndef _LISTS2_H
 #define _LISTS2_H
 

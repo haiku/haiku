@@ -1,3 +1,8 @@
+/*
+ * Copyright 2004-2008, François Revol, <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <SupportDefs.h>
 #include <TypeConstants.h>
 #include "googlefs.h"
@@ -544,7 +549,7 @@ struct attr_entry text_attrs[] = {
 
 char *readmestr = \
 "Welcome to the Google™ FileSystem for BeOS™, Zeta™ and Haiku™.\n"
-"Copyright© 2004, 2005, François Revol.\n"
+"Copyright© 2004-2008, François Revol.\n"
 "Google is a trademark of Google, Inc.\n"
 "BeOS is a trademark of ACCESS.\n"
 "Zeta is a trademark of yellowTAB GmbH.\n"

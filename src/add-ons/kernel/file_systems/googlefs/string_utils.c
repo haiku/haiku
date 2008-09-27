@@ -1,3 +1,8 @@
+/*
+ * Copyright 2004-2008, François Revol, <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <malloc.h>
 #include <string.h>
 #include "string_utils.h"
