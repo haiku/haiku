@@ -431,6 +431,7 @@ load_module_image(const char* path, module_image** _moduleImage)
 	moduleImage->image = image;
 	moduleImage->ref_count = 0;
 
+TRACE(("load_module_image() inserting image %p, %s\n", moduleImage, moduleImage->path));
 	hash_insert(sModuleImagesHash, moduleImage);
 
 	TRACE(("load_module_image(\"%s\"): image loaded: %p\n", path, moduleImage));
@@ -463,7 +464,10 @@ unload_module_image(module_image* moduleImage, bool remove)
 	}
 
 	if (remove)
+{
+TRACE(("unload_module_image() removing image %p, %s\n", moduleImage, moduleImage->path));
 		hash_remove(sModuleImagesHash, moduleImage);
+}
 
 	unload_kernel_add_on(moduleImage->image);
 	free(moduleImage->path);
@@ -1131,6 +1135,7 @@ register_preloaded_module_image(struct preloaded_image* image)
 	moduleImage->image = image->id;
 	moduleImage->ref_count = 0;
 
+TRACE(("register_preloaded_module_image() inserting image %p, %s\n", moduleImage, moduleImage->path));
 	hash_insert(sModuleImagesHash, moduleImage);
 
 	for (info = moduleImage->info; *info; info++) {
@@ -1836,6 +1841,9 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 	// When the boot volume is also where the boot loader pre-loaded the images
 	// from, we get the actual paths for those images.
 	TRACE(("module_init_post_boot_device(%d)\n", bootingFromBootLoaderVolume));
+#ifdef TRACE_MODULE
+hash_dump_table(sModuleImagesHash);
+#endif
 
 	RecursiveLocker _(sModulesLock);
 
@@ -1941,9 +1949,13 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 	// re-insert the images that have got a new path
 	while (module_image* image = imagesToReinsert) {
 		imagesToReinsert = image->next;
+TRACE(("module_init_post_boot_device() re-inserting image %p, %s\n", image, image->path));
 		hash_insert(sModuleImagesHash, image);
 	}
 
+#ifdef TRACE_MODULE
+hash_dump_table(sModuleImagesHash);
+#endif
 	TRACE(("module_init_post_boot_device() done\n"));
 
 	return B_OK;
