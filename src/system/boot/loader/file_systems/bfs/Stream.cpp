@@ -137,6 +137,10 @@ Stream::InitCheck()
 status_t
 Stream::GetNextSmallData(const small_data **_smallData) const
 {
+	// TODO: Stream derives from bfs_inode and we read only sizeof(bfs_inode)
+	// bytes from disk, i.e. the small data region is not in memory.
+	panic("Stream::GetNextSmallData(): small data region is not loaded!");
+
 	const small_data *smallData = *_smallData;
 
 	// begin from the start?
@@ -155,7 +159,7 @@ Stream::GetNextSmallData(const small_data **_smallData) const
 }
 
 
-status_t 
+status_t
 Stream::GetName(char *name, size_t size) const
 {
 	const small_data *smallData = NULL;
@@ -170,7 +174,7 @@ Stream::GetName(char *name, size_t size) const
 }
 
 
-status_t 
+status_t
 Stream::ReadLink(char *buffer, size_t bufferSize)
 {
 	// link in the stream
@@ -415,7 +419,7 @@ Stream::NodeFactory(Volume &volume, off_t id)
 //	#pragma mark -
 
 
-status_t 
+status_t
 bfs_inode::InitCheck(Volume *volume)
 {
 	if (Flags() & INODE_NOT_READY) {
