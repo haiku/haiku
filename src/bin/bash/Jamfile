@@ -12,10 +12,10 @@ SubDirSysHdrs [ FDirName $(SUBDIR) include ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) lib ] ;
 SubDirSysHdrs $(SUBDIR) ;
 
-BuildPlatformMain mksyntax : 
+BuildPlatformMain mksyntax :
 	mksyntax.c ;
 
-BuildPlatformMain mksignames : 
+BuildPlatformMain mksignames :
 	mksignames.c ;
 
 SEARCH on [ FGristFiles mksignames.c ] = [ FDirName $(SUBDIR) support ] ;
@@ -84,7 +84,7 @@ BinCommand sh :
 Includes [ FGristFiles trap.c ] : <bash>signames.h ;
 
 # some sources include the generated builtext.h
-Includes [ FGristFiles execute_cmd.c nojobs.c parse.c ] : <bash>builtext.h ;
+Includes [ FGristFiles execute_cmd.c jobs.c parse.c ] : <bash>builtext.h ;
 
 SubInclude HAIKU_TOP src bin bash lib ;
 SubInclude HAIKU_TOP src bin bash builtins ;
