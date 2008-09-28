@@ -56,9 +56,9 @@ bus_std_ops(int32 op, ...)
 				return ENODEV;
 			}
 
+			gUSBStack = stack;
 #ifndef __HAIKU__
 			// Plain R5 workaround, see comment above.
-			gUSBStack = stack;
 			shared = create_area("shared usb stack", &address,
 				B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_NO_LOCK,
 				B_KERNEL_WRITE_AREA);
