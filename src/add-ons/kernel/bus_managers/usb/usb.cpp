@@ -24,6 +24,12 @@ bus_std_ops(int32 op, ...)
 			if (gUSBStack)
 				return B_OK;
 
+#ifndef __HAIKU__
+			// This code is to handle plain R5 (non-BONE) where the same module
+			// gets loaded multiple times (once for each exported module
+			// interface, the USB v2 and v3 API in our case). We don't want to
+			// ever create multiple stacks however, so we "share" the same stack
+			// for both modules by storing it's address in a shared area.
 			void *address = NULL;
 			area_id shared = find_area("shared usb stack");
 			if (shared >= B_OK && clone_area("usb stack clone", &address,
@@ -32,6 +38,7 @@ bus_std_ops(int32 op, ...)
 				TRACE(("usb_module: found shared stack at %p\n", gUSBStack));
 				return B_OK;
 			}
+#endif
 
 #ifdef TRACE_USB
 			set_dprintf_enabled(true);
@@ -49,14 +56,15 @@ bus_std_ops(int32 op, ...)
 				return ENODEV;
 			}
 
+#ifndef __HAIKU__
+			// Plain R5 workaround, see comment above.
 			gUSBStack = stack;
 			shared = create_area("shared usb stack", &address,
 				B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_NO_LOCK,
 				B_KERNEL_WRITE_AREA);
-			if (shared >= B_OK) {
+			if (shared >= B_OK)
 				*((Stack **)address) = gUSBStack;
-				return B_OK;
-			}
+#endif
 			break;
 		}
 
