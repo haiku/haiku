@@ -119,7 +119,7 @@ get_device_descriptor(usb_device device)
 
 
 const usb_configuration_info *
-get_nth_configuration(usb_device device, uint index)
+get_nth_configuration(usb_device device, uint32 index)
 {
 	TRACE(("usb_module: get_nth_configuration(%ld, %d)\n", device, index));
 	Object *object = gUSBStack->GetObject(device);
@@ -355,6 +355,102 @@ usb_ioctl(uint32 opcode, void *buffer, size_t bufferSize)
 }
 
 
+status_t
+get_nth_roothub(uint32 index, usb_device *rootHub)
+{
+	if (!rootHub)
+		return B_BAD_VALUE;
+
+	BusManager *busManager = gUSBStack->BusManagerAt(index);
+	if (!busManager)
+		return B_ENTRY_NOT_FOUND;
+
+	Hub *hub = busManager->GetRootHub();
+	if (!hub)
+		return B_NO_INIT;
+
+	*rootHub = hub->USBID();
+	return B_OK;
+}
+
+
+status_t
+get_nth_child(usb_device _hub, uint8 index, usb_device *childDevice)
+{
+	if (!childDevice)
+		return B_BAD_VALUE;
+
+	Object *object = gUSBStack->GetObject(_hub);
+	if (!object || (object->Type() & USB_OBJECT_HUB) == 0)
+		return B_DEV_INVALID_PIPE;
+
+	Hub *hub = (Hub *)object;
+	for (uint8 i = 0; i < 8; i++) {
+		if (hub->ChildAt(i) == NULL)
+			continue;
+
+		if (index-- > 0)
+			continue;
+
+		*childDevice = hub->ChildAt(i)->USBID();
+		return B_OK;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+get_device_parent(usb_device _device, usb_device *parentHub, uint8 *portIndex)
+{
+	if (!parentHub || !portIndex)
+		return B_BAD_VALUE;
+
+	Object *object = gUSBStack->GetObject(_device);
+	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
+		return B_DEV_INVALID_PIPE;
+
+	Object *parent = object->Parent();
+	if (!parent || (parent->Type() & USB_OBJECT_HUB) == 0)
+		return B_ENTRY_NOT_FOUND;
+
+	Hub *hub = (Hub *)parent;
+	for (uint8 i = 0; i < 8; i++) {
+		if (hub->ChildAt(i) == object) {
+			*portIndex = i;
+			*parentHub = hub->USBID();
+			return B_OK;
+		}
+	}
+
+	return B_ERROR;
+}
+
+
+status_t
+reset_port(usb_device _hub, uint8 portIndex)
+{
+	Object *object = gUSBStack->GetObject(_hub);
+	if (!object || (object->Type() & USB_OBJECT_HUB) == 0)
+		return B_DEV_INVALID_PIPE;
+
+	Hub *hub = (Hub *)object;
+	return hub->ResetPort(portIndex);
+}
+
+
+status_t
+disable_port(usb_device _hub, uint8 portIndex)
+{
+	Object *object = gUSBStack->GetObject(_hub);
+	if (!object || (object->Type() & USB_OBJECT_HUB) == 0)
+		return B_DEV_INVALID_PIPE;
+
+	Hub *hub = (Hub *)object;
+	return hub->DisablePort(portIndex);
+}
+
+
 /*
 	This module exports the USB API v3
 */
@@ -389,7 +485,12 @@ struct usb_module_info gModuleInfoV3 = {
 	queue_request,						// queue_request
 	set_pipe_policy,					// set_pipe_policy
 	cancel_queued_transfers,			// cancel_queued_transfers
-	usb_ioctl							// usb_ioctl
+	usb_ioctl,							// usb_ioctl
+	get_nth_roothub,					// get_nth_roothub
+	get_nth_child,						// get_nth_child
+	get_device_parent,					// get_device_parent
+	reset_port,							// reset_port
+	disable_port						// disable_port
 };
 
 

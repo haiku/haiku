@@ -129,7 +129,7 @@ struct usb_module_info {
 
 	/* Get the nth supported configuration of a device*/
 	const usb_configuration_info	*(*get_nth_configuration)(usb_device device,
-										uint index);
+										uint32 index);
 
 	/* Get the current configuration */
 	const usb_configuration_info	*(*get_configuration)(usb_device device);
@@ -211,9 +211,47 @@ struct usb_module_info {
 	/* Cancel all pending async requests in a pipe */
 	status_t						(*cancel_queued_transfers)(usb_pipe pipe);
 
-	/* tuning, timeouts, etc */
+	/* Tuning, configuration of timeouts, etc */
 	status_t						(*usb_ioctl)(uint32 opcode, void *buffer,
 										size_t bufferSize);
+
+	/*
+	 * Enumeration of device topology - With these commands you can enumerate
+	 * the roothubs and enumerate child devices of hubs. Note that the index
+	 * provided to get_nth_child does not map to the port where the child
+	 * device is attached to. To get this information you would call
+	 * get_device_parent which provides you with the parent hub and the port
+	 * index of a device. To test whether an enumerated child is a hub you
+	 * can either examine the device descriptor or you can call get_nth_child
+	 * and check the returned status. A value of B_OK indicates that the call
+	 * succeeded and the returned info is valid, B_ENTRY_NOT_FOUND indicates
+	 * that you have reached the last index. Any other error indicates that
+	 * the provided arguments are invalid (i.e. not a hub or invalid pointers)
+	 * or an internal error occured. Note that there are no guarantees that
+	 * the device handle you get stays valid while you are using it. If it gets
+	 * invalid any further use will simply return an error. You should install
+	 * notify hooks to avoid such situations.
+	 */
+	status_t						(*get_nth_roothub)(uint32 index,
+										usb_device *rootHub);
+	status_t						(*get_nth_child)(usb_device hub,
+										uint8 index, usb_device *childDevice);
+	status_t						(*get_device_parent)(usb_device device,
+										usb_device *parentHub,
+										uint8 *portIndex);
+
+	/*
+	 * Hub interaction - These commands are only valid when used with a hub
+	 * device handle. Use reset_port to trigger a reset of the port with index
+	 * portIndex. This will cause a disconnect event for the attached device.
+	 * With disable_port you can specify that the port at portIndex shall be
+	 * disabled. This will also cause a disconnect event for the attached
+	 * device. Use reset_port to reenable a previously disabled port.
+	 */
+	status_t						(*reset_port)(usb_device hub,
+										uint8 portIndex);
+	status_t						(*disable_port)(usb_device hub,
+										uint8 portIndex);
 };
 
 
