@@ -224,7 +224,7 @@ actions RunCommandLine1 {
 		eval "${target}=${t}"
 	done
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(COMMAND_LINE)
+	"$(COMMAND_LINE)"
 }
 
 
