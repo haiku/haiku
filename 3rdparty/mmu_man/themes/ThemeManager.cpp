@@ -194,6 +194,7 @@ status_t ThemeManager::LoadAddons()
 	ADDA(ta);
 #endif
 	ta = instantiate_themes_addon_sounds();
+	ADDA(ta);
 	ta = instantiate_themes_addon_terminal();
 	ADDA(ta);
 #if defined(__HAIKU__) || defined(B_BEOS_VERSION_DANO)
