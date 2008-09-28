@@ -11,7 +11,7 @@
 
 
 #define MLEN		((int)(MSIZE - sizeof(struct m_hdr)))
-#define MHLEN		((int)(MSIZE - sizeof(struct pkthdr)))
+#define MHLEN		((int)(MLEN - sizeof(struct pkthdr)))
 
 #define MINCLSIZE	(MHLEN + 1)
 
