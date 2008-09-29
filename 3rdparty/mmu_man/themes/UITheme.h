@@ -83,6 +83,11 @@
 #define B_UI_SETTINGS_CHANGED '_UIC'
 #endif
 
+#define R5_DECOR_BEOS 0
+#define R5_DECOR_WIN95 1
+#define R5_DECOR_AMIGA 2
+#define R5_DECOR_MAC 3
+
 #ifndef __HAIKU__
 #ifndef B_BEOS_VERSION_DANO
 // R5 compatibility

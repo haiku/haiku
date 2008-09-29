@@ -26,6 +26,7 @@
 #include "ThemesAddon.h"
 #include "ThemeImporter.h"
 #include "BeThemeImporter.h"
+#include "MSThemeImporter.h"
 
 #include "ParseMessage.h"
 #include "DumpMessage.h"
@@ -58,6 +59,7 @@ ThemeManager::ThemeManager()
 
 	// XXX: add more
 	fThemeImporters.AddItem(new BeThemeImporter());
+	fThemeImporters.AddItem(new MSThemeImporter());
 	
 	// XXX test
 /*

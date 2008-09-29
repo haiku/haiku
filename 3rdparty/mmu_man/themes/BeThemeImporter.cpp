@@ -43,6 +43,7 @@ BeThemeImporter::BeThemeImporter()
 	FENTRY;
 	BVolumeRoster r;
 	BVolume v;
+	// TODO: query all volumes ?
 	r.GetBootVolume(&v);
 	fQuery.Clear();
 	fQuery.SetVolume(&v);
@@ -89,7 +90,7 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 	if (err < 0)
 		return B_ERROR;
 	PRINT(("BeThemeImporter: importing from '%s'\n", path.Path()));
-		
+
 	BMessage global(Z_THEME_MESSAGE_WHAT);
 	BMessage info;
 	BMessage decor;

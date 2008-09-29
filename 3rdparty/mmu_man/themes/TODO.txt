@@ -1,7 +1,6 @@
 TODOs for Theme manager:
 * check R5 build
 * style cleanup (-> Haiku style)
-* enable theme comments again (tooltip on listitem ?).
 * make ParseMessage more robust
 * forbid quitting while themes are loading!
 * implement BackupFiles() methods to add required files to a zip.
@@ -15,8 +14,10 @@ TODOs for Theme manager:
 	- Deskbar logo (Be, leaf...)
 	- dircolors (cf. http://linux.die.net/man/5/dir_colors )
 	- icons (/etc/icons ? svg/hvif, setmime...)
+	- Tracker usage bar colors
 	- mouse cursors (needs app_server fixes ??)
 	- Pulse colors (-> sample code)
 	- BeIDE/Pe/Eddie full colors (map to singe namespace)
+	- Vision/BeShare full colors (map to singe namespace)
 	- Firefox theme ?
 

@@ -30,6 +30,7 @@ Application <3rdparty>Themes :
 	CompareMessages.cpp
 	DumpMessage.cpp
 	MakeScreenshot.cpp
+	MSThemeImporter.cpp
 	ParseMessage.cpp
 	TextInputAlert.cpp
 	ThemeAddonItem.cpp
@@ -42,7 +43,8 @@ Application <3rdparty>Themes :
 	Utils.cpp
 	ViewItem.cpp
 	$(addonSources)
-	: be media translation $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
+	: be media textencoding translation 
+	  $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
 	: Themes.rdef
 ;
 
