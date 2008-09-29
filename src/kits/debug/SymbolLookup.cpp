@@ -476,21 +476,23 @@ SymbolLookup::Init()
 			}
 		}
 
-		if (!remoteDebugArea) {
+		if (remoteDebugArea) {
+			TRACE(("SymbolLookup::Init(): found debug area, translating "
+				"address...\n"));
+		} else {
 			TRACE(("SymbolLookup::Init(): Couldn't find debug area!\n"));
-			return B_ERROR;
 		}
-
-		TRACE(("SymbolLookup::Init(): found debug area, translating address...\n"));
 
 		// translate the address
 		try {
-			fDebugArea = &Read(*remoteDebugArea);
+			if (remoteDebugArea != NULL) {
+				fDebugArea = &Read(*remoteDebugArea);
 
-			TRACE(("SymbolLookup::Init(): translated debug area is at: %p, "
-				"loaded_images: %p\n", fDebugArea, fDebugArea->loaded_images));
+				TRACE(("SymbolLookup::Init(): translated debug area is at: %p, "
+					"loaded_images: %p\n", fDebugArea, fDebugArea->loaded_images));
+			}
 		} catch (Exception exception) {
-			return exception.Error();
+			// we can live without the debug area
 		}
 	}
 
