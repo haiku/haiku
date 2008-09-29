@@ -39,7 +39,7 @@ public:
 		fImage->AddReference();
 	}
 
-	~ThreadImage()
+	virtual ~ThreadImage()
 	{
 		fImage->RemoveReference();
 	}
@@ -260,15 +260,12 @@ ThreadProfileResult::SetInterval(bigtime_t interval)
 
 // #pragma mark - AbstractThreadProfileResult
 
+
 AbstractThreadProfileResult::AbstractThreadProfileResult()
 	:
 	fImages(),
 	fNewImages(),
-	fOldImages(),
-	fTotalTicks(0),
-	fUnkownTicks(0),
-	fDroppedTicks(0),
-	fTotalSampleCount(0)
+	fOldImages()
 {
 }
 
@@ -283,16 +280,9 @@ AbstractThreadProfileResult::~AbstractThreadProfileResult()
 
 
 status_t
-AbstractThreadProfileResult::Init(Thread* thread)
-{
-	return ThreadProfileResult::Init(thread);
-}
-
-
-status_t
 AbstractThreadProfileResult::AddImage(Image* image)
 {
-	ThreadImage* threadImage = new(std::nothrow) ThreadImage(image);
+	ThreadImage* threadImage = CreateThreadImage(image);
 	if (threadImage == NULL)
 		return B_NO_MEMORY;
 
@@ -347,70 +337,28 @@ AbstractThreadProfileResult::FindImage(addr_t address) const
 }
 
 
-void
-AbstractThreadProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
+// #pragma mark - BasicThreadProfileResult
+
+
+BasicThreadProfileResult::BasicThreadProfileResult()
+	:
+	fTotalTicks(0),
+	fUnkownTicks(0),
+	fDroppedTicks(0),
+	fTotalSampleCount(0)
 {
-	if (gOptions.analyze_full_stack) {
-		// Sort the samples. This way hits of the same symbol are
-		// successive and we can avoid incrementing the hit count of the
-		// same symbol twice. Same for images.
-		std::sort(samples, samples + sampleCount);
-
-		int32 unknownSamples = 0;
-		ThreadImage* previousImage = NULL;
-		int32 previousSymbol = -1;
-
-		for (int32 i = 0; i < sampleCount; i++) {
-			addr_t address = samples[i];
-			ThreadImage* image = FindImage(address);
-			int32 symbol = -1;
-			if (image != NULL) {
-				symbol = image->GetImage()->FindSymbol(address);
-				if (symbol < 0) {
-					// TODO: Count unknown image hits?
-				} else if (symbol != previousSymbol)
-					image->AddSymbolHit(symbol);
-
-				if (image != previousImage)
-					image->AddImageHit();
-			} else
-				unknownSamples++;
-
-			previousImage = image;
-			previousSymbol = symbol;
-		}
-
-		if (unknownSamples == sampleCount)
-			fUnkownTicks++;
-	} else {
-		ThreadImage* image = NULL;
-		for (int32 k = 0; k < sampleCount; k++) {
-			addr_t address = samples[k];
-			image = FindImage(address);
-			if (image != NULL) {
-				image->AddHit(address);
-				break;
-			}
-		}
-
-		if (image == NULL)
-			fUnkownTicks++;
-	}
-
-	fTotalTicks++;
-	fTotalSampleCount += sampleCount;
 }
 
 
 void
-AbstractThreadProfileResult::AddDroppedTicks(int32 dropped)
+BasicThreadProfileResult::AddDroppedTicks(int32 dropped)
 {
 	fDroppedTicks += dropped;
 }
 
 
 void
-AbstractThreadProfileResult::PrintResults()
+BasicThreadProfileResult::PrintResults()
 {
 	// count images and symbols
 	int32 imageCount = 0;
@@ -523,3 +471,76 @@ AbstractThreadProfileResult::PrintResults()
 		fprintf(gOptions.output, "  no functions were hit\n");
 }
 
+
+ThreadImage*
+BasicThreadProfileResult::CreateThreadImage(Image* image)
+{
+	return new(std::nothrow) ThreadImage(image);
+}
+
+
+// #pragma mark - InclusiveThreadProfileResult
+
+
+void
+InclusiveThreadProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
+{
+	// Sort the samples. This way hits of the same symbol are
+	// successive and we can avoid incrementing the hit count of the
+	// same symbol twice. Same for images.
+	std::sort(samples, samples + sampleCount);
+
+	int32 unknownSamples = 0;
+	ThreadImage* previousImage = NULL;
+	int32 previousSymbol = -1;
+
+	for (int32 i = 0; i < sampleCount; i++) {
+		addr_t address = samples[i];
+		ThreadImage* image = FindImage(address);
+		int32 symbol = -1;
+		if (image != NULL) {
+			symbol = image->GetImage()->FindSymbol(address);
+			if (symbol < 0) {
+				// TODO: Count unknown image hits?
+			} else if (symbol != previousSymbol)
+				image->AddSymbolHit(symbol);
+
+			if (image != previousImage)
+				image->AddImageHit();
+		} else
+			unknownSamples++;
+
+		previousImage = image;
+		previousSymbol = symbol;
+	}
+
+	if (unknownSamples == sampleCount)
+		fUnkownTicks++;
+
+	fTotalTicks++;
+	fTotalSampleCount += sampleCount;
+}
+
+
+// #pragma mark - ExclusiveThreadProfileResult
+
+
+void
+ExclusiveThreadProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
+{
+	ThreadImage* image = NULL;
+	for (int32 k = 0; k < sampleCount; k++) {
+		addr_t address = samples[k];
+		image = FindImage(address);
+		if (image != NULL) {
+			image->AddHit(address);
+			break;
+		}
+	}
+
+	if (image == NULL)
+		fUnkownTicks++;
+
+	fTotalTicks++;
+	fTotalSampleCount += sampleCount;
+}

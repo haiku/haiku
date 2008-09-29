@@ -80,17 +80,17 @@ public:
 								AbstractThreadProfileResult();
 	virtual						~AbstractThreadProfileResult();
 
-	virtual	status_t			Init(Thread* thread);
-
 	virtual	status_t			AddImage(Image* image);
 	virtual	void				SynchronizeImages(int32 event);
 
 			ThreadImage*		FindImage(addr_t address) const;
 
 	virtual	void				AddSamples(addr_t* samples,
-									int32 sampleCount);
-	virtual	void				AddDroppedTicks(int32 dropped);
-	virtual	void				PrintResults();
+									int32 sampleCount) = 0;
+	virtual	void				AddDroppedTicks(int32 dropped) = 0;
+	virtual	void				PrintResults() = 0;
+
+	virtual ThreadImage*		CreateThreadImage(Image* image) = 0;
 
 protected:
 	typedef DoublyLinkedList<ThreadImage>	ImageList;
@@ -98,10 +98,37 @@ protected:
 			ImageList			fImages;
 			ImageList			fNewImages;
 			ImageList			fOldImages;
+};
+
+
+class BasicThreadProfileResult : public AbstractThreadProfileResult {
+public:
+								BasicThreadProfileResult();
+
+	virtual	void				AddDroppedTicks(int32 dropped);
+	virtual	void				PrintResults();
+
+	virtual ThreadImage*		CreateThreadImage(Image* image);
+
+protected:
 			int64				fTotalTicks;
 			int64				fUnkownTicks;
 			int64				fDroppedTicks;
 			int64				fTotalSampleCount;
+};
+
+
+class InclusiveThreadProfileResult : public BasicThreadProfileResult {
+public:
+	virtual	void				AddSamples(addr_t* samples,
+									int32 sampleCount);
+};
+
+
+class ExclusiveThreadProfileResult : public BasicThreadProfileResult {
+public:
+	virtual	void				AddSamples(addr_t* samples,
+									int32 sampleCount);
 };
 
 

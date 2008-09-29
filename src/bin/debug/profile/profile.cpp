@@ -174,8 +174,12 @@ public:
 private:
 	status_t _CreateThreadProfileResult(Thread* thread)
 	{
-		ThreadProfileResult* profileResult
-			= new(std::nothrow) AbstractThreadProfileResult;
+		ThreadProfileResult* profileResult;
+		if (gOptions.analyze_full_stack)
+			profileResult = new(std::nothrow) InclusiveThreadProfileResult;
+		else
+			profileResult = new(std::nothrow) ExclusiveThreadProfileResult;
+
 		if (profileResult == NULL)
 			return B_NO_MEMORY;
 
