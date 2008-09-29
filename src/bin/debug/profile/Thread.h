@@ -12,6 +12,7 @@
 
 class Team;
 class ThreadImage;
+class ThreadProfileResult;
 
 
 class Thread : public DoublyLinkedListLinkImpl<Thread> {
@@ -24,14 +25,15 @@ public:
 	inline	addr_t*				Samples() const;
 	inline	Team*				GetTeam() const;
 
+	inline	ThreadProfileResult* ProfileResult() const;
+			void				SetProfileResult(ThreadProfileResult* result);
+
 			void				UpdateInfo();
 
 			void				SetSampleArea(area_id area, addr_t* samples);
 			void				SetInterval(bigtime_t interval);
 
 			status_t			AddImage(Image* image);
-			void				ImageRemoved(Image* image);
-			ThreadImage*		FindImage(addr_t address) const;
 
 			void				AddSamples(int32 count, int32 dropped,
 									int32 stackDepth, bool variableStackDepth,
@@ -41,25 +43,64 @@ public:
 private:
 	typedef DoublyLinkedList<ThreadImage>	ImageList;
 
-			void				_SynchronizeImages();
-
-			void				_AddNewImages(ImageList& newImages,
-									int32 event);
-			void				_RemoveObsoleteImages(int32 event);
-
-			ThreadImage*		_FindImageByID(image_id id) const;
-
 private:
 			thread_info			fInfo;
 			::Team*				fTeam;
 			area_id				fSampleArea;
 			addr_t*				fSamples;
+			ThreadProfileResult* fProfileResult;
+};
+
+
+class ThreadProfileResult {
+public:
+								ThreadProfileResult();
+	virtual						~ThreadProfileResult();
+
+	virtual	status_t			Init(Thread* thread);
+
+			void				SetInterval(bigtime_t interval);
+
+	virtual	status_t			AddImage(Image* image) = 0;
+	virtual	void				SynchronizeImages(int32 event) = 0;
+
+	virtual	void				AddSamples(addr_t* samples,
+									int32 sampleCount) = 0;
+	virtual	void				AddDroppedTicks(int32 dropped) = 0;
+	virtual	void				PrintResults() = 0;
+
+protected:
+			Thread*				fThread;
+			bigtime_t			fInterval;
+};
+
+
+class AbstractThreadProfileResult : public ThreadProfileResult {
+public:
+								AbstractThreadProfileResult();
+	virtual						~AbstractThreadProfileResult();
+
+	virtual	status_t			Init(Thread* thread);
+
+	virtual	status_t			AddImage(Image* image);
+	virtual	void				SynchronizeImages(int32 event);
+
+			ThreadImage*		FindImage(addr_t address) const;
+
+	virtual	void				AddSamples(addr_t* samples,
+									int32 sampleCount);
+	virtual	void				AddDroppedTicks(int32 dropped);
+	virtual	void				PrintResults();
+
+protected:
+	typedef DoublyLinkedList<ThreadImage>	ImageList;
+
 			ImageList			fImages;
+			ImageList			fNewImages;
 			ImageList			fOldImages;
 			int64				fTotalTicks;
 			int64				fUnkownTicks;
 			int64				fDroppedTicks;
-			bigtime_t			fInterval;
 			int64				fTotalSampleCount;
 };
 
@@ -92,6 +133,13 @@ Team*
 Thread::GetTeam() const
 {
 	return fTeam;
+}
+
+
+ThreadProfileResult*
+Thread::ProfileResult() const
+{
+	return fProfileResult;
 }
 
 

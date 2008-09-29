@@ -124,26 +124,25 @@ Thread::Thread(const thread_info& info, Team* team)
 	fTeam(team),
 	fSampleArea(-1),
 	fSamples(NULL),
-	fImages(),
-	fOldImages(),
-	fTotalTicks(0),
-	fUnkownTicks(0),
-	fDroppedTicks(0),
-	fInterval(1),
-	fTotalSampleCount(0)
+	fProfileResult(NULL)
 {
 }
 
 
 Thread::~Thread()
 {
-	while (ThreadImage* image = fImages.RemoveHead())
-		delete image;
-	while (ThreadImage* image = fOldImages.RemoveHead())
-		delete image;
-
 	if (fSampleArea >= 0)
 		delete_area(fSampleArea);
+
+	delete fProfileResult;
+}
+
+
+void
+Thread::SetProfileResult(ThreadProfileResult* result)
+{
+	delete fProfileResult;
+	fProfileResult = result;
 }
 
 
@@ -167,12 +166,131 @@ Thread::SetSampleArea(area_id area, addr_t* samples)
 void
 Thread::SetInterval(bigtime_t interval)
 {
-	fInterval = interval;
+	fProfileResult->SetInterval(interval);
 }
 
 
 status_t
 Thread::AddImage(Image* image)
+{
+	return fProfileResult->AddImage(image);
+}
+
+
+void
+Thread::AddSamples(int32 count, int32 dropped, int32 stackDepth,
+	bool variableStackDepth, int32 event)
+{
+	fProfileResult->SynchronizeImages(event);
+
+	if (variableStackDepth) {
+		addr_t* samples = fSamples;
+
+		while (count > 0) {
+			addr_t sampleCount = *(samples++);
+
+			if (sampleCount >= B_DEBUG_PROFILE_EVENT_BASE) {
+				int32 eventParameterCount
+					= sampleCount & B_DEBUG_PROFILE_EVENT_PARAMETER_MASK;
+				if (sampleCount == B_DEBUG_PROFILE_IMAGE_EVENT) {
+					fProfileResult->SynchronizeImages((int32)samples[0]);
+				} else {
+					fprintf(stderr, "unknown profile event: %#lx\n",
+						sampleCount);
+				}
+
+				samples += eventParameterCount;
+				count -= eventParameterCount + 1;
+				continue;
+			}
+
+			fProfileResult->AddSamples(samples, sampleCount);
+
+			samples += sampleCount;
+			count -= sampleCount + 1;
+		}
+	} else {
+		count = count / stackDepth * stackDepth;
+
+		for (int32 i = 0; i < count; i += stackDepth)
+			fProfileResult->AddSamples(fSamples + i, stackDepth);
+	}
+
+	fProfileResult->AddDroppedTicks(dropped);
+}
+
+
+void
+Thread::PrintResults() const
+{
+	fProfileResult->PrintResults();
+}
+
+
+// #pragma mark - ThreadProfileResult
+
+
+ThreadProfileResult::ThreadProfileResult()
+	:
+	fThread(NULL),
+	fInterval(1)
+{
+}
+
+
+ThreadProfileResult::~ThreadProfileResult()
+{
+}
+
+
+status_t
+ThreadProfileResult::Init(Thread* thread)
+{
+	fThread = thread;
+	return B_OK;
+}
+
+
+void
+ThreadProfileResult::SetInterval(bigtime_t interval)
+{
+	fInterval = interval;
+}
+
+
+// #pragma mark - AbstractThreadProfileResult
+
+AbstractThreadProfileResult::AbstractThreadProfileResult()
+	:
+	fImages(),
+	fNewImages(),
+	fOldImages(),
+	fTotalTicks(0),
+	fUnkownTicks(0),
+	fDroppedTicks(0),
+	fTotalSampleCount(0)
+{
+}
+
+
+AbstractThreadProfileResult::~AbstractThreadProfileResult()
+{
+	while (ThreadImage* image = fImages.RemoveHead())
+		delete image;
+	while (ThreadImage* image = fOldImages.RemoveHead())
+		delete image;
+}
+
+
+status_t
+AbstractThreadProfileResult::Init(Thread* thread)
+{
+	return ThreadProfileResult::Init(thread);
+}
+
+
+status_t
+AbstractThreadProfileResult::AddImage(Image* image)
 {
 	ThreadImage* threadImage = new(std::nothrow) ThreadImage(image);
 	if (threadImage == NULL)
@@ -184,31 +302,41 @@ Thread::AddImage(Image* image)
 		return error;
 	}
 
-	fImages.Add(threadImage);
+	fNewImages.Add(threadImage);
 
 	return B_OK;
 }
 
 
 void
-Thread::ImageRemoved(Image* image)
+AbstractThreadProfileResult::SynchronizeImages(int32 event)
 {
+	// remove obsolete images
 	ImageList::Iterator it = fImages.GetIterator();
-	while (ThreadImage* threadImage = it.Next()) {
-		if (threadImage->GetImage() == image) {
-			fImages.Remove(threadImage);
-			if (threadImage->TotalHits() > 0)
-				fOldImages.Add(threadImage);
+	while (ThreadImage* image = it.Next()) {
+		int32 deleted = image->GetImage()->DeletionEvent();
+		if (deleted >= 0 && event >= deleted) {
+			it.Remove();
+			if (image->TotalHits() > 0)
+				fOldImages.Add(image);
 			else
-				delete threadImage;
-			return;
+				delete image;
+		}
+	}
+
+	// add new images
+	it = fNewImages.GetIterator();
+	while (ThreadImage* image = it.Next()) {
+		if (image->GetImage()->CreationEvent() >= event) {
+			it.Remove();
+			fImages.Add(image);
 		}
 	}
 }
 
 
 ThreadImage*
-Thread::FindImage(addr_t address) const
+AbstractThreadProfileResult::FindImage(addr_t address) const
 {
 	ImageList::ConstIterator it = fImages.GetIterator();
 	while (ThreadImage* image = it.Next()) {
@@ -220,127 +348,75 @@ Thread::FindImage(addr_t address) const
 
 
 void
-Thread::AddSamples(int32 count, int32 dropped, int32 stackDepth,
-	bool variableStackDepth, int32 event)
+AbstractThreadProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
 {
-	_RemoveObsoleteImages(event);
+	if (gOptions.analyze_full_stack) {
+		// Sort the samples. This way hits of the same symbol are
+		// successive and we can avoid incrementing the hit count of the
+		// same symbol twice. Same for images.
+		std::sort(samples, samples + sampleCount);
 
-	// Temporarily remove images that have been created after the given
-	// event.
-	ImageList newImages;
-	ImageList::Iterator it = fImages.GetIterator();
-	while (ThreadImage* image = it.Next()) {
-		if (image->GetImage()->CreationEvent() > event) {
-			it.Remove();
-			newImages.Add(image);
-		}
-	}
+		int32 unknownSamples = 0;
+		ThreadImage* previousImage = NULL;
+		int32 previousSymbol = -1;
 
-	if (variableStackDepth) {
-		// Variable stack depth means we have full caller stack analyzes
-		// enabled.
-		int32 totalSampleCount = 0;
-		int32 tickCount = 0;
-		addr_t* samples = fSamples;
+		for (int32 i = 0; i < sampleCount; i++) {
+			addr_t address = samples[i];
+			ThreadImage* image = FindImage(address);
+			int32 symbol = -1;
+			if (image != NULL) {
+				symbol = image->GetImage()->FindSymbol(address);
+				if (symbol < 0) {
+					// TODO: Count unknown image hits?
+				} else if (symbol != previousSymbol)
+					image->AddSymbolHit(symbol);
 
-		while (count > 0) {
-			addr_t sampleCount = *(samples++);
+				if (image != previousImage)
+					image->AddImageHit();
+			} else
+				unknownSamples++;
 
-			if (sampleCount >= B_DEBUG_PROFILE_EVENT_BASE) {
-				int32 eventParameterCount
-					= sampleCount & B_DEBUG_PROFILE_EVENT_PARAMETER_MASK;
-				if (sampleCount == B_DEBUG_PROFILE_IMAGE_EVENT) {
-					int32 imageEvent = (int32)samples[0];
-					_RemoveObsoleteImages(imageEvent);
-					_AddNewImages(newImages, imageEvent);
-				} else {
-					fprintf(stderr, "unknown profile event: %#lx\n",
-						sampleCount);
-				}
-
-				samples += eventParameterCount;
-				count -= eventParameterCount + 1;
-				continue;
-			}
-
-			// Sort the samples. This way hits of the same symbol are
-			// successive and we can avoid incrementing the hit count of the
-			// same symbol twice. Same for images.
-			std::sort(samples, samples + sampleCount);
-
-			int32 unknownSamples = 0;
-			ThreadImage* previousImage = NULL;
-			int32 previousSymbol = -1;
-
-			for (uint32 i = 0; i < sampleCount; i++) {
-				addr_t address = samples[i];
-				ThreadImage* image = FindImage(address);
-				int32 symbol = -1;
-				if (image != NULL) {
-					symbol = image->GetImage()->FindSymbol(address);
-					if (symbol < 0) {
-						// TODO: Count unknown image hits?
-					} else if (symbol != previousSymbol)
-						image->AddSymbolHit(symbol);
-
-					if (image != previousImage)
-						image->AddImageHit();
-				} else
-					unknownSamples++;
-
-				previousImage = image;
-				previousSymbol = symbol;
-			}
-
-			if (unknownSamples == (int32)sampleCount)
-				fUnkownTicks++;
-
-			samples += sampleCount;
-			count -= sampleCount + 1;
-			tickCount++;
-			totalSampleCount += sampleCount;
+			previousImage = image;
+			previousSymbol = symbol;
 		}
 
-		fTotalTicks += tickCount;
-		fTotalSampleCount += totalSampleCount;
+		if (unknownSamples == sampleCount)
+			fUnkownTicks++;
 	} else {
-		count = count / stackDepth * stackDepth;
-
-		for (int32 i = 0; i < count; i += stackDepth) {
-			ThreadImage* image = NULL;
-			for (int32 k = 0; k < stackDepth; k++) {
-				addr_t address = fSamples[i + k];
-				image = FindImage(address);
-				if (image != NULL) {
-					image->AddHit(address);
-					break;
-				}
+		ThreadImage* image = NULL;
+		for (int32 k = 0; k < sampleCount; k++) {
+			addr_t address = samples[k];
+			image = FindImage(address);
+			if (image != NULL) {
+				image->AddHit(address);
+				break;
 			}
-
-			if (image == NULL)
-				fUnkownTicks++;
 		}
 
-		fTotalTicks += count / stackDepth;
+		if (image == NULL)
+			fUnkownTicks++;
 	}
 
-	fDroppedTicks += dropped;
-
-	// re-add the new images
-	fImages.MoveFrom(&newImages);
-
-	_SynchronizeImages();
+	fTotalTicks++;
+	fTotalSampleCount += sampleCount;
 }
 
 
 void
-Thread::PrintResults() const
+AbstractThreadProfileResult::AddDroppedTicks(int32 dropped)
+{
+	fDroppedTicks += dropped;
+}
+
+
+void
+AbstractThreadProfileResult::PrintResults()
 {
 	// count images and symbols
 	int32 imageCount = 0;
 	int32 symbolCount = 0;
 
-	ImageList::ConstIterator it = fOldImages.GetIterator();
+	ImageList::Iterator it = fOldImages.GetIterator();
 	while (ThreadImage* image = it.Next()) {
 		if (image->TotalHits() > 0) {
 			imageCount++;
@@ -398,7 +474,7 @@ Thread::PrintResults() const
 
 	int64 totalTicks = fTotalTicks;
 	fprintf(gOptions.output, "\nprofiling results for thread \"%s\" "
-		"(%ld):\n", Name(), ID());
+		"(%ld):\n", fThread->Name(), fThread->ID());
 	fprintf(gOptions.output, "  tick interval:  %lld us\n", fInterval);
 	fprintf(gOptions.output, "  total ticks:    %lld (%lld us)\n",
 		totalTicks, totalTicks * fInterval);
@@ -447,71 +523,3 @@ Thread::PrintResults() const
 		fprintf(gOptions.output, "  no functions were hit\n");
 }
 
-
-void
-Thread::_SynchronizeImages()
-{
-	const BObjectList<Image>& teamImages = fTeam->Images();
-
-	// remove obsolete images
-	ImageList::Iterator it = fImages.GetIterator();
-	while (ThreadImage* image = it.Next()) {
-		if (fTeam->FindImage(image->ID()) == NULL) {
-			it.Remove();
-			if (image->TotalHits() > 0)
-				fOldImages.Add(image);
-			else
-				delete image;
-		}
-	}
-
-	// add new images
-	for (int32 i = 0; Image* image = teamImages.ItemAt(i); i++) {
-		if (_FindImageByID(image->ID()) == NULL)
-			AddImage(image);
-	}
-}
-
-
-void
-Thread::_AddNewImages(ImageList& newImages, int32 event)
-{
-	ImageList::Iterator it = newImages.GetIterator();
-	while (ThreadImage* image = it.Next()) {
-		if (image->GetImage()->CreationEvent() >= event) {
-			it.Remove();
-			fImages.Add(image);
-		}
-	}
-}
-
-
-void
-Thread::_RemoveObsoleteImages(int32 event)
-{
-	// remove obsolete images
-	ImageList::Iterator it = fImages.GetIterator();
-	while (ThreadImage* image = it.Next()) {
-		int32 deleted = image->GetImage()->DeletionEvent();
-		if (deleted >= 0 && event >= deleted) {
-			it.Remove();
-			if (image->TotalHits() > 0)
-				fOldImages.Add(image);
-			else
-				delete image;
-		}
-	}
-}
-
-
-ThreadImage*
-Thread::_FindImageByID(image_id id) const
-{
-	ImageList::ConstIterator it = fImages.GetIterator();
-	while (ThreadImage* image = it.Next()) {
-		if (image->ID() == id)
-			return image;
-	}
-
-	return NULL;
-}

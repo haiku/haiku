@@ -123,6 +123,12 @@ public:
 		if (thread == NULL)
 			return B_NO_MEMORY;
 
+		error = _CreateThreadProfileResult(thread);
+		if (error != B_OK) {
+			delete thread;
+			return error;
+		}
+
 		error = team->InitThread(thread);
 		if (error != B_OK) {
 			delete thread;
@@ -163,6 +169,24 @@ public:
 				return thread;
 		}
 		return NULL;
+	}
+
+private:
+	status_t _CreateThreadProfileResult(Thread* thread)
+	{
+		ThreadProfileResult* profileResult
+			= new(std::nothrow) AbstractThreadProfileResult;
+		if (profileResult == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = profileResult->Init(thread);
+		if (error != B_OK) {
+			delete profileResult;
+			return error;
+		}
+
+		thread->SetProfileResult(profileResult);
+		return B_OK;
 	}
 
 private:
