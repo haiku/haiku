@@ -78,7 +78,8 @@ status_t MultiInvoker::AddTarget(const BHandler* h, const BLooper* loop)
 	BMessenger* msgr = new BMessenger(h, loop, &err);
 	if (err == B_OK)
 		m_messengers.AddItem(msgr);
-	
+	else
+		delete msgr;
 	return err;	
 }
 
