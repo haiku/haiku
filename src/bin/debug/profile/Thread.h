@@ -15,6 +15,26 @@ class ThreadImage;
 class ThreadProfileResult;
 
 
+class ThreadImage {
+public:
+								ThreadImage(Image* image);
+	virtual						~ThreadImage();
+
+	virtual	status_t			Init();
+
+	inline	image_id			ID() const;
+	inline	Image*				GetImage() const;
+
+	inline	bool				ContainsAddress(addr_t address) const;
+
+	inline	int64				TotalHits() const;
+
+protected:
+			Image*				fImage;
+			int64				fTotalHits;
+};
+
+
 class Thread : public DoublyLinkedListLinkImpl<Thread> {
 public:
 								Thread(const thread_info& info, Team* team);
@@ -75,6 +95,7 @@ protected:
 };
 
 
+template<typename ThreadImageType>
 class AbstractThreadProfileResult : public ThreadProfileResult {
 public:
 								AbstractThreadProfileResult();
@@ -83,17 +104,17 @@ public:
 	virtual	status_t			AddImage(Image* image);
 	virtual	void				SynchronizeImages(int32 event);
 
-			ThreadImage*		FindImage(addr_t address) const;
+			ThreadImageType*	FindImage(addr_t address) const;
 
 	virtual	void				AddSamples(addr_t* samples,
 									int32 sampleCount) = 0;
 	virtual	void				AddDroppedTicks(int32 dropped) = 0;
 	virtual	void				PrintResults() = 0;
 
-	virtual ThreadImage*		CreateThreadImage(Image* image) = 0;
+	virtual ThreadImageType*	CreateThreadImage(Image* image) = 0;
 
 protected:
-	typedef DoublyLinkedList<ThreadImage>	ImageList;
+	typedef DoublyLinkedList<ThreadImageType>	ImageList;
 
 			ImageList			fImages;
 			ImageList			fNewImages;
@@ -101,35 +122,35 @@ protected:
 };
 
 
-class BasicThreadProfileResult : public AbstractThreadProfileResult {
-public:
-								BasicThreadProfileResult();
-
-	virtual	void				AddDroppedTicks(int32 dropped);
-	virtual	void				PrintResults();
-
-	virtual ThreadImage*		CreateThreadImage(Image* image);
-
-protected:
-			int64				fTotalTicks;
-			int64				fUnkownTicks;
-			int64				fDroppedTicks;
-			int64				fTotalSampleCount;
-};
+// #pragma mark -
 
 
-class InclusiveThreadProfileResult : public BasicThreadProfileResult {
-public:
-	virtual	void				AddSamples(addr_t* samples,
-									int32 sampleCount);
-};
+image_id
+ThreadImage::ID() const
+{
+	return fImage->ID();
+}
 
 
-class ExclusiveThreadProfileResult : public BasicThreadProfileResult {
-public:
-	virtual	void				AddSamples(addr_t* samples,
-									int32 sampleCount);
-};
+bool
+ThreadImage::ContainsAddress(addr_t address) const
+{
+	return fImage->ContainsAddress(address);
+}
+
+
+Image*
+ThreadImage::GetImage() const
+{
+	return fImage;
+}
+
+
+int64
+ThreadImage::TotalHits() const
+{
+	return fTotalHits;
+}
 
 
 // #pragma mark -
@@ -167,6 +188,90 @@ ThreadProfileResult*
 Thread::ProfileResult() const
 {
 	return fProfileResult;
+}
+
+
+// #pragma mark - AbstractThreadProfileResult
+
+
+template<typename ThreadImageType>
+AbstractThreadProfileResult<ThreadImageType>::AbstractThreadProfileResult()
+	:
+	fImages(),
+	fNewImages(),
+	fOldImages()
+{
+}
+
+
+template<typename ThreadImageType>
+AbstractThreadProfileResult<ThreadImageType>::~AbstractThreadProfileResult()
+{
+	while (ThreadImageType* image = fImages.RemoveHead())
+		delete image;
+	while (ThreadImageType* image = fOldImages.RemoveHead())
+		delete image;
+}
+
+
+template<typename ThreadImageType>
+status_t
+AbstractThreadProfileResult<ThreadImageType>::AddImage(Image* image)
+{
+	ThreadImageType* threadImage = CreateThreadImage(image);
+	if (threadImage == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = threadImage->Init();
+	if (error != B_OK) {
+		delete threadImage;
+		return error;
+	}
+
+	fNewImages.Add(threadImage);
+
+	return B_OK;
+}
+
+
+template<typename ThreadImageType>
+void
+AbstractThreadProfileResult<ThreadImageType>::SynchronizeImages(int32 event)
+{
+	// remove obsolete images
+	ImageList::Iterator it = fImages.GetIterator();
+	while (ThreadImageType* image = it.Next()) {
+		int32 deleted = image->GetImage()->DeletionEvent();
+		if (deleted >= 0 && event >= deleted) {
+			it.Remove();
+			if (image->TotalHits() > 0)
+				fOldImages.Add(image);
+			else
+				delete image;
+		}
+	}
+
+	// add new images
+	it = fNewImages.GetIterator();
+	while (ThreadImageType* image = it.Next()) {
+		if (image->GetImage()->CreationEvent() >= event) {
+			it.Remove();
+			fImages.Add(image);
+		}
+	}
+}
+
+
+template<typename ThreadImageType>
+ThreadImageType*
+AbstractThreadProfileResult<ThreadImageType>::FindImage(addr_t address) const
+{
+	ImageList::ConstIterator it = fImages.GetIterator();
+	while (ThreadImageType* image = it.Next()) {
+		if (image->ContainsAddress(address))
+			return image;
+	}
+	return NULL;
 }
 
 

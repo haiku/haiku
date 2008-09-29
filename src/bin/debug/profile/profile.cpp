@@ -23,6 +23,7 @@
 
 #include <util/DoublyLinkedList.h>
 
+#include "BasicThreadProfileResult.h"
 #include "debug_utils.h"
 #include "Image.h"
 #include "Options.h"
