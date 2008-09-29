@@ -16,6 +16,7 @@
 #include <arch/debug_console.h>
 #include <arch/int.h>
 #include <boot/kernel_args.h>
+#include <elf.h>
 #include <util/kqueue.h>
 #include <smp.h>
 
@@ -70,7 +71,7 @@ dump_int_statistics(int argc, char **argv)
 			continue;
 
 		kprintf("int %3d, enabled %ld, handled %8lld, unhandled %8lld%s%s\n",
-			i, sVectors[i].enable_count, sVectors[i].handled_count, 
+			i, sVectors[i].enable_count, sVectors[i].handled_count,
 			sVectors[i].unhandled_count,
 			B_SPINLOCK_IS_LOCKED(&sVectors[i].vector_lock) ? ", ACTIVE" : "",
 			sVectors[i].handler_list.next == &sVectors[i].handler_list
@@ -78,10 +79,21 @@ dump_int_statistics(int argc, char **argv)
 
 		for (io = sVectors[i].handler_list.next;
 				io != &sVectors[i].handler_list; io = io->next) {
-			kprintf("\t%p", io->func);
+			const char *symbol, *imageName;
+			bool exactMatch;
+			addr_t address, baseAddress;
+
+			status_t error = elf_debug_lookup_symbol_address((addr_t)io->func,
+				&baseAddress, &symbol, &imageName, &exactMatch);
+			if (error == B_OK && exactMatch) {
+				if (strchr(imageName, '/') != NULL)
+					imageName = strrchr(imageName, '/') + 1;
+
+				kprintf("\t%s:%s (%p), data %p\n", imageName, symbol, io->func,
+					io->data);
+			} else
+				kprintf("\t%p, data %p\n", io->func, io->data);
 		}
-		if (sVectors[i].handler_list.next != &sVectors[i].handler_list)
-			kprintf("\n");
 	}
 	return 0;
 }
@@ -258,7 +270,7 @@ status_t
 install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 	ulong flags)
 {
-	struct io_handler *io = NULL; 
+	struct io_handler *io = NULL;
 	cpu_status state;
 
 	if (vector < 0 || vector >= NUM_IO_VECTORS)
@@ -312,7 +324,7 @@ status_t
 remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 {
 	status_t status = B_BAD_VALUE;
-	struct io_handler *io = NULL; 
+	struct io_handler *io = NULL;
 	cpu_status state;
 
 	if (vector < 0 || vector >= NUM_IO_VECTORS)
@@ -350,5 +362,5 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 		free(io);
 
 	return status;
-} 
+}
 
