@@ -35,10 +35,20 @@ private:
 			void			_SetupFirstLayoutItem(BCardLayout* layout);
 			void			_SetupSecondLayoutItem(BCardLayout* layout);
 			void			_DisallowChar(BTextView* textView);
-			void			_SetupTranslatorMenu(BMenu* translatorMenu);
-			void			_SetupOutputPathMenu(BMenu* outputPathMenu);
-			BString			_FindValidFileName(const char* name) const;
+			void			_SetupTranslatorMenu(BMenu* translatorMenu,
+								const BMessage& settings);
+			void			_SetupOutputPathMenu(BMenu* outputPathMenu,
+								const BMessage& settings);
+			void			_AddItemToPathMenu(const char* path,
+								BString& label, int32 index, bool markItem);
 			void			_CenterAndShow();
+
+			void			_UpdatePreviewPanel();
+			BString			_FindValidFileName(const char* name) const;
+			int32			_PathIndexInMenu(const BString& path) const;
+
+			BMessage		_ReadSettings() const;
+			void			_WriteSettings() const;
 
 			void			_TakeScreenshot();
 			status_t		_GetActiveWindowFrame(BRect* frame);
@@ -68,7 +78,6 @@ private:
 			bool			fIncludeCursor;
 			bool			fGrabActiveWindow;
 			bool			fShowConfigWindow;
-			bool			fSaveScreenshotSilent;
 
 			int32			fTranslator;
 			int32			fImageFileType;

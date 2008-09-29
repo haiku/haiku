@@ -26,6 +26,7 @@
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <Message.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <RadioButton.h>
@@ -82,6 +83,7 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	: BWindow(BRect(0, 0, 200.0, 100.0), "Take Screenshot", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE |
 		B_AVOID_FRONT | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
+	fDelayControl(NULL),
 	fScreenshot(NULL),
 	fOutputPathPanel(NULL),
 	fLastSelectedPath(NULL),
@@ -89,11 +91,16 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	fIncludeBorder(includeBorder),
 	fIncludeCursor(includeCursor),
 	fGrabActiveWindow(grabActiveWindow),
-	fShowConfigWindow(showConfigWindow),
-	fSaveScreenshotSilent(saveScreenshotSilent)
+	fShowConfigWindow(showConfigWindow)
 {
-	_InitWindow();
-	_CenterAndShow();
+	if (saveScreenshotSilent) {
+		_TakeScreenshot();
+		_SaveScreenshotSilent();
+		be_app_messenger.SendMessage(B_QUIT_REQUESTED);
+	} else {
+		_InitWindow();
+		_CenterAndShow();
+	}
 }
 
 
@@ -136,6 +143,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 		case kTakeScreenshot: {
 			Hide();
 			_TakeScreenshot();
+			_UpdatePreviewPanel();
 			Show();
 		}	break;
 
@@ -172,21 +180,18 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			entry_ref ref;
 			if (message->FindRef("refs", &ref) == B_OK) {
 				BString path(BPath(&ref).Path());
-
-				BMessage* message = new BMessage(kLocationChanged);
-				message->AddString("path", path.String());
-
-				fOutputPathMenu->TruncateString(&path, B_TRUNCATE_MIDDLE,
-					fOutputPathMenu->StringWidth("SomethingLongHere"));
-				fLastSelectedPath = new BMenuItem(path.String(), message);
-				fLastSelectedPath->SetMarked(true);
-
-				fOutputPathMenu->AddItem(fLastSelectedPath,
-					fOutputPathMenu->CountItems() - 2);
+				int32 index = _PathIndexInMenu(path);
+				if (index < 0) {
+					_AddItemToPathMenu(path.String(),
+						path, fOutputPathMenu->CountItems() - 2, true);
+				} else {
+					fOutputPathMenu->ItemAt(index)->SetMarked(true);
+				}
 			}
 		}	break;
 
 		case kFinishScreenshot: {
+			_WriteSettings();
 			_SaveScreenshot();
 			be_app_messenger.SendMessage(B_QUIT_REQUESTED);
 		}	break;
@@ -218,6 +223,7 @@ ScreenshotWindow::_InitWindow()
 
 	if (!fShowConfigWindow) {
 		_TakeScreenshot();
+		_UpdatePreviewPanel();
 		layout->SetVisibleItem(1L);
 	} else {
 		layout->SetVisibleItem(0L);
@@ -319,10 +325,12 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 
 	fNameControl = new BTextControl("", "Name:", "screenshot", NULL);
 
-	_SetupTranslatorMenu(new BMenu("Please select"));
+	BMessage settings(_ReadSettings());
+
+	_SetupTranslatorMenu(new BMenu("Please select"), settings);
 	BMenuField* menuField = new BMenuField("Save as:", fTranslatorMenu);
 
-	_SetupOutputPathMenu(new BMenu("Please select"));
+	_SetupOutputPathMenu(new BMenu("Please select"), settings);
 	BMenuField* menuField2 = new BMenuField("Save in:", fOutputPathMenu);
 
 	fNameControl->SetText(_FindValidFileName("screenshot").String());
@@ -372,7 +380,8 @@ ScreenshotWindow::_DisallowChar(BTextView* textView)
 
 
 void
-ScreenshotWindow::_SetupTranslatorMenu(BMenu* translatorMenu)
+ScreenshotWindow::_SetupTranslatorMenu(BMenu* translatorMenu,
+	const BMessage& settings)
 {
 	fTranslatorMenu = translatorMenu;
 
@@ -386,12 +395,15 @@ ScreenshotWindow::_SetupTranslatorMenu(BMenu* translatorMenu)
 	if (fTranslatorMenu->ItemAt(0))
 		fTranslatorMenu->ItemAt(0)->SetMarked(true);
 
+	if (settings.FindInt32("be:type", &fImageFileType) != B_OK)
+		fImageFileType = B_PNG_FORMAT;
+
+	int32 imageFileType;
 	for (int32 i = 0; i < fTranslatorMenu->CountItems(); ++i) {
 		BMenuItem* item = fTranslatorMenu->ItemAt(i);
 		if (item && item->Message()) {
-			item->Message()->FindInt32("be:type", &fImageFileType);
-			item->Message()->FindInt32("be:translator", &fTranslator);
-			if (fImageFileType == B_PNG_FORMAT) {
+			item->Message()->FindInt32("be:type", &imageFileType);
+			if (fImageFileType == imageFileType) {
 				item->SetMarked(true);
 				break;
 			}
@@ -401,37 +413,99 @@ ScreenshotWindow::_SetupTranslatorMenu(BMenu* translatorMenu)
 
 
 void
-ScreenshotWindow::_SetupOutputPathMenu(BMenu* outputPathMenu)
+ScreenshotWindow::_SetupOutputPathMenu(BMenu* outputPathMenu,
+	const BMessage& settings)
 {
 	fOutputPathMenu = outputPathMenu;
+	fOutputPathMenu->SetLabelFromMarked(true);
+
+	BString lastSelectedPath;
+	settings.FindString("lastSelectedPath", &lastSelectedPath);
 
 	BPath path;
 	find_directory(B_USER_DIRECTORY, &path);
 
-	BMessage* message = new BMessage(kLocationChanged);
-	message->AddString("path", path.Path());
-	fOutputPathMenu->AddItem(new BMenuItem("Home directory", message));
+	BString label("Home directory");
+	_AddItemToPathMenu(path.Path(), label, 0, (path.Path() == lastSelectedPath));
 
 	path.Append("Desktop");
-	message = new BMessage(kLocationChanged);
-	message->AddString("path", path.Path());
-	fOutputPathMenu->AddItem(new BMenuItem("Desktop", message), 0);
+	label.SetTo("Desktop");
+	_AddItemToPathMenu(path.Path(), label, 0, (path.Path() == lastSelectedPath));
 
 	find_directory(B_BEOS_ETC_DIRECTORY, &path);
 	path.Append("artwork");
 
-	message = new BMessage(kLocationChanged);
-	message->AddString("path", path.Path());
-	fOutputPathMenu->AddItem(new BMenuItem("Artwork directory", message));
+	label.SetTo("Artwork directory");
+	_AddItemToPathMenu(path.Path(), label, 2, (path.Path() == lastSelectedPath));
+
+	int32 i = 0;
+	BString userPath;
+	while (settings.FindString("path", i++, &userPath) == B_OK) {
+		_AddItemToPathMenu(userPath.String(), userPath, 3,
+			(userPath == lastSelectedPath));
+	}
+
+	if (!fLastSelectedPath) {
+		if (settings.IsEmpty() || lastSelectedPath.Length() == 0) {
+			fOutputPathMenu->ItemAt(1)->SetMarked(true);
+			fLastSelectedPath = fOutputPathMenu->ItemAt(1);
+		} else {
+			_AddItemToPathMenu(lastSelectedPath.String(), lastSelectedPath, 3,
+				true);
+		}
+	}
 
 	fOutputPathMenu->AddItem(new BSeparatorItem());
-
 	fOutputPathMenu->AddItem(new BMenuItem("Choose directory...",
 		new BMessage(kChooseLocation)));
+}
 
-	fOutputPathMenu->SetLabelFromMarked(true);
-	fOutputPathMenu->ItemAt(1)->SetMarked(true);
-	fLastSelectedPath = fOutputPathMenu->ItemAt(1);
+
+void
+ScreenshotWindow::_AddItemToPathMenu(const char* path, BString& label,
+	int32 index, bool markItem)
+{
+	BMessage* message = new BMessage(kLocationChanged);
+	message->AddString("path", path);
+
+	fOutputPathMenu->TruncateString(&label, B_TRUNCATE_MIDDLE,
+		fOutputPathMenu->StringWidth("SomethingLongHere"));
+
+	fOutputPathMenu->AddItem(new BMenuItem(label.String(), message), index);
+
+	if (markItem) {
+		fOutputPathMenu->ItemAt(index)->SetMarked(true);
+		fLastSelectedPath = fOutputPathMenu->ItemAt(index);
+	}
+}
+
+
+void
+ScreenshotWindow::_CenterAndShow()
+{
+	BSize size = GetLayout()->PreferredSize();
+	ResizeTo(size.Width(), size.Height());
+
+	BRect frame(BScreen(this).Frame());
+	MoveTo((frame.Width() - size.Width()) / 2.0,
+		(frame.Height() - size.Height()) / 2.0);
+
+	Show();
+}
+
+
+void
+ScreenshotWindow::_UpdatePreviewPanel()
+{
+	fPreviewBox->ClearViewBitmap();
+	fPreviewBox->SetViewBitmap(fScreenshot, fScreenshot->Bounds(),
+		fPreviewBox->Bounds(), B_FOLLOW_ALL, 0);
+
+	BCardLayout* layout = dynamic_cast<BCardLayout*> (GetLayout());
+	if (layout)
+		layout->SetVisibleItem(1L);
+
+	SetTitle("Save Screenshot");
 }
 
 
@@ -452,11 +526,14 @@ ScreenshotWindow::_FindValidFileName(const char* name) const
 	if (!BEntry(outputPath.Path()).Exists())
 		return fileName;
 
+	if (strncmp(name, "screenshot", strlen("screenshot")) == 0)
+		fileName.SetTo("screenshot");
+
 	BEntry entry;
 	int32 index = 1;
 	char filename[32];
 	do {
-		sprintf(filename, "%s%ld", name, index++);
+		sprintf(filename, "%s%ld", fileName.String(), index++);
 		outputPath.SetTo(path);
 		outputPath.Append(filename);
 		entry.SetTo(outputPath.Path());
@@ -466,30 +543,81 @@ ScreenshotWindow::_FindValidFileName(const char* name) const
 }
 
 
-void
-ScreenshotWindow::_CenterAndShow()
+int32
+ScreenshotWindow::_PathIndexInMenu(const BString& path) const
 {
-	if (fSaveScreenshotSilent) {
-		_SaveScreenshotSilent();
-		be_app_messenger.SendMessage(B_QUIT_REQUESTED);
-		return;
+	BString userPath;
+	for (int32 i = 0; i < fOutputPathMenu->CountItems(); ++i) {
+		BMenuItem* item = fOutputPathMenu->ItemAt(i);
+		if (item && item->Message()
+			&& item->Message()->FindString("path", &userPath) == B_OK) {
+			if (userPath == path)
+				return i;
+		}
+	}
+	return -1;
+}
+
+
+BMessage
+ScreenshotWindow::_ReadSettings() const
+{
+	BPath settingsPath;
+	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
+	settingsPath.Append("screenshot");
+
+	BMessage settings;
+
+	BFile file(settingsPath.Path(), B_READ_ONLY);
+	if (file.InitCheck() == B_OK)
+		settings.Unflatten(&file);
+
+	return settings;
+}
+
+
+void
+ScreenshotWindow::_WriteSettings() const
+{
+	BMessage settings;
+	settings.AddInt32("be:type", fImageFileType);
+
+	BString path;
+	int32 count = fOutputPathMenu->CountItems();
+	if (count > 5) {
+		for (int32 i = count - 3; i > count - 8 && i > 2; --i) {
+			BMenuItem* item = fOutputPathMenu->ItemAt(i);
+			if (item) {
+				BMessage* msg = item->Message();
+				if (msg && msg->FindString("path", &path) == B_OK)
+					settings.AddString("path", path.String());
+			}
+		}
 	}
 
-	BSize size = GetLayout()->PreferredSize();
-	ResizeTo(size.Width(), size.Height());
+	if (fLastSelectedPath) {
+		BMessage* msg = fLastSelectedPath->Message();
+		if (msg && msg->FindString("path", &path) == B_OK)
+			settings.AddString("lastSelectedPath", path.String());
+	}
 
-	BRect frame(BScreen(this).Frame());
-	MoveTo((frame.Width() - size.Width()) / 2.0,
-		(frame.Height() - size.Height()) / 2.0);
+	BPath settingsPath;
+	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
+	settingsPath.Append("screenshot");
 
-	Show();
+	BFile file(settingsPath.Path(), B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	if (file.InitCheck() == B_OK) {
+		ssize_t size;
+		settings.Flatten(&file, &size);
+	}
 }
 
 
 void
 ScreenshotWindow::_TakeScreenshot()
 {
-	snooze((atoi(fDelayControl->Text()) * 1000000) + 50000);
+	if (fDelayControl)
+		snooze((atoi(fDelayControl->Text()) * 1000000) + 50000);
 
 	BRect frame;
 	delete fScreenshot;
@@ -499,16 +627,6 @@ ScreenshotWindow::_TakeScreenshot()
 	} else {
 		BScreen(this).GetBitmap(&fScreenshot, fIncludeCursor);
 	}
-
-	fPreviewBox->ClearViewBitmap();
-	fPreviewBox->SetViewBitmap(fScreenshot, fScreenshot->Bounds(),
-		fPreviewBox->Bounds(), B_FOLLOW_ALL, 0);
-
-	BCardLayout* layout = dynamic_cast<BCardLayout*> (GetLayout());
-	if (layout)
-		layout->SetVisibleItem(1L);
-
-	SetTitle("Save Screenshot");
 }
 
 
