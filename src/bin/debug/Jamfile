@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src bin debug ;
 
 UsePrivateHeaders debug ;
-#UsePrivateHeaders kernel ;
 UsePrivateHeaders libroot ;
 UsePrivateHeaders shared ;
 UsePrivateSystemHeaders ;
