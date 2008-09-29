@@ -509,8 +509,14 @@ AcpiOsMapMemory (
 	area_id area;
 	void *there;
 
-	area = map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,&there);
+	area = map_physical_memory("acpi_physical_mem_area", map_base,
+			ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,&there);
+	if (area < 0) {
+		dprintf("ACPI: cannot map memory at %p, length %ld\n", map_base, length);
+		return NULL;
+	}
 	there += page_offset;
+
 	return there;
 #endif
 
