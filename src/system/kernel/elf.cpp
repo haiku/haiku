@@ -1528,7 +1528,9 @@ elf_load_user_image(const char *path, struct team *team, int flags,
     imageInfo.node = st.st_ino;
 	strlcpy(imageInfo.name, path, sizeof(imageInfo.name));
 
-	register_image(team, &imageInfo, sizeof(image_info));
+	imageInfo.id = register_image(team, &imageInfo, sizeof(image_info));
+	if (imageInfo.id >= 0 && team_get_current_team_id() == team->id)
+		user_debug_image_created(&imageInfo);
 		// Don't care, if registering fails. It's not crucial.
 
 	TRACE(("elf_load: done!\n"));
