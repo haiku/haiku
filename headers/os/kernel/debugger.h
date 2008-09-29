@@ -180,6 +180,18 @@ typedef enum {
 } debug_debugger_message;
 
 
+// profile events -- when the buffer is in variable stack depth format, a sample
+// count entry >= B_DEBUG_PROFILE_EVENT_BASE indicates a profile event
+enum {
+	B_DEBUG_PROFILE_EVENT_BASE				= 0x80000000,
+	B_DEBUG_PROFILE_EVENT_PARAMETER_MASK	= 0x0000ffff,
+		// & with to get the event's parameter count
+
+	B_DEBUG_PROFILE_IMAGE_EVENT				= 0x80010001
+		// single parameter: the respective image event counter
+};
+
+
 // #pragma mark -
 // #pragma mark ----- messages to the debug nub thread -----
 

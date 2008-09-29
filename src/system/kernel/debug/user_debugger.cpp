@@ -1192,11 +1192,25 @@ profiling_do_sample(bool& flushBuffer)
 
 	// Check, whether the buffer is full or an image event occurred since the
 	// last sample was taken.
+	int32 maxSamples = debugInfo.profile.max_samples;
 	int32 sampleCount = debugInfo.profile.sample_count;
 	int32 stackDepth = debugInfo.profile.stack_depth;
 	int32 imageEvent = thread->team->debug_info.image_event;
 	if (debugInfo.profile.sample_count > 0) {
-		if (debugInfo.profile.image_event < imageEvent
+		if (debugInfo.profile.last_image_event < imageEvent
+			&& debugInfo.profile.variable_stack_depth
+			&& sampleCount + 2 <= maxSamples) {
+			// an image event occurred, but we use variable stack depth and
+			// have enough room in the buffer to indicate an image event
+			addr_t* event = debugInfo.profile.samples + sampleCount;
+			event[0] = B_DEBUG_PROFILE_IMAGE_EVENT;
+			event[1] = imageEvent;
+			sampleCount += 2;
+			debugInfo.profile.sample_count = sampleCount;
+			debugInfo.profile.last_image_event = imageEvent;
+		}
+
+		if (debugInfo.profile.last_image_event < imageEvent
 			|| debugInfo.profile.flush_threshold - sampleCount < stackDepth) {
 			if (!IS_KERNEL_ADDRESS(arch_debug_get_interrupt_pc())) {
 				flushBuffer = true;
@@ -1206,7 +1220,7 @@ profiling_do_sample(bool& flushBuffer)
 			// We can't flush the buffer now, since we interrupted a kernel
 			// function. If the buffer is not full yet, we add the samples,
 			// otherwise we have to drop them.
-			if (debugInfo.profile.max_samples - sampleCount < stackDepth) {
+			if (maxSamples - sampleCount < stackDepth) {
 				debugInfo.profile.dropped_ticks++;
 				return true;
 			}
@@ -1214,6 +1228,7 @@ profiling_do_sample(bool& flushBuffer)
 	} else {
 		// first sample -- set the image event
 		debugInfo.profile.image_event = imageEvent;
+		debugInfo.profile.last_image_event = imageEvent;
 	}
 
 	// get the samples
@@ -2300,6 +2315,8 @@ debug_nub_thread(void *)
 							threadDebugInfo.profile.interval_left = interval;
 							threadDebugInfo.profile.installed_timer = NULL;
 							threadDebugInfo.profile.image_event = imageEvent;
+							threadDebugInfo.profile.last_image_event
+								= imageEvent;
 						} else
 							result = B_BAD_VALUE;
 					} else

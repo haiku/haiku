@@ -96,6 +96,9 @@ struct thread_debug_info {
 		int32			image_event;
 			// number of the image event when the first sample was written into
 			// the buffer
+		int32			last_image_event;
+			// number of the image event when the last sample was written into
+			// the buffer
 		bool			variable_stack_depth;
 			// record a variable number of samples per hit
 		bool			buffer_full;

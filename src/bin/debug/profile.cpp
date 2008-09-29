@@ -495,8 +495,26 @@ public:
 			int32 totalSampleCount = 0;
 			int32 tickCount = 0;
 			addr_t* samples = fSamples;
+
 			while (count > 0) {
-				int32 sampleCount = *(samples++);
+				addr_t sampleCount = *(samples++);
+
+				if (sampleCount >= B_DEBUG_PROFILE_EVENT_BASE) {
+					int32 eventParameterCount
+						= sampleCount & B_DEBUG_PROFILE_EVENT_PARAMETER_MASK;
+					if (sampleCount == B_DEBUG_PROFILE_IMAGE_EVENT) {
+						int32 imageEvent = (int32)samples[0];
+						_RemoveObsoleteImages(imageEvent);
+						_AddNewImages(newImages, imageEvent);
+					} else {
+						fprintf(stderr, "unknown profile event: %#lx\n",
+							sampleCount);
+					}
+
+					samples += eventParameterCount;
+					count -= eventParameterCount + 1;
+					continue;
+				}
 
 				// Sort the samples. This way hits of the same symbol are
 				// successive and we can avoid incrementing the hit count of the
@@ -507,7 +525,7 @@ public:
 				ThreadImage* previousImage = NULL;
 				int32 previousSymbol = -1;
 
-				for (int32 i = 0; i < sampleCount; i++) {
+				for (uint32 i = 0; i < sampleCount; i++) {
 					addr_t address = samples[i];
 					ThreadImage* image = FindImage(address);
 					int32 symbol = -1;
@@ -527,7 +545,7 @@ public:
 					previousSymbol = symbol;
 				}
 
-				if (unknownSamples == sampleCount)
+				if (unknownSamples == (int32)sampleCount)
 					fUnkownTicks++;
 
 				samples += sampleCount;
@@ -681,7 +699,20 @@ public:
 	}
 
 private:
+	typedef DoublyLinkedList<ThreadImage>	ImageList;
+
 	void _SynchronizeImages();
+
+	void _AddNewImages(ImageList& newImages, int32 event)
+	{
+		ImageList::Iterator it = newImages.GetIterator();
+		while (ThreadImage* image = it.Next()) {
+			if (image->GetImage()->CreationEvent() >= event) {
+				it.Remove();
+				fImages.Add(image);
+			}
+		}
+	}
 
 	void _RemoveObsoleteImages(int32 event)
 	{
@@ -711,8 +742,6 @@ private:
 	}
 
 private:
-	typedef DoublyLinkedList<ThreadImage>	ImageList;
-
 	thread_info	fInfo;
 	::Team*		fTeam;
 	area_id		fSampleArea;
