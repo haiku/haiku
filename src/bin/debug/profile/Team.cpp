@@ -287,8 +287,7 @@ Team::_LoadSymbols(debug_symbol_lookup_context* lookupContext,
 
 status_t
 Team::_LoadImageSymbols(debug_symbol_lookup_context* lookupContext,
-	const image_info& imageInfo, team_id owner, int32 event,
-	Image** _image = NULL)
+	const image_info& imageInfo, team_id owner, int32 event, Image** _image)
 {
 	Image* image = new(std::nothrow) Image(imageInfo, owner, event);
 	if (image == NULL)
