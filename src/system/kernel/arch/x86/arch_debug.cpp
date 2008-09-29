@@ -787,7 +787,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 
 			if (skipIframes > 0) {
 				if (--skipIframes == 0)
-					skipFrames = 1;
+					skipFrames = 0;
 			}
 		} else {
 			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK)
