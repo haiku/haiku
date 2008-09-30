@@ -123,7 +123,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include <malloc.h>
 #include <sys/time.h>
 #include <OS.h>
 
@@ -510,7 +509,7 @@ AcpiOsMapMemory (
 	void *there;
 
 	area = map_physical_memory("acpi_physical_mem_area", map_base,
-			ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,&there);
+			ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_ADDRESS,0,&there);
 	if (area < 0) {
 		dprintf("ACPI: cannot map memory at %p, length %ld\n", map_base, length);
 		return NULL;
