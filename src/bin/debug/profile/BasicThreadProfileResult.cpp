@@ -119,41 +119,16 @@ BasicThreadProfileResult::AddDroppedTicks(int32 dropped)
 void
 BasicThreadProfileResult::PrintResults()
 {
-	// count images and symbols
-	int32 imageCount = 0;
+	// get hit images
+	BasicThreadImage* images[fOldImages.Size() + fImages.Size()];
+	int32 imageCount = GetHitImages(images);
+
+	// count symbols
 	int32 symbolCount = 0;
-
-	ImageList::Iterator it = fOldImages.GetIterator();
-	while (BasicThreadImage* image = it.Next()) {
-		if (image->TotalHits() > 0) {
-			imageCount++;
-			if (image->TotalHits() > image->UnknownHits())
-				symbolCount += image->GetImage()->SymbolCount();
-		}
-	}
-
-	it = fImages.GetIterator();
-	while (BasicThreadImage* image = it.Next()) {
-		if (image->TotalHits() > 0) {
-			imageCount++;
-			if (image->TotalHits() > image->UnknownHits())
-				symbolCount += image->GetImage()->SymbolCount();
-		}
-	}
-
-	BasicThreadImage* images[imageCount];
-	imageCount = 0;
-
-	it = fOldImages.GetIterator();
-	while (BasicThreadImage* image = it.Next()) {
-		if (image->TotalHits() > 0)
-			images[imageCount++] = image;
-	}
-
-	it = fImages.GetIterator();
-	while (BasicThreadImage* image = it.Next()) {
-		if (image->TotalHits() > 0)
-			images[imageCount++] = image;
+	for (int32 k = 0; k < imageCount; k++) {
+		BasicThreadImage* image = images[k];
+		if (image->TotalHits() > image->UnknownHits())
+			symbolCount += image->GetImage()->SymbolCount();
 	}
 
 	// find and sort the hit symbols
@@ -261,7 +236,7 @@ InclusiveThreadProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
 			symbol = image->GetImage()->FindSymbol(address);
 			if (symbol < 0) {
 				// TODO: Count unknown image hits?
-			} else if (symbol != previousSymbol)
+			} else if (image != previousImage || symbol != previousSymbol)
 				image->AddSymbolHit(symbol);
 
 			if (image != previousImage)

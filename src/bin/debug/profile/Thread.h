@@ -105,6 +105,7 @@ public:
 	virtual	void				SynchronizeImages(int32 event);
 
 			ThreadImageType*	FindImage(addr_t address) const;
+			int32				GetHitImages(ThreadImageType** images) const;
 
 	virtual	void				AddSamples(addr_t* samples,
 									int32 sampleCount) = 0;
@@ -239,7 +240,7 @@ void
 AbstractThreadProfileResult<ThreadImageType>::SynchronizeImages(int32 event)
 {
 	// remove obsolete images
-	ImageList::Iterator it = fImages.GetIterator();
+	typename ImageList::Iterator it = fImages.GetIterator();
 	while (ThreadImageType* image = it.Next()) {
 		int32 deleted = image->GetImage()->DeletionEvent();
 		if (deleted >= 0 && event >= deleted) {
@@ -266,7 +267,7 @@ template<typename ThreadImageType>
 ThreadImageType*
 AbstractThreadProfileResult<ThreadImageType>::FindImage(addr_t address) const
 {
-	ImageList::ConstIterator it = fImages.GetIterator();
+	typename ImageList::ConstIterator it = fImages.GetIterator();
 	while (ThreadImageType* image = it.Next()) {
 		if (image->ContainsAddress(address))
 			return image;
@@ -274,5 +275,27 @@ AbstractThreadProfileResult<ThreadImageType>::FindImage(addr_t address) const
 	return NULL;
 }
 
+
+template<typename ThreadImageType>
+int32
+AbstractThreadProfileResult<ThreadImageType>::GetHitImages(
+	ThreadImageType** images) const
+{
+	int32 imageCount = 0;
+
+	typename ImageList::ConstIterator it = fOldImages.GetIterator();
+	while (ThreadImageType* image = it.Next()) {
+		if (image->TotalHits() > 0)
+			images[imageCount++] = image;
+	}
+
+	it = fImages.GetIterator();
+	while (ThreadImageType* image = it.Next()) {
+		if (image->TotalHits() > 0)
+			images[imageCount++] = image;
+	}
+
+	return imageCount;
+}
 
 #endif	// THREAD_H
