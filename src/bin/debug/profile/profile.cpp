@@ -24,6 +24,7 @@
 #include <util/DoublyLinkedList.h>
 
 #include "BasicThreadProfileResult.h"
+#include "CallgrindThreadProfileResult.h"
 #include "debug_utils.h"
 #include "Image.h"
 #include "Options.h"
@@ -67,6 +68,8 @@ static const char* kUsage =
 	"                   caller stack per tick. If the topmost address doesn't\n"
 	"                   hit a known image, the next address will be matched\n"
 	"                   (and so on).\n"
+	"  -v <directory> - Create valgrind/callgrind output. <directory> is the\n"
+	"                   directory where to put the output files.\n"
 ;
 
 
@@ -176,7 +179,9 @@ private:
 	status_t _CreateThreadProfileResult(Thread* thread)
 	{
 		ThreadProfileResult* profileResult;
-		if (gOptions.analyze_full_stack)
+		if (gOptions.callgrind_directory != NULL)
+			profileResult = new(std::nothrow) CallgrindThreadProfileResult;
+		else if (gOptions.analyze_full_stack)
 			profileResult = new(std::nothrow) InclusiveThreadProfileResult;
 		else
 			profileResult = new(std::nothrow) ExclusiveThreadProfileResult;
@@ -239,7 +244,7 @@ main(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+cCfhi:klo:s:", sLongOptions,
+		int c = getopt_long(argc, (char**)argv, "+cCfhi:klo:s:v:", sLongOptions,
 			NULL);
 		if (c == -1)
 			break;
@@ -272,6 +277,11 @@ main(int argc, const char* const* argv)
 				break;
 			case 's':
 				stackDepth = atol(optarg);
+				break;
+			case 'v':
+				gOptions.callgrind_directory = optarg;
+				gOptions.analyze_full_stack = true;
+				gOptions.stack_depth = 64;
 				break;
 			default:
 				print_usage_and_exit(true);

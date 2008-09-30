@@ -16,6 +16,7 @@ struct Options {
 		interval(1000),
 		stack_depth(5),
 		output(NULL),
+		callgrind_directory(NULL),
 		profile_kernel(true),
 		profile_loading(false),
 		profile_teams(true),
@@ -27,6 +28,7 @@ struct Options {
 	bigtime_t	interval;
 	int32		stack_depth;
 	FILE*		output;
+	const char*	callgrind_directory;
 	bool		profile_kernel;
 	bool		profile_loading;
 	bool		profile_teams;
