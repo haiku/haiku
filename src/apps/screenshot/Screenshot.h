@@ -19,4 +19,5 @@ private:
 
 private:
 	bool				fArgvReceived;
+	bool				fRefsReceived;
 };

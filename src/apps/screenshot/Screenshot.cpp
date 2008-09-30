@@ -14,7 +14,8 @@
 
 Screenshot::Screenshot()
 	: BApplication("application/x-vnd.haiku-screenshot"),
-	fArgvReceived(false)
+	fArgvReceived(false),
+	fRefsReceived(false)
 {
 }
 
@@ -27,10 +28,11 @@ Screenshot::~Screenshot()
 void
 Screenshot::ReadyToRun()
 {
-	if(!fArgvReceived)
+	if(!fArgvReceived && !fRefsReceived)
 		new ScreenshotWindow();
 
 	fArgvReceived = false;
+	fRefsReceived = false;
 }
 
 
@@ -57,6 +59,8 @@ Screenshot::RefsReceived(BMessage* message)
 
 	new ScreenshotWindow(delay * 1000000, includeBorder, includeCursor,
 		grabActiveWindow, showConfigureWindow, saveScreenshotSilent);
+
+	fRefsReceived = true;
 }
 
 

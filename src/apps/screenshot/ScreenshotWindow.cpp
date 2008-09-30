@@ -190,11 +190,14 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			}
 		}	break;
 
-		case kFinishScreenshot: {
+		case kFinishScreenshot:
 			_WriteSettings();
 			_SaveScreenshot();
+
+		// fall through
+		case B_QUIT_REQUESTED:
 			be_app_messenger.SendMessage(B_QUIT_REQUESTED);
-		}	break;
+		break;
 
 		case kShowOptions: {
 			BCardLayout* layout = dynamic_cast<BCardLayout*> (GetLayout());
@@ -323,7 +326,7 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 	fPreviewBox->SetExplicitMinSize(BSize(200.0, B_SIZE_UNSET));
 	fPreviewBox->SetFlags(fPreviewBox->Flags() | B_FULL_UPDATE_ON_RESIZE);
 
-	fNameControl = new BTextControl("", "Name:", "screenshot", NULL);
+	fNameControl = new BTextControl("", "Name:", "screenshot1", NULL);
 
 	BMessage settings(_ReadSettings());
 
@@ -333,7 +336,7 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 	_SetupOutputPathMenu(new BMenu("Please select"), settings);
 	BMenuField* menuField2 = new BMenuField("Save in:", fOutputPathMenu);
 
-	fNameControl->SetText(_FindValidFileName("screenshot").String());
+	fNameControl->SetText(_FindValidFileName("screenshot1").String());
 
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
@@ -739,7 +742,7 @@ ScreenshotWindow::_SaveScreenshotSilent() const
 	int32 index = 1;
 	do {
 		char filename[32];
-		sprintf(filename, "screenshot%ld.png", index++);
+		sprintf(filename, "screenshot%ld", index++);
 		path = homePath;
 		path.Append(filename);
 		entry.SetTo(path.Path());

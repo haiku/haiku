@@ -28,7 +28,7 @@ public:
 								bool saveScreenshotSilent = false);
 	virtual					~ScreenshotWindow();
 
-	virtual void			MessageReceived(BMessage* message);
+	virtual	void			MessageReceived(BMessage* message);
 
 private:
 			void			_InitWindow();
