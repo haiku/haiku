@@ -60,7 +60,6 @@ public:
 			void			UnlockExclusiveAccess();
 
 			// for screen shots
-			bool			DumpToFile(const char *path);
 			ServerBitmap*	DumpToBitmap();
 			status_t		ReadBitmap(ServerBitmap *bitmap, bool drawCursor,
 								BRect bounds);
