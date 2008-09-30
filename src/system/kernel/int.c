@@ -81,10 +81,9 @@ dump_int_statistics(int argc, char **argv)
 				io != &sVectors[i].handler_list; io = io->next) {
 			const char *symbol, *imageName;
 			bool exactMatch;
-			addr_t address, baseAddress;
 
 			status_t error = elf_debug_lookup_symbol_address((addr_t)io->func,
-				&baseAddress, &symbol, &imageName, &exactMatch);
+				NULL, &symbol, &imageName, &exactMatch);
 			if (error == B_OK && exactMatch) {
 				if (strchr(imageName, '/') != NULL)
 					imageName = strrchr(imageName, '/') + 1;
