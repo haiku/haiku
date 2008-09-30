@@ -76,8 +76,9 @@ public:
 			int32			Flags() const { return fNode.Flags(); }
 
 			off_t			Size() const { return fNode.data.Size(); }
+			off_t			AllocatedSize() const;
 			off_t			LastModified() const
-								{ return fNode.last_modified_time; }
+								{ return fNode.LastModifiedTime(); }
 
 			const block_run& BlockRun() const
 								{ return fNode.inode_num; }

@@ -10,15 +10,15 @@
 
 
 struct stat {
-	dev_t			st_dev;			/* "device" that this file resides on */
-	ino_t			st_ino;			/* this file's inode #, unique per device */
-	mode_t			st_mode;		/* mode bits (rwx for user, group, etc) */
+	dev_t			st_dev;			/* device ID that this file resides on */
+	ino_t			st_ino;			/* this file's serial inode ID */
+	mode_t			st_mode;		/* file mode (rwx for user, group, etc) */
 	nlink_t			st_nlink;		/* number of hard links to this file */
-	uid_t			st_uid;			/* user id of the owner of this file */
-	gid_t			st_gid;			/* group id of the owner of this file */
+	uid_t			st_uid;			/* user ID of the owner of this file */
+	gid_t			st_gid;			/* group ID of the owner of this file */
 	off_t			st_size;		/* size in bytes of this file */
 	dev_t			st_rdev;		/* device type (not used) */
-	size_t			st_blksize;		/* preferred block size for i/o */
+	blksize_t		st_blksize;		/* preferred block size for I/O */
 	time_t			st_atime;		/* last access time */
 	time_t			st_mtime;		/* last modification time */
 	time_t			st_ctime;		/* last change time, not creation time */
@@ -29,6 +29,7 @@ struct stat {
 	 * TODO: we should find another solution for this, as BStatable::GetStat()
 	 *		can only retrieve the R5 stat structure */
 	unsigned int	st_type;		/* attribute/index type */
+	blkcnt_t		st_blocks;		/* number of blocks allocated for object */
 };
 
 /* extended file types */

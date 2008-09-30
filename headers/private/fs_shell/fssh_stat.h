@@ -30,6 +30,7 @@ struct fssh_stat {
 	// TODO: we should find another solution for this, as BStatable::GetStat()
 	//		can only retrieve the R5 stat structure
 	unsigned int		fssh_st_type;		/* attribute/index type */
+	fssh_off_t			fssh_st_blocks;		/* number of blocks allocated for object */
 };
 typedef struct fssh_stat fssh_struct_stat;
 

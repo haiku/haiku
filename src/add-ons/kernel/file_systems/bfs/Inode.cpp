@@ -1275,6 +1275,48 @@ Inode::IsEmpty()
 //	#pragma mark - data stream
 
 
+/*!	Computes the number of bytes this inode occupies in the file system.
+	This includes the file meta blocks used for maintaining its data stream.
+
+	TODO: However, the attributes in extra files are not really accounted for;
+	depending on the speed penalty, this should be changed, though (the value
+	could be cached in the inode structure or Inode object, though).
+*/
+off_t
+Inode::AllocatedSize() const
+{
+	if (IsSymLink() && (Flags() & INODE_LONG_SYMLINK) == 0) {
+		// This symlink does not have a data stream
+		return Node().InodeSize();
+	}
+
+	const data_stream& data = Node().data;
+	uint32 blockSize = fVolume->BlockSize();
+	off_t size = blockSize;
+
+	if (data.MaxDoubleIndirectRange() != 0) {
+		off_t doubleIndirectSize = data.MaxDoubleIndirectRange()
+			- data.MaxIndirectRange();
+		int32 indirectSize = (1L << (INDIRECT_BLOCKS_SHIFT
+				+ fVolume->BlockShift())) * (blockSize / sizeof(block_run));
+
+		size += (2 * NUM_ARRAY_BLOCKS + doubleIndirectSize / indirectSize)
+			* blockSize + data.MaxDoubleIndirectRange();
+	} else if (data.MaxIndirectRange() != 0)
+		size += NUM_ARRAY_BLOCKS + data.MaxIndirectRange();
+	else
+		size += data.MaxDirectRange();
+
+	if (!Node().attributes.IsZero()) {
+		// TODO: to make this exact, we'd had to count all attributes
+		size += 2 * blockSize;
+			// 2 blocks, one for the attributes inode, one for its B+tree
+	}
+
+	return size;
+}
+
+
 /*!	Finds the block_run where "pos" is located in the data_stream of
 	the inode.
 	If successful, "offset" will then be set to the file offset

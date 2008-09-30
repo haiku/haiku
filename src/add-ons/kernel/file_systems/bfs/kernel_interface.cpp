@@ -50,11 +50,14 @@ fill_stat_buffer(Inode* inode, struct stat& stat)
 	stat.st_mtime = stat.st_ctime = (time_t)(node.LastModifiedTime() >> INODE_TIME_SHIFT);
 	stat.st_crtime = (time_t)(node.CreateTime() >> INODE_TIME_SHIFT);
 
-	if (inode->IsSymLink() && (node.Flags() & INODE_LONG_SYMLINK) == 0) {
+	if (inode->IsSymLink() && (inode->Flags() & INODE_LONG_SYMLINK) == 0) {
 		// symlinks report the size of the link here
 		stat.st_size = strlen(node.short_symlink);
 	} else
 		stat.st_size = inode->Size();
+
+	stat.st_blocks = inode->AllocatedSize() / node.InodeSize();
+		// TODO: decide for a unit to use for st_blocks!
 }
 
 

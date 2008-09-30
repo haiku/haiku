@@ -1224,6 +1224,7 @@
 #define st_ctime	fssh_st_ctime
 #define st_crtime	fssh_st_crtime
 #define st_type		fssh_st_type
+#define st_blocks	fssh_st_blocks
 
 /* extended file types */
 #define S_ATTR_DIR			FSSH_S_ATTR_DIR
