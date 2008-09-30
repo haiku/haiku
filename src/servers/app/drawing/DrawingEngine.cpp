@@ -16,7 +16,6 @@
 #include "DrawState.h"
 #include "GlyphLayoutEngine.h"
 #include "Painter.h"
-#include "PNGDump.h"
 #include "ServerBitmap.h"
 #include "ServerCursor.h"
 #include "RenderingBuffer.h"
@@ -1139,24 +1138,6 @@ DrawingEngine::StringWidth(const char* string, int32 length,
 }
 
 // #pragma mark -
-
-// DumpToFile
-bool
-DrawingEngine::DumpToFile(const char *path)
-{
-	CRASH_IF_NOT_EXCLUSIVE_LOCKED
-
-	RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
-	if (buffer) {
-		BRect bounds(0.0, 0.0, buffer->Width() - 1, buffer->Height() - 1);
-		SaveToPNG(path, bounds, buffer->ColorSpace(),
-				  buffer->Bits(),
-				  buffer->BitsLength(),
-				  buffer->BytesPerRow());
-		return true;
-	}
-	return false;
-}
 
 // DumpToBitmap
 ServerBitmap*

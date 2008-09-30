@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers app ;
 
-UseLibraryHeaders agg png zlib ;
+UseLibraryHeaders agg ;
 UsePrivateHeaders app graphics input interface kernel shared storage ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
@@ -40,7 +40,6 @@ Server app_server :
 	MultiLocker.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindow.cpp
-	PNGDump.cpp
 	ProfileMessageSupport.cpp
 	RGBColor.cpp
 	RegionPool.cpp
@@ -62,7 +61,7 @@ Server app_server :
 
 	# libraries
 	:
-	libtranslation.so libz.so libpng.so libbe.so
+	libtranslation.so libbe.so
 	libasdrawing.a libpainter.a libagg.a libfreetype.so
 	libtextencoding.so libshared.a
 
