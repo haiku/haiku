@@ -98,20 +98,8 @@ status_t OpenSoundDeviceEngine::Open(int mode)
 
 	// set driver buffer size by using the "fragments" API
 	// TODO: export this setting as a BParameter?
-
-	// NOTE stippi: 2048 bytes driver buffer is long enough for playback on
-	// BeOS. On Haiku, testing on HD Audio hardware, it is too short. However,
-	// I seem to remember the HD Audio supports 32 bit sample width (while
-	// C-Media supports "only" 16). If OSS uses the same 2048 bytes even for
-	// 32 bit/sample, then I could see how that would be asking for too much,
-	// since that would effectively half the latency.
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	uint32 bufferCount = 6;
-	uint32 bufferSize = 0x000b; // 1024 bytes
-#else
 	uint32 bufferCount = 4;
 	uint32 bufferSize = 0x000a; // 512 bytes
-#endif
 	v = (bufferCount << 16) | bufferSize;
 	if (ioctl(fFD, SNDCTL_DSP_SETFRAGMENT, &v, sizeof(int)) < 0) {
 		fInitCheckStatus = errno;
