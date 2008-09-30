@@ -61,12 +61,10 @@ configure_dma(ide_device_info *device)
 		device->DMA_enabled = device->DMA_supported = device->bus->can_DMA;
 		if (device->DMA_enabled) {
 			dprintf("IDE: enabling DMA\n");
-		}
-		else {
+		} else {
 			dprintf("IDE: disabling DMA (failsafe option selected)\n");
 		}
-	}
-	else {
+	} else {
 		device->DMA_enabled = false;
 		dprintf("IDE: DMA not possible, disabling\n");
 	}
