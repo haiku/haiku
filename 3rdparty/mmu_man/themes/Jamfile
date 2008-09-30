@@ -44,7 +44,7 @@ Application <3rdparty>Themes :
 	ViewItem.cpp
 	$(addonSources)
 	: be media textencoding translation 
-	  $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
+	  $(TARGET_LIBSTDC++)
 	: Themes.rdef
 ;
 

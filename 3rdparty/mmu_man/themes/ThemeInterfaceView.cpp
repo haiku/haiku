@@ -478,7 +478,7 @@ void ThemeInterfaceView::PopulateThemeList()
 		if (c)
 			c->SetEnabled(false);
 	}
-	thread_id tid = spawn_thread(_ThemeListPopulatorTh, "", B_LOW_PRIORITY, this);
+	thread_id tid = spawn_thread(_ThemeListPopulatorTh, "ThemeListPopulator", B_LOW_PRIORITY, this);
 	resume_thread(tid);
 }
 
