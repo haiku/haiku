@@ -338,6 +338,8 @@ ext2_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 	stat->st_crtime = node.CreationTime();
 
 	stat->st_size = inode->Size();
+	stat->st_blocks = (inode->Size() + 511) / 512;
+
 	return B_OK;
 }
 

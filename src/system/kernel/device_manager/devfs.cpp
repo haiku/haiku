@@ -1789,6 +1789,7 @@ devfs_read_stat(fs_volume* _volume, fs_vnode* _vnode, struct stat* stat)
 
 	stat->st_nlink = 1;
 	stat->st_blksize = 65536;
+	stat->st_blocks = 0;
 
 	stat->st_uid = vnode->uid;
 	stat->st_gid = vnode->gid;

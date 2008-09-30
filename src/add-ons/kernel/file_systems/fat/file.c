@@ -195,6 +195,7 @@ dosfs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 	st->st_uid = 0;
 	st->st_gid = 0;
 	st->st_size = node->st_size;
+	st->st_blocks = (node->st_size + 511) / 512;
 	st->st_blksize = 0x10000; /* this value was chosen arbitrarily */
 	st->st_atime = st->st_mtime = st->st_ctime = st->st_crtime = node->st_time;
 

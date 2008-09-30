@@ -446,10 +446,12 @@ fill_stat_buffer(Volume* volume, Inode* inode, Attribute* attribute,
 
 	if (attribute != NULL) {
 		stat.st_size = attribute->Size();
+		stat.st_blocks = 0;
 		stat.st_mode = S_ATTR | 0666;
 		stat.st_type = attribute->Type();
 	} else {
 		stat.st_size = inode->Size() + sizeof(wav_header);
+		stat.st_blocks = inode->Size() / 512;
 		stat.st_mode = inode->Type();
 		stat.st_type = 0;
 	}

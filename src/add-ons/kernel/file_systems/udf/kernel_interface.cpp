@@ -232,6 +232,7 @@ udf_read_stat(fs_volume *_volume, fs_vnode *node, struct stat *stat)
 
 	stat->st_mode = icb->Mode();
 	stat->st_size = icb->Length();
+	stat->st_blocks = (stat->st_size + 511) / 512;
 
 	// File times. For now, treat the modification time as creation
 	// time as well, since true creation time is an optional extended
