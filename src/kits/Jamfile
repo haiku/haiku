@@ -20,12 +20,17 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 UsePrivateHeaders [ FDirName kernel ]   # For KMessage.h
 UsePrivateHeaders syslog_daemon ;		# For syslog.cpp
 
+local pngDump ;
+if $(TARGET_PLATFORM) != haiku {
+	pngDump = libpng.so libz.so ;
+}
+
 # Build our libbe.so
 
 AddResources libbe.so : libbe_version.rdef ;
 
 SharedLibrary libbe.so :
-	: 
+	:
 	<libbe>app_kit.o
 	<libbe>interface_kit.o
 	<libbe>storage_kit.o
@@ -35,7 +40,7 @@ SharedLibrary libbe.so :
 	libagg.a
 
 	libroot.so	# make sure it links against our libroot.so
-	libpng.so libz.so # For dumping the screen to PNG in the Interface Kit
+	$(pngDump) # For dumping the screen to PNG in the Interface Kit on R5
 	$(TARGET_LIBSTDC++)
 ;
 
@@ -71,7 +76,6 @@ SharedLibrary libbe_haiku.so :
 
 	libbeadapter.so
 	$(TARGET_NETWORK_LIBS)
-	libpng.so # For dumping the screen to PNG in the Interface Kit
 	$(TARGET_LIBSTDC++)
 ;
 

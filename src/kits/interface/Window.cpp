@@ -44,8 +44,9 @@
 #include <tracker_private.h>
 #include <WindowPrivate.h>
 
-#include "PNGDump.h"
-
+#ifndef __HAIKU__
+#	include "PNGDump.h"
+#endif
 
 //#define DEBUG_WIN
 #ifdef DEBUG_WIN
@@ -2663,8 +2664,8 @@ BWindow::_DequeueAll()
 	 a)	it uses the _DetermineTarget() method to tell what the later target of
 		a message will be, if no explicit target is supplied.
 	 b)	it calls _UnpackMessage() and _SanitizeMessage() to duplicate the message
-	 	to all of its intended targets, and to add all fields the target would
-	 	expect in such a message.
+		to all of its intended targets, and to add all fields the target would
+		expect in such a message.
 
 	This is important because the app_server sends all input events to the
 	preferred handler, and expects them to be correctly distributed to their
@@ -2876,7 +2877,7 @@ BWindow::_CreateTopView()
 	fTopView->_SetOwner(this);
 
 	// we can't use AddChild() because this is the top view
-  	fTopView->_CreateSelf();
+	fTopView->_CreateSelf();
 
 	STRACE(("BuildTopView ended\n"));
 }
@@ -3296,6 +3297,19 @@ BWindow::_HandleKeyDown(BMessage* event)
 		// Check for Print Screen
 		int32 rawKey;
 		if (event->FindInt32("key", &rawKey) == B_OK && rawKey == B_PRINT_KEY) {
+#ifdef __HAIKU__
+			BMessage message(B_REFS_RECEIVED);
+			message.AddBool("silent", true);
+
+			if ((modifiers & B_CONTROL_KEY) != 0)
+				message.AddBool("window", true);
+
+			if ((modifiers & B_SHIFT_KEY) != 0 || (modifiers & B_OPTION_KEY) != 0)
+				message.ReplaceBool("silent", false);
+
+			be_roster->Launch("application/x-vnd.haiku-screenshot", &message);
+			return true;
+#elif
 			// Get filename
 			BPath homePath;
 
@@ -3328,7 +3342,7 @@ BWindow::_HandleKeyDown(BMessage* event)
 
 			// Free the bitmap allocated by BScreen.GetBitmap
 			delete screenDump;
-
+#endif
 			return true;
 		}
 	}

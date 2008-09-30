@@ -26,8 +26,14 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders app input print interface shared tracker ;
-UseLibraryHeaders icon png zlib ;
 
+local pngDump ;
+if $(TARGET_PLATFORM) = haiku {
+	UseLibraryHeaders icon ;
+} else {
+	pngDump = PNGDump.cpp ;
+	UseLibraryHeaders icon png zlib ;
+}
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
@@ -78,7 +84,6 @@ MergeObject <libbe>interface_kit.o :
 	PictureButton.cpp
 	PictureDataWriter.cpp
 	PicturePlayer.cpp
-	PNGDump.cpp
 	Point.cpp
 	Polygon.cpp
 	PopUpMenu.cpp
@@ -126,6 +131,9 @@ MergeObject <libbe>interface_kit.o :
 	LayoutOptimizer.cpp
 	OneElementLayouter.cpp
 	SimpleLayouter.cpp
+
+	# required on R5
+	$(pngDump)
 ;
 
 StaticLibrary libcolumnlistview.a :
