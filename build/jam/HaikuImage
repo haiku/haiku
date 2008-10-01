@@ -140,8 +140,8 @@ BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com etherpci $(X86_ONLY)ipro1000
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
 	config_manager agp_gart usb firewire #acpi
 ;
-BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 $(GPL_ONLY)reiserfs ;
-#googlefs nfs $(GPL_ONLY)ntfs ;
+BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 nfs $(GPL_ONLY)reiserfs ;
+#googlefs $(GPL_ONLY)ntfs ;
 
 
 # modules
