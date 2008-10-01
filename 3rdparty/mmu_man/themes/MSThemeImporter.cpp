@@ -608,7 +608,7 @@ status_t MSThemeImporter::ParseWinPath(BDirectory &rootDir, const char *from, BP
 	BDirectory dir;
 	while (p.Length()) {
 		BString component;
-		PRINT(("ParseWinPath: p.L %d p '%s'\n", p.Length(), p.String()));
+		//PRINT(("ParseWinPath: p.L %d p '%s'\n", p.Length(), p.String()));
 		int32 len = p.FindFirst('\\');
 		if (len < 0)
 			len = p.Length();
@@ -617,8 +617,8 @@ status_t MSThemeImporter::ParseWinPath(BDirectory &rootDir, const char *from, BP
 		err = dir.SetTo(to.Path());
 		if (err < B_OK)
 			return err;
-		PRINT(("ParseWinPath: at '%s'\n", to.Path()));
-		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		//PRINT(("ParseWinPath: at '%s'\n", to.Path()));
+		//PRINT(("ParseWinPath: testing '%s'\n", component.String()));
 		if (dir.Contains(component.String())) {
 			to.Append(component.String());
 			continue;
@@ -626,25 +626,25 @@ status_t MSThemeImporter::ParseWinPath(BDirectory &rootDir, const char *from, BP
 		// can't find as is, try various capitalizations
 		// (caseless fs SUXOR)
 		component.Capitalize();
-		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		//PRINT(("ParseWinPath: testing '%s'\n", component.String()));
 		if (dir.Contains(component.String())) {
 			to.Append(component.String());
 			continue;
 		}
 		component.CapitalizeEachWord();
-		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		//PRINT(("ParseWinPath: testing '%s'\n", component.String()));
 		if (dir.Contains(component.String())) {
 			to.Append(component.String());
 			continue;
 		}
 		component.ToLower();
-		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		//PRINT(("ParseWinPath: testing '%s'\n", component.String()));
 		if (dir.Contains(component.String())) {
 			to.Append(component.String());
 			continue;
 		}
 		component.ToUpper();
-		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		//PRINT(("ParseWinPath: testing '%s'\n", component.String()));
 		if (dir.Contains(component.String())) {
 			to.Append(component.String());
 			continue;

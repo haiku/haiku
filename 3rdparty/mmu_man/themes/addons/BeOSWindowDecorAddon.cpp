@@ -7,6 +7,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <InterfaceDefs.h>
@@ -48,11 +49,13 @@
 status_t set_window_decor_safe(const char *name, BMessage *globals)
 {
 	// make sure the decor exists (set_window_decor() always returns B_OK)
+	//PRINT(("set_window_decor_safe(%s, %p)\n", name, globals));
 	BPath p("/etc/decors/");
 	p.Append(name);
 	BNode n(p.Path());
 	if (n.InitCheck() < B_OK || !n.IsFile())
 		return ENOENT;
+	//PRINT(("set_window_decor_safe: found\n"));
 	set_window_decor(name, globals);
 	return B_OK;
 }
@@ -135,8 +138,9 @@ status_t DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	
 #ifdef B_BEOS_VERSION_DANO
 	bool decorDone = false;
+	int i;
 	// try each name until one works
-	for (int i = 0; window_decor.FindString("window:decor", i, &decorName) == B_OK; i++) {
+	for (i = 0; window_decor.FindString("window:decor", i, &decorName) == B_OK; i++) {
 		err = set_window_decor_safe(decorName.String(), 
 			(window_decor.FindMessage("window:decor_globals", &globals) == B_OK)?&globals:NULL);
 		if (err < B_OK)
@@ -145,9 +149,9 @@ status_t DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 		break;
 	}
 	// none match but we did have one, force the default with the globals
-	if (!decorDone && decorName.Length()) {
+	if (!decorDone && i > 0) {
 		decorDone = true;
-		set_window_decor_safe(decorName.String(), 
+		set_window_decor("Default", 
 		(window_decor.FindMessage("window:decor_globals", &globals) == B_OK)?&globals:NULL);
 	}
 	// none... maybe R5 number ?
