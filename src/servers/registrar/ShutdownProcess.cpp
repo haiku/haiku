@@ -123,7 +123,7 @@ public:
 		: MessageEvent(0, target, MSG_PHASE_TIMED_OUT)
 	{
 		SetAutoDelete(false);
-		
+
 		fMessage.AddInt32("phase", INVALID_PHASE);
 		fMessage.AddInt32("team", -1);
 	}
@@ -540,14 +540,14 @@ private:
 			stripeRect.right = kStripeWidth;
 			SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 			FillRect(stripeRect);
-			
+
 			if (fAppInfo && fAppInfo->largeIcon) {
 				if (fAppInfo->largeIcon->ColorSpace() == B_RGBA32) {
 					SetDrawingMode(B_OP_ALPHA);
 					SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 				} else
 					SetDrawingMode(B_OP_OVER);
-				
+
 				DrawBitmapAsync(fAppInfo->largeIcon,
 					BPoint(kStripeWidth - kIconSize / 2, kIconVSpacing));
 			}
@@ -944,7 +944,7 @@ ShutdownProcess::_InitShutdownWindow()
 			}
 		}
 
-		// add the applications		
+		// add the applications
 		if (fWindow) {
 			BAutolock _(fWorkerLock);
 			_AddShutdownWindowApps(fUserApps);
@@ -1248,10 +1248,8 @@ ShutdownProcess::_WorkerDoShutdown()
 	// that is, if an asynchronous BRoster::Shutdown() was requested, we
 	// notify the caller at this point.
 	bool synchronous;
-	if (fRequest->FindBool("synchronous", &synchronous) == B_OK
-		&& !synchronous) {
+	if (fRequest->FindBool("synchronous", &synchronous) == B_OK && !synchronous)
 		_SendReply(B_OK);
-	}
 
 	// ask the user to confirm the shutdown, if desired
 	bool askUser;
@@ -1264,6 +1262,8 @@ ShutdownProcess::_WorkerDoShutdown()
 		BAlert *alert = new BAlert(title, text, "Cancel", buttonText, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
+		alert->SetFeel(B_NORMAL_WINDOW_FEEL);
+		alert->SetWorkspaces(B_ALL_WORKSPACES);
 		int32 result = alert->Go();
 
 		if (result != 1)
@@ -1404,7 +1404,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool systemApps)
 			status_t error = _GetNextEvent(event, team, phase, false);
 			if (error != B_OK)
 				throw_error(error);
-	
+
 			if (event == ABORT_EVENT) {
 				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled by "
 					"team %ld (-1 => user)\n", team));
@@ -1412,7 +1412,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool systemApps)
 				_DisplayAbortingApp(team);
 				throw_error(B_SHUTDOWN_CANCELLED);
 			}
-	
+
 		} while (event != NO_EVENT);
 	}
 
@@ -1556,7 +1556,7 @@ ShutdownProcess::_WaitForBackgroundApps()
 				// ignore: it's too late to abort the shutdown
 			}
 
-			if (event == TIMEOUT_EVENT)	
+			if (event == TIMEOUT_EVENT)
 				return;
 		}
 	}
@@ -1794,7 +1794,7 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 		if (event == TIMEOUT_EVENT)
 			break;
 
-		// stop waiting when the user hit the cancel button 
+		// stop waiting when the user hit the cancel button
 		if (event == ABORT_EVENT && phase == ABORTED_PHASE && eventTeam < 0)
 			break;
 
