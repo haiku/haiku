@@ -25,6 +25,7 @@
 
 //#define HAVE_PREF_BTN
 
+
 ThemeAddonItem::ThemeAddonItem(BRect bounds, ThemeInterfaceView *iview, int32 id)
 	: ViewItem(bounds, "addonitem", B_FOLLOW_NONE, B_WILL_DRAW)
 {
@@ -71,6 +72,7 @@ ThemeAddonItem::ThemeAddonItem(BRect bounds, ThemeInterfaceView *iview, int32 id
 	SetFont(&fnt);
 }
 
+
 ThemeAddonItem::~ThemeAddonItem()
 {
 	delete fApplyBox;
@@ -80,12 +82,16 @@ ThemeAddonItem::~ThemeAddonItem()
 #endif
 }
 
-void ThemeAddonItem::DrawItem(BView *ownerview, BRect frame, bool complete)
+
+void
+ThemeAddonItem::DrawItem(BView *ownerview, BRect frame, bool complete)
 {
 	ViewItem::DrawItem(ownerview, frame, complete);
 }
 
-void ThemeAddonItem::AttachedToWindow()
+
+void
+ThemeAddonItem::AttachedToWindow()
 {
 	AddChild(fApplyBox);
 	fApplyBox->SetTarget(fIView);
@@ -98,7 +104,9 @@ void ThemeAddonItem::AttachedToWindow()
 	RelayoutButtons();
 }
 
-void ThemeAddonItem::MessageReceived(BMessage *message)
+
+void
+ThemeAddonItem::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 	case B_LANGUAGE_CHANGED:
@@ -107,12 +115,16 @@ void ThemeAddonItem::MessageReceived(BMessage *message)
 	BView::MessageReceived(message);
 }
 
-void ThemeAddonItem::Draw(BRect)
+
+void
+ThemeAddonItem::Draw(BRect)
 {
 	DrawString(fAddonName.String(), BPoint(10, 15/*Bounds().Height()/2*/));
 }
 
-void ThemeAddonItem::RelocalizeStrings()
+
+void
+ThemeAddonItem::RelocalizeStrings()
 {
 	fApplyBox->SetLabel(_T("Apply"));
 	fSaveBox->SetLabel(_T("Save"));
@@ -129,7 +141,9 @@ void ThemeAddonItem::RelocalizeStrings()
 	RelayoutButtons();
 }
 
-void ThemeAddonItem::RelayoutButtons()
+
+void
+ThemeAddonItem::RelayoutButtons()
 {
 	fApplyBox->ResizeToPreferred();
 	fSaveBox->MoveTo(fApplyBox->Frame().right+CTRL_SPACING, fApplyBox->Frame().top);
@@ -140,7 +154,10 @@ void ThemeAddonItem::RelayoutButtons()
 #endif
 }
 
-int32 ThemeAddonItem::AddonId()
+
+int32
+ThemeAddonItem::AddonId()
 {
 	return fId;
 }
+

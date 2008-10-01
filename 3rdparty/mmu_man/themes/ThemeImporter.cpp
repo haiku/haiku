@@ -30,23 +30,30 @@ ThemeImporter::ThemeImporter(const char *name)
 	fSettings.MakeEmpty();
 }
 
+
 ThemeImporter::~ThemeImporter()
 {
 	FENTRY;
 }
 
-const char *ThemeImporter::Name()
+
+const char *
+ThemeImporter::Name()
 {
 	return fName.String();
 }
 
-const char *ThemeImporter::Description()
+
+const char *
+ThemeImporter::Description()
 {
 	FENTRY;
 	return "No description yet.";
 }
 	
-status_t	ThemeImporter::LoadSettings(BMessage &settings)
+
+status_t
+ThemeImporter::LoadSettings(BMessage &settings)
 {
 	FENTRY;
 	uint32 flags;
@@ -56,7 +63,9 @@ status_t	ThemeImporter::LoadSettings(BMessage &settings)
 	return B_OK;
 }
 
-status_t	ThemeImporter::SaveSettings(BMessage &settings)
+
+status_t
+ThemeImporter::SaveSettings(BMessage &settings)
 {
 	FENTRY;
 	status_t err;
@@ -65,29 +74,39 @@ status_t	ThemeImporter::SaveSettings(BMessage &settings)
 	return err;
 }
 
-void ThemeImporter::SetFlags(uint32 flags)
+
+void
+ThemeImporter::SetFlags(uint32 flags)
 {
 	fFlags = flags;
 }
 
-uint32 ThemeImporter::Flags()
+
+uint32
+ThemeImporter::Flags()
 {
 	return fFlags;
 }
 
-status_t ThemeImporter::FetchThemes()
+
+status_t
+ThemeImporter::FetchThemes()
 {
 	FENTRY;
 	return B_OK;
 }
 
-status_t ThemeImporter::ImportNextTheme(BMessage **theme)
+
+status_t
+ThemeImporter::ImportNextTheme(BMessage **theme)
 {
 	FENTRY;
 	return ENOENT;
 }
 
-status_t ThemeImporter::EndImports()
+
+status_t
+ThemeImporter::EndImports()
 {
 	FENTRY;
 	return B_OK;

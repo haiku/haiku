@@ -43,6 +43,7 @@ extern status_t MakeScreenshot(BBitmap **here);
 #define FENTRY
 #endif
 
+
 ThemeManager::ThemeManager()
 	: fAddonCount(0)
 {
@@ -78,6 +79,7 @@ ThemeManager::ThemeManager()
 */
 }
 
+
 ThemeManager::~ThemeManager()
 {
 	FENTRY;
@@ -88,7 +90,9 @@ ThemeManager::~ThemeManager()
 		UnloadAddons();
 }
 
-status_t ThemeManager::LoadAddons()
+
+status_t
+ThemeManager::LoadAddons()
 {
 	FENTRY;
 	ThemesAddon *ta;
@@ -216,7 +220,9 @@ status_t ThemeManager::LoadAddons()
 	return B_OK;
 }
 
-status_t ThemeManager::UnloadAddons()
+
+status_t
+ThemeManager::UnloadAddons()
 {
 	FENTRY;
 	int32 i;
@@ -235,7 +241,9 @@ status_t ThemeManager::UnloadAddons()
 	return B_OK;
 }
 
-int32 ThemeManager::FindAddon(const char *name)
+
+int32
+ThemeManager::FindAddon(const char *name)
 {
 	FENTRY;
 	int32 i;
@@ -250,13 +258,17 @@ int32 ThemeManager::FindAddon(const char *name)
 	return -1;
 }
 
-int32 ThemeManager::CountAddons()
+
+int32
+ThemeManager::CountAddons()
 {
 	FENTRY;
 	return fAddonCount;
 }
 
-ThemesAddon *ThemeManager::AddonAt(int32 addon)
+
+ThemesAddon *
+ThemeManager::AddonAt(int32 addon)
 {
 	FENTRY;
 	if (addon < 0)
@@ -264,7 +276,9 @@ ThemesAddon *ThemeManager::AddonAt(int32 addon)
 	return (ThemesAddon *)fAddonList.ItemAt(addon);
 }
 
-const char *ThemeManager::AddonName(int32 addon)
+
+const char *
+ThemeManager::AddonName(int32 addon)
 {
 	FENTRY;
 	if (addon < 0)
@@ -272,7 +286,9 @@ const char *ThemeManager::AddonName(int32 addon)
 	return ((ThemesAddon *)fAddonList.ItemAt(addon))->Name();
 }
 
-const char *ThemeManager::AddonDescription(int32 addon)
+
+const char *
+ThemeManager::AddonDescription(int32 addon)
 {
 	FENTRY;
 	if (addon < 0)
@@ -280,9 +296,12 @@ const char *ThemeManager::AddonDescription(int32 addon)
 	return ((ThemesAddon *)fAddonList.ItemAt(addon))->Description();
 }
 
+
 const char	*AddonName(int32 addon);
 
-BView		*ThemeManager::OptionsView(int32 addon)
+
+BView *
+ThemeManager::OptionsView(int32 addon)
 {
 	FENTRY;
 	ThemesAddon *ta;
@@ -292,7 +311,9 @@ BView		*ThemeManager::OptionsView(int32 addon)
 	return NULL;
 }
 
-status_t	ThemeManager::RunPreferencesPanel(int32 addon)
+
+status_t
+ThemeManager::RunPreferencesPanel(int32 addon)
 {
 	FENTRY;
 	ThemesAddon *ta;
@@ -302,7 +323,9 @@ status_t	ThemeManager::RunPreferencesPanel(int32 addon)
 	return B_OK;
 }
 
-status_t	ThemeManager::LoadSettings()
+
+status_t
+ThemeManager::LoadSettings()
 {
 	FENTRY;
 	BMessage addonSettings;
@@ -341,7 +364,9 @@ status_t	ThemeManager::LoadSettings()
 	return B_OK;
 }
 
-status_t	ThemeManager::SaveSettings()
+
+status_t
+ThemeManager::SaveSettings()
 {
 	FENTRY;
 	BMessage addonSettings;
@@ -375,7 +400,9 @@ status_t	ThemeManager::SaveSettings()
 	return B_OK;
 }
 
-void ThemeManager::SetAddonFlags(int32 addon, uint32 flags)
+
+void
+ThemeManager::SetAddonFlags(int32 addon, uint32 flags)
 {
 	FENTRY;
 	ThemesAddon *ta;
@@ -384,7 +411,9 @@ void ThemeManager::SetAddonFlags(int32 addon, uint32 flags)
 		ta->SetAddonFlags(flags);
 }
 
-uint32 ThemeManager::AddonFlags(int32 addon)
+
+uint32
+ThemeManager::AddonFlags(int32 addon)
 {
 	FENTRY;
 	ThemesAddon *ta;
@@ -394,7 +423,9 @@ uint32 ThemeManager::AddonFlags(int32 addon)
 	return 0L;
 }
 
-status_t ThemeManager::AddNames(BMessage &names)
+
+status_t
+ThemeManager::AddNames(BMessage &names)
 {
 	FENTRY;
 	int32 i;
@@ -411,14 +442,18 @@ status_t ThemeManager::AddNames(BMessage &names)
 	return gerr;
 }
 
-status_t ThemeManager::GetNames(BMessage &names)
+
+status_t
+ThemeManager::GetNames(BMessage &names)
 {
 	FENTRY;
 	names = fNames;
 	return B_OK;
 }
 
-status_t ThemeManager::LoadThemes()
+
+status_t
+ThemeManager::LoadThemes()
 {
 	FENTRY;
 	int dirwhich;
@@ -461,7 +496,9 @@ status_t ThemeManager::LoadThemes()
 	return B_OK;
 }
 
-status_t ThemeManager::AddTheme(BMessage *theme)
+
+status_t
+ThemeManager::AddTheme(BMessage *theme)
 {
 	FENTRY;
 	BString name;
@@ -477,7 +514,9 @@ status_t ThemeManager::AddTheme(BMessage *theme)
 	return B_OK;
 }
 
-status_t ThemeManager::UnloadThemes()
+
+status_t
+ThemeManager::UnloadThemes()
 {
 	FENTRY;
 	int32 i;
@@ -491,14 +530,18 @@ status_t ThemeManager::UnloadThemes()
 	return B_OK;
 }
 
-int32 ThemeManager::CountThemes()
+
+int32
+ThemeManager::CountThemes()
 {
 	FENTRY;
 
 	return fThemeList.CountItems();
 }
 
-BMessage *ThemeManager::ThemeAt(int32 id, bool allowbackup)
+
+BMessage *
+ThemeManager::ThemeAt(int32 id, bool allowbackup)
 {
 	FENTRY;
 	BMessage *theme;
@@ -512,7 +555,9 @@ BMessage *ThemeManager::ThemeAt(int32 id, bool allowbackup)
 	return theme;
 }
 
-status_t ThemeManager::SetThemeAt(int32 id, BMessage &copyfrom)
+
+status_t
+ThemeManager::SetThemeAt(int32 id, BMessage &copyfrom)
 {
 	FENTRY;
 	BMessage *theme;
@@ -537,7 +582,9 @@ status_t ThemeManager::SetThemeAt(int32 id, BMessage &copyfrom)
 	return B_OK;
 }
 
-int32 ThemeManager::FindTheme(const char *name)
+
+int32
+ThemeManager::FindTheme(const char *name)
 {
 	FENTRY;
 	int32 i;
@@ -556,7 +603,9 @@ int32 ThemeManager::FindTheme(const char *name)
 	return -1L;
 }
 
-status_t ThemeManager::CurrentTheme(BMessage &copyto)
+
+status_t
+ThemeManager::CurrentTheme(BMessage &copyto)
 {
 	FENTRY;
 
@@ -578,8 +627,8 @@ status_t ThemeManager::CurrentTheme(BMessage &copyto)
 }
 
 
-
-status_t ThemeManager::ApplyTheme(int32 id, uint32 flags)
+status_t
+ThemeManager::ApplyTheme(int32 id, uint32 flags)
 {
 	FENTRY;
 	int32 i;
@@ -605,7 +654,9 @@ status_t ThemeManager::ApplyTheme(int32 id, uint32 flags)
 	return gerr;
 }
 
-int32 ThemeManager::MakeTheme(uint32 flags)
+
+int32
+ThemeManager::MakeTheme(uint32 flags)
 {
 	FENTRY;
 	int32 i, id;
@@ -632,7 +683,9 @@ int32 ThemeManager::MakeTheme(uint32 flags)
 	return id;
 }
 
-status_t ThemeManager::UpdateTheme(int32 id, uint32 flags)
+
+status_t
+ThemeManager::UpdateTheme(int32 id, uint32 flags)
 {
 	FENTRY;
 	int32 i;
@@ -668,7 +721,9 @@ status_t ThemeManager::UpdateTheme(int32 id, uint32 flags)
 	return B_OK;//gerr;
 }
 
-status_t ThemeManager::DeleteTheme(int32 id)
+
+status_t
+ThemeManager::DeleteTheme(int32 id)
 {
 	status_t err;
 	BMessage *theme;
@@ -715,7 +770,9 @@ status_t ThemeManager::DeleteTheme(int32 id)
 	return B_OK;
 }
 
-int32 ThemeManager::SelectedTheme()
+
+int32
+ThemeManager::SelectedTheme()
 {
 	BMessage *theme;
 	theme = ThemeAt(fSelectedTheme);
@@ -725,7 +782,9 @@ int32 ThemeManager::SelectedTheme()
 	return fSelectedTheme;
 }
 
-status_t ThemeManager::ApplyDefaultTheme(uint32 flags)
+
+status_t
+ThemeManager::ApplyDefaultTheme(uint32 flags)
 {
 	FENTRY;
 	int32 i;
@@ -748,7 +807,8 @@ status_t ThemeManager::ApplyDefaultTheme(uint32 flags)
 }
 
 
-status_t ThemeManager::BackupCurrent()
+status_t
+ThemeManager::BackupCurrent()
 {
 	FENTRY;
 	int32 i;
@@ -768,7 +828,9 @@ status_t ThemeManager::BackupCurrent()
 	return gerr;
 }
 
-status_t ThemeManager::RestoreCurrent()
+
+status_t
+ThemeManager::RestoreCurrent()
 {
 	FENTRY;
 	int32 i;
@@ -790,13 +852,17 @@ status_t ThemeManager::RestoreCurrent()
 	return gerr;
 }
 
-bool ThemeManager::CanRevert()
+
+bool
+ThemeManager::CanRevert()
 {
 	FENTRY;
 	return !fBackupTheme.IsEmpty();
 }
 
-status_t ThemeManager::CompareToCurrent(BMessage &theme)
+
+status_t
+ThemeManager::CompareToCurrent(BMessage &theme)
 {
 	FENTRY;
 	int32 i;
@@ -817,7 +883,8 @@ status_t ThemeManager::CompareToCurrent(BMessage &theme)
 }
 
 	
-status_t ThemeManager::InstallFiles(BMessage &theme, BDirectory &folder)
+status_t
+ThemeManager::InstallFiles(BMessage &theme, BDirectory &folder)
 {
 	FENTRY;
 	int32 i;
@@ -836,7 +903,9 @@ status_t ThemeManager::InstallFiles(BMessage &theme, BDirectory &folder)
 	return gerr;
 }
 
-status_t ThemeManager::BackupFiles(BMessage &theme, BDirectory &folder)
+
+status_t
+ThemeManager::BackupFiles(BMessage &theme, BDirectory &folder)
 {
 	FENTRY;
 	int32 i;
@@ -855,7 +924,9 @@ status_t ThemeManager::BackupFiles(BMessage &theme, BDirectory &folder)
 	return gerr;
 }
 
-status_t ThemeManager::SaveTheme(int32 id, bool excl)
+
+status_t
+ThemeManager::SaveTheme(int32 id, bool excl)
 {
 	FENTRY;
 	status_t err;
@@ -910,7 +981,9 @@ status_t ThemeManager::SaveTheme(int32 id, bool excl)
 	return B_OK;
 }
 
-status_t ThemeManager::PackageTheme(BMessage &theme)
+
+status_t
+ThemeManager::PackageTheme(BMessage &theme)
 {
 	PRINT(("UNIMPLEMENTED %s()\n", __FUNCTION__));
 
@@ -918,7 +991,9 @@ status_t ThemeManager::PackageTheme(BMessage &theme)
 	return B_OK;
 }
 
-status_t ThemeManager::LoadTheme(const char *path, BMessage **to)
+
+status_t
+ThemeManager::LoadTheme(const char *path, BMessage **to)
 {
 	status_t err;
 	BDirectory dir;
@@ -959,13 +1034,17 @@ status_t ThemeManager::LoadTheme(const char *path, BMessage **to)
 	return err;
 }
 
-int32 ThemeManager::CountThemeImporters()
+
+int32
+ThemeManager::CountThemeImporters()
 {
 	FENTRY;
 	return fThemeImporters.CountItems();
 }
 
-const char * ThemeManager::ThemeImporterAt(int32 index)
+
+const char *
+ThemeManager::ThemeImporterAt(int32 index)
 {
 	FENTRY;
 	ThemeImporter *importer;
@@ -975,7 +1054,9 @@ const char * ThemeManager::ThemeImporterAt(int32 index)
 	return importer->Name();
 }
 
-status_t ThemeManager::ImportThemesFor(int32 index, const char *path)
+
+status_t
+ThemeManager::ImportThemesFor(int32 index, const char *path)
 {
 	FENTRY;
 	status_t err;
@@ -1002,7 +1083,9 @@ status_t ThemeManager::ImportThemesFor(int32 index, const char *path)
 	return B_OK;
 }
 
-bool ThemeManager::ThemeHasInfoFor(int32 id, BString &module)
+
+bool
+ThemeManager::ThemeHasInfoFor(int32 id, BString &module)
 {
 	FENTRY;
 	status_t err;
@@ -1026,7 +1109,9 @@ bool ThemeManager::ThemeHasInfoFor(int32 id, BString &module)
 	return false;
 }
 
-status_t ThemeManager::ThemeName(int32 id, BString &copyto)
+
+status_t
+ThemeManager::ThemeName(int32 id, BString &copyto)
 {
 	FENTRY;
 	status_t err;
@@ -1050,7 +1135,9 @@ status_t ThemeManager::ThemeName(int32 id, BString &copyto)
 	return B_OK;
 }
 
-status_t ThemeManager::ThemeLocation(int32 id, BString &copyto)
+
+status_t
+ThemeManager::ThemeLocation(int32 id, BString &copyto)
 {
 	FENTRY;
 	status_t err;
@@ -1070,7 +1157,9 @@ status_t ThemeManager::ThemeLocation(int32 id, BString &copyto)
 	return B_OK;
 }
 
-bool ThemeManager::ThemeIsReadOnly(int32 id)
+
+bool
+ThemeManager::ThemeIsReadOnly(int32 id)
 {
 	FENTRY;
 	status_t err;
@@ -1095,7 +1184,9 @@ bool ThemeManager::ThemeIsReadOnly(int32 id)
 	return false;
 }
 
-status_t ThemeManager::ThemeDescription(int32 id, BString &copyto)
+
+status_t
+ThemeManager::ThemeDescription(int32 id, BString &copyto)
 {
 	FENTRY;
 	status_t err;
@@ -1119,7 +1210,9 @@ status_t ThemeManager::ThemeDescription(int32 id, BString &copyto)
 	return B_OK;
 }
 
-status_t ThemeManager::ThemeKeywords(int32 id, BString &copyto)
+
+status_t
+ThemeManager::ThemeKeywords(int32 id, BString &copyto)
 {
 	FENTRY;
 	status_t err;
@@ -1143,7 +1236,9 @@ status_t ThemeManager::ThemeKeywords(int32 id, BString &copyto)
 	return B_OK;
 }
 
-status_t ThemeManager::ThemeScreenShot(int32 id, BBitmap **copyto)
+
+status_t
+ThemeManager::ThemeScreenShot(int32 id, BBitmap **copyto)
 {
 	FENTRY;
 	status_t err;
@@ -1184,7 +1279,9 @@ status_t ThemeManager::ThemeScreenShot(int32 id, BBitmap **copyto)
 	return B_OK;
 }
 
-status_t ThemeManager::SetThemeHasInfoFor(int32 id, BString module)
+
+status_t
+ThemeManager::SetThemeHasInfoFor(int32 id, BString module)
 {
 	FENTRY;
 	status_t err;
@@ -1209,7 +1306,9 @@ status_t ThemeManager::SetThemeHasInfoFor(int32 id, BString module)
 	return err;
 }
 
-status_t ThemeManager::SetThemeName(int32 id, BString name)
+
+status_t
+ThemeManager::SetThemeName(int32 id, BString name)
 {
 	FENTRY;
 	status_t err;
@@ -1236,7 +1335,9 @@ status_t ThemeManager::SetThemeName(int32 id, BString name)
 	return err;
 }
 
-status_t ThemeManager::SetThemeDescription(int32 id, BString description)
+
+status_t
+ThemeManager::SetThemeDescription(int32 id, BString description)
 {
 	FENTRY;
 	status_t err;
@@ -1263,7 +1364,9 @@ status_t ThemeManager::SetThemeDescription(int32 id, BString description)
 	return err;
 }
 
-status_t ThemeManager::SetThemeKeywords(int32 id, BString keywords)
+
+status_t
+ThemeManager::SetThemeKeywords(int32 id, BString keywords)
 {
 	FENTRY;
 	status_t err;
@@ -1290,7 +1393,9 @@ status_t ThemeManager::SetThemeKeywords(int32 id, BString keywords)
 	return err;
 }
 
-status_t ThemeManager::SetThemeScreenShot(int32 id, BBitmap *bitmap)
+
+status_t
+ThemeManager::SetThemeScreenShot(int32 id, BBitmap *bitmap)
 {
 	FENTRY;
 	status_t err;
@@ -1347,7 +1452,9 @@ status_t ThemeManager::SetThemeScreenShot(int32 id, BBitmap *bitmap)
 	return err;
 }
 
-status_t ThemeManager::MakeThemeScreenShot(int32 id)
+
+status_t
+ThemeManager::MakeThemeScreenShot(int32 id)
 {
 	FENTRY;
 	status_t err;
@@ -1369,7 +1476,9 @@ status_t ThemeManager::MakeThemeScreenShot(int32 id)
 	return err;
 }
 
-void ThemeManager::NormalizeThemeFolderName(BString &name)
+
+void
+ThemeManager::NormalizeThemeFolderName(BString &name)
 {
 	FENTRY;
 	name.RemoveSet("\"\\'/&:*~#|`^");

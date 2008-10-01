@@ -25,8 +25,11 @@
 extern bool CompareMessages(BMessage &a, BMessage &b);
 
 
+// #pragma mark - 
+
+
 ThemesAddon::ThemesAddon(const char *name, const char *message_name)
-	:fImageId(-1),
+	: fImageId(-1),
 	fName(NULL),
 	fMsgName(NULL),
 	fFlags(0L)
@@ -38,6 +41,7 @@ ThemesAddon::ThemesAddon(const char *name, const char *message_name)
 	fSettings.MakeEmpty();
 }
 
+
 ThemesAddon::~ThemesAddon()
 {
 	FENTRY;
@@ -45,30 +49,40 @@ ThemesAddon::~ThemesAddon()
 	free(fName);
 }
 
-const char *ThemesAddon::Name()
+
+const char *
+ThemesAddon::Name()
 {
 	return (const char *)fName;
 }
 
-const char *ThemesAddon::Description()
+
+const char *
+ThemesAddon::Description()
 {
 	FENTRY;
 	return "No description yet.";
 }
+
 	
-BView		*ThemesAddon::OptionsView()
+BView *
+ThemesAddon::OptionsView()
 {
 	FENTRY;
 	return NULL;
 }
 
-status_t	ThemesAddon::RunPreferencesPanel()
+
+status_t
+ThemesAddon::RunPreferencesPanel()
 {
 	FENTRY;
 	return B_OK;
 }
 
-status_t	ThemesAddon::LoadSettings(BMessage &settings)
+
+status_t
+ThemesAddon::LoadSettings(BMessage &settings)
 {
 	FENTRY;
 	uint32 flags;
@@ -78,7 +92,9 @@ status_t	ThemesAddon::LoadSettings(BMessage &settings)
 	return B_OK;
 }
 
-status_t	ThemesAddon::SaveSettings(BMessage &settings)
+
+status_t
+ThemesAddon::SaveSettings(BMessage &settings)
 {
 	FENTRY;
 	status_t err;
@@ -87,17 +103,23 @@ status_t	ThemesAddon::SaveSettings(BMessage &settings)
 	return err;
 }
 
-void ThemesAddon::SetAddonFlags(uint32 flags)
+
+void
+ThemesAddon::SetAddonFlags(uint32 flags)
 {
 	fFlags = flags;
 }
 
-uint32 ThemesAddon::AddonFlags()
+
+uint32
+ThemesAddon::AddonFlags()
 {
 	return fFlags;
 }
 
-status_t ThemesAddon::AddNames(BMessage &names)
+
+status_t
+ThemesAddon::AddNames(BMessage &names)
 {
 	FENTRY;
 	BString str;
@@ -109,7 +131,8 @@ status_t ThemesAddon::AddNames(BMessage &names)
 }
 
 
-status_t ThemesAddon::MyMessage(BMessage &theme, BMessage &mine)
+status_t
+ThemesAddon::MyMessage(BMessage &theme, BMessage &mine)
 {
 	FENTRY;
 	BMessage msg;
@@ -126,7 +149,9 @@ error:
 	return err;
 }
 
-status_t ThemesAddon::SetMyMessage(BMessage &theme, BMessage &mine)
+
+status_t
+ThemesAddon::SetMyMessage(BMessage &theme, BMessage &mine)
 {
 	FENTRY;
 	status_t err;
@@ -141,26 +166,34 @@ status_t ThemesAddon::SetMyMessage(BMessage &theme, BMessage &mine)
 	return err;
 }
 
-const char *ThemesAddon::MessageName()
+
+const char *
+ThemesAddon::MessageName()
 {
 	return (const char *)fMsgName;
 }
 
-status_t ThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+ThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	FENTRY;
 	(void)theme; (void) flags;
 	return B_OK;
 }
 
-status_t ThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+ThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	FENTRY;
 	(void)theme; (void) flags;
 	return B_OK;
 }
 
-status_t ThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+ThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	FENTRY;
 	(void) flags;
@@ -168,23 +201,28 @@ status_t ThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-status_t ThemesAddon::BackupCurrent(BMessage &theme)
+status_t
+ThemesAddon::BackupCurrent(BMessage &theme)
 {
 	FENTRY;
 	return MakeTheme(theme);
 }
 
-status_t ThemesAddon::RestoreCurrent(BMessage &theme)
+
+status_t
+ThemesAddon::RestoreCurrent(BMessage &theme)
 {
 	FENTRY;
 	return ApplyTheme(theme);
 }
 
+
 /* by default, try to find the addon's specific message
  * and compare them. Some addons don't add any message,
  * they'll have to do comparison by hand.
  */
-status_t ThemesAddon::CompareToCurrent(BMessage &theme)
+status_t
+ThemesAddon::CompareToCurrent(BMessage &theme)
 {
 	FENTRY;
 	BMessage current, a, b;
@@ -207,14 +245,16 @@ status_t ThemesAddon::CompareToCurrent(BMessage &theme)
 }
 
 	
-status_t ThemesAddon::InstallFiles(BMessage &theme, BDirectory &folder)
+status_t
+ThemesAddon::InstallFiles(BMessage &theme, BDirectory &folder)
 {
 	FENTRY;
 	(void)theme; (void)folder;
 	return B_OK;
 }
 
-status_t ThemesAddon::BackupFiles(BMessage &theme, BDirectory &folder)
+status_t
+ThemesAddon::BackupFiles(BMessage &theme, BDirectory &folder)
 {
 	FENTRY;
 	(void)theme; (void)folder;
@@ -224,12 +264,16 @@ status_t ThemesAddon::BackupFiles(BMessage &theme, BDirectory &folder)
 
 	/* private */
 
-void ThemesAddon::SetImageId(image_id id)
+
+void
+ThemesAddon::SetImageId(image_id id)
 {
 	fImageId = id;
 }
 
-image_id ThemesAddon::ImageId()
+
+image_id
+ThemesAddon::ImageId()
 {
 	return fImageId;
 }

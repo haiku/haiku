@@ -10,7 +10,7 @@ class BButton;
 
 class ThemeAddonItem : public ViewItem
 {
-	public:
+public:
 					ThemeAddonItem(BRect bounds, ThemeInterfaceView *iview, int32 id);
 					~ThemeAddonItem();
 		void		DrawItem(BView *ownerview, BRect frame, bool complete = false);
@@ -22,7 +22,7 @@ class ThemeAddonItem : public ViewItem
 		void		RelayoutButtons();
 		int32		AddonId();
 		
-	private:
+private:
 		int32		fId;
 		ThemeInterfaceView	*fIView;
 		BString		fAddonName;
