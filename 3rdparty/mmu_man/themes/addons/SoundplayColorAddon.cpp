@@ -43,33 +43,43 @@ status_t	MakeTheme(BMessage &theme, uint32 flags=0L);
 status_t	ApplyDefaultTheme(uint32 flags=0L);
 };
 
+
 SoundplayThemesAddon::SoundplayThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 SoundplayThemesAddon::~SoundplayThemesAddon()
 {
 }
 
-const char *SoundplayThemesAddon::Description()
+
+const char *
+SoundplayThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	SoundplayThemesAddon::RunPreferencesPanel()
+
+status_t
+SoundplayThemesAddon::RunPreferencesPanel()
 {
 	return B_OK;
 }
 
-status_t SoundplayThemesAddon::AddNames(BMessage &names)
+
+status_t
+SoundplayThemesAddon::AddNames(BMessage &names)
 {
 	//names.AddString(Z_THEME_BEIDE_SETTINGS, "BeIDE Settings");
 	(void)names;
 	return B_OK;
 }
 
-status_t SoundplayThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+SoundplayThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage uisettings;
 	status_t err;
@@ -111,13 +121,17 @@ status_t SoundplayThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t SoundplayThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+SoundplayThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	(void)theme; (void)flags;
 	return B_OK;
 }
 
-status_t SoundplayThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+SoundplayThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage uisettings;
@@ -128,7 +142,9 @@ status_t SoundplayThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new SoundplayThemesAddon;
 }
+

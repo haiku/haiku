@@ -28,6 +28,7 @@
 #define A_MSGNAME Z_THEME_UI_SETTINGS
 #define A_DESCRIPTION "System colors, fonts and other goodies"
 
+
 class UISettingsThemesAddon : public ThemesAddon {
 public:
 	UISettingsThemesAddon();
@@ -45,21 +46,27 @@ status_t	MakeTheme(BMessage &theme, uint32 flags=0L);
 status_t	ApplyDefaultTheme(uint32 flags=0L);
 };
 
+
 UISettingsThemesAddon::UISettingsThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 UISettingsThemesAddon::~UISettingsThemesAddon()
 {
 }
 
-const char *UISettingsThemesAddon::Description()
+
+const char *
+UISettingsThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	UISettingsThemesAddon::RunPreferencesPanel()
+
+status_t
+UISettingsThemesAddon::RunPreferencesPanel()
 {
 	status_t err = B_OK;
 	entry_ref ref;
@@ -90,7 +97,9 @@ status_t	UISettingsThemesAddon::RunPreferencesPanel()
 	return err;
 }
 
-status_t UISettingsThemesAddon::AddNames(BMessage &names)
+
+status_t
+UISettingsThemesAddon::AddNames(BMessage &names)
 {
 	BMessage uisettings;
 	BMessage uinames;
@@ -113,7 +122,9 @@ status_t UISettingsThemesAddon::AddNames(BMessage &names)
 	return B_OK;
 }
 
-status_t UISettingsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+UISettingsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage uisettings;
 	BFont fnt;
@@ -153,7 +164,9 @@ status_t UISettingsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t UISettingsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+UISettingsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	BMessage uisettings;
 	BMessage names;
@@ -181,7 +194,9 @@ status_t UISettingsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	return err;
 }
 
-status_t UISettingsThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+UISettingsThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage uisettings;
@@ -205,9 +220,11 @@ status_t UISettingsThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new UISettingsThemesAddon;
 }
+
 
 #endif /* B_BEOS_VERSION_DANO */

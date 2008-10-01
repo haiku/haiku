@@ -32,6 +32,7 @@
 
 #define BEIDE_SETTINGS_NAME "Metrowerks/BeIDE_Prefs"
 
+
 // __PACKED
 struct beide_editor_pref {
 	uint32 dummy; /* BIG ENDIAN */
@@ -66,32 +67,42 @@ status_t	MakeTheme(BMessage &theme, uint32 flags=0L);
 status_t	ApplyDefaultTheme(uint32 flags=0L);
 };
 
+
 BeIDEThemesAddon::BeIDEThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 BeIDEThemesAddon::~BeIDEThemesAddon()
 {
 }
 
-const char *BeIDEThemesAddon::Description()
+
+const char *
+BeIDEThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	BeIDEThemesAddon::RunPreferencesPanel()
+
+status_t
+BeIDEThemesAddon::RunPreferencesPanel()
 {
 	return B_OK;
 }
 
-status_t BeIDEThemesAddon::AddNames(BMessage &names)
+
+status_t
+BeIDEThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_BEIDE_SETTINGS, "BeIDE Settings");
 	return B_OK;
 }
 
-status_t BeIDEThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+BeIDEThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage uisettings;
 	status_t err;
@@ -166,13 +177,17 @@ status_t BeIDEThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t BeIDEThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+BeIDEThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	(void)theme; (void)flags;
 	return B_OK;
 }
 
-status_t BeIDEThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+BeIDEThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage uisettings;
@@ -185,7 +200,9 @@ status_t BeIDEThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new BeIDEThemesAddon;
 }
+

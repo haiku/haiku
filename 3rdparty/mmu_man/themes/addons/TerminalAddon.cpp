@@ -117,6 +117,7 @@ struct termprefs {
 static const char *kHaikuTerminalAppSig = "application/x-vnd.Haiku-Terminal";
 static const char *kBeOSTerminalAppSig = "application/x-vnd.Be-SHEL";
 
+
 class TerminalThemesAddon : public ThemesAddon {
 public:
 	TerminalThemesAddon();
@@ -146,21 +147,27 @@ status_t	LoadHaikuTerminalSettings(BMessage &into);
 status_t	SaveHaikuTerminalSettings(BMessage &from);
 };
 
+
 TerminalThemesAddon::TerminalThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 TerminalThemesAddon::~TerminalThemesAddon()
 {
 }
 
-const char *TerminalThemesAddon::Description()
+
+const char *
+TerminalThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	TerminalThemesAddon::RunPreferencesPanel()
+
+status_t
+TerminalThemesAddon::RunPreferencesPanel()
 {
 	BAlert *alert;
 	alert = new BAlert("info", "Please use the Settings menu in the Terminal application.", "Gotcha");
@@ -168,7 +175,9 @@ status_t	TerminalThemesAddon::RunPreferencesPanel()
 	return B_OK;
 }
 
-status_t TerminalThemesAddon::AddNames(BMessage &names)
+
+status_t
+TerminalThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_TERMINAL_SETTINGS, "Terminal Preferences");
 	names.AddString(TP_COLS, "Terminal column count");
@@ -185,7 +194,9 @@ status_t TerminalThemesAddon::AddNames(BMessage &names)
 	return B_OK;
 }
 
-status_t TerminalThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+TerminalThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	status_t err;
 
@@ -199,7 +210,9 @@ status_t TerminalThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t TerminalThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+TerminalThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 #ifdef __HAIKU__
 	return MakeThemeHaiku(theme, flags);
@@ -208,7 +221,9 @@ status_t TerminalThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 #endif
 }
 
-status_t TerminalThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+TerminalThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage termpref;
@@ -223,7 +238,9 @@ status_t TerminalThemesAddon::ApplyDefaultTheme(uint32 flags)
 	return ApplyTheme(theme, flags);
 }
 
-status_t TerminalThemesAddon::InstallFiles(BMessage &theme, BDirectory &folder)
+
+status_t
+TerminalThemesAddon::InstallFiles(BMessage &theme, BDirectory &folder)
 {
 	BMessage termpref;
 	status_t err;
@@ -236,7 +253,9 @@ status_t TerminalThemesAddon::InstallFiles(BMessage &theme, BDirectory &folder)
 	return B_OK;
 }
 
-status_t TerminalThemesAddon::BackupFiles(BMessage &theme, BDirectory &folder)
+
+status_t
+TerminalThemesAddon::BackupFiles(BMessage &theme, BDirectory &folder)
 {
 	BMessage termpref;
 	status_t err;
@@ -252,7 +271,8 @@ status_t TerminalThemesAddon::BackupFiles(BMessage &theme, BDirectory &folder)
 }
 
 
-status_t TerminalThemesAddon::ApplyThemeR5(BMessage &theme, uint32 flags)
+status_t
+TerminalThemesAddon::ApplyThemeR5(BMessage &theme, uint32 flags)
 {
 	BMessage termpref;
 	status_t err;
@@ -344,7 +364,9 @@ status_t TerminalThemesAddon::ApplyThemeR5(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t TerminalThemesAddon::MakeThemeR5(BMessage &theme, uint32 flags)
+
+status_t
+TerminalThemesAddon::MakeThemeR5(BMessage &theme, uint32 flags)
 {
 	BMessage termpref;
 	status_t err;
@@ -394,7 +416,8 @@ status_t TerminalThemesAddon::MakeThemeR5(BMessage &theme, uint32 flags)
 }
 
 
-status_t TerminalThemesAddon::ApplyThemeHaiku(BMessage &theme, uint32 flags)
+status_t
+TerminalThemesAddon::ApplyThemeHaiku(BMessage &theme, uint32 flags)
 {
 	BMessage termpref;
 	BMessage lines;
@@ -521,7 +544,9 @@ status_t TerminalThemesAddon::ApplyThemeHaiku(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t TerminalThemesAddon::MakeThemeHaiku(BMessage &theme, uint32 flags)
+
+status_t
+TerminalThemesAddon::MakeThemeHaiku(BMessage &theme, uint32 flags)
 {
 	BMessage termpref;
 	BMessage lines;
@@ -598,7 +623,8 @@ status_t TerminalThemesAddon::MakeThemeHaiku(BMessage &theme, uint32 flags)
 }
 
 
-status_t TerminalThemesAddon::LoadHaikuTerminalSettings(BMessage &into)
+status_t
+TerminalThemesAddon::LoadHaikuTerminalSettings(BMessage &into)
 {
 	status_t err;
 	BPath pTermPref;
@@ -633,7 +659,8 @@ status_t TerminalThemesAddon::LoadHaikuTerminalSettings(BMessage &into)
 }
 
 
-status_t TerminalThemesAddon::SaveHaikuTerminalSettings(BMessage &from)
+status_t
+TerminalThemesAddon::SaveHaikuTerminalSettings(BMessage &from)
 {
 	BMessage settings;
 	status_t err;
@@ -682,7 +709,9 @@ status_t TerminalThemesAddon::SaveHaikuTerminalSettings(BMessage &from)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new TerminalThemesAddon;
 }
+

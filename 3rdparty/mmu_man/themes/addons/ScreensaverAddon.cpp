@@ -32,6 +32,7 @@
 
 #define MS_NAME "modulesettings_"
 
+
 class ScreensaverThemesAddon : public ThemesAddon {
 public:
 	ScreensaverThemesAddon();
@@ -49,21 +50,27 @@ status_t	MakeTheme(BMessage &theme, uint32 flags=0L);
 status_t	ApplyDefaultTheme(uint32 flags=0L);
 };
 
+
 ScreensaverThemesAddon::ScreensaverThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 ScreensaverThemesAddon::~ScreensaverThemesAddon()
 {
 }
 
-const char *ScreensaverThemesAddon::Description()
+
+const char *
+ScreensaverThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	ScreensaverThemesAddon::RunPreferencesPanel()
+
+status_t
+ScreensaverThemesAddon::RunPreferencesPanel()
 {
 	status_t err;
 	entry_ref ref;
@@ -87,7 +94,9 @@ status_t	ScreensaverThemesAddon::RunPreferencesPanel()
 	return err;
 }
 
-status_t ScreensaverThemesAddon::AddNames(BMessage &names)
+
+status_t
+ScreensaverThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_SCREENSAVER_SETTINGS, "Screensaver settings");
 	names.AddString(Z_THEME_SS_MODULE, "Screensaver active module");
@@ -95,7 +104,9 @@ status_t ScreensaverThemesAddon::AddNames(BMessage &names)
 	return B_OK;
 }
 
-status_t ScreensaverThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+ScreensaverThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage screensaver;
 	status_t err;
@@ -135,7 +146,9 @@ status_t ScreensaverThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return err;
 }
 
-status_t ScreensaverThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+ScreensaverThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	BMessage screensaver;
 	status_t err;
@@ -168,7 +181,9 @@ status_t ScreensaverThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	return err;
 }
 
-status_t ScreensaverThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+ScreensaverThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage screensaver;
@@ -178,7 +193,9 @@ status_t ScreensaverThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new ScreensaverThemesAddon;
 }
+

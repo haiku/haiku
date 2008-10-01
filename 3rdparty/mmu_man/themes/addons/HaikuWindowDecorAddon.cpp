@@ -40,7 +40,9 @@ status_t set_decorator(const int32 &index);
 
 using namespace BPrivate;
 
-status_t set_decorator(const char *name)
+
+status_t
+set_decorator(const char *name)
 {
 	BString n;
 	status_t err;
@@ -59,9 +61,11 @@ status_t set_decorator(const char *name)
 	return ENOENT;
 }
 
+
 #define A_NAME "Window Decor"
 #define A_MSGNAME Z_THEME_WINDOW_DECORATIONS
 #define A_DESCRIPTION "Window decorations and scrollbars"
+
 
 class DecorThemesAddon : public ThemesAddon {
 public:
@@ -80,21 +84,27 @@ status_t	MakeTheme(BMessage &theme, uint32 flags=0L);
 status_t	ApplyDefaultTheme(uint32 flags=0L);
 };
 
+
 DecorThemesAddon::DecorThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 DecorThemesAddon::~DecorThemesAddon()
 {
 }
 
-const char *DecorThemesAddon::Description()
+
+const char *
+DecorThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	DecorThemesAddon::RunPreferencesPanel()
+
+status_t
+DecorThemesAddon::RunPreferencesPanel()
 {
 	status_t err;
 	entry_ref ref;
@@ -109,7 +119,9 @@ status_t	DecorThemesAddon::RunPreferencesPanel()
 	return err;
 }
 
-status_t DecorThemesAddon::AddNames(BMessage &names)
+
+status_t
+DecorThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_WINDOW_DECORATIONS, "Window decorations and scrollbars");
 	names.AddString("window:decor", "Window decor");
@@ -117,7 +129,9 @@ status_t DecorThemesAddon::AddNames(BMessage &names)
 	return B_OK;
 }
 
-status_t DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage window_decor;
 	BMessage globals;
@@ -178,7 +192,9 @@ extern void __set_window_decor(int32 theme);
 	return B_OK;
 }
 
-status_t DecorThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+DecorThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	BMessage window_decor;
 	BMessage globals;
@@ -215,7 +231,9 @@ status_t DecorThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	return err;
 }
 
-status_t DecorThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+DecorThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage window_decor;
@@ -226,9 +244,11 @@ status_t DecorThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new DecorThemesAddon;
 }
+
 
 #endif /* B_BEOS_VERSION_DANO */

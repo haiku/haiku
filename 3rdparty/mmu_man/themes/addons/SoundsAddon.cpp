@@ -27,6 +27,7 @@
 #define A_MSGNAME Z_THEME_SOUNDS_SETTINGS
 #define A_DESCRIPTION "System sound events"
 
+
 class SoundsThemesAddon : public ThemesAddon {
 public:
 	SoundsThemesAddon();
@@ -44,21 +45,27 @@ status_t	MakeTheme(BMessage &theme, uint32 flags=0L);
 status_t	ApplyDefaultTheme(uint32 flags=0L);
 };
 
+
 SoundsThemesAddon::SoundsThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 SoundsThemesAddon::~SoundsThemesAddon()
 {
 }
 
-const char *SoundsThemesAddon::Description()
+
+const char *
+SoundsThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	SoundsThemesAddon::RunPreferencesPanel()
+
+status_t
+SoundsThemesAddon::RunPreferencesPanel()
 {
 	status_t err;
 	entry_ref ref;
@@ -87,7 +94,9 @@ status_t	SoundsThemesAddon::RunPreferencesPanel()
 	return err;
 }
 
-status_t SoundsThemesAddon::AddNames(BMessage &names)
+
+status_t
+SoundsThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_SOUNDS_SETTINGS, "Sounds Settings");
 	names.AddString("sounds:file", "Filename for this sound event");
@@ -95,7 +104,9 @@ status_t SoundsThemesAddon::AddNames(BMessage &names)
 	return B_OK;
 }
 
-status_t SoundsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+SoundsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage sounds;
 	status_t err;
@@ -152,7 +163,9 @@ status_t SoundsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t SoundsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+SoundsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	BMessage sounds;
 	status_t err;
@@ -190,7 +203,9 @@ status_t SoundsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	return err;
 }
 
-status_t SoundsThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+SoundsThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage sounds;
@@ -202,7 +217,9 @@ status_t SoundsThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new SoundsThemesAddon;
 }
+

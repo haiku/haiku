@@ -32,6 +32,7 @@
 
 #define PE_SETTINGS_NAME "pe/settings"
 
+
 class PeThemesAddon : public ThemesAddon {
 public:
 	PeThemesAddon();
@@ -49,32 +50,42 @@ status_t	MakeTheme(BMessage &theme, uint32 flags=0L);
 status_t	ApplyDefaultTheme(uint32 flags=0L);
 };
 
+
 PeThemesAddon::PeThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 PeThemesAddon::~PeThemesAddon()
 {
 }
 
-const char *PeThemesAddon::Description()
+
+const char *
+PeThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	PeThemesAddon::RunPreferencesPanel()
+
+status_t
+PeThemesAddon::RunPreferencesPanel()
 {
 	return B_OK;
 }
 
-status_t PeThemesAddon::AddNames(BMessage &names)
+
+status_t
+PeThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_PE_SETTINGS, "Pe Settings");
 	return B_OK;
 }
 
-status_t PeThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+PeThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage uisettings;
 	status_t err;
@@ -121,13 +132,17 @@ status_t PeThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t PeThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+PeThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	(void)theme; (void)flags;
 	return B_OK;
 }
 
-status_t PeThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+PeThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage uisettings;
@@ -142,7 +157,9 @@ status_t PeThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new PeThemesAddon;
 }
+

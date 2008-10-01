@@ -68,32 +68,42 @@ status_t	SetSPSkin(BString *from);
 status_t	StripPath(BString *path);
 };
 
+
 WinampSkinThemesAddon::WinampSkinThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 WinampSkinThemesAddon::~WinampSkinThemesAddon()
 {
 }
 
-const char *WinampSkinThemesAddon::Description()
+
+const char *
+WinampSkinThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	WinampSkinThemesAddon::RunPreferencesPanel()
+
+status_t
+WinampSkinThemesAddon::RunPreferencesPanel()
 {
 	return B_OK;
 }
 
-status_t WinampSkinThemesAddon::AddNames(BMessage &names)
+
+status_t
+WinampSkinThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_WINAMP_SKIN_SETTINGS, "CLAmp/SoundPlay Skin Settings");
 	return B_OK;
 }
 
-status_t WinampSkinThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+WinampSkinThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage skin;
 	BString name;
@@ -114,7 +124,9 @@ status_t WinampSkinThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t WinampSkinThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+WinampSkinThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	BMessage skin;
 	BString name;
@@ -141,7 +153,9 @@ status_t WinampSkinThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	return err;
 }
 
-status_t WinampSkinThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+WinampSkinThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage skin;
@@ -150,7 +164,9 @@ status_t WinampSkinThemesAddon::ApplyDefaultTheme(uint32 flags)
 	return ApplyTheme(theme, flags);
 }
 
-int32 WinampSkinThemesAddon::WhichApp()
+
+int32
+WinampSkinThemesAddon::WhichApp()
 {
 	// XXX
 /*
@@ -167,7 +183,9 @@ int32 WinampSkinThemesAddon::WhichApp()
 	return USE_SP;
 }
 
-status_t WinampSkinThemesAddon::CLSkin(BString *to, bool preffile)
+
+status_t
+WinampSkinThemesAddon::CLSkin(BString *to, bool preffile)
 {
 	if (preffile) {
 		BPath CLSPath;
@@ -201,7 +219,9 @@ status_t WinampSkinThemesAddon::CLSkin(BString *to, bool preffile)
 	return B_ERROR;
 }
 
-status_t WinampSkinThemesAddon::SPSkin(BString *to, bool preffile)
+
+status_t
+WinampSkinThemesAddon::SPSkin(BString *to, bool preffile)
 {
 	if (preffile) {
 		status_t err;
@@ -236,7 +256,9 @@ status_t WinampSkinThemesAddon::SPSkin(BString *to, bool preffile)
 	return B_ERROR;
 }
 
-status_t WinampSkinThemesAddon::CLSkinPath(BPath *to)
+
+status_t
+WinampSkinThemesAddon::CLSkinPath(BPath *to)
 {
 	char buffer[B_FILE_NAME_LENGTH+1];
 	BPath CLSPath;
@@ -255,7 +277,9 @@ status_t WinampSkinThemesAddon::CLSkinPath(BPath *to)
 	return B_OK;
 }
 
-status_t WinampSkinThemesAddon::SPSkinPath(BPath *to)
+
+status_t
+WinampSkinThemesAddon::SPSkinPath(BPath *to)
 {
 	status_t err;
 	BMessage settings;
@@ -280,7 +304,9 @@ status_t WinampSkinThemesAddon::SPSkinPath(BPath *to)
 	return err;
 }
 
-status_t WinampSkinThemesAddon::SetCLSkin(BString *from)
+
+status_t
+WinampSkinThemesAddon::SetCLSkin(BString *from)
 {
 	status_t err;
 	BPath p;
@@ -314,7 +340,9 @@ status_t WinampSkinThemesAddon::SetCLSkin(BString *from)
 	return B_OK;
 }
 
-status_t WinampSkinThemesAddon::SetSPSkin(BString *from)
+
+status_t
+WinampSkinThemesAddon::SetSPSkin(BString *from)
 {
 	status_t err;
 	BPath p;
@@ -410,7 +438,9 @@ status_t WinampSkinThemesAddon::SetSPSkin(BString *from)
 	return B_OK;
 }
 
-status_t WinampSkinThemesAddon::StripPath(BString *path)
+
+status_t
+WinampSkinThemesAddon::StripPath(BString *path)
 {
 	if (!path)
 		return EINVAL;
@@ -421,7 +451,9 @@ status_t WinampSkinThemesAddon::StripPath(BString *path)
 
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new WinampSkinThemesAddon;
 }
+

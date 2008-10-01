@@ -33,6 +33,7 @@
 
 #define B__DESKTOP_COLOR "be:desktop_color"
 
+
 class BackgroundThemesAddon : public ThemesAddon {
 public:
 	BackgroundThemesAddon();
@@ -58,21 +59,27 @@ status_t	BackupFiles(BMessage &theme, BDirectory &folder);
 	
 };
 
+
 BackgroundThemesAddon::BackgroundThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 BackgroundThemesAddon::~BackgroundThemesAddon()
 {
 }
 
-const char *BackgroundThemesAddon::Description()
+
+const char *
+BackgroundThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	BackgroundThemesAddon::RunPreferencesPanel()
+
+status_t
+BackgroundThemesAddon::RunPreferencesPanel()
 {
 /*	if (be_roster->Launch("application/x-vnd.obos-Backgrounds") < B_OK)
 		if (be_roster->Launch("application/x-vnd.Be-Backgrounds") < B_OK)
@@ -104,7 +111,9 @@ status_t	BackgroundThemesAddon::RunPreferencesPanel()
 	return err;
 }
 
-status_t BackgroundThemesAddon::AddNames(BMessage &names)
+
+status_t
+BackgroundThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_BACKGROUND_SETTINGS, "Desktop backgrounds and color; please respect count and ordering of all fields!");
 	names.AddString(B_BACKGROUND_WORKSPACES, "Workspaces each backdrop apply to");
@@ -116,7 +125,9 @@ status_t BackgroundThemesAddon::AddNames(BMessage &names)
 	return B_OK;
 }
 
-status_t BackgroundThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+BackgroundThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage backgrounds;
 	status_t err = B_OK;
@@ -177,7 +188,9 @@ getout:
 	return err;
 }
 
-status_t BackgroundThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+BackgroundThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	BMessage backgrounds;
 	status_t err = B_OK;
@@ -239,7 +252,9 @@ getout:
 	return err;
 }
 
-status_t BackgroundThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+BackgroundThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage backgrounds;
@@ -250,20 +265,26 @@ status_t BackgroundThemesAddon::ApplyDefaultTheme(uint32 flags)
 	return ApplyTheme(theme, flags);
 }
 
-status_t BackgroundThemesAddon::InstallFiles(BMessage &theme, BDirectory &folder)
+
+status_t
+BackgroundThemesAddon::InstallFiles(BMessage &theme, BDirectory &folder)
 {
 	(void)theme; (void)folder;
 	return B_OK;
 }
 
-status_t BackgroundThemesAddon::BackupFiles(BMessage &theme, BDirectory &folder)
+
+status_t
+BackgroundThemesAddon::BackupFiles(BMessage &theme, BDirectory &folder)
 {
 	(void)theme; (void)folder;
 	return B_OK;
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new BackgroundThemesAddon;
 }
+

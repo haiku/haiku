@@ -23,6 +23,7 @@
 #define A_MSGNAME Z_THEME_DESKBAR_SETTINGS
 #define A_DESCRIPTION "Deskbar on-screen position"
 
+
 class DeskbarThemesAddon : public ThemesAddon {
 public:
 	DeskbarThemesAddon();
@@ -40,21 +41,27 @@ status_t	MakeTheme(BMessage &theme, uint32 flags=0L);
 status_t	ApplyDefaultTheme(uint32 flags=0L);
 };
 
+
 DeskbarThemesAddon::DeskbarThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 DeskbarThemesAddon::~DeskbarThemesAddon()
 {
 }
 
-const char *DeskbarThemesAddon::Description()
+
+const char *
+DeskbarThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	DeskbarThemesAddon::RunPreferencesPanel()
+
+status_t
+DeskbarThemesAddon::RunPreferencesPanel()
 {
 	status_t err;
 	entry_ref ref;
@@ -83,7 +90,9 @@ status_t	DeskbarThemesAddon::RunPreferencesPanel()
 	return err;
 }
 
-status_t DeskbarThemesAddon::AddNames(BMessage &names)
+
+status_t
+DeskbarThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_DESKBAR_SETTINGS, "Deskbar position");
 	names.AddString("db:location", "Deskbar on-screen position");
@@ -91,7 +100,9 @@ status_t DeskbarThemesAddon::AddNames(BMessage &names)
 	return B_OK;
 }
 
-status_t DeskbarThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+DeskbarThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage deskbar;
 	status_t err;
@@ -112,7 +123,9 @@ status_t DeskbarThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return db.SetLocation((deskbar_location)loc, expanded);
 }
 
-status_t DeskbarThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+DeskbarThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	BMessage deskbar;
 	status_t err;
@@ -137,7 +150,9 @@ status_t DeskbarThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	return err;
 }
 
-status_t DeskbarThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+DeskbarThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage deskbar;
@@ -150,7 +165,9 @@ status_t DeskbarThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new DeskbarThemesAddon;
 }
+

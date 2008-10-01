@@ -32,6 +32,7 @@
 
 #define EDDIE_SETTINGS_NAME "Eddie/settings"
 
+
 class EddieThemesAddon : public ThemesAddon {
 public:
 	EddieThemesAddon();
@@ -49,32 +50,42 @@ status_t	MakeTheme(BMessage &theme, uint32 flags=0L);
 status_t	ApplyDefaultTheme(uint32 flags=0L);
 };
 
+
 EddieThemesAddon::EddieThemesAddon()
 	: ThemesAddon(A_NAME, A_MSGNAME)
 {
 }
 
+
 EddieThemesAddon::~EddieThemesAddon()
 {
 }
 
-const char *EddieThemesAddon::Description()
+
+const char *
+EddieThemesAddon::Description()
 {
 	return A_DESCRIPTION;
 }
 
-status_t	EddieThemesAddon::RunPreferencesPanel()
+
+status_t
+EddieThemesAddon::RunPreferencesPanel()
 {
 	return B_OK;
 }
 
-status_t EddieThemesAddon::AddNames(BMessage &names)
+
+status_t
+EddieThemesAddon::AddNames(BMessage &names)
 {
 	names.AddString(Z_THEME_EDDIE_SETTINGS, "Eddie Settings");
 	return B_OK;
 }
 
-status_t EddieThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
+
+status_t
+EddieThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage uisettings;
 	status_t err;
@@ -121,13 +132,17 @@ status_t EddieThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	return B_OK;
 }
 
-status_t EddieThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
+
+status_t
+EddieThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 {
 	(void)theme; (void)flags;
 	return B_OK;
 }
 
-status_t EddieThemesAddon::ApplyDefaultTheme(uint32 flags)
+
+status_t
+EddieThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage uisettings;
@@ -142,7 +157,9 @@ status_t EddieThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instantiate_themes_addon()
+ThemesAddon *
+instantiate_themes_addon()
 {
 	return (ThemesAddon *) new EddieThemesAddon;
 }
+
