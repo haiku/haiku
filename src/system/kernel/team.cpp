@@ -998,7 +998,8 @@ team_create_thread_start(void *args)
 		(void **)&t->user_stack_base, B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK,
 		B_READ_AREA | B_WRITE_AREA | B_STACK_AREA, 0);
 	if (t->user_stack_area < 0) {
-		dprintf("team_create_thread_start: could not create default user stack region\n");
+		dprintf("team_create_thread_start: could not create default user stack "
+			"region: %s\n", strerror(t->user_stack_area));
 
 		free_team_arg(teamArgs);
 		return t->user_stack_area;
