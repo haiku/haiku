@@ -22,7 +22,13 @@
 #include "acpixf.h"
 #include "acpi_priv.h"
 
+//#define TRACE_ACPI_BUS
+#ifdef TRACE_ACPI_BUS
 #define TRACE(x...) dprintf("acpi: " x)
+#else
+#define TRACE(x...)
+#endif
+
 #define ERROR(x...) dprintf("acpi: " x)
 
 
@@ -39,6 +45,8 @@ get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void* context,
 	uint32* counter = (uint32*)context;
 	ACPI_STATUS status;
 	ACPI_BUFFER buffer;
+
+	TRACE("get_device_by_hid_callback %p, %ld, %p\n", object, depth, context);
 
 	*_returnValue = NULL;
 
@@ -97,24 +105,6 @@ acpi_std_ops(int32 op,...)
 				return ENOSYS;
 			}
 
-#ifndef __HAIKU__
-			{
-				// Once upon a time, there was no module(s) dependency(ies) automatic loading feature.
-				// Let's do it the old way
-				status_t status;
-
-				status = get_module(B_DPC_MODULE_NAME, (module_info **)&gDPC);
-				if (status != B_OK)
-					return status;
-
-				status = get_module(B_PCI_MODULE_NAME,
-					(module_info **)&gPCIManager);
-				if (status != B_OK) {
-					put_module(B_DPC_MODULE_NAME);
-					return status;
-				}
-			}
-#endif
 
 			if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task", B_NORMAL_PRIORITY) != B_OK) {
 				ERROR("AcpiInitializeSubsystem failed (new_dpc_queue() failed!)\n");
@@ -159,10 +149,6 @@ acpi_std_ops(int32 op,...)
 			return B_OK;
 
 		err:
-#ifndef __HAIKU__
-			put_module(B_DPC_MODULE_NAME);
-			put_module(B_PCI_MODULE_NAME);
-#endif
 			return B_ERROR;
 		}
 
@@ -177,12 +163,6 @@ acpi_std_ops(int32 op,...)
 				gDPCHandle = NULL;
 			}
 
-#ifndef __HAIKU__
-			// Once upon a time, there was no module(s) dependency(ies) automatic UNloading feature.
-			// Let's do it the old way
-			put_module(B_DPC_MODULE_NAME);
-			put_module(B_PCI_MODULE_NAME);
-#endif
 			break;
 		}
 
@@ -248,6 +228,8 @@ get_next_entry(uint32 objectType, const char *base, char *result,
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
 
+	TRACE("get_next_entry %ld, %s\n", objectType, base);
+
 	if (base == NULL || !strcmp(base, "\\")) {
 		parent = ACPI_ROOT_OBJECT;
 	} else {
@@ -281,6 +263,7 @@ get_device(const char* hid, uint32 index, char* result, size_t resultLength)
 	uint32 counter[2] = {index, 0};
 	char *buffer = NULL;
 
+	TRACE("get_device %s, index %ld\n", hid, index);
 	status = AcpiGetDevices((char*)hid, (void*)&get_device_by_hid_callback,
 		counter, (void**)&buffer);
 	if (status != AE_OK || buffer == NULL)
@@ -299,6 +282,7 @@ get_device_hid(const char *path, char *hid)
 	ACPI_OBJECT info;
 	ACPI_BUFFER infoBuffer;
 
+	TRACE("get_device_hid: path %s, hid %s\n", path, hid);
 	if (AcpiGetHandle(NULL, (char*)path, &handle) != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 
@@ -432,6 +416,8 @@ prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 {
 	ACPI_STATUS status;
 
+	TRACE("prepare_sleep_state %d, %p, %ld\n", state, wakeFunc, size);
+
 	if (state != ACPI_POWER_STATE_OFF) {
 		physical_entry wakeVector;
 
@@ -455,6 +441,8 @@ static status_t
 enter_sleep_state(uint8 state)
 {
 	ACPI_STATUS status;
+
+	TRACE("enter_sleep_state %d\n", state);
 
 	status = AcpiEnterSleepState(state);
 	if (status != AE_OK)
