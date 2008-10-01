@@ -31,7 +31,8 @@ HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
 
 # boot floppy
 HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME = haiku-boot-floppy-container ;
-HAIKU_CONTAINER_GRIST on $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME) = FloppyBootImage ;
+HAIKU_CONTAINER_GRIST on $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
+	= FloppyBootImage ;
 # HAIKU_INCLUDE_IN_CONTAINER_VAR -- update only mode not supported
 HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
 	= HAIKU_FLOPPY_BOOT_IMAGE_INSTALL_TARGETS ;
@@ -116,8 +117,10 @@ if $(JAM_TARGETS) {
 		EXIT "Run ./configure in the source tree's root directory first!" ;
 	}
 	if ! ( $(timezones) && $(libgccObjects) ) {
-		ECHO "No `Timezones' or `libgccObjects' found in $(HAIKU_BUILD_OUTPUT_DIR)!" ;
-		EXIT "Please run ./configure in the source tree's root directory again!" ;
+		ECHO "No `Timezones' or `libgccObjects' found in"
+			"$(HAIKU_BUILD_OUTPUT_DIR)!" ;
+		EXIT "Please run ./configure in the source tree's root directory"
+			"again!" ;
 	}
 
 	LOCATE on BuildConfig = $(HAIKU_BUILD_OUTPUT_DIR) ;
@@ -279,10 +282,12 @@ if $(HAIKU_ARCH) = ppc {
 }
 if $(HAIKU_ARCH) = m68k {
 	# We don't need a PIC kernel as it's always at the same place.
-	# it's actually needed to not use pic, else linking fails due to too large pc refs.
+	# it's actually needed to not use pic, else linking fails due to too large
+	# pc refs.
 	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
-	# we don't want to have to handle emulating missing FPU opcodes for 040 and 060 in the kernel
+	# we don't want to have to handle emulating missing FPU opcodes for 040 and
+	# 060 in the kernel
 	HAIKU_KERNEL_CCFLAGS += -m68020-60 ;
 	HAIKU_KERNEL_C++FLAGS += -m68020-60 ;
 }
@@ -298,8 +303,8 @@ if $(DEBUG_PRINTF) {
 }
 
 # warning flags
-HAIKU_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes -Wpointer-arith -Wcast-align
-	-Wsign-compare ;
+HAIKU_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes
+	-Wpointer-arith -Wcast-align -Wsign-compare ;
 HAIKU_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-ctor-dtor-privacy
 	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
 
@@ -475,7 +480,8 @@ if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
 }
 
 if $(HOST_PLATFORM) = cygwin {
-	HOST_LINKFLAGS += -Xlinker --allow-multiple-definition -Xlinker --enable-auto-import ;
+	HOST_LINKFLAGS += -Xlinker --allow-multiple-definition -Xlinker
+		--enable-auto-import ;
 }
 
 HOST_CPU	?= $(OSPLAT:L) ;
@@ -538,8 +544,8 @@ if $(HOST_ARCH) = m68k {
 }
 
 # warning flags
-HOST_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes -Wpointer-arith -Wcast-align
-	-Wsign-compare ;
+HOST_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes -Wpointer-arith
+	-Wcast-align -Wsign-compare ;
 HOST_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-ctor-dtor-privacy
 	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
 
@@ -671,10 +677,10 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	} else {
 		# Otherwise the generic attribute emulation is used, which uses a
 		# directory per file to store its attribute. We need to redefine RM so
-		# that the attributes are removed as well. We use a wrapper script, which
-		# invokes a build tool. If the build tool hasn't been built yet, the
-		# normal "rm" is used and the attributes are leaked (likely there aren't
-		# any yet).
+		# that the attributes are removed as well. We use a wrapper script,
+		# which invokes a build tool. If the build tool hasn't been built yet,
+		# the normal "rm" is used and the attributes are leaked (likely there
+		# aren't any yet).
 		RM = $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ";"
 			[ FDirName $(HAIKU_TOP) build scripts rm_attrs ]
 			[ FDirName $(HAIKU_OBJECT_DIR) $(HOST_PLATFORM) $(HOST_ARCH) release
@@ -972,7 +978,8 @@ HAIKU_DOCUMENTATION_OBJECT_DIR ?= [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR)
 	documentation ] ;
 
 # TODO: Rethink test stuff.
-HAIKU_TEST_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tests $(TARGET_PLATFORM) $(HAIKU_ARCH) ] ;
+HAIKU_TEST_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tests
+	$(TARGET_PLATFORM) $(HAIKU_ARCH) ] ;
 HAIKU_APP_TEST_DIR		?= [ FDirName $(HAIKU_TEST_DIR) apps ] ;
 HAIKU_APP_TEST_LIB_DIR 	?= [ FDirName $(HAIKU_APP_TEST_DIR) lib ] ;
 HAIKU_TMP_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tmp ] ;
