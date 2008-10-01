@@ -1,7 +1,7 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2005-2007, François Revol, revol@free.fr.
- * Distributed under the terms of the MIT License.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 /*! Launches an application/document from the shell */
@@ -9,7 +9,11 @@
 
 #include <Entry.h>
 #include <List.h>
-#include <MimeType.h>
+#ifdef __HAIKU__
+#	include <MimeType.h>
+#else
+#	include <Mime.h>
+#endif
 #include <Roster.h>
 #include <String.h>
 
@@ -56,8 +60,10 @@ main(int argc, char **argv)
 	if (strrchr(progName, '/'))
 		progName = strrchr(progName, '/') + 1;
 
-	if (argc < 2)
-		fprintf(stderr,"usage: %s <file[:line[:column]] or url or application signature> ...\n", progName);
+	if (argc < 2) {
+		fprintf(stderr,"usage: %s <file[:line[:column]] or url or application "
+			"signature> ...\n", progName);
+	}
 
 	while (*++argv) {
 		status_t status = B_OK;
@@ -93,7 +99,8 @@ main(int argc, char **argv)
 			// if not there is likely no supporting app anyway
 			if (BMimeType::IsValid(mimeType.String())) {
 				char *args[2] = { *argv, NULL };
-				status = be_roster->Launch(openWith ? openWith : mimeType.String(), 1, args);
+				status = be_roster->Launch(openWith ? openWith
+					: mimeType.String(), 1, args);
 				if (status == B_OK)
 					continue;
 			}
@@ -130,7 +137,8 @@ main(int argc, char **argv)
 			status = B_ENTRY_NOT_FOUND;
 
 		if (status != B_OK && status != B_ALREADY_RUNNING) {
-			fprintf(stderr, "%s: \"%s\": %s\n", progName, *argv, strerror(status));
+			fprintf(stderr, "%s: \"%s\": %s\n", progName, *argv,
+				strerror(status));
 			// make sure the shell knows this
 			exitcode = EXIT_FAILURE;
 		}
