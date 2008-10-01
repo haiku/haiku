@@ -2549,11 +2549,23 @@ BTextView::GetPreferredSize(float* _width, float* _height)
 
 	_ValidateLayoutData();
 
-	if (_width)
-		*_width = fLayoutData->min.width;
+	if (_width) {
+		float width = Bounds().Width();
+		if (width < fLayoutData->min.width
+			|| (Flags() & B_SUPPORTS_LAYOUT) != 0) {
+			width = fLayoutData->min.width;
+		}
+		*_width = width;
+	}
 
-	if (_height)
-		*_height = fLayoutData->min.height;
+	if (_height) {
+		float height = Bounds().Height();
+		if (height < fLayoutData->min.height
+			|| (Flags() & B_SUPPORTS_LAYOUT) != 0) {
+			height = fLayoutData->min.height;
+		}
+		*_height = height;
+	}
 }
 
 
@@ -2673,6 +2685,19 @@ BTextView::_ValidateLayoutData()
 	CALLED();
 
 	float lineHeight = ceilf(LineHeight(0));
+	if (lineHeight == 0.0) {
+		// We probably don't have text content yet. Take the initial
+		// style's font height or fall back to the plain font.
+		const BFont* font;
+		fStyles->GetNullStyle(&font, NULL);
+		if (font == NULL)
+			font = be_plain_font;
+
+		font_height fontHeight;
+		font->GetHeight(&fontHeight);
+		// This is how the height is calculated in _RecalculateLineBreaks().
+		lineHeight = ceilf(fontHeight.ascent + fontHeight.descent) + 1;
+	}
 	TRACE("line height: %.2f\n", lineHeight);
 
 	// compute our minimal size
