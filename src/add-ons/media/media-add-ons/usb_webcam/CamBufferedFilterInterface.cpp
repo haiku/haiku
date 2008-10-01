@@ -1,3 +1,8 @@
+/*
+ * Copyright 2004-2008, François Revol, <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "CamBufferedFilterInterface.h"
 #include "CamDevice.h"
 #include "CamDebug.h"

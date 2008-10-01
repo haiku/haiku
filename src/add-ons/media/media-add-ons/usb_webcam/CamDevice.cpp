@@ -1,3 +1,8 @@
+/*
+ * Copyright 2004-2008, François Revol, <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "CamDevice.h"
 #include "CamSensor.h"
 #include "CamDeframer.h"
@@ -486,7 +491,7 @@ CamDevice::DataPumpThread()
 			len = fBulkIn->BulkTransfer(fBuffer, fBufferLen);
 #endif
 			
-			//PRINT((CH ": got %d bytes" CT, len));
+			PRINT((CH ": got %d bytes" CT, len));
 #ifdef DEBUG_WRITE_DUMP
 			write(fDumpFD, fBuffer, len);
 #endif

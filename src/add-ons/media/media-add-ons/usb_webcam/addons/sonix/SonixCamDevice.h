@@ -1,3 +1,7 @@
+/*
+ * Copyright 2004-2008, François Revol, <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SONIX_CAM_DEVICE_H
 #define _SONIX_CAM_DEVICE_H
 

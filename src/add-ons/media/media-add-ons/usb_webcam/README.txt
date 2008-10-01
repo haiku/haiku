@@ -1,5 +1,5 @@
 USB Webcam driver
-(c) 2004-2007 François Revol.
+(c) 2004-2008 François Revol.
 Parts (c) Be,Inc. (ProducerNode sample code).
 
 Current version of my USB Webcam driver. WORK IN PROGRESS!

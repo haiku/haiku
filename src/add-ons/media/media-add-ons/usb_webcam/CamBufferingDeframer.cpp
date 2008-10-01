@@ -1,3 +1,8 @@
+/*
+ * Copyright 2004-2008, François Revol, <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
+
 /* 
  * buffer based deframer
  * buffers all packet until it finds a complete frame.
