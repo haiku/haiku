@@ -645,48 +645,37 @@ arch_int_configure_io_interrupt(int irq, uint32 config)
 }
 
 
+#undef arch_int_enable_interrupts
+#undef arch_int_disable_interrupts
+#undef arch_int_restore_interrupts
+#undef arch_int_are_interrupts_enabled
+
+
 void
 arch_int_enable_interrupts(void)
 {
-	asm("sti");
+	arch_int_enable_interrupts_inline();
 }
 
 
 int
 arch_int_disable_interrupts(void)
 {
-	int flags;
-
-	asm("pushfl;\n"
-		"popl %0;\n"
-		"cli" : "=g" (flags));
-	return flags & 0x200 ? 1 : 0;
+	return arch_int_disable_interrupts_inline();
 }
 
 
 void
 arch_int_restore_interrupts(int oldstate)
 {
-	int flags = oldstate ? 0x200 : 0;
-
-	asm("pushfl;\n"
-		"popl	%1;\n"
-		"andl	$0xfffffdff,%1;\n"
-		"orl	%0,%1;\n"
-		"pushl	%1;\n"
-		"popfl\n"
-		: : "r" (flags), "r" (0));
+	arch_int_restore_interrupts_inline(oldstate);
 }
 
 
 bool
 arch_int_are_interrupts_enabled(void)
 {
-	int flags;
-
-	asm("pushfl;\n"
-		"popl %0;\n" : "=g" (flags));
-	return flags & 0x200 ? 1 : 0;
+	return arch_int_are_interrupts_enabled_inline();
 }
 
 

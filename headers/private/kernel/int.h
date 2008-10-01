@@ -42,4 +42,10 @@ are_interrupts_enabled(void)
 }
 #endif
 
+
+// map those directly to the arch versions, so they can be inlined
+#define disable_interrupts()		arch_int_disable_interrupts()
+#define restore_interrupts(status)	arch_int_restore_interrupts(status)
+
+
 #endif /* _KERNEL_INT_H */

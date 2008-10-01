@@ -248,6 +248,10 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 //	#pragma mark - public API
 
 
+#undef disable_interrupts
+#undef restore_interrupts
+
+
 cpu_status
 disable_interrupts(void)
 {

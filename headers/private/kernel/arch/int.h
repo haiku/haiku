@@ -8,7 +8,6 @@
 #ifndef KERNEL_ARCH_INT_H
 #define KERNEL_ARCH_INT_H
 
-#include <arch_int.h>
 
 // config flags for arch_int_configure_io_interrupt()
 #define B_EDGE_TRIGGERED		1
@@ -37,5 +36,9 @@ bool arch_int_are_interrupts_enabled(void);
 #ifdef __cplusplus
 }
 #endif
+
+
+#include <arch_int.h>
+
 
 #endif	/* KERNEL_ARCH_INT_H */

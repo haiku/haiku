@@ -10,6 +10,7 @@
 #include <vm_address_space.h>
 #include <vm_page.h>
 #include <vm_priv.h>
+#include <int.h>
 #include <smp.h>
 #include <util/queue.h>
 #include <heap.h>
