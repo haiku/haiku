@@ -122,6 +122,8 @@ status_t DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BMessage window_decor;
 	BMessage globals;
 	BString decorName;
+	int32 decorId;
+	bool decorDone = false;
 	status_t err;
 
 	if (!(flags & UI_THEME_SETTINGS_SET_ALL) || !(AddonFlags() & Z_THEME_ADDON_DO_SET_ALL))
@@ -132,8 +134,33 @@ status_t DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	if (err)
 		return err;
 
-	if (window_decor.FindString("window:decor", &decorName) == B_OK)
-		set_decorator(decorName.String());
+	// try each name until one works
+	for (int i = 0; window_decor.FindString("window:decor", i, &decorName) == B_OK; i++) {
+		if (set_decorator(decorName.String()) == B_OK) {
+			decorDone = true;
+			break;
+		}
+	}
+	// none... maybe R5 number ?
+	if (!decorDone && 
+		window_decor.FindInt32("window:R5:decor", &decorId) == B_OK) {
+		int32 defaultDecor = 0; // XXX ?
+		switch (decorId) {
+			case R5_DECOR_BEOS:
+			default:
+				set_decorator(defaultDecor);
+				break;
+			case R5_DECOR_WIN95:
+				set_decorator("WinDecorator");
+				break;
+			case R5_DECOR_AMIGA:
+				set_decorator("AmigaDecorator");
+				break;
+			case R5_DECOR_MAC:
+				set_decorator("MacDecorator");
+				break;
+		}
+	}
 #if 0
 #ifdef B_BEOS_VERSION_DANO
 	if (window_decor.FindString("window:decor", &decorName) == B_OK)

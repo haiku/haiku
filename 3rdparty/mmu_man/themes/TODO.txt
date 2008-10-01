@@ -1,6 +1,7 @@
 TODOs for Theme manager:
 * check R5 build
 * style cleanup (-> Haiku style)
+* enable theme descriptions again (tooltip on listitem ?).
 * make ParseMessage more robust
 * forbid quitting while themes are loading!
 * implement BackupFiles() methods to add required files to a zip.

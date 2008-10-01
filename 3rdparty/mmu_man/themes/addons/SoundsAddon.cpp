@@ -177,10 +177,11 @@ status_t SoundsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 		//printf("\t%s: %s\n", item.String(), path.Path());
 		if (path.Path()) {
 			msg.AddString("sounds:file", path.Path());
+			gain = 1.0;
 #if defined(__HAIKU__) || defined(B_BEOS_VERSION_DANO)
-			if (bmfs.GetAudioGainFor(BMediaFiles::B_SOUNDS, item.String(), &gain) >= B_OK)
-				msg.AddFloat("sounds:volume", gain);
+			bmfs.GetAudioGainFor(BMediaFiles::B_SOUNDS, item.String(), &gain);
 #endif
+			msg.AddFloat("sounds:volume", gain);
 		}
 		sounds.AddMessage(item.String(), &msg);
 	}

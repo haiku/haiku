@@ -55,6 +55,7 @@
 /* compatibility stuff ahead */
 
 /* some field names not always defined */
+// ui_colors
 #ifndef B_BEOS_VERSION_DANO
 #define B_UI_PANEL_BACKGROUND_COLOR "be:c:PanBg"
 #define B_UI_PANEL_TEXT_COLOR "be:c:PanTx"
@@ -79,6 +80,9 @@
 #define B_UI_MENU_SELECTED_BORDER_COLOR "be:c:MenSBr"
 #define B_UI_SUCCESS_COLOR "be:c:Success"
 #define B_UI_FAILURE_COLOR "be:c:Failure"
+// fonts
+// other
+#define B_UI_MENU_ZSNAKE "be:MenZSnake"
 // broadcasted on update
 #define B_UI_SETTINGS_CHANGED '_UIC'
 #endif

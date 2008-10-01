@@ -147,6 +147,40 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 		if (sscanf(token.String(), "DECOR:%ld", &value) >= 1) {
 			value = (value < 4) ? value : 0;
 			decor.AddInt32("window:R5:decor", value);
+			switch (value) {
+				case R5_DECOR_BEOS:
+				default:
+					decor.AddString("window:decor", "R5");
+					// fallbacks
+					decor.AddString("window:decor", "Default");
+					decor.AddString("window:decor", "ClassicBe");
+					decor.AddString("window:decor", "BeDecorator");
+					break;
+				case R5_DECOR_WIN95:
+					decor.AddString("window:decor", "Win95");
+					// fallbacks
+					decor.AddString("window:decor", "Win2k");
+					decor.AddString("window:decor", "Win");
+					decor.AddString("window:decor", "Redmond");
+					decor.AddString("window:decor", "Seattle");
+					decor.AddString("window:decor", "WinDecorator");
+					break;
+					
+				case R5_DECOR_AMIGA:
+					decor.AddString("window:decor", "Amiga");
+					// fallbacks
+					decor.AddString("window:decor", "AmigaOS");
+					decor.AddString("window:decor", "AmigaOS4");
+					break;
+				case R5_DECOR_MAC:
+					decor.AddString("window:decor", "Mac");
+					// fallbacks
+					decor.AddString("window:decor", "MacOS");
+					decor.AddString("window:decor", "Baqua");
+					decor.AddString("window:decor", "Cupertino");
+					decor.AddString("window:decor", "MacDecorator");
+					break;
+			}
 		}
 	}
 	

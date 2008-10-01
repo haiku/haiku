@@ -40,12 +40,6 @@
 #define FENTRY
 #endif
 
-static const deskbar_location kDeskbarLocationMap[] = {
-	//2:top 1:topright 5:bottom
-	B_DESKBAR_LEFT_TOP, B_DESKBAR_RIGHT_TOP, B_DESKBAR_TOP,
-	B_DESKBAR_LEFT_BOTTOM, B_DESKBAR_RIGHT_BOTTOM, B_DESKBAR_BOTTOM
-};
-
 static struct ui_color_map {
 	const char *wname;
 	const char *name1;
@@ -114,6 +108,75 @@ static struct screensaver_map {
 	{ NULL, NULL }
 };
 
+
+/*
+'[' <REGPATH> [|.A|.W] ']'
+left to map:
+AppEvents\\Schemes\\Apps\\.Default\\AppGPFault\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\DeviceConnect\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\DeviceDisconnect\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\DeviceFail\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\LowBatteryAlarm\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\MenuCommand\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\MenuPopup\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\PrintComplete\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\RingIn\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\Ringout\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\SystemHand\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\SystemQuestion\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\SystemStartMenu\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\WindowsLogoff\\.Current
+AppEvents\\Schemes\\Apps\\.Default\\WindowsLogon\\.Current
+AppEvents\\Schemes\\Apps\\Explorer\\EmptyRecycleBin\\.Current
+AppEvents\\Schemes\\Apps\\Explorer\\Navigating\\.Current
+*/
+
+static struct sounds_map {
+	const char *wname;
+	const char *name;
+} sSoundsMap[] = {
+	//{ "", "BeShare-DLFinished" },
+	//{ "", "BeShare-InactivChat" },
+	//{ "", "BeShare-Name Said" },
+	//{ "", "BeShare-NoComplete" },
+	//{ "", "BeShare-Private Msg" },
+	//{ "", "BeShare-PrivateWndw" },
+	//{ "", "BeShare-ULFinished" },
+	//{ "", "BeShare-ULStarted" },
+	//{ "", "BeShare-WatchedUser" },
+	{ "AppEvents\\Schemes\\Apps\\.Default\\.Default\\.Current", "Beep" },
+	//{ "", "Capture" },
+	//{ "", "IM Connected" },
+	//{ "", "IM Disconnected" },
+	//{ "", "IM Message Received" },
+	//{ "", "IM Status: Available" },
+	//{ "", "IM Status: Away" },
+	//{ "", "IM Status: Offline" },
+	{ "AppEvents\\Schemes\\Apps\\.Default\\SystemExclamation\\.Current", "InfoPopper: Error Message" },
+	{ "AppEvents\\Schemes\\Apps\\.Default\\SystemAsterisk\\.Current", "InfoPopper: Important Message" },
+	{ "AppEvents\\Schemes\\Apps\\.Default\\SystemNotification\\.Current", "InfoPopper: Information Message" },
+	//{ "", "InfoPopper: Progress Message" },
+	//{ "", "Key Down" },
+	//{ "", "Key Repeat" },
+	//{ "", "Key Up" },
+	//{ "", "Mouse Down" },
+	//{ "", "Mouse Up" },
+	{ "AppEvents\\Schemes\\Apps\\.Default\\MailBeep\\.Current", "New E-mail" },
+	{ "AppEvents\\Schemes\\Apps\\.Default\\SystemStart\\.Current", "Startup" },
+	//{ "", "Vision Nick Notification" },
+	//{ "AppEvents\\Schemes\\Apps\\.Default\\RestoreDown\\.Current", "Window Activated" },
+	// actually *app* close/open...
+	{ "AppEvents\\Schemes\\Apps\\.Default\\Close\\.Current", "Window Close" },
+	{ "AppEvents\\Schemes\\Apps\\.Default\\Minimize\\.Current", "Window Minimized" },
+	{ "AppEvents\\Schemes\\Apps\\.Default\\Open\\.Current", "Window Open" },
+	// or Activated ?
+	{ "AppEvents\\Schemes\\Apps\\.Default\\RestoreUp\\.Current", "Window Restored" },
+	{ "AppEvents\\Schemes\\Apps\\.Default\\Maximize\\.Current", "Window Zoomed" },
+	//{ "", "Yahoo: Buzz" },
+	// non official sounds yet
+	{ "AppEvents\\Schemes\\Apps\\.Default\\SystemExit\\.Current", "Shutdown" },
+	{ NULL, NULL }
+};
 
 MSThemeImporter::MSThemeImporter()
 	:ThemeImporter("MSTheme")
@@ -231,9 +294,10 @@ status_t MSThemeImporter::ImportNextTheme(BMessage **theme)
 	content.UnlockBuffer();
 	if (err < B_OK)
 		return err;
+	//PRINT(("'%s'\n", content.String()));
 	// strip DOS CR
-	content.RemoveSet("\r");
-	//printf("'%s'\n", content.String());
+	// RemoveSet() seems to be buggy on BeOS (strips UTF-8 chars ???)
+	content.RemoveAll("\r");
 
 	// is it really a theme file ?
 	if (content.IFindFirst("[Theme]") < 0)
@@ -246,6 +310,7 @@ status_t MSThemeImporter::ImportNextTheme(BMessage **theme)
 	BMessage deskbar;
 	BMessage ui_settings;
 	BMessage screensaver;
+	BMessage sounds;
 
 	BString leaf(path.Leaf());
 	leaf.RemoveLast(".theme");
@@ -269,7 +334,7 @@ status_t MSThemeImporter::ImportNextTheme(BMessage **theme)
 		BString line;
 		content.MoveInto(line, 0, content.FindFirst('\n'));
 		content.RemoveFirst("\n");
-		//printf(":'%s'\n", line.String());
+		//PRINT((":'%s'\n", line.String()));
 		if (line.Length() < 1)
 			continue;
 		if (line[0] == ';')
@@ -380,14 +445,64 @@ status_t MSThemeImporter::ImportNextTheme(BMessage **theme)
 					if (value == "Metallic" && themeWindowDecor == "Redmond")
 						themeWindowDecor = "Seattle";
 			}
+		} else if (section.IFindFirst("AppEvents\\Schemes\\Apps") > -1) {
+			if (key != "DefaultValue")
+				continue;
+			// system sound...
+			for (int i = 0; sSoundsMap[i].wname; i++) {
+				if (section.IFindFirst(sSoundsMap[i].wname) > -1) {
+					BString encodedPath;
+					if (section.IFindFirst(".W]") > -1) {
+						// Wide Char weirdly encoded path...
+						// skip for now.
+						break;
+						// someone knows this +AOk- stuff ??
+					} else {
+						// ANSI path (.A or none specified)
+						// but it's been converted to UTF-8 already
+						// so we just use that one.
+						encodedPath = value;
+					}
+					PRINT(("Sound: '%s' -> '%s' (%s)\n", section.String(), sSoundsMap[i].name, value.String()));
+					if (encodedPath.Length() == 0)
+						break;
+					BPath soundPath;
+					if (ParseWinPath(rootDir, encodedPath.String(), soundPath) < B_OK)
+						break;
+					BMessage sound('SndI');
+					sound.AddString("sounds:file", soundPath.Path());
+					sound.AddFloat("sounds:volume", 1.0);
+					if (sounds.ReplaceMessage(sSoundsMap[i].name, &sound) < B_OK)
+						sounds.AddMessage(sSoundsMap[i].name, &sound);
+				}
+			}
 		} else {
 			;//PRINT(("MSThemeImporter: unknown section '%s', line '%s'\n", section.String(), line.String()));
 		}
 	}
 
+	// apply settings now we that have everything
+	
+	// force Deskbar at the bottom... it's Windows, right?
+	// XXX: I couldn't find a reg key for that in any theme,
+	// but likely there is one.
+	deskbar_location loc = B_DESKBAR_BOTTOM;
+	bool expanded = true;
+	deskbar.AddInt32("db:location", (int32)loc);
+	deskbar.AddBool("db:expanded", expanded);
+
+	// window decor
 	decor.AddString("window:decor", themeWindowDecor.String());
+	// fallbacks
+	decor.AddString("window:decor", "Win95");
+	decor.AddString("window:decor", "Win2k");
+	decor.AddString("window:decor", "Win");
+	decor.AddString("window:decor", "Redmond");
+	decor.AddString("window:decor", "Seattle");
+	decor.AddString("window:decor", "WinDecorator");
 	decor.AddInt32("window:R5:decor", themeWindowDecorR5);
 
+	// wallpaper
 	if (themeWallpaperPath.InitCheck() == B_OK) {
 		backgrounds.AddString(B_BACKGROUND_IMAGE, themeWallpaperPath.Path());
 		backgrounds.AddInt32(B_BACKGROUND_WORKSPACES, 0xffffffff);
@@ -408,8 +523,12 @@ status_t MSThemeImporter::ImportNextTheme(BMessage **theme)
 		}
 		backgrounds.AddInt32(B_BACKGROUND_MODE, wallpaperMode);
 		backgrounds.AddPoint(B_BACKGROUND_ORIGIN, themeWallpaperOrigin);
+		//XXX: there is a reg key for that, is it used ?
 		//backgrounds.AddBool(B_BACKGROUND_ERASE_TEXT, erasetext);
 	}
+
+	// ui settings: disable Z-Snake
+	ui_settings.AddBool(B_UI_MENU_ZSNAKE, false);
 
 	screensaver.AddString("screensaver:modulename", themeScreensaver.String());
 
@@ -419,6 +538,7 @@ status_t MSThemeImporter::ImportNextTheme(BMessage **theme)
 	global.AddMessage(Z_THEME_DESKBAR_SETTINGS, &deskbar);
 	global.AddMessage(Z_THEME_UI_SETTINGS, &ui_settings);
 	global.AddMessage(Z_THEME_SCREENSAVER_SETTINGS, &screensaver);
+	global.AddMessage(Z_THEME_SOUNDS_SETTINGS, &sounds);
 	*theme = new BMessage(global);
 	//global.PrintToStream();
 
@@ -464,12 +584,14 @@ bool MSThemeImporter::ScanDirectory(BDirectory &dir, int depth)
 
 status_t MSThemeImporter::ParseWinPath(BDirectory &rootDir, const char *from, BPath &to)
 {
+	status_t err;
 	//FENTRY;
 	//return ENOENT;
 	//BDirectory winDir(&rootDir, "WINDOWS");
 	//BDirectory resourceDir(&winDir, "Resources");
+	PRINT(("ParseWinPath(, %s, )\n", from));
 	BString p(from);
-	p.ReplaceAll('\\', '/');
+	//p.ReplaceAll('\\', '/');
 	to.SetTo(&rootDir, ".");
 	
 	if (p.IFindFirst("%WinDir%") == 0) {
@@ -480,10 +602,58 @@ status_t MSThemeImporter::ParseWinPath(BDirectory &rootDir, const char *from, BP
 		to.Append("WINDOWS/Resources");
 		p.IReplaceFirst("%ResourceDir%", "");
 	}
+	//TODO: %ThemeDir%
 	
 	//TODO: split and check for correct case
-	//TODO: %ThemeDir%
-	to.Append(p.String());
+	BDirectory dir;
+	while (p.Length()) {
+		BString component;
+		PRINT(("ParseWinPath: p.L %d p '%s'\n", p.Length(), p.String()));
+		int32 len = p.FindFirst('\\');
+		if (len < 0)
+			len = p.Length();
+		p.MoveInto(component, 0, len);
+		p.RemoveFirst("\\");
+		err = dir.SetTo(to.Path());
+		if (err < B_OK)
+			return err;
+		PRINT(("ParseWinPath: at '%s'\n", to.Path()));
+		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		if (dir.Contains(component.String())) {
+			to.Append(component.String());
+			continue;
+		}
+		// can't find as is, try various capitalizations
+		// (caseless fs SUXOR)
+		component.Capitalize();
+		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		if (dir.Contains(component.String())) {
+			to.Append(component.String());
+			continue;
+		}
+		component.CapitalizeEachWord();
+		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		if (dir.Contains(component.String())) {
+			to.Append(component.String());
+			continue;
+		}
+		component.ToLower();
+		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		if (dir.Contains(component.String())) {
+			to.Append(component.String());
+			continue;
+		}
+		component.ToUpper();
+		PRINT(("ParseWinPath: testing '%s'\n", component.String()));
+		if (dir.Contains(component.String())) {
+			to.Append(component.String());
+			continue;
+		}
+		PRINT(("ParseWinPath: failed\n"));
+		// TODO: loop on GetNextEntry and ICompare ?
+		return ENOENT;
+	}
+	PRINT(("ParseWinPath(, %s, ) -> %s\n", from, to.Path()));
 	return B_OK;
 }
 

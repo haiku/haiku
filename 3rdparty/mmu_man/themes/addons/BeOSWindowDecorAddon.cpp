@@ -23,6 +23,19 @@
 #include "ThemesAddon.h"
 #include "UITheme.h"
 
+// for reference:
+//
+// available decors in Dano:
+// (Default R5) Baqua BlueSteel Graphite Origin OriginSimple
+//
+// available decors in Zeta:
+// (Default R5) Cupertino MenloTab Redmond Smoke ZetaDecor Menlo 
+// R5 Seattle TV_ ZLight blueBeOS yellowTAB
+//
+// mine:
+// Win2k TextMode TextModeBlue
+
+
 #ifdef SINGLE_BINARY
 #define instantiate_themes_addon instantiate_themes_addon_window_decor
 #endif
@@ -30,6 +43,21 @@
 #define A_NAME "Window Decor"
 #define A_MSGNAME Z_THEME_WINDOW_DECORATIONS
 #define A_DESCRIPTION "Window decorations and scrollbars"
+
+#ifdef B_BEOS_VERSION_DANO
+status_t set_window_decor_safe(const char *name, BMessage *globals)
+{
+	// make sure the decor exists (set_window_decor() always returns B_OK)
+	BPath p("/etc/decors/");
+	p.Append(name);
+	BNode n(p.Path());
+	if (n.InitCheck() < B_OK || !n.IsFile())
+		return ENOENT;
+	set_window_decor(name, globals);
+	return B_OK;
+}
+#endif
+
 
 class DecorThemesAddon : public ThemesAddon {
 public:
@@ -95,6 +123,7 @@ status_t DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BMessage window_decor;
 	BMessage globals;
 	BString decorName;
+	int32 decorId = R5_DECOR_BEOS;
 	status_t err;
 
 	if (!(flags & UI_THEME_SETTINGS_SET_ALL) || !(AddonFlags() & Z_THEME_ADDON_DO_SET_ALL))
@@ -105,14 +134,123 @@ status_t DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 		return err;
 	
 #ifdef B_BEOS_VERSION_DANO
-	if (window_decor.FindString("window:decor", &decorName) == B_OK)
-		set_window_decor(decorName.String(), 
+	bool decorDone = false;
+	// try each name until one works
+	for (int i = 0; window_decor.FindString("window:decor", i, &decorName) == B_OK; i++) {
+		err = set_window_decor_safe(decorName.String(), 
 			(window_decor.FindMessage("window:decor_globals", &globals) == B_OK)?&globals:NULL);
+		if (err < B_OK)
+			continue;
+		decorDone = true;
+		break;
+	}
+	// none match but we did have one, force the default with the globals
+	if (!decorDone && decorName.Length()) {
+		decorDone = true;
+		set_window_decor_safe(decorName.String(), 
+		(window_decor.FindMessage("window:decor_globals", &globals) == B_OK)?&globals:NULL);
+	}
+	// none... maybe R5 number ?
+	if (!decorDone && 
+		window_decor.FindInt32("window:R5:decor", &decorId) == B_OK) {
+		switch (decorId) {
+			case R5_DECOR_BEOS:
+			default:
+				err = set_window_decor_safe("R5", NULL);
+				if (err >= B_OK)
+					break;
+				err = set_window_decor_safe("BeOS", NULL);
+				if (err >= B_OK)
+					break;
+				set_window_decor("R5", NULL);
+				break;
+			case R5_DECOR_WIN95:
+				err = set_window_decor_safe("Win2k", NULL);
+				if (err >= B_OK)
+					break;
+				err = set_window_decor_safe("Redmond", NULL);
+				if (err >= B_OK)
+					break;
+				err = set_window_decor_safe("Seattle", NULL);
+				if (err >= B_OK)
+					break;
+				set_window_decor("R5", NULL);
+				break;
+			case R5_DECOR_AMIGA:
+				err = set_window_decor_safe("Amiga", NULL);
+				if (err >= B_OK)
+					break;
+				err = set_window_decor_safe("AmigaOS", NULL);
+				if (err >= B_OK)
+					break;
+				err = set_window_decor_safe("AmigaOS4", NULL);
+				if (err >= B_OK)
+					break;
+				set_window_decor("R5", NULL);
+				break;
+			case R5_DECOR_MAC:
+				err = set_window_decor_safe("Mac", NULL);
+				if (err >= B_OK)
+					break;
+				err = set_window_decor_safe("MacOS", NULL);
+				if (err >= B_OK)
+					break;
+				err = set_window_decor_safe("Baqua", NULL);
+				if (err >= B_OK)
+					break;
+				err = set_window_decor_safe("Cupertino", NULL);
+				if (err >= B_OK)
+					break;
+				set_window_decor("R5", NULL);
+				break;
+		}
+		decorDone = true;
+	}
+	// it might be intentionally there is none...
+	//if (!decorDone)
+	//	set_window_decor("Default", NULL);
 #else
+	// best effort with what we have
 extern void __set_window_decor(int32 theme);
-	int32 decorNr = 0;
-	if (window_decor.FindInt32("window:R5:decor", &decorNr) == B_OK)
-		__set_window_decor(decorNr);
+	if (window_decor.FindInt32("window:R5:decor", &decorId) == B_OK)
+		__set_window_decor(decorId);
+	else {
+		BString name;
+		for (int i = 0; window_decor.FindString("window:decor", i, &decorName) == B_OK; i++) {
+			if (decorName.IFindFirst("R5") > -1 || 
+				decorName.IFindFirst("BeOS") > -1 || 
+				decorName.IFindFirst("Be") > -1 || 
+				decorName.IFindFirst("yellow") > -1 || 
+				decorName.IFindFirst("Menlo") > -1 || 
+				decorName.IFindFirst("Default") > -1 || 
+				decorName.IFindFirst("Origin") > -1) {
+				__set_window_decor(R5_DECOR_BEOS);
+				break;
+			}
+			if (decorName.IFindFirst("Microsoft") > -1 || 
+				decorName.IFindFirst("2k") > -1 || 
+				decorName.IFindFirst("XP") > -1 || 
+				decorName.IFindFirst("Redmond") > -1 || 
+				decorName.IFindFirst("Seattle") > -1 || 
+				decorName.IFindFirst("Win") > -1) {
+				__set_window_decor(R5_DECOR_WIN95);
+				break;
+			}
+			if (decorName.IFindFirst("Amiga") > -1 || 
+				decorName.IFindFirst("OS4") > -1) {
+				__set_window_decor(R5_DECOR_AMIGA);
+				break;
+			}
+			if (decorName.IFindFirst("Mac") > -1 || 
+				decorName.IFindFirst("Apple") > -1 || 
+				decorName.IFindFirst("Aqua") > -1 || 
+				decorName.IFindFirst("Cupertino") > -1 || 
+				decorName.IFindFirst("OSX") > -1) {
+				__set_window_decor(R5_DECOR_MAC);
+				break;
+			}
+		}
+	}
 #endif
 	// XXX: add colors à la WindowShade ?
 	
