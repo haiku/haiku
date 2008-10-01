@@ -10,7 +10,10 @@ local haiku-utils_rsrc = [ FGristFiles haiku-utils.rsrc ] ;
 
 ResComp $(haiku-utils_rsrc) : [ FGristFiles haiku-utils.rdef ] ;
 
+AddResources fortune : fortune.rdef ;
 AddResources hey : hey.rdef ;
+AddResources mimeset : mimeset.rdef ;
+AddResources urlwrapper : urlwrapper.rdef ;
 
 # standard commands that don't need any additional library
 StdBinCommands
@@ -67,9 +70,6 @@ StdBinCommands
 	top.c
 	tput.c
 	: libtermcap.a : $(haiku-utils_rsrc) ;
-
-AddResources mimeset : mimeset.rdef ;
-AddResources urlwrapper : urlwrapper.rdef ;
 
 # standard commands that need libbe.so
 StdBinCommands
