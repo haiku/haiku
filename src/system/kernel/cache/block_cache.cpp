@@ -1596,17 +1596,10 @@ get_next_locked_block_cache(block_cache *last)
 	} else
 		cache = sCaches.Head();
 
-	while (cache != NULL) {
-		cache = sCaches.GetNext(cache);
-		if (cache == NULL)
-			break;
-
+	if (cache != NULL) {
 		mutex_lock(&cache->lock);
-		break;
-	}
-
-	if (cache != NULL)
 		sCaches.Insert(sCaches.GetNext(cache), (block_cache *)&sMarkCache);
+	}
 
 	return cache;
 }
