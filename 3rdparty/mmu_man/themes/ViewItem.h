@@ -1,3 +1,7 @@
+/*
+ * Copyright 2000-2008, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _VIEW_ITEM_H_
 #define _VIEW_ITEM_H_
 

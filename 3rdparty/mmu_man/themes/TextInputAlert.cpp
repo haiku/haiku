@@ -1,3 +1,8 @@
+/*
+ * Copyright 2007-2008, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 //HACK :P
 #define private public
 #include <Alert.h>

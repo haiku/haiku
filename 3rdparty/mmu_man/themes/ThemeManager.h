@@ -1,4 +1,11 @@
 /*
+ * Copyright 2000-2008, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _THEMEMANAGER_H_
+#define _THEMEMANAGER_H_
+
+/*
  * ThemeManager class header
  */
 
@@ -138,3 +145,5 @@ private:
 
 using namespace Z::ThemeManager;
 
+
+#endif	// _THEMEMANAGER_H_

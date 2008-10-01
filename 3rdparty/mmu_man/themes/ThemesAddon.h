@@ -1,3 +1,7 @@
+/*
+ * Copyright 2000-2008, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _THEMES_ADDON_H
 #define _THEMES_ADDON_H
 /*

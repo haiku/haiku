@@ -1,3 +1,7 @@
+/*
+ * Copyright 2008, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _BE_THEME_IMPORTER_H
 #define _BE_THEME_IMPORTER_H
 /*

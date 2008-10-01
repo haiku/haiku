@@ -8,7 +8,7 @@ resource app_version {
 	variety    = B_APPV_ALPHA,
 	internal   = 0,
 	short_info = "Themes",
-	long_info  = "Themes ©2006-2008 François Revol."
+	long_info  = "Themes ©2000-2008 François Revol."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

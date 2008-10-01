@@ -1,3 +1,8 @@
+/*
+ * Copyright 2000-2008, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "ThemeAddonItem.h"
 #include "ThemeInterfaceView.h"
 #include "ThemeManager.h"
