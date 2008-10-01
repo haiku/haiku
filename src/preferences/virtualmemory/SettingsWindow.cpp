@@ -39,7 +39,7 @@ class SizeSlider : public BSlider {
 			BMessage* message, int32 min, int32 max, uint32 resizingMode);
 		virtual ~SizeSlider();
 
-		virtual char* UpdateText() const;
+		virtual const char* UpdateText() const;
 
 	private:
 		mutable BString	fText;
@@ -91,12 +91,12 @@ SizeSlider::~SizeSlider()
 }
 
 
-char *
+const char *
 SizeSlider::UpdateText() const
 {
 	fText = byte_string(Value() * kMegaByte);
 
-	return const_cast<char*>(fText.String());
+	return fText.String();
 }
 
 
