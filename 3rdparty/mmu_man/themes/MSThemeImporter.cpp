@@ -178,24 +178,33 @@ static struct sounds_map {
 	{ NULL, NULL }
 };
 
+
+// #pragma mark - 
+
+
 MSThemeImporter::MSThemeImporter()
 	:ThemeImporter("MSTheme")
 {
 	FENTRY;
 }
 
+
 MSThemeImporter::~MSThemeImporter()
 {
 	FENTRY;
 }
 
-const char *MSThemeImporter::Description()
+
+const char *
+MSThemeImporter::Description()
 {
 	FENTRY;
 	return "Imports MSTheme themes";
 }
 	
-status_t MSThemeImporter::FetchThemes()
+
+status_t
+MSThemeImporter::FetchThemes()
 {
 	FENTRY;
 	status_t err = ENOENT;
@@ -238,7 +247,9 @@ status_t MSThemeImporter::FetchThemes()
 	return err;
 }
 
-status_t MSThemeImporter::ImportNextTheme(BMessage **theme)
+
+status_t
+MSThemeImporter::ImportNextTheme(BMessage **theme)
 {
 	FENTRY;
 	status_t err;
@@ -545,13 +556,17 @@ status_t MSThemeImporter::ImportNextTheme(BMessage **theme)
 	return B_OK;
 }
 
-status_t MSThemeImporter::EndImports()
+
+status_t
+MSThemeImporter::EndImports()
 {
 	FENTRY;
 	return B_OK;
 }
 
-bool MSThemeImporter::ScanDirectory(BDirectory &dir, int depth)
+
+bool
+MSThemeImporter::ScanDirectory(BDirectory &dir, int depth)
 {
 	//FENTRY;
 	BEntry ent;
@@ -582,7 +597,9 @@ bool MSThemeImporter::ScanDirectory(BDirectory &dir, int depth)
 	return found;
 }
 
-status_t MSThemeImporter::ParseWinPath(BDirectory &rootDir, const char *from, BPath &to)
+
+status_t
+MSThemeImporter::ParseWinPath(BDirectory &rootDir, const char *from, BPath &to)
 {
 	status_t err;
 	//FENTRY;

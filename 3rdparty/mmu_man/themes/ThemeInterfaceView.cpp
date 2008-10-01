@@ -64,32 +64,44 @@ static const uint32 skOnlineThemes	= 'TmOL';
 static char* skThemeURL			= "http://www.zeta-os.com/cms/download.php?list.4";
 
 #define HIDESS_OFFSET (Bounds().Width()/2 - 130)
-// ------------------------------------------------------------------------------
-filter_result refs_filter(BMessage *message, BHandler **handler, BMessageFilter *filter)
+
+
+// #pragma mark - refs_filter
+
+
+filter_result
+refs_filter(BMessage *message, BHandler **handler, BMessageFilter *filter)
 {
 	(void)handler;
 	(void)filter;
 	switch (message->what) {
-	case B_REFS_RECEIVED:
-		message->PrintToStream();
-		break;
+		case B_REFS_RECEIVED:
+			message->PrintToStream();
+			break;
 	}
 	return B_DISPATCH_MESSAGE;
 }
 
-// ------------------------------------------------------------------------------
+
+// #pragma mark - MyInvoker
+
+
 class MyInvoker : public BInvoker {
-	public:
-		MyInvoker(BMessage* message, const BHandler* handler, const BLooper* looper = NULL);
-		virtual ~MyInvoker();
-		virtual status_t Invoke(BMessage* message = NULL);
-		void SetOwner(TextInputAlert *alert);
-	private:
-		TextInputAlert *fOwner;
+public:
+						MyInvoker(BMessage* message, 
+							const BHandler* handler, 
+							const BLooper* looper = NULL);
+	virtual				~MyInvoker();
+	virtual status_t	Invoke(BMessage* message = NULL);
+	void				SetOwner(TextInputAlert *alert);
+private:
+	TextInputAlert*		fOwner;
 };
 
 
-MyInvoker::MyInvoker(BMessage* message, const BHandler* handler, const BLooper* looper)
+MyInvoker::MyInvoker(BMessage* message, 
+	const BHandler* handler, 
+	const BLooper* looper)
 	: BInvoker(message, handler, looper)
 {
 }
@@ -120,21 +132,27 @@ MyInvoker::SetOwner(TextInputAlert *alert)
 }
 
 
-// ------------------------------------------------------------------------------
+// #pragma mark -
+
+
 //extern "C" BView *get_pref_view(const BRect& Bounds)
-extern "C" BView *themes_pref(const BRect& Bounds)
+extern "C" BView *
+themes_pref(const BRect& Bounds)
 {
 	return new ThemeInterfaceView(Bounds);
 }
 
-// ------------------------------------------------------------------------------
+
+// #pragma mark - ThemeInterfaceView
+
+
 ThemeInterfaceView::ThemeInterfaceView(BRect _bounds)
-	: BView(_bounds, "Themes", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
-	, fThemeManager(NULL)
-	, fScreenshotPaneHidden(false)
-	, fHasScreenshot(false)
-	, fPopupInvoker(NULL)
-	, fBox(NULL)
+	: BView(_bounds, "Themes", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	fThemeManager(NULL),
+	fScreenshotPaneHidden(false),
+	fHasScreenshot(false),
+	fPopupInvoker(NULL),
+	fBox(NULL)
 {
 /*
 	BMessageFilter *filt = new BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, refs_filter);
@@ -144,14 +162,14 @@ ThemeInterfaceView::ThemeInterfaceView(BRect _bounds)
 */
 }
 
-// ------------------------------------------------------------------------------
+
 ThemeInterfaceView::~ThemeInterfaceView()
 {
 	delete fPopupInvoker;
 	delete fThemeManager;
 }
 
-// ------------------------------------------------------------------------------
+
 void
 ThemeInterfaceView::AllAttached()
 {
@@ -280,14 +298,14 @@ ThemeInterfaceView::AllAttached()
 	PopulateThemeList();
 }
 
-// ------------------------------------------------------------------------------
+
 void
 ThemeInterfaceView::MessageReceived(BMessage *_msg)
 {
 	ThemeManager *tman;
 	int32 value;
 	int32 id;
-//_msg->PrintToStream();
+
 	switch(_msg->what)
 	{
 		case B_REFS_RECEIVED:
@@ -424,14 +442,16 @@ ThemeInterfaceView::MessageReceived(BMessage *_msg)
 	}
 }
 
-// ------------------------------------------------------------------------------
-ThemeManager* ThemeInterfaceView::GetThemeManager()
+
+ThemeManager* 
+ThemeInterfaceView::GetThemeManager()
 {
 	return fThemeManager;
 }
 
-// ------------------------------------------------------------------------------
-void ThemeInterfaceView::HideScreenshotPane(bool hide)
+
+void
+ThemeInterfaceView::HideScreenshotPane(bool hide)
 {
 	BString lbl;
 	if (IsScreenshotPaneHidden() && hide)
@@ -462,14 +482,16 @@ void ThemeInterfaceView::HideScreenshotPane(bool hide)
 }
 
 
-// ------------------------------------------------------------------------------
-bool ThemeInterfaceView::IsScreenshotPaneHidden()
+
+bool
+ThemeInterfaceView::IsScreenshotPaneHidden()
 {
 	return fScreenshotPaneHidden;
 }
 
-// ------------------------------------------------------------------------------
-void ThemeInterfaceView::PopulateThemeList()
+
+void
+ThemeInterfaceView::PopulateThemeList()
 {
 	int i;
 	BControl *c;
@@ -478,20 +500,23 @@ void ThemeInterfaceView::PopulateThemeList()
 		if (c)
 			c->SetEnabled(false);
 	}
-	thread_id tid = spawn_thread(_ThemeListPopulatorTh, "ThemeListPopulator", B_LOW_PRIORITY, this);
+	thread_id tid = spawn_thread(_ThemeListPopulatorTh, "ThemeListPopulator", 
+		B_LOW_PRIORITY, this);
 	resume_thread(tid);
 }
 
-// ------------------------------------------------------------------------------
-int32 ThemeInterfaceView::_ThemeListPopulatorTh(void *arg)
+
+int32
+ThemeInterfaceView::_ThemeListPopulatorTh(void *arg)
 {
 	ThemeInterfaceView *_this = (ThemeInterfaceView *)arg;
 	_this->_ThemeListPopulator();
 	return 0;
 }
 
-// ------------------------------------------------------------------------------
-void ThemeInterfaceView::_ThemeListPopulator()
+
+void
+ThemeInterfaceView::_ThemeListPopulator()
 {
 	status_t err;
 	int32 i, count;
@@ -548,6 +573,8 @@ void ThemeInterfaceView::_ThemeListPopulator()
 			LockLooper();
 			fThemeList->AddItem(ti);
 			UnlockLooper();
+			// rest a bit
+			snooze(1000);
 		}
 	}
 	// enable controls again
@@ -561,8 +588,9 @@ void ThemeInterfaceView::_ThemeListPopulator()
 	UnlockLooper();
 }
 
-// ------------------------------------------------------------------------------
-void ThemeInterfaceView::PopulateAddonList()
+
+void
+ThemeInterfaceView::PopulateAddonList()
 {
 	int32 i, count;
 	ViewItem *vi;
@@ -575,8 +603,9 @@ void ThemeInterfaceView::PopulateAddonList()
 	}
 }
 
-// ------------------------------------------------------------------------------
-status_t ThemeInterfaceView::Revert()
+
+status_t
+ThemeInterfaceView::Revert()
 {
 	status_t err = B_OK;
 	ThemeManager* tman = GetThemeManager();
@@ -589,8 +618,9 @@ status_t ThemeInterfaceView::Revert()
 	return B_OK;
 }
 
-// ------------------------------------------------------------------------------
-status_t ThemeInterfaceView::ApplyDefaults()
+
+status_t
+ThemeInterfaceView::ApplyDefaults()
 {
 	status_t err = B_OK;
 	ThemeManager* tman = GetThemeManager();
@@ -601,8 +631,9 @@ status_t ThemeInterfaceView::ApplyDefaults()
 	return err;
 }
 
-// ------------------------------------------------------------------------------
-status_t ThemeInterfaceView::ApplySelected()
+
+status_t
+ThemeInterfaceView::ApplySelected()
 {
 	status_t err;
 	ThemeManager* tman = GetThemeManager();
@@ -623,8 +654,9 @@ status_t ThemeInterfaceView::ApplySelected()
 	return err;
 }
 
-// ------------------------------------------------------------------------------
-status_t ThemeInterfaceView::CreateNew(const char *name)
+
+status_t
+ThemeInterfaceView::CreateNew(const char *name)
 {
 	status_t err;
 	ThemeManager* tman = GetThemeManager();
@@ -649,8 +681,9 @@ status_t ThemeInterfaceView::CreateNew(const char *name)
 	return B_OK;
 }
 
-// ------------------------------------------------------------------------------
-status_t ThemeInterfaceView::SaveSelected()
+
+status_t
+ThemeInterfaceView::SaveSelected()
 {
 	status_t err;
 	ThemeManager* tman = GetThemeManager();
@@ -680,8 +713,9 @@ status_t ThemeInterfaceView::SaveSelected()
 	return err;
 }
 
-// ------------------------------------------------------------------------------
-status_t ThemeInterfaceView::DeleteSelected()
+
+status_t
+ThemeInterfaceView::DeleteSelected()
 {
 	status_t err;
 	ThemeManager* tman = GetThemeManager();
@@ -710,8 +744,9 @@ status_t ThemeInterfaceView::DeleteSelected()
 	return err;
 }
 
-// ------------------------------------------------------------------------------
-status_t ThemeInterfaceView::AddScreenshot()
+
+status_t
+ThemeInterfaceView::AddScreenshot()
 {
 	status_t err;
 	ThemeManager* tman = GetThemeManager();
@@ -739,8 +774,9 @@ status_t ThemeInterfaceView::AddScreenshot()
 	return err;
 }
 
-// ------------------------------------------------------------------------------
-status_t ThemeInterfaceView::ThemeSelected()
+
+status_t
+ThemeInterfaceView::ThemeSelected()
 {
 	status_t err;
 	ThemeManager* tman = GetThemeManager();
@@ -795,18 +831,21 @@ status_t ThemeInterfaceView::ThemeSelected()
 	return err;
 }
 
-// ------------------------------------------------------------------------------
-void ThemeInterfaceView::SetIsRevertable()
+
+void
+ThemeInterfaceView::SetIsRevertable()
 {
 	BMessenger msgr(Parent());
 	msgr.SendMessage(B_PREF_APP_ENABLE_REVERT);
 }
 
+
 // PRIVATE: in libzeta for now.
 extern status_t ScaleBitmap(const BBitmap& inBitmap, BBitmap& outBitmap);
 
-// ------------------------------------------------------------------------------
-void ThemeInterfaceView::SetScreenshot(BBitmap *shot)
+
+void
+ThemeInterfaceView::SetScreenshot(BBitmap *shot)
 {
 	// no screenshotpanel
 	if(NULL == fScreenshotPane)
@@ -837,8 +876,9 @@ void ThemeInterfaceView::SetScreenshot(BBitmap *shot)
 		delete shot;
 }
 
-// ------------------------------------------------------------------------------
-status_t ThemeInterfaceView::AError(const char *func, status_t err)
+
+status_t
+ThemeInterfaceView::AError(const char *func, status_t err)
 {
 	BAlert *alert;
 	BString msg;

@@ -6,7 +6,7 @@
 
 class ThemeItem : public BStringItem
 {
-	public:
+public:
 					ThemeItem(int32 id, const char *name, bool ro = false);
 					~ThemeItem();
 		void		DrawItem(BView *owner, BRect frame, bool complete = false);
@@ -15,7 +15,7 @@ class ThemeItem : public BStringItem
 		bool		IsReadOnly();
 		void		SetReadOnly(bool set);
 		int32		ThemeId();
-	private:
+private:
 		int32		fId;
 		bool		fRo;
 		bool		fCurrent;

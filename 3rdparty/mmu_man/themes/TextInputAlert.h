@@ -5,7 +5,7 @@
 #include <TextControl.h>
 
 class TextInputAlert : public BAlert {
-	public:
+public:
 		TextInputAlert(const char *title, 
 						const char *text, 
 						const char *initial, /* initial input value */
@@ -21,7 +21,7 @@ class TextInputAlert : public BAlert {
 		BTextControl *TextControl() const { return fText; };
 
 		
-	private:
+private:
 		BTextControl *fText;
 };
 

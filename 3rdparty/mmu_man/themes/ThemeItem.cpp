@@ -3,6 +3,10 @@
 #include <Font.h>
 #include <stdio.h>
 
+
+// #pragma mark - 
+
+
 ThemeItem::ThemeItem(int32 id, const char *name, bool ro)
 	: BStringItem(name)
 {
@@ -11,11 +15,14 @@ ThemeItem::ThemeItem(int32 id, const char *name, bool ro)
 	fRo = ro;
 }
 
+
 ThemeItem::~ThemeItem()
 {
 }
 
-void ThemeItem::DrawItem(BView *owner, BRect frame, bool complete)
+
+void
+ThemeItem::DrawItem(BView *owner, BRect frame, bool complete)
 {
 	rgb_color col;
 	if (fCurrent || fRo)
@@ -44,27 +51,37 @@ void ThemeItem::DrawItem(BView *owner, BRect frame, bool complete)
 		owner->PopState();
 }
 
-int32 ThemeItem::ThemeId()
+
+int32
+ThemeItem::ThemeId()
 {
 	return fId;
 }
 
-bool ThemeItem::IsCurrent()
+
+bool
+ThemeItem::IsCurrent()
 {
 	return fCurrent;
 }
 
-void ThemeItem::SetCurrent(bool set)
+
+void
+ThemeItem::SetCurrent(bool set)
 {
 	fCurrent = set;
 }
 
-bool ThemeItem::IsReadOnly()
+
+bool
+ThemeItem::IsReadOnly()
 {
 	return fRo;
 }
 
-void ThemeItem::SetReadOnly(bool set)
+
+void
+ThemeItem::SetReadOnly(bool set)
 {
 	fRo = set;
 }

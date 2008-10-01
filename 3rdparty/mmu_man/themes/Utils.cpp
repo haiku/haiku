@@ -16,6 +16,7 @@ typedef struct font_folder_info {
 	char *name;
 	uint32 flags;
 } font_folder_info;
+
 typedef struct font_file_info {
 	char *name;
 	uint32 flags;
@@ -34,7 +35,8 @@ extern long _count_font_files_(long);
 extern status_t _get_nth_font_file_(long, font_file_info **);
 extern status_t _get_nth_font_folder_(long, font_folder_info **);
 
-status_t find_font_file(entry_ref *to, font_family family, font_style style, float size)
+status_t
+find_font_file(entry_ref *to, font_family family, font_style style, float size)
 {
 #ifdef B_BEOS_VERSION_DANO
 	status_t err = ENOENT;
@@ -74,6 +76,7 @@ status_t find_font_file(entry_ref *to, font_family family, font_style style, flo
 	return ENOENT;
 }
 
+
 #define _BORK(_t) \
 	err = find_directory(_t, &path); \
 	if (!err && (s = dir->FindFirst(path.Path())) >= 0) { \
@@ -86,7 +89,8 @@ status_t find_font_file(entry_ref *to, font_family family, font_style style, flo
 		return B_OK; \
 	} \
 
-status_t escape_find_directory(BString *dir)
+status_t
+escape_find_directory(BString *dir)
 {
 	status_t err;
 	BPath path;
@@ -157,6 +161,7 @@ status_t escape_find_directory(BString *dir)
 }
 #undef _BORK
 
+
 #define _BORK(_t) \
 	if (tok == #_t) { \
 		err = find_directory(_t, &path); \
@@ -167,7 +172,8 @@ status_t escape_find_directory(BString *dir)
 	} \
 
 
-status_t unescape_find_directory(BString *dir)
+status_t
+unescape_find_directory(BString *dir)
 {
 	status_t err = B_ERROR;
 	int32 s, e;
@@ -243,12 +249,13 @@ status_t unescape_find_directory(BString *dir)
 	
 	return B_OK;
 }
-
 #undef _BORK
+
 
 // copy a file including its attributes
 #define BUFF_SZ 1024*1024
-status_t copy_file(entry_ref *ref, const char *to)
+status_t
+copy_file(entry_ref *ref, const char *to)
 {
 	char *buff;
 	status_t err = B_OK;
@@ -265,7 +272,8 @@ status_t copy_file(entry_ref *ref, const char *to)
 }
 
 
-int testhook()
+int
+testhook()
 {
 	status_t err;
 	BString str("/boot/home/config/fonts/ttfonts/toto.ttf");
@@ -274,7 +282,6 @@ int testhook()
 	err = unescape_find_directory(&str);
 	printf("error 0x%08lx %s\n", err, str.String());
 	return 0;
-	return 1;
 }
 
 status_t

@@ -18,7 +18,9 @@
 // PRIVATE: in libzeta for now.
 extern status_t ScaleBitmap(const BBitmap& inBitmap, BBitmap& outBitmap);
 
-status_t MakeScreenshot(BBitmap **here)
+
+status_t
+MakeScreenshot(BBitmap **here)
 {
 	status_t err;
 	BScreen bs;
@@ -73,3 +75,4 @@ status_t MakeScreenshot(BBitmap **here)
 
 	return B_OK;
 }
+

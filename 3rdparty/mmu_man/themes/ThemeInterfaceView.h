@@ -20,7 +20,7 @@ class MyInvoker;
 
 class ThemeInterfaceView : public BView
 {
-	public:
+public:
 							ThemeInterfaceView(BRect _bounds);
 		virtual 			~ThemeInterfaceView();
 		
@@ -48,7 +48,7 @@ class ThemeInterfaceView : public BView
 		void				SetScreenshot(BBitmap *shot);
 		status_t			AError(const char *func, status_t err);
 
-	private:
+private:
 		static int32		_ThemeListPopulatorTh(void *arg);
 		void				_ThemeListPopulator();
 		

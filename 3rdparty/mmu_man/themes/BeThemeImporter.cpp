@@ -37,6 +37,10 @@ static const deskbar_location kDeskbarLocationMap[] = {
 	B_DESKBAR_LEFT_BOTTOM, B_DESKBAR_RIGHT_BOTTOM, B_DESKBAR_BOTTOM
 };
 
+
+// #pragma mark - 
+
+
 BeThemeImporter::BeThemeImporter()
 	:ThemeImporter("BeTheme")
 {
@@ -50,25 +54,32 @@ BeThemeImporter::BeThemeImporter()
 	fQuery.SetPredicate(QSTR);
 }
 
+
 BeThemeImporter::~BeThemeImporter()
 {
 	FENTRY;
 	fQuery.Clear();
 }
 
-const char *BeThemeImporter::Description()
+
+const char *
+BeThemeImporter::Description()
 {
 	FENTRY;
 	return "Imports BeTheme themes";
 }
 	
-status_t BeThemeImporter::FetchThemes()
+
+status_t
+BeThemeImporter::FetchThemes()
 {
 	FENTRY;
 	return fQuery.Fetch();
 }
 
-status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
+
+status_t
+BeThemeImporter::ImportNextTheme(BMessage **theme)
 {
 	FENTRY;
 	status_t err;
@@ -268,7 +279,9 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 	return B_OK;
 }
 
-status_t BeThemeImporter::EndImports()
+
+status_t
+BeThemeImporter::EndImports()
 {
 	FENTRY;
 	fQuery.Clear();
