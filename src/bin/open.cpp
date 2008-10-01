@@ -9,11 +9,7 @@
 
 #include <Entry.h>
 #include <List.h>
-#ifdef __HAIKU__
-#	include <MimeType.h>
-#else
-#	include <Mime.h>
-#endif
+#include <Mime.h>
 #include <Roster.h>
 #include <String.h>
 
