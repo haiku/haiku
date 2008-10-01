@@ -8,12 +8,11 @@
 #ifndef _KERNEL_DEBUG_H
 #define _KERNEL_DEBUG_H
 
+#include "kernel_debug_config.h"
 
 #include <KernelExport.h>
 #include <module.h>
 
-
-#define KDEBUG 1
 
 #if DEBUG
 /*

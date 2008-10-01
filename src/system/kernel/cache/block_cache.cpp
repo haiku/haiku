@@ -25,6 +25,8 @@
 #include <util/AutoLock.h>
 #include <util/khash.h>
 
+#include "kernel_debug_config.h"
+
 
 // TODO: this is a naive but growing implementation to test the API:
 //	1) block reading/writing is not at all optimized for speed, it will
@@ -40,9 +42,6 @@
 #else
 #	define TRACE(x) ;
 #endif
-
-#define DEBUG_BLOCK_CACHE
-#define DEBUG_CHANGED
 
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
@@ -66,7 +65,7 @@ struct cached_block {
 	void			*current_data;
 	void			*original_data;
 	void			*parent_data;
-#ifdef DEBUG_CHANGED
+#ifdef BLOCK_CACHE_DEBUG_CHANGED
 	void			*compare;
 #endif
 	int32			ref_count;
@@ -838,7 +837,7 @@ block_cache::FreeBlock(cached_block *block)
 			block->block_number, block->original_data, block->parent_data);
 	}
 
-#ifdef DEBUG_CHANGED
+#ifdef BLOCK_CACHE_DEBUG_CHANGED
 	Free(block->compare);
 #endif
 
@@ -910,7 +909,7 @@ block_cache::NewBlock(off_t blockNumber)
 	block->parent_data = NULL;
 	block->is_dirty = false;
 	block->unused = false;
-#ifdef DEBUG_CHANGED
+#ifdef BLOCK_CACHE_DEBUG_CHANGED
 	block->compare = NULL;
 #endif
 
@@ -1001,7 +1000,7 @@ block_cache::LowMemoryHandler(void *data, uint32 resources, int32 level)
 static void
 put_cached_block(block_cache *cache, cached_block *block)
 {
-#ifdef DEBUG_CHANGED
+#ifdef BLOCK_CACHE_DEBUG_CHANGED
 	if (!block->is_dirty && block->compare != NULL
 		&& memcmp(block->current_data, block->compare, cache->block_size)) {
 		dprintf("new block:\n");
@@ -2527,7 +2526,7 @@ block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 	if (block == NULL)
 		return NULL;
 
-#ifdef DEBUG_CHANGED
+#ifdef BLOCK_CACHE_DEBUG_CHANGED
 	if (block->compare == NULL)
 		block->compare = cache->Allocate();
 	if (block->compare != NULL)
