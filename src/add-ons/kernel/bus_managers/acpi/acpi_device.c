@@ -4,9 +4,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <malloc.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "acpi_priv.h"
 
@@ -30,7 +30,7 @@ static status_t
 acpi_get_object(acpi_device device, const char *path, acpi_object_type **return_value) 
 {
 	char objname[255];
-	sprintf(objname, "%s.%s", device->path, path);
+	snprintf(objname, sizeof(objname), "%s.%s", device->path, path);
 	return get_object(objname, return_value);
 }
 
@@ -66,14 +66,8 @@ acpi_device_init_driver(device_node *node, void **cookie)
 	device->type = type;
 	device->node = node;
 
-#ifdef __HAIKU__
 	snprintf(device->name, sizeof(device->name), "acpi_device %s", 
 		path);
-#else
-	strncpy(device->name, "acpi_device ", sizeof(device->name) - 1);
-	strncat(device->name, path, sizeof(device->name) - 1);
-	device->name[sizeof(device->name) - 1] = '\0';
-#endif
 	
 	*cookie = device;
 
