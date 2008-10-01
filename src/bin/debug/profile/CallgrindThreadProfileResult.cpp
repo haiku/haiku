@@ -189,7 +189,7 @@ CallgrindThreadProfileResult::PrintResults()
 
 	fprintf(out, "positions: line\n");
 	fprintf(out, "events: Ticks Time\n");
-	fprintf(out, "summary: %lld\n", fTotalTicks);
+	fprintf(out, "summary: %lld %lld\n", fTotalTicks, fTotalTicks * fInterval);
 
 	// get hit images
 	CallgrindThreadImage* images[fOldImages.Size() + fImages.Size()];
@@ -236,6 +236,8 @@ CallgrindThreadProfileResult::PrintResults()
 			fprintf(out, "0 %lld\n", fDroppedTicks);
 		}
 	}
+
+	fprintf(out, "\ntotals: %lld %lld\n", fTotalTicks, fTotalTicks * fInterval);
 
 	fclose(out);
 }
