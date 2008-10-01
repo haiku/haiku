@@ -111,7 +111,7 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 	char *buff;
 	buff = str.LockBuffer(1024);
 	memset(buff, 0, 1024);
-	file.Read(buff, 1024);
+	file.Read(buff, 1024-1);
 	if (err < B_OK)
 		return err;
 	str.UnlockBuffer();
@@ -125,7 +125,7 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 	str = "";
 	buff = str.LockBuffer(1024);
 	memset(buff, 0, 1024);
-	file.Read(buff, 1024);
+	file.Read(buff, 1024-1);
 	if (err < B_OK)
 		return err;
 	str.UnlockBuffer();
@@ -189,7 +189,7 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 		return B_ERROR;
 	buff = str.LockBuffer(1024);
 	memset(buff, 0, 1024);
-	file.Read(buff, 1024);
+	file.Read(buff, 1024-1);
 	if (err < B_OK)
 		return err;
 	str.UnlockBuffer();
