@@ -254,12 +254,9 @@ SetIncludePropertiesVariables HAIKU ;
 HAIKU_ASFLAGS = ;
 
 # C/C++ flags
-HAIKU_CCFLAGS += -Wno-multichar ;
-HAIKU_C++FLAGS += -Wno-multichar ;
-
-HAIKU_KERNEL_CCFLAGS += -finline -fno-builtin -Wno-multichar
+HAIKU_KERNEL_CCFLAGS += -finline -fno-builtin
 	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
-HAIKU_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions -Wno-multichar
+HAIKU_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions
 	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
 HAIKU_KERNEL_DEFINES += _KERNEL_MODE ;
 
@@ -304,9 +301,10 @@ if $(DEBUG_PRINTF) {
 
 # warning flags
 HAIKU_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes
-	-Wpointer-arith -Wcast-align -Wsign-compare ;
+	-Wpointer-arith -Wcast-align -Wsign-compare -Wno-multichar ;
 HAIKU_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-ctor-dtor-privacy
-	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
+	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare
+	-Wno-multichar ;
 
 HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes
 	-Wno-multichar ;
@@ -1005,3 +1003,40 @@ AUTO_SET_UP_CONFIG_VARIABLES +=
 	# also add PLATFORM and SUPPORTED_PLATFORMS
 	PLATFORM SUPPORTED_PLATFORMS
 ;
+
+
+# enable -Werror for certain parts of the source tree
+
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	rule EnableWerror dirTokens : scope {
+		AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens) : -Werror
+			: $(scope) ;
+		AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens) : -Werror
+			: $(scope) ;
+	}
+} else {
+# TODO: Enable after updating to a newer gcc 4 version that supports -Wno-error!
+	# -Wuninitialized gives too many false positives.
+#	rule EnableWerror dirTokens : scope {
+#		AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens)
+#			: -Werror -Wno-error=uninitialized : $(scope) ;
+#		AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens)
+#			: -Werror -Wno-error=uninitialized : $(scope) ;
+#	}
+	rule EnableWerror dirTokens : scope {
+	}
+}
+
+# Work-around for GCC 2 problem -- despite -Wno-multichar it reports
+# multichar warnings in headers/private/kernel/debugger_keymaps.h included by
+# src/system/kernel/arch/x86/arch_debug_console.c.
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	local file = <src!system!kernel!arch!x86>arch_debug_console.o ;
+	CCFLAGS on $(file) = [ on $(file) return $(CCFLAGS) ] ;
+}
+
+EnableWerror src kits app ;
+EnableWerror src kits interface ;
+EnableWerror src kits storage ;
+EnableWerror src kits support ;
+EnableWerror src system kernel ;
