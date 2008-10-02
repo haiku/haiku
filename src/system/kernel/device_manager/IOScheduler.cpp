@@ -30,6 +30,21 @@
 #endif
 
 
+IOCallback::~IOCallback()
+{
+}
+
+
+status_t
+IOCallback::DoIO(IOOperation* operation)
+{
+	return B_ERROR;
+}
+
+
+// #pragma mark -
+
+
 void
 IORequestOwner::Dump() const
 {

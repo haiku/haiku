@@ -26,6 +26,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "timers/apic.h"
+
 
 //#define TRACE_ARCH_SMP
 #ifdef TRACE_ARCH_SMP
@@ -76,7 +78,7 @@ setup_apic(kernel_args *args, int32 cpu)
 		config = (apic_read(APIC_LINT0) & 0xffff00ff);
 		config |= APIC_LVT_DM_ExtINT | APIC_LVT_IIPP | APIC_LVT_TM;
 		apic_write(APIC_LINT0, config);
-	
+
 		/* setup LINT1 as NMI */
 		config = (apic_read(APIC_LINT1) & 0xffff00ff);
 		config |= APIC_LVT_DM_NMI | APIC_LVT_IIPP;

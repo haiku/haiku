@@ -122,7 +122,7 @@ typedef struct ioapic_s {
 	volatile uint32	io_register_select;
 	uint32			reserved[3];
 	volatile uint32	io_window_register;
-} ioapic _PACKED;
+} ioapic;
 
 static ioapic *sIOAPIC = NULL;
 static uint32 sIOAPICMaxRedirectionEntry = 23;

@@ -18,6 +18,13 @@
 
 #include "apic.h"
 
+
+/* Method Prototypes */
+static int apic_get_prio(void);
+static status_t apic_set_hardware_timer(bigtime_t relativeTimeout);
+static status_t apic_clear_hardware_timer(void);
+static status_t apic_init(struct kernel_args *args);
+
 static void *sApicPtr = NULL;
 static uint32 sApicTicsPerSec = 0;
 

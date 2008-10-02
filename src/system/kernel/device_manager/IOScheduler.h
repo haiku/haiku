@@ -19,7 +19,9 @@
 
 class IOCallback {
 public:
-	virtual	status_t			DoIO(IOOperation* operation);
+	virtual						~IOCallback();
+
+	virtual	status_t			DoIO(IOOperation* operation) = 0;
 };
 
 typedef status_t (*io_callback)(void* data, io_operation* operation);

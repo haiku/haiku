@@ -154,20 +154,6 @@ get_child_partition(partition_id partitionID, int32 index)
 }
 
 
-// compare_partition_data_offset
-static int
-compare_partition_data_offset(const void* _a, const void* _b)
-{
-	const partition_data* a = *(const partition_data**)_a;
-	const partition_data* b = *(const partition_data**)_b;
-
-	if (a->offset == b->offset)
-		return 0;
-
-	return a->offset < b->offset ? -1 : 1;
-}
-
-
 // create_child_partition
 partition_data *
 create_child_partition(partition_id partitionID, int32 index,

@@ -36,7 +36,7 @@
 #ifdef TRACE_MTRR_ARCH_VM
 #	define TRACE_MTRR(x...) dprintf(x)
 #else
-#	define TRACE_MTRR(x...) 
+#	define TRACE_MTRR(x...)
 #endif
 
 
@@ -78,6 +78,7 @@ free_mtrr(int32 index)
 }
 
 
+#if 0
 /*!
  	Checks if the provided range overlaps an existing mtrr range
  	If it actually extends an existing range, extendedIndex is filled
@@ -93,20 +94,21 @@ is_memory_overlapping(uint64 base, uint64 length, int32 *extendedIndex)
 			x86_get_mtrr(index, &b, &l, &t);
 
 			// check first for write combining extensions
-			if (base <= b 
+			if (base <= b
 				&& (base + length) >= (b + l)
 				&& t == IA32_MTR_WRITE_COMBINING) {
 				*extendedIndex = index;
 				return true;
 			}
 			if ((base >= b && base < (b + l))
-				|| ((base + length) > b 
+				|| ((base + length) > b
 					&& (base + length) <= (b + l)))
 				return true;
 		}
 	}
 	return false;
 }
+#endif	// 0
 
 
 static uint64
@@ -182,7 +184,7 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 #endif
 
 	// length must be a power of 2; just round it up to the next value
-	length = nearest_power(length); 	
+	length = nearest_power(length);
 
 	if (length + base <= base) {
 		// 4GB overflow
@@ -198,7 +200,7 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 	if (index < 0)
 		return B_ERROR;
 
-	TRACE_MTRR("allocate MTRR slot %ld, base = %Lx, length = %Lx, type=0x%lx\n", 
+	TRACE_MTRR("allocate MTRR slot %ld, base = %Lx, length = %Lx, type=0x%lx\n",
 		index, base, length, type);
 
 	sMemoryTypeIDs[index] = id;

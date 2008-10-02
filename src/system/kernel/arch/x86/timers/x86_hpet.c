@@ -21,7 +21,6 @@
 	#define TRACE(x) ;
 #endif
 
-static uint32 sHPETAddr;
 static struct hpet_regs *sHPETRegs;
 
 struct timer_info gHPETTimer = {

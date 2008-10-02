@@ -1018,6 +1018,10 @@ public:
 		addr_t deltaFound = INT_MAX;
 		bool exactMatch = false;
 
+		// to get rid of the erroneous "uninitialized" warnings
+		symbolFound.st_name = 0;
+		symbolFound.st_value = 0;
+
 		for (uint32 i = 0; i < hashTabSize; i++) {
 			uint32 bucket;
 			if (!_Read(&hashBuckets[i], bucket))

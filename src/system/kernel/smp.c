@@ -656,7 +656,7 @@ smp_wake_up_non_boot_cpus()
 void
 smp_cpu_rendezvous(volatile uint32 *var, int current_cpu)
 {
-	atomic_or(var, 1 << current_cpu);
+	atomic_or((vint32*)var, 1 << current_cpu);
 
 	while (*var != ((1 << sNumCPUs) - 1))
 		PAUSE();
