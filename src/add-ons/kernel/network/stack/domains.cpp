@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -168,11 +168,21 @@ add_interface_to_domain(net_domain *_domain,
 	net_interface_private *interface = NULL;
 	status_t status;
 
-	if (find_interface(domain, request.ifr_name) != NULL)
-		status = B_NAME_IN_USE;
-	else
+	if (find_interface(domain, request.ifr_name) == NULL) {
+		// We must not hold the domain's link when creating the interface:
+		// this will call get_module() which might want to access a network
+		// device when booting from network.
+		locker.Unlock();
 		status = create_interface(domain, request.ifr_name,
 			baseName, deviceInterface, &interface);
+		locker.Lock();
+
+		if (find_interface(domain, request.ifr_name) != NULL) {
+			delete_interface(interface);
+			status = B_NAME_IN_USE;
+		}
+	} else
+		status = B_NAME_IN_USE;
 
 	put_device_interface(deviceInterface);
 
@@ -302,8 +312,8 @@ domain_removed_device_interface(net_device_interface *interface)
 
 status_t
 register_domain(int family, const char *name,
-	struct net_protocol_module_info *module, 
-	struct net_address_module_info *addressModule, 
+	struct net_protocol_module_info *module,
+	struct net_address_module_info *addressModule,
 	net_domain **_domain)
 {
 	TRACE(("register_domain(%d, %s)\n", family, name));
@@ -342,7 +352,7 @@ unregister_domain(net_domain *_domain)
 	MutexLocker locker(sDomainLock);
 
 	list_remove_item(&sDomains, domain);
-	
+
 	net_interface_private *interface = NULL;
 	while (true) {
 		interface = (net_interface_private *)list_remove_head_item(&domain->interfaces);
