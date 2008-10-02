@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -25,7 +25,6 @@ extern "C" {
 	bool swap_free_page_swap_space(vm_page *page);
 	uint32 swap_available_pages(void);
 	uint32 swap_total_swap_pages(void);
-	void swap_get_info(struct system_memory_info *info);
 }
 
 
@@ -73,5 +72,7 @@ private:
 };
 
 #endif	// ENABLE_SWAP_SUPPORT
+
+extern "C" void swap_get_info(struct system_memory_info *info);
 
 #endif	/* _KERNEL_VM_STORE_ANONYMOUS_H */
