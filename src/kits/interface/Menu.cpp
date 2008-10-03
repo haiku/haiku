@@ -813,7 +813,30 @@ BMenu::Superitem() const
 void
 BMenu::MessageReceived(BMessage *msg)
 {
-	BView::MessageReceived(msg);
+	switch (msg->what) {
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			//float deltaX = 0
+			float deltaY = 0;
+			//msg->FindFloat("be:wheel_delta_x", &deltaX);
+			msg->FindFloat("be:wheel_delta_y", &deltaY);
+			if (deltaY == 0)
+				return;
+			
+			BMenuWindow *window = dynamic_cast<BMenuWindow *>(Window());
+			if (window == NULL)
+				return;
+				
+			window->TryScrollBy(deltaY);	
+			
+			break;
+		}
+		default:
+			BView::MessageReceived(msg);
+			break;
+	}
+	
+	
 }
 
 

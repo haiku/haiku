@@ -336,7 +336,7 @@ BMenuWindow::DetachScrollers()
 
 
 bool
-BMenuWindow::CheckForScrolling(BPoint cursor)
+BMenuWindow::CheckForScrolling(const BPoint &cursor)
 {
 	if (!fMenuFrame || !fUpperScroller || !fLowerScroller)
 		return false;
@@ -346,17 +346,45 @@ BMenuWindow::CheckForScrolling(BPoint cursor)
 
 
 bool
-BMenuWindow::_Scroll(BPoint cursor)
+BMenuWindow::TryScrollBy(const float &step)
+{
+	if (!fMenuFrame || !fUpperScroller || !fLowerScroller)
+		return false;
+	
+	_ScrollBy(step);
+	
+	return true;
+}
+
+
+bool
+BMenuWindow::_Scroll(const BPoint &where)
 {
 	ASSERT((fLowerScroller != NULL));
 	ASSERT((fUpperScroller != NULL));
 	
-	ConvertFromScreen(&cursor);
+	const BPoint cursor = ConvertFromScreen(where);
 
 	BRect lowerFrame = fLowerScroller->Frame();
 	BRect upperFrame = fUpperScroller->Frame();
 
 	if (fLowerScroller->IsEnabled() && lowerFrame.Contains(cursor)) {		
+		_ScrollBy(1);
+	} else if (fUpperScroller->IsEnabled() && upperFrame.Contains(cursor)) {		
+		_ScrollBy(-1);
+	} else
+		return false;
+
+	snooze(10000);
+
+	return true;
+}
+
+
+void
+BMenuWindow::_ScrollBy(const float &step)
+{
+	if (step > 0) {
 		if (fValue == 0) {
 			fUpperScroller->SetEnabled(true);
 			fUpperScroller->Invalidate();
@@ -374,7 +402,7 @@ BMenuWindow::_Scroll(BPoint cursor)
 			fMenu->ScrollBy(0, kScrollStep);
 			fValue += kScrollStep;
 		}
-	} else if (fUpperScroller->IsEnabled() && upperFrame.Contains(cursor)) {		
+	} else if (step < 0) {
 		if (fValue == fLimit) {
 			fLowerScroller->SetEnabled(true);
 			fLowerScroller->Invalidate();
@@ -390,11 +418,6 @@ BMenuWindow::_Scroll(BPoint cursor)
 			fMenu->ScrollBy(0, -kScrollStep);
 			fValue -= kScrollStep;
 		}
-	} else
-		return false;
-
-	snooze(10000);
-
-	return true;
+	}
 }
 

@@ -34,8 +34,9 @@ class BMenuWindow : public BWindow {
 		void AttachScrollers();
 		void DetachScrollers();
 
-		bool CheckForScrolling(BPoint cursor);
-
+		bool CheckForScrolling(const BPoint &cursor);
+		bool TryScrollBy(const float &step);
+	
 	private:
 		BMenu *fMenu;
 		BMenuFrame *fMenuFrame;
@@ -45,7 +46,8 @@ class BMenuWindow : public BWindow {
 		float fValue;
 		float fLimit;
 		
-		bool _Scroll(BPoint cursor);
+		bool _Scroll(const BPoint &cursor);
+		void _ScrollBy(const float &step);
 };
 
 }	// namespace BPrivate
