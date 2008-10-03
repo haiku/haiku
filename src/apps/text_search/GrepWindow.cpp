@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 1998-2007 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 #include "GrepWindow.h"
@@ -141,7 +141,7 @@ GrepWindow::GrepWindow(BMessage* message)
 	_LoadPrefs();
 	_TileIfMultipleWindows();
 
-	Show(); 	
+	Show();
 }
 
 
@@ -404,7 +404,7 @@ GrepWindow::_SetWindowTitle()
 
 	if (!title.Length())
 		title = APP_NAME;
-		
+
 	SetTitle(title.String());
 }
 
@@ -419,34 +419,34 @@ GrepWindow::_CreateMenus()
 	fPreferencesMenu = new BMenu(_T("Preferences"));
 	fHistoryMenu = new BMenu(_T("History"));
 	fEncodingMenu = new BMenu(_T("Encoding"));
-	
+
 	fNew = new BMenuItem(
 		_T("New Window"), new BMessage(MSG_NEW_WINDOW), 'N');
-		
+
 	fOpen = new BMenuItem(
 		_T("Set Which Files to Search"), new BMessage(MSG_OPEN_PANEL), 'F');
 
 	fClose = new BMenuItem(
 		_T("Close"), new BMessage(B_QUIT_REQUESTED), 'W');
-	
+
 	fAbout = new BMenuItem(
 		_T("About"), new BMessage(B_ABOUT_REQUESTED));
 
 	fQuit = new BMenuItem(
 		_T("Quit"), new BMessage(MSG_QUIT_NOW), 'Q');
-	
+
 	fSearch = new BMenuItem(
 		_T("Search"), new BMessage(MSG_START_CANCEL), 'S');
-		
+
 	fSelectAll = new BMenuItem(
 		_T("Select All"), new BMessage(MSG_SELECT_ALL), 'A');
-		
+
 	fTrimSelection = new BMenuItem(
 		_T("Trim to Selection"), new BMessage(MSG_TRIM_SELECTION), 'T');
-		
+
 	fOpenSelection = new BMenuItem(
 		_T("Open Selection"), new BMessage(MSG_OPEN_SELECTION), 'O');
-		
+
 	fSelectInTracker = new BMenuItem(
 		_T("Show Files in Tracker"), new BMessage(MSG_SELECT_IN_TRACKER), 'K');
 
@@ -477,12 +477,12 @@ GrepWindow::_CreateMenus()
 	fShowLinesMenuitem = new BMenuItem(
 		_T("Show Lines"), new BMessage(MSG_MENU_SHOW_LINES), 'L');
 	fShowLinesMenuitem->SetMarked(true);
-	
+
 	fUTF8 = new BMenuItem("UTF8", new BMessage('utf8'));
 	fShiftJIS = new BMenuItem("ShiftJIS", new BMessage(B_SJIS_CONVERSION));
 	fEUC = new BMenuItem("EUC", new BMessage(B_EUC_CONVERSION));
 	fJIS = new BMenuItem("JIS", new BMessage(B_JIS_CONVERSION));
-	
+
 	fFileMenu->AddItem(fNew);
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(fOpen);
@@ -491,7 +491,7 @@ GrepWindow::_CreateMenus()
 	fFileMenu->AddItem(fAbout);
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(fQuit);
-	
+
 	fActionMenu->AddItem(fSearch);
 	fActionMenu->AddSeparatorItem();
 	fActionMenu->AddItem(fSelectAll);
@@ -500,7 +500,7 @@ GrepWindow::_CreateMenus()
 	fActionMenu->AddItem(fOpenSelection);
 	fActionMenu->AddItem(fSelectInTracker);
 	fActionMenu->AddItem(fCopyText);
-	
+
 	fPreferencesMenu->AddItem(fRecurseLinks);
 	fPreferencesMenu->AddItem(fRecurseDirs);
 	fPreferencesMenu->AddItem(fSkipDotDirs);
@@ -510,7 +510,7 @@ GrepWindow::_CreateMenus()
 	fPreferencesMenu->AddItem(fInvokePe);
 	fPreferencesMenu->AddSeparatorItem();
 	fPreferencesMenu->AddItem(fShowLinesMenuitem);
-	
+
  	fEncodingMenu->AddItem(fUTF8);
  	fEncodingMenu->AddItem(fShiftJIS);
  	fEncodingMenu->AddItem(fEUC);
@@ -526,10 +526,10 @@ GrepWindow::_CreateMenus()
 	fMenuBar->AddItem(fPreferencesMenu);
 	fMenuBar->AddItem(fHistoryMenu);
 	fMenuBar->AddItem(fEncodingMenu);
-	
+
 	AddChild(fMenuBar);
 	SetKeyMenuBar(fMenuBar);
-	
+
 	fSearch->SetEnabled(false);
 }
 
@@ -537,16 +537,16 @@ GrepWindow::_CreateMenus()
 void
 GrepWindow::_CreateViews()
 {
-	// The search pattern entry field does not send a message when 
-	// <Enter> is pressed, because the "Search/Cancel" button already 
+	// The search pattern entry field does not send a message when
+	// <Enter> is pressed, because the "Search/Cancel" button already
 	// does this and we don't want to send the same message twice.
 
 	fSearchText = new BTextControl(
 		BRect(0, 0, 0, 1), "SearchText", NULL, NULL, NULL,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE); 
-	
-	fSearchText->TextView()->SetMaxBytes(1000); 
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE);
+
+	fSearchText->TextView()->SetMaxBytes(1000);
 	fSearchText->ResizeToPreferred();
 		// because it doesn't have a label
 
@@ -555,23 +555,23 @@ GrepWindow::_CreateViews()
 	fButton = new BButton(
 		BRect(0, 1, 80, 1), "Button", _T("Search"),
 		new BMessage(MSG_START_CANCEL), B_FOLLOW_RIGHT);
-	
+
 	fButton->MakeDefault(true);
 	fButton->ResizeToPreferred();
 	fButton->SetEnabled(false);
-	
+
 	fShowLinesCheckbox = new BCheckBox(
 		BRect(0, 0, 1, 1), "ShowLines", _T("Show Lines"),
 		new BMessage(MSG_CHECKBOX_SHOW_LINES), B_FOLLOW_LEFT);
-	
+
 	fShowLinesCheckbox->SetValue(B_CONTROL_ON);
 	fShowLinesCheckbox->ResizeToPreferred();
-	
-	fSearchResults = new GrepListView(); 
+
+	fSearchResults = new GrepListView();
 
 	fSearchResults->SetInvocationMessage(new BMessage(MSG_INVOKE_ITEM));
 	fSearchResults->ResizeToPreferred();
-}	
+}
 
 
 void
@@ -581,13 +581,13 @@ GrepWindow::_LayoutViews()
 	fMenuBar->GetPreferredSize(&menubarWidth, &menubarHeight);
 
 	BBox *background = new BBox(
-		BRect(0, menubarHeight + 1, 2, menubarHeight + 2), B_EMPTY_STRING, 
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, 
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, 
-		B_PLAIN_BORDER); 
+		BRect(0, menubarHeight + 1, 2, menubarHeight + 2), B_EMPTY_STRING,
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
+		B_PLAIN_BORDER);
 
 	BScrollView *scroller = new BScrollView(
-		"ScrollSearchResults", fSearchResults, B_FOLLOW_ALL_SIDES, 
+		"ScrollSearchResults", fSearchResults, B_FOLLOW_ALL_SIDES,
 		B_FULL_UPDATE_ON_RESIZE, true, true, B_NO_BORDER);
 
 	scroller->ResizeToPreferred();
@@ -601,7 +601,7 @@ GrepWindow::_LayoutViews()
 	float backgroundHeight = 8 + fSearchText->Frame().Height()
 		+ 8 + fButton->Frame().Height() + 8;
 
-	ResizeTo(width, height);  
+	ResizeTo(width, height);
 
 	AddChild(background);
 	background->ResizeTo(width,	backgroundHeight);
@@ -641,15 +641,15 @@ GrepWindow::_TileIfMultipleWindows()
 	if (be_app->Lock()) {
 		int32 windowCount = be_app->CountWindows();
 		be_app->Unlock();
-		
+
 		if (windowCount > 1)
-			MoveBy(20,20); 
+			MoveBy(20,20);
 	}
-	
+
 	BScreen screen(this);
 	BRect screenFrame = screen.Frame();
 	BRect windowFrame = Frame();
-	
+
 	if (windowFrame.left > screenFrame.right
 		|| windowFrame.top > screenFrame.bottom
 		|| windowFrame.right < screenFrame.left
@@ -788,16 +788,16 @@ GrepWindow::_OnStartCancel()
 		fPreferencesMenu->SetEnabled(false);
 		fHistoryMenu->SetEnabled(false);
 		fEncodingMenu->SetEnabled(false);
-		
+
 		fSearchText->SetEnabled(false);
 
 		fButton->MakeFocus(true);
 		fButton->SetLabel(_T("Cancel"));
 		fSearch->SetEnabled(false);
 
-		// We need to remember the search pattern, because during 
-		// the grepping, the text control's text will be replaced 
-		// by the name of the file that's currently being grepped. 
+		// We need to remember the search pattern, because during
+		// the grepping, the text control's text will be replaced
+		// by the name of the file that's currently being grepped.
 		// When the grepping finishes, we need to restore the old
 		// search pattern.
 
@@ -1102,7 +1102,7 @@ GrepWindow::_OnRecurseDirs()
 	_ModelChanged();
 }
 
-		
+
 void
 GrepWindow::_OnSkipDotDirs()
 {
@@ -1120,7 +1120,7 @@ GrepWindow::_OnEscapeText()
 	_ModelChanged();
 }
 
-	
+
 void
 GrepWindow::_OnCaseSensitive()
 {
@@ -1154,30 +1154,30 @@ GrepWindow::_OnCheckboxShowLines()
 	// toggle checkbox and menuitem
 	fModel->fShowContents = !fModel->fShowContents;
 	fShowLinesMenuitem->SetMarked(!fShowLinesMenuitem->IsMarked());
-	
+
 	// Selection in BOutlineListView in multiple selection mode
 	// gets weird when collapsing. I've tried all sorts of things.
 	// It seems impossible to make it behave just right.
-	
+
 	// Going from collapsed to expande mode, the superitems
-	// keep their selection, the subitems don't (yet) have 
+	// keep their selection, the subitems don't (yet) have
 	// a selection. This works as expected, AFAIK.
-	
+
 	// Going from expanded to collapsed mode, I would like
 	// for a selected subitem (line) to select its superitem,
-	// (its file) and the subitem be unselected. 
-	
+	// (its file) and the subitem be unselected.
+
 	// I've successfully tried code patches that apply the
 	// selection pattern that I want, but with weird effects
-	// on subsequent manual selection. 
+	// on subsequent manual selection.
 	// Lines stay selected while the user tries to select
-	// some other line. It just gets weird. 
-	
-	// It's as though listItem->Select() and Deselect() 
+	// some other line. It just gets weird.
+
+	// It's as though listItem->Select() and Deselect()
 	// put the items in some semi-selected state.
 	// Or maybe I've got it all wrong.
-	
-	// So, here's the plain basic collapse/expand. 
+
+	// So, here's the plain basic collapse/expand.
 	// I think it's the least bad of what's possible on BeOS R5,
 	// but perhaps someone comes along with a patch of magic.
 
@@ -1214,7 +1214,7 @@ void
 GrepWindow::_OnInvokeItem()
 {
 	for (int32 selectionIndex = 0; ; selectionIndex++) {
-		int32 itemIndex = fSearchResults->CurrentSelection(selectionIndex); 
+		int32 itemIndex = fSearchResults->CurrentSelection(selectionIndex);
 		BListItem* item = fSearchResults->ItemAt(itemIndex);
 		if (item == NULL)
 			break;
@@ -1298,7 +1298,7 @@ GrepWindow::_OnTrimSelection()
 			fSearchResults->ItemAt(index));
 		if (item == NULL)
 			break;
-		
+
 		if (!item->IsSelected() || item->OutlineLevel() != 0)
 			continue;
 
@@ -1327,7 +1327,7 @@ void
 GrepWindow::_OnCopyText()
 {
 	bool onlyCopySelection = true;
-	
+
 	if (fSearchResults->CurrentSelection() < 0)
 		onlyCopySelection = false;
 
@@ -1352,11 +1352,11 @@ GrepWindow::_OnCopyText()
 
 	if (be_clipboard->Lock()) {
 		be_clipboard->Clear();
-		
+
 		clip = be_clipboard->Data();
 
 		clip->AddData("text/plain", B_MIME_TYPE, buffer.String(),
-			buffer.Length());			
+			buffer.Length());
 
 		status = be_clipboard->Commit();
 
@@ -1408,7 +1408,7 @@ GrepWindow::_OnSelectInTracker()
 			continue;
 
 		message.AddRef("refs", &file_ref);
-		
+
 		// add parent folder to list of folders to open
 		folderPath.SetTo(filePath.String());
 		if (folderPath.GetParent(&folderPath) == B_OK) {
@@ -1434,7 +1434,7 @@ GrepWindow::_OnSelectInTracker()
 			snooze(aShortWhile);
 			_OpenFoldersInTracker(&folderList);
 		}
-	}	
+	}
 
 	if (!_AreAllFoldersOpenInTracker(&folderList)) {
 		BAlert* alert = new BAlert(NULL,
@@ -1448,7 +1448,7 @@ GrepWindow::_OnSelectInTracker()
 
 	_SelectFilesInTracker(&folderList, &message);
 
-out:	
+out:
 	// delete folderList contents
 	int32 folderCount = folderList.CountItems();
 	for (int32 x = 0; x < folderCount; x++)
@@ -1476,7 +1476,7 @@ GrepWindow::_OnAboutRequested()
 	BString fAppVersion;
 
 	if (be_app->Lock()) {
-		be_app->GetAppInfo(&appInfo); 
+		be_app->GetAppInfo(&appInfo);
 		appFile.SetTo(&appInfo.ref, B_READ_ONLY);
 		appFileInfo.SetTo(&appFile);
 		if (appFileInfo.GetVersionInfo(&vInfo, B_APP_VERSION_KIND) == B_OK)
@@ -1484,7 +1484,7 @@ GrepWindow::_OnAboutRequested()
 		be_app->Unlock();
 	}
 
-	BString text; 
+	BString text;
 	text << APP_NAME << " " << fAppVersion << "\n";
 	int32 titleLength = text.Length();
 	text << _T("Get a grip on grep.") << "\n\n";
@@ -1498,10 +1498,10 @@ GrepWindow::_OnAboutRequested()
 	text << _T("Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, "
 		"Oliver Tappe, Luc Schrijvers and momoziro.");
 	text << "\n";
-	
+
 	BAlert* alert = new BAlert("Tracker Grep", text.String(), _T("Ok"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-	
+
 	BTextView* view = alert->TextView();
 	BFont font;
 	view->SetStylable(true);
@@ -1558,7 +1558,7 @@ GrepWindow::_OnOpenPanel()
 		return;
 
 	fFilePanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(NULL, this),
-		&path, B_FILE_NODE|B_DIRECTORY_NODE|B_SYMLINK_NODE, 
+		&path, B_FILE_NODE|B_DIRECTORY_NODE|B_SYMLINK_NODE,
 		true, new BMessage(MSG_REFS_RECEIVED), NULL, true, true);
 
 	fFilePanel->Show();
@@ -1660,7 +1660,7 @@ GrepWindow::_RemoveFolderListDuplicates(BList* folderList)
 				y--;
 			}
 		}
-	} 
+	}
 }
 
 
@@ -1669,11 +1669,11 @@ GrepWindow::_OpenFoldersInTracker(BList* folderList)
 {
 	status_t status = B_OK;
 	BMessage refsMsg(B_REFS_RECEIVED);
-	
+
 	int32 folderCount = folderList->CountItems();
 	for (int32 index = 0; index < folderCount; index++) {
 		BPath* path = static_cast<BPath*>(folderList->ItemAt(index));
-		
+
 		entry_ref folderRef;
 		status = get_ref_for_path(path->Path(), &folderRef);
 		if (status != B_OK)
@@ -1682,7 +1682,7 @@ GrepWindow::_OpenFoldersInTracker(BList* folderList)
 		status = refsMsg.AddRef("refs", &folderRef);
 		if (status != B_OK)
 			return status;
-	} 
+	}
 
 	status = be_roster->Launch(TRACKER_SIGNATURE, &refsMsg);
 	if (status != B_OK && status != B_ALREADY_RUNNING)
@@ -1695,7 +1695,7 @@ GrepWindow::_OpenFoldersInTracker(BList* folderList)
 bool
 GrepWindow::_AreAllFoldersOpenInTracker(BList *folderList)
 {
-	// Compare the folders we want open in Tracker to 
+	// Compare the folders we want open in Tracker to
 	// the actual Tracker windows currently open.
 
 	// We build a list of open Tracker windows, and compare
@@ -1711,12 +1711,12 @@ GrepWindow::_AreAllFoldersOpenInTracker(BList *folderList)
 	BList windowList;
 
 	if (!trackerMessenger.IsValid())
-		return false; 
+		return false;
 
 	for (int32 count = 1; ; count++) {
 		sendMessage.MakeEmpty();
 		replyMessage.MakeEmpty();
-		
+
 		sendMessage.what = B_GET_PROPERTY;
 		sendMessage.AddSpecifier("Path");
 		sendMessage.AddSpecifier("Poses");
@@ -1725,7 +1725,7 @@ GrepWindow::_AreAllFoldersOpenInTracker(BList *folderList)
 		status = trackerMessenger.SendMessage(&sendMessage, &replyMessage);
 		if (status != B_OK)
 			return false;
-	
+
 		entry_ref* trackerRef = new (nothrow) entry_ref;
 		status = replyMessage.FindRef("result", trackerRef);
 		if (status != B_OK || !windowList.AddItem(trackerRef)) {
@@ -1752,18 +1752,18 @@ GrepWindow::_AreAllFoldersOpenInTracker(BList *folderList)
 	// Loop over the two lists and see if all folders exist as window
 	for (int32 x = 0; x < folderCount; x++) {
 		for (int32 y = 0; y < windowCount; y++) {
-			
+
 			folderPath = static_cast<BPath*>(folderList->ItemAt(x));
 			windowRef = static_cast<entry_ref*>(windowList.ItemAt(y));
-			
+
 			if (folderPath == NULL)
 				break;
-			
+
 			if (windowRef == NULL)
 				break;
-			
+
 			folderString = folderPath->Path();
-			
+
 			BEntry entry;
 			BPath path;
 
@@ -1803,16 +1803,16 @@ GrepWindow::_SelectFilesInTracker(BList* folderList, BMessage* refsMessage)
 	BMessage windowReplyMessage;
 	BMessage selectionSendMessage;
 	BMessage selectionReplyMessage;
-	
+
 	if (!trackerMessenger.IsValid())
-		return status; 
-	
+		return status;
+
 	// loop over Tracker windows
 	for (int32 windowCount = 1; ; windowCount++) {
-	
+
 		windowSendMessage.MakeEmpty();
 		windowReplyMessage.MakeEmpty();
-		
+
 		windowSendMessage.what = B_GET_PROPERTY;
 		windowSendMessage.AddSpecifier("Path");
 		windowSendMessage.AddSpecifier("Poses");
@@ -1861,7 +1861,7 @@ GrepWindow::_SelectFilesInTracker(BList* folderList, BMessage* refsMessage)
 				selectionSendMessage.MakeEmpty();
 				selectionSendMessage.what = B_SET_PROPERTY;
 				selectionReplyMessage.MakeEmpty();
-				
+
 				// loop over refs and add to message
 				entry_ref ref;
 				for (int32 index = 0; ; index++) {
@@ -1877,11 +1877,11 @@ GrepWindow::_SelectFilesInTracker(BList* folderList, BMessage* refsMessage)
 
 				// finish selection message
 				selectionSendMessage.AddSpecifier("Selection");
-				selectionSendMessage.AddSpecifier("Poses");	
-				selectionSendMessage.AddSpecifier("Window", windowCount);				
+				selectionSendMessage.AddSpecifier("Poses");
+				selectionSendMessage.AddSpecifier("Window", windowCount);
 
 				trackerMessenger.SendMessage(&selectionSendMessage,
-					&selectionReplyMessage);	
+					&selectionReplyMessage);
 			}
 		}
 	}
