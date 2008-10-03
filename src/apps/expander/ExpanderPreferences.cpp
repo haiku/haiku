@@ -231,6 +231,10 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 
 ExpanderPreferences::~ExpanderPreferences()
 {
+	if (fUsePanel && fUsePanel->RefFilter())
+		delete fUsePanel->RefFilter();
+
+	delete fUsePanel;
 }
 
 

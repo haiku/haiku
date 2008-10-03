@@ -169,6 +169,14 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 
 ExpanderWindow::~ExpanderWindow()
 {
+	if (fDestPanel && fDestPanel->RefFilter())
+		delete fDestPanel->RefFilter();
+
+	if (fSourcePanel && fSourcePanel->RefFilter())
+		delete fSourcePanel->RefFilter();
+
+	delete fDestPanel;
+	delete fSourcePanel;
 }
 
 
