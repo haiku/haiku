@@ -6,7 +6,7 @@
  *		Stephan Aßmus 	<superstippi@gmx.de>
  *		Fredrik Modéen	<fredrik@modeen.se>
  */
- 
+
 #include "PlaylistWindow.h"
 
 #include <stdio.h>
@@ -46,21 +46,22 @@ PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 		Controller* controller)
 	: BWindow(frame, "Playlist", B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS)
-
+	, fOpenPanel(NULL)
+	, fSavePanel(NULL)
 	, fLocker(new RWLocker("command stack lock"))
 	, fCommandStack(new CommandStack(fLocker))
 	, fCommandStackListener(this)
 {
-	frame = Bounds();	
-	
+	frame = Bounds();
+
 	_CreateMenu(frame);
 		// will adjust frame to account for menubar
-	
+
 	frame.right -= B_V_SCROLL_BAR_WIDTH;
 	fListView = new PlaylistListView(frame, playlist, controller,
 		fCommandStack);
 
-	BScrollView* scrollView = new BScrollView("playlist scrollview", fListView, 
+	BScrollView* scrollView = new BScrollView("playlist scrollview", fListView,
 		B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER);
 
 	fTopView = 	scrollView;
@@ -88,6 +89,9 @@ PlaylistWindow::~PlaylistWindow()
 	fCommandStack->RemoveListener(&fCommandStackListener);
 	delete fCommandStack;
 	delete fLocker;
+
+	delete fOpenPanel;
+	delete fSavePanel;
 }
 
 
@@ -133,7 +137,7 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-		
+
 		case M_PLAYLIST_SAVE:
 			if (!fSavePanel)
 				fSavePanel = new BFilePanel(B_SAVE_PANEL);
@@ -142,12 +146,12 @@ PlaylistWindow::MessageReceived(BMessage* message)
 		case B_SAVE_REQUESTED:
 			printf("We are saving\n");
 			//Use fListView and have a SaveToFile?
-			break;		
+			break;
 		case M_PLAYLIST_OPEN:
 			if (!fOpenPanel)
 				fOpenPanel = new BFilePanel(B_OPEN_PANEL);
 			fOpenPanel->Show();
-			break;						
+			break;
 
 		case M_PLAYLIST_EMPTY:
 			fListView->RemoveAll();
@@ -176,7 +180,7 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 //	fileMenu->AddItem(new BMenuItem("Open"B_UTF8_ELLIPSIS,
 //		new BMessage(M_PLAYLIST_OPEN), 'O'));
 //	fileMenu->AddItem(new BMenuItem("Save"B_UTF8_ELLIPSIS,
-//		new BMessage(M_PLAYLIST_SAVE), 'S'));	
+//		new BMessage(M_PLAYLIST_SAVE), 'S'));
 //	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Close",
 		new BMessage(B_QUIT_REQUESTED), 'W'));
