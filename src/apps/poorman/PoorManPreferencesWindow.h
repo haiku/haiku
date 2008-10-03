@@ -4,7 +4,7 @@
  *	Started: 4/27/2004
  *	Version: 0.1
  */
- 
+
 
 #ifndef POOR_MAN_PREFERENCES_WINDOW_H
 #define POOR_MAN_PREFERENCES_WINDOW_H
@@ -30,7 +30,7 @@ private:
 
 				PoorManView	*	prefView;
 				PoorManView	*	buttonView;
-				
+
 				// ------------------------------------------------
 				// Tabs
 				BTabView	*	prefTabView;
@@ -41,20 +41,20 @@ private:
 				PoorManSiteView		*	siteView;
 				PoorManLoggingView	*	loggingView;
 				PoorManAdvancedView	*	advancedView;
-				
+
 				// ------------------------------------------------
 				// Buttons
 				BButton		*	cancelButton;
 				BButton		*	doneButton;
-				
+
 				// ------------------------------------------------
 				// FilePanels
 				BFilePanel	*	webDirFilePanel;
 				BFilePanel	*	logFilePanel;
-				
-				
+
+
 				// ------------------------------------------------
-				// temporary preference variables used to save and 
+				// temporary preference variables used to save and
 				// set the application to
 				// site tab
 				char		web_directory[B_FILE_NAME_LENGTH];
@@ -68,8 +68,10 @@ private:
 				int32		max_connections;
 public:
 				PoorManPreferencesWindow(BRect frame, char * name);
+				~PoorManPreferencesWindow();
+
 virtual	void	MessageReceived(BMessage * message);
-				
+
 		void	ShowWebDirFilePanel() { if (!webDirFilePanel->IsShowing()) webDirFilePanel->Show(); }
 		void	SelectWebDir(BMessage * message);
 		void	CreateLogFile(BMessage * message);
