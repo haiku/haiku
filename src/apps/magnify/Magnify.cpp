@@ -343,8 +343,10 @@ TWindow::MessageReceived(BMessage* m)
 			// freeze the image here, unfreeze after dump or cancel
 			fFatBits->StartSave();
 
-			fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(NULL, this),
-				0, 0, false, new BMessage(msg_dump));
+			BMessenger messenger(this);
+			BMessage message(msg_dump);
+			fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger, 0, 0, false,
+				&message);
 			fSavePanel->SetSaveText("Bitmaps.h");
 			fSavePanel->Show();
 			break;
