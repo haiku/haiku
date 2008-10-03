@@ -822,21 +822,18 @@ BMenu::MessageReceived(BMessage *msg)
 			msg->FindFloat("be:wheel_delta_y", &deltaY);
 			if (deltaY == 0)
 				return;
-			
+
 			BMenuWindow *window = dynamic_cast<BMenuWindow *>(Window());
 			if (window == NULL)
 				return;
-				
-			window->TryScrollBy(deltaY);	
-			
+
+			window->TryScrollBy(deltaY);
 			break;
 		}
 		default:
 			BView::MessageReceived(msg);
 			break;
 	}
-	
-	
 }
 
 
@@ -2769,4 +2766,4 @@ MenuPrivate::QuitTracking(bool thisMenuOnly)
 	fMenu->_QuitTracking(thisMenuOnly);
 }
 
-} ;
+}	// namespace BPrivate

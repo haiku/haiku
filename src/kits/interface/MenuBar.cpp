@@ -29,10 +29,10 @@ using BPrivate::gDefaultTokens;
 struct menubar_data {
 	BMenuBar *menuBar;
 	int32 menuIndex;
-	
+
 	bool sticky;
 	bool showMenu;
-	
+
 	bool useRect;
 	BRect rect;
 };
@@ -78,14 +78,14 @@ BMenuBar::BMenuBar(BMessage *data)
 	fTracking(false)
 {
 	int32 border;
-	
+
 	if (data->FindInt32("_border", &border) == B_OK)
 		SetBorder((menu_bar_border)border);
-	
+
 	menu_layout layout = B_ITEMS_IN_COLUMN;
 	data->FindInt32("_layout", (int32 *)&layout);
-	
-	_InitData(layout);	
+
+	_InitData(layout);
 }
 
 
@@ -95,7 +95,7 @@ BMenuBar::~BMenuBar()
 		status_t dummy;
 		wait_for_thread(fTrackingPID, &dummy);
 	}
-	
+
 	delete fLastBounds;
 }
 
@@ -105,7 +105,7 @@ BMenuBar::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BMenuBar"))
 		return new BMenuBar(data);
-	
+
 	return NULL;
 }
 
@@ -117,7 +117,7 @@ BMenuBar::Archive(BMessage *data, bool deep) const
 
 	if (err < B_OK)
 		return err;
-	
+
 	if (Border() != B_BORDER_FRAME)
 		err = data->AddInt32("_border", Border());
 
@@ -125,7 +125,7 @@ BMenuBar::Archive(BMessage *data, bool deep) const
 }
 
 
-void 
+void
 BMenuBar::SetBorder(menu_bar_border border)
 {
 	fBorder = border;
@@ -149,7 +149,7 @@ BMenuBar::Draw(BRect updateRect)
 
 	// TODO: implement additional border styles
 	rgb_color color = HighColor();
-	
+
 	BRect bounds(Bounds());
 	// Restore the background of the previously selected menuitem
 	DrawBackground(bounds & updateRect);
@@ -187,21 +187,21 @@ BMenuBar::AttachedToWindow()
 }
 
 
-void 
+void
 BMenuBar::DetachedFromWindow()
 {
 	BMenu::DetachedFromWindow();
 }
 
 
-void 
+void
 BMenuBar::MessageReceived(BMessage *msg)
 {
 	BMenu::MessageReceived(msg);
 }
 
 
-void 
+void
 BMenuBar::MouseDown(BPoint where)
 {
 	if (fTracking)
@@ -212,33 +212,33 @@ BMenuBar::MouseDown(BPoint where)
 		window->Activate();
 		window->UpdateIfNeeded();
 	}
-	
+
 	StartMenuBar(-1, false, false);
 }
 
 
-void 
+void
 BMenuBar::WindowActivated(bool state)
 {
 	BView::WindowActivated(state);
 }
 
 
-void 
+void
 BMenuBar::MouseUp(BPoint where)
 {
 	BView::MouseUp(where);
 }
 
 
-void 
+void
 BMenuBar::FrameMoved(BPoint newPosition)
-{	
+{
 	BMenu::FrameMoved(newPosition);
 }
 
 
-void 
+void
 BMenuBar::FrameResized(float newWidth, float newHeight)
 {
 	// invalidate right border
@@ -261,14 +261,14 @@ BMenuBar::FrameResized(float newWidth, float newHeight)
 }
 
 
-void 
+void
 BMenuBar::Show()
 {
 	BView::Show();
 }
 
 
-void 
+void
 BMenuBar::Hide()
 {
 	BView::Hide();
@@ -282,49 +282,49 @@ BMenuBar::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier, int3
 }
 
 
-status_t 
+status_t
 BMenuBar::GetSupportedSuites(BMessage *data)
 {
 	return BMenu::GetSupportedSuites(data);
 }
 
 
-void 
+void
 BMenuBar::ResizeToPreferred()
 {
 	BMenu::ResizeToPreferred();
 }
 
 
-void 
+void
 BMenuBar::GetPreferredSize(float *width, float *height)
 {
 	BMenu::GetPreferredSize(width, height);
 }
 
 
-void 
+void
 BMenuBar::MakeFocus(bool state)
 {
 	BMenu::MakeFocus(state);
 }
 
 
-void 
+void
 BMenuBar::AllAttached()
 {
 	BMenu::AllAttached();
 }
 
 
-void 
+void
 BMenuBar::AllDetached()
 {
 	BMenu::AllDetached();
 }
 
 
-status_t 
+status_t
 BMenuBar::Perform(perform_code d, void *arg)
 {
 	return BMenu::Perform(d, arg);
@@ -370,33 +370,33 @@ BMenuBar::operator=(const BMenuBar &)
 }
 
 
-void 
+void
 BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *specialRect)
 {
 	if (fTracking)
 		return;
 
 	BWindow *window = Window();
-	if (window == NULL) 
+	if (window == NULL)
 		debugger("MenuBar must be added to a window before it can be used.");
-	
-	BAutolock lock(window);	
+
+	BAutolock lock(window);
 	if (!lock.IsLocked())
 		return;
-	
+
 	fPrevFocusToken = -1;
 	fTracking = true;
-	
+
 	// We are called from the window's thread,
 	// so let's call MenusBeginning() directly
 	window->MenusBeginning();
-	
+
 	fMenuSem = create_sem(0, "window close sem");
 	_set_menu_sem_(window, fMenuSem);
-	
+
 	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking", B_DISPLAY_PRIORITY, NULL);
 	if (fTrackingPID >= 0) {
-		menubar_data data;	
+		menubar_data data;
 		data.menuBar = this;
 		data.menuIndex = menuIndex;
 		data.sticky = sticky;
@@ -404,10 +404,9 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *speci
 		data.useRect = specialRect != NULL;
 		if (data.useRect)
 			data.rect = *specialRect;
-		
-		resume_thread(fTrackingPID);	
+
+		resume_thread(fTrackingPID);
 		send_data(fTrackingPID, 0, &data, sizeof(data));
-	
 	} else {
 		fTracking = false;
 		_set_menu_sem_(window, B_NO_MORE_SEMS);
@@ -426,33 +425,33 @@ BMenuBar::_TrackTask(void *arg)
 
 	BMenuBar *menuBar = data.menuBar;
 	if (data.useRect)
-		menuBar->fExtraRect = &data.rect;	
+		menuBar->fExtraRect = &data.rect;
 	menuBar->_SetStickyMode(data.sticky);
-	
+
 	int32 action;
 	menuBar->_Track(&action, data.menuIndex, data.showMenu);
-	
+
 	menuBar->fTracking = false;
 	menuBar->fExtraRect = NULL;
 
 	// We aren't the BWindow thread, so don't call MenusEnded() directly
 	BWindow *window = menuBar->Window();
 	window->PostMessage(_MENUS_DONE_);
-	
+
 	_set_menu_sem_(window, B_BAD_SEM_ID);
 	delete_sem(menuBar->fMenuSem);
 	menuBar->fMenuSem = B_BAD_SEM_ID;
-	
+
 	return 0;
 }
 
 
 BMenuItem *
 BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
-{	
+{
 	// TODO: Cleanup, merge some "if" blocks if possible
 	fChosenItem = NULL;
-	
+
 	BWindow *window = Window();
 	fState = MENU_STATE_TRACKING;
 
@@ -460,7 +459,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 	uint32 buttons;
 	if (window->Lock()) {
 		if (startIndex != -1) {
-			be_app->ObscureCursor();		
+			be_app->ObscureCursor();
 			_SelectItem(ItemAt(startIndex), true, true);
 		}
 		GetMouse(&where, &buttons);
@@ -494,7 +493,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			// us the new position.
 			// TODO: Maybe have a shared struct between all menus
 			// where to store the current mouse position ?
-			// (Or just use the BView mouse hooks)			
+			// (Or just use the BView mouse hooks)
 			BPoint newWhere;
 			if (window->Lock()) {
 				GetMouse(&newWhere, &buttons);
@@ -505,10 +504,10 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			// that are children of BMenuFields "sticky" (see ticket #953)
 			if (localAction == MENU_STATE_CLOSED) {
 				if (fExtraRect != NULL && fExtraRect->Contains(where)
-					// 9 = 3 pixels ^ 2 (since point_distance() returns the square of the distance)					
+					// 9 = 3 pixels ^ 2 (since point_distance() returns the square of the distance)
 					&& point_distance(newWhere, where) < 9) {
 					_SetStickyMode(true);
-					fExtraRect = NULL;				
+					fExtraRect = NULL;
 				} else
 					fState = MENU_STATE_CLOSED;
 			}
@@ -527,7 +526,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 				}
 			} else {
 				// No submenu, just select the item
-				_SelectItem(menuItem);					
+				_SelectItem(menuItem);
 			}
 		} else if (menuItem == NULL && fSelected != NULL
 			&& !_IsStickyMode() && Bounds().Contains(where)) {
@@ -536,8 +535,8 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 		}
 
 		window->Unlock();
-		
-		if (fState != MENU_STATE_CLOSED) {	
+
+		if (fState != MENU_STATE_CLOSED) {
 			// if user doesn't move the mouse, loop here,
 			// so we don't interfer with keyboard menu navigation
 			BPoint newLocation;
@@ -548,9 +547,9 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 					break;
 				GetMouse(&newLocation, &newButtons, true);
 				UnlockLooper();
-			} while (newLocation == where 
+			} while (newLocation == where
 					&& newButtons == buttons);
-			
+
 			where = newLocation;
 			buttons = newButtons;
 
@@ -569,13 +568,13 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 					fState = MENU_STATE_CLOSED;
 				} else
 					_SetStickyMode(true);
-			}		
+			}
 		}
 	}
-	 
+
 	if (window->Lock()) {
 		if (fSelected != NULL)
-			_SelectItem(NULL);	
+			_SelectItem(NULL);
 
 		if (fChosenItem != NULL)
 			fChosenItem->Invoke();
@@ -614,28 +613,28 @@ BMenuBar::_StealFocus()
 }
 
 
-void 
+void
 BMenuBar::_RestoreFocus()
 {
 	BWindow *window = Window();
 	if (window != NULL && window->Lock()) {
 		BHandler *handler = NULL;
-		if (fPrevFocusToken != -1 
+		if (fPrevFocusToken != -1
 			&& gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN, (void **)&handler) == B_OK) {
 			BView *view = dynamic_cast<BView *>(handler);
 			if (view != NULL && view->Window() == window)
-				view->MakeFocus();		
-		
+				view->MakeFocus();
+
 		} else if (IsFocus())
 			MakeFocus(false);
-		
+
 		fPrevFocusToken = -1;
 		window->Unlock();
 	}
 }
 
 
-void 
+void
 BMenuBar::_InitData(menu_layout layout)
 {
 	fLastBounds = new BRect(Bounds());
