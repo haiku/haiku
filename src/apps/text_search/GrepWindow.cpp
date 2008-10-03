@@ -511,10 +511,10 @@ GrepWindow::_CreateMenus()
 	fPreferencesMenu->AddSeparatorItem();
 	fPreferencesMenu->AddItem(fShowLinesMenuitem);
 
- 	fEncodingMenu->AddItem(fUTF8);
- 	fEncodingMenu->AddItem(fShiftJIS);
- 	fEncodingMenu->AddItem(fEUC);
- 	fEncodingMenu->AddItem(fJIS);
+	fEncodingMenu->AddItem(fUTF8);
+	fEncodingMenu->AddItem(fShiftJIS);
+	fEncodingMenu->AddItem(fEUC);
+	fEncodingMenu->AddItem(fJIS);
 
 //	fEncodingMenu->SetLabelFromMarked(true);
 		// Do we really want this ?
@@ -1557,9 +1557,11 @@ GrepWindow::_OnOpenPanel()
 	if (get_ref_for_path(fModel->fFilePanelPath.String(), &path) != B_OK)
 		return;
 
-	fFilePanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(NULL, this),
-		&path, B_FILE_NODE|B_DIRECTORY_NODE|B_SYMLINK_NODE,
-		true, new BMessage(MSG_REFS_RECEIVED), NULL, true, true);
+	BMessenger messenger(this);
+	BMessage message(MSG_REFS_RECEIVED);
+	fFilePanel = new BFilePanel(B_OPEN_PANEL, &messenger, &path,
+		B_FILE_NODE | B_DIRECTORY_NODE | B_SYMLINK_NODE, true,
+		&message, NULL, true, true);
 
 	fFilePanel->Show();
 }

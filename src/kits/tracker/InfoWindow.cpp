@@ -787,10 +787,10 @@ BInfoWindow::OpenFilePanel(const entry_ref *ref)
 	// for the sym link
 	if (fFilePanel == NULL) {
 		BMessenger runner(this);
-
+		BMessage message(kNewTargetSelected);
 		fFilePanel = new BFilePanel(B_OPEN_PANEL, &runner, ref,
 			B_FILE_NODE | B_SYMLINK_NODE | B_DIRECTORY_NODE,
-			false, new BMessage(kNewTargetSelected));
+			false, &message);
 
 		if (fFilePanel != NULL) {
 			fFilePanel->SetButtonLabel(B_DEFAULT_BUTTON,"Select");

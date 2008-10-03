@@ -167,6 +167,8 @@ RecorderWindow::~RecorderWindow()
 	//	Clean up currently recording file, if any.
 	fRecEntry.Remove();
 	fRecEntry.Unset();
+
+	delete fSavePanel;
 }
 
 
@@ -266,7 +268,7 @@ RecorderWindow::InitWindow()
 
 		BRect buttonRect;
 
-  		//	Button for rewinding
+		//	Button for rewinding
 		buttonRect = BRect(BPoint(0,0), kSkipButtonSize);
 		buttonRect.OffsetTo(background->Bounds().LeftBottom() - BPoint(-7, 25));
 		fRewindButton = new TransportButton(buttonRect, "Rewind",
