@@ -898,14 +898,14 @@ ShowImageWindow::SaveAs(BMessage *message)
 
 	// Add the chosen translator and output type to the
 	// message that the save panel will send back
-	BMessage *panelMsg = new BMessage(MSG_SAVE_PANEL);
-	panelMsg->AddInt32(kTranslatorField, outTranslator);
-	panelMsg->AddInt32(kTypeField, outType);
+	BMessage panelMsg(MSG_SAVE_PANEL);
+	panelMsg.AddInt32(kTranslatorField, outTranslator);
+	panelMsg.AddInt32(kTypeField, outType);
 
 	// Create save panel and show it
 	BMessenger target(this);
 	fSavePanel = new (std::nothrow) BFilePanel(B_SAVE_PANEL,
-		&target, NULL, 0, false, panelMsg);
+		&target, NULL, 0, false, &panelMsg);
 	if (!fSavePanel)
 		return;
 
