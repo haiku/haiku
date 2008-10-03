@@ -20,7 +20,8 @@ typedef struct acpi_ns_device_info {
 
 
 static void 
-dump_acpi_namespace(acpi_ns_device_info *device, char *root, void *buf, size_t* num_bytes, int indenting) {
+dump_acpi_namespace(acpi_ns_device_info *device, char *root, void *buf, size_t* num_bytes, int indenting) 
+{
 	char result[255];
 	char output[255];
 	char tabs[255];
@@ -89,8 +90,9 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, void *buf, size_t* 
 				sprintf(output, "%s     BUFFER_FIELD", output);
 				break;
 		}
-		sprintf(output, "%s\n", output);
-		
+		// TODO: This is obviously broken!
+		// We should respect "*num_bytes", otherwise
+		// we could have a buffer overflow. See ticket #2786
 		sprintf((buf + *num_bytes), "%s", output);
 		*num_bytes += strlen(output);
 		
