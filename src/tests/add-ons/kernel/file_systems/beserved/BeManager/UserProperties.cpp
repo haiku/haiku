@@ -186,8 +186,8 @@ void UserPropertiesView::Draw(BRect rect)
 	MovePenTo(202, 210);
 	DrawString("days");
 
-	SetDrawingMode(B_OP_ALPHA); 
-	SetHighColor(0, 0, 0, 180);       
+	SetDrawingMode(B_OP_ALPHA);
+	SetHighColor(0, 0, 0, 180);
 	SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 	DrawBitmap(icon, iconRect);
 }
@@ -246,7 +246,6 @@ UserPropertiesPanel::UserPropertiesPanel(BRect frame, const char *name, BWindow 
 	infoView = new UserPropertiesView(r, name == NULL ? NULL : user);
 	AddChild(infoView);
 
-	myMsgr = new BMessenger(NULL, this, NULL);
 	Show();
 }
 
@@ -264,7 +263,9 @@ void UserPropertiesPanel::MessageReceived(BMessage *msg)
 	switch (msg->what)
 	{
 		case MSG_USER_BROWSE:
-			filePanel = new BFilePanel(B_OPEN_PANEL, myMsgr, &entryRef, B_DIRECTORY_NODE, false);
+			BMessenger messenger(this);
+			filePanel = new BFilePanel(B_OPEN_PANEL, &messenger, &entryRef,
+				B_DIRECTORY_NODE, false);
 //			filePanel->SetTarget(this);
 			filePanel->Show();
 			filePanel->Window()->SetTitle("User Home");

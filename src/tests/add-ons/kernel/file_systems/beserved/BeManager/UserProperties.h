@@ -58,7 +58,6 @@ class UserPropertiesPanel : public BWindow
 		bool isCancelled()			{ return cancelled; }
 
 	private:
-		BMessenger *myMsgr;
 		UserPropertiesView *infoView;
 		BWindow *shareWin;
 		char user[33];

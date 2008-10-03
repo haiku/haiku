@@ -12,18 +12,18 @@
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -59,12 +59,12 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 	:	BView(frame, name, resize, flags)
 {
 	fSettings = settings;
-	
+
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	BMessage *pMsg;
 	int32 val;
-	
+
 	// Show Caption checkbox
 	pMsg = new BMessage(CHANGE_CAPTION);
 	fShowCaption = new BCheckBox(BRect(10, 45, 180, 62),
@@ -73,7 +73,7 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 	fShowCaption->SetValue(val);
 	fShowCaption->SetViewColor(ViewColor());
 	AddChild(fShowCaption);
-	
+
 	// Change Border checkbox
 	pMsg = new BMessage(CHANGE_BORDER);
 	fShowBorder = new BCheckBox(BRect(10, 70, 180, 87),
@@ -82,7 +82,7 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 	fShowBorder->SetValue(val);
 	fShowBorder->SetViewColor(ViewColor());
 	AddChild(fShowBorder);
-	
+
 	// Delay Menu
 	// setup PNG interlace options menu
 	int32 currentDelay = fSettings->SetGetInt32(SAVER_SETTING_DELAY) / 1000;
@@ -123,19 +123,20 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 		"Delay Menu Field", "Delay:", fDelayMenu);
 	fDelayMenuField->SetViewColor(ViewColor());
 	fDelayMenuField->SetDivider(40);
-	AddChild(fDelayMenuField);	
+	AddChild(fDelayMenuField);
 
 	// Choose Image Folder button
 	pMsg = new BMessage(CHOOSE_DIRECTORY);
 	fChooseFolder = new BButton(BRect(50, 160, 180, 180),
 		"Choose Folder", "Choose Image Folder" B_UTF8_ELLIPSIS, pMsg);
 	AddChild(fChooseFolder);
-	
+
 	// Setup choose folder file panel
 	pMsg = new BMessage(CHANGE_DIRECTORY);
 	fFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, (const entry_ref *) NULL,
 		B_DIRECTORY_NODE, false, pMsg, NULL, true, true);
 	fFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
+	delete pMsg;
 }
 
 // ---------------------------------------------------------------
@@ -154,7 +155,7 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 SlideShowConfigView::~SlideShowConfigView()
 {
 	fSettings->Release();
-	
+
 	delete fFilePanel;
 	fFilePanel = NULL;
 }
@@ -180,7 +181,7 @@ SlideShowConfigView::AllAttached()
 	fShowBorder->SetTarget(msgr);
 	fChooseFolder->SetTarget(msgr);
 	fFilePanel->SetTarget(msgr);
-	
+
 	// Set target for menu items
 	for (int32 i = 0; i < fDelayMenu->CountItems(); i++) {
 		BMenuItem *item = fDelayMenu->ItemAt(i);
@@ -215,7 +216,7 @@ SlideShowConfigView::MessageReceived(BMessage *message)
 			fSettings->SetGetBool(SAVER_SETTING_CAPTION, &bNewVal);
 			fSettings->SaveSettings();
 			break;
-			
+
 		case CHANGE_BORDER:
 			if (fShowBorder->Value())
 				bNewVal = true;
@@ -224,7 +225,7 @@ SlideShowConfigView::MessageReceived(BMessage *message)
 			fSettings->SetGetBool(SAVER_SETTING_BORDER, &bNewVal);
 			fSettings->SaveSettings();
 			break;
-			
+
 		case CHOOSE_DIRECTORY:
 		{
 			BString strDirectory;
@@ -236,11 +237,11 @@ SlideShowConfigView::MessageReceived(BMessage *message)
 			if (entry.GetRef(&ref) != B_OK)
 				return;
 			fFilePanel->SetPanelDirectory(&ref);
-			
+
 			fFilePanel->Show();
 			break;
 		}
-		
+
 		case CHANGE_DIRECTORY:
 		{
 			entry_ref ref;
@@ -253,14 +254,14 @@ SlideShowConfigView::MessageReceived(BMessage *message)
 			if (path.InitCheck() != B_OK)
 				return;
 			BString strDirectory = path.Path();
-			
+
 			fSettings->SetString(SAVER_SETTING_DIRECTORY, strDirectory);
 			fSettings->SaveSettings();
-			
+
 			Invalidate();
 			break;
 		}
-		
+
 		case CHANGE_DELAY:
 		{
 			int32 newVal;
@@ -271,7 +272,7 @@ SlideShowConfigView::MessageReceived(BMessage *message)
 			}
 			break;
 		}
-		
+
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -300,10 +301,10 @@ SlideShowConfigView::Draw(BRect area)
 	float xbold, ybold;
 	xbold = fh.descent + 1;
 	ybold = fh.ascent + fh.descent * 2 + fh.leading;
-	
+
 	char title[] = "SlideShow Screen Saver";
 	DrawString(title, BPoint(xbold, ybold));
-	
+
 	SetFont(be_plain_font);
 	font_height plainh;
 	GetFontHeight(&plainh);
@@ -312,7 +313,7 @@ SlideShowConfigView::Draw(BRect area)
 
 	char writtenby[] = "Written by Michael Wilber";
 	DrawString(writtenby, BPoint(xbold, yplain * 1 + ybold));
-	
+
 	// Draw current folder
 	BString strFolder;
 	fSettings->GetString(SAVER_SETTING_DIRECTORY, strFolder);

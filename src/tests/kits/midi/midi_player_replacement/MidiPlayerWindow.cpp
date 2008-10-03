@@ -48,7 +48,7 @@ public:
 	{
 		fWindows->Show();
 	}
-	
+
 //--------------
 
 	void SetOrigin(BPoint origin)
@@ -326,7 +326,9 @@ entry_ref ref;
 				}
 				else
 				{
-					fInputFilePanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL, B_FILE_NODE, false, msg);
+					BMessenger messenger(this)
+					fInputFilePanel = new BFilePanel(B_OPEN_PANEL, &messenger,
+						NULL, B_FILE_NODE, false, msg);
 					fInputFilePanel->Show();
 				}
 				break;
@@ -375,7 +377,9 @@ entry_ref ref;
 				}
 				else
 				{
-					fOutputFilePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, B_FILE_NODE, false, msg);
+					BMessenger messenger(this)
+					fOutputFilePanel = new BFilePanel(B_SAVE_PANEL, &messenger,
+						NULL, B_FILE_NODE, false, msg);
 					fOutputFilePanel->Show();
 				}
 				break;
@@ -437,7 +441,9 @@ entry_ref ref;
 				}
 				else
 				{
-					fOutputFilePanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL, B_FILE_NODE, false, msg);
+					BMessenger messenger(this)
+					fOutputFilePanel = new BFilePanel(B_OPEN_PANEL, &messenger,
+						NULL, B_FILE_NODE, false, msg);
 					fOutputFilePanel->Show();
 				}
 				break;
@@ -552,7 +558,9 @@ entry_ref ref;
 					PostMessage(&message);
 					message = BMessage(*msg);
 					message.what = CHANGE_INPUT_FILE;
-					fInputFilePanel = fInputFilePanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL, B_FILE_NODE, false, msg);;
+					BMessenger messenger(this)
+					fInputFilePanel = new BFilePanel(B_OPEN_PANEL, &messenger,
+						NULL, B_FILE_NODE, false, msg);;
 					PostMessage(&message);
 					message = BMessage(OUTPUT_CHANGE_TO_BEOS_SYNTH);
 					PostMessage(&message);
