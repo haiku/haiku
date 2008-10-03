@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network re pci ;
+
+UsePrivateHeaders kernel net ;
+
+UseHeaders [ FDirName $(SUBDIR) .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel drivers network rtl8139 ] : true ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+KernelAddon re :
+	if_re.c
+	glue.c
+	: libfreebsd_network.a rtl8139_mii.a
+	;
+
