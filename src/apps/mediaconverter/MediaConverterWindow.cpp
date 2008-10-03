@@ -35,17 +35,17 @@
 // #pragma mark - DirectoryFilter
 
 
-class DirectoryFilter : public BRefFilter 
-{ 
-public: 
-        DirectoryFilter(){}; 
-        virtual bool Filter(const entry_ref *ref, 
-                BNode *node, struct stat *st, const char *filetype)
-		{ 
-			return node->IsDirectory(); 
+class DirectoryFilter : public BRefFilter
+{
+public:
+		DirectoryFilter(){};
+		virtual bool Filter(const entry_ref *ref,
+				BNode *node, struct stat *st, const char *filetype)
+		{
+			return node->IsDirectory();
 		}
-private: 
-}; 
+private:
+};
 
 
 // #pragma mark - FileFormatMenuItem
@@ -55,7 +55,7 @@ class FileFormatMenuItem : public BMenuItem {
 	public:
 				FileFormatMenuItem(media_file_format* format);
 	virtual		~FileFormatMenuItem();
-	
+
 	media_file_format fFileFormat;
 };
 
@@ -79,7 +79,7 @@ class CodecMenuItem : public BMenuItem {
 	public:
 				CodecMenuItem(media_codec_info *ci, uint32 msg_type);
 	virtual		~CodecMenuItem();
-	
+
 	media_codec_info fCodecInfo;
 };
 
@@ -128,16 +128,16 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 
 	BPath path(&mypath);
 	path.GetParent(&path);
-	path.Append("Language/Dictionaries"); 
-    path.Append("MediaConverter");
-	be_locale.LoadLanguageFile(path.Path()); 
+	path.Append("Language/Dictionaries");
+	path.Append("MediaConverter");
+	be_locale.LoadLanguageFile(path.Path());
 
 #endif
 
-    BRect dummyRect(0, 0, 10, 10);
-    fMenuBar = new BMenuBar(dummyRect, "menubar");
+	BRect dummyRect(0, 0, 10, 10);
+	fMenuBar = new BMenuBar(dummyRect, "menubar");
 	_CreateMenu();
-    AddChild(fMenuBar);
+	AddChild(fMenuBar);
 
 	// background
 	BRect r(frame);
@@ -173,7 +173,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	r2.right = r.right - 5;
 	r2.bottom = r2.top + 120;
 	fBox2 = new BBox(r2, NULL, B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	
+
 	r3 = r2;
 	r3.OffsetTo(0, 0);
 	r3.InsetBy(5, 5);
@@ -190,14 +190,14 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	r3.OffsetTo(0, 0);
 	r3.InsetBy(8, 8);
 	r3.top += be_bold_font->Size() - 3;
-	
+
 	BRect r4(r3);
 	r4.bottom = r4.top + 20;
 	BPopUpMenu* popmenu = new BPopUpMenu("");
 	fFormatMenu = new BMenuField(r4, NULL, FORMAT_LABEL, popmenu,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fBox3->AddChild(fFormatMenu);
-	
+
 	r4.top = r4.bottom + 5;
 	r4.bottom = r4.top + 20;
 	popmenu = new BPopUpMenu("");
@@ -239,14 +239,14 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fBox3->AddChild(fStartDurationTC);
 	fStartDurationTC->SetText("0");
-	
+
 	r4.top = r4.bottom + 5;
 	r4.bottom = r4.top + 20;
 	fEndDurationTC = new BTextControl(r4, NULL, "", "0", NULL,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fBox3->AddChild(fEndDurationTC);
 	fEndDurationTC->SetText("0");
- 	
+
 	r4.top = r4.bottom + 5;
 	r4.bottom = r4.top + 50;
 
@@ -256,7 +256,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 		B_BLOCK_THUMB, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fVideoQualitySlider->SetValue(fVideoQuality);
 	fVideoQualitySlider->SetEnabled(false);
-    fBox3->AddChild(fVideoQualitySlider);
+	fBox3->AddChild(fVideoQualitySlider);
 
 	r4.top = r4.bottom + 5;
 	r4.bottom = r4.top + 50;
@@ -267,7 +267,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 		B_BLOCK_THUMB, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fAudioQualitySlider->SetValue(fAudioQuality);
 	fAudioQualitySlider->SetEnabled(false);
-    fBox3->AddChild(fAudioQualitySlider);
+	fBox3->AddChild(fAudioQualitySlider);
 	background->AddChild(fBox3);
 
 	// buttons
@@ -317,11 +317,11 @@ MediaConverterWindow::~MediaConverterWindow()
 
 
 /*
-void 
+void
 MediaConverterWindow::DispatchMessage(BMessage *msg, BHandler *handler)
 {
 	if (msg->WasDropped() && msg->what == B_SIMPLE_DATA) {
-	
+
 		printf("Dispatch 1\n");
 		DetachCurrentMessage();
 		msg->what = B_REFS_RECEIVED;
@@ -334,7 +334,7 @@ MediaConverterWindow::DispatchMessage(BMessage *msg, BHandler *handler)
 */
 
 
-void 
+void
 MediaConverterWindow::MessageReceived(BMessage *msg)
 {
 	status_t status;
@@ -353,7 +353,7 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 	BPath name;
 	BEntry inentry;
 	int32 value;
-   	BRect ButtonRect;
+	BRect ButtonRect;
 
 	switch (msg->what) {
 		#if B_BEOS_VERSION <= B_BEOS_VERSION_6
@@ -377,7 +377,7 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 				delete msg;
 			}
 			break;
-	
+
 		case FORMAT_SELECT_MESSAGE:
 			BuildAudioVideoMenus();
 			break;
@@ -385,7 +385,7 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			break;
 		case VIDEO_CODEC_SELECT_MESSAGE:
 			break;
-	
+
 		case CONVERT_BUTTON_MESSAGE:
 			if (!fConverting) {
 				fConvertButton->SetLabel(CANCEL_LABEL);
@@ -396,10 +396,10 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			} else if (!fCancelling) {
 				fCancelling = true;
 				SetStatusMessage(CANCELLING_LABEL B_UTF8_ELLIPSIS);
-				BMessenger(be_app).SendMessage(CANCEL_CONVERSION_MESSAGE);			
+				BMessenger(be_app).SendMessage(CANCEL_CONVERSION_MESSAGE);
 			}
 			break;
-	
+
 		case CONVERSION_DONE_MESSAGE:
 			SetStatusMessage(fCancelling ? CONV_CANCEL_LABEL : CONV_COMPLETE_LABEL);
 			fConverting = false;
@@ -409,20 +409,20 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 				SetEnabled(enable, enable);
 			}
 			fConvertButton->SetLabel(CONVERT_LABEL);
-	
-	
+
+
 			break;
-	
+
 		case OUTPUT_FOLDER_MESSAGE:
 		//	 Execute Save Panel
 			if (!fSaveFilePanel) {
-			    BButton *SelectThisDir;
-	
+				BButton *SelectThisDir;
+
 				fSaveFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_DIRECTORY_NODE, true, new BMessage(FOLDER_SELECT_MESSAGE), NULL, false, true);
 				fSaveFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, SELECT_LABEL);
 				fSaveFilePanel->Window()->SetTitle(SAVE_DIR_LABEL);
 				fSaveFilePanel->SetTarget(this);
-	
+
 				fSaveFilePanel->Window()->Lock();
 				ButtonRect = fSaveFilePanel->Window()->ChildAt(0)->FindView("cancel button")->Frame();
 				ButtonRect.right  = ButtonRect.left - 20;
@@ -432,14 +432,14 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 				SelectThisDir->SetTarget(this);
 				fSaveFilePanel->Window()->ChildAt(0)->AddChild(SelectThisDir);
 				fSaveFilePanel->Window()->Unlock();
-	
+
 				BRefFilter *filter;
 				filter = new DirectoryFilter;
 				fSaveFilePanel->SetRefFilter(filter);
 			}
 			fSaveFilePanel->Show();
 			break;
-	
+
 		case FOLDER_SELECT_MESSAGE:
 		//	 "SELECT" Button at Save Panel Pushed
 			fSaveFilePanel->GetNextSelectedRef(&inRef);
@@ -447,7 +447,7 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			_SetOutputFolder(inentry);
 			fOutputDirSpecified = true;
 			break;
-	
+
 		case SELECT_THIS_DIR_MESSAGE:
 		//	 "THIS DIR" Button at Save Panel Pushed
 			fSaveFilePanel->GetPanelDirectory(&inRef);
@@ -456,7 +456,7 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			_SetOutputFolder(inentry);
 			fOutputDirSpecified = true;
 			break;
-	
+
 		case OPEN_FILE_MESSAGE:
 		//	 Execute Open Panel
 			if (!fOpenFilePanel) {
@@ -465,17 +465,17 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			}
 			fOpenFilePanel->Show();
 			break;
-	
+
 		case B_REFS_RECEIVED:
 		//	Media Files Seleced by Open Panel
 			DetachCurrentMessage();
 			msg->what = B_REFS_RECEIVED;
 			BMessenger(be_app).SendMessage(msg);
 			// fall through
-	
+
 		case B_CANCEL:
 			break;
-	
+
 		case DISP_ABOUT_MESSAGE: {
 			(new BAlert(ABOUT_TITLE_LABEL B_UTF8_ELLIPSIS,
 					"MediaConverter\n"
@@ -496,7 +496,7 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			string = "";
 			string << fStartDurationTC->Text();
 			string << "000";
-			
+
 			strcpy(buffer,string.String());
 			argv[1] = buffer;
 			srcIndex = fListView->CurrentSelection();
@@ -504,15 +504,15 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			if (status == B_OK) {
 				inentry.SetTo(&inRef);
 				inentry.GetPath(&name);
-	
+
 				strcpy(buffer, string.String());
-				
+
 				strcpy(buffer2, name.Path());
 				argv[2]= buffer2;
 			}
-	
+
 			status = be_roster->Launch(&ref, 3, argv);
-	
+
 			if (status != B_OK) {
 				string2 << LAUNCH_ERROR << strerror(status);
 				(new BAlert("", string2.String(), OK_LABEL))->Go();
@@ -520,14 +520,14 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case VIDEO_QUALITY_CHANGED_MESSAGE:
-			msg->FindInt32("be:value",&value); 
+			msg->FindInt32("be:value",&value);
 			sprintf(buffer, VIDEO_QUALITY_LABEL, (int8)value);
 			fVideoQualitySlider->SetLabel(buffer);
 			fVideoQuality = value;
 			break;
 
 		case AUDIO_QUALITY_CHANGED_MESSAGE:
-			msg->FindInt32("be:value",&value); 
+			msg->FindInt32("be:value",&value);
 			sprintf(buffer, AUDIO_QUALITY_LABEL, (int8)value);
 			fAudioQualitySlider->SetLabel(buffer);
 			fAudioQuality = value;
@@ -594,7 +594,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 
 	// add available audio encoders to menu
 	format.type = B_MEDIA_RAW_AUDIO;
-	format.u.raw_audio = media_raw_audio_format::wildcard;	
+	format.u.raw_audio = media_raw_audio_format::wildcard;
 	while (get_next_encoder(&cookie, mf_format, &format, &outfmt, &codec_info) == B_OK) {
 		if (separator) {
 			menu->AddItem(new BMenuItem("No Audio",
@@ -705,7 +705,7 @@ MediaConverterWindow::GetSelectedFormatInfo(media_file_format** format,
 }
 
 
-void 
+void
 MediaConverterWindow::BuildFormatMenu()
 {
 	BMenu *menu = fFormatMenu->Menu();
@@ -723,7 +723,7 @@ MediaConverterWindow::BuildFormatMenu()
 		ff_item = new FileFormatMenuItem(&mfi);
 		menu->AddItem(ff_item);
 	}
-	
+
 	// mark first item
 	item = menu->ItemAt(0);
 	if (item != NULL) {
@@ -732,13 +732,13 @@ MediaConverterWindow::BuildFormatMenu()
 	}
 }
 
-void 
+void
 MediaConverterWindow::SetFileMessage(const char *message)
 {
 	fStatusView->SetStatus(message);
 }
 
-void 
+void
 MediaConverterWindow::SetStatusMessage(const char *message)
 {
 	fStatusView2->SetStatus(message);
@@ -770,7 +770,7 @@ MediaConverterWindow::RemoveSourceFile(int32 index)
 }
 
 
-int32 
+int32
 MediaConverterWindow::CountSourceFiles()
 {
 	return fListView->CountItems();
@@ -793,7 +793,7 @@ MediaConverterWindow::GetSourceFileAt(int32 index, BMediaFile** _file,
 }
 
 
-void 
+void
 MediaConverterWindow::SourceFileSelectionChanged()
 {
 	int32 selected = fListView->CurrentSelection();
@@ -828,7 +828,7 @@ MediaConverterWindow::SourceFileSelectionChanged()
 // #pragma mark -
 
 
-void 
+void
 MediaConverterWindow::SetEnabled(bool enabled, bool convertEnabled)
 {
 	fConvertButton->SetEnabled(convertEnabled);
@@ -846,7 +846,7 @@ MediaConverterWindow::SetEnabled(bool enabled, bool convertEnabled)
 }
 
 
-bool 
+bool
 MediaConverterWindow::IsEnabled()
 {
 	return fEnabled;
@@ -924,7 +924,7 @@ MediaConverterWindow::_UpdateLabels()
 						 r.bottom - buttonFrame.Height() - 25);
 		fPreviewButton->MoveTo(buttonFrame.LeftTop());
 	}
-		
+
 	if (fDestButton != NULL) {
 		fDestButton->SetLabel(OUTPUT_FOLDER_LABEL);
 		fDestButton->ResizeToPreferred();
@@ -940,16 +940,16 @@ MediaConverterWindow::_UpdateLabels()
 	sprintf(buffer, VIDEO_QUALITY_LABEL, (int8)fVideoQuality);
 	if (fVideoQualitySlider != NULL) {
 		fVideoQualitySlider->SetLabel(buffer);
-	    fVideoQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
-	    	SLIDER_HIGH_LABEL);
+		fVideoQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
+			SLIDER_HIGH_LABEL);
 	}
 
 	sprintf(buffer, AUDIO_QUALITY_LABEL, (int8)fAudioQuality);
-	
+
 	if (fAudioQualitySlider != NULL) {
 		fAudioQualitySlider->SetLabel(buffer);
-	    fAudioQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
-	    	SLIDER_HIGH_LABEL);
+		fAudioQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
+			SLIDER_HIGH_LABEL);
 	}
 
 	float maxLabelLen = 0;
@@ -965,7 +965,7 @@ MediaConverterWindow::_UpdateLabels()
 		fStartDurationTC->SetDivider(maxLabelLen + 5);
 	if (fEndDurationTC != NULL)
 		fEndDurationTC->SetDivider(maxLabelLen + 5);
-	
+
 	if (fFormatMenu != NULL) {
 		fFormatMenu->SetLabel(FORMAT_LABEL);
 		maxLabelLen = MAX(maxLabelLen, fFormatMenu->StringWidth(
@@ -1013,10 +1013,10 @@ MediaConverterWindow::_DestroyMenu()
 void
 MediaConverterWindow::_CreateMenu()
 {
-    BMenuItem* item;
-    BMenu* menu;
+	BMenuItem* item;
+	BMenu* menu;
 
-    menu = new BMenu(FILE_MENU_LABEL);
+	menu = new BMenu(FILE_MENU_LABEL);
 	item = new BMenuItem(OPEN_MENU_LABEL B_UTF8_ELLIPSIS,
 		new BMessage(OPEN_FILE_MESSAGE));
 	menu->AddItem(item);
@@ -1028,7 +1028,7 @@ MediaConverterWindow::_CreateMenu()
 	item = new BMenuItem(QUIT_MENU_LABEL, new BMessage(QUIT_MESSAGE));
 	menu->AddItem(item);
 
-    fMenuBar->AddItem(menu);
+	fMenuBar->AddItem(menu);
 }
 
 
