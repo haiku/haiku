@@ -218,13 +218,15 @@ IconEditorApp::ReadyToRun()
 {
 	// create file panels
 	BMessenger messenger(this, this);
+	BMessage message(B_REFS_RECEIVED);
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL,
 								&messenger,
 								NULL,
 								B_FILE_NODE,
 								true,
-								new BMessage(B_REFS_RECEIVED));
+								&message);
 
+	message.what = MSG_SAVE_AS;
 	fSavePanel = new SavePanel("save panel",
 							   &messenger,
 								NULL,
@@ -232,7 +234,7 @@ IconEditorApp::ReadyToRun()
 									| B_DIRECTORY_NODE
 									| B_SYMLINK_NODE,
 								false,
-								new BMessage(MSG_SAVE_AS));
+								&message);
 
 	// create main window
 	BMessage settings('stns');
@@ -515,7 +517,7 @@ IconEditorApp::_Open(const BMessenger& externalObserver, const uint8* data,
 			// the reason is that the LittleEndianBuffer knows read and write
 			// mode, in this case it is used read-only, and it does not assume
 			// ownership of the buffer
-	
+
 		if (ret < B_OK) {
 			// inform user of failure at this point
 			BString helper("Opening the icon failed!");
@@ -524,7 +526,7 @@ IconEditorApp::_Open(const BMessenger& externalObserver, const uint8* data,
 									   "Bummer", NULL, NULL);
 			// launch alert asynchronously
 			alert->Go(NULL);
-	
+
 			delete icon;
 			return;
 		}
@@ -560,7 +562,7 @@ DocumentSaver*
 IconEditorApp::_CreateSaver(const entry_ref& ref, uint32 exportMode)
 {
 	DocumentSaver* saver;
-	
+
 	switch (exportMode) {
 		case EXPORT_MODE_FLAT_ICON:
 			saver = new SimpleFileSaver(new FlatIconExporter(), ref);
