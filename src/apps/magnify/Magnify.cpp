@@ -339,7 +339,7 @@ TWindow::MessageReceived(BMessage* m)
 			fFatBits->MakeActive(!fFatBits->Active());
 			break;
 
-		case msg_save:
+		case msg_save: {
 			// freeze the image here, unfreeze after dump or cancel
 			fFatBits->StartSave();
 
@@ -349,7 +349,7 @@ TWindow::MessageReceived(BMessage* m)
 				&message);
 			fSavePanel->SetSaveText("Bitmaps.h");
 			fSavePanel->Show();
-			break;
+		}	break;
 		case msg_dump:
 			{
 				delete fSavePanel;
