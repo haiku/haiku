@@ -30,6 +30,13 @@ ImageFilePanel::ImageFilePanel(file_panel_mode mode, BMessenger *target,
 }
 
 
+ImageFilePanel::~ImageFilePanel()
+{
+	if (RefFilter())
+		delete RefFilter();
+}
+
+
 void
 ImageFilePanel::Show()
 {

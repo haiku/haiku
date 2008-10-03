@@ -36,6 +36,7 @@ class ImageFilePanel : public BFilePanel {
 			uint32 nodeFlavors = 0, bool allowMultipleSelection = true,
 			BMessage* message = NULL, BRefFilter* filter = NULL,
 			bool modal = false, bool hideWhenDone = true);
+		~ImageFilePanel();
 
 		virtual void SelectionChanged();
 
