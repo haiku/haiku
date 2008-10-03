@@ -310,6 +310,8 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 
 MediaConverterWindow::~MediaConverterWindow()
 {
+	delete fSaveFilePanel;
+	delete fOpenFilePanel;
 }
 
 
@@ -418,7 +420,9 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			if (!fSaveFilePanel) {
 				BButton *SelectThisDir;
 
-				fSaveFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_DIRECTORY_NODE, true, new BMessage(FOLDER_SELECT_MESSAGE), NULL, false, true);
+				BMessage message(FOLDER_SELECT_MESSAGE);
+				fSaveFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
+					B_DIRECTORY_NODE, true, &message, NULL, false, true);
 				fSaveFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, SELECT_LABEL);
 				fSaveFilePanel->Window()->SetTitle(SAVE_DIR_LABEL);
 				fSaveFilePanel->SetTarget(this);
@@ -428,7 +432,7 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 				ButtonRect.right  = ButtonRect.left - 20;
 				ButtonRect.left = ButtonRect.right - 130;
 				SelectThisDir = new BButton(ButtonRect, NULL, SELECT_DIR_LABEL,
-									 new BMessage(SELECT_THIS_DIR_MESSAGE), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
+					new BMessage(SELECT_THIS_DIR_MESSAGE), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
 				SelectThisDir->SetTarget(this);
 				fSaveFilePanel->Window()->ChildAt(0)->AddChild(SelectThisDir);
 				fSaveFilePanel->Window()->Unlock();
@@ -460,7 +464,8 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 		case OPEN_FILE_MESSAGE:
 		//	 Execute Open Panel
 			if (!fOpenFilePanel) {
-				fOpenFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, true, NULL, NULL, false, true);
+				fOpenFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
+					B_FILE_NODE, true, NULL, NULL, false, true);
 				fOpenFilePanel->SetTarget(this);
 			}
 			fOpenFilePanel->Show();
