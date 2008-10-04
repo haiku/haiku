@@ -27,6 +27,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Subversion
 #	Vision
 #	VLC
+#	Welcome
 #	WonderBrush
 #	Yasm
 
@@ -413,6 +414,14 @@ if [ IsOptionalHaikuImagePackageAdded VLC ] {
 	}
 }
 
+# Welcome
+if [ IsOptionalHaikuImagePackageAdded Welcome ] {
+	CopyDirectoryToHaikuImage beos documentation
+		: [ FDirName $(HAIKU_TOP) docs welcome ]
+		: welcome : -x .svn ;
+	AddSymlinkToHaikuImage home Desktop
+		: /boot/beos/documentation/welcome/welcome.html : Welcome ;
+}
 
 # WonderBrush
 if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
