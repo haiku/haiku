@@ -612,6 +612,11 @@ vm86_cleanup(struct vm86_state *state)
 	The function will return B_OK if the BIOS was called successfully,
 	otherwise an apropriate error code. After the call the registers are
 	copied back to \a state to reflect the status after the BIOS returned.
+
+	Any buffer which is given to the BIOS function may be allocated starting
+	from address 0x1000 up to the allocated RAM size (see vm86_prepare()). The
+	area below 0x1000 is not available because it is used for the interrupt
+	vector table, BIOS data area and as real mode stack.
 */
 extern "C" status_t
 vm86_do_int(struct vm86_state *state, uint8 vec)
