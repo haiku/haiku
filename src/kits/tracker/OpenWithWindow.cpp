@@ -198,7 +198,7 @@ FindOne(const BString *element, void *castToString)
 {
 	if (strcasecmp(element->String(), (const char *)castToString) == 0)
 		return element;
-	
+
 	return 0;
 }
 
@@ -207,10 +207,10 @@ static const entry_ref *
 AddOneUniqueDocumentType(const entry_ref *ref, void *castToList)
 {
 	BObjectList<BString> *list = (BObjectList<BString> *)castToList;
-	
+
 	BEntry entry(ref, true);
 		// traverse symlinks
-	
+
 	// get this documents type
 	char type[B_MIME_TYPE_LENGTH];
 	BFile file(&entry, O_RDONLY);
@@ -286,9 +286,9 @@ OpenWithContainerWindow::MakeDefaultAndOpen()
 	if (!selectedAppPose)
 		return;
 
-	// collect all the types of all the opened documents into a list	
+	// collect all the types of all the opened documents into a list
 	BObjectList<BString> openedFileTypes(10, true);
-	EachEntryRef(EntryList(), AddOneUniqueDocumentType, &openedFileTypes, 100);	
+	EachEntryRef(EntryList(), AddOneUniqueDocumentType, &openedFileTypes, 100);
 
 	// set the default application to be the selected pose for all the
 	// mime types in the list
@@ -445,10 +445,10 @@ OpenWithContainerWindow::RestoreWindowState(AttributeStreamNode *node)
 	if (!node)
 		return;
 
-	const char *rectAttributeName = kAttrWindowFrame;	
+	const char *rectAttributeName = kAttrWindowFrame;
 	BRect frame(Frame());
 	if (node->Read(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame)
-		== sizeof(BRect)) {	
+		== sizeof(BRect)) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	}
@@ -566,8 +566,7 @@ AddSupportingAppForTypeToQuery(SearchForSignatureEntryList *queryIterator,
 static const entry_ref *
 AddOneRefSignatures(const entry_ref *ref, void *castToIterator)
 {
-	// ToDo:
-	// resolve cases where each entry has a different type and
+	// TODO: resolve cases where each entry has a different type and
 	// their supporting apps are disjoint sets
 
 	SearchForSignatureEntryList *queryIterator =
@@ -579,7 +578,7 @@ AddOneRefSignatures(const entry_ref *ref, void *castToIterator)
 
 	BString mimeType(model.MimeType());
 
-	if (!mimeType.Length() || mimeType.ICompare(B_FILE_MIMETYPE) == 0) 
+	if (!mimeType.Length() || mimeType.ICompare(B_FILE_MIMETYPE) == 0)
 		// if model is of unknown type, try mimeseting it first
 		model.Mimeset(true);
 
@@ -683,8 +682,7 @@ OpenWithPoseView::OpenSelection(BPose *pose, int32 *)
 		// else - once we have an extensible sniffer, tell users to ask
 		// publishers to fix up sniffers
 	}
-		
-		
+
 	BMessage message(*window->EntryList());
 		// make a clone to send
 	message.RemoveName("launchUsingSelector");
@@ -696,7 +694,7 @@ OpenWithPoseView::OpenSelection(BPose *pose, int32 *)
 
 	if (fSelectionHandler)
 		fSelectionHandler->PostMessage(&message);
-		
+
 	window->PostMessage(B_QUIT_REQUESTED);
 }
 
@@ -737,12 +735,12 @@ OpenWithPoseView::Pulse()
 	}
 
 	ASSERT(fSelectionList->CountItems() == 1);
-	
+
 	// enable the Open and make default if selected application different
 	// from preferred app ref
 	window->SetCanSetAppAsDefault((*fSelectionList->FirstItem()->
 		TargetModel()->EntryRef()) != fPreferredRef);
-	
+
 	_inherited::Pulse();
 }
 
@@ -786,23 +784,26 @@ OpenWithPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 cou
 	// overridden to try to select the preferred handling app
 	_inherited::CreatePoses(models, poseInfoArray, count, resultingPoses, insertionSort,
 		lastPoseIndexPtr, boundsPtr, forceDraw);
-	
-	if (resultingPoses)
-		for (int32 index = 0; index < count; index++) 
+
+	if (resultingPoses) {
+		for (int32 index = 0; index < count; index++) {
 			if (resultingPoses[index] && fHaveCommonPreferredApp
-				&& *(models[index]->EntryRef()) == fPreferredRef)
+				&& *(models[index]->EntryRef()) == fPreferredRef) {
 				// this is our preferred app, select it's pose
 				SelectPose(resultingPoses[index], IndexOfPose(resultingPoses[index]));
+			}
+		}
+	}
 }
 
 
 void
 OpenWithPoseView::KeyDown(const char *bytes, int32 count)
 {
-	if (bytes[0] == B_TAB)
+	if (bytes[0] == B_TAB) {
 		// just shift the focus, don't tab to the next pose
 		BView::KeyDown(bytes, count);
-	else
+	} else
 		_inherited::KeyDown(bytes, count);
 }
 
@@ -950,7 +951,7 @@ int32
 RelationCachingModelProxy::Relation(SearchForSignatureEntryList *iterator,
 	BMessage *entries) const
 {
-	if (fRelation == kUnknownRelation) 
+	if (fRelation == kUnknownRelation)
 		fRelation = iterator->Relation(entries, fModel);
 
 	return fRelation;
@@ -1061,7 +1062,7 @@ OpenWithMenu::AddNextItem()
 		// Tracker, filter out version that don't list the correct types,
 		// etc.
 		delete model;
-	} else 
+	} else
 		fSupportingAppList->AddItem(new RelationCachingModelProxy(model));
 
 	return true;
@@ -1128,7 +1129,7 @@ OpenWithMenu::DoneBuildingItemList()
 		// divide different relations of opening with a separator
 		int32 relation = modelProxy->Relation(fIterator, &fEntriesToOpen);
 		if (lastRelation != -1 && relation != lastRelation)
-			AddSeparatorItem();			
+			AddSeparatorItem();
 		lastRelation = relation;
 
 		ModelMenuItem *item = new ModelMenuItem(model, result.String(), message);
@@ -1186,7 +1187,7 @@ SearchForSignatureEntryList::~SearchForSignatureEntryList()
 }
 
 
-void 
+void
 SearchForSignatureEntryList::PushUniqueSignature(const char *str)
 {
 	// do a unique add
@@ -1197,21 +1198,21 @@ SearchForSignatureEntryList::PushUniqueSignature(const char *str)
 }
 
 
-status_t 
+status_t
 SearchForSignatureEntryList::GetNextEntry(BEntry *entry, bool)
 {
 	return fIteratorList->GetNextEntry(entry);
 }
 
 
-status_t 
+status_t
 SearchForSignatureEntryList::GetNextRef(entry_ref *ref)
 {
 	return fIteratorList->GetNextRef(ref);
 }
 
 
-int32 
+int32
 SearchForSignatureEntryList::GetNextDirents(struct dirent *buffer,
 	size_t length, int32 count)
 {
@@ -1238,7 +1239,7 @@ AddOnePredicateTerm(const BString *item, void *castToParams)
 }
 
 
-status_t 
+status_t
 SearchForSignatureEntryList::Rewind()
 {
 	if (fIteratorList)
@@ -1253,7 +1254,7 @@ SearchForSignatureEntryList::Rewind()
 	// build the predicate string by oring queries for the individual
 	// signatures
 	BString predicateString;
-	
+
 	AddOneTermParams params;
 	params.result = &predicateString;
 	params.first = true;
@@ -1265,24 +1266,24 @@ SearchForSignatureEntryList::Rewind()
 	fIteratorList->AddItem(new TWalkerWrapper(
 		new WALKER_NS::TQueryWalker(predicateString.String())));
 	fIteratorList->AddItem(new ConditionalAllAppsIterator(this));
-	
+
 	return fIteratorList->Rewind();
 }
 
 
-int32 
+int32
 SearchForSignatureEntryList::CountEntries()
 {
 	return 0;
 }
 
 
-bool 
+bool
 SearchForSignatureEntryList::GetPreferredApp(entry_ref *ref) const
 {
 	if (fPreferredAppCount == 1)
 		*ref = fPreferredRef;
-	
+
 	return fPreferredAppCount == 1;
 }
 
@@ -1299,7 +1300,7 @@ SearchForSignatureEntryList::TrySettingPreferredApp(const entry_ref *ref)
 }
 
 
-void 
+void
 SearchForSignatureEntryList::TrySettingPreferredAppForFile(const entry_ref *ref)
 {
 	if (!fPreferredAppForFileCount) {
@@ -1312,28 +1313,28 @@ SearchForSignatureEntryList::TrySettingPreferredAppForFile(const entry_ref *ref)
 }
 
 
-void 
+void
 SearchForSignatureEntryList::NonGenericFileFound()
 {
 	fGenericFilesOnly = false;
 }
 
 
-bool 
+bool
 SearchForSignatureEntryList::GenericFilesOnly() const
 {
 	return fGenericFilesOnly;
 }
 
 
-bool 
+bool
 SearchForSignatureEntryList::ShowAllApplications() const
 {
 	return fCanAddAllApps && !fFoundOneNonSuperHandler;
 }
 
 
-int32 
+int32
 SearchForSignatureEntryList::Relation(const Model *nodeModel,
 	const Model *applicationModel)
 {
@@ -1356,7 +1357,7 @@ SearchForSignatureEntryList::Relation(const Model *nodeModel,
 }
 
 
-int32 
+int32
 SearchForSignatureEntryList::Relation(const BMessage *entriesToOpen,
 	const Model *model) const
 {
@@ -1366,7 +1367,7 @@ SearchForSignatureEntryList::Relation(const BMessage *entriesToOpen,
 }
 
 
-void 
+void
 SearchForSignatureEntryList::RelationDescription(const BMessage *entriesToOpen,
 	const Model *model, BString *description) const
 {
@@ -1376,7 +1377,7 @@ SearchForSignatureEntryList::RelationDescription(const BMessage *entriesToOpen,
 }
 
 
-int32 
+int32
 SearchForSignatureEntryList::Relation(const BMessage *entriesToOpen,
 	const Model *applicationModel, const entry_ref *preferredApp,
 	const entry_ref *preferredAppForFile)
@@ -1392,7 +1393,7 @@ SearchForSignatureEntryList::Relation(const BMessage *entriesToOpen,
 		Model model(&ref, true, true);
 		if (model.InitCheck())
 			continue;
-		
+
 		int32 result = Relation(&model, applicationModel);
 		if (result != kNoRelation) {
 			if (preferredAppForFile
@@ -1400,19 +1401,19 @@ SearchForSignatureEntryList::Relation(const BMessage *entriesToOpen,
 				return kPreferredForFile;
 
 			if (result == kSupportsType && preferredApp
-				&& *applicationModel->EntryRef() == *preferredApp) 
+				&& *applicationModel->EntryRef() == *preferredApp)
 				// application matches cached preferred app, we are done
 				return kPreferredForType;
-				
+
 			return result;
 		}
 	}
-	
+
 	return kNoRelation;
 }
 
 
-void 
+void
 SearchForSignatureEntryList::RelationDescription(const BMessage *entriesToOpen,
 	const Model *applicationModel, BString *description, const entry_ref *preferredApp,
 	const entry_ref *preferredAppForFile)
@@ -1426,11 +1427,11 @@ SearchForSignatureEntryList::RelationDescription(const BMessage *entriesToOpen,
 			*description = "Preferred for file";
 			return;
 		}
-		
+
 		Model model(&ref, true, true);
 		if (model.InitCheck())
 			continue;
-		
+
 		BMimeType mimeType;
 		int32 result = Relation(&model, applicationModel);
 		switch (result) {
@@ -1442,43 +1443,43 @@ SearchForSignatureEntryList::RelationDescription(const BMessage *entriesToOpen,
 				return;
 
 			case kSupportsSupertype:
-				{
-					mimeType.SetTo(model.MimeType());
-					// status_t result = mimeType.GetSupertype(&mimeType);
-					
-					char *type = (char *)mimeType.Type();
-					char *tmp = strchr(type, '/');
-					if (tmp)
-						*tmp = '\0';
-						
-					//PRINT(("getting supertype for %s, result %s, got %s\n",
-					//	model.MimeType(), strerror(result), mimeType.Type()));
-					*description = "Handles any ";
-					// *description += mimeType.Type();
-					*description += type;
-					return;
-				}
-	
+			{
+				mimeType.SetTo(model.MimeType());
+				// status_t result = mimeType.GetSupertype(&mimeType);
+
+				char *type = (char *)mimeType.Type();
+				char *tmp = strchr(type, '/');
+				if (tmp)
+					*tmp = '\0';
+
+				//PRINT(("getting supertype for %s, result %s, got %s\n",
+				//	model.MimeType(), strerror(result), mimeType.Type()));
+				*description = "Handles any ";
+				// *description += mimeType.Type();
+				*description += type;
+				return;
+			}
+
 			case kSupportsType:
-				{
-					mimeType.SetTo(model.MimeType());
-					
-					if (preferredApp && *applicationModel->EntryRef() == *preferredApp)
-						// application matches cached preferred app, we are done
-						*description = "Preferred for ";
-					else
-						*description = "Handles ";
-			
-					char shortDescription[256];
-					if (mimeType.GetShortDescription(shortDescription) == B_OK)
-						*description += shortDescription;
-					else
-						*description += mimeType.Type();
-					return;
-				}
+			{
+				mimeType.SetTo(model.MimeType());
+
+				if (preferredApp && *applicationModel->EntryRef() == *preferredApp)
+					// application matches cached preferred app, we are done
+					*description = "Preferred for ";
+				else
+					*description = "Handles ";
+
+				char shortDescription[256];
+				if (mimeType.GetShortDescription(shortDescription) == B_OK)
+					*description += shortDescription;
+				else
+					*description += mimeType.Type();
+				return;
+			}
 		}
 	}
-	
+
 	*description = "Does not handle file";
 }
 
@@ -1520,7 +1521,7 @@ SearchForSignatureEntryList::CanOpenWithFilter(const Model *appModel,
 			BPath path, path2;
 			BEntry entry(appModel->EntryRef());
 			entry.GetPath(&path);
-			
+
 			BEntry entry2(&trackerInfo.ref);
 			entry2.GetPath(&path2);
 
@@ -1531,7 +1532,7 @@ SearchForSignatureEntryList::CanOpenWithFilter(const Model *appModel,
 			return false;
 		}
 	}
-	
+
 	if (FSInTrashDir(appModel->EntryRef()))
 		return false;
 
@@ -1542,10 +1543,10 @@ SearchForSignatureEntryList::CanOpenWithFilter(const Model *appModel,
 		BAppFileInfo appFileInfo(dynamic_cast<BFile *>(appModel->Node()));
 		if (appFileInfo.GetAppFlags(&flags) != B_OK)
 			return false;
-		
+
 		if ((flags & B_BACKGROUND_APP) || (flags & B_ARGV_ONLY))
 			return false;
-		
+
 		if (!signature[0])
 			// weed out apps with empty signatures
 			return false;
@@ -1557,7 +1558,7 @@ SearchForSignatureEntryList::CanOpenWithFilter(const Model *appModel,
 		BPath path;
 		BEntry entry(appModel->EntryRef());
 		entry.GetPath(&path);
-		
+
 		PRINT(("filtering out %s, does not handle any of opened files\n",
 			path.Path()));
 #endif
@@ -1628,7 +1629,8 @@ ConditionalAllAppsIterator::GetNextRef(entry_ref *ref)
 
 
 int32
-ConditionalAllAppsIterator::GetNextDirents(struct dirent *buffer, size_t length, int32 count)
+ConditionalAllAppsIterator::GetNextDirents(struct dirent *buffer, size_t length,
+	int32 count)
 {
 	if (!Iterate())
 		return 0;

@@ -116,7 +116,7 @@ class SearchForSignatureEntryList : public EntryListBase {
 			// returns the reason why an application is shown in Open With window
 
 		CachedEntryIteratorList *fIteratorList;
-		BObjectList<BString> fSignatures;	
+		BObjectList<BString> fSignatures;
 
 		entry_ref fPreferredRef;
 		int32 fPreferredAppCount;
@@ -132,7 +132,7 @@ class OpenWithContainerWindow : public BContainerWindow {
 		OpenWithContainerWindow(BMessage *entriesToOpen,
 			LockingList<BWindow> *windowList,
 			window_look look = B_DOCUMENT_WINDOW_LOOK,
-			window_feel feel = B_NORMAL_WINDOW_FEEL, 
+			window_feel feel = B_NORMAL_WINDOW_FEEL,
 			uint32 flags = 0, uint32 workspace = B_CURRENT_WORKSPACE);
 			// <entriesToOpen> eventually get opened by the selected app
 		virtual ~OpenWithContainerWindow();
@@ -273,13 +273,13 @@ class OpenWithMenu : public BSlowMenu {
 
 		virtual bool StartBuildingItemList();
 		virtual bool AddNextItem();
-		virtual void DoneBuildingItemList();	
+		virtual void DoneBuildingItemList();
 		virtual void ClearMenuBuildingState();
 
 		BMessage fEntriesToOpen;
 		BHandler *target;
 		BMessenger fMessenger;
-	
+
 		// menu building state
 		SearchForSignatureEntryList *fIterator;
 		entry_ref fPreferredRef;
@@ -305,7 +305,7 @@ class ConditionalAllAppsIterator : public EntryListBase {
 		virtual status_t Rewind();
 		virtual int32 CountEntries();
 
-	protected:	
+	protected:
 		bool Iterate() const;
 		void Instantiate();
 
@@ -313,7 +313,7 @@ class ConditionalAllAppsIterator : public EntryListBase {
 		SearchForSignatureEntryList *fParent;
 		WALKER_NS::TWalker *fWalker;
 };
- 
+
 } // namespace BPrivate
 
 using namespace BPrivate;

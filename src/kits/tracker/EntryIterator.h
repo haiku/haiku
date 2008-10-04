@@ -99,7 +99,7 @@ public:
 	// sorted by their i-node number -- this turns out to give quite a bit
 	// better performance over just using the order in which they show up using
 	// the default BEntryList iterator subclass
-	
+
 	CachedEntryIterator(BEntryList *iterator, int32 numEntries,
 		bool sortInodes = false);
 		// CachedEntryIterator does not get to own the <iterator>
@@ -112,22 +112,24 @@ public:
 
 	virtual status_t Rewind();
 	virtual int32 CountEntries();
-	
+
 	virtual void SetTo(BEntryList *iterator);
 		// CachedEntryIterator does not get to own the <iterator>
-		
+
 private:
+	static int _CompareInodes(const dirent *ent1, const dirent *ent2);
+
 	BEntryList *fIterator;
 	entry_ref *fEntryRefBuffer;
 	int32 fCacheSize;
 	int32 fNumEntries;
 	int32 fIndex;
-	
+
 	dirent *fDirentBuffer;
 	dirent *fCurrentDirent;
 	bool fSortInodes;
 	BObjectList<dirent> *fSortedList;
-	
+
 	BEntry *fEntryBuffer;
 };
 
@@ -185,8 +187,8 @@ protected:
 
 class CachedEntryIteratorList : public CachedEntryIterator {
 public:
-	CachedEntryIteratorList();
-	void AddItem(BEntryList *);
+	CachedEntryIteratorList(bool sortInodes = true);
+	void AddItem(BEntryList *list);
 
 protected:
 	EntryIteratorList fIteratorList;
