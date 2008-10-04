@@ -9,7 +9,7 @@
 #include "accel.h"
 
 
-status_t 
+status_t
 SetCursorShape(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y,
 				uint8* andMask, uint8* xorMask)
 {
@@ -23,8 +23,8 @@ SetCursorShape(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y,
 		// Update cursor variables appropriately.
 
 		SharedInfo& si = *gInfo.sharedInfo;
-		si.cursor.hot_x = hot_x;
-		si.cursor.hot_y = hot_y;
+		si.cursorHotX = hot_x;
+		si.cursorHotY = hot_y;
 
 		if ( ! gInfo.LoadCursorImage(width, height, andMask, xorMask))
 			return B_ERROR;
@@ -34,7 +34,7 @@ SetCursorShape(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y,
 }
 
 
-void 
+void
 MoveCursor(uint16 xPos, uint16 yPos)
 {
 	// Move the cursor to the specified position on the desktop.  If we're
@@ -72,8 +72,8 @@ MoveCursor(uint16 xPos, uint16 yPos)
 		MoveDisplay(hds, vds);
 
 	// Put cursor in correct physical position.
-	x -= (hds + si.cursor.hot_x);
-	y -= (vds + si.cursor.hot_y);
+	x -= (hds + si.cursorHotX);
+	y -= (vds + si.cursorHotY);
 
 	// Position the cursor on the display.
 	gInfo.SetCursorPosition(x, y);

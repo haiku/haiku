@@ -623,7 +623,7 @@ Virge_ModeInit(const DisplayModeEx& mode)
 	}
 
 	int width = mode.bytesPerRow >> 3;
-	regRec.CRTC[19] = 0xFF & width;
+	regRec.CRTC[0x13] = 0xFF & width;
 	regRec.CR51 = (0x300 & width) >> 4; 	// Extension bits
 
 	regRec.CR33 = 0x20;
@@ -693,6 +693,13 @@ Virge_ModeInit(const DisplayModeEx& mode)
 	regRec.SR57 = 0xff ;
 
 	Virge_WriteMode(mode, regRec);		// write mode registers to hardware
+
+	// Note that the Virge VX chip does not display the hardware cursor when the
+	// mode is set to 640x480;  thus, in this case the hardware cursor functions
+	// will be disabled so that a software cursor will be used.
+
+	si.bDisableHdwCursor = (si.chipType == S3_VIRGE_VX
+		&& mode.timing.h_display == 640 && mode.timing.v_display == 480);
 
 	return true;
 }

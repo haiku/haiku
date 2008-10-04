@@ -8,8 +8,9 @@
 
 #include "accel.h"
 
-#include <create_display_modes.h>
+#include <create_display_modes.h>		// common accelerant header file
 #include <string.h>
+#include <unistd.h>
 
 
 void 
@@ -29,7 +30,7 @@ InitCrtcTimingValues(const DisplayModeEx& mode, int horzScaleFactor, uint8 crtc[
 	int hDisp_e = (mode.timing.h_display * horzScaleFactor) / 8 - 1;
 	int hSync_s = (mode.timing.h_sync_start * horzScaleFactor) / 8;
 	int hSync_e = (mode.timing.h_sync_end * horzScaleFactor) / 8;
-	int hBlank_s = hDisp_e;			// start of horizontal blanking
+	int hBlank_s = hDisp_e + 1;		// start of horizontal blanking
 	int hBlank_e = hTotal;			// end of horizontal blanking
 
 	int vTotal = mode.timing.v_total - 2;
@@ -38,8 +39,6 @@ InitCrtcTimingValues(const DisplayModeEx& mode, int horzScaleFactor, uint8 crtc[
 	int vSync_e = mode.timing.v_sync_end;
 	int vBlank_s = vDisp_e;			// start of vertical blanking
 	int vBlank_e = vTotal;			// end of vertical blanking
-
-	TRACE("InitCrtcTimingValues()\n");
 
 	// CRTC Controller values
 
@@ -146,6 +145,28 @@ FindDisplayMode(int width, int height, int refreshRate, uint32 colorDepth)
 }
 
 
+
+static bool
+IsThereEnoughFBMemory(const display_mode* mode, uint32 bitsPerPixel)
+{
+	// Test if there is enough Frame Buffer memory for the mode and color depth
+	// specified by the caller, and return true if there is sufficient memory.
+
+	uint32 maxWidth = mode->virtual_width;
+	if (mode->timing.h_display > maxWidth)
+		maxWidth = mode->timing.h_display;
+
+	uint32 maxHeight = mode->virtual_height;
+	if (mode->timing.v_display > maxHeight)
+		maxHeight = mode->timing.v_display;
+
+	uint32 bytesPerPixel = (bitsPerPixel + 7) / 8;
+
+	return (maxWidth * maxHeight * bytesPerPixel < gInfo.sharedInfo->maxFrameBufferSize);
+}
+
+
+
 bool
 IsModeUsable(const display_mode* mode)
 {
@@ -162,10 +183,9 @@ IsModeUsable(const display_mode* mode)
 	if ( ! gInfo.GetColorSpaceParams(mode->space, bitsPerPixel, maxPixelClock))
 		return false;
 
-	// Is there enough memory to handle the mode?
+	// Is there enough frame buffer memory to handle the mode?
 
-	if (mode->virtual_width * mode->virtual_height * ((bitsPerPixel + 7) / 8)
-			> si.maxFrameBufferSize)
+	if ( ! IsThereEnoughFBMemory(mode, bitsPerPixel))
 		return false;
 
 	if (mode->timing.pixel_clock > maxPixelClock)
@@ -190,42 +210,65 @@ IsModeUsable(const display_mode* mode)
 	if (mode->timing.h_display == 640 && mode->timing.v_display < 480)
 		return false;
 
-	// In most mode lists, there are three entries for 640 x 480 which have a
-	// refresh rate of 60 Hz.  The one with a pixel clock of 25175 works fine
-	// with the S3 chips;  however, the other two with higher clock rates
-	// cause the display to be offset down and to the right;  thus, reject them.
-
-	if (mode->timing.h_display == 640 && mode->timing.v_display == 480) {
-		int modeRefreshRate = int(((mode->timing.pixel_clock * 1000.0 /
-				mode->timing.h_total) / mode->timing.v_total) + 0.5);
-		if (modeRefreshRate == 60 && mode->timing.pixel_clock > 26000)
-			return false;
-	}
-
-	// If the video is connected directly to an LCD display (ie, laptop
+	// If the video chip is connected directly to an LCD display (ie, laptop
 	// computer), restrict the display mode to resolutions where the width and
 	// height of the mode are less than or equal to the width and height of the
-	// LCD display.  Note that this code is not needed under Haiku since it can
-	// get the preferred mode which should be the resolution of the LCD display.
+	// LCD display.
 
-#ifndef __HAIKU__
-
-	if (si.displayType == MT_LCD && si.panelX > 0 && si.panelY > 0 &&
-		(mode->timing.h_display > si.panelX
+	if (si.displayType == MT_LCD && si.panelX > 0 && si.panelY > 0
+			&& (mode->timing.h_display > si.panelX
 			|| mode->timing.v_display > si.panelY)) {
 		return false;
 	}
-
-#endif	// __HAIKU__
 
 	return true;
 }
 
 
 status_t
-CreateModeList(bool (*checkMode)(const display_mode* mode))
+CreateModeList( bool (*checkMode)(const display_mode* mode),
+				bool (*getEdid)(edid1_info& edidInfo))
 {
 	SharedInfo& si = *gInfo.sharedInfo;
+
+	// Obtain EDID info which is needed for for building the mode list.
+	// However, if a laptop's LCD display is active, bypass getting the EDID
+	// info since it is not needed, and if the external display supports only
+	// resolutions smaller than the size of the laptop LCD display, it would
+	// unnecessarily restrict size of the resolutions that could be set for
+	// laptop LCD display.
+
+	si.bHaveEDID = false;
+
+	if (si.displayType != MT_LCD) {
+		if (getEdid != NULL)
+			si.bHaveEDID = getEdid(si.edidInfo);
+
+		if ( ! si.bHaveEDID) {
+			S3GetEDID ged;
+			ged.magic = S3_PRIVATE_DATA_MAGIC;
+
+			if (ioctl(gInfo.deviceFileDesc, S3_GET_EDID, &ged, sizeof(ged)) == B_OK) {
+				if (ged.rawEdid.version.version != 1
+						|| ged.rawEdid.version.revision > 4) {
+					TRACE("CreateModeList(); EDID version %d.%d out of range\n",
+						ged.rawEdid.version.version, ged.rawEdid.version.revision);
+				} else {
+					edid_decode(&si.edidInfo, &ged.rawEdid);	// decode & save EDID info
+					si.bHaveEDID = true;
+				}
+			}
+		}
+
+		if (si.bHaveEDID) {
+#ifdef ENABLE_DEBUG_TRACE
+			edid_dump(&(si.edidInfo));
+#endif
+		} else {
+			TRACE("CreateModeList(); Unable to get EDID info\n");
+		}
+	}
+
 	display_mode* list;
 	uint32 count = 0;
 	area_id listArea;
@@ -254,9 +297,9 @@ ProposeDisplayMode(display_mode *target, const display_mode *low,
 	(void)low;		// avoid compiler warning for unused arg
 	(void)high;		// avoid compiler warning for unused arg
 
-	TRACE("ProposeDisplayMode()  clock: %d, width: %d, height: %d, space: 0x%X\n",
-		  target->timing.pixel_clock, target->virtual_width, target->virtual_height,
-		  target->space);
+	TRACE("ProposeDisplayMode()  %dx%d, pixel clock: %d kHz, space: 0x%X\n",
+		target->timing.h_display, target->timing.v_display,
+		target->timing.pixel_clock, target->space);
 
 	// Search the mode list for the specified mode.
 
@@ -275,6 +318,7 @@ ProposeDisplayMode(display_mode *target, const display_mode *low,
 }
 
 
+
 status_t 
 SetDisplayMode(display_mode* pMode)
 {
@@ -290,27 +334,50 @@ SetDisplayMode(display_mode* pMode)
 	if ( ! gInfo.GetColorSpaceParams(mode.space, mode.bpp, maxPixelClock))
 		return B_ERROR;
 
-	mode.bytesPerRow = mode.virtual_width * ((mode.bpp + 7) / 8);	// use virtual width
-
 	if (ProposeDisplayMode(&mode, pMode, pMode) != B_OK)
 		return B_ERROR;
 
-	// Test if there is sufficient memory for this mode.  Use the virtual width
-	// and height for this calculation since one or both might be greater than
-	// the actual dimensions of the mode.
+	// Note that for some Savage chips, accelerated drawing is badly messed up
+	// when the display width is 1400 because 1400 is not evenly divisible by 32.
+	// For those chips, set the width to 1408 so that accelerated drawing will
+	// draw properly.
 
-	if (mode.bytesPerRow * mode.virtual_height > si.maxFrameBufferSize)
+	if (mode.timing.h_display == 1400 && (si.chipType == S3_PROSAVAGE
+			|| si.chipType == S3_PROSAVAGE_DDR
+			|| si.chipType == S3_TWISTER
+			|| si.chipType == S3_SUPERSAVAGE
+			|| si.chipType == S3_SAVAGE2000)) {
+		mode.timing.h_display = 1408;
+		mode.virtual_width = 1408;
+	}
+
+	int bytesPerPixel = (mode.bpp + 7) / 8;
+	mode.bytesPerRow = mode.timing.h_display * bytesPerPixel;
+
+	// Is there enough frame buffer memory for this mode?
+
+	if ( ! IsThereEnoughFBMemory(&mode, mode.bpp))
 		return B_ERROR;
 
-	TRACE("Display Mode:  width = %d, height = %d, depth = %d\n",
+	TRACE("Set display mode: %dx%d  virtual size: %dx%d  color depth: %d bpp\n",
+		mode.timing.h_display, mode.timing.v_display,
 		mode.virtual_width, mode.virtual_height, mode.bpp);
 
-	TRACE("Mode Timing = { %d  %d %d %d %d  %d %d %d %d  0x%x }\n",
+	TRACE("   mode timing: %d  %d %d %d %d  %d %d %d %d\n",
 		mode.timing.pixel_clock,
-		mode.timing.h_display, mode.timing.h_sync_start, mode.timing.h_sync_end,
+		mode.timing.h_display,
+		mode.timing.h_sync_start, mode.timing.h_sync_end,
 		mode.timing.h_total,
-		mode.timing.v_display, mode.timing.v_sync_start, mode.timing.v_sync_end,
-		mode.timing.v_total, mode.timing.flags);
+		mode.timing.v_display,
+		mode.timing.v_sync_start, mode.timing.v_sync_end,
+		mode.timing.v_total);
+
+	TRACE("   mode hFreq: %.1f kHz  vFreq: %.1f Hz  %chSync %cvSync\n",
+		double(mode.timing.pixel_clock) / mode.timing.h_total,
+		((double(mode.timing.pixel_clock) / mode.timing.h_total) * 1000.0)
+		/ mode.timing.v_total,
+		(mode.timing.flags & B_POSITIVE_HSYNC) ? '+' : '-',
+		(mode.timing.flags & B_POSITIVE_VSYNC) ? '+' : '-');
 
 	if ( ! gInfo.SetDisplayMode(mode))
 		return B_ERROR;
@@ -379,7 +446,8 @@ GetFrameBufferConfig(frame_buffer_config* pFBC)
 
 	pFBC->frame_buffer = (void*)((addr_t)si.videoMemAddr + si.frameBufferOffset);
 	pFBC->frame_buffer_dma = (void*)((addr_t)si.videoMemPCI + si.frameBufferOffset);
-	pFBC->bytes_per_row = si.displayMode.bytesPerRow;
+	uint32 bytesPerPixel = (si.displayMode.bpp + 7) / 8;
+	pFBC->bytes_per_row = si.displayMode.virtual_width * bytesPerPixel;
 
 	return B_OK;
 }
@@ -418,7 +486,6 @@ GetTimingConstraints(display_timing_constraints *constraints)
 {
 	(void)constraints;		// avoid compiler warning for unused arg
 
-	TRACE("GetTimingConstraints() called\n");
 	return B_ERROR;
 }
 
@@ -428,8 +495,6 @@ GetPreferredDisplayMode(display_mode* preferredMode)
 {
 	// If the chip is connected to a laptop LCD panel, find the mode with
 	// matching width and height, 60 Hz refresh rate, and greatest color depth.
-
-	TRACE("GetPreferredDisplayMode()\n");
 
 	SharedInfo& si = *gInfo.sharedInfo;
 
@@ -452,8 +517,6 @@ GetPreferredDisplayMode(display_mode* preferredMode)
 status_t
 GetEdidInfo(void* info, size_t size, uint32* _version)
 {
-	TRACE("GetEdidInfo()\n");
-
 	SharedInfo& si = *gInfo.sharedInfo;
 
 	if ( ! si.bHaveEDID)

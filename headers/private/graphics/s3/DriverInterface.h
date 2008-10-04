@@ -2,7 +2,7 @@
 	Copyright 2007-2008 Haiku, Inc.  All rights reserved.
 	Distributed under the terms of the MIT license.
 
-	Other authors:
+	Authors:
 	Gerald Zajac 2007-2008
 */
 
@@ -16,27 +16,42 @@
 #include <edid.h>
 
 
-// This is the info that needs to be shared between the kernel driver and
-// the accelerant for the sample driver.
+// This file contains info that is shared between the kernel driver and the
+// accelerant, and info that is shared among the source files of the accelerant.
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
 
 #define ENABLE_DEBUG_TRACE		// if defined, turns on debug output to syslog
 
 
 #define NUM_ELEMENTS(a) ((int)(sizeof(a) / sizeof(a[0]))) 	// for computing number of elements in an array
 
-struct benaphore {
+struct Benaphore {
 	sem_id	sem;
-	int32	ben;
-};
+	int32	count;
 
-#define INIT_BEN(x) 	x.sem = create_sem(0, "S3 "#x" benaphore");	x.ben = 0;
-#define AQUIRE_BEN(x)	if((atomic_add(&(x.ben), 1)) >= 1) acquire_sem(x.sem);
-#define RELEASE_BEN(x)	if((atomic_add(&(x.ben), -1)) > 1) release_sem(x.sem);
-#define DELETE_BEN(x)	delete_sem(x.sem);
+	status_t Init(const char* name)
+	{
+		count = 0;
+		sem = create_sem(0, name);
+		return sem < 0 ? sem : B_OK;
+	}
+
+	status_t Acquire()
+	{
+		if (atomic_add(&count, 1) > 0)
+			return acquire_sem(sem);
+		return B_OK;
+	}
+
+	status_t Release()
+	{
+		if (atomic_add(&count, -1) > 1)
+			return release_sem(sem);
+		return B_OK;
+	}
+
+	void Delete()	{ delete_sem(sem); }
+};
 
 
 #define S3_PRIVATE_DATA_MAGIC	 0x4521 // a private driver rev, of sorts
@@ -45,6 +60,7 @@ struct benaphore {
 enum {
 	S3_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
 	S3_DEVICE_NAME,
+	S3_GET_EDID,
 	S3_GET_PIO,
 	S3_SET_PIO,
 	S3_RUN_INTERRUPTS,
@@ -54,7 +70,7 @@ enum {
 // Chip type numbers.  These are used to group the chips into related
 // groups.	See table S3_ChipTable in driver.c
 
-enum S3_ChipType {
+enum ChipType {
 	S3_TRIO64 = 1,
 	S3_TRIO64_VP,		// Trio64V+ has same ID as Trio64 but different revision number
 	S3_TRIO64_UVP,
@@ -106,33 +122,10 @@ enum MonitorType {
 };
 
 
-// Bitmap descriptor structures for BCI (for Savage chips)
-struct HIGH {
-	unsigned short Stride;
-	unsigned char Bpp;
-	unsigned char ResBWTile;
-};
-
-struct BMPDESC1 {
-	unsigned long Offset;
-	HIGH  HighPart;
-};
-
-struct BMPDESC2 {
-	unsigned long LoPart;
-	unsigned long HiPart;
-};
-
-union BMPDESC {
-	BMPDESC1 bd1;
-	BMPDESC2 bd2;
-};
-
-
 
 struct DisplayModeEx : display_mode {
-	uint32	bpp;			// bits/pixel
-	uint32	bytesPerRow;	// number of bytes in one line/row
+	uint32	bpp;				// bits/pixel
+	uint32	bytesPerRow;		// actual number of bytes in one line/row
 };
 
 
@@ -146,6 +139,9 @@ struct SharedInfo {
 
 	bool	bAccelerantInUse;	// true = accelerant has been initialized
 	bool	bInterruptAssigned;	// card has a useable interrupt assigned to it
+
+	bool	bDisableHdwCursor;	// true = disable hardware cursor & use software cursor
+	bool	bDisableAccelDraw;	// true = disable accelerated drawing
 
 	sem_id	vertBlankSem;		// vertical blank semaphore; if < 0, there is no semaphore
 
@@ -169,11 +165,8 @@ struct SharedInfo {
 	area_id modeArea;			// area containing list of display modes the driver supports
 	uint32	modeCount;			// number of display modes in the list
 
-	// Cursor info.
-	struct {
-		uint16	hot_x;			// Cursor hot spot. Top left corner of the cursor
-		uint16	hot_y;			// is 0,0
-	} cursor;
+	uint16	cursorHotX;			// Cursor hot spot. Top left corner of the cursor
+	uint16	cursorHotY;			// is 0,0
 
 	// Current display mode configuration, and other parameters related to
 	// current display mode.
@@ -183,12 +176,7 @@ struct SharedInfo {
 	edid1_info	edidInfo;
 	bool		bHaveEDID;		// true = EDID info from device is in edidInfo
 
-	// Acceleration engine.
-	struct {
-		uint64		count;		// last fifo slot used
-		uint64		lastIdle;	// last fifo slot we *know* the engine was idle after
-		benaphore	lock;	 	// for serializing access to the acceleration engine
-	} engine;
+	Benaphore	engineLock;		// for serializing access to the acceleration engine
 
 	int		mclk;
 
@@ -198,41 +186,39 @@ struct SharedInfo {
 	uint16	panelY;				// laptop LCD height
 
 	// Command Overflow Buffer (COB) parameters for Savage chips.
-	bool	bDisableCOB;		// enable/disable COB for Savage 4 & ProSavage
-	uint32	cobIndex;			// size index
-	uint32	cobSize;			// size in bytes
+	uint32	cobSizeIndex;		// size index
 	uint32	cobOffset;			// offset in video memory
-	uint32	bciThresholdLo; 	// low and high thresholds for
-	uint32  bciThresholdHi; 	// shadow status update (32bit words)
 
-	BMPDESC GlobalBD;			// Bitmap Descriptor for BCI
+	uint32	globalBitmapDesc;	// Global Bitmap Descriptor for BCI
 };
 
 
 // Set some boolean condition (like enabling or disabling interrupts)
 struct S3SetBoolState {
-	uint32	magic;		// magic number to make sure the caller groks us
+	uint32	magic;		// magic number
 	bool	bEnable;	// state to set
 };
 
 
 // Retrieve the area_id of the kernel/accelerant shared info
 struct S3GetPrivateData {
-	uint32	magic;		// magic number to make sure the caller groks us
+	uint32	magic;			// magic number
 	area_id sharedInfoArea;	// ID of area containing shared information
 };
 
 
-struct S3GetSetPIO {
-	uint32	  magic;	// magic number to make sure the caller groks us
-	uint32	  offset;	// offset of PIO register to read/write
-	uint32	  size;		// number of bytes to transfer
-	uint32	  value;	// value to write or value that was read
+struct S3GetEDID {
+	uint32		magic;		// magic number
+	edid1_raw	rawEdid;	// raw EDID info to obtain
 };
 
 
-#if defined(__cplusplus)
-}
-#endif
+struct S3GetSetPIO {
+	uint32	magic;	// magic number
+	uint32	offset;	// offset of PIO register to read/write
+	uint32	size;		// number of bytes to transfer
+	uint32	value;	// value to write or value that was read
+};
+
 
 #endif	// DRIVERINTERFACE_H

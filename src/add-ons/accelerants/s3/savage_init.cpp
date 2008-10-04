@@ -95,23 +95,6 @@ WaitIdleEmpty2K()
 }
 
 
-static bool
-IsLCDWidthValid(int width)
-{
-	// Search the array of valid LCD widths to find a width that matches the
-	// width by the caller, and return true if a match is found.
-
-	const int lcdWidths[] = { 640, 800, 1024, 1152, 1280, 1400, 1440, 1600, 1680 };
-
-	for (int i = 0; i < NUM_ELEMENTS(lcdWidths); i++) {
-		if (lcdWidths[i] == width)
-			return true;
-	}
-
-	return false;		// match not found
-}
-
-
 static void
 Savage_GetPanelInfo()
 {
@@ -132,20 +115,12 @@ Savage_GetPanelInfo()
 	int panelX = (ReadSeqReg(0x61) + ((ReadSeqReg(0x66) & 0x02) << 7) + 1) * 8;
 	int panelY =  ReadSeqReg(0x69) + ((ReadSeqReg(0x6e) & 0x70) << 4) + 1;
 
-	if ( ! IsLCDWidthValid(panelX)) {
+	// A Savage IX/MV in a Thinkpad T22 or SuperSavage in a Thinkpad T23 with
+	// a 1400x1050 display will return a width of 1408;  thus, in this case,
+	// set the width to the correct value of 1400.
 
-		// Some chips such as the Savage IX/MV in a Thinkpad T-22 will return
-		// a width that is 8 pixels too wide probably because reg SR61 is set
-		// to a value +1 higher than it should be.  Subtract 8 from the width,
-		// and check if that is a valid width.
-
-		panelX -= 8;
-		if ( ! IsLCDWidthValid(panelX)) {
-			TRACE("%dx%d LCD panel width invalid.\n", panelX + 8, panelY);
-			si.displayType = MT_CRT;
-			return;
-		}
-	}
+	if (panelX == 1408)
+		panelX = 1400;
 
 	char* sTechnology;
 
@@ -199,7 +174,7 @@ Savage_Init(void)
 	static		 uint8 RamSavage4[] =  { 2, 4, 8, 12, 16, 32, 64, 32 };
 	static const uint8 RamSavageMX[] = { 2, 8, 4, 16, 8, 16, 4, 16 };
 	static const uint8 RamSavageNB[] = { 0, 2, 4, 8, 16, 32, 16, 2 };
-	int ramSizeMB = 0;		// memory size in megabytes
+	uint32 ramSizeMB = 0;		// memory size in megabytes
 
 	uint8 cr36 = ReadCrtcReg(0x36);		// get amount of video ram
 
@@ -239,57 +214,37 @@ Savage_Init(void)
 			break;
 	}
 
-	TRACE("Savage_Init() memory size: %d MB\n", ramSizeMB);
+	uint32 usableMB = ramSizeMB;
 
-	if (ramSizeMB <= 0)
+
+	// If a Savage MX chip has > 8 MB, clamp it at 8 MB since memory for the
+	// hardware cursor above 8 MB is unusable.
+
+	if (si.chipType == S3_SAVAGE_MX && ramSizeMB > 8)
+		usableMB = 8;
+
+	TRACE("Savage_Init() memory size: %d MB, usable memory: %d MB\n", ramSizeMB, usableMB);
+
+	if (usableMB <= 0)
 		return B_ERROR;
 
-	si.videoMemSize = ramSizeMB * 1024 * 1024;
-
-
-	// Certain Savage4 and ProSavage chips can have coherency problems
-	// with respect to the Command Overflow Buffer (COB);	thus, to avoid
-	// problems with these chips, set bDisableCOB to true.
-
-	si.bDisableCOB = false;
+	si.videoMemSize = usableMB * 1024 * 1024;
 
 	// Compute the Command Overflow Buffer (COB) location.
 
-	if ((S3_SAVAGE4_SERIES(si.chipType) || S3_SUPERSAVAGE == si.chipType)
-		&& si.bDisableCOB) {
-
-		// The Savage4 and ProSavage have COB coherency bugs which render
-		// the buffer useless.
-
-		si.cobIndex = 0;
-		si.cobSize = 0;
-		si.bciThresholdHi = 32;
-		si.bciThresholdLo = 0;
-	} else {
-		// We use 128kB for the COB on all other chips.
-		si.cobSize = 0x20000;
-		if (S3_SAVAGE_3D_SERIES(si.chipType) || si.chipType == S3_SAVAGE2000)
-			si.cobIndex = 7;	// rev.A savage4 apparently also uses 7
-		else
-			si.cobIndex = 2;
-
-		// Max command size: 2560 entries.
-		si.bciThresholdHi = si.cobSize / 4 + 32 - 2560;
-		si.bciThresholdLo = si.bciThresholdHi - 2560;
-	}
+	uint32 cobSize = 0x20000;	// use 128kB for the COB
+	si.cobSizeIndex = 7;
 
 	// Note that the X.org developers stated that the command overflow buffer
 	// (COB) must END at a 4MB boundary which for all practical purposes means
-	// the very end of the video memory.  The cursor must be at the beginning
-	// of the video memory.  It had been tried immediately preceding the COB,
-	// but the Savage MX chip screws up the cursor in that case.
+	// the very end of the video memory.
 
-	si.cobOffset = (si.videoMemSize - si.cobSize) & ~0x1ffff;	// align cob to 128k
-	si.cursorOffset = 0;
-	si.frameBufferOffset = si.cursorOffset + CURSOR_BYTES;
-	si.maxFrameBufferSize = si.cobOffset - si.frameBufferOffset;
+	si.cobOffset = (si.videoMemSize - cobSize) & ~0x1ffff;	// align cob to 128k
+	si.cursorOffset = (si.cobOffset - CURSOR_BYTES) & ~0xfff;	// align to 4k boundary
+	si.frameBufferOffset = 0;
+	si.maxFrameBufferSize = si.cursorOffset - si.frameBufferOffset;
 
-	TRACE("cobIndex: %d	cobSize: %d  cobOffset: 0x%x\n", si.cobIndex, si.cobSize, si.cobOffset);
+	TRACE("cobSizeIndex: %d	cobSize: %d  cobOffset: 0x%x\n", si.cobSizeIndex, cobSize, si.cobOffset);
 	TRACE("cursorOffset: 0x%x  frameBufferOffset: 0x%x\n", si.cursorOffset, si.frameBufferOffset);
 
 	// Reset graphics engine to avoid memory corruption.
@@ -340,13 +295,12 @@ Savage_Init(void)
 	si.colorSpaces[2] = B_RGB32;
 	si.colorSpaceCount = 3;
 
-	// Get info about the display capabilities (EDID).
-
-	Savage_GetEdidInfo();
+	si.bDisableHdwCursor = false;	// allow use of hardware cursor
+	si.bDisableAccelDraw = false;	// allow use of accelerated drawing functions
 
 	// Setup the mode list.
 
-	return CreateModeList(IsModeUsable);
+	return CreateModeList(IsModeUsable, Savage_GetEdidInfo);
 }
 
 
@@ -379,7 +333,7 @@ Savage_SetFunctionPointers(void)
 	}
 
 	gInfo.DPMSCapabilities = Savage_DPMSCapabilities;
-	gInfo.DPMSMode = Savage_DPMSMode;
+	gInfo.GetDPMSMode = Savage_GetDPMSMode;
 	gInfo.SetDPMSMode = Savage_SetDPMSMode;
 
 	gInfo.LoadCursorImage = Savage_LoadCursorImage;

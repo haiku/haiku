@@ -26,7 +26,7 @@ Trio64_DPMSCapabilities(void)
 
 
 uint32 
-Trio64_DPMSMode(void)
+Trio64_GetDPMSMode(void)
 {
 	// Return the current DPMS mode.
 
@@ -53,7 +53,7 @@ Trio64_DPMSMode(void)
 			TRACE("Unknown DPMS mode, reg sr0D: 0x%X\n", ReadSeqReg(0x0d));
 	}
 
-	TRACE("Trio64_DPMSMode() mode: %d\n", mode);
+	TRACE("Trio64_GetDPMSMode() mode: %d\n", mode);
 	return mode;
 }
 

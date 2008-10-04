@@ -80,13 +80,13 @@ SetI2CSignals(void* cookie, int _clock, int data)
 
 
 bool
-Virge_GetEdidInfo(void)
+Virge_GetEdidInfo(edid1_info& edidInfo)
 {
 	// Get the EDID info and return true if successful.
 
 	SharedInfo& si = *gInfo.sharedInfo;
 
-	si.bHaveEDID = false;
+	bool bResult = false;
 
 	if (si.chipType == S3_TRIO_3D_2X) {
 		uint32 DDCPort = 0xAA;
@@ -100,7 +100,7 @@ Virge_GetEdidInfo(void)
 		uint8 tmp = ReadCrtcReg(DDCPort);
 		WriteCrtcReg(DDCPort, tmp | 0x13);
 
-		si.bHaveEDID = (ddc2_read_edid1(&bus, &(si.edidInfo), NULL, NULL) == B_OK);
+		bResult = (ddc2_read_edid1(&bus, &edidInfo, NULL, NULL) == B_OK);
 
 		WriteCrtcReg(DDCPort, tmp);
 	} else {
@@ -113,18 +113,10 @@ Virge_GetEdidInfo(void)
 		uint8 tmp = ReadReg8(DDC_REG);
 		WriteReg8(DDC_REG, tmp | 0x13);
 
-		si.bHaveEDID = (ddc2_read_edid1(&bus, &(si.edidInfo), NULL, NULL) == B_OK);
+		bResult = (ddc2_read_edid1(&bus, &edidInfo, NULL, NULL) == B_OK);
 
 		WriteReg8(DDC_REG, tmp);
 	}
 
-	if (si.bHaveEDID) {
-#ifdef ENABLE_DEBUG_TRACE
-		edid_dump(&(si.edidInfo));
-#endif
-	} else {
-		TRACE("Virge_GetEdidInfo() failed!\n");
-	}
-
-	return si.bHaveEDID;
+	return bResult;
 }

@@ -27,7 +27,7 @@ Savage_DPMSCapabilities(void)
 
 
 uint32 
-Savage_DPMSMode(void)
+Savage_GetDPMSMode(void)
 {
 	// Return the current DPMS mode.
 
@@ -59,7 +59,7 @@ Savage_DPMSMode(void)
 		mode = ((ReadSeqReg(0x31) & 0x10) ? B_DPMS_ON : B_DPMS_OFF);
 	}
 
-	TRACE("Savage_DPMSMode() mode: %d\n", mode);
+	TRACE("Savage_GetDPMSMode() mode: %d\n", mode);
 	return mode;
 }
 

@@ -97,15 +97,15 @@ InitAccelerant(int fileDesc)
 		} else {
 			result = gInfo.ChipInit();	// perform init related to current chip
 			if (result == B_OK) {
+				result = si.engineLock.Init("ATI engine lock");
+				if (result == B_OK) {
+					if (gInfo.ShowCursor != NULL)
+						gInfo.ShowCursor(false);
 
-				INIT_BEN(si.engine.lock);
-				si.engine.lastIdle = 0;
-				si.engine.count = 0;
-
-				gInfo.ShowCursor(false);
-
-				// ensure that this function won't be executed again (copies should be clones)
-				si.bAccelerantInUse = true;
+					// ensure that this function won't be executed again
+					// (copies should be clones)
+					si.bAccelerantInUse = true;
+				}
 			}
 		}
 

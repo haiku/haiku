@@ -26,7 +26,7 @@ Virge_DPMSCapabilities(void)
 
 
 uint32 
-Virge_DPMSMode(void)
+Virge_GetDPMSMode(void)
 {
 	// Return the current DPMS mode.
 
@@ -53,7 +53,7 @@ Virge_DPMSMode(void)
 			TRACE("Unknown DPMS mode, reg sr0D: 0x%X\n", ReadSeqReg(0x0d));
 	}
 
-	TRACE("Virge_DPMSMode() mode: %d\n", mode);
+	TRACE("Virge_GetDPMSMode() mode: %d\n", mode);
 	return mode;
 }
 

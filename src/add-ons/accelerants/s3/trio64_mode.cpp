@@ -130,7 +130,7 @@ Trio64_ModeInit(const DisplayModeEx& mode)
 			break;
 	}
 
-	bool bEnableAccelFuncs = true;
+	bool bDisableAccelFuncs = false;
 
 	switch (mode.timing.h_display) {
 		case 640:
@@ -152,7 +152,7 @@ Trio64_ModeInit(const DisplayModeEx& mode)
 			cr50 |= 0x81;
 			break;
 		default:
-			bEnableAccelFuncs = false;	// use app_server default accel functions
+			bDisableAccelFuncs = true;	// use app_server default accel functions
 			break;
 	}
 
@@ -167,20 +167,7 @@ Trio64_ModeInit(const DisplayModeEx& mode)
 	// only with the display widths defined in the above switch statement.  For
 	// the other widths, the default functions in the app_server will be used.
 
-	if (bEnableAccelFuncs)
-	{
-		gInfo.FillRectangle = Trio64_FillRectangle;
-		gInfo.FillSpan = Trio64_FillSpan;
-		gInfo.InvertRectangle = Trio64_InvertRectangle;
-		gInfo.ScreenToScreenBlit = Trio64_ScreenToScreenBlit;
-	}
-	else
-	{
-		gInfo.FillRectangle = NULL;
-		gInfo.FillSpan = NULL;
-		gInfo.InvertRectangle = NULL;
-		gInfo.ScreenToScreenBlit = NULL;
-	}
+	si.bDisableAccelDraw = bDisableAccelFuncs;
 
 	// Set the standard CRTC vga regs.
 

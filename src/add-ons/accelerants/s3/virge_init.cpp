@@ -226,13 +226,12 @@ Virge_Init(void)
 	si.colorSpaces[1] = B_RGB16;
 	si.colorSpaceCount = 2;
 
-	// Get info about the display capabilities (EDID).
-
-	Virge_GetEdidInfo();
+	si.bDisableHdwCursor = false;	// allow use of hardware cursor
+	si.bDisableAccelDraw = false;	// allow use of accelerated drawing functions
 
 	// Setup the mode list.
 
-	return CreateModeList(IsModeUsable);
+	return CreateModeList(IsModeUsable, Virge_GetEdidInfo);
 }
 
 
@@ -251,7 +250,7 @@ Virge_SetFunctionPointers(void)
 	gInfo.WaitIdleEmpty = VirgeWaitIdleEmpty;
 
 	gInfo.DPMSCapabilities = Virge_DPMSCapabilities;
-	gInfo.DPMSMode = Virge_DPMSMode;
+	gInfo.GetDPMSMode = Virge_GetDPMSMode;
 	gInfo.SetDPMSMode = Virge_SetDPMSMode;
 
 	gInfo.LoadCursorImage = Virge_LoadCursorImage;

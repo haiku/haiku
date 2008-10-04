@@ -136,9 +136,12 @@ Trio64_Init(void)
 	si.colorSpaces[1] = B_RGB16;
 	si.colorSpaceCount = 2;
 
+	si.bDisableHdwCursor = false;	// allow use of hardware cursor
+	si.bDisableAccelDraw = false;	// allow use of accelerated drawing functions
+
 	// Setup the mode list.
 
-	return CreateModeList(Trio64_IsModeUsable);
+	return CreateModeList(Trio64_IsModeUsable, NULL);
 }
 
 
@@ -152,7 +155,7 @@ Trio64_SetFunctionPointers(void)
 	gInfo.WaitIdleEmpty = WaitIdle;
 
 	gInfo.DPMSCapabilities = Trio64_DPMSCapabilities;
-	gInfo.DPMSMode = Trio64_DPMSMode;
+	gInfo.GetDPMSMode = Trio64_GetDPMSMode;
 	gInfo.SetDPMSMode = Trio64_SetDPMSMode;
 
 	gInfo.LoadCursorImage = Trio64_LoadCursorImage;

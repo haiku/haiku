@@ -25,7 +25,7 @@ Savage_FillRectangle(engine_token *et, uint32 color, fill_rect_params *pList, ui
 
 	(void)et;		// avoid compiler warning for unused arg
 
-	BCI_CMD_SET_ROP(cmd, 0xCC);		// use GXcopy for rop
+	BCI_CMD_SET_ROP(cmd, 0xF0);		// use GXcopy for rop
 
 	while (count--) {
 		int x = pList->left;
@@ -38,8 +38,8 @@ Savage_FillRectangle(engine_token *et, uint32 color, fill_rect_params *pList, ui
 		gInfo.WaitQueue(7);
 
 		BCI_SEND(cmd);
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->frameBufferOffset);
+		BCI_SEND(gInfo.sharedInfo->globalBitmapDesc);
 
 		BCI_SEND(color);
 		BCI_SEND(BCI_X_Y(x, y));
@@ -58,7 +58,7 @@ Savage_FillSpan(engine_token *et, uint32 color, uint16 *pList, uint32 count)
 
 	(void)et;		// avoid compiler warning for unused arg
 
-	BCI_CMD_SET_ROP(cmd, 0xCC);		// use GXcopy for rop
+	BCI_CMD_SET_ROP(cmd, 0xF0);		// use GXcopy for rop
 
 	while (count--) {
 		int y = *pList++;
@@ -78,8 +78,8 @@ Savage_FillSpan(engine_token *et, uint32 color, uint16 *pList, uint32 count)
 		gInfo.WaitQueue(7);
 
 		BCI_SEND(cmd);
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->frameBufferOffset);
+		BCI_SEND(gInfo.sharedInfo->globalBitmapDesc);
 
 		BCI_SEND(color);
 		BCI_SEND(BCI_X_Y(x, y));
@@ -109,8 +109,8 @@ Savage_InvertRectangle(engine_token *et, fill_rect_params *pList, uint32 count)
 		gInfo.WaitQueue(7);
 
 		BCI_SEND(cmd);
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->frameBufferOffset);
+		BCI_SEND(gInfo.sharedInfo->globalBitmapDesc);
 
 		BCI_SEND(BCI_X_Y(x, y));
 		BCI_SEND(BCI_W_H(w, h));
@@ -157,17 +157,17 @@ Savage_ScreenToScreenBlit(engine_token *et, blit_params *pList, uint32 count)
 
 		BCI_SEND(cmd);
 
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->frameBufferOffset);
+		BCI_SEND(gInfo.sharedInfo->globalBitmapDesc);
 
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
-		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->frameBufferOffset);
+		BCI_SEND(gInfo.sharedInfo->globalBitmapDesc);
 
 		BCI_SEND(BCI_X_Y(src_x, src_y));
 		BCI_SEND(BCI_X_Y(dest_x, dest_y));
 		BCI_SEND(BCI_W_H(width + 1, height + 1));
 
-		pList ++;
+		pList++;
 	}
 }
 

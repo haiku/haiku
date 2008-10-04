@@ -14,6 +14,8 @@ get_accelerant_hook(uint32 feature, void* data)
 {
 	(void)data;		// avoid compiler warning for unused arg
 
+	SharedInfo& si = *gInfo.sharedInfo;
+
 	switch (feature) {
 		// General
 		case B_INIT_ACCELERANT:				return (void*)InitAccelerant;
@@ -42,13 +44,16 @@ get_accelerant_hook(uint32 feature, void* data)
 
 		// DPMS
 		case B_DPMS_CAPABILITIES:		return (void*)(gInfo.DPMSCapabilities);
-		case B_DPMS_MODE:				return (void*)(gInfo.DPMSMode);
+		case B_DPMS_MODE:				return (void*)(gInfo.GetDPMSMode);
 		case B_SET_DPMS_MODE:			return (void*)(gInfo.SetDPMSMode);
 
 		// Cursor
-		case B_SET_CURSOR_SHAPE:		return (void*)SetCursorShape;
-		case B_MOVE_CURSOR:				return (void*)MoveCursor;
-		case B_SHOW_CURSOR:				return (void*)(gInfo.ShowCursor);
+		case B_SET_CURSOR_SHAPE:
+			return (void*)(si.bDisableHdwCursor ? NULL : SetCursorShape);
+		case B_MOVE_CURSOR:
+			return (void*)(si.bDisableHdwCursor ? NULL : MoveCursor);
+		case B_SHOW_CURSOR:
+			return (void*)(si.bDisableHdwCursor ? NULL : gInfo.ShowCursor);
 
 		// Engine Management
 		case B_ACCELERANT_ENGINE_COUNT:	return (void*)AccelerantEngineCount;
@@ -59,10 +64,14 @@ get_accelerant_hook(uint32 feature, void* data)
 		case B_SYNC_TO_TOKEN:			return (void*)SyncToToken;
 
 		// 2D acceleration
-		case B_SCREEN_TO_SCREEN_BLIT:	return (void*)(gInfo.ScreenToScreenBlit);
-		case B_FILL_RECTANGLE:			return (void*)(gInfo.FillRectangle);
-		case B_INVERT_RECTANGLE:		return (void*)(gInfo.InvertRectangle);
-		case B_FILL_SPAN:				return (void*)(gInfo.FillSpan);
+		case B_SCREEN_TO_SCREEN_BLIT:
+			return (void*)(si.bDisableAccelDraw ? NULL : gInfo.ScreenToScreenBlit);
+		case B_FILL_RECTANGLE:
+			return (void*)(si.bDisableAccelDraw ? NULL : gInfo.FillRectangle);
+		case B_INVERT_RECTANGLE:
+			return (void*)(si.bDisableAccelDraw ? NULL : gInfo.InvertRectangle);
+		case B_FILL_SPAN:
+			return (void*)(si.bDisableAccelDraw ? NULL : gInfo.FillSpan);
 	}
 
 	return NULL;	// Return null pointer for any feature not handled above

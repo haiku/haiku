@@ -13,11 +13,6 @@
 #include "register_io.h"
 
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-
 
 #undef TRACE
 
@@ -43,7 +38,7 @@ struct AccelerantInfo {
 	display_mode* modeList;			// list of standard display modes
 	area_id		 modeListArea;		// mode list area ID
 
-	bool		 bAccelerantIsClone;// true if this is a cloned accelerant
+	bool	bAccelerantIsClone;		// true if this is a cloned accelerant
 
 	// Pointers to wait handlers.
 	void	(*WaitQueue)(uint32);
@@ -51,7 +46,7 @@ struct AccelerantInfo {
 
 	// Pointers to DPMS functions.
 	uint32	(*DPMSCapabilities)(void);
-	uint32	(*DPMSMode)(void);
+	uint32	(*GetDPMSMode)(void);
 	status_t (*SetDPMSMode)(uint32 dpms_flags);
 
 	// Pointers to cursor functions.
@@ -82,6 +77,10 @@ extern AccelerantInfo gInfo;
 // chips will have no prefix.
 //================================================================
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 // General
 status_t InitAccelerant(int fd);
 ssize_t  AccelerantCloneInfoSize(void);
@@ -109,15 +108,15 @@ status_t GetEdidInfo(void* info, size_t size, uint32* _version);
 
 // DPMS
 uint32   Savage_DPMSCapabilities(void);
-uint32   Savage_DPMSMode(void);
+uint32   Savage_GetDPMSMode(void);
 status_t Savage_SetDPMSMode(uint32 dpms_flags);
 
 uint32   Trio64_DPMSCapabilities(void);
-uint32   Trio64_DPMSMode(void);
+uint32   Trio64_GetDPMSMode(void);
 status_t Trio64_SetDPMSMode(uint32 dpms_flags);
 
 uint32   Virge_DPMSCapabilities(void);
-uint32   Virge_DPMSMode(void);
+uint32   Virge_GetDPMSMode(void);
 status_t Virge_SetDPMSMode(uint32 dpms_flags);
 
 // Cursor
@@ -152,20 +151,25 @@ void	 Virge_FillSpan(engine_token* et, uint32 color, uint16* list, uint32 count)
 void	 Virge_InvertRectangle(engine_token* et, fill_rect_params* list, uint32 count);
 void	 Virge_ScreenToScreenBlit(engine_token* et, blit_params* list, uint32 count);
 
+#if defined(__cplusplus)
+}
+#endif
+
 
 
 // Prototypes for other functions that are called from source files other than
 // where they are defined.
 //============================================================================
 
-status_t CreateModeList(bool (*checkMode)(const display_mode* mode));
+status_t CreateModeList(bool (*checkMode)(const display_mode* mode),
+						bool (*getEdid)(edid1_info& edidInfo));
 void	 InitCrtcTimingValues(const DisplayModeEx& mode, int horzScaleFactor, uint8 crtc[],
 							  uint8& cr3b, uint8& cr3c, uint8& cr5d, uint8& cr5e);
 bool	 IsModeUsable(const display_mode* mode);
 
 // Savage functions.
 
-bool	 Savage_GetEdidInfo(void);
+bool	 Savage_GetEdidInfo(edid1_info& edidInfo);
 
 bool	 Savage_LoadCursorImage(int width, int height, uint8* and_mask, uint8* xor_mask);
 void	 Savage_SetCursorPosition(int x, int y);
@@ -185,7 +189,7 @@ void	 Trio64_SetFunctionPointers(void);
 
 // Virge functions.
 
-bool	 Virge_GetEdidInfo(void);
+bool	 Virge_GetEdidInfo(edid1_info& edidInfo);
 
 bool	 Virge_LoadCursorImage(int width, int height, uint8* and_mask, uint8* xor_mask);
 void	 Virge_SetCursorPosition(int x, int y);
@@ -194,9 +198,5 @@ void	 Virge_AdjustFrame(const DisplayModeEx& mode);
 bool	 Virge_SetDisplayMode(const DisplayModeEx& mode);
 void	 Virge_SetFunctionPointers(void);
 
-
-#if defined(__cplusplus)
-}
-#endif
 
 #endif	// _ACCEL_H

@@ -50,7 +50,7 @@ SetI2CSignals(void* cookie, int _clock, int data)
 
 
 bool
-Savage_GetEdidInfo(void)
+Savage_GetEdidInfo(edid1_info& edidInfo)
 {
 	// Get the EDID info and return true if successful.
 
@@ -83,17 +83,8 @@ Savage_GetEdidInfo(void)
 	uint8 tmp = ReadCrtcReg(DDCPort);
 	WriteCrtcReg(DDCPort, tmp | 0x13);
 
-	si.bHaveEDID = (ddc2_read_edid1(&bus, &(si.edidInfo), NULL, NULL) == B_OK);
-
+	bool bResult = (ddc2_read_edid1(&bus, &edidInfo, NULL, NULL) == B_OK);
 	WriteCrtcReg(DDCPort, tmp);
 
-	if (si.bHaveEDID) {
-#ifdef ENABLE_DEBUG_TRACE
-		edid_dump(&(si.edidInfo));
-#endif
-	} else {
-		TRACE("Savage_GetEdidInfo() failed!\n");
-	}
-
-	return si.bHaveEDID;
+	return bResult;
 }

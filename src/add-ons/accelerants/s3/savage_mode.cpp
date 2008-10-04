@@ -1,7 +1,8 @@
 /*
 	Haiku S3 Savage driver adapted from the X.org Savage driver.
 
-	Copyright 1995-1997 The XFree86 Project, Inc.
+	Copyright (C) 1994-2000 The XFree86 Project, Inc.	All Rights Reserved.
+	Copyright (c) 2003-2006, X.Org Foundation
 
 	Copyright 2007-2008 Haiku, Inc.  All rights reserved.
 	Distributed under the terms of the MIT license.
@@ -21,9 +22,9 @@
 struct SavageRegRec {
 	uint8  CRTC[25];			// Crtc Controller reg's
 
-	uint8  SR12, SR13, SR15, SR18, SR1B, SR29;
-	uint8  CR31, CR33, CR34, CR3A, CR3B, CR3C;
-	uint8  CR40, CR42, CR43, CR45;
+	uint8  SR12, SR13, SR1B, SR29;
+	uint8  CR33, CR34, CR3A, CR3B, CR3C;
+	uint8  CR42, CR43, CR45;
 	uint8  CR50, CR51, CR53, CR58, CR5D, CR5E;
 	uint8  CR65, CR66, CR67, CR69;
 	uint8  CR86, CR88;
@@ -32,14 +33,11 @@ struct SavageRegRec {
 
 
 
-
 static void 
 Savage_SetGBD_Twister(const DisplayModeEx& mode)
 {
 	SharedInfo& si = *gInfo.sharedInfo;
 	int bci_enable;
-
-	TRACE("Savage_SetGBD_Twister()\n");
 
 	if (si.chipType == S3_SAVAGE4)
 		bci_enable = BCI_ENABLE;
@@ -68,12 +66,7 @@ Savage_SetGBD_Twister(const DisplayModeEx& mode)
 
 	WriteCrtcReg(0x69, 0x80, 0x80);
 
-	WriteReg32(0x8128, 0xFFFFFFFFL);
-	WriteReg32(0x812C, 0xFFFFFFFFL);
-
-	WriteReg32(S3_GLB_BD_HIGH, bci_enable | S3_LITTLE_ENDIAN | S3_BD64);
-
-	WriteCrtcReg(0x50, 0xc1, 0xc1);		// CR50, bit 7,6,0 = 111, Use GBD
+	WriteReg32(S3_GLOBAL_GBD_REG, bci_enable | S3_LITTLE_ENDIAN | S3_BD64);
 
 	// If MS1NB style linear tiling mode.
 	// bit MM850C[15] = 0 select NB linear tile mode.
@@ -82,45 +75,6 @@ Savage_SetGBD_Twister(const DisplayModeEx& mode)
 	uint32 ulTmp = ReadReg32(ADVANCED_FUNC_CTRL) | 0x8000;	// use MS-s style tile mode
 	WriteReg32(ADVANCED_FUNC_CTRL, ulTmp);
 
-	// Set up Tiled Surface Registers
-	//  Bit 25:20 - Surface width in tiles.
-	//  Bit 29 - Y Range Flag.
-	//  Bit 31:30	= 00, 4 bpp.
-	// 				= 01, 8 bpp.
-	// 				= 10, 16 bpp.
-	// 				= 11, 32 bpp.
-
-	// Global Bitmap Descriptor Register MM816C - twister/prosavage
-	//	bit 24~25: tile format
-	//		00: linear
-	//		01: destination tiling format
-	//		10: texture tiling format
-	//		11: reserved
-	//	bit 28: block write disble/enable
-	//		0: disable
-	//		1: enable
-
-	// Global Bitmap Descriptor Register MM816C - savage4
-	//	bit 24~25: tile format
-	//		00: linear
-	//		01: reserved
-	//		10: 16 bpp tiles
-	//		11: 32 bpp tiles
-	//	bit 28: block write disable/enable
-	//		0: enable
-	//		1: disable
-
-	//  Do not enable block_write even for non-tiling modes, because
-	//  the driver cannot determine if the memory type is the certain
-	//  type of SGRAM for which block_write can be used.
-
-	si.GlobalBD.bd1.HighPart.ResBWTile = TILE_FORMAT_LINEAR;	// linear
-	si.GlobalBD.bd1.HighPart.ResBWTile |= 0x10;		// disable block write
-	// HW uses width.
-	si.GlobalBD.bd1.HighPart.Stride = (uint16)(mode.timing.h_display);	// number of pixels per line
-	si.GlobalBD.bd1.HighPart.Bpp = (uint8)(mode.bpp);
-	si.GlobalBD.bd1.Offset = si.frameBufferOffset;
-
 	// CR88, bit 4 - Block write enabled/disabled.
 	//
 	// Note: Block write must be disabled when writing to tiled
@@ -128,28 +82,12 @@ Savage_SetGBD_Twister(const DisplayModeEx& mode)
 	//		 write should only be enabled for certain types of SGRAM.
 
 	WriteCrtcReg(0x88, DISABLE_BLOCK_WRITE_2D, DISABLE_BLOCK_WRITE_2D);
-
-	// CR31, bit 0 = 0, Disable address offset bits(CR6A_6-0).
-	//		 bit 0 = 1, Enable 8 Mbytes of display memory thru 64K window
-	//					at A000:0.
-
-	WriteCrtcReg(MEMORY_CONFIG_REG, 0x00, 0x01);
-
-	// Program the GBD and SBD's.
-
-	WriteReg32(S3_GLB_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_GLB_BD_HIGH, si.GlobalBD.bd2.HiPart | bci_enable | S3_LITTLE_ENDIAN | S3_BD64);
-	WriteReg32(S3_PRI_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_PRI_BD_HIGH, si.GlobalBD.bd2.HiPart);
 }
 
 
 static void 
 Savage_SetGBD_3D(const DisplayModeEx& mode)
 {
-	TRACE("Savage_SetGBD_3D()\n");
-
-	SharedInfo& si = *gInfo.sharedInfo;
 	int bci_enable = BCI_ENABLE;
 
 	// MM81C0 and 81C4 are used to control primary stream.
@@ -174,12 +112,7 @@ Savage_SetGBD_3D(const DisplayModeEx& mode)
 
 	WriteCrtcReg(0x69, 0x80, 0x80);
 
-	WriteReg32(0x8128, 0xFFFFFFFFL);
-	WriteReg32(0x812C, 0xFFFFFFFFL);
-
-	WriteReg32(S3_GLB_BD_HIGH, bci_enable | S3_LITTLE_ENDIAN | S3_BD64);
-
-	WriteCrtcReg(0x50, 0xc1, 0xc1);		// CR50, bit 7,6,0 = 111, Use GBD
+	WriteReg32(S3_GLOBAL_GBD_REG, bci_enable | S3_LITTLE_ENDIAN | S3_BD64);
 
 	// If MS1NB style linear tiling mode.
 	// bit MM850C[15] = 0 select NB linear tile mode.
@@ -188,36 +121,6 @@ Savage_SetGBD_3D(const DisplayModeEx& mode)
 	uint32 ulTmp = ReadReg32(ADVANCED_FUNC_CTRL) | 0x8000;	// use MS-s style tile mode
 	WriteReg32(ADVANCED_FUNC_CTRL, ulTmp);
 
-	// Tiled Surface 0 Registers MM48C40:
-	//	bit 0~23: tile surface 0 frame buffer offset
-	//	bit 24~29:tile surface 0 width
-	//	bit 30~31:tile surface 0 bits/pixel
-	//		00: reserved
-	//		01, 8 bits
-	//		10, 16 Bits.
-	//		11, 32 Bits.
-
-	// Global Bitmap Descriptor Register MM816C
-	//	bit 24~25: tile format
-	//		00: linear
-	//		01: reserved
-	//		10: 16 bpp tiles
-	//		11: 32 bpp tiles
-	//	bit 28: block write disable/enable
-	//		 0: enable
-	//		 1: disable
-
-	// Do not enable block_write even for non-tiling modes, because
-	// the driver cannot determine if the memory type is the certain
-	// type of SGRAM for which block_write can be used.
-
-	si.GlobalBD.bd1.HighPart.ResBWTile = TILE_FORMAT_LINEAR;	// linear
-	si.GlobalBD.bd1.HighPart.ResBWTile |= 0x10;		// disable block write
-	// HW uses width.
-	si.GlobalBD.bd1.HighPart.Stride = (uint16)(mode.timing.h_display);	// number of pixels per line
-	si.GlobalBD.bd1.HighPart.Bpp = (uint8)(mode.bpp);
-	si.GlobalBD.bd1.Offset = si.frameBufferOffset;
-
 	// CR88, bit 4 - Block write enabled/disabled.
 	//
 	// Note: Block write must be disabled when writing to tiled
@@ -225,26 +128,12 @@ Savage_SetGBD_3D(const DisplayModeEx& mode)
 	//		 write should only be enabled for certain types of SGRAM.
 
 	WriteCrtcReg(0x88, DISABLE_BLOCK_WRITE_2D, DISABLE_BLOCK_WRITE_2D);
-
-	// CR31, bit 0 = 0, Disable address offset bits(CR6A_6-0).
-	//		 bit 0 = 1, Enable 8 Mbytes of display memory thru 64K window
-	//					at A000:0.
-
-	WriteCrtcReg(MEMORY_CONFIG_REG, 0x00, 0x01);
-
-	// Program the GBD and SBD's.
-	WriteReg32(S3_GLB_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_GLB_BD_HIGH, si.GlobalBD.bd2.HiPart | bci_enable | S3_LITTLE_ENDIAN | S3_BD64);
-	WriteReg32(S3_PRI_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_PRI_BD_HIGH, si.GlobalBD.bd2.HiPart);
 }
 
 
 static void 
 Savage_SetGBD_MX(const DisplayModeEx& mode)
 {
-	TRACE("Savage_SetGBD_MX()\n");
-
 	SharedInfo& si = *gInfo.sharedInfo;
 	int bci_enable = BCI_ENABLE;
 
@@ -285,12 +174,7 @@ Savage_SetGBD_MX(const DisplayModeEx& mode)
 		(((mode.bytesPerRow * 2) << 16) & 0x3FFF0000) |
 		(mode.bytesPerRow & 0x00003fff));
 
-	WriteReg32(0x8128, 0xFFFFFFFFL);
-	WriteReg32(0x812C, 0xFFFFFFFFL);
-
-	WriteReg32(S3_GLB_BD_HIGH, bci_enable | S3_LITTLE_ENDIAN | S3_BD64);
-
-	WriteCrtcReg(0x50, 0xc1, 0xc1);		// CR50, bit 7,6,0 = 111, Use GBD
+	WriteReg32(S3_GLOBAL_GBD_REG, bci_enable | S3_LITTLE_ENDIAN | S3_BD64);
 
 	// CR78, bit 3  - Block write enabled(1)/disabled(0).
 	//		 bit 2  - Block write cycle time(0:2 cycles,1: 1 cycle)
@@ -299,60 +183,12 @@ Savage_SetGBD_MX(const DisplayModeEx& mode)
 	//			write should only be enabled for certain types of SGRAM.
 
 	WriteCrtcReg(0x78, 0xfb, 0xfb);
-
-	// Tiled Surface 0 Registers MM48C40:
-	//	bit 0~23: tile surface 0 frame buffer offset
-	//	bit 24~29:tile surface 0 width
-	//	bit 30~31:tile surface 0 bits/pixel
-	//		00: reserved
-	//		01, 8 bits
-	//		10, 16 Bits.
-	//		11, 32 Bits.
-
-	// Global Bitmap Descriptor Register MM816C
-	//	bit 24~25: tile format
-	//		00: linear
-	//		01: reserved
-	//		10: 16 bit
-	//		11: 32 bit
-	//	bit 28: block write disble/enable
-	//		0: enable
-	//		1: disable
-
-	// Do not enable block_write even for non-tiling modes, because
-	// the driver cannot determine if the memory type is the certain
-	// type of SGRAM for which block_write can be used.
-
-	si.GlobalBD.bd1.HighPart.ResBWTile = TILE_FORMAT_LINEAR;	// linear
-	si.GlobalBD.bd1.HighPart.ResBWTile |= 0x10;		// disable block write
-	// HW uses width.
-	si.GlobalBD.bd1.HighPart.Stride = (uint16)(mode.timing.h_display);	// number of pixels per line
-	si.GlobalBD.bd1.HighPart.Bpp = (uint8)(mode.bpp);
-	si.GlobalBD.bd1.Offset = si.frameBufferOffset;
-
-	// CR31, bit 0 = 0, Disable address offset bits(CR6A_6-0).
-	//		 bit 0 = 1, Enable 8 Mbytes of display memory thru 64K window
-	//					at A000:0.
-
-	WriteCrtcReg(MEMORY_CONFIG_REG, 0x04, 0x05);	// CR31
-
-	// Program the GBD and SBD's.
-	WriteReg32(S3_GLB_BD_LOW, si.GlobalBD.bd2.LoPart );
-	// 8: bci enable.
-	WriteReg32(S3_GLB_BD_HIGH, (si.GlobalBD.bd2.HiPart
-							  | bci_enable | S3_LITTLE_ENDIAN | S3_BD64));
-	WriteReg32(S3_PRI_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_PRI_BD_HIGH, si.GlobalBD.bd2.HiPart);
-	WriteReg32(S3_SEC_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_SEC_BD_HIGH, si.GlobalBD.bd2.HiPart);
 }
 
 
 static void 
 Savage_SetGBD_Super(const DisplayModeEx& mode)
 {
-	TRACE("Savage_SetGBD_Super()\n");
-
 	SharedInfo& si = *gInfo.sharedInfo;
 	int bci_enable = BCI_ENABLE_TWISTER;
 
@@ -395,47 +231,14 @@ Savage_SetGBD_Super(const DisplayModeEx& mode)
 	WriteReg32(PRI_STREAM2_FBUF_ADDR0, (si.frameBufferOffset & 0xfffffffc) | 0x80000000);
 	WriteReg32(PRI_STREAM2_FBUF_ADDR1, si.frameBufferOffset & 0xfffffffc);
 
-	WriteReg32(0x8128, 0xFFFFFFFFL);
-	WriteReg32(0x812C, 0xFFFFFFFFL);
-
 	// Bit 28:block write disable.
-	WriteReg32(S3_GLB_BD_HIGH, bci_enable | S3_BD64 | 0x10000000);
-
-	WriteCrtcReg(0x50, 0xc1, 0xc1);		// CR50, bit 7,6,0 = 111, Use GBD
-
-	// Do not enable block_write even for non-tiling modes, because
-	// the driver cannot determine if the memory type is the certain
-	// type of SGRAM for which block_write can be used.
-
-	si.GlobalBD.bd1.HighPart.ResBWTile = TILE_FORMAT_LINEAR;	// linear
-	si.GlobalBD.bd1.HighPart.ResBWTile |= 0x10;		// disable block write
-	// HW uses width.
-	si.GlobalBD.bd1.HighPart.Stride = (uint16)(mode.timing.h_display);	// number of pixels per line
-	si.GlobalBD.bd1.HighPart.Bpp = (uint8)(mode.bpp);
-	si.GlobalBD.bd1.Offset = si.frameBufferOffset;
-
-	// CR31, bit 0 = 0, Disable address offset bits(CR6A_6-0).
-	//		 bit 0 = 1, Enable 8 Mbytes of display memory thru 64K window
-	//					at A000:0.
-
-	WriteCrtcReg(MEMORY_CONFIG_REG, 0x00, 0x01);
-
-	// Program the GBD and SBDs.
-	WriteReg32(S3_GLB_BD_LOW, si.GlobalBD.bd2.LoPart );
-	WriteReg32(S3_GLB_BD_HIGH, (si.GlobalBD.bd2.HiPart
-							  | bci_enable | S3_LITTLE_ENDIAN | S3_BD64));
-	WriteReg32(S3_PRI_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_PRI_BD_HIGH, si.GlobalBD.bd2.HiPart);
-	WriteReg32(S3_SEC_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_SEC_BD_HIGH, si.GlobalBD.bd2.HiPart);
+	WriteReg32(S3_GLOBAL_GBD_REG, bci_enable | S3_BD64 | 0x10000000);
 }
 
 
 static void 
 Savage_SetGBD_2000(const DisplayModeEx& mode)
 {
-	TRACE("Savage_SetGBD_2000()\n");
-
 	SharedInfo& si = *gInfo.sharedInfo;
 	int bci_enable = BCI_ENABLE_TWISTER;
 
@@ -463,47 +266,18 @@ Savage_SetGBD_2000(const DisplayModeEx& mode)
 
 	WriteCrtcReg(0x67, 0x08, 0x08);
 
-	WriteReg32(0x8128, 0xFFFFFFFFL);
-	WriteReg32(0x812C, 0xFFFFFFFFL);
-
 	// Bit 28:block write disable.
-	WriteReg32(S3_GLB_BD_HIGH, bci_enable | S3_BD64 | 0x10000000);
+	WriteReg32(S3_GLOBAL_GBD_REG, bci_enable | S3_BD64 | 0x10000000);
 
-	WriteCrtcReg(0x50, 0xc1, 0xc1);		// CR50, bit 7,6,0 = 111, Use GBD
 	WriteCrtcReg(0x73, 0x00, 0x20);		// CR73 bit 5 = 0 block write disable
-
-	// Do not enable block_write even for non-tiling modes, because
-	// the driver cannot determine if the memory type is the certain
-	// type of SGRAM for which block_write can be used.
-
-	si.GlobalBD.bd1.HighPart.ResBWTile = TILE_FORMAT_LINEAR;	// linear
-	si.GlobalBD.bd1.HighPart.ResBWTile |= 0x10;		// disable block write
-	// HW uses width.
-	si.GlobalBD.bd1.HighPart.Stride = (uint16)(mode.timing.h_display);	// number of pixels per line
-	si.GlobalBD.bd1.HighPart.Bpp = (uint8)(mode.bpp);
-	si.GlobalBD.bd1.Offset = si.frameBufferOffset;
-
-	// CR31, bit 0 = 0, Disable address offset bits(CR6A_6-0).
-	//		 bit 0 = 1, Enable 8 Mbytes of display memory thru 64K window
-	//					at A000:0.
-
-	WriteCrtcReg(MEMORY_CONFIG_REG, 0x00, 0x01);
-
-	// Program the GBD and SBDs.
-	WriteReg32(S3_GLB_BD_LOW, si.GlobalBD.bd2.LoPart );
-	WriteReg32(S3_GLB_BD_HIGH, (si.GlobalBD.bd2.HiPart
-							  | bci_enable | S3_LITTLE_ENDIAN | S3_BD64));
-	WriteReg32(S3_PRI_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_PRI_BD_HIGH, si.GlobalBD.bd2.HiPart);
-	WriteReg32(S3_SEC_BD_LOW, si.GlobalBD.bd2.LoPart);
-	WriteReg32(S3_SEC_BD_HIGH, si.GlobalBD.bd2.HiPart);
 }
+
 
 
 static void 
 Savage_SetGBD(const DisplayModeEx& mode)
 {
-	TRACE("Savage_SetGBD()\n");
+	SharedInfo& si = *gInfo.sharedInfo;
 
 	VerticalRetraceWait();
 
@@ -531,19 +305,27 @@ Savage_SetGBD(const DisplayModeEx& mode)
 			Savage_SetGBD_2000(mode);
 			break;
 	}
+
+	WriteCrtcReg(0x50, 0xc1, 0xc1);		// CR50, bit 7,6,0 = 111, Use GBD
+
+	// Set up the Global Bitmap Descriptor used for BCI.
+	// Do not enable block_write because we can't determine if the memory
+	// type is a certain type of SGRAM for which block write can be used.
+	//	bit 24~25: tile format,  00 = linear
+	//	bit 28: block write disble/enable, 0 = disable, 1 = enable
+
+	si.globalBitmapDesc = mode.timing.h_display | (mode.bpp << 16)
+		| TILE_FORMAT_LINEAR | BCI_BD_BW_DISABLE | S3_BD64;	// disable block write
 }
 
 
 static void 
 Savage_Initialize2DEngine(const DisplayModeEx& mode)
 {
-	TRACE("Savage_Initialize2DEngine()\n");
-
 	SharedInfo& si = *gInfo.sharedInfo;
-	uint32 thresholds;
 
-	WriteCrtcReg(0x40, 0x01);
-	WriteCrtcReg(0x31, 0x0c);
+	WriteCrtcReg(0x40, 0x01);	// enable graphics engine
+	WriteCrtcReg(0x31, 0x0c);	// turn on 16-bit register access
 
 	// Setup plane masks.
 	WriteReg32(0x8128, ~0);		// enable all write planes
@@ -555,14 +337,16 @@ Savage_Initialize2DEngine(const DisplayModeEx& mode)
 		case S3_SAVAGE_3D:
 		case S3_SAVAGE_MX:
 
-			// Disable BCI.
-			WriteReg32(0x48C18, ReadReg32(0x48C18) & 0x3FF0);
-			// Setup BCI command overflow buffer.
-			WriteReg32(0x48C14, (si.cobOffset >> 11) | (si.cobIndex << 29));	// tim
+			WriteReg32(0x48C18, ReadReg32(0x48C18) & 0x3FF0);	// Disable BCI
+
+			// Setup BCI command overflow buffer.  0x48c14
+			// Bits 0-11  = Bits 22-11 of the Command Buffer Offset.
+			// Bits 12-28 = Total number of entries in the command buffer(Read only).
+			// Bits 29-31 = COB size index, 111 = 32K entries or 128K bytes
+			WriteReg32(0x48C14, (si.cobOffset >> 11) | (si.cobSizeIndex << 29));
+
 			// Program shadow status update.
-			thresholds = ((si.bciThresholdLo & 0xffff) << 16) |
-						 (si.bciThresholdHi & 0xffff);
-			WriteReg32(0x48C10, thresholds);
+			WriteReg32(0x48C10, 0x78207220);
 
 			WriteReg32(0x48C0C, 0);
 			// Enable BCI and command overflow buffer.
@@ -575,23 +359,14 @@ Savage_Initialize2DEngine(const DisplayModeEx& mode)
 		case S3_PROSAVAGE_DDR:
 		case S3_SUPERSAVAGE:
 
-			// Disable BCI.
-			WriteReg32(0x48C18, ReadReg32(0x48C18) & 0x3FF0);
+			// Some Savage4 and ProSavage chips have coherency problems with
+			// respect to the Command Overflow Buffer (COB); thus, do not
+			// enable the COB.
 
-			if ( ! si.bDisableCOB) {
-				// Setup BCI command overflow buffer.
-				WriteReg32(0x48C14, (si.cobOffset >> 11) | (si.cobIndex << 29));
-			}
-			// Program shadow status update;   AGD: what should this be?
-			thresholds = ((si.bciThresholdLo & 0x1fffe0) << 11)
-						| ((si.bciThresholdHi & 0x1fffe0) >> 5);
-			WriteReg32(0x48C10, thresholds);
-
+			WriteReg32(0x48C18, ReadReg32(0x48C18) & 0x3FF0);	// Disable BCI
+			WriteReg32(0x48C10, 0x00700040);
 			WriteReg32(0x48C0C, 0);
-			if (si.bDisableCOB)
-				WriteReg32(0x48C18, ReadReg32(0x48C18) | 0x08);		// enable BCI without COB
-			else
-				WriteReg32(0x48C18, ReadReg32(0x48C18) | 0x0C);		// enable BCI with COB
+			WriteReg32(0x48C18, ReadReg32(0x48C18) | 0x08);		// enable BCI without COB
 
 			break;
 
@@ -600,22 +375,16 @@ Savage_Initialize2DEngine(const DisplayModeEx& mode)
 			// Disable BCI.
 			WriteReg32(0x48C18, 0);
 			// Setup BCI command overflow buffer.
-			WriteReg32(0x48C18, (si.cobOffset >> 7) | (si.cobIndex));
+			WriteReg32(0x48C18, (si.cobOffset >> 7) | (si.cobSizeIndex));
 			// Disable shadow status update.
 			WriteReg32(0x48A30, 0);
 			// Enable BCI and command overflow buffer.
-			WriteReg32(0x48C18, ReadReg32(0x48C18) | 0x00280000 );
+			WriteReg32(0x48C18, ReadReg32(0x48C18) | 0x00280000);
 
 			break;
 	}
 
 	// Use and set global bitmap descriptor.
-
-	// For reasons I do not fully understand yet, on the Savage4, the
-	// write to the GBD register, MM816C, does not "take" at this time.
-	// Only the low-order byte is acknowledged, resulting in an incorrect
-	// stride.  Writing the register later, after the mode switch, works
-	// correctly.	This needs to get resolved.
 
 	Savage_SetGBD(mode);
 }
@@ -624,8 +393,6 @@ Savage_Initialize2DEngine(const DisplayModeEx& mode)
 static void 
 Savage_GEReset(const DisplayModeEx& mode)
 {
-	TRACE("Savage_GEReset() begin\n");
-
 	gInfo.WaitIdleEmpty();
 	snooze(10000);
 
@@ -665,7 +432,7 @@ Savage_GEReset(const DisplayModeEx& mode)
 			break;
 
 		snooze(10000);
-		TRACE("Restarting S3 graphics engine reset %2d ...\n", r);
+		TRACE("Savage_GEReset(), restarting S3 graphics engine reset %2d ...\n", r);
 	}
 
 	// At this point, the FIFO is empty and the engine is idle.
@@ -678,8 +445,6 @@ Savage_GEReset(const DisplayModeEx& mode)
 	WriteReg32(MONO_PAT_1, ~0);
 
 	Savage_SetGBD(mode);
-
-	TRACE("Savage_GEReset() end\n");
 }
 
 
@@ -739,7 +504,7 @@ Savage_CalcClock(long freq, int min_m,
 static void 
 Savage_WriteMode(const DisplayModeEx& mode, const SavageRegRec& regRec)
 {
-	TRACE("Savage_WriteMode() enter\n");
+	TRACE("Savage_WriteMode() begin\n");
 
 	SharedInfo& si = *gInfo.sharedInfo;
 
@@ -756,7 +521,7 @@ Savage_WriteMode(const DisplayModeEx& mode, const SavageRegRec& regRec)
 	if (ReadCrtcReg(0x66) & 0x01) {
 		Savage_GEReset(mode);	// reset GE to make sure nothing is going on
 	}
-	
+
 	WriteCrtcReg(0x67, regRec.CR67 & ~0x0e); // no STREAMS yet old and new
 
 	// Set register SR19 to zero so that the ProSavage chips will start up
@@ -769,7 +534,7 @@ Savage_WriteMode(const DisplayModeEx& mode, const SavageRegRec& regRec)
 	// not cleared, it will startup only if booting under BeOS using the
 	// default boot screen or the boot screen resolution matches the resolution
 	// of the mode currently being set.
-	
+
 	if (si.chipType == S3_SAVAGE_MX)
 		WriteSeqReg(0x30, 0x00, 0x08);
 
@@ -777,14 +542,20 @@ Savage_WriteMode(const DisplayModeEx& mode, const SavageRegRec& regRec)
 
 	WriteCrtcReg(0x66, regRec.CR66);
 	WriteCrtcReg(0x3a, regRec.CR3A);
-	WriteCrtcReg(0x31, regRec.CR31);
 	WriteCrtcReg(0x58, regRec.CR58);
 	WriteCrtcReg(0x53, regRec.CR53 & 0x7f);
 
-	// Set DCLK registers.
+	// If Savage IX/MX or SuperSavage, set SR54 & SR56 to 0x10 so that when
+	// resolutions are set where the width and/or height is less than the
+	// native resolution of the attached LCD display, the chip will not expand
+	// the display to fill the screen.  That is, if a resolution is set to
+	// 640x480, it will use only 640x480 pixels for the display.  When the chip
+	// expands the display, text is much less readable.
 
-	WriteSeqReg(0x29, regRec.SR29);
-	WriteSeqReg(0x15, regRec.SR15);
+	if (S3_SAVAGE_MOBILE_SERIES(si.chipType)) {
+		WriteSeqReg(0x54, 0x10);
+		WriteSeqReg(0x56, 0x10);
+	}
 
 	// Set the standard CRTC vga regs.
 
@@ -818,7 +589,6 @@ Savage_WriteMode(const DisplayModeEx& mode, const SavageRegRec& regRec)
 
 	// Other mode timing and extended regs.
 	WriteCrtcReg(0x34, regRec.CR34);
-	WriteCrtcReg(0x40, regRec.CR40);
 	WriteCrtcReg(0x42, regRec.CR42);
 	WriteCrtcReg(0x45, regRec.CR45);
 	WriteCrtcReg(0x50, regRec.CR50);
@@ -837,22 +607,21 @@ Savage_WriteMode(const DisplayModeEx& mode, const SavageRegRec& regRec)
 	if (si.chipType == S3_SAVAGE4)
 		WriteCrtcReg(0xb0, regRec.CRB0);
 
-	// Set extended seq regs for dclk.
-	WriteSeqReg(0x12, regRec.SR12);
-	WriteSeqReg(0x13, regRec.SR13);
-	WriteSeqReg(0x29, regRec.SR29);
-
-	WriteSeqReg(0x18, regRec.SR18);
 	WriteSeqReg(0x1b, regRec.SR1B);
 
-	// Load new m, n pll values for dclk & mclk.
-	temp = ReadSeqReg(0x15) & ~0x21;
+	if ( ! (S3_SAVAGE_MOBILE_SERIES(si.chipType) &&  si.displayType == MT_LCD)) {
+		// Set extended seq regs for dclk.
+		WriteSeqReg(0x12, regRec.SR12);
+		WriteSeqReg(0x13, regRec.SR13);
+		WriteSeqReg(0x29, regRec.SR29);
 
-	WriteSeqReg(0x15, temp | 0x03);
-	WriteSeqReg(0x15, temp | 0x23);
-	WriteSeqReg(0x15, temp | 0x03);
-	WriteSeqReg(0x15, regRec.SR15);
-	snooze( 100 );
+		// Load new m, n pll values for dclk & mclk.
+		temp = ReadSeqReg(0x15) & ~0x20;
+		WriteSeqReg(0x15, temp);
+		WriteSeqReg(0x15, temp | 0x20);
+		WriteSeqReg(0x15, temp);
+		snooze(100);
+	}
 
 	// Now write out cr67 in full, possibly starting STREAMS.
 	VerticalRetraceWait();
@@ -874,7 +643,7 @@ Savage_WriteMode(const DisplayModeEx& mode, const SavageRegRec& regRec)
 
 	Savage_SetGBD(mode);
 
-	TRACE("Savage_WriteMode() end\n");
+	TRACE("Savage_WriteMode() done\n");
 
 	return;
 }
@@ -883,7 +652,7 @@ Savage_WriteMode(const DisplayModeEx& mode, const SavageRegRec& regRec)
 static bool 
 Savage_ModeInit(const DisplayModeEx& mode)
 {
-	TRACE("Savage_ModeInit(%dx%d, %dHz)\n",
+	TRACE("Savage_ModeInit(%dx%d, %d kHz)\n",
 		mode.timing.h_display, mode.timing.v_display, mode.timing.pixel_clock);
 
 	SharedInfo& si = *gInfo.sharedInfo;
@@ -896,7 +665,7 @@ Savage_ModeInit(const DisplayModeEx& mode)
 
 	InitCrtcTimingValues(mode, horizScaleFactor, regRec.CRTC,
 			regRec.CR3B, regRec.CR3C, regRec.CR5D, regRec.CR5E);
-	regRec.CRTC[23] = 0xEB;
+	regRec.CRTC[0x17] = 0xEB;
 
 	int dclk = mode.timing.pixel_clock;
 	regRec.CR67 = 0x00;
@@ -930,25 +699,14 @@ Savage_ModeInit(const DisplayModeEx& mode)
 			break;
 	}
 
-
-	// Use traditional register-crunching to set mode.
-
 	regRec.CR3A = (ReadCrtcReg(0x3a) & 0x7f) | 0x15;
 	regRec.CR53 = 0x00;
-	regRec.CR31 = 0x8c;
 	regRec.CR66 = 0x89;
 	regRec.CR58 = (ReadCrtcReg(0x58) & 0x80) | 0x13;
 
-	if (si.chipType == S3_SAVAGE2000)
-		regRec.SR15 = 0x02;
-	else
-		regRec.SR15 = 0x83;
-	
-	regRec.SR18 = 0x00;
 	regRec.SR1B = ReadSeqReg(0x1b) | 0x10;	// enable 8-bit Color Lookup Table
 
 	regRec.CR43 = regRec.CR45 = regRec.CR65 = 0x00;
-	regRec.CR40 = ReadCrtcReg(0x40) & ~0x01;
 
 	unsigned int m, n, r;
 	Savage_CalcClock(dclk, 1, 1, 127, 0, 4, 180000, 360000, &m, &n, &r);
@@ -997,7 +755,6 @@ Savage_ModeInit(const DisplayModeEx& mode)
 	else
 		regRec.CR33 = 0x08;
 
-	regRec.CR67 |= 1;
 	regRec.CR69 = 0;
 	regRec.CR86 = ReadCrtcReg(0x86) | 0x08;
 	regRec.CR88 = ReadCrtcReg(0x88) | DISABLE_BLOCK_WRITE_2D;
@@ -1027,6 +784,7 @@ Savage_SetDisplayMode(const DisplayModeEx& mode)
 	Savage_AdjustFrame(mode);
 
 	WriteSeqReg(0x01, 0x00, 0x20);		// unblank the screen
+
 	return true;
 }
 

@@ -40,17 +40,9 @@
 // Primary Stream 2 Stride.
 #define PRI_STREAM2_STRIDE		0x81b8
 
+#define S3_GLOBAL_GBD_REG		0x816C	// global bitmap descriptor register
+
 #define MEMORY_CTRL0_REG		0xCA
-#define MEMORY_CONFIG_REG		0x31
-
-// Bitmap descriptor register.
-#define S3_GLB_BD_LOW			0x8168
-#define S3_GLB_BD_HIGH			0x816C
-#define S3_PRI_BD_LOW			0x8170
-#define S3_PRI_BD_HIGH			0x8174
-#define S3_SEC_BD_LOW			0x8178
-#define S3_SEC_BD_HIGH			0x817c
-
 #define MEM_PS1					0x10	// CRCA_4 :Primary stream 1
 #define MEM_PS2					0x20	// CRCA_5 :Primary stream 2
 
@@ -73,7 +65,6 @@
 
 #define TILE_FORMAT_LINEAR	0
 
-// BD - BCI enable.
 #define BCI_ENABLE			8		// savage4, MX, IX, 3D
 #define BCI_ENABLE_TWISTER	0		// twister, prosavage, DDR, supersavage, 2000
 
@@ -81,6 +72,7 @@
 #define S3_LITTLE_ENDIAN	0
 #define S3_BD64				1
 
+#define BCI_BD_BW_DISABLE	0x10000000
 #define BCI_BUFFER_OFFSET	0x10000
 
 #define BCI_GET_PTR		vuint32* bci_ptr = ((uint32*)(gInfo.regs + BCI_BUFFER_OFFSET))
