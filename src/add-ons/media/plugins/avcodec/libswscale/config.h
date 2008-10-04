@@ -1,1 +1,0 @@
-/boot/home/programming/haiku/src/add-ons/media/plugins/avcodec/libavcodec/config.h
