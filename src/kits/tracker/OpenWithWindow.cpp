@@ -1249,7 +1249,9 @@ SearchForSignatureEntryList::Rewind()
 		return ENOENT;
 
 	// build up the iterator
-	fIteratorList = new CachedEntryIteratorList;
+	fIteratorList = new CachedEntryIteratorList(false);
+		// We cannot sort the cached inodes, as CanOpenWithFilter() relies
+		// on the fact that ConditionalAllAppsIterator results come last.
 
 	// build the predicate string by oring queries for the individual
 	// signatures
