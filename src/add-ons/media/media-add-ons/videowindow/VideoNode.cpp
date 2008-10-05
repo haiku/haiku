@@ -64,7 +64,7 @@ VideoNode::~VideoNode()
 	Quit();
 	DeleteBuffers();
 	delete fBitmapLocker;
-	if (fWindow)
+	if (fWindow /*&& fWindow->Lock()*/)
 		fWindow->Quit();
 }
 
