@@ -285,17 +285,17 @@ BList::MoveItem(int32 fromIndex, int32 toIndex)
 		|| (toIndex < 0))
 		return false;
 
+	void * tmpMover = fObjectList[fromIndex];
 	if (fromIndex < toIndex) {
-		void * tmpMover = fObjectList[fromIndex];
-		memmove(fObjectList + fromIndex + 1, fObjectList + fromIndex,
+		memmove(fObjectList + fromIndex, fObjectList + fromIndex + 1,
 			(toIndex - fromIndex) * sizeof(void *));
 		fObjectList[toIndex] = tmpMover;
 	} else if (fromIndex > toIndex) {
-		void * tmpMover = fObjectList[fromIndex];
 		memmove(fObjectList + toIndex + 1, fObjectList + toIndex,
 			(fromIndex - toIndex) * sizeof(void *));
-		fObjectList[toIndex] = tmpMover;
 	};
+	fObjectList[toIndex] = tmpMover;
+
 	return true;
 }
 
