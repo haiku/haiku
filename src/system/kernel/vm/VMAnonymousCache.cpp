@@ -43,11 +43,11 @@
 
 #if	ENABLE_SWAP_SUPPORT
 
-//#define TRACE_STORE
-#ifdef TRACE_STORE
-#	define TRACE(x) dprintf x
+//#define TRACE_VM_ANONYMOUS_CACHE
+#ifdef TRACE_VM_ANONYMOUS_CACHE
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) do { } while (true)
 #endif
 
 
@@ -444,8 +444,9 @@ status_t
 VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 	int32 numGuardPages)
 {
-	TRACE(("VMAnonymousCache::Init(canOvercommit = %s, numGuardPages = %ld) "
-		"at %p\n", canOvercommit ? "yes" : "no", numGuardPages, store));
+	TRACE("%p->VMAnonymousCache::Init(canOvercommit = %s, "
+		"numPrecommittedPages = %ld, numGuardPages = %ld)\n", this,
+		canOvercommit ? "yes" : "no", numPrecommittedPages, numGuardPages);
 
 	status_t error = VMCache::Init(CACHE_TYPE_RAM);
 	if (error != B_OK)
@@ -465,6 +466,8 @@ VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 status_t
 VMAnonymousCache::Commit(off_t size)
 {
+	TRACE("%p->VMAnonymousCache::Commit(%lld)\n", this, size);
+
 	// if we can overcommit, we don't commit here, but in anonymous_fault()
 	if (fCanOvercommit) {
 		if (fHasPrecommitted)
@@ -510,7 +513,8 @@ VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 		swap_file *swapFile = find_swap_file(startSlotIndex);
 
-		off_t pos = (startSlotIndex - swapFile->first_slot) * B_PAGE_SIZE;
+		off_t pos = (off_t)(startSlotIndex - swapFile->first_slot)
+			* B_PAGE_SIZE;
 
 		status_t status = vfs_read_pages(swapFile->vnode, swapFile->cookie, pos,
 			vecs + i, j - i, 0, _numBytes);
@@ -539,10 +543,10 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 		}
 	}
 
-	if (fAllocatedSwapSize + count * B_PAGE_SIZE > fCommittedSwapSize)
+	if (fAllocatedSwapSize + (off_t)count * B_PAGE_SIZE > fCommittedSwapSize)
 		return B_ERROR;
 
-	fAllocatedSwapSize += count * B_PAGE_SIZE;
+	fAllocatedSwapSize += (off_t)count * B_PAGE_SIZE;
 	locker.Unlock();
 
 	uint32 n = count;
@@ -559,13 +563,13 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 
 		swap_file *swapFile = find_swap_file(slotIndex);
 
-		off_t pos = (slotIndex - swapFile->first_slot) * B_PAGE_SIZE;
+		off_t pos = (off_t)(slotIndex - swapFile->first_slot) * B_PAGE_SIZE;
 
 		status_t status = vfs_write_pages(swapFile->vnode, swapFile->cookie,
 			pos, vecs + i, n, flags, _numBytes);
 		if (status != B_OK) {
 			locker.Lock();
-			fAllocatedSwapSize -= n * B_PAGE_SIZE;
+			fAllocatedSwapSize -= (off_t)n * B_PAGE_SIZE;
 			locker.Unlock();
 
 			swap_slot_dealloc(slotIndex, n);
@@ -630,7 +634,7 @@ VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 
 	// write the page asynchrounously
 	swap_file* swapFile = find_swap_file(slotIndex);
-	off_t pos = (slotIndex - swapFile->first_slot) * B_PAGE_SIZE;
+	off_t pos = (off_t)(slotIndex - swapFile->first_slot) * B_PAGE_SIZE;
 
 	return vfs_asynchronous_write_pages(swapFile->vnode, swapFile->cookie, pos,
 		vecs, 1, numBytes, flags, callback);
@@ -777,7 +781,7 @@ VMAnonymousCache::Merge(VMCache* _source)
 				// this page is not swapped out
 				continue;
 
-			vm_page* page = LookupPage(pageIndex << PAGE_SHIFT);
+			vm_page* page = LookupPage((off_t)pageIndex << PAGE_SHIFT);
 
 			bool keepSwapPage = true;
 			if (page != NULL && !page->merge_swap) {
@@ -812,7 +816,7 @@ VMAnonymousCache::Merge(VMCache* _source)
 
 		// All source swap pages that have not been freed yet are taken over by
 		// by the consumer.
-		fAllocatedSwapSize += B_PAGE_SIZE * sourceSwapBlock->used;
+		fAllocatedSwapSize += B_PAGE_SIZE * (off_t)sourceSwapBlock->used;
 
 		if (sourceSwapBlock->used == 0) {
 			// All swap pages have been freed -- we can discard the source swap
@@ -942,6 +946,9 @@ VMAnonymousCache::_SwapBlockGetAddress(off_t pageIndex)
 status_t
 VMAnonymousCache::_Commit(off_t size)
 {
+	TRACE("%p->VMAnonymousCache::_Commit(%lld), already committed: %lld "
+		"(%lld swap)\n", this, size, committed_size, fCommittedSwapSize);
+
 	// Basic strategy: reserve swap space first, only when running out of swap
 	// space, reserve real memory.
 
@@ -953,6 +960,10 @@ VMAnonymousCache::_Commit(off_t size)
 	if (size > fCommittedSwapSize) {
 		fCommittedSwapSize += swap_space_reserve(size - fCommittedSwapSize);
 		committed_size = fCommittedSwapSize + committedMemory;
+		if (size > fCommittedSwapSize) {
+			TRACE("%p->VMAnonymousCache::_Commit(%lld), reserved only %lld "
+				"swap\n", this, size, fCommittedSwapSize);
+		}
 	}
 
 	if (committed_size == size)
@@ -983,8 +994,11 @@ VMAnonymousCache::_Commit(off_t size)
 	// the start of the method, so we try to reserve real memory, now.
 
 	off_t toReserve = size - committed_size;
-	if (vm_try_reserve_memory(toReserve, 1000000) != B_OK)
+	if (vm_try_reserve_memory(toReserve, 1000000) != B_OK) {
+		dprintf("%p->VMAnonymousCache::_Commit(%lld): Failed to reserve %lld "
+			"bytes of RAM\n", this, size, toReserve);
 		return B_NO_MEMORY;
+	}
 
 	committed_size = size;
 	return B_OK;
@@ -1040,7 +1054,7 @@ swap_file_add(char *path)
 	swap->vnode = node;
 	swap->cookie = descriptor->cookie;
 
-	int32 pageCount = st.st_size >> PAGE_SHIFT;
+	uint32 pageCount = st.st_size >> PAGE_SHIFT;
 	swap->bmp = radix_bitmap_create(pageCount);
 	if (swap->bmp == NULL) {
 		free(swap);
@@ -1064,7 +1078,7 @@ swap_file_add(char *path)
 	mutex_unlock(&sSwapFileListLock);
 
 	mutex_lock(&sAvailSwapSpaceLock);
-	sAvailSwapSpace += pageCount * B_PAGE_SIZE;
+	sAvailSwapSpace += (off_t)pageCount * B_PAGE_SIZE;
 	mutex_unlock(&sAvailSwapSpaceLock);
 
 	return B_OK;
@@ -1104,7 +1118,8 @@ swap_file_delete(char *path)
 	locker.Unlock();
 
 	mutex_lock(&sAvailSwapSpaceLock);
-	sAvailSwapSpace -= (swapFile->last_slot - swapFile->first_slot) * PAGE_SIZE;
+	sAvailSwapSpace -= (off_t)(swapFile->last_slot - swapFile->first_slot)
+		* PAGE_SIZE;
 	mutex_unlock(&sAvailSwapSpaceLock);
 
 	close(swapFile->fd);
@@ -1174,7 +1189,7 @@ swap_init_post_modules()
 
 		unload_driver_settings(settings);
 	} else
-		size = vm_page_num_pages() * B_PAGE_SIZE * 2;
+		size = (off_t)vm_page_num_pages() * B_PAGE_SIZE * 2;
 
 	if (size < B_PAGE_SIZE)
 		return;
@@ -1254,8 +1269,8 @@ void
 swap_get_info(struct system_memory_info *info)
 {
 #if ENABLE_SWAP_SUPPORT
-	info->max_swap_space = swap_total_swap_pages() * B_PAGE_SIZE;
-	info->free_swap_space = swap_available_pages() * B_PAGE_SIZE;
+	info->max_swap_space = (uint64)swap_total_swap_pages() * B_PAGE_SIZE;
+	info->free_swap_space = (uint64)swap_available_pages() * B_PAGE_SIZE;
 #else
 	info->max_swap_space = 0;
 	info->free_swap_space = 0;
