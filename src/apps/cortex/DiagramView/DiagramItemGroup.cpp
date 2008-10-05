@@ -5,7 +5,7 @@
 
 	Objects of this class can manage one or more of the DiagramItem
 	type M_BOX, M_WIRE and M_ENDPOINT. Many methods let you specify
-	which type of item you want to deal with.	
+	which type of item you want to deal with.
 */
 
 #include "DiagramItemGroup.h"
@@ -317,7 +317,7 @@ DiagramItemGroup::DrawItems(BRect updateRect, uint32 whichType, BRegion* updateR
 	if (whichType & DiagramItem::M_BOX) {
 		for (int32 i = CountItems(DiagramItem::M_BOX) - 1; i >= 0; i--) {
 			DiagramItem *item = ItemAt(i, DiagramItem::M_BOX);
-			if (item && item->Frame().Intersects(updateRect)) {	
+			if (item && item->Frame().Intersects(updateRect)) {
 				item->Draw(updateRect);
 				if (updateRegion)
 					updateRegion->Exclude(item->Frame());

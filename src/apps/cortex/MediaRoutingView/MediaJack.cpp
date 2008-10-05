@@ -136,7 +136,7 @@ void MediaJack::attachedToDiagram()
 void MediaJack::detachedFromDiagram()
 {
 	D_METHOD(("MediaJack::detachedFromDiagram()\n"));
-	
+
 	// make sure we're no longer displaying a tooltip
 	TipManager *tips = TipManager::Instance();
 	tips->hideTip(view()->ConvertToScreen(Frame()));
@@ -241,7 +241,7 @@ void MediaJack::MouseOver(
 			TipManager *tips = TipManager::Instance();
 			BString tipText = m_label.String();
 			tipText << " (" << MediaString::getStringFor(m_format.type) << ")";
-			tips->showTip(tipText.String(),view()->ConvertToScreen(Frame()), 
+			tips->showTip(tipText.String(),view()->ConvertToScreen(Frame()),
 						  TipManager::LEFT_OFFSET_FROM_POINTER, BPoint(12.0, 8.0));
 			break;
 		}
@@ -364,7 +364,7 @@ void MediaJack::setPosition(
 void MediaJack::_updateBitmap()
 {
 	D_METHOD(("MediaJack::_updateBitmap()\n"));
-	
+
 	if (m_bitmap)
 	{
 		delete m_bitmap;
@@ -404,7 +404,7 @@ void MediaJack::_drawInto(
 			{
 				BRect r;
 				BPoint p;
-				
+
 				// fill rect
 				r = targetRect;
 				target->SetLowColor(M_GRAY_COLOR);
@@ -684,7 +684,7 @@ void MediaJack::_updateAbbreviation()
 	D_METHOD(("MediaJack::_updateAbbreviation()\n"));
 
 	int32 offset;
-	m_abbreviation = "";	
+	m_abbreviation = "";
 	m_abbreviation += m_label[0];
 	offset = m_label.FindFirst(" ") + 1;
 	if ((offset > 1) && (offset < m_label.CountChars() - 1))
@@ -714,7 +714,7 @@ void MediaJack::showContextMenu(
 		media_input input;
 		getInput(&input);
 		BMessage *message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
-		message->AddData("input", B_RAW_TYPE, 
+		message->AddData("input", B_RAW_TYPE,
 						 reinterpret_cast<const void *>(&input), sizeof(input));
 		menu->AddItem(item = new BMenuItem("Get Info", message));
 	}
@@ -723,7 +723,7 @@ void MediaJack::showContextMenu(
 		media_output output;
 		getOutput(&output);
 		BMessage *message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
-		message->AddData("output", B_RAW_TYPE, 
+		message->AddData("output", B_RAW_TYPE,
 						 reinterpret_cast<const void *>(&output), sizeof(output));
 		menu->AddItem(item = new BMenuItem("Get Info", message));
 	}
