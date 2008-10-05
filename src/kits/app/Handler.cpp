@@ -51,7 +51,7 @@ static property_info sHandlerPropInfo[] = {
 					{
 						"suites",		// name
 						B_STRING_TYPE	// type
-					} 
+					}
 				}
 			},
 			{						// ctypes[1]
@@ -338,10 +338,10 @@ BHandler::AddFilter(BMessageFilter *filter)
 
 	if (fLooper != NULL)
 		filter->SetLooper(fLooper);
-		
+
 	if (!fFilters)
 		fFilters = new BList;
-		
+
 	fFilters->AddItem(filter);
 }
 
@@ -479,15 +479,15 @@ BHandler::GetSupportedSuites(BMessage *data)
 			PrintToStream() on both data and the contained BPropertyInfo):
 
 BMessage: what =  (0x0, or 0)
-    entry         suites, type='CSTR', c=1, size=21, data[0]: "suite/vnd.Be-handler"
-    entry       messages, type='SCTD', c=1, size= 0,
-      property   commands                       types                specifiers
+	entry         suites, type='CSTR', c=1, size=21, data[0]: "suite/vnd.Be-handler"
+	entry       messages, type='SCTD', c=1, size= 0,
+	  property   commands                       types                specifiers
 --------------------------------------------------------------------------------
-        Suites   PGET                                               1
-                 (RTSC,suites)
-                 (DTCS,messages)
+		Suites   PGET                                               1
+				 (RTSC,suites)
+				 (DTCS,messages)
 
-     Messenger   PGET                          GNSM                 1
+	 Messenger   PGET                          GNSM                 1
   InternalName   PGET                          RTSC                 1
 
 			With a good deal of trial and error, I determined that the
@@ -692,12 +692,12 @@ ObserverList::_ValidateHandlers(uint32 what)
 	while (iterator != handlers.end()) {
 		BMessenger target(*iterator);
 		if (!target.IsValid()) {
-			iterator++;			
+			iterator++;
 			continue;
 		}
 
 		Add(target, what);
-		iterator = handlers.erase(iterator);	
+		iterator = handlers.erase(iterator);
 	}
 }
 
