@@ -58,6 +58,7 @@ VideoNode::VideoNode(const char *name, BMediaAddOn* addon, int32 id)
 	_InitDisplay();
 }
 
+
 VideoNode::~VideoNode()
 {
 	Quit();
@@ -103,9 +104,8 @@ VideoNode::BufferReceived(BBuffer * buffer)
 		HandleBuffer(buffer);
 	} else {
 		media_timed_event event(buffer->Header()->start_time,
-								BTimedEventQueue::B_HANDLE_BUFFER,
-								buffer,
-								BTimedEventQueue::B_RECYCLE_BUFFER);
+			BTimedEventQueue::B_HANDLE_BUFFER, buffer,
+			BTimedEventQueue::B_RECYCLE_BUFFER);
 		EventQueue()->AddEvent(event);
 	}
 }
@@ -131,24 +131,23 @@ VideoNode::DisposeInputCookie(int32 cookie)
 
 
 status_t
-VideoNode::	HandleMessage(int32 message,
-						  const void *data,
-						  size_t size)
+VideoNode::	HandleMessage(int32 message, const void *data, size_t size)
 {
 	return B_ERROR;
 }
 
 
 void
-VideoNode::HandleEvent(const media_timed_event *event,
-					   bigtime_t lateness,
-					   bool realTimeEvent)
+VideoNode::HandleEvent(const media_timed_event *event, bigtime_t lateness,
+	bool realTimeEvent)
 {
 	switch (event->type) {
 		case BTimedEventQueue::B_START:
 			break;
 		case BTimedEventQueue::B_STOP:
-			EventQueue()->FlushEvents(event->event_time, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER);
+			EventQueue()->FlushEvents(event->event_time,
+				BTimedEventQueue::B_ALWAYS, true,
+				BTimedEventQueue::B_HANDLE_BUFFER);
 			break;
 		case BTimedEventQueue::B_HANDLE_BUFFER:
 			HandleBuffer((BBuffer *)event->pointer);
@@ -156,23 +155,21 @@ VideoNode::HandleEvent(const media_timed_event *event,
 		default:
 			fprintf(stderr, "VideoNode::HandleEvent unknown event");
 			break;
-	}			
+	}
 }
 
 
 void
-VideoNode::ProducerDataStatus(const media_destination &dst,
-							 int32 status,
-							 bigtime_t at_media_time)
+VideoNode::ProducerDataStatus(const media_destination &dst, int32 status,
+	bigtime_t at_media_time)
 {
 	// do nothing
 }
 
 
 status_t
-VideoNode::GetLatencyFor(const media_destination &dst,
-						 bigtime_t *out_latency,
-						 media_node_id *out_id)
+VideoNode::GetLatencyFor(const media_destination &dst,  bigtime_t *out_latency,
+	media_node_id *out_id)
 {
 	if (dst != fInput.destination)
 		return B_MEDIA_BAD_DESTINATION;
@@ -184,8 +181,7 @@ VideoNode::GetLatencyFor(const media_destination &dst,
 
 
 status_t
-VideoNode::AcceptFormat(const media_destination &dst,
-						media_format *format)
+VideoNode::AcceptFormat(const media_destination &dst, media_format *format)
 {
 	/* The connection process:
 	 *                BBufferProducer::FormatProposal
@@ -195,7 +191,7 @@ VideoNode::AcceptFormat(const media_destination &dst,
 	 *                BBufferProducer::Connect
 	 */
 	if (dst != fInput.destination)
-		return B_MEDIA_BAD_DESTINATION;	
+		return B_MEDIA_BAD_DESTINATION;
 
 	if (format->type == B_MEDIA_NO_TYPE)
 		format->type = B_MEDIA_RAW_VIDEO;
@@ -203,15 +199,13 @@ VideoNode::AcceptFormat(const media_destination &dst,
 	if (format->type != B_MEDIA_RAW_VIDEO)
 		return B_MEDIA_BAD_FORMAT;
 
-	return B_OK;	
+	return B_OK;
 }
 
 
 status_t
-VideoNode::Connected(const media_source &src,
-					 const media_destination &dst,
-					 const media_format &format,
-					 media_input *out_input)
+VideoNode::Connected(const media_source &src, const media_destination &dst,
+	const media_format &format, media_input *out_input)
 {
 	/* The connection process:
 	 *                BBufferProducer::FormatProposal
@@ -231,20 +225,21 @@ VideoNode::Connected(const media_source &src,
 		fInput.format.u.raw_video.field_rate = 25.0;
 
 	color_space colorspace = format.u.raw_video.display.format;
-	BRect		frame(0, 0, format.u.raw_video.display.line_width - 1, format.u.raw_video.display.line_count - 1);
-	status_t	err;
+	BRect frame(0, 0, format.u.raw_video.display.line_width - 1,
+		format.u.raw_video.display.line_count - 1);
 
 	DeleteBuffers();
-	err = CreateBuffers(frame, colorspace, fOverlayEnabled);
+	status_t err = CreateBuffers(frame, colorspace, fOverlayEnabled);
 	if (err && fOverlayEnabled) {
 		SetOverlayEnabled(false);
 		err = CreateBuffers(frame, colorspace, fOverlayEnabled);
 	}
 
 	if (err) {
-		fprintf(stderr, "VideoNode::Connected failed, fOverlayEnabled = %d\n", fOverlayEnabled);
+		fprintf(stderr, "VideoNode::Connected failed, fOverlayEnabled = %d\n",
+			fOverlayEnabled);
 		return err;
-	}	
+	}
 
 	*out_input = fInput;
 
@@ -253,8 +248,7 @@ VideoNode::Connected(const media_source &src,
 
 
 void
-VideoNode::Disconnected(const media_source &src,
-						const media_destination &dst)
+VideoNode::Disconnected(const media_source &src, const media_destination &dst)
 {
 	if (src != fInput.source)
 		return;
@@ -269,10 +263,8 @@ VideoNode::Disconnected(const media_source &src,
 
 
 status_t
-VideoNode::FormatChanged(const media_source &src,
-						 const media_destination &dst,
-						 int32 from_change_count,
-						 const media_format &format)
+VideoNode::FormatChanged(const media_source &src, const media_destination &dst,
+	int32 from_change_count, const media_format &format)
 {
 	if (src != fInput.source)
 		return B_MEDIA_BAD_SOURCE;
@@ -280,8 +272,10 @@ VideoNode::FormatChanged(const media_source &src,
 		return B_MEDIA_BAD_DESTINATION;
 
 	color_space colorspace = format.u.raw_video.display.format;
-	BRect		frame(0, 0, format.u.raw_video.display.line_width - 1, format.u.raw_video.display.line_count - 1);
-	status_t	err;
+	BRect frame(0, 0, format.u.raw_video.display.line_width - 1,
+		format.u.raw_video.display.line_count - 1);
+
+	status_t err;
 
 	DeleteBuffers();
 	if (fOverlayEnabled) {
@@ -298,11 +292,11 @@ VideoNode::FormatChanged(const media_source &src,
 	if (err) {
 		fprintf(stderr, "VideoNode::FormatChanged failed (lost buffer group!)\n");
 		return B_MEDIA_BAD_FORMAT;
-	}	
+	}
 
 	fInput.format = format;
 
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -368,12 +362,17 @@ VideoNode::IsOverlayActive()
 status_t
 VideoNode::CreateBuffers(BRect frame, color_space cspace, bool overlay)
 {
-	//printf("VideoNode::CreateBuffers: frame %d,%d,%d,%d colorspace 0x%08x, overlay %d\n", 
-	//	int(frame.left), int(frame.top), int(frame.right), int(frame.bottom), int(cspace), overlay);
+	printf("VideoNode::CreateBuffers: frame %d,%d,%d,%d colorspace 0x%08x, "
+		"overlay %d\n", int(frame.left), int(frame.top), int(frame.right),
+		int(frame.bottom), int(cspace), overlay);
 
 	LockBitmap();
 	ASSERT(fBitmap == 0);
-	uint32 flags = overlay ? (B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL) : 0;
+
+	uint32 flags = 0;
+	if (overlay)
+		flags = B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL;
+
 	fBitmap = new BBitmap(frame, flags, cspace);
 	if (!(fBitmap && fBitmap->InitCheck() == B_OK && fBitmap->IsValid())) {
 		delete fBitmap;
@@ -405,7 +404,8 @@ VideoNode::_InitDisplay()
 {
 	// TODO: Get rid of hardcoded values
 	BRect size(0,0,320,240);
-	fVideoView = new VideoView(size, "Video View", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE, this);
+	fVideoView = new VideoView(size, "Video View", B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE, this);
 
 	size.OffsetBy(40.f, 40.f);
 	fWindow = new VideoWindow(size, fVideoView);
