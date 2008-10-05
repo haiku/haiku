@@ -18,20 +18,8 @@
 
 #include <sys/uio.h>
 
+#include "kernel_debug_config.h"
 
-// Enables the vm_page::queue, i.e. it is tracked which queue the page should
-// be in.
-//#define DEBUG_PAGE_QUEUE	1
-
-// Enables extra debug fields in the vm_page used to track page transitions
-// between caches.
-//#define DEBUG_PAGE_CACHE_TRANSITIONS	1
-
-// Enables a global list of all vm_cache structures.
-//#define DEBUG_CACHE_LIST 1
-
-// uncomment to build in swap support
-#define ENABLE_SWAP_SUPPORT 1
 
 #ifdef __cplusplus
 

@@ -46,9 +46,6 @@
 #define SCRUB_SIZE 16
 	// this many pages will be cleared at once in the page scrubber thread
 
-// for debugging: limit the amount of available RAM (in MB)
-//#define LIMIT_AVAILABLE_MEMORY	256
-
 
 typedef struct page_queue {
 	vm_page *head;
