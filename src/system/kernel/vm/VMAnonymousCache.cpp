@@ -47,7 +47,7 @@
 #ifdef TRACE_VM_ANONYMOUS_CACHE
 #	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x...) do { } while (true)
+#	define TRACE(x...) do { } while (false)
 #endif
 
 
