@@ -37,37 +37,40 @@ DiagramItemGroup::DiagramItemGroup(uint32 acceptedTypes, bool multiSelection)
 DiagramItemGroup::~DiagramItemGroup()
 {
 	D_METHOD(("DiagramItemGroup::~DiagramItemGroup()\n"));
-	if (fSelection) {
-		fSelection->MakeEmpty();
-		delete fSelection;
-	}
 
-	if (fBoxes && (fTypes & DiagramItem::M_BOX)) {
-		while (CountItems(DiagramItem::M_BOX) > 0) {
-			DiagramItem *item = ItemAt(0, DiagramItem::M_BOX);
-			if (RemoveItem(item))
-				delete item;
-		}
-		delete fBoxes;
-	}
-
+	int32 count = 0;
 	if (fWires && (fTypes & DiagramItem::M_WIRE)) {
-		while (CountItems(DiagramItem::M_WIRE) > 0) {
-			DiagramItem *item = ItemAt(0, DiagramItem::M_WIRE);
+		count = fWires->CountItems();
+		for (int32 i = 0; i < count; ++i) {
+			DiagramItem* item = static_cast<DiagramItem*>(fWires->ItemAtFast(i));
 			if (RemoveItem(item))
 				delete item;
 		}
 		delete fWires;
 	}
 
+	if (fBoxes && (fTypes & DiagramItem::M_BOX)) {
+		count = fBoxes->CountItems();
+		for (int32 i = 0; i < count; ++i) {
+			DiagramItem* item = static_cast<DiagramItem*>(fBoxes->ItemAtFast(i));
+			if (RemoveItem(item))
+				delete item;
+		}
+		delete fBoxes;
+	}
+
 	if (fEndPoints && (fTypes & DiagramItem::M_ENDPOINT)) {
-		while (CountItems(DiagramItem::M_ENDPOINT) > 0) {
-			DiagramItem *item = ItemAt(0, DiagramItem::M_ENDPOINT);
+		count = fEndPoints->CountItems();
+		for (int32 i = 0; i < count; ++i) {
+			DiagramItem* item = static_cast<DiagramItem*>(fEndPoints->ItemAtFast(i));
 			if (RemoveItem(item))
 				delete item;
 		}
 		delete fEndPoints;
 	}
+
+	if (fSelection)
+		delete fSelection;
 }
 
 
@@ -86,7 +89,6 @@ DiagramItemGroup::CountItems(uint32 whichType) const
 		if (whichType & DiagramItem::M_BOX) {
 			if (fBoxes)
 				count += fBoxes->CountItems();
-
 		}
 
 		if (whichType & DiagramItem::M_WIRE) {
@@ -198,6 +200,9 @@ DiagramItemGroup::AddItem(DiagramItem *item)
 {
 	D_METHOD(("DiagramItemGroup::AddItem()\n"));
 	if (item && (fTypes & item->type())) {
+		if (item->m_group)
+			item->m_group->RemoveItem(item);
+
 		switch (item->type()) {
 			case DiagramItem::M_BOX:
 				if (!fBoxes)

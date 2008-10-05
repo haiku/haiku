@@ -376,7 +376,9 @@ void MediaJack::_updateBitmap()
 		tempBitmap->AddChild(tempView);
 		tempView->SetOrigin(0.0, 0.0);
 
-		int32 layout = dynamic_cast<MediaRoutingView *>(view())->getLayout();
+		MediaRoutingView* mediaView = dynamic_cast<MediaRoutingView*>(view());
+		int32 layout = mediaView ? mediaView->getLayout() : MediaRoutingView::M_ICON_VIEW;
+
 		_drawInto(tempView, tempView->Bounds(), layout);
 
 		tempView->Sync();
