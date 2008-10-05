@@ -224,7 +224,7 @@ bool
 BList::ReplaceItem(int32 index, void *newItem)
 {
 	bool result = false;
-	
+
 	if (index >= 0 && index < fItemCount) {
 		fObjectList[index] = newItem;
 		result = true;
@@ -257,44 +257,44 @@ bool
 BList::SwapItems(int32 indexA, int32 indexB)
 {
 	bool result = false;
-	
+
 	if (indexA >= 0 && indexA < fItemCount
 		&& indexB >= 0 && indexB < fItemCount) {
-		
+
 		void *tmpItem = fObjectList[indexA];
 		fObjectList[indexA] = fObjectList[indexB];
 		fObjectList[indexB] = tmpItem;
-		
+
 		result = true;
-	}	
-		 
+	}
+
 	return result;
 }
 
 
-//MoveItem
-  //This moves a list item from posititon a to position b, moving the appropriate block of
-  // list elements to make up for the move.  For example, in the array:
-  // A B C D E F G H I J
-  //  Moveing 1(B)->6(G) would result in this:
-  // A C D E F G B H I J
+// MoveItem
+// This moves a list item from posititon a to position b, moving the appropriate
+// block of list elements to make up for the move. For example, in the array:
+//	A B C D E F G H I J
+//		Moveing 1(B)->6(G) would result in this:
+// A C D E F G B H I J
 bool
 BList::MoveItem(int32 fromIndex, int32 toIndex)
 {
-	if ((fromIndex >= fItemCount) || (toIndex >= fItemCount) || (fromIndex < 0) || (toIndex < 0))
+	if ((fromIndex >= fItemCount) || (toIndex >= fItemCount) || (fromIndex < 0)
+		|| (toIndex < 0))
 		return false;
-	
-	if (fromIndex < toIndex)
-	{
-		void * tmp_mover = fObjectList[fromIndex];
-		memmove(fObjectList + fromIndex + 1, fObjectList + fromIndex, (toIndex - fromIndex) * sizeof(void *));
-		fObjectList[toIndex] = tmp_mover;
-	} 
-	else if (fromIndex > toIndex)
-	{
-		void * tmp_mover = fObjectList[fromIndex];
-		memmove(fObjectList + toIndex + 1, fObjectList + toIndex, (fromIndex - toIndex) * sizeof(void *));
-		fObjectList[toIndex] = tmp_mover;
+
+	if (fromIndex < toIndex) {
+		void * tmpMover = fObjectList[fromIndex];
+		memmove(fObjectList + fromIndex + 1, fObjectList + fromIndex,
+			(toIndex - fromIndex) * sizeof(void *));
+		fObjectList[toIndex] = tmpMover;
+	} else if (fromIndex > toIndex) {
+		void * tmpMover = fObjectList[fromIndex];
+		memmove(fObjectList + toIndex + 1, fObjectList + toIndex,
+			(fromIndex - toIndex) * sizeof(void *));
+		fObjectList[toIndex] = tmpMover;
 	};
 	return true;
 }
@@ -390,7 +390,7 @@ BList::IsEmpty() const
 /* Iterating over the list. */
 //iterate a function over the whole list.  If the function outputs a true
 //value, then the process is terminated.
-	
+
 void
 BList::DoForEach(bool (*func)(void *))
 {
@@ -415,7 +415,7 @@ BList::DoForEach(bool (*func)(void *, void*), void * arg)
 	if (func != NULL)
 	{
 		while ((!terminate) && (index < fItemCount))
-		{	
+		{
 			terminate = func(fObjectList[index], arg);
 			index++;
 		};
@@ -478,9 +478,9 @@ BList::_ResizeArray(int32 count)
 		if (newObjectList) {
 			fObjectList = newObjectList;
 			fPhysicalSize = newSize;
-			// set our lower bound to either 1/4 
+			// set our lower bound to either 1/4
 			//of the current physical size, or 0
-			fResizeThreshold = fPhysicalSize >> 2 >= fBlockSize 
+			fResizeThreshold = fPhysicalSize >> 2 >= fBlockSize
 				? fPhysicalSize >> 2 : 0;
 		} else
 			result = false;
