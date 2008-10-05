@@ -132,8 +132,9 @@ BHandler::BHandler(const char *name)
 BHandler::~BHandler()
 {
 	if (LockLooper()) {
-		Looper()->RemoveHandler(this);
-		UnlockLooper();
+		BLooper* looper = Looper();
+		looper->RemoveHandler(this);
+		looper->Unlock();
 	}
 
 	// remove all filters
@@ -331,13 +332,14 @@ BHandler::NextHandler() const
 void
 BHandler::AddFilter(BMessageFilter *filter)
 {
-	if (fLooper && !fLooper->IsLocked()) {
+	BLooper* looper = fLooper;
+	if (looper && !looper->IsLocked()) {
 		debugger("Owning Looper must be locked before calling SetFilterList");
 		return;
 	}
 
-	if (fLooper != NULL)
-		filter->SetLooper(fLooper);
+	if (looper != NULL)
+		filter->SetLooper(looper);
 
 	if (!fFilters)
 		fFilters = new BList;
@@ -349,7 +351,8 @@ BHandler::AddFilter(BMessageFilter *filter)
 bool
 BHandler::RemoveFilter(BMessageFilter *filter)
 {
-	if (fLooper && !fLooper->IsLocked()) {
+	BLooper* looper = fLooper;
+	if (looper && !looper->IsLocked()) {
 		debugger("Owning Looper must be locked before calling SetFilterList");
 		return false;
 	}
@@ -366,7 +369,8 @@ BHandler::RemoveFilter(BMessageFilter *filter)
 void
 BHandler::SetFilterList(BList* filters)
 {
-	if (fLooper && !fLooper->IsLocked()) {
+	BLooper* looper = fLooper;
+	if (looper && !looper->IsLocked()) {
 		debugger("Owning Looper must be locked before calling SetFilterList");
 		return;
 	}
@@ -391,7 +395,7 @@ BHandler::SetFilterList(BList* filters)
 			BMessageFilter *filter =
 				static_cast<BMessageFilter *>(fFilters->ItemAt(i));
 			if (filter != NULL)
-				filter->SetLooper(fLooper);
+				filter->SetLooper(looper);
 		}
 	}
 }
@@ -447,9 +451,7 @@ BHandler::LockLooperWithTimeout(bigtime_t timeout)
 void
 BHandler::UnlockLooper()
 {
-	// The looper is locked at this point, and cannot change
-	if (fLooper != NULL)
-		fLooper->Unlock();
+	fLooper->Unlock();
 }
 
 
