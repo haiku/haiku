@@ -41,31 +41,22 @@ DiagramItemGroup::~DiagramItemGroup()
 	int32 count = 0;
 	if (fWires && (fTypes & DiagramItem::M_WIRE)) {
 		count = fWires->CountItems();
-		for (int32 i = 0; i < count; ++i) {
-			DiagramItem* item = static_cast<DiagramItem*>(fWires->ItemAtFast(i));
-			if (RemoveItem(item))
-				delete item;
-		}
+		for (int32 i = 0; i < count; ++i)
+			delete static_cast<DiagramItem*>(fWires->ItemAt(i));
 		delete fWires;
 	}
 
 	if (fBoxes && (fTypes & DiagramItem::M_BOX)) {
 		count = fBoxes->CountItems();
-		for (int32 i = 0; i < count; ++i) {
-			DiagramItem* item = static_cast<DiagramItem*>(fBoxes->ItemAtFast(i));
-			if (RemoveItem(item))
-				delete item;
-		}
+		for (int32 i = 0; i < count; ++i)
+			delete static_cast<DiagramItem*>(fBoxes->ItemAt(i));
 		delete fBoxes;
 	}
 
 	if (fEndPoints && (fTypes & DiagramItem::M_ENDPOINT)) {
 		count = fEndPoints->CountItems();
-		for (int32 i = 0; i < count; ++i) {
-			DiagramItem* item = static_cast<DiagramItem*>(fEndPoints->ItemAtFast(i));
-			if (RemoveItem(item))
-				delete item;
-		}
+		for (int32 i = 0; i < count; ++i)
+			delete static_cast<DiagramItem*>(fEndPoints->ItemAt(i));
 		delete fEndPoints;
 	}
 
