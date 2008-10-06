@@ -51,12 +51,6 @@ MainApp::MainApp()
 	  fMediaServerRunning(false),
 	  fMediaAddOnServerRunning(false)
 {
-	// XXX: HACK HACK HACK
-	// this works around a locking issue where gMainApp isn't set yet,
-	// while NewWindow() calls Show() which in the window thread calls
-	// Controller::PlayerActivated() which calls gMainApp->PlayerCount()
-	gMainApp = this;
-	fFirstWindow = NewWindow();
 }
 
 
@@ -79,11 +73,25 @@ MainApp::QuitRequested()
 
 
 BWindow*
-MainApp::NewWindow()
+MainApp::FirstWindow()
 {
 	BAutolock _(this);
+	if (fFirstWindow)
+		return fFirstWindow;
+	return NewWindow();
+}
+
+
+BWindow*
+MainApp::NewWindow()
+{
+	BWindow* win;
+	BAutolock _(this);
 	fPlayerCount++;
-	return new MainWin();
+	win = new MainWin();
+	if (!fFirstWindow)
+		fFirstWindow = win;
+	return win;
 }
 
 
@@ -101,6 +109,9 @@ MainApp::PlayerCount() const
 void
 MainApp::ReadyToRun()
 {
+	// make sure we have at least one window open
+	FirstWindow();
+
 	// setup the settings window now, we need to have it
 	fSettingsWindow = new SettingsWindow(BRect(150, 150, 450, 520));
 	fSettingsWindow->Hide();
@@ -134,7 +145,7 @@ MainApp::RefsReceived(BMessage *msg)
 	entry_ref ref;
 	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++) {
 		BWindow *win;
-		win = (i == 0 && IsLaunching()) ? fFirstWindow : NewWindow();
+		win = NewWindow();
 		BMessage m(B_REFS_RECEIVED);
 		m.AddRef("refs", &ref);
 		win->PostMessage(&m);
@@ -244,7 +255,7 @@ MainApp::MessageReceived(BMessage* message)
 void
 MainApp::AboutRequested()
 {
-	fFirstWindow->PostMessage(B_ABOUT_REQUESTED);
+	FirstWindow()->PostMessage(B_ABOUT_REQUESTED);
 }
 
 

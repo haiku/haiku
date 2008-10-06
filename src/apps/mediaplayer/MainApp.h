@@ -39,6 +39,7 @@ public:
 								MainApp();
 	virtual						~MainApp();
 
+			BWindow*			FirstWindow();
 			BWindow*			NewWindow();
 			int32				PlayerCount() const;
 
