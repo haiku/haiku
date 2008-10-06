@@ -20,6 +20,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Development
 #	Firefox
 #	Links
+#	NetSurf
 #	OpenSound
 #	OpenSSL
 #	Pe
@@ -35,6 +36,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 # package dependencies
 OptionalPackageDependencies APR-util : APR ;
 OptionalPackageDependencies Development : Perl ;
+OptionalPackageDependencies NetSurf : OpenSSL ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
 OptionalPackageDependencies Subversion : OpenSSL ;
 
@@ -269,6 +271,23 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/home/config/bin/links ;
+	}
+}
+
+
+# NetSurf web browser
+if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package NetSurf available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		Echo "No optional package NetSurf available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage NetSurf
+			: http://revolf.free.fr/beos/netsurf-bone.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/netsurf/NetSurf ;
 	}
 }
 
