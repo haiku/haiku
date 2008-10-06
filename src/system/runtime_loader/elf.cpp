@@ -1835,7 +1835,7 @@ get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
 	// iterate through all the hash buckets until we've found the one
 	for (i = 0; i < HASHTABSIZE(image); i++) {
 		for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
-			struct Elf32_Sym *symbol = &image->syms[i];
+			struct Elf32_Sym *symbol = &image->syms[j];
 
 			if (count == num) {
 				strlcpy(nameBuffer, SYMNAME(image, symbol), *_nameLength);
