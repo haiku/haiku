@@ -32,14 +32,13 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, void *buf, size_t* 
 	
 	hid[8] = '\0';
 	tabs[0] = '\0';
-
 	for (i = 0; i < indenting; i++) {
 		sprintf(tabs, "%s|    ", tabs);
 	}
 	sprintf(tabs, "%s|--- ", tabs);
 	depth = sizeof(char) * 5 * indenting + sizeof(char); // index into result where the device name will be.
 	
-	dprintf("acpi_ns_dump: recursing from %s\n", root);
+	dprintf("acpi_ns_dump: recursing from %s, depth %d\n", root, depth);
 	while (device->acpi->get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
 		type = device->acpi->get_object_type(result);
 		sprintf(output, "%s%s", tabs, result + depth);
@@ -124,7 +123,8 @@ acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 {
 	acpi_ns_device_info *device = (acpi_ns_device_info *)_cookie;
 	size_t bytes = 0;
-	
+	dprintf("acpi_namespace_read(cookie: %p, position: %ld, buffer: %p, size: %ld)\n",
+			_cookie, position, buf, *num_bytes);	
 	if (position == 0) { // First read
 		dump_acpi_namespace(device, "\\", buf, &bytes, 0);
 		if (bytes <= *num_bytes) {
