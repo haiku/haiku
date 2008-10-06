@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,7 @@
 #include "ScreenSaverSettings.h"
 
 #include <InputServerFilter.h>
+#include <Locker.h>
 #include <Looper.h>
 #include <Node.h>
 
@@ -23,51 +24,62 @@ static const uint32 kMsgSuspendScreenSaver = 'susp';
 class BMessageRunner;
 class ScreenSaverFilter;
 
-class ScreenSaverController : public BLooper {
-	public:
-        ScreenSaverController(ScreenSaverFilter *filter);
-        void MessageReceived(BMessage *msg);
 
-	private:
-        ScreenSaverFilter* fFilter;
+class ScreenSaverController : public BLooper {
+public:
+								ScreenSaverController(
+									ScreenSaverFilter* filter);
+	virtual	void				MessageReceived(BMessage* msg);
+
+private:
+			ScreenSaverFilter*	fFilter;
 };
 
-class ScreenSaverFilter : public BInputServerFilter {
-	public:
-		ScreenSaverFilter();
-		virtual ~ScreenSaverFilter();
 
-		virtual filter_result Filter(BMessage *message, BList *outList);
+class ScreenSaverFilter : public BInputServerFilter, BLocker {
+public:
+								ScreenSaverFilter();
+	virtual						~ScreenSaverFilter();
 
-		void Suspend(BMessage *message);
+	virtual	filter_result		Filter(BMessage* message, BList* outList);
 
-		void CheckTime();
-		void CheckCornerInvoke();
+			void				Suspend(BMessage* message);
 
-		uint32 SnoozeTime() {return fSnoozeTime;}
-		void ReloadSettings();
-		void SetEnabled(bool enabled) { fEnabled = enabled; }
+			void				CheckTime();
+			void				CheckCornerInvoke();
 
-	private:
-		void _WatchSettings();
-		void _UpdateRectangles();
-		BRect _ScreenCorner(screen_corner pos, uint32 cornerSize);
+			void				ReloadSettings();
+			void				SetEnabled(bool enabled);
 
-		void _Invoke();
-		void _Banish();
+private:
+			uint32				_SnoozeTime() {return fSnoozeTime;}
+			void				_WatchSettings();
+			void				_UpdateRectangles();
+			BRect				_ScreenCorner(screen_corner pos,
+									uint32 cornerSize);
 
-		ScreenSaverSettings fSettings;
-		bigtime_t		fLastEventTime, fBlankTime, fSnoozeTime;
-		screen_corner	fBlankCorner, fNeverBlankCorner, fCurrentCorner;
-		BRect			fBlankRect, fNeverBlankRect;
-		bool			fEnabled;
-		uint32			fFrameNum;
+			void				_Invoke();
+			void				_Banish();
 
-		ScreenSaverController* fController;
-		node_ref		fNodeRef;
-		BMessageRunner*	fRunner;
-		BMessageRunner*	fCornerRunner;
-		bool			fWatchingDirectory, fWatchingFile;
+			ScreenSaverSettings	fSettings;
+			bigtime_t			fLastEventTime;
+			bigtime_t			fBlankTime;
+			bigtime_t			fSnoozeTime;
+			screen_corner		fBlankCorner;
+			screen_corner		fNeverBlankCorner;
+			screen_corner		fCurrentCorner;
+			BRect				fBlankRect;
+			BRect				fNeverBlankRect;
+			uint32				fFrameNum;
+
+			ScreenSaverController* fController;
+			node_ref			fNodeRef;
+			BMessageRunner*		fRunner;
+			BMessageRunner*		fCornerRunner;
+			bool				fWatchingDirectory;
+			bool				fWatchingFile;
+
+			bool				fEnabled;
 };
 
 #endif	/* SCREEN_SAVER_FILTER_H */

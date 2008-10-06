@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku.
+ * Copyright 2003-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
 #include "ScreenSaverFilter.h"
 
 #include <Application.h>
+#include <Autolock.h>
 #include <MessageRunner.h>
 #include <NodeMonitor.h>
 #include <OS.h>
@@ -101,22 +102,24 @@ ScreenSaverController::MessageReceived(BMessage *message)
 
 
 ScreenSaverFilter::ScreenSaverFilter() 
-	:
+	: BLocker("screen saver filter"),
 	fLastEventTime(0),
 	fBlankTime(0),
 	fSnoozeTime(0),
 	fCurrentCorner(NO_CORNER),
-	fEnabled(false),
 	fFrameNum(0),
 	fRunner(NULL),
 	fCornerRunner(NULL),
 	fWatchingDirectory(false), 
-	fWatchingFile(false)
+	fWatchingFile(false),
+	fEnabled(false)
 {
 	CALLED();
 	fController = new (std::nothrow) ScreenSaverController(this);
 	if (fController == NULL)
 		return;
+
+	BAutolock _(this);
 
 	fController->Run();
 
@@ -127,21 +130,23 @@ ScreenSaverFilter::ScreenSaverFilter()
 
 ScreenSaverFilter::~ScreenSaverFilter()
 {
+	be_roster->StopWatching(fController);
+
+	// We must quit our controller without being locked, or else we might
+	// deadlock; when the controller is gone, there is no reason to lock
+	// anymore, anyway.
+	if (fController->Lock())
+		fController->Quit();
+
 	delete fCornerRunner;
 	delete fRunner;
 
 	if (fWatchingFile || fWatchingDirectory)
 		watch_node(&fNodeRef, B_STOP_WATCHING, fController);
-
-	be_roster->StopWatching(fController);
-
-	if (fController->Lock())
-		fController->Quit();
 }
 
 
-/*!
-	Starts watching the settings file, or if that doesn't exist, the directory
+/*!	Starts watching the settings file, or if that doesn't exist, the directory
 	the settings file will be placed into.
 */
 void
@@ -176,6 +181,7 @@ ScreenSaverFilter::_WatchSettings()
 }
 
 
+/*!	Starts the screen saver if allowed */
 void
 ScreenSaverFilter::_Invoke()
 {
@@ -192,10 +198,28 @@ ScreenSaverFilter::_Invoke()
 }
 
 
+/*! Stops the running screen saver, if any */
+void
+ScreenSaverFilter::_Banish() 
+{
+	CALLED();
+	if (!fEnabled)
+		return;
+
+	SERIAL_PRINT(("we quit screenblanker\n"));
+
+	// Don't care if it fails
+	BMessenger blankerMessenger(SCREEN_BLANKER_SIG, -1, NULL);
+	blankerMessenger.SendMessage(B_QUIT_REQUESTED);
+	fEnabled = false;
+}
+
+
 void
 ScreenSaverFilter::ReloadSettings()
 {
 	CALLED();
+	BAutolock _(this);
 	bool isFirst = !fWatchingDirectory && !fWatchingFile;
 
 	_WatchSettings();
@@ -224,26 +248,19 @@ ScreenSaverFilter::ReloadSettings()
 	}
 
 	BMessage check(kMsgCheckTime);
-	fRunner = new (std::nothrow) BMessageRunner(fController, &check, fSnoozeTime);
-	if (fRunner->InitCheck() != B_OK) {
-		SERIAL_PRINT(("fRunner init failed\n"));
+	fRunner = new (std::nothrow) BMessageRunner(fController, &check,
+		fSnoozeTime);
+	if (fRunner == NULL || fRunner->InitCheck() != B_OK) {
+		SERIAL_PRINT(("screen saver filter runner init failed\n"));
 	}
 }
 
 
 void
-ScreenSaverFilter::_Banish() 
+ScreenSaverFilter::SetEnabled(bool enabled)
 {
-	CALLED();
-	if (!fEnabled)
-		return;
-
-	SERIAL_PRINT(("we quit screenblanker\n"));
-
-	// Don't care if it fails
-	BMessenger blankerMessenger(SCREEN_BLANKER_SIG, -1, NULL);
-	blankerMessenger.SendMessage(B_QUIT_REQUESTED);
-	fEnabled = false;
+	BAutolock _(this);
+	fEnabled = enabled;
 }
 
 
@@ -251,6 +268,8 @@ void
 ScreenSaverFilter::CheckTime()
 {
 	CALLED();
+	BAutolock _(this);
+
 	bigtime_t now = system_time();
 	if (now >= fLastEventTime + fBlankTime)  
 		_Invoke();
@@ -267,7 +286,7 @@ ScreenSaverFilter::CheckTime()
 	else
 		fSnoozeTime = fLastEventTime + fBlankTime - now;
 
-	if (fRunner)
+	if (fRunner != NULL)
 		fRunner->SetInterval(fSnoozeTime);
 }
 
@@ -275,6 +294,8 @@ ScreenSaverFilter::CheckTime()
 void
 ScreenSaverFilter::CheckCornerInvoke()
 {
+	BAutolock _(this);
+
 	bigtime_t inactivity = system_time() - fLastEventTime;
 
 	if (fCurrentCorner == fBlankCorner && fBlankCorner != NO_CORNER
@@ -326,6 +347,8 @@ ScreenSaverFilter::_ScreenCorner(screen_corner corner, uint32 cornerSize)
 filter_result
 ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 {
+	BAutolock _(this);
+
 	fLastEventTime = system_time();
 
 	switch (message->what) {
@@ -366,7 +389,8 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 			// we ignore the Print-Screen key to make screen shots of
 			// screen savers possible
 			int32 key;
-			if (fEnabled && message->FindInt32("key", &key) == B_OK && key == 0xe)
+			if (fEnabled && message->FindInt32("key", &key) == B_OK
+				&& key == 0xe)
 				return B_DISPATCH_MESSAGE;
 		}
 	}
