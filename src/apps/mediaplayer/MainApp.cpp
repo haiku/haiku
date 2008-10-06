@@ -53,7 +53,7 @@ MainApp::MainApp()
 {
 	// XXX: HACK HACK HACK
 	// this works around a locking issue where gMainApp isn't set yet,
-	// while NewWindow() calls Show() which in the window thread calls 
+	// while NewWindow() calls Show() which in the window thread calls
 	// Controller::PlayerActivated() which calls gMainApp->PlayerCount()
 	gMainApp = this;
 	fFirstWindow = NewWindow();
@@ -102,7 +102,7 @@ MainApp::PlayerCount() const
 void
 MainApp::ReadyToRun()
 {
-	// setup the settings window now, we need to have it 
+	// setup the settings window now, we need to have it
 	fSettingsWindow = new SettingsWindow(BRect(150, 150, 450, 520));
 	fSettingsWindow->Hide();
 	fSettingsWindow->Show();
@@ -122,7 +122,7 @@ MainApp::ReadyToRun()
 void
 MainApp::RefsReceived(BMessage *msg)
 {
-	// The user dropped a file (or files) on this app's icon, 
+	// The user dropped a file (or files) on this app's icon,
 	// or double clicked a file that's handled by this app.
 	// Command line arguments are also redirected to here by
 	// ArgvReceived() but without MIME type check.
@@ -131,7 +131,7 @@ MainApp::RefsReceived(BMessage *msg)
 	// If IsLaunching() is true, we use fFirstWindow as first
 	// window.
 	printf("MainApp::RefsReceived\n");
-	
+
 	entry_ref ref;
 	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++) {
 		BWindow *win;
@@ -143,7 +143,7 @@ MainApp::RefsReceived(BMessage *msg)
 }
 
 
-void 
+void
 MainApp::ArgvReceived(int32 argc, char **argv)
 {
 	char cwd[B_PATH_NAME_LENGTH];
@@ -161,7 +161,7 @@ MainApp::ArgvReceived(int32 argc, char **argv)
 		BEntry entry(path.Path(), true);
 		if (!entry.Exists() || !entry.IsFile())
 			continue;
-		
+
 		entry_ref ref;
 		if (B_OK == entry.GetRef(&ref))
 			m.AddRef("refs", &ref);
@@ -174,7 +174,7 @@ MainApp::ArgvReceived(int32 argc, char **argv)
 }
 
 
-void 
+void
 MainApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -195,7 +195,7 @@ MainApp::MessageReceived(BMessage* message)
 			bool isAddonServer = strcmp(mimeSig, kMediaServerAddOnSig) == 0;
 			if (!isMediaServer && !isAddonServer)
 				break;
-	
+
 			bool running = (message->what == B_SOME_APP_LAUNCHED);
 			if (isMediaServer)
 				fMediaServerRunning = running;
@@ -275,7 +275,7 @@ MainApp::_ShowSettingsWindow()
 // #pragma mark -
 
 
-int 
+int
 main()
 {
 	EventQueue::CreateDefault();
