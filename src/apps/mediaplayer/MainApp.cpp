@@ -68,9 +68,8 @@ MainApp::~MainApp()
 bool
 MainApp::QuitRequested()
 {
-	// TODO: When doing this in the destructor, the MainApp does not
-	// quit properly. Is this a Haiku bug? (SettingsWindow::QuitRequested()
-	// returns "false" always.)
+	// Note: This needs to be done here, SettingsWindow::QuitRequested()
+	// returns "false" always.
 	if (fSettingsWindow && fSettingsWindow->Lock())
 		fSettingsWindow->Quit();
 	fSettingsWindow = NULL;
