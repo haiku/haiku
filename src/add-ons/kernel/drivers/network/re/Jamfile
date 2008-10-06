@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network re ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network re pci ;
