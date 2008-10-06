@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons input_server filters screensaver ;
+SubDir HAIKU_TOP src add-ons input_server filters screen_saver ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
