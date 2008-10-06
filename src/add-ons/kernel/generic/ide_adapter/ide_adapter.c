@@ -140,6 +140,8 @@ ide_adapter_write_pio(ide_adapter_channel_info *channel, uint16 *data,
 	if (channel->lost)
 		return B_ERROR;
 
+	force_16bit = true;
+
 	if ((count & 1) != 0 || force_16bit) {
 		for (; count > 0; --count)
 			pci->write_io_16(device, ioaddr, *(data++));
