@@ -8,10 +8,15 @@
  */
 
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <KernelExport.h>
+
 #include <smp.h>
 #include <util/AutoLock.h>
 #include <vm.h>
+#include <vm_address_space.h>
 #include <vm_page.h>
 #include <vm_priv.h>
 
@@ -20,9 +25,6 @@
 #include <arch/cpu.h>
 
 #include <arch/x86/bios.h>
-
-#include <stdlib.h>
-#include <string.h>
 
 
 //#define TRACE_ARCH_VM
@@ -382,10 +384,21 @@ arch_vm_init_post_modules(kernel_args *args)
 
 
 void
-arch_vm_aspace_swap(vm_address_space *aspace)
+arch_vm_aspace_swap(struct vm_address_space *from, struct vm_address_space *to)
 {
+	int cpu = smp_get_current_cpu();
+	if (from != NULL) {
+		atomic_and(&from->translation_map.arch_data->active_on_cpus,
+			~((uint32)1 << cpu));
+	}
+
+	if (to != NULL && to != vm_kernel_address_space()) {
+		atomic_or(&to->translation_map.arch_data->active_on_cpus,
+			(uint32)1 << cpu);
+	}
+
 	i386_swap_pgdir((addr_t)i386_translation_map_get_pgdir(
-		&aspace->translation_map));
+		&to->translation_map));
 }
 
 

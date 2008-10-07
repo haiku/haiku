@@ -1441,7 +1441,7 @@ thread_exit(void)
 		RELEASE_TEAM_LOCK();
 
 		// swap address spaces, to make sure we're running on the kernel's pgdir
-		vm_swap_address_space(vm_kernel_address_space());
+		vm_swap_address_space(team->address_space, vm_kernel_address_space());
 		restore_interrupts(state);
 
 		TRACE(("thread_exit: thread %ld now a kernel thread!\n", thread->id));

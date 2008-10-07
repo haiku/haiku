@@ -27,7 +27,8 @@ status_t arch_vm_init(struct kernel_args *args);
 status_t arch_vm_init_post_area(struct kernel_args *args);
 status_t arch_vm_init_end(struct kernel_args *args);
 status_t arch_vm_init_post_modules(struct kernel_args *args);
-void arch_vm_aspace_swap(struct vm_address_space *aspace);
+void arch_vm_aspace_swap(struct vm_address_space *from,
+	struct vm_address_space *to);
 bool arch_vm_supports_protection(uint32 protection);
 
 status_t arch_vm_set_memory_type(struct vm_area *area, addr_t physicalBase,

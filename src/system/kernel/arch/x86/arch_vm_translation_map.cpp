@@ -662,12 +662,18 @@ flush_tmap(vm_translation_map *map)
 
 		if (IS_KERNEL_MAP(map)) {
 			arch_cpu_global_TLB_invalidate();
-			smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0, NULL,
-				SMP_MSG_FLAG_SYNC);
+			smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0,
+				NULL, SMP_MSG_FLAG_SYNC);
 		} else {
 			arch_cpu_user_TLB_invalidate();
-			smp_send_broadcast_ici(SMP_MSG_USER_INVALIDATE_PAGES, 0, 0, 0, NULL,
-				SMP_MSG_FLAG_SYNC);
+
+			int cpu = smp_get_current_cpu();
+			uint32 cpuMask = map->arch_data->active_on_cpus
+				& ~((uint32)1 << cpu);
+			if (cpuMask != 0) {
+				smp_send_multicast_ici(cpuMask, SMP_MSG_USER_INVALIDATE_PAGES,
+					0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
+			}
 		}
 	} else {
 		TRACE(("flush_tmap: %d pages to invalidate, invalidate list\n",
@@ -675,10 +681,23 @@ flush_tmap(vm_translation_map *map)
 
 		arch_cpu_invalidate_TLB_list(map->arch_data->pages_to_invalidate,
 			map->arch_data->num_invalidate_pages);
-		smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
-			(uint32)map->arch_data->pages_to_invalidate,
-			map->arch_data->num_invalidate_pages, 0, NULL,
-			SMP_MSG_FLAG_SYNC);
+
+		if (IS_KERNEL_MAP(map)) {
+			smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
+				(uint32)map->arch_data->pages_to_invalidate,
+				map->arch_data->num_invalidate_pages, 0, NULL,
+				SMP_MSG_FLAG_SYNC);
+		} else {
+			int cpu = smp_get_current_cpu();
+			uint32 cpuMask = map->arch_data->active_on_cpus
+				& ~((uint32)1 << cpu);
+			if (cpuMask != 0) {
+				smp_send_multicast_ici(cpuMask, SMP_MSG_INVALIDATE_PAGE_LIST,
+					(uint32)map->arch_data->pages_to_invalidate,
+					map->arch_data->num_invalidate_pages, 0, NULL,
+					SMP_MSG_FLAG_SYNC);
+			}
+		}
 	}
 	map->arch_data->num_invalidate_pages = 0;
 
@@ -777,6 +796,7 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 		return B_NO_MEMORY;
 	}
 
+	map->arch_data->active_on_cpus = 0;
 	map->arch_data->num_invalidate_pages = 0;
 
 	if (!kernel) {

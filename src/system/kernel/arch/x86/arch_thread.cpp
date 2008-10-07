@@ -358,8 +358,21 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 
 	newPageDirectory = (addr_t)x86_next_page_directory(from, to);
 
-	if ((newPageDirectory % B_PAGE_SIZE) != 0)
-		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", newPageDirectory);
+	ASSERT((newPageDirectory % B_PAGE_SIZE) == 0);
+
+	if (newPageDirectory != 0) {
+		// update on which CPUs the address space is used
+		int cpu = smp_get_current_cpu();
+		if (vm_address_space* addressSpace = from->team->address_space) {
+			atomic_and(&addressSpace->translation_map.arch_data->active_on_cpus,
+				~((uint32)1 << cpu));
+		}
+
+		if (vm_address_space* addressSpace = to->team->address_space) {
+			atomic_or(&addressSpace->translation_map.arch_data->active_on_cpus,
+				(uint32)1 << cpu);
+		}
+	}
 
 	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
 	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);

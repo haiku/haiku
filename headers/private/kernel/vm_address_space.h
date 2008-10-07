@@ -34,7 +34,7 @@ struct vm_address_space *vm_get_current_user_address_space(void);
 team_id vm_current_user_address_space_id(void);
 struct vm_address_space *vm_get_address_space(team_id team);
 void vm_put_address_space(struct vm_address_space *aspace);
-#define vm_swap_address_space(aspace) arch_vm_aspace_swap(aspace)
+#define vm_swap_address_space(from, to) arch_vm_aspace_swap(from, to)
 
 #ifdef __cplusplus
 }

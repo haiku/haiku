@@ -29,7 +29,7 @@
 
 #warning M68K: WRITEME
 
-status_t 
+status_t
 arch_vm_init(kernel_args *args)
 {
 	return B_OK;
@@ -62,7 +62,7 @@ arch_vm_init_end(kernel_args *args)
 #if 0
 	TRACE(("arch_vm_init_end(): %lu virtual ranges to keep:\n",
 		args->arch_args.num_virtual_ranges_to_keep));
-	
+
 	for (int i = 0; i < (int)args->arch_args.num_virtual_ranges_to_keep; i++) {
 		addr_range &range = args->arch_args.virtual_ranges_to_keep[i];
 
@@ -102,11 +102,10 @@ arch_vm_init_post_modules(kernel_args *args)
 }
 
 
-void 
-arch_vm_aspace_swap(vm_address_space *aspace)
+void
+arch_vm_aspace_swap(struct vm_address_space *from, struct vm_address_space *to)
 {
-	m68k_set_pgdir(m68k_translation_map_get_pgdir(
-		&aspace->translation_map));
+	m68k_set_pgdir(m68k_translation_map_get_pgdir(&to->translation_map));
 }
 
 
