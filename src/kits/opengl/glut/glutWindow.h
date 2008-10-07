@@ -5,33 +5,23 @@
  * and is provided without guarantee or warrantee expressed or
  * implied. This program is -not- in the public domain.
  *
- *
- *  FILE:	glutWindow.h
- *
  *	DESCRIPTION:	the GlutWindow class saves all events for
  *		handling by main thread
  ***********************************************************/
 
-/***********************************************************
- *	Headers
- ***********************************************************/
 #include <GL/glut.h>
 #include <Window.h>
 #include <GLView.h>
 
-/***********************************************************
- *	CLASS:	GlutWindow
- *
- *  INHERITS FROM:  BGLView (NOT BWindow!)
- *
- *  DESCRIPTION:	all information needed for windows and
- *			subwindows (handled as similarly as possible)
- ***********************************************************/
+
+/*!	All information needed for windows and
+	subwindows (handled as similarly as possible).
+*/
 class GlutWindow : public BGLView {
 public:
-	GlutWindow(GlutWindow *nparent, char *name, int x, int y, int width,
-				int height, ulong options);
-				
+	GlutWindow(GlutWindow *nparent, const char *name, int x, int y, int width,
+		int height, ulong options);
+
 	virtual void MessageReceived(BMessage *message);
 	void KeyDown(const char *bytes, int32 numBytes);
 	void KeyUp(const char *bytes, int32 numBytes);
@@ -44,7 +34,7 @@ public:
 	void ErrorCallback(GLenum errorCode);
 
 	static long MenuThread(void *menu);
-	
+
 	int num;			// window number returned to user
 	int cursor;			// my cursor
 #define GLUT_MAX_MENUS              3
@@ -53,23 +43,23 @@ public:
 	uint32 m_buttons;			// the last mouse button state
 
 	/* Window relationship state. */
-  GlutWindow *parent;   /* parent window */
-  GlutWindow *children; /* first child window */
-  GlutWindow *siblings; /* next sibling */
+	GlutWindow *parent;   /* parent window */
+	GlutWindow *children; /* first child window */
+	GlutWindow *siblings; /* next sibling */
 
 	// leave out buttons and dials callbacks that we don't support
-  GLUTdisplayCB display;  /* redraw  */
-  GLUTreshapeCB reshape;  /* resize  (width,height) */
-  GLUTmouseCB mouse;    /* mouse  (button,state,x,y) */
-  GLUTmotionCB motion;  /* motion  (x,y) */
-  GLUTpassiveCB passive;  /* passive motion  (x,y) */
-  GLUTentryCB entry;    /* window entry/exit  (state) */
-  GLUTkeyboardCB keyboard;  /* keyboard  (ASCII,x,y) */
-  GLUTkeyboardCB keyboardUp;  /* keyboard up (ASCII,x,y) */
-  GLUTvisibilityCB visibility;  /* visibility  */
-  GLUTspecialCB special;  /* special key  */
-  GLUTspecialCB specialUp;  /* special key up */
-  GLUTwindowStatusCB windowStatus;  /* window status */
+	GLUTdisplayCB display;  /* redraw  */
+	GLUTreshapeCB reshape;  /* resize  (width,height) */
+	GLUTmouseCB mouse;    /* mouse  (button,state,x,y) */
+	GLUTmotionCB motion;  /* motion  (x,y) */
+	GLUTpassiveCB passive;  /* passive motion  (x,y) */
+	GLUTentryCB entry;    /* window entry/exit  (state) */
+	GLUTkeyboardCB keyboard;  /* keyboard  (ASCII,x,y) */
+	GLUTkeyboardCB keyboardUp;  /* keyboard up (ASCII,x,y) */
+	GLUTvisibilityCB visibility;  /* visibility  */
+	GLUTspecialCB special;  /* special key  */
+	GLUTspecialCB specialUp;  /* special key up */
+	GLUTwindowStatusCB windowStatus;  /* window status */
 
 	bool anyevents;		// were any events received?
 	bool displayEvent;		// call display
@@ -85,7 +75,7 @@ public:
 	bool specialUpEvent;		// call special
 	bool statusEvent;		// menu status changed
 	bool menuEvent;			// menu selected
-	
+
 	int button, mouseState; // for mouse callback
 	int mouseX, mouseY; // for mouse callback
 	int motionX, motionY; // for motion callback
@@ -113,8 +103,9 @@ public:
  ***********************************************************/
 class GlutBWindow : public BDirectWindow {
 public:
-	GlutBWindow(BRect frame, char *name);
+	GlutBWindow(BRect frame, const char *name);
 	~GlutBWindow();
+
 	void DirectConnected(direct_buffer_info *info);
 	bool QuitRequested();	// exits app
 	void Minimize(bool minimized);  // minimized windows are not visible
