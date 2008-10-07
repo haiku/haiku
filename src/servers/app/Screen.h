@@ -39,7 +39,8 @@ class Screen {
 									bool makeDefault);
 			status_t			SetPreferredMode();
 			status_t			SetBestMode(uint16 width, uint16 height,
-									uint32 colorspace, float frequency);
+									uint32 colorspace, float frequency,
+									bool strict = true);
 
 			void				GetMode(display_mode* mode) const;
 			void				GetMode(uint16 &width, uint16 &height,
