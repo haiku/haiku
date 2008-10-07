@@ -124,7 +124,7 @@ Screen::SetMode(uint16 width, uint16 height, uint32 colorSpace,
 
 status_t
 Screen::SetBestMode(uint16 width, uint16 height, uint32 colorSpace,
-	float frequency)
+	float frequency, bool strict)
 {
 	// search for a matching mode
 	display_mode* modes = NULL;
@@ -138,9 +138,14 @@ Screen::SetBestMode(uint16 width, uint16 height, uint32 colorSpace,
 	int32 index = _FindBestMode(modes, count, width, height, colorSpace,
 		frequency);
 	if (index < 0) {
-		debug_printf("Finding best mode failed");
-		delete[] modes;
-		return B_ERROR;
+		if (strict) {
+			debug_printf("Finding best mode failed");
+			delete[] modes;
+			return B_ERROR;
+		} else {
+			index = 0;
+			// Just use the first mode in the list
+		}
 	}
 
 	display_mode mode = modes[index];
