@@ -282,7 +282,7 @@ SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToHaikuImage beos system boot : $(bootScripts) ;
 
 local logoArtwork = "HAIKU logo - white on blue - big.png"
-	"HAIKU logo - white on blue - small.png" ;
+	"HAIKU logo - white on blue - normal.png" ;
 SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
 AddFilesToHaikuImage beos etc artwork : $(logoArtwork) ;
 
