@@ -10,7 +10,7 @@
 //		"hey Becasso get AspectRatio of Canvas 0"
 //		outputs
 //		Reply BMessage(B_REPLY):
-//		   "result" (B_DOUBLE_TYPE) : 0.600  
+//		   "result" (B_DOUBLE_TYPE) : 0.600
 //		but "hey -o Becasso get AspectRatio of Canvas 0"
 //		outputs 0.600000 directly.
 //
@@ -43,7 +43,7 @@
 //		          Suites   B_GET_PROPERTY                      DIRECT
 //		       Messenger   B_GET_PROPERTY                      DIRECT
 //		    InternalName   B_GET_PROPERTY                      DIRECT
-//		
+//
 //		            name   value                               kind
 //		--------------------------------------------------------------------------------
 //		          Backup   0x6261636B ('back')                 COMMAND
@@ -52,7 +52,7 @@
 //		                   Usage: Stops the current operation...
 //		       Type Code   0x74797065 ('type')                 TYPE CODE
 //		                   Usage: Type code info...
-// 
+//
 //	You can also use the application defined commands (as the verb) with hey:
 //		hey MyBackupApp Backup "Maui"
 //
@@ -62,7 +62,7 @@
 //      more like english, bare reverse-index-specifiers are now handled, and
 //      named specifiers can contain only digits by quoting it (but make sure the
 //      shell passed the quotes through).
-//      
+//
 //      Hey(target,const char*,reply) was previously limited to 100 tokens.  It
 //      now uses a vector<> so it's only limited by available memory.
 //
@@ -90,15 +90,15 @@
 //
 //		The range specifier sent to the target was 1 greater than it should've been. Fixed.
 //
-//		'hey' made the assumption that the first thread in a team will be the 
-//		application thread (and therefore have the application's name).  
+//		'hey' made the assumption that the first thread in a team will be the
+//		application thread (and therefore have the application's name).
 //		This was not always the case. Fix from Scott Lindsey <wombat@gobe.com>.
 //
-//v1.1.0:	Flattened BPropertyInfo is printed if found in the reply of B_GET_SUPPORTED_SUITES 
-//		1,2,3 and 4 character message constant is supported (e.g. '1', '12', '123', '1234') 
-//		Alpha is sent with rgb_color 
+//v1.1.0:	Flattened BPropertyInfo is printed if found in the reply of B_GET_SUPPORTED_SUITES
+//		1,2,3 and 4 character message constant is supported (e.g. '1', '12', '123', '1234')
+//		Alpha is sent with rgb_color
 //
-//v1.0.0	First public release 
+//v1.0.0	First public release
 
 
 #include <stdio.h>
@@ -141,33 +141,33 @@ status_t
 parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 {
 	if (!the_application.IsValid()) {
-		if (!silent) 
+		if (!silent)
 			fprintf(stderr, "Cannot find the application (%s)\n", argv[argapp]);
 		return B_ERROR;
 	}
 
 	if (argc < 3) {
-		if (!silent) 
+		if (!silent)
 			fprintf(stderr, "Cannot find the verb!\n");
 		return B_ERROR;
 	}
 
-	
+
 	BMessage the_reply;
 	int32 argx = argapp+1;
 	status_t err = Hey(&the_application, argv, &argx, argc, &the_reply);
 
 	if (err != B_OK) {
-		if (!silent) 
+		if (!silent)
 			fprintf(stderr, "Error when sending message to %s!\n", argv[argapp]);
 		return B_ERROR;
 	} else {
 		if (the_reply.what == (uint32)B_MESSAGE_NOT_UNDERSTOOD || the_reply.what==(uint32)B_ERROR){	// I do it myself
 			if (the_reply.HasString("message")){
-				if (!silent) 
+				if (!silent)
 					printf("%s (error 0x%8lX)\n", the_reply.FindString("message"), the_reply.FindInt32("error"));
 			} else {
-				if (!silent) 
+				if (!silent)
 					printf("error 0x%8lX\n", the_reply.FindInt32("error"));
 			}
 			return 1;
@@ -231,7 +231,7 @@ parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 	return B_OK;
 }
 
-int 
+int
 main(int argc, char *argv[])
 {
 	BApplication app("application/x-amezei-hey");
@@ -250,14 +250,14 @@ main(int argc, char *argv[])
 		"         -o: output result to stdout for easy parsing\n\n", VERSION);
 		// Updated Usage string to reflect "do", "the", bare -index, and '"name"' changes below
 		//   -- pfolk@uni.uiuc.edu 1999-11-03
-		
+
 		return 1;
 	}
-	
+
 	int32 argapp = 1;
 	silent = false;
 	output = false;
-	
+
 	// Updated option mechanism --SS
 	for (int i = 0; i < argc; i++) {
 		if (strcmp(argv[i], "-s")==0 || strcmp(argv[i], "-S")==0){
@@ -303,25 +303,25 @@ main(int argc, char *argv[])
 			}
 		}
 	}
-		
+
 	return 1;
 }
 
 
-int32 
+int32
 HeyInterpreterThreadHook(void* arg)
 {
 	if (!arg)
 		return 1;
-	
+
 	BMessage environment(*(BMessage*) arg);
 	char* prompt = "Hey";
-	if (environment.HasString("prompt")) 
+	if (environment.HasString("prompt"))
 		environment.FindString("prompt", (const char **)&prompt);
 	printf("%s> ", prompt);
-	
+
 	BMessenger target;
-	if (environment.HasMessenger("Target")) 
+	if (environment.HasMessenger("Target"))
 		environment.FindMessenger("Target", &target);
 
 	char command[1024];
@@ -337,11 +337,11 @@ HeyInterpreterThreadHook(void* arg)
 		}
 		printf("%s> ", prompt);
 	}
-	
+
 	return 0;
 }
 
-status_t 
+status_t
 Hey(BMessenger* target, const char* arg, BMessage* reply)
 {
 	BList argv; // number of tokens is now limited only by memory  -- pfolk@uni.uiuc.edu 1999-11-03
@@ -350,19 +350,19 @@ Hey(BMessenger* target, const char* arg, BMessage* reply)
 	int32 tokenNdex = 0;
 	int32 argNdex = 0;
 	bool inquotes = false;
-	
+
 	while (arg[argNdex] != 0) { // for each character in arg
-		if (arg[argNdex] == '\"') 
+		if (arg[argNdex] == '\"')
 			inquotes = !inquotes;
 		if (!inquotes && isSpace(arg[argNdex])) { // if the character is white space
 			if (tokenNdex!=0) { //  close off currentToken token
-				currentToken[tokenNdex] = 0; 
+				currentToken[tokenNdex] = 0;
 				argv.AddItem(currentToken);
 				currentToken += tokenNdex+1;
 				tokenNdex=0;
 				argNdex++;
 			} else { // just skip the whitespace
-				argNdex++; 
+				argNdex++;
 			}
 		} else { // copy char into current token
 			currentToken[tokenNdex] = arg[argNdex];
@@ -370,13 +370,13 @@ Hey(BMessenger* target, const char* arg, BMessage* reply)
 			argNdex++;
 		}
 	}
-	
+
 	if (tokenNdex!=0) { //  close off currentToken token
-		currentToken[tokenNdex] = 0; 
+		currentToken[tokenNdex] = 0;
 		argv.AddItem(currentToken);
 	}
 	argv.AddItem(NULL);
-	
+
 	int32 argx = 0;
 	status_t ret = Hey(target, (char **)argv.Items(), &argx, argv.CountItems()-1, reply);
 	  // This used to be "return Hey(...);"---so tokens wasn't delete'd.  -- pfolk@uni.uiuc.edu 1999-11-03
@@ -385,7 +385,7 @@ Hey(BMessenger* target, const char* arg, BMessage* reply)
 }
 
 
-bool 
+bool
 isSpace(char c)
 {
 	switch (c) {
@@ -399,7 +399,7 @@ isSpace(char c)
 }
 
 
-status_t 
+status_t
 Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 {
 	bool direct_what = false;
@@ -412,26 +412,26 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 		status_t result=B_OK;
 		while ((result = add_specifier(&get_target, argv, argx, argc))==B_OK)
 			;
-		
+
 		if (result!=B_ERROR){	// bad syntax
-			if (!silent) 
+			if (!silent)
 				fprintf(stderr, "Bad specifier syntax!\n");
 			return result;
 		}
 		BMessage msgr;
 		if (target && target->IsValid()) {
 			result = target->SendMessage(&get_target, &msgr);
-			if (result!=B_OK) 
+			if (result!=B_OK)
 				return result;
 			result = msgr.FindMessenger ("result", target);
 			if (result!=B_OK) {
-				if (!silent) 
+				if (!silent)
 					fprintf(stderr, "Couldn't retrieve the BMessenger!\n");
 				return result;
 			}
 		}
 		if (!argv[*argx]) {
-			if (!silent) 
+			if (!silent)
 				fprintf(stderr, "Syntax error - forgot \"do\"?\n");
 			return B_ERROR;
 		}
@@ -467,7 +467,7 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 			case 3:
 				the_message.what=(((int32)argv[*argx][0])<<16)|(((int32)argv[*argx][1])<<8)|(((int32)argv[*argx][2]));
 				break;
-			case 4:			
+			case 4:
 				the_message.what=(((int32)argv[*argx][0])<<24)|(((int32)argv[*argx][1])<<16)|(((int32)argv[*argx][2])<<8)|(((int32)argv[*argx][3]));
 				break;
 			default:
@@ -483,11 +483,11 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 						BPropertyInfo propinfo;
 						const value_info *vinfo;
 						int32 vinfo_index, vinfo_count;
-						
+
 //						const char *str;
 //						while (rply.FindString("suites", j++, &str) == B_OK)
 //							printf ("Suite %ld: %s\n", j, str);
-//							
+//
 //						j = 0;
 						while(rply.FindData("messages", B_PROPERTY_INFO_TYPE, j++, (const void **)&voidptr, &sizefound)==B_OK && !found){
 							if(propinfo.Unflatten(B_PROPERTY_INFO_TYPE, (const void *)voidptr, sizefound)==B_OK){
@@ -497,11 +497,11 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 #if TEST_VALUEINFO>0
 								value_info vinfo[10]={	{"Backup", 'back', B_COMMAND_KIND, "This command backs up your hard drive."},
 											{"Abort", 'abor', B_COMMAND_KIND, "Stops the current operation..."},
-											{"Type Code", 'type', B_TYPE_CODE_KIND, "Type code info..."}	
+											{"Type Code", 'type', B_TYPE_CODE_KIND, "Type code info..."}
 										};
 								vinfo_count=3;
 #endif
-				
+
 								while(vinfo_index<vinfo_count){
 									if(strcmp(vinfo[vinfo_index].name, argv[*argx])==0){
 										found=true;
@@ -513,7 +513,7 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 									}
 									vinfo_index++;
 								}
-								
+
 							}
 						}
 					}
@@ -521,14 +521,14 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 
 
 				if(!found){
-					if(!silent) 
+					if(!silent)
 						fprintf(stderr, "Bad verb (\"%s\")\n", argv[*argx]);
 					return -1;
 				}
 		}
 		direct_what = true;
 	}
-	
+
 	status_t result = B_OK;
 	(*argx)++;
 
@@ -540,15 +540,15 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 		if (the_message.what!=B_REFS_RECEIVED){	// LOAD has no specifier
 			while ((result=add_specifier(&the_message, argv, argx, argc))==B_OK)
 				;
-		
+
 			if (result!=B_ERROR){	// bad syntax
-				if (!silent) 
+				if (!silent)
 					fprintf(stderr, "Bad specifier syntax!\n");
 				return result;
 			}
 		}
 	}
-	
+
 	// if verb is SET or LOAD, there should be a to <value>
 	if ((the_message.what==B_SET_PROPERTY || the_message.what==B_REFS_RECEIVED) && argv[*argx]!=NULL){
 		if (strcasecmp(argv[*argx], "to")==0) {
@@ -557,10 +557,10 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 		result = add_data(&the_message, argv, argx);
 		if (result!=B_OK) {
 			if (result==B_FILE_NOT_FOUND){
-				if (!silent) 
+				if (!silent)
 					fprintf(stderr, "File not found!\n");
 			} else {
-				if (!silent) 
+				if (!silent)
 					fprintf(stderr, "Invalid 'to...' value format!\n");
 			}
 			return result;
@@ -568,7 +568,7 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 	}
 
 	add_with(&the_message, argv, argx, argc);
-	
+
 #if DEBUG_HEY>0
 	fprintf(stderr, "Send ");
 	print_message(&the_message);
@@ -587,7 +587,7 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 
 // There can be a with <name>=<type>() [and <name>=<type> ...]
 // I treat "and" just the same as "with", it's just to make the script syntax more English-like.
-status_t 
+status_t
 add_with(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 {
 	status_t result = B_OK;
@@ -601,10 +601,10 @@ add_with(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 				result=add_data(to_message, argv, argx);
 				if (result!=B_OK){
 					if (result==B_FILE_NOT_FOUND){
-						if (!silent) 
+						if (!silent)
 							fprintf(stderr, "File not found!\n");
 					} else {
-						if (!silent) 
+						if (!silent)
 							fprintf(stderr, "Invalid 'with...' value format!\n");
 					}
 					return result;
@@ -613,7 +613,7 @@ add_with(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 				// printf ("argc = %d, argv[%d] = %s\n", argc, *argx, argv[*argx]);
 				if (*argx < argc - 1 && strcasecmp(argv[*argx], "and")==0) {
 					(*argx)++;
-				} else 
+				} else
 					done = true;
 			} while (!done);
 		}
@@ -621,47 +621,47 @@ add_with(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 	return result;
 }
 
-// returns B_OK if successful 
+// returns B_OK if successful
 //         B_ERROR if no more specifiers
 //         B_BAD_SCRIPT_SYNTAX if syntax error
-status_t 
+status_t
 add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 {
 	char *property=argv[*argx];
-	
+
 	if (property==NULL)
 		return B_ERROR;		// no more specifiers
-	
+
 	(*argx)++;
-	
+
 	if (strcasecmp(property, "do")==0){	// Part of the "hey App let Specifier do Verb".
 		return B_ERROR;	// no more specifiers
 	}
-	
+
 	if (strcasecmp(property, "to")==0){	// it is the 'to' string!!!
 		return B_ERROR;	// no more specifiers
 	}
-	
+
 	if (strcasecmp(property, "with")==0){	// it is the 'with' string!!!
 		*argx -= 2;
 		add_with (to_message, argv, argx, argc);
 		return B_ERROR;	// no more specifiers
 	}
-	
+
 	if (strcasecmp(property, "of")==0){		// skip "of", read real property
 		property = argv[*argx];
-		if (property==NULL) 
+		if (property==NULL)
 			return B_BAD_SCRIPT_SYNTAX;		// bad syntax
 		(*argx)++;
 	}
-	
+
 	if (strcasecmp(property, "the")==0){		// skip "the", read real property  -- pfolk@uni.uiuc.edu 1999-11-03
 		property = argv[*argx];
-		if (property==NULL) 
+		if (property==NULL)
 			return B_BAD_SCRIPT_SYNTAX;		// bad syntax
 		(*argx)++;
 	}
-	
+
 	// decide the specifier
 
 	char *specifier = NULL;
@@ -678,12 +678,12 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 
 	if (strcasecmp(specifier, "of")==0){	// direct specifier
 		to_message->AddSpecifier(property);
-		return B_OK;	
+		return B_OK;
 	}
 
 	if (strcasecmp(specifier, "to")==0){	// direct specifier
 		to_message->AddSpecifier(property);
-		return B_ERROR;		// no more specifiers	
+		return B_ERROR;		// no more specifiers
 	}
 
 
@@ -700,14 +700,14 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 			ix1 = strtoul(specifier+1, &end, 10);
 			if (end[0]==']'){	// it was an index
 				to_message->AddSpecifier(property, ix1);
-				return B_OK;	
+				return B_OK;
 			} else {
 				specifier=argv[*argx];
 				if (specifier==NULL){
 					// I was wrong, it was just an index
 					to_message->AddSpecifier(property, ix1);
-					return B_OK;	
-				}		
+					return B_OK;
+				}
 				(*argx)++;
 				if (strcasecmp(specifier, "to")==0){
 					specifier = argv[*argx];
@@ -717,7 +717,7 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 					(*argx)++;
 					ix2 = strtoul(specifier, &end, 10);
 					to_message->AddSpecifier(property, ix1, ix2-ix1>0 ? ix2-ix1 : 1);
-					return B_OK;		
+					return B_OK;
 				} else {
 					return B_BAD_SCRIPT_SYNTAX;		// wrong syntax
 				}
@@ -735,7 +735,7 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 				break;
 			}
 		}
-		
+
 		if (index_spec){
 			if (reverse) {
 				// Copied from above  -- pfolk@uni.uiuc.edu 1999-11-03
@@ -744,7 +744,7 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 				revspec.AddInt32("index", atol(specifier+1));
 				to_message->AddSpecifier(&revspec);
 			}
-			else 
+			else
 				to_message->AddSpecifier(property, atol(specifier));
 		} else {
 			// Allow any name by counting an initial " as a literal-string indicator
@@ -758,19 +758,19 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 			to_message->AddSpecifier(property, specifier);
 		}
 	}
-	
+
 	return B_OK;
 }
 
 
-status_t 
+status_t
 add_data(BMessage *to_message, char *argv[], int32 *argx)
 {
 	char *valuestring=argv[*argx];
-	
-	if (valuestring==NULL) 
+
+	if (valuestring==NULL)
 		return B_ERROR;
-	
+
 	// try to interpret it as an integer or float
 	bool contains_only_digits = true;
 	bool is_floating_point = false;
@@ -796,7 +796,7 @@ add_data(BMessage *to_message, char *argv[], int32 *argx)
 			return B_OK;
 		}
 	}
-	
+
 	// if true or false, it is bool
 	if (strcasecmp(valuestring, "true")==0){
 		to_message->AddBool("data", true);
@@ -812,12 +812,12 @@ add_data(BMessage *to_message, char *argv[], int32 *argx)
 	#define MAX_NAME_LENGTH 128
 	char curname[MAX_NAME_LENGTH];
 	strcpy (curname, "data");	// This is the default.
-	
+
 	char *s = valuestring;
 	while (*++s && *s != '=')
 		// Look for a '=' character...
 		;
-	if (*s == '=') {	// We found a <name>= 
+	if (*s == '=') {	// We found a <name>=
 		*s = 0;
 		strcpy (curname, valuestring);	// Use the new <name>
 		valuestring = s + 1;			// Reposition the valuestring ptr.
@@ -879,7 +879,7 @@ add_data(BMessage *to_message, char *argv[], int32 *argx)
 				}
 			}
 		}
-		
+
 		to_message->AddRect(curname, BRect(l,t,r,b));
 		return B_OK;
 	} else if (strncasecmp(valuestring, "rgb_color", strlen("rgb_color"))==0){
@@ -898,26 +898,26 @@ add_data(BMessage *to_message, char *argv[], int32 *argx)
 				}
 			}
 		}
-		
+
 		to_message->AddData(curname, B_RGB_COLOR_TYPE, &clr, sizeof(rgb_color));
 		return B_OK;
 	} else if (strncasecmp(valuestring, "file", strlen("file"))==0){
 		entry_ref file_ref;
-		
+
 		// remove the last ] or )
 		if (valuestring[strlen(valuestring)-1]==')' || valuestring[strlen(valuestring)-1]==']'){
 			valuestring[strlen(valuestring)-1] = 0;
 		}
-		
+
 		if (get_ref_for_path(valuestring+5, &file_ref)!=B_OK){
 			return B_FILE_NOT_FOUND;
 		}
-		
+
 		// check if the ref is valid
 		BEntry entry;
 		if (entry.SetTo(&file_ref)!=B_OK) return B_FILE_NOT_FOUND;
 		//if(!entry.Exists())  return B_FILE_NOT_FOUND;
-		
+
 		// add both ways, refsreceived needs it as "refs" while scripting needs "data"
 		to_message->AddRef("refs", &file_ref);
 		to_message->AddRef(curname, &file_ref);
@@ -937,12 +937,12 @@ add_data(BMessage *to_message, char *argv[], int32 *argx)
 }
 
 
-void 
+void
 print_message(BMessage *message)
 {
 	BList textlist;
 	add_message_contents(&textlist, message, 0);
-	
+
 	char *whatString = get_datatype_string(message->what);
 	printf("BMessage(%s):\n", whatString);
 	free(whatString);
@@ -954,7 +954,7 @@ print_message(BMessage *message)
 }
 
 
-void 
+void
 add_message_contents(BList *textlist, BMessage *msg, int32 level)
 {
 	int32 count;
@@ -968,13 +968,13 @@ add_message_contents(BList *textlist, BMessage *msg, int32 level)
 	void *voidptr;
 	BMessage a_message;
 	char *textline, *datatype, *content;
-	
+
 	// go though all message data
 	count = msg->CountNames(B_ANY_TYPE);
 	for (i=0; i<count; i++){
 		msg->GetInfo(B_ANY_TYPE, i, &namefound, &typefound);
 		j = 0;
-		
+
 		while (msg->FindData(namefound, typefound, j++, (const void **)&voidptr, &sizefound)==B_OK){
 			datatype = get_datatype_string(typefound);
 			content = format_data(typefound, (char*)voidptr, sizefound);
@@ -984,7 +984,7 @@ add_message_contents(BList *textlist, BMessage *msg, int32 level)
 			textlist->AddItem(textline);
 			delete [] datatype;
 			delete [] content;
-			
+
 			if (typefound==B_MESSAGE_TYPE){
 				msg->FindMessage(namefound, j-1, &a_message);
 				add_message_contents(textlist, &a_message, level+1);
@@ -1002,7 +1002,7 @@ char *
 get_datatype_string(int32 type)
 {
 	char *str = new char[128];
-	
+
 	switch (type){
 		case B_ANY_TYPE:	strcpy(str, "B_ANY_TYPE"); break;
 		case B_ASCII_TYPE:	strcpy(str, "B_ASCII_TYPE"); break;
@@ -1107,12 +1107,12 @@ get_datatype_string(int32 type)
 		case B_NAME_SPECIFIER	 :	strcpy(str, "B_NAME_SPECIFIER"); break;
 
 		case B_ERROR	 :	strcpy(str, "B_ERROR"); break;
-				
+
 		default:	// unknown
 					id_to_string(type, str);
 					break;
 	}
-	
+
 	return str;
 
 }
@@ -1139,7 +1139,7 @@ format_data(int32 type, char *ptr, long size)
 	uint8 ui8;
 	BMessage anothermsg;
 	char *tempstr;
-	
+
 	if (size<=0L){
 		str = new char;
 		*str = 0;
@@ -1150,7 +1150,7 @@ format_data(int32 type, char *ptr, long size)
 		case B_MIME_TYPE:
 		case B_ASCII_TYPE:
 		case B_STRING_TYPE:
-					if (size>512) 
+					if (size>512)
 						size=512;
 					str = new char[size+4];
 					*str='\"';
@@ -1173,58 +1173,58 @@ format_data(int32 type, char *ptr, long size)
 						strcpy(str, "invalid entry_ref");
 					}
 					break;
-					
+
 		case B_SSIZE_T_TYPE:
 		case B_INT64_TYPE:
 					str = new char[64];
 					i64 = *(int64*)ptr;
 					sprintf(str, "%Ld (0x%LX)", i64, i64);
 					break;
-		
+
 		case B_SIZE_T_TYPE:
 		case B_INT32_TYPE:
 					str = new char[64];
 					i32 = *(int32*)ptr;
 					sprintf(str, "%ld (0x%08lX)", i32, i32);
 					break;
-		
+
 		case B_INT16_TYPE:
 					str = new char[64];
 					i16 = *(int16*)ptr;
 					sprintf(str, "%d (0x%04X)", i16, i16);
 					break;
-		
+
 		case B_CHAR_TYPE:
 		case B_INT8_TYPE:
 					str = new char[64];
 					i8 = *(int8*)ptr;
 					sprintf(str, "%d (0x%02X)", i8, i8);
 					break;
-		
+
 		case B_UINT64_TYPE:
 					str = new char[64];
 					ui64 = *(uint64*)ptr;
 					sprintf(str, "%Lu (0x%LX)", ui64, ui64);
 					break;
-		
+
 		case B_UINT32_TYPE:
 					str = new char[64];
 					ui32 = *(uint32*)ptr;
 					sprintf(str, "%lu (0x%08lX)", ui32, ui32);
 					break;
-		
+
 		case B_UINT16_TYPE:
 					str = new char[64];
 					ui16 = *(uint16*)ptr;
 					sprintf(str, "%u (0x%04X)", ui16, ui16);
 					break;
-		
+
 		case B_UINT8_TYPE:
 					str = new char[64];
 					ui8 = *(uint8*)ptr;
 					sprintf(str, "%u (0x%02X)", ui8, ui8);
 					break;
-		
+
 		case B_BOOL_TYPE:
 					str = new char[10];
 					if (*ptr){
@@ -1233,36 +1233,36 @@ format_data(int32 type, char *ptr, long size)
 						strcpy(str, "FALSE");
 					}
 					break;
-					
+
 		case B_FLOAT_TYPE:
 					str = new char[40];
 					fptr = (float*)ptr;
 					sprintf(str, "%.3f", *fptr);
 					break;
-					
+
 		case B_DOUBLE_TYPE:
 					str = new char[40];
 					dptr = (double*)ptr;
 					sprintf(str, "%.3f", *dptr);
 					break;
-					
+
 		case B_RECT_TYPE:
 					str = new char[200];
 					fptr = (float*)ptr;
 					sprintf(str, "BRect(%.1f, %.1f, %.1f, %.1f)", fptr[0], fptr[1], fptr[2], fptr[3]);
 					break;
-					
+
 		case B_POINT_TYPE:
 					str = new char[200];
 					fptr = (float*)ptr;
 					sprintf(str, "BPoint(%.1f, %.1f)", fptr[0], fptr[1]);
 					break;
 
-		case B_RGB_COLOR_TYPE:	
+		case B_RGB_COLOR_TYPE:
 					str = new char[64];
 					sprintf(str, "Red=%u  Green=%u  Blue=%u  Alpha=%u", ((uint8*)ptr)[0], ((uint8*)ptr)[1], ((uint8*)ptr)[2], ((uint8*)ptr)[3] );
 					break;
-					
+
 		case B_COLOR_8_BIT_TYPE:
 					str = new char[size*6+4];
 					*str = 0;
@@ -1283,7 +1283,7 @@ format_data(int32 type, char *ptr, long size)
 						strcpy(str, "error when unflattening");
 					}
 					break;
-					
+
 		case B_PROPERTY_INFO_TYPE: {
 					BPropertyInfo propinfo;
 					if (propinfo.Unflatten(B_PROPERTY_INFO_TYPE, (const void *)ptr, size)==B_OK){
@@ -1308,7 +1308,7 @@ format_data(int32 type, char *ptr, long size)
 								strcat(str, " ");
 								delete [] tempstr;
 							}
-							
+
 							// pad the rest with spaces
 							if (strlen(start)<36){
 								strcat(str, "                                    "+strlen(start) );
@@ -1329,7 +1329,7 @@ format_data(int32 type, char *ptr, long size)
 									default: strcat(str, "<NONE> "); break;
 								}
 							}
-							
+
 							// pad the rest with spaces
 							if (strlen(start)<60){
 								strcat(str, "                                                            "+strlen(start) );
@@ -1348,15 +1348,15 @@ format_data(int32 type, char *ptr, long size)
 								for (int32 j = 0; j < 5 && pinfo[pinfo_index].ctypes[i].pairs[j].type != 0; j++) {
 									uint32 type = pinfo[pinfo_index].ctypes[i].pairs[j].type;
 									char str2[4];
-									sprintf(str2, "(%s %c%c%c%c)", pinfo[pinfo_index].ctypes[i].pairs[j].name, 
+									sprintf(str2, "(%s %c%c%c%c)", pinfo[pinfo_index].ctypes[i].pairs[j].name,
 										int(type & 0xFF000000) >> 24,
-										int(type & 0xFF0000) >> 16, 
+										int(type & 0xFF0000) >> 16,
 										int(type & 0xFF00) >> 8, (int)type & 0xFF);
 									strcat(str, str2);
 								}
 							}
 							strcat(str, "\n");
-							
+
 							// is there usage info?
 							if (pinfo[pinfo_index].usage){
 								strcat(str, "                   Usage: ");
@@ -1365,29 +1365,29 @@ format_data(int32 type, char *ptr, long size)
 							}
 
 						}
-						
-						
+
+
 						// handle value infos....
 						const value_info *vinfo = propinfo.Values();
 						int32 vinfo_count = propinfo.CountValues();
 #if TEST_VALUEINFO>0
 						value_info vinfo[10] = {	{"Backup", 'back', B_COMMAND_KIND, "This command backs up your hard drive."},
 										{"Abort", 'abor', B_COMMAND_KIND, "Stops the current operation..."},
-										{"Type Code", 'type', B_TYPE_CODE_KIND, "Type code info..."}	
+										{"Type Code", 'type', B_TYPE_CODE_KIND, "Type code info..."}
 									};
 						vinfo_count = 3;
 #endif
 
 						if (vinfo && vinfo_count>0){
 							sprintf(str+strlen(str), "\n            name   value                               kind\n--------------------------------------------------------------------------------\n");
-							
+
 							for (int32 vinfo_index = 0; vinfo_index<vinfo_count; vinfo_index++){
-							
+
 								char *start = str+strlen(str);
 								strcat(str, "                "+(strlen(vinfo[vinfo_index].name) <16 ? strlen(vinfo[vinfo_index].name) : 16 ));
 								strcat(str, vinfo[vinfo_index].name);
 								strcat(str, "   ");
-							
+
 								sprintf(str+strlen(str), "0x%8lX (", vinfo[vinfo_index].value);
 								id_to_string(vinfo[vinfo_index].value, str+strlen(str));
 								strcat(str, ")");
@@ -1404,9 +1404,9 @@ format_data(int32 type, char *ptr, long size)
 									case B_TYPE_CODE_KIND: 	strcat(str, "TYPE CODE       "); break;
 									default:				strcat(str, "unknown         "); break;
 								}
-	
+
 								strcat(str, "\n");
-								
+
 								// is there usage info?
 								if (vinfo[vinfo_index].usage){
 									strcat(str, "                   Usage: ");
@@ -1415,7 +1415,7 @@ format_data(int32 type, char *ptr, long size)
 								}
 							}
 						}
-						
+
 					} else {
 						str = new char[64];
 						strcpy(str, "error when unflattening");
@@ -1434,9 +1434,9 @@ format_data(int32 type, char *ptr, long size)
 					*(str+strlen(str)-2) = 0;
 					break;
 	}
-	
+
 	return str;
-	
+
 }
 
 
@@ -1448,33 +1448,33 @@ id_to_string(long ID, char *here)
 	uint8 digit2 = (ID>>8) & 255;
 	uint8 digit3 = (ID) & 255;
 	bool itsvalid = false;
-	
+
 	if (digit0==0){
 		if (digit1==0){
 			if (digit2==0) {
 				// 1 digits
-				if (is_valid_char(digit3) ) 
+				if (is_valid_char(digit3) )
 					itsvalid=TRUE;
 				sprintf(here, "'%c'", digit3);
 			} else {
 				// 2 digits
-				if (is_valid_char(digit2) && is_valid_char(digit3) ) 
+				if (is_valid_char(digit2) && is_valid_char(digit3) )
 					itsvalid=TRUE;
 				sprintf(here, "'%c%c'", digit2, digit3);
 			}
 		} else {
 			// 3 digits
-			if (is_valid_char(digit1) && is_valid_char(digit2) && is_valid_char(digit3) ) 
+			if (is_valid_char(digit1) && is_valid_char(digit2) && is_valid_char(digit3) )
 				itsvalid=TRUE;
 			sprintf(here, "'%c%c%c'", digit1, digit2, digit3);
 		}
 	} else {
 		// 4 digits
-		if (is_valid_char(digit0) && is_valid_char(digit1) && is_valid_char(digit2) && is_valid_char(digit3) ) 
+		if (is_valid_char(digit0) && is_valid_char(digit1) && is_valid_char(digit2) && is_valid_char(digit3) )
 			itsvalid=TRUE;
 		sprintf(here, "'%c%c%c%c'", digit0, digit1, digit2, digit3);
 	}
-	
+
 	if (!itsvalid){
 		sprintf(here, "%ldL", ID);
 	}
@@ -1483,7 +1483,7 @@ id_to_string(long ID, char *here)
 }
 
 
-bool 
+bool
 is_valid_char(uint8 c)
 {
 	return (c>=32 && c<128);
