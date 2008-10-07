@@ -63,18 +63,6 @@ typedef struct page_directory_entry {
 } page_directory_entry;
 
 static page_table_entry *iospace_pgtables = NULL;
-
-#define PAGE_INVALIDATE_CACHE_SIZE 64
-
-// vm_translation object stuff
-typedef struct vm_translation_map_arch_info {
-	page_directory_entry *pgdir_virt;
-	page_directory_entry *pgdir_phys;
-	int num_invalidate_pages;
-	addr_t pages_to_invalidate[PAGE_INVALIDATE_CACHE_SIZE];
-} vm_translation_map_arch_info;
-
-
 static page_table_entry *page_hole = NULL;
 static page_directory_entry *page_hole_pgdir = NULL;
 static page_directory_entry *sKernelPhysicalPageDirectory = NULL;
