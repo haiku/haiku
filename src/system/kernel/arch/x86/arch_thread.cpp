@@ -161,23 +161,16 @@ i386_get_current_iframe(void)
 void *
 x86_next_page_directory(struct thread *from, struct thread *to)
 {
-	if (from->team->address_space != NULL && to->team->address_space != NULL) {
-		// they are both user space threads
-		if (from->team == to->team) {
-			// dont change the pgdir, same address space
-			return NULL;
-		}
-		// switching to a new address space
-		return i386_translation_map_get_pgdir(&to->team->address_space->translation_map);
-	} else if (from->team->address_space == NULL && to->team->address_space == NULL) {
-		// they must both be kernel space threads
+	vm_address_space* toAddressSpace = to->team->address_space;
+	if (from->team->address_space == toAddressSpace) {
+		// don't change the pgdir, same address space
 		return NULL;
-	} else if (to->team->address_space == NULL) {
-		// the one we're switching to is kernel space
-		return i386_translation_map_get_pgdir(&vm_kernel_address_space()->translation_map);
 	}
 
-	return i386_translation_map_get_pgdir(&to->team->address_space->translation_map);
+	if (toAddressSpace == NULL)
+		toAddressSpace = vm_kernel_address_space();
+
+	return i386_translation_map_get_pgdir(&toAddressSpace->translation_map);
 }
 
 
