@@ -555,6 +555,66 @@ smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2, uint32 d
 
 
 void
+smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, uint32 data,
+	uint32 data2, uint32 data3, void *data_ptr, uint32 flags)
+{
+	if (!sICIEnabled)
+		return;
+
+	int currentCPU = smp_get_current_cpu();
+	cpuMask &= ~((cpu_mask_t)1 << currentCPU);
+	if (cpuMask == 0)
+		return;
+
+	// count target CPUs
+	int32 targetCPUs = 0;
+	for (int32 i = 0; i < sNumCPUs; i++) {
+		if ((cpuMask & (cpu_mask_t)1 << i) != 0)
+			targetCPUs++;
+	}
+
+	// find_free_message leaves interrupts disabled
+	struct smp_msg *msg;
+	int state = find_free_message(&msg);
+
+	msg->message = message;
+	msg->data = data;
+	msg->data2 = data2;
+	msg->data3 = data3;
+	msg->data_ptr = data_ptr;
+	msg->ref_count = targetCPUs;
+	msg->flags = flags;
+	msg->proc_bitmap = ~cpuMask;
+	msg->done = false;
+
+	// stick it in the broadcast mailbox
+	acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
+	msg->next = sBroadcastMessages;
+	sBroadcastMessages = msg;
+	release_spinlock(&sBroadcastMessageSpinlock);
+
+	arch_smp_send_broadcast_ici();
+		// TODO: Introduce a call that only bothers the target CPUs!
+
+	if (flags & SMP_MSG_FLAG_SYNC) {
+		// wait for the other cpus to finish processing it
+		// the interrupt handler will ref count it to <0
+		// if the message is sync after it has removed it from the mailbox
+		while (msg->done == false) {
+			process_pending_ici(currentCPU);
+			PAUSE();
+		}
+
+		// for SYNC messages, it's our responsibility to put it
+		// back into the free list
+		return_free_message(msg);
+	}
+
+	restore_interrupts(state);
+}
+
+
+void
 smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 	void *data_ptr, uint32 flags)
 {
@@ -658,7 +718,7 @@ smp_cpu_rendezvous(volatile uint32 *var, int current_cpu)
 {
 	atomic_or((vint32*)var, 1 << current_cpu);
 
-	while (*var != ((1 << sNumCPUs) - 1))
+	while (*var != (((uint32)1 << sNumCPUs) - 1))
 		PAUSE();
 }
 

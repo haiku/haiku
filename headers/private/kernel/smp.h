@@ -31,6 +31,8 @@ enum {
 	SMP_MSG_FLAG_FREE_ARG	= 0x2,
 };
 
+typedef uint32 cpu_mask_t;
+
 typedef void (*smp_call_func)(uint32 data1, int32 currentCPU, uint32 data2, uint32 data3);
 
 
@@ -46,6 +48,8 @@ void smp_wake_up_non_boot_cpus(void);
 void smp_cpu_rendezvous(volatile uint32 *var, int current_cpu);
 void smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2, uint32 data3,
 		void *data_ptr, uint32 flags);
+void smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, uint32 data,
+		uint32 data2, uint32 data3, void *data_ptr, uint32 flags);
 void smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 		void *data_ptr, uint32 flags);
 
