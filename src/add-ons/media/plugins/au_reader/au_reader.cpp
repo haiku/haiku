@@ -75,12 +75,12 @@ auReader::Sniff(int32 *streamCount)
 	}
 
 	int64 filesize = Source()->Seek(0, SEEK_END);
-	if (filesize < 28) {
+	if (filesize < sizeof(struct snd_header)) {
 		TRACE("auReader::Sniff: File too small\n");
 		return B_ERROR;
 	}
 	
-	snd_header header;
+	struct snd_header header;
 
 	if (sizeof(header) != Source()->ReadAt(0, &header, sizeof(header))) {
 		TRACE("auReader::Sniff: header reading failed\n");
@@ -241,7 +241,7 @@ auReader::Sniff(int32 *streamCount)
 				fFormat.u.raw_audio.format = B_AUDIO_FORMAT_FLOAT64;
 				break;
 			default:
-				TRACE("WavReader::Sniff: unhandled raw format\n");
+				TRACE("auReader::Sniff: unhandled raw format\n");
 				return B_ERROR;
 		}
 		fFormat.u.raw_audio.byte_order = B_MEDIA_BIG_ENDIAN;
@@ -266,6 +266,7 @@ void
 auReader::GetFileFormatInfo(media_file_format *mff)
 {
 	mff->capabilities =   media_file_format::B_READABLE
+						| media_file_format::B_KNOWS_RAW_AUDIO
 						| media_file_format::B_KNOWS_ENCODED_AUDIO
 						| media_file_format::B_IMPERFECTLY_SEEKABLE;
 	mff->family = B_MISC_FORMAT_FAMILY;
