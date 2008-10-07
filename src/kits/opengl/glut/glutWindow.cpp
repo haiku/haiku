@@ -580,8 +580,11 @@ GlutBWindow::GlutBWindow(BRect frame, char *name) :
 }
 
 void GlutBWindow::DirectConnected( direct_buffer_info *info ) {
+	if (!bgl)
+		return;
+
 	bgl->DirectConnected(info);
-	if(bgl && !fConnectionDisabled) {
+	if(!fConnectionDisabled) {
 		bgl->EnableDirectMode(true);
 	}
 	int newVisState;
