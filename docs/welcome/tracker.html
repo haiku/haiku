@@ -1,30 +1,58 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-	<TITLE>The Tracker</TITLE>
-	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGEDBY" CONTENT="Humdinger">
-	<META NAME="CHANGED" CONTENT="20080926;15151900">
-	<META NAME="CHANGEDBY" CONTENT="Humdinger">
-	<STYLE TYPE="text/css">
-	</STYLE>
-</HEAD>
-<BODY LANG="en-US">
-<TABLE WIDTH=100% BORDER=0 CELLPADDING=0 CELLSPACING=0>
-	<COL WIDTH=256*>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#326496">
-			<P STYLE="background: #326496"><a href="welcome.html"><img src="welcome-images/shijin-logo.png" alt="Logo" border="0"></a></p>
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#204f7e">
-			<P STYLE="background: #204f7e"><img src="welcome-images/dummy.png" alt="dummy"></p>
-		</TD>
-	</TR>
-<TR><TD WIDTH=100% VALIGN=TOP>
-<br><br>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>The Tracker</title>
+	<style type="text/css">
+	</style>
+</head>
+<body lang="en-US" text="#000000" bgcolor="#ffffff" link="#dc3c01"
+	vlink="#892601" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+	<td width="5%" bgcolor="#efefef" align="right" valign="bottom">
+		<img src="welcome-images/logo_lt.png" alt="logo"
+			border="0">
+	</td>
+	<td width="45%" bgcolor="#efefef" valign="bottom">
+		<img src="welcome-images/logo_rt.png" alt="logo"
+			border="0">
+	</td>
+	<td width="45%" height="70" bgcolor="#efefef" align="right" valign="bottom">
+		<font size="4">The Tracker</font>
+	</td>
+	<td width="5%" bgcolor="#efefef"></td>
+	</tr>
+	<tr>
+	<td width="5%" bgcolor="#efefef" valign="top" align="right">
+		<img src="welcome-images/logo_lb.png" alt="logo"
+			border="0">
+	</td>
+	<td width="90%" bgcolor="#efefef" valign="top" colspan="2">
+		<img src="welcome-images/logo_rb.png" alt="logo"
+			border="0">
+	</td>
+	<td width="5%" bgcolor="#efefef"></td>
+</tr>
+
+<tr>
+	<td width="5%" bgcolor="#e0e0e0">&nbsp;</td>
+	<td nowrap width="90%" bgcolor="#e0e0e0" align="right" colspan="2">
+		<small><a href="welcome.html">Welcome</a>
+		&nbsp;&nbsp;&nbsp;
+		Previous: <a href="twitcher.html">The Twitcher</a>
+		&nbsp;&nbsp;&nbsp;
+		Next: <a href="deskbar.html">The Deskbar</a></small>
+	</td>
+	<td width="5%" bgcolor="#e0e0e0">&nbsp;</td>
+</tr>
+
+<tr>
+<td width="5%">&nbsp;</td>
+<td width="90%" valign="top" colspan="2">
+
+<br>
 <h2><a name="tracker">The Tracker</a></h2>
 <p>The Tracker is the graphical interface to all your files. It let's you create new files and folders or find, launch or rename as well as copy or delete existing ones.
 </p><p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a e.g. crashed or frozen Tracker is to call the TeamManager with <tt>CTRL+ALT+DEL</tt> to kill Tracker and then click the <i>Restart Desktop...</i> button. The same brings back a wayward Deskbar.
@@ -73,9 +101,9 @@ This is also true for...</p>
 <p>Tracker windows offer three different viewing modes from the <i>Window</i> menu:
 <ul><li><b>Icon View</b> (<tt>ALT+1</tt>) - Big icons, you can change the size from the submenu.</li>
 <li><b>Mini Icon View</b> (<tt>ALT+2</tt>) - Small icons.</li>
-<li><b>List View</b> (<tt>ALT+3</tt>) - A detailed list of your files enabling you to show/hide available attributes.</li></ul>
+<li><b>List View</b> (<tt>ALT+3</tt>) - A detailed list of your files enabling you to show/hide available <i>attributes</i>. (See topic <a href="attributes.html">File Attributes</a>.)</li></ul>
 </p><p>The <i>Window</i> menu offers a number of other functions:
-<ul><li><b>Resize Window</b> (<tt>ALT+Y</tt>) - Resizes the window to its ideal size</li>
+<ul><li><b>Resize Window</b> (<tt>ALT+Y</tt>) - Resizes the window to its ideal size.</li>
 <li><b>Clean Up</b> (<tt>ALT+K</tt>) - Aligns all icons to an invisible grid. Hold down <tt>SHIFT</tt> and the menu becomes <i>Clean Up All</i> which additionally sorts all icons alphabetically.</li>
 <li><b>Select...</b> (<tt>SHIFT+ALT+A</tt>) - Select files according to a regular expression.</li>
 </ul>
@@ -83,14 +111,14 @@ This is also true for...</p>
 </p>
 <br>
 <h4><a name="tracker-preferences">Tracker preferences</a></h4>
-<p><i>Window | Preferences...</i> opens a panel that offers a number of setting that, where not obvious, should become clear once tried out. Since all settings a re applied live, you'll immediately see the changes.
+<p><i>Window | Preferences...</i> opens a panel that offers a number of setting that, where not obvious, should become clear once tried out. Since all settings are applied live, you'll immediately see the changes.
 <br>So, in short, the not so obvious settings:
 <ul><li><b>Desktop</b> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</li>
-<li><b>Windows</b> - You can set <i>Single Window Navigation</i>, i.e. a double-clicked folder doesn't open in its own window, but inside its parent instead. This is not the same as clicking while holding the <tt>WIN</tt> key, as described above, because you'll lose the per window saved position and size.
-<br>
+<li><b>Windows</b> - You can set <i>Single Window Navigation</i>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of it's parent folder. This is not the same as clicking while holding the <tt>WIN</tt> key, as described above, because you'll lose the per window saved position and size.
+<br><br>
 <img src="tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" width="608" height="413">
 <p>
-On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy&paste a path name and use back, forward and up buttons.</p></li>
+Before you switch Tracker to Single Window Navigation mode, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy&paste a path name and use back, forward and up buttons.</p></li>
 <li><b>Date and Time</b> - Set date and time formats.</li>
 <li><b>Trash</b> - Set the behaviour when deleting a file.</li>
 <li><b>Volume Icons</b> - Set the colour of an optional indicator of free space that's shown besides a disk's icon.</li>
@@ -101,7 +129,7 @@ On the other hand, single window browsing offers a <i>Navigator</i> where you ca
 <p>When invoked on a selected file, the <i>File</i> menu offers about the same options as when you open a context menu by right-clicking the file. Exceptions are commands that don't specifically target a selected file, like <i>Find..</i> or <i>New...</i>.
 </p><p>As usual the usage of the commands is pretty clear, so we'll concentrate on the niftier parts.</p>
 <ul><li><b>Find...</b> - Find a file or folder. See topic <a href="Query.html">Query</a> for more info.</li>
-<li><b>New...</b> - Create a new folder or any other file after a template.
+<li><b>New...</b> - Create a new folder or any other file based on a <i>template</i>.
 <br><br>
 <img src="tracker-images/new-menu.png" alt="new-menu.png" width="627" height="219">
 <p>Choosing <i>Edit Templates...</i> opens the folder <tt>/boot/home/config/settings/Tracker/Tracker New Templates</tt>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <i>New...</i> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
@@ -111,8 +139,24 @@ On the other hand, single window browsing offers a <i>Navigator</i> where you ca
 <p>The preferred application that would open the file when double-clicked, is checkmarked. In this submenu are only those applications listed that deal with the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. If you don't click on an app in the submenu, but on <i>Open With...</i> a panel opens:
 <br><br>
 <img src="tracker-images/open-with-preferred.png" alt="open-with-preferred" width="627" height="219">
-<p>
-</TD></TR>
-</TABLE>
-</BODY>
-</HTML>
+</p>
+
+</td>
+<td width="5%">&nbsp;</td>
+</tr>
+
+<tr>
+	<td width="5%" bgcolor="#efefef">&nbsp;</td>
+	<td width="90%" bgcolor="#efefef" align="right" colspan="2">
+		<a href="welcome.html">Welcome</a>
+		&nbsp;&nbsp;&nbsp;
+		Previous: <a href="twitcher.html">The Twitcher</a>
+		&nbsp;&nbsp;&nbsp;
+		Next: <a href="deskbar.html">The Deskbar</a>
+	</td>
+	<td width="5%" bgcolor="#efefef">&nbsp;</td>
+</tr>
+
+</table>
+</body>
+</html>
