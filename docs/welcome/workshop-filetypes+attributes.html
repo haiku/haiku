@@ -3,61 +3,30 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<title>Workshop: Filetypes & Attributes</title>
-	<style type="text/css">
-		body { padding: 0px }
-		a:visited { color: #892601; }
-		a:link { color: #dc3c01; }
-	</style>
+	<link rel="stylesheet" type="text/css" href="welcome.css">
 </head>
-<body lang="en-US" text="#000000" bgcolor="#ffffff" link="#dc3c01"
-	vlink="#892601" marginwidth="0" marginheight="0">
+<body lang="en-US">
 
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr>
-	<td width="5%" bgcolor="#efefef" align="right" valign="bottom">
-		<img src="welcome-images/logo_lt.png" alt="logo"
-			border="0">
-	</td>
-	<td width="45%" bgcolor="#efefef" valign="bottom">
-		<img src="welcome-images/logo_rt.png" alt="logo"
-			border="0">
-	</td>
-	<td width="45%" height="70" bgcolor="#efefef" align="right" valign="bottom">
-		<font size="4">Welcome to Haiku!</font>
-	</td>
-	<td width="5%" bgcolor="#efefef"></td>
-	</tr>
-	<tr>
-	<td width="5%" bgcolor="#efefef" valign="top" align="right">
-		<img src="welcome-images/logo_lb.png" alt="logo"
-			border="0">
-	</td>
-	<td width="90%" bgcolor="#efefef" valign="top" colspan="2">
-		<img src="welcome-images/logo_rb.png" alt="logo"
-			border="0">
-	</td>
-	<td width="5%" bgcolor="#efefef"></td>
-</tr>
-
-<tr>
-	<td width="5%" bgcolor="#e0e0e0">&nbsp;</td>
-	<td nowrap width="90%" bgcolor="#e0e0e0" align="right" colspan="2">
-		<small><a href="welcome.html">Welcome</a>
+<div class="logo">
+	<img src="welcome-images/logo.png" alt="logo">
+	<div class="title">Filetypes, Attributes and Queries</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="welcome.html">Welcome</a>
 		&nbsp;&nbsp;&nbsp;
 		Previous: <a href="filetypes.html">Filetypes</a>
 		&nbsp;&nbsp;&nbsp;
-		Next: <a href="attributes.html">File Attributes</a></small>
-	</td>
-	<td width="5%" bgcolor="#e0e0e0">&nbsp;</td>
-</tr>
+		Next: <a href="attributes.html">File Attributes</a>
+	</p>
+</div>
 
-<tr>
-<td width="5%">&nbsp;</td>
-<td width="90%" valign="top" colspan="2">
-<br>
+<div class="content">
+
+<h2>Filetypes, Attributes and Queries</h2>
 <p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.
 </p>
-<br>
+
 <h2><a name="preparations">Preparations</a></h2>
 <p>Let's first decide what filetype and attributes would serve our needs. Originally, I wanted to use a Bookmark file with a link to the movie's IMdB page, but Haiku doesn't have a "bookmarkable" browser like BeOS' <i>NetPositiv</i> at the moment, so I came up with this: The file itself will be a JPEG image for the movie cover.<br>
 To that we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (</>/= vs. is/contains/starts with).
@@ -180,22 +149,18 @@ Open the folder containing your DVDdb files and arrange the attributes how you'd
 <img src="workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" width="757" height="462">
 </p>
 
-</td>
-<td width="5%">&nbsp;</td>
-</tr>
+</div>
 
-<tr>
-	<td width="5%" bgcolor="#efefef">&nbsp;</td>
-	<td width="90%" bgcolor="#efefef" align="right" colspan="2">
+<div class="bottomnav">
+	<p>
 		<a href="welcome.html">Welcome</a>
 		&nbsp;&nbsp;&nbsp;
 		Previous: <a href="filetypes.html">Filetypes</a>
 		&nbsp;&nbsp;&nbsp;
 		Next: <a href="attributes.html">File Attributes</a>
-	</td>
-	<td width="5%" bgcolor="#efefef">&nbsp;</td>
-</tr>
+	</p>
+</div>
 
-</table>
 </body>
 </html>
+
