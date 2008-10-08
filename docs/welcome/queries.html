@@ -24,7 +24,7 @@
 <h2>Queries</h2>
 <p>A query is a file search based on file attributes and can be performed within Tracker or in Terminal. Queries are saved in "<tt>/boot/home/queries</tt>" and by default last seven days before being purged. Note, that these aren't static result lists of your search, but are the query formulas which trigger a new search whenever you open them.
 </p>
-<br>
+
 <h3>The Find window</h3>
 <p>You start a query by invoking the <i>Find...</i> menu either from the Deskbar menu or any Tracker window or the Desktop (which is actually a fullscreen Tracker window). The shortcut is <tt>ALT+F</tt>. You're presented with the Find window:
 <br>
@@ -45,13 +45,12 @@ types.<br />
 [8] Check if your query is supposed to <i>Include trash</i>.<br />
 [9] Optionally, enter a name for this query if you want to save it.<br />
 [10] You can drag&amp;drop the icon to save the query.
-</p><p><br />
 </p>
-<h3>Basic queries - "by Name"</h3>
-<p>If you simply want to find all files on your mounted disks that match a certain pattern, simply leave the search method at "<i>by Name</i>", enter the search term into the text box and press <tt>ENTER</tt>. 
 
-</p><p><br />
+<h3>Basic queries - "by Name"</h3>
+<p>If you simply want to find all files on your mounted disks that match a certain pattern, simply leave the search method at "<i>by Name</i>", enter the search term into the text box and press <tt>ENTER</tt>.
 </p>
+
 <h3>Advanced queries - "by Attribute"</h3>
 <p>You can create more advanced queries by searching within the attributes of specific file types. For that to work, these attributes have to be indexed (see <a href="index.html">Index</a>).
 <br>
@@ -65,8 +64,8 @@ types.<br />
 <br>
 <img src="queries-images/query-window-filled.png" alt="query-winsow-filled.png" width="441" height="262"<br>
 </p><p>This is your Find window when you're looking for all emails Clara Botter has sent to you in the last two months that had in the subject "vibraphone" or "skepticality".
-</p><p><br />
 </p>
+
 <h3>Even more advanced queries - "by Formula"</h3>
 <p>Typing in a formula query by hand is daunting and really quite unpractical. It still has its uses.
 </p><p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to 
@@ -82,16 +81,13 @@ types.<br />
        ||(MAIL:subject==&quot;*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*&quot;))
        &amp;&amp;(BEOS:TYPE==&quot;text/x-email&quot;))</pre>
 
-<p>What's the use?
-</p>
+<p>What's the use?</p>
 <ul>
 <li>You could copy and paste the string into an email, forum or IRC for others to use or debug.</li>
 <li>You can use this method to construct a query in "<i>Attribute</i> mode and then switch to "<i>Formula</i> mode, to comfortably generate a search string to use for a query in Terminal or a script.</li>
 <li>You can fine tune your query by inserting paranthesis where needed, make parts case-sensitive or negate logical combinations by changing. e.g. "<tt>==</tt>" to "<tt>!=</tt>" for a NOT AND. All you need is a basic understanding of <a href="http://en.wikipedia.org/wiki/Regular_expression" class='external free' title="http://en.wikipedia.org/wiki/Regular expression" rel="nofollow">regular expressions</a> and maybe some scripting basics.</li>
-
 </ul>
-<p><br />
-</p>
+
 <h3>The result window</h3>
 <p>After you start a search, the Find window will be replaced by a result window. Here is an example that queried for "server":
 </p><p><img src="queries-images/result-window.png" alt="result-window.png" width="704" height="359">

@@ -39,6 +39,14 @@ h2 a:hover, a:active {
 	text-decoration: none;
 	color: #0c3762;
 }
+h3 a:hover, a:active {
+	text-decoration: none;
+	color: #222;
+}
+h4 a:hover, a:active {
+	text-decoration: none;
+	color: #000;
+}
 
 /* basic text elements */
 
