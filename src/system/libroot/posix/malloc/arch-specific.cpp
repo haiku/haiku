@@ -54,6 +54,9 @@ struct free_chunk {
 static const size_t kInitialHeapSize = 50 * B_PAGE_SIZE;
 	// that's about what hoard allocates anyway
 
+static const size_t kHeapIncrement = 16 * B_PAGE_SIZE;
+	// the steps in which to increase the heap size
+
 static area_id sHeapArea;
 static hoardLockType sHeapLock;
 static void *sHeapBase;
@@ -88,7 +91,7 @@ __init_heap(void)
 	status_t status = _kern_reserve_heap_address_range((addr_t *)&sHeapBase,
 		B_EXACT_ADDRESS, 0x48000000);
 
-	sHeapArea = create_area("heap", (void **)&sHeapBase, 
+	sHeapArea = create_area("heap", (void **)&sHeapBase,
 		status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,
 		kInitialHeapSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (sHeapArea < B_OK)
@@ -194,7 +197,8 @@ hoardSbrk(long size)
 	sFreeHeapSize += size;
 
 	// round to next page size
-	size_t pageSize = (sFreeHeapSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+	size_t pageSize = (sFreeHeapSize + kHeapIncrement - 1)
+		& ~(kHeapIncrement - 1);
 
 	if (pageSize < sHeapAreaSize) {
 		SERIAL_PRINT(("HEAP-%ld: heap area large enough for %ld\n", find_thread(NULL), size));
