@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,10 +10,10 @@
 
 #include "ScreenSaverWindow.h"
 
-#include <WindowPrivate.h>
-
 #include <Application.h>
 #include <View.h>
+
+#include <WindowPrivate.h>
 
 
 /*!
@@ -22,7 +22,8 @@
 */
 ScreenSaverWindow::ScreenSaverWindow(BRect frame)
 	: BDirectWindow(frame, "ScreenSaver Window",
-		B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+		B_NO_BORDER_WINDOW_LOOK, kWindowScreenFeel,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
 	fSaver(NULL)
 {
 	frame.OffsetTo(0, 0);

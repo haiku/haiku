@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,30 +11,31 @@
 
 #include "PasswordWindow.h"
 
-
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
 #include <Screen.h>
 
+#include <WindowPrivate.h>
+
 
 PasswordWindow::PasswordWindow()
-	: BWindow(BRect(100, 100, 400, 230), "Enter Password", B_NO_BORDER_WINDOW_LOOK,
-		B_FLOATING_ALL_WINDOW_FEEL,
+	: BWindow(BRect(100, 100, 400, 230), "Enter Password",
+		B_NO_BORDER_WINDOW_LOOK, kWindowScreenFeel /* TODO: should be B_MODAL_APP_WINDOW_FEEL*/,
 		B_NOT_MOVABLE | B_NOT_CLOSABLE |B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
-		| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS , B_ALL_WORKSPACES)
+		| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES)
 {
 	BView* topView = new BView(Bounds(), "topView", B_FOLLOW_ALL, B_WILL_DRAW);
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	BRect bounds(Bounds());	
+	BRect bounds(Bounds());
 	bounds.InsetBy(10.0, 10.0);
 
 	BBox *customBox = new BBox(bounds, "customBox", B_FOLLOW_NONE);
 	topView->AddChild(customBox);
 	customBox->SetLabel("Unlock screen saver");
-	
+
 	bounds.top += 10.0;
 	fPassword = new BTextControl(bounds, "password", "Enter password:",
 		"VeryLongPasswordPossible", B_FOLLOW_NONE);
@@ -44,7 +45,7 @@ PasswordWindow::PasswordWindow()
 	fPassword->TextView()->HideTyping(true);
 	fPassword->SetDivider(be_plain_font->StringWidth("Enter password:") + 5.0);
 
-	BButton* button = new BButton(BRect(), "unlock", "Unlock", 
+	BButton* button = new BButton(BRect(), "unlock", "Unlock",
 		new BMessage(kMsgUnlock), B_FOLLOW_NONE);
 	customBox->AddChild(button);
 	button->MakeDefault(true);
