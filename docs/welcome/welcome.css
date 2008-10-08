@@ -1,0 +1,42 @@
+/*
+ * Copyright 2008, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		François Revol <revol@free.fr>
+ */
+
+body { 
+	/* remove default borders around content */
+	margin: 0em;
+	/* for NetSurf */
+	padding: 0px;
+
+	/* body colors */
+	background-color: white;
+	color: black;
+}
+
+/* link colors */
+a:link { color: #dc3c01; }
+/*a:active { color: #dc3c01; }*/
+a:visited { color: #892601; }
+
+/* top banner elements (with the logo): td in a tr of class top-banner */
+tr.top-banner td {
+	background: #efefef;
+}
+
+/* nav banner elements: td in a tr of class nav-banner */
+tr.nav-banner td {
+	background: #e0e0e0;
+}
+
+/* same for bottom nav banner */
+tr.bnav-banner td {
+	background: #e0e0e0;
+}
+
+/* the tr containing the content text */
+/* tr.content { } */
+
