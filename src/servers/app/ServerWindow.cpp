@@ -167,7 +167,8 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fCurrentDrawingRegion(),
 	fCurrentDrawingRegionValid(false),
 
-	fDirectWindowData(NULL)
+	fDirectWindowData(NULL),
+	fDirectWindowFeel(B_NORMAL_WINDOW_FEEL)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
 
@@ -183,6 +184,7 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 
 	fDeathSemaphore = create_sem(0, "window death");
 }
+
 
 #ifdef PROFILE_MESSAGE_LOOP
 static int
@@ -1087,14 +1089,18 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_DIRECT_WINDOW_SET_FULLSCREEN:
 		{
 			// TODO: maybe there is more to do than this?
+			// (like resizing it to screen size?)
 			bool enable;
 			link.Read<bool>(&enable);
 
 			status_t status = B_OK;
 			if (!fWindow->IsOffscreenWindow()) {
 //fDesktop->UnlockSingleWindow();
+				if (enable)
+					fDirectWindowFeel = fWindow->Feel();
+
 				fDesktop->SetWindowFeel(fWindow,
-					enable ? kWindowScreenFeel : B_NORMAL_WINDOW_FEEL);
+					enable ? kWindowScreenFeel : fDirectWindowFeel);
 //fDesktop->LockSingleWindow();
 			} else
 				status = B_BAD_TYPE;

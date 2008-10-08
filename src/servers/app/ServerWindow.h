@@ -50,7 +50,7 @@ struct window_info;
 class ServerWindow : public MessageLooper {
 public:
 								ServerWindow(const char *title, ServerApp *app,
-									port_id clientPort, port_id looperPort, 
+									port_id clientPort, port_id looperPort,
 									int32 clientToken);
 	virtual						~ServerWindow();
 
@@ -91,7 +91,7 @@ public:
 
 			// related thread/team_id(s).
 	inline	team_id				ClientTeam() const { return fClientTeam; }
-			
+
 			void				HandleDirectConnection(int32 bufferState = -1,
 									int32 driverState = -1);
 
@@ -163,6 +163,7 @@ private:
 			bool				fCurrentDrawingRegionValid;
 
 			direct_window_data*	fDirectWindowData;
+			window_feel			fDirectWindowFeel;
 };
 
 #endif	// SERVER_WINDOW_H

@@ -151,7 +151,7 @@ Window::Window(const BRect& frame, const char *name,
 	// _ResizeBy() will adapt the frame for validity before resizing
 	if (feel == kDesktopWindowFeel) {
 		// the desktop window spans over the whole screen
-		// ToDo: this functionality should be moved somewhere else
+		// TODO: this functionality should be moved somewhere else
 		//  (so that it is always used when the workspace is changed)
 		uint16 width, height;
 		uint32 colorSpace;
@@ -1435,7 +1435,7 @@ Window::HasModal() const
 
 /*!	\brief Returns the windows that's in behind of the backmost position
 		this window can get.
-		Returns NULL is this window can be the backmost window.
+	Returns NULL is this window can be the backmost window.
 */
 Window*
 Window::Backmost(Window* window, int32 workspace)
@@ -1464,7 +1464,7 @@ Window::Backmost(Window* window, int32 workspace)
 
 /*!	\brief Returns the windows that's in front of the frontmost position
 		this window can get.
-		Returns NULL if this window can be the frontmost window.
+	Returns NULL if this window can be the frontmost window.
 */
 Window*
 Window::Frontmost(Window* first, int32 workspace)
@@ -1505,6 +1505,10 @@ Window::RemoveFromSubset(Window* window)
 }
 
 
+/*!	Returns whether or not a window is in the subset of this window.
+	If a window is in the subset of this window, it means it should always
+	appear behind this window.
+*/
 bool
 Window::HasInSubset(const Window* window) const
 {
@@ -1516,7 +1520,7 @@ Window::HasInSubset(const Window* window) const
 	// of their application
 	if (fFeel == kMenuWindowFeel)
 		return window->ServerWindow()->App() == ServerWindow()->App();
-	else if (window->Feel() == kMenuWindowFeel)
+	if (window->Feel() == kMenuWindowFeel)
 		return false;
 
 	// we have a few special feels that have a fixed order
