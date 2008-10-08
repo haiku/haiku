@@ -1339,8 +1339,11 @@ format_data(int32 type, char *ptr, long size)
 							for (int32 i = 0; i < 10 && pinfo[pinfo_index].types[i] != 0; i++) {
 								uint32 type = pinfo[pinfo_index].types[i];
 								char str2[6];
-								sprintf(str2, "%c%c%c%c ", int(type & 0xFF000000) >> 24,
-									int(type & 0xFF0000) >> 16, int(type & 0xFF00) >> 8, (int)type & 0xFF);
+								snprintf(str2, sizeof(str2), "%c%c%c%c ",
+									int(type & 0xFF000000) >> 24,
+									int(type & 0xFF0000) >> 16,
+									int(type & 0xFF00) >> 8,
+									(int)type & 0xFF);
 								strcat(str, str2);
 							}
 
@@ -1348,10 +1351,13 @@ format_data(int32 type, char *ptr, long size)
 								for (int32 j = 0; j < 5 && pinfo[pinfo_index].ctypes[i].pairs[j].type != 0; j++) {
 									uint32 type = pinfo[pinfo_index].ctypes[i].pairs[j].type;
 									char str2[strlen(pinfo[pinfo_index].ctypes[i].pairs[j].name) + 8];
-									sprintf(str2, "(%s %c%c%c%c)", pinfo[pinfo_index].ctypes[i].pairs[j].name,
+									snprintf(str2, sizeof(str2),
+										"(%s %c%c%c%c)",
+										pinfo[pinfo_index].ctypes[i].pairs[j].name,
 										int(type & 0xFF000000) >> 24,
 										int(type & 0xFF0000) >> 16,
-										int(type & 0xFF00) >> 8, (int)type & 0xFF);
+										int(type & 0xFF00) >> 8,
+										(int)type & 0xFF);
 									strcat(str, str2);
 								}
 							}
