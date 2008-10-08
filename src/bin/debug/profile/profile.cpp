@@ -389,6 +389,9 @@ main(int argc, const char* const* argv)
 			}
 
 			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
+				if (!gOptions.profile_teams)
+					break;
+
 				if (threadManager.AddTeam(message.team_created.new_team)
 						== B_OK) {
 					threadManager.AddThread(message.team_created.new_team);
@@ -414,9 +417,6 @@ main(int argc, const char* const* argv)
 				break;
 
 			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
-				if (!gOptions.profile_teams)
-					break;
-
 				if (Team* team = threadManager.FindTeam(message.origin.team)) {
 					team->AddImage(message.image_created.info,
 						message.image_created.image_event);
