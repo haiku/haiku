@@ -1,7 +1,12 @@
+/*
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #undef NDEBUG
 
 #include <assert.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +23,7 @@ static const char *kUsage =
 	"Options:\n"
 	"  -d                   - call disable_debugger() first\n"
 	"  -h, --help           - print this info text\n"
+	"  --signal             - crash in a signal handler\n"
 	"  --thread             - crash in a separate thread\n"
 	"\n"
 	"Modes:\n"
@@ -26,7 +32,7 @@ static const char *kUsage =
 	"  segv2                - strcmp() using a 0x1 pointer\n"
 	"  div                  - executes a division by zero\n"
 	"  debugger             - invokes debugger()\n"
-	"  assert               - failed assert(), which should invoke the "
+	"  assert               - failed assert(), which should invoke the\n"
 	"                         debugger\n"
 	"\n"
 	"[x86 specific]\n"
@@ -113,6 +119,24 @@ crash_protection()
 typedef int crash_function_t();
 
 
+struct Options {
+	Options()
+		:
+		inThread(false),
+		inSignalHandler(false),
+		disableDebugger(false)
+	{
+	}
+
+	crash_function_t*	function;
+	bool				inThread;
+	bool				inSignalHandler;
+	bool				disableDebugger;
+};
+
+static Options sOptions;
+
+
 static crash_function_t*
 get_crash_function(const char* mode)
 {
@@ -138,12 +162,29 @@ get_crash_function(const char* mode)
 }
 
 
+static void
+signal_handler(int signal)
+{
+	sOptions.function();
+}
+
+
+static void
+do_crash()
+{
+	if (sOptions.inSignalHandler) {
+		signal(SIGUSR1, &signal_handler);
+		send_signal(find_thread(NULL), SIGUSR1);
+	} else
+		sOptions.function();
+}
+
+
 static status_t
 crashing_thread(void* data)
 {
-	crash_function_t* doCrash = (crash_function_t*)data;
 	snooze(100000);
-	doCrash();
+	do_crash();
 	return 0;
 }
 
@@ -151,8 +192,6 @@ crashing_thread(void* data)
 int
 main(int argc, const char* const* argv)
 {
-	bool inThread = false;
-	bool disableDebugger = false;
 	const char* mode = "segv";
 
 	// parse args
@@ -164,9 +203,11 @@ main(int argc, const char* const* argv)
 			if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
 				print_usage_and_exit(false);
 			} else if (strcmp(arg, "-d") == 0) {
-				disableDebugger = true;
+				sOptions.disableDebugger = true;
+			} else if (strcmp(arg, "--signal") == 0) {
+				sOptions.inSignalHandler = true;
 			} else if (strcmp(arg, "--thread") == 0) {
-				inThread = true;
+				sOptions.inThread = true;
 			} else {
 				fprintf(stderr, "Invalid option \"%s\"\n", arg);
 				print_usage_and_exit(true);
@@ -176,18 +217,18 @@ main(int argc, const char* const* argv)
 		}
 	}
 
-	crash_function_t* doCrash = get_crash_function(mode);
-	if (doCrash == NULL) {
+	sOptions.function = get_crash_function(mode);
+	if (sOptions.function == NULL) {
 		fprintf(stderr, "Invalid mode \"%s\"\n", mode);
 		print_usage_and_exit(true);
 	}
 
-	if (disableDebugger)
+	if (sOptions.disableDebugger)
 		disable_debugger(true);
 
-	if (inThread) {
+	if (sOptions.inThread) {
 		thread_id thread = spawn_thread(crashing_thread, "crashing thread",
-			B_NORMAL_PRIORITY, (void*)doCrash);
+			B_NORMAL_PRIORITY, NULL);
 		if (thread < 0) {
 			fprintf(stderr, "Error: Failed to spawn thread: %s\n",
 				strerror(thread));
@@ -199,7 +240,7 @@ main(int argc, const char* const* argv)
 		while (wait_for_thread(thread, &result) == B_INTERRUPTED) {
 		}
 	} else {
-		doCrash();
+		do_crash();
 	}
 
 	return 0;
