@@ -379,7 +379,7 @@ void
 WorkspacesView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {
-	if (Window() == NULL || EventMask() == 0)
+	if (dynamic_cast<WorkspacesWindow*>(Window()) == NULL || EventMask() == 0)
 		return;
 
 	// Auto-Raise
@@ -399,6 +399,11 @@ WorkspacesView::MouseMoved(BPoint where, uint32 transit,
 void
 WorkspacesView::MouseDown(BPoint where)
 {
+	// With enabled auto-raise feature, we'll get mouse messages we don't
+	// want to handle here.
+	if (!Bounds().Contains(where))
+		return;
+
 	int32 buttons = 0;
 	if (Window() != NULL && Window()->CurrentMessage() != NULL)
 		Window()->CurrentMessage()->FindInt32("buttons", &buttons);
