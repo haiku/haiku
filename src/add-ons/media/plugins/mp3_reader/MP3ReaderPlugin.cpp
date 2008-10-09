@@ -861,8 +861,11 @@ mp3Reader::IsMp3File()
 	// Real Media
 	if (buf[0] == '.' && buf[1] == 'R' && buf[2] == 'M' && buf[3] == 'F')
 		return false;
-	// Quicktime
+	// Quicktime or MPEG4 (Not really a good way, moov could be anywhere)
 	if (buf[4] == 'm' && buf[5] == 'o' && buf[6] == 'o' && buf[7] == 'v')
+		return false;
+	// On newer quicktime and on MPEG4 files ftyp is likely to be first
+	if (buf[4] == 'f' && buf[5] == 't' && buf[6] == 'y' && buf[7] == 'p')
 		return false;
 	// ASF 1 (first few bytes of GUID)
 	if (buf[0] == 0x30 && buf[1] == 0x26 && buf[2] == 0xb2 && buf[3] == 0x75
