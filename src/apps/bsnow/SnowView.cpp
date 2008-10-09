@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <Alert.h>
+#include <Debug.h>
 #include <Message.h>
 #include <MessageRunner.h>
 #include <OS.h>
@@ -37,7 +38,8 @@ SnowView::SnowView()
 	AddChild(fDragger);
 	SetHighColor(255,255,255);
 }
-/*
+
+#ifdef DEBUG
 filter_result msgfilter(BMessage *message, BHandler **target, BMessageFilter *filter)
 {
 	switch (message->what) {
@@ -56,14 +58,16 @@ filter_result msgfilter(BMessage *message, BHandler **target, BMessageFilter *fi
 	}
 	return B_DISPATCH_MESSAGE;
 }
-*/
+#endif
 
 SnowView::SnowView(BMessage *archive)
  : BView(archive)
 {
 	system_info si;
-	//printf("SnowView()\n");
-	//archive->PrintToStream();
+	PRINT(("SnowView()\n"));
+#ifdef DEBUG
+	archive->PrintToStream();
+#endif
 	fDragger = NULL;
 	fAttached = false;
 	fMsgRunner = NULL;
@@ -157,7 +161,9 @@ void SnowView::AttachedToWindow()
 		fInvalidator = spawn_thread(SnowMakerThread, INVALIDATOR_THREAD_NAME, B_LOW_PRIORITY, (void *)this);
 		resume_thread(fInvalidator);
 		printf("BSnow: OK: ws = %ld x %ld\n", fCachedWsWidth, fCachedWsHeight);
-		//Window()->AddCommonFilter(new BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, msgfilter));
+#ifdef DEBUG
+		Window()->AddCommonFilter(new BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, msgfilter));
+#endif
 	}
 }
 
