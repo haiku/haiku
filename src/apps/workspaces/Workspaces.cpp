@@ -303,6 +303,10 @@ WorkspacesView::WorkspacesView(BRect frame)
 WorkspacesView::WorkspacesView(BMessage* archive)
 	: BView(archive)
 {
+	// Make sure the auto-raise feature didn't leave any artifacts - this is
+	// not a good idea to keep enabled for a replicant.
+	if (EventMask() != 0)
+		SetEventMask(0);
 }
 
 
@@ -379,19 +383,20 @@ void
 WorkspacesView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {
-	if (dynamic_cast<WorkspacesWindow*>(Window()) == NULL || EventMask() == 0)
+	WorkspacesWindow* window = dynamic_cast<WorkspacesWindow*>(Window());
+	if (window == NULL || !window->IsAutoRaising())
 		return;
 
 	// Auto-Raise
 
 	where = ConvertToScreen(where);
-	BScreen screen(Window());
+	BScreen screen(window);
 	BRect frame = screen.Frame();
 	if (where.x == frame.left || where.x == frame.right
 		|| where.y == frame.top || where.y == frame.bottom) {
 		// cursor is on screen edge
-		if (Window()->Frame().Contains(where))
-			Window()->Activate();
+		if (window->Frame().Contains(where))
+			window->Activate();
 	}
 }
 
