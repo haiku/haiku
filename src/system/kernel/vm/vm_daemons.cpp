@@ -21,6 +21,12 @@
 
 //#define TRACK_PAGE_USAGE_STATS	1
 
+//#define TRACE_VM_DAEMONS
+#ifdef TRACE_VM_DAEMONS
+#define TRACE(x) dprintf x
+#else
+#define TRACE(x) ;
+#endif
 
 const static uint32 kMinScanPagesCount = 512;
 const static uint32 kMaxScanPagesCount = 8192;
@@ -130,8 +136,8 @@ update_page_usage_stats()
 		for (int32 i = 0; i < 256; i++)
 			sum += (int64)sPageUsage[i] * (i - 128);
 
-		dprintf("average page usage: %f (%lu pages)\n",
-			(float)sum / sPageUsagePageCount, sPageUsagePageCount);
+		TRACE(("average page usage: %f (%lu pages)\n",
+			(float)sum / sPageUsagePageCount, sPageUsagePageCount));
 	}
 }
 
@@ -188,8 +194,8 @@ check_page_activation(int32 index)
 	bool modified;
 	int32 activation = vm_test_map_activation(page, &modified);
 	if (modified && page->state != PAGE_STATE_MODIFIED) {
-		//dprintf("page %p -> move to modified\n", page);
-		vm_page_set_state(page, PAGE_STATE_MODIFIED);
+		TRACE(("page %p -> move to modified\n", page);
+		vm_page_set_state(page, PAGE_STATE_MODIFIED));
 	}
 
 	if (activation > 0) {
@@ -198,7 +204,7 @@ check_page_activation(int32 index)
 			if (page->state != PAGE_STATE_MODIFIED)
 				vm_page_set_state(page, PAGE_STATE_ACTIVE);
 			page->usage_count = 1;
-			//dprintf("page %p -> move to active\n", page);
+			TRACE(("page %p -> move to active\n", page));
 		} else if (page->usage_count < 127)
 			page->usage_count++;
 
@@ -230,7 +236,7 @@ check_page_activation(int32 index)
 			vm_page_schedule_write_page(page);
 		else
 			vm_page_set_state(page, PAGE_STATE_INACTIVE);
-		//dprintf("page %p -> move to inactive\n", page);
+		TRACE(("page %p -> move to inactive\n", page));
 	}
 
 	return true;
@@ -292,15 +298,15 @@ page_daemon(void* /*unused*/)
 			- (kMaxScanPagesCount - kMinScanPagesCount)
 			* pagesLeft / sLowPagesCount;
 		uint32 leftToFree = sLowPagesCount - pagesLeft;
-		/*dprintf("wait interval %Ld, scan pages %lu, free %lu, "
+		TRACE(("wait interval %Ld, scan pages %lu, free %lu, "
 			"target %lu\n",	scanWaitInterval, scanPagesCount, 
-			pagesLeft, leftToFree);*/
+			pagesLeft, leftToFree));
 
 		for (uint32 i = 0; i < scanPagesCount && leftToFree > 0; i++) {
 			if (clearPage == 0)
-				dprintf("clear through\n");
+				TRACE(("clear through\n"));
 			if (checkPage == 0) {
-				dprintf("check through\n");
+				TRACE(("check through\n"));
 #ifdef TRACK_PAGE_USAGE_STATS
 				update_page_usage_stats();
 #endif
