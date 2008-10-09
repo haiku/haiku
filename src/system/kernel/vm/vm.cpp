@@ -1642,7 +1642,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 	bool canOvercommit = false;
 	addr_t physicalBase = 0;
 
-	TRACE(("create_anonymous_area %s: size 0x%lx\n", name, size));
+	TRACE(("create_anonymous_area [%d] %s: size 0x%lx\n", team, name, size));
 
 	size = PAGE_ALIGN(size);
 
@@ -4004,8 +4004,14 @@ vm_init(kernel_args *args)
 	vm_page_init_num_pages(args);
 	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
 
-	// map in the new heap and initialize it
 	size_t heapSize = INITIAL_HEAP_SIZE;
+	// try to accomodate low memory systems
+	while (heapSize > sAvailableMemory / 8)
+		heapSize /= 2;
+	if (heapSize < 1024 * 1024)
+		panic("vm_init: go buy some RAM please.");
+
+	// map in the new heap and initialize it
 	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	TRACE(("heap at 0x%lx\n", heapBase));
