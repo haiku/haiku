@@ -2,13 +2,11 @@ SubDir HAIKU_TOP src system boot ;
 
 local librootFunctions =
 	abs.o
-	byteorder.o
 	ctype.o
 	qsort.o
 	kernel_vsprintf.o
 	memset.o
 	memcmp.o
-	memcpy.o
 	memmove.o
 	strdup.o
 	strlen.o

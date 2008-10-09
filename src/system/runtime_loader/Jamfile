@@ -25,8 +25,6 @@ StaticLibrary libruntime_loader.a :
 	:
 	<src!system!libroot!os>syscalls.o
 	<src!system!libroot!os>sem.o
-	<src!system!libroot!os!arch!$(TARGET_ARCH)>atomic.o
-	<src!system!libroot!os!arch!$(TARGET_ARCH)>thread.o
 
 	<src!system!libroot!posix>errno.o
 
@@ -37,7 +35,6 @@ StaticLibrary libruntime_loader.a :
 
 	<src!system!libroot!posix!string>memchr.o
 	<src!system!libroot!posix!string>memcmp.o
-	<src!system!libroot!posix!string>memcpy.o
 	<src!system!libroot!posix!string>memmove.o
 	<src!system!libroot!posix!string>memset.o
 	<src!system!libroot!posix!string>strcasecmp.o
@@ -57,7 +54,6 @@ StaticLibrary libruntime_loader.a :
 	<src!system!libroot!posix!string>strrchr.o
 	<src!system!libroot!posix!string>strspn.o
 	<src!system!libroot!posix!string>strstr.o
-	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
 
 	[ FGristFiles kernel_vsprintf.o ]
 ;
@@ -69,20 +65,20 @@ SEARCH on [ FGristFiles kernel_vsprintf.c ]
 SEARCH on [ FGristFiles KMessage.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
-
 Objects
 	runtime_loader.c
 	elf.cpp
 	export.c
 	heap.cpp
 	utility.cpp
-	arch_relocate.c
 ;
 
 Ld runtime_loader :
-	[ FGristFiles runtime_loader.o elf.o export.o heap.o utility.o arch_relocate.o ]
+	[ FGristFiles runtime_loader.o elf.o export.o heap.o utility.o ]
 	libruntime_loader.a
+	libruntime_loader_$(TARGET_ARCH).a
 	$(TARGET_GCC_LIBGCC)
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld
 ;
+
+HaikuSubInclude arch $(TARGET_ARCH) ;

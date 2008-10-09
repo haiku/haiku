@@ -13,7 +13,7 @@ KernelMergeObject kernel_os_main.o :
 SEARCH on [ FGristFiles
 	driver_settings.c
 	find_directory.c
-	fs_info.c 
+	fs_info.c
 	wait_for_objects.cpp
 	] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
@@ -85,7 +85,6 @@ KernelMergeObject kernel_lib_posix.o :
 	# string
 	memchr.c
 	memcmp.c
-	memcpy.c
 	memmove.c
 	memset.c
 	strcasecmp.c
@@ -114,31 +113,7 @@ KernelMergeObject kernel_lib_posix.o :
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
-# TODO: Move the following arch specific part into arch/$(TARGET_ARCH) subdirs!
-
-SEARCH_SOURCE += [ FDirName $(librootSources) os arch $(TARGET_ARCH) ] ;
-
-KernelMergeObject kernel_os_arch_$(TARGET_ARCH).o :
-	atomic.S
-	byteorder.S
-	system_time_asm.S
-	system_time.c
-
-	: $(TARGET_KERNEL_PIC_CCFLAGS)
-;
-
-SEARCH_SOURCE += [ FDirName $(posixSources) arch $(TARGET_ARCH) ] ;
-SEARCH_SOURCE += [ FDirName $(posixSources) string arch $(TARGET_ARCH) ] ;
-
-KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
-	siglongjmp.S
-	sigsetjmp.S
-	kernel_longjmp_return.c
-	kernel_setjmp_save_sigs.c
-	arch_string.S				# TODO: Not needed for X86!
-
-	: $(TARGET_KERNEL_PIC_CCFLAGS)
-;
+# misc
 
 UsePrivateHeaders shared ;
 
@@ -149,3 +124,5 @@ KernelMergeObject kernel_misc.o :
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
+
+HaikuSubInclude arch $(TARGET_ARCH) ;

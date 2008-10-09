@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src system libroot posix string arch ppc ;
+
+UsePrivateSystemHeaders ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+
+MergeObject posix_string_arch_$(TARGET_ARCH).o :
+	memcpy.c
+;

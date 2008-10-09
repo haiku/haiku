@@ -23,7 +23,6 @@ KernelMergeObject kernel_arch_x86.o :
 #	arch_selector.c
 	arch_real_time_clock.c
 	arch_smp.c
-	arch_string.S
 	arch_thread.cpp
 	arch_timer.c
 	arch_vm.cpp
@@ -37,7 +36,7 @@ KernelMergeObject kernel_arch_x86.o :
 	cpuid.S
 	syscall.S
 	vm86.cpp
-	
+
 	x86_pit.c
 	x86_apic.c
 	x86_hpet.c

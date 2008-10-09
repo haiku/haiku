@@ -4,19 +4,30 @@ DEFINES += _BOOT_MODE ;
 
 local kernelArchSources =
 	arch_elf.c
-	arch_string.S
 ;
 
 local kernelArchObjects =
 	<src!system!kernel!arch!$(TARGET_ARCH)>cpuid.o
 ;
 
-KernelMergeObject boot_arch_x86.o :
+local kernelLibArchSources =
+	arch_string.S
+;
+
+local kernelLibArchObjects =
+	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
+;
+
+KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	$(kernelArchSources)
+	$(kernelLibArchSources)
 	: # additional flags
 	:
 	$(kernelArchObjects)
+	$(kernelLibArchObjects)
 ;
 
 SEARCH on [ FGristFiles $(kernelArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
+SEARCH on [ FGristFiles $(kernelLibArchSources) ]
+    = [ FDirName $(HAIKU_TOP) src system kernel lib arch $(TARGET_ARCH) ] ;

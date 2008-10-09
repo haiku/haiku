@@ -2,15 +2,22 @@ SubDir HAIKU_TOP src system boot arch m68k ;
 
 DEFINES += _BOOT_MODE ;
 
+# TODO: Is there any reason to recompile arch_string.S here?
 local librootArchObjects =
 #	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
 	arch_string.S
 ;
 
-KernelMergeObject boot_arch_m68k.o :
+local kernelLibArchObjects =
+	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
+;
+
+KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	arch_elf.cpp
 	$(librootArchObjects)
 	: -fno-pic
+	:
+	$(kernelLibArchObjects)
 ;
 
 SEARCH on [ FGristFiles arch_elf.cpp ]

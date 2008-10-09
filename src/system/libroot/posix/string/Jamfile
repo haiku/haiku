@@ -8,7 +8,6 @@ MergeObject posix_string.o :
 	memccpy.c
 	memchr.c
 	memcmp.c
-	memcpy.c
 	memmove.c
 	memset.c
 	stpcpy.c
@@ -39,11 +38,4 @@ MergeObject posix_string.o :
 	strxfrm.c
 ;
 
-SubDir HAIKU_TOP src system libroot posix string arch $(TARGET_ARCH) ;
-
-UsePrivateSystemHeaders ;
-
-MergeObject posix_string_arch_$(TARGET_ARCH).o :
-	arch_string.S
-;
-
+HaikuSubInclude arch $(TARGET_ARCH) ;
