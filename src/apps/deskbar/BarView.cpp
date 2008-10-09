@@ -380,7 +380,7 @@ TBarView::PositionWindow(BRect screenFrame)
 		if (fState == kFullState)
 			moveLoc.x = screenFrame.right - fBarMenuBar->Frame().Width();
 		else
-			moveLoc.x = screenFrame.right - kMinimumWindowWidth;
+			moveLoc.x = screenFrame.right - windowWidth;
 	}
 
 	// bottom, full or corners
