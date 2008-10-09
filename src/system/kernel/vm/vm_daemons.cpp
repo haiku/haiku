@@ -292,8 +292,9 @@ page_daemon(void* /*unused*/)
 			- (kMaxScanPagesCount - kMinScanPagesCount)
 			* pagesLeft / sLowPagesCount;
 		uint32 leftToFree = sLowPagesCount - pagesLeft;
-dprintf("wait interval %Ld, scan pages %lu, free %lu, target %lu\n",
-	scanWaitInterval, scanPagesCount, pagesLeft, leftToFree);
+		/*dprintf("wait interval %Ld, scan pages %lu, free %lu, "
+			"target %lu\n",	scanWaitInterval, scanPagesCount, 
+			pagesLeft, leftToFree);*/
 
 		for (uint32 i = 0; i < scanPagesCount && leftToFree > 0; i++) {
 			if (clearPage == 0)

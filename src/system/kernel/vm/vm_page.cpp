@@ -1241,10 +1241,10 @@ page_writer(void* /*unused*/)
 		writtenPages += numPages;
 		if (writtenPages >= 1024) {
 			bigtime_t now = system_time();
-			dprintf("page writer: wrote 1024 pages (total: %llu ms, "
+			TRACE(("page writer: wrote 1024 pages (total: %llu ms, "
 				"collect: %llu ms, write: %llu ms)\n",
 				(now - lastWrittenTime) / 1000,
-				pageCollectionTime / 1000, pageWritingTime / 1000);
+				pageCollectionTime / 1000, pageWritingTime / 1000));
 			writtenPages -= 1024;
 			lastWrittenTime = now;
 			pageCollectionTime = 0;
@@ -1588,7 +1588,7 @@ vm_page_init_num_pages(kernel_args *args)
 			+ args->physical_memory_range[i].size) / B_PAGE_SIZE;
 	}
 
-	TRACE(("first phys page = 0x%lx, end 0x%x\n", sPhysicalPageOffset,
+	TRACE(("first phys page = 0x%lx, end 0x%lx\n", sPhysicalPageOffset,
 		physicalPagesEnd));
 
 	sNumPages = physicalPagesEnd - sPhysicalPageOffset;
@@ -1609,7 +1609,7 @@ vm_page_init(kernel_args *args)
 	sPages = (vm_page *)vm_allocate_early(args, sNumPages * sizeof(vm_page),
 		~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	TRACE(("vm_init: putting free_page_table @ %p, # ents %d (size 0x%x)\n",
+	TRACE(("vm_init: putting free_page_table @ %p, # ents %ld (size 0x%x)\n",
 		sPages, sNumPages, (unsigned int)(sNumPages * sizeof(vm_page))));
 
 	// initialize the free page table
