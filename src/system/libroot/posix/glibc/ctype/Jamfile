@@ -10,5 +10,6 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 MergeObject posix_gnu_ctype.o :
 	ctype.c
+	ctype-extn.c
 	ctype-info.c
 ;
