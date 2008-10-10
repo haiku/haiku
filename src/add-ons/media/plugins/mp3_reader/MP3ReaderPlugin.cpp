@@ -106,7 +106,7 @@ static const char * name_table[4][4] =
 // frame_sample_count_table[layer_index]
 static const int frame_sample_count_table[4] = { 0, 1152, 1152, 384 };
 
-static const int MAX_CHUNK_SIZE = 5200;
+static const size_t MAX_CHUNK_SIZE = 5200;
 
 struct mp3data
 {
@@ -317,9 +317,10 @@ mp3Reader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 
 status_t
 mp3Reader::Seek(void *cookie,
-				uint32 seekTo,
+				uint32 flags,
 				int64 *frame, bigtime_t *time)
 {
+	// Find a seek position and seek to it
 	if (!fSeekableSource)
 		return B_ERROR;
 
@@ -328,14 +329,14 @@ mp3Reader::Seek(void *cookie,
 	
 	// this isn't very accurate
 
-	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
+	if (flags & B_MEDIA_SEEK_TO_FRAME) {
 		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *frame / (float)data->frameCount) : -1;
 		if (pos < 0)
 			pos = (*frame * fDataSize) / data->frameCount;
 		TRACE("mp3Reader::Seek to frame %Ld, pos %Ld\n", *frame, pos);
 		*time = (*frame * data->duration) / data->frameCount;
 		TRACE("mp3Reader::Seek newtime %Ld\n", *time);
-	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
+	} else if (flags & B_MEDIA_SEEK_TO_TIME) {
 		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *time / (float)data->duration) : -1;
 		if (pos < 0)
 			pos = (*time * fDataSize) / data->duration;
@@ -380,6 +381,66 @@ mp3Reader::Seek(void *cookie,
 	return B_OK;
 }
 
+status_t
+mp3Reader::FindKeyFrame(void* cookie, uint32 flags,
+							int64* frame, bigtime_t* time)
+{
+	// Find a seek position without actually seeking
+	if (!fSeekableSource)
+		return B_ERROR;
+
+	mp3data *data = reinterpret_cast<mp3data *>(cookie);
+	int64 pos;
+	
+	// this isn't very accurate
+
+	if (flags & B_MEDIA_SEEK_TO_FRAME) {
+		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *frame / (float)data->frameCount) : -1;
+		if (pos < 0)
+			pos = (*frame * fDataSize) / data->frameCount;
+		TRACE("mp3Reader::FindKeyFrame to frame %Ld, pos %Ld\n", *frame, pos);
+		*time = (*frame * data->duration) / data->frameCount;
+		TRACE("mp3Reader::FindKeyFrame newtime %Ld\n", *time);
+	} else if (flags & B_MEDIA_SEEK_TO_TIME) {
+		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *time / (float)data->duration) : -1;
+		if (pos < 0)
+			pos = (*time * fDataSize) / data->duration;
+		TRACE("mp3Reader::FindKeyFrame to time %Ld, pos %Ld\n", *time, pos);
+		*frame = (*time * data->frameCount) / data->duration;
+		TRACE("mp3Reader::FindKeyFrame newframe %Ld\n", *frame);
+	} else {
+		return B_ERROR;
+	}
+	
+	// We ignore B_MEDIA_SEEK_CLOSEST_FORWARD, B_MEDIA_SEEK_CLOSEST_BACKWARD
+
+	uint8 buffer[16000];
+	if (pos > fDataSize - 16000)
+		pos = fDataSize - 16000;
+	if (pos < 0)
+		pos = 0;
+	int64 size = fDataSize - pos;
+	if (size > 16000)
+		size = 16000;
+	if (size != Source()->ReadAt(fDataStart + pos, buffer, size)) {
+		TRACE("mp3Reader::FindKeyFrame: unexpected read error\n");
+		return B_ERROR;
+	}
+	int32 end = size - 4;
+	int32 ofs;
+	for (ofs = 0; ofs < end; ofs++) {
+		if (buffer[ofs] != 0xff) // quick check
+			continue;
+		if (IsValidStream(&buffer[ofs], size - ofs))
+			break;
+	}
+	if (ofs == end) {
+		TRACE("mp3Reader::FindKeyFrame: couldn't synchronize\n");
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
 
 status_t
 mp3Reader::GetNextChunk(void *cookie,
@@ -397,7 +458,7 @@ mp3Reader::GetNextChunk(void *cookie,
 
 #if 0
 // XXXX TEST
-	int size = min_c(MAX_CHUNK_SIZE - 16, maxbytes);
+	size_t size = min_c(MAX_CHUNK_SIZE - 16, maxbytes);
 	if (size != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer,size)) {
 		TRACE("mp3Reader::GetNextChunk: unexpected read error\n");
 		return B_ERROR;
@@ -460,7 +521,7 @@ retry:
 	*chunkSize = size + 4;
 	
 	if (*chunkSize > MAX_CHUNK_SIZE) {
-		printf("mp3Reader: chunk buffer overrun, read %ld bytes into %d bytes buffer\n", *chunkSize, MAX_CHUNK_SIZE);
+		printf("mp3Reader: chunk buffer overrun, read %ld bytes into %ld bytes buffer\n", *chunkSize, MAX_CHUNK_SIZE);
 		exit(1);
 	}
 
