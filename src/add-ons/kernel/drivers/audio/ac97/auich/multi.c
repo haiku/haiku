@@ -678,13 +678,12 @@ auich_get_description(auich_dev *card, multi_description *data)
 		memcpy(data->channels, card->multi.chans, size * sizeof(card->multi.chans[0]));
 	}
 
-	data->output_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
-	data->input_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
-	/*data->output_rates = B_SR_44100;
-	data->input_rates = B_SR_44100;*/
+	switch (current_settings.sample_rate) {
+		case 48000: data->output_rates = data->input_rates = B_SR_48000; break;
+		case 44100: data->output_rates = data->input_rates = B_SR_44100; break;
+	}
 	data->min_cvsr_rate = 0;
 	data->max_cvsr_rate = 48000;
-	//data->max_cvsr_rate = 44100;
 
 	data->output_formats = B_FMT_16BIT;
 	data->input_formats = B_FMT_16BIT;
@@ -731,18 +730,17 @@ auich_get_global_format(auich_dev *card, multi_format_info *data)
 	data->output_latency = 0;
 	data->input_latency = 0;
 	data->timecode_kind = 0;
-	data->input.rate = B_SR_48000;
-	data->input.cvsr = 48000;
-	data->input.format = B_FMT_16BIT;
-	data->output.rate = B_SR_48000;
-	data->output.cvsr = 48000;
-	data->output.format = B_FMT_16BIT;
-	/*data->input.rate = B_SR_44100;
-	data->input.cvsr = 44100;
-	data->input.format = B_FMT_16BIT;
-	data->output.rate = B_SR_44100;
-	data->output.cvsr = 44100;
-	data->output.format = B_FMT_16BIT;*/
+	switch (current_settings.sample_rate) {
+		case 48000: 
+			data->input.rate = data->output.rate = B_SR_48000;
+			data->input.cvsr = data->output.cvsr = 48000;
+			break;
+		case 44100:
+			data->input.rate = data->output.rate = B_SR_44100;
+			data->input.cvsr = data->output.cvsr = 44100;
+			break;
+	}
+	data->input.format = data->output.format = B_FMT_16BIT;
 	return B_OK;
 }
 
