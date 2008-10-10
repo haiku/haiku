@@ -207,9 +207,10 @@ WavReader::Sniff(int32 *streamCount)
 	fFrameRate = UINT32(format.samples_per_sec);
 	fBitsPerSample = UINT16(format.bits_per_sample);
 	if (fBitsPerSample == 0) {
-		printf("WavReader::Sniff: Error, bits_per_sample = 0\n");
+		printf("WavReader::Sniff: Error, bits_per_sample = 0 assuming 8\n");
 		fBitsPerSample = 8;
 	}
+	fAvgBytesPerSec = format.avg_bytes_per_sec;
 	fFrameCount = foundFact ? UINT32(fact.sample_length) : 0;
 	fFormatCode = UINT16(format.format_tag);
 	if (fFormatCode == 0xfffe && foundFmtExt)
@@ -266,7 +267,16 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 	data->buffersize = (BUFFER_SIZE / fBlockAlign) * fBlockAlign;
 	data->buffer = malloc(data->buffersize);
 	data->framecount = fFrameCount ? fFrameCount : (8 * fDataSize) / data->bitsperframe;
-	data->duration = (data->framecount * 1000000LL) / data->fps;
+	if (fFormatCode == 0x0055) {
+		// mp3 in wav file
+		if (fAvgBytesPerSec) {
+			data->duration = (data->datasize * 1000000LL) / fAvgBytesPerSec;
+		} else {
+			data->duration = (data->framecount * 1000000LL) / data->fps / fBitsPerSample * fChannelCount;
+		}
+	} else {
+		data->duration = (data->framecount * 1000000LL) / data->fps;
+	}
 	data->raw = fFormatCode == 0x0001;
 
 	TRACE(" bitsperframe %ld\n", data->bitsperframe);
@@ -351,20 +361,21 @@ WavReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 
 status_t
 WavReader::Seek(void *cookie,
-				uint32 seekTo,
+				uint32 flags,
 				int64 *frame, bigtime_t *time)
 {
+	// Seek to the given position
 	wavdata *data = reinterpret_cast<wavdata *>(cookie);
 	uint64 pos;
 
-	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
+	if (flags & B_MEDIA_SEEK_TO_FRAME) {
 		if (data->raw)
 			pos = (*frame * data->bitsperframe) / 8;
 		else
 			pos = (*frame * fDataSize) / data->framecount;
 		pos = (pos / fBlockAlign) * fBlockAlign; // round down to a block start
 		TRACE("WavReader::Seek to frame %Ld, pos %Ld\n", *frame, pos);
-	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
+	} else if (flags & B_MEDIA_SEEK_TO_TIME) {
 		if (data->raw)
 			pos = (*time * data->fps * data->bitsperframe) / (1000000LL * 8);
 		else
@@ -393,6 +404,48 @@ WavReader::Seek(void *cookie,
 	return B_OK;
 }
 
+status_t
+WavReader::FindKeyFrame(void* cookie, uint32 flags,
+							int64* frame, bigtime_t* time)
+{
+	// Find a seek position without actually seeking
+	wavdata *data = reinterpret_cast<wavdata *>(cookie);
+	uint64 pos;
+
+	if (flags & B_MEDIA_SEEK_TO_FRAME) {
+		if (data->raw)
+			pos = (*frame * data->bitsperframe) / 8;
+		else
+			pos = (*frame * fDataSize) / data->framecount;
+		pos = (pos / fBlockAlign) * fBlockAlign; // round down to a block start
+		TRACE("WavReader::Seek to frame %Ld, pos %Ld\n", *frame, pos);
+	} else if (flags & B_MEDIA_SEEK_TO_TIME) {
+		if (data->raw)
+			pos = (*time * data->fps * data->bitsperframe) / (1000000LL * 8);
+		else
+			pos = (*time * fDataSize) / data->duration;
+		pos = (pos / fBlockAlign) * fBlockAlign; // round down to a block start
+		TRACE("WavReader::Seek to time %Ld, pos %Ld\n", *time, pos);
+	} else {
+		return B_ERROR;
+	}
+
+	if (data->raw)
+		*frame = (8 * pos) / data->bitsperframe;
+	else
+		*frame = (pos * data->framecount) / fDataSize;
+	*time = (*frame * 1000000LL) / data->fps;
+
+	TRACE("WavReader::Seek newtime %Ld\n", *time);
+	TRACE("WavReader::Seek newframe %Ld\n", *frame);
+	
+	if (pos < 0 || pos > data->datasize) {
+		TRACE("WavReader::Seek invalid position %Ld\n", pos);
+		return B_ERROR;
+	}
+	
+	return B_OK;
+}
 
 status_t
 WavReader::GetNextChunk(void *cookie,

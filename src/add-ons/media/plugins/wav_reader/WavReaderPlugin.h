@@ -44,15 +44,17 @@ public:
 	status_t	FreeCookie(void *cookie);
 	
 	status_t	GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-							  media_format *format, const void **infoBuffer, size_t *infoSize);
+					media_format *format, const void **infoBuffer, size_t *infoSize);
 
-	status_t	Seek(void *cookie,
-					 uint32 seekTo,
-					 int64 *frame, bigtime_t *time);
+	status_t	Seek(void *cookie, uint32 flags,
+					int64 *frame, bigtime_t *time);
+
+	status_t	FindKeyFrame(void* cookie, uint32 flags,
+					int64* frame, bigtime_t* time);
 
 	status_t	GetNextChunk(void *cookie,
-							 const void **chunkBuffer, size_t *chunkSize,
-							 media_header *mediaHeader);
+					const void **chunkBuffer, size_t *chunkSize,
+					media_header *mediaHeader);
 									 
 	BPositionIO *Source() { return fSource; }
 	
@@ -68,6 +70,7 @@ private:
 	int				fBitsPerSample;
 	uint16			fFormatCode;
 	uint16			fBlockAlign;
+	uint16			fAvgBytesPerSec;
 };
 
 
