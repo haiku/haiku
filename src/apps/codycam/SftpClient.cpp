@@ -73,8 +73,16 @@ SftpClient::Connect(const string& server, const string& login, const string& pas
 {
 	bool rc = false;
 	BString cmd("sftp ");
+	BString host(server.c_str());
+	BString port;
+	if (host.FindFirst(':'))
+		host.MoveInto(port, host.FindFirst(':'), host.Length());
+	port.RemoveAll(":");
+	if (port.Length())
+		cmd << "-oPort=" << port << " ";
 	cmd << login.c_str();
-	cmd << "@" << server.c_str();
+	cmd << "@" << host.String();
+	printf("COMMAND: '%s'\n", cmd.String());
 	SetCommandLine(cmd.String());
 	rc = SpawningUploadClient::Connect(server, login, passwd);
 	BString reply;
