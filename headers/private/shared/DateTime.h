@@ -18,25 +18,64 @@ enum time_type {
 };
 
 
+enum diff_type {
+	B_HOURS_DIFF,
+	B_MINUTES_DIFF,
+	B_SECONDS_DIFF,
+	B_MILLISECONDS_DIFF,
+	B_MICROSECONDS_DIFF
+};
+
+
 class BTime {
 	public:
 						BTime();
-						BTime(int32 hour, int32 minute, int32 second);
+						BTime(int32 hour, int32 minute, int32 second,
+							int32 microsecond = 0);
 						~BTime();
 
 		bool			IsValid() const;
+		bool			IsValid(const BTime& time) const;
+		bool			IsValid(int32 hour, int32 minute, int32 second,
+							int32 microsecond = 0) const;
 
 		static BTime	CurrentTime(time_type type);
-		bool			SetTime(int32 hour, int32 minute, int32 second);
+
+		BTime			Time() const;
+		bool			SetTime(const BTime& time);
+		bool			SetTime(int32 hour, int32 minute, int32 second,
+							int32 microsecond = 0);
+
+		void			AddHours(int32 hours);
+		void			AddMinutes(int32 minutes);
+		void			AddSeconds(int32 seconds);
+		void			AddMilliseconds(int32 milliseconds);
+		void			AddMicroseconds(int32 microseconds);
 
 		int32			Hour() const;
 		int32			Minute() const;
 		int32			Second() const;
+		int32			Millisecond() const;
+		int32			Microsecond() const;
+		bigtime_t		Difference(const BTime& time, diff_type type) const;
+
+		bool			operator!=(const BTime& time) const;
+		bool			operator==(const BTime& time) const;
+
+		bool			operator<(const BTime& time) const;
+		bool			operator<=(const BTime& time) const;
+
+		bool			operator>(const BTime& time) const;
+		bool			operator>=(const BTime& time) const;
 
 	private:
-		int32			fHour;
-		int32			fMinute;
-		int32			fSecond;
+		bigtime_t		_Microseconds() const;
+		void			_AddMicroseconds(bigtime_t microseconds);
+		bool			_SetTime(int32 hour, int32 minute, int32 second,
+							int32 microsecond);
+
+	private:
+		bigtime_t		fMicroseconds;
 };
 
 

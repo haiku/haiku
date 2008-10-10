@@ -11,24 +11,35 @@
 
 
 #include <time.h>
+#include <sys/time.h>
 
 
 namespace BPrivate {
 
 
+const int32			kSecondsPerMinute			= 60;
+
+const int32			kHoursPerDay				= 24;
+const int32			kMinutesPerDay				= 1440;
+const int32			kSecondsPerDay				= 86400;
+const int32			kMillisecondsPerDay			= 86400000;
+
+const int32			kMicrosecondsPerSecond		= 1000000;
+const int32			kMicrosecondsPerMinute		= 60000000;
+const bigtime_t		kMicrosecondsPerHour		= 3600000000LL;
+const bigtime_t		kMicrosecondsPerDay			= 86400000000LL;
+
+
 BTime::BTime()
-	: fHour(-1),
-	  fMinute(-1),
-	  fSecond(-1)
+	: fMicroseconds(-1)
 {
 }
 
 
-BTime::BTime(int32 hour, int32 minute, int32 second)
-	: fHour(hour),
-	  fMinute(minute),
-	  fSecond(second)
+BTime::BTime(int32 hour, int32 minute, int32 second, int32 microsecond)
+	: fMicroseconds(-1)
 {
+	_SetTime(hour, minute, second, microsecond);
 }
 
 
@@ -40,67 +51,241 @@ BTime::~BTime()
 bool
 BTime::IsValid() const
 {
-	if (fHour < 0 || fHour >= 24)
-		return false;
-
-	if (fMinute < 0 || fMinute >= 60)
-		return false;
-
-	if (fSecond < 0 || fSecond >= 60)
-		return false;
-
-	return true;
-}
-
-
-BTime
-BTime::CurrentTime(time_type type)
-{
-	time_t timer;
-	struct tm result;
-	struct tm* timeinfo;
-
-	time(&timer);
-
-	if (type == B_GMT_TIME)
-		timeinfo = gmtime_r(&timer, &result);
-	else
-		timeinfo = localtime_r(&timer, &result);
-
-	int32 sec = timeinfo->tm_sec;
-	return BTime(timeinfo->tm_hour, timeinfo->tm_min, (sec > 59) ? 59 : sec);
+	return fMicroseconds > -1 && fMicroseconds < kMicrosecondsPerDay;
 }
 
 
 bool
-BTime::SetTime(int32 hour, int32 minute, int32 second)
+BTime::IsValid(const BTime& time) const
 {
-	fHour = hour;
-	fMinute = minute;
-	fSecond = second;
+	return time.fMicroseconds > -1 && time.fMicroseconds < kMicrosecondsPerDay;
+}
 
+
+bool
+BTime::IsValid(int32 hour, int32 minute, int32 second, int32 microsecond) const
+{
+	return BTime(hour, minute, second, microsecond).IsValid();
+}
+
+
+BTime
+		BTime::CurrentTime(time_type type)
+{
+	struct timeval tv;
+	if (gettimeofday(&tv, NULL) != 0) {
+		// gettimeofday failed?
+		time(&tv.tv_sec);
+	}
+
+	struct tm result;
+	struct tm* timeinfo;
+	if (type == B_GMT_TIME)
+		timeinfo = gmtime_r(&tv.tv_sec, &result);
+	else
+		timeinfo = localtime_r(&tv.tv_sec, &result);
+
+	int32 sec = timeinfo->tm_sec;
+	return BTime(timeinfo->tm_hour, timeinfo->tm_min, (sec > 59) ? 59 : sec,
+		tv.tv_usec);
+}
+
+
+BTime
+BTime::Time() const
+{
+	BTime time;
+	time.fMicroseconds = fMicroseconds;
+	return time;
+}
+
+
+bool
+BTime::SetTime(const BTime& time)
+{
+	fMicroseconds = time.fMicroseconds;
 	return IsValid();
+}
+
+
+bool
+BTime::SetTime(int32 hour, int32 minute, int32 second, int32 microsecond)
+{
+	return _SetTime(hour, minute, second, microsecond);
+}
+
+
+void
+BTime::AddHours(int32 hours)
+{
+	_AddMicroseconds(bigtime_t(hours % kHoursPerDay) * kMicrosecondsPerHour);
+}
+
+
+void
+BTime::AddMinutes(int32 minutes)
+{
+	_AddMicroseconds(bigtime_t(minutes % kMinutesPerDay) *
+		kMicrosecondsPerMinute);
+}
+
+
+void
+BTime::AddSeconds(int32 seconds)
+{
+	_AddMicroseconds(bigtime_t(seconds % kSecondsPerDay) *
+		kMicrosecondsPerSecond);
+}
+
+
+void
+BTime::AddMilliseconds(int32 milliseconds)
+{
+	_AddMicroseconds(bigtime_t(milliseconds % kMillisecondsPerDay) * 1000);
+}
+
+
+void
+BTime::AddMicroseconds(int32 microseconds)
+{
+	_AddMicroseconds(microseconds);
 }
 
 
 int32
 BTime::Hour() const
 {
-	return fHour;
+	return int32(_Microseconds() / kMicrosecondsPerHour);
 }
 
 
 int32
 BTime::Minute() const
 {
-	return fMinute;
+	return int32((_Microseconds() % kMicrosecondsPerHour)) / kMicrosecondsPerMinute;
 }
 
 
 int32
 BTime::Second() const
 {
-	return fSecond;
+	return int32(_Microseconds() / kMicrosecondsPerSecond) % kSecondsPerMinute;
+}
+
+
+int32
+BTime::Millisecond() const
+{
+
+	return Microsecond() / 1000;
+}
+
+
+int32
+BTime::Microsecond() const
+{
+	return int32(_Microseconds() % 1000000);
+}
+
+
+bigtime_t
+BTime::_Microseconds() const
+{
+	return fMicroseconds == -1 ? 0 : fMicroseconds;
+}
+
+
+bigtime_t
+BTime::Difference(const BTime& time, diff_type type) const
+{
+	bigtime_t diff = time._Microseconds() - _Microseconds();
+	switch (type) {
+		case B_HOURS_DIFF: {
+			diff /= kMicrosecondsPerHour;
+		}	break;
+		case B_MINUTES_DIFF: {
+			diff /= kMicrosecondsPerMinute;
+		}	break;
+		case B_SECONDS_DIFF: {
+			diff /= kMicrosecondsPerSecond;
+		}	break;
+		case B_MILLISECONDS_DIFF: {
+			diff /= 1000;
+		}	break;
+		case B_MICROSECONDS_DIFF:
+		default:	break;
+	}
+	return diff;
+}
+
+
+bool
+BTime::operator!=(const BTime& time) const
+{
+	return fMicroseconds != time.fMicroseconds;
+}
+
+
+bool
+BTime::operator==(const BTime& time) const
+{
+	return fMicroseconds == time.fMicroseconds;
+}
+
+
+bool
+BTime::operator<(const BTime& time) const
+{
+	return fMicroseconds < time.fMicroseconds;
+}
+
+
+bool
+BTime::operator<=(const BTime& time) const
+{
+	return fMicroseconds <= time.fMicroseconds;
+}
+
+
+bool
+BTime::operator>(const BTime& time) const
+{
+	return fMicroseconds > time.fMicroseconds;
+}
+
+
+bool
+BTime::operator>=(const BTime& time) const
+{
+	return fMicroseconds >= time.fMicroseconds;
+}
+
+
+void
+BTime::_AddMicroseconds(bigtime_t microseconds)
+{
+	bigtime_t count = 0;
+	if (microseconds < 0) {
+		count = ((kMicrosecondsPerDay - microseconds) / kMicrosecondsPerDay) *
+			kMicrosecondsPerDay;
+	}
+	fMicroseconds = (_Microseconds() + microseconds + count) % kMicrosecondsPerDay;
+}
+
+
+bool
+BTime::_SetTime(int32 hour, int32 minute, int32 second,	int32 microsecond)
+{
+	fMicroseconds = hour * kMicrosecondsPerHour +
+					minute * kMicrosecondsPerMinute +
+					second * kMicrosecondsPerSecond +
+					microsecond;
+
+	bool isValid = IsValid();
+	if (!isValid)
+		fMicroseconds = -1;
+
+	return isValid;
 }
 
 
