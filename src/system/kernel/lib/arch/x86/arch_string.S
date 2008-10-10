@@ -106,7 +106,7 @@ FUNCTION(memset_generic):
 	pop		%edi
 
 	// return value is the value passed in
-	mov		12(%ebp), %eax
+	mov		8(%ebp), %eax
 
 	mov		%ebp, %esp
 	pop		%ebp
