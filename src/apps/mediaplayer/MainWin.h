@@ -25,7 +25,6 @@
 #include <Menu.h>
 #include <Button.h>
 #include <Slider.h>
-#include <FilePanel.h>
 
 #include "Controller.h"
 #include "ControllerView.h"
@@ -101,7 +100,6 @@ private:
 			BMenuBar*			fMenuBar;
 			BView*				fBackground;
 			VideoView*			fVideoView;
-			BFilePanel*			fFilePanel;
 			ControllerView*		fControls;
 			InfoWin*			fInfoWin;
 			PlaylistWindow*		fPlaylistWindow;

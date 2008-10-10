@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,12 +11,17 @@
 
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Application.h>
+#include <Autolock.h>
+#include <Entry.h>
+#include <File.h>
 #include <Roster.h>
 #include <Path.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <NodeInfo.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
@@ -25,6 +30,7 @@
 #include <FilePanel.h>
 
 #include "CommandStack.h"
+#include "MainApp.h"
 #include "PlaylistListView.h"
 #include "RWLocker.h"
 
@@ -34,6 +40,7 @@ enum {
 	// file
 	M_PLAYLIST_OPEN			= 'open',
 	M_PLAYLIST_SAVE			= 'save',
+	M_PLAYLIST_SAVE_RESULT	= 'psrs',
 
 	// edit
 	M_PLAYLIST_EMPTY		= 'emty',
@@ -45,12 +52,11 @@ enum {
 PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 		Controller* controller)
 	: BWindow(frame, "Playlist", B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-		B_ASYNCHRONOUS_CONTROLS)
-	, fOpenPanel(NULL)
-	, fSavePanel(NULL)
-	, fLocker(new RWLocker("command stack lock"))
-	, fCommandStack(new CommandStack(fLocker))
-	, fCommandStackListener(this)
+		B_ASYNCHRONOUS_CONTROLS),
+	  fPlaylist(playlist),
+	  fLocker(new RWLocker("command stack lock")),
+	  fCommandStack(new CommandStack(fLocker)),
+	  fCommandStackListener(this)
 {
 	frame = Bounds();
 
@@ -89,9 +95,6 @@ PlaylistWindow::~PlaylistWindow()
 	fCommandStack->RemoveListener(&fCommandStackListener);
 	delete fCommandStack;
 	delete fLocker;
-
-	delete fOpenPanel;
-	delete fSavePanel;
 }
 
 
@@ -138,20 +141,32 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case M_PLAYLIST_SAVE:
-			if (!fSavePanel)
-				fSavePanel = new BFilePanel(B_SAVE_PANEL);
-			fSavePanel->Show();
+		case M_PLAYLIST_OPEN: {
+			BMessenger target(this);
+			BMessage result(B_REFS_RECEIVED);
+			BMessage appMessage(M_SHOW_OPEN_PANEL);
+			appMessage.AddMessenger("target", target);
+			appMessage.AddMessage("message", &result);
+			appMessage.AddString("title", "Open Playlist");
+			appMessage.AddString("label", "Open");
+			be_app->PostMessage(&appMessage);
 			break;
-		case B_SAVE_REQUESTED:
-			printf("We are saving\n");
-			//Use fListView and have a SaveToFile?
+		}
+		case M_PLAYLIST_SAVE: {
+			BMessenger target(this);
+			BMessage result(M_PLAYLIST_SAVE_RESULT);
+			BMessage appMessage(M_SHOW_SAVE_PANEL);
+			appMessage.AddMessenger("target", target);
+			appMessage.AddMessage("message", &result);
+			appMessage.AddString("title", "Save Playlist");
+			appMessage.AddString("label", "Save");
+			be_app->PostMessage(&appMessage);
 			break;
-		case M_PLAYLIST_OPEN:
-			if (!fOpenPanel)
-				fOpenPanel = new BFilePanel(B_OPEN_PANEL);
-			fOpenPanel->Show();
+		}
+		case M_PLAYLIST_SAVE_RESULT: {
+			_SavePlaylist(message);
 			break;
+		}
 
 		case M_PLAYLIST_EMPTY:
 			fListView->RemoveAll();
@@ -177,11 +192,11 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	BMenuBar* menuBar = new BMenuBar(frame, "main menu");
 	BMenu* fileMenu = new BMenu("Playlist");
 	menuBar->AddItem(fileMenu);
-//	fileMenu->AddItem(new BMenuItem("Open"B_UTF8_ELLIPSIS,
-//		new BMessage(M_PLAYLIST_OPEN), 'O'));
-//	fileMenu->AddItem(new BMenuItem("Save"B_UTF8_ELLIPSIS,
-//		new BMessage(M_PLAYLIST_SAVE), 'S'));
-//	fileMenu->AddSeparatorItem();
+	fileMenu->AddItem(new BMenuItem("Open"B_UTF8_ELLIPSIS,
+		new BMessage(M_PLAYLIST_OPEN), 'O'));
+	fileMenu->AddItem(new BMenuItem("Save"B_UTF8_ELLIPSIS,
+		new BMessage(M_PLAYLIST_SAVE), 'S'));
+	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Close",
 		new BMessage(B_QUIT_REQUESTED), 'W'));
 
@@ -207,7 +222,6 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 }
 
 
-// _ObjectChanged
 void
 PlaylistWindow::_ObjectChanged(const Notifier* object)
 {
@@ -228,5 +242,110 @@ PlaylistWindow::_ObjectChanged(const Notifier* object)
 		else
 			fRedoMI->SetLabel("<nothing to redo>");
 	}
+}
+
+
+static void
+display_save_alert(const char* message)
+{
+	BAlert* alert = new BAlert("Save Error", message, "Ok", NULL, NULL,
+		B_WIDTH_AS_USUAL, B_STOP_ALERT);
+	alert->Go(NULL);
+}
+
+
+static void
+display_save_alert(status_t error)
+{
+	BString errorMessage("Saving the playlist failed.\n\nError: ");
+	errorMessage << strerror(error);
+	display_save_alert(errorMessage.String());
+}
+
+
+void
+PlaylistWindow::_SavePlaylist(const BMessage* message)
+{
+	entry_ref ref;
+	const char* name;
+	if (message->FindRef("directory", &ref) != B_OK
+		|| message->FindString("name", &name) != B_OK) {
+		display_save_alert("Internal error (malformed message). "
+			"Saving the Playlist failed.");
+		return;
+	}
+
+	BString tempName(name);
+	tempName << system_time();
+
+	BPath origPath(&ref);
+	BPath tempPath(&ref);
+	if (origPath.InitCheck() != B_OK || tempPath.InitCheck() != B_OK
+		|| origPath.Append(name) != B_OK
+		|| tempPath.Append(tempName.String()) != B_OK) {
+		display_save_alert("Internal error (out of memory). "
+			"Saving the Playlist failed.");
+		return;
+	}
+
+	BEntry origEntry(origPath.Path());
+	BEntry tempEntry(tempPath.Path());
+	if (origEntry.InitCheck() != B_OK || tempEntry.InitCheck() != B_OK) {
+		display_save_alert("Internal error (out of memory). "
+			"Saving the Playlist failed.");
+		return;
+	}
+
+	class TempEntryRemover {
+	public:
+		TempEntryRemover(BEntry* entry)
+			: fEntry(entry)
+		{
+		}
+		~TempEntryRemover()
+		{
+			if (fEntry)
+				fEntry->Remove();
+		}
+		void Detach()
+		{
+			fEntry = NULL;
+		}
+	private:
+		BEntry* fEntry;
+	} remover(&tempEntry);
+
+	BFile file(&tempEntry, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	if (file.InitCheck() != B_OK) {
+		BString errorMessage("Saving the playlist failed:\n\nError: ");
+		errorMessage << strerror(file.InitCheck());
+		display_save_alert(errorMessage.String());
+		return;
+	}
+
+	AutoLocker<Playlist> lock(fPlaylist);
+	if (!lock.IsLocked()) {
+		display_save_alert("Internal error (locking failed). "
+			"Saving the Playlist failed.");
+		return;
+	}
+
+	status_t ret = fPlaylist->Flatten(&file);
+	if (ret != B_OK) {
+		display_save_alert(ret);
+		return;
+	}
+	lock.Unlock();
+
+	if (origEntry.Exists()) {
+		// TODO: copy attributes
+	}
+
+	// clobber original entry, if it exists
+	tempEntry.Rename(name, true);
+	remover.Detach();
+
+	BNodeInfo info(&file);
+	info.SetType("application/x-vnd.haiku-playlist");
 }
 

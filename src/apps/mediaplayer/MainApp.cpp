@@ -2,7 +2,7 @@
  * MainApp.cpp - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
- * Copyright (C) 2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright (C) 2008 Stephan Aßmus <superstippi@gmx.de> (MIT Ok)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,6 +23,7 @@
 #include <Alert.h>
 #include <Autolock.h>
 #include <Entry.h>
+#include <FilePanel.h>
 #include <MediaRoster.h>
 #include <Path.h>
 #include <Roster.h>
@@ -35,7 +36,7 @@
 #include "SettingsWindow.h"
 
 
-MainApp *gMainApp;
+MainApp* gMainApp;
 const char* kAppSig = "application/x-vnd.Haiku-MediaPlayer";
 
 static const char* kMediaServerSig = "application/x-vnd.Be.media-server";
@@ -45,8 +46,12 @@ static const char* kMediaServerAddOnSig = "application/x-vnd.Be.addon-host";
 MainApp::MainApp()
 	: BApplication(kAppSig),
 	  fPlayerCount(0),
-	  //fFirstWindow(NewWindow()),
+	  fFirstWindow(NULL),
 	  fSettingsWindow(NULL),
+
+	  fOpenFilePanel(NULL),
+	  fSaveFilePanel(NULL),
+	  fLastFilePanelFolder(),
 
 	  fMediaServerRunning(false),
 	  fMediaAddOnServerRunning(false)
@@ -56,6 +61,8 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
+	delete fOpenFilePanel;
+	delete fSaveFilePanel;
 }
 
 
@@ -63,7 +70,8 @@ bool
 MainApp::QuitRequested()
 {
 	// Note: This needs to be done here, SettingsWindow::QuitRequested()
-	// returns "false" always.
+	// returns "false" always. (Standard BApplication quit procedure will
+	// hang otherwise.)
 	if (fSettingsWindow && fSettingsWindow->Lock())
 		fSettingsWindow->Quit();
 	fSettingsWindow = NULL;
@@ -76,7 +84,7 @@ BWindow*
 MainApp::FirstWindow()
 {
 	BAutolock _(this);
-	if (fFirstWindow)
+	if (fFirstWindow != NULL)
 		return fFirstWindow;
 	return NewWindow();
 }
@@ -85,13 +93,12 @@ MainApp::FirstWindow()
 BWindow*
 MainApp::NewWindow()
 {
-	BWindow* win;
 	BAutolock _(this);
 	fPlayerCount++;
-	win = new MainWin();
-	if (!fFirstWindow)
-		fFirstWindow = win;
-	return win;
+	BWindow* window = new MainWin();
+	if (fFirstWindow == NULL)
+		fFirstWindow = window;
+	return window;
 }
 
 
@@ -130,7 +137,7 @@ MainApp::ReadyToRun()
 
 
 void
-MainApp::RefsReceived(BMessage *msg)
+MainApp::RefsReceived(BMessage* message)
 {
 	// The user dropped a file (or files) on this app's icon,
 	// or double clicked a file that's handled by this app.
@@ -142,14 +149,9 @@ MainApp::RefsReceived(BMessage *msg)
 	// window.
 	printf("MainApp::RefsReceived\n");
 
-	entry_ref ref;
-	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++) {
-		BWindow *win;
-		win = NewWindow();
-		BMessage m(B_REFS_RECEIVED);
-		m.AddRef("refs", &ref);
-		win->PostMessage(&m);
-	}
+	BWindow* window = NewWindow();
+	if (window)
+		window->PostMessage(message);
 }
 
 
@@ -245,6 +247,20 @@ MainApp::MessageReceived(BMessage* message)
 			_ShowSettingsWindow();
 			break;
 
+		case M_SHOW_OPEN_PANEL:
+			_ShowOpenFilePanel(message);
+			break;
+		case M_SHOW_SAVE_PANEL:
+			_ShowSaveFilePanel(message);
+			break;
+
+		case M_OPEN_PANEL_RESULT:
+			_HandleOpenPanelResult(message);
+			break;
+		case M_SAVE_PANEL_RESULT:
+			_HandleSavePanelResult(message);
+			break;
+
 		default:
 			BApplication::MessageReceived(message);
 			break;
@@ -257,6 +273,9 @@ MainApp::AboutRequested()
 {
 	FirstWindow()->PostMessage(B_ABOUT_REQUESTED);
 }
+
+
+// #pragma mark -
 
 
 void
@@ -272,17 +291,155 @@ MainApp::_BroadcastMessage(const BMessage& _message)
 void
 MainApp::_ShowSettingsWindow()
 {
-	if (fSettingsWindow->Lock()) {
-		if (fSettingsWindow->IsHidden())
-			fSettingsWindow->Show();
-		else
-			fSettingsWindow->Activate();
-		fSettingsWindow->Unlock();
+	BAutolock lock(fSettingsWindow);
+	if (!lock.IsLocked())
+		return;
+
+	// If the window is already showing, don't jerk the workspaces around,
+	// just pull it to the current one.
+	uint32 workspace = 1UL << (uint32)current_workspace();
+	uint32 windowWorkspaces = fSettingsWindow->Workspaces();
+	if ((windowWorkspaces & workspace) == 0) {
+		// window in a different workspace, reopen in current
+		fSettingsWindow->SetWorkspaces(workspace);
 	}
+
+	if (fSettingsWindow->IsHidden())
+		fSettingsWindow->Show();
+	else
+		fSettingsWindow->Activate();
 }
 
 
-// #pragma mark -
+// #pragma mark - file panels
+
+
+void
+MainApp::_ShowOpenFilePanel(const BMessage* message)
+{
+	if (fOpenFilePanel == NULL) {
+		BMessenger target(this);
+		fOpenFilePanel = new BFilePanel(B_OPEN_PANEL, &target);
+	}
+
+	_ShowFilePanel(fOpenFilePanel, M_OPEN_PANEL_RESULT, message,
+		"Open", "Open");
+}
+
+
+void
+MainApp::_ShowSaveFilePanel(const BMessage* message)
+{
+	if (fSaveFilePanel == NULL) {
+		BMessenger target(this);
+		fSaveFilePanel = new BFilePanel(B_SAVE_PANEL, &target);
+	}
+
+	_ShowFilePanel(fSaveFilePanel, M_SAVE_PANEL_RESULT, message,
+		"Save", "Save");
+}
+
+
+void
+MainApp::_ShowFilePanel(BFilePanel* panel, uint32 command,
+	const BMessage* message, const char* defaultTitle,
+	const char* defaultLabel)
+{
+//	printf("_ShowFilePanel()\n");
+//	message->PrintToStream();
+
+	BMessage panelMessage(command);
+
+	if (message != NULL) {
+		BMessage targetMessage;
+		if (message->FindMessage("message", &targetMessage) == B_OK)
+			panelMessage.AddMessage("message", &targetMessage);
+	
+		BMessenger target;
+		if (message->FindMessenger("target", &target) == B_OK)
+			panelMessage.AddMessenger("target", target);
+
+		const char* panelTitle;
+		if (message->FindString("title", &panelTitle) != B_OK)
+			panelTitle = defaultTitle;
+		{
+			BString finalPanelTitle = "MediaPlayer: ";
+			finalPanelTitle << panelTitle;
+			BAutolock lock(panel->Window());
+			panel->Window()->SetTitle(finalPanelTitle.String());
+		}
+		const char* buttonLabel;
+		if (message->FindString("label", &buttonLabel) != B_OK)
+			buttonLabel = defaultLabel;
+		panel->SetButtonLabel(B_DEFAULT_BUTTON, buttonLabel);
+	}
+
+//	panelMessage.PrintToStream();
+	panel->SetMessage(&panelMessage);
+
+	if (fLastFilePanelFolder != entry_ref()) {
+		panel->SetPanelDirectory(&fLastFilePanelFolder);
+	}
+
+	panel->Show();
+}
+
+
+void
+MainApp::_HandleOpenPanelResult(const BMessage* message)
+{
+	_HandleFilePanelResult(fOpenFilePanel, message);
+}
+
+
+void
+MainApp::_HandleSavePanelResult(const BMessage* message)
+{
+	_HandleFilePanelResult(fSaveFilePanel, message);
+}
+
+
+void
+MainApp::_HandleFilePanelResult(BFilePanel* panel, const BMessage* message)
+{
+//	printf("_HandleFilePanelResult()\n");
+//	message->PrintToStream();
+
+	panel->GetPanelDirectory(&fLastFilePanelFolder);
+
+	BMessage targetMessage;
+	if (message->FindMessage("message", &targetMessage) != B_OK)
+		targetMessage.what = message->what;
+
+	BMessenger target;
+	if (message->FindMessenger("target", &target) != B_OK) {
+		if (targetMessage.what == M_OPEN_PANEL_RESULT
+			|| targetMessage.what == M_SAVE_PANEL_RESULT) {
+			// prevent endless message cycle
+			return;
+		}
+		// send result message to ourselves
+		target = BMessenger(this);
+	}
+
+	// copy the important contents of the message
+	// save panel
+	entry_ref directory;
+	if (message->FindRef("directory", &directory) == B_OK)
+		targetMessage.AddRef("directory", &directory);
+	const char* name;
+	if (message->FindString("name", &name) == B_OK)
+		targetMessage.AddString("name", name);
+	// open panel
+	entry_ref ref;
+	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++)
+		targetMessage.AddRef("refs", &ref);
+
+	target.SendMessage(&targetMessage);
+}
+
+
+// #pragma mark - main
 
 
 int

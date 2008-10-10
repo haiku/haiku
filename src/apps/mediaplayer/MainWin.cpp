@@ -101,7 +101,6 @@ enum {
 MainWin::MainWin()
 	: BWindow(BRect(100,100,400,300), NAME, B_TITLED_WINDOW,
  		B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */),
-	  fFilePanel(NULL),
 	  fInfoWin(NULL),
 	  fPlaylistWindow(NULL),
 	  fHasFile(false),
@@ -218,7 +217,6 @@ MainWin::~MainWin()
 		fPlaylistWindow->Quit();
 	
 	delete fPlaylist;
-	delete fFilePanel;
 
 	// quit the Controller looper thread
 	thread_id controllerThread = fController->Thread();
@@ -469,14 +467,17 @@ MainWin::MessageReceived(BMessage *msg)
 		case M_FILE_NEWPLAYER:
 			gMainApp->NewWindow();
 			break;
-		case M_FILE_OPEN:
-			if (!fFilePanel) {
-				fFilePanel = new BFilePanel();
-				fFilePanel->SetTarget(BMessenger(0, this));
-				fFilePanel->SetPanelDirectory("/boot/home/");
-			}
-			fFilePanel->Show();
+		case M_FILE_OPEN: {
+			BMessenger target(this);
+			BMessage result(B_REFS_RECEIVED);
+			BMessage appMessage(M_SHOW_OPEN_PANEL);
+			appMessage.AddMessenger("target", target);
+			appMessage.AddMessage("message", &result);
+			appMessage.AddString("title", "Open Clips");
+			appMessage.AddString("label", "Open");
+			be_app->PostMessage(&appMessage);
 			break;
+		}
 		case M_FILE_INFO:
 			ShowFileInfo();
 			break;

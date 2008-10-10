@@ -11,6 +11,7 @@
 #include <new>
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Autolock.h>
 
 #include "Playlist.h"
@@ -39,8 +40,12 @@ ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 	temp.AppendRefs(refsMessage);
 
 	fNewCount = temp.CountItems();
-	if (fNewCount <= 0)
+	if (fNewCount <= 0) {
+		BAlert* alert = new BAlert("Nothing to Play", "None of the files "
+			"you wanted to play appear to be media files.", "Ok");
+		alert->Go(NULL);
 		return;
+	}
 
 	fNewRefs = new (nothrow) entry_ref[fNewCount];
 	if (!fNewRefs)

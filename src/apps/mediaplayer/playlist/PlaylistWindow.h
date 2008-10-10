@@ -39,6 +39,7 @@ class PlaylistWindow : public BWindow {
  private:
 			void				_CreateMenu(BRect& frame);
 			void				_ObjectChanged(const Notifier* object);
+			void				_SavePlaylist(const BMessage* message);
 
 			Playlist*			fPlaylist;
 			PlaylistListView*	fListView;
@@ -47,9 +48,6 @@ class PlaylistWindow : public BWindow {
 			BMenuItem*			fUndoMI;
 			BMenuItem*			fRedoMI;
 			
-			BFilePanel*			fOpenPanel;
-			BFilePanel*			fSavePanel;
-
 			RWLocker*			fLocker;
 			CommandStack*		fCommandStack;
 			ListenerAdapter		fCommandStackListener;

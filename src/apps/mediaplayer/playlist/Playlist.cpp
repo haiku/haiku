@@ -75,7 +75,7 @@ static const char* kPathKey = "path";
 
 
 status_t
-Playlist::UnArchive(const BMessage* archive)
+Playlist::Unarchive(const BMessage* archive)
 {
 	if (archive == NULL)
 		return B_BAD_VALUE;
@@ -115,6 +115,61 @@ Playlist::Archive(BMessage* into) const
 	}
 
 	return B_OK;
+}
+
+
+static const uint32 kPlaylistMagicBytes = 'MPPL';
+static const char* kTextPlaylistMimeString = "text/x-playlist";
+static const char* kBinaryPlaylistMimeString
+	= "application/x-vnd.haiku-playlist";
+
+status_t
+Playlist::Unflatten(BDataIO* stream)
+{
+	if (stream == NULL)
+		return B_BAD_VALUE;
+
+	uint32 magicBytes;
+	ssize_t read = stream->Read(&magicBytes, 4);
+	if (read != 4) {
+		if (read < 0)
+			return (status_t)read;
+		return B_IO_ERROR;
+	}
+
+	if (B_LENDIAN_TO_HOST_INT32(magicBytes) != kPlaylistMagicBytes)
+		return B_BAD_VALUE;
+
+	BMessage archive;
+	status_t ret = archive.Unflatten(stream);
+	if (ret != B_OK)
+		return ret;
+
+
+	return Unarchive(&archive);
+}
+
+
+status_t
+Playlist::Flatten(BDataIO* stream) const
+{
+	if (stream == NULL)
+		return B_BAD_VALUE;
+
+	BMessage archive;
+	status_t ret = Archive(&archive);
+	if (ret != B_OK)
+		return ret;
+
+	uint32 magicBytes = B_HOST_TO_LENDIAN_INT32(kPlaylistMagicBytes);
+	ssize_t written = stream->Write(&magicBytes, 4);
+	if (written != 4) {
+		if (written < 0)
+			return (status_t)written;
+		return B_IO_ERROR;
+	}
+
+	return archive.Flatten(stream);
 }
 
 
@@ -386,7 +441,7 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 		if (_IsMediaFile(mimeString)) {
 			//printf("Adding\n");
 			playlist->AddRef(ref);
-		} else if (_IsPlaylist(mimeString)) {
+		} else if (_IsTextPlaylist(mimeString)) {
 			//printf("RunPlaylist thing\n");
 			BFile file(&ref, B_READ_ONLY);
 			FileReadWrite lineReader(&file);
@@ -408,6 +463,11 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 				} else
 					printf("Error - No File Found in playlist\n");
 			}
+		} else if (_IsBinaryPlaylist(mimeString)) {
+			BFile file(&ref, B_READ_ONLY);
+			Playlist temp;
+			if (temp.Unflatten(&file) == B_OK)
+				playlist->AdoptPlaylist(temp, playlist->CountItems());
 		} else
 			printf("MIME Type = %s\n", mimeString.String());
 	}
@@ -431,30 +491,6 @@ Playlist::playlist_cmp(const void *p1, const void *p2)
 }
 
 
-/*static*/ void
-Playlist::_AddPlayListFileToPlayList(const entry_ref& ref, Playlist* playlist)
-{
-	
-	BFile file(&ref, B_READ_ONLY);
-	FileReadWrite lineReader(&file);
-	
-	BString str;
-	while (lineReader.Next(str)) {
-		BPath path = BPath(str.String());
-		entry_ref refPath; 
-		status_t err; 
-		if ((err = get_ref_for_path(path.Path(), &refPath)) == B_OK) {
-			AppendToPlaylistRecursive(refPath, playlist);
-		} else			
-			printf("Error - %s: [%lx]\n", strerror(err), (int32) err);
-	}
-	/*
-		Read line for x to the end of file (while?)
-		make a enty_ref and call AppendToPlaylistRecursive(with new entry, playlist)
-	*/
-}
-
-
 /*static*/ bool
 Playlist::_IsMediaFile(const BString& mimeString)
 {
@@ -472,9 +508,16 @@ Playlist::_IsMediaFile(const BString& mimeString)
 
 
 /*static*/ bool
-Playlist::_IsPlaylist(const BString& mimeString)
+Playlist::_IsTextPlaylist(const BString& mimeString)
 {    	
-	return mimeString.Compare("text/x-playlist") == 0;
+	return mimeString.Compare(kTextPlaylistMimeString) == 0;
+}
+
+
+/*static*/ bool
+Playlist::_IsBinaryPlaylist(const BString& mimeString)
+{    	
+	return mimeString.Compare(kBinaryPlaylistMimeString) == 0;
 }
 
 

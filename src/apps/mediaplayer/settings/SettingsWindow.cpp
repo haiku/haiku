@@ -20,7 +20,6 @@
 
 #ifdef __HAIKU__
 #	include <GridLayoutBuilder.h>
-#	include <GroupLayout.h>
 #	include <GroupLayoutBuilder.h>
 #	include <SpaceLayoutItem.h>
 #endif

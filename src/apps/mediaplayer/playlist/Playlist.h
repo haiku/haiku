@@ -26,6 +26,7 @@
 #include <List.h>
 #include <Locker.h>
 
+class BDataIO;
 class BMessage;
 class BString;
 
@@ -49,8 +50,11 @@ public:
 								Playlist();
 								~Playlist();
 			// archiving
-			status_t			UnArchive(const BMessage* archive);
+			status_t			Unarchive(const BMessage* archive);
 			status_t			Archive(BMessage* into) const;
+
+			status_t			Unflatten(BDataIO* stream);
+			status_t			Flatten(BDataIO* stream) const;
 
 
 			// list functionality
@@ -91,10 +95,9 @@ public:
 private:
 			static int			playlist_cmp(const void* p1, const void* p2);
 			static bool 		_IsMediaFile(const BString& mimeString);
-			static bool			_IsPlaylist(const BString& mimeString);
+			static bool			_IsTextPlaylist(const BString& mimeString);
+			static bool			_IsBinaryPlaylist(const BString& mimeString);
 			static BString		_MIMEString(const entry_ref* entry);
-			static void 		_AddPlayListFileToPlayList(const entry_ref& ref,
-									Playlist* playlist);
 			void				_NotifyRefAdded(const entry_ref& ref,
 									int32 index) const;
 			void				_NotifyRefRemoved(int32 index) const;
