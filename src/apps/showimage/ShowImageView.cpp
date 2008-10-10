@@ -92,7 +92,7 @@ const uint32 kMsgPopUpMenuClosed = 'pmcl';
 static bool
 entry_ref_is_file(const entry_ref *ref)
 {
-	BEntry entry(ref);
+	BEntry entry(ref, true);
 	if (entry.InitCheck() != B_OK)
 		return false;
 
