@@ -442,8 +442,9 @@ put_device_interface(struct net_device_interface *interface)
 	wait_for_thread(interface->consumer_thread, &status);
 
 	net_device *device = interface->device;
+	const char* moduleName = device->module->info.name;
 	device->module->uninit_device(device);
-	put_module(device->module->info.name);
+	put_module(moduleName);
 
 	recursive_lock_destroy(&interface->rx_lock);
 	delete interface;
