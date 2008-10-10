@@ -59,7 +59,7 @@ MessageImporter::Import(Icon* icon, BPositionIO* stream)
 		return ret;
 	}
 
-	if (B_LENDIAN_TO_HOST_INT32(magic) != kNativeIconMagicNumber) {
+	if (B_BENDIAN_TO_HOST_INT32(magic) != kNativeIconMagicNumber) {
 		// this might be an old native icon file, where
 		// we didn't prepend the magic number yet, seek back
 		if (stream->Seek(position, SEEK_SET) != position) {

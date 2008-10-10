@@ -104,7 +104,7 @@ MessageExporter::Export(const Icon* icon, BPositionIO* stream)
 	// later tells us that this file is one of us
 	if (ret == B_OK) {
 		ssize_t size = sizeof(uint32);
-		uint32 magic = B_HOST_TO_LENDIAN_INT32(kNativeIconMagicNumber);
+		uint32 magic = B_HOST_TO_BENDIAN_INT32(kNativeIconMagicNumber);
 		ssize_t written = stream->Write(&magic, size);
 		if (written != size) {
 			if (written < 0)

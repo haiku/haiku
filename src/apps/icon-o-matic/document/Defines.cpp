@@ -7,7 +7,7 @@
  */
 #include "Defines.h"
 
-const uint32 kNativeIconMagicNumber = 'GSMI';
+const uint32 kNativeIconMagicNumber = 'IMSG';
 const char*	kNativeIconMimeType	= "application/x-vnd.Haiku-icon";
 
 

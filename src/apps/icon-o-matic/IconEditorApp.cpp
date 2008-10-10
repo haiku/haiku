@@ -740,7 +740,7 @@ IconEditorApp::_InstallDocumentMimeType()
 			strerror(ret));
 
 	// set sniffer rule
-	const char* snifferRule = "0.9 ('GSMI')";
+	const char* snifferRule = "0.9 ('IMSG')";
 	ret = mime.SetSnifferRule(snifferRule);
 	if (ret < B_OK) {
 		BString parseError;
