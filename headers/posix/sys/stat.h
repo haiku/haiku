@@ -23,11 +23,6 @@ struct stat {
 	time_t			st_mtime;		/* last modification time */
 	time_t			st_ctime;		/* last change time, not creation time */
 	time_t			st_crtime;		/* creation time */
-
-	/* Haiku extensions:
-	 * TODO: we might also define special types for files and TTYs
-	 * TODO: we should find another solution for this, as BStatable::GetStat()
-	 *		can only retrieve the R5 stat structure */
 	unsigned int	st_type;		/* attribute/index type */
 	blkcnt_t		st_blocks;		/* number of blocks allocated for object */
 };
@@ -104,24 +99,12 @@ extern "C" {
 
 extern int    chmod(const char *path, mode_t mode);
 extern int 	  fchmod(int fd, mode_t mode);
-extern int    _stat(const char *path, struct stat *st, size_t statSize);
-extern int    _fstat(int fd, struct stat *st, size_t statSize);
-extern int    _lstat(const char *path, struct stat *st, size_t statSize);
-extern int    mkdir(const char *path, mode_t mode);
-extern int    mkfifo(const char *path, mode_t mode);
-extern mode_t umask(mode_t cmask);
-
-/* This achieves backwards compatibility with R5 */
-#if 0 /* def HAIKU_TARGET_PLATFORM_HAIKU */
-#define stat(fd, st) _stat(fd, st, sizeof(struct stat))
-#define fstat(fd, st) _fstat(fd, st, sizeof(struct stat))
-#define lstat(fd, st) _lstat(fd, st, sizeof(struct stat))
-#else
-/* ... and this fixes the build for R5 for now */
 extern int    stat(const char *path, struct stat *st);
 extern int    fstat(int fd, struct stat *st);
 extern int    lstat(const char *path, struct stat *st);
-#endif
+extern int    mkdir(const char *path, mode_t mode);
+extern int    mkfifo(const char *path, mode_t mode);
+extern mode_t umask(mode_t cmask);
 
 #ifdef __cplusplus
 }

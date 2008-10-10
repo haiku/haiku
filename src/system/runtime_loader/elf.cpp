@@ -651,6 +651,7 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 	int gccMajor = 0;
 	int gccMiddle = 0;
 	int gccMinor = 0;
+	bool isHaiku = true;
 
 	// Read up to 10 comments. The first three or four are usually from the
 	// glue code.
@@ -720,11 +721,15 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 			gccMiddle = version[1];
 			gccMinor = version[2];
 		}
+
+		if (gccMajor == 2 && strcmp(gccPlatform, "haiku"))
+			isHaiku = false;
 	}
 
 	image->gcc_version.major = gccMajor;
 	image->gcc_version.middle = gccMiddle;
 	image->gcc_version.minor = gccMinor;
+	image->gcc_version.haiku = isHaiku;
 
 	return gccMajor != 0;
 }
@@ -1099,47 +1104,83 @@ find_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
 }
 
 
+/*!	This functions is called when we run BeOS images on Haiku.
+	It allows us to redirect functions to ensure compatibility.
+*/
+static const char*
+beos_compatibility_map_symbol(const char* symbolName)
+{
+	struct symbol_mapping {
+		const char* from;
+		const char* to;
+	};
+	static const struct symbol_mapping kMappings[] = {
+		// TODO: improve this, and also use it for libnet.so compatibility!
+		{"fstat", "__be_fstat"},
+		{"lstat", "__be_lstat"},
+		{"stat", "__be_stat"},
+	};
+	const uint32 kMappingCount = sizeof(kMappings) / sizeof(kMappings[0]);
+
+	for (uint32 i = 0; i < kMappingCount; i++) {
+		if (!strcmp(symbolName, kMappings[i].from))
+			return kMappings[i].to;
+	}
+
+	return symbolName;
+}
+
+
 int
 resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
-	addr_t *sym_addr)
+	addr_t *symAddress)
 {
-	struct Elf32_Sym *sym2;
-	char *symname;
-	image_t *shimg;
-
 	switch (sym->st_shndx) {
 		case SHN_UNDEF:
+		{
+			struct Elf32_Sym *sharedSym;
+			image_t *sharedImage;
+			const char *symName;
+
 			// patch the symbol name
-			symname = SYMNAME(image, sym);
+			symName = SYMNAME(image, sym);
+			if (!image->gcc_version.haiku) {
+				// The image has been compiled with a BeOS compiler. This means
+				// we'll have to redirect some functions for compatibility.
+				symName = beos_compatibility_map_symbol(symName);
+			}
 
 			// it's undefined, must be outside this image, try the other images
-			sym2 = find_undefined_symbol(rootImage, image, symname, &shimg);
-			if (!sym2) {
+			sharedSym = find_undefined_symbol(rootImage, image, symName,
+				&sharedImage);
+			if (sharedSym == NULL) {
 				FATAL("elf_resolve_symbol: could not resolve symbol '%s'\n",
-					symname);
+					symName);
 				return B_MISSING_SYMBOL;
 			}
 
 			// make sure they're the same type
 			if (ELF32_ST_TYPE(sym->st_info) != STT_NOTYPE
-				&& ELF32_ST_TYPE(sym->st_info) != ELF32_ST_TYPE(sym2->st_info)) {
+				&& ELF32_ST_TYPE(sym->st_info)
+					!= ELF32_ST_TYPE(sharedSym->st_info)) {
 				FATAL("elf_resolve_symbol: found symbol '%s' in shared image "
-					"but wrong type\n", symname);
+					"but wrong type\n", symName);
 				return B_MISSING_SYMBOL;
 			}
 
-			if (ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL
-				&& ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
+			if (ELF32_ST_BIND(sharedSym->st_info) != STB_GLOBAL
+				&& ELF32_ST_BIND(sharedSym->st_info) != STB_WEAK) {
 				FATAL("elf_resolve_symbol: found symbol '%s' but not "
-					"exported\n", symname);
+					"exported\n", symName);
 				return B_MISSING_SYMBOL;
 			}
 
-			*sym_addr = sym2->st_value + shimg->regions[0].delta;
+			*symAddress = sharedSym->st_value + sharedImage->regions[0].delta;
 			return B_NO_ERROR;
+		}
 
 		case SHN_ABS:
-			*sym_addr = sym->st_value + image->regions[0].delta;
+			*symAddress = sym->st_value + image->regions[0].delta;
 			return B_NO_ERROR;
 
 		case SHN_COMMON:
@@ -1149,7 +1190,7 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 
 		default:
 			// standard symbol
-			*sym_addr = sym->st_value + image->regions[0].delta;
+			*symAddress = sym->st_value + image->regions[0].delta;
 			return B_NO_ERROR;
 	}
 }

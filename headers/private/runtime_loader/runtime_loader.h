@@ -43,6 +43,7 @@ typedef struct image_t {
 		int				major;
 		int				middle;
 		int				minor;
+		bool			haiku;
 	} gcc_version;
 
 	addr_t 				entry_point;
