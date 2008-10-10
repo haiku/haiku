@@ -86,7 +86,7 @@ FUNCTION(memset_generic):
 1:	// lwordwise
 	// prepare %eax -- the low byte must be copied to the other bytes
 	mov		%al, %ah
-	mov		%ax, %dx
+	mov		%eax, %edx
 	shl		$16, %eax
 	mov		%dx, %ax
 
