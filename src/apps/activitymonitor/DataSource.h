@@ -267,6 +267,7 @@ public:
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
 	virtual bool		AdaptiveScale() const;
+	virtual scale_type	ScaleType() const;
 	virtual bool		Primary() const;
 
 private:

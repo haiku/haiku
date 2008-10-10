@@ -1066,6 +1066,13 @@ NetworkUsageDataSource::AdaptiveScale() const
 }
 
 
+scale_type
+NetworkUsageDataSource::ScaleType() const
+{
+	return kBytePerSecondScale;
+}
+
+
 bool
 NetworkUsageDataSource::Primary() const
 {

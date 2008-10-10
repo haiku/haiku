@@ -115,7 +115,7 @@ Scale::Update(int64 value)
 {
 	if (!fInitialized || fMinimumValue > value)
 		fMinimumValue = value;
-	if (!fInitialized || fMaximumValue > value)
+	if (!fInitialized || fMaximumValue < value)
 		fMaximumValue = value;
 
 	fInitialized = true;
