@@ -12,4 +12,5 @@ StaticLibrary libruntime_loader_$(TARGET_ARCH).a :
 	<src!system!libroot!os!arch!$(TARGET_ARCH)>thread.o
 
 	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>memcpy.o
+	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>memset.o
 ;

@@ -57,4 +57,6 @@ dummy()
 	// struct x86_optimized_functions
 	DEFINE_OFFSET_MACRO(X86_OPTIMIZED_FUNCTIONS, x86_optimized_functions,
 		memcpy);
+	DEFINE_OFFSET_MACRO(X86_OPTIMIZED_FUNCTIONS, x86_optimized_functions,
+		memset);
 }

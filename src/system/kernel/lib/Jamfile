@@ -86,7 +86,6 @@ KernelMergeObject kernel_lib_posix.o :
 	memchr.c
 	memcmp.c
 	memmove.c
-	memset.c
 	strcasecmp.c
 	strcasestr.c
 	strcat.c

@@ -100,6 +100,8 @@
 typedef struct x86_optimized_functions {
 	void 	(*memcpy)(void* dest, const void* source, size_t count);
 	void*	memcpy_end;
+	void 	(*memset)(void* dest, int value, size_t count);
+	void*	memset_end;
 } x86_optimized_functions;
 
 typedef struct x86_cpu_module_info {

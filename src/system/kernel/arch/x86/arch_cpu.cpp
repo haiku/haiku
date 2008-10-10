@@ -87,10 +87,14 @@ static x86_cpu_module_info *sCpuModule;
 
 extern "C" void memcpy_generic(void* dest, const void* source, size_t count);
 extern int memcpy_generic_end;
+extern "C" void memset_generic(void* dest, int value, size_t count);
+extern int memset_generic_end;
 
 x86_optimized_functions gOptimizedFunctions = {
 	memcpy_generic,
-	&memcpy_generic_end
+	&memcpy_generic_end,
+	memset_generic,
+	&memset_generic_end
 };
 
 
@@ -605,6 +609,11 @@ arch_cpu_init_post_modules(kernel_args *args)
 			gOptimizedFunctions.memcpy = functions.memcpy;
 			gOptimizedFunctions.memcpy_end = functions.memcpy_end;
 		}
+
+		if (functions.memset != NULL) {
+			gOptimizedFunctions.memset = functions.memset;
+			gOptimizedFunctions.memset_end = functions.memset_end;
+		}
 	}
 
 	// put the optimized functions into the commpage
@@ -612,11 +621,18 @@ arch_cpu_init_post_modules(kernel_args *args)
 		- (addr_t)gOptimizedFunctions.memcpy;
 	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY,
 		(const void*)gOptimizedFunctions.memcpy, memcpyLen);
+	size_t memsetLen = (addr_t)gOptimizedFunctions.memset_end
+		- (addr_t)gOptimizedFunctions.memset;
+	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMSET,
+		(const void*)gOptimizedFunctions.memset, memsetLen);
 
 	// add the functions to the commpage image
 	image_id image = get_commpage_image();
 	elf_add_memory_image_symbol(image, "commpage_memcpy",
 		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_MEMCPY], memcpyLen,
+		B_SYMBOL_TYPE_TEXT);
+	elf_add_memory_image_symbol(image, "commpage_memset",
+		((addr_t*)USER_COMMPAGE_ADDR)[COMMPAGE_ENTRY_X86_MEMSET], memsetLen,
 		B_SYMBOL_TYPE_TEXT);
 
 	return B_OK;

@@ -36,7 +36,6 @@ StaticLibrary libruntime_loader.a :
 	<src!system!libroot!posix!string>memchr.o
 	<src!system!libroot!posix!string>memcmp.o
 	<src!system!libroot!posix!string>memmove.o
-	<src!system!libroot!posix!string>memset.o
 	<src!system!libroot!posix!string>strcasecmp.o
 	<src!system!libroot!posix!string>strcat.o
 	<src!system!libroot!posix!string>strchr.o

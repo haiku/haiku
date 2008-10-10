@@ -5,7 +5,6 @@ local librootFunctions =
 	ctype.o
 	qsort.o
 	kernel_vsprintf.o
-	memset.o
 	memcmp.o
 	memmove.o
 	strdup.o

@@ -9,7 +9,6 @@ MergeObject posix_string.o :
 	memchr.c
 	memcmp.c
 	memmove.c
-	memset.c
 	stpcpy.c
 	strcasecmp.c
 	strcasestr.c

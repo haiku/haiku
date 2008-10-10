@@ -10,6 +10,7 @@ local librootArchObjects =
 
 local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
+	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
 KernelMergeObject boot_arch_$(TARGET_ARCH).o :
