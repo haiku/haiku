@@ -722,7 +722,7 @@ analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
 			gccMinor = version[2];
 		}
 
-		if (gccMajor == 2 && strcmp(gccPlatform, "haiku"))
+		if (gccMajor == 2 && gccPlatform != NULL && strcmp(gccPlatform, "haiku"))
 			isHaiku = false;
 	}
 
