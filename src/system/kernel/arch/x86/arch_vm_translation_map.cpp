@@ -379,7 +379,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	// now, fill in the pentry
 	do {
 		err = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
-				(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+				(addr_t *)&pt, PHYSICAL_PAGE_DONT_WAIT);
 	} while (err < 0);
 	index = VADDR_TO_PTENT(va);
 
@@ -425,7 +425,7 @@ restart:
 
 	do {
 		status = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
-			(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+			(addr_t *)&pt, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 
 	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
@@ -517,7 +517,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 
 	do {
 		status = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
-			(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+			(addr_t *)&pt, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	index = VADDR_TO_PTENT(va);
 
@@ -573,7 +573,7 @@ restart:
 
 	do {
 		status = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
-				(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+				(addr_t *)&pt, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 
 	for (index = VADDR_TO_PTENT(start); index < 1024 && start < end; index++, start += B_PAGE_SIZE) {
@@ -619,7 +619,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 
 	do {
 		status = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
-			(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+			(addr_t *)&pt, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	index = VADDR_TO_PTENT(va);
 
@@ -706,7 +706,7 @@ flush_tmap(vm_translation_map *map)
 
 
 static status_t
-map_iospace_chunk(addr_t va, addr_t pa)
+map_iospace_chunk(addr_t va, addr_t pa, uint32 flags)
 {
 	int i;
 	page_table_entry *pt;
@@ -979,7 +979,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 		physicalPageTable = ADDR_REVERSE_SHIFT(sKernelVirtualPageDirectory[index].addr);
 
 		get_physical_page_tmap(physicalPageTable,
-			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_NO_WAIT);
+			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_DONT_WAIT);
 
 		index = VADDR_TO_PTENT((addr_t)sQueryPageTable);
 		put_page_table_entry_in_pgtable(&pageTableEntry[index], physicalPageTable,

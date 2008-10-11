@@ -17,10 +17,10 @@
 #endif
 
 /*  (mmu_man) Implementation details on 68030 and others:
-	
+
 	Unlike on x86 we can't just switch the context to another team by just
 	setting a register to another page directory, since we only have one
-	page table containing both kernel and user address mappings. 
+	page table containing both kernel and user address mappings.
 	The 030 supports arbitrary layout of the page directory tree, including
 	a 1-bit first level (2 entries top level table) that would map kernel
 	and user land at a single place. But 040 and later only support a fixed
@@ -28,7 +28,7 @@
 
 	Since 68k SMP hardware is rare enough we don't want to support them, we
 	can take some shortcuts.
-	
+
 	As we don't want a separate user and kernel space, we'll use a single
 	table. With the 7/7/6 split the 2nd level would require 32KB of tables,
 	which is small enough to not want to use the list hack from x86.
@@ -227,7 +227,7 @@ early_query(addr_t va, addr_t *_physicalAddress)
 	int32 index;
 	status_t err = B_ERROR;	// no pagetable here
 	TRACE(("%s(%p,)\n", __FUNCTION__, va));
-	
+
 	index = VADDR_TO_PRENT(va);
 	TRACE(("%s: pr[%d].type %d\n", __FUNCTION__, index, pr[index].type));
 	if (pr && pr[index].type == DT_ROOT) {
@@ -252,7 +252,7 @@ early_query(addr_t va, addr_t *_physicalAddress)
 				pt = (page_table_entry *)pa;
 				index = 0; // single descriptor
 			}
-			
+
 			if (pt && pt[index].type == DT_PAGE) {
 				*_physicalAddress = PTE_TO_PA(pt[index]);
 				// we should only be passed page va, but just in case.
@@ -261,7 +261,7 @@ early_query(addr_t va, addr_t *_physicalAddress)
 			}
 		}
 	}
-	
+
 	return err;
 }
 
@@ -370,7 +370,7 @@ destroy_tmap(vm_translation_map *map)
 				pgtbl_pn = PDE_TO_PN(pgdir[j]);
 				page = vm_lookup_page(pgtbl_pn);
 				pgtbl = (page_table_entry *)page;
-				
+
 				if (!page) {
 					panic("destroy_tmap: didn't find pgtable page\n");
 					return;
@@ -504,7 +504,7 @@ map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
 		need = 1;
 		need += (VADDR_TO_PDENT(end) + 1 - VADDR_TO_PDENT(start) + NUM_PAGETBL_PER_PAGE - 1) / NUM_PAGETBL_PER_PAGE;
 	}
-	
+
 	return need;
 }
 
@@ -552,7 +552,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 		for (i = 0; i < NUM_DIRTBL_PER_PAGE; i++) {
 			unsigned aindex = rindex & ~(NUM_DIRTBL_PER_PAGE-1); /* aligned */
 			page_root_entry *apr = &pr[aindex + i];
-			
+
 			// put in the pgdir
 			put_pgdir_in_pgroot(apr, pgdir, attributes
 				| (attributes & B_USER_PROTECTION ? B_WRITE_AREA : B_KERNEL_WRITE_AREA));
@@ -571,7 +571,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	// now, fill in the pentry
 	do {
 		err = get_physical_page_tmap(PRE_TO_PA(pr[rindex]),
-				&pd_pg, PHYSICAL_PAGE_NO_WAIT);
+				&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (err < 0);
 	pd = (page_directory_entry *)pd_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -598,7 +598,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 		for (i = 0; i < NUM_PAGETBL_PER_PAGE; i++) {
 			unsigned aindex = dindex & ~(NUM_PAGETBL_PER_PAGE-1); /* aligned */
 			page_directory_entry *apd = &pd[aindex + i];
-			
+
 			// put in the pgdir
 			put_pgtable_in_pgdir(apd, pgtable, attributes
 				| (attributes & B_USER_PROTECTION ? B_WRITE_AREA : B_KERNEL_WRITE_AREA));
@@ -615,7 +615,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	// now, fill in the pentry
 	do {
 		err = get_physical_page_tmap(PDE_TO_PA(pd[dindex]),
-				&pt_pg, PHYSICAL_PAGE_NO_WAIT);
+				&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (err < 0);
 	pt = (page_table_entry *)pt_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -668,7 +668,7 @@ restart:
 
 	do {
 		status = get_physical_page_tmap(PRE_TO_PA(pr[index]),
-			&pd_pg, PHYSICAL_PAGE_NO_WAIT);
+			&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pd = (page_directory_entry *)pd_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -684,7 +684,7 @@ restart:
 
 	do {
 		status = get_physical_page_tmap(PDE_TO_PA(pd[index]),
-			&pt_pg, PHYSICAL_PAGE_NO_WAIT);
+			&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pt = (page_table_entry *)pt_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -751,7 +751,7 @@ query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
 				pt = (page_table_entry *)sQueryPage;
 				index = 0; // single descriptor
 			}
-			
+
 			if (pt /*&& pt[index].type == DT_PAGE*/) {
 				*_physical = PTE_TO_PA(pt[index]);
 				// we should only be passed page va, but just in case.
@@ -764,10 +764,10 @@ query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
 			}
 		}
 	}
-	
+
 	// unmap the pg table from the indirect desc.
 	sQueryDesc.type = DT_INVALID;
-	
+
 	return err;
 }
 
@@ -795,7 +795,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 
 	do {
 		status = get_physical_page_tmap(PRE_TO_PA(pr[index]),
-			&pd_pg, PHYSICAL_PAGE_NO_WAIT);
+			&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pd = (page_directory_entry *)pd_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -811,7 +811,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 
 	do {
 		status = get_physical_page_tmap(PDE_TO_PA(pd[index]),
-			&pt_pg, PHYSICAL_PAGE_NO_WAIT);
+			&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pt = (page_table_entry *)pt_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -825,7 +825,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 		pi_pg = pt_pg;
 		do {
 			status = get_physical_page_tmap(PIE_TO_PA(pi[index]),
-				&pt_pg, PHYSICAL_PAGE_NO_WAIT);
+				&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 		} while (status < B_OK);
 		pt = (page_table_entry *)pt_pg;
 		// add offset from start of page
@@ -880,7 +880,7 @@ protect_tmap(vm_translation_map *map, addr_t start, addr_t end, uint32 attribute
 restart:
 	if (start >= end)
 		return B_OK;
-	
+
 	index = VADDR_TO_PRENT(start);
 	if (pr[index].type != DT_ROOT) {
 		// no pagedir here, move the start up to access the next page table
@@ -890,7 +890,7 @@ restart:
 
 	do {
 		status = get_physical_page_tmap(PRE_TO_PA(pr[index]),
-			&pd_pg, PHYSICAL_PAGE_NO_WAIT);
+			&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pd = (page_directory_entry *)pd_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -906,7 +906,7 @@ restart:
 
 	do {
 		status = get_physical_page_tmap(PDE_TO_PA(pd[index]),
-			&pt_pg, PHYSICAL_PAGE_NO_WAIT);
+			&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pt = (page_table_entry *)pt_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -962,7 +962,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 
 	do {
 		status = get_physical_page_tmap(PRE_TO_PA(pr[index]),
-			&pd_pg, PHYSICAL_PAGE_NO_WAIT);
+			&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pd = (page_directory_entry *)pd_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -978,7 +978,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 
 	do {
 		status = get_physical_page_tmap(PDE_TO_PA(pd[index]),
-			&pt_pg, PHYSICAL_PAGE_NO_WAIT);
+			&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pt = (page_table_entry *)pt_pg;
 	// we want the table at rindex, not at rindex%(tbl/page)
@@ -992,7 +992,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 		pi_pg = pt_pg;
 		do {
 			status = get_physical_page_tmap(PIE_TO_PA(pi[index]),
-				&pt_pg, PHYSICAL_PAGE_NO_WAIT);
+				&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 		} while (status < B_OK);
 		pt = (page_table_entry *)pt_pg;
 		// add offset from start of page
@@ -1059,7 +1059,7 @@ flush_tmap(vm_translation_map *map)
 
 
 static status_t
-map_iospace_chunk(addr_t va, addr_t pa)
+map_iospace_chunk(addr_t va, addr_t pa, uint32 flags)
 {
 	int i;
 	page_table_entry *pt;
@@ -1218,7 +1218,7 @@ m68k_vm_translation_map_init(kernel_args *args)
 	// clear out the bottom 2 GB, unmap everything
 	memset(page_hole_pgdir + FIRST_USER_PGDIR_ENT, 0, sizeof(page_directory_entry) * NUM_USER_PGDIR_ENTS);
 #endif
-	
+
 	sKernelPhysicalPageRoot = (page_root_entry *)args->arch_args.phys_pgroot;
 	sKernelVirtualPageRoot = (page_root_entry *)args->arch_args.vir_pgroot;
 
@@ -1349,18 +1349,18 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 		int32 index;
 
 		// first get pa for the indirect descriptor
-		
+
 		index = VADDR_TO_PRENT((addr_t)&sQueryDesc);
 		physicalPageDir = PRE_TO_PA(sKernelVirtualPageRoot[index]);
 
 		get_physical_page_tmap(physicalPageDir,
-			(addr_t *)&pageDirEntry, PHYSICAL_PAGE_NO_WAIT);
+			(addr_t *)&pageDirEntry, PHYSICAL_PAGE_DONT_WAIT);
 
 		index = VADDR_TO_PDENT((addr_t)&sQueryDesc);
 		physicalPageTable = PDE_TO_PA(pageDirEntry[index]);
 
 		get_physical_page_tmap(physicalPageTable,
-			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_NO_WAIT);
+			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_DONT_WAIT);
 
 		index = VADDR_TO_PTENT((addr_t)&sQueryDesc);
 
@@ -1371,25 +1371,25 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 
 		put_physical_page_tmap((addr_t)pageTableEntry);
 		put_physical_page_tmap((addr_t)pageDirEntry);
-		
+
 		// then the va for the page table for the query page.
-		
+
 		//sQueryPageTable = (page_indirect_entry *)(queryPage);
 
 		index = VADDR_TO_PRENT(queryPage);
 		physicalPageDir = PRE_TO_PA(sKernelVirtualPageRoot[index]);
 
 		get_physical_page_tmap(physicalPageDir,
-			(addr_t *)&pageDirEntry, PHYSICAL_PAGE_NO_WAIT);
+			(addr_t *)&pageDirEntry, PHYSICAL_PAGE_DONT_WAIT);
 
 		index = VADDR_TO_PDENT(queryPage);
 		physicalPageTable = PDE_TO_PA(pageDirEntry[index]);
 
 		get_physical_page_tmap(physicalPageTable,
-			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_NO_WAIT);
+			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_DONT_WAIT);
 
 		index = VADDR_TO_PTENT(queryPage);
-		
+
 		put_page_indirect_entry_in_pgtable(&pageTableEntry[index], physicalIndirectDesc,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
 
@@ -1424,7 +1424,7 @@ m68k_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	uint32 index;
 	uint32 i;
 	TRACE(("early_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
-	
+
 	// everything much simpler here because pa = va
 	// thanks to transparent translation which hasn't been disabled yet
 

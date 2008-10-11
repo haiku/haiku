@@ -3107,7 +3107,8 @@ display_mem(int argc, char **argv)
 		gKernelStartup = true;
 			// vm_get_physical_page() needs to lock...
 
-		if (vm_get_physical_page(address, &copyAddress, PHYSICAL_PAGE_NO_WAIT) != B_OK) {
+		if (vm_get_physical_page(address, &copyAddress, PHYSICAL_PAGE_DONT_WAIT)
+				!= B_OK) {
 			kprintf("getting the hardware page failed.");
 			gKernelStartup = false;
 			return 0;
@@ -4624,11 +4625,13 @@ if (cacheOffset == 0x12000)
 
 		// try to get a mapping for the src and dest page so we can copy it
 		for (;;) {
-			map->ops->get_physical_page(sourcePage->physical_page_number * B_PAGE_SIZE,
-				(addr_t *)&source, PHYSICAL_PAGE_CAN_WAIT);
+			map->ops->get_physical_page(
+				sourcePage->physical_page_number * B_PAGE_SIZE,
+				(addr_t *)&source, 0);
 
-			if (map->ops->get_physical_page(page->physical_page_number * B_PAGE_SIZE,
-					(addr_t *)&dest, PHYSICAL_PAGE_NO_WAIT) == B_OK)
+			if (map->ops->get_physical_page(
+					page->physical_page_number * B_PAGE_SIZE,
+					(addr_t *)&dest, PHYSICAL_PAGE_DONT_WAIT) == B_OK)
 				break;
 
 			// it couldn't map the second one, so sleep and retry

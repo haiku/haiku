@@ -9,30 +9,30 @@
 	PIO data transmission
 
 	This file is more difficult then you might expect as the SCSI system
-	uses physical addresses everywhere which have to be mapped into 
+	uses physical addresses everywhere which have to be mapped into
 	virtual address space during transmission. Additionally, during ATAPI
 	commands we may have to transmit more data then exist because the
-	data len specified by the command doesn't need to be the same as 
+	data len specified by the command doesn't need to be the same as
 	of the data buffer provided.
-	
-	The handling of S/G entries of odd size may look superfluous as the 
+
+	The handling of S/G entries of odd size may look superfluous as the
 	SCSI bus manager can take care of that. In general, this would be possible
 	as most controllers need even alignment for DMA as well, but some can
 	handle _any_ S/G list and it wouldn't be sensitive to enforce stricter
 	alignement just for some rare PIO transmissions.
-	
+
 	Little hint for the meaning of "transferred": this is the number of bytes
 	sent over the bus. For read-transmissions, this may be one more then copied
 	into the buffer (the extra byte read is stored in device->odd_byte), for
 	write-transmissions, this may be one less (the waiting byte is pending in
 	device->odd_byte).
-	
+
 	In terms of error handling: we don't bother checking transmission of every
-	single byte via read/write_pio(). At least at the end of the request, when 
+	single byte via read/write_pio(). At least at the end of the request, when
 	the status bits are verified, we will see that something has gone wrong.
-	
+
 	TBD: S/G entries may have odd start address. For non-Intel architecture
-	we either have to copy data to an aligned buffer or have to modify 
+	we either have to copy data to an aligned buffer or have to modify
 	PIO-handling in controller drivers.
 */
 
@@ -73,7 +73,7 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress,
 
 	if (write) {
 		// if there is a byte left from last chunk, transmit it together
-		// with the first byte of the current chunk (IDE requires 16 bits 
+		// with the first byte of the current chunk (IDE requires 16 bits
 		// to be transmitted at once)
 		if (device->has_odd_byte) {
 			uint8 buffer[2];
@@ -90,7 +90,7 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress,
 		controller->write_pio(channel_cookie, (uint16 *)virtualAddress,
 			length / 2, false);
 
-		// take care if chunk size was odd, which means that 1 byte remains		
+		// take care if chunk size was odd, which means that 1 byte remains
 		virtualAddress += length & ~1;
 		*transferred += length & ~1;
 
@@ -111,7 +111,7 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress,
 			length / 2, false);
 
 		// take care of odd chunk size;
-		// in this case we read 1 byte to few!		
+		// in this case we read 1 byte to few!
 		virtualAddress += length & ~1;
 		*transferred += length & ~1;
 
@@ -150,15 +150,14 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 		SHOW_FLOW(4, "Transmitting to/from physical address %lx, %d bytes left",
 			physicalAddress, length);
 
-		if (vm_get_physical_page(physicalAddress, &virtualAddress,
-				PHYSICAL_PAGE_CAN_WAIT) != B_OK) {
+		if (vm_get_physical_page(physicalAddress, &virtualAddress, 0) != B_OK) {
 			// ouch: this should never ever happen
 			set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
 			return B_ERROR;
 		}
 
 		// if chunks starts in the middle of a page, we have even less then
-		// a page left		
+		// a page left
 		page_left = B_PAGE_SIZE - physicalAddress % B_PAGE_SIZE;
 
 		SHOW_FLOW(4, "page_left=%d", page_left);
@@ -175,7 +174,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 		if (err != B_OK)
 			return err;
 
-		length -= cur_len;	
+		length -= cur_len;
 		physicalAddress += cur_len;
 	}
 
@@ -242,7 +241,7 @@ write_discard_PIO(ide_device_info *device, int length)
 		int cur_len;
 
 		// if device asks for odd number of bytes, append an extra byte to
-		// make length even (this is the "length + 1" term)		
+		// make length even (this is the "length + 1" term)
 		cur_len = min(length + 1, (int)(sizeof(buffer))) / 2;
 
 		bus->controller->write_pio(bus->channel_cookie, (uint16 *)buffer, cur_len, false);

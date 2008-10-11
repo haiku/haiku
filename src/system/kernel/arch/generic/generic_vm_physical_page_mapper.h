@@ -12,7 +12,8 @@
 extern "C" {
 #endif
 
-typedef status_t (*generic_map_iospace_chunk_func)(addr_t, addr_t);
+typedef status_t (*generic_map_iospace_chunk_func)(addr_t virtualAddress,
+	addr_t physicalAddress, uint32 flags);
 
 status_t generic_get_physical_page(addr_t pa, addr_t *va, uint32 flags);
 status_t generic_put_physical_page(addr_t va);

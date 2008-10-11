@@ -90,7 +90,8 @@ restart:
 				break;
 		}
 
-		sMapIOSpaceChunk(paddr_desc[index].va, index * sIOSpaceChunkSize);
+		sMapIOSpaceChunk(paddr_desc[index].va, index * sIOSpaceChunkSize,
+			flags);
 		mutex_unlock(&sMutex);
 
 		return B_OK;
@@ -99,7 +100,7 @@ restart:
 	// replace an earlier mapping
 	if (queue_peek(&mapped_paddr_lru) == NULL) {
 		// no free slots available
-		if (flags == PHYSICAL_PAGE_NO_WAIT) {
+		if ((flags & PHYSICAL_PAGE_DONT_WAIT) != 0) {
 			// put back to the caller and let them handle this
 			mutex_unlock(&sMutex);
 			return B_NO_MEMORY;
@@ -123,7 +124,7 @@ restart:
 	virtual_pmappings[(*va - sIOSpaceBase) / sIOSpaceChunkSize]
 		= paddr_desc + index;
 
-	sMapIOSpaceChunk(paddr_desc[index].va, index * sIOSpaceChunkSize);
+	sMapIOSpaceChunk(paddr_desc[index].va, index * sIOSpaceChunkSize, flags);
 
 	mutex_unlock(&sMutex);
 	return B_OK;

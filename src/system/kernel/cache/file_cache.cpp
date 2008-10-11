@@ -235,7 +235,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 			addr_t virtualAddress;
 			if (vm_get_physical_page(
 					pages[i]->physical_page_number * B_PAGE_SIZE,
-					&virtualAddress, PHYSICAL_PAGE_CAN_WAIT) < B_OK) {
+					&virtualAddress, 0) < B_OK) {
 				panic("could not get physical page");
 			}
 
@@ -334,7 +334,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 		addr_t virtualAddress;
 		vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
-			&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+			&virtualAddress, 0);
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS, virtualAddress, B_PAGE_SIZE);
 		// ToDo: check if the array is large enough!
@@ -649,7 +649,7 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 
 				addr_t virtualAddress;
 				vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
-					&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+					&virtualAddress, 0);
 
 				// copy the contents of the page already in memory
 				if (doWrite) {

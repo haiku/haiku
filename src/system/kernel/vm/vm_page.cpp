@@ -817,7 +817,7 @@ clear_page(struct vm_page *page)
 {
 	addr_t virtualAddress;
 	vm_get_physical_page(page->physical_page_number << PAGE_SHIFT,
-		&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+		&virtualAddress, 0);
 
 	memset((void *)virtualAddress, 0, B_PAGE_SIZE);
 

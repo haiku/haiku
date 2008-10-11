@@ -93,8 +93,8 @@ sg_memcpy(const physical_entry *sgTable, int sgCount, const void *data,
 		size_t size = min_c(dataSize, sgTable[i].size);
 		addr_t address;
 
-		if (vm_get_physical_page((addr_t)sgTable[i].address, &address,
-				PHYSICAL_PAGE_CAN_WAIT) < B_OK)
+		if (vm_get_physical_page((addr_t)sgTable[i].address, &address, 0)
+				< B_OK)
 			return B_ERROR;
 
 		TRACE("sg_memcpy phyAddr %p, addr %p, size %lu\n", sgTable[i].address, (void *)address, size);

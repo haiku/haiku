@@ -43,7 +43,7 @@ ide_request_sense(ide_device_info *device, ide_qrequest *qrequest)
 
 	request->data_resid = request->data_length - transferSize;
 
-	// normally, all flags are set to "success", but for Request Sense 
+	// normally, all flags are set to "success", but for Request Sense
 	// this would have overwritten the sense we want to read
 	device->subsys_status = SCSI_REQ_CMP;
 	request->device_status = SCSI_STATUS_GOOD;
@@ -68,7 +68,7 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocationLength,
 	int sgCount = request->sg_count;
 	int requestSize;
 
-	SHOW_FLOW(3, "offset=%u, req_size_limit=%d, size=%d, sg_list=%p, sg_cnt=%d, %s buffer", 
+	SHOW_FLOW(3, "offset=%u, req_size_limit=%d, size=%d, sg_list=%p, sg_cnt=%d, %s buffer",
 		offset, allocationLength, size, sgList, sgCount, toBuffer ? "to" : "from");
 
 	// skip unused S/G entries
@@ -81,7 +81,7 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocationLength,
 	if (sgCount == 0)
 		return 0;
 
-	// remaining bytes we are allowed to copy from/to request 		
+	// remaining bytes we are allowed to copy from/to request
 	requestSize = min(allocationLength, request->data_length) - offset;
 
 	// copy one S/G entry at a time
@@ -92,8 +92,8 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocationLength,
 		bytes = min(size, requestSize);
 		bytes = min(bytes, sgList->size);
 
-		if (vm_get_physical_page((addr_t)sgList->address, &virtualAddress,
-				PHYSICAL_PAGE_CAN_WAIT) != B_OK) 
+		if (vm_get_physical_page((addr_t)sgList->address, &virtualAddress, 0)
+				!= B_OK)
 			return false;
 
 		SHOW_FLOW(4, "buffer=%p, virt_addr=%p, bytes=%d, to_buffer=%d",

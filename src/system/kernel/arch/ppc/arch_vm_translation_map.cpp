@@ -119,7 +119,7 @@ typedef struct vm_translation_map_arch_info {
 } vm_translation_map_arch_info;
 
 
-void 
+void
 ppc_translation_map_change_asid(vm_translation_map *map)
 {
 // this code depends on the kernel being at 0x80000000, fix if we change that
@@ -157,7 +157,7 @@ unlock_tmap(vm_translation_map *map)
 }
 
 
-static void 
+static void
 destroy_tmap(vm_translation_map *map)
 {
 	if (map->map_count > 0) {
@@ -167,7 +167,7 @@ destroy_tmap(vm_translation_map *map)
 
 	// mark the vsid base not in use
 	int baseBit = map->arch_data->vsid_base >> VSID_BASE_SHIFT;
-	atomic_and((vint32 *)&sVSIDBaseBitmap[baseBit / 32], 
+	atomic_and((vint32 *)&sVSIDBaseBitmap[baseBit / 32],
 			~(1 << (baseBit % 32)));
 
 	free(map->arch_data);
@@ -177,7 +177,7 @@ destroy_tmap(vm_translation_map *map)
 
 static void
 fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID,
-	addr_t virtualAddress, addr_t physicalAddress, uint8 protection, 
+	addr_t virtualAddress, addr_t physicalAddress, uint8 protection,
 	bool secondaryHash)
 {
 	// lower 32 bit - set at once
@@ -237,7 +237,7 @@ map_tmap(vm_translation_map *map, addr_t virtualAddress, addr_t physicalAddress,
 		if (entry->valid)
 			continue;
 
-		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress, 
+		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress,
 			protection, false);
 		map->map_count++;
 		return B_OK;
@@ -254,7 +254,7 @@ map_tmap(vm_translation_map *map, addr_t virtualAddress, addr_t physicalAddress,
 		if (entry->valid)
 			continue;
 
-		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress, 
+		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress,
 			protection, false);
 		map->map_count++;
 		return B_OK;
@@ -374,7 +374,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_outPhysical, uint32 *_ou
 
 
 static status_t
-map_iospace_chunk(addr_t va, addr_t pa)
+map_iospace_chunk(addr_t va, addr_t pa, uint32 flags)
 {
 	pa &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
 	va &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
@@ -386,7 +386,7 @@ map_iospace_chunk(addr_t va, addr_t pa)
 }
 
 
-static addr_t 
+static addr_t
 get_mapped_size_tmap(vm_translation_map *map)
 {
 	return map->map_count;
@@ -432,7 +432,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t virtualAddress, uint32 flags)
 }
 
 
-static void 
+static void
 flush_tmap(vm_translation_map *map)
 {
 // TODO: arch_cpu_global_TLB_invalidate() is extremely expensive and doesn't
@@ -586,7 +586,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	}
 
 	// create an area to cover the page table
-	sPageTableArea = create_area("page_table", (void **)&sPageTable, B_EXACT_ADDRESS, 
+	sPageTableArea = create_area("page_table", (void **)&sPageTable, B_EXACT_ADDRESS,
 		sPageTableSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	// init physical page mapper
@@ -613,7 +613,7 @@ arch_vm_translation_map_init_post_sem(kernel_args *args)
  */
 
 status_t
-arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, 
+arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress,
 	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
 {
 	uint32 virtualSegmentID = get_sr((void *)virtualAddress) & 0xffffff;
@@ -647,7 +647,7 @@ arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t
 
 // XXX currently assumes this translation map is active
 
-status_t 
+status_t
 arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
 {
 	//PANIC_UNIMPLEMENTED();

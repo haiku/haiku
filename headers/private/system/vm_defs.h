@@ -49,8 +49,7 @@
 
 // flags for vm_get_physical_page()
 enum {
-	PHYSICAL_PAGE_NO_WAIT = 0,
-	PHYSICAL_PAGE_CAN_WAIT,
+	PHYSICAL_PAGE_DONT_WAIT		= 0x01
 };
 
 // mapping argument for several internal VM functions

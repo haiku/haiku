@@ -464,8 +464,8 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 		bytes = min(size, req_size);
 		bytes = min(bytes, sg_list->size);
 
-		if (vm_get_physical_page((addr_t)sg_list->address, (void *)&virtualAddress,
-				PHYSICAL_PAGE_CAN_WAIT) != B_OK)
+		if (vm_get_physical_page((addr_t)sg_list->address,
+				(void*)&virtualAddress, 0) != B_OK)
 			return false;
 
 		SHOW_FLOW(0, "buffer = %p, virt_addr = %#lx, bytes = %lu, to_buffer = %d",

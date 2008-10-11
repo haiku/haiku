@@ -119,8 +119,8 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 
 		bytes = min( size, sg_list->size );
 
-		if (vm_get_physical_page((addr_t)sg_list->address, &virtualAddress,
-				PHYSICAL_PAGE_CAN_WAIT) != B_OK)
+		if (vm_get_physical_page((addr_t)sg_list->address, &virtualAddress, 0)
+				!= B_OK)
 			return false;
 
 		if (to_buffer)
