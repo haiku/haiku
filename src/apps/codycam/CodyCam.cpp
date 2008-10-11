@@ -619,10 +619,6 @@ VideoWindow::MessageReceived(BMessage* message)
 			if (control != NULL) {
 				strncpy(fFtpInfo.passwordText, ((BTextControl*)control)->Text(), 64);
 				FTPINFO("password = '%s'\n", fFtpInfo.passwordText);
-				if (Lock()) {
-					((BTextControl*)control)->SetText("<HIDDEN>");
-					Unlock();
-				}
 			}
 			break;
 
@@ -785,6 +781,9 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 		fPasswordSetting->Value(), new BMessage(msg_password));
 	fPassword->SetTarget(this);
 	fPassword->SetDivider(fPassword->Divider() - 30);
+	fPassword->TextView()->HideTyping(true);
+	// BeOS HideTyping() seems broken, it empties the text
+	fPassword->SetText(fPasswordSetting->Value());
 	fFtpSetupBox->AddChild(fPassword);	
 
 	aFrame.top = aFrame.bottom + kYBuffer;
