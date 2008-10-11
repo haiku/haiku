@@ -106,6 +106,7 @@ BEOS_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addon
 	usb_webcam.media_addon
 	video_producer_demo.media_addon
 	video_window_demo.media_addon
+	firewire_dv.media_addon
 	#legacy.media_addon
 ;
 BEOS_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
