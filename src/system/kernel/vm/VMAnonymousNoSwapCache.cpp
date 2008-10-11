@@ -96,7 +96,7 @@ VMAnonymousNoSwapCache::HasPage(off_t offset)
 
 status_t
 VMAnonymousNoSwapCache::Read(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes)
+	uint32 flags, size_t *_numBytes)
 {
 	panic("anonymous_store: read called. Invalid!\n");
 	return B_ERROR;

@@ -496,7 +496,7 @@ VMAnonymousCache::HasPage(off_t offset)
 
 status_t
 VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes)
+	uint32 flags, size_t *_numBytes)
 {
 	off_t pageIndex = offset >> PAGE_SHIFT;
 
@@ -517,7 +517,7 @@ VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
 			* B_PAGE_SIZE;
 
 		status_t status = vfs_read_pages(swapFile->vnode, swapFile->cookie, pos,
-			vecs + i, j - i, 0, _numBytes);
+			vecs + i, j - i, flags, _numBytes);
 		if (status != B_OK)
 			return status;
 	}

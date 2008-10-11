@@ -861,7 +861,8 @@ VMCache::HasPage(off_t offset)
 
 
 status_t
-VMCache::Read(off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+VMCache::Read(off_t offset, const iovec *vecs, size_t count, uint32 flags,
+	size_t *_numBytes)
 {
 	return B_ERROR;
 }

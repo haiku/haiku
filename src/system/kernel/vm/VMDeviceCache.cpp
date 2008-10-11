@@ -27,7 +27,7 @@ VMDeviceCache::HasPage(off_t offset)
 
 status_t
 VMDeviceCache::Read(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes)
+	uint32 flags, size_t *_numBytes)
 {
 	panic("device_store: read called. Invalid!\n");
 	return B_ERROR;

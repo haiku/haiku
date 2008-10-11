@@ -45,6 +45,7 @@
 #include <vm_priv.h>
 
 #include "VMAnonymousCache.h"
+#include "io_requests.h"
 
 
 //#define TRACE_VM
@@ -4438,15 +4439,12 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 
 			// get a virtual address for the page
 			iovec vec;
-			map->ops->get_physical_page(
-				page->physical_page_number * B_PAGE_SIZE,
-				(addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
+			vec.iov_base = (void*)(page->physical_page_number * B_PAGE_SIZE);
 			size_t bytesRead = vec.iov_len = B_PAGE_SIZE;
 
 			// read it in
-			status_t status = cache->Read(cacheOffset, &vec, 1, &bytesRead);
-
-			map->ops->put_physical_page((addr_t)vec.iov_base);
+			status_t status = cache->Read(cacheOffset, &vec, 1,
+				B_PHYSICAL_IO_REQUEST, &bytesRead);
 
 			cache->Lock();
 

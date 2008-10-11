@@ -11,6 +11,33 @@
 
 #include <file_cache.h>
 #include <vfs.h>
+#include <vm.h>
+
+#include "io_requests.h"
+
+
+static inline status_t
+memset_physical(addr_t address, int value, size_t length)
+{
+	while (length > 0) {
+		addr_t pageOffset = address % B_PAGE_SIZE;
+		addr_t virtualAddress;
+		status_t error = vm_get_physical_page(address - pageOffset,
+			&virtualAddress, 0);
+		if (error != B_OK)
+			return error;
+
+		size_t toSet = min_c(length, B_PAGE_SIZE - pageOffset);
+		memset((void*)(virtualAddress + pageOffset), value, toSet);
+
+		vm_put_physical_page(virtualAddress);
+
+		length -= toSet;
+		address += toSet;
+	}
+
+	return B_OK;
+}
 
 
 status_t
@@ -41,12 +68,12 @@ VMVnodeCache::HasPage(off_t offset)
 
 status_t
 VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes)
+	uint32 flags, size_t *_numBytes)
 {
 	size_t bytesUntouched = *_numBytes;
 
 	status_t status = vfs_read_pages(fVnode, NULL, offset, vecs, count,
-		0, _numBytes);
+		flags, _numBytes);
 
 	bytesUntouched -= *_numBytes;
 
@@ -61,9 +88,12 @@ VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
 	for (int32 i = count; i-- > 0 && bytesUntouched != 0;) {
 		size_t length = min_c(bytesUntouched, vecs[i].iov_len);
 
-		// ToDo: will have to map the pages in later (when we switch to physical pages)
-		memset((void *)((addr_t)vecs[i].iov_base + vecs[i].iov_len - length),
-			0, length);
+		addr_t address = (addr_t)vecs[i].iov_base + vecs[i].iov_len - length;
+		if ((flags & B_PHYSICAL_IO_REQUEST) != 0)
+			memset_physical(address, 0, length);
+		else
+			memset((void*)address, 0, length);
+
 		bytesUntouched -= length;
 	}
 
