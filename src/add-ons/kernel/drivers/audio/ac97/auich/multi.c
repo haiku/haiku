@@ -29,6 +29,7 @@
  *
  */
 
+#include <driver_settings.h>
 #include <OS.h>
 #include <MediaDefs.h>
 #include <strings.h>
@@ -42,6 +43,7 @@
 #include "auich.h"
 #include "util.h"
 #include "io.h"
+
 
 static void	
 auich_ac97_get_mix(void *card, const void *cookie, int32 type, float *values) {
@@ -1011,6 +1013,7 @@ static status_t
 auich_open(const char *name, uint32 flags, void** cookie)
 {
 	auich_dev *card = NULL;
+	void *settings_handle;
 	int ix;
 	
 	LOG(("open()\n"));
@@ -1038,6 +1041,31 @@ auich_open(const char *name, uint32 flags, void** cookie)
 			
 	*cookie = card;
 	card->multi.card = card;
+		
+	// get driver settings
+	settings_handle = load_driver_settings(AUICH_SETTINGS);
+	if (settings_handle != NULL) {
+		const char *item;
+		char       *end;
+		uint32      value;
+
+		item = get_driver_parameter (settings_handle, "sample_rate", "48000", "48000");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') 
+			current_settings.sample_rate = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_frames", "256", "256");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') 
+			current_settings.buffer_frames = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_count", "4", "4");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') 
+			current_settings.buffer_count = value;
+
+		unload_driver_settings(settings_handle);
+	}
 		
 	LOG(("stream_new\n"));
 		

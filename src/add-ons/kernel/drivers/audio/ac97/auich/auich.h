@@ -167,6 +167,8 @@ typedef struct _auich_dev {
 } auich_dev;
 
 
+#define AUICH_SETTINGS "auich.settings"
+
 typedef struct {
 	uint32	sample_rate;
 	uint32	buffer_frames;

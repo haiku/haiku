@@ -721,30 +721,13 @@ init_driver(void)
 	void *settings_handle;
 	pci_info info;
 	num_cards = 0;
-
+		
 	PRINT(("init_driver()\n"));
 
 	// get driver settings
-	settings_handle = load_driver_settings("auich.settings");
+	settings_handle = load_driver_settings(AUICH_SETTINGS);
 	if (settings_handle != NULL) {
-		const char *item;
-		char       *end;
-		uint32      value;
-
-		item = get_driver_parameter (settings_handle, "sample_rate", "48000", "48000");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.sample_rate = value;
-
-		item = get_driver_parameter (settings_handle, "buffer_frames", "256", "256");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.buffer_frames = value;
-
-		item = get_driver_parameter (settings_handle, "buffer_count", "4", "4");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.buffer_count = value;
-
 		current_settings.use_thread = get_driver_boolean_parameter (settings_handle, "use_thread", false, false);
-		
 		unload_driver_settings (settings_handle);
 	}
 
