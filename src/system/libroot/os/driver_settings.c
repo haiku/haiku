@@ -39,6 +39,7 @@
 #	include <kdriver_settings.h>
 #	include <kernel.h>
 #	include <boot/kernel_args.h>
+#	include <boot_device.h>
 #endif
 #ifdef _BOOT_MODE
 #	include <boot/kernel_args.h>
@@ -405,6 +406,7 @@ new_settings(char *buffer, const char *driverName)
 	handle->text = buffer;
 
 #ifdef _KERNEL_MODE
+	handle->ref_count = 1;
 	strlcpy(handle->name, driverName, sizeof(handle->name));
 #endif
 
@@ -644,6 +646,8 @@ driver_settings_init(kernel_args *args)
 
 		strlcpy(handle->name, settings->name, sizeof(handle->name));
 		handle->magic = 0;
+		handle->ref_count = 0;
+		
 			// this triggers parsing the settings when they are actually used
 		list_add_item(&sHandles, handle);
 
@@ -659,19 +663,18 @@ driver_settings_init(kernel_args *args)
 
 
 status_t
-unload_driver_settings(void *handle)
+unload_driver_settings(void *_handle)
 {
+	settings_handle *handle = (settings_handle *)_handle;
 	if (!check_handle(handle))
 		return B_BAD_VALUE;
 
 #ifdef _KERNEL_MODE
 	mutex_lock(&sLock);
-	// ToDo: as soon as "/boot" is accessible, we should start throwing away settings
-#if 0
-	if (--handle->ref_count == 0) {
+	if (--handle->ref_count == 0 && gBootDevice > 0) {
+		// don't unload an handle when /boot is not available
 		list_remove_link(&handle->link);
 	} else
-#endif
 		handle = NULL;
 	mutex_unlock(&sLock);
 #endif
@@ -696,7 +699,10 @@ load_driver_settings(const char *driverName)
 	// see if we already have these settings loaded
 	mutex_lock(&sLock);
 	handle = find_driver_settings(driverName);
-	if (handle != NULL) {
+	if (handle != NULL && handle->ref_count == 0 && gBootDevice > 0) {
+		// an handle with a zero ref_count should be unloaded if /boot is available 
+		free_settings(handle);
+	} else if (handle != NULL) {
 		handle->ref_count++;
 
 		// we got it, now let's see if it already has been parsed
