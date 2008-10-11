@@ -56,8 +56,7 @@ fill_stat_buffer(Inode* inode, struct stat& stat)
 	} else
 		stat.st_size = inode->Size();
 
-	stat.st_blocks = inode->AllocatedSize() / node.InodeSize();
-		// TODO: decide for a unit to use for st_blocks!
+	stat.st_blocks = inode->AllocatedSize() / 512;
 }
 
 
