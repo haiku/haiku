@@ -16,6 +16,7 @@
 #include <heap.h>
 #include <arch_system_info.h>
 #include <arch/vm_translation_map.h>
+#include <thread.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -648,12 +649,11 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 static void
 flush_tmap(vm_translation_map *map)
 {
-	cpu_status state;
-
 	if (map->arch_data->num_invalidate_pages <= 0)
 		return;
 
-	state = disable_interrupts();
+	struct thread* thread = thread_get_current_thread();
+	thread_pin_to_current_cpu(thread);
 
 	if (map->arch_data->num_invalidate_pages > PAGE_INVALIDATE_CACHE_SIZE) {
 		// invalidate all pages
@@ -701,7 +701,7 @@ flush_tmap(vm_translation_map *map)
 	}
 	map->arch_data->num_invalidate_pages = 0;
 
-	restore_interrupts(state);
+	thread_unpin_from_current_cpu(thread);
 }
 
 
@@ -711,7 +711,6 @@ map_iospace_chunk(addr_t va, addr_t pa)
 	int i;
 	page_table_entry *pt;
 	addr_t ppn;
-	int state;
 
 	pa &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
 	va &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
@@ -729,12 +728,13 @@ map_iospace_chunk(addr_t va, addr_t pa)
 		pt[i].global = 1;
 	}
 
-	state = disable_interrupts();
+	struct thread* thread = thread_get_current_thread();
+	thread_pin_to_current_cpu(thread);
 	arch_cpu_invalidate_TLB_range(va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE));
 	smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_RANGE,
 		va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE), 0,
 		NULL, SMP_MSG_FLAG_SYNC);
-	restore_interrupts(state);
+	thread_unpin_from_current_cpu(thread);
 
 	return B_OK;
 }
