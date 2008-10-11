@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src system kernel lib arch m86k ;
+SubDir HAIKU_TOP src system kernel lib arch m68k ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
