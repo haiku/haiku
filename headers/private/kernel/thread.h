@@ -205,4 +205,32 @@ thread_interrupt(struct thread* thread, bool kill)
 }
 
 
+static inline void
+thread_pin_to_current_cpu(struct thread* thread)
+{
+	thread->pinned_to_cpu++;
+}
+
+
+static inline void
+thread_unpin_from_current_cpu(struct thread* thread)
+{
+	thread->pinned_to_cpu--;
+}
+
+
+static inline void
+thread_disable_scheduling(struct thread* thread)
+{
+	thread->keep_scheduled++;
+}
+
+
+static inline void
+thread_enable_scheduling(struct thread* thread)
+{
+	thread->keep_scheduled--;
+}
+
+
 #endif /* _THREAD_H */

@@ -230,6 +230,9 @@ struct thread {
 	int32			state;
 	int32			next_state;
 	struct cpu_ent	*cpu;
+	struct cpu_ent	*previous_cpu;
+	int32			pinned_to_cpu;
+	int32			keep_scheduled;
 
 	sigset_t		sig_pending;
 	sigset_t		sig_block_mask;

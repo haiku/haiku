@@ -223,6 +223,9 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->id = threadID >= 0 ? threadID : allocate_thread_id();
 	thread->team = NULL;
 	thread->cpu = cpu;
+	thread->previous_cpu = NULL;
+	thread->pinned_to_cpu = 0;
+	thread->keep_scheduled = 0;
 	thread->fault_handler = 0;
 	thread->page_faults_allowed = 1;
 	thread->kernel_stack_area = -1;

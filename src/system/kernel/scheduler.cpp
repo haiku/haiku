@@ -543,7 +543,7 @@ context_switch(struct thread *fromThread, struct thread *toThread)
 	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
 		user_debug_thread_unscheduled(fromThread);
 
-	toThread->cpu = fromThread->cpu;
+	toThread->previous_cpu = toThread->cpu = fromThread->cpu;
 	fromThread->cpu = NULL;
 
 	arch_thread_set_current_thread(toThread);
@@ -560,8 +560,11 @@ context_switch(struct thread *fromThread, struct thread *toThread)
 static int32
 reschedule_event(timer *unused)
 {
-	// this function is called as a result of the timer event set by the scheduler
-	// returning this causes a reschedule on the timer event
+	if (thread_get_current_thread()->keep_scheduled > 0)
+		return B_HANDLED_INTERRUPT;
+
+	// this function is called as a result of the timer event set by the
+	// scheduler returning this causes a reschedule on the timer event
 	thread_get_current_thread()->cpu->preempted = 1;
 	return B_INVOKE_SCHEDULER;
 }
@@ -616,6 +619,14 @@ scheduler_reschedule(void)
 					nextThread = nextThread->queue_next;
 				}
 #endif
+
+				// skip thread, if it doesn't want to run on this CPU
+				if (nextThread->pinned_to_cpu > 0
+					&& nextThread->previous_cpu != oldThread->cpu) {
+					prevThread = nextThread;
+					nextThread = nextThread->queue_next;
+					continue;
+				}
 
 				// always extract real time threads
 				if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
