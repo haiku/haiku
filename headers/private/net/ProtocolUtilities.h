@@ -199,13 +199,6 @@ DECL_DATAGRAM_SOCKET(inline status_t)::SocketEnqueue(net_buffer *_buffer)
 
 DECL_DATAGRAM_SOCKET(inline status_t)::_SocketEnqueue(net_buffer *_buffer)
 {
-	if (_buffer->flags & MSG_BCAST) {
-		// only deliver datagrams sent to a broadcast address
-		// to sockets with SO_BROADCAST on.
-		if (!(fSocket->options & SO_BROADCAST))
-			return B_OK;
-	}
-
 	net_buffer *buffer = ModuleBundle::Buffer()->clone(_buffer, false);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
