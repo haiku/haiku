@@ -467,6 +467,7 @@ WorkspacesView::MouseDown(BMessage* message, BPoint where)
 
 	fLeftTopOffset = where - windowFrame.LeftTop();
 	fSelectedWorkspace = index;
+	fClickPoint = where;
 
 	if (index >= 0)
 		_Invalidate();
@@ -550,10 +551,15 @@ WorkspacesView::MouseMoved(BMessage* message, BPoint where)
 		leftTop = fSelectedWindow->Anchor(fSelectedWorkspace).position;
 	}
 
-	Window()->Desktop()->MoveWindowBy(fSelectedWindow, left - leftTop.x, top - leftTop.y,
-		fSelectedWorkspace);
+	float diff = (fClickPoint.x - where.x) * (fClickPoint.x - where.x)
+		+ (fClickPoint.y - where.y) * (fClickPoint.y - where.y);
+	if (!fHasMoved && diff > 4)
+		fHasMoved = true;
 
-	fHasMoved = true;
+	if (fHasMoved) {
+		Window()->Desktop()->MoveWindowBy(fSelectedWindow, left - leftTop.x,
+			top - leftTop.y, fSelectedWorkspace);
+	}
 }
 
 

@@ -56,6 +56,7 @@ private:
 	::Window*		fSelectedWindow;
 	int32			fSelectedWorkspace;
 	bool			fHasMoved;
+	BPoint			fClickPoint;
 	BPoint			fLeftTopOffset;
 };
 
