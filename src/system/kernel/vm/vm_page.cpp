@@ -230,6 +230,39 @@ class StolenPage : public AbstractTraceEntry {
 #endif	// PAGE_ALLOCATION_TRACING
 
 
+#if PAGE_WRITER_TRACING
+
+namespace PageWriterTracing {
+
+class WritePage : public AbstractTraceEntry {
+	public:
+		WritePage(vm_page* page)
+			:
+			fCache(page->cache),
+			fPage(page)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page write: %p, cache: %p", fPage, fCache);
+		}
+
+	private:
+		VMCache*	fCache;
+		vm_page*	fPage;
+};
+
+}	// namespace PageWriterTracing
+
+#	define TPW(x)	new(std::nothrow) PageWriterTracing::x
+
+#else
+#	define TPW(x)
+#endif	// PAGE_WRITER_TRACING
+
+
 /*!	Dequeues a page from the head of the given queue */
 static vm_page *
 dequeue_page(page_queue *queue)
@@ -1222,6 +1255,8 @@ page_writer(void* /*unused*/)
 			locker.Unlock();
 
 			//dprintf("write page %p, cache %p (%ld)\n", page, page->cache, page->cache->ref_count);
+			TPW(WritePage(page));
+
 			vm_clear_map_flags(page, PAGE_MODIFIED);
 			cache->AcquireRefLocked();
 			numPages++;

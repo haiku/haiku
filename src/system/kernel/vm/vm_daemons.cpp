@@ -12,6 +12,7 @@
 
 #include <OS.h>
 
+#include <tracing.h>
 #include <vm.h>
 #include <vm_priv.h>
 #include <vm_cache.h>
@@ -104,6 +105,84 @@ PageCacheLocker::Unlock()
 
 	fPage = NULL;
 }
+
+
+//	#pragma mark -
+
+
+#if PAGE_DAEMON_TRACING
+
+namespace PageDaemonTracing {
+
+class ActivatePage : public AbstractTraceEntry {
+	public:
+		ActivatePage(vm_page* page)
+			:
+			fCache(page->cache),
+			fPage(page)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page activated:   %p, cache: %p", fPage, fCache);
+		}
+
+	private:
+		VMCache*	fCache;
+		vm_page*	fPage;
+};
+
+
+class DeactivatePage : public AbstractTraceEntry {
+	public:
+		DeactivatePage(vm_page* page)
+			:
+			fCache(page->cache),
+			fPage(page)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page deactivated: %p, cache: %p", fPage, fCache);
+		}
+
+	private:
+		VMCache*	fCache;
+		vm_page*	fPage;
+};
+
+
+class FreedPageSwap : public AbstractTraceEntry {
+	public:
+		FreedPageSwap(vm_page* page)
+			:
+			fCache(page->cache),
+			fPage(page)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page swap freed:  %p, cache: %p", fPage, fCache);
+		}
+
+	private:
+		VMCache*	fCache;
+		vm_page*	fPage;
+};
+
+}	// namespace PageDaemonTracing
+
+#	define T(x)	new(std::nothrow) PageDaemonTracing::x
+
+#else
+#	define T(x)
+#endif	// PAGE_DAEMON_TRACING
 
 
 //	#pragma mark -
@@ -205,6 +284,7 @@ check_page_activation(int32 index)
 				vm_page_set_state(page, PAGE_STATE_ACTIVE);
 			page->usage_count = 1;
 			TRACE(("page %p -> move to active\n", page));
+			T(ActivatePage(page));
 		} else if (page->usage_count < 127)
 			page->usage_count++;
 
@@ -237,6 +317,7 @@ check_page_activation(int32 index)
 		else
 			vm_page_set_state(page, PAGE_STATE_INACTIVE);
 		TRACE(("page %p -> move to inactive\n", page));
+		T(DeactivatePage(page));
 	}
 
 	return true;
@@ -260,6 +341,7 @@ free_page_swap_space(int32 index)
 			// We need to mark the page modified, since otherwise it could be
 			// stolen and we'd lose its data.
 			vm_page_set_state(page, PAGE_STATE_MODIFIED);
+			T(FreedPageSwap(page));
 			return true;
 		}
 	}
@@ -299,7 +381,7 @@ page_daemon(void* /*unused*/)
 			* pagesLeft / sLowPagesCount;
 		uint32 leftToFree = sLowPagesCount - pagesLeft;
 		TRACE(("wait interval %Ld, scan pages %lu, free %lu, "
-			"target %lu\n",	scanWaitInterval, scanPagesCount, 
+			"target %lu\n",	scanWaitInterval, scanPagesCount,
 			pagesLeft, leftToFree));
 
 		for (uint32 i = 0; i < scanPagesCount && leftToFree > 0; i++) {

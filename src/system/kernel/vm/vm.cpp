@@ -1529,6 +1529,9 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 	// grab a ref to the address space (the area holds this)
 	atomic_add(&addressSpace->ref_count, 1);
 
+//	ktrace_printf("map_backing_store: cache: %p (source: %p), \"%s\" -> %p",
+//		cache, sourceCache, areaName, area);
+
 	*_area = area;
 	return B_OK;
 
@@ -4716,6 +4719,10 @@ vm_soft_fault(vm_address_space *addressSpace, addr_t originalAddress,
 			originalAddress);
 		return B_BAD_ADDRESS;
 	}
+
+//	ktrace_printf("page fault: %s %#lx, %s, area: %p",
+//		isWrite ? "write" : "read", originalAddress, isUser ? "user" : "kernel",
+//		area);
 
 	// check permissions
 	uint32 protection = get_area_page_protection(area, address);
