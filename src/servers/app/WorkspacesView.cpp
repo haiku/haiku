@@ -150,15 +150,22 @@ WorkspacesView::_WindowFrame(const BRect& workspaceFrame,
 	BRect frame = windowFrame;
 	frame.OffsetTo(windowPosition);
 
+	// scale down the rect
 	float factor = workspaceFrame.Width() / screenFrame.Width();
-	frame.left = rintf(frame.left * factor);
-	frame.right = rintf(frame.right * factor);
+	frame.left = frame.left * factor;
+	frame.right = frame.right * factor;
 
 	factor = workspaceFrame.Height() / screenFrame.Height();
-	frame.top = rintf(frame.top * factor);
-	frame.bottom = rintf(frame.bottom * factor);
+	frame.top = frame.top * factor;
+	frame.bottom = frame.bottom * factor;
 
-	frame.OffsetBy(workspaceFrame.LeftTop());
+	// offset by the workspace fame position
+	// and snap to integer coordinates without distorting the size too much
+	frame.OffsetTo(rintf(frame.left + workspaceFrame.left),
+		rintf(frame.top + workspaceFrame.top));
+	frame.right = rintf(frame.right);
+	frame.bottom = rintf(frame.bottom);
+
 	return frame;
 }
 
@@ -181,7 +188,8 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 
 	tabFrame = _WindowFrame(workspaceFrame, screenFrame,
 		tabFrame, tabFrame.LeftTop() - offset);
-	if (!workspaceFrame.Intersects(frame) && !workspaceFrame.Intersects(tabFrame))
+	if (!workspaceFrame.Intersects(frame)
+		&& !workspaceFrame.Intersects(tabFrame))
 		return;
 
 	// ToDo: let decorator do this!
@@ -206,48 +214,55 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 	if (tabFrame.right >= frame.right)
 		tabFrame.right = frame.right - 1;
 
-	tabFrame.top = frame.top - 1;
 	tabFrame.bottom = frame.top - 1;
+	tabFrame.top = min_c(tabFrame.top, tabFrame.bottom);
 	tabFrame = tabFrame & workspaceFrame;
 
 	if (decorator != NULL && tabFrame.IsValid()) {
-		drawingEngine->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
+		drawingEngine->FillRect(tabFrame, yellow);
 		backgroundRegion.Exclude(tabFrame);
 	}
 
 	drawingEngine->StrokeRect(frame, frameColor);
 
+	BRect fillFrame = frame.InsetByCopy(1, 1) & workspaceFrame;
 	frame = frame & workspaceFrame;
-	if (frame.IsValid()) {
-		drawingEngine->FillRect(frame.InsetByCopy(1, 1), white);
-		backgroundRegion.Exclude(frame);
-	}
+	if (!frame.IsValid())
+		return;
+
+	// fill the window itself
+	drawingEngine->FillRect(fillFrame, white);
 
 	// draw title
 
-	// TODO: disabled because it's much too slow this way - the mini-window
-	//	functionality should probably be moved into the Window class,
-	//	so that it has only to be recalculated on demand. With double buffered
-	//	windows, this would also open up the door to have a more detailed
-	//	preview.
-#if 0
+	// TODO: the mini-window functionality should probably be moved into the
+	// Window class, so that it has only to be recalculated on demand. With
+	// double buffered windows, this would also open up the door to have a
+	// more detailed preview.
 	BString title(window->Title());
 
-	ServerFont font = fDrawState->Font();
-	font.SetSize(7);
-	fDrawState->SetFont(font);
+	const ServerFont& font = fDrawState->Font();
 
-	fDrawState->Font().TruncateString(&title, B_TRUNCATE_END, frame.Width() - 4);
-	float width = drawingEngine->StringWidth(title.String(), title.Length(),
-		fDrawState, NULL);
-	float height = drawingEngine->StringHeight(title.String(), title.Length(),
-		fDrawState);
+	font.TruncateString(&title, B_TRUNCATE_END, fillFrame.Width() - 4);
+	font_height fontHeight;
+	font.GetHeight(fontHeight);
+	float height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
+	if (title.Length() > 0 && height < frame.Height() - 2) {
+		rgb_color textColor = tint_color(white, B_DARKEN_4_TINT);
+		drawingEngine->SetHighColor(textColor);
+		drawingEngine->SetLowColor(white);
 
-	drawingEngine->DrawString(title.String(), title.Length(),
-		BPoint(frame.left + (frame.Width() - width) / 2,
-			frame.top + (frame.Height() + height) / 2),
-		fDrawState, NULL);
-#endif
+		float width = font.StringWidth(title.String(), title.Length());
+
+		BPoint textOffset;
+		textOffset.x = rintf(frame.left + (frame.Width() - width) / 2);
+		textOffset.y = rintf(frame.top + (frame.Height() - height) / 2
+			+ fontHeight.ascent);
+		drawingEngine->DrawString(title.String(), title.Length(), textOffset);
+	}
+
+	// prevent the next window down from drawing over this window
+	backgroundRegion.Exclude(frame);
 }
 
 
@@ -285,6 +300,12 @@ WorkspacesView::_DrawWorkspace(DrawingEngine* drawingEngine,
 	BRegion workspaceRegion(rect);
 	backgroundRegion.IntersectWith(&workspaceRegion);
 	drawingEngine->ConstrainClippingRegion(&backgroundRegion);
+
+	ServerFont font = fDrawState->Font();
+	font.SetSize(ceilf(max_c(9.0,
+		min_c(Frame().Height(), Frame().Width()) / 15)));
+	fDrawState->SetFont(font);
+	drawingEngine->SetFont(font);
 
 	// We draw from top down and cut the window out of the clipping region
 	// which reduces the flickering
