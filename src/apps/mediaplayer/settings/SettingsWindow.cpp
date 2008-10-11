@@ -276,6 +276,9 @@ SettingsWindow::~SettingsWindow()
 void
 SettingsWindow::Show()
 {
+	// The Settings that we want to be able to revert to is the state at which
+	// the SettingsWindow was shown. So the current settings are stored in
+	// fLastSettings.
 	Settings::Default()->LoadSettings(fLastSettings);
 	fSettings = fLastSettings;
 	AdoptSettings();

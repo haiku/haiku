@@ -33,6 +33,7 @@
 #include <unistd.h>
 
 #include "EventQueue.h"
+#include "Settings.h"
 #include "SettingsWindow.h"
 
 
@@ -56,6 +57,8 @@ MainApp::MainApp()
 	  fMediaServerRunning(false),
 	  fMediaAddOnServerRunning(false)
 {
+	mpSettings settings = Settings::CurrentSettings();
+	fLastFilePanelFolder = settings.filePanelFolder;
 }
 
 
@@ -75,6 +78,11 @@ MainApp::QuitRequested()
 	if (fSettingsWindow && fSettingsWindow->Lock())
 		fSettingsWindow->Quit();
 	fSettingsWindow = NULL;
+
+	// store the current file panel ref in the global settings
+	mpSettings settings = Settings::CurrentSettings();
+	settings.filePanelFolder = fLastFilePanelFolder;
+	Settings::Default()->SaveSettings(settings);
 
 	return BApplication::QuitRequested();
 }
@@ -260,6 +268,18 @@ MainApp::MessageReceived(BMessage* message)
 		case M_SAVE_PANEL_RESULT:
 			_HandleSavePanelResult(message);
 			break;
+		case B_CANCEL: {
+			// The user canceled a file panel, but store at least the current
+			// file panel folder.
+			uint32 oldWhat;
+			if (message->FindInt32("old_what", (int32*)&oldWhat) != B_OK)
+				break;
+			if (oldWhat == M_OPEN_PANEL_RESULT && fOpenFilePanel != NULL)
+				fOpenFilePanel->GetPanelDirectory(&fLastFilePanelFolder);
+			else if (oldWhat == M_SAVE_PANEL_RESULT && fSaveFilePanel != NULL)
+				fSaveFilePanel->GetPanelDirectory(&fLastFilePanelFolder);
+			break;
+		}
 
 		default:
 			BApplication::MessageReceived(message);

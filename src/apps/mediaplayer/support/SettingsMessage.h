@@ -36,8 +36,9 @@ public:
 									const char* value);
 			status_t			SetValue(const char* name,
 									const BString& value);
-			status_t			SetValue(const char *name, BPoint value);
-			status_t			SetValue(const char* name, BRect value);
+			status_t			SetValue(const char *name, const BPoint& value);
+			status_t			SetValue(const char* name, const BRect& value);
+			status_t			SetValue(const char* name, const entry_ref& value);
 			status_t			SetValue(const char* name,
 									const BMessage* value);
 			status_t			SetValue(const char* name,
@@ -65,6 +66,8 @@ public:
 									BPoint defaultValue) const;
 			BRect				GetValue(const char* name,
 									BRect defaultValue) const;
+			entry_ref			GetValue(const char* name,
+									const entry_ref& defaultValue) const;
 			BMessage			GetValue(const char* name,
 									const BMessage& defaultValue) const;
 

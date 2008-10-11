@@ -9,30 +9,32 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include <Entry.h>
 #include <Locker.h>
 
 #include "Notifier.h"
 #include "SettingsMessage.h"
 
 struct mpSettings {
-	bool	autostart;
-	bool	closeWhenDonePlayingMovie;
-	bool	closeWhenDonePlayingSound;
-	bool	loopMovie;
-	bool	loopSound;
-	bool	useOverlays;
-	bool	scaleBilinear;
-	enum {
-		BG_MOVIES_FULL_VOLUME = 0,
-		BG_MOVIES_HALF_VLUME = 1,
-		BG_MOVIES_MUTED = 2
-	};
-	uint32	backgroundMovieVolumeMode;
-
-	bool operator!=(const mpSettings& other) const;
+			bool				autostart;
+			bool				closeWhenDonePlayingMovie;
+			bool				closeWhenDonePlayingSound;
+			bool				loopMovie;
+			bool				loopSound;
+			bool				useOverlays;
+			bool				scaleBilinear;
+			enum {
+				BG_MOVIES_FULL_VOLUME = 0,
+				BG_MOVIES_HALF_VLUME = 1,
+				BG_MOVIES_MUTED = 2
+			};
+			uint32				backgroundMovieVolumeMode;
+			entry_ref			filePanelFolder;
+		
+			bool				operator!=(const mpSettings& other) const;
 };
 
-#define SETTINGS_FILENAME "MediaPlayerSettings"
+#define SETTINGS_FILENAME "MediaPlayer"
 
 class Settings : public BLocker, public Notifier {
 public:

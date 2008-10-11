@@ -21,14 +21,16 @@ mpSettings::operator!=(const mpSettings& other) const
 		|| loopSound != other.loopSound
 		|| useOverlays != other.useOverlays
 		|| scaleBilinear != other.scaleBilinear
-		|| backgroundMovieVolumeMode != other.backgroundMovieVolumeMode;
+		|| backgroundMovieVolumeMode != other.backgroundMovieVolumeMode
+		|| filePanelFolder != other.filePanelFolder;
 }
 
 
 Settings::Settings(const char* filename)
 	: BLocker("settings lock"),
-	  fSettingsMessage(B_USER_CONFIG_DIRECTORY, filename)
+	  fSettingsMessage(B_USER_SETTINGS_DIRECTORY, filename)
 {
+	// The settings are loaded from disk in the SettingsMessage constructor.
 }
 
 
@@ -51,6 +53,11 @@ Settings::LoadSettings(mpSettings& settings) const
 	settings.backgroundMovieVolumeMode
 		= fSettingsMessage.GetValue("bgMovieVolumeMode",
 			(uint32)mpSettings::BG_MOVIES_FULL_VOLUME);
+
+	entry_ref defaultFilePanelFolder;
+		// an "unset" entry_ref
+	settings.filePanelFolder = fSettingsMessage.GetValue(
+		"filePanelDirectory", defaultFilePanelFolder);
 }
 
 
@@ -72,6 +79,9 @@ Settings::SaveSettings(const mpSettings& settings)
 
 	fSettingsMessage.SetValue("bgMovieVolumeMode",
 		settings.backgroundMovieVolumeMode);
+
+	fSettingsMessage.SetValue("filePanelDirectory",
+		settings.filePanelFolder);
 
 	// Save at this point, although saving is also done on destruction,
 	// this will make sure the settings are saved even when the player

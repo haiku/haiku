@@ -9,6 +9,7 @@
 
 #include "SettingsMessage.h"
 
+#include <Entry.h>
 #include <File.h>
 #include <String.h>
 
@@ -158,7 +159,7 @@ SettingsMessage::SetValue(const char* name, const BString& value)
 
 
 status_t
-SettingsMessage::SetValue(const char* name, BPoint value) 
+SettingsMessage::SetValue(const char* name, const BPoint& value) 
 {
 	if (ReplacePoint(name, value) == B_OK)
 		return B_OK;
@@ -167,11 +168,20 @@ SettingsMessage::SetValue(const char* name, BPoint value)
 
 
 status_t
-SettingsMessage::SetValue(const char* name, BRect value)
+SettingsMessage::SetValue(const char* name, const BRect& value)
 {
 	if (ReplaceRect(name, value) == B_OK)
 		return B_OK;
 	return AddRect(name, value);
+}
+
+
+status_t
+SettingsMessage::SetValue(const char* name, const entry_ref& value)
+{
+	if (ReplaceRef(name, &value) == B_OK)
+		return B_OK;
+	return AddRef(name, &value);
 }
 
 
@@ -300,6 +310,16 @@ SettingsMessage::GetValue(const char* name, BRect defaultValue) const
 {
 	BRect value;
 	if (FindRect(name, &value) != B_OK)
+		return defaultValue;
+	return value;
+}
+
+
+entry_ref
+SettingsMessage::GetValue(const char* name, const entry_ref& defaultValue) const
+{
+	entry_ref value;
+	if (FindRef(name, &value) != B_OK)
 		return defaultValue;
 	return value;
 }
