@@ -29,6 +29,7 @@
  *
  */
 
+#include <driver_settings.h>
 #include <OS.h>
 #include <MediaDefs.h>
 #include "debug.h"
@@ -45,6 +46,22 @@ typedef enum {
 	B_MIX_MUTE = 1 << 1,
 	B_MIX_NOMINAL = 1 << 2
 } mixer_type;
+
+typedef struct {
+	uint8	channels;
+	uint8	bitsPerSample;
+	uint32	sample_rate;
+	uint32	buffer_frames;
+	int32	buffer_count;
+} echo_settings;
+
+echo_settings current_settings = {
+	2,	// channels
+	16,	// bits per sample
+	48000,	// sample rate
+	512,	// buffer frames
+	2	// buffer count
+};
 
 
 static void	
@@ -490,8 +507,8 @@ echo_get_description(echo_dev *card, multi_description *data)
 	data->interface_version = B_CURRENT_INTERFACE_VERSION;
 	data->interface_minimum = B_CURRENT_INTERFACE_VERSION;
 
-	strncpy(data->friendly_name, card->caps.szName, 32);
-	strcpy(data->vendor_info, AUTHOR);
+	strncpy(data->friendly_name, card->caps.szName, sizeof(data->friendly_name));
+	strncpy(data->vendor_info, AUTHOR, sizeof(data->vendor_info));
 
 	data->output_channel_count = card->multi.output_channel_count;
 	data->input_channel_count = card->multi.input_channel_count;
@@ -534,10 +551,11 @@ echo_get_description(echo_dev *card, multi_description *data)
 	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;
 	data->start_latency = 3000;
 
-	strcpy(data->control_panel,"");
+	strcpy(data->control_panel, "");
 
 	return B_OK;
 }
+
 
 static status_t 
 echo_get_enabled_channels(echo_dev *card, multi_channel_enable *data)
@@ -556,6 +574,7 @@ echo_get_enabled_channels(echo_dev *card, multi_channel_enable *data)
 	return B_OK;
 }
 
+
 static status_t 
 echo_set_enabled_channels(echo_dev *card, multi_channel_enable *data)
 {
@@ -565,6 +584,7 @@ echo_set_enabled_channels(echo_dev *card, multi_channel_enable *data)
 	PRINT(("set_enabled_channels 3 : %s\n", B_TEST_CHANNEL(data->enable_bits, 3) ? "enabled": "disabled"));
 	return B_OK;
 }
+
 
 static status_t 
 echo_get_global_format(echo_dev *card, multi_format_info *data)
@@ -588,6 +608,7 @@ echo_get_global_format(echo_dev *card, multi_format_info *data)
 	return B_OK;
 }
 
+
 static status_t 
 echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 {
@@ -610,7 +631,6 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 	ASSERT(current_settings.buffer_count == 2);
 	
 	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD; // XXX ???
-//	data->flags = 0;
 		
 	data->return_playback_buffers = current_settings.buffer_count;	/* playback_buffers[b][] */
 	data->return_playback_channels = 0;	/* playback_buffers[][c] */
@@ -677,6 +697,7 @@ echo_play_inth(void* inthparams)
 		release_sem_etc(stream->card->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
+
 void
 echo_record_inth(void* inthparams)
 {
@@ -697,6 +718,7 @@ echo_record_inth(void* inthparams)
 	//if (count <= 0)
 		release_sem_etc(stream->card->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 }
+
 
 static status_t 
 echo_buffer_exchange(echo_dev *card, multi_buffer_info *data)
@@ -929,6 +951,52 @@ echo_open(const char *name, uint32 flags, void** cookie)
 #ifdef CARDBUS
 	card->opened = true;
 #endif
+
+	void *settings_handle;
+	// get driver settings
+	settings_handle = load_driver_settings ("echo.settings");
+	if (settings_handle != NULL) {
+		const char* item;
+		char* end;
+		uint32 value;
+
+		item = get_driver_parameter (settings_handle, "channels", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.channels = value;
+		}
+		PRINT(("channels %u\n", current_settings.channels));
+		
+		item = get_driver_parameter (settings_handle, "bitsPerSample", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.bitsPerSample = value;
+		}
+		PRINT(("bitsPerSample %u\n", current_settings.bitsPerSample));
+		
+		item = get_driver_parameter (settings_handle, "sample_rate", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.sample_rate = value;
+		}
+		PRINT(("sample_rate %lu\n", current_settings.sample_rate));
+		
+		item = get_driver_parameter (settings_handle, "buffer_frames", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.buffer_frames = value;
+		}
+		PRINT(("buffer_frames %lu\n", current_settings.buffer_frames));
+
+		item = get_driver_parameter (settings_handle, "buffer_count", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.buffer_count = value;
+		}
+		PRINT(("buffer_count %lu\n", current_settings.buffer_count));
+		
+		unload_driver_settings (settings_handle);
+	}
 		
 	LOG(("creating play streams\n"));
 

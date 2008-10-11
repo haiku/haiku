@@ -24,7 +24,6 @@
 
 #include <KernelExport.h>
 #include <Drivers.h>
-#include <driver_settings.h>
 #include <unistd.h>
 #include "OsSupportBeOS.h"
 #include "EchoGalsXface.h"
@@ -73,14 +72,6 @@ echo_dev cards[NUM_CARDS];
 int32 num_names;
 char * names[NUM_CARDS*20+1];
 #endif // CARDBUS
-
-echo_settings current_settings = {
-	2,	// channels
-	16,	// bits per sample
-	48000,	// sample rate
-	512,	// buffer frames
-	2	// buffer count
-};
 
 extern device_hooks multi_hooks;
 #ifdef MIDI_SUPPORT
@@ -534,52 +525,6 @@ status_t
 init_driver(void)
 {
 	PRINT(("init_driver()\n"));
-
-	void *settings_handle;
-	// get driver settings
-	settings_handle = load_driver_settings ("echo.settings");
-	if (settings_handle != NULL) {
-		const char* item;
-		char* end;
-		uint32 value;
-
-		item = get_driver_parameter (settings_handle, "channels", NULL, NULL);
-		if (item) {
-			value = strtoul (item, &end, 0);
-			if (*end == '\0') current_settings.channels = value;
-		}
-		PRINT(("channels %lu\n", current_settings.channels));
-		
-		item = get_driver_parameter (settings_handle, "bitsPerSample", NULL, NULL);
-		if (item) {
-			value = strtoul (item, &end, 0);
-			if (*end == '\0') current_settings.bitsPerSample = value;
-		}
-		PRINT(("bitsPerSample %lu\n", current_settings.bitsPerSample));
-		
-		item = get_driver_parameter (settings_handle, "sample_rate", NULL, NULL);
-		if (item) {
-			value = strtoul (item, &end, 0);
-			if (*end == '\0') current_settings.sample_rate = value;
-		}
-		PRINT(("sample_rate %lu\n", current_settings.sample_rate));
-		
-		item = get_driver_parameter (settings_handle, "buffer_frames", NULL, NULL);
-		if (item) {
-			value = strtoul (item, &end, 0);
-			if (*end == '\0') current_settings.buffer_frames = value;
-		}
-		PRINT(("buffer_frames %lu\n", current_settings.buffer_frames));
-
-		item = get_driver_parameter (settings_handle, "buffer_count", NULL, NULL);
-		if (item) {
-			value = strtoul (item, &end, 0);
-			if (*end == '\0') current_settings.buffer_count = value;
-		}
-		PRINT(("buffer_count %lu\n", current_settings.buffer_count));
-		
-		unload_driver_settings (settings_handle);
-	}
 
 #ifdef CARDBUS
 	// Get card services client module
