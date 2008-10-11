@@ -258,6 +258,16 @@ create_interface(net_domain *domain, const char *name, const char *baseName,
 	interface->metric = 0;
 	interface->device_interface = grab_device_interface(deviceInterface);
 
+	// setup direct route for bound devices
+	interface->direct_route.destination = NULL;
+	interface->direct_route.mask = NULL;
+	interface->direct_route.gateway = NULL;
+	interface->direct_route.flags = 0;
+	interface->direct_route.mtu = 0;
+	interface->direct_route.interface = interface;
+	interface->direct_route.ref_count = 1;
+		// make sure this doesn't get deleted accidently
+
 	status_t status = get_domain_datalink_protocols(interface);
 	if (status < B_OK) {
 		delete interface;

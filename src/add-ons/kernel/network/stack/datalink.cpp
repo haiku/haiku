@@ -208,19 +208,19 @@ datalink_control_interface(net_domain_private *domain, int32 option,
 	status_t status = (interface == NULL) ? ENODEV : B_OK;
 
 	switch (option) {
-	case SIOCGIFINDEX:
-		if (interface)
-			request.ifr_index = interface->index;
-		else
-			request.ifr_index = 0;
-		break;
+		case SIOCGIFINDEX:
+			if (interface)
+				request.ifr_index = interface->index;
+			else
+				request.ifr_index = 0;
+			break;
 
-	case SIOCGIFNAME:
-		if (interface)
-			strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
-		else
-			status = B_BAD_VALUE; // TODO should be ENXIO?
-		break;
+		case SIOCGIFNAME:
+			if (interface)
+				strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
+			else
+				status = B_BAD_VALUE; // TODO: should be ENXIO?
+			break;
 	}
 
 	if (status < B_OK)
@@ -386,7 +386,12 @@ datalink_send_datagram(net_protocol *protocol, net_domain *domain,
 		domain = protocol->module->get_domain(protocol);
 
 	net_route *route = NULL;
-	status_t status = get_buffer_route(domain, buffer, &route);
+	status_t status;
+	if (protocol->socket->bound_to_device > 0) {
+		status = get_device_route(domain, protocol->socket->bound_to_device,
+			&route);
+	} else
+		status = get_buffer_route(domain, buffer, &route);
 	if (status < B_OK)
 		return status;
 

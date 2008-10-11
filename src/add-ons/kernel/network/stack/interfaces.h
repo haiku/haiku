@@ -50,6 +50,7 @@ typedef DoublyLinkedList<net_device_interface> DeviceInterfaceList;
 struct net_interface_private : net_interface {
 	char				base_name[IF_NAMESIZE];
 	net_device_interface *device_interface;
+	net_route_private	direct_route;
 };
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,8 +42,10 @@ status_t get_route_information(struct net_domain *domain, void *buffer,
 void invalidate_routes(net_domain *, net_interface *);
 struct net_route *get_route(struct net_domain *domain,
 				const struct sockaddr *address);
+status_t get_device_route(struct net_domain *domain, uint32 index,
+				struct net_route **_route);
 status_t get_buffer_route(struct net_domain *domain,
-	struct net_buffer *buffer, struct net_route **_route);
+				struct net_buffer *buffer, struct net_route **_route);
 void put_route(struct net_domain *domain, struct net_route *route);
 
 status_t register_route_info(struct net_domain *domain,

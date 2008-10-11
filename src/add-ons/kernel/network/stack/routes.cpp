@@ -8,6 +8,7 @@
 
 
 #include "domains.h"
+#include "interfaces.h"
 #include "routes.h"
 #include "stack_private.h"
 #include "utility.h"
@@ -604,6 +605,32 @@ get_route(struct net_domain *_domain, const struct sockaddr *address)
 	MutexLocker locker(domain->lock);
 
 	return get_route_internal(domain, address);
+}
+
+
+status_t
+get_device_route(struct net_domain *_domain, uint32 index, net_route **_route)
+{
+	net_domain_private *domain = (net_domain_private *)_domain;
+
+	MutexLocker _(domain->lock);
+
+	net_interface_private *interface = NULL;
+
+	while (true) {
+		interface = (net_interface_private *)list_get_next_item(
+			&domain->interfaces, interface);
+		if (interface == NULL)
+			break;
+
+		if (interface->device->index == index) {
+			atomic_add(&interface->direct_route.ref_count, 1);
+			*_route = &interface->direct_route;
+			return B_OK;
+		}
+	}
+
+	return ENETUNREACH;
 }
 
 

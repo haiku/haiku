@@ -183,7 +183,7 @@ process_ancillary_data(net_socket *socket, ancillary_data_container* container,
 			return bytesWritten;
 
 		dataBuffer += bytesWritten;
-		dataBufferLen -= bytesWritten;		
+		dataBufferLen -= bytesWritten;
 	}
 
 	messageHeader->msg_controllen -= dataBufferLen;
@@ -235,7 +235,7 @@ socket_open(int family, int type, int protocol, net_socket **_socket)
 	status_t status = create_socket(family, type, protocol, &socket);
 	if (status < B_OK)
 		return status;
-	
+
 	status = socket->first_info->open(socket->first_protocol);
 	if (status < B_OK) {
 		socket_delete(socket);
@@ -570,7 +570,7 @@ socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 	mutex_lock(&socket->lock);
 
 	// first remove the pending connections, then the already connected
-	// ones as needed	
+	// ones as needed
 	net_socket_private *child;
 	while (socket->child_count > backlog
 		&& (child = (net_socket_private *)list_remove_tail_item(
@@ -764,7 +764,7 @@ socket_bind(net_socket *socket, const struct sockaddr *address,
 
 	memcpy(&socket->address, address, sizeof(sockaddr));
 
-	status_t status = socket->first_info->bind(socket->first_protocol, 
+	status_t status = socket->first_info->bind(socket->first_protocol,
 		(sockaddr *)address);
 	if (status < B_OK) {
 		// clear address again, as binding failed
@@ -1326,6 +1326,21 @@ socket_set_option(net_socket *socket, int level, int option, const void *value,
 				socket->options &= ~option;
 			return B_OK;
 
+		case SO_BINDTODEVICE:
+		{
+			if (length != sizeof(int32))
+				return B_BAD_VALUE;
+
+			int index = *(const int32 *)value;
+			if (index < 0)
+				return B_BAD_VALUE;
+
+			// TODO: we might want to check if the device exists at all
+			// (although it doesn't really harm when we don't)
+			socket->bound_to_device = index;
+			return B_OK;
+		}
+
 		default:
 			break;
 	}
@@ -1373,7 +1388,7 @@ socket_socketpair(int family, int type, int protocol, net_socket* sockets[2])
 	if (error == B_OK)
 		error = socket_listen(sockets[0], 1);
 
-	// connect them	
+	// connect them
 	if (error == B_OK) {
 		error = socket_connect(sockets[1], (sockaddr*)&sockets[0]->address,
 			sockets[0]->address.ss_len);
