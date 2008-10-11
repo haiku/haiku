@@ -387,7 +387,7 @@ datalink_send_datagram(net_protocol *protocol, net_domain *domain,
 
 	net_route *route = NULL;
 	status_t status;
-	if (protocol->socket->bound_to_device > 0) {
+	if (protocol != NULL && protocol->socket->bound_to_device > 0) {
 		status = get_device_route(domain, protocol->socket->bound_to_device,
 			&route);
 	} else
@@ -408,7 +408,7 @@ datalink_send_datagram(net_protocol *protocol, net_domain *domain,
 	\param _matchedType will be set to either zero or MSG_BCAST if non-NULL.
 */
 bool
-datalink_is_local_address(net_domain *_domain, const struct sockaddr *address, 
+datalink_is_local_address(net_domain *_domain, const struct sockaddr *address,
 	net_interface **_interface, uint32 *_matchedType)
 {
 	net_domain_private *domain = (net_domain_private *)_domain;
@@ -437,7 +437,7 @@ datalink_is_local_address(net_domain *_domain, const struct sockaddr *address,
 
 		// check for matching broadcast address if interface support broadcasting
 		if (interface->flags & IFF_BROADCAST
-			&& domain->address_module->equal_addresses(interface->destination, 
+			&& domain->address_module->equal_addresses(interface->destination,
 				address)) {
 			matchedType = MSG_BCAST;
 			break;
