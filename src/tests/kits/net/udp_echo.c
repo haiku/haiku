@@ -39,7 +39,7 @@ udp_echo_client(int sockFD, const struct sockaddr_in* serverAddr)
 		if (len > 0)
 			len--;
 printf("trying to send %u bytes...\n", len);
-		status = sendto(sockFD, buf, len, 0, 
+		status = sendto(sockFD, buf, len, 0,
 			(struct sockaddr*)serverAddr, sizeof(struct sockaddr_in));
 		if (status < 0) {
 			printf("sendto(): %x (%s)\n", errno, strerror(errno));
@@ -70,7 +70,7 @@ udp_broadcast(int sockFD, const struct sockaddr_in* serverAddr)
 
 	setsockopt(sockFD, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
 
-	status = sendto(sockFD, buf, len, 0, 
+	status = sendto(sockFD, buf, len, 0,
 		(struct sockaddr*)serverAddr, sizeof(struct sockaddr_in));
 	if (status < 0) {
 		printf("sendto(): %s\n", strerror(errno));
@@ -112,7 +112,7 @@ udp_echo_server(int sockFD)
 				buf[i] = tolower(buf[i]);
 		}
 		printf("sending <%s>\n", buf);
-		status = sendto(sockFD, buf, status, 0, 
+		status = sendto(sockFD, buf, status, 0,
 			(struct sockaddr*)&clientAddr, sizeof(clientAddr));
 		if (status < 0) {
 			printf("sendto(): %x (%s)\n", errno, strerror(errno));
@@ -134,6 +134,7 @@ main(int argc, char** argv)
 		SERVER_MODE,
 	} mode;
 	unsigned short bindPort = 0;
+	const char* bindAddr = NULL;
 
 	if (argc < 2) {
 		printf("usage: %s client <IP-address> <port> [local-port]\n", __progname);
@@ -154,22 +155,28 @@ main(int argc, char** argv)
 		serverAddr.sin_addr.s_addr = inet_addr(argv[2]);
 		if (argc > 4)
 			bindPort = atoi(argv[4]);
-		printf("client connected to server(%lx:%u)\n", serverAddr.sin_addr.s_addr, 
+		printf("client connected to server(%lx:%u)\n", serverAddr.sin_addr.s_addr,
 			ntohs(serverAddr.sin_port));
 	} else if (!strcmp(argv[1], "broadcast")) {
 		mode = BROADCAST_MODE;
 		if (argc < 3) {
-			printf("usage: %s broadcast <port> [local-port]\n", __progname);
+			printf("usage: %s broadcast <port> [local-addr] [broadcast-addr] [local-port]\n", __progname);
 			exit(5);
 		}
+
+		if (argc > 3)
+			bindAddr = argv[3];
 
 		memset(&serverAddr, 0, sizeof(struct sockaddr_in));
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_port = htons(atoi(argv[2]));
-		serverAddr.sin_addr.s_addr = INADDR_BROADCAST;
+		if (argc > 4)
+			serverAddr.sin_addr.s_addr = inet_addr(argv[4]);
+		else
+			serverAddr.sin_addr.s_addr = INADDR_BROADCAST;
 
-		if (argc > 3)
-			bindPort = atoi(argv[3]);
+		if (argc > 5)
+			bindPort = atoi(argv[5]);
 	} else if (!strcmp(argv[1], "server")) {
 		mode = SERVER_MODE;
 		if (argc < 3) {
@@ -181,11 +188,17 @@ main(int argc, char** argv)
 
 	sockFD = socket(AF_INET, SOCK_DGRAM, 0);
 
-	if (bindPort > 0) {
+	if (bindAddr != NULL || bindPort > 0) {
 		memset(&localAddr, 0, sizeof(struct sockaddr_in));
 		localAddr.sin_family = AF_INET;
-		localAddr.sin_port = htons(bindPort);
-		printf("binding to port %u\n", bindPort);
+		if (bindAddr != NULL) {
+			localAddr.sin_addr.s_addr = inet_addr(bindAddr);
+			printf("binding to addr %s\n", bindAddr);
+		}
+		if (bindPort > 0) {
+			localAddr.sin_port = htons(bindPort);
+			printf("binding to port %u\n", bindPort);
+		}
 		status = bind(sockFD, (struct sockaddr *)&localAddr, sizeof(localAddr));
 		if (status < 0) {
 			printf("bind(): %x (%s)\n", errno, strerror(errno));
