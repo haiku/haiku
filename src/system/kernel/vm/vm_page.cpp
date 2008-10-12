@@ -1880,7 +1880,7 @@ vm_page_allocate_page(int pageState, bool reserved)
 		if (reserved || sReservedPages < free_page_queue_count()) {
 			page = dequeue_page(queue);
 			if (page == NULL) {
-#ifdef DEBUG
+#ifdef DEBUG_PAGE_QUEUE
 				if (queue->count != 0)
 					panic("queue %p corrupted, count = %d\n", queue, queue->count);
 #endif
