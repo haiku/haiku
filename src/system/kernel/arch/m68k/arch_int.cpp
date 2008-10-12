@@ -334,6 +334,7 @@ arch_int_init(kernel_args *args)
 	vbr = args->arch_args.phys_vbr;
 	/* point VBR to the new table */
 	asm volatile  ("movec %0,%%vbr" : : "r"(vbr):);
+	
 	return B_OK;
 }
 
@@ -341,7 +342,9 @@ arch_int_init(kernel_args *args)
 status_t
 arch_int_init_post_vm(kernel_args *args)
 {
-	return B_OK;
+	status_t err;
+	err = M68KPlatform::Default()->InitPIC(args);
+	return err;
 }
 
 
@@ -502,9 +505,6 @@ probe_pic_device(device_node_handle node, PICModuleList &picModules)
 status_t
 arch_int_init_post_device_manager(struct kernel_args *args)
 {
-	status_t err;
-	err = M68KPlatform::Default()->InitPIC(args);
-	return err;
 #if 0 /* PIC modules */
 	// get the interrupt controller driver modules
 	PICModuleList picModules;

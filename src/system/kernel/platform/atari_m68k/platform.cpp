@@ -23,6 +23,11 @@
 
 #define MFP0_VECTOR_BASE	64
 #define MFP1_VECTOR_BASE	(MFP0_VECTOR_BASE+16)
+
+#define RTC_BASE	0xFFFF8960
+
+#define RTC_VECTOR	(MFP1_VECTOR_BASE+14)
+
 // ?
 #define SCC_C0_VECTOR_BASE	(MFP1_VECTOR_BASE+16)
 // ??
@@ -89,6 +94,19 @@ public:
 		int fVector;
 	};
 
+	class RTC {
+	public:
+		RTC(uint32 base, int vector);
+		~RTC();
+
+		uint32 Base() const { return fBase; };
+		int Vector() const { return fVector; };
+
+	private:
+		uint32 fBase;
+		int fVector;
+	};
+
 	M68KAtari();
 	virtual ~M68KAtari();
 
@@ -121,9 +139,9 @@ private:
 	MFP	*MFPForIrq(int irq);
 	static int32	MFPTimerInterrupt(void *data);
 
-	int	fRTC;
-
 	MFP	*fMFP[2];
+
+	RTC	*fRTC;
 
 	// native features (ARAnyM emulator)
 	uint32 (*nfGetID)(const char *name);
@@ -203,13 +221,30 @@ M68KAtari::MFP::AcknowledgeIOInterrupt(int irq)
 }
 
 
+// #pragma mark - M68KAtari::RTc
+
+
+static char sRTCBuffer[sizeof(M68KAtari::RTC)];
+
+// constructor
+M68KAtari::RTC::RTC(uint32 base, int vector)
+{
+	fBase = base;
+	fVector = vector;
+}
+
+
+M68KAtari::RTC::~RTC()
+{
+}
+
+
 // #pragma mark - M68KAtari
 
 
 // constructor
 M68KAtari::M68KAtari()
-	: M68KPlatform(B_ATARI_PLATFORM, M68K_PLATFORM_ATARI),
-	  fRTC(-1)
+	: M68KPlatform(B_ATARI_PLATFORM, M68K_PLATFORM_ATARI)
 {
 }
 
@@ -269,7 +304,6 @@ M68KAtari::InitPostVM(struct kernel_args *kernelArgs)
 status_t
 M68KAtari::InitPIC(struct kernel_args *kernelArgs)
 {
-	panic("WRITEME");
 	fMFP[0] = new(sMFP0Buffer) M68KAtari::MFP(MFP0_BASE, MFP0_VECTOR_BASE);
 	//if (kernelArgs->arch_args.machine == /*TT*/) {
 		fMFP[1] = new(sMFP1Buffer) M68KAtari::MFP(MFP1_BASE, MFP1_VECTOR_BASE);
@@ -282,8 +316,8 @@ status_t
 M68KAtari::InitRTC(struct kernel_args *kernelArgs,
 	struct real_time_data *data)
 {
-	panic("WRITEME");
-	return B_NO_INIT;
+	fRTC = new(sRTCBuffer) M68KAtari::RTC(RTC_BASE, RTC_VECTOR);
+#warning M68K: FIXME
 	return B_OK;
 }
 
@@ -496,12 +530,14 @@ M68KAtari::AcknowledgeIOInterrupt(int irq)
 void
 M68KAtari::SetHardwareRTC(uint32 seconds)
 {
+#warning M68K: WRITEME
 }
 
 
 uint32
 M68KAtari::GetHardwareRTC()
 {
+#warning M68K: WRITEME
 	return 0;
 }
 
