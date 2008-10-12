@@ -435,8 +435,10 @@ datalink_is_local_address(net_domain *_domain, const struct sockaddr *address,
 		if (domain->address_module->equal_addresses(interface->address, address))
 			break;
 
-		// check for matching broadcast address if interface support broadcasting
-		if (interface->flags & IFF_BROADCAST
+		// check for matching broadcast address if interface supports
+		// broadcasting (IFF_BROADCAST is a link-level flag, so it is
+		// a property of the device)
+		if ((interface->device->flags & IFF_BROADCAST)
 			&& domain->address_module->equal_addresses(interface->destination,
 				address)) {
 			matchedType = MSG_BCAST;
