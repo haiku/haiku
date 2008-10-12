@@ -108,6 +108,7 @@ null_sav_1:
 	sub.l		#IFRAME_fpu-IFRAME_fp,%sp
 null_sav_2:	
 
+	move.l		%sp,%fp			/* have stack_trace() find the iframe */
 	move.l		%sp,-(%sp)		/* push address of iframe */
 	bsr		m68k_exception_entry	/* call C entry */
 	add.l		#4,%sp

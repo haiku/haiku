@@ -194,7 +194,7 @@ return 0;
 		// see if the frame pointer matches the iframe
 		struct iframe *frame = NULL;
 		for (i = 0; i < frameStack->index; i++) {
-			if (framePointer == (((addr_t)frameStack->frames[i] - 8) & ~0xf)) {
+			if (framePointer == (addr_t)frameStack->frames[i]) {
 				// it's an iframe
 				frame = frameStack->frames[i];
 				break;
@@ -324,7 +324,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		// see if the frame pointer matches the iframe
 		struct iframe *frame = NULL;
 		for (i = 0; i < frameStack->index; i++) {
-			if (framePointer == (((addr_t)frameStack->frames[i] - 8) & ~0xf)) {
+			if (framePointer == (addr_t)frameStack->frames[i]) {
 				// it's an iframe
 				frame = frameStack->frames[i];
 				break;
