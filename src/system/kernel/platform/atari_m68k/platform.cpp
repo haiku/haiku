@@ -1,5 +1,5 @@
 /*
-	Just a dummy. No BIOS services are required in the kernel.
+	Atari kernel platform code.
 */
 
 #include <arch_platform.h>
@@ -288,8 +288,10 @@ M68KAtari::InitRTC(struct kernel_args *kernelArgs,
 status_t
 M68KAtari::InitTimer(struct kernel_args *kernelArgs)
 {
-	panic("WRITEME");
-	return B_NO_INIT;
+	
+	out8(fMFP[0]->Base() + MFP_TACR, 0); // stop it
+	install_io_interrupt_handler(fMFP[0]->Vector()+13, &pit_timer_interrupt, NULL, 0);
+	return B_OK;
 }
 
 
@@ -504,12 +506,17 @@ M68KAtari::GetHardwareRTC()
 void
 M68KAtari::SetHardwareTimer(bigtime_t timeout)
 {
+	uint8 counts = (uint8)(timeout & 0x0ff);
+	//XXX: SCALE
+	out8(fMFP[0]->Base() + MFP_TADR, counts);
+	out8(fMFP[0]->Base() + MFP_TACR, 0x01); // delay mode, device by 4
 }
 
 
 void
 M68KAtari::ClearHardwareTimer(void)
 {
+	out8(fMFP[0]->Base() + MFP_TACR, 0); // stop it
 }
 
 
