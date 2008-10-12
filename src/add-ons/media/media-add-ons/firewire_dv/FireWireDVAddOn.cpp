@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+
 #include <Alert.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -24,19 +25,28 @@
 
 struct device_info
 {
-	FireWireCard *		card;
-	char			name[16];
+	FireWireCard*	card;
+	char		name[16];
 	media_format 	in_formats[1];
 	media_format 	out_formats[1];
 	flavor_info 	flavor;
 };
 
-extern "C" BMediaAddOn *
+extern "C" BMediaAddOn*
 make_media_addon(image_id id)
 {
 	CALLED();
 	return new FireWireDVAddOn(id);
 }
+
+
+FireWireDVAddOn::FireWireDVAddOn(image_id id)
+	: BMediaAddOn(id)
+{
+	CALLED();
+	ScanFolder("/dev/bus/fw");
+}
+
 
 FireWireDVAddOn::~FireWireDVAddOn()
 {
@@ -44,15 +54,9 @@ FireWireDVAddOn::~FireWireDVAddOn()
 	FreeDeviceList();
 }
 
-FireWireDVAddOn::FireWireDVAddOn(image_id id)
- :	BMediaAddOn(id)
-{
-	CALLED();
-	ScanFolder("/dev/bus/fw");
-}
 
 status_t
-FireWireDVAddOn::InitCheck(const char **out_failure_text)
+FireWireDVAddOn::InitCheck(const char** out_failure_text)
 {
 	CALLED();
 	if (!fDeviceList.CountItems()) {
@@ -62,6 +66,7 @@ FireWireDVAddOn::InitCheck(const char **out_failure_text)
 	return B_OK;
 }
 
+
 int32
 FireWireDVAddOn::CountFlavors()
 {
@@ -69,30 +74,35 @@ FireWireDVAddOn::CountFlavors()
 	return fDeviceList.CountItems();
 }
 
+
 status_t
-FireWireDVAddOn::GetFlavorAt(int32 n, const flavor_info **out_info)
+FireWireDVAddOn::GetFlavorAt(int32 n, const flavor_info** out_info)
 {
 	CALLED();
-	device_info *dev = (device_info *)fDeviceList.ItemAt(n);
+	device_info* dev = fDeviceList.ItemAt(n);
 	if (!dev)
 		return B_ERROR;
 	*out_info = &dev->flavor;
 	return B_OK;
 }
 
+
 BMediaNode *
-FireWireDVAddOn::InstantiateNodeFor(const flavor_info *info, BMessage *config,	status_t *out_error)
+FireWireDVAddOn::InstantiateNodeFor(const flavor_info* info, BMessage* config,
+	status_t* out_error)
 {
 	CALLED();
-	device_info *dev = (device_info *)fDeviceList.ItemAt(info->internal_id);
+	device_info* dev = fDeviceList.ItemAt(info->internal_id);
 	if (!dev || dev->flavor.internal_id != info->internal_id) {
 		*out_error = B_ERROR;
 		return NULL;
 	}
 	*out_error = B_OK;
 	
-	return new FireWireDVNode(this, dev->name, dev->flavor.internal_id, dev->card);
+	return new FireWireDVNode(this, dev->name, dev->flavor.internal_id, 
+		dev->card);
 }
+
 
 bool
 FireWireDVAddOn::WantsAutoStart()
@@ -101,15 +111,18 @@ FireWireDVAddOn::WantsAutoStart()
 	return false;
 }
 
+
 status_t
-FireWireDVAddOn::AutoStart(int index, BMediaNode **outNode, int32 *outInternalID, bool *outHasMore)
+FireWireDVAddOn::AutoStart(int index, BMediaNode** outNode, 
+	int32* outInternalID, bool* outHasMore)
 {
 	CALLED();
 	return B_ERROR;
 }
 
+
 void
-FireWireDVAddOn::ScanFolder(const char *path)
+FireWireDVAddOn::ScanFolder(const char* path)
 {
 	CALLED();
 	BDirectory dir(path);
@@ -130,10 +143,11 @@ FireWireDVAddOn::ScanFolder(const char *path)
 	}
 }
 
+
 void
-FireWireDVAddOn::AddDevice(FireWireCard *card, const char *path)
+FireWireDVAddOn::AddDevice(FireWireCard* card, const char* path)
 {
-	const char *fwnumber;
+	const char* fwnumber;
 	
 	// get card name, info and type
 		
@@ -175,9 +189,10 @@ FireWireDVAddOn::AddDevice(FireWireCard *card, const char *path)
 void
 FireWireDVAddOn::FreeDeviceList()
 {
-	device_info *dev;
-	while ((dev = (device_info *)fDeviceList.RemoveItem((int32)0))) {
+	device_info* dev;
+	while ((dev = fDeviceList.RemoveItemAt(0L))) {
 		delete dev->card;
 		delete dev;
 	}
 }
+

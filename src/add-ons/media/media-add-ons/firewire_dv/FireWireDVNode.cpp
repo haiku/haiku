@@ -8,6 +8,8 @@
  * Copyright (c) 2004-2007 Marcus Overhagen <marcus@overhagen.de>
  */
 
+#include "FireWireDVNode.h"
+
 #include <fcntl.h>
 #include <malloc.h>
 #include <math.h>
@@ -17,18 +19,17 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
-#include <MediaRoster.h>
+#include <Autolock.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
-#include <ParameterWeb.h>
-#include <TimeSource.h>
-#include <String.h>
-#include <Autolock.h>
 #include <Debug.h>
-
 #include <Directory.h>
 #include <Entry.h>
+#include <MediaRoster.h>
+#include <ParameterWeb.h>
 #include <Path.h>
+#include <TimeSource.h>
+#include <String.h>
 
 #include "FireWireDVNode.h"
 #include "FireWireCard.h"
@@ -42,7 +43,7 @@
 #ifdef TRACE
 #	undef TRACE
 #endif
-#define TRACE_FIREWIRE_NODE
+//#define TRACE_FIREWIRE_NODE
 #ifdef TRACE_FIREWIRE_NODE
 #	define TRACE(x...)		printf(x)
 #else
@@ -53,20 +54,19 @@
 
 #define M_REFRESH_PARAMETER_WEB 		(BTimedEventQueue::B_USER_EVENT + 1)
 
-FireWireDVNode::FireWireDVNode(
-	BMediaAddOn *addon, const char *name,
-	int32 internal_id, FireWireCard *card)
- :	BMediaNode(name)
- ,	BBufferProducer(B_MEDIA_ENCODED_VIDEO)
- ,	BControllable()
- ,	BMediaEventLooper()
- ,	fOutputEnabledEncVideo(false)
- ,	fCard(card)
- ,	fCaptureThreadsActive(false)
- ,	fThreadIdCardReader(-1)
- ,	fTerminateThreads(false)
- ,	fBufferGroupEncVideo(0)
- ,	fCaptureActive(false)
+FireWireDVNode::FireWireDVNode(BMediaAddOn* addon, const char* name, 
+	int32 internal_id, FireWireCard* card)
+	: BMediaNode(name),
+	BBufferProducer(B_MEDIA_ENCODED_VIDEO),	
+	BControllable(),
+	BMediaEventLooper(),
+	fOutputEnabledEncVideo(false),
+	fCard(card),
+	fCaptureThreadsActive(false),
+	fThreadIdCardReader(-1),
+	fTerminateThreads(false),
+	fBufferGroupEncVideo(0),
+	fCaptureActive(false)
 {
 	CALLED();
 
@@ -92,10 +92,8 @@ FireWireDVNode::~FireWireDVNode()
 
 
 /* BMediaNode */
-
-
-BMediaAddOn *
-FireWireDVNode::AddOn(int32 *internal_id) const
+BMediaAddOn*
+FireWireDVNode::AddOn(int32* internal_id) const
 {
 	if (internal_id)
 		*internal_id = fInternalID;
@@ -104,7 +102,7 @@ FireWireDVNode::AddOn(int32 *internal_id) const
 
 
 status_t 
-FireWireDVNode::HandleMessage(int32 message, const void *data, size_t size)
+FireWireDVNode::HandleMessage(int32 message, const void* data, size_t size)
 {
 	return B_ERROR;
 }
@@ -119,7 +117,7 @@ FireWireDVNode::Preroll()
 
 
 void
-FireWireDVNode::SetTimeSource(BTimeSource *time_source)
+FireWireDVNode::SetTimeSource(BTimeSource* time_source)
 {
 	CALLED();
 }
@@ -134,8 +132,6 @@ FireWireDVNode::SetRunMode(run_mode mode)
 
 
 /* BMediaEventLooper */
-
-
 void 
 FireWireDVNode::NodeRegistered()
 {
@@ -156,8 +152,8 @@ FireWireDVNode::NodeRegistered()
 
 
 void 
-FireWireDVNode::HandleEvent(const media_timed_event *event,
-		bigtime_t lateness, bool realTimeEvent)
+FireWireDVNode::HandleEvent(const media_timed_event* event,
+	bigtime_t lateness, bool realTimeEvent)
 {
 
 	switch(event->type)
@@ -188,12 +184,10 @@ FireWireDVNode::HandleEvent(const media_timed_event *event,
 
 
 /* BBufferProducer */
-
-
 status_t 
-FireWireDVNode::FormatChangeRequested(const media_source &source,
-		const media_destination &destination, media_format *io_format,
-		int32 *_deprecated_)
+FireWireDVNode::FormatChangeRequested(const media_source& source,
+	const media_destination& destination, media_format* io_format,
+	int32* _deprecated_)
 {
 	CALLED();
 
@@ -203,7 +197,7 @@ FireWireDVNode::FormatChangeRequested(const media_source &source,
 
 
 status_t 
-FireWireDVNode::GetNextOutput(int32 *cookie, media_output *out_output)
+FireWireDVNode::GetNextOutput(int32* cookie, media_output* out_output)
 {
 	CALLED();
 	
@@ -227,7 +221,7 @@ FireWireDVNode::DisposeOutputCookie(int32 cookie)
 
 
 status_t 
-FireWireDVNode::SetBufferGroup(const media_source &source, BBufferGroup *group)
+FireWireDVNode::SetBufferGroup(const media_source& source, BBufferGroup* group)
 {
 	CALLED();
 	return B_ERROR;
@@ -235,9 +229,9 @@ FireWireDVNode::SetBufferGroup(const media_source &source, BBufferGroup *group)
 
 
 status_t 
-FireWireDVNode::VideoClippingChanged(const media_source &for_source,
-		int16 num_shorts, int16 *clip_data,
-		const media_video_display_info &display, int32 *_deprecated_)
+FireWireDVNode::VideoClippingChanged(const media_source& for_source,
+	int16 num_shorts, int16* clip_data,
+	const media_video_display_info& display, int32* _deprecated_)
 {
 	CALLED();
 	return B_ERROR;
@@ -245,7 +239,7 @@ FireWireDVNode::VideoClippingChanged(const media_source &for_source,
 
 
 status_t 
-FireWireDVNode::GetLatency(bigtime_t *out_latency)
+FireWireDVNode::GetLatency(bigtime_t* out_latency)
 {
 	CALLED();
 	
@@ -256,7 +250,7 @@ FireWireDVNode::GetLatency(bigtime_t *out_latency)
 
 status_t 
 FireWireDVNode::FormatSuggestionRequested(
-		media_type type, int32 quality, media_format *format)
+	media_type type, int32 quality, media_format* format)
 {
 	CALLED();
 
@@ -280,7 +274,8 @@ FireWireDVNode::FormatSuggestionRequested(
 
 
 status_t 
-FireWireDVNode::FormatProposal(const media_source &source, media_format *format)
+FireWireDVNode::FormatProposal(const media_source& source, 
+	media_format* format)
 {
 	CALLED();	
 	/* The connection process:
@@ -320,9 +315,9 @@ FireWireDVNode::FormatProposal(const media_source &source, media_format *format)
 
 
 status_t 
-FireWireDVNode::PrepareToConnect(const media_source &source,
-		const media_destination &destination, media_format *format,
-		media_source *out_source, char *out_name)
+FireWireDVNode::PrepareToConnect(const media_source& source,
+	const media_destination& destination, media_format* format,
+	media_source* out_source, char* out_name)
 {
 	/* The connection process:
 	 *                BBufferProducer::FormatProposal
@@ -372,9 +367,9 @@ FireWireDVNode::PrepareToConnect(const media_source &source,
 
 
 void 
-FireWireDVNode::Connect(status_t error, const media_source &source,
-		const media_destination &destination, const media_format &format,
-		char *io_name)
+FireWireDVNode::Connect(status_t error, const media_source& source,
+	const media_destination& destination, const media_format& format,
+	char* io_name)
 {
 	/* The connection process:
 	 *                BBufferProducer::FormatProposal
@@ -417,7 +412,7 @@ FireWireDVNode::Connect(status_t error, const media_source &source,
 
 void 
 FireWireDVNode::Disconnect(const media_source &source,
-		const media_destination &destination)
+	const media_destination& destination)
 {
 	CALLED();
 
@@ -428,16 +423,16 @@ FireWireDVNode::Disconnect(const media_source &source,
 
 
 void 
-FireWireDVNode::LateNoticeReceived(const media_source &source,
-		bigtime_t how_much, bigtime_t performance_time)
+FireWireDVNode::LateNoticeReceived(const media_source& source,
+	bigtime_t how_much, bigtime_t performance_time)
 {
 	TRACE("FireWireDVNode::LateNoticeReceived %Ld late at %Ld\n", how_much, performance_time);
 }
 
 
 void 
-FireWireDVNode::EnableOutput(const media_source &source, bool enabled,
-		int32 *_deprecated_)
+FireWireDVNode::EnableOutput(const media_source& source, bool enabled,
+	int32* _deprecated_)
 {
 	CALLED();
 	fOutputEnabledEncVideo = enabled;
@@ -445,9 +440,9 @@ FireWireDVNode::EnableOutput(const media_source &source, bool enabled,
 
 
 void 
-FireWireDVNode::AdditionalBufferRequested(const media_source &source,
-		media_buffer_id prev_buffer, bigtime_t prev_time,
-		const media_seek_tag *prev_tag)
+FireWireDVNode::AdditionalBufferRequested(const media_source& source,
+	media_buffer_id prev_buffer, bigtime_t prev_time,
+	const media_seek_tag* prev_tag)
 {
 	CALLED();
 	// we don't support offline mode
@@ -456,8 +451,6 @@ FireWireDVNode::AdditionalBufferRequested(const media_source &source,
 
 
 /* FireWireDVNode */
-
-
 void
 FireWireDVNode::HandleTimeWarp(bigtime_t performance_time)
 {
@@ -559,7 +552,7 @@ FireWireDVNode::StopCaptureThreads()
 
 
 int32
-FireWireDVNode::_card_reader_thread_(void *arg)
+FireWireDVNode::_card_reader_thread_(void* arg)
 {
 	static_cast<FireWireDVNode *>(arg)->card_reader_thread();
 	return 0;
@@ -585,10 +578,10 @@ FireWireDVNode::card_reader_thread()
 			continue;
 		}
 
-		end = (char *)data + sizeUsed;
+		end = (char*)data + sizeUsed;
 
 		while (data < end) {
-			BBuffer *buf = fBufferGroupEncVideo->RequestBuffer(rbufsize, 10000);
+			BBuffer* buf = fBufferGroupEncVideo->RequestBuffer(rbufsize, 10000);
 			if (!buf) {
 				TRACE("OutVideo: request buffer timout\n");
 				continue;
@@ -608,12 +601,12 @@ FireWireDVNode::card_reader_thread()
 			//what should the start_time be?
 			hdr->start_time = TimeSource()->PerformanceTimeFor(system_time());
 
-			lock.Lock();
+			fLock.Lock();
 			if (B_OK != SendBuffer(buf, fOutputEncVideo.destination)) {
 				TRACE("OutVideo: sending buffer failed\n");
 				buf->Recycle();
 			} 
-			lock.Unlock();
+			fLock.Unlock();
 		}
 		
 	}
@@ -631,7 +624,7 @@ FireWireDVNode::RefreshParameterWeb()
 
 
 void
-FireWireDVNode::SetAboutInfo(BParameterGroup *about)
+FireWireDVNode::SetAboutInfo(BParameterGroup* about)
 {
 	//May need more useful infomation?
 	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, "FireWireDV media_addon info:", B_GENERIC);
@@ -648,17 +641,17 @@ BParameterWeb *
 FireWireDVNode::CreateParameterWeb()
 {
 	/* Set up the parameter web */
-	BParameterWeb *web = new BParameterWeb();
+	BParameterWeb* web = new BParameterWeb();
 
 	BString name;
 	name << Name();
 	
-	BParameterGroup *main = web->MakeGroup(name.String());
+	BParameterGroup* main = web->MakeGroup(name.String());
 
 	if (!fCaptureActive) {
-		BParameterGroup *info = main->MakeGroup("Info");
+		BParameterGroup* info = main->MakeGroup("Info");
 		info->MakeNullParameter(0, B_MEDIA_NO_TYPE, info->Name(), B_GENERIC);
-		BParameterGroup *about = main->MakeGroup("About");
+		BParameterGroup* about = main->MakeGroup("About");
 		about->MakeNullParameter(0, B_MEDIA_NO_TYPE, about->Name(), B_GENERIC);
 		SetAboutInfo(about);
 		info->MakeNullParameter(0, B_MEDIA_NO_TYPE, "Node is stopped", B_GENERIC);
@@ -666,7 +659,7 @@ FireWireDVNode::CreateParameterWeb()
 		return web;
 	}
 
-	BParameterGroup *about = main->MakeGroup("About");
+	BParameterGroup* about = main->MakeGroup("About");
 	about->MakeNullParameter(0, B_MEDIA_NO_TYPE, about->Name(), B_GENERIC);
 	SetAboutInfo(about);
 	
@@ -675,7 +668,8 @@ FireWireDVNode::CreateParameterWeb()
 
 
 status_t 
-FireWireDVNode::GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size)
+FireWireDVNode::GetParameterValue(int32 id, bigtime_t* last_change, 
+	void* value, size_t* size)
 {
 	TRACE("FireWireDVNode::GetParameterValue, id 0x%lx\n", id);
 	//do we need Parameter for firewire dv?	
@@ -684,9 +678,12 @@ FireWireDVNode::GetParameterValue(int32 id, bigtime_t *last_change, void *value,
 
 
 void
-FireWireDVNode::SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size)
+FireWireDVNode::SetParameterValue(int32 id, bigtime_t when, const void* value, 
+	size_t size)
 {
-	TRACE("FireWireDVNode::SetParameterValue, id 0x%lx, size %ld, value 0x%lx\n", id, size, *(const int32 *)value);
+	TRACE("FireWireDVNode::SetParameterValue, id 0x%lx, size %ld, "
+		"value 0x%lx\n", id, size, *(const int32*)value);
 	//do we need parameter for firewire dv?
 	TRACE("FireWireDVNode::SetParameterValue finished\n");
 }
+

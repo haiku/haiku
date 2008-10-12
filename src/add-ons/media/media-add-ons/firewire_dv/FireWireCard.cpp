@@ -6,6 +6,8 @@
  *
  */
 
+#include "FireWireCard.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -16,7 +18,6 @@
 #include <stdint.h>
 #include <errno.h>
 
-#include "FireWireCard.h"
 #include "glue.h"
 
 #define TAG	(1<<6)
@@ -79,11 +80,11 @@ struct mpeg_pldt {
 #define	MPEG_RBUFSIZE (MPEG_PSIZE * MPEG_NPACKET_R)
 
 
-FireWireCard::FireWireCard(const char *path)
- :	fInitStatus(B_OK)
- ,	fDev(-1)
- ,	fBuf(NULL)
- ,	fPad(NULL)
+FireWireCard::FireWireCard(const char* path)
+	: fInitStatus(B_OK),
+	fDev(-1),
+	fBuf(NULL),
+	fPad(NULL)
 {
 	printf("FireWireCard opening %s\n", path);
 
@@ -111,7 +112,7 @@ FireWireCard::InitCheck()
 
 
 ssize_t
-FireWireCard::Read(void **data)
+FireWireCard::Read(void** data)
 {
 	if (fFormat == FMT_MPEGTS)
 		return MpegtsRead(data);
@@ -121,7 +122,7 @@ FireWireCard::Read(void **data)
 
 
 status_t
-FireWireCard::Extract(void *dest, void **src, ssize_t *sizeUsed)
+FireWireCard::Extract(void* dest, void** src, ssize_t* sizeUsed)
 {
 	if (fFormat == FMT_MPEGTS)
 		return MpegtsExtract(dest, src, sizeUsed);
@@ -131,7 +132,7 @@ FireWireCard::Extract(void *dest, void **src, ssize_t *sizeUsed)
 
 
 void
-FireWireCard::GetBufInfo(size_t *rbufsize, int *rcount)
+FireWireCard::GetBufInfo(size_t* rbufsize, int* rcount)
 {
 	*rbufsize = fRbufSize;
 	*rcount = fRcount;
@@ -141,12 +142,13 @@ FireWireCard::GetBufInfo(size_t *rbufsize, int *rcount)
 status_t
 FireWireCard::DetectRecvFn()
 {
-	char *buf, ich = TAG | CHANNEL;
+	char* buf;
+	char ich = TAG | CHANNEL;
 	struct fw_isochreq isoreq;
 	struct fw_isobufreq bufreq;
 	int len;
-	u_int32_t *ptr;
-	struct ciphdr *ciph;
+	u_int32_t* ptr;
+	struct ciphdr* ciph;
 
 	bufreq.rx.nchunk = 8;
 	bufreq.rx.npacket = 16;
@@ -164,12 +166,12 @@ FireWireCard::DetectRecvFn()
 	if (ioctl(fDev, FW_SRSTREAM, &isoreq) < 0)
 		return errno;
 
-	buf = (char *)malloc(1024*16);
+	buf = (char*)malloc(1024*16);
 	len = read(fDev, buf, 1024*16);
 	if (len < 0)
 		return errno;
-	ptr = (u_int32_t *) buf;
-	ciph = (struct ciphdr *)(ptr + 1);
+	ptr = (u_int32_t*) buf;
+	ciph = (struct ciphdr*)(ptr + 1);
 
 	switch(ciph->fmt) {
 		case CIP_FMT_DVCR:
@@ -197,7 +199,7 @@ FireWireCard::DetectRecvFn()
 
 
 ssize_t
-FireWireCard::DvRead(void **buffer)
+FireWireCard::DvRead(void** buffer)
 {
 	struct fw_isochreq isoreq;
 	struct fw_isobufreq bufreq;
@@ -234,30 +236,30 @@ FireWireCard::DvRead(void **buffer)
 
 
 status_t
-FireWireCard::DvExtract(void *dest, void **src, ssize_t *sizeUsed)
+FireWireCard::DvExtract(void* dest, void** src, ssize_t* sizeUsed)
 {
-	struct dvdbc *dv;
-	struct ciphdr *ciph;
-	struct fw_pkt *pkt;
-	u_int32_t *ptr;
+	struct dvdbc* dv;
+	struct ciphdr* ciph;
+	struct fw_pkt* pkt;
+	u_int32_t* ptr;
 	int nblocks[] = {250 /* NTSC */, 300 /* PAL */};
 	int npad, k, m, system = -1, nb;
 
 	k = m = 0;
-	ptr = (u_int32_t *) (*src);
+	ptr = (u_int32_t*) (*src);
 
-	pkt = (struct fw_pkt *) ptr;
-	ciph = (struct ciphdr *)(ptr + 1);	/* skip iso header */
+	pkt = (struct fw_pkt*) ptr;
+	ciph = (struct ciphdr*)(ptr + 1);	/* skip iso header */
 	if (ciph->fmt != CIP_FMT_DVCR) {
 		fprintf(stderr, "unknown format 0x%x", ciph->fmt);
 		return B_ERROR;
 	}
-	ptr = (u_int32_t *) (ciph + 1);		/* skip cip header */
+	ptr = (u_int32_t*) (ciph + 1);		/* skip cip header */
 	if (pkt->mode.stream.len <= sizeof(struct ciphdr))
 		/* no payload */
 		return B_ERROR;
-	for (dv = (struct dvdbc *)ptr;
-			(char *)dv < (char *)(ptr + ciph->len);
+	for (dv = (struct dvdbc*)ptr;
+			(char*)dv < (char *)(ptr + ciph->len);
 			dv+=6) {
 
 		if  (dv->sct == DV_SCT_HEADER && dv->dseq == 0) {
@@ -282,7 +284,7 @@ FireWireCard::DvExtract(void *dest, void **src, ssize_t *sizeUsed)
 							npad);
 				npad *= DV_DSIZE;
 				memcpy(dest, fPad, npad);
-				dest = (char *)dest + npad;
+				dest = (char*)dest + npad;
 			}
 #endif
 			k++;
@@ -297,16 +299,16 @@ FireWireCard::DvExtract(void *dest, void **src, ssize_t *sizeUsed)
 			continue;
 		m++;
 		memcpy(dest, dv, DV_DSIZE);
-		dest = (char *)dest + DV_DSIZE;
+		dest = (char*)dest + DV_DSIZE;
 	}
-	ptr = (u_int32_t *)dv;
+	ptr = (u_int32_t*)dv;
 	*src = ptr;
 	return B_OK;
 }
 
 
 ssize_t
-FireWireCard::MpegtsRead(void **buffer)
+FireWireCard::MpegtsRead(void** buffer)
 {
 	struct fw_isochreq isoreq;
 	struct fw_isobufreq bufreq;
@@ -344,20 +346,20 @@ FireWireCard::MpegtsRead(void **buffer)
 	
 
 status_t
-FireWireCard::MpegtsExtract(void *dest, void **src, ssize_t *sizeUsed)
+FireWireCard::MpegtsExtract(void* dest, void** src, ssize_t* sizeUsed)
 {
-	uint32_t *ptr;
-	struct fw_pkt *pkt;
-	struct ciphdr *ciph;
-	struct mpeg_pldt *pld;
+	uint32_t* ptr;
+	struct fw_pkt* pkt;
+	struct ciphdr* ciph;
+	struct mpeg_pldt* pld;
 	int pkt_size, startwr;
 
 	ptr = (uint32_t *)(*src);
 	startwr = 0;
 
-	pkt = (struct fw_pkt *) ptr;	
+	pkt = (struct fw_pkt*) ptr;	
 	/* there is no CRC in the 1394 header */
-	ciph = (struct ciphdr *)(ptr + 1);	/* skip iso header */
+	ciph = (struct ciphdr*)(ptr + 1);	/* skip iso header */
 	if (ciph->fmt != CIP_FMT_MPEG) {
 		fprintf(stderr, "unknown format 0x%x", ciph->fmt);
 		return B_ERROR;
@@ -367,7 +369,7 @@ FireWireCard::MpegtsExtract(void *dest, void **src, ssize_t *sizeUsed)
 			"fn=3 is supported)", ciph->fn);
 		return B_ERROR;
 	}
-	ptr = (uint32_t *) (ciph + 1);		/* skip cip header */
+	ptr = (uint32_t*) (ciph + 1);		/* skip cip header */
 
 	if (pkt->mode.stream.len <= sizeof(struct ciphdr)) {
 		/* no payload */
@@ -381,12 +383,12 @@ FireWireCard::MpegtsExtract(void *dest, void **src, ssize_t *sizeUsed)
 		startwr = 1;
 	/* Read out all the MPEG TS data blocks from current packet */
 	for (pld = (struct mpeg_pldt *)ptr;
-	    (intptr_t)pld < (intptr_t)((char *)ptr +
+	    (intptr_t)pld < (intptr_t)((char*)ptr +
 	    pkt->mode.stream.len - sizeof(struct ciphdr));
 	    pld++) {
 		if (startwr == 1) {
 			memcpy(dest, pld->payload, sizeof(pld->payload));
-			dest = (char *)dest + sizeof(pld->payload);
+			dest = (char*)dest + sizeof(pld->payload);
 		}
 	}
 
@@ -394,7 +396,8 @@ next:
 	/* CRCs are removed from both header and trailer
 	so that only 4 bytes of 1394 header remains */
 	pkt_size = pkt->mode.stream.len + 4; 
-	ptr = (uint32_t *)((intptr_t)pkt + pkt_size);
+	ptr = (uint32_t*)((intptr_t)pkt + pkt_size);
 	*src = ptr;
 	return B_OK;
 }
+
