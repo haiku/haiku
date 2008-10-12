@@ -15,7 +15,7 @@
 	<p>
 		<a href="welcome.html">Welcome</a>
 		&nbsp;&nbsp;&nbsp;
-		Previous: <a href="twitcher.html">The Twitcher</a>
+		Previous: <a href="teammonitor.html">The Team Monitor</a>
 		&nbsp;&nbsp;&nbsp;
 		Next: <a href="deskbar.html">The Deskbar</a>
 	</p>
@@ -25,7 +25,7 @@
 
 <h2><a name="tracker">The Tracker</a></h2>
 <p>The Tracker is the graphical interface to all your files. It let's you create new files and folders or find, launch or rename as well as copy or delete existing ones.
-</p><p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a e.g. crashed or frozen Tracker is to call the TeamManager with <tt>CTRL+ALT+DEL</tt> to kill Tracker and then click the <i>Restart Desktop...</i> button. The same brings back a wayward Deskbar.
+</p><p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.
 </p>
 
 <h3><a name="mounting-volumes">Mounting Volumes</a></h3>
@@ -36,7 +36,7 @@
 </p><p>There are also <i>Mount Settings</i> so you don't have to mount everything manually after every bootup.<br>
 The above settings will mount all disks on bootup that were mounted previously and will automatically mount any storage device you connect/insert.
 </p><p><b><font size="+1" color="#FF0000">Warning:</font><br>
-<font color="#FF0000">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume. This garantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</font></b>
+<font color="#FF0000">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</font></b>
 </p>
 
 <h3><a name="navigating">Navigating</a></h3>
@@ -56,9 +56,9 @@ The above settings will mount all disks on bootup that were mounted previously a
 </p><br>
 <p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br>
 You can prevent that by holding down the left <tt>WIN</tt> key, which automatically closes the parent window.<br>
-This is also true for...</p>
+This is also true for keyboard navigation.</p>
 <h4><a name="keyboard-navigation">Keyboard navigation</a></h4>
-<p>A few shortcuts are essential for keyboard navigation:
+<p>A few shortcuts are essential:
 <ul><li><tt>ALT+CURSOR-UP</tt> - Open parent folder.</li>
 <li><tt>ALT+CURSOR-DOWN</tt> or <tt>RETURN</tt> - Open selected folder.</li>
 <li><tt>ALT+W</tt> - Close window.</li>
@@ -78,7 +78,7 @@ This is also true for...</p>
 <li><b>Clean Up</b> (<tt>ALT+K</tt>) - Aligns all icons to an invisible grid. Hold down <tt>SHIFT</tt> and the menu becomes <i>Clean Up All</i> which additionally sorts all icons alphabetically.</li>
 <li><b>Select...</b> (<tt>SHIFT+ALT+A</tt>) - Select files according to a regular expression.</li>
 </ul>
-</p><p>The rest of the functions are pretty self-explanatory, leaving the...
+</p><p>The rest of the functions are pretty self-explanatory, leaving the Tracker preferences.
 </p>
 
 <h4><a name="tracker-preferences">Tracker preferences</a></h4>
@@ -97,8 +97,8 @@ Before you switch Tracker to Single Window Navigation mode, because that may fee
 </p>
 
 <h3>Working with files</h3>
-<p>When invoked on a selected file, the <i>File</i> menu offers about the same options as when you open a context menu by right-clicking the file. Exceptions are commands that don't specifically target a selected file, like <i>Find..</i> or <i>New...</i>.
-</p><p>As usual the usage of the commands is pretty clear, so we'll concentrate on the niftier parts.</p>
+<p>When invoked on a selected file, most of the <i>File</i> menu commands are also offered in the context menu by right-clicking that file.
+</p><p>As usual the usage of the commands is pretty clear.</p>
 <ul><li><b>Find...</b> - Find a file or folder. See topic <a href="Query.html">Query</a> for more info.</li>
 <li><b>New...</b> - Create a new folder or any other file based on a <i>template</i>.
 <br><br>
@@ -106,13 +106,29 @@ Before you switch Tracker to Single Window Navigation mode, because that may fee
 <p>Choosing <i>Edit Templates...</i> opens the folder <tt>/boot/home/config/settings/Tracker/Tracker New Templates</tt>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <i>New...</i> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
 <li><b>Open With...</b> - A submenu offers all applications that can handle this filetype. 
 <br><br>
-<img src="tracker-images/open-with.png" alt="open-with.png" width="303" height="215">
-<p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu list first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <i>Open With...</i> entry instead, a panel opens:
+<img src="tracker-images/open-with.png" alt="open-with.png" width="303" height="343">
+<p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu lists first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <i>Open With...</i> entry instead, a panel opens:
 <br><br>
 <img src="tracker-images/open-with-preferred.png" alt="open-with-preferred" width="539" height="262">
 <p>Here you'll again find the programs that were listed in the submenu. By selecting one and clicking the <i>Open and Make Preferred</i> button, you changed the preferred application for every file of that filetype, here <tt>text/plain</tt>.
+</p></li>
+<li><b>Get Info</b>
+<br><br>
+<img src="tracker-images/get-info.png" alt="get-info" width="326" height="302">
+<p>The panel presents info on the selected file and lets you set the default application and, after you expanded that part of the panel, permissions and owner. Clicking on the path will open it in a Tracker window.</li>
+<li><b>Edit Name</b>, <b>Duplicate</b> and <b>Move to Trash</b> - lets you rename or duplicate a file or put the selected file(s) to the trash.</li>
+<li><b>Move to</b>, <b>Copy to</b> and <b>Create Link</b> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <tt>SHIFT</tt> while invoking the menu offers the option to create a relative link.</li>
+<li><b>Cut</b>, <b>Copy</b> and <b>Paste</b> - lets you cut, copy and paste files using the clipboard. By holding <tt>SHIFT</tt> while invoking the menu you can <b>Copy/Cut more</b> files, maybe from another folder that you can paste somewhere else later. Also, while holding <tt>SHIFT</tt> you can paste the copied files in the clipboard as links.</li>
+<li><b>Identify</b> - will sniff out and set the type of a file if it didn't have one before, e.g. if you transfered a file with <i>wget</i> which doesn't set a filetype itself. Holding <tt>SHIFT</tt> while invoking the menu changes the item to identify the filetype and correct it if it was false before.</li></ul>
 </p>
 
+<h3>Transaction status</h3>
+<p>When you copy, move or delete files, Tracker shows its progress with a status window. If you initiate more than one transaction, each job gets its own status display.
+</p>
+<img src="tracker-images/transaction-status.png" width="361" height="149">
+<br>
+<p>To the right are two buttons to pause or stop a transaction entirely. Sometimes it can be useful to temporarily pause a large transaction. For example, you may need to quickly launch a large application. Copying large amounts of data chokes your harddisk’s IO bandwidth and thus delays your workflow.
+</p>
 </div>
 
 <div class="bottomnav">
