@@ -34,12 +34,21 @@
 #include "PlaylistListView.h"
 #include "RWLocker.h"
 
-#define DEBUG 1
+// TODO:
+// Maintaining a playlist file on disk is a bit tricky. The playlist ref should
+// be discarded when the user
+// * loads a new playlist via Open,
+// * loads a new playlist via dropping it on the MainWindow,
+// * loads a new playlist via dropping it into the ListView while replacing
+//   the contents,
+// * replacing the contents by other stuff.
+
 
 enum {
 	// file
 	M_PLAYLIST_OPEN			= 'open',
 	M_PLAYLIST_SAVE			= 'save',
+	M_PLAYLIST_SAVE_AS		= 'svas',
 	M_PLAYLIST_SAVE_RESULT	= 'psrs',
 
 	// edit
@@ -153,6 +162,14 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			break;
 		}
 		case M_PLAYLIST_SAVE: {
+			if (fSavedPlaylistRef != entry_ref()) {
+				_SavePlaylist(fSavedPlaylistRef);
+				break;
+			} else {
+				// FALL THROUGH
+			}
+		}
+		case M_PLAYLIST_SAVE_AS: {
 			BMessenger target(this);
 			BMessage result(M_PLAYLIST_SAVE_RESULT);
 			BMessage appMessage(M_SHOW_SAVE_PANEL);
@@ -194,9 +211,13 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	menuBar->AddItem(fileMenu);
 	fileMenu->AddItem(new BMenuItem("Open"B_UTF8_ELLIPSIS,
 		new BMessage(M_PLAYLIST_OPEN), 'O'));
-	fileMenu->AddItem(new BMenuItem("Save"B_UTF8_ELLIPSIS,
-		new BMessage(M_PLAYLIST_SAVE), 'S'));
+	fileMenu->AddItem(new BMenuItem("Save As"B_UTF8_ELLIPSIS,
+		new BMessage(M_PLAYLIST_SAVE_AS), 'S', B_SHIFT_KEY));
+//	fileMenu->AddItem(new BMenuItem("Save",
+//		new BMessage(M_PLAYLIST_SAVE), 'S'));
+
 	fileMenu->AddSeparatorItem();
+
 	fileMenu->AddItem(new BMenuItem("Close",
 		new BMessage(B_QUIT_REQUESTED), 'W'));
 
@@ -296,6 +317,29 @@ PlaylistWindow::_SavePlaylist(const BMessage* message)
 		return;
 	}
 
+	_SavePlaylist(origEntry, tempEntry, name);
+}
+
+
+void
+PlaylistWindow::_SavePlaylist(const entry_ref& ref)
+{
+	BString tempName(ref.name);
+	tempName << system_time();
+	entry_ref tempRef(ref);
+	tempRef.set_name(tempName.String());
+
+	BEntry origEntry(&ref);
+	BEntry tempEntry(&tempRef);
+
+	_SavePlaylist(origEntry, tempEntry, ref.name);
+}
+
+
+void
+PlaylistWindow::_SavePlaylist(BEntry& origEntry, BEntry& tempEntry,
+	const char* finalName)
+{
 	class TempEntryRemover {
 	public:
 		TempEntryRemover(BEntry* entry)
@@ -342,7 +386,7 @@ PlaylistWindow::_SavePlaylist(const BMessage* message)
 	}
 
 	// clobber original entry, if it exists
-	tempEntry.Rename(name, true);
+	tempEntry.Rename(finalName, true);
 	remover.Detach();
 
 	BNodeInfo info(&file);

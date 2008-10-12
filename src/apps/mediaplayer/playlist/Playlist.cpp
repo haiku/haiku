@@ -253,7 +253,7 @@ Playlist::AdoptPlaylist(Playlist& other, int32 index)
 		}
 		if (index <= fCurrentIndex)
 			SetCurrentRefIndex(fCurrentIndex + count);
-		// empty the other list, so that the entry_refs are no ours
+		// empty the other list, so that the entry_refs are now ours
 		other.fRefs.MakeEmpty();
 		return true;
 	}
@@ -395,11 +395,31 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 
 	Playlist temporaryPlaylist;
 	Playlist* playlist = add ? &temporaryPlaylist : this;
+	bool sortPlaylist = true;
 
 	entry_ref ref;
-	for (int i = 0; refsReceivedMessage->FindRef("refs", i, &ref) == B_OK; i++) 
-		AppendToPlaylistRecursive(ref, playlist);
-	playlist->Sort();
+	int32 subAppendIndex = CountItems();
+	for (int i = 0; refsReceivedMessage->FindRef("refs", i, &ref) == B_OK;
+			i++) {
+		Playlist subPlaylist;
+		if (_IsPlaylist(_MIMEString(&ref))) {
+			AppendPlaylistToPlaylist(ref, &subPlaylist);
+			// Do not sort the whole playlist anymore, as that
+			// will screw up the ordering in the saved playlist.
+			sortPlaylist = false;
+		} else {
+			AppendToPlaylistRecursive(ref, &subPlaylist);
+			// At least sort the this subsection of the playlist
+			// if the whole playlist is not sorted anymore.
+			if (!sortPlaylist)
+				subPlaylist.Sort();
+		}
+		int32 subPlaylistCount = subPlaylist.CountItems();
+		AdoptPlaylist(subPlaylist, subAppendIndex);
+		subAppendIndex += subPlaylistCount;
+	}
+	if (sortPlaylist)
+		playlist->Sort();
 
 	if (add)
 		AdoptPlaylist(temporaryPlaylist, appendIndex);
@@ -416,16 +436,8 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 {
 	// recursively append the ref (dive into folders)
 	BEntry entry(&ref, true);
-	if (entry.InitCheck() < B_OK) {
-		printf("Not OK\n");
+	if (entry.InitCheck() < B_OK || !entry.Exists())
 		return;
-	}
-	
-	if (!entry.Exists()) {
-		BPath path = BPath(&ref);
-		//printf("Don't exist - %s\n", path.Path());
-		return;
-	}
 	
 	if (entry.IsDirectory()) {
 		BDirectory dir(&entry);
@@ -441,35 +453,47 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 		if (_IsMediaFile(mimeString)) {
 			//printf("Adding\n");
 			playlist->AddRef(ref);
-		} else if (_IsTextPlaylist(mimeString)) {
-			//printf("RunPlaylist thing\n");
-			BFile file(&ref, B_READ_ONLY);
-			FileReadWrite lineReader(&file);
-	
-			BString str;
-			entry_ref refPath; 
-			status_t err; 
-			BPath path;
-			while (lineReader.Next(str)) {
-				str = str.RemoveFirst("file://");
-				str = str.RemoveLast("..");
-				path = BPath(str.String());
-				printf("Line %s\n", path.Path());
-				if (path.Path() != NULL) {
-					if ((err = get_ref_for_path(path.Path(), &refPath)) == B_OK) {
-						playlist->AddRef(refPath);
-					} else			
-						printf("Error - %s: [%lx]\n", strerror(err), (int32) err);
-				} else
-					printf("Error - No File Found in playlist\n");
-			}
-		} else if (_IsBinaryPlaylist(mimeString)) {
-			BFile file(&ref, B_READ_ONLY);
-			Playlist temp;
-			if (temp.Unflatten(&file) == B_OK)
-				playlist->AdoptPlaylist(temp, playlist->CountItems());
 		} else
 			printf("MIME Type = %s\n", mimeString.String());
+	}
+}
+
+
+/*static*/ void
+Playlist::AppendPlaylistToPlaylist(const entry_ref& ref, Playlist* playlist)
+{
+	BEntry entry(&ref, true);
+	if (entry.InitCheck() < B_OK || !entry.Exists())
+		return;
+
+	BString mimeString = _MIMEString(&ref);
+	if (_IsTextPlaylist(mimeString)) {
+		//printf("RunPlaylist thing\n");
+		BFile file(&ref, B_READ_ONLY);
+		FileReadWrite lineReader(&file);
+
+		BString str;
+		entry_ref refPath; 
+		status_t err; 
+		BPath path;
+		while (lineReader.Next(str)) {
+			str = str.RemoveFirst("file://");
+			str = str.RemoveLast("..");
+			path = BPath(str.String());
+			printf("Line %s\n", path.Path());
+			if (path.Path() != NULL) {
+				if ((err = get_ref_for_path(path.Path(), &refPath)) == B_OK) {
+					playlist->AddRef(refPath);
+				} else			
+					printf("Error - %s: [%lx]\n", strerror(err), (int32) err);
+			} else
+				printf("Error - No File Found in playlist\n");
+		}
+	} else if (_IsBinaryPlaylist(mimeString)) {
+		BFile file(&ref, B_READ_ONLY);
+		Playlist temp;
+		if (temp.Unflatten(&file) == B_OK)
+			playlist->AdoptPlaylist(temp, playlist->CountItems());
 	}
 }
 
@@ -518,6 +542,13 @@ Playlist::_IsTextPlaylist(const BString& mimeString)
 Playlist::_IsBinaryPlaylist(const BString& mimeString)
 {    	
 	return mimeString.Compare(kBinaryPlaylistMimeString) == 0;
+}
+
+
+/*static*/ bool
+Playlist::_IsPlaylist(const BString& mimeString)
+{    	
+	return _IsTextPlaylist(mimeString) || _IsBinaryPlaylist(mimeString);
 }
 
 

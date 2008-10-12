@@ -11,6 +11,7 @@
 #define PLAYLIST_WINDOW_H
 
 
+#include <Entry.h>
 #include <Window.h>
 
 #include "ListenerAdapter.h"
@@ -27,7 +28,7 @@ class BButton;
 class BFilePanel;
 
 class PlaylistWindow : public BWindow {
- public:
+public:
 								PlaylistWindow(BRect frame,
 									Playlist* playlist,
 									Controller* controller);
@@ -36,10 +37,14 @@ class PlaylistWindow : public BWindow {
 	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
 
- private:
+private:
 			void				_CreateMenu(BRect& frame);
 			void				_ObjectChanged(const Notifier* object);
-			void				_SavePlaylist(const BMessage* message);
+
+			void				_SavePlaylist(const BMessage* filePanelMessage);
+			void				_SavePlaylist(const entry_ref& ref);
+			void				_SavePlaylist(BEntry& origEntry,
+									BEntry& tempEntry, const char* finalName);
 
 			Playlist*			fPlaylist;
 			PlaylistListView*	fListView;
@@ -47,10 +52,12 @@ class PlaylistWindow : public BWindow {
 			BView*				fTopView;
 			BMenuItem*			fUndoMI;
 			BMenuItem*			fRedoMI;
-			
+
 			RWLocker*			fLocker;
 			CommandStack*		fCommandStack;
 			ListenerAdapter		fCommandStackListener;
+
+			entry_ref			fSavedPlaylistRef;
 };
 
 #endif // PLAYLIST_WINDOW_H

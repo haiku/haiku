@@ -91,13 +91,16 @@ public:
 									int32 appendIndex = -1);
 	static	void				AppendToPlaylistRecursive(const entry_ref& ref,
 									Playlist* playlist);
+	static	void				AppendPlaylistToPlaylist(const entry_ref& ref,
+									Playlist* playlist);
 
 private:
-			static int			playlist_cmp(const void* p1, const void* p2);
-			static bool 		_IsMediaFile(const BString& mimeString);
-			static bool			_IsTextPlaylist(const BString& mimeString);
-			static bool			_IsBinaryPlaylist(const BString& mimeString);
-			static BString		_MIMEString(const entry_ref* entry);
+	static	int					playlist_cmp(const void* p1, const void* p2);
+	static	bool 				_IsMediaFile(const BString& mimeString);
+	static	bool				_IsTextPlaylist(const BString& mimeString);
+	static	bool				_IsBinaryPlaylist(const BString& mimeString);
+	static	bool				_IsPlaylist(const BString& mimeString);
+	static	BString				_MIMEString(const entry_ref* entry);
 			void				_NotifyRefAdded(const entry_ref& ref,
 									int32 index) const;
 			void				_NotifyRefRemoved(int32 index) const;

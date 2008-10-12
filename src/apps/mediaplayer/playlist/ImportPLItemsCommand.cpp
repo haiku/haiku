@@ -54,6 +54,7 @@ ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 	// init new entries
 	for (int32 i = 0; i < fNewCount; i++) {
 		if (temp.GetRefAt(i, &fNewRefs[i]) < B_OK) {
+			// indicate bad object init
 			delete[] fNewRefs;
 			fNewRefs = NULL;
 			return;
