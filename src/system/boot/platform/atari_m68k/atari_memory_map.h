@@ -6,7 +6,9 @@
 #define ATARI_MEMORY_MAP_H
 
 /* the DMA-accessible RAM */
-#define ATARI_CHIPRAM_BASE			0x00000000
+/*#define ATARI_CHIPRAM_BASE			0x00000000*/
+/* actually, the first 2kB aren't usable */
+#define ATARI_CHIPRAM_BASE			0x00001000
 #define ATARI_CHIPRAM_MAX			0x00e00000
 #define ATARI_CHIPRAM_LAST						\
 	(ATARI_CHIPRAM_BASE + (ATARI_CHIPRAM_MAX - 1))

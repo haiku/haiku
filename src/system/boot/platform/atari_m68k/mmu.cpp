@@ -625,7 +625,7 @@ mmu_init(void)
 
 	// st ram as 1st range
 	gKernelArgs.physical_memory_range[0].start = ATARI_CHIPRAM_BASE;
-	gKernelArgs.physical_memory_range[0].size = *TOSVARphystop;
+	gKernelArgs.physical_memory_range[0].size = *TOSVARphystop - ATARI_CHIPRAM_BASE;
 	gKernelArgs.num_physical_memory_ranges = 1;
 
 	// fast ram as 2nd range
