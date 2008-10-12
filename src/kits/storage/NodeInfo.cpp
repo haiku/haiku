@@ -728,7 +728,6 @@ BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size iconSize) const
 		return B_BAD_VALUE;
 
 	// set some icon size related variables
-	status_t error = B_OK;
 	BRect bounds;
 	switch (iconSize) {
 		case B_MINI_ICON:
@@ -745,87 +744,97 @@ BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size iconSize) const
 	}
 
 	// check parameters and initialization
-	if (error == B_OK
-		&& (icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
-		error = B_BAD_VALUE;
-	}
-	if (error == B_OK && InitCheck() != B_OK)
-		error = B_NO_INIT;
+	if (icon->InitCheck() != B_OK || icon->Bounds() != bounds)
+		return B_BAD_VALUE;
 
-	bool success = false;
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
 
-	// get node MIME type, and, if that fails, the generic icon
+	// Ask GetIcon() first.
+	if (GetIcon(icon, iconSize) == B_OK)
+		return B_OK;
+
+	// If not successful, see if the node has a type available at all. If no type
+	// is available, use one of the standard types depending on 
+	status_t error = B_OK;
 	char mimeString[B_MIME_TYPE_LENGTH];
-	if (error == B_OK) {
-		if (GetType(mimeString) != B_OK) {
-			struct stat stat;
-			error = fNode->GetStat(&stat);
-			if (error == B_OK) {
-				// no type available -- get the icon for the appropriate type (file/dir/etc.)
-				BMimeType type;
-				if (S_ISREG(stat.st_mode)) {
-					// is it an application (executable) or just a regular file?
-					if ((stat.st_mode & S_IXUSR) != 0)
-						type.SetTo(B_APP_MIME_TYPE);
-					else
-						type.SetTo(B_FILE_MIME_TYPE);
-				} else if (S_ISDIR(stat.st_mode)) {
-					// it's either a volume or just a standard directory
-					fs_info info;
-					if (fs_stat_dev(stat.st_dev, &info) == 0 && stat.st_ino == info.root)
-						type.SetTo(B_VOLUME_MIME_TYPE);
-					else
-						type.SetTo(B_DIRECTORY_MIME_TYPE);
-				} else if (S_ISLNK(stat.st_mode))
-					type.SetTo(B_SYMLINK_MIME_TYPE);
-
-				success = (type.GetIcon(icon, iconSize) == B_OK);
-					// NOTE: if there is an icon but getting it failes for some reason,
-					// the error is not reported, and the fall back retrieval methods
-					// are still tried. (IAW, we can't differentiate the reason for error.)
-			}
+	if (GetType(mimeString) != B_OK) {
+		// Get the icon from a mime type...
+		BMimeType type;
+	
+		struct stat stat;
+		error = fNode->GetStat(&stat);
+		if (error == B_OK) {
+			// no type available -- get the icon for the appropriate type (file/dir/etc.)
+			if (S_ISREG(stat.st_mode)) {
+				// is it an application (executable) or just a regular file?
+				if ((stat.st_mode & S_IXUSR) != 0)
+					type.SetTo(B_APP_MIME_TYPE);
+				else
+					type.SetTo(B_FILE_MIME_TYPE);
+			} else if (S_ISDIR(stat.st_mode)) {
+				// it's either a volume or just a standard directory
+				fs_info info;
+				if (fs_stat_dev(stat.st_dev, &info) == 0 && stat.st_ino == info.root)
+					type.SetTo(B_VOLUME_MIME_TYPE);
+				else
+					type.SetTo(B_DIRECTORY_MIME_TYPE);
+			} else if (S_ISLNK(stat.st_mode))
+				type.SetTo(B_SYMLINK_MIME_TYPE);
+		} else {
+			// GetStat() failed.
+			// Return the icon for "application/octet-stream" from the MIME database.
+			type.SetTo(B_FILE_MIME_TYPE);
 		}
-	}
 
-	// Ask GetIcon().
-	if (error == B_OK && !success)
-		success = (GetIcon(icon, iconSize) == B_OK);
+		return type.GetIcon(icon, iconSize);
 
-	// Get the preferred application and ask the MIME database, if that
-	// application has a special icon for the node's file type.
-	if (error == B_OK && !success) {
+	} else {
+		// We know the mimetype of the node.
+		bool success = false;
+
+		// Get the preferred application and ask the MIME database, if that
+		// application has a special icon for the node's file type.
 		char signature[B_MIME_TYPE_LENGTH];
 		if (GetPreferredApp(signature) == B_OK) {
 			BMimeType type(signature);
-			success = (type.GetIconForType(mimeString, icon, iconSize) == B_OK);
+			success = type.GetIconForType(mimeString, icon, iconSize) == B_OK;
 		}
-	}
 
-	// Ask the MIME database whether there is an icon for the node's file type.
-	BMimeType nodeType;
-	if (error == B_OK && !success) {
-		nodeType.SetTo(mimeString);
-		success = (nodeType.GetIcon(icon, iconSize) == B_OK);
-	}
+		// TODO: Confirm Tracker asks preferred app icons before asking mime icons.
 
-	// Ask the MIME database for the preferred application for the node's
-	// file type and whether this application has a special icon for the type.
-	if (error == B_OK && !success) {
-		char signature[B_MIME_TYPE_LENGTH];
-		if (nodeType.GetPreferredApp(signature) == B_OK) {
+		BMimeType nodeType(mimeString);
+
+		// Ask the MIME database for the preferred application for the node's
+		// file type and whether this application has a special icon for the type.
+		if (!success && nodeType.GetPreferredApp(signature) == B_OK) {
 			BMimeType type(signature);
-			success = (type.GetIconForType(mimeString, icon, iconSize) == B_OK);
+			success = type.GetIconForType(mimeString, icon, iconSize) == B_OK;
 		}
+
+		// Ask the MIME database whether there is an icon for the node's file type.
+		if (!success)
+			success = nodeType.GetIcon(icon, iconSize) == B_OK;
+
+		// Get the super type if still no success.
+		BMimeType superType;
+		if (!success && nodeType.GetSupertype(&superType) == B_OK) {
+			// Ask the MIME database for the preferred application for the node's
+			// super type and whether this application has a special icon for the type.
+			if (superType.GetPreferredApp(signature) == B_OK) {
+				BMimeType type(signature);
+				success = type.GetIconForType(superType.Type(), icon, iconSize) == B_OK;
+			}
+			// Get the icon of the super type itself.
+			if (!success)
+				success = superType.GetIcon(icon, iconSize) == B_OK;
+		}
+		
+		if (success)
+			return B_OK;
 	}
 
-	// Return the icon for "application/octet-stream" from the MIME database.
-	if (error == B_OK && !success) {
-		// get the "application/octet-stream" icon
-		BMimeType type(B_FILE_MIME_TYPE);
-		error = type.GetIcon(icon, iconSize);
-		success = (error == B_OK);
-	}
-	return error;
+	return B_ERROR;
 }
 
 // GetTrackerIcon
