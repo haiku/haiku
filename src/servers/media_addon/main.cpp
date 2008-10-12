@@ -69,28 +69,28 @@ struct AddOnInfo {
 
 class MediaAddonServer : BApplication {
 public:
-	MediaAddonServer(const char *sig);
-	~MediaAddonServer();
-	void ReadyToRun();
-	bool QuitRequested();
-	void MessageReceived(BMessage *msg);
+					MediaAddonServer(const char *sig);
+	virtual 		~MediaAddonServer();
+	virtual	void 	ReadyToRun();
+	virtual bool 	QuitRequested();
+	virtual void 	MessageReceived(BMessage *msg);
 	
-	void WatchDir(BEntry *dir);
-	void AddOnAdded(const char *path, ino_t file_node);
-	void AddOnRemoved(ino_t file_node);
-	void HandleMessage(int32 code, const void *data, size_t size);
-
-	void PutAddonIfPossible(AddOnInfo *info);
-	void InstantiatePhysicalInputsAndOutputs(AddOnInfo *info);
-	void InstantiateAutostartFlavors(AddOnInfo *info);
-	void DestroyInstantiatedFlavors(AddOnInfo *info);
-	
-	void ScanAddOnFlavors(BMediaAddOn *addon);
-
-	port_id ControlPort() const { return fControlPort; }
-
 private:
-	static int32 _ControlThread(void *arg);
+			void 	WatchDir(BEntry *dir);
+			void 	AddOnAdded(const char *path, ino_t file_node);
+			void 	AddOnRemoved(ino_t file_node);
+			void 	HandleMessage(int32 code, const void *data, size_t size);
+
+			void 	PutAddonIfPossible(AddOnInfo *info);
+			void 	InstantiatePhysicalInputsAndOutputs(AddOnInfo *info);
+			void 	InstantiateAutostartFlavors(AddOnInfo *info);
+			void 	DestroyInstantiatedFlavors(AddOnInfo *info);
+	
+			void 	ScanAddOnFlavors(BMediaAddOn *addon);
+
+			port_id ControlPort() const { return fControlPort; }
+
+	static 	int32 	_ControlThread(void *arg);
 
 	Map<ino_t, media_addon_id> *fFileMap;
 	Map<media_addon_id, AddOnInfo> *fInfoMap;
