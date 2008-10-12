@@ -183,7 +183,12 @@ private:
 			bigtime_t			fLastSeekEventTime;
 
 			ListenerAdapter		fGlobalSettingsListener;
+
+			bool				fAutoplaySetting;
+				// maintains the auto-play setting
 			bool 				fAutoplay;
+				// is true if the player is already playing
+				// otherwise it's the same as fAutoplaySetting
 			bool				fLoopMovies;
 			bool				fLoopSounds;
 			uint32				fBackgroundMovieVolumeMode;

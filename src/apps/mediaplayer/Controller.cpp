@@ -114,6 +114,8 @@ Controller::Controller()
 {
 	Settings::Default()->AddListener(&fGlobalSettingsListener);
 	_AdoptGlobalSettings();
+
+	fAutoplay = fAutoplaySetting;
 }
 
 
@@ -189,8 +191,10 @@ Controller::SetTo(const entry_ref &ref)
 
 	if (fRef == ref) {
 		if (InitCheck() == B_OK) {
-			SetPosition(0.0);
-			StartPlaying();
+			if (fAutoplay) {
+				SetPosition(0.0);
+				StartPlaying(true);
+			}
 		}
 		return B_OK;
 	}
@@ -488,6 +492,8 @@ Controller::Stop()
 
 	StopPlaying();
 	SetPosition(0.0);
+
+	fAutoplay = fAutoplaySetting;
 }
 
 
@@ -499,6 +505,7 @@ Controller::Play()
 	BAutolock _(this);
 	
 	StartPlaying();
+	fAutoplay = true;
 }
 
 
@@ -510,6 +517,8 @@ Controller::Pause()
 	BAutolock _(this);
 
 	PausePlaying();
+
+	fAutoplay = fAutoplaySetting;
 }
 
 
@@ -520,8 +529,11 @@ Controller::TogglePlaying()
 
 	BAutolock _(this);
 
-	if (InitCheck() == B_OK)
+	if (InitCheck() == B_OK) {
 		NodeManager::TogglePlaying();
+
+		fAutoplay = IsPlaying() || fAutoplaySetting;
+	}
 }
 
 
@@ -784,7 +796,7 @@ Controller::_AdoptGlobalSettings()
 	mpSettings settings = Settings::CurrentSettings();
 		// thread safe
 
-	fAutoplay = settings.autostart;
+	fAutoplaySetting = settings.autostart;
 	// not yet used:
 	fLoopMovies = settings.loopMovie;
 	fLoopSounds = settings.loopSound;
