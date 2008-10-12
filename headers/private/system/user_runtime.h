@@ -46,6 +46,8 @@ struct rld_export {
 
 	void (*call_atexit_hooks_for_range)(addr_t start, addr_t size);
 
+	void (*call_termination_hooks)();
+
 	const struct user_space_program_args *program_args;
 };
 

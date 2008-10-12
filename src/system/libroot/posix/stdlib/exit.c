@@ -8,12 +8,15 @@
  */
 
 
-#include <syscalls.h>
+#include <SupportDefs.h>
+
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <limits.h>
-#include <SupportDefs.h>
+
+#include <syscalls.h>
+#include <user_runtime.h>
 
 
 extern void _IO_cleanup(void);
@@ -143,6 +146,8 @@ exit(int status)
 
 	// close all open files
 	_IO_cleanup();
+
+	__gRuntimeLoader->call_termination_hooks();
 
 	// exit with status code
 	_kern_exit_team(status);

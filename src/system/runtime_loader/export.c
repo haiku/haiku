@@ -37,7 +37,8 @@ struct rld_export gRuntimeLoader = {
 	get_next_image_dependency,
 
 	elf_reinit_after_fork,
-	NULL // call_atexit_hooks_for_range
+	NULL, // call_atexit_hooks_for_range
+	terminate_program
 };
 
 
