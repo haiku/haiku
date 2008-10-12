@@ -206,7 +206,7 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 	uint32 vecCount = kMaxSubRequests;
 	status_t error = cookie->get_vecs(cookie->cookie, request, requestOffset,
 		requestLength, vecs, &vecCount);
-	if (error != B_OK)
+	if (error != B_OK && error != B_BUFFER_OVERFLOW)
 		return error;
 	if (vecCount == 0) {
 		*_partialTransfer = true;
