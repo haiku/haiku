@@ -505,7 +505,7 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 	// the entry and check, if the latter is a prefix of the first one.
 	BPath dirPath(this, ".", true);
 	BPath entryPath(entry);
-	if (dirPath.InitCheck() == B_OK && entryPath.InitCheck() != B_OK)
+	if (dirPath.InitCheck() != B_OK || entryPath.InitCheck() != B_OK)
 		return false;
 
 	return !strncmp(dirPath.Path(), entryPath.Path(), strlen(dirPath.Path()));
