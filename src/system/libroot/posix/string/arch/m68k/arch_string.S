@@ -4,7 +4,7 @@
 */
 
 #warning M68K: optimize memcpy
-#if 0
+#if 1
 #define FUNCTION(x) .global x; .type x,@function; x
 
 /* that should be enough for now */
@@ -15,11 +15,11 @@ FUNCTION(memcpy):
 	move.l	(4,%a7),%a1
 	move.l	(8,%a7),%a0
 	move.l	(12,%a7),%d0
+_memcpy_loop:
 	addi.l	#-1,%d0
 	blt	_memcpy_out
-_memcpy_loop:
 	move.b	(%a0)+,(%a1)+
-	dbf	%d0,_memcpy_loop
+	bra	_memcpy_loop
 _memcpy_out:
 	move.l	(4,%a7),%a0
 	move.l	%a0,%d0
