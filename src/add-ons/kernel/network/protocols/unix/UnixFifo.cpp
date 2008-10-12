@@ -575,3 +575,4 @@ UnixFifo::_WriteNonBlocking(UnixRequest& request)
 	// Write as much as we can.
 	RETURN_ERROR(fBuffer.Write(request));
 }
+
