@@ -37,6 +37,8 @@ static const char* kUsage =
 	"the user and kernel times of all threads that ran during that time.\n"
 	"\n"
 	"Options:\n"
+	"  -b <size>    - When doing scheduling analysis: the size of the buffer\n"
+	"                 used (in MB)\n"
 	"  -h, --help   - Print this usage info.\n"
 	"  -o <output>  - Print the results to file <output>.\n"
 	"  -s           - Also perform a scheduling analysis over the time the\n"
@@ -212,12 +214,13 @@ wait_object_to_string(scheduling_analysis_wait_object* waitObject, char* buffer,
 
 
 static void
-do_scheduling_analysis(bigtime_t startTime, bigtime_t endTime)
+do_scheduling_analysis(bigtime_t startTime, bigtime_t endTime,
+	size_t bufferSize)
 {
 	printf("\n");
 
 	// allocate a chunk of memory for the scheduling analysis
-	void* buffer = malloc(SCHEDULING_ANALYSIS_BUFFER_SIZE);
+	void* buffer = malloc(bufferSize);
 	if (buffer == NULL) {
 		fprintf(stderr, "Error: Failed to allocate memory for the scheduling "
 			"analysis.\n");
@@ -228,7 +231,7 @@ do_scheduling_analysis(bigtime_t startTime, bigtime_t endTime)
 	// do the scheduling analysis
 	scheduling_analysis analysis;
 	status_t error = _kern_analyze_scheduling(startTime, endTime, buffer,
-		SCHEDULING_ANALYSIS_BUFFER_SIZE, &analysis);
+		bufferSize, &analysis);
 	if (error != B_OK) {
 		fprintf(stderr, "Error: Scheduling analysis failed: %s\n",
 			strerror(error));
@@ -359,7 +362,7 @@ do_scheduling_analysis(bigtime_t startTime, bigtime_t endTime)
 
 static void
 do_timing_analysis(int argc, const char* const* argv, bool schedulingAnalysis,
-	int outFD)
+	int outFD, size_t bufferSize)
 {
 	// gather initial usage info
 	thread_info initialUsage[MAX_THREADS];
@@ -478,7 +481,7 @@ do_timing_analysis(int argc, const char* const* argv, bool schedulingAnalysis,
 	}
 
 	if (schedulingAnalysis)
-		do_scheduling_analysis(startTime, endTime);
+		do_scheduling_analysis(startTime, endTime, bufferSize);
 }
 
 
@@ -487,6 +490,7 @@ main(int argc, const char* const* argv)
 {
 	const char* outputFile = NULL;
 	bool schedulingAnalysis = false;
+	size_t bufferSize = SCHEDULING_ANALYSIS_BUFFER_SIZE;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -496,11 +500,20 @@ main(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+ho:s", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+b:ho:s", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case 'b':
+				bufferSize = atol(optarg);
+				if (bufferSize < 1 || bufferSize > 1024) {
+					fprintf(stderr, "Error: Invalid buffer size. Should be "
+						"between 1 and 1024 MB\n");
+					exit(1);
+				}
+				bufferSize *= 1024 * 1024;
+				break;
 			case 'h':
 				print_usage_and_exit(false);
 				break;
@@ -532,7 +545,8 @@ main(int argc, const char* const* argv)
 		}
 	}
 
-	do_timing_analysis(argc - optind, argv + optind, schedulingAnalysis, outFD);
+	do_timing_analysis(argc - optind, argv + optind, schedulingAnalysis, outFD,
+		bufferSize);
 
 	return 0;
 }
