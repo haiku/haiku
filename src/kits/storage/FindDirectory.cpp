@@ -36,7 +36,8 @@ find_directory(directory_which which, BPath *path, bool createIt,
 		device = volume->Device();
 
 	char buffer[B_PATH_NAME_LENGTH];
-	status_t error = find_directory(which, device, createIt, buffer, B_PATH_NAME_LENGTH);
+	status_t error = find_directory(which, device, createIt, buffer,
+		B_PATH_NAME_LENGTH);
 	if (error == B_OK)
 		error = path->SetTo(buffer);
 
