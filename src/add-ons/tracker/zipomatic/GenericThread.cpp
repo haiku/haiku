@@ -3,6 +3,8 @@
 
 #include "GenericThread.h"
 
+#include <string.h>
+
 GenericThread::GenericThread(const char * a_thread_name, int32 a_priority, BMessage * a_message)	
 	:
 	m_thread_data_store	(a_message),
@@ -313,7 +315,7 @@ GenericThread::GetName (void)
 {
 	thread_info	t_thread_info;
 	GetInfo (& t_thread_info);
-	return (t_thread_info.name);
+	return strdup(t_thread_info.name);
 }
 
 thread_state	
