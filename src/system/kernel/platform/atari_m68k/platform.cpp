@@ -5,6 +5,7 @@
 #include <arch_platform.h>
 
 #include <new>
+#include <util/kernel_cpp.h>
 
 #include <KernelExport.h>
 
@@ -13,7 +14,7 @@
 //#include <platform/openfirmware/openfirmware.h>
 #include <platform/atari_m68k/MFP.h>
 #include <real_time_clock.h>
-#include <util/kernel_cpp.h>
+#include <timer.h>
 
 #include "debugger_keymaps.h"
 
@@ -118,6 +119,8 @@ public:
 
 private:
 	MFP	*MFPForIrq(int irq);
+	static int32	MFPTimerInterrupt(void *data);
+
 	int	fRTC;
 
 	MFP	*fMFP[2];
@@ -290,7 +293,7 @@ M68KAtari::InitTimer(struct kernel_args *kernelArgs)
 {
 	
 	out8(fMFP[0]->Base() + MFP_TACR, 0); // stop it
-	install_io_interrupt_handler(fMFP[0]->Vector()+13, &pit_timer_interrupt, NULL, 0);
+	install_io_interrupt_handler(fMFP[0]->Vector()+13, &MFPTimerInterrupt, fMFP[0], 0);
 	return B_OK;
 }
 
@@ -540,6 +543,12 @@ M68KAtari::MFPForIrq(int irq)
 		}
 	}
 	return NULL;
+}
+
+int32
+M68KAtari::MFPTimerInterrupt(void *data)
+{
+	return timer_interrupt();
 }
 
 
