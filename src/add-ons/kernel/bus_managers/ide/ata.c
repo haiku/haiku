@@ -49,13 +49,13 @@ void
 ata_dpc_PIO(ide_qrequest *qrequest)
 {
 	ide_device_info *device = qrequest->device;
-	uint32 timeout = qrequest->request->timeout > 0 ? 
+	uint32 timeout = qrequest->request->timeout > 0 ?
 		qrequest->request->timeout : IDE_STD_TIMEOUT;
 
 	SHOW_FLOW0(3, "");
 
 	if (check_rw_error(device, qrequest)
-		|| !check_rw_status(device, qrequest->is_write ? device->left_blocks > 0 : true)) 
+		|| !check_rw_status(device, qrequest->is_write ? device->left_blocks > 0 : true))
 	{
 		// failure reported by device
 		SHOW_FLOW0( 3, "command finished unsuccessfully" );
@@ -182,7 +182,7 @@ static uint8 cmd_28[2][2] = {
 /** create IDE read/write command */
 
 static bool
-create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest, 
+create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 	uint64 pos, size_t length, bool write)
 {
 	SHOW_FLOW0( 3, "" );
@@ -216,8 +216,8 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 				device->tf.queued48.lba_24_31 = (pos >> 24) & 0xff;
 				device->tf.queued48.lba_32_39 = (pos >> 32) & 0xff;
 				device->tf.queued48.lba_40_47 = (pos >> 40) & 0xff;
-				device->tf.queued48.command = write ? IDE_CMD_WRITE_DMA_QUEUED 
-					: IDE_CMD_READ_DMA_QUEUED;
+				device->tf.queued48.command = write ? IDE_CMD_WRITE_DMA_QUEUED_EXT
+					: IDE_CMD_READ_DMA_QUEUED_EXT;
 				return true;
 			} else {
 				// non-queued LBA48
@@ -260,7 +260,7 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 				device->tf.queued.lba_8_15 = (pos >> 8) & 0xff;
 				device->tf.queued.lba_16_23 = (pos >> 16) & 0xff;
 				device->tf.queued.lba_24_27 = (pos >> 24) & 0xf;
-				device->tf.queued.command = write ? IDE_CMD_WRITE_DMA_QUEUED 
+				device->tf.queued.command = write ? IDE_CMD_WRITE_DMA_QUEUED
 					: IDE_CMD_READ_DMA_QUEUED;
 				return true;
 			} else {
@@ -303,7 +303,7 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 		track_size = infoblock->current_heads * infoblock->current_sectors;
 
 		if (track_size == 0) {
-			set_sense(device, 
+			set_sense(device,
 				SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_MEDIUM_FORMAT_CORRUPTED);
 			return false;
 		}
@@ -342,7 +342,7 @@ ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 	ide_bus_info *bus = device->bus;
 	uint32 timeout;
 
-	// make a copy first as settings may get changed by user during execution	
+	// make a copy first as settings may get changed by user during execution
 	qrequest->is_write = write;
 	qrequest->uses_dma = device->DMA_enabled;
 
@@ -375,7 +375,7 @@ ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 		goto err_setup;
 
 	// if no timeout is specified, use standard
-	timeout = qrequest->request->timeout > 0 ? 
+	timeout = qrequest->request->timeout > 0 ?
 		qrequest->request->timeout : IDE_STD_TIMEOUT;
 
 	// in DMA mode, we continue with "accessing",
@@ -383,7 +383,7 @@ ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 	// on PIO write, we continue with "accessing"
 	if (!send_command(device, qrequest, !device->is_atapi, timeout,
 			(!qrequest->uses_dma && !qrequest->is_write) ?
-				ide_state_async_waiting : ide_state_accessing)) 
+				ide_state_async_waiting : ide_state_accessing))
 		goto err_send;
 
 	if (qrequest->uses_dma) {
@@ -419,7 +419,7 @@ ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 	} else {
 		// on PIO read, we start with waiting, on PIO write we can
 		// transmit data immediately; we let the service thread do
-		// the writing, so the caller can issue the next command 
+		// the writing, so the caller can issue the next command
 		// immediately (this optimisation really pays on SMP systems
 		// only)
 		SHOW_FLOW0(3, "Ready for PIO");
@@ -438,9 +438,9 @@ err_setup:
 
 	finish_checksense(qrequest);
 	return;
-	
+
 err_send:
-	// error during/after send; 
+	// error during/after send;
 	// in this case, the device discards queued request automatically
 	if (qrequest->uses_dma)
 		abort_dma(device, qrequest);
@@ -499,7 +499,7 @@ check_rw_error(ide_device_info *device, ide_qrequest *qrequest)
 			set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_RANDOM_POS_ERROR);
 			return true;
 		}
-		
+
 		if ((error & ide_error_mcr) != 0) {
 			// XXX proper sense key?
 			// for TUR this case is not defined !?
@@ -548,7 +548,7 @@ check_output(ide_device_info *device, bool drdy_required,
 
 	status = bus->controller->get_altstatus(bus->channel_cookie);
 
-	// if device is busy, other flags are indeterminate	
+	// if device is busy, other flags are indeterminate
 	if ((status & ide_status_bsy) != 0) {
 		device->subsys_status = SCSI_SEQUENCE_FAIL;
 		return false;
@@ -704,7 +704,7 @@ configure_command_queueing(ide_device_info *device)
 
 	SHOW_INFO0(2, "Enabled command queueing");
 
-	// official IBM docs talk about 31 queue entries, though 
+	// official IBM docs talk about 31 queue entries, though
 	// their disks report 32; let's hope their docs are wrong
 	return initialize_qreq_array(device, device->infoblock.queue_depth + 1);
 }

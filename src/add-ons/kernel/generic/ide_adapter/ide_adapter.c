@@ -57,7 +57,7 @@ ide_adapter_write_command_block_regs(ide_adapter_channel_info *channel,
 		return B_ERROR;
 
 	for (i = 0; i < 7; i++) {
-		if (((1 << (i-7)) & mask) != 0) {
+		if (((1 << (i + 6)) & mask) != 0) {
 			SHOW_FLOW( 4, "%x->HI(%x)", tf->raw.r[i + 7], i );
 			pci->write_io_8(device, ioaddr + 1 + i, tf->raw.r[i + 7]);
 		}
