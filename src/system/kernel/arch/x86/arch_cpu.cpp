@@ -108,11 +108,11 @@ acpi_shutdown(void)
 	if (get_module(B_ACPI_MODULE_NAME, (module_info**)&acpi) != B_OK)
 		return B_NOT_SUPPORTED;
 
-	status_t status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
+	status_t status = acpi->prepare_sleep_state(ACPI_POWER_STATE_OFF, NULL, 0);
 	if (status == B_OK) {
-		cpu_status state = disable_interrupts();
+		//cpu_status state = disable_interrupts();
 		status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
-		restore_interrupts(state);
+		//restore_interrupts(state);
 	}
 
 	put_module(B_ACPI_MODULE_NAME);
