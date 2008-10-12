@@ -57,6 +57,7 @@ private:
 public:
 	class StreamInterface {
 	public:
+		virtual			~StreamInterface() {};
 		virtual ssize_t		ReadPage() = 0;
 	};
 };
