@@ -230,7 +230,7 @@ static void
 put_level(int32 level)
 {
 	while (level-- > 0)
-		dprintf("   ");
+		kprintf("   ");
 }
 
 
@@ -241,31 +241,31 @@ dump_attribute(device_attr* attr, int32 level)
 		return;
 
 	put_level(level + 2);
-	dprintf("\"%s\" : ", attr->name);
+	kprintf("\"%s\" : ", attr->name);
 	switch (attr->type) {
 		case B_STRING_TYPE:
-			dprintf("string : \"%s\"", attr->value.string);
+			kprintf("string : \"%s\"", attr->value.string);
 			break;
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
-			dprintf("uint8 : %u (%#x)", attr->value.ui8, attr->value.ui8);
+			kprintf("uint8 : %u (%#x)", attr->value.ui8, attr->value.ui8);
 			break;
 		case B_INT16_TYPE:
 		case B_UINT16_TYPE:
-			dprintf("uint16 : %u (%#x)", attr->value.ui16, attr->value.ui16);
+			kprintf("uint16 : %u (%#x)", attr->value.ui16, attr->value.ui16);
 			break;
 		case B_INT32_TYPE:
 		case B_UINT32_TYPE:
-			dprintf("uint32 : %lu (%#lx)", attr->value.ui32, attr->value.ui32);
+			kprintf("uint32 : %lu (%#lx)", attr->value.ui32, attr->value.ui32);
 			break;
 		case B_INT64_TYPE:
 		case B_UINT64_TYPE:
-			dprintf("uint64 : %Lu (%#Lx)", attr->value.ui64, attr->value.ui64);
+			kprintf("uint64 : %Lu (%#Lx)", attr->value.ui64, attr->value.ui64);
 			break;
 		default:
-			dprintf("raw data");
+			kprintf("raw data");
 	}
-	dprintf("\n");
+	kprintf("\n");
 }
 
 
@@ -2126,7 +2126,7 @@ void
 device_node::Dump(int32 level)
 {
 	put_level(level);
-	dprintf("(%ld) @%p \"%s\" (ref %ld, init %ld, module %p, data %p)\n", level,
+	kprintf("(%ld) @%p \"%s\" (ref %ld, init %ld, module %p, data %p)\n", level,
 		this, ModuleName(), fRefCount, fInitialized, DriverModule(),
 		DriverData());
 
@@ -2139,7 +2139,7 @@ device_node::Dump(int32 level)
 	while (deviceIterator.HasNext()) {
 		Device* device = deviceIterator.Next();
 		put_level(level);
-		dprintf("device: %s, %p\n", device->ModuleName(), device->Data());
+		kprintf("device: %s, %p\n", device->ModuleName(), device->Data());
 	}
 
 	NodeList::ConstIterator iterator = Children().GetIterator();
@@ -2231,10 +2231,6 @@ device_manager_init(struct kernel_args* args)
 
 	recursive_lock_init(&sLock, "device manager");
 	init_node_tree();
-
-#ifdef TRACE_DEVICE_MANAGER
-	sRootNode->Dump();
-#endif
 
 	register_generic_syscall(DEVICE_MANAGER_SYSCALLS, control_device_manager,
 		1, 0);
