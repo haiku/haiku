@@ -3006,8 +3006,8 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 	Returns \c true in case the message should still be dispatched
 */
 bool
-BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message, BHandler** _target,
-	bool* _usePreferred)
+BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message,
+	BHandler** _target, bool* _usePreferred)
 {
 	if (cookie.message == NULL)
 		return false;
@@ -3140,21 +3140,7 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 						viewUnderMouse = _FindView(token);
 
 					// add transit information
-					int32 transit;
-					if (viewUnderMouse == view) {
-						// the mouse is over the target view
-						if (fLastMouseMovedView != view)
-							transit = B_ENTERED_VIEW;
-						else
-							transit = B_INSIDE_VIEW;
-					} else {
-						// the mouse is not over the target view
-						if (view == fLastMouseMovedView)
-							transit = B_EXITED_VIEW;
-						else
-							transit = B_OUTSIDE_VIEW;
-					}
-
+					uint32 transit = _TransitForMouseMoved(view, viewUnderMouse);;
 					message->AddInt32("be:transit", transit);
 
 					if (usePreferred || viewUnderMouse == NULL)
@@ -3210,24 +3196,52 @@ BWindow::_StealMouseMessage(BMessage* message, bool& deleteMessage)
 		message->RemoveName("_feed_focus");
 		deleteMessage = false;
 	} else {
-		// The message is only thought for the preferred handler, so we
-		// can just remove it.
-		MessageQueue()->RemoveMessage(message);
 		deleteMessage = true;
 
 		if (message->what == B_MOUSE_MOVED) {
 			// We need to update the last mouse moved view, as this message
-			// won't make it to _SanitizeMessage() anymore
+			// won't make it to _SanitizeMessage() anymore.
 			BView* viewUnderMouse = NULL;
 			int32 token;
 			if (message->FindInt32("_view_token", &token) == B_OK)
 				viewUnderMouse = _FindView(token);
 
-			fLastMouseMovedView = viewUnderMouse;
+			// Don't remove important transit messages!
+			uint32 transit = _TransitForMouseMoved(fLastMouseMovedView,
+				viewUnderMouse);
+			if (transit == B_ENTERED_VIEW || transit == B_EXITED_VIEW)
+				deleteMessage = false;
+		}
+
+		if (deleteMessage) {
+			// The message is only thought for the preferred handler, so we
+			// can just remove it.
+			MessageQueue()->RemoveMessage(message);
 		}
 	}
 
 	return true;
+}
+
+
+uint32
+BWindow::_TransitForMouseMoved(BView* view, BView* viewUnderMouse) const
+{
+	uint32 transit;
+	if (viewUnderMouse == view) {
+		// the mouse is over the target view
+		if (fLastMouseMovedView != view)
+			transit = B_ENTERED_VIEW;
+		else
+			transit = B_INSIDE_VIEW;
+	} else {
+		// the mouse is not over the target view
+		if (view == fLastMouseMovedView)
+			transit = B_EXITED_VIEW;
+		else
+			transit = B_OUTSIDE_VIEW;
+	}
+	return transit;
 }
 
 

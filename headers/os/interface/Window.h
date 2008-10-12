@@ -301,6 +301,8 @@ private:
 								BHandler* target, bool usePreferred);
 			bool			_StealMouseMessage(BMessage* message,
 								bool& deleteMessage);
+			uint32			_TransitForMouseMoved(BView* view,
+								BView* viewUnderMouse) const;
 
 			bool			InUpdate();
 			void			_DequeueAll();
