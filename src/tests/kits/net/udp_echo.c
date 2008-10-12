@@ -104,7 +104,7 @@ udp_echo_server(int sockFD)
 			exit(5);
 		}
 		buf[status] = 0;
-		printf("got <%s> from client(%lx:%u)\n", buf, clientAddr.sin_addr.s_addr, clientAddr.sin_port);
+		printf("got <%s> from client(%08x:%u)\n", buf, clientAddr.sin_addr.s_addr, clientAddr.sin_port);
 		for (i = 0; i < status; ++i) {
 			if (islower(buf[i]))
 				buf[i] = toupper(buf[i]);
@@ -132,7 +132,7 @@ main(int argc, char** argv)
 		CLIENT_MODE,
 		BROADCAST_MODE,
 		SERVER_MODE,
-	} mode;
+	} mode = 0;
 	unsigned short bindPort = 0;
 	const char* bindAddr = NULL;
 
@@ -155,7 +155,7 @@ main(int argc, char** argv)
 		serverAddr.sin_addr.s_addr = inet_addr(argv[2]);
 		if (argc > 4)
 			bindPort = atoi(argv[4]);
-		printf("client connected to server(%lx:%u)\n", serverAddr.sin_addr.s_addr,
+		printf("client connected to server(%08x:%u)\n", serverAddr.sin_addr.s_addr,
 			ntohs(serverAddr.sin_port));
 	} else if (!strcmp(argv[1], "broadcast")) {
 		mode = BROADCAST_MODE;
