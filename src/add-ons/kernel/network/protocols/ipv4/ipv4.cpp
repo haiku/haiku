@@ -12,6 +12,7 @@
 
 #include <net_datalink.h>
 #include <net_datalink_protocol.h>
+#include <net_device.h>
 #include <net_protocol.h>
 #include <net_stack.h>
 #include <NetBufferUtilities.h>
@@ -1249,6 +1250,7 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 
 	sockaddr_in &source = *(sockaddr_in *)buffer->source;
 	sockaddr_in &destination = *(sockaddr_in *)buffer->destination;
+	sockaddr_in &broadcastAddress = *(sockaddr_in *)interface->destination;
 
 	bool headerIncluded = false, checksumNeeded = true;
 	if (protocol != NULL)
@@ -1258,8 +1260,10 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 
 	if (destination.sin_addr.s_addr == INADDR_ANY)
 		return EDESTADDRREQ;
-	else if (destination.sin_addr.s_addr == INADDR_BROADCAST) {
-		// TODO check for local broadcast addresses as well?
+	else if ((interface->device->flags & IFF_BROADCAST) != 0
+		&& (destination.sin_addr.s_addr == INADDR_BROADCAST
+			|| destination.sin_addr.s_addr
+				== broadcastAddress.sin_addr.s_addr)) {
 		if (protocol && !(protocol->socket->options & SO_BROADCAST))
 			return B_BAD_VALUE;
 		buffer->flags |= MSG_BCAST;
