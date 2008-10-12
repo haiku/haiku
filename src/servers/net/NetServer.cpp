@@ -588,14 +588,8 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 		request.ifr_route = route;
 
 		if (autoConfig) {
-			// add a default route to make the interface accessible, even without an address
-			if (ioctl(socket, SIOCADDRT, &request, sizeof(request)) < 0) {
-				fprintf(stderr, "%s: Could not add route for %s: %s\n",
-					Name(), device, strerror(errno));
-			} else {
-				_QuitLooperForDevice(device);
-				startAutoConfig = true;
-			}
+			_QuitLooperForDevice(device);
+			startAutoConfig = true;
 		} else if (addressMessage.FindString("gateway", &string) == B_OK
 			&& parse_address(familyIndex, string, gateway)) {
 			// add gateway route, if we're asked for it

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/sockio.h>
 #include <sys/time.h>
 
 
@@ -407,6 +408,24 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 	int option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
+
+	if (state == INIT) {
+		// The local interface does not have an address yet, bind the socket
+		// to the device directly.
+		int linkSocket = ::socket(AF_LINK, SOCK_DGRAM, 0);
+		if (linkSocket >= 0) {
+			// we need to know the index of the device to be able to bind to it
+			ifreq request;
+			prepare_request(request, fDevice.String());
+			if (ioctl(linkSocket, SIOCGIFINDEX, &request, sizeof(struct ifreq))
+					== 0) {
+				setsockopt(socket, SOL_SOCKET, SO_BINDTODEVICE,
+					&request.ifr_index, sizeof(int));
+			}
+
+			close(linkSocket);
+		}
+	}
 
 	bigtime_t previousLeaseTime = fLeaseTime;
 	fLeaseTime = 0;
