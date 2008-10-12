@@ -2,11 +2,13 @@
  * Copyright 2008, François Revol, revol@free.fr
  * Distributed under the terms of the MIT License.
  */
+
 #include <ctype.h>
 #include <cxxabi.h>
-#include <debug.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
+
+#include <debug.h>
 
 #define DEMANGLE_BUFFER_SIZE (16*1024)
 static char sDemangleBuffer[DEMANGLE_BUFFER_SIZE];
@@ -14,11 +16,12 @@ static char sDemangleBuffer[DEMANGLE_BUFFER_SIZE];
 extern "C" void set_debug_demangle_hook(const char *(*demangle_hook)(const char *));
 
 /* gcc's __cxa_demangle calls malloc and friends...
- * we don't want to let it call the real one from inside the kernel debugger... 
+ * we don't want to let it call the real one from inside the kernel debugger...
  * instead we just return it a static buffer.
  */
 
-void *malloc(size_t len)
+void *
+malloc(size_t len)
 {
 	if (len < DEMANGLE_BUFFER_SIZE)
 		return sDemangleBuffer;
@@ -26,12 +29,14 @@ void *malloc(size_t len)
 }
 
 
-void free(void *ptr)
+void
+free(void *ptr)
 {
 }
 
 
-void *realloc(void * old_ptr, size_t new_size)
+void *
+realloc(void * oldPtr, size_t newSize)
 {
 	return NULL;
 }
@@ -134,7 +139,10 @@ DemangleDebugOutputFilter::Print(const char* format, va_list args)
 }
 #endif
 
-static const char *kdebug_demangle(const char *sym)
+
+static const char *
+demangle_symbol(const char *sym, char* buffer, size_t bufferSize,
+	bool* _isObjectMethod)
 {
 	char *demangled;
 	size_t length = DEMANGLE_BUFFER_SIZE;
@@ -147,47 +155,19 @@ static const char *kdebug_demangle(const char *sym)
 	return sym;
 }
 
-static void
-exit_debugger()
-{
-}
 
-
-static status_t
-std_ops(int32 op, ...)
-{
-	if (op == B_MODULE_INIT) {
-#if 0
-		DebugOutputFilter *old;
-		DemangleDebugOutputFilter *filter = new(std::nothrow) DemangleDebugOutputFilter;
-		old = set_debug_output_filter(filter);
-		filter->SetChain(old);
-#endif
-		debug_set_demangle_hook(kdebug_demangle);
-
-		return B_OK;
-	} else if (op == B_MODULE_UNINIT) {
-		return B_OK;
-	}
-
-	return B_BAD_VALUE;
-}
-
-
-static struct debugger_module_info sModuleInfo = {
+static struct debugger_demangle_module_info sModuleInfo = {
 	{
-		"debugger/demangle/v1",
-		B_KEEP_LOADED,
-		&std_ops
+		"debugger/demangle/gcc3+/v1",
+		0,
+		NULL
 	},
 
+	demangle_symbol,
 	NULL,
-	exit_debugger,
-	NULL,
-	NULL
 };
 
-module_info *modules[] = { 
+module_info *modules[] = {
 	(module_info *)&sModuleInfo,
 	NULL
 };

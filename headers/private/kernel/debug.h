@@ -66,6 +66,16 @@ struct debugger_module_info {
 	// TODO: add hooks for tunnelling gdb ?
 };
 
+struct debugger_demangle_module_info {
+	module_info info;
+
+	const char* (*demangle_symbol)(const char* name, char* buffer,
+		size_t bufferSize, bool* _isObjectMethod);
+	status_t (*get_next_argument)(uint32* _cookie, const char* symbol,
+		char* name, size_t nameSize, int32* _type, size_t* _argumentLength);
+};
+
+
 extern int dbg_register_file[B_MAX_CPU_COUNT][14];
 
 typedef struct debug_page_fault_info {
@@ -89,21 +99,21 @@ struct kernel_args;
 extern status_t debug_init(struct kernel_args *args);
 extern status_t	debug_init_post_vm(struct kernel_args *args);
 extern status_t	debug_init_post_modules(struct kernel_args *args);
-extern void debug_early_boot_message(const char *string);
-extern void debug_puts(const char *s, int32 length);
-extern bool debug_debugger_running(void);
-extern bool debug_screen_output_enabled(void);
-extern void debug_stop_screen_debug_output(void);
-extern void debug_set_page_fault_info(addr_t faultAddress, addr_t pc,
-				uint32 flags);
+extern void		debug_early_boot_message(const char *string);
+extern void		debug_puts(const char *s, int32 length);
+extern bool		debug_debugger_running(void);
+extern bool		debug_screen_output_enabled(void);
+extern void		debug_stop_screen_debug_output(void);
+extern void		debug_set_page_fault_info(addr_t faultAddress, addr_t pc,
+					uint32 flags);
 extern debug_page_fault_info* debug_get_page_fault_info();
 
-extern void	kputs(const char *string);
-extern void	kputs_unfiltered(const char *string);
-extern void kprintf_unfiltered(const char *format, ...)
-				__attribute__ ((format (__printf__, 1, 2)));
-extern void dprintf_no_syslog(const char *format, ...)
-				__attribute__ ((format (__printf__, 1, 2)));
+extern void		kputs(const char *string);
+extern void		kputs_unfiltered(const char *string);
+extern void		kprintf_unfiltered(const char *format, ...)
+					__attribute__ ((format (__printf__, 1, 2)));
+extern void		dprintf_no_syslog(const char *format, ...)
+					__attribute__ ((format (__printf__, 1, 2)));
 
 extern bool		is_debug_variable_defined(const char* variableName);
 extern bool		set_debug_variable(const char* variableName, uint64 value);
@@ -125,8 +135,11 @@ extern status_t	add_debugger_command_alias(const char* newName,
 					const char* oldName, const char* description);
 extern bool		print_debugger_command_usage(const char* command);
 
-extern void debug_set_demangle_hook(const char *(*hook)(const char *));
-extern const char *debug_demangle(const char *);
+extern const char *debug_demangle_symbol(const char* symbol, char* buffer,
+					size_t bufferSize, bool* _isObjectMethod);
+extern status_t	debug_get_next_demangled_argument(uint32* _cookie,
+					const char* symbol, char* name, size_t nameSize,
+					int32* _type, size_t* _argumentLength);
 
 extern struct thread* debug_set_debugged_thread(struct thread* thread);
 extern struct thread* debug_get_debugged_thread();

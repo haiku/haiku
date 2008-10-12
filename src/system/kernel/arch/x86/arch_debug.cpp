@@ -99,10 +99,6 @@ lookup_symbol(struct thread* thread, addr_t address, addr_t *_baseAddress,
 		}
 	}
 
-	if (status == B_OK) {
-		*_symbolName = debug_demangle(*_symbolName);
-	}
-
 	return status;
 }
 
@@ -126,11 +122,17 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	status = lookup_symbol(thread, eip, &baseAddress, &symbol, &image,
 		&exactMatch);
 
+	char buffer[64];
+	const char* name = debug_demangle_symbol(symbol, buffer, sizeof(buffer),
+		NULL);
+	if (name == NULL)
+		name = symbol;
+
 	kprintf("%2ld %08lx (+%4ld) %08lx", callIndex, ebp, diff, eip);
 
 	if (status == B_OK) {
-		if (symbol != NULL) {
-			kprintf("   <%s>:%s + 0x%04lx%s\n", image, symbol,
+		if (name != NULL) {
+			kprintf("   <%s>:%s + 0x%04lx%s\n", image, name,
 				eip - baseAddress, exactMatch ? "" : " (nearest)");
 		} else {
 			kprintf("   <%s@%p>:unknown + 0x%04lx\n", image,
@@ -437,6 +439,15 @@ stack_trace(int argc, char **argv)
 
 
 static void
+set_debug_argument_variable(int32 index, uint64 value)
+{
+	char name[8];
+	snprintf(name, sizeof(name), "_arg%ld", index);
+	set_debug_variable(name, value);
+}
+
+
+static void
 print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	int32 argCount)
 {
@@ -444,6 +455,9 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	addr_t baseAddress;
 	bool exactMatch;
 	status_t status;
+	char buffer[64];
+	const char* name = NULL;
+	bool isObjectMethod;
 
 	status = lookup_symbol(thread, eip, &baseAddress, &symbol, &image,
 		&exactMatch);
@@ -452,8 +466,16 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 
 	if (status == B_OK) {
 		if (symbol != NULL) {
-			kprintf("   <%s>:%s%s", image, symbol,
-				exactMatch ? "" : " (nearest)");
+			if (exactMatch && argCount <= 0) {
+				name = debug_demangle_symbol(symbol, buffer, sizeof(buffer),
+					&isObjectMethod);
+				if (argCount < 0)
+					isObjectMethod = false;
+			}
+			if (name == NULL) {
+				kprintf("   <%s>:%s%s", image, symbol,
+					exactMatch ? "" : " (nearest)");
+			}
 		} else {
 			kprintf("   <%s@%p>:unknown + 0x%04lx", image,
 				(void *)baseAddress, eip - baseAddress);
@@ -469,20 +491,114 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	}
 
 	int32 *arg = (int32 *)(nextEbp + 8);
-	kprintf("(");
 
-	for (int32 i = 0; i < argCount; i++) {
-		if (i > 0)
-			kprintf(", ");
-		kprintf("%#lx", *arg);
-		if (*arg > -0x10000 && *arg < 0x10000)
-			kprintf(" (%ld)", *arg);
+	if (name != NULL) {
+		if (isObjectMethod) {
+			const char* lastName = strrchr(name, ':') - 1;
+			int namespaceLength = lastName - name;
 
-		char name[8];
-		snprintf(name, sizeof(name), "_arg%ld", i + 1);
-		set_debug_variable(name, *(uint32 *)arg);
+			kprintf("   <%s> %.*s<%p>%s", image, namespaceLength, name,
+				*(uint32 **)arg, lastName);
+			set_debug_variable("_this", *(uint32 *)arg);
+			arg++;
+		} else
+			kprintf("   <%s> %s", image, name);
 
-		arg++;
+		kprintf("(");
+
+		char buffer[64];
+		size_t length;
+		int32 type, i = 0;
+		uint32 cookie = 0;
+		while (debug_get_next_demangled_argument(&cookie, symbol, buffer,
+				sizeof(buffer), &type, &length) == B_OK) {
+			if (i++ > 0)
+				kprintf(", ");
+
+			// retrieve value and type identifier
+
+			uint64 value;
+
+			switch (type) {
+				case B_INT64_TYPE:
+					value = *(int64*)arg;
+					kprintf("int64: %Ld", value);
+					break;
+				case B_INT32_TYPE:
+					value = *(int32*)arg;
+					kprintf("int32: %ld", (int32)value);
+					break;
+				case B_INT16_TYPE:
+					value = *(int16*)arg;
+					kprintf("int16: %d", (int16)value);
+					break;
+				case B_INT8_TYPE:
+					value = *(int8*)arg;
+					kprintf("int8: %d", (int8)value);
+					break;
+				case B_UINT64_TYPE:
+					value = *(uint64*)arg;
+					kprintf("uint64: %Lx", value);
+					if (value < 0x100000)
+						kprintf(" (%Lu)", value);
+					break;
+				case B_UINT32_TYPE:
+					value = *(uint32*)arg;
+					kprintf("uint32: %lx", (uint32)value);
+					if (value < 0x100000)
+						kprintf(" (%lu)", (uint32)value);
+					break;
+				case B_UINT16_TYPE:
+					value = *(uint16*)arg;
+					kprintf("uint16: %#x (%u)", (uint16)value, (uint16)value);
+					break;
+				case B_UINT8_TYPE:
+					value = *(uint8*)arg;
+					kprintf("uint8: %#x (%u)", (uint8)value, (uint8)value);
+					break;
+				case B_BOOL_TYPE:
+					value = *(uint8*)arg;
+					kprintf(value ? "true" : "false");
+					break;
+				default:
+					if (buffer[0]) {
+						kprintf("%s%s: ", buffer, type == B_POINTER_TYPE ? "*"
+							: type == B_REF_TYPE ? "&" : "");
+					}
+
+					if (length == 4) {
+						value = *(uint32*)arg;
+						kprintf("%#lx", (uint32)value);
+						break;
+					}
+
+					if (length == 8)
+						value = *(uint64*)arg;
+					else
+						value = (uint64)arg;
+					kprintf("%#Lx", value);
+					break;
+			}
+
+			if (type == B_STRING_TYPE && value != 0)
+				kprintf(" \"%s\"", (char*)value);
+
+			set_debug_argument_variable(i, value);
+			arg = (int32*)((uint8*)arg + length);
+		}
+	} else {
+		kprintf("(");
+
+		for (int32 i = 0; i < argCount; i++) {
+			if (i > 0)
+				kprintf(", ");
+			kprintf("%#lx", *arg);
+			if (*arg > -0x10000 && *arg < 0x10000)
+				kprintf(" (%ld)", *arg);
+
+			set_debug_argument_variable(i + 1, *(uint32 *)arg);
+			arg++;
+		}
 	}
 
 	kprintf(")\n");
@@ -500,7 +616,8 @@ show_call(int argc, char **argv)
 		"the specified thread.\n"
 		"  <thread id>   -  The ID of the thread for which to print the call.\n"
 		"  <call index>  -  The index of the call in the stack trace.\n"
-		"  <arg count>   -  The number of call arguments to print.\n";
+		"  <arg count>   -  The number of call arguments to print (use 'c' to\n"
+		"                   force the C++ demangler to use class methods).\n";
 	if (argc == 2 && strcmp(argv[1], "--help") == 0) {
 		kprintf(usage, argv[0]);
 		return 0;
@@ -512,8 +629,11 @@ show_call(int argc, char **argv)
 	int32 argCount = 0;
 
 	if (argc >= 2 && argv[argc - 1][0] == '-') {
-		argCount = strtoul(argv[argc - 1] + 1, NULL, 0);
-		if (argCount < 0 || argCount > 16) {
+		if (argv[argc - 1][1] != 'c')
+			argCount = strtoul(argv[argc - 1] + 1, NULL, 0);
+		else
+			argCount = -1;
+		if (argCount < -1 || argCount > 16) {
 			kprintf("Invalid argument count \"%ld\".\n", argCount);
 			return 0;
 		}

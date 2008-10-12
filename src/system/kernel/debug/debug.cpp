@@ -81,7 +81,7 @@ static int64 sMessageRepeatFirstTime = 0;
 static int64 sMessageRepeatLastTime = 0;
 static int32 sMessageRepeatCount = 0;
 
-static debugger_module_info *sDebuggerModules[8];
+static debugger_module_info* sDebuggerModules[8];
 static const uint32 kMaxDebuggerModules = sizeof(sDebuggerModules)
 	/ sizeof(sDebuggerModules[0]);
 
@@ -91,7 +91,7 @@ static const uint32 kMaxDebuggerModules = sizeof(sDebuggerModules)
 static char sLineBuffer[HISTORY_SIZE][LINE_BUFFER_SIZE] = { "", };
 static int32 sCurrentLine = 0;
 
-static const char *(*sDemangleHook)(const char *) = NULL;
+static debugger_demangle_module_info* sDemangleModule;
 
 static struct thread* sDebuggedThread;
 
@@ -1105,7 +1105,7 @@ debug_init_post_vm(kernel_args *args)
 
 
 status_t
-debug_init_post_modules(struct kernel_args *args)
+debug_init_post_modules(struct kernel_args* args)
 {
 	void *cookie;
 
@@ -1115,6 +1115,9 @@ debug_init_post_modules(struct kernel_args *args)
 	syslog_init_post_threads();
 
 	// load kernel debugger addons
+
+	static const char* kDemanglePrefix = "debugger/demangle/";
+
 	cookie = open_module_list("debugger");
 	uint32 count = 0;
 	while (count < kMaxDebuggerModules) {
@@ -1124,7 +1127,14 @@ debug_init_post_modules(struct kernel_args *args)
 		if (read_next_module_name(cookie, name, &nameLength) != B_OK)
 			break;
 
-		if (get_module(name, (module_info **)&sDebuggerModules[count]) == B_OK) {
+		// get demangle module, if any
+		if (!strncmp(name, kDemanglePrefix, strlen(kDemanglePrefix))) {
+			if (sDemangleModule == NULL)
+				get_module(name, (module_info**)&sDemangleModule);
+			continue;
+		}
+
+		if (get_module(name, (module_info**)&sDebuggerModules[count]) == B_OK) {
 			dprintf("kernel debugger extension \"%s\": loaded\n", name);
 			count++;
 		} else
@@ -1273,9 +1283,10 @@ flush_pending_repeats(void)
 				syslog_write(temp, length);
 			if (sBlueScreenEnabled || sDebugScreenEnabled)
 				blue_screen_puts(temp);
-			for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
+			for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++) {
 				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
 					sDebuggerModules[i]->debugger_puts(temp, length);
+			}
 		} else {
 			// if we only have one repeat just reprint the last buffer
 			if (sSerialDebugEnabled)
@@ -1284,9 +1295,12 @@ flush_pending_repeats(void)
 				syslog_write(sLastOutputBuffer, strlen(sLastOutputBuffer));
 			if (sBlueScreenEnabled || sDebugScreenEnabled)
 				blue_screen_puts(sLastOutputBuffer);
-			for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
-				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
-					sDebuggerModules[i]->debugger_puts(sLastOutputBuffer, strlen(sLastOutputBuffer));
+			for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++) {
+				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts) {
+					sDebuggerModules[i]->debugger_puts(sLastOutputBuffer,
+						strlen(sLastOutputBuffer));
+				}
+			}
 		}
 
 		sMessageRepeatFirstTime = 0;
@@ -1348,9 +1362,10 @@ dprintf_args(const char *format, va_list args, bool syslogOutput)
 			syslog_write(sOutputBuffer, length);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(sOutputBuffer);
-		for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
+		for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++) {
 			if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
 				sDebuggerModules[i]->debugger_puts(sOutputBuffer, length);
+		}
 
 		memcpy(sLastOutputBuffer, sOutputBuffer, length);
 		sLastOutputBuffer[length] = 0;
@@ -1414,19 +1429,29 @@ kprintf_unfiltered(const char *format, ...)
 }
 
 
-extern void
-debug_set_demangle_hook(const char *(*hook)(const char *))
+const char*
+debug_demangle_symbol(const char* symbol, char* buffer, size_t bufferSize,
+	bool* _isObjectMethod)
 {
-	sDemangleHook = hook;
+	if (sDemangleModule != NULL && sDemangleModule->demangle_symbol != NULL) {
+		return sDemangleModule->demangle_symbol(symbol, buffer, bufferSize,
+			_isObjectMethod);
+	}
+
+	return symbol;
 }
 
 
-extern const char *
-debug_demangle(const char *sym)
+status_t
+debug_get_next_demangled_argument(uint32* _cookie, const char* symbol,
+	char* name, size_t nameSize, int32* _type, size_t* _argumentLength)
 {
-	if (sDemangleHook)
-		return sDemangleHook(sym);
-	return sym;
+	if (sDemangleModule != NULL && sDemangleModule->get_next_argument != NULL) {
+		return sDemangleModule->get_next_argument(_cookie, symbol, name,
+			nameSize, _type, _argumentLength);
+	}
+
+	return B_NOT_SUPPORTED;
 }
 
 
