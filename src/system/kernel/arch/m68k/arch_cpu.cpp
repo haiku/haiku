@@ -16,6 +16,8 @@
 #include <arch_thread.h>
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
+#include <commpage.h>
+#include <elf.h>
 
 extern struct m68k_cpu_ops cpu_ops_030;
 extern struct m68k_cpu_ops cpu_ops_040;
@@ -93,6 +95,9 @@ arch_cpu_init_post_vm(kernel_args *args)
 status_t
 arch_cpu_init_post_modules(kernel_args *args)
 {
+	// add the functions to the commpage image
+	image_id image = get_commpage_image();
+
 	return B_OK;
 }
 

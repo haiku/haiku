@@ -168,6 +168,7 @@ m68k_exception_entry(struct iframe *iframe)
 {
 	int vector = iframe->cpu.vector >> 2;
 	int ret = B_HANDLED_INTERRUPT;
+	bool hardwareInterrupt = false;
 
 	if (vector != -1) {
 		dprintf("m68k_exception_entry: time %lld vector 0x%x, iframe %p, "
@@ -193,7 +194,6 @@ m68k_exception_entry(struct iframe *iframe)
 
 			if (kernelDebugger) {
 				// if this thread has a fault handler, we're allowed to be here
-				struct thread *thread = thread_get_current_thread();
 				if (thread && thread->fault_handler != 0) {
 					iframe->cpu.pc = thread->fault_handler;
 					break;
@@ -206,6 +206,17 @@ m68k_exception_entry(struct iframe *iframe)
 					(void *)iframe->cpu.pc);
 				break;
 			} else if ((iframe->cpu.sr & SR_IP_MASK) != 0) {
+				// interrupts disabled
+
+				// If a page fault handler is installed, we're allowed to be here.
+				// TODO: Now we are generally allowing user_memcpy() with interrupts
+				// disabled, which in most cases is a bug. We should add some thread
+				// flag allowing to explicitly indicate that this handling is desired.
+				if (thread && thread->fault_handler != 0) {
+					iframe->cpu.pc = thread->fault_handler;
+						return;
+				}
+
 				// if the interrupts were disabled, and we are not running the
 				// kernel startup the page fault was not allowed to happen and
 				// we must panic
@@ -265,6 +276,7 @@ dprintf("handling I/O interrupts...\n");
 			}
 #endif
 dprintf("handling I/O interrupts done\n");
+			hardwareInterrupt = true;
 			break;
 		}
 
@@ -288,6 +300,14 @@ dprintf("handling I/O interrupts done\n");
 		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
+	} else if (hardwareInterrupt && thread->post_interrupt_callback != NULL) {
+		void (*callback)(void*) = thread->post_interrupt_callback;
+		void* data = thread->post_interrupt_data;
+
+		thread->post_interrupt_callback = NULL;
+		thread->post_interrupt_data = NULL;
+
+		callback(data);
 	}
 
 	// pop iframe

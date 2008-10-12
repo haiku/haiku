@@ -66,7 +66,8 @@
 #endif
 
 // 4 MB of iospace
-#define IOSPACE_SIZE (4*1024*1024)
+//#define IOSPACE_SIZE (4*1024*1024)
+#define IOSPACE_SIZE (16*1024*1024)
 // 256K = 2^6*4K
 #define IOSPACE_CHUNK_SIZE (NUM_PAGEENT_PER_TBL*B_PAGE_SIZE)
 

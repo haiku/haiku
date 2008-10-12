@@ -11,6 +11,7 @@
 #include <KernelExport.h>
 
 #include <cpu.h>
+#include <elf.h>
 #include <smp.h>
 
 
@@ -20,6 +21,9 @@ arch_commpage_init(void)
 {
 	/* no optimized memcpy or anything yet */
 	/* we don't use it for syscall yet either */
+	// add syscall to the commpage image
+	image_id image = get_commpage_image();
+
 	return B_OK;
 }
 

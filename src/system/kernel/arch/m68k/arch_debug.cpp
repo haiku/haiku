@@ -284,18 +284,32 @@ arch_debug_get_caller(void)
 }
 
 
+/*!	Captures a stack trace (the return addresses) of the current thread.
+	\param returnAddresses The array the return address shall be written to.
+	\param maxCount The maximum number of return addresses to be captured.
+	\param skipIframes The number of interrupt frames that shall be skipped. If
+		greater than 0, \a skipFrames is ignored.
+	\param skipFrames The number of stack frames that shall be skipped.
+	\param userOnly If \c true, only userland return addresses are captured.
+	\return The number of return addresses written to the given array.
+*/
 int32
 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	int32 skipIframes, int32 skipFrames, bool userOnly)
 {
-// TODO: Support skipIframes!
 	struct iframe_stack *frameStack;
 	addr_t framePointer;
 	int32 count = 0;
 	int32 i, num = 0, last = 0;
 
-	// always skip our own frame
-	skipFrames++;
+	// Keep skipping normal stack frames until we've skipped the iframes we're
+	// supposed to skip.
+	if (skipIframes > 0) {
+		skipFrames = INT_MAX;
+	} else {
+		// always skip our own frame
+		skipFrames++;
+	}
 
 	struct thread* thread = thread_get_current_thread();
 	framePointer = (addr_t)get_current_stack_frame();
@@ -323,6 +337,11 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		if (frame) {
 			ip = frame->cpu.pc;
  			nextFrame = frame->a[6];
+
+			if (skipIframes > 0) {
+				if (--skipIframes == 0)
+					skipFrames = 0;
+			}
 		} else {
 			if (get_next_frame(framePointer, &nextFrame, &ip) != B_OK)
 				break;
