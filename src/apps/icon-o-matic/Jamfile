@@ -50,6 +50,7 @@ local sourceDirs =
 	import_export/flat_icon
 	import_export/message
 	import_export/svg
+	import_export/styled_text
 	shape
 	shape/commands
 	style
@@ -228,6 +229,9 @@ Application Icon-O-Matic :
 	# import_export/message
 	MessageExporter.cpp
 	MessageImporter.cpp
+
+	# import_export/styled_text
+	StyledTextImporter.cpp
 
 	# import_export/svg
 	DocumentBuilder.cpp

@@ -11,6 +11,7 @@
 #include <new>
 #include <stdio.h>
 
+#include <Clipboard.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -62,6 +63,8 @@
 #include "Style.h"
 #include "StyleContainer.h"
 #include "VectorPath.h"
+
+#include "StyledTextImporter.h"
 
 using std::nothrow;
 
@@ -120,6 +123,24 @@ MainWindow::MessageReceived(BMessage* message)
 		return;
 	}
 
+	if (message->WasDropped()) {
+		const rgb_color *color;
+		int32 len;
+		int32 i;
+		// create styles from dropped colors
+		for (i = 0; message->FindData("RGBColor", B_RGB_COLOR_TYPE, i, 
+			(const void **)&color, &len) == B_OK; i++) {
+			if (len != sizeof(rgb_color))
+				continue;
+			Style* style = new (nothrow) Style(*color);
+			Style* styles[1] = { style };
+			AddStylesCommand* styleCommand = new (nothrow) AddStylesCommand(
+				fDocument->Icon()->Styles(), styles, 1,
+				fDocument->Icon()->Styles()->CountStyles());
+			fDocument->CommandStack()->Perform(styleCommand);
+		}
+	}
+
 	switch (message->what) {
 
 		case B_REFS_RECEIVED:
@@ -128,6 +149,63 @@ MainWindow::MessageReceived(BMessage* message)
 			if (modifiers() & B_SHIFT_KEY)
 				message->AddBool("append", true);
 			be_app->PostMessage(message);
+			break;
+
+		case B_MIME_DATA:
+			if (message->HasData("text/plain", B_MIME_TYPE)) {
+				status_t err;
+				Icon* icon;
+				icon = new (nothrow) Icon(*fDocument->Icon());
+				if (icon) {
+					StyledTextImporter importer;
+					err = importer.Import(icon, message);
+					if (err >= B_OK) {
+							AutoWriteLocker locker(fDocument);
+
+							SetIcon(NULL);
+
+							// incorporate the loaded icon into the document
+							// (either replace it or append to it)
+							fDocument->MakeEmpty(false);
+								// if append, the document savers are preserved
+							fDocument->SetIcon(icon);
+							SetIcon(icon);
+					}
+				}
+			}
+			break;
+
+		case B_PASTE:
+			if (be_clipboard->Lock()) {
+				status_t err;
+				BMessage *clip = be_clipboard->Data();
+
+				if (!clip || !clip->HasData("text/plain", B_MIME_TYPE)) {
+					be_clipboard->Unlock();
+					break;
+				}
+
+				Icon* icon;
+				icon = new (nothrow) Icon(*fDocument->Icon());
+				if (icon) {
+					StyledTextImporter importer;
+					err = importer.Import(icon, clip);
+					if (err >= B_OK) {
+							AutoWriteLocker locker(fDocument);
+
+							SetIcon(NULL);
+
+							// incorporate the loaded icon into the document
+							// (either replace it or append to it)
+							fDocument->MakeEmpty(false);
+								// if append, the document savers are preserved
+							fDocument->SetIcon(icon);
+							SetIcon(icon);
+					}
+				}
+
+				be_clipboard->Unlock();
+			}
 			break;
 
 		case MSG_UNDO:
