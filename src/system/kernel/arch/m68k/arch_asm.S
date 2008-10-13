@@ -8,7 +8,7 @@
 
 #include <arch/m68k/arch_cpu.h>
 
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <asm_defs.h>
 
 .text
 
@@ -16,12 +16,14 @@
 FUNCTION(reboot):
 	reset
 	rts
+FUNCTION_END(reboot)
 
 
 /* void arch_int_enable_interrupts(void) */
 FUNCTION(arch_int_enable_interrupts):
 	andi	#0xf8ff,%sr
 	rts
+FUNCTION_END(arch_int_enable_interrupts)
 
 
 /* int arch_int_disable_interrupts(void) 
@@ -36,6 +38,7 @@ FUNCTION(arch_int_disable_interrupts):
 	lsr.l	#8,%d0
 	andi.l	#7,%d0
 	rts
+FUNCTION_END(arch_int_disable_interrupts)
 
 
 /* void arch_int_restore_interrupts(int oldState) 
@@ -50,6 +53,7 @@ FUNCTION(arch_int_restore_interrupts):
 	or.w	%d0,%d1
 	move	%d1,%sr
 	rts
+FUNCTION_END(arch_int_restore_interrupts)
 
 
 /* bool arch_int_are_interrupts_enabled(void) */
@@ -61,12 +65,14 @@ FUNCTION(arch_int_are_interrupts_enabled):
 	moveq.l	#1,%d0
 arch_int_are_interrupts_enabled_no:
 	rts
+FUNCTION_END(arch_int_are_interrupts_enabled)
 
 
 // ToDo: fixme
 FUNCTION(dbg_save_registers):
 #warning M68K: implement dbx_save_registers!
 	rts
+FUNCTION_END(dbg_save_registers)
 
 
 /* long long get_time_base(void) */
@@ -76,6 +82,7 @@ FUNCTION(get_time_base):
 	clr.l	%d1
 	//passed through a0 or d0:d1 ?
 	rts
+FUNCTION_END(get_time_base)
 
 
 #warning M68K: FIX m68k_context_switch
@@ -97,6 +104,7 @@ FUNCTION(m68k_context_switch):
 	//move.w		(%sp)+,%sr
 
 	rts
+FUNCTION_END(m68k_context_switch)
 
 
 // void m68k_switch_stack_and_call(addr_t newKstack,
@@ -111,6 +119,7 @@ FUNCTION(m68k_switch_stack_and_call):
 	jsr		(%a1)		// call the target function
 _loop:
 	bra		_loop
+FUNCTION_END(m68k_switch_stack_and_call)
 
 
 // m68k_kernel_thread_root(): parameters in r13-r15, the functions to call
@@ -130,4 +139,5 @@ FUNCTION(m68k_kernel_thread_root):
 	// debugger (without a message at the moment).
 	clr.l		-(%sp)
 	jmp		kernel_debugger
+FUNCTION_END(m68k_kernel_thread_root)
 

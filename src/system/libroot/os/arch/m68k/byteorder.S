@@ -3,7 +3,7 @@
 ** Distributed under the terms of the OpenBeOS License.
 */
 
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <asm_defs.h>
 
 .text
 
@@ -18,7 +18,7 @@ FUNCTION(__swap_int16):
 		lsl.w	#8,%d0
 		move.b	%d1,%d0
 		rts
-
+FUNCTION_END(__swap_int16)
 
 /* uint32 __swap_int32(uint32 value)
  */
@@ -32,7 +32,7 @@ FUNCTION(__swap_int32):
 		lsl.l	#8,%d0
 		move.b	(4,%a7),%d0
 		rts
-
+FUNCTION_END(__swap_int32)
 
 /* uint64 __swap_int64(uint64 value)
  */
@@ -54,7 +54,7 @@ FUNCTION(__swap_int64):
 		lsl.l	#8,%d0
 		move.b	(8,%a7),%d0
 		rts
-
+FUNCTION_END(__swap_int64)
 
 /* TODO: The following functions can surely be optimized. A simple optimization
  * would be to define macros with the contents of the __swap_int{32,64}
@@ -66,7 +66,7 @@ FUNCTION(__swap_int64):
 FUNCTION(__swap_float):
 		jmp		__swap_int32
 		//rts
-
+FUNCTION_END(__swap_float)
 
 
 /* double __swap_double(double value)
@@ -74,4 +74,6 @@ FUNCTION(__swap_float):
 FUNCTION(__swap_double):
 		jmp		__swap_int32
 		//rts
-		//XXX:check sizeof(double)
+#warning M68K: XXX:check sizeof(double)
+FUNCTION_END(__swap_double)
+

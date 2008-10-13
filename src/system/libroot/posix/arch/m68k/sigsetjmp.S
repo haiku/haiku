@@ -3,6 +3,8 @@
  * reserved. Distributed under the terms of the Haiku License.
  */
 
+#include <asm_defs.h>
+
 #include "setjmp_internal.h"
 
 /* int sigsetjmp(jmp_buf buffer, int saveMask) */
@@ -25,6 +27,8 @@ FUNCTION(sigsetjmp):
 #warning M68K: check this.
 
 	jmp		__setjmp_save_sigs
+FUNCTION_END(__sigsetjmp)
+FUNCTION_END(sigsetjmp)
 
 
 /* int setjmp(jmp_buf buffer) */
@@ -36,6 +40,6 @@ FUNCTION(setjmp):
 	move.l	%a0,-(%a7)
 	// call __sigsetjmp with saveMask = 0
 	jmp	__sigsetjmp
-
+FUNCTION_END(setjmp)
 
 #pragma weak _setjmp=setjmp

@@ -3,7 +3,7 @@
 ** Distributed under the terms of the OpenBeOS License.
 */
 
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <asm_defs.h>
 
 .text
 
@@ -12,4 +12,4 @@
 FUNCTION(__m68k_get_time_base):
 #warning M68K: implement __m68k_get_time_base()
 		rts
-
+FUNCTION_END(__m68k_get_time_base)

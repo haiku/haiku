@@ -3,7 +3,7 @@
 ** Distributed under the terms of the OpenBeOS License.
 */
 
-#define FUNCTION(x) .global x; .type x,@function; x
+#include <asm_defs.h>
 
 .text
 

@@ -3,9 +3,10 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+#include <asm_defs.h>
+
 #warning M68K: optimize memcpy
 #if 1
-#define FUNCTION(x) .global x; .type x,@function; x
 
 /* that should be enough for now */
 
@@ -24,4 +25,5 @@ _memcpy_out:
 	move.l	(4,%a7),%a0
 	move.l	%a0,%d0
 	rts
+FUNCTION_END(memcpy)
 #endif

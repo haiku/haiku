@@ -3,6 +3,8 @@
  * reserved. Distributed under the terms of the Haiku License.
  */
 
+#include <asm_defs.h>
+
 #include "setjmp_internal.h"
 
 /* int __siglongjmp(jmp_buf buffer, int value) */
@@ -22,5 +24,8 @@ FUNCTION(_longjmp):
 	move.l	(JMP_REGS_PC,%a0),(%a7)
 
 	jmp	__longjmp_return
+FUNCTION_END(siglongjmp)
+FUNCTION_END(longjmp)
+FUNCTION_END(_longjmp)
 
 #pragma weak longjmp=siglongjmp
