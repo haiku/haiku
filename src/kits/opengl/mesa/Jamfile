@@ -34,6 +34,24 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) swrast ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) swrast_setup ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) tnl ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) vbo ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
+
+BuildPlatformMain gen_matypes :
+	gen_matypes.c ;
+
+rule MkMaTypes
+{
+        MakeLocateArch $(<) ;
+        Depends $(<) : gen_matypes ;
+        MkMaTypes1 $(<) : gen_matypes ;
+        LocalClean clean : $(<) ;
+}
+
+actions MkMaTypes1
+{
+        $(2) > $(1) ;
+}
+
 
 {
 	local defines ;
@@ -58,6 +76,8 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) vbo ] ;
 
 local arch_sources ;
 if $(TARGET_ARCH) = x86 {
+
+	MkMaTypes <mesa>matypes.h ;
 
 	arch_sources = 
 		common_x86.c
@@ -88,7 +108,9 @@ if $(TARGET_ARCH) = x86 {
 		x86sse.c
 		;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) x86 rtasm ] ;
+	Includes [ FGristFiles $(arch_sources) ] : <mesa>matypes.h ;
+
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) x86 rtasm ] ;
 
 } else if $(TARGET_ARCH) = ppc {
 
@@ -107,8 +129,6 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) x86 rtasm ] ;
 } else {
 	arch_sources = t_vtx_generic.c ;
 }
-
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
 
 
 StaticLibrary libmesa.a : 
