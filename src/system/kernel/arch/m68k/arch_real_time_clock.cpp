@@ -70,14 +70,14 @@ same_time(const cmos_time *time1, const cmos_time *time2)
 static uint8
 cmos_read(uint8 addr)
 {
-	return M68KPlatform::Default()->ReadRTCReg(reg);
+	return M68KPlatform::Default()->ReadRTCReg(addr);
 }
 
 
 static void
 cmos_write(uint8 addr, uint8 data)
 {
-	M68KPlatform::Default()->WriteRTCReg(reg, data);
+	M68KPlatform::Default()->WriteRTCReg(addr, data);
 }
 
 
