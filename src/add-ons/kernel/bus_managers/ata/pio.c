@@ -152,7 +152,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 			physicalAddress, length);
 
 		if (vm_get_physical_page(physicalAddress, &virtualAddress,
-				PHYSICAL_PAGE_CAN_WAIT) != B_OK) {
+				0) != B_OK) {
 			// ouch: this should never ever happen
 //xxx fix this			set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
 			return B_ERROR;
