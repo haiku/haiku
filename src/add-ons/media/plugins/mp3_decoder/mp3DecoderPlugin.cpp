@@ -166,6 +166,7 @@ mp3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 		ioDecodedFormat->u.raw_audio.buffer_size = AudioBufferSize(ioDecodedFormat->u.raw_audio);
 	else
 		ioDecodedFormat->u.raw_audio.buffer_size = (ioDecodedFormat->u.raw_audio.buffer_size / frame_size) * frame_size;
+
 	if (ioDecodedFormat->u.raw_audio.channel_mask == 0)
 		ioDecodedFormat->u.raw_audio.channel_mask = (fChannelCount == 1) ? B_CHANNEL_LEFT : B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 
@@ -240,6 +241,7 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 
 	*frameCount = out_bytes / fFrameSize;
 
+	TRACE("framecount %Ld, time %Ld\n",*frameCount, mediaHeader->start_time);
 	return (out_bytes > 0) ? B_OK : last_err;
 }
 
