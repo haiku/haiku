@@ -132,15 +132,15 @@ BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 ;
 BEOS_ADD_ONS_DRIVERS_MIDI = emuxki ;
 BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com etherpci $(X86_ONLY)ipro1000
-	$(X86_ONLY)rtl8139 rtl8169 $(X86_ONLY)rtl81xx sis900 
-	$(X86_ONLY)via_rhine wb840 $(X86_ONLY)ipro100 $(X86_ONLY)nforce 
-	#vlance 
+	$(X86_ONLY)rtl8139 rtl8169 $(X86_ONLY)rtl81xx sis900
+	$(X86_ONLY)via_rhine wb840 $(X86_ONLY)ipro100 $(X86_ONLY)nforce
+	#vlance
 	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect usb_ecm
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
 #BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
-	config_manager agp_gart usb firewire #acpi
+	config_manager agp_gart usb firewire acpi
 ;
 BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 nfs $(GPL_ONLY)reiserfs ;
 #googlefs $(GPL_ONLY)ntfs ;
@@ -171,6 +171,11 @@ AddFilesToHaikuImage beos system add-ons kernel interrupt_controllers
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToHaikuImage beos system add-ons kernel cpu : generic_x86 ;
+
+	if $(HAIKU_GCC_VERSION[1]) = 2 {
+		AddFilesToHaikuImage beos system add-ons kernel debugger demangle :
+			<kdebug>gcc2 ;
+	}
 }
 
 # drivers
@@ -595,7 +600,7 @@ HAIKU_IMAGE_NAME ?= $(HAIKU_DEFAULT_IMAGE_NAME) ;
 HAIKU_IMAGE_DIR ?= $(HAIKU_DEFAULT_IMAGE_DIR) ;
 HAIKU_IMAGE = $(HAIKU_IMAGE_NAME) ;
 HAIKU_IMAGE_SIZE ?= $(HAIKU_DEFAULT_IMAGE_SIZE) ; # 100 MB
-HAIKU_IMAGE_LABEL ?= $(HAIKU_DEFAULT_IMAGE_LABEL) ; 
+HAIKU_IMAGE_LABEL ?= $(HAIKU_DEFAULT_IMAGE_LABEL) ;
 MakeLocate $(HAIKU_IMAGE) : $(HAIKU_IMAGE_DIR) ;
 
 # Set the default installation directory.
