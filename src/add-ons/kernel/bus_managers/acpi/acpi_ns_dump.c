@@ -95,6 +95,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 				sprintf(output, "%s     BUFFER_FIELD", output);
 				break;
 		}
+		strcat(output, "\n");
 		written = 0;
 		if (acquire_sem(device->sync_sem) == B_OK) {
 			//dprintf("writing %ld bytes to the buffer.\n", strlen(output));
