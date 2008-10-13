@@ -51,7 +51,7 @@ nop()
 }
 
 
-#if DEBUG
+#if DEBUG > 1
 static const char *
 PictureOpToString(int op)
 {
@@ -106,7 +106,7 @@ PictureOpToString(int op)
 		RETURN_STRING(B_PIC_SET_FONT_SHEAR);
 		RETURN_STRING(B_PIC_SET_FONT_BPP);
 		RETURN_STRING(B_PIC_SET_FONT_FACE);
-		default: return "Unknown op";	
+		default: return "Unknown op";
 	}
 	#undef RETURN_STRING
 }
@@ -162,7 +162,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 		fprintf(file, "PicturePlayer: A smaller than needed function table was supplied.\n");
 #endif
 		functionTable = dummyTable;
-		memcpy(functionTable, callBackTable, tableEntries * sizeof(void *));		
+		memcpy(functionTable, callBackTable, tableEntries * sizeof(void *));
 	}
 
 	const char *data = reinterpret_cast<const char *>(fData);
@@ -194,7 +194,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_STROKE_LINE:
 			{
-				((fnc_BPointBPoint)functionTable[2])(userData, 
+				((fnc_BPointBPoint)functionTable[2])(userData,
 					*reinterpret_cast<const BPoint *>(data), /* start */
 					*reinterpret_cast<const BPoint *>(data + sizeof(BPoint))); /* end */
 				break;
@@ -246,7 +246,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_STROKE_ARC:
 			{
-				((fnc_BPointBPointff)functionTable[9])(userData, 
+				((fnc_BPointBPointff)functionTable[9])(userData,
 					*reinterpret_cast<const BPoint *>(data), /* center */
 					*reinterpret_cast<const BPoint *>(data + sizeof(BPoint)), /* radii */
 					*reinterpret_cast<const float *>(data + 2 * sizeof(BPoint)), /* startTheta */
@@ -285,7 +285,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			case B_PIC_STROKE_POLYGON:
 			{
 				int32 numPoints = *reinterpret_cast<const int32 *>(data);
-				((fnc_iPBPointb)functionTable[13])(userData, 
+				((fnc_iPBPointb)functionTable[13])(userData,
 					numPoints,
 					reinterpret_cast<const BPoint *>(data + sizeof(int32)), /* points */
 					*reinterpret_cast<const uint8 *>(data + sizeof(int32) + numPoints * sizeof(BPoint))); /* is-closed */
@@ -294,7 +294,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_FILL_POLYGON:
 			{
-				((fnc_iPBPoint)functionTable[14])(userData, 
+				((fnc_iPBPoint)functionTable[14])(userData,
 					*reinterpret_cast<const int32 *>(data), /* numPoints */
 					reinterpret_cast<const BPoint *>(data + sizeof(int32))); /* points */
 				break;
@@ -303,24 +303,24 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			case B_PIC_STROKE_SHAPE:
 			case B_PIC_FILL_SHAPE:
 			{
-				const bool stroke = (op == B_PIC_STROKE_SHAPE);							
+				const bool stroke = (op == B_PIC_STROKE_SHAPE);
 				int32 opCount = *reinterpret_cast<const int32 *>(data);
 				int32 ptCount = *reinterpret_cast<const int32 *>(data + sizeof(int32));
 				const uint32 *opList = reinterpret_cast<const uint32 *>(data + 2 * sizeof(int32));
 				const BPoint *ptList = reinterpret_cast<const BPoint *>(data + 2 * sizeof(int32) + opCount * sizeof(uint32));
 
 				// TODO: remove BShape data copying
-				BShape shape; 
+				BShape shape;
 				shape.SetData(opCount, ptCount, opList, ptList);
 
 				const int32 tableIndex = stroke ? 15 : 16;
 				((fnc_BShape)functionTable[tableIndex])(userData, &shape);
 				break;
 			}
-			
+
 			case B_PIC_DRAW_STRING:
 			{
-				((fnc_Pcff)functionTable[17])(userData, 
+				((fnc_Pcff)functionTable[17])(userData,
 					reinterpret_cast<const char *>(data + 2 * sizeof(float)), /* string */
 					*reinterpret_cast<const float *>(data), /* escapement.space */
 					*reinterpret_cast<const float *>(data + sizeof(float))); /* escapement.nonspace */
@@ -348,14 +348,14 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 					*reinterpret_cast<const int32 *>(data + sizeof(BPoint)));
 				break;
 			}
-			
+
 			case B_PIC_SET_CLIPPING_RECTS:
 			{
 				// TODO: Not sure if it's compatible with R5's BPicture version
 				const uint32 numRects = *reinterpret_cast<const uint32 *>(data);
 				const BRect *rects = reinterpret_cast<const BRect *>(data + sizeof(uint32));
 				((fnc_PBRecti)functionTable[20])(userData, rects, numRects);
-				
+
 				break;
 			}
 
@@ -393,7 +393,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			case B_PIC_ENTER_FONT_STATE:
 			{
 				((fnc)functionTable[26])(userData);
-				fontStateBlockSize = size;				
+				fontStateBlockSize = size;
 				break;
 			}
 
@@ -435,14 +435,14 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			}
 
 			case B_PIC_SET_FORE_COLOR:
-			{			
+			{
 				((fnc_Color)functionTable[33])(userData,
 					*reinterpret_cast<const rgb_color *>(data)); /* color */
 				break;
 			}
 
 			case B_PIC_SET_BACK_COLOR:
-			{		
+			{
 				((fnc_Color)functionTable[34])(userData,
 					*reinterpret_cast<const rgb_color *>(data)); /* color */
 				break;
@@ -510,7 +510,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 					*reinterpret_cast<const int32 *>(data)); /* flags */
 				break;
 			}
-			
+
 			case B_PIC_SET_FONT_SHEAR:
 			{
 				((fnc_f)functionTable[44])(userData,
@@ -537,9 +537,9 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				break;
 		}
 
-		// Skip the already handled block unless it's one of these two, 
+		// Skip the already handled block unless it's one of these two,
 		// since they can contain other nested ops.
-		if (op != B_PIC_ENTER_STATE_CHANGE && op != B_PIC_ENTER_FONT_STATE) {		
+		if (op != B_PIC_ENTER_STATE_CHANGE && op != B_PIC_ENTER_FONT_STATE) {
 			pos += size;
 			data += size;
 			if (stateBlockSize > 0)
@@ -547,24 +547,24 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			if (fontStateBlockSize > 0)
 				fontStateBlockSize -= size + 6;
 		}
-		
+
 		// call the exit_state_change hook if needed
 		if (stateBlockSize == 0) {
 			((fnc)functionTable[25])(userData);
-			stateBlockSize = -1;		
+			stateBlockSize = -1;
 		}
-		
+
 		// call the exit_font_state hook if needed
 		if (fontStateBlockSize == 0) {
 			((fnc)functionTable[27])(userData);
-			fontStateBlockSize = -1;		
+			fontStateBlockSize = -1;
 		}
 #if DEBUG
 		numOps++;
 #if DEBUG > 1
 		fprintf(file, "executed in %lld usecs\n", system_time() - startOpTime);
 #endif
-#endif		
+#endif
 		// TODO: what if too much was read, should we return B_ERROR?
 	}
 
