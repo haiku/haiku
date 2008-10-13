@@ -734,6 +734,7 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		[ FDirName $(HAIKU_TOP) headers build os drivers ]
 		[ FDirName $(HAIKU_TOP) headers build os kernel ]
 		[ FDirName $(HAIKU_TOP) headers build os interface ]
+		[ FDirName $(HAIKU_TOP) headers build os opengl ]
 		[ FDirName $(HAIKU_TOP) headers build os storage ]
 		[ FDirName $(HAIKU_TOP) headers build os support ]
 	;

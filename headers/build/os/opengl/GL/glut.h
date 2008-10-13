@@ -10,6 +10,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#if defined(__MINGW32__)
+#include <GL/mesa_wgl.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -115,7 +119,7 @@ extern _CRTIMP void __cdecl exit(int);
 #endif
 
 /* GLUT API entry point declarations for Win32. */
-#if defined(GLUT_BUILDING_LIB) && defined(_DLL)
+#if (defined(BUILD_GLUT32) || defined(GLUT_BUILDING_LIB)) && defined(_DLL)
 # 	define GLUTAPI __declspec(dllexport)
 #elif defined(_DLL)
 #   define GLUTAPI __declspec(dllimport)
@@ -130,9 +134,12 @@ extern _CRTIMP void __cdecl exit(int);
 #		pragma message( "----: being multiply defined you should include WINDOWS.H priot to gl/glut.h" )
 #	endif
 #	define CALLBACK __stdcall
-typedef int (GLUTAPIENTRY *PROC)();
-typedef void *HGLRC;
-typedef void *HDC;
+
+#if !defined(__MINGW32__)
+	typedef int (GLUTAPIENTRY *PROC)();
+	typedef void *HGLRC;
+	typedef void *HDC;
+#endif
 typedef unsigned long COLORREF;
 #endif
 
@@ -193,13 +200,11 @@ WGLAPI int   GLAPIENTRY SetPixelFormat(HDC,int,const PIXELFORMATDESCRIPTOR *);
 #else /* _WIN32 not defined */
 
 /* Define GLUTAPIENTRY and GLUTCALLBACK to nothing if we aren't on Win32. */
-#  define GLUTAPIENTRY
+#  define GLUTAPIENTRY GLAPIENTRY
 #  define GLUTAPIENTRYV
-#  define GLUT_APIENTRY_DEFINED
 #  define GLUTCALLBACK
 #  define GLUTAPI extern
-/* Prototype exit for the non-Win32 case (see above). */
-/*extern void exit(int);  this screws up gcc -ansi -pedantic! */
+
 #endif
 
 
@@ -745,28 +750,6 @@ GLUTAPI int GLUTAPIENTRY glutGameModeGet(GLenum mode);
 
 #ifdef __cplusplus
 }
-#endif
-
-#if 0
-#ifdef GLUT_APIENTRY_DEFINED
-# undef GLUT_APIENTRY_DEFINED
-# undef APIENTRY
-#endif
-
-#ifdef GLUT_WINGDIAPI_DEFINED
-# undef GLUT_WINGDIAPI_DEFINED
-# undef WINGDIAPI
-#endif
-
-#ifdef GLUT_DEFINED___CDECL
-# undef GLUT_DEFINED___CDECL
-# undef __cdecl
-#endif
-
-#ifdef GLUT_DEFINED__CRTIMP
-# undef GLUT_DEFINED__CRTIMP
-# undef _CRTIMP
-#endif
 #endif
 
 #endif                  /* __glut_h__ */

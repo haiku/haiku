@@ -1,34 +1,39 @@
 /*
-** License Applicability. Except to the extent portions of this file are
-** made subject to an alternative license as permitted in the SGI Free
-** Software License B, Version 1.1 (the "License"), the contents of this
-** file are subject only to the provisions of the License. You may not use
-** this file except in compliance with the License. You may obtain a copy
-** of the License at Silicon Graphics, Inc., attn: Legal Services, 1600
-** Amphitheatre Parkway, Mountain View, CA 94043-1351, or at:
-** 
-** http://oss.sgi.com/projects/FreeB
-** 
-** Note that, as provided in the License, the Software is distributed on an
-** "AS IS" basis, with ALL EXPRESS AND IMPLIED WARRANTIES AND CONDITIONS
-** DISCLAIMED, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES AND
-** CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A
-** PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-** 
-** Original Code. The Original Code is: OpenGL Sample Implementation,
-** Version 1.2.1, released January 26, 2000, developed by Silicon Graphics,
-** Inc. The Original Code is Copyright (c) 1991-2000 Silicon Graphics, Inc.
-** Copyright in any portions created by third parties is as indicated
-** elsewhere herein. All Rights Reserved.
-** 
-** Additional Notice Provisions: This software was created using the
-** OpenGL(R) version 1.2.1 Sample Implementation published by SGI, but has
-** not been independently verified as being compliant with the OpenGL(R)
-** version 1.2.1 Specification.
-*/
+ * SGI FREE SOFTWARE LICENSE B (Version 2.0, Sept. 18, 2008)
+ * Copyright (C) 1991-2000 Silicon Graphics, Inc. All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice including the dates of first publication and
+ * either this permission notice or a reference to
+ * http://oss.sgi.com/projects/FreeB/
+ * shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * SILICON GRAPHICS, INC. BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+ * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Except as contained in this notice, the name of Silicon Graphics, Inc.
+ * shall not be used in advertising or otherwise to promote the sale, use or
+ * other dealings in this Software without prior written authorization from
+ * Silicon Graphics, Inc.
+ */
 
 #ifndef __glu_h__
 #define __glu_h__
+
+#if defined(USE_MGL_NAMESPACE)
+#include "glu_mangle.h"
+#endif
 
 #include <GL/gl.h>
 
@@ -40,10 +45,21 @@
 #define GLAPIENTRYP GLAPIENTRY *
 #endif
 
-#ifndef GLAPI
-#define GLAPI	_IMPEXP_GL
-#endif
+#if (defined(_MSC_VER) || defined(__MINGW32__)) && defined(BUILD_GLU32)
+# undef GLAPI
+# define GLAPI __declspec(dllexport)
+#elif (defined(_MSC_VER) || defined(__MINGW32__)) && defined(_DLL)
+/* tag specifying we're building for DLL runtime support */
+# undef GLAPI
+# define GLAPI __declspec(dllimport)
+#elif !defined(GLAPI)
+/* for use with static link lib build of Win32 edition only */
+# define GLAPI extern
+#endif /* _STATIC_MESA support */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*************************************************************/
 
@@ -250,17 +266,16 @@
 class GLUnurbs;
 class GLUquadric;
 class GLUtesselator;
-extern "C" {
 #else
 typedef struct GLUnurbs GLUnurbs;
 typedef struct GLUquadric GLUquadric;
 typedef struct GLUtesselator GLUtesselator;
 #endif
 
-typedef struct GLUnurbs GLUnurbsObj;
-typedef struct GLUquadric GLUquadricObj;
-typedef struct GLUtesselator GLUtesselatorObj;
-typedef struct GLUtesselator GLUtriangulatorObj;
+typedef GLUnurbs GLUnurbsObj;
+typedef GLUquadric GLUquadricObj;
+typedef GLUtesselator GLUtesselatorObj;
+typedef GLUtesselator GLUtriangulatorObj;
 
 #define GLU_TESS_MAX_COORD 1.0e150
 

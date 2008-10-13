@@ -36,6 +36,8 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) tnl ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) vbo ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
 
+USES_BE_API on gen_matypes = true ;
+
 BuildPlatformMain gen_matypes :
 	gen_matypes.c ;
 
