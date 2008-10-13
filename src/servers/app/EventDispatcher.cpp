@@ -814,6 +814,8 @@ EventDispatcher::_EventLoop()
 					// that the mouse has exited its views
 					addedTokens = _AddTokens(event, fPreviousMouseTarget,
 						B_POINTER_EVENTS);
+					if (addedTokens)
+						_SetFeedFocus(event);
 
 					_SendMessage(fPreviousMouseTarget->Messenger(), event,
 						kMouseTransitImportance);

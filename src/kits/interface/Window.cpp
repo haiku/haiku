@@ -3143,7 +3143,7 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 					uint32 transit = _TransitForMouseMoved(view, viewUnderMouse);;
 					message->AddInt32("be:transit", transit);
 
-					if (usePreferred || viewUnderMouse == NULL)
+					if (usePreferred)
 						fLastMouseMovedView = viewUnderMouse;
 				}
 			}
