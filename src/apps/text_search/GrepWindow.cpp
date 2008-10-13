@@ -610,7 +610,7 @@ GrepWindow::_LayoutViews()
 	background->AddChild(fButton);
 
 	fSearchText->MoveTo(8, 8);
-	fSearchText->ResizeBy(width - 16, 0);
+	fSearchText->ResizeTo(width - 16, fSearchText->Frame().Height());
 	fSearchText->MakeFocus(true);
 
 	fShowLinesCheckbox->MoveTo(
