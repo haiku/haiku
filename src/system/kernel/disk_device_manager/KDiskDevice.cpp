@@ -69,10 +69,8 @@ KDiskDevice::SetTo(const char *path)
 		if (error != B_OK)
 			return error;
 	} else {
-		// no media: try to get the device geometry, but don't fail, if
-		// we can't get it
-		if (GetGeometry(&fDeviceData.geometry) != B_OK)
-			_ResetGeometry();
+		// no media present: reset the geometry
+		_ResetGeometry();
 	}
 
 	// set device flags
