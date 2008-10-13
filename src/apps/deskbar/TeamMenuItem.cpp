@@ -220,7 +220,7 @@ TTeamMenuItem::Draw()
 	BRect frame(Frame());
 	BMenu *menu = Menu();
 	menu->PushState();
-	rgb_color menuColor = ui_color(B_MENU_BACKGROUND_COLOR);
+	rgb_color menuColor = menu->ViewColor();
 
 	//	if not selected or being tracked on, fill with gray
 	TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
@@ -413,9 +413,10 @@ TTeamMenuItem::DrawContentLabel()
 		label = Label();
 
 	TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
-	bool canHandle = !barview->Dragging() || barview->AppCanHandleTypes(Signature());
+	bool canHandle = !barview->Dragging()
+		|| barview->AppCanHandleTypes(Signature());
 	if (IsSelected() && IsEnabled() && canHandle)
-		menu->SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+		menu->SetLowColor(tint_color(menu->ViewColor(),
 			B_HIGHLIGHT_BACKGROUND_TINT));
 	else
 		menu->SetLowColor(menu->ViewColor());

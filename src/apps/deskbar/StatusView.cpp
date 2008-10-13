@@ -325,7 +325,7 @@ TReplicantTray::AdjustPlacement()
 void
 TReplicantTray::Draw(BRect)
 {
-	rgb_color menuColor = ui_color(B_MENU_BACKGROUND_COLOR);
+	rgb_color menuColor = ViewColor();
 	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
 	
@@ -1441,7 +1441,7 @@ TDragRegion::FrameMoved(BPoint)
 void 
 TDragRegion::Draw(BRect)
 {
-	rgb_color menuColor = ui_color(B_MENU_BACKGROUND_COLOR);
+	rgb_color menuColor = ViewColor();
 	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
 	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
 	rgb_color vvdark = tint_color(menuColor, B_DARKEN_4_TINT);
@@ -1479,7 +1479,7 @@ TDragRegion::Draw(BRect)
 void
 TDragRegion::DrawDragRegion()
 {	
-	rgb_color menuColor = ui_color(B_MENU_BACKGROUND_COLOR);
+	rgb_color menuColor = ViewColor();
 	rgb_color menuHilite = tint_color(menuColor, B_HIGHLIGHT_BACKGROUND_TINT);
 	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);

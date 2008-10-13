@@ -171,7 +171,7 @@ void
 TWindowMenuItem::Draw()
 {
 	if (fExpanded) {
-		rgb_color menuColor = ui_color(B_MENU_BACKGROUND_COLOR);
+		rgb_color menuColor = Menu()->ViewColor();
 		BRect frame(Frame());
 		BMenu *menu = Menu();
 

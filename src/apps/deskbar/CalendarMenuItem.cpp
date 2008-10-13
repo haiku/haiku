@@ -132,7 +132,7 @@ CalendarMenuItem::DrawContent()
 		Menu()->DrawString(text, point);
 
 		if (today) {
-			Menu()->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
+			Menu()->SetLowColor(Menu()->ViewColor());
 			Menu()->SetFont(be_plain_font);
 		}
 
