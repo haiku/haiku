@@ -43,15 +43,16 @@ BuildPlatformMain gen_matypes :
 
 rule MkMaTypes
 {
-        MakeLocateArch $(<) ;
-        Depends $(<) : gen_matypes ;
-        MkMaTypes1 $(<) : gen_matypes ;
-        LocalClean clean : $(<) ;
+	MakeLocateArch $(<) ;
+	Depends $(<) : gen_matypes ;
+	MkMaTypes1 $(<) : gen_matypes ;
+	LocalClean clean : $(<) ;
 }
 
 actions MkMaTypes1
 {
-        $(2) > $(1) ;
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR);
+	$(2) > $(1) ;
 }
 
 
