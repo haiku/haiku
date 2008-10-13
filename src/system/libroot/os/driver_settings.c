@@ -646,9 +646,15 @@ driver_settings_init(kernel_args *args)
 
 		strlcpy(handle->name, settings->name, sizeof(handle->name));
 		handle->magic = 0;
-		handle->ref_count = 0;
-		
 			// this triggers parsing the settings when they are actually used
+
+		if (!strcmp(handle->name, B_SAFEMODE_DRIVER_SETTINGS)) {
+			// These settings cannot be reloaded, so we better don't through
+			// them away.
+			handle->ref_count = 1;
+		} else
+			handle->ref_count = 0;
+
 		list_add_item(&sHandles, handle);
 
 		settings = settings->next;
@@ -700,7 +706,9 @@ load_driver_settings(const char *driverName)
 	mutex_lock(&sLock);
 	handle = find_driver_settings(driverName);
 	if (handle != NULL && handle->ref_count == 0 && gBootDevice > 0) {
-		// an handle with a zero ref_count should be unloaded if /boot is available 
+		// A handle with a zero ref_count should be unloaded if /boot is
+		// available.
+		list_remove_link(&handle->link);
 		free_settings(handle);
 	} else if (handle != NULL) {
 		handle->ref_count++;
