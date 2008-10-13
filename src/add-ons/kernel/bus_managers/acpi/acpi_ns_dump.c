@@ -11,16 +11,22 @@
 
 #include "acpi_priv.h"
 
+#include <util/ring_buffer.h>
 
 typedef struct acpi_ns_device_info {
 	device_node *node;
 	acpi_root_info	*acpi;
 	void	*acpi_cookie;
+	thread_id thread;
+	struct ring_buffer *buffer;
+	sem_id write_sem;
+	sem_id sync_sem;
 } acpi_ns_device_info;
 
 
+
 static void 
-dump_acpi_namespace(acpi_ns_device_info *device, char *root, void *buf, size_t* num_bytes, int indenting) 
+dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting) 
 {
 	char result[255];
 	char output[255];
@@ -29,7 +35,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, void *buf, size_t* 
 	int i, depth;
 	uint32 type;
 	void *counter = NULL;
-	
+	size_t written = 0;
 	hid[8] = '\0';
 	tabs[0] = '\0';
 	for (i = 0; i < indenting; i++) {
@@ -38,7 +44,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, void *buf, size_t* 
 	sprintf(tabs, "%s|--- ", tabs);
 	depth = sizeof(char) * 5 * indenting + sizeof(char); // index into result where the device name will be.
 	
-	dprintf("acpi_ns_dump: recursing from %s, depth %d\n", root, depth);
+	//dprintf("acpi_ns_dump: recursing from %s, depth %d\n", root, depth);
 	while (device->acpi->get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
 		type = device->acpi->get_object_type(result);
 		sprintf(output, "%s%s", tabs, result + depth);
@@ -89,14 +95,30 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, void *buf, size_t* 
 				sprintf(output, "%s     BUFFER_FIELD", output);
 				break;
 		}
-		// TODO: This is obviously broken!
-		// We should respect "*num_bytes", otherwise
-		// we could have a buffer overflow. See ticket #2786
-		sprintf((buf + *num_bytes), "%s", output);
-		*num_bytes += strlen(output);
-		
-		dump_acpi_namespace(device, result, buf, num_bytes, indenting + 1);
+		written = 0;
+		if (acquire_sem(device->sync_sem) == B_OK) {
+			//dprintf("writing %ld bytes to the buffer.\n", strlen(output));
+			written = ring_buffer_write(device->buffer, output, strlen(output));
+			//dprintf("written %ld bytes\n", written);
+			release_sem(device->sync_sem);
+		}
+
+		if (written > 0)
+			release_sem_etc(device->write_sem, 1, 0);
+
+		dump_acpi_namespace(device, result, indenting + 1);
 	}
+//	dprintf("dump_acpi_namespace() returns\n");
+}
+
+
+static int32
+acpi_namespace_dump(void *arg)
+{
+	acpi_ns_device_info *device = (acpi_ns_device_info*)(arg);
+        dump_acpi_namespace(device, "\\", 0);
+	release_sem(device->write_sem);
+	return 0;
 }
 
 
@@ -108,9 +130,31 @@ static status_t
 acpi_namespace_open(void *_cookie, const char* path, int flags, void** cookie)
 {
 	acpi_ns_device_info *device = (acpi_ns_device_info *)_cookie;
+
 	dprintf("\nacpi_ns_dump: device_open\n");
+
 	*cookie = device;
-	
+
+	device->buffer = create_ring_buffer(2048);
+
+	device->write_sem = create_sem(0, "sem");
+	if (device->write_sem < 0)
+		return device->write_sem;
+
+	device->sync_sem = create_sem(1, "sync sem");
+	if (device->sync_sem < 0) {
+		delete_sem(device->write_sem);
+		return device->sync_sem;
+	}
+
+	device->thread = spawn_kernel_thread(acpi_namespace_dump, "acpi dumper",
+		 B_NORMAL_PRIORITY, device);
+	if (device->thread < 0) {
+		delete_sem(device->write_sem);
+		delete_sem(device->sync_sem);
+		return device->thread;
+	}
+	resume_thread(device->thread);
 	return B_OK;
 }
 
@@ -122,22 +166,31 @@ static status_t
 acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 {
 	acpi_ns_device_info *device = (acpi_ns_device_info *)_cookie;
-	size_t bytes = 0;
-	dprintf("acpi_namespace_read(cookie: %p, position: %ld, buffer: %p, size: %ld)\n",
-			_cookie, position, buf, *num_bytes);	
-	if (position == 0) { // First read
-		dump_acpi_namespace(device, "\\", buf, &bytes, 0);
-		if (bytes <= *num_bytes) {
-			*num_bytes = bytes;
-			dprintf("acpi_ns_dump: read %lu bytes\n", *num_bytes);
-		} else {
-			*num_bytes = 0;
-			return B_IO_ERROR;
+	size_t bytesRead = -1; 
+	size_t bytesToRead = 0;
+	status_t status;
+        dprintf("acpi_namespace_read(cookie: %p, position: %ld, buffer: %p, size: %ld)\n",
+                        _cookie, position, buf, *num_bytes);
+
+	status = acquire_sem_etc(device->write_sem, 1, 0, 0);
+	if (status == B_OK) {
+		if (acquire_sem(device->sync_sem) == B_OK) {
+        		bytesToRead = ring_buffer_readable(device->buffer);
+                        bytesRead = ring_buffer_read(device->buffer, buf, bytesToRead);
+                	release_sem(device->sync_sem);
 		}
-	} else {
+        }
+
+	dprintf("semaphore acquired: %s\n", strerror(status));
+	if (bytesRead < 0) {
 		*num_bytes = 0;
+		dprintf("returning %s\n", strerror(bytesRead));
+		return bytesRead;
 	}
+
+	*num_bytes = bytesRead;
 	
+	dprintf("%ld bytes read\n", bytesRead);
 	return B_OK;
 }
 
@@ -174,7 +227,15 @@ acpi_namespace_control(void* cookie, uint32 op, void* arg, size_t len)
 static status_t
 acpi_namespace_close(void* cookie)
 {
+	status_t status;
 	dprintf("acpi_ns_dump: device_close\n");
+	acpi_ns_device_info *device = (acpi_ns_device_info *)cookie;
+
+	delete_sem(device->write_sem);
+	delete_sem(device->sync_sem);
+	wait_for_thread(device->thread, &status);
+
+	delete_ring_buffer(device->buffer);
 	return B_OK;
 }
 
@@ -187,7 +248,7 @@ static status_t
 acpi_namespace_free(void* cookie)
 {
 	dprintf("acpi_ns_dump: device_free\n");
-
+	
 	return B_OK;
 }
 
@@ -213,7 +274,7 @@ acpi_namespace_init_device(void *_cookie, void **cookie)
 		return err;
 	}
 	
-	*cookie = device;
+		*cookie = device;
 	return B_OK;
 }
 
