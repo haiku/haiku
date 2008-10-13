@@ -436,6 +436,10 @@ extern void m68k_context_switch(void **_oldStackPointer, void *newStackPointer);
 extern bool m68k_set_fault_handler(addr_t *handlerLocation, addr_t handler)
 	__attribute__((noinline));
 
+extern bool m68k_is_hw_register_readable(addr_t address);
+extern bool m68k_is_hw_register_writable(addr_t address, uint16 value);
+	// defined in kernel: arch/m68k/cpu_asm.S
+
 #ifdef __cplusplus
 }
 #endif

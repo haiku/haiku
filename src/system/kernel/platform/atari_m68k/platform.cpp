@@ -85,6 +85,9 @@ public:
 		uint32 Base() const { return fBase; };
 		int Vector() const { return fVector; };
 
+		uint8 ReadReg(uint32 reg) { return in8(fBase + reg); };
+		void WriteReg(uint32 reg, uint8 v) { out8(fBase + reg, v); };
+
 		void EnableIOInterrupt(int irq);
 		void DisableIOInterrupt(int irq);
 		bool AcknowledgeIOInterrupt(int irq);
@@ -261,6 +264,7 @@ M68KAtari::Init(struct kernel_args *kernelArgs)
 	fMFP[0] = NULL;
 	fMFP[1] = NULL;
 
+	// initialize ARAnyM NatFeatures
 	nfGetID =
 		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_get_id;
 	nfCall = 
@@ -268,6 +272,14 @@ M68KAtari::Init(struct kernel_args *kernelArgs)
 	nfPage = (char *)
 		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_page;
 
+	// probe for hardware
+	if (m68k_is_hw_register_readable(MFP0_BASE))
+		fMFP[0] = new(sMFP0Buffer) M68KAtari::MFP(MFP0_BASE, MFP0_VECTOR_BASE);
+	else
+		panic("You MUST have an ST MFP! Wait, is that *really* an Atari ???");
+	if (m68k_is_hw_register_readable(MFP1_BASE))
+		fMFP[1] = new(sMFP1Buffer) M68KAtari::MFP(MFP1_BASE, MFP1_VECTOR_BASE);
+	//}
 	return B_OK;
 }
 
@@ -304,10 +316,6 @@ M68KAtari::InitPostVM(struct kernel_args *kernelArgs)
 status_t
 M68KAtari::InitPIC(struct kernel_args *kernelArgs)
 {
-	fMFP[0] = new(sMFP0Buffer) M68KAtari::MFP(MFP0_BASE, MFP0_VECTOR_BASE);
-	//if (kernelArgs->arch_args.machine == /*TT*/) {
-		fMFP[1] = new(sMFP1Buffer) M68KAtari::MFP(MFP1_BASE, MFP1_VECTOR_BASE);
-	//}
 	return B_NO_INIT;
 }
 
@@ -326,7 +334,7 @@ status_t
 M68KAtari::InitTimer(struct kernel_args *kernelArgs)
 {
 	
-	out8(fMFP[0]->Base() + MFP_TACR, 0); // stop it
+	fMFP[0]->WriteReg(MFP_TACR, 0); // stop it
 	install_io_interrupt_handler(fMFP[0]->Vector()+13, &MFPTimerInterrupt, fMFP[0], 0);
 	return B_OK;
 }
@@ -547,15 +555,15 @@ M68KAtari::SetHardwareTimer(bigtime_t timeout)
 {
 	uint8 counts = (uint8)(timeout & 0x0ff);
 	//XXX: SCALE
-	out8(fMFP[0]->Base() + MFP_TADR, counts);
-	out8(fMFP[0]->Base() + MFP_TACR, 0x01); // delay mode, device by 4
+	fMFP[0]->WriteReg(MFP_TADR, counts);
+	fMFP[0]->WriteReg(MFP_TACR, 0x01); // delay mode, device by 4
 }
 
 
 void
 M68KAtari::ClearHardwareTimer(void)
 {
-	out8(fMFP[0]->Base() + MFP_TACR, 0); // stop it
+	fMFP[0]->WriteReg(MFP_TACR, 0); // stop it
 }
 
 
