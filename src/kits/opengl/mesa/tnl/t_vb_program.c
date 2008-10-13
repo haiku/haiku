@@ -45,8 +45,6 @@
 #include "tnl/t_context.h"
 #include "tnl/t_pipeline.h"
 
-#include "swrast/s_context.h"
-#include "swrast/s_texfilter.h"
 
 
 /*!
@@ -244,6 +242,8 @@ init_machine(GLcontext *ctx, struct gl_program_machine *machine)
 
    machine->FetchTexelLod = vp_fetch_texel;
    machine->FetchTexelDeriv = NULL; /* not used by vertex programs */
+
+   machine->Samplers = ctx->VertexProgram._Current->Base.SamplerUnits;
 }
 
 

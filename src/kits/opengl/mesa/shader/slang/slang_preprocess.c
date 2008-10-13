@@ -28,8 +28,8 @@
  * \author Michal Krol
  */
 
-#include "imports.h"
-#include "grammar_mesa.h"
+#include "main/imports.h"
+#include "shader/grammar/grammar_mesa.h"
 #include "slang_preprocess.h"
 
 LONGSTRING static const char *slang_pp_directives_syn =
@@ -537,7 +537,11 @@ pp_state_init (pp_state *self, slang_info_log *elog)
 {
    self->line = 0;
    self->file = 1;
+#if FEATURE_es2_glsl
+   self->version = 100;
+#else
    self->version = 110;
+#endif
    pp_symbols_init (&self->symbols);
    pp_ext_init (&self->ext);
    self->elog = elog;
@@ -729,6 +733,14 @@ expand (expand_state *e, pp_symbols *symbols)
             slang_string_pushi (e->output, e->state->version);
             slang_string_pushc (e->output, ' ');
          }
+#if FEATURE_es2_glsl
+         else if (_mesa_strcmp (id, "GL_ES") == 0 ||
+                  _mesa_strcmp (id, "GL_FRAGMENT_PRECISION_HIGH") == 0) {
+            slang_string_pushc (e->output, ' ');
+            slang_string_pushi (e->output, '1');
+            slang_string_pushc (e->output, ' ');
+         }
+#endif
          else {
             pp_symbol *symbol;
 
@@ -829,6 +841,16 @@ static GLboolean
 preprocess_source (slang_string *output, const char *source, grammar pid, grammar eid,
                    slang_info_log *elog)
 {
+   static const char *predefined[] = {
+      "__FILE__",
+      "__LINE__",
+      "__VERSION__",
+#if FEATURE_es2_glsl
+      "GL_ES",
+      "GL_FRAGMENT_PRECISION_HIGH",
+#endif
+      NULL
+   };
    byte *prod;
    GLuint size, i;
    pp_state state;
@@ -839,6 +861,15 @@ preprocess_source (slang_string *output, const char *source, grammar pid, gramma
    }
 
    pp_state_init (&state, elog);
+
+   /* add the predefined symbols to the symbol table */
+   for (i = 0; predefined[i]; i++) {
+      pp_symbol *symbol = NULL;
+      symbol = pp_symbols_push(&state.symbols);
+      assert(symbol);
+      slang_string_pushs(&symbol->name,
+                         predefined[i], _mesa_strlen(predefined[i]));
+   }
 
    i = 0;
    while (i < size) {

@@ -126,7 +126,7 @@ int Knotvector::validate( void )
     return 0;
 }
 
-void Knotvector::show( char *msg )
+void Knotvector::show( const char *msg )
 {
 #ifndef NDEBUG
     _glu_dprintf( "%s\n", msg );

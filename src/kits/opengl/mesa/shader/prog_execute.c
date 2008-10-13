@@ -43,7 +43,7 @@
 #include "prog_instruction.h"
 #include "prog_parameter.h"
 #include "prog_print.h"
-#include "slang_library_noise.h"
+#include "shader/slang/slang_library_noise.h"
 
 
 /* debug predicate */
@@ -89,7 +89,9 @@ get_register_pointer(const struct prog_src_register *source,
       else {
          const struct gl_program_parameter_list *params;
          ASSERT(source->File == PROGRAM_LOCAL_PARAM ||
-                source->File == PROGRAM_STATE_VAR);
+                source->File == PROGRAM_CONSTANT ||
+                source->File == PROGRAM_STATE_VAR ||
+                source->File == PROGRAM_UNIFORM);
          params = machine->CurProgram->Parameters;
          if (reg < 0 || reg >= params->NumParameters)
             return ZeroVec;
@@ -309,6 +311,8 @@ fetch_texel(GLcontext *ctx,
             const GLfloat texcoord[4], GLfloat lodBias,
             GLfloat color[4])
 {
+   const GLuint unit = machine->Samplers[inst->TexSrcUnit];
+
    /* Note: we only have the right derivatives for fragment input attribs.
     */
    if (machine->NumDeriv > 0 &&
@@ -319,12 +323,10 @@ fetch_texel(GLcontext *ctx,
       machine->FetchTexelDeriv(ctx, texcoord,
                                machine->DerivX[attr],
                                machine->DerivY[attr],
-                               lodBias,
-                               inst->TexSrcUnit, color);
+                               lodBias, unit, color);
    }
    else {
-      machine->FetchTexelLod(ctx, texcoord, lodBias,
-                             inst->TexSrcUnit, color);
+      machine->FetchTexelLod(ctx, texcoord, lodBias, unit, color);
    }
 }
 
@@ -715,7 +717,7 @@ _mesa_execute_program(GLcontext * ctx,
                 * result.z = result.x * APPX(result.y)
                 * We do what the ARB extension says.
                 */
-               q[2] = pow(2.0, t[0]);
+               q[2] = (GLfloat) pow(2.0, t[0]);
             }
             q[1] = t[0] - floor_t0;
             q[3] = 1.0F;
@@ -1521,9 +1523,7 @@ _mesa_execute_program(GLcontext * ctx,
       default:
          _mesa_problem(ctx, "Bad opcode %d in _mesa_execute_program",
                        inst->Opcode);
-		       assert(0);
          return GL_TRUE;        /* return value doesn't matter */
-
       }
 
       numExec++;

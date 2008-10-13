@@ -49,7 +49,7 @@
 #define CONTEXT_H
 
 
-#include "glapi.h"
+#include "glapi/glapi.h"
 #include "imports.h"
 #include "mtypes.h"
 

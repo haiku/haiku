@@ -84,6 +84,7 @@ enum _format {
    MESA_FORMAT_YCBCR,		/*                     YYYY YYYY UorV UorV */
    MESA_FORMAT_YCBCR_REV,	/*                     UorV UorV YYYY YYYY */
    MESA_FORMAT_Z24_S8,          /* ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ SSSS SSSS */
+   MESA_FORMAT_S8_Z24,          /* SSSS SSSS ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ */
    MESA_FORMAT_Z16,             /*                     ZZZZ ZZZZ ZZZZ ZZZZ */
    MESA_FORMAT_Z32,             /* ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ ZZZZ */
    /*@}*/
@@ -211,6 +212,7 @@ extern const struct gl_texture_format _mesa_texformat_l8;
 extern const struct gl_texture_format _mesa_texformat_i8;
 extern const struct gl_texture_format _mesa_texformat_ci8;
 extern const struct gl_texture_format _mesa_texformat_z24_s8;
+extern const struct gl_texture_format _mesa_texformat_s8_z24;
 extern const struct gl_texture_format _mesa_texformat_z16;
 extern const struct gl_texture_format _mesa_texformat_z32;
 /*@}*/

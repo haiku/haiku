@@ -368,11 +368,13 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
             dst += srcWidth * 4;
          }
 
+         /* size after optional convolution */
+         convWidth = srcWidth;
+         convHeight = srcHeight;
+
          /* do convolution */
          {
             GLfloat *src = tempImage + img * (srcWidth * srcHeight * 4);
-            convWidth = srcWidth;
-            convHeight = srcHeight;
             if (dims == 1) {
                ASSERT(ctx->Pixel.Convolution1DEnabled);
                _mesa_convolve_1d_image(ctx, &convWidth, src, convImage);
@@ -1138,7 +1140,7 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 GLboolean
 _mesa_texstore_z32(TEXSTORE_PARAMS)
 {
-   const GLfloat depthScale = (GLfloat) 0xffffffff;
+   const GLuint depthScale = 0xffffffff;
    (void) dims;
    ASSERT(dstFormat == &_mesa_texformat_z32);
    ASSERT(dstFormat->TexelBytes == sizeof(GLuint));
@@ -1185,7 +1187,7 @@ _mesa_texstore_z32(TEXSTORE_PARAMS)
 GLboolean
 _mesa_texstore_z16(TEXSTORE_PARAMS)
 {
-   const GLfloat depthScale = 65535.0f;
+   const GLuint depthScale = 0xffff;
    (void) dims;
    ASSERT(dstFormat == &_mesa_texformat_z16);
    ASSERT(dstFormat->TexelBytes == sizeof(GLushort));
@@ -1504,7 +1506,6 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 	    (baseInternalFormat == GL_RGBA ||
 	     baseInternalFormat == GL_RGB) &&
             srcType == GL_UNSIGNED_BYTE) {
-
       int img, row, col;
       for (img = 0; img < srcDepth; img++) {
          const GLint srcRowStride = _mesa_image_row_stride(srcPacking,
@@ -1516,11 +1517,12 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
             + dstYoffset * dstRowStride
             + dstXoffset * dstFormat->TexelBytes;
          for (row = 0; row < srcHeight; row++) {
+            GLuint *d4 = (GLuint *) dstRow;
             for (col = 0; col < srcWidth; col++) {
-               dstRow[col * 4 + 0] = srcRow[col * 3 + BCOMP];
-               dstRow[col * 4 + 1] = srcRow[col * 3 + GCOMP];
-               dstRow[col * 4 + 2] = srcRow[col * 3 + RCOMP];
-               dstRow[col * 4 + 3] = 0xff;
+               d4[col] = ((0xff                    << 24) |
+                          (srcRow[col * 3 + RCOMP] << 16) |
+                          (srcRow[col * 3 + GCOMP] <<  8) |
+                          (srcRow[col * 3 + BCOMP] <<  0));
             }
             dstRow += dstRowStride;
             srcRow += srcRowStride;
@@ -1532,7 +1534,9 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 	    dstFormat == &_mesa_texformat_argb8888 &&
             srcFormat == GL_RGBA &&
 	    baseInternalFormat == GL_RGBA &&
-            (srcType == GL_UNSIGNED_BYTE && littleEndian)) {
+            srcType == GL_UNSIGNED_BYTE &&
+            littleEndian) {
+      /* same as above case, but src data has alpha too */
       GLint img, row, col;
       /* For some reason, streaming copies to write-combined regions
        * are extremely sensitive to the characteristics of how the
@@ -1549,13 +1553,13 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
             + dstImageOffsets[dstZoffset + img] * dstFormat->TexelBytes
             + dstYoffset * dstRowStride
             + dstXoffset * dstFormat->TexelBytes;
-
          for (row = 0; row < srcHeight; row++) {
+            GLuint *d4 = (GLuint *) dstRow;
             for (col = 0; col < srcWidth; col++) {
-               *(GLuint *)(dstRow + col * 4)  = (srcRow[col * 4 + RCOMP] << 16 |
-						 srcRow[col * 4 + GCOMP] << 8 |
-						 srcRow[col * 4 + BCOMP] << 0 |
-						 srcRow[col * 4 + ACOMP] << 24);
+               d4[col] = ((srcRow[col * 4 + ACOMP] << 24) |
+                          (srcRow[col * 4 + RCOMP] << 16) |
+                          (srcRow[col * 4 + GCOMP] <<  8) |
+                          (srcRow[col * 4 + BCOMP] <<  0));
             }
             dstRow += dstRowStride;
             srcRow += srcRowStride;
@@ -2441,6 +2445,87 @@ _mesa_texstore_z24_s8(TEXSTORE_PARAMS)
 }
 
 
+/**
+ * Store a combined depth/stencil texture image.
+ */
+GLboolean
+_mesa_texstore_s8_z24(TEXSTORE_PARAMS)
+{
+   const GLuint depthScale = 0xffffff;
+   const GLint srcRowStride
+      = _mesa_image_row_stride(srcPacking, srcWidth, srcFormat, srcType)
+      / sizeof(GLuint);
+   GLint img, row;
+
+   ASSERT(dstFormat == &_mesa_texformat_s8_z24);
+   ASSERT(srcFormat == GL_DEPTH_STENCIL_EXT || srcFormat == GL_DEPTH_COMPONENT);
+   ASSERT(srcFormat != GL_DEPTH_STENCIL_EXT || srcType == GL_UNSIGNED_INT_24_8_EXT);
+
+   /* Incase we only upload depth we need to preserve the stencil */
+   if (srcFormat == GL_DEPTH_COMPONENT) {
+      for (img = 0; img < srcDepth; img++) {
+         GLuint *dstRow = (GLuint *) dstAddr
+            + dstImageOffsets[dstZoffset + img]
+            + dstYoffset * dstRowStride / sizeof(GLuint)
+            + dstXoffset;
+         const GLuint *src
+            = (const GLuint *) _mesa_image_address(dims, srcPacking, srcAddr,
+                  srcWidth, srcHeight,
+                  srcFormat, srcType,
+                  img, 0, 0);
+         for (row = 0; row < srcHeight; row++) {
+            GLuint depth[MAX_WIDTH];
+            GLint i;
+            _mesa_unpack_depth_span(ctx, srcWidth,
+                                    GL_UNSIGNED_INT, /* dst type */
+                                    depth, /* dst addr */
+                                    depthScale,
+                                    srcType, src, srcPacking);
+
+            for (i = 0; i < srcWidth; i++)
+               dstRow[i] = depth[i] | (dstRow[i] & 0xFF000000);
+
+            src += srcRowStride;
+            dstRow += dstRowStride / sizeof(GLuint);
+         }
+      }
+   } else {
+      for (img = 0; img < srcDepth; img++) {
+         GLuint *dstRow = (GLuint *) dstAddr
+            + dstImageOffsets[dstZoffset + img]
+            + dstYoffset * dstRowStride / sizeof(GLuint)
+            + dstXoffset;
+         const GLuint *src
+            = (const GLuint *) _mesa_image_address(dims, srcPacking, srcAddr,
+                  srcWidth, srcHeight,
+                  srcFormat, srcType,
+                  img, 0, 0);
+         for (row = 0; row < srcHeight; row++) {
+            GLubyte stencil[MAX_WIDTH];
+            GLint i;
+            /* the 24 depth bits will be in the low position: */
+            _mesa_unpack_depth_span(ctx, srcWidth,
+                                    GL_UNSIGNED_INT, /* dst type */
+                                    dstRow, /* dst addr */
+                                    depthScale,
+                                    srcType, src, srcPacking);
+            /* get the 8-bit stencil values */
+            _mesa_unpack_stencil_span(ctx, srcWidth,
+                                      GL_UNSIGNED_BYTE, /* dst type */
+                                      stencil, /* dst addr */
+                                      srcType, src, srcPacking,
+                                      ctx->_ImageTransferState);
+            /* merge stencil values into depth values */
+            for (i = 0; i < srcWidth; i++)
+               dstRow[i] |= stencil[i] << 24;
+
+            src += srcRowStride;
+            dstRow += dstRowStride / sizeof(GLuint);
+         }
+      }
+   }
+   return GL_TRUE;
+}
 
 /**
  * Store an image in any of the formats:
@@ -2976,9 +3061,7 @@ _mesa_store_teximage1d(GLcontext *ctx, GLenum target, GLint level,
 
    /* GL_SGIS_generate_mipmap */
    if (level == texObj->BaseLevel && texObj->GenerateMipmap) {
-      _mesa_generate_mipmap(ctx, target,
-                            &ctx->Texture.Unit[ctx->Texture.CurrentUnit],
-                            texObj);
+      ctx->Driver.GenerateMipmap(ctx, target, texObj);
    }
 
    _mesa_unmap_teximage_pbo(ctx, packing);
@@ -3062,9 +3145,7 @@ _mesa_store_teximage2d(GLcontext *ctx, GLenum target, GLint level,
 
    /* GL_SGIS_generate_mipmap */
    if (level == texObj->BaseLevel && texObj->GenerateMipmap) {
-      _mesa_generate_mipmap(ctx, target,
-                            &ctx->Texture.Unit[ctx->Texture.CurrentUnit],
-                            texObj);
+      ctx->Driver.GenerateMipmap(ctx, target, texObj);
    }
 
    _mesa_unmap_teximage_pbo(ctx, packing);
@@ -3138,9 +3219,7 @@ _mesa_store_teximage3d(GLcontext *ctx, GLenum target, GLint level,
 
    /* GL_SGIS_generate_mipmap */
    if (level == texObj->BaseLevel && texObj->GenerateMipmap) {
-      _mesa_generate_mipmap(ctx, target,
-                            &ctx->Texture.Unit[ctx->Texture.CurrentUnit],
-                            texObj);
+      ctx->Driver.GenerateMipmap(ctx, target, texObj);
    }
 
    _mesa_unmap_teximage_pbo(ctx, packing);
@@ -3186,9 +3265,7 @@ _mesa_store_texsubimage1d(GLcontext *ctx, GLenum target, GLint level,
 
    /* GL_SGIS_generate_mipmap */
    if (level == texObj->BaseLevel && texObj->GenerateMipmap) {
-      _mesa_generate_mipmap(ctx, target,
-                            &ctx->Texture.Unit[ctx->Texture.CurrentUnit],
-                            texObj);
+      ctx->Driver.GenerateMipmap(ctx, target, texObj);
    }
 
    _mesa_unmap_teximage_pbo(ctx, packing);
@@ -3241,9 +3318,7 @@ _mesa_store_texsubimage2d(GLcontext *ctx, GLenum target, GLint level,
 
    /* GL_SGIS_generate_mipmap */
    if (level == texObj->BaseLevel && texObj->GenerateMipmap) {
-      _mesa_generate_mipmap(ctx, target,
-                            &ctx->Texture.Unit[ctx->Texture.CurrentUnit],
-                            texObj);
+      ctx->Driver.GenerateMipmap(ctx, target, texObj);
    }
 
    _mesa_unmap_teximage_pbo(ctx, packing);
@@ -3296,9 +3371,7 @@ _mesa_store_texsubimage3d(GLcontext *ctx, GLenum target, GLint level,
 
    /* GL_SGIS_generate_mipmap */
    if (level == texObj->BaseLevel && texObj->GenerateMipmap) {
-      _mesa_generate_mipmap(ctx, target,
-                            &ctx->Texture.Unit[ctx->Texture.CurrentUnit],
-                            texObj);
+      ctx->Driver.GenerateMipmap(ctx, target, texObj);
    }
 
    _mesa_unmap_teximage_pbo(ctx, packing);
@@ -3372,9 +3445,7 @@ _mesa_store_compressed_teximage2d(GLcontext *ctx, GLenum target, GLint level,
 
    /* GL_SGIS_generate_mipmap */
    if (level == texObj->BaseLevel && texObj->GenerateMipmap) {
-      _mesa_generate_mipmap(ctx, target,
-                            &ctx->Texture.Unit[ctx->Texture.CurrentUnit],
-                            texObj);
+      ctx->Driver.GenerateMipmap(ctx, target, texObj);
    }
 
    _mesa_unmap_teximage_pbo(ctx, &ctx->Unpack);
@@ -3484,9 +3555,7 @@ _mesa_store_compressed_texsubimage2d(GLcontext *ctx, GLenum target,
 
    /* GL_SGIS_generate_mipmap */
    if (level == texObj->BaseLevel && texObj->GenerateMipmap) {
-      _mesa_generate_mipmap(ctx, target,
-                            &ctx->Texture.Unit[ctx->Texture.CurrentUnit],
-                            texObj);
+      ctx->Driver.GenerateMipmap(ctx, target, texObj);
    }
 
    _mesa_unmap_teximage_pbo(ctx, &ctx->Unpack);
@@ -3714,8 +3783,8 @@ _mesa_get_teximage(GLcontext *ctx, GLenum target, GLint level,
 void
 _mesa_get_compressed_teximage(GLcontext *ctx, GLenum target, GLint level,
                               GLvoid *img,
-                              const struct gl_texture_object *texObj,
-                              const struct gl_texture_image *texImage)
+                              struct gl_texture_object *texObj,
+                              struct gl_texture_image *texImage)
 {
    GLuint size;
 

@@ -28,7 +28,7 @@
 #ifndef _TNL_H
 #define _TNL_H
 
-#include "mtypes.h"
+#include "main/mtypes.h"
 
 
 

@@ -251,7 +251,9 @@ StaticLibrary libmesa.a :
 	prog_parameter.c
 	prog_print.c
 	prog_statevars.c
+	prog_uniform.c
 	program.c
+	programopt.c
 	shader_api.c
 
 	# shader/grammar

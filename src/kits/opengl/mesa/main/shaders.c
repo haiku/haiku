@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.3
+ * Version:  7.1
  *
- * Copyright (C) 2004-2007  Brian Paul   All Rights Reserved.
+ * Copyright (C) 2004-2008  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -378,7 +378,7 @@ _mesa_ShaderSourceARB(GLhandleARB shaderObj, GLsizei count,
    GLsizei i, totalLength;
    GLcharARB *source;
 
-   if (string == NULL) {
+   if (!shaderObj || string == NULL) {
       _mesa_error(ctx, GL_INVALID_VALUE, "glShaderSourceARB");
       return;
    }
@@ -396,7 +396,7 @@ _mesa_ShaderSourceARB(GLhandleARB shaderObj, GLsizei count,
    for (i = 0; i < count; i++) {
       if (string[i] == NULL) {
          _mesa_free((GLvoid *) offsets);
-         _mesa_error(ctx, GL_INVALID_VALUE, "glShaderSourceARB(null string)");
+         _mesa_error(ctx, GL_INVALID_OPERATION, "glShaderSourceARB(null string)");
          return;
       }
       if (length == NULL || length[i] < 0)

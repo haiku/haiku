@@ -1,6 +1,6 @@
 /**************************************************************************
 
-Copyright 2002 Tungsten Graphics Inc., Cedar Park, Texas.
+Copyright 2002-2008 Tungsten Graphics Inc., Cedar Park, Texas.
 
 All Rights Reserved.
 
@@ -30,16 +30,17 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
  *   Keith Whitwell <keith@tungstengraphics.com>
  */
 
-#include "glheader.h"
-#include "context.h"
-#include "macros.h"
-#include "vtxfmt.h"
-#include "dlist.h"
-#include "state.h"
-#include "light.h"
-#include "api_arrayelt.h"
-#include "api_noop.h"
-#include "dispatch.h"
+#include "main/glheader.h"
+#include "main/bufferobj.h"
+#include "main/context.h"
+#include "main/macros.h"
+#include "main/vtxfmt.h"
+#include "main/dlist.h"
+#include "main/state.h"
+#include "main/light.h"
+#include "main/api_arrayelt.h"
+#include "main/api_noop.h"
+#include "glapi/dispatch.h"
 
 #include "vbo_context.h"
 
@@ -655,7 +656,10 @@ void vbo_exec_vtx_init( struct vbo_exec_context *exec )
    /* Allocate a buffer object.  Will just reuse this object
     * continuously.
     */
-   exec->vtx.bufferobj = ctx->Array.NullBufferObj;
+   _mesa_reference_buffer_object(ctx,
+                                 &exec->vtx.bufferobj,
+                                 ctx->Array.NullBufferObj);
+
    exec->vtx.buffer_map = ALIGN_MALLOC(VBO_VERT_BUFFER_SIZE * sizeof(GLfloat), 64);
 
    vbo_exec_vtxfmt_init( exec );
