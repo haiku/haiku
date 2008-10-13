@@ -41,58 +41,59 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 	for (i = 0; i < indenting; i++) {
 		sprintf(tabs, "%s|    ", tabs);
 	}
-	sprintf(tabs, "%s|--- ", tabs);
+	snprintf(tabs, sizeof(tabs), "%s|--- ", tabs);
 	depth = sizeof(char) * 5 * indenting + sizeof(char); // index into result where the device name will be.
 	
 	//dprintf("acpi_ns_dump: recursing from %s, depth %d\n", root, depth);
 	while (device->acpi->get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
 		type = device->acpi->get_object_type(result);
-		sprintf(output, "%s%s", tabs, result + depth);
+		snprintf(output, sizeof(output), "%s%s", tabs, result + depth);
 		switch(type) {
-			case ACPI_TYPE_ANY: 
+			case ACPI_TYPE_ANY:
+			default: 
 				break;
 			case ACPI_TYPE_INTEGER:
-				sprintf(output, "%s     INTEGER", output);
+				snprintf(output, sizeof(output), "%s     INTEGER", output);
 				break;
 			case ACPI_TYPE_STRING:
-				sprintf(output, "%s     STRING", output);
+				snprintf(output, sizeof(output), "%s     STRING", output);
 				break;
 			case ACPI_TYPE_BUFFER:
-				sprintf(output, "%s     BUFFER", output);
+				snprintf(output, sizeof(output), "%s     BUFFER", output);
 				break;
 			case ACPI_TYPE_PACKAGE:
-				sprintf(output, "%s     PACKAGE", output);
+				snprintf(output, sizeof(output), "%s     PACKAGE", output);
 				break;
 			case ACPI_TYPE_FIELD_UNIT:
-				sprintf(output, "%s     FIELD UNIT", output);
+				snprintf(output, sizeof(output), "%s     FIELD UNIT", output);
 				break;
 			case ACPI_TYPE_DEVICE:
 				device->acpi->get_device_hid(result, hid);
-				sprintf(output, "%s     DEVICE (%s)", output, hid);
+				snprintf(output, sizeof(output), "%s     DEVICE (%s)", output, hid);
 				break;
 			case ACPI_TYPE_EVENT:
-				sprintf(output, "%s     EVENT", output);
+				snprintf(output, sizeof(output), "%s     EVENT", output);
 				break;
 			case ACPI_TYPE_METHOD:
-				sprintf(output, "%s     METHOD", output);
+				snprintf(output, sizeof(output), "%s     METHOD", output);
 				break;
 			case ACPI_TYPE_MUTEX:
-				sprintf(output, "%s     MUTEX", output);
+				snprintf(output, sizeof(output), "%s     MUTEX", output);
 				break;
 			case ACPI_TYPE_REGION:
-				sprintf(output, "%s     REGION", output);
+				snprintf(output, sizeof(output), "%s     REGION", output);
 				break;
 			case ACPI_TYPE_POWER:
-				sprintf(output, "%s     POWER", output);
+				snprintf(output, sizeof(output), "%s     POWER", output);
 				break;
 			case ACPI_TYPE_PROCESSOR:
-				sprintf(output, "%s     PROCESSOR", output);
+				snprintf(output, sizeof(output), "%s     PROCESSOR", output);
 				break;
 			case ACPI_TYPE_THERMAL:
-				sprintf(output, "%s     THERMAL", output);
+				snprintf(output, sizeof(output), "%s     THERMAL", output);
 				break;
 			case ACPI_TYPE_BUFFER_FIELD:
-				sprintf(output, "%s     BUFFER_FIELD", output);
+				snprintf(output, sizeof(output), "%s     BUFFER_FIELD", output);
 				break;
 		}
 		strcat(output, "\n");
@@ -109,7 +110,6 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 
 		dump_acpi_namespace(device, result, indenting + 1);
 	}
-//	dprintf("dump_acpi_namespace() returns\n");
 }
 
 
@@ -170,7 +170,7 @@ acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 	size_t bytesRead = -1; 
 	size_t bytesToRead = 0;
 	status_t status;
-        dprintf("acpi_namespace_read(cookie: %p, position: %ld, buffer: %p, size: %ld)\n",
+        dprintf("acpi_namespace_read(cookie: %p, position: %lld, buffer: %p, size: %ld)\n",
                         _cookie, position, buf, *num_bytes);
 
 	status = acquire_sem_etc(device->write_sem, 1, 0, 0);
@@ -182,16 +182,13 @@ acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 		}
         }
 
-	dprintf("semaphore acquired: %s\n", strerror(status));
 	if (bytesRead < 0) {
 		*num_bytes = 0;
-		dprintf("returning %s\n", strerror(bytesRead));
 		return bytesRead;
 	}
 
 	*num_bytes = bytesRead;
 	
-	dprintf("%ld bytes read\n", bytesRead);
 	return B_OK;
 }
 
