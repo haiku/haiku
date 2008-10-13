@@ -463,11 +463,13 @@ _user_register_file_device(const char *_filename)
 	if (error != B_OK)
 		return error;
 
+	KPath path(filename, true);
+
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		if (KFileDiskDevice *device = manager->FindFileDevice(filename))
+		if (KFileDiskDevice *device = manager->FindFileDevice(path.Path()))
 			return device->ID();
-		return manager->CreateFileDevice(filename);
+		return manager->CreateFileDevice(path.Path());
 	}
 	return B_ERROR;
 }
