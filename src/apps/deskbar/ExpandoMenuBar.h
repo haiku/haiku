@@ -66,6 +66,7 @@ class TExpandoMenuBar : public BMenuBar {
 		virtual void MessageReceived(BMessage *message);
 		virtual void MouseDown(BPoint where);
 		virtual void MouseMoved(BPoint where, uint32 code, const BMessage *);
+		virtual void MouseUp(BPoint where);
 
 		virtual void Draw(BRect update);
 		virtual void DrawBackground(BRect update);
@@ -88,7 +89,7 @@ class TExpandoMenuBar : public BMenuBar {
 		void AddTeam(team_id team, const char *signature);
 		void RemoveTeam(team_id team, bool partial);
 
-		void Hilite(drag_and_drop_selection which);
+		void _FinishedDrag(bool invoke = false);
 
 		bool fVertical;
 		bool fOverflow;
@@ -102,6 +103,7 @@ class TExpandoMenuBar : public BMenuBar {
 
 		TBarMenuTitle *fBeMenuItem;
 		TTeamMenuItem *fSeparatorItem;
+		TTeamMenuItem *fPreviousDragTargetItem;
 
 #ifdef DOUBLECLICKBRINGSTOFRONT
 		int32 fLastClickItem;

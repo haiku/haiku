@@ -59,6 +59,7 @@ class TTeamMenuItem : public BMenuItem {
 
 		void SetOverrideWidth(float width);
 		void SetOverrideHeight(float height);
+		void SetOverrideSelected(bool selected);
 
 		bool IsExpanded();
 		void ToggleExpandState(bool resizeWindow);
@@ -82,6 +83,8 @@ class TTeamMenuItem : public BMenuItem {
 			float width = -1.0f, float height = -1.0f,
 			bool drawLabel = true,bool vertical=true);
 
+		bool _IsSelected() const;
+
 		BList *fTeam;
 		BBitmap *fIcon;
 		char *fName;
@@ -96,6 +99,7 @@ class TTeamMenuItem : public BMenuItem {
 		bool fVertical;
 
 		bool fExpanded;
+		bool fOverriddenSelected;
 };
 
 #endif /* TEAMMENUITEM_H */

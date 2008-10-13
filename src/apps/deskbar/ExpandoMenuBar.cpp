@@ -78,7 +78,8 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView *bar, BRect frame, const char *name,
 	fShowTeamExpander(static_cast<TBarApp *>(be_app)->Settings()->superExpando),
 	fExpandNewTeams(static_cast<TBarApp *>(be_app)->Settings()->expandNewTeams),
 	fBarView(bar),
-	fFirstApp(0)
+	fFirstApp(0),
+	fPreviousDragTargetItem(NULL)
 {
 #ifdef DOUBLECLICKBRINGSTOFRONT
 	fLastClickItem = -1;
@@ -392,8 +393,8 @@ void
 TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 {
 	if (!message) {
-		//	force a cleanup
-		fBarView->DragStop(true);
+		// force a cleanup
+		_FinishedDrag();
 		BMenuBar::MouseMoved(where, code, message);
 		return;
 	}
@@ -403,26 +404,58 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 		|| Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons) < B_OK)
 		buttons = 0;
 
+	if (buttons == 0)
+		return;
+
 	switch (code) {
 		case B_ENTERED_VIEW:
-			if (message && buttons != 0) {
-				fBarView->CacheDragData(message);
-				MouseDown(where);
-			}
+			// fPreviousDragTargetItem should always be NULL here anyways.
+			if (fPreviousDragTargetItem)
+				_FinishedDrag();
+
+			fBarView->CacheDragData(message);
+			fPreviousDragTargetItem = NULL;
 			break;
 
+		case B_OUTSIDE_VIEW:
+			// NOTE: Should not be here, but for the sake of defensive
+			// programming...
 		case B_EXITED_VIEW:
-			if (fBarView->Dragging() && buttons != 0) {
-				if (!TeamItemAtPoint(where)
-					&& !InBeMenu(where)
-					&& (fSeparatorItem && !fSeparatorItem->Frame().Contains(where))
-					&& !Frame().Contains(where)) {
-					fBarView->DragStop();
+			_FinishedDrag();
+			break;
+
+		case B_INSIDE_VIEW:
+			if (fBarView->Dragging()) {
+				TTeamMenuItem* item = NULL;
+				for (int32 i = 0; i < CountItems(); i++) {
+					BMenuItem* _item = ItemAt(i);
+					if (_item->Frame().Contains(where)) {
+						item = dynamic_cast<TTeamMenuItem*>(_item);
+						break;
+					}
 				}
+				if (item == fPreviousDragTargetItem)
+					break;
+				if (fPreviousDragTargetItem != NULL)
+					fPreviousDragTargetItem->SetOverrideSelected(false);
+				if (item != NULL)
+					item->SetOverrideSelected(true);
+				fPreviousDragTargetItem = item;
 			}
 			break;
 	}
-	BMenuBar::MouseMoved(where, code, message);
+}
+
+
+void
+TExpandoMenuBar::MouseUp(BPoint where)
+{
+	if (!fBarView->Dragging()) {
+		BMenuBar::MouseUp(where);
+		return;
+	}
+
+	_FinishedDrag(true);
 }
 
 
@@ -814,5 +847,19 @@ TExpandoMenuBar::monitor_team_windows(void *arg)
 		snooze(150000);
 	}
 	return B_OK;
+}
+
+
+void
+TExpandoMenuBar::_FinishedDrag(bool invoke)
+{
+	if (fPreviousDragTargetItem != NULL) {
+		if (invoke)
+			fPreviousDragTargetItem->Invoke();
+		fPreviousDragTargetItem->SetOverrideSelected(false);
+		fPreviousDragTargetItem = NULL;
+	}
+	if (!invoke && fBarView->Dragging())
+		fBarView->DragStop(true);
 }
 

@@ -101,6 +101,7 @@ TTeamMenuItem::InitData(BList *team, BBitmap *icon, char *name, char *sig,
 
 	fOverrideWidth = width;
 	fOverrideHeight = height;
+	fOverriddenSelected = false;
 
 	fDrawLabel = drawLabel;
 	fVertical = vertical;
@@ -153,6 +154,14 @@ void
 TTeamMenuItem::SetOverrideHeight(float height)
 {
 	fOverrideHeight = height;
+}
+
+
+void
+TTeamMenuItem::SetOverrideSelected(bool selected)
+{
+	fOverriddenSelected = selected;
+	Highlight(selected);
 }
 
 
@@ -225,14 +234,14 @@ TTeamMenuItem::Draw()
 	//	if not selected or being tracked on, fill with gray
 	TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
 	bool canHandle = !barview->Dragging() || barview->AppCanHandleTypes(Signature());
-	if (!IsSelected() && !menu->IsRedrawAfterSticky() || !canHandle || !IsEnabled()) {
+	if (!_IsSelected() && !menu->IsRedrawAfterSticky() || !canHandle || !IsEnabled()) {
 		frame.InsetBy(1, 1);
 		menu->SetHighColor(menuColor);
 		menu->FillRect(frame);
 	}
 
 	//	draw the gray, unselected item, border
-	if (!IsSelected() || !IsEnabled()) {
+	if (!_IsSelected() || !IsEnabled()) {
 		rgb_color shadow = tint_color(menuColor, B_DARKEN_1_TINT);
 		rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
 
@@ -257,7 +266,7 @@ TTeamMenuItem::Draw()
 	}
 
 	//	if selected or being tracked on, fill with the hilite gray color
-	if (IsEnabled() && IsSelected() && !menu->IsRedrawAfterSticky() && canHandle) {
+	if (IsEnabled() && _IsSelected() && !menu->IsRedrawAfterSticky() && canHandle) {
 		// fill
 		menu->SetHighColor(tint_color(menuColor, B_HIGHLIGHT_BACKGROUND_TINT));
 		menu->FillRect(frame);
@@ -415,7 +424,7 @@ TTeamMenuItem::DrawContentLabel()
 	TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
 	bool canHandle = !barview->Dragging()
 		|| barview->AppCanHandleTypes(Signature());
-	if (IsSelected() && IsEnabled() && canHandle)
+	if (_IsSelected() && IsEnabled() && canHandle)
 		menu->SetLowColor(tint_color(menu->ViewColor(),
 			B_HIGHLIGHT_BACKGROUND_TINT));
 	else
@@ -519,5 +528,12 @@ TTeamMenuItem::ExpanderBounds() const
 	BRect bounds(Frame());
 	bounds.left = bounds.right - kSwitchWidth;
 	return bounds;
+}
+
+
+bool
+TTeamMenuItem::_IsSelected() const
+{
+	return IsSelected() || fOverriddenSelected;
 }
 
