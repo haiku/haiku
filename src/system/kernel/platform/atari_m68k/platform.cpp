@@ -18,15 +18,28 @@
 
 #include "debugger_keymaps.h"
 
+/* which MFP timer to use */
+#define SYS_TDR		MFP_TADR
+#define SYS_TCR		MFP_TACR
+#define SYS_TCRMASK	0x0f	/* mask for timer control (0xf for A&B, 0x7 for C, 0x38 for D) */
+#define SYS_TENABLE	0x01	/* delay mode with /4 prescaler: 0x01 (<<3 for timer D) */
+#define SYS_TDISABLE	0x00
+#define SYS_TVECTOR	13
+#define MFP_FREQ	2457600UL
+#define MFP_PRESCALER	4
+#define MFP_RATE	(MFP_FREQ/MFP_PRESCALER)
+#define MFP_MAX_TIMER_INTERVAL	(0xff * 1000000L / MFP_RATE)
+
+
 #define MFP0_BASE	0xFFFFFA00
 #define MFP1_BASE	0xFFFFFA80
 
 #define MFP0_VECTOR_BASE	64
 #define MFP1_VECTOR_BASE	(MFP0_VECTOR_BASE+16)
 
-#define RTC_BASE	0xFFFF8960
+#define TT_RTC_BASE	0xFFFF8960
 
-#define RTC_VECTOR	(MFP1_VECTOR_BASE+14)
+#define TT_RTC_VECTOR	(MFP1_VECTOR_BASE+14)
 
 // ?
 #define SCC_C0_VECTOR_BASE	(MFP1_VECTOR_BASE+16)
@@ -65,7 +78,7 @@ enum keycodes {
 };
 
 #define in8(a)  (*(volatile uint8 *)(a))
-#define out8(a, v)  (*(volatile uint8 *)(a) = v)
+#define out8(v, a)  (*(volatile uint8 *)(a) = v)
 
 
 namespace BPrivate {
@@ -86,7 +99,7 @@ public:
 		int Vector() const { return fVector; };
 
 		uint8 ReadReg(uint32 reg) { return in8(fBase + reg); };
-		void WriteReg(uint32 reg, uint8 v) { out8(fBase + reg, v); };
+		void WriteReg(uint32 reg, uint8 v) { out8(v, fBase + reg); };
 
 		void EnableIOInterrupt(int irq);
 		void DisableIOInterrupt(int irq);
@@ -105,6 +118,9 @@ public:
 		uint32 Base() const { return fBase; };
 		int Vector() const { return fVector; };
 
+		uint8 ReadReg(uint32 reg);
+		void WriteReg(uint32 reg, uint8 v) { out8((uint8)reg,fBase+1); out8(v,fBase+3); };
+
 	private:
 		uint32 fBase;
 		int fVector;
@@ -112,6 +128,8 @@ public:
 
 	M68KAtari();
 	virtual ~M68KAtari();
+
+	void ProbeHardware(struct kernel_args *kernelArgs);
 
 	virtual status_t Init(struct kernel_args *kernelArgs);
 	virtual status_t InitSerialDebug(struct kernel_args *kernelArgs);
@@ -130,6 +148,8 @@ public:
 	virtual void DisableIOInterrupt(int irq);
 	virtual bool AcknowledgeIOInterrupt(int irq);
 
+	virtual	uint8 ReadRTCReg(uint8 reg);
+	virtual	void WriteRTCReg(uint8 reg, uint8 val);
 	virtual	void SetHardwareRTC(uint32 seconds);
 	virtual	uint32 GetHardwareRTC();
 
@@ -189,7 +209,7 @@ M68KAtari::MFP::EnableIOInterrupt(int irq)
 	uint8 val = in8(reg);
 	if (val & bit == 0) {
 		val |= bit;
-		out8(reg, val);
+		out8(val, reg);
 	}
 }
 
@@ -203,7 +223,7 @@ M68KAtari::MFP::DisableIOInterrupt(int irq)
 	uint8 val = in8(reg);
 	if (val & bit) {
 		val &= ~bit;
-		out8(reg, val);
+		out8(val, reg);
 	}
 }
 
@@ -217,7 +237,7 @@ M68KAtari::MFP::AcknowledgeIOInterrupt(int irq)
 	uint8 val = in8(reg);
 	if (val & bit) {
 		val &= ~bit;
-		out8(reg, val);
+		out8(val, reg);
 		return true;
 	}
 	return false;
@@ -242,6 +262,22 @@ M68KAtari::RTC::~RTC()
 }
 
 
+uint8
+M68KAtari::RTC::ReadReg(uint32 reg)
+{
+	int waitTime = 10000;
+
+	if (reg < 0x0a) {	// time of day stuff...
+				// check for in progress updates before accessing
+		out8(0x0a, fBase+1);
+		while((in8(fBase+3) & 0x80) && --waitTime);
+	}
+	
+	out8((uint8)reg,fBase+1);
+	return in8(fBase+3);
+}
+
+
 // #pragma mark - M68KAtari
 
 
@@ -258,11 +294,32 @@ M68KAtari::~M68KAtari()
 }
 
 
+void
+M68KAtari::ProbeHardware(struct kernel_args *kernelArgs)
+{
+	dprintf("Atari hardware:\n");
+	// if we are here we already know we have one
+	dprintf("	ST MFP\n");
+	if (m68k_is_hw_register_readable(MFP1_BASE)) {
+		dprintf("	TT MFP\n");
+		fMFP[1] = new(sMFP1Buffer) M68KAtari::MFP(MFP1_BASE, MFP1_VECTOR_BASE);
+	}
+	if (m68k_is_hw_register_readable(TT_RTC_BASE)) {
+		dprintf("	TT RTC MC146818A\n");
+		fRTC = new(sRTCBuffer) M68KAtari::RTC(TT_RTC_BASE,TT_RTC_VECTOR);
+	} else
+		panic("TT RTC required!");
+
+
+}
+
+
 status_t
 M68KAtari::Init(struct kernel_args *kernelArgs)
 {
 	fMFP[0] = NULL;
 	fMFP[1] = NULL;
+	fRTC = NULL;
 
 	// initialize ARAnyM NatFeatures
 	nfGetID =
@@ -272,14 +329,13 @@ M68KAtari::Init(struct kernel_args *kernelArgs)
 	nfPage = (char *)
 		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_page;
 
-	// probe for hardware
-	if (m68k_is_hw_register_readable(MFP0_BASE))
+	// probe for ST-MFP
+	if (m68k_is_hw_register_readable(MFP0_BASE)) {
 		fMFP[0] = new(sMFP0Buffer) M68KAtari::MFP(MFP0_BASE, MFP0_VECTOR_BASE);
-	else
+	} else
+		// won't really work anyway from here
 		panic("You MUST have an ST MFP! Wait, is that *really* an Atari ???");
-	if (m68k_is_hw_register_readable(MFP1_BASE))
-		fMFP[1] = new(sMFP1Buffer) M68KAtari::MFP(MFP1_BASE, MFP1_VECTOR_BASE);
-	//}
+	
 	return B_OK;
 }
 
@@ -292,7 +348,10 @@ M68KAtari::InitSerialDebug(struct kernel_args *kernelArgs)
 
 #warning M68K: add real serial debug output someday
 
-	//out8(IKBD_BASE+IKBD_DATA, 0x11);
+	//out8(0x11, IKBD_BASE+IKBD_DATA);
+
+	// now we can expect to see something
+	ProbeHardware(kernelArgs);
 
 	return B_OK;
 }
@@ -316,7 +375,7 @@ M68KAtari::InitPostVM(struct kernel_args *kernelArgs)
 status_t
 M68KAtari::InitPIC(struct kernel_args *kernelArgs)
 {
-	return B_NO_INIT;
+	return B_OK;
 }
 
 
@@ -324,8 +383,6 @@ status_t
 M68KAtari::InitRTC(struct kernel_args *kernelArgs,
 	struct real_time_data *data)
 {
-	fRTC = new(sRTCBuffer) M68KAtari::RTC(RTC_BASE, RTC_VECTOR);
-#warning M68K: FIXME
 	return B_OK;
 }
 
@@ -335,7 +392,7 @@ M68KAtari::InitTimer(struct kernel_args *kernelArgs)
 {
 	
 	fMFP[0]->WriteReg(MFP_TACR, 0); // stop it
-	install_io_interrupt_handler(fMFP[0]->Vector()+13, &MFPTimerInterrupt, fMFP[0], 0);
+	install_io_interrupt_handler(fMFP[0]->Vector()+13, &MFPTimerInterrupt, this, 0);
 	return B_OK;
 }
 
@@ -535,6 +592,25 @@ M68KAtari::AcknowledgeIOInterrupt(int irq)
 	return false;
 }
 
+
+uint8
+M68KAtari::ReadRTCReg(uint8 reg)
+{
+	// fake century
+	// (on MC146818A it's in the RAM, but probably it's used for that purpose...)
+	// but just in case, we're in 20xx now anyway :)
+	if (reg == 0x32)
+		return 0x20;
+	return fRTC->ReadReg(reg);
+}
+
+
+void
+M68KAtari::WriteRTCReg(uint8 reg, uint8 val)
+{
+	fRTC->WriteReg(reg, val);
+}
+
 void
 M68KAtari::SetHardwareRTC(uint32 seconds)
 {
@@ -553,17 +629,29 @@ M68KAtari::GetHardwareRTC()
 void
 M68KAtari::SetHardwareTimer(bigtime_t timeout)
 {
-	uint8 counts = (uint8)(timeout & 0x0ff);
-	//XXX: SCALE
-	fMFP[0]->WriteReg(MFP_TADR, counts);
-	fMFP[0]->WriteReg(MFP_TACR, 0x01); // delay mode, device by 4
+	uint8 nextEventClocks;
+	if (timeout <= 0)
+		nextEventClocks = 2;
+	else if (timeout < MFP_MAX_TIMER_INTERVAL)
+		nextEventClocks = timeout * MFP_RATE / 1000000;
+	else
+		nextEventClocks = 0xff;
+
+	fMFP[0]->WriteReg(SYS_TDR, nextEventClocks);
+	// delay mode, device by 4
+	fMFP[0]->WriteReg(SYS_TCR, (fMFP[0]->ReadReg(SYS_TCR) & SYS_TCRMASK) | SYS_TENABLE);
+	// enable irq
+	EnableIOInterrupt(MFP1_VECTOR_BASE + SYS_TVECTOR);
 }
 
 
 void
 M68KAtari::ClearHardwareTimer(void)
 {
-	fMFP[0]->WriteReg(MFP_TACR, 0); // stop it
+	// disable the irq (as on PC but I'm not sure it's needed)
+	DisableIOInterrupt(MFP1_VECTOR_BASE + SYS_TVECTOR);
+	// stop it, we don't want another countdown
+	fMFP[0]->WriteReg(SYS_TCR, (fMFP[0]->ReadReg(SYS_TCR) & SYS_TCRMASK) | SYS_TDISABLE);
 }
 
 
@@ -592,6 +680,10 @@ M68KAtari::MFPForIrq(int irq)
 int32
 M68KAtari::MFPTimerInterrupt(void *data)
 {
+	M68KAtari *_this = (M68KAtari *)data;
+	// disable the timer, else it will loop again with the same value
+	_this->ClearHardwareTimer();
+	// handle the timer
 	return timer_interrupt();
 }
 
