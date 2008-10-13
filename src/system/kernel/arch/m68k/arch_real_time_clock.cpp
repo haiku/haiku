@@ -1,16 +1,165 @@
 /*
  * Copyright 2007, François Revol, revol@free.fr.
- * Distributed under the terms of the MIT License.
+ * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>. All rights reserved.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
  *
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Distributed under the terms of the MIT License.
  */
 
 #include <arch/real_time_clock.h>
 
 #include <arch_platform.h>
+#include <real_time_clock.h>
 #include <real_time_data.h>
 #include <smp.h>
+
+typedef struct	{
+	uint8 second;
+	uint8 minute;
+	uint8 hour;
+	uint8 day;
+	uint8 month;
+	uint8 year;
+	uint8 century;
+} cmos_time;
+
+
+static uint32
+bcd_to_int(uint8 bcd)
+{
+	uint32 numl;
+	uint32 numh;
+
+	numl = bcd & 0x0f;
+	numh = (bcd & 0xf0) >> 4;
+
+	return numh * 10 + numl;
+}
+
+
+static uint8
+int_to_bcd(uint32 number)
+{
+	uint8 low;
+	uint8 high;
+
+	if (number > 99)
+		return 0;
+
+	high = number / 10;
+	low = number % 10;
+
+	return (high << 4) | low;
+}
+
+
+static int
+same_time(const cmos_time *time1, const cmos_time *time2)
+{
+	return time1->second == time2->second
+		&& time1->minute == time2->minute
+		&& time1->hour == time2->hour
+		&& time1->day == time2->day
+		&& time1->month == time2->month
+		&& time1->year == time2->year
+		&& time1->century == time2->century;
+}
+
+
+static uint8
+cmos_read(uint8 addr)
+{
+	return M68KPlatform::Default()->ReadRTCReg(reg);
+}
+
+
+static void
+cmos_write(uint8 addr, uint8 data)
+{
+	M68KPlatform::Default()->WriteRTCReg(reg, data);
+}
+
+
+static void
+set_24_hour_mode(void)
+{
+	uint8 status_b;
+
+	status_b = cmos_read(0x0b);
+	status_b |= 0x02;
+	cmos_write(0x0b, status_b);
+}
+
+
+static void
+read_cmos_clock(cmos_time *cmos)
+{
+	set_24_hour_mode();
+
+	cmos->century = cmos_read(0x32);
+	cmos->year = cmos_read(0x09);
+	cmos->month = cmos_read(0x08);
+	cmos->day = cmos_read(0x07);
+	cmos->hour = cmos_read(0x04);
+	cmos->minute = cmos_read(0x02);
+	cmos->second = cmos_read(0x00);
+}
+
+
+static void
+write_cmos_clock(cmos_time *cmos)
+{
+	set_24_hour_mode();
+
+	cmos_write(0x32, cmos->century);
+	cmos_write(0x09, cmos->year);
+	cmos_write(0x08, cmos->month);
+	cmos_write(0x07, cmos->day);
+	cmos_write(0x04, cmos->hour);
+	cmos_write(0x02, cmos->minute);
+	cmos_write(0x00, cmos->second);
+}
+
+
+static uint32
+cmos_to_secs(const cmos_time *cmos)
+{
+	struct tm t;
+	t.tm_year = bcd_to_int(cmos->century) * 100 + bcd_to_int(cmos->year)
+		- RTC_EPOCH_BASE_YEAR;
+	t.tm_mon = bcd_to_int(cmos->month) - 1;
+	t.tm_mday = bcd_to_int(cmos->day);
+	t.tm_hour = bcd_to_int(cmos->hour);
+	t.tm_min = bcd_to_int(cmos->minute);
+	t.tm_sec = bcd_to_int(cmos->second);
+
+	return rtc_tm_to_secs(&t);
+}
+
+
+static void
+secs_to_cmos(uint32 seconds, cmos_time *cmos)
+{
+	int wholeYear;
+
+	struct tm t;
+	rtc_secs_to_tm(seconds, &t);
+
+	wholeYear = t.tm_year + RTC_EPOCH_BASE_YEAR;
+
+	cmos->century = int_to_bcd(wholeYear / 100);
+	cmos->year = int_to_bcd(wholeYear % 100);
+	cmos->month = int_to_bcd(t.tm_mon + 1);
+	cmos->day = int_to_bcd(t.tm_mday);
+	cmos->hour = int_to_bcd(t.tm_hour);
+	cmos->minute = int_to_bcd(t.tm_min);
+	cmos->second = int_to_bcd(t.tm_sec);
+}
+
+
+//	#pragma mark -
+
 
 
 static spinlock sSetArchDataLock;
