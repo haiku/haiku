@@ -26,21 +26,25 @@ extern "C" {
 partition_id _user_get_next_disk_device_id(int32 *cookie, size_t *neededSize);
 partition_id _user_find_disk_device(const char *filename, size_t *neededSize);
 partition_id _user_find_partition(const char *filename, size_t *neededSize);
+partition_id _user_find_file_disk_device(const char *filename,
+				size_t *neededSize);
 status_t _user_get_disk_device_data(partition_id deviceID, bool deviceOnly,
 				user_disk_device_data *buffer, size_t bufferSize,
 				size_t *neededSize);
 
 partition_id _user_register_file_device(const char *filename);
 status_t _user_unregister_file_device(partition_id deviceID,
-									  const char *filename);
+				const char *filename);
 	// Only a valid deviceID or filename need to be passed. The other one
 	// is -1/NULL. If both is given only filename is ignored.
+status_t _user_get_file_disk_device_path(partition_id id, char* buffer,
+				size_t bufferSize);
 
 // disk systems
 status_t _user_get_disk_system_info(disk_system_id id,
-									user_disk_system_info *info);
+				user_disk_system_info *info);
 status_t _user_get_next_disk_system_info(int32 *cookie,
-										 user_disk_system_info *info);
+				user_disk_system_info *info);
 status_t _user_find_disk_system(const char *name, user_disk_system_info *info);
 
 // disk device modification

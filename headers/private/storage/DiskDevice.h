@@ -37,6 +37,9 @@ public:
 									bool receiveCompleteProgressUpdates = true);
 			status_t			CancelModifications();
 
+			bool				IsFile() const;
+			status_t			GetFilePath(BPath* path) const;
+
 private:
 			friend class BDiskDeviceList;
 			friend class BDiskDeviceRoster;

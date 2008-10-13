@@ -441,9 +441,14 @@ extern status_t		_kern_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
 /* Disk Device Manager syscalls */
 
 // iterating, retrieving device/partition data
-extern partition_id	_kern_get_next_disk_device_id(int32 *cookie, size_t *neededSize);
-extern partition_id	_kern_find_disk_device(const char *filename, size_t *neededSize);
-extern partition_id	_kern_find_partition(const char *filename, size_t *neededSize);
+extern partition_id	_kern_get_next_disk_device_id(int32 *cookie,
+						size_t *neededSize);
+extern partition_id	_kern_find_disk_device(const char *filename,
+						size_t *neededSize);
+extern partition_id	_kern_find_partition(const char *filename,
+						size_t *neededSize);
+extern partition_id	_kern_find_file_disk_device(const char *filename,
+						size_t *neededSize);
 extern status_t		_kern_get_disk_device_data(partition_id deviceID,
 						bool deviceOnly, struct user_disk_device_data *buffer,
 						size_t bufferSize, size_t *neededSize);
@@ -452,6 +457,8 @@ extern status_t		_kern_unregister_file_device(partition_id deviceID,
 						const char *filename);
 	// Only a valid deviceID or filename need to be passed. The other one
 	// is -1/NULL. If both is given only filename is ignored.
+extern status_t		_kern_get_file_disk_device_path(partition_id id,
+						char* buffer, size_t bufferSize);
 
 // disk systems
 extern status_t		_kern_get_disk_system_info(disk_system_id id,

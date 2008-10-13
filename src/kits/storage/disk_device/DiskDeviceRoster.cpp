@@ -377,7 +377,7 @@ BDiskDeviceRoster::GetPartitionWithID(int32 id, BDiskDevice *device,
 	return B_OK;
 }
 
-// GetDeviceForPath
+
 status_t
 BDiskDeviceRoster::GetDeviceForPath(const char *filename, BDiskDevice *device)
 {
@@ -392,11 +392,10 @@ BDiskDeviceRoster::GetDeviceForPath(const char *filename, BDiskDevice *device)
 	return device->_SetTo(id, true, neededSize);
 }
 
-// GetPartitionForPath
+
 status_t
 BDiskDeviceRoster::GetPartitionForPath(const char *filename,
-									   BDiskDevice *device,
-									   BPartition **partition)
+	BDiskDevice *device, BPartition **partition)
 {
 	if (!filename || !device || !partition)
 		return B_BAD_VALUE;
@@ -415,6 +414,25 @@ BDiskDeviceRoster::GetPartitionForPath(const char *filename,
 		return B_ENTRY_NOT_FOUND;
 	return B_OK;
 }
+
+
+status_t
+BDiskDeviceRoster::GetFileDeviceForPath(const char *filename,
+	BDiskDevice *device)
+{
+	if (!filename || !device)
+		return B_BAD_VALUE;
+
+	// get the device ID
+	size_t neededSize = 0;
+	partition_id id = _kern_find_file_disk_device(filename, &neededSize);
+	if (id < 0)
+		return id;
+
+	// download the device data
+	return device->_SetTo(id, true, neededSize);
+}
+
 
 // StartWatching
 /*!	\brief Adds a target to the list of targets to be notified on disk device

@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 /*! \file ddm_userland_interface.cpp
@@ -15,6 +16,7 @@
 
 #include <AutoDeleter.h>
 #include <ddm_userland_interface.h>
+#include <fs/KPath.h>
 #include <KDiskDevice.h>
 #include <KDiskDeviceManager.h>
 #include <KDiskDeviceUtils.h>
@@ -328,6 +330,38 @@ _user_find_partition(const char *_filename, size_t *neededSize)
 }
 
 
+partition_id
+_user_find_file_disk_device(const char *_filename, size_t *neededSize)
+{
+	UserStringParameter<false> filename;
+	status_t error = filename.Init(_filename, B_PATH_NAME_LENGTH);
+	if (error != B_OK)
+		return error;
+
+	KPath path(filename, true);
+
+	partition_id id = B_ENTRY_NOT_FOUND;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// find the device
+	if (KFileDiskDevice* device = manager->RegisterFileDevice(path.Path())) {
+		PartitionRegistrar _(device, true);
+		id = device->ID();
+		if (neededSize) {
+			if (DeviceReadLocker locker = device) {
+				// get the needed size
+				UserDataWriter writer;
+				device->WriteUserData(writer);
+				error = copy_to_user_value(neededSize, writer.AllocatedSize());
+				if (error != B_OK)
+					return error;
+			} else
+				return B_ERROR;
+		}
+	}
+	return id;
+}
+
+
 // _user_get_disk_device_data
 /*!	\brief Writes data describing the disk device identified by ID and all
 		   its partitions into the supplied buffer.
@@ -456,6 +490,31 @@ _user_unregister_file_device(partition_id deviceID, const char *_filename)
 
 		return manager->DeleteFileDevice(filename);
 	}
+}
+
+
+status_t
+_user_get_file_disk_device_path(partition_id id, char* buffer,
+	size_t bufferSize)
+{
+	if (id < 0 || buffer == NULL || bufferSize == 0)
+		return B_BAD_VALUE;
+
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+
+	if (KDiskDevice *device = manager->RegisterDevice(id, true)) {
+		PartitionRegistrar _(device, true);
+		if (DeviceReadLocker locker = device) {
+			KFileDiskDevice* fileDevice
+				= dynamic_cast<KFileDiskDevice*>(device);
+			if (fileDevice == NULL)
+				return B_BAD_VALUE;
+
+			return user_strlcpy(buffer, fileDevice->FilePath(), bufferSize);
+		}
+	}
+
+	return B_ERROR;
 }
 
 

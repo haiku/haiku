@@ -27,6 +27,7 @@ KFileDiskDevice::KFileDiskDevice(partition_id id)
 	: KDiskDevice(id),
 	  fFilePath(NULL)
 {
+	SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_IS_FILE);
 }
 
 // destructor

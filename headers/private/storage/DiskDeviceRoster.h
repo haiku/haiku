@@ -28,7 +28,7 @@ enum {
 	// Basic masks
 	B_DEVICE_REQUEST_MOUNT_POINT			= 0x0001,	// mount point changes
 	B_DEVICE_REQUEST_MOUNTING				= 0x0002,	// mounting/unmounting
-	B_DEVICE_REQUEST_PARTITION				= 0x0004,	// partition changes 
+	B_DEVICE_REQUEST_PARTITION				= 0x0004,	// partition changes
 	B_DEVICE_REQUEST_DEVICE					= 0x0008,	// device changes (media changes)
 	B_DEVICE_REQUEST_DEVICE_LIST			= 0x0010,	// device additions/removals
 	B_DEVICE_REQUEST_JOB_LIST				= 0x0020, 	// job addition/initiation/cancellation/completion
@@ -125,6 +125,8 @@ public:
 								BDiskDevice* device);
 			status_t		GetPartitionForPath(const char* filename,
 								BDiskDevice* device, BPartition** _partition);
+			status_t		GetFileDeviceForPath(const char* filename,
+								BDiskDevice* device);
 
 			status_t		StartWatching(BMessenger target,
 								uint32 eventMask = B_DEVICE_REQUEST_ALL);

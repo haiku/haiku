@@ -62,6 +62,7 @@ enum {
 	B_DISK_DEVICE_HAS_MEDIA		= 0x02,
 	B_DISK_DEVICE_READ_ONLY		= 0x04,
 	B_DISK_DEVICE_WRITE_ONCE	= 0x08,
+	B_DISK_DEVICE_IS_FILE		= 0x10,
 };
 
 // disk system flags

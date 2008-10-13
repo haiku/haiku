@@ -59,8 +59,8 @@ BDiskDevice::~BDiskDevice()
 bool
 BDiskDevice::HasMedia() const
 {
-	return (fDeviceData
-		&& fDeviceData->device_flags & B_DISK_DEVICE_HAS_MEDIA);
+	return fDeviceData
+		&& (fDeviceData->device_flags & B_DISK_DEVICE_HAS_MEDIA) != 0;
 }
 
 
@@ -71,8 +71,8 @@ BDiskDevice::HasMedia() const
 bool
 BDiskDevice::IsRemovableMedia() const
 {
-	return (fDeviceData
-		&& fDeviceData->device_flags & B_DISK_DEVICE_REMOVABLE);
+	return fDeviceData
+		&& (fDeviceData->device_flags & B_DISK_DEVICE_REMOVABLE) != 0;
 }
 
 
@@ -80,8 +80,8 @@ BDiskDevice::IsRemovableMedia() const
 bool
 BDiskDevice::IsReadOnlyMedia() const
 {
-	return (fDeviceData
-		&& fDeviceData->device_flags & B_DISK_DEVICE_READ_ONLY);
+	return fDeviceData
+		&& (fDeviceData->device_flags & B_DISK_DEVICE_READ_ONLY) != 0;
 }
 
 
@@ -89,8 +89,8 @@ BDiskDevice::IsReadOnlyMedia() const
 bool
 BDiskDevice::IsWriteOnceMedia() const
 {
-	return (fDeviceData
-		&& fDeviceData->device_flags & B_DISK_DEVICE_WRITE_ONCE);
+	return fDeviceData
+		&& (fDeviceData->device_flags & B_DISK_DEVICE_WRITE_ONCE) != 0;
 }
 
 
@@ -190,7 +190,7 @@ BDiskDevice::Unset()
 status_t
 BDiskDevice::InitCheck() const
 {
-	return (fDeviceData ? B_OK : B_NO_INIT);
+	return fDeviceData ? B_OK : B_NO_INIT;
 }
 
 
@@ -216,7 +216,7 @@ BDiskDevice::IsModified() const
 		{
 			return Visit(device, 0);
 		}
-		
+
 		virtual bool Visit(BPartition *partition, int32 level)
 		{
 			return partition->_IsModified();
@@ -229,7 +229,7 @@ BDiskDevice::IsModified() const
 
 // PrepareModifications
 /*!	\brief Initializes the partition hierarchy for modifications.
- * 	
+ *
  * 	Subsequent modifications are performed on so-called \a shadow structure
  * 	and not written to device until \ref CommitModifications is called.
  *
@@ -330,6 +330,36 @@ BDiskDevice::CancelModifications()
 		error = _SetTo(ID(), true, 0);
 
 	return error;
+}
+
+
+/*!	\brief Returns whether or not this device is a virtual device backed
+		up by a file.
+*/
+bool
+BDiskDevice::IsFile() const
+{
+	return fDeviceData
+		&& (fDeviceData->device_flags & B_DISK_DEVICE_IS_FILE) != 0;
+}
+
+
+/*!	\brief Retrieves the path of the file backing up the disk device.*/
+status_t
+BDiskDevice::GetFilePath(BPath* path) const
+{
+	if (path == NULL)
+		return B_BAD_VALUE;
+	if (!IsFile())
+		return B_BAD_TYPE;
+
+	char pathBuffer[B_PATH_NAME_LENGTH];
+	status_t status = _kern_get_file_disk_device_path(
+		fDeviceData->device_partition_data.id, pathBuffer, sizeof(pathBuffer));
+	if (status != B_OK)
+		return status;
+
+	return path->SetTo(pathBuffer);
 }
 
 
