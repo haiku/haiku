@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DISK_DEVICE_DEFS_H
@@ -88,6 +88,7 @@ enum {
 	B_DISK_SYSTEM_SUPPORTS_MOVING_WHILE_MOUNTED					= 0x020000,
 	B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED	= 0x040000,
 	B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED	= 0x080000,
+	B_DISK_SYSTEM_SUPPORTS_WRITING								= 0x100000,
 
 	// partitioning system specific flags
 	B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD						= 0x001000,

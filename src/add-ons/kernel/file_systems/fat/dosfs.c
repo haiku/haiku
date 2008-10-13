@@ -1338,7 +1338,7 @@ static file_system_module_info sFATFileSystem = {
 
 	"fat",					// short_name
 	"FAT32 File System",	// pretty_name
-	0,	// DDM flags
+	B_DISK_SYSTEM_SUPPORTS_WRITING,	// DDM flags
 
 	// scanning
 	dosfs_identify_partition,

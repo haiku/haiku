@@ -2118,7 +2118,8 @@ bfs_get_supported_operations(partition_data* partition, uint32 mask)
 {
 	// TODO: We should at least check the partition size.
 	return B_DISK_SYSTEM_SUPPORTS_INITIALIZING
-		| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME;
+		| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+		| B_DISK_SYSTEM_SUPPORTS_WRITING;
 }
 
 
@@ -2327,6 +2328,7 @@ static file_system_module_info sBeFileSystem = {
 //	| B_DISK_SYSTEM_SUPPORTS_MOVING_WHILE_MOUNTED
 //	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED
 //	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED
+	| B_DISK_SYSTEM_SUPPORTS_WRITING
 	,
 
 	// scanning
