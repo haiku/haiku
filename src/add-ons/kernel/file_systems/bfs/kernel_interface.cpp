@@ -624,9 +624,16 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 		{
 			// let's makebootable (or anyone else) update the boot block
 			// while BFS is mounted
-			if (user_memcpy(&volume->SuperBlock().pad_to_block,
-					(uint8*)buffer + offsetof(disk_super_block, pad_to_block),
-					sizeof(volume->SuperBlock().pad_to_block)) < B_OK)
+			update_boot_block update;
+			if (bufferLength != sizeof(update_boot_block))
+				return B_BAD_VALUE;
+			if (user_memcpy(&update, buffer, sizeof(update_boot_block)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (update.offset < offsetof(disk_super_block, pad_to_block)
+				|| update.length + update.offset > 512)
+				return B_BAD_VALUE;
+			if (user_memcpy((uint8*)&volume->SuperBlock() + update.offset,
+					update.data, update.length) != B_OK)
 				return B_BAD_ADDRESS;
 
 			return volume->WriteSuperBlock();

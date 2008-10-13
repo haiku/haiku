@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BFS_CONTROL_H
@@ -8,7 +8,11 @@
 //! additional functionality exported via ioctl()
 
 
-#include "system_dependencies.h"
+#ifdef BFS_SHELL
+#	include "system_dependencies.h"
+#else
+#	include <SupportDefs.h>
+#endif
 
 
 /* ioctl to check the version of BFS used - parameter is a uint32 *
@@ -17,6 +21,12 @@
 #define BFS_IOCTL_VERSION			14200
 
 #define BFS_IOCTL_UPDATE_BOOT_BLOCK	14204
+
+struct update_boot_block {
+	uint32			offset;
+	const uint8*	data;
+	uint32			length;
+};
 
 /* ioctls to use the "chkbfs" feature from the outside
  * all calls use a struct check_result as single parameter
