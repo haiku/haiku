@@ -10,6 +10,7 @@
 
 
 #include "Importer.h"
+#include <Entry.h>
 
 class BMessage;
 class BShape;
