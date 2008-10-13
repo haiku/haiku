@@ -41,7 +41,7 @@ RefreshWindow::RefreshWindow(BPoint position, float current, float min, float ma
 
 	rect.top += stringView->Bounds().Height() + 14;
 	fRefreshSlider = new RefreshSlider(rect, min, max, B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
-	fRefreshSlider->SetValue(rint(current * 10));
+	fRefreshSlider->SetValue((int32)rintf(current * 10));
 	fRefreshSlider->SetModificationMessage(new BMessage(SLIDER_MODIFICATION_MSG));
 	float width, height;
 	fRefreshSlider->GetPreferredSize(&width, &height);

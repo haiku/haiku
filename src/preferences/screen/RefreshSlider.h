@@ -20,7 +20,7 @@ class RefreshSlider : public BSlider {
 		virtual ~RefreshSlider();
 
 		virtual void DrawFocusMark();
-		virtual char* UpdateText() const;
+		virtual const char* UpdateText() const;
 		virtual void KeyDown(const char* bytes, int32 numBytes);
 
 	private:

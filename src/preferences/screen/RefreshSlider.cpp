@@ -21,7 +21,7 @@
 
 RefreshSlider::RefreshSlider(BRect frame, float min, float max, uint32 resizingMode)
 	: BSlider(frame, "Screen", "Refresh Rate:", 
-		new BMessage(SLIDER_INVOKE_MSG), rintf(min * 10), rintf(max * 10),
+		new BMessage(SLIDER_INVOKE_MSG), (int32)rintf(min * 10), (int32)rintf(max * 10),
 		B_BLOCK_THUMB, resizingMode),
 	fStatus(new (std::nothrow) char[32])
 {
@@ -87,7 +87,7 @@ RefreshSlider::KeyDown(const char *bytes, int32 numBytes)
 }
 
 
-char*
+const char*
 RefreshSlider::UpdateText() const
 {
 	if (fStatus != NULL)
