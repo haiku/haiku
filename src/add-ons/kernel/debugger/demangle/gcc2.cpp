@@ -39,6 +39,10 @@ argument_type(const char* arg, size_t& length)
 			ignore_qualifiers(&arg);
 			if (arg[0] == 'c')
 				return B_STRING_TYPE;
+			if (arg[0] == 't') {
+				// TODO: templates are not yet supported
+				return 0;
+			}
 
 			return type == 'P' ? B_POINTER_TYPE : B_REF_TYPE;
 		case 'x':
@@ -75,6 +79,19 @@ argument_type(const char* arg, size_t& length)
 					return B_UINT32_TYPE;
 			}
 			break;
+
+		case 'f':
+			return B_FLOAT_TYPE;
+		case 'd':
+			length = sizeof(double);
+			return B_DOUBLE_TYPE;
+		case 'r':
+			// TODO: is "long double" supported under Haiku at all?
+			return 0;
+
+		case 't':
+			// TODO: templates are not yet supported
+			return 0;
 
 		default:
 			return B_ANY_TYPE;
@@ -235,24 +252,118 @@ mangled_start(const char* name, size_t* _symbolLength, int32* _symbolType)
 	if (name == NULL)
 		return NULL;
 
-	const char* mangled = strstr(name, "__");
+	// search '__' starting from the end, don't accept them at the start
+	size_t pos = strlen(name) - 1;
+	const char* mangled = NULL;
+
+	while (pos > 1) {
+		if (name[pos] == '_') {
+			if (name[pos - 1] == '_') {
+				mangled = name + pos + 1;
+				break;
+			} else
+				pos--;
+		}
+		pos--;
+	}
+
 	if (mangled == NULL)
 		return NULL;
 
-	if (_symbolLength != NULL)
-		*_symbolLength = mangled - name;
+	if (mangled[0] == 'H') {
+		// TODO: we don't support templates yet
+		return NULL;
+	}
 
-	if (mangled[2] == 'F') {
+	if (_symbolLength != NULL)
+		*_symbolLength = pos - 1;
+
+	if (mangled[0] == 'F') {
 		if (_symbolType != NULL)
 			*_symbolType = TYPE_FUNCTION;
-		return mangled + 3;
+		return mangled + 1;
 	}
 
 	if (_symbolType != NULL)
 		*_symbolType = TYPE_METHOD;
-	return mangled + 2;
+	return mangled;
 }
 
+
+static status_t
+get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
+	size_t nameSize, int32* _type, size_t* _argumentLength, bool repeating)
+{
+	const char* mangled = mangled_start(symbol, NULL, NULL);
+	if (mangled == NULL)
+		return B_BAD_VALUE;
+
+	const char* arg = first_argument(mangled);
+
+	// (void) is not an argument
+	if (arg != NULL && arg[0] == 'v')
+		return B_ENTRY_NOT_FOUND;
+
+	uint32 current = *_cookie;
+	if (current > 32)
+		return B_TOO_MANY_ARGS;
+
+	for (uint32 i = 0; i < current; i++) {
+		arg = next_argument(arg);
+		if (arg != NULL && arg[0] == 'N') {
+			// repeat argument 'count' times
+			uint32 index;
+			uint32 count = parse_repeats(&arg, index);
+			if (current <= i + count) {
+				if (repeating)
+					return B_LINK_LIMIT;
+
+				// it's a repeat case
+				status_t status = get_next_argument_internal(&index, symbol, name,
+					nameSize, _type, _argumentLength, true);
+				if (status == B_OK)
+					(*_cookie)++;
+				return status;
+			}
+
+			i += count - 1;
+		}
+	}
+
+	if (arg == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	if (arg[0] == 'T') {
+		// duplicate argument
+		if (repeating)
+			return B_LINK_LIMIT;
+
+		arg++;
+		uint32 index = parse_number(&arg, false);
+		status_t status = get_next_argument_internal(&index, symbol, name,
+			nameSize, _type, _argumentLength, true);
+		if (status == B_OK)
+			(*_cookie)++;
+		return status;
+	}
+
+	(*_cookie)++;
+
+	size_t argumentLength;
+	int32 type = argument_type(arg, argumentLength);
+	if (type == 0)
+		return B_NOT_SUPPORTED;
+
+	if (_type != NULL)
+		*_type = type;
+	if (_argumentLength != NULL)
+		*_argumentLength = argumentLength;
+
+	uint32 length = argument_name_length(&arg);
+	strlcpy(name, arg, min_c(length + 1, nameSize));
+
+	return B_OK;
+}
 
 
 //	#pragma mark -
@@ -299,63 +410,8 @@ status_t
 get_next_argument(uint32* _cookie, const char* symbol, char* name,
 	size_t nameSize, int32* _type, size_t* _argumentLength)
 {
-	const char* mangled = mangled_start(symbol, NULL, NULL);
-	if (mangled == NULL)
-		return B_BAD_VALUE;
-
-	const char* arg = first_argument(mangled);
-
-	// (void) is not an argument
-	if (arg != NULL && arg[0] == 'v')
-		return B_ENTRY_NOT_FOUND;
-
-	uint32 current = *_cookie;
-	for (uint32 i = 0; i < current; i++) {
-		arg = next_argument(arg);
-		if (arg != NULL && arg[0] == 'N') {
-			// repeat argument 'count' times
-			uint32 index;
-			uint32 count = parse_repeats(&arg, index);
-			if (current <= i + count) {
-				// it's a repeat case
-				status_t status = get_next_argument(&index, symbol, name,
-					nameSize, _type, _argumentLength);
-				if (status == B_OK)
-					(*_cookie)++;
-				return status;
-			}
-
-			i += count - 1;
-		}
-	}
-
-	if (arg == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	if (arg[0] == 'T') {
-		// duplicate argument
-		arg++;
-		uint32 index = parse_number(&arg, false);
-		status_t status = get_next_argument(&index, symbol, name,
-			nameSize, _type, _argumentLength);
-		if (status == B_OK)
-			(*_cookie)++;
-		return status;
-	}
-
-	(*_cookie)++;
-
-	size_t argumentLength;
-	int32 type = argument_type(arg, argumentLength);
-	if (_type != NULL)
-		*_type = type;
-	if (_argumentLength != NULL)
-		*_argumentLength = argumentLength;
-
-	uint32 length = argument_name_length(&arg);
-	strlcpy(name, arg, min_c(length + 1, nameSize));
-
-	return B_OK;
+	return get_next_argument_internal(_cookie, symbol, name, nameSize, _type,
+		_argumentLength, false);
 }
 
 
