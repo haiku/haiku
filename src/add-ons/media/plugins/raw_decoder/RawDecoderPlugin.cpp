@@ -108,10 +108,11 @@ RawDecoder::Setup(media_format *ioEncodedFormat,
 	// since we can translate to a different buffer size,
 	// suggest something nicer than delivered by the
 	// file reader (perhaps we should even report wildcard?)
-	ioEncodedFormat->u.raw_audio.buffer_size = AudioBufferSize(
-														ioEncodedFormat->u.raw_audio.channel_count,
-														ioEncodedFormat->u.raw_audio.format,
-														ioEncodedFormat->u.raw_audio.frame_rate);
+	// I don't believe we can negotiate the buffer size with the reader
+//	ioEncodedFormat->u.raw_audio.buffer_size = AudioBufferSize(
+//														ioEncodedFormat->u.raw_audio.channel_count,
+//														ioEncodedFormat->u.raw_audio.format,
+//														ioEncodedFormat->u.raw_audio.frame_rate);
 	return B_OK;
 }
 
@@ -143,8 +144,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 {
 	char s[1024];
 
-	string_for_format(*ioDecodedFormat, s, sizeof(s));
-	TRACE("RawDecoder::NegotiateAudioOutputFormat enter: %s\n", s);
+	TRACE("RawDecoder::NegotiateAudioOutputFormat enter:\n");
 
 	ioDecodedFormat->type = B_MEDIA_RAW_AUDIO;
 	switch (ioDecodedFormat->u.raw_audio.format) {
@@ -198,15 +198,19 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 	ioDecodedFormat->u.raw_audio.channel_mask = 0;
 	ioDecodedFormat->u.raw_audio.matrix_mask = 0;
 
-	if (ioDecodedFormat->u.raw_audio.buffer_size < 128 || ioDecodedFormat->u.raw_audio.buffer_size > 65536) {
-		ioDecodedFormat->u.raw_audio.buffer_size = AudioBufferSize(
-														ioDecodedFormat->u.raw_audio.channel_count,
-														ioDecodedFormat->u.raw_audio.format,
-														ioDecodedFormat->u.raw_audio.frame_rate);
-	} else {
+	ioDecodedFormat->u.raw_audio.buffer_size = fInputFormat.u.raw_audio.buffer_size;
+
+// I don't believe we can negotiate the buffer size with the reader
+// the decoder might use a different buffer for output but it must read all bytes given.
+//	if (ioDecodedFormat->u.raw_audio.buffer_size < 128 || ioDecodedFormat->u.raw_audio.buffer_size > 65536) {
+//		ioDecodedFormat->u.raw_audio.buffer_size = AudioBufferSize(
+//														ioDecodedFormat->u.raw_audio.channel_count,
+//														ioDecodedFormat->u.raw_audio.format,
+//														ioDecodedFormat->u.raw_audio.frame_rate);
+//	} else {
 		// round down to exact multiple of output frame size
-		ioDecodedFormat->u.raw_audio.buffer_size = (ioDecodedFormat->u.raw_audio.buffer_size / fOutputFrameSize) * fOutputFrameSize;
-	}
+//		ioDecodedFormat->u.raw_audio.buffer_size = (ioDecodedFormat->u.raw_audio.buffer_size / fOutputFrameSize) * fOutputFrameSize;
+//	}
 
 	fOutputBufferFrameCount = ioDecodedFormat->u.raw_audio.buffer_size / fOutputFrameSize;
 
@@ -505,6 +509,9 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 
 	if (fSwapOutput)
 		fSwapOutput(buffer, *frameCount * fInputFormat.u.raw_audio.channel_count);
+	
+	TRACE("framecount %Ld, time %Ld\n",*frameCount, mediaHeader->start_time);
+		
 	return *frameCount ? B_OK : B_ERROR;
 }
 
