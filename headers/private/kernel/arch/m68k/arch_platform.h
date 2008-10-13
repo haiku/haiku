@@ -48,6 +48,9 @@ public:
 	virtual void DisableIOInterrupt(int irq) = 0;
 	virtual bool AcknowledgeIOInterrupt(int irq) = 0;
 
+	// mimic the PC CMOS
+	virtual uint8 ReadRTCReg(uint8 reg) = 0;
+	virtual void WriteRTCReg(uint8 reg, uint8 val) = 0;
 	virtual	void SetHardwareRTC(uint32 seconds) = 0;
 	virtual	uint32 GetHardwareRTC() = 0;
 
