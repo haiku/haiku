@@ -1,5 +1,9 @@
 SubDir HAIKU_TOP src bin makebootable platform bios_ia32 ;
 
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
+
+UsePrivateHeaders shared storage ;
+
 # write the stage 1 boot loader into the makebootable resources
 AddFileDataResource makebootable : RAWT:666:BootCode : stage1.bin ;
 

@@ -39,6 +39,13 @@
 
 #ifdef __HAIKU__
 #	include <image.h>
+
+#	include <DiskDevice.h>
+#	include <DiskDeviceRoster.h>
+#	include <Partition.h>
+#	include <Path.h>
+
+#	include "bfs_control.h"
 #endif
 
 
@@ -46,9 +53,9 @@ static const char *kCommandName = "makebootable";
 
 static const int kBootCodeSize				= 1024;
 static const int kFirstBootCodePartSize		= 512;
-static const int kSecondBootcodePartOffset	= 676;
-static const int kSecondBootcodePartSize	= kBootCodeSize
-												- kSecondBootcodePartOffset;
+static const int kSecondBootCodePartOffset	= 676;
+static const int kSecondBootCodePartSize	= kBootCodeSize
+												- kSecondBootCodePartOffset;
 static const int kPartitionOffsetOffset		= 506;
 
 static int kArgc;
@@ -185,8 +192,8 @@ find_own_image(image_info *info)
 {
 	int32 cookie = 0;
 	while (get_next_image_info(B_CURRENT_TEAM, &cookie, info) == B_OK) {
-		if (((addr_t)info->text <= (addr_t)find_own_image 
-			&& (addr_t)info->text + info->text_size 
+		if (((addr_t)info->text <= (addr_t)find_own_image
+			&& (addr_t)info->text + info->text_size
 				> (addr_t)find_own_image)) {
 			return B_OK;
 		}
@@ -252,7 +259,7 @@ main(int argc, const char *const *argv)
 	bootCodeData = read_boot_code_data(argv[0]);
 #else
 	image_info info;
-	if (find_own_image(&info) == B_OK)	
+	if (find_own_image(&info) == B_OK)
 		bootCodeData = read_boot_code_data(info.name);
 #endif
 	if (!bootCodeData) {
@@ -285,7 +292,7 @@ main(int argc, const char *const *argv)
 		int64 partitionOffset = 0;
 		fs_info info;	// needs to be here (we use the device name later)
 		if (S_ISDIR(st.st_mode)) {
-			#ifdef __BEOS__
+			#ifdef __HAIKU__
 
 				// a directory: get the device
 				error = fs_stat_dev(st.st_dev, &info);
@@ -303,7 +310,7 @@ main(int argc, const char *const *argv)
 				fprintf(stderr, "Error: Specifying directories not supported "
 					"on this platform!\n");
 				exit(1);
-			
+
 			#endif
 
 		} else if (S_ISREG(st.st_mode)) {
@@ -331,7 +338,7 @@ main(int argc, const char *const *argv)
 						break;
 					}
 				}
-				
+
 				// Remove de 's' from 'ad2s2' slice device (partition for DOS
 				// users) to get 'ad2' base device
 				baseNameLen--;
@@ -482,7 +489,7 @@ main(int argc, const char *const *argv)
 					// The given device is the base device. We'll write at
 					// offset 0.
 				}
-			
+
 			#else	// !HAIKU_HOST_PLATFORM_LINUX
 
 			// partitions are block devices under Haiku, but not under BeOS
@@ -510,7 +517,7 @@ main(int argc, const char *const *argv)
 		#ifdef __BEOS__
 
 			// get a partition info
-			if (!noPartition 
+			if (!noPartition
 				&& strlen(fileName) >= 3
 				&& strncmp("raw", fileName + strlen(fileName) - 3, 3)) {
 				partition_info partitionInfo;
@@ -538,8 +545,45 @@ main(int argc, const char *const *argv)
 		write_boot_code_part(fileName, fd, startOffset, bootCodeData, 0,
 			kFirstBootCodePartSize, dryRun);
 		write_boot_code_part(fileName, fd, startOffset, bootCodeData,
-			kSecondBootcodePartOffset, kSecondBootcodePartSize,
+			kSecondBootCodePartOffset, kSecondBootCodePartSize,
 			dryRun);
+
+#ifdef __HAIKU__
+		// check if this partition is mounted
+		BDiskDeviceRoster roster;
+		BPartition* partition;
+		BDiskDevice device;
+		status_t status = roster.GetPartitionForPath(fileName, &device,
+			&partition);
+		if (status != B_OK) {
+			status = roster.GetFileDeviceForPath(fileName, &device);
+			if (status == B_OK)
+				partition = &device;
+		}
+		if (status == B_OK && partition->IsMounted() && !dryRun) {
+			// This partition is mounted, we need to tell BFS to update its
+			// boot block (we are using part of the same logical block).
+			BPath path;
+			status = partition->GetMountPoint(&path);
+			if (status == B_OK) {
+				update_boot_block update;
+				update.offset = kSecondBootCodePartOffset - 512;
+				update.data = bootCodeData + kSecondBootCodePartOffset;
+				update.length = kSecondBootCodePartSize;
+
+				int mountFD = open(path.Path(), O_RDONLY);
+				if (ioctl(mountFD, BFS_IOCTL_UPDATE_BOOT_BLOCK, &update,
+						sizeof(update_boot_block)) != 0) {
+					fprintf(stderr, "Could not update BFS boot block: %s\n",
+						strerror(errno));
+				}
+				close(mountFD);
+			} else {
+				fprintf(stderr, "Could not update BFS boot code while the "
+					"partition is mounted!");
+			}
+		}
+#endif	// __HAIKU__
 
 		close(fd);
 	}
