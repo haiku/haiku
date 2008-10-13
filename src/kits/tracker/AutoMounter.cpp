@@ -46,6 +46,7 @@ All rights reserved.
 #	include <DiskDevice.h>
 #	include <DiskDeviceList.h>
 #	include <DiskDeviceTypes.h>
+#	include <DiskSystem.h>
 #	include <fs_volume.h>
 #endif
 
@@ -198,6 +199,11 @@ AutoMounter::_SuggestMountFlags(const BPartition* partition,
 #endif
 		isBFS = true;
 	}
+
+	BDiskSystem diskSystem;
+	status_t status = partition->GetDiskSystem(&diskSystem);
+	if (status == B_OK && !diskSystem.SupportsWriting())
+		askReadOnly = false;
 
 	if (partition->IsReadOnly())
 		askReadOnly = false;
@@ -529,7 +535,7 @@ AutoMounter::GetSettings(BMessage *message)
         if (fs_stat_dev(volume.Device(), &info) == 0
 			&& info.flags & (B_FS_IS_REMOVABLE | B_FS_IS_PERSISTENT)) {
 			message->AddString(info.device_name, info.volume_name);
-			
+
 			BString mountFlagsKey(info.device_name);
 			mountFlagsKey << kMountFlagsKeyExtension;
 			uint32 mountFlags = 0;
