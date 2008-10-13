@@ -104,8 +104,136 @@ lookup_symbol(struct thread* thread, addr_t address, addr_t *_baseAddress,
 
 
 static void
+set_debug_argument_variable(int32 index, uint64 value)
+{
+	char name[8];
+	snprintf(name, sizeof(name), "_arg%ld", index);
+	set_debug_variable(name, value);
+}
+
+
+static status_t
+print_demangled_call(const char* image, const char* symbol, addr_t args,
+	bool noObjectMethod, bool addDebugVariables)
+{
+	bool isObjectMethod;
+	char buffer[64];
+	const char* name = debug_demangle_symbol(symbol, buffer, sizeof(buffer),
+		&isObjectMethod);
+	if (name == NULL)
+		return B_ERROR;
+
+	uint32* arg = (uint32*)args;
+
+	if (noObjectMethod)
+		isObjectMethod = false;
+	if (isObjectMethod) {
+		const char* lastName = strrchr(name, ':') - 1;
+		int namespaceLength = lastName - name;
+
+		kprintf("<%s> %.*s<%p>%s", image, namespaceLength, name,
+			*(uint32 **)arg, lastName);
+		if (addDebugVariables)
+			set_debug_variable("_this", *(uint32 *)arg);
+		arg++;
+	} else
+		kprintf("<%s> %s", image, name);
+
+	kprintf("(");
+
+	size_t length;
+	int32 type, i = 0;
+	uint32 cookie = 0;
+	while (debug_get_next_demangled_argument(&cookie, symbol, buffer,
+			sizeof(buffer), &type, &length) == B_OK) {
+		if (i++ > 0)
+			kprintf(", ");
+
+		// retrieve value and type identifier
+
+		uint64 value;
+
+		switch (type) {
+			case B_INT64_TYPE:
+				value = *(int64*)arg;
+				kprintf("int64: %Ld", value);
+				break;
+			case B_INT32_TYPE:
+				value = *(int32*)arg;
+				kprintf("int32: %ld", (int32)value);
+				break;
+			case B_INT16_TYPE:
+				value = *(int16*)arg;
+				kprintf("int16: %d", (int16)value);
+				break;
+			case B_INT8_TYPE:
+				value = *(int8*)arg;
+				kprintf("int8: %d", (int8)value);
+				break;
+			case B_UINT64_TYPE:
+				value = *(uint64*)arg;
+				kprintf("uint64: %#Lx", value);
+				if (value < 0x100000)
+					kprintf(" (%Lu)", value);
+				break;
+			case B_UINT32_TYPE:
+				value = *(uint32*)arg;
+				kprintf("uint32: %#lx", (uint32)value);
+				if (value < 0x100000)
+					kprintf(" (%lu)", (uint32)value);
+				break;
+			case B_UINT16_TYPE:
+				value = *(uint16*)arg;
+				kprintf("uint16: %#x (%u)", (uint16)value, (uint16)value);
+				break;
+			case B_UINT8_TYPE:
+				value = *(uint8*)arg;
+				kprintf("uint8: %#x (%u)", (uint8)value, (uint8)value);
+				break;
+			case B_BOOL_TYPE:
+				value = *(uint8*)arg;
+				kprintf(value ? "true" : "false");
+				break;
+			default:
+				if (buffer[0]) {
+					kprintf("%s%s: ", buffer, type == B_POINTER_TYPE ? "*"
+						: type == B_REF_TYPE ? "&" : "");
+				}
+
+				if (length == 4) {
+					value = *(uint32*)arg;
+					if (value == 0
+						&& (type == B_POINTER_TYPE || type == B_REF_TYPE))
+						kprintf("NULL");
+					else
+						kprintf("%#lx", (uint32)value);
+					break;
+				}
+
+				if (length == 8)
+					value = *(uint64*)arg;
+				else
+					value = (uint64)arg;
+				kprintf("%#Lx", value);
+				break;
+		}
+
+		if (type == B_STRING_TYPE)
+			kprintf(" \"%s\"", (char*)value);
+
+		if (addDebugVariables)
+			set_debug_argument_variable(i, value);
+		arg = (uint32*)((uint8*)arg + length);
+	}
+
+	kprintf(")");
+	return B_OK;
+}
+
+
+static void
 print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
-	int32 callIndex)
+	int32 callIndex, bool demangle)
 {
 	const char *symbol, *image;
 	addr_t baseAddress;
@@ -122,29 +250,30 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	status = lookup_symbol(thread, eip, &baseAddress, &symbol, &image,
 		&exactMatch);
 
-	char buffer[64];
-	const char* name = debug_demangle_symbol(symbol, buffer, sizeof(buffer),
-		NULL);
-	if (name == NULL)
-		name = symbol;
-
-	kprintf("%2ld %08lx (+%4ld) %08lx", callIndex, ebp, diff, eip);
+	kprintf("%2ld %08lx (+%4ld) %08lx   ", callIndex, ebp, diff, eip);
 
 	if (status == B_OK) {
-		if (name != NULL) {
-			kprintf("   <%s>:%s + 0x%04lx%s\n", image, name,
-				eip - baseAddress, exactMatch ? "" : " (nearest)");
-		} else {
-			kprintf("   <%s@%p>:unknown + 0x%04lx\n", image,
-				(void *)baseAddress, eip - baseAddress);
+		if (exactMatch && demangle) {
+			status = print_demangled_call(image, symbol, nextEbp + 8, false,
+				false);
 		}
+
+		if (!exactMatch || !demangle || status != B_OK) {
+			if (symbol != NULL) {
+				kprintf("<%s>:%s%s", image, symbol,
+					exactMatch ? "" : " (nearest)");
+			} else
+				kprintf("<%s@%p>:unknown", image, (void *)baseAddress);
+		}
+
+		kprintf(" + 0x%04lx\n", eip - baseAddress);
 	} else {
 		vm_area *area = NULL;
 		if (thread->team->address_space != NULL)
 			area = vm_area_lookup(thread->team->address_space, eip);
 		if (area != NULL) {
-			kprintf("   %ld:%s@%p + %#lx\n", area->id, area->name, (void *)area->base,
-				eip - area->base);
+			kprintf("%ld:%s@%p + %#lx\n", area->id, area->name,
+				(void*)area->base, eip - area->base);
 		} else
 			kprintf("\n");
 	}
@@ -358,12 +487,20 @@ find_debug_variable(const char* variableName, bool& settable)
 static int
 stack_trace(int argc, char **argv)
 {
-	static const char* usage = "usage: %s [ <thread id> ]\n"
+	static const char* usage = "usage: %s [-d] [ <thread id> ]\n"
 		"Prints a stack trace for the current, respectively the specified\n"
 		"thread.\n"
+		"  -d           -  Disables the demangling of the symbols.\n"
 		"  <thread id>  -  The ID of the thread for which to print the stack\n"
 		"                  trace.\n";
-	if (argc > 2 || argc == 2 && strcmp(argv[1], "--help") == 0) {
+	bool demangle = true;
+	int32 threadIndex = 1;
+	if (argc > 1 && !strcmp(argv[1], "-d")) {
+		demangle = false;
+		threadIndex++;
+	}
+
+	if (argc > threadIndex + 1 || argc == 2 && strcmp(argv[1], "--help") == 0) {
 		kprintf(usage, argv[0]);
 		return 0;
 	}
@@ -374,8 +511,8 @@ stack_trace(int argc, char **argv)
 	uint32 ebp = x86_read_ebp();
 	int32 num = 0, last = 0;
 
-	setup_for_thread(argc == 2 ? argv[1] : NULL, &thread, &ebp,
-		&oldPageDirectory);
+	setup_for_thread(argc == threadIndex + 1 ? argv[threadIndex] : NULL,
+		&thread, &ebp, &oldPageDirectory);
 
 	if (thread != NULL) {
 		kprintf("stack trace for thread %ld \"%s\"\n", thread->id,
@@ -391,7 +528,7 @@ stack_trace(int argc, char **argv)
 		}
 	}
 
-	kprintf("frame            caller     <image>:function + offset\n");
+	kprintf("frame               caller     <image>:function + offset\n");
 
 	bool onKernelStack = true;
 
@@ -403,7 +540,8 @@ stack_trace(int argc, char **argv)
 			struct iframe *frame = (struct iframe *)ebp;
 
 			print_iframe(frame);
-			print_stack_frame(thread, frame->eip, ebp, frame->ebp, callIndex);
+			print_stack_frame(thread, frame->eip, ebp, frame->ebp, callIndex,
+				demangle);
 
  			ebp = frame->ebp;
 		} else {
@@ -417,7 +555,7 @@ stack_trace(int argc, char **argv)
 			if (eip == 0 || ebp == 0)
 				break;
 
-			print_stack_frame(thread, eip, ebp, nextEbp, callIndex);
+			print_stack_frame(thread, eip, ebp, nextEbp, callIndex, demangle);
 			ebp = nextEbp;
 		}
 
@@ -439,15 +577,6 @@ stack_trace(int argc, char **argv)
 
 
 static void
-set_debug_argument_variable(int32 index, uint64 value)
-{
-	char name[8];
-	snprintf(name, sizeof(name), "_arg%ld", index);
-	set_debug_variable(name, value);
-}
-
-
-static void
 print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	int32 argCount)
 {
@@ -455,29 +584,28 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	addr_t baseAddress;
 	bool exactMatch;
 	status_t status;
-	char buffer[64];
-	const char* name = NULL;
-	bool isObjectMethod;
+	bool demangled = false;
+	int32 *arg = (int32 *)(nextEbp + 8);
 
 	status = lookup_symbol(thread, eip, &baseAddress, &symbol, &image,
 		&exactMatch);
 
-	kprintf("%08lx %08lx", ebp, eip);
+	kprintf("%08lx %08lx   ", ebp, eip);
 
 	if (status == B_OK) {
 		if (symbol != NULL) {
-			if (exactMatch && argCount <= 0) {
-				name = debug_demangle_symbol(symbol, buffer, sizeof(buffer),
-					&isObjectMethod);
-				if (argCount < 0)
-					isObjectMethod = false;
+			if (exactMatch && (argCount == 0 || argCount == -1)) {
+				status = print_demangled_call(image, symbol, (addr_t)arg,
+					argCount == -1, true);
+				if (status == B_OK)
+					demangled = true;
 			}
-			if (name == NULL) {
-				kprintf("   <%s>:%s%s", image, symbol,
+			if (!demangled) {
+				kprintf("<%s>:%s%s", image, symbol,
 					exactMatch ? "" : " (nearest)");
 			}
 		} else {
-			kprintf("   <%s@%p>:unknown + 0x%04lx", image,
+			kprintf("<%s@%p>:unknown + 0x%04lx", image,
 				(void *)baseAddress, eip - baseAddress);
 		}
 	} else {
@@ -485,108 +613,12 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 		if (thread->team->address_space != NULL)
 			area = vm_area_lookup(thread->team->address_space, eip);
 		if (area != NULL) {
-			kprintf("   %ld:%s@%p + %#lx", area->id, area->name,
+			kprintf("%ld:%s@%p + %#lx", area->id, area->name,
 				(void *)area->base, eip - area->base);
 		}
 	}
 
-	int32 *arg = (int32 *)(nextEbp + 8);
-
-	if (name != NULL) {
-		if (isObjectMethod) {
-			const char* lastName = strrchr(name, ':') - 1;
-			int namespaceLength = lastName - name;
-
-			kprintf("   <%s> %.*s<%p>%s", image, namespaceLength, name,
-				*(uint32 **)arg, lastName);
-			set_debug_variable("_this", *(uint32 *)arg);
-			arg++;
-		} else
-			kprintf("   <%s> %s", image, name);
-
-		kprintf("(");
-
-		char buffer[64];
-		size_t length;
-		int32 type, i = 0;
-		uint32 cookie = 0;
-		while (debug_get_next_demangled_argument(&cookie, symbol, buffer,
-				sizeof(buffer), &type, &length) == B_OK) {
-			if (i++ > 0)
-				kprintf(", ");
-
-			// retrieve value and type identifier
-
-			uint64 value;
-
-			switch (type) {
-				case B_INT64_TYPE:
-					value = *(int64*)arg;
-					kprintf("int64: %Ld", value);
-					break;
-				case B_INT32_TYPE:
-					value = *(int32*)arg;
-					kprintf("int32: %ld", (int32)value);
-					break;
-				case B_INT16_TYPE:
-					value = *(int16*)arg;
-					kprintf("int16: %d", (int16)value);
-					break;
-				case B_INT8_TYPE:
-					value = *(int8*)arg;
-					kprintf("int8: %d", (int8)value);
-					break;
-				case B_UINT64_TYPE:
-					value = *(uint64*)arg;
-					kprintf("uint64: %Lx", value);
-					if (value < 0x100000)
-						kprintf(" (%Lu)", value);
-					break;
-				case B_UINT32_TYPE:
-					value = *(uint32*)arg;
-					kprintf("uint32: %lx", (uint32)value);
-					if (value < 0x100000)
-						kprintf(" (%lu)", (uint32)value);
-					break;
-				case B_UINT16_TYPE:
-					value = *(uint16*)arg;
-					kprintf("uint16: %#x (%u)", (uint16)value, (uint16)value);
-					break;
-				case B_UINT8_TYPE:
-					value = *(uint8*)arg;
-					kprintf("uint8: %#x (%u)", (uint8)value, (uint8)value);
-					break;
-				case B_BOOL_TYPE:
-					value = *(uint8*)arg;
-					kprintf(value ? "true" : "false");
-					break;
-				default:
-					if (buffer[0]) {
-						kprintf("%s%s: ", buffer, type == B_POINTER_TYPE ? "*"
-							: type == B_REF_TYPE ? "&" : "");
-					}
-
-					if (length == 4) {
-						value = *(uint32*)arg;
-						kprintf("%#lx", (uint32)value);
-						break;
-					}
-
-					if (length == 8)
-						value = *(uint64*)arg;
-					else
-						value = (uint64)arg;
-					kprintf("%#Lx", value);
-					break;
-			}
-
-			if (type == B_STRING_TYPE && value != 0)
-				kprintf(" \"%s\"", (char*)value);
-
-			set_debug_argument_variable(i, value);
-			arg = (int32*)((uint8*)arg + length);
-		}
-	} else {
+	if (!demangled) {
 		kprintf("(");
 
 		for (int32 i = 0; i < argCount; i++) {
@@ -599,9 +631,10 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 			set_debug_argument_variable(i + 1, *(uint32 *)arg);
 			arg++;
 		}
-	}
 
-	kprintf(")\n");
+		kprintf(")\n");
+	} else
+		kprintf("\n");
 
 	set_debug_variable("_frame", nextEbp);
 }
@@ -617,7 +650,8 @@ show_call(int argc, char **argv)
 		"  <thread id>   -  The ID of the thread for which to print the call.\n"
 		"  <call index>  -  The index of the call in the stack trace.\n"
 		"  <arg count>   -  The number of call arguments to print (use 'c' to\n"
-		"                   force the C++ demangler to use class methods).\n";
+		"                   force the C++ demangler to use class methods,\n"
+		"                   use 'd' to disable demangling).\n";
 	if (argc == 2 && strcmp(argv[1], "--help") == 0) {
 		kprintf(usage, argv[0]);
 		return 0;
@@ -629,11 +663,14 @@ show_call(int argc, char **argv)
 	int32 argCount = 0;
 
 	if (argc >= 2 && argv[argc - 1][0] == '-') {
-		if (argv[argc - 1][1] != 'c')
-			argCount = strtoul(argv[argc - 1] + 1, NULL, 0);
-		else
+		if (argv[argc - 1][1] == 'c')
 			argCount = -1;
-		if (argCount < -1 || argCount > 16) {
+		else if (argv[argc - 1][1] == 'd')
+			argCount = -2;
+		else
+			argCount = strtoul(argv[argc - 1] + 1, NULL, 0);
+
+		if (argCount < -2 || argCount > 16) {
 			kprintf("Invalid argument count \"%ld\".\n", argCount);
 			return 0;
 		}
