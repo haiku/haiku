@@ -228,8 +228,9 @@ static status_t
 acpi_namespace_close(void* cookie)
 {
 	status_t status;
-	dprintf("acpi_ns_dump: device_close\n");
 	acpi_ns_device_info *device = (acpi_ns_device_info *)cookie;
+	
+	dprintf("acpi_ns_dump: device_close\n");
 
 	delete_sem(device->write_sem);
 	delete_sem(device->sync_sem);
