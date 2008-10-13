@@ -290,6 +290,17 @@ BDiskSystem::SupportsInitializing() const
 }
 
 
+bool
+BDiskSystem::SupportsWriting() const
+{
+	if (InitCheck() != B_OK
+		|| !IsFileSystem())
+		return false;
+
+	return (fFlags & B_DISK_SYSTEM_SUPPORTS_WRITING) != 0;
+}
+
+
 // GetTypeForContentType
 status_t
 BDiskSystem::GetTypeForContentType(const char* contentType, BString* type) const

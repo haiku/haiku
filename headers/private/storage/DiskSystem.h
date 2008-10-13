@@ -45,6 +45,7 @@ public:
 			bool			SupportsCreatingChild() const;
 			bool			SupportsDeletingChild() const;
 			bool			SupportsInitializing() const;
+			bool			SupportsWriting() const;
 
 			status_t		GetTypeForContentType(const char* contentType,
 								BString* type) const;
