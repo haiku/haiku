@@ -253,7 +253,7 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 
 		BPath path;
 		partition->GetPath(&path);
-		
+
 		// cut off beginning of the device path (if /dev/disk/)
 		int32 skip = strlen("/dev/disk/");
 		if (strncmp(path.Path(), "/dev/disk/", skip))
@@ -341,17 +341,63 @@ main(int argc, char **argv)
 	// mount/unmount volumes
 	deviceList.VisitEachMountablePartition(&mountVisitor);
 
+	BDiskDeviceRoster roster;
+
+	// try mount file images
+	for (StringSet::iterator iterator = mountVisitor.toMount.begin();
+			iterator != mountVisitor.toMount.end();) {
+		const char* name = (*iterator).c_str();
+		iterator++;
+
+		BEntry entry(name, true);
+		if (!entry.Exists())
+			continue;
+
+		// TODO: improve error messages
+		BPath path;
+		if (entry.GetPath(&path) != B_OK)
+			continue;
+
+		// a file with this name exists, so try to mount it
+		partition_id id = roster.RegisterFileDevice(path.Path());
+		if (id < B_OK)
+			continue;
+
+		BDiskDevice device;
+		BPartition* partition;
+		if (roster.GetPartitionWithID(id, &device, &partition) != B_OK) {
+			roster.UnregisterFileDevice(id);
+			continue;
+		}
+
+		status_t status = partition->Mount(NULL,
+			mountVisitor.readOnly ? B_MOUNT_READ_ONLY : 0);
+		if (!mountVisitor.silent) {
+			if (status >= B_OK) {
+				BPath mountPoint;
+				partition->GetMountPoint(&mountPoint);
+				printf("Image \"%s\" mounted successfully at \"%s\".\n", name,
+					mountPoint.Path());
+			}
+		}
+		if (status >= B_OK) {
+			// remove from list
+			mountVisitor.toMount.erase(name);
+		} else
+			roster.UnregisterFileDevice(id);
+	}
+
+	// TODO: support unmounting images by path!
+
 	// print errors for the volumes to mount/unmount, that weren't found
 	if (!mountVisitor.silent) {
 		for (StringSet::iterator it = mountVisitor.toMount.begin();
-			 it != mountVisitor.toMount.end();
-			 it++) {
+				it != mountVisitor.toMount.end(); it++) {
 			fprintf(stderr, "Failed to mount volume `%s': Volume not found.\n",
 				(*it).c_str());
 		}
 		for (StringSet::iterator it = mountVisitor.toUnmount.begin();
-			 it != mountVisitor.toUnmount.end();
-			 it++) {
+				it != mountVisitor.toUnmount.end(); it++) {
 			fprintf(stderr, "Failed to unmount volume `%s': Volume not found.\n",
 				(*it).c_str());
 		}
