@@ -55,7 +55,10 @@ public:
 	status_t	GetNextChunk(void *cookie,
 					const void **chunkBuffer, size_t *chunkSize,
 					media_header *mediaHeader);
-									 
+					
+	status_t	CalculateNewPosition(void* cookie, uint32 flags,
+					int64 *frame, bigtime_t *time, int64 *position);
+
 	BPositionIO *Source() { return fSource; }
 	
 private:
@@ -67,10 +70,11 @@ private:
 	int64			fFrameCount;
 	int32			fChannelCount;
 	int32			fFrameRate;
-	int				fBitsPerSample;
+	int32			fSampleRate;
+	uint16			fBitsPerSample;
 	uint16			fFormatCode;
 	uint16			fBlockAlign;
-	uint16			fAvgBytesPerSec;
+	uint32			fAvgBytesPerSec;
 };
 
 
