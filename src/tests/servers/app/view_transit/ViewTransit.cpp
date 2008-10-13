@@ -124,8 +124,10 @@ main(int argc, char **argv)
 	window->AddChild(new View(frame, "L ", B_FOLLOW_ALL, 255, 0, 0));
 	frame.left = frame.right + 1;
 	frame.right = window->Bounds().right;
-	window->AddChild(new View(frame, "R", B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT,
-		0, 255, 0));
+	View* view = new View(frame, "R", B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT,
+		0, 255, 0);
+	window->AddChild(view);
+	view->SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 
 	window->Show();
 
