@@ -6,7 +6,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
 
-Application ViewState :
+Application ViewTransit :
 	ViewTransit.cpp
 	: be
 ;
