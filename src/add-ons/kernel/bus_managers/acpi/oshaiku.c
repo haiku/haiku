@@ -128,6 +128,7 @@
 
 #ifdef _KERNEL_MODE
 #	include <KernelExport.h>
+#	include <vm.h>
 #include <PCI.h>
 extern pci_module_info *gPCIManager;
 #include <dpc.h>
@@ -209,7 +210,6 @@ AcpiOsGetRootPointer (void)
 	dprintf("AcpiOsGetRootPointer returning %p\n", (void *)acpi_root);
 	return acpi_root;
 #else
-
 	return (AeLocalGetRootPointer());
 #endif
 }
@@ -234,7 +234,6 @@ AcpiOsPredefinedOverride (
     const ACPI_PREDEFINED_NAMES *InitVal,
     ACPI_STRING                 *NewVal)
 {
-
     if (!InitVal || !NewVal)
     {
         return (AE_BAD_PARAMETER);
@@ -264,7 +263,6 @@ AcpiOsTableOverride (
     ACPI_TABLE_HEADER       *ExistingTable,
     ACPI_TABLE_HEADER       **NewTable)
 {
-
     if (!ExistingTable || !NewTable)
     {
         return (AE_BAD_PARAMETER);
@@ -307,8 +305,7 @@ AcpiOsReadable (
     void                    *Pointer,
     ACPI_SIZE               Length)
 {
-
-    return (TRUE);
+    return TRUE;
 }
 
 
@@ -330,8 +327,7 @@ AcpiOsWritable (
     void                    *Pointer,
     ACPI_SIZE               Length)
 {
-
-    return (TRUE);
+	return TRUE;
 }
 
 
@@ -351,7 +347,6 @@ void
 AcpiOsRedirectOutput (
     void                    *Destination)
 {
-
     AcpiGbl_OutputFile = Destination;
 }
 
@@ -373,14 +368,11 @@ AcpiOsPrintf (
     const char              *Fmt,
     ...)
 {
-    va_list                 Args;
+    va_list Args;
 
-
-    va_start (Args, Fmt);
-
-    AcpiOsVprintf (Fmt, Args);
-
-    va_end (Args);
+    va_start(Args, Fmt);
+    AcpiOsVprintf(Fmt, Args);
+    va_end(Args);
 }
 
 
@@ -432,7 +424,9 @@ AcpiOsVprintf (
     }
 
 #else
-	dprintf(Fmt, Args);
+	static char outputBuffer[1024];
+	vsnprintf(outputBuffer, 1024, Fmt, Args);
+	dprintf("%s", outputBuffer);
 #endif
 }
 
@@ -501,7 +495,6 @@ AcpiOsMapMemory (
     ACPI_PHYSICAL_ADDRESS   where,
     ACPI_SIZE	length)
 {
-
 #ifdef _KERNEL_MODE
 	uint32 page_offset = ACPI_TO_INTEGER(where) % B_PAGE_SIZE;
 	void *map_base = ACPI_ADD_PTR(void,where,0L - page_offset);
@@ -509,13 +502,14 @@ AcpiOsMapMemory (
 	void *there;
 
 	area = map_physical_memory("acpi_physical_mem_area", map_base,
-			ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_ADDRESS,0,&there);
+		ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_ADDRESS, 0,
+		&there);
 	if (area < 0) {
-		dprintf("ACPI: cannot map memory at %p, length %ld\n", map_base, length);
+		dprintf("ACPI: cannot map memory at %p, length %d\n", map_base, length);
 		return NULL;
 	}
-	there += page_offset;
 
+	there += page_offset;
 	return there;
 #endif
 
@@ -542,7 +536,6 @@ AcpiOsUnmapMemory (
     void                    *where,
     ACPI_SIZE               length)
 {
-
 	delete_area(area_for(where));
 	return;
 }
@@ -564,12 +557,7 @@ void *
 AcpiOsAllocate (
     ACPI_SIZE               size)
 {
-    void                    *Mem;
-
-
-    Mem = (void *) malloc ((size_t) size);
-
-    return Mem;
+	return (void *)malloc((size_t)size);
 }
 
 
@@ -589,9 +577,7 @@ void
 AcpiOsFree (
     void                    *mem)
 {
-
-
-    free (mem);
+    free(mem);
 }
 
 
@@ -614,7 +600,7 @@ AcpiOsCreateSemaphore (
     UINT32              InitialUnits,
     ACPI_HANDLE         *OutHandle)
 {
-    *OutHandle = (ACPI_HANDLE)(create_sem(InitialUnits,"acpi_sem"));
+    *OutHandle = (ACPI_HANDLE)create_sem(InitialUnits, "acpi_sem");
     return AE_OK;
 }
 
@@ -634,14 +620,7 @@ ACPI_STATUS
 AcpiOsDeleteSemaphore (
     ACPI_HANDLE         Handle)
 {
-
-    if (!Handle)
-    {
-        return AE_BAD_PARAMETER;
-    }
-
-	delete_sem((sem_id)(Handle));
-
+	delete_sem((sem_id)Handle);
     return AE_OK;
 }
 
@@ -666,8 +645,22 @@ AcpiOsWaitSemaphore (
     UINT32              Units,
     UINT16              Timeout)
 {
+	if (Timeout != ACPI_WAIT_FOREVER) {
+		switch (acquire_sem_etc((sem_id)Handle, Units, B_RELATIVE_TIMEOUT,
+			(bigtime_t)Timeout * 1000)) {
+			case B_TIMED_OUT:
+				return AE_TIME;
+			case B_BAD_VALUE:
+				return AE_BAD_PARAMETER;
+			case B_OK:
+				return AE_OK;
+			default:
+				return AE_ERROR;
+		}
+	}
 
-    return (acquire_sem_etc((sem_id)(Handle),Units,0,Timeout) == B_OK ? AE_OK : AE_BAD_PARAMETER);
+	return acquire_sem_etc((sem_id)Handle, Units, 0, 0)
+		== B_OK ? AE_OK : AE_BAD_PARAMETER;
 }
 
 
@@ -689,30 +682,20 @@ AcpiOsSignalSemaphore (
     ACPI_HANDLE         Handle,
     UINT32              Units)
 {
-	release_sem_etc((sem_id)(Handle),Units,0);
-
+	release_sem_etc((sem_id)Handle, Units, 0);
     return AE_OK;
 }
 
-/* For R5 compatibility */
-
-inline int32
-_atomic_test_and_set(volatile int32 *value, int32 newValue, int32 testAgainst)
-{
-	int32 oldValue;
-	asm volatile("lock; cmpxchg %%ecx, (%%edx)"
-		: "=a" (oldValue) : "a" (testAgainst), "c" (newValue), "d" (value));
-	return oldValue;
-}
 
 ACPI_STATUS
 AcpiOsCreateLock (
     ACPI_HANDLE             *OutHandle)
 {
-
     *OutHandle = (ACPI_HANDLE)malloc(sizeof(spinlock));
-    *((spinlock *)(*OutHandle)) = 1;
+    if (OutHandle == NULL)
+    	return AE_NO_MEMORY;
 
+    *((spinlock *)(*OutHandle)) = 0;
     return AE_OK;
 }
 
@@ -728,25 +711,9 @@ ACPI_CPU_FLAGS
 AcpiOsAcquireLock (
     ACPI_HANDLE             Handle)
 {
-	/*cpu_status cpu;
-
-	if (Flags == ACPI_NOT_ISR)
-		cpu = disable_interrupts();
-
-    acquire_spinlock ((spinlock *)(Handle));
-
-    if (Flags == ACPI_NOT_ISR)
-    	restore_interrupts(cpu);*/
-
-    /* Why aren't we using real spinlocks? Well, they seem to cause
-       kernel hangs at boot, at least on Dano. I don't really know
-       why, as they should be equivalent to this. Maybe in sysinit2
-       interrupts are already off, and the double disable interrupts
-       call is hanging the system? I'm not sure how to detect that
-       though. Anyway, this works, even if it's stupid. */
-
-    while (_atomic_test_and_set(((spinlock *)(Handle)),0,1) <= 0);
-    return (0);
+	cpu_status cpu = disable_interrupts();
+    acquire_spinlock((spinlock *)Handle);
+	return cpu;
 }
 
 
@@ -755,17 +722,8 @@ AcpiOsReleaseLock (
     ACPI_HANDLE             Handle,
     ACPI_CPU_FLAGS          Flags)
 {
-    /*cpu_status cpu;
-
-	if (Flags == ACPI_NOT_ISR)
-		cpu = disable_interrupts();
-
-    release_spinlock ((spinlock *)(Handle));
-
-    if (Flags == ACPI_NOT_ISR)
-    	restore_interrupts(cpu);*/
-
-    atomic_add(((spinlock *)(Handle)),1);
+    release_spinlock((spinlock *)Handle);
+	restore_interrupts((cpu_status)Flags);
 }
 
 
@@ -790,10 +748,9 @@ AcpiOsInstallInterruptHandler (
     ACPI_OSD_HANDLER        ServiceRoutine,
     void                    *Context)
 {
-
 #ifdef _KERNEL_MODE
-
-	install_io_interrupt_handler(InterruptNumber,(interrupt_handler)ServiceRoutine,Context,0);
+	install_io_interrupt_handler(InterruptNumber,
+		(interrupt_handler)ServiceRoutine, Context, 0);
 		/* It so happens that the Haiku and ACPI-CA interrupt handler routines
 		   return the same values with the same meanings */
 #endif
@@ -819,16 +776,16 @@ AcpiOsRemoveInterruptHandler (
     UINT32                  InterruptNumber,
     ACPI_OSD_HANDLER        ServiceRoutine)
 {
-
 #ifdef _KERNEL_MODE
-dprintf("AcpiOsRemoveInterruptHandler()\n");
-	remove_io_interrupt_handler(InterruptNumber,(interrupt_handler)ServiceRoutine,NULL);
+	panic("AcpiOsRemoveInterruptHandler()\n");
+	/*remove_io_interrupt_handler(InterruptNumber,
+		(interrupt_handler)ServiceRoutine, NULL);*/
 		/* Crap. We don't get the Context argument back. */
 	#warning Sketchy code!
-
+	return AE_OK;
+#else
+	return AE_ERROR;
 #endif
-
-    return AE_OK;
 }
 
 
@@ -852,8 +809,6 @@ AcpiOsExecute (
     ACPI_OSD_EXEC_CALLBACK  Function,
     void                    *Context)
 {
-	status_t err;
-
 	switch (Type) {
 		case OSL_GLOBAL_LOCK_HANDLER:
 		case OSL_NOTIFY_HANDLER:
@@ -864,10 +819,9 @@ AcpiOsExecute (
 			break;
 	}
 
-	err = gDPC->queue_dpc(gDPCHandle, Function, Context);
-
-	if (err != B_OK)
+	if (gDPC->queue_dpc(gDPCHandle, Function, Context) != B_OK)
 		return AE_ERROR;
+
 	return AE_OK;
 }
 
@@ -922,12 +876,7 @@ void
 AcpiOsStall (
     UINT32                  microseconds)
 {
-
-    if (microseconds)
-    {
-        spin (microseconds);
-    }
-    return;
+	spin(microseconds);
 }
 
 
@@ -947,10 +896,7 @@ void
 AcpiOsSleep (
     ACPI_INTEGER            milliseconds)
 {
-
-    snooze (milliseconds * 1000);    /* Sleep for micro seconds */
-
-    return;
+    snooze(milliseconds * 1000);    /* Sleep for micro seconds */
 }
 
 /******************************************************************************
@@ -968,13 +914,7 @@ AcpiOsSleep (
 UINT64
 AcpiOsGetTimer (void)
 {
-    struct timeval  time;
-
-    gettimeofday(&time, NULL);
-
-    /* Seconds * 10^7 = 100ns(10^-7), Microseconds(10^-6) * 10^1 = 100ns */
-
-    return (((UINT64) time.tv_sec * 10000000) + ((UINT64) time.tv_usec * 10));
+	return system_time() * 10;
 }
 
 
@@ -995,8 +935,7 @@ ACPI_STATUS
 AcpiOsValidateInterface (
     char                    *Interface)
 {
-
-    return (AE_SUPPORT);
+    return AE_SUPPORT;
 }
 
 
@@ -1022,8 +961,7 @@ AcpiOsValidateAddress (
     ACPI_PHYSICAL_ADDRESS   Address,
     ACPI_SIZE               Length)
 {
-
-    return (AE_OK);
+    return AE_OK;
 }
 
 
@@ -1049,18 +987,23 @@ AcpiOsReadPciConfiguration (
     void                    *Value,
     UINT32                  Width)
 {
-
 #ifdef _KERNEL_MODE
 	UINT32 val = gPCIManager->read_pci_config(
-		PciId->Bus, PciId->Device, PciId->Function, Register, Width/8);
+		PciId->Bus, PciId->Device, PciId->Function, Register, Width / 8);
 	switch (Width) {
-		case 1: *(UINT8*)Value = val;
-		case 2: *(UINT16*)Value = val;
-		case 4: *(UINT32*)Value = val;
+		case 8: *(UINT8 *)Value = val;
+		case 16: *(UINT16 *)Value = val;
+		case 32: *(UINT32 *)Value = val;
+		default:
+			dprintf("AcpiOsReadPciConfiguration unhandled value width: %u\n",
+				Width);
+			return AE_ERROR;
 	}
-#endif
 
-    return (AE_OK);
+    return AE_OK;
+#else
+	return AE_ERROR;
+#endif
 }
 
 
@@ -1086,13 +1029,13 @@ AcpiOsWritePciConfiguration (
     ACPI_INTEGER            Value,
     UINT32                  Width)
 {
-
 #ifdef _KERNEL_MODE
 	gPCIManager->write_pci_config(
-		PciId->Bus, PciId->Device, PciId->Function, Register, Width/8, Value);
+		PciId->Bus, PciId->Device, PciId->Function, Register, Width / 8, Value);
+	return AE_OK;
+#else
+    return AE_ERROR;
 #endif
-
-    return (AE_OK);
 }
 
 /* TEMPORARY STUB FUNCTION */
@@ -1102,7 +1045,6 @@ AcpiOsDerivePciId(
     ACPI_HANDLE             chandle,
     ACPI_PCI_ID             **PciId)
 {
-
 }
 
 
@@ -1126,27 +1068,29 @@ AcpiOsReadPort (
     UINT32                  *Value,
     UINT32                  Width)
 {
-
 #ifdef _KERNEL_MODE
+	switch (Width) {
+		case 8:
+			*Value = gPCIManager->read_io_8(Address);
+			break;
 
-    switch (Width)
-    {
-    case 8:
-        *Value = gPCIManager->read_io_8(Address);
-        break;
+		case 16:
+			*Value = gPCIManager->read_io_16(Address);
+			break;
 
-    case 16:
-        *Value = gPCIManager->read_io_16(Address);
-        break;
+		case 32:
+			*Value = gPCIManager->read_io_32(Address);
+			break;
 
-    case 32:
-        *Value = gPCIManager->read_io_32(Address);
-        break;
-    }
+		default:
+			dprintf("AcpiOsReadPort: unhandeld width: %u\n", Width);
+			return AE_ERROR;
+	}
 
+	return AE_OK;
+#else
+	return AE_ERROR;
 #endif
-
-    return (AE_OK);
 }
 
 
@@ -1170,26 +1114,29 @@ AcpiOsWritePort (
     UINT32                  Value,
     UINT32                  Width)
 {
-
 #ifdef _KERNEL_MODE
-
 	switch (Width) {
-	case 8:
-		gPCIManager->write_io_8(Address,Value);
-		break;
+		case 8:
+			gPCIManager->write_io_8(Address, Value);
+			break;
 
-	case 16:
-		gPCIManager->write_io_16(Address,Value);
-		break;
+		case 16:
+			gPCIManager->write_io_16(Address,Value);
+			break;
 
-	case 32:
-		gPCIManager->write_io_32(Address,Value);
-		break;
+		case 32:
+			gPCIManager->write_io_32(Address,Value);
+			break;
+
+		default:
+			dprintf("AcpiOsWritePort: unhandeld width: %u\n", Width);
+			return AE_ERROR;
 	}
 
+	return AE_OK;
+#else
+	return AE_ERROR;
 #endif
-
-    return (AE_OK);
 }
 
 
@@ -1213,14 +1160,20 @@ AcpiOsReadMemory (
     UINT32                  *Value,
     UINT32                  Width)
 {
-
 #ifdef _KERNEL_MODE
+	addr_t pageOffset = Address % B_PAGE_SIZE;
+	addr_t virtualAddress;
+	status_t error = vm_get_physical_page(Address - pageOffset,
+		&virtualAddress, 0);
+	if (error != B_OK)
+		return AE_ERROR;
 
-    memcpy(Value, gPCIManager->ram_address(ACPI_TO_POINTER(Address)), Width/8);
-
+	memcpy(Value, (void*)(virtualAddress + pageOffset), Width / 8);
+	vm_put_physical_page(virtualAddress);
+	return AE_OK;
+#else
+	return AE_ERROR;
 #endif
-
-    return (AE_OK);
 }
 
 
@@ -1244,14 +1197,20 @@ AcpiOsWriteMemory (
     UINT32                  Value,
     UINT32                  Width)
 {
-
 #ifdef _KERNEL_MODE
+	addr_t pageOffset = Address % B_PAGE_SIZE;
+	addr_t virtualAddress;
+	status_t error = vm_get_physical_page(Address - pageOffset,
+		&virtualAddress, 0);
+	if (error != B_OK)
+		return AE_ERROR;
 
-    memcpy(gPCIManager->ram_address(ACPI_TO_POINTER(Address)), &Value, Width/8);
-
+	memcpy((void*)(virtualAddress + pageOffset), &Value, Width / 8);
+	vm_put_physical_page(virtualAddress);
+	return AE_OK;
+#else
+	return AE_ERROR;
 #endif
-
-    return (AE_OK);
 }
 
 
@@ -1280,27 +1239,21 @@ AcpiOsSignal (
     UINT32                  Function,
     void                    *Info)
 {
+	switch (Function) {
+		case ACPI_SIGNAL_FATAL:
+			if (Info != NULL)
+				panic(Info);
+			else
+				panic("AcpiOsSignal: fatal");
+        	break;
 
-    switch (Function)
-    {
-    case ACPI_SIGNAL_FATAL:
-        break;
-
-    case ACPI_SIGNAL_BREAKPOINT:
-
-        if (Info)
-        {
-            AcpiOsPrintf ("AcpiOsBreakpoint: %s ****\n", Info);
-        }
-        else
-        {
-            AcpiOsPrintf ("At AcpiOsBreakpoint ****\n");
-        }
-
-        break;
+		case ACPI_SIGNAL_BREAKPOINT:
+			if (Info != NULL)
+				AcpiOsPrintf ("AcpiOsBreakpoint: %s ****\n", Info);
+			else
+				AcpiOsPrintf ("At AcpiOsBreakpoint ****\n");
+			break;
     }
 
-
-    return (AE_OK);
+    return AE_OK;
 }
-
