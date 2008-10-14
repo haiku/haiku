@@ -1075,8 +1075,9 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 		dprintf("group %d first free too late\n",
 			(int)groupIndex);
 	}
-	if (group.fLargestValid && largestStart != group.fLargestStart
-		|| largestLength != group.fLargestLength) {
+	if (group.fLargestValid
+		&& (largestStart != group.fLargestStart
+			|| largestLength != group.fLargestLength)) {
 		panic("bfs %p: group %d largest differs: %d.%d, checked %d.%d.\n",
 			fVolume, (int)groupIndex, (int)group.fLargestStart,
 			(int)group.fLargestLength, (int)largestStart, (int)largestLength);
