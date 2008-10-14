@@ -17,6 +17,9 @@
 
 #include "vmdkimage.h"
 
+#ifdef __BEOS__
+#define pread(_fd, _buf, _count, _pos) read_pos(_fd, _pos, _buf, _count)
+#endif
 
 static void
 print_usage()
