@@ -118,6 +118,8 @@ MainWindow::~MainWindow()
 void
 MainWindow::MessageReceived(BMessage* message)
 {
+	bool discard = false;
+
 	if (!fDocument || !fDocument->WriteLock()) {
 		BWindow::MessageReceived(message);
 		return;
@@ -132,12 +134,19 @@ MainWindow::MessageReceived(BMessage* message)
 			(const void **)&color, &len) == B_OK; i++) {
 			if (len != sizeof(rgb_color))
 				continue;
+			char name[30];
+			sprintf(name, "Color (#%02x%02x%02x)", 
+				color->red, color->green, color->blue);
 			Style* style = new (nothrow) Style(*color);
+			style->SetName(name);
 			Style* styles[1] = { style };
 			AddStylesCommand* styleCommand = new (nothrow) AddStylesCommand(
 				fDocument->Icon()->Styles(), styles, 1,
 				fDocument->Icon()->Styles()->CountStyles());
 			fDocument->CommandStack()->Perform(styleCommand);
+			// don't handle anything else,
+			// or we might paste the clipboard on B_PASTE
+			discard = true;
 		}
 	}
 
@@ -151,62 +160,50 @@ MainWindow::MessageReceived(BMessage* message)
 			be_app->PostMessage(message);
 			break;
 
-		case B_MIME_DATA:
-			if (message->HasData("text/plain", B_MIME_TYPE)) {
-				status_t err;
-				Icon* icon;
-				icon = new (nothrow) Icon(*fDocument->Icon());
-				if (icon) {
-					StyledTextImporter importer;
-					err = importer.Import(icon, message);
-					if (err >= B_OK) {
-							AutoWriteLocker locker(fDocument);
-
-							SetIcon(NULL);
-
-							// incorporate the loaded icon into the document
-							// (either replace it or append to it)
-							fDocument->MakeEmpty(false);
-								// if append, the document savers are preserved
-							fDocument->SetIcon(icon);
-							SetIcon(icon);
-					}
-				}
-			}
-			break;
-
 		case B_PASTE:
-			if (be_clipboard->Lock()) {
-				status_t err;
-				BMessage *clip = be_clipboard->Data();
+		case B_MIME_DATA:
+		{
+			BMessage *clip = message;
+			status_t err;
 
-				if (!clip || !clip->HasData("text/plain", B_MIME_TYPE)) {
-					be_clipboard->Unlock();
+			if (discard)
+				break;
+
+			if (message->what == B_PASTE) {
+				if (!be_clipboard->Lock())
 					break;
-				}
-
-				Icon* icon;
-				icon = new (nothrow) Icon(*fDocument->Icon());
-				if (icon) {
-					StyledTextImporter importer;
-					err = importer.Import(icon, clip);
-					if (err >= B_OK) {
-							AutoWriteLocker locker(fDocument);
-
-							SetIcon(NULL);
-
-							// incorporate the loaded icon into the document
-							// (either replace it or append to it)
-							fDocument->MakeEmpty(false);
-								// if append, the document savers are preserved
-							fDocument->SetIcon(icon);
-							SetIcon(icon);
-					}
-				}
-
-				be_clipboard->Unlock();
+				clip = be_clipboard->Data();
 			}
+
+			if (!clip || !clip->HasData("text/plain", B_MIME_TYPE)) {
+				if (message->what == B_PASTE)
+					be_clipboard->Unlock();
+				break;
+			}
+
+			Icon* icon;
+			icon = new (nothrow) Icon(*fDocument->Icon());
+			if (icon) {
+				StyledTextImporter importer;
+				err = importer.Import(icon, clip);
+				if (err >= B_OK) {
+						AutoWriteLocker locker(fDocument);
+
+						SetIcon(NULL);
+
+						// incorporate the loaded icon into the document
+						// (either replace it or append to it)
+						fDocument->MakeEmpty(false);
+							// if append, the document savers are preserved
+						fDocument->SetIcon(icon);
+						SetIcon(icon);
+				}
+			}
+
+			if (message->what == B_PASTE)
+				be_clipboard->Unlock();
 			break;
+		}
 
 		case MSG_UNDO:
 			fDocument->CommandStack()->Undo();
