@@ -5,6 +5,7 @@
  * Authors:
  *		François Revol <revol@free.fr>
  */
+
 #include "StyledTextImporter.h"
 
 #include <new>
@@ -38,7 +39,7 @@ using std::nothrow;
 
 class ShapeIterator : public BShapeIterator {
  public:
-	ShapeIterator(Icon *icon, Shape *to, BPoint offset);
+	ShapeIterator(Icon *icon, Shape *to, BPoint offset, const char *name);
 	~ShapeIterator() {};
 
 	virtual	status_t	IterateMoveTo(BPoint *point);
@@ -54,15 +55,22 @@ class ShapeIterator : public BShapeIterator {
 	Shape *fShape;
 	VectorPath *fPath;
 	BPoint fOffset;
+	const char *fName;
+	BPoint fLastPoint;
+	bool fHasLastPoint;
 };
 
-ShapeIterator::ShapeIterator(Icon *icon, Shape *to, BPoint offset)
+ShapeIterator::ShapeIterator(Icon *icon, Shape *to, BPoint offset, 
+	const char *name)
 {
 	CALLED();
 	fIcon = icon;
 	fShape = to;
 	fPath = NULL;
 	fOffset = offset;
+	fName = name;
+	fLastPoint = offset;
+	fHasLastPoint = false;
 }
 
 status_t
@@ -73,7 +81,9 @@ ShapeIterator::IterateMoveTo(BPoint *point)
 		NextPath();
 	if (!CurrentPath())
 		return B_ERROR;
-	fPath->AddPoint(fOffset + *point);
+	//fPath->AddPoint(fOffset + *point);
+	fLastPoint = fOffset + *point;
+	fHasLastPoint = true;
 	return B_OK;
 }
 
@@ -83,8 +93,12 @@ ShapeIterator::IterateLineTo(int32 lineCount, BPoint *linePts)
 	CALLED();
 	if (!CurrentPath())
 		return B_ERROR;
-	while (lineCount--)
-		fPath->AddPoint(fOffset + *linePts++);
+	while (lineCount--) {
+		fPath->AddPoint(fOffset + *linePts);
+		fLastPoint = fOffset + *linePts;
+		fHasLastPoint = true;
+		linePts++;
+	}
 	return B_OK;
 }
 
@@ -94,11 +108,17 @@ ShapeIterator::IterateBezierTo(int32 bezierCount, BPoint *bezierPts)
 	CALLED();
 	if (!CurrentPath())
 		return B_ERROR;
+	BPoint start(bezierPts[0]);
+	if (fHasLastPoint)
+		start = fLastPoint;
 	while (bezierCount--) {
-		fPath->AddPoint(fOffset + bezierPts[1], 
-			fOffset + bezierPts[0], fOffset + bezierPts[2], false);
-			bezierPts += 3;
+		fPath->AddPoint(fOffset + bezierPts[0], 
+			fLastPoint, fOffset + bezierPts[1], true);
+		fLastPoint = fOffset + bezierPts[2];
+		bezierPts += 3;
 	}
+	fPath->AddPoint(fLastPoint);
+	fHasLastPoint = true;
 	return B_OK;
 }
 
@@ -110,6 +130,7 @@ ShapeIterator::IterateClose()
 		return B_ERROR;
 	fPath->SetClosed(true);
 	NextPath();
+	fHasLastPoint = false;
 	return B_OK;
 }
 
@@ -120,6 +141,7 @@ ShapeIterator::CurrentPath()
 	if (fPath)
 		return fPath;
 	fPath = new (nothrow) VectorPath();
+	fPath->SetName(fName);
 	return fPath;
 }
 
@@ -206,7 +228,7 @@ StyledTextImporter::Import(Icon* icon, const entry_ref* ref)
 	mio.SetSize((size_t)size + 1);
 	memset((void *)mio.Buffer(), 0, (size_t)size + 1);
 
-	// TODO: read runs
+	// TODO: read runs from attribute
 
 	return _Import(icon, (const char *)mio.Buffer(), NULL);
 }
@@ -257,7 +279,7 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 		while (run && currentRun < runs->count - 1 && 
 			i >= runs->runs[currentRun + 1].offset) {
 			run = &runs->runs[++currentRun];
-			printf("switching to run %d\n", currentRun);
+			//printf("switching to run %d\n", currentRun);
 		}
 
 		int charLen;
@@ -290,13 +312,17 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 
 		float charWidth;
 		charWidth = font.StringWidth(str.String() + i, charLen);
-		printf("StringWidth( %d) = %f\n", charLen, charWidth);
+		//printf("StringWidth( %d) = %f\n", charLen, charWidth);
+		BString glyphName(str.String() + i, charLen);
+		glyphName.Prepend("Glyph (");
+		glyphName.Append(")");
 
 		font.GetGlyphShapes((str.String() + i), 1, glyphs);
 		if (glyph.Bounds().IsValid()) {
 			//offset.x += glyph.Bounds().Width();
 			offset.x += charWidth;
 			Shape* shape = new (nothrow) Shape(NULL);
+			shape->SetName(glyphName.String());
 			if (!shape || !icon->Shapes()->AddShape(shape)) {
 				delete shape;
 				return B_NO_MEMORY;
@@ -307,7 +333,7 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 					break;
 				}
 			}
-			ShapeIterator iterator(icon, shape, offset);
+			ShapeIterator iterator(icon, shape, offset, glyphName.String());
 			if (iterator.Iterate(&glyph) < B_OK)
 				return B_ERROR;
 
@@ -337,6 +363,9 @@ StyledTextImporter::_AddStyle(Icon *icon, text_run *run)
 		delete style;
 		return B_NO_MEMORY;
 	}
+	char name[30];
+	sprintf(name, "Color (#%02x%02x%02x)", color.red, color.green, color.blue);
+	style->SetName(name);
 
 	bool found = false;
 	for (int i = 0; i < fStyleCount; i++) {
