@@ -2,16 +2,18 @@
  * Copyright 2007, Marcus Overhagen. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdarg.h>
+
 #include <errno.h>
+#include <fcntl.h>
 #include <getopt.h>
+#include <limits.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "vmdkimage.h"
 
@@ -22,14 +24,117 @@ print_usage()
 	printf("\n");
 	printf("vmdkimage\n");
 	printf("\n");
-	printf("usage: vmdkimage -i <imagesize> -h <headersize> [-c] [-H] [-f] "
-		"<file>\n");
+	printf("usage: vmdkimage -i <imagesize> -h <headersize> [-c] [-H] "
+		"[-u <uuid>] [-f] <file>\n");
+	printf("   or: vmdkimage -d <file>\n");
+	printf("       -d, --dump         dumps info for the image file\n");
 	printf("       -i, --imagesize    size of raw partition image file\n");
 	printf("       -h, --headersize   size of the vmdk header to write\n");
 	printf("       -f, --file         the raw partition image file\n");
+	printf("       -u, --uuid         UUID for the image instead of a computed "
+		"one\n");
 	printf("       -c, --clear-image  set the image content to zero\n");
 	printf("       -H, --header-only  write only the header\n");
 	exit(EXIT_FAILURE);
+}
+
+
+static void
+dump_image_info(const char *filename)
+{
+	int image = open(filename, O_RDONLY);
+	if (image < 0) {
+		fprintf(stderr, "Error: couldn't open file %s (%s)\n", filename,
+			strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	SparseExtentHeader header;
+	if (read(image, &header, 512) != 512) {
+		fprintf(stderr, "Error: couldn't read header: %s\n", strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	if (header.magicNumber != SPARSE_MAGICNUMBER) {
+		fprintf(stderr, "Error: invalid header magic.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	printf("--------------- Header ---------------\n");
+	printf("  version:             %d\n", (int)header.version);
+	printf("  flags:               %d\n", (int)header.flags);
+	printf("  capacity:            %d\n", (int)header.capacity);
+	printf("  grainSize:           %lld\n", header.grainSize);
+	printf("  descriptorOffset:    %lld\n", header.descriptorOffset);
+	printf("  descriptorSize:      %lld\n", header.descriptorSize);
+	printf("  numGTEsPerGT:        %u\n", (unsigned int)header.numGTEsPerGT);
+	printf("  rgdOffset:           %lld\n", header.rgdOffset);
+	printf("  gdOffset:            %lld\n", header.gdOffset);
+	printf("  overHead:            %lld\n", header.overHead);
+	printf("  uncleanShutdown:     %s\n",
+		header.uncleanShutdown ? "yes" : "no");
+	printf("  singleEndLineChar:   '%c'\n", header.singleEndLineChar);
+	printf("  nonEndLineChar:      '%c'\n", header.nonEndLineChar);
+	printf("  doubleEndLineChar1:  '%c'\n", header.doubleEndLineChar1);
+	printf("  doubleEndLineChar2:  '%c'\n", header.doubleEndLineChar2);
+
+	if (header.descriptorOffset != 0) {
+		printf("\n--------------- Descriptor ---------------\n");
+		size_t descriptorSize = header.descriptorSize * 512 * 2;
+		char *descriptor = (char *)malloc(descriptorSize);
+		if (descriptor == NULL) {
+			fprintf(stderr, "Error: cannot allocate descriptor size %u.\n",
+				(unsigned int)descriptorSize);
+			exit(EXIT_FAILURE);
+		}
+
+		if (pread(image, descriptor, descriptorSize,
+				header.descriptorOffset * 512) != (ssize_t)descriptorSize) {
+			fprintf(stderr, "Error: couldn't read header: %s\n",
+				strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+
+		puts(descriptor);
+		putchar('\n');
+		free(descriptor);
+	}
+
+	close(image);
+}
+
+
+static uint64
+hash_string(const char *string)
+{
+	uint64 hash = 0;
+	char c;
+
+	while ((c = *string++) != 0) {
+		hash = c + (hash << 6) + (hash << 16) - hash;
+	}
+
+	return hash;
+}
+
+
+static bool
+is_valid_uuid(const char *uuid)
+{
+	const char *kHex = "0123456789abcdef";
+	for (int i = 0; i < 36; i++) {
+		if (!uuid[i])
+			return false;
+		if (i == 8 || i == 13 || i == 18 || i == 23) {
+			if (uuid[i] != '-')
+				return false;
+			continue;
+		}
+		if (strchr(kHex, uuid[i]) == NULL)
+			return false;
+	}
+
+	return uuid[36] == '\0';
 }
 
 
@@ -39,8 +144,10 @@ main(int argc, char *argv[])
 	uint64 headersize = 0;
 	uint64 imagesize = 0;
 	const char *file = NULL;
+	const char *uuid = NULL;
 	bool headerOnly = false;
 	bool clearImage = false;
+	bool dumpOnly = false;
 
 	if (sizeof(SparseExtentHeader) != 512) {
 		fprintf(stderr, "compilation error: struct size is %u byte\n",
@@ -50,22 +157,27 @@ main(int argc, char *argv[])
 
 	while (1) {
 		int c;
-		static struct option long_options[] =
-		{
+		static struct option long_options[] = {
+			{"dump", no_argument, 0, 'd'},
 		 	{"headersize", required_argument, 0, 'h'},
 			{"imagesize", required_argument, 0, 'i'},
 			{"file", required_argument, 0, 'f'},
+			{"uuid", required_argument, 0, 'u'},
 			{"clear-image", no_argument, 0, 'c'},
 			{"header-only", no_argument, 0, 'H'},
 			{0, 0, 0, 0}
 		};
 
 		opterr = 0; /* don't print errors */
-		c = getopt_long(argc, argv, "h:i:cHf:", long_options, NULL);
+		c = getopt_long(argc, argv, "dh:i:u:cHf:", long_options, NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case 'd':
+				dumpOnly = true;
+				break;
+
 			case 'h':
 				headersize = strtoull(optarg, NULL, 10);
 				if (strchr(optarg, 'G') || strchr(optarg, 'g'))
@@ -84,6 +196,15 @@ main(int argc, char *argv[])
 					imagesize *= 1024 * 1024;
 				else if (strchr(optarg, 'K') || strchr(optarg, 'k'))
 					imagesize *= 1024;
+				break;
+
+			case 'u':
+				uuid = optarg;
+				if (!is_valid_uuid(uuid)) {
+					fprintf(stderr, "Error: invalid UUID given (use "
+						"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx format only).\n");
+					exit(EXIT_FAILURE);
+				}
 				break;
 
 			case 'f':
@@ -106,10 +227,15 @@ main(int argc, char *argv[])
 	if (file == NULL && optind == argc - 1)
 		file = argv[optind];
 
+	if (dumpOnly && file != NULL) {
+		dump_image_info(file);
+		return 0;
+	}
+
 	if (!headersize || !imagesize || !file)
 		print_usage();
 
-	char desc[512];
+	char desc[1024];
 	SparseExtentHeader header;
 
 	if (headersize < sizeof(desc) + sizeof(header)) {
@@ -170,7 +296,7 @@ main(int argc, char *argv[])
 	header.capacity = 0;
 	header.grainSize = 16;
 	header.descriptorOffset = 1;
-	header.descriptorSize = sizeof(desc) / 512;
+	header.descriptorSize = (sizeof(desc) + 511) / 512;
 	header.numGTEsPerGT = 512;
 	header.rgdOffset = 0;
 	header.gdOffset = 0;
@@ -181,6 +307,29 @@ main(int argc, char *argv[])
 	header.doubleEndLineChar1 = '\r';
 	header.doubleEndLineChar2 = '\n';
 
+	// Generate UUID for the image by hashing its full path
+	uint64 uuid1 = 0, uuid2 = 0, uuid3 = 0, uuid4 = 0, uuid5 = 0;
+	if (uuid == NULL) {
+		char fullPath[PATH_MAX + 1];
+		strcpy(fullPath, "Haiku");
+
+		if (realpath(file, fullPath + 5) == NULL)
+			strncpy(fullPath, file, sizeof(fullPath));
+
+		for (size_t i = strlen(fullPath); i < sizeof(fullPath) - 1; i++) {
+			// fill rest with some numbers
+			fullPath[i] = i % 10 + '0';
+		}
+		fullPath[sizeof(fullPath) - 1] = '\0';
+
+		uuid1 = hash_string(fullPath);
+		uuid2 = hash_string(fullPath) + 5;
+		uuid3 = hash_string(fullPath) + 13;
+		uuid4 = hash_string(fullPath) + 19;
+		uuid5 = hash_string(fullPath) + 29;
+	}
+
+	// Create embedded descriptor
 	strcat(desc,
 		"# Disk Descriptor File\n"
 		"version=1\n"
@@ -201,19 +350,27 @@ main(int argc, char *argv[])
 		"ddb.geometry.cylinders = \"%llu\"\n",
 		sectors, heads, cylinders);
 
+	if (uuid == NULL) {
+		sprintf(desc + strlen(desc),
+			"ddb.uuid.image=\"%08llx-%04llx-%04llx-%04llx-%012llx\"\n",
+			uuid1 & 0xffffffff, uuid2 & 0xffff, uuid3 & 0xffff, uuid4 & 0xffff,
+			uuid5 & 0xffffffffffffLL);
+	} else
+		sprintf(desc + strlen(desc), "ddb.uuid.image=\"%s\"\n", uuid);
+
 	int fd = open(file, O_RDWR | O_CREAT, 0666);
 	if (fd < 0) {
 		fprintf(stderr, "Error: couldn't open file %s (%s)\n", file,
 			strerror(errno));
 		exit(EXIT_FAILURE);
 	}
-	if (sizeof(header) != write(fd, &header, sizeof(header)))
+	if (write(fd, &header, sizeof(header)) != sizeof(header))
 		goto write_err;
 
-	if (sizeof(desc) != write(fd, desc, sizeof(desc)))
+	if (write(fd, desc, sizeof(desc)) != sizeof(desc))
 		goto write_err;
 
-	if (headersize - 1 != (uint64)lseek(fd, headersize - 1, SEEK_SET))
+	if ((uint64)lseek(fd, headersize - 1, SEEK_SET) != headersize - 1)
 		goto write_err;
 
 	if (1 != write(fd, "", 1))

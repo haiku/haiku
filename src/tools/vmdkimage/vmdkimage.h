@@ -6,15 +6,14 @@
 #define _VMDKIMAGE_H
 
 typedef unsigned char uint8;
-typedef unsigned int  uint32;
+typedef unsigned int uint32;
 typedef unsigned long long uint64;
 
 
 typedef uint64 SectorType;
 typedef uint8 Bool;
 
-struct SparseExtentHeader
-{
+struct SparseExtentHeader {
 	uint32            magicNumber;
 	uint32            version;
 	uint32            flags;
@@ -36,4 +35,4 @@ struct SparseExtentHeader
 
 #define SPARSE_MAGICNUMBER 0x564d444b /* 'V' 'M' 'D' 'K' */
 
-#endif
+#endif	// _VMDKIMAGE_H
