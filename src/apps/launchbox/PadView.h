@@ -14,6 +14,8 @@
 class BGroupLayout;
 class LaunchButton;
 
+#define DEFAULT_ICON_SIZE 32
+
 class PadView : public BView {
  public:
 								PadView(const char* name);
@@ -39,11 +41,15 @@ class PadView : public BView {
 			void				SetOrientation(enum orientation orientation);
 			enum orientation	Orientation() const;
 
+			void				SetIconSize(uint32 size);
+			uint32				IconSize() const;
+
  private:
 			BPoint				fDragOffset;
 			bool				fDragging;
 			bigtime_t			fClickTime;
 			BGroupLayout*		fButtonLayout;
+			uint32				fIconSize;
 };
 
 #endif // PAD_VIEW_H

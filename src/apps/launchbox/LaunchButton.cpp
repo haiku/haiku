@@ -34,28 +34,24 @@ LaunchButton::fClickSpeed = 0;
 
 // constructor
 LaunchButton::LaunchButton(const char* name, uint32 id, const char* label,
-						   BMessage* message, BHandler* target)
+		BMessage* message, BHandler* target)
 	: IconButton(name, id, label, message, target),
 	  fRef(NULL),
 	  fAppSig(NULL),
 	  fDescription(""),
 	  fAnticipatingDrop(false),
-	  fLastClickTime(0)
+	  fLastClickTime(0),
+	  fIconSize(DEFAULT_ICON_SIZE)
 {
 	if (fClickSpeed == 0 || get_click_speed(&fClickSpeed) < B_OK)
 		fClickSpeed = 500000;
-
-	BSize size(32.0 + 8.0, 32.0 + 8.0);
-	SetExplicitMinSize(size);
-	SetExplicitMaxSize(size);
 }
 
 // destructor
 LaunchButton::~LaunchButton()
 {
 	delete fRef;
-	if (fAppSig)
-		free(fAppSig);
+	free(fAppSig);
 }
 
 // AttachedToWindow
@@ -290,8 +286,7 @@ void
 LaunchButton::SetTo(const char* appSig, bool updateIcon)
 {
 	if (appSig) {
-		if (fAppSig)
-			free(fAppSig);
+		free(fAppSig);
 		fAppSig = strdup(appSig);
 		if (updateIcon) {
 			entry_ref ref;
@@ -309,6 +304,22 @@ LaunchButton::SetDescription(const char* text)
 	fDescription.SetTo(text);
 	_UpdateToolTip();
 }
+
+// SetIconSize
+void
+LaunchButton::SetIconSize(uint32 size)
+{
+	if (fIconSize == size)
+		return;
+
+	fIconSize = size;
+	_UpdateIcon(fRef);
+
+	InvalidateLayout();
+	Invalidate();
+}
+
+// #pragma mark -
 
 // _UpdateToolTip
 void
@@ -339,8 +350,11 @@ LaunchButton::_UpdateToolTip()
 void
 LaunchButton::_UpdateIcon(const entry_ref* ref)
 {
-	BBitmap* icon = new BBitmap(BRect(0.0, 0.0, 31.0, 31.0), B_RGBA32);
-	if (BNodeInfo::GetTrackerIcon(ref, icon, B_LARGE_ICON) >= B_OK)
+	BBitmap* icon = new BBitmap(BRect(0.0, 0.0, fIconSize - 1,
+		fIconSize - 1), B_RGBA32);
+	// NOTE: passing an invalid/unknown icon_size argument will cause
+	// the BNodeInfo to ignore it and just use the bitmap bounds.
+	if (BNodeInfo::GetTrackerIcon(ref, icon, (icon_size)fIconSize) >= B_OK)
 		SetIcon(icon);
 
 	delete icon;

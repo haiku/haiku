@@ -43,6 +43,9 @@ class IconButton : public BView, public BInvoker {
 										   const BMessage* message);
 	virtual	void				GetPreferredSize(float* width,
 												 float* height);
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+
 
 	// BInvoker interface
 	virtual	status_t			Invoke(BMessage* message = NULL);

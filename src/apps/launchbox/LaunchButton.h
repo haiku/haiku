@@ -52,6 +52,10 @@ class LaunchButton : public IconButton {
 			const char*			Description() const
 									{ return fDescription.String(); }
 
+			void				SetIconSize(uint32 size);
+			uint32				IconSize() const
+									{ return fIconSize; }
+
  private:
 			void				_UpdateToolTip();
 			void				_UpdateIcon(const entry_ref* ref);
@@ -63,6 +67,8 @@ class LaunchButton : public IconButton {
 	bool						fAnticipatingDrop;
 	bigtime_t					fLastClickTime;
 	BPoint						fDragStart;
+
+	uint32						fIconSize;
 
 	static bigtime_t			fClickSpeed;
 };

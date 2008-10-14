@@ -237,25 +237,42 @@ IconButton::GetPreferredSize(float* width, float* height)
 	if (IsValid()) {
 		minWidth += fNormalBitmap->Bounds().IntegerWidth() + 1.0;
 		minHeight += fNormalBitmap->Bounds().IntegerHeight() + 1.0;
-	} else {
-		minWidth += MIN_SPACE;
-		minHeight += MIN_SPACE;
 	}
 	if (minWidth < MIN_SPACE)
 		minWidth = MIN_SPACE;
 	if (minHeight < MIN_SPACE)
 		minHeight = MIN_SPACE;
+
+	float hPadding = max_c(4.0, ceilf(minHeight / 4.0));
+	float vPadding = max_c(4.0, ceilf(minWidth / 4.0));
+
 	if (fLabel.CountChars() > 0) {
 		font_height fh;
 		GetFontHeight(&fh);
-		minHeight += ceilf(fh.ascent + fh.descent) + 4.0;
-		minWidth += StringWidth(fLabel.String()) + 4.0;
+		minHeight += ceilf(fh.ascent + fh.descent) + vPadding;
+		minWidth += StringWidth(fLabel.String()) + vPadding;
 	}
 
 	if (width)
-		*width = minWidth + 4.0;
+		*width = minWidth + hPadding;
 	if (height)
-		*height = minHeight + 4.0;
+		*height = minHeight + vPadding;
+}
+
+// MinSize
+BSize
+IconButton::MinSize()
+{
+	BSize size;
+	GetPreferredSize(&size.width, &size.height);
+	return size;
+}
+
+// MaxSize
+BSize
+IconButton::MaxSize()
+{
+	return MinSize();
 }
 
 // Invoke

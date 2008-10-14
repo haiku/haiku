@@ -357,6 +357,11 @@ MainWindow::LoadSettings(const BMessage* message)
 	if (message->FindInt32("orientation", &orientation) == B_OK)
 		fPadView->SetOrientation((enum orientation)orientation);
 
+	// restore icon size
+	int32 iconSize;
+	if (message->FindInt32("icon size", &iconSize) == B_OK)
+		fPadView->SetIconSize(iconSize);
+
 	// restore buttons
 	const char* path;
 	bool buttonAdded = false;
@@ -429,6 +434,10 @@ MainWindow::SaveSettings(BMessage* message)
 	if (message->ReplaceInt32("orientation",
 			(int32)fPadView->Orientation()) != B_OK)
 		message->AddInt32("orientation", (int32)fPadView->Orientation());
+
+	// store icon size
+	if (message->ReplaceInt32("icon size", fPadView->IconSize()) != B_OK)
+		message->AddInt32("icon size", fPadView->IconSize());
 
 	// store buttons
 	message->RemoveName("path");

@@ -22,10 +22,12 @@
 #include "LaunchButton.h"
 #include "MainWindow.h"
 
-bigtime_t kActivationDelay = 40000;
+static bigtime_t sActivationDelay = 40000;
+static const uint32 kIconSizes[] = { 16, 20, 24, 32, 40, 48, 64 };
 
 enum {
-	MSG_TOGGLE_LAYOUT			= 'tgll'
+	MSG_TOGGLE_LAYOUT			= 'tgll',
+	MSG_SET_ICON_SIZE			= 'stis'
 };
 
 // constructor
@@ -33,11 +35,12 @@ PadView::PadView(const char* name)
 	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE, NULL),
 	  fDragging(false),
 	  fClickTime(0),
-	  fButtonLayout(new BGroupLayout(B_VERTICAL, 4))
+	  fButtonLayout(new BGroupLayout(B_VERTICAL, 4)),
+	  fIconSize(DEFAULT_ICON_SIZE)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	get_click_speed(&kActivationDelay); 
+	get_click_speed(&sActivationDelay); 
 
 	fButtonLayout->SetInsets(2, 7, 2, 2);
 	SetLayout(fButtonLayout);
@@ -138,6 +141,11 @@ PadView::MessageReceived(BMessage* message)
 				fButtonLayout->SetOrientation(B_HORIZONTAL);
 			}
 			break;
+		case MSG_SET_ICON_SIZE:
+			uint32 size;
+			if (message->FindInt32("size", (int32*)&size) == B_OK)
+				SetIconSize(size);
+			break;
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -184,7 +192,7 @@ PadView::MouseDown(BPoint where)
 			window->Activate(false);
 		}
 	} else {
-		if (system_time() - fClickTime < kActivationDelay) {
+		if (system_time() - fClickTime < sActivationDelay) {
 			window->Minimize(true);
 			fClickTime = 0;
 		} else {
@@ -205,7 +213,7 @@ PadView::MouseUp(BPoint where)
 		uint32 buttons;
 		window->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 		if (buttons & B_PRIMARY_MOUSE_BUTTON
-			&& system_time() - fClickTime < kActivationDelay
+			&& system_time() - fClickTime < sActivationDelay
 			&& window->IsActive())
 			window->Activate();
 	}
@@ -244,7 +252,7 @@ PadView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 				if (where.x >= windowFrame.left && where.x <= windowFrame.right) {
 					if (position.y < 0.5 && where.y == frame.top)
 						raise = true;
-					else if (position.y > 0.5 && where.y == frame.top)
+					else if (position.y > 0.5 && where.y == frame.bottom)
 						raise = true;
 				}
 			}
@@ -258,6 +266,8 @@ PadView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 void
 PadView::AddButton(LaunchButton* button, LaunchButton* beforeButton)
 {
+	button->SetIconSize(fIconSize);
+
 	if (beforeButton)
 		fButtonLayout->AddView(fButtonLayout->IndexOfView(beforeButton), button);
 	else
@@ -338,6 +348,20 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	item->SetTarget(this);
 	settingsM->AddItem(item);
 
+	BMenu* iconSizeM = new BMenu("Icon size");
+	for (uint32 i = 0; i < sizeof(kIconSizes) / sizeof(uint32); i++) {
+		uint32 iconSize = kIconSizes[i];
+		message = new BMessage(MSG_SET_ICON_SIZE);
+		message->AddInt32("size", iconSize);
+		BString label;
+		label << iconSize << " x " << iconSize; 
+		item = new BMenuItem(label.String(), message);
+		item->SetTarget(this);
+		item->SetMarked(IconSize() == iconSize);
+		iconSizeM->AddItem(item);
+	}
+	settingsM->AddItem(iconSizeM);
+
 	uint32 what = window->Look() == B_BORDERED_WINDOW_LOOK ? MSG_SHOW_BORDER : MSG_HIDE_BORDER;
 	item = new BMenuItem("Show Window Border", new BMessage(what));
 	item->SetTarget(window);
@@ -414,6 +438,26 @@ enum orientation
 PadView::Orientation() const
 {
 	return fButtonLayout->Orientation();
+}
+
+// SetIconSize
+void
+PadView::SetIconSize(uint32 size)
+{
+	if (size == fIconSize)
+		return;
+
+	fIconSize = size;
+
+	for (int32 i = 0; LaunchButton* button = ButtonAt(i); i++)
+		button->SetIconSize(fIconSize);
+}
+
+// IconSize
+uint32
+PadView::IconSize() const
+{
+	return fIconSize;
 }
 
 
