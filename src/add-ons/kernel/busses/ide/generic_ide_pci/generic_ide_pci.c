@@ -166,11 +166,18 @@ supports_device(device_node *parent)
 		|| pnp->get_attr_uint16(parent, B_DEVICE_SUB_TYPE, &subClass, false) != B_OK)
 		return -1;
 
-	if (strcmp(bus, "pci") || baseClass != PCI_mass_storage
-		|| subClass != PCI_ide)
+	if (strcmp(bus, "pci") || baseClass != PCI_mass_storage)
 		return 0.0f;
 
-	return 0.3f;
+	if (subClass == PCI_ide)
+		return 0.3f;
+
+	// vendor 105a: Promise Technology, Inc.; device 4d69: 20269 (Ultra133TX2)
+	// has subClass set to PCI_mass_storage_other, and there are others as well.
+	if (subClass == PCI_mass_storage_other)
+		return 0.3f;
+
+	return 0.0f;
 }
 
 
