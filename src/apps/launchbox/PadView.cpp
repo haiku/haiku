@@ -216,38 +216,40 @@ PadView::MouseUp(BPoint where)
 void
 PadView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	if (MainWindow* window = dynamic_cast<MainWindow*>(Window())) {
-		if (fDragging) {
-			window->MoveTo(ConvertToScreen(where) - fDragOffset);
-		} else if (window->AutoRaise()) {
-			where = ConvertToScreen(where);
-			BScreen screen(window);
-			BRect frame = screen.Frame();
-			BRect windowFrame = window->Frame();
-			if (where.x == frame.left || where.x == frame.right
-				|| where.y == frame.top || where.y == frame.bottom) {
-				BPoint position = window->ScreenPosition();
-				bool raise = false;
-				if (fabs(0.5 - position.x) > fabs(0.5 - position.y)) {
-					// left or right border
-					if (where.y >= windowFrame.top && where.y <= windowFrame.bottom) {
-						if (position.x < 0.5 && where.x == frame.left)
-							raise = true;
-						else if (position.x > 0.5 && where.x == frame.right)
-							raise = true;
-					}
-				} else {
-					// top or bottom border
-					if (where.x >= windowFrame.left && where.x <= windowFrame.right) {
-						if (position.y < 0.5 && where.y == frame.top)
-							raise = true;
-						else if (position.y > 0.5 && where.y == frame.top)
-							raise = true;
-					}
+	MainWindow* window = dynamic_cast<MainWindow*>(Window());
+	if (window == NULL)
+		return;
+
+	if (fDragging) {
+		window->MoveTo(ConvertToScreen(where) - fDragOffset);
+	} else if (window->AutoRaise()) {
+		where = ConvertToScreen(where);
+		BScreen screen(window);
+		BRect frame = screen.Frame();
+		BRect windowFrame = window->Frame();
+		if (where.x == frame.left || where.x == frame.right
+			|| where.y == frame.top || where.y == frame.bottom) {
+			BPoint position = window->ScreenPosition();
+			bool raise = false;
+			if (fabs(0.5 - position.x) > fabs(0.5 - position.y)) {
+				// left or right border
+				if (where.y >= windowFrame.top && where.y <= windowFrame.bottom) {
+					if (position.x < 0.5 && where.x == frame.left)
+						raise = true;
+					else if (position.x > 0.5 && where.x == frame.right)
+						raise = true;
 				}
-				if (raise)
-					window->Activate();
+			} else {
+				// top or bottom border
+				if (where.x >= windowFrame.left && where.x <= windowFrame.right) {
+					if (position.y < 0.5 && where.y == frame.top)
+						raise = true;
+					else if (position.y > 0.5 && where.y == frame.top)
+						raise = true;
+				}
 			}
+			if (raise)
+				window->Activate();
 		}
 	}
 }
@@ -280,116 +282,118 @@ PadView::ButtonAt(int32 index) const
 void
 PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 {
-	if (MainWindow* window = dynamic_cast<MainWindow*>(Window())) {
-		LaunchButton* nearestButton = button;
-		if (!nearestButton) {
-			// find the nearest button
-			for (int32 i = 0; (nearestButton = ButtonAt(i)); i++) {
-				if (nearestButton->Frame().top > where.y)
-					break;
-			}
+	MainWindow* window = dynamic_cast<MainWindow*>(Window());
+	if (window == NULL)
+		return;
+
+	LaunchButton* nearestButton = button;
+	if (!nearestButton) {
+		// find the nearest button
+		for (int32 i = 0; (nearestButton = ButtonAt(i)); i++) {
+			if (nearestButton->Frame().top > where.y)
+				break;
 		}
-		BPopUpMenu* menu = new BPopUpMenu("launch popup", false, false);
-		// add button
-		BMessage* message = new BMessage(MSG_ADD_SLOT);
-		message->AddPointer("be:source", (void*)nearestButton);
-		BMenuItem* item = new BMenuItem("Add Button Here", message);
+	}
+	BPopUpMenu* menu = new BPopUpMenu("launch popup", false, false);
+	// add button
+	BMessage* message = new BMessage(MSG_ADD_SLOT);
+	message->AddPointer("be:source", (void*)nearestButton);
+	BMenuItem* item = new BMenuItem("Add Button Here", message);
+	item->SetTarget(window);
+	menu->AddItem(item);
+	// button options
+	if (button) {
+		// remove button
+		message = new BMessage(MSG_CLEAR_SLOT);
+		message->AddPointer("be:source", (void*)button);
+		item = new BMenuItem("Clear Button", message);
 		item->SetTarget(window);
 		menu->AddItem(item);
-		// button options
-		if (button) {
-			// remove button
-			message = new BMessage(MSG_CLEAR_SLOT);
-			message->AddPointer("be:source", (void*)button);
-			item = new BMenuItem("Clear Button", message);
-			item->SetTarget(window);
-			menu->AddItem(item);
-			// remove button
-			message = new BMessage(MSG_REMOVE_SLOT);
-			message->AddPointer("be:source", (void*)button);
-			item = new BMenuItem("Remove Button", message);
-			item->SetTarget(window);
-			menu->AddItem(item);
+		// remove button
+		message = new BMessage(MSG_REMOVE_SLOT);
+		message->AddPointer("be:source", (void*)button);
+		item = new BMenuItem("Remove Button", message);
+		item->SetTarget(window);
+		menu->AddItem(item);
 // TODO: disabled because Haiku does not yet support tool tips
-//			if (button->Ref()) {
-//				message = new BMessage(MSG_SET_DESCRIPTION);
-//				message->AddPointer("be:source", (void*)button);
-//				item = new BMenuItem("Set Description"B_UTF8_ELLIPSIS, message);
-//				item->SetTarget(window);
-//				menu->AddItem(item);
-//			}
-		}
-		menu->AddSeparatorItem();
-		// window settings
-		BMenu* settingsM = new BMenu("Settings");
-		settingsM->SetFont(be_plain_font);
-
-		const char* toggleLayoutLabel;
-		if (fButtonLayout->Orientation() == B_HORIZONTAL)
-			toggleLayoutLabel = "Vertical Layout";
-		else
-			toggleLayoutLabel = "Horizontal Layout";
-		item = new BMenuItem(toggleLayoutLabel, new BMessage(MSG_TOGGLE_LAYOUT));
-		item->SetTarget(this);
-		settingsM->AddItem(item);
-
-		uint32 what = window->Look() == B_BORDERED_WINDOW_LOOK ? MSG_SHOW_BORDER : MSG_HIDE_BORDER;
-		item = new BMenuItem("Show Window Border", new BMessage(what));
-		item->SetTarget(window);
-		item->SetMarked(what == MSG_HIDE_BORDER);
-		settingsM->AddItem(item);
-
-		item = new BMenuItem("Auto Raise", new BMessage(MSG_TOGGLE_AUTORAISE));
-		item->SetTarget(window);
-		item->SetMarked(window->AutoRaise());
-		settingsM->AddItem(item);
-
-		item = new BMenuItem("Show On All Workspaces", new BMessage(MSG_SHOW_ON_ALL_WORKSPACES));
-		item->SetTarget(window);
-		item->SetMarked(window->ShowOnAllWorkspaces());
-		settingsM->AddItem(item);
-
-		menu->AddItem(settingsM);
-
-		menu->AddSeparatorItem();
-
-		// pad commands
-		BMenu* padM = new BMenu("Pad");
-		padM->SetFont(be_plain_font);
-		// new pad
-		item = new BMenuItem("New", new BMessage(MSG_ADD_WINDOW));
-		item->SetTarget(be_app);
-		padM->AddItem(item);
-		// new pad
-		item = new BMenuItem("Clone", new BMessage(MSG_ADD_WINDOW));
-		item->SetTarget(window);
-		padM->AddItem(item);
-		padM->AddSeparatorItem();
-		// close
-		item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED));
-		item->SetTarget(window);
-		padM->AddItem(item);
-		menu->AddItem(padM);
-		// app commands
-		BMenu* appM = new BMenu("LaunchBox");
-		appM->SetFont(be_plain_font);
-		// about
-		item = new BMenuItem("About", new BMessage(B_ABOUT_REQUESTED));
-		item->SetTarget(be_app);
-		appM->AddItem(item);
-		// quit
-		item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED));
-		item->SetTarget(be_app);
-		appM->AddItem(item);
-		menu->AddItem(appM);
-		// finish popup
-		menu->SetAsyncAutoDestruct(true);
-		menu->SetFont(be_plain_font);
-		where = ConvertToScreen(where);
-		BRect mouseRect(where, where);
-		mouseRect.InsetBy(-4.0, -4.0);
-		menu->Go(where, true, false, mouseRect, true);
+//		if (button->Ref()) {
+//			message = new BMessage(MSG_SET_DESCRIPTION);
+//			message->AddPointer("be:source", (void*)button);
+//			item = new BMenuItem("Set Description"B_UTF8_ELLIPSIS, message);
+//			item->SetTarget(window);
+//			menu->AddItem(item);
+//		}
 	}
+	menu->AddSeparatorItem();
+	// window settings
+	BMenu* settingsM = new BMenu("Settings");
+	settingsM->SetFont(be_plain_font);
+
+	const char* toggleLayoutLabel;
+	if (fButtonLayout->Orientation() == B_HORIZONTAL)
+		toggleLayoutLabel = "Vertical Layout";
+	else
+		toggleLayoutLabel = "Horizontal Layout";
+	item = new BMenuItem(toggleLayoutLabel, new BMessage(MSG_TOGGLE_LAYOUT));
+	item->SetTarget(this);
+	settingsM->AddItem(item);
+
+	uint32 what = window->Look() == B_BORDERED_WINDOW_LOOK ? MSG_SHOW_BORDER : MSG_HIDE_BORDER;
+	item = new BMenuItem("Show Window Border", new BMessage(what));
+	item->SetTarget(window);
+	item->SetMarked(what == MSG_HIDE_BORDER);
+	settingsM->AddItem(item);
+
+	item = new BMenuItem("Auto Raise", new BMessage(MSG_TOGGLE_AUTORAISE));
+	item->SetTarget(window);
+	item->SetMarked(window->AutoRaise());
+	settingsM->AddItem(item);
+
+	item = new BMenuItem("Show On All Workspaces", new BMessage(MSG_SHOW_ON_ALL_WORKSPACES));
+	item->SetTarget(window);
+	item->SetMarked(window->ShowOnAllWorkspaces());
+	settingsM->AddItem(item);
+
+	menu->AddItem(settingsM);
+
+	menu->AddSeparatorItem();
+
+	// pad commands
+	BMenu* padM = new BMenu("Pad");
+	padM->SetFont(be_plain_font);
+	// new pad
+	item = new BMenuItem("New", new BMessage(MSG_ADD_WINDOW));
+	item->SetTarget(be_app);
+	padM->AddItem(item);
+	// new pad
+	item = new BMenuItem("Clone", new BMessage(MSG_ADD_WINDOW));
+	item->SetTarget(window);
+	padM->AddItem(item);
+	padM->AddSeparatorItem();
+	// close
+	item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED));
+	item->SetTarget(window);
+	padM->AddItem(item);
+	menu->AddItem(padM);
+	// app commands
+	BMenu* appM = new BMenu("LaunchBox");
+	appM->SetFont(be_plain_font);
+	// about
+	item = new BMenuItem("About", new BMessage(B_ABOUT_REQUESTED));
+	item->SetTarget(be_app);
+	appM->AddItem(item);
+	// quit
+	item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED));
+	item->SetTarget(be_app);
+	appM->AddItem(item);
+	menu->AddItem(appM);
+	// finish popup
+	menu->SetAsyncAutoDestruct(true);
+	menu->SetFont(be_plain_font);
+	where = ConvertToScreen(where);
+	BRect mouseRect(where, where);
+	mouseRect.InsetBy(-4.0, -4.0);
+	menu->Go(where, true, false, mouseRect, true);
 }
 
 // SetOrientation
