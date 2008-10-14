@@ -1,6 +1,6 @@
 /*
-** Copyright 2004, OpenBeOS. All Rights Reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2004-2008, Haiku Inc. All Rights Reserved.
+** Distributed under the terms of the MIT license.
 */
 #ifndef _SCROLL_VIEW_H
 #define _SCROLL_VIEW_H
