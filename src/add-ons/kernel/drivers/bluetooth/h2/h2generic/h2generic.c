@@ -22,10 +22,10 @@
 #include <bluetooth/HCI/btHCI_module.h>
 
 #define BT_DEBUG_THIS_MODULE
-#define MODULE_NAME "BT"
 #define SUBMODULE_NAME BLUETOOTH_DEVICE_DEVFS_NAME
-#define SUBMODULE_COLOR 31
+#define SUBMODULE_COLOR 35
 #include <btDebug.h>
+#include <btModules.h>
 
 #include "h2generic.h"
 #include "h2transactions.h"
@@ -38,8 +38,6 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 /* Modules */
 static char* usb_name = B_USB_MODULE_NAME;
 static char* hci_name = BT_HCI_MODULE_NAME;
-
-#define NET_BLUETOOTH_DEVICE_NAME "network/devices/bluetooth/v1" //move out!!
 static char* btDevices_name = NET_BLUETOOTH_DEVICE_NAME;
 
 
@@ -602,7 +600,7 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 		    snb_put(snbuf, params, size);
 
 			err = submit_tx_command(bdev, snbuf);
-			debugf("device launched %ld\n", err);
+			debugf("command launched %ld\n", err);
 		break;
 
 		case BT_UP:

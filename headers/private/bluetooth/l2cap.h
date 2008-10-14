@@ -32,7 +32,13 @@
 
 // TODO: from BSD compatibility layer
 #define htole16(x) (x)
+#define le16toh(x) (x)
+#define le32toh(x) (x)
+#define htole32(x) (x)
 
+#define HZ	1000000 // us per second TODO: move somewhere more generic
+#define bluetooth_l2cap_ertx_timeout (60*HZ)
+#define bluetooth_l2cap_rtx_timeout  (300*HZ)
 
 /*
  * Channel IDs are assigned relative to the instance of L2CAP node, i.e.
@@ -50,13 +56,13 @@
 
 /*
  * L2CAP signaling command ident's are assigned relative to the connection,
- * because there is only one signaling channel (cid == 0x01) for every 
- * connection. So up to 254 (0xff - 0x01) L2CAP commands can be pending at the 
+ * because there is only one signaling channel (cid == 0x01) for every
+ * connection. So up to 254 (0xff - 0x01) L2CAP commands can be pending at the
  * same time for the same connection.
  */
-#define L2CAP_NULL_IDENT		0x00        /* DO NOT USE THIS IDENT */ 
-#define L2CAP_FIRST_IDENT		0x01        /* dynamically alloc. (start) */ 
-#define L2CAP_LAST_IDENT		0xff        /* dynamically alloc. (end) */ 
+#define L2CAP_NULL_IDENT		0x00        /* DO NOT USE THIS IDENT */
+#define L2CAP_FIRST_IDENT		0x01        /* dynamically alloc. (start) */
+#define L2CAP_LAST_IDENT		0xff        /* dynamically alloc. (end) */
 
 
 /* L2CAP MTU */
@@ -122,7 +128,7 @@
 #define L2CAP_OPT_FLUSH_TIMO		0x02
 #define L2CAP_OPT_FLUSH_TIMO_SIZE	sizeof(uint16)
 #define L2CAP_OPT_QOS			0x03
-#define L2CAP_OPT_QOS_SIZE		sizeof(l2cap_qos)
+#define L2CAP_OPT_QOS_SIZE		sizeof(l2cap_flow_t)
 /* 0x4 - 0xff - reserved for future use */
 
 /* L2CAP Information request type codes */
@@ -291,5 +297,5 @@ typedef union {
 typedef l2cap_info_rsp_data_t *	l2cap_info_rsp_data_p;
 
 
-#endif 
+#endif
 

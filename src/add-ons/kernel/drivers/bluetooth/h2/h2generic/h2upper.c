@@ -113,8 +113,7 @@ post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
 
 				snb_park(&bdev->snetBufferRecycleTrash, snbuf);
 
-	        }
-	        else {
+	        } else {
 	            flowf("ERROR:bluetooth_server not found for posting\n");
 	            err = B_NAME_NOT_FOUND;
 	        }
@@ -125,12 +124,10 @@ post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
    	        btDevices->receive_data(bdev->ndev, &nbuf);
 			
         }
-    }
-    else {
+    } else {
         // TODO: Upper layer comunication
         /* Not freeing because is being used by upper layers*/    
     }
-
     
     return err;
 }
