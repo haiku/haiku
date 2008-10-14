@@ -1787,7 +1787,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 		// to access the rightmost pixel of the source with a weighting
 		// of 255. This in turn will trigger an optimization in the loop
 		// that also prevents out of bounds access.
-		float index = i * (srcWidth - 1) / ((srcWidth * xScale) - 1);
+		float index = i * (srcWidth - 1) / (srcWidth * xScale - 1);
 		// round down to get the left pixel
 		xWeights[i].index = (uint16)index;
 		xWeights[i].weight = 255 - (uint16)((index - xWeights[i].index) * 255);
@@ -1805,7 +1805,7 @@ Painter::_DrawBitmapBilinearCopy32(agg::rendering_buffer& srcBuffer,
 		// to access the bottommost pixel of the source with a weighting
 		// of 255. This in turn will trigger an optimization in the loop
 		// that also prevents out of bounds access.
-		float index = i * (srcHeight - 1) / ((srcHeight * yScale) - 1);
+		float index = i * (srcHeight - 1) / (srcHeight * yScale - 1);
 		// round down to get the top pixel
 		yWeights[i].index = (uint16)index;
 		yWeights[i].weight = 255 - (uint16)((index - yWeights[i].index) * 255);
