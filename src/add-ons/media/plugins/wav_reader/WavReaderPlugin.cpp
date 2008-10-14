@@ -31,7 +31,7 @@
 #include "WavReaderPlugin.h"
 #include "RawFormats.h"
 
-#define TRACE_WAVE_READER
+//#define TRACE_WAVE_READER
 #ifdef TRACE_WAVE_READER
   #define TRACE printf
 #else
