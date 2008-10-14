@@ -66,15 +66,11 @@ private:
 	int64			fFileSize;
 	int64			fDataStart;
 	int64			fDataSize;
+	
+	wave_format_ex	fMetaData;
 
 	int64			fFrameCount;
-	int32			fChannelCount;
 	int32			fFrameRate;
-	int32			fSampleRate;
-	uint16			fBitsPerSample;
-	uint16			fFormatCode;
-	uint16			fBlockAlign;
-	uint32			fAvgBytesPerSec;
 };
 
 

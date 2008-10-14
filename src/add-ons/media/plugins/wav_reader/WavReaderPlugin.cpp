@@ -31,18 +31,23 @@
 #include "WavReaderPlugin.h"
 #include "RawFormats.h"
 
-//#define TRACE_WAVE_READER
+#define TRACE_WAVE_READER
 #ifdef TRACE_WAVE_READER
   #define TRACE printf
 #else
   #define TRACE(a...)
 #endif
 
+#define ERROR(a...) fprintf(stderr, a)
+
 #define BUFFER_SIZE	16384 // must be > 5200 for mp3 decoder to work
 
 #define FOURCC(a,b,c,d)	((((uint32)(d)) << 24) | (((uint32)(c)) << 16) | (((uint32)(b)) << 8) | ((uint32)(a)))
 #define UINT16(a) 		((uint16)B_LENDIAN_TO_HOST_INT16((a)))
 #define UINT32(a) 		((uint32)B_LENDIAN_TO_HOST_INT32((a)))
+
+// This Reader only deals with CBR audio
+// My understanding is that no WAV file will have VBR audio anyway
 
 struct wavdata
 {
@@ -144,25 +149,25 @@ WavReader::Sniff(int32 *streamCount)
 	while (pos + sizeof(chunk_struct) <= fFileSize) {
 		chunk_struct chunk;
 		if (sizeof(chunk) != Source()->ReadAt(pos, &chunk, sizeof(chunk))) {
-			TRACE("WavReader::Sniff: chunk header reading failed\n");
+			ERROR("WavReader::Sniff: chunk header reading failed\n");
 			return B_ERROR;
 		}
 		pos += sizeof(chunk);
 		if (UINT32(chunk.len) == 0) {
-			TRACE("WavReader::Sniff: Error: chunk of size 0 found\n");
+			ERROR("WavReader::Sniff: Error: chunk of size 0 found\n");
 			return B_ERROR;
 		}
 		switch (UINT32(chunk.fourcc)) {
 			case FOURCC('f','m','t',' '):
 				if (UINT32(chunk.len) >= sizeof(format)) {
 					if (sizeof(format) != Source()->ReadAt(pos, &format, sizeof(format))) {
-						TRACE("WavReader::Sniff: format chunk reading failed\n");
+						ERROR("WavReader::Sniff: format chunk reading failed\n");
 						break;
 					}
 					foundFmt = true;
 					if (UINT32(chunk.len) >= sizeof(format_ext) && UINT16(format.format_tag) == 0xfffe) {
 						if (sizeof(format_ext) != Source()->ReadAt(pos, &format_ext, sizeof(format_ext))) {
-							TRACE("WavReader::Sniff: format extensible chunk reading failed\n");
+							ERROR("WavReader::Sniff: format extensible chunk reading failed\n");
 							break;
 						}
 						foundFmtExt = true;
@@ -172,7 +177,7 @@ WavReader::Sniff(int32 *streamCount)
 			case FOURCC('f','a','c','t'):
 				if (UINT32(chunk.len) >= sizeof(fact)) {
 					if (sizeof(fact) != Source()->ReadAt(pos, &fact, sizeof(fact))) {
-						TRACE("WavReader::Sniff: fact chunk reading failed\n");
+						ERROR("WavReader::Sniff: fact chunk reading failed\n");
 						break;
 					}
 					foundFact = true;
@@ -201,11 +206,11 @@ WavReader::Sniff(int32 *streamCount)
 	}
 
 	if (!foundFmt) {
-		TRACE("WavReader::Sniff: couldn't find format chunk\n");
+		ERROR("WavReader::Sniff: couldn't find format chunk\n");
 		return B_ERROR;
 	}
 	if (!foundData) {
-		TRACE("WavReader::Sniff: couldn't find data chunk\n");
+		ERROR("WavReader::Sniff: couldn't find data chunk\n");
 		return B_ERROR;
 	}
 	
@@ -227,38 +232,39 @@ WavReader::Sniff(int32 *streamCount)
 		TRACE("  sample_length         %ld\n", UINT32(fact.sample_length));
 	}
 
-	fChannelCount = UINT16(format.channels);
-	fSampleRate = UINT32(format.samples_per_sec);
-	fBlockAlign = UINT16(format.block_align);
-	fBitsPerSample = UINT16(format.bits_per_sample);
-	if (fBitsPerSample == 0) {
-		printf("WavReader::Sniff: Error, bits_per_sample = 0 calculating\n");
-		fBitsPerSample = fBlockAlign * 8 / fChannelCount;
+	fMetaData.extra_size = 0;
+	fMetaData.channels = UINT16(format.channels);
+	fMetaData.samples_per_sec = UINT32(format.samples_per_sec);
+	fMetaData.block_align = UINT16(format.block_align);
+	fMetaData.bits_per_sample = UINT16(format.bits_per_sample);
+	if (fMetaData.bits_per_sample == 0) {
+		fMetaData.bits_per_sample = fMetaData.block_align * 8 / fMetaData.channels;
+		ERROR("WavReader::Sniff: Error, bits_per_sample = 0 calculating as %d\n",fMetaData.bits_per_sample);
 	}
-	fFrameRate = fSampleRate * fChannelCount;
+	fFrameRate = fMetaData.samples_per_sec * fMetaData.channels;
 	
-	fAvgBytesPerSec = format.avg_bytes_per_sec;
+	fMetaData.avg_bytes_per_sec = format.avg_bytes_per_sec;
 	
 	// fact.sample_length is really no of samples for all channels
-	fFrameCount = foundFact ? UINT32(fact.sample_length) / fChannelCount : 0;
-	fFormatCode = UINT16(format.format_tag);
-	if (fFormatCode == 0xfffe && foundFmtExt)
-		fFormatCode = (format_ext.guid[1] << 8) | format_ext.guid[0];
+	fFrameCount = foundFact ? UINT32(fact.sample_length) / fMetaData.channels : 0;
+	fMetaData.format_tag = UINT16(format.format_tag);
+	if (fMetaData.format_tag == 0xfffe && foundFmtExt)
+		fMetaData.format_tag = (format_ext.guid[1] << 8) | format_ext.guid[0];
 
-	int min_align = (fFormatCode == 0x0001) ? (fBitsPerSample * fChannelCount + 7) / 8 : 1;
-	if (fBlockAlign < min_align)
-		fBlockAlign = min_align;
+	int min_align = (fMetaData.format_tag == 0x0001) ? (fMetaData.bits_per_sample * fMetaData.channels + 7) / 8 : 1;
+	if (fMetaData.block_align < min_align)
+		fMetaData.block_align = min_align;
 
 	TRACE("  fDataStart     %Ld\n", fDataStart);
 	TRACE("  fDataSize      %Ld\n", fDataSize);
-	TRACE("  fChannelCount  %ld\n", fChannelCount);
-	TRACE("  fSampleRate    %ld\n", fSampleRate);
+	TRACE("  Channels       %d\n", fMetaData.channels);
+	TRACE("  SampleRate     %ld\n", fMetaData.samples_per_sec);
 	TRACE("  fFrameRate     %ld\n", fFrameRate);
 	TRACE("  fFrameCount    %Ld\n", fFrameCount);
-	TRACE("  fBitsPerSample %d\n", fBitsPerSample);
-	TRACE("  fBlockAlign    %d\n", fBlockAlign);
+	TRACE("  BitsPerSample  %d\n", fMetaData.bits_per_sample);
+	TRACE("  BlockAlign     %d\n", fMetaData.block_align);
 	TRACE("  min_align      %d\n", min_align);
-	TRACE("  fFormatCode    0x%04x\n", fFormatCode);
+	TRACE("  Format     0x%04x\n", fMetaData.format_tag);
 	
 	// XXX fact.sample_length contains duration of encoded files?
 
@@ -291,18 +297,18 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 
 	data->position = 0;
 	data->datasize = fDataSize;
-	data->fps = fSampleRate;
-	data->buffersize = (BUFFER_SIZE / fBlockAlign) * fBlockAlign;
+	data->fps = fMetaData.samples_per_sec;
+	data->buffersize = (BUFFER_SIZE / fMetaData.block_align) * fMetaData.block_align;
 	data->buffer = malloc(data->buffersize);
-	data->framecount = fFrameCount ? fFrameCount : (8 * fDataSize) / (fChannelCount * fBitsPerSample);
-	data->raw = fFormatCode == 0x0001;
+	data->framecount = fFrameCount ? fFrameCount : (8 * fDataSize) / (fMetaData.channels * fMetaData.bits_per_sample);
+	data->raw = fMetaData.format_tag == 0x0001;
 
-	if (!fAvgBytesPerSec) {
-		fAvgBytesPerSec = fSampleRate * fBlockAlign;
+	if (!fMetaData.avg_bytes_per_sec) {
+		fMetaData.avg_bytes_per_sec = fMetaData.samples_per_sec * fMetaData.block_align;
 	}
 
-	data->duration = (data->datasize * 1000000LL) / fAvgBytesPerSec;
-	data->bitrate = fAvgBytesPerSec * 8;
+	data->duration = (data->datasize * 1000000LL) / fMetaData.avg_bytes_per_sec;
+	data->bitrate = fMetaData.avg_bytes_per_sec * 8;
 
 	TRACE(" raw        %s\n", data->raw ? "true" : "false");
 	TRACE(" framecount %Ld\n", data->framecount);
@@ -312,16 +318,16 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 	TRACE(" buffersize %ld\n", data->buffersize);
 	
 	BMediaFormats formats;
-	if (fFormatCode == 0x0001) {
+	if (fMetaData.format_tag == 0x0001) {
 		// a raw PCM format
 		media_format_description description;
 		description.family = B_BEOS_FORMAT_FAMILY;
 		description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
 		formats.GetFormatFor(description, &data->format);
 		// Really SampleRate
-		data->format.u.raw_audio.frame_rate = fSampleRate;
-		data->format.u.raw_audio.channel_count = fChannelCount;
-		switch (fBitsPerSample) {
+		data->format.u.raw_audio.frame_rate = fMetaData.samples_per_sec;
+		data->format.u.raw_audio.channel_count = fMetaData.channels;
+		switch (fMetaData.bits_per_sample) {
 			case 8:
 				data->format.u.raw_audio.format = B_AUDIO_FORMAT_UINT8;
 				break;
@@ -335,7 +341,8 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 				data->format.u.raw_audio.format = B_AUDIO_FORMAT_INT32;
 				break;
 			default:
-				TRACE("WavReader::AllocateCookie: unhandled bits per sample %d\n", fBitsPerSample);
+				ERROR("WavReader::AllocateCookie: unhandled bits per sample %d\n", fMetaData.bits_per_sample);
+				delete data;
 				return B_ERROR;
 		}
 		data->format.u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
@@ -345,13 +352,22 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 		// some encoded format
 		media_format_description description;
 		description.family = B_WAV_FORMAT_FAMILY;
-		description.u.wav.codec = fFormatCode;
+		description.u.wav.codec = fMetaData.format_tag;
 		formats.GetFormatFor(description, &data->format);
 		// Really SampleRate
-		data->format.u.encoded_audio.output.frame_rate = fSampleRate;
-		data->format.u.encoded_audio.output.channel_count = fChannelCount;
+		data->format.u.encoded_audio.bit_rate = data->bitrate;
+		data->format.u.encoded_audio.output.frame_rate = fMetaData.samples_per_sec;
+		data->format.u.encoded_audio.output.channel_count = fMetaData.channels;
 	}
 	
+	printf("SetMetaData called with size %ld\n",sizeof(wave_format_ex));
+	
+	if (data->format.SetMetaData(&fMetaData, sizeof(wave_format_ex)) != B_OK) {
+		ERROR("WavReader::Failed to SetMetaData\n");
+		delete data;
+		return B_ERROR;
+	}
+
 	// store the cookie
 	*cookie = data;
 	return B_OK;
@@ -380,8 +396,8 @@ WavReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 	*frameCount = data->framecount;
 	*duration = data->duration;
 	*format = data->format;
-	*infoBuffer = 0;
-	*infoSize = 0;
+	*infoBuffer = &fMetaData;
+	*infoSize = sizeof(wave_format_ex);
 	return B_OK;
 }
 
@@ -404,7 +420,7 @@ WavReader::CalculateNewPosition(void *cookie,
 		return B_ERROR;
 	}
 
-	*position = (*position / fBlockAlign) * fBlockAlign; // round down to a block start
+	*position = (*position / fMetaData.block_align) * fMetaData.block_align; // round down to a block start
 
 	TRACE(", position %Ld ", *position);
 
@@ -415,7 +431,7 @@ WavReader::CalculateNewPosition(void *cookie,
 	TRACE("newframe %Ld\n", *frame);
 	
 	if (*position < 0 || *position > data->datasize) {
-		printf("WavReader::CalculateNewPosition invalid position %Ld\n", *position);
+		ERROR("WavReader::CalculateNewPosition invalid position %Ld\n", *position);
 		return B_ERROR;
 	}
 	
@@ -476,12 +492,12 @@ WavReader::GetNextChunk(void *cookie,
 	if (maxreadsize < readsize)
 		readsize = maxreadsize;
 	if (readsize == 0) {
-		printf("WavReader::GetNextChunk: LAST BUFFER ERROR at time %9Ld\n",mediaHeader->start_time);
+		ERROR("WavReader::GetNextChunk: LAST BUFFER ERROR at time %9Ld\n",mediaHeader->start_time);
 		return B_LAST_BUFFER_ERROR;
 	}
 			
 	if (readsize != Source()->ReadAt(fDataStart + data->position, data->buffer, readsize)) {
-		printf("WavReader::GetNextChunk: unexpected read error at position %9Ld\n",fDataStart + data->position);
+		ERROR("WavReader::GetNextChunk: unexpected read error at position %9Ld\n",fDataStart + data->position);
 		return B_ERROR;
 	}
 	

@@ -48,6 +48,16 @@ struct format_struct
 	uint16 bits_per_sample;
 }; 
 
+struct wave_format_ex {
+	uint16 format_tag;
+	uint16 channels;
+	uint32 samples_per_sec;
+	uint32 avg_bytes_per_sec;
+	uint16 block_align;
+	uint16 bits_per_sample;
+	uint16 extra_size;
+} _PACKED;
+
 struct format_struct_extensible
 { 
 	uint16 format_tag; // 0xfffe for extensible format
