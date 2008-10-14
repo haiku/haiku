@@ -17,7 +17,7 @@
 #include "avcodec.h"
 
 #undef TRACE
-#define TRACE_AV_CODEC
+//#define TRACE_AV_CODEC
 #ifdef TRACE_AV_CODEC
 #	define TRACE(x...)	printf(x)
 #else
@@ -172,11 +172,13 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 						"(id = %d)!!!\n",gCodecTable[i].id);
 					return B_ERROR;
 				}
+				TRACE("avCodec: found decoder %s\n",fCodec->name);
 				
 				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY) {
+					TRACE("Additional MetaData required for WAV format. Should contain %ld has %ld\n",sizeof(wave_format_ex),infoSize);
 					const wave_format_ex *wfmt_data
-						= (const wave_format_ex *)ioEncodedFormat->MetaData();
-					int wfmt_size = ioEncodedFormat->MetaDataSize();
+						= (const wave_format_ex *)infoBuffer;
+					size_t wfmt_size = infoSize;
 					if (wfmt_data && wfmt_size) {
 						fBlockAlign = wfmt_data->block_align;
 						fExtraDataSize = wfmt_data->extra_size;
