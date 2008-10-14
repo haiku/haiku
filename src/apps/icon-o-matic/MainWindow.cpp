@@ -1058,19 +1058,19 @@ MainWindow::_CreateMenuBar(BRect frame)
 	BMenu* filterModeMenu = new BMenu("Snap to Grid");
 	BMessage* message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_OFF);
-	filterModeMenu->AddItem(new BMenuItem("Off", message));
+	filterModeMenu->AddItem(new BMenuItem("Off", message, '4'));
 
 	message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_64);
-	filterModeMenu->AddItem(new BMenuItem("64 x 64", message));
+	filterModeMenu->AddItem(new BMenuItem("64 x 64", message, '3'));
 
 	message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_32);
-	filterModeMenu->AddItem(new BMenuItem("32 x 32", message));
+	filterModeMenu->AddItem(new BMenuItem("32 x 32", message, '2'));
 
 	message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_16);
-	filterModeMenu->AddItem(new BMenuItem("16 x 16", message));
+	filterModeMenu->AddItem(new BMenuItem("16 x 16", message, '1'));
 
 	filterModeMenu->ItemAt(0)->SetMarked(true);
 	filterModeMenu->SetRadioMode(true);
