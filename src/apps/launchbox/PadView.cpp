@@ -25,7 +25,7 @@
 bigtime_t kActivationDelay = 40000;
 
 enum {
-	MSG_TOGGLE_LAYOUT	= 'tgll'
+	MSG_TOGGLE_LAYOUT			= 'tgll'
 };
 
 // constructor
@@ -148,45 +148,51 @@ PadView::MessageReceived(BMessage* message)
 void
 PadView::MouseDown(BPoint where)
 {
-	if (BWindow* window = Window()) {
-		BRegion region;
-		GetClippingRegion(&region);
-		if (region.Contains(where)) {
-			bool handle = true;
-			for (int32 i = 0; BView* child = ChildAt(i); i++) {
-				if (child->Frame().Contains(where)) {
-					handle = false;
-					break;
-				}
-			}
-			if (handle) {
-				if (BMessage* message = window->CurrentMessage()) {
-					uint32 buttons;
-					message->FindInt32("buttons", (int32*)&buttons);
-					if (buttons & B_SECONDARY_MOUSE_BUTTON) {
-						BRect r = Bounds();
-						r.InsetBy(2.0, 2.0);
-						r.top += 6.0;
-						if (r.Contains(where)) {
-							DisplayMenu(where);
-						} else {
-							// sends the window to the back
-							window->Activate(false);
-						}
-					} else {
-						if (system_time() - fClickTime < kActivationDelay) {
-							window->Minimize(true);
-							fClickTime = 0;
-						} else {
-							window->Activate();
-							fDragOffset = ConvertToScreen(where) - window->Frame().LeftTop();
-							fDragging = true;
-							SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-							fClickTime = system_time();
-						}
-					}
-				}
-			}
+	BWindow* window = Window();
+	if (window == NULL)
+		return;
+
+	BRegion region;
+	GetClippingRegion(&region);
+	if (!region.Contains(where))
+		return;
+
+	bool handle = true;
+	for (int32 i = 0; BView* child = ChildAt(i); i++) {
+		if (child->Frame().Contains(where)) {
+			handle = false;
+			break;
+		}
+	}
+	if (!handle)
+		return;
+
+	BMessage* message = window->CurrentMessage();
+	if (message == NULL)
+		return;
+
+	uint32 buttons;
+	message->FindInt32("buttons", (int32*)&buttons);
+	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+		BRect r = Bounds();
+		r.InsetBy(2.0, 2.0);
+		r.top += 6.0;
+		if (r.Contains(where)) {
+			DisplayMenu(where);
+		} else {
+			// sends the window to the back
+			window->Activate(false);
+		}
+	} else {
+		if (system_time() - fClickTime < kActivationDelay) {
+			window->Minimize(true);
+			fClickTime = 0;
+		} else {
+			window->Activate();
+			fDragOffset = ConvertToScreen(where) - window->Frame().LeftTop();
+			fDragging = true;
+			SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+			fClickTime = system_time();
 		}
 	}
 }
