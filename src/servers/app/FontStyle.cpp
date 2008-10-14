@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,10 +25,11 @@ static BLocker sFontLock("font lock");
 /*!
 	\brief Constructor
 	\param filepath path to a font file
-	\param face FreeType handle for the font file after it is loaded - it will be kept open until the FontStyle is destroied
+	\param face FreeType handle for the font file after it is loaded - it will
+		   be kept open until the FontStyle is destroyed
 */
 FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
-	: //BLocker(BString("FontStyle_").Append(face->style_name).String()),
+	:
 	fFreeTypeFace(face),
 	fName(face->style_name),
 	fPath(path),
@@ -74,7 +75,8 @@ FontStyle::Hash() const
 bool
 FontStyle::CompareTo(Hashable& other) const
 {
-	// our hash values are unique (unless you have more than 65536 font families installed...)
+	// our hash values are unique (unless you have more than 65536 font
+	// families installed...)
 	return Hash() == other.Hash();
 }
 
@@ -103,7 +105,7 @@ FontStyle::GetHeight(float size, font_height& height) const
 
 
 /*!
-	\brief Returns the path to the style's font file 
+	\brief Returns the path to the style's font file
 	\return The style's font file path
 */
 const char*
@@ -153,7 +155,7 @@ FontStyle::Flags() const
 
 /*!
 	\brief Updates the given face to match the one from this style
-	
+
 	The specified font face often doesn't match the exact face of
 	a style. This method will preserve the attributes of the face
 	that this style does not alter, and will only update the
@@ -192,27 +194,6 @@ FontStyle::UpdateFace(FT_Face face)
 	fFreeTypeFace = face;
 	return B_OK;
 }
-
-
-/*!
-	\brief Converts an ASCII character to Unicode for the style
-	\param c An ASCII character
-	\return A Unicode value for the character
-*/
-
-// TODO: Re-enable when I understand how the FT2 Cache system changed from
-// 2.1.4 to 2.1.8
-/*
-int16
-FontStyle::ConvertToUnicode(uint16 c)
-{
-	FT_Face f;
-	if(FTC_Manager_LookupFace(ftmanager,(FTC_FaceID)cachedface,&f)!=0)
-		return 0;
-	
-	return FT_Get_Char_Index(f,c);
-}
-*/
 
 
 void

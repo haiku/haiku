@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -50,13 +50,14 @@ class FontKey : public Hashable {
 /*!
 	\class FontStyle FontStyle.h
 	\brief Object used to represent a font style
-	
+
 	FontStyle objects help abstract a lot of the font engine details while
 	still offering plenty of information the style in question.
 */
-class FontStyle : public ReferenceCounting, public Hashable/*, public BLocker*/ {
+class FontStyle : public ReferenceCounting, public Hashable {
 	public:
-						FontStyle(node_ref& nodeRef, const char* path, FT_Face face);
+						FontStyle(node_ref& nodeRef, const char* path,
+							FT_Face face);
 		virtual			~FontStyle();
 
 		virtual uint32	Hash() const;
@@ -73,7 +74,8 @@ class FontStyle : public ReferenceCounting, public Hashable/*, public BLocker*/ 
 	\return true if fixed, false if not
 */
 		bool			IsFixedWidth() const
-							{ return fFreeTypeFace->face_flags & FT_FACE_FLAG_FIXED_WIDTH; }
+							{ return fFreeTypeFace->face_flags
+								& FT_FACE_FLAG_FIXED_WIDTH; }
 
 /*	\fn bool FontStyle::IsFullAndHalfFixed()
 	\brief Determines whether the font has 2 different, fixed, widths.
@@ -88,14 +90,16 @@ class FontStyle : public ReferenceCounting, public Hashable/*, public BLocker*/ 
 	\return true if scalable, false if not
 */
 		bool			IsScalable() const
-							{ return fFreeTypeFace->face_flags & FT_FACE_FLAG_SCALABLE; }
+							{ return fFreeTypeFace->face_flags
+								& FT_FACE_FLAG_SCALABLE; }
 /*!
 	\fn bool FontStyle::HasKerning(void)
 	\brief Determines whether the font has kerning information
 	\return true if kerning info is available, false if not
 */
 		bool			HasKerning() const
-							{ return fFreeTypeFace->face_flags & FT_FACE_FLAG_KERNING; }
+							{ return fFreeTypeFace->face_flags
+								& FT_FACE_FLAG_KERNING; }
 /*!
 	\fn bool FontStyle::HasTuned(void)
 	\brief Determines whether the font contains strikes
@@ -150,10 +154,6 @@ class FontStyle : public ReferenceCounting, public Hashable/*, public BLocker*/ 
 							{ return fFreeTypeFace; }
 
 		status_t		UpdateFace(FT_Face face);
-
-// TODO: Re-enable when I understand how the FT2 Cache system changed from
-// 2.1.4 to 2.1.8
-//		int16			ConvertToUnicode(uint16 c);
 
 	private:
 		friend class FontFamily;
