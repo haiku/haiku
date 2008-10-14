@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,8 +31,8 @@ using std::nothrow;
 
 // constructor
 IconButton::IconButton(const char* name, uint32 id, const char* label,
-					   BMessage* message, BHandler* target)
-	: BView(BRect(0.0, 0.0, 10.0, 10.0), name, B_FOLLOW_NONE, B_WILL_DRAW),
+		BMessage* message, BHandler* target)
+	: BView(name, B_WILL_DRAW),
 	  BInvoker(message, target),
 	  fButtonState(STATE_ENABLED),
 	  fID(id),
@@ -69,9 +69,8 @@ void
 IconButton::AttachedToWindow()
 {
 	SetTarget(fTargetCache);
-	if (!Target()) {
+	if (!Target())
 		SetTarget(Window());
-	}
 }
 
 // Draw
@@ -169,14 +168,15 @@ IconButton::Draw(BRect area)
 void
 IconButton::MouseDown(BPoint where)
 {
-	if (IsValid()) {
-		if (_HasFlags(STATE_ENABLED)/* && !_HasFlags(STATE_FORCE_PRESSED)*/) {
-			if (Bounds().Contains(where)) {
-				SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-				_AddFlags(STATE_PRESSED | STATE_TRACKING);
-			} else {
-				_ClearFlags(STATE_PRESSED | STATE_TRACKING);
-			}
+	if (!IsValid())
+		return;
+
+	if (_HasFlags(STATE_ENABLED)/* && !_HasFlags(STATE_FORCE_PRESSED)*/) {
+		if (Bounds().Contains(where)) {
+			SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+			_AddFlags(STATE_PRESSED | STATE_TRACKING);
+		} else {
+			_ClearFlags(STATE_PRESSED | STATE_TRACKING);
 		}
 	}
 }
@@ -185,42 +185,44 @@ IconButton::MouseDown(BPoint where)
 void
 IconButton::MouseUp(BPoint where)
 {
-	if (IsValid()) {
-//		if (!_HasFlags(STATE_FORCE_PRESSED)) {
-			if (_HasFlags(STATE_ENABLED) && _HasFlags(STATE_PRESSED) && Bounds().Contains(where))
-				Invoke();
-			else if (Bounds().Contains(where))
-				_AddFlags(STATE_INSIDE);
-			_ClearFlags(STATE_PRESSED | STATE_TRACKING);
-//		}
-	}
+	if (!IsValid())
+		return;
+
+//	if (!_HasFlags(STATE_FORCE_PRESSED)) {
+		if (_HasFlags(STATE_ENABLED) && _HasFlags(STATE_PRESSED) && Bounds().Contains(where))
+			Invoke();
+		else if (Bounds().Contains(where))
+			_AddFlags(STATE_INSIDE);
+		_ClearFlags(STATE_PRESSED | STATE_TRACKING);
+//	}
 }
 
 // MouseMoved
 void
 IconButton::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 {
-	if (IsValid()) {
-		uint32 buttons = 0;
-		Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
-		// catch a mouse up event that we might have missed
-		if (!buttons && _HasFlags(STATE_PRESSED)) {
-			MouseUp(where);
-			return;
-		}
-		if (buttons && !_HasFlags(STATE_TRACKING))
-			return;
-		if ((transit == B_INSIDE_VIEW || transit == B_ENTERED_VIEW)
-			&& _HasFlags(STATE_ENABLED))
-			_AddFlags(STATE_INSIDE);
-		else 
-			_ClearFlags(STATE_INSIDE);
-		if (_HasFlags(STATE_TRACKING)) {
-			if (Bounds().Contains(where))
-				_AddFlags(STATE_PRESSED);
-			else
-				_ClearFlags(STATE_PRESSED);
-		}
+	if (!IsValid())
+		return;
+
+	uint32 buttons = 0;
+	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
+	// catch a mouse up event that we might have missed
+	if (!buttons && _HasFlags(STATE_PRESSED)) {
+		MouseUp(where);
+		return;
+	}
+	if (buttons && !_HasFlags(STATE_TRACKING))
+		return;
+	if ((transit == B_INSIDE_VIEW || transit == B_ENTERED_VIEW)
+		&& _HasFlags(STATE_ENABLED))
+		_AddFlags(STATE_INSIDE);
+	else 
+		_ClearFlags(STATE_INSIDE);
+	if (_HasFlags(STATE_TRACKING)) {
+		if (Bounds().Contains(where))
+			_AddFlags(STATE_PRESSED);
+		else
+			_ClearFlags(STATE_PRESSED);
 	}
 }
 
@@ -294,41 +296,42 @@ IconButton::IsPressed() const
 status_t
 IconButton::SetIcon(const char* pathToBitmap)
 {
+	if (pathToBitmap == NULL)
+		return B_BAD_VALUE;
+
 	status_t status = B_BAD_VALUE;
-	if (pathToBitmap) {
-		BBitmap* fileBitmap = NULL;
-		// try to load bitmap from either relative or absolute path
-		BEntry entry(pathToBitmap, true);
-		if (!entry.Exists()) {
-			app_info info;
-			status = be_app->GetAppInfo(&info);
+	BBitmap* fileBitmap = NULL;
+	// try to load bitmap from either relative or absolute path
+	BEntry entry(pathToBitmap, true);
+	if (!entry.Exists()) {
+		app_info info;
+		status = be_app->GetAppInfo(&info);
+		if (status == B_OK) {
+			BEntry app_entry(&info.ref, true);
+			BPath path;
+			app_entry.GetPath(&path);
+			status = path.InitCheck();
 			if (status == B_OK) {
-				BEntry app_entry(&info.ref, true);
-				BPath path;
-				app_entry.GetPath(&path);
-				status = path.InitCheck();
+				status = path.GetParent(&path);
 				if (status == B_OK) {
-					status = path.GetParent(&path);
-					if (status == B_OK) {
-						status = path.Append(pathToBitmap, true);
-						if (status == B_OK)
-							fileBitmap = BTranslationUtils::GetBitmap(path.Path());
-						else 
-							printf("IconButton::SetIcon() - path.Append() failed: %s\n", strerror(status));
-					} else
-						printf("IconButton::SetIcon() - path.GetParent() failed: %s\n", strerror(status));
+					status = path.Append(pathToBitmap, true);
+					if (status == B_OK)
+						fileBitmap = BTranslationUtils::GetBitmap(path.Path());
+					else 
+						printf("IconButton::SetIcon() - path.Append() failed: %s\n", strerror(status));
 				} else
-					printf("IconButton::SetIcon() - path.InitCheck() failed: %s\n", strerror(status));
+					printf("IconButton::SetIcon() - path.GetParent() failed: %s\n", strerror(status));
 			} else
-				printf("IconButton::SetIcon() - be_app->GetAppInfo() failed: %s\n", strerror(status));
+				printf("IconButton::SetIcon() - path.InitCheck() failed: %s\n", strerror(status));
 		} else
-			fileBitmap = BTranslationUtils::GetBitmap(pathToBitmap);
-		if (fileBitmap) {
-			status = _MakeBitmaps(fileBitmap);
-			delete fileBitmap;
-		} else
-			status = B_ERROR;
-	}
+			printf("IconButton::SetIcon() - be_app->GetAppInfo() failed: %s\n", strerror(status));
+	} else
+		fileBitmap = BTranslationUtils::GetBitmap(pathToBitmap);
+	if (fileBitmap) {
+		status = _MakeBitmaps(fileBitmap);
+		delete fileBitmap;
+	} else
+		status = B_ERROR;
 	return status;
 }
 
@@ -378,7 +381,7 @@ IconButton::SetIcon(const BMimeType* fileType, bool small)
 // SetIcon
 status_t
 IconButton::SetIcon(const unsigned char* bitsFromQuickRes,
-					uint32 width, uint32 height, color_space format, bool convertToBW)
+	uint32 width, uint32 height, color_space format, bool convertToBW)
 {
 	status_t status = B_BAD_VALUE;
 	if (bitsFromQuickRes && width > 0 && height > 0) {
@@ -485,15 +488,15 @@ IconButton::Bitmap() const
 bool
 IconButton::DrawBorder() const
 {
-	return (IsEnabled() && (_HasFlags(STATE_INSIDE) || _HasFlags(STATE_TRACKING))
-			|| _HasFlags(STATE_FORCE_PRESSED));
+	return (IsEnabled() && (_HasFlags(STATE_INSIDE)
+		|| _HasFlags(STATE_TRACKING)) || _HasFlags(STATE_FORCE_PRESSED));
 }
 
 // DrawNormalBorder
 void
 IconButton::DrawNormalBorder(BRect r, rgb_color background,
-							 rgb_color shadow, rgb_color darkShadow,
-							 rgb_color lightShadow, rgb_color light)
+	rgb_color shadow, rgb_color darkShadow,
+	rgb_color lightShadow, rgb_color light)
 {
 	_DrawFrame(r, shadow, darkShadow, light, lightShadow);
 }
@@ -501,8 +504,8 @@ IconButton::DrawNormalBorder(BRect r, rgb_color background,
 // DrawPressedBorder
 void
 IconButton::DrawPressedBorder(BRect r, rgb_color background,
-							rgb_color shadow, rgb_color darkShadow,
-							rgb_color lightShadow, rgb_color light)
+	rgb_color shadow, rgb_color darkShadow,
+	rgb_color lightShadow, rgb_color light)
 {
 	_DrawFrame(r, shadow, light, darkShadow, background);
 }
@@ -511,7 +514,8 @@ IconButton::DrawPressedBorder(BRect r, rgb_color background,
 bool
 IconButton::IsValid() const
 {
-	return (fNormalBitmap && fDisabledBitmap && fClickedBitmap && fDisabledClickedBitmap
+	return (fNormalBitmap && fDisabledBitmap && fClickedBitmap
+		&& fDisabledClickedBitmap
 		&& fNormalBitmap->IsValid()
 		&& fDisabledBitmap->IsValid()
 		&& fClickedBitmap->IsValid()
@@ -556,7 +560,8 @@ IconButton::SetEnabled(bool enabled)
 BBitmap*
 IconButton::_ConvertToRGB32(const BBitmap* bitmap) const
 {
-	BBitmap* convertedBitmap = new(nothrow) BBitmap(bitmap->Bounds(), B_BITMAP_ACCEPTS_VIEWS, B_RGBA32);
+	BBitmap* convertedBitmap = new(nothrow) BBitmap(bitmap->Bounds(),
+		B_BITMAP_ACCEPTS_VIEWS, B_RGBA32);
 	if (convertedBitmap && convertedBitmap->IsValid()) {
 		memset(convertedBitmap->Bits(), 0, convertedBitmap->BitsLength());
 		BView* helper = new BView(bitmap->Bounds(), "helper",
