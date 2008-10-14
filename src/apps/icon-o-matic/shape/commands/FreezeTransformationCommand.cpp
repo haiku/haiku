@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "Shape.h"
 #include "Style.h"
 #include "VectorPath.h"

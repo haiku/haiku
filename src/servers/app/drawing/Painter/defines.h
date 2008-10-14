@@ -20,6 +20,9 @@
 #include <agg_scanline_bin.h>
 #include <agg_scanline_p.h>
 #include <agg_scanline_u.h>
+#include <agg_span_allocator.h>
+#include <agg_span_gradient.h>
+#include <agg_span_interpolator_linear.h>
 #include <agg_rendering_buffer.h>
 
 #include "agg_rasterizer_scanline_aa_subpix.h"
@@ -67,7 +70,6 @@
 
 	typedef agg::rasterizer_scanline_aa<>						rasterizer_type;
 	typedef agg::rasterizer_scanline_aa_subpix<>				rasterizer_subpix_type;
-
 
 #endif // DEFINES_H
 

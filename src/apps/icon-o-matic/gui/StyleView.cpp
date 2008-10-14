@@ -23,7 +23,7 @@
 
 #include "CommandStack.h"
 #include "CurrentColor.h"
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "GradientControl.h"
 #include "SetColorCommand.h"
 #include "SetGradientCommand.h"
@@ -438,7 +438,7 @@ StyleView::_SetStyleType(int32 type)
 void
 StyleView::_SetGradientType(int32 type)
 {
-	fGradientControl->Gradient()->SetType((gradient_type)type);
+	fGradientControl->Gradient()->SetType((gradients_type)type);
 }
 
 // _AdoptCurrentColor

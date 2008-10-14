@@ -18,7 +18,7 @@
 # define kWhite (rgb_color){ 255, 255, 255, 255 }
 #endif // ICON_O_MATIC
 
-#include "Gradient.h"
+#include "GradientTransformable.h"
 
 using std::nothrow;
 

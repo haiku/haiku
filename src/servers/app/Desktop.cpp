@@ -976,7 +976,7 @@ Desktop::_SetWorkspace(int32 index)
 			// is up-to-date
 			if (window->Frame().LeftTop() != position) {
 				BPoint offset = position - window->Frame().LeftTop();
-				window->MoveBy(offset.x, offset.y);
+				window->MoveBy((int32)offset.x, (int32)offset.y);
 			}
 			continue;
 		}
@@ -1822,7 +1822,7 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 			window->Anchor(workspace).position += BPoint(x, y);
 			_WindowChanged(window);
 		} else
-			window->MoveBy(x, y);
+			window->MoveBy((int32)x, (int32)y);
 
 		UnlockAllWindows();
 		return;
@@ -1834,7 +1834,7 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	// no more drawing for DirectWindows
 	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
 
-	window->MoveBy(x, y);
+	window->MoveBy((int32)x, (int32)y);
 
 	BRegion background;
 	_RebuildClippingForAllWindows(background);
@@ -1842,7 +1842,7 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	// construct the region that is possible to be blitted
 	// to move the contents of the window
 	BRegion copyRegion(window->VisibleRegion());
-	copyRegion.OffsetBy(-x, -y);
+	copyRegion.OffsetBy((int32)-x, (int32)-y);
 	copyRegion.IntersectWith(&newDirtyRegion);
 		// newDirtyRegion == the windows old visible region
 
@@ -1850,7 +1850,7 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	// moved into the dirty region (for now)
 	newDirtyRegion.Include(&window->VisibleRegion());
 
-	GetDrawingEngine()->CopyRegion(&copyRegion, x, y);
+	GetDrawingEngine()->CopyRegion(&copyRegion, (int32)x, (int32)y);
 
 	// allow DirectWindows to draw again after the visual
 	// content is at the new location
@@ -1858,7 +1858,7 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 
 	// in the dirty region, exclude the parts that we
 	// could move by blitting
-	copyRegion.OffsetBy(x, y);
+	copyRegion.OffsetBy((int32)x, (int32)y);
 	newDirtyRegion.Exclude(&copyRegion);
 
 	MarkDirty(newDirtyRegion);
@@ -1876,7 +1876,7 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 		return;
 
 	if (!window->IsVisible()) {
-		window->ResizeBy(x, y, NULL);
+		window->ResizeBy((int32)x, (int32)y, NULL);
 		UnlockAllWindows();
 		return;
 	}
@@ -1888,7 +1888,7 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	// it is shrunk in "previouslyOccupiedRegion"
 	BRegion previouslyOccupiedRegion(window->VisibleRegion());
 
-	window->ResizeBy(x, y, &newDirtyRegion);
+	window->ResizeBy((int32)x, (int32)y, &newDirtyRegion);
 
 	BRegion background;
 	_RebuildClippingForAllWindows(background);

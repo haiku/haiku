@@ -18,7 +18,7 @@
 #include "ui_defines.h"
 #include "support_ui.h"
 
-#include "Gradient.h"
+#include "GradientTransformable.h"
 
 // constructor
 GradientControl::GradientControl(BMessage* message, BHandler* target)

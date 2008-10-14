@@ -44,6 +44,12 @@
 #include <View.h>
 #include <Window.h>
 
+#include <GradientLinear.h>
+#include <GradientRadial.h>
+#include <GradientRadialFocus.h>
+#include <GradientDiamond.h>
+#include <GradientConic.h>
+
 #include <math.h>
 #include <new>
 #include <stdio.h>
@@ -2574,6 +2580,15 @@ BView::FillEllipse(BPoint center, float xRadius, float yRadius,
 
 
 void
+BView::FillEllipse(BPoint center, float xRadius, float yRadius,
+	const BGradient& gradient)
+{
+	FillEllipse(BRect(center.x - xRadius, center.y - yRadius,
+					  center.x + xRadius, center.y + yRadius), gradient);
+}
+
+
+void
 BView::FillEllipse(BRect rect, ::pattern pattern)
 {
 	if (fOwner == NULL)
@@ -2585,6 +2600,23 @@ BView::FillEllipse(BRect rect, ::pattern pattern)
 	fOwner->fLink->StartMessage(AS_FILL_ELLIPSE);
 	fOwner->fLink->Attach<BRect>(rect);
 
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::FillEllipse(BRect rect, const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+	
+	_CheckLockAndSwitchCurrent();
+	
+	fOwner->fLink->StartMessage(AS_FILL_ELLIPSE_GRADIENT);
+	fOwner->fLink->Attach<BRect>(rect);
+	fOwner->fLink->Attach<gradient_type>(gradient.Type());
+	fOwner->fLink->AttachGradient(gradient);
+	
 	_FlushIfNotInTransaction();
 }
 
@@ -2627,6 +2659,15 @@ BView::FillArc(BPoint center,float xRadius, float yRadius, float startAngle,
 
 
 void
+BView::FillArc(BPoint center,float xRadius, float yRadius, float startAngle,
+	float arcAngle, const BGradient& gradient)
+{
+	FillArc(BRect(center.x - xRadius, center.y - yRadius, center.x + xRadius,
+				  center.y + yRadius), startAngle, arcAngle, gradient);
+}
+
+
+void
 BView::FillArc(BRect rect, float startAngle, float arcAngle,
 	::pattern pattern)
 {
@@ -2641,6 +2682,26 @@ BView::FillArc(BRect rect, float startAngle, float arcAngle,
 	fOwner->fLink->Attach<float>(startAngle);
 	fOwner->fLink->Attach<float>(arcAngle);
 
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::FillArc(BRect rect, float startAngle, float arcAngle,
+	const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+	
+	_CheckLockAndSwitchCurrent();
+	
+	fOwner->fLink->StartMessage(AS_FILL_ARC_GRADIENT);
+	fOwner->fLink->Attach<BRect>(rect);
+	fOwner->fLink->Attach<float>(startAngle);
+	fOwner->fLink->Attach<float>(arcAngle);
+	fOwner->fLink->Attach<gradient_type>(gradient.Type());
+	fOwner->fLink->AttachGradient(gradient);
+	
 	_FlushIfNotInTransaction();
 }
 
@@ -2679,6 +2740,26 @@ BView::FillBezier(BPoint *controlPoints, ::pattern pattern)
 	fOwner->fLink->Attach<BPoint>(controlPoints[2]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[3]);
 
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::FillBezier(BPoint *controlPoints, const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+	
+	_CheckLockAndSwitchCurrent();
+	
+	fOwner->fLink->StartMessage(AS_FILL_BEZIER_GRADIENT);
+	fOwner->fLink->Attach<BPoint>(controlPoints[0]);
+	fOwner->fLink->Attach<BPoint>(controlPoints[1]);
+	fOwner->fLink->Attach<BPoint>(controlPoints[2]);
+	fOwner->fLink->Attach<BPoint>(controlPoints[3]);
+	fOwner->fLink->Attach<gradient_type>(gradient.Type());
+	fOwner->fLink->AttachGradient(gradient);
+	
 	_FlushIfNotInTransaction();
 }
 
@@ -2762,6 +2843,33 @@ BView::FillPolygon(const BPolygon *polygon, ::pattern pattern)
 
 
 void
+BView::FillPolygon(const BPolygon *polygon, const BGradient& gradient)
+{
+	if (polygon == NULL
+		|| polygon->fCount <= 2
+		|| fOwner == NULL)
+		return;
+	
+	_CheckLockAndSwitchCurrent();
+	
+	if (fOwner->fLink->StartMessage(AS_FILL_POLYGON_GRADIENT,
+									polygon->fCount * sizeof(BPoint)
+									+ sizeof(BRect) + sizeof(int32)) == B_OK) {
+		fOwner->fLink->Attach<BRect>(polygon->Frame());
+		fOwner->fLink->Attach<int32>(polygon->fCount);
+		fOwner->fLink->Attach(polygon->fPoints,
+							  polygon->fCount * sizeof(BPoint));
+		fOwner->fLink->Attach<gradient_type>(gradient.Type());
+		fOwner->fLink->AttachGradient(gradient);
+		
+		_FlushIfNotInTransaction();
+	} else {
+		fprintf(stderr, "ERROR: Can't send polygon to app_server!\n");
+	}
+}
+
+
+void
 BView::FillPolygon(const BPoint *ptArray, int32 numPts, ::pattern pattern)
 {
 	if (!ptArray)
@@ -2769,6 +2877,18 @@ BView::FillPolygon(const BPoint *ptArray, int32 numPts, ::pattern pattern)
 
 	BPolygon polygon(ptArray, numPts);
 	FillPolygon(&polygon, pattern);
+}
+
+
+void
+BView::FillPolygon(const BPoint *ptArray, int32 numPts,
+	const BGradient& gradient)
+{
+	if (!ptArray)
+		return;
+	
+	BPolygon polygon(ptArray, numPts);
+	FillPolygon(&polygon, gradient);
 }
 
 
@@ -2783,6 +2903,20 @@ BView::FillPolygon(const BPoint *ptArray, int32 numPts, BRect bounds,
 
 	polygon.MapTo(polygon.Frame(), bounds);
 	FillPolygon(&polygon, p);
+}
+
+
+void
+BView::FillPolygon(const BPoint *ptArray, int32 numPts, BRect bounds,
+	const BGradient& gradient)
+{
+	if (!ptArray)
+		return;
+	
+	BPolygon polygon(ptArray, numPts);
+	
+	polygon.MapTo(polygon.Frame(), bounds);
+	FillPolygon(&polygon, gradient);
 }
 
 
@@ -2819,6 +2953,28 @@ BView::FillRect(BRect rect, ::pattern pattern)
 	fOwner->fLink->StartMessage(AS_FILL_RECT);
 	fOwner->fLink->Attach<BRect>(rect);
 
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::FillRect(BRect rect, const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+	
+	// NOTE: ensuring compatibility with R5,
+	// invalid rects are not filled, they are stroked though!
+	if (!rect.IsValid())
+		return;
+	
+	_CheckLockAndSwitchCurrent();
+	
+	fOwner->fLink->StartMessage(AS_FILL_RECT_GRADIENT);
+	fOwner->fLink->Attach<BRect>(rect);
+	fOwner->fLink->Attach<gradient_type>(gradient.Type());
+	fOwner->fLink->AttachGradient(gradient);
+	
 	_FlushIfNotInTransaction();
 }
 
@@ -2863,6 +3019,26 @@ BView::FillRoundRect(BRect rect, float xRadius, float yRadius,
 
 
 void
+BView::FillRoundRect(BRect rect, float xRadius, float yRadius,
+	const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+	
+	_CheckLockAndSwitchCurrent();
+	
+	fOwner->fLink->StartMessage(AS_FILL_ROUNDRECT_GRADIENT);
+	fOwner->fLink->Attach<BRect>(rect);
+	fOwner->fLink->Attach<float>(xRadius);
+	fOwner->fLink->Attach<float>(yRadius);
+	fOwner->fLink->Attach<gradient_type>(gradient.Type());
+	fOwner->fLink->AttachGradient(gradient);
+	
+	_FlushIfNotInTransaction();
+}
+
+
+void
 BView::FillRegion(BRegion *region, ::pattern pattern)
 {
 	if (region == NULL || fOwner == NULL)
@@ -2875,6 +3051,23 @@ BView::FillRegion(BRegion *region, ::pattern pattern)
 	fOwner->fLink->StartMessage(AS_FILL_REGION);
 	fOwner->fLink->AttachRegion(*region);
 
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::FillRegion(BRegion *region, const BGradient& gradient)
+{
+	if (region == NULL || fOwner == NULL)
+		return;
+	
+	_CheckLockAndSwitchCurrent();
+	
+	fOwner->fLink->StartMessage(AS_FILL_REGION_GRADIENT);
+	fOwner->fLink->AttachRegion(*region);
+	fOwner->fLink->Attach<gradient_type>(gradient.Type());
+	fOwner->fLink->AttachGradient(gradient);
+	
 	_FlushIfNotInTransaction();
 }
 
@@ -2980,6 +3173,46 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3, pattern p)
 
 void
 BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+	const BGradient& gradient)
+{
+	if (fOwner) {
+		// we construct the smallest rectangle that contains the 3 points
+		// for the 1st point
+		BRect bounds(pt1, pt1);
+		
+		// for the 2nd point
+		if (pt2.x < bounds.left)
+			bounds.left = pt2.x;
+		
+		if (pt2.y < bounds.top)
+			bounds.top = pt2.y;
+		
+		if (pt2.x > bounds.right)
+			bounds.right = pt2.x;
+		
+		if (pt2.y > bounds.bottom)
+			bounds.bottom = pt2.y;
+		
+		// for the 3rd point
+		if (pt3.x < bounds.left)
+			bounds.left = pt3.x;
+		
+		if (pt3.y < bounds.top)
+			bounds.top = pt3.y;
+		
+		if (pt3.x > bounds.right)
+			bounds.right = pt3.x;
+		
+		if (pt3.y > bounds.bottom)
+			bounds.bottom = pt3.y;
+		
+		FillTriangle(pt1, pt2, pt3, bounds, gradient);
+	}
+}
+
+
+void
+BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	BRect bounds, ::pattern pattern)
 {
 	if (fOwner == NULL)
@@ -2994,6 +3227,26 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	fOwner->fLink->Attach<BPoint>(pt3);
 	fOwner->fLink->Attach<BRect>(bounds);
 
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+	BRect bounds, const BGradient& gradient)
+{
+	if (fOwner == NULL)
+		return;
+	
+	_CheckLockAndSwitchCurrent();
+	fOwner->fLink->StartMessage(AS_FILL_TRIANGLE_GRADIENT);
+	fOwner->fLink->Attach<BPoint>(pt1);
+	fOwner->fLink->Attach<BPoint>(pt2);
+	fOwner->fLink->Attach<BPoint>(pt3);
+	fOwner->fLink->Attach<BRect>(bounds);
+	fOwner->fLink->Attach<gradient_type>(gradient.Type());
+	fOwner->fLink->AttachGradient(gradient);
+	
 	_FlushIfNotInTransaction();
 }
 
@@ -3069,6 +3322,31 @@ BView::FillShape(BShape *shape, ::pattern pattern)
 	fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(int32));
 	fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
 
+	_FlushIfNotInTransaction();
+}
+
+
+void
+BView::FillShape(BShape *shape, const BGradient& gradient)
+{
+	if (shape == NULL || fOwner == NULL)
+		return;
+	
+	shape_data *sd = (shape_data *)(shape->fPrivateData);
+	if (sd->opCount == 0 || sd->ptCount == 0)
+		return;
+	
+	_CheckLockAndSwitchCurrent();
+	
+	fOwner->fLink->StartMessage(AS_FILL_SHAPE_GRADIENT);
+	fOwner->fLink->Attach<BRect>(shape->Bounds());
+	fOwner->fLink->Attach<int32>(sd->opCount);
+	fOwner->fLink->Attach<int32>(sd->ptCount);
+	fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(int32));
+	fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
+	fOwner->fLink->Attach<gradient_type>(gradient.Type());
+	fOwner->fLink->AttachGradient(gradient);
+	
 	_FlushIfNotInTransaction();
 }
 
@@ -5170,5 +5448,3 @@ BView::_PrintTree()
 		}
 	}
 }
-
-

@@ -6,7 +6,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include "Gradient.h"
+#include "GradientTransformable.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -16,59 +16,6 @@
 #ifdef ICON_O_MATIC
 #  include "support.h"
 #endif
-
-// constructor
-color_step::color_step(const rgb_color c, float o)
-{
-	color.red = c.red;
-	color.green = c.green;
-	color.blue = c.blue;
-	color.alpha = c.alpha;
-	offset = o;
-}
-
-// constructor
-color_step::color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o)
-{
-	color.red = r;
-	color.green = g;
-	color.blue = b;
-	color.alpha = a;
-	offset = o;
-}
-
-// constructor
-color_step::color_step(const color_step& other)
-{
-	color.red = other.color.red;
-	color.green = other.color.green;
-	color.blue = other.color.blue;
-	color.alpha = other.color.alpha;
-	offset = other.offset;
-}
-
-// constructor
-color_step::color_step()
-{
-	color.red = 0;
-	color.green = 0;
-	color.blue = 0;
-	color.alpha = 255;
-	offset = 0;
-}
-
-// operator!=
-bool
-color_step::operator!=(const color_step& other) const
-{
-	return color.red != other.color.red ||
-		   color.green != other.color.green ||
-		   color.blue != other.color.blue ||
-		   color.alpha != other.color.alpha ||
-		   offset != other.offset;
-}
-
-// #pragma mark -
 
 // constructor
 Gradient::Gradient(bool empty)
@@ -398,7 +345,7 @@ Gradient::ColorAtFast(int32 index) const
 
 // SetType
 void
-Gradient::SetType(gradient_type type)
+Gradient::SetType(gradients_type type)
 {
 	if (fType != type) {
 		fType = type;
@@ -575,7 +522,7 @@ Gradient::FitToBounds(const BRect& bounds)
 
 // string_for_type
 static const char*
-string_for_type(gradient_type type)
+string_for_type(gradients_type type)
 {
 	switch (type) {
 		case GRADIENT_LINEAR:

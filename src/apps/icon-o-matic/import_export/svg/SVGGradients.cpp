@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Gradient.h"
+#include "GradientTransformable.h"
 
 #include "SVGGradients.h"
 

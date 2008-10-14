@@ -202,14 +202,23 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_STROKE_TRIANGLE: string = "AS_STROKE_TRIANGLE"; break;
 
 		case AS_FILL_ARC: string = "AS_FILL_ARC"; break;
+		case AS_FILL_ARC_GRADIENT: string = "AS_FILL_ARC_GRADIENT"; break;
 		case AS_FILL_BEZIER: string = "AS_FILL_BEZIER"; break;
+		case AS_FILL_BEZIER_GRADIENT: string = "AS_FILL_BEZIER_GRADIENT"; break;
 		case AS_FILL_ELLIPSE: string = "AS_FILL_ELLIPSE"; break;
+		case AS_FILL_ELLIPSE_GRADIENT: string = "AS_FILL_ELLIPSE_GRADIENT"; break;
 		case AS_FILL_POLYGON: string = "AS_FILL_POLYGON"; break;
+		case AS_FILL_POLYGON_GRADIENT: string = "AS_FILL_POLYGON_GRADIENT"; break;
 		case AS_FILL_RECT: string = "AS_FILL_RECT"; break;
+		case AS_FILL_RECT_GRADIENT: string = "AS_FILL_RECT_GRADIENT"; break;
 		case AS_FILL_REGION: string = "AS_FILL_REGION"; break;
+		case AS_FILL_REGION_GRADIENT: string = "AS_FILL_REGION_GRADIENT"; break;
 		case AS_FILL_ROUNDRECT: string = "AS_FILL_ROUNDRECT"; break;
+		case AS_FILL_ROUNDRECT_GRADIENT: string = "AS_FILL_ROUNDRECT_GRADIENT"; break;
 		case AS_FILL_SHAPE: string = "AS_FILL_SHAPE"; break;
+		case AS_FILL_SHAPE_GRADIENT: string = "AS_FILL_SHAPE_GRADIENT"; break;
 		case AS_FILL_TRIANGLE: string = "AS_FILL_TRIANGLE"; break;
+		case AS_FILL_TRIANGLE_GRADIENT: string = "AS_FILL_TRIANGLE_GRADIENT"; break;
 
 		case AS_DRAW_STRING: string = "AS_DRAW_STRING"; break;
 		case AS_DRAW_STRING_WITH_DELTA: string = "AS_DRAW_STRING_WITH_DELTA"; break;

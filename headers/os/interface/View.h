@@ -16,6 +16,7 @@
 #include <InterfaceDefs.h>
 #include <Rect.h>
 #include <Size.h>
+#include <Gradient.h>
 
 
 // mouse button
@@ -317,7 +318,13 @@ public:
 								pattern p = B_SOLID_HIGH);
 			void			FillPolygon(const BPoint* ptArray, int32 numPts,
 								BRect bounds, pattern p = B_SOLID_HIGH);
-
+			void			FillPolygon(const BPolygon* polygon,
+								const BGradient& gradient);
+			void			FillPolygon(const BPoint* ptArray, int32 numPts,
+								const BGradient& gradient);
+			void			FillPolygon(const BPoint* ptArray, int32 numPts,
+								BRect bounds, const BGradient& gradient);
+	
 			void			StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 								BRect bounds, pattern p = B_SOLID_HIGH);
 			void			StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
@@ -326,17 +333,26 @@ public:
 								pattern p = B_SOLID_HIGH);
 			void			FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 								BRect bounds, pattern p = B_SOLID_HIGH);
+			void			FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+								const BGradient& gradient);
+			void			FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
+								BRect bounds, const BGradient& gradient);
 
 			void			StrokeRect(BRect r, pattern p = B_SOLID_HIGH);
 			void			FillRect(BRect r, pattern p = B_SOLID_HIGH);
+			void			FillRect(BRect r, const BGradient& gradient);
 			void			FillRegion(BRegion* region,
 								pattern p = B_SOLID_HIGH);
+			void			FillRegion(BRegion* region,
+							   const BGradient& gradient);
 			void			InvertRect(BRect r);
 
 			void			StrokeRoundRect(BRect r, float xRadius,
 								float yRadius, pattern p = B_SOLID_HIGH);
 			void			FillRoundRect(BRect r, float xRadius, float yRadius,
 								pattern p = B_SOLID_HIGH);
+			void			FillRoundRect(BRect r, float xRadius, float yRadius,
+								const BGradient& gradient);
 
 			void			StrokeEllipse(BPoint center, float xRadius,
 								float yRadius, pattern p = B_SOLID_HIGH);
@@ -344,7 +360,10 @@ public:
 			void			FillEllipse(BPoint center, float xRadius,
 								float yRadius, pattern p = B_SOLID_HIGH);
 			void			FillEllipse(BRect r, pattern p = B_SOLID_HIGH);
-
+			void			FillEllipse(BPoint center, float xRadius,
+								float yRadius, const BGradient& gradient);
+			void			FillEllipse(BRect r, const BGradient& gradient);
+	
 			void			StrokeArc(BPoint center, float xRadius,
 								float yRadius, float startAngle, float arcAngle,
 								pattern p = B_SOLID_HIGH);
@@ -355,15 +374,23 @@ public:
 								pattern p = B_SOLID_HIGH);
 			void			FillArc(BRect r, float startAngle, float arcAngle,
 								pattern p = B_SOLID_HIGH);
-
+			void			FillArc(BPoint center, float xRadius, float yRadius,
+								float startAngle, float arcAngle,
+								const BGradient& gradient);
+			void			FillArc(BRect r, float startAngle, float arcAngle,
+								const BGradient& gradient);
+	
 			void			StrokeBezier(BPoint* controlPoints,
 								pattern p = B_SOLID_HIGH);
 			void			FillBezier(BPoint* controlPoints,
 								pattern p = B_SOLID_HIGH);
+			void			FillBezier(BPoint* controlPoints,
+							   const BGradient& gradient);
 	
 			void			StrokeShape(BShape* shape,
 								pattern p = B_SOLID_HIGH);
 			void			FillShape(BShape* shape, pattern p = B_SOLID_HIGH);
+			void			FillShape(BShape* shape, const BGradient& gradient);
 
 			void			CopyBits(BRect src, BRect dst);
 

@@ -36,7 +36,7 @@ StaticLibrary libicon.a :
 	VectorPath.cpp
 
 	# style
-	Gradient.cpp
+	GradientTransformable.cpp
 	Style.cpp
 	StyleContainer.cpp
 

@@ -51,6 +51,11 @@
 #include <DirectWindow.h>
 #include <TokenSpace.h>
 #include <View.h>
+#include <GradientLinear.h>
+#include <GradientRadial.h>
+#include <GradientRadialFocus.h>
+#include <GradientDiamond.h>
+#include <GradientConic.h>
 
 #include <new>
 
@@ -58,6 +63,7 @@ using std::nothrow;
 
 //#define TRACE_SERVER_WINDOW
 //#define TRACE_SERVER_WINDOW_MESSAGES
+//#define TRACE_SERVER_GRADIENTS
 //#define PROFILE_MESSAGE_LOOP
 
 
@@ -73,6 +79,13 @@ using std::nothrow;
 #	define DTRACE(x) printf x
 #else
 #	define DTRACE(x) ;
+#endif
+
+#ifdef TRACE_SERVER_GRADIENTS
+#	include <OS.h>
+#	define GTRACE(x) debug_printf x
+#else
+#	define GTRACE(x) ;
 #endif
 
 #ifdef PROFILE_MESSAGE_LOOP
@@ -2120,6 +2133,23 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			drawingEngine->FillRect(rect);
 			break;
 		}
+		case AS_FILL_RECT_GRADIENT:
+		{
+			GTRACE(("ServerWindow %s: Message AS_FILL_RECT_GRADIENT\n", Title()));
+
+			BRect rect;
+			link.Read<BRect>(&rect);
+			gradient_type gradientType;
+			link.Read<gradient_type>(&gradientType);
+			BGradient* gradient = _GetNewGradientForType(gradientType);
+			if (gradient) {
+				link.ReadGradient(gradient);
+				fCurrentView->ConvertToScreenForDrawing(&rect);
+				fCurrentView->ConvertToScreenForDrawing(gradient);
+				drawingEngine->FillRectGradient(rect, *gradient);
+			}
+			break;
+		}
 		case AS_VIEW_DRAW_BITMAP:
 		{
 			DTRACE(("ServerWindow %s: Message AS_VIEW_DRAW_BITMAP: View name: %s\n", fTitle, fCurrentView->Name()));
@@ -2159,6 +2189,26 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			drawingEngine->DrawArc(r, angle, span, code == AS_FILL_ARC);
 			break;
 		}
+		case AS_FILL_ARC_GRADIENT:
+		{
+			GTRACE(("ServerWindow %s: Message AS_FILL_ARC_GRADIENT\n", Title()));
+
+			float angle, span;
+			BRect r;
+			link.Read<BRect>(&r);
+			link.Read<float>(&angle);
+			link.Read<float>(&span);
+			gradient_type gradientType;
+			link.Read<gradient_type>(&gradientType);
+			BGradient* gradient = _GetNewGradientForType(gradientType);
+			if (gradient) {
+				link.ReadGradient(gradient);			
+				fCurrentView->ConvertToScreenForDrawing(&r);
+				fCurrentView->ConvertToScreenForDrawing(gradient);
+				drawingEngine->FillArcGradient(r, angle, span, *gradient);
+			}
+			break;
+		}
 		case AS_STROKE_BEZIER:
 		case AS_FILL_BEZIER:
 		{
@@ -2173,6 +2223,25 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			drawingEngine->DrawBezier(pts, code == AS_FILL_BEZIER);
 			break;
 		}
+		case AS_FILL_BEZIER_GRADIENT:
+		{
+			GTRACE(("ServerWindow %s: Message AS_FILL_BEZIER_GRADIENT\n", Title()));
+			
+			BPoint pts[4];
+			for (int32 i = 0; i < 4; i++) {
+				link.Read<BPoint>(&(pts[i]));
+				fCurrentView->ConvertToScreenForDrawing(&pts[i]);
+			}
+			gradient_type gradientType;
+			link.Read<gradient_type>(&gradientType);
+			BGradient* gradient = _GetNewGradientForType(gradientType);
+			if (gradient) {
+				link.ReadGradient(gradient);			
+				fCurrentView->ConvertToScreenForDrawing(gradient);
+				drawingEngine->FillBezierGradient(pts, *gradient);
+			}
+			break;
+		}
 		case AS_STROKE_ELLIPSE:
 		case AS_FILL_ELLIPSE:
 		{
@@ -2183,6 +2252,23 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			drawingEngine->DrawEllipse(rect, code == AS_FILL_ELLIPSE);
+			break;
+		}
+		case AS_FILL_ELLIPSE_GRADIENT:
+		{
+			GTRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE_GRADIENT\n", Title()));
+			
+			BRect rect;
+			link.Read<BRect>(&rect);
+			gradient_type gradientType;
+			link.Read<gradient_type>(&gradientType);
+			BGradient* gradient = _GetNewGradientForType(gradientType);
+			if (gradient) {
+				link.ReadGradient(gradient);			
+				fCurrentView->ConvertToScreenForDrawing(&rect);
+				fCurrentView->ConvertToScreenForDrawing(gradient);
+				drawingEngine->FillEllipseGradient(rect, *gradient);
+			}
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
@@ -2198,6 +2284,26 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			drawingEngine->DrawRoundRect(rect, xrad, yrad, code == AS_FILL_ROUNDRECT);
+			break;
+		}
+		case AS_FILL_ROUNDRECT_GRADIENT:
+		{
+			GTRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT_GRADIENT\n", Title()));
+			
+			BRect rect;
+			float xrad,yrad;
+			link.Read<BRect>(&rect);
+			link.Read<float>(&xrad);
+			link.Read<float>(&yrad);
+			gradient_type gradientType;
+			link.Read<gradient_type>(&gradientType);
+			BGradient* gradient = _GetNewGradientForType(gradientType);
+			if (gradient) {
+				link.ReadGradient(gradient);
+				fCurrentView->ConvertToScreenForDrawing(&rect);
+				fCurrentView->ConvertToScreenForDrawing(gradient);
+				drawingEngine->FillRoundRectGradient(rect, xrad, yrad, *gradient);
+			}
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
@@ -2217,6 +2323,28 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			drawingEngine->DrawTriangle(pts, rect, code == AS_FILL_TRIANGLE);
+			break;
+		}
+		case AS_FILL_TRIANGLE_GRADIENT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE_GRADIENT\n", Title()));
+			
+			BPoint pts[3];
+			BRect rect;
+			for (int32 i = 0; i < 3; i++) {
+				link.Read<BPoint>(&(pts[i]));
+				fCurrentView->ConvertToScreenForDrawing(&pts[i]);
+			}
+			link.Read<BRect>(&rect);
+			gradient_type gradientType;
+			link.Read<gradient_type>(&gradientType);
+			BGradient* gradient = _GetNewGradientForType(gradientType);
+			if (gradient) {
+				link.ReadGradient(gradient);			
+				fCurrentView->ConvertToScreenForDrawing(&rect);
+				fCurrentView->ConvertToScreenForDrawing(gradient);
+				drawingEngine->FillTriangleGradient(pts, rect, *gradient);
+			}
 			break;
 		}
 		case AS_STROKE_POLYGON:
@@ -2241,6 +2369,35 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 				drawingEngine->DrawPolygon(pointList, pointCount, polyFrame,
 					code == AS_FILL_POLYGON, isClosed && pointCount > 2);
+			}
+			delete[] pointList;
+			break;
+		}
+		case AS_FILL_POLYGON_GRADIENT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_FILL_POLYGON_GRADIENT\n", Title()));
+			
+			BRect polyFrame;
+			bool isClosed = true;
+			int32 pointCount;
+			link.Read<BRect>(&polyFrame);
+			link.Read<int32>(&pointCount);
+			
+			BPoint* pointList = new(nothrow) BPoint[pointCount];
+			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK) {
+				gradient_type gradientType;
+				link.Read<gradient_type>(&gradientType);
+				BGradient* gradient = _GetNewGradientForType(gradientType);
+				if (gradient) {
+					link.ReadGradient(gradient);
+					for (int32 i = 0; i < pointCount; i++)
+						fCurrentView->ConvertToScreenForDrawing(&pointList[i]);
+					fCurrentView->ConvertToScreenForDrawing(&polyFrame);
+					fCurrentView->ConvertToScreenForDrawing(gradient);
+					
+					drawingEngine->FillPolygonGradient(pointList, pointCount,
+						polyFrame, *gradient, isClosed && pointCount > 2);
+				}
 			}
 			delete[] pointList;
 			break;
@@ -2279,6 +2436,45 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			delete[] ptList;
 			break;
 		}
+		case AS_FILL_SHAPE_GRADIENT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_FILL_SHAPE_GRADIENT\n", Title()));
+			
+			BRect shapeFrame;
+			int32 opCount;
+			int32 ptCount;
+			
+			link.Read<BRect>(&shapeFrame);
+			link.Read<int32>(&opCount);
+			link.Read<int32>(&ptCount);
+			
+			uint32* opList = new(nothrow) uint32[opCount];
+			BPoint* ptList = new(nothrow) BPoint[ptCount];
+			if (link.Read(opList, opCount * sizeof(uint32)) >= B_OK &&
+				link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
+				
+				// this might seem a bit weird, but under R5, the shapes
+				// are always offset by the current pen location
+				BPoint penLocation = fCurrentView->CurrentState()->PenLocation();
+				for (int32 i = 0; i < ptCount; i++) {
+					ptList[i] += penLocation;
+					fCurrentView->ConvertToScreenForDrawing(&ptList[i]);
+				}
+				gradient_type gradientType;
+				link.Read<gradient_type>(&gradientType);
+				BGradient* gradient = _GetNewGradientForType(gradientType);
+				if (gradient) {
+					link.ReadGradient(gradient);				
+					fCurrentView->ConvertToScreenForDrawing(gradient);
+					drawingEngine->FillShapeGradient(shapeFrame, opCount, opList,
+						ptCount, ptList, *gradient);
+				}
+			}
+			
+			delete[] opList;
+			delete[] ptList;
+			break;
+		}
 		case AS_FILL_REGION:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_REGION\n", Title()));
@@ -2290,6 +2486,24 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			fCurrentView->ConvertToScreenForDrawing(&region);
 			drawingEngine->FillRegion(region);
 
+			break;
+		}
+		case AS_FILL_REGION_GRADIENT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_FILL_REGION_GRADIENT\n", Title()));
+			
+			BRegion region;
+			if (link.ReadRegion(&region) < B_OK)
+				break;
+			gradient_type gradientType;
+			link.Read<gradient_type>(&gradientType);
+			BGradient* gradient = _GetNewGradientForType(gradientType);
+			if (gradient) {
+				link.ReadGradient(gradient);			
+				fCurrentView->ConvertToScreenForDrawing(&region);
+				fCurrentView->ConvertToScreenForDrawing(gradient);
+				drawingEngine->FillRegionGradient(region, *gradient);
+			}
 			break;
 		}
 		case AS_STROKE_LINEARRAY:
@@ -3276,4 +3490,31 @@ ServerWindow::PictureToRegion(ServerPicture *picture, BRegion &region,
 	fprintf(stderr, "ServerWindow::PictureToRegion() not implemented\n");
 	region.MakeEmpty();
 	return B_ERROR;
+}
+
+
+BGradient*
+ServerWindow::_GetNewGradientForType(gradient_type type)
+{
+	switch (type) {
+		case B_GRADIENT_LINEAR: {
+			return new (std::nothrow) BGradientLinear();
+		}
+		case B_GRADIENT_RADIAL: {
+			return new (std::nothrow) BGradientRadial();
+		}
+		case B_GRADIENT_RADIAL_FOCUS: {
+			return new (std::nothrow) BGradientRadialFocus();
+		}
+		case B_GRADIENT_DIAMOND: {
+			return new (std::nothrow) BGradientDiamond();
+		}
+		case B_GRADIENT_CONIC: {
+			return new (std::nothrow) BGradientConic();
+		}
+		case B_GRADIENT_NONE: {
+			return new (std::nothrow) BGradient();
+		}			
+	}
+	return NULL;
 }

@@ -34,6 +34,7 @@ class Window;
 class ServerBitmap;
 class ServerCursor;
 class ServerPicture;
+class BGradient;
 
 class View {
  public:
@@ -133,6 +134,7 @@ class View {
 			void			ConvertToScreenForDrawing(BPoint* point) const;
 			void			ConvertToScreenForDrawing(BRect* rect) const;
 			void			ConvertToScreenForDrawing(BRegion* region) const;
+			void			ConvertToScreenForDrawing(BGradient* gradient) const;
 
 			void			ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const;
 			void			ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const;

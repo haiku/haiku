@@ -16,7 +16,7 @@
 #include "support.h"
 
 #include "Icon.h"
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "Shape.h"
 #include "StrokeTransformer.h"
 #include "Style.h"

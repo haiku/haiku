@@ -19,6 +19,11 @@
 #include <ServerProtocol.h>
 #include <String.h>
 #include <Region.h>
+#include <GradientLinear.h>
+#include <GradientRadial.h>
+#include <GradientRadialFocus.h>
+#include <GradientDiamond.h>
+#include <GradientConic.h>
 
 #include "link_message.h"
 #include "syscalls.h"
@@ -30,6 +35,15 @@
 #else
 #	define STRACE(x) ;
 #endif
+
+//#define TRACE_LINK_RECEIVER_GRADIENTS
+#ifdef TRACE_LINK_RECEIVER_GRADIENTS
+#	include <OS.h>
+#	define GTRACE(x) debug_printf x
+#else
+#	define GTRACE(x) ;
+#endif
+
 
 namespace BPrivate {
 
@@ -455,6 +469,87 @@ LinkReceiver::ReadRegion(BRegion* region)
 }
 
 
+status_t
+LinkReceiver::ReadGradient(BGradient *gradient)
+{
+	GTRACE(("LinkReceiver::ReadGradient\n"));
+	gradient_type gradientType;
+	int32 colorsCount;
+	Read(&gradientType, sizeof(gradient_type));
+	Read(&colorsCount, sizeof(int32));
+	
+	if (colorsCount > 0) {
+		color_step step;
+		for (int i = 0; i < colorsCount; i++) {
+			Read(&step, sizeof(color_step));
+			gradient->AddColor(step, i);
+		}
+	}
+	
+	switch(gradientType) {
+		case B_GRADIENT_LINEAR: {
+			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_LINEAR\n"));
+			BGradientLinear* linear = (BGradientLinear*) gradient;
+			BPoint start;
+			BPoint end;
+			Read(&start, sizeof(BPoint));
+			Read(&end, sizeof(BPoint));
+			linear->SetStart(start);
+			linear->SetEnd(end);
+			break;
+		}
+		case B_GRADIENT_RADIAL: {
+			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_RADIAL\n"));
+			BGradientRadial* radial = (BGradientRadial*) gradient;
+			BPoint center;
+			float radius;
+			Read(&center, sizeof(BPoint));
+			Read(&radius, sizeof(float));
+			radial->SetCenter(center);
+			radial->SetRadius(radius);
+			break;
+		}
+		case B_GRADIENT_RADIAL_FOCUS: {
+			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_RADIAL_FOCUS\n"));
+			BGradientRadialFocus* radialFocus =
+				(BGradientRadialFocus*) gradient;
+			BPoint center;
+			BPoint focal;
+			float radius;
+			Read(&center, sizeof(BPoint));
+			Read(&focal, sizeof(BPoint));
+			Read(&radius, sizeof(float));
+			radialFocus->SetCenter(center);
+			radialFocus->SetFocal(focal);
+			radialFocus->SetRadius(radius);
+			break;
+		}
+		case B_GRADIENT_DIAMOND: {
+			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_DIAMOND\n"));
+			BGradientDiamond* diamond = (BGradientDiamond*) gradient;
+			BPoint center;
+			Read(&center, sizeof(BPoint));
+			diamond->SetCenter(center);
+			break;
+		}
+		case B_GRADIENT_CONIC: {
+			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_CONIC\n"));
+			BGradientConic* conic = (BGradientConic*) gradient;
+			BPoint center;
+			float angle;
+			Read(&center, sizeof(BPoint));
+			Read(&angle, sizeof(float));
+			conic->SetCenter(center);
+			conic->SetAngle(angle);
+			break;
+		}
+		case B_GRADIENT_NONE: {
+			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_NONE\n"));
+			break;
+		}
+	}
+	
+	return B_OK;
+}
+
 }	// namespace BPrivate
-
-

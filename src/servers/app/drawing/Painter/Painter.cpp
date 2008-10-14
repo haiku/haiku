@@ -15,6 +15,11 @@
 #include <GraphicsDefs.h>
 #include <Region.h>
 #include <String.h>
+#include <GradientLinear.h>
+#include <GradientRadial.h>
+#include <GradientRadialFocus.h>
+#include <GradientDiamond.h>
+#include <GradientConic.h>
 
 #include <ShapePrivate.h>
 
@@ -52,12 +57,21 @@
 using std::nothrow;
 
 #undef TRACE
-//#define TRACE_PAINTER
+// #define TRACE_PAINTER
 #ifdef TRACE_PAINTER
 #	define TRACE(x...)		printf(x)
 #else
 #	define TRACE(x...)
 #endif
+
+//#define TRACE_GRADIENTS
+#ifdef TRACE_GRADIENTS
+#	include <OS.h>
+#	define GTRACE(x...)		debug_printf(x)
+#else
+#	define GTRACE(x...)
+#endif
+
 
 #define CHECK_CLIPPING	if (!fValidClipping) return BRect(0, 0, -1, -1);
 #define CHECK_CLIPPING_NO_RETURN	if (!fValidClipping) return;
@@ -492,6 +506,28 @@ Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 	return _DrawTriangle(pt1, pt2, pt3, true);
 }
 
+// FillTriangleGradient
+BRect
+Painter::FillTriangleGradient(BPoint pt1, BPoint pt2, BPoint pt3,
+					  const BGradient& gradient) const
+{
+	CHECK_CLIPPING
+	
+	_Transform(&pt1);
+	_Transform(&pt2);
+	_Transform(&pt3);
+	
+	fPath.remove_all();
+	
+	fPath.move_to(pt1.x, pt1.y);
+	fPath.line_to(pt2.x, pt2.y);
+	fPath.line_to(pt3.x, pt3.y);
+	
+	fPath.close_polygon();
+	
+	return _FillPathGradient(fPath, gradient);
+}
+
 // DrawPolygon
 BRect
 Painter::DrawPolygon(BPoint* p, int32 numPts,
@@ -523,6 +559,34 @@ Painter::DrawPolygon(BPoint* p, int32 numPts,
 	return BRect(0.0, 0.0, -1.0, -1.0);
 }
 
+// FillPolygonGradient
+BRect
+Painter::FillPolygonGradient(BPoint* p, int32 numPts,
+					 const BGradient& gradient, bool closed) const
+{
+	CHECK_CLIPPING
+	
+	if (numPts > 0) {
+		
+		fPath.remove_all();
+		
+		_Transform(p);
+		fPath.move_to(p->x, p->y);
+		
+		for (int32 i = 1; i < numPts; i++) {
+			p++;
+			_Transform(p);
+			fPath.line_to(p->x, p->y);
+		}
+		
+		if (closed)
+			fPath.close_polygon();
+		
+		return _FillPathGradient(fPath, gradient);
+	}
+	return BRect(0.0, 0.0, -1.0, -1.0);
+}
+
 // DrawBezier
 BRect
 Painter::DrawBezier(BPoint* p, bool filled) const
@@ -550,6 +614,28 @@ Painter::DrawBezier(BPoint* p, bool filled) const
 	}
 }
 
+// FillBezierGradient
+BRect
+Painter::FillBezierGradient(BPoint* p, const BGradient& gradient) const
+{
+	CHECK_CLIPPING
+	
+	fPath.remove_all();
+	
+	_Transform(&(p[0]));
+	_Transform(&(p[1]));
+	_Transform(&(p[2]));
+	_Transform(&(p[3]));
+	
+	fPath.move_to(p[0].x, p[0].y);
+	fPath.curve4(p[1].x, p[1].y,
+				 p[2].x, p[2].y,
+				 p[3].x, p[3].y);
+	
+	
+	fPath.close_polygon();
+	return _FillPathGradient(fCurve, gradient);
+}
 
 
 // DrawShape
@@ -598,6 +684,51 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 		return _FillPath(fCurve);
 	else
 		return _StrokePath(fCurve);
+}
+
+// FillShapeGradient
+BRect
+Painter::FillShapeGradient(const int32& opCount, const uint32* opList,
+				   const int32& ptCount, const BPoint* points,
+				   const BGradient& gradient) const
+{
+	CHECK_CLIPPING
+	
+	// TODO: if shapes are ever used more heavily in Haiku,
+	// it would be nice to use BShape data directly (write
+	// an AGG "VertexSource" adaptor)
+	fPath.remove_all();
+	for (int32 i = 0; i < opCount; i++) {
+		uint32 op = opList[i] & 0xFF000000;
+		if (op & OP_MOVETO) {
+			fPath.move_to(points->x, points->y);
+			points++;
+		}
+		
+		if (op & OP_LINETO) {
+			int32 count = opList[i] & 0x00FFFFFF;
+			while (count--) {
+				fPath.line_to(points->x, points->y);
+				points++;
+			}
+		}
+		
+		if (op & OP_BEZIERTO) {
+			int32 count = opList[i] & 0x00FFFFFF;
+			while (count) {
+				fPath.curve4(points[0].x, points[0].y,
+							 points[1].x, points[1].y,
+							 points[2].x, points[2].y);
+				points += 3;
+				count -= 3;
+			}
+		}
+		
+		if (op & OP_CLOSE)
+			fPath.close_polygon();
+	}
+	
+	return _FillPathGradient(fCurve, gradient);
 }
 
 // StrokeRect
@@ -721,6 +852,34 @@ Painter::FillRect(const BRect& r) const
 	fPath.close_polygon();
 
 	return _FillPath(fPath);
+}
+
+// FillRectGradient
+BRect
+Painter::FillRectGradient(const BRect& r, const BGradient& gradient) const
+{
+	CHECK_CLIPPING
+	
+	// support invalid rects
+	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
+	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
+	_Transform(&a, false);
+	_Transform(&b, false);
+	
+	// account for stricter interpretation of coordinates in AGG
+	// the rectangle ranges from the top-left (.0, .0)
+	// to the bottom-right (.9999, .9999) corner of pixels
+	b.x += 1.0;
+	b.y += 1.0;
+	
+	fPath.remove_all();
+	fPath.move_to(a.x, a.y);
+	fPath.line_to(b.x, a.y);
+	fPath.line_to(b.x, b.y);
+	fPath.line_to(a.x, b.y);
+	fPath.close_polygon();
+	
+	return _FillPathGradient(fPath, gradient);
 }
 
 // FillRect
@@ -907,6 +1066,31 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 	return _FillPath(rect);
 }
 
+// FillRoundRectGradient
+BRect
+Painter::FillRoundRectGradient(const BRect& r, float xRadius, float yRadius,
+							   const BGradient& gradient) const
+{
+	CHECK_CLIPPING
+	
+	BPoint lt(r.left, r.top);
+	BPoint rb(r.right, r.bottom);
+	_Transform(&lt, false);
+	_Transform(&rb, false);
+	
+	// account for stricter interpretation of coordinates in AGG
+	// the rectangle ranges from the top-left (.0, .0)
+	// to the bottom-right (.9999, .9999) corner of pixels
+	rb.x += 1.0;
+	rb.y += 1.0;
+	
+	agg::rounded_rect rect;
+	rect.rect(lt.x, lt.y, rb.x, rb.y);
+	rect.radius(xRadius, yRadius);
+	
+	return _FillPathGradient(rect, gradient);
+}
+
 // AlignEllipseRect
 void
 Painter::AlignEllipseRect(BRect* rect, bool filled) const
@@ -999,6 +1183,29 @@ Painter::DrawEllipse(BRect r, bool fill) const
 	}
 }
 
+// FillEllipseGradient
+BRect
+Painter::FillEllipseGradient(BRect r, const BGradient& gradient) const
+{
+	CHECK_CLIPPING
+	
+	AlignEllipseRect(&r, true);
+	
+	float xRadius = r.Width() / 2.0;
+	float yRadius = r.Height() / 2.0;
+	BPoint center(r.left + xRadius, r.top + yRadius);
+	
+	int32 divisions = (int32)((xRadius + yRadius + 2 * fPenSize) * PI / 2);
+	if (divisions < 12)
+		divisions = 12;
+	if (divisions > 4096)
+		divisions = 4096;
+	
+	agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
+		
+	return _FillPathGradient(path, gradient);
+}
+
 // StrokeArc
 BRect
 Painter::StrokeArc(BPoint center, float xRadius, float yRadius, float angle,
@@ -1053,6 +1260,42 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 	fPath.close_polygon();
 
 	return _FillPath(fPath);
+}
+
+// FillArcGradient
+BRect
+Painter::FillArcGradient(BPoint center, float xRadius, float yRadius, float angle,
+				 float span, const BGradient& gradient) const
+{
+	CHECK_CLIPPING
+	
+	_Transform(&center);
+	
+	double angleRad = (angle * PI) / 180.0;
+	double spanRad = (span * PI) / 180.0;
+	agg::bezier_arc arc(center.x, center.y, xRadius, yRadius,
+						-angleRad, -spanRad);
+	
+	agg::conv_curve<agg::bezier_arc> segmentedArc(arc);
+	
+	fPath.remove_all();
+	
+	// build a new path by starting at the center point,
+	// then traversing the arc, then going back to the center
+	fPath.move_to(center.x, center.y);
+	
+	segmentedArc.rewind(0);
+	double x;
+	double y;
+	unsigned cmd = segmentedArc.vertex(&x, &y);
+	while (!agg::is_stop(cmd)) {
+		fPath.line_to(x, y);
+		cmd = segmentedArc.vertex(&x, &y);
+	}
+	
+	fPath.close_polygon();
+	
+	return _FillPathGradient(fPath, gradient);
 }
 
 // #pragma mark -
@@ -1157,6 +1400,21 @@ Painter::FillRegion(const BRegion* region) const
 	BRect touched = FillRect(copy.RectAt(0));
 	for (int32 i = 1; i < count; i++) {
 		touched = touched | FillRect(copy.RectAt(i));
+	}
+	return touched;
+}
+
+// FillRegionGradient
+BRect
+Painter::FillRegionGradient(const BRegion* region, const BGradient& gradient) const
+{
+	CHECK_CLIPPING
+	
+	BRegion copy(*region);
+	int32 count = copy.CountRects();
+	BRect touched = FillRectGradient(copy.RectAt(0), gradient);
+	for (int32 i = 1; i < count; i++) {
+		touched = touched | FillRectGradient(copy.RectAt(i), gradient);
 	}
 	return touched;
 }
@@ -2255,3 +2513,313 @@ Painter::_FillPath(VertexSource& path) const
 	return _Clipped(_BoundingBox(path));
 }
 
+// _FillPathGradient
+template<class VertexSource>
+BRect
+Painter::_FillPathGradient(VertexSource& path, const BGradient& gradient) const
+{
+	GTRACE("Painter::_FillPathGradient\n");
+	
+	switch(gradient.Type()) {
+		case B_GRADIENT_LINEAR: {
+			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_LINEAR\n"));
+			_FillPathGradientLinear(path, *((const BGradientLinear*) &gradient));
+			break;
+		}
+		case B_GRADIENT_RADIAL: {
+			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_RADIAL\n"));
+			_FillPathGradientRadial(path,
+				*((const BGradientRadial*) &gradient));
+			break;
+		}
+		case B_GRADIENT_RADIAL_FOCUS: {
+			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_RADIAL_FOCUS\n"));
+			_FillPathGradientRadialFocus(path,
+				*((const BGradientRadialFocus*) &gradient));
+			break;
+		}
+		case B_GRADIENT_DIAMOND: {
+			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_DIAMOND\n"));
+			_FillPathGradientDiamond(path,
+				*((const BGradientDiamond*) &gradient));
+			break;
+		}
+		case B_GRADIENT_CONIC: {
+			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_CONIC\n"));
+			_FillPathGradientConic(path,
+				*((const BGradientConic*) &gradient));
+			break;
+		}
+		case B_GRADIENT_NONE: {
+			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_NONE\n"));
+			break;
+		}
+	}
+
+	return _Clipped(_BoundingBox(path));
+}
+
+// _MakeGradient
+template<class Array>
+void
+Painter::_MakeGradient(Array& array, const BGradient& gradient) const
+{
+	for (int i = 0; i < gradient.CountColors() - 1; i++) {
+		color_step* from = gradient.ColorAtFast(i);
+		color_step* to = gradient.ColorAtFast(i + 1);
+		agg::rgba8 fromColor(from->color.red, from->color.green,
+							 from->color.blue, from->color.alpha);
+		agg::rgba8 toColor(to->color.red, to->color.green,
+						   to->color.blue, to->color.alpha);
+		GTRACE("Painter::_MakeGradient> fromColor(%d, %d, %d) offset = %f\n",
+			   fromColor.r, fromColor.g, fromColor.b, from->offset);
+		GTRACE("Painter::_MakeGradient> toColor(%d, %d, %d) offset = %f\n",
+			   toColor.r, toColor.g, toColor.b, to->offset);
+		float dist = to->offset - from->offset;
+		GTRACE("Painter::_MakeGradient> dist = %f\n", dist);
+		if (dist > 0) {
+			for (int j = from->offset; j <= to->offset; j++) {
+				float f = (float)(to->offset - j) / (float)(dist + 1);
+				array[j] = toColor.gradient(fromColor, f);
+				GTRACE("Painter::_MakeGradient> array[%d](%d, %d, %d)\n",
+					   array[j].r, array[j].g, array[j].b);
+			}
+		}
+	}
+}
+
+// _CalcLinearGradientTransform
+void Painter::_CalcLinearGradientTransform(BPoint startPoint, BPoint endPoint,
+										   agg::trans_affine& mtx,
+										   float gradient_d2) const
+{
+	float dx = endPoint.x - startPoint.x;
+	float dy = endPoint.y - startPoint.y;
+	mtx.reset();
+	mtx *= agg::trans_affine_scaling(sqrt(dx * dx + dy * dy) / gradient_d2);
+	mtx *= agg::trans_affine_rotation(atan2(dy, dx));
+	mtx *= agg::trans_affine_translation(startPoint.x, startPoint.y);
+	mtx.invert();
+}
+
+// _FillPathGradientLinear
+template<class VertexSource>
+void
+Painter::_FillPathGradientLinear(VertexSource& path,
+								 const BGradientLinear& linear) const
+{
+	GTRACE("Painter::_FillPathGradientLinear\n");
+	
+	BPoint start = linear.Start();
+	BPoint end = linear.End();
+
+	typedef agg::span_interpolator_linear<> interpolator_type;
+	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
+	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
+	typedef agg::gradient_x	gradient_func_type;
+	typedef agg::span_gradient<agg::rgba8, interpolator_type,
+				gradient_func_type, color_array_type> span_gradient_type;
+	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
+				span_gradient_type> renderer_gradient_type;
+	
+	gradient_func_type gradientFunc;
+	agg::trans_affine gradientMtx;
+	interpolator_type spanInterpolator(gradientMtx);
+	span_allocator_type spanAllocator;
+	color_array_type colorArray;
+	
+	_MakeGradient(colorArray, linear);
+
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
+									colorArray, 0, 100);
+	
+	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
+											spanGradient);
+
+	_CalcLinearGradientTransform(start, end, gradientMtx);
+
+	fRasterizer.reset();
+	fRasterizer.add_path(path);
+	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+}
+
+// _FillPathGradientRadial
+template<class VertexSource>
+void
+Painter::_FillPathGradientRadial(VertexSource& path,
+								 const BGradientRadial& radial) const
+{
+	GTRACE("Painter::_FillPathGradientRadial\n");
+	
+	BPoint center = radial.Center();
+	float radius = radial.Radius();
+	
+	typedef agg::span_interpolator_linear<> interpolator_type;
+	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
+	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
+	typedef agg::gradient_radial gradient_func_type;
+	typedef agg::span_gradient<agg::rgba8, interpolator_type,
+	gradient_func_type, color_array_type> span_gradient_type;
+	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
+	span_gradient_type> renderer_gradient_type;
+	
+	gradient_func_type gradientFunc;
+	agg::trans_affine gradientMtx;
+	interpolator_type spanInterpolator(gradientMtx);
+	span_allocator_type spanAllocator;
+	color_array_type colorArray;
+	
+	_MakeGradient(colorArray, radial);
+	
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
+									colorArray, 0, 100);
+	
+	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
+											spanGradient);
+
+	gradientMtx.reset();
+	gradientMtx *= agg::trans_affine_translation(center.x, center.y);
+	gradientMtx.invert();
+
+//	_CalcLinearGradientTransform(start, end, gradientMtx);
+	
+	fRasterizer.reset();
+	fRasterizer.add_path(path);
+	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+}
+
+// _FillPathGradientRadialFocus
+template<class VertexSource>
+void
+Painter::_FillPathGradientRadialFocus(VertexSource& path,
+							const BGradientRadialFocus& focus) const
+{
+	GTRACE("Painter::_FillPathGradientRadialFocus\n");
+	
+	BPoint center = focus.Center();
+	BPoint focal = focus.Focal();
+	float radius = focus.Radius();
+	
+	typedef agg::span_interpolator_linear<> interpolator_type;
+	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
+	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
+	typedef agg::gradient_radial_focus gradient_func_type;
+	typedef agg::span_gradient<agg::rgba8, interpolator_type,
+	gradient_func_type, color_array_type> span_gradient_type;
+	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
+	span_gradient_type> renderer_gradient_type;
+	
+	gradient_func_type gradientFunc;
+	agg::trans_affine gradientMtx;
+	interpolator_type spanInterpolator(gradientMtx);
+	span_allocator_type spanAllocator;
+	color_array_type colorArray;
+	
+	_MakeGradient(colorArray, focus);
+	
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
+									colorArray, 0, 100);
+	
+	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
+											spanGradient);
+	
+	gradientMtx.reset();
+	gradientMtx *= agg::trans_affine_translation(center.x, center.y);
+	gradientMtx.invert();
+	
+	//	_CalcLinearGradientTransform(start, end, gradientMtx);
+	
+	fRasterizer.reset();
+	fRasterizer.add_path(path);
+	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+}
+
+// _FillPathGradientDiamond
+template<class VertexSource>
+void
+Painter::_FillPathGradientDiamond(VertexSource& path,
+								  const BGradientDiamond& diamond) const
+{
+	GTRACE("Painter::_FillPathGradientDiamond\n");
+	
+	BPoint center = diamond.Center();
+//	float radius = diamond.Radius();
+	
+	typedef agg::span_interpolator_linear<> interpolator_type;
+	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
+	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
+	typedef agg::gradient_diamond gradient_func_type;
+	typedef agg::span_gradient<agg::rgba8, interpolator_type,
+	gradient_func_type, color_array_type> span_gradient_type;
+	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
+	span_gradient_type> renderer_gradient_type;
+	
+	gradient_func_type gradientFunc;
+	agg::trans_affine gradientMtx;
+	interpolator_type spanInterpolator(gradientMtx);
+	span_allocator_type spanAllocator;
+	color_array_type colorArray;
+	
+	_MakeGradient(colorArray, diamond);
+	
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
+									colorArray, 0, 100);
+	
+	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
+											spanGradient);
+	
+	gradientMtx.reset();
+	gradientMtx *= agg::trans_affine_translation(center.x, center.y);
+	gradientMtx.invert();
+	
+	//	_CalcLinearGradientTransform(start, end, gradientMtx);
+	
+	fRasterizer.reset();
+	fRasterizer.add_path(path);
+	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+}
+
+// _FillPathGradientConic
+template<class VertexSource>
+void
+Painter::_FillPathGradientConic(VertexSource& path,
+								const BGradientConic& conic) const
+{
+	GTRACE("Painter::_FillPathGradientConic\n");
+	
+	BPoint center = conic.Center();
+//	float radius = conic.Radius();
+	
+	typedef agg::span_interpolator_linear<> interpolator_type;
+	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
+	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
+	typedef agg::gradient_conic gradient_func_type;
+	typedef agg::span_gradient<agg::rgba8, interpolator_type,
+	gradient_func_type, color_array_type> span_gradient_type;
+	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
+	span_gradient_type> renderer_gradient_type;
+	
+	gradient_func_type gradientFunc;
+	agg::trans_affine gradientMtx;
+	interpolator_type spanInterpolator(gradientMtx);
+	span_allocator_type spanAllocator;
+	color_array_type colorArray;
+	
+	_MakeGradient(colorArray, conic);
+	
+	span_gradient_type spanGradient(spanInterpolator, gradientFunc,
+									colorArray, 0, 100);
+	
+	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
+											spanGradient);
+	
+	gradientMtx.reset();
+	gradientMtx *= agg::trans_affine_translation(center.x, center.y);
+	gradientMtx.invert();
+	
+	//	_CalcLinearGradientTransform(start, end, gradientMtx);
+	
+	fRasterizer.reset();
+	fRasterizer.add_path(path);
+	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+}

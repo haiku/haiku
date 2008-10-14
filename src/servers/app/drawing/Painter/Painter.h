@@ -26,6 +26,12 @@
 
 class BBitmap;
 class BRegion;
+class BGradient;
+class BGradientLinear;
+class BGradientRadial;
+class BGradientRadialFocus;
+class BGradientDiamond;
+class BGradientConic;
 class DrawState;
 class FontCacheReference;
 class RenderingBuffer;
@@ -101,16 +107,25 @@ class Painter {
 			BRect				FillTriangle(	BPoint pt1,
 												BPoint pt2,
 												BPoint pt3) const;
-
+			BRect				FillTriangleGradient(BPoint pt1, BPoint pt2,
+													 BPoint pt3,
+													 const BGradient& gradient) const;
+	
 								// polygons
 			BRect				DrawPolygon(	BPoint* ptArray,
 												int32 numPts,
 											    bool filled,
 											    bool closed) const;
-
+			BRect				FillPolygonGradient(BPoint* ptArray,
+													int32 numPts,
+													const BGradient& gradient,
+													bool closed) const;
+	
 								// bezier curves
 			BRect				DrawBezier(		BPoint* controlPoints,
 												bool filled) const;
+			BRect				FillBezierGradient(BPoint* controlPoints,
+												   const BGradient& gradient) const;
 
 								// shapes
 			BRect				DrawShape(		const int32& opCount,
@@ -118,7 +133,12 @@ class Painter {
 												const int32& ptCount,
 												const BPoint* ptList,
 												bool filled) const;
-
+			BRect				FillShapeGradient(const int32& opCount,
+									const uint32* opList,
+									const int32& ptCount,
+									const BPoint* ptList,
+									const BGradient& gradient) const;
+	
 								// rects
 			BRect				StrokeRect(		const BRect& r) const;
 
@@ -127,6 +147,8 @@ class Painter {
 												const rgb_color& c) const;
 
 			BRect				FillRect(		const BRect& r) const;
+			BRect				FillRectGradient(const BRect& r,
+												 const BGradient& gradient) const;
 
 			// fills a solid rect with color c, no blending
 			void				FillRect(		const BRect& r,
@@ -143,13 +165,19 @@ class Painter {
 			BRect				FillRoundRect(	const BRect& r,
 												float xRadius,
 												float yRadius) const;
-
+			BRect				FillRoundRectGradient(const BRect& r,
+												float xRadius,
+												float yRadius,
+												const BGradient& gradient) const;
+	
 								// ellipses
 			void				AlignEllipseRect(BRect* rect,
 												 bool filled) const;
 
 			BRect				DrawEllipse(	BRect r,
 												bool filled) const;
+			BRect				FillEllipseGradient(BRect r,
+											const BGradient& gradient) const;
 
 								// arcs
 			BRect				StrokeArc(		BPoint center,
@@ -163,7 +191,13 @@ class Painter {
 												float yRadius,
 												float angle,
 												float span) const;
-
+			BRect				FillArcGradient(BPoint center,
+												float xRadius,
+												float yRadius,
+												float angle,
+												float span,
+												const BGradient& gradient) const;
+	
 								// strings
 			BRect				DrawString(		const char* utf8String,
 												uint32 length,
@@ -191,6 +225,8 @@ class Painter {
 
 								// some convenience stuff
 			BRect				FillRegion(		const BRegion* region) const;
+			BRect				FillRegionGradient(const BRegion* region,
+											const BGradient& gradient) const;
 
 			BRect				InvertRect(		const BRect& r) const;
 
@@ -265,7 +301,31 @@ class Painter {
 			BRect				_StrokePath(VertexSource& path) const;
 			template<class VertexSource>
 			BRect				_FillPath(VertexSource& path) const;
-
+			void				_CalcLinearGradientTransform(BPoint startPoint,
+									BPoint endPoint, agg::trans_affine& mtx,
+									float gradient_d2 = 100.0f) const;
+			template<class Array>
+			void				_MakeGradient(Array& array,
+									const BGradient& gradient) const;
+			template<class VertexSource>
+			BRect				_FillPathGradient(VertexSource& path,
+										const BGradient& gradient) const;
+			template<class VertexSource>
+			void				_FillPathGradientLinear(VertexSource& path,
+										const BGradientLinear& linear) const;
+			template<class VertexSource>
+			void				_FillPathGradientRadial(VertexSource& path,
+										const BGradientRadial& radial) const;
+			template<class VertexSource>
+			void				_FillPathGradientRadialFocus(VertexSource& path,
+										const BGradientRadialFocus& focus) const;
+			template<class VertexSource>
+			void				_FillPathGradientDiamond(VertexSource& path,
+										const BGradientDiamond& diamond) const;
+			template<class VertexSource>
+			void				_FillPathGradientConic(VertexSource& path,
+										const BGradientConic& conic) const;
+	
 mutable agg::rendering_buffer	fBuffer;
 
 	// AGG rendering and rasterization classes

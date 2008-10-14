@@ -85,7 +85,7 @@ Application Icon-O-Matic :
 	VectorPath.cpp
 
 	# icon/style
-	Gradient.cpp
+	GradientTransformable.cpp
 	Style.cpp
 	StyleContainer.cpp
 

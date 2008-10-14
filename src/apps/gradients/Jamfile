@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src apps gradients ;
+
+Application Gradients :
+	Gradients.cpp
+	: be
+	: Gradients.rdef
+;

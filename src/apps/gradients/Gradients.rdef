@@ -1,0 +1,27 @@
+
+resource app_signature "application/x-vnd.Haiku-Gradients";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_BETA,
+
+	internal = 0,
+
+	short_info = "Gradients",
+	long_info = "Gradients ©2008 Haiku, Inc."
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+
+resource vector_icon {
+	$"6E636966020200040269FF0000D000FF000200040308FF0000C700FF00FF0000"
+	$"FF020A0420204020406020600A044020602060604060020A000100000A010101"
+	$"00"
+};
+
+#endif // HAIKU_TARGET_PLATFORM_HAIKU

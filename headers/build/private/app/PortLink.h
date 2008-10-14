@@ -50,6 +50,7 @@ class ServerLink {
 		status_t AttachString(const char *string, int32 length = -1);
 		status_t AttachRegion(const BRegion &region);
 		status_t AttachShape(BShape &shape);
+		status_t AttachGradient(const BGradient &gradient);
 		template <class Type> status_t Attach(const Type& data);
 
 		// receive methods
@@ -63,6 +64,7 @@ class ServerLink {
 		status_t ReadString(char **string);
 		status_t ReadRegion(BRegion *region);
 		status_t ReadShape(BShape *shape);
+		status_t ReadGradient(BGradient *gradient);
 		template <class Type> status_t Read(Type *data);
 
 		// convenience methods

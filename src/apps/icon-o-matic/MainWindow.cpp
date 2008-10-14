@@ -52,7 +52,7 @@
 
 // TODO: just for testing
 #include "AffineTransformer.h"
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "Icon.h"
 #include "MultipleManipulatorState.h"
 #include "PathManipulator.h"

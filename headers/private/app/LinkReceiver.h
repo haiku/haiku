@@ -15,6 +15,7 @@
 
 class BString;
 class BRegion;
+class BGradient;
 
 
 namespace BPrivate {
@@ -37,6 +38,7 @@ class LinkReceiver {
 		status_t ReadString(BString& string, size_t* _length = NULL);
 		status_t ReadString(char* buffer, size_t bufferSize);
 		status_t ReadRegion(BRegion* region);
+		status_t ReadGradient(BGradient *gradient);
 
 		template <class Type> status_t Read(Type *data)
 			{ return Read(data, sizeof(Type)); }

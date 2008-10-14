@@ -11,7 +11,7 @@
 #include <new>
 #include <stdio.h>
 
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "Style.h"
 
 using std::nothrow;

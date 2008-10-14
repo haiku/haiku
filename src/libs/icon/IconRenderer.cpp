@@ -17,7 +17,7 @@
 #include <agg_span_gradient.h>
 #include <agg_span_interpolator_linear.h>
 
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "Icon.h"
 #include "Shape.h"
 #include "ShapeContainer.h"

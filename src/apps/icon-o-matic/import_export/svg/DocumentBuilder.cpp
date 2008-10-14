@@ -31,7 +31,7 @@
 #include <agg_bounding_rect.h>
 
 #include "AutoDeleter.h"
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "Icon.h"
 #include "PathContainer.h"
 #include "Shape.h"

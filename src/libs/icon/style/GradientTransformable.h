@@ -5,8 +5,8 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-#ifndef GRADIENT_H
-#define GRADIENT_H
+#ifndef GRADIENT_TRANSFORMABLE_H
+#define GRADIENT_TRANSFORMABLE_H
 
 
 #ifdef ICON_O_MATIC
@@ -18,39 +18,27 @@
 #include "Transformable.h"
 
 #include <GraphicsDefs.h>
+#include <Gradient.h>
 #include <List.h>
 
 class BMessage;
 
-
-namespace BPrivate {
-namespace Icon {
-
-enum gradient_type {
+enum gradients_type {
 	GRADIENT_LINEAR = 0,
 	GRADIENT_CIRCULAR,
 	GRADIENT_DIAMOND,
 	GRADIENT_CONIC,
 	GRADIENT_XY,
-	GRADIENT_SQRT_XY,
+	GRADIENT_SQRT_XY
 };
 
 enum interpolation_type {
 	INTERPOLATION_LINEAR = 0,
-	INTERPOLATION_SMOOTH,
+	INTERPOLATION_SMOOTH
 };
 
-struct color_step {
-					color_step(const rgb_color c, float o);
-					color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o);
-					color_step(const color_step& other);
-					color_step();
-
-			bool	operator!=(const color_step& other) const;
-
-	rgb_color		color;
-	float			offset;
-};
+namespace BPrivate {
+namespace Icon {
 
 #ifdef ICON_O_MATIC
 class Gradient : public BArchivable,
@@ -97,8 +85,8 @@ class Gradient : public Transformable {
 			color_step*			ColorAt(int32 index) const;
 			color_step*			ColorAtFast(int32 index) const;
 
-			void				SetType(gradient_type type);
-			gradient_type		Type() const
+			void				SetType(gradients_type type);
+			gradients_type		Type() const
 									{ return fType; }
 
 			void				SetInterpolation(interpolation_type type);
@@ -122,7 +110,7 @@ class Gradient : public Transformable {
 			void				_MakeEmpty();
 
 			BList				fColors;
-			gradient_type		fType;
+			gradients_type		fType;
 			interpolation_type	fInterpolation;
 			bool				fInheritTransformation;
 };
@@ -130,4 +118,4 @@ class Gradient : public Transformable {
 }	// namespace Icon
 }	// namespace BPrivate
 
-#endif	// GRADIENT_H
+#endif	// GRADIENT_TRANSFORMABLE_H

@@ -22,7 +22,7 @@
 #include "AssignStyleCommand.h"
 #include "CurrentColor.h"
 #include "CommandStack.h"
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "MoveStylesCommand.h"
 #include "RemoveStylesCommand.h"
 #include "Style.h"

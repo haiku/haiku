@@ -19,7 +19,7 @@
 #include "AffineTransformer.h"
 #include "ContourTransformer.h"
 #include "FlatIconFormat.h"
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "Icon.h"
 #include "LittleEndianBuffer.h"
 #include "PathCommandQueue.h"

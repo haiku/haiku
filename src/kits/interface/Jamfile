@@ -57,6 +57,12 @@ MergeObject <libbe>interface_kit.o :
 	Deskbar.cpp
 	Dragger.cpp
 	Font.cpp
+	Gradient.cpp
+	GradientLinear.cpp
+	GradientRadial.cpp
+	GradientRadialFocus.cpp
+	GradientDiamond.cpp
+	GradientConic.cpp
 	GraphicsDefs.cpp
 	GridLayout.cpp
 	GridLayoutBuilder.cpp

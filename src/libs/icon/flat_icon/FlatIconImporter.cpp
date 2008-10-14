@@ -19,7 +19,7 @@
 #include "AutoDeleter.h"
 #include "ContourTransformer.h"
 #include "FlatIconFormat.h"
-#include "Gradient.h"
+#include "GradientTransformable.h"
 #include "Icon.h"
 #include "LittleEndianBuffer.h"
 #include "PathCommandQueue.h"
@@ -221,7 +221,7 @@ _ReadGradientStyle(LittleEndianBuffer& buffer)
 	Gradient gradient(true);
 		// empty gradient
 
-	gradient.SetType((gradient_type)gradientType);
+	gradient.SetType((gradients_type)gradientType);
 	// TODO: support more stuff with flags
 	// ("inherits transformation" and so on)
 	if (gradientFlags & GRADIENT_FLAG_TRANSFORM) {

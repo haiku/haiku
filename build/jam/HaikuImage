@@ -66,7 +66,7 @@ BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 ;
 BEOS_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
 	$(X86_ONLY)GLDirectMode $(X86_ONLY)GLTeapot Mandelbrot Pairs
-	Playground Pulse Sudoku
+	Playground Pulse Sudoku Gradients
 ;
 BEOS_SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libtranslation.so libbnetapi.so libnetwork.so libdebug.so libbsd.so
