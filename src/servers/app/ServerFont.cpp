@@ -812,7 +812,7 @@ ServerFont::StringWidth(const char *string, int32 numBytes,
 
 	StringWidthConsumer consumer;
 	if (!GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
-		deltaArray, kerning, fSpacing))
+			deltaArray, kerning, fSpacing))
 		return 0.0;
 
 	return consumer.width;
