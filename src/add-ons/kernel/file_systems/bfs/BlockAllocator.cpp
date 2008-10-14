@@ -818,7 +818,7 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 group,
 			start = 0;
 		}
 
-		if (current == fGroups[group].NumBits()) {
+		if (current == (int32)fGroups[group].NumBits()) {
 			if (range > bestLength) {
 				bestGroup = group;
 				bestStart = rangeStart;
@@ -1075,7 +1075,7 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 		dprintf("group %d first free too late\n",
 			(int)groupIndex);
 	}
-	if (largestStart != group.fLargestStart
+	if (group.fLargestValid && largestStart != group.fLargestStart
 		|| largestLength != group.fLargestLength) {
 		panic("bfs %p: group %d largest differs: %d.%d, checked %d.%d.\n",
 			fVolume, (int)groupIndex, (int)group.fLargestStart,
