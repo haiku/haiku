@@ -652,26 +652,18 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 group,
 	AllocationBlock cached(fVolume);
 	MutexLocker lock(fLock);
 
-	// The first scan through all allocation groups will look for the
-	// wanted maximum of blocks, the second scan will just look to
-	// satisfy the minimal requirement
-	uint16 numBlocks = maximum;
 	uint32 bitsPerFullBlock = fVolume->BlockSize() << 3;
 
-	for (int32 i = 0; i < fNumGroups * 2; i++, group++, start = 0) {
+	// Find the block_run that can fulfill the request best
+	int32 bestGroup = -1;
+	int32 bestStart = -1;
+	int32 bestLength = -1;
+
+	for (int32 i = 0; i < fNumGroups; i++, group++, start = 0) {
 		group = group % fNumGroups;
 
 		if (start >= fGroups[group].NumBits() || fGroups[group].IsFull())
 			continue;
-
-		if (i >= fNumGroups) {
-			// If the minimum is the same as the maximum, it's not necessary to
-			// search for in the allocation groups a second time
-			if (maximum == minimum)
-				return B_DEVICE_FULL;
-
-			numBlocks = minimum;
-		}
 
 		// The wanted maximum is smaller than the largest free block in the
 		// group or already smaller than the minimum
@@ -707,56 +699,60 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 group,
 					}
 
 					// have we found a range large enough to hold numBlocks?
-					if (++range >= maximum)
+					if (++range >= maximum) {
+						bestGroup = group;
+						bestStart = rangeStart;
+						bestLength = range;
 						break;
-				} else if (i >= fNumGroups && range >= minimum) {
-					// we have found a block larger than the required minimum
-					// (second pass)
-					break;
+					}
 				} else {
 					// end of a range
+					if (range > bestLength) {
+						bestGroup = group;
+						bestStart = rangeStart;
+						bestLength = range;
+					}
 					range = 0;
 				}
 			}
 
-			// TODO: we could also remember a "largest free block that fits the
-			//	minimal requirement" in the group, and use that - this would
-			//	avoid the need for a second run
+			T(Block("alloc-out", block, cached.Block(),
+				fVolume->BlockSize(), group, rangeStart));
 
-			// if we found a suitable block, mark the blocks as in use, and
-			// write the updated block bitmap back to disk
-			if (range >= numBlocks) {
-				// adjust allocation size
-				if (numBlocks < maximum)
-					numBlocks = range;
-
-				if (fGroups[group].Allocate(transaction, rangeStart, numBlocks)
-						< B_OK)
-					RETURN_ERROR(B_IO_ERROR);
-
-				run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(group);
-				run.start = HOST_ENDIAN_TO_BFS_INT16(rangeStart);
-				run.length = HOST_ENDIAN_TO_BFS_INT16(numBlocks);
-
-				fVolume->SuperBlock().used_blocks =
-					HOST_ENDIAN_TO_BFS_INT64(fVolume->UsedBlocks() + numBlocks);
-					// We are not writing back the disk's super block - it's
-					// either done by the journaling code, or when the disk
-					// is unmounted.
-					// If the value is not correct at mount time, it will be
-					// fixed anyway.
-
-				T(Allocate(run));
-				T(Block("alloc-out", block, cached.Block(),
-					fVolume->BlockSize(), group, rangeStart));
-				return B_OK;
-			}
+			if (bestLength >= maximum)
+				break;
 
 			// start from the beginning of the next block
 			start = 0;
 		}
+
+		if (bestLength >= maximum)
+			break;
 	}
-	return B_DEVICE_FULL;
+
+	// If we found a suitable range, mark the blocks as in use, and
+	// write the updated block bitmap back to disk
+	if (bestLength < minimum)
+		return B_DEVICE_FULL;
+
+	if (fGroups[bestGroup].Allocate(transaction, bestStart, bestLength)
+			< B_OK)
+		RETURN_ERROR(B_IO_ERROR);
+
+	run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(bestGroup);
+	run.start = HOST_ENDIAN_TO_BFS_INT16(bestStart);
+	run.length = HOST_ENDIAN_TO_BFS_INT16(bestLength);
+
+	fVolume->SuperBlock().used_blocks =
+		HOST_ENDIAN_TO_BFS_INT64(fVolume->UsedBlocks() + bestLength);
+		// We are not writing back the disk's super block - it's
+		// either done by the journaling code, or when the disk
+		// is unmounted.
+		// If the value is not correct at mount time, it will be
+		// fixed anyway.
+
+	T(Allocate(run));
+	return B_OK;
 }
 
 
