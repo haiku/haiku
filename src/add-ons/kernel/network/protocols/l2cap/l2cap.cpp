@@ -25,31 +25,45 @@
 
 #include <KernelExport.h>
 #include <util/list.h>
+#include <util/DoublyLinkedList.h>
 
 #include <new>
 #include <stdlib.h>
 #include <string.h>
 
-#include <bluetooth/HCI/btHCI_acl.h>
-
 #include "l2cap_address.h"
+#include "l2cap_internal.h"
+#include "l2cap_lower.h"
+#include "L2capEndpoint.h"
 
+#include <bluetooth/HCI/btHCI_acl.h>
+#include <BTCoreData.h>
+#include <btModules.h>
 
 #define BT_DEBUG_THIS_MODULE
+#define SUBMODULE_NAME "L2cap"
+#define SUBMODULE_COLOR 32
 #include <btDebug.h>
 
 
 typedef NetBufferField<uint16, offsetof(hci_acl_header, alen)> AclLenField;
+DoublyLinkedList<L2capEndpoint> EndpointList;
 
 
 struct l2cap_protocol : net_protocol {
+
 };
 
 
 extern net_protocol_module_info gL2CAPModule;
 
+
+
+// module references
+bluetooth_core_data_module_info *btCoreData;
 net_buffer_module_info *gBufferModule;
-static net_stack_module_info *sStackModule;
+net_stack_module_info *sStackModule;
+net_socket_module_info *gSocketModule;
 
 static struct net_domain *sDomain;
 
@@ -58,9 +72,11 @@ l2cap_init_protocol(net_socket *socket)
 {
 	flowf("\n");
 
-	l2cap_protocol *protocol = new (std::nothrow) l2cap_protocol;
+	L2capEndpoint* protocol = new (std::nothrow) L2capEndpoint(socket);
 	if (protocol == NULL)
 		return NULL;
+
+	EndpointList.Add(protocol);
 
 	return protocol;
 }
@@ -70,6 +86,9 @@ status_t
 l2cap_uninit_protocol(net_protocol *protocol)
 {
 	flowf("\n");
+	
+	// TODO: Some more checkins	/ uninit
+	EndpointList.Remove((L2capEndpoint*)protocol);
 	
 	delete protocol;
 	return B_OK;
@@ -128,7 +147,7 @@ l2cap_control(net_protocol *protocol, int level, int option, void *value,
 	flowf("\n");
 	
 /*	return protocol->next->module->control(protocol->next, level, option, value, _length); */
-	return EOPNOTSUPP;
+	return B_OK;
 }
 
 
@@ -139,7 +158,7 @@ l2cap_getsockopt(net_protocol *protocol, int level, int option,
 	flowf("\n");
 	
 /*	return protocol->next->module->getsockopt(protocol->next, level, option, value, length); */
-	return EOPNOTSUPP;
+	return B_OK;
 }
 
 
@@ -155,11 +174,9 @@ l2cap_setsockopt(net_protocol *protocol, int level, int option,
 
 
 status_t
-l2cap_bind(net_protocol *protocol, const struct sockaddr *address)
+l2cap_bind(net_protocol* protocol, const struct sockaddr* address)
 {
-	flowf("\n");
-	
-	return B_ERROR;
+	return ((L2capEndpoint*)protocol)->Bind(address);
 }
 
 
@@ -175,9 +192,7 @@ l2cap_unbind(net_protocol *protocol, struct sockaddr *address)
 status_t
 l2cap_listen(net_protocol *protocol, int count)
 {
-	flowf("\n");
-	
-	return EOPNOTSUPP;
+	return ((L2capEndpoint*)protocol)->Listen(count);
 }
 
 
@@ -258,21 +273,11 @@ l2cap_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 status_t
 l2cap_receive_data(net_buffer *buffer)
 {
-	debugf("received some data, buffer length %lu\n", buffer->size);
+	HciConnection* conn = (HciConnection*) buffer;
+	debugf("received some data, buffer length %lu\n", conn->currentRxPacket->size);
+	
+	l2cap_receive(conn, conn->currentRxPacket);
 
-	NetBufferHeaderReader<hci_acl_header> bufferHeader(buffer);
-	if (bufferHeader.Status() < B_OK)
-		return bufferHeader.Status();
-
-	hci_acl_header &header = bufferHeader.Data();
-
-	debugf("  got handle %u, len %u\n", header.handle, header.alen);
-	debugf("  computed checksum: %ld\n", gBufferModule->checksum(buffer, 0, buffer->size, true));
-
-	if (gBufferModule->checksum(buffer, 0, buffer->size, true) != 0)
-		return B_BAD_DATA;
-
-	gBufferModule->free(buffer);
 	return B_OK;
 }
 
@@ -303,13 +308,13 @@ l2cap_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 static status_t
 l2cap_std_ops(int32 op, ...)
 {
+	status_t error;		
+
 	flowf("\n");
 	
 	switch (op) {
 		case B_MODULE_INIT:
 		{
-			status_t error;		
-
 			error = sStackModule->register_domain_protocols(AF_BLUETOOTH, SOCK_STREAM, BLUETOOTH_PROTO_L2CAP,
 				"network/protocols/l2cap/v1",
 				NULL);
@@ -329,12 +334,17 @@ l2cap_std_ops(int32 op, ...)
 				return error;
 			}
 
+			new (&EndpointList) DoublyLinkedList<L2capEndpoint>;
+
+			error = InitializeConnectionPurgeThread();
 
 			return B_OK;
 		}
 
 		case B_MODULE_UNINIT:
 		
+			error = QuitConnectionPurgeThread();
+
 			sStackModule->unregister_domain(sDomain);
 			return B_OK;
 
@@ -346,8 +356,8 @@ l2cap_std_ops(int32 op, ...)
 
 net_protocol_module_info gL2CAPModule = {
 	{
-		"network/protocols/l2cap/v1",
-		0,
+		NET_BLUETOOTH_L2CAP_NAME,
+		B_KEEP_LOADED,
 		l2cap_std_ops
 	},
 	NET_PROTOCOL_ATOMIC_MESSAGES,
@@ -382,6 +392,8 @@ net_protocol_module_info gL2CAPModule = {
 module_dependency module_dependencies[] = {
 	{NET_STACK_MODULE_NAME, (module_info **)&sStackModule},
 	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
+	{BT_CORE_DATA_MODULE_NAME, (module_info **)&btCoreData},
+	{NET_SOCKET_MODULE_NAME, (module_info **)&gSocketModule},
 	{}
 };
 

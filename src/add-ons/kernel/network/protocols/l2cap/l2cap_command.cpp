@@ -79,12 +79,31 @@ struct _info_rsp {
 	l2cap_info_rsp_data_t data;
 } __attribute__ ((packed));
 
+// Configuration options
+struct _cfg_opt_flow {
+	l2cap_cfg_opt_t	 hdr;
+	l2cap_flow_t		 val;
+} __attribute__ ((packed));
+
+
+struct _cfg_opt_flush {
+	l2cap_cfg_opt_t	 hdr;
+	uint16		 val;
+} __attribute__ ((packed));
+
+struct _cfg_opt_mtu {
+	l2cap_cfg_opt_t	 hdr;
+	uint16		 val;
+} __attribute__ ((packed));
+
+
+
 
 /* L2CAP_CommandRej */
-static inline net_buffer*
+net_buffer*
 l2cap_cmd_rej(uint8 _ident, uint16 _reason, uint16 _mtu, uint16 _scid, uint16 _dcid)
 {
-	
+
 	net_buffer* _m = gBufferModule->create(sizeof(struct _cmd_rej));
 	if ((_m) == NULL)
 		return NULL;
@@ -110,7 +129,7 @@ l2cap_cmd_rej(uint8 _ident, uint16 _reason, uint16 _mtu, uint16 _scid, uint16 _d
 		bufferHeader->data.cid.dcid = htole16((_dcid));
 		bufferHeader->hdr.length += sizeof(bufferHeader->data.cid);
 	}
-	
+
 	_m->size = sizeof(bufferHeader->hdr) + bufferHeader->hdr.length;	 /* TODO: needed ?*/
 
 	bufferHeader->hdr.length = htole16(bufferHeader->hdr.length);
@@ -122,13 +141,13 @@ l2cap_cmd_rej(uint8 _ident, uint16 _reason, uint16 _mtu, uint16 _scid, uint16 _d
 
 
 /* L2CAP_ConnectReq */
-static inline net_buffer*
+net_buffer*
 l2cap_con_req(uint8 _ident, uint16 _psm, uint16 _scid)
 {
 
 	net_buffer* _m = gBufferModule->create(sizeof(struct _con_req));
 	if ((_m) == NULL)
-		return NULL;						
+		return NULL;
 
 	NetBufferPrepend<struct _con_req> bufferHeader(_m);
 	status_t status = bufferHeader.Status();
@@ -136,7 +155,7 @@ l2cap_con_req(uint8 _ident, uint16 _psm, uint16 _scid)
 		/* TODO free the buffer */
 		return NULL;
 	}
-	
+
 	bufferHeader->hdr.code = L2CAP_CON_REQ;
 	bufferHeader->hdr.ident = (_ident);
 	bufferHeader->hdr.length = htole16(sizeof(bufferHeader->param));
@@ -151,13 +170,13 @@ l2cap_con_req(uint8 _ident, uint16 _psm, uint16 _scid)
 
 
 /* L2CAP_ConnectRsp */
-static inline net_buffer*
+net_buffer*
 l2cap_con_rsp(uint8 _ident, uint16 _dcid, uint16 _scid, uint16 _result, uint16 _status)
 {
 
 	net_buffer* _m = gBufferModule->create(sizeof(struct _con_rsp));
 	if ((_m) == NULL)
-		return NULL;						
+		return NULL;
 
 	NetBufferPrepend<struct _con_rsp> bufferHeader(_m);
 	status_t status = bufferHeader.Status();
@@ -182,14 +201,14 @@ l2cap_con_rsp(uint8 _ident, uint16 _dcid, uint16 _scid, uint16 _result, uint16 _
 
 
 /* L2CAP_ConfigReq */
-static inline net_buffer*
+net_buffer*
 l2cap_cfg_req(uint8 _ident, uint16 _dcid, uint16 _flags, net_buffer* _data)
 {
 
 	net_buffer* _m = gBufferModule->create(sizeof(struct _cfg_req));
 	if ((_m) == NULL){
 		/* TODO free the _data buffer? */
-		return NULL;	
+		return NULL;
 	}
 
 	(_m)->size = sizeof(struct _cfg_req);	  /* check if needed */
@@ -211,6 +230,7 @@ l2cap_cfg_req(uint8 _ident, uint16 _dcid, uint16 _flags, net_buffer* _data)
 	bufferHeader.Sync();
 
 	/* Add the given data */
+	// TODO: given data can be freed... merge does it?
 	gBufferModule->merge(_m, _data, true);
 
 	return _m;
@@ -218,14 +238,14 @@ l2cap_cfg_req(uint8 _ident, uint16 _dcid, uint16 _flags, net_buffer* _data)
 
 
 /* L2CAP_ConfigRsp */
-static inline net_buffer*
+net_buffer*
 l2cap_cfg_rsp(uint8 _ident, uint16 _scid, uint16 _flags, uint16 _result, net_buffer* _data)
 {
 
 	net_buffer* _m = gBufferModule->create(sizeof(struct _cfg_rsp));
 	if ((_m) == NULL){
 		/* TODO free the _data buffer */
-		return NULL;	
+		return NULL;
 	}
 
 	NetBufferPrepend<struct _cfg_rsp> bufferHeader(_m);
@@ -246,20 +266,20 @@ l2cap_cfg_rsp(uint8 _ident, uint16 _scid, uint16 _flags, uint16 _result, net_buf
 	bufferHeader.Sync();
 
 	gBufferModule->merge(_m, _data, true);
-	
+
 	return _m;
 
 }
 
 
 /* L2CAP_DisconnectReq */
-static inline net_buffer*
+net_buffer*
 l2cap_discon_req(uint8 _ident, uint16 _dcid, uint16 _scid)
 {
 
 	net_buffer* _m = gBufferModule->create(sizeof(struct _discon_req));
 	if ((_m) == NULL){
-		return NULL;	
+		return NULL;
 	}
 
 	NetBufferPrepend<struct _discon_req> bufferHeader(_m);
@@ -283,13 +303,13 @@ l2cap_discon_req(uint8 _ident, uint16 _dcid, uint16 _scid)
 
 
 /* L2CA_DisconnectRsp */
-static inline net_buffer*
+net_buffer*
 l2cap_discon_rsp(uint8 _ident, uint16 _dcid, uint16 _scid)
 {
 
 	net_buffer* _m = gBufferModule->create(sizeof(struct _discon_rsp));
 	if ((_m) == NULL){
-		return NULL;	
+		return NULL;
 	}
 
 	NetBufferPrepend<struct _discon_rsp> bufferHeader(_m);
@@ -313,27 +333,16 @@ l2cap_discon_rsp(uint8 _ident, uint16 _dcid, uint16 _scid)
 
 
 /* L2CAP_EchoReq */
-static inline net_buffer*
+net_buffer*
 l2cap_echo_req(uint8 _ident, void* _data, size_t _size)
 {
 	net_buffer* _m = gBufferModule->create(sizeof(l2cap_cmd_hdr_t));
 	if ((_m) == NULL){
 		/* TODO free the _data buffer */
-		return NULL;	
-	}
-
-	NetBufferPrepend<l2cap_cmd_hdr_t> bufferHeader(_m);
-	status_t status = bufferHeader.Status();
-	if (status < B_OK) {
-		/* TODO free the buffer */
 		return NULL;
 	}
 
-	bufferHeader->code = L2CAP_ECHO_REQ;
-	bufferHeader->ident = (_ident);
-	bufferHeader->length = htole16(0);
 
-	bufferHeader.Sync();	
 
 	if ((_data) != NULL) {
 	   	gBufferModule->append(_m, _data, _size);
@@ -344,13 +353,13 @@ l2cap_echo_req(uint8 _ident, void* _data, size_t _size)
 
 
 /* L2CAP_InfoReq */
-static inline net_buffer*
+net_buffer*
 l2cap_info_req(uint8 _ident, uint16 _type)
 {
 
 	net_buffer* _m = gBufferModule->create(sizeof(struct _info_req));
 	if ((_m) == NULL){
-		return NULL;	
+		return NULL;
 	}
 
 	NetBufferPrepend<struct _info_req> bufferHeader(_m);
@@ -373,13 +382,13 @@ l2cap_info_req(uint8 _ident, uint16 _type)
 
 
 /* L2CAP_InfoRsp */
-static inline net_buffer*
+net_buffer*
 l2cap_info_rsp(uint8 _ident, uint16 _type, uint16 _result, uint16 _mtu)
 {
 
 	net_buffer* _m = gBufferModule->create(sizeof(struct _info_rsp));
 	if ((_m) == NULL){
-		return NULL;	
+		return NULL;
 	}
 
 	NetBufferPrepend<struct _info_rsp> bufferHeader(_m);
@@ -401,10 +410,10 @@ l2cap_info_rsp(uint8 _ident, uint16 _type, uint16 _result, uint16 _mtu)
 		case L2CAP_CONNLESS_MTU:
 			bufferHeader->data.mtu.mtu = htole16((_mtu));
 			bufferHeader->hdr.length += sizeof((bufferHeader->data.mtu.mtu));
-			break;				
-		}						   
-	}							   
-									
+			break;
+		}
+	}
+
 	(_m)->size = sizeof(bufferHeader->hdr) + bufferHeader->hdr.length;
 
 	bufferHeader->hdr.length = htole16(bufferHeader->hdr.length);
@@ -420,12 +429,81 @@ l2cap_info_rsp(uint8 _ident, uint16 _type, uint16 _result, uint16 _mtu)
 #endif
 
 
+#define _ng_l2cap_build_cfg_options(_m, _mtu, _flush_timo, _flow)	\
+
 /* Build configuration options  */
-static inline net_buffer*
+net_buffer*
 l2cap_build_cfg_options(uint16* _mtu, uint16* _flush_timo, l2cap_flow_t* _flow)
 {
-	//TODO:
+	size_t requestedSize = 0;
 
-	return NULL;
+	if (_mtu != NULL)
+		requestedSize+=sizeof(*_mtu);
+
+
+	if (_flush_timo != NULL)
+		requestedSize+=sizeof(*_flush_timo);
+
+	if (_flow != NULL)
+		requestedSize+=sizeof(*_flow);
+	
+	net_buffer* _m = gBufferModule->create(sizeof(requestedSize));
+
+	if (_m == NULL)
+		return NULL;
+
+	if (_mtu != NULL) {
+		NetBufferPrepend<struct _cfg_opt_mtu> bufferHeader(_m);
+		status_t status = bufferHeader.Status();
+		if (status < B_OK) {
+			/* TODO free the buffer ?? */
+			return NULL;
+		}
+
+		bufferHeader->hdr.type = L2CAP_OPT_MTU;
+		bufferHeader->hdr.length = sizeof(bufferHeader->val);
+		bufferHeader->val = htole16(*(uint16 *)(_mtu));
+
+		delete &bufferHeader;
+	}
+
+	if (_flush_timo != NULL) {
+
+		NetBufferPrepend<struct _cfg_opt_flush> bufferHeader(_m);
+		status_t status = bufferHeader.Status();
+		if (status < B_OK) {
+			/* TODO free the buffer ?? */
+			return NULL;
+		}
+
+		bufferHeader->hdr.type = L2CAP_OPT_FLUSH_TIMO;
+		bufferHeader->hdr.length = sizeof(bufferHeader->val);
+		bufferHeader->val = htole16(*(int16 *)(_flush_timo));
+
+		delete &bufferHeader;
+	}
+
+	if (_flow != NULL) {
+
+		NetBufferPrepend<struct _cfg_opt_flow> bufferHeader(_m);
+		status_t status = bufferHeader.Status();
+		if (status < B_OK) {
+			/* TODO free the buffer ?? */
+			return NULL;
+		}
+
+		bufferHeader->hdr.type = L2CAP_OPT_QOS;
+		bufferHeader->hdr.length = sizeof(bufferHeader->val);
+		bufferHeader->val.flags = _flow->flags;
+		bufferHeader->val.service_type = _flow->service_type;
+		bufferHeader->val.token_rate = htole32(_flow->token_rate);
+		bufferHeader->val.token_bucket_size = htole32(_flow->token_bucket_size);
+		bufferHeader->val.peak_bandwidth = htole32(_flow->peak_bandwidth);
+		bufferHeader->val.latency = htole32(_flow->latency);
+		bufferHeader->val.delay_variation = htole32(_flow->delay_variation);
+
+		delete &bufferHeader;
+	}
+
+	return _m;
 }
-

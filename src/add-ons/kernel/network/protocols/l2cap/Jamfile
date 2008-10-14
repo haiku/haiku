@@ -10,12 +10,18 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
-UsePrivateHeaders kernel net bluetooth ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net bluetooth ;
 
 KernelAddon l2cap :
 	l2cap.cpp
 	l2cap_address.cpp
 	l2cap_command.cpp
+	l2cap_signal.cpp
+	l2cap_lower.cpp
+	l2cap_upper.cpp
+# Stack subModules
+    L2capEndpoint.cpp
 ;
 
 # Installation
