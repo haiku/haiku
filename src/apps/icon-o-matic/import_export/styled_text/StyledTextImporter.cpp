@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Archivable.h>
 #include <ByteOrder.h>
 #include <DataIO.h>
@@ -94,8 +95,9 @@ ShapeIterator::IterateBezierTo(int32 bezierCount, BPoint *bezierPts)
 	if (!CurrentPath())
 		return B_ERROR;
 	while (bezierCount--) {
-		fPath->AddPoint(fOffset + *bezierPts++, 
-			fOffset + *bezierPts++, fOffset + *bezierPts++, false);
+		fPath->AddPoint(fOffset + bezierPts[1], 
+			fOffset + bezierPts[0], fOffset + bezierPts[2], false);
+			bezierPts += 3;
 	}
 	return B_OK;
 }
@@ -221,6 +223,15 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 		return ret;
 	}
 
+	BString str(text);
+	if (str.Length() > 50) {
+		BAlert* alert = new BAlert("too big", 
+			"The text you are trying to import is quite long, are you sure ?", 
+			"Yes", "No", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (alert->Go())
+			return B_CANCELED;
+	}
+
 	StyleContainer* styles = icon->Styles();
 	// import run colors as styles
 	if (runs) {
@@ -230,23 +241,27 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 		}
 	}
 
-#if 1
+
+
 	int32 currentRun = 0;
 	text_run *run = NULL;
 	if (runs)
 		run = &runs->runs[0];
-	BString str(text);
 	int32 len = str.Length();
 	int32 chars = str.CountChars();
-	BPoint offset(0,0);
+	BPoint origin(0,0);
+	BPoint offset(origin);
 
 	for (int32 i = 0, c = 0; i < len && c < chars; c++) {
 		// make sure we are still on the (good) run
 		while (run && currentRun < runs->count - 1 && 
 			i >= runs->runs[currentRun + 1].offset) {
-			printf("switching to run %d\n", currentRun);
 			run = &runs->runs[++currentRun];
+			printf("switching to run %d\n", currentRun);
 		}
+
+		int charLen;
+		for (charLen = 1; str.ByteAt(i + charLen) & 0x80; charLen++);
 
 		BShape glyph;
 		BShape *glyphs[1] = { &glyph };
@@ -254,9 +269,33 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 		if (run)
 			font = run->font;
 
+		// first char
+		if (offset == BPoint(0,0)) {
+			font_height height;
+			font.GetHeight(&height);
+			origin.y += height.ascent;
+			offset = origin;
+		}
+		// LF
+		if (str[i] == '\n') {
+			// XXX: should take the MAX() for the line
+			// XXX: should use descent + leading from previous line
+			font_height height;
+			font.GetHeight(&height);
+			origin.y += height.ascent + height.descent + height.leading;
+			offset = origin;
+			i++;
+			continue;
+		}
+
+		float charWidth;
+		charWidth = font.StringWidth(str.String() + i, charLen);
+		printf("StringWidth( %d) = %f\n", charLen, charWidth);
+
 		font.GetGlyphShapes((str.String() + i), 1, glyphs);
 		if (glyph.Bounds().IsValid()) {
-			offset.x += glyph.Bounds().Width();
+			//offset.x += glyph.Bounds().Width();
+			offset.x += charWidth;
 			Shape* shape = new (nothrow) Shape(NULL);
 			if (!shape || !icon->Shapes()->AddShape(shape)) {
 				delete shape;
@@ -277,7 +316,7 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 		// skip the rest of UTF-8 char bytes
 		for (i++; i < len && str[i] & 0x80; i++);
 	}
-#endif
+
 	delete[] fStyleMap;
 
 	return B_OK;
