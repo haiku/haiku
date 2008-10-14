@@ -19,6 +19,9 @@ struct check_control;
 struct check_cookie;
 
 
+#define DEBUG_ALLOCATION_GROUPS
+
+
 class BlockAllocator {
 public:
 							BlockAllocator(Volume* volume);
@@ -59,6 +62,9 @@ public:
 #endif
 
 private:
+#ifdef DEBUG_ALLOCATION_GROUPS
+			void			_CheckGroup(int32 group) const;
+#endif
 			bool			_IsValidCheckControl(check_control* control);
 			bool			_CheckBitmapIsUsedAt(off_t block) const;
 			void			_SetCheckBitmapAt(off_t block);
@@ -76,6 +82,9 @@ private:
 };
 
 #ifdef BFS_DEBUGGER_COMMANDS
+#if BFS_TRACING
+int dump_block_allocator_blocks(int argc, char** argv);
+#endif
 int dump_block_allocator(int argc, char** argv);
 #endif
 

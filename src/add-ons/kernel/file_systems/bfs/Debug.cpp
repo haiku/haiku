@@ -423,6 +423,10 @@ remove_debugger_commands()
 {
 	remove_debugger_command("bfs_inode", dump_inode);
 	remove_debugger_command("bfs_allocator", dump_block_allocator);
+#if BFS_TRACING
+	remove_debugger_command("bfs_allocator_blocks",
+		dump_block_allocator_blocks);
+#endif
 	remove_debugger_command("bfs_journal", dump_journal);
 	remove_debugger_command("bfs_btree_header", dump_bplustree_header);
 	remove_debugger_command("bfs_btree_node", dump_bplustree_node);
@@ -437,6 +441,10 @@ add_debugger_commands()
 	add_debugger_command("bfs_inode", dump_inode, "dump an Inode object");
 	add_debugger_command("bfs_allocator", dump_block_allocator,
 		"dump a BFS block allocator");
+#if BFS_TRACING
+	add_debugger_command("bfs_allocator_blocks", dump_block_allocator_blocks,
+		"dump a BFS block allocator actions that affected a certain block");
+#endif
 	add_debugger_command("bfs_journal", dump_journal,
 		"dump the journal log entries");
 	add_debugger_command("bfs_btree_header", dump_bplustree_header,
