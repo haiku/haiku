@@ -79,7 +79,7 @@ IconButton::Draw(BRect area)
 {
 	rgb_color background = LowColor();
 	if (BView* parent = Parent())
-		background = parent->ViewColor();
+		background = parent->LowColor();
 	rgb_color lightShadow, shadow, darkShadow, light;
 	BRect r(Bounds());
 	BBitmap* bitmap = fNormalBitmap;
