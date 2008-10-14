@@ -25,10 +25,14 @@
 #define SYS_TENABLE	0x01	/* delay mode with /4 prescaler: 0x01 (<<3 for timer D) */
 #define SYS_TDISABLE	0x00
 #define SYS_TVECTOR	13
-#define MFP_FREQ	2457600UL
 #define MFP_PRESCALER	4
-#define MFP_RATE	(MFP_FREQ/MFP_PRESCALER)
-#define MFP_MAX_TIMER_INTERVAL	(0xff * 1000000L / MFP_RATE)
+
+/* used for timer interrupt */
+#define MFP_TIMER_RATE	(MFP_FREQ/MFP_PRESCALER)
+#define MFP_MAX_TIMER_INTERVAL	(0xff * 1000000L / MFP_TIMER_RATE)
+
+/* used for system_time() calculation */
+#define MFP_SYSTEM_TIME_RATE	(MFP_FREQ/MFP_PRESCALER)
 
 
 #define MFP0_BASE	0xFFFFFA00
@@ -383,6 +387,8 @@ status_t
 M68KAtari::InitRTC(struct kernel_args *kernelArgs,
 	struct real_time_data *data)
 {
+	// XXX we should do this in the bootloader maybe...
+	args->arch_args.time_base_frequency = MFP_SYSTEM_TIME_RATE;
 	return B_OK;
 }
 
