@@ -318,19 +318,21 @@ main(int argc, char *argv[])
 		strcpy(fullPath, "Haiku");
 
 		if (realpath(file, fullPath + 5) == NULL)
-			strncpy(fullPath, file, sizeof(fullPath));
+			strncpy(fullPath + 5, file, sizeof(fullPath) - 5);
 
-		for (size_t i = strlen(fullPath); i < sizeof(fullPath) - 1; i++) {
+		size_t pathLength = strlen(fullPath);
+		for (size_t i = pathLength; i < 42; i++) {
 			// fill rest with some numbers
 			fullPath[i] = i % 10 + '0';
 		}
-		fullPath[sizeof(fullPath) - 1] = '\0';
+		if (pathLength < 42)
+			fullPath[42] = '\0';
 
 		uuid1 = hash_string(fullPath);
-		uuid2 = hash_string(fullPath) + 5;
-		uuid3 = hash_string(fullPath) + 13;
-		uuid4 = hash_string(fullPath) + 19;
-		uuid5 = hash_string(fullPath) + 29;
+		uuid2 = hash_string(fullPath + 5);
+		uuid3 = hash_string(fullPath + 13);
+		uuid4 = hash_string(fullPath + 19);
+		uuid5 = hash_string(fullPath + 29);
 	}
 
 	// Create embedded descriptor
