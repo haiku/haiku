@@ -59,8 +59,6 @@ All rights reserved.
 #include "TeamMenuItem.h"
 
 
-extern menu_info *_menu_info_ptr_;
-
 const int32 kDefaultRecentDocCount = 10;
 const int32 kDefaultRecentFolderCount = 10;
 const int32 kDefaultRecentAppCount = 10;
@@ -85,9 +83,7 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	fCachedTypesList(NULL),
 	fMaxRecentDocs(kDefaultRecentDocCount),
 	fMaxRecentApps(kDefaultRecentAppCount),
-	fLastDragItem(NULL),
-	fClickToOpen(_menu_info_ptr_->click_to_open)
-		// init click to open to current local setting
+	fLastDragItem(NULL)
 {		
 }
 
@@ -603,14 +599,6 @@ init_tracking_hook(BMenuItem *item,
 status_t
 TBarView::DragStart()
 {	
-	// always set the click to open state
-	// to false during a drag
-	// so that a release on a menu/menubar will not
-	// leave the menu open (ExpandoMenuBar, BarMenuBar)
-	// will get reset to actual initial system
-	// state on DragStop
-	_menu_info_ptr_->click_to_open = false;
-
 	if (!Dragging())
 		return B_OK;
 
@@ -709,10 +697,6 @@ TBarView::DragStop(bool full)
 {
 	if (!Dragging())
 		return;
-
-	// revert the local click to open to
-	// the launch state, cached in constructor
-	_menu_info_ptr_->click_to_open = fClickToOpen;
 
 	if (fExpando) {
 		if (fLastDragItem) {

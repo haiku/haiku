@@ -166,7 +166,6 @@ class TBarView : public BView {
 		uint32 fMaxRecentApps;
 
 		TTeamMenuItem *fLastDragItem;
-		bool fClickToOpen;
 };
 
 
