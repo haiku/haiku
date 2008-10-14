@@ -89,6 +89,8 @@ enum {
 
 /*  Port drivers can use to send information (1 for all for
 	at moment refer to ioctl GET_NOTIFICATION_PORT)*/
-#define BT_USERLAND_PORT_NAME "BT kernel-user Land"
+#define BT_USERLAND_PORT_NAME "bluetooth kernel-user Land"
+#define BLUETOOTH_CONNECTION_PORT "bluetooth connection port"
+#define BLUETOOTH_CONNECTION_SCHED_PORT "bluetooth con sched port"
 
 #endif // _BTHCI_TRANSPORT_H_
