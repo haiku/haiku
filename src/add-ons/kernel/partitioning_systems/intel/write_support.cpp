@@ -1064,6 +1064,7 @@ move_partition(int fd, off_t fromOffset, off_t toOffset, off_t size,
 	uint8 *buffer, int32 buffer_size, disk_job_id job)
 {
 // TODO: This should be a service function of the DDM!
+// TODO: This seems to be broken if source and destination overlap.
 	status_t error = B_OK;
 	off_t cycleCount = size / buffer_size;
 	int32 remainingSize = size - cycleCount * buffer_size;
