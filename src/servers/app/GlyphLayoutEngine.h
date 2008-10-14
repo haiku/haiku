@@ -155,6 +155,8 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			continue;
 		}
 
+// TODO: Currently disabled, because it works much too slow (doesn't seem
+// to be properly cached in FreeType.)
 //		if (kerning)
 //			entry->GetKerning(lastCharCode, charCode, &advanceX, &advanceY);
 
@@ -164,10 +166,13 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 		if (delta)
 			x += IsWhiteSpace(charCode) ? delta->space : delta->nonspace;
 
-		if (!consumer.ConsumeGlyph(index, charCode, glyph, entry, x, y))
+		if (!consumer.ConsumeGlyph(index, charCode, glyph, entry, x, y)) {
+			advanceX = 0;
+			advanceY = 0;
 			break;
+		}
 
-		// increment pen position
+		// get next increment for pen position
 		advanceX = glyph->advance_x;
 		advanceY = glyph->advance_y;
 
