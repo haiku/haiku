@@ -1,7 +1,7 @@
 #include <sys/bus.h>
 #include <pci/if_rlreg.h>
 
-HAIKU_FBSD_DRIVER_GLUE(re, re, pci);
+HAIKU_FBSD_DRIVER_GLUE(rtl81xx, re, pci);
 HAIKU_FBSD_MII_DRIVER(rlphy);
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE);
 
