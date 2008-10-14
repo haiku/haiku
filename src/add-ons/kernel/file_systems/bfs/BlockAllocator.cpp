@@ -1014,6 +1014,7 @@ BlockAllocator::BitmapSize() const
 }
 
 
+#ifdef DEBUG_ALLOCATION_GROUPS
 void
 BlockAllocator::_CheckGroup(int32 groupIndex) const
 {
@@ -1083,6 +1084,7 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 			(int)group.fLargestLength, (int)largestStart, (int)largestLength);
 	}
 }
+#endif	// DEBUG_ALLOCATION_GROUPS
 
 
 //	#pragma mark - Bitmap validity checking
