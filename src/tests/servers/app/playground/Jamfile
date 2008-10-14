@@ -11,8 +11,8 @@ Application Playground :
 	ObjectView.cpp
 	ObjectWindow.cpp
 	States.cpp
-#	StatusView.cpp
 	: be
+	: Playground.rdef
 ;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {

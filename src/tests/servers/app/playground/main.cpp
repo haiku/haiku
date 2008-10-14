@@ -10,10 +10,7 @@
 int
 main(int argc, char** argv)
 {
-	BApplication* app = new BApplication("application/x.vnd-Haiku.Objects");
-
-	BRect a(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
-	a.PrintToStream();
+	BApplication* app = new BApplication("application/x.vnd-Haiku.Playground");
 
 	BRect frame(50.0, 50.0, 600.0, 400.0);
 	BWindow* window = new ObjectWindow(frame, "Playground");
