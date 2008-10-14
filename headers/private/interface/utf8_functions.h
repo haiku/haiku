@@ -161,7 +161,7 @@ UTF8ToCharCode(const char **bytes)
 
 		mask <<= 1;
 		if (mask == 0x40)
-			break;
+			return result;
 	}
 
 	if (mask == 0x40)
