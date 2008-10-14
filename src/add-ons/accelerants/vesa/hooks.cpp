@@ -1,16 +1,18 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "accelerant_protos.h"
 
 
-// ToDo: these are some temporary dummy functions to see if this helps with our current app_server
+// TODO: these are some temporary dummy functions to see if this helps with our
+// current app_server
 
 status_t
-vesa_set_cursor_shape(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y, uint8 *andMask, uint8 *xorMask)
+vesa_set_cursor_shape(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y,
+	uint8 *andMask, uint8 *xorMask)
 {
 	return B_OK;
 }

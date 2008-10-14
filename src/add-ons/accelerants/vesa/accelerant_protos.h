@@ -1,6 +1,6 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef _ACCELERANT_PROTOS_H
 #define _ACCELERANT_PROTOS_H
@@ -28,31 +28,31 @@ uint32 vesa_accelerant_mode_count(void);
 status_t vesa_get_mode_list(display_mode *dm);
 status_t vesa_propose_display_mode(display_mode *target,
 	const display_mode *low, const display_mode *high);
-status_t vesa_set_display_mode(display_mode *mode_to_set);
-status_t vesa_get_display_mode(display_mode *current_mode);
+status_t vesa_set_display_mode(display_mode *modeToSet);
+status_t vesa_get_display_mode(display_mode *currentMode);
 status_t vesa_get_edid_info(void *info, size_t size, uint32 *_version);
 status_t vesa_get_frame_buffer_config(frame_buffer_config *config);
 status_t vesa_get_pixel_clock_limits(display_mode *dm, uint32 *low,
 	uint32 *high);
-status_t vesa_move_display(uint16 h_display_start, uint16 v_display_start);
+status_t vesa_move_display(uint16 hDisplayStart, uint16 vDisplayStart);
 status_t vesa_get_timing_constraints(display_timing_constraints *dtc);
-void vesa_set_indexed_colors(uint count, uint8 first, uint8 *color_data,
+void vesa_set_indexed_colors(uint count, uint8 first, uint8 *colorData,
 	uint32 flags);
 
 // DPMS
 uint32 vesa_dpms_capabilities(void);
 uint32 vesa_dpms_mode(void);
-status_t vesa_set_dpms_mode(uint32 dpms_flags);
+status_t vesa_set_dpms_mode(uint32 dpmsFlags);
 
 // cursor
-status_t vesa_set_cursor_shape(uint16 width, uint16 height, uint16 hot_x,
-	uint16 hot_y, uint8 *andMask, uint8 *xorMask);
+status_t vesa_set_cursor_shape(uint16 width, uint16 height, uint16 hotX,
+	uint16 hotY, uint8 *andMask, uint8 *xorMask);
 void vesa_move_cursor(uint16 x, uint16 y);
 void vesa_show_cursor(bool is_visible);
 
 // accelerant engine
 uint32 vesa_accelerant_engine_count(void);
-status_t vesa_acquire_engine(uint32 capabilities, uint32 max_wait,
+status_t vesa_acquire_engine(uint32 capabilities, uint32 maxWait,
 	sync_token *st, engine_token **et);
 status_t vesa_release_engine(engine_token *et, sync_token *st);
 void vesa_wait_engine_idle(void);
