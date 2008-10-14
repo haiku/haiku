@@ -17,8 +17,9 @@
 
 #include "vmdkimage.h"
 
-#ifdef __BEOS__
+#if defined(__BEOS__) && !defined(__HAIKU__)
 #define pread(_fd, _buf, _count, _pos) read_pos(_fd, _pos, _buf, _count)
+#define realpath(x, y)	NULL
 #endif
 
 static void
