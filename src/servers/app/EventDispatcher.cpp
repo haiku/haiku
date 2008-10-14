@@ -696,7 +696,7 @@ EventDispatcher::_DeliverDragMessage()
 		fDragMessage.AddPoint("_drop_offset_", fDragOffset);
 		fDragMessage.what = _MESSAGE_DROPPED_;
 
-		_SendMessage(fPreviousMouseTarget->Messenger(), 
+		_SendMessage(fPreviousMouseTarget->Messenger(),
 			&fDragMessage, 100.0);
 	}
 
