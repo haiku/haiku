@@ -1040,10 +1040,11 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 				if (firstFree < 0) {
 					firstFree = currentBit;
 					if (!group.fLargestValid) {
-						if (firstFree < group.fFirstFree) {
+						if (firstFree >= 0 && firstFree < group.fFirstFree) {
 							// mostly harmless but noteworthy
-							dprintf("group %d first free too late\n",
-								(int)groupIndex);
+							dprintf("group %d first free too late: should be "
+								"%d, is %d\n", (int)groupIndex, (int)firstFree,
+								(int)group.fFirstFree);
 						}
 						return;
 					}
@@ -1071,10 +1072,10 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 		largestLength = currentLength;
 	}
 
-	if (firstFree < group.fFirstFree) {
+	if (firstFree >= 0 && firstFree < group.fFirstFree) {
 		// mostly harmless but noteworthy
-		dprintf("group %d first free too late\n",
-			(int)groupIndex);
+		dprintf("group %d first free too late: should be %d, is %d\n",
+			(int)groupIndex, (int)firstFree, (int)group.fFirstFree);
 	}
 	if (group.fLargestValid
 		&& (largestStart != group.fLargestStart
