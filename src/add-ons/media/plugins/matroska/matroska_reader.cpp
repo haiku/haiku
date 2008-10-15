@@ -442,7 +442,7 @@ mkvReader::FreeCookie(void *_cookie)
 
 status_t
 mkvReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, const void **infoBuffer, size_t *infoSize)
+	media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	mkv_cookie *cookie = (mkv_cookie *)_cookie;
 	if (cookie) {
@@ -457,8 +457,7 @@ mkvReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 
 
 status_t
-mkvReader::Seek(void *cookie, uint32 flags,
-				int64 *frame, bigtime_t *time)
+mkvReader::Seek(void *cookie, uint32 flags, int64 *frame, bigtime_t *time)
 {
 	// Seek to the specified frame or time
 	mkv_cookie *mkvcookie = (mkv_cookie *)cookie;
