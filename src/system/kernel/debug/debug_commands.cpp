@@ -351,13 +351,25 @@ invoke_debugger_command_pipe(debugger_command_pipe* pipe)
 			sOutputBuffers[i], kOutputBufferSize);
 	}
 
-	int result = invoke_pipe_segment(pipe, 0, NULL);
+	int result;
+	while (true) {
+		result = invoke_pipe_segment(pipe, 0, NULL);
 
-	// perform final rerun for all commands that want it
-	for (int32 i = 1; result != B_KDEBUG_ERROR && i < segments; i++) {
-		debugger_command_pipe_segment& segment = pipe->segments[i];
-		if ((segment.command->flags & B_KDEBUG_PIPE_FINAL_RERUN) != 0)
-			result = invoke_pipe_segment(pipe, i, NULL);
+		// perform final rerun for all commands that want it
+		for (int32 i = 1; result != B_KDEBUG_ERROR && i < segments; i++) {
+			debugger_command_pipe_segment& segment = pipe->segments[i];
+			if ((segment.command->flags & B_KDEBUG_PIPE_FINAL_RERUN) != 0) {
+				result = invoke_pipe_segment(pipe, i, NULL);
+				if (result == B_KDEBUG_RESTART_PIPE) {
+					for (int32 j = 0; j < i; j++)
+						pipe->segments[j].invocations = 0;
+					break;
+				}
+			}
+		}
+
+		if (result != B_KDEBUG_RESTART_PIPE)
+			break;
 	}
 
 	sCurrentPipe = oldPipe;

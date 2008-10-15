@@ -48,7 +48,8 @@
 #endif
 
 // command return value
-#define B_KDEBUG_ERROR	4
+#define B_KDEBUG_ERROR			4
+#define B_KDEBUG_RESTART_PIPE	5
 
 // command flags
 #define B_KDEBUG_DONT_PARSE_ARGUMENTS	(0x01)

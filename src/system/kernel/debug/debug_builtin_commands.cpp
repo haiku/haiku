@@ -149,6 +149,59 @@ cmd_head(int argc, char** argv)
 
 
 static int
+cmd_tail(int argc, char** argv)
+{
+	debugger_command_pipe_segment* segment
+		= get_current_debugger_command_pipe_segment();
+	if (segment == NULL) {
+		kprintf_unfiltered("%s can only be run as part of a pipe!\n", argv[0]);
+		return B_KDEBUG_ERROR;
+	}
+
+	struct user_data {
+		uint64	max_lines;
+		int64	line_count;
+		bool	restarted;
+	};
+	user_data* userData = (user_data*)segment->user_data;
+
+	if (segment->invocations == 0) {
+		if (argc > 3) {
+			print_debugger_command_usage(argv[0]);
+			return B_KDEBUG_ERROR;
+		}
+
+		userData->max_lines = 10;
+		if (argc > 2 && !evaluate_debug_expression(argv[1],
+				&userData->max_lines, false)) {
+			return B_KDEBUG_ERROR;
+		}
+
+		userData->line_count = 1;
+		userData->restarted = false;
+	} else if (!userData->restarted) {
+		if (argv[argc - 1] == NULL) {
+			userData->restarted = true;
+			userData->line_count -= userData->max_lines;
+			return B_KDEBUG_RESTART_PIPE;
+		}
+
+		++userData->line_count;
+	} else {
+		if (argv[argc - 1] == NULL)
+			return 0;
+
+		if (--userData->line_count < 0) {
+			kputs(argv[argc - 1]);
+			kputs("\n");
+		}
+	}
+
+	return 0;
+}
+
+
+static int
 cmd_grep(int argc, char** argv)
 {
 	bool caseSensitive = true;
@@ -300,6 +353,13 @@ debug_builtin_commands_init()
 		"Should be used in a command pipe. It prints only the first\n"
 		"<maxLines> lines of output from the previous command in the pipe and\n"
 		"silently discards the rest of the output.\n", 0);
+	add_debugger_command_etc("tail", &cmd_tail,
+		"Prints only the last lines of output from another command",
+		"[ <maxLines> ]\n"
+		"Should be used in a command pipe. It prints only the last\n"
+		"<maxLines> (default 10) lines of output from the previous command in\n"
+		"the pipe and silently discards the rest of the output.\n",
+		B_KDEBUG_PIPE_FINAL_RERUN);
 	add_debugger_command_etc("grep", &cmd_grep,
 		"Filters output from another command",
 		"[ -i ] [ -v ] <pattern>\n"
