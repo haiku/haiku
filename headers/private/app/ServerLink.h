@@ -66,7 +66,7 @@ class ServerLink {
 		status_t ReadString(char** _string, size_t* _length = NULL);
 		status_t ReadRegion(BRegion *region);
 		status_t ReadShape(BShape *shape);
-		status_t ReadGradient(BGradient *gradient);
+		status_t ReadGradient(BGradient **gradient);
 		template <class Type> status_t Read(Type *data);
 
 		// convenience methods

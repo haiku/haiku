@@ -115,87 +115,10 @@ ServerLink::AttachShape(BShape &shape)
 
 
 status_t
-ServerLink::ReadGradient(BGradient *gradient)
+ServerLink::ReadGradient(BGradient **gradient)
 {
 	GTRACE(("ServerLink::ReadGradient\n"));
-	fReceiver->ReadGradient(gradient);
-/*	gradient_type gradientType;
-	int32 colorsCount;
-	fReceiver->Read(&gradientType, sizeof(gradient_type));
-	fReceiver->Read(&colorsCount, sizeof(int32));
-
-	if (colorsCount > 0) {
-		color_step step;
-		for (int i = 0; i < colorsCount; i++) {
-			fReceiver->Read(&step, sizeof(color_step));
-			gradient->AddColor(step, i);
-		}
-	}
-
-	switch(gradientType) {
-		case B_GRADIENT_LINEAR: {
-			GTRACE(("ServerLink::ReadGradient> type == B_GRADIENT_LINEAR\n"));
-			BGradientLinear* linear = (BGradientLinear*) gradient;
-			BPoint start;
-			BPoint end;
-			fReceiver->Read(&start, sizeof(BPoint));
-			fReceiver->Read(&end, sizeof(BPoint));
-			linear->SetStart(start);
-			linear->SetEnd(end);
-			break;
-		}
-		case B_GRADIENT_RADIAL: {
-			GTRACE(("ServerLink::ReadGradient> type == B_GRADIENT_RADIAL\n"));
-			BGradientRadial* radial = (BGradientRadial*) gradient;
-			BPoint center;
-			float radius;
-			fReceiver->Read(&center, sizeof(BPoint));
-			fReceiver->Read(&radius, sizeof(float));
-			radial->SetCenter(center);
-			radial->SetRadius(radius);
-			break;
-		}
-		case B_GRADIENT_RADIAL_FOCUS: {
-			GTRACE(("ServerLink::ReadGradient> type == B_GRADIENT_RADIAL_FOCUS\n"));
-			BGradientRadialFocus* radialFocus =
-				(BGradientRadialFocus*) gradient;
-			BPoint center;
-			BPoint focal;
-			float radius;
-			fReceiver->Read(&center, sizeof(BPoint));
-			fReceiver->Read(&focal, sizeof(BPoint));
-			fReceiver->Read(&radius, sizeof(float));
-			radialFocus->SetCenter(center);
-			radialFocus->SetFocal(focal);
-			radialFocus->SetRadius(radius);
-			break;
-		}
-		case B_GRADIENT_DIAMOND: {
-			GTRACE(("ServerLink::ReadGradient> type == B_GRADIENT_DIAMOND\n"));
-			BGradientDiamond* diamond = (BGradientDiamond*) gradient;
-			BPoint center;
-			fReceiver->Read(&center, sizeof(BPoint));
-			diamond->SetCenter(center);
-			break;
-		}
-		case B_GRADIENT_CONIC: {
-			GTRACE(("ServerLink::ReadGradient> type == B_GRADIENT_CONIC\n"));
-			BGradientConic* conic = (BGradientConic*) gradient;
-			BPoint center;
-			float angle;
-			fReceiver->Read(&center, sizeof(BPoint));
-			fReceiver->Read(&angle, sizeof(float));
-			conic->SetCenter(center);
-			conic->SetAngle(angle);
-			break;
-		}
-		case B_GRADIENT_NONE: {
-			GTRACE(("ServerLink::ReadGradient> type == B_GRADIENT_NONE\n"));
-			break;
-		}
-	}
-*/
-	return B_OK;
+	return fReceiver->ReadGradient(gradient);
 }
 
 	

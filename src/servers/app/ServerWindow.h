@@ -130,8 +130,6 @@ private:
 			void				_UpdateCurrentDrawingRegion();
 
 			bool				_MessageNeedsAllWindowsLocked(uint32 code) const;
-	
-			BGradient*			_GetNewGradientForType(gradient_type type);
 
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,

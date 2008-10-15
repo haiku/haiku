@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Pahtz <pahtz@yahoo.com.au>
  *		Axel Dörfler
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Artur Wyszynski <harakash@gmail.com>
  */
 
 /** Class for low-overhead port-based messaging */
@@ -469,79 +470,120 @@ LinkReceiver::ReadRegion(BRegion* region)
 }
 
 
+static BGradient*
+gradient_for_type(gradient_type type)
+{
+	switch (type) {
+		case B_GRADIENT_LINEAR:
+			return new (std::nothrow) BGradientLinear();
+		case B_GRADIENT_RADIAL:
+			return new (std::nothrow) BGradientRadial();
+		case B_GRADIENT_RADIAL_FOCUS:
+			return new (std::nothrow) BGradientRadialFocus();
+		case B_GRADIENT_DIAMOND:
+			return new (std::nothrow) BGradientDiamond();
+		case B_GRADIENT_CONIC:
+			return new (std::nothrow) BGradientConic();
+		case B_GRADIENT_NONE:
+			return new (std::nothrow) BGradient();
+	}
+	return NULL;
+}
+
+
 status_t
-LinkReceiver::ReadGradient(BGradient *gradient)
+LinkReceiver::ReadGradient(BGradient** _gradient)
 {
 	GTRACE(("LinkReceiver::ReadGradient\n"));
 	gradient_type gradientType;
 	int32 colorsCount;
-	Read(&gradientType, sizeof(gradient_type));
-	Read(&colorsCount, sizeof(int32));
+	status_t ret;
+	if ((ret = Read(&gradientType, sizeof(gradient_type))) != B_OK)
+		return ret;
+	if ((ret = Read(&colorsCount, sizeof(int32))) != B_OK)
+		return ret;
+	BGradient* gradient = gradient_for_type(gradientType);
+	if (!gradient)
+		return B_NO_MEMORY;
+
+	*_gradient = gradient;
 	
 	if (colorsCount > 0) {
 		color_step step;
 		for (int i = 0; i < colorsCount; i++) {
-			Read(&step, sizeof(color_step));
-			gradient->AddColor(step, i);
+			if ((ret = Read(&step, sizeof(color_step))) != B_OK)
+				return ret; 
+			if (!gradient->AddColor(step, i))
+				return B_NO_MEMORY;
 		}
 	}
-	
+
 	switch(gradientType) {
 		case B_GRADIENT_LINEAR: {
 			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_LINEAR\n"));
-			BGradientLinear* linear = (BGradientLinear*) gradient;
+			BGradientLinear* linear = (BGradientLinear*)gradient;
 			BPoint start;
 			BPoint end;
-			Read(&start, sizeof(BPoint));
-			Read(&end, sizeof(BPoint));
+			if ((ret = Read(&start, sizeof(BPoint))) != B_OK)
+				return ret; 
+			if ((ret = Read(&end, sizeof(BPoint))) != B_OK)
+				return ret; 
 			linear->SetStart(start);
 			linear->SetEnd(end);
-			break;
+			return B_OK;
 		}
 		case B_GRADIENT_RADIAL: {
 			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_RADIAL\n"));
-			BGradientRadial* radial = (BGradientRadial*) gradient;
+			BGradientRadial* radial = (BGradientRadial*)gradient;
 			BPoint center;
 			float radius;
-			Read(&center, sizeof(BPoint));
-			Read(&radius, sizeof(float));
+			if ((ret = Read(&center, sizeof(BPoint))) != B_OK)
+				return ret; 
+			if ((ret = Read(&radius, sizeof(float))) != B_OK)
+				return ret; 
 			radial->SetCenter(center);
 			radial->SetRadius(radius);
-			break;
+			return B_OK;
 		}
 		case B_GRADIENT_RADIAL_FOCUS: {
 			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_RADIAL_FOCUS\n"));
 			BGradientRadialFocus* radialFocus =
-				(BGradientRadialFocus*) gradient;
+				(BGradientRadialFocus*)gradient;
 			BPoint center;
 			BPoint focal;
 			float radius;
-			Read(&center, sizeof(BPoint));
-			Read(&focal, sizeof(BPoint));
-			Read(&radius, sizeof(float));
+			if ((ret = Read(&center, sizeof(BPoint))) != B_OK)
+				return ret; 
+			if ((ret = Read(&focal, sizeof(BPoint))) != B_OK)
+				return ret; 
+			if ((ret = Read(&radius, sizeof(float))) != B_OK)
+				return ret; 
 			radialFocus->SetCenter(center);
 			radialFocus->SetFocal(focal);
 			radialFocus->SetRadius(radius);
-			break;
+			return B_OK;
 		}
 		case B_GRADIENT_DIAMOND: {
 			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_DIAMOND\n"));
-			BGradientDiamond* diamond = (BGradientDiamond*) gradient;
+			BGradientDiamond* diamond = (BGradientDiamond*)gradient;
 			BPoint center;
-			Read(&center, sizeof(BPoint));
+			if ((ret = Read(&center, sizeof(BPoint))) != B_OK)
+				return ret; 
 			diamond->SetCenter(center);
-			break;
+			return B_OK;
 		}
 		case B_GRADIENT_CONIC: {
 			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_CONIC\n"));
-			BGradientConic* conic = (BGradientConic*) gradient;
+			BGradientConic* conic = (BGradientConic*)gradient;
 			BPoint center;
 			float angle;
-			Read(&center, sizeof(BPoint));
-			Read(&angle, sizeof(float));
+			if ((ret = Read(&center, sizeof(BPoint))) != B_OK)
+				return ret; 
+			if ((ret = Read(&angle, sizeof(float))) != B_OK)
+				return ret; 
 			conic->SetCenter(center);
 			conic->SetAngle(angle);
-			break;
+			return B_OK;
 		}
 		case B_GRADIENT_NONE: {
 			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_NONE\n"));
@@ -549,7 +591,7 @@ LinkReceiver::ReadGradient(BGradient *gradient)
 		}
 	}
 	
-	return B_OK;
+	return B_ERROR;
 }
 
 }	// namespace BPrivate

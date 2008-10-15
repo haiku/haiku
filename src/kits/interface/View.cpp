@@ -2629,7 +2629,6 @@ BView::FillEllipse(BRect rect, const BGradient& gradient)
 
 	fOwner->fLink->StartMessage(AS_FILL_ELLIPSE_GRADIENT);
 	fOwner->fLink->Attach<BRect>(rect);
-	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
@@ -2714,7 +2713,6 @@ BView::FillArc(BRect rect, float startAngle, float arcAngle,
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<float>(startAngle);
 	fOwner->fLink->Attach<float>(arcAngle);
-	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
@@ -2772,7 +2770,6 @@ BView::FillBezier(BPoint *controlPoints, const BGradient& gradient)
 	fOwner->fLink->Attach<BPoint>(controlPoints[1]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[2]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[3]);
-	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
@@ -2874,7 +2871,6 @@ BView::FillPolygon(const BPolygon *polygon, const BGradient& gradient)
 		fOwner->fLink->Attach<int32>(polygon->fCount);
 		fOwner->fLink->Attach(polygon->fPoints,
 							  polygon->fCount * sizeof(BPoint));
-		fOwner->fLink->Attach<gradient_type>(gradient.Type());
 		fOwner->fLink->AttachGradient(gradient);
 
 		_FlushIfNotInTransaction();
@@ -2987,7 +2983,6 @@ BView::FillRect(BRect rect, const BGradient& gradient)
 
 	fOwner->fLink->StartMessage(AS_FILL_RECT_GRADIENT);
 	fOwner->fLink->Attach<BRect>(rect);
-	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
@@ -3046,7 +3041,6 @@ BView::FillRoundRect(BRect rect, float xRadius, float yRadius,
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<float>(xRadius);
 	fOwner->fLink->Attach<float>(yRadius);
-	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
@@ -3080,7 +3074,6 @@ BView::FillRegion(BRegion *region, const BGradient& gradient)
 
 	fOwner->fLink->StartMessage(AS_FILL_REGION_GRADIENT);
 	fOwner->fLink->AttachRegion(*region);
-	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
@@ -3259,7 +3252,6 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	fOwner->fLink->Attach<BPoint>(pt2);
 	fOwner->fLink->Attach<BPoint>(pt3);
 	fOwner->fLink->Attach<BRect>(bounds);
-	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
@@ -3359,7 +3351,6 @@ BView::FillShape(BShape *shape, const BGradient& gradient)
 	fOwner->fLink->Attach<int32>(sd->ptCount);
 	fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(int32));
 	fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
-	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
 
 	_FlushIfNotInTransaction();
