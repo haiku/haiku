@@ -690,14 +690,14 @@ BlockAllocator::Uninitialize()
 
 
 status_t
-BlockAllocator::AllocateBlocks(Transaction& transaction, int32 group,
+BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 	uint16 start, uint16 maximum, uint16 minimum, block_run& run)
 {
 	if (maximum == 0)
 		return B_BAD_VALUE;
 
 	FUNCTION_START(("group = %ld, start = %u, maximum = %u, minimum = %u\n",
-		group, start, maximum, minimum));
+		groupIndex, start, maximum, minimum));
 
 	AllocationBlock cached(fVolume);
 	MutexLocker lock(fLock);
@@ -709,33 +709,30 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 group,
 	int32 bestStart = -1;
 	int32 bestLength = -1;
 
-	for (int32 i = 0; i < fNumGroups + 1; i++, group++, start = 0) {
-		group = group % fNumGroups;
-		CHECK_ALLOCATION_GROUP(group);
+	for (int32 i = 0; i < fNumGroups + 1; i++, groupIndex++, start = 0) {
+		groupIndex = groupIndex % fNumGroups;
+		AllocationGroup& group = fGroups[groupIndex];
 
-		if (start >= fGroups[group].NumBits() || fGroups[group].IsFull())
+		CHECK_ALLOCATION_GROUP(groupIndex);
+
+		if (start >= group.NumBits() || group.IsFull())
 			continue;
 
 		// The wanted maximum is smaller than the largest free block in the
 		// group or already smaller than the minimum
-		// TODO: disabled because it's currently not maintained after the first
-		// allocation
 
-		//if (numBlocks > fGroups[group].fLargest)
-		//	continue;
+		if (start < group.fFirstFree)
+			start = group.fFirstFree;
 
-		if (start < fGroups[group].fFirstFree)
-			start = fGroups[group].fFirstFree;
-
-		if (fGroups[group].fLargestValid) {
-			if (fGroups[group].fLargestLength < bestLength)
+		if (group.fLargestValid) {
+			if (group.fLargestLength < bestLength)
 				continue;
 
-			if (fGroups[group].fLargestStart >= start) {
-				if (fGroups[group].fLargestLength >= bestLength) {
-					bestGroup = group;
-					bestStart = fGroups[group].fLargestStart;
-					bestLength = fGroups[group].fLargestLength;
+			if (group.fLargestStart >= start) {
+				if (group.fLargestLength >= bestLength) {
+					bestGroup = groupIndex;
+					bestStart = group.fLargestStart;
+					bestLength = group.fLargestLength;
 
 					if (bestLength >= maximum)
 						break;
@@ -752,65 +749,65 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 group,
 		// (one allocation can't exceed one allocation group)
 
 		uint32 block = start / (fVolume->BlockSize() << 3);
-		int32 range = 0, rangeStart = 0;
+		int32 currentStart = 0, currentLength = 0;
 		int32 groupLargestStart = -1;
-		int32 groupLargest = -1;
-		int32 current = start;
-		bool canUseLargest = start == 0;
+		int32 groupLargestLength = -1;
+		int32 currentBit = start;
+		bool canFindGroupLargest = start == 0;
 
-		for (; block < fGroups[group].NumBlocks(); block++) {
-			if (cached.SetTo(fGroups[group], block) < B_OK)
+		for (; block < group.NumBlocks(); block++) {
+			if (cached.SetTo(group, block) < B_OK)
 				RETURN_ERROR(B_ERROR);
 
-			T(Block("alloc-in", fGroups[group].Start() + block, cached.Block(),
-				fVolume->BlockSize(), group, rangeStart));
+			T(Block("alloc-in", group.Start() + block, cached.Block(),
+				fVolume->BlockSize(), groupIndex, currentStart));
 
 			// find a block large enough to hold the allocation
 			for (uint32 bit = start % bitsPerFullBlock;
 					bit < cached.NumBlockBits(); bit++) {
 				if (!cached.IsUsed(bit)) {
-					if (range == 0) {
+					if (currentLength == 0) {
 						// start new range
-						rangeStart = current;
+						currentStart = currentBit;
 					}
 
 					// have we found a range large enough to hold numBlocks?
-					if (++range >= maximum) {
-						bestGroup = group;
-						bestStart = rangeStart;
-						bestLength = range;
+					if (++currentLength >= maximum) {
+						bestGroup = groupIndex;
+						bestStart = currentStart;
+						bestLength = currentLength;
 						break;
 					}
 				} else {
-					if (range) {
+					if (currentLength) {
 						// end of a range
-						if (range > bestLength) {
-							bestGroup = group;
-							bestStart = rangeStart;
-							bestLength = range;
+						if (currentLength > bestLength) {
+							bestGroup = groupIndex;
+							bestStart = currentStart;
+							bestLength = currentLength;
 						}
-						if (range > groupLargest) {
-							groupLargestStart = rangeStart;
-							groupLargest = range;
+						if (currentLength > groupLargestLength) {
+							groupLargestStart = currentStart;
+							groupLargestLength = currentLength;
 						}
-						range = 0;
+						currentLength = 0;
 					}
-					if ((int32)fGroups[group].NumBits() - current
-							<= groupLargest) {
+					if ((int32)group.NumBits() - currentBit
+							<= groupLargestLength) {
 						// We can't find a bigger block in this group anymore,
 						// let's skip the rest.
-						block = fGroups[group].NumBlocks();
+						block = group.NumBlocks();
 						break;
 					}
 				}
-				current++;
+				currentBit++;
 			}
 
 			T(Block("alloc-out", block, cached.Block(),
-				fVolume->BlockSize(), group, rangeStart));
+				fVolume->BlockSize(), groupIndex, currentStart));
 
 			if (bestLength >= maximum) {
-				canUseLargest = false;
+				canFindGroupLargest = false;
 				break;
 			}
 
@@ -818,23 +815,23 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 group,
 			start = 0;
 		}
 
-		if (current == (int32)fGroups[group].NumBits()) {
-			if (range > bestLength) {
-				bestGroup = group;
-				bestStart = rangeStart;
-				bestLength = range;
+		if (currentBit == (int32)group.NumBits()) {
+			if (currentLength > bestLength) {
+				bestGroup = groupIndex;
+				bestStart = currentStart;
+				bestLength = currentLength;
 			}
-			if (canUseLargest && range > groupLargest) {
-				groupLargestStart = rangeStart;
-				groupLargest = range;
+			if (canFindGroupLargest && currentLength > groupLargestLength) {
+				groupLargestStart = currentStart;
+				groupLargestLength = currentLength;
 			}
 		}
 
-		if (canUseLargest && !fGroups[group].fLargestValid
-			&& groupLargest >= 0) {
-			fGroups[group].fLargestStart = groupLargestStart;
-			fGroups[group].fLargestLength = groupLargest;
-			fGroups[group].fLargestValid = true;
+		if (canFindGroupLargest && !group.fLargestValid
+			&& groupLargestLength >= 0) {
+			group.fLargestStart = groupLargestStart;
+			group.fLargestLength = groupLargestLength;
+			group.fLargestValid = true;
 		}
 
 		if (bestLength >= maximum)
