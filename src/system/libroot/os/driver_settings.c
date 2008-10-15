@@ -650,7 +650,7 @@ driver_settings_init(kernel_args *args)
 			// this triggers parsing the settings when they are actually used
 
 		if (!strcmp(handle->name, B_SAFEMODE_DRIVER_SETTINGS)) {
-			// These settings cannot be reloaded, so we better don't through
+			// These settings cannot be reloaded, so we better don't throw
 			// them away.
 			handle->ref_count = 1;
 		} else
