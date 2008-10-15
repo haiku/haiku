@@ -202,7 +202,7 @@ KeyboardDevice::_InterpretBuffer()
 		0x1d,	// =
 		0x31,	// [
 		0x32,	// ]
-		0x00,	// unmapped
+		0x33,	// backslash
 		0x33,	// backslash
 		0x45,	// ;
 		0x46,	// '
