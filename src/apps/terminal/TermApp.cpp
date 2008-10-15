@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
@@ -37,7 +37,7 @@ static bool sUsageRequested = false;
 
 
 const ulong MSG_ACTIVATE_TERM = 'msat';
-const ulong MSG_TERM_IS_MINIMIZE = 'mtim';
+const ulong MSG_TERM_WINDOW_INFO = 'mtwi';
 
 
 TermApp::TermApp()
@@ -132,7 +132,7 @@ TermApp::AboutRequested()
 	BAlert *alert = new BAlert("about", "Terminal\n"
 		"\twritten by Kazuho Okui and Takashi Murai\n"
 		"\tupdated by Kian Duffy and others\n\n"
-		"\tCopyright " B_UTF8_COPYRIGHT "2003-2005, Haiku.\n", "Ok");
+		"\tCopyright " B_UTF8_COPYRIGHT "2003-2008, Haiku.\n", "Ok");
 	BTextView *view = alert->TextView();
 	
 	view->SetStylable(true);
@@ -159,10 +159,11 @@ TermApp::MessageReceived(BMessage* msg)
 			fTermWindow->Activate();
 			break;
 
-		case MSG_TERM_IS_MINIMIZE:
+		case MSG_TERM_WINDOW_INFO:
 		{
 			BMessage reply(B_REPLY);
-			reply.AddBool("result", fTermWindow->IsMinimized());
+			reply.AddBool("minimized", fTermWindow->IsMinimized());
+			reply.AddInt32("workspaces", fTermWindow->Workspaces());
 			msg->SendReply(&reply);
 			break;
 		}
@@ -265,15 +266,15 @@ TermApp::_ActivateTermWindow(team_id id)
 void
 TermApp::_SwitchTerm()
 {
-	team_id myId = be_app->Team(); // My id
+	team_id myId = be_app->Team();
 	BList teams;
 	be_roster->GetAppList(TERM_SIGNATURE, &teams); 
+
 	int32 numTerms = teams.CountItems();
+	if (numTerms <= 1)
+		return;
 
-	if (numTerms <= 1 )
-		return; //Can't Switch !!
-
-	// Find position of mine in app teams.
+	// Find our position in the app teams.
 	int32 i;
 
 	for (i = 0; i < numTerms; i++) {
@@ -284,7 +285,7 @@ TermApp::_SwitchTerm()
 	do {
 		if (--i < 0)
 			i = numTerms - 1;
-	} while (_IsMinimized(reinterpret_cast<team_id>(teams.ItemAt(i))));
+	} while (!_IsSwitchTarget(reinterpret_cast<team_id>(teams.ItemAt(i))));
 
 	// Activate switched terminal.
 	_ActivateTermWindow(reinterpret_cast<team_id>(teams.ItemAt(i)));
@@ -292,19 +293,26 @@ TermApp::_SwitchTerm()
 
 
 bool
-TermApp::_IsMinimized(team_id id)
+TermApp::_IsSwitchTarget(team_id id)
 {
 	BMessenger app(TERM_SIGNATURE, id);
-	if (app.IsTargetLocal())
-		return fTermWindow->IsMinimized();
+	if (app.IsTargetLocal()) {
+		return !fTermWindow->IsMinimized()
+			&& (fTermWindow->Workspaces() & (1L << current_workspace())) != 0;
+	}
 
 	BMessage reply;
-	if (app.SendMessage(MSG_TERM_IS_MINIMIZE, &reply) != B_OK)
-		return true;
+	if (app.SendMessage(MSG_TERM_WINDOW_INFO, &reply) != B_OK)
+		return false;
 
-	bool hidden;
-	reply.FindBool("result", &hidden);
-	return hidden;
+	bool minimized;
+	int32 workspaces;
+	if (reply.FindBool("minimized", &minimized) != B_OK
+		|| reply.FindInt32("workspaces", &workspaces) != B_OK)
+		return false;
+
+	return !minimized
+		&& (workspaces & (1L << current_workspace())) != 0;
 }
 
 

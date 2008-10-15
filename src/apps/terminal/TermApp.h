@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
@@ -55,7 +55,7 @@ class TermApp : public BApplication {
 		status_t _MakeTermWindow(BRect& frame);
 		void _SwitchTerm();
 		void _ActivateTermWindow(team_id id);
-		bool _IsMinimized(team_id id);
+		bool _IsSwitchTarget(team_id id);
 		void _SanitizeIDs(BMessage* data, uint8* windows, ssize_t length);
 		bool _UpdateIDs(bool set, uint8* windows, ssize_t maxLength,
 			ssize_t* _length);
