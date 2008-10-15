@@ -110,7 +110,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	AddChild(fColorWell);
 	
 	fPicker = new BColorControl(BPoint(wellrect.right + kBorderSpace, wellrect.top),
-			B_CELLS_32x8, 5.0, "fPicker", new BMessage(UPDATE_COLOR));
+			B_CELLS_32x8, 8.0, "fPicker", new BMessage(UPDATE_COLOR));
 	fPicker->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(fPicker);	
 	
