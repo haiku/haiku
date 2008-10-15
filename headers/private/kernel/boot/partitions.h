@@ -93,6 +93,8 @@ struct file_system_module_info {
 };
 
 extern file_system_module_info gBFSFileSystemModule;
+extern file_system_module_info gFATFileSystemModule;
+extern file_system_module_info gHFSPlusFileSystemModule;
 extern file_system_module_info gAmigaFFSFileSystemModule;
 extern file_system_module_info gTarFileSystemModule;
 

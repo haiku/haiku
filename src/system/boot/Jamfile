@@ -35,6 +35,7 @@ KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_bfs.a
 	boot_amiga_ffs.a
 	boot_tarfs.a
+	boot_fatfs.a
 
 	libz.a
 
