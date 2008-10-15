@@ -69,6 +69,21 @@ PairsView::AttachedToWindow()
 }
 
 
+bool
+PairsView::_HasBitmap(BList& bitmaps, BBitmap* bitmap)
+{
+	// TODO: if this takes too long, we could build a hash value for each
+	// bitmap in a separate list
+	for (int32 i = bitmaps.CountItems(); i-- > 0;) {
+		BBitmap* item = (BBitmap*)bitmaps.ItemAtFast(i);
+		if (!memcmp(item->Bits(), bitmap->Bits(), item->BitsLength()))
+			return true;
+	}
+
+	return false;
+}
+
+
 void
 PairsView::_ReadRandomIcons()
 {
@@ -125,10 +140,9 @@ PairsView::_ReadRandomIcons()
 
 		delete[] data;
 
-		if (!bitmaps.AddItem(bitmap))
+		if (_HasBitmap(bitmaps, bitmap) || !bitmaps.AddItem(bitmap))
 			delete bitmap;
-
-		if (bitmaps.CountItems() >= 128) {
+		else if (bitmaps.CountItems() >= 128) {
 			// this is enough to choose from, stop eating memory...
 			break;
 		}

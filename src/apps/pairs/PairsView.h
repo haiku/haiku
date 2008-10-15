@@ -28,6 +28,7 @@ private:
 			void				_SetPairsBoard();
 			void				_ReadRandomIcons();
 			void				_GenerateCardPos();
+			bool				_HasBitmap(BList& bitmaps, BBitmap* bitmap);
 
 			BMessage*			fButtonMessage;
 			BBitmap*			fCard[8];
