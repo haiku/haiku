@@ -163,6 +163,7 @@ GetVideoFormat(media_format *format, const char *codec, void *private_data, int 
 
 	if (IS_CODEC(codec, "V_MS/VFW/FOURCC")) {
 		if (private_size < (int)sizeof(bitmap_info_header)) {
+			TRACE("private_size too small!\n");
 			return B_ERROR;
 		}
 		const bitmap_info_header *bih = (const bitmap_info_header *)private_data;
@@ -177,6 +178,11 @@ GetVideoFormat(media_format *format, const char *codec, void *private_data, int 
 
 		return B_OK;
 	}
+	if (IS_CODEC(codec, "V_MPEG4/ISO/AVC")) {
+		printf("TODO: MPEG4/AVC a.k.a h264\n");
+		return B_ERROR;
+	}
+	TRACE("not a codec!\n");
 
 	return B_ERROR;
 }
