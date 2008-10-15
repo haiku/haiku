@@ -645,6 +645,7 @@ driver_settings_init(kernel_args *args)
 			handle->text = NULL;
 
 		strlcpy(handle->name, settings->name, sizeof(handle->name));
+		handle->settings.parameters = NULL;
 		handle->magic = 0;
 			// this triggers parsing the settings when they are actually used
 
