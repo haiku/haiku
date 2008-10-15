@@ -68,7 +68,7 @@ typedef uint32_t socklen_t;
 #define	SO_ERROR		0x40000007	/* get error status and clear */
 #define	SO_TYPE			0x40000008	/* get socket type */
 #define SO_NONBLOCK		0x40000009
-#define SO_BINDTODEVICE	0x4000000a
+#define SO_BINDTODEVICE	0x4000000a	/* binds the socket to a specific device index */
 #define SO_PEERCRED		0x4000000b	/* get peer credentials, param: ucred */
 
 /* Shutdown options */
