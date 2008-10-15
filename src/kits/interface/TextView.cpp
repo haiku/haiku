@@ -2135,16 +2135,25 @@ BTextView::SetTextRect(BRect rect)
 {
 	if (rect == fTextRect)
 		return;
-		
+
+	bool needsRefresh = fTextRect.left != rect.left
+		 || fTextRect.right != rect.right || fTextRect.top != rect.top;
+
+	fLayoutData->UpdateInsets(Bounds().OffsetToCopy(B_ORIGIN), rect);
+
+	if (!needsRefresh)
+		rect.bottom = fTextRect.bottom;
+
 	fTextRect = rect;
 	fMinTextRectWidth = fTextRect.Width();
 		// used in auto-resizing mode to keep the text rect from
 		// shrinking below a certain value.
 
-	fLayoutData->UpdateInsets(Bounds(), fTextRect);
-
-	if (Window() != NULL)
-		Invalidate();		
+	if (needsRefresh) {
+		// In BeOS, the text rect height is always adjusted to the text data
+		// height. Setting a narrower text rect will therefore enlarge the height.
+		_Refresh(0, TextLength(), true, false);
+	}
 }
 
 
@@ -2186,7 +2195,7 @@ void
 BTextView::GetInsets(float* _left, float* _top, float* _right,
 	float* _bottom) const
 {
-	BRect bounds = Bounds();
+	BRect bounds = Bounds().OffsetToCopy(B_ORIGIN);
 
 	if (_left)
 		*_left = fTextRect.left - bounds.left;
@@ -2707,24 +2716,12 @@ BTextView::DoLayout()
 		size.height = fLayoutData->min.height;
 
 	// layout text rect
-	BPoint previousLocation = fTextRect.LeftTop();
-	float previousTextWidth = fTextRect.Width();
-
-	fTextRect = Bounds();
-	fTextRect.left += fLayoutData->leftInset;
-	fTextRect.top += fLayoutData->topInset;
-	fTextRect.right -= fLayoutData->rightInset;
-	fTextRect.bottom -= fLayoutData->bottomInset;
-
-	// recalculate linebreaks and invalidate if necessary
-	if (previousTextWidth != fTextRect.Width()
-		|| previousLocation != fTextRect.LeftTop()) {
-		int32 startLine = 0;
-		int32 endLine = fLines->NumLines() - 1;
-		_RecalculateLineBreaks(&startLine, &endLine);
-	}
-
-	Invalidate();
+	BRect textRect = Bounds().OffsetToCopy(B_ORIGIN);
+	textRect.left += fLayoutData->leftInset;
+	textRect.top += fLayoutData->topInset;
+	textRect.right -= fLayoutData->rightInset;
+	textRect.bottom -= fLayoutData->bottomInset;
+	SetTextRect(textRect);
 }
 
 
@@ -3130,7 +3127,7 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	fTrackingMouse = NULL;
 
 	fLayoutData = new LayoutData;
-	fLayoutData->UpdateInsets(Bounds(), fTextRect);
+	fLayoutData->UpdateInsets(Bounds().OffsetToCopy(B_ORIGIN), fTextRect);
 }
 
 
@@ -4485,8 +4482,8 @@ BTextView::_UpdateScrollbars()
 	// do we have a horizontal scroll bar?
 	if (horizontalScrollBar != NULL) {
 		long viewWidth = bounds.IntegerWidth();
-		long dataWidth = fTextRect.IntegerWidth();
-		dataWidth += (long)ceilf(fTextRect.left) + 1;
+		long dataWidth = (long)ceilf(fTextRect.IntegerWidth()
+			+ fLayoutData->leftInset + fLayoutData->rightInset);
 		
 		long maxRange = dataWidth - viewWidth;
 		maxRange = max_c(maxRange, 0);
@@ -4499,8 +4496,8 @@ BTextView::_UpdateScrollbars()
 	// how about a vertical scroll bar?
 	if (verticalScrollBar != NULL) {
 		long viewHeight = bounds.IntegerHeight();
-		long dataHeight = fTextRect.IntegerHeight();
-		dataHeight += (long)ceilf(fTextRect.top) + 1;
+		long dataHeight = (long)ceilf(fTextRect.IntegerHeight()
+			+ fLayoutData->topInset + fLayoutData->bottomInset);
 		
 		long maxRange = dataHeight - viewHeight;
 		maxRange = max_c(maxRange, 0);
