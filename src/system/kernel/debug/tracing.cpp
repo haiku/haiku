@@ -430,6 +430,10 @@ class UserTraceEntry : public AbstractTraceEntry {
 		{
 			fMessage = alloc_tracing_buffer_strcpy(message, 256, true);
 
+#if KTRACE_PRINTF_STACK_TRACE
+			fStackTrace = capture_tracing_stack_trace(
+				KTRACE_PRINTF_STACK_TRACE, 1, false);
+#endif
 			Initialized();
 		}
 
@@ -438,8 +442,18 @@ class UserTraceEntry : public AbstractTraceEntry {
 			out.Print("user: %s", fMessage);
 		}
 
+#if KTRACE_PRINTF_STACK_TRACE
+		virtual void DumpStackTrace(TraceOutput& out)
+		{
+			out.PrintStackTrace(fStackTrace);
+		}
+#endif
+
 	private:
 		char*	fMessage;
+#if KTRACE_PRINTF_STACK_TRACE
+		tracing_stack_trace* fStackTrace;
+#endif
 };
 
 #endif	// ENABLE_TRACING
