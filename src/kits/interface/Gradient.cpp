@@ -128,7 +128,7 @@ BGradient::BGradient(BMessage* archive)
 	if (archive->FindFloat("linear_x2", (float*)&fData.linear.x2) < B_OK)
 		fData.linear.x2 = 0.0f;
 	if (archive->FindFloat("linear_y2", (float*)&fData.linear.y2) < B_OK)
-		fData.linear.x2 = 0.0f;
+		fData.linear.y2 = 0.0f;
 
 	// radial
 	if (archive->FindFloat("radial_cx", (float*)&fData.radial.cx) < B_OK)
@@ -147,8 +147,8 @@ BGradient::BGradient(BMessage* archive)
 		fData.radial_focus.fx = 0.0f;
 	if (archive->FindFloat("radial_f_fy", (float*)&fData.radial_focus.fy) < B_OK)
 		fData.radial_focus.fy = 0.0f;
-	if (archive->FindFloat("radial_f_radius", (float*)&fData.radial.radius) < B_OK)
-		fData.radial.radius = 0.0f;
+	if (archive->FindFloat("radial_f_radius", (float*)&fData.radial_focus.radius) < B_OK)
+		fData.radial_focus.radius = 0.0f;
 
 	// diamond
 	if (archive->FindFloat("diamond_cx", (float*)&fData.diamond.cx) < B_OK)
@@ -222,7 +222,7 @@ BGradient::Archive(BMessage* into, bool deep) const
 	if (ret >= B_OK)
 		ret = into->AddFloat("radial_f_fy", (float)fData.radial_focus.fy);
 	if (ret >= B_OK)
-		ret = into->AddFloat("radial_radius", (float)fData.radial.radius);
+		ret = into->AddFloat("radial_f_radius", (float)fData.radial_focus.radius);
 	
 	// diamond
 	if (ret >= B_OK)
