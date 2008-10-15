@@ -1301,7 +1301,7 @@ BPlusTree::Insert(Transaction& transaction, const uint8* key, uint16 keyLength,
 					return B_OK;
 				}
 
-				RETURN_ERROR(B_NAME_IN_USE);
+				return B_NAME_IN_USE;
 			}
 		}
 
