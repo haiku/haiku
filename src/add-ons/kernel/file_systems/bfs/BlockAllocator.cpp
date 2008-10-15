@@ -154,8 +154,8 @@ class AllocationBlock : public CachedBlock {
 public:
 	AllocationBlock(Volume* volume);
 
-	void Allocate(uint16 start, uint16 numBlocks);
-	void Free(uint16 start, uint16 numBlocks);
+	inline void Allocate(uint16 start, uint16 numBlocks);
+	inline void Free(uint16 start, uint16 numBlocks);
 	inline bool IsUsed(uint16 block);
 
 	status_t SetTo(AllocationGroup& group, uint16 block);
@@ -755,7 +755,7 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 group,
 		int32 range = 0, rangeStart = 0;
 		int32 groupLargestStart = -1;
 		int32 groupLargest = -1;
-		int32 current = block * bitsPerFullBlock + start;
+		int32 current = start;
 		bool canUseLargest = start == 0;
 
 		for (; block < fGroups[group].NumBlocks(); block++) {
