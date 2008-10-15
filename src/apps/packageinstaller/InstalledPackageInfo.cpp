@@ -23,50 +23,47 @@ const char * kPackagesDir = "packages";
 static status_t
 info_prepare(const char *filename, BFile *file, BMessage *info)
 {
-	if (!filename)
-		return B_ERROR;
+	if (filename == NULL || file == NULL || info == NULL)
+		return B_BAD_VALUE;
 
 	BPath path;
-	if (find_directory(B_USER_CONFIG_DIRECTORY, &path) != B_OK 
-			|| path.Append(kPackagesDir) != B_OK 
-			|| path.Append(filename) != B_OK)
-		return B_ERROR;
+	status_t ret = find_directory(B_USER_CONFIG_DIRECTORY, &path);
+	if (ret == B_OK)
+		ret = path.Append(kPackagesDir);
+	if (ret == B_OK)
+		ret = path.Append(filename);
+	if (ret == B_OK)
+		ret = file->SetTo(path.Path(), B_READ_ONLY);
+	if (ret == B_OK)
+		ret = info->Unflatten(file);
+	if (ret == B_OK && info->what != P_PACKAGE_INFO)
+		ret = B_ERROR;
 
-	file->SetTo(path.Path(), B_READ_ONLY);
-	if (file->InitCheck() != B_OK)
-		return B_ERROR;
-
-	status_t ret = info->Unflatten(file);
-	if (ret != B_OK || info->what != P_PACKAGE_INFO)
-		return B_ERROR;
-
-	return B_OK;
+	return ret;
 }
 
 
-const char *
-info_get_package_name(const char *filename)
+status_t
+info_get_package_name(const char *filename, BString &name)
 {
 	BFile file;
 	BMessage info;
-	if (info_prepare(filename, &file, &info) != B_OK)
-		return NULL;
-	BString name;
-	info.FindString("package_name", &name);
-	return name.String();
+	status_t ret = info_prepare(filename, &file, &info);
+	if (ret == B_OK)
+		ret = info.FindString("package_name", &name);
+	return ret;
 }
 
 
-const char *
-info_get_package_version(const char *filename)
+status_t
+info_get_package_version(const char *filename, BString &version)
 {
 	BFile file;
 	BMessage info;
-	if (info_prepare(filename, &file, &info) != B_OK)
-		return NULL;
-	BString version;
-	info.FindString("package_version", &version);
-	return version.String();
+	status_t ret = info_prepare(filename, &file, &info);
+	if (ret == B_OK)
+		ret = info.FindString("package_version", &version);
+	return ret;
 }
 
 

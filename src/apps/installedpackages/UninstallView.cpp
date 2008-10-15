@@ -6,18 +6,26 @@
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
  */
 #include "UninstallView.h"
-#include <Alert.h>
-#include <String.h>
-#include <Directory.h>
-#include <File.h>
-#include <Entry.h>
-#include <Button.h>
-#include <Box.h>
-#include <StringView.h>
-#include <NodeMonitor.h>
-#include <FindDirectory.h>
 
 #include <stdio.h>
+#include <string.h>
+
+#include <Alert.h>
+#include <Box.h>
+#include <Button.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <NodeMonitor.h>
+#include <String.h>
+#include <StringView.h>
+
+#ifdef __HAIKU__
+#	include <GroupLayout.h>
+#	include <GroupLayoutBuilder.h>
+#	include <SpaceLayoutItem.h>
+#endif
 
 
 enum {
@@ -37,20 +45,27 @@ enum {
 //	- Add a status window (reuse the one from PackageInstall)
 
 
+static const char* kNoPackageSelected = "No package selected.";
+
 class UninstallView::InfoItem : public BStringItem {
 	public:
-		InfoItem(const char *name, const char *version, node_ref ref)
-			:	BStringItem(name),
-				fVersion(version),
-				fNodeRef(ref)
+		InfoItem(const BString& name, const BString& version,
+				const char* filename, const node_ref& ref)
+			: BStringItem(name.String()),
+			  fName(name),
+			  fVersion(version),
+			  fNodeRef(ref)
 		{
+			if (fName.Length() == 0)
+				SetText(filename);
 		}
 
-		const char * GetName() { return BStringItem::Text(); }
-		const char * GetVersion() { return fVersion.String(); };
+		const char* GetName() { return fName.String(); }
+		const char* GetVersion() { return fVersion.String(); };
 		node_ref GetNodeRef() { return fNodeRef; };
 
 	private:
+		BString fName;
 		BString fVersion;
 		node_ref fNodeRef;
 };
@@ -67,8 +82,6 @@ UninstallView::UninstallView(BRect frame)
 
 UninstallView::~UninstallView()
 {
-	_ClearAppList();
-
 	// Stop all node watching
 	stop_watching(this);
 }
@@ -97,8 +110,7 @@ UninstallView::AttachedToWindow()
 		fToPackages.GetParent(&path);
 		if (dir.SetTo(path.Path()) != B_OK)
 			return;
-	}
-	else
+	} else
 		fWatcherRunning = true;
 
 	dir.GetNodeRef(&ref);
@@ -111,7 +123,7 @@ UninstallView::AttachedToWindow()
 
 
 void
-UninstallView::MessageReceived(BMessage *msg)
+UninstallView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case B_NODE_MONITOR:
@@ -138,11 +150,8 @@ UninstallView::MessageReceived(BMessage *msg)
 				usleep(10000);
 
 				if (fWatcherRunning) {
-					name = info_get_package_name(filename.String());
-					version = info_get_package_version(filename.String());
-					fAppList->AddItem(new InfoItem(name.String(), version.String(), ref));
-				}
-				else {
+					_AddFile(filename.String(), ref);
+				} else {
 					// This most likely means we were waiting for the packages/ dir
 					// to appear
 					if (filename == "packages") {
@@ -150,8 +159,7 @@ UninstallView::MessageReceived(BMessage *msg)
 							fWatcherRunning = true;
 					}
 				}
-			}
-			else if (opcode == B_ENTRY_REMOVED) {
+			} else if (opcode == B_ENTRY_REMOVED) {
 				node_ref ref;
 				if (msg->FindInt32("device", &ref.device) != B_OK ||
 						msg->FindInt64("node", &ref.node) != B_OK)
@@ -163,13 +171,12 @@ UninstallView::MessageReceived(BMessage *msg)
 					iter = static_cast<InfoItem *>(fAppList->ItemAt(i));
 					if (iter->GetNodeRef() == ref) {
 						if (i == fAppList->CurrentSelection())
-							fDescription->SetText(T("No package selected"));
+							fDescription->SetText(T(kNoPackageSelected));
 						fAppList->RemoveItem(i);
 						delete iter;
 					}
 				}
-			}
-			else if (opcode == B_ENTRY_MOVED) {
+			} else if (opcode == B_ENTRY_MOVED) {
 				ino_t from, to;
 				if (msg->FindInt64("from directory", &from) != B_OK ||
 						msg->FindInt64("to directory", &to) != B_OK)
@@ -182,8 +189,7 @@ UninstallView::MessageReceived(BMessage *msg)
 				if (ref.node == to) {
 					// Package added
 					// TODO
-				}
-				else if (ref.node == from) {
+				} else if (ref.node == from) {
 					// Package removed
 					// TODO
 				}
@@ -192,23 +198,27 @@ UninstallView::MessageReceived(BMessage *msg)
 		}
 		case P_MSG_SELECT:
 		{
+			fButton->SetEnabled(false);
+			fDescription->SetText(T(kNoPackageSelected));
+
 			int32 index = fAppList->CurrentSelection();
 			if (index < 0)
 				break;
 
 			fprintf(stderr, "Another debug message...\n");
 
-			InfoItem *item = dynamic_cast<InfoItem *>(fAppList->ItemAt(index));
+			InfoItem* item = dynamic_cast<InfoItem*>(fAppList->ItemAt(index));
 			if (!item)
 				break;
 
-			fprintf(stderr, "Uh: %s and %s\n", item->GetName(), item->GetVersion());
+			fprintf(stderr, "Uh: %s and %s\n", item->GetName(),
+				item->GetVersion());
 
-			if (fCurrentSelection.SetTo(item->GetName(), item->GetVersion()) != B_OK)
+			if (fCurrentSelection.SetTo(item->GetName(),
+					item->GetVersion()) != B_OK)
 				break;
 
-			fprintf(stderr, "                     ...how much longer?\n");
-
+			fButton->SetEnabled(true);
 			fDescription->SetText(fCurrentSelection.GetDescription());
 			break;
 		}
@@ -221,24 +231,23 @@ UninstallView::MessageReceived(BMessage *msg)
 			if (index < 0)
 				break;
 
-			BAlert *notify;
+			BAlert* notify;
 			if (fCurrentSelection.Uninstall() == B_OK) {
-				BListItem *item = static_cast<BListItem *>(fAppList->ItemAt(index));
-				fAppList->RemoveItem(index);
+				BListItem* item = fAppList->RemoveItem(index);
 				delete item;
 
-				fDescription->SetText(T("No package selected"));
+				fDescription->SetText(T(kNoPackageSelected));
 
 				notify = new BAlert("removal_success",
-						T("The package you selected has been successfully removed "
-							"from your system."), T("OK"));
-			}
-			else
+					T("The package you selected has been successfully removed "
+					"from your system."), T("OK"));
+			} else {
 				notify = new BAlert("removal_failed",
-						T("The selected package was not removed from your system. The "
-							"given installed package information file might have been "
-							"corrupted."), T("OK"), NULL, 
-						NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+					T("The selected package was not removed from your system. "
+					"The given installed package information file might have "
+					"been corrupted."), T("OK"), NULL, 
+					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			}
 
 			notify->Go();
 		}
@@ -253,24 +262,78 @@ void
 UninstallView::_InitView()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+#ifdef __HAIKU__
+	BBox* descriptionBox = new BBox(B_PLAIN_BORDER, NULL);
+	BGroupLayout* descriptionLayout = new BGroupLayout(B_VERTICAL, 5);
+	descriptionBox->SetLayout(descriptionLayout);
+
+	BBox* buttonBox = new BBox(B_PLAIN_BORDER, NULL);
+	BGroupLayout* buttonLayout = new BGroupLayout(B_HORIZONTAL, 5);
+	buttonBox->SetLayout(buttonLayout);
+
+	fAppList = new BListView("pkg_list", B_SINGLE_SELECTION_LIST);
+	fAppList->SetSelectionMessage(new BMessage(P_MSG_SELECT));
+	BScrollView* scrollView = new BScrollView("list_scroll", fAppList,
+		B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
+	BGroupLayout* scrollLayout = new BGroupLayout(B_HORIZONTAL);
+	scrollView->SetLayout(scrollLayout);
+
+	BStringView* descriptionLabel = new BStringView("desc_label",
+		T("Package description"));
+	descriptionLabel->SetFont(be_bold_font);
+
+	fDescription = new BTextView("description", B_WILL_DRAW);
+	fDescription->MakeSelectable(false);
+	fDescription->MakeEditable(false);
+	fDescription->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fDescription->SetText(T(kNoPackageSelected));
+
+	fButton = new BButton("removal", T("Remove"), new BMessage(P_MSG_REMOVE));
+	fButton->SetEnabled(false);
+
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(scrollView)
+		.Add(BGroupLayoutBuilder(descriptionLayout)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+				.Add(descriptionLabel)
+				.AddGlue()
+			)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10))
+				.Add(fDescription)
+			)
+			.SetInsets(5, 5, 5, 5)
+		)
+		.Add(BGroupLayoutBuilder(buttonLayout)
+			.AddGlue()
+			.Add(fButton)
+			.SetInsets(5, 5, 5, 5)
+		)
+	);
+
+#else
+
 	BRect rect = Bounds().InsetBySelf(10.0f, 10.0f);
 	rect.bottom = 125.0f;
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	fAppList = new BListView(rect, "pkg_list", B_SINGLE_SELECTION_LIST, 
-			B_FOLLOW_NONE);
+		B_FOLLOW_NONE);
 	fAppList->SetSelectionMessage(new BMessage(P_MSG_SELECT));
 
-	BScrollView *scroll = new BScrollView("list_scroll", fAppList, B_FOLLOW_NONE,
-			0, false, true);
+	BScrollView *scroll = new BScrollView("list_scroll", fAppList,
+		B_FOLLOW_NONE, 0, false, true);
 	AddChild(scroll);
 
 	rect.top = rect.bottom + 8.0f;
 	rect.bottom += 120.0f;
 	rect.right += B_V_SCROLL_BAR_WIDTH;
-	BBox *box = new BBox(rect, "desc_box");
+	BBox* box = new BBox(rect, "desc_box");
 
 	BStringView *descLabel = new BStringView(BRect(3, 3, 10, 10), "desc_label",
-			T("Package description:"));
+		T("Package description:"));
 	descLabel->ResizeToPreferred();
 	box->AddChild(descLabel);
 
@@ -278,21 +341,23 @@ UninstallView::_InitView()
 	inside.top = descLabel->Frame().bottom + 10.0f;
 	inside.right -= B_V_SCROLL_BAR_WIDTH;
 	fDescription = new BTextView(inside, "description", 
-			BRect(0, 0, inside.Width(), inside.Height()), B_FOLLOW_NONE, B_WILL_DRAW);
+		BRect(0, 0, inside.Width(), inside.Height()), B_FOLLOW_NONE,
+		B_WILL_DRAW);
 	fDescription->MakeSelectable(true);
 	fDescription->MakeEditable(false);
 	fDescription->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fDescription->SetText(T("No package selected."));
+	fDescription->SetText(T(kNoPackageSelected));
 	
 	fDescScroll = new BScrollView("desc_scroll", fDescription, B_FOLLOW_NONE,
-			0, false, true, B_NO_BORDER);
+		0, false, true, B_NO_BORDER);
 	box->AddChild(fDescScroll);
 
 	AddChild(box);
 
 	fButton = new BButton(BRect(0, 0, 1, 1), "removal", T("Remove"),
-			new BMessage(P_MSG_REMOVE));
+		new BMessage(P_MSG_REMOVE));
 	fButton->ResizeToPreferred();
+	fButton->SetEnabled(false);
 
 	rect.top = rect.bottom + 5.0f;
 	rect.left = Bounds().Width() - 5.0f - fButton->Bounds().Width();
@@ -301,6 +366,8 @@ UninstallView::_InitView()
 	AddChild(fButton);
 
 	ResizeTo(Bounds().Width(), fButton->Frame().bottom + 10.0f);
+
+#endif
 }
 
 
@@ -320,20 +387,17 @@ UninstallView::_ReloadAppList()
 	fprintf(stderr, "Ichi! %s\n", fToPackages.Path());
 
 	BEntry iter;
-	node_ref ref;
-	char filename[B_FILE_NAME_LENGTH];
-	BString name, version;
-	while (1) {
-		ret = dir.GetNextEntry(&iter);
-		if (ret != B_OK)
-			break;
-		
-		fprintf(stderr, "Found one!\n");
-		iter.GetName(filename);
-		iter.GetNodeRef(&ref);
-		name = info_get_package_name(filename);
-		version = info_get_package_version(filename);
-		fAppList->AddItem(new InfoItem(name.String(), version.String(), ref));
+	while (dir.GetNextEntry(&iter) == B_OK) {
+		char filename[B_FILE_NAME_LENGTH];
+		if (iter.GetName(filename) != B_OK)
+			continue;
+
+		node_ref ref;
+		if (iter.GetNodeRef(&ref) != B_OK)
+			continue;
+
+		printf("Found package '%s'\n", filename);
+		_AddFile(filename, ref);
 	}
 
 	if (ret != B_ENTRY_NOT_FOUND)
@@ -346,14 +410,27 @@ UninstallView::_ReloadAppList()
 void
 UninstallView::_ClearAppList()
 {
-	int32 i, count = fAppList->CountItems();
-	BListItem *iter = 0;
+	while (BListItem* item = fAppList->RemoveItem(0L))
+		delete item;
+}
 
-	for (i = 0;i < count;i++) {
-		iter = static_cast<BListItem *>(fAppList->ItemAt(0));
-		fAppList->RemoveItem((int32)0);
-		delete iter;
+
+void
+UninstallView::_AddFile(const char* filename, const node_ref& ref)
+{
+	BString name;
+	status_t ret = info_get_package_name(filename, name);
+	if (ret != B_OK || name.Length() == 0) {
+		fprintf(stderr, "Error extracting package name: %s\n",
+			strerror(ret));
 	}
+	BString version;
+	ret = info_get_package_version(filename, version);
+	if (ret != B_OK || version.Length() == 0) {
+		fprintf(stderr, "Error extracting package version: %s\n",
+			strerror(ret));
+	}
+	fAppList->AddItem(new InfoItem(name, version, filename, ref));
 }
 
 

@@ -14,15 +14,8 @@
 
 
 class UninstallWindow : public BWindow {
-	public:
-		UninstallWindow();
-		~UninstallWindow();
-		
-		bool QuitRequested();
-		
-	private:
-		UninstallView *fBackground;
+public:
+								UninstallWindow();
 };
 
-
-#endif
+#endif // UNINSTALLWINDOW_H

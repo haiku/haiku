@@ -6,7 +6,8 @@
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
  */
 #include "UninstallWindow.h"
-#include <Application.h>
+
+#include <GroupLayout.h>
 
 
 // Macro reserved for later localization
@@ -14,28 +15,15 @@
 
 
 UninstallWindow::UninstallWindow()
-	:	BWindow(BRect(100, 100, 600, 300), T("Installed packages"), 
-			B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
+	: BWindow(BRect(100, 100, 600, 300), T("Installed packages"),
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE
+		| B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	fBackground = new UninstallView(Bounds());
-	AddChild(fBackground);
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	ResizeTo(Bounds().Width(), fBackground->Bounds().Height());
-}
+	BView* view = new UninstallView(Bounds());
+	AddChild(view);
 
-
-UninstallWindow::~UninstallWindow()
-{
-	RemoveChild(fBackground);
-	
-	delete fBackground;
-}
-
-
-bool
-UninstallWindow::QuitRequested()
-{
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return true;
+	ResizeTo(Bounds().Width(), view->Bounds().Height());
 }
 

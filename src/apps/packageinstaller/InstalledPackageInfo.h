@@ -25,8 +25,8 @@ extern const char * kPackagesDir;
 
 // Useful function for fetching the package name and version without parsing all
 // other data
-const char * info_get_package_name(const char *filename);
-const char * info_get_package_version(const char *filename);
+status_t info_get_package_name(const char *filename, BString &name);
+status_t info_get_package_version(const char *filename, BString &name);
 
 
 class InstalledPackageInfo {
