@@ -150,6 +150,7 @@ private:
 			//	void _ConfirmString(const char *, int32);
 
 			// selection
+			float			_MouseDistanceSinceLastClick(BPoint where);
 			void			_Select(TermPos start, TermPos end, bool inclusive,
 								bool setInitialSelection);
 			void			_ExtendSelection(TermPos, bool inclusive,
@@ -242,7 +243,9 @@ private:
 			TermPos			fInitialSelectionStart;
 			TermPos			fInitialSelectionEnd;
 			bool			fMouseTracking;
+			bool			fCheckMouseTracking;
 			int				fSelectGranularity;
+			BPoint			fLastClickPoint;
 
 			// Input Method parameter.
 			int				fIMViewPtr;

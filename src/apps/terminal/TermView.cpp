@@ -1802,6 +1802,15 @@ TermView::_WritePTY(const char* text, int32 numBytes)
 }
 
 
+//! Returns the square of the actual pixel distance between both points
+float
+TermView::_MouseDistanceSinceLastClick(BPoint where)
+{
+	return (fLastClickPoint.x - where.x) * (fLastClickPoint.x - where.x)
+		+ (fLastClickPoint.y - where.y) * (fLastClickPoint.y - where.y);
+}
+
+
 void
 TermView::MouseDown(BPoint where)
 {
@@ -1816,6 +1825,7 @@ TermView::MouseDown(BPoint where)
 	// paste button
 	if ((buttons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON)) != 0) {
 		Paste(gMouseClipboard);
+		fLastClickPoint = where;
 		return;
 	}
 
@@ -1850,14 +1860,12 @@ TermView::MouseDown(BPoint where)
 			}
 		}
 
-		// If mouse has a lot of movement, disable double/triple click.
-		/*BPoint inPoint = fClickPoint - where;
-		if (abs((int)inPoint.x) > 16 || abs((int)inPoint.y) > 16)
+		// If mouse has moved too much, disable double/triple click.
+		if (_MouseDistanceSinceLastClick(where) > 8)
 			clicks = 1;
-		*/
 
 		SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,
-				B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
+			B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
 
 		TermPos clickPos = _ConvertToTerminal(where);
 
@@ -1876,7 +1884,7 @@ TermView::MouseDown(BPoint where)
 
 		switch (clicks) {
 			case 1:
-				fMouseTracking = true;
+				fCheckMouseTracking = true;
 				fSelectGranularity = SELECT_CHARS;
 	      		break;
 
@@ -1892,17 +1900,19 @@ TermView::MouseDown(BPoint where)
 				fSelectGranularity = SELECT_LINES;
 				break;
 		}
-		return;
   	}
 
-	BView::MouseDown(where);
+	fLastClickPoint = where;
 }
 
 
 void
 TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 {
-	BView::MouseMoved(where, transit, message);
+	if (fCheckMouseTracking) {
+		if (_MouseDistanceSinceLastClick(where) > 9)
+			fMouseTracking = true;
+	}
 	if (!fMouseTracking)
 		return;
 
@@ -1962,7 +1972,7 @@ TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 void
 TermView::MouseUp(BPoint where)
 {
-	BView::MouseUp(where);
+	fCheckMouseTracking = false;
 	fMouseTracking = false;
 
 	if (fAutoScrollRunner != NULL) {
