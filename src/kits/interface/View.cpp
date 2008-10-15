@@ -1375,8 +1375,11 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 
 
 void
-BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
+BView::GetMouse(BPoint *_location, uint32 *_buttons, bool checkMessageQueue)
 {
+	if (_location == NULL && _buttons == NULL)
+		return;
+
 	_CheckOwnerLockAndSwitchCurrent();
 
 	uint32 eventOptions = fEventOptions | fMouseEventOptions;
@@ -1424,13 +1427,14 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 							continue;
 						}
 					}
-					message->FindPoint("screen_where", location);
-					message->FindInt32("buttons", (int32 *)buttons);
+					message->FindPoint("screen_where", _location);
+					message->FindInt32("buttons", (int32 *)_buttons);
 					queue->Unlock();
 						// we need to hold the queue lock until here, because
 						// the message might still be used for something else
 
-					ConvertFromScreen(location);
+					if (_location != NULL)
+						ConvertFromScreen(_location);
 
 					if (deleteMessage)
 						delete message;
@@ -1449,8 +1453,10 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	int32 code;
 	if (fOwner->fLink->FlushWithReply(code) == B_OK
 		&& code == B_OK) {
-		fOwner->fLink->Read<BPoint>(location);
-		fOwner->fLink->Read<uint32>(buttons);
+		BPoint location;
+		uint32 buttons;
+		fOwner->fLink->Read<BPoint>(&location);
+		fOwner->fLink->Read<uint32>(&buttons);
 			// TODO: ServerWindow replies with an int32 here
 
 		ConvertFromScreen(location);
@@ -1464,8 +1470,16 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 			// to scrolling. An app reading these messages would have to know
 			// the locations of the window and view for each message...
 			// otherwise it is potentially broken anyways.
-	} else
-		*buttons = 0;
+		if (_location != NULL)
+			*_location = location;
+		if (_buttons != NULL)
+			*_buttons = buttons;
+	} else {
+		if (_location != NULL)
+			_location->Set(0, 0);
+		if (_buttons != NULL)
+			*_buttons = 0;
+	}
 }
 
 
@@ -2609,14 +2623,14 @@ BView::FillEllipse(BRect rect, const BGradient& gradient)
 {
 	if (fOwner == NULL)
 		return;
-	
+
 	_CheckLockAndSwitchCurrent();
-	
+
 	fOwner->fLink->StartMessage(AS_FILL_ELLIPSE_GRADIENT);
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
-	
+
 	_FlushIfNotInTransaction();
 }
 
@@ -2692,16 +2706,16 @@ BView::FillArc(BRect rect, float startAngle, float arcAngle,
 {
 	if (fOwner == NULL)
 		return;
-	
+
 	_CheckLockAndSwitchCurrent();
-	
+
 	fOwner->fLink->StartMessage(AS_FILL_ARC_GRADIENT);
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<float>(startAngle);
 	fOwner->fLink->Attach<float>(arcAngle);
 	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
-	
+
 	_FlushIfNotInTransaction();
 }
 
@@ -2749,9 +2763,9 @@ BView::FillBezier(BPoint *controlPoints, const BGradient& gradient)
 {
 	if (fOwner == NULL)
 		return;
-	
+
 	_CheckLockAndSwitchCurrent();
-	
+
 	fOwner->fLink->StartMessage(AS_FILL_BEZIER_GRADIENT);
 	fOwner->fLink->Attach<BPoint>(controlPoints[0]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[1]);
@@ -2759,7 +2773,7 @@ BView::FillBezier(BPoint *controlPoints, const BGradient& gradient)
 	fOwner->fLink->Attach<BPoint>(controlPoints[3]);
 	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
-	
+
 	_FlushIfNotInTransaction();
 }
 
@@ -2849,9 +2863,9 @@ BView::FillPolygon(const BPolygon *polygon, const BGradient& gradient)
 		|| polygon->fCount <= 2
 		|| fOwner == NULL)
 		return;
-	
+
 	_CheckLockAndSwitchCurrent();
-	
+
 	if (fOwner->fLink->StartMessage(AS_FILL_POLYGON_GRADIENT,
 									polygon->fCount * sizeof(BPoint)
 									+ sizeof(BRect) + sizeof(int32)) == B_OK) {
@@ -2861,7 +2875,7 @@ BView::FillPolygon(const BPolygon *polygon, const BGradient& gradient)
 							  polygon->fCount * sizeof(BPoint));
 		fOwner->fLink->Attach<gradient_type>(gradient.Type());
 		fOwner->fLink->AttachGradient(gradient);
-		
+
 		_FlushIfNotInTransaction();
 	} else {
 		fprintf(stderr, "ERROR: Can't send polygon to app_server!\n");
@@ -2886,7 +2900,7 @@ BView::FillPolygon(const BPoint *ptArray, int32 numPts,
 {
 	if (!ptArray)
 		return;
-	
+
 	BPolygon polygon(ptArray, numPts);
 	FillPolygon(&polygon, gradient);
 }
@@ -2912,9 +2926,9 @@ BView::FillPolygon(const BPoint *ptArray, int32 numPts, BRect bounds,
 {
 	if (!ptArray)
 		return;
-	
+
 	BPolygon polygon(ptArray, numPts);
-	
+
 	polygon.MapTo(polygon.Frame(), bounds);
 	FillPolygon(&polygon, gradient);
 }
@@ -2962,19 +2976,19 @@ BView::FillRect(BRect rect, const BGradient& gradient)
 {
 	if (fOwner == NULL)
 		return;
-	
+
 	// NOTE: ensuring compatibility with R5,
 	// invalid rects are not filled, they are stroked though!
 	if (!rect.IsValid())
 		return;
-	
+
 	_CheckLockAndSwitchCurrent();
-	
+
 	fOwner->fLink->StartMessage(AS_FILL_RECT_GRADIENT);
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
-	
+
 	_FlushIfNotInTransaction();
 }
 
@@ -3024,16 +3038,16 @@ BView::FillRoundRect(BRect rect, float xRadius, float yRadius,
 {
 	if (fOwner == NULL)
 		return;
-	
+
 	_CheckLockAndSwitchCurrent();
-	
+
 	fOwner->fLink->StartMessage(AS_FILL_ROUNDRECT_GRADIENT);
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<float>(xRadius);
 	fOwner->fLink->Attach<float>(yRadius);
 	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
-	
+
 	_FlushIfNotInTransaction();
 }
 
@@ -3060,14 +3074,14 @@ BView::FillRegion(BRegion *region, const BGradient& gradient)
 {
 	if (region == NULL || fOwner == NULL)
 		return;
-	
+
 	_CheckLockAndSwitchCurrent();
-	
+
 	fOwner->fLink->StartMessage(AS_FILL_REGION_GRADIENT);
 	fOwner->fLink->AttachRegion(*region);
 	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
-	
+
 	_FlushIfNotInTransaction();
 }
 
@@ -3179,33 +3193,33 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 		// we construct the smallest rectangle that contains the 3 points
 		// for the 1st point
 		BRect bounds(pt1, pt1);
-		
+
 		// for the 2nd point
 		if (pt2.x < bounds.left)
 			bounds.left = pt2.x;
-		
+
 		if (pt2.y < bounds.top)
 			bounds.top = pt2.y;
-		
+
 		if (pt2.x > bounds.right)
 			bounds.right = pt2.x;
-		
+
 		if (pt2.y > bounds.bottom)
 			bounds.bottom = pt2.y;
-		
+
 		// for the 3rd point
 		if (pt3.x < bounds.left)
 			bounds.left = pt3.x;
-		
+
 		if (pt3.y < bounds.top)
 			bounds.top = pt3.y;
-		
+
 		if (pt3.x > bounds.right)
 			bounds.right = pt3.x;
-		
+
 		if (pt3.y > bounds.bottom)
 			bounds.bottom = pt3.y;
-		
+
 		FillTriangle(pt1, pt2, pt3, bounds, gradient);
 	}
 }
@@ -3237,7 +3251,7 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 {
 	if (fOwner == NULL)
 		return;
-	
+
 	_CheckLockAndSwitchCurrent();
 	fOwner->fLink->StartMessage(AS_FILL_TRIANGLE_GRADIENT);
 	fOwner->fLink->Attach<BPoint>(pt1);
@@ -3246,7 +3260,7 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	fOwner->fLink->Attach<BRect>(bounds);
 	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
-	
+
 	_FlushIfNotInTransaction();
 }
 
@@ -3331,13 +3345,13 @@ BView::FillShape(BShape *shape, const BGradient& gradient)
 {
 	if (shape == NULL || fOwner == NULL)
 		return;
-	
+
 	shape_data *sd = (shape_data *)(shape->fPrivateData);
 	if (sd->opCount == 0 || sd->ptCount == 0)
 		return;
-	
+
 	_CheckLockAndSwitchCurrent();
-	
+
 	fOwner->fLink->StartMessage(AS_FILL_SHAPE_GRADIENT);
 	fOwner->fLink->Attach<BRect>(shape->Bounds());
 	fOwner->fLink->Attach<int32>(sd->opCount);
@@ -3346,7 +3360,7 @@ BView::FillShape(BShape *shape, const BGradient& gradient)
 	fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
 	fOwner->fLink->Attach<gradient_type>(gradient.Type());
 	fOwner->fLink->AttachGradient(gradient);
-	
+
 	_FlushIfNotInTransaction();
 }
 
@@ -4679,7 +4693,7 @@ BView::_ClipToPicture(BPicture *picture, BPoint where,
 	// This implementation is pretty slow, since just creating an offscreen bitmap
 	// takes a lot of time. That's the main reason why it should be moved
 	// to the server.
-	
+
 	// Here the idea is to get rid of the padding bytes in the bitmap,
 	// as padding complicates and slows down the iteration.
 	// TODO: Maybe it's not so nice as it assumes BBitmaps to be aligned
@@ -4688,7 +4702,7 @@ BView::_ClipToPicture(BPicture *picture, BPoint where,
 	if ((bounds.IntegerWidth() + 1) % 32)
 		bounds.right = bounds.left + ((bounds.IntegerWidth() + 1) / 32 + 1) * 32 - 1;
 
-	// TODO: I used a RGBA32 bitmap because drawing on a GRAY8 doesn't work.	
+	// TODO: I used a RGBA32 bitmap because drawing on a GRAY8 doesn't work.
 	BBitmap *bitmap = new BBitmap(bounds, B_RGBA32, true);
 	if (bitmap && bitmap->InitCheck() == B_OK && bitmap->Lock()) {
 		BView *view = new BView(bounds, "drawing view", B_FOLLOW_NONE, 0);
@@ -4696,8 +4710,8 @@ BView::_ClipToPicture(BPicture *picture, BPoint where,
 		view->DrawPicture(picture, where);
 		view->Sync();
 		bitmap->Unlock();
-	} 
-	
+	}
+
 	BRegion region;
 	int32 width = bounds.IntegerWidth() + 1;
 	int32 height = bounds.IntegerHeight() + 1;
@@ -4705,13 +4719,13 @@ BView::_ClipToPicture(BPicture *picture, BPoint where,
 		uint32 bit = 0;
 		uint32 *bits = (uint32 *)bitmap->Bits();
 		clipping_rect rect;
-		
+
 		// TODO: A possible optimization would be adding "spans" instead
 		// of 1x1 rects. That would probably help with very complex
 		// BPictures
 		for (int32 y = 0; y < height; y++) {
-			for (int32 x = 0; x < width; x++) {		
-				bit = *bits++;	
+			for (int32 x = 0; x < width; x++) {
+				bit = *bits++;
 				if (bit != 0xFFFFFFFF) {
 					rect.left = x;
 					rect.right = rect.left;
@@ -4723,15 +4737,15 @@ BView::_ClipToPicture(BPicture *picture, BPoint where,
 		bitmap->UnlockBits();
 	}
 	delete bitmap;
-	
+
 	if (invert) {
 		BRegion inverseRegion;
 		inverseRegion.Include(Bounds());
 		inverseRegion.Exclude(&region);
 		ConstrainClippingRegion(&inverseRegion);
 	} else
-		ConstrainClippingRegion(&region); 
-#else	
+		ConstrainClippingRegion(&region);
+#else
 	if (_CheckOwnerLockAndSwitchCurrent()) {
 		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_PICTURE);
 		fOwner->fLink->Attach<int32>(picture->Token());
