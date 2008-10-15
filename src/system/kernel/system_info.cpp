@@ -43,7 +43,9 @@ static uint32 sHaikuRevision __attribute__((section("_haiku_revision")));
 static int
 dump_info(int argc, char **argv)
 {
-	kprintf("kernel build: %s %s\n\n", __DATE__, __TIME__);
+	kprintf("kernel build: %s %s\n", __DATE__, __TIME__);
+	kprintf("SVN revision: %lu\n\n", sHaikuRevision);
+
 	kprintf("cpu count: %ld, active times:\n", smp_get_num_cpus());
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++)
