@@ -1517,8 +1517,9 @@ TermView::MessageReceived(BMessage *msg)
 
 		case MSG_REMOVE_RESIZE_VIEW_IF_NEEDED:
 		{
+			BPoint point;
 			uint32 buttons;
-			GetMouse(NULL, &buttons, false);
+			GetMouse(&point, &buttons, false);
 			if (buttons != 0)
 				break;
 

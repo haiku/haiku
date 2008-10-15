@@ -11,6 +11,9 @@
 
 #include "TermScrollView.h"
 
+#ifndef __HAIKU__
+#define fVerticalScrollBar fVSB
+#endif
 
 class TermScrollBar : public BScrollBar {
 public:
