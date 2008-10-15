@@ -147,6 +147,213 @@ private:
 //	#pragma mark -
 
 
+TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize)
+	: BView(frame, "termview", B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
+	fTermRows(ROWS_DEFAULT),
+	fTermColumns(COLUMNS_DEFAULT),
+	fEncoding(M_UTF8),
+	fScrBufSize(historySize)
+{
+	_InitObject(argc, argv);
+}
+
+
+TermView::TermView(int rows, int columns, int32 argc, const char** argv,
+		int32 historySize)
+	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
+	fTermRows(rows),
+	fTermColumns(columns),
+	fEncoding(M_UTF8),
+	fScrBufSize(historySize)
+{
+	_InitObject(argc, argv);
+	SetTermSize(fTermRows, fTermColumns, true);
+
+	// TODO: Don't show the dragger, since replicant capabilities
+	// don't work very well ATM.
+	/*
+	BRect rect(0, 0, 16, 16);
+	rect.OffsetTo(Bounds().right - rect.Width(),
+		Bounds().bottom - rect.Height());
+
+	SetFlags(Flags() | B_DRAW_ON_CHILDREN | B_FOLLOW_ALL);
+	AddChild(new BDragger(rect, this,
+		B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW));*/
+}
+
+
+TermView::TermView(BMessage* archive)
+	:
+	BView(archive),
+	fTermRows(ROWS_DEFAULT),
+	fTermColumns(COLUMNS_DEFAULT),
+	fEncoding(M_UTF8),
+	fScrBufSize(1000)
+{
+	// We need this
+	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
+
+	if (archive->FindInt32("encoding", (int32*)&fEncoding) < B_OK)
+		fEncoding = M_UTF8;
+	if (archive->FindInt32("columns", (int32*)&fTermColumns) < B_OK)
+		fTermColumns = COLUMNS_DEFAULT;
+	if (archive->FindInt32("rows", (int32*)&fTermRows) < B_OK)
+		fTermRows = ROWS_DEFAULT;
+
+	int32 argc = 0;
+	if (archive->HasInt32("argc"))
+		archive->FindInt32("argc", &argc);
+
+	const char **argv = new const char*[argc];
+	for (int32 i = 0; i < argc; i++) {
+		archive->FindString("argv", i, (const char**)&argv[i]);
+	}
+
+	// TODO: Retrieve colors, history size, etc. from archive
+	_InitObject(argc, argv);
+
+	delete[] argv;
+}
+
+
+/*!	Initializes the object for further use.
+	The members fTermRows, fTermColumns, fEncoding, and fScrBufSize must
+	already be initialized; they are not touched by this method.
+*/
+status_t
+TermView::_InitObject(int32 argc, const char** argv)
+{
+	fShell = NULL;
+	fWinchRunner = NULL;
+	fCursorBlinkRunner = NULL;
+	fAutoScrollRunner = NULL;
+	fResizeRunner = NULL;
+	fResizeView = NULL;
+	fCharClassifier = NULL;
+	fFontWidth = 0;
+	fFontHeight = 0;
+	fFontAscent = 0;
+	fFrameResized = false;
+	fLastActivityTime = 0;
+	fCursorState = 0;
+	fCursorHeight = 0;
+	fCursor = TermPos(0, 0);
+	fTextBuffer = NULL;
+	fVisibleTextBuffer = NULL;
+	fScrollBar = NULL;
+	fTextForeColor = kBlackColor;
+	fTextBackColor = kWhiteColor;
+	fCursorForeColor = kWhiteColor;
+	fCursorBackColor = kBlackColor;
+	fSelectForeColor = kWhiteColor;
+	fSelectBackColor = kBlackColor;
+	fScrollOffset = 0;
+	fLastSyncTime = 0;
+	fScrolledSinceLastSync = 0;
+	fSyncRunner = NULL;
+	fConsiderClockedSync = false;
+	fSelStart = TermPos(-1, -1);
+	fSelEnd = TermPos(-1, -1);
+	fMouseTracking = false;
+	fIMflag = false;
+
+	fTextBuffer = new(std::nothrow) TerminalBuffer;
+	if (fTextBuffer == NULL)
+		return B_NO_MEMORY;
+
+	fVisibleTextBuffer = new(std::nothrow) BasicTerminalBuffer;
+	if (fVisibleTextBuffer == NULL)
+		return B_NO_MEMORY;
+
+	// TODO: Make the special word chars user-settable!
+	fCharClassifier = new(std::nothrow) CharClassifier(
+		kDefaultSpecialWordChars);
+	if (fCharClassifier == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = fTextBuffer->Init(fTermColumns, fTermRows, fScrBufSize);
+	if (error != B_OK)
+		return error;
+	fTextBuffer->SetEncoding(fEncoding);
+
+	error = fVisibleTextBuffer->Init(fTermColumns, fTermRows + 2, 0);
+	if (error != B_OK)
+		return error;
+
+	fShell = new (std::nothrow) Shell();
+	if (fShell == NULL)
+		return B_NO_MEMORY;
+
+	SetTermFont(be_fixed_font);
+	SetTermSize(fTermRows, fTermColumns, false);
+	//SetIMAware(false);
+
+	status_t status = fShell->Open(fTermRows, fTermColumns,
+		EncodingAsShortString(fEncoding), argc, argv);
+
+	if (status < B_OK)
+		return status;
+
+	status = _AttachShell(fShell);
+	if (status < B_OK)
+		return status;
+
+	SetLowColor(fTextBackColor);
+	SetViewColor(B_TRANSPARENT_32_BIT);
+
+	return B_OK;
+}
+
+
+TermView::~TermView()
+{
+	Shell* shell = fShell;
+		// _DetachShell sets fShell to NULL
+
+	_DetachShell();
+
+	delete fSyncRunner;
+	delete fAutoScrollRunner;
+	delete fCharClassifier;
+	delete fVisibleTextBuffer;
+	delete fTextBuffer;
+	delete shell;
+}
+
+
+/* static */
+BArchivable *
+TermView::Instantiate(BMessage* data)
+{
+	if (validate_instantiation(data, "TermView"))
+		return new (std::nothrow) TermView(data);
+
+	return NULL;
+}
+
+
+status_t
+TermView::Archive(BMessage* data, bool deep) const
+{
+	status_t status = BView::Archive(data, deep);
+	if (status == B_OK)
+		status = data->AddString("add_on", TERM_SIGNATURE);
+	if (status == B_OK)
+		status = data->AddInt32("encoding", (int32)fEncoding);
+	if (status == B_OK)
+		status = data->AddInt32("columns", (int32)fTermColumns);
+	if (status == B_OK)
+		status = data->AddInt32("rows", (int32)fTermRows);
+
+	if (data->ReplaceString("class", "TermView") != B_OK)
+		data->AddString("class", "TermView");
+
+	return status;
+}
+
+
 inline int32
 TermView::_LineAt(float y)
 {
@@ -191,274 +398,6 @@ TermView::_InvalidateTextRect(int32 x1, int32 y1, int32 x2, int32 y2)
 //debug_printf("Invalidate((%f, %f) - (%f, %f))\n", rect.left, rect.top,
 //rect.right, rect.bottom);
 	Invalidate(rect);
-}
-
-
-TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize)
-	: BView(frame, "termview", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
-	fShell(NULL),
-	fWinchRunner(NULL),
-	fCursorBlinkRunner(NULL),
-	fAutoScrollRunner(NULL),
-	fResizeRunner(NULL),
-	fResizeView(NULL),
-	fCharClassifier(NULL),
-	fFontWidth(0),
-	fFontHeight(0),
-	fFontAscent(0),
-	fFrameResized(false),
-	fLastActivityTime(0),
-	fCursorState(0),
-	fCursorHeight(0),
-	fCursor(0, 0),
-	fTermRows(ROWS_DEFAULT),
-	fTermColumns(COLUMNS_DEFAULT),
-	fEncoding(M_UTF8),
-	fTextBuffer(NULL),
-	fVisibleTextBuffer(NULL),
-	fScrollBar(NULL),
-	fTextForeColor(kBlackColor),
-	fTextBackColor(kWhiteColor),
-	fCursorForeColor(kWhiteColor),
-	fCursorBackColor(kBlackColor),
-	fSelectForeColor(kWhiteColor),
-	fSelectBackColor(kBlackColor),
-	fScrollOffset(0),
-	fScrBufSize(historySize),
-	fLastSyncTime(0),
-	fScrolledSinceLastSync(0),
-	fSyncRunner(NULL),
-	fConsiderClockedSync(false),
-	fSelStart(-1, -1),
-	fSelEnd(-1, -1),
-	fMouseTracking(false),
-	fIMflag(false)
-{
-	_InitObject(argc, argv);
-}
-
-
-TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 historySize)
-	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
-	fShell(NULL),
-	fWinchRunner(NULL),
-	fCursorBlinkRunner(NULL),
-	fAutoScrollRunner(NULL),
-	fResizeRunner(NULL),
-	fResizeView(NULL),
-	fCharClassifier(NULL),
-	fFontWidth(0),
-	fFontHeight(0),
-	fFontAscent(0),
-	fFrameResized(false),
-	fLastActivityTime(0),
-	fCursorState(0),
-	fCursorHeight(0),
-	fCursor(0, 0),
-	fTermRows(rows),
-	fTermColumns(columns),
-	fEncoding(M_UTF8),
-	fTextBuffer(NULL),
-	fVisibleTextBuffer(NULL),
-	fScrollBar(NULL),
-	fTextForeColor(kBlackColor),
-	fTextBackColor(kWhiteColor),
-	fCursorForeColor(kWhiteColor),
-	fCursorBackColor(kBlackColor),
-	fSelectForeColor(kWhiteColor),
-	fSelectBackColor(kBlackColor),
-	fScrollOffset(0),
-	fScrBufSize(historySize),
-	fLastSyncTime(0),
-	fScrolledSinceLastSync(0),
-	fSyncRunner(NULL),
-	fConsiderClockedSync(false),
-	fSelStart(-1, -1),
-	fSelEnd(-1, -1),
-	fMouseTracking(false),
-	fIMflag(false)
-{
-	_InitObject(argc, argv);
-	SetTermSize(fTermRows, fTermColumns, true);
-
-	// TODO: Don't show the dragger, since replicant capabilities
-	// don't work very well ATM.
-	/*
-	BRect rect(0, 0, 16, 16);
-	rect.OffsetTo(Bounds().right - rect.Width(),
-				Bounds().bottom - rect.Height());
-
-	SetFlags(Flags() | B_DRAW_ON_CHILDREN | B_FOLLOW_ALL);
-	AddChild(new BDragger(rect, this,
-		B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW));*/
-}
-
-
-TermView::TermView(BMessage *archive)
-	:
-	BView(archive),
-	fShell(NULL),
-	fWinchRunner(NULL),
-	fCursorBlinkRunner(NULL),
-	fAutoScrollRunner(NULL),
-	fResizeRunner(NULL),
-	fResizeView(NULL),
-	fCharClassifier(NULL),
-	fFontWidth(0),
-	fFontHeight(0),
-	fFontAscent(0),
-	fFrameResized(false),
-	fLastActivityTime(0),
-	fCursorState(0),
-	fCursorHeight(0),
-	fCursor(0, 0),
-	fTermRows(ROWS_DEFAULT),
-	fTermColumns(COLUMNS_DEFAULT),
-	fEncoding(M_UTF8),
-	fTextBuffer(NULL),
-	fVisibleTextBuffer(NULL),
-	fScrollBar(NULL),
-	fTextForeColor(kBlackColor),
-	fTextBackColor(kWhiteColor),
-	fCursorForeColor(kWhiteColor),
-	fCursorBackColor(kBlackColor),
-	fSelectForeColor(kWhiteColor),
-	fSelectBackColor(kBlackColor),
-	fScrBufSize(1000),
-	fLastSyncTime(0),
-	fScrolledSinceLastSync(0),
-	fSyncRunner(NULL),
-	fConsiderClockedSync(false),
-	fSelStart(-1, -1),
-	fSelEnd(-1, -1),
-	fMouseTracking(false),
-	fIMflag(false)
-{
-	// We need this
-	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
-
-	if (archive->FindInt32("encoding", (int32 *)&fEncoding) < B_OK)
-		fEncoding = M_UTF8;
-	if (archive->FindInt32("columns", (int32 *)&fTermColumns) < B_OK)
-		fTermColumns = COLUMNS_DEFAULT;
-	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
-		fTermRows = ROWS_DEFAULT;
-
-	int32 argc = 0;
-	if (archive->HasInt32("argc"))
-		archive->FindInt32("argc", &argc);
-
-	const char **argv = new const char*[argc];
-	for (int32 i = 0; i < argc; i++) {
-		archive->FindString("argv", i, (const char **)&argv[i]);
-	}
-
-	// TODO: Retrieve colors, history size, etc. from archive
-	_InitObject(argc, argv);
-
-	delete[] argv;
-}
-
-
-status_t
-TermView::_InitObject(int32 argc, const char **argv)
-{
-	fTextBuffer = new(std::nothrow) TerminalBuffer;
-	if (fTextBuffer == NULL)
-		return B_NO_MEMORY;
-
-	fVisibleTextBuffer = new(std::nothrow) BasicTerminalBuffer;
-	if (fVisibleTextBuffer == NULL)
-		return B_NO_MEMORY;
-
-	// TODO: Make the special word chars user-settable!
-	fCharClassifier = new(std::nothrow) CharClassifier(
-		kDefaultSpecialWordChars);
-	if (fCharClassifier == NULL)
-		return B_NO_MEMORY;
-
-	status_t error = fTextBuffer->Init(fTermColumns, fTermRows, fScrBufSize);
-	if (error != B_OK)
-		return error;
-	fTextBuffer->SetEncoding(fEncoding);
-
-	error = fVisibleTextBuffer->Init(fTermColumns, fTermRows + 2, 0);
-	if (error != B_OK)
-		return error;
-
-	fShell = new (std::nothrow) Shell();
-	if (fShell == NULL)
-		return B_NO_MEMORY;
-
-	SetTermFont(be_fixed_font);
-	SetTermSize(fTermRows, fTermColumns, false);
-	//SetIMAware(false);
-
-	status_t status = fShell->Open(fTermRows, fTermColumns,
-								EncodingAsShortString(fEncoding),
-								argc, argv);
-
-	if (status < B_OK)
-		return status;
-
-	status = _AttachShell(fShell);
-	if (status < B_OK)
-		return status;
-
-
-	SetLowColor(fTextBackColor);
-	SetViewColor(B_TRANSPARENT_32_BIT);
-
-	return B_OK;
-}
-
-
-TermView::~TermView()
-{
-	Shell *shell = fShell;
-		// _DetachShell sets fShell to NULL
-
-	_DetachShell();
-
-	delete fSyncRunner;
-	delete fAutoScrollRunner;
-	delete fCharClassifier;
-	delete fVisibleTextBuffer;
-	delete fTextBuffer;
-	delete shell;
-}
-
-
-/* static */
-BArchivable *
-TermView::Instantiate(BMessage* data)
-{
-	if (validate_instantiation(data, "TermView"))
-		return new (std::nothrow) TermView(data);
-
-	return NULL;
-}
-
-
-status_t
-TermView::Archive(BMessage* data, bool deep) const
-{
-	status_t status = BView::Archive(data, deep);
-	if (status == B_OK)
-		status = data->AddString("add_on", TERM_SIGNATURE);
-	if (status == B_OK)
-		status = data->AddInt32("encoding", (int32)fEncoding);
-	if (status == B_OK)
-		status = data->AddInt32("columns", (int32)fTermColumns);
-	if (status == B_OK)
-		status = data->AddInt32("rows", (int32)fTermRows);
-
-	if (data->ReplaceString("class", "TermView") != B_OK)
-		data->AddString("class", "TermView");
-
-	return status;
 }
 
 
@@ -1602,13 +1541,15 @@ TermView::ScrollTo(BPoint where)
 
 
 BHandler*
-TermView::ResolveSpecifier(BMessage *message, int32 index, BMessage *specifier,
-				int32 what, const char *property)
+TermView::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
+	int32 what, const char* property)
 {
-	BHandler *target = this;
+	BHandler* target = this;
 	BPropertyInfo propInfo(sPropList);
-	if (propInfo.FindMatch(message, index, specifier, what, property) < B_OK)
-		target = BView::ResolveSpecifier(message, index, specifier, what, property);
+	if (propInfo.FindMatch(message, index, specifier, what, property) < B_OK) {
+		target = BView::ResolveSpecifier(message, index, specifier, what,
+			property);
+	}
 
 	return target;
 }
@@ -1616,7 +1557,7 @@ TermView::ResolveSpecifier(BMessage *message, int32 index, BMessage *specifier,
 
 //! Gets dropped file full path and display it at cursor position.
 void
-TermView::_DoFileDrop(entry_ref &ref)
+TermView::_DoFileDrop(entry_ref& ref)
 {
 	BEntry ent(&ref);
 	BPath path(&ent);

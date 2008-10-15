@@ -8,7 +8,6 @@
  *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  *		Kian Duffy, myob@users.sourceforge.net
  */
-
 #ifndef TERMVIEW_H
 #define TERMVIEW_H
 
@@ -32,216 +31,227 @@ class ResizeWindow;
 
 class TermView : public BView {
 public:
-	TermView(BRect frame, int32 argc, const char **argv, int32 historySize);
-	TermView(int rows, int columns, int32 argc, const char **argv,
-		int32 historySize);
-	TermView(BMessage *archive);
-	~TermView();
+							TermView(BRect frame, int32 argc, const char** argv,
+								int32 historySize);
+							TermView(int rows, int columns, int32 argc,
+								const char** argv, int32 historySize);
+							TermView(BMessage* archive);
+							~TermView();
 
-	static	BArchivable* Instantiate(BMessage* data);
-	virtual status_t Archive(BMessage* data, bool deep = true) const;
+	static	BArchivable*	Instantiate(BMessage* data);
+	virtual status_t		Archive(BMessage* data, bool deep = true) const;
 
-	virtual void GetPreferredSize(float *width, float *height);
+	virtual void			GetPreferredSize(float* _width, float* _height);
 
-	const char *TerminalName() const;
+			const char*		TerminalName() const;
 
-	inline TerminalBuffer* TextBuffer() const	{ return fTextBuffer; }
+	inline	TerminalBuffer* TextBuffer() const	{ return fTextBuffer; }
 
-	void	GetTermFont(BFont *font) const;
-	void	SetTermFont(const BFont *font);
+			void			GetTermFont(BFont* font) const;
+			void			SetTermFont(const BFont* font);
 
-	void	GetFontSize(int *width, int *height);
-	BRect	SetTermSize(int rows, int cols, bool resize);
+			void			GetFontSize(int* width, int* height);
+			BRect			SetTermSize(int rows, int cols, bool resize);
 
-	void	SetTextColor(rgb_color fore, rgb_color back);
-	void	SetSelectColor(rgb_color fore, rgb_color back);
-	void	SetCursorColor(rgb_color fore, rgb_color back);
+			void			SetTextColor(rgb_color fore, rgb_color back);
+			void			SetSelectColor(rgb_color fore, rgb_color back);
+			void			SetCursorColor(rgb_color fore, rgb_color back);
 
-	int	Encoding() const;
-	void	SetEncoding(int encoding);
+			int				Encoding() const;
+			void			SetEncoding(int encoding);
 
-	// void  SetIMAware (bool);
-	void	SetScrollBar(BScrollBar *scrbar);
-	BScrollBar  *ScrollBar() const { return fScrollBar; };
+			//void  		SetIMAware(bool);
+			void			SetScrollBar(BScrollBar* scrollBar);
+			BScrollBar*		ScrollBar() const { return fScrollBar; };
 
-	virtual void	SetTitle(const char *title);
-	virtual void	NotifyQuit(int32 reason);
+	virtual void			SetTitle(const char* title);
+	virtual void			NotifyQuit(int32 reason);
 
-	// edit functions
-	void	Copy(BClipboard *clipboard);
-	void	Paste(BClipboard *clipboard);
-	void	SelectAll();
-	void	Clear();
+			// edit functions
+			void			Copy(BClipboard* clipboard);
+			void			Paste(BClipboard* clipboard);
+			void			SelectAll();
+			void			Clear();
 
-	// Other
-	void	GetFrameSize(float *width, float *height);
-	bool	Find(const BString &str, bool forwardSearch, bool matchCase, bool matchWord);
-	void	GetSelection(BString &str);
+			// Other
+			void			GetFrameSize(float* width, float* height);
+			bool			Find(const BString& str, bool forwardSearch,
+								bool matchCase, bool matchWord);
+			void			GetSelection(BString& string);
 
-	void	CheckShellGone();
+			void			CheckShellGone();
 
-	void	InitiateDrag();
+			void			InitiateDrag();
 
 protected:
-	virtual void	AttachedToWindow();
-	virtual void	DetachedFromWindow();
-	virtual void	Draw(BRect updateRect);
-	virtual void	WindowActivated(bool active);
-	virtual void	KeyDown(const char*, int32);
+	virtual void			AttachedToWindow();
+	virtual void			DetachedFromWindow();
+	virtual void			Draw(BRect updateRect);
+	virtual void			WindowActivated(bool active);
+	virtual void			KeyDown(const char* bytes, int32 numBytes);
 
-	virtual void	MouseDown(BPoint where);
-	virtual void	MouseMoved(BPoint, uint32, const BMessage *);
-	virtual void	MouseUp(BPoint where);
+	virtual void			MouseDown(BPoint where);
+	virtual void			MouseMoved(BPoint where, uint32 transit,
+								const BMessage* message);
+	virtual void			MouseUp(BPoint where);
 
-	virtual void	FrameResized(float width, float height);
-	virtual void	MessageReceived(BMessage* message);
+	virtual void			FrameResized(float width, float height);
+	virtual void			MessageReceived(BMessage* message);
 
-	virtual void	ScrollTo(BPoint where);
+	virtual void			ScrollTo(BPoint where);
 
-	virtual status_t GetSupportedSuites(BMessage *msg);
-	virtual BHandler* ResolveSpecifier(BMessage *msg, int32 index,
-						BMessage *specifier, int32 form,
-						const char *property);
+	virtual status_t		GetSupportedSuites(BMessage* msg);
+	virtual BHandler*		ResolveSpecifier(BMessage* msg, int32 index,
+								BMessage* specifier, int32 form,
+								const char* property);
 
 private:
-	// point and text offset conversion
-	inline int32 _LineAt(float y);
-	inline float _LineOffset(int32 index);
-	inline TermPos _ConvertToTerminal(const BPoint &p);
-	inline BPoint _ConvertFromTerminal(const TermPos &pos);
+			// point and text offset conversion
+	inline	int32			_LineAt(float y);
+	inline	float			_LineOffset(int32 index);
+	inline	TermPos			_ConvertToTerminal(const BPoint& point);
+	inline	BPoint			_ConvertFromTerminal(const TermPos& pos);
 
-	inline void _InvalidateTextRect(int32 x1, int32 y1, int32 x2, int32 y2);
+	inline	void			_InvalidateTextRect(int32 x1, int32 y1, int32 x2,
+								int32 y2);
 
-	status_t _InitObject(int32 argc, const char **argv);
+			status_t		_InitObject(int32 argc, const char** argv);
 
-	status_t _AttachShell(Shell *shell);
-	void _DetachShell();
+			status_t		_AttachShell(Shell* shell);
+			void			_DetachShell();
 
-	void _AboutRequested();
+			void			_AboutRequested();
 
-	void _DrawLinePart(int32 x1, int32 y1, uint16 attr, char *buf,
-		int32 width, bool mouse, bool cursor, BView *inView);
-	void _DrawCursor();
-	void _InvalidateTextRange(TermPos start, TermPos end);
+			void			_DrawLinePart(int32 x1, int32 y1, uint16 attr,
+								char* buffer, int32 width, bool mouse,
+								bool cursor, BView* inView);
+			void			_DrawCursor();
+			void			_InvalidateTextRange(TermPos start, TermPos end);
 
-	bool _IsCursorVisible() const;
-	void _BlinkCursor();
-	void _ActivateCursor(bool invalidate);
+			bool			_IsCursorVisible() const;
+			void			_BlinkCursor();
+			void			_ActivateCursor(bool invalidate);
 
-	void _DoPrint(BRect updateRect);
-	void _UpdateScrollBarRange();
-	void _DoFileDrop(entry_ref &ref);
+			void			_DoPrint(BRect updateRect);
+			void			_UpdateScrollBarRange();
+			void			_DoFileDrop(entry_ref &ref);
 
-	void _SynchronizeWithTextBuffer(int32 visibleDirtyTop,
-		int32 visibleDirtyBottom);
+			void			_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
+								int32 visibleDirtyBottom);
 
-	void _WritePTY(const char* text, int32 numBytes);
+			void			_WritePTY(const char* text, int32 numBytes);
 
-	// Comunicate Input Method
-	//  void _DoIMStart (BMessage* message);
-	//  void _DoIMStop (BMessage* message);
-	//  void _DoIMChange (BMessage* message);
-	//  void _DoIMLocation (BMessage* message);
-	//  void _DoIMConfirm (void);
-	//	void _ConfirmString(const char *, int32);
+			// Comunicate Input Method
+			//  void _DoIMStart (BMessage* message);
+			//  void _DoIMStop (BMessage* message);
+			//  void _DoIMChange (BMessage* message);
+			//  void _DoIMLocation (BMessage* message);
+			//  void _DoIMConfirm (void);
+			//	void _ConfirmString(const char *, int32);
 
-	// selection
-	void _Select(TermPos start, TermPos end, bool inclusive,
-		bool setInitialSelection);
-	void _ExtendSelection(TermPos, bool inclusive, bool useInitialSelection);
-	void _Deselect();
-	bool _HasSelection() const;
-	void _SelectWord(BPoint where, bool extend, bool useInitialSelection);
-	void _SelectLine(BPoint where, bool extend, bool useInitialSelection);
+			// selection
+			void			_Select(TermPos start, TermPos end, bool inclusive,
+								bool setInitialSelection);
+			void			_ExtendSelection(TermPos, bool inclusive,
+								bool useInitialSelection);
+			void			_Deselect();
+			bool			_HasSelection() const;
+			void			_SelectWord(BPoint where, bool extend,
+								bool useInitialSelection);
+			void			_SelectLine(BPoint where, bool extend,
+								bool useInitialSelection);
 
-	void _AutoScrollUpdate();
+			void			_AutoScrollUpdate();
 
-	bool _CheckSelectedRegion(const TermPos &pos) const;
-	bool _CheckSelectedRegion(int32 row, int32 firstColumn,
-		int32& lastColumn) const;
+			bool			_CheckSelectedRegion(const TermPos& pos) const;
+			bool			_CheckSelectedRegion(int32 row, int32 firstColumn,
+								int32& lastColumn) const;
 
-	void _UpdateSIGWINCH();
+			void			_UpdateSIGWINCH();
 
-	void _ScrollTo(float y, bool scrollGfx);
-	void _ScrollToRange(TermPos start, TermPos end);
+			void			_ScrollTo(float y, bool scrollGfx);
+			void			_ScrollToRange(TermPos start, TermPos end);
 
 private:
 	class CharClassifier;
 
-	Shell *fShell;
+			Shell*			fShell;
 
-	BMessageRunner *fWinchRunner;
-	BMessageRunner *fCursorBlinkRunner;
-	BMessageRunner *fAutoScrollRunner;
-	BMessageRunner *fResizeRunner;
-	BStringView *fResizeView;
-	CharClassifier *fCharClassifier;
+			BMessageRunner*	fWinchRunner;
+			BMessageRunner*	fCursorBlinkRunner;
+			BMessageRunner*	fAutoScrollRunner;
+			BMessageRunner*	fResizeRunner;
+			BStringView*	fResizeView;
+			CharClassifier*	fCharClassifier;
 
-	// Font and Width
-	BFont fHalfFont;
-	int fFontWidth;
-	int fFontHeight;
-	int fFontAscent;
-	struct escapement_delta fEscapement;
+			// Font and Width
+			BFont			fHalfFont;
+			int				fFontWidth;
+			int				fFontHeight;
+			int				fFontAscent;
+			struct escapement_delta fEscapement;
 
-	// frame resized flag.
-	bool fFrameResized;
+			// frame resized flag.
+			bool			fFrameResized;
 
-	// Cursor Blinking, draw flag.
-	bigtime_t	fLastActivityTime;
-	int32		fCursorState;
-	int fCursorHeight;
+			// Cursor Blinking, draw flag.
+			bigtime_t		fLastActivityTime;
+			int32			fCursorState;
+			int				fCursorHeight;
 
-	// Cursor position.
-	TermPos fCursor;
+			// Cursor position.
+			TermPos			fCursor;
 
-	int32 fMouseButtons;
+			int32			fMouseButtons;
 
-	// Terminal rows and columns.
-	int fTermRows;
-	int fTermColumns;
+			// Terminal rows and columns.
+			int				fTermRows;
+			int				fTermColumns;
 
-	int fEncoding;
+			int				fEncoding;
 
-	// Object pointer.
-	TerminalBuffer		*fTextBuffer;
-	BasicTerminalBuffer	*fVisibleTextBuffer;
-	BScrollBar			*fScrollBar;
+			// Object pointer.
+			TerminalBuffer*	fTextBuffer;
+			BasicTerminalBuffer* fVisibleTextBuffer;
+			BScrollBar*		fScrollBar;
 
-	// Color and Attribute.
-	rgb_color fTextForeColor, fTextBackColor;
-	rgb_color fCursorForeColor, fCursorBackColor;
-	rgb_color fSelectForeColor, fSelectBackColor;
+			// Color and Attribute.
+			rgb_color		fTextForeColor;
+			rgb_color		fTextBackColor;
+			rgb_color		fCursorForeColor;
+			rgb_color		fCursorBackColor;
+			rgb_color		fSelectForeColor;
+			rgb_color		fSelectBackColor;
 
-	// Scroll Region
-	float fScrollOffset;
-	int32 fScrBufSize;
-		// TODO: That's the history capacity -- only needed until the text
-		// buffer is created.
-	float fAutoScrollSpeed;
+			// Scroll Region
+			float			fScrollOffset;
+			int32			fScrBufSize;
+				// TODO: That's the history capacity -- only needed
+				// until the text buffer is created.
+			float			fAutoScrollSpeed;
 
-	// redraw management
-	bigtime_t		fLastSyncTime;
-	int32			fScrolledSinceLastSync;
-	BMessageRunner*	fSyncRunner;
-	bool			fConsiderClockedSync;
+			// redraw management
+			bigtime_t		fLastSyncTime;
+			int32			fScrolledSinceLastSync;
+			BMessageRunner*	fSyncRunner;
+			bool			fConsiderClockedSync;
 
-	// selection
-	TermPos fSelStart;
-	TermPos fSelEnd;
-	TermPos fInitialSelectionStart;
-	TermPos fInitialSelectionEnd;
-	bool fMouseTracking;
-	int fSelectGranularity;
+			// selection
+			TermPos			fSelStart;
+			TermPos			fSelEnd;
+			TermPos			fInitialSelectionStart;
+			TermPos			fInitialSelectionEnd;
+			bool			fMouseTracking;
+			int				fSelectGranularity;
 
-	// Input Method parameter.
-	int fIMViewPtr;
-	TermPos fIMStartPos;
-	TermPos fIMEndPos;
-	BString fIMString;
-	bool fIMflag;
-	BMessenger fIMMessenger;
-	int32 fImCodeState;
+			// Input Method parameter.
+			int				fIMViewPtr;
+			TermPos			fIMStartPos;
+			TermPos			fIMEndPos;
+			BString			fIMString;
+			bool			fIMflag;
+			BMessenger		fIMMessenger;
+			int32			fImCodeState;
 };
 
 
