@@ -54,7 +54,7 @@ All rights reserved.
 #include "IconMenuItem.h"
 #include "MountMenu.h"
 #include "PoseView.h"
-#include "SlowContextPopup.h"
+#include "ShowingAwarePopUpMenu.h"
 #include "Tracker.h"
 #include "TemplatesMenu.h"
 
@@ -329,7 +329,7 @@ void
 BDeskWindow::AddTrashContextMenu()
 {
 	// setup special trash context menu
-	fTrashContextMenu = new BSlowContextMenu("TrashContext");
+	fTrashContextMenu = new BShowingAwarePopUpMenu("TrashContext");
 	fTrashContextMenu->SetFont(be_plain_font);
 	fTrashContextMenu->AddItem(new BMenuItem("Empty Trash",
 		new BMessage(kEmptyTrash)));
