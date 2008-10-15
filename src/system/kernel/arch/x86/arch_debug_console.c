@@ -17,6 +17,7 @@
 #include <arch/cpu.h>
 #include <arch/debug_console.h>
 #include <boot/stage2.h>
+#include <debug.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -346,16 +347,21 @@ arch_debug_serial_putchar(const char c)
 void
 arch_debug_serial_puts(const char *s)
 {
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sSerialOutputSpinlock);
+	cpu_status state = 0;
+	if (!debug_debugger_running()) {
+		state = disable_interrupts();
+		acquire_spinlock(&sSerialOutputSpinlock);
+	}
 
 	while (*s != '\0') {
 		_arch_debug_serial_putchar(*s);
 		s++;
 	}
 
-	release_spinlock(&sSerialOutputSpinlock);
-	restore_interrupts(state);
+	if (!debug_debugger_running()) {
+		release_spinlock(&sSerialOutputSpinlock);
+		restore_interrupts(state);
+	}
 }
 
 
