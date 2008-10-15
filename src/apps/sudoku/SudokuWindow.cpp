@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -192,9 +192,9 @@ SudokuWindow::SudokuWindow()
 		new BMessage(kMsgOpenFilePanel)));
 	item->SetShortcut('O', B_COMMAND_KEY);
 	BMenu* subMenu = new BMenu("Generate");
-	subMenu->AddItem(new BMenuItem("Very Easy",
-		new BMessage(kMsgGenerateVeryEasySudoku)));
 	subMenu->AddItem(new BMenuItem("Easy",
+		new BMessage(kMsgGenerateVeryEasySudoku)));
+	subMenu->AddItem(new BMenuItem("Advanced",
 		new BMessage(kMsgGenerateEasySudoku)));
 	subMenu->AddItem(new BMenuItem("Hard",
 		new BMessage(kMsgGenerateHardSudoku)));
