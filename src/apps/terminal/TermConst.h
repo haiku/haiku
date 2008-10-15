@@ -1,7 +1,7 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files or portions
@@ -66,31 +66,31 @@ const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
 
 
 // Preference Message
-const ulong PSET__COLS		= 'pcol';
-const ulong PSET__ROWS		= 'prow';
-const ulong PSET__HFONT		= 'phfn';
-const ulong PSET__HFONT_SIZE	= 'phfs';
-const ulong PSET_FORE_COLOR	= 'pfcl';
-const ulong PSET_BACK_COLOR	= 'pbcl';
-const ulong PSET__CODING	= 'pcod';
+const ulong PSET__COLS							= 'pcol';
+const ulong PSET__ROWS							= 'prow';
+const ulong PSET__HFONT							= 'phfn';
+const ulong PSET__HFONT_SIZE					= 'phfs';
+const ulong PSET_FORE_COLOR						= 'pfcl';
+const ulong PSET_BACK_COLOR						= 'pbcl';
+const ulong PSET__CODING						= 'pcod';
 
 // Terminal Size Messages
-const uint32 EIGHTYTWENTYFOUR 		= 'etfo';
-const uint32 EIGHTYTWENTYFIVE 		= 'etfv';
-const uint32 EIGHTYFORTY 			= 'efor';
-const uint32 ONETHREETWOTWENTYFOUR 	= 'hunf';
-const uint32 ONETHREETWOTWENTYFIVE 	= 'hunv';
-const uint32 FULLSCREEN			= 'fscr';
+const uint32 EIGHTYTWENTYFOUR					= 'etfo';
+const uint32 EIGHTYTWENTYFIVE					= 'etfv';
+const uint32 EIGHTYFORTY						= 'efor';
+const uint32 ONETHREETWOTWENTYFOUR				= 'hunf';
+const uint32 ONETHREETWOTWENTYFIVE				= 'hunv';
+const uint32 FULLSCREEN							= 'fscr';
 
-const uint32 MSG_FONT_CHANGED		= 'fntc';
-const uint32 SAVE_AS_DEFAULT 		= 'sadf';
-const uint32 MSG_CHECK_CHILDREN		= 'ckch';
-const uint32 MSG_PREVIOUS_TAB		= 'ptab';
-const uint32 MSG_NEXT_TAB			= 'ntab';
-
-const uint32 MSG_TERMINAL_BUFFER_CHANGED	= 'bufc';
-const uint32 MSG_SET_TERMNAL_TITLE			= 'sett';
-const uint32 MSG_QUIT_TERMNAL				= 'qutt';
+const uint32 MSG_FONT_CHANGED					= 'fntc';
+const uint32 SAVE_AS_DEFAULT 					= 'sadf';
+const uint32 MSG_CHECK_CHILDREN					= 'ckch';
+const uint32 MSG_PREVIOUS_TAB					= 'ptab';
+const uint32 MSG_NEXT_TAB						= 'ntab';
+const uint32 MSG_REMOVE_RESIZE_VIEW_IF_NEEDED	= 'rmrv';
+const uint32 MSG_TERMINAL_BUFFER_CHANGED		= 'bufc';
+const uint32 MSG_SET_TERMNAL_TITLE				= 'sett';
+const uint32 MSG_QUIT_TERMNAL					= 'qutt';
 
 // Preference Read/Write Keys
 const char* const PREF_HALF_FONT_FAMILY = "Half Font Family";

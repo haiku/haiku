@@ -38,6 +38,7 @@
 #include <Roster.h>
 #include <ScrollBar.h>
 #include <String.h>
+#include <StringView.h>
 #include <Window.h>
 
 #include "CodeConv.h"
@@ -115,8 +116,7 @@ restrict_value(const Type& value, const Type& min, const Type& max)
 }
 
 
-class TermView::CharClassifier : public TerminalCharClassifier
-{
+class TermView::CharClassifier : public TerminalCharClassifier {
 public:
 	CharClassifier(const char* specialWordChars)
 		:
@@ -142,6 +142,9 @@ public:
 private:
 	const char*	fSpecialWordChars;
 };
+
+
+//	#pragma mark -
 
 
 inline int32
@@ -198,6 +201,8 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 	fWinchRunner(NULL),
 	fCursorBlinkRunner(NULL),
 	fAutoScrollRunner(NULL),
+	fResizeRunner(NULL),
+	fResizeView(NULL),
 	fCharClassifier(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
@@ -241,6 +246,8 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	fWinchRunner(NULL),
 	fCursorBlinkRunner(NULL),
 	fAutoScrollRunner(NULL),
+	fResizeRunner(NULL),
+	fResizeView(NULL),
 	fCharClassifier(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
@@ -296,6 +303,8 @@ TermView::TermView(BMessage *archive)
 	fWinchRunner(NULL),
 	fCursorBlinkRunner(NULL),
 	fAutoScrollRunner(NULL),
+	fResizeRunner(NULL),
+	fResizeView(NULL),
 	fCharClassifier(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
@@ -983,6 +992,9 @@ TermView::DetachedFromWindow()
 	delete fCursorBlinkRunner;
 	fCursorBlinkRunner = NULL;
 
+	delete fResizeRunner;
+	fResizeRunner = NULL;
+
 	{
 		BAutolock _(fTextBuffer);
 		fTextBuffer->UnsetListener();
@@ -1313,6 +1325,28 @@ TermView::FrameResized(float width, float height)
 	if (columns == fTermColumns && rows == fTermRows)
 		return;
 
+	bool hasResizeView = fResizeRunner != NULL;
+	if (!hasResizeView) {
+		// show the current size in a view
+		fResizeView = new BStringView(BRect(100, 100, 300, 140), "size", "");
+		fResizeView->SetAlignment(B_ALIGN_CENTER);
+		fResizeView->SetFont(be_bold_font);
+
+		BMessage message(MSG_REMOVE_RESIZE_VIEW_IF_NEEDED);
+		fResizeRunner = new(std::nothrow) BMessageRunner(BMessenger(this),
+			&message, 25000LL);
+	}
+
+	BString text;
+	text << columns << " x " << rows;
+	fResizeView->SetText(text.String());
+	fResizeView->GetPreferredSize(&width, &height);
+	fResizeView->ResizeTo(width * 1.5, height * 1.5);
+	fResizeView->MoveTo((Bounds().Width() - fResizeView->Bounds().Width()) / 2,
+		(Bounds().Height()- fResizeView->Bounds().Height()) / 2);
+	if (!hasResizeView)
+		AddChild(fResizeView);
+
 	SetTermSize(rows, columns, false);
 
 	fFrameResized = true;
@@ -1480,6 +1514,24 @@ TermView::MessageReceived(BMessage *msg)
 				SetTitle(title);
 			break;
 		}
+
+		case MSG_REMOVE_RESIZE_VIEW_IF_NEEDED:
+		{
+			uint32 buttons;
+			GetMouse(NULL, &buttons, false);
+			if (buttons != 0)
+				break;
+
+			if (fResizeView != NULL) {
+				fResizeView->RemoveSelf();
+				delete fResizeView;
+				fResizeView = NULL;
+			}
+			delete fResizeRunner;
+			fResizeRunner = NULL;
+			break;
+		}
+
 		case MSG_QUIT_TERMNAL:
 		{
 			int32 reason;

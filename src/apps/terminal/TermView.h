@@ -1,7 +1,7 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed under the terms of the MIT license.
  * Authors:
@@ -25,29 +25,31 @@ class BClipboard;
 class BMessageRunner;
 class BScrollBar;
 class BString;
+class BStringView;
 class Shell;
 class TermBuffer;
+class ResizeWindow;
 
 class TermView : public BView {
 public:
 	TermView(BRect frame, int32 argc, const char **argv, int32 historySize);
 	TermView(int rows, int columns, int32 argc, const char **argv,
 		int32 historySize);
-	TermView(BMessage *archive);	
+	TermView(BMessage *archive);
 	~TermView();
 
 	static	BArchivable* Instantiate(BMessage* data);
 	virtual status_t Archive(BMessage* data, bool deep = true) const;
-	
+
 	virtual void GetPreferredSize(float *width, float *height);
 
 	const char *TerminalName() const;
 
 	inline TerminalBuffer* TextBuffer() const	{ return fTextBuffer; }
-	
+
 	void	GetTermFont(BFont *font) const;
 	void	SetTermFont(const BFont *font);
-	
+
 	void	GetFontSize(int *width, int *height);
 	BRect	SetTermSize(int rows, int cols, bool resize);
 
@@ -66,11 +68,11 @@ public:
 	virtual void	NotifyQuit(int32 reason);
 
 	// edit functions
-	void	Copy(BClipboard *clipboard);	
+	void	Copy(BClipboard *clipboard);
 	void	Paste(BClipboard *clipboard);
 	void	SelectAll();
-	void	Clear();	
-	
+	void	Clear();
+
 	// Other
 	void	GetFrameSize(float *width, float *height);
 	bool	Find(const BString &str, bool forwardSearch, bool matchCase, bool matchWord);
@@ -86,7 +88,7 @@ protected:
 	virtual void	Draw(BRect updateRect);
 	virtual void	WindowActivated(bool active);
 	virtual void	KeyDown(const char*, int32);
-	
+
 	virtual void	MouseDown(BPoint where);
 	virtual void	MouseMoved(BPoint, uint32, const BMessage *);
 	virtual void	MouseUp(BPoint where);
@@ -120,8 +122,8 @@ private:
 	void _DrawLinePart(int32 x1, int32 y1, uint16 attr, char *buf,
 		int32 width, bool mouse, bool cursor, BView *inView);
 	void _DrawCursor();
-	void _InvalidateTextRange(TermPos start, TermPos end);	
-	
+	void _InvalidateTextRange(TermPos start, TermPos end);
+
 	bool _IsCursorVisible() const;
 	void _BlinkCursor();
 	void _ActivateCursor(bool invalidate);
@@ -135,21 +137,21 @@ private:
 
 	void _WritePTY(const char* text, int32 numBytes);
 
-	// Comunicate Input Method 
+	// Comunicate Input Method
 	//  void _DoIMStart (BMessage* message);
 	//  void _DoIMStop (BMessage* message);
 	//  void _DoIMChange (BMessage* message);
 	//  void _DoIMLocation (BMessage* message);
 	//  void _DoIMConfirm (void);
 	//	void _ConfirmString(const char *, int32);
-	
+
 	// selection
 	void _Select(TermPos start, TermPos end, bool inclusive,
 		bool setInitialSelection);
 	void _ExtendSelection(TermPos, bool inclusive, bool useInitialSelection);
 	void _Deselect();
 	bool _HasSelection() const;
-	void _SelectWord(BPoint where, bool extend, bool useInitialSelection); 
+	void _SelectWord(BPoint where, bool extend, bool useInitialSelection);
 	void _SelectLine(BPoint where, bool extend, bool useInitialSelection);
 
 	void _AutoScrollUpdate();
@@ -171,7 +173,8 @@ private:
 	BMessageRunner *fWinchRunner;
 	BMessageRunner *fCursorBlinkRunner;
 	BMessageRunner *fAutoScrollRunner;
-
+	BMessageRunner *fResizeRunner;
+	BStringView *fResizeView;
 	CharClassifier *fCharClassifier;
 
 	// Font and Width
@@ -209,7 +212,7 @@ private:
 	rgb_color fTextForeColor, fTextBackColor;
 	rgb_color fCursorForeColor, fCursorBackColor;
 	rgb_color fSelectForeColor, fSelectBackColor;
-	
+
 	// Scroll Region
 	float fScrollOffset;
 	int32 fScrBufSize;
