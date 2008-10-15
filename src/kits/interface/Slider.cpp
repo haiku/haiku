@@ -12,7 +12,6 @@
 #include <Slider.h>
 
 #include <stdio.h>
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,6 +22,8 @@
 #include <Region.h>
 #include <String.h>
 #include <Window.h>
+
+#include <binary_compatibility/Interface.h>
 
 
 BSlider::BSlider(BRect frame, const char* name, const char* label,
@@ -285,9 +286,58 @@ BSlider::Archive(BMessage *archive, bool deep) const
 
 
 status_t
-BSlider::Perform(perform_code d, void *arg)
+BSlider::Perform(perform_code code, void* _data)
 {
-	return BControl::Perform(d, arg);
+	switch (code) {
+		case PERFORM_CODE_MIN_SIZE:
+			((perform_data_min_size*)_data)->return_value
+				= BSlider::MinSize();
+			return B_OK;
+		case PERFORM_CODE_MAX_SIZE:
+			((perform_data_max_size*)_data)->return_value
+				= BSlider::MaxSize();
+			return B_OK;
+		case PERFORM_CODE_PREFERRED_SIZE:
+			((perform_data_preferred_size*)_data)->return_value
+				= BSlider::PreferredSize();
+			return B_OK;
+		case PERFORM_CODE_LAYOUT_ALIGNMENT:
+			((perform_data_layout_alignment*)_data)->return_value
+				= BSlider::LayoutAlignment();
+			return B_OK;
+		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
+			((perform_data_has_height_for_width*)_data)->return_value
+				= BSlider::HasHeightForWidth();
+			return B_OK;
+		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
+		{
+			perform_data_get_height_for_width* data
+				= (perform_data_get_height_for_width*)_data;
+			BSlider::GetHeightForWidth(data->width, &data->min, &data->max,
+				&data->preferred);
+			return B_OK;
+}
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BSlider::SetLayout(data->layout);
+			return B_OK;
+		}
+		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		{
+			perform_data_invalidate_layout* data
+				= (perform_data_invalidate_layout*)_data;
+			BSlider::InvalidateLayout(data->descendants);
+			return B_OK;
+		}
+		case PERFORM_CODE_DO_LAYOUT:
+		{
+			BSlider::DoLayout();
+			return B_OK;
+		}
+	}
+
+	return BControl::Perform(code, _data);
 }
 
 
@@ -2018,8 +2068,29 @@ _ReservedSlider5__7BSlider(BSlider *slider)
 	return slider->BSlider::MaxUpdateTextWidth();
 }
 
-extern "C" void _ReservedSlider1__7BSlider() {}
-extern "C" void _ReservedSlider2__7BSlider() {}
-extern "C" void _ReservedSlider3__7BSlider() {}
+
+extern "C"
+void
+_ReservedSlider1__7BSlider(BSlider* slider, orientation _orientation)
+{
+	slider->BSlider::SetOrientation(_orientation);
+}
+
+
+extern "C"
+void
+_ReservedSlider2__7BSlider(BSlider* slider, float thickness)
+{
+	slider->BSlider::SetBarThickness(thickness);
+}
+
+
+extern "C"
+void
+_ReservedSlider3__7BSlider(BSlider* slider, const BFont* font,
+	uint32 properties)
+{
+	slider->BSlider::SetFont(font, properties);
+}
 
 #endif	// __GNUC__ < 3

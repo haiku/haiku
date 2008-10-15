@@ -9,9 +9,8 @@
 //!	BDragger represents a replicant "handle".
 
 
-#include <AppServerLink.h>
-#include <ServerProtocol.h>
-#include <ViewPrivate.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <Alert.h>
 #include <Autolock.h>
@@ -24,10 +23,12 @@
 #include <Shelf.h>
 #include <Window.h>
 
-#include "ZombieReplicantView.h"
+#include <AppServerLink.h>
+#include <binary_compatibility/Interface.h>
+#include <ServerProtocol.h>
+#include <ViewPrivate.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "ZombieReplicantView.h"
 
 
 bool BDragger::sVisible;
@@ -378,9 +379,58 @@ BDragger::GetSupportedSuites(BMessage* data)
 
 
 status_t
-BDragger::Perform(perform_code d, void* arg)
+BDragger::Perform(perform_code code, void* _data)
 {
-	return BView::Perform(d, arg);
+	switch (code) {
+		case PERFORM_CODE_MIN_SIZE:
+			((perform_data_min_size*)_data)->return_value
+				= BDragger::MinSize();
+			return B_OK;
+		case PERFORM_CODE_MAX_SIZE:
+			((perform_data_max_size*)_data)->return_value
+				= BDragger::MaxSize();
+			return B_OK;
+		case PERFORM_CODE_PREFERRED_SIZE:
+			((perform_data_preferred_size*)_data)->return_value
+				= BDragger::PreferredSize();
+			return B_OK;
+		case PERFORM_CODE_LAYOUT_ALIGNMENT:
+			((perform_data_layout_alignment*)_data)->return_value
+				= BDragger::LayoutAlignment();
+			return B_OK;
+		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
+			((perform_data_has_height_for_width*)_data)->return_value
+				= BDragger::HasHeightForWidth();
+			return B_OK;
+		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
+		{
+			perform_data_get_height_for_width* data
+				= (perform_data_get_height_for_width*)_data;
+			BDragger::GetHeightForWidth(data->width, &data->min, &data->max,
+				&data->preferred);
+			return B_OK;
+}
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BDragger::SetLayout(data->layout);
+			return B_OK;
+		}
+		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		{
+			perform_data_invalidate_layout* data
+				= (perform_data_invalidate_layout*)_data;
+			BDragger::InvalidateLayout(data->descendants);
+			return B_OK;
+		}
+		case PERFORM_CODE_DO_LAYOUT:
+		{
+			BDragger::DoLayout();
+			return B_OK;
+		}
+	}
+
+	return BView::Perform(code, _data);
 }
 
 
@@ -620,3 +670,15 @@ BDragger::_ShowPopUp(BView *target, BPoint where)
 	
 	fPopUp->Go(point, true, false, rect, true);
 }
+
+
+#if __GNUC__ < 3
+
+extern "C" BBitmap*
+_ReservedDragger1__8BDragger(BDragger* dragger, BPoint* offset,
+	drawing_mode* mode)
+{
+	return dragger->BDragger::DragBitmap(offset, mode);
+}
+
+#endif

@@ -55,7 +55,7 @@ class BSlider : public BControl {
 
 		static 	BArchivable	*Instantiate(BMessage *data);
 		virtual	status_t 	Archive(BMessage *data, bool deep = true) const;
-		virtual status_t	Perform(perform_code d, void *arg);
+		virtual status_t	Perform(perform_code code, void* data);
 
 		virtual void		WindowActivated(bool state);
 		virtual	void		AttachedToWindow();

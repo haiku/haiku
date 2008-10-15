@@ -22,6 +22,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <binary_compatibility/Interface.h>
+
 //#define TRACE_SCROLLBAR
 #ifdef TRACE_SCROLLBAR
 #	define TRACE(x...) printf(x)
@@ -1153,9 +1155,58 @@ BScrollBar::PreferredSize()
 
 
 status_t
-BScrollBar::Perform(perform_code d, void* arg)
+BScrollBar::Perform(perform_code code, void* _data)
 {
-	return BView::Perform(d, arg);
+	switch (code) {
+		case PERFORM_CODE_MIN_SIZE:
+			((perform_data_min_size*)_data)->return_value
+				= BScrollBar::MinSize();
+			return B_OK;
+		case PERFORM_CODE_MAX_SIZE:
+			((perform_data_max_size*)_data)->return_value
+				= BScrollBar::MaxSize();
+			return B_OK;
+		case PERFORM_CODE_PREFERRED_SIZE:
+			((perform_data_preferred_size*)_data)->return_value
+				= BScrollBar::PreferredSize();
+			return B_OK;
+		case PERFORM_CODE_LAYOUT_ALIGNMENT:
+			((perform_data_layout_alignment*)_data)->return_value
+				= BScrollBar::LayoutAlignment();
+			return B_OK;
+		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
+			((perform_data_has_height_for_width*)_data)->return_value
+				= BScrollBar::HasHeightForWidth();
+			return B_OK;
+		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
+		{
+			perform_data_get_height_for_width* data
+				= (perform_data_get_height_for_width*)_data;
+			BScrollBar::GetHeightForWidth(data->width, &data->min, &data->max,
+				&data->preferred);
+			return B_OK;
+}
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BScrollBar::SetLayout(data->layout);
+			return B_OK;
+		}
+		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		{
+			perform_data_invalidate_layout* data
+				= (perform_data_invalidate_layout*)_data;
+			BScrollBar::InvalidateLayout(data->descendants);
+			return B_OK;
+		}
+		case PERFORM_CODE_DO_LAYOUT:
+		{
+			BScrollBar::DoLayout();
+			return B_OK;
+		}
+	}
+
+	return BView::Perform(code, _data);
 }
 
 

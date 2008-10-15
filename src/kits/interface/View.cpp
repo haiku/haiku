@@ -9,16 +9,10 @@
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
+#include <math.h>
+#include <stdio.h>
 
-#include <AppMisc.h>
-#include <AppServerLink.h>
-#include <MessagePrivate.h>
-#include <MessageUtils.h>
-#include <PortLink.h>
-#include <ServerProtocol.h>
-#include <ShapePrivate.h>
-#include <TokenSpace.h>
-#include <ViewPrivate.h>
+#include <new>
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -50,9 +44,16 @@
 #include <GradientDiamond.h>
 #include <GradientConic.h>
 
-#include <math.h>
-#include <new>
-#include <stdio.h>
+#include <AppMisc.h>
+#include <AppServerLink.h>
+#include <binary_compatibility/Interface.h>
+#include <MessagePrivate.h>
+#include <MessageUtils.h>
+#include <PortLink.h>
+#include <ServerProtocol.h>
+#include <ShapePrivate.h>
+#include <TokenSpace.h>
+#include <ViewPrivate.h>
 
 
 using std::nothrow;
@@ -4279,9 +4280,58 @@ BView::MessageReceived(BMessage* msg)
 
 
 status_t
-BView::Perform(perform_code d, void* arg)
+BView::Perform(perform_code code, void* _data)
 {
-	return B_BAD_VALUE;
+	switch (code) {
+		case PERFORM_CODE_MIN_SIZE:
+			((perform_data_min_size*)_data)->return_value
+				= BView::MinSize();
+			return B_OK;
+		case PERFORM_CODE_MAX_SIZE:
+			((perform_data_max_size*)_data)->return_value
+				= BView::MaxSize();
+			return B_OK;
+		case PERFORM_CODE_PREFERRED_SIZE:
+			((perform_data_preferred_size*)_data)->return_value
+				= BView::PreferredSize();
+			return B_OK;
+		case PERFORM_CODE_LAYOUT_ALIGNMENT:
+			((perform_data_layout_alignment*)_data)->return_value
+				= BView::LayoutAlignment();
+			return B_OK;
+		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
+			((perform_data_has_height_for_width*)_data)->return_value
+				= BView::HasHeightForWidth();
+			return B_OK;
+		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
+		{
+			perform_data_get_height_for_width* data
+				= (perform_data_get_height_for_width*)_data;
+			BView::GetHeightForWidth(data->width, &data->min, &data->max,
+				&data->preferred);
+			return B_OK;
+}
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BView::SetLayout(data->layout);
+			return B_OK;
+		}
+		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		{
+			perform_data_invalidate_layout* data
+				= (perform_data_invalidate_layout*)_data;
+			BView::InvalidateLayout(data->descendants);
+			return B_OK;
+		}
+		case PERFORM_CODE_DO_LAYOUT:
+		{
+			BView::DoLayout();
+			return B_OK;
+		}
+	}
+
+	return BHandler::Perform(code, _data);
 }
 
 
@@ -5305,16 +5355,106 @@ BView::_SwitchServerCurrentView() const
 }
 
 
-extern "C" void _ReservedView1__5BView() {}
-extern "C" void _ReservedView2__5BView() {}
-extern "C" void _ReservedView3__5BView() {}
-extern "C" void _ReservedView4__5BView() {}
-extern "C" void _ReservedView5__5BView() {}
-extern "C" void _ReservedView6__5BView() {}
-extern "C" void _ReservedView7__5BView() {}
-extern "C" void _ReservedView8__5BView() {}
-extern "C" void _ReservedView9__5BView() {}
-extern "C" void _ReservedView10__5BView() {}
+extern "C" void
+_ReservedView1__5BView(BView* view, BRect rect)
+{
+	view->BView::DrawAfterChildren(rect);
+}
+
+
+extern "C" void
+_ReservedView2__5BView(BView* view)
+{
+	// MinSize()
+	perform_data_min_size data;
+	view->Perform(PERFORM_CODE_MIN_SIZE, &data);
+}
+
+
+extern "C" void
+_ReservedView3__5BView(BView* view)
+{
+	// MaxSize()
+	perform_data_max_size data;
+	view->Perform(PERFORM_CODE_MAX_SIZE, &data);
+}
+
+
+extern "C" BSize
+_ReservedView4__5BView(BView* view)
+{
+	// PreferredSize()
+	perform_data_preferred_size data;
+	view->Perform(PERFORM_CODE_PREFERRED_SIZE, &data);
+	return data.return_value;
+}
+
+
+extern "C" BAlignment
+_ReservedView5__5BView(BView* view)
+{
+	// LayoutAlignment()
+	perform_data_layout_alignment data;
+	view->Perform(PERFORM_CODE_LAYOUT_ALIGNMENT, &data);
+	return data.return_value;
+}
+
+
+extern "C" bool
+_ReservedView6__5BView(BView* view)
+{
+	// HasHeightForWidth()
+	perform_data_has_height_for_width data;
+	view->Perform(PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH, &data);
+	return data.return_value;
+}
+
+
+extern "C" void
+_ReservedView7__5BView(BView* view, float width, float* min, float* max,
+	float* preferred)
+{
+	// GetHeightForWidth()
+	perform_data_get_height_for_width data;
+	data.width = width;
+	view->Perform(PERFORM_CODE_GET_HEIGHT_FOR_WIDTH, &data);
+	if (min != NULL)
+		*min = data.min;
+	if (max != NULL)
+		*max = data.max;
+	if (preferred != NULL)
+		*preferred = data.preferred;
+}
+
+
+extern "C" void
+_ReservedView8__5BView(BView* view, BLayout* layout)
+{
+	// SetLayout()
+	perform_data_set_layout data;
+	data.layout = layout;
+	view->Perform(PERFORM_CODE_SET_LAYOUT, &data);
+}
+
+
+extern "C" void
+_ReservedView9__5BView(BView* view, bool descendants)
+{
+	// InvalidateLayout()
+	perform_data_invalidate_layout data;
+	data.descendants = descendants;
+	view->Perform(PERFORM_CODE_INVALIDATE_LAYOUT, &data);
+}
+
+
+extern "C" void
+_ReservedView10__5BView(BView* view)
+{
+	// DoLayout()
+	view->Perform(PERFORM_CODE_DO_LAYOUT, NULL);
+}
+
+
 void BView::_ReservedView11(){}
 void BView::_ReservedView12(){}
 void BView::_ReservedView13(){}

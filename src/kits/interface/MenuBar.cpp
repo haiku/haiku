@@ -18,10 +18,12 @@
 #include <Window.h>
 
 #include <AppMisc.h>
+#include <binary_compatibility/Interface.h>
 #include <MenuPrivate.h>
 #include <TokenSpace.h>
 
 #include "BMCPrivate.h"
+
 
 using BPrivate::gDefaultTokens;
 
@@ -325,9 +327,58 @@ BMenuBar::AllDetached()
 
 
 status_t
-BMenuBar::Perform(perform_code d, void *arg)
+BMenuBar::Perform(perform_code code, void* _data)
 {
-	return BMenu::Perform(d, arg);
+	switch (code) {
+		case PERFORM_CODE_MIN_SIZE:
+			((perform_data_min_size*)_data)->return_value
+				= BMenuBar::MinSize();
+			return B_OK;
+		case PERFORM_CODE_MAX_SIZE:
+			((perform_data_max_size*)_data)->return_value
+				= BMenuBar::MaxSize();
+			return B_OK;
+		case PERFORM_CODE_PREFERRED_SIZE:
+			((perform_data_preferred_size*)_data)->return_value
+				= BMenuBar::PreferredSize();
+			return B_OK;
+		case PERFORM_CODE_LAYOUT_ALIGNMENT:
+			((perform_data_layout_alignment*)_data)->return_value
+				= BMenuBar::LayoutAlignment();
+			return B_OK;
+		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
+			((perform_data_has_height_for_width*)_data)->return_value
+				= BMenuBar::HasHeightForWidth();
+			return B_OK;
+		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
+		{
+			perform_data_get_height_for_width* data
+				= (perform_data_get_height_for_width*)_data;
+			BMenuBar::GetHeightForWidth(data->width, &data->min, &data->max,
+				&data->preferred);
+			return B_OK;
+}
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BMenuBar::SetLayout(data->layout);
+			return B_OK;
+		}
+		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		{
+			perform_data_invalidate_layout* data
+				= (perform_data_invalidate_layout*)_data;
+			BMenuBar::InvalidateLayout(data->descendants);
+			return B_OK;
+		}
+		case PERFORM_CODE_DO_LAYOUT:
+		{
+			BMenuBar::DoLayout();
+			return B_OK;
+		}
+	}
+
+	return BMenu::Perform(code, _data);
 }
 
 

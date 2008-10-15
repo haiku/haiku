@@ -13,6 +13,8 @@
 
 #include <ListView.h>
 
+#include <stdio.h>
+
 #include <Autolock.h>
 #include <LayoutUtils.h>
 #include <PropertyInfo.h>
@@ -20,7 +22,7 @@
 #include <ScrollView.h>
 #include <Window.h>
 
-#include <stdio.h>
+#include <binary_compatibility/Interface.h>
 
 
 struct track_data {
@@ -1062,12 +1064,61 @@ BListView::GetSupportedSuites(BMessage* data)
 	return err;
 }
 
-// Perform
 status_t
-BListView::Perform(perform_code d, void *arg)
+BListView::Perform(perform_code code, void* _data)
 {
-	return BView::Perform(d, arg);
+	switch (code) {
+		case PERFORM_CODE_MIN_SIZE:
+			((perform_data_min_size*)_data)->return_value
+				= BListView::MinSize();
+			return B_OK;
+		case PERFORM_CODE_MAX_SIZE:
+			((perform_data_max_size*)_data)->return_value
+				= BListView::MaxSize();
+			return B_OK;
+		case PERFORM_CODE_PREFERRED_SIZE:
+			((perform_data_preferred_size*)_data)->return_value
+				= BListView::PreferredSize();
+			return B_OK;
+		case PERFORM_CODE_LAYOUT_ALIGNMENT:
+			((perform_data_layout_alignment*)_data)->return_value
+				= BListView::LayoutAlignment();
+			return B_OK;
+		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
+			((perform_data_has_height_for_width*)_data)->return_value
+				= BListView::HasHeightForWidth();
+			return B_OK;
+		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
+		{
+			perform_data_get_height_for_width* data
+				= (perform_data_get_height_for_width*)_data;
+			BListView::GetHeightForWidth(data->width, &data->min, &data->max,
+				&data->preferred);
+			return B_OK;
 }
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BListView::SetLayout(data->layout);
+			return B_OK;
+		}
+		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		{
+			perform_data_invalidate_layout* data
+				= (perform_data_invalidate_layout*)_data;
+			BListView::InvalidateLayout(data->descendants);
+			return B_OK;
+		}
+		case PERFORM_CODE_DO_LAYOUT:
+		{
+			BListView::DoLayout();
+			return B_OK;
+		}
+	}
+
+	return BView::Perform(code, _data);
+}
+
 
 // WindowActivated
 void

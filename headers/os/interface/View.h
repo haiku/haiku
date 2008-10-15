@@ -506,7 +506,7 @@ public:
 			float			Scale() const;
 								// new for Haiku
 
-	virtual status_t		Perform(perform_code d, void* arg);
+	virtual status_t		Perform(perform_code code, void* data);
 
 	virtual	void			DrawAfterChildren(BRect r);
 

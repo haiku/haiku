@@ -9,6 +9,10 @@
 
 //!	BAlert displays a modal alert window.
 
+#include <new>
+#include <stdio.h>
+#include <string.h>
+
 #include <Alert.h>
 #include <Autolock.h>
 #include <Beep.h>
@@ -28,9 +32,8 @@
 #include <TextView.h>
 #include <View.h>
 
-#include <new>
-#include <stdio.h>
-#include <string.h>
+#include <binary_compatibility/Interface.h>
+
 
 //#define DEBUG_ALERT
 #ifdef DEBUG_ALERT
@@ -417,9 +420,18 @@ BAlert::AlertPosition(float width, float height)
 
 
 status_t
-BAlert::Perform(perform_code d, void* arg)
+BAlert::Perform(perform_code code, void* _data)
 {
-	return BWindow::Perform(d, arg);
+	switch (code) {
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BAlert::SetLayout(data->layout);
+			return B_OK;
+}
+	}
+
+	return BWindow::Perform(code, _data);
 }
 
 

@@ -99,10 +99,6 @@ static property_info sReplicantPropertyList[] = {
 };
 
 
-extern "C" void  _ReservedShelf1__6BShelfFv(BShelf *const, int32,
-	const BMessage*, const BView*);
-
-
 namespace BPrivate {
 
 struct replicant_data {
@@ -1018,9 +1014,10 @@ BShelf::ReplicantDeleted(int32 index, const BMessage *archive,
 }
 
 
-void
+extern "C" void
 _ReservedShelf1__6BShelfFv(BShelf *const, int32, const BMessage*, const BView*)
 {
+	// is not contained in BeOS R5's libbe, so we leave it empty
 }
 
 

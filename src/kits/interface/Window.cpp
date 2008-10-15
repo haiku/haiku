@@ -33,6 +33,7 @@
 #include <AppMisc.h>
 #include <AppServerLink.h>
 #include <ApplicationPrivate.h>
+#include <binary_compatibility/Interface.h>
 #include <DirectMessageTarget.h>
 #include <input_globals.h>
 #include <InputServerTypes.h>
@@ -2013,9 +2014,18 @@ BWindow::RemoveFromSubset(BWindow *window)
 
 
 status_t
-BWindow::Perform(perform_code d, void *arg)
+BWindow::Perform(perform_code code, void* _data)
 {
-	return BLooper::Perform(d, arg);
+	switch (code) {
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BWindow::SetLayout(data->layout);
+			return B_OK;
+}
+	}
+
+	return BLooper::Perform(code, _data);
 }
 
 
@@ -3624,9 +3634,12 @@ BWindow::IsFilePanel() const
 
 
 extern "C" void
-_ReservedWindow1__7BWindow()
+_ReservedWindow1__7BWindow(BWindow* window, BLayout* layout)
 {
 	// SetLayout()
+	perform_data_set_layout data;
+	data.layout = layout;
+	window->Perform(PERFORM_CODE_SET_LAYOUT, &data);
 }
 
 
