@@ -41,10 +41,9 @@ All rights reserved.
 #include "ContainerWindow.h"
 #include "DesktopPoseView.h"
 
+class BPopUpMenu;
 
 namespace BPrivate {
-	
-class BShowingAwarePopUpMenu;
 
 class BDeskWindow : public BContainerWindow {
 public:
@@ -83,7 +82,7 @@ protected:
 private:
 	BShelf *fDeskShelf;
 		// shelf for replicant support
-	BShowingAwarePopUpMenu *fTrashContextMenu;
+	BPopUpMenu *fTrashContextMenu;
 
 	BRect fOldFrame;
 	

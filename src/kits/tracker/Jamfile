@@ -72,7 +72,6 @@ SharedLibrary libtracker.so :
 	Settings.cpp
 	SettingsHandler.cpp
 	SettingsViews.cpp
-	ShowingAwarePopUpMenu.cpp
 	SlowContextPopup.cpp
 	SlowMenu.cpp
 	StatusWindow.cpp
