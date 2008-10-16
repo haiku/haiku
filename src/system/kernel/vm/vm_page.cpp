@@ -46,6 +46,12 @@
 #define SCRUB_SIZE 16
 	// this many pages will be cleared at once in the page scrubber thread
 
+#define MAX_PAGE_WRITER_IO_PRIORITY				B_URGENT_DISPLAY_PRIORITY
+	// maximum I/O priority of the page writer
+#define MAX_PAGE_WRITER_IO_PRIORITY_THRESHOLD	10000
+	// the maximum I/O priority shall be reached when this many pages need to
+	// be written
+
 
 typedef struct page_queue {
 	vm_page *head;
@@ -1192,6 +1198,22 @@ page_writer(void* /*unused*/)
 				// all 3 seconds when no one triggers us
 		}
 
+		// depending on how urgent it becomes to get pages to disk, we adjust
+		// our I/O priority
+		page_num_t modifiedPages = sModifiedPageQueue.count
+			- sModifiedTemporaryPages;
+		uint32 lowPagesState = low_resource_state(B_KERNEL_RESOURCE_PAGES);
+		int32 ioPriority = B_IDLE_PRIORITY;
+		if (lowPagesState >= B_LOW_RESOURCE_CRITICAL
+			|| modifiedPages > MAX_PAGE_WRITER_IO_PRIORITY_THRESHOLD) {
+			ioPriority = MAX_PAGE_WRITER_IO_PRIORITY;
+		} else {
+			ioPriority = (uint64)MAX_PAGE_WRITER_IO_PRIORITY * modifiedPages
+				/ MAX_PAGE_WRITER_IO_PRIORITY_THRESHOLD;
+		}
+
+		thread_set_io_priority(ioPriority);
+
 		uint32 numPages = 0;
 		run.PrepareNextRun();
 
@@ -1201,8 +1223,7 @@ page_writer(void* /*unused*/)
 
 		// collect pages to be written
 #if ENABLE_SWAP_SUPPORT
-		bool lowOnPages = low_resource_state(B_KERNEL_RESOURCE_PAGES)
-			!= B_NO_LOW_RESOURCE;
+		bool lowOnPages = lowPagesState != B_NO_LOW_RESOURCE;
 #endif
 
 		pageCollectionTime -= system_time();
