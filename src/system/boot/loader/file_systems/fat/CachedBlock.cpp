@@ -47,14 +47,14 @@ CachedBlock::~CachedBlock()
 }
 
 
-inline void
+void
 CachedBlock::Unset()
 {
 	fBlockNumber = -1;
 }
 
 
-inline uint8 *
+uint8 *
 CachedBlock::SetTo(off_t block)
 {
 	if (block == fBlockNumber)
