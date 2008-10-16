@@ -93,7 +93,8 @@ class IconView : public BControl {
 		void ShowIconHeap(bool show);
 		void ShowEmptyFrame(bool show);
 		void SetTarget(const BMessenger& target);
-		void Invoke();
+		void SetModificationMessage(BMessage* message);
+		void Invoke(const BMessage* message = NULL);
 
 		::Icon* Icon();
 		int32 IconSize() const { return fIconSize; } 
@@ -116,6 +117,7 @@ class IconView : public BControl {
 		void _StopWatching();
 
 		BMessenger	fTarget;
+		BMessage*	fModificationMessage;
 		int32		fIconSize;
 		BBitmap*	fIcon;
 		BBitmap*	fHeapIcon;

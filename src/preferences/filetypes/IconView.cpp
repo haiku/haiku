@@ -525,6 +525,7 @@ Icon::AllocateBitmap(int32 size, int32 space)
 
 IconView::IconView(BRect rect, const char* name, uint32 resizeMode, uint32 flags)
 	: BControl(rect, name, NULL, NULL, resizeMode, B_WILL_DRAW | flags),
+	fModificationMessage(NULL),
 	fIconSize(B_LARGE_ICON),
 	fIcon(NULL),
 	fHeapIcon(NULL),
@@ -542,6 +543,7 @@ IconView::IconView(BRect rect, const char* name, uint32 resizeMode, uint32 flags
 IconView::~IconView()
 {
 	delete fIcon;
+	delete fModificationMessage;
 }
 
 
@@ -864,6 +866,9 @@ IconView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 
 		icon->CopyTo(message);
 
+		if (icon != fIconData)
+			delete icon;
+
 		BBitmap *dragBitmap = new BBitmap(fIcon->Bounds(), B_RGBA32, true);
 		dragBitmap->Lock();
 		BView *view = new BView(dragBitmap->Bounds(), B_EMPTY_STRING, B_FOLLOW_NONE, 0);
@@ -1111,9 +1116,22 @@ IconView::SetTarget(const BMessenger& target)
 
 
 void
-IconView::Invoke()
+IconView::SetModificationMessage(BMessage* message)
 {
-	fTarget.SendMessage(kMsgIconInvoked);
+	delete fModificationMessage;
+	fModificationMessage = message;
+}
+
+
+void
+IconView::Invoke(const BMessage* _message)
+{
+	if (_message == NULL)
+		fTarget.SendMessage(kMsgIconInvoked);
+	else {
+		BMessage message(*_message);
+		fTarget.SendMessage(&message);
+	}
 }
 
 
@@ -1238,6 +1256,9 @@ IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data, size_t size
 		}
 		Invalidate();
 	}
+
+	if (fModificationMessage)
+		Invoke(fModificationMessage);
 }
 
 
