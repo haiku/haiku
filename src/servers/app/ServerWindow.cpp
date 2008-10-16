@@ -348,7 +348,9 @@ ServerWindow::ReplaceDecorator()
 }
 
 
-//! Shows the window's Window
+/*! Shows the window's Window. You need to have all windows locked when
+	calling this function.
+*/
 void
 ServerWindow::_Show()
 {
@@ -358,18 +360,16 @@ ServerWindow::_Show()
 	if (fQuitting || !fWindow->IsHidden() || fWindow->IsOffscreenWindow())
 		return;
 
-	// TODO: Maybe we need to dispatch a message to the desktop to show/hide us
-	// instead of doing it from this thread.
-	fDesktop->UnlockSingleWindow();
 	fDesktop->ShowWindow(fWindow);
-	fDesktop->LockSingleWindow();
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
 }
 
 
-//! Hides the window's Window
+/*! Hides the window's Window. You need to have all windows locked when
+	calling this function.
+*/
 void
 ServerWindow::_Hide()
 {
@@ -382,9 +382,7 @@ ServerWindow::_Hide()
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_STOP);
 
-	fDesktop->UnlockSingleWindow();
 	fDesktop->HideWindow(fWindow);
-	fDesktop->LockSingleWindow();
 }
 
 
@@ -648,12 +646,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					break;
 				}
 
-				if (minimize && !fWindow->IsHidden())
+				if (minimize && !fWindow->IsHidden()) {
 					_Hide();
-				else if (!minimize && fWindow->IsHidden())
-					_Show();
+					fWindow->SetMinimized(minimize);
+				} else if (!minimize && fWindow->IsHidden()) {
+					fDesktop->ActivateWindow(fWindow);
+						// this will unminimize the window for us
+				}
 
-				fWindow->SetMinimized(minimize);
 			}
 			break;
 		}
@@ -665,12 +665,10 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<bool>(&activate);
 
-//fDesktop->UnlockSingleWindow();
 			if (activate)
 				fDesktop->ActivateWindow(fWindow);
 			else
 				fDesktop->SendWindowBehind(fWindow, NULL);
-//fDesktop->LockSingleWindow();
 			break;
 		}
 		case AS_SEND_BEHIND:
@@ -2221,7 +2219,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_FILL_BEZIER_GRADIENT:
 		{
 			GTRACE(("ServerWindow %s: Message AS_FILL_BEZIER_GRADIENT\n", Title()));
-			
+
 			BPoint pts[4];
 			for (int32 i = 0; i < 4; i++) {
 				link.Read<BPoint>(&(pts[i]));
@@ -2249,7 +2247,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_FILL_ELLIPSE_GRADIENT:
 		{
 			GTRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE_GRADIENT\n", Title()));
-			
+
 			BRect rect;
 			link.Read<BRect>(&rect);
 			BGradient* gradient;
@@ -2278,7 +2276,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_FILL_ROUNDRECT_GRADIENT:
 		{
 			GTRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT_GRADIENT\n", Title()));
-			
+
 			BRect rect;
 			float xrad,yrad;
 			link.Read<BRect>(&rect);
@@ -2314,7 +2312,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_FILL_TRIANGLE_GRADIENT:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE_GRADIENT\n", Title()));
-			
+
 			BPoint pts[3];
 			BRect rect;
 			for (int32 i = 0; i < 3; i++) {
@@ -2359,13 +2357,13 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_FILL_POLYGON_GRADIENT:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_POLYGON_GRADIENT\n", Title()));
-			
+
 			BRect polyFrame;
 			bool isClosed = true;
 			int32 pointCount;
 			link.Read<BRect>(&polyFrame);
 			link.Read<int32>(&pointCount);
-			
+
 			BPoint* pointList = new(nothrow) BPoint[pointCount];
 			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK) {
 				BGradient* gradient;
@@ -2375,7 +2373,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 					fCurrentView->ConvertToScreenForDrawing(&pointList[i]);
 				fCurrentView->ConvertToScreenForDrawing(&polyFrame);
 				fCurrentView->ConvertToScreenForDrawing(gradient);
-				
+
 				drawingEngine->FillPolygonGradient(pointList, pointCount,
 					polyFrame, *gradient, isClosed && pointCount > 2);
 			}
@@ -2419,20 +2417,20 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_FILL_SHAPE_GRADIENT:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_SHAPE_GRADIENT\n", Title()));
-			
+
 			BRect shapeFrame;
 			int32 opCount;
 			int32 ptCount;
-			
+
 			link.Read<BRect>(&shapeFrame);
 			link.Read<int32>(&opCount);
 			link.Read<int32>(&ptCount);
-			
+
 			uint32* opList = new(nothrow) uint32[opCount];
 			BPoint* ptList = new(nothrow) BPoint[ptCount];
 			if (link.Read(opList, opCount * sizeof(uint32)) >= B_OK &&
 				link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
-				
+
 				// this might seem a bit weird, but under R5, the shapes
 				// are always offset by the current pen location
 				BPoint penLocation = fCurrentView->CurrentState()->PenLocation();
@@ -2447,7 +2445,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				drawingEngine->FillShapeGradient(shapeFrame, opCount, opList,
 					ptCount, ptList, *gradient);
 			}
-			
+
 			delete[] opList;
 			delete[] ptList;
 			break;
@@ -2468,7 +2466,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_FILL_REGION_GRADIENT:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_REGION_GRADIENT\n", Title()));
-			
+
 			BRegion region;
 			if (link.ReadRegion(&region) < B_OK)
 				break;
@@ -3431,7 +3429,10 @@ bool
 ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 {
 	switch (code) {
+		case AS_SHOW_WINDOW:
+		case AS_HIDE_WINDOW:
 		case AS_ACTIVATE_WINDOW:
+		case AS_MINIMIZE_WINDOW:
 		case AS_SET_WINDOW_TITLE:
 		case AS_ADD_TO_SUBSET:
 		case AS_REMOVE_FROM_SUBSET:
