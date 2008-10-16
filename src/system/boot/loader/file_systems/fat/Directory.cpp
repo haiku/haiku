@@ -265,7 +265,7 @@ Directory::Inode() const
 }
 
 status_t 
-Directory::GetNextEntry(void *cookie, uint8 mask, uint8 match = 0)
+Directory::GetNextEntry(void *cookie, uint8 mask, uint8 match)
 {
 	TRACE(("FASFS::Directory::%s(, %02x, %02x)\n", __FUNCTION__, mask, match));
 	struct dir_cookie *c = (struct dir_cookie *)cookie;
