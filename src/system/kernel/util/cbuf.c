@@ -529,6 +529,8 @@ cbuf_user_memcpy_from_chain(void *_dest, cbuf *chain, size_t offset, size_t leng
 	int bufferOffset;
 	int err;
 
+	if (length == 0)
+		return B_OK;
 	if (chain == NULL)
 		return B_BAD_VALUE;
 

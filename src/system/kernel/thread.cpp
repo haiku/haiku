@@ -743,7 +743,7 @@ receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize,
 		return status;
 	}
 
-	if (buffer != NULL && bufferSize != 0) {
+	if (buffer != NULL && bufferSize != 0 && thread->msg.buffer != NULL) {
 		size = min_c(bufferSize, thread->msg.size);
 		status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer,
 			0, size);
