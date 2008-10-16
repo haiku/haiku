@@ -1041,3 +1041,4 @@ EnableWerror src kits interface ;
 EnableWerror src kits storage ;
 EnableWerror src kits support ;
 EnableWerror src system kernel ;
+EnableWerror src add-ons kernel file_systems bfs ;
