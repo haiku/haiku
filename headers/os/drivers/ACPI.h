@@ -114,7 +114,6 @@ struct acpi_object_type {
 		} package;
 		struct {
 			uint32 cpu_id;
-
 			int pblk_address;
 			size_t pblk_length;
 		} processor;
