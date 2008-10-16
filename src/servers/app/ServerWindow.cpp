@@ -348,8 +348,7 @@ ServerWindow::ReplaceDecorator()
 }
 
 
-/*! Shows the window's Window. You need to have all windows locked when
-	calling this function.
+/*! Shows the window's Window.
 */
 void
 ServerWindow::_Show()
@@ -360,7 +359,11 @@ ServerWindow::_Show()
 	if (fQuitting || !fWindow->IsHidden() || fWindow->IsOffscreenWindow())
 		return;
 
+	// TODO: Maybe we need to dispatch a message to the desktop to show/hide us
+	// instead of doing it from this thread.
+	fDesktop->UnlockSingleWindow();
 	fDesktop->ShowWindow(fWindow);
+	fDesktop->LockSingleWindow();
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
@@ -382,7 +385,9 @@ ServerWindow::_Hide()
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_STOP);
 
+	fDesktop->UnlockSingleWindow();
 	fDesktop->HideWindow(fWindow);
+	fDesktop->LockSingleWindow();
 }
 
 
@@ -650,8 +655,10 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					_Hide();
 					fWindow->SetMinimized(minimize);
 				} else if (!minimize && fWindow->IsHidden()) {
+					fDesktop->UnlockSingleWindow();
 					fDesktop->ActivateWindow(fWindow);
 						// this will unminimize the window for us
+					fDesktop->LockSingleWindow();
 				}
 
 			}
@@ -749,7 +756,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					status = B_BAD_VALUE;
 				} else {
 //fDesktop->UnlockSingleWindow();
-// TODO: there is a big race condition when we unlock here (window could be gone by now)!
+// TODO: there is a big race condition when we unlock here
+// (window could be gone by now)!
 					status = fDesktop->AddWindowToSubset(fWindow, window)
 						? B_OK : B_NO_MEMORY;
 //fDesktop->LockSingleWindow();
@@ -3429,10 +3437,7 @@ bool
 ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 {
 	switch (code) {
-		case AS_SHOW_WINDOW:
-		case AS_HIDE_WINDOW:
 		case AS_ACTIVATE_WINDOW:
-		case AS_MINIMIZE_WINDOW:
 		case AS_SET_WINDOW_TITLE:
 		case AS_ADD_TO_SUBSET:
 		case AS_REMOVE_FROM_SUBSET:
