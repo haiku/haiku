@@ -810,7 +810,7 @@ ApplicationTypeWindow::_NeedsSaving(uint32 _flags) const
 	}
 
 	if (_flags & CHECK_TYPES) {
-		if (!fOriginalInfo.supportedTypes.CompareData(_SupportedTypes()))
+		if (!fOriginalInfo.supportedTypes.HasSameData(_SupportedTypes()))
 			flags |= CHECK_TYPES;
 		else
 			flags &= ~CHECK_TYPES;
