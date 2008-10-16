@@ -149,6 +149,35 @@ FILE *					AcpiGbl_OutputFile;
 
 static uint32 acpi_root = 0;
 
+#define DEBUG_OSHAIKU	0 /* verbosity level 0 = off, 1 = normal, 2 = all */
+
+#if DEBUG_OSHAIKU > 0
+#	define DEBUG_FUNCTION() \
+		dprintf("acpi[%ld]: %s\n", find_thread(NULL), __PRETTY_FUNCTION__);
+#	define DEBUG_FUNCTION_F(x, y...) \
+		dprintf("acpi[%ld]: %s(" x ")\n", find_thread(NULL), __PRETTY_FUNCTION__, y);
+
+#	if DEBUG_OSHAIKU > 1
+#		define DEBUG_FUNCTION_V() \
+			dprintf("acpi[%ld]: %s\n", find_thread(NULL), __PRETTY_FUNCTION__);
+#		define DEBUG_FUNCTION_VF(x, y...) \
+			dprintf("acpi[%ld]: %s(" x ")\n", find_thread(NULL), __PRETTY_FUNCTION__, y);
+#	else
+#		define DEBUG_FUNCTION_V() \
+		/* nothing */
+#		define DEBUG_FUNCTION_VF(x, y...) \
+		/* nothing */
+#	endif
+#else
+#	define DEBUG_FUNCTION() \
+		/* nothing */
+#	define DEBUG_FUNCTION_F(x, y...) \
+		/* nothing */
+#	define DEBUG_FUNCTION_V() \
+		/* nothing */
+#	define DEBUG_FUNCTION_VF(x, y...) \
+		/* nothing */
+#endif
 
 /******************************************************************************
  *
@@ -170,6 +199,7 @@ AcpiOsInitialize(void)
 #else
 	AcpiGbl_OutputFile = NULL;
 #endif
+	DEBUG_FUNCTION();
 	return AE_OK;
 }
 
@@ -177,6 +207,7 @@ AcpiOsInitialize(void)
 ACPI_STATUS
 AcpiOsTerminate(void)
 {
+	DEBUG_FUNCTION();
 	return AE_OK;
 }
 
@@ -200,6 +231,7 @@ AcpiOsGetRootPointer(void)
 #ifdef _KERNEL_MODE
 	ACPI_SIZE address;
 	ACPI_STATUS status;
+	DEBUG_FUNCTION();
 	if (acpi_root == 0) {
 		status = AcpiFindRootPointer(&address);
 		if (status == AE_OK)
@@ -231,6 +263,7 @@ ACPI_STATUS
 AcpiOsPredefinedOverride(const ACPI_PREDEFINED_NAMES *InitVal,
 	ACPI_STRING *NewVal)
 {
+	DEBUG_FUNCTION();
 	if (!InitVal || !NewVal)
 		return AE_BAD_PARAMETER;
 
@@ -257,6 +290,7 @@ ACPI_STATUS
 AcpiOsTableOverride(ACPI_TABLE_HEADER *ExistingTable,
 	ACPI_TABLE_HEADER **NewTable)
 {
+	DEBUG_FUNCTION();
 	if (!ExistingTable || !NewTable)
 		return AE_BAD_PARAMETER;
 
@@ -292,6 +326,7 @@ AcpiOsTableOverride(ACPI_TABLE_HEADER *ExistingTable,
 BOOLEAN
 AcpiOsReadable(void *Pointer, ACPI_SIZE Length)
 {
+	DEBUG_FUNCTION_F("addr: %p; length: %lu", Pointer, (size_t)Length);
 	return TRUE;
 }
 
@@ -312,6 +347,7 @@ AcpiOsReadable(void *Pointer, ACPI_SIZE Length)
 BOOLEAN
 AcpiOsWritable(void *Pointer, ACPI_SIZE Length)
 {
+	DEBUG_FUNCTION_F("addr: %p; length: %lu", Pointer, (size_t)Length);
 	return TRUE;
 }
 
@@ -331,6 +367,7 @@ AcpiOsWritable(void *Pointer, ACPI_SIZE Length)
 void
 AcpiOsRedirectOutput(void *Destination)
 {
+	DEBUG_FUNCTION();
 	AcpiGbl_OutputFile = Destination;
 }
 
@@ -351,6 +388,7 @@ void ACPI_INTERNAL_VAR_XFACE
 AcpiOsPrintf(const char *Fmt, ...)
 {
 	va_list Args;
+	DEBUG_FUNCTION();
 	va_start(Args, Fmt);
 	AcpiOsVprintf(Fmt, Args);
 	va_end(Args);
@@ -434,6 +472,7 @@ AcpiOsGetLine(char *Buffer)
 	Buffer[i] = 0;
 
 	/* Return the number of bytes in the string */
+	DEBUG_FUNCTION_F("buffer: \"%s\"; result: %lu", Buffer, (uint32)i);
 	return i;
 }
 
@@ -458,6 +497,8 @@ AcpiOsMapMemory(ACPI_PHYSICAL_ADDRESS where, ACPI_SIZE length)
 	void *there;
 	area_id area = map_physical_memory("acpi_physical_mem_area", (void *)where,
 		length, B_ANY_KERNEL_ADDRESS, 0, &there);
+	DEBUG_FUNCTION_F("addr: 0x%08lx; length: %lu; mapped: %p; area: %ld",
+		(addr_t)where, (size_t)length, there, area);
 	if (area < 0) {
 		dprintf("ACPI: cannot map memory at 0x%08x, length %d\n", where, length);
 		return NULL;
@@ -487,6 +528,7 @@ AcpiOsMapMemory(ACPI_PHYSICAL_ADDRESS where, ACPI_SIZE length)
 void
 AcpiOsUnmapMemory(void *where, ACPI_SIZE length)
 {
+	DEBUG_FUNCTION_F("mapped: %p; length: %lu", where, (size_t)length);
 	delete_area(area_for(where));
 }
 
@@ -506,7 +548,9 @@ AcpiOsUnmapMemory(void *where, ACPI_SIZE length)
 void *
 AcpiOsAllocate(ACPI_SIZE size)
 {
-	return malloc((size_t)size);
+	void *result = malloc((size_t)size);
+	DEBUG_FUNCTION_VF("result: %p", result);
+	return result;
 }
 
 
@@ -525,6 +569,7 @@ AcpiOsAllocate(ACPI_SIZE size)
 void
 AcpiOsFree(void *mem)
 {
+	DEBUG_FUNCTION_VF("mem: %p", mem);
 	free(mem);
 }
 
@@ -547,6 +592,8 @@ AcpiOsCreateSemaphore(UINT32 MaxUnits, UINT32 InitialUnits,
 	ACPI_HANDLE *OutHandle)
 {
 	*OutHandle = (ACPI_HANDLE)create_sem(InitialUnits, "acpi_sem");
+	DEBUG_FUNCTION_F("max: %lu; count: %lu; result: %ld",
+		(uint32)MaxUnits, (uint32)InitialUnits, (sem_id)*OutHandle);
 	if (*OutHandle < B_OK)
 		return AE_ERROR;
 	return AE_OK;
@@ -567,6 +614,7 @@ AcpiOsCreateSemaphore(UINT32 MaxUnits, UINT32 InitialUnits,
 ACPI_STATUS
 AcpiOsDeleteSemaphore(ACPI_HANDLE Handle)
 {
+	DEBUG_FUNCTION_F("sem: %ld", (sem_id)Handle);
 	delete_sem((sem_id)Handle);
 	return AE_OK;
 }
@@ -589,22 +637,32 @@ AcpiOsDeleteSemaphore(ACPI_HANDLE Handle)
 ACPI_STATUS
 AcpiOsWaitSemaphore(ACPI_HANDLE Handle, UINT32 Units, UINT16 Timeout)
 {
+	ACPI_STATUS result;
+	DEBUG_FUNCTION_VF("sem: %ld; count: %lu; timeout: %u",
+		(sem_id)Handle, (uint32)Units, (uint16)Timeout);
 	if (Timeout != ACPI_WAIT_FOREVER) {
 		switch (acquire_sem_etc((sem_id)Handle, Units, B_RELATIVE_TIMEOUT,
 			(bigtime_t)Timeout * 1000)) {
 			case B_TIMED_OUT:
-				return AE_TIME;
+				result = AE_TIME;
+				break;
 			case B_BAD_VALUE:
-				return AE_BAD_PARAMETER;
+				result = AE_BAD_PARAMETER;
+				break;
 			case B_OK:
-				return AE_OK;
+				result = AE_OK;
+				break;
 			default:
-				return AE_ERROR;
+				result = AE_ERROR;
+				break;
 		}
+	} else {
+		result = acquire_sem_etc((sem_id)Handle, Units, 0, 0)
+			== B_OK ? AE_OK : AE_BAD_PARAMETER;
 	}
 
-	return acquire_sem_etc((sem_id)Handle, Units, 0, 0)
-		== B_OK ? AE_OK : AE_BAD_PARAMETER;
+	DEBUG_FUNCTION_VF("result: %lu", (uint32)result);
+	return result;
 }
 
 
@@ -624,6 +682,8 @@ AcpiOsWaitSemaphore(ACPI_HANDLE Handle, UINT32 Units, UINT16 Timeout)
 ACPI_STATUS
 AcpiOsSignalSemaphore(ACPI_HANDLE Handle, UINT32 Units)
 {
+	DEBUG_FUNCTION_VF("sem: %ld; count: %lu", (sem_id)Handle,
+		(uint32)Units);
 	release_sem_etc((sem_id)Handle, Units, 0);
 	return AE_OK;
 }
@@ -633,6 +693,7 @@ ACPI_STATUS
 AcpiOsCreateLock(ACPI_HANDLE *OutHandle)
 {
 	*OutHandle = (ACPI_HANDLE)malloc(sizeof(spinlock));
+	DEBUG_FUNCTION_F("result: %p", (spinlock *)*OutHandle);
 	if (OutHandle == NULL)
 		return AE_NO_MEMORY;
 
@@ -643,6 +704,7 @@ AcpiOsCreateLock(ACPI_HANDLE *OutHandle)
 void
 AcpiOsDeleteLock(ACPI_HANDLE Handle)
 {
+	DEBUG_FUNCTION();
 	free(Handle);
 }
 
@@ -650,7 +712,9 @@ AcpiOsDeleteLock(ACPI_HANDLE Handle)
 ACPI_CPU_FLAGS
 AcpiOsAcquireLock(ACPI_HANDLE Handle)
 {
-	cpu_status cpu = disable_interrupts();
+	cpu_status cpu;
+	DEBUG_FUNCTION_F("spinlock: %p", (spinlock *)Handle);
+	cpu = disable_interrupts();
 	acquire_spinlock((spinlock *)Handle);
 	return cpu;
 }
@@ -661,6 +725,7 @@ AcpiOsReleaseLock(ACPI_HANDLE Handle, ACPI_CPU_FLAGS Flags)
 {
 	release_spinlock((spinlock *)Handle);
 	restore_interrupts((cpu_status)Flags);
+	DEBUG_FUNCTION_F("spinlock: %p", (spinlock *)Handle);
 }
 
 
@@ -683,12 +748,14 @@ UINT32
 AcpiOsInstallInterruptHandler(UINT32 InterruptNumber,
 	ACPI_OSD_HANDLER ServiceRoutine, void *Context)
 {
+	DEBUG_FUNCTION_F("vector: %lu; handler: %p; data: %p",
+		(uint32)InterruptNumber, ServiceRoutine, Context);
 #ifdef _KERNEL_MODE
-	install_io_interrupt_handler(InterruptNumber,
-		(interrupt_handler)ServiceRoutine, Context, 0);
 		/*	It so happens that the Haiku and ACPI-CA interrupt handler routines
 			return the same values with the same meanings */
-	return AE_OK;
+	return install_io_interrupt_handler(InterruptNumber,
+		(interrupt_handler)ServiceRoutine, Context, 0) == B_OK ? AE_OK
+		: AE_ERROR;
 #else
 	return AE_ERROR;
 #endif
@@ -711,6 +778,8 @@ ACPI_STATUS
 AcpiOsRemoveInterruptHandler(UINT32 InterruptNumber,
 	ACPI_OSD_HANDLER ServiceRoutine)
 {
+	DEBUG_FUNCTION_F("vector: %lu; handler: %p", (uint32)InterruptNumber,
+		ServiceRoutine);
 #ifdef _KERNEL_MODE
 	panic("AcpiOsRemoveInterruptHandler()\n");
 	/*remove_io_interrupt_handler(InterruptNumber,
@@ -742,6 +811,7 @@ ACPI_STATUS
 AcpiOsExecute(ACPI_EXECUTE_TYPE Type, ACPI_OSD_EXEC_CALLBACK Function,
 	void *Context)
 {
+	DEBUG_FUNCTION();
 	switch (Type) {
 		case OSL_GLOBAL_LOCK_HANDLER:
 		case OSL_NOTIFY_HANDLER:
@@ -799,6 +869,7 @@ AcpiOsBreakpoint(char *Msg)
 void
 AcpiOsStall(UINT32 microseconds)
 {
+	DEBUG_FUNCTION_F("microseconds: %lu", (uint32)microseconds);
 	spin(microseconds);
 }
 
@@ -818,6 +889,7 @@ AcpiOsStall(UINT32 microseconds)
 void
 AcpiOsSleep(ACPI_INTEGER milliseconds)
 {
+	DEBUG_FUNCTION_F("milliseconds: %lu", (uint32)milliseconds);
 	snooze(milliseconds * 1000); /* Sleep for micro seconds */
 }
 
@@ -836,6 +908,7 @@ AcpiOsSleep(ACPI_INTEGER milliseconds)
 UINT64
 AcpiOsGetTimer (void)
 {
+	DEBUG_FUNCTION();
 	return system_time() * 10;
 }
 
@@ -856,6 +929,7 @@ AcpiOsGetTimer (void)
 ACPI_STATUS
 AcpiOsValidateInterface(char *Interface)
 {
+	DEBUG_FUNCTION_F("interface: \"%s\"", Interface);
 	return AE_SUPPORT;
 }
 
@@ -880,6 +954,8 @@ ACPI_STATUS
 AcpiOsValidateAddress(UINT8 SpaceId, ACPI_PHYSICAL_ADDRESS Address,
 	ACPI_SIZE Length)
 {
+	DEBUG_FUNCTION_F("space: %u; addr: 0x%08lx; length: %lu",
+		(uint8)SpaceId, (addr_t)Address, (size_t)Length);
 	return AE_OK;
 }
 
@@ -906,6 +982,7 @@ AcpiOsReadPciConfiguration(ACPI_PCI_ID *PciId, UINT32 Register, void *Value,
 #ifdef _KERNEL_MODE
 	UINT32 val = gPCIManager->read_pci_config(
 		PciId->Bus, PciId->Device, PciId->Function, Register, Width / 8);
+	DEBUG_FUNCTION();
 	switch (Width) {
 		case 8: *(UINT8 *)Value = val;
 		case 16: *(UINT16 *)Value = val;
@@ -943,6 +1020,7 @@ AcpiOsWritePciConfiguration(ACPI_PCI_ID *PciId, UINT32 Register,
 	ACPI_INTEGER Value, UINT32 Width)
 {
 #ifdef _KERNEL_MODE
+	DEBUG_FUNCTION();
 	gPCIManager->write_pci_config(
 		PciId->Bus, PciId->Device, PciId->Function, Register, Width / 8, Value);
 	return AE_OK;
@@ -976,6 +1054,8 @@ ACPI_STATUS
 AcpiOsReadPort(ACPI_IO_ADDRESS Address, UINT32 *Value, UINT32 Width)
 {
 #ifdef _KERNEL_MODE
+	DEBUG_FUNCTION_F("addr: 0x%08lx; width: %lu", (addr_t)Address,
+		(uint32)Width);
 	switch (Width) {
 		case 8:
 			*Value = gPCIManager->read_io_8(Address);
@@ -1019,6 +1099,8 @@ ACPI_STATUS
 AcpiOsWritePort(ACPI_IO_ADDRESS Address, UINT32 Value, UINT32 Width)
 {
 #ifdef _KERNEL_MODE
+	DEBUG_FUNCTION_F("addr: 0x%08lx; value: %lu; width: %lu",
+		(addr_t)Address, (uint32)Value, (uint32)Width);
 	switch (Width) {
 		case 8:
 			gPCIManager->write_io_8(Address, Value);
@@ -1066,6 +1148,7 @@ AcpiOsReadMemory(ACPI_PHYSICAL_ADDRESS Address, UINT32 *Value, UINT32 Width)
 	addr_t virtualAddress;
 	status_t error = vm_get_physical_page(Address - pageOffset,
 		&virtualAddress, 0);
+	DEBUG_FUNCTION();
 	if (error != B_OK)
 		return AE_ERROR;
 
@@ -1100,6 +1183,7 @@ AcpiOsWriteMemory(ACPI_PHYSICAL_ADDRESS Address, UINT32 Value, UINT32 Width)
 	addr_t virtualAddress;
 	status_t error = vm_get_physical_page(Address - pageOffset,
 		&virtualAddress, 0);
+	DEBUG_FUNCTION();
 	if (error != B_OK)
 		return AE_ERROR;
 
@@ -1135,13 +1219,16 @@ AcpiOsGetThreadId(void)
 ACPI_STATUS
 AcpiOsSignal(UINT32 Function, void *Info)
 {
+	DEBUG_FUNCTION();
 	switch (Function) {
 		case ACPI_SIGNAL_FATAL:
+#ifdef _KERNEL_MODE
 			if (Info != NULL)
 				panic(Info);
 			else
 				panic("AcpiOsSignal: fatal");
 			break;
+#endif
 
 		case ACPI_SIGNAL_BREAKPOINT:
 			if (Info != NULL)
