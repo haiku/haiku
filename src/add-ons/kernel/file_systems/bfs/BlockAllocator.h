@@ -19,7 +19,7 @@ struct check_control;
 struct check_cookie;
 
 
-#define DEBUG_ALLOCATION_GROUPS
+//#define DEBUG_ALLOCATION_GROUPS
 
 
 class BlockAllocator {

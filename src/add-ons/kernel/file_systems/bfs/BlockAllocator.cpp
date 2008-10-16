@@ -366,7 +366,7 @@ AllocationGroup::AddFreeRange(int32 start, int32 blocks)
 status_t
 AllocationGroup::Allocate(Transaction& transaction, uint16 start, int32 length)
 {
-	ASSERT(start + length <= fNumBits);
+	ASSERT(start + length <= (int32)fNumBits);
 
 	// Update the allocation group info
 	// TODO: this info will be incorrect if something goes wrong later
@@ -435,7 +435,7 @@ AllocationGroup::Allocate(Transaction& transaction, uint16 start, int32 length)
 status_t
 AllocationGroup::Free(Transaction& transaction, uint16 start, int32 length)
 {
-	ASSERT(start + length <= fNumBits);
+	ASSERT(start + length <= (int32)fNumBits);
 
 	// Update the allocation group info
 	// TODO: this info will be incorrect if something goes wrong later
