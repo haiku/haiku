@@ -147,7 +147,8 @@ ACPI_MODULE_NAME		("oshaiku")
 extern FILE *			AcpiGbl_DebugFile;
 FILE *					AcpiGbl_OutputFile;
 
-static uint32 acpi_root = 0;
+static uint32 sACPIRoot = 0;
+static void *sInterruptHandlerData[32];
 
 #define DEBUG_OSHAIKU	0 /* verbosity level 0 = off, 1 = normal, 2 = all */
 
@@ -232,13 +233,13 @@ AcpiOsGetRootPointer(void)
 	ACPI_SIZE address;
 	ACPI_STATUS status;
 	DEBUG_FUNCTION();
-	if (acpi_root == 0) {
+	if (sACPIRoot == 0) {
 		status = AcpiFindRootPointer(&address);
 		if (status == AE_OK)
-			acpi_root = address;
+			sACPIRoot = address;
 	}
-	dprintf("AcpiOsGetRootPointer returning %p\n", (void *)acpi_root);
-	return acpi_root;
+	dprintf("AcpiOsGetRootPointer returning %p\n", (void *)sACPIRoot);
+	return sACPIRoot;
 #else
 	return (AeLocalGetRootPointer());
 #endif
@@ -751,14 +752,9 @@ AcpiOsInstallInterruptHandler(UINT32 InterruptNumber,
 	DEBUG_FUNCTION_F("vector: %lu; handler: %p; data: %p",
 		(uint32)InterruptNumber, ServiceRoutine, Context);
 #ifdef _KERNEL_MODE
-	if (Context != NULL) {
-		// we don't get the context parameter when
-		panic("ACPI: cannot add interrupt handler with non-null context");
-		return AE_ERROR;
-	}
-
 	/*	It so happens that the Haiku and ACPI-CA interrupt handler routines
 		return the same values with the same meanings */
+	sInterruptHandlerData[InterruptNumber] = Context;
 	return install_io_interrupt_handler(InterruptNumber,
 		(interrupt_handler)ServiceRoutine, Context, 0) == B_OK ? AE_OK
 		: AE_ERROR;
@@ -788,7 +784,8 @@ AcpiOsRemoveInterruptHandler(UINT32 InterruptNumber,
 		ServiceRoutine);
 #ifdef _KERNEL_MODE
 	remove_io_interrupt_handler(InterruptNumber,
-		(interrupt_handler)ServiceRoutine, NULL);
+		(interrupt_handler)ServiceRoutine,
+		sInterruptHandlerData[InterruptNumber]);
 	return AE_OK;
 #else
 	return AE_ERROR;
