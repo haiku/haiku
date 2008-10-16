@@ -261,7 +261,7 @@ BMessage::HasSameData(const BMessage &other, bool ignoreFieldOrder,
 			BMessage message, otherMessage;
 			if (message.Unflatten((const char *)data) == B_OK
 				&& otherMessage.Unflatten((const char *)otherData) == B_OK) {
-				if (!message.CompareData(ignoreFieldOrder, deep))
+				if (!message.HasSameData(ignoreFieldOrder, deep))
 					return false;
 				needsMemCompare = false;
 			}
