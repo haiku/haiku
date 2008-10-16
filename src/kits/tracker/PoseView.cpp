@@ -7477,13 +7477,16 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 	StopWatching();
 	ClearPoses();
 
-	// Restore state if requested
-	if (node) {
-		uint32 oldMode = ViewMode();
-
-		// Get new state
-		RestoreState(node);
-
+	// Restore state, might fail if the state has never been saved for this node
+	uint32 oldMode = ViewMode();
+	bool viewStateRestored = false;		
+	if (node) {		
+		BViewState *previousState = fViewState;
+		RestoreState(node);		
+		viewStateRestored = (fViewState != previousState);
+	}
+	
+	if (viewStateRestored) {
 		// Make sure the title view reset its items
 		fTitleView->Reset();
 
@@ -7529,6 +7532,9 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 		UpdateScrollRange();
 		SetScrollBarsTo(origin);
 		EnableScrollBars();
+	} else {
+		ResetOrigin();
+		ResetPosePlacementHint();
 	}
 
 	StartWatching();
@@ -7541,9 +7547,7 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 	else AddPoses(TargetModel());
 	TargetModel()->CloseNode();
 
-	Invalidate();
-	ResetOrigin();
-	ResetPosePlacementHint();
+	Invalidate();	
 
 	sLastKeyTime = 0;
 }
