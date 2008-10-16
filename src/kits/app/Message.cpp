@@ -221,7 +221,7 @@ BMessage::operator delete(void *pointer, size_t size)
 
 
 bool
-BMessage::CompareData(const BMessage &other, bool ignoreFieldOrder,
+BMessage::HasSameData(const BMessage &other, bool ignoreFieldOrder,
 	bool deep) const
 {
 	if (this == &other)
