@@ -14,6 +14,7 @@
 
 #include <int.h>
 #include <lock.h>
+#include <thread.h>
 
 
 namespace BPrivate {
@@ -161,6 +162,24 @@ private:
 // InterruptsSpinLocker
 typedef AutoLocker<spinlock, InterruptsSpinLocking> InterruptsSpinLocker;
 
+// ThreadCPUPinLocking
+class ThreadCPUPinLocking {
+public:
+	inline bool Lock(struct thread* thread)
+	{
+		thread_pin_to_current_cpu(thread);
+		return true;
+	}
+
+	inline void Unlock(struct thread* thread)
+	{
+		thread_unpin_from_current_cpu(thread);
+	}
+};
+
+// MutexLocker
+typedef AutoLocker<struct thread, ThreadCPUPinLocking> ThreadCPUPinner;
+
 }	// namespace BPrivate
 
 using BPrivate::AutoLocker;
@@ -171,5 +190,6 @@ using BPrivate::WriteLocker;
 using BPrivate::InterruptsLocker;
 using BPrivate::SpinLocker;
 using BPrivate::InterruptsSpinLocker;
+using BPrivate::ThreadCPUPinner;
 
 #endif	// KERNEL_UTIL_AUTO_LOCKER_H
