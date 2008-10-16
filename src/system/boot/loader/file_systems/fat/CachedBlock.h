@@ -10,6 +10,8 @@
 
 #include <SupportDefs.h>
 #include <sys/stat.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "Volume.h"
 
@@ -36,6 +38,34 @@ class CachedBlock {
 		uint8	*fBlock;
 };
 
+
+inline void
+CachedBlock::Unset()
+{
+	fBlockNumber = -1;
+}
+
+
+inline uint8 *
+CachedBlock::SetTo(off_t block)
+{
+	if (block == fBlockNumber)
+		return fBlock;
+	if (fBlock == NULL) {
+		fBlock = (uint8 *)malloc(BlockSize());
+		if (fBlock == NULL)
+			return NULL;
+	}
+
+	fBlockNumber = block;
+	if (read_pos(fVolume.Device(), block << BlockShift(), fBlock, BlockSize()) < (ssize_t)BlockSize())
+		return NULL;
+
+	return fBlock;
+}
+
+
 }	// namespace FATFS
+
 
 #endif	/* CACHED_BLOCK_H */
