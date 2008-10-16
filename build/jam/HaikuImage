@@ -375,7 +375,7 @@ AddFilesToHaikuImage beos system : zbeos ;
 
 # boot module links
 AddBootModuleSymlinksToHaikuImage
-	pci $(X86_ONLY)isa config_manager ide scsi usb
+	$(X86_ONLY)acpi pci $(X86_ONLY)isa config_manager ide scsi usb
 	$(PPC_ONLY)openpic
 	ide_adapter locked_pool scsi_periph
 	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa
