@@ -220,6 +220,65 @@ BMessage::operator delete(void *pointer, size_t size)
 }
 
 
+bool
+BMessage::CompareData(const BMessage &other, bool ignoreFieldOrder,
+	bool deep) const
+{
+	if (this == &other)
+		return true;
+
+	if (fHeader->field_count != other.fHeader->field_count)
+		return false;
+
+	for (int32 i = 0; i < fHeader->field_count; i++) {
+		field_header *field = &fFields[i];
+		field_header *otherField = NULL;
+
+		const char *name = (const char *)fData + field->offset;
+		if (ignoreFieldOrder) {
+			if (other._FindField(name, B_ANY_TYPE, &otherField) != B_OK)
+				return false;
+		} else {
+			otherField = &other.fFields[i];
+			if (otherField->name_length != field->name_length)
+				return false;
+
+			const char *otherName = (const char *)other.fData
+				+ otherField->offset;
+			if (strncmp(name, otherName, field->name_length) != 0)
+				return false;
+		}
+
+		if (otherField->type != field->type || otherField->count != field->count)
+			return false;
+
+		uint8 *data = fData + field->offset + field->name_length;
+		uint8 *otherData = other.fData + otherField->offset
+			+ otherField->name_length;
+
+		bool needsMemCompare = true;
+		if (deep && field->type == B_MESSAGE_TYPE) {
+			BMessage message, otherMessage;
+			if (message.Unflatten((const char *)data) == B_OK
+				&& otherMessage.Unflatten((const char *)otherData) == B_OK) {
+				if (!message.CompareData(ignoreFieldOrder, deep))
+					return false;
+				needsMemCompare = false;
+			}
+		}
+
+		if (needsMemCompare) {
+			if (otherField->data_size != field->data_size)
+				return false;
+			if (memcmp(data, otherData, field->data_size) != 0)
+				return false;
+		}
+	}
+
+	return true;
+}
+
+
 status_t
 BMessage::_InitCommon(bool initHeader)
 {

@@ -216,6 +216,10 @@ class BMessage {
 		status_t		ReplaceData(const char *name, type_code type, int32 index,
 							const void *data, ssize_t numBytes);
 
+		// Compareing data (only) - Haiku experimental API
+		bool			CompareData(const BMessage &other,
+							bool ignoreFieldOrder = true, bool deep = false) const;
+
 		void			*operator new(size_t size);
 		void			*operator new(size_t, void *pointer);
 		void			operator delete(void *pointer, size_t size);
