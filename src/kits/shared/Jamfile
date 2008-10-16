@@ -3,10 +3,12 @@ SubDir HAIKU_TOP src kits shared ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+UseLibraryHeaders agg ;
 UsePrivateHeaders shared ;
 
 StaticLibrary libshared.a :
 	AboutWindow.cpp
+	AffineTransform.cpp
 	CalendarView.cpp
 	ColorQuantizer.cpp
 	CommandPipe.cpp

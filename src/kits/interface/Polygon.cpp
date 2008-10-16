@@ -8,6 +8,7 @@
  */
 
 
+#include <AffineTransform.h>
 #include <Polygon.h>
 
 #include <stdlib.h>
@@ -152,6 +153,31 @@ BPolygon::PrintToStream () const
 {
 	for (uint32 i = 0; i < fCount; i++)
 		fPoints[i].PrintToStream();
+}
+
+
+void
+BPolygon::Transform(const BAffineTransform& transform)
+{
+	transform.Apply(fPoints, (int32)fCount);
+	_ComputeBounds();
+}
+
+
+BPolygon&
+BPolygon::TransformBySelf(const BAffineTransform& transform)
+{
+	Transform(transform);
+	return *this;
+}
+
+
+BPolygon*
+BPolygon::TransformByCopy(const BAffineTransform& transform) const
+{
+	BPolygon* copy = new BPolygon(this);
+	copy->Transform(transform);
+	return copy;
 }
 
 
