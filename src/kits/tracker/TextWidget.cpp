@@ -92,15 +92,13 @@ BTextWidget::RecalculateText(const BPoseView *view)
 
 
 const char *
-BTextWidget::Text() const
+BTextWidget::Text(const BPoseView *view) const
 {
 	StringAttributeText *textAttribute = dynamic_cast<StringAttributeText *>(fText);
-	
-	ASSERT(textAttribute);
-	if (!textAttribute)
-		return "";
+	if (textAttribute == NULL)
+		return NULL;
 
-	return textAttribute->Value();
+	return textAttribute->ValueAsText(view);
 }
 
 

@@ -85,7 +85,7 @@ public:
 	bool IsActive() const;
 	void SetActive(bool);
 	
-	const char *Text() const;
+	const char *Text(const BPoseView *view) const;
 		// returns the untruncated version of the text
 	float TextWidth(const BPoseView *) const;
 	float PreferredWidth(const BPoseView *) const;

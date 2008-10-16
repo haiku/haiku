@@ -587,7 +587,7 @@ inline void PrintDirToStream(const BDirectory *, const char * = 0) {}
 			thread_info info;													\
 			get_thread_info(find_thread(NULL), &info);							\
 			PrintToLogFile("[t %Ld] \"%s\" (%s:%i) ", system_time(),			\
-				info.name, __FILE__, __LINE__);								\
+				info.name, __FILE__, __LINE__);									\
 			PrintToLogFile _ARGS_;												\
 			PrintToLogFile("\n");												\
 			fflush(logFile);													\
@@ -616,6 +616,10 @@ inline int64 SwapInt64(int64 value) { return (int64)B_SWAP_INT64((uint64)value);
 inline uint64 SwapUInt64(uint64 value) { return B_SWAP_INT64(value); }
 
 
+extern const float kExactMatchScore;
+float ComputeTypeAheadScore(const char *text, const char *match,
+	size_t matchLength, bool wordMode = false);
+
 } // namespace BPrivate
 
-#endif
+#endif	// _UTILITIES_H

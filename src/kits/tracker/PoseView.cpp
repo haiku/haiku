@@ -2166,7 +2166,7 @@ BPoseView::MessageReceived(BMessage *message)
 			BPose *pose = fSelectionList->FirstItem();
 			if (pose) {
 				pose->EditFirstWidget(BPoint(0,
-						fPoseList->IndexOf(pose) * fListElemHeight), this);
+					fPoseList->IndexOf(pose) * fListElemHeight), this);
 			}
 			break;
 		}
@@ -6017,33 +6017,50 @@ BPoseView::FindNextMatch(int32 *matchingIndex, bool reverse)
 BPose *
 BPoseView::FindBestMatch(int32 *index)
 {
-	char bestSoFar[B_FILE_NAME_LENGTH] = { 0 };
 	BPose *poseToSelect = NULL;
-
-	BColumn *firstColumn = FirstColumn();
+	float bestScore = -1;
+	int32 count = fPoseList->CountItems();
+	size_t matchLength = strlen(sMatchString);
 
 	// loop through all poses to find match
-	int32 count = fPoseList->CountItems();
-	for (int32 i = 0; i < count; i++) {
-		BPose *pose = fPoseList->ItemAt(i);
-		const char * text;
-		if (ViewMode() == kListMode)
-			text = pose->TargetModel()->Name();
-		else {
-			ModelNodeLazyOpener modelOpener(pose->TargetModel());
-			BTextWidget *widget = pose->WidgetFor(firstColumn, this, modelOpener);
-			if (widget)
-				text = widget->Text();
-			else
-				text = pose->TargetModel()->Name();
-		}
+	for (int32 j = 0; j < CountColumns(); j++) {
+		BColumn *column = ColumnAt(j);
 
-		if (strcasecmp(text, sMatchString) >= 0)
-			if (strcasecmp(text, bestSoFar) <= 0 || !bestSoFar[0]) {
-				strcpy(bestSoFar, text);
+		for (int32 i = 0; i < count; i++) {
+			BPose *pose = fPoseList->ItemAt(i);
+			float score = -1;
+
+			if (ViewMode() == kListMode) {
+				ModelNodeLazyOpener modelOpener(pose->TargetModel());
+				BTextWidget *widget = pose->WidgetFor(column, this, modelOpener);
+				const char *text = NULL;
+				if (widget != NULL)
+					text = widget->Text(this);
+
+				if (text != NULL) {
+					score = ComputeTypeAheadScore(text, sMatchString,
+						matchLength);
+				}
+			} else {
+				score = ComputeTypeAheadScore(pose->TargetModel()->Name(),
+					sMatchString, matchLength);
+			}
+
+			if (score > bestScore) {
 				poseToSelect = pose;
+				bestScore = score;
 				*index = i;
 			}
+			if (score == kExactMatchScore)
+				break;
+		}
+
+		// TODO: we might want to change this to make it always work
+		// over all columns, but this would require some more changes
+		// to how Tracker represents data (for example we could filter
+		// the results out).
+		if (bestScore > 0 || ViewMode() != kListMode)
+			break;
 	}
 
 	return poseToSelect;
@@ -6339,7 +6356,7 @@ BPoseView::WasClickInPath(const BPose *pose, int32 index, BPoint mouseLoc) const
 	if (widget->AttrHash() != AttrHashString(kAttrPath, B_STRING_TYPE))
 		return false;
 
-	BEntry entry(widget->Text());
+	BEntry entry(widget->Text(this));
 	if (entry.InitCheck() != B_OK)
 		return false;
 

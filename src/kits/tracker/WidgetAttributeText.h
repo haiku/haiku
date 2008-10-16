@@ -140,9 +140,11 @@ WidgetAttributeText::TargetModel() const
 class StringAttributeText : public WidgetAttributeText {
 	public:
 		StringAttributeText(const Model *, const BColumn *);
-		const char *Value();
+
+		virtual const char *ValueAsText(const BPoseView *view);
 			// returns the untrucated text that corresponds to the attribute
 			// value
+
 		virtual bool CheckAttributeChanged();
 
 		virtual float PreferredWidth(const BPoseView *) const;
@@ -156,6 +158,7 @@ class StringAttributeText : public WidgetAttributeText {
 		virtual void ReadValue(BString *result) = 0;
 
 		virtual int Compare(WidgetAttributeText &, BPoseView *view);
+
 		BString fFullValueText;
 		bool fValueDirty;
 			// used for lazy read, managed by ReadValue
@@ -200,32 +203,32 @@ union GenericValueStruct {
 };
 
 
-class GenericAttributeText : public WidgetAttributeText {
+class GenericAttributeText : public StringAttributeText {
 	// used for displaying mime extra attributes
 	// supports different formats
 	public:
-		GenericAttributeText(const Model *, const BColumn *);
+		GenericAttributeText(const Model *model, const BColumn *column);
 		virtual bool CheckAttributeChanged();
 
-		virtual float PreferredWidth(const BPoseView *) const;
+		virtual float PreferredWidth(const BPoseView *view) const;
 
 		virtual int Compare(WidgetAttributeText &, BPoseView *view);
 
 		virtual void SetUpEditing(BTextView *);
 		virtual bool CommitEditedText(BTextView *);
 
+		virtual const char *ValueAsText(const BPoseView *view);
+
 	private:
 		virtual bool CommitEditedTextFlavor(BTextView *);
 
 		virtual void FitValue(BString *result, const BPoseView *);
-		virtual void ReadValue();
+		virtual void ReadValue(BString *result);
 
-		// ToDo:
+		// TODO:
 		// split this up into a scalar flavor and string flavor
 		// to save memory
-		BString fFullValueText;
 		GenericValueStruct fValue;
-		bool fValueDirty;
 };
 
 

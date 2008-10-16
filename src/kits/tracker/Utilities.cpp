@@ -80,6 +80,8 @@ static const float kStubToStringSlotX = 5;
 
 namespace BPrivate {
 
+const float kExactMatchScore = INFINITY;
+
 const rgb_color	kBlack = {0, 0, 0, 255};
 const rgb_color	kWhite = {255, 255, 255, 255};
 
@@ -1580,6 +1582,77 @@ BootedInSafeMode()
 {
 	const char *safeMode = getenv("SAFEMODE");
 	return (safeMode && strcmp(safeMode, "yes") == 0);
+}
+
+
+float
+ComputeTypeAheadScore(const char *text, const char *match, size_t matchLength,
+	bool wordMode)
+{
+	float first = -1;
+	float second = -1;
+	float third = -1;
+
+	// highest score: exact match
+	float score = 0;
+	size_t pos = 0;
+	for (; pos < matchLength; pos++) {
+		if (text[pos] == '\0') {
+			score = 0;
+			break;
+		}
+		if (tolower(text[pos]) != tolower(match[pos]))
+			break;
+
+		score++;
+	}
+	if (pos == matchLength) {
+		// we don't need to look any further
+		return kExactMatchScore;
+	}
+
+	first = score;
+
+	// there was no exact match
+
+	// second best: all characters at word beginnings
+	if (wordMode) {
+		score = 0;
+		for (int32 j = 0, k = 0; match[j]; j++) {
+			while (text[k]
+				&& tolower(text[k]) != tolower(match[j])) {
+				k++;
+			}
+			if (text[k] == '\0') {
+				score = 0;
+				break;
+			}
+	
+			bool wordStart = k == 0 || isspace(text[k - 1]);
+			if (wordStart)
+				score++;
+			if (j > 0) {
+				bool wordEnd = !text[k + 1] || isspace(text[k + 1]);
+				if (wordEnd)
+					score += 0.3;
+				if (match[j - 1] == text[k - 1])
+					score += 0.7;
+			}
+	
+			score += 1.f / (k + 1);
+			k++;
+		}
+		second = score;
+	}
+
+	// acceptable last: exact match inside the string
+	score = 0;
+	const char* found = strstr(text + 1, match);
+	if (found != NULL)
+		score = 1.f / (found - text);
+	third = score;
+
+	return max_c(first, max_c(second, third));
 }
 
 
