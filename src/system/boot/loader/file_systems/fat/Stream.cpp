@@ -19,7 +19,8 @@
 #include <unistd.h>
 #include <string.h>
 
-#define TRACE(x) dprintf x
+//#define TRACE(x) dprintf x
+#define TRACE(x) do {} while (0)
 
 
 using namespace FATFS;

@@ -12,7 +12,8 @@
 #include <unistd.h>
 
 
-#define TRACE(x) dprintf x
+//#define TRACE(x) dprintf x
+#define TRACE(x) do {} while (0)
 
 
 namespace FATFS {

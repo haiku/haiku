@@ -18,7 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TRACE(x) dprintf x
+//#define TRACE(x) dprintf x
+#define TRACE(x) do {} while (0)
 
 using namespace FATFS;
 
