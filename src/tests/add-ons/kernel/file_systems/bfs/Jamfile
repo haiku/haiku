@@ -1,5 +1,9 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs ;
 
+SimpleTest bfs_allocator_invalidate_largest :
+	bfs_allocator_invalidate_largest.cpp
+;
+
 SimpleTest bfs_attribute_iterator_test :
 	bfs_attribute_iterator_test.cpp
 	: be ;

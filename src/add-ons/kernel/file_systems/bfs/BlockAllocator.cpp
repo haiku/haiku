@@ -366,8 +366,7 @@ AllocationGroup::AddFreeRange(int32 start, int32 blocks)
 status_t
 AllocationGroup::Allocate(Transaction& transaction, uint16 start, int32 length)
 {
-	if (start > fNumBits)
-		return B_ERROR;
+	ASSERT(start + length <= fNumBits);
 
 	// Update the allocation group info
 	// TODO: this info will be incorrect if something goes wrong later
@@ -377,16 +376,22 @@ AllocationGroup::Allocate(Transaction& transaction, uint16 start, int32 length)
 	fFreeBits -= length;
 
 	if (fLargestValid) {
+		bool cut = false;
 		if (fLargestStart == start) {
+			// cut from start
 			fLargestStart += length;
 			fLargestLength -= length;
+			cut = true;
 		} else if (start > fLargestStart
 			&& start < fLargestStart + fLargestLength) {
+			// cut from end
 			fLargestLength = start - fLargestStart;
+			cut = true;
 		}
-		if (fLargestLength < fLargestStart
-			|| fLargestLength
-					< (int32)fNumBits - (fLargestStart + fLargestLength)) {
+		if (cut && (fLargestLength < fLargestStart
+				|| fLargestLength
+						< (int32)fNumBits - (fLargestStart + fLargestLength))) {
+			// might not be the largest block anymore
 			fLargestValid = false;
 		}
 	}
@@ -430,8 +435,7 @@ AllocationGroup::Allocate(Transaction& transaction, uint16 start, int32 length)
 status_t
 AllocationGroup::Free(Transaction& transaction, uint16 start, int32 length)
 {
-	if (start > fNumBits)
-		return B_ERROR;
+	ASSERT(start + length <= fNumBits);
 
 	// Update the allocation group info
 	// TODO: this info will be incorrect if something goes wrong later
@@ -440,8 +444,8 @@ AllocationGroup::Free(Transaction& transaction, uint16 start, int32 length)
 	fFreeBits += length;
 
 	// The range to be freed cannot be part of the valid largest range
-	ASSERT(!fLargestValid || start < fLargestStart
-		|| start > fLargestStart + fLargestLength);
+	ASSERT(!fLargestValid || start + length <= fLargestStart
+		|| start > fLargestStart);
 
 	if (fLargestValid
 		&& (start + length == fLargestStart
