@@ -337,6 +337,8 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		
 		if (u.HasUser())
 			cmd << "-l " << u.user << " ";
+		if (u.HasPort())
+			cmd << "-oPort=" << u.port << " ";
 		cmd << u.host;
 		PRINT(("CMD='%s'\n", cmd.String()));
 		cmd << failc;
@@ -367,6 +369,8 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		BString cmd("sftp ");
 		
 		//cmd << url;
+		if (u.HasPort())
+			cmd << "-oPort=" << u.port << " ";
 		if (u.HasUser())
 			cmd << u.user << "@";
 		cmd << u.host;
