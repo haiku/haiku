@@ -14,6 +14,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	APR
 #	APR-util
 #	Beam
+#	BeHappy
 #	BePDF
 #	Bluetooth
 #	CVS
@@ -35,6 +36,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 
 # package dependencies
 OptionalPackageDependencies APR-util : APR ;
+OptionalPackageDependencies BeHappy : NetSurf ;
 OptionalPackageDependencies Development : Perl ;
 OptionalPackageDependencies NetSurf : OpenSSL ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
@@ -88,6 +90,23 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 		AddSymlinkToHaikuImage home config be Applications
 #			: /boot/apps/beam-1-1-2-bone-with-libs/Beam ;
 			: /boot/apps/beam-1-1-2-r5-with-libs/Beam ;
+	}
+}
+
+
+# BeHappy
+if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package BeHappy available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		Echo "No optional package BeHappy available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage BeHappy
+			: http://revolf.free.fr/beos/behappy-bone.zip
+			: 
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/BeHappy/BeHappy ;
 	}
 }
 
