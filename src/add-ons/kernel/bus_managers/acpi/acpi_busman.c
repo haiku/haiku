@@ -233,7 +233,7 @@ get_next_entry(uint32 objectType, const char *base, char *result,
 	if (base == NULL || !strcmp(base, "\\")) {
 		parent = ACPI_ROOT_OBJECT;
 	} else {
-		status = AcpiGetHandle(NULL, (char*)base, &parent);
+		status = AcpiGetHandle(NULL, (ACPI_STRING)base, &parent);
 		if (status != AE_OK)
 			return B_ENTRY_NOT_FOUND;
 	}
@@ -264,7 +264,7 @@ get_device(const char* hid, uint32 index, char* result, size_t resultLength)
 	char *buffer = NULL;
 
 	TRACE("get_device %s, index %ld\n", hid, index);
-	status = AcpiGetDevices((char*)hid, (void*)&get_device_by_hid_callback,
+	status = AcpiGetDevices((ACPI_STRING)hid, (void*)&get_device_by_hid_callback,
 		counter, (void**)&buffer);
 	if (status != AE_OK || buffer == NULL)
 		return B_ENTRY_NOT_FOUND;
@@ -283,7 +283,7 @@ get_device_hid(const char *path, char *hid)
 	ACPI_BUFFER infoBuffer;
 
 	TRACE("get_device_hid: path %s, hid %s\n", path, hid);
-	if (AcpiGetHandle(NULL, (char*)path, &handle) != AE_OK)
+	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 
 	infoBuffer.Pointer = &info;
@@ -319,7 +319,7 @@ get_object_type(const char* path)
 	ACPI_HANDLE handle;
 	ACPI_OBJECT_TYPE type;
 
-	if (AcpiGetHandle(NULL, (char*)path, &handle) != AE_OK)
+	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 
 	AcpiGetType(handle, &type);
@@ -334,7 +334,7 @@ get_object(const char* path, acpi_object_type** _returnValue)
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
 
-	status = AcpiGetHandle(NULL, (char*)path, &handle);
+	status = AcpiGetHandle(NULL, (ACPI_STRING)path, &handle);
 	if (status != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 
@@ -356,7 +356,7 @@ get_object_typed(const char* path, acpi_object_type** _returnValue,
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
 
-	status = AcpiGetHandle(NULL, path, &handle);
+	status = AcpiGetHandle(NULL, (ACPI_STRING)path, &handle);
 	if (status != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 
@@ -380,8 +380,8 @@ evaluate_object(const char* object, acpi_object_type* returnValue,
 	buffer.Pointer = returnValue;
 	buffer.Length = bufferLength;
 
-	status = AcpiEvaluateObject(NULL, object, NULL, returnValue != NULL
-			? &buffer : NULL);
+	status = AcpiEvaluateObject(NULL, (ACPI_STRING)object, NULL,
+		returnValue != NULL ? &buffer : NULL);
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -396,17 +396,17 @@ evaluate_method(const char* object, const char* method,
 	ACPI_OBJECT_LIST acpiArgs;
 	ACPI_HANDLE handle;
 
-	if (AcpiGetHandle(NULL, object, &handle) != AE_OK)
+	if (AcpiGetHandle(NULL, (ACPI_STRING)object, &handle) != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 
 	buffer.Pointer = returnValue;
 	buffer.Length = bufferLength;
 
 	acpiArgs.Count = numArgs;
-	acpiArgs.Pointer = args;
+	acpiArgs.Pointer = (ACPI_OBJECT *)args;
 
-	status = AcpiEvaluateObject(handle, method, args != NULL ? &acpiArgs : NULL,
-		returnValue != NULL ? &buffer : NULL);
+	status = AcpiEvaluateObject(handle, (ACPI_STRING)method,
+		args != NULL ? &acpiArgs : NULL, returnValue != NULL ? &buffer : NULL);
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -421,10 +421,15 @@ prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 	if (state != ACPI_POWER_STATE_OFF) {
 		physical_entry wakeVector;
 
-		lock_memory(&wakeFunc, size, 0);
-		get_memory_map(&wakeFunc, size, &wakeVector, 1);
+		status = lock_memory(&wakeFunc, size, 0);
+		if (status != B_OK)
+			return status;
 
-		status = AcpiSetFirmwareWakingVector(wakeVector.address);
+		status = get_memory_map(&wakeFunc, size, &wakeVector, 1);
+		if (status != B_OK)
+			return status;
+
+		status = AcpiSetFirmwareWakingVector((addr_t)wakeVector.address);
 		if (status != AE_OK)
 			return B_ERROR;
 	}
