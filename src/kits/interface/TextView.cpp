@@ -1969,7 +1969,21 @@ BTextView::LineWidth(int32 lineNum) const
 float
 BTextView::LineHeight(int32 lineNum) const
 {
-	return TextHeight(lineNum, lineNum);
+	float lineHeight = TextHeight(lineNum, lineNum);
+	if (lineHeight == 0.0) {
+		// We probably don't have text content yet. Take the initial
+		// style's font height or fall back to the plain font.
+		const BFont* font;
+		fStyles->GetNullStyle(&font, NULL);
+		if (font == NULL)
+			font = be_plain_font;
+
+		font_height fontHeight;
+		font->GetHeight(&fontHeight);
+		// This is how the height is calculated in _RecalculateLineBreaks().
+		lineHeight = ceilf(fontHeight.ascent + fontHeight.descent) + 1;
+	}
+	return lineHeight;
 }
 
 
@@ -2734,19 +2748,6 @@ BTextView::_ValidateLayoutData()
 	CALLED();
 
 	float lineHeight = ceilf(LineHeight(0));
-	if (lineHeight == 0.0) {
-		// We probably don't have text content yet. Take the initial
-		// style's font height or fall back to the plain font.
-		const BFont* font;
-		fStyles->GetNullStyle(&font, NULL);
-		if (font == NULL)
-			font = be_plain_font;
-
-		font_height fontHeight;
-		font->GetHeight(&fontHeight);
-		// This is how the height is calculated in _RecalculateLineBreaks().
-		lineHeight = ceilf(fontHeight.ascent + fontHeight.descent) + 1;
-	}
 	TRACE("line height: %.2f\n", lineHeight);
 
 	// compute our minimal size
