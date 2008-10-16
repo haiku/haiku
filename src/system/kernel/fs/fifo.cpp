@@ -76,23 +76,34 @@ class RingBuffer {
 class ReadRequest : public DoublyLinkedListLinkImpl<ReadRequest> {
 	public:
 		ReadRequest()
-			: fThread(find_thread(NULL))
+			:
+			fThread(thread_get_current_thread()),
+			fNotified(true)
 		{
+			B_INITIALIZE_SPINLOCK(&fLock);
 		}
 
-		void SetUnnotified()	{ fNotified = false; }
+		void SetNotified(bool notified)
+		{
+			InterruptsSpinLocker _(fLock);
+			fNotified = notified;
+		}
 
 		void Notify()
 		{
+			InterruptsSpinLocker _(fLock);
+
 			if (!fNotified) {
-				thread_unblock(fThread, B_OK);
+				SpinLocker threadLocker(gThreadSpinlock);
+				thread_unblock_locked(fThread, B_OK);
 				fNotified = true;
 			}
 		}
 
 	private:
-		thread_id			fThread;
-		bool				fNotified;
+		spinlock			fLock;
+		struct thread*		fThread;
+		volatile bool		fNotified;
 };
 
 
@@ -464,15 +475,20 @@ Inode::RemoveReadRequest(ReadRequest &request)
 status_t
 Inode::WaitForReadRequest(ReadRequest &request)
 {
-	request.SetUnnotified();
-
 	// add the entry to wait on
 	thread_prepare_to_block(thread_get_current_thread(), B_CAN_INTERRUPT,
 		THREAD_BLOCK_TYPE_OTHER, "fifo read request");
 
+	request.SetNotified(false);
+
 	// wait
 	mutex_unlock(&fRequestLock);
 	status_t status = thread_block();
+
+	// Before going to lock again, we need to make sure no one tries to
+	// unblock us. Otherwise that would screw with mutex_lock().
+	request.SetNotified(true);
+
 	mutex_lock(&fRequestLock);
 
 	return status;
