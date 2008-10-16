@@ -136,6 +136,9 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		elf_init(&sKernelArgs);
 		TRACE("init modules\n");
 		module_init(&sKernelArgs);
+		TRACE("init semaphores\n");
+		haiku_sem_init(&sKernelArgs);
+		TRACE("init interrupts post vm\n");
 		int_init_post_vm(&sKernelArgs);
 		cpu_init_post_vm(&sKernelArgs);
 		commpage_init();
@@ -149,8 +152,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init real time clock\n");
 		rtc_init(&sKernelArgs);
 
-		TRACE("init semaphores\n");
-		haiku_sem_init(&sKernelArgs);
+		TRACE("init condition variables\n");
 		condition_variable_init();
 
 		// now we can create and use semaphores
