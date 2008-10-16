@@ -91,7 +91,7 @@ acpi_std_ops(int32 op,...)
 			}
 
 			if (!acpiDisabled) {
-				// check if safemode settings disable DMA
+				// check if safemode settings disable ACPI
 				settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
 				if (settings != NULL) {
 					acpiDisabled = get_driver_boolean_parameter(settings,
