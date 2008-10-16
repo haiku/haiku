@@ -105,12 +105,6 @@ acpi_std_ops(int32 op,...)
 				return ENOSYS;
 			}
 
-
-			if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task", B_NORMAL_PRIORITY) != B_OK) {
-				ERROR("AcpiInitializeSubsystem failed (new_dpc_queue() failed!)\n");
-				goto err;
-			}
-
 #ifdef ACPI_DEBUG_OUTPUT
 			AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;
 			AcpiDbgLayer = ACPI_ALL_COMPONENTS;
@@ -158,9 +152,13 @@ acpi_std_ops(int32 op,...)
 				ERROR("Could not bring system out of ACPI mode. Oh well.\n");
 
 				/* This isn't so terrible. We'll just fail silently */
-			if (gDPCHandle != NULL) {
-				gDPC->delete_dpc_queue(gDPCHandle);
-				gDPCHandle = NULL;
+			if (gDPC != NULL) {
+				if (gDPCHandle != NULL) {
+					gDPC->delete_dpc_queue(gDPCHandle);
+					gDPCHandle = NULL;
+				}
+
+				put_module(B_DPC_MODULE_NAME);
 			}
 
 			break;

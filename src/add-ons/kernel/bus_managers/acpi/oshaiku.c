@@ -751,8 +751,14 @@ AcpiOsInstallInterruptHandler(UINT32 InterruptNumber,
 	DEBUG_FUNCTION_F("vector: %lu; handler: %p; data: %p",
 		(uint32)InterruptNumber, ServiceRoutine, Context);
 #ifdef _KERNEL_MODE
-		/*	It so happens that the Haiku and ACPI-CA interrupt handler routines
-			return the same values with the same meanings */
+	if (Context != NULL) {
+		// we don't get the context parameter when
+		panic("ACPI: cannot add interrupt handler with non-null context");
+		return AE_ERROR;
+	}
+
+	/*	It so happens that the Haiku and ACPI-CA interrupt handler routines
+		return the same values with the same meanings */
 	return install_io_interrupt_handler(InterruptNumber,
 		(interrupt_handler)ServiceRoutine, Context, 0) == B_OK ? AE_OK
 		: AE_ERROR;
@@ -781,11 +787,8 @@ AcpiOsRemoveInterruptHandler(UINT32 InterruptNumber,
 	DEBUG_FUNCTION_F("vector: %lu; handler: %p", (uint32)InterruptNumber,
 		ServiceRoutine);
 #ifdef _KERNEL_MODE
-	panic("AcpiOsRemoveInterruptHandler()\n");
-	/*remove_io_interrupt_handler(InterruptNumber,
-		(interrupt_handler)ServiceRoutine, NULL);*/
-		/* Crap. We don't get the Context argument back. */
-	#warning Sketchy code!
+	remove_io_interrupt_handler(InterruptNumber,
+		(interrupt_handler)ServiceRoutine, NULL);
 	return AE_OK;
 #else
 	return AE_ERROR;
@@ -820,6 +823,20 @@ AcpiOsExecute(ACPI_EXECUTE_TYPE Type, ACPI_OSD_EXEC_CALLBACK Function,
 		case OSL_EC_POLL_HANDLER:
 		case OSL_EC_BURST_HANDLER:
 			break;
+	}
+
+	if (gDPC == NULL && get_module(B_DPC_MODULE_NAME,
+			(module_info **)&gDPC) != B_OK) {
+		dprintf("failed to get dpc module for os execution\n");
+		return AE_ERROR;
+	}
+
+	if (gDPCHandle == NULL) {
+		if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
+				B_NORMAL_PRIORITY) != B_OK) {
+			dprintf("failed to create os execution queue\n");
+			return AE_ERROR;
+		}
 	}
 
 	if (gDPC->queue_dpc(gDPCHandle, Function, Context) != B_OK)
@@ -1199,7 +1216,10 @@ AcpiOsWriteMemory(ACPI_PHYSICAL_ADDRESS Address, UINT32 Value, UINT32 Width)
 UINT32
 AcpiOsGetThreadId(void)
 {
-	return find_thread(NULL);
+	// ACPI treats a 0 return as an error,
+	// but we are thread 0 in early boot
+	thread_id thread = find_thread(NULL);
+	return thread == 0 ? 1 : thread;
 }
 
 

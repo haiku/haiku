@@ -20,14 +20,13 @@
 #	define TRACE(x) ;
 #endif
 
-device_manager_info *gDeviceManager;
-pci_module_info *gPCIManager;
-dpc_module_info *gDPC;
+device_manager_info *gDeviceManager = NULL;
+pci_module_info *gPCIManager = NULL;
+dpc_module_info *gDPC = NULL;
 
 module_dependency module_dependencies[] = {
 	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager},
 	{B_PCI_MODULE_NAME, (module_info **)&gPCIManager},
-	{B_DPC_MODULE_NAME, (module_info **)&gDPC},
 	{}
 };
 
