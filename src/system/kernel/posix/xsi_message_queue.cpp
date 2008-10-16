@@ -127,6 +127,10 @@ public:
 		queueLocker->Unlock();
 
 		InterruptsSpinLocker _(gThreadSpinlock);
+// TODO: We've got a serious race condition: If BlockAndUnlock() returned due to
+// interruption, we will still be queued. A WakeUpThread() at this point will
+// call thread_unblock() and might thus screw with our trying to re-lock the
+// mutex.
 		return thread_block_locked(thread);
 	}
 
@@ -428,7 +432,7 @@ XsiMessageQueue::Insert(queued_message *message)
 		int32 oldCount = atomic_get(&sXsiMessageCount);
 		if (oldCount >= MAX_XSI_MESSAGE)
 			return true;
-		// If another thread updates the counter we keep 
+		// If another thread updates the counter we keep
 		// iterating
 		if (atomic_test_and_set(&sXsiMessageCount, oldCount + 1, oldCount)
 			== oldCount)

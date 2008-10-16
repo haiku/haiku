@@ -144,6 +144,10 @@ public:
 		setLocker->Unlock();
 
 		InterruptsSpinLocker _(gThreadSpinlock);
+// TODO: We've got a serious race condition: If BlockAndUnlock() returned due to
+// interruption, we will still be queued. A WakeUpThread() at this point will
+// call thread_unblock() and might thus screw with our trying to re-lock the
+// mutex.
 		return thread_block_locked(thread);
 	}
 
@@ -840,8 +844,8 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 	}
 
 	// Lock the semaphore set itself and release both the semaphore
-	// set hash table lock and the ipc hash table lock _only_ if 
-	// the command it's not IPC_RMID, this prevents undesidered 
+	// set hash table lock and the ipc hash table lock _only_ if
+	// the command it's not IPC_RMID, this prevents undesidered
 	// situation from happening while (hopefully) improving the
 	// concurrency.
 	MutexLocker setLocker;
