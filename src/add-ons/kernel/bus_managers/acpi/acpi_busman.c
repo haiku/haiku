@@ -86,7 +86,7 @@ acpi_std_ops(int32 op,...)
 			settings = load_driver_settings("kernel");
 			if (settings != NULL) {
 				acpiDisabled = !get_driver_boolean_parameter(settings, "acpi",
-					true, true);
+					false, false);
 				unload_driver_settings(settings);
 			}
 
@@ -101,7 +101,7 @@ acpi_std_ops(int32 op,...)
 			}
 
 			if (acpiDisabled) {
-				ERROR("ACPI disabled");
+				ERROR("ACPI disabled\n");
 				return ENOSYS;
 			}
 
