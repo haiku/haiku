@@ -12,7 +12,6 @@
 #include "StringView.h"
 #include "TypeListWindow.h"
 
-#include <AppFileInfo.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
@@ -38,12 +37,18 @@
 
 
 const uint32 kMsgSave = 'save';
-const uint32 kMsgFlagsChanged = 'flgc';
+const uint32 kMsgSignatureChanged = 'sgch';
+const uint32 kMsgToggleAppFlags = 'tglf';
+const uint32 kMsgAppFlagsChanged = 'afch';
+
+const uint32 kMsgIconChanged = 'icch';
+const uint32 kMsgTypeIconsChanged = 'tich';
 
 const uint32 kMsgTypeSelected = 'tpsl';
 const uint32 kMsgAddType = 'adtp';
 const uint32 kMsgTypeAdded = 'tpad';
 const uint32 kMsgRemoveType = 'rmtp';
+const uint32 kMsgTypeRemoved = 'tprm';
 
 
 class SupportedTypeItem : public BStringItem {
@@ -193,7 +198,8 @@ SupportedTypeListView::AcceptsDrag(const BMessage* message)
 ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entry)
 	: BWindow(BRect(0.0f, 0.0f, 250.0f, 340.0f).OffsetBySelf(position),
 		"Application Type", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
+	fChangedProperties(0)
 {
 	// add the menu
 
@@ -201,7 +207,9 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	AddChild(menuBar);
 
 	BMenu* menu = new BMenu("File");
-	menu->AddItem(new BMenuItem("Save", new BMessage(kMsgSave), 'S', B_COMMAND_KEY));
+	fSaveMenuItem = new BMenuItem("Save", new BMessage(kMsgSave), 'S');
+	fSaveMenuItem->SetEnabled(false);
+	menu->AddItem(fSaveMenuItem);
 	BMenuItem* item;
 	menu->AddItem(item = new BMenuItem("Save Into Resource File" B_UTF8_ELLIPSIS,
 		NULL));
@@ -222,7 +230,9 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 
 	rect = topView->Bounds().InsetByCopy(8.0f, 8.0f);
 	fSignatureControl = new BTextControl(rect, "signature", "Signature:", NULL,
-		NULL, B_FOLLOW_LEFT_RIGHT);
+		new BMessage(kMsgSignatureChanged), B_FOLLOW_LEFT_RIGHT);
+	fSignatureControl->SetModificationMessage(
+		new BMessage(kMsgSignatureChanged));
 	fSignatureControl->SetDivider(fSignatureControl->StringWidth(
 		fSignatureControl->Label()) + 4.0f);
 	float width, height;
@@ -255,38 +265,44 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	topView->AddChild(box);
 
 	fFlagsCheckBox = new BCheckBox(rect, "flags", "Application Flags",
-		new BMessage(kMsgFlagsChanged));
+		new BMessage(kMsgToggleAppFlags));
 	fFlagsCheckBox->SetValue(B_CONTROL_ON);
 	fFlagsCheckBox->ResizeToPreferred();
 	box->SetLabel(fFlagsCheckBox);
 
 	rect.top = fFlagsCheckBox->Bounds().Height() + 4.0f;
-	fSingleLaunchButton = new BRadioButton(rect, "single", "Single Launch", NULL);
+	fSingleLaunchButton = new BRadioButton(rect, "single", "Single Launch",
+		new BMessage(kMsgAppFlagsChanged));
 	fSingleLaunchButton->ResizeToPreferred();
 	box->AddChild(fSingleLaunchButton);
 
 	rect.OffsetBy(0.0f, fSingleLaunchButton->Bounds().Height() + 0.0f);
-	fMultipleLaunchButton = new BRadioButton(rect, "multiple", "Multiple Launch", NULL);
+	fMultipleLaunchButton = new BRadioButton(rect, "multiple",
+		"Multiple Launch", new BMessage(kMsgAppFlagsChanged));
 	fMultipleLaunchButton->ResizeToPreferred();
 	box->AddChild(fMultipleLaunchButton);
 
 	rect.OffsetBy(0.0f, fSingleLaunchButton->Bounds().Height() + 0.0f);
-	fExclusiveLaunchButton = new BRadioButton(rect, "exclusive", "Exclusive Launch", NULL);
+	fExclusiveLaunchButton = new BRadioButton(rect, "exclusive",
+		"Exclusive Launch", new BMessage(kMsgAppFlagsChanged));
 	fExclusiveLaunchButton->ResizeToPreferred();
 	box->AddChild(fExclusiveLaunchButton);
 
 	rect.top = fSingleLaunchButton->Frame().top;
 	rect.left = fExclusiveLaunchButton->Frame().right + 4.0f;
-	fArgsOnlyCheckBox = new BCheckBox(rect, "args only", "Args Only", NULL);
+	fArgsOnlyCheckBox = new BCheckBox(rect, "args only", "Args Only",
+		new BMessage(kMsgAppFlagsChanged));
 	fArgsOnlyCheckBox->ResizeToPreferred();
 	box->AddChild(fArgsOnlyCheckBox);
 
 	rect.top += fArgsOnlyCheckBox->Bounds().Height();
-	fBackgroundAppCheckBox = new BCheckBox(rect, "background", "Background App", NULL);
+	fBackgroundAppCheckBox = new BCheckBox(rect, "background",
+		"Background App", new BMessage(kMsgAppFlagsChanged));
 	fBackgroundAppCheckBox->ResizeToPreferred();
 	box->AddChild(fBackgroundAppCheckBox);
 
-	box->ResizeTo(box->Bounds().Width(), fExclusiveLaunchButton->Frame().bottom + 8.0f);
+	box->ResizeTo(box->Bounds().Width(),
+		fExclusiveLaunchButton->Frame().bottom + 8.0f);
 
 	// "Icon" group
 
@@ -315,6 +331,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	if (rect.top < fontHeight.ascent + fontHeight.descent + 4.0f)
 		rect.top = fontHeight.ascent + fontHeight.descent + 4.0f;
 	fIconView = new IconView(rect, "icon");
+	fIconView->SetModificationMessage(new BMessage(kMsgIconChanged));
 	box->AddChild(fIconView);
 
 	// "Supported Types" group
@@ -366,6 +383,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.right = rect.left + B_LARGE_ICON - 1.0f;
 	rect.bottom = rect.top + B_LARGE_ICON - 1.0f;
 	fTypeIconView = new IconView(rect, "type icon", B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	fTypeIconView->SetModificationMessage(new BMessage(kMsgTypeIconsChanged));
 	typeBox->AddChild(fTypeIconView);
 
 	// "Version Info" group
@@ -560,7 +578,10 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 
 	// Set Controls
 
+	fSignatureControl->SetModificationMessage(NULL);
 	fSignatureControl->SetText(signature);
+	fSignatureControl->SetModificationMessage(
+		new BMessage(kMsgSignatureChanged));
 
 	// flags
 
@@ -593,7 +614,9 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 	else
 		fIcon.Unset();
 
+	fIconView->SetModificationMessage(NULL);
 	fIconView->SetTo(&fIcon);
+	fIconView->SetModificationMessage(new BMessage(kMsgIconChanged));
 
 	// supported types
 
@@ -613,7 +636,9 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 		fTypeListView->AddItem(item);
 	}
 	fTypeListView->SortItems(&SupportedTypeItem::Compare);
+	fTypeIconView->SetModificationMessage(NULL);
 	fTypeIconView->SetTo(NULL);
+	fTypeIconView->SetModificationMessage(new BMessage(kMsgTypeIconsChanged));
 	fTypeIconView->SetEnabled(false);
 	fRemoveTypeButton->SetEnabled(false);
 
@@ -638,6 +663,18 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 
 	fShortDescriptionControl->SetText(versionInfo.short_info);
 	fLongDescriptionView->SetText(versionInfo.long_info);
+
+	// store original data
+
+	fOriginalInfo.signature = signature;
+	fOriginalInfo.flags = flags;
+	fOriginalInfo.versionInfo = versionInfo;
+	fOriginalInfo.supportedTypes = supportedTypes;
+	fOriginalInfo.iconChanged = false;
+	fOriginalInfo.typeIconsChanged = false;
+
+	fChangedProperties = 0;
+	_CheckSaveMenuItem(0);
 }
 
 
@@ -683,40 +720,9 @@ ApplicationTypeWindow::_Save()
 
 	// Retrieve Info
 
-	uint32 flags = 0;
-	if (fFlagsCheckBox->Value() != B_CONTROL_OFF) {
-		if (fSingleLaunchButton->Value() != B_CONTROL_OFF)
-			flags |= B_SINGLE_LAUNCH;
-		else if (fMultipleLaunchButton->Value() != B_CONTROL_OFF)
-			flags |= B_MULTIPLE_LAUNCH;
-		else if (fExclusiveLaunchButton->Value() != B_CONTROL_OFF)
-			flags |= B_EXCLUSIVE_LAUNCH;
-
-		if (fArgsOnlyCheckBox->Value() != B_CONTROL_OFF)
-			flags |= B_ARGV_ONLY;
-		if (fBackgroundAppCheckBox->Value() != B_CONTROL_OFF)
-			flags |= B_BACKGROUND_APP;
-	}
-
-	BMessage supportedTypes;
-	for (int32 i = 0; i < fTypeListView->CountItems(); i++) {
-		SupportedTypeItem* item = dynamic_cast<SupportedTypeItem*>(
-			fTypeListView->ItemAt(i));
-
-		if (item != NULL)
-			supportedTypes.AddString("types", item->Type());
-	}
-
-	version_info versionInfo;
-	versionInfo.major = atol(fMajorVersionControl->Text());
-	versionInfo.middle = atol(fMiddleVersionControl->Text());
-	versionInfo.minor = atol(fMinorVersionControl->Text());
-	versionInfo.variety = fVarietyMenu->IndexOf(fVarietyMenu->FindMarked());
-	versionInfo.internal = atol(fInternalVersionControl->Text());
-	strlcpy(versionInfo.short_info, fShortDescriptionControl->Text(),
-		sizeof(versionInfo.short_info));
-	strlcpy(versionInfo.long_info, fLongDescriptionView->Text(),
-		sizeof(versionInfo.long_info));
+	uint32 flags = _Flags();
+	BMessage supportedTypes = _SupportedTypes();
+	version_info versionInfo = _VersionInfo();
 
 	// Save
 
@@ -739,7 +745,145 @@ ApplicationTypeWindow::_Save()
 		if (item != NULL)
 			item->Icon().CopyTo(info, item->Type(), true);
 	}
+
+	// reset the saved info
+	fOriginalInfo.signature = fSignatureControl->Text();
+	fOriginalInfo.flags = flags;
+	fOriginalInfo.versionInfo = versionInfo;
+	fOriginalInfo.supportedTypes = supportedTypes;
+	fOriginalInfo.iconChanged = false;
+	fOriginalInfo.typeIconsChanged = false;
+
+	fChangedProperties = 0;
+	_CheckSaveMenuItem(0);
 }
+
+
+void
+ApplicationTypeWindow::_CheckSaveMenuItem(uint32 flags)
+{
+	fChangedProperties = _NeedsSaving(flags);
+	fSaveMenuItem->SetEnabled(fChangedProperties != 0);
+}
+
+
+bool
+operator!=(const version_info& a, const version_info& b)
+{
+	return a.major != b.major || a.middle != b.middle || a.minor != b.minor
+		|| a.variety != b.variety || a.internal != b.internal
+		|| strcmp(a.short_info, b.short_info) != 0
+		|| strcmp(a.long_info, b.long_info) != 0;
+}
+
+
+uint32
+ApplicationTypeWindow::_NeedsSaving(uint32 _flags) const
+{
+	uint32 flags = fChangedProperties;
+	if (_flags & CHECK_SIGNATUR) {
+		if (fOriginalInfo.signature != fSignatureControl->Text())
+			flags |= CHECK_SIGNATUR;
+		else
+			flags &= ~CHECK_SIGNATUR;
+	}
+
+	if (_flags & CHECK_FLAGS) {
+		if (fOriginalInfo.flags != _Flags())
+			flags |= CHECK_FLAGS;
+		else
+			flags &= ~CHECK_FLAGS;
+	}
+
+	if (_flags & CHECK_VERSION) {
+		if (fOriginalInfo.versionInfo != _VersionInfo())
+			flags |= CHECK_VERSION;
+		else
+			flags &= ~CHECK_VERSION;
+	}
+
+	if (_flags & CHECK_ICON) {
+		if (fOriginalInfo.iconChanged)
+			flags |= CHECK_ICON;
+		else
+			flags &= ~CHECK_ICON;
+	}
+
+	if (_flags & CHECK_TYPES) {
+		if (!fOriginalInfo.supportedTypes.CompareData(_SupportedTypes()))
+			flags |= CHECK_TYPES;
+		else
+			flags &= ~CHECK_TYPES;
+	}
+
+	if (_flags & CHECK_TYPE_ICONS) {
+		if (fOriginalInfo.typeIconsChanged)
+			flags |= CHECK_TYPE_ICONS;
+		else
+			flags &= ~CHECK_TYPE_ICONS;
+	}
+
+	return flags;
+}
+
+
+// #pragma mark -
+
+
+uint32
+ApplicationTypeWindow::_Flags() const
+{
+	uint32 flags = 0;
+	if (fFlagsCheckBox->Value() != B_CONTROL_OFF) {
+		if (fSingleLaunchButton->Value() != B_CONTROL_OFF)
+			flags |= B_SINGLE_LAUNCH;
+		else if (fMultipleLaunchButton->Value() != B_CONTROL_OFF)
+			flags |= B_MULTIPLE_LAUNCH;
+		else if (fExclusiveLaunchButton->Value() != B_CONTROL_OFF)
+			flags |= B_EXCLUSIVE_LAUNCH;
+
+		if (fArgsOnlyCheckBox->Value() != B_CONTROL_OFF)
+			flags |= B_ARGV_ONLY;
+		if (fBackgroundAppCheckBox->Value() != B_CONTROL_OFF)
+			flags |= B_BACKGROUND_APP;
+	}
+	return flags;
+}
+
+
+BMessage
+ApplicationTypeWindow::_SupportedTypes() const
+{
+	BMessage supportedTypes;
+	for (int32 i = 0; i < fTypeListView->CountItems(); i++) {
+		SupportedTypeItem* item = dynamic_cast<SupportedTypeItem*>(
+			fTypeListView->ItemAt(i));
+
+		if (item != NULL)
+			supportedTypes.AddString("types", item->Type());
+	}
+	return supportedTypes;
+}
+
+
+version_info
+ApplicationTypeWindow::_VersionInfo() const
+{
+	version_info versionInfo;
+	versionInfo.major = atol(fMajorVersionControl->Text());
+	versionInfo.middle = atol(fMiddleVersionControl->Text());
+	versionInfo.minor = atol(fMinorVersionControl->Text());
+	versionInfo.variety = fVarietyMenu->IndexOf(fVarietyMenu->FindMarked());
+	versionInfo.internal = atol(fInternalVersionControl->Text());
+	strlcpy(versionInfo.short_info, fShortDescriptionControl->Text(),
+		sizeof(versionInfo.short_info));
+	strlcpy(versionInfo.long_info, fLongDescriptionView->Text(),
+		sizeof(versionInfo.long_info));
+	return versionInfo;
+}
+
+
+// #pragma mark -
 
 
 void
@@ -754,8 +898,27 @@ void
 ApplicationTypeWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgFlagsChanged:
+		case kMsgToggleAppFlags:
 			_UpdateAppFlagsEnabled();
+			_CheckSaveMenuItem(CHECK_FLAGS);
+			break;
+
+		case kMsgSignatureChanged:
+			_CheckSaveMenuItem(CHECK_SIGNATUR);
+			break;
+
+		case kMsgAppFlagsChanged:
+			_CheckSaveMenuItem(CHECK_FLAGS);
+			break;
+
+		case kMsgIconChanged:
+			fOriginalInfo.iconChanged = true;
+			_CheckSaveMenuItem(CHECK_ICON);
+			break;
+
+		case kMsgTypeIconsChanged:
+			fOriginalInfo.typeIconsChanged = true;
+			_CheckSaveMenuItem(CHECK_TYPE_ICONS);
 			break;
 
 		case kMsgSave:
@@ -768,9 +931,14 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 			if (message->FindInt32("index", &index) == B_OK) {
 				SupportedTypeItem* item = (SupportedTypeItem*)fTypeListView->ItemAt(index);
 
+				fTypeIconView->SetModificationMessage(NULL);
 				fTypeIconView->SetTo(item != NULL ? &item->Icon() : NULL);
+				fTypeIconView->SetModificationMessage(
+					new BMessage(kMsgTypeIconsChanged));
 				fTypeIconView->SetEnabled(item != NULL);
 				fRemoveTypeButton->SetEnabled(item != NULL);
+
+				_CheckSaveMenuItem(CHECK_TYPES);
 			}
 			break;
 		}
@@ -817,6 +985,8 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 
 			fTypeListView->AddItem(newItem, insertAt);
 			fTypeListView->Select(insertAt);
+
+			_CheckSaveMenuItem(CHECK_TYPES);
 			break;
 		}
 
@@ -827,9 +997,14 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 				break;
 
 			delete fTypeListView->RemoveItem(index);
+			fTypeIconView->SetModificationMessage(NULL);
 			fTypeIconView->SetTo(NULL);
+			fTypeIconView->SetModificationMessage(
+				new BMessage(kMsgTypeIconsChanged));
 			fTypeIconView->SetEnabled(false);
 			fRemoveTypeButton->SetEnabled(false);
+
+			_CheckSaveMenuItem(CHECK_TYPES);
 			break;
 		}
 
@@ -852,6 +1027,8 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 
 			// TODO: update supported types names
 //			if (which == B_MIME_TYPE_DELETED)
+
+//			_CheckSaveMenuItem(...);
 			break;
 
 		default:
@@ -863,6 +1040,22 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 bool
 ApplicationTypeWindow::QuitRequested()
 {
+	if (_NeedsSaving(CHECK_ALL) != 0) {
+		BAlert* alert = new BAlert("Save Request", "Do you want to save "
+			"the changes?", "Quit, Don't save", "Cancel", "Save",
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		int32 choice = alert->Go();
+		switch (choice) {
+			case 0:
+				break;
+			case 1:
+				return false;
+			case 2:
+				_Save();
+				break;
+		}
+	}
+
 	be_app->PostMessage(kMsgTypeWindowClosed);
 	return true;
 }
