@@ -176,6 +176,9 @@ label:
 			case '\0':
 				--format;
 				break;
+			case '0':
+				// ignore '0'-modifier supported by glibc for compatibility
+				goto label;
 			case 'A':
 				pt = _add((t->tm_wday < 0 ||
 					t->tm_wday >= DAYSPERWEEK) ?
