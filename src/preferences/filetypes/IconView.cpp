@@ -80,7 +80,7 @@ icon_for_type(const BMimeType& type, uint8** _data, size_t* _size,
 	if (source != kNoIcon) {
 		*_data = data;
 		*_size = size;
-	}
+	} // NOTE: else there is no data, so nothing is leaked.
 	if (_source)
 		*_source = source;
 
@@ -599,7 +599,6 @@ IconView::MessageReceived(BMessage* message)
 			
 		delete large;
 		delete mini;
-		delete data;
 
 		return;
 	}
