@@ -5,8 +5,7 @@
 #ifndef KERNEL_ARCH_USER_DEBUGGER_H
 #define KERNEL_ARCH_USER_DEBUGGER_H
 
-// Enable this to get support for kernel breakpoints.
-//#define KERNEL_BREAKPOINTS 1
+#include "kernel_debug_config.h"
 
 #ifndef _ASSEMBLER
 

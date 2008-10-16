@@ -8,6 +8,9 @@
 // benaphore-style.
 #define KDEBUG 1
 
+// Enable this to get support for kernel breakpoints.
+//#define KERNEL_BREAKPOINTS 1
+
 
 // block cache
 
