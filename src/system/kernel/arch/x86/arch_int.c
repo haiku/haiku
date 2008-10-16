@@ -28,6 +28,7 @@
 
 #include "interrupts.h"
 
+#include <ACPI.h>
 #include <safemode.h>
 #include <string.h>
 #include <stdio.h>
@@ -515,6 +516,7 @@ ioapic_init(kernel_args *args)
 	uint32 version;
 	uint64 targetAPIC;
 	void *settings;
+	acpi_module_info *acpi;
 
 	static interrupt_controller ioapicController = {
 		"82093AA IOAPIC",
@@ -556,6 +558,10 @@ ioapic_init(kernel_args *args)
 
 	// TODO: remove when the PCI IRQ routing through ACPI is available below
 	return;
+	if (get_module(B_ACPI_MODULE_NAME, (module_info **)&acpi) != B_OK) {
+		dprintf("acpi module not available, not configuring ioapic\n");
+		return;
+	}
 
 	// map in the ioapic
 	sIOAPIC = (ioapic *)args->arch_args.ioapic;
@@ -618,6 +624,7 @@ ioapic_init(kernel_args *args)
 	// routing.
 
 	// prefer the ioapic over the normal pic
+	put_module(B_ACPI_MODULE_NAME);
 	dprintf("using ioapic for interrupt routing\n");
 	sCurrentPIC = &ioapicController;
 	gUsingIOAPIC = true;
