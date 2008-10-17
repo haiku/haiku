@@ -23,6 +23,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Links
 #	NetSurf
 #	OpenSound
+#	OpenSSH
 #	OpenSSL
 #	Pe
 #	Perl
