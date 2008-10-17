@@ -589,6 +589,7 @@ undertaker(void* /*args*/)
 			release_sem_etc(entry.deathSem, 1, B_DO_NOT_RESCHEDULE);
 
 		// free the thread structure
+		locker.Lock();
 		thread_enqueue(thread, &dead_q);
 			// TODO: Use the slab allocator!
 	}
@@ -1119,7 +1120,8 @@ _dump_thread_info(struct thread *thread, bool shortInfo)
 	kprintf("name:               \"%s\"\n", thread->name);
 	kprintf("all_next:           %p\nteam_next:          %p\nq_next:             %p\n",
 		thread->all_next, thread->team_next, thread->queue_next);
-	kprintf("priority:           %ld (next %ld)\n", thread->priority, thread->next_priority);
+	kprintf("priority:           %ld (next %ld, I/O: %ld)\n", thread->priority,
+		thread->next_priority, thread->io_priority);
 	kprintf("state:              %s\n", state_to_text(thread, thread->state));
 	kprintf("next_state:         %s\n", state_to_text(thread, thread->next_state));
 	kprintf("cpu:                %p ", thread->cpu);
