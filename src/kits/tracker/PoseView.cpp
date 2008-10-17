@@ -98,6 +98,7 @@ const float kDoubleClickTresh = 6;
 const float kCountViewWidth = 62;
 
 const uint32 kAddNewPoses = 'Tanp';
+const uint32 kAddPosesCompleted = 'Tapc';
 const int32 kMaxAddPosesChunk = 10;
 
 namespace BPrivate {
@@ -1361,6 +1362,10 @@ BPoseView::AddPosesTask(void *castToParams)
 			if (!count)
 				break;
 		}
+
+		BMessage finishedSending(kAddPosesCompleted);
+		lock.Target().SendMessage(&finishedSending);
+				
 	} catch (failToLock) {
 		// we are here because the window got closed or otherwise failed to
 		// lock
@@ -1380,7 +1385,6 @@ BPoseView::AddPosesTask(void *castToParams)
 	// build attributes menu based on mime types we've added
 
  	if (lock.Lock()) {
-  		view->AddPosesCompleted();
 #ifdef MSIPL_COMPILE_H
 	// workaround for broken PPC STL, not needed with the SGI headers for x86
  		set<thread_id>::iterator i = view->fAddPosesThreads.find(threadID);
@@ -1975,6 +1979,10 @@ BPoseView::MessageReceived(BMessage *message)
 			delete currentPoses;
 			break;
 		}
+
+		case kAddPosesCompleted:
+			AddPosesCompleted();
+			break;
 
 		case kRestoreBackgroundImage:
 			ContainerWindow()->UpdateBackgroundImage();
