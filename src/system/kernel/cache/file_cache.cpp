@@ -17,6 +17,7 @@
 #include <file_cache.h>
 #include <generic_syscall.h>
 #include <low_resource_manager.h>
+#include <thread.h>
 #include <util/AutoLock.h>
 #include <util/kernel_cpp.h>
 #include <vfs.h>
@@ -332,12 +333,8 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 		ref->cache->InsertPage(page, offset + pos);
 
-		addr_t virtualAddress;
-		vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
-			&virtualAddress, 0);
-
-		add_to_iovec(vecs, vecCount, MAX_IO_VECS, virtualAddress, B_PAGE_SIZE);
-		// ToDo: check if the array is large enough!
+		add_to_iovec(vecs, vecCount, MAX_IO_VECS,
+		page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE);
 	}
 
 	push_access(ref, offset, bufferSize, true);
@@ -352,8 +349,8 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		iovec readVec = { vecs[0].iov_base, B_PAGE_SIZE };
 		size_t bytesRead = B_PAGE_SIZE;
 
-		status = vfs_read_pages(ref->vnode, cookie, offset, &readVec, 1, 0,
-			&bytesRead);
+		status = vfs_read_pages(ref->vnode, cookie, offset, &readVec, 1,
+			B_PHYSICAL_IO_REQUEST, &bytesRead);
 		// ToDo: handle errors for real!
 		if (status < B_OK)
 			panic("1. vfs_read_pages() failed: %s!\n", strerror(status));
@@ -367,7 +364,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 		if (offset + pageOffset + bufferSize == ref->cache->virtual_end) {
 			// the space in the page after this write action needs to be cleaned
-			memset((void *)(last + lastPageOffset), 0,
+			memset_physical(last + lastPageOffset, 0,
 				B_PAGE_SIZE - lastPageOffset);
 		} else {
 			// the end of this write does not happen on a page boundary, so we
@@ -377,28 +374,29 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 			status = vfs_read_pages(ref->vnode, cookie,
 				PAGE_ALIGN(offset + pageOffset + bufferSize) - B_PAGE_SIZE,
-				&readVec, 1, 0, &bytesRead);
+				&readVec, 1, B_PHYSICAL_IO_REQUEST, &bytesRead);
 			// ToDo: handle errors for real!
 			if (status < B_OK)
 				panic("vfs_read_pages() failed: %s!\n", strerror(status));
 
 			if (bytesRead < B_PAGE_SIZE) {
 				// the space beyond the file size needs to be cleaned
-				memset((void *)(last + bytesRead), 0, B_PAGE_SIZE - bytesRead);
+				memset_physical(last + bytesRead, 0, B_PAGE_SIZE - bytesRead);
 			}
 		}
 	}
 
 	for (int32 i = 0; i < vecCount; i++) {
 		addr_t base = (addr_t)vecs[i].iov_base;
-		size_t bytes = min_c(bufferSize, size_t(vecs[i].iov_len - pageOffset));
+		size_t bytes = min_c(bufferSize,
+			size_t(vecs[i].iov_len - pageOffset));
 
 		if (useBuffer) {
 			// copy data from user buffer
-			user_memcpy((void *)(base + pageOffset), (void *)buffer, bytes);
+			memcpy_to_physical(base + pageOffset, (void *)buffer, bytes, true);
 		} else {
 			// clear buffer instead
-			memset((void *)(base + pageOffset), 0, bytes);
+			memset_physical(base + pageOffset, 0, bytes);
 		}
 
 		bufferSize -= bytes;
@@ -412,7 +410,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	if (writeThrough) {
 		// write cached pages back to the file if we were asked to do that
 		status_t status = vfs_write_pages(ref->vnode, cookie, offset, vecs,
-			vecCount, 0, &numBytes);
+			vecCount, B_PHYSICAL_IO_REQUEST, &numBytes);
 		if (status < B_OK) {
 			// ToDo: remove allocated pages, ...?
 			panic("file_cache: remove allocated pages! write pages failed: %s\n",
@@ -424,17 +422,6 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		reserve_pages(ref, reservePages, true);
 
 	ref->cache->Lock();
-
-	// unmap the pages again
-
-	for (int32 i = 0; i < vecCount; i++) {
-		addr_t base = (addr_t)vecs[i].iov_base;
-		size_t size = vecs[i].iov_len;
-		for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE,
-				base += B_PAGE_SIZE) {
-			vm_put_physical_page(base);
-		}
-	}
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
