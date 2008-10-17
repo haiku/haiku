@@ -158,8 +158,6 @@ generic_put_physical_page(addr_t va)
 			release_sem_etc(sChunkAvailableSem, 1, B_DO_NOT_RESCHEDULE);
 		}
 	}
-if (desc->ref_count < 0)
-panic("generic_put_physical_page(): ref count < 0: %ld\n", desc->ref_count);
 
 	mutex_unlock(&sMutex);
 
@@ -182,7 +180,7 @@ dump_iospace(int argc, char** argv)
 		// physical address descriptors
 		kprintf("I/O space physical descriptors (%p)\n", paddr_desc);
 
-		int32 max = 1024;
+		int32 max = vm_page_num_pages() / (sIOSpaceChunkSize / B_PAGE_SIZE);
 		if (argc == 3)
 			max = strtol(argv[2], NULL, 0);
 
@@ -202,8 +200,7 @@ dump_iospace(int argc, char** argv)
 			virtual_pmappings, first_free_vmapping);
 
 		for (i = 0; i < num_virtual_chunks; i++) {
-			kprintf("[%2ld. %03lx] ", i,
-				(virtual_pmappings[i] - paddr_desc) / sizeof(paddr_desc[0]));
+			kprintf("[%2ld. %03lx] ", i, virtual_pmappings[i] - paddr_desc);
 			if (i % 8 == 7)
 				kprintf("\n");
 		}
