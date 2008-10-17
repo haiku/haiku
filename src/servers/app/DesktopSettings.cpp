@@ -508,6 +508,7 @@ DesktopSettingsPrivate::SetWorkspacesCount(int32 number)
 		number = kMaxWorkspaces;
 
 	fWorkspacesCount = number;
+	Save(kWorkspacesSettings);
 }
 
 
