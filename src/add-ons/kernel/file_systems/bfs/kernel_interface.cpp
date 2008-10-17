@@ -1110,6 +1110,11 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 				&& (status = inode->GetTree(&movedTree)) == B_OK) {
 				status = movedTree->Replace(transaction, (const uint8*)"..",
 					2, newDirectory->ID());
+
+				if (status == B_OK) {
+					// update/add the cache entry for the parent
+					entry_cache_add(volume->ID(), id, "..", newDirectory->ID());
+				}
 			}
 
 			if (status == B_OK)
@@ -1477,7 +1482,10 @@ bfs_remove_dir(fs_volume* _volume, fs_vnode* _directory, const char* name)
 	off_t id;
 	status_t status = directory->Remove(transaction, name, &id, true);
 	if (status == B_OK) {
+		// Remove the cache entry for the directory and potentially also
+		// the parent entry still belonging to the directory
 		entry_cache_remove(volume->ID(), directory->ID(), name);
+		entry_cache_remove(volume->ID(), id, "..");
 
 		transaction.Done();
 
