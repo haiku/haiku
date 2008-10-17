@@ -7142,50 +7142,62 @@ fs_sync(dev_t device)
 	if (status < B_OK)
 		return status;
 
+	struct vnode marker;
+	marker.remove = true;
+
 	// First, synchronize all file caches
 
-	struct vnode *previousVnode = NULL;
 	while (true) {
+		MutexLocker locker(sVnodeMutex);
+
 		// synchronize access to vnode list
 		recursive_lock_lock(&mount->rlock);
 
-		struct vnode *vnode = previousVnode;
-		do {
+		struct vnode *vnode;
+		if (!marker.remove) {
+			vnode = (struct vnode *)list_get_next_item(&mount->vnodes, &marker);
+			list_remove_item(&mount->vnodes, &marker);
+			marker.remove =	true;
+		} else
+			vnode = (struct vnode *)list_get_first_item(&mount->vnodes);
+
+		while (vnode != NULL && (vnode->cache == NULL
+			|| vnode->remove || vnode->busy)) {
 			// TODO: we could track writes (and writable mapped vnodes)
 			//	and have a simple flag that we could test for here
 			vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode);
-		} while (vnode != NULL && vnode->cache == NULL);
+		}
 
-		ino_t id = -1;
-		if (vnode != NULL)
-			id = vnode->id;
+		if (vnode != NULL) {
+			// insert marker vnode again
+			list_insert_item_before(&mount->vnodes,
+				list_get_next_item(&mount->vnodes, vnode), &marker);
+			marker.remove = false;
+		}
 
 		recursive_lock_unlock(&mount->rlock);
 
 		if (vnode == NULL)
 			break;
 
-		// acquire a reference to the vnode
+		vnode = lookup_vnode(mount->id, vnode->id);
+		if (vnode == NULL || vnode->busy)
+			continue;
 
-		if (get_vnode(mount->id, id, &vnode, true, false) == B_OK) {
-			if (previousVnode != NULL)
-				put_vnode(previousVnode);
-
-			if (vnode->cache != NULL)
-				vnode->cache->WriteModified();
-
-			// the next vnode might change until we lock the vnode list again,
-			// but this vnode won't go away since we keep a reference to it.
-			previousVnode = vnode;
-		} else {
-			dprintf("syncing of mount %ld stopped due to vnode %Ld.\n",
-				mount->id, id);
-			break;
+		if (vnode->ref_count == 0) {
+			// this vnode has been unused before
+			list_remove_item(&sUnusedVnodeList, vnode);
+			sUnusedVnodes--;
 		}
-	}
+		inc_vnode_ref_count(vnode);
 
-	if (previousVnode != NULL)
-		put_vnode(previousVnode);
+		locker.Unlock();
+
+		if (vnode->cache != NULL && !vnode->remove)
+			vnode->cache->WriteModified();
+
+		put_vnode(vnode);
+	}
 
 	// And then, let the file systems do their synchronizing work
 
