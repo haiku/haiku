@@ -672,10 +672,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<bool>(&activate);
 
+			fDesktop->UnlockSingleWindow();
+
 			if (activate)
 				fDesktop->ActivateWindow(fWindow);
 			else
 				fDesktop->SendWindowBehind(fWindow, NULL);
+
+			fDesktop->LockSingleWindow();
 			break;
 		}
 		case AS_SEND_BEHIND:
@@ -3437,7 +3441,6 @@ bool
 ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 {
 	switch (code) {
-		case AS_ACTIVATE_WINDOW:
 		case AS_SET_WINDOW_TITLE:
 		case AS_ADD_TO_SUBSET:
 		case AS_REMOVE_FROM_SUBSET:
