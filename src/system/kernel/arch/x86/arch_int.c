@@ -914,7 +914,7 @@ hardware_interrupt(struct iframe* frame)
 	if (levelTriggered)
 		sCurrentPIC->end_of_interrupt(vector);
 
-	if (ret == B_INVOKE_SCHEDULER) {
+	if (ret == B_INVOKE_SCHEDULER || thread->cpu->invoke_scheduler) {
 		cpu_status state = disable_interrupts();
 		GRAB_THREAD_LOCK();
 

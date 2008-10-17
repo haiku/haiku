@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -10,6 +11,7 @@
 
 #include "blue_screen.h"
 
+#include <cpu.h>
 #include <debug.h>
 #include <debug_paranoia.h>
 #include <driver_settings.h>
@@ -44,6 +46,8 @@
 static const char* const kKDLPrompt = "kdebug> ";
 
 extern "C" int kgets(char *buffer, int length);
+
+void call_modules_hook(bool enter);
 
 
 int dbg_register_file[B_MAX_CPU_COUNT][14];
@@ -94,6 +98,10 @@ static int32 sCurrentLine = 0;
 static debugger_demangle_module_info* sDemangleModule;
 
 static struct thread* sDebuggedThread;
+static vint32 sInDebugger = 0;
+static bool sPreviousDprintfState;
+static volatile bool sHandOverKDL = false;
+static vint32 sHandOverKDLToCPU = -1;
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
 
@@ -714,6 +722,83 @@ kernel_debugger_loop(void)
 }
 
 
+static void
+enter_kernel_debugger(const char* message)
+{
+	while (atomic_add(&sInDebugger, 1) > 0) {
+		// The debugger is already running, find out where...
+		if (sDebuggerOnCPU == smp_get_current_cpu()) {
+			// We are re-entering the debugger on the same CPU.
+			break;
+		}
+
+		// Some other CPU must have entered the debugger and tried to halt
+		// us. Process ICIs to ensure we get the halt request. Then we are
+		// blocking there until everyone leaves the debugger and we can
+		// try to enter it again.
+		atomic_add(&sInDebugger, -1);
+		smp_intercpu_int_handler();
+	}
+
+	arch_debug_save_registers(&dbg_register_file[smp_get_current_cpu()][0]);
+	sPreviousDprintfState = set_dprintf_enabled(true);
+
+	if (sDebuggerOnCPU != smp_get_current_cpu() && smp_get_num_cpus() > 1) {
+		// First entry on a MP system, send a halt request to all of the other
+		// CPUs. Should they try to enter the debugger they will be cought in
+		// the loop above.
+		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0, NULL,
+			SMP_MSG_FLAG_SYNC);
+	}
+
+	if (sBlueScreenOutput) {
+		if (blue_screen_enter(false) == B_OK)
+			sBlueScreenEnabled = true;
+	}
+
+	sDebugOutputFilter = &gDefaultDebugOutputFilter;
+
+	sDebuggedThread = NULL;
+
+	if (message)
+		kprintf("PANIC: %s\n", message);
+
+	sCurrentKernelDebuggerMessage = message;
+
+	// sort the commands
+	sort_debugger_commands();
+
+	call_modules_hook(true);
+}
+
+
+static void
+exit_kernel_debugger()
+{
+	call_modules_hook(false);
+	set_dprintf_enabled(sPreviousDprintfState);
+
+	sDebugOutputFilter = NULL;
+
+	sBlueScreenEnabled = false;
+	atomic_add(&sInDebugger, -1);
+}
+
+
+static void
+hand_over_kernel_debugger()
+{
+	// Wait until the hand-over is complete.
+	// The other CPU gets our sInDebugger reference and will release it when
+	// done. Note, that there's a small race condition: the other CPU could
+	// hand over to another CPU without us noticing. Since this is only
+	// initiated by the user, it is harmless, though.
+	sHandOverKDL = true;
+	while (sHandOverKDLToCPU >= 0)
+		PAUSE();
+}
+
+
 static int
 cmd_dump_kdl_message(int argc, char **argv)
 {
@@ -780,6 +865,36 @@ cmd_dump_syslog(int argc, char **argv)
 		kprintf("\n");
 
 	return 0;
+}
+
+
+static int
+cmd_switch_cpu(int argc, char **argv)
+{
+	if (argc > 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	if (argc == 1) {
+		kprintf("running on CPU %ld\n", smp_get_current_cpu());
+		return 0;
+	}
+
+	int32 newCPU = parse_expression(argv[1]);
+	if (newCPU < 0 || newCPU >= smp_get_num_cpus()) {
+		kprintf("invalid CPU index\n");
+		return 0;
+	}
+
+	if (newCPU == smp_get_current_cpu()) {
+		kprintf("already running on CPU %ld\n", newCPU);
+		return 0;
+	}
+
+	sHandOverKDLToCPU = newCPU;
+
+	return B_KDEBUG_QUIT;
 }
 
 
@@ -949,6 +1064,7 @@ syslog_init(struct kernel_args *args)
 		"Dumps the syslog buffer.\n",
 		"[-n]\nDumps the whole syslog buffer, or, if -n is specified, only "
 		"the part that hasn't been send yet.\n", 0);
+
 	return B_OK;
 
 err2:
@@ -1058,6 +1174,10 @@ debug_init(kernel_args *args)
 status_t
 debug_init_post_vm(kernel_args *args)
 {
+	add_debugger_command_etc("cpu", &cmd_switch_cpu,
+		"Switches to another CPU.\n",
+		"<cpu>\n"
+		"Switches to CPU with the index <cpu>.\n", 0);
 	add_debugger_command_etc("message", &cmd_dump_kdl_message,
 		"Reprint the message printed when entering KDL",
 		"\n"
@@ -1162,6 +1282,25 @@ debug_get_page_fault_info()
 }
 
 
+void
+debug_trap_cpu_in_kdl(bool returnIfHandedOver)
+{
+	cpu_status state = disable_interrupts();
+
+	while (sInDebugger != 0) {
+		if (sHandOverKDL && sHandOverKDLToCPU == smp_get_current_cpu()) {
+			if (returnIfHandedOver)
+				return;
+
+			kernel_debugger(NULL);
+		} else
+			PAUSE();
+	}
+
+	restore_interrupts(state);
+}
+
+
 //	#pragma mark - public API
 
 
@@ -1190,68 +1329,31 @@ panic(const char *format, ...)
 void
 kernel_debugger(const char *message)
 {
-	static vint32 inDebugger = 0;
-	cpu_status state;
-	bool dprintfState;
+	cpu_status state = disable_interrupts();
 
-	state = disable_interrupts();
-	while (atomic_add(&inDebugger, 1) > 0) {
-		// The debugger is already running, find out where...
-		if (sDebuggerOnCPU != smp_get_current_cpu()) {
-			// Some other CPU must have entered the debugger and tried to halt
-			// us. Process ICIs to ensure we get the halt request. Then we are
-			// blocking there until everyone leaves the debugger and we can
-			// try to enter it again.
-			atomic_add(&inDebugger, -1);
-			smp_intercpu_int_handler();
-		} else {
-			// We are re-entering the debugger on the same CPU.
+	while (true) {
+		if (sHandOverKDLToCPU == smp_get_current_cpu()) {
+			sHandOverKDLToCPU = -1;
+			sHandOverKDL = false;
+		} else
+			enter_kernel_debugger(message);
+
+		kernel_debugger_loop();
+
+		if (sHandOverKDLToCPU < 0) {
+			exit_kernel_debugger();
 			break;
 		}
+
+		hand_over_kernel_debugger();
+
+		debug_trap_cpu_in_kdl(true);
+
+		if (sHandOverKDLToCPU != smp_get_current_cpu())
+			break;
 	}
 
-	arch_debug_save_registers(&dbg_register_file[smp_get_current_cpu()][0]);
-	dprintfState = set_dprintf_enabled(true);
-
-	if (sDebuggerOnCPU != smp_get_current_cpu() && smp_get_num_cpus() > 1) {
-		// First entry on a MP system, send a halt request to all of the other
-		// CPUs. Should they try to enter the debugger they will be cought in
-		// the loop above.
-		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0,
-			(void *)&inDebugger, SMP_MSG_FLAG_SYNC);
-	}
-
-	if (sBlueScreenOutput) {
-		if (blue_screen_enter(false) == B_OK)
-			sBlueScreenEnabled = true;
-	}
-
-	sDebugOutputFilter = &gDefaultDebugOutputFilter;
-
-	sDebuggedThread = NULL;
-
-	if (message)
-		kprintf("PANIC: %s\n", message);
-
-	sCurrentKernelDebuggerMessage = message;
-
-	// sort the commands
-	sort_debugger_commands();
-
-	call_modules_hook(true);
-
-	kernel_debugger_loop();
-
-	call_modules_hook(false);
-	set_dprintf_enabled(dprintfState);
-
-	sDebugOutputFilter = NULL;
-
-	sBlueScreenEnabled = false;
-	atomic_add(&inDebugger, -1);
 	restore_interrupts(state);
-
-	// ToDo: in case we change dbg_register_file - don't we want to restore it?
 }
 
 

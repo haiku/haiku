@@ -222,6 +222,7 @@ private:
 
 // The run queue. Holds the threads ready to run ordered by priority.
 static struct thread *sRunQueue = NULL;
+static cpu_mask_t sIdleCPUs = 0;
 
 
 static int
@@ -506,6 +507,43 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 		sRunQueue = thread;
 
 	thread->next_priority = thread->priority;
+
+	if (thread->priority != B_IDLE_PRIORITY) {
+		int32 currentCPU = smp_get_current_cpu();
+		if (sIdleCPUs != 0) {
+			if (thread->pinned_to_cpu > 0) {
+				// thread is pinned to a CPU -- notify it, if it is idle
+				int32 targetCPU = thread->previous_cpu->cpu_num;
+				if ((sIdleCPUs & (1 << targetCPU)) != 0) {
+					sIdleCPUs &= ~(1 << targetCPU);
+					smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
+						0, NULL, SMP_MSG_FLAG_ASYNC);
+				}
+			} else {
+				// Thread is not pinned to any CPU -- take it ourselves, if we
+				// are idle, otherwise notify the next idle CPU. In either case
+				// we clear the idle bit of the chosen CPU, so that the
+				// scheduler_enqueue_in_run_queue() won't try to bother the
+				// same CPU again, if invoked before it handled the interrupt.
+				cpu_mask_t idleCPUs = CLEAR_BIT(sIdleCPUs, currentCPU);
+				if ((sIdleCPUs & (1 << currentCPU)) != 0) {
+					sIdleCPUs = idleCPUs;
+				} else {
+					int32 targetCPU = 0;
+					for (; targetCPU < B_MAX_CPU_COUNT; targetCPU++) {
+						cpu_mask_t mask = 1 << targetCPU;
+						if ((idleCPUs & mask) != 0) {
+							sIdleCPUs &= ~mask;
+							break;
+						}
+					}
+
+					smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
+						0, NULL, SMP_MSG_FLAG_ASYNC);
+				}
+			}
+		}
+	}
 }
 
 
@@ -580,6 +618,8 @@ scheduler_reschedule(void)
 	struct thread *nextThread, *prevThread;
 
 	TRACE(("reschedule(): cpu %d, cur_thread = %ld\n", smp_get_current_cpu(), thread_get_current_thread()->id));
+
+	oldThread->cpu->invoke_scheduler = false;
 
 	oldThread->state = oldThread->next_state;
 	switch (oldThread->next_state) {
@@ -706,6 +746,13 @@ scheduler_reschedule(void)
 		oldThread->cpu->preempted = 0;
 		add_timer(quantumTimer, &reschedule_event, quantum,
 			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_THREAD_LOCK);
+
+		// update the idle bit for this CPU in the CPU mask
+		int32 cpuNum = smp_get_current_cpu();
+		if (nextThread->priority == B_IDLE_PRIORITY)
+			sIdleCPUs = SET_BIT(sIdleCPUs, cpuNum);
+		else
+			sIdleCPUs = CLEAR_BIT(sIdleCPUs, cpuNum);
 
 		if (nextThread != oldThread)
 			context_switch(oldThread, nextThread);

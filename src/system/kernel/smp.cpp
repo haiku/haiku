@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -76,34 +77,135 @@ static struct {
 	void		*caller;
 	spinlock	*lock;
 } sLastCaller[NUM_LAST_CALLERS];
-static int32 sLastIndex = 0;
+static vint32 sLastIndex = 0;
 
 
 static void
 push_lock_caller(void *caller, spinlock *lock)
 {
-	sLastCaller[sLastIndex].caller = caller;
-	sLastCaller[sLastIndex].lock = lock;
+	int32 index = atomic_add(&sLastIndex, 1) % NUM_LAST_CALLERS;
 
-	if (++sLastIndex >= NUM_LAST_CALLERS)
-		sLastIndex = 0;
+	sLastCaller[index].caller = caller;
+	sLastCaller[index].lock = lock;
 }
 
 
 static void *
 find_lock_caller(spinlock *lock)
 {
-	int32 i;
+	int32 lastIndex = sLastIndex % NUM_LAST_CALLERS;
 
-	for (i = 0; i < NUM_LAST_CALLERS; i++) {
-		int32 index = (NUM_LAST_CALLERS + sLastIndex - 1 - i) % NUM_LAST_CALLERS;
+	for (int32 i = 0; i < NUM_LAST_CALLERS; i++) {
+		int32 index = (NUM_LAST_CALLERS + lastIndex - 1 - i) % NUM_LAST_CALLERS;
 		if (sLastCaller[index].lock == lock)
 			return sLastCaller[index].caller;
 	}
 
 	return NULL;
 }
+
+
+int
+dump_spinlock(int argc, char** argv)
+{
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	uint64 address;
+	if (!evaluate_debug_expression(argv[1], &address, false))
+		return 0;
+
+	spinlock* lock = (spinlock*)(addr_t)address;
+	kprintf("spinlock %p:\n", lock);
+	bool locked = B_SPINLOCK_IS_LOCKED(lock);
+	if (locked) {
+		kprintf("  locked from %p\n", find_lock_caller(lock));
+	} else
+		kprintf("  not locked\n");
+
+	return 0;
+}
+
+
 #endif	// DEBUG_SPINLOCKS
+
+
+int
+dump_ici_messages(int argc, char** argv)
+{
+	// count broadcast messages
+	int32 count = 0;
+	int32 doneCount = 0;
+	int32 unreferencedCount = 0;
+	smp_msg* message = sBroadcastMessages;
+	while (message != NULL) {
+		count++;
+		if (message->done)
+			doneCount++;
+		if (message->ref_count <= 0)
+			unreferencedCount++;
+		message = message->next;
+	}
+
+	kprintf("ICI broadcast messages: %ld, first: %p\n", count,
+		sBroadcastMessages);
+	kprintf("  done:         %ld\n", doneCount);
+	kprintf("  unreferenced: %ld\n", unreferencedCount);
+
+	// count per-CPU messages
+	for (int32 i = 0; i < sNumCPUs; i++) {
+		count = 0;
+		message = sCPUMessages[i];
+		while (message != NULL) {
+			count++;
+			message = message->next;
+		}
+
+		kprintf("CPU %ld messages: %ld, first: %p\n", i, count,
+			sCPUMessages[i]);
+	}
+
+	return 0;
+}
+
+
+int
+dump_ici_message(int argc, char** argv)
+{
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	uint64 address;
+	if (!evaluate_debug_expression(argv[1], &address, false))
+		return 0;
+
+	smp_msg* message = (smp_msg*)(addr_t)address;
+	kprintf("ICI message %p:\n", message);
+	kprintf("  next:        %p\n", message->next);
+	kprintf("  message:     %ld\n", message->message);
+	kprintf("  data:        %ld\n", message->data);
+	kprintf("  data2:       %ld\n", message->data2);
+	kprintf("  data3:       %ld\n", message->data3);
+	kprintf("  data_ptr:    %p\n", message->data_ptr);
+	kprintf("  flags:       %lx\n", message->flags);
+	kprintf("  ref_count:   %lx\n", message->ref_count);
+	kprintf("  done:        %s\n", message->done ? "true" : "false");
+	kprintf("  proc_bitmap: %lx\n", message->proc_bitmap);
+
+	return 0;
+}
+
+
+static inline void
+process_all_pending_ici(int32 currentCPU)
+{
+	while (process_pending_ici(currentCPU) != B_ENTRY_NOT_FOUND)
+		;
+}
 
 
 void
@@ -115,16 +217,20 @@ acquire_spinlock(spinlock *lock)
 			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
 #if B_DEBUG_SPINLOCK_CONTENTION
 		while (atomic_add(&lock->lock, 1) != 0)
-			process_pending_ici(currentCPU);
+			process_all_pending_ici(currentCPU);
 #else
 		while (1) {
 			while (*lock != 0) {
-				process_pending_ici(currentCPU);
+				process_all_pending_ici(currentCPU);
 				PAUSE();
 			}
 			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
+
+#if DEBUG_SPINLOCKS
+		push_lock_caller(arch_debug_get_caller(), lock);
+#endif
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
@@ -156,7 +262,7 @@ acquire_spinlock_nocheck(spinlock *lock)
 		}
 #else
 		while (1) {
-			while(*lock != 0)
+			while (*lock != 0)
 				PAUSE();
 			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
@@ -220,8 +326,12 @@ find_free_message(struct smp_msg **msg)
 	TRACE(("find_free_message: entry\n"));
 
 retry:
-	while (sFreeMessageCount <= 0)
+	while (sFreeMessageCount <= 0) {
+		state = disable_interrupts();
+		process_all_pending_ici(smp_get_current_cpu());
+		restore_interrupts(state);
 		PAUSE();
+	}
 	state = disable_interrupts();
 	acquire_spinlock(&sFreeMessageSpinlock);
 
@@ -327,7 +437,10 @@ finish_message_processing(int currentCPU, struct smp_msg *msg, int source_mailbo
 
 		TRACE(("cleaning up message %p\n", msg));
 
-		if (msg == *mbox) {
+		if (source_mailbox != MAILBOX_BCAST) {
+			// local mailbox -- the message has already been removed in
+			// check_for_message()
+		} else if (msg == *mbox) {
 			(*mbox) = msg->next;
 		} else {
 			// we need to walk to find the message in the list.
@@ -347,7 +460,7 @@ finish_message_processing(int currentCPU, struct smp_msg *msg, int source_mailbo
 			if (msg1 == msg && last != NULL)
 				last->next = msg->next;
 			else
-				dprintf("last == NULL or msg != msg1!!!\n");
+				panic("last == NULL or msg != msg1");
 		}
 
 		release_spinlock(spinlock);
@@ -370,13 +483,13 @@ static int32
 process_pending_ici(int32 currentCPU)
 {
 	struct smp_msg *msg;
-	vint32 *haltValue = NULL;
+	bool haltCPU = false;
 	int sourceMailbox = 0;
 	int retval = B_HANDLED_INTERRUPT;
 
 	msg = check_for_message(currentCPU, &sourceMailbox);
 	if (msg == NULL)
-		return retval;
+		return B_ENTRY_NOT_FOUND;
 
 	TRACE(("  cpu %ld message = %ld\n", currentCPU, msg->message));
 
@@ -393,17 +506,20 @@ process_pending_ici(int32 currentCPU)
 		case SMP_MSG_GLOBAL_INVALIDATE_PAGES:
 			arch_cpu_global_TLB_invalidate();
 			break;
-		case SMP_MSG_RESCHEDULE:
-			retval = B_INVOKE_SCHEDULER;
-			break;
 		case SMP_MSG_CPU_HALT:
-			haltValue = (vint32 *)msg->data_ptr;
-			dprintf("CPU %ld halted!\n", currentCPU);
+			haltCPU = true;
 			break;
 		case SMP_MSG_CALL_FUNCTION:
 		{
 			smp_call_func func = (smp_call_func)msg->data_ptr;
 			func(msg->data, currentCPU, msg->data2, msg->data3);
+			break;
+		}
+		case SMP_MSG_RESCHEDULE_IF_IDLE:
+		{
+			struct thread* thread = thread_get_current_thread();
+			if (thread->priority == B_IDLE_PRIORITY)
+				thread->cpu->invoke_scheduler = true;
 			break;
 		}
 
@@ -415,14 +531,8 @@ process_pending_ici(int32 currentCPU)
 	finish_message_processing(currentCPU, msg, sourceMailbox);
 
 	// special case for the halt message
-	if (haltValue) {
-		cpu_status state = disable_interrupts();
-
-		while (*haltValue != 0)
-			PAUSE();
-
-		restore_interrupts(state);
-	}
+	if (haltCPU)
+		debug_trap_cpu_in_kdl(false);
 
 	return retval;
 }
@@ -476,16 +586,15 @@ spinlock_contention_syscall(const char* subsystem, uint32 function,
 int
 smp_intercpu_int_handler(void)
 {
-	int retval;
 	int currentCPU = smp_get_current_cpu();
 
 	TRACE(("smp_intercpu_int_handler: entry on cpu %d\n", currentCPU));
 
-	retval = process_pending_ici(currentCPU);
+	process_all_pending_ici(currentCPU);
 
 	TRACE(("smp_intercpu_int_handler: done\n"));
 
-	return retval;
+	return B_HANDLED_INTERRUPT;
 }
 
 
@@ -535,7 +644,7 @@ smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2, uint32 d
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
 			while (msg->done == false) {
-				process_pending_ici(currentCPU);
+				process_all_pending_ici(currentCPU);
 				PAUSE();
 			}
 			// for SYNC messages, it's our responsibility to put it
@@ -556,9 +665,12 @@ smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, uint32 data,
 		return;
 
 	int currentCPU = smp_get_current_cpu();
-	cpuMask &= ~((cpu_mask_t)1 << currentCPU);
-	if (cpuMask == 0)
+	cpuMask &= ~((cpu_mask_t)1 << currentCPU)
+		& (((cpu_mask_t)1 << sNumCPUs) - 1);
+	if (cpuMask == 0) {
+		panic("smp_send_multicast_ici(): 0 CPU mask");
 		return;
+	}
 
 	// count target CPUs
 	int32 targetCPUs = 0;
@@ -595,7 +707,7 @@ smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, uint32 data,
 		// the interrupt handler will ref count it to <0
 		// if the message is sync after it has removed it from the mailbox
 		while (msg->done == false) {
-			process_pending_ici(currentCPU);
+			process_all_pending_ici(currentCPU);
 			PAUSE();
 		}
 
@@ -656,7 +768,7 @@ smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 			TRACE(("smp_send_broadcast_ici: waiting for ack\n"));
 
 			while (msg->done == false) {
-				process_pending_ici(currentCPU);
+				process_all_pending_ici(currentCPU);
 				PAUSE();
 			}
 
@@ -723,6 +835,21 @@ smp_init(kernel_args *args)
 	int i;
 
 	TRACE(("smp_init: entry\n"));
+
+#if DEBUG_SPINLOCKS
+	add_debugger_command_etc("spinlock", &dump_spinlock,
+		"Dump info on a spinlock",
+		"\n"
+		"Dumps info on a spinlock.\n", 0);
+#endif
+	add_debugger_command_etc("ici", &dump_ici_messages,
+		"Dump info on pending ICI messages",
+		"\n"
+		"Dumps info on pending ICI messages.\n", 0);
+	add_debugger_command_etc("ici_message", &dump_ici_message,
+		"Dump info on an ICI message",
+		"\n"
+		"Dumps info on an ICI message.\n", 0);
 
 	if (args->num_cpus > 1) {
 		sFreeMessages = NULL;

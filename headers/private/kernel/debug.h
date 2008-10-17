@@ -108,6 +108,7 @@ extern void		debug_stop_screen_debug_output(void);
 extern void		debug_set_page_fault_info(addr_t faultAddress, addr_t pc,
 					uint32 flags);
 extern debug_page_fault_info* debug_get_page_fault_info();
+extern void debug_trap_cpu_in_kdl(bool returnIfHandedOver);
 
 extern void		kputs(const char *string);
 extern void		kputs_unfiltered(const char *string);

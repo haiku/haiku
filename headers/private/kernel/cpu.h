@@ -35,6 +35,7 @@ typedef struct cpu_ent {
 	bigtime_t last_kernel_time;
 	bigtime_t last_user_time;
 
+	bool invoke_scheduler;
 	bool disabled;
 
 	// arch-specific stuff
