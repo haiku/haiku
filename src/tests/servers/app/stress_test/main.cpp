@@ -1,10 +1,11 @@
 // main.cpp
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <Application.h>
 #include <MessageRunner.h>
 #include <Window.h>
-
-#include <stdlib.h>
 
 
 int32 gMaxCount = 0;
@@ -77,6 +78,7 @@ TestApp::MessageReceived(BMessage* message)
 		case 'tick':
 			switch (fTestMode) {
 				case TEST_MANY_WINDOWS:
+				{
 					fFrame.OffsetBy(10.0, 0.0);
 					if (fFrame.right > fScreenFrame.right) {
 						// next row
@@ -86,8 +88,126 @@ TestApp::MessageReceived(BMessage* message)
 						// back to top
 						fFrame.OffsetTo(10.0, 30.0);
 					}
-					new TestWindow(fFrame);
+					int32 action = CountWindows() > 1 ? rand() % 10 : 0;
+					switch (action) {
+						case 0:	// new
+							new TestWindow(fFrame);
+							break;
+						case 1:	// move
+						{
+							BWindow* window = WindowAt(rand() % CountWindows());
+							if (window->Lock()) {
+								if (window->IsHidden())
+									window->Show();
+								window->MoveBy(23, 19);
+								window->Unlock();
+							}
+							break;
+						}
+						case 2:	// hide
+						{
+							BWindow* window = WindowAt(rand() % CountWindows());
+							if (window->Lock()) {
+								if (!window->IsHidden())
+									window->Hide();
+								window->Unlock();
+							}
+							break;
+						}
+						case 3:	// activate
+						{
+							BWindow* window = WindowAt(rand() % CountWindows());
+							if (window->Lock()) {
+								if (window->IsHidden())
+									window->Show();
+								window->Activate();
+								window->Unlock();
+							}
+							break;
+						}
+						case 4:	// change workspace
+						{
+							BWindow* window = WindowAt(rand() % CountWindows());
+							if (window->Lock()) {
+								if (window->IsHidden())
+									window->Show();
+								window->SetWorkspaces(1 << (rand() % 4));
+								window->Unlock();
+							}
+							break;
+						}
+						case 5:	// minimize
+						{
+							BWindow* window = WindowAt(rand() % CountWindows());
+							if (window->Lock()) {
+								if (window->IsHidden())
+									window->Show();
+								window->Minimize(true);
+								window->Unlock();
+							}
+							break;
+						}
+						case 6:	// change size
+						{
+							BWindow* window = WindowAt(rand() % CountWindows());
+							if (window->Lock()) {
+								if (window->IsHidden())
+									window->Show();
+								window->ResizeBy(1, 2);
+								window->Unlock();
+							}
+							break;
+						}
+						case 7:	// set title
+						{
+							BWindow* window = WindowAt(rand() % CountWindows());
+							if (window->Lock()) {
+								if (window->IsHidden())
+									window->Show();
+								char title[256];
+								snprintf(title, sizeof(title), "Title %d",
+									rand() % 100);
+								window->SetTitle(title);
+								window->Unlock();
+							}
+							break;
+						}
+						case 8:	// set look
+						{
+							BWindow* window = WindowAt(rand() % CountWindows());
+							if (window->Lock()) {
+								if (window->IsHidden())
+									window->Show();
+								window_look looks[] = {
+									B_DOCUMENT_WINDOW_LOOK,
+									B_MODAL_WINDOW_LOOK,
+									B_FLOATING_WINDOW_LOOK,
+								};
+								window->SetLook(looks[rand() % 3]);
+								window->Unlock();
+							}
+							break;
+						}
+						case 9:	// set feel
+						{
+							BWindow* window = WindowAt(rand() % CountWindows());
+							if (window->Lock()) {
+								if (window->IsHidden())
+									window->Show();
+								window_feel feels[] = {
+									B_NORMAL_WINDOW_FEEL,
+									B_FLOATING_APP_WINDOW_FEEL,
+									B_MODAL_APP_WINDOW_FEEL,
+								};
+								window->SetFeel(feels[rand() % 3]);
+								window->Unlock();
+							}
+							break;
+						}
+					}
 					break;
+				}
+
 				case TEST_SINGLE_WINDOW:
 					if (fWindow) {
 						fWindow->Lock();
@@ -114,7 +234,7 @@ TestWindow::TestWindow(BRect frame)
 
 	BMessenger self(this);
 	BMessage message(B_QUIT_REQUESTED);
-	fPulse = new BMessageRunner(self, &message, 10000000, 1);
+	fPulse = new BMessageRunner(self, &message, 100000000LL, 1);
 
 	if (Thread() < B_OK)
 		Quit();
