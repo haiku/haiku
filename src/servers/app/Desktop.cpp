@@ -2013,6 +2013,9 @@ Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
 
 	LockAllWindows();
 
+	// NOTE: we bypass the anchor-mechanism by intention when switching
+	// the workspace programmatically.
+
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
 		if (workspace_in_workspaces(i, oldWorkspaces)) {
 			// window is on this workspace, is it anymore?
@@ -2047,6 +2050,21 @@ Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
 			}
 		}
 	}
+
+	// If the window is visible only on one workspace, we set it's current
+	// position in that workspace (so that WorkspacesView will find us).
+	int32 firstWorkspace = -1;
+	for (int32 i = 0; i < kMaxWorkspaces; i++) {
+		if ((newWorkspaces & (1L << i)) != 0) {
+			if (firstWorkspace != -1) {
+				firstWorkspace = -1;
+				break;
+			}
+			firstWorkspace = i;
+		}
+	}
+	if (firstWorkspace >= 0)
+		window->Anchor(firstWorkspace).position = window->Frame().LeftTop();
 
 	// take care about modals and floating windows
 	_UpdateSubsetWorkspaces(window);
