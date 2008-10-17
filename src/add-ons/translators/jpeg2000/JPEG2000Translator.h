@@ -89,7 +89,7 @@ class SSlider : public BSlider {
 					thumb_style thumbType = B_BLOCK_THUMB,
 					uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 					uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
-		char*	UpdateText() const;
+		const char*	UpdateText() const;
 		void	ResizeToPreferred();
 
 	private:

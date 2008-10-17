@@ -27,7 +27,7 @@ void
 usage(int status)
 {
 	fprintf(stderr, "usage: %s [-p] [-r <time>]\n"
-		" -p,--periodic\tDumps changes periodically every second.\n",
+		" -p,--periodic\tDumps changes periodically every second.\n"
 		" -r,--rate\tDumps changes periodically every <time> milli seconds.\n",
 		kProgramName);
 

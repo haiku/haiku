@@ -663,7 +663,7 @@ SSlider::SSlider(BRect frame, const char *name, const char *label,
 
 
 //!	Update status string - show actual value
-char*
+const char*
 SSlider::UpdateText() const
 {
 	snprintf(fStatusLabel, sizeof(fStatusLabel), "%ld", Value());

@@ -238,7 +238,7 @@ NormalPulseView::Pulse()
 		if (Window()->Lock()) {
 			// Set the value of each CPU bar
 			for (int x = 0; x < fCpuCount; x++) {
-				fProgressBars[x]->Set(max_c(0, cpu_times[x] * 100));
+				fProgressBars[x]->Set((int32)max_c(0, cpu_times[x] * 100));
 			}
 
 			Sync();

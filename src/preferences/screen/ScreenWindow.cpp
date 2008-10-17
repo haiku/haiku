@@ -285,7 +285,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		item->SetMarked(true);
 
 	fMonitorView = new MonitorView(BRect(0.0, 0.0, 80.0, 80.0), "monitor",
-		screen.Frame().Width() + 1, screen.Frame().Height() + 1);
+		screen.Frame().IntegerWidth() + 1, screen.Frame().IntegerHeight() + 1);
 	fScreenBox->AddChild(fMonitorView);
 
 	view->AddChild(fScreenBox);
