@@ -2,33 +2,32 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<title>The Tracker</title>
-	<link rel="stylesheet" type="text/css" href="welcome.css">
+	<title>Tracker</title>
+	<link rel="stylesheet" type="text/css" href="../welcome/welcome.css">
 </head>
 <body lang="en-US">
 
 <div class="logo">
-	<img src="welcome-images/logo.png" alt="logo">
-	<div class="title">The Tracker</div>
+	<img src="../welcome/welcome-images/logo.png" alt="logo">
+	<div class="title">Tracker</div>
 </div>
 <div class="topnav">
 	<p>
-		<a href="welcome.html">Welcome</a>
+		<a href="contents.html">Contents</a>
 		&nbsp;&nbsp;&nbsp;
-		Previous: <a href="teammonitor.html">The Team Monitor</a>
+		Previous: <a href="teammonitor.html">Team Monitor</a>
 		&nbsp;&nbsp;&nbsp;
-		Next: <a href="deskbar.html">The Deskbar</a>
+		Next: <a href="tracker-add-ons.html">Tracker Add-Ons</a>
 	</p>
 </div>
 
 <div class="content">
 
-<h2><a name="tracker">The Tracker</a></h2>
 <p>The Tracker is the graphical interface to all your files. It let's you create new files and folders or find, launch or rename as well as copy or delete existing ones.
 </p><p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.
 </p>
 
-<h3><a name="mounting-volumes">Mounting Volumes</a></h3>
+<h2><a name="mounting-volumes">Mounting Volumes</a></h2>
 <p>In order to access a harddisk, CD, USB stick etc., you first have to mount the volume, that is, let the system know it's there. This is done with a right-click on the Desktop or an already mounted volume (like the boot disk) and choosing the volume from the <i>Mount</i> submenu.
 </p>
 <img src="tracker-images/mount-settings.png" alt="drill-down.png" width="581" height="290">
@@ -39,7 +38,7 @@ The above settings will mount all disks on bootup that were mounted previously a
 <font color="#FF0000">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</font></b>
 </p>
 
-<h3><a name="navigating">Navigating</a></h3>
+<h2><a name="navigating">Navigating</a></h2>
 <p>Moving through your folders is one of Trackers main purposes, just like the file managers on other platforms. Haiku's Tracker has some unique features that will help you doing that efficiently.
 </p><p>Instead of double-clicking your way down folder after folder, there's a better way to drill down:
 </p>
@@ -57,7 +56,7 @@ The above settings will mount all disks on bootup that were mounted previously a
 <p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br>
 You can prevent that by holding down the left <tt>WIN</tt> key, which automatically closes the parent window.<br>
 This is also true for keyboard navigation.</p>
-<h4><a name="keyboard-navigation">Keyboard navigation</a></h4>
+<h3><a name="keyboard-navigation">Keyboard navigation</a></h3>
 <p>A few shortcuts are essential:
 <ul><li><tt>ALT+CURSOR-UP</tt> - Open parent folder.</li>
 <li><tt>ALT+CURSOR-DOWN</tt> or <tt>RETURN</tt> - Open selected folder.</li>
@@ -66,7 +65,7 @@ This is also true for keyboard navigation.</p>
 <li><tt>right MENU-KEY</tt> - Open Deskbar menu (leave with <tt>ESC</tt>).</li></ul>
 </p>
 
-<h3><a name="appearance">Appearance</a></h3>
+<h2><a name="appearance">Appearance</a></h2>
 <img src="tracker-images/window-menu.png" alt="window-menu.png" width="382" height="259">
 <br>
 <p>Tracker windows offer three different viewing modes from the <i>Window</i> menu:
@@ -81,7 +80,7 @@ This is also true for keyboard navigation.</p>
 </p><p>The rest of the functions are pretty self-explanatory, leaving the Tracker preferences.
 </p>
 
-<h4><a name="tracker-preferences">Tracker preferences</a></h4>
+<h3><a name="tracker-preferences">Tracker preferences</a></h3>
 <p><i>Window | Preferences...</i> opens a panel that offers a number of setting that, where not obvious, should become clear once tried out. Since all settings are applied live, you'll immediately see the changes.
 <br>So, in short, the not so obvious settings:
 <ul><li><b>Desktop</b> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</li>
@@ -96,7 +95,7 @@ Before you switch Tracker to Single Window Navigation mode, because that may fee
 </ul>
 </p>
 
-<h3>Working with files</h3>
+<h2><a name="working-with-files">Working with files</a></h2>
 <p>When invoked on a selected file, most of the <i>File</i> menu commands are also offered in the context menu by right-clicking that file.
 </p><p>As usual the usage of the commands is pretty clear.</p>
 <ul><li><b>Find...</b> - Find a file or folder. See topic <a href="Query.html">Query</a> for more info.</li>
@@ -119,10 +118,11 @@ Before you switch Tracker to Single Window Navigation mode, because that may fee
 <li><b>Edit Name</b>, <b>Duplicate</b> and <b>Move to Trash</b> - lets you rename or duplicate a file or put the selected file(s) to the trash.</li>
 <li><b>Move to</b>, <b>Copy to</b> and <b>Create Link</b> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <tt>SHIFT</tt> while invoking the menu offers the option to create a relative link.</li>
 <li><b>Cut</b>, <b>Copy</b> and <b>Paste</b> - lets you cut, copy and paste files using the clipboard. By holding <tt>SHIFT</tt> while invoking the menu you can <b>Copy/Cut more</b> files, maybe from another folder that you can paste somewhere else later. Also, while holding <tt>SHIFT</tt> you can paste the copied files in the clipboard as links.</li>
-<li><b>Identify</b> - will sniff out and set the type of a file if it didn't have one before, e.g. if you transfered a file with <i>wget</i> which doesn't set a filetype itself. Holding <tt>SHIFT</tt> while invoking the menu changes the item to identify the filetype and correct it if it was false before.</li></ul>
+<li><b>Identify</b> - will sniff out and set the type of a file if it didn't have one before, e.g. if you transfered a file with <i>wget</i> which doesn't set a filetype itself. Holding <tt>SHIFT</tt> while invoking the menu changes the item to identify the filetype and correct it if it was false before.</li>
+<li><b>Add-Ons</b> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</li></ul>
 </p>
 
-<h3>Transaction status</h3>
+<h2><a name="transaction-status">Transaction status</a></h2>
 <p>When you copy, move or delete files, Tracker shows its progress with a status window. If you initiate more than one transaction, each job gets its own status display.
 </p>
 <img src="tracker-images/transaction-status.png" width="361" height="149">
@@ -133,11 +133,11 @@ Before you switch Tracker to Single Window Navigation mode, because that may fee
 
 <div class="bottomnav">
 	<p>
-		<a href="welcome.html">Welcome</a>
+		<a href="contents.html">Contents</a>
 		&nbsp;&nbsp;&nbsp;
-		Previous: <a href="teammonitor.html">The Team Monitor</a>
+		Previous: <a href="teammonitor.html">Team Monitor</a>
 		&nbsp;&nbsp;&nbsp;
-		Next: <a href="deskbar.html">The Deskbar</a>
+		Next: <a href="tracker-add-ons.html">Tracker Add-Ons</a>
 	</p>
 </div>
 

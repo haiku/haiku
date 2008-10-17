@@ -161,3 +161,8 @@ div.bottomnav p {
 	font-size: 0.9em;
 }
 
+td.onelinetop {
+	vertical-align: top;
+	white-space: nowrap;
+}
+	
