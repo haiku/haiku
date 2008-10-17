@@ -146,6 +146,7 @@ class BPoseView : public BView {
 		virtual	void KeyDown(const char *, int32);
 		virtual void Pulse();
 		virtual void MoveBy(float, float);
+		virtual void ScrollTo(BPoint point);
 
 		// misc. mode setters
 		void SetMultipleSelection(bool);

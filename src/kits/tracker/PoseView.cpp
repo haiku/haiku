@@ -609,11 +609,6 @@ BPoseView::SaveState(AttributeStreamNode *node)
 	// save view state into object
 	BMallocIO stream;
 
-	if (ViewMode() == kListMode)
-		fViewState->SetListOrigin(LeftTop());
-	else
-		fViewState->SetIconOrigin(LeftTop());
-
 	stream.Seek(0, SEEK_SET);
 	fViewState->ArchiveToStream(&stream);
 
@@ -630,8 +625,7 @@ BPoseView::SaveState(AttributeStreamNode *node)
 	node->Write(viewStateAttr, viewStateAttrForeign, B_RAW_TYPE,
 		stream.Position(), stream.Buffer());
 
-	fStateNeedsSaving = false;
-	fViewState->MarkSaved();
+	fStateNeedsSaving = false;	
 }
 
 
@@ -639,12 +633,6 @@ void
 BPoseView::SaveState(BMessage &message) const
 {
 	SaveColumnState(message);
-
-	if (ViewMode() == kListMode)
-		fViewState->SetListOrigin(LeftTop());
-	else
-		fViewState->SetIconOrigin(LeftTop());
-
 	fViewState->ArchiveToMessage(message);
 }
 
@@ -856,6 +844,19 @@ BPoseView::MoveBy(float x, float y)
 		fTitleView->MoveBy(x, y);
 
 	_inherited::MoveBy(x, y);
+}
+
+
+void
+BPoseView::ScrollTo(BPoint point)
+{
+	_inherited::ScrollTo(point);
+		
+	//keep the view state in sync.
+	if (ViewMode() == kListMode)
+		fViewState->SetListOrigin(LeftTop());
+	else
+		fViewState->SetIconOrigin(LeftTop());
 }
 
 
@@ -1504,7 +1505,7 @@ BPoseView::AddPosesCompleted()
 		BRect bounds(Bounds());
 		float lastItemTop = (fPoseList->CountItems() - 1) * fListElemHeight;
 		if (bounds.top > lastItemTop)
-			ScrollTo(bounds.left, max_c(lastItemTop, 0));
+			BView::ScrollTo(bounds.left, max_c(lastItemTop, 0));
 	}
 }
 
@@ -1998,6 +1999,7 @@ BPoseView::MessageReceived(BMessage *message)
 					// we must save the current view origin if we come from
 					// any icon mode. We can't do that in SetViewMode() since
 					// Refresh() resets the current view origin.
+					// TODO: Shouldn't be needed anymore
 					if (ViewMode() != kListMode)
 						fViewState->SetIconOrigin(LeftTop());
 										
@@ -2727,6 +2729,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	}
 
 	// save the current origin and get origin for new view mode
+	// TODO: shouldn't be needed anymore
 	BPoint origin(LeftTop());
 	BPoint newOrigin(origin);
 
@@ -7221,7 +7224,8 @@ BPoseView::DeletePose(const node_ref *itemNode, BPose *pose, int32 index)
 			int32 index = (int32)(bounds.bottom / fListElemHeight);
 			BPose *pose = fPoseList->ItemAt(index);
 			if (!pose && bounds.top > 0) // scroll up a little
-				ScrollTo(bounds.left, max_c(bounds.top - fListElemHeight, 0));
+				BView::ScrollTo(bounds.left,
+					max_c(bounds.top - fListElemHeight, 0));
 		}
 
 		delete pose;

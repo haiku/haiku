@@ -133,7 +133,6 @@ class BViewState {
 		void SetReverseSort(bool);
 
 		bool StateNeedsSaving();
-		void MarkSaved();
 
 	private:
 		static BViewState *_Sanitize(BViewState *state, bool fixOnly = false);
@@ -148,7 +147,19 @@ class BViewState {
 		uint32 fPrimarySortType;
 		uint32 fSecondarySortType;
 		bool fReverseSort;
-		bool fStateNeedsSaving;
+		
+		void _StorePreviousState();
+		
+		uint32 	fPreviousViewMode;
+		uint32 	fPreviousLastIconMode;
+		uint32 	fPreviousIconSize;
+		BPoint 	fPreviousListOrigin;
+		BPoint 	fPreviousIconOrigin;
+		uint32 	fPreviousPrimarySortAttr;
+		uint32 	fPreviousSecondarySortAttr;
+		uint32 	fPreviousPrimarySortType;
+		uint32 	fPreviousSecondarySortType;
+		bool 	fPreviousReverseSort;		
 };
 
 
@@ -287,18 +298,12 @@ BViewState::ReverseSort() const
 inline void
 BViewState::SetViewMode(uint32 mode)
 {
-	if (mode != fViewMode)
-		fStateNeedsSaving = true;
-	
 	fViewMode = mode;
 }
 
 inline void
 BViewState::SetLastIconMode(uint32 mode)
 {
-	if (mode != fLastIconMode)
-		fStateNeedsSaving = true;
-
 	fLastIconMode = mode;
 }
 
@@ -311,78 +316,59 @@ BViewState::SetIconSize(uint32 size)
 inline void
 BViewState::SetListOrigin(BPoint newOrigin)
 {
-	if (newOrigin != fListOrigin)
-		fStateNeedsSaving = true;
-
 	fListOrigin = newOrigin;
 }
 
 inline void
 BViewState::SetIconOrigin(BPoint newOrigin)
 {
-	if (newOrigin != fIconOrigin)
-		fStateNeedsSaving = true;
-	
 	fIconOrigin = newOrigin;
 }
 
 inline void
 BViewState::SetPrimarySort(uint32 attr)
 {
-	if (attr != fPrimarySortAttr)
-		fStateNeedsSaving = true;
-	
 	fPrimarySortAttr = attr;
 }
 
 inline void
 BViewState::SetSecondarySort(uint32 attr)
 {
-	if (attr != fSecondarySortAttr)
-		fStateNeedsSaving = true;
-
 	fSecondarySortAttr = attr;
 }
 
 inline void
 BViewState::SetPrimarySortType(uint32 type)
 {
-	if (type != fPrimarySortType)
-		fStateNeedsSaving = true;
-
 	fPrimarySortType = type;
 }
 
 inline void
 BViewState::SetSecondarySortType(uint32 type)
 {
-	if (type != fSecondarySortType)
-		fStateNeedsSaving = true;
-
 	fSecondarySortType = type;
 }
 
 inline void
 BViewState::SetReverseSort(bool on)
 {
-	if (fReverseSort != on)
-		fStateNeedsSaving = true;
-
 	fReverseSort = on;
 }
 
 inline bool
 BViewState::StateNeedsSaving()
 {
-	return fStateNeedsSaving;	
+	return (fPreviousViewMode != fViewMode)
+		|| (fPreviousLastIconMode != fLastIconMode)
+		|| (fPreviousIconSize != fIconSize)
+		|| (fPreviousListOrigin != fListOrigin)
+		|| (fPreviousIconOrigin != fIconOrigin)
+		|| (fPreviousPrimarySortAttr != fPrimarySortAttr)
+		|| (fPreviousSecondarySortAttr != fSecondarySortAttr)
+		|| (fPreviousPrimarySortType != fPrimarySortType)
+		|| (fPreviousSecondarySortType != fSecondarySortType)
+		|| (fPreviousReverseSort != fReverseSort);
 }
-
-inline void
-BViewState::MarkSaved()
-{
-	fStateNeedsSaving = false;	
-}
-
 
 } // namespace BPrivate
 

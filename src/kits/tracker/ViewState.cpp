@@ -287,7 +287,8 @@ BViewState::BViewState()
 	fSecondarySortAttr = 0;
 	fSecondarySortType = 0;
 	fReverseSort = false;
-	fStateNeedsSaving = false;
+	
+	_StorePreviousState();
 }
 
 
@@ -317,8 +318,7 @@ BViewState::BViewState(BMallocIO *stream, bool endianSwap)
 		fSecondarySortType = B_SWAP_INT32(fSecondarySortType);
 	}
 
-	fStateNeedsSaving = false;
-
+	_StorePreviousState();
 	_Sanitize(this, true);
 }
 
@@ -334,8 +334,8 @@ BViewState::BViewState(const BMessage &message)
 	message.FindInt32(kViewStateSecondarySortAttrName, (int32 *)&fSecondarySortAttr);
 	message.FindInt32(kViewStateSecondarySortTypeName, (int32 *)&fSecondarySortType);
 	message.FindBool(kViewStateReverseSortName, &fReverseSort);
-	fStateNeedsSaving = false;
 
+	_StorePreviousState();
 	_Sanitize(this, true);
 }
 
@@ -412,6 +412,22 @@ BViewState::InstantiateFromMessage(const BMessage &message)
 		return NULL;
 
 	return _Sanitize(new (std::nothrow) BViewState(message));
+}
+
+
+void
+BViewState::_StorePreviousState()
+{
+	fPreviousViewMode = fViewMode;
+	fPreviousLastIconMode = fLastIconMode;
+	fPreviousIconSize = fIconSize;
+	fPreviousListOrigin = fListOrigin;
+	fPreviousIconOrigin = fIconOrigin;
+	fPreviousPrimarySortAttr = fPrimarySortAttr;
+	fPreviousSecondarySortAttr = fSecondarySortAttr;
+	fPreviousPrimarySortType = fPrimarySortType;
+	fPreviousSecondarySortType = fSecondarySortType;
+	fPreviousReverseSort = fReverseSort;
 }
 
 
