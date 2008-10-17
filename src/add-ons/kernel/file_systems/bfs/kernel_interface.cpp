@@ -267,7 +267,12 @@ bfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 
 	status_t status = node->InitCheck(volume);
 	if (status < B_OK) {
-		FATAL(("inode at %Ld is corrupt!\n", id));
+		if ((node->Flags() & INODE_DELETED) != 0) {
+			INFORM(("inode at %Ld is already deleted!\n", id));
+		} else {
+			FATAL(("inode at %Ld could not be read: %s!\n", id,
+				strerror(status)));
+		}
 		return status;
 	}
 
