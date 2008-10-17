@@ -46,5 +46,5 @@
 	# (system shutdown, battery info, ...)
 	# default is off
 
-#acpi false
-	# ACPI support, on by default
+#acpi true
+	# ACPI support, off by default
