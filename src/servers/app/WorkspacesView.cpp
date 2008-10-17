@@ -192,10 +192,10 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 		&& !workspaceFrame.Intersects(tabFrame))
 		return;
 
-	// ToDo: let decorator do this!
-	rgb_color yellow;
+	rgb_color yellow = (rgb_color){ 255, 203, 0, 255 };
 	if (decorator != NULL)
 		yellow = decorator->UIColor(B_WINDOW_TAB_COLOR);
+	// TODO: let decorator do this!
 	rgb_color frameColor = (rgb_color){ 180, 180, 180, 255 };
 	rgb_color white = (rgb_color){ 255, 255, 255, 255 };
 
@@ -293,7 +293,7 @@ WorkspacesView::_DrawWorkspace(DrawingEngine* drawingEngine,
 
 	BRegion backgroundRegion = redraw;
 
-	// ToDo: would be nice to get the real update region here
+	// TODO: would be nice to get the real update region here
 
 	BRect screenFrame = _ScreenFrame(index);
 
