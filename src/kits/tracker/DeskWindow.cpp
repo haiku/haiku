@@ -328,7 +328,7 @@ void
 BDeskWindow::AddTrashContextMenu()
 {
 	// setup special trash context menu
-	fTrashContextMenu = new BPopUpMenu("TrashContext");
+	fTrashContextMenu = new BPopUpMenu("TrashContext", false, false);
 	fTrashContextMenu->SetFont(be_plain_font);
 	fTrashContextMenu->AddItem(new BMenuItem("Empty Trash",
 		new BMessage(kEmptyTrash)));
