@@ -64,18 +64,18 @@ class BColumn {
 		void ArchiveToMessage(BMessage &) const;
 
 		const char* Title() const;
-		float Offset() const;
-		float Width() const;
-		alignment Alignment() const;
+		float 		Offset() const;
+		float 		Width() const;
+		alignment 	Alignment() const;
 		const char* AttrName() const;
-		uint32 AttrType() const;
+		uint32 		AttrType() const;
 		const char* DisplayAs() const;
-		uint32 AttrHash() const;
-		bool StatField() const;
-		bool Editable() const;
+		uint32 		AttrHash() const;
+		bool 		StatField() const;
+		bool 		Editable() const;
 
-		void SetOffset(float);
-		void SetWidth(float);
+		void 		SetOffset(float);
+		void 		SetWidth(float);
 
 	private:
 		void _Init(const char *title, float offset, float width,
@@ -83,16 +83,16 @@ class BColumn {
 			const char* displayAs, bool statField, bool editable);
 		static BColumn* _Sanitize(BColumn* column);
 
-		BString fTitle;
-		float fOffset;
-		float fWidth;
-		alignment fAlignment;
-		BString fAttrName;
-		BString fDisplayAs;
-		uint32 fAttrHash;
-		uint32 fAttrType;
-		bool fStatField;
-		bool fEditable;
+		BString 	fTitle;
+		float 		fOffset;
+		float 		fWidth;
+		alignment 	fAlignment;
+		BString 	fAttrName;
+		BString 	fDisplayAs;
+		uint32 		fAttrHash;
+		uint32 		fAttrType;
+		bool 		fStatField;
+		bool 		fEditable;
 };
 
 
@@ -169,11 +169,13 @@ BColumn::Title() const
 	return fTitle.String();
 }
 
+
 inline float
 BColumn::Offset() const
 {
 	return fOffset;
 }
+
 
 inline float
 BColumn::Width() const
@@ -181,11 +183,13 @@ BColumn::Width() const
 	return fWidth;
 }
 
+
 inline alignment
 BColumn::Alignment() const
 {
 	return fAlignment;
 }
+
 
 inline const char *
 BColumn::AttrName() const
@@ -193,11 +197,13 @@ BColumn::AttrName() const
 	return fAttrName.String();
 }
 
+
 inline uint32
 BColumn::AttrHash() const
 {
 	return fAttrHash;
 }
+
 
 inline uint32
 BColumn::AttrType() const
@@ -205,11 +211,13 @@ BColumn::AttrType() const
 	return fAttrType;
 }
 
+
 inline const char *
 BColumn::DisplayAs() const
 {
 	return fDisplayAs.String();
 }
+
 
 inline bool
 BColumn::StatField() const
@@ -217,11 +225,13 @@ BColumn::StatField() const
 	return fStatField;
 }
 
+
 inline bool
 BColumn::Editable() const
 {
 	return fEditable;
 }
+
 
 inline void
 BColumn::SetWidth(float w)
@@ -229,11 +239,13 @@ BColumn::SetWidth(float w)
 	fWidth = w;
 }
 
+
 inline void
 BColumn::SetOffset(float o)
 {
 	fOffset = o;
 }
+
 
 inline uint32
 BViewState::ViewMode() const
@@ -241,11 +253,13 @@ BViewState::ViewMode() const
 	return fViewMode;
 }
 
+
 inline uint32
 BViewState::LastIconMode() const
 {
 	return fLastIconMode;
 }
+
 
 inline uint32
 BViewState::IconSize() const
@@ -253,11 +267,13 @@ BViewState::IconSize() const
 	return fIconSize;
 }
 
+
 inline BPoint
 BViewState::ListOrigin() const
 {
 	return fListOrigin;
 }
+
 
 inline BPoint
 BViewState::IconOrigin() const
@@ -265,17 +281,20 @@ BViewState::IconOrigin() const
 	return fIconOrigin;
 }
 
+
 inline uint32
 BViewState::PrimarySort() const
 {
 	return fPrimarySortAttr;
 }
 
+
 inline uint32
 BViewState::SecondarySort() const
 {
 	return fSecondarySortAttr;
 }
+
 
 inline uint32
 BViewState::PrimarySortType() const
@@ -295,11 +314,13 @@ BViewState::ReverseSort() const
 	return fReverseSort;
 }
 
+
 inline void
 BViewState::SetViewMode(uint32 mode)
 {
 	fViewMode = mode;
 }
+
 
 inline void
 BViewState::SetLastIconMode(uint32 mode)
@@ -307,11 +328,13 @@ BViewState::SetLastIconMode(uint32 mode)
 	fLastIconMode = mode;
 }
 
+
 inline void
 BViewState::SetIconSize(uint32 size)
 {
 	fIconSize = size;
 }
+
 
 inline void
 BViewState::SetListOrigin(BPoint newOrigin)
@@ -331,11 +354,13 @@ BViewState::SetPrimarySort(uint32 attr)
 	fPrimarySortAttr = attr;
 }
 
+
 inline void
 BViewState::SetSecondarySort(uint32 attr)
 {
 	fSecondarySortAttr = attr;
 }
+
 
 inline void
 BViewState::SetPrimarySortType(uint32 type)
@@ -343,17 +368,20 @@ BViewState::SetPrimarySortType(uint32 type)
 	fPrimarySortType = type;
 }
 
+
 inline void
 BViewState::SetSecondarySortType(uint32 type)
 {
 	fSecondarySortType = type;
 }
 
+
 inline void
 BViewState::SetReverseSort(bool on)
 {
 	fReverseSort = on;
 }
+
 
 inline bool
 BViewState::StateNeedsSaving()

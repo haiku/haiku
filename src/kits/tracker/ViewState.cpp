@@ -167,7 +167,7 @@ BColumn::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 	int32 version;
 	uint32 key;
 	if (stream->Read(&key, sizeof(uint32)) <= 0
-		|| stream->Read(&version, sizeof(int32)) <=0) 
+		|| stream->Read(&version, sizeof(int32)) <=0)
 		return 0;
 
 	if (endianSwap) {
@@ -193,7 +193,7 @@ BColumn::InstantiateFromMessage(const BMessage &message, int32 index)
 	if (message.FindInt32(kColumnVersionName, index, &messageVersion) != B_OK)
 		return NULL;
 
-	if (version != messageVersion) 
+	if (version != messageVersion)
 		return NULL;
 
 	return _Sanitize(new (std::nothrow) BColumn(message, index));
@@ -287,7 +287,7 @@ BViewState::BViewState()
 	fSecondarySortAttr = 0;
 	fSecondarySortType = 0;
 	fReverseSort = false;
-	
+
 	_StorePreviousState();
 }
 
@@ -310,8 +310,10 @@ BViewState::BViewState(BMallocIO *stream, bool endianSwap)
 		fViewMode = B_SWAP_INT32(fViewMode);
 		fLastIconMode = B_SWAP_INT32(fLastIconMode);
 		fIconSize = B_SWAP_INT32(fIconSize);
-		swap_data(B_POINT_TYPE, &fListOrigin, sizeof(fListOrigin), B_SWAP_ALWAYS);
-		swap_data(B_POINT_TYPE, &fIconOrigin, sizeof(fIconOrigin), B_SWAP_ALWAYS);
+		swap_data(B_POINT_TYPE, &fListOrigin,
+			sizeof(fListOrigin), B_SWAP_ALWAYS);
+		swap_data(B_POINT_TYPE, &fIconOrigin,
+			sizeof(fIconOrigin), B_SWAP_ALWAYS);
 		fPrimarySortAttr = B_SWAP_INT32(fPrimarySortAttr);
 		fSecondarySortAttr = B_SWAP_INT32(fSecondarySortAttr);
 		fPrimarySortType = B_SWAP_INT32(fPrimarySortType);
@@ -329,10 +331,14 @@ BViewState::BViewState(const BMessage &message)
 	message.FindInt32(kViewStateLastIconModeName, (int32 *)&fLastIconMode);
 	message.FindPoint(kViewStateListOriginName, &fListOrigin);
 	message.FindPoint(kViewStateIconOriginName, &fIconOrigin);
-	message.FindInt32(kViewStatePrimarySortAttrName, (int32 *)&fPrimarySortAttr);
-	message.FindInt32(kViewStatePrimarySortTypeName, (int32 *)&fPrimarySortType);
-	message.FindInt32(kViewStateSecondarySortAttrName, (int32 *)&fSecondarySortAttr);
-	message.FindInt32(kViewStateSecondarySortTypeName, (int32 *)&fSecondarySortType);
+	message.FindInt32(kViewStatePrimarySortAttrName,
+		(int32 *)&fPrimarySortAttr);
+	message.FindInt32(kViewStatePrimarySortTypeName,
+		(int32 *)&fPrimarySortType);
+	message.FindInt32(kViewStateSecondarySortAttrName,
+		(int32 *)&fSecondarySortAttr);
+	message.FindInt32(kViewStateSecondarySortTypeName,
+		(int32 *)&fSecondarySortType);
 	message.FindBool(kViewStateReverseSortName, &fReverseSort);
 
 	_StorePreviousState();
@@ -366,15 +372,20 @@ void
 BViewState::ArchiveToMessage(BMessage &message) const
 {
 	message.AddInt32(kViewStateVersionName, kViewStateArchiveVersion);
-	
+
 	message.AddInt32(kViewStateViewModeName, static_cast<int32>(fViewMode));
-	message.AddInt32(kViewStateLastIconModeName, static_cast<int32>(fLastIconMode));
+	message.AddInt32(kViewStateLastIconModeName,
+		static_cast<int32>(fLastIconMode));
 	message.AddPoint(kViewStateListOriginName, fListOrigin);
 	message.AddPoint(kViewStateIconOriginName, fIconOrigin);
-	message.AddInt32(kViewStatePrimarySortAttrName, static_cast<int32>(fPrimarySortAttr));
-	message.AddInt32(kViewStatePrimarySortTypeName, static_cast<int32>(fPrimarySortType));
-	message.AddInt32(kViewStateSecondarySortAttrName, static_cast<int32>(fSecondarySortAttr));
-	message.AddInt32(kViewStateSecondarySortTypeName, static_cast<int32>(fSecondarySortType));
+	message.AddInt32(kViewStatePrimarySortAttrName,
+		static_cast<int32>(fPrimarySortAttr));
+	message.AddInt32(kViewStatePrimarySortTypeName,
+		static_cast<int32>(fPrimarySortType));
+	message.AddInt32(kViewStateSecondarySortAttrName,
+		static_cast<int32>(fSecondarySortAttr));
+	message.AddInt32(kViewStateSecondarySortTypeName,
+		static_cast<int32>(fSecondarySortType));
 	message.AddBool(kViewStateReverseSortName, fReverseSort);
 	message.AddInt32(kViewStateIconSizeName, static_cast<int32>(fIconSize));
 }
@@ -392,7 +403,7 @@ BViewState::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 		version = SwapInt32(version);
 	}
 
-	if (!ValidateStream(stream, key, version)) 
+	if (!ValidateStream(stream, key, version))
 		return NULL;
 
 	return _Sanitize(new (std::nothrow) BViewState(stream, endianSwap));
@@ -408,7 +419,7 @@ BViewState::InstantiateFromMessage(const BMessage &message)
 	if (message.FindInt32(kViewStateVersionName, &messageVersion) != B_OK)
 		return NULL;
 
-	if (version != messageVersion) 
+	if (version != messageVersion)
 		return NULL;
 
 	return _Sanitize(new (std::nothrow) BViewState(message));
