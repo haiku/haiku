@@ -17,6 +17,7 @@
 #include "ServerBitmap.h"
 
 #include <MessagePrivate.h>
+#include <MessengerPrivate.h>
 #include <ServerProtocol.h>
 #include <TokenSpace.h>
 
@@ -71,6 +72,8 @@ struct event_listener {
 };
 
 static const char* kTokenName = "_token";
+
+static const uint32 kFakeMouseMoved = 'fake';
 
 static const float kMouseMovedImportance = 0.1f;
 static const float kMouseTransitImportance = 1.0f;
@@ -494,7 +497,44 @@ EventDispatcher::GetMouse(BPoint& where, int32& buttons)
 void
 EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
 {
-	BAutolock _(this);
+	if (fStream == NULL)
+		return;
+
+	BMessage* fakeMove = new BMessage(kFakeMouseMoved);
+	if (fakeMove == NULL)
+		return;
+
+	fakeMove->AddMessenger("target", target.Messenger());
+	fakeMove->AddInt32("view_token", viewToken);
+
+	fStream->InsertEvent(fakeMove);
+}
+
+
+void
+EventDispatcher::_SendFakeMouseMoved(BMessage* message)
+{
+	BMessenger target;
+	int32 viewToken;
+	if (message->FindInt32("view_token", &viewToken) != B_OK
+		|| message->FindMessenger("target", &target) != B_OK)
+		return;
+
+	if (fDesktop == NULL)
+		return;
+
+	// Check if the target is still valid
+	::EventTarget* eventTarget = NULL;
+
+	fDesktop->LockSingleWindow();
+
+	if (target.IsValid())
+		eventTarget = fDesktop->FindTarget(target);
+
+	fDesktop->UnlockSingleWindow();
+
+	if (eventTarget == NULL)
+		return;
 
 	BMessage moved(B_MOUSE_MOVED);
 	moved.AddPoint("screen_where", fLastCursorPosition);
@@ -504,7 +544,7 @@ EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
 		moved.AddMessage("be:drag_message", &fDragMessage);
 
 	if (fPreviousMouseTarget != NULL
-		&& fPreviousMouseTarget != &target) {
+		&& fPreviousMouseTarget->Messenger() != target) {
 		_AddTokens(&moved, fPreviousMouseTarget, B_POINTER_EVENTS);
 		_SendMessage(fPreviousMouseTarget->Messenger(), &moved,
 			kMouseTransitImportance);
@@ -515,8 +555,9 @@ EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
 	moved.AddInt32("_view_token", viewToken);
 		// this only belongs to the new target
 
-	_SendMessage(target.Messenger(), &moved, kMouseTransitImportance);
-	fPreviousMouseTarget = &target;
+	_SendMessage(target, &moved, kMouseTransitImportance);
+
+	fPreviousMouseTarget = eventTarget;
 }
 
 
@@ -718,12 +759,6 @@ EventDispatcher::_EventLoop()
 {
 	BMessage* event;
 	while (fStream->GetNextEvent(&event)) {
-		if (event == NULL) {
-			// may happen in out of memory situations or junk at the port
-			// we can't do anything about those yet
-			continue;
-		}
-
 		BAutolock _(this);
 		fLastUpdate = system_time();
 
@@ -734,6 +769,9 @@ EventDispatcher::_EventLoop()
 		bool addedTokens = false;
 
 		switch (event->what) {
+			case kFakeMouseMoved:
+				_SendFakeMouseMoved(event);
+				break;
 			case B_MOUSE_MOVED:
 			{
 				BPoint where;

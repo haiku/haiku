@@ -120,7 +120,7 @@ InputServerStream::UpdateScreenBounds(BRect bounds)
 bool
 InputServerStream::GetNextEvent(BMessage** _event)
 {
-	if (fEvents.IsEmpty()) {
+	while (fEvents.IsEmpty()) {
 		// wait for new events
 		BMessage* event;
 		status_t status = _MessageFromPort(&event);
@@ -191,6 +191,21 @@ InputServerStream::GetNextCursorPosition(BPoint &where)
 }
 
 
+status_t
+InputServerStream::InsertEvent(BMessage* event)
+{
+	fEvents.AddMessage(event);
+	status_t status = write_port_etc(fPort, 'insm', NULL, 0, B_RELATIVE_TIMEOUT,
+		0);
+	if (status == B_BAD_PORT_ID)
+		return status;
+
+	// If the port is full, we obviously don't care to report this, as we
+	// already placed our message.
+	return B_OK;
+}
+
+
 BMessage*
 InputServerStream::PeekLatestMouseMoved()
 {
@@ -230,6 +245,10 @@ InputServerStream::_MessageFromPort(BMessage** _message, bigtime_t timeout)
 	if (code == 'quit') {
 		// this will cause GetNextEvent() to return false
 		return B_BAD_PORT_ID;
+	}
+	if (code == 'insm') {
+		// a message has been inserted into our queue
+		return B_INTERRUPTED;
 	}
 
 	// we have the message, now let's unflatten it

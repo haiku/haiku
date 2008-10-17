@@ -167,6 +167,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		Window*					FindWindowByClientToken(int32 token,
 									team_id teamID);
+		EventTarget*			FindTarget(BMessenger& messenger);
 
 #if USE_MULTI_LOCKER
 		bool					LockSingleWindow()

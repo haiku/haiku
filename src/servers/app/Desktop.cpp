@@ -1326,8 +1326,6 @@ Desktop::RemoveWorkspacesView(WorkspacesView* view)
 
 	This has only to be done in case the view changed without user interaction,
 	ie. because of a workspace change or a closing window.
-
-	Windows must not be locked when calling this method.
 */
 void
 Desktop::_SendFakeMouseMoved(Window* window)
@@ -1520,6 +1518,9 @@ Desktop::ActivateWindow(Window* window)
 
 	// TODO: take care about floating windows
 
+	if (!LockAllWindows())
+		return;
+
 	bool windowOnOtherWorkspace = !window->InWorkspace(fCurrentWorkspace);
 	if (windowOnOtherWorkspace) {
 		if ((window->Flags() & B_NO_WORKSPACE_ACTIVATION) == 0
@@ -1535,12 +1536,11 @@ Desktop::ActivateWindow(Window* window)
 					break;
 				}
 			}
-		} else if ((window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) == 0)
+		} else if ((window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) == 0) {
+			UnlockAllWindows();
 			return;
+		}
 	}
-
-	if (!LockAllWindows())
-		return;
 
 	if (windowOnOtherWorkspace
 		&& (window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) != 0) {
@@ -1554,12 +1554,7 @@ Desktop::ActivateWindow(Window* window)
 		// Unlike WindowAction(), this is called from the application itself,
 		// so we will just unminimize the window here.
 		window->SetMinimized(false);
-		UnlockAllWindows();
-
 		ShowWindow(window);
-
-		if (!LockAllWindows())
-			return;
 	}
 
 	if (window == FrontWindow()) {
@@ -2368,7 +2363,7 @@ Desktop::ViewUnderMouse(const Window* window)
 }
 
 
-Window *
+Window*
 Desktop::FindWindowByClientToken(int32 token, team_id teamID)
 {
 	for (Window *window = fAllWindows.FirstWindow(); window != NULL;
@@ -2377,6 +2372,19 @@ Desktop::FindWindowByClientToken(int32 token, team_id teamID)
 			&& window->ServerWindow()->ClientTeam() == teamID) {
 			return window;
 		}
+	}
+
+	return NULL;
+}
+
+
+::EventTarget*
+Desktop::FindTarget(BMessenger& messenger)
+{
+	for (Window *window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		if (window->EventTarget().Messenger() == messenger)
+			return &window->EventTarget();
 	}
 
 	return NULL;
