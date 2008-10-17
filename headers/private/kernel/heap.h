@@ -79,7 +79,7 @@ static const struct nogrow_t {
 } nogrow = {};
 
 inline void*
-operator new(size_t size, const nogrow_t& nogrow)
+operator new(size_t size, const nogrow_t& nogrow) throw()
 {
 	return malloc_nogrow(size);
 }
