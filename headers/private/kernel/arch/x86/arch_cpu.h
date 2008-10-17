@@ -17,6 +17,10 @@
 #endif	// !_ASSEMBLER
 
 
+#undef PAUSE
+#define PAUSE() asm volatile ("pause;")
+
+
 // MSR registers (possibly Intel specific)
 #define IA32_MSR_APIC_BASE				0x1b
 

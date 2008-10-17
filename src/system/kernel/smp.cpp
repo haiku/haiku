@@ -33,12 +33,6 @@
 #	define TRACE(x) ;
 #endif
 
-#if __INTEL__
-#	define PAUSE() asm volatile ("pause;")
-#else
-#	define PAUSE()
-#endif
-
 #define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
 
 struct smp_msg {

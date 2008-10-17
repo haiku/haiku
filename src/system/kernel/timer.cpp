@@ -14,6 +14,7 @@
 
 #include <arch/timer.h>
 #include <boot/kernel_args.h>
+#include <cpu.h>
 #include <smp.h>
 #include <thread.h>
 #include <util/AutoLock.h>
@@ -34,12 +35,6 @@ static per_cpu_timer_data sPerCPU[B_MAX_CPU_COUNT];
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
-#endif
-
-#if __INTEL__
-#	define PAUSE() asm volatile ("pause;")
-#else
-#	define PAUSE()
 #endif
 
 
@@ -168,7 +163,7 @@ add_timer(timer *event, timer_hook hook, bigtime_t period, int32 flags)
 	bigtime_t scheduleTime;
 	bigtime_t currentTime = system_time();
 	cpu_status state;
-	
+
 	if (event == NULL || hook == NULL || period < 0)
 		return B_BAD_VALUE;
 

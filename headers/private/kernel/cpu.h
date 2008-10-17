@@ -15,6 +15,12 @@
 #include <arch/cpu.h>
 
 
+// define PAUSE, if not done in arch/cpu.h
+#ifndef PAUSE
+#	define PAUSE()
+#endif
+
+
 /* CPU local data structure */
 
 typedef struct cpu_ent {
@@ -30,7 +36,7 @@ typedef struct cpu_ent {
 	bigtime_t last_user_time;
 
 	bool disabled;
-	
+
 	// arch-specific stuff
 	arch_cpu_info arch;
 } cpu_ent __attribute__((aligned(64)));
