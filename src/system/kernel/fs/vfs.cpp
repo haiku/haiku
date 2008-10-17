@@ -264,11 +264,10 @@ private:
 };
 
 
-struct vnode : fs_vnode {
+struct vnode : fs_vnode, DoublyLinkedListLinkImpl<vnode> {
 	struct vnode	*next;
 	vm_cache		*cache;
 	dev_t			device;
-	list_link		mount_link;
 	list_link		unused_link;
 	ino_t			id;
 	struct fs_mount	*mount;
@@ -289,6 +288,8 @@ struct vnode_hash_key {
 	ino_t	vnode;
 };
 
+typedef DoublyLinkedList<vnode> VnodeList;
+
 /*!	\brief Structure to manage a mounted file system
 
 	Note: The root_vnode and covers_vnode fields (what others?) are
@@ -302,17 +303,34 @@ struct vnode_hash_key {
 	is NULL, though).
 */
 struct fs_mount {
-	struct fs_mount	*next;
-	file_system_module_info *fs;
+	fs_mount()
+		:
+		volume(NULL),
+		device_name(NULL),
+		fs_name(NULL)
+	{
+		recursive_lock_init(&rlock, "mount rlock");
+	}
+
+	~fs_mount()
+	{
+		recursive_lock_destroy(&rlock);
+		free(device_name);
+		free(fs_name);
+		free(volume);
+	}
+
+	struct fs_mount* next;
+	file_system_module_info* fs;
 	dev_t			id;
-	fs_volume		*volume;
-	char			*device_name;
-	char			*fs_name;
+	fs_volume*		volume;
+	char*			device_name;
+	char*			fs_name;
 	recursive_lock	rlock;	// guards the vnodes list
-	struct vnode	*root_vnode;
-	struct vnode	*covers_vnode;
-	KPartition		*partition;
-	struct list		vnodes;
+	struct vnode*	root_vnode;
+	struct vnode*	covers_vnode;
+	KPartition*		partition;
+	VnodeList		vnodes;
 	EntryCache		entry_cache;
 	bool			unmounting;
 	bool			owns_file_device;
@@ -947,23 +965,16 @@ vnode_hash(void *_vnode, const void *_key, uint32 range)
 static void
 add_vnode_to_mount_list(struct vnode *vnode, struct fs_mount *mount)
 {
-	recursive_lock_lock(&mount->rlock);
-
-	list_add_link_to_head(&mount->vnodes, &vnode->mount_link);
-
-	recursive_lock_unlock(&mount->rlock);
+	RecursiveLocker _(mount->rlock);
+	mount->vnodes.Add(vnode);
 }
 
 
 static void
 remove_vnode_from_mount_list(struct vnode *vnode, struct fs_mount *mount)
 {
-	recursive_lock_lock(&mount->rlock);
-
-	list_remove_link(&vnode->mount_link);
-	vnode->mount_link.next = vnode->mount_link.prev = NULL;
-
-	recursive_lock_unlock(&mount->rlock);
+	RecursiveLocker _(mount->rlock);
+	mount->vnodes.Remove(vnode);
 }
 
 
@@ -6666,10 +6677,10 @@ query_rewind(struct file_descriptor *descriptor)
 
 
 static dev_t
-fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
-	const char *args, bool kernel)
+fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
+	const char* args, bool kernel)
 {
-	struct fs_mount *mount;
+	struct fs_mount* mount;
 	status_t status = 0;
 
 	FUNCTION(("fs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
@@ -6784,17 +6795,15 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		}
 	}
 
-	mount = (struct fs_mount *)malloc(sizeof(struct fs_mount));
+	mount = new(std::nothrow) struct ::fs_mount;
 	if (mount == NULL)
 		return B_NO_MEMORY;
 
 	mount->volume = (fs_volume*)malloc(sizeof(fs_volume));
 	if (mount->volume == NULL) {
-		free(mount);
+		delete mount;
 		return B_NO_MEMORY;
 	}
-
-	list_init_etc(&mount->vnodes, offsetof(struct vnode, mount_link));
 
 	mount->fs_name = get_file_system_name(fsName);
 	if (mount->fs_name == NULL) {
@@ -6814,8 +6823,6 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		status = ENODEV;
 		goto err3;
 	}
-
-	recursive_lock_init(&mount->rlock, "mount rlock");
 
 	// initialize structure
 	mount->id = sNextMountID++;
@@ -6931,16 +6938,12 @@ err5:
 	hash_remove(sMountsTable, mount);
 	mutex_unlock(&sMountMutex);
 
-	recursive_lock_destroy(&mount->rlock);
 	put_file_system(mount->fs);
-	free(mount->device_name);
 err3:
 	mount->entry_cache.Uninit();
 err2:
-	free(mount->fs_name);
 err1:
-	free(mount->volume);
-	free(mount);
+	delete mount;
 
 	return status;
 }
@@ -7021,8 +7024,10 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 		// cycle through the list of vnodes associated with this mount and
 		// make sure all of them are not busy or have refs on them
 		vnode = NULL;
-		while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes,
-				vnode)) != NULL) {
+		VnodeList::Iterator iterator = mount->vnodes.GetIterator();
+		while (iterator.HasNext()) {
+			vnode = iterator.Next();
+
 			// The root vnode ref_count needs to be 1 here (the mount has a
 			// reference).
 			if (vnode->busy
@@ -7072,7 +7077,9 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 	// structure in unmounting state
 	mount->unmounting = true;
 
-	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
+	VnodeList::Iterator iterator = mount->vnodes.GetIterator();
+	while (iterator.HasNext()) {
+		vnode = iterator.Next();
 		vnode->busy = true;
 
 		if (vnode->ref_count == 0) {
@@ -7095,8 +7102,7 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 	// Free all vnodes associated with this mount.
 	// They will be removed from the mount list by free_vnode(), so
 	// we don't have to do this.
-	while ((vnode = (struct vnode *)list_get_first_item(&mount->vnodes))
-			!= NULL) {
+	while ((vnode = mount->vnodes.RemoveHead()) != NULL) {
 		free_vnode(vnode, false);
 	}
 
@@ -7124,11 +7130,7 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 	}
 
 	mount->entry_cache.Uninit();
-
-	free(mount->device_name);
-	free(mount->fs_name);
-	free(mount->volume);
-	free(mount);
+	delete mount;
 
 	return B_OK;
 }
@@ -7155,23 +7157,22 @@ fs_sync(dev_t device)
 
 		struct vnode *vnode;
 		if (!marker.remove) {
-			vnode = (struct vnode *)list_get_next_item(&mount->vnodes, &marker);
-			list_remove_item(&mount->vnodes, &marker);
+			vnode = mount->vnodes.GetNext(&marker);
+			mount->vnodes.Remove(&marker);
 			marker.remove =	true;
 		} else
-			vnode = (struct vnode *)list_get_first_item(&mount->vnodes);
+			vnode = mount->vnodes.First();
 
 		while (vnode != NULL && (vnode->cache == NULL
 			|| vnode->remove || vnode->busy)) {
 			// TODO: we could track writes (and writable mapped vnodes)
 			//	and have a simple flag that we could test for here
-			vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode);
+			vnode = mount->vnodes.GetNext(vnode);
 		}
 
 		if (vnode != NULL) {
 			// insert marker vnode again
-			list_insert_item_before(&mount->vnodes,
-				list_get_next_item(&mount->vnodes, vnode), &marker);
+			mount->vnodes.Insert(mount->vnodes.GetNext(vnode), &marker);
 			marker.remove = false;
 		}
 
