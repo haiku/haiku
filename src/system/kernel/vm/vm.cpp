@@ -5162,6 +5162,70 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 }
 
 
+status_t
+memset_physical(addr_t address, int value, size_t length)
+{
+	ThreadCPUPinner _(thread_get_current_thread());
+
+	while (length > 0) {
+		addr_t pageOffset = address % B_PAGE_SIZE;
+		addr_t virtualAddress;
+		status_t error = vm_get_physical_page(address - pageOffset,
+			&virtualAddress, 0);
+		if (error != B_OK)
+			return error;
+
+		size_t toSet = min_c(length, B_PAGE_SIZE - pageOffset);
+		memset((void*)(virtualAddress + pageOffset), value, toSet);
+
+		vm_put_physical_page(virtualAddress);
+
+		length -= toSet;
+		address += toSet;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+memcpy_to_physical(addr_t to, const void* _from, size_t length, bool user)
+{
+	const uint8* from = (const uint8*)_from;
+	addr_t pageOffset = to % B_PAGE_SIZE;
+
+	ThreadCPUPinner _(thread_get_current_thread());
+
+	while (length > 0) {
+		size_t toCopy = min_c(length, B_PAGE_SIZE - pageOffset);
+
+		addr_t virtualAddress;
+		status_t error = vm_get_physical_page(to - pageOffset, &virtualAddress,
+			0);
+		if (error != B_OK)
+			return error;
+
+		if (user) {
+			error = user_memcpy((void*)(virtualAddress + pageOffset), from,
+				toCopy);
+		} else
+			memcpy((void*)(virtualAddress + pageOffset), from, toCopy);
+
+		vm_put_physical_page(virtualAddress);
+
+		if (error != B_OK)
+			return error;
+
+		to += toCopy;
+		from += toCopy;
+		length -= toCopy;
+		pageOffset = 0;
+	}
+
+	return B_OK;
+}
+
+
 //	#pragma mark - kernel public API
 
 

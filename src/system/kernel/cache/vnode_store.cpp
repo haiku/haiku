@@ -16,30 +16,6 @@
 #include "io_requests.h"
 
 
-static inline status_t
-memset_physical(addr_t address, int value, size_t length)
-{
-	while (length > 0) {
-		addr_t pageOffset = address % B_PAGE_SIZE;
-		addr_t virtualAddress;
-		status_t error = vm_get_physical_page(address - pageOffset,
-			&virtualAddress, 0);
-		if (error != B_OK)
-			return error;
-
-		size_t toSet = min_c(length, B_PAGE_SIZE - pageOffset);
-		memset((void*)(virtualAddress + pageOffset), value, toSet);
-
-		vm_put_physical_page(virtualAddress);
-
-		length -= toSet;
-		address += toSet;
-	}
-
-	return B_OK;
-}
-
-
 status_t
 VMVnodeCache::Init(struct vnode *vnode)
 {

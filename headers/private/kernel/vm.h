@@ -99,6 +99,10 @@ uint32 vm_num_page_faults(void);
 off_t vm_available_memory(void);
 off_t vm_available_not_needed_memory(void);
 
+status_t memset_physical(addr_t address, int value, size_t length);
+status_t memcpy_to_physical(addr_t to, const void* from, size_t length,
+	bool user);
+
 // user syscalls
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);
