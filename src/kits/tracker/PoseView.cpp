@@ -5902,24 +5902,26 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 		}
 
 		case B_BACKSPACE:
+		{
+			if (strlen(sMatchString) == 0)
+				break;
+
 			// remove last char from the typeahead buffer
-			if (strcmp(sMatchString, "") != 0) {
-				sMatchString[strlen(sMatchString) - 1] = '\0';
+			sMatchString[strlen(sMatchString) - 1] = '\0';
 
-				sLastKeyTime = system_time();
+			sLastKeyTime = system_time();
 
-				fCountView->SetTypeAhead(sMatchString);
+			fCountView->SetTypeAhead(sMatchString);
 
-				// select our new string
-				int32 index;
-				BPose *pose = FindBestMatch(&index);
-				if (!pose) {		// wrap around
-					sMatchString[0] = '\0';
-					pose = FindBestMatch(&index);
-				}
-				SelectPose(pose, index);
-			}
+			// select our new string
+			int32 index;
+			BPose *pose = FindBestMatch(&index);
+			if (!pose)
+				break;
+
+			SelectPose(pose, index);
 			break;
+		}
 
 		default:
 		{
@@ -5960,10 +5962,9 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 
 			int32 index;
 			BPose *pose = FindBestMatch(&index);
-			if (!pose) {		// wrap around
-				sMatchString[0] = '\0';
-				pose = FindBestMatch(&index);
-			}
+			if (!pose)
+				break;
+
 			SelectPose(pose, index);
 			break;
 		}
