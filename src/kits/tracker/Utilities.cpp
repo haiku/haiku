@@ -1589,35 +1589,20 @@ float
 ComputeTypeAheadScore(const char *text, const char *match, size_t matchLength,
 	bool wordMode)
 {
-	float first = -1;
-	float second = -1;
-	float third = -1;
-
 	// highest score: exact match
-	float score = 0;
-	size_t pos = 0;
-	for (; pos < matchLength; pos++) {
-		if (text[pos] == '\0') {
-			score = 0;
-			break;
-		}
-		if (tolower(text[pos]) != tolower(match[pos]))
-			break;
+	const char* found = strcasestr(text, match);
+	if (found != NULL) {
+		if (found == text)
+			return kExactMatchScore;
 
-		score++;
+		return 1.f / (found - text);
 	}
-	if (pos == matchLength) {
-		// we don't need to look any further
-		return kExactMatchScore;
-	}
-
-	first = score;
 
 	// there was no exact match
 
 	// second best: all characters at word beginnings
 	if (wordMode) {
-		score = 0;
+		float score = 0;
 		for (int32 j = 0, k = 0; match[j]; j++) {
 			while (text[k]
 				&& tolower(text[k]) != tolower(match[j])) {
@@ -1642,17 +1627,11 @@ ComputeTypeAheadScore(const char *text, const char *match, size_t matchLength,
 			score += 1.f / (k + 1);
 			k++;
 		}
-		second = score;
+
+		return score;
 	}
 
-	// acceptable last: exact match inside the string
-	score = 0;
-	const char* found = strstr(text + 1, match);
-	if (found != NULL)
-		score = 1.f / (found - text);
-	third = score;
-
-	return max_c(first, max_c(second, third));
+	return -1;
 }
 
 
