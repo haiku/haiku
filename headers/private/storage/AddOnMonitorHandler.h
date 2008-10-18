@@ -45,11 +45,11 @@ protected:
 					           ino_t to_directory, dev_t device, ino_t node);
 
 private:
-	void	HandlePulse();
+	void	_HandlePulse();
 
-	std::list<add_on_directory_info> directories;
-	std::list<add_on_entry_info> pending_entries;
-	std::list<add_on_entry_info> former_entries;
+	std::list<add_on_directory_info> fDirectories;
+	std::list<add_on_entry_info> fPendingEntries;
+	std::list<add_on_entry_info> fFormerEntries;
 };
 
 
