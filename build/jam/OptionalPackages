@@ -104,7 +104,7 @@ if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
 	} else {
 		InstallOptionalHaikuImagePackage BeHappy
 			: http://revolf.free.fr/beos/behappy-bone.zip
-			: 
+			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeHappy/BeHappy ;
@@ -335,6 +335,11 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package OpenSSH available for gcc4" ;
 	} else {
+		if ! $(HAIKU_IMAGE_HOST_NAME) {
+			Exit "Optional package OpenSSH requires the HAIKU_IMAGE_HOST_NAME"
+				"variable to be set!" ;
+		}
+
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage openssh-5.0p1-gcc2-2008-05-04-1
 			: $(baseURL)/openssh-5.0p1-gcc2-2008-05-04-1.zip
