@@ -56,7 +56,7 @@ rule RelSymLink
 
 rule AbsSymLink
 {
-	# AbsSymLink <link> : <link target> : <link dir> 
+	# AbsSymLink <link> : <link target> : <link dir>
 	#			: <makeDefaultDependencies> ;
 	# Creates an absolute symbolic link from <link> to <link target>.
 	# <link> and <link target> must be usual targets. If <link dir> is
@@ -127,12 +127,12 @@ rule HaikuInstall
 			Chmod $(target) ;
 		}
 
-		if $(OWNER) && $(CHOWN) { 
+		if $(OWNER) && $(CHOWN) {
 			Chown $(target) ;
 			OWNER on $(target) = $(OWNER) ;
 		}
 
-		if $(GROUP) && $(CHGRP) { 
+		if $(GROUP) && $(CHGRP) {
 			Chgrp $(target) ;
 			GROUP on $(target) = $(GROUP) ;
 		}
@@ -173,7 +173,7 @@ rule HaikuInstallRelSymLink
 	HaikuInstall $(1) : $(2) : $(3) : $(4) : InstallRelSymLinkAdapter ;
 }
 
- 
+
 rule UnarchiveObjects
 {
 	# UnarchiveObjects <target objects> : <static object>
@@ -251,13 +251,18 @@ rule CopySetHaikuRevision target : source
 actions CopySetHaikuRevision1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	revision=`(LC_ALL=C LANG=C svn info $(HAIKU_TOP) 2> /dev/null ||
-		(cd $(HAIKU_TOP) && LC_ALL=C LANG=C git svn info) 2> /dev/null ||
-		(git log --max-count=1 --grep="git-svn-id:" 2> /dev/null |
-			grep git-svn-id: | cut -d '@' -f 2 |
-			awk '{printf "Revision: " $1}') 2> /dev/null ||
-		echo Revision: 0) |
+	revision=`LC_ALL=C LANG=C svn info $(HAIKU_TOP) 2> /dev/null |
 		grep Revision | awk '{printf $2}'`
+	if [ "$revision" = 0 -o "$revision" = "" ]; then
+		revision=`(cd $(HAIKU_TOP) && LC_ALL=C LANG=C git svn info)
+				2> /dev/null ||
+			(git log --max-count=1 --grep="git-svn-id:" 2> /dev/null |
+				grep git-svn-id: | cut -d '@' -f 2 |
+					awk '{printf $1}') 2> /dev/null`
+	fi
+	if [ "$revision" = "" ]; then
+		revision=0
+	fi
 	$(2[1]) --data $(2[3]) $(1) &&
 	$(2[2]) $(1) ${revision}
 }
