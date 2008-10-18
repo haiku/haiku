@@ -2003,16 +2003,6 @@ BPoseView::MessageReceived(BMessage *message)
 			if (message->FindInt32("size", &size) == B_OK) {
 				if (size != (int32)IconSizeInt()) {
 					fViewState->SetIconSize(size);
-					
-					// we must save the current view origin if we come from
-					// any icon mode. We can't do that in SetViewMode() since
-					// Refresh() resets the current view origin.
-					// TODO: Shouldn't be needed anymore
-					if (ViewMode() != kListMode)
-						fViewState->SetIconOrigin(LeftTop());
-										
-					Refresh();	// we need to refresh since the icons need
-								// to be rescaled
 				} else
 					break;		// no change
 			}
@@ -2736,23 +2726,12 @@ BPoseView::SetViewMode(uint32 newMode)
 		}
 	}
 
-	// save the current origin and get origin for new view mode
-	// TODO: shouldn't be needed anymore
-	BPoint origin(LeftTop());
-	BPoint newOrigin(origin);
-
-	if (ViewMode() == kListMode) {
+	// update origin in case of a list <-> icon mode transition
+	BPoint newOrigin;
+	if (ViewMode() == kListMode)
 		newOrigin = fViewState->ListOrigin();
-		fViewState->SetIconOrigin(origin);
-	} else if (oldMode == kListMode) {
-		fViewState->SetListOrigin(origin);
+	else
 		newOrigin = fViewState->IconOrigin();
-	}
-	
-	// any transition to kScaleIconMode needs restoring the origin
-	// in any other xIconMode -> xIconMode transition, the origin doesn't change
-	if (ViewMode() == kScaleIconMode)		
-		newOrigin = fViewState->IconOrigin();	
 
 	PinPointToValidRange(newOrigin);
 
