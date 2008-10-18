@@ -162,29 +162,26 @@ struct EntryCacheHashDefinition {
 
 class EntryCache {
 public:
-	// Note: Constructor and destructor are never invoked, since instances of
-	// this class are member of the fs_mount C structure. Hence we do all
-	// initialization/uninitialization in Init()/Uninit() explicitly.
-
-	status_t Init()
+	EntryCache()
 	{
 		mutex_init(&fLock, "entry cache");
 
 		new(&fEntries) EntryTable;
 		new(&fUsedEntries) EntryList;
 		fEntryCount = 0;
-
-		return fEntries.Init();
 	}
 
-	void Uninit()
+	~EntryCache()
 	{
 		while (EntryCacheEntry* entry = fUsedEntries.Head())
 			_Remove(entry);
 
-		fEntries.~EntryTable();
-
 		mutex_destroy(&fLock);
+	}
+
+	status_t Init()
+	{
+		return fEntries.Init();
 	}
 
 	status_t Add(ino_t dirID, const char* name, ino_t nodeID)
@@ -6816,12 +6813,12 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 	status = mount->entry_cache.Init();
 	if (status != B_OK)
-		goto err2;
+		goto err1;
 
 	mount->fs = get_file_system(fsName);
 	if (mount->fs == NULL) {
 		status = ENODEV;
-		goto err3;
+		goto err1;
 	}
 
 	// initialize structure
@@ -6852,31 +6849,31 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		// we haven't mounted anything yet
 		if (strcmp(path, "/") != 0) {
 			status = B_ERROR;
-			goto err5;
+			goto err2;
 		}
 
 		status = mount->fs->mount(mount->volume, device, flags, args, &rootID);
 		if (status < 0) {
 			// ToDo: why should we hide the error code from the file system here?
 			//status = ERR_VFS_GENERAL;
-			goto err5;
+			goto err2;
 		}
 	} else {
 		struct vnode *coveredVnode;
 		status = path_to_vnode(path, true, &coveredVnode, NULL, kernel);
 		if (status < B_OK)
-			goto err5;
+			goto err2;
 
 		// make sure covered_vnode is a directory
 		if (!S_ISDIR(coveredVnode->type)) {
 			status = B_NOT_A_DIRECTORY;
-			goto err5;
+			goto err2;
 		}
 
 		if (coveredVnode->mount->root_vnode == coveredVnode) {
 			// this is already a mount point
 			status = B_BUSY;
-			goto err5;
+			goto err2;
 		}
 
 		mount->covers_vnode = coveredVnode;
@@ -6884,7 +6881,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		// mount it
 		status = mount->fs->mount(mount->volume, device, flags, args, &rootID);
 		if (status < B_OK)
-			goto err6;
+			goto err3;
 	}
 
 	// the root node is supposed to be owned by the file system - it must
@@ -6893,7 +6890,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	if (mount->root_vnode == NULL || mount->root_vnode->ref_count != 1) {
 		panic("fs_mount: file system does not own its root node!\n");
 		status = B_ERROR;
-		goto err7;
+		goto err4;
 	}
 
 	// No race here, since fs_mount() is the only function changing
@@ -6928,20 +6925,17 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 	return mount->id;
 
-err7:
+err4:
 	FS_MOUNT_CALL_NO_PARAMS(mount, unmount);
-err6:
+err3:
 	if (mount->covers_vnode)
 		put_vnode(mount->covers_vnode);
-err5:
+err2:
 	mutex_lock(&sMountMutex);
 	hash_remove(sMountsTable, mount);
 	mutex_unlock(&sMountMutex);
 
 	put_file_system(mount->fs);
-err3:
-	mount->entry_cache.Uninit();
-err2:
 err1:
 	delete mount;
 
@@ -7129,9 +7123,7 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 		partition->Unregister();
 	}
 
-	mount->entry_cache.Uninit();
 	delete mount;
-
 	return B_OK;
 }
 
