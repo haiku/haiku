@@ -12,11 +12,12 @@
 // Manager for input_server add-ons (devices, filters, methods)
 
 
-#include <Locker.h>
-#include <Looper.h>
 #include <InputServerDevice.h>
 #include <InputServerFilter.h>
 #include <InputServerMethod.h>
+#include <Locker.h>
+#include <Looper.h>
+
 #include "AddOnMonitor.h"
 #include "AddOnMonitorHandler.h"
 #include "TList.h"
@@ -40,7 +41,7 @@ class AddOnManager : public BLooper {
 		void		RegisterDevice(BInputServerDevice *isd, const entry_ref &ref, image_id addon_image);
 		void		RegisterFilter(BInputServerFilter *isf, const entry_ref &ref, image_id addon_image);
 		void		RegisterMethod(BInputServerMethod *ism, const entry_ref &ref, image_id addon_image);
-		
+
 		status_t HandleFindDevices(BMessage*, BMessage*);
 		status_t HandleWatchDevices(BMessage*, BMessage*);
 		status_t HandleIsDeviceRunning(BMessage*, BMessage*);
@@ -49,13 +50,13 @@ class AddOnManager : public BLooper {
 		status_t HandleSystemShuttingDown(BMessage*, BMessage*);
 		status_t HandleMethodReplicant(BMessage*, BMessage*);
 		status_t HandleNodeMonitor(BMessage*);
-		
+
 		void LoadReplicant();
 		void UnloadReplicant();
 		int32 GetReplicantAt(BMessenger target, int32 index) const;
 		status_t GetReplicantName(BMessenger target, int32 uid, BMessage *reply) const;
 		status_t GetReplicantView(BMessenger target, int32 uid, BMessage *reply) const;
-	
+
 	private:
 		class InputServerMonitorHandler;
 		friend class InputServerMonitorHandler;

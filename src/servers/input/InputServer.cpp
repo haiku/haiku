@@ -180,12 +180,11 @@ InputServer::InputServer()
 			fSafeMode = true;
 	}
 
-
 	gDeviceManager.LoadState();
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	if (has_data(find_thread(NULL))) {
-		PRINT(("HasData == YES\n")); 
+		PRINT(("HasData == YES\n"));
 		int32 buffer[2];
 		thread_id appThreadId;
 		memset(buffer, 0, sizeof(buffer));
@@ -282,7 +281,7 @@ InputServer::_LoadKeymap()
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return B_BAD_VALUE;
-	
+
 	path.Append("Key_map");
 
 	status_t err;
@@ -290,7 +289,7 @@ InputServer::_LoadKeymap()
 	BFile file(path.Path(), B_READ_ONLY);
 	if ((err = file.InitCheck()) != B_OK)
 		return err;
-	
+
 	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys))
 		return B_BAD_VALUE;
 
@@ -311,7 +310,7 @@ InputServer::_LoadKeymap()
 
 	if (file.Read(fChars, fCharsSize) != (signed)fCharsSize)
 		return B_BAD_VALUE;
-	
+
 	return B_OK;
 }
 
@@ -369,7 +368,7 @@ InputServer::_SaveKeymap(bool isDefault)
 	if ((err = file.Write(fChars, fCharsSize)) < (ssize_t)fCharsSize)
 		return err;
 
-	// don't bother reporting an error if this fails, since this isn't fatal 
+	// don't bother reporting an error if this fails, since this isn't fatal
 	// the keymap will still be functional, and will just be identified as (Current) in prefs instead of its
 	// actual name
 	if (isDefault)
@@ -385,8 +384,8 @@ InputServer::QuitRequested()
 	CALLED();
 	if (!BApplication::QuitRequested())
 		return false;
-	
-	PostMessage(SYSTEM_SHUTTING_DOWN); 
+
+	PostMessage(SYSTEM_SHUTTING_DOWN);
 
 	bool shutdown = false;
 	CurrentMessage()->FindBool("_shutdown_", &shutdown);
@@ -487,9 +486,9 @@ InputServer::MessageReceived(BMessage* message)
 		case IS_SET_METHOD:
 			HandleSetMethod(message);
 			break;
-		case IS_GET_MOUSE_TYPE: 
+		case IS_GET_MOUSE_TYPE:
 			status = HandleGetSetMouseType(message, &reply);
-			break;	
+			break;
 		case IS_SET_MOUSE_TYPE:
 			status = HandleGetSetMouseType(message, &reply);
 			break;
@@ -623,7 +622,7 @@ InputServer::MessageReceived(BMessage* message)
 		}
 
 		default:
-			return;		
+			return;
 	}
 
 	reply.AddInt32("status", status);
@@ -655,7 +654,7 @@ InputServer::HandleGetSetMouseType(BMessage* message, BMessage* reply)
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
 		msg.AddInt32("code", B_MOUSE_TYPE_CHANGED);
-		return fAddOnManager->PostMessage(&msg);	
+		return fAddOnManager->PostMessage(&msg);
 	}
 
 	return reply->AddInt32("mouse_type", fMouseSettings.MouseType());
@@ -674,7 +673,7 @@ InputServer::HandleGetSetMouseAcceleration(BMessage* message,
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
 		msg.AddInt32("code", B_MOUSE_ACCELERATION_CHANGED);
-		return fAddOnManager->PostMessage(&msg);	
+		return fAddOnManager->PostMessage(&msg);
 	}
 
 	return reply->AddInt32("speed", fMouseSettings.AccelerationFactor());
@@ -779,7 +778,7 @@ InputServer::HandleSetKeyboardLocks(BMessage* message, BMessage* reply)
 {
 	if (message->FindInt32("locks", (int32*)&fKeys.lock_settings) == B_OK) {
 		be_app_messenger.SendMessage(IS_SAVE_KEYMAP);
-		
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_KEYBOARD_DEVICE);
 		msg.AddInt32("code", B_KEY_LOCKS_CHANGED);
@@ -1035,7 +1034,7 @@ InputServer::SetActiveMethod(BInputServerMethod* method)
 }
 
 
-const BMessenger* 
+const BMessenger*
 InputServer::MethodReplicant()
 {
 	return fReplicantMessenger;
@@ -1049,7 +1048,7 @@ InputServer::SetMethodReplicant(const BMessenger* messenger)
 }
 
 
-bool 
+bool
 InputServer::EventLoopRunning()
 {
 	return fEventLooperPort >= B_OK;
@@ -1122,7 +1121,7 @@ InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
 		for (int32 i = 0; (device = devices[i]) != NULL; i++) {
 			for (int32 j = fInputDeviceList.CountItems() - 1; j >= 0; j--) {
 				InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(j);
-	
+
 				if (item->ServerDevice() == &serverDevice && item->HasName(device->name)) {
 					item->Stop();
 					fInputDeviceList.RemoveItem(j);
@@ -1159,8 +1158,8 @@ InputServer::RegisterDevices(BInputServerDevice& serverDevice,
 
 	input_device_ref *device = NULL;
 	for (int32 i = 0; (device = devices[i]) != NULL; i++) {
-		if (device->type != B_POINTING_DEVICE 
-			&& device->type != B_KEYBOARD_DEVICE 
+		if (device->type != B_POINTING_DEVICE
+			&& device->type != B_KEYBOARD_DEVICE
 			&& device->type != B_UNDEFINED_DEVICE)
 			continue;
 
@@ -1195,25 +1194,27 @@ InputServer::RegisterDevices(BInputServerDevice& serverDevice,
 
 
 status_t
-InputServer::StartStopDevices(const char* name, input_device_type type, bool doStart)
+InputServer::StartStopDevices(const char* name, input_device_type type,
+	bool doStart)
 {
 	CALLED();
 	BAutolock lock(fInputDeviceListLocker);
 
 	for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
+		InputDeviceListItem* item
+			= (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
 		if (!item)
 			continue;
 
 		if (item->Matches(name, type)) {
 			if (!doStart ^ item->Running())
 				return B_ERROR;
-				
+
 			if (doStart)
 				item->Start();
 			else
 				item->Stop();
-			
+
 			if (name)
 				return B_OK;
 		}
@@ -1227,7 +1228,7 @@ InputServer::StartStopDevices(const char* name, input_device_type type, bool doS
 
 
 
-status_t 
+status_t
 InputServer::StartStopDevices(BInputServerDevice& serverDevice, bool doStart)
 {
 	CALLED();
@@ -1237,7 +1238,7 @@ InputServer::StartStopDevices(BInputServerDevice& serverDevice, bool doStart)
 	if (item != NULL) {
 		if (!doStart ^ item->Running())
 			return B_ERROR;
-		
+
 		if (doStart)
 			item->Start();
 		else
@@ -1249,13 +1250,13 @@ InputServer::StartStopDevices(BInputServerDevice& serverDevice, bool doStart)
 }
 
 
-status_t 
+status_t
 InputServer::ControlDevices(const char* name, input_device_type type,
 	uint32 code, BMessage* message)
 {
 	CALLED();
 	BAutolock lock(fInputDeviceListLocker);
-	
+
 	for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
 		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
 		if (!item)
@@ -1400,7 +1401,7 @@ InputServer::_EventLoop()
 			events.AddItem(event);
 		}
 
-		// This is where the message should be processed.	
+		// This is where the message should be processed.
 
 		if (_SanitizeEvents(events)
 			&& _MethodizeEvents(events)
@@ -1466,7 +1467,7 @@ InputServer::_SanitizeEvents(EventList& events)
 					fMousePos.y -= y;
 					fMousePos.ConstrainTo(fFrame);
 
-					event->RemoveName("x"); 
+					event->RemoveName("x");
 					event->RemoveName("y");
 					event->AddPoint("where", fMousePos);
 					event->AddInt32("be:delta_x", x);
@@ -1485,7 +1486,7 @@ InputServer::_SanitizeEvents(EventList& events)
 					fMousePos.y = absY * fFrame.Height();
 					fMousePos.ConstrainTo(fFrame);
 
-					event->RemoveName("x"); 
+					event->RemoveName("x");
 					event->RemoveName("y");
 					event->AddPoint("where", fMousePos);
 					PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
@@ -1511,7 +1512,7 @@ InputServer::_SanitizeEvents(EventList& events)
 					fKeyInfo.modifiers = modifiers;
 				else
 					event->AddInt32("modifiers", fKeyInfo.modifiers);
-	
+
 				// update or add key states
 				const uint8 *data;
 				ssize_t size;
@@ -1537,7 +1538,7 @@ InputServer::_SanitizeEvents(EventList& events)
 				uint8 byte;
 				if (event->FindInt8("byte", (int8*)&byte) < B_OK)
 					byte = 0;
-				
+
 				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
 					|| byte == B_ZENKAKU_HANKAKU) {
 					SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY));
@@ -1551,7 +1552,7 @@ InputServer::_SanitizeEvents(EventList& events)
 		}
 
 		index++;
-	}	
+	}
 
 	return true;
 }

@@ -35,7 +35,7 @@ class AddOnManager::InputServerMonitorHandler : public AddOnMonitorHandler {
 		}
 
 		virtual void
-		AddOnCreated(const add_on_entry_info * entry_info)
+		AddOnCreated(const add_on_entry_info* entryInfo)
 		{
 		}
 
@@ -116,7 +116,7 @@ AddOnManager::RegisterAddOn(BEntry& entry)
 	PRINT(("AddOnManager::RegisterAddOn(): trying to load \"%s\"\n", path.Path()));
 
 	image_id addonImage = load_add_on(path.Path());
-	
+
 	if (addonImage < B_OK) {
 		PRINT(("load addon %s failed\n", path.Path()));
 		return addonImage;
@@ -125,16 +125,16 @@ AddOnManager::RegisterAddOn(BEntry& entry)
 	BString pathString = path.Path();
 
 	if (pathString.FindFirst("input_server/devices") > 0) {
-		BInputServerDevice *(*instantiate_func)();
+		BInputServerDevice* (*instantiateFunc)();
 
 		if (get_image_symbol(addonImage, "instantiate_input_device",
-				B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func) < B_OK) {
+				B_SYMBOL_TYPE_TEXT, (void**)&instantiateFunc) < B_OK) {
 			PRINTERR(("AddOnManager::RegisterAddOn(): can't find instantiate_input_device in \"%s\"\n",
 				path.Path()));
 			goto exit_error;
 		}
 
-		BInputServerDevice *device = (*instantiate_func)();
+		BInputServerDevice* device = (*instantiateFunc)();
 		if (device == NULL) {
 			PRINTERR(("AddOnManager::RegisterAddOn(): instantiate_input_device in \"%s\" returned NULL\n",
 				path.Path()));
@@ -151,16 +151,16 @@ AddOnManager::RegisterAddOn(BEntry& entry)
 
 		RegisterDevice(device, ref, addonImage);
 	} else if (pathString.FindFirst("input_server/filters") > 0) {
-		BInputServerFilter *(*instantiate_func)();
+		BInputServerFilter* (*instantiateFunc)();
 
 		if (get_image_symbol(addonImage, "instantiate_input_filter",
-				B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func) < B_OK) {
+				B_SYMBOL_TYPE_TEXT, (void**)&instantiateFunc) < B_OK) {
 			PRINTERR(("AddOnManager::RegisterAddOn(): can't find instantiate_input_filter in \"%s\"\n",
 				path.Path()));
 			goto exit_error;
 		}
 
-		BInputServerFilter *filter = (*instantiate_func)();
+		BInputServerFilter* filter = (*instantiateFunc)();
 		if (filter == NULL) {
 			PRINTERR(("AddOnManager::RegisterAddOn(): instantiate_input_filter in \"%s\" returned NULL\n",
 				path.Path()));
@@ -176,16 +176,16 @@ AddOnManager::RegisterAddOn(BEntry& entry)
 
 		RegisterFilter(filter, ref, addonImage);
 	} else if (pathString.FindFirst("input_server/methods") > 0) {
-		BInputServerMethod *(*instantiate_func)();
+		BInputServerMethod* (*instantiateFunc)();
 
 		if (get_image_symbol(addonImage, "instantiate_input_method",
-				B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func) < B_OK) {
+				B_SYMBOL_TYPE_TEXT, (void**)&instantiateFunc) < B_OK) {
 			PRINTERR(("AddOnManager::RegisterAddOn(): can't find instantiate_input_method in \"%s\"\n",
 				path.Path()));
 			goto exit_error;
 		}
 
-		BInputServerMethod *method = (*instantiate_func)();
+		BInputServerMethod* method = (*instantiateFunc)();
 		if (method == NULL) {
 			PRINTERR(("AddOnManager::RegisterAddOn(): instantiate_input_method in \"%s\" returned NULL\n",
 				path.Path()));
@@ -281,7 +281,7 @@ AddOnManager::UnregisterAddOn(BEntry& entry)
 			if (gInputServer->MethodReplicant())
 				gInputServer->MethodReplicant()->SendMessage(&msg);
 		}
-	} 
+	}
 
 	return B_OK;
 }
@@ -319,16 +319,18 @@ AddOnManager::RegisterAddOns()
 	BDirectory directory;
 	BPath path;
 	// when safemode, only B_BEOS_ADDONS_DIRECTORY is used
-	for (uint32 i = fSafeMode ? 2 : 0 ; i < sizeof(directories) / sizeof(directory_which) ; i++)
-		for (uint32 j = 0 ; j < sizeof(subDirectories) / sizeof(char[24]) ; j++) {
-			if ((find_directory(directories[i], &path) == B_OK)
-				&& (path.Append(subDirectories[j]) == B_OK)
-				&& (directory.SetTo(path.Path()) == B_OK) 
-				&& (directory.GetNodeRef(&nref) == B_OK)) {
+	for (uint32 i = fSafeMode ? 2 : 0;
+			i < sizeof(directories) / sizeof(directory_which); i++) {
+		for (uint32 j = 0; j < sizeof(subDirectories) / sizeof(char[24]); j++) {
+			if (find_directory(directories[i], &path) == B_OK
+				&& path.Append(subDirectories[j]) == B_OK
+				&& directory.SetTo(path.Path()) == B_OK
+				&& directory.GetNodeRef(&nref) == B_OK) {
 				fHandler->AddDirectory(&nref);
 			}
 		}
-#else
+	}
+#else	// APPSERVER_TEST_MODE
 	BEntry entry("/boot/home/svnhaiku/trunk/tests/servers/input/view_input_device/input_server/devices/ViewInputDevice");
 	RegisterAddOn(entry);
 #endif
@@ -349,7 +351,7 @@ AddOnManager::UnregisterAddOns()
 	// we have to stop manually the addons because the monitor doesn't disable them on exit
 
 	{
-		device_info *info;
+		device_info* info;
 		for (fDeviceList.Rewind(); fDeviceList.GetNext(&info);) {
 			gInputServer->StartStopDevices(*info->device, false);
 			delete info->device;
@@ -360,7 +362,7 @@ AddOnManager::UnregisterAddOns()
 	}
 
 	{
-		filter_info *info;
+		filter_info* info;
 		for (fFilterList.Rewind(); fFilterList.GetNext(&info);) {
 			delete info->filter;
 			if (info->addon_image >= B_OK)
@@ -370,7 +372,7 @@ AddOnManager::UnregisterAddOns()
 	}
 
 	{
-		method_info *info;
+		method_info* info;
 		for (fMethodList.Rewind(); fMethodList.GetNext(&info);) {
 			delete info->method;
 			if (info->addon_image >= B_OK)
@@ -387,9 +389,9 @@ AddOnManager::RegisterDevice(BInputServerDevice* device, const entry_ref& ref,
 {
 	BAutolock locker(fLock);
 
-	device_info *pinfo;
-	for (fDeviceList.Rewind(); fDeviceList.GetNext(&pinfo);) {
-		if (!strcmp(pinfo->ref.name, ref.name)) {
+	device_info* info;
+	for (fDeviceList.Rewind(); fDeviceList.GetNext(&info);) {
+		if (!strcmp(info->ref.name, ref.name)) {
 			// we already know this device
 			return;
 		}
@@ -397,12 +399,12 @@ AddOnManager::RegisterDevice(BInputServerDevice* device, const entry_ref& ref,
 
 	PRINT(("AddOnManager::RegisterDevice, name %s\n", ref.name));
 
-	device_info info;
-	info.ref = ref;
-	info.addon_image = addonImage;
-	info.device = device;
+	device_info newInfo;
+	newInfo.ref = ref;
+	newInfo.addon_image = addonImage;
+	newInfo.device = device;
 
-	fDeviceList.Insert(info);
+	fDeviceList.Insert(newInfo);
 }
 
 
@@ -508,7 +510,7 @@ AddOnManager::LoadReplicant()
 
 	BMessage reply;
 
-	if ((to.SendMessage(&request, &reply) == B_OK) 
+	if ((to.SendMessage(&request, &reply) == B_OK)
 		&& (reply.FindMessenger("result", &status) == B_OK)) {
 		// enum replicant in Status view
 		int32 index = 0;
@@ -555,17 +557,17 @@ AddOnManager::GetReplicantAt(BMessenger target, int32 index) const
 		return err;
 
 	int32 uid;
-	if ((err = reply.FindInt32("result", &uid)) != B_OK) 
+	if ((err = reply.FindInt32("result", &uid)) != B_OK)
 		return err;
 
 	return uid;
 }
 
 
-status_t 
+status_t
 AddOnManager::GetReplicantName(BMessenger target, int32 uid, BMessage *reply) const
 {
-	// We send a message to the target shelf, asking it for the Name of the 
+	// We send a message to the target shelf, asking it for the Name of the
 	// replicant with the given unique id.
 
 	BMessage request(B_GET_PROPERTY);
@@ -594,7 +596,7 @@ status_t
 AddOnManager::GetReplicantView(BMessenger target, int32 uid,
 	BMessage* reply) const
 {
-	// We send a message to the target shelf, asking it for the Name of the 
+	// We send a message to the target shelf, asking it for the Name of the
 	// replicant with the given unique id.
 
 	BMessage request(B_GET_PROPERTY);
@@ -763,27 +765,27 @@ status_t
 AddOnManager::HandleMethodReplicant(BMessage* message, BMessage* reply)
 {
 	CALLED();
-	
+
 	if (InputServer::gInputMethodList.CountItems() == 0) {
 		UnloadReplicant();
 		return B_OK;
 	}
-	
+
 	LoadReplicant();
-	
+
 	BAutolock lock(InputServer::gInputMethodListLocker);
-	
+
 	if (gInputServer->MethodReplicant()) {
 		_BMethodAddOn_ *addon = InputServer::gKeymapMethod.fOwner;
 		addon->AddMethod();
-		
+
 		for (int32 i=0; i<InputServer::gInputMethodList.CountItems(); i++) {
-			BInputServerMethod *method = 
+			BInputServerMethod *method =
 				(BInputServerMethod *)InputServer::gInputMethodList.ItemAt(i);
 			_BMethodAddOn_ *addon = method->fOwner;
 			addon->AddMethod();
 		}
 	}
-	
+
 	return B_OK;
 }

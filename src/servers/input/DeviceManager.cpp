@@ -1,63 +1,67 @@
 /*
-** Copyright 2004, the Haiku project. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Author : Jérôme Duval
-** Original authors: Marcus Overhagen, Axel Dörfler
-*/
+ * Copyright 2004-2008, the Haiku project. All rights reserved.
+ * Distributed under the terms of the Haiku License.
+ *
+ * Authors:
+ *		Marcus Overhagen, Axel Dörfler
+ *		Jérôme Duval
+ */
 
-#include "InputServer.h"
 #include "DeviceManager.h"
+
+#include <stdio.h>
+#include <string.h>
 
 #include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
+#include <image.h>
 #include <Path.h>
 #include <String.h>
 
-#include <image.h>
-#include <stdio.h>
-#include <string.h>
+#include "InputServer.h"
 
 
 void
-DeviceManager::MessageReceived(BMessage * msg)
+DeviceManager::MessageReceived(BMessage *msg)
 {
 	CALLED();
 	if (msg->what == B_NODE_MONITOR) {
 		int32 opcode;
 		if (msg->FindInt32("opcode", &opcode) == B_OK) {
 			switch (opcode) {
-			case B_ENTRY_CREATED:
-			case B_ENTRY_REMOVED:
-			case B_ENTRY_MOVED:
-			{
-				node_ref dir_nref;
-				if ((msg->FindInt32("device", &dir_nref.device)!=B_OK)
-					|| (msg->FindInt64("directory", &dir_nref.node)!=B_OK))
-					return;
-				
-				_BDeviceAddOn_ *addon = NULL;
-				int32 i = 0;
-				while ((addon = GetAddOn(i++)) !=NULL) {
-					int32 j=0;
-					node_ref *dnref = NULL;
-					while ((dnref = (node_ref *)addon->fMonitoredRefs.ItemAt(j++)) != NULL) {
-						if (*dnref == dir_nref) {
-							addon->fDevice->Control(NULL, NULL, msg->what, msg);
+				case B_ENTRY_CREATED:
+				case B_ENTRY_REMOVED:
+				case B_ENTRY_MOVED:
+				{
+					node_ref dir_nref;
+					if (msg->FindInt32("device", &dir_nref.device) != B_OK
+						|| msg->FindInt64("directory", &dir_nref.node) != B_OK)
+						return;
+
+					_BDeviceAddOn_ *addon = NULL;
+					int32 i = 0;
+					while ((addon = GetAddOn(i++)) !=NULL) {
+						int32 j=0;
+						node_ref *dnref = NULL;
+						while ((dnref = (node_ref *)addon->fMonitoredRefs.ItemAt(j++)) != NULL) {
+							if (*dnref == dir_nref) {
+								addon->fDevice->Control(NULL, NULL, msg->what,
+									msg);
+							}
 						}
-					}					
+					}
+					break;
 				}
-			}	
-				break;
-			case B_STAT_CHANGED:
-			case B_ATTR_CHANGED:
-			case B_DEVICE_MOUNTED:
-			case B_DEVICE_UNMOUNTED:
-			default:
-				BLooper::MessageReceived(msg);
-				break;
+
+				case B_STAT_CHANGED:
+				case B_ATTR_CHANGED:
+				case B_DEVICE_MOUNTED:
+				case B_DEVICE_UNMOUNTED:
+				default:
+					BLooper::MessageReceived(msg);
+					break;
 			}
 		}
 	}
@@ -94,7 +98,7 @@ DeviceManager::AddDirectory(const node_ref *nref, _BDeviceAddOn_ *addon)
 
 
 status_t
-DeviceManager::RemoveDirectory(const node_ref * nref, _BDeviceAddOn_ *addon)
+DeviceManager::RemoveDirectory(const node_ref *nref, _BDeviceAddOn_ *addon)
 {
 	CALLED();
 	BDirectory directory(nref);
@@ -132,7 +136,7 @@ DeviceManager::DeviceManager()
 DeviceManager::~DeviceManager()
 {
 	_BDeviceAddOn_ *addon = NULL;
-	while ((addon = (_BDeviceAddOn_ *)fDeviceAddons.RemoveItem((int32)0)) !=NULL)
+	while ((addon = (_BDeviceAddOn_ *)fDeviceAddons.RemoveItem((int32)0)) != NULL)
 		delete addon;
 }
 
@@ -154,9 +158,8 @@ DeviceManager::SaveState()
 }
 
 
-status_t 
-DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon, 
-				const char *device)
+status_t
+DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon, const char *device)
 {
 	CALLED();
 	status_t err;
@@ -173,7 +176,7 @@ DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon,
 			PRINTERR(("DeviceManager::StartMonitoringDevice SetTo error %s: %s\n", path.Path(), strerror(err)));
 			return err;
 		}
-	if ((err = create_directory(path.Path(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) != B_OK
+		if ((err = create_directory(path.Path(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) != B_OK
 			|| (err = directory.SetTo(path.Path())) != B_OK) {
 			PRINTERR(("DeviceManager::StartMonitoringDevice CreateDirectory error %s: %s\n", path.Path(), strerror(err)));
 			return err;
@@ -184,7 +187,7 @@ DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon,
 		PRINTERR(("DeviceManager::StartMonitoringDevice GetNodeRef error %s: %s\n", path.Path(), strerror(err)));
 		return err;
 	}
-	
+
 	// test if already monitored
 	bool alreadyMonitored = false;
 	_BDeviceAddOn_ *tmpaddon = NULL;
@@ -200,19 +203,19 @@ DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon,
 			}
 		}
 		if (alreadyMonitored)
-			break;				
+			break;
 	}
-	
+
 	// monitor if needed
 	if (!alreadyMonitored) {
-		if ((err = AddDirectory(&nref, addon)) != B_OK) 
+		if ((err = AddDirectory(&nref, addon)) != B_OK)
 			return err;
 	}
-			
+
 	// add addon in list
 	if (!fDeviceAddons.HasItem(addon))
 		fDeviceAddons.AddItem(addon);
-	
+
 	// add dir ref in list
 	int32 j=0;
 	node_ref *dnref = NULL;
@@ -223,37 +226,35 @@ DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon,
 			break;
 		}
 	}
-	
-	if (!alreadyMonitored) {
+
+	if (!alreadyMonitored)
 		addon->fMonitoredRefs.AddItem(new node_ref(nref));
-	}
-	
+
 	return B_OK;
 }
 
 
-status_t 
-DeviceManager::StopMonitoringDevice(_BDeviceAddOn_ *addon, 
-				const char *device)
+status_t
+DeviceManager::StopMonitoringDevice(_BDeviceAddOn_ *addon, const char *device)
 {
 	CALLED();
 	status_t err;
 	node_ref nref;
 	BDirectory directory;
 	BPath path("/dev");
-	if (((err = path.Append(device)) != B_OK)
-		|| ((err = directory.SetTo(path.Path())) != B_OK)
-		|| ((err = directory.GetNodeRef(&nref)) != B_OK))
+	if ((err = path.Append(device)) != B_OK
+		|| (err = directory.SetTo(path.Path())) != B_OK
+		|| (err = directory.GetNodeRef(&nref)) != B_OK)
 		return err;
-		
+
 	// test if still monitored
 	bool stillMonitored = false;
 	_BDeviceAddOn_ *tmpaddon = NULL;
 	int32 i = 0;
-	while ((tmpaddon = (_BDeviceAddOn_ *)fDeviceAddons.ItemAt(i++)) !=NULL) {
+	while ((tmpaddon = (_BDeviceAddOn_ *)fDeviceAddons.ItemAt(i++)) != NULL) {
 		if (addon == tmpaddon)
 			continue;
-			
+
 		int32 j=0;
 		node_ref *dnref = NULL;
 		while ((dnref = (node_ref *)tmpaddon->fMonitoredRefs.ItemAt(j++)) != NULL) {
@@ -265,10 +266,10 @@ DeviceManager::StopMonitoringDevice(_BDeviceAddOn_ *addon,
 		if (stillMonitored)
 			break;
 	}
-	
+
 	// remove from list
 	node_ref *dnref = NULL;
-	int32 j=0;
+	int32 j = 0;
 	while ((dnref = (node_ref *)addon->fMonitoredRefs.ItemAt(j)) != NULL) {
 		if (*dnref == nref) {
 			addon->fMonitoredRefs.RemoveItem(j);
@@ -278,15 +279,14 @@ DeviceManager::StopMonitoringDevice(_BDeviceAddOn_ *addon,
 		j++;
 	}
 
-	if (addon->fMonitoredRefs.IsEmpty()) {
+	if (addon->fMonitoredRefs.IsEmpty())
 		fDeviceAddons.RemoveItem(addon);
-	}
-	
+
 	// stop monitoring if needed
 	if (!stillMonitored) {
 		if ((err = RemoveDirectory(&nref, addon)) != B_OK)
 			return err;
-	} 
-		
+	}
+
 	return B_OK;
 }
