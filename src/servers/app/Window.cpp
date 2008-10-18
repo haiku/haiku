@@ -1436,12 +1436,19 @@ Window::HasModal() const
 /*!	\brief Returns the windows that's in behind of the backmost position
 		this window can get.
 	Returns NULL is this window can be the backmost window.
+
+	\param workspace the workspace on which this check should be made. If
+		the value is -1, the window's current workspace will be used.
 */
 Window*
 Window::Backmost(Window* window, int32 workspace)
 {
 	if (workspace == -1)
 		workspace = fCurrentWorkspace;
+
+	ASSERT(workspace != -1);
+	if (workspace == -1)
+		return NULL;
 
 	// Desktop windows are always backmost
 	if (fFeel == kDesktopWindowFeel)
@@ -1465,12 +1472,19 @@ Window::Backmost(Window* window, int32 workspace)
 /*!	\brief Returns the windows that's in front of the frontmost position
 		this window can get.
 	Returns NULL if this window can be the frontmost window.
+
+	\param workspace the workspace on which this check should be made. If
+		the value is -1, the window's current workspace will be used.
 */
 Window*
 Window::Frontmost(Window* first, int32 workspace)
 {
 	if (workspace == -1)
 		workspace = fCurrentWorkspace;
+
+	ASSERT(workspace != -1);
+	if (workspace == -1)
+		return NULL;
 
 	if (fFeel == kDesktopWindowFeel)
 		return first ? first : NextWindow(workspace);
