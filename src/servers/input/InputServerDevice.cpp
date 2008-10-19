@@ -1,18 +1,68 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
-
-#include "InputServer.h"
 
 #include <InputServerDevice.h>
 
 #include <new>
 
+#include <Directory.h>
+#include <Path.h>
+
+#include "InputServer.h"
+
+
+DeviceAddOn::DeviceAddOn(BInputServerDevice *device)
+	:
+	fDevice(device)
+{
+}
+
+
+DeviceAddOn::~DeviceAddOn()
+{
+	while (const char* path = fMonitoredPaths.PathAt(0)) {
+		gInputServer->AddOnManager()->StopMonitoringDevice(this, path);
+	}
+}
+
+
+bool
+DeviceAddOn::HasPath(const char* path) const
+{
+	return fMonitoredPaths.HasPath(path);
+}
+
+
+status_t
+DeviceAddOn::AddPath(const char* path)
+{
+	return fMonitoredPaths.AddPath(path);
+}
+
+
+status_t
+DeviceAddOn::RemovePath(const char* path)
+{
+	return fMonitoredPaths.RemovePath(path);
+}
+
+
+int32
+DeviceAddOn::CountPaths() const
+{
+	return fMonitoredPaths.CountPaths();
+}
+
+
+//	#pragma mark -
+
+
 BInputServerDevice::BInputServerDevice()
 {
-	fOwner = new (std::nothrow) _BDeviceAddOn_(this);
+	fOwner = new(std::nothrow) DeviceAddOn(this);
 }
 
 
@@ -94,15 +144,41 @@ BInputServerDevice::StartMonitoringDevice(const char* device)
 	CALLED();
 	PRINT(("StartMonitoringDevice %s\n", device));
 
-	return InputServer::gDeviceManager.StartMonitoringDevice(fOwner, device);
+	return gInputServer->AddOnManager()->StartMonitoringDevice(fOwner, device);
 }
 
 
 status_t
 BInputServerDevice::StopMonitoringDevice(const char* device)
 {
-	CALLED();
-	return InputServer::gDeviceManager.StopMonitoringDevice(fOwner, device);
+	return gInputServer->AddOnManager()->StopMonitoringDevice(fOwner, device);
+}
+
+
+status_t
+BInputServerDevice::AddDevices(const char* path)
+{
+	BDirectory directory;
+	status_t status = directory.SetTo(path);
+	if (status != B_OK)
+		return status;
+
+	BEntry entry;
+	while (directory.GetNextEntry(&entry) == B_OK) {
+		BPath entryPath(&entry);
+
+		if (entry.IsDirectory()) {
+			AddDevices(entryPath.Path());
+		} else {
+			BMessage added(B_NODE_MONITOR);
+			added.AddInt32("opcode", B_ENTRY_CREATED);
+			added.AddString("path", entryPath.Path());
+
+			Control(NULL, NULL, B_INPUT_DEVICE_ADDED, &added);
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -110,4 +186,3 @@ void BInputServerDevice::_ReservedInputServerDevice1() {}
 void BInputServerDevice::_ReservedInputServerDevice2() {}
 void BInputServerDevice::_ReservedInputServerDevice3() {}
 void BInputServerDevice::_ReservedInputServerDevice4() {}
-

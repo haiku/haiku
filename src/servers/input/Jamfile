@@ -54,7 +54,6 @@ Server input_server :
 	InputServerMethod.cpp
 
 	AddOnManager.cpp
-	DeviceManager.cpp
 
 	MouseSettings.cpp
 	KeyboardSettings.cpp
@@ -62,6 +61,8 @@ Server input_server :
 	MethodReplicant.cpp
 	MethodMenuItem.cpp
 	BottomlineWindow.cpp
+
+	PathList.cpp
 
 	# storage
 	AddOnMonitor.cpp

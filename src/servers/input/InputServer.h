@@ -1,18 +1,16 @@
 /*
- * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef INPUT_SERVER_APP_H
 #define INPUT_SERVER_APP_H
 
-// #define DEBUG 1
 
-#include "AddOnManager.h"
-#include "DeviceManager.h"
-#include "KeyboardSettings.h"
-#include "MouseSettings.h"
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-#include "shared_cursor_area.h"
+//#define DEBUG 1
 
 #include <Application.h>
 #include <Debug.h>
@@ -28,9 +26,12 @@
 #include <Screen.h>
 #include <SupportDefs.h>
 
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <shared_cursor_area.h>
+
+#include "AddOnManager.h"
+#include "KeyboardSettings.h"
+#include "MouseSettings.h"
+#include "PathList.h"
 
 
 #define INPUTSERVER_SIGNATURE "application/x-vnd.Be-input_server"
@@ -65,14 +66,26 @@ class InputDeviceListItem {
 		bool 				fRunning;
 };
 
-class _BDeviceAddOn_ {
-	public:
-		_BDeviceAddOn_(BInputServerDevice *device)
-			: fDevice(device) {}
+namespace BPrivate {
 
-		BInputServerDevice* fDevice;
-		BList fMonitoredRefs;
+class DeviceAddOn {
+public:
+								DeviceAddOn(BInputServerDevice* device);
+								~DeviceAddOn();
+
+			bool				HasPath(const char* path) const;
+			status_t			AddPath(const char* path);
+			status_t			RemovePath(const char* path);
+			int32				CountPaths() const;
+
+			BInputServerDevice*	Device() { return fDevice; }
+
+private:
+			BInputServerDevice*	fDevice;
+			PathList			fMonitoredPaths;
 };
+
+}	// namespace BPrivate
 
 class _BMethodAddOn_ {
 	public:
@@ -109,7 +122,7 @@ class InputServer : public BApplication {
 
 		virtual bool QuitRequested();
 		virtual void ReadyToRun();
-		virtual void MessageReceived(BMessage* message); 
+		virtual void MessageReceived(BMessage* message);
 
 		void HandleSetMethod(BMessage* message);
 		status_t HandleGetSetMouseType(BMessage* message, BMessage* reply);
@@ -156,13 +169,13 @@ class InputServer : public BApplication {
 
 		bool SafeMode();
 
+		::AddOnManager* AddOnManager() { return fAddOnManager; }
+
 		static BList gInputFilterList;
 		static BLocker gInputFilterListLocker;
 
 		static BList gInputMethodList;
 		static BLocker gInputMethodListLocker;
-
-		static DeviceManager gDeviceManager;
 
 		static KeymapMethod gKeymapMethod;
 
@@ -215,7 +228,7 @@ class InputServer : public BApplication {
 
 		port_id      	fEventLooperPort;
 
-		AddOnManager*	fAddOnManager;
+		::AddOnManager*	fAddOnManager;
 
 		BScreen			fScreen;
 		BRect			fFrame;
@@ -259,7 +272,7 @@ extern InputServer* gInputServer;
 #		define PRINT(x)	_iprint x
 #	else
 #		undef PRINT
-#		define PRINT(x)	SERIAL_PRINT(x)	
+#		define PRINT(x)	SERIAL_PRINT(x)
 #	endif
 #	define PRINTERR(x)		PRINT(x)
 #	define EXIT()          PRINT(("EXIT %s\n", __PRETTY_FUNCTION__))

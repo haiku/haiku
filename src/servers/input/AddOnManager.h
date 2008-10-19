@@ -1,15 +1,14 @@
 /*
- * Copyright 2004-2005, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marcus Overhagen, Axel Dörfler
+ *		Marcus Overhagen
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Jérôme Duval
  */
-#ifndef _ADD_ON_MANAGER_H
-#define _ADD_ON_MANAGER_H
-
-// Manager for input_server add-ons (devices, filters, methods)
+#ifndef ADD_ON_MANAGER_H
+#define ADD_ON_MANAGER_H
 
 
 #include <InputServerDevice.h>
@@ -18,74 +17,114 @@
 #include <Locker.h>
 #include <Looper.h>
 
-#include "AddOnMonitor.h"
-#include "AddOnMonitorHandler.h"
-#include "TList.h"
+#include <AddOnMonitor.h>
+#include <AddOnMonitorHandler.h>
 
+#include "PathList.h"
+
+
+using namespace BPrivate;
 
 class AddOnManager : public BLooper {
-	public:
-		AddOnManager(bool safeMode);
-		~AddOnManager();
+public:
+								AddOnManager(bool safeMode);
+								~AddOnManager();
 
-		void		LoadState();
-		void		SaveState();
-		void 		MessageReceived(BMessage *message);
+			void				LoadState();
+			void				SaveState();
 
-	private:
-		status_t	RegisterAddOn(BEntry &entry);
-		status_t	UnregisterAddOn(BEntry &entry);
-		void		RegisterAddOns();
-		void		UnregisterAddOns();
+			void 				MessageReceived(BMessage* message);
 
-		void		RegisterDevice(BInputServerDevice *isd, const entry_ref &ref, image_id addon_image);
-		void		RegisterFilter(BInputServerFilter *isf, const entry_ref &ref, image_id addon_image);
-		void		RegisterMethod(BInputServerMethod *ism, const entry_ref &ref, image_id addon_image);
+			status_t			StartMonitoringDevice(DeviceAddOn* addOn,
+									const char* device);
+			status_t			StopMonitoringDevice(DeviceAddOn* addOn,
+									const char* device);
 
-		status_t HandleFindDevices(BMessage*, BMessage*);
-		status_t HandleWatchDevices(BMessage*, BMessage*);
-		status_t HandleIsDeviceRunning(BMessage*, BMessage*);
-		status_t HandleStartStopDevices(BMessage*, BMessage*);
-		status_t HandleControlDevices(BMessage*, BMessage*);
-		status_t HandleSystemShuttingDown(BMessage*, BMessage*);
-		status_t HandleMethodReplicant(BMessage*, BMessage*);
-		status_t HandleNodeMonitor(BMessage*);
+private:
+			void				_RegisterAddOns();
+			void				_UnregisterAddOns();
 
-		void LoadReplicant();
-		void UnloadReplicant();
-		int32 GetReplicantAt(BMessenger target, int32 index) const;
-		status_t GetReplicantName(BMessenger target, int32 uid, BMessage *reply) const;
-		status_t GetReplicantView(BMessenger target, int32 uid, BMessage *reply) const;
+			status_t			_RegisterAddOn(BEntry& entry);
+			status_t			_UnregisterAddOn(BEntry& entry);
 
-	private:
-		class InputServerMonitorHandler;
-		friend class InputServerMonitorHandler;
+			bool				_IsDevice(const char* path) const;
+			bool				_IsFilter(const char* path) const;
+			bool				_IsMethod(const char* path) const;
 
-		struct device_info {
-			entry_ref ref;
-			image_id addon_image;
-			BInputServerDevice *device;
-		};
-		struct filter_info {
-			entry_ref ref;
-			image_id addon_image;
-			BInputServerFilter *filter;
-		};
-		struct method_info {
-			entry_ref ref;
-			image_id addon_image;
-			BInputServerMethod *method;
-		};
+			status_t			_RegisterDevice(BInputServerDevice* device,
+									const entry_ref& ref, image_id image);
+			status_t			_RegisterFilter(BInputServerFilter* filter,
+									const entry_ref& ref, image_id image);
+			status_t			_RegisterMethod(BInputServerMethod* method,
+									const entry_ref& ref, image_id image);
 
-		BLocker fLock;
-		List<device_info> fDeviceList;
-		List<filter_info> fFilterList;
-		List<method_info> fMethodList;
+			status_t			_HandleFindDevices(BMessage* message,
+									BMessage* reply);
+			status_t			_HandleWatchDevices(BMessage* message,
+									BMessage* reply);
+			status_t			_HandleIsDeviceRunning(BMessage* message,
+									BMessage* reply);
+			status_t			_HandleStartStopDevices(BMessage* message,
+									BMessage* reply);
+			status_t			_HandleControlDevices(BMessage* message,
+									BMessage* reply);
+			status_t			_HandleSystemShuttingDown(BMessage* message,
+									BMessage* reply);
+			status_t			_HandleMethodReplicant(BMessage* message,
+									BMessage* reply);
+			void				_HandleDeviceMonitor(BMessage* message);
 
-		AddOnMonitorHandler	*fHandler;
-		AddOnMonitor		*fAddOnMonitor;
+			void				_LoadReplicant();
+			void				_UnloadReplicant();
+			int32				_GetReplicantAt(BMessenger target,
+									int32 index) const;
+			status_t			_GetReplicantName(BMessenger target,
+									int32 uid, BMessage* reply) const;
+			status_t			_GetReplicantView(BMessenger target, int32 uid,
+									BMessage* reply) const;
 
-		bool fSafeMode;
+			status_t			_AddDevicePath(DeviceAddOn* addOn,
+									const char* path, bool& newPath);
+			status_t			_RemoveDevicePath(DeviceAddOn* addOn,
+									const char* path, bool& lastPath);
+
+private:
+	class MonitorHandler;
+	friend class MonitorHandler;
+
+	template<typename T> struct add_on_info {
+		add_on_info()
+			:
+			image(-1), add_on(NULL)
+		{
+		}
+
+		~add_on_info()
+		{
+			delete add_on;
+			if (image >= 0)
+				unload_add_on(image);
+		}
+
+		entry_ref				ref;
+		image_id				image;
+		T*						add_on;
+	};
+	typedef struct add_on_info<BInputServerDevice> device_info;
+	typedef struct add_on_info<BInputServerFilter> filter_info;
+	typedef struct add_on_info<BInputServerMethod> method_info;
+
+			BObjectList<device_info> fDeviceList;
+			BObjectList<filter_info> fFilterList;
+			BObjectList<method_info> fMethodList;
+
+			BObjectList<DeviceAddOn> fDeviceAddOns;
+			PathList			fDevicePaths;
+
+			MonitorHandler*		fHandler;
+			AddOnMonitor*		fAddOnMonitor;
+
+			bool fSafeMode;
 };
 
-#endif // _ADD_ON_MANAGER_H
+#endif	// ADD_ON_MANAGER_H

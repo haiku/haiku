@@ -58,8 +58,6 @@ BLocker InputServer::gInputFilterListLocker("is_filter_queue_sem");
 BList InputServer::gInputMethodList;
 BLocker InputServer::gInputMethodListLocker("is_method_queue_sem");
 
-DeviceManager InputServer::gDeviceManager;
-
 KeymapMethod InputServer::gKeymapMethod;
 
 
@@ -180,8 +178,6 @@ InputServer::InputServer()
 			fSafeMode = true;
 	}
 
-	gDeviceManager.LoadState();
-
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	if (has_data(find_thread(NULL))) {
 		PRINT(("HasData == YES\n"));
@@ -218,8 +214,11 @@ InputServer::InputServer()
 
 	_InitKeyboardMouseStates();
 
-	fAddOnManager = new AddOnManager(SafeMode());
-	fAddOnManager->LoadState();
+	fAddOnManager = new(std::nothrow) ::AddOnManager(SafeMode());
+	if (fAddOnManager != NULL) {
+		fAddOnManager->Run();
+		fAddOnManager->LoadState();
+	}
 
 	BMessenger messenger(this);
 	BRoster().StartWatching(messenger, B_REQUEST_LAUNCHED);
@@ -229,8 +228,10 @@ InputServer::InputServer()
 InputServer::~InputServer()
 {
 	CALLED();
-	fAddOnManager->Lock();
-	fAddOnManager->Quit();
+	if (fAddOnManager != NULL) {
+		fAddOnManager->Lock();
+		fAddOnManager->Quit();
+	}
 
 	_ReleaseInput(NULL);
 }
@@ -395,7 +396,6 @@ InputServer::QuitRequested()
 		return false;
 	} else {
 		fAddOnManager->SaveState();
-		gDeviceManager.SaveState();
 
 		delete_port(fEventLooperPort);
 			// the event looper thread will exit after this
