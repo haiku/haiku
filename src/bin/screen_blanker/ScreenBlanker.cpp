@@ -55,7 +55,7 @@ ScreenBlanker::~ScreenBlanker()
 
 
 void
-ScreenBlanker::ReadyToRun() 
+ScreenBlanker::ReadyToRun()
 {
 	if (!fSettings.Load()) {
 		fprintf(stderr, "could not load settings\n");
@@ -113,19 +113,18 @@ ScreenBlanker::_SetDPMSMode(uint32 mode)
 
 
 void
-ScreenBlanker::_ShowPasswordWindow() 
+ScreenBlanker::_ShowPasswordWindow()
 {
 	_TurnOnScreen();
 
 	if (fWindow->Lock()) {
 		fRunner->Suspend();
 
-		if (fWindow->SetFullScreen(false) == B_OK) {
-			fWindow->Sync();
-				// TODO: is that needed?
-			ShowCursor();
-			fPasswordWindow->Show();
-		}
+		fWindow->Sync();
+			// TODO: is that needed?
+		ShowCursor();
+		fPasswordWindow->Show();
+
 		fWindow->Unlock();
 	}
 
@@ -228,10 +227,8 @@ ScreenBlanker::MessageReceived(BMessage* message)
 
 		case kMsgResumeSaver:
 			if (fWindow->Lock()) {
-				if (fWindow->SetFullScreen(true) == B_OK) {
-					HideCursor();
-					fPasswordWindow->Hide();
-				}
+				HideCursor();
+				fPasswordWindow->Hide();
 
 				fRunner->Resume();
 				fWindow->Unlock();
@@ -272,7 +269,7 @@ ScreenBlanker::QuitRequested()
 
 
 void
-ScreenBlanker::_Shutdown() 
+ScreenBlanker::_Shutdown()
 {
 	delete fRunner;
 
@@ -289,7 +286,7 @@ ScreenBlanker::_Shutdown()
 
 
 int
-main(int, char**) 
+main(int, char**)
 {
 	ScreenBlanker app;
 	app.Run();
