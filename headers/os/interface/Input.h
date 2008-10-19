@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2008, Haiku, Inc.
+ * Copyright 2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  */
-
 #ifndef _INPUT_H
 #define _INPUT_H
+
 
 #include <BeBuild.h>
 #include <Messenger.h>
@@ -45,33 +45,32 @@ status_t		watch_input_devices(BMessenger target, bool start);
 
 class BInputDevice {
 public:
-							~BInputDevice();
+								~BInputDevice();
 
-	const char*				Name() const;
-	input_device_type		Type() const;
-	bool					IsRunning() const;
+			const char*			Name() const;
+			input_device_type	Type() const;
+			bool				IsRunning() const;
 
-	status_t				Start();
-	status_t				Stop();
-	status_t				Control(uint32 code, BMessage* message);
-	
-	static status_t			Start(input_device_type type);
-	static status_t			Stop(input_device_type type);
-	static status_t			Control(input_device_type type, 
-									uint32 code, 
+			status_t			Start();
+			status_t			Stop();
+			status_t			Control(uint32 code, BMessage* message);
+
+	static	status_t			Start(input_device_type type);
+	static	status_t			Stop(input_device_type type);
+	static	status_t			Control(input_device_type type, uint32 code,
 									BMessage* message);
-									
-private:
-	friend BInputDevice*	find_input_device(const char* name);
-	friend status_t			get_input_devices(BList* list);
 
-							BInputDevice();
-	void					_SetNameAndType(const char* name,
-											  input_device_type	type);
-											  
-	char*					fName;
-	input_device_type		fType;
-	uint32					_reserved[4];
+private:
+	friend BInputDevice* find_input_device(const char* name);
+	friend status_t get_input_devices(BList* list);
+
+								BInputDevice();
+			void				_SetNameAndType(const char* name,
+									input_device_type type);
+
+			char*				fName;
+			input_device_type	fType;
+			uint32				_reserved[4];
 };
 
-#endif
+#endif	// _INPUT_H
