@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Jérôme Duval. All rights reserved.
+ * Copyright 2004-2008, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KEYBOARD_INPUT_DEVICE_H
@@ -15,80 +15,67 @@
 #include <Locker.h>
 #include <List.h>
 
-#include <stdio.h>
+#include <ObjectList.h>
 
 
 class KeyboardInputDevice;
 
 struct keyboard_device : public BHandler {
-	keyboard_device(const char *path);
-	virtual ~keyboard_device();	
+							keyboard_device(const char* path);
+	virtual					~keyboard_device();
 
-	virtual void MessageReceived(BMessage* message);
-	status_t EnqueueInlineInputMethod(int32 opcode, const char* string = NULL,
-		bool confirmed = false, BMessage* keyDown = NULL);
+	virtual	void			MessageReceived(BMessage* message);
+			status_t		EnqueueInlineInputMethod(int32 opcode,
+								const char* string = NULL,
+								bool confirmed = false,
+								BMessage* keyDown = NULL);
 
-	KeyboardInputDevice *owner;
-	input_device_ref device_ref;
-	char path[B_PATH_NAME_LENGTH];
-	int fd;
-	thread_id device_watcher;
-	kb_settings settings;
-	volatile bool active;
-	bool isAT;
-	volatile bool input_method_started;
-	uint32 modifiers;
+	KeyboardInputDevice*	owner;
+	input_device_ref		device_ref;
+	char					path[B_PATH_NAME_LENGTH];
+	int						fd;
+	thread_id				device_watcher;
+	kb_settings				settings;
+	volatile bool			active;
+	bool					isAT;
+	volatile bool			input_method_started;
+	uint32					modifiers;
 };
 
 
 class KeyboardInputDevice : public BInputServerDevice {
-	public:
-		KeyboardInputDevice();
-		~KeyboardInputDevice();
+public:
+							KeyboardInputDevice();
+							~KeyboardInputDevice();
 
-		virtual status_t InitCheck();
+	virtual	status_t		InitCheck();
 
-		virtual status_t Start(const char *name, void *cookie);
-		virtual status_t Stop(const char *name, void *cookie);
+	virtual	status_t		Start(const char* name, void* cookie);
+	virtual status_t		Stop(const char* name, void* cookie);
 
-		virtual status_t Control(const char *name, void *cookie,
-			uint32 command, BMessage *message);
+	virtual status_t		Control(const char* name, void* cookie,
+								uint32 command, BMessage* message);
 
-		virtual status_t SystemShuttingDown();
+	virtual status_t		SystemShuttingDown();
 
-#ifdef DEBUG							 
-		static FILE *sLogFile;
-#endif
+private:
+			status_t		_HandleMonitor(BMessage* message);
+			status_t		_InitFromSettings(void* cookie, uint32 opcode = 0);
+			void			_RecursiveScan(const char* directory);
 
-	private:
-		status_t _HandleMonitor(BMessage *message);
-		status_t _InitFromSettings(void *cookie, uint32 opcode = 0);
-		void _RecursiveScan(const char *directory);
+			status_t		_AddDevice(const char* path);
+			status_t		_RemoveDevice(const char* path);
 
-		status_t _AddDevice(const char *path);
-		status_t _RemoveDevice(const char *path);
+			void			_SetLeds(keyboard_device* device);
 
-		static int32 _DeviceWatcher(void *arg);
+	static	int32			_DeviceWatcher(void* arg);
 
-		void _SetLeds(keyboard_device *device);
-
-		BList fDevices;
-		Keymap	fKeymap;
-		TMWindow *fTMWindow;
-		BLocker	fKeymapLock;
+			BObjectList<keyboard_device> fDevices;
+			Keymap			fKeymap;
+			TMWindow*		fTeamMonitorWindow;
+			BLocker			fKeymapLock;
 };
 
-extern "C" BInputServerDevice *instantiate_input_device();
-
-#if DEBUG
-	inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
-		fputs(buf, KeyboardInputDevice::sLogFile); fflush(KeyboardInputDevice::sLogFile); }
-	#define LOG_ERR(text...) LOG(text)
-#else
-	#define LOG(text...)
-	#define LOG_ERR(text...) fprintf(stderr, text)
-#endif
-
-#define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
+extern "C" BInputServerDevice* instantiate_input_device();
 
 #endif	// KEYBOARD_INPUT_DEVICE_H

@@ -1,11 +1,18 @@
 /*
  * Copyright 2004-2006, Jérôme Duval. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
+ *
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "KeyboardInputDevice.h"
-#include "kb_mouse_driver.h"
+
+#include <errno.h>
+#include <new>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include <Application.h>
 #include <Autolock.h>
@@ -15,22 +22,23 @@
 #include <Path.h>
 #include <String.h>
 
-#include <errno.h>
-#include <new>
-#include <stdlib.h>
-#include <unistd.h>
+#include "kb_mouse_driver.h"
 
 
-#if DEBUG
-FILE *KeyboardInputDevice::sLogFile = NULL;
+//#define TRACE_KEYBOARD_DEVICE
+#ifdef TRACE_KEYBOARD_DEVICE
+#	define LOG(text...) debug_printf(text)
+#	define LOG_ERR(text...) LOG(text)
+#else
+#	define LOG(text...) do {} while (0)
+#	define LOG_ERR(text...) debug_printf(text)
 #endif
 
-const static uint32 kKeyboardThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
-const static char *kKeyboardDevicesDirectory = "/dev/input/keyboard";
+#define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
-// "/dev/" is automatically prepended by StartMonitoringDevice()
-const static char *kKeyboardDevicesDirectoryPS2 = "input/keyboard/at";
-const static char *kKeyboardDevicesDirectoryUSB = "input/keyboard/usb";
+
+const static uint32 kKeyboardThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
+const static char* kKeyboardDevicesDirectory = "/dev/input/keyboard";
 
 const static uint32 kATKeycodeMap[] = {
 	0x1,	// Esc
@@ -57,7 +65,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x2d,	// U
 	0x2e,	// I
 	0x2f,	// O
-	0x30,	// P 
+	0x30,	// P
 	0x31,   // [
 	0x32,	// ]
 	0x47,	// ENTER
@@ -327,16 +335,15 @@ const static uint32 kATKeycodeMap[] = {
 };
 
 
-extern "C"
-BInputServerDevice *
+extern "C" BInputServerDevice*
 instantiate_input_device()
 {
-	return new (std::nothrow) KeyboardInputDevice();
+	return new(std::nothrow) KeyboardInputDevice();
 }
 
 
-static char *
-get_short_name(const char *longName)
+static char*
+get_short_name(const char* longName)
 {
 	CALLED();
 	BString string(longName);
@@ -366,57 +373,47 @@ get_short_name(const char *longName)
 
 KeyboardInputDevice::KeyboardInputDevice()
 	:
-	fTMWindow(NULL),
+	fDevices(2, true),
+	fTeamMonitorWindow(NULL),
 	fKeymapLock("keymap lock")
 {
-#if DEBUG
-	if (sLogFile == NULL)
-		sLogFile = fopen("/var/log/keyboard_device_log.log", "a");
-#endif
 	CALLED();
+
+	StartMonitoringDevice(kKeyboardDevicesDirectory);
+	_RecursiveScan(kKeyboardDevicesDirectory);
 }
 
 
 KeyboardInputDevice::~KeyboardInputDevice()
 {
 	CALLED();
-	StopMonitoringDevice(kKeyboardDevicesDirectoryUSB);
-	StopMonitoringDevice(kKeyboardDevicesDirectoryPS2);
-
-	int count = fDevices.CountItems();
-	while (count-- > 0) {
-		delete (keyboard_device *)fDevices.RemoveItem((int32)0);
-	}
-
-#if DEBUG	
-	fclose(sLogFile);
-#endif
+	StopMonitoringDevice(kKeyboardDevicesDirectory);
 }
 
 
-status_t 
+status_t
 KeyboardInputDevice::SystemShuttingDown()
 {
 	CALLED();
-	if (fTMWindow)
-		fTMWindow->PostMessage(SYSTEM_SHUTTING_DOWN);
+	if (fTeamMonitorWindow)
+		fTeamMonitorWindow->PostMessage(SYSTEM_SHUTTING_DOWN);
 
 	return B_OK;
 }
 
 
 status_t
-KeyboardInputDevice::_InitFromSettings(void *cookie, uint32 opcode)
+KeyboardInputDevice::_InitFromSettings(void* cookie, uint32 opcode)
 {
 	CALLED();
 
-	keyboard_device *device = (keyboard_device *)cookie;
+	keyboard_device* device = (keyboard_device*)cookie;
 
 	if (opcode == 0 || opcode == B_KEY_REPEAT_RATE_CHANGED) {
 		if (get_key_repeat_rate(&device->settings.key_repeat_rate) != B_OK)
 			LOG_ERR("error when get_key_repeat_rate\n");
 		else if (ioctl(device->fd, KB_SET_KEY_REPEAT_RATE,
-				&device->settings.key_repeat_rate) != B_OK)
+			&device->settings.key_repeat_rate) != B_OK)
 			LOG_ERR("error when KB_SET_KEY_REPEAT_RATE, fd:%d\n", device->fd);
 	}
 
@@ -424,12 +421,11 @@ KeyboardInputDevice::_InitFromSettings(void *cookie, uint32 opcode)
 		if (get_key_repeat_delay(&device->settings.key_repeat_delay) != B_OK)
 			LOG_ERR("error when get_key_repeat_delay\n");
 		else if (ioctl(device->fd, KB_SET_KEY_REPEAT_DELAY,
-				&device->settings.key_repeat_delay) != B_OK)
+			&device->settings.key_repeat_delay) != B_OK)
 			LOG_ERR("error when KB_SET_KEY_REPEAT_DELAY, fd:%d\n", device->fd);
 	}
 
-	if (opcode == 0 
-		|| opcode == B_KEY_MAP_CHANGED 
+	if (opcode == 0 || opcode == B_KEY_MAP_CHANGED
 		|| opcode == B_KEY_LOCKS_CHANGED) {
 		BAutolock lock(fKeymapLock);
 		fKeymap.LoadCurrent();
@@ -445,25 +441,15 @@ status_t
 KeyboardInputDevice::InitCheck()
 {
 	CALLED();
-	status_t status = BInputServerDevice::InitCheck();
-	if (status < B_OK)
-		return status;
-
-	// TODO: this doesn't belong here!
-	_RecursiveScan(kKeyboardDevicesDirectory);
-
-	StartMonitoringDevice(kKeyboardDevicesDirectoryPS2);
-	StartMonitoringDevice(kKeyboardDevicesDirectoryUSB);
-
-	return B_OK;
+	return BInputServerDevice::InitCheck();
 }
 
 
 status_t
-KeyboardInputDevice::Start(const char *name, void *cookie)
+KeyboardInputDevice::Start(const char* name, void* cookie)
 {
 	CALLED();
-	keyboard_device *device = (keyboard_device *)cookie;
+	keyboard_device* device = (keyboard_device*)cookie;
 
 	if ((device->fd = open(device->path, O_RDWR)) < B_OK) {
 		fprintf(stderr, "error when opening %s: %s\n", device->path, strerror(errno));
@@ -487,10 +473,10 @@ KeyboardInputDevice::Start(const char *name, void *cookie)
 
 
 status_t
-KeyboardInputDevice::Stop(const char *name, void *cookie)
+KeyboardInputDevice::Stop(const char* name, void* cookie)
 {
 	CALLED();
-	keyboard_device *device = (keyboard_device *)cookie;
+	keyboard_device* device = (keyboard_device*)cookie;
 
 	LOG("Stop(%s)\n", name);
 
@@ -505,9 +491,9 @@ KeyboardInputDevice::Stop(const char *name, void *cookie)
 		wait_for_thread(device->device_watcher, &dummy);
 	}
 
-	if (fTMWindow) {
-		fTMWindow->PostMessage(B_QUIT_REQUESTED);
-		fTMWindow = NULL;
+	if (fTeamMonitorWindow) {
+		fTeamMonitorWindow->PostMessage(B_QUIT_REQUESTED);
+		fTeamMonitorWindow = NULL;
 	}
 
 	return B_OK;
@@ -515,15 +501,15 @@ KeyboardInputDevice::Stop(const char *name, void *cookie)
 
 
 status_t
-KeyboardInputDevice::Control(const char *name, void *cookie,
-	uint32 command, BMessage *message)
+KeyboardInputDevice::Control(const char* name, void* cookie,
+	uint32 command, BMessage* message)
 {
 	CALLED();
 	LOG("Control(%s, code: %lu)\n", name, command);
 
 	if (command == B_NODE_MONITOR)
 		_HandleMonitor(message);
-	else if (command >= B_KEY_MAP_CHANGED 
+	else if (command >= B_KEY_MAP_CHANGED
 		&& command <= B_KEY_REPEAT_RATE_CHANGED) {
 		_InitFromSettings(cookie, command);
 	}
@@ -532,57 +518,35 @@ KeyboardInputDevice::Control(const char *name, void *cookie,
 
 
 status_t
-KeyboardInputDevice::_HandleMonitor(BMessage *message)
+KeyboardInputDevice::_HandleMonitor(BMessage* message)
 {
 	CALLED();
-	int32 opcode = 0;
-	status_t status;
-	if ((status = message->FindInt32("opcode", &opcode)) < B_OK)
-		return status;
 
-	if (opcode != B_ENTRY_CREATED
-		&& opcode != B_ENTRY_REMOVED)
-		return B_OK;
-
-	BEntry entry;
-	BPath path;
-	dev_t device;
-	ino_t directory;
-	const char *name = NULL;
-
-	message->FindInt32("device", &device);
-	message->FindInt64("directory", &directory);
-	message->FindString("name", &name);
-
-	entry_ref ref(device, directory, name);
-
-	if ((status = entry.SetTo(&ref)) != B_OK)
-		return status;
-	if ((status = entry.GetPath(&path)) != B_OK)
-		return status;
-	if ((status = path.InitCheck()) != B_OK)
-		return status;
+	const char* path;
+	int32 opcode;
+	if (message->FindInt32("opcode", &opcode) != B_OK
+		|| opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED
+		|| message->FindString("path", &path) != B_OK)
+		return B_BAD_VALUE;
 
 	if (opcode == B_ENTRY_CREATED)
-		_AddDevice(path.Path());
-	else
-		_RemoveDevice(path.Path());
+		return _AddDevice(path);
 
-	return status;
+	return _RemoveDevice(path);
 }
 
 
 status_t
-KeyboardInputDevice::_AddDevice(const char *path)
+KeyboardInputDevice::_AddDevice(const char* path)
 {
 	CALLED();
-	keyboard_device *device = new (std::nothrow) keyboard_device(path);
+	keyboard_device* device = new(std::nothrow) keyboard_device(path);
 	if (device == NULL)
 		return B_NO_MEMORY;
 
 	device->owner = this;
 
-	input_device_ref *devices[2];
+	input_device_ref* devices[2];
 	devices[0] = &device->device_ref;
 	devices[1] = NULL;
 
@@ -593,22 +557,22 @@ KeyboardInputDevice::_AddDevice(const char *path)
 
 
 status_t
-KeyboardInputDevice::_RemoveDevice(const char *path)
+KeyboardInputDevice::_RemoveDevice(const char* path)
 {
 	CALLED();
-	keyboard_device *device;
-	for (int i = 0; (device = (keyboard_device *)fDevices.ItemAt(i)) != NULL; i++) {
+	keyboard_device* device;
+	for (int i = 0; (device = fDevices.ItemAt(i)) != NULL; i++) {
 		if (!strcmp(device->path, path)) {
-			fDevices.RemoveItem(device);
+			fDevices.RemoveItemAt(i);
 
-			input_device_ref *devices[2];
+			input_device_ref* devices[2];
 			devices[0] = &device->device_ref;
 			devices[1] = NULL;
 			UnregisterDevices(devices);
 
 			delete device;
 			return B_OK;
-		}	
+		}
 	}
 
 	return B_ENTRY_NOT_FOUND;
@@ -616,10 +580,10 @@ KeyboardInputDevice::_RemoveDevice(const char *path)
 
 
 /*static*/ int32
-KeyboardInputDevice::_DeviceWatcher(void *arg)
+KeyboardInputDevice::_DeviceWatcher(void* arg)
 {
 	CALLED();
-	keyboard_device* device = (keyboard_device *)arg;
+	keyboard_device* device = (keyboard_device*)arg;
 	KeyboardInputDevice* owner = device->owner;
 	uint8 buffer[16];
 	uint8 activeDeadKey = 0;
@@ -643,17 +607,17 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 		LOG("KB_READ :");
 
 		if (device->isAT) {
-			at_kbd_io *at_kbd = (at_kbd_io *)buffer;
-			if (at_kbd->scancode > 0)
-				keycode = kATKeycodeMap[at_kbd->scancode-1];
-			isKeyDown = at_kbd->is_keydown;
-			timestamp = at_kbd->timestamp;
-			LOG(" %02x", at_kbd->scancode);
+			at_kbd_io* atKeyboard = (at_kbd_io*)buffer;
+			if (atKeyboard->scancode > 0)
+				keycode = kATKeycodeMap[atKeyboard->scancode - 1];
+			isKeyDown = atKeyboard->is_keydown;
+			timestamp = atKeyboard->timestamp;
+			LOG(" %02x", atKeyboard->scancode);
 		} else {
-			raw_key_info *raw_kbd = (raw_key_info *)buffer;
-			isKeyDown = raw_kbd->is_keydown;
-			timestamp = raw_kbd->timestamp;
-			keycode = raw_kbd->be_keycode;
+			raw_key_info* rawKeyInfo= (raw_key_info*)buffer;
+			isKeyDown = rawKeyInfo->is_keydown;
+			timestamp = rawKeyInfo->timestamp;
+			keycode = rawKeyInfo->be_keycode;
 		}
 
 		if (keycode == 0)
@@ -671,7 +635,7 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 				}
 			}
 
-			if (noOtherKeyPressed) {		
+			if (noOtherKeyPressed) {
 				BMessenger deskbar("application/x-vnd.Be-TSKB");
 				if (deskbar.IsValid())
 					deskbar.SendMessage('BeMn');
@@ -692,11 +656,11 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 			LOG("TeamMonitor called\n");
 
 			// show the team monitor
-			if (owner->fTMWindow == NULL)
-				owner->fTMWindow = new (std::nothrow) TMWindow();
+			if (owner->fTeamMonitorWindow == NULL)
+				owner->fTeamMonitorWindow = new (std::nothrow) TMWindow();
 
-			if (owner->fTMWindow != NULL) {
-				owner->fTMWindow->Enable();
+			if (owner->fTeamMonitorWindow != NULL) {
+				owner->fTeamMonitorWindow->Enable();
 
 				// cancel timer only for R5
 				if (ioctl(device->fd, KB_CANCEL_CONTROL_ALT_DEL, NULL) == B_OK)
@@ -707,10 +671,10 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 		BAutolock lock(owner->fKeymapLock);
 
 		uint32 modifiers = keymap->Modifier(keycode);
-		if (modifiers 
-			&& (!(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) 
+		if (modifiers
+			&& (!(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK))
 				|| isKeyDown)) {
-			BMessage *msg = new BMessage;
+			BMessage* msg = new BMessage;
 			if (msg == NULL)
 				continue;
 
@@ -739,12 +703,13 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 			newDeadKey = keymap->IsDeadKey(keycode, device->modifiers);
 
 		if (newDeadKey == 0) {
-			char *string = NULL, *rawString = NULL;
+			char* string = NULL;
+			char* rawString = NULL;
 			int32 numBytes = 0, rawNumBytes = 0;
 			keymap->GetChars(keycode, device->modifiers, activeDeadKey, &string, &numBytes);
 			keymap->GetChars(keycode, 0, 0, &rawString, &rawNumBytes);
 
-			BMessage *msg = new BMessage;
+			BMessage* msg = new BMessage;
 			if (msg == NULL) {
 				free(string);
 				free(rawString);
@@ -796,7 +761,7 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 		} else if (isKeyDown) {
 			// start of a dead key
 			if (device->EnqueueInlineInputMethod(B_INPUT_METHOD_STARTED) == B_OK) {
-				char *string = NULL;
+				char* string = NULL;
 				int32 numBytes = 0;
 				keymap->GetChars(keycode, device->modifiers, 0, &string, &numBytes);
 
@@ -822,7 +787,7 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 
 
 void
-KeyboardInputDevice::_RecursiveScan(const char *directory)
+KeyboardInputDevice::_RecursiveScan(const char* directory)
 {
 	CALLED();
 	BEntry entry;
@@ -839,7 +804,7 @@ KeyboardInputDevice::_RecursiveScan(const char *directory)
 
 
 void
-KeyboardInputDevice::_SetLeds(keyboard_device *device)
+KeyboardInputDevice::_SetLeds(keyboard_device* device)
 {
 	if (device->fd < 0)
 		return;
@@ -861,7 +826,7 @@ KeyboardInputDevice::_SetLeds(keyboard_device *device)
 //	#pragma mark -
 
 
-keyboard_device::keyboard_device(const char *path)
+keyboard_device::keyboard_device(const char* path)
 	: BHandler("keyboard device"),
 	owner(NULL),
 	fd(-1),
@@ -923,7 +888,7 @@ keyboard_device::EnqueueInlineInputMethod(int32 opcode,
 
 
 void
-keyboard_device::MessageReceived(BMessage *message)
+keyboard_device::MessageReceived(BMessage* message)
 {
 	if (message->what != B_INPUT_METHOD_EVENT) {
 		BHandler::MessageReceived(message);

@@ -2,10 +2,10 @@ SubDir HAIKU_TOP src add-ons input_server devices keyboard ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders input interface tracker ;
+UsePrivateHeaders input interface shared tracker ;
 UsePrivateSystemHeaders ;
 
-Addon <input>keyboard : 
+Addon <input>keyboard :
 	KeyboardInputDevice.cpp
 	Keymap.cpp
 
@@ -15,5 +15,5 @@ Addon <input>keyboard :
 	: input_server be ;
 
 Package haiku-inputkit-cvs :
-	<input>keyboard : 
+	<input>keyboard :
 	boot home config add-ons input_server devices ;

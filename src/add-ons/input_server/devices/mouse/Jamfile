@@ -2,10 +2,10 @@ SubDir HAIKU_TOP src add-ons input_server devices mouse ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders input ;
+UsePrivateHeaders input shared ;
 
-Addon <input>mouse : 
-	MouseInputDevice.cpp 
+Addon <input>mouse :
+	MouseInputDevice.cpp
 	: be input_server ;
 
 Package haiku-inputkit-cvs :

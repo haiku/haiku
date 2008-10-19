@@ -10,8 +10,12 @@
 
 
 #include "MouseInputDevice.h"
-#include "kb_mouse_settings.h"
-#include "kb_mouse_driver.h"
+
+#include <errno.h>
+#include <new>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include <Debug.h>
 #include <Directory.h>
@@ -21,28 +25,25 @@
 #include <String.h>
 #include <View.h>
 
-#include <errno.h>
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "kb_mouse_settings.h"
+#include "kb_mouse_driver.h"
 
-#if DEBUG
-FILE *MouseInputDevice::sLogFile = NULL;
+
+//#define TRACE_MOUSE_DEVICE
+#ifdef TRACE_MOUSE_DEVICE
+#	define LOG(text...) debug_printf(text)
 #	define LOG_ERR(text...) LOG(text)
 #else
-#	define LOG(text...)
-#	define LOG_ERR(text...) fprintf(stderr, text)
+#	define LOG(text...) do {} while (0)
+#	define LOG_ERR(text...) debug_printf(text)
 #endif
 
 #define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
-const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
-const static char *kMouseDevicesDirectory = "/dev/input/mouse";
 
-// "/dev/" is automatically prepended by StartMonitoringDevice()
-const static char *kMouseDevicesDirectoryPS2 = "input/mouse/ps2";
-const static char *kMouseDevicesDirectoryUSB = "input/mouse/usb";
+const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
+const static char* kMouseDevicesDirectory = "/dev/input/mouse";
+
 
 class MouseDevice {
 	public:
@@ -59,7 +60,7 @@ class MouseDevice {
 
 	private:
 		void _Run();
-		static status_t _ThreadFunction(void *arg);
+		static status_t _ThreadFunction(void* arg);
 
 		BMessage* _BuildMouseMessage(uint32 what, uint64 when, uint32 buttons,
 					int32 deltaX, int32 deltaY) const;
@@ -83,30 +84,17 @@ class MouseDevice {
 };
 
 
-#if DEBUG
-inline void
-LOG(const char *fmt, ...)
-{
-	char buf[1024];
-	va_list ap;
-	va_start(ap, fmt);
-	vsprintf(buf, fmt, ap); va_end(ap);
-	fputs(buf, MouseInputDevice::sLogFile); fflush(MouseInputDevice::sLogFile);
-}
-#endif
-
-
-extern "C" BInputServerDevice *
+extern "C" BInputServerDevice*
 instantiate_input_device()
 {
-	return new (std::nothrow) MouseInputDevice();
+	return new(std::nothrow) MouseInputDevice();
 }
 
 
 //	#pragma mark -
 
 
-MouseDevice::MouseDevice(BInputServerDevice& target, const char *driverPath)
+MouseDevice::MouseDevice(BInputServerDevice& target, const char* driverPath)
 	:
 	fTarget(target),
 	fDevice(-1),
@@ -136,7 +124,7 @@ MouseDevice::~MouseDevice()
 
 	free(fDeviceRef.name);
 }
-	
+
 
 status_t
 MouseDevice::Start()
@@ -149,9 +137,9 @@ MouseDevice::Start()
 
 	char threadName[B_OS_NAME_LENGTH];
 	snprintf(threadName, B_OS_NAME_LENGTH, "%s watcher", fDeviceRef.name);
-	
+
 	fThread = spawn_thread(_ThreadFunction, threadName,
-		kMouseThreadPriority, (void *)this);
+		kMouseThreadPriority, (void*)this);
 
 	status_t status;
 	if (fThread < B_OK)
@@ -256,7 +244,7 @@ MouseDevice::_Run()
 			movements.clicks, movements.wheel_xdelta, movements.wheel_ydelta);
 		LOG("%s: x: %ld, y: %ld\n", fDeviceRef.name, deltaX, deltaY);
 
-		BMessage *message = NULL;
+		BMessage* message = NULL;
 
 		// Send single messages for each event
 
@@ -268,7 +256,7 @@ MouseDevice::_Run()
 			if (message != NULL) {
 				if (pressedButton) {
 					message->AddInt32("clicks", movements.clicks);
-					LOG("B_MOUSE_DOWN\n");	
+					LOG("B_MOUSE_DOWN\n");
 				} else
 					LOG("B_MOUSE_UP\n");
 
@@ -303,7 +291,7 @@ MouseDevice::_Run()
 status_t
 MouseDevice::_ThreadFunction(void* arg)
 {
-	MouseDevice* device = (MouseDevice *)arg;
+	MouseDevice* device = (MouseDevice*)arg;
 	device->_Run();
 	return B_OK;
 }
@@ -384,7 +372,7 @@ MouseDevice::_RemapButtons(uint32 buttons) const
 }
 
 
-char *
+char*
 MouseDevice::_BuildShortName() const
 {
 	BString string(fPath);
@@ -412,15 +400,12 @@ MouseDevice::_BuildShortName() const
 
 
 MouseInputDevice::MouseInputDevice()
-{		
-#if DEBUG
-	sLogFile = fopen("/var/log/mouse_device_log.log", "a");
-#endif
+	:
+	fDevices(2, true)
+{
 	CALLED();
-	
-	StartMonitoringDevice(kMouseDevicesDirectoryPS2);
-	StartMonitoringDevice(kMouseDevicesDirectoryUSB);
 
+	StartMonitoringDevice(kMouseDevicesDirectory);
 	_RecursiveScan(kMouseDevicesDirectory);
 }
 
@@ -428,17 +413,7 @@ MouseInputDevice::MouseInputDevice()
 MouseInputDevice::~MouseInputDevice()
 {
 	CALLED();
-	StopMonitoringDevice(kMouseDevicesDirectoryUSB);
-	StopMonitoringDevice(kMouseDevicesDirectoryPS2);
-
-	int32 count = fDevices.CountItems();
-	while (count-- > 0) {
-		delete (MouseDevice *)fDevices.RemoveItem(count);
-	}
-
-#if DEBUG
-	fclose(sLogFile);
-#endif
+	StopMonitoringDevice(kMouseDevicesDirectory);
 }
 
 
@@ -451,7 +426,7 @@ MouseInputDevice::InitCheck()
 
 
 status_t
-MouseInputDevice::Start(const char *name, void *cookie)
+MouseInputDevice::Start(const char* name, void* cookie)
 {
 	LOG("%s(%s)\n", __PRETTY_FUNCTION__, name);
 	MouseDevice* device = (MouseDevice*)cookie;
@@ -461,7 +436,7 @@ MouseInputDevice::Start(const char *name, void *cookie)
 
 
 status_t
-MouseInputDevice::Stop(const char *name, void *cookie)
+MouseInputDevice::Stop(const char* name, void* cookie)
 {
 	LOG("%s(%s)\n", __PRETTY_FUNCTION__, name);
 	MouseDevice* device = (MouseDevice*)cookie;
@@ -477,11 +452,11 @@ MouseInputDevice::Control(const char* name, void* cookie,
 {
 	LOG("%s(%s, code: %lu)\n", __PRETTY_FUNCTION__, name, command);
 	MouseDevice* device = (MouseDevice*)cookie;
-	
+
 	if (command == B_NODE_MONITOR)
 		return _HandleMonitor(message);
 
-	if (command >= B_MOUSE_TYPE_CHANGED 
+	if (command >= B_MOUSE_TYPE_CHANGED
 		&& command <= B_MOUSE_ACCELERATION_CHANGED)
 		return device->UpdateSettings();
 
@@ -490,56 +465,33 @@ MouseInputDevice::Control(const char* name, void* cookie,
 
 
 // TODO: Test this. USB doesn't work on my machine
-status_t 
+status_t
 MouseInputDevice::_HandleMonitor(BMessage* message)
 {
 	CALLED();
 
+	const char* path;
 	int32 opcode;
-	if (message->FindInt32("opcode", &opcode) < B_OK)
+	if (message->FindInt32("opcode", &opcode) != B_OK
+		|| opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED
+		|| message->FindString("path", &path) != B_OK)
 		return B_BAD_VALUE;
-
-	if (opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED)
-		return B_OK;
-
-	BEntry entry;
-	BPath path;
-	dev_t device;
-	ino_t directory;
-	const char *name;
-
-	if (message->FindInt32("device", &device) < B_OK
-		|| message->FindInt64("directory", &directory) < B_OK
-		|| message->FindString("name", &name) < B_OK)
-		return B_BAD_VALUE;
-
-	entry_ref ref(device, directory, name);
-	status_t status;
-
-	if ((status = entry.SetTo(&ref)) != B_OK)
-		return status;
-	if ((status = entry.GetPath(&path)) != B_OK)
-		return status;
-	if ((status = path.InitCheck()) != B_OK)
-		return status;
 
 	if (opcode == B_ENTRY_CREATED)
-		status = _AddDevice(path.Path());
-	else
-		status = _RemoveDevice(path.Path());
+		return _AddDevice(path);
 
-	return status;	
+	return _RemoveDevice(path);
 }
 
 
 MouseDevice*
-MouseInputDevice::_FindDevice(const char *path)
+MouseInputDevice::_FindDevice(const char* path)
 {
 	CALLED();
 
 	for (int32 i = fDevices.CountItems(); i-- > 0;) {
-		MouseDevice* device = (MouseDevice*)fDevices.ItemAt(i);
-		if (!strcmp(device->Path(), path)) 
+		MouseDevice* device = fDevices.ItemAt(i);
+		if (!strcmp(device->Path(), path))
 			return device;
 	}
 
@@ -548,11 +500,11 @@ MouseInputDevice::_FindDevice(const char *path)
 
 
 status_t
-MouseInputDevice::_AddDevice(const char *path)
+MouseInputDevice::_AddDevice(const char* path)
 {
 	CALLED();
 
-	MouseDevice* device = new (std::nothrow) MouseDevice(*this, path);
+	MouseDevice* device = new(std::nothrow) MouseDevice(*this, path);
 	if (!device) {
 		LOG("No memory\n");
 		return B_NO_MEMORY;
@@ -563,7 +515,7 @@ MouseInputDevice::_AddDevice(const char *path)
 		return B_NO_MEMORY;
 	}
 
-	input_device_ref *devices[2];
+	input_device_ref* devices[2];
 	devices[0] = device->DeviceRef();
 	devices[1] = NULL;
 
@@ -572,7 +524,7 @@ MouseInputDevice::_AddDevice(const char *path)
 
 
 status_t
-MouseInputDevice::_RemoveDevice(const char *path)
+MouseInputDevice::_RemoveDevice(const char* path)
 {
 	CALLED();
 
@@ -582,7 +534,7 @@ MouseInputDevice::_RemoveDevice(const char *path)
 
 	fDevices.RemoveItem(device);
 
-	input_device_ref *devices[2];
+	input_device_ref* devices[2];
 	devices[0] = device->DeviceRef();
 	devices[1] = NULL;
 

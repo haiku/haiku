@@ -2,7 +2,7 @@
 //
 //	Copyright (c) 2004-2005, Haiku
 //
-//  This software is part of the Haiku distribution and is covered 
+//  This software is part of the Haiku distribution and is covered
 //  by the MIT license.
 //
 //
@@ -10,7 +10,7 @@
 //  Author:      Jérôme Duval
 //  Description: Keyboard input server addon
 //  Created :    October 13, 2004
-// 
+//
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
@@ -42,8 +42,8 @@ extern "C" void _kshutdown_(bool reboot);
 
 
 TMWindow::TMWindow()
-	: BWindow(BRect(0, 0, 350, 300), "Team Monitor", 
-		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL, 
+	: BWindow(BRect(0, 0, 350, 300), "Team Monitor",
+		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS,
 		B_ALL_WORKSPACES),
 	fQuitting(false)
@@ -51,20 +51,20 @@ TMWindow::TMWindow()
 	if (Lock()) {
 
 		// ToDo: make this font sensitive
-	
+
 		fView = new TMView(Bounds(), "background", B_FOLLOW_ALL,
 			B_WILL_DRAW, B_NO_BORDER);
 		AddChild(fView);
-	
+
 		float width, height;
 		fView->GetPreferredSize(&width, &height);
 		ResizeTo(width, height);
-	
+
 		BRect screenFrame = BScreen(this).Frame();
 		BPoint point;
 		point.x = (screenFrame.Width() - Bounds().Width()) / 2;
 		point.y = (screenFrame.Height() - Bounds().Height()) / 2;
-	
+
 		if (screenFrame.Contains(point))
 			MoveTo(point);
 		SetSizeLimits(Bounds().Width(), Bounds().Width()*2, Bounds().Height(), Bounds().Height()*2);
@@ -105,7 +105,7 @@ TMWindow::Enable()
 {
 	if (Lock()) {
 		SetPulseRate(1000000);
-	
+
 		if (IsHidden()) {
 			fView->UpdateList();
 			Show();
@@ -138,14 +138,14 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	rect.bottom -= 14;
 	rect.top = rect.bottom - 20;
 
-	BButton *cancel = new BButton(rect, "cancel", "Cancel", 
+	BButton *cancel = new BButton(rect, "cancel", "Cancel",
 		new BMessage(TM_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(cancel);
 
 	rect.left = 10;
 	rect.right = rect.left + font.StringWidth("Force Reboot") + 20;
 
-	BButton *forceReboot = new BButton(rect, "force", "Force Reboot", 
+	BButton *forceReboot = new BButton(rect, "force", "Force Reboot",
 		new BMessage(TM_FORCE_REBOOT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(forceReboot);
 
@@ -164,7 +164,7 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	fDescView = new TMDescView(rect, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fDescView);
 	fDescView->ResizeToPreferred();
-	
+
 	rect = fDescView->Frame();
 	rect.left = 10;
 	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
@@ -181,15 +181,15 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	rect.bottom = fKillButton->Frame().top - 10;
 
-	fListView = new BListView(rect, "teams", B_SINGLE_SELECTION_LIST, 
+	fListView = new BListView(rect, "teams", B_SINGLE_SELECTION_LIST,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM);
 	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
 
-	BScrollView *scrollView = new BScrollView("scroll_teams", fListView, 
+	BScrollView *scrollView = new BScrollView("scroll_teams", fListView,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
 	AddChild(scrollView);
 
-	
+
 }
 
 
@@ -259,7 +259,6 @@ TMView::Pulse()
 void
 TMView::UpdateList()
 {
-	CALLED();
 	bool changed = false;
 
 	for (int32 i = 0; i < fListView->CountItems(); i++) {
@@ -289,7 +288,7 @@ TMView::UpdateList()
 			item->fFound = true;
 			changed = true;
 		}
-	}	
+	}
 
 	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
 		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
