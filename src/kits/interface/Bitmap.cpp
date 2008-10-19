@@ -237,10 +237,8 @@ BBitmap::BBitmap(const BBitmap& source)
 */
 BBitmap::~BBitmap()
 {
-	if (fWindow != NULL) {
-		fWindow->Lock();
+	if (fWindow && fWindow->Lock())
 		delete fWindow;
-	}
 	_CleanUp();
 }
 
@@ -1079,14 +1077,14 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// So at this point the bitmap has to be already cleared to white.
 		// Better move the above code to the server so the problem looks more clear.
 		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
-	        	fWindow = new(std::nothrow) BWindow(Bounds(), fServerToken);
-       			if (fWindow) {
-               			// A BWindow starts life locked and is unlocked
-                		// in Show(), but this window is never shown and
-                		// it's message loop is never started.
-                		fWindow->Unlock();
-        		} else
-                		fInitError = B_NO_MEMORY;
+			fWindow = new(std::nothrow) BWindow(Bounds(), fServerToken);
+				if (fWindow) {
+						// A BWindow starts life locked and is unlocked
+						// in Show(), but this window is never shown and
+						// it's message loop is never started.
+						fWindow->Unlock();
+				} else
+					fInitError = B_NO_MEMORY;
 		}
 	}
 }

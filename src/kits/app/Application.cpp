@@ -1478,7 +1478,7 @@ BApplication::_CountWindows(bool includeMenus) const
 	uint32 count = 0;
 	for (int32 i = 0; i < gLooperList.CountLoopers(); i++) {
 		BWindow* window = dynamic_cast<BWindow*>(gLooperList.LooperAt(i));
-		if (window != NULL && (includeMenus
+		if (window != NULL && !window->fOffscreen && (includeMenus
 				|| dynamic_cast<BMenuWindow *>(window) == NULL)) {
 			count++;
 		}
@@ -1498,8 +1498,8 @@ BApplication::_WindowAt(uint32 index, bool includeMenus) const
 	uint32 count = gLooperList.CountLoopers();
 	for (uint32 i = 0; i < count && index < count; i++) {
 		BWindow* window = dynamic_cast<BWindow*>(gLooperList.LooperAt(i));
-		if (window == NULL || (!includeMenus
-				&& dynamic_cast<BMenuWindow *>(window) != NULL)) {
+		if (window == NULL || window != NULL && window->fOffscreen 
+			|| (!includeMenus && dynamic_cast<BMenuWindow *>(window) != NULL)) {
 			index++;
 			continue;
 		}

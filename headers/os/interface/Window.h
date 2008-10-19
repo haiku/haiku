@@ -347,7 +347,7 @@ private:
 			BList			fShortcuts;
 			int32			fTopViewToken;
 			bool			fUpdateRequested;
-			bool			_unused3;
+			bool			fOffscreen;
 			bool			fIsFilePanel;
 			bool			_unused4;
 			bigtime_t		fPulseRate;

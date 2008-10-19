@@ -2554,6 +2554,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fLastViewToken = B_NULL_TOKEN;
 
 	// TODO: other initializations!
+	fOffscreen = false;
 
 	// Create the server-side window
 
@@ -2583,6 +2584,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 		} else {
 			fLink->StartMessage(AS_CREATE_OFFSCREEN_WINDOW);
 			fLink->Attach<int32>(bitmapToken);
+			fOffscreen = true;
 		}
 
 		fLink->Attach<BRect>(fFrame);
