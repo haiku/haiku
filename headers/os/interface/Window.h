@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,14 +42,14 @@ enum window_type {
 enum window_look {
 	B_BORDERED_WINDOW_LOOK	= 20,
 	B_NO_BORDER_WINDOW_LOOK	= 19,
-	B_TITLED_WINDOW_LOOK	= 1,	
+	B_TITLED_WINDOW_LOOK	= 1,
 	B_DOCUMENT_WINDOW_LOOK	= 11,
 	B_MODAL_WINDOW_LOOK		= 3,
 	B_FLOATING_WINDOW_LOOK	= 7
 };
 
 enum window_feel {
-	B_NORMAL_WINDOW_FEEL			= 0,	
+	B_NORMAL_WINDOW_FEEL			= 0,
 	B_MODAL_SUBSET_WINDOW_FEEL		= 2,
 	B_MODAL_APP_WINDOW_FEEL			= 1,
 	B_MODAL_ALL_WINDOW_FEEL			= 3,
@@ -92,10 +92,10 @@ enum {
 
 class BWindow : public BLooper {
 public:
-							BWindow(BRect frame, const char* title, 
+							BWindow(BRect frame, const char* title,
 								window_type type, uint32 flags,
 								uint32 workspace = B_CURRENT_WORKSPACE);
-							BWindow(BRect frame, const char* title, 
+							BWindow(BRect frame, const char* title,
 								window_look look, window_feel feel, uint32 flags,
 								uint32 workspace = B_CURRENT_WORKSPACE);
 	virtual					~BWindow();
@@ -123,7 +123,7 @@ public:
 	virtual void			Minimize(bool minimize);
 	virtual	void			Zoom(BPoint origin, float width, float height);
 			void			Zoom();
-			void			SetZoomLimits(float maxWidth, float maxHeight);				
+			void			SetZoomLimits(float maxWidth, float maxHeight);
 	virtual void			ScreenChanged(BRect screenSize, color_space format);
 
 			void			SetPulseRate(bigtime_t rate);
@@ -144,7 +144,7 @@ public:
 			bool			NeedsUpdate() const;
 			void			UpdateIfNeeded();
 
-			BView*			FindView(const char* viewName) const;						
+			BView*			FindView(const char* viewName) const;
 			BView*			FindView(BPoint) const;
 			BView*			CurrentFocus() const;
 
@@ -196,7 +196,7 @@ public:
 
 			void			SetSizeLimits(float minWidth, float maxWidth,
 								float minHeight, float maxHeight);
-			void			GetSizeLimits(float* minWidth, float* maxWidth, 
+			void			GetSizeLimits(float* minWidth, float* maxWidth,
 								float* minHeight, float* maxHeight);
 
 			status_t		SetDecoratorSettings(const BMessage& settings);
@@ -264,7 +264,7 @@ private:
 	friend class BWindowScreen;
 	friend class BDirectWindow;
 	friend class BFilePanel;
-	
+
 	friend void _set_menu_sem_(BWindow* w, sem_id sem);
 	friend status_t _safe_get_server_token_(const BLooper*, int32*);
 
@@ -337,7 +337,7 @@ private:
 			bool			fActive;
 			short			fShowLevel;
 			uint32			fFlags;
-		
+
 			BView*			fTopView;
 			BView*			fFocus;
 			BView*			fLastMouseMovedView;
@@ -348,7 +348,7 @@ private:
 			int32			fTopViewToken;
 			bool			fUpdateRequested;
 			bool			_unused3;
-			bool			fIsFilePanel;				
+			bool			fIsFilePanel;
 			bool			_unused4;
 			bigtime_t		fPulseRate;
 			bool			_unused5;
@@ -369,8 +369,8 @@ private:
 			BPrivate::PortLink*	fLink;
 			BMessageRunner*	fPulseRunner;
 			BRect			fPreviousFrame;
-		
+
 			uint32			_reserved[9];
 };
 
-#endif	// _WINDOW_H 
+#endif	// _WINDOW_H

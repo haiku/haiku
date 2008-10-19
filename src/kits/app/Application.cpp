@@ -200,7 +200,7 @@ BApplication::BApplication(BMessage *data)
 	// constructor here, test if it's needed
 	: BLooper(looper_name_for(NULL))
 {
-	const char *signature = NULL;	
+	const char *signature = NULL;
 	data->FindString("mime_sig", &signature);
 
 	_InitData(signature, true, NULL);
@@ -456,7 +456,7 @@ BApplication::Instantiate(BMessage *data)
 	if (validate_instantiation(data, "BApplication"))
 		return new BApplication(data);
 
-	return NULL;	
+	return NULL;
 }
 
 
@@ -495,7 +495,7 @@ BApplication::Run()
 
 	AssertLocked();
 
-	if (fRunCalled)	
+	if (fRunCalled)
 		debugger("BApplication::Run was already called. Can only be called once.");
 
 	fThread = find_thread(NULL);
@@ -746,7 +746,7 @@ BApplication::ResolveSpecifier(BMessage *message, int32 index,
 	}
 
 	return NULL;
-	
+
 }
 
 
@@ -874,7 +874,7 @@ BResources *
 BApplication::AppResources()
 {
 	AutoLocker<BLocker> lock(sAppResourcesLock);
-	
+
 	// BApplication caches its resources, so check
 	// if it already happened.
 	if (sAppResources != NULL)
@@ -884,7 +884,7 @@ BApplication::AppResources()
 	bool found = false;
 
 	// App is already running. Get its entry ref with
-	// GetAppInfo()	
+	// GetAppInfo()
 	app_info appInfo;
 	if (be_app && be_app->GetAppInfo(&appInfo) == B_OK) {
 		ref = appInfo.ref;
@@ -896,7 +896,7 @@ BApplication::AppResources()
 
 	if (!found)
 		return NULL;
-	
+
 	BFile file(&ref, B_READ_ONLY);
 	if (file.InitCheck() == B_OK) {
 		sAppResources = new (std::nothrow) BResources(&file, false);
@@ -969,7 +969,7 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 		case B_PULSE:
 			Pulse();
 			break;
-		
+
 		case B_APP_ACTIVATED:
 		{
 			bool active = false;
@@ -977,7 +977,7 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 			AppActivated(active);
 			break;
 		}
-		
+
 		case _SHOW_DRAG_HANDLES_:
 		{
 			bool show;
@@ -989,12 +989,12 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 		}
 
 		// TODO: Handle these as well
-		case _DISPOSE_DRAG_: 
-		case _PING_:	
+		case _DISPOSE_DRAG_:
+		case _PING_:
 			puts("not yet handled message:");
 			DBG(message->PrintToStream());
 			break;
-		
+
 		default:
 			BLooper::DispatchMessage(message, handler);
 			break;
@@ -1082,7 +1082,7 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 				for (int32 i=0; err == B_OK && i<count; i++) {
 					BMessenger messenger(LooperAt(i));
 					err = reply.AddMessenger("result", messenger);
-				}				
+				}
 			} else if (strcmp("Windows", property) == 0) {
 				int32 count = CountWindows();
 				err = B_OK;
@@ -1173,7 +1173,7 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 					}
 				}
 			} else if (strcmp("Name", property) == 0) {
-				err = reply.AddString("result", Name());	
+				err = reply.AddString("result", Name());
 			}
 			break;
 		case B_COUNT_PROPERTIES:
@@ -1246,7 +1246,7 @@ BApplication::_InitGUIContext()
 	// create global system cursors
 	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);
 	B_CURSOR_I_BEAM = new BCursor(B_I_BEAM_CURSOR);
-	
+
 	// TODO: would be nice to get the workspace at launch time from the registrar
 	fInitialWorkspace = current_workspace();
 

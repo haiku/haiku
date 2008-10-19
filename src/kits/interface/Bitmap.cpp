@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku Inc.
+ * Copyright 2001-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -323,7 +323,7 @@ BBitmap::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BBitmap"))
 		return new BBitmap(data);
-	
+
 	return NULL;
 }
 
@@ -350,7 +350,7 @@ BBitmap::Archive(BMessage *data, bool deep) const
 
 	if (ret == B_OK)
 		ret = data->AddInt32("_rowbytes", fBytesPerRow);
-	
+
 	if (ret == B_OK && deep) {
 		if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
 			BMessage views;
@@ -470,7 +470,7 @@ void *
 BBitmap::Bits() const
 {
 	const_cast<BBitmap *>(this)->_AssertPointer();
-	
+
 	if (fFlags & B_BITMAP_WILL_OVERLAY) {
 		overlay_client_data* data = (overlay_client_data*)fBasePointer;
 		return data->buffer;
@@ -996,7 +996,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 			// Ask the server (via our owning application) to create a bitmap.
 			BPrivate::AppServerLink link;
 
-			// Attach Data: 
+			// Attach Data:
 			// 1) BRect bounds
 			// 2) color_space space
 			// 3) int32 bitmap_flags
@@ -1077,7 +1077,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// TODO: Creating an offscreen window with a non32 bit bitmap
 		// copies the current content of the bitmap to a back buffer.
 		// So at this point the bitmap has to be already cleared to white.
-		// Better move the above code to the server so the problem looks more clear. 
+		// Better move the above code to the server so the problem looks more clear.
 		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
 	        	fWindow = new(std::nothrow) BWindow(Bounds(), fServerToken);
        			if (fWindow) {
@@ -1107,7 +1107,7 @@ BBitmap::_CleanUp()
 	} else {
 		BPrivate::AppServerLink link;
 		// AS_DELETE_BITMAP:
-		// Attached Data: 
+		// Attached Data:
 		//	1) int32 server token
 		link.StartMessage(AS_DELETE_BITMAP);
 		link.Attach<int32>(fServerToken);
