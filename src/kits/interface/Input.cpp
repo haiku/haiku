@@ -1,10 +1,12 @@
 /*
  * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
- * 
- * Author:			Marc Flerackers (mflerackers@androme.be)
- * Description:		Functions and class to manage input devices.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
  */
+
+//!	Functions and class to manage input devices.
 
 #include <stdlib.h>
 #include <string.h>
@@ -37,13 +39,13 @@ find_input_device(const char *name)
 	BInputDevice *dev = new (std::nothrow) BInputDevice;
 	if (dev == NULL)
 		return NULL;
-		
+
 	const char *device;
 	int32 type;
 
 	reply.FindString("device", &device);
 	reply.FindInt32("type", &type);
-	
+
 	dev->_SetNameAndType(device, (input_device_type)type);
 
 	return dev;
@@ -66,7 +68,7 @@ get_input_devices(BList *list)
 	const char *name;
 	int32 type;
 	int32 i = 0;
-	
+
 	while (reply.FindString("device", i, &name) == B_OK) {
 		reply.FindInt32("type", i++, &type);
 
@@ -208,8 +210,7 @@ BInputDevice::Stop(input_device_type type)
 
 
 status_t
-BInputDevice::Control(input_device_type type, uint32 code,
-									  BMessage *message)
+BInputDevice::Control(input_device_type type, uint32 code, BMessage *message)
 {
 	BMessage command(IS_CONTROL_DEVICES);
 	BMessage reply;
@@ -260,10 +261,10 @@ _control_input_server_(BMessage *command, BMessage *reply)
 		if (!sInputServer)
 			return B_NO_MEMORY;
 	}
-	
+
 	if (!sInputServer->IsValid())
 		*sInputServer = BMessenger("application/x-vnd.Be-input_server", -1, NULL);
-		
+
 	status_t err = sInputServer->SendMessage(command, reply);
 
 	if (err != B_OK)
