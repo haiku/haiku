@@ -28,7 +28,7 @@
 #undef TRACE
 //#define TRACE_PATH_MONITOR
 #ifdef TRACE_PATH_MONITOR
-#	define TRACE(x...) printf(x)
+#	define TRACE(x...) debug_printf(x)
 #else
 #	define TRACE(x...) ;
 #endif
@@ -51,7 +51,7 @@ struct FileEntry {
 
 #if __GNUC__ > 3
 	bool operator<(const FileEntry& a, const FileEntry& b);
-	class FileEntryLess : public binary_function<FileEntry, FileEntry, bool> 
+	class FileEntryLess : public binary_function<FileEntry, FileEntry, bool>
 	{
 		public:
 		bool operator() (const FileEntry& a, const FileEntry& b) const
@@ -115,13 +115,13 @@ class PathHandler : public BHandler {
 		void _NotifyTarget(BMessage* message) const;
 		void _NotifyTarget(BMessage* message, const node_ref& nodeRef) const;
 
-		status_t _AddDirectory(BEntry& entry);
-		status_t _AddDirectory(node_ref& nodeRef);
+		status_t _AddDirectory(BEntry& entry, bool notify = false);
+		status_t _AddDirectory(node_ref& nodeRef, bool notify = false);
 		status_t _RemoveDirectory(const node_ref& nodeRef, ino_t directoryNode);
 		status_t _RemoveDirectory(BEntry& entry, ino_t directoryNode);
 
 		bool _HasFile(const node_ref& nodeRef) const;
-		status_t _AddFile(BEntry& entry);
+		status_t _AddFile(BEntry& entry, bool notify = false);
 		status_t _RemoveFile(const node_ref& nodeRef);
 		status_t _RemoveFile(BEntry& entry);
 
@@ -206,6 +206,8 @@ PathHandler::PathHandler(const char* path, uint32 flags, BMessenger target,
 	if (fStatus < B_OK)
 		return;
 
+	TRACE("PathHandler: %s\n", path);
+
 	looper->Lock();
 	looper->AddHandler(this);
 	looper->Unlock();
@@ -248,18 +250,18 @@ PathHandler::Quit()
 void
 PathHandler::Dump()
 {
-	printf("WATCHING DIRECTORIES:\n");
+	TRACE("WATCHING DIRECTORIES:\n");
 	DirectorySet::iterator i = fDirectories.begin();
 	for (; i != fDirectories.end(); i++) {
-		printf("  %ld:%Ld (%s)\n", i->node.device, i->node.node, i->contained
+		TRACE("  %ld:%Ld (%s)\n", i->node.device, i->node.node, i->contained
 			? "contained" : "-");
 	}
 
-	printf("WATCHING FILES:\n");
+	TRACE("WATCHING FILES:\n");
 
 	FileSet::iterator j = fFiles.begin();
 	for (; j != fFiles.end(); j++) {
-		printf("  %ld:%Ld\n", j->ref.device, j->node);
+		TRACE("  %ld:%Ld\n", j->ref.device, j->node);
 	}
 }
 #endif
@@ -359,7 +361,7 @@ PathHandler::_EntryCreated(BMessage* message)
 		// a new directory to watch for us
 		if (!entryContained && !_CloserToPath(entry)
 			|| parentContained && !_WatchRecursively()
-			|| _AddDirectory(entry) != B_OK
+			|| _AddDirectory(entry, true) != B_OK
 			|| _WatchFilesOnly())
 			notify = parentContained;
 		// NOTE: entry is now toast after _AddDirectory() was called!
@@ -445,13 +447,13 @@ PathHandler::_EntryMoved(BMessage* message)
 				// there is a new directory to watch for us
 				if (entryContained
 					|| parentContained && !_WatchRecursively()) {
-					_AddDirectory(entry);
+					_AddDirectory(entry, true);
 					// NOTE: entry is toast now!
 				} else if (_GetClosest(fPath.Path(), false,
 						nodeRef) == B_OK) {
 					// the new directory might put us even
 					// closer to the path we are after
-					_AddDirectory(nodeRef);
+					_AddDirectory(nodeRef, true);
 				}
 
 				wasAdded = true;
@@ -619,6 +621,8 @@ PathHandler::_NotifyTarget(BMessage* message, const node_ref& nodeRef) const
 	BMessage update(*message);
 	update.what = B_PATH_MONITOR;
 
+	TRACE("_NotifyTarget(): node ref %ld.%Ld\n", nodeRef.device, nodeRef.node);
+
 	WatchedDirectory directory;
 	directory.node = nodeRef;
 
@@ -659,7 +663,7 @@ PathHandler::_NotifyTarget(BMessage* message, const node_ref& nodeRef) const
 
 
 status_t
-PathHandler::_AddDirectory(BEntry& entry)
+PathHandler::_AddDirectory(BEntry& entry, bool notify)
 {
 	WatchedDirectory directory;
 	status_t status = entry.GetNodeRef(&directory.node);
@@ -669,7 +673,7 @@ PathHandler::_AddDirectory(BEntry& entry)
 #ifdef TRACE_PATH_MONITOR
 {
 	BPath path(&entry);
-	printf("  ADD DIRECTORY %s, %ld:%Ld\n",
+	TRACE("  ADD DIRECTORY %s, %ld:%Ld\n",
 		path.Path(), directory.node.device, directory.node.node);
 }
 #endif
@@ -703,10 +707,10 @@ PathHandler::_AddDirectory(BEntry& entry)
 		while (dir.GetNextEntry(&entry) == B_OK) {
 			if (entry.IsDirectory()) {
 				// and here is the recursion:
-				if (_AddDirectory(entry) != B_OK)
+				if (_AddDirectory(entry, notify) != B_OK)
 					break;
 			} else if (!_WatchFoldersOnly()) {
-				if (_AddFile(entry) != B_OK)
+				if (_AddFile(entry, notify) != B_OK)
 					break;
 			}
 		}
@@ -724,7 +728,7 @@ PathHandler::_AddDirectory(BEntry& entry)
 
 
 status_t
-PathHandler::_AddDirectory(node_ref& nodeRef)
+PathHandler::_AddDirectory(node_ref& nodeRef, bool notify)
 {
 	BDirectory directory(&nodeRef);
 	status_t status = directory.InitCheck();
@@ -732,7 +736,7 @@ PathHandler::_AddDirectory(node_ref& nodeRef)
 		BEntry entry;
 		status = directory.GetEntry(&entry);
 		if (status == B_OK)
-			status = _AddDirectory(entry);
+			status = _AddDirectory(entry, notify);
 	}
 
 	return status;
@@ -799,7 +803,7 @@ PathHandler::_HasFile(const node_ref& nodeRef) const
 
 
 status_t
-PathHandler::_AddFile(BEntry& entry)
+PathHandler::_AddFile(BEntry& entry, bool notify)
 {
 	if ((fFlags & (WATCH_NODE_FLAG_MASK & ~B_WATCH_DIRECTORY)) == 0)
 		return B_OK;
@@ -807,7 +811,7 @@ PathHandler::_AddFile(BEntry& entry)
 #ifdef TRACE_PATH_MONITOR
 {
 	BPath path(&entry);
-	printf("  ADD FILE %s\n", path.Path());
+	TRACE("  ADD FILE %s\n", path.Path());
 }
 #endif
 
@@ -816,9 +820,9 @@ PathHandler::_AddFile(BEntry& entry)
 	if (status != B_OK)
 		return status;
 
-	// check if we are already know this file
+	// check if we already know this file
 
-	// TODO: It should be possible to ommit this check if we know it
+	// TODO: It should be possible to omit this check if we know it
 	// can't be the case (for example when adding subfolders recursively,
 	// although in that case, the API user may still have added this file
 	// independently, so for now, it should be the safest to perform this
@@ -835,6 +839,21 @@ PathHandler::_AddFile(BEntry& entry)
 	setEntry.node = nodeRef.node;
 
 	fFiles.insert(setEntry);
+
+	if (notify && _WatchFilesOnly()) {
+		// We also notify our target about new files if it's only interested
+		// in files; it won't be notified about new directories, so it cannot
+		// know when to search for them.
+		BMessage update;
+		update.AddInt32("opcode", B_ENTRY_CREATED);
+		update.AddInt32("device", nodeRef.device);
+		update.AddInt64("directory", setEntry.ref.directory);
+		update.AddString("name", setEntry.ref.name);
+		update.AddBool("added", true);
+
+		_NotifyTarget(&update, nodeRef);
+	}
+
 	return B_OK;
 }
 
@@ -887,13 +906,14 @@ BPathMonitor::~BPathMonitor()
 BPathMonitor::_InitLockerIfNeeded()
 {
 	static vint32 lock = 0;
-	
+
 	if (sLocker != NULL)
 		return B_OK;
 
 	while (sLocker == NULL) {
 		if (atomic_add(&lock, 1) == 0) {
 			sLocker = new (nothrow) BLocker("path monitor");
+			TRACE("Create PathMonitor locker\n");
 			if (sLocker == NULL)
 				return B_NO_MEMORY;
 		}
@@ -908,7 +928,7 @@ BPathMonitor::_InitLockerIfNeeded()
 BPathMonitor::_InitLooperIfNeeded()
 {
 	static vint32 lock = 0;
-	
+
 	if (sLooper != NULL)
 		return B_OK;
 
@@ -916,6 +936,7 @@ BPathMonitor::_InitLooperIfNeeded()
 		if (atomic_add(&lock, 1) == 0) {
 			// first thread initializes the global looper
 			sLooper = new (nothrow) BLooper("PathMonitor looper");
+			TRACE("Start PathMonitor looper\n");
 			if (sLooper == NULL)
 				return B_NO_MEMORY;
 			thread_id thread = sLooper->Run();
@@ -932,6 +953,8 @@ BPathMonitor::_InitLooperIfNeeded()
 /*static*/ status_t
 BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target)
 {
+	TRACE("StartWatching(%s)\n", path);
+
 	status_t status = _InitLockerIfNeeded();
 	if (status != B_OK)
 		return status;
@@ -973,6 +996,8 @@ BPathMonitor::StopWatching(const char* path, BMessenger target)
 {
 	if (sLocker == NULL)
 		return B_NO_INIT;
+
+	TRACE("StopWatching(%s)\n", path);
 
 	BAutolock _(sLocker);
 
