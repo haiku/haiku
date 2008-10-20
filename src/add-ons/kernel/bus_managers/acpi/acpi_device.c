@@ -29,9 +29,12 @@ acpi_get_object_type(acpi_device device)
 static status_t 
 acpi_get_object(acpi_device device, const char *path, acpi_object_type **return_value) 
 {
-	char objname[255];
-	snprintf(objname, sizeof(objname), "%s.%s", device->path, path);
-	return get_object(objname, return_value);
+	if (path) {
+		char objname[255];
+		snprintf(objname, sizeof(objname), "%s.%s", device->path, path);
+		return get_object(objname, return_value);
+	}
+	return get_object(device->path, return_value);
 }
 
 
