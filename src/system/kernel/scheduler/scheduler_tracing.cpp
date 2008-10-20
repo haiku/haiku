@@ -193,8 +193,6 @@ cmd_scheduler(int argc, char** argv)
 
 				if (state == STILL_RUNNING) {
 					// thread preempted
-					state = PREEMPTED;
-
 					runs++;
 					preemptions++;
 					totalRunTime += diffTime;
@@ -202,6 +200,9 @@ cmd_scheduler(int argc, char** argv)
 						minRunTime = diffTime;
 					if (diffTime > maxRunTime)
 						maxRunTime = diffTime;
+
+					state = PREEMPTED;
+					lastTime = entry->Time();
 				} else if (state == RUNNING) {
 					// thread starts waiting (it hadn't been added to the run
 					// queue before being unscheduled)
@@ -214,6 +215,7 @@ cmd_scheduler(int argc, char** argv)
 						maxRunTime = diffTime;
 
 					state = WAITING;
+					lastTime = entry->Time();
 				}
 			}
 		} else if (EnqueueThread* entry
