@@ -10,6 +10,8 @@ SubDir HAIKU_TOP src system kernel ;
 	SubDirC++Flags $(defines) ;
 }
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) scheduler ] ;
+
 UsePrivateHeaders libroot ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders runtime_loader ;
@@ -35,7 +37,6 @@ KernelMergeObject kernel_core.o :
 	Notifications.cpp
 	port.cpp
 	real_time_clock.c
-	scheduler.cpp
 	sem.cpp
 	shutdown.c
 	signal.cpp
@@ -47,6 +48,11 @@ KernelMergeObject kernel_core.o :
 	timer.cpp
 	usergroup.cpp
 	wait_for_objects.cpp
+
+	# scheduler
+	scheduler.cpp
+	scheduler_tracing.cpp
+	scheduling_analysis.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
