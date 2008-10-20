@@ -71,7 +71,7 @@
 #define HAS_FS_CALL(vnode, op)			(vnode->ops->op != NULL)
 #define HAS_FS_MOUNT_CALL(mount, op)	(mount->volume->ops->op != NULL)
 
-#ifdef KDEBUG
+#if KDEBUG
 #	define FS_CALL(vnode, op, params...) \
 		( HAS_FS_CALL(vnode, op) ? \
 			vnode->ops->op(vnode->mount->volume, vnode, params) \

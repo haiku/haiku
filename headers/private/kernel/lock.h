@@ -18,7 +18,7 @@ struct mutex_waiter;
 typedef struct mutex {
 	const char*				name;
 	struct mutex_waiter*	waiters;
-#ifdef KDEBUG
+#if KDEBUG
 	thread_id				holder;
 #else
 	int32					count;
@@ -31,7 +31,7 @@ typedef struct mutex {
 
 typedef struct recursive_lock {
 	mutex		lock;
-#ifndef KDEBUG
+#if !KDEBUG
 	thread_id	holder;
 #endif
 	int			recursion;
@@ -77,7 +77,7 @@ typedef struct rw_lock {
 
 
 // static initializers
-#ifdef KDEBUG
+#if KDEBUG
 #	define MUTEX_INITIALIZER(name)			{ name, NULL, -1, 0 }
 #	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), 0 }
 #else
@@ -130,7 +130,7 @@ extern status_t _mutex_trylock(mutex* lock);
 static inline status_t
 mutex_lock(mutex* lock)
 {
-#ifdef KDEBUG
+#if KDEBUG
 	return _mutex_lock(lock, false);
 #else
 	if (atomic_add(&lock->count, -1) < 0)
@@ -143,7 +143,7 @@ mutex_lock(mutex* lock)
 static inline status_t
 mutex_lock_threads_locked(mutex* lock)
 {
-#ifdef KDEBUG
+#if KDEBUG
 	return _mutex_lock(lock, true);
 #else
 	if (atomic_add(&lock->count, -1) < 0)
@@ -156,7 +156,7 @@ mutex_lock_threads_locked(mutex* lock)
 static inline status_t
 mutex_trylock(mutex* lock)
 {
-#ifdef KDEBUG
+#if KDEBUG
 	return _mutex_trylock(lock);
 #else
 	if (atomic_test_and_set(&lock->count, -1, 0) != 0)
@@ -169,7 +169,7 @@ mutex_trylock(mutex* lock)
 static inline void
 mutex_unlock(mutex* lock)
 {
-#if !defined(KDEBUG)
+#if !KDEBUG
 	if (atomic_add(&lock->count, 1) < -1)
 #endif
 		_mutex_unlock(lock, false);
@@ -179,7 +179,7 @@ mutex_unlock(mutex* lock)
 static inline void
 mutex_transfer_lock(mutex* lock, thread_id thread)
 {
-#ifdef KDEBUG
+#if KDEBUG
 	lock->holder = thread;
 #endif
 }

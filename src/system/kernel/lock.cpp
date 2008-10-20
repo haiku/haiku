@@ -43,7 +43,7 @@ struct rw_lock_waiter {
 #define RW_LOCK_FLAG_OWNS_NAME	RW_LOCK_FLAG_CLONE_NAME
 
 
-#ifdef KDEBUG
+#if KDEBUG
 #	define RECURSIVE_LOCK_HOLDER(lock)	((lock)->lock.holder)
 #else
 #	define RECURSIVE_LOCK_HOLDER(lock)	((lock)->holder)
@@ -100,7 +100,7 @@ recursive_lock_lock(recursive_lock *lock)
 
 	if (thread != RECURSIVE_LOCK_HOLDER(lock)) {
 		mutex_lock(&lock->lock);
-#ifndef KDEBUG
+#if !KDEBUG
 		lock->holder = thread;
 #endif
 	}
@@ -124,7 +124,7 @@ recursive_lock_trylock(recursive_lock *lock)
 		if (status != B_OK)
 			return status;
 
-#ifndef KDEBUG
+#if !KDEBUG
 		lock->holder = thread;
 #endif
 	}
@@ -141,7 +141,7 @@ recursive_lock_unlock(recursive_lock *lock)
 		panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
 
 	if (--lock->recursion == 0) {
-#ifndef KDEBUG
+#if !KDEBUG
 		lock->holder = -1;
 #endif
 		mutex_unlock(&lock->lock);
@@ -253,7 +253,7 @@ rw_lock_destroy(rw_lock* lock)
 	// unblock all waiters
 	InterruptsSpinLocker locker(gThreadSpinlock);
 
-#ifdef KDEBUG
+#if KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
 		!= lock->holder) {
 		panic("rw_lock_destroy(): there are blocking threads, but the caller "
@@ -429,7 +429,7 @@ mutex_init(mutex* lock, const char *name)
 {
 	lock->name = name;
 	lock->waiters = NULL;
-#ifdef KDEBUG
+#if KDEBUG
 	lock->holder = -1;
 #else
 	lock->count = 0;
@@ -445,7 +445,7 @@ mutex_init_etc(mutex* lock, const char *name, uint32 flags)
 {
 	lock->name = (flags & MUTEX_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
 	lock->waiters = NULL;
-#ifdef KDEBUG
+#if KDEBUG
 	lock->holder = -1;
 #else
 	lock->count = 0;
@@ -465,7 +465,7 @@ mutex_destroy(mutex* lock)
 	// unblock all waiters
 	InterruptsSpinLocker locker(gThreadSpinlock);
 
-#ifdef KDEBUG
+#if KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
 		!= lock->holder) {
 		panic("mutex_destroy(): there are blocking threads, but caller doesn't "
@@ -496,7 +496,7 @@ mutex_switch_lock(mutex* from, mutex* to)
 {
 	InterruptsSpinLocker locker(gThreadSpinlock);
 
-#if !defined(KDEBUG)
+#if !KDEBUG
 	if (atomic_add(&from->count, 1) < -1)
 #endif
 		_mutex_unlock(from, true);
@@ -508,7 +508,7 @@ mutex_switch_lock(mutex* from, mutex* to)
 status_t
 _mutex_lock(mutex* lock, bool threadsLocked)
 {
-#ifdef KDEBUG
+#if KDEBUG
 	if (!gKernelStartup && !threadsLocked && !are_interrupts_enabled()) {
 		panic("_mutex_lock(): called with interrupts disabled for lock %p",
 			lock);
@@ -520,7 +520,7 @@ _mutex_lock(mutex* lock, bool threadsLocked)
 
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
-#ifdef KDEBUG
+#if KDEBUG
 	if (lock->holder < 0) {
 		lock->holder = thread_get_current_thread_id();
 		return B_OK;
@@ -552,7 +552,7 @@ _mutex_lock(mutex* lock, bool threadsLocked)
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_MUTEX, lock);
 	status_t error = thread_block_locked(waiter.thread);
 
-#ifdef KDEBUG
+#if KDEBUG
 	if (error == B_OK)
 		lock->holder = waiter.thread->id;
 #endif
@@ -567,7 +567,7 @@ _mutex_unlock(mutex* lock, bool threadsLocked)
 	// lock only, if !threadsLocked
 	InterruptsSpinLocker locker(gThreadSpinlock, false, !threadsLocked);
 
-#ifdef KDEBUG
+#if KDEBUG
 	if (thread_get_current_thread_id() != lock->holder) {
 		panic("_mutex_unlock() failure: thread %ld is trying to release "
 			"mutex %p (current holder %ld)\n", thread_get_current_thread_id(),
@@ -586,7 +586,7 @@ _mutex_unlock(mutex* lock, bool threadsLocked)
 		// unblock thread
 		thread_unblock_locked(waiter->thread, B_OK);
 
-#ifdef KDEBUG
+#if KDEBUG
 		// Already set the holder to the unblocked thread. Besides that this
 		// actually reflects the current situation, setting it to -1 would
 		// cause a race condition, since another locker could think the lock
@@ -596,7 +596,7 @@ _mutex_unlock(mutex* lock, bool threadsLocked)
 	} else {
 		// We've acquired the spinlock before the locker that is going to wait.
 		// Just mark the lock as released.
-#ifdef KDEBUG
+#if KDEBUG
 		lock->holder = -1;
 #else
 		lock->flags |= MUTEX_FLAG_RELEASED;
@@ -608,7 +608,7 @@ _mutex_unlock(mutex* lock, bool threadsLocked)
 status_t
 _mutex_trylock(mutex* lock)
 {
-#ifdef KDEBUG
+#if KDEBUG
 	InterruptsSpinLocker _(gThreadSpinlock);
 
 	if (lock->holder <= 0) {
@@ -638,7 +638,7 @@ dump_mutex_info(int argc, char** argv)
 	kprintf("mutex %p:\n", lock);
 	kprintf("  name:            %s\n", lock->name);
 	kprintf("  flags:           0x%x\n", lock->flags);
-#ifdef KDEBUG
+#if KDEBUG
 	kprintf("  holder:          %ld\n", lock->holder);
 #else
 	kprintf("  count:           %ld\n", lock->count);

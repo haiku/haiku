@@ -2239,7 +2239,7 @@ TCPEndpoint::Dump() const
 	kprintf("TCP endpoint %p\n", this);
 	kprintf("  state: %s\n", name_for_state(fState));
 	kprintf("  flags: 0x%lx\n", fFlags);
-#ifdef KDEBUG
+#if KDEBUG
 	kprintf("  lock: { %p, holder: %ld }\n", &fLock, fLock.holder);
 #endif
 	kprintf("  accept sem: %ld\n", fAcceptSemaphore);

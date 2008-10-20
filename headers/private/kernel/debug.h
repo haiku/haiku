@@ -14,12 +14,17 @@
 #include <module.h>
 
 
-#if DEBUG
-/*
- * The kernel debug level.
- * Level 1 is usual asserts, > 1 should be used for very expensive runtime checks
+/*	KDEBUG
+	The kernel debug level.
+	Level 1 is usual asserts, > 1 should be used for very expensive runtime
+	checks
  */
-#	define KDEBUG 1
+#if !defined(KDEBUG)
+#	if DEBUG
+#		define KDEBUG 1
+#	else
+#		define KDEBUG 0
+#	endif
 #endif
 
 #define ASSERT_ALWAYS(x) \

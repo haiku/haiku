@@ -3465,7 +3465,7 @@ dump_cache(int argc, char **argv)
 	kprintf("  temporary:    %ld\n", cache->temporary);
 	kprintf("  scan_skip:    %ld\n", cache->scan_skip);
 	kprintf("  lock:         %p\n", cache->GetLock());
-#ifdef KDEBUG
+#if KDEBUG
 	kprintf("  lock.holder:  %ld\n", cache->GetLock()->holder);
 #endif
 	kprintf("  areas:\n");
