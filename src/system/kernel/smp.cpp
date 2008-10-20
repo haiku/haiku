@@ -77,13 +77,18 @@ static struct {
 	void		*caller;
 	spinlock	*lock;
 } sLastCaller[NUM_LAST_CALLERS];
+
 static vint32 sLastIndex = 0;
+	// Is incremented atomically. Must be % NUM_LAST_CALLERS before being used
+	// as index into sLastCaller. Note, that it has to be casted to uint32
+	// before applying the modulo operation, since otherwise after overflowing
+	// that would yield negative indices.
 
 
 static void
 push_lock_caller(void *caller, spinlock *lock)
 {
-	int32 index = atomic_add(&sLastIndex, 1) % NUM_LAST_CALLERS;
+	int32 index = (uint32)atomic_add(&sLastIndex, 1) % NUM_LAST_CALLERS;
 
 	sLastCaller[index].caller = caller;
 	sLastCaller[index].lock = lock;
@@ -93,7 +98,7 @@ push_lock_caller(void *caller, spinlock *lock)
 static void *
 find_lock_caller(spinlock *lock)
 {
-	int32 lastIndex = sLastIndex % NUM_LAST_CALLERS;
+	int32 lastIndex = (uint32)sLastIndex % NUM_LAST_CALLERS;
 
 	for (int32 i = 0; i < NUM_LAST_CALLERS; i++) {
 		int32 index = (NUM_LAST_CALLERS + lastIndex - 1 - i) % NUM_LAST_CALLERS;
