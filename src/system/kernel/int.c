@@ -20,6 +20,8 @@
 #include <util/kqueue.h>
 #include <smp.h>
 
+#include "kernel_debug_config.h"
+
 
 //#define TRACE_INT
 #ifdef TRACE_INT
@@ -28,8 +30,6 @@
 #	define TRACE(x) ;
 #endif
 
-#define DEBUG_INT
-	// adds statistics and unhandled counter
 
 struct io_handler {
 	struct io_handler	*next;
@@ -44,7 +44,7 @@ struct io_vector {
 	spinlock			vector_lock;
 	int32				enable_count;
 	bool				no_lock_vector;
-#ifdef DEBUG_INT
+#if DEBUG_INTERRUPTS
 	int64				handled_count;
 	int64				unhandled_count;
 	int					trigger_count;
@@ -55,7 +55,7 @@ struct io_vector {
 static struct io_vector sVectors[NUM_IO_VECTORS];
 
 
-#ifdef DEBUG_INT
+#if DEBUG_INTERRUPTS
 static int
 dump_int_statistics(int argc, char **argv)
 {
@@ -128,7 +128,7 @@ int_init_post_vm(kernel_args *args)
 		B_INITIALIZE_SPINLOCK(&sVectors[i].vector_lock);
 		sVectors[i].enable_count = 0;
 		sVectors[i].no_lock_vector = false;
-#ifdef DEBUG_INT
+#if DEBUG_INTERRUPTS
 		sVectors[i].handled_count = 0;
 		sVectors[i].unhandled_count = 0;
 		sVectors[i].trigger_count = 0;
@@ -137,7 +137,7 @@ int_init_post_vm(kernel_args *args)
 		initque(&sVectors[i].handler_list);	/* initialize handler queue */
 	}
 
-#ifdef DEBUG_INT
+#if DEBUG_INTERRUPTS
 	add_debugger_command("ints", &dump_int_statistics,
 		"list interrupt statistics");
 #endif
@@ -199,7 +199,7 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 			invokeScheduler = true;
 	}
 
-#ifdef DEBUG_INT
+#if DEBUG_INTERRUPTS
 	sVectors[vector].trigger_count++;
 	if (status != B_UNHANDLED_INTERRUPT || handled || invokeScheduler) {
 		sVectors[vector].handled_count++;

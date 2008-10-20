@@ -4565,7 +4565,7 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache, off_t cacheOffset,
 		// If we inserted a dummy page into this cache (i.e. if it is the top
 		// cache), we have to remove it now
 		if (dummyPage.state == PAGE_STATE_BUSY && dummyPage.cache == cache) {
-#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+#if DEBUG_PAGE_CACHE_TRANSITIONS
 			page->debug_flags = dummyPage.debug_flags | 0x8;
 			if (dummyPage.collided_page != NULL) {
 				dummyPage.collided_page->collided_page = page;
@@ -4579,7 +4579,7 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache, off_t cacheOffset,
 		cache->InsertPage(page, cacheOffset);
 
 		if (dummyPage.state == PAGE_STATE_BUSY) {
-#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+#if DEBUG_PAGE_CACHE_TRANSITIONS
 			page->debug_flags = dummyPage.debug_flags | 0x10;
 			if (dummyPage.collided_page != NULL) {
 				dummyPage.collided_page->collided_page = page;
@@ -4756,7 +4756,7 @@ vm_soft_fault(vm_address_space *addressSpace, addr_t originalAddress,
 	dummyPage.state = PAGE_STATE_INACTIVE;
 	dummyPage.type = PAGE_TYPE_DUMMY;
 	dummyPage.wired_count = 0;
-#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+#if DEBUG_PAGE_CACHE_TRANSITIONS
 	dummyPage.debug_flags = 0;
 	dummyPage.collided_page = NULL;
 #endif	// DEBUG_PAGE_CACHE_TRANSITIONS

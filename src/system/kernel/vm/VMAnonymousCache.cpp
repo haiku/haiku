@@ -735,7 +735,7 @@ VMAnonymousCache::Merge(VMCache* _source)
 					!= SWAP_SLOT_NONE) {
 				page->merge_swap = true;
 			}
-#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+#if DEBUG_PAGE_CACHE_TRANSITIONS
 		} else {
 			page->debug_flags = 0;
 			if (consumerPage->state == PAGE_STATE_BUSY)

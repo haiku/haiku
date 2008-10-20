@@ -21,6 +21,8 @@
 #include <vm_page.h>
 #include <vm_cache.h>
 
+#include "kernel_debug_config.h"
+
 
 //#define TRACE_FILE_MAP
 #ifdef TRACE_FILE_MAP
@@ -34,7 +36,6 @@
 //	for the whole map.
 // TODO: it would be nice if we could free a file map in low memory situations.
 
-#define DEBUG_FILE_MAP
 
 #define CACHED_FILE_EXTENTS	2
 	// must be smaller than MAX_FILE_IO_VECS
@@ -51,7 +52,7 @@ struct file_extent_array {
 };
 
 class FileMap
-#ifdef DEBUG_FILE_MAP
+#if DEBUG_FILE_MAP
 	: public DoublyLinkedListLinkImpl<FileMap>
 #endif
 {
@@ -94,7 +95,7 @@ private:
 	bool			fCacheAll;
 };
 
-#ifdef DEBUG_FILE_MAP
+#if DEBUG_FILE_MAP
 typedef DoublyLinkedList<FileMap> FileMapList;
 
 static FileMapList sList;
@@ -111,7 +112,7 @@ FileMap::FileMap(struct vnode* vnode, off_t size)
 {
 	mutex_init(&fLock, "file map");
 
-#ifdef DEBUG_FILE_MAP
+#if DEBUG_FILE_MAP
 	MutexLocker _(sLock);
 	sList.Add(this);
 #endif
@@ -123,7 +124,7 @@ FileMap::~FileMap()
 	_Free();
 	mutex_destroy(&fLock);
 
-#ifdef DEBUG_FILE_MAP
+#if DEBUG_FILE_MAP
 	MutexLocker _(sLock);
 	sList.Remove(this);
 #endif
@@ -459,7 +460,7 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count,
 //	#pragma mark -
 
 
-#ifdef DEBUG_FILE_MAP
+#if DEBUG_FILE_MAP
 
 static int
 dump_file_map(int argc, char** argv)
@@ -553,7 +554,7 @@ dump_file_map_stats(int argc, char** argv)
 extern "C" status_t
 file_map_init(void)
 {
-#ifdef DEBUG_FILE_MAP
+#if DEBUG_FILE_MAP
 	add_debugger_command_etc("file_map", &dump_file_map,
 		"Dumps the specified file map.",
 		"[-p] <file-map>\n"

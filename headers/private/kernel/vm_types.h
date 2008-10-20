@@ -83,11 +83,11 @@ struct vm_page {
 
 	vm_page_mappings	mappings;
 
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 	void*				queue;
 #endif
 
-#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+#if DEBUG_PAGE_CACHE_TRANSITIONS
 	uint32	debug_flags;
 	struct vm_page *collided_page;
 #endif

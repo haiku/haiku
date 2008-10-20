@@ -65,7 +65,7 @@ struct cached_block {
 	void			*current_data;
 	void			*original_data;
 	void			*parent_data;
-#ifdef BLOCK_CACHE_DEBUG_CHANGED
+#if BLOCK_CACHE_DEBUG_CHANGED
 	void			*compare;
 #endif
 	int32			ref_count;
@@ -837,7 +837,7 @@ block_cache::FreeBlock(cached_block *block)
 			block->block_number, block->original_data, block->parent_data);
 	}
 
-#ifdef BLOCK_CACHE_DEBUG_CHANGED
+#if BLOCK_CACHE_DEBUG_CHANGED
 	Free(block->compare);
 #endif
 
@@ -909,7 +909,7 @@ block_cache::NewBlock(off_t blockNumber)
 	block->parent_data = NULL;
 	block->is_dirty = false;
 	block->unused = false;
-#ifdef BLOCK_CACHE_DEBUG_CHANGED
+#if BLOCK_CACHE_DEBUG_CHANGED
 	block->compare = NULL;
 #endif
 
@@ -1000,7 +1000,7 @@ block_cache::LowMemoryHandler(void *data, uint32 resources, int32 level)
 static void
 put_cached_block(block_cache *cache, cached_block *block)
 {
-#ifdef BLOCK_CACHE_DEBUG_CHANGED
+#if BLOCK_CACHE_DEBUG_CHANGED
 	if (!block->is_dirty && block->compare != NULL
 		&& memcmp(block->current_data, block->compare, cache->block_size)) {
 		dprintf("new block:\n");
@@ -1321,7 +1321,7 @@ write_cached_block(block_cache *cache, cached_block *block,
 }
 
 
-#ifdef DEBUG_BLOCK_CACHE
+#if DEBUG_BLOCK_CACHE
 
 static void
 dump_block(cached_block *block)
@@ -1752,7 +1752,7 @@ block_cache_init(void)
 	if (sNotifierWriterThread >= B_OK)
 		send_signal_etc(sNotifierWriterThread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
-#ifdef DEBUG_BLOCK_CACHE
+#if DEBUG_BLOCK_CACHE
 	add_debugger_command_etc("block_caches", &dump_caches,
 		"dumps all block caches", "\n", 0);
 	add_debugger_command_etc("block_cache", &dump_cache,
@@ -2519,7 +2519,7 @@ block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 	if (block == NULL)
 		return NULL;
 
-#ifdef BLOCK_CACHE_DEBUG_CHANGED
+#if BLOCK_CACHE_DEBUG_CHANGED
 	if (block->compare == NULL)
 		block->compare = cache->Allocate();
 	if (block->compare != NULL)

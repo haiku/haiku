@@ -923,7 +923,7 @@ VMCache::Merge(VMCache* source)
 			// the page is not yet in the consumer cache - move it upwards
 			source->RemovePage(page);
 			InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
-#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+#if DEBUG_PAGE_CACHE_TRANSITIONS
 		} else {
 			page->debug_flags = 0;
 			if (consumerPage->state == PAGE_STATE_BUSY)

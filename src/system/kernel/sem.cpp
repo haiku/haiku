@@ -34,6 +34,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "kernel_debug_config.h"
+
 
 //#define TRACE_SEM
 #ifdef TRACE_SEM
@@ -49,7 +51,6 @@
 #	define KTRACE(x...) do {} while (false)
 #endif
 
-#define DEBUG_LAST_ACQUIRER
 
 struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
 	queued_thread(struct thread *thread, int32 count)
@@ -81,7 +82,7 @@ struct sem_entry {
 			team_id				owner;	// if set to -1, means owned by a port
 			select_info			*select_infos;
 			thread_id			last_acquirer;
-#ifdef DEBUG_LAST_ACQUIRER
+#if DEBUG_SEM_LAST_ACQUIRER
 			int32				last_acquire_count;
 			thread_id			last_releaser;
 			int32				last_release_count;
@@ -177,7 +178,7 @@ dump_sem(struct sem_entry *sem)
 		set_debug_variable("_semID", sem->id);
 		set_debug_variable("_owner", sem->u.used.owner);
 
-#ifdef DEBUG_LAST_ACQUIRER
+#if DEBUG_SEM_LAST_ACQUIRER
 		kprintf("last acquired by: %ld, count: %ld\n", sem->u.used.last_acquirer,
 			sem->u.used.last_acquire_count);
 		kprintf("last released by: %ld, count: %ld\n", sem->u.used.last_releaser,
@@ -817,7 +818,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 
 		if (acquireStatus >= B_OK) {
 			sSems[slot].u.used.last_acquirer = thread_get_current_thread_id();
-#ifdef DEBUG_LAST_ACQUIRER
+#if DEBUG_SEM_LAST_ACQUIRER
 			sSems[slot].u.used.last_acquire_count = count;
 #endif
 		}
@@ -833,7 +834,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	} else {
 		sSems[slot].u.used.net_count -= count;
 		sSems[slot].u.used.last_acquirer = thread_get_current_thread_id();
-#ifdef DEBUG_LAST_ACQUIRER
+#if DEBUG_SEM_LAST_ACQUIRER
 		sSems[slot].u.used.last_acquire_count = count;
 #endif
 	}
@@ -902,7 +903,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		flags);
 
 	sSems[slot].u.used.last_acquirer = -sSems[slot].u.used.last_acquirer;
-#ifdef DEBUG_LAST_ACQUIRER
+#if DEBUG_SEM_LAST_ACQUIRER
 	sSems[slot].u.used.last_releaser = thread_get_current_thread_id();
 	sSems[slot].u.used.last_release_count = count;
 #endif

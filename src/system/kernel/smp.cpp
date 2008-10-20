@@ -24,8 +24,9 @@
 #include <spinlock_contention.h>
 #include <thread.h>
 
+#include "kernel_debug_config.h"
 
-#define DEBUG_SPINLOCKS 1
+
 //#define TRACE_SMP
 
 #ifdef TRACE_SMP

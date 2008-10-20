@@ -10,6 +10,9 @@
 
 #include <OS.h>
 
+#include "kernel_debug_config.h"
+
+
 // allocate 16MB initial heap for the kernel
 #define INITIAL_HEAP_SIZE			16 * 1024 * 1024
 // grow by another 4MB each time the heap runs out of memory
@@ -18,9 +21,6 @@
 #define HEAP_DEDICATED_GROW_SIZE	1 * 1024 * 1024
 // use areas for allocations bigger than 1MB
 #define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
-
-// store size, thread and team info at the end of each allocation block
-#define KERNEL_HEAP_LEAK_CHECK 0
 
 
 typedef struct heap_class_s {

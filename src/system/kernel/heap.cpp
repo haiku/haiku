@@ -25,6 +25,7 @@
 #include <util/DoublyLinkedList.h>
 #include <vm.h>
 
+
 //#define TRACE_HEAP
 #ifdef TRACE_HEAP
 #	define TRACE(x) dprintf x
@@ -32,12 +33,6 @@
 #	define TRACE(x) ;
 #endif
 
-// initialize newly allocated memory with something non zero
-#define PARANOID_KERNEL_MALLOC 1
-// check for double free, and fill freed memory with 0xdeadbeef
-#define PARANOID_KERNEL_FREE 1
-// validate sanity of the heap after each operation (slow!)
-#define PARANOID_HEAP_VALIDATION 0
 
 #if KERNEL_HEAP_LEAK_CHECK
 typedef struct heap_leak_check_info_s {

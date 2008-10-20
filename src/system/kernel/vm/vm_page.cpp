@@ -286,7 +286,7 @@ dequeue_page(page_queue *queue)
 		if (page->type != PAGE_TYPE_DUMMY)
 			queue->count--;
 
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 		if (page->queue != queue) {
 			panic("dequeue_page(queue: %p): page %p thinks it is in queue "
 				"%p", queue, page, page->queue);
@@ -304,7 +304,7 @@ dequeue_page(page_queue *queue)
 static void
 enqueue_page(page_queue *queue, vm_page *page)
 {
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 	if (page->queue != NULL) {
 		panic("enqueue_page(queue: %p, page: %p): page thinks it is "
 			"already in queue %p", queue, page, page->queue);
@@ -321,7 +321,7 @@ enqueue_page(page_queue *queue, vm_page *page)
 	if (page->type != PAGE_TYPE_DUMMY)
 		queue->count++;
 
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 	page->queue = queue;
 #endif
 }
@@ -331,7 +331,7 @@ enqueue_page(page_queue *queue, vm_page *page)
 static void
 enqueue_page_to_head(page_queue *queue, vm_page *page)
 {
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 	if (page->queue != NULL) {
 		panic("enqueue_page_to_head(queue: %p, page: %p): page thinks it is "
 			"already in queue %p", queue, page, page->queue);
@@ -348,7 +348,7 @@ enqueue_page_to_head(page_queue *queue, vm_page *page)
 	if (page->type != PAGE_TYPE_DUMMY)
 		queue->count++;
 
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 	page->queue = queue;
 #endif
 }
@@ -357,7 +357,7 @@ enqueue_page_to_head(page_queue *queue, vm_page *page)
 static void
 remove_page_from_queue(page_queue *queue, vm_page *page)
 {
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 	if (page->queue != queue) {
 		panic("remove_page_from_queue(queue: %p, page: %p): page thinks it "
 			"is in queue %p", queue, page, page->queue);
@@ -377,7 +377,7 @@ remove_page_from_queue(page_queue *queue, vm_page *page)
 	if (page->type != PAGE_TYPE_DUMMY)
 		queue->count--;
 
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 	page->queue = NULL;
 #endif
 }
@@ -400,7 +400,7 @@ move_page_to_queue(page_queue *fromQueue, page_queue *toQueue, vm_page *page)
 static void
 insert_page_after(page_queue *queue, vm_page *before, vm_page *page)
 {
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 	if (page->queue != NULL) {
 		panic("enqueue_page(queue: %p, page: %p): page thinks it is "
 			"already in queue %p", queue, page, page->queue);
@@ -424,7 +424,7 @@ insert_page_after(page_queue *queue, vm_page *before, vm_page *page)
 	if (page->type != PAGE_TYPE_DUMMY)
 		queue->count++;
 
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 	page->queue = queue;
 #endif
 }
@@ -558,10 +558,10 @@ dump_page(int argc, char **argv)
 	kprintf("wired_count:     %d\n", page->wired_count);
 	kprintf("usage_count:     %d\n", page->usage_count);
 	kprintf("busy_writing:    %d\n", page->busy_writing);
-	#ifdef DEBUG_PAGE_QUEUE
+	#if DEBUG_PAGE_QUEUE
 		kprintf("queue:           %p\n", page->queue);
 	#endif
-	#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+	#if DEBUG_PAGE_CACHE_TRANSITIONS
 		kprintf("debug_flags:     0x%lx\n", page->debug_flags);
 		kprintf("collided page:   %p\n", page->collided_page);
 	#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
@@ -1674,10 +1674,10 @@ vm_page_init(kernel_args *args)
 		sPages[i].busy_writing = false;
 		sPages[i].merge_swap = false;
 		sPages[i].cache = NULL;
-		#ifdef DEBUG_PAGE_QUEUE
+		#if DEBUG_PAGE_QUEUE
 			sPages[i].queue = NULL;
 		#endif
-		#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+		#if DEBUG_PAGE_CACHE_TRANSITIONS
 			sPages[i].debug_flags = 0;
 			sPages[i].collided_page = NULL;
 		#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
@@ -1896,7 +1896,7 @@ vm_page_allocate_page(int pageState, bool reserved)
 		if (reserved || sReservedPages < free_page_queue_count()) {
 			page = dequeue_page(queue);
 			if (page == NULL) {
-#ifdef DEBUG_PAGE_QUEUE
+#if DEBUG_PAGE_QUEUE
 				if (queue->count != 0)
 					panic("queue %p corrupted, count = %d\n", queue, queue->count);
 #endif
