@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2006-2008, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,12 @@
 #define _KERNEL_GENERIC_VM_PHYSICAL_PAGE_MAPPER_H
 
 #include <boot/kernel_args.h>
+
+
+// flags for generic_get_physical_page()
+enum {
+	PHYSICAL_PAGE_DONT_WAIT		= 0x01
+};
 
 #ifdef __cplusplus
 extern "C" {

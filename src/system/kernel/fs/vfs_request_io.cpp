@@ -92,8 +92,9 @@ public:
 		while (length > 0) {
 			addr_t pageOffset = buffer % B_PAGE_SIZE;
 			addr_t virtualAddress;
+			void* handle;
 			status_t error = vm_get_physical_page(buffer - pageOffset,
-				&virtualAddress, 0);
+				&virtualAddress, &handle);
 			if (error != B_OK)
 				return error;
 
@@ -102,7 +103,7 @@ public:
 			error = InternalIO(offset, (void*)(virtualAddress + pageOffset),
 				&transferred);
 
-			vm_put_physical_page(virtualAddress);
+			vm_put_physical_page(virtualAddress, handle);
 
 			if (error != B_OK)
 				return error;

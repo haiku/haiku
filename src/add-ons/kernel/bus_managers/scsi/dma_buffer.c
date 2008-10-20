@@ -114,21 +114,17 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 	// was allocated in kernel and is thus visible even if the thread
 	// was changed
 	for (; size > 0 && num_vecs > 0; ++sg_list, --num_vecs) {
-		addr_t virtualAddress;
 		size_t bytes;
 
 		bytes = min( size, sg_list->size );
 
-		if (vm_get_physical_page((addr_t)sg_list->address, &virtualAddress, 0)
-				!= B_OK)
-			return false;
-
-		if (to_buffer)
-			memcpy(buffer_data, (void *)virtualAddress, bytes);
-		else
-			memcpy((void *)virtualAddress, buffer_data, bytes);
-
-		vm_put_physical_page(virtualAddress);
+		if (to_buffer) {
+			vm_memcpy_from_physical(buffer_data, (addr_t)sg_list->address,
+				bytes, false);
+		} else {
+			vm_memcpy_to_physical((addr_t)sg_list->address, buffer_data,
+				bytes, false);
+		}
 
 		buffer_data += bytes;
 	}

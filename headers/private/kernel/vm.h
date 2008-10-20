@@ -91,17 +91,27 @@ status_t vm_unmap_pages(struct vm_area *area, addr_t base, size_t length,
 			bool preserveModified);
 status_t vm_map_page(struct vm_area *area, struct vm_page *page, addr_t address,
 			uint32 protection);
-status_t vm_get_physical_page(addr_t paddr, addr_t *vaddr, uint32 flags);
-status_t vm_put_physical_page(addr_t vaddr);
+
+status_t vm_get_physical_page(addr_t paddr, addr_t* vaddr, void** _handle);
+status_t vm_put_physical_page(addr_t vaddr, void* handle);
+status_t vm_get_physical_page_current_cpu(addr_t paddr, addr_t* vaddr,
+			void** _handle);
+status_t vm_put_physical_page_current_cpu(addr_t vaddr, void* handle);
+status_t vm_get_physical_page_debug(addr_t paddr, addr_t* vaddr,
+			void** _handle);
+status_t vm_put_physical_page_debug(addr_t vaddr, void* handle);
 
 void vm_get_info(struct system_memory_info *info);
 uint32 vm_num_page_faults(void);
 off_t vm_available_memory(void);
 off_t vm_available_not_needed_memory(void);
 
-status_t memset_physical(addr_t address, int value, size_t length);
-status_t memcpy_to_physical(addr_t to, const void* from, size_t length,
-	bool user);
+status_t vm_memset_physical(addr_t address, int value, size_t length);
+status_t vm_memcpy_from_physical(void* to, addr_t from, size_t length,
+			bool user);
+status_t vm_memcpy_to_physical(addr_t to, const void* from, size_t length,
+			bool user);
+void vm_memcpy_physical_page(addr_t to, addr_t from);
 
 // user syscalls
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,

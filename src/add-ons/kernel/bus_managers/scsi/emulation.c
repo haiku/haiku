@@ -459,24 +459,20 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 	// copy one S/G entry at a time
 	for (; size > 0 && req_size > 0 && sg_count > 0; ++sg_list, --sg_count) {
 		size_t bytes;
-		addr_t virtualAddress;
 
 		bytes = min(size, req_size);
 		bytes = min(bytes, sg_list->size);
 
-		if (vm_get_physical_page((addr_t)sg_list->address,
-				(void*)&virtualAddress, 0) != B_OK)
-			return false;
-
 		SHOW_FLOW(0, "buffer = %p, virt_addr = %#lx, bytes = %lu, to_buffer = %d",
-			buffer, virtualAddress + offset, bytes, to_buffer);
+			buffer, (addr_t)sg_list->address + offset, bytes, to_buffer);
 
-		if (to_buffer)
-			memcpy(buffer, (void *)(virtualAddress + offset), bytes);
-		else
-			memcpy((void *)(virtualAddress + offset), buffer, bytes);
-
-		vm_put_physical_page(virtualAddress);
+		if (to_buffer) {
+			vm_memcpy_from_physical(buffer, (addr_t)sg_list->address + offset,
+				bytes, false);
+		} else {
+			vm_memcpy_to_physical((addr_t)sg_list->address + offset, buffer,
+				bytes, false);
+		}
 
 		buffer = (char *)buffer + bytes;
 		size -= bytes;

@@ -1104,32 +1104,15 @@ IORequest::_CopySimple(void* bounceBuffer, void* external, size_t size,
 
 
 /* static */ status_t
-IORequest::_CopyPhysical(void* _bounceBuffer, void* _external, size_t size,
+IORequest::_CopyPhysical(void* bounceBuffer, void* external, size_t size,
 	team_id team, bool copyIn)
 {
-	uint8* bounceBuffer = (uint8*)_bounceBuffer;
-	addr_t external = (addr_t)_external;
-
-	while (size > 0) {
-		addr_t pageOffset = external % B_PAGE_SIZE;
-		addr_t virtualAddress;
-		status_t error = vm_get_physical_page(external - pageOffset,
-			&virtualAddress, 0);
-		if (error != B_OK)
-			return error;
-
-		size_t toCopy = min_c(size, B_PAGE_SIZE - pageOffset);
-		_CopySimple(bounceBuffer, (void*)(virtualAddress + pageOffset), toCopy,
-			team, copyIn);
-
-		vm_put_physical_page(virtualAddress);
-
-		size -= toCopy;
-		bounceBuffer += toCopy;
-		external += toCopy;
+	if (copyIn) {
+		return vm_memcpy_from_physical(bounceBuffer, (addr_t)external, size,
+			false);
 	}
 
-	return B_OK;
+	return vm_memcpy_to_physical((addr_t)external, bounceBuffer, size, false);
 }
 
 

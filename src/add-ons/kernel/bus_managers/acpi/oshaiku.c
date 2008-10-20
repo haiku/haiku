@@ -1158,16 +1158,10 @@ ACPI_STATUS
 AcpiOsReadMemory(ACPI_PHYSICAL_ADDRESS Address, UINT32 *Value, UINT32 Width)
 {
 #ifdef _KERNEL_MODE
-	addr_t pageOffset = Address % B_PAGE_SIZE;
-	addr_t virtualAddress;
-	status_t error = vm_get_physical_page(Address - pageOffset,
-		&virtualAddress, 0);
-	DEBUG_FUNCTION();
-	if (error != B_OK)
+	if (vm_memcpy_from_physical(Value, (addr_t)Address, Width / 8, false)
+			!= B_OK) {
 		return AE_ERROR;
-
-	memcpy(Value, (void*)(virtualAddress + pageOffset), Width / 8);
-	vm_put_physical_page(virtualAddress);
+	}
 	return AE_OK;
 #else
 	return AE_ERROR;
@@ -1193,16 +1187,10 @@ ACPI_STATUS
 AcpiOsWriteMemory(ACPI_PHYSICAL_ADDRESS Address, UINT32 Value, UINT32 Width)
 {
 #ifdef _KERNEL_MODE
-	addr_t pageOffset = Address % B_PAGE_SIZE;
-	addr_t virtualAddress;
-	status_t error = vm_get_physical_page(Address - pageOffset,
-		&virtualAddress, 0);
-	DEBUG_FUNCTION();
-	if (error != B_OK)
+	if (vm_memcpy_to_physical((addr_t)Address, &Value, Width / 8, false)
+			!= B_OK) {
 		return AE_ERROR;
-
-	memcpy((void*)(virtualAddress + pageOffset), &Value, Width / 8);
-	vm_put_physical_page(virtualAddress);
+	}
 	return AE_OK;
 #else
 	return AE_ERROR;

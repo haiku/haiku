@@ -39,6 +39,7 @@
 #include "ide_internal.h"
 #include "ide_sim.h"
 
+#include <thread.h>
 #include <vm.h>
 
 #include <string.h>
@@ -144,13 +145,18 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 	// one page into address space at once
 	while (length > 0) {
 		addr_t virtualAddress;
+		void* handle;
 		int page_left, cur_len;
 		status_t err;
+		struct thread* thread = thread_get_current_thread();
 
 		SHOW_FLOW(4, "Transmitting to/from physical address %lx, %d bytes left",
 			physicalAddress, length);
 
-		if (vm_get_physical_page(physicalAddress, &virtualAddress, 0) != B_OK) {
+		thread_pin_to_current_cpu(thread);
+		if (vm_get_physical_page_current_cpu(physicalAddress, &virtualAddress,
+				&handle) != B_OK) {
+			thread_unpin_from_current_cpu(thread);
 			// ouch: this should never ever happen
 			set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
 			return B_ERROR;
@@ -169,7 +175,8 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 		err = transfer_PIO_virtcont(device, (uint8 *)virtualAddress,
 			cur_len, write, transferred);
 
-		vm_put_physical_page(virtualAddress);
+		vm_put_physical_page_current_cpu(virtualAddress, handle);
+		thread_unpin_from_current_cpu(thread);
 
 		if (err != B_OK)
 			return err;

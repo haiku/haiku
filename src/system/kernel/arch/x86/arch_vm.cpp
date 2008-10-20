@@ -26,6 +26,8 @@
 
 #include <arch/x86/bios.h>
 
+#include "x86_paging.h"
+
 
 //#define TRACE_ARCH_VM
 #ifdef TRACE_ARCH_VM

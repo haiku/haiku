@@ -8,6 +8,8 @@
 
 #include <arch/thread.h>
 
+#include <string.h>
+
 #include <arch/user_debugger.h>
 #include <arch_cpu.h>
 #include <debug.h>
@@ -20,7 +22,7 @@
 #include <vm_address_space.h>
 #include <vm_types.h>
 
-#include <string.h>
+#include "x86_paging.h"
 
 
 //#define TRACE_ARCH_THREAD

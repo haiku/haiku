@@ -55,7 +55,7 @@
 #include <stdlib.h>
 
 #include "generic_vm_physical_page_mapper.h"
-
+#include "generic_vm_physical_page_ops.h"
 
 
 #define TRACE_VM_TMAP
@@ -119,8 +119,8 @@ static addr_t sIOSpaceBase;
 #define IS_KERNEL_MAP(map)		(map->arch_data->rtdir_phys == sKernelPhysicalPageRoot)
 
 static status_t early_query(addr_t va, addr_t *out_physical);
-static status_t get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags);
-static status_t put_physical_page_tmap(addr_t va);
+static status_t get_physical_page_tmap_internal(addr_t pa, addr_t *va, uint32 flags);
+static status_t put_physical_page_tmap_internal(addr_t va);
 
 static void flush_tmap(vm_translation_map *map);
 
@@ -571,7 +571,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	}
 	// now, fill in the pentry
 	do {
-		err = get_physical_page_tmap(PRE_TO_PA(pr[rindex]),
+		err = get_physical_page_tmap_internal(PRE_TO_PA(pr[rindex]),
 				&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (err < 0);
 	pd = (page_directory_entry *)pd_pg;
@@ -615,7 +615,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	}
 	// now, fill in the pentry
 	do {
-		err = get_physical_page_tmap(PDE_TO_PA(pd[dindex]),
+		err = get_physical_page_tmap_internal(PDE_TO_PA(pd[dindex]),
 				&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (err < 0);
 	pt = (page_table_entry *)pt_pg;
@@ -627,8 +627,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	put_page_table_entry_in_pgtable(&pt[pindex], pa, attributes,
 		IS_KERNEL_MAP(map));
 
-	put_physical_page_tmap(pt_pg);
-	put_physical_page_tmap(pd_pg);
+	put_physical_page_tmap_internal(pt_pg);
+	put_physical_page_tmap_internal(pd_pg);
 
 	if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE)
 		map->arch_data->pages_to_invalidate[map->arch_data->num_invalidate_pages] = va;
@@ -668,7 +668,7 @@ restart:
 	}
 
 	do {
-		status = get_physical_page_tmap(PRE_TO_PA(pr[index]),
+		status = get_physical_page_tmap_internal(PRE_TO_PA(pr[index]),
 			&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pd = (page_directory_entry *)pd_pg;
@@ -679,12 +679,12 @@ restart:
 	if (pd[index].type != DT_DIR) {
 		// no pagetable here, move the start up to access the next page table
 		start = ROUNDUP(start + 1, B_PAGE_SIZE);
-		put_physical_page_tmap(pd_pg);
+		put_physical_page_tmap_internal(pd_pg);
 		goto restart;
 	}
 
 	do {
-		status = get_physical_page_tmap(PDE_TO_PA(pd[index]),
+		status = get_physical_page_tmap_internal(PDE_TO_PA(pd[index]),
 			&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pt = (page_table_entry *)pt_pg;
@@ -710,8 +710,8 @@ restart:
 		map->arch_data->num_invalidate_pages++;
 	}
 
-	put_physical_page_tmap(pt_pg);
-	put_physical_page_tmap(pd_pg);
+	put_physical_page_tmap_internal(pt_pg);
+	put_physical_page_tmap_internal(pd_pg);
 
 	goto restart;
 }
@@ -795,7 +795,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 	}
 
 	do {
-		status = get_physical_page_tmap(PRE_TO_PA(pr[index]),
+		status = get_physical_page_tmap_internal(PRE_TO_PA(pr[index]),
 			&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pd = (page_directory_entry *)pd_pg;
@@ -806,12 +806,12 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 	index = VADDR_TO_PDENT(va);
 	if (pd[index].type != DT_DIR) {
 		// no pagetable here
-		put_physical_page_tmap(pd_pg);
+		put_physical_page_tmap_internal(pd_pg);
 		return B_NO_ERROR;
 	}
 
 	do {
-		status = get_physical_page_tmap(PDE_TO_PA(pd[index]),
+		status = get_physical_page_tmap_internal(PDE_TO_PA(pd[index]),
 			&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pt = (page_table_entry *)pt_pg;
@@ -825,14 +825,14 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 		pi = (page_indirect_entry *)pt;
 		pi_pg = pt_pg;
 		do {
-			status = get_physical_page_tmap(PIE_TO_PA(pi[index]),
+			status = get_physical_page_tmap_internal(PIE_TO_PA(pi[index]),
 				&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 		} while (status < B_OK);
 		pt = (page_table_entry *)pt_pg;
 		// add offset from start of page
 		pt += PIE_TO_PO(pi[index]) / sizeof(page_table_entry);
 		// release the indirect table page
-		put_physical_page_tmap(pi_pg);
+		put_physical_page_tmap_internal(pi_pg);
 	}
 
 	*_physical = PTE_TO_PA(pt[index]);
@@ -847,8 +847,8 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 		| (pt[index].accessed ? PAGE_ACCESSED : 0)
 		| ((pt[index].type == DT_PAGE) ? PAGE_PRESENT : 0);
 
-	put_physical_page_tmap(pt_pg);
-	put_physical_page_tmap(pd_pg);
+	put_physical_page_tmap_internal(pt_pg);
+	put_physical_page_tmap_internal(pd_pg);
 
 	TRACE(("query_tmap: returning pa 0x%lx for va 0x%lx\n", *_physical, va));
 
@@ -890,7 +890,7 @@ restart:
 	}
 
 	do {
-		status = get_physical_page_tmap(PRE_TO_PA(pr[index]),
+		status = get_physical_page_tmap_internal(PRE_TO_PA(pr[index]),
 			&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pd = (page_directory_entry *)pd_pg;
@@ -901,12 +901,12 @@ restart:
 	if (pd[index].type != DT_DIR) {
 		// no pagetable here, move the start up to access the next page table
 		start = ROUNDUP(start + 1, B_PAGE_SIZE);
-		put_physical_page_tmap(pd_pg);
+		put_physical_page_tmap_internal(pd_pg);
 		goto restart;
 	}
 
 	do {
-		status = get_physical_page_tmap(PDE_TO_PA(pd[index]),
+		status = get_physical_page_tmap_internal(PDE_TO_PA(pd[index]),
 			&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pt = (page_table_entry *)pt_pg;
@@ -936,8 +936,8 @@ restart:
 		map->arch_data->num_invalidate_pages++;
 	}
 
-	put_physical_page_tmap(pt_pg);
-	put_physical_page_tmap(pd_pg);
+	put_physical_page_tmap_internal(pt_pg);
+	put_physical_page_tmap_internal(pd_pg);
 
 	goto restart;
 }
@@ -962,7 +962,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 	}
 
 	do {
-		status = get_physical_page_tmap(PRE_TO_PA(pr[index]),
+		status = get_physical_page_tmap_internal(PRE_TO_PA(pr[index]),
 			&pd_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pd = (page_directory_entry *)pd_pg;
@@ -973,12 +973,12 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 	index = VADDR_TO_PDENT(va);
 	if (pd[index].type != DT_DIR) {
 		// no pagetable here
-		put_physical_page_tmap(pd_pg);
+		put_physical_page_tmap_internal(pd_pg);
 		return B_NO_ERROR;
 	}
 
 	do {
-		status = get_physical_page_tmap(PDE_TO_PA(pd[index]),
+		status = get_physical_page_tmap_internal(PDE_TO_PA(pd[index]),
 			&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 	} while (status < B_OK);
 	pt = (page_table_entry *)pt_pg;
@@ -992,14 +992,14 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 		pi = (page_indirect_entry *)pt;
 		pi_pg = pt_pg;
 		do {
-			status = get_physical_page_tmap(PIE_TO_PA(pi[index]),
+			status = get_physical_page_tmap_internal(PIE_TO_PA(pi[index]),
 				&pt_pg, PHYSICAL_PAGE_DONT_WAIT);
 		} while (status < B_OK);
 		pt = (page_table_entry *)pt_pg;
 		// add offset from start of page
 		pt += PIE_TO_PO(pi[index]) / sizeof(page_table_entry);
 		// release the indirect table page
-		put_physical_page_tmap(pi_pg);
+		put_physical_page_tmap_internal(pi_pg);
 	}
 
 	// clear out the flags we've been requested to clear
@@ -1012,8 +1012,8 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 		tlb_flush = true;
 	}
 
-	put_physical_page_tmap(pt_pg);
-	put_physical_page_tmap(pd_pg);
+	put_physical_page_tmap_internal(pt_pg);
+	put_physical_page_tmap_internal(pd_pg);
 
 	if (tlb_flush) {
 		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE)
@@ -1097,16 +1097,31 @@ map_iospace_chunk(addr_t va, addr_t pa, uint32 flags)
 
 
 static status_t
-get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags)
+get_physical_page_tmap_internal(addr_t pa, addr_t *va, uint32 flags)
 {
 	return generic_get_physical_page(pa, va, flags);
 }
 
 
 static status_t
-put_physical_page_tmap(addr_t va)
+put_physical_page_tmap_internal(addr_t va)
 {
 	return generic_put_physical_page(va);
+}
+
+
+static status_t
+get_physical_page_tmap(addr_t physicalAddress, addr_t *_virtualAddress,
+	void **handle)
+{
+	return generic_get_physical_page(physicalAddress, _virtualAddress, 0);
+}
+
+
+static status_t
+put_physical_page_tmap(addr_t virtualAddress, void *handle)
+{
+	return generic_put_physical_page(virtualAddress);
 }
 
 
@@ -1124,7 +1139,18 @@ static vm_translation_map_ops tmap_ops = {
 	clear_flags_tmap,
 	flush_tmap,
 	get_physical_page_tmap,
-	put_physical_page_tmap
+	put_physical_page_tmap,
+	get_physical_page_tmap,	// *_current_cpu()
+	put_physical_page_tmap,	// *_current_cpu()
+	get_physical_page_tmap,	// *_debug()
+	put_physical_page_tmap,	// *_debug()
+		// TODO: Replace the *_current_cpu() and *_debug() versions!
+
+	generic_vm_memset_physical,
+	generic_vm_memcpy_from_physical,
+	generic_vm_memcpy_to_physical,
+	generic_vm_memcpy_physical_page
+		// TODO: Verify that this is safe to use!
 };
 
 
@@ -1354,13 +1380,13 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 		index = VADDR_TO_PRENT((addr_t)&sQueryDesc);
 		physicalPageDir = PRE_TO_PA(sKernelVirtualPageRoot[index]);
 
-		get_physical_page_tmap(physicalPageDir,
+		get_physical_page_tmap_internal(physicalPageDir,
 			(addr_t *)&pageDirEntry, PHYSICAL_PAGE_DONT_WAIT);
 
 		index = VADDR_TO_PDENT((addr_t)&sQueryDesc);
 		physicalPageTable = PDE_TO_PA(pageDirEntry[index]);
 
-		get_physical_page_tmap(physicalPageTable,
+		get_physical_page_tmap_internal(physicalPageTable,
 			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_DONT_WAIT);
 
 		index = VADDR_TO_PTENT((addr_t)&sQueryDesc);
@@ -1370,8 +1396,8 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 		// add offset
 		physicalIndirectDesc += ((addr_t)&sQueryDesc) % B_PAGE_SIZE;
 
-		put_physical_page_tmap((addr_t)pageTableEntry);
-		put_physical_page_tmap((addr_t)pageDirEntry);
+		put_physical_page_tmap_internal((addr_t)pageTableEntry);
+		put_physical_page_tmap_internal((addr_t)pageDirEntry);
 
 		// then the va for the page table for the query page.
 
@@ -1380,13 +1406,13 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 		index = VADDR_TO_PRENT(queryPage);
 		physicalPageDir = PRE_TO_PA(sKernelVirtualPageRoot[index]);
 
-		get_physical_page_tmap(physicalPageDir,
+		get_physical_page_tmap_internal(physicalPageDir,
 			(addr_t *)&pageDirEntry, PHYSICAL_PAGE_DONT_WAIT);
 
 		index = VADDR_TO_PDENT(queryPage);
 		physicalPageTable = PDE_TO_PA(pageDirEntry[index]);
 
-		get_physical_page_tmap(physicalPageTable,
+		get_physical_page_tmap_internal(physicalPageTable,
 			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_DONT_WAIT);
 
 		index = VADDR_TO_PTENT(queryPage);
@@ -1394,8 +1420,8 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 		put_page_indirect_entry_in_pgtable(&pageTableEntry[index], physicalIndirectDesc,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
 
-		put_physical_page_tmap((addr_t)pageTableEntry);
-		put_physical_page_tmap((addr_t)pageDirEntry);
+		put_physical_page_tmap_internal((addr_t)pageTableEntry);
+		put_physical_page_tmap_internal((addr_t)pageDirEntry);
 		//invalidate_TLB(sQueryPageTable);
 	}
 	// qmery_tmap_interrupt checks for the NULL, now it can use it

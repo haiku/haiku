@@ -28,6 +28,7 @@ KernelMergeObject kernel_arch_ppc.o :
 	arch_asm.S
 
 	generic_vm_physical_page_mapper.cpp
+	generic_vm_physical_page_ops.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 ;

@@ -233,22 +233,15 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 	for (int32 i = 0; i < pageIndex; i++) {
 		if (useBuffer && bufferSize != 0) {
-			addr_t virtualAddress;
-			if (vm_get_physical_page(
-					pages[i]->physical_page_number * B_PAGE_SIZE,
-					&virtualAddress, 0) < B_OK) {
-				panic("could not get physical page");
-			}
-
 			size_t bytes = min_c(bufferSize, (size_t)B_PAGE_SIZE - pageOffset);
 
-			user_memcpy((void*)buffer, (void*)(virtualAddress + pageOffset),
-				bytes);
+			vm_memcpy_from_physical((void*)buffer,
+				pages[i]->physical_page_number * B_PAGE_SIZE + pageOffset,
+				bytes, true);
+
 			buffer += bytes;
 			bufferSize -= bytes;
 			pageOffset = 0;
-
-			vm_put_physical_page(virtualAddress);
 		}
 	}
 
@@ -364,7 +357,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 		if (offset + pageOffset + bufferSize == ref->cache->virtual_end) {
 			// the space in the page after this write action needs to be cleaned
-			memset_physical(last + lastPageOffset, 0,
+			vm_memset_physical(last + lastPageOffset, 0,
 				B_PAGE_SIZE - lastPageOffset);
 		} else {
 			// the end of this write does not happen on a page boundary, so we
@@ -381,7 +374,8 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 			if (bytesRead < B_PAGE_SIZE) {
 				// the space beyond the file size needs to be cleaned
-				memset_physical(last + bytesRead, 0, B_PAGE_SIZE - bytesRead);
+				vm_memset_physical(last + bytesRead, 0,
+					B_PAGE_SIZE - bytesRead);
 			}
 		}
 	}
@@ -393,10 +387,11 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 		if (useBuffer) {
 			// copy data from user buffer
-			memcpy_to_physical(base + pageOffset, (void *)buffer, bytes, true);
+			vm_memcpy_to_physical(base + pageOffset, (void *)buffer, bytes,
+				true);
 		} else {
 			// clear buffer instead
-			memset_physical(base + pageOffset, 0, bytes);
+			vm_memset_physical(base + pageOffset, 0, bytes);
 		}
 
 		bufferSize -= bytes;
@@ -634,25 +629,20 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 				page->state = PAGE_STATE_BUSY;
 				locker.Unlock();
 
-				addr_t virtualAddress;
-				vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
-					&virtualAddress, 0);
-
 				// copy the contents of the page already in memory
+				addr_t pageAddress = page->physical_page_number * B_PAGE_SIZE
+					+ pageOffset;
 				if (doWrite) {
 					if (useBuffer) {
-						user_memcpy((void *)(virtualAddress + pageOffset),
-							(void *)buffer, bytesInPage);
+						vm_memcpy_to_physical(pageAddress, (void*)buffer,
+							bytesInPage, true);
 					} else {
-						user_memset((void *)(virtualAddress + pageOffset),
-							0, bytesInPage);
+						vm_memset_physical(pageAddress, 0, bytesInPage);
 					}
 				} else if (useBuffer) {
-					user_memcpy((void *)buffer,
-						(void *)(virtualAddress + pageOffset), bytesInPage);
+					vm_memcpy_from_physical((void*)buffer, pageAddress,
+						bytesInPage, true);
 				}
-
-				vm_put_physical_page(virtualAddress);
 
 				locker.Lock();
 

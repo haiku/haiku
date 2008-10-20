@@ -47,11 +47,6 @@
 	(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_OVERCOMMITTING_AREA \
 		| B_SHARED_AREA)
 
-// flags for vm_get_physical_page()
-enum {
-	PHYSICAL_PAGE_DONT_WAIT		= 0x01
-};
-
 // mapping argument for several internal VM functions
 enum {
 	REGION_NO_PRIVATE_MAP = 0,

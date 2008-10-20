@@ -821,13 +821,8 @@ move_page_to_active_or_inactive_queue(vm_page *page, bool dequeued)
 static void
 clear_page(struct vm_page *page)
 {
-	addr_t virtualAddress;
-	vm_get_physical_page(page->physical_page_number << PAGE_SHIFT,
-		&virtualAddress, 0);
-
-	memset((void *)virtualAddress, 0, B_PAGE_SIZE);
-
-	vm_put_physical_page(virtualAddress);
+	vm_memset_physical(page->physical_page_number << PAGE_SHIFT, 0,
+		B_PAGE_SIZE);
 }
 
 

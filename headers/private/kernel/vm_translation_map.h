@@ -43,9 +43,32 @@ typedef struct vm_translation_map_ops {
 				uint32 attributes);
 	status_t (*clear_flags)(vm_translation_map *map, addr_t va, uint32 flags);
 	void (*flush)(vm_translation_map *map);
+
+	// get/put virtual address for physical page -- will be usuable on all CPUs
+	// (usually more expensive than the *_current_cpu() versions)
 	status_t (*get_physical_page)(addr_t physicalAddress,
-				addr_t *_virtualAddress, uint32 flags);
-	status_t (*put_physical_page)(addr_t virtualAddress);
+				addr_t *_virtualAddress, void **handle);
+	status_t (*put_physical_page)(addr_t virtualAddress, void *handle);
+
+	// get/put virtual address for physical page -- thread must be pinned the
+	// whole time
+	status_t (*get_physical_page_current_cpu)(addr_t physicalAddress,
+				addr_t *_virtualAddress, void **handle);
+	status_t (*put_physical_page_current_cpu)(addr_t virtualAddress,
+				void *handle);
+
+	// get/put virtual address for physical in KDL
+	status_t (*get_physical_page_debug)(addr_t physicalAddress,
+				addr_t *_virtualAddress, void **handle);
+	status_t (*put_physical_page_debug)(addr_t virtualAddress, void *handle);
+
+	// memory operations on pages
+	status_t (*memset_physical)(addr_t address, int value, size_t length);
+	status_t (*memcpy_from_physical)(void* to, addr_t from, size_t length,
+				bool user);
+	status_t (*memcpy_to_physical)(addr_t to, const void* from, size_t length,
+				bool user);
+	void (*memcpy_physical_page)(addr_t to, addr_t from);
 } vm_translation_map_ops;
 
 #include <arch/vm_translation_map.h>

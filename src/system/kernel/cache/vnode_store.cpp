@@ -66,7 +66,7 @@ VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 		addr_t address = (addr_t)vecs[i].iov_base + vecs[i].iov_len - length;
 		if ((flags & B_PHYSICAL_IO_REQUEST) != 0)
-			memset_physical(address, 0, length);
+			vm_memset_physical(address, 0, length);
 		else
 			memset((void*)address, 0, length);
 

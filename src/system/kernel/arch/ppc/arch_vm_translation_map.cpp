@@ -84,6 +84,8 @@
 #include <stdlib.h>
 
 #include "generic_vm_physical_page_mapper.h"
+#include "generic_vm_physical_page_ops.h"
+
 
 static struct page_table_entry_group *sPageTable;
 static size_t sPageTableSize;
@@ -444,16 +446,17 @@ flush_tmap(vm_translation_map *map)
 
 
 static status_t
-get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags)
+get_physical_page_tmap(addr_t physicalAddress, addr_t *_virtualAddress,
+	void **handle)
 {
-	return generic_get_physical_page(pa, va, flags);
+	return generic_get_physical_page(physicalAddress, _virtualAddress, 0);
 }
 
 
 static status_t
-put_physical_page_tmap(addr_t va)
+put_physical_page_tmap(addr_t virtualAddress, void *handle)
 {
-	return generic_put_physical_page(va);
+	return generic_put_physical_page(virtualAddress);
 }
 
 
@@ -471,7 +474,18 @@ static vm_translation_map_ops tmap_ops = {
 	clear_flags_tmap,
 	flush_tmap,
 	get_physical_page_tmap,
-	put_physical_page_tmap
+	put_physical_page_tmap,
+	get_physical_page_tmap,	// *_current_cpu()
+	put_physical_page_tmap,	// *_current_cpu()
+	get_physical_page_tmap,	// *_debug()
+	put_physical_page_tmap,	// *_debug()
+		// TODO: Replace the *_current_cpu() and *_debug() versions!
+
+	generic_vm_memset_physical,
+	generic_vm_memcpy_from_physical,
+	generic_vm_memcpy_to_physical,
+	generic_vm_memcpy_physical_page
+		// TODO: Verify that this is safe to use!
 };
 
 

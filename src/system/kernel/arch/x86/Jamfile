@@ -3,12 +3,10 @@ SubDir HAIKU_TOP src system kernel arch x86 ;
 SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) system kernel ] ;
 	# for syscall_numbers.h
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers ps2 ;
-SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 SubDirHdrs $(SUBDIR) timers ;
 
 UsePrivateKernelHeaders ;
-
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+UsePrivateHeaders shared ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
 
@@ -36,12 +34,12 @@ KernelMergeObject kernel_arch_x86.o :
 	cpuid.S
 	syscall.S
 	vm86.cpp
+	x86_physical_page_mapper.cpp
+	x86_physical_page_mapper_large_memory.cpp
 
 	x86_pit.c
 	x86_apic.c
 	x86_hpet.c
-
-	generic_vm_physical_page_mapper.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;

@@ -3095,6 +3095,8 @@ display_mem(int argc, char **argv)
 	if (num <= 0)
 		num = displayWidth;
 
+	void* physicalPageHandle = NULL;
+
 	if (physical) {
 		int32 offset = address & (B_PAGE_SIZE - 1);
 		if (num * itemSize + offset > B_PAGE_SIZE) {
@@ -3104,17 +3106,12 @@ display_mem(int argc, char **argv)
 
 		address = ROUNDOWN(address, B_PAGE_SIZE);
 
-		gKernelStartup = true;
-			// vm_get_physical_page() needs to lock...
-
-		if (vm_get_physical_page(address, &copyAddress, PHYSICAL_PAGE_DONT_WAIT)
-				!= B_OK) {
+		if (vm_get_physical_page_debug(address, &copyAddress,
+				&physicalPageHandle) != B_OK) {
 			kprintf("getting the hardware page failed.");
-			gKernelStartup = false;
 			return 0;
 		}
 
-		gKernelStartup = false;
 		address += offset;
 		copyAddress += offset;
 	} else
@@ -3202,9 +3199,7 @@ display_mem(int argc, char **argv)
 
 	if (physical) {
 		copyAddress = ROUNDOWN(copyAddress, B_PAGE_SIZE);
-		gKernelStartup = true;
-		vm_put_physical_page(copyAddress);
-		gKernelStartup = false;
+		vm_put_physical_page_debug(copyAddress, physicalPageHandle);
 	}
 	return 0;
 }
@@ -4611,7 +4606,6 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache, off_t cacheOffset,
 		// fault_find_page() didn't find the page, it would return the top cache
 		// for write faults.
 		vm_page *sourcePage = page;
-		void *source, *dest;
 
 		// ToDo: if memory is low, it might be a good idea to steal the page
 		//	from our source cache - if possible, that is
@@ -4623,26 +4617,9 @@ if (cacheOffset == 0x12000)
 		sourcePage, page, sourcePage->cache, topCacheRef->cache);
 #endif
 
-		// try to get a mapping for the src and dest page so we can copy it
-		for (;;) {
-			map->ops->get_physical_page(
-				sourcePage->physical_page_number * B_PAGE_SIZE,
-				(addr_t *)&source, 0);
-
-			if (map->ops->get_physical_page(
-					page->physical_page_number * B_PAGE_SIZE,
-					(addr_t *)&dest, PHYSICAL_PAGE_DONT_WAIT) == B_OK)
-				break;
-
-			// it couldn't map the second one, so sleep and retry
-			// keeps an extremely rare deadlock from occuring
-			map->ops->put_physical_page((addr_t)source);
-			snooze(5000);
-		}
-
-		memcpy(dest, source, B_PAGE_SIZE);
-		map->ops->put_physical_page((addr_t)source);
-		map->ops->put_physical_page((addr_t)dest);
+		// copy the page
+		vm_memcpy_physical_page(page->physical_page_number * B_PAGE_SIZE,
+			sourcePage->physical_page_number * B_PAGE_SIZE);
 
 		if (sourcePage->state != PAGE_STATE_MODIFIED)
 			vm_page_set_state(sourcePage, PAGE_STATE_ACTIVE);
@@ -4860,9 +4837,47 @@ found:
 
 
 status_t
-vm_get_physical_page(addr_t paddr, addr_t *_vaddr, uint32 flags)
+vm_get_physical_page(addr_t paddr, addr_t* _vaddr, void** _handle)
 {
-	return (*vm_kernel_address_space()->translation_map.ops->get_physical_page)(paddr, _vaddr, flags);
+	return vm_kernel_address_space()->translation_map.ops->get_physical_page(
+		paddr, _vaddr, _handle);
+}
+
+status_t
+vm_put_physical_page(addr_t vaddr, void* handle)
+{
+	return vm_kernel_address_space()->translation_map.ops->put_physical_page(
+		vaddr, handle);
+}
+
+
+status_t
+vm_get_physical_page_current_cpu(addr_t paddr, addr_t* _vaddr, void** _handle)
+{
+	return vm_kernel_address_space()->translation_map.ops
+		->get_physical_page_current_cpu(paddr, _vaddr, _handle);
+}
+
+status_t
+vm_put_physical_page_current_cpu(addr_t vaddr, void* handle)
+{
+	return vm_kernel_address_space()->translation_map.ops
+		->put_physical_page_current_cpu(vaddr, handle);
+}
+
+
+status_t
+vm_get_physical_page_debug(addr_t paddr, addr_t* _vaddr, void** _handle)
+{
+	return vm_kernel_address_space()->translation_map.ops
+		->get_physical_page_debug(paddr, _vaddr, _handle);
+}
+
+status_t
+vm_put_physical_page_debug(addr_t vaddr, void* handle)
+{
+	return vm_kernel_address_space()->translation_map.ops
+		->put_physical_page_debug(vaddr, handle);
 }
 
 
@@ -4900,13 +4915,6 @@ vm_available_not_needed_memory(void)
 {
 	MutexLocker locker(sAvailableMemoryLock);
 	return sAvailableMemory - sNeededMemory;
-}
-
-
-status_t
-vm_put_physical_page(addr_t vaddr)
-{
-	return (*vm_kernel_address_space()->translation_map.ops->put_physical_page)(vaddr);
 }
 
 
@@ -5163,66 +5171,34 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 
 status_t
-memset_physical(addr_t address, int value, size_t length)
+vm_memset_physical(addr_t address, int value, size_t length)
 {
-	ThreadCPUPinner _(thread_get_current_thread());
-
-	while (length > 0) {
-		addr_t pageOffset = address % B_PAGE_SIZE;
-		addr_t virtualAddress;
-		status_t error = vm_get_physical_page(address - pageOffset,
-			&virtualAddress, 0);
-		if (error != B_OK)
-			return error;
-
-		size_t toSet = min_c(length, B_PAGE_SIZE - pageOffset);
-		memset((void*)(virtualAddress + pageOffset), value, toSet);
-
-		vm_put_physical_page(virtualAddress);
-
-		length -= toSet;
-		address += toSet;
-	}
-
-	return B_OK;
+	return vm_kernel_address_space()->translation_map.ops->memset_physical(
+		address, value, length);
 }
 
 
 status_t
-memcpy_to_physical(addr_t to, const void* _from, size_t length, bool user)
+vm_memcpy_from_physical(void* to, addr_t from, size_t length, bool user)
 {
-	const uint8* from = (const uint8*)_from;
-	addr_t pageOffset = to % B_PAGE_SIZE;
+	return vm_kernel_address_space()->translation_map.ops->memcpy_from_physical(
+		to, from, length, user);
+}
 
-	ThreadCPUPinner _(thread_get_current_thread());
 
-	while (length > 0) {
-		size_t toCopy = min_c(length, B_PAGE_SIZE - pageOffset);
+status_t
+vm_memcpy_to_physical(addr_t to, const void* _from, size_t length, bool user)
+{
+	return vm_kernel_address_space()->translation_map.ops->memcpy_to_physical(
+		to, _from, length, user);
+}
 
-		addr_t virtualAddress;
-		status_t error = vm_get_physical_page(to - pageOffset, &virtualAddress,
-			0);
-		if (error != B_OK)
-			return error;
 
-		if (user) {
-			error = user_memcpy((void*)(virtualAddress + pageOffset), from,
-				toCopy);
-		} else
-			memcpy((void*)(virtualAddress + pageOffset), from, toCopy);
-
-		vm_put_physical_page(virtualAddress);
-
-		if (error != B_OK)
-			return error;
-
-		to += toCopy;
-		from += toCopy;
-		length -= toCopy;
-		pageOffset = 0;
-	}
-
-	return B_OK;
+void
+vm_memcpy_physical_page(addr_t to, addr_t from)
+{
+	return vm_kernel_address_space()->translation_map.ops->memcpy_physical_page(
+		to, from);
 }
 
 
