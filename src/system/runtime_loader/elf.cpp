@@ -1297,6 +1297,7 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 		if (found) {
 			atomic_add(&found->ref_count, 1);
 			*_image = found;
+			_kern_close(fd);
 			KTRACE("rld: load_container(\"%s\"): already loaded after all",
 				name);
 			return B_OK;
