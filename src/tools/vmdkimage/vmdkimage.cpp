@@ -314,7 +314,7 @@ main(int argc, char *argv[])
 	// Generate UUID for the image by hashing its full path
 	uint64 uuid1 = 0, uuid2 = 0, uuid3 = 0, uuid4 = 0, uuid5 = 0;
 	if (uuid == NULL) {
-		char fullPath[PATH_MAX + 1];
+		char fullPath[PATH_MAX + 6];
 		strcpy(fullPath, "Haiku");
 
 		if (realpath(file, fullPath + 5) == NULL)
