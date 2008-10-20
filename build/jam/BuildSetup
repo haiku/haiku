@@ -466,11 +466,11 @@ HOST_UNARFLAGS		?= x ;
 
 # check the host platform compatibility
 SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
-	: linux freebsd darwin sunos cygwin ;
+	: linux openbsd freebsd darwin sunos cygwin ;
 
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
 	|| $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = cygwin
-	|| $(HOST_PLATFORM) = sunos {
+	|| $(HOST_PLATFORM) = sunos || $(HOST_PLATFORM) = openbsd {
 	# don't use lex: otherwise rc will not work correctly
 	if $(LEX) = lex {
 		LEX = flex ;

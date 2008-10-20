@@ -329,6 +329,7 @@ case "${platform}" in
 	FreeBSD) buildPlatform=freebsd ;;
 	Haiku)	buildPlatform=haiku_host ;;
 	Linux)	buildPlatform=linux ;;
+	OpenBSD) buildPlatform=openbsd ;;
 	SunOS)	buildPlatform=sunos ;;
 	CYGWIN_NT-*) buildPlatform=cygwin ;;
 	*)		echo Unsupported platform: ${platform}
