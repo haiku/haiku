@@ -9,8 +9,8 @@ Addon <input>keyboard :
 	KeyboardInputDevice.cpp
 	Keymap.cpp
 
-	TMWindow.cpp
-	TMListItem.cpp
+	TeamMonitorWindow.cpp
+	TeamListItem.cpp
 
 	: input_server be ;
 

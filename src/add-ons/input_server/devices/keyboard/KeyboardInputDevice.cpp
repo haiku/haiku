@@ -657,7 +657,7 @@ KeyboardInputDevice::_DeviceWatcher(void* arg)
 
 			// show the team monitor
 			if (owner->fTeamMonitorWindow == NULL)
-				owner->fTeamMonitorWindow = new(std::nothrow) TMWindow();
+				owner->fTeamMonitorWindow = new(std::nothrow) TeamMonitorWindow();
 
 			if (owner->fTeamMonitorWindow != NULL)
 				owner->fTeamMonitorWindow->Enable();

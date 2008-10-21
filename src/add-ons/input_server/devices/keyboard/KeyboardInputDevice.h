@@ -15,7 +15,7 @@
 #include <ObjectList.h>
 
 #include "Keymap.h"
-#include "TMWindow.h"
+#include "TeamMonitorWindow.h"
 #include "kb_mouse_settings.h"
 
 
@@ -73,7 +73,7 @@ private:
 
 			BObjectList<keyboard_device> fDevices;
 			Keymap			fKeymap;
-			TMWindow*		fTeamMonitorWindow;
+			TeamMonitorWindow* fTeamMonitorWindow;
 			BLocker			fKeymapLock;
 };
 

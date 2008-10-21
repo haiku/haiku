@@ -9,7 +9,7 @@
 
 //!	Keyboard input server addon
 
-#include "TMWindow.h"
+#include "TeamMonitorWindow.h"
 
 #include <stdio.h>
 
@@ -29,7 +29,29 @@
 #include <tracker_private.h>
 
 #include "KeyboardInputDevice.h"
-#include "TMListItem.h"
+#include "TeamListItem.h"
+
+
+class TeamDescriptionView : public BBox {
+public:
+							TeamDescriptionView();
+	virtual					~TeamDescriptionView();
+
+	virtual void			MessageReceived(BMessage* message);
+	virtual void			Draw(BRect bounds);
+	virtual void			GetPreferredSize(float* _width, float* _height);
+
+			void			CtrlAltDelPressed(bool keyDown);
+
+			void			SetItem(TeamListItem* item);
+			TeamListItem*	Item() { return fItem; }
+
+private:
+			const char*		fText[3];
+			TeamListItem*	fItem;
+			int32			fSeconds;
+			BMessageRunner*	fRebootRunner;
+};
 
 
 static const uint32 kMsgUpdate = 'TMup';
@@ -42,7 +64,7 @@ const uint32 TM_SELECTED_TEAM = 'TMst';
 static const uint32 kMsgRebootTick = 'TMrt';
 
 
-TMWindow::TMWindow()
+TeamMonitorWindow::TeamMonitorWindow()
 	: BWindow(BRect(0, 0, 350, 300), "Team Monitor",
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS,
@@ -75,7 +97,7 @@ TMWindow::TMWindow()
 
 	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
-	fDescriptionView = new TMDescView;
+	fDescriptionView = new TeamDescriptionView;
 	layout->AddView(fDescriptionView);
 
 	groupView = new BGroupView(B_HORIZONTAL);
@@ -121,13 +143,13 @@ TMWindow::TMWindow()
 }
 
 
-TMWindow::~TMWindow()
+TeamMonitorWindow::~TeamMonitorWindow()
 {
 }
 
 
 void
-TMWindow::MessageReceived(BMessage *msg)
+TeamMonitorWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case SYSTEM_SHUTTING_DOWN:
@@ -151,7 +173,7 @@ TMWindow::MessageReceived(BMessage *msg)
 			break;
 		case TM_KILL_APPLICATION:
 		{
-			TMListItem* item = (TMListItem*)fListView->ItemAt(
+			TeamListItem* item = (TeamListItem*)fListView->ItemAt(
 				fListView->CurrentSelection());
 			if (item != NULL) {
 				kill_team(item->GetInfo()->team);
@@ -170,7 +192,7 @@ TMWindow::MessageReceived(BMessage *msg)
 		case TM_SELECTED_TEAM:
 		{
 			fKillButton->SetEnabled(fListView->CurrentSelection() >= 0);
-			TMListItem* item = (TMListItem*)fListView->ItemAt(
+			TeamListItem* item = (TeamListItem*)fListView->ItemAt(
 				fListView->CurrentSelection());
 			fDescriptionView->SetItem(item);
 			break;
@@ -187,7 +209,7 @@ TMWindow::MessageReceived(BMessage *msg)
 
 
 bool
-TMWindow::QuitRequested()
+TeamMonitorWindow::QuitRequested()
 {
 	Disable();
 	return fQuitting;
@@ -195,13 +217,13 @@ TMWindow::QuitRequested()
 
 
 void
-TMWindow::UpdateList()
+TeamMonitorWindow::UpdateList()
 {
 	bool changed = false;
 
 	for (int32 i = 0; i < fListView->CountItems(); i++) {
-		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
-		item->fFound = false;
+		TeamListItem *item = (TeamListItem*)fListView->ItemAt(i);
+		item->SetFound(false);
 	}
 
 	int32 cookie = 0;
@@ -212,26 +234,26 @@ TMWindow::UpdateList()
 
 		bool found = false;
 		for (int32 i = 0; i < fListView->CountItems(); i++) {
-			TMListItem *item = (TMListItem*)fListView->ItemAt(i);
+			TeamListItem *item = (TeamListItem*)fListView->ItemAt(i);
 			if (item->GetInfo()->team == info.team) {
-				item->fFound = true;
+				item->SetFound(true);
 				found = true;
 			}
 		}
 
 		if (!found) {
-			TMListItem *item = new TMListItem(info);
+			TeamListItem* item = new TeamListItem(info);
 
 			fListView->AddItem(item,
 				item->IsSystemServer() ? fListView->CountItems() : 0);
-			item->fFound = true;
+			item->SetFound(true);
 			changed = true;
 		}
 	}
 
 	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
-		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
-		if (!item->fFound) {
+		TeamListItem *item = (TeamListItem*)fListView->ItemAt(i);
+		if (!item->Found()) {
 			if (item == fDescriptionView->Item()) {
 				fDescriptionView->SetItem(NULL);
 				fKillButton->SetEnabled(false);
@@ -257,7 +279,7 @@ TMWindow::UpdateList()
 
 
 void
-TMWindow::Enable()
+TeamMonitorWindow::Enable()
 {
 	if (Lock()) {
 		if (IsHidden()) {
@@ -273,7 +295,7 @@ TMWindow::Enable()
 
 
 void
-TMWindow::Disable()
+TeamMonitorWindow::Disable()
 {
 	fListView->DeselectAll();
 	delete fUpdateRunner;
@@ -285,8 +307,8 @@ TMWindow::Disable()
 //	#pragma mark -
 
 
-TMDescView::TMDescView()
-	: BBox("descview", B_WILL_DRAW | B_PULSE_NEEDED, B_NO_BORDER),
+TeamDescriptionView::TeamDescriptionView()
+	: BBox("description view", B_WILL_DRAW | B_PULSE_NEEDED, B_NO_BORDER),
 	fItem(NULL),
 	fSeconds(4),
 	fRebootRunner(NULL)
@@ -315,14 +337,14 @@ TMDescView::TMDescView()
 }
 
 
-TMDescView::~TMDescView()
+TeamDescriptionView::~TeamDescriptionView()
 {
 	delete fRebootRunner;
 }
 
 
 void
-TMDescView::MessageReceived(BMessage* message)
+TeamDescriptionView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgRebootTick:
@@ -340,7 +362,7 @@ TMDescView::MessageReceived(BMessage* message)
 
 
 void
-TMDescView::CtrlAltDelPressed(bool keyDown)
+TeamDescriptionView::CtrlAltDelPressed(bool keyDown)
 {
 	if (!(keyDown ^ fRebootRunner != NULL))
 		return;
@@ -358,7 +380,7 @@ TMDescView::CtrlAltDelPressed(bool keyDown)
 
 
 void
-TMDescView::Draw(BRect rect)
+TeamDescriptionView::Draw(BRect rect)
 {
 	rect = Bounds();
 
@@ -413,7 +435,7 @@ TMDescView::Draw(BRect rect)
 
 
 void
-TMDescView::GetPreferredSize(float *_width, float *_height)
+TeamDescriptionView::GetPreferredSize(float *_width, float *_height)
 {
 	if (_width != NULL) {
 		float width = 0;
@@ -444,7 +466,7 @@ TMDescView::GetPreferredSize(float *_width, float *_height)
 
 
 void
-TMDescView::SetItem(TMListItem *item)
+TeamDescriptionView::SetItem(TeamListItem *item)
 {
 	fItem = item;
 	Invalidate();

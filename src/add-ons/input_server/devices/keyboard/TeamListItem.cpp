@@ -1,39 +1,27 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2004-2005, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        TMListItem.cpp
-//  Author:      Jérôme Duval
-//  Description: Keyboard input server addon
-//  Created :    October 24, 2004
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2004-2008, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ */
+
+#include "TeamListItem.h"
+
+#include <string.h>
 
 #include <NodeInfo.h>
 #include <View.h>
-
-#include "TMListItem.h"
-
-#include <string.h>
 
 
 static const int32 kItemMargin = 2;
 
 
-TMListItem::TMListItem(team_info &tinfo) 
-	: BListItem(),
+TeamListItem::TeamListItem(team_info &tinfo)
+	:
 	fInfo(tinfo),
-#ifdef __HAIKU__
 	fIcon(BRect(0, 0, 15, 15), B_RGBA32),
 	fLargeIcon(BRect(0, 0, 31, 31), B_RGBA32)
-#else
-	fIcon(BRect(0, 0, 15, 15), B_CMAP8),
-	fLargeIcon(BRect(0, 0, 31, 31), B_CMAP8)
-#endif
 {
 	int32 cookie = 0;
 	image_info info;
@@ -47,13 +35,13 @@ TMListItem::TMListItem(team_info &tinfo)
 }
 
 
-TMListItem::~TMListItem()
+TeamListItem::~TeamListItem()
 {
 }
 
 
 void
-TMListItem::DrawItem(BView *owner, BRect frame, bool complete)
+TeamListItem::DrawItem(BView *owner, BRect frame, bool complete)
 {
 	rgb_color kHighlight = { 140,140,140,0 };
 	rgb_color kBlack = { 0,0,0,0 };
@@ -63,11 +51,11 @@ TMListItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 	if (IsSelected() || complete) {
 		rgb_color color;
-		if (IsSelected()) {
+		if (IsSelected())
 			color = kHighlight;
-		} else {
+		else
 			color = owner->ViewColor();
-		}
+
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
 		owner->FillRect(r);
@@ -78,13 +66,10 @@ TMListItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 	frame.left += 4;
 	BRect iconFrame(frame);
-	iconFrame.Set(iconFrame.left, iconFrame.top+1, iconFrame.left+15, iconFrame.top+16);
-#ifdef __HAIKU__
+	iconFrame.Set(iconFrame.left, iconFrame.top + 1, iconFrame.left + 15,
+		iconFrame.top + 16);
 	owner->SetDrawingMode(B_OP_ALPHA);
 	owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-#else
-	owner->SetDrawingMode(B_OP_OVER);
-#endif
 	owner->DrawBitmap(&fIcon, iconFrame);
 	owner->SetDrawingMode(B_OP_COPY);
 
@@ -95,22 +80,22 @@ TMListItem::DrawItem(BView *owner, BRect frame, bool complete)
 	font_height	finfo;
 	font.GetHeight(&finfo);
 	owner->SetFont(&font);
-	owner->MovePenTo(frame.left+8, frame.top + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2) +
-					(finfo.ascent + finfo.descent) - 1);
+	owner->MovePenTo(frame.left + 8, frame.top + ((frame.Height()
+			- (finfo.ascent + finfo.descent + finfo.leading)) / 2)
+		+ (finfo.ascent + finfo.descent) - 1);
 	owner->DrawString(fPath.Leaf());
 }
 
 
-/*static*/
-int32
-TMListItem::MinimalHeight()
+/*static*/ int32
+TeamListItem::MinimalHeight()
 {
 	return 16 + kItemMargin;
 }
 
 
 void
-TMListItem::Update(BView *owner, const BFont *font)
+TeamListItem::Update(BView* owner, const BFont* font)
 {
 	// we need to override the update method so we can make sure
 	// the list item size doesn't change
@@ -120,17 +105,17 @@ TMListItem::Update(BView *owner, const BFont *font)
 }
 
 
-const team_info *
-TMListItem::GetInfo()
+const team_info*
+TeamListItem::GetInfo()
 {
 	return &fInfo;
 }
 
 
 bool
-TMListItem::IsSystemServer()
+TeamListItem::IsSystemServer()
 {
-	char *system = "/boot/beos/system/";
+	char* system = "/boot/beos/system/";
 	if (strncmp(system, fInfo.args, strlen(system)) == 0)
 		return true;
 
