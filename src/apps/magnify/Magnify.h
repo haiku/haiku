@@ -61,10 +61,10 @@ class TMagnify : public BView {
 
 		void			InitBuffers(int32 hPixelCount, int32 vPixelCount,
 							int32 pixelSize, bool showGrid);
-		
+
 		virtual void	AttachedToWindow();
 		virtual void	Draw(BRect);
-		
+
 		virtual void	KeyDown(const char *bytes, int32 numBytes);
 		virtual void	FrameResized(float, float);
 		virtual void	MouseDown(BPoint where);
@@ -84,7 +84,7 @@ class TMagnify : public BView {
 
 		void			CrossHair1Loc(float* x, float* y);
 		void			CrossHair2Loc(float* x, float* y);
-		BPoint			CrossHair1Loc();		
+		BPoint			CrossHair1Loc();
 		BPoint			CrossHair2Loc();
 
 		void			NudgeMouse(float x, float y);
@@ -94,7 +94,7 @@ class TMagnify : public BView {
 		void			SetUpdate(bool);
 
 		void			CopyImage();
-		
+
 		long			ThreadID() { return fThread; }
 
 		void			MakeActive(bool);
@@ -113,7 +113,7 @@ class TMagnify : public BView {
 		void			SaveImage(entry_ref* ref, char* name, bool selectionOnly=false);
 		void 			SaveBits(BFile* file, const BBitmap *bitmap, char* name) const;
 		void			EndSave();
-		
+
 	private:
 		static long		MagnifyTask(void *);
 
@@ -156,26 +156,26 @@ class TInfoView : public BBox {
 	public:
 						TInfoView(BRect frame);
 		virtual			~TInfoView();
-				
+
 		virtual void	AttachedToWindow();
 		virtual void	Draw(BRect updateRect);
 		virtual void	FrameResized(float width, float height);
 
-		void			AddMenu();		
+		void			AddMenu();
 		void			SetMagView(TMagnify* magView);
 
 	private:
-		float	 		fFontHeight;		
+		float	 		fFontHeight;
 		TMagnify*		fMagView;
 		BMenuField*	 	fPopUp;
 		TMenu*			fMenu;
-		
+
 		int32 			fHPixelCount;
 		int32 			fVPixelCount;
 		int32			fPixelSize;
-		
+
 		rgb_color		fSelectionColor;
-		
+
 		BPoint			fCH1Loc;
 		BPoint			fCH2Loc;
 
@@ -235,14 +235,14 @@ class TWindow : public BWindow {
 		float 			fFontHeight;
 
 		bool			fShowGrid;
-		
+
 		int32			fHPixelCount;
 		int32			fVPixelCount;
 		int32	 		fPixelSize;
-		
+
 		TMagnify*		fFatBits;
 		TInfoView*		fInfo;
-		
+
 		BFilePanel*		fSavePanel;
 };
 
