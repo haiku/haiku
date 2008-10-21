@@ -591,6 +591,7 @@ KeyboardInputDevice::_DeviceWatcher(void* arg)
 	uint32 lastKeyCode = 0;
 	uint32 repeatCount = 1;
 	uint8 states[16];
+	bool ctrlAltDelPressed = false;
 
 	memset(states, 0, sizeof(states));
 
@@ -626,7 +627,7 @@ KeyboardInputDevice::_DeviceWatcher(void* arg)
 		LOG(" %Ld, %02x, %02lx\n", timestamp, isKeyDown, keycode);
 
 		if (isKeyDown && keycode == 0x68) {
-			// MENU KEY for OpenTracker 5.2.0+
+			// MENU KEY for Tracker
 			bool noOtherKeyPressed = true;
 			for (int32 i = 0; i < 16; i++) {
 				if (states[i] != 0) {
@@ -649,23 +650,28 @@ KeyboardInputDevice::_DeviceWatcher(void* arg)
 				states[(keycode) >> 3] &= (!(1 << (7 - (keycode & 0x7))));
 		}
 
-		if (isKeyDown
-			&& keycode == 0x34 // DELETE KEY
+		if (isKeyDown && keycode == 0x34 // DELETE KEY
 			&& (states[0x5c >> 3] & (1 << (7 - (0x5c & 0x7))))
 			&& (states[0x5d >> 3] & (1 << (7 - (0x5d & 0x7))))) {
 			LOG("TeamMonitor called\n");
 
 			// show the team monitor
 			if (owner->fTeamMonitorWindow == NULL)
-				owner->fTeamMonitorWindow = new (std::nothrow) TMWindow();
+				owner->fTeamMonitorWindow = new(std::nothrow) TMWindow();
 
-			if (owner->fTeamMonitorWindow != NULL) {
+			if (owner->fTeamMonitorWindow != NULL)
 				owner->fTeamMonitorWindow->Enable();
 
-				// cancel timer only for R5
-				if (ioctl(device->fd, KB_CANCEL_CONTROL_ALT_DEL, NULL) == B_OK)
-					LOG("KB_CANCEL_CONTROL_ALT_DEL : OK\n");
+			ctrlAltDelPressed = true;
+		}
+		if (ctrlAltDelPressed) {
+			if (owner->fTeamMonitorWindow != NULL) {
+				BMessage message(kMsgCtrlAltDelPressed);
+				message.AddBool("key down", isKeyDown);
+				owner->fTeamMonitorWindow->PostMessage(&message);
 			}
+			if (!isKeyDown)
+				ctrlAltDelPressed = false;
 		}
 
 		BAutolock lock(owner->fKeymapLock);

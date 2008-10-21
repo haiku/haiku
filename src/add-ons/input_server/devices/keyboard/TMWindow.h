@@ -21,11 +21,13 @@
 class TMDescView : public BBox {
 	public:
 		TMDescView();
+		virtual ~TMDescView();
 
-		virtual void Pulse();
-
+		virtual void MessageReceived(BMessage* message);
 		virtual void Draw(BRect bounds);
 		virtual void GetPreferredSize(float *_width, float *_height);
+
+		void CtrlAltDelPressed(bool keyDown);
 
 		void SetItem(TMListItem *item);
 		TMListItem *Item() { return fItem; }
@@ -34,7 +36,7 @@ class TMDescView : public BBox {
 		const char* fText[3];
 		TMListItem* fItem;
 		int32 fSeconds;
-		bool fKeysPressed;
+		BMessageRunner* fRebootRunner;
 };
 
 class TMWindow : public BWindow {
@@ -60,5 +62,7 @@ class TMWindow : public BWindow {
 		BButton *fRestartButton;
 		TMDescView *fDescriptionView;
 };
+
+static const uint32 kMsgCtrlAltDelPressed = 'TMcp';
 
 #endif	// TMWINDOW_H

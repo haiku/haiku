@@ -39,6 +39,8 @@ const uint32 TM_KILL_APPLICATION = 'TMka';
 const uint32 TM_RESTART_DESKTOP = 'TMrd';
 const uint32 TM_SELECTED_TEAM = 'TMst';
 
+static const uint32 kMsgRebootTick = 'TMrt';
+
 
 TMWindow::TMWindow()
 	: BWindow(BRect(0, 0, 350, 300), "Team Monitor",
@@ -134,6 +136,14 @@ TMWindow::MessageReceived(BMessage *msg)
 
 		case kMsgUpdate:
 			UpdateList();
+			break;
+
+		case kMsgCtrlAltDelPressed:
+			bool keyDown;
+			if (msg->FindBool("key down", &keyDown) != B_OK)
+				break;
+
+			fDescriptionView->CtrlAltDelPressed(keyDown);
 			break;
 
 		case TM_FORCE_REBOOT:
@@ -250,10 +260,10 @@ void
 TMWindow::Enable()
 {
 	if (Lock()) {
-		BMessage message(kMsgUpdate);
-		fUpdateRunner = new BMessageRunner(this, &message, 1000000LL);
-
 		if (IsHidden()) {
+			BMessage message(kMsgUpdate);
+			fUpdateRunner = new BMessageRunner(this, &message, 1000000LL);
+
 			UpdateList();
 			Show();
 		}
@@ -277,7 +287,9 @@ TMWindow::Disable()
 
 TMDescView::TMDescView()
 	: BBox("descview", B_WILL_DRAW | B_PULSE_NEEDED, B_NO_BORDER),
-	fItem(NULL)
+	fItem(NULL),
+	fSeconds(4),
+	fRebootRunner(NULL)
 {
 /*
 	BTextView* textView = new BTextView("description");
@@ -295,9 +307,6 @@ TMDescView::TMDescView()
 	fText[1] = "\"Kill Application\" button in order to close it.";
 	fText[2] = "Hold CONTROL+ALT+DELETE for %ld seconds to reboot.";
 
-	fKeysPressed = false;
-	fSeconds = 4;
-
 	float width, height;
 	GetPreferredSize(&width, &height);
 	SetExplicitMinSize(BSize(width, -1));
@@ -306,15 +315,45 @@ TMDescView::TMDescView()
 }
 
 
-void
-TMDescView::Pulse()
+TMDescView::~TMDescView()
 {
-	// TODO: connect this mechanism with the keyboard device - it can tell us
-	//	if ctrl-alt-del is pressed
-	if (fKeysPressed) {
-		fSeconds--;
-		Invalidate();
+	delete fRebootRunner;
+}
+
+
+void
+TMDescView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgRebootTick:
+			fSeconds--;
+			if (fSeconds == 0)
+				Window()->PostMessage(TM_FORCE_REBOOT);
+			else
+				Invalidate();
+			break;
+
+		default:
+			BBox::MessageReceived(message);
 	}
+}
+
+
+void
+TMDescView::CtrlAltDelPressed(bool keyDown)
+{
+	if (!(keyDown ^ fRebootRunner != NULL))
+		return;
+
+	delete fRebootRunner;
+	fRebootRunner = NULL;
+	fSeconds = 4;
+
+	if (keyDown) {
+		BMessage tick(kMsgRebootTick);
+		fRebootRunner = new BMessageRunner(this, &tick, 1000000LL);
+	} else
+		Invalidate();
 }
 
 
