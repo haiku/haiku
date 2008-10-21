@@ -258,7 +258,8 @@ TTracker::QuitRequested()
 		BContainerWindow *window = dynamic_cast<BContainerWindow *>
 			(fWindowList.ItemAt(i));
 
-		if (window && window->TargetModel() && !window->PoseView()->IsDesktopWindow()) {
+		if (window && window->Lock() && window->TargetModel()
+			&& !window->PoseView()->IsDesktopWindow()) {
 			if (window->TargetModel()->IsRoot())
 				message.AddBool("open_disks_window", true);
 			else {
@@ -294,6 +295,7 @@ TTracker::QuitRequested()
 					message.AddInt8(path.Path(), flags);
 				}
 			}	
+			window->Unlock();		
 		}
 	}
 	lock.Unlock();
