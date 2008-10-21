@@ -225,14 +225,16 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	panel->AddChild(ok, cancel);
 	ok->ResizeToPreferred();
 
-	bounds.right = fLicenseKey->Frame().right;
+	ResizeTo(divider * 1.3 + 10.0 + ok->Bounds().Width() + cancel->Bounds().Width(),
+		ok->Frame().bottom + 10.0);
+
+	bounds.right = Bounds().right - 10.0;
 	ok->MoveTo(bounds.right - ok->Bounds().Width(), ok->Frame().top);
 
 	bounds = ok->Frame();
 	cancel->MoveTo(bounds.left - cancel->Bounds().Width() - 10.0, bounds.top);
 
 	ok->MakeDefault(true);
-	ResizeTo(bounds.right + 10.0, bounds.bottom + 10.0);
 
 	BButton *button = new BButton(bounds, NULL, "Open Settings Folder" B_UTF8_ELLIPSIS,
 		new BMessage(OPEN_SETTINGS_FOLDER_MSG));

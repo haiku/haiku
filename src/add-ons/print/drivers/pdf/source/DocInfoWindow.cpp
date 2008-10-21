@@ -173,7 +173,7 @@ DocInfoWindow::FrameResized(float newWidth, float newHeight)
 		_AdjustScrollBar(height, fieldsHeight);
 
 		while (textControl) {
-			textControl->SetDivider(width / 2.0);
+			textControl->SetDivider(textControl->Bounds().Width() / 2.0);
 			textControl = dynamic_cast<BTextControl*> (textControl->NextSibling());
 		}
 	}
@@ -193,9 +193,15 @@ DocInfoWindow::_SetupDocInfoView(BBox* panel)
 	BMenuField *menu = new BMenuField(bounds, "delete", "", fKeyList,
 		B_FOLLOW_BOTTOM);
 	panel->AddChild(menu);
-	menu->ResizeToPreferred();
 	menu->SetDivider(0);
+
+#ifdef __HAIKU__
+	menu->ResizeToPreferred();
 	menu->MoveTo(bounds.left, bounds.bottom - menu->Bounds().Height());
+#else
+	menu->ResizeTo(menu->StringWidth("Delete Key") + 15.0, 25.0);
+	menu->MoveTo(bounds.left, bounds.bottom - 25.0);
+#endif
 
 	const char* title[6] = { "Title", "Author", "Subject", "Keywords", "Creator",
 		NULL };	// PDFlib sets these: "Producer", "CreationDate", not "ModDate"
@@ -206,9 +212,15 @@ DocInfoWindow::_SetupDocInfoView(BBox* panel)
 	BRect frame(menu->Frame());
 	menu = new BMenuField(frame, "add", "", defaultKeys, B_FOLLOW_BOTTOM);
 	panel->AddChild(menu);
-	menu->ResizeToPreferred();
 	menu->SetDivider(0);
+
+#ifdef __HAIKU__
+	menu->ResizeToPreferred();
 	menu->MoveBy(frame.Width() + 10.0, 0.0);
+#else
+	menu->ResizeTo(menu->StringWidth("Default Keys") + 15.0, 25.0);
+	menu->MoveBy(menu->Bounds().Width() + 10.0, 0.0);
+#endif
 
 	frame = menu->Frame();
 	frame.left = frame.right + 10.0;
@@ -216,7 +228,10 @@ DocInfoWindow::_SetupDocInfoView(BBox* panel)
 	BTextControl *add = new BTextControl(frame, "add", "Add Key:", "",
 		new BMessage(ADD_KEY_MSG), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	panel->AddChild(add);
-	add->ResizeToPreferred();
+
+	float width, height;
+	add->GetPreferredSize(&width, &height);
+	add->ResizeTo(bounds.right - frame.left, height);
 	add->SetDivider(be_plain_font->StringWidth("Add Key: "));
 
 	bounds.bottom = frame.top - 10.0;
@@ -286,7 +301,11 @@ DocInfoWindow::_AddFieldToTable(BRect rect, const char* name, const char* value)
 	BTextControl *textControl = new BTextControl(rect, name, name, value, NULL,
 		B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_NAVIGABLE);
 	fTable->AddChild(textControl);
-	textControl->ResizeToPreferred();
+	float width, height;
+	textControl->GetPreferredSize(&width, &height);
+
+	textControl->ResizeTo(rect.Width(), height);
+	textControl->SetDivider(rect.Width() / 2.0);
 
 	fKeyList->AddItem(new BMenuItem(name, new BMessage(REMOVE_KEY_MSG)));
 
