@@ -100,6 +100,9 @@ class TMagnify : public BView {
 		void			MakeActive(bool);
 		bool			Active() { return fActive; }
 
+		void			MakeSticked(bool);
+		bool			Sticked() const { return fStickCoordinates; }
+
 		void			AddCrossHair();
 		void			RemoveCrossHair();
 		void			SetCrossHairsShowing(bool ch1=false, bool ch2=false);
@@ -138,6 +141,7 @@ class TMagnify : public BView {
 		TWindow*		fParent;
 
 		bool			fImageFrozenOnSave;
+		bool			fStickCoordinates;
 };
 
 class TMenu : public BMenu {

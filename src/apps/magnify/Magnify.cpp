@@ -49,6 +49,7 @@ const int32 msg_toggle_ruler = 'rulr';
 const int32 msg_copy_image = 'copy';
 const int32 msg_track_color = 'trak';
 const int32 msg_freeze = 'frez';
+const int32 msg_stick = 'stic';
 const int32 msg_dump = 'dump';
 const int32 msg_add_cross_hair = 'acrs';
 const int32 msg_remove_cross_hair = 'rcrs';
@@ -165,6 +166,8 @@ BuildInfoMenu(BMenu *menu)
 
 	menuItem = new BMenuItem("Freeze/Unfreeze image", new BMessage(msg_freeze),'F');
 	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Stick Coordinates", new BMessage(msg_stick), 'I');
+	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
 	menuItem = new BMenuItem("Make Square", new BMessage(msg_make_square),'/');
@@ -258,6 +261,7 @@ TWindow::TWindow(int32 pixelCount)
 	AddShortcut('H', B_SHIFT_KEY, 	new BMessage(msg_remove_cross_hair));
 	AddShortcut('G', B_COMMAND_KEY, new BMessage(msg_toggle_grid));
 	AddShortcut('F', B_COMMAND_KEY, new BMessage(msg_freeze));
+	AddShortcut('I', B_COMMAND_KEY, new BMessage(msg_stick));
 	AddShortcut('-', B_COMMAND_KEY, new BMessage(msg_shrink));
 	AddShortcut('=', B_COMMAND_KEY, new BMessage(msg_grow));
 	AddShortcut('/', B_COMMAND_KEY, new BMessage(msg_make_square));
@@ -337,6 +341,10 @@ TWindow::MessageReceived(BMessage* m)
 				SetFlags(B_OUTLINE_RESIZE | B_NOT_ZOOMABLE);
 
 			fFatBits->MakeActive(!fFatBits->Active());
+			break;
+
+		case msg_stick:
+			fFatBits->MakeSticked(!fFatBits->Sticked());
 			break;
 
 		case msg_save: {
@@ -1068,7 +1076,8 @@ TMagnify::TMagnify(BRect r, TWindow* parent)
 	fCrossHair1(-1, -1),
 	fShowCrossHair2(false),
 	fCrossHair2(-1, -1),
-	fParent(parent)
+	fParent(parent),
+	fStickCoordinates(false)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 }
@@ -1482,9 +1491,12 @@ TMagnify::Update(bool force)
 	ulong button;
 	static long counter = 0;
 
-	GetMouse(&loc, &button);
+	if (!fStickCoordinates) {
+		GetMouse(&loc, &button);
+		ConvertToScreen(&loc);
+	} else
+		loc = fLastLoc;
 
-	ConvertToScreen(&loc);
 	if (force || fLastLoc != loc || counter++ % 35 == 0) {
 		if (fImageView->CreateImage(loc, force))
 			Invalidate();
@@ -1606,6 +1618,13 @@ void
 TMagnify::MakeActive(bool s)
 {
 	fActive = s;
+}
+
+
+void
+TMagnify::MakeSticked(bool s)
+{
+	fStickCoordinates = s;
 }
 
 
