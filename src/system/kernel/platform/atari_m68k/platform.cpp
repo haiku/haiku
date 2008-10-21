@@ -13,6 +13,7 @@
 #include <arch/cpu.h>
 //#include <platform/openfirmware/openfirmware.h>
 #include <platform/atari_m68k/MFP.h>
+#include <platform/atari_m68k/platform_atari_m68k.h>
 #include <real_time_clock.h>
 #include <timer.h>
 
@@ -313,8 +314,6 @@ M68KAtari::ProbeHardware(struct kernel_args *kernelArgs)
 		fRTC = new(sRTCBuffer) M68KAtari::RTC(TT_RTC_BASE,TT_RTC_VECTOR);
 	} else
 		panic("TT RTC required!");
-
-
 }
 
 
@@ -388,7 +387,7 @@ M68KAtari::InitRTC(struct kernel_args *kernelArgs,
 	struct real_time_data *data)
 {
 	// XXX we should do this in the bootloader maybe...
-	args->arch_args.time_base_frequency = MFP_SYSTEM_TIME_RATE;
+	kernelArgs->arch_args.time_base_frequency = MFP_SYSTEM_TIME_RATE;
 	return B_OK;
 }
 
@@ -639,7 +638,7 @@ M68KAtari::SetHardwareTimer(bigtime_t timeout)
 	if (timeout <= 0)
 		nextEventClocks = 2;
 	else if (timeout < MFP_MAX_TIMER_INTERVAL)
-		nextEventClocks = timeout * MFP_RATE / 1000000;
+		nextEventClocks = timeout * MFP_TIMER_RATE / 1000000;
 	else
 		nextEventClocks = 0xff;
 

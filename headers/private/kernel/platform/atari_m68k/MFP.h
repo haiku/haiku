@@ -1,6 +1,11 @@
 #ifndef _MFP_H
 #define _MFP_H
 
+/*
+ * references:
+ * http://alive.atari.org/hosting/docs/atari/st/MFP.htm
+ */
+
 #define MFP_GPDR	0x01
 #define MFP_AER		0x03
 #define MFP_DDR		0x05
