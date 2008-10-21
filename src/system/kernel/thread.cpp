@@ -2523,14 +2523,7 @@ set_thread_priority(thread_id id, int32 priority)
 		thread = thread_get_thread_struct_locked(id);
 		if (thread) {
 			oldPriority = thread->priority;
-			thread->next_priority = priority;
-			if (thread->state == B_THREAD_READY && thread->priority != priority) {
-				// if the thread is in the run queue, we reinsert it at a new position
-				scheduler_remove_from_run_queue(thread);
-				thread->priority = priority;
-				scheduler_enqueue_in_run_queue(thread);
-			} else
-				thread->priority = priority;
+			scheduler_set_thread_priority(thread, priority);
 		} else
 			oldPriority = B_BAD_THREAD_ID;
 

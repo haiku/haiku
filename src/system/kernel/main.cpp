@@ -163,6 +163,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		smp_init_post_generic_syscalls();
 		TRACE("init cbuf\n");
 		cbuf_init();
+		TRACE("init scheduler\n");
+		scheduler_init();
 		TRACE("init threads\n");
 		thread_init(&sKernelArgs);
 		TRACE("init ports\n");
@@ -178,8 +180,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);
 		low_resource_manager_init_post_thread();
-		TRACE("init scheduler\n");
-		scheduler_init();
 		TRACE("init notification services\n");
 		notifications_init();
 		TRACE("init VFS\n");

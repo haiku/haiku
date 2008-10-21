@@ -228,7 +228,7 @@ public:
 		fRemainingBytes = (addr_t)fHashTable - (addr_t)fBuffer;
 
 		image_info info;
-		if (elf_get_image_info_for_address((addr_t)&scheduler_start, &info)
+		if (elf_get_image_info_for_address((addr_t)&scheduler_init, &info)
 				== B_OK) {
 			fKernelStart = (addr_t)info.text;
 			fKernelEnd = (addr_t)info.data + info.data_size;
