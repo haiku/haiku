@@ -178,7 +178,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 		err = transfer_PIO_virtcont(device, (char *)virtualAddress,
 			cur_len, write, transferred);
 
-		vm_put_physical_page_current_cpu(virtualAddress);
+		vm_put_physical_page_current_cpu(virtualAddress, handle);
 		thread_unpin_from_current_cpu(thread);
 
 		if (err != B_OK)
