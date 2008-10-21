@@ -81,7 +81,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	if (settings->FindBool("create_xrefs", &fCreateXRefs) != B_OK)
 		fCreateXRefs = false;
 
-	if (settings->FindInt32("close_option", (int32)&fCloseOption) != B_OK)
+	if (settings->FindInt32("close_option", (int32*)&fCloseOption) != B_OK)
 		fCloseOption = kNever;
 
 	BRect bounds(Bounds());

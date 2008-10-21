@@ -26,7 +26,10 @@ JSDSlider::~JSDSlider()
 } 
 
 
-const char*
+#ifdef __HAIKU__
+const
+#endif
+char*
 JSDSlider::UpdateText() const
 {
 	// When the slider's Draw method is called, this method will also be called.
@@ -46,5 +49,9 @@ JSDSlider::UpdateText() const
 	}
 
 	fResult.SetTo(string);
+#ifdef __HAIKU__
 	return fResult.String();
+#else
+	return const_cast<char*>(fResult.String());
+#endif
 }

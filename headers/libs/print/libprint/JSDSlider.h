@@ -21,9 +21,11 @@ public:
 							BMessage *msg, int32 min, int32 max, thumb_style t);
 
 	virtual				~JSDSlider();
-
+#ifdef __HAIKU__
 	virtual const char* UpdateText() const;
-
+#else
+	virtual		char*	UpdateText() const;
+#endif
 private:
 	mutable	BString		fResult;
 };
