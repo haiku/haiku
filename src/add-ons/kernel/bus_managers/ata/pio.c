@@ -163,7 +163,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 			return B_ERROR;
 		}
 
-		ASSERT((physicalAddress & 4097) == (virtualAddress & 4097));
+		ASSERT(physicalAddress % B_PAGE_SIZE == virtualAddress % B_PAGE_SIZE);
 
 		// if chunks starts in the middle of a page, we have even less then
 		// a page left
