@@ -990,20 +990,26 @@ AcpiOsValidateAddress(UINT8 SpaceId, ACPI_PHYSICAL_ADDRESS Address,
  *****************************************************************************/
 
 ACPI_STATUS
-AcpiOsReadPciConfiguration(ACPI_PCI_ID *PciId, UINT32 Register, void *Value,
-	UINT32 Width)
+AcpiOsReadPciConfiguration(ACPI_PCI_ID *pciId, UINT32 offset, void *value,
+	UINT32 width)
 {
 #ifdef _KERNEL_MODE
 	UINT32 val = gPCIManager->read_pci_config(
-		PciId->Bus, PciId->Device, PciId->Function, Register, Width / 8);
+		pciId->Bus, pciId->Device, pciId->Function, offset, width / 8);
 	DEBUG_FUNCTION();
-	switch (Width) {
-		case 8: *(UINT8 *)Value = val;
-		case 16: *(UINT16 *)Value = val;
-		case 32: *(UINT32 *)Value = val;
+	switch (width) {
+		case 8:
+			*(UINT8 *)value = val;
+			break;
+		case 16:
+			*(UINT16 *)value = val;
+			break;
+		case 32:
+			*(UINT32 *)value = val;
+			break;
 		default:
 			dprintf("AcpiOsReadPciConfiguration unhandled value width: %u\n",
-				Width);
+				width);
 			return AE_ERROR;
 	}
 
