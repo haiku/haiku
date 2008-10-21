@@ -1,44 +1,43 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2004-2005, Haiku
-//
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT license.
-//
-//
-//  File:        TMWindow.cpp
-//  Author:      Jérôme Duval
-//  Description: Keyboard input server addon
-//  Created :    October 13, 2004
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2004-2008, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ *		Axel Doerfler, axeld@pinc-software.de
+ */
 
+//!	Keyboard input server addon
 
 #include "TMWindow.h"
-#include "TMListItem.h"
-#include "KeyboardInputDevice.h"
 
-#include "tracker_private.h"
+#include <stdio.h>
 
+#include <CardLayout.h>
+#include <GroupLayout.h>
+#include <GroupView.h>
 #include <Message.h>
+#include <MessageRunner.h>
 #include <Roster.h>
 #include <ScrollView.h>
 #include <Screen.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
+#include <TextView.h>
+
+#include <syscalls.h>
+#include <tracker_private.h>
+
+#include "KeyboardInputDevice.h"
+#include "TMListItem.h"
 
 
+static const uint32 kMsgUpdate = 'TMup';
 const uint32 TM_CANCEL = 'TMca';
 const uint32 TM_FORCE_REBOOT = 'TMfr';
 const uint32 TM_KILL_APPLICATION = 'TMka';
 const uint32 TM_RESTART_DESKTOP = 'TMrd';
 const uint32 TM_SELECTED_TEAM = 'TMst';
-
-#ifndef __HAIKU__
-extern "C" void _kshutdown_(bool reboot);
-#else
-#	include <syscalls.h>
-#	define _kshutdown_(x) _kern_shutdown(x)
-#endif
 
 
 TMWindow::TMWindow()
@@ -46,30 +45,77 @@ TMWindow::TMWindow()
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS,
 		B_ALL_WORKSPACES),
-	fQuitting(false)
+	fQuitting(false),
+	fUpdateRunner(NULL)
 {
-	if (Lock()) {
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	float inset = 10;
+	layout->SetInsets(inset, inset, inset, inset);
+	layout->SetSpacing(inset);
+	SetLayout(layout);
 
-		// ToDo: make this font sensitive
+	layout->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-		fView = new TMView(Bounds(), "background", B_FOLLOW_ALL,
-			B_WILL_DRAW, B_NO_BORDER);
-		AddChild(fView);
+	fListView = new BListView("teams");
+	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
 
-		float width, height;
-		fView->GetPreferredSize(&width, &height);
-		ResizeTo(width, height);
+	BScrollView *scrollView = new BScrollView("scroll_teams", fListView,
+		0, B_SUPPORTS_LAYOUT, false, true, B_FANCY_BORDER);
+	layout->AddView(scrollView);
 
-		BRect screenFrame = BScreen(this).Frame();
-		BPoint point;
-		point.x = (screenFrame.Width() - Bounds().Width()) / 2;
-		point.y = (screenFrame.Height() - Bounds().Height()) / 2;
+	BGroupView* groupView = new BGroupView(B_HORIZONTAL);
+	layout->AddView(groupView);
 
-		if (screenFrame.Contains(point))
-			MoveTo(point);
-		SetSizeLimits(Bounds().Width(), Bounds().Width()*2, Bounds().Height(), Bounds().Height()*2);
-		Unlock();
-	}
+	fKillButton = new BButton("kill", "Kill Application",
+		new BMessage(TM_KILL_APPLICATION));
+	groupView->AddChild(fKillButton);
+	fKillButton->SetEnabled(false);
+
+	groupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
+
+	fDescriptionView = new TMDescView;
+	layout->AddView(fDescriptionView);
+
+	groupView = new BGroupView(B_HORIZONTAL);
+	layout->AddView(groupView);
+
+	BButton *forceReboot = new BButton("force", "Force Reboot",
+		new BMessage(TM_FORCE_REBOOT));
+	groupView->GroupLayout()->AddView(forceReboot);
+
+	BSpaceLayoutItem* glue = BSpaceLayoutItem::CreateGlue();
+	glue->SetExplicitMinSize(BSize(inset, -1));
+	groupView->GroupLayout()->AddItem(glue);
+
+	fRestartButton = new BButton("restart", "Restart the Desktop",
+		new BMessage(TM_RESTART_DESKTOP));
+	fRestartButton->Hide();
+	groupView->GroupLayout()->AddView(fRestartButton);
+
+	glue = BSpaceLayoutItem::CreateGlue();
+	glue->SetExplicitMinSize(BSize(inset, -1));
+	groupView->GroupLayout()->AddItem(glue);
+
+	BButton *cancel = new BButton("cancel", "Cancel",
+		new BMessage(TM_CANCEL));
+	groupView->GroupLayout()->AddView(cancel);
+
+	BSize preferredSize = layout->View()->PreferredSize();
+	if (preferredSize.width > Bounds().Width())
+		ResizeTo(preferredSize.width, Bounds().Height());
+	if (preferredSize.height > Bounds().Height())
+		ResizeTo(Bounds().Width(), preferredSize.height);
+
+	BRect screenFrame = BScreen(this).Frame();
+	BPoint point;
+	point.x = (screenFrame.Width() - Bounds().Width()) / 2;
+	point.y = (screenFrame.Height() - Bounds().Height()) / 2;
+
+	if (screenFrame.Contains(point))
+		MoveTo(point);
+
+	SetSizeLimits(Bounds().Width(), Bounds().Width() * 2,
+		Bounds().Height(), screenFrame.Height());
 }
 
 
@@ -85,6 +131,44 @@ TMWindow::MessageReceived(BMessage *msg)
 		case SYSTEM_SHUTTING_DOWN:
 			fQuitting = true;
 			break;
+
+		case kMsgUpdate:
+			UpdateList();
+			break;
+
+		case TM_FORCE_REBOOT:
+			_kern_shutdown(true);
+			break;
+		case TM_KILL_APPLICATION:
+		{
+			TMListItem* item = (TMListItem*)fListView->ItemAt(
+				fListView->CurrentSelection());
+			if (item != NULL) {
+				kill_team(item->GetInfo()->team);
+				UpdateList();
+			}
+			break;
+		}
+		case TM_RESTART_DESKTOP:
+		{
+			if (!be_roster->IsRunning(kTrackerSignature))
+				be_roster->Launch(kTrackerSignature);
+			if (!be_roster->IsRunning(kDeskbarSignature))
+				be_roster->Launch(kDeskbarSignature);
+			break;
+		}
+		case TM_SELECTED_TEAM:
+		{
+			fKillButton->SetEnabled(fListView->CurrentSelection() >= 0);
+			TMListItem* item = (TMListItem*)fListView->ItemAt(
+				fListView->CurrentSelection());
+			fDescriptionView->SetItem(item);
+			break;
+		}
+		case TM_CANCEL:
+			PostMessage(B_QUIT_REQUESTED);
+			break;
+
 		default:
 			BWindow::MessageReceived(msg);
 			break;
@@ -101,163 +185,7 @@ TMWindow::QuitRequested()
 
 
 void
-TMWindow::Enable()
-{
-	if (Lock()) {
-		SetPulseRate(1000000);
-
-		if (IsHidden()) {
-			fView->UpdateList();
-			Show();
-		}
-		Unlock();
-	}
-}
-
-
-void
-TMWindow::Disable()
-{
-	fView->ListView()->DeselectAll();
-	SetPulseRate(0);
-	Hide();
-}
-
-
-//	#pragma mark -
-
-
-TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
-	uint32 flags, border_style border)
-	: BBox(bounds, name, resizeFlags, flags | B_PULSE_NEEDED, border)
-{
-	BFont font = be_plain_font;
-	BRect rect = bounds;
-	rect.right -= 10;
-	rect.left = rect.right - font.StringWidth("Cancel") - 40;
-	rect.bottom -= 14;
-	rect.top = rect.bottom - 20;
-
-	BButton *cancel = new BButton(rect, "cancel", "Cancel",
-		new BMessage(TM_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	AddChild(cancel);
-
-	rect.left = 10;
-	rect.right = rect.left + font.StringWidth("Force Reboot") + 20;
-
-	BButton *forceReboot = new BButton(rect, "force", "Force Reboot",
-		new BMessage(TM_FORCE_REBOOT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(forceReboot);
-
-	BRect restartRect = rect;
-	restartRect.left = rect.right + 10;
-	restartRect.right = restartRect.left + font.StringWidth("Restart the Desktop") + 20;
-	fRestartButton = new BButton(restartRect, "restart", "Restart the Desktop",
-		new BMessage(TM_RESTART_DESKTOP), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(fRestartButton);
-	fRestartButton->Hide();
-
-	rect.left += 4;
-	rect.bottom = rect.top - 8;
-	rect.top = rect.bottom - 30;
-	rect.right = bounds.right - 10;
-	fDescView = new TMDescView(rect, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-	AddChild(fDescView);
-	fDescView->ResizeToPreferred();
-
-	rect = fDescView->Frame();
-	rect.left = 10;
-	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
-	rect.bottom = rect.top - 8;
-	rect.top = rect.bottom - 20;
-
-	fKillButton = new BButton(rect, "kill", "Kill Application",
-		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(fKillButton);
-	fKillButton->SetEnabled(false);
-
-	rect = bounds;
-	rect.InsetBy(12, 12);
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom = fKillButton->Frame().top - 10;
-
-	fListView = new BListView(rect, "teams", B_SINGLE_SELECTION_LIST,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM);
-	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
-
-	BScrollView *scrollView = new BScrollView("scroll_teams", fListView,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
-	AddChild(scrollView);
-
-
-}
-
-
-void
-TMView::AttachedToWindow()
-{
-	if (BButton *cancel = dynamic_cast<BButton*>(FindView("cancel"))) {
-		Window()->SetDefaultButton(cancel);
-		cancel->SetTarget(this);
-	}
-
-	if (BButton *reboot = dynamic_cast<BButton*>(FindView("force")))
-		reboot->SetTarget(this);
-
-	fKillButton->SetTarget(this);
-	fRestartButton->SetTarget(this);
-	fListView->SetTarget(this);
-}
-
-
-void
-TMView::MessageReceived(BMessage *msg)
-{
-	switch (msg->what) {
-		case TM_FORCE_REBOOT:
-			_kshutdown_(true);
-			break;
-		case TM_KILL_APPLICATION: {
-			TMListItem *item = (TMListItem*)ListView()->ItemAt(
-				ListView()->CurrentSelection());
-			kill_team(item->GetInfo()->team);
-			UpdateList();
-			break;
-		}
-		case TM_RESTART_DESKTOP: {
-			if (!be_roster->IsRunning(kTrackerSignature))
-				be_roster->Launch(kTrackerSignature);
-			if (!be_roster->IsRunning(kDeskbarSignature))
-				be_roster->Launch(kDeskbarSignature);
-			break;
-		}
-		case TM_SELECTED_TEAM: {
-			fKillButton->SetEnabled(fListView->CurrentSelection() >= 0);
-			TMListItem *item = (TMListItem*)ListView()->ItemAt(
-				ListView()->CurrentSelection());
-			fDescView->SetItem(item);
-			break;
-		}
-		case TM_CANCEL:
-			Window()->PostMessage(B_QUIT_REQUESTED);
-			break;
-
-		default:
-			BBox::MessageReceived(msg);
-			break;
-	}
-}
-
-
-void
-TMView::Pulse()
-{
-	UpdateList();
-}
-
-
-void
-TMView::UpdateList()
+TMWindow::UpdateList()
 {
 	bool changed = false;
 
@@ -284,7 +212,8 @@ TMView::UpdateList()
 		if (!found) {
 			TMListItem *item = new TMListItem(info);
 
-			fListView->AddItem(item, item->IsSystemServer() ? fListView->CountItems() : 0);
+			fListView->AddItem(item,
+				item->IsSystemServer() ? fListView->CountItems() : 0);
 			item->fFound = true;
 			changed = true;
 		}
@@ -293,8 +222,8 @@ TMView::UpdateList()
 	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
 		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
 		if (!item->fFound) {
-			if (item == fDescView->Item()) {
-				fDescView->SetItem(NULL);
+			if (item == fDescriptionView->Item()) {
+				fDescriptionView->SetItem(NULL);
 				fKillButton->SetEnabled(false);
 			}
 
@@ -307,43 +236,59 @@ TMView::UpdateList()
 		fListView->Invalidate();
 
 	bool desktopRunning = be_roster->IsRunning(kTrackerSignature)
-		&&  be_roster->IsRunning(kDeskbarSignature);
-	if (!desktopRunning && fRestartButton->IsHidden())
+		&& be_roster->IsRunning(kDeskbarSignature);
+	if (!desktopRunning && fRestartButton->IsHidden()) {
 		fRestartButton->Show();
+		fRestartButton->Parent()->Layout(true);
+	}
+
 	fRestartButton->SetEnabled(!desktopRunning);
 }
 
 
 void
-TMView::GetPreferredSize(float *_width, float *_height)
+TMWindow::Enable()
 {
-	fDescView->GetPreferredSize(_width, _height);
+	if (Lock()) {
+		BMessage message(kMsgUpdate);
+		fUpdateRunner = new BMessageRunner(this, &message, 1000000LL);
 
-	if (_width)
-		*_width += 28;
-
-	if (_height) {
-		*_height += fKillButton->Bounds().Height() * 2
-			+ TMListItem::MinimalHeight() * 8 + 50;
+		if (IsHidden()) {
+			UpdateList();
+			Show();
+		}
+		Unlock();
 	}
 }
 
 
 void
-TMDescView::ResizeToPreferred()
+TMWindow::Disable()
 {
-	float bottom = Bounds().bottom;
-	BView::ResizeToPreferred();
-	MoveBy(0, bottom - Bounds().bottom);
+	fListView->DeselectAll();
+	delete fUpdateRunner;
+	fUpdateRunner = NULL;
+	Hide();
 }
+
 
 //	#pragma mark -
 
 
-TMDescView::TMDescView(BRect rect, uint32 resizeMode)
-	: BBox(rect, "descview", resizeMode, B_WILL_DRAW | B_PULSE_NEEDED, B_NO_BORDER),
+TMDescView::TMDescView()
+	: BBox("descview", B_WILL_DRAW | B_PULSE_NEEDED, B_NO_BORDER),
 	fItem(NULL)
 {
+/*
+	BTextView* textView = new BTextView("description");
+	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	textView->MakeEditable(false);
+	textView->SetText("Select an application from the list above and click "
+		"the \"Kill Application\" button in order to close it.\n\n"
+		"Hold CONTROL+ALT+DELETE for %ld seconds to reboot.");
+	view->AddChild(textView);
+	((BCardLayout*)view->GetLayout())->SetVisibleItem((int32)0);
+*/
 	SetFont(be_plain_font);
 
 	fText[0] = "Select an application from the list above and click the";
@@ -352,13 +297,19 @@ TMDescView::TMDescView(BRect rect, uint32 resizeMode)
 
 	fKeysPressed = false;
 	fSeconds = 4;
+
+	float width, height;
+	GetPreferredSize(&width, &height);
+	SetExplicitMinSize(BSize(width, -1));
+	SetExplicitPreferredSize(BSize(width, height));
+	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, height));
 }
 
 
 void
 TMDescView::Pulse()
 {
-	// ToDo: connect this mechanism with the keyboard device - it can tell us
+	// TODO: connect this mechanism with the keyboard device - it can tell us
 	//	if ctrl-alt-del is pressed
 	if (fKeysPressed) {
 		fSeconds--;
@@ -374,18 +325,15 @@ TMDescView::Draw(BRect rect)
 
 	font_height	fontInfo;
 	GetFontHeight(&fontInfo);
-	float height = ceil(fontInfo.ascent + fontInfo.descent + fontInfo.leading + 2);
+	float height
+		= ceil(fontInfo.ascent + fontInfo.descent + fontInfo.leading + 2);
 
 	if (fItem) {
 		// draw icon and application path
 		BRect frame(rect);
 		frame.Set(frame.left, frame.top, frame.left + 31, frame.top + 31);
-#ifdef __HAIKU__
 		SetDrawingMode(B_OP_ALPHA);
 		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-#else
-		SetDrawingMode(B_OP_OVER);
-#endif
 		DrawBitmap(fItem->LargeIcon(), frame);
 		SetDrawingMode(B_OP_COPY);
 
@@ -428,10 +376,10 @@ TMDescView::Draw(BRect rect)
 void
 TMDescView::GetPreferredSize(float *_width, float *_height)
 {
-	if (_width) {
+	if (_width != NULL) {
 		float width = 0;
 		for (int32 i = 0; i < 3; i++) {
-			float stringWidth = StringWidth(fText[i]);
+			float stringWidth = ceilf(StringWidth(fText[i]));
 			if (stringWidth > width)
 				width = stringWidth;
 		}
@@ -442,11 +390,12 @@ TMDescView::GetPreferredSize(float *_width, float *_height)
 		*_width = width;
 	}
 
-	if (_height) {
+	if (_height != NULL) {
 		font_height	fontInfo;
 		GetFontHeight(&fontInfo);
 
-		float height = 4 * ceil(fontInfo.ascent + fontInfo.descent + fontInfo.leading + 2);
+		float height = 4 * ceil(fontInfo.ascent + fontInfo.descent
+			+ fontInfo.leading + 2);
 		if (height < 32)
 			height = 32;
 

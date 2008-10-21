@@ -6,16 +6,17 @@
 #define KEYBOARD_INPUT_DEVICE_H
 
 
-#include "Keymap.h"
-#include "TMWindow.h"
-#include "kb_mouse_settings.h"
-
 #include <Handler.h>
 #include <InputServerDevice.h>
 #include <Locker.h>
 #include <List.h>
 
+#include <InputServerTypes.h>
 #include <ObjectList.h>
+
+#include "Keymap.h"
+#include "TMWindow.h"
+#include "kb_mouse_settings.h"
 
 
 class KeyboardInputDevice;
