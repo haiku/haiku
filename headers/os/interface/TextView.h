@@ -175,7 +175,7 @@ public:
 	virtual	void				ScrollToOffset(int32 inOffset);
 			void				ScrollToSelection();
 
-			void				Highlight(int32 startOffset, int32 endOffset);	
+			void				Highlight(int32 startOffset, int32 endOffset);
 
 			void				SetTextRect(BRect rect);
 			BRect				TextRect() const;
@@ -208,9 +208,9 @@ public:
 									BView* resizeView = NULL);
 			bool				IsResizable() const;
 			void				SetDoesUndo(bool undo);
-			bool				DoesUndo() const;		
+			bool				DoesUndo() const;
 			void				HideTyping(bool enabled);
-			bool				IsTypingHidden() const;	
+			bool				IsTypingHidden() const;
 
 	virtual	void				ResizeToPreferred();
 	virtual	void				GetPreferredSize(float* _width, float* _height);
@@ -331,7 +331,7 @@ private:
 									int32 startOffset = -1, bool erase = false);
 			void				_DrawCaret(int32 offset);
 			void				_ShowCaret();
-			void				_HideCaret();		
+			void				_HideCaret();
 			void				_InvertCaret();
 			void				_DragCaret(int32 offset);
 
@@ -348,7 +348,7 @@ private:
 			bool				_MessageDropped(BMessage* inMessage,
 									BPoint where, BPoint offset);
 
-			void				_PerformAutoScrolling();									
+			void				_PerformAutoScrolling();
 			void				_UpdateScrollbars();
 			void				_AutoResize(bool doRedraw = true);
 
@@ -418,7 +418,7 @@ private:
 
 			uint32				_reserved[8];
 
-	static	BPrivate::WidthBuffer*		sWidths;
+	static	BPrivate::WidthBuffer* sWidths;
 };
 
 #endif	// _TEXTVIEW_H

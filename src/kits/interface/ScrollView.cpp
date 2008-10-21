@@ -17,73 +17,23 @@ static const float kPlainBorderSize = 1;
 
 
 BScrollView::BScrollView(const char *name, BView *target, uint32 resizingMode,
-	uint32 flags, bool horizontal, bool vertical, border_style border)
-	: BView(CalcFrame(target, horizontal, vertical, border), name,
-		resizingMode, ModifyFlags(flags, border)),
+		uint32 flags, bool horizontal, bool vertical, border_style border)
+	: BView(_ComputeFrame(target, horizontal, vertical, border), name,
+		resizingMode, _ModifyFlags(flags, border)),
 	fTarget(target),
-	fHorizontalScrollBar(NULL),
-	fVerticalScrollBar(NULL),
-	fBorder(border),
-	fHighlighted(false)
+	fBorder(border)
 {
-	BRect targetFrame;
-	if (fTarget) {
-		// layout target and add it
-		fTarget->TargetedByScrollView(this);
-		fTarget->MoveTo(B_ORIGIN);
-	
-		if (border != B_NO_BORDER)
-			fTarget->MoveBy(BorderSize(border), BorderSize(border));
-	
-		AddChild(fTarget);
-		targetFrame = fTarget->Frame();
-	} else {
-		// no target specified
-		targetFrame = Bounds();
-		if (horizontal)
-			targetFrame.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
-		if (vertical)
-			targetFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
-		if (border == B_FANCY_BORDER) {
-			targetFrame.bottom--;
-			targetFrame.right--;
-		}
-	}
+	_Init(horizontal, vertical);
+}
 
-	if (horizontal) {
-		BRect rect = targetFrame;
-		rect.top = rect.bottom + 1;
-		rect.bottom = rect.top + B_H_SCROLL_BAR_HEIGHT;
-		if (border != B_NO_BORDER || vertical) {
-			// extend scrollbar so that it overlaps one pixel with vertical scrollbar
-			rect.right++;
-		}
-		if (border != B_NO_BORDER) {
-			// the scrollbar draws part of the surrounding frame on the left
-			rect.left--;
-		}
-		fHorizontalScrollBar = new BScrollBar(rect, "_HSB_", fTarget, 0, 1000, B_HORIZONTAL);
-		AddChild(fHorizontalScrollBar);
-	}
 
-	if (vertical) {
-		BRect rect = targetFrame;
-		rect.left = rect.right + 1;
-		rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
-		if (border != B_NO_BORDER || horizontal) {
-			// extend scrollbar so that it overlaps one pixel with vertical scrollbar
-			rect.bottom++;
-		}
-		if (border != B_NO_BORDER) {
-			// the scrollbar draws part of the surrounding frame on the left
-			rect.top--;
-		}
-		fVerticalScrollBar = new BScrollBar(rect, "_VSB_", fTarget, 0, 1000, B_VERTICAL);
-		AddChild(fVerticalScrollBar);
-	}
-
-	fPreviousWidth = uint16(Bounds().Width());
-	fPreviousHeight = uint16(Bounds().Height());
+BScrollView::BScrollView(const char* name, BView* target, uint32 flags,
+		bool horizontal, bool vertical, border_style border)
+	: BView(name, _ModifyFlags(flags, border) | B_SUPPORTS_LAYOUT),
+	fTarget(target),
+	fBorder(border)
+{
+	_Init(horizontal, vertical);
 }
 
 
@@ -116,7 +66,7 @@ BScrollView::BScrollView(BMessage *archive)
 		BScrollBar *bar = dynamic_cast<BScrollBar *>(view);
 		if (bar == NULL)
 			continue;
-		
+
 		if (bar->Orientation() == B_HORIZONTAL)
 			fHorizontalScrollBar = bar;
 		else if (bar->Orientation() == B_VERTICAL)
@@ -130,6 +80,76 @@ BScrollView::BScrollView(BMessage *archive)
 
 BScrollView::~BScrollView()
 {
+}
+
+
+void
+BScrollView::_Init(bool horizontal, bool vertical)
+{
+	fHorizontalScrollBar = NULL;
+	fVerticalScrollBar = NULL;
+	fHighlighted = false;
+
+	BRect targetFrame;
+	if (fTarget) {
+		// layout target and add it
+		fTarget->TargetedByScrollView(this);
+		fTarget->MoveTo(B_ORIGIN);
+
+		if (fBorder != B_NO_BORDER)
+			fTarget->MoveBy(_BorderSize(), _BorderSize());
+
+		AddChild(fTarget);
+		targetFrame = fTarget->Frame();
+	} else {
+		// no target specified
+		targetFrame = Bounds();
+		if (horizontal)
+			targetFrame.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
+		if (vertical)
+			targetFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
+		if (fBorder == B_FANCY_BORDER) {
+			targetFrame.bottom--;
+			targetFrame.right--;
+		}
+	}
+
+	if (horizontal) {
+		BRect rect = targetFrame;
+		rect.top = rect.bottom + 1;
+		rect.bottom = rect.top + B_H_SCROLL_BAR_HEIGHT;
+		if (fBorder != B_NO_BORDER || vertical) {
+			// extend scrollbar so that it overlaps one pixel with vertical scrollbar
+			rect.right++;
+		}
+		if (fBorder != B_NO_BORDER) {
+			// the scrollbar draws part of the surrounding frame on the left
+			rect.left--;
+		}
+		fHorizontalScrollBar = new BScrollBar(rect, "_HSB_", fTarget, 0, 1000,
+			B_HORIZONTAL);
+		AddChild(fHorizontalScrollBar);
+	}
+
+	if (vertical) {
+		BRect rect = targetFrame;
+		rect.left = rect.right + 1;
+		rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
+		if (fBorder != B_NO_BORDER || horizontal) {
+			// extend scrollbar so that it overlaps one pixel with vertical scrollbar
+			rect.bottom++;
+		}
+		if (fBorder != B_NO_BORDER) {
+			// the scrollbar draws part of the surrounding frame on the left
+			rect.top--;
+		}
+		fVerticalScrollBar = new BScrollBar(rect, "_VSB_", fTarget, 0, 1000,
+			B_VERTICAL);
+		AddChild(fVerticalScrollBar);
+	}
+
+	fPreviousWidth = uint16(Bounds().Width());
+	fPreviousHeight = uint16(Bounds().Height());
 }
 
 
@@ -183,8 +203,8 @@ BScrollView::AttachedToWindow()
 	BRect bounds = ConvertToScreen(Bounds());
 	BRect windowBounds = Window()->Frame();
 
-	if (bounds.right - BorderSize(fBorder) != windowBounds.right
-		|| bounds.bottom - BorderSize(fBorder) != windowBounds.bottom)
+	if (bounds.right - _BorderSize() != windowBounds.right
+		|| bounds.bottom - _BorderSize() != windowBounds.bottom)
 		return;
 
 	if (fHorizontalScrollBar)
@@ -237,7 +257,7 @@ BScrollView::Draw(BRect updateRect)
 		StrokeLine(bounds.LeftBottom(), bounds.LeftTop());
 		bounds.left++;
 		StrokeLine(bounds.LeftTop(), bounds.RightTop());
-	
+
 		SetHighColor(ui_color(B_SHINE_COLOR));
 		StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
 		bounds.top++;
@@ -263,7 +283,7 @@ BScrollView::SetBorder(border_style border)
 	if (fBorder == border)
 		return;
 
-	float offset = BorderSize(fBorder) - BorderSize(border);
+	float offset = _BorderSize() - _BorderSize(border);
 	float resize = 2 * offset;
 
 	float horizontalGap = 0, verticalGap = 0;
@@ -304,7 +324,7 @@ BScrollView::SetBorder(border_style border)
 		fVerticalScrollBar->ResizeBy(0, resize + verticalGap - change);
 	}
 
-	SetFlags(ModifyFlags(Flags(), border));
+	SetFlags(_ModifyFlags(Flags(), border));
 }
 
 
@@ -327,19 +347,12 @@ BScrollView::SetBorderHighlighted(bool state)
 
 	fHighlighted = state;
 
-	/* The BeBook describes something like this:
-	
-	if (LockLooper()) {
-		Draw(Bounds());
-		UnlockLooper();
-	}
-	*/
-	
-	// but this is much cleaner, I think:
 	BRect bounds = Bounds();
 	Invalidate(BRect(bounds.left, bounds.top, bounds.right, bounds.top));
-	Invalidate(BRect(bounds.left, bounds.top + 1, bounds.left, bounds.bottom - 1));
-	Invalidate(BRect(bounds.right, bounds.top + 1, bounds.right, bounds.bottom - 1));
+	Invalidate(BRect(bounds.left, bounds.top + 1, bounds.left,
+		bounds.bottom - 1));
+	Invalidate(BRect(bounds.right, bounds.top + 1, bounds.right,
+		bounds.bottom - 1));
 	Invalidate(BRect(bounds.left, bounds.bottom, bounds.right, bounds.bottom));
 
 	return B_OK;
@@ -373,7 +386,9 @@ BScrollView::SetTarget(BView *target)
 		fVerticalScrollBar->SetTarget(target);
 
 	if (target != NULL) {
-		target->MoveTo(BorderSize(fBorder), BorderSize(fBorder));
+		target->MoveTo(_BorderSize(), _BorderSize());
+		BRect innerFrame = _InnerFrame();
+		target->ResizeTo(innerFrame.Width(), innerFrame.Height());
 		target->TargetedByScrollView(this);
 
 		AddChild(target, ChildAt(0));
@@ -440,7 +455,7 @@ BScrollView::FrameResized(float width, float height)
 	// changes in width
 
 	BRect bounds = Bounds();
-	float border = BorderSize(fBorder) - 1;
+	float border = _BorderSize() - 1;
 
 	if (bounds.Width() > fPreviousWidth) {
 		// invalidate the region between the old and the new right border
@@ -475,52 +490,88 @@ BScrollView::FrameResized(float width, float height)
 }
 
 
-void 
+void
 BScrollView::ResizeToPreferred()
 {
 	BView::ResizeToPreferred();
 }
 
 
-void 
+void
 BScrollView::GetPreferredSize(float *_width, float *_height)
 {
-	BRect frame = CalcFrame(fTarget, fHorizontalScrollBar, fVerticalScrollBar, fBorder);
-
-	if (fTarget != NULL) {
-		float width, height;
-		fTarget->GetPreferredSize(&width, &height);
-
-		frame.right += width - fTarget->Frame().Width();
-		frame.bottom += height - fTarget->Frame().Height();
-	}
+	BSize size = PreferredSize();
 
 	if (_width)
-		*_width = frame.Width();
+		*_width = size.width;
 	if (_height)
-		*_height = frame.Height();
+		*_height = size.height;
 }
 
 
+float
+BScrollView::_BorderSize() const
+{
+	return _BorderSize(fBorder);
+}
 
-
-/** This static method is used to calculate the frame that the
- *	ScrollView will cover depending on the frame of its target
- *	and which border style is used.
- *	It is used in the constructor and at other places.
- */
 
 BRect
-BScrollView::CalcFrame(BView *target, bool horizontal, bool vertical, border_style border)
+BScrollView::_InnerFrame() const
 {
-	BRect frame = target != NULL ? target->Frame() : BRect(0, 0, 80, 80);
+	BRect frame = Bounds();
 
+	float borderSize = _BorderSize();
+	frame.InsetBy(borderSize, borderSize);
+
+	if (fHorizontalScrollBar != NULL) {
+		frame.bottom -= B_H_SCROLL_BAR_HEIGHT;
+		if (borderSize == 0)
+			frame.bottom--;
+	}
+	if (fVerticalScrollBar != NULL) {
+		frame.right -= B_V_SCROLL_BAR_WIDTH;
+		if (borderSize == 0)
+			frame.right--;
+	}
+
+	return frame;
+}
+
+
+BSize
+BScrollView::_ComputeSize(BSize targetSize) const
+{
+	BRect frame = _ComputeFrame(
+		BRect(0, 0, targetSize.width, targetSize.height));
+
+	return BSize(frame.Width(), frame.Height());
+}
+
+
+BRect
+BScrollView::_ComputeFrame(BRect targetRect) const
+{
+	return _ComputeFrame(targetRect, fHorizontalScrollBar != NULL,
+		fVerticalScrollBar != NULL, fBorder);
+}
+
+
+/*!	This static method is used to calculate the frame that the
+	ScrollView will cover depending on the frame of its target
+	and which border style is used.
+	It is used in the constructor and at other places.
+*/
+/*static*/ BRect
+BScrollView::_ComputeFrame(BRect frame, bool horizontal, bool vertical,
+	border_style border)
+{
 	if (vertical)
 		frame.right += B_V_SCROLL_BAR_WIDTH;
 	if (horizontal)
 		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
 
-	float borderSize = BorderSize(border);
+	float borderSize = _BorderSize(border);
 	frame.InsetBy(-borderSize, -borderSize);
 
 	if (borderSize == 0) {
@@ -534,11 +585,19 @@ BScrollView::CalcFrame(BView *target, bool horizontal, bool vertical, border_sty
 }
 
 
-/** This method returns the size of the specified border
- */
+/*static*/ BRect
+BScrollView::_ComputeFrame(BView *target, bool horizontal, bool vertical,
+	border_style border)
+{
+	return _ComputeFrame(target != NULL ? target->Frame() : BRect(0, 0, 16, 16),
+		horizontal, vertical, border);
+}
 
-float 
-BScrollView::BorderSize(border_style border)
+
+/*! This method returns the size of the specified border.
+*/
+/*static*/ float
+BScrollView::_BorderSize(border_style border)
 {
 	if (border == B_FANCY_BORDER)
 		return kFancyBorderSize;
@@ -549,12 +608,11 @@ BScrollView::BorderSize(border_style border)
 }
 
 
-/** This method changes the "flags" argument as passed on to
- *	the BView constructor.
- */
-
-int32
-BScrollView::ModifyFlags(int32 flags, border_style border)
+/*!	This method changes the "flags" argument as passed on to
+	the BView constructor.
+*/
+/*static*/ int32
+BScrollView::_ModifyFlags(int32 flags, border_style border)
 {
 	// We either need B_FULL_UPDATE_ON_RESIZE or
 	// B_FRAME_EVENTS if we have to draw a border
@@ -575,21 +633,22 @@ BScrollView::WindowActivated(bool active)
 }
 
 
-void 
+void
 BScrollView::MakeFocus(bool state)
 {
 	BView::MakeFocus(state);
 }
 
 
-BHandler *
-BScrollView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier, int32 form, const char *property)
+BHandler*
+BScrollView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
+	int32 form, const char* property)
 {
 	return BView::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 
-status_t 
+status_t
 BScrollView::GetSupportedSuites(BMessage *data)
 {
 	return BView::GetSupportedSuites(data);
@@ -599,17 +658,8 @@ BScrollView::GetSupportedSuites(BMessage *data)
 BSize
 BScrollView::MinSize()
 {
-// TODO: This is not yet correct.
-	BSize size = (fTarget ? fTarget->MinSize() : BSize(-1, -1));
-
-	if (fVerticalScrollBar)
-		size.width += B_V_SCROLL_BAR_WIDTH;
-	if (fHorizontalScrollBar)
-		size.height += B_H_SCROLL_BAR_HEIGHT;
-
-	float borderSize = BorderSize(fBorder);
-	size.width += 2 * borderSize;
-	size.height += 2 * borderSize;
+	BSize size = _ComputeSize(fTarget != NULL ? fTarget->MinSize()
+		: BSize(16, 16));
 
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
@@ -618,19 +668,53 @@ BScrollView::MinSize()
 BSize
 BScrollView::PreferredSize()
 {
-// TODO: This is not yet correct.
-	BSize size = (fTarget ? fTarget->PreferredSize() : BSize(-1, -1));
-
-	if (fVerticalScrollBar)
-		size.width += B_V_SCROLL_BAR_WIDTH;
-	if (fHorizontalScrollBar)
-		size.height += B_H_SCROLL_BAR_HEIGHT;
-
-	float borderSize = BorderSize(fBorder);
-	size.width += 2 * borderSize;
-	size.height += 2 * borderSize;
+	BSize size = _ComputeSize(fTarget != NULL ? fTarget->PreferredSize()
+		: BSize(32, 32));
 
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+void
+BScrollView::InvalidateLayout(bool descendants)
+{
+	BView::InvalidateLayout(descendants);
+}
+
+
+void
+BScrollView::DoLayout()
+{
+	if (!(Flags() & B_SUPPORTS_LAYOUT))
+		return;
+
+	// If the user set a layout, we let the base class version call its
+	// hook.
+	if (GetLayout()) {
+		BView::DoLayout();
+		return;
+	}
+
+	BRect innerFrame = _InnerFrame();
+
+	if (fTarget != NULL) {
+		fTarget->MoveTo(innerFrame.left, innerFrame.top);
+		fTarget->ResizeTo(innerFrame.Width(), innerFrame.Height());
+
+		//BLayoutUtils::AlignInFrame(fTarget, fTarget->Bounds());
+	}
+
+	if (fHorizontalScrollBar != NULL) {
+		fHorizontalScrollBar->MoveTo(innerFrame.left, innerFrame.bottom);
+		fHorizontalScrollBar->ResizeTo(innerFrame.Width(),
+			fHorizontalScrollBar->Bounds().Height());
+	}
+
+	if (fVerticalScrollBar != NULL) {
+		fVerticalScrollBar->MoveTo(innerFrame.right, innerFrame.top);
+		fVerticalScrollBar->ResizeTo(fVerticalScrollBar->Bounds().Width(),
+			innerFrame.Height());
+	}
 }
 
 
