@@ -1474,7 +1474,7 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 			break;
 
 		case TCXONC:			// Unix, but even Linux doesn't handle it
-			dprintf("tty: unsupported TCXONC\n");
+			//dprintf("tty: unsupported TCXONC\n");
 			break;
 
 		case TCQUERYCONNECTED:	// BeOS
