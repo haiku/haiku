@@ -1138,9 +1138,12 @@ debug_puts(const char *string, int32 length)
 			syslog_write(string, length);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(string);
-		for (uint32 i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
-			if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
-				sDebuggerModules[i]->debugger_puts(string, length);
+		if (sSerialDebugEnabled) {
+			for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
+				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+					sDebuggerModules[i]->debugger_puts(string, length);
+			}
+		}
 
 		memcpy(sLastOutputBuffer, string, length);
 		sLastOutputBuffer[length] = 0;
@@ -1364,47 +1367,52 @@ set_dprintf_enabled(bool newState)
 }
 
 
+//!	Must be called with the sSpinlock held.
 static void
 flush_pending_repeats(void)
 {
-	if (sMessageRepeatCount > 0) {
-		int32 length;
-		uint32 i;
+	if (sMessageRepeatCount <= 0)
+		return;
 
-		if (sMessageRepeatCount > 1) {
-			static char temp[40];
-			length = snprintf(temp, sizeof(temp),
-				"Last message repeated %ld times.\n", sMessageRepeatCount);
+	if (sMessageRepeatCount > 1) {
+		static char temp[40];
+		size_t length = snprintf(temp, sizeof(temp),
+			"Last message repeated %ld times.\n", sMessageRepeatCount);
 
-			if (sSerialDebugEnabled)
-				arch_debug_serial_puts(temp);
-			if (sSyslogOutputEnabled)
-				syslog_write(temp, length);
-			if (sBlueScreenEnabled || sDebugScreenEnabled)
-				blue_screen_puts(temp);
-			for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++) {
+		if (sSerialDebugEnabled)
+			arch_debug_serial_puts(temp);
+		if (sSyslogOutputEnabled)
+			syslog_write(temp, length);
+		if (sBlueScreenEnabled || sDebugScreenEnabled)
+			blue_screen_puts(temp);
+		if (sSerialDebugEnabled) {
+			for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
 				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
 					sDebuggerModules[i]->debugger_puts(temp, length);
 			}
-		} else {
-			// if we only have one repeat just reprint the last buffer
-			if (sSerialDebugEnabled)
-				arch_debug_serial_puts(sLastOutputBuffer);
-			if (sSyslogOutputEnabled)
-				syslog_write(sLastOutputBuffer, strlen(sLastOutputBuffer));
-			if (sBlueScreenEnabled || sDebugScreenEnabled)
-				blue_screen_puts(sLastOutputBuffer);
-			for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++) {
+		}
+	} else {
+		// if we only have one repeat just reprint the last buffer
+		size_t length = strlen(sLastOutputBuffer);
+
+		if (sSerialDebugEnabled)
+			arch_debug_serial_puts(sLastOutputBuffer);
+		if (sSyslogOutputEnabled)
+			syslog_write(sLastOutputBuffer, length);
+		if (sBlueScreenEnabled || sDebugScreenEnabled)
+			blue_screen_puts(sLastOutputBuffer);
+		if (sSerialDebugEnabled) {
+			for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
 				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts) {
 					sDebuggerModules[i]->debugger_puts(sLastOutputBuffer,
-						strlen(sLastOutputBuffer));
+						length);
 				}
 			}
 		}
-
-		sMessageRepeatFirstTime = 0;
-		sMessageRepeatCount = 0;
 	}
+
+	sMessageRepeatFirstTime = 0;
+	sMessageRepeatCount = 0;
 }
 
 
