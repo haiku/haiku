@@ -71,7 +71,7 @@ static bool sSyslogDropped = false;
 
 static const char* sCurrentKernelDebuggerMessage;
 
-#define SYSLOG_BUFFER_SIZE 65536
+#define DEFAULT_SYSLOG_BUFFER_SIZE 65536
 #define OUTPUT_BUFFER_SIZE 1024
 static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
 static char sLastOutputBuffer[OUTPUT_BUFFER_SIZE];
@@ -1021,7 +1021,7 @@ syslog_init_post_threads(void)
 
 
 static status_t
-syslog_init(struct kernel_args *args)
+syslog_init(struct kernel_args* args)
 {
 	status_t status;
 	int32 length = 0;
@@ -1035,7 +1035,25 @@ syslog_init(struct kernel_args *args)
 		goto err1;
 	}
 
-	sSyslogBuffer = create_ring_buffer(SYSLOG_BUFFER_SIZE);
+	{
+		size_t bufferSize = DEFAULT_SYSLOG_BUFFER_SIZE;
+		void* handle = load_driver_settings("kernel");
+		if (handle != NULL) {
+			const char* sizeString = get_driver_parameter(handle,
+				"syslog_buffer_size", NULL, NULL);
+			if (sizeString != NULL) {
+				bufferSize = strtoul(sizeString, NULL, 0);
+				if (bufferSize > 262144)
+					bufferSize = 262144;
+				else if (bufferSize < SYSLOG_MESSAGE_BUFFER_SIZE)
+					bufferSize = SYSLOG_MESSAGE_BUFFER_SIZE;
+			}
+
+			unload_driver_settings(handle);
+		}
+
+		sSyslogBuffer = create_ring_buffer(bufferSize);
+	}
 	if (sSyslogBuffer == NULL) {
 		status = B_NO_MEMORY;
 		goto err2;

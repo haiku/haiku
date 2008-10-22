@@ -19,9 +19,13 @@
 	# disables syslog debug output - all debug output is also sent to
 	# the syslog service by default.
 
+#syslog_buffer_size 131768
+	# The default size of the internal syslog ring buffer - if you often see
+	# <DROP> or <TRUNC> messages in your syslog, you might want to increase
+	# this value. Defaults to 65536 bytes.
+
 #syslog_time_stamps true
-	# Include time stamps in syslog debug output,
-	# you don't get them by default
+	# Include time stamps in syslog debug output, defaults to false.
 
 #syslog_max_size 20MB
 	# change maximum syslog file size, default is 512kB
