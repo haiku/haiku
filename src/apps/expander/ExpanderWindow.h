@@ -49,6 +49,7 @@ class ExpanderWindow : public BWindow {
 		void _UpdateWindowSize(bool showContents);
 		void StartListing();
 		void StopListing();
+		bool ValidateDest();
 
 		BFilePanel *fSourcePanel;
 		DirectoryFilePanel *fDestPanel;

@@ -179,6 +179,21 @@ ExpanderWindow::~ExpanderWindow()
 	delete fSourcePanel;
 }
 
+bool 
+ExpanderWindow::ValidateDest()
+{
+	BEntry entry(fDestText->Text(), true);
+	if (!entry.Exists()) {
+		BAlert *alert = new BAlert("destAlert", "The destination"
+			" directory does not exist.", "Cancel", NULL, NULL,
+			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+		alert->Go();
+		return false;
+	} else {
+		entry.GetRef(&fDestRef);
+		return true;
+	}
+}
 
 void
 ExpanderWindow::FrameResized(float width, float height)
@@ -233,6 +248,8 @@ ExpanderWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case MSG_EXPAND:
+			if (!ValidateDest())
+				break;
 			if (!fExpandingStarted) {
 				StartExpanding();
 				break;
@@ -309,16 +326,7 @@ ExpanderWindow::MessageReceived(BMessage *msg)
 		break;
 		case MSG_DESTTEXT:
 		{
-			BEntry entry(fDestText->Text(), true);
-			if (!entry.Exists()) {
-				BAlert *alert = new BAlert("destAlert", "The directory was either moved, renamed or not\n"
-					"supported.",
-					"Cancel", NULL, NULL,
-					B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
-				alert->Go();
-				break;
-			}
-			entry.GetRef(&fDestRef);
+			ValidateDest();
 		}
 		break;
 		case MSG_PREFERENCES:
