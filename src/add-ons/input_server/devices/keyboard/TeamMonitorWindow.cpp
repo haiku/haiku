@@ -55,6 +55,7 @@ private:
 
 
 static const uint32 kMsgUpdate = 'TMup';
+static const uint32 kMsgLaunchTerminal = 'TMlt';
 const uint32 TM_CANCEL = 'TMca';
 const uint32 TM_FORCE_REBOOT = 'TMfr';
 const uint32 TM_KILL_APPLICATION = 'TMka';
@@ -140,6 +141,9 @@ TeamMonitorWindow::TeamMonitorWindow()
 
 	SetSizeLimits(Bounds().Width(), Bounds().Width() * 2,
 		Bounds().Height(), screenFrame.Height());
+
+	AddShortcut('T', B_COMMAND_KEY | B_SHIFT_KEY,
+		new BMessage(kMsgLaunchTerminal));
 }
 
 
@@ -166,6 +170,10 @@ TeamMonitorWindow::MessageReceived(BMessage *msg)
 				break;
 
 			fDescriptionView->CtrlAltDelPressed(keyDown);
+			break;
+
+		case kMsgLaunchTerminal:
+			be_roster->Launch("application/x-vnd.Haiku-Terminal");
 			break;
 
 		case TM_FORCE_REBOOT:
