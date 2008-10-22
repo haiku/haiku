@@ -928,14 +928,11 @@ syslog_sender(void *data)
 					length = SYSLOG_MAX_MESSAGE_LENGTH;
 
 				length = ring_buffer_read(sSyslogBuffer,
-					(uint8 *)sSyslogMessage->message, length);
+					(uint8*)sSyslogMessage->message, length);
 				if (sSyslogDropped) {
-					// add drop marker
-					if (length < (int32)SYSLOG_MAX_MESSAGE_LENGTH - 6)
-						strlcat(sSyslogMessage->message, "<DROP>", SYSLOG_MAX_MESSAGE_LENGTH);
-					else if (length > 7)
-						strcpy(sSyslogMessage->message + length - 7, "<DROP>");
-
+					// Add drop marker - since parts had to be dropped, it's
+					// guaranteed that we have enough space in the buffer now.
+					ring_buffer_write(sSyslogBuffer, (uint8*)"<DROP>", 6);
 					sSyslogDropped = false;
 				}
 
@@ -1412,13 +1409,11 @@ flush_pending_repeats(void)
 
 
 static void
-check_pending_repeats(void *data, int iter)
+check_pending_repeats(void* /*data*/, int /*iteration*/)
 {
-	(void)data;
-	(void)iter;
 	if (sMessageRepeatCount > 0
-		&& ((system_time() - sMessageRepeatLastTime) > 1000000
-		|| (system_time() - sMessageRepeatFirstTime) > 3000000)) {
+		&& (system_time() - sMessageRepeatLastTime > 1000000
+			|| system_time() - sMessageRepeatFirstTime > 3000000)) {
 		cpu_status state = disable_interrupts();
 		acquire_spinlock(&sSpinlock);
 
