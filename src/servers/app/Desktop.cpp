@@ -173,6 +173,9 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 				fDesktop->SetWorkspaceAsync(key - 2);
 				return B_SKIP_MESSAGE;
 			}
+		} if (key == 0x11 && (modifiers & B_COMMAND_KEY) != 0) {
+			// switch to previous workspace
+			fDesktop->SetWorkspaceAsync(-1);
 		}
 	}
 
@@ -296,6 +299,7 @@ Desktop::Desktop(uid_t userID)
 	fApplicationsLock("application list"),
 	fShutdownSemaphore(-1),
 	fCurrentWorkspace(0),
+	fPreviousWorkspace(0),
 	fAllWindows(kAllWindowList),
 	fSubsetWindows(kSubsetList),
 	fFocusList(kFocusList),
@@ -633,6 +637,9 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			int32 index;
 			link.Read<int32>(&index);
 
+			if (index == -1)
+				index = fPreviousWorkspace;
+
 			SetWorkspace(index);
 			break;
 		}
@@ -885,8 +892,7 @@ Desktop::SetWorkspace(int32 index)
 }
 
 
-/*!
-	Changes the current workspace to the one specified by \a index.
+/*!	Changes the current workspace to the one specified by \a index.
 	You must hold the all window lock when calling this method.
 */
 void
@@ -946,6 +952,7 @@ Desktop::_SetWorkspace(int32 index)
 		window->SetCurrentWorkspace(-1);
 	}
 
+	fPreviousWorkspace = fCurrentWorkspace;
 	fCurrentWorkspace = index;
 
 	// show windows, and include them in the changed region - but only

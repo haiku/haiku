@@ -279,6 +279,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		::Workspace::Private	fWorkspaces[kMaxWorkspaces];
 		int32					fCurrentWorkspace;
+		int32					fPreviousWorkspace;
 
 		WindowList				fAllWindows;
 		WindowList				fSubsetWindows;
