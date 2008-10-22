@@ -1,0 +1,22 @@
+DefineBuildProfile alpha-raw : image : "haiku-alpha.image" ;
+DefineBuildProfile alpha-vmware : vmware-image : "haiku-alpha.vmdk" ;
+
+switch $(HAIKU_BUILD_PROFILE) {
+	case "alpha-*" : {
+		Echo Building Haiku R1/alpha ;
+		HAIKU_ROOT_USER_NAME = user ;
+		HAIKU_ROOT_USER_REAL_NAME = "Yourself" ;
+		AddGroupToHaikuImage party : 101 : user sshd ;
+		HAIKU_IMAGE_HOST_NAME = shredder ;
+		HAIKU_IMAGE_SIZE = 400 ;
+		USE_SSL = 1 ;
+
+		AddOptionalHaikuImagePackages BePDF Firefox Pe Vision VLC WonderBrush ;
+		AddOptionalHaikuImagePackages CVS Development Subversion OpenSSH Yasm ;
+		AddOptionalHaikuImagePackages Welcome ;
+	}
+
+	case "beta-*" : {
+		Echo You wish. ;
+	}
+}

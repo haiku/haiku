@@ -45,6 +45,8 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildSetup ] ;
 	}
 }
 
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) ReleaseBuildProfiles ] ;
+
 # If a build profile was specified on the command line, now is the time to
 # check whether it is unknown or one of the default profiles.
 if $(HAIKU_BUILD_PROFILE) && ! $(HAIKU_BUILD_PROFILE_DEFINED) {
