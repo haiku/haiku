@@ -78,7 +78,7 @@ static char sLastOutputBuffer[OUTPUT_BUFFER_SIZE];
 static DebugOutputFilter* sDebugOutputFilter = NULL;
 DefaultDebugOutputFilter gDefaultDebugOutputFilter;
 
-static void flush_pending_repeats(void);
+static void flush_pending_repeats(bool syslogOutput);
 static void check_pending_repeats(void *data, int iter);
 
 static int64 sMessageRepeatFirstTime = 0;
@@ -150,7 +150,7 @@ void
 DefaultDebugOutputFilter::Print(const char* format, va_list args)
 {
 	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
-	flush_pending_repeats();
+	flush_pending_repeats(sInDebugger == 0);
 	PrintString(sOutputBuffer);
 }
 
@@ -1148,7 +1148,7 @@ debug_puts(const char *string, int32 length)
 		if (sMessageRepeatFirstTime == 0)
 			sMessageRepeatFirstTime = sMessageRepeatLastTime;
 	} else {
-		flush_pending_repeats();
+		flush_pending_repeats(true);
 
 		if (sSerialDebugEnabled)
 			arch_debug_serial_puts(string);
@@ -1387,7 +1387,7 @@ set_dprintf_enabled(bool newState)
 
 //!	Must be called with the sSpinlock held.
 static void
-flush_pending_repeats(void)
+flush_pending_repeats(bool syslogOutput)
 {
 	if (sMessageRepeatCount <= 0)
 		return;
@@ -1399,7 +1399,7 @@ flush_pending_repeats(void)
 
 		if (sSerialDebugEnabled)
 			arch_debug_serial_puts(temp);
-		if (sSyslogOutputEnabled)
+		if (sSyslogOutputEnabled && syslogOutput)
 			syslog_write(temp, length);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(temp);
@@ -1415,7 +1415,7 @@ flush_pending_repeats(void)
 
 		if (sSerialDebugEnabled)
 			arch_debug_serial_puts(sLastOutputBuffer);
-		if (sSyslogOutputEnabled)
+		if (sSyslogOutputEnabled && syslogOutput)
 			syslog_write(sLastOutputBuffer, length);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(sLastOutputBuffer);
@@ -1443,7 +1443,7 @@ check_pending_repeats(void* /*data*/, int /*iteration*/)
 		cpu_status state = disable_interrupts();
 		acquire_spinlock(&sSpinlock);
 
-		flush_pending_repeats();
+		flush_pending_repeats(true);
 
 		release_spinlock(&sSpinlock);
 		restore_interrupts(state);
@@ -1477,7 +1477,7 @@ dprintf_args(const char *format, va_list args, bool syslogOutput)
 		if (sMessageRepeatFirstTime == 0)
 			sMessageRepeatFirstTime = sMessageRepeatLastTime;
 	} else {
-		flush_pending_repeats();
+		flush_pending_repeats(syslogOutput);
 
 		if (sSerialDebugEnabled)
 			arch_debug_serial_puts(sOutputBuffer);
