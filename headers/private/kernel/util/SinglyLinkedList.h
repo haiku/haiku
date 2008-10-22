@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -144,6 +144,9 @@ class SinglyLinkedList {
 		inline void Add(Element* element);
 		inline void Remove(Element* element);
 
+		inline void MoveFrom(SINGLY_LINKED_LIST_CLASS_NAME* fromList);
+			// O(1) if either list is empty, otherwise O(n).
+
 		inline void RemoveAll();
 		inline void MakeEmpty()			{ RemoveAll(); }
 
@@ -202,6 +205,31 @@ SINGLY_LINKED_LIST_CLASS_NAME::Remove(Element* element)
 
 	elementLink->next = NULL;
 }
+
+
+SINGLY_LINKED_LIST_TEMPLATE_LIST
+void
+SINGLY_LINKED_LIST_CLASS_NAME::MoveFrom(SINGLY_LINKED_LIST_CLASS_NAME* fromList)
+{
+	if (fromList->fFirst == NULL)
+		return;
+
+	if (fFirst == NULL) {
+		// This list is empty -- just transfer the head.
+		fFirst = fromList->fFirst;
+		fromList->fFirst = NULL;
+		return;
+	}
+
+	// Neither list is empty -- find the tail of this list.
+	Element* tail = fFirst;
+	while (Element* next = sGetLink(tail)->next)
+		tail = next;
+
+	sGetLink(tail)->next = fromList->fFirst;
+	fromList->fFirst = NULL;
+}
+
 
 // RemoveAll
 SINGLY_LINKED_LIST_TEMPLATE_LIST
