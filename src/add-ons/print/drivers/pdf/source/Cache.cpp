@@ -68,7 +68,7 @@ CacheItem* Cache::Find(CIDescription* desc) {
 	CacheItem* item = ItemAt(id);
 
 	// In 2. pass for each item an entry must exists
-	ASSERT(fPass == 1 && item != NULL);
+	ASSERT(fPass != 1 || item != NULL);
 	if (fPass == 1) return item->Reference();
 	
 	// In 1. pass we create an entry for each bitmap
