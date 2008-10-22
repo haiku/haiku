@@ -22,12 +22,15 @@
 #include <smp.h>
 #include <tls.h>
 #include <vm.h>
+#include <vm_address_space.h>
+#include <vm_types.h>
 
 #include <arch_system_info.h>
 #include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
 
 #include "interrupts.h"
+#include "x86_paging.h"
 
 
 #define DUMP_FEATURE_STRING 1
@@ -539,6 +542,10 @@ arch_cpu_init_post_vm(kernel_args *args)
 	// (a fixed number of used GDT entries)
 	//i386_selector_init(gGDT);  // pass the new gdt
 
+
+	vm_translation_map_arch_info* kernelArchTranslationMap
+		= vm_kernel_address_space()->translation_map.arch_data;
+
 	// setup task-state segments
 	for (i = 0; i < args->num_cpus; i++) {
 		// initialize the regular and double fault tss stored in the per-cpu
@@ -553,6 +560,10 @@ arch_cpu_init_post_vm(kernel_args *args)
 
 		// initialize the double fault tss
 		init_double_fault(i);
+
+		// init active translation map
+		gCPU[i].arch.active_translation_map = kernelArchTranslationMap;
+		kernelArchTranslationMap->AddReference();
 	}
 
 	// set the current hardware task on cpu 0

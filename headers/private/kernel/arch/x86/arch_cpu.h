@@ -238,6 +238,8 @@ typedef struct arch_cpu_info {
 	int model;
 	int extended_model;
 
+	struct vm_translation_map_arch_info* active_translation_map;
+
 	// local TSS for this cpu
 	struct tss tss;
 	struct tss double_fault_tss;

@@ -12,10 +12,12 @@
 
 #include <arch/user_debugger.h>
 #include <arch_cpu.h>
+#include <cpu.h>
 #include <debug.h>
 #include <kernel.h>
 #include <ksignal.h>
 #include <int.h>
+#include <team.h>
 #include <thread.h>
 #include <tls.h>
 #include <tracing.h>
@@ -336,21 +338,6 @@ arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack,
 void
 arch_thread_context_switch(struct thread *from, struct thread *to)
 {
-	addr_t newPageDirectory;
-
-#if 0
-	int i;
-
-	dprintf("arch_thread_context_switch: cpu %d 0x%x -> 0x%x, aspace 0x%x -> 0x%x, old stack = 0x%x:0x%x, stack = 0x%x:0x%x\n",
-		smp_get_current_cpu(), t_from->id, t_to->id,
-		t_from->team->address_space, t_to->team->address_space,
-		t_from->arch_info.current_stack.ss, t_from->arch_info.current_stack.esp,
-		t_to->arch_info.current_stack.ss, t_to->arch_info.current_stack.esp);
-#endif
-#if 0
-	for (i = 0; i < 11; i++)
-		dprintf("*esp[%d] (0x%x) = 0x%x\n", i, ((unsigned int *)new_at->esp + i), *((unsigned int *)new_at->esp + i));
-#endif
 	i386_set_tss_and_kstack(to->kernel_stack_top);
 
 	// set TLS GDT entry to the current thread - since this action is
@@ -358,23 +345,29 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 	if (to->user_local_storage != 0)
 		set_tls_context(to);
 
-	newPageDirectory = (addr_t)x86_next_page_directory(from, to);
+	struct cpu_ent* cpuData = to->cpu;
+	vm_translation_map_arch_info* activeMap
+		= cpuData->arch.active_translation_map;
+	vm_address_space* toAddressSpace = to->team->address_space;
 
-	ASSERT((newPageDirectory % B_PAGE_SIZE) == 0);
-
-	if (newPageDirectory != 0) {
+	addr_t newPageDirectory;
+	vm_translation_map_arch_info* toMap;
+	if (toAddressSpace != NULL
+		&& (toMap = toAddressSpace->translation_map.arch_data) != activeMap) {
 		// update on which CPUs the address space is used
-		int cpu = smp_get_current_cpu();
-		if (vm_address_space* addressSpace = from->team->address_space) {
-			atomic_and(&addressSpace->translation_map.arch_data->active_on_cpus,
-				~((uint32)1 << cpu));
-		}
+		int cpu = cpuData->cpu_num;
+		atomic_and(&activeMap->active_on_cpus, ~((uint32)1 << cpu));
+		atomic_or(&toMap->active_on_cpus, (uint32)1 << cpu);
 
-		if (vm_address_space* addressSpace = to->team->address_space) {
-			atomic_or(&addressSpace->translation_map.arch_data->active_on_cpus,
-				(uint32)1 << cpu);
-		}
-	}
+		// assign the new map to the CPU
+		activeMap->RemoveReference();
+		toMap->AddReference();
+		cpuData->arch.active_translation_map = toMap;
+
+		// get the new page directory
+		newPageDirectory = (addr_t)toMap->pgdir_phys;
+	} else
+		newPageDirectory = 0;
 
 	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
 	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);

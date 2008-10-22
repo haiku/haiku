@@ -10,6 +10,9 @@
 
 #include <SupportDefs.h>
 
+#include <heap.h>
+#include <int.h>
+
 
 #define PAGE_INVALIDATE_CACHE_SIZE 64
 
@@ -52,15 +55,24 @@ typedef struct page_directory_entry {
 } page_directory_entry;
 
 
-typedef struct vm_translation_map_arch_info {
+struct vm_translation_map_arch_info : DeferredDeletable {
 	struct page_directory_entry*		pgdir_virt;
 	struct page_directory_entry*		pgdir_phys;
 	TranslationMapPhysicalPageMapper*	page_mapper;
+	vint32 ref_count;
 	vint32 active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
 	int num_invalidate_pages;
 	addr_t pages_to_invalidate[PAGE_INVALIDATE_CACHE_SIZE];
-} vm_translation_map_arch_info;
+
+								vm_translation_map_arch_info();
+	virtual						~vm_translation_map_arch_info();
+
+	inline	void				AddReference();
+	inline	void				RemoveReference();
+
+			void				Delete();
+};
 
 
 void x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
@@ -97,6 +109,21 @@ update_page_table_entry(page_table_entry *entry, page_table_entry *with)
 {
 	// update page table entry atomically
 	*(uint32 *)entry = *(uint32 *)with;
+}
+
+
+inline void
+vm_translation_map_arch_info::AddReference()
+{
+	atomic_add(&ref_count, 1);
+}
+
+
+inline void
+vm_translation_map_arch_info::RemoveReference()
+{
+	if (atomic_add(&ref_count, -1) == 1)
+		Delete();
 }
 
 

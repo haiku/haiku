@@ -41,7 +41,33 @@ static page_directory_entry *sPageHolePageDir = NULL;
 static page_directory_entry *sKernelPhysicalPageDirectory = NULL;
 static page_directory_entry *sKernelVirtualPageDirectory = NULL;
 
-static vm_translation_map *sTMapList;
+
+// Accessor class to reuse the SinglyLinkedListLink of DeferredDeletable for
+// vm_translation_map_arch_info.
+struct ArchTMapGetLink {
+private:
+	typedef SinglyLinkedListLink<vm_translation_map_arch_info> Link;
+
+public:
+	inline Link* operator()(vm_translation_map_arch_info* element) const
+	{
+		return (Link*)element->GetSinglyLinkedListLink();
+	}
+
+	inline const Link* operator()(
+		const vm_translation_map_arch_info* element) const
+	{
+		return (const Link*)element->GetSinglyLinkedListLink();
+	}
+
+};
+
+
+typedef SinglyLinkedList<vm_translation_map_arch_info, ArchTMapGetLink>
+	ArchTMapList;
+
+
+static ArchTMapList sTMapList;
 static spinlock sTMapListLock;
 
 #define CHATTY_TMAP 0
@@ -69,13 +95,13 @@ i386_translation_map_get_pgdir(vm_translation_map *map)
 void
 x86_update_all_pgdirs(int index, page_directory_entry e)
 {
-	vm_translation_map *entry;
 	unsigned int state = disable_interrupts();
 
 	acquire_spinlock(&sTMapListLock);
 
-	for(entry = sTMapList; entry != NULL; entry = entry->next)
-		entry->arch_data->pgdir_virt[index] = e;
+	ArchTMapList::Iterator it = sTMapList.GetIterator();
+	while (vm_translation_map_arch_info* info = it.Next())
+		info->pgdir_virt[index] = e;
 
 	release_spinlock(&sTMapListLock);
 	restore_interrupts(state);
@@ -143,45 +169,48 @@ unlock_tmap(vm_translation_map *map)
 }
 
 
+vm_translation_map_arch_info::vm_translation_map_arch_info()
+	:
+	pgdir_virt(NULL),
+	ref_count(1)
+{
+}
+
+
+vm_translation_map_arch_info::~vm_translation_map_arch_info()
+{
+	// free the page dir
+	free(pgdir_virt);
+}
+
+
+void
+vm_translation_map_arch_info::Delete()
+{
+	// remove from global list
+	InterruptsSpinLocker locker(sTMapListLock);
+	sTMapList.Remove(this);
+	locker.Unlock();
+
+	if (are_interrupts_enabled())
+		delete this;
+	else
+		deferred_delete(this);
+}
+
+
 static void
 destroy_tmap(vm_translation_map *map)
 {
-	int state;
-	vm_translation_map *entry;
-	vm_translation_map *last = NULL;
-	unsigned int i;
-
 	if (map == NULL)
 		return;
-
-	// remove it from the tmap list
-	state = disable_interrupts();
-	acquire_spinlock(&sTMapListLock);
-
-	// TODO: How about using a doubly linked list?
-	entry = sTMapList;
-	while (entry != NULL) {
-		if (entry == map) {
-			if (last != NULL)
-				last->next = entry->next;
-			else
-				sTMapList = entry->next;
-
-			break;
-		}
-		last = entry;
-		entry = entry->next;
-	}
-
-	release_spinlock(&sTMapListLock);
-	restore_interrupts(state);
 
 	if (map->arch_data->page_mapper != NULL)
 		map->arch_data->page_mapper->Delete();
 
 	if (map->arch_data->pgdir_virt != NULL) {
 		// cycle through and free all of the user space pgtables
-		for (i = VADDR_TO_PDENT(USER_BASE);
+		for (uint32 i = VADDR_TO_PDENT(USER_BASE);
 				i <= VADDR_TO_PDENT(USER_BASE + (USER_SIZE - 1)); i++) {
 			addr_t pgtable_addr;
 			vm_page *page;
@@ -194,10 +223,10 @@ destroy_tmap(vm_translation_map *map)
 				vm_page_set_state(page, PAGE_STATE_FREE);
 			}
 		}
-		free(map->arch_data->pgdir_virt);
 	}
 
-	free(map->arch_data);
+	map->arch_data->RemoveReference();
+
 	recursive_lock_destroy(&map->lock);
 }
 
@@ -710,11 +739,10 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 	CObjectDeleter<recursive_lock> lockDeleter(&map->lock,
 		&recursive_lock_destroy);
 
-	map->arch_data = (vm_translation_map_arch_info*)
-		malloc(sizeof(vm_translation_map_arch_info));
+	map->arch_data = new(std::nothrow) vm_translation_map_arch_info;
 	if (map->arch_data == NULL)
 		return B_NO_MEMORY;
-	MemoryDeleter archInfoDeleter(map->arch_data);
+	ObjectDeleter<vm_translation_map_arch_info> archInfoDeleter(map->arch_data);
 
 	map->arch_data->active_on_cpus = 0;
 	map->arch_data->num_invalidate_pages = 0;
@@ -763,8 +791,7 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 			sKernelVirtualPageDirectory + FIRST_KERNEL_PGDIR_ENT,
 			NUM_KERNEL_PGDIR_ENTS * sizeof(page_directory_entry));
 
-		map->next = sTMapList;
-		sTMapList = map;
+		sTMapList.Add(map->arch_data);
 
 		release_spinlock(&sTMapListLock);
 		restore_interrupts(state);
@@ -805,7 +832,7 @@ arch_vm_translation_map_init(kernel_args *args)
 		args->arch_args.vir_pgdir;
 
 	B_INITIALIZE_SPINLOCK(&sTMapListLock);
-	sTMapList = NULL;
+	new (&sTMapList) ArchTMapList;
 
 // TODO: Select the best page mapper!
 	large_memory_physical_page_ops_init(args, &tmap_ops);

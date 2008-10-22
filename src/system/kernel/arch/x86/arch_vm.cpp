@@ -388,19 +388,14 @@ arch_vm_init_post_modules(kernel_args *args)
 void
 arch_vm_aspace_swap(struct vm_address_space *from, struct vm_address_space *to)
 {
-	int cpu = smp_get_current_cpu();
-	if (from != NULL) {
-		atomic_and(&from->translation_map.arch_data->active_on_cpus,
-			~((uint32)1 << cpu));
-	}
-
-	if (to != NULL && to != vm_kernel_address_space()) {
-		atomic_or(&to->translation_map.arch_data->active_on_cpus,
-			(uint32)1 << cpu);
-	}
-
-	i386_swap_pgdir((addr_t)i386_translation_map_get_pgdir(
-		&to->translation_map));
+	// This functions is only invoked when a userland thread is in the process
+	// of dying. It switches to the kernel team and does whatever cleanup is
+	// necessary (in case it is the team's main thread, it will delete the
+	// team).
+	// It is however not necessary to change the page directory. Userland team's
+	// page directories include all kernel mappings as well. Furthermore our
+	// arch specific translation map data objects are ref-counted, so they won't
+	// go away as long as they are still used on any CPU.
 }
 
 
