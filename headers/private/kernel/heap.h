@@ -75,6 +75,9 @@ status_t heap_init_post_thread();
 
 #include <new>
 
+#include <util/SinglyLinkedList.h>
+
+
 static const struct nogrow_t {
 } nogrow = {};
 
@@ -83,6 +86,16 @@ operator new(size_t size, const nogrow_t& nogrow) throw()
 {
 	return malloc_nogrow(size);
 }
+
+
+class DeferredDeletable : public SinglyLinkedListLinkImpl<DeferredDeletable> {
+public:
+	virtual						~DeferredDeletable();
+};
+
+
+void deferred_delete(DeferredDeletable* deletable);
+
 
 #endif	/* __cplusplus */
 

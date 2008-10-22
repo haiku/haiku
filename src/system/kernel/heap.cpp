@@ -22,7 +22,6 @@
 #include <thread.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
-#include <util/DoublyLinkedList.h>
 #include <vm.h>
 
 
@@ -124,9 +123,11 @@ typedef struct area_allocation_info_s {
 	void *		allocation_base;
 } area_allocation_info;
 
-struct DeferredFreeListEntry : DoublyLinkedListLinkImpl<DeferredFreeListEntry> {
+struct DeferredFreeListEntry : SinglyLinkedListLinkImpl<DeferredFreeListEntry> {
 };
-typedef DoublyLinkedList<DeferredFreeListEntry> DeferredFreeList;
+
+typedef SinglyLinkedList<DeferredFreeListEntry> DeferredFreeList;
+typedef SinglyLinkedList<DeferredDeletable> DeferredDeletableList;
 
 // Heap class configuration
 #define HEAP_CLASS_COUNT 3
@@ -173,6 +174,7 @@ static sem_id sHeapGrownNotify = -1;
 static bool sAddGrowHeap = false;
 
 static DeferredFreeList sDeferredFreeList;
+static DeferredDeletableList sDeferredDeletableList;
 static spinlock sDeferredFreeListLock;
 
 
@@ -1610,7 +1612,7 @@ heap_class_for(size_t size)
 static void
 deferred_deleter(void *arg, int iteration)
 {
-	// move entries to on-stack list
+	// move entries and deletables to on-stack lists
 	InterruptsSpinLocker locker(sDeferredFreeListLock);
 	if (sDeferredFreeList.IsEmpty())
 		return;
@@ -1618,11 +1620,18 @@ deferred_deleter(void *arg, int iteration)
 	DeferredFreeList entries;
 	entries.MoveFrom(&sDeferredFreeList);
 
+	DeferredDeletableList deletables;
+	deletables.MoveFrom(&sDeferredDeletableList);
+
 	locker.Unlock();
 
 	// free the entries
 	while (DeferredFreeListEntry* entry = entries.RemoveHead())
 		free(entry);
+
+	// delete the deletables
+	while (DeferredDeletable* deletable = deletables.RemoveHead())
+		delete deletable;
 }
 
 
@@ -2035,7 +2044,6 @@ deferred_free(void* block)
 	if (block == NULL)
 		return;
 
-	// TODO: Use SinglyLinkedList, so that we only need sizeof(void*).
 	DeferredFreeListEntry* entry = new(block) DeferredFreeListEntry;
 
 	InterruptsSpinLocker _(sDeferredFreeListLock);
@@ -2077,4 +2085,20 @@ malloc_referenced_release(void* data)
 	int32* referencedData = (int32*)data - 1;
 	if (atomic_add(referencedData, -1) < 1)
 		free(referencedData);
+}
+
+
+DeferredDeletable::~DeferredDeletable()
+{
+}
+
+
+void
+deferred_delete(DeferredDeletable* deletable)
+{
+	if (deletable == NULL)
+		return;
+
+	InterruptsSpinLocker _(sDeferredFreeListLock);
+	sDeferredDeletableList.Add(deletable);
 }
