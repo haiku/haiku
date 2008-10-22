@@ -258,41 +258,43 @@ TTracker::QuitRequested()
 		BContainerWindow *window = dynamic_cast<BContainerWindow *>
 			(fWindowList.ItemAt(i));
 
-		if (window && window->Lock() && window->TargetModel()
-			&& !window->PoseView()->IsDesktopWindow()) {
-			if (window->TargetModel()->IsRoot())
-				message.AddBool("open_disks_window", true);
-			else {
-				BEntry entry;
-				BPath path;
-				const entry_ref *ref = window->TargetModel()->EntryRef();
-				if (entry.SetTo(ref) == B_OK && entry.GetPath(&path) == B_OK) {
-					int8 flags = window->IsMinimized() ? kOpenWindowMinimized : kOpenWindowNoFlags;
-					uint32 deviceFlags = GetVolumeFlags(window->TargetModel());
+		if (window && window->Lock()) {
+			if (window->TargetModel()
+				&& !window->PoseView()->IsDesktopWindow()) {
+				if (window->TargetModel()->IsRoot())
+					message.AddBool("open_disks_window", true);
+				else {
+					BEntry entry;
+					BPath path;
+					const entry_ref *ref = window->TargetModel()->EntryRef();
+					if (entry.SetTo(ref) == B_OK && entry.GetPath(&path) == B_OK) {
+						int8 flags = window->IsMinimized() ? kOpenWindowMinimized : kOpenWindowNoFlags;
+						uint32 deviceFlags = GetVolumeFlags(window->TargetModel());
 
-					// save state for every window which is
-					//	a) already open on another workspace
-					//	b) on a volume not capable of writing attributes
-					if (window != FindContainerWindow(ref)
-						|| (deviceFlags & (B_FS_HAS_ATTR | B_FS_IS_READONLY)) != B_FS_HAS_ATTR) {
-						BMessage stateMessage;
-						window->SaveState(stateMessage);
-						window->SetSaveStateEnabled(false);
-							// This is to prevent its state to be saved to the node when closed.
-						message.AddMessage("window state", &stateMessage);
-						flags |= kOpenWindowHasState;
-					}
-					const char *target;
-					bool pathAlreadyExists = false;
-					for (int32 index = 0;message.FindString("paths", index, &target) == B_OK;index++) {
-						if (!strcmp(target,path.Path())) {
-							pathAlreadyExists = true;
-							break;
+						// save state for every window which is
+						//	a) already open on another workspace
+						//	b) on a volume not capable of writing attributes
+						if (window != FindContainerWindow(ref)
+							|| (deviceFlags & (B_FS_HAS_ATTR | B_FS_IS_READONLY)) != B_FS_HAS_ATTR) {
+							BMessage stateMessage;
+							window->SaveState(stateMessage);
+							window->SetSaveStateEnabled(false);
+								// This is to prevent its state to be saved to the node when closed.
+							message.AddMessage("window state", &stateMessage);
+							flags |= kOpenWindowHasState;
 						}
+						const char *target;
+						bool pathAlreadyExists = false;
+						for (int32 index = 0;message.FindString("paths", index, &target) == B_OK;index++) {
+							if (!strcmp(target,path.Path())) {
+								pathAlreadyExists = true;
+								break;
+							}
+						}
+						if (!pathAlreadyExists)
+							message.AddString("paths", path.Path());
+						message.AddInt8(path.Path(), flags);
 					}
-					if (!pathAlreadyExists)
-						message.AddString("paths", path.Path());
-					message.AddInt8(path.Path(), flags);
 				}
 			}	
 			window->Unlock();		
