@@ -1539,13 +1539,14 @@ Window::HasInSubset(const Window* window) const
 
 	// we have a few special feels that have a fixed order
 
-	const int32 feel[] = {kWindowScreenFeel, B_MODAL_ALL_WINDOW_FEEL,
-		B_FLOATING_ALL_WINDOW_FEEL, 0};
+	const int32 kFeels[] = {kPasswordWindowFeel, kWindowScreenFeel,
+		B_MODAL_ALL_WINDOW_FEEL, B_FLOATING_ALL_WINDOW_FEEL, 0};
 
-	for (int32 order = 0; feel[order]; order++) {
-		if (fFeel == feel[order])
+	for (uint32 order = 0;
+			order < sizeof(kFeels) / sizeof(kFeels[0]); order++) {
+		if (fFeel == kFeels[order])
 			return true;
-		if (window->Feel() == feel[order])
+		if (window->Feel() == kFeels[order])
 			return false;
 	}
 
@@ -1666,7 +1667,8 @@ Window::IsValidFeel(window_feel feel)
 		|| feel == B_FLOATING_ALL_WINDOW_FEEL
 		|| feel == kDesktopWindowFeel
 		|| feel == kMenuWindowFeel
-		|| feel == kWindowScreenFeel;
+		|| feel == kWindowScreenFeel
+		|| feel == kPasswordWindowFeel;
 }
 
 
