@@ -651,14 +651,16 @@ RecorderWindow::Record(BMessage * message)
 		return;
 	}
 	//	Reserve space on disk (creates fewer fragments)
-	err = fRecFile.SetSize(seconds*4*48000LL);
+	err = fRecFile.SetSize(seconds * fRecordFormat.u.raw_audio.channel_count 
+		* fRecordFormat.u.raw_audio.frame_rate * (fRecordFormat.u.raw_audio.format & 0xf));
 	if (err < B_OK) {
 		ErrorAlert("record a sound that long", err);
 		fRecEntry.Remove();
 		fRecEntry.Unset();
 		return;
 	}
-	fRecLimit = seconds*4*48000LL;
+	fRecLimit = (off_t)(seconds * fRecordFormat.u.raw_audio.channel_count 
+		* fRecordFormat.u.raw_audio.frame_rate * (fRecordFormat.u.raw_audio.format & 0xf));
 	fRecSize = 0;
 
 	fRecFile.Seek(sizeof(struct wave_struct), SEEK_SET);
@@ -917,9 +919,8 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 	}
 
 	//	Get a format, any format.
-	media_format fmt;
-	fmt.u.raw_audio = fAudioOutput.format.u.raw_audio;
-	fmt.type = B_MEDIA_RAW_AUDIO;
+	fRecordFormat.u.raw_audio = fAudioOutput.format.u.raw_audio;
+	fRecordFormat.type = B_MEDIA_RAW_AUDIO;
 
 	//	Tell the consumer where we want data to go.
 	err = fRecordNode->SetHooks(RecordFile, NotifyRecordFile, this);
@@ -930,7 +931,7 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 	}
 
 	//	Using the same structs for input and output is OK in BMediaRoster::Connect().
-	err = fRoster->Connect(fAudioOutput.source, fRecInput.destination, &fmt, &fAudioOutput, &fRecInput);
+	err = fRoster->Connect(fAudioOutput.source, fRecInput.destination, &fRecordFormat, &fAudioOutput, &fRecInput);
 	if (err < B_OK) {
 		CONNECT((stderr, "RecorderWindow::MakeRecordConnection(): failed to connect sound recorder to audio input node.\n"));
 		tsobj->Release();
@@ -978,11 +979,14 @@ RecorderWindow::StopRecording()
 		header.format_chunk.fourcc = FOURCC('f','m','t',' ');
 		header.format_chunk.len = sizeof(header.format);
 		header.format.format_tag = 1;
-		header.format.channels = 2;
-		header.format.samples_per_sec = 48000;
-		header.format.avg_bytes_per_sec = 48000 * 4;
-		header.format.block_align = 4;
-		header.format.bits_per_sample = 16;
+		header.format.channels = fRecordFormat.u.raw_audio.channel_count;
+		header.format.samples_per_sec = (uint32)fRecordFormat.u.raw_audio.frame_rate;
+		header.format.avg_bytes_per_sec = (uint32)(fRecordFormat.u.raw_audio.frame_rate 
+			* fRecordFormat.u.raw_audio.channel_count
+			* (fRecordFormat.u.raw_audio.format & 0xf));
+		header.format.bits_per_sample = (fRecordFormat.u.raw_audio.format & 0xf) * 8;
+		header.format.block_align = (fRecordFormat.u.raw_audio.format & 0xf) 
+			* fRecordFormat.u.raw_audio.channel_count;
 		header.data_chunk.fourcc = FOURCC('d','a','t','a');
 		header.data_chunk.len = fRecSize;
 		fRecFile.Seek(0, SEEK_SET);

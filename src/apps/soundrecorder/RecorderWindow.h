@@ -111,6 +111,8 @@ private:
 		BtnState fButtonState;
 		BEntry fRecEntry;
 
+		media_format fRecordFormat;
+		
 		BFile fRecFile;
 		off_t fRecLimit;
 		off_t fRecSize;
