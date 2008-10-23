@@ -105,7 +105,7 @@ extern int open (const char *, int, ...);
 # define O_TEXT _O_TEXT
 #endif
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
   /* BeOS 5 has O_BINARY and O_TEXT, but they have no effect.  */
 # undef O_BINARY
 # undef O_TEXT

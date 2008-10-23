@@ -231,7 +231,7 @@ ar_scan (char *archive, long int (*function) PARAMS ((void)), long int arg)
 #endif
 
 #ifndef WINDOWS32
-# ifndef __BEOS__
+# if (!defined(__BEOS__) && !defined(__HAIKU__))
 #  include <ar.h>
 # else
    /* BeOS 5 doesn't have <ar.h> but has archives in the same format

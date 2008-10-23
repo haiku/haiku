@@ -632,7 +632,7 @@ static struct ignore_pattern *hide_patterns;
    want to mess up the terminal if control chars get sent to it, and some
    quoting methods pass through control chars as-is.  */
 static bool qmark_funny_chars;
-#ifdef __BEOS__  /* Default to show UTF8 chars in BeOS terminal. */
+#if (defined(__BEOS__) || defined(__HAIKU__))  /* Default to show UTF8 chars in BeOS terminal. */
 #define QMARK_FUNNY_CHARS_TTY 0
 #else
 #define QMARK_FUNNY_CHARS_TTY 1
@@ -3484,7 +3484,7 @@ print_long_format (const struct fileinfo *f)
       p = buf;
     }
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
   if (f->stat_ok
       && (S_ISCHR (f->stat.st_mode) || S_ISBLK (f->stat.st_mode)))
     {

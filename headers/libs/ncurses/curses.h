@@ -439,7 +439,7 @@ extern NCURSES_EXPORT(int) wresize (WINDOW *, int, int);
  */
 #if 1
 #ifdef NCURSES_WGETCH_EVENTS
-#if !defined(__BEOS__)		/* Fix _nc_timed_wait() on BEOS... */
+#if !(defined(__BEOS__) || defined(__HAIKU__))		/* Fix _nc_timed_wait() on BEOS... */
 #  define NCURSES_EVENT_VERSION	1
 #endif	/* !defined(__BEOS__) */
 

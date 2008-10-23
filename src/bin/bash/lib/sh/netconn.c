@@ -45,7 +45,7 @@ int
 isnetconn (fd)
      int fd;
 {
-#if defined (HAVE_GETPEERNAME) && !defined (SVR4_2) && !defined (__BEOS__)
+#if defined (HAVE_GETPEERNAME) && !defined (SVR4_2) && !defined (__BEOS__) && !defined(__HAIKU__)
   int rv;
   socklen_t l;
   struct sockaddr sa;
@@ -54,7 +54,7 @@ isnetconn (fd)
   rv = getpeername(fd, &sa, &l);
   /* Solaris 2.5 getpeername() returns EINVAL if the fd is not a socket. */
   return ((rv < 0 && (errno == ENOTSOCK || errno == EINVAL)) ? 0 : 1);
-#else /* !HAVE_GETPEERNAME || SVR4_2 || __BEOS__ */
+#else /* !HAVE_GETPEERNAME || SVR4_2 || __BEOS__ || __HAIKU__ */
 #  if defined (SVR4) || defined (SVR4_2)
   /* Sockets on SVR4 and SVR4.2 are character special (streams) devices. */
   struct stat sb;
@@ -69,15 +69,15 @@ isnetconn (fd)
 #    endif /* S_ISFIFO */
   return (S_ISCHR (sb.st_mode));
 #  else /* !SVR4 && !SVR4_2 */
-#    if defined (S_ISSOCK) && !defined (__BEOS__)
+#    if defined (S_ISSOCK) && !defined (__BEOS__) && !defined(__HAIKU__)
   struct stat sb;
 
   if (fstat (fd, &sb) < 0)
     return (0);
   return (S_ISSOCK (sb.st_mode));
-#    else /* !S_ISSOCK || __BEOS__ */
+#    else /* !S_ISSOCK || __BEOS__ || __HAIKU__ */
   return (0);
-#    endif /* !S_ISSOCK || __BEOS__ */
+#    endif /* !S_ISSOCK || __BEOS__ || __HAIKU__ */
 #  endif /* !SVR4 && !SVR4_2 */
-#endif /* !HAVE_GETPEERNAME || SVR4_2 || __BEOS__ */
+#endif /* !HAVE_GETPEERNAME || SVR4_2 || __BEOS__ || __HAIKU__ */
 }

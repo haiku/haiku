@@ -40,7 +40,7 @@ typedef unsigned long tif_long;
  */
 #if (defined macintosh || defined __POWERPC__ || \
 	defined __CFM68K__ || defined __MC68K__) && \
-	!defined MAC && !defined __BEOS__
+	!defined MAC && !(defined(__BEOS__) || defined(__HAIKU__))
 #  define MAC
 #endif
 

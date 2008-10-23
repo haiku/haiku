@@ -365,7 +365,7 @@ struct builtin_term builtin_termcaps[] =
     {TERMCAP2KEY('*', '7'), "\233\065\065~"},	/* shifted end key */
 # endif
 
-# if defined(__BEOS__) || defined(ALL_BUILTIN_TCAPS)
+# if (defined(__BEOS__) || defined(__HAIKU__)) || defined(ALL_BUILTIN_TCAPS)
 /*
  * almost standard ANSI terminal, default for bebox
  */
@@ -1403,7 +1403,7 @@ struct builtin_term builtin_termcaps[] =
 # define DEFAULT_TERM	(char_u *)"vt320"
 #endif
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 # undef DEFAULT_TERM
 # define DEFAULT_TERM	(char_u *)"beos-ansi"
 #endif
@@ -2450,7 +2450,7 @@ termcapinit(name)
 	name = NULL;	    /* empty name is equal to no name */
     term = name;
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
     /*
      * TERM environment variable is normally set to 'ansi' on the Bebox;
      * Since the BeBox doesn't quite support full ANSI yet, we use our

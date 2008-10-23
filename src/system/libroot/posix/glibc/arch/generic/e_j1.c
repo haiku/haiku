@@ -191,7 +191,7 @@ static double V0[5] = {
     /* if Y1(NaN) is NaN, Y1(-inf) is NaN, Y1(inf) is 0 */
 	if(ix>=0x7ff00000) return  one/(x+x*x);
         if((ix|lx)==0) return -HUGE_VAL+x; /* -inf and overflow exception.  */;
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if(hx<0) return -HUGE_VAL+x;
 #else
         if(hx<0) return zero/(zero*x);

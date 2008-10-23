@@ -28,7 +28,7 @@
 #ifndef _REGEX_H
 #define _REGEX_H 1
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 # undef __STDC__
 # define __STDC__ 1
 #endif

@@ -129,7 +129,7 @@ typedef union ds_ioctl_arg_t {
 typedef struct dev_link_t {
     dev_node_t		*dev;
     u_int		state, open;
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
     wait_queue_head_t	pending;
     struct timer_list	release;
 #endif
@@ -164,7 +164,7 @@ int unregister_pccard_driver(dev_info_t *dev_info);
 #define register_pcmcia_driver register_pccard_driver
 #define unregister_pcmcia_driver unregister_pccard_driver
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #define DS_MODULE_NAME "bus_managers/pcmcia_ds/v2"
 typedef struct ds_module_info {
     bus_manager_info binfo;

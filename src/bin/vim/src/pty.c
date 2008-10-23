@@ -37,7 +37,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  */
 
-/* RCS_ID("$Id: pty.c,v 1.1 2004/06/15 09:02:26 korli Exp $ FAU") */
+/* RCS_ID("$Id$ FAU") */
 
 #include "vim.h"
 
@@ -356,7 +356,7 @@ OpenPTY(ttyn)
 static char PtyProto[] = "/dev/ptym/ptyXY";
 static char TtyProto[] = "/dev/pty/ttyXY";
 # else
-#  ifdef __BEOS__
+#  if (defined(__BEOS__) || defined(__HAIKU__))
 static char PtyProto[] = "/dev/pt/XY";
 static char TtyProto[] = "/dev/tt/XY";
 #  else

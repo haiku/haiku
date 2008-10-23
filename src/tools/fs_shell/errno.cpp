@@ -33,7 +33,7 @@ fssh_set_errno(int error)
 int
 fssh_to_host_error(int error)
 {
-	#if __BEOS__
+	#if (defined(__BEOS__) || defined(__HAIKU__))
 		return error;
 	#else
 		return _haiku_to_host_error(error);

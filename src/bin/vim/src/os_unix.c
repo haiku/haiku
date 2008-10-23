@@ -45,7 +45,7 @@
  * Use this prototype for select, some include files have a wrong prototype
  */
 #undef select
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 # define select	beos_select
 #endif
 
@@ -131,7 +131,7 @@ static int	did_set_icon = FALSE;
 static void may_core_dump __ARGS((void));
 
 static int  WaitForChar __ARGS((long));
-#if defined(__BEOS__)
+#if (defined(__BEOS__) || defined(__HAIKU__))
 int  RealWaitForChar __ARGS((int, long, int *));
 #else
 static int  RealWaitForChar __ARGS((int, long, int *));
@@ -969,7 +969,7 @@ sigcont_handler SIGDEFARG(sigarg)
 mch_suspend()
 {
     /* BeOS does have SIGTSTP, but it doesn't work. */
-#if defined(SIGTSTP) && !defined(__BEOS__)
+#if defined(SIGTSTP) && !(defined(__BEOS__) || defined(__HAIKU__))
     out_flush();	    /* needed to make cursor visible on some systems */
     settmode(TMODE_COOK);
     out_flush();	    /* needed to disable mouse on some systems */
@@ -3428,7 +3428,7 @@ mch_call_shell(cmd, options)
 # endif
 
     {
-# ifdef __BEOS__
+# if (defined(__BEOS__) || defined(__HAIKU__))
 	beos_cleanup_read_thread();
 # endif
 	if ((pid = fork()) == -1)	/* maybe we should use vfork() */
@@ -4044,7 +4044,7 @@ WaitForChar(msec)
  * Or when a Linux GPM mouse event is waiting.
  */
 /* ARGSUSED */
-#if defined(__BEOS__)
+#if (defined(__BEOS__) || defined(__HAIKU__))
     int
 #else
     static  int

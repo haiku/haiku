@@ -6,7 +6,7 @@
 
 #include <sys/types.h>
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 # if __POWERPC__
 #  include "regex.h"  // use included regex if system doesn't provide one
 # else

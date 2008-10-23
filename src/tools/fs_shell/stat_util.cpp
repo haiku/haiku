@@ -33,7 +33,7 @@ from_platform_mode(mode_t mode)
 	fssh_mode_t fsshMode = 0;
 
 	// BeOS/Haiku only
-	#ifdef __BEOS__
+	#if (defined(__BEOS__) || defined(__HAIKU__))
 		SET_ST_MODE_BIT(FSSH_S_ATTR_DIR, S_ATTR_DIR);
 		SET_ST_MODE_BIT(FSSH_S_ATTR, S_ATTR);
 		SET_ST_MODE_BIT(FSSH_S_INDEX_DIR, S_INDEX_DIR);
@@ -95,7 +95,7 @@ to_platform_mode(fssh_mode_t fsshMode)
 	mode_t mode = 0;
 
 	// BeOS/Haiku only
-	#ifdef __BEOS__
+	#if (defined(__BEOS__) || defined(__HAIKU__))
 		SET_ST_MODE_BIT(FSSH_S_ATTR_DIR, S_ATTR_DIR);
 		SET_ST_MODE_BIT(FSSH_S_ATTR, S_ATTR);
 		SET_ST_MODE_BIT(FSSH_S_INDEX_DIR, S_INDEX_DIR);

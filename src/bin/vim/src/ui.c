@@ -243,7 +243,7 @@ ui_suspend()
     mch_suspend();
 }
 
-#if !defined(UNIX) || !defined(SIGTSTP) || defined(PROTO) || defined(__BEOS__)
+#if !defined(UNIX) || !defined(SIGTSTP) || defined(PROTO) || (defined(__BEOS__) || defined(__HAIKU__))
 /*
  * When the OS can't really suspend, call this function to start a shell.
  * This is never called in the GUI.
@@ -1692,7 +1692,7 @@ fill_input_buf(exit_on_error)
      * If we can't get any, and there isn't any in the buffer, we give up and
      * exit Vim.
      */
-# ifdef __BEOS__
+# if (defined(__BEOS__) || defined(__HAIKU__))
     /*
      * On the BeBox version (for now), all input is secretly performed within
      * beos_select() which is called from RealWaitForChar().

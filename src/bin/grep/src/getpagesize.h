@@ -2,7 +2,7 @@
 
 #ifndef HAVE_GETPAGESIZE
 
-#if !defined getpagesize && defined __BEOS__
+#if !defined getpagesize && (defined(__BEOS__) || defined(__HAIKU__))
 # include <OS.h>
 # define getpagesize() B_PAGE_SIZE
 #endif

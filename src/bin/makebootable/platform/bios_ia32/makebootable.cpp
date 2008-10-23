@@ -319,7 +319,7 @@ main(int argc, const char *const *argv)
 		} else if (S_ISCHR(st.st_mode)) {
 			// character special: a device or partition under BeOS
 			// or under FreeBSD
-			#if !defined(__BEOS__) && !defined(HAIKU_HOST_PLATFORM_FREEBSD)
+			#if !(defined(__BEOS__) || defined(__HAIKU__)) && !defined(HAIKU_HOST_PLATFORM_FREEBSD)
 
 				fprintf(stderr, "Error: Character special devices not "
 					"supported on this platform.\n");
@@ -514,7 +514,7 @@ main(int argc, const char *const *argv)
 			exit(1);
 		}
 
-		#ifdef __BEOS__
+		#if (defined(__BEOS__) || defined(__HAIKU__))
 
 			// get a partition info
 			if (!noPartition

@@ -1239,7 +1239,7 @@ int uz_opts(__G__ pargc, pargv)
                     else
                         uO.jflag = TRUE;
                     break;
-#if (defined(__BEOS__) || defined(MACOS) || defined(HAS_JUNK_EXTRA_FIELD_OPTION))
+#if ((defined(__BEOS__) || defined(__HAIKU__)) || defined(MACOS) || defined(HAS_JUNK_EXTRA_FIELD_OPTION))
                 case ('J'):    /* Junk BeOS or MacOS file attributes */
                     if( negative ) {
                         uO.J_flag = FALSE, negative = 0;

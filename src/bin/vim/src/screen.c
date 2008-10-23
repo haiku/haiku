@@ -7704,7 +7704,7 @@ screen_del_lines(off, row, line_count, end, force, wp)
 #endif
     if (can_clear(T_CD) && result_empty)
 	type = USE_T_CD;
-#if defined(__BEOS__) && defined(BEOS_DR8)
+#if (defined(__BEOS__) || defined(__HAIKU__)) && defined(BEOS_DR8)
     /*
      * USE_NL does not seem to work in Terminal of DR8 so we set T_DB="" in
      * its internal termcap... this works okay for tests which test *T_DB !=

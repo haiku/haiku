@@ -436,7 +436,7 @@ extern int CardServices(int func, void *a1, void *a2, void *a3);
 extern int CardServices(int func, ...);
 #endif
 
-#ifdef __BEOS__ 
+#if (defined(__BEOS__) || defined(__HAIKU__)) 
 #define SS_MODULE_NAME(s)	("busses/pcmcia/" s "/v1")
 #define MTD_MODULE_NAME(s)	("busses/pcmcia/" s "/v1")
 #define CS_CLIENT_MODULE_NAME	"bus_managers/pcmcia_cs/client/v1"

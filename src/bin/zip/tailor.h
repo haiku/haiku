@@ -37,7 +37,7 @@
 #include "atari/osdep.h"
 #endif
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #include "beos/osdep.h"
 #endif
 
@@ -448,7 +448,7 @@ typedef struct ztimbuf {
 #ifdef MVS
 #  define OS_CODE  0xf00
 #endif
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #  define OS_CODE  0x1000
 #endif
 #ifdef TANDEM

@@ -53,7 +53,7 @@ static int can_update_cursor = TRUE; /* can display the cursor */
 gui_start()
 {
     char_u	*old_term;
-#if defined(UNIX) && !defined(__BEOS__) && !defined(MACOS_X)
+#if defined(UNIX) && !(defined(__BEOS__) || defined(__HAIKU__)) && !defined(MACOS_X)
 # define MAY_FORK
     int		dofork = TRUE;
 #endif
@@ -566,7 +566,7 @@ error:
 gui_exit(rc)
     int		rc;
 {
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
     /* don't free the fonts, it leads to a BUS error
      * richard@whitequeen.com Jul 99 */
     free_highlight_fonts();

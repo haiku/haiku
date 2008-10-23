@@ -146,7 +146,7 @@
 /* try to identify Mac OS 9 compilers */
 
 #if (defined macintosh || defined __POWERPC__ || defined __CFM68K__) && \
-	!defined MAC && !defined MACOSX && !defined __BEOS__
+	!defined MAC && !defined MACOSX && !(defined(__BEOS__) || !defined(__HAIKU__))
 #define MAC
 #endif
 
@@ -163,7 +163,7 @@
 
 /* ----------------------------------- BeOS --------------------------------- */
 
-#ifdef __BEOS__
+#if defined(__BEOS__) || defined(__HAIKU__)
 #define PDF_PLATFORM	"BeOS"
 
 #ifdef __POWERPC__
@@ -172,7 +172,7 @@
 #define PDC_ISBIGENDIAN 1
 #endif	/* __POWERPC__ */
 
-#endif /* __BEOS__ */
+#endif /* __BEOS__ || __HAIKU__ */
 
 /* --------------------------------- AS/400 --------------------------------- */
 

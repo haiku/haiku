@@ -237,7 +237,7 @@ static double zero  =  0.00000000000000000000e+00;
     /* if Y(n,NaN) is NaN */
 	if((ix|((u_int32_t)(lx|-lx))>>31)>0x7ff00000) return x+x;
 	if((ix|lx)==0) return -HUGE_VAL+x; /* -inf and overflow exception.  */;
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if(hx<0) return -HUGE_VAL+x;
 #else
 	if(hx<0) return zero/(zero*x);

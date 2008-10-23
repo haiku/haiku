@@ -50,7 +50,7 @@
 #  define GLOBAL(g) G.g
 #endif
 
-#ifdef __BEOS__                /* why yes, we do */
+#if (defined(__BEOS__) || defined(__HAIKU__))                /* why yes, we do */
 #  define HAVE_TERMIOS_H
 #endif
 
@@ -332,7 +332,7 @@ void Echon(__G)
 
 #if (defined(UNZIP) && !defined(FUNZIP))
 
-#if (defined(UNIX) || defined(__BEOS__))
+#if (defined(UNIX) || (defined(__BEOS__) || defined(__HAIKU__)))
 #ifdef MORE
 
 /*
@@ -584,7 +584,7 @@ char *getp(__G__ m, p, n)
 #else /* !HAVE_WORKING_GETCH */
 
 
-#if (defined(UNIX) || defined(__MINT__) || defined(__BEOS__))
+#if (defined(UNIX) || defined(__MINT__) || (defined(__BEOS__) || defined(__HAIKU__)))
 
 #ifndef _PATH_TTY
 #  ifdef __MINT__

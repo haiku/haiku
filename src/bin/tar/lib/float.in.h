@@ -25,7 +25,7 @@
 #define _GL_FLOAT_H
 
 /* 'long double' properties.  */
-#if defined __i386__ && defined __BEOS__
+#if defined __i386__ && (defined(__BEOS__) || defined(__HAIKU__))
 /* Number of mantissa units, in base FLT_RADIX.  */
 # undef LDBL_MANT_DIG
 # define LDBL_MANT_DIG   64

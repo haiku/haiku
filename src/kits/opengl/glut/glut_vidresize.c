@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#if !defined(_WIN32) && !defined(__BEOS__)
+#if !defined(_WIN32) && !(defined(__BEOS__) || defined(__HAIKU__))
 #include <GL/glx.h>
 #endif
 

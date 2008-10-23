@@ -206,7 +206,7 @@ typedef unsigned int       uint32;
 typedef long long          sint64;
 typedef unsigned long long uint64;
 
-#elif defined(__BEOS__)
+#elif (defined(__BEOS__) || defined(__HAIKU__))
 typedef signed char        sint8;
 typedef signed short       sint16;
 typedef signed int         sint32;

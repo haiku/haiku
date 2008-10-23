@@ -17,7 +17,7 @@
 #include "fssh_errno.h"
 #include "partition_support.h"
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #	include <Drivers.h>
 #else
 #	if defined(HAIKU_HOST_PLATFORM_FREEBSD) \
@@ -42,7 +42,7 @@
 #endif
 
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	// Defined in libroot_build.so.
 	extern "C" int _kern_dup(int fd);
 	extern "C" status_t _kern_close(int fd);
@@ -92,7 +92,7 @@ fssh_dup(int fd)
 	// Use the _kern_dup() defined in libroot on BeOS incompatible systems.
 	// Required for proper attribute emulation support.
 	int newFD;
-	#if __BEOS__
+	#if (defined(__BEOS__) || defined(__HAIKU__))
 		newFD = dup(fd);
 	#else
 		newFD = _kern_dup(fd);
@@ -115,7 +115,7 @@ fssh_close(int fd)
 
 	// Use the _kern_close() defined in libroot on BeOS incompatible systems.
 	// Required for proper attribute emulation support.
-	#if __BEOS__
+	#if (defined(__BEOS__) || defined(__HAIKU__))
 		return close(fd);
 	#else
 		return _kern_close(fd);
@@ -146,7 +146,7 @@ fssh_ioctl(int fd, unsigned long op, ...)
 			fssh_device_geometry *geometry
 				= va_arg(list, fssh_device_geometry*);
 
-			#ifdef __BEOS__
+			#if (defined(__BEOS__) || defined(__HAIKU__))
 				device_geometry systemGeometry;
 				if (ioctl(fd, B_GET_GEOMETRY, &systemGeometry) == 0) {
 					geometry->bytes_per_sector
@@ -270,7 +270,7 @@ fssh_ioctl(int fd, unsigned long op, ...)
 
 		case FSSH_B_FLUSH_DRIVE_CACHE:
 		{
-			#ifdef __BEOS__
+			#if (defined(__BEOS__) || defined(__HAIKU__))
 				if (ioctl(fd, B_FLUSH_DRIVE_CACHE) == 0)
 					error = B_OK;
 				else
@@ -284,7 +284,7 @@ fssh_ioctl(int fd, unsigned long op, ...)
 
 		case 10000:	// IOCTL_FILE_UNCACHED_IO
 		{
-			#ifdef __BEOS__
+			#if (defined(__BEOS__) || defined(__HAIKU__))
 				if (ioctl(fd, 10000) == 0)
 					error = B_OK;
 				else

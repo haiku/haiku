@@ -54,7 +54,7 @@
 #include "xreadlink.h"
 #include "yesno.h"
 
-#if __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #	include <fs_attr.h>
 #endif
 

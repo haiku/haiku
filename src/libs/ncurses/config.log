@@ -1311,7 +1311,7 @@ configure: failed program was:
 #line 11958 "configure"
 #include "confdefs.h"
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #include <stdbool.h>
 #endif
 

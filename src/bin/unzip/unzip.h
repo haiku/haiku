@@ -220,7 +220,7 @@ freely, subject to the following restrictions:
 #    define MODERN
 #  endif
 #endif
-#if (defined(CMS_MVS) || defined(__BEOS__))  /* || defined(CONVEX) */
+#if (defined(CMS_MVS) || (defined(__BEOS__) || defined(__HAIKU__)))  /* || defined(CONVEX) */
 #  ifndef PROTO
 #    define PROTO
 #  endif
@@ -427,7 +427,7 @@ typedef struct _UzpOpts {
     int scanimage;      /* -I: scan image files */
 #endif
     int jflag;          /* -j: junk pathnames (unzip) */
-#if (defined(__BEOS__) || defined(MACOS) || defined(HAS_JUNK_EXTRA_FIELD_OPTION))
+#if ((defined(__BEOS__) || defined(__HAIKU__)) || defined(MACOS) || defined(HAS_JUNK_EXTRA_FIELD_OPTION))
     int J_flag;         /* -J: ignore BeOS/MacOS extra field info (unzip) */
 #endif
     int lflag;          /* -12slmv: listing format (zipinfo) */
@@ -454,7 +454,7 @@ typedef struct _UzpOpts {
     int uflag;          /* -u: "update" (extract only newer/brand-new files) */
     int vflag;          /* -v: (verbosely) list directory */
     int V_flag;         /* -V: don't strip VMS version numbers */
-#if (defined(__BEOS__) || defined(TANDEM) || defined(THEOS) || defined(UNIX))
+#if ((defined(__BEOS__) || defined(__HAIKU__)) || defined(TANDEM) || defined(THEOS) || defined(UNIX))
     int X_flag;         /* -X: restore owner/protection or UID/GID or ACLs */
 #endif
 #if (defined(OS2) || defined(VMS) || defined(WIN32))

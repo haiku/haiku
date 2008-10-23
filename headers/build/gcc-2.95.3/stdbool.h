@@ -2,7 +2,7 @@
 #ifndef __STDBOOL_H__
 #define __STDBOOL_H__	1
 
-#ifdef __BEOS__
+#if defined(__BEOS__) || defined(__HAIKU__)
 	typedef unsigned char _Bool;
 	#define bool _Bool
 	#define false 0

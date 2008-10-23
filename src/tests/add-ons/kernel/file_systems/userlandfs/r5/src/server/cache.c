@@ -46,7 +46,7 @@
 #include <unistd.h>
 
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #include <OS.h>
 #include <KernelExport.h>
 #endif

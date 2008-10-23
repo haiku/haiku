@@ -24,7 +24,7 @@
   #endif
 #endif
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
   #define _UNIX
   #define _BEOS
 #endif

@@ -31,7 +31,7 @@
 namespace BPrivate {
 namespace Storage {
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 // device_is_root_device
 bool
 device_is_root_device(dev_t device)

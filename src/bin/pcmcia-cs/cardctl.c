@@ -30,7 +30,7 @@
     file under either the MPL or the GPL.
 
 ======================================================================*/
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #include <OS.h>
 #endif
 
@@ -67,7 +67,7 @@ static char *configpath = "/etc/pcmcia";
 static char *scheme, *stabfile;
 
 /*====================================================================*/
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 static int major = 0;
 
 static int lookup_dev(char *name)
@@ -96,7 +96,7 @@ static int lookup_dev(char *name)
 
 static int open_sock(int sock)
 {
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
     char fn[B_OS_NAME_LENGTH];
     sprintf(fn, "/dev/bus/pcmcia/sock/%d", sock);
     return open(fn, O_RDONLY);
@@ -493,7 +493,7 @@ static int fetch_stab(void)
     return 0;
 }
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 static void eprintf(char *name, char *fmt, ...)
 {
     va_list args;
@@ -510,7 +510,7 @@ static int execute(stab_t *s, char *action, char *scheme)
     int ret;
     char cmd[133];
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
     eprintf("SOCKET", "%d", s->socket);
     eprintf("INSTANCE", "%d", s->instance);
 #endif
@@ -695,7 +695,7 @@ int main(int argc, char *argv[])
 	exit(EXIT_FAILURE);
     }
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
     major = lookup_dev("pcmcia");
     if (major < 0) {
 	if (major == -ENODEV)

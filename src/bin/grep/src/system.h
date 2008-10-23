@@ -53,7 +53,7 @@ extern char *sys_errlist[];
 #endif
 
 /* Some operating systems treat text and binary files differently.  */
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 # undef O_BINARY /* BeOS 5 has O_BINARY and O_TEXT, but they have no effect. */
 #endif
 #ifdef HAVE_DOS_FILE_CONTENTS

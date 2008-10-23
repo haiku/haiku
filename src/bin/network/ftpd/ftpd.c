@@ -1431,7 +1431,7 @@ pass(char *passwd)
 			goto skip;
 		}
 		rval = strcmp(pw->pw_passwd, xpasswd);
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 		if (pw->pw_expire && time(NULL) >= pw->pw_expire)
 			rval = 1;	/* failure */
 #endif
@@ -1494,7 +1494,7 @@ skip:
 	setusercontext(lc, pw, 0,
 		LOGIN_SETLOGIN|LOGIN_SETGROUP|LOGIN_SETPRIORITY|
 		LOGIN_SETRESOURCES|LOGIN_SETUMASK|LOGIN_SETMAC);
-#elif !defined(__BEOS__)
+#elif !(defined(__BEOS__) || defined(__HAIKU__))
 	setlogin(pw->pw_name);
 	(void) initgroups(pw->pw_name, pw->pw_gid);
 #endif
@@ -1531,7 +1531,7 @@ skip:
 #endif
 	;
 	chrootdir = NULL;
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	/*
 	 * For a chrooted local user,
 	 * a) see whether ftpchroot(5) specifies a chroot directory,
@@ -1549,7 +1549,7 @@ skip:
 	}
 #endif
 	if (guest || dochroot) {
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 		/*
 		 * If no chroot directory set yet, use the login directory.
 		 * Copy it so it can be modified while pw->pw_dir stays intact.
@@ -2135,7 +2135,7 @@ send_data(FILE *instr, FILE *outstr, size_t blksize, off_t filesize, int isreg)
 		netfd = fileno(outstr);
 		filefd = fileno(instr);
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 		if (isreg) {
 			char *msg = "Transfer complete.";
 			off_t cnt, offset;
@@ -3244,7 +3244,7 @@ send_file_list(char *whichf)
 
 			CHECKOOB(goto abrt);
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 			if (dir->d_name[0] == '.' && dir->d_name[1] == '\0')
 				continue;
 			if (dir->d_name[0] == '.' && dir->d_name[1] == '.' &&

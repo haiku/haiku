@@ -13,7 +13,7 @@
 
 #if defined(_WIN32)
 #include "glutwin32.h"
-#elif !defined(__BEOS__)
+#elif !(defined(__BEOS__) || defined(__HAIKU__))
 #ifdef __sgi
 #define SUPPORT_FORTRAN
 #endif
@@ -114,7 +114,7 @@ extern int sys$gettim(struct timeval *);
   { if (__glutGameModeWindow) return; }
 
 /* BeOS doesn't need most of this file */
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 
 #define GLUT_WIND_IS_RGB(x)         (((x) & GLUT_INDEX) == 0)
 #define GLUT_WIND_IS_INDEX(x)       (((x) & GLUT_INDEX) != 0)
@@ -298,7 +298,7 @@ typedef void (*GLUTtabletButtonFCB) (int *, int *, int *, int *);
 typedef void (*GLUTjoystickFCB) (unsigned int *buttonMask, int *x, int *y, int *z);
 #endif
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 
 typedef struct _GLUTcolorcell GLUTcolorcell;
 struct _GLUTcolorcell {
@@ -647,7 +647,7 @@ extern XSizeHints __glutSizeHints;
 extern char **__glutArgv;
 #endif  /* BeOS */
 extern char *__glutProgramName;
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 extern int __glutArgc;
 extern int __glutConnectionFD;
 extern int __glutInitHeight;
@@ -740,7 +740,7 @@ extern void __glutFatalUsage(char *format,...);
 #ifdef __cplusplus
 }
 #endif
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 
 /* private routines from glut_win.c */
 extern GLUTwindow *__glutGetWindow(Window win);

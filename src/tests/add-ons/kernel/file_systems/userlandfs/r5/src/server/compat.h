@@ -29,7 +29,7 @@
 #include <fcntl.h>
 #include <time.h>
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #include <OS.h>              /* for typedefs and prototypes */
 #include <image.h>           /* for a few typedefs */
 #include <Drivers.h>         /* for various ioctl structs, etc */
@@ -156,7 +156,7 @@ struct my_stat {
 #define FALSE 0
 #endif
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 typedef long               sem_id;
 typedef unsigned char      uchar;
 typedef short              int16;

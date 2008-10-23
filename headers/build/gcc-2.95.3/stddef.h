@@ -168,9 +168,9 @@ typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #endif
 #if !(defined (__GNUG__) && defined (size_t))
 typedef __SIZE_TYPE__ size_t;
-#ifdef __BEOS__
+#if defined(__BEOS__) || defined(__HAIKU__)
 typedef long ssize_t;
-#endif /* __BEOS__ */
+#endif /* __BEOS__ || __HAIKU__ */
 #endif /* !(defined (__GNUG__) && defined (size_t)) */
 #endif /* __size_t */
 #endif /* _SIZET_ */

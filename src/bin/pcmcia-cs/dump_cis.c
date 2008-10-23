@@ -30,7 +30,7 @@
     file under either the MPL or the GPL.
     
 ======================================================================*/
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #include <OS.h>
 #endif
 #include <sys/types.h>
@@ -53,7 +53,7 @@ static int verbose = 0;
 static char indent[10] = "  ";
 
 /*====================================================================*/
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 static int major = 0;
 
 static int lookup_dev(char *name)
@@ -81,7 +81,7 @@ static int lookup_dev(char *name)
 
 static int open_sock(int sock)
 {
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
     char fn[B_OS_NAME_LENGTH];
     sprintf(fn, "/dev/bus/pcmcia/sock/%d", sock);
     return open(fn, O_RDONLY);
@@ -1040,7 +1040,7 @@ int main(int argc, char *argv[])
 	exit(EXIT_FAILURE);
     }
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
     major = lookup_dev("pcmcia");
     if (major < 0) {
 	fprintf(stderr, "no pcmcia driver in /proc/devices\n");

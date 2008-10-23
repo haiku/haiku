@@ -186,7 +186,7 @@
 #endif
 
 /* Additional config for us */
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 
 #define WITHOUT_SERVER 1
 #include <support/SupportDefs.h>

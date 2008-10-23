@@ -16,7 +16,7 @@
 using namespace FSShell;
 
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	// The _kern_open() defined in libroot_build.so.
 	extern "C"  int _kern_open(int fd, const char *path, int openMode,
 		int perms);
@@ -39,7 +39,7 @@ fssh_open(const char *pathname, int oflags, ...)
 	// Use the _kern_open() defined in libroot on BeOS incompatible systems.
 	// Required for proper attribute emulation support.
 	int fd;
-	#if __BEOS__
+	#if (defined(__BEOS__) || defined(__HAIKU__))
 		fd = open(pathname, to_platform_open_mode(oflags),
 			to_platform_mode(mode));
 	#else

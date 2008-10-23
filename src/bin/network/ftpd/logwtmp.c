@@ -48,7 +48,7 @@ __FBSDID("$FreeBSD: src/libexec/ftpd/logwtmp.c,v 1.13 2004/11/18 13:46:29 yar Ex
 
 #include <fcntl.h>
 #include <time.h>
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #include <timeconv.h>
 #include <utmp.h>
 #endif
@@ -71,7 +71,7 @@ ftpd_logwtmp(line, name, addr)
 	char *line, *name;
 	struct sockaddr *addr;
 {
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	struct utmp ut;
 	struct stat buf;
 	char host[UT_HOSTSIZE];

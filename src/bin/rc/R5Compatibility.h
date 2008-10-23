@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 // Already defined unter Linux.
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 extern size_t	strnlen(const char *string, size_t count);
 #endif
 

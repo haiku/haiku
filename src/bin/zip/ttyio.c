@@ -50,7 +50,7 @@
 #  define GLOBAL(g) G.g
 #endif
 
-#if (defined(__ATHEOS__) || defined(__BEOS__))  /* why yes, we do */
+#if (defined(__ATHEOS__) || (defined(__BEOS__) || defined(__HAIKU__)))  /* why yes, we do */
 #  define HAVE_TERMIOS_H
 #endif
 

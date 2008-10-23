@@ -21,7 +21,7 @@ using FSShell::from_platform_stat;
 using FSShell::to_platform_mode;
 
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	// The _kern_read_stat() defined in libroot_build.so.
 	extern "C" status_t _kern_read_stat(int fd, const char *path,
 		bool traverseLink, struct stat *st, size_t statSize);
@@ -35,7 +35,7 @@ FSShell::unrestricted_stat(const char *path, struct fssh_stat *fsshStat)
 
 	// Use the _kern_read_stat() defined in libroot on BeOS incompatible
 	// systems. Required for support for opening symlinks.
-#if __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (::stat(path, &st) < 0)
 		return -1;
 #else
@@ -59,7 +59,7 @@ FSShell::unrestricted_fstat(int fd, struct fssh_stat *fsshStat)
 
 	// Use the _kern_read_stat() defined in libroot on BeOS incompatible
 	// systems. Required for support for opening symlinks.
-#if __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (fstat(fd, &st) < 0)
 		return -1;
 #else
@@ -83,7 +83,7 @@ FSShell::unrestricted_lstat(const char *path, struct fssh_stat *fsshStat)
 
 	// Use the _kern_read_stat() defined in libroot on BeOS incompatible
 	// systems. Required for support for opening symlinks.
-#if __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	if (lstat(path, &st) < 0)
 		return -1;
 #else

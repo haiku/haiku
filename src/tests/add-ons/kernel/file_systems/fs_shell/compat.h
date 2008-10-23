@@ -23,7 +23,7 @@
 #define _FS_INTERFACE_H
 	// don't include that file
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #	define dprintf build_platform_dprintf
 #	include <stdio.h>
 #	undef dprintf
@@ -46,7 +46,7 @@ typedef struct iovec iovec;
 #include <fcntl.h>
 #include <time.h>
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #	include <OS.h>				/* for typedefs and prototypes */
 #	include <image.h>			/* for a few typedefs */
 #	include <Drivers.h>			/* for various ioctl structs, etc */
@@ -234,7 +234,7 @@ struct my_stat {
 #endif
 
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 
 typedef attr_info my_attr_info;
 
@@ -257,7 +257,7 @@ typedef struct my_attr_info
 #define FALSE 0
 #endif
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 
 #ifdef __cplusplus
 extern "C" {

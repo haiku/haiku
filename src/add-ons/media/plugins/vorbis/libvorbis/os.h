@@ -13,7 +13,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os.h,v 1.1 2003/12/13 20:17:56 shatty Exp $
+ last mod: $Id$
 
  ********************************************************************/
 
@@ -66,7 +66,7 @@
 #  define max(x,y)  ((x)<(y)?(y):(x))
 #endif
 
-#if defined(__i386__) && defined(__GNUC__) && !defined(__BEOS__)
+#if defined(__i386__) && defined(__GNUC__) && !(defined(__BEOS__) || defined(__HAIKU__))
 #  define VORBIS_FPU_CONTROL
 /* both GCC and MSVC are kinda stupid about rounding/casting to int.
    Because of encapsulation constraints (GCC can't see inside the asm

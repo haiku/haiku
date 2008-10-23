@@ -59,7 +59,7 @@ extern int _stricoll __ARGS((char *a, char *b));
 # ifdef VMS
 #  include "os_vms.pro"
 # endif
-# ifdef __BEOS__
+# if (defined(__BEOS__) || defined(__HAIKU__))
 #  include "os_beos.pro"
 # endif
 # ifdef MACOS

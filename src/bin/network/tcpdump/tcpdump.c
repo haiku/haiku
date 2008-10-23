@@ -366,7 +366,7 @@ show_dlts_and_exit(pcap_t *pd)
 #define U_FLAG
 #endif
 
-#if !defined(WIN32) && !defined(__BEOS__)
+#if !defined(WIN32) && !(defined(__BEOS__) || defined(__HAIKU__))
 /* Drop root privileges and chroot if necessary */
 static void
 droproot(const char *username, const char *chroot_dir)
@@ -994,7 +994,7 @@ main(int argc, char **argv)
 		callback = print_packet;
 		pcap_userdata = (u_char *)&printinfo;
 	}
-#if !defined(WIN32) && !defined(__BEOS__)
+#if !defined(WIN32) && !(defined(__BEOS__) || defined(__HAIKU__))
 	/*
 	 * We cannot do this earlier, because we want to be able to open
 	 * the file (if done) for writing before giving up permissions.

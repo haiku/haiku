@@ -684,7 +684,7 @@ test_socket_open (int sock)
 # define close(fd) closesocket (fd)
 #endif
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 # define read(fd, buf, cnt) recv (fd, buf, cnt, 0)
 # define write(fd, buf, cnt) send (fd, buf, cnt, 0)
 #endif

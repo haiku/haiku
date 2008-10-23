@@ -185,7 +185,7 @@
 # define __ARGS(x) x
 #endif
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 # include "os_beos.h"
 # define __ARGS(x)  x
 #endif

@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h,v 1.2 2004/02/24 13:52:39 shatty Exp $
+ last mod: $Id$
 
  ********************************************************************/
 #ifndef _OS_TYPES_H
@@ -61,7 +61,7 @@
    typedef u_int32_t ogg_uint32_t;
    typedef int64_t ogg_int64_t;
 
-#elif defined(__BEOS__)
+#elif (defined(__BEOS__) || defined(__HAIKU__))
 
    /* Be */
 #  include <inttypes.h>

@@ -4023,7 +4023,7 @@ testThread(void)
     return (res);
 }
 
-#elif defined __BEOS__
+#elif (defined(__BEOS__) || defined(__HAIKU__))
 #include <OS.h>
 
 static thread_id tid[MAX_ARGC];

@@ -37,7 +37,7 @@ is_alternate(void* pointer)
 void
 sigHandler(int signal, void *userData, vregs *regs)
 {
-#ifdef __BEOS__
+#if defined(__BEOS__) || defined(__HAIKU__)
 	if (userData != kUserDataMagic)
 		fprintf(stderr, "FAILED: user data not correct: %p\n", userData);
 #endif
@@ -69,7 +69,7 @@ main()
 	newAction.sa_handler = (sighandler_t)sigHandler;
 	newAction.sa_mask = 0;
 	newAction.sa_flags = SA_ONESHOT | SA_ONSTACK | SA_RESTART;
-#ifdef __BEOS__
+#if defined(__BEOS__) || defined(__HAIKU__)
 	newAction.sa_userdata = (void*)kUserDataMagic;
 #endif
 	sigaction(SIGALRM, &newAction, NULL);

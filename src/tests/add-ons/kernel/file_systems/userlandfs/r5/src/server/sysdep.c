@@ -103,7 +103,7 @@ device_is_removeable(int fd)
 #endif
 }
 
-#if defined(__BEOS__) && !defined(USER)
+#if (defined(__BEOS__) || defined(__HAIKU__)) && !defined(USER)
 #include "scsi.h"
 #endif
 
@@ -120,7 +120,7 @@ lock_removeable_device(int fd, bool on_or_off)
 
 
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 ssize_t
 read_pos(int fd, fs_off_t _pos, void *data,  size_t nbytes)
 {
@@ -334,7 +334,7 @@ system_time(void)
 
 #endif  /* unix */
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #include <KernelExport.h>
 
 void

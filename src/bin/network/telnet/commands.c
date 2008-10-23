@@ -40,7 +40,7 @@ static const char sccsid[] = "@(#)commands.c	8.4 (Berkeley) 5/30/95";
 __FBSDID("$FreeBSD: src/contrib/telnet/telnet/commands.c,v 1.35 2005/02/28 12:46:52 tobez Exp $");
 
 #include <sys/param.h>
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 # include <sys/file.h>
 #endif
 #include <sys/socket.h>

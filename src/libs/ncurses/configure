@@ -11958,7 +11958,7 @@ cat >conftest.$ac_ext <<_ACEOF
 #line 11958 "configure"
 #include "confdefs.h"
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #include <stdbool.h>
 #endif
 
@@ -12557,7 +12557,7 @@ cat >conftest.$ac_ext <<_ACEOF
 #line 12557 "configure"
 #include "confdefs.h"
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #include <stdbool.h>
 #endif
 

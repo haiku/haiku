@@ -231,7 +231,7 @@
 #  endif
 #endif
 
-#if defined (__BEOS__)
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #  ifdef ZLIB_DLL
 #    ifdef ZLIB_INTERNAL
 #      define ZEXPORT   __declspec(dllexport)

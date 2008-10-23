@@ -15,7 +15,7 @@ fs_strerror(int error)
 }
 
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 
 int
 from_platform_error(int error)

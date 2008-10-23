@@ -118,7 +118,7 @@ int
 main(int argc, char *argv[])
 {
 	int ch;
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	char *ep;
 	u_long ultmp;
 #endif
@@ -187,7 +187,7 @@ main(int argc, char *argv[])
 			doaddrlookup = 0;
 			break;
 		case 'S':
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 			fprintf(stderr, "-S option is not supported\n");
 #else
 # ifdef	HAS_GETTOS

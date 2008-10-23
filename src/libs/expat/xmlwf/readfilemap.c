@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #include <unistd.h>
 #endif
 

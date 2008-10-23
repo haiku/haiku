@@ -70,7 +70,7 @@ NamedRegistries::getRegistry( string name )
   if ( foundIt == m_registries.end() )
   {
     TestFactoryRegistry *factory = new TestFactoryRegistry( name );
-#if defined(__POWERPC__) && defined(__BEOS__)
+#if defined(__POWERPC__) && (defined(__BEOS__) || defined(__HAIKU__))
     m_registries.insert( 
     	pair<
   			const basic_string< char, char_traits< char>, allocator<char> >, 

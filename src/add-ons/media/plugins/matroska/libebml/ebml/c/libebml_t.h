@@ -72,7 +72,7 @@ extern "C" {
     typedef uint16_t uint16;
     typedef uint8_t uint8;
 # endif // __GNUC__
-#elif defined(__BEOS__)
+#elif (defined(__BEOS__) || defined(__HAIKU__))
 #include <SupportDefs.h>
 #elif defined(DJGPP)				/* SL : DJGPP doesn't support POSIX types ???? */
     typedef signed long long int64;
@@ -98,7 +98,7 @@ extern "C" {
     typedef uint32_t uint32;
     typedef uint16_t uint16;
     typedef uint8_t uint8;
-#elif defined(__BEOS__)
+#elif (defined(__BEOS__) || defined(__HAIKU__))
 # include <support/SupportDefs.h>
 #else // anything else (Linux, BSD, ...)
 # include <sys/types.h>

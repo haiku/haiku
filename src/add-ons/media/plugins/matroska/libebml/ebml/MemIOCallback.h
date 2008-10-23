@@ -36,7 +36,7 @@
 
 #include "IOCallback.h"
 #include <string>
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #include <sstream>
 #else
 #include <strstream>

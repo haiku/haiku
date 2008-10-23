@@ -34,7 +34,7 @@
 #include <term.h>
 #include <errno.h>
 
-#if defined(__BEOS__)
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #undef false
 #undef true
 #include <OS.h>
@@ -342,7 +342,7 @@ char_ready(void)
 }
 
 #else
-#if defined(__BEOS__)
+#if (defined(__BEOS__) || defined(__HAIKU__))
 int
 char_ready(void)
 {

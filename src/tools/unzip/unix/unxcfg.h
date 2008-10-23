@@ -1,5 +1,5 @@
 // That's exactly the BeOS configuration.
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #  include <sys/types.h>          /* [cjh]:  This is pretty much a generic  */
 #  include <sys/stat.h>           /* POSIX 1003.1 system; see beos/ for     */
 #  include <fcntl.h>              /* extra code to deal with our extra file */

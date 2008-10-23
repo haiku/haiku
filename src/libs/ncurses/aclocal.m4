@@ -252,7 +252,7 @@ AC_CACHE_VAL(cf_cv_header_stdbool_h,[
 	AC_TRY_COMPILE([],[bool foo = false],
 		[cf_cv_header_stdbool_h=0],
 		[AC_TRY_COMPILE([
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #include <stdbool.h>
 #endif
 ],[bool foo = false],

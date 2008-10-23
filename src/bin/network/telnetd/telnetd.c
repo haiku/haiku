@@ -47,7 +47,7 @@ __FBSDID("$FreeBSD: src/contrib/telnet/telnetd/telnetd.c,v 1.28 2005/05/21 15:28
 #include <libutil.h>
 #include <paths.h>
 #include <termcap.h>
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 # include <utmp.h>
 #endif
 
@@ -136,7 +136,7 @@ main(int argc, char *argv[])
 	struct sockaddr_storage from;
 	int on = 1, fromlen;
 	int ch;
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	u_long ultmp;
 	char *ep;
 #endif
@@ -273,7 +273,7 @@ main(int argc, char *argv[])
 			break;
 
 		case 'S':
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 			fprintf(stderr, "-S option is not supported\n");
 #else
 # ifdef	HAS_GETTOS
@@ -699,7 +699,7 @@ doit(struct sockaddr *who)
 	Please contact your net administrator");
 	remote_hostname[sizeof(remote_hostname) - 1] = '\0';
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	trimdomain(remote_hostname, UT_HOSTSIZE);
 #endif
 	if (!isdigit(remote_hostname[0]) && strlen(remote_hostname) > utmp_len)
@@ -847,7 +847,7 @@ telnet(int f, int p, char *host)
 	if (my_state_is_wont(TELOPT_ECHO))
 		send_will(TELOPT_ECHO, 1);
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	/*
 	 * Turn on packet mode
 	 */
@@ -1099,7 +1099,7 @@ telnet(int f, int p, char *host)
 					pcc = 1;
 				}
 #endif	/* LINEMODE */
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 				if (ptyibuf[0] & TIOCPKT_FLUSHWRITE) {
 					netclear();	/* clear buffer back */
 # ifndef	NO_URGENT

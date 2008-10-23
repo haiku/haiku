@@ -533,7 +533,7 @@ int main(int argc, char** argv)
   }
 
   /* run the server, if requested */
-#if !defined(MACINTOSH) && !defined(WIN32) && !defined(__BEOS__)
+#if !defined(MACINTOSH) && !defined(WIN32) && !(defined(__BEOS__) || defined(__HAIKU__))
   if (with_server) {
     server = new_fluid_server(settings, newclient, synth);
     if (server == NULL) {
@@ -567,7 +567,7 @@ int main(int argc, char** argv)
 
  cleanup:
 
-#if !defined(MACINTOSH) && !defined(WIN32) && !defined(__BEOS__)
+#if !defined(MACINTOSH) && !defined(WIN32) && !(defined(__BEOS__) || defined(__HAIKU__))
   if (server != NULL) {
     /* if the user typed 'quit' in the shell, kill the server */
     if (!interactive) {

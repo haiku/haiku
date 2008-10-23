@@ -52,7 +52,7 @@
 #  include "atari/zipup.h"
 #endif
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #  include "beos/zipup.h"
 #endif
 

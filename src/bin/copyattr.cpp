@@ -430,7 +430,7 @@ copy_entry(const char *sourcePath, const char *destPath,
 		destNode->SetOwner(sourceStat.st_uid);
 		destNode->SetGroup(sourceStat.st_gid);
 		destNode->SetPermissions(sourceStat.st_mode);
-		#ifdef __BEOS__
+		#if (defined(__BEOS__) || defined(__HAIKU__))
 			destNode->SetCreationTime(sourceStat.st_crtime);
 		#endif
 		destNode->SetModificationTime(sourceStat.st_mtime);

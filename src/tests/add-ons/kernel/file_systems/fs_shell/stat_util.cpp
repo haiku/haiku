@@ -5,7 +5,7 @@
 
 #include "stat_util.h"
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 
 void
 from_platform_stat(const struct stat *st, struct my_stat *myst)

@@ -58,7 +58,7 @@
 #  endif
 #endif
 
-#if (defined(__ATHEOS__) || defined(__BEOS__) || defined(UNIX))
+#if (defined(__ATHEOS__) || (defined(__BEOS__) || defined(__HAIKU__)) || defined(UNIX))
 #  ifndef ATH_BEO_UNX
 #    define ATH_BEO_UNX
 #  endif

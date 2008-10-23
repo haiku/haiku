@@ -110,7 +110,7 @@ get_charset_aliases (void)
   cp = charset_aliases;
   if (cp == NULL)
     {
-#if !(defined VMS || defined WIN32_NATIVE || defined __CYGWIN__ || defined __BEOS__)
+#if !(defined VMS || defined WIN32_NATIVE || defined __CYGWIN__ || (defined(__BEOS__) || defined(__HAIKU__)))
       FILE *fp;
       const char *dir;
       const char *base = "charset.alias";

@@ -182,7 +182,7 @@ local_wcslen (const wchar_t *s)
 # /* Use snprintf if it exists under the name 'snprintf' or '_snprintf'.
      But don't use it on BeOS, since BeOS snprintf produces no output if the
      size argument is >= 0x3000000.  */
-# if (HAVE_DECL__SNPRINTF || HAVE_SNPRINTF) && !defined __BEOS__
+# if (HAVE_DECL__SNPRINTF || HAVE_SNPRINTF) && !(defined(__BEOS__) || defined(__HAIKU__))
 #  define USE_SNPRINTF 1
 # else
 #  define USE_SNPRINTF 0

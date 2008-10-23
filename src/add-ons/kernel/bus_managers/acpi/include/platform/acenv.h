@@ -232,7 +232,7 @@
 #elif defined(__NetBSD__)
 #include "acnetbsd.h"
 
-#elif defined(__BEOS__)
+#elif (defined(__BEOS__) || defined(__HAIKU__))
 #include "achaiku.h"
 
 #elif defined(MODESTO)

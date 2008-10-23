@@ -20462,7 +20462,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <sys/types.h>
-#if defined __GLIBC__ && !defined __BEOS__
+#if defined __GLIBC__ && !(defined(__BEOS__) || defined(__HAIKU__))
 Do not use statvfs on systems with GNU libc, because that function stats
 all preceding entries in /proc/mounts, and that makes df hang if even
 one of the corresponding file systems is hard-mounted, but not available.

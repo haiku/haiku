@@ -270,7 +270,7 @@ Keymap::Dump()
 status_t
 Keymap::LoadCurrent()
 {
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	key_map *keys = NULL;
 	get_key_map(&keys, &fChars);
 	if (!keys)
@@ -1096,7 +1096,7 @@ status_t _restore_key_map_();
 void
 Keymap::RestoreSystemDefault()
 {
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	// work-around to get rid of this stupid find_directory_r() on Zeta
 #	ifdef find_directory
 #		undef find_directory
@@ -1121,7 +1121,7 @@ Keymap::RestoreSystemDefault()
 void
 Keymap::SaveAsCurrent()
 {
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
@@ -1149,7 +1149,7 @@ Keymap::SaveAsCurrent()
 status_t
 Keymap::Use()
 {
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	return _restore_key_map_();
 
 #else	// ! __BEOS__

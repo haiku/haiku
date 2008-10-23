@@ -4694,7 +4694,7 @@ f_has(argvars, retvar)
 	"arp",
 # endif
 #endif
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	"beos",
 #endif
 #ifdef MSDOS

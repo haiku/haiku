@@ -635,7 +635,7 @@ unsigned int fluid_curtime()
 }
 
 
-#elif __BEOS__
+#elif defined(__BEOS__) || defined(__HAIKU__)
 
 struct _fluid_timer_t
 {
@@ -1153,7 +1153,7 @@ int fluid_thread_join(fluid_thread_t* thread)
   return (wait_result == WAIT_OBJECT_0)? FLUID_OK : FLUID_FAILED;
 }
 
-#elif defined(__BEOS__)
+#elif defined(__BEOS__) || defined(__HAIKU__)
 /* Not implemented */
 fluid_thread_t* new_fluid_thread(fluid_thread_func_t func, void* data, int detach) { return NULL; }
 int delete_fluid_thread(fluid_thread_t* thread) { return 0; }
@@ -1288,7 +1288,7 @@ void fluid_socket_close(fluid_socket_t sock)
 
 #endif
 
-#if !defined(MACINTOSH) && !defined(WIN32) && !defined(__BEOS__)
+#if !defined(MACINTOSH) && !defined(WIN32) && !defined(__BEOS__) && !defined(__HAIKU__)
 
 
 fluid_istream_t fluid_socket_get_istream(fluid_socket_t sock)

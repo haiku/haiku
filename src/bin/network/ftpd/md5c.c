@@ -37,7 +37,7 @@ __FBSDID("$FreeBSD: src/lib/libmd/md5c.c,v 1.17 2006/01/17 15:35:56 phk Exp $");
 #include <string.h>
 #endif
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #include <machine/endian.h>
 #include <sys/endian.h>
 #endif

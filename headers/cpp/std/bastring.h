@@ -61,7 +61,7 @@ extern void __length_error (const char *);
 
 #endif
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 // Needed for atomic_add():
 typedef long int32;
 typedef volatile long vint32;
@@ -79,7 +79,7 @@ private:
 
     charT* data () { return reinterpret_cast<charT *>(this + 1); }
     charT& operator[] (size_t s) { return data () [s]; }
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
     charT* grab () { if (selfish) return clone (); atomic_add((vint32*) &ref, 1); return data (); }
     void release() { if (atomic_add((int32*) &ref, -1) == 1) delete this; }
 #else

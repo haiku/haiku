@@ -2406,7 +2406,7 @@ nextarg: ;
 #endif
   }
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
   /* Set the filetype of the zipfile to "application/zip" */
   setfiletype( zipfile, "application/zip" );
 #endif

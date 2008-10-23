@@ -5,7 +5,7 @@
 #ifndef _FSSH_COMPATIBILITY_H
 #define _FSSH_COMPATIBILITY_H
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #	ifndef HAIKU_HOST_PLATFORM_HAIKU
 #		include <HaikuBuildCompatibility.h>
 #	endif

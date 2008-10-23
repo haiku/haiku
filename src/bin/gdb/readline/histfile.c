@@ -32,7 +32,7 @@
 #include <stdio.h>
 
 #include <sys/types.h>
-#if !defined(_MINIX) && !defined(__BEOS__)
+#if !defined(_MINIX) && !(defined(__BEOS__) || defined(__HAIKU__))
 #  include <sys/file.h>
 #endif
 #include "posixstat.h"
@@ -347,7 +347,7 @@ history_truncate_file (fname, lines)
     {
       write (file, bp, chars_read - (bp - buffer));
 
-#if defined (__BEOS__)
+#if (defined(__BEOS__) || defined(__HAIKU__))
       /* BeOS ignores O_TRUNC. */
       ftruncate (file, chars_read - (bp - buffer));
 #endif

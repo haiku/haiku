@@ -235,7 +235,7 @@ public:
 		if (recLen > size)
 			return FS_NAME_TOO_LONG;
 
-		#ifdef __BEOS__
+		#if (defined(__BEOS__) || defined(__HAIKU__))
 			entry->d_dev = hostEntry->d_dev;
 		#endif
 		entry->d_ino = hostEntry->d_ino;

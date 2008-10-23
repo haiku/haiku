@@ -188,7 +188,7 @@ V[]  =  {1.27304834834123699328e-02, /* 0x3F8A1270, 0x91C9C71A */
     /* Y0(NaN) is NaN, y0(-inf) is Nan, y0(inf) is 0, y0(0) is -inf.  */
 	if(ix>=0x7ff00000) return  one/(x+x*x);
         if((ix|lx)==0) return -HUGE_VAL+x; /* -inf and overflow exception.  */
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
         if(hx<0) return -HUGE_VAL+x;  // also valid says the spec
 #else
 	if(hx<0) return zero/(zero*x);

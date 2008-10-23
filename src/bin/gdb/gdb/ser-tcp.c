@@ -178,7 +178,7 @@ net_open (struct serial *scb, const char *name)
   tmp = 0;
   ioctl (scb->fd, FIONBIO, &tmp);
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
   if (use_udp == 0)
     {
       /* Disable Nagle algorithm. Needed in some cases. */

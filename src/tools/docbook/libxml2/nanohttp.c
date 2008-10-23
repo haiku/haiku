@@ -96,13 +96,13 @@
  * A couple portability macros
  */
 #ifndef _WINSOCKAPI_
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 #define closesocket(s) close(s)
 #endif
 #define SOCKET int
 #endif
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #ifndef PF_INET
 #define PF_INET AF_INET
 #endif
@@ -845,7 +845,7 @@ xmlNanoHTTPConnectAttempt(struct sockaddr *addr)
 	status = ioctl(s, FIONBIO, &enable);
     }
 #else /* VMS */
-#if defined(__BEOS__)
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	{
 		bool noblock = true;
 		status = setsockopt(s, SOL_SOCKET, SO_NONBLOCK, &noblock, sizeof(noblock));

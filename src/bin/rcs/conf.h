@@ -1,6 +1,6 @@
 /* RCS compile-time configuration */
 
-	/* $Id: conf.h,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $ */
+	/* $Id$ */
 
 /*
  * This file is generated automatically.
@@ -73,7 +73,7 @@
 /* #define has_varargs ? */ /* Does <varargs.h> work?  */
 #define va_start_args 2 /* How many args does va_start() take?  */
 
-#if defined(O_BINARY) && !defined(__BEOS__)
+#if defined(O_BINARY) && !(defined(__BEOS__) || defined(__HAIKU__))
 	/* Text and binary i/o behave differently.  */
 	/* This is incompatible with Posix and Unix.  */
 #	define FOPEN_RB "rb"
@@ -246,7 +246,7 @@ typedef void *malloc_type; /* type returned by malloc() */
 
 /* traditional BSD */
 
-#if has_sys_siglist && !defined(sys_siglist) && !defined (__BEOS__)
+#if has_sys_siglist && !defined(sys_siglist) && !(defined(__BEOS__) || defined(__HAIKU__))
 	extern char const * const sys_siglist[];
 #endif
 

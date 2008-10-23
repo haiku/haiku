@@ -16,7 +16,7 @@
  */
 
 
-#if defined(__POWERPC__) && defined(__BEOS__)
+#if defined(__POWERPC__) && (defined(__BEOS__) || defined(__HAIKU__))
 #define CPPUNIT_HAVE_SSTREAM 1
 #undef CPPUNIT_FUNC_STRING_COMPARE_STRING_FIRST
 #endif

@@ -42,7 +42,7 @@
 
 #include <curses.priv.h>
 
-#ifdef __BEOS__
+#if defined(__BEOS__) || defined(__HAIKU__)
 #undef false
 #undef true
 #include <OS.h>

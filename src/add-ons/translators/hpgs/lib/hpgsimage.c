@@ -34,7 +34,7 @@
 #include <hpgsimage.h>
 #include <math.h>
 #include <errno.h>
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 #include <png.h>
 #else
 #include <libpng12/png.h>

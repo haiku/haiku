@@ -90,7 +90,7 @@ double fluid_utime(void);
 unsigned int fluid_curtime();
 #define fluid_utime()  0.0
 
-#elif defined(__BEOS__)
+#elif (defined(__BEOS__) || defined(__HAIKU__))
 
 #include <OS.h>
 unsigned int fluid_curtime(void);

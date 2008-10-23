@@ -101,7 +101,7 @@ typedef int __builtin_va_alist_t __attribute__((__mode__(__word__)));
 
 #ifndef __GNUC_VA_LIST
 #define __GNUC_VA_LIST
-#if defined(__svr4__) || defined(_AIX) || defined(_M_UNIX) || defined(__BEOS__)
+#if defined(__svr4__) || defined(_AIX) || defined(_M_UNIX) || defined(__BEOS__) || defined(__HAIKU__)
 typedef char *__gnuc_va_list;
 #else
 typedef void *__gnuc_va_list;

@@ -42,7 +42,7 @@ __FBSDID("$FreeBSD: src/contrib/telnet/telnetd/sys_term.c,v 1.18 2003/05/04 02:5
 #include <sys/types.h>
 #include <libutil.h>
 #include <stdlib.h>
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 # include <sys/tty.h>
 # include <utmp.h>
 #endif
@@ -57,7 +57,7 @@ __FBSDID("$FreeBSD: src/contrib/telnet/telnetd/sys_term.c,v 1.18 2003/05/04 02:5
 int cleanopen(char *);
 void scrub_env(void);
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 
 struct	utmp wtmp;
 
@@ -408,7 +408,7 @@ getpty(int *ptynum __unused)
 	char *p1, *p2;
 	int i;
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 	(void) strcpy(line, "/dev/pt/XX");
 #else
 	(void) strcpy(line, _PATH_DEV);
@@ -989,7 +989,7 @@ cleanopen(char *li)
 	(void) chown(li, 0, 0);
 	(void) chmod(li, 0600);
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	(void) revoke(li);
 #endif
 
@@ -1002,7 +1002,7 @@ cleanopen(char *li)
 }
 
 
-#ifdef __BEOS__
+#if (defined(__BEOS__) || defined(__HAIKU__))
 /* taken from DragonFly's telnetd */
 int
 login_tty(int t)
@@ -1372,7 +1372,7 @@ cleanup(int sig __unused)
 	 */
 	sigfillset(&mask);
 	sigprocmask(SIG_SETMASK, &mask, NULL);
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 	if (logout(p))
 		logwtmp(p, "", "");
 	(void)chmod(line, 0666);

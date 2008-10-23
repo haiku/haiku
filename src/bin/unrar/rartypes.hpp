@@ -5,7 +5,7 @@ typedef unsigned char    byte;   //8 bits
 typedef unsigned short   ushort; //preferably 16 bits, but can be more
 typedef unsigned int     uint;   //32 bits or more
 
-#ifndef __BEOS__
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
 typedef unsigned int     uint32; //32 bits exactly
 #endif
 typedef          int     sint32; //signed 32 bits exactly
