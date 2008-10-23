@@ -1,5 +1,7 @@
-// UpdateQueue.h
-
+/*
+ * Copyright 2005-2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef UPDATE_QUEUE_H
 #define UPDATE_QUEUE_H
 
@@ -8,29 +10,32 @@
 #include <OS.h>
 #include <Region.h>
 
-class HWInterface;
+#include "HWInterface.h"
 
-class UpdateQueue : public BLocker {
+
+class UpdateQueue : public BLocker, public HWInterfaceListener {
  public:
  								UpdateQueue(HWInterface* interface);
  	virtual						~UpdateQueue();
 
-			status_t			InitCheck();
+	virtual	void				FrameBufferChanged();
+
+			status_t			Init();
+			void				Shutdown();
 
 			void				AddRect(const BRect& rect);
 
  private:
-	static	int32				_execute_updates_(void *cookie);
+	static	int32				_ExecuteUpdatesEntry(void *cookie);
 			int32				_ExecuteUpdates();
 
-			void				_Reschedule();
-
+	volatile bool				fQuitting;
 			HWInterface*		fInterface;
 
 			BRegion				fUpdateRegion;
 			thread_id			fUpdateExecutor;
-			sem_id				fThreadControl;
-			status_t			fStatus;
+			sem_id				fRetraceSem;
+			bigtime_t			fRefreshDuration;
 };
 
 #endif	// UPDATE_QUEUE_H

@@ -23,7 +23,7 @@ using std::nothrow;
 
 
 BitmapHWInterface::BitmapHWInterface(ServerBitmap* bitmap)
-	: HWInterface(),
+	: HWInterface(false, false),
 	  fBackBuffer(NULL),
 	  fFrontBuffer(new(nothrow) BitmapBuffer(bitmap))
 {

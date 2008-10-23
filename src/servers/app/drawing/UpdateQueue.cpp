@@ -1,73 +1,119 @@
-// UpdateQueue.cpp
+/*
+ * Copyright 2005-2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#include "UpdateQueue.h"
 
 #include <new>
 #include <stdio.h>
 #include <string.h>
 
-#include "HWInterface.h"
 
-#include "UpdateQueue.h"
+//#define TRACE_UPDATE_QUEUE
+#ifdef TRACE_UPDATE_QUEUE
+#	include <FunctionTracer.h>
+#	include <String.h>
+
+	static int32 sFunctionDepth = -1;
+#	define CALLED(x...)	FunctionTracer _ft("UpdateQueue", __FUNCTION__, \
+							sFunctionDepth)
+#	define TRACE(x...)	{ BString _to; \
+							_to.Append(' ', (sFunctionDepth + 1) * 2); \
+							printf("%s", _to.String()); printf(x); }
+#else
+#	define CALLED(x...)
+#	define TRACE(x...)
+#endif
+
 
 // constructor
 UpdateQueue::UpdateQueue(HWInterface* interface)
- :	BLocker("AppServer_UpdateQueue"),
+	:
+	BLocker("AppServer_UpdateQueue"),
+	fQuitting(false),
  	fInterface(interface),
 	fUpdateRegion(),
-	fUpdateExecutor(-1),
-	fThreadControl(-1),
-	fStatus(B_ERROR)
+	fUpdateExecutor(B_BAD_THREAD_ID),
+	fRetraceSem(B_BAD_SEM_ID),
+	fRefreshDuration(1000000 / 60)
 {
-	fThreadControl = create_sem(0, "update queue control");
-	if (fThreadControl >= B_OK)
-		fStatus = B_OK;
-	else
-		fStatus = fThreadControl;
-	if (fStatus == B_OK) {
-		fUpdateExecutor = spawn_thread(_execute_updates_, "update queue runner",
-									   B_NORMAL_PRIORITY, this);
-		if (fUpdateExecutor >= B_OK) {
-			fStatus = B_OK;
-			resume_thread(fUpdateExecutor);
-		} else
-			fStatus = fUpdateExecutor;
-	}
+	CALLED();
+	TRACE("this: %p\n", this);
+	TRACE("fInterface: %p\n", fInterface);
 }
 
 // destructor
 UpdateQueue::~UpdateQueue()
 {
-	if (delete_sem(fThreadControl) == B_OK)
-		wait_for_thread(fUpdateExecutor, &fUpdateExecutor);
+	CALLED();
+
+	Shutdown();
 }
 
-// InitCheck
-status_t
-UpdateQueue::InitCheck()
+// FrameBufferChanged
+void
+UpdateQueue::FrameBufferChanged()
 {
-	return fStatus;
+	CALLED();
+
+	Init();
+}
+
+// Init
+status_t
+UpdateQueue::Init()
+{
+	CALLED();
+
+	Shutdown();
+
+	fRetraceSem = fInterface->RetraceSemaphore();
+//	fRefreshDuration = fInterface->...
+
+	TRACE("fRetraceSem: %ld, fRefreshDuration: %lld\n",
+		fRetraceSem, fRefreshDuration);
+
+	fQuitting = false;
+	fUpdateExecutor = spawn_thread(_ExecuteUpdatesEntry, "update queue runner",
+		B_REAL_TIME_PRIORITY, this);
+	if (fUpdateExecutor < B_OK)
+		return fUpdateExecutor;
+		
+	return resume_thread(fUpdateExecutor);
+}
+
+// Shutdown
+void
+UpdateQueue::Shutdown()
+{
+	CALLED();
+
+	if (fUpdateExecutor < B_OK)
+		return;
+	fQuitting = true;
+	status_t exitValue;
+	wait_for_thread(fUpdateExecutor, &exitValue);
+	fUpdateExecutor = B_BAD_THREAD_ID;
 }
 
 // AddRect
 void
 UpdateQueue::AddRect(const BRect& rect)
 {
-//	Lock();
-//printf("UpdateQueue::AddRect()\n");
-	// NOTE: The access to fUpdateRegion
-	// is protected by the HWInterface lock.
-	// When trying to access the fUpdateRegion,
-	// our thread will first try to lock the
-	// HWInterface, while on the other hand
-	// HWInterface will always be locked when
-	// it calls AddRect().
-	fUpdateRegion.Include(rect);
-//	_Reschedule();
-//	Unlock();
+	if (!rect.IsValid())
+		return;
+
+	CALLED();
+
+	if (Lock()) {
+		fUpdateRegion.Include(rect);
+		Unlock();
+	}
 }
 
-// _execute_updates_
+// _ExecuteUpdatesEntry
 int32
-UpdateQueue::_execute_updates_(void* cookie)
+UpdateQueue::_ExecuteUpdatesEntry(void* cookie)
 {
 	UpdateQueue *gc = (UpdateQueue*)cookie;
 	return gc->_ExecuteUpdates();
@@ -77,51 +123,50 @@ UpdateQueue::_execute_updates_(void* cookie)
 int32
 UpdateQueue::_ExecuteUpdates()
 {
-	bool running = true;
-	while (running) {
-		status_t err = acquire_sem_etc(fThreadControl, 1, B_RELATIVE_TIMEOUT,
-									   20000);
+	while (!fQuitting) {
+		status_t err;
+		if (fRetraceSem >= 0) {
+			bigtime_t timeout = system_time() + fRefreshDuration * 2;
+//			TRACE("acquire_sem_etc(%lld)\n", timeout);
+			do {
+				err = acquire_sem_etc(fRetraceSem, 1,
+					B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
+			} while (err == B_INTERRUPTED && !fQuitting);
+		} else {
+			bigtime_t timeout = system_time() + fRefreshDuration;
+//			TRACE("snooze_until(%lld)\n", timeout);
+			do {
+				err = snooze_until(timeout, B_SYSTEM_TIMEBASE);
+			} while (err == B_INTERRUPTED && !fQuitting);
+		}
+		if (fQuitting)
+			return B_OK;
 		switch (err) {
 			case B_OK:
 			case B_TIMED_OUT:
 				// execute updates
 				if (fInterface->LockParallelAccess()) {
-					int32 count = fUpdateRegion.CountRects();
-					if (count > 0) {
-						for (int32 i = 0; i < count; i++) {
-							fInterface->CopyBackToFront(fUpdateRegion.RectAt(i));
+					if (Lock()) {
+						int32 count = fUpdateRegion.CountRects();
+						if (count > 0) {
+							TRACE("CopyBackToFront() - rects: %ld\n", count);
+							// NOTE: not using the BRegion version, since that
+							// doesn't take care of leaving out and compositing
+							// the cursor.
+							for (int32 i = 0; i < count; i++)
+								fInterface->CopyBackToFront(
+									fUpdateRegion.RectAt(i));
+							fUpdateRegion.MakeEmpty();
 						}
-						fUpdateRegion.MakeEmpty();
+						Unlock();
 					}
 					fInterface->UnlockParallelAccess();
 				}
 				break;
-			case B_BAD_SEM_ID:
-				running = false;
-				break;
 			default:
-printf("other error: %s\n", strerror(err));
-//running = false;
-				snooze(20000);
-				break;
+				return err;
 		}
 	}
-	return 0;
-}
-
-// _Reschedule
-//
-// PRE: The object must be locked.
-void
-UpdateQueue::_Reschedule()
-{
-	// TODO: _Reschedule() is supposed to cause the
-	// immediate wake up of the update thread, but
-	// the HWInterface is still locked when we get here.
-	// Somehow this causes a deadlock, but I don't
-	// see why yet...
-	if (fStatus == B_OK) {
-		release_sem(fThreadControl);
-	}
+	return B_OK;
 }
 

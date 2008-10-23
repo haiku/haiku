@@ -95,7 +95,7 @@ public:
 	virtual	bool				IsDoubleBuffered() const;
 
 protected:
-	virtual	void				CopyBackToFront(/*const*/ BRegion& region);
+	virtual	void				_CopyBackToFront(/*const*/ BRegion& region);
 
 	virtual	void				_DrawCursor(IntRect area) const;
 

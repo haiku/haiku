@@ -45,7 +45,8 @@ class HWInterfaceListener {
 
 class HWInterface : protected MultiLocker {
  public:
-								HWInterface(bool doubleBuffered = false);
+								HWInterface(bool doubleBuffered = false,
+									bool enableUpdateQueue = true);
 	virtual						~HWInterface();
 
 	// locking
@@ -138,16 +139,17 @@ class HWInterface : protected MultiLocker {
 			RenderingBuffer*	DrawingBuffer() const;
 	virtual	RenderingBuffer*	FrontBuffer() const = 0;
 	virtual	RenderingBuffer*	BackBuffer() const = 0;
+			void				SetAsyncDoubleBuffered(bool doubleBuffered);
 	virtual	bool				IsDoubleBuffered() const;
 
-	// Invalidate is planned to be used for scheduling an area for updating
-	// you need to WriteLock!
-	virtual	status_t			Invalidate(const BRect& frame);
+	// Invalidate is used for scheduling an area for updating
+			status_t			Invalidate(const BRect& frame);
 	// while as CopyBackToFront() actually performs the operation
-			status_t			CopyBackToFront(const BRect& frame);
+	// either directly or asynchronously by the UpdateQueue thread
+	virtual	status_t			CopyBackToFront(const BRect& frame);
 
 protected:
-	virtual	void				CopyBackToFront(/*const*/ BRegion& region);
+	virtual	void				_CopyBackToFront(/*const*/ BRegion& region);
 
 public:
 	// TODO: Just a quick and primitive way to get single buffered mode working.

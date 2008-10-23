@@ -9,17 +9,21 @@
 
 #include "HWInterface.h"
 
+#include <new>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <vesa/vesa_info.h>
+
 #include "drawing_support.h"
 
 #include "RenderingBuffer.h"
 #include "SystemPalette.h"
 #include "UpdateQueue.h"
 
-#include <vesa/vesa_info.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+using std::nothrow;
 
 
 HWInterfaceListener::HWInterfaceListener()
@@ -35,7 +39,7 @@ HWInterfaceListener::~HWInterfaceListener()
 // #pragma mark - HWInterface
 
 
-HWInterface::HWInterface(bool doubleBuffered)
+HWInterface::HWInterface(bool doubleBuffered, bool enableUpdateQueue)
 	: MultiLocker("hw interface lock"),
 	  fCursorAreaBackup(NULL),
 	  fFloatingOverlaysLock("floating overlays lock"),
@@ -48,22 +52,22 @@ HWInterface::HWInterface(bool doubleBuffered)
 	  fCursorLocation(0, 0),
 	  fDoubleBuffered(doubleBuffered),
 	  fVGADevice(-1),
-//	  fUpdateExecutor(new UpdateQueue(this))
 	  fUpdateExecutor(NULL),
 	  fListeners(20)
 {
+	SetAsyncDoubleBuffered(doubleBuffered && enableUpdateQueue);
 }
 
 // destructor
 HWInterface::~HWInterface()
 {
+	SetAsyncDoubleBuffered(false);
+
 	delete fCursorAreaBackup;
 
 	// The standard cursor doesn't belong us - the drag bitmap might
 	if (fCursor != fCursorAndDragBitmap)
 		delete fCursorAndDragBitmap;
-
-	delete fUpdateExecutor;
 }
 
 // Initialize
@@ -286,6 +290,24 @@ HWInterface::DrawingBuffer() const
 }
 
 
+void
+HWInterface::SetAsyncDoubleBuffered(bool doubleBuffered)
+{
+	if (doubleBuffered) {
+		if (fUpdateExecutor != NULL)
+			return;
+		fUpdateExecutor = new (nothrow) UpdateQueue(this);
+		AddListener(fUpdateExecutor);
+	} else {
+		if (fUpdateExecutor == NULL)
+			return;
+		RemoveListener(fUpdateExecutor);
+		delete fUpdateExecutor;
+		fUpdateExecutor = NULL;
+	}
+}
+
+
 bool
 HWInterface::IsDoubleBuffered() const
 {
@@ -298,20 +320,21 @@ status_t
 HWInterface::Invalidate(const BRect& frame)
 {
 	if (IsDoubleBuffered()) {
-		return CopyBackToFront(frame);
-
-// TODO: the remaining problem is the immediate wake up of the
-// thread carrying out the updates, when I enable it, there
-// seems to be a deadlock, but I didn't figure it out yet.
-// Maybe the same bug is there without the wakeup, only, triggered
-// less often.... scarry, huh?
-/*		if (frame.IsValid()) {
+#if 0
+// NOTE: The UpdateQueue works perfectly fine, but it screws the
+// flicker-free-ness of the double buffered rendering. The problem being the
+// asynchronous nature. The UpdateQueue will transfer regions of the screen
+// which have been clean at the time we are in this function, but which have
+// been damaged meanwhile by drawing into them again. All in all, the
+// UpdateQueue is good for reducing the number of times that the transfer
+// is performed, and makes it happen during refresh only, but until there
+// is a smarter way to synchronize this all better, I've disabled it.
+		if (fUpdateExecutor != NULL) {
 			fUpdateExecutor->AddRect(frame);
 			return B_OK;
 		}
-		return B_BAD_VALUE;*/
-	} else {
-//		_DrawCursor(frame);
+#endif
+		return CopyBackToFront(frame);
 	}
 	return B_OK;
 }
@@ -336,13 +359,18 @@ HWInterface::CopyBackToFront(const BRect& frame)
 		// make sure we don't copy out of bounds
 		area = bufferClip & area;
 
+		bool cursorLocked = fFloatingOverlaysLock.Lock();
+
 		BRegion region((BRect)area);
 		if (IsDoubleBuffered())
 			region.Exclude((clipping_rect)_CursorFrame());
 
-		CopyBackToFront(region);
+		_CopyBackToFront(region);
 
 		_DrawCursor(area);
+
+		if (cursorLocked)
+			fFloatingOverlaysLock.Unlock();
 
 		return B_OK;
 	}
@@ -351,7 +379,7 @@ HWInterface::CopyBackToFront(const BRect& frame)
 
 
 void
-HWInterface::CopyBackToFront(/*const*/ BRegion& region)
+HWInterface::_CopyBackToFront(/*const*/ BRegion& region)
 {
 	RenderingBuffer* backBuffer = BackBuffer();
 

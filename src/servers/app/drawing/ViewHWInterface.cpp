@@ -385,8 +385,11 @@ CardWindow::Invalidate(const BRect& frame)
 //	#pragma mark -
 
 
+static const bool kDefaultDoubleBuffered = true;
+
+
 ViewHWInterface::ViewHWInterface()
-	: HWInterface(),
+	: HWInterface(kDefaultDoubleBuffered),
 	  fBackBuffer(NULL),
 	  fFrontBuffer(NULL),
 	  fWindow(NULL)
@@ -755,11 +758,11 @@ ViewHWInterface::IsDoubleBuffered() const
 	return HWInterface::IsDoubleBuffered();
 }
 
-// Invalidate
+// CopyBackToFront
 status_t
-ViewHWInterface::Invalidate(const BRect& frame)
+ViewHWInterface::CopyBackToFront(const BRect& frame)
 {
-	status_t ret = HWInterface::Invalidate(frame);
+	status_t ret = HWInterface::CopyBackToFront(frame);
 
 	if (ret >= B_OK && fWindow)
 		fWindow->Invalidate(frame);

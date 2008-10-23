@@ -508,7 +508,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 	bool tryOffscreenBackBuffer = false;
 	fOffscreenBackBuffer = false;
-#if 0
+#if 1
 	if (fVGADevice < 0 && (color_space)newMode.space == B_RGB32) {
 		// we should have an accelerated graphics driver, try
 		// to allocate a frame buffer large enough to contain
@@ -647,6 +647,11 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 			// clear out backbuffer, alpha is 255 this way
 			memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 		}
+#if 0
+// NOTE: Currently disabled, because it make the double buffered mode flicker
+// again. See HWInterface::Invalidate() for more information.
+		SetAsyncDoubleBuffered(doubleBuffered);
+#endif
 	}
 
 	// update color palette configuration if necessary
@@ -1342,7 +1347,7 @@ AccelerantHWInterface::IsDoubleBuffered() const
 
 
 void
-AccelerantHWInterface::CopyBackToFront(/*const*/ BRegion& region)
+AccelerantHWInterface::_CopyBackToFront(/*const*/ BRegion& region)
 {
 	if (fOffscreenBackBuffer) {
 		int32 xOffset = 0;
@@ -1361,7 +1366,7 @@ AccelerantHWInterface::CopyBackToFront(/*const*/ BRegion& region)
 		return;
 	}
 
-	return HWInterface::CopyBackToFront(region);
+	return HWInterface::_CopyBackToFront(region);
 }
 
 
