@@ -125,7 +125,10 @@ RecorderWindow::RecorderWindow() :
 
 	fInitCheck = InitWindow();
 	if (fInitCheck != B_OK) {
-		ErrorAlert("connect to media server", fInitCheck);
+		if (fInitCheck == B_NAME_NOT_FOUND)
+			ErrorAlert("find default audio hardware", fInitCheck);
+		else
+			ErrorAlert("connect to media server", fInitCheck);
 		PostMessage(B_QUIT_REQUESTED);
 	} else
 		Show();

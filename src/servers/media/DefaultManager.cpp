@@ -224,31 +224,31 @@ DefaultManager::Get(media_node_id *nodeid, char *input_name, int32 *inputid, nod
 	switch (type) {
 		case VIDEO_INPUT: 		// output: nodeid
 			if (fPhysicalVideoIn == -1)
-				return B_ERROR;
+				return B_NAME_NOT_FOUND;
 			*nodeid = fPhysicalVideoIn;
 			return B_OK;
 
 		case AUDIO_INPUT: 		// output: nodeid
 			if (fPhysicalAudioIn == -1)
-				return B_ERROR;
+				return B_NAME_NOT_FOUND;
 			*nodeid = fPhysicalAudioIn;
 			return B_OK;
 			
 		case VIDEO_OUTPUT: 		// output: nodeid
 			if (fPhysicalVideoOut == -1)
-				return B_ERROR;
+				return B_NAME_NOT_FOUND;
 			*nodeid = fPhysicalVideoOut;
 			return B_OK;
 
 		case AUDIO_OUTPUT:		// output: nodeid
 			if (fPhysicalAudioOut == -1)
-				return B_ERROR;
+				return B_NAME_NOT_FOUND;
 			*nodeid = fPhysicalAudioOut;
 			return B_OK;
 
 		case AUDIO_OUTPUT_EX:	// output: nodeid, input_name, input_id
 			if (fPhysicalAudioOut == -1)
-				return B_ERROR;
+				return B_NAME_NOT_FOUND;
 			*nodeid = fPhysicalAudioOut;
 			*inputid = fPhysicalAudioOutInputID;
 			strcpy(input_name, fPhysicalAudioOutInputName);
@@ -256,7 +256,7 @@ DefaultManager::Get(media_node_id *nodeid, char *input_name, int32 *inputid, nod
 
 		case AUDIO_MIXER:		// output: nodeid
 			if (fAudioMixer == -1)
-				return B_ERROR;
+				return B_NAME_NOT_FOUND;
 			*nodeid = fAudioMixer;
 			return B_OK;
 
