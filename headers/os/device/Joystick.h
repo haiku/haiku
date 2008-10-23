@@ -21,21 +21,7 @@ class BString;
 struct entry_ref;
 struct _extended_joystick;
 class _BJoystickTweaker;
-
-typedef struct _joystick_info {
-	char		module_name[64];
-	char		controller_name[64];
-	int16		num_axes;
-	int16		num_buttons;
-	int16		num_hats;
-	uint32		num_sticks;
-	bool		calibration_enable;
-	bigtime_t	max_latency;
-	BList		name_axis;
-	BList		name_hat;
-	BList		name_button;
-//	BList		name_
-} joystick_info;
+struct _joystick_info;
 
 /* -----------------------------------------------------------------------*/
 class BJoystick {
@@ -44,7 +30,7 @@ public:
 virtual				~BJoystick();
 
 		status_t	Open(const char *portName);
-		status_t	Open(const char *portName, bool enter_enhanced = true);
+		status_t	Open(const char *portName, bool enter_enhanced);
 		void		Close(void);
 
 		status_t	Update(void);
@@ -84,7 +70,6 @@ virtual				~BJoystick();
 		/* NOTE: Buttons() are 1 == on */
 		uint32		ButtonValues(int32 for_stick = 0);
 		status_t	GetButtonNameAt(int32 index, BString * out_name);
-/* -----------------------------------------------------------------------*/
 
 protected:
 

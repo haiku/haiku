@@ -16,7 +16,20 @@
 
 class BJoystick;
 
-struct _joystick_info;
+typedef struct _joystick_info {
+        char            module_name[64];
+        char            controller_name[64];
+        int16           num_axes;
+        int16           num_buttons;
+        int16           num_hats;
+        uint32          num_sticks;
+        bool            calibration_enable;
+        bigtime_t       max_latency;
+        BList           name_axis;
+        BList           name_hat;
+        BList           name_button;
+//      BList           name_
+} joystick_info;
 
 class _BJoystickTweaker {
 

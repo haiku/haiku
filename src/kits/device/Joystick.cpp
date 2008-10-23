@@ -41,6 +41,7 @@ FILE *BJoystick::sLogFile = NULL;
 
 #include "JoystickTweaker.h"
 
+
 BJoystick::BJoystick()
 	:
 	fBeBoxMode(false),
