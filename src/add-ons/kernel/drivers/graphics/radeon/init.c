@@ -382,13 +382,14 @@ status_t Radeon_FirstOpen( device_info *di )
 	// fix AGP settings for IGP chipset
 	Radeon_Set_AGP( di, !di->settings.force_pci ); // disable AGP
 
+	
+	// time to init Command Processor
+	result = Radeon_InitCP( di );
+	if( result != B_OK )
+		goto err;
+			
 	if ( di->acc_dma )
 	{
-		// time to init Command Processor
-		result = Radeon_InitCP( di );
-		if( result != B_OK )
-			goto err;
-			
 		result = Radeon_InitDMA( di );
 		if( result != B_OK )
 			goto err0;
