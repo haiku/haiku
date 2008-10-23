@@ -524,11 +524,13 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 		}
 	}
 
-	// trigger the HW accelerated version if is was available
+	// trigger the HW accelerated version if it was available
 	if (sortedRectList) {
 		fGraphicsCard->CopyRegion(sortedRectList, count, xOffset, yOffset);
-		if (fGraphicsCard->IsDoubleBuffered())
-			fGraphicsCard->Invalidate(region->Frame());
+		if (fGraphicsCard->IsDoubleBuffered()) {
+			fGraphicsCard->Invalidate(
+				region->Frame().OffsetByCopy(xOffset, yOffset));
+		}
 	}
 
 	delete[] sortedRectList;
@@ -552,12 +554,11 @@ DrawingEngine::InvertRect(BRect r)
 		BRegion region(r);
 		region.IntersectWith(fPainter->ClippingRegion());
 		fGraphicsCard->InvertRegion(region);
-		if (fGraphicsCard->IsDoubleBuffered())
-			_CopyToFront(r);
 	} else {
 		fPainter->InvertRect(r);
-		_CopyToFront(r);
 	}
+
+	_CopyToFront(r);
 }
 
 // DrawBitmap
@@ -836,13 +837,11 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 		region.IntersectWith(fPainter->ClippingRegion());
 		fGraphicsCard->FillRegion(region, color,
 			fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
-
-		if (fGraphicsCard->IsDoubleBuffered())
-			_CopyToFront(r);
 	} else {
 		fPainter->FillRect(r, color);
-		_CopyToFront(r);
 	}
+
+	_CopyToFront(r);
 }
 
 
@@ -873,16 +872,14 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 	if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
 		&& frame.Width() * frame.Height() > 100) {
 		fGraphicsCard->FillRegion(r, color, fSuspendSyncLevel == 0
-											|| overlaysHider.WasHidden());
-		if (fGraphicsCard->IsDoubleBuffered())
-			_CopyToFront(frame);
+			|| overlaysHider.WasHidden());
 	} else {
 		int32 count = r.CountRects();
 		for (int32 i = 0; i < count; i++)
 			fPainter->FillRectNoClipping(r.RectAtInt(i), color);
-
-		_CopyToFront(frame);
 	}
+
+	_CopyToFront(frame);
 }
 
 // #pragma mark - DrawState
@@ -957,8 +954,7 @@ DrawingEngine::FillRect(BRect r)
 	if (doInSoftware)
 		fPainter->FillRect(r);
 
-	if (fGraphicsCard->IsDoubleBuffered())
-		_CopyToFront(r);
+	_CopyToFront(r);
 }
 
 
@@ -976,8 +972,7 @@ DrawingEngine::FillRectGradient(BRect r, const BGradient& gradient)
 	
 	fPainter->FillRectGradient(r, gradient);
 	
-	if (fGraphicsCard->IsDoubleBuffered())
-		_CopyToFront(r);
+	_CopyToFront(r);
 }
 
 
@@ -1030,8 +1025,7 @@ DrawingEngine::FillRegion(BRegion& r)
 			touched = touched | fPainter->FillRect(r.RectAt(i));
 	}
 
-	if (fGraphicsCard->IsDoubleBuffered())
-		_CopyToFront(r.Frame());
+	_CopyToFront(r.Frame());
 }
 
 
@@ -1052,8 +1046,7 @@ DrawingEngine::FillRegionGradient(BRegion& r, const BGradient& gradient)
 	for (int32 i = 1; i < count; i++)
 		touched = touched | fPainter->FillRectGradient(r.RectAt(i), gradient);
 	
-	if (fGraphicsCard->IsDoubleBuffered())
-		_CopyToFront(r.Frame());
+	_CopyToFront(r.Frame());
 }
 
 
