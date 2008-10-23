@@ -37,6 +37,7 @@
 #include <system_info.h>
 #include <thread.h>
 #include <team.h>
+#include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
 #include <vm_address_space.h>
@@ -764,6 +765,124 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 			thread_yield(true);
 	}
 }
+
+
+//	#pragma mark -
+
+
+#if VM_PAGE_FAULT_TRACING
+
+namespace VMPageFaultTracing {
+
+class PageFaultStart : public AbstractTraceEntry {
+public:
+	PageFaultStart(addr_t address, bool write, bool user, addr_t pc)
+		:
+		fAddress(address),
+		fPC(pc),
+		fWrite(write),
+		fUser(user)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page fault %#lx %s %s, pc: %#lx", fAddress,
+			fWrite ? "write" : "read", fUser ? "user" : "kernel", fPC);
+	}
+
+private:
+	addr_t	fAddress;
+	addr_t	fPC;
+	bool	fWrite;
+	bool	fUser;
+};
+
+
+// page fault errors
+enum {
+	PAGE_FAULT_ERROR_NO_AREA		= 0,
+	PAGE_FAULT_ERROR_KERNEL_ONLY,
+	PAGE_FAULT_ERROR_READ_ONLY,
+	PAGE_FAULT_ERROR_KERNEL_BAD_USER_MEMORY,
+	PAGE_FAULT_ERROR_NO_ADDRESS_SPACE
+};
+
+
+class PageFaultError : public AbstractTraceEntry {
+public:
+	PageFaultError(area_id area, status_t error)
+		:
+		fArea(area),
+		fError(error)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		switch (fError) {
+			case PAGE_FAULT_ERROR_NO_AREA:
+				out.Print("page fault error: no area");
+				break;
+			case PAGE_FAULT_ERROR_KERNEL_ONLY:
+				out.Print("page fault error: area: %ld, kernel only", fArea);
+				break;
+			case PAGE_FAULT_ERROR_READ_ONLY:
+				out.Print("page fault error: area: %ld, read only", fArea);
+				break;
+			case PAGE_FAULT_ERROR_KERNEL_BAD_USER_MEMORY:
+				out.Print("page fault error: kernel touching bad user memory");
+				break;
+			case PAGE_FAULT_ERROR_NO_ADDRESS_SPACE:
+				out.Print("page fault error: no address space");
+				break;
+			default:
+				out.Print("page fault error: area: %ld, error: %s", fArea,
+					strerror(fError));
+				break;
+		}
+	}
+
+private:
+	area_id		fArea;
+	status_t	fError;
+};
+
+
+class PageFaultDone : public AbstractTraceEntry {
+public:
+	PageFaultDone(area_id area, VMCache* topCache, VMCache* cache,
+			vm_page* page)
+		:
+		fArea(area),
+		fTopCache(topCache),
+		fCache(cache),
+		fPage(page)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("page fault done: area: %ld, top cache: %p, cache: %p, "
+			"page: %p", fArea, fTopCache, fCache, fPage);
+	}
+
+private:
+	area_id		fArea;
+	VMCache*	fTopCache;
+	VMCache*	fCache;
+	vm_page*	fPage;
+};
+
+}	// namespace VMPageFaultTracing
+
+#	define TPF(x) new(std::nothrow) VMPageFaultTracing::x;
+#else
+#	define TPF(x) ;
+#endif	// VM_PAGE_FAULT_TRACING
 
 
 //	#pragma mark -
@@ -2295,6 +2414,23 @@ vm_clone_area(team_id team, const char *name, void **address,
 {
 	vm_area *newArea = NULL;
 	vm_area *sourceArea;
+
+	// Check whether the source area exists and is cloneable. If so, mark it
+	// B_SHARED_AREA, so that we don't get problems with copy-on-write.
+	{
+		AddressSpaceWriteLocker locker;
+		status_t status = locker.SetFromArea(sourceID, sourceArea);
+		if (status != B_OK)
+			return status;
+
+		if (!kernel && (sourceArea->protection & B_KERNEL_AREA) != 0)
+			return B_NOT_ALLOWED;
+
+		sourceArea->protection |= B_SHARED_AREA;
+		protection |= B_SHARED_AREA;
+	}
+
+	// Now lock both address spaces and actually do the cloning.
 
 	MultiAddressSpaceLocker locker;
 	vm_address_space *sourceAddressSpace;
@@ -4169,6 +4305,8 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 	FTRACE(("vm_page_fault: page fault at 0x%lx, ip 0x%lx\n", address,
 		faultAddress));
 
+	TPF(PageFaultStart(address, isWrite, isUser, faultAddress));
+
 	addr_t pageAddress = ROUNDOWN(address, B_PAGE_SIZE);
 	vm_address_space *addressSpace = NULL;
 
@@ -4185,6 +4323,9 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 				dprintf("vm_page_fault: kernel thread accessing invalid user "
 					"memory!\n");
 				status = B_BAD_ADDRESS;
+				TPF(PageFaultError(-1,
+					VMPageFaultTracing
+						::PAGE_FAULT_ERROR_KERNEL_BAD_USER_MEMORY));
 			} else {
 				// XXX weird state.
 				panic("vm_page_fault: non kernel thread accessing user memory "
@@ -4197,6 +4338,8 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 		// this keeps a user space thread from passing a buffer that crosses
 		// into kernel space
 		status = B_BAD_ADDRESS;
+		TPF(PageFaultError(-1,
+			VMPageFaultTracing::PAGE_FAULT_ERROR_NO_ADDRESS_SPACE));
 	}
 
 	if (status == B_OK)
@@ -4697,23 +4840,24 @@ vm_soft_fault(vm_address_space *addressSpace, addr_t originalAddress,
 	if (area == NULL) {
 		dprintf("vm_soft_fault: va 0x%lx not covered by area in address space\n",
 			originalAddress);
+		TPF(PageFaultError(-1, VMPageFaultTracing::PAGE_FAULT_ERROR_NO_AREA));
 		return B_BAD_ADDRESS;
 	}
-
-//	ktrace_printf("page fault: %s %#lx, %s, area: %p",
-//		isWrite ? "write" : "read", originalAddress, isUser ? "user" : "kernel",
-//		area);
 
 	// check permissions
 	uint32 protection = get_area_page_protection(area, address);
 	if (isUser && (protection & B_USER_PROTECTION) == 0) {
 		dprintf("user access on kernel area 0x%lx at %p\n", area->id, (void *)originalAddress);
+		TPF(PageFaultError(area->id,
+			VMPageFaultTracing::PAGE_FAULT_ERROR_KERNEL_ONLY));
 		return B_PERMISSION_DENIED;
 	}
 	if (isWrite && (protection
 			& (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
 		dprintf("write access attempted on read-only area 0x%lx at %p\n",
 			area->id, (void *)originalAddress);
+		TPF(PageFaultError(area->id,
+			VMPageFaultTracing::PAGE_FAULT_ERROR_READ_ONLY));
 		return B_PERMISSION_DENIED;
 	}
 
@@ -4772,6 +4916,7 @@ vm_soft_fault(vm_address_space *addressSpace, addr_t originalAddress,
 
 	if (status == B_OK) {
 		// All went fine, all there is left to do is to map the page into the address space
+		TPF(PageFaultDone(area->id, topCache, page->cache, page));
 
 		// In case this is a copy-on-write page, we need to unmap it from the area now
 		if (isWrite && page->cache == topCache)
@@ -4789,7 +4934,8 @@ vm_soft_fault(vm_address_space *addressSpace, addr_t originalAddress,
 		vm_map_page(area, page, address, newProtection);
 
 		pageSource->ReleaseRefAndUnlock();
-	}
+	} else
+		TPF(PageFaultError(area->id, status));
 
 	atomic_add(&area->no_cache_change, -1);
 
@@ -5683,6 +5829,8 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target,
 		vm_delete_area(target, clonedArea, kernel);
 		return status;
 	}
+
+	// TODO: The clonedArea is B_SHARED_AREA, which is not really desired.
 
 	return clonedArea;
 }
