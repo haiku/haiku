@@ -29,13 +29,16 @@ local defines = [ FDefines TEST_MODE=1 ] ;
 SubDirCcFlags $(defines) ; #-finstrument-functions ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
 SubDirC++Flags $(defines) ; #-finstrument-functions ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
 
-SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
+SEARCH_SOURCE += $(appServerDir) ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) drawing ] ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) drawing Painter ] ;
 
 SharedLibrary libhwinterface.so :
 	BBitmapBuffer.cpp
 	DWindowBuffer.cpp
 	HWInterface.cpp
 	RGBColor.cpp
+	UpdateQueue.cpp
 
 	: libhaikuappserver.so be
 ;
@@ -100,8 +103,6 @@ Server haiku_app_server :
 	EventDispatcher.cpp
 	EventStream.cpp
 	MessageLooper.cpp
-	PNGDump.cpp
-	RAMLinkMsgReader.cpp
 
 	# Manager Classes
 	BitmapManager.cpp
@@ -123,7 +124,6 @@ Server haiku_app_server :
 	drawing_support.cpp
 	DrawingEngine.cpp
 	MallocBuffer.cpp
-	UpdateQueue.cpp
 
 	VirtualScreen.cpp
 	BitmapHWInterface.cpp
