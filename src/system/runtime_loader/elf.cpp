@@ -1261,6 +1261,17 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 	// reload them.
 	if (type != B_ADD_ON_IMAGE) {
 		found = find_image(name, APP_OR_LIBRARY_TYPE);
+
+		if (found == NULL && type != B_APP_IMAGE) {
+			// Special case for add-ons that link against the application
+			// executable, with the executable not having a soname set.
+			if (const char* lastSlash = strrchr(name, '/')) {
+				image_t* programImage = get_program_image();
+				if (strcmp(programImage->name, lastSlash + 1) == 0)
+					found = programImage;
+			}
+		}
+
 		if (found) {
 			atomic_add(&found->ref_count, 1);
 			*_image = found;
@@ -1279,7 +1290,7 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 	fd = open_executable(path, type, rpath, get_program_path(),
 		sSearchPathSubDir);
 	if (fd < 0) {
-		FATAL("cannot open file %s\n", path);
+		FATAL("cannot open file %s\n", name);
 		KTRACE("rld: load_container(\"%s\"): failed to open file", name);
 		return fd;
 	}
