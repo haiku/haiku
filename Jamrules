@@ -14,6 +14,15 @@ HCACHEFILE = header_cache ;
 JCACHEFILE = jamfile_cache ;
 LOCATE on $(HCACHEFILE) $(JCACHEFILE) = $(HAIKU_BUILD_OUTPUT_DIR) ;
 
+# include BuildConfig
+local buildConfig = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : BuildConfig ] ;
+if ! $(buildConfig) {
+	ECHO "No `BuildConfig' found in $(HAIKU_BUILD_OUTPUT_DIR)!" ;
+	EXIT "Run ./configure in the source tree's root directory first!" ;
+}
+LOCATE on BuildConfig = $(HAIKU_BUILD_OUTPUT_DIR) ;
+include BuildConfig ;
+
 # The build setup and rules are neatly organized in several files. Include
 # them now. Start with the side-effect-less rules, since they are the most
 # likely to be used in the top level context (i.e. not only in rules).

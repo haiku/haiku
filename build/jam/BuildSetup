@@ -106,16 +106,11 @@ if $(JAM_TARGETS) {
 }
 
 
-# Include BuildConfig/Timezones/libgccObjects
+# include Timezones/libgccObjects
 {
-	local buildConfig = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : BuildConfig ] ;
 	local timezones = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : Timezones ] ;
 	local libgccObjects = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : libgccObjects ] ;
 
-	if ! $(buildConfig) {
-		ECHO "No `BuildConfig' found in $(HAIKU_BUILD_OUTPUT_DIR)!" ;
-		EXIT "Run ./configure in the source tree's root directory first!" ;
-	}
 	if ! ( $(timezones) && $(libgccObjects) ) {
 		ECHO "No `Timezones' or `libgccObjects' found in"
 			"$(HAIKU_BUILD_OUTPUT_DIR)!" ;
@@ -123,11 +118,9 @@ if $(JAM_TARGETS) {
 			"again!" ;
 	}
 
-	LOCATE on BuildConfig = $(HAIKU_BUILD_OUTPUT_DIR) ;
 	LOCATE on Timezones = $(HAIKU_BUILD_OUTPUT_DIR) ;
 	LOCATE on libgccObjects = $(HAIKU_BUILD_OUTPUT_DIR) ;
 
-	include BuildConfig ;
 	include Timezones ;
 	include libgccObjects ;
 }
