@@ -221,7 +221,7 @@ dump_sem_info(int argc, char **argv)
 	if (IS_KERNEL_ADDRESS(num)) {
 		dump_sem((struct sem_entry *)num);
 		return 0;
-	} else if (num > 0) {
+	} else if (num >= 0) {
 		uint32 slot = num % sMaxSems;
 		if (sSems[slot].id != (int)num) {
 			kprintf("sem %ld (%#lx) doesn't exist!\n", num, num);
