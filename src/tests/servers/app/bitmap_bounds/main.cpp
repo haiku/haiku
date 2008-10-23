@@ -96,37 +96,26 @@ TestView::Draw(BRect updateRect)
 	BRect view = bitmap.OffsetToCopy(B_ORIGIN);
 
 	DrawBitmap(fBitmap, bitmap, view);
-
 }
 
-
-// show_window
-void
-show_window(BRect frame, const char* name)
-{
-	BWindow* window = new BWindow(frame, name,
-								  B_TITLED_WINDOW,
-								  B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE);
-
-	BView* view = new TestView(window->Bounds(), "test",
-							   B_FOLLOW_ALL, B_WILL_DRAW);
-	window->AddChild(view);
-
-	window->Show();
-}
 
 // main
 int
 main(int argc, char** argv)
 {
-	BApplication* app = new BApplication(
-		"application/x.vnd-Haiku.BitmapBounds");
+	BApplication app("application/x.vnd-Haiku.BitmapBounds");
 
 	BRect frame(50.0, 50.0, 300.0, 250.0);
-	show_window(frame, "Bitmap-Bounds Test");
+	BWindow* window = new BWindow(frame, "Bitmap Bounds", B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE);
 
-	app->Run();
+	BView* view = new TestView(window->Bounds(), "test",
+		B_FOLLOW_ALL, B_WILL_DRAW);
+	window->AddChild(view);
 
-	delete app;
+	window->Show();
+
+	app.Run();
+
 	return 0;
 }
