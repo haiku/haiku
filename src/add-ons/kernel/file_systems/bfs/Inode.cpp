@@ -2151,9 +2151,11 @@ Inode::Free(Transaction& transaction)
 	// Perhaps there should be an implementation of Inode::ShrinkStream() that
 	// just frees the data_stream, but doesn't change the inode (since it is
 	// freed anyway) - that would make an undelete command possible
-	status_t status = SetFileSize(transaction, 0);
-	if (status < B_OK)
-		return status;
+	if (!IsSymLink() || (Flags() & INODE_LONG_SYMLINK) != 0) {
+		status_t status = SetFileSize(transaction, 0);
+		if (status < B_OK)
+			return status;
+	}
 
 	// Free all attributes, and remove their indices
 	{
@@ -2165,7 +2167,7 @@ Inode::Free(Transaction& transaction)
 		uint32 type;
 		size_t length;
 		ino_t id;
-		while ((status = iterator.GetNext(name, &length, &type, &id)) == B_OK) {
+		while (iterator.GetNext(name, &length, &type, &id) == B_OK) {
 			RemoveAttribute(transaction, name);
 		}
 	}
