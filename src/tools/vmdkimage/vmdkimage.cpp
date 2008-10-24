@@ -145,8 +145,8 @@ is_valid_uuid(const char *uuid)
 int
 main(int argc, char *argv[])
 {
-	uint64 headersize = 0;
-	uint64 imagesize = 0;
+	uint64 headerSize = 0;
+	uint64 imageSize = 0;
 	const char *file = NULL;
 	const char *uuid = NULL;
 	bool headerOnly = false;
@@ -183,23 +183,23 @@ main(int argc, char *argv[])
 				break;
 
 			case 'h':
-				headersize = strtoull(optarg, NULL, 10);
+				headerSize = strtoull(optarg, NULL, 10);
 				if (strchr(optarg, 'G') || strchr(optarg, 'g'))
-					headersize *= 1024 * 1024 * 1024;
+					headerSize *= 1024 * 1024 * 1024;
 				else if (strchr(optarg, 'M') || strchr(optarg, 'm'))
-					headersize *= 1024 * 1024;
+					headerSize *= 1024 * 1024;
 				else if (strchr(optarg, 'K') || strchr(optarg, 'k'))
-					headersize *= 1024;
+					headerSize *= 1024;
 				break;
 
 			case 'i':
-				imagesize = strtoull(optarg, NULL, 10);
+				imageSize = strtoull(optarg, NULL, 10);
 				if (strchr(optarg, 'G') || strchr(optarg, 'g'))
-					imagesize *= 1024 * 1024 * 1024;
+					imageSize *= 1024 * 1024 * 1024;
 				else if (strchr(optarg, 'M') || strchr(optarg, 'm'))
-					imagesize *= 1024 * 1024;
+					imageSize *= 1024 * 1024;
 				else if (strchr(optarg, 'K') || strchr(optarg, 'k'))
-					imagesize *= 1024;
+					imageSize *= 1024;
 				break;
 
 			case 'u':
@@ -236,36 +236,36 @@ main(int argc, char *argv[])
 		return 0;
 	}
 
-	if (!headersize || !imagesize || !file)
+	if (!headerSize || !imageSize || !file)
 		print_usage();
 
 	char desc[1024];
 	SparseExtentHeader header;
 
-	if (headersize < sizeof(desc) + sizeof(header)) {
+	if (headerSize < sizeof(desc) + sizeof(header)) {
 		fprintf(stderr, "Error: header size must be at least %u byte\n",
 			(unsigned)(sizeof(desc) + sizeof(header)));
 		exit(EXIT_FAILURE);
 	}
 
-	if (headersize % 512) {
+	if (headerSize % 512) {
 		fprintf(stderr, "Error: header size must be a multiple of 512 bytes\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if (imagesize % 512) {
+	if (imageSize % 512) {
 		fprintf(stderr, "Error: image size must be a multiple of 512 bytes\n");
 		exit(EXIT_FAILURE);
 	}
 
 	// arbitrary 1 GB limitation
-	if (headersize > 0x40000000u) {
+	if (headerSize > 0x40000000ULL) {
 		fprintf(stderr, "Error: header size too large\n");
 		exit(EXIT_FAILURE);
 	}
 
-	// arbitrary 2 GB limitation
-	if (imagesize > 0x80000000u) {
+	// arbitrary 4 GB limitation
+	if (imageSize > 0x100000000ULL) {
 		fprintf(stderr, "Error: image size too large\n");
 		exit(EXIT_FAILURE);
 	}
@@ -273,8 +273,8 @@ main(int argc, char *argv[])
 	const char *name = strrchr(file, '/');
 	name = name ? (name + 1) : file;
 
-//	printf("headersize %llu\n", headersize);
-//	printf("imagesize %llu\n", imagesize);
+//	printf("headerSize %llu\n", headerSize);
+//	printf("imageSize %llu\n", imageSize);
 //	printf("file %s\n", file);
 
 	uint64 sectors;
@@ -284,7 +284,7 @@ main(int argc, char *argv[])
 	// TODO: fixme!
 	sectors = 63;
 	heads = 16;
-	cylinders = imagesize / (sectors * heads * 512);
+	cylinders = imageSize / (sectors * heads * 512);
 	while (cylinders > 1024) {
 		cylinders /= 2;
 		heads *= 2;
@@ -304,7 +304,7 @@ main(int argc, char *argv[])
 	header.numGTEsPerGT = 512;
 	header.rgdOffset = 0;
 	header.gdOffset = 0;
-	header.overHead = headersize / 512;
+	header.overHead = headerSize / 512;
 	header.uncleanShutdown = 0;
 	header.singleEndLineChar = '\n';
 	header.nonEndLineChar = ' ';
@@ -345,7 +345,7 @@ main(int argc, char *argv[])
 	sprintf(desc + strlen(desc),
 		"# Extent Description\n"
 		"RW %llu FLAT \"%s\" %llu\n",
-		actualImageSize / 512, name, headersize / 512);
+		actualImageSize / 512, name, headerSize / 512);
 	sprintf(desc + strlen(desc),
 		"# Disk Data Base\n"
 		"ddb.toolsVersion = \"0\"\n"
@@ -376,15 +376,15 @@ main(int argc, char *argv[])
 	if (write(fd, desc, sizeof(desc)) != sizeof(desc))
 		goto write_err;
 
-	if ((uint64)lseek(fd, headersize - 1, SEEK_SET) != headersize - 1)
+	if ((uint64)lseek(fd, headerSize - 1, SEEK_SET) != headerSize - 1)
 		goto write_err;
 
 	if (1 != write(fd, "", 1))
 		goto write_err;
 
 	if (!headerOnly) {
-		if (clearImage && ftruncate(fd, headersize) != 0
-			|| ftruncate(fd, actualImageSize + headersize) != 0) {
+		if (clearImage && ftruncate(fd, headerSize) != 0
+			|| ftruncate(fd, actualImageSize + headerSize) != 0) {
 			fprintf(stderr, "Error: resizing file %s failed (%s)\n", file,
 				strerror(errno));
 			exit(EXIT_FAILURE);
