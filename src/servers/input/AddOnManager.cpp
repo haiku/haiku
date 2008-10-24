@@ -146,6 +146,9 @@ AddOnManager::SaveState()
 }
 
 
+// #pragma mark -
+
+
 void
 AddOnManager::_RegisterAddOns()
 {
@@ -168,11 +171,12 @@ AddOnManager::_RegisterAddOns()
 		B_COMMON_ADDONS_DIRECTORY,
 		B_BEOS_ADDONS_DIRECTORY
 	};
-	const char subDirectories[][24] = {
+	const char* subDirectories[] = {
 		"input_server/devices",
 		"input_server/filters",
 		"input_server/methods"
 	};
+	int32 subDirectoryCount = sizeof(subDirectories) / sizeof(const char*);
 
 	node_ref nref;
 	BDirectory directory;
@@ -180,7 +184,7 @@ AddOnManager::_RegisterAddOns()
 	// when safemode, only B_BEOS_ADDONS_DIRECTORY is used
 	for (uint32 i = fSafeMode ? 2 : 0;
 			i < sizeof(directories) / sizeof(directory_which); i++) {
-		for (uint32 j = 0; j < sizeof(subDirectories) / sizeof(char[24]); j++) {
+		for (uint32 j = 0; j < subDirectoryCount; j++) {
 			if (find_directory(directories[i], &path) == B_OK
 				&& path.Append(subDirectories[j]) == B_OK
 				&& directory.SetTo(path.Path()) == B_OK
@@ -202,6 +206,7 @@ AddOnManager::_UnregisterAddOns()
 	int32 exitValue;
 	wait_for_thread(fAddOnMonitor->Thread(), &exitValue);
 	delete fHandler;
+	fHandler = NULL;
 
 	// We have to stop manually the add-ons because the monitor doesn't
 	// disable them on exit
@@ -498,6 +503,9 @@ AddOnManager::_RegisterMethod(BInputServerMethod* method, const entry_ref& ref,
 
 	return B_OK;
 }
+
+
+// #pragma mark -
 
 
 void
@@ -830,8 +838,17 @@ AddOnManager::_HandleDeviceMonitor(BMessage* message)
 			const char* path;
 			const char* watchedPath;
 			if (message->FindString("watched_path", &watchedPath) != B_OK
-				|| message->FindString("path", &path) != B_OK)
+				|| message->FindString("path", &path) != B_OK) {
+#if DEBUG
+				char string[1024];
+				sprintf(string, "message does not contain all fields - "
+					"watched_path: %d, path: %d\n",
+					message->HasString("watched_path"),
+					message->HasString("path"));
+				debugger(string);
+#endif
 				return;
+			}
 
 			// Notify all watching devices
 
