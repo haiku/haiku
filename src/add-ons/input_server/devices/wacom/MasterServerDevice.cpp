@@ -290,8 +290,11 @@ MasterServerDevice::_HandleNodeMonitor(BMessage* message)
 						PRINT(("removing device '%s'\n", pointingDevice->DevicePath()));
 
 						if (_LockDevices()) {
-							if (fDevices.RemoveItem((void*)pointingDevice))
+							if (fDevices.RemoveItem((void*)pointingDevice)) {
+								
 								delete pointingDevice;
+								i--;
+							}
 							_UnlockDevices();
 						}
 					}
