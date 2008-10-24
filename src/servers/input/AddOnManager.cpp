@@ -156,7 +156,6 @@ AddOnManager::_RegisterAddOns()
 	fHandler = new MonitorHandler(this);
 	fAddOnMonitor = new AddOnMonitor(fHandler);
 
-#ifndef APPSERVER_TEST_MODE
 	err = fAddOnMonitor->InitCheck();
 	if (err != B_OK) {
 		ERROR("AddOnManager::RegisterAddOns(): fAddOnMonitor->InitCheck() "
@@ -190,10 +189,6 @@ AddOnManager::_RegisterAddOns()
 			}
 		}
 	}
-#else	// APPSERVER_TEST_MODE
-	BEntry entry("/boot/home/svnhaiku/trunk/tests/servers/input/view_input_device/input_server/devices/ViewInputDevice");
-	_RegisterAddOn(entry);
-#endif
 }
 
 
@@ -388,13 +383,14 @@ AddOnManager::_RegisterDevice(BInputServerDevice* device, const entry_ref& ref,
 	}
 
 	info->ref = ref;
-	info->image = addOnImage;
 	info->add_on = device;
 
 	if (!fDeviceList.AddItem(info)) {
 		delete info;
 		return B_NO_MEMORY;
 	}
+
+	info->image = addOnImage;
 
 	return B_OK;
 }
@@ -425,7 +421,6 @@ AddOnManager::_RegisterFilter(BInputServerFilter* filter, const entry_ref& ref,
 	}
 
 	info->ref = ref;
-	info->image = addOnImage;
 	info->add_on = filter;
 
 	if (!fFilterList.AddItem(info)) {
@@ -439,6 +434,9 @@ AddOnManager::_RegisterFilter(BInputServerFilter* filter, const entry_ref& ref,
 		delete info;
 		return B_NO_MEMORY;
 	}
+
+	info->image = addOnImage;
+
 	return B_OK;
 }
 
@@ -468,7 +466,6 @@ AddOnManager::_RegisterMethod(BInputServerMethod* method, const entry_ref& ref,
 	}
 
 	info->ref = ref;
-	info->image = addOnImage;
 	info->add_on = method;
 
 	if (!fMethodList.AddItem(info)) {
@@ -482,6 +479,8 @@ AddOnManager::_RegisterMethod(BInputServerMethod* method, const entry_ref& ref,
 		delete info;
 		return B_NO_MEMORY;
 	}
+
+	info->image = addOnImage;
 
 	if (gInputServer->MethodReplicant() == NULL) {
 		_LoadReplicant();
