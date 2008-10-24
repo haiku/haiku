@@ -210,7 +210,7 @@ search_executable_in_path_list(const char *name, const char *pathList,
 			}
 			_kern_close(fd);
 		}
-		
+
 		pathListLen = pathListEnd - pathEnd - 1;
 		pathList = pathEnd + 1;
 	}
@@ -395,6 +395,14 @@ runtime_loader(void *_args)
 
 		for (i = 0; i < gProgramArgs->env_count; i++)
 			gProgramArgs->env[i] += relocationOffset;
+	}
+
+	if (!strcmp(gProgramArgs->program_path,
+			"/boot/beos/system/runtime_loader")) {
+		// TODO: this is a (temporary) work-around for bug #2273 which causes
+		// the cache's mutex to be locked twice when starting the runtime_loader
+		// itself.
+		return 1;
 	}
 
 #if DEBUG_RLD
