@@ -195,7 +195,7 @@ PartitionRecorder::_Record(BPartition* partition)
 	message.AddString("type", type);
 	message.AddString("path", partitionPath.Path());
 	message.AddInt8("drive", fDrive);
-	message.AddInt64("size", partition->ContentSize());	
+	message.AddInt64("size", partition->Size());	
 	// Specific data
 	off_t offset = partition->Offset();
 	message.AddInt64("offset", offset);
