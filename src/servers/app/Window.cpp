@@ -1540,7 +1540,7 @@ Window::HasInSubset(const Window* window) const
 	// we have a few special feels that have a fixed order
 
 	const int32 kFeels[] = {kPasswordWindowFeel, kWindowScreenFeel,
-		B_MODAL_ALL_WINDOW_FEEL, B_FLOATING_ALL_WINDOW_FEEL, 0};
+		B_MODAL_ALL_WINDOW_FEEL, B_FLOATING_ALL_WINDOW_FEEL};
 
 	for (uint32 order = 0;
 			order < sizeof(kFeels) / sizeof(kFeels[0]); order++) {
