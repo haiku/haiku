@@ -393,7 +393,7 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 		return;
 	}
 
-	strncpy(*chars, &(fChars[offset+1]), *numBytes );
+	strncpy(*chars, &(fChars[offset + 1]), *numBytes );
 	(*chars)[*numBytes] = 0; 	
 }
 
