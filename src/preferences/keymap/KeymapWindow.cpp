@@ -47,7 +47,7 @@ static const uint32 kMsgUseKeymap = 'UkyM';
 static const uint32 kMsgRevertKeymap = 'Rvrt';
 
 KeymapWindow::KeymapWindow()
-	:	BWindow(BRect(80, 25, 692, 281), "Keymap", B_TITLED_WINDOW,
+	:	BWindow(BRect(80, 25, 750, 280), "Keymap", B_TITLED_WINDOW,
 			B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS )
 {
 	fFirstTime = true;
@@ -66,7 +66,7 @@ KeymapWindow::KeymapWindow()
 	// Create the Maps box and contents
 	AddMaps(placeholderView);
 	
-	fMapView = new MapView(BRect(150, 9, 600, 189), "mapView", &fCurrentMap);
+	fMapView = new MapView(BRect(205, 15, 655, 189), "mapView", &fCurrentMap);
 	placeholderView->AddChild(fMapView);
 	
 	BMenuItem *item = fFontMenu->FindMarked();
@@ -75,12 +75,12 @@ KeymapWindow::KeymapWindow()
 	}
 	
 	// The 'Use' button
-	fUseButton = new BButton(BRect(527, 200, 600, 220), "useButton", "Use",
+	fUseButton = new BButton(BRect(582, 200, 655, 220), "useButton", "Use",
 		new BMessage(kMsgUseKeymap));
 	placeholderView->AddChild(fUseButton);
 	
 	// The 'Revert' button
-	fRevertButton = new BButton(BRect(442, 200, 515, 220), "revertButton",
+	fRevertButton = new BButton(BRect(497, 200, 570, 220), "revertButton",
 		 "Revert", new BMessage(kMsgRevertKeymap));
 	placeholderView->AddChild(fRevertButton);
 	UpdateButtons();
@@ -187,35 +187,29 @@ KeymapWindow::AddMenuBar()
 void 
 KeymapWindow::AddMaps(BView *placeholderView)
 {
-	// The Maps box
-	BRect bounds = BRect(9, 11, 140, 226);
-	BBox *mapsBox = new BBox(bounds);
-	mapsBox->SetLabel("Maps");
-	placeholderView->AddChild(mapsBox);
-
 	// The System list
-	BStringView *systemLabel = new BStringView(BRect(13, 13, 113, 33), "system", "System");
-	mapsBox->AddChild(systemLabel);
+	BStringView *systemLabel = new BStringView(BRect(13, 5, 143, 28), "system", "System:");
+	placeholderView->AddChild(systemLabel);
 	
-	bounds = BRect(13, 35, 103, 105);
+	BRect bounds = BRect(13, 27, 173, 130);
 	fSystemListView = new BListView(bounds, "systemList");
 	
-	mapsBox->AddChild(new BScrollView("systemScrollList", fSystemListView,
+	placeholderView->AddChild(new BScrollView("systemScrollList", fSystemListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true));
 	fSystemListView->SetSelectionMessage(new BMessage(kMsgSystemMapSelected));
 
 	// The User list
-	BStringView *userLabel = new BStringView(BRect(13, 110, 113, 128), "user", "User");
-	mapsBox->AddChild(userLabel);
+	BStringView *userLabel = new BStringView(BRect(13, 135, 143, 153), "user", "User:");
+	placeholderView->AddChild(userLabel);
 
-	bounds = BRect(13, 130, 103, 200);
+	bounds = BRect(13, 155, 173, 225);
 	fUserListView = new BListView(bounds, "userList");
 	// '(Current)'
 	KeymapListItem *currentKeymapItem = static_cast<KeymapListItem*>(fUserListView->FirstItem());
 	if (currentKeymapItem != NULL)
 		fUserListView->AddItem(currentKeymapItem);
 	// Saved keymaps
-	mapsBox->AddChild(new BScrollView("userScrollList", fUserListView,
+	placeholderView->AddChild(new BScrollView("userScrollList", fUserListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true));
 	fUserListView->SetSelectionMessage(new BMessage(kMsgUserMapSelected));
 	
@@ -1574,7 +1568,6 @@ MapView::MessageReceived(BMessage *msg)
 				
 				if (Window()->IsActive()
 					&& msg->what == B_KEY_DOWN) {
-					fTextView->MakeFocus();
 					char *str = NULL;
 					int32 numBytes;
 					if (fActiveDeadKey) {
