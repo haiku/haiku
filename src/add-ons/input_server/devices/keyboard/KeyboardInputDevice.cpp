@@ -379,8 +379,8 @@ KeyboardInputDevice::KeyboardInputDevice()
 {
 	CALLED();
 
-	StartMonitoringDevice(kKeyboardDevicesDirectory);
 	_RecursiveScan(kKeyboardDevicesDirectory);
+	StartMonitoringDevice(kKeyboardDevicesDirectory);
 }
 
 
@@ -525,14 +525,32 @@ KeyboardInputDevice::_HandleMonitor(BMessage* message)
 	const char* path;
 	int32 opcode;
 	if (message->FindInt32("opcode", &opcode) != B_OK
-		|| opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED
+		|| (opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED)
 		|| message->FindString("path", &path) != B_OK)
 		return B_BAD_VALUE;
 
 	if (opcode == B_ENTRY_CREATED)
 		return _AddDevice(path);
 
+#if 0
 	return _RemoveDevice(path);
+#else
+	// Don't handle B_ENTRY_REMOVED, let the control thread take care of it.
+	return B_OK;
+#endif
+}
+
+
+keyboard_device*
+KeyboardInputDevice::_FindDevice(const char* path) const
+{
+	for (int i = fDevices.CountItems() - 1; i >= 0; i--) {
+		keyboard_device* device = fDevices.ItemAt(i);
+		if (strcmp(device->path, path) == 0)
+			return device;
+	}
+
+	return NULL;
 }
 
 
@@ -540,6 +558,9 @@ status_t
 KeyboardInputDevice::_AddDevice(const char* path)
 {
 	CALLED();
+
+	_RemoveDevice(path);
+
 	keyboard_device* device = new(std::nothrow) keyboard_device(path);
 	if (device == NULL)
 		return B_NO_MEMORY;
@@ -560,22 +581,20 @@ status_t
 KeyboardInputDevice::_RemoveDevice(const char* path)
 {
 	CALLED();
-	keyboard_device* device;
-	for (int i = 0; (device = fDevices.ItemAt(i)) != NULL; i++) {
-		if (!strcmp(device->path, path)) {
-			fDevices.RemoveItemAt(i);
 
-			input_device_ref* devices[2];
-			devices[0] = &device->device_ref;
-			devices[1] = NULL;
-			UnregisterDevices(devices);
+	keyboard_device* device = _FindDevice(path);
+	if (device == NULL)
+		return B_ENTRY_NOT_FOUND;
 
-			delete device;
-			return B_OK;
-		}
-	}
+	input_device_ref* devices[2];
+	devices[0] = &device->device_ref;
+	devices[1] = NULL;
 
-	return B_ENTRY_NOT_FOUND;
+	UnregisterDevices(devices);
+
+	fDevices.RemoveItem(device);
+
+	return B_OK;
 }
 
 
@@ -598,8 +617,12 @@ KeyboardInputDevice::_DeviceWatcher(void* arg)
 	LOG("%s\n", __PRETTY_FUNCTION__);
 
 	while (device->active) {
-		if (ioctl(device->fd, KB_READ, &buffer) != B_OK)
+		if (ioctl(device->fd, KB_READ, &buffer) != B_OK) {
+			device->device_watcher = -1;
+			device->owner->_RemoveDevice(device->path);
+			// TOAST!
 			return 0;
+		}
 
 		uint32 keycode = 0;
 		bool isKeyDown = false;
@@ -697,7 +720,7 @@ KeyboardInputDevice::_DeviceWatcher(void* arg)
 			msg->AddInt32("modifiers", device->modifiers);
 			msg->AddData("states", B_UINT8_TYPE, states, 16);
 
-			if (owner->EnqueueMessage(msg)!=B_OK)
+			if (owner->EnqueueMessage(msg) != B_OK)
 				delete msg;
 
 			if (modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK))
@@ -717,8 +740,8 @@ KeyboardInputDevice::_DeviceWatcher(void* arg)
 
 			BMessage* msg = new BMessage;
 			if (msg == NULL) {
-				free(string);
-				free(rawString);
+				delete[] string;
+				delete[] rawString;
 				continue;
 			}
 

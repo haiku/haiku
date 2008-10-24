@@ -31,6 +31,10 @@ public:
 								uint32 command, BMessage* message);
 
 private:
+	friend class MouseDevice;
+	// TODO: needed by the control thread to remove a dead device
+	// find a better way...
+
 			status_t		_HandleMonitor(BMessage* message);
 			void			_RecursiveScan(const char* directory);
 

@@ -60,10 +60,15 @@ public:
 	virtual status_t		SystemShuttingDown();
 
 private:
+	friend struct keyboard_device;
+	// TODO: needed by the control thread to remove a dead device
+	// find a better way...
+
 			status_t		_HandleMonitor(BMessage* message);
 			status_t		_InitFromSettings(void* cookie, uint32 opcode = 0);
 			void			_RecursiveScan(const char* directory);
 
+			keyboard_device* _FindDevice(const char* path) const;
 			status_t		_AddDevice(const char* path);
 			status_t		_RemoveDevice(const char* path);
 
