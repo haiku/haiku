@@ -301,6 +301,13 @@ KeymapWindow::MessageReceived(BMessage* message)
 				static_cast<KeymapListItem*>(fSystemListView->ItemAt(fSystemListView->CurrentSelection()));
 			if (keymapListItem) {
 				fCurrentMap.Load(keymapListItem->KeymapEntry());
+
+				if (fFirstTime) {
+					fPreviousMap.Load(keymapListItem->KeymapEntry());
+					fAppliedMap.Load(keymapListItem->KeymapEntry());
+					fFirstTime = false;
+				}
+
 				fMapView->Invalidate();
 				
 				// Deselect item in other BListView
@@ -375,9 +382,11 @@ KeymapWindow::RevertKeymap()
 	fPreviousMap.Use();
 	fAppliedMap.Load(ref);
 	
-	//select and load it (first item in fUserListView is a ref to Key_map)
-	fUserListView->DeselectAll();
-	fUserListView->Select(0);		
+	fCurrentMapName = GetActiveKeymapName();
+		
+	if (!SelectCurrentMap(fSystemListView))
+		if (!SelectCurrentMap(fUserListView))
+			fUserListView->Select(0L);		
 }
 
 
@@ -400,8 +409,8 @@ KeymapWindow::UseKeymap()
 	}
 	fCurrentMap.Use();
 	fAppliedMap.Load(ref);
-	
-	fUserListView->Select(0);
+
+	fCurrentMapName = GetActiveKeymapName();
 }
 
 
@@ -446,16 +455,7 @@ KeymapWindow::FillUserMaps()
 	
 	fUserListView->AddItem(new KeymapListItem(ref, "(Current)"));
 
-	BNode node(&ref);
-	char name[B_FILE_NAME_LENGTH];
-	name[0] = '\0';
-	if (node.InitCheck() == B_OK) {
-		ssize_t readSize = node.ReadAttr("keymap:name", B_STRING_TYPE, 0, name, sizeof(name) - 1);
-		if (readSize > 0) {
-			name[readSize] = '\0';
-			fCurrentMapName = name;
-		}
-	}	
+	fCurrentMapName = GetActiveKeymapName();
 
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
@@ -468,6 +468,28 @@ KeymapWindow::FillUserMaps()
 		while( directory.GetNextRef(&ref) == B_OK ) {
 			fUserListView->AddItem(new KeymapListItem(ref));
 		}
+}
+
+
+BString
+KeymapWindow::GetActiveKeymapName()
+{
+	BString mapName = "(Current)";	//safe default
+
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return mapName;
+	
+	path.Append("Key_map");
+
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+	BNode node(&ref);
+	
+	if (node.InitCheck() == B_OK)
+		node.ReadAttrString("keymap:name", &mapName);
+
+	return mapName;
 }
 
 

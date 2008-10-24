@@ -86,6 +86,7 @@ protected:
 	void 				FillUserMaps();
 	
 	bool				SelectCurrentMap(BListView *list);
+	BString				GetActiveKeymapName();
 
 	BListView			*fSystemListView;
 	BListView			*fUserListView;
