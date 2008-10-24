@@ -44,7 +44,8 @@ class BottomlineWindow;
 class InputDeviceListItem {
 	public:
 		InputDeviceListItem(BInputServerDevice& serverDevice,
-			input_device_ref& device);
+			const input_device_ref& device);
+		~InputDeviceListItem();
 
 		void Start();
 		void Stop();

@@ -64,13 +64,25 @@ KeymapMethod InputServer::gKeymapMethod;
 extern "C" _EXPORT BView* instantiate_deskbar_item();
 
 
+// #pragma mark - InputDeviceListItem
+
+
 InputDeviceListItem::InputDeviceListItem(BInputServerDevice& serverDevice,
-	input_device_ref& device)
+		const input_device_ref& device)
 	:
 	fServerDevice(&serverDevice),
-	fDevice(device),
+	fDevice(),
 	fRunning(false)
 {
+	fDevice.name = strdup(device.name);
+	fDevice.type = device.type;
+	fDevice.cookie = device.cookie;
+}
+
+
+InputDeviceListItem::~InputDeviceListItem()
+{
+	free(fDevice.name);
 }
 
 
@@ -217,6 +229,8 @@ InputServer::InputServer()
 	fAddOnManager = new(std::nothrow) ::AddOnManager(SafeMode());
 	if (fAddOnManager != NULL) {
 		fAddOnManager->Run();
+		// TODO: The BLooper thread may already start running here,
+		// is this a problem?
 		fAddOnManager->LoadState();
 	}
 
@@ -1124,8 +1138,8 @@ InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
 
 				if (item->ServerDevice() == &serverDevice && item->HasName(device->name)) {
 					item->Stop();
-					fInputDeviceList.RemoveItem(j);
-					delete item;
+					if (fInputDeviceList.RemoveItem(j))
+						delete item;
 					break;
 				}
 			}
@@ -1137,8 +1151,8 @@ InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
 
 			if (item->ServerDevice() == &serverDevice) {
 				item->Stop();
-				fInputDeviceList.RemoveItem(i);
-				delete item;
+				if (fInputDeviceList.RemoveItem(i))
+					delete item;
 			}
 		}
 	}
@@ -1170,6 +1184,7 @@ InputServer::RegisterDevices(BInputServerDevice& serverDevice,
 			InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(j);
 
 			if (item->HasName(device->name)) {
+debug_printf("InputServer::RegisterDevices() device_ref already exists: %s\n", device->name);
 				PRINT(("RegisterDevices found %s\n", device->name));
 				found = true;
 				break;
@@ -1396,6 +1411,7 @@ InputServer::_EventLoop()
 			if ((err = event->Unflatten(buffer)) < 0) {
 				PRINTERR(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
 				delete event;
+				continue;
 			}
 
 			events.AddItem(event);
