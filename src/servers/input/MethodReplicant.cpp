@@ -1,18 +1,15 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2004, Haiku
-//
-//  This software is part of the Haiku distribution and is covered
-//  by the Haiku license.
-//
-//
-//  File:			MethodReplicant.cpp
-//  Authors:		Jérôme Duval,
-//
-//  Description:	Input Server
-//  Created:		October 13, 2004
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright (c) 2004-2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT/X11 license.
+ *
+ * Authors:	
+ *		Jérôme Duval
+ */
+
+#include "MethodReplicant.h"
+
+#include <new>
+#include <string.h>
 
 #include <Alert.h>
 #include <AppDefs.h>
@@ -24,8 +21,6 @@
 #include <Messenger.h>
 #include <PopUpMenu.h>
 
-#include <string.h>
-#include "MethodReplicant.h"
 #include "remote_icon.h"
 
 #include "InputServerTypes.h"
@@ -84,7 +79,7 @@ MethodReplicant::MethodReplicant(BMessage *message)
 MethodReplicant::~MethodReplicant()
 {
 	delete fSegments;
-	delete fSignature;
+	free(fSignature);
 }
 
 
@@ -95,7 +90,7 @@ MethodReplicant::Instantiate(BMessage *data)
 	CALLED();
 	if (!validate_instantiation(data, REPLICANT_CTL_NAME))
 		return NULL;
-	return new MethodReplicant(data);
+	return new(std::nothrow) MethodReplicant(data);
 }
 
 
