@@ -327,6 +327,11 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 			case ' ': flags |= SPACE; goto repeat;
 			case '#': flags |= SPECIAL; goto repeat;
 			case '0': flags |= ZEROPAD; goto repeat;
+
+			case '%':
+				if (!put_character(&string, &bytesLeft, format[0]))
+					break;
+				continue;
 		}
 
 		/* get field width */
