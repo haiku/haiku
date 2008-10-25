@@ -51,6 +51,38 @@ const uint32 kMsgRemoveType = 'rmtp';
 const uint32 kMsgTypeRemoved = 'tprm';
 
 
+// TextView that filters the tab key to be able to tab-navigate while editing	
+class TabFilteringTextView : public BTextView {
+	public:
+		TabFilteringTextView(BRect frame, const char* name, BRect textRect,
+			uint32 resizeMask, uint32 flags = B_WILL_DRAW | B_PULSE_NEEDED);
+		virtual ~TabFilteringTextView();
+		virtual void KeyDown(const char* bytes, int32 count);
+};
+
+
+TabFilteringTextView::TabFilteringTextView(BRect frame, const char* name,
+	BRect textRect, uint32 resizeMask, uint32 flags)
+	:	BTextView(frame, name, textRect, resizeMask, flags)
+{
+}
+
+
+TabFilteringTextView::~TabFilteringTextView()
+{
+}
+
+
+void
+TabFilteringTextView::KeyDown(const char* bytes, int32 count)
+{
+	if (bytes[0] == B_TAB)
+		BView::KeyDown(bytes, count);
+	else
+		BTextView::KeyDown(bytes, count);
+}
+
+
 class SupportedTypeItem : public BStringItem {
 	public:
 		SupportedTypeItem(const char* type);
@@ -494,8 +526,9 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.top += 1.0f;
 	rect.right = box->Bounds().Width() - 10.0f - B_V_SCROLL_BAR_WIDTH;
 	rect.bottom = rect.top + fShortDescriptionControl->Bounds().Height() * 3.0f - 1.0f;
-	fLongDescriptionView = new BTextView(rect, "long desc",
-		rect.OffsetToCopy(B_ORIGIN), B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
+	fLongDescriptionView = new TabFilteringTextView(rect, "long desc",
+		rect.OffsetToCopy(B_ORIGIN), B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS
+		| B_NAVIGABLE);
 	fLongDescriptionView->SetMaxBytes(sizeof(versionInfo.long_info));
 
 	scrollView = new BScrollView("desc scrollview", fLongDescriptionView,
