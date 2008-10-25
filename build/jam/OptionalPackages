@@ -221,12 +221,10 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) = 1 {
 		# gcc and binutils
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-080323
-			: $(baseURL)/gcc-2.95.3-haiku-080323.zip
-			: develop tools
+		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-081024
+			: $(baseURL)/gcc-2.95.3-haiku-081024.zip
+			:
 		;
-		AddSymlinkToHaikuImage develop tools : gcc-2.95.3-haiku-080323
-			: gnupro ;
 
 		# other tools
 		InstallOptionalHaikuImagePackage autoconf-2.61-gcc2-2008-03-24
