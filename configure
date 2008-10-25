@@ -240,7 +240,7 @@ buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
 buildCrossToolsMachine=
 alternativeGCCOutputDir=
 
-haikuRequiredLegacyGCCVersion="2.95.3-haiku-080323"
+haikuRequiredLegacyGCCVersion="2.95.3-haiku-081024"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
 
