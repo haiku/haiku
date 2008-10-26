@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
+ *		Rene Gollent (rene@gollent.com)
  */
 
 //!	BDragger represents a replicant "handle".
@@ -595,9 +596,10 @@ BDragger::_DetermineRelationship()
 
 	if (fRelation == TARGET_IS_PARENT) {
 		BRect bounds (Frame());
-		if (bounds.left < 0 || bounds.top < 0) 
-			MoveTo(Parent()->Bounds().right - bounds.Width(),
-				Parent()->Bounds().bottom - bounds.Height()); 
+		BRect parentBounds (Parent()->Bounds());
+		if (!parentBounds.Contains(bounds)) 
+			MoveTo(parentBounds.right - bounds.Width(),
+				parentBounds.bottom - bounds.Height()); 
 	}	
 
 	return B_OK;
