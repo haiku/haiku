@@ -593,6 +593,13 @@ BDragger::_DetermineRelationship()
 			return B_ERROR;
 	}
 
+	if (fRelation == TARGET_IS_PARENT) {
+		BRect bounds (Frame());
+		if (bounds.left < 0 || bounds.top < 0) 
+			MoveTo(Parent()->Bounds().right - bounds.Width(),
+				Parent()->Bounds().bottom - bounds.Height()); 
+	}	
+
 	return B_OK;
 }
 
