@@ -674,8 +674,8 @@ DefaultDecorator::_DoLayout()
 			fMaxTabSize += fTextOffset;
 		fMaxTabSize += fMinTabSize;
 
-		float tabSize = fLook != kLeftTitledWindowLook
-			? fFrame.Width() : fFrame.Height();
+		float tabSize = (fLook != kLeftTitledWindowLook
+			? fFrame.Width() : fFrame.Height()) + fBorderWidth * 2;
 		if (tabSize < fMinTabSize)
 			tabSize = fMinTabSize;
 		if (tabSize > fMaxTabSize)
