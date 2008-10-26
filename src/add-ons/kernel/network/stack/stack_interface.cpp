@@ -94,14 +94,13 @@ stack_interface_recvfrom(net_socket* socket, void* data, size_t length,
 	message.msg_controllen = 0;
 	message.msg_flags = 0;
 
-	status_t error = gNetSocketModule.receive(socket, &message, data, length,
+	ssize_t received = gNetSocketModule.receive(socket, &message, data, length,
 		flags);
-	if (error < 0)
-		return error;
 
-	if (_addressLength != NULL)
+	if (received >= 0 && _addressLength != NULL)
 		*_addressLength = message.msg_namelen;
-	return B_OK;
+
+	return received;
 }
 
 
