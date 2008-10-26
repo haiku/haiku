@@ -96,7 +96,7 @@ stack_interface_recvfrom(net_socket* socket, void* data, size_t length,
 
 	status_t error = gNetSocketModule.receive(socket, &message, data, length,
 		flags);
-	if (error != B_OK)
+	if (error < 0)
 		return error;
 
 	if (_addressLength != NULL)
