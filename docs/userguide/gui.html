@@ -15,6 +15,8 @@
 	<p>
 		<a href="contents.html">Contents</a>
 		&nbsp;&nbsp;&nbsp;
+		Previous: <a href="filesystem-layout.html">Filesystem layout</a>
+		&nbsp;&nbsp;&nbsp;
 		Next: <a href="workspaces.html">Workspaces</a>
 	</p>
 </div>
@@ -23,13 +25,9 @@
 
 <p>Haiku's graphical user interface is an integral part of the system. Unlike Unix-based operating systems, there's no separate window manager and booting just into a command line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.
 </p><p>As you probably have experience with other graphical environments, let's skip over the standards like menus, right-click context menus, drag&drop etc. Let's have a look at the few unique aspects of Haiku's GUI instead.</p>
-</p><br>
-<p>Before we start with that, there's one more thing you'll probably run into quite quickly: By default, Haiku's option key, to invoke commands from menus for example, is not the usual <tt>CTRL</tt> key, but <tt>ALT</tt> instead. This has historical reasons, because the BeOS was inspired somewhat by MacOS. After you get used to it, it actually feels better as e.g. <tt>ALT+C</tt> and <tt>ALT+V</tt> is reached more conveniently on the keyboard and these commands seemlessly integrate into the <acronym title="Bourne Again Shell">bash</acronym> shell of the Terminal.
-</p><p>In any case, you can switch to the maybe more familiar <tt>CTRL</tt> key in the <i>Menu</i> preferences.
 </p>
-<br />
-<img src="gui-images/gui.png" alt="gui.png" width="644" height="404"
-</p><p><br />
+<img src="gui-images/gui.png" alt="gui.png" width="644" height="404">
+<br>
 There are only a few things in Haiku's GUI that aren't obvious and deserve an explanation.
 </p><p>
 [1] The Deskbar is Haiku's "Start" menu and taskbar, if you will. See topic <a href="deskbar.html">Deskbar</a>.<br>
@@ -39,7 +37,34 @@ There are only a few things in Haiku's GUI that aren't obvious and deserve an ex
 [3] The close button.<br>
 [4] The "alternative size" button (expands window to full screen in most applications).<br>
 [5] The resize button. Dragging anywhere else on a window's border will move the window.<br>
-</p><p>That's pretty much all there is to Haiku's GUI widgets in general. You'll find more information in <a href="welcome.html#system">Getting to know the system</a>.
+</p>
+
+<h2><a name="open-save-panel">Open and save panels</a></h2>
+<p>When opening or saving a file from any application, a panel like this opens:</p>
+<img src="gui-images/open-save.png" alt="open-save.png" width="645" height="362">
+<br>
+<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a drop-down menu for different file formats and their settings.<br>
+You can enter parent folders with the drop-down menu above the file listing.
+</p><p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menubar) into the panel. This changes the panel to that new location.
+</p>
+
+<h3><a name="open-save-shortcuts">Keyboard shortcuts</a></h3>
+<p>You can use many of the shortcuts also used in Tracker. Besides the commands that are also available through the <i>File</i> menu, there are a few not that obvious:
+</p><p><table border="0" cellpadding="0" cellspacing="0">
+<tr><td><tt>ALT+CURSOR-UP</tt></td><td width="25"></td><td> Open parent folder.</td></tr>
+<tr><td class="onelinetop"><tt>ALT+CURSOR-DOWN or RETURN</tt></td><td></td><td> Open selected folder.</td></tr>
+<tr><td><tt>ALT+D</tt></td><td></td><td> Takes you to your Desktop.</td></tr>
+<tr><td><tt>ALT+H</tt></td><td></td><td> Takes you to your Home folder.</td></tr>
+</table>
+</p>
+
+<h3><a name="favorites-recent">Favorites and recent folders</a></h3>
+<p>
+The menu <i>Favorites</i> provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<img src="gui-images/favorites.png" alt="favorites.png" width="455" height="209">
+<br>
+<p>To add a Favorite, you simply navigate to your destination and choose <i>Favorites | Add Current Folder</i>. From now on it will appear in every open/save panel. To remove a Favorite, choose <i>Favorites | Configure Favorites...</i> and delete its entry.<br>
+All Favorites are kept in <tt>/boot/home/config/settings/Tracker/Go/</tt>. So you might as well add and remove links to files and folders there directly.
 </p>
 
 </div>
@@ -47,6 +72,8 @@ There are only a few things in Haiku's GUI that aren't obvious and deserve an ex
 <div class="bottomnav">
 	<p>
 		<a href="contents.html">Contents</a>
+		&nbsp;&nbsp;&nbsp;
+		Previous: <a href="filesystem-layout.html">Filesystem layout</a>
 		&nbsp;&nbsp;&nbsp;
 		Next: <a href="workspaces.html">Workspaces</a>
 	</p>
