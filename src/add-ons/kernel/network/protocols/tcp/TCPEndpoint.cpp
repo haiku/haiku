@@ -732,7 +732,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		return EDESTADDRREQ;
 	if (!is_writable(fState)) {
 		// we only send signals when called from userland
-		if (gStackModule->is_syscall)
+		if (gStackModule->is_syscall())
 			send_signal(find_thread(NULL), SIGPIPE);
 		return EPIPE;
 	}
@@ -758,7 +758,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 
 			if (!is_writable(fState)) {
 				// we only send signals when called from userland
-				if (gStackModule->is_syscall)
+				if (gStackModule->is_syscall())
 					send_signal(find_thread(NULL), SIGPIPE);
 				return EPIPE;
 			}
