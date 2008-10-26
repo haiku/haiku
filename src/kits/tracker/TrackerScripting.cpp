@@ -40,6 +40,7 @@ All rights reserved.
 
 #define kPropertyTrash "Trash"
 #define kPropertyFolder "Folder"
+#define kPropertyPreferences "Preferences"
 
 #if 0
 
@@ -73,6 +74,15 @@ const property_info kTrackerPropertyList[] = {
 		"create Folder to path # creates a new folder",
 		0,
 		{ B_REF_TYPE },
+		{},
+		{}
+	},
+	{	kPropertyPreferences,
+		{ B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		"shows Tracker preferences",
+		0,
+		{},
 		{},
 		{}
 	},
@@ -274,8 +284,18 @@ TTracker::DeleteProperty(BMessage */*specifier*/, int32 /*form*/,
 
 
 bool
-TTracker::ExecuteProperty(BMessage *, int32 , const char *, BMessage *)
+TTracker::ExecuteProperty(BMessage *, int32 form, const char *property, BMessage *)
 {
+	if (strcmp(property, kPropertyPreferences) == 0) {
+		
+		if (form != B_DIRECT_SPECIFIER)
+			// only support direct specifier
+			return false;
+		
+		ShowSettingsWindow();
+		return true;
+
+	}
 	return false;
 }
 
