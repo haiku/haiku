@@ -76,7 +76,7 @@ struct queued_message : DoublyLinkedListLinkImpl<queued_message> {
 			free(message);
 	}
 
-	status_t copy_to_user_buffer(void *_message, ssize_t _length)
+	ssize_t copy_to_user_buffer(void *_message, ssize_t _length)
 	{
 		if (_length > length)
 			_length = length;
@@ -85,7 +85,7 @@ struct queued_message : DoublyLinkedListLinkImpl<queued_message> {
 			|| user_memcpy((void *)((char *)_message + sizeof(long)), message,
 			_length) != B_OK)
 			return B_ERROR;
-		return B_OK;
+		return _length;
 	}
 
 	bool		initOK;
@@ -753,8 +753,7 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 	}
 
 	queued_message *message = NULL;
-	bool notReceived = true;
-	while (notReceived) {
+	while (true) {
 		message = messageQueue->Remove(messageType);
 
 		if (message == NULL && !(messageFlags & IPC_NOWAIT)) {
@@ -776,15 +775,13 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 				&& sequenceNumber != messageQueue->SequenceNumber())) {
 				TRACE_ERROR(("xsi_msgrcv: message queue id %d (sequence = %ld) "
 					"got destroyed\n", messageQueueID, sequenceNumber));
-				notReceived = false;
-				result = EIDRM;
+				return EIDRM;
 			} else if (result == B_INTERRUPTED) {
 				TRACE_ERROR(("xsi_msgrcv: thread %d got interrupted while "
 					"waiting on message queue %d\n",(int)thread->id,
 					messageQueueID));
 				messageQueue->Deque(&queueEntry, /* waitForMessage */ true);
-				notReceived = false;
-				result = EINTR;
+				return EINTR;
 			} else {
 				messageQueueLocker.Lock();
 				messageQueueHashLocker.Unlock();
@@ -805,16 +802,16 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 				return E2BIG;
 			}
 
-			status_t result
+			ssize_t result
 				= message->copy_to_user_buffer(messagePointer, messageSize);
-			if (result != B_OK) {
+			if (result < 0) {
 				messageQueue->Insert(message);
 				return B_BAD_ADDRESS;
 			}
 
 			delete message;
 			TRACE(("xsi_msgrcv: message received correctly\n"));
-			notReceived = false;
+			return result;
 		}
 	}
 
