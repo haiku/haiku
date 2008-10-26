@@ -1,19 +1,14 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
-
-/*
-	Part of Open IDE bus manager
-
-	IDE bus manager interface
-*/
-
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef __IDE_TYPES_H__
 #define __IDE_TYPES_H__
 
+
 #include <iovec.h>
 #include <lendian_bitfield.h>
+
 
 // IDE task file.
 // contains the command block interpreted under different conditions with
@@ -239,14 +234,12 @@ enum {
 
 	// for 48 bits, the following flags tell which registers to load twice
 	ide_mask_features_48		= 0x80 | ide_mask_features,
-	ide_mask_sector_count_48	= 0x80 | ide_mask_sector_count,
-	ide_mask_LBA_low_48			= 0x100 | ide_mask_LBA_low,
-	ide_mask_LBA_mid_48			= 0x200 | ide_mask_LBA_mid,
-	ide_mask_LBA_high_48		= 0x400 | ide_mask_LBA_high,
+	ide_mask_sector_count_48	= 0x100 | ide_mask_sector_count,
+	ide_mask_LBA_low_48			= 0x200 | ide_mask_LBA_low,
+	ide_mask_LBA_mid_48			= 0x400 | ide_mask_LBA_mid,
+	ide_mask_LBA_high_48		= 0x800 | ide_mask_LBA_high,
 	
-	ide_mask_HOB				= 0x780
-
-	//ide_mask_all			= 0x7f
+	ide_mask_HOB				= 0xf80
 }; // ide_reg_mask
 
 // status register
