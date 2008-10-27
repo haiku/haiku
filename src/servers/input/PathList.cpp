@@ -16,7 +16,7 @@
 struct PathList::path_entry {
 	path_entry(const char* _path)
 		:
-		ref_count(0)
+		ref_count(1)
 	{
 		path = strdup(_path);
 	}
