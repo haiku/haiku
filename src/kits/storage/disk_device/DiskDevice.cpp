@@ -110,26 +110,28 @@ BDiskDevice::IsWriteOnceMedia() const
 status_t
 BDiskDevice::Eject(bool update)
 {
-/*	// get path
-	const char* path = Path();
-	status_t error = (path ? B_OK : B_NO_INIT);
+	if (fDeviceData == NULL)
+		return B_NO_INIT;
+
 	// check whether the device media is removable
-	if (error == B_OK && !IsRemovable())
-		error = B_BAD_VALUE;
+	if (!IsRemovableMedia())
+		return B_BAD_VALUE;
+
 	// open, eject and close the device
-	if (error == B_OK) {
-		int fd = open(path, O_RDONLY);
-		if (fd < 0 || ioctl(fd, B_EJECT_DEVICE) != 0)
-			error = errno;
-		if (fd >= 0)
-			close(fd);
-	}
-	if (error == B_OK && update)
-		error = Update();
-	return error;
-*/
-	// not implemented
-	return B_ERROR;
+	int fd = open(fDeviceData->path, O_RDONLY);
+	if (fd < 0)
+		return errno;
+
+	status_t status = B_OK;
+	if (ioctl(fd, B_EJECT_DEVICE) != 0)
+		status = errno;
+
+	close(fd);
+
+	if (status == B_OK && update)
+		status = Update();
+
+	return status;
 }
 
 
