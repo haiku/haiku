@@ -7107,7 +7107,7 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 	// Free all vnodes associated with this mount.
 	// They will be removed from the mount list by free_vnode(), so
 	// we don't have to do this.
-	while ((vnode = mount->vnodes.RemoveHead()) != NULL) {
+	while ((vnode = mount->vnodes.Head()) != NULL) {
 		free_vnode(vnode, false);
 	}
 
