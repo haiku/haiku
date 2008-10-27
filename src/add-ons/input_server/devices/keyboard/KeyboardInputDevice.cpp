@@ -379,8 +379,8 @@ KeyboardInputDevice::KeyboardInputDevice()
 {
 	CALLED();
 
-	_RecursiveScan(kKeyboardDevicesDirectory);
 	StartMonitoringDevice(kKeyboardDevicesDirectory);
+	_RecursiveScan(kKeyboardDevicesDirectory);
 }
 
 
@@ -618,8 +618,16 @@ KeyboardInputDevice::_DeviceWatcher(void* arg)
 
 	while (device->active) {
 		if (ioctl(device->fd, KB_READ, &buffer) != B_OK) {
-			device->device_watcher = -1;
-			device->owner->_RemoveDevice(device->path);
+			if (device->active) {
+				device->device_watcher = -1;
+				device->owner->_RemoveDevice(device->path);
+			} else {
+				// In case active is already false, another thread
+				// waits for this thread to quit, and may already hold
+				// locks that _RemoveDevice() wants to acquire. In another
+				// words, the device is already being removed, so we simply
+				// quit here.
+			}
 			// TOAST!
 			return 0;
 		}

@@ -234,8 +234,16 @@ MouseDevice::_Run()
 		memset(&movements, 0, sizeof(movements));
 
 		if (ioctl(fDevice, MS_READ, &movements) != B_OK) {
-			fThread = -1;
-			fTarget._RemoveDevice(fPath.String());
+			if (fActive) {
+				fThread = -1;
+				fTarget._RemoveDevice(fPath.String());
+			} else {
+				// In case active is already false, another thread
+				// waits for this thread to quit, and may already hold
+				// locks that _RemoveDevice() wants to acquire. In another
+				// words, the device is already being removed, so we simply
+				// quit here.
+			}
 			// TOAST!
 			return;
 		}
@@ -410,8 +418,8 @@ MouseInputDevice::MouseInputDevice()
 {
 	CALLED();
 
-	_RecursiveScan(kMouseDevicesDirectory);
 	StartMonitoringDevice(kMouseDevicesDirectory);
+	_RecursiveScan(kMouseDevicesDirectory);
 }
 
 
