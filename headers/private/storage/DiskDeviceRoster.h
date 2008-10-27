@@ -18,6 +18,7 @@ class BDiskDeviceVisitor;
 class BDiskScannerPartitionAddOn;
 class BDiskSystem;
 class BPartition;
+class BVolume;
 
 namespace BPrivate {
 	class AddOnImage;
@@ -114,6 +115,13 @@ public:
 								BDiskDeviceVisitor* visitor,
 								BDiskDevice* device = NULL,
 								BPartition** _partition = NULL);
+
+			status_t		FindPartitionByVolume(BVolume* volume,
+								BDiskDevice* device,
+								BPartition** _partition);
+			status_t		FindPartitionByMountPoint(const char* mountPoint,
+								BDiskDevice* device,
+								BPartition** _partition);
 
 			status_t		GetDeviceWithID(partition_id id,
 								BDiskDevice* device) const;

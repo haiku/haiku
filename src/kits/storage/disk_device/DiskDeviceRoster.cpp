@@ -19,6 +19,7 @@
 #include <Message.h>
 #include <Partition.h>
 #include <Path.h>
+#include <Volume.h>
 
 #include <syscalls.h>
 #include <ddm_userland_interface_defs.h>
@@ -186,7 +187,7 @@ BDiskDeviceRoster::UnregisterFileDevice(partition_id device)
 */
 bool
 BDiskDeviceRoster::VisitEachDevice(BDiskDeviceVisitor *visitor,
-								   BDiskDevice *device)
+	BDiskDevice *device)
 {
 	bool terminatedEarly = false;
 	if (visitor) {
@@ -224,8 +225,7 @@ BDiskDeviceRoster::VisitEachDevice(BDiskDeviceVisitor *visitor,
 */
 bool
 BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
-									  BDiskDevice *device,
-									  BPartition **partition)
+	BDiskDevice *device, BPartition **partition)
 {
 	bool terminatedEarly = false;
 	if (visitor) {
@@ -270,8 +270,7 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 */
 bool
 BDiskDeviceRoster::VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
-											 BDiskDevice *device,
-											 BPartition **partition)
+	BDiskDevice *device, BPartition **partition)
 {
 	bool terminatedEarly = false;
 	if (visitor) {
@@ -306,8 +305,7 @@ BDiskDeviceRoster::VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
 */
 bool
 BDiskDeviceRoster::VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
-											   BDiskDevice *device,
-											   BPartition **partition)
+	BDiskDevice *device, BPartition **partition)
 {
 	bool terminatedEarly = false;
 	if (visitor) {
@@ -322,7 +320,59 @@ BDiskDeviceRoster::VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
 	return terminatedEarly;
 }
 
-// GetDeviceWithID
+
+/*!	\brief Finds a BPartition by BVolume.
+*/
+status_t
+BDiskDeviceRoster::FindPartitionByVolume(BVolume* volume, BDiskDevice* device,
+	BPartition** _partition)
+{
+	class FindPartitionVisitor : public BDiskDeviceVisitor {
+	public:
+		FindPartitionVisitor(dev_t volume)
+			:
+			fVolume(volume)
+		{
+		}
+
+		virtual bool Visit(BDiskDevice* device)
+		{
+			return Visit(device, 0);
+		}
+
+		virtual bool Visit(BPartition* partition, int32 level)
+		{
+			BVolume volume;
+			return partition->GetVolume(&volume) == B_OK
+				&& volume.Device() == fVolume;
+		}
+
+	private:
+		dev_t	fVolume;
+	} visitor(volume->Device());
+
+	if (VisitEachMountedPartition(&visitor, device, _partition))
+		return B_OK;
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+/*!	\brief Finds a BPartition by mount path.
+*/
+status_t
+BDiskDeviceRoster::FindPartitionByMountPoint(const char* mountPoint,
+	BDiskDevice* device, BPartition** _partition)
+{
+	BVolume volume(dev_for_path(mountPoint));
+	if (volume.InitCheck() == B_OK
+		&& FindPartitionByVolume(&volume, device, _partition))
+		return B_OK;
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 /*!	\brief Returns a BDiskDevice for a given ID.
 
 	The supplied \a device is initialized to the device identified by \a id.
