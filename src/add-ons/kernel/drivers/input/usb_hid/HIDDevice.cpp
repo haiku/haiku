@@ -240,6 +240,11 @@ status_t
 HIDDevice::Close()
 {
 	fOpen = false;
+	// make threads waiting for a transfer bail out
+	if (fTransferNotifySem >= 0) {
+		delete_sem(fTransferNotifySem);
+		fTransferNotifySem = -1;
+	}
 	return B_OK;
 }
 

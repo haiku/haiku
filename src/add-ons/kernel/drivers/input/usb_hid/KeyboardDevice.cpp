@@ -65,15 +65,15 @@ KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 					_SetTransferProcessed();
 					if (result != B_OK)
 						return result;
-				} else if (result == B_TIMED_OUT) {
+				} else if (result == B_TIMED_OUT && IsOpen()) {
 					// this case is for handling key repeats, it means
 					// no interrupt transfer has happened
 					_WriteKey(fCurrentRepeatKey, true);
 					// the next timeout is reduced to the repeat_rate
 					fCurrentRepeatDelay = fRepeatRate;
-				} else if (result == B_INTERRUPTED)
+				} else if (result == B_INTERRUPTED && IsOpen()) {
 					continue;
-				else if (result != B_OK)
+				} else
 					return result;
 			}
 

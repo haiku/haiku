@@ -78,7 +78,7 @@ static	void					_TransferCallback(void *cookie,
 
 		char *					fName;
 		int32					fParentCookie;
-		bool					fOpen;
+volatile bool					fOpen;
 		bool					fRemoved;
 
 		struct ring_buffer *	fRingBuffer;
