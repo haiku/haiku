@@ -863,6 +863,12 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 	info->capacity = capacity;
 
 	if (info->block_size != blockSize) {
+		if (capacity == 0) {
+			// there is obviously no medium in the drive, don't try to update
+			// the DMA resource
+			return;
+		}
+
 		if (info->block_size != 0) {
 			dprintf("old %ld, new %ld\n", info->block_size, blockSize);
 			panic("updating DMAResource not yet implemented...");
