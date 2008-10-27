@@ -29,19 +29,67 @@
 #include "kb_mouse_driver.h"
 
 
+#undef TRACE
+#undef CALLED
 //#define TRACE_MOUSE_DEVICE
 #ifdef TRACE_MOUSE_DEVICE
+
+	class FunctionTracer {
+	public:
+		FunctionTracer(const void* pointer, const char* className,
+				const char* functionName,
+				int32& depth)
+			: fFunctionName(),
+			  fPrepend(),
+			  fFunctionDepth(depth),
+			  fPointer(pointer)
+		{
+			fFunctionDepth++;
+			fPrepend.Append(' ', fFunctionDepth * 2);
+			fFunctionName << className << "::" << functionName << "()";
+	
+			debug_printf("%p -> %s%s {\n", fPointer, fPrepend.String(),
+				fFunctionName.String());
+		}
+	
+		 ~FunctionTracer()
+		{
+			debug_printf("%p -> %s}\n", fPointer, fPrepend.String());
+			fFunctionDepth--;
+		}
+	
+	private:
+		BString	fFunctionName;
+		BString	fPrepend;
+		int32&	fFunctionDepth;
+		const void* fPointer;
+	};
+
+
+	static int32 sFunctionDepth = -1;
+#	define MD_CALLED(x...)	FunctionTracer _ft(this, "MouseDevice", \
+								__FUNCTION__, sFunctionDepth)
+#	define MID_CALLED(x...)	FunctionTracer _ft(this, "MouseInputDevice", \
+								__FUNCTION__, sFunctionDepth)
+#	define TRACE(x...)	{ BString _to; \
+							_to.Append(' ', (sFunctionDepth + 1) * 2); \
+							debug_printf("%p -> %s", this, _to.String()); \
+							debug_printf(x); }
 #	define LOG(text...) debug_printf(text)
+#	define LOG_EVENT(text...) do {} while (0)
 #	define LOG_ERR(text...) LOG(text)
 #else
-#	define LOG(text...) do {} while (0)
+#	define TRACE(x...) do {} while (0)
+#	define MD_CALLED(x...) TRACE(x)
+#	define MID_CALLED(x...) TRACE(x)
+#	define LOG(text...) TRACE(x)
 #	define LOG_ERR(text...) debug_printf(text)
+#	define LOG_EVENT(text...) TRACE(x)
 #endif
+
 
 //#define LOG_DEVICES(text...) debug_printf(text)
 #define LOG_DEVICES(text...) LOG(text)
-
-#define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
 
 
@@ -103,9 +151,12 @@ MouseDevice::MouseDevice(MouseInputDevice& target, const char* driverPath)
 	fTarget(target),
 	fPath(driverPath),
 	fDevice(-1),
+	fDeviceRemapsButtons(false),
 	fThread(-1),
 	fActive(false)
 {
+	MD_CALLED();
+
 	fDeviceRef.name = _BuildShortName();
 	fDeviceRef.type = B_POINTING_DEVICE;
 	fDeviceRef.cookie = this;
@@ -115,13 +166,17 @@ MouseDevice::MouseDevice(MouseInputDevice& target, const char* driverPath)
 	fSettings.map.button[1] = B_SECONDARY_MOUSE_BUTTON;
 	fSettings.map.button[2] = B_TERTIARY_MOUSE_BUTTON;
 #endif
-
-	fDeviceRemapsButtons = false;
 };
 
 
 MouseDevice::~MouseDevice()
 {
+	MD_CALLED();
+	TRACE("delete\n");
+
+	if (fTarget._HasDevice(this))
+		TRACE("still in the list!\n");
+
 	if (fActive)
 		Stop();
 
@@ -132,6 +187,8 @@ MouseDevice::~MouseDevice()
 status_t
 MouseDevice::Start()
 {
+	MD_CALLED();
+
 	fDevice = open(fPath.String(), O_RDWR);
 	if (fDevice < 0)
 		return errno;
@@ -166,11 +223,13 @@ MouseDevice::Start()
 void
 MouseDevice::Stop()
 {
-	close(fDevice);
-	fDevice = -1;
+	MD_CALLED();
 
 	fActive = false;
 		// this will stop the thread as soon as it reads the next packet
+
+	close(fDevice);
+	fDevice = -1;
 
 	if (fThread >= B_OK) {
 		// unblock the thread, which might wait on a semaphore.
@@ -186,7 +245,7 @@ MouseDevice::Stop()
 status_t
 MouseDevice::UpdateSettings()
 {
-	CALLED();
+	MD_CALLED();
 
 	// retrieve current values
 
@@ -254,10 +313,10 @@ MouseDevice::_Run()
 		int32 deltaX, deltaY;
 		_ComputeAcceleration(movements, deltaX, deltaY);
 
-		LOG("%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld, wheel_x:%ld, wheel_y:%ld\n",
+		LOG_EVENT("%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld, wheel_x:%ld, wheel_y:%ld\n",
 			fDeviceRef.name, movements.buttons, movements.xdelta, movements.ydelta,
 			movements.clicks, movements.wheel_xdelta, movements.wheel_ydelta);
-		LOG("%s: x: %ld, y: %ld\n", fDeviceRef.name, deltaX, deltaY);
+		LOG_EVENT("%s: x: %ld, y: %ld\n", fDeviceRef.name, deltaX, deltaY);
 
 		// Send single messages for each event
 
@@ -269,9 +328,9 @@ MouseDevice::_Run()
 			if (message != NULL) {
 				if (pressedButton) {
 					message->AddInt32("clicks", movements.clicks);
-					LOG("B_MOUSE_DOWN\n");
+					LOG_EVENT("B_MOUSE_DOWN\n");
 				} else
-					LOG("B_MOUSE_UP\n");
+					LOG_EVENT("B_MOUSE_UP\n");
 
 				fTarget.EnqueueMessage(message);
 				lastButtons = movements.buttons;
@@ -416,7 +475,7 @@ MouseInputDevice::MouseInputDevice()
 	:
 	fDevices(2, true)
 {
-	CALLED();
+	MID_CALLED();
 
 	StartMonitoringDevice(kMouseDevicesDirectory);
 	_RecursiveScan(kMouseDevicesDirectory);
@@ -425,15 +484,18 @@ MouseInputDevice::MouseInputDevice()
 
 MouseInputDevice::~MouseInputDevice()
 {
-	CALLED();
+	MID_CALLED();
+
 	StopMonitoringDevice(kMouseDevicesDirectory);
+	fDevices.MakeEmpty();
 }
 
 
 status_t
 MouseInputDevice::InitCheck()
 {
-	CALLED();
+	MID_CALLED();
+
 	return BInputServerDevice::InitCheck();
 }
 
@@ -441,7 +503,8 @@ MouseInputDevice::InitCheck()
 status_t
 MouseInputDevice::Start(const char* name, void* cookie)
 {
-	LOG("%s(%s)\n", __PRETTY_FUNCTION__, name);
+	MID_CALLED();
+
 	MouseDevice* device = (MouseDevice*)cookie;
 
 	return device->Start();
@@ -451,10 +514,11 @@ MouseInputDevice::Start(const char* name, void* cookie)
 status_t
 MouseInputDevice::Stop(const char* name, void* cookie)
 {
-	LOG("%s(%s)\n", __PRETTY_FUNCTION__, name);
-	MouseDevice* device = (MouseDevice*)cookie;
+	TRACE("%s(%s)\n", __PRETTY_FUNCTION__, name);
 
+	MouseDevice* device = (MouseDevice*)cookie;
 	device->Stop();
+
 	return B_OK;
 }
 
@@ -463,7 +527,8 @@ status_t
 MouseInputDevice::Control(const char* name, void* cookie,
 	uint32 command, BMessage* message)
 {
-	LOG("%s(%s, code: %lu)\n", __PRETTY_FUNCTION__, name, command);
+	TRACE("%s(%s, code: %lu)\n", __PRETTY_FUNCTION__, name, command);
+
 	MouseDevice* device = (MouseDevice*)cookie;
 
 	if (command == B_NODE_MONITOR)
@@ -480,7 +545,7 @@ MouseInputDevice::Control(const char* name, void* cookie,
 status_t
 MouseInputDevice::_HandleMonitor(BMessage* message)
 {
-	CALLED();
+	MID_CALLED();
 
 	const char* path;
 	int32 opcode;
@@ -501,78 +566,10 @@ MouseInputDevice::_HandleMonitor(BMessage* message)
 }
 
 
-MouseDevice*
-MouseInputDevice::_FindDevice(const char* path)
-{
-	CALLED();
-
-	for (int32 i = fDevices.CountItems() - 1; i >= 0; i--) {
-		MouseDevice* device = fDevices.ItemAt(i);
-		if (strcmp(device->Path(), path) == 0)
-			return device;
-	}
-
-	return NULL;
-}
-
-
-status_t
-MouseInputDevice::_AddDevice(const char* path)
-{
-	CALLED();
-
-	_RemoveDevice(path);
-
-	MouseDevice* device = new(std::nothrow) MouseDevice(*this, path);
-	if (!device) {
-		LOG("MouseInputDevice::_AddDevice() - No memory\n");
-		return B_NO_MEMORY;
-	}
-
-	if (!fDevices.AddItem(device)) {
-		delete device;
-		return B_NO_MEMORY;
-	}
-
-	input_device_ref* devices[2];
-	devices[0] = device->DeviceRef();
-	devices[1] = NULL;
-
-	LOG_DEVICES("MouseInputDevice::_AddDevice(%s), name: %s\n", path,
-		devices[0]->name);
-
-	return RegisterDevices(devices);
-}
-
-
-status_t
-MouseInputDevice::_RemoveDevice(const char* path)
-{
-	CALLED();
-
-	MouseDevice* device = _FindDevice(path);
-	if (device == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	input_device_ref* devices[2];
-	devices[0] = device->DeviceRef();
-	devices[1] = NULL;
-
-	LOG_DEVICES("MouseInputDevice::_RemoveDevice(%s), name: %s\n", path,
-		devices[0]->name);
-
-	UnregisterDevices(devices);
-
-	fDevices.RemoveItem(device);
-
-	return B_OK;
-}
-
-
 void
 MouseInputDevice::_RecursiveScan(const char* directory)
 {
-	CALLED();
+	MID_CALLED();
 
 	BEntry entry;
 	BDirectory dir(directory);
@@ -591,4 +588,85 @@ MouseInputDevice::_RecursiveScan(const char* directory)
 			_AddDevice(path.Path());
 	}
 }
+
+
+MouseDevice*
+MouseInputDevice::_FindDevice(const char* path)
+{
+	MID_CALLED();
+
+	for (int32 i = fDevices.CountItems() - 1; i >= 0; i--) {
+		MouseDevice* device = fDevices.ItemAt(i);
+		if (strcmp(device->Path(), path) == 0)
+			return device;
+	}
+
+	return NULL;
+}
+
+
+status_t
+MouseInputDevice::_AddDevice(const char* path)
+{
+	MID_CALLED();
+
+	_RemoveDevice(path);
+
+	MouseDevice* device = new(std::nothrow) MouseDevice(*this, path);
+	if (!device) {
+		TRACE("No memory\n");
+		return B_NO_MEMORY;
+	}
+
+	if (!fDevices.AddItem(device)) {
+		TRACE("No memory in list\n");
+		delete device;
+		return B_NO_MEMORY;
+	}
+
+	input_device_ref* devices[2];
+	devices[0] = device->DeviceRef();
+	devices[1] = NULL;
+
+	TRACE("adding path: %s, name: %s\n", path, devices[0]->name);
+
+	return RegisterDevices(devices);
+}
+
+
+status_t
+MouseInputDevice::_RemoveDevice(const char* path)
+{
+	MID_CALLED();
+
+	MouseDevice* device = _FindDevice(path);
+	if (device == NULL) {
+		TRACE("%s not found\n", path);
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	input_device_ref* devices[2];
+	devices[0] = device->DeviceRef();
+	devices[1] = NULL;
+
+	TRACE("removing path: %s, name: %s\n", path, devices[0]->name);
+
+	UnregisterDevices(devices);
+
+	fDevices.RemoveItem(device);
+
+	return B_OK;
+}
+
+
+bool
+MouseInputDevice::_HasDevice(const MouseDevice* device) const
+{
+	for (int32 i = fDevices.CountItems() - 1; i >= 0; i--) {
+		if (device == fDevices.ItemAt(i))
+			return true;
+	}
+	return false;
+}
+
 

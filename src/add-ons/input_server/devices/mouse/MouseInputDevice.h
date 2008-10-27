@@ -42,6 +42,9 @@ private:
 			status_t		_AddDevice(const char* path);
 			status_t		_RemoveDevice(const char* path);
 
+			bool			_HasDevice(const MouseDevice* device) const;
+
+private:
 			BObjectList<MouseDevice> fDevices;
 };
 
