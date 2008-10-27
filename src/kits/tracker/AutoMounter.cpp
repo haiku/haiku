@@ -301,6 +301,13 @@ void
 AutoMounter::_UnmountAndEjectVolume(BPartition* partition, BPath& mountPoint,
 	const char* name)
 {
+	BDiskDevice device;
+	if (partition == NULL) {
+		// Try to retrieve partition
+		BDiskDeviceRoster().FindPartitionByMountPoint(mountPoint.Path(),
+			&device, &partition);
+	}
+
 	status_t status;
 	if (partition != NULL)
 		status = partition->Unmount();
@@ -322,7 +329,45 @@ AutoMounter::_UnmountAndEjectVolume(BPartition* partition, BPath& mountPoint,
 		return;
 	}
 
-	// TODO: eject!
+	if (TrackerSettings().EjectWhenUnmounting() && partition != NULL) {
+		// eject device if it doesn't have any mounted partitions left
+		class IsMountedVisitor : public BDiskDeviceVisitor {
+		public:
+			IsMountedVisitor()
+				:
+				fHasMounted(false)
+			{
+			}
+
+			virtual bool Visit(BDiskDevice* device)
+			{
+				return Visit(device, 0);
+			}
+
+			virtual bool Visit(BPartition* partition, int32 level)
+			{
+				if (partition->IsMounted()) {
+					fHasMounted = true;
+					return true;
+				}
+
+				return false;
+			}
+
+			bool HasMountedPartitions() const
+			{
+				return fHasMounted;
+			}
+
+		private:
+			bool	fHasMounted;
+		} visitor;
+
+		partition->Device()->VisitEachDescendant(&visitor);
+
+		if (!visitor.HasMountedPartitions())
+			partition->Device()->Eject();
+	}
 
 	// remove the directory if it's a directory in rootfs
 	if (dev_for_path(mountPoint.Path()) == dev_for_path("/"))
@@ -533,7 +578,7 @@ AutoMounter::GetSettings(BMessage *message)
 	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
         fs_info info;
         if (fs_stat_dev(volume.Device(), &info) == 0
-			&& info.flags & (B_FS_IS_REMOVABLE | B_FS_IS_PERSISTENT)) {
+			&& (info.flags & (B_FS_IS_REMOVABLE | B_FS_IS_PERSISTENT)) != 0) {
 			message->AddString(info.device_name, info.volume_name);
 
 			BString mountFlagsKey(info.device_name);
