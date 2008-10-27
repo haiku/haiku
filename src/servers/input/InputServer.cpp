@@ -94,7 +94,7 @@ InputDeviceListItem::Start()
 	if (err != B_OK) {
 		PRINTERR(("      error: %s (%lx)\n", strerror(err), err));
 	}
-	fRunning = true;
+	fRunning = err == B_OK;
 }
 
 
@@ -240,10 +240,8 @@ InputServer::InputServer()
 InputServer::~InputServer()
 {
 	CALLED();
-	if (fAddOnManager != NULL) {
-		fAddOnManager->Lock();
+	if (fAddOnManager->Lock())
 		fAddOnManager->Quit();
-	}
 
 	_ReleaseInput(NULL);
 }
@@ -1067,21 +1065,6 @@ InputServer::EventLoopRunning()
 }
 
 
-/*!	The fInputDeviceListLocker must be locked when calling this function */
-InputDeviceListItem*
-InputServer::_FindInputDeviceListItem(BInputServerDevice& device)
-{
-	for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
-
-		if (item->ServerDevice() == &device)
-			return item;
-	}
-
-	return NULL;
-}
-
-
 status_t
 InputServer::GetDeviceInfo(const char* name, input_device_type *_type,
 	bool *_isRunning)
@@ -1220,8 +1203,12 @@ InputServer::StartStopDevices(const char* name, input_device_type type,
 			continue;
 
 		if (item->Matches(name, type)) {
-			if (!doStart ^ item->Running())
-				return B_ERROR;
+			if (doStart == item->Running()) {
+				if (name)
+					return B_OK;
+				else
+					continue;
+			}
 
 			if (doStart)
 				item->Start();
@@ -1233,8 +1220,10 @@ InputServer::StartStopDevices(const char* name, input_device_type type,
 		}
 	}
 
-	if (name)
+	if (name) {
+		// item not found
 		return B_ERROR;
+	}
 
 	return B_OK;
 }
@@ -1247,17 +1236,20 @@ InputServer::StartStopDevices(BInputServerDevice& serverDevice, bool doStart)
 	CALLED();
 	BAutolock lock(fInputDeviceListLocker);
 
-	InputDeviceListItem* item = _FindInputDeviceListItem(serverDevice);
-	if (item != NULL) {
-		if (!doStart ^ item->Running())
-			return B_ERROR;
+	for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
+
+		if (item->ServerDevice() != &serverDevice)
+			continue;
+
+		if (doStart == item->Running())
+			continue;
 
 		if (doStart)
 			item->Start();
 		else
 			item->Stop();
 	}
-	EXIT();
 
 	return B_OK;
 }

@@ -206,8 +206,6 @@ class InputServer : public BApplication {
 		status_t _AcquireInput(BMessage& message, BMessage& reply);
 		void _ReleaseInput(BMessage* message);
 
-		InputDeviceListItem* _FindInputDeviceListItem(BInputServerDevice& device);
-
 	private:
 		bool 			fEventLoopRunning;
 		bool 			fSafeMode;
