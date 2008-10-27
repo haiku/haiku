@@ -229,8 +229,6 @@ InputServer::InputServer()
 	fAddOnManager = new(std::nothrow) ::AddOnManager(SafeMode());
 	if (fAddOnManager != NULL) {
 		fAddOnManager->Run();
-		// TODO: The BLooper thread may already start running here,
-		// is this a problem?
 		fAddOnManager->LoadState();
 	}
 
