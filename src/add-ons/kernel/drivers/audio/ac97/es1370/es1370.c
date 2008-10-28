@@ -491,8 +491,8 @@ init_driver(void)
 {
 	void *settings_handle;
 	pci_info info;
-	num_cards = 0;
 	int ix = 0;
+	num_cards = 0;
 
 	PRINT(("init_driver()\n"));
 
