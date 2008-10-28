@@ -85,7 +85,7 @@ mutex_lock(pthread_mutex_t *mutex, bigtime_t timeout)
 	if (MUTEX_TYPE(mutex) == PTHREAD_MUTEX_ERRORCHECK
 		&& mutex->owner == thisThread) {
 		// we detect this kind of deadlock and return an error
-		return B_BUSY;
+		return EDEADLK;
 	}
 
 	if (MUTEX_TYPE(mutex) == PTHREAD_MUTEX_RECURSIVE
@@ -123,11 +123,12 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 int
 pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
-	return mutex_lock(mutex, 0);
+	status_t status = mutex_lock(mutex, 0);
+	return status == B_WOULD_BLOCK ? EBUSY : status;
 }
 
 
-int 
+int
 pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *tv)
 {
 	bool invalidTime = false;
@@ -156,11 +157,8 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 	if (mutex == NULL)
 		return B_BAD_VALUE;
 
-	if (mutex->owner != find_thread(NULL)) {
-		// this is a bug in the calling application!
-		// ToDo: should we handle it in another way?
-		fprintf(stderr, "mutex unlocked from foreign thread!\n");
-	}
+	if (mutex->owner != find_thread(NULL))
+		return EPERM;
 
 	if (MUTEX_TYPE(mutex) == PTHREAD_MUTEX_RECURSIVE) {
 		if (mutex->owner_count-- > 1)
@@ -176,7 +174,7 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 }
 
 
-int 
+int
 pthread_mutex_getprioceiling(pthread_mutex_t *mutex, int *_prioCeiling)
 {
 	if (mutex == NULL || _prioCeiling == NULL)
@@ -189,7 +187,7 @@ pthread_mutex_getprioceiling(pthread_mutex_t *mutex, int *_prioCeiling)
 }
 
 
-int 
+int
 pthread_mutex_setprioceiling(pthread_mutex_t *mutex, int prioCeiling,
 	int *_oldCeiling)
 {
