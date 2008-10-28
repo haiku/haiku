@@ -11,7 +11,6 @@
 
 #include "HWindow.h"
 #include "HEventList.h"
-#include "HEventItem.h"
 
 #include <stdio.h>
 
