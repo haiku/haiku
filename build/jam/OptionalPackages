@@ -14,6 +14,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	APR
 #	APR-util
 #	Beam
+#	BeBook
 #	BeHappy
 #	BePDF
 #	Bluetooth
@@ -37,7 +38,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 
 # package dependencies
 OptionalPackageDependencies APR-util : APR ;
-OptionalPackageDependencies BeHappy : NetSurf ;
+OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies Development : Perl ;
 OptionalPackageDependencies NetSurf : OpenSSL ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
@@ -94,6 +95,16 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 	}
 }
 
+
+# BeBook
+if [ IsOptionalHaikuImagePackageAdded BeBook ] {
+	InstallOptionalHaikuImagePackage bebook_20081026
+		: http://haiku-files.org/files/optional-packages/bebook_20081026.zip
+		: beos documentation
+	;
+	AddSymlinkToHaikuImage home Desktop
+		: /boot/beos/documentation/bebook/index.html : BeBook ;
+}
 
 # BeHappy
 if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
