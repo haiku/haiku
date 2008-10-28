@@ -559,13 +559,12 @@ BShelf::MessageReceived(BMessage *msg)
 				err = _GetProperty(&specifier, &reply);
 				if (err == B_OK)
 					err = reply.FindInt32("index", &i);
-				bool popped = (msg->PopSpecifier()==B_OK);
-				if (err == B_OK && !popped && msg->what == B_DELETE_PROPERTY) { // Delete Replicant
+
+				if (err == B_OK && msg->what == B_DELETE_PROPERTY) { // Delete Replicant
 					err = DeleteReplicant(i);
 					break;
 				}
-				if (err == B_OK && popped 
-					&& msg->what == B_GET_SUPPORTED_SUITES) {
+				if (err == B_OK && msg->what == B_GET_SUPPORTED_SUITES) {
 					err = replyMsg.AddString("suites", "suite/vnd.Be-replicant");
 					if (err == B_OK) {
 						BPropertyInfo propInfo(sReplicantPropertyList);
@@ -573,16 +572,14 @@ BShelf::MessageReceived(BMessage *msg)
 					}
 					break;
 				}
-				if (err == B_OK)
+				if (err == B_OK )
 					repMessage = ReplicantAt(i, &replicant, &ID, &err);
 				if (err == B_OK && replicant) {
-					if (!popped) { // Get Replicant
-						BMessage archive;
-						err = replicant->Archive(&archive);
-						if (err == B_OK)
-							err = replyMsg.AddMessage("result", &archive);
-						break;
-					}
+					BMessage archive;
+					err = replicant->Archive(&archive);
+					if (err == B_OK)
+						err = replyMsg.AddMessage("result", &archive);
+					break;
 					// now handles the replicant suite
 					err = B_BAD_SCRIPT_SYNTAX;
 					if (msg->what != B_GET_PROPERTY)
@@ -680,6 +677,10 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 	BView *replicant = NULL;
 	switch (shelfPropInfo.FindMatch(msg, 0, specifier, form, property)) {
 		case 0:
+			if (msg->what == B_COUNT_PROPERTIES) {
+				target = this;
+				break;
+			}
 		case 1:
 			if (msg->PopSpecifier() != B_OK ) {
 				target = this;
@@ -698,9 +699,7 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 				ReplicantAt(i, &replicant, &ID, &err);
 
 			if (err == B_OK && replicant != NULL) {
-				if (index <= 0 && msg->what == B_GET_SUPPORTED_SUITES)
-					return this;
-				msg->PopSpecifier();
+				return this;
 			} else {
 				BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
 				replyMsg.AddInt32("error", B_BAD_INDEX);
