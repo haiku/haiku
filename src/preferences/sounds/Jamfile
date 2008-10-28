@@ -2,15 +2,13 @@ SubDir HAIKU_TOP src preferences sounds ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	SubDirC++Flags -fmultiple-symbol-spaces ;
-}
+UsePrivateHeaders interface ;
 
 Preference Sounds : 
 	HApp.cpp 
-	HEventItem.cpp 
+#	HEventItem.cpp 
 	HWindow.cpp 
 	HEventList.cpp 
-	: be game tracker libmedia.so
+	: be libcolumnlistview.a game tracker libmedia.so
 	: Sounds.rdef
 	;

@@ -1,38 +1,57 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:        HEventList.h
-//  Author:      Jérôme Duval, Oliver Ruiz Dorantes, Atsushi Takamatsu
-//  Description: Sounds Preferences
-//  Created :    November 24, 2003
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
+/*
+ * Copyright 2003-2008 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Jérôme Duval
+ *		Oliver Ruiz Dorantes
+ *		Atsushi Takamatsu
+ */
 #ifndef __HEVENTLIST_H__
 #define __HEVENTLIST_H__
 
-#include <ListView.h>
-#include "HEventItem.h"
+#include <ColumnListView.h>
+#include <String.h>
 
-enum{
+enum {
+	kEventColumn,
+	kSoundColumn,
+};
+
+
+class HEventRow : public BRow {
+public:
+					HEventRow(const char* event_name,
+						const char* path);
+		virtual			~HEventRow();
+		
+		const char*		Name() const { return fName.String();}
+		const char*		Path() const { return fPath.String();}
+			void		Remove(const char *type);
+			void		SetPath(const char* path);
+protected:
+
+private:
+			BString		fName;
+			BString		fPath;
+};
+
+
+enum {
 	M_EVENT_CHANGED = 'SCAG'
 };
 
-class HEventList : public BListView {
+
+class HEventList : public BColumnListView {
 public:
-					HEventList(BRect rect
-						, const char* name="EventList");
+					HEventList(BRect rect, 
+						const char* name = "EventList");
 		virtual			~HEventList();
 				void	RemoveAll();
 				void	SetType(const char* type);
 				void	SetPath(const char* path);
 protected:
-		virtual void	SelectionChanged();
+		virtual 	void	SelectionChanged();
 private:
 		char			*fType;	
 };

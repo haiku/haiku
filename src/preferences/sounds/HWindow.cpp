@@ -50,8 +50,6 @@ HWindow::HWindow(BRect rect, const char *name)
 
 	fFilePanel = new BFilePanel();
 	fFilePanel->SetTarget(this);
-	
-	fEventList->Select(0);
 }
 
 
@@ -71,28 +69,13 @@ HWindow::InitGUI()
 	listView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(listView);
 
-	BRect stringRect(16, 5, 60, 22);
-	BStringView *stringView = new BStringView(stringRect, "event", "Event");
-	stringView->SetFont(be_bold_font);
-	stringView->ResizeToPreferred();
-	listView->AddChild(stringView);
-
-	stringRect.OffsetBy(120, 0);
-	stringView = new BStringView(stringRect, "sound", "Sound");
-	stringView->SetFont(be_bold_font);
-	stringView->ResizeToPreferred();
-	listView->AddChild(stringView);
-
 	rect.left += 13;
-	rect.right -= B_V_SCROLL_BAR_WIDTH + 13;
+	rect.right -= 13;
 	rect.top += 28;
 	rect.bottom -= 7;
 	fEventList = new HEventList(rect);
 	fEventList->SetType(BMediaFiles::B_SOUNDS);
-
-	BScrollView *scrollView = new BScrollView("", fEventList, B_FOLLOW_ALL, 0,
-		false, true);
-	listView->AddChild(scrollView);
+	listView->AddChild(fEventList);
 
 	rect = Bounds();
 	rect.top = rect.bottom - 105;
@@ -158,10 +141,9 @@ HWindow::MessageReceived(BMessage *message)
 			BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 			BMenu *menu = menufield->Menu();
 
-			int32 sel = fEventList->CurrentSelection();
-			if (sel >= 0) {
-				HEventItem *item = cast_as(fEventList->ItemAt(sel), HEventItem);
-				BPath path(item->Path());
+			HEventRow* row = (HEventRow *)fEventList->CurrentSelection();
+			if (row != NULL) {
+				BPath path(row->Path());
 				if (path.InitCheck() != B_OK) {
 					BMenuItem *item = menu->FindItem("<none>");
 					if (item)
@@ -180,8 +162,8 @@ HWindow::MessageReceived(BMessage *message)
 		case B_REFS_RECEIVED:
 		{
 			entry_ref ref;
-			int32 sel = fEventList->CurrentSelection();
-			if (message->FindRef("refs", &ref) == B_OK && sel >= 0) {
+			HEventRow* row = (HEventRow *)fEventList->CurrentSelection();
+			if (message->FindRef("refs", &ref) == B_OK && row != NULL) {
 				BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 				BMenu *menu = menufield->Menu();
 
@@ -218,10 +200,9 @@ HWindow::MessageReceived(BMessage *message)
 
 		case M_PLAY_MESSAGE:
 		{
-			int32 sel = fEventList->CurrentSelection();
-			if (sel >= 0) {
-				HEventItem *item = cast_as(fEventList->ItemAt(sel), HEventItem);
-				const char *path = item->Path();
+			HEventRow* row = (HEventRow *)fEventList->CurrentSelection();
+			if (row != NULL) {
+				const char *path = row->Path();
 				if (path) {
 					entry_ref ref;
 					::get_ref_for_path(path, &ref);
@@ -291,13 +272,13 @@ HWindow::SetupMenuField()
 {
 	BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 	BMenu *menu = menufield->Menu();
-	int32 count = fEventList->CountItems();
+	int32 count = fEventList->CountRows();
 	for (int32 i = 0; i < count; i++) {
-		HEventItem *item = cast_as(fEventList->ItemAt(i), HEventItem);
-		if (!item)
+		HEventRow *row = (HEventRow *)fEventList->RowAt(i);
+		if (!row)
 			continue;
 
-		BPath path(item->Path());
+		BPath path(row->Path());
 		if (path.InitCheck() != B_OK)
 			continue;
 		if (menu->FindItem(path.Leaf()))
@@ -383,7 +364,7 @@ HWindow::SetupMenuField()
 void
 HWindow::Pulse()
 {
-	int32 sel = fEventList->CurrentSelection();
+	HEventRow* row = (HEventRow *)fEventList->CurrentSelection();
 	BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 	BButton *button = cast_as(FindView("play"), BButton);
 	BButton *stop = cast_as(FindView("stop"), BButton);
@@ -391,11 +372,10 @@ HWindow::Pulse()
 	if (!menufield)
 		return;
 
-	if (sel >= 0) {
+	if (row != NULL) {
 		menufield->SetEnabled(true);
 
-		HEventItem *item = cast_as(fEventList->ItemAt(sel), HEventItem);
-		const char *path = item->Path();
+		const char *path = row->Path();
 		if (path && strcmp(path, ""))
 			button->SetEnabled(true);
 		else
