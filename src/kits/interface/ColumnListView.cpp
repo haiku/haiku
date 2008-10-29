@@ -3685,7 +3685,6 @@ void OutlineView::FrameResized(float width, float height)
 
 void OutlineView::ScrollTo(BPoint position)
 {
-printf("OutlineView::ScrollTo(BPoint(%.1f, %.1f))\n", position.x, position.y);
 	fVisibleRect.OffsetTo(position.x, position.y);
 
 	// In FixScrollBar, we might not have been able to change the size of
@@ -3699,7 +3698,6 @@ printf("OutlineView::ScrollTo(BPoint(%.1f, %.1f))\n", position.x, position.y);
 		FixScrollBar(true);
 	
 	_inherited::ScrollTo(position);
-printf("  scrolled to BPoint(%.1f, %.1f)\n", Bounds().left, Bounds().top);
 }
 
 const BRect& OutlineView::VisibleRect() const
