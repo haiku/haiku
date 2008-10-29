@@ -3,6 +3,9 @@
 # (respectively installing the files in the installation directory).
 
 # create directories that will remain empty
+AddDirectoryToHaikuImage common bin ;
+AddDirectoryToHaikuImage common include ;
+AddDirectoryToHaikuImage common lib ;
 AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage home config bin ;
 AddDirectoryToHaikuImage home config lib ;
