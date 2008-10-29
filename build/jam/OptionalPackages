@@ -407,9 +407,9 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 		Echo "No optional package Perl available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage perl-5.10.0-gcc2-2008-03-24
-			: $(baseURL)/perl-5.10.0-gcc2-2008-03-24.zip
-			: home
+		InstallOptionalHaikuImagePackage perl-5.10.0-gcc2-2008-10-29
+			: $(baseURL)/perl-5.10.0-gcc2-2008-10-29.zip
+			:
 		;
 	}
 }
