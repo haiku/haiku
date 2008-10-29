@@ -197,7 +197,6 @@ static const rgb_color kColor[B_COLOR_TOTAL] =
 static const int32 kMaxDepth = 1024;
 static const float kLeftMargin = kLatchWidth;
 static const float kRightMargin = kLatchWidth;
-static const float kBottomMargin = kLatchWidth;
 static const float kOutlineLevelIndent = kLatchWidth;
 static const float kColumnResizeAreaWidth = 10.0;
 static const float kRowDragSensitivity = 5.0;
@@ -2398,7 +2397,7 @@ OutlineView::OutlineView(BRect rect, BList *visibleColumns, BList *sortColumns,
 	:	BView(rect, "outline_view", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
 		fColumns(visibleColumns),
 		fSortColumns(sortColumns),
-		fItemsHeight(24.),
+		fItemsHeight(0.0),
 		fVisibleRect(rect.OffsetToCopy(0, 0)),
 		fFocusRow(0),
 		fRollOverRow(0),
@@ -2454,7 +2453,7 @@ void OutlineView::Clear()
 	DeselectAll();	// Make sure selection list doesn't point to deleted rows!
 	RecursiveDeleteRows(&fRows, false);
 	Invalidate();
-	fItemsHeight = 24.;
+	fItemsHeight = 0.0;
 	FixScrollBar(true);
 }
 
@@ -3629,8 +3628,8 @@ void OutlineView::FixScrollBar(bool scrollToFit)
 	BScrollBar *vScrollBar = ScrollBar(B_VERTICAL);
 	if (vScrollBar) {
 		if (fItemsHeight > fVisibleRect.Height()) {
-			float maxScrollBarValue = (fItemsHeight + kBottomMargin) - fVisibleRect.Height();
-			vScrollBar->SetProportion(fVisibleRect.Height() / (fItemsHeight + kBottomMargin));
+			float maxScrollBarValue = fItemsHeight - fVisibleRect.Height();
+			vScrollBar->SetProportion(fVisibleRect.Height() / fItemsHeight);
 
 			// If the user is scrolled down too far when makes the range smaller, the list
 			// will jump suddenly, which is undesirable.  In this case, don't fix the scroll
@@ -3712,7 +3711,7 @@ void OutlineView::ScrollTo(BPoint position)
 	// the scroll bar because the user was scrolled down too far.  Take
 	// this opportunity to sneak it in if we can.
 	BScrollBar *vScrollBar = ScrollBar(B_VERTICAL);
-	float maxScrollBarValue = (fItemsHeight + kBottomMargin) - fVisibleRect.Height();
+	float maxScrollBarValue = fItemsHeight - fVisibleRect.Height();
 	float min, max;
 	vScrollBar->GetRange(&min, &max);
 	if (max != maxScrollBarValue && position.y > maxScrollBarValue)
