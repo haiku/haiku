@@ -187,6 +187,16 @@ BStringColumn::DrawField(BField* _field, BRect rect, BView* parent)
 }
 
 
+float
+BStringColumn::GetPreferredWidth(BField *_field, BView* parent) const
+{
+	BStringField* field = static_cast<BStringField*>(_field);
+	BFont font;
+	parent->GetFont(&font);
+	return font.StringWidth(field->String()) + 2 * kTEXT_MARGIN;
+}
+
+
 int
 BStringColumn::CompareFields(BField* field1, BField* field2)
 {

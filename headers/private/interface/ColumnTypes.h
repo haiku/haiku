@@ -85,6 +85,7 @@ class BStringColumn : public BTitledColumn
 												 BView* parent);
 		virtual int			CompareFields		(BField* field1,
 												 BField* field2);
+		virtual float		GetPreferredWidth(BField* field, BView* parent) const;
 		virtual	bool		AcceptsField        (const BField* field) const;
 
 	private:

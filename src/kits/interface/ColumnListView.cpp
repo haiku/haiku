@@ -237,7 +237,7 @@ private:
 	int32 FindColumn(BPoint, float *out_leftEdge);
 	void FixScrollBar(bool scrollToFit);
 	void DragSelectedColumn(BPoint);
-	void ResizeSelectedColumn(BPoint);
+	void ResizeSelectedColumn(BPoint, bool = false);
 	void ComputeDragBoundries(BColumn*, BPoint);
 	void DrawTitle(BView*, BRect, BColumn*, bool depressed);
 
@@ -296,6 +296,7 @@ public:
 
 			void				RedrawColumn(BColumn *column, float leftEdge, bool isFirstColumn);
 			void 				StartSorting();
+			float				GetColumnPreferredWidth(BColumn *column);
 	
 			void				AddRow(BRow*, int32 index, BRow *TheRow);
 			BRow*				CurrentSelection(BRow *lastSelected) const;
@@ -617,6 +618,11 @@ int BColumn::CompareFields(BField *, BField *)
 void BColumn::GetColumnName(BString* into) const
 {
 	*into = "(Unnamed)";
+}
+
+float BColumn::GetPreferredWidth(BField *field, BView *parent) const
+{
+	return fWidth;
 }
 
 bool BColumn::IsVisible() const
@@ -1798,13 +1804,21 @@ void TitleView::SetColumnFlags(column_flags flags)
 }
 
 
-void TitleView::ResizeSelectedColumn(BPoint position)
+void TitleView::ResizeSelectedColumn(BPoint position, bool preferred)
 {
 	float minWidth = fSelectedColumn->MinWidth();
 	float maxWidth = fSelectedColumn->MaxWidth();
 	
 	float originalEdge = fSelectedColumnRect.left + fSelectedColumn->Width(); 
-	if (position.x > fSelectedColumnRect.left + maxWidth)
+	if (preferred) {
+		float width = fOutlineView->GetColumnPreferredWidth(fSelectedColumn);
+		if (width < minWidth)
+			fSelectedColumn->SetWidth(minWidth);
+		else if (width > maxWidth)
+			fSelectedColumn->SetWidth(maxWidth);
+		else
+			fSelectedColumn->SetWidth(width);
+	} else if (position.x > fSelectedColumnRect.left + maxWidth)
 		fSelectedColumn->SetWidth(maxWidth);
 	else if (position.x < fSelectedColumnRect.left + minWidth)
 		fSelectedColumn->SetWidth(minWidth);
@@ -2138,6 +2152,13 @@ void TitleView::MouseDown(BPoint position)
 				&& position.x < rightEdge + kColumnResizeAreaWidth / 2
 				&& column->MaxWidth() > column->MinWidth()
 				&& (fColumnFlags & B_ALLOW_COLUMN_RESIZE)) {
+				int32 clicks = 0;
+				Window()->CurrentMessage()->FindInt32("clicks", &clicks);
+				if (clicks == 2) {
+					ResizeSelectedColumn(position, true);
+					fCurrentState = INACTIVE;
+					break;
+				}
 				fCurrentState = RESIZING_COLUMN;
 				fSelectedColumn = column;
 				fSelectedColumnRect.Set(leftEdge, 0, rightEdge, fVisibleRect.Height());
@@ -4034,6 +4055,22 @@ void OutlineView::InvalidateCachedPositions()
 {
 	if (fFocusRow)
 		FindRect(fFocusRow, &fFocusRowRect);
+}
+
+float OutlineView::GetColumnPreferredWidth(BColumn *column)
+{
+	float preferred = 0.0;
+	for (RecursiveOutlineIterator iterator(&fRows); iterator.CurrentRow();
+		iterator.GoToNext()) {
+		BRow *row = iterator.CurrentRow();
+		BField *field = row->GetField(column->fFieldID);
+		if (field) {
+			float width = column->GetPreferredWidth(field, this);
+			if (preferred < width)
+				preferred = width;
+		}
+	}
+	return preferred;
 }
 
 // #pragma mark -

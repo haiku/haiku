@@ -183,6 +183,7 @@ public:
 	virtual	void		MouseUp(BColumnListView *parent, BRow *row, BField *field);
 		
 	virtual void		GetColumnName(BString* into) const;
+	virtual float		GetPreferredWidth(BField *field, BView *parent) const;
 	
 			bool		IsVisible() const;
 			void		SetVisible(bool);
