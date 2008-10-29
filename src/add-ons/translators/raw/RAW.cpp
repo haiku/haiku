@@ -36,6 +36,9 @@
 	(fFilters >> ((((row) << 1 & 14) + ((col) & 1)) << 1) & 3)
 
 
+#define     COMPRESSION_PACKBITS        32773   /* Macintosh RLE */
+
+
 static const uint32 kImageBufferCount = 10;
 static const uint32 kDecodeBufferCount = 2048;
 
@@ -2549,12 +2552,12 @@ DCRaw::_LoadRAW(const image_data_info& image)
 			_LoadRAWCanonCompressed(image);
 	} else {
 		switch (image.compression) {
-			case 32773:
+			case COMPRESSION_PACKBITS:
 				_LoadRAWPacked12(image);
 				break;
 
 			default:
-				printf("unknown compression: %ld\n", image.compression);
+				fprintf(stderr, "DCRaw: unknown compression: %ld\n", image.compression);
 				throw (status_t)B_NO_TRANSLATOR;
 				break;
 		}
@@ -3430,7 +3433,7 @@ DCRaw::Identify()
 					sizeof(image_data_info) * (fNumImages - i));
 			}
 			i--;
-		} else if (fImages[i].is_raw)
+		} else if (fImages[i].is_raw && fImages[i].compression == COMPRESSION_PACKBITS)
 			rawCount++;
 	}
 

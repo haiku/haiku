@@ -11,6 +11,8 @@
 struct jhead;
 struct tiff_tag;
 
+#define COMPRESSION_PACKBITS 32773
+
 
 struct image_meta_info {
 	char	manufacturer[64];
