@@ -39,12 +39,6 @@ HIDDevice::HIDDevice(usb_device device, usb_pipe interruptPipe,
 	if (ringBufferSize > 0)
 		fRingBuffer = create_ring_buffer(ringBufferSize);
 
-	fTransferNotifySem = create_sem(0, "hid device transfer notify sem");
-	if (fTransferNotifySem < B_OK) {
-		fStatus = fTransferNotifySem;
-		return;
-	}
-
 	fTransferBuffer = (uint8 *)malloc(fTotalReportSize);
 	if (fTransferBuffer == NULL) {
 		fStatus = B_NO_MEMORY;
@@ -231,7 +225,17 @@ HIDDevice::SetParentCookie(int32 cookie)
 status_t
 HIDDevice::Open(uint32 flags)
 {
+	if (fOpen)
+		return B_BUSY;
+
+	if (fTransferNotifySem < 0) {
+		fTransferNotifySem = create_sem(0, "hid device transfer notify sem");
+		if (fTransferNotifySem < 0)
+			return (status_t)fTransferNotifySem;
+	}
+
 	fOpen = true;
+
 	return B_OK;
 }
 
@@ -242,8 +246,10 @@ HIDDevice::Close()
 	fOpen = false;
 	// make threads waiting for a transfer bail out
 	if (fTransferNotifySem >= 0) {
+		gUSBModule->cancel_queued_transfers(fInterruptPipe);
 		delete_sem(fTransferNotifySem);
 		fTransferNotifySem = -1;
+		_SetTransferProcessed();
 	}
 	return B_OK;
 }
@@ -307,6 +313,8 @@ HIDDevice::_IsTransferUnprocessed()
 status_t
 HIDDevice::_ScheduleTransfer()
 {
+	if (fTransferNotifySem < 0)
+		return B_ERROR;
 	if (fTransferUnprocessed)
 		return B_BUSY;
 	if (fRemoved)

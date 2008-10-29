@@ -44,6 +44,23 @@ KeyboardDevice::~KeyboardDevice()
 
 
 status_t
+KeyboardDevice::Open(uint32 flags)
+{
+	status_t status = HIDDevice::Open(flags);
+	if (status != B_OK) {
+		TRACE_ALWAYS("keyboard device failed to open: %s\n",
+			strerror(status));
+		return status;
+	}
+
+	fCurrentRepeatDelay = B_INFINITE_TIMEOUT;
+	fCurrentRepeatKey = 0;
+
+	return B_OK;
+}
+
+
+status_t
 KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 {
 	switch (op) {
@@ -71,6 +88,7 @@ KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 					_WriteKey(fCurrentRepeatKey, true);
 					// the next timeout is reduced to the repeat_rate
 					fCurrentRepeatDelay = fRepeatRate;
+					break;
 				} else if (result == B_INTERRUPTED && IsOpen()) {
 					continue;
 				} else
@@ -346,8 +364,10 @@ KeyboardDevice::_InterpretBuffer()
 					fCurrentRepeatDelay = fRepeatDelay;
 				} else {
 					// cancel the repeats if they are for this key
-					if (fCurrentRepeatKey == key)
+					if (fCurrentRepeatKey == key) {
 						fCurrentRepeatDelay = B_INFINITE_TIMEOUT;
+						fCurrentRepeatKey = 0;
+					}
 				}
 			} else
 				break;

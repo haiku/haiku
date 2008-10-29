@@ -18,6 +18,7 @@ public:
 									size_t totalReportSize);
 virtual							~KeyboardDevice();
 
+virtual	status_t				Open(uint32 flags);
 virtual	status_t				Control(uint32 op, void *buffer, size_t length);
 
 private:
