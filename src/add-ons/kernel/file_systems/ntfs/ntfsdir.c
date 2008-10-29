@@ -69,15 +69,10 @@ static int _ntfs_dirent_filler(void *_dirent, const ntfschar *name,
 	return 0;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_free_dircookie( void *_ns, void *node, void *cookie )
-#else
-int
-fs_free_dircookie( void *_ns, void *node, void *cookie )
-#endif
+fs_free_dircookie( fs_volume *_vol, fs_vnode *vnode, void *cookie )
 {
-	nspace		*ns = (nspace*)_ns;
+	nspace		*ns = (nspace*)_vol->private_volume;
 	
 	LOCK_VOL(ns);
 	ERRPRINT("fs_free_dircookie - ENTER\n");
@@ -91,16 +86,11 @@ fs_free_dircookie( void *_ns, void *node, void *cookie )
 	return B_NO_ERROR;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_opendir( void *_ns, void *_node, void **_cookie )
-#else
-int
-fs_opendir( void *_ns, void *_node, void **_cookie )
-#endif
+fs_opendir( fs_volume *_vol, fs_vnode *_node, void** _cookie )
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_node->private_node;
 	dircookie	*cookie = (dircookie*)ntfs_calloc( sizeof(dircookie) );	
 	int			result = B_NO_ERROR;
 	ntfs_inode	*ni=NULL;
@@ -141,15 +131,10 @@ exit:
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_closedir( void *_ns, void *node, void *_cookie )
-#else
-int
-fs_closedir( void *_ns, void *node, void *_cookie )
-#endif
+fs_closedir( fs_volume *_vol, fs_vnode *_node, void *cookie )
 {
-	nspace		*ns = (nspace*)_ns;	
+	nspace		*ns = (nspace*)_vol->private_volume;	
 
 	LOCK_VOL(ns);
 	
@@ -162,16 +147,11 @@ fs_closedir( void *_ns, void *node, void *_cookie )
 	return B_NO_ERROR;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_readdir( void *_ns, void *_node, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num )
-#else
-int
-fs_readdir(void *_ns, void *_node, void *_cookie, long *num, struct dirent *buf, size_t bufsize)
-#endif
+fs_readdir( fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num )
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_node->private_node;
 	dircookie	*cookie = (dircookie*)_cookie;
 	uint32 		nameLength = bufsize - sizeof(buf) + 1, realLen;
 	int 		result = B_NO_ERROR;
@@ -230,15 +210,10 @@ exit:
 	return result;
 }
 		
-#ifdef __HAIKU__			
 status_t
-fs_rewinddir( void *_ns, void *_node, void *_cookie )
-#else
-int
-fs_rewinddir( void *_ns, void *_node, void *_cookie )
-#endif
+fs_rewinddir( fs_volume *_vol, fs_vnode *vnode, void *_cookie )
 {
-	nspace		*ns = (nspace*)_ns;
+	nspace		*ns = (nspace*)_vol->private_volume;
 	dircookie	*cookie = (dircookie*)_cookie;
 	int			result = EINVAL;
 

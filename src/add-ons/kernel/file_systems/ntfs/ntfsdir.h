@@ -31,22 +31,10 @@ typedef struct dircookie
 	char 				name[MAX_PATH];
 } dircookie;
 
-#ifdef __HAIKU__
-
-status_t fs_free_dircookie( void *_ns, void *node, void *cookie );
-status_t fs_opendir( void *_ns, void *_node, void **_cookie );
-status_t fs_closedir( void *_ns, void *node, void *_cookie );
-status_t fs_rewinddir( void *_ns, void *_node, void *_cookie );
-status_t fs_readdir( void *_ns, void *_node, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
-
-#else
-
-int fs_free_dircookie( void *_ns, void *node, void *cookie );
-int fs_opendir( void *_ns, void *_node, void **_cookie );
-int fs_closedir( void *_ns, void *node, void *_cookie );
-int fs_rewinddir( void *_ns, void *_node, void *_cookie );
-int fs_readdir(void *_ns, void *_node, void *cookie, long *num, struct dirent *buf, size_t bufsize);
-
-#endif //__HAIKU__
+status_t	fs_closedir(fs_volume *volume, fs_vnode *vnode, void *cookie);
+status_t	fs_free_dircookie(fs_volume *volume, fs_vnode *vnode, void *cookie);
+status_t	fs_opendir(fs_volume *volume, fs_vnode *vnode, void** cookie);
+status_t  	fs_readdir(fs_volume *volume, fs_vnode *vnode, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
+status_t	fs_rewinddir(fs_volume *volume, fs_vnode *vnode, void *cookie);
 
 #endif

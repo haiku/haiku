@@ -42,80 +42,47 @@
 #include "lock.h"
 #include "volume_util.h"
 
+extern fs_vnode_ops gNTFSVnodeOps;
+extern fs_volume_ops gNTFSVolumeOps;
 
-#ifdef __HAIKU__
 
 float		fs_identify_partition(int fd, partition_data *partition, void **_cookie);
 status_t	fs_scan_partition(int fd, partition_data *partition, void *_cookie);
 void		fs_free_identify_partition_cookie(partition_data *partition, void *_cookie);
 
-status_t	fs_mount(dev_t nsid, const char *device, ulong flags, const char *args, void **data, ino_t *vnid);
-status_t	fs_create_symlink(void *_ns, void *_dir, const char *name, const char *target, int mode);
-status_t   	fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, void **_cookie, ino_t *_vnid);
-status_t	fs_walk(void *_ns, void *_base, const char *file, ino_t *vnid,int *_type);
-status_t	fs_get_vnode_name(void *_ns, void *_node, char *buffer, size_t bufferSize);
-status_t	fs_unmount(void *_ns);
-status_t	fs_rfsstat(void *_ns, struct fs_info *);
-status_t  	fs_wfsstat(void *_vol, const struct fs_info *fss, uint32 mask);
-status_t 	fs_sync(void *_ns);
-status_t	fs_read_vnode(void *_ns, ino_t vnid, void **_node, bool reenter);
-status_t	fs_write_vnode(void *_ns, void *_node, bool reenter);
-status_t    fs_remove_vnode( void *_ns, void *_node, bool reenter );
-status_t	fs_access( void *ns, void *node, int mode );
-status_t	fs_rstat(void *_ns, void *_node, struct stat *st);
-status_t	fs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask);
-status_t	fs_open(void *_ns, void *_node, int omode, void **cookie);
-status_t	fs_close(void *ns, void *node, void *cookie);
-status_t	fs_free_cookie(void *ns, void *node, void *cookie);
-status_t	fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf, size_t *len);
-status_t	fs_write(void *ns, void *node, void *cookie, off_t pos, const void *buf, size_t *len);
-status_t	fs_mkdir(void *_ns, void *_node, const char *name,	int perms, ino_t *_vnid);
-status_t 	fs_rmdir(void *_ns, void *dir, const char *name);
-status_t	fs_opendir(void* _ns, void* _node, void** cookie);
-status_t  	fs_readdir( void *_ns, void *_node, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
-status_t	fs_rewinddir(void *_ns, void *_node, void *cookie);
-status_t	fs_closedir(void *_ns, void *_node, void *cookie);
-status_t	fs_free_dircookie(void *_ns, void *_node, void *cookie);
-status_t 	fs_readlink(void *_ns, void *_node, char *buf, size_t *bufsize);
-status_t 	fs_fsync(void *_ns, void *_node);
-status_t    fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *newname);
-status_t    fs_unlink(void *_ns, void *_node, const char *name);
+status_t	fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino_t *vnid);
+status_t	fs_create_symlink(fs_volume *volume, fs_vnode *dir, const char *name, const char *target, int mode);
+status_t   	fs_create(fs_volume *volume, fs_vnode *dir, const char *name, int omode, int perms, void **_cookie, ino_t *_vnid);
+status_t	fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *vnid);
+status_t	fs_get_vnode_name(fs_volume *volume, fs_vnode *vnode, char *buffer, size_t bufferSize);
+status_t	fs_unmount(fs_volume *_vol);
+status_t	fs_rfsstat(fs_volume *_vol, struct fs_info *);
+status_t  	fs_wfsstat(fs_volume *_vol, const struct fs_info *fss, uint32 mask);
+status_t 	fs_sync(fs_volume *_vol);
+status_t	fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *_flags, bool reenter);
+status_t	fs_write_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter);
+status_t    fs_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter);
+status_t	fs_access(fs_volume *volume, fs_vnode *vnode, int mode);
+status_t	fs_rstat(fs_volume *volume, fs_vnode *vnode, struct stat *st);
+status_t	fs_wstat(fs_volume *volume, fs_vnode *vnode, const struct stat *st, uint32 mask);
+status_t	fs_open(fs_volume *volume, fs_vnode *vnode, int omode, void **cookie);
+status_t	fs_close(fs_volume *volume, fs_vnode *vnode, void *cookie);
+status_t	fs_free_cookie(fs_volume *volume, fs_vnode *vnode, void *cookie);
+status_t	fs_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos, void *buf, size_t *len);
+status_t	fs_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos, const void *buf, size_t *len);
+status_t	fs_mkdir(fs_volume *volume, fs_vnode *parent, const char *name,	int perms, ino_t *_vnid);
+status_t 	fs_rmdir(fs_volume *volume, fs_vnode *parent, const char *name);
+status_t	fs_opendir(fs_volume *volume, fs_vnode *vnode, void** cookie);
+status_t  	fs_readdir(fs_volume *volume, fs_vnode *vnode, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
+status_t	fs_rewinddir(fs_volume *volume, fs_vnode *vnode, void *cookie);
+status_t	fs_closedir(fs_volume *volume, fs_vnode *vnode, void *cookie);
+status_t	fs_free_dircookie(fs_volume *volume, fs_vnode *vnode, void *cookie);
+status_t 	fs_readlink(fs_volume *volume, fs_vnode *link, char *buf, size_t *bufsize);
+status_t 	fs_fsync(fs_volume *_vol, fs_vnode *_node);
+status_t    fs_rename(fs_volume *volume, fs_vnode *fromDir, const char *fromName, fs_vnode *toDir, const char *toName);
+status_t    fs_unlink(fs_volume *volume, fs_vnode *dir, const char *name);
 
-#else
 
-int			fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t len, void **data, ino_t *vnid);
-int			fs_unmount(void *_ns);
-int			fs_walk(void *_ns, void *_base, const char *file, char **newpath, ino_t *vnid);
-int			fs_read_vnode(void *_ns, ino_t vnid, char r, void **node);
-int			fs_write_vnode(void *_ns, void *_node, char r);
-int			fs_rstat(void *_ns, void *_node, struct stat *st);
-int			fs_wstat(void *_vol, void *_node, struct stat *st, long mask);
-int			fs_open(void *_ns, void *_node, int omode, void **cookie);
-int			fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf, size_t *len);
-int			fs_write(void *ns, void *node, void *cookie, off_t pos, const void *buf, size_t *len);
-int			fs_free_cookie(void *ns, void *node, void *cookie);
-int			fs_close(void *ns, void *node, void *cookie);
-int			fs_access(void *_ns, void *_node, int mode);
-int			fs_opendir(void* _ns, void* _node, void** cookie);
-int			fs_readdir(void *_ns, void *_node, void *cookie, long *num, struct dirent *buf, size_t bufsize);
-int			fs_rewinddir(void *_ns, void *_node, void *cookie);
-int			fs_closedir(void *_ns, void *_node, void *cookie);
-int			fs_free_dircookie(void *_ns, void *_node, void *cookie);
-int			fs_rfsstat(void *_ns, struct fs_info *);
-int			fs_wfsstat(void *_vol, struct fs_info *fss, long mask);
-int			fs_readlink(void *_ns, void *_node, char *buf, size_t *bufsize);
-int			fs_mkdir(void *_ns, void *_node, const char *name,	int perms);
-int			fs_rmdir(void *_ns, void *dir, const char *name);
-int			fs_remove_vnode( void *_ns, void *_node, char reenter );
-int			fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *newname);
-int			fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, ino_t *_vnid, void **_cookie);
-int			fs_unlink(void *_ns, void *_node, const char *name);
-int			fs_fsync(void *_ns, void *_node);
-int			fs_sync(void *_ns);
-int			fs_create_symlink(void *ns, void *_dir, const char *name, const char *path);
-
-#endif //__HAIKU__
-
-status_t 	do_unlink(nspace *vol, vnode *dir, const char *name, bool isdir);
+status_t 	do_unlink(fs_volume *volume, vnode *dir, const char *name, bool isdir);
 
 #endif

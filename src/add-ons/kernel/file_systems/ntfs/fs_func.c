@@ -41,7 +41,6 @@
 #include "volume_util.h"
 #include "fs_func.h"
 
-#ifdef __HAIKU__
 
 typedef struct identify_cookie {
 	NTFS_BOOT_SECTOR boot;
@@ -117,15 +116,10 @@ fs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 	identify_cookie *cookie = (identify_cookie *)_cookie;
 	free(cookie);
 }
-#endif //__HAIKU__
 
-#ifdef __HAIKU__
+
 status_t
-fs_mount(dev_t nsid, const char *device, ulong flags, const char *args, void **data, ino_t *vnid)
-#else
-int
-fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t len, void **data, ino_t *vnid)
-#endif
+fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args, ino_t *_rootID)
 {
 	nspace		*ns;
 	vnode		*newNode = NULL;
@@ -153,15 +147,7 @@ fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t le
 	strcpy(ns->devicePath,device);
 
 	sprintf(lockname, "ntfs_lock %lx", ns->id);
-
-#ifdef __HAIKU__
 	recursive_lock_init_etc(&(ns->vlock), lockname, MUTEX_FLAG_CLONE_NAME);
-#else
-	if ((result = new_lock(&(ns->vlock), lockname)) != B_OK) {
-		ERRPRINT("fs_mount - error creating lock (%s)\n", strerror(result));
-		goto exit;
-	}
-#endif
 
 	handle = load_driver_settings("ntfs");
 	ns->show_sys_files = ! (strcasecmp(get_driver_parameter(handle, "hide_sys_files", "true", "true"), "true") == 0);
@@ -183,19 +169,20 @@ fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t le
 		result = errno;
 
 	if (result == B_NO_ERROR) {
-		*vnid = FILE_root;
-		*data = (void*)ns;
-		ns->id = nsid;
+		*_rootID = FILE_root;
+		ns->id = _vol->id;
+		_vol->private_volume = (void *)ns;
+		_vol->ops = &gNTFSVolumeOps;
 
 		newNode = (vnode*)ntfs_calloc( sizeof(vnode) );
 		if ( newNode == NULL )
 			result = ENOMEM;
 		else {
 
-			newNode->vnid = *vnid;
+			newNode->vnid = *_rootID;
 			newNode->parent_vnid = -1;
 
-			result = publish_vnode( nsid, *vnid, (void*)newNode );
+			result = publish_vnode( _vol, *_rootID, (void*)newNode, &gNTFSVnodeOps, 0777, 0);
 			if ( result != B_NO_ERROR )	{
 				free( ns );
 				result = EINVAL;
@@ -216,26 +203,17 @@ exit:
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_unmount(void *_ns)
-#else
-int
-fs_unmount(void *_ns)
-#endif
+fs_unmount(fs_volume *_vol)
 {
-	nspace		*ns = (nspace*)_ns;
+	nspace		*ns = (nspace*)_vol->private_volume;
 	status_t	result = B_NO_ERROR;
 
 	ERRPRINT("fs_unmount - ENTER\n");
 
 	ntfs_umount( ns->ntvol, true );
 
-#ifdef __HAIKU__
 	recursive_lock_destroy(&(ns->vlock));
-#else
-	free_lock(&(ns->vlock));
-#endif
 
 	free( ns );
 
@@ -244,15 +222,10 @@ fs_unmount(void *_ns)
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_rfsstat( void *_ns, struct fs_info * fss )
-#else
-int
-fs_rfsstat( void *_ns, struct fs_info * fss )
-#endif
+fs_rfsstat( fs_volume *_vol, struct fs_info * fss )
 {
-	nspace	*ns = (nspace*)_ns;
+	nspace	*ns = (nspace*)_vol->private_volume;
 	int 	i;
 
 	LOCK_VOL(ns);
@@ -288,15 +261,11 @@ fs_rfsstat( void *_ns, struct fs_info * fss )
 	return B_NO_ERROR;
 }
 
-#ifdef __HAIKU__
+
 status_t
-fs_wfsstat(void *_vol, const struct fs_info * fss, uint32 mask)
-#else
-int
-fs_wfsstat(void *_vol, struct fs_info *fss, long mask)
-#endif
+fs_wfsstat( fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 {
-	nspace* 	ns = (nspace*)_vol;
+	nspace* 	ns = (nspace*)_vol->private_volume;
 	status_t	result = B_NO_ERROR;
 
 	if (ns->flags & B_FS_IS_READONLY) {
@@ -306,11 +275,7 @@ fs_wfsstat(void *_vol, struct fs_info *fss, long mask)
 
 	LOCK_VOL(ns);
 
-#ifdef __HAIKU__
 	if (mask & FS_WRITE_FSINFO_NAME) {
-#else
-	if (mask & WFSSTAT_NAME) {
-#endif
 		result = ntfs_change_label( ns->ntvol,  (char*)fss->volume_name );
 		goto exit;
 	}
@@ -322,16 +287,11 @@ exit:
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_walk(void *_ns, void *_base, const char *file, ino_t *vnid,int *_type)
-#else
-int
-fs_walk(void *_ns, void *_base, const char *file, char **newpath, ino_t *vnid)
-#endif
+fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *vnid)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*baseNode = (vnode*)_base;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*baseNode = (vnode*)_dir->private_node;
 	vnode		*newNode = NULL;
 	ntfschar 	*unicode = NULL;
 	ntfs_inode 	*bi = NULL;
@@ -342,18 +302,18 @@ fs_walk(void *_ns, void *_base, const char *file, char **newpath, ino_t *vnid)
 
 	ERRPRINT("fs_walk - ENTER : find for \"%s\"\n",file);
 
-	if(ns == NULL || _base == NULL || file == NULL || vnid == NULL) {
+	if(ns == NULL || _dir == NULL || file == NULL || vnid == NULL) {
 	  result = EINVAL;
 	  goto	exit;
 	 }
 
 	if ( !strcmp( file, "." ) )	{
 		*vnid = baseNode->vnid;
-		if ( get_vnode( ns->id, *vnid, (void**)&newNode ) != 0 )
+		if ( get_vnode( _vol, *vnid, (void**)&newNode ) != 0 )
 			result = ENOENT;
 	} else if ( !strcmp( file, ".." ) && baseNode->vnid != FILE_root ) {
 		*vnid = baseNode->parent_vnid;
-		if ( get_vnode( ns->id, *vnid, (void**)&newNode ) != 0 )
+		if ( get_vnode( _vol, *vnid, (void**)&newNode ) != 0 )
 			result = ENOENT;
 	} else {
 			unicode = ntfs_calloc(MAX_PATH);
@@ -379,7 +339,7 @@ fs_walk(void *_ns, void *_base, const char *file, char **newpath, ino_t *vnid)
 				goto exit;
 			}
 
-			if( get_vnode( ns->id, *vnid, (void**)&newNode ) !=0 )
+			if( get_vnode( _vol, *vnid, (void**)&newNode ) !=0 )
 				result = ENOENT;
 
 			if(newNode!=NULL)
@@ -395,12 +355,11 @@ exit:
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_get_vnode_name(void *_ns, void *_node, char *buffer, size_t bufferSize)
+fs_get_vnode_name(fs_volume *_vol, fs_vnode *_vnode, char *buffer, size_t bufferSize)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode   	*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode   	*node = (vnode*)_vnode->private_node;
 	ntfs_inode	*ni=NULL;
 	status_t	result = B_NO_ERROR;
 
@@ -433,19 +392,13 @@ exit:
 
 	return result;
 }
-#endif
 
 
 
-#ifdef __HAIKU__
 status_t
-fs_read_vnode(void *_ns, ino_t vnid, void **node, bool reenter)
-#else
-int
-fs_read_vnode(void *_ns, ino_t vnid, char reenter, void **node)
-#endif
+fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type, uint32 *_flags, bool reenter)
 {
-	nspace		*ns = (nspace*)_ns;
+	nspace		*ns = (nspace*)_vol->private_volume;
 	vnode		*newNode = NULL;
 	ntfs_inode	*ni=NULL;
 	status_t	result = B_NO_ERROR;
@@ -454,6 +407,10 @@ fs_read_vnode(void *_ns, ino_t vnid, char reenter, void **node)
 		LOCK_VOL(ns);
 
 	ERRPRINT("fs_read_vnode - ENTER\n");
+
+	_node->private_node = NULL;
+	_node->ops = &gNTFSVnodeOps;
+	_flags = 0;	
 
 	newNode = (vnode*)ntfs_calloc( sizeof(vnode) );
 	if ( newNode != NULL ) {
@@ -479,7 +436,8 @@ fs_read_vnode(void *_ns, ino_t vnid, char reenter, void **node)
 			}
 		}
 
-		*node = (void*)newNode;
+		_node->private_node = newNode;
+		*_type = 0666;
 	}
 	else
 		result = ENOMEM;
@@ -496,16 +454,11 @@ exit:
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_write_vnode( void *_ns, void *_node, bool reenter )
-#else
-int
-fs_write_vnode( void *_ns, void *_node, char reenter )
-#endif
+fs_write_vnode( fs_volume *_vol, fs_vnode *_node, bool reenter )
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_node->private_node;
 	status_t	result = B_NO_ERROR;
 
 	if ( !reenter )
@@ -524,16 +477,11 @@ fs_write_vnode( void *_ns, void *_node, char reenter )
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_remove_vnode( void *_ns, void *_node, bool reenter )
-#else
-int
-fs_remove_vnode( void *_ns, void *_node, char reenter )
-#endif
+fs_remove_vnode( fs_volume *_vol, fs_vnode *_node, bool reenter )
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_node->private_node;
 	status_t	result = B_NO_ERROR;
 
 	if ( !reenter )
@@ -552,16 +500,11 @@ fs_remove_vnode( void *_ns, void *_node, char reenter )
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_rstat( void *_ns, void *_node, struct stat *stbuf )
-#else
-int
-fs_rstat( void *_ns, void *_node, struct stat *stbuf )
-#endif
+fs_rstat( fs_volume *_vol, fs_vnode *_node, struct stat *stbuf )
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_node->private_node;
 	ntfs_inode 	*ni = NULL;
 	ntfs_attr 	*na;
 	status_t	result = B_NO_ERROR;
@@ -659,16 +602,11 @@ exit:
 
 }
 
-#ifdef __HAIKU__
 status_t
-fs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
-#else
-int
-fs_wstat(void *_vol, void *_node, struct stat *st, long mask)
-#endif
+fs_wstat( fs_volume *_vol, fs_vnode *_node, const struct stat *st, uint32 mask )
 {
-	nspace		*ns = (nspace*)_vol;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_node->private_node;
 	ntfs_inode 	*ni = NULL;
 	status_t	result = B_NO_ERROR;
 
@@ -682,11 +620,8 @@ fs_wstat(void *_vol, void *_node, struct stat *st, long mask)
 			goto exit;
 	}
 
-#ifdef __HAIKU__
 	if ( mask & B_STAT_SIZE ) {
-#else
-	if (mask & WSTAT_SIZE) {
-#endif
+
 		ERRPRINT("fs_wstat: setting file size to %Lx\n", st->st_size);
 
 		if ( ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ) {
@@ -704,30 +639,19 @@ fs_wstat(void *_vol, void *_node, struct stat *st, long mask)
 
 			ntfs_mark_free_space_outdated(ns);
 
-#ifdef __HAIKU__
 			notify_stat_changed(ns->id, MREF(ni->mft_no), mask);
-#else
-			notify_listener(B_STAT_CHANGED, ns->id, 0, 0, MREF(ni->mft_no), NULL);
-#endif
-
 		}
 	}
 
-#ifdef __HAIKU__
 	if (mask & B_STAT_MODIFICATION_TIME) {
-#else
-	if (mask & WSTAT_MTIME) {
-#endif
+
 		ERRPRINT("fs_wstat: setting modification time\n");
 
 		ni->last_access_time = st->st_atime;
 		ni->last_data_change_time = st->st_mtime;
 		ni->last_mft_change_time = st->st_ctime;
-#ifdef __HAIKU__
+
 		notify_stat_changed(ns->id, MREF(ni->mft_no), mask);
-#else
-		notify_listener(B_STAT_CHANGED, ns->id, 0, 0, MREF(ni->mft_no), NULL);
-#endif
 	}
 
 exit:
@@ -743,15 +667,10 @@ exit:
 }
 
 
-#ifdef __HAIKU__
 status_t
-fs_sync(void *_ns)
-#else
-int
-fs_sync(void *_ns)
-#endif
+fs_sync(fs_volume *_vol)
 {
-	nspace *ns = (nspace *)_ns;
+	nspace *ns = (nspace *)_vol->private_volume;
 
 	LOCK_VOL(ns);
 
@@ -765,16 +684,11 @@ fs_sync(void *_ns)
 }
 
 
-#ifdef __HAIKU__
 status_t
-fs_fsync(void *_ns, void *_node)
-#else
-int
-fs_fsync(void *_ns, void *_node)
-#endif
+fs_fsync(fs_volume *_vol, fs_vnode *_node)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_node->private_node;
 	ntfs_inode 	*ni = NULL;
 	status_t	result = B_NO_ERROR;
 
@@ -807,16 +721,11 @@ exit:
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_open(void *_ns, void *_node, int omode, void **_cookie)
-#else
-int
-fs_open(void *_ns, void *_node, int omode, void **_cookie)
-#endif
+fs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_node->private_node;
 	filecookie	*cookie=NULL;
 	ntfs_inode	*ni=NULL;
 	ntfs_attr 	*na = NULL;
@@ -872,16 +781,11 @@ exit:
 }
 
 
-#ifdef __HAIKU__
 status_t
-fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, void **_cookie, ino_t *_vnid)
-#else
-int
-fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, ino_t *_vnid, void **_cookie)
-#endif
+fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode, int perms, void **_cookie, ino_t *_vnid)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*dir = (vnode*)_dir;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*dir = (vnode*)_dir->private_node;
 	filecookie	*cookie = NULL;
 	vnode		*newNode = NULL;
 	ntfs_attr 	*na = NULL;
@@ -900,7 +804,7 @@ fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, ino_t *
 
 	ERRPRINT("fs_create - ENTER: name=%s\n",name);
 
-	if(_ns==NULL || _dir==NULL) {
+	if(_vol==NULL || _dir==NULL) {
 		result = EINVAL;
 		goto exit;
 	}
@@ -964,15 +868,11 @@ fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, ino_t *
 			set_mime(newNode, name);
 
 			result = B_NO_ERROR;
-			result = publish_vnode(ns->id, *_vnid, (void*)newNode);
+			result = publish_vnode(_vol, *_vnid, (void*)newNode,&gNTFSVnodeOps, 0777, 0);
 
 			ntfs_mark_free_space_outdated(ns);
 
-#ifdef __HAIKU__
 			notify_entry_created(ns->id, MREF( bi->mft_no ), name, *_vnid);
-#else
-			notify_listener(B_ENTRY_CREATED, ns->id, MREF( bi->mft_no ), 0, *_vnid, name);
-#endif
 
 		} else
 			result = errno;
@@ -1001,16 +901,11 @@ exit:
 	return 		result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_read( void *_ns, void *_node, void *_cookie, off_t offset, void *buf, size_t *len )
-#else
-int
-fs_read( void *_ns, void *_node, void *_cookie, off_t offset, void *buf, size_t *len )
-#endif
+fs_read( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf, size_t *len )
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_dir->private_node;
 	//filecookie *cookie = (filecookie*)_cookie;  //temporary not used
 	ntfs_inode 	*ni = NULL;
 	ntfs_attr 	*na = NULL;
@@ -1083,16 +978,11 @@ exit2:
 }
 
 
-#ifdef __HAIKU__
 status_t
-fs_write( void *_ns, void *_node, void *_cookie, off_t offset, const void *buf, size_t *len )
-#else
-int
-fs_write( void *_ns, void *_node, void *_cookie, off_t offset, const void *buf, size_t *len )
-#endif
+fs_write( fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, const void *buf, size_t *len )
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_dir->private_node;
 	filecookie	*cookie = (filecookie*)_cookie;
 	ntfs_inode 	*ni = NULL;
 	ntfs_attr 	*na = NULL;
@@ -1186,13 +1076,8 @@ exit2:
 }
 
 
-#ifdef __HAIKU__
 status_t
-fs_close(void *ns, void *node, void *cookie)
-#else
-int
-fs_close(void *ns, void *node, void *cookie)
-#endif
+fs_close(fs_volume *_vol, fs_vnode *_node, void *cookie)
 {
 	ERRPRINT("fs_close - ENTER\n");
 
@@ -1200,13 +1085,8 @@ fs_close(void *ns, void *node, void *cookie)
 	return B_NO_ERROR;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_free_cookie( void *ns, void *node, void *cookie )
-#else
-int
-fs_free_cookie( void *ns, void *node, void *cookie )
-#endif
+fs_free_cookie( fs_volume *_vol, fs_vnode *_node, void *cookie )
 {
 	ERRPRINT("fs_free_cookie - ENTER\n");
 
@@ -1217,13 +1097,8 @@ fs_free_cookie( void *ns, void *node, void *cookie )
 	return B_NO_ERROR;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_access( void *ns, void *node, int mode )
-#else
-int
-fs_access( void *ns, void *node, int mode )
-#endif
+fs_access( fs_volume *_vol, fs_vnode *_node, int mode )
 {
 	ERRPRINT("fs_access - ENTER\n");
 
@@ -1231,16 +1106,11 @@ fs_access( void *ns, void *node, int mode )
 	return B_NO_ERROR;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_readlink(void *_ns, void *_node, char *buff, size_t *buff_size)
-#else
-int
-fs_readlink(void *_ns, void *_node, char *buff, size_t *buff_size)
-#endif
+fs_readlink(fs_volume *_vol, fs_vnode *_node, char *buff, size_t *buff_size)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*node = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*node = (vnode*)_node->private_node;
 	ntfs_attr 	*na = NULL;
 	INTX_FILE 	*intx_file = NULL;
 	ntfs_inode 	*ni = NULL;
@@ -1331,16 +1201,11 @@ exit:
 	return result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_create_symlink(void *_ns, void *_dir, const char *name, const char *target, int mode)
-#else
-int
-fs_create_symlink(void *_ns, void *_dir, const char *name, const char *target)
-#endif
+fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name, const char *target, int mode)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*dir = (vnode*)_dir;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*dir = (vnode*)_dir->private_node;
 	ntfs_inode	*sym = NULL;
 	ntfs_inode	*bi = NULL;
 	vnode		*symnode = NULL;
@@ -1397,16 +1262,12 @@ fs_create_symlink(void *_ns, void *_dir, const char *name, const char *target)
 	else
 			set_mime(symnode, name);
 
-	if ((result = publish_vnode(ns->id, MREF(sym->mft_no), symnode)) != 0)
+	if ((result = publish_vnode(_vol, MREF(sym->mft_no), symnode,&gNTFSVnodeOps, 0777, 0)) != 0)
 		ERRPRINT("fs_symlink - new_vnode failed for vnid %Ld: %s\n", MREF(sym->mft_no), strerror(result));
 
-	put_vnode(ns->id, MREF(sym->mft_no) );
+	put_vnode(_vol, MREF(sym->mft_no) );
 
-#ifdef __HAIKU__
 	notify_entry_created(ns->id, MREF( bi->mft_no ), name, MREF(sym->mft_no));
-#else
-	notify_listener(B_ENTRY_CREATED, ns->id, MREF(bi->mft_no), 0, MREF(sym->mft_no), name);
-#endif
 
 exit:
 
@@ -1423,16 +1284,11 @@ exit:
 }
 
 
-#ifdef __HAIKU__
 status_t
-fs_mkdir(void *_ns, void *_node, const char *name,	int perms, ino_t *_vnid)
-#else
-int
-fs_mkdir(void *_ns, void *_node, const char *name,	int perms)
-#endif
+fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms, ino_t *_vnid)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*dir = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*dir = (vnode*)_dir->private_node;
 	vnode		*newNode =NULL;
 	ntfschar 	*uname = NULL;
 	int 		uname_len;
@@ -1449,7 +1305,7 @@ fs_mkdir(void *_ns, void *_node, const char *name,	int perms)
 
 	ERRPRINT("fs_mkdir - ENTER: name=%s\n",name);
 
-	if(_ns==NULL || _node==NULL || name==NULL) {
+	if(_vol==NULL || _dir==NULL || name==NULL) {
 	 	result = EINVAL;
 	 	goto exit;
 	}
@@ -1459,14 +1315,6 @@ fs_mkdir(void *_ns, void *_node, const char *name,	int perms)
 		result = ENOENT;
 		goto exit;
 	}
-
-#ifndef __HAIKU__
-	if (is_vnode_removed(ns->id, MREF(bi->mft_no)) > 0) {
-		ERRPRINT("fs_mkdir - called in removed directory\n");
-		result = EPERM;
-		goto exit;
-	}
-#endif
 
 	if (! bi->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
 		result =  EINVAL;
@@ -1495,20 +1343,15 @@ fs_mkdir(void *_ns, void *_node, const char *name,	int perms)
 		newNode->parent_vnid = MREF(bi->mft_no);
 		set_mime(newNode, ".***");
 
-		result = publish_vnode(ns->id, vnid, (void*)newNode);
-#ifdef __HAIKU__
+		result = publish_vnode(_vol, vnid, (void*)newNode,&gNTFSVnodeOps, 0777, 0);
+
 		*_vnid = vnid;
-#endif
-		put_vnode(ns->id, MREF(ni->mft_no));
+
+		put_vnode(_vol, MREF(ni->mft_no));
 
 		ntfs_mark_free_space_outdated(ns);
 
-#ifdef __HAIKU__
 		notify_entry_created(ns->id, MREF( bi->mft_no ), name, vnid);
-#else
-		notify_listener(B_ENTRY_CREATED, ns->id, MREF( bi->mft_no ), 0, vnid, name);
-#endif
-
 	}
 	else
 		result = errno;
@@ -1527,17 +1370,12 @@ exit:
 	return 		result;
 }
 
-#ifdef __HAIKU__
 status_t
-fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *newname)
-#else
-int
-fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *newname)
-#endif
+fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname, fs_vnode *_ndir, const char *newname)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*odir = (vnode*)_odir;
-	vnode		*ndir = (vnode*)_ndir;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*odir = (vnode*)_odir->private_node;
+	vnode		*ndir = (vnode*)_ndir->private_node;
 
 	vnode		*onode = NULL;
 	vnode		*nnode = NULL;
@@ -1564,7 +1402,7 @@ fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *
 
 	ERRPRINT("fs_rename - oldname:%s newname:%s\n", oldname, newname);
 
-	if (_ns == NULL || _odir == NULL || _ndir == NULL
+	if (_vol == NULL || _odir == NULL || _ndir == NULL
 		|| oldname == NULL || *oldname == '\0'
 		|| newname == NULL || *newname == '\0'
 		|| !strcmp(oldname, ".") || !strcmp(oldname, "..")
@@ -1604,7 +1442,7 @@ fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *
 		goto exit;
 	}
 
-	result = get_vnode( ns->id, ovnid, (void**)&onode );
+	result = get_vnode( _vol, ovnid, (void**)&onode );
 	if( result != B_NO_ERROR)
 		goto	exit;
 
@@ -1614,12 +1452,12 @@ fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *
 			if(ndi!=NULL) {
 				nvnid = MREF( ntfs_inode_lookup_by_name(ndi, unewname, unewname_len) );
 				if (nvnid != (u64) -1)
-					get_vnode( ns->id, nvnid, (void**)&nnode );
+					get_vnode( _vol, nvnid, (void**)&nnode );
 			}
 
 			if(nnode!=NULL) {
 				result = EINVAL;
-				put_vnode(ns->id, nnode->vnid);
+				put_vnode(_vol, nnode->vnid);
 				goto exit;
 			}
 
@@ -1652,25 +1490,20 @@ fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *
 
 			onode->parent_vnid = MREF( ndi->mft_no );
 
-#ifdef __HAIKU__
 			notify_entry_moved(ns->id, MREF( odi->mft_no ), oldname, MREF( ndi->mft_no ), newname, onode->vnid );
 			notify_attribute_changed(ns->id, onode->vnid, "BEOS:TYPE", B_ATTR_CHANGED);
-#else
-			notify_listener(B_ENTRY_MOVED,  ns->id, MREF( odi->mft_no ), MREF( ndi->mft_no ), MREF( onode->vnid ), newname);
-			notify_listener(B_ATTR_CHANGED, ns->id, 0, 0, onode->vnid, "BEOS:TYPE");
-#endif
 
-			put_vnode(ns->id, onode->vnid );
+			put_vnode(_vol, onode->vnid );
 
 	} else { //renaming
 
 			nvnid = MREF( ntfs_inode_lookup_by_name(odi, unewname, unewname_len) );
 			if (nvnid != (u64) -1)
-					get_vnode( ns->id, nvnid, (void**)&nnode );
+					get_vnode( _vol, nvnid, (void**)&nnode );
 
 			if(nnode!=NULL) {
 				result = EINVAL;
-				put_vnode(ns->id, nnode->vnid);
+				put_vnode( _vol, nnode->vnid);
 				goto exit;
 			}
 
@@ -1700,14 +1533,9 @@ fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *
 			}
 
 			ntfs_delete(oi, odi, uoldname, uoldname_len);
-#ifdef __HAIKU__
 			notify_entry_moved(ns->id, MREF( odi->mft_no ), oldname, MREF( odi->mft_no ), newname, onode->vnid );
 			notify_attribute_changed(ns->id, onode->vnid, "BEOS:TYPE", B_ATTR_CHANGED);
-#else
-			notify_listener(B_ENTRY_MOVED,  ns->id, MREF( odi->mft_no ), MREF( odi->mft_no ), MREF( onode->vnid ), newname);
-			notify_listener(B_ATTR_CHANGED, ns->id, 0, 0, onode->vnid, "BEOS:TYPE");
-#endif
-			put_vnode(ns->id, onode->vnid );
+			put_vnode(_vol, onode->vnid );
 	}
 
 
@@ -1729,9 +1557,10 @@ exit:
 }
 
 status_t
-do_unlink(nspace *vol, vnode *dir, const char *name, bool	isdir)
+do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool	isdir)
 {
-	ino_t 	vnid;
+	nspace		*vol = (nspace*)_vol->private_volume;
+	ino_t 		vnid;
 	vnode 		*node = NULL;
 	ntfs_inode	*ni = NULL;
 	ntfs_inode 	*bi = NULL;
@@ -1758,7 +1587,7 @@ do_unlink(nspace *vol, vnode *dir, const char *name, bool	isdir)
 		goto exit1;
 	}
 
-	result = get_vnode(vol->id, vnid, (void**) & node);
+	result = get_vnode(_vol, vnid, (void**) & node);
 
 	if(result != B_NO_ERROR || node==NULL)
 	{
@@ -1793,15 +1622,11 @@ do_unlink(nspace *vol, vnode *dir, const char *name, bool	isdir)
 
 	node->parent_vnid = dir->vnid;
 
-#ifdef __HAIKU__
 	notify_entry_removed(vol->id, dir->vnid, name, vnid);
-#else
-	notify_listener(B_ENTRY_REMOVED, vol->id, MREF(dir->vnid), 0, vnid, NULL);
-#endif
 
-	result = remove_vnode(vol->id, vnid);
+	result = remove_vnode(_vol, vnid);
 exit2:
-	put_vnode(vol->id, vnid);
+	put_vnode(_vol, vnid);
 exit1:
 	if(uname!=NULL)
 		free(uname);
@@ -1816,16 +1641,11 @@ exit1:
 }
 
 
-#ifdef __HAIKU__
 status_t
-fs_rmdir(void *_ns, void *_node, const char *name)
-#else
-int
-fs_rmdir(void *_ns, void *_node, const char *name)
-#endif
+fs_rmdir(fs_volume *_vol, fs_vnode *_dir, const char *name)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*dir = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*dir = (vnode*)_dir->private_node;
 	status_t	result = B_NO_ERROR;
 
 	if (ns->flags & B_FS_IS_READONLY) {
@@ -1852,7 +1672,7 @@ fs_rmdir(void *_ns, void *_node, const char *name)
 		goto exit1;
 	}
 
-	result = do_unlink(ns, dir, name, true);
+	result = do_unlink(_vol, dir, name, true);
 
 	ntfs_mark_free_space_outdated(ns);
 
@@ -1866,16 +1686,11 @@ exit1:
 }
 
 
-#ifdef __HAIKU__
 status_t
-fs_unlink(void *_ns, void *_node, const char *name)
-#else
-int
-fs_unlink(void *_ns, void *_node, const char *name)
-#endif
+fs_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name)
 {
-	nspace		*ns = (nspace*)_ns;
-	vnode		*dir = (vnode*)_node;
+	nspace		*ns = (nspace*)_vol->private_volume;
+	vnode		*dir = (vnode*)_dir->private_node;
 	status_t	result = B_NO_ERROR;
 
 	if (ns->flags & B_FS_IS_READONLY) {
@@ -1902,7 +1717,7 @@ fs_unlink(void *_ns, void *_node, const char *name)
 		goto exit;
 	}
 
-	result = do_unlink(ns, dir, name, false);
+	result = do_unlink(_vol, dir, name, false);
 
 	ntfs_mark_free_space_outdated(ns);
 

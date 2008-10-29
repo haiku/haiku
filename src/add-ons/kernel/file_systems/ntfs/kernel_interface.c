@@ -33,7 +33,6 @@
 #include <malloc.h>
 #include <stdio.h>
 
-#ifdef __HAIKU__
 
 #include <fs_interface.h>
 #include <kernel/lock.h>
@@ -47,21 +46,10 @@
 #include <NodeMonitor.h>
 #include <util/kernel_cpp.h>
 
-#else
-
-#include "fsproto.h"
-#include "lock.h"
-
-#define publish_vnode new_vnode
-
-#endif
-
 #include "fs_func.h"
 #include "ntfsdir.h"
 #include "attributes.h"
 
-
-#ifdef __HAIKU__
 
 static status_t
 ntfs_std_ops(int32 op, ...)
@@ -76,54 +64,59 @@ ntfs_std_ops(int32 op, ...)
 	}
 }
 
-
-static file_system_module_info sNTFSFileSystem = {
-	{
-		"file_systems/ntfs" B_CURRENT_FS_API_VERSION,
-		0,
-		ntfs_std_ops,
-	},
-
-	"ntfs",						// short_name
-	"Windows NT File System",	// pretty_name
-	0,							// DDM flags
-
-	// scanning
-	fs_identify_partition,
-	fs_scan_partition,
-	fs_free_identify_partition_cookie,
-	NULL,	// free_partition_content_cookie()
-
-	&fs_mount,
+fs_volume_ops gNTFSVolumeOps = {
 	&fs_unmount,
 	&fs_rfsstat,
 	&fs_wfsstat,
-	NULL,
+	&fs_sync,
+	&fs_read_vnode,
 
+	/* index directory & index operations */
+	NULL,	//&fs_open_index_dir,
+	NULL,	//&fs_close_index_dir,
+	NULL,	//&fs_free_index_dir_cookie,
+	NULL,	//&fs_read_index_dir,
+	NULL,	//&fs_rewind_index_dir,
+
+	NULL,	//&fs_create_index,
+	NULL,	//&fs_remove_index,
+	NULL,	//&fs_stat_index,
+
+	/* query operations */
+	NULL,	//&fs_open_query,
+	NULL,	//&fs_close_query,
+	NULL, 	//&fs_free_query_cookie,
+	NULL, 	//&fs_read_query,
+	NULL, 	//&fs_rewind_query,
+};
+
+fs_vnode_ops gNTFSVnodeOps = {
 	/* vnode operations */
 	&fs_walk,
 	&fs_get_vnode_name,
-	&fs_read_vnode,
 	&fs_write_vnode,
 	&fs_remove_vnode,
 
 	/* VM file access */
-	NULL, 	// &fs_can_page
-	NULL,	// &fs_read_pages
-	NULL, 	// &fs_write_pages
+	NULL,
+	NULL,
+	NULL,
 
-	NULL,	// &fs_get_file_map
+	NULL,	// io()
+	NULL,	// cancel_io()
 
-	NULL, 	// &fs_ioctl
-	NULL, 	// &fs_set_flags
-	NULL,	// &fs_select
-	NULL,	// &fs_deselect
+	NULL,
 
+	NULL,
+	NULL,	//&fs_set_flags,
+	NULL,	//&fs_select
+	NULL,	//&fs_deselect
 	&fs_fsync,
 
-	&fs_readlink,	
-	&fs_create_symlink,
-	NULL, 	// &fs_link,
+	&fs_readlink,
+	&fs_create_symlink,	
+
+	NULL,	//&fs_link,
 	&fs_unlink,
 	&fs_rename,
 
@@ -147,7 +140,7 @@ static file_system_module_info sNTFSFileSystem = {
 	&fs_free_dircookie,
 	&fs_readdir,
 	&fs_rewinddir,
-	
+
 	/* attribute directory operations */
 	&fs_open_attrib_dir,
 	&fs_close_attrib_dir,
@@ -167,103 +160,32 @@ static file_system_module_info sNTFSFileSystem = {
 	NULL,	//&fs_write_attr_stat,
 	NULL,	//&fs_rename_attr,
 	NULL,	//&fs_remove_attr,
-
-	/* index directory & index operations */
-	NULL,	// &fs_open_index_dir
-	NULL,	// &fs_close_index_dir
-	NULL,	// &fs_free_index_dir_cookie
-	NULL,	// &fs_read_index_dir
-	NULL,	// &fs_rewind_index_dir
-
-	NULL,	// &fs_create_index
-	NULL,	// &fs_remove_index
-	NULL,	// &fs_stat_index
-
-	/* query operations */
-	NULL,	// &fs_open_query
-	NULL,	// &fs_close_query
-	NULL,	// &fs_free_query_cookie
-	NULL,	// &fs_read_query
-	NULL,	// &fs_rewind_query
 };
+
+
+
+static file_system_module_info sNTFSFileSystem = {
+	{
+		"file_systems/ntfs" B_CURRENT_FS_API_VERSION,
+		0,
+		ntfs_std_ops,
+	},
+
+	"ntfs",						// short_name
+	"Windows NT File System",	// pretty_name
+	B_DISK_SYSTEM_SUPPORTS_WRITING,							// DDM flags
+
+	// scanning
+	fs_identify_partition,
+	fs_scan_partition,
+	fs_free_identify_partition_cookie,
+	NULL,	// free_partition_content_cookie()
+
+	&fs_mount,
+};
+
 
 module_info *modules[] = {
 	(module_info *)&sNTFSFileSystem,
 	NULL,
 };
-
-#else
-
-int32	api_version = B_CUR_FS_API_VERSION;
-
-vnode_ops fs_entry =  {
-	&fs_read_vnode,						/* read_vnode func ptr */
-	&fs_write_vnode,					/* write_vnode func ptr */
-	&fs_remove_vnode,					/* remove_vnode func ptr */
-	NULL,								/* secure_vnode func ptr */
-	&fs_walk,							/* walk func ptr */
-	&fs_access,							/* access func ptr */
-	&fs_create,							/* create func ptr */
-	&fs_mkdir, 							/* mkdir func ptr */
-	&fs_create_symlink,
-	NULL,
-	&fs_rename,
-	&fs_unlink,							/* unlink func ptr */
-	&fs_rmdir, 							/* rmdir func ptr */
-	&fs_readlink,						/* readlink func ptr */
-	&fs_opendir,						/* opendir func ptr */
-	&fs_closedir,						/* closedir func ptr */
-	&fs_free_dircookie,					/* free_dircookie func ptr */
-	&fs_rewinddir,						/* rewinddir func ptr */
-	&fs_readdir,						/* readdir func ptr */
-	&fs_open,							/* open file func ptr */
-	&fs_close,							/* close file func ptr */
-	&fs_free_cookie,					/* free cookie func ptr */
-	&fs_read,							/* read file func ptr */
-	&fs_write, 							/* write file func ptr */
-	NULL, /* readv */
-	NULL, /* writev */
-	NULL,								/* ioctl func ptr */
-	NULL,								/* setflags file func ptr */
-	&fs_rstat,							/* rstat func ptr */
-	&fs_wstat, 							/* wstat func ptr */
-	&fs_fsync,
-	NULL, 								/* initialize func ptr */
-	&fs_mount,							/* mount func ptr */
-	&fs_unmount,						/* unmount func ptr */
-	&fs_sync,							/* sync func ptr */
-	&fs_rfsstat,						/* rfsstat func ptr */
-	&fs_wfsstat,						/* wfsstat func ptr */
-	NULL, 								// select
-	NULL, 								// deselect
-
-	NULL,								// open_indexdir
-	NULL, 								// close_indexdir
-	NULL, 								// free_indexdircookie
-	NULL, 								// rewind_indexdir
-	NULL, 								// read_indexdir
-
-	NULL, 								// create_index
-	NULL, 								// remove_index
-	NULL, 								// rename_index
-	NULL, 								// stat_index
-
-	&fs_open_attrib_dir, 				// open_attrdir
-	&fs_close_attrib_dir,				// close_attrdir
-	&fs_free_attrib_dir_cookie, 		// free_attrdircookie
-	&fs_rewind_attrib_dir, 				// rewind_attrdir
-	&fs_read_attrib_dir, 				// read_attrdir
-
-	&fs_write_attrib, 					// write_attr
-	&fs_read_attrib, 					// read_attr
-	NULL, 								// remove_attr
-	NULL, 								// rename_attr
-	&fs_read_attrib_stat, 				// stat_attr
-
-	NULL, 								// open_query
-	NULL, 								// close_query
-	NULL, 								// free_querycookie
-	NULL  								// read_query
-};
-
-#endif
