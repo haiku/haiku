@@ -181,8 +181,8 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 	TIFF* tif = TIFFClientOpen("TIFFTranslator", "r", inSource,
 		tiff_read_proc, tiff_write_proc, tiff_seek_proc, tiff_close_proc,
 		tiff_size_proc, tiff_map_file_proc, tiff_unmap_file_proc); 
-    if (!tif)
-    	return B_NO_TRANSLATOR;
+	if (!tif)
+		return B_NO_TRANSLATOR;
 
 	// count number of documents
 	int32 documentCount = 0, documentIndex = 1;
@@ -197,14 +197,17 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 
 		if (documentIndex < 1 || documentIndex > documentCount) {
 			// document index is invalid
+			fprintf(stderr, "identify_tiff_header: invalid document index\n");
 			return B_NO_TRANSLATOR;
 		}
 	}
 
 	// identify the document the user specified or the first document
 	// if the user did not specify which document they wanted to identify
-	if (!TIFFSetDirectory(tif, documentIndex - 1))
+	if (!TIFFSetDirectory(tif, documentIndex - 1)) {
+		fprintf(stderr, "identify_tiff_header: couldn't set directory\n");
 		return B_NO_TRANSLATOR;
+	}
 
 	if (ioExtension) {
 		// add page count to ioExtension
