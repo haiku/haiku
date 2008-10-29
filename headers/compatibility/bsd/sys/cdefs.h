@@ -11,7 +11,10 @@
 
 #define __FBSDID(x)
 #define __unused
-#define protected
+
+#ifndef __cplusplus
+#	define protected
+#endif
 
 #define __printflike(a, b)	__attribute__ ((format (__printf__, (a), (b))))
 #define __printf0like(a, b)
