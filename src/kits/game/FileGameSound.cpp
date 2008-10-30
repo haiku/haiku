@@ -31,14 +31,14 @@ struct _gs_media_tracker
 // Locale utility functions -----------------------------------------------
 bool FillBuffer(_gs_ramp * ramp, uint8 * data, uint8 * buffer, size_t * bytes)
 {
-	int32 samples = *bytes / sizeof(int16);
+	int32 samples = *bytes / sizeof(uint8);
 
 	for (int32 byte = 0; byte < samples; byte++) {
 		float gain = *ramp->value;
 		data[byte] = uint8(float(buffer[byte]) * gain);
 
 		if (ChangeRamp(ramp)) {
-			*bytes = byte * sizeof(int16);
+			*bytes = byte * sizeof(uint8);
 			return true;
 		}
 	}
