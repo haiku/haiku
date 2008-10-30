@@ -313,6 +313,23 @@ cmd_wc(int argc, char** argv)
 }
 
 
+static int
+cmd_faults(int argc, char** argv)
+{
+	if (argc > 2) {
+		print_debugger_command_usage(argv[0]);
+		return B_KDEBUG_ERROR;
+	}
+
+	if (argc == 2)
+		gInvokeCommandDirectly = parse_expression(argv[1]) == 0;
+
+	kprintf("Fault handling is %s%s.\n", argc == 2 ? "now " : "",
+		gInvokeCommandDirectly ? "off" : "on");
+	return 0;
+}
+
+
 // #pragma mark -
 
 
@@ -347,6 +364,10 @@ debug_builtin_commands_init()
 		"Prints a human-readable description for the given numeric error\n"
 		"code.\n"
 		"  <error>  - The numeric error code.\n", 0);
+	add_debugger_command_etc("faults", &cmd_faults, "Toggles fault handling "
+		"for debugger commands",
+		"[0|1]\n"
+		"Toggles fault handling on (1) or off (0).\n", 0);
 	add_debugger_command_etc("head", &cmd_head,
 		"Prints only the first lines of output from another command",
 		"<maxLines>\n"

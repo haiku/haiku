@@ -36,6 +36,7 @@ typedef struct debugger_command_pipe {
 	bool							broken;
 } debugger_command_pipe;
 
+extern bool gInvokeCommandDirectly;
 
 #ifdef __cplusplus
 extern "C" {

@@ -24,15 +24,15 @@
 #include "debug_variables.h"
 
 
-#define DEBUG_DEBUGGER_COMMANDS 0
-	// Turns off the "FAULT" message to get a stack crawl
-	// of the failing debugger command.
-
 #define INVOKE_COMMAND_FAULT	1
 #define INVOKE_COMMAND_ERROR	2
 
+
 static const int32 kMaxInvokeCommandDepth = 5;
 static const int32 kOutputBufferSize = 1024;
+
+
+bool gInvokeCommandDirectly = false;
 
 static spinlock sSpinlock = B_SPINLOCK_INITIALIZER;
 
@@ -40,7 +40,6 @@ static struct debugger_command *sCommands;
 
 static jmp_buf sInvokeCommandEnv[kMaxInvokeCommandDepth];
 static int32 sInvokeCommandLevel = 0;
-static bool sInvokeCommandDirectly = false;
 static bool sInCommand = false;
 static char sOutputBuffers[MAX_DEBUGGER_COMMAND_PIPE_LENGTH][kOutputBufferSize];
 static debugger_command_pipe* sCurrentPipe;
@@ -276,7 +275,7 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 
 	// Invoking the command directly might be useful when debugging debugger
 	// commands.
-	if (sInvokeCommandDirectly)
+	if (gInvokeCommandDirectly)
 		return command->func(argc, argv);
 
 	sInCommand = true;
@@ -284,13 +283,11 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 	switch (setjmp(sInvokeCommandEnv[sInvokeCommandLevel++])) {
 		case 0:
 			int result;
-#if DEBUG_DEBUGGER_COMMANDS
 			thread->fault_handler = (addr_t)&&error;
 			// Fake goto to trick the compiler not to optimize the code at the
 			// label away.
 			if (!thread)
 				goto error;
-#endif
 
 			result = command->func(argc, argv);
 
@@ -299,12 +296,11 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 			sInCommand = false;
 			return result;
 
-#if DEBUG_DEBUGGER_COMMANDS
 		error:
 			// jump to INVOKE_COMMAND_FAULT case, cleaning up the stack
 			longjmp(sInvokeCommandEnv[--sInvokeCommandLevel],
 				INVOKE_COMMAND_FAULT);
-#endif
+
 		case INVOKE_COMMAND_FAULT:
 		{
 			debug_page_fault_info* info = debug_get_page_fault_info();
@@ -337,7 +333,7 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 void
 abort_debugger_command()
 {
-	if (!sInvokeCommandDirectly && sInvokeCommandLevel > 0) {
+	if (!gInvokeCommandDirectly && sInvokeCommandLevel > 0) {
 		longjmp(sInvokeCommandEnv[--sInvokeCommandLevel],
 			INVOKE_COMMAND_ERROR);
 	}
