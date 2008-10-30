@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <sys/utsname.h>
 #include <time.h>
+#include <unistd.h>
 
 #include <AppFileInfo.h>
 #include <Application.h>
@@ -44,6 +45,10 @@
 #include "HyperTextView.h"
 #include "Utilities.h"
 
+
+#ifndef LINE_MAX
+#define LINE_MAX 2048
+#endif
 
 #define SCROLL_CREDITS_VIEW 'mviv'
 #define READ_APP_QUERY_ENT 'raqe'
@@ -367,7 +372,7 @@ AboutView::AboutView(const BRect &rect)
 	if (year < 2008)
 		year = 2008;
 	snprintf(string, sizeof(string),
-		"Copyright " B_UTF8_COPYRIGHT " 2001-%ld The Haiku project.", year);
+		"Copyright " B_UTF8_COPYRIGHT " 2001-%ld The Haiku project. ", year);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(string);
@@ -1068,6 +1073,7 @@ AboutView::PickRandomHaiku()
 void
 AboutView::_AddCopyrightsFromAttribute()
 {
+#ifdef __HAIKU__
 	// open the app executable file
 	char appPath[B_PATH_NAME_LENGTH];
 	int appFD;
@@ -1147,6 +1153,7 @@ AboutView::_AddCopyrightsFromAttribute()
 
 	// flush current package
 	AddCopyrightEntry(package);
+#endif
 }
 
 
