@@ -1561,6 +1561,9 @@ debug_demangle_symbol(const char* symbol, char* buffer, size_t bufferSize,
 			_isObjectMethod);
 	}
 
+	if (_isObjectMethod != NULL)
+		*_isObjectMethod = false;
+
 	return symbol;
 }
 
