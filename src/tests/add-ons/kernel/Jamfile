@@ -25,6 +25,7 @@ SEARCH on [ FGristFiles
 
 SubInclude HAIKU_TOP src tests add-ons kernel bus_managers ;
 SubInclude HAIKU_TOP src tests add-ons kernel busses ;
+SubInclude HAIKU_TOP src tests add-ons kernel debugger ;
 # SubInclude HAIKU_TOP src tests add-ons kernel disk_scanner ;
 SubInclude HAIKU_TOP src tests add-ons kernel drivers ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems ;

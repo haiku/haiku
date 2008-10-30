@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src tests add-ons kernel debugger ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared ;
+
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel debugger demangle ;
+
+SimpleTest gcc2_demangle_test : gcc2_demangle_test.cpp ;
+
