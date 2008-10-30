@@ -24,6 +24,10 @@
 #include "debug_variables.h"
 
 
+#define DEBUG_DEBUGGER_COMMANDS 0
+	// Turns off the "FAULT" message to get a stack crawl
+	// of the failing debugger command.
+
 #define INVOKE_COMMAND_FAULT	1
 #define INVOKE_COMMAND_ERROR	2
 
@@ -280,11 +284,13 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 	switch (setjmp(sInvokeCommandEnv[sInvokeCommandLevel++])) {
 		case 0:
 			int result;
+#if DEBUG_DEBUGGER_COMMANDS
 			thread->fault_handler = (addr_t)&&error;
 			// Fake goto to trick the compiler not to optimize the code at the
 			// label away.
 			if (!thread)
 				goto error;
+#endif
 
 			result = command->func(argc, argv);
 
@@ -293,11 +299,12 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 			sInCommand = false;
 			return result;
 
-error:
+#if DEBUG_DEBUGGER_COMMANDS
+		error:
 			// jump to INVOKE_COMMAND_FAULT case, cleaning up the stack
 			longjmp(sInvokeCommandEnv[--sInvokeCommandLevel],
 				INVOKE_COMMAND_FAULT);
-
+#endif
 		case INVOKE_COMMAND_FAULT:
 		{
 			debug_page_fault_info* info = debug_get_page_fault_info();
