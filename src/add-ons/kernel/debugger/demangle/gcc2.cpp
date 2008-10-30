@@ -230,13 +230,15 @@ count_namespaces(const char** _mangled)
 		// more than one namespace
 		if (mangled[1] == '_') {
 			// more than 9 namespaces
-			namespaces = strtoul(mangled + 1, (char**)&mangled, 10);
+			namespaces = strtoul(mangled + 2, (char**)&mangled, 10);
 			if (mangled[0] != '_')
 				namespaces = 0;
-		} else
-			namespaces = mangled[1] - '0';
 
-		mangled++;
+			mangled++;
+		} else {
+			namespaces = mangled[1] - '0';
+			mangled += 2;
+		}
 	} else if (isdigit(mangled[0]))
 		namespaces = 1;
 
@@ -396,6 +398,12 @@ demangle_symbol(const char* name, char* buffer, size_t bufferSize,
 	if (mangled == NULL)
 		return NULL;
 
+	if (mangled[0] == 'C') {
+		// ignore const method
+		type = TYPE_METHOD;
+		mangled++;
+	}
+
 	if (_isObjectMethod != NULL) {
 		// we can only guess with GCC2 mangling
 		*_isObjectMethod = type == TYPE_METHOD;
@@ -407,6 +415,10 @@ demangle_symbol(const char* name, char* buffer, size_t bufferSize,
 	buffer[0] = '\0';
 
 	while (namespaces-- > 0) {
+		if (namespaceStart[0] == 't') {
+			// It's a template class after all
+			return NULL;
+		}
 		if (!isdigit(namespaceStart[0]))
 			break;
 
