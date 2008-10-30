@@ -200,7 +200,7 @@ GameProducer::PrepareToConnect(const media_source& what, const media_destination
 
 	// check the buffer size, which may still be wildcarded
 	if (format->u.raw_audio.buffer_size == media_raw_audio_format::wildcard.buffer_size)
-		format->u.raw_audio.buffer_size = 2048;		// pick something comfortable to suggest
+		format->u.raw_audio.buffer_size = 4096;		// pick something comfortable to suggest
 
 	// Now reserve the connection, and return information about it
 	fOutput.destination = where;
