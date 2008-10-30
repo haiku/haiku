@@ -13,6 +13,14 @@
 #include <debug.h>
 
 
+//#define TRACE_GCC2_DEMANGLER
+#ifdef TRACE_GCC2_DEMANGLER
+#	define TRACE(x...) kprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 enum {
 	TYPE_FUNCTION,
 	TYPE_METHOD,
@@ -22,8 +30,15 @@ enum {
 static void
 ignore_qualifiers(const char** _arg)
 {
-	while (isupper(**_arg))
+	while (isupper(**_arg)) {
+		if (**_arg == 'F') {
+			// skip function declaration
+			while (**_arg && **_arg != '_')
+				(*_arg)++;
+		}
+
 		(*_arg)++;
+	}
 }
 
 
@@ -332,6 +347,8 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 
 	if (arg == NULL)
 		return B_ENTRY_NOT_FOUND;
+
+	TRACE("\n\targ %ld: %s\n", current, arg);
 
 	if (arg[0] == 'T') {
 		// duplicate argument
