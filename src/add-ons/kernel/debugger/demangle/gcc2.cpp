@@ -31,6 +31,10 @@ static void
 ignore_qualifiers(const char** _arg)
 {
 	while (isupper(**_arg)) {
+		if (**_arg == 'Q') {
+			// argument has namespaces
+			break;
+		}
 		if (**_arg == 'F') {
 			// skip function declaration
 			while (**_arg && **_arg != '_')
@@ -166,61 +170,6 @@ skip_numbers(const char** _arg, int32 count)
 
 
 static uint32
-argument_name_length(const char** _arg)
-{
-	if (**_arg == 'N')
-		return 0;
-
-	ignore_qualifiers(_arg);
-
-	// See if it's a built-in type
-	if (isalpha(**_arg))
-		return 0;
-
-	return strtoul(*_arg, (char**)_arg, 10);
-}
-
-
-static uint32
-argument_length(const char** _arg)
-{
-	if (**_arg == 'N') {
-		// skip repeats
-		skip_numbers(_arg, 2);
-		return 0;
-	} else if (**_arg == 'T') {
-		// skip reference
-		skip_numbers(_arg, 1);
-		return 0;
-	}
-
-	ignore_qualifiers(_arg);
-
-	// See if it's a built-in type
-	if (isalpha(**_arg))
-		return 1;
-
-	return strtoul(*_arg, (char**)_arg, 10);
-}
-
-
-static const char*
-next_argument(const char* arg)
-{
-	if (arg == NULL)
-		return NULL;
-
-	uint32 length = argument_length(&arg);
-	arg += length;
-
-	if (!arg[0])
-		return NULL;
-
-	return arg;
-}
-
-
-static uint32
 count_namespaces(const char** _mangled)
 {
 	const char* mangled = *_mangled;
@@ -247,9 +196,10 @@ count_namespaces(const char** _mangled)
 }
 
 
-static const char*
-first_argument(const char* mangled)
+static void
+skip_namespaces(const char** _mangled)
 {
+	const char* mangled = *_mangled;
 	int32 namespaces = count_namespaces(&mangled);
 
 	while (namespaces-- > 0) {
@@ -258,6 +208,67 @@ first_argument(const char* mangled)
 
 		mangled += strtoul(mangled, (char**)&mangled, 10);
 	}
+
+	*_mangled = mangled;
+}
+
+
+static bool
+has_named_argument(const char** _arg)
+{
+	ignore_qualifiers(_arg);
+
+	// See if it's a built-in type
+	return **_arg == 'Q' || isdigit(**_arg);
+}
+
+
+static uint32
+argument_length(const char** _arg)
+{
+	if (**_arg == 'N') {
+		// skip repeats
+		skip_numbers(_arg, 2);
+		return 0;
+	} else if (**_arg == 'T') {
+		// skip reference
+		skip_numbers(_arg, 1);
+		return 0;
+	}
+
+	ignore_qualifiers(_arg);
+
+	// See if it's a built-in type
+	if (**_arg != 'Q' && !isdigit(**_arg))
+		return 1;
+
+	const char* mangled = *_arg;
+	skip_namespaces(&mangled);
+
+	return mangled - *_arg;
+}
+
+
+static const char*
+next_argument(const char* arg)
+{
+	if (arg == NULL)
+		return NULL;
+
+	uint32 length = argument_length(&arg);
+	arg += length;
+
+	if (!arg[0])
+		return NULL;
+
+	return arg;
+}
+
+
+static const char*
+first_argument(const char* mangled)
+{
+	skip_namespaces(&mangled);
 
 	return mangled;
 }
@@ -378,8 +389,28 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 	if (_argumentLength != NULL)
 		*_argumentLength = argumentLength;
 
-	uint32 length = argument_name_length(&arg);
-	strlcpy(name, arg, min_c(length + 1, nameSize));
+	name[0] = '\0';
+	if (!has_named_argument(&arg))
+		return B_OK;
+
+	const char* namespaceStart = arg;
+	int32 namespaces = count_namespaces(&namespaceStart);
+
+	while (namespaces-- > 0) {
+		if (namespaceStart[0] == 't') {
+			// It's a template class after all
+			return B_BAD_TYPE;
+		}
+		if (!isdigit(namespaceStart[0]))
+			break;
+
+		uint32 length = strtoul(namespaceStart, (char**)&namespaceStart, 10);
+		uint32 max = strlen(name) + length + 1;
+		strlcat(name, namespaceStart, min_c(max, nameSize));
+		if (namespaces > 0)
+			strlcat(name, "::", nameSize);
+		namespaceStart += length;
+	}
 
 	return B_OK;
 }
