@@ -8,10 +8,9 @@
 
 #include "ReadHelper.h"
 
+
 struct jhead;
 struct tiff_tag;
-
-#define COMPRESSION_PACKBITS 32773
 
 
 struct image_meta_info {
@@ -51,6 +50,10 @@ struct image_data_info {
 	off_t	data_offset;
 	bool	is_raw;
 };
+
+#define COMPRESSION_PACKBITS 32773
+	/* Macintosh RLE */
+
 
 typedef void (*monitor_hook)(const char* message, float percentage, void* data);
 
