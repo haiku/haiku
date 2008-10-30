@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 1997-2007, Dave Coffin, dcoffin a cybercom o net
@@ -23,8 +23,8 @@
 
 //#define TRACE(x) printf x
 #define TRACE(x)
-//#define TAG(x) printf x
-#define TAG(x)
+//#define TAG(x...) printf(x)
+#define TAG(x...)
 
 #define ABS(x) (((int)(x) ^ ((int)(x) >> 31)) - ((int)(x) >> 31))
 #define LIM(x,min,max) MAX(min,MIN(x,max))
@@ -276,6 +276,21 @@ DCRaw::_FlipIndex(uint32 row, uint32 col, uint32 flip)
 
 
 bool
+DCRaw::_SupportsCompression(image_data_info& image) const
+{
+	switch (image.compression) {
+		//case COMPRESSION_NONE:
+		case COMPRESSION_OLD_JPEG:
+		case COMPRESSION_PACKBITS:
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+
+bool
 DCRaw::_IsCanon() const
 {
 	return !strncasecmp(fMeta.manufacturer, "Canon", 5);
@@ -293,6 +308,13 @@ bool
 DCRaw::_IsNikon() const
 {
 	return !strncasecmp(fMeta.manufacturer, "Nikon", 5);
+}
+
+
+bool
+DCRaw::_IsOlympus() const
+{
+	return !strncasecmp(fMeta.manufacturer, "Olympus", 7);
 }
 
 
@@ -458,8 +480,8 @@ DCRaw::_ParseManufacturerTag(off_t baseOffset)
 		off_t nextOffset;
 		tiff_tag tag;
 		_ParseTIFFTag(baseOffset, tag, nextOffset);
-		TAG(("Manufacturer tag %u (type %u, length %lu)\n", tag.tag, tag.type,
-			tag.length));
+		TAG("Manufacturer tag %u (type %u, length %lu)\n", tag.tag, tag.type,
+			tag.length);
 
 		if (strstr(fMeta.manufacturer, "PENTAX")) {
 			if (tag.tag == 0x1b)
@@ -695,8 +717,8 @@ DCRaw::_ParseEXIF(off_t baseOffset)
 		off_t nextOffset;
 		tiff_tag tag;
 		_ParseTIFFTag(baseOffset, tag, nextOffset);
-		TAG(("EXIF tag %u (type %u, length %lu)\n", tag.tag, tag.type,
-			tag.length));
+		TAG("EXIF tag %u (type %u, length %lu)\n", tag.tag, tag.type,
+			tag.length);
 
 		switch (tag.tag) {
 #if 0
@@ -905,6 +927,16 @@ DCRaw::_FixupValues()
 		if (isCR2) {
 			fInputHeight -= fTopMargin;
 			fInputWidth -= fLeftMargin;
+		}
+	}
+
+	// Olympus
+
+	if (_IsOlympus()) {
+		if (!strcmp(fMeta.model,"E-300") || !strcmp(fMeta.model,"E-500")) {
+			fInputWidth -= 20;
+			fMeta.maximum = 0xfc30;
+			//if (load_raw == &CLASS unpacked_load_raw) black = 0;
 		}
 	}
 }
@@ -2293,23 +2325,45 @@ DCRaw::_LosslessJPEGRow(struct jhead *jh, int jrow)
 //	#pragma mark - RAW loaders
 
 
+void
+DCRaw::_LoadRAWUnpacked(const image_data_info& image)
+{
+	uint32 rawWidth = _Raw().width;
+
+	uint16* pixel = (uint16*)calloc(rawWidth, sizeof(uint16));
+	if (pixel == NULL)
+		return;
+
+	fRead.Seek((fTopMargin * rawWidth + fLeftMargin) * sizeof(uint16),
+		SEEK_CUR);
+
+	for (uint32 row = 0; row < fInputHeight; row++) {
+		fRead.NextShorts(pixel, rawWidth);
+		for (uint32 column = 0; column < fInputWidth; column++) {
+			_Bayer(column, row) = pixel[column];
+		}
+	}
+
+	free(pixel);
+}
+
+
 /*!	This is, for example, used in PENTAX RAW images
 */
 void
 DCRaw::_LoadRAWPacked12(const image_data_info& image)
 {
 	uint32 rawWidth = _Raw().width;
-	uint32 column, row;
 
 	_InitDecodeBits();
 
-	for (row = 0; row < fInputHeight; row++) {
-		for (column = 0; column < fInputWidth; column++) {
+	for (uint32 row = 0; row < fInputHeight; row++) {
+		for (uint32 column = 0; column < fInputWidth; column++) {
 			//uint16 bits = _GetDecodeBits(12);
 			_Bayer(column, row) = _GetDecodeBits(12);
 			//fImageData[((row) >> fShrink)*fOutputWidth + ((column) >> fShrink)][FC(row,column)] = bits;
 		}
-		for (column = fInputWidth * 3 / 2; column < rawWidth; column++) {
+		for (uint32 column = fInputWidth * 3 / 2; column < rawWidth; column++) {
 			_GetDecodeBits(8);
 		}
 	}
@@ -2577,13 +2631,22 @@ DCRaw::_LoadRAWLosslessJPEG(const image_data_info& image)
 void
 DCRaw::_LoadRAW(const image_data_info& image)
 {
+#if 0
 	if (_IsCanon()) {
 		if (fIsTIFF)
-			_LoadRAWLosslessJPEG(image);
 		else
 			_LoadRAWCanonCompressed(image);
-	} else {
+	} else
+#endif
+	{
 		switch (image.compression) {
+			case COMPRESSION_NONE:
+				_LoadRAWUnpacked(image);
+				break;
+			case COMPRESSION_OLD_JPEG:
+				_LoadRAWLosslessJPEG(image);
+				//_LoadRAWCanonCompressed(image);
+				break;
 			case COMPRESSION_PACKBITS:
 				_LoadRAWPacked12(image);
 				break;
@@ -2792,7 +2855,7 @@ DCRaw::_ParseTIFFImageFileDirectory(off_t baseOffset, uint32 offset)
 		off_t nextOffset;
 		tiff_tag tag;
 		_ParseTIFFTag(baseOffset, tag, nextOffset);
-		TAG(("TIFF tag: %u\n", tag.tag));
+		TAG("TIFF tag: %u\n", tag.tag);
 
 		switch (tag.tag) {
 #if 0
@@ -3325,7 +3388,9 @@ DCRaw::_ParseTIFF(off_t baseOffset)
 		if (maxSamples < fImages[i].samples)
 			maxSamples = fImages[i].samples;
 
-		if (fImages[i].compression != 6 || fImages[i].samples != 3) {
+		if ((fImages[i].compression != COMPRESSION_OLD_JPEG
+				|| fImages[i].samples != 3)
+			&& _SupportsCompression(fImages[i])) {
 			fImages[i].is_raw = true;
 
 			if (fRawIndex < 0 || fImages[i].width * fImages[i].height

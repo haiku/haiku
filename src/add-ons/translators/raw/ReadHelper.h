@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef READ_HELPER_H
@@ -160,13 +160,13 @@ class TReadHelper {
 		inline void
 		NextShorts(uint16* data, size_t length)
 		{
-			fError = fStream.Read(data, length);
-			if (fError < (ssize_t)length)
+			fError = fStream.Read(data, length * 2);
+			if (fError < (ssize_t)length * 2)
 				fError = B_ERROR;
 
 			if (fError >= B_OK) {
 				if (IsSwapping())
-					swap_data(B_INT16_TYPE, data, length, B_SWAP_ALWAYS);
+					swap_data(B_INT16_TYPE, data, length * 2, B_SWAP_ALWAYS);
 				return;
 			}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef RAW_H
@@ -51,8 +51,9 @@ struct image_data_info {
 	bool	is_raw;
 };
 
-#define COMPRESSION_PACKBITS 32773
-	/* Macintosh RLE */
+#define COMPRESSION_NONE		1
+#define COMPRESSION_OLD_JPEG	6		// Old JPEG (before 6.0)
+#define COMPRESSION_PACKBITS	32773	// Macintosh RLE
 
 
 typedef void (*monitor_hook)(const char* message, float percentage, void* data);
@@ -84,9 +85,11 @@ class DCRaw {
 		uint16& _Bayer(int32 column, int32 row);
 		int32 _FilterCoefficient(int32 column, int32 row);
 		int32 _FlipIndex(uint32 row, uint32 col, uint32 flip);
+		bool _SupportsCompression(image_data_info& info) const;
 		bool _IsCanon() const;
 		bool _IsKodak() const;
 		bool _IsNikon() const;
+		bool _IsOlympus() const;
 		bool _IsPentax() const;
 		bool _IsSamsung() const;
 
@@ -119,6 +122,7 @@ class DCRaw {
 		void _LosslessJPEGRow(struct jhead *jh, int jrow);
 
 		// RAW Loader
+		void _LoadRAWUnpacked(const image_data_info& image);
 		void _LoadRAWPacked12(const image_data_info& info);
 		void _MakeCanonDecoder(uint32 table);
 		bool _CanonHasLowBits();
