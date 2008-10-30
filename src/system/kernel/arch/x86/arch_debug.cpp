@@ -218,8 +218,12 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 				break;
 		}
 
-		if (type == B_STRING_TYPE)
-			kprintf(" \"%s\"", (char*)value);
+		if (type == B_STRING_TYPE) {
+			if (user_strlcpy(buffer, (char*)value, sizeof(buffer)) < B_OK)
+				kprintf(" '???'");
+			else
+				kprintf(" \"%s\"", buffer);
+		}
 
 		if (addDebugVariables)
 			set_debug_argument_variable(i, value);
