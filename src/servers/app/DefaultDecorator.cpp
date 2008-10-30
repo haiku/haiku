@@ -137,6 +137,8 @@ DefaultDecorator::~DefaultDecorator()
 void
 DefaultDecorator::SetTitle(const char* string, BRegion* updateRegion)
 {
+	// TODO: we could be much smarter about the update region
+
 	BRect rect = TabRect();
 
 	Decorator::SetTitle(string);
