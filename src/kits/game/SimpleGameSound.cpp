@@ -181,7 +181,7 @@ BSimpleGameSound::Init(const entry_ref* inFile)
 		delete [] buffer;
 		delete [] data;
 	} else {
-		// We need to detriman the size, in bytes, of a single sample.
+		// We need to determine the size, in bytes, of a single sample.
 		// At the same time, we will store the format of the audio buffer		
 		size_t frameSize = get_sample_size(gsformat.format) * gsformat.channel_count;
 		char * data = new char[frames * frameSize]; 
