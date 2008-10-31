@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -67,7 +67,14 @@ static uint16 sPalette16[] = {
 };
 static uint32 sPalette32[] = {
 	// is also used by 24 bit modes
-	0xffffff, 0x0000ff, 0x00ff00, 0x00ffff, 0xff0000, 0xff00ff, 0xffff00, 0x000000,
+	0xffffff,	// white
+	0x336698,	// blue
+	0x4e9a00,	// green
+	0x06989a,	// cyan
+	0xcc0000,	// red
+	0x73447b,	// magenta
+	0xdaa800,	// yellow
+	0x000000,	// black
 };
 
 static struct console_info sConsole;
