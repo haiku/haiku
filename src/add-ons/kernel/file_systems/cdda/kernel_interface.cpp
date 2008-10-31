@@ -652,6 +652,7 @@ Volume::Mount(const char* device)
 
 		inode->AddAttribute("Audio:Artist", B_STRING_TYPE,
 			text.artists[i] != NULL ? text.artists[i] : text.artist);
+		inode->AddAttribute("Audio:Album", B_STRING_TYPE, text.album);
 		inode->AddAttribute("Audio:Title", B_STRING_TYPE, text.titles[i]);
 		inode->AddAttribute("Audio:Genre", B_STRING_TYPE, text.genre);
 		inode->AddAttribute("Audio:Track", B_INT32_TYPE, track);
