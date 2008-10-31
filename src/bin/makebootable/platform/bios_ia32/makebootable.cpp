@@ -35,6 +35,13 @@
 
 #	include "PartitionMap.h"
 #	include "PartitionMapParser.h"
+#elif HAIKU_HOST_PLATFORM_DARWIN
+#	include <ctype.h>
+#	include <sys/disk.h>
+#	include <sys/ioctl.h>
+
+#	include "PartitionMap.h"
+#	include "PartitionMapParser.h"
 #endif
 
 #ifdef __HAIKU__
@@ -411,7 +418,7 @@ main(int argc, const char *const *argv)
 			#endif // HAIKU_HOST_PLATFORM_FREEBSD
 
 		} else if (S_ISBLK(st.st_mode)) {
-			// block device: a device or partition under Linux
+			// block device: a device or partition under Linux or Darwin
 			#ifdef HAIKU_HOST_PLATFORM_LINUX
 
 				// chop off the trailing number
@@ -490,8 +497,72 @@ main(int argc, const char *const *argv)
 					// offset 0.
 				}
 
-			#else	// !HAIKU_HOST_PLATFORM_LINUX
+			#elif defined(HAIKU_HOST_PLATFORM_DARWIN)
+				// chop off the trailing number
+				int fileNameLen = strlen(fileName);
+				int baseNameLen = fileNameLen - 2;
+								
+				// get base device name and partition index
+				char baseDeviceName[B_PATH_NAME_LENGTH];
+				int partitionIndex = atoi(fileName + baseNameLen + 1);
+				memcpy(baseDeviceName, fileName, baseNameLen);
+				baseDeviceName[baseNameLen] = '\0';
+				
+				// open base device
+				int baseFD = open(baseDeviceName, O_RDONLY);
+				if (baseFD < 0) {
+					fprintf(stderr, "Error: Failed to open \"%s\": %s\n",
+							baseDeviceName, strerror(errno));
+					exit(1);
+				}
+				
+				// get device size
+				int64 blockSize;
+				int64 blockCount;
+				int64 deviceSize;
+				if (ioctl(baseFD, DKIOCGETBLOCKSIZE, &blockSize) == -1) {
+					fprintf(stderr, "Error: Failed to get block size "
+							"for \"%s\": %s\n", baseDeviceName,
+							strerror(errno));
+					exit(1);
+				}
+				if (ioctl(baseFD, DKIOCGETBLOCKCOUNT, &blockCount) == -1) {
+					fprintf(stderr, "Error: Failed to get block count "
+							"for \"%s\": %s\n", baseDeviceName,
+							strerror(errno));
+					exit(1);
+				}
 
+				deviceSize = blockSize * blockCount;
+			
+				// parse the partition map
+				PartitionMapParser parser(baseFD, 0, deviceSize);
+				PartitionMap map;
+				error = parser.Parse(NULL, &map);
+				if (error != B_OK) {
+					fprintf(stderr, "Error: Parsing partition table on "
+							"device \"%s\" failed: %s\n", baseDeviceName,
+							strerror(error));
+					exit(1);
+				}
+				
+				close(baseFD);
+									
+				// check the partition we are supposed to write at
+				Partition *partition = map.PartitionAt(partitionIndex - 1);
+				if (!partition || partition->IsEmpty()) {
+					fprintf(stderr, "Error: Invalid partition index %d.\n",
+							partitionIndex);
+					exit(1);
+				}
+				
+				if (partition->IsExtended()) {
+					fprintf(stderr, "Error: Partition %d is an extended "
+							"partition.\n", partitionIndex);
+					exit(1);
+				}
+				partitionOffset = partition->Offset();
+			#else
 			// partitions are block devices under Haiku, but not under BeOS
 			#ifndef __HAIKU__
 				fprintf(stderr, "Error: Block devices not supported on this "
@@ -539,8 +610,9 @@ main(int argc, const char *const *argv)
 			= B_HOST_TO_LENDIAN_INT32((uint32)(partitionOffset / 512));
 
 		// write the boot code
-		printf("Writing boot code to \"%s\" (partition offset: %lld bytes) "
-			"...\n", fileName, partitionOffset);
+		printf("Writing boot code to \"%s\" (partition offset: %lld bytes, "
+			"start offset = %d) "
+			"...\n", fileName, partitionOffset, startOffset);
 
 		write_boot_code_part(fileName, fd, startOffset, bootCodeData, 0,
 			kFirstBootCodePartSize, dryRun);
