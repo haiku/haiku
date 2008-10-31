@@ -17,6 +17,5 @@ SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs fragmenter ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs mkbfs ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs queries ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs r5 ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs randomread ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs rename ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs structureSizes ;

@@ -5,5 +5,6 @@ SubInclude HAIKU_TOP src tests add-ons kernel file_systems cdda ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems fs_shell ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems fragmenter ;
 #SubInclude HAIKU_TOP src tests add-ons kernel file_systems iso9660 ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems random_read ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems udf ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs ;
