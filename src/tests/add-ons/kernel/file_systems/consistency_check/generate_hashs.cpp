@@ -122,6 +122,7 @@ private:
 
 struct file_entry {
 	uint8			hash[SHA_DIGEST_LENGTH];
+	ino_t			node;
 	std::string		path;
 
 	bool operator<(const struct file_entry& other) const
@@ -373,6 +374,8 @@ process_directory(const char* path)
 	if (dir == NULL)
 		return;
 
+	size_t pathLength = strlen(path);
+
 	while (struct dirent* entry = readdir(dir)) {
 		if (!strcmp(entry->d_name, ".")
 			|| !strcmp(entry->d_name, ".."))
@@ -380,7 +383,8 @@ process_directory(const char* path)
 
 		char fullPath[1024];
 		strlcpy(fullPath, path, sizeof(fullPath));
-		strlcat(fullPath, "/", sizeof(fullPath));
+		if (path[pathLength - 1] != '/')
+			strlcat(fullPath, "/", sizeof(fullPath));
 		strlcat(fullPath, entry->d_name, sizeof(fullPath));
 
 		process_file(fullPath);
@@ -421,6 +425,7 @@ process_file(const char* path)
 
 	file_entry entry;
 	memcpy(entry.hash, gSHA.Digest(), SHA_DIGEST_LENGTH);
+	entry.node = stat.st_ino;
 	entry.path = path;
 
 	printf("%s  %s\n", entry.HashString().c_str(), path);
@@ -429,30 +434,98 @@ process_file(const char* path)
 }
 
 
+void
+write_hash_file(const char* name, int fileCount, char** files)
+{
+	int file = open(name, O_WRONLY | O_TRUNC | O_CREAT);
+	if (file < 0) {
+		fprintf(stderr, "%s: Could not write hash file \"%s\": %s\n",
+			kProgramName, name, strerror(errno));
+		return;
+	}
+
+	write(file, "HASH", 4);
+
+	write(file, &fileCount, sizeof(int));
+	for (int i = 0; i < fileCount; i++) {
+		int length = strlen(files[i]);
+		write(file, &length, sizeof(int));
+		write(file, files[i], length + 1);
+	}
+
+	fileCount = gFiles.size();
+	write(file, &fileCount, sizeof(int));
+	for (int i = 0; i < fileCount; i++) {
+		file_entry& entry = gFiles[i];
+
+		write(file, entry.hash, SHA_DIGEST_LENGTH);
+		write(file, &entry.node, sizeof(ino_t));
+
+		int length = entry.path.size();
+		write(file, &length, sizeof(int));
+		write(file, entry.path.c_str(), length + 1);
+	}
+
+	close(file);
+}
+
+
 int
 main(int argc, char** argv)
 {
 	if (argc < 2) {
-		fprintf(stderr, "usage: %s <hash-file> <files>\n", kProgramName);
+		fprintf(stderr, "usage: %s <hash-file> [<files> ...]\n"
+			"\tWhen invoked without files, the hash-file is updated only.\n",
+			kProgramName);
 		return 1;
 	}
 
+	const char* hashFileName = argv[1];
+
 	status_t status = gSHA.Init();
 	if (status != B_OK) {
-		fprintf(stderr, "Could not initialize SHA processor: %s\n",
-			strerror(status));
+		fprintf(stderr, "%s: Could not initialize SHA processor: %s\n",
+			kProgramName, strerror(status));
 		return 1;
 	}
 
 	bigtime_t start = system_time();
 
-	for (int i = 1; i < argc; i++) {
-		process_file(argv[i]);
+	if (argc == 2) {
+		int file = open(hashFileName, O_RDONLY);
+		if (file < 0) {
+			return 1;
+		}
+
+		char buffer[2048];
+		read(file, buffer, 4);
+		if (memcmp(buffer, "HASH", 4)) {
+			close(file);
+			return 1;
+		}
+		int fileCount;
+		read(file, &fileCount, sizeof(int));
+
+		for (int i = 0; i < fileCount; i++) {
+			int length;
+			read(file, &length, sizeof(int));
+			read(file, buffer, length + 1);
+			process_file(buffer);
+		}
+
+		close(file);
+	} else {
+		for (int i = 2; i < argc; i++) {
+			process_file(argv[i]);
+		}
 	}
 
 	sort(gFiles.begin(), gFiles.end());
 
 	bigtime_t runtime = system_time() - start;
+
+	write_hash_file(hashFileName, argc - 2, argv + 2);
+
 	if (gFiles.size() > 0) {
 		printf("Generated hashes for %ld files in %g seconds, %g msec per "
 			"file.\n", gFiles.size(), runtime / 1000000.0,
