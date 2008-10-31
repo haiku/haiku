@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef VESA_H
 #define VESA_H
 
@@ -117,6 +117,28 @@ struct vbe_mode_info {
 #define SET_MODE_SPECIFY_CRTC		(1 << 11)
 #define SET_MODE_LINEAR_BUFFER		(1 << 14)
 #define SET_MODE_DONT_CLEAR_MEMORY	(1 << 15)
+
+
+/* CRTC info block structure */
+
+struct crtc_info_block {
+	uint16	horizontal_total;
+	uint16	horizontal_sync_start;
+	uint16	horizontal_sync_end;
+	uint16	vertical_total;
+	uint16	vertical_sync_start;
+	uint16	vertical_sync_end;
+	uint8	flags;
+	uint32	pixel_clock;		// in Hz
+	uint16	refresh_rate;		// in 0.01 Hz
+
+	uint8	_reserved[40];
+} _PACKED;
+
+#define CRTC_DOUBLE_SCAN		0x01
+#define CRTC_INTERLACED			0x02
+#define CRTC_NEGATIVE_HSYNC		0x04
+#define CRTC_NEGATIVE_VSYNC		0x08
 
 
 /* VBE 3.0 protected mode interface

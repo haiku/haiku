@@ -42,6 +42,7 @@ struct video_mode {
 	uint16		mode;
 	uint16		width, height, bits_per_pixel;
 	uint32		bytes_per_row;
+	crtc_info_block* timing;
 };
 
 static vbe_info_block sInfo;
@@ -149,39 +150,98 @@ closest_video_mode(int32 width, int32 height, int32 depth)
 }
 
 
-static video_mode *
-find_edid_mode(edid1_info &info, bool allowPalette)
+static crtc_info_block*
+get_crtc_info_block(edid1_detailed_timing& timing)
+{
+	// Copy timing structure to set the mode with
+	crtc_info_block* crtcInfo = (crtc_info_block*)malloc(
+		sizeof(crtc_info_block));
+	if (crtcInfo == NULL)
+		return NULL;
+
+	memset(crtcInfo, 0, sizeof(crtc_info_block));
+	crtcInfo->horizontal_sync_start = timing.h_active + timing.h_sync_off;
+	crtcInfo->horizontal_sync_end = crtcInfo->horizontal_sync_start
+		+ timing.h_sync_width;
+	crtcInfo->horizontal_total = timing.h_active + timing.h_blank;
+	crtcInfo->vertical_sync_start = timing.v_active + timing.v_sync_off;
+	crtcInfo->vertical_sync_end = crtcInfo->vertical_sync_start
+		+ timing.v_sync_width;
+	crtcInfo->vertical_total = timing.v_active + timing.v_blank;
+	crtcInfo->pixel_clock = timing.pixel_clock * 10000L;
+	crtcInfo->refresh_rate = crtcInfo->pixel_clock
+		/ (crtcInfo->horizontal_total / 10)
+		/ (crtcInfo->vertical_total / 10);
+
+	crtcInfo->flags = 0;
+	if (timing.sync == 3) {
+		// TODO: this switches the default sync when sync != 3 (compared to
+		// create_display_modes().
+		if ((timing.misc & 1) == 0)
+			crtcInfo->flags |= CRTC_NEGATIVE_HSYNC;
+		if ((timing.misc & 2) == 0)
+			crtcInfo->flags |= CRTC_NEGATIVE_VSYNC;
+	}
+	if (timing.interlaced)
+		crtcInfo->flags |= CRTC_INTERLACED;
+
+	return crtcInfo;
+}
+
+
+static crtc_info_block*
+get_crtc_info_block(edid1_std_timing& timing)
+{
+	// TODO: implement me!
+	return NULL;
+}
+
+
+static video_mode*
+find_edid_mode(edid1_info& info, bool allowPalette)
 {
 	video_mode *mode = NULL;
 
 	// try detailed timing first
 	for (int32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; i++) {
-		edid1_detailed_monitor &monitor = info.detailed_monitor[i];
+		edid1_detailed_monitor& monitor = info.detailed_monitor[i];
 
 		if (monitor.monitor_desc_type == EDID1_IS_DETAILED_TIMING) {
 			mode = find_video_mode(monitor.data.detailed_timing.h_active,
 				monitor.data.detailed_timing.v_active, allowPalette);
-			if (mode != NULL)
+			if (mode != NULL) {
+				mode->timing
+					= get_crtc_info_block(monitor.data.detailed_timing);
 				return mode;
+			}
 		}
 	}
+
+	int32 best = -1;
 
 	// try standard timings next
 	for (int32 i = 0; i < EDID1_NUM_STD_TIMING; i++) {
 		if (info.std_timing[i].h_size <= 256)
 			continue;
 
-		video_mode *found = find_video_mode(info.std_timing[i].h_size,
+		video_mode* found = find_video_mode(info.std_timing[i].h_size,
 			info.std_timing[i].v_size, allowPalette);
 		if (found != NULL) {
 			if (mode != NULL) {
 				// prefer higher resolutions
-				if (found->width > mode->width)
+				if (found->width > mode->width) {
 					mode = found;
-			} else
+					best = i;
+				}
+			} else {
 				mode = found;
+				best = i;
+			}
 		}
 	}
+
+	if (best >= 0)
+		mode->timing = get_crtc_info_block(info.std_timing[best]);
 
 	return mode;
 }
@@ -413,6 +473,8 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 				videoMode->width = modeInfo.width;
 				videoMode->height = modeInfo.height;
 				videoMode->bits_per_pixel = modeInfo.bits_per_pixel;
+				videoMode->timing = NULL;
+
 				if (modeInfo.bits_per_pixel == 16
 					&& modeInfo.red_mask_size + modeInfo.green_mask_size
 						+ modeInfo.blue_mask_size == 15) {
@@ -472,11 +534,18 @@ vesa_get_mode(uint16 *_mode)
 
 
 static status_t
-vesa_set_mode(uint16 mode)
+vesa_set_mode(video_mode* mode)
 {
 	struct bios_regs regs;
 	regs.eax = 0x4f02;
-	regs.ebx = (mode & SET_MODE_MASK) | SET_MODE_LINEAR_BUFFER;
+	regs.ebx = (mode->mode & SET_MODE_MASK) | SET_MODE_LINEAR_BUFFER;
+
+	if (mode->timing != NULL) {
+		regs.ebx |= SET_MODE_SPECIFY_CRTC;
+		regs.es = ADDRESS_SEGMENT(mode->timing);
+		regs.edi = ADDRESS_OFFSET(mode->timing);
+	}
+
 	call_bios(0x10, &regs);
 
 	if ((regs.eax & 0xffff) != 0x4f)
@@ -904,7 +973,7 @@ platform_switch_to_logo(void)
 		// getting the EDID data and setting the video mode. As such we wait here briefly to give
 		// everything enough time to settle.
 		spin(1000);
-		if (vesa_set_mode(sMode->mode) != B_OK)
+		if (vesa_set_mode(sMode) != B_OK)
 			goto fallback;
 
 		struct vbe_mode_info modeInfo;
