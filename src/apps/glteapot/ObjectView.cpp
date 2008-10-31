@@ -291,19 +291,19 @@ ObjectView::Pulse()
 void
 ObjectView::MessageReceived(BMessage* msg)
 {
-	BMenuItem* item = NULL;	
+	BMenuItem* item = NULL;
 	bool toggleItem = false;
 
 	switch (msg->what) {
-   	    case kMsgFPS:
-		    fFps = (fFps) ? false : true;
+		case kMsgFPS:
+			fFps = (fFps) ? false : true;
 			msg->FindPointer("source", reinterpret_cast<void**>(&item));
 			item->SetMarked(fFps);
 			fForceRedraw = true;
 			setEvent(drawEvent);
 			break;
-	    case kMsgAddModel:
-		    fObjListLock.Lock();
+		case kMsgAddModel:
+			fObjListLock.Lock();
 			fObjects.AddItem(new TriangleObject(this, teapotPath));
 			fObjListLock.Unlock();
 			setEvent(drawEvent);
@@ -365,12 +365,12 @@ ObjectView::MessageReceived(BMessage* msg)
 		case kMsgFog:
 			fFog = !fFog;
 			toggleItem = true;
-			break;			
+			break;
 	}
 	
-	if (toggleItem && msg->FindPointer("source", reinterpret_cast<void**>(&item)) == B_OK){		
+	if (toggleItem && msg->FindPointer("source", reinterpret_cast<void**>(&item)) == B_OK){
 		item->SetMarked(!item->IsMarked());
-		setEvent(drawEvent);			
+		setEvent(drawEvent);
 	}
 	
 	BGLView::MessageReceived(msg);
