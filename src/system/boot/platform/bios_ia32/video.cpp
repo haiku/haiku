@@ -1184,7 +1184,11 @@ platform_init_video(void)
 	}
 
 	edid1_info info;
-	if (vesa_get_edid(&info) == B_OK) {
+	// Note, we currently ignore EDID information for VBE2 - while the EDID
+	// information itself seems to be reliable, older chips often seem to
+	// use very strange default timings with higher modes.
+	// TODO: Maybe add a setting to enable it anyway?
+	if (sInfo.version.major >= 3 && vesa_get_edid(&info) == B_OK) {
 		// we got EDID information from the monitor, try to find a new default
 		// mode
 		video_mode *defaultMode = find_edid_mode(info, false);
