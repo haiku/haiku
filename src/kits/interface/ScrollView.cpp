@@ -493,6 +493,8 @@ BScrollView::FrameResized(float width, float height)
 void
 BScrollView::ResizeToPreferred()
 {
+	if (Window() == NULL)
+		return;
 	BView::ResizeToPreferred();
 }
 
