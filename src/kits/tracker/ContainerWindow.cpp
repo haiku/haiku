@@ -1088,13 +1088,13 @@ BContainerWindow::FrameResized(float, float)
 		BPoint scroll(B_ORIGIN);
 		if (offsetX < 0 && PoseView()->Bounds().right > extent.right
 			&& Bounds().Width() > fPreviousBounds.Width())
-			scroll.x =
-				max_c(fPreviousBounds.Width() - Bounds().Width(), offsetX);
+			scroll.x
+				= max_c(fPreviousBounds.Width() - Bounds().Width(), offsetX);
 
 		if (offsetY < 0 && PoseView()->Bounds().bottom > extent.bottom
 			&& Bounds().Height() > fPreviousBounds.Height())
-			scroll.y =
-				max_c(fPreviousBounds.Height() - Bounds().Height(), offsetY);
+			scroll.y
+				= max_c(fPreviousBounds.Height() - Bounds().Height(), offsetY);
 
 		if (scroll != B_ORIGIN)
 			PoseView()->ScrollBy(scroll.x, scroll.y);
