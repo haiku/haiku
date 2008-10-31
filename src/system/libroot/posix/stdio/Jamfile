@@ -3,7 +3,9 @@ SubDir HAIKU_TOP src system libroot posix stdio ;
 UsePrivateSystemHeaders ;
 
 MergeObject posix_stdio.o :
+	__freading.cpp
 	_fseek.c
+	fpurge.cpp
 	remove.c
 	rename.c
 # The other files are superseded by the glibc libio/stdio stuff

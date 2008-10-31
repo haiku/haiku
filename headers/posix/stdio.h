@@ -1,4 +1,4 @@
-/* 
+/*
 ** Distributed under the terms of the OpenBeOS License.
 */
 #ifndef _STDIO_H_
@@ -96,6 +96,7 @@ extern void		perror(const char *errorPrefix);
 /* file I/O */
 extern int		fflush(FILE *stream);
 extern int		fflush_unlocked(FILE *stream);
+extern int		fpurge(FILE *stream);
 
 extern int		fgetpos(FILE *stream, fpos_t *position);
 extern int		fsetpos(FILE *stream, const fpos_t *position);

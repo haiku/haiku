@@ -17,12 +17,12 @@ extern "C" {
 
 /* The following stdio extensions are not implemented yet */
 /* extern size_t	__fufsize(FILE* stream); */
-/* extern int		__freading(FILE* stream); */
+extern int		__freading(FILE* stream);
 /* extern int		__fwriting(FILE* stream); */
 /* extern int		__freadable(FILE* stream); */
 /* extern int		__fwritable(FILE* stream); */
 /* extern int		__flbf(FILE* stream); */
-/* extern void		__fpurge(FILE* stream); */
+extern void		__fpurge(FILE* stream);
 /* extern size_t	__fpending(FILE* stream); */
 
 extern void		_flushlbf(void);
