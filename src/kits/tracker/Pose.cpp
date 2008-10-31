@@ -526,7 +526,7 @@ BPose::PointInPose(BPoint loc, const BPoseView *poseView, BPoint where,
 
 void
 BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
-	const BRegion *updateRgn, BPoint offset, bool selected, bool recalculateText)
+	const BRegion *updateRgn, BPoint offset, bool selected)
 {
 	// If the background wasn't cleared and Draw() is not called after
 	// having edited a name or similar (with fullDraw)
@@ -536,7 +536,7 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 		return;
 	} else
 		fBackgroundClean = false;
-	
+		
 	bool directDraw = (drawView == poseView);
 	bool windowActive = poseView->Window()->IsActive();
 	bool showSelectionWhenInactive = poseView->fShowSelectionWhenInactive;
@@ -576,9 +576,6 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 				if (!updateRgn || updateRgn->Intersects(widgetRect)) {
 					BRect widgetTextRect(widget->CalcRect(rect.LeftTop(), column,
 						poseView));
-					
-					if (recalculateText)
-						widget->RecalculateText(poseView);
 					
 					bool selectDuringDraw = directDraw && selected
 						&& windowActive;

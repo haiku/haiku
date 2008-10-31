@@ -83,14 +83,6 @@ BTextWidget::Compare(const BTextWidget &with, BPoseView *view) const
 }
 
 
-void
-BTextWidget::RecalculateText(const BPoseView *view)
-{
-	fText->SetDirty(true);
-	fText->CheckViewChanged(view);	
-}
-
-
 const char *
 BTextWidget::Text(const BPoseView *view) const
 {

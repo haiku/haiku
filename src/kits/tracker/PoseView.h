@@ -471,7 +471,7 @@ class BPoseView : public BView {
 		// pose handling
 		BRect CalcPoseRect(BPose *, int32 index, bool minimal = false) const;
 		void DrawPose(BPose *, int32 index, bool fullDraw = true);
-		void DrawViewCommon(BRect, bool recalculateText = false);
+		void DrawViewCommon(const BRect &updateRect);
 
 		// pose list handling
 		int32 BSearchList(const BPose *, int32 *index);

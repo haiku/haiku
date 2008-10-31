@@ -91,8 +91,6 @@ public:
 	float PreferredWidth(const BPoseView *) const;
 	int	Compare(const BTextWidget &, BPoseView *) const;
 		// used for sorting in PoseViews
-
-	void RecalculateText(const BPoseView *view);
 	
 private:
 	BRect CalcRectCommon(BPoint poseLoc, const BColumn *, const BPoseView *, float width);

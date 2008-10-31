@@ -8143,7 +8143,7 @@ BPoseView::SynchronousUpdate(BRect updateRect, bool clip)
 
 
 void
-BPoseView::DrawViewCommon(BRect updateRect, bool recalculateText)
+BPoseView::DrawViewCommon(const BRect &updateRect)
 {
 	GetClippingRegion(fUpdateRegion);
 
@@ -8158,7 +8158,7 @@ BPoseView::DrawViewCommon(BRect updateRect, bool recalculateText)
 		for (int32 index = startIndex; index < count; index++) {
 			BPose *pose = fPoseList->ItemAt(index);
 			BRect poseRect(pose->CalcRect(loc, this, true));
-			pose->Draw(poseRect, this, true, fUpdateRegion, recalculateText);
+			pose->Draw(poseRect, this, true, fUpdateRegion);
 			loc.y += fListElemHeight;
 			if (loc.y >= updateRect.bottom)
 				break;
@@ -9213,7 +9213,7 @@ BPoseView::UpdateDateColumns(BMessage *message)
 		if (col && col->AttrType() == B_TIME_TYPE) {
 			columnRect.left = col->Offset();
 			columnRect.right = columnRect.left + col->Width();
-			DrawViewCommon(columnRect, true); // true means recalculate texts.
+			Invalidate(columnRect);
 		}
 	}
 }

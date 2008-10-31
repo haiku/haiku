@@ -155,7 +155,8 @@ WidgetAttributeText::~WidgetAttributeText()
 const char *
 WidgetAttributeText::FittingText(const BPoseView *view)
 {
-	if (fDirty || fColumn->Width() != fOldWidth || !fValueIsDefined)
+	if (fDirty || fColumn->Width() != fOldWidth || CheckSettingsChanged()
+		|| !fValueIsDefined )
 		CheckViewChanged(view);
 
 	ASSERT(!fDirty);
@@ -168,12 +169,18 @@ WidgetAttributeText::CheckViewChanged(const BPoseView *view)
 {
 	BString newText;
 	FitValue(&newText, view);
-
 	if (newText == fText)
 		return false;
 
 	fText = newText;
 	return true;
+}
+
+
+bool
+WidgetAttributeText::CheckSettingsChanged()
+{	
+	return false;
 }
 
 
@@ -1084,6 +1091,23 @@ TimeAttributeText::FitValue(BString *result, const BPoseView *view)
 	fOldWidth = fColumn->Width();
 	fTruncatedWidth = TruncTime(result, fValue, view, fOldWidth);
 	fDirty = false;
+}
+
+
+bool
+TimeAttributeText::CheckSettingsChanged()
+{	
+	bool changed = fLastClockIs24 != fSettings.ClockIs24Hr()
+		|| fLastDateOrder != fSettings.DateOrderFormat()
+		|| fLastTimeFormatSeparator != fSettings.TimeFormatSeparator();
+
+	if (changed) {
+		fLastClockIs24 = fSettings.ClockIs24Hr();
+		fLastDateOrder = fSettings.DateOrderFormat();
+		fLastTimeFormatSeparator = fSettings.TimeFormatSeparator();
+	}
+
+	return changed;
 }
 
 

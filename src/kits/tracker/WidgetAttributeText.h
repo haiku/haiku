@@ -66,6 +66,9 @@ class WidgetAttributeText {
 			// returns true if fitted text changed, either because value
 			// changed or because width/view changed
 
+		virtual bool CheckSettingsChanged();
+			// override if the text rendering depends on a setting
+
 		const char *FittingText(const BPoseView *);
 			// returns text, recalculating if not yet calculated
 
@@ -233,10 +236,17 @@ class GenericAttributeText : public StringAttributeText {
 
 
 class TimeAttributeText : public ScalarAttributeText {
-	protected:
+	public:
 		TimeAttributeText(const Model *, const BColumn *);
+	protected:
 		virtual float PreferredWidth(const BPoseView *) const;
 		virtual void FitValue(BString *result, const BPoseView *);
+		virtual bool CheckSettingsChanged();
+
+		TrackerSettings fSettings;
+		bool fLastClockIs24;
+		DateOrder fLastDateOrder;
+		FormatSeparator fLastTimeFormatSeparator;
 };
 
 
