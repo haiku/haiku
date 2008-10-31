@@ -71,6 +71,30 @@ const unsigned char kShiftBits[] = {
 
 const float kLightBGTint = (B_LIGHTEN_1_TINT + B_LIGHTEN_1_TINT + B_NO_TINT) / 3.0;
 
+// map control key shortcuts to drawable Unicode characters
+// cf. http://unicode.org/charts/PDF/U2190.pdf
+const char *kUTF8ControlMap[] = {
+	NULL, 
+	"\xe2\x86\xb8", /* B_HOME U+21B8 */
+	NULL, NULL, 
+	NULL, /* B_END */
+	NULL, /* B_INSERT */
+	NULL, NULL,
+	NULL, /* B_BACKSPACE */
+	"\xe2\x86\xb9", /* B_TAB U+21B9 */
+	"\xe2\x86\xb5", /* B_ENTER, U+21B5 */
+	//"\xe2\x8f\x8e", /* B_ENTER, U+23CE it's the official one */
+	NULL, /* B_PAGE_UP */
+	NULL, /* B_PAGE_DOWN */
+	NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, 
+	"\xe2\x86\x90", /* B_LEFT_ARROW */
+	"\xe2\x86\x92", /* B_RIGHT_ARROW */
+	"\xe2\x86\x91", /* B_UP_ARROW */
+	"\xe2\x86\x93", /* B_DOWN_ARROW */
+};
+
 using BPrivate::MenuPrivate;
 
 BMenuItem::BMenuItem(const char *label, BMessage *message, char shortcut,
@@ -731,19 +755,10 @@ BMenuItem::_DrawShortcutSymbol()
 		where.x -= fBounds.Height() - 3;
 
 	const float ascent = MenuPrivate(fSuper).Ascent();
-	switch (fShortcutChar) {
-		case B_DOWN_ARROW:
-		case B_UP_ARROW:
-		case B_LEFT_ARROW:
-		case B_RIGHT_ARROW:
-		case B_ENTER:
-			_DrawControlChar(fShortcutChar, where + BPoint(0, ascent));
-			break;
-
-		default:
-			fSuper->DrawChar(fShortcutChar, where + BPoint(0, ascent));
-			break;
-	}
+	if (fShortcutChar < B_SPACE && kUTF8ControlMap[fShortcutChar])
+		_DrawControlChar(fShortcutChar, where + BPoint(0, ascent));
+	else
+		fSuper->DrawChar(fShortcutChar, where + BPoint(0, ascent));
 
 	where.y += (fBounds.Height() - 11) / 2 - 1;
 	where.x -= 4;	
@@ -834,24 +849,8 @@ BMenuItem::_DrawControlChar(char shortcut, BPoint where)
 	// TODO: If needed, take another font for the control characters
 	//	(or have font overlays in the app_server!)
 	const char* symbol = " ";
-
-	switch (shortcut) {
-		case B_DOWN_ARROW:
-			symbol = "\xe2\x86\x93";
-			break;
-		case B_UP_ARROW:
-			symbol = "\xe2\x86\x91";
-			break;
-		case B_LEFT_ARROW:
-			symbol = "\xe2\x86\x90";
-			break;
-		case B_RIGHT_ARROW:
-			symbol = "\xe2\x86\x92";
-			break;
-		case B_ENTER:
-			symbol = "\xe2\x86\xb5";
-			break;
-	}
+	if (kUTF8ControlMap[fShortcutChar])
+		symbol = kUTF8ControlMap[fShortcutChar];
 
 	fSuper->DrawString(symbol, where);
 }
