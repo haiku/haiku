@@ -45,10 +45,8 @@ MouseDevice::Control(uint32 op, void *buffer, size_t length)
 				// NOTE: this thread is now blocking until the semaphore is
 				// released in the callback function
 				status_t result = acquire_sem_etc(fTransferNotifySem, 1,
-					B_CAN_INTERRUPT, 0);
-				if (result == B_INTERRUPTED && IsOpen())
-					continue;
-				else if (result != B_OK)
+					B_CAN_INTERRUPT, B_INFINITE_TIMEOUT);
+				if (result != B_OK)
 					return result;
 
 				result = _InterpretBuffer();

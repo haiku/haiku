@@ -89,8 +89,6 @@ KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 					// the next timeout is reduced to the repeat_rate
 					fCurrentRepeatDelay = fRepeatRate;
 					break;
-				} else if (result == B_INTERRUPTED && IsOpen()) {
-					continue;
 				} else
 					return result;
 			}
