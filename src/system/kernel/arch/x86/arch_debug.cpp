@@ -131,7 +131,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 		const char* lastName = strrchr(name, ':') - 1;
 		int namespaceLength = lastName - name;
 
-		kprintf("<%s> %.*s<%p>%s", image, namespaceLength, name,
+		kprintf("<%s> %.*s<\33[32m%p\33[0m>%s", image, namespaceLength, name,
 			*(uint32 **)arg, lastName);
 		if (addDebugVariables)
 			set_debug_variable("_this", *(uint32 *)arg);
@@ -156,43 +156,45 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 		switch (type) {
 			case B_INT64_TYPE:
 				value = *(int64*)arg;
-				kprintf("int64: %Ld", value);
+				kprintf("int64: \33[34m%Ld\33[0m", value);
 				break;
 			case B_INT32_TYPE:
 				value = *(int32*)arg;
-				kprintf("int32: %ld", (int32)value);
+				kprintf("int32: \33[34m%ld\33[0m", (int32)value);
 				break;
 			case B_INT16_TYPE:
 				value = *(int16*)arg;
-				kprintf("int16: %d", (int16)value);
+				kprintf("int16: \33[34m%d\33[0m", (int16)value);
 				break;
 			case B_INT8_TYPE:
 				value = *(int8*)arg;
-				kprintf("int8: %d", (int8)value);
+				kprintf("int8: \33[34m%d\33[0m", (int8)value);
 				break;
 			case B_UINT64_TYPE:
 				value = *(uint64*)arg;
-				kprintf("uint64: %#Lx", value);
+				kprintf("uint64: \33[34m%#Lx\33[0m", value);
 				if (value < 0x100000)
-					kprintf(" (%Lu)", value);
+					kprintf(" (\33[34m%Lu\33[0m)", value);
 				break;
 			case B_UINT32_TYPE:
 				value = *(uint32*)arg;
-				kprintf("uint32: %#lx", (uint32)value);
+				kprintf("uint32: \33[34m%#lx\33[0m", (uint32)value);
 				if (value < 0x100000)
-					kprintf(" (%lu)", (uint32)value);
+					kprintf(" (\33[34m%lu\33[0m)", (uint32)value);
 				break;
 			case B_UINT16_TYPE:
 				value = *(uint16*)arg;
-				kprintf("uint16: %#x (%u)", (uint16)value, (uint16)value);
+				kprintf("uint16: \33[34m%#x\33[0m (\33[34m%u\33[0m)",
+					(uint16)value, (uint16)value);
 				break;
 			case B_UINT8_TYPE:
 				value = *(uint8*)arg;
-				kprintf("uint8: %#x (%u)", (uint8)value, (uint8)value);
+				kprintf("uint8: \33[34m%#x\33[0m (\33[34m%u\33[0m)",
+					(uint8)value, (uint8)value);
 				break;
 			case B_BOOL_TYPE:
 				value = *(uint8*)arg;
-				kprintf(value ? "true" : "false");
+				kprintf("\33[34m%s\33[0m", value ? "true" : "false");
 				break;
 			default:
 				if (buffer[0]) {
@@ -206,7 +208,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 						&& (type == B_POINTER_TYPE || type == B_REF_TYPE))
 						kprintf("NULL");
 					else
-						kprintf("%#lx", (uint32)value);
+						kprintf("\33[34m%#lx\33[0m", (uint32)value);
 					break;
 				}
 
@@ -214,15 +216,17 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 					value = *(uint64*)arg;
 				else
 					value = (uint64)arg;
-				kprintf("%#Lx", value);
+				kprintf("\33[34m%#Lx\33[0m", value);
 				break;
 		}
 
 		if (type == B_STRING_TYPE) {
-			if (user_strlcpy(buffer, (char*)value, sizeof(buffer)) < B_OK)
-				kprintf(" '???'");
+			if (value == 0)
+				kprintf(" \33[31m\"<NULL>\"\33[0m");
+			else if (user_strlcpy(buffer, (char*)value, sizeof(buffer)) < B_OK)
+				kprintf(" \33[31m\"<???>\"\33[0m");
 			else
-				kprintf(" \"%s\"", buffer);
+				kprintf(" \33[36m\"%s\"\33[0m", buffer);
 		}
 
 		if (addDebugVariables)
