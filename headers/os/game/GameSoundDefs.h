@@ -21,7 +21,7 @@
 //
 //	File Name:		GameSound.cpp
 //	Author:			Christopher ML Zumwalt May (cdzumwalt@dsl-only.net)
-//	Description:	Declerations for game sounds
+//	Description:	Declarations for game sounds
 //------------------------------------------------------------------------------
 
 #if !defined(_GAME_SOUND_DEFS_H)
