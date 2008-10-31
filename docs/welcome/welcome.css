@@ -161,8 +161,15 @@ div.bottomnav p {
 	font-size: 0.9em;
 }
 
+td {
+	vertical-align: top;
+}
+
 td.onelinetop {
 	vertical-align: top;
 	white-space: nowrap;
 }
-	
+
+tt {
+	background-color:rgb(240,240,240)
+}

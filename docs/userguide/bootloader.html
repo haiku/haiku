@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>Boot Loader</title>
+	<link rel="stylesheet" type="text/css" href="../welcome/welcome.css">
+</head>
+<body lang="en-US">
+
+<div class="logo">
+	<img src="../welcome/welcome-images/logo.png" alt="logo">
+	<div class="title">Boot Loader</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="contents.html">Contents</a>
+		&nbsp;&nbsp;&nbsp;
+		Next: <a href="filesystem-layout.html">Filesystem layout</a>
+	</p>
+</div>
+
+<div class="content">
+
+<p>Haiku's Boot Loader can help you when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick).<br>
+It's also handy after you installed a software component that acts up and prevents you from booting the system to remove it again. The <i>Disable user add-ons</i> option that's mentioned below, will start Haiku without loading user installed components, e.g. a driver.
+</p><p>To enter the Boot Loader options, you have to press the <tt>SPACE BAR</tt> right at the beginning of the boot process. It's easy to miss so you best keep hitting the key until it shows up.
+</p><br><p>
+</p><p>Once it's there, you're offered three menus:
+</p><p><table>
+<tr><td><b>Select boot volume</b></td><td>&nbsp;</td><td>Choose which Haiku installation to start.</td></tr>
+<tr><td><b>Select safe mode options</b><br>
+</td><td>&nbsp;</td><td>There are several options to try in case of hardware related trouble. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.
+<p><i>- Safe mode<br>
+- Disable user add-ons<br>
+- Disable IDE DMA<br>
+- Use fail-safe video mode<br>
+- Don't call the BIOS<br>
+- Disable APM<br>
+- Disable ACPI</br>
+- Enable on screen debug output</i>
+</p><p></p></td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td>&nbsp;</td><td>If you had to activate the option <i>Use fail-safe video mode</i>, you can set resolution and colour depth.</td></tr>
+</table>
+</p><br><p>
+</p><p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:
+</p>
+<img src="bootloader-images/boot-screen.png" alt="boot-screen.png" width="480" height="300">
+<br>
+<p>If everything works OK, one symbol after another quickly lights up.
+
+<!----- There's an old <a href="http://betips.net/1997/09/09/understanding-the-boot-icons/">BeOS Tip Server entry</a> by Scot Hacker, that's still valid, though some icons have changed since then:
+</p><p><table>
+<tr><td><b>Atom</b></td><td width="10">&nbsp;</td><td>Indicates the handoff of the bootloader to the Haiku kernel.</td></tr>
+<tr><td><b>Atom</b></td><td>&nbsp;</td><td>Indicates the handoff of the bootloader to the Haiku kernel.</td></tr>
+<tr><td><b>Atom</b></td><td>&nbsp;</td><td>Indicates the handoff of the bootloader to the Haiku kernel.</td></tr>
+<tr><td><b>Atom</b></td><td>&nbsp;</td><td>Indicates the handoff of the bootloader to the Haiku kernel.</td></tr>
+<tr><td><b>Atom</b></td><td>&nbsp;</td><td>Indicates the handoff of the bootloader to the Haiku kernel.</td></tr>
+<tr><td><b>Atom</b></td><td>&nbsp;</td><td>Indicates the handoff of the bootloader to the Haiku kernel.</td></tr>
+<tr><td><b>Atom</b></td><td>&nbsp;</td><td>Indicates the handoff of the bootloader to the Haiku kernel.</td></tr>
+</table>
+----->
+</p>
+
+</div>
+
+<div class="bottomnav">
+	<p>
+		<a href="contents.html">Contents</a>
+		&nbsp;&nbsp;&nbsp;
+		Next: <a href="filesystem-layout.html">Filesystem layout</a>
+	</p>
+</div>
+
+</body>
+</html>

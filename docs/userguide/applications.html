@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>Applications</title>
+	<link rel="stylesheet" type="text/css" href="../welcome/welcome.css">
+</head>
+<body lang="en-US">
+
+<div class="logo">
+	<img src="../welcome/welcome-images/logo.png" alt="logo">
+	<div class="title">Applications</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="contents.html">Contents</a>
+		&nbsp;&nbsp;&nbsp;
+		Previous: <a href="workshop-filetypes+attributes.html">Workshop</a>
+		&nbsp;&nbsp;&nbsp;
+		Next: <a href="desktop-applets.html">Desktop Applets</a>
+	</p>
+</div>
+
+<div class="content">
+
+<p>Before diving into all the applications that come with Haiku, let's have a more detailed look at how to install and uninstall programs you downloaded somewhere, for example from a site mentioned on the <a href="../welcome/welcome.html#software">Welcome</a> page.
+</p>
+
+<h2><a name="install">Installing applications</a></h2>
+<p>Haiku software always comes as an archive. Most of the time it's a ZIP, some old BeOS packages come in Software Valet's PKG format. Software Valet was able to automatically execute installation scripts, so after double-clicking you just select a destination folder and everything's taken care of.<br>
+If it's a ZIP archive, double-clicking opens <i>Expander</i> where you also set the destination and unpack it. As explained in the topic <a href="filesystem-layout">Filesystem layout</a>, that destination is either
+</p><p><table border="0" cellpadding="0" cellspacing="0">
+<tr><td><tt>/boot/common/apps/</tt></td><td>&nbsp;&nbsp;&nbsp;</td><td> for applications available to every user</td></tr>
+<tr><td><tt>/boot/home/apps/</tt></td><td>&nbsp;&nbsp;&nbsp;</td><td> for applications only available to yourself</td></tr>
+</table>
+</p><p>This distinction will only become relevant once Haiku gets multi-user support, of course.
+</p><p>Once the archive is unpacked, you should have a look into the newly created folder. Often you find ReadMe files or other documentation of interest.
+</p><p>Some programs need further configurations. For example, <a href="tracker-add-ons.html">Tracker Add-Ons</a>, Translators or other system enhancing components have to be put into the right folders. Either you'll find a little script file (often with the suffix <tt>.sh</tt>) like <tt>install</tt> that you simply double click to have all taken care of.<br>
+Sometimes you'll find folders that link to the correct destination named "<tt>drag [filename] here...</tt>". So, you simply follow that instruction and you're done.
+</p><p>Most of the time, however, nothing of the sort is necessary and you're done after unpacking.<br>
+See topic <a href="deskbar.html">Deskbar</a> or LaunchBox to see how to add shortcuts to your newly installed application.
+</p>
+
+<h2><a name="uninstall">Uninstalling applications</a></h2
+<p>If the installation was done with an install script, chances are, there's an uninstall script as well. In that case, double-click it and you're done.<br>
+Otherwise, uninstalling is simply done by deleting the application's folder.
+</p><p>This, of course, leaves back possible configuration files in your <tt>~/config/settings</tt> folder. This may be on purpose, if you want to keep those settings in case you'll install it again in the future. Also, when the installation involved those "<tt>drag [filename] here...</tt>" folders, those files are also left behind.
+</p><p>One method to quickly get to all the app's files is to do a quick query for a significant part of the application's name. This will reveal the app's binary, its installation folder and its settings as well as possible links in the Deskbar etc. Simply select all relevant files and delete them.
+</p>
+
+<h2><a name="list-of-apps">Haiku's applications</a></h2>
+<p>Haiku comes with a set of mostly small but essential applications:
+</p><p><table border="0" cellpadding="0" cellspacing="5" width="100%"> 
+	<tr><td><a href="apps-activitymonitor.html">ActivityMonitor</a></td>
+		<td valign="top">A tool to track system resources like CPU and memory usage.</td></tr>
+	<tr><td><a href="apps-bepdf.html">BePDF</a></td>
+		<td valign="top">A <acronym title="Portable Document Format">PDF</acronym> viewer</td></tr>
+	<tr><td><a href="apps-cdplayer.html">CDPlayer</a></td>
+		<td valign="top">A player for audio CDs.</td></tr>
+	<tr><td><a href="apps-codycam.html">CodyCam</a></td>
+		<td valign="top">A tool to regularly upload images from a webcam to a server.</td></tr>
+	<tr><td><a href="apps-deskcalc.html">DeskCalc</a></td>
+		<td valign="top">A calculator.</td></tr>
+	<tr><td><a href="apps-diskprobe.html">DiskProbe</a></td>
+		<td valign="top">A HEX editor for files and volumes.</td></tr>
+	<tr><td><a href="apps-diskusage.html">DiskUsage</a></td>
+		<td valign="top">A tool to visualize a disk's memory usage.</td></tr>
+	<tr><td><a href="apps-drivesetup.html">DriveSetup</a></td>
+		<td valign="top">A harddisk partitioning tool.</td></tr>
+	<tr><td><a href="apps-firefox.html">Firefox</a></td>
+		<td valign="top">Mozilla's famous browser.</td></tr>
+	<tr><td><a href="apps-icon-o-matic.html">Icon-O-Matic</a></td>
+		<td valign="top">An app to create Haiku's vector icons.</td></tr>
+	<tr><td><a href="apps-magnify.html">Magnify</a></td>
+		<td valign="top">A magnified view of the area around your mouse pointer.</td></tr>
+	<tr><td><a href="apps-mail.html">Mail</b></td>
+		<td valign="top">An email client.</td></tr>
+	<tr><td><a href="apps-mediaplayer.html">MediaPlayer</a></td>
+		<td valign="top">A player for all supported audio/video files.</td></tr>
+	<tr><td><a href="apps-midiplayer.html">MidiPlayer</a></td>
+		<td valign="top">A player for MIDI files.</td></tr>
+	<tr><td><a href="apps-pe.html">pe</a></td>
+		<td valign="top">A texteditor with syntax coloring and much more.</td></tr>
+	<tr><td><a href="apps-people.html">People</a></td>
+		<td valign="top">A contact manager.</td></tr>
+	<tr><td><a href="apps-screenshot.html">Screenshot</a></td>
+		<td valign="top">A tool to take screenshots.</td></tr>
+	<tr><td><a href="apps-soundrecorder.html">SoundRecorder</a></td>
+		<td valign="top">A tool to record audio from line-in or a microphone.</td></tr>
+	<tr><td><a href="apps-stylededit.html">StyledEdit</a></td>
+		<td valign="top">A text editor.</td></tr>
+	<tr><td><a href="apps-terminal.html">Terminal</a></td>
+		<td valign="top">Access to the bash.</td></tr>
+	<tr><td><a href="apps-tv.html">TV</a></td>
+		<td valign="top">A viewer for analog TV.</td></tr>
+	<tr><td><a href="apps-vision.html">Vision</a></td>
+		<td valign="top">An <acronym title="Internet Relay Chat">IRC</acronym> client.</td></tr>
+	<tr><td><a href="apps-vlc.html">VLC</a></td>
+		<td valign="top">The VideoLAN movie player.</td></tr>
+	<tr><td><a href="apps-wonderbrush.html">WonderBrush</a></td>
+		<td valign="top">Yellowbite's vector graphics programm.</td></tr>
+</table>
+</p>
+
+</div>
+
+<div class="bottomnav">
+	<p>
+		<a href="contents.html">Contents</a>
+		&nbsp;&nbsp;&nbsp;
+		Previous: <a href="workshop-filetypes+attributes.html">Workshop</a>
+		&nbsp;&nbsp;&nbsp;
+		Next: <a href="desktop-applets.html">Desktop Applets</a>
+	</p>
+</div>
+
+</body>
+</html>
