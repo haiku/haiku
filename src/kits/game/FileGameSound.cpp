@@ -7,6 +7,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -28,7 +29,7 @@ struct _gs_media_tracker
 	size_t			position;
 };
 
-// Locale utility functions -----------------------------------------------
+// Local utility functions -----------------------------------------------
 bool FillBuffer(_gs_ramp * ramp, uint8 * data, uint8 * buffer, size_t * bytes)
 {
 	int32 samples = *bytes / sizeof(uint8);
@@ -218,77 +219,79 @@ void
 BFileGameSound::FillBuffer(void *inBuffer,
 						   size_t inByteCount)
 {
-	size_t bytes = inByteCount;
+	// Split or combine decoder buffers into mixer buffers
+	// fPlayPosition is where we got up to in the input buffer after last call
 
-	if (!fPaused || fPausing) {
-		if (fPlayPosition == 0 || fPlayPosition + inByteCount >= fBufferSize) {
-			Load();
-		}
-
-		if (fPlayPosition + bytes > fBufferSize)
-			bytes = fBufferSize - fPlayPosition;
-
-		if (bytes == 0)
-			return;
-
-		if (fPausing) {
-			Lock();
-
-			bool rampDone = false;
-
-			// Fill the requested buffer, stopping if the paused flag is set
-			switch(Format().format) {
-				case gs_audio_format::B_GS_U8:
-					rampDone = ::FillBuffer(fPausing, (uint8*)inBuffer,
-										(uint8*)&fBuffer[fPlayPosition], &bytes);
-					break;
-
-				case gs_audio_format::B_GS_S16:
-					rampDone = ::FillBuffer(fPausing, (int16*)inBuffer,
-										(int16*)&fBuffer[fPlayPosition], &bytes);
-					break;
-
-				case gs_audio_format::B_GS_S32:
-					rampDone = ::FillBuffer(fPausing, (int32*)inBuffer,
-										(int32*)&fBuffer[fPlayPosition], &bytes);
-					break;
-
-				case gs_audio_format::B_GS_F:
-					rampDone = ::FillBuffer(fPausing, (float*)inBuffer,
-										(float*)&fBuffer[fPlayPosition], &bytes);
-					break;
+	size_t out_offset = 0;
+	
+	while (inByteCount > 0 && !fPaused) {
+		if (!fPaused || fPausing) {
+			printf("mixout %ld, inByteCount %ld, decin %ld, BufferSize %ld\n",out_offset, inByteCount, fPlayPosition, fBufferSize);
+			if (fPlayPosition == 0 || fPlayPosition >= fBufferSize) {
+				Load();
 			}
 
-			// We finished ramping
-			if (rampDone) {
-				if (bytes < inByteCount && !fPausing) {
-					// Since we are resuming play back,
-					// we need to copy any remaining samples
-					char * buffer = (char*)inBuffer;
-					memcpy(&buffer[bytes], &fBuffer[fPlayPosition + bytes],
-						   inByteCount - bytes);
+			if (fPausing) {
+				Lock();
+		
+				bool rampDone = false;
+				size_t bytes = fBufferSize - fPlayPosition;
+				
+				if (bytes > inByteCount) {
+					bytes = inByteCount;
 				}
+				
+				// Fill the requested buffer, stopping if the paused flag is set
+				char * buffer = (char*)inBuffer;
 
-				delete fPausing;
-				fPausing = NULL;
+				switch(Format().format) {
+					case gs_audio_format::B_GS_U8:
+						rampDone = ::FillBuffer(fPausing, (uint8*)&buffer[out_offset], (uint8*)&fBuffer[fPlayPosition], &bytes);
+						break;
+			
+					case gs_audio_format::B_GS_S16:
+						rampDone = ::FillBuffer(fPausing, (int16*)&buffer[out_offset], (int16*)&fBuffer[fPlayPosition], &bytes);
+						break;
+			
+					case gs_audio_format::B_GS_S32:
+						rampDone = ::FillBuffer(fPausing, (int32*)&buffer[out_offset], (int32*)&fBuffer[fPlayPosition], &bytes);
+						break;
+			
+					case gs_audio_format::B_GS_F:
+						rampDone = ::FillBuffer(fPausing, (float*)&buffer[out_offset], (float*)&fBuffer[fPlayPosition], &bytes);
+						break;
+				}
+			
+				inByteCount -= bytes;
+				out_offset += bytes;
+				fPlayPosition += bytes;
+			
+				// We finished ramping
+				if (rampDone) {
+
+					// We need to be able to stop asap when the pause flag is flipped.
+					while(fPlayPosition < fBufferSize && (inByteCount > 0)) {
+						buffer[out_offset++] = fBuffer[fPlayPosition++];
+						inByteCount--;
+					}
+				
+					delete fPausing;
+					fPausing = NULL;
+				}
+							
+				Unlock();
+			} else {
+		
+				char * buffer = (char*)inBuffer;
+
+				// We need to be able to stop asap when the pause flag is flipped.
+				while(fPlayPosition < fBufferSize && (!fPaused || fPausing) && (inByteCount > 0)) {
+					buffer[out_offset++] = fBuffer[fPlayPosition++];
+					inByteCount--;
+				}
 			}
-
-			Unlock();
-		} else {
-			size_t byte = 0;
-			char * buffer = (char*)inBuffer;
-
-			// We need to be able to stop asap when the pause flag is flipped.
-			while(byte < bytes && (!fPaused || fPausing)) {
-				buffer[byte] = fBuffer[fPlayPosition + byte];
-				byte++;
-			}
-
-			bytes = byte;
 		}
 	}
-
-	fPlayPosition += bytes;
 }
 
 
@@ -402,19 +405,14 @@ BFileGameSound::Init(const entry_ref* file)
 bool
 BFileGameSound::Load()
 {
-	if (fPlayPosition != 0) {
-		if (fBufferSize > fPlayPosition)
-			memcpy(fBuffer, fBuffer + fPlayPosition, fBufferSize - fPlayPosition);
-		fPlayPosition = fBufferSize - fPlayPosition;
-	}
-
-	// time to read a new buffer
+	// read a new buffer
 	int64 frames = 0;
-	fAudioStream->stream->ReadFrames(fBuffer + fPlayPosition, &frames);
-	fBufferSize = fPlayPosition + frames * fFrameSize;
+	fAudioStream->stream->ReadFrames(fBuffer, &frames);
+	fBufferSize = frames * fFrameSize;
 	fPlayPosition = 0;
-
-	if (fBufferSize == 0) {
+	
+	if (fBufferSize <= 0) {
+		// EOF
 		if (fLooping) {
 			// start reading next time from the start of the file
 			int64 frame = 0;
@@ -423,7 +421,7 @@ BFileGameSound::Load()
 			StopPlaying();
 		}
 	}
-
+		
 	return true;
 }
 
