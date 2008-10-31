@@ -153,6 +153,10 @@ closest_video_mode(int32 width, int32 height, int32 depth)
 static crtc_info_block*
 get_crtc_info_block(edid1_detailed_timing& timing)
 {
+	// This feature is only available on chipsets supporting VBE3 and up
+	if (sInfo.version.major < 3)
+		return NULL;
+
 	// Copy timing structure to set the mode with
 	crtc_info_block* crtcInfo = (crtc_info_block*)malloc(
 		sizeof(crtc_info_block));
@@ -172,6 +176,12 @@ get_crtc_info_block(edid1_detailed_timing& timing)
 	crtcInfo->refresh_rate = crtcInfo->pixel_clock
 		/ (crtcInfo->horizontal_total / 10)
 		/ (crtcInfo->vertical_total / 10);
+
+	TRACE(("crtc: h %u/%u/%u, v %u/%u/%u, pixel clock %lu, refresh %u\n",
+		crtcInfo->horizontal_sync_start, crtcInfo->horizontal_sync_end,
+		crtcInfo->horizontal_total, crtcInfo->vertical_sync_start,
+		crtcInfo->vertical_sync_end, crtcInfo->vertical_total,
+		crtcInfo->pixel_clock, crtcInfo->refresh_rate));
 
 	crtcInfo->flags = 0;
 	if (timing.sync == 3) {
@@ -534,13 +544,13 @@ vesa_get_mode(uint16 *_mode)
 
 
 static status_t
-vesa_set_mode(video_mode* mode)
+vesa_set_mode(video_mode* mode, bool useTiming)
 {
 	struct bios_regs regs;
 	regs.eax = 0x4f02;
 	regs.ebx = (mode->mode & SET_MODE_MASK) | SET_MODE_LINEAR_BUFFER;
 
-	if (mode->timing != NULL) {
+	if (useTiming && mode->timing != NULL) {
 		regs.ebx |= SET_MODE_SPECIFY_CRTC;
 		regs.es = ADDRESS_SEGMENT(mode->timing);
 		regs.edi = ADDRESS_OFFSET(mode->timing);
@@ -969,11 +979,14 @@ platform_switch_to_logo(void)
 		if (!sModeChosen)
 			get_mode_from_settings();
 
-		// On some BIOS / chipset / monitor combinations, there seems to be a timing issue between
-		// getting the EDID data and setting the video mode. As such we wait here briefly to give
-		// everything enough time to settle.
+		// On some BIOS / chipset / monitor combinations, there seems to be a
+		// timing issue between getting the EDID data and setting the video
+		// mode. As such we wait here briefly to give everything enough time
+		// to settle.
 		spin(1000);
-		if (vesa_set_mode(sMode) != B_OK)
+
+		if ((sMode->timing == NULL || vesa_set_mode(sMode, true) != B_OK)
+			&& vesa_set_mode(sMode, false) != B_OK)
 			goto fallback;
 
 		struct vbe_mode_info modeInfo;
