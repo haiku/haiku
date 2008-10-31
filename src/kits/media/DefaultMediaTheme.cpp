@@ -36,6 +36,8 @@ class DynamicScrollView : public BView {
 
 		virtual void AttachedToWindow(void);
 		virtual void FrameResized(float width, float height);
+		virtual void FrameMoved(BPoint newPosition);
+		virtual void GetPreferredSize(float *_width, float *_height);
 
 		void SetContentBounds(BRect bounds);
 		BRect ContentBounds() const { return fContentBounds; }
@@ -57,6 +59,10 @@ class GroupView : public BView {
 		virtual void AttachedToWindow();
 		virtual void AllAttached();
 		virtual void GetPreferredSize(float *_width, float *_height);
+
+		virtual	BSize MinSize();
+		virtual	BSize MaxSize();
+		virtual	BSize PreferredSize();
 
 		void SetContentBounds(BRect bounds);
 		BRect ContentBounds() const { return fContentBounds; }
@@ -200,6 +206,29 @@ DynamicScrollView::FrameResized(float width, float height)
 
 
 void 
+DynamicScrollView::FrameMoved(BPoint newPosition)
+{
+	UpdateBars();
+}
+
+
+void 
+DynamicScrollView::GetPreferredSize(float *_width, float *_height)
+{
+	float width = 50;
+	if (fVerticalScrollBar)
+		width += B_V_SCROLL_BAR_WIDTH;
+	float height = 50;
+	if (fHorizontalScrollBar)
+		height += B_H_SCROLL_BAR_HEIGHT;
+	if (_width)
+		*_width = width;
+	if (_height)
+		*_height = height;
+}
+
+
+void 
 DynamicScrollView::SetContentBounds(BRect bounds)
 {
 	fContentBounds = bounds;
@@ -226,74 +255,55 @@ DynamicScrollView::UpdateBars()
 
 	// do we have to remove a scroll bar?
 
-	bool horizontal = width > Bounds().Width();
-	bool vertical = height > Bounds().Height();
-	bool horizontalChanged = false;
-	bool verticalChanged = false;
+	bool horizontal = width > bounds.Width();
+	bool vertical = height > bounds.Height();
 
 	if (!horizontal && fHorizontalScrollBar != NULL) {
 		RemoveChild(fHorizontalScrollBar);
 		delete fHorizontalScrollBar;
 		fHorizontalScrollBar = NULL;
-		fTarget->ResizeBy(0, B_H_SCROLL_BAR_HEIGHT);
-		horizontalChanged = true;
 	}
 
 	if (!vertical && fVerticalScrollBar != NULL) {
 		RemoveChild(fVerticalScrollBar);
 		delete fVerticalScrollBar;
 		fVerticalScrollBar = NULL;
-		fTarget->ResizeBy(B_V_SCROLL_BAR_WIDTH, 0);
-		verticalChanged = true;
 	}
 
 	// or do we have to add a scroll bar?
 
 	if (horizontal && fHorizontalScrollBar == NULL) {
-		BRect rect = Frame();
+		BRect rect = Bounds();
 		rect.top = rect.bottom + 1 - B_H_SCROLL_BAR_HEIGHT;
 		if (vertical || fIsDocumentScroller)
 			rect.right -= B_V_SCROLL_BAR_WIDTH;
 
 		fHorizontalScrollBar = new BScrollBar(rect, "horizontal", fTarget, 0,
 			width, B_HORIZONTAL);
-		fTarget->ResizeBy(0, -B_H_SCROLL_BAR_HEIGHT);
 		AddChild(fHorizontalScrollBar);
-		horizontalChanged = true;
 	}
 
 	if (vertical && fVerticalScrollBar == NULL) {
-		BRect rect = Frame();
+		BRect rect = Bounds();
 		rect.left = rect.right + 1 - B_V_SCROLL_BAR_WIDTH;
 		if (horizontal || fIsDocumentScroller)
 			rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
 		fVerticalScrollBar = new BScrollBar(rect, "vertical", fTarget, 0,
 			height, B_VERTICAL);
-		fTarget->ResizeBy(-B_V_SCROLL_BAR_WIDTH, 0);
 		AddChild(fVerticalScrollBar);
-		verticalChanged = true;
 	}
 
-	// adapt the scroll bars, so that they don't overlap each other
-	if (!fIsDocumentScroller) {
-		if (horizontalChanged && !verticalChanged && vertical) {
-			fVerticalScrollBar->ResizeBy(0, (horizontal ? -1 : 1)
-				* B_H_SCROLL_BAR_HEIGHT);
-		}
-		if (verticalChanged && !horizontalChanged && horizontal) {
-			fHorizontalScrollBar->ResizeBy((vertical ? -1 : 1)
-				* B_V_SCROLL_BAR_WIDTH, 0);
-		}
-	}
-
-	// update the scroll bar range & proportions
+	// update the scroll bar range & proportions and layout views
 
 	bounds = Bounds();
 	if (fHorizontalScrollBar != NULL)
-		bounds.bottom -= B_H_SCROLL_BAR_HEIGHT;
+		bounds.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
 	if (fVerticalScrollBar != NULL)
-		bounds.right -= B_V_SCROLL_BAR_WIDTH;
+		bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
+
+	fTarget->MoveTo(bounds.LeftTop());
+	fTarget->ResizeTo(bounds.Width(), bounds.Height());
 
 	if (fHorizontalScrollBar != NULL) {
 		float delta = width - bounds.Width();
@@ -303,6 +313,17 @@ DynamicScrollView::UpdateBars()
 		fHorizontalScrollBar->SetRange(0, delta);
 		fHorizontalScrollBar->SetSteps(1, bounds.Width());
 		fHorizontalScrollBar->SetProportion(bounds.Width() / width);
+
+		float barWidth = Bounds().Width();
+		if (vertical) {
+			// scrollbars overlap one pixel of the frame
+			barWidth += 1;
+		}
+		if (vertical || fIsDocumentScroller)
+			barWidth -= B_V_SCROLL_BAR_WIDTH + 1;
+		
+		fHorizontalScrollBar->MoveTo(bounds.left, bounds.bottom + 1);
+		fHorizontalScrollBar->ResizeTo(barWidth, B_H_SCROLL_BAR_HEIGHT);
 	}
 	if (fVerticalScrollBar != NULL) {
 		float delta = height - bounds.Height();
@@ -312,6 +333,17 @@ DynamicScrollView::UpdateBars()
 		fVerticalScrollBar->SetRange(0, delta);
 		fVerticalScrollBar->SetSteps(1, bounds.Height());
 		fVerticalScrollBar->SetProportion(bounds.Height() / height);
+
+		float barHeight = Bounds().Height();
+		if (horizontal) {
+			// scrollbars overlap one pixel of the frame
+			barHeight += 1;
+		}
+		if (horizontal || fIsDocumentScroller)
+			barHeight -= B_H_SCROLL_BAR_HEIGHT + 1;
+
+		fVerticalScrollBar->MoveTo(bounds.right + 1, bounds.top);
+		fVerticalScrollBar->ResizeTo(B_V_SCROLL_BAR_WIDTH, barHeight);
 	}
 }
 
@@ -358,6 +390,29 @@ GroupView::GetPreferredSize(float *_width, float *_height)
 
 	if (_height)
 		*_height = fContentBounds.Height();
+}
+
+
+BSize
+GroupView::MinSize()
+{
+	return BSize(100, 100);
+}
+
+
+BSize
+GroupView::PreferredSize()
+{
+	return MinSize();
+}
+
+
+BSize
+GroupView::MaxSize()
+{
+	BSize max;
+	GetPreferredSize(&max.width, &max.height);
+	return max;
 }
 
 
@@ -471,11 +526,11 @@ TitleView::Draw(BRect updateRect)
 
 	SetDrawingMode(B_OP_COPY);
 	SetHighColor(240, 240, 240);
-	DrawString(fTitle, BPoint(rect.left + 1, rect.bottom - 9));
+	DrawString(fTitle, BPoint(rect.left + 1, rect.bottom - 8));
 
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(80, 20, 20);
-	DrawString(fTitle, BPoint(rect.left, rect.bottom - 8));
+	DrawString(fTitle, BPoint(rect.left, rect.bottom - 9));
 }
 
 
@@ -732,8 +787,11 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 			// if we don't need a container to put that view into,
 			// we're done here (but the groupView may span over the
 			// whole hintRect)
-			groupView->MoveBy(-5, -5);
-			groupView->ResizeBy(10, 10);
+			if (groupView->Frame().LeftTop() == BPoint(5, 5)) {
+				// remove insets, as they are not needed
+				groupView->MoveBy(-5, -5);
+				groupView->ResizeBy(10, 10);
+			}
 
 			return new DynamicScrollView(groupView->Name(), groupView);
 		}
