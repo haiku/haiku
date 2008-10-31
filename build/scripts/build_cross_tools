@@ -95,7 +95,8 @@ copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 
 # configure gcc
 cd $gccObjDir
-CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/gcc/configure --prefix=$installDir \
+CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" $buildToolsDir/gcc/configure \
+	--prefix=$installDir \
 	--target=i586-pc-haiku --disable-nls --enable-shared=yes \
 	--enable-languages=c,c++ --with-headers=$tmpIncludeDir \
 	--with-libs=$tmpLibDir || exit 1
