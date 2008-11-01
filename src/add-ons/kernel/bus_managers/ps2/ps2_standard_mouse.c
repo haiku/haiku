@@ -271,7 +271,8 @@ probe_standard_mouse(ps2_dev * dev)
 	uint8 deviceId = 0;
 	
 	// get device id
-	status = ps2_dev_command(dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, &deviceId, 1);
+	status = ps2_dev_command(dev, PS2_CMD_GET_DEVICE_ID, NULL, 0,
+		&deviceId, 1);
 	if (status != B_OK) {
 		INFO("ps2: probe_mouse get device id failed\n");
 		return B_ERROR;
@@ -311,8 +312,7 @@ probe_standard_mouse(ps2_dev * dev)
 }
 
 
-//	#pragma mark -
-//	Device functions
+//	#pragma mark - Device functions
 
 
 status_t 

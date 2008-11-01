@@ -54,7 +54,8 @@ synaptics_pt_set_packagesize(ps2_dev *dev, uint8 size)
 		syn_cookie->mode&= ~SYN_FOUR_BYTE_CHILD;
 	set_touchpad_mode(dev->parent_dev, syn_cookie->mode);
 		
-	status = ps2_dev_command(dev->parent_dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
+	status = ps2_dev_command(dev->parent_dev, PS2_CMD_ENABLE, NULL, 0, NULL,
+		0);
 	if (status < B_OK) {
 		INFO("SYNAPTICS: cannot enable touchpad %s\n", dev->parent_dev->name);
 		return B_ERROR;
@@ -76,8 +77,8 @@ send_touchpad_arg_timeout(ps2_dev *dev, uint8 arg, bigtime_t timeout)
 	int8 i;
 	uint8 val[8];
 	for (i = 0; i < 4; i++) {
-		val[2*i] = (arg >> (6-2*i)) & 3;
-		val[2*i + 1] = 0xE8;
+		val[2 * i] = (arg >> (6 - 2 * i)) & 3;
+		val[2 * i + 1] = 0xE8;
 	}
 	return ps2_dev_command_timeout(dev, 0xE8, val, 7, NULL, 0, timeout);
 }
@@ -142,7 +143,8 @@ passthrough_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count,
 		in[i - 1] = pt_in[i * 6 + 1];
 	}
 	
-	status = ps2_dev_command(dev->parent_dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
+	status = ps2_dev_command(dev->parent_dev, PS2_CMD_ENABLE, NULL, 0, NULL,
+		0);
 	if (status != B_OK)
 		return status;
 	
@@ -456,13 +458,16 @@ query_capability(ps2_dev *dev)
 }
 
 
+//	#pragma mark -
+
+
 status_t
 probe_synaptics(ps2_dev *dev)
 {
 	uint8 val[3];
 	uint8 deviceId;
 	TRACE("SYNAPTICS: probe\n");
-	
+
 	send_touchpad_arg(dev, 0x00);
 	ps2_dev_command(dev, 0xE9, NULL, 0, val, 3);
 	
@@ -479,13 +484,16 @@ probe_synaptics(ps2_dev *dev)
 		gTouchpadInfo.minorVersion);
 	// version >= 4.0?
 	if (gTouchpadInfo.minorVersion <= 2
-			&& gTouchpadInfo.majorVersion <= 3) {
+		&& gTouchpadInfo.majorVersion <= 3) {
 		TRACE("SYNAPTICS: too old touchpad not supported\n");
 		return B_ERROR;
 	}
 	dev->name = kSynapticsPath[dev->idx];
 	return B_OK;
 }
+
+
+//	#pragma mark - Device functions
 
 
 status_t 
