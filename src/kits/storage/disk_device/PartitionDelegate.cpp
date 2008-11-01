@@ -11,8 +11,8 @@
 
 
 #undef TRACE
-//#define TRACE(format...)
-#define TRACE(format...)	printf(format)
+#define TRACE(format...)
+//#define TRACE(format...)	printf(format)
 
 
 // constructor
