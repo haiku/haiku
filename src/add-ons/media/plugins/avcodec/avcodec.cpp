@@ -117,16 +117,14 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 	if (isAudio && !fOutputBuffer)
 		fOutputBuffer = new char[100000];
 
-#if DEBUG
+//#if DEBUG
 	char buffer[1024];
-	string_for_format(*ioEncodedFormat, buffer, sizeof(buffer);
+	string_for_format(*ioEncodedFormat, buffer, sizeof(buffer));
 	TRACE("[%c]   input_format=%s\n", isAudio?('a'):('v'), buffer);
 	TRACE("[%c]   infoSize=%ld\n", isAudio?('a'):('v'), infoSize);
-	TRACE("[%c]   user_data_type=%08lx\n", isAudio?('a'):('v'),
-		ioEncodedFormat->user_data_type);
-//	TRACE("[%c]   meta_data_size=%ld\n", isAudio?('a'):('v'),
-//		ioEncodedFormat->meta_data_size);
-#endif
+	TRACE("[%c]   user_data_type=%08lx\n", isAudio?('a'):('v'),	ioEncodedFormat->user_data_type);
+//	TRACE("[%c]   meta_data_size=%ld\n", isAudio?('a'):('v'), ioEncodedFormat->meta_data_size);
+//#endif
 
 	media_format_description descr;
 	for (int32 i = 0; gCodecTable[i].id; i++) {
@@ -157,10 +155,10 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer,
 						| descr.u.misc.codec;
 					break;
 				default:
-				puts("ERR family");
+					puts("ERR family");
 					return B_ERROR;
 			}
-			TRACE("  codec id = \"%c%c%c%c\"\n", (char)((cid >> 24) & 0xff),
+			TRACE("  0x%04lx codec id = \"%c%c%c%c\"\n", uint32(cid), (char)((cid >> 24) & 0xff),
 				(char)((cid >> 16) & 0xff), (char)((cid >> 8) & 0xff),
 				(char)(cid & 0xff));
 
@@ -393,7 +391,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 	set_thread_priority(find_thread(NULL), B_NORMAL_PRIORITY);
 #endif
 
-	TRACE("[%c] avCodec::Decode()\n", isAudio?('a'):('v'));
+//	TRACE("[%c] avCodec::Decode()\n", isAudio?('a'):('v'));
 
 	if (isAudio) {
 
@@ -432,7 +430,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 				status_t err;
 				err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize, &chunk_mh);
 				if (err != B_OK || fChunkBufferSize < 0) {
-					TRACE("GetNextChunk error\n");
+					TRACE("GetNextChunk error %ld\n",fChunkBufferSize);
 					fChunkBufferSize = 0;
 					break;
 				}
@@ -456,8 +454,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 					fChunkBufferOffset = 0;
 					fChunkBufferSize = 0;
 //				} else {
-//					TRACE("audio decode: len %d, out_size %d\n", len,
-//						out_size);
+//					TRACE("audio decode: len %d, out_size %d\n", len, out_size);
 				}
 				fChunkBufferOffset += len;
 				fChunkBufferSize -= len;
@@ -475,8 +472,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 
 		err = GetNextChunk(&data, &size, &chunk_mh);
 		if (err != B_OK) {
-			TRACE("avCodec::Decode(): error 0x%08lx from GetNextChunk()\n",
-				err);
+			TRACE("avCodec::Decode(): error 0x%08lx from GetNextChunk()\n",	err);
 			return err;
 		}
 
@@ -527,8 +523,8 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 #ifdef DO_PROFILING
 			prof_t2 = system_time();
 #endif
-			TRACE("ONE FRAME OUT !! len=%d size=%ld (%s)\n", len, size,
-				pixfmt_to_string(ffc->pix_fmt));
+//			TRACE("ONE FRAME OUT !! len=%d size=%ld (%s)\n", len, size,
+//				pixfmt_to_string(ffc->pix_fmt));
 /*
 			opicture.data[0] = (uint8_t *)out_buffer;
 			opicture.linesize[0] = fOutputVideoFormat.display.bytes_per_row;

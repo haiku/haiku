@@ -20,11 +20,11 @@ StaticLibrary libavcodec.a :
 	aac_parser.c
 	aactab.c
 	aasc.c
-#	ac3.c
-#	ac3_parser.c
-#	ac3dec.c
-#	ac3dec_data.c
-#	ac3tab.c
+	ac3.c
+	ac3_parser.c
+	ac3dec.c
+	ac3dec_data.c
+	ac3tab.c
 	acelp_filters.c
 	acelp_math.c
 	acelp_pitch_delay.c
@@ -33,7 +33,7 @@ StaticLibrary libavcodec.a :
 	adxdec.c
 	alac.c
 	allcodecs.c
-#	apedec.c
+	apedec.c
 	asv1.c
 	atrac3.c
 	audioconvert.c
@@ -140,9 +140,9 @@ StaticLibrary libavcodec.a :
 	mjpega_dump_header_bsf.c
 	mjpegbdec.c
 	mjpegdec.c
-#	mlp.c
-#	mlp_parser.c
-#	mlpdec.c
+	mlp.c
+	mlp_parser.c
+	mlpdec.c
 #	mmvideo.c
 	motion_est.c
 	motionpixels.c
@@ -166,9 +166,9 @@ StaticLibrary libavcodec.a :
 	msmpeg4.c
 	msmpeg4data.c
 	msrle.c
-#	msvideo1.c
-#	nellymoser.c
-#	nellymoserdec.c
+	msvideo1.c
+	nellymoser.c
+	nellymoserdec.c
 	noise_bsf.c
 	nuv.c
 	opt.c
@@ -177,8 +177,8 @@ StaticLibrary libavcodec.a :
 	pcx.c
 	png.c
 #	pngdec.c
-#	pnm.c
-#	pnm_parser.c
+	pnm.c
+	pnm_parser.c
 #	pnmenc.c
 	pthread.c
 	ptx.c
@@ -197,67 +197,67 @@ StaticLibrary libavcodec.a :
 	resample2.c
 	rl2.c
 	rle.c
-#	roqaudioenc.c
-#	roqvideo.c
-#	roqvideodec.c
+	roqaudioenc.c
+	roqvideo.c
+	roqvideodec.c
 #	roqvideoenc.c
 	rpza.c
 	rtjpeg.c
-#	rv10.c
+	rv10.c
 #	rv30.c
 #	rv30dsp.c
 #	rv34.c
-#	rv40.c
+	rv40.c
 	s3tc.c
 	sgidec.c
 	shorten.c
 	simple_idct.c
-#	smacker.c
+	smacker.c
 	smc.c
 #	snow.c
 	sonic.c
-#	sp5xdec.c
+	sp5xdec.c
 #	sunrast.c
-#	svq1.c
-#	svq1dec.c
-#	svq3.c
+	svq1.c
+	svq1dec.c
+#	svq3.c	- Included by h264
 #	targa.c
 #	tiertexseqv.c
 #	tiff.c
 #	tiffenc.c
-#	truemotion1.c
-#	truemotion2.c
-#	truespeech.c
+	truemotion1.c
+	truemotion2.c
+	truespeech.c
 #	tscc.c
 #	tta.c
 #	txd.c
 	ulti.c
 	utils.c
 	vb.c
-#	vc1.c
-#	vc1_parser.c
-#	vc1data.c
-#	vc1dsp.c
-#	vcr1.c
-#	vmdav.c
+	vc1.c
+	vc1_parser.c
+	vc1data.c
+	vc1dsp.c
+	vcr1.c
+	vmdav.c
 #	vmnc.c
 	vorbis.c
 	vorbis_data.c
 	vorbis_dec.c
-#	vp3.c
-#	vp3_parser.c
-#	vp3dsp.c
-#	vp5.c
-#	vp56.c
-#	vp56data.c
-#	vp6.c
+	vp3.c
+	vp3_parser.c
+	vp3dsp.c
+	vp5.c
+	vp56.c
+	vp56data.c
+	vp6.c
 #	vqavideo.c
 	wavpack.c
-#	wma.c
-#	wmadec.c
+	wma.c
+	wmadec.c
 	wmv2.c
-#	wmv2dec.c
-#	wnv1.c
+	wmv2dec.c
+	wnv1.c
 #	ws-snd1.c
 #	xan.c
 	xiph.c

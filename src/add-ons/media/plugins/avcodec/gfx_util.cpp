@@ -55,7 +55,7 @@ gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFor
 				}
 			}
 					
-			if (pixelFormat == PIX_FMT_YUV420P) {
+			if (pixelFormat == PIX_FMT_YUV420P || pixelFormat == PIX_FMT_YUVJ420P) {
 				#if INCLUDE_MMX
 				if (mmx) {
 					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgb32_mmx\n");
@@ -107,7 +107,7 @@ gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFor
 				}
 			}
 			
-			if (pixelFormat == PIX_FMT_YUV420P) {
+			if (pixelFormat == PIX_FMT_YUV420P || pixelFormat == PIX_FMT_YUVJ420P) {
 				#if INCLUDE_MMX
 				if (mmx) {
 					TRACE("resolve_colorspace: gfx_conv_yuv420p_ycbcr422_mmx\n");
@@ -147,6 +147,10 @@ const char *pixfmt_to_string(int p)
 	switch(p) {
 	case PIX_FMT_YUV420P:
 		return "PIX_FMT_YUV420P";
+	case PIX_FMT_YUVJ420P:
+		return "PIX_FMT_YUVJ420P - YUV420P (Jpeg)";
+	case PIX_FMT_YUVA420P:
+		return "PIX_FMT_YUVA420P - YUV420P (Alpha)";
 	case PIX_FMT_YUV422:
 		return "PIX_FMT_YUV422";
 	case PIX_FMT_RGB24:
