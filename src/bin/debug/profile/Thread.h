@@ -255,9 +255,14 @@ AbstractThreadProfileResult<ThreadImageType>::SynchronizeImages(int32 event)
 	// add new images
 	it = fNewImages.GetIterator();
 	while (ThreadImageType* image = it.Next()) {
-		if (image->GetImage()->CreationEvent() >= event) {
+		if (image->GetImage()->CreationEvent() <= event) {
 			it.Remove();
-			fImages.Add(image);
+			int32 deleted = image->GetImage()->DeletionEvent();
+			if (deleted >= 0 && event >= deleted) {
+				// image already deleted
+				delete image;
+			} else
+				fImages.Add(image);
 		}
 	}
 }
