@@ -243,6 +243,7 @@ Partition::_Mount(file_system_module_info *module, Directory **_fileSystem)
 			FileMapDisk *disk = FileMapDisk::FindAnyFileMapDisk(fileSystem);
 			if (disk) {
 				TRACE(("%p Partition::_Mount: found FileMapDisk\n", this));
+				disk->RegisterFileMapBootItem();
 				add_partitions_for(disk, true, false);
 			}
 		}

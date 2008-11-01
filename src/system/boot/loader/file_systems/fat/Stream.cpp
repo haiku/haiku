@@ -13,6 +13,7 @@
 #include "File.h"
 
 #include <util/kernel_cpp.h>
+#include <boot/FileMapDisk.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -66,6 +67,39 @@ status_t
 Stream::GetName(char *nameBuffer, size_t bufferSize) const
 {
 	return strlcpy(nameBuffer, fName, bufferSize);
+}
+
+
+status_t
+Stream::GetFileMap(struct file_map_run *runs, int32 *count)
+{
+	int32 i;
+	uint32 cluster = fFirstCluster;
+	uint32 next = fVolume.InvalidClusterID();
+	off_t offset = 0LL;
+
+	for (i = 0; i < *count; i++) {
+		runs[i].offset = offset;
+		runs[i].block = fVolume.ToBlock(cluster);
+		runs[i].len = fVolume.ClusterSize();
+		do {
+			next = fVolume.NextCluster(cluster);
+			if (next != cluster + 1)
+				break;
+			runs[i].len += fVolume.ClusterSize();
+		} while (true);
+		if (!fVolume.IsValidCluster(next))
+			break;
+		cluster = next;
+		offset += runs[i].len;
+	}
+
+	// too big
+	if (i == *count && fVolume.IsValidCluster(next))
+		return B_ERROR;
+
+	*count = i;
+	return B_OK;
 }
 
 

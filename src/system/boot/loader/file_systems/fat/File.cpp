@@ -34,7 +34,7 @@ File::~File()
 }
 
 
-status_t 
+status_t
 File::InitCheck()
 {
 	if (!fStream.InitCheck() < B_OK)
@@ -44,7 +44,7 @@ File::InitCheck()
 }
 
 
-status_t 
+status_t
 File::Open(void **_cookie, int mode)
 {
 	TRACE(("FATFS::File::%s(, %d)\n", __FUNCTION__, mode));
@@ -55,14 +55,14 @@ File::Open(void **_cookie, int mode)
 }
 
 
-status_t 
+status_t
 File::Close(void *cookie)
 {
 	return B_OK;
 }
 
 
-ssize_t 
+ssize_t
 File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	TRACE(("FATFS::File::%s(, %Ld,, %d)\n", __FUNCTION__, pos, bufferSize));
@@ -74,17 +74,24 @@ File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 }
 
 
-ssize_t 
+ssize_t
 File::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	return EROFS;
 }
 
 
-status_t 
+status_t
 File::GetName(char *nameBuffer, size_t bufferSize) const
 {
 	return fStream.GetName(nameBuffer, bufferSize);
+}
+
+
+status_t
+File::GetFileMap(struct file_map_run *runs, int32 *count)
+{
+	return fStream.GetFileMap(runs, count);
 }
 
 

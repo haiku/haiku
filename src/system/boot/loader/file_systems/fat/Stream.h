@@ -17,6 +17,7 @@
 
 class Node;
 
+struct file_map_run;
 
 namespace FATFS {
 
@@ -29,6 +30,7 @@ class Stream {
 		Volume &GetVolume() const { return fVolume; }
 
 		status_t GetName(char *nameBuffer, size_t bufferSize) const;
+		status_t GetFileMap(struct file_map_run *runs, int32 *count);
 		off_t	Size() const { return fSize; }
 		uint32	FirstCluster() const { return fFirstCluster; }
 

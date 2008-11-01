@@ -99,6 +99,13 @@ Node::GetName(char *nameBuffer, size_t bufferSize) const
 }
 
 
+status_t
+Node::GetFileMap(struct file_map_run *runs, int32 *count)
+{
+	return B_ERROR;
+}
+
+
 int32 
 Node::Type() const
 {
@@ -127,6 +134,7 @@ Node::Acquire()
 	TRACE(("%p::Acquire(), fRefCount = %ld\n", this, fRefCount));
 	return B_OK;
 }
+
 
 status_t 
 Node::Release()

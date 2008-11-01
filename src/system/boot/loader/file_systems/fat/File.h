@@ -28,6 +28,7 @@ class File : public Node {
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
 
 		virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
+		virtual status_t GetFileMap(struct file_map_run *runs, int32 *count);
 		virtual int32 Type() const;
 		virtual off_t Size() const;
 		virtual ino_t Inode() const;

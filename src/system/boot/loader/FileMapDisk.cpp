@@ -4,6 +4,7 @@
  */
 
 #include <boot/FileMapDisk.h>
+#include <boot_item.h>
 
 #include <new>
 
@@ -117,7 +118,14 @@ FileMapDisk::GetName(char *nameBuffer, size_t bufferSize) const
 	return B_OK;
 }
 
-// Size
+
+status_t
+FileMapDisk::GetFileMap(struct file_map_run *runs, int32 *count)
+{
+	return fNode->GetFileMap(runs, count);
+}
+
+
 off_t
 FileMapDisk::Size() const
 {
@@ -127,14 +135,6 @@ FileMapDisk::Size() const
 }
 
 
-status_t
-FileMapDisk::GetFileMap(FileMap **map)
-{
-	return ENOSYS;
-}
-
-
-// FindAnyFileMapDisk
 FileMapDisk *
 FileMapDisk::FindAnyFileMapDisk(Directory *volume)
 {
@@ -168,3 +168,22 @@ FileMapDisk::FindAnyFileMapDisk(Directory *volume)
 
 	return disk;
 }
+
+
+status_t
+FileMapDisk::RegisterFileMapBootItem()
+{
+	return B_ERROR;
+	struct file_map_boot_item *item;
+	item = (struct file_map_boot_item *)malloc(sizeof(struct file_map_boot_item));
+	item->num_runs = FMAP_MAX_RUNS;
+	status_t err;
+	err = GetFileMap(item->runs, &item->num_runs);
+	if (err < B_OK)
+		return err;
+//	err = add_boot_item("file_map_disk", item, sizeof(struct file_map_boot_item));
+	err = B_ERROR;
+	return err;
+}
+
+
