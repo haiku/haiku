@@ -4,21 +4,23 @@
 #include "kb_mouse_driver.h"
 #include "ps2_trackpoint.h"
 
-const char* kTrackpointPath[4] = {"input/mouse/ps2/ibm_trackpoint_0",
-									"input/mouse/ps2/ibm_trackpoint_1",
-									"input/mouse/ps2/ibm_trackpoint_2",
-									"input/mouse/ps2/ibm_trackpoint_3"};
+const char* kTrackpointPath[4] = {
+	"input/mouse/ps2/ibm_trackpoint_0",
+	"input/mouse/ps2/ibm_trackpoint_1",
+	"input/mouse/ps2/ibm_trackpoint_2",
+	"input/mouse/ps2/ibm_trackpoint_3"
+};
 
 
 status_t
-probe_trackpoint(ps2_dev *dev)
+probe_trackpoint(ps2_dev* dev)
 {
 	uint8 val[2];
 
 	TRACE("TRACKPOINT: probe\n");
 	ps2_dev_command(dev, 0xE1, NULL, 0, val, 2);
 	
-	if(val[0] != 0x01){
+	if (val[0] != 0x01) {
 		TRACE("TRACKPOINT: not found\n");
 		return B_ERROR;
 	}

@@ -9,7 +9,7 @@ KernelAddon ps2 :
 	ps2_dev.c
 	ps2_keyboard.c
 	ps2_module.c
-	ps2_standart_mouse.c
+	ps2_standard_mouse.c
 	ps2_synaptics.c
 	ps2_trackpoint.c
 	ps2_service.c

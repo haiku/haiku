@@ -41,7 +41,8 @@ struct ps2_dev
 // functions
 	void          (*disconnect)(ps2_dev *);
 	int32		  (*handle_int)(ps2_dev *);
-	status_t	  (*command)(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout);
+	status_t	  (*command)(ps2_dev *dev, uint8 cmd, const uint8 *out,
+					int out_count, uint8 *in, int in_count, bigtime_t timeout);
 };
 
 #define PS2_DEVICE_COUNT 6
@@ -52,13 +53,13 @@ extern ps2_dev ps2_device[PS2_DEVICE_COUNT];
 #define PS2_DEVICE_SYN_PASSTHROUGH 4
 #define PS2_DEVICE_KEYB  5
 
-#define PS2_FLAG_KEYB		(1<<0)
-#define PS2_FLAG_OPEN		(1<<1)
-#define PS2_FLAG_ENABLED	(1<<2)
-#define PS2_FLAG_CMD		(1<<3)
-#define PS2_FLAG_ACK		(1<<4)
-#define PS2_FLAG_NACK		(1<<5)
-#define PS2_FLAG_GETID		(1<<6)
+#define PS2_FLAG_KEYB		(1 << 0)
+#define PS2_FLAG_OPEN		(1 << 1)
+#define PS2_FLAG_ENABLED	(1 << 2)
+#define PS2_FLAG_CMD		(1 << 3)
+#define PS2_FLAG_ACK		(1 << 4)
+#define PS2_FLAG_NACK		(1 << 5)
+#define PS2_FLAG_GETID		(1 << 6)
 
 void 		ps2_dev_send(ps2_dev *dev, uint8 data);
 
@@ -67,10 +68,13 @@ status_t	ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks);
 status_t	ps2_dev_init(void);
 void		ps2_dev_exit(void);
 
-status_t	standart_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout);
+status_t	standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
+				int out_count, uint8 *in, int in_count, bigtime_t timeout);
 
-status_t	ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
-status_t	ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout);
+status_t	ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out,
+				int out_count, uint8 *in, int in_count);
+status_t	ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
+				int out_count, uint8 *in, int in_count, bigtime_t timeout);
 
 void		ps2_dev_publish(ps2_dev *dev);
 void		ps2_dev_unpublish(ps2_dev *dev);

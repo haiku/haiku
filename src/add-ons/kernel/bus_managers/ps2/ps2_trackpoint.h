@@ -1,5 +1,5 @@
-#ifndef SYNAPTICS_H
-#define SYNAPTICS_H
+#ifndef TRACKPOINT_H
+#define TRACKPOINT_H
 
 #include <KernelExport.h>
 
@@ -9,4 +9,4 @@
 status_t probe_trackpoint(ps2_dev *dev);
 
 
-#endif
+#endif /* TRACKPOINT_H */

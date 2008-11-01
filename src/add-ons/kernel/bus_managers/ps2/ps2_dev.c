@@ -12,7 +12,7 @@
 #include "ps2_dev.h"
 #include "ps2_service.h"
 
-#include "ps2_standart_mouse.h"
+#include "ps2_standard_mouse.h"
 #include "ps2_synaptics.h"
 #include "ps2_trackpoint.h"
 
@@ -22,12 +22,12 @@
 
 
 ps2_dev ps2_device[PS2_DEVICE_COUNT] = {
-	{ .name = "input/mouse/ps2/0",   .active = false, .idx = 0, .result_sem = -1, .command = standart_command_timeout },
-	{ .name = "input/mouse/ps2/1",   .active = false, .idx = 1, .result_sem = -1, .command = standart_command_timeout },
-	{ .name = "input/mouse/ps2/2",   .active = false, .idx = 2, .result_sem = -1, .command = standart_command_timeout },
-	{ .name = "input/mouse/ps2/3",   .active = false, .idx = 3, .result_sem = -1, .command = standart_command_timeout },
+	{ .name = "input/mouse/ps2/0",   .active = false, .idx = 0, .result_sem = -1, .command = standard_command_timeout },
+	{ .name = "input/mouse/ps2/1",   .active = false, .idx = 1, .result_sem = -1, .command = standard_command_timeout },
+	{ .name = "input/mouse/ps2/2",   .active = false, .idx = 2, .result_sem = -1, .command = standard_command_timeout },
+	{ .name = "input/mouse/ps2/3",   .active = false, .idx = 3, .result_sem = -1, .command = standard_command_timeout },
 	{ .name = "input/mouse/ps2/synaptics_passthrough",	.active = false, .result_sem = -1, .command = passthrough_command},
-	{ .name = "input/keyboard/at/0", .active = false, .result_sem = -1, .flags = PS2_FLAG_KEYB, .command = standart_command_timeout }
+	{ .name = "input/keyboard/at/0", .active = false, .result_sem = -1, .flags = PS2_FLAG_KEYB, .command = standard_command_timeout }
 };
 
 
@@ -67,29 +67,29 @@ ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
 	// the probe function has to set the dev name and the dev packet size
 	
 	status = probe_trackpoint(dev);
-	if (status == B_OK){
-		*hooks = &gStandartMouseDeviceHooks;
+	if (status == B_OK) {
+		*hooks = &gStandardMouseDeviceHooks;
 		goto dev_found;
 	}
 	
 	status = probe_synaptics(dev);
-	if (status == B_OK){
+	if (status == B_OK) {
 		*hooks = &gSynapticsDeviceHooks;
 		goto dev_found;
 	}
 	
-	status = probe_standart_mouse(dev);
-	if (status == B_OK){
-		*hooks = &gStandartMouseDeviceHooks;
+	status = probe_standard_mouse(dev);
+	if (status == B_OK) {
+		*hooks = &gStandardMouseDeviceHooks;
 		goto dev_found;
 	}
 	
 	return B_ERROR;
 	
 dev_found:	
-	if(dev == &(ps2_device[PS2_DEVICE_SYN_PASSTHROUGH])){
+	if (dev == &(ps2_device[PS2_DEVICE_SYN_PASSTHROUGH]))
 		synaptics_pt_set_packagesize(dev, dev->packet_size);
-	}
+
 	return B_OK;
 }
 
@@ -134,13 +134,12 @@ ps2_dev_publish(ps2_dev *dev)
 	if (dev->active)
 		return;
 	
-	if(atomic_get(&dev->flags) & PS2_FLAG_KEYB){
+	if (atomic_get(&dev->flags) & PS2_FLAG_KEYB) {
 		status = devfs_publish_device(dev->name, &gKeyboardDeviceHooks);
-	}
-	else{
+	} else {
 		device_hooks *hooks;
 		status = ps2_dev_detect_pointing(dev, &hooks);
-		if(status == B_OK){
+		if (status == B_OK) {
 			status = devfs_publish_device(dev->name, hooks);
 		}
 		
@@ -265,7 +264,7 @@ pass_to_handler:
 
 
 status_t
-standart_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout)
+standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout)
 {
 	status_t res;
 	bigtime_t start;
