@@ -2,6 +2,14 @@ SubDir HAIKU_TOP src tests add-ons kernel file_systems consistency_check ;
 
 SimpleTest generate_hashs :
 	generate_hashs.cpp
+	AdaptiveBuffering.cpp
+	SHA256.cpp
+	: be $(TARGET_LIBSTDC++)
+;
+
+SimpleTest consistency_check :
+	consistency_check.cpp
+	AdaptiveBuffering.cpp
 	SHA256.cpp
 	: be $(TARGET_LIBSTDC++)
 ;

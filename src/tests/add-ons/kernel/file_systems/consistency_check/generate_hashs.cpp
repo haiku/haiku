@@ -16,7 +16,9 @@
 #include <unistd.h>
 
 #include <OS.h>
+#include <Path.h>
 
+#include "AdaptiveBuffering.h"
 #include "SHA256.h"
 
 
@@ -30,43 +32,6 @@ static const char *kProgramName = __progname;
 const size_t kInitialBufferSize = 1 * 1024 * 1024;
 const size_t kMaxBufferSize = 10 * 1024 * 1024;
 
-
-class AdaptiveBuffering {
-public:
-							AdaptiveBuffering(size_t initialBufferSize,
-								size_t maxBufferSize, uint32 count);
-	virtual					~AdaptiveBuffering();
-
-	virtual status_t		Init();
-
-	virtual status_t		Read(uint8* buffer, size_t* _length);
-	virtual status_t		Write(uint8* buffer, size_t length);
-
-			status_t		Run();
-
-private:
-			void			_QuitWriter();
-			status_t		_Writer();
-	static	status_t		_Writer(void* self);
-
-			thread_id		fWriterThread;
-			uint8**			fBuffers;
-			size_t*			fReadBytes;
-			uint32			fBufferCount;
-			uint32			fReadIndex;
-			uint32			fWriteIndex;
-			uint32			fReadCount;
-			uint32			fWriteCount;
-			size_t			fMaxBufferSize;
-			size_t			fCurrentBufferSize;
-			sem_id			fReadSem;
-			sem_id			fWriteSem;
-			sem_id			fFinishedSem;
-			status_t		fWriteStatus;
-			uint32			fWriteTime;
-			bool			fFinished;
-			bool			fQuit;
-};
 
 class SHAProcessor : public AdaptiveBuffering {
 public:
@@ -150,223 +115,6 @@ SHAProcessor gSHA;
 FileList gFiles;
 
 
-AdaptiveBuffering::AdaptiveBuffering(size_t initialBufferSize,
-		size_t maxBufferSize, uint32 count)
-	:
-	fWriterThread(-1),
-	fBuffers(NULL),
-	fReadBytes(NULL),
-	fBufferCount(count),
-	fReadIndex(0),
-	fWriteIndex(0),
-	fReadCount(0),
-	fWriteCount(0),
-	fMaxBufferSize(maxBufferSize),
-	fCurrentBufferSize(initialBufferSize),
-	fReadSem(-1),
-	fWriteSem(-1),
-	fFinishedSem(-1),
-	fWriteStatus(B_OK),
-	fWriteTime(0),
-	fFinished(false),
-	fQuit(false)
-{
-}
-
-
-AdaptiveBuffering::~AdaptiveBuffering()
-{
-	_QuitWriter();
-
-	delete_sem(fReadSem);
-	delete_sem(fWriteSem);
-
-	if (fBuffers != NULL) {
-		for (uint32 i = 0; i < fBufferCount; i++) {
-			if (fBuffers[i] == NULL)
-				break;
-
-			free(fBuffers[i]);
-		}
-
-		free(fBuffers);
-	}
-
-	free(fReadBytes);
-}
-
-
-status_t
-AdaptiveBuffering::Init()
-{
-	fReadBytes = (size_t*)malloc(fBufferCount * sizeof(size_t));
-	if (fReadBytes == NULL)
-		return B_NO_MEMORY;
-
-	fBuffers = (uint8**)malloc(fBufferCount * sizeof(uint8*));
-	if (fBuffers == NULL)
-		return B_NO_MEMORY;
-
-	for (uint32 i = 0; i < fBufferCount; i++) {
-		fBuffers[i] = (uint8*)malloc(fMaxBufferSize);
-		if (fBuffers[i] == NULL)
-			return B_NO_MEMORY;
-	}
-
-	fReadSem = create_sem(0, "reader");
-	if (fReadSem < B_OK)
-		return fReadSem;
-
-	fWriteSem = create_sem(fBufferCount - 1, "writer");
-	if (fWriteSem < B_OK)
-		return fWriteSem;
-
-	fFinishedSem = create_sem(0, "finished");
-	if (fFinishedSem < B_OK)
-		return fFinishedSem;
-
-	fWriterThread = spawn_thread(&_Writer, "buffer reader", B_LOW_PRIORITY,
-		this);
-	if (fWriterThread < B_OK)
-		return fWriterThread;
-
-	return resume_thread(fWriterThread);
-}
-
-
-status_t
-AdaptiveBuffering::Read(uint8* /*buffer*/, size_t* _length)
-{
-	*_length = 0;
-	return B_OK;
-}
-
-
-status_t
-AdaptiveBuffering::Write(uint8* /*buffer*/, size_t /*length*/)
-{
-	return B_OK;
-}
-
-
-status_t
-AdaptiveBuffering::Run()
-{
-	fReadIndex = 0;
-	fWriteIndex = 0;
-	fReadCount = 0;
-	fWriteCount = 0;
-	fWriteStatus = B_OK;
-	fWriteTime = 0;
-
-	while (fWriteStatus >= B_OK) {
-		bigtime_t start = system_time();
-		int32 index = fReadIndex;
-
-		TRACE("%ld. read index %lu, buffer size %lu\n", fReadCount, index,
-			fCurrentBufferSize);
-
-		fReadBytes[index] = fCurrentBufferSize;
-		status_t status = Read(fBuffers[index], &fReadBytes[index]);
-		if (status < B_OK)
-			return status;
-
-		TRACE("%ld. read -> %lu bytes\n", fReadCount, fReadBytes[index]);
-
-		fReadCount++;
-		fReadIndex = (index + 1) % fBufferCount;
-		if (fReadBytes[index] == 0)
-			fFinished = true;
-		release_sem(fReadSem);
-
-		while (acquire_sem(fWriteSem) == B_INTERRUPTED)
-			;
-
-		if (fFinished)
-			break;
-
-		bigtime_t readTime = system_time() - start;
-		uint32 writeTime = fWriteTime;
-		if (writeTime) {
-			if (writeTime > readTime) {
-				fCurrentBufferSize = fCurrentBufferSize * 8/9;
-				fCurrentBufferSize &= ~65535;
-			} else {
-				fCurrentBufferSize = fCurrentBufferSize * 9/8;
-				fCurrentBufferSize = (fCurrentBufferSize + 65535) & ~65535;
-
-				if (fCurrentBufferSize > fMaxBufferSize)
-					fCurrentBufferSize = fMaxBufferSize;
-			}
-		}
-	}
-
-	while (acquire_sem(fFinishedSem) == B_INTERRUPTED)
-		;
-
-	return fWriteStatus;
-}
-
-
-void
-AdaptiveBuffering::_QuitWriter()
-{
-	if (fWriterThread >= B_OK) {
-		fQuit = true;
-		release_sem(fReadSem);
-
-		status_t status;
-		wait_for_thread(fWriterThread, &status);
-
-		fWriterThread = -1;
-	}
-}
-
-
-status_t
-AdaptiveBuffering::_Writer()
-{
-	while (true) {
-		while (acquire_sem(fReadSem) == B_INTERRUPTED)
-			;
-		if (fQuit)
-			break;
-
-		bigtime_t start = system_time();
-
-		TRACE("%ld. write index %lu, %p, bytes %lu\n", fWriteCount, fWriteIndex,
-			fBuffers[fWriteIndex], fReadBytes[fWriteIndex]);
-
-		fWriteStatus = Write(fBuffers[fWriteIndex], fReadBytes[fWriteIndex]);
-
-		TRACE("%ld. write done\n", fWriteCount);
-
-		fWriteIndex = (fWriteIndex + 1) % fBufferCount;
-		fWriteTime = uint32(system_time() - start);
-		fWriteCount++;
-
-		release_sem(fWriteSem);
-
-		if (fWriteStatus < B_OK)
-			return fWriteStatus;
-		if (fFinished)
-			release_sem(fFinishedSem);
-	}
-
-	return B_OK;
-}
-
-
-/*static*/ status_t
-AdaptiveBuffering::_Writer(void* self)
-{
-	return ((AdaptiveBuffering*)self)->_Writer();
-}
-
-
-//	#pragma mark -
-
-
 void
 process_directory(const char* path)
 {
@@ -428,7 +176,7 @@ process_file(const char* path)
 	entry.node = stat.st_ino;
 	entry.path = path;
 
-	printf("%s  %s\n", entry.HashString().c_str(), path);
+	//printf("%s  %s\n", entry.HashString().c_str(), path);
 
 	gFiles.push_back(entry);
 }
@@ -489,48 +237,99 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	bigtime_t start = system_time();
+	int fileCount = argc - 2;
+	char** files = argv + 2;
 
 	if (argc == 2) {
+		// read files from hash file
+
 		int file = open(hashFileName, O_RDONLY);
 		if (file < 0) {
+			fprintf(stderr, "%s: Could not open hash file \"%s\": %s\n",
+				kProgramName, hashFileName, strerror(status));
 			return 1;
 		}
 
 		char buffer[2048];
 		read(file, buffer, 4);
 		if (memcmp(buffer, "HASH", 4)) {
+			fprintf(stderr, "%s: \"%s\" is not a hash file\n",
+				kProgramName, hashFileName);
 			close(file);
 			return 1;
 		}
-		int fileCount;
 		read(file, &fileCount, sizeof(int));
+		TRACE("Found %d path(s):\n", fileCount);
+
+		files = (char**)malloc(fileCount * sizeof(char*));
+		if (files == NULL) {
+			fprintf(stderr, "%s: Could not allocate %ld bytes\n",
+				kProgramName, fileCount * sizeof(char*));
+			close(file);
+			return 1;
+		}
 
 		for (int i = 0; i < fileCount; i++) {
 			int length;
 			read(file, &length, sizeof(int));
-			read(file, buffer, length + 1);
-			process_file(buffer);
+
+			files[i] = (char*)malloc(length + 1);
+			if (files[i] == NULL) {
+				fprintf(stderr, "%s: Could not allocate %d bytes\n",
+					kProgramName, length + 1);
+				close(file);
+				// TODO: we actually leak memory here, but it's not important in this context
+				return 1;
+			}
+			read(file, files[i], length + 1);
+			TRACE("\t%s\n", files[i]);
 		}
 
 		close(file);
 	} else {
-		for (int i = 2; i < argc; i++) {
-			process_file(argv[i]);
+		// Normalize paths
+		char** normalizedFiles = (char**)malloc(fileCount * sizeof(char*));
+		if (normalizedFiles == NULL) {
+			fprintf(stderr, "%s: Could not allocate %ld bytes\n",
+				kProgramName, fileCount * sizeof(char*));
+			return 1;
 		}
+
+		for (int i = 0; i < fileCount; i++) {
+			BPath path(files[i], NULL, true);
+			normalizedFiles[i] = strdup(path.Path());
+			if (normalizedFiles[i] == NULL) {
+				fprintf(stderr, "%s: Could not allocate %ld bytes\n",
+					kProgramName, strlen(path.Path()) + 1);
+				return 1;
+			}
+		}
+
+		files = normalizedFiles;
+	}
+
+	bigtime_t start = system_time();
+
+	for (int i = 0; i < fileCount; i++) {
+		process_file(files[i]);
 	}
 
 	sort(gFiles.begin(), gFiles.end());
 
 	bigtime_t runtime = system_time() - start;
 
-	write_hash_file(hashFileName, argc - 2, argv + 2);
+	write_hash_file(hashFileName, fileCount, files);
 
 	if (gFiles.size() > 0) {
 		printf("Generated hashes for %ld files in %g seconds, %g msec per "
 			"file.\n", gFiles.size(), runtime / 1000000.0,
 			runtime / 1000.0 / gFiles.size());
 	}
+
+	for (int i = 0; i < fileCount; i++) {
+		free(files[i]);
+	}
+	free(files);
 
 	return 0;
 }
