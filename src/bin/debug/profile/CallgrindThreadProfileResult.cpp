@@ -167,12 +167,24 @@ void
 CallgrindThreadProfileResult::PrintResults()
 {
 	// create output file
+
+	// create output dir
 	mkdir(gOptions.callgrind_directory, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
-	char fileName[B_PATH_NAME_LENGTH];
-	snprintf(fileName, sizeof(fileName), "%s/callgrind.out.%ld",
-		gOptions.callgrind_directory, fThread->ID());
+	// get the thread name and replace slashes by hyphens
+	char threadName[B_OS_NAME_LENGTH];
+	strlcpy(threadName, fThread->Name(), sizeof(threadName));
+	char* slash = threadName;
+	while ((slash = strchr(slash, '/')) != NULL)
+		*slash = '-';
 
+	// create the file name
+	char fileName[B_PATH_NAME_LENGTH];
+	snprintf(fileName, sizeof(fileName), "%s/callgrind.out.%ld.%s.%lldms",
+		gOptions.callgrind_directory, fThread->ID(), threadName,
+		fTotalTicks * fInterval);
+
+	// create the file
 	FILE* out = fopen(fileName, "w+");
 	if (out == NULL) {
 		fprintf(stderr, "%s: Failed to open output file \"%s\": %s\n",
