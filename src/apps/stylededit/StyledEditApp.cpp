@@ -38,7 +38,7 @@ namespace
 	void
 	cascade()
 	{
-		BScreen screen(NULL);
+		BScreen screen;
 		BRect screenBorder = screen.Frame();
 		float left = gWindowRect.left + 15;
 		if (left + gWindowRect.Width() > screenBorder.right)
@@ -55,7 +55,7 @@ namespace
 	void
 	uncascade()
 	{
-		BScreen screen(NULL);
+		BScreen screen;
 		BRect screenBorder = screen.Frame();
 
 		float left = gWindowRect.left - 15;
