@@ -160,12 +160,12 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 	if (mutex->owner != find_thread(NULL))
 		return EPERM;
 
-	if (MUTEX_TYPE(mutex) == PTHREAD_MUTEX_RECURSIVE) {
-		if (mutex->owner_count-- > 1)
-			return B_OK;
-
-		mutex->owner = -1;
+	if (MUTEX_TYPE(mutex) == PTHREAD_MUTEX_RECURSIVE
+		&& mutex->owner_count-- > 1) {
+		return B_OK;
 	}
+
+	mutex->owner = -1;
 
 	if (atomic_add((vint32*)&mutex->count, -1) > 1)
 		return release_sem(mutex->sem);
