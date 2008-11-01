@@ -38,7 +38,7 @@
 #include <string.h>
 
 
-#define TRACE_MP4_READER
+//#define TRACE_MP4_READER
 #ifdef TRACE_MP4_READER
 #	define TRACE printf
 #else
@@ -266,7 +266,7 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 
 			format->u.raw_audio.buffer_size = stream_header->suggested_buffer_size;
 		} else {
-			printf("codecid %s codecsubtype %s\n",&audio_format->compression,&audio_format->codecSubType);
+			TRACE("codecid %s codecsubtype %s\n",&audio_format->compression,&audio_format->codecSubType);
 		
 			description.family = B_QUICKTIME_FORMAT_FAMILY;
 			
@@ -376,8 +376,8 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 #ifdef TRACE_MP4_READER
 		if (data) {
 			uint8 *p = (uint8 *)data;
-			TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-				size , p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15], p[16], p[17]);
+				TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+					size, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
 		}
 #endif
 	
@@ -650,7 +650,7 @@ mp4Reader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 	bool keyframe;
 
 	if (theFileReader->GetNextChunkInfo(cookie->stream, (cookie->frame_pos / cookie->frame_size), &start, &size, &keyframe) == false) {
-		TRACE("LAST BUFFER ERROR %ld\n",cookie->frame_pos);
+		TRACE("LAST BUFFER : %d (%ld)\n",cookie->stream, cookie->frame_pos);
 		return B_LAST_BUFFER_ERROR;
 	}
 
@@ -663,11 +663,11 @@ mp4Reader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 	mediaHeader->start_time = bigtime_t(double(cookie->frame_pos) * 1000000.0 * double(cookie->frames_per_sec_scale)) / cookie->frames_per_sec_rate;
 
 	if (cookie->audio) {
-//		TRACE("Audio");
+		TRACE("Audio");
 		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
 		mediaHeader->u.encoded_audio.buffer_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
 	} else {
-//		TRACE("Video");
+		TRACE("Video");
 		mediaHeader->type = B_MEDIA_ENCODED_VIDEO;
 		mediaHeader->u.encoded_video.field_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
 		mediaHeader->u.encoded_video.first_active_line = 0;
@@ -675,7 +675,7 @@ mp4Reader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 		mediaHeader->u.encoded_video.field_number = 0;
 		mediaHeader->u.encoded_video.field_sequence = cookie->frame_pos;
 	}
-//	TRACE(" stream %d: frame %ld start time %.6f file pos %lld Size %ld key frame %s\n",cookie->stream, (cookie->frame_pos / cookie->frame_size), mediaHeader->start_time / 1000000.0, start, size, keyframe ? "true" : "false");
+	TRACE(" stream %d: frame %ld start time %.6f file pos %lld Size %ld key frame %s\n",cookie->stream, (cookie->frame_pos / cookie->frame_size), mediaHeader->start_time / 1000000.0, start, size, keyframe ? "true" : "false");
 
 	cookie->frame_pos += cookie->frame_size;
 	

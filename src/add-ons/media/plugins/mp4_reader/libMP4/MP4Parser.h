@@ -172,7 +172,7 @@ public:
 	char	*OnGetAtomName();
 	
 	uint64	getSUMCounts() { return SUMCounts; };
-	uint64	getSUMDurations() { return SUMDurations; };
+	bigtime_t	getSUMDurations() { return SUMDurations; };
 	uint32	getSampleForTime(bigtime_t pTime);
 	uint32	getSampleForFrame(uint32 pFrame);
 	void	setFrameRate(float pFrameRate) { FrameRate = pFrameRate; };
