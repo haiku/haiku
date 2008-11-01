@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src add-ons input_server devices touchpad ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders input ;
+
+Addon <input>touchpad :
+	TouchpadInputDevice.cpp
+	: be input_server ;
+
+Package haiku-inputkit-cvs :
+        <input>touchpad :
+        boot home config add-ons input_server devices ;

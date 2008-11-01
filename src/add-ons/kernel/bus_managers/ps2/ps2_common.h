@@ -41,7 +41,7 @@
 extern isa_module_info *gIsa;
 
 extern device_hooks gKeyboardDeviceHooks;
-extern device_hooks gMouseDeviceHooks;
+extern device_hooks gPointingDeviceHooks;
 
 extern bool gActiveMultiplexingEnabled;
 extern sem_id gControllerSem;

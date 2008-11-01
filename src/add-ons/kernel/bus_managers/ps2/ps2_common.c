@@ -321,7 +321,7 @@ status_t
 ps2_init(void)
 {
 	status_t status;
-
+	
 	TRACE("ps2: init\n");
 
 	status = get_module(B_ISA_MODULE_NAME, (module_info **)&gIsa);
@@ -361,6 +361,7 @@ ps2_init(void)
 		goto err5;
 	}
 
+	ps2_flush();
 	status = ps2_setup_active_multiplexing(&gActiveMultiplexingEnabled);
 	if (status) {
 		INFO("ps2: setting up active multiplexing failed\n");
@@ -382,7 +383,7 @@ ps2_init(void)
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
 	}
-
+	
 	TRACE("ps2: init done!\n");
 	return B_OK;
 

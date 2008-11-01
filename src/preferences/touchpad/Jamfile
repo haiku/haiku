@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src preferences touchpad ;
+
+UsePrivateHeaders input ;
+
+Preference Touchpad : 
+	TouchpadPref.cpp
+	TouchpadPrefView.cpp
+	main.cpp
+	: be
+	: Touchpad.rdef
+	;

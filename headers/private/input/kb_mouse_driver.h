@@ -62,6 +62,8 @@ enum {
 	MS_GET_CLICKSPEED,
 	MS_SET_CLICKSPEED,
 	MS_NUM_SERIAL_MICE,
+	MS_IS_TOUCHPAD,
+	MS_SET_TOUCHPAD_SETTINGS,
 	
 	IIC_WRITE = B_DEVICE_OP_CODES_END + 200, 
 	RESTART_SYSTEM,
@@ -116,6 +118,25 @@ typedef struct {
   float		tilt_x;
   float		tilt_y;
 } tablet_movement;
+
+#define B_ONE_FINGER	0x01
+#define B_TWO_FINGER	0x02
+#define B_MULTI_FINGER	0x04
+#define B_PEN			0x08
+
+typedef struct
+{
+	uint8		buttons;
+	uint32		xPosition;
+	uint32		yPosition;
+	uint8		zPressure;
+	uint8		fingers;
+	bool		gesture;
+	uint8		fingerWidth;
+	// 1 - 4	normal width
+	// 5 - 11	very wide finger or palm
+	// 12		maximum reportable width; extrem wide contact
+} touchpad_movement;
 
 #ifdef __cplusplus
 }

@@ -20,4 +20,5 @@ SubInclude HAIKU_TOP src preferences screen ;
 SubInclude HAIKU_TOP src preferences screensaver ;
 SubInclude HAIKU_TOP src preferences sounds ;
 SubInclude HAIKU_TOP src preferences time ;
+SubInclude HAIKU_TOP src preferences touchpad ;
 SubInclude HAIKU_TOP src preferences virtualmemory ;

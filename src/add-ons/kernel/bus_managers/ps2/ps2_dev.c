@@ -12,18 +12,86 @@
 #include "ps2_dev.h"
 #include "ps2_service.h"
 
+#include "ps2_standart_mouse.h"
+#include "ps2_synaptics.h"
+#include "ps2_trackpoint.h"
+
 #include <fs/devfs.h>
 
 #include <string.h>
 
 
 ps2_dev ps2_device[PS2_DEVICE_COUNT] = {
-	{ .name = "input/mouse/ps2/0",   .active = false, .idx = 0, .result_sem = -1 },
-	{ .name = "input/mouse/ps2/1",   .active = false, .idx = 1, .result_sem = -1 },
-	{ .name = "input/mouse/ps2/2",   .active = false, .idx = 2, .result_sem = -1 },
-	{ .name = "input/mouse/ps2/3",   .active = false, .idx = 3, .result_sem = -1 },
-	{ .name = "input/keyboard/at/0", .active = false, .result_sem = -1, .flags = PS2_FLAG_KEYB }
+	{ .name = "input/mouse/ps2/0",   .active = false, .idx = 0, .result_sem = -1, .command = standart_command_timeout },
+	{ .name = "input/mouse/ps2/1",   .active = false, .idx = 1, .result_sem = -1, .command = standart_command_timeout },
+	{ .name = "input/mouse/ps2/2",   .active = false, .idx = 2, .result_sem = -1, .command = standart_command_timeout },
+	{ .name = "input/mouse/ps2/3",   .active = false, .idx = 3, .result_sem = -1, .command = standart_command_timeout },
+	{ .name = "input/mouse/ps2/synaptics_passthrough",	.active = false, .result_sem = -1, .command = passthrough_command},
+	{ .name = "input/keyboard/at/0", .active = false, .result_sem = -1, .flags = PS2_FLAG_KEYB, .command = standart_command_timeout }
 };
+
+
+static status_t
+ps2_reset_mouse(ps2_dev *dev)
+{
+	uint8 data[2];
+	status_t status;
+	
+	TRACE("ps2: ps2_reset_mouse\n");
+	
+	status = ps2_dev_command(dev, PS2_CMD_RESET, NULL, 0, data, 2);
+		
+	if (status == B_OK && data[0] != 0xAA && data[1] != 0x00) {
+		TRACE("ps2: reset mouse failed, response was: 0x%02x 0x%02x\n", data[0], data[1]);
+		status = B_ERROR;
+	} else if (status != B_OK) {
+		TRACE("ps2: reset mouse failed\n");
+	} else {
+		TRACE("ps2: reset mouse success\n");
+	}
+	
+	return status;
+}
+
+
+status_t
+ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
+{
+	status_t status = ps2_reset_mouse(dev);
+	if (status != B_OK) {
+		INFO("ps2: reset failed\n");
+		return B_ERROR;
+	}
+		
+	// probe devices
+	// the probe function has to set the dev name and the dev packet size
+	
+	status = probe_trackpoint(dev);
+	if (status == B_OK){
+		*hooks = &gStandartMouseDeviceHooks;
+		goto dev_found;
+	}
+	
+	status = probe_synaptics(dev);
+	if (status == B_OK){
+		*hooks = &gSynapticsDeviceHooks;
+		goto dev_found;
+	}
+	
+	status = probe_standart_mouse(dev);
+	if (status == B_OK){
+		*hooks = &gStandartMouseDeviceHooks;
+		goto dev_found;
+	}
+	
+	return B_ERROR;
+	
+dev_found:	
+	if(dev == &(ps2_device[PS2_DEVICE_SYN_PASSTHROUGH])){
+		synaptics_pt_set_packagesize(dev, dev->packet_size);
+	}
+	return B_OK;
+}
 
 
 status_t
@@ -65,12 +133,22 @@ ps2_dev_publish(ps2_dev *dev)
 	
 	if (dev->active)
 		return;
-
+	
+	if(atomic_get(&dev->flags) & PS2_FLAG_KEYB){
+		status = devfs_publish_device(dev->name, &gKeyboardDeviceHooks);
+	}
+	else{
+		device_hooks *hooks;
+		status = ps2_dev_detect_pointing(dev, &hooks);
+		if(status == B_OK){
+			status = devfs_publish_device(dev->name, hooks);
+		}
+		
+		//status = devfs_publish_device(dev->name, &gPointingDeviceHooks);
+	}
+	
 	dev->active = true;
 	
-	status = devfs_publish_device(dev->name, (atomic_get(&dev->flags)
-			& PS2_FLAG_KEYB) ? &gKeyboardDeviceHooks : &gMouseDeviceHooks);
-
 	INFO("ps2: devfs_publish_device %s, status = 0x%08lx\n", dev->name, status);
 }
 
@@ -181,20 +259,13 @@ pass_to_handler:
 		TRACE("ps2: %s not enabled, data 0x%02x dropped\n", dev->name, data);
 		return B_HANDLED_INTERRUPT;
 	}
-
+	
 	return dev->handle_int(dev);
 }
 
 
 status_t
-ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
-{
-	return ps2_dev_command_timeout(dev, cmd, out, out_count, in, in_count, 4000000);
-}
-
-
-status_t
-ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout)
+standart_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout)
 {
 	status_t res;
 	bigtime_t start;
@@ -299,5 +370,19 @@ ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count
 	TRACE("ps2: ps2_dev_command result 0x%08lx\n", res);
 
 	return res;
+}
+
+
+status_t
+ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
+{
+	return ps2_dev_command_timeout(dev, cmd, out, out_count, in, in_count, 4000000);
+}
+
+
+status_t
+ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout)
+{
+	return dev->command(dev, cmd, out, out_count, in, in_count, timeout);
 }
 
