@@ -22,12 +22,47 @@
 
 
 ps2_dev ps2_device[PS2_DEVICE_COUNT] = {
-	{ .name = "input/mouse/ps2/0",   .active = false, .idx = 0, .result_sem = -1, .command = standard_command_timeout },
-	{ .name = "input/mouse/ps2/1",   .active = false, .idx = 1, .result_sem = -1, .command = standard_command_timeout },
-	{ .name = "input/mouse/ps2/2",   .active = false, .idx = 2, .result_sem = -1, .command = standard_command_timeout },
-	{ .name = "input/mouse/ps2/3",   .active = false, .idx = 3, .result_sem = -1, .command = standard_command_timeout },
-	{ .name = "input/mouse/ps2/synaptics_passthrough",	.active = false, .result_sem = -1, .command = passthrough_command},
-	{ .name = "input/keyboard/at/0", .active = false, .result_sem = -1, .flags = PS2_FLAG_KEYB, .command = standard_command_timeout }
+	{
+		.name = "input/mouse/ps2/0",
+		.active = false,
+		.idx = 0,
+		.result_sem = -1,
+		.command = standard_command_timeout
+	},
+	{
+		.name = "input/mouse/ps2/1",
+		.active = false,
+		.idx = 1,
+		.result_sem = -1,
+		.command = standard_command_timeout
+	},
+	{
+		.name = "input/mouse/ps2/2",
+		.active = false,
+		.idx = 2,
+		.result_sem = -1,
+		.command = standard_command_timeout
+	},
+	{
+		.name = "input/mouse/ps2/3",
+		.active = false,
+		.idx = 3,
+		.result_sem = -1,
+		.command = standard_command_timeout
+	},
+	{
+		.name = "input/mouse/ps2/synaptics_passthrough",
+		.active = false,
+		.result_sem = -1,
+		.command = passthrough_command
+	},
+	{
+		.name = "input/keyboard/at/0",
+		.active = false,
+		.result_sem = -1,
+		.flags = PS2_FLAG_KEYB,
+		.command = standard_command_timeout
+	}
 };
 
 
@@ -36,20 +71,21 @@ ps2_reset_mouse(ps2_dev *dev)
 {
 	uint8 data[2];
 	status_t status;
-	
+
 	TRACE("ps2: ps2_reset_mouse\n");
-	
+
 	status = ps2_dev_command(dev, PS2_CMD_RESET, NULL, 0, data, 2);
-		
+
 	if (status == B_OK && data[0] != 0xAA && data[1] != 0x00) {
-		TRACE("ps2: reset mouse failed, response was: 0x%02x 0x%02x\n", data[0], data[1]);
+		TRACE("ps2: reset mouse failed, response was: 0x%02x 0x%02x\n", data[0],
+			data[1]);
 		status = B_ERROR;
 	} else if (status != B_OK) {
 		TRACE("ps2: reset mouse failed\n");
 	} else {
 		TRACE("ps2: reset mouse success\n");
 	}
-	
+
 	return status;
 }
 
@@ -62,31 +98,31 @@ ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
 		INFO("ps2: reset failed\n");
 		return B_ERROR;
 	}
-		
+
 	// probe devices
 	// the probe function has to set the dev name and the dev packet size
-	
+
 	status = probe_trackpoint(dev);
 	if (status == B_OK) {
 		*hooks = &gStandardMouseDeviceHooks;
 		goto dev_found;
 	}
-	
+
 	status = probe_synaptics(dev);
 	if (status == B_OK) {
 		*hooks = &gSynapticsDeviceHooks;
 		goto dev_found;
 	}
-	
+
 	status = probe_standard_mouse(dev);
 	if (status == B_OK) {
 		*hooks = &gStandardMouseDeviceHooks;
 		goto dev_found;
 	}
-	
+
 	return B_ERROR;
-	
-dev_found:	
+
+dev_found:
 	if (dev == &(ps2_device[PS2_DEVICE_SYN_PASSTHROUGH]))
 		synaptics_pt_set_packagesize(dev, dev->packet_size);
 
@@ -130,10 +166,10 @@ ps2_dev_publish(ps2_dev *dev)
 {
 	status_t status;
 	TRACE("ps2: ps2_dev_publish %s\n", dev->name);
-	
+
 	if (dev->active)
 		return;
-	
+
 	if (atomic_get(&dev->flags) & PS2_FLAG_KEYB) {
 		status = devfs_publish_device(dev->name, &gKeyboardDeviceHooks);
 	} else {
@@ -142,12 +178,12 @@ ps2_dev_publish(ps2_dev *dev)
 		if (status == B_OK) {
 			status = devfs_publish_device(dev->name, hooks);
 		}
-		
+
 		//status = devfs_publish_device(dev->name, &gPointingDeviceHooks);
 	}
-	
+
 	dev->active = true;
-	
+
 	INFO("ps2: devfs_publish_device %s, status = 0x%08lx\n", dev->name, status);
 }
 
@@ -160,9 +196,9 @@ ps2_dev_unpublish(ps2_dev *dev)
 
 	if (!dev->active)
 		return;
-		
+
 	dev->active = false;
-	
+
 	status = devfs_unpublish_device(dev->name, true);
 
 	if ((dev->flags & PS2_FLAG_ENABLED) && dev->disconnect)
@@ -177,9 +213,9 @@ ps2_dev_handle_int(ps2_dev *dev)
 {
 	const uint8 data = dev->history[0].data;
 	uint32 flags;
-	
+
 	flags = atomic_get(&dev->flags);
-	
+
 	if (flags & PS2_FLAG_CMD) {
 		if ((flags & (PS2_FLAG_ACK | PS2_FLAG_NACK)) == 0) {
 			int cnt = 1;
@@ -223,7 +259,7 @@ ps2_dev_handle_int(ps2_dev *dev)
 		}
 		return B_HANDLED_INTERRUPT;
 	}
-	
+
 pass_to_handler:
 
 	if ((flags & PS2_FLAG_KEYB) == 0) {
@@ -253,12 +289,12 @@ pass_to_handler:
 		}
 		return B_HANDLED_INTERRUPT;
 	}
-	
+
 	if ((flags & PS2_FLAG_ENABLED) == 0) {
 		TRACE("ps2: %s not enabled, data 0x%02x dropped\n", dev->name, data);
 		return B_HANDLED_INTERRUPT;
 	}
-	
+
 	return dev->handle_int(dev);
 }
 
@@ -287,7 +323,7 @@ standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_coun
 	dev->result_buf_cnt = in_count;
 	dev->result_buf_idx = 0;
 	dev->result_buf = in;
-	
+
 	res = B_OK;
 	for (i = -1; res == B_OK && i < out_count; i++) {
 
@@ -341,7 +377,7 @@ standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_coun
 
 		if (res != B_OK)
 			break;
-	}	
+	}
 
 	if (res == B_OK) {
 		if (in_count == 0) {
@@ -360,7 +396,7 @@ standard_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_coun
 			}
 
 			TRACE("ps2: ps2_dev_command wait for input res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
-		
+
 			for (i = 0; i < in_count; i++)
 				TRACE("ps2: ps2_dev_command rx: 0x%02x\n", in[i]);
 		}
