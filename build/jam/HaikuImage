@@ -65,7 +65,7 @@ BEOS_APPS = AboutSystem ActivityMonitor CodyCam DeskCalc DiskProbe DiskUsage
 ;
 BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
-	ScreenSaver Sounds Time VirtualMemory
+	ScreenSaver Sounds Time Touchpad VirtualMemory
 ;
 BEOS_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
 	$(X86_ONLY)GLDirectMode $(X86_ONLY)GLTeapot Mandelbrot Pairs
@@ -412,7 +412,7 @@ AddSymlinkToHaikuImage beos system add-ons Tracker
 AddSymlinkToHaikuImage beos system add-ons Tracker
 	: /boot/beos/apps/DiskUsage : DiskUsage-I ;
 AddFilesToHaikuImage beos system add-ons input_server devices
-	: <input>keyboard <input>mouse <input>wacom ;
+	: <input>keyboard <input>mouse <input>touchpad <input>wacom ;
 AddFilesToHaikuImage beos system add-ons input_server filters : screen_saver ;
 AddFilesToHaikuImage beos system add-ons kernel network : stack ;
 AddFilesToHaikuImage beos system add-ons kernel network devices
