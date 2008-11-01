@@ -61,7 +61,8 @@ private:
 
 		BBitmap*				fBitmap;
 		bool					fDirectModeEnabled;
-		direct_buffer_info*		fInfo;
+		direct_buffer_info*			fInfo;
+		BLocker					fInfoLocker;
 
 		GLcontext*				fContext;
 		GLvisual*				fVisual;

@@ -17,6 +17,7 @@
 
 #include "MesaSoftwareRenderer.h"
 
+#include <Autolock.h>
 #include <GraphicsDefs.h>
 #include <Screen.h>
 
@@ -203,6 +204,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	fBitmap(NULL),
 	fDirectModeEnabled(false),
 	fInfo(NULL),
+	fInfoLocker("info locker"),
 	fContext(NULL),
 	fVisual(NULL),
 	fFrameBuffer(NULL),
@@ -324,6 +326,7 @@ MesaSoftwareRenderer::LockGL()
 
 	BRect b = GLView()->Bounds();
 	color_space cs = B_RGBA32;
+	
 	if (fDirectModeEnabled && fInfo != NULL) {
 		cs = BScreen(GLView()->Window()).ColorSpace();
 	}
@@ -436,6 +439,7 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 			GLView()->DrawBitmap(fBitmap);
 			GLView()->UnlockLooper();
 		} else {
+			BAutolock lock(fInfoLocker);
 			uint8 bytesPerPixel = fInfo->bits_per_pixel / 8;
 			uint32 bytesPerRow = fBitmap->BytesPerRow();
 			for (uint32 i = 0; i < fInfo->clip_list_count; i++) {
@@ -555,8 +559,17 @@ MesaSoftwareRenderer::EnableDirectMode(bool enabled)
 
 void
 MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
-{
-	fInfo = info;
+{	
+	BAutolock lock(fInfoLocker);
+	if (info) {
+		if (!fInfo)
+			fInfo = new direct_buffer_info();
+		memcpy(fInfo, info, sizeof(*info));
+	} else if (fInfo) {
+		delete fInfo;
+		fInfo = NULL;
+	}
+		
 }
 
 
