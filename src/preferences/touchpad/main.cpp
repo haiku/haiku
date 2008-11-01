@@ -14,13 +14,13 @@ class TouchpadPrefWindow : public BWindow
 							window_type type,
 							uint32 flags)
 							:BWindow(frame, title, type, flags)
-		{};
+		{}
 		
-		virtual bool TouchpadPrefWindow::QuitRequested()
+		virtual bool QuitRequested()
 		{
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			return true;
-		};
+		}
 };
 
 
