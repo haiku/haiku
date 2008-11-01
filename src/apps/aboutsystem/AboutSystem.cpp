@@ -535,6 +535,7 @@ AboutView::AboutView(const BRect &rect)
 		"James Woodcock\n"
 		"Artur Wyszynski\n"
 		"Gerald Zajac\n"
+		"Clemens Zeidler\n"
 		"Łukasz Zemczak\n"
 		"JiSheng Zhang\n"
 		"Zhao Shuai\n"
