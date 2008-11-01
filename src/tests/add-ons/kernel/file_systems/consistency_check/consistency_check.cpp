@@ -116,7 +116,7 @@ FileList gFiles;
 
 
 void
-process_file(const file_entry& entry)
+process_file(const file_entry& entry, int number)
 {
 	struct stat stat;
 	if (::stat(entry.path.c_str(), &stat) != 0) {
@@ -146,6 +146,12 @@ process_file(const file_entry& entry)
 
 	if (memcmp(entry.hash, gSHA.Digest(), SHA_DIGEST_LENGTH))
 		fprintf(stderr, "\"%s\": Contents differ!\n", entry.path.c_str());
+
+	static bigtime_t sLastUpdate = -1;
+	if (system_time() - sLastUpdate > 500000) {
+		printf("%ld files scanned\33[1A\n", number);
+		sLastUpdate = system_time();
+	}
 }
 
 
@@ -220,7 +226,7 @@ main(int argc, char** argv)
 	bigtime_t start = system_time();
 
 	for (int i = 0; i < fileCount; i++) {
-		process_file(gFiles[i]);
+		process_file(gFiles[i], i);
 	}
 
 	bigtime_t runtime = system_time() - start;

@@ -181,6 +181,12 @@ process_file(const char* path)
 	//printf("%s  %s\n", entry.HashString().c_str(), path);
 
 	gFiles.push_back(entry);
+
+	static bigtime_t sLastUpdate = -1;
+	if (system_time() - sLastUpdate > 500000) {
+		printf("%ld files scanned\33[1A\n", gFiles.size());
+		sLastUpdate = system_time();
+	}
 }
 
 
