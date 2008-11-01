@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2006, Haiku.
+ * Copyright 2004-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 #ifndef MOUSE_INPUT_DEVICE_H
 #define MOUSE_INPUT_DEVICE_H

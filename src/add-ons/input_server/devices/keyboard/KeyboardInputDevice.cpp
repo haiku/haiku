@@ -1,6 +1,7 @@
 /*
  * Copyright 2004-2006, Jérôme Duval. All rights reserved.
  * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008, Stephan Aßmus, superstippi@gmx.de.
  *
  * Distributed under the terms of the MIT License.
  */

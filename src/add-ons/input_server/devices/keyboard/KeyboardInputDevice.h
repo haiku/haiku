@@ -1,5 +1,6 @@
 /*
  * Copyright 2004-2008, Jérôme Duval. All rights reserved.
+ * Copyright 2008, Stephan Aßmus, superstippi@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KEYBOARD_INPUT_DEVICE_H
@@ -47,16 +48,16 @@ private:
 			int32				_Thread();
 
 private:
-	KeyboardInputDevice*		fOwner;
-	input_device_ref			fDeviceRef;
-	char						fPath[B_PATH_NAME_LENGTH];
-	int							fFD;
-	thread_id					fThread;
-	kb_settings					fSettings;
+			KeyboardInputDevice* fOwner;
+			input_device_ref	fDeviceRef;
+			char				fPath[B_PATH_NAME_LENGTH];
+			int					fFD;
+			thread_id			fThread;
+			kb_settings			fSettings;
 	volatile bool				fActive;
-	bool						fIsAT;
+			bool				fIsAT;
 	volatile bool				fInputMethodStarted;
-	uint32						fModifiers;
+			uint32				fModifiers;
 
 			Keymap				fKeymap;
 			BLocker				fKeymapLock;

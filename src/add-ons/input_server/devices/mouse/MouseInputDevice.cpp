@@ -6,6 +6,7 @@
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Jérôme Duval
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus, superstippi@gmx.de
  */
 
 

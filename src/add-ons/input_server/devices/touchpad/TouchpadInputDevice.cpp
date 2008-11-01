@@ -1,11 +1,12 @@
 /*
- * Copyright 2004-2007, Haiku.
+ * Copyright 2004-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Jérôme Duval
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 
 
