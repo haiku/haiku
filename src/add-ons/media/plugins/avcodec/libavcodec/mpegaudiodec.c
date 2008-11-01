@@ -2425,7 +2425,7 @@ retry:
         av_log(avctx, AV_LOG_ERROR, "incomplete frame\n");
         return -1;
     }else if(s->frame_size < buf_size){
-        av_log(avctx, AV_LOG_ERROR, "incorrect frame size\n");
+        av_log(avctx, AV_LOG_ERROR, "incorrect frame size expected %d found %d\n",s->frame_size,buf_size);
         buf_size= s->frame_size;
     }
 
