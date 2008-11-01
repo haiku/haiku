@@ -12,18 +12,18 @@
  *		Clemens Zeidler	<czeidler@gmx.de>
  */
 
-#ifndef __PS2_STANDARD_standard_mouse_H
-#define __PS2_STANDARD_standard_mouse_H
+#ifndef __PS2_STANDARD_MOUSE_H
+#define __PS2_STANDARD_MOUSE_H
 
 #include <Drivers.h>
 
 #include "packet_buffer.h"
 
-#define standard_mouse_HISTORY_SIZE	256
+#define MOUSE_HISTORY_SIZE				256
 	// we record that many mouse packets before we start to drop them
 
-#define F_pointing_dev_TYPE_STANDARD			0x1
-#define F_pointing_dev_TYPE_INTELLIMOUSE		0x2
+#define F_MOUSE_TYPE_STANDARD			0x1
+#define F_MOUSE_TYPE_INTELLIMOUSE		0x2
 
 typedef struct
 {
@@ -56,5 +56,5 @@ void standard_mouse_disconnect(ps2_dev *dev);
 device_hooks gStandardMouseDeviceHooks; 
 
 
-#endif /* __PS2_STANDARD_standard_mouse_H */
+#endif /* __PS2_STANDARD_MOUSE_H */
 

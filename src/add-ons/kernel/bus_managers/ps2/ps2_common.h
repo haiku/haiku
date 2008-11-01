@@ -60,7 +60,8 @@ status_t		ps2_wait_write(void);
 
 void			ps2_flush(void);
 
-extern status_t ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
+extern status_t ps2_command(uint8 cmd, const uint8 *out, int out_count,
+	uint8 *in, int in_count);
 
 // prototypes from keyboard.c & mouse.c
 extern status_t probe_keyboard(void);

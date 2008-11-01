@@ -38,14 +38,14 @@
 #define MIN_PRESSURE			30
 #define MAX_PRESSURE			200
 
-#define synaptics_HISTORY_SIZE	256
+#define SYNAPTICS_HISTORY_SIZE	256
 
 // no touchpad / left / right button pressed
-#define IS_SYN_PT_PACKAGE(val) ((val[0] & 0xFC) == 0x84 && (val[3] & 0xCC) == 0xc4)
+#define IS_SYN_PT_PACKAGE(val) ((val[0] & 0xFC) == 0x84 \
+	&& (val[3] & 0xCC) == 0xc4)
 
 
-typedef struct
-{
+typedef struct {
 	uint8 majorVersion;
 	uint8 minorVersion;
 	
@@ -59,8 +59,7 @@ typedef struct
 } touchpad_info;
 
 
-typedef struct
-{
+typedef struct {
 	uint8		buttons;
 	uint32		xPosition;
 	uint32		yPosition;
@@ -105,11 +104,14 @@ status_t synaptics_pt_set_packagesize(ps2_dev *dev, uint8 size);
 status_t send_touchpad_arg(ps2_dev *dev, uint8 arg);
 status_t send_touchpad_arg_timeout(ps2_dev *dev, uint8 arg, bigtime_t timeout);
 status_t set_touchpad_mode(ps2_dev *dev, uint8 mode);
-status_t passthrough_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout);
+status_t passthrough_command(ps2_dev *dev, uint8 cmd, const uint8 *out,
+	int out_count, uint8 *in, int in_count, bigtime_t timeout);
 
 bool edge_motion(mouse_movement *movement, touch_event *event, bool validStart);
-status_t touchevent_to_movement(synaptics_cookie* cookie, touch_event *event, mouse_movement *movement);
-status_t get_synaptics_movment(synaptics_cookie* cookie, mouse_movement *movement);
+status_t touchevent_to_movement(synaptics_cookie* cookie, touch_event *event,
+	mouse_movement *movement);
+status_t get_synaptics_movment(synaptics_cookie* cookie,
+	mouse_movement *movement);
 void query_capability(ps2_dev *dev);
 status_t probe_synaptics(ps2_dev *dev);
 

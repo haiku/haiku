@@ -107,13 +107,13 @@ ps2_packet_to_movement(standard_mouse_cookie *cookie, uint8 packet[],
 
 	cookie->buttons_state = buttons;
 
-	if (cookie->flags & F_pointing_dev_TYPE_INTELLIMOUSE) {
+	if (cookie->flags & F_MOUSE_TYPE_INTELLIMOUSE) {
 		yDeltaWheel = packet[3] & 0x07; 
  		if (packet[3] & 0x08) 
 			yDeltaWheel |= ~0x07; 
 	}
 /*
-	if (cookie->flags & F_standard_mouse_TYPE_2WHEELS) {
+	if (cookie->flags & F_MOUSE_TYPE_2WHEELS) {
 		switch (packet[3] & 0x0F) {
 			case 0x01: yDeltaWheel = +1; break; // wheel 1 down
 			case 0x0F: yDeltaWheel = -1; break; // wheel 1 up
@@ -358,13 +358,13 @@ standard_mouse_open(const char *name, uint32 flags, void **_cookie)
 	dev->handle_int = &standard_mouse_handle_int;
 	
 	if (strstr(dev->name, "standard_mouse") != NULL)
-		cookie->flags = F_pointing_dev_TYPE_STANDARD;
+		cookie->flags = F_MOUSE_TYPE_STANDARD;
 
 	if (strstr(dev->name, "intelli_mouse") != NULL)
-		cookie->flags = F_pointing_dev_TYPE_INTELLIMOUSE;
+		cookie->flags = F_MOUSE_TYPE_INTELLIMOUSE;
 		
 	cookie->standard_mouse_buffer
-		= create_packet_buffer(standard_mouse_HISTORY_SIZE * dev->packet_size);
+		= create_packet_buffer(MOUSE_HISTORY_SIZE * dev->packet_size);
 	if (cookie->standard_mouse_buffer == NULL) {
 		TRACE("ps2: can't allocate mouse actions buffer\n");
 		goto err2;

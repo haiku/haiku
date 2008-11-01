@@ -539,7 +539,7 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 	dev->packet_size = PS2_PACKET_SYNAPTICS;
 	
 	cookie->synaptics_ring_buffer
-		= create_packet_buffer(synaptics_HISTORY_SIZE * dev->packet_size);
+		= create_packet_buffer(SYNAPTICS_HISTORY_SIZE * dev->packet_size);
 	if (cookie->synaptics_ring_buffer == NULL) {
 		TRACE("ps2: can't allocate mouse actions buffer\n");
 		goto err2;

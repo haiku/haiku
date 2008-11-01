@@ -16,15 +16,13 @@ typedef struct ps2_dev ps2_dev;
 #include "ps2_common.h"
 
 
-typedef struct
-{
+typedef struct {
 	bigtime_t		time;
 	uint8			data;
 	bool			error;
 } data_history;
 
-struct ps2_dev
-{
+struct ps2_dev {
 	const char *	name;
 	bool			active;
 	uint8           idx;
