@@ -1,3 +1,10 @@
+/*
+ * Copyright 2008, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		François Revol <revol@free.fr>
+ */
 #ifndef _MFP_H
 #define _MFP_H
 
