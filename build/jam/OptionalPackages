@@ -447,7 +447,7 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Vision-0.9.7-H-11012008/Vision ;
+			: /boot/apps/Vision-0.9.7-H-01112008/Vision ;
 	}
 }
 
