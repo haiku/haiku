@@ -1,5 +1,7 @@
 /*
  * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,14 +9,22 @@
 
 #include <new>
 
+#include <Directory.h>
 #include <List.h>
+#include <Path.h>
+#include <Volume.h>
 
 #include <DiskDeviceTypes.h>
 #include <MutablePartition.h>
 
 #include <AutoDeleter.h>
 
+#ifdef ASSERT
+#	undef ASSERT
+#endif
+
 #include "bfs.h"
+#include "bfs_control.h"
 #include "bfs_disk_system.h"
 
 
@@ -33,8 +43,8 @@ static const uint32 kDiskSystemFlags =
 	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
 //	| B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING
 //	| B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED
-//	| B_DISK_SYSTEM_SUPPORTS_CHECKING_WHILE_MOUNTED
-//	| B_DISK_SYSTEM_SUPPORTS_REPAIRING_WHILE_MOUNTED
+	| B_DISK_SYSTEM_SUPPORTS_CHECKING_WHILE_MOUNTED
+	| B_DISK_SYSTEM_SUPPORTS_REPAIRING_WHILE_MOUNTED
 //	| B_DISK_SYSTEM_SUPPORTS_RESIZING_WHILE_MOUNTED
 //	| B_DISK_SYSTEM_SUPPORTS_MOVING_WHILE_MOUNTED
 //	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED
@@ -166,25 +176,116 @@ BFSAddOn::Initialize(BMutablePartition* partition, const char* name,
 // #pragma mark - BFSPartitionHandle
 
 
-// constructor
 BFSPartitionHandle::BFSPartitionHandle(BMutablePartition* partition)
 	: BPartitionHandle(partition)
 {
 }
 
 
-// destructor
 BFSPartitionHandle::~BFSPartitionHandle()
 {
 }
 
 
-// Init
 status_t
 BFSPartitionHandle::Init()
 {
 // TODO: Check parameters.
 	return B_OK;
+}
+
+
+uint32
+BFSPartitionHandle::SupportedOperations(uint32 mask)
+{
+	return kDiskSystemFlags & mask;
+}
+
+
+status_t
+BFSPartitionHandle::Repair(bool checkOnly)
+{
+	BVolume volume(Partition()->VolumeID());
+	BDirectory directory;
+	volume.GetRootDirectory(&directory);
+	BPath path;
+	path.SetTo(&directory, ".");
+
+	int fd = open(path.Path(), O_RDONLY);
+	if (fd < 0) {
+	    printf("chkbfs: error opening '.'\n");
+	    return errno;
+	}
+
+	struct check_control result;
+	memset(&result, 0, sizeof(result));
+	result.magic = BFS_IOCTL_CHECK_MAGIC;
+	result.flags = !checkOnly ? BFS_FIX_BITMAP_ERRORS : 0;
+	if (!checkOnly) {
+		//printf("will fix any severe errors!\n");
+		result.flags |= BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID;
+	}
+
+	// start checking
+	if (ioctl(fd, BFS_IOCTL_START_CHECKING, &result, sizeof(result)) < 0) {
+	    printf("chkbfs: error starting!\n");
+	    return errno;
+	}
+
+	off_t attributeDirectories = 0, attributes = 0;
+	off_t files = 0, directories = 0, indices = 0;
+	off_t counter = 0;
+
+	// check all files and report errors
+	while (ioctl(fd, BFS_IOCTL_CHECK_NEXT_NODE, &result, sizeof(result)) == 0) {
+		if (++counter % 50 == 0)
+			printf("%9Ld nodes processed\x1b[1A\n", counter);
+
+		if (result.errors) {
+			printf("%s (inode = %Ld)", result.name, result.inode);
+			if (result.errors & BFS_MISSING_BLOCKS)
+				printf(", some blocks weren't allocated");
+			if (result.errors & BFS_BLOCKS_ALREADY_SET)
+				printf(", has blocks already set");
+			if (result.errors & BFS_INVALID_BLOCK_RUN)
+				printf(", has invalid block run(s)");
+			if (result.errors & BFS_COULD_NOT_OPEN)
+				printf(", could not be opened");
+			if (result.errors & BFS_WRONG_TYPE)
+				printf(", has wrong type");
+			if (result.errors & BFS_NAMES_DONT_MATCH)
+				printf(", names don't match");
+			putchar('\n');
+		}
+		if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
+			indices++;
+		else if (result.mode & S_ATTR_DIR)
+			attributeDirectories++;
+		else if (result.mode & S_ATTR)
+			attributes++;
+		else if (S_ISDIR(result.mode))
+			directories++;
+		else
+			files++;
+	}
+
+	// stop checking
+	if (ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result)) < 0)
+	    printf("chkbfs: error stopping!\n");
+
+	close(fd);
+
+	printf("checked %Ld nodes, %Ld blocks not allocated, %Ld blocks already "
+		"set, %Ld blocks could be freed\n", counter, result.stats.missing,
+		result.stats.already_set, result.stats.freed);
+	printf("\tfiles\t\t%Ld\n\tdirectories\t%Ld\n\tattributes\t%Ld\n\tattr. "
+		"dirs\t%Ld\n\tindices\t\t%Ld\n", files, directories, attributes,
+		attributeDirectories, indices);
+
+	if (result.status == B_ENTRY_NOT_FOUND)
+		result.status = B_OK;
+
+	return result.status;
 }
 
 

@@ -38,6 +38,10 @@ public:
 								~BFSPartitionHandle();
 
 			status_t			Init();
+
+	virtual	uint32				SupportedOperations(uint32 mask);
+
+	virtual	status_t			Repair(bool checkOnly);
 };
 
 
