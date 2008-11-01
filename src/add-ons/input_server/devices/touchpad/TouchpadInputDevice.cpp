@@ -49,7 +49,7 @@ const static char *kTouchpadDevicesDirectoryPS2 = "input/touchpad/ps2";
 
 class TouchpadDevice {
 	public:
-		TouchpadDevice(BInputServerDevice& target, const char* path);
+		TouchpadDevice(TouchpadInputDevice& target, const char* path);
 		~TouchpadDevice();
 
 		status_t Start();
@@ -76,22 +76,22 @@ class TouchpadDevice {
 
 		char* _BuildShortName() const;
 
-		status_t GetSettingsPath(BPath &path);
+		status_t _GetSettingsPath(BPath &path);
 
 	private:
-		BInputServerDevice& fTarget;
-		BString	fPath;
-		int fDevice;
+		TouchpadInputDevice&	fTarget;
+		BString					fPath;
+		int						fDevice;
 
-		input_device_ref fDeviceRef;
-		mouse_settings fSettings;
-		bool fDeviceRemapsButtons;
+		input_device_ref		fDeviceRef;
+		mouse_settings			fSettings;
+		bool					fDeviceRemapsButtons;
 
-		thread_id fThread;
-		volatile bool fActive;
+		thread_id				fThread;
+		volatile bool			fActive;
 
-		bool fIsTouchpad;
-		touchpad_settings fTouchpadSettings;
+		bool					fIsTouchpad;
+		touchpad_settings		fTouchpadSettings;
 };
 
 
@@ -118,10 +118,12 @@ instantiate_input_device()
 //	#pragma mark -
 
 
-TouchpadDevice::TouchpadDevice(BInputServerDevice& target, const char *driverPath)
+TouchpadDevice::TouchpadDevice(TouchpadInputDevice& target,
+		const char* driverPath)
 	:
 	fTarget(target),
 	fDevice(-1),
+	fDeviceRemapsButtons(false),
 	fThread(-1),
 	fActive(false),
 	fIsTouchpad(false)
@@ -138,7 +140,6 @@ TouchpadDevice::TouchpadDevice(BInputServerDevice& target, const char *driverPat
 	fSettings.map.button[2] = B_TERTIARY_MOUSE_BUTTON;
 #endif
 
-	fDeviceRemapsButtons = false;
 };
 
 
@@ -152,13 +153,12 @@ TouchpadDevice::~TouchpadDevice()
 
 
 status_t
-TouchpadDevice::GetSettingsPath(BPath &path)
+TouchpadDevice::_GetSettingsPath(BPath &path)
 {
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if(status < B_OK)
+	if (status < B_OK)
 		return status;
-	path.Append(TOUCHPAD_SETTINGS_FILE);
-	return B_OK;
+	return path.Append(TOUCHPAD_SETTINGS_FILE);
 }
 
 
@@ -170,7 +170,7 @@ TouchpadDevice::Start()
 		return errno;
 
 	// touchpad settings
-	if(ioctl(fDevice, MS_IS_TOUCHPAD, NULL) == B_OK){
+	if (ioctl(fDevice, MS_IS_TOUCHPAD, NULL) == B_OK) {
 		LOG("is touchpad %s\n", fPath.String());
 		fIsTouchpad = true;
 	}
@@ -178,25 +178,23 @@ TouchpadDevice::Start()
 	fTouchpadSettings = kDefaultTouchpadSettings;
 
 	BPath path;
-	status_t status = GetSettingsPath(path);
+	status_t status = _GetSettingsPath(path);
 	BFile settingsFile(path.Path(), B_READ_ONLY);
-	if(status == B_OK && settingsFile.InitCheck() == B_OK){
-		if(settingsFile.Read(&fTouchpadSettings, sizeof(touchpad_settings))
-			!= sizeof(touchpad_settings))
-		{
+	if (status == B_OK && settingsFile.InitCheck() == B_OK) {
+		if (settingsFile.Read(&fTouchpadSettings, sizeof(touchpad_settings))
+				!= sizeof(touchpad_settings)) {
 			LOG("failed to load settings\n");
 		}
 	}
 
 	UpdateTouchpadSettings();
-
 	UpdateSettings();
 
 	char threadName[B_OS_NAME_LENGTH];
 	snprintf(threadName, B_OS_NAME_LENGTH, "%s watcher", fDeviceRef.name);
 
 	fThread = spawn_thread(_ThreadFunction, threadName,
-		kMouseThreadPriority, (void *)this);
+		kMouseThreadPriority, (void*)this);
 
 	if (fThread < B_OK)
 		status = fThread;
@@ -222,6 +220,9 @@ TouchpadDevice::Stop()
 	fActive = false;
 		// this will stop the thread as soon as it reads the next packet
 
+	close(fDevice);
+	fDevice = -1;
+
 	if (fThread >= B_OK) {
 		// unblock the thread, which might wait on a semaphore.
 		suspend_thread(fThread);
@@ -230,14 +231,14 @@ TouchpadDevice::Stop()
 		status_t dummy;
 		wait_for_thread(fThread, &dummy);
 	}
-
-	close(fDevice);
 }
 
 
 status_t
 TouchpadDevice::UpdateSettings()
 {
+	// TODO: This is duplicated in MouseInputDevice.cpp -> Refactor
+
 	CALLED();
 
 	// retrieve current values
@@ -272,21 +273,28 @@ TouchpadDevice::UpdateSettings()
 		ioctl(fDevice, MS_SET_TYPE, &fSettings.type);
 
 	return B_OK;
-
 }
 
 
 status_t
 TouchpadDevice::ReadTouchpadSettingsMsg(BMessage* msg)
 {
-	msg->FindBool("scroll_twofinger", &(fTouchpadSettings.scroll_twofinger));
-	msg->FindBool("scroll_multifinger", &(fTouchpadSettings.scroll_multifinger));
-	msg->FindFloat("scroll_rightrange", &(fTouchpadSettings.scroll_rightrange));
-	msg->FindFloat("scroll_bottomrange", &(fTouchpadSettings.scroll_bottomrange));
-	msg->FindInt16("scroll_xstepsize", (int16*)&(fTouchpadSettings.scroll_xstepsize));
-	msg->FindInt16("scroll_ystepsize", (int16*)&(fTouchpadSettings.scroll_ystepsize));
-	msg->FindInt8("scroll_acceleration", (int8*)&(fTouchpadSettings.scroll_acceleration));
-	msg->FindInt8("tapgesture_sensibility", (int8*)&(fTouchpadSettings.tapgesture_sensibility));
+	msg->FindBool("scroll_twofinger",
+		&(fTouchpadSettings.scroll_twofinger));
+	msg->FindBool("scroll_multifinger",
+		&(fTouchpadSettings.scroll_multifinger));
+	msg->FindFloat("scroll_rightrange",
+		&(fTouchpadSettings.scroll_rightrange));
+	msg->FindFloat("scroll_bottomrange",
+		&(fTouchpadSettings.scroll_bottomrange));
+	msg->FindInt16("scroll_xstepsize",
+		(int16*)&(fTouchpadSettings.scroll_xstepsize));
+	msg->FindInt16("scroll_ystepsize",
+		(int16*)&(fTouchpadSettings.scroll_ystepsize));
+	msg->FindInt8("scroll_acceleration",
+		(int8*)&(fTouchpadSettings.scroll_acceleration));
+	msg->FindInt8("tapgesture_sensibility",
+		(int8*)&(fTouchpadSettings.tapgesture_sensibility));
 
 	return B_OK;
 }
@@ -295,7 +303,7 @@ TouchpadDevice::ReadTouchpadSettingsMsg(BMessage* msg)
 status_t
 TouchpadDevice::UpdateTouchpadSettings()
 {
-	if(fIsTouchpad){
+	if (fIsTouchpad) {
 		ioctl(fDevice, MS_SET_TOUCHPAD_SETTINGS, &fTouchpadSettings);
 		return B_OK;
 	}
@@ -306,14 +314,27 @@ TouchpadDevice::UpdateTouchpadSettings()
 void
 TouchpadDevice::_Run()
 {
+	// TODO: Exact duplicate of MouseDevice::_Run() -> Refactor
 	uint32 lastButtons = 0;
 
 	while (fActive) {
 		mouse_movement movements;
 		memset(&movements, 0, sizeof(movements));
 
-		if (ioctl(fDevice, MS_READ, &movements) != B_OK)
+		if (ioctl(fDevice, MS_READ, &movements) != B_OK) {
+			if (fActive) {
+				fThread = -1;
+				fTarget._RemoveDevice(fPath.String());
+			} else {
+				// In case active is already false, another thread
+				// waits for this thread to quit, and may already hold
+				// locks that _RemoveDevice() wants to acquire. In another
+				// words, the device is already being removed, so we simply
+				// quit here.
+			}
+			// TOAST!
 			return;
+		}
 
 		uint32 buttons = lastButtons ^ movements.buttons;
 
@@ -325,8 +346,6 @@ TouchpadDevice::_Run()
 			device->device_ref.name, movements.buttons, movements.xdelta, movements.ydelta,
 			movements.clicks, movements.wheel_xdelta, movements.wheel_ydelta);
 		LOG("%s: x: %ld, y: %ld\n", device->device_ref.name, deltaX, deltaY);*/
-
-		BMessage *message = NULL;
 
 		// Send single messages for each event
 
@@ -355,7 +374,7 @@ TouchpadDevice::_Run()
 		}
 
 		if ((movements.wheel_ydelta != 0) || (movements.wheel_xdelta != 0)) {
-			message = new BMessage(B_MOUSE_WHEEL_CHANGED);
+			BMessage* message = new BMessage(B_MOUSE_WHEEL_CHANGED);
 			if (message == NULL)
 				continue;
 
@@ -373,7 +392,7 @@ TouchpadDevice::_Run()
 status_t
 TouchpadDevice::_ThreadFunction(void* arg)
 {
-	TouchpadDevice* device = (TouchpadDevice *)arg;
+	TouchpadDevice* device = (TouchpadDevice*)arg;
 	device->_Run();
 	return B_OK;
 }
@@ -383,6 +402,8 @@ BMessage*
 TouchpadDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons,
 	int32 deltaX, int32 deltaY) const
 {
+	// TODO: Exact duplicate of MouseDevice::_BuildMouseMessage() -> Refactor
+
 	BMessage* message = new BMessage(what);
 	if (message == NULL)
 		return NULL;
@@ -403,6 +424,8 @@ void
 TouchpadDevice::_ComputeAcceleration(const mouse_movement& movements,
 	int32& deltaX, int32& deltaY) const
 {
+	// TODO: Exact duplicate of MouseDevice::_ComputeAcceleration() -> Refactor
+
 	// basic mouse speed
 	deltaX = movements.xdelta * fSettings.accel.speed >> 16;
 	deltaY = movements.ydelta * fSettings.accel.speed >> 16;
@@ -430,6 +453,8 @@ TouchpadDevice::_ComputeAcceleration(const mouse_movement& movements,
 uint32
 TouchpadDevice::_RemapButtons(uint32 buttons) const
 {
+	// TODO: Exact duplicate of MouseDevice::_RemapButtons() -> Refactor
+
 	if (fDeviceRemapsButtons)
 		return buttons;
 
@@ -464,8 +489,8 @@ TouchpadDevice::_BuildShortName() const
 	string.CopyInto(name, slash + 1, string.Length() - slash);
 	//int32 index = atoi(name.String()) + 1;
 
-	BString final = "Touchpad_";
-	final+= name;
+	BString final = "Touchpad ";
+	final += name;
 
 	LOG("NAME %s, %s\n", final.String(), fPath.String());
 
@@ -484,7 +509,6 @@ TouchpadInputDevice::TouchpadInputDevice()
 	CALLED();
 
 	StartMonitoringDevice(kTouchpadDevicesDirectoryPS2);
-
 	_RecursiveScan(kTouchpadDevicesDirectoryPS2);
 }
 
@@ -493,11 +517,7 @@ TouchpadInputDevice::~TouchpadInputDevice()
 {
 	CALLED();
 	StopMonitoringDevice(kTouchpadDevicesDirectoryPS2);
-
-	int32 count = fDevices.CountItems();
-	while (count-- > 0) {
-		delete (TouchpadDevice *)fDevices.RemoveItem(count);
-	}
+	fDevices.MakeEmpty();
 
 #if DEBUG
 	fclose(sLogFile);
@@ -541,13 +561,13 @@ TouchpadInputDevice::Control(const char* name, void* cookie,
 	LOG("%s(%s, code: %lu)\n", __PRETTY_FUNCTION__, name, command);
 	TouchpadDevice* device = (TouchpadDevice*)cookie;
 
-	if (command == MS_SET_TOUCHPAD_SETTINGS){
+	if (command == B_NODE_MONITOR)
+		return _HandleMonitor(message);
+
+	if (command == MS_SET_TOUCHPAD_SETTINGS) {
 		device->ReadTouchpadSettingsMsg(message);
 		return device->UpdateTouchpadSettings();
 	}
-
-	if (command == B_NODE_MONITOR)
-		return _HandleMonitor(message);
 
 	if (command >= B_MOUSE_TYPE_CHANGED
 		&& command <= B_MOUSE_ACCELERATION_CHANGED)
@@ -557,46 +577,46 @@ TouchpadInputDevice::Control(const char* name, void* cookie,
 }
 
 
-// TODO: Test this. USB doesn't work on my machine
 status_t
 TouchpadInputDevice::_HandleMonitor(BMessage* message)
 {
 	CALLED();
 
+	const char* path;
 	int32 opcode;
-	if (message->FindInt32("opcode", &opcode) < B_OK)
+	if (message->FindInt32("opcode", &opcode) != B_OK
+		|| (opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED)
+		|| message->FindString("path", &path) != B_OK)
 		return B_BAD_VALUE;
-
-	if (opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED)
-		return B_OK;
-
-	BEntry entry;
-	BPath path;
-	dev_t device;
-	ino_t directory;
-	const char *name;
-
-	if (message->FindInt32("device", &device) < B_OK
-		|| message->FindInt64("directory", &directory) < B_OK
-		|| message->FindString("name", &name) < B_OK)
-		return B_BAD_VALUE;
-
-	entry_ref ref(device, directory, name);
-	status_t status;
-
-	if ((status = entry.SetTo(&ref)) != B_OK)
-		return status;
-	if ((status = entry.GetPath(&path)) != B_OK)
-		return status;
-	if ((status = path.InitCheck()) != B_OK)
-		return status;
 
 	if (opcode == B_ENTRY_CREATED)
-		status = _AddDevice(path.Path());
-	else
-		status = _RemoveDevice(path.Path());
+		return _AddDevice(path);
 
-	return status;
+#if 0
+	return _RemoveDevice(path);
+#else
+	// Don't handle B_ENTRY_REMOVED, let the control thread take care of it.
+	return B_OK;
+#endif
+}
+
+
+void
+TouchpadInputDevice::_RecursiveScan(const char* directory)
+{
+	CALLED();
+
+	BEntry entry;
+	BDirectory dir(directory);
+	while (dir.GetNextEntry(&entry) == B_OK) {
+		BPath path;
+		entry.GetPath(&path);
+
+		if (entry.IsDirectory())
+			_RecursiveScan(path.Path());
+		else
+			_AddDevice(path.Path());
+	}
 }
 
 
@@ -605,9 +625,9 @@ TouchpadInputDevice::_FindDevice(const char *path)
 {
 	CALLED();
 
-	for (int32 i = fDevices.CountItems(); i-- > 0;) {
-		TouchpadDevice* device = (TouchpadDevice*)fDevices.ItemAt(i);
-		if (!strcmp(device->Path(), path))
+	for (int32 i = fDevices.CountItems() - 1; i >= 0; i--) {
+		TouchpadDevice* device = fDevices.ItemAt(i);
+		if (strcmp(device->Path(), path) == 0)
 			return device;
 	}
 
@@ -631,7 +651,7 @@ TouchpadInputDevice::_AddDevice(const char *path)
 		return B_NO_MEMORY;
 	}
 
-	input_device_ref *devices[2];
+	input_device_ref* devices[2];
 	devices[0] = device->DeviceRef();
 	devices[1] = NULL;
 
@@ -648,39 +668,15 @@ TouchpadInputDevice::_RemoveDevice(const char *path)
 	if (device == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	fDevices.RemoveItem(device);
-
-	input_device_ref *devices[2];
+	input_device_ref* devices[2];
 	devices[0] = device->DeviceRef();
 	devices[1] = NULL;
 
 	UnregisterDevices(devices);
 
-	delete device;
+	fDevices.RemoveItem(device);
+
 	return B_OK;
 }
 
-
-void
-TouchpadInputDevice::_RecursiveScan(const char* directory)
-{
-	CALLED();
-
-	BEntry entry;
-	BDirectory dir(directory);
-	while (dir.GetNextEntry(&entry) == B_OK) {
-		BPath path;
-		entry.GetPath(&path);
-
-		if (!strcmp(path.Leaf(), "serial")) {
-			// skip serial
-			continue;
-		}
-
-		if (entry.IsDirectory())
-			_RecursiveScan(path.Path());
-		else
-			_AddDevice(path.Path());
-	}
-}
 

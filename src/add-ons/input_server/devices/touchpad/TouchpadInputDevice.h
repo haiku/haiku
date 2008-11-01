@@ -12,7 +12,8 @@
 
 #include <InputServerDevice.h>
 #include <InterfaceDefs.h>
-#include <List.h>
+
+#include <ObjectList.h>
 
 #include <stdio.h>
 #define DEBUG 1
@@ -20,30 +21,34 @@
 class TouchpadDevice;
 
 class TouchpadInputDevice : public BInputServerDevice {
-	public:
-		TouchpadInputDevice();
-		~TouchpadInputDevice();
+public:
+								TouchpadInputDevice();
+	virtual						~TouchpadInputDevice();
 
-		virtual status_t InitCheck();
+	virtual	status_t			InitCheck();
 
-		virtual status_t Start(const char* name, void* cookie);
-		virtual status_t Stop(const char* name, void* cookie);
+	virtual	status_t			Start(const char* name, void* cookie);
+	virtual	status_t			Stop(const char* name, void* cookie);
 
-		virtual status_t Control(const char* name, void* cookie,
-							uint32 command, BMessage* message);
+	virtual status_t			Control(const char* name, void* cookie,
+									uint32 command, BMessage* message);
 
 	private:
-		status_t _HandleMonitor(BMessage* message);
-		void _RecursiveScan(const char* directory);
+	friend class TouchpadDevice;
+	// TODO: needed by the control thread to remove a dead device
+	// find a better way...
 
-		TouchpadDevice* _FindDevice(const char* path);
-		status_t _AddDevice(const char* path);
-		status_t _RemoveDevice(const char* path);
+			status_t			_HandleMonitor(BMessage* message);
+			void				_RecursiveScan(const char* directory);
 
-		BList fDevices;
+			TouchpadDevice*		_FindDevice(const char* path);
+			status_t			_AddDevice(const char* path);
+			status_t			_RemoveDevice(const char* path);
+
+			BObjectList<TouchpadDevice> fDevices;
 #ifdef DEBUG
 public:
-	static FILE *sLogFile;
+	static	FILE*				sLogFile;
 #endif
 };
 
