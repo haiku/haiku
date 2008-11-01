@@ -163,8 +163,10 @@ BPartition::Delegate::Defragment()
 status_t
 BPartition::Delegate::Repair(bool checkOnly)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	if (fPartitionHandle == NULL)
+		return B_NO_INIT;
+
+	return fPartitionHandle->Repair(checkOnly);
 }
 
 

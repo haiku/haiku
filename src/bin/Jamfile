@@ -75,6 +75,7 @@ StdBinCommands
 StdBinCommands
 	alert.cpp
 	beep.cpp
+	checkfs.cpp
 	clipboard.cpp
 	df.cpp
 	dpms.cpp
