@@ -280,7 +280,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **out_decoder,
 		return res;
 	}
 
-	// Here we should work out a way so that if there is a setup failure we can try the next decoder
+	// TODO Here we should work out a way so that if there is a setup failure we can try the next decoder
 	res = _plugin_manager.CreateDecoder(&decoder,
 		fStreamInfo[stream].encodedFormat);
 	if (res != B_OK) {
