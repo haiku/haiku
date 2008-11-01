@@ -146,7 +146,7 @@ void
 process_file(const char* path)
 {
 	struct stat stat;
-	if (::stat(path, &stat) != 0) {
+	if (::lstat(path, &stat) != 0) {
 		fprintf(stderr, "Could not stat file \"%s\": %s\n", path,
 			strerror(errno));
 		return;
@@ -156,6 +156,8 @@ process_file(const char* path)
 		process_directory(path);
 		return;
 	}
+	if (S_ISLNK(stat.st_mode))
+		return;
 
 	int file = open(path, O_RDONLY);
 	if (file < 0) {
