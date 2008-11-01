@@ -1116,14 +1116,20 @@ BlockAllocator::StartChecking(check_control* control)
 	if (!_IsValidCheckControl(control))
 		return B_BAD_VALUE;
 
+	fVolume->GetJournal(0)->Lock(NULL, true);
+		// Lock the volume's journal
+
 	status_t status = mutex_lock(&fLock);
-	if (status < B_OK)
+	if (status < B_OK) {
+		fVolume->GetJournal(0)->Unlock(NULL, true);
 		return status;
+	}
 
 	size_t size = BitmapSize();
 	fCheckBitmap = (uint32*)malloc(size);
 	if (fCheckBitmap == NULL) {
 		mutex_unlock(&fLock);
+		fVolume->GetJournal(0)->Unlock(NULL, true);
 		return B_NO_MEMORY;
 	}
 
@@ -1132,6 +1138,7 @@ BlockAllocator::StartChecking(check_control* control)
 		free(fCheckBitmap);
 		fCheckBitmap = NULL;
 		mutex_unlock(&fLock);
+		fVolume->GetJournal(0)->Unlock(NULL, true);
 
 		return B_NO_MEMORY;
 	}
@@ -1209,7 +1216,7 @@ BlockAllocator::StopChecking(check_control* control)
 				= HOST_ENDIAN_TO_BFS_INT64(usedBlocks);
 
 			int32 blocksInBitmap = fNumGroups * fBlocksPerGroup;
-			int32 blockSize = fVolume->BlockSize();
+			size_t blockSize = fVolume->BlockSize();
 
 			for (int32 i = 0; i < blocksInBitmap; i += 512) {
 				Transaction transaction(fVolume, 1 + i);
@@ -1235,6 +1242,7 @@ BlockAllocator::StopChecking(check_control* control)
 	fCheckCookie = NULL;
 	delete cookie;
 	mutex_unlock(&fLock);
+	fVolume->GetJournal(0)->Unlock(NULL, true);
 
 	return B_OK;
 }

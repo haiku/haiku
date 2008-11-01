@@ -403,7 +403,8 @@ Journal::Journal(Volume* volume)
 	fMaxTransactionSize(fLogSize / 2 - 5),
 	fUsed(0),
 	fUnwrittenTransactions(0),
-	fHasSubtransaction(false)
+	fHasSubtransaction(false),
+	fSeparateSubTransactions(false)
 {
 	recursive_lock_init(&fLock, "bfs journal");
 	mutex_init(&fEntriesLock, "bfs journal entries");
@@ -909,16 +910,19 @@ Journal::FlushLogAndBlocks()
 
 
 status_t
-Journal::Lock(Transaction* owner)
+Journal::Lock(Transaction* owner, bool separateSubTransactions)
 {
 	status_t status = recursive_lock_lock(&fLock);
 	if (status != B_OK)
 		return status;
 
-	if (recursive_lock_get_recursion(&fLock) > 1) {
+	if (!fSeparateSubTransactions && recursive_lock_get_recursion(&fLock) > 1) {
 		// we'll just use the current transaction again
 		return B_OK;
 	}
+
+	if (separateSubTransactions)
+		fSeparateSubTransactions = true;
 
 	fOwner = owner;
 
@@ -951,13 +955,18 @@ Journal::Lock(Transaction* owner)
 void
 Journal::Unlock(Transaction* owner, bool success)
 {
-	if (recursive_lock_get_recursion(&fLock) == 1) {
+	if (fSeparateSubTransactions || recursive_lock_get_recursion(&fLock) == 1) {
 		// we only end the transaction if we would really unlock it
 		// TODO: what about failing transactions that do not unlock?
+		// (they must make the parent fail, too)
 		_TransactionDone(success);
 
 		fTimestamp = system_time();
 		fOwner = NULL;
+
+		if (fSeparateSubTransactions
+			&& recursive_lock_get_recursion(&fLock) == 1)
+			fSeparateSubTransactions = false;
 	}
 
 	recursive_lock_unlock(&fLock);
@@ -1061,7 +1070,7 @@ Transaction::Start(Volume* volume, off_t refBlock)
 		return B_OK;
 
 	fJournal = volume->GetJournal(refBlock);
-	if (fJournal != NULL && fJournal->Lock(this) == B_OK)
+	if (fJournal != NULL && fJournal->Lock(this, false) == B_OK)
 		return B_OK;
 
 	fJournal = NULL;

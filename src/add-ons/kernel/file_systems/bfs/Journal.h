@@ -26,7 +26,8 @@ public:
 
 			status_t		InitCheck();
 
-			status_t		Lock(Transaction* owner);
+			status_t		Lock(Transaction* owner,
+								bool separateSubTransactions);
 			void			Unlock(Transaction* owner, bool success);
 
 			status_t		ReplayLog();
@@ -69,6 +70,7 @@ private:
 			bigtime_t		fTimestamp;
 			int32			fTransactionID;
 			bool			fHasSubtransaction;
+			bool			fSeparateSubTransactions;
 };
 
 
