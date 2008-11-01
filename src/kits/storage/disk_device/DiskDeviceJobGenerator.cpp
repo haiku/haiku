@@ -31,8 +31,8 @@
 
 
 #undef TRACE
-//#define TRACE(x...)
-#define TRACE(x...)	printf(x)
+#define TRACE(x...)
+//#define TRACE(x...)	printf(x)
 
 
 using std::nothrow;
@@ -72,7 +72,7 @@ struct DiskDeviceJobGenerator::MoveInfo {
 };
 
 
-// PartitionRefInfo 
+// PartitionRefInfo
 struct DiskDeviceJobGenerator::PartitionRefInfo {
 	PartitionRefInfo()
 		: partition(NULL),
