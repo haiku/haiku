@@ -6,8 +6,8 @@
  *		Stefano Ceccherini
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
-#ifndef MOUSE_INPUT_DEVICE_H
-#define MOUSE_INPUT_DEVICE_H
+#ifndef TOUCHPAD_INPUT_DEVICE_H
+#define TOUCHPAD_INPUT_DEVICE_H
 
 
 #include <InputServerDevice.h>
@@ -16,7 +16,7 @@
 #include <ObjectList.h>
 
 #include <stdio.h>
-#define DEBUG 1
+
 
 class TouchpadDevice;
 
@@ -46,12 +46,8 @@ public:
 			status_t			_RemoveDevice(const char* path);
 
 			BObjectList<TouchpadDevice> fDevices;
-#ifdef DEBUG
-public:
-	static	FILE*				sLogFile;
-#endif
 };
 
 extern "C" BInputServerDevice* instantiate_input_device();
 
-#endif	// MOUSE_INPUT_DEVICE_H
+#endif	// TOUCHPAD_INPUT_DEVICE_H

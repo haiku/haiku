@@ -31,15 +31,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#if DEBUG
-FILE *TouchpadInputDevice::sLogFile = NULL;
+//#define TRACE_TOUCHPAD_DEVICE
+#ifdef TRACE_TOUCHPAD_DEVICE
+#	define LOG(text...) debug_printf(text)
 #	define LOG_ERR(text...) LOG(text)
 #else
-#	define LOG(text...)
-#	define LOG_ERR(text...) fprintf(stderr, text)
+#	define LOG(text...) do {} while (0)
+#	define LOG_ERR(text...) debug_printf(text)
 #endif
 
 #define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
+
 
 const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 
@@ -93,19 +95,6 @@ class TouchpadDevice {
 		bool					fIsTouchpad;
 		touchpad_settings		fTouchpadSettings;
 };
-
-
-#if DEBUG
-inline void
-LOG(const char *fmt, ...)
-{
-	char buf[1024];
-	va_list ap;
-	va_start(ap, fmt);
-	vsprintf(buf, fmt, ap); va_end(ap);
-	fputs(buf, TouchpadInputDevice::sLogFile); fflush(TouchpadInputDevice::sLogFile);
-}
-#endif
 
 
 extern "C" BInputServerDevice *
@@ -503,9 +492,6 @@ TouchpadDevice::_BuildShortName() const
 
 TouchpadInputDevice::TouchpadInputDevice()
 {
-#if DEBUG
-	sLogFile = fopen("/var/log/mouse_device_log.log", "a");
-#endif
 	CALLED();
 
 	StartMonitoringDevice(kTouchpadDevicesDirectoryPS2);
@@ -518,10 +504,6 @@ TouchpadInputDevice::~TouchpadInputDevice()
 	CALLED();
 	StopMonitoringDevice(kTouchpadDevicesDirectoryPS2);
 	fDevices.MakeEmpty();
-
-#if DEBUG
-	fclose(sLogFile);
-#endif
 }
 
 
