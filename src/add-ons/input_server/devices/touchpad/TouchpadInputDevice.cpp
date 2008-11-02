@@ -45,8 +45,7 @@
 
 const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 
-// "/dev/" is automatically prepended by StartMonitoringDevice()
-const static char *kTouchpadDevicesDirectoryPS2 = "input/touchpad/ps2";
+const static char* kTouchpadDevicesDirectoryPS2 = "/dev/input/touchpad/ps2";
 
 
 class TouchpadDevice {
@@ -586,7 +585,7 @@ TouchpadInputDevice::_HandleMonitor(BMessage* message)
 void
 TouchpadInputDevice::_RecursiveScan(const char* directory)
 {
-	CALLED();
+	LOG("TouchpadInputDevice::_RecursiveScan(%s)\n", directory);
 
 	BEntry entry;
 	BDirectory dir(directory);
@@ -633,6 +632,8 @@ TouchpadInputDevice::_AddDevice(const char *path)
 		return B_NO_MEMORY;
 	}
 
+	LOG_ERR("TouchpadInputDevice::_AddDevice(%s)\n", path);
+
 	input_device_ref* devices[2];
 	devices[0] = device->DeviceRef();
 	devices[1] = NULL;
@@ -649,6 +650,8 @@ TouchpadInputDevice::_RemoveDevice(const char *path)
 	TouchpadDevice* device = _FindDevice(path);
 	if (device == NULL)
 		return B_ENTRY_NOT_FOUND;
+
+	LOG_ERR("TouchpadInputDevice::_RemoveDevice(%s)\n", path);
 
 	input_device_ref* devices[2];
 	devices[0] = device->DeviceRef();
