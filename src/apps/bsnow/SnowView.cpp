@@ -500,7 +500,7 @@ void SnowView::MouseUp(BPoint where)
 	msg.AddSpecifier("Replicant", "BSnow");
 	msg.AddSpecifier("Shelf");
 	msg.AddSpecifier("View", "PoseView");
-	msg.AddSpecifier("Window", 1); /* 0 is Twitcher */
+	msg.AddSpecifier("Window", 1); /* 0 is Tracker Status */
 	if ((msgr.SendMessage(&msg, &reply) == B_OK) && 
 				(reply.what == B_NO_REPLY || reply.what == B_REPLY)) {
 		//reply.PrintToStream();
