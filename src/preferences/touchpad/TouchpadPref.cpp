@@ -14,21 +14,21 @@ TouchpadPref::TouchpadPref()
 	// default center position
 	fWindowPosition.x = -1;
 	fWindowPosition.y = -1;
-	
+
 	ConnectToTouchPad();
-	
-	if(LoadSettings() != B_OK){
+
+	if (LoadSettings() != B_OK)
 		Defaults();
-	}
+
 	fStartSettings = fSettings;
 }
 
 
 TouchpadPref::~TouchpadPref()
 {
-	if(fConnected){
+	if (fConnected)
 		delete fTouchPad;
-	}
+
 	SaveSettings();
 }
 
@@ -40,13 +40,13 @@ TouchpadPref::Revert()
 }
 
 
-status_t		
+status_t
 TouchpadPref::UpdateSettings()
 {
-	LOG("UpdateSettings of device %s\n", fTouchPad->Name());
-	if(!fConnected){
+	if (!fConnected)
 		return B_ERROR;
-	}
+
+	LOG("UpdateSettings of device %s\n", fTouchPad->Name());
 
 	BMessage msg;
 	msg.AddBool("scroll_twofinger", fSettings.scroll_twofinger);
@@ -57,7 +57,8 @@ TouchpadPref::UpdateSettings()
 	msg.AddInt16("scroll_ystepsize", fSettings.scroll_ystepsize);
 	msg.AddInt8("scroll_acceleration", fSettings.scroll_acceleration);
 	msg.AddInt8("tapgesture_sensibility", fSettings.tapgesture_sensibility);
-	return fTouchPad->Control(MS_SET_TOUCHPAD_SETTINGS, &msg);	
+
+	return fTouchPad->Control(MS_SET_TOUCHPAD_SETTINGS, &msg);
 }
 
 
@@ -72,10 +73,10 @@ status_t
 TouchpadPref::GetSettingsPath(BPath &path)
 {
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if(status < B_OK)
+	if (status < B_OK)
 		return status;
-	path.Append(TOUCHPAD_SETTINGS_FILE);
-	return B_OK;
+
+	return path.Append(TOUCHPAD_SETTINGS_FILE);
 }
 
 
@@ -84,27 +85,26 @@ TouchpadPref::LoadSettings()
 {
 	BPath path;
 	status_t status = GetSettingsPath(path);
-	if(status != B_OK)
+	if (status != B_OK)
 		return status;
-		
+
 	BFile settingsFile(path.Path(), B_READ_ONLY);
 	status = settingsFile.InitCheck();
-	if(status != B_OK)
+	if (status != B_OK)
 		return status;
-	
-	if(settingsFile.Read(&fSettings, sizeof(touchpad_settings))
-		!= sizeof(touchpad_settings)) 
-	{
+
+	if (settingsFile.Read(&fSettings, sizeof(touchpad_settings))
+			!= sizeof(touchpad_settings)) {
 		LOG("failed to load settings\n");
 		return B_ERROR;
 	}
-	
-	if(settingsFile.Read(&fWindowPosition, sizeof(BPoint))
-		!= sizeof(BPoint)) 
-	{
+
+	if (settingsFile.Read(&fWindowPosition, sizeof(BPoint))
+			!= sizeof(BPoint)) {
 		LOG("failed to load settings\n");
 		return B_ERROR;
-	}	
+	}
+
 	return B_OK;
 }
 
@@ -114,27 +114,26 @@ TouchpadPref::SaveSettings()
 {
 	BPath path;
 	status_t status = GetSettingsPath(path);
-	if(status != B_OK)
+	if (status != B_OK)
 		return status;
-		
+
 	BFile settingsFile(path.Path(), B_READ_WRITE | B_CREATE_FILE);
 	status = settingsFile.InitCheck();
-	if(status != B_OK)
+	if (status != B_OK)
 		return status;
-	
-	if(settingsFile.Write(&fSettings, sizeof(touchpad_settings))
-		!= sizeof(touchpad_settings)) 
-	{
+
+	if (settingsFile.Write(&fSettings, sizeof(touchpad_settings))
+			!= sizeof(touchpad_settings)) {
 		LOG("can't save settings\n");
 		return B_ERROR;
 	}
-	
-	if(settingsFile.Write(&fWindowPosition, sizeof(BPoint))
-		!= sizeof(BPoint)) 
-	{
+
+	if (settingsFile.Write(&fWindowPosition, sizeof(BPoint))
+			!= sizeof(BPoint)) {
 		LOG("can't save window position\n");
 		return B_ERROR;
-	}	
+	}
+
 	return B_OK;
 }
 
@@ -144,36 +143,34 @@ TouchpadPref::ConnectToTouchPad()
 {
 	BList devList;
 	status_t status = get_input_devices(&devList);
-	if(status != B_OK){
+	if (status != B_OK)
 		return status;
-	}
+
 	int32 i = 0;
-	while(true){
-		BInputDevice * dev = (BInputDevice*)devList.ItemAt(i);
-		if(!dev)
+	while (true) {
+		BInputDevice* dev = (BInputDevice*)devList.ItemAt(i);
+		if (dev == NULL)
 			break;
 		i++;
-		
+
 		LOG("input device %s\n", dev->Name());
-		
-		bool isTouchpad = false;
+
 		BString name = dev->Name();
-				
-		if(name.FindFirst("Touchpad") != B_ERROR
+
+		if (name.FindFirst("Touchpad") >= 0
 			&& dev->Type() == B_POINTING_DEVICE
-			&& !fConnected)
-		{
-			isTouchpad = true;
+			&& !fConnected) {
 			fConnected = true;
 			fTouchPad = dev;
-		}
-		else{
+			// Don't bail out here, since we need to delete the other devices
+			// yet.
+		} else {
 			delete dev;
 		}
 	}
-	if(fConnected)
+	if (fConnected)
 		return B_OK;
-	
+
 	LOG("touchpad input device NOT found\n");
 	return B_ENTRY_NOT_FOUND;
 }
