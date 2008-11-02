@@ -176,9 +176,11 @@ make_small(float value)
 void
 get_raw_movement(movement_maker *move, uint32 posX, uint32 posY)
 {
+	const float acceleration = 0.8;
+	const float translation = 12.0;
+
 	int diff;
 	float xDelta, yDelta;
-	const float acceleration = 0.7;
 
 	if (move->movementStarted) {
 		move->movementStarted = false;
@@ -212,8 +214,8 @@ get_raw_movement(movement_maker *move, uint32 posX, uint32 posY)
 
 	// compute current delta and reset accumulated delta if
 	// abs() is greater than 1
-	xDelta = move->deltaSumX / 10.0;
-	yDelta = move->deltaSumY / 10.0;
+	xDelta = move->deltaSumX / translation;
+	yDelta = move->deltaSumY / translation;
 	if (xDelta > 1.0) {
 		move->deltaSumX = 0.0;
 		xDelta = 1.0 + (xDelta - 1.0) * acceleration;
