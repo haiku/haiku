@@ -127,6 +127,35 @@ PartitionColumn::DrawField(BField* field, BRect rect, BView* parent)
 	}
 }
 
+
+float
+PartitionColumn::GetPreferredWidth(BField *_field, BView* parent) const
+{
+	BBitmapStringField* bitmapField
+		= dynamic_cast<BBitmapStringField*>(_field);
+	BStringField* stringField = dynamic_cast<BStringField*>(_field);
+
+	float parentWidth = Inherited::GetPreferredWidth(_field, parent);
+	float width = 0.0;
+
+	if (bitmapField) {
+		const BBitmap* bitmap = bitmapField->Bitmap();
+		BFont font;
+		parent->GetFont(&font);
+		width = font.StringWidth(bitmapField->String()) + 3 * fTextMargin;
+		if (bitmap)
+			width += bitmap->Bounds().Width();
+		else
+			width += 16;
+	} else if (stringField) {
+		BFont font;
+		parent->GetFont(&font);
+		width = font.StringWidth(stringField->String()) + 2 * fTextMargin;
+	}
+	return max_c(width, parentWidth);
+}
+
+
 bool 
 PartitionColumn::AcceptsField(const BField* field) const
 {

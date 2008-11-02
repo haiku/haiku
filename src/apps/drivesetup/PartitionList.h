@@ -49,6 +49,7 @@ public:
 
 	virtual	void				DrawField(BField* field, BRect rect,
 									BView* parent);
+	virtual float				GetPreferredWidth(BField* field, BView* parent) const;
 
 	virtual	bool				AcceptsField(const BField* field) const;
 
