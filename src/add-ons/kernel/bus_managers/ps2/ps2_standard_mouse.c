@@ -40,7 +40,7 @@
  * - bit 0: Left button (1 = down)
  * byte 1: X position change, since last probed (-127 to +127)
  * byte 2: Y position change, since last probed (-127 to +127)
- * 
+ *
  * Intellimouse mice send a four byte packet, where the first three
  * bytes are the same as standard mice, and the last one reports the
  * Z position, which is, usually, the wheel movement.
@@ -108,9 +108,9 @@ ps2_packet_to_movement(standard_mouse_cookie *cookie, uint8 packet[],
 	cookie->buttons_state = buttons;
 
 	if (cookie->flags & F_MOUSE_TYPE_INTELLIMOUSE) {
-		yDeltaWheel = packet[3] & 0x07; 
- 		if (packet[3] & 0x08) 
-			yDeltaWheel |= ~0x07; 
+		yDeltaWheel = packet[3] & 0x07;
+ 		if (packet[3] & 0x08)
+			yDeltaWheel |= ~0x07;
 	}
 /*
 	if (cookie->flags & F_MOUSE_TYPE_2WHEELS) {
@@ -155,7 +155,7 @@ standard_mouse_read_event(standard_mouse_cookie *cookie,
 	status_t status;
 
 	TRACE("ps2: standard_mouse_read_event\n");
-	
+
 	status = acquire_sem_etc(cookie->standard_mouse_sem, 1, B_CAN_INTERRUPT, 0);
 	TRACE("ps2: standard_mouse_read_event acquired\n");
 	if (status < B_OK)
@@ -165,14 +165,14 @@ standard_mouse_read_event(standard_mouse_cookie *cookie,
 		TRACE("ps2: standard_mouse_read_event: Error device no longer "
 			"active\n");
 		return B_ERROR;
-	}	
-	
+	}
+
 	if (packet_buffer_read(cookie->standard_mouse_buffer, packet,
 		cookie->dev->packet_size) != cookie->dev->packet_size) {
 		TRACE("ps2: error copying buffer\n");
 		return B_ERROR;
 	}
-	
+
 	if (!(packet[0] & 8))
 		panic("ps2: got broken data from packet_buffer_read\n");
 
@@ -199,15 +199,15 @@ standard_mouse_disconnect(ps2_dev *dev)
  */
 int32
 standard_mouse_handle_int(ps2_dev *dev)
-{	
+{
 	standard_mouse_cookie *cookie = (standard_mouse_cookie*)dev->cookie;
 	const uint8 data = dev->history[0].data;
-	
+
 	TRACE("ps2: standard mouse: %1x\t%1x\t%1x\t%1x\t%1x\t%1x\t%1x\t%1x\n",
-				data >> 7 & 1, data >> 6 & 1, data >> 5 & 1, 
-				data >> 4 & 1, data >> 3 & 1, data >> 2 & 1, 
+				data >> 7 & 1, data >> 6 & 1, data >> 5 & 1,
+				data >> 4 & 1, data >> 3 & 1, data >> 2 & 1,
 				data >> 1 & 1, data >> 0 & 1);
-				
+
 	if (cookie->packet_index == 0 && !(data & 8)) {
 		INFO("ps2: bad mouse data, trying resync\n");
 		return B_HANDLED_INTERRUPT;
@@ -248,7 +248,7 @@ standard_mouse_handle_int(ps2_dev *dev)
 	}
 
 	// complete packet is assembled
-	
+
 	cookie->packet_index = 0;
 	if (packet_buffer_write(cookie->standard_mouse_buffer,
 		cookie->packet_buffer, dev->packet_size) != dev->packet_size) {
@@ -269,7 +269,7 @@ probe_standard_mouse(ps2_dev * dev)
 {
 	status_t status;
 	uint8 deviceId = 0;
-	
+
 	// get device id
 	status = ps2_dev_command(dev, PS2_CMD_GET_DEVICE_ID, NULL, 0,
 		&deviceId, 1);
@@ -278,7 +278,7 @@ probe_standard_mouse(ps2_dev * dev)
 		return B_ERROR;
 	}
 
-	TRACE("ps2: probe_mouse device id: %2x\n", deviceId);		
+	TRACE("ps2: probe_mouse device id: %2x\n", deviceId);
 
 	// check for MS Intellimouse
 	if (deviceId == 0) {
@@ -307,7 +307,7 @@ probe_standard_mouse(ps2_dev * dev)
 		INFO("ps2: probe_mouse Error unknown device id.\n");
 		return B_ERROR;
 	}
-		
+
 	return B_OK;
 }
 
@@ -315,16 +315,16 @@ probe_standard_mouse(ps2_dev * dev)
 //	#pragma mark - Device functions
 
 
-status_t 
+status_t
 standard_mouse_open(const char *name, uint32 flags, void **_cookie)
 {
 	standard_mouse_cookie *cookie;
 	status_t status;
 	ps2_dev *dev = NULL;
 	int i;
-	
+
 	TRACE("ps2: standard_mouse_open %s\n", name);
-		
+
 	for (dev = NULL, i = 0; i < PS2_DEVICE_COUNT; i++) {
 		if (0 == strcmp(ps2_device[i].name, name)) {
 			dev = &ps2_device[i];
@@ -336,33 +336,33 @@ standard_mouse_open(const char *name, uint32 flags, void **_cookie)
 			break;
 		}*/
 	}
-	
+
 	if (dev == NULL) {
 		TRACE("ps2: dev = NULL\n");
 		return B_ERROR;
 	}
-	
+
 	if (atomic_or(&dev->flags, PS2_FLAG_OPEN) & PS2_FLAG_OPEN)
 		return B_BUSY;
-	
+
 	cookie = malloc(sizeof(standard_mouse_cookie));
 	if (cookie == NULL)
 		goto err1;
-		
+
 	*_cookie = cookie;
 	memset(cookie, 0, sizeof(*cookie));
-	
+
 	cookie->dev = dev;
 	dev->cookie = cookie;
 	dev->disconnect = &standard_mouse_disconnect;
 	dev->handle_int = &standard_mouse_handle_int;
-	
-	if (strstr(dev->name, "standard_mouse") != NULL)
+
+	if (strstr(dev->name, "standard") != NULL)
 		cookie->flags = F_MOUSE_TYPE_STANDARD;
 
-	if (strstr(dev->name, "intelli_mouse") != NULL)
+	if (strstr(dev->name, "intelli") != NULL)
 		cookie->flags = F_MOUSE_TYPE_INTELLIMOUSE;
-		
+
 	cookie->standard_mouse_buffer
 		= create_packet_buffer(MOUSE_HISTORY_SIZE * dev->packet_size);
 	if (cookie->standard_mouse_buffer == NULL) {
@@ -385,7 +385,7 @@ standard_mouse_open(const char *name, uint32 flags, void **_cookie)
 	}
 
 	atomic_or(&dev->flags, PS2_FLAG_ENABLED);
-	
+
 
 	TRACE("ps2: standard_mouse_open %s success\n", name);
 	return B_OK;
@@ -398,7 +398,7 @@ err2:
 	free(cookie);
 err1:
 	atomic_and(&dev->flags, ~PS2_FLAG_OPEN);
-	
+
 	TRACE("ps2: standard_mouse_open %s failed\n", name);
 	return B_ERROR;
 }
@@ -455,7 +455,7 @@ status_t
 standard_mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
 	standard_mouse_cookie *cookie = (standard_mouse_cookie*)_cookie;
-	
+
 	switch (op) {
 		case MS_NUM_EVENTS:
 		{
@@ -472,7 +472,7 @@ standard_mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 			TRACE("ps2: ioctl MS_READ\n");
 			if ((status = standard_mouse_read_event(cookie, &movement)) < B_OK)
 				return status;
-//			TRACE("%s %d %d %d %d\n", cookie->dev->name, 
+//			TRACE("%s %d %d %d %d\n", cookie->dev->name,
 //				movement.xdelta, movement.ydelta, movement.buttons,
 //				movement.clicks);
 			return user_memcpy(buffer, &movement, sizeof(movement));
