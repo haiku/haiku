@@ -6,11 +6,11 @@
 #include <asm_defs.h>
 
 
-.text
-
 /* saves the conversion factor needed for system_time */
-cv_factor:
-	.word 0
+.lcomm cv_factor 4
+
+
+.text
 
 FUNCTION(__x86_setup_system_time):
 	movl	4(%esp),%eax
