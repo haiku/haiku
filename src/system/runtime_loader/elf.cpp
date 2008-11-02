@@ -11,12 +11,12 @@
 
 #include "runtime_loader_private.h"
 
-#include <OS.h>
-
-#include <string.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <OS.h>
 
 #include <elf32.h>
 #include <runtime_loader.h>
@@ -83,6 +83,8 @@ static KMessage sErrorMessage;
 static bool sProgramLoaded = false;
 static const char *sSearchPathSubDir = NULL;
 static bool sInvalidImageIDs;
+static image_t **sPreloadedImages = NULL;
+static uint32 sPreloadedImageCount = 0;
 
 // a recursive lock
 static sem_id sSem;
@@ -1002,63 +1004,23 @@ find_symbol(image_t *image, const char *name, int32 type)
 
 
 static struct Elf32_Sym*
-find_symbol_recursively_impl(image_t* image, const char* name,
+find_symbol_in_root_image_list(image_t* rootImage, const char* name,
 	image_t** foundInImage)
 {
-	image->flags |= RFLAG_VISITED;
-
-	struct Elf32_Sym *symbol;
-
-	// look up the symbol in this image
-	if (image->dynamic_ptr) {
-		symbol = find_symbol(image, name, B_SYMBOL_TYPE_ANY);
-		if (symbol) {
-			*foundInImage = image;
-			return symbol;
-		}
-	}
-
-	// recursively search dependencies
-	for (uint32 i = 0; i < image->num_needed; i++) {
-		if (!(image->needed[i]->flags & RFLAG_VISITED)) {
-			symbol = find_symbol_recursively_impl(image->needed[i], name,
-				foundInImage);
-			if (symbol)
+	int32 count = rootImage->symbol_resolution_image_count;
+	image_t** images = rootImage->symbol_resolution_images;
+	for (int32 i = 0; i < count; i++) {
+		image_t* image = images[i];
+		if (image->dynamic_ptr) {
+			Elf32_Sym* symbol = find_symbol(image, name, B_SYMBOL_TYPE_ANY);
+			if (symbol) {
+				*foundInImage = image;
 				return symbol;
+			}
 		}
 	}
 
 	return NULL;
-}
-
-
-static void
-clear_image_flag_recursively(image_t* image, uint32 flag)
-{
-	image->flags &= ~flag;
-
-	for (uint32 i = 0; i < image->num_needed; i++) {
-		if (image->needed[i]->flags & flag)
-			clear_image_flag_recursively(image->needed[i], flag);
-	}
-}
-
-
-static struct Elf32_Sym*
-find_symbol_recursively(image_t* image, const char* name,
-	image_t** foundInImage)
-{
-	struct Elf32_Sym* symbol = find_symbol_recursively_impl(image, name,
-		foundInImage);
-	clear_image_flag_recursively(image, RFLAG_VISITED);
-	return symbol;
-}
-
-
-static struct Elf32_Sym*
-find_symbol_in_loaded_images(const char* name, image_t** foundInImage)
-{
-	return find_symbol_recursively(sLoadedImages.head, name, foundInImage);
 }
 
 
@@ -1068,23 +1030,8 @@ find_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
 {
 	// If not simulating BeOS style symbol resolution, undefined symbols are
 	// searched recursively starting from the root image.
-	// TODO: Breadth first might be better than the depth first strategy used
-	// here. We're also visiting images multiple times. Consider building a
-	// breadth-first sorted array of images for each root image.
-	if ((rootImage->flags & IMAGE_FLAG_R5_SYMBOL_RESOLUTION) == 0) {
-		Elf32_Sym* symbol = find_symbol_recursively(rootImage, name,
-			foundInImage);
-		if (symbol != NULL)
-			return symbol;
-
-		// If the root image is not the program image (i.e. it is a dynamically
-		// loaded add-on or library), we try the program image hierarchy too.
-		image_t* programImage = get_program_image();
-		if (rootImage != programImage)
-			return find_symbol_recursively(programImage, name, foundInImage);
-
-		return NULL;
-	}
+	if ((rootImage->flags & IMAGE_FLAG_R5_SYMBOL_RESOLUTION) == 0)
+		return find_symbol_in_root_image_list(rootImage, name, foundInImage);
 
 	// BeOS style symbol resolution: It is sufficient to check the direct
 	// dependencies. The linker would have complained, if the symbol wasn't
@@ -1561,6 +1508,36 @@ topological_sort(image_t *image, uint32 slot, image_t **initList,
 }
 
 
+static uint32
+topological_sort_breadth_first(image_t* image, image_t** list, uint32 sortFlag)
+{
+	if ((image->flags & sortFlag) != 0)
+		return 0;
+
+	// We directly use the result list as queue for the breadth first search.
+	list[0] = image;
+	image->flags |= sortFlag;
+
+	int32 index = 0;
+	int32 count = 1;
+
+	while (index < count) {
+		image = list[index++];
+
+		for (uint32 i = 0; i < image->num_needed; i++) {
+			image_t* neededImage = image->needed[i];
+			if ((neededImage->flags & sortFlag) == 0) {
+				// dependency not yet visited -- add to queue
+				list[count++] = neededImage;
+				neededImage->flags |= sortFlag;
+			}
+		}
+	}
+
+	return count;
+}
+
+
 static ssize_t
 get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
 {
@@ -1580,17 +1557,81 @@ get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
 }
 
 
+static ssize_t
+get_sorted_image_list_breadth_first(image_t* image, image_t*** _list,
+	uint32 sortFlag)
+{
+	image_t** list = (image_t**)malloc(sLoadedImageCount * sizeof(image_t*));
+	if (list == NULL) {
+		FATAL("memory shortage in get_sorted_image_list()");
+		*_list = NULL;
+		return B_NO_MEMORY;
+	}
+
+	memset(list, 0, sLoadedImageCount * sizeof(image_t *));
+
+	*_list = list;
+
+	return topological_sort_breadth_first(image, list, sortFlag);
+}
+
+
 static status_t
 relocate_dependencies(image_t *image)
 {
-	ssize_t count, i;
-	image_t **list;
+	// build an array of images in the order we want to lookup symbols
+	image_t** lookupList;
+	ssize_t lookupCount = get_sorted_image_list_breadth_first(image,
+		&lookupList, RFLAG_VISITED);
+	if (lookupCount < 0)
+		return lookupCount;
 
-	count = get_sorted_image_list(image, &list, RFLAG_RELOCATED);
+	// If the image is not the program image, add it and its dependencies, too.
+	if (sProgramImage != NULL && image != sProgramImage) {
+		lookupCount += topological_sort_breadth_first(sProgramImage,
+			lookupList + lookupCount, RFLAG_VISITED);
+	}
+
+	// If we have pre-loaded images, prepend them.
+	if (sPreloadedImageCount > 0) {
+		// Count the ones that have to be added -- normally all, but one never
+		// knows.
+		uint32 preloadedCount = 0;
+		for (uint32 i = 0; i < sPreloadedImageCount; i++) {
+			image_t* preloadedImage = sPreloadedImages[i];
+			if ((preloadedImage->flags & RFLAG_VISITED) == 0)
+				preloadedCount++;
+		}
+
+		// add them
+		if (preloadedCount > 0) {
+			memmove(lookupList + preloadedCount, lookupList,
+				lookupCount * sizeof(image_t*));
+			lookupCount += preloadedCount;
+
+			preloadedCount = 0;
+			for (uint32 i = 0; i < sPreloadedImageCount; i++) {
+				image_t* preloadedImage = sPreloadedImages[i];
+				if ((preloadedImage->flags & RFLAG_VISITED) == 0)
+					lookupList[preloadedCount++] = preloadedImage;
+			}
+		}
+	}
+
+	// clear the "visited" flag
+	for (int32 i = 0; i < lookupCount; i++)
+		lookupList[i]->flags &= ~RFLAG_VISITED;
+
+	image->symbol_resolution_images = lookupList;
+	image->symbol_resolution_image_count = lookupCount;
+
+	// get the images that still have to be relocated
+	image_t **list;
+	ssize_t count = get_sorted_image_list(image, &list, RFLAG_RELOCATED);
 	if (count < B_OK)
 		return count;
 
-	for (i = 0; i < count; i++) {
+	for (ssize_t i = 0; i < count; i++) {
 		status_t status = relocate_image(image, list[i]);
 		if (status < B_OK)
 			return status;
@@ -1652,6 +1693,124 @@ put_image(image_t *image)
 }
 
 
+void
+inject_runtime_loader_api(image_t* rootImage)
+{
+	// We patch any exported __gRuntimeLoader symbols to point to our private
+	// API.
+	image_t* image;
+	Elf32_Sym* symbol = find_symbol_in_root_image_list(rootImage,
+		"__gRuntimeLoader", &image);
+
+	if (symbol != NULL) {
+		void** _export = (void**)(symbol->st_value + image->regions[0].delta);
+		*_export = &gRuntimeLoader;
+	}
+}
+
+
+static status_t
+add_preloaded_image(image_t* image)
+{
+	// We realloc() everytime -- not particularly efficient, but good enough for
+	// small number of preloaded images.
+	image_t** newArray = (image_t**)realloc(sPreloadedImages,
+		sizeof(image_t*) * (sPreloadedImageCount + 1));
+	if (newArray == NULL)
+		return B_NO_MEMORY;
+
+	sPreloadedImages = newArray;
+	newArray[sPreloadedImageCount++] = image;
+
+	return B_OK;
+}
+
+
+image_id
+preload_image(char const* path)
+{
+	if (path == NULL)
+		return B_BAD_VALUE;
+
+	KTRACE("rld: preload_image(\"%s\")", path);
+
+	image_t *image = NULL;
+	status_t status = load_container(path, B_ADD_ON_IMAGE, NULL, &image);
+	if (status < B_OK) {
+		rld_unlock();
+		KTRACE("rld: preload_image(\"%s\") failed to load container: %s", path,
+			strerror(status));
+		return status;
+	}
+
+	for (image_t* otherImage = sLoadedImages.head; otherImage != NULL;
+			otherImage = otherImage->next) {
+		status = load_dependencies(otherImage);
+		if (status < B_OK)
+			goto err;
+	}
+
+	status = relocate_dependencies(image);
+	if (status < B_OK)
+		goto err;
+
+	status = add_preloaded_image(image);
+	if (status < B_OK)
+		goto err;
+
+	inject_runtime_loader_api(image);
+
+	remap_images();
+	init_dependencies(image, true);
+
+	KTRACE("rld: preload_image(\"%s\") done: id: %ld", path, image->id);
+
+	return image->id;
+
+err:
+	KTRACE("rld: preload_image(\"%s\") failed: %s", path, strerror(status));
+
+	dequeue_image(&sLoadedImages, image);
+	sLoadedImageCount--;
+	delete_image(image);
+	return status;
+}
+
+
+static void
+preload_images()
+{
+	const char* imagePaths = getenv("LD_PRELOAD");
+	if (imagePaths == NULL)
+		return;
+
+	while (*imagePaths != '\0') {
+		// find begin of image path
+		while (*imagePaths != '\0' && isspace(*imagePaths))
+			imagePaths++;
+
+		if (*imagePaths == '\0')
+			break;
+
+		// find end of image path
+		const char* imagePath = imagePaths;
+		while (*imagePaths != '\0' && !isspace(*imagePaths))
+			imagePaths++;
+
+		// extract the path
+		char path[B_PATH_NAME_LENGTH];
+		size_t pathLen = imagePaths - imagePath;
+		if (pathLen > sizeof(path) - 1)
+			continue;
+		memcpy(path, imagePath, pathLen);
+		path[pathLen] = '\0';
+
+		// load the image
+		preload_image(path);
+	}
+}
+
+
 //	#pragma mark - libroot.so exported functions
 
 
@@ -1665,6 +1824,8 @@ load_program(char const *path, void **_entry)
 
 	rld_lock();
 		// for now, just do stupid simple global locking
+
+	preload_images();
 
 	TRACE(("rld: load %s\n", path));
 
@@ -1682,25 +1843,17 @@ load_program(char const *path, void **_entry)
 	if (status < B_OK)
 		goto err;
 
-	// We patch any exported __gRuntimeLoader symbols to point to our private API
-	{
-		struct Elf32_Sym *symbol = find_symbol_in_loaded_images(
-			"__gRuntimeLoader", &image);
-		if (symbol != NULL) {
-			void **_export = (void **)(symbol->st_value + image->regions[0].delta);
-			*_export = &gRuntimeLoader;
-		}
-	}
+	inject_runtime_loader_api(sProgramImage);
 
-	init_dependencies(sLoadedImages.head, true);
 	remap_images();
-		// ToDo: once setup_system_time() is fixed, move this one line higher!
+	init_dependencies(sProgramImage, true);
 
 	// Since the images are initialized now, we no longer should use our
 	// getenv(), but use the one from libroot.so
 	{
-		struct Elf32_Sym *symbol = find_symbol_in_loaded_images("getenv",
-			&image);
+		struct Elf32_Sym *symbol = find_symbol_in_root_image_list(sProgramImage,
+			"getenv", &image);
+
 		if (symbol != NULL)
 			gGetEnv = (char* (*)(const char*))
 				(symbol->st_value + image->regions[0].delta);

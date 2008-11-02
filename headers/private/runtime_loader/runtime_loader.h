@@ -65,6 +65,11 @@ typedef struct image_t {
 	uint32				num_needed;
 	struct image_t		**needed;
 
+	// For "root" images (the program, add-ons): Symbols are searched in the
+	// images in array order.
+	uint32				symbol_resolution_image_count;
+	struct image_t		**symbol_resolution_images;
+
 	// describes the text and data regions
 	uint32				num_regions;
 	elf_region_t		regions[1];
