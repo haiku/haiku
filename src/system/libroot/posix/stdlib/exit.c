@@ -15,8 +15,8 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#include <runtime_loader.h>
 #include <syscalls.h>
-#include <user_runtime.h>
 
 
 extern void _IO_cleanup(void);

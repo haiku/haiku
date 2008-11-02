@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix stdlib ;
 
-UsePrivateHeaders drivers libroot ;
+UsePrivateHeaders drivers libroot runtime_loader ;
 UsePrivateSystemHeaders ;
 
 MergeObject posix_stdlib.o :

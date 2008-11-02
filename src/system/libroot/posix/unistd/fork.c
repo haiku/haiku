@@ -11,8 +11,8 @@
 #include <errno.h>
 
 #include <libroot_private.h>
+#include <runtime_loader.h>
 #include <syscalls.h>
-#include <user_runtime.h>
 
 
 typedef struct fork_hook {

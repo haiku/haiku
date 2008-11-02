@@ -1,13 +1,13 @@
 SubDir HAIKU_TOP src system libroot ;
 
-UsePrivateHeaders libroot ;
+UsePrivateHeaders libroot runtime_loader ;
 UsePrivateSystemHeaders ;
 
 UnarchiveObjects $(TARGET_GCC_LIBGCC_OBJECTS) : $(TARGET_GCC_LIBGCC) ;
 	# we need to link against libgcc.a objects and make
 	# it available to other applications as in BeOS
 
-local librootObjects = 
+local librootObjects =
 	os_main.o
 	os_arch_$(TARGET_ARCH).o
 

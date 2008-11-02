@@ -8,10 +8,12 @@
 
 
 #include <libroot_private.h>
-#include <user_runtime.h>
 
 #include <dlfcn.h>
 #include <string.h>
+
+#include <runtime_loader.h>
+#include <user_runtime.h>
 
 
 static status_t sStatus;

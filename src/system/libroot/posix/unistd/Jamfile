@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix unistd ;
 
 UsePrivateSystemHeaders ;
-UsePrivateHeaders libroot ;
+UsePrivateHeaders libroot runtime_loader ;
 
 MergeObject posix_unistd.o :
 	access.c

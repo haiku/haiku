@@ -13,6 +13,7 @@
 
 #include <libroot_lock.h>
 #include <libroot_private.h>
+#include <runtime_loader.h>
 #include <user_runtime.h>
 
 

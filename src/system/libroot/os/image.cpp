@@ -5,8 +5,9 @@
 
 
 #include <libroot_private.h>
-#include <user_runtime.h>
+#include <runtime_loader.h>
 #include <syscalls.h>
+#include <user_runtime.h>
 
 #include <OS.h>
 #include <image.h>

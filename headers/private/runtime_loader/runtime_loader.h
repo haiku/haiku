@@ -15,6 +15,39 @@
 
 #include <elf32.h>
 
+
+// #pragma mark - runtime loader libroot interface
+
+
+struct user_space_program_args;
+
+struct rld_export {
+	// runtime loader API export
+	image_id (*load_add_on)(char const *path, uint32 flags);
+	status_t (*unload_add_on)(image_id imageID);
+	status_t (*get_image_symbol)(image_id imageID, char const *symbolName,
+		int32 symbolType, void **_location);
+	status_t (*get_nth_image_symbol)(image_id imageID, int32 num, char *symbolName,
+		int32 *nameLength, int32 *symbolType, void **_location);
+	status_t (*test_executable)(const char *path, char *interpreter);
+	status_t (*get_next_image_dependency)(image_id id, uint32 *cookie,
+		const char **_name);
+
+	status_t (*reinit_after_fork)();
+
+	void (*call_atexit_hooks_for_range)(addr_t start, addr_t size);
+
+	void (*call_termination_hooks)();
+
+	const struct user_space_program_args *program_args;
+};
+
+extern struct rld_export *__gRuntimeLoader;
+
+
+// #pragma mark - runtime loader debugger interface
+
+
 typedef struct elf_region_t {
 	area_id		id;
 	addr_t		start;

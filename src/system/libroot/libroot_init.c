@@ -3,13 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <string.h>
 
-#include <libroot_private.h>
-#include <user_runtime.h>
 #include <fork.h>
 #include <image.h>
-
-#include <string.h>
+#include <libroot_private.h>
+#include <runtime_loader.h>
+#include <user_runtime.h>
 
 
 void initialize_before(image_id imageID);

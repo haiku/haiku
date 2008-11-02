@@ -4,7 +4,7 @@ UsePrivateHeaders app shared [ FDirName syslog_daemon ] ;
 UsePrivateSystemHeaders ;
 UsePrivateHeaders kernel ;
 	# For util/KMessage.h
-UsePrivateHeaders libroot ;
+UsePrivateHeaders libroot runtime_loader ;
 
 if $(HAIKU_MULTIUSER_QUERY) = 1 {
 	PWD_BACKEND = pwd_query.c ;
