@@ -41,6 +41,8 @@ class BTitledColumn : public BColumn
 		void				Title				(BString* forTitle) const; // sets the BString arg to be the title
 		float				FontHeight			() const;
 
+		virtual float		GetPreferredWidth(BField* field, BView* parent) const;
+
 	private:
 		float				fFontHeight;
 		BString				fTitle;
