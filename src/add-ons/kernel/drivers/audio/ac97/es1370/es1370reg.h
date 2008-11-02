@@ -118,16 +118,49 @@
 #define STAT_DAC2       0x00000002	/* DAC2 int pending */
 #define STAT_ADC        0x00000001	/* ADC int pending */
 
-#define CODEC_OMIX1	0x10
-#define CODEC_OMIX2	0x11
-#define CODEC_LIMIX1	0x12
-#define CODEC_RIMIX1	0x13
-#define CODEC_LIMIX2	0x14
-#define CODEC_RIMIX2	0x15
-#define CODEC_RES_PD	0x16
-#define CODEC_CSEL	0x17
-#define CODEC_ADSEL	0x18
-#define CODEC_MGAIN	0x19
+/* AKM AK4531 CODEC Control Register Map */
+
+#define CODEC_MASTER_VOL_L	0x00
+#define CODEC_MASTER_VOL_R	0x01
+#define CODEC_VOICE_VOL_L	0x02
+#define CODEC_VOICE_VOL_R	0x03
+#define CODEC_FM_VOL_L		0x04
+#define CODEC_FM_VOL_R		0x05
+#define CODEC_CD_VOL_L		0x06
+#define CODEC_CD_VOL_R		0x07
+#define CODEC_LINE_VOL_L	0x08
+#define CODEC_LINE_VOL_R	0x09
+#define CODEC_AUX_VOL_L		0x0A
+#define CODEC_AUX_VOL_R		0x0B
+#define CODEC_MONO1_VOL		0x0C
+#define CODEC_MONO2_VOL		0x0D
+#define CODEC_MIC_VOL		0x0E
+#define CODEC_MONO_OUT_VOL	0x0F
+#define CODEC_OUTPUT_MIX1	0x10
+#define CODEC_OUTPUT_MIX2	0x11
+#define CODEC_L_INPUT_MIX1	0x12
+#define CODEC_R_INPUT_MIX1	0x13
+#define CODEC_L_INPUT_MIX2	0x14
+#define CODEC_R_INPUT_MIX2	0x15
+#define CODEC_RESET_PWRDWN	0x16
+#define CODEC_CLOCK_SEL		0x17
+#define CODEC_AD_INPUT_SEL	0x18
+#define CODEC_MIC_AMP_GAIN	0x19
+
+/* output mixer mute bit positions */
+#define ES1370_OUTPUT_MIX1_FML		(1<<6)
+#define ES1370_OUTPUT_MIX1_FMR		(1<<5)
+#define ES1370_OUTPUT_MIX1_LINEL	(1<<4)
+#define ES1370_OUTPUT_MIX1_LINER	(1<<3)
+#define ES1370_OUTPUT_MIX1_CDL		(1<<2)
+#define ES1370_OUTPUT_MIX1_CDR		(1<<1)
+#define ES1370_OUTPUT_MIX1_MIC		(1<<0)
+#define ES1370_OUTPUT_MIX2_AUXL		(1<<5)
+#define ES1370_OUTPUT_MIX2_AUXR		(1<<4)
+#define ES1370_OUTPUT_MIX2_VOICEL	(1<<3)
+#define ES1370_OUTPUT_MIX2_VOICER	(1<<2)
+#define ES1370_OUTPUT_MIX2_MONO2	(1<<1)
+#define ES1370_OUTPUT_MIX2_MONO1	(1<<0)
 
 /* ES1371 specific */
 

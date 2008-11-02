@@ -463,14 +463,22 @@ es1370_setup(es1370_dev * card)
 	
 	/* reset the codec */	
 	PRINT(("codec reset\n"));
-	es1370_codec_write(&card->config, CODEC_RES_PD, 0x2);
-	es1370_codec_write(&card->config, CODEC_RES_PD, 0x3);
-	es1370_codec_write(&card->config, CODEC_CSEL, 0x0);
+	es1370_codec_write(&card->config, CODEC_RESET_PWRDWN, 0x2);
+	snooze (20);
+	es1370_codec_write(&card->config, CODEC_RESET_PWRDWN, 0x3);
+	snooze (20);
+	es1370_codec_write(&card->config, CODEC_CLOCK_SEL, 0x0);
 
-	es1370_codec_write(&card->config, 0x0, 0x0);
-	es1370_codec_write(&card->config, 0x1, 0x0);
-	es1370_codec_write(&card->config, 0x2, 0x0);
-	es1370_codec_write(&card->config, 0x3, 0x0);
+	/* set max volume on master and mixer outputs */
+	es1370_codec_write(&card->config, CODEC_MASTER_VOL_L, 0x0);
+	es1370_codec_write(&card->config, CODEC_MASTER_VOL_R, 0x0);
+	es1370_codec_write(&card->config, CODEC_VOICE_VOL_L, 0x0);
+	es1370_codec_write(&card->config, CODEC_VOICE_VOL_R, 0x0);
+
+	/* unmute CD playback */
+	es1370_codec_write(&card->config, CODEC_OUTPUT_MIX1, ES1370_OUTPUT_MIX1_CDL | ES1370_OUTPUT_MIX1_CDR);
+	/* unmute mixer output */
+	es1370_codec_write(&card->config, CODEC_OUTPUT_MIX2, ES1370_OUTPUT_MIX2_VOICEL | ES1370_OUTPUT_MIX2_VOICER);
 
 	snooze(50000); // 50 ms
 
