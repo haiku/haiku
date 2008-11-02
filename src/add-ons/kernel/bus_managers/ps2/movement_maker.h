@@ -11,20 +11,19 @@ float ceilf(float x);
 float sqrtf(float x);
 int32 make_small(float value);
 
-typedef struct
-{
+typedef struct {
 	int32			xDelta;
 	int32			yDelta;
-	
+
 	int8			acceleration;
 	int8			speed;
-	
+
 	float			scrolling_x;
 	float			scrolling_y;
 	int32			scrolling_xStep;
 	int32			scrolling_yStep;
 	int32			scroll_acceleration;
-	
+
 	uint8			n_points;
 	float			historyX[HISTORY_SIZE];
 	float			historyY[HISTORY_SIZE];

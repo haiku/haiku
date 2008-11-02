@@ -31,7 +31,8 @@ struct packet_buffer {
 struct packet_buffer *
 create_packet_buffer(size_t size)
 {
-	struct packet_buffer *buffer = (packet_buffer *)malloc(sizeof(packet_buffer));
+	struct packet_buffer *buffer
+		= (packet_buffer *)malloc(sizeof(packet_buffer));
 	if (buffer == NULL)
 		return NULL;
 
@@ -126,7 +127,8 @@ packet_buffer_read(struct packet_buffer *buffer, uint8 *data, size_t length)
 
 
 size_t
-packet_buffer_write(struct packet_buffer *buffer, const uint8 *data, size_t length)
+packet_buffer_write(struct packet_buffer *buffer, const uint8 *data,
+	size_t length)
 {
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&buffer->lock);

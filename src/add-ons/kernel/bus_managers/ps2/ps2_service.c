@@ -42,10 +42,10 @@ ps2_service_notify_device_added(ps2_dev *dev)
 	ps2_service_cmd cmd;
 
 	TRACE("ps2: ps2_service_notify_device_added %s\n", dev->name);
-	
+
 	cmd.id = PS2_SERVICE_NOTIFY_DEVICE_ADDED;
 	cmd.dev = dev;
-	
+
 	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
 	release_sem_etc(sServiceSem, 1, B_DO_NOT_RESCHEDULE);
 
@@ -59,10 +59,10 @@ ps2_service_notify_device_republish(ps2_dev *dev)
 	ps2_service_cmd cmd;
 
 	TRACE("ps2: ps2_service_notify_device_republish %s\n", dev->name);
-	
+
 	cmd.id = PS2_SERVICE_NOTIFY_DEVICE_REPUBLISH;
 	cmd.dev = dev;
-	
+
 	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
 	release_sem_etc(sServiceSem, 1, B_DO_NOT_RESCHEDULE);
 
@@ -79,7 +79,7 @@ ps2_service_notify_device_removed(ps2_dev *dev)
 
 	cmd.id = PS2_SERVICE_NOTIFY_DEVICE_REMOVED;
 	cmd.dev = dev;
-	
+
 	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
 	release_sem_etc(sServiceSem, 1, B_DO_NOT_RESCHEDULE);
 
@@ -115,7 +115,7 @@ ps2_service_thread(void *arg)
 					snooze(2500000);
 					ps2_dev_publish(cmd.dev);
 					break;
-					
+
 				case PS2_SERVICE_NOTIFY_DEVICE_REMOVED:
 					TRACE("ps2: PS2_SERVICE_NOTIFY_DEVICE_REMOVED %s\n", cmd.dev->name);
 					ps2_dev_unpublish(cmd.dev);
@@ -139,7 +139,7 @@ static int
 ps2_republish(int argc, char **argv)
 {
 	int dev = 4;
-	if (argc == 2) 
+	if (argc == 2)
 		dev = strtoul(argv[1], NULL, 0);
 	if (dev < 0 || dev > 4)
 		dev = 4;
@@ -171,7 +171,7 @@ ps2_service_init(void)
 
 	TRACE("ps2: ps2_service_init done\n");
 	return B_OK;
-	
+
 err3:
 	delete_sem(sServiceSem);
 err2:

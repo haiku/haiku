@@ -60,7 +60,7 @@ static status_t
 set_typematic(int32 rate, bigtime_t delay)
 {
 	uint8 value;
-	
+
 	TRACE("ps2: set_typematic rate %ld, delay %Ld\n", rate, delay);
 
 	// input server and keyboard preferences *seem* to use a range of 20-300
@@ -68,22 +68,22 @@ set_typematic(int32 rate, bigtime_t delay)
 		rate = 20;
 	if (rate > 300)
 		rate = 300;
-		
+
 	// map this into range 0-31
 	rate = ((rate - 20) * 31) / (300 - 20);
 
 	// keyboard uses 0 == fast, 31 == slow
 	value = 31 - rate;
-	
+
 	if (delay >= 875000)
 		value |= 3 << 5;
 	else if (delay >= 625000)
 		value |= 2 << 5;
 	else if (delay >= 375000)
 		value |= 1 << 5;
-	else 
+	else
 		value |= 0 << 5;
-		
+
 	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_KEYBOARD_SET_TYPEMATIC, &value, 1, NULL, 0);
 }
 
@@ -103,13 +103,13 @@ keyboard_handle_int(ps2_dev *dev)
 		sIsExtended = true;
 //		TRACE("Extended key\n");
 		return B_HANDLED_INTERRUPT;
-	} 
+	}
 
 //	TRACE("scancode: %x\n", scancode);
 
 	if (scancode & 0x80) {
 		keyInfo.is_keydown = false;
-		scancode &= 0x7f;	
+		scancode &= 0x7f;
 	} else
 		keyInfo.is_keydown = true;
 
@@ -143,7 +143,7 @@ read_keyboard_packet(at_kbd_io *packet)
 	status = acquire_sem_etc(sKeyboardSem, 1, B_CAN_INTERRUPT, 0);
 	if (status < B_OK)
 		return status;
-		
+
 	if (!ps2_device[PS2_DEVICE_KEYB].active) {
 		TRACE("ps2: read_keyboard_packet, Error device no longer active\n");
 		return B_ERROR;
@@ -219,7 +219,7 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 
 	if (atomic_or(&sKeyboardOpenMask, 1) != 0)
 		return B_BUSY;
-		
+
 	status = probe_keyboard();
 	if (status != B_OK) {
 		INFO("ps2: keyboard probing failed\n");
@@ -269,7 +269,7 @@ keyboard_close(void *cookie)
 	delete_sem(sKeyboardSem);
 
 	atomic_and(&ps2_device[PS2_DEVICE_KEYB].flags, ~PS2_FLAG_ENABLED);
-	
+
 	atomic_and(&sKeyboardOpenMask, 0);
 
 	TRACE("ps2: keyboard_close done\n");
@@ -338,7 +338,7 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			// 0xF8 (Set All Keys Make/Break) - Keyboard responds with "ack" (0xFA).
 			return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xf8, NULL, 0, NULL, 0);
 		}
-		
+
 		case KB_SET_KEY_REPEAT_RATE:
 		{
 			int32 key_repeat_rate;
@@ -350,7 +350,7 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			sKeyboardRepeatRate = key_repeat_rate;
 			return B_OK;
 		}
-		
+
 		case KB_GET_KEY_REPEAT_RATE:
 		{
 			TRACE("ps2: ioctl KB_GET_KEY_REPEAT_RATE\n");
@@ -367,7 +367,7 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				return B_ERROR;
 			sKeyboardRepeatDelay = key_repeat_delay;
 			return B_OK;
-				
+
 		}
 
 		case KB_GET_KEY_REPEAT_DELAY:

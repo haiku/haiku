@@ -28,7 +28,7 @@
 typedef struct
 {
 	ps2_dev *		dev;
-	
+
 	sem_id			standard_mouse_sem;
 	packet_buffer *	standard_mouse_buffer;
 	bigtime_t		click_last_time;
@@ -49,11 +49,11 @@ status_t standard_mouse_close(void *_cookie);
 status_t standard_mouse_freecookie(void *_cookie);
 status_t standard_mouse_ioctl(void *_cookie, uint32 op, void *buffer,
 	size_t length);
-	
+
 int32 standard_mouse_handle_int(ps2_dev *dev);
 void standard_mouse_disconnect(ps2_dev *dev);
 
-device_hooks gStandardMouseDeviceHooks; 
+device_hooks gStandardMouseDeviceHooks;
 
 
 #endif /* __PS2_STANDARD_MOUSE_H */

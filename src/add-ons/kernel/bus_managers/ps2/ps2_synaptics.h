@@ -11,7 +11,7 @@
 
 #define SYN_TOUCHPAD			0x47
 // Synaptics modes
-#define SYN_ABSOLUTE_MODE		0x80 
+#define SYN_ABSOLUTE_MODE		0x80
 // Absolute plus w mode
 #define SYN_ABSOLUTE_W_MODE		0x81
 #define SYN_FOUR_BYTE_CHILD		(1 << 1)
@@ -25,7 +25,7 @@
 // synaptics touchpad proportions
 #define SYN_EDGE_MOTION_WIDTH	50
 #define SYN_EDGE_MOTION_SPEED	5
-#define SYN_AREA_OFFSET			40	// increase the touchpad size a little bit 
+#define SYN_AREA_OFFSET			40	// increase the touchpad size a little bit
 #define SYN_AREA_START_X		(1472 - SYN_AREA_OFFSET)
 #define SYN_AREA_END_X			(5472 + SYN_AREA_OFFSET)
 #define SYN_AREA_WIDTH_X		(SYN_AREA_END_X - SYN_AREA_START_X)
@@ -48,14 +48,14 @@
 typedef struct {
 	uint8 majorVersion;
 	uint8 minorVersion;
-	
+
 	bool capExtended;
 	bool capSleep;
 	bool capFourButtons;
 	bool capMultiFinger;
 	bool capPalmDetection;
 	bool capPassThrough;
-	
+
 } touchpad_info;
 
 
@@ -68,20 +68,20 @@ typedef struct {
 	bool		finger;
 	bool		gesture;
 	// absolut w mode
-	uint8		wValue;	
+	uint8		wValue;
 } touch_event;
 
 
 typedef struct
 {
 	ps2_dev *			dev;
-	
+
 	sem_id				synaptics_sem;
 	packet_buffer 	*	synaptics_ring_buffer;
 	size_t				packet_index;
 	uint8				packet_buffer[PS2_PACKET_SYNAPTICS];
 	uint8				mode;
-	
+
 	movement_maker		movement_maker;
 	bool				movement_started;
 	bool				scrolling_started;
@@ -93,7 +93,7 @@ typedef struct
 	bool				tapdrag_started;
 	bool				valid_edge_motion;
 	bool				double_click;
-	
+
 	touchpad_settings	settings;
 } synaptics_cookie;
 
@@ -119,7 +119,7 @@ status_t synaptics_open(const char *name, uint32 flags, void **_cookie);
 status_t synaptics_close(void *_cookie);
 status_t synaptics_freecookie(void *_cookie);
 status_t synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length);
-	
+
 int32 synaptics_handle_int(ps2_dev *dev);
 void synaptics_disconnect(ps2_dev *dev);
 

@@ -19,14 +19,14 @@ probe_trackpoint(ps2_dev* dev)
 
 	TRACE("TRACKPOINT: probe\n");
 	ps2_dev_command(dev, 0xE1, NULL, 0, val, 2);
-	
+
 	if (val[0] != 0x01) {
 		TRACE("TRACKPOINT: not found\n");
 		return B_ERROR;
 	}
 	dev->name = kTrackpointPath[dev->idx];
 	dev->packet_size = 3;
-	TRACE("TRACKPOINT: version 0x%x found\n", val[1]);	
-		
+	TRACE("TRACKPOINT: version 0x%x found\n", val[1]);
+
 	return B_OK;
 }

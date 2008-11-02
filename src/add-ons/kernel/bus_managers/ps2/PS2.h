@@ -20,8 +20,8 @@ extern "C" {
 typedef struct {
 	bus_manager_info	binfo;
 
-	int32 (*function1)(); 
-	int32 (*function2)(); 
+	int32 (*function1)();
+	int32 (*function2)();
 
 } ps2_module_info;
 

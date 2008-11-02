@@ -35,7 +35,7 @@ struct ps2_dev {
 	data_history	history[2];
 	ps2_dev *		parent_dev;
 	size_t			packet_size;
-	
+
 // functions
 	void          (*disconnect)(ps2_dev *);
 	int32		  (*handle_int)(ps2_dev *);

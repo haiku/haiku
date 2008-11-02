@@ -34,31 +34,31 @@ std_ops(int32 op, ...)
 		case B_MODULE_INIT:
 			return ps2_init();
 
-		case B_MODULE_UNINIT: 
+		case B_MODULE_UNINIT:
 			ps2_uninit();
-			break; 
-		default: 
+			break;
+		default:
 			return B_ERROR;
 	}
-	return B_OK; 
+	return B_OK;
 }
 
 
 static ps2_module_info ps2_module = {
 	.binfo = {
-		.minfo = { 
+		.minfo = {
 			.name    = B_PS2_MODULE_NAME,
 			.flags   = B_KEEP_LOADED,
 			.std_ops = std_ops,
 		},
 		.rescan = NULL,
 	},
-	&function1, 
-	&function2, 
+	&function1,
+	&function2,
 };
 
 
-module_info *modules[] = { 
-	(module_info *)&ps2_module, 
+module_info *modules[] = {
+	(module_info *)&ps2_module,
 	NULL
 };
