@@ -255,9 +255,9 @@ get_movement(movement_maker *move, uint32 posX, uint32 posY)
 {
 	get_raw_movement(move, posX, posY);
 
-	INFO("SYN: pos: %lu x %lu, delta: %ld x %ld, sums: %ld x %ld\n",
-		posX, posY, move->xDelta, move->yDelta,
-		move->deltaSumX, move->deltaSumY);
+//	INFO("SYN: pos: %lu x %lu, delta: %ld x %ld, sums: %ld x %ld\n",
+//		posX, posY, move->xDelta, move->yDelta,
+//		move->deltaSumX, move->deltaSumY);
 
 	move->xDelta = move->xDelta * move->speed;
 	move->yDelta = move->yDelta * move->speed;
