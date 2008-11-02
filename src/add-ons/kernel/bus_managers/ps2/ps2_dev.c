@@ -102,7 +102,7 @@ ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
 	// probe devices
 	// the probe function has to set the dev name and the dev packet size
 
-#if 1
+#if 0
 	status = probe_trackpoint(dev);
 	if (status == B_OK) {
 		*hooks = &gStandardMouseDeviceHooks;

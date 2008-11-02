@@ -421,14 +421,14 @@ get_synaptics_movment(synaptics_cookie* cookie, mouse_movement *movement)
  	event.yPosition = event_buffer[5];
 
  	val32 = event_buffer[1] & 0x0F;
- 	event.xPosition+= val32 << 8;
+ 	event.xPosition += val32 << 8;
  	val32 = event_buffer[1] >> 4 & 0x0F;
- 	event.yPosition+= val32 << 8;
+ 	event.yPosition += val32 << 8;
 
  	xTwelfBit = event_buffer[3] >> 4 & 1;
- 	event.xPosition+= xTwelfBit << 12;
+ 	event.xPosition += xTwelfBit << 12;
  	yTwelfBit = event_buffer[3] >> 5 & 1;
- 	event.yPosition+= yTwelfBit << 12;
+ 	event.yPosition += yTwelfBit << 12;
 
  	status = touchevent_to_movement(cookie, &event, movement);
 
