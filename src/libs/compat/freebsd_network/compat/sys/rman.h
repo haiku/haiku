@@ -7,6 +7,7 @@
 
 
 #include <sys/bus.h>
+#include <machine/resource.h>
 
 
 #define RF_ACTIVE		0x0002

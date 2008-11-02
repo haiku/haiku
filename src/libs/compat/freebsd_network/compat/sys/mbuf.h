@@ -114,6 +114,7 @@ void m_move_pkthdr(struct mbuf *, struct mbuf *);
 u_int m_length(struct mbuf *m, struct mbuf **last);
 u_int m_fixhdr(struct mbuf *m);
 void m_cat(struct mbuf *m, struct mbuf *n);
+struct mbuf *m_collapse(struct mbuf *m, int how, int maxfrags);
 void m_copydata(const struct mbuf *m, int off, int len, caddr_t cp);
 
 struct ifnet;
