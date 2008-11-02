@@ -4,8 +4,6 @@
 #include <OS.h>
 
 
-#define HISTORY_SIZE 1
-
 float floorf(float x);
 float ceilf(float x);
 float sqrtf(float x);
@@ -24,9 +22,11 @@ typedef struct {
 	int32			scrolling_yStep;
 	int32			scroll_acceleration;
 
-	uint8			n_points;
-	float			historyX[HISTORY_SIZE];
-	float			historyY[HISTORY_SIZE];
+	bool			movementStarted;
+	uint32			previousX;
+	uint32			previousY;
+	int32			deltaSumX;
+	int32			deltaSumY;
 } movement_maker;
 
 

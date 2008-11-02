@@ -176,43 +176,62 @@ make_small(float value)
 void
 get_raw_movement(movement_maker *move, uint32 posX, uint32 posY)
 {
-	int16 i;
-	float meanXOld = 0, meanYOld = 0;
-	float meanX = 0, meanY = 0;
+	int diff;
+	float xDelta, yDelta;
+	const float acceleration = 0.7;
 
-	// calculate mean
-	for (i = 0; i < move->n_points; i++) {
-		meanXOld += move->historyX[i];
-		meanYOld += move->historyY[i];
-	}
-	if (move->n_points == 0) {
-		meanXOld = posX;
-		meanYOld = posY;
-	} else {
-		meanXOld = meanXOld / move->n_points;
-		meanYOld = meanYOld / move->n_points;
+	if (move->movementStarted) {
+		move->movementStarted = false;
+		// init delta tracking
+		move->previousX = posX;
+		move->previousY = posY;
+		// deltas are automatically reset
 	}
 
-	meanX = (meanXOld + posX) / 2;
-	meanY = (meanYOld + posY) / 2;
+	// accumulate delta and store current pos, reset if pos did not change
+	diff = posX - move->previousX;
+	// lessen the effect of small diffs
+	if ((diff > -3 && diff < -1) || (diff > 1 && diff < 3))
+		diff /= 2;
+	if (diff == 0)
+		move->deltaSumX = 0.0;
+	else
+		move->deltaSumX += diff;
 
-	// fill history
-	for (i = 0; i < HISTORY_SIZE - 1; i++) {
-		move->historyX[i] = move->historyX[i + 1];
-		move->historyY[i] = move->historyY[i + 1];
+	diff = posY - move->previousY;
+	// lessen the effect of small diffs
+	if ((diff > -3 && diff < -1) || (diff > 1 && diff < 3))
+		diff /= 2;
+	if (diff == 0)
+		move->deltaSumY = 0.0;
+	else
+		move->deltaSumY += diff;
+
+	move->previousX = posX;
+	move->previousY = posY;
+
+	// compute current delta and reset accumulated delta if
+	// abs() is greater than 1
+	xDelta = move->deltaSumX / 10.0;
+	yDelta = move->deltaSumY / 10.0;
+	if (xDelta > 1.0) {
+		move->deltaSumX = 0.0;
+		xDelta = 1.0 + (xDelta - 1.0) * acceleration;
+	} else if (xDelta < -1.0) {
+		move->deltaSumX = 0.0;
+		xDelta = -1.0 + (xDelta + 1.0) * acceleration;
 	}
-	move->historyX[HISTORY_SIZE - 1] = meanX;
-	move->historyY[HISTORY_SIZE - 1] = meanY;
 
-	if (move->n_points < HISTORY_SIZE) {
-		move->n_points++;
-		move->xDelta = 0;
-		move->yDelta = 0;
-		return;
+	if (yDelta > 1.0) {
+		move->deltaSumY = 0.0;
+		yDelta = 1.0 + (yDelta - 1.0) * acceleration;
+	} else if (yDelta < -1.0) {
+		move->deltaSumY = 0.0;
+		yDelta = -1.0 + (yDelta + 1.0) * acceleration;
 	}
 
-	move->xDelta = make_small((meanX - meanXOld) / 16);
-	move->yDelta = make_small((meanY - meanYOld) / 16);
+	move->xDelta = make_small(xDelta);
+	move->yDelta = make_small(yDelta);
 }
 
 
@@ -235,6 +254,11 @@ void
 get_movement(movement_maker *move, uint32 posX, uint32 posY)
 {
 	get_raw_movement(move, posX, posY);
+
+	INFO("SYN: pos: %lu x %lu, delta: %ld x %ld, sums: %ld x %ld\n",
+		posX, posY, move->xDelta, move->yDelta,
+		move->deltaSumX, move->deltaSumY);
+
 	move->xDelta = move->xDelta * move->speed;
 	move->yDelta = move->yDelta * move->speed;
 }
@@ -248,8 +272,8 @@ get_scrolling(movement_maker *move, uint32 posX, uint32 posY)
 	get_raw_movement(move, posX, posY);
 	compute_acceleration(move, move->scroll_acceleration);
 
-	move->scrolling_x+= move->xDelta;
-	move->scrolling_y+= move->yDelta;
+	move->scrolling_x += move->xDelta;
+	move->scrolling_y += move->yDelta;
 
 	stepsX = make_small(move->scrolling_x / move->scrolling_xStep);
 	stepsY = make_small(move->scrolling_y / move->scrolling_yStep);
@@ -270,7 +294,7 @@ start_new_movment(movement_maker *move)
 	if (move->scrolling_yStep <= 0)
 		move->scrolling_yStep = 1;
 
-	move->n_points = 0;
+	move->movementStarted = true;
 	move->scrolling_x = 0;
 	move->scrolling_y = 0;
 }
