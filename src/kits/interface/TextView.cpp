@@ -3485,7 +3485,7 @@ BTextView::_Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 	
 	// if the line breaks have changed, force an erase
 	if (fromLine != saveFromLine || toLine != saveToLine
-			|| newHeight != saveHeight ) {
+			|| newHeight != saveHeight) {
 		erase = true;
 		fromOffset = -1;	
 	}
@@ -3566,7 +3566,7 @@ BTextView::_RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 		int32 nextOffset = _NextInitialByte(fromOffset);
 		if (toOffset < nextOffset && fromOffset < textLength)
 			toOffset = nextOffset;
-		
+
 		// set the ascent of this line
 		curLine->ascent = ascent;
 		
@@ -3767,6 +3767,7 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 
 		offset += delta;
 		delta = 0;
+
 	} while (offset < limit && !done);
 
 	if (offset - fromOffset < 1) {
@@ -3777,7 +3778,7 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 		strWidth = 0.0;
 
 		int32 current = fromOffset;
-		for (offset = fromOffset; offset <= limit; current = offset,
+		for (offset = fromOffset; offset < limit; current = offset,
 				offset = _NextInitialByte(offset)) {
 			strWidth += _StyledWidth(current, offset - current, &ascent,
 				&descent);
