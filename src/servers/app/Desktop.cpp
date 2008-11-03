@@ -760,7 +760,8 @@ Desktop::SetLastMouseState(const BPoint& position, int32 buttons,
 
 	if (fLastMouseButtons == 0 && fLockedFocusWindow) {
 		fLockedFocusWindow = NULL;
-		SetFocusWindow(windowUnderMouse);
+		if (fSettings->FocusFollowsMouse())
+			SetFocusWindow(windowUnderMouse);
 	}
 }
 
