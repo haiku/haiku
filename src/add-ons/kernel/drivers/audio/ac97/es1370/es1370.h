@@ -111,6 +111,7 @@ typedef struct _es1370_dev {
 	multi_dev	multi;
 } es1370_dev;
 
+#define ES1370_SETTINGS "es1370.settings"
 
 typedef struct {
 	uint32	sample_rate;

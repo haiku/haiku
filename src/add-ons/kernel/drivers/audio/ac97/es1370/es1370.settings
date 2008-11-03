@@ -4,6 +4,6 @@
 # ~/config/settings/kernel/drivers/
 #
 
-#sample_rate	48000
+#sample_rate	44100
 #buffer_frames	512
 #buffer_count	2

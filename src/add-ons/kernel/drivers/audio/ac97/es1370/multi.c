@@ -8,6 +8,7 @@
  *		Jerome Duval, jerome.duval@free.fr
  */
 
+#include <driver_settings.h>
 #include <OS.h>
 #include <MediaDefs.h>
 #include <strings.h>
@@ -582,7 +583,8 @@ es1370_play_inth(void* inthparams)
 	acquire_spinlock(&slock);
 	stream->real_time = system_time();
 	stream->frames_count += current_settings.buffer_frames;
-	stream->buffer_cycle = stream->trigblk;
+	stream->buffer_cycle = (stream->trigblk 
+		+ stream->blkmod - 1) % stream->blkmod;
 	stream->update_needed = true;
 	release_spinlock(&slock);
 	
@@ -775,6 +777,7 @@ static status_t
 es1370_open(const char *name, uint32 flags, void** cookie)
 {
 	es1370_dev *card = NULL;
+	void *settings_handle;
 	int ix;
 	
 	LOG(("open()\n"));
@@ -803,6 +806,31 @@ es1370_open(const char *name, uint32 flags, void** cookie)
 	*cookie = card;
 	card->multi.card = card;
 		
+	// get driver settings
+	settings_handle = load_driver_settings(ES1370_SETTINGS);
+	if (settings_handle != NULL) {
+		const char *item;
+		char       *end;
+		uint32      value;
+
+		item = get_driver_parameter (settings_handle, "sample_rate", "44100", "44100");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') 
+			current_settings.sample_rate = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_frames", "512", "512");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') 
+			current_settings.buffer_frames = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_count", "2", "2");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') 
+			current_settings.buffer_count = value;
+
+		unload_driver_settings(settings_handle);
+	}
+
 	LOG(("stream_new\n"));
 		
 	card->rstream = es1370_stream_new(card, ES1370_USE_RECORD, current_settings.buffer_frames, current_settings.buffer_count);
