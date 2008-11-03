@@ -801,6 +801,19 @@ dump_node(int argc, char **argv)
 		kprintf(" device:      %p\n", vnode->stream.u.dev.device);
 		kprintf(" node:        %p\n", vnode->stream.u.dev.device->Node());
 		kprintf(" partition:   %p\n", vnode->stream.u.dev.partition);
+		if (vnode->stream.u.dev.partition != NULL) {
+			partition_info& info = vnode->stream.u.dev.partition->info;
+			kprintf("  raw device node: %p\n",
+				vnode->stream.u.dev.partition->raw_device);
+			kprintf("  offset:          %Ld\n", info.offset);
+			kprintf("  size:            %Ld\n", info.size);
+			kprintf("  block size:      %ld\n", info.logical_block_size);
+			kprintf("  session:         %ld\n", info.session);
+			kprintf("  partition:       %ld\n", info.partition);
+			kprintf("  device:          %s\n", info.device);
+			set_debug_variable("_raw",
+				(addr_t)vnode->stream.u.dev.partition->raw_device);
+		}
 	}
 
 	return 0;
