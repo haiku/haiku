@@ -933,21 +933,22 @@ Journal::Lock(Transaction* owner, bool separateSubTransactions)
 	//	For that, it would be nice to have some call-back interface in the
 	//	cache transaction API...
 
-	if (fUnwrittenTransactions > 0) {
-		// start a sub transaction
-		cache_start_sub_transaction(fVolume->BlockCache(), fTransactionID);
-		fHasSubtransaction = true;
-	} else
-		fTransactionID = cache_start_transaction(fVolume->BlockCache());
+	if (fOwner != NULL) {
+		if (fUnwrittenTransactions > 0) {
+			// start a sub transaction
+			cache_start_sub_transaction(fVolume->BlockCache(), fTransactionID);
+			fHasSubtransaction = true;
+		} else
+			fTransactionID = cache_start_transaction(fVolume->BlockCache());
 
-	if (fTransactionID < B_OK) {
-		recursive_lock_unlock(&fLock);
-		return fTransactionID;
+		if (fTransactionID < B_OK) {
+			recursive_lock_unlock(&fLock);
+			return fTransactionID;
+		}
+
+		cache_add_transaction_listener(fVolume->BlockCache(), fTransactionID,
+			TRANSACTION_IDLE, _TransactionIdle, this);
 	}
-
-	cache_add_transaction_listener(fVolume->BlockCache(), fTransactionID,
-		TRANSACTION_IDLE, _TransactionIdle, this);
-
 	return B_OK;
 }
 
@@ -959,7 +960,8 @@ Journal::Unlock(Transaction* owner, bool success)
 		// we only end the transaction if we would really unlock it
 		// TODO: what about failing transactions that do not unlock?
 		// (they must make the parent fail, too)
-		_TransactionDone(success);
+		if (fOwner != NULL)
+			_TransactionDone(success);
 
 		fTimestamp = system_time();
 		fOwner = NULL;
