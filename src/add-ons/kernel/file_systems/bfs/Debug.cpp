@@ -343,9 +343,12 @@ dump_volume(int argc, char** argv)
 		return 0;
 	}
 
+	kprintf("id:           %ld\n", volume->ID());
 	kprintf("block cache:  %p\n", volume->BlockCache());
+	kprintf("journal:      %p\n", volume->GetJournal(0));
+	kprintf("allocator:    %p\n", &volume->Allocator());
 	kprintf("root node:    %p\n", volume->RootNode());
-	kprintf("indices node: %p\n", volume->IndicesNode());
+	kprintf("indices node: %p\n\n", volume->IndicesNode());
 
 	dump_super_block(&volume->SuperBlock());
 
