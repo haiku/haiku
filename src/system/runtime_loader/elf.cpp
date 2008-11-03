@@ -8,7 +8,6 @@
  * Distributed under the terms of the NewOS License.
  */
 
-
 #include "runtime_loader_private.h"
 
 #include <ctype.h>
@@ -22,6 +21,8 @@
 #include <runtime_loader.h>
 #include <syscalls.h>
 #include <user_runtime.h>
+#include <util/DoublyLinkedList.h>
+#include <util/kernel_cpp.h>
 #include <util/KMessage.h>
 #include <vm_defs.h>
 
@@ -36,8 +37,8 @@
 #endif
 
 
-// ToDo: implement better locking strategy
-// ToDo: implement lazy binding
+// TODO: implement better locking strategy
+// TODO: implement lazy binding
 
 #define	PAGE_MASK (B_PAGE_SIZE - 1)
 
@@ -75,6 +76,47 @@ enum {
 
 typedef void (*init_term_function)(image_id);
 
+
+// image events
+enum {
+	IMAGE_EVENT_LOADED,
+	IMAGE_EVENT_RELOCATED,
+	IMAGE_EVENT_INITIALIZED,
+	IMAGE_EVENT_UNINITIALIZING,
+	IMAGE_EVENT_UNLOADING
+};
+
+
+struct RuntimeLoaderAddOn
+		: public DoublyLinkedListLinkImpl<RuntimeLoaderAddOn> {
+	image_t*				image;
+	runtime_loader_add_on*	addOn;
+
+	RuntimeLoaderAddOn(image_t* image, runtime_loader_add_on* addOn)
+		:
+		image(image),
+		addOn(addOn)
+	{
+	}
+};
+
+typedef DoublyLinkedList<RuntimeLoaderAddOn> AddOnList;
+
+struct RuntimeLoaderSymbolPatcher {
+	RuntimeLoaderSymbolPatcher*		next;
+	runtime_loader_symbol_patcher*	patcher;
+	void*							cookie;
+
+	RuntimeLoaderSymbolPatcher(runtime_loader_symbol_patcher* patcher,
+			void* cookie)
+		:
+		patcher(patcher),
+		cookie(cookie)
+	{
+	}
+};
+
+
 static image_queue_t sLoadedImages = {0, 0};
 static image_queue_t sDisposableImages = {0, 0};
 static uint32 sLoadedImageCount = 0;
@@ -85,11 +127,14 @@ static const char *sSearchPathSubDir = NULL;
 static bool sInvalidImageIDs;
 static image_t **sPreloadedImages = NULL;
 static uint32 sPreloadedImageCount = 0;
+static AddOnList sAddOns;
 
 // a recursive lock
 static sem_id sSem;
 static thread_id sSemOwner;
 static int32 sSemCount;
+
+extern runtime_loader_add_on_export gRuntimeLoaderAddOnExport;
 
 
 void
@@ -456,6 +501,18 @@ delete_image_struct(image_t *image)
 	memset(image->needed, 0xa5, sizeof(image->needed[0]) * image->num_needed);
 #endif
 	free(image->needed);
+	free(image->symbol_resolution_images);
+
+	while (RuntimeLoaderSymbolPatcher* patcher
+			= image->defined_symbol_patchers) {
+		image->defined_symbol_patchers = patcher->next;
+		delete patcher;
+	}
+	while (RuntimeLoaderSymbolPatcher* patcher
+			= image->undefined_symbol_patchers) {
+		image->undefined_symbol_patchers = patcher->next;
+		delete patcher;
+	}
 
 #ifdef DEBUG
 	// overwrite images to make sure they aren't accidently reused anywhere
@@ -970,6 +1027,110 @@ parse_dynamic_segment(image_t *image)
 }
 
 
+static void
+patch_defined_symbol(image_t* image, const char* name, void** symbol,
+	int32* type)
+{
+	RuntimeLoaderSymbolPatcher* patcher = image->defined_symbol_patchers;
+	while (patcher != NULL && *symbol != 0) {
+		image_t* inImage = image;
+		patcher->patcher(patcher->cookie, NULL, image, name, &inImage,
+			symbol, type);
+		patcher = patcher->next;
+	}
+}
+
+
+static void
+patch_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
+	image_t** foundInImage, void** symbol, int32* type)
+{
+	if (*foundInImage != NULL)
+		patch_defined_symbol(*foundInImage, name, symbol, type);
+
+	RuntimeLoaderSymbolPatcher* patcher = image->undefined_symbol_patchers;
+	while (patcher != NULL) {
+		patcher->patcher(patcher->cookie, rootImage, image, name, foundInImage,
+			symbol, type);
+		patcher = patcher->next;
+	}
+}
+
+
+status_t
+register_defined_symbol_patcher(struct image_t* image,
+	runtime_loader_symbol_patcher* _patcher, void* cookie)
+{
+	RuntimeLoaderSymbolPatcher* patcher
+		= new(mynothrow) RuntimeLoaderSymbolPatcher(_patcher, cookie);
+	if (patcher == NULL)
+		return B_NO_MEMORY;
+
+	patcher->next = image->defined_symbol_patchers;
+	image->defined_symbol_patchers = patcher;
+
+	return B_OK;
+}
+
+
+void
+unregister_defined_symbol_patcher(struct image_t* image,
+	runtime_loader_symbol_patcher* _patcher, void* cookie)
+{
+	RuntimeLoaderSymbolPatcher** patcher = &image->defined_symbol_patchers;
+	while (*patcher != NULL) {
+		if ((*patcher)->patcher == _patcher && (*patcher)->cookie == cookie) {
+			RuntimeLoaderSymbolPatcher* toDelete = *patcher;
+			*patcher = (*patcher)->next;
+			delete toDelete;
+			return;
+		}
+		patcher = &(*patcher)->next;
+	}
+}
+
+
+status_t
+register_undefined_symbol_patcher(struct image_t* image,
+	runtime_loader_symbol_patcher* _patcher, void* cookie)
+{
+	RuntimeLoaderSymbolPatcher* patcher
+		= new(mynothrow) RuntimeLoaderSymbolPatcher(_patcher, cookie);
+	if (patcher == NULL)
+		return B_NO_MEMORY;
+
+	patcher->next = image->undefined_symbol_patchers;
+	image->undefined_symbol_patchers = patcher;
+
+	return B_OK;
+}
+
+
+void
+unregister_undefined_symbol_patcher(struct image_t* image,
+	runtime_loader_symbol_patcher* _patcher, void* cookie)
+{
+	RuntimeLoaderSymbolPatcher** patcher = &image->undefined_symbol_patchers;
+	while (*patcher != NULL) {
+		if ((*patcher)->patcher == _patcher && (*patcher)->cookie == cookie) {
+			RuntimeLoaderSymbolPatcher* toDelete = *patcher;
+			*patcher = (*patcher)->next;
+			delete toDelete;
+			return;
+		}
+		patcher = &(*patcher)->next;
+	}
+}
+
+
+runtime_loader_add_on_export gRuntimeLoaderAddOnExport = {
+	register_defined_symbol_patcher,
+	unregister_defined_symbol_patcher,
+	register_undefined_symbol_patcher,
+	unregister_undefined_symbol_patcher
+};
+
+
 static struct Elf32_Sym *
 find_symbol(image_t *image, const char *name, int32 type)
 {
@@ -1000,6 +1161,25 @@ find_symbol(image_t *image, const char *name, int32 type)
 	}
 
 	return NULL;
+}
+
+
+static status_t
+find_symbol(image_t* image, char const* symbolName, int32 symbolType,
+	void **_location)
+{
+	// get the symbol in the image
+	struct Elf32_Sym* symbol = find_symbol(image, symbolName, symbolType);
+	if (symbol == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	void* location = (void*)(symbol->st_value + image->regions[0].delta);
+	patch_defined_symbol(image, symbolName, &location, &symbolType);
+
+	if (_location != NULL)
+		*_location = location;
+
+	return B_OK;
 }
 
 
@@ -1051,7 +1231,7 @@ find_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
 }
 
 
-/*!	This functions is called when we run BeOS images on Haiku.
+/*!	This function is called when we run BeOS images on Haiku.
 	It allows us to redirect functions to ensure compatibility.
 */
 static const char*
@@ -1062,7 +1242,12 @@ beos_compatibility_map_symbol(const char* symbolName)
 		const char* to;
 	};
 	static const struct symbol_mapping kMappings[] = {
-		// TODO: improve this, and also use it for libnet.so compatibility!
+		// TODO: Improve this, and also use it for libnet.so compatibility!
+		// Allow an image to provide a function that will be invoked for every
+		// (transitively) depending image. The function can return a table to
+		// remap symbols (probably better address to address). All the tables
+		// for a single image would be combined into a hash table and an
+		// undefined symbol patcher using this hash table would be added.
 		{"fstat", "__be_fstat"},
 		{"lstat", "__be_lstat"},
 		{"stat", "__be_stat"},
@@ -1097,33 +1282,73 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 				symName = beos_compatibility_map_symbol(symName);
 			}
 
+			int32 type = B_SYMBOL_TYPE_ANY;
+			if (ELF32_ST_TYPE(sym->st_info) == STT_FUNC)
+				type = B_SYMBOL_TYPE_TEXT;
+			else if (ELF32_ST_TYPE(sym->st_info) == STT_OBJECT)
+				type = B_SYMBOL_TYPE_DATA;
+
 			// it's undefined, must be outside this image, try the other images
 			sharedSym = find_undefined_symbol(rootImage, image, symName,
 				&sharedImage);
-			if (sharedSym == NULL) {
-				FATAL("elf_resolve_symbol: could not resolve symbol '%s'\n",
-					symName);
-				return B_MISSING_SYMBOL;
-			}
+			void* location = NULL;
 
-			// make sure they're the same type
-			if (ELF32_ST_TYPE(sym->st_info) != STT_NOTYPE
+			enum {
+				ERROR_NO_SYMBOL,
+				ERROR_WRONG_TYPE,
+				ERROR_NOT_EXPORTED,
+				ERROR_UNPATCHED
+			};
+			uint32 lookupError = ERROR_UNPATCHED;
+
+			if (sharedSym == NULL) {
+				// symbol not found at all
+				lookupError = ERROR_NO_SYMBOL;
+				sharedImage = NULL;
+			} else if (ELF32_ST_TYPE(sym->st_info) != STT_NOTYPE
 				&& ELF32_ST_TYPE(sym->st_info)
 					!= ELF32_ST_TYPE(sharedSym->st_info)) {
-				FATAL("elf_resolve_symbol: found symbol '%s' in shared image "
-					"but wrong type\n", symName);
-				return B_MISSING_SYMBOL;
-			}
-
-			if (ELF32_ST_BIND(sharedSym->st_info) != STB_GLOBAL
+				// symbol not of the requested type
+				lookupError = ERROR_WRONG_TYPE;
+				sharedImage = NULL;
+			} else if (ELF32_ST_BIND(sharedSym->st_info) != STB_GLOBAL
 				&& ELF32_ST_BIND(sharedSym->st_info) != STB_WEAK) {
-				FATAL("elf_resolve_symbol: found symbol '%s' but not "
-					"exported\n", symName);
+				// symbol not exported
+				lookupError = ERROR_NOT_EXPORTED;
+				sharedImage = NULL;
+			} else {
+				// symbol is fine, get its location
+				location = (void*)(sharedSym->st_value
+					+ sharedImage->regions[0].delta);
+			}
+
+			patch_undefined_symbol(rootImage, image, symName, &sharedImage,
+				&location, &type);
+
+			if (location == NULL) {
+				switch (lookupError) {
+					case ERROR_NO_SYMBOL:
+						FATAL("elf_resolve_symbol: could not resolve symbol "
+							"'%s'\n", symName);
+						break;
+					case ERROR_WRONG_TYPE:
+						FATAL("elf_resolve_symbol: found symbol '%s' in shared "
+							"image but wrong type\n", symName);
+						break;
+					case ERROR_NOT_EXPORTED:
+						FATAL("elf_resolve_symbol: found symbol '%s', but not "
+							"exported\n", symName);
+						break;
+					case ERROR_UNPATCHED:
+						FATAL("elf_resolve_symbol: found symbol '%s', but was "
+							"hidden by symbol patchers\n", symName);
+						break;
+				}
 				return B_MISSING_SYMBOL;
 			}
 
-			*symAddress = sharedSym->st_value + sharedImage->regions[0].delta;
-			return B_NO_ERROR;
+			*symAddress = (addr_t)location;
+			return B_OK;
 		}
 
 		case SHN_ABS:
@@ -1139,6 +1364,37 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 			// standard symbol
 			*symAddress = sym->st_value + image->regions[0].delta;
 			return B_NO_ERROR;
+	}
+}
+
+
+static void
+image_event(image_t* image, uint32 event)
+{
+	AddOnList::Iterator it = sAddOns.GetIterator();
+	while (RuntimeLoaderAddOn* addOn = it.Next()) {
+		void (*function)(image_t* image) = NULL;
+
+		switch (event) {
+			case IMAGE_EVENT_LOADED:
+				function = addOn->addOn->image_loaded;
+				break;
+			case IMAGE_EVENT_RELOCATED:
+				function = addOn->addOn->image_relocated;
+				break;
+			case IMAGE_EVENT_INITIALIZED:
+				function = addOn->addOn->image_initialized;
+				break;
+			case IMAGE_EVENT_UNINITIALIZING:
+				function = addOn->addOn->image_uninitializing;
+				break;
+			case IMAGE_EVENT_UNLOADING:
+				function = addOn->addOn->image_unloading;
+				break;
+		}
+
+		if (function != NULL)
+			function(image);
 	}
 }
 
@@ -1185,6 +1441,7 @@ relocate_image(image_t *rootImage, image_t *image)
 	}
 
 	_kern_image_relocated(image->id);
+	image_event(image, IMAGE_EVENT_RELOCATED);
 	return B_OK;
 }
 
@@ -1357,6 +1614,7 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 
 	image->type = type;
 	register_image(image, fd, path);
+	image_event(image, IMAGE_EVENT_LOADED);
 
 	_kern_close(fd);
 
@@ -1666,6 +1924,8 @@ init_dependencies(image_t *image, bool initHead)
 
 		if (image->init_routine != 0)
 			((init_term_function)image->init_routine)(image->id);
+
+		image_event(image, IMAGE_EVENT_INITIALIZED);
 	}
 	TRACE(("%ld:  init done.\n", find_thread(NULL)));
 
@@ -1762,6 +2022,18 @@ preload_image(char const* path)
 
 	remap_images();
 	init_dependencies(image, true);
+
+	// if the image contains an add-on, register it
+	runtime_loader_add_on* addOnStruct;
+	if (find_symbol(image, "__gRuntimeLoaderAddOn", B_SYMBOL_TYPE_DATA,
+			(void**)&addOnStruct) == B_OK) {
+		RuntimeLoaderAddOn* addOn = new(mynothrow) RuntimeLoaderAddOn(image,
+			addOnStruct);
+		if (addOn != NULL) {
+			sAddOns.Add(addOn);
+			addOnStruct->init(&gRuntimeLoader, &gRuntimeLoaderAddOnExport);
+		}
+	}
 
 	KTRACE("rld: preload_image(\"%s\") done: id: %ld", path, image->id);
 
@@ -2006,11 +2278,15 @@ unload_library(image_id imageID, bool addOn)
 					image->regions[0].vmstart, image->regions[0].vmsize);
 			}
 
+			image_event(image, IMAGE_EVENT_UNINITIALIZING);
+
 			if (image->term_routine)
 				((init_term_function)image->term_routine)(image->id);
 
 			dequeue_image(&sDisposableImages, image);
 			unmap_image(image);
+
+			image_event(image, IMAGE_EVENT_UNLOADING);
 
 			delete_image(image);
 		}
@@ -2044,21 +2320,27 @@ get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
 			struct Elf32_Sym *symbol = &image->syms[j];
 
 			if (count == num) {
-				strlcpy(nameBuffer, SYMNAME(image, symbol), *_nameLength);
-				*_nameLength = strlen(SYMNAME(image, symbol));
+				const char* symbolName = SYMNAME(image, symbol);
+				strlcpy(nameBuffer, symbolName, *_nameLength);
+				*_nameLength = strlen(symbolName);
 
-				if (_type != NULL) {
-					// ToDo: check with the return types of that BeOS function
-					if (ELF32_ST_TYPE(symbol->st_info) == STT_FUNC)
-						*_type = B_SYMBOL_TYPE_TEXT;
-					else if (ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT)
-						*_type = B_SYMBOL_TYPE_DATA;
-					else
-						*_type = B_SYMBOL_TYPE_ANY;
-				}
+				void* location = (void*)(symbol->st_value
+					+ image->regions[0].delta);
+				int32 type;
+				if (ELF32_ST_TYPE(symbol->st_info) == STT_FUNC)
+					type = B_SYMBOL_TYPE_TEXT;
+				else if (ELF32_ST_TYPE(symbol->st_info) == STT_OBJECT)
+					type = B_SYMBOL_TYPE_DATA;
+				else
+					type = B_SYMBOL_TYPE_ANY;
+					// TODO: check with the return types of that BeOS function
 
+				patch_defined_symbol(image, symbolName, &location, &type);
+
+				if (_type != NULL)
+					*_type = type;
 				if (_location != NULL)
-					*_location = (void *)(symbol->st_value + image->regions[0].delta);
+					*_location = location;
 				goto out;
 			}
 			count++;
@@ -2091,17 +2373,9 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
 
 	// get the image from those who have been already initialized
 	image = find_loaded_image_by_id(imageID);
-	if (image != NULL) {
-		struct Elf32_Sym *symbol;
-
-		// get the symbol in the image
-		symbol = find_symbol(image, symbolName, symbolType);
-		if (symbol) {
-			if (_location != NULL)
-				*_location = (void *)(symbol->st_value + image->regions[0].delta);
-		} else
-			status = B_ENTRY_NOT_FOUND;
-	} else
+	if (image != NULL)
+		status = find_symbol(image, symbolName, symbolType, _location);
+	else
 		status = B_BAD_IMAGE_ID;
 
 	rld_unlock();
@@ -2190,8 +2464,12 @@ terminate_program(void)
 
 		TRACE(("%ld:  term: %s\n", find_thread(NULL), image->name));
 
+		image_event(image, IMAGE_EVENT_UNINITIALIZING);
+
 		if (image->term_routine)
 			((init_term_function)image->term_routine)(image->id);
+
+		image_event(image, IMAGE_EVENT_UNLOADING);
 	}
 	TRACE(("%ld:  term done.\n", find_thread(NULL)));
 
@@ -2202,6 +2480,9 @@ terminate_program(void)
 void
 rldelf_init(void)
 {
+	// invoke static constructors
+	new(&sAddOns) AddOnList;
+
 	sSem = create_sem(1, "runtime loader");
 	sSemOwner = -1;
 	sSemCount = 0;

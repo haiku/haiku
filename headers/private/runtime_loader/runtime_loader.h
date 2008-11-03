@@ -48,6 +48,8 @@ extern struct rld_export *__gRuntimeLoader;
 // #pragma mark - runtime loader debugger interface
 
 
+struct RuntimeLoaderSymbolPatcher;
+
 typedef struct elf_region_t {
 	area_id		id;
 	addr_t		start;
@@ -103,6 +105,11 @@ typedef struct image_t {
 	uint32				symbol_resolution_image_count;
 	struct image_t		**symbol_resolution_images;
 
+	// Singly-linked list of symbol patchers for symbols defined respectively
+	// referenced by this image.
+	struct RuntimeLoaderSymbolPatcher	*defined_symbol_patchers;
+	struct RuntimeLoaderSymbolPatcher	*undefined_symbol_patchers;
+
 	// describes the text and data regions
 	uint32				num_regions;
 	elf_region_t		regions[1];
@@ -133,5 +140,49 @@ typedef struct image_queue_t {
 typedef struct runtime_loader_debug_area {
 	image_queue_t	*loaded_images;
 } runtime_loader_debug_area;
+
+
+// #pragma mark - runtime loader add-on interface
+
+
+// symbol patcher callback
+typedef void runtime_loader_symbol_patcher(void* cookie,
+	struct image_t* rootImage, struct image_t* image, const char* name,
+	struct image_t** foundInImage, void** symbol, int32* type);
+
+// interface provided to add-ons
+struct runtime_loader_add_on_export {
+	status_t	(*register_defined_symbol_patcher)(struct image_t* image,
+					runtime_loader_symbol_patcher* patcher, void* cookie);
+	void		(*unregister_defined_symbol_patcher)(struct image_t* image,
+					runtime_loader_symbol_patcher* patcher, void* cookie);
+	status_t	(*register_undefined_symbol_patcher)(struct image_t* image,
+					runtime_loader_symbol_patcher* patcher, void* cookie);
+	void		(*unregister_undefined_symbol_patcher)(struct image_t* image,
+					runtime_loader_symbol_patcher* patcher, void* cookie);
+};
+
+
+#define RUNTIME_LOADER_ADD_ON_VERSION	1
+
+typedef struct runtime_loader_add_on {
+	uint32	version;
+	uint32	flags;
+
+	// called after the add-on image has been loaded
+	void	(*init)(struct rld_export* standardInterface,
+				struct runtime_loader_add_on_export* addOnInterface);
+
+	// called whenever the respective image event occurs
+	void	(*image_loaded)(struct image_t* image);
+	void	(*image_relocated)(struct image_t* image);
+	void	(*image_initialized)(struct image_t* image);
+	void	(*image_uninitializing)(struct image_t* image);
+	void	(*image_unloading)(struct image_t* image);
+} runtime_loader_add_on;
+
+// This is the variable a preloaded shared object has to export to get picked up
+// by the runtime loader as an add-on.
+extern runtime_loader_add_on __gRuntimeLoaderAddOn;
 
 #endif	// _RUNTIME_LOADER_H
