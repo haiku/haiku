@@ -236,8 +236,11 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 			: $(baseURL)/gcc-2.95.3-haiku-081024.zip
 			:
 		;
-
 		# other tools
+		InstallOptionalHaikuImagePackage m4-1.4.12-gcc2-2008-11-04
+			: $(baseURL)/m4-1.4.12-gcc2-2008-11-04.zip
+			:
+		;
 		InstallOptionalHaikuImagePackage autoconf-2.61-gcc2-2008-03-24
 			: $(baseURL)/autoconf-2.61-gcc2-2008-03-24.zip
 			: home

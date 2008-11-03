@@ -40,9 +40,10 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
 	gawk $(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname id ident
 	ideinfo idestatus ifconfig <bin>install installsound iroster isvolume join
 	keymap kill less lessecho lesskey link listarea listattr listimage listdev
-	listport listres listsem ln locate logger login logname ls lsindex m4 make
-	makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex modifiers
-	mount mount_nfs mountvolume mv nc netstat nl nohup od open passwd paste
+	listport listres listsem ln locate logger login logname ls lsindex
+	make makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex
+	modifiers mount mount_nfs mountvolume mv
+	nc netstat nl nohup od open passwd paste
 	patch pathchk pc ping play playfile playsound playwav pr prio printenv
 	printf profile ps ptx pwd query quit rc readlink release renice rescan rlog
 	rm rmattr rmindex rmdir roster route
