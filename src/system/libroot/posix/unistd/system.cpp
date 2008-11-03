@@ -1,14 +1,14 @@
-/* 
-** Copyright 2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
-
+/*
+ * Copyright 2004-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <image.h>
 
-#include <unistd.h>
-#include <stdlib.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 
 extern "C" int
@@ -26,15 +26,17 @@ system(const char *command)
 		return -1;
 	}
 
-	status_t returnValue;
-	status_t error;
-	do {
-		error = wait_for_thread(thread, &returnValue);
-	} while (error == B_INTERRUPTED);
-	
-	if (error != B_OK) {
-		errno = error;
-		return -1;
+	resume_thread(thread);
+
+	int exitStatus;
+	pid_t result;
+	while ((result = waitpid(thread, &exitStatus, 0)) < 0
+		&& errno == B_INTERRUPTED) {
+		// waitpid() was interrupted by a signal, retry...
 	}
-	return returnValue;
+
+	if (result < 0)
+		return -1;
+
+	return exitStatus;
 }
