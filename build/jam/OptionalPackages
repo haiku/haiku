@@ -277,8 +277,8 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package Firefox available for gcc4" ;
 	} else {
- 		InstallOptionalHaikuImagePackage Firefox
-			: http://www.yellowbites.com/downloads/Firefox-2.0.0.12.zip
+ 		InstallOptionalHaikuImagePackage Firefox-2.0.0.17
+			: http://www.yellowbites.com/downloads/Firefox-2.0.0.17.zip
  			: apps
  		;
  		AddSymlinkToHaikuImage home config be Applications
@@ -384,17 +384,15 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package Pe available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage pe-2.4.1-x86
-			: http://dl.hirschkaefer.de/beos/pe-2.4.1-x86.zip
+		InstallOptionalHaikuImagePackage pe-2.4.1-x86-rc2
+			: http://www.yellowbites.com/downloads/pe-2.4.1-x86.zip
 			: apps
 		;
 
-		# TODO: The installation directory should probably be renamed to just
-		# "pe" (or "Pe") and the contained "(drag lpe here...)" be removed.
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/pe-2.4.1-x86/pe ;
+			: /boot/apps/Pe/Pe ;
 		AddSymlinkToHaikuImage home config bin
-			: /boot/apps/pe-2.4.1-x86/lpe ;
+			: /boot/apps/Pe/lpe ;
 	}
 }
 
@@ -458,12 +456,12 @@ if [ IsOptionalHaikuImagePackageAdded VLC ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package VLC available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage VLC
+		InstallOptionalHaikuImagePackage VLC-0.8.6c
 			: http://www.yellowbites.com/downloads/vlc-0.8.6c.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/vlc-0.8.6c/vlc ;
+			: "/boot/apps/vlc-0.8.6c/VLC media player" ;
 	}
 }
 
