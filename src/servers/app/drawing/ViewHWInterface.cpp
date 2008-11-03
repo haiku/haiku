@@ -758,6 +758,17 @@ ViewHWInterface::IsDoubleBuffered() const
 	return HWInterface::IsDoubleBuffered();
 }
 
+// Invalidate
+status_t
+ViewHWInterface::Invalidate(const BRect& frame)
+{
+	status_t ret = HWInterface::Invalidate(frame);
+
+	if (ret >= B_OK && fWindow && !IsDoubleBuffered())
+		fWindow->Invalidate(frame);
+	return ret;
+}
+
 // CopyBackToFront
 status_t
 ViewHWInterface::CopyBackToFront(const BRect& frame)

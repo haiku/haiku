@@ -143,7 +143,7 @@ class HWInterface : protected MultiLocker {
 	virtual	bool				IsDoubleBuffered() const;
 
 	// Invalidate is used for scheduling an area for updating
-			status_t			Invalidate(const BRect& frame);
+	virtual	status_t			Invalidate(const BRect& frame);
 	// while as CopyBackToFront() actually performs the operation
 	// either directly or asynchronously by the UpdateQueue thread
 	virtual	status_t			CopyBackToFront(const BRect& frame);
