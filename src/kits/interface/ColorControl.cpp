@@ -675,6 +675,8 @@ BColorControl::MouseUp(BPoint point)
 void
 BColorControl::MouseDown(BPoint point)
 {
+	if (!IsEnabled())
+		return;
 	if (!fPaletteFrame.Contains(point))
 		return;
 	
