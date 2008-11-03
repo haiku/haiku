@@ -262,7 +262,7 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 		*_target = NULL;
 	}
 
-	fDesktop->SetLastMouseState(where, buttons);
+	fDesktop->SetLastMouseState(where, buttons, window);
 
 	fDesktop->UnlockAllWindows();
 
@@ -311,6 +311,7 @@ Desktop::Desktop(uid_t userID)
 
 	fMouseEventWindow(NULL),
 	fWindowUnderMouse(NULL),
+	fLockedFocusWindow(NULL),
 	fViewUnderMouse(B_NULL_TOKEN),
 	fLastMousePosition(B_ORIGIN),
 	fLastMouseButtons(0),
@@ -750,10 +751,17 @@ Desktop::Cursor() const
 
 
 void
-Desktop::SetLastMouseState(const BPoint& position, int32 buttons)
+Desktop::SetLastMouseState(const BPoint& position, int32 buttons,
+	Window* windowUnderMouse)
 {
+	// The all-window-lock is write-locked.
 	fLastMousePosition = position;
 	fLastMouseButtons = buttons;
+
+	if (fLastMouseButtons == 0 && fLockedFocusWindow) {
+		fLockedFocusWindow = NULL;
+		SetFocusWindow(windowUnderMouse);
+	}
 }
 
 
@@ -1375,9 +1383,13 @@ Desktop::SetFocusWindow(Window* focus)
 	if (!LockAllWindows())
 		return;
 
-	bool hasModal = _WindowHasModal(focus);
+	// test for B_LOCK_WINDOW_FOCUS
+	if (fLockedFocusWindow && focus != fLockedFocusWindow) {
+		UnlockAllWindows();
+		return;
+	}
 
-	// TODO: test for B_LOCK_WINDOW_FOCUS
+	bool hasModal = _WindowHasModal(focus);
 
 	if (focus == fFocus && focus != NULL && !focus->IsHidden()
 		&& (focus->Flags() & B_AVOID_FOCUS) == 0 && !hasModal) {
@@ -1460,6 +1472,23 @@ Desktop::SetFocusWindow(Window* focus)
 	}
 }
 
+
+void
+Desktop::SetFocusLocked(const Window* window)
+{
+	AutoWriteLocker _(fWindowLock);
+
+	if (window != NULL) {
+		// Don't allow this to be set when no mouse buttons
+		// are pressed. (BView::SetMouseEventMask() should only be called
+		// from mouse hooks.)
+		if (fLastMouseButtons == 0)
+			return;
+	}
+
+	fLockedFocusWindow = window;
+}
+	
 
 void
 Desktop::_BringWindowsToFront(WindowList& windows, int32 list,

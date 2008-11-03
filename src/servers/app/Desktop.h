@@ -82,7 +82,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					SetCursor(ServerCursor* cursor);
 		ServerCursorReference	Cursor() const;
 		void					SetLastMouseState(const BPoint& position,
-									int32 buttons);
+									int32 buttons, Window* windowUnderMouse);
 									// for use by the mouse filter only
 									// both mouse position calls require
 									// the Desktop object to be locked
@@ -164,6 +164,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		void					SetFocusWindow(Window* window = NULL);
 		EventTarget*			KeyboardEventTarget();
+		void					SetFocusLocked(const Window* window);
 
 		Window*					FindWindowByClientToken(int32 token,
 									team_id teamID);
@@ -303,6 +304,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		Window*					fMouseEventWindow;
 		const Window*			fWindowUnderMouse;
+		const Window*			fLockedFocusWindow;
 		int32					fViewUnderMouse;
 		BPoint					fLastMousePosition;
 		int32					fLastMouseButtons;

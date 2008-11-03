@@ -1343,6 +1343,8 @@ fDesktop->LockSingleWindow();
 fDesktop->UnlockSingleWindow();
 				// TODO: possible deadlock
 				if (eventMask != 0 || options != 0) {
+					if (options & B_LOCK_WINDOW_FOCUS)
+						fDesktop->SetFocusLocked(fWindow);
 					fDesktop->EventDispatcher().AddTemporaryListener(EventTarget(),
 						fCurrentView->Token(), eventMask, options);
 				} else {
