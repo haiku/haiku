@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src bin debug ltrace arch x86 ;
+
+UsePrivateSystemHeaders ;
+
+StaticLibrary arch_ltrace_stub.a
+	:
+	arch_ltrace_stub.S
+;
