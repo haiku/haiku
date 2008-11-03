@@ -11,20 +11,16 @@
 #include <new>
 #include <stdlib.h>
 
-#if _KERNEL_MODE
+#if _KERNEL_MODE || _LOADER_MODE
 
 using namespace std;
 extern const nothrow_t std::nothrow;
 
-// Oh no! C++ in the kernel! Are you nuts?
-//
-//	- no exceptions
-//	- (almost) no virtuals (well, the Query code now uses them)
-//	- it's basically only the C++ syntax, and type checking
-//	- since one tend to encapsulate everything in classes, it has a slightly
-//	  higher memory overhead
-//	- nicer code
-//	- easier to maintain
+// We need new() versions we can use when also linking against libgcc.
+// std::nothrow can't be used since it's defined in both libgcc and
+// kernel_cpp.cpp.
+typedef struct {} mynothrow_t;
+extern const mynothrow_t mynothrow;
 
 
 inline void *
@@ -34,7 +30,7 @@ operator new(size_t size) throw (std::bad_alloc)
 	// keep the prototype as specified in <new>, or else GCC 3
 	// won't like us
 	return malloc(size);
-} 
+}
 
 
 inline void *
@@ -42,7 +38,7 @@ operator new[](size_t size) throw (std::bad_alloc)
 {
 	return malloc(size);
 }
- 
+
 
 inline void *
 operator new(size_t size, const std::nothrow_t &) throw ()
@@ -58,11 +54,25 @@ operator new[](size_t size, const std::nothrow_t &) throw ()
 }
 
 
+inline void *
+operator new(size_t size, const mynothrow_t &) throw ()
+{
+	return malloc(size);
+}
+
+
+inline void *
+operator new[](size_t size, const mynothrow_t &) throw ()
+{
+	return malloc(size);
+}
+
+
 inline void
 operator delete(void *ptr) throw ()
 {
 	free(ptr);
-} 
+}
 
 
 inline void

@@ -1,7 +1,7 @@
 /*
  * Copyright 2003-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de.
  *		Ingo Weinhold, bonefish@users.sf.net.
@@ -37,6 +37,8 @@ const std::nothrow_t std::nothrow = {};
 const nothrow_t std::nothrow = {};
 #	endif
 #endif
+
+const mynothrow_t mynothrow = {};
 
 #if __GNUC__ == 2
 
