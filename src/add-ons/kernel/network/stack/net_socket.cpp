@@ -119,16 +119,14 @@ create_socket(int family, int type, int protocol, net_socket_private **_socket)
 		link));
 
 	status_t status = get_domain_protocols(socket);
-	if (status < B_OK)
-		goto err2;
+	if (status < B_OK) {
+		mutex_destroy(&socket->lock);
+		delete socket;
+		return status;
+	}
 
 	*_socket = socket;
 	return B_OK;
-
-err2:
-	mutex_destroy(&socket->lock);
-	delete socket;
-	return status;
 }
 
 
