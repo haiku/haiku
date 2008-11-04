@@ -188,7 +188,7 @@ KernelAddon acpi :
 	acpi_busman.c
 	acpi_module.c
 	acpi_device.c
-	acpi_ns_dump.c
+	acpi_ns_dump.cpp
 	:
 	libacpi_ca.a
 	;

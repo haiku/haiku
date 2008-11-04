@@ -11,19 +11,75 @@
 
 #include "acpi_priv.h"
 
+#include <util/kernel_cpp.h>
 #include <util/ring_buffer.h>
+
+class RingBuffer {
+public:
+	RingBuffer(size_t size = 1024);
+	~RingBuffer();	
+	ssize_t Read(void *buffer, size_t length);
+	ssize_t Write(const void *buffer, size_t length);
+	size_t WritableAmount() const;
+	size_t ReadableAmount() const;
+
+	bool Lock();
+	void Unlock();
+private:
+	ring_buffer *fBuffer;
+	sem_id fLock;
+};
+
 
 typedef struct acpi_ns_device_info {
 	device_node *node;
 	acpi_root_info	*acpi;
 	void	*acpi_cookie;
 	thread_id thread;
-	struct ring_buffer *buffer;
-	sem_id write_sem;
-	sem_id sync_sem;
+	sem_id read_sem;
+	RingBuffer *buffer;
 } acpi_ns_device_info;
 
 
+
+// called with the buffer lock held
+static bool
+make_space(acpi_ns_device_info *device, size_t space)
+{
+	size_t available = device->buffer->WritableAmount();
+	if (space <= available)
+		return true;
+	bool released = false;
+	do {
+		/*if (!released) {
+			released = true;
+			if (release_sem(device->read_sem) != B_OK) {
+				panic("can't release sem");
+				return false;
+			}
+		}*/
+		device->buffer->Unlock();
+
+		if (!released) {
+			dprintf("try to release\n");
+			if (release_sem_etc(device->read_sem, 1, B_RELEASE_IF_WAITING_ONLY) == B_OK) {
+				dprintf("released\n");
+				released = true;
+			}
+		}
+		snooze(10000);
+
+		if (!device->buffer->Lock()) {
+			return false;
+		}
+		
+	} while (device->buffer->WritableAmount() < space);
+	
+	return true;
+} 
+
+
+static int32 sNumCount = 0;
 
 static void 
 dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting) 
@@ -32,22 +88,28 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 	char output[255];
 	char tabs[255];
 	char hid[9];
-	int i, depth;
-	uint32 type;
-	void *counter = NULL;
+	int i;
 	size_t written = 0;
 	hid[8] = '\0';
 	tabs[0] = '\0';
 	for (i = 0; i < indenting; i++) {
 		sprintf(tabs, "%s|    ", tabs);
 	}
-	snprintf(tabs, sizeof(tabs), "%s|--- ", tabs);
-	depth = sizeof(char) * 5 * indenting + sizeof(char); // index into result where the device name will be.
+	sprintf(tabs, "%s|--- ", tabs);
+	int depth = sizeof(char) * 5 * indenting + sizeof(char); // index into result where the device name will be.
 	
-	//dprintf("acpi_ns_dump: recursing from %s, depth %d\n", root, depth);
+	if (atomic_add(&sNumCount, 1) >= 200) {
+		dprintf("above 200");
+		// TODO: Without this, the function never finishes
+		// to dump the acpi tree, so there seems to be something
+		// weird with the acpi code 
+		exit_thread(B_ERROR);
+	}	
+
+	void *counter = NULL;
 	while (device->acpi->get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
-		type = device->acpi->get_object_type(result);
-		snprintf(output, sizeof(output), "%s%s", tabs, result + depth);
+		uint32 type = device->acpi->get_object_type(result);
+		sprintf(output, "%s%s", tabs, result + depth);
 		switch(type) {
 			case ACPI_TYPE_ANY:
 			default: 
@@ -96,20 +158,35 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 				snprintf(output, sizeof(output), "%s     BUFFER_FIELD", output);
 				break;
 		}
-		strcat(output, "\n");
+		//strcat(output, "\n");
 		written = 0;
-		if (acquire_sem(device->sync_sem) == B_OK) {
-			//dprintf("writing %ld bytes to the buffer.\n", strlen(output));
-			written = ring_buffer_write(device->buffer, output, strlen(output));
-			//dprintf("written %ld bytes\n", written);
-			release_sem(device->sync_sem);
+		RingBuffer &ringBuffer = *device->buffer;
+		size_t toWrite = strlen(output);
+		if (toWrite > 0) {
+			strlcat(output, "\n", sizeof(output));
+			toWrite++;
+			if (ringBuffer.Lock()) {
+				if (ringBuffer.WritableAmount() < toWrite) {
+					//dprintf("not enough space\n");
+					if (!make_space(device, toWrite)) {
+						panic("couldn't make space");
+						exit_thread(0);
+					}
+				}
+
+				if (ringBuffer.WritableAmount() < toWrite)
+					panic("fuck!!!");
+				written = ringBuffer.Write(output, toWrite);
+				//dprintf("written %ld bytes\n", written);
+				ringBuffer.Unlock();
+			}
+
+			dump_acpi_namespace(device, result, indenting + 1);
 		}
 
-		if (written > 0)
-			release_sem_etc(device->write_sem, 1, 0);
-
-		dump_acpi_namespace(device, result, indenting + 1);
 	}
+	//dprintf("Reached end of devices, root %s, counter %p\n", root, counter);
+	//panic("reached end of device!!!");
 }
 
 
@@ -117,12 +194,26 @@ static int32
 acpi_namespace_dump(void *arg)
 {
 	acpi_ns_device_info *device = (acpi_ns_device_info*)(arg);
-        dump_acpi_namespace(device, "\\", 0);
-	release_sem(device->write_sem);
+	dprintf("**** start dumping ****\n");
+        dump_acpi_namespace(device, NULL, 0);
+	dprintf("**** finished dumping. Writing last line ****\n");
+	if (device->buffer->Lock()) {
+		size_t writable = device->buffer->WritableAmount();
+		if (writable < 1)
+			make_space(device, 1);
+		device->buffer->Unlock();
+	}
+
+	if (device->buffer->Lock()) {
+		device->buffer->Write("\n", 1);
+		device->buffer->Unlock();
+	}
+
+	dprintf("written. exiting\n");
 	return 0;
 }
 
-
+extern "C" {
 /* ----------
 	acpi_namespace_open - handle open() calls
 ----- */
@@ -136,25 +227,21 @@ acpi_namespace_open(void *_cookie, const char* path, int flags, void** cookie)
 
 	*cookie = device;
 
-	device->buffer = create_ring_buffer(2048);
+	RingBuffer *ringBuffer = new RingBuffer(1024);
+	if (ringBuffer == NULL)
+		return B_NO_MEMORY;
 
-	device->write_sem = create_sem(0, "sem");
-	if (device->write_sem < 0)
-		return device->write_sem;
-
-	device->sync_sem = create_sem(1, "sync sem");
-	if (device->sync_sem < 0) {
-		delete_sem(device->write_sem);
-		return device->sync_sem;
-	}
+	device->read_sem = create_sem(0, "read_sem");
 
 	device->thread = spawn_kernel_thread(acpi_namespace_dump, "acpi dumper",
 		 B_NORMAL_PRIORITY, device);
 	if (device->thread < 0) {
-		delete_sem(device->write_sem);
-		delete_sem(device->sync_sem);
+		delete ringBuffer;
 		return device->thread;
 	}
+
+	device->buffer = ringBuffer;
+	sNumCount = 0;
 	resume_thread(device->thread);
 	return B_OK;
 }
@@ -167,21 +254,40 @@ static status_t
 acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 {
 	acpi_ns_device_info *device = (acpi_ns_device_info *)_cookie;
-	size_t bytesRead = -1; 
-	size_t bytesToRead = 0;
-	status_t status;
-        dprintf("acpi_namespace_read(cookie: %p, position: %lld, buffer: %p, size: %ld)\n",
-                        _cookie, position, buf, *num_bytes);
+	size_t bytesRead = 0; 
+	size_t readable = 0;
+        //dprintf("acpi_namespace_read(cookie: %p, position: %lld, buffer: %p, size: %ld)\n",
+        //                _cookie, position, buf, *num_bytes);
 
-	status = acquire_sem_etc(device->write_sem, 1, 0, 0);
-	if (status == B_OK) {
-		if (acquire_sem(device->sync_sem) == B_OK) {
-        		bytesToRead = ring_buffer_readable(device->buffer);
-                        bytesRead = ring_buffer_read(device->buffer, buf, bytesToRead);
-                	release_sem(device->sync_sem);
+	RingBuffer &ringBuffer = *device->buffer;
+
+	if (ringBuffer.Lock()) {
+		readable = ringBuffer.ReadableAmount();
+
+		//dprintf("%ld bytes readable\n", readable);
+		if (readable <= 0) {
+			//dprintf("acquiring read sem...\n");
+			ringBuffer.Unlock();
+			status_t status = acquire_sem_etc(device->read_sem, 1, B_CAN_INTERRUPT, 0);
+			if (status < B_OK) {
+				//dprintf("read: acquire_sem returned %s\n", strerror(status));
+				*num_bytes = 0;
+				return status;
+			}
+			//dprintf("read sem acquired\n");
+			if (!ringBuffer.Lock()) {
+				dprintf("read: couldn't acquire lock. bailing\n");
+				*num_bytes = 0;
+				return B_ERROR;
+			}
 		}
-        }
 
+		//dprintf("readable %ld\n", ringBuffer.ReadableAmount());
+		bytesRead = ringBuffer.Read(buf, *num_bytes);
+		ringBuffer.Unlock();
+	}
+
+	//dprintf("read: read %ld bytes\n", bytesRead);
 	if (bytesRead < 0) {
 		*num_bytes = 0;
 		return bytesRead;
@@ -227,14 +333,14 @@ acpi_namespace_close(void* cookie)
 {
 	status_t status;
 	acpi_ns_device_info *device = (acpi_ns_device_info *)cookie;
-	
 	dprintf("acpi_ns_dump: device_close\n");
+	if (device->read_sem >= 0)
+		delete_sem(device->read_sem);
+	
+	kill_thread(device->thread);
 
-	delete_sem(device->write_sem);
-	delete_sem(device->sync_sem);
-	wait_for_thread(device->thread, &status);
+	delete device->buffer;
 
-	delete_ring_buffer(device->buffer);
 	return B_OK;
 }
 
@@ -273,7 +379,7 @@ acpi_namespace_init_device(void *_cookie, void **cookie)
 		return err;
 	}
 	
-		*cookie = device;
+	*cookie = device;
 	return B_OK;
 }
 
@@ -285,6 +391,7 @@ acpi_namespace_uninit_device(void *_cookie)
 	free(device);
 }
 
+}
 
 struct device_module_info acpi_ns_dump_module = {
 	{
@@ -308,3 +415,64 @@ struct device_module_info acpi_ns_dump_module = {
 	NULL,
 	NULL
 };
+
+
+RingBuffer::RingBuffer(size_t size)
+{
+	fBuffer = create_ring_buffer(size);
+	fLock = create_sem(1, "ring buffer lock");
+}
+
+
+RingBuffer::~RingBuffer()
+{
+	delete_sem(fLock);
+	delete_ring_buffer(fBuffer);
+}
+
+
+ssize_t
+RingBuffer::Read(void *buffer, size_t size)
+{
+	return ring_buffer_read(fBuffer, (uint8*)buffer, size);
+}
+
+
+ssize_t
+RingBuffer::Write(const void *buffer, size_t size)
+{
+	return ring_buffer_write(fBuffer, (uint8*)buffer, size);
+}
+
+
+size_t
+RingBuffer::ReadableAmount() const
+{
+	return ring_buffer_readable(fBuffer);
+}
+
+
+size_t
+RingBuffer::WritableAmount() const
+{
+	return ring_buffer_writable(fBuffer);
+}
+
+
+bool
+RingBuffer::Lock()
+{
+	//status_t status = acquire_sem_etc(fLock, 1, B_CAN_INTERRUPT, 0);
+	status_t status = acquire_sem(fLock);
+	return status == B_OK;
+}
+
+
+void
+RingBuffer::Unlock()
+{
+	release_sem(fLock);
+}
+
+
+
