@@ -72,7 +72,6 @@ make_space(acpi_ns_device_info *device, size_t space)
 } 
 
 
-static int32 sNumCount = 0;
 
 static void 
 dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting) 
@@ -175,22 +174,18 @@ static int32
 acpi_namespace_dump(void *arg)
 {
 	acpi_ns_device_info *device = (acpi_ns_device_info*)(arg);
-	dprintf("**** start dumping ****\n");
         dump_acpi_namespace(device, NULL, 0);
-	dprintf("**** finished dumping. Writing last line ****\n");
 	if (device->buffer->Lock()) {
 		size_t writable = device->buffer->WritableAmount();
 		if (writable < 1)
 			make_space(device, 1);
-		device->buffer->Unlock();
-	}
-
-	if (device->buffer->Lock()) {
 		device->buffer->Write("\n", 1);
 		device->buffer->Unlock();
 	}
 
-	dprintf("written. exiting\n");
+	delete_sem(device->read_sem);
+	device->read_sem = -1;
+
 	return 0;
 }
 
@@ -228,8 +223,6 @@ acpi_namespace_open(void *_cookie, const char* path, int flags, void** cookie)
 
 	device->buffer = ringBuffer;
 
-	sNumCount = 0;
-
 	resume_thread(device->thread);
 
 	return B_OK;
@@ -258,7 +251,7 @@ acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 			//dprintf("acquiring read sem...\n");
 			ringBuffer.Unlock();
 			status_t status = acquire_sem_etc(device->read_sem, 1, B_CAN_INTERRUPT, 0);
-			if (status < B_OK) {
+			if (status == B_INTERRUPTED) {
 				//dprintf("read: acquire_sem returned %s\n", strerror(status));
 				*num_bytes = 0;
 				return status;
