@@ -30,7 +30,6 @@ class BMediaRoster;
 class BBox;
 class BButton;
 class BCheckBox;
-class BTextControl;
 class BMenuField;
 class SoundConsumer;
 class SoundListView;
@@ -58,7 +57,6 @@ public:
 			VIEW_LIST,
 			LOOP,
 			INPUT_SELECTED = 'cW00',	//	control messages
-			LENGTH_CHANGED,
 			SOUND_SELECTED,
 			STOP_PLAYING,
 			STOP_RECORDING,
@@ -84,7 +82,6 @@ private:
 		VolumeSlider *fVolumeSlider;
 		TrackSlider *fTrackSlider;
 		UpDownButton * fUpDownButton;
-		BTextControl * fLengthControl;
 		BMenuField * fInputField;
 		SoundConsumer * fRecordNode;
 		BSoundPlayer * fPlayer;
@@ -114,7 +111,6 @@ private:
 		media_format fRecordFormat;
 		
 		BFile fRecFile;
-		off_t fRecLimit;
 		off_t fRecSize;
 
 		media_node fAudioInputNode;

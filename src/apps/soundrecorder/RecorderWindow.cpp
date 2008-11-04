@@ -114,7 +114,6 @@ RecorderWindow::RecorderWindow() :
 	fStopButton = NULL;
 	fSaveButton = NULL;
 	fLoopButton = NULL;
-	fLengthControl = NULL;
 	fInputField = NULL;
 	fRecordNode = 0;
 	fRecording = false;
@@ -453,22 +452,6 @@ RecorderWindow::InitWindow()
 		fInputField->SetDivider(fInputField->StringWidth("Input:") + 4.0f);
 		fBottomBox->AddChild(fInputField);
 
-		//	Text field for entering length to record (in seconds)
-		r.OffsetBy(0, 1);
-		r.left = r.right + 10;
-		r.right = frame.right - (frame.right - frame.left) / 4;
-		msg = new BMessage(LENGTH_CHANGED);
-		fLengthControl = new BTextControl(r, "Length", "Length:", "8", msg);
-		fLengthControl->SetDivider(fLengthControl->StringWidth("Length:") + 4.0f);
-		fLengthControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_RIGHT);
-		fBottomBox->AddChild(fLengthControl);
-
-		r.left += r.Width()+5;
-		r.right = r.left + 65;
-		r.bottom -= 1;
-		BStringView* lenUnits = new BStringView(r, "Seconds", "seconds");
-		fBottomBox->AddChild(lenUnits);
-
 		fBottomBox->AddChild(fFileInfoBox);
 
 		fBottomBox->Hide();
@@ -522,9 +505,6 @@ RecorderWindow::MessageReceived(BMessage * message)
 	switch (message->what) {
 	case INPUT_SELECTED:
 		Input(message);
-		break;
-	case LENGTH_CHANGED:
-		Length(message);
 		break;
 	case SOUND_SELECTED:
 		Selected(message);
@@ -621,12 +601,6 @@ RecorderWindow::Record(BMessage * message)
 {
 	//	User pressed Record button
 	fRecording = true;
-	int seconds = atoi(fLengthControl->Text());
-	if (seconds < 1) {
-		ErrorAlert("record a sound that's shorter than a second", B_ERROR);
-		return;
-	}
-
 	if (fButtonState != btnPaused) {
 		StopRecording();
 		return;			//	user is too fast on the mouse
@@ -654,7 +628,7 @@ RecorderWindow::Record(BMessage * message)
 		return;
 	}
 	//	Reserve space on disk (creates fewer fragments)
-	err = fRecFile.SetSize(seconds * fRecordFormat.u.raw_audio.channel_count 
+	err = fRecFile.SetSize(4 * fRecordFormat.u.raw_audio.channel_count 
 		* fRecordFormat.u.raw_audio.frame_rate * (fRecordFormat.u.raw_audio.format & 0xf));
 	if (err < B_OK) {
 		ErrorAlert("record a sound that long", err);
@@ -662,8 +636,6 @@ RecorderWindow::Record(BMessage * message)
 		fRecEntry.Unset();
 		return;
 	}
-	fRecLimit = (off_t)(seconds * fRecordFormat.u.raw_audio.channel_count 
-		* fRecordFormat.u.raw_audio.frame_rate * (fRecordFormat.u.raw_audio.format & 0xf));
 	fRecSize = 0;
 
 	fRecFile.Seek(sizeof(struct wave_struct), SEEK_SET);
@@ -804,36 +776,6 @@ RecorderWindow::DoSave(BMessage * message)
 		}
 	} else {
 		WINDOW((stderr, "Couldn't save file.\n"));
-	}
-}
-
-
-void
-RecorderWindow::Length(BMessage * message)
-{
-	//	User changed the Length field -- validate
-	const char * ptr = fLengthControl->Text();
-	const char * start = ptr;
-	const char * anchor = ptr;
-	const char * end = fLengthControl->Text() + fLengthControl->TextView()->TextLength();
-	while (ptr < end) {
-		//	Remember the last start-of-character for UTF-8 compatibility
-		//	needed in call to Select() below (which takes bytes).
-		if (*ptr & 0x80) {
-			if (*ptr & 0xc0 == 0xc0) {
-				anchor = ptr;
-			}
-		}
-		else {
-			anchor = ptr;
-		}
-		if (!isdigit(*ptr)) {
-			fLengthControl->TextView()->MakeFocus(true);
-			fLengthControl->TextView()->Select(anchor-start, fLengthControl->TextView()->TextLength());
-			beep();
-			break;
-		}
-		ptr++;
 	}
 }
 
@@ -1006,7 +948,6 @@ RecorderWindow::StopRecording()
 	//	Close the file.
 	fRecFile.Unset();
 	//	No more recording going on.
-	fRecLimit = 0;
 	fRecSize = 0;
 	SetButtonState(btnPaused);
 	fRecordButton->SetStopped();
@@ -1051,7 +992,6 @@ RecorderWindow::UpdateButtons()
 	fForwardButton->SetEnabled((fButtonState != btnRecording) && hasSelection);
 	fStopButton->SetEnabled(fButtonState != btnPaused);
 	fSaveButton->SetEnabled(hasSelection && (fButtonState != btnRecording));
-	fLengthControl->SetEnabled(fButtonState != btnRecording);
 	fInputField->SetEnabled(fButtonState != btnRecording);
 }
 
@@ -1217,14 +1157,9 @@ RecorderWindow::RecordFile(void * cookie, bigtime_t timestamp, void * data, size
 	if (window->fRecording) {
 		//	Write the data to file (we don't buffer or guard file access
 		//	or anything)
-		if (window->fRecSize < window->fRecLimit) {
-			window->fRecFile.WriteAt(window->fRecSize, data, size);
-			window->fVUView->ComputeNextLevel(data, size);
-			window->fRecSize += size;
-		} else {
-			// We're done!
-			window->PostMessage(STOP_RECORDING);
-		}
+		window->fRecFile.WriteAt(window->fRecSize, data, size);
+		window->fVUView->ComputeNextLevel(data, size);
+		window->fRecSize += size;
 	}
 }
 
