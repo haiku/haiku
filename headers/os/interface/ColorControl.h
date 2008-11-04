@@ -91,8 +91,8 @@ class BColorControl : public BControl {
 		void				_DrawColorArea(BView* target, BRect update);
 		void				_DrawSelectors(BView* target);		
 		void				_ColorRamp(BRect rect, BView* target,
-								rgb_color baseColor, int16 flag,
-								bool focused, BRect update);
+								rgb_color baseColor, rgb_color compColor, 
+								int16 flag, bool focused, BRect update);
 		BPoint				_SelectorPosition(const BRect& rampRect, uint8 shade) const;
 		BRect				_PaletteSelectorFrame(uint8 colorIndex) const;		
 		BRect				_RampFrame(uint8 rampIndex) const;

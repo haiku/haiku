@@ -6,6 +6,7 @@
  *		Marc Flerackers (mflerackers@androme.be)
  *		Axel Dörfler, axeld@pinc-software.de
  *		Alexandre Deckner, alex@zappotek.com
+ *		Jérôme Duval
  */
 
 /**	BColorControl displays a palette of selectable colors. */
@@ -145,7 +146,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 		BRect bounds = fPaletteFrame;
 		bounds.InsetBy(-2.0f, -2.0f); 
 		
-		fBitmap = new BBitmap(bounds, B_RGB32, true, false);			
+		fBitmap = new BBitmap(bounds, B_RGB32, true, false);
 		fOffscreenView = new BView(bounds, "off_view", 0, 0);
 
 		fBitmap->Lock();
@@ -253,26 +254,26 @@ BColorControl::SetValue(int32 value)
 		if (fSelectedPaletteColorIndex == -1 || c != c2) {
 				//here SetValue hasn't been called by mouse tracking
 			fSelectedPaletteColorIndex = BScreen(Window()).IndexForColor(c2);
-		}				
+		}
 		
-		c2 = BScreen(Window()).ColorForIndex(fSelectedPaletteColorIndex);	
+		c2 = BScreen(Window()).ColorForIndex(fSelectedPaletteColorIndex);
 		
 		Invalidate(_PaletteSelectorFrame(fPreviousSelectedPaletteColorIndex));
-		Invalidate(_PaletteSelectorFrame(fSelectedPaletteColorIndex));		
+		Invalidate(_PaletteSelectorFrame(fSelectedPaletteColorIndex));
 		
 		fPreviousSelectedPaletteColorIndex = fSelectedPaletteColorIndex;	
-	} else {		
+	} else {	
 		float invalidateRadius = kSelectorSize/2 + kSelectorPenSize;
 		BPoint p;
 		
 		if (c1.red != c2.red) {
 			p = _SelectorPosition(_RampFrame(1), c1.red);
 			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));	
+				 p.x + invalidateRadius, p.y + invalidateRadius));
 				 
 			p = _SelectorPosition(_RampFrame(1), c2.red);
 			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));	
+				 p.x + invalidateRadius, p.y + invalidateRadius));
 		}
 		if (c1.green != c2.green) {
 			p = _SelectorPosition(_RampFrame(2), c1.green);
@@ -281,17 +282,17 @@ BColorControl::SetValue(int32 value)
 				 	
 			p = _SelectorPosition(_RampFrame(2), c2.green);
 			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));		
+				 p.x + invalidateRadius, p.y + invalidateRadius));
 		}
 		if (c1.blue != c2.blue) {
 			p = _SelectorPosition(_RampFrame(3), c1.blue);
 			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
 				 p.x + invalidateRadius, p.y + invalidateRadius));
-				 	
+			
 			p = _SelectorPosition(_RampFrame(3), c2.blue);
 			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));				
-		} 
+				 p.x + invalidateRadius, p.y + invalidateRadius));
+		}
 	}
 	
 	// the textcontrols have to be updated even when the color
@@ -371,8 +372,8 @@ BColorControl::MessageReceived(BMessage *message)
 			color.red = min_c(strtol(fRedText->Text(), NULL, 10), 255);
 			color.green = min_c(strtol(fGreenText->Text(), NULL, 10), 255);
 			color.blue = min_c(strtol(fBlueText->Text(), NULL, 10), 255);
-			color.alpha = 255;			
-					
+			color.alpha = 255;
+			
 			SetValue(color);
 			Invoke();
 			break;
@@ -413,69 +414,91 @@ BColorControl::_DrawColorArea(BView* target, BRect update)
 	BRegion region(update);
 	target->ConstrainClippingRegion(&region);
 	
-	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR),
-	lightenmax = tint_color(noTint, B_LIGHTEN_MAX_TINT),
-	darken1 = tint_color(noTint, B_DARKEN_1_TINT),
-	darken4 = tint_color(noTint, B_DARKEN_4_TINT);
+	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
+	rgb_color lightenmax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
+	rgb_color darken1 = tint_color(noTint, B_DARKEN_1_TINT);
+	rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
+	rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);
 		
 	BRect bevelRect = fPaletteFrame.InsetByCopy(-2.0,-2.0);	//bevel
-	
+
+	bool enabled = IsEnabled();
+		
 	// First bevel
-	target->SetHighColor(darken1);
+	if (enabled)
+		target->SetHighColor(darken1);
+	else
+		target->SetHighColor(noTint);
 	target->StrokeLine(bevelRect.LeftBottom(), bevelRect.LeftTop());
 	target->StrokeLine(bevelRect.LeftTop(), bevelRect.RightTop());
-	target->SetHighColor(lightenmax);
+	if (enabled)
+		target->SetHighColor(lightenmax);
+	else
+		target->SetHighColor(lighten1);
 	target->StrokeLine(BPoint(bevelRect.left + 1.0f, bevelRect.bottom), bevelRect.RightBottom());
 	target->StrokeLine(bevelRect.RightBottom(), BPoint(bevelRect.right, bevelRect.top + 1.0f));
 
 	bevelRect.InsetBy(1.0f, 1.0f);
 
 	// Second bevel
-	target->SetHighColor(darken4);
+	if (enabled)
+		target->SetHighColor(darken4);
+	else
+		target->SetHighColor(darken2);
 	target->StrokeLine(bevelRect.LeftBottom(), bevelRect.LeftTop());
 	target->StrokeLine(bevelRect.LeftTop(), bevelRect.RightTop());
 	target->SetHighColor(noTint);
 	target->StrokeLine(BPoint(bevelRect.left + 1.0f, bevelRect.bottom), bevelRect.RightBottom());
 	target->StrokeLine(bevelRect.RightBottom(), BPoint(bevelRect.right, bevelRect.top + 1.0f));
 	
-	if (fPaletteMode) {	      	      
-      	int colBegin = max_c(0, -1 + int(update.left) / int(fCellSize));
-      	int colEnd = min_c(fColumns, 2 + int(update.right) / int(fCellSize));
-      	int rowBegin = max_c(0, -1 + int(update.top) / int(fCellSize));
-      	int rowEnd = min_c(fRows, 2 + int(update.bottom) / int(fCellSize));
-      	
-      	//grid
-		target->SetHighColor(darken1);		
-		for (int xi = 0; xi < fColumns+1; xi++){
+	if (fPaletteMode) {
+		int colBegin = max_c(0, -1 + int(update.left) / int(fCellSize));
+		int colEnd = min_c(fColumns, 2 + int(update.right) / int(fCellSize));
+		int rowBegin = max_c(0, -1 + int(update.top) / int(fCellSize));
+		int rowEnd = min_c(fRows, 2 + int(update.bottom) / int(fCellSize));
+		
+		//grid
+		if (enabled)
+			target->SetHighColor(darken1);
+		else
+			target->SetHighColor(noTint);
+		for (int xi = 0; xi < fColumns+1; xi++) {
 			float x = fPaletteFrame.left + float(xi) * fCellSize;
-			target->StrokeLine(BPoint(x, fPaletteFrame.top), BPoint(x, fPaletteFrame.bottom));				
+			target->StrokeLine(BPoint(x, fPaletteFrame.top), BPoint(x, fPaletteFrame.bottom));
 		}
-		for (int yi = 0; yi < fRows+1; yi++){
+		for (int yi = 0; yi < fRows+1; yi++) {
 			float y = fPaletteFrame.top + float(yi) * fCellSize;
-			target->StrokeLine(BPoint(fPaletteFrame.left, y), BPoint(fPaletteFrame.right, y));				
-		} 
-		    
-        //colors  	        
-      	for (int col = colBegin; col < colEnd; col++){
-      		for (int row = rowBegin; row < rowEnd; row++){  
-      			uint8 colorIndex = row * fColumns + col;
-      			float x = fPaletteFrame.left + col * fCellSize;
+			target->StrokeLine(BPoint(fPaletteFrame.left, y), BPoint(fPaletteFrame.right, y));
+		}
+		
+		//colors
+		for (int col = colBegin; col < colEnd; col++) {
+			for (int row = rowBegin; row < rowEnd; row++) {
+				uint8 colorIndex = row * fColumns + col;
+				float x = fPaletteFrame.left + col * fCellSize;
 				float y = fPaletteFrame.top + row * fCellSize;
-				
-      			target->SetHighColor(system_colors()->color_list[colorIndex]);
+					
+				target->SetHighColor(system_colors()->color_list[colorIndex]);
 				target->FillRect(BRect(x+1, y+1, x + fCellSize - 1, y + fCellSize - 1));
-      		}      		
-      	}       				 
+			}
+		}
 	} else {
 		rgb_color white = {255, 255, 255, 255};
 		rgb_color red = {255, 0, 0, 255};
 		rgb_color green = {0, 255, 0, 255};
 		rgb_color blue = {0, 0, 255, 255};
-			
-		_ColorRamp(_RampFrame(0), target, white, 0, false, update);	
-		_ColorRamp(_RampFrame(1), target, red, 0, false, update);	
-		_ColorRamp(_RampFrame(2), target, green, 0, false, update);	
-		_ColorRamp(_RampFrame(3), target, blue, 0, false, update);		
+		
+		rgb_color compColor = {0, 0, 0, 255};
+		if (!enabled) {
+			compColor.red = compColor.green = compColor.blue = 156;
+			red.red = green.green = blue.blue = 70;
+			white.red = white.green = white.blue = 70;
+		}
+		_ColorRamp(_RampFrame(0), target, white, compColor, 0, false, update);
+		_ColorRamp(_RampFrame(1), target, red, compColor, 0, false, update);	
+		_ColorRamp(_RampFrame(2), target, green, compColor, 0, false, update);
+		_ColorRamp(_RampFrame(3), target, blue, compColor, 0, false, update);	
 	}
 	
 	ConstrainClippingRegion(NULL);
@@ -489,13 +512,13 @@ BColorControl::_DrawSelectors(BView* target)
 	rgb_color lightenmax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
 	
 	if (fPaletteMode) {
-		if (fSelectedPaletteColorIndex != -1) {			     	
+		if (fSelectedPaletteColorIndex != -1) {
 	      	target->SetHighColor(lightenmax);
 			target->StrokeRect(_PaletteSelectorFrame(fSelectedPaletteColorIndex));
-		}			
+		}
 	} else {
-		rgb_color color = ValueAsColor();			
-		target->SetPenSize(kSelectorPenSize);		
+		rgb_color color = ValueAsColor();
+		target->SetPenSize(kSelectorPenSize);
 		target->SetHighColor(255, 255, 255);
 		
 		target->StrokeEllipse(_SelectorPosition(_RampFrame(1), color.red),
@@ -505,14 +528,14 @@ BColorControl::_DrawSelectors(BView* target)
 		target->StrokeEllipse(_SelectorPosition(_RampFrame(3), color.blue),
 			 kSelectorSize / 2, kSelectorSize / 2);	
 			 
-		target->SetPenSize(1.0f);		
+		target->SetPenSize(1.0f);	
 	}
 }
 
 
 void
 BColorControl::_ColorRamp(BRect rect, BView* target,
-	rgb_color baseColor, int16 flag, bool focused, BRect update)
+	rgb_color baseColor, rgb_color compColor, int16 flag, bool focused, BRect update)
 {
 	float width = rect.Width() + 1;
 	rgb_color color;
@@ -524,12 +547,11 @@ BColorControl::_ColorRamp(BRect rect, BView* target,
 		target->BeginLineArray((int32)update.Width() + 1);
 	
 		for (float i = (update.left - rect.left); i <= (update.right - rect.left) + 1; i++) {
-			color.red = (uint8)(i * baseColor.red / width);
-			color.green = (uint8)(i * baseColor.green / width);
-			color.blue = (uint8)(i * baseColor.blue / width);
-	
+			color.red = (uint8)(i * baseColor.red / width) + compColor.red;
+			color.green = (uint8)(i * baseColor.green / width) + compColor.green;
+			color.blue = (uint8)(i * baseColor.blue / width) + compColor.blue;
 			target->AddLine(BPoint(rect.left + i, rect.top),
-				BPoint(rect.left + i, rect.bottom - 1), color);			
+				BPoint(rect.left + i, rect.bottom - 1), color);	
 		}
 	
 		target->EndLineArray();
@@ -574,7 +596,7 @@ BColorControl::_PaletteSelectorFrame(uint8 colorIndex) const
 void
 BColorControl::_InitOffscreen()
 {
-	if (fBitmap->Lock()) {			
+	if (fBitmap->Lock()) {	
 		_DrawColorArea(fOffscreenView, fPaletteFrame.InsetByCopy(-2.0f,-2.0f));
 		fOffscreenView->Sync();
 		fBitmap->Unlock();
@@ -680,20 +702,20 @@ BColorControl::MouseDown(BPoint point)
 	if (!fPaletteFrame.Contains(point))
 		return;
 	
-	if (fPaletteMode) {	      	
-      	int column = (int) ( (point.x - fPaletteFrame.left) / fCellSize );
+	if (fPaletteMode) {
+		int column = (int) ( (point.x - fPaletteFrame.left) / fCellSize );
 		int row = (int) ( (point.y - fPaletteFrame.top) / fCellSize );
-      	int colorIndex = row * fColumns + column;
-      	if (colorIndex >= 0 && colorIndex < 256) {      		
-      		fSelectedPaletteColorIndex = colorIndex;
-      		SetValue(system_colors()->color_list[colorIndex]);
-    	}
+		int colorIndex = row * fColumns + column;
+		if (colorIndex >= 0 && colorIndex < 256) {
+			fSelectedPaletteColorIndex = colorIndex;
+			SetValue(system_colors()->color_list[colorIndex]);
+		}
 	} else {
 		rgb_color color = ValueAsColor();
 	
 		uint8 shade = (unsigned char)max_c(0,
-			 min_c((point.x - _RampFrame(0).left) * 255 / _RampFrame(0).Width(), 255));
-				
+			min_c((point.x - _RampFrame(0).left) * 255 / _RampFrame(0).Width(), 255));
+		
 		if (_RampFrame(0).Contains(point)) {
 			color.red = color.green = color.blue = shade;
 			fFocusedComponent = 1;
@@ -727,16 +749,15 @@ BColorControl::MouseMoved(BPoint point, uint32 transit,
 	if (!IsTracking())
 		return;	
 		
-	if (fPaletteMode && fPaletteFrame.Contains(point)) {		      	
-      	int column = (int) ( (point.x - fPaletteFrame.left) / fCellSize );
+	if (fPaletteMode && fPaletteFrame.Contains(point)) {
+		int column = (int) ( (point.x - fPaletteFrame.left) / fCellSize );
 		int row = (int) ( (point.y - fPaletteFrame.top) / fCellSize );
-      	int colorIndex = row * fColumns + column;
-      	if (colorIndex >= 0 && colorIndex < 256) {
-      		fSelectedPaletteColorIndex = colorIndex;
-      		SetValue(system_colors()->color_list[colorIndex]);      		
-    	} 
-    	
-	} else {		
+		int colorIndex = row * fColumns + column;
+		if (colorIndex >= 0 && colorIndex < 256) {
+			fSelectedPaletteColorIndex = colorIndex;
+			SetValue(system_colors()->color_list[colorIndex]);
+		}
+	} else {
 		if (fFocusedComponent == 0)
 			return;
 	
@@ -781,7 +802,7 @@ BColorControl::GetPreferredSize(float *_width, float *_height)
 {
 	BRect rect = fPaletteFrame.InsetByCopy(-2.0,-2.0);	//bevel	
 	
-	if (rect.Height() < fBlueText->Frame().bottom) {		
+	if (rect.Height() < fBlueText->Frame().bottom) {
 		// adjust the height to fit
 		rect.bottom = fBlueText->Frame().bottom;
 	}
