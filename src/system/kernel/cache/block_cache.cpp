@@ -58,15 +58,15 @@ struct block_cache;
 typedef DoublyLinkedListLink<cached_block> block_link;
 
 struct cached_block {
-	cached_block	*next;			// next in hash
-	cached_block	*transaction_next;
+	cached_block*	next;			// next in hash
+	cached_block*	transaction_next;
 	block_link		link;
 	off_t			block_number;
-	void			*current_data;
-	void			*original_data;
-	void			*parent_data;
+	void*			current_data;
+	void*			original_data;
+	void*			parent_data;
 #if BLOCK_CACHE_DEBUG_CHANGED
-	void			*compare;
+	void*			compare;
 #endif
 	int32			ref_count;
 	int32			accessed;
@@ -75,11 +75,11 @@ struct cached_block {
 	bool			is_dirty : 1;
 	bool			unused : 1;
 	bool			discard : 1;
-	cache_transaction *transaction;
-	cache_transaction *previous_transaction;
+	cache_transaction* transaction;
+	cache_transaction* previous_transaction;
 
-	static int Compare(void *_cacheEntry, const void *_block);
-	static uint32 Hash(void *_cacheEntry, const void *_block, uint32 range);
+	static int Compare(void* _cacheEntry, const void* _block);
+	static uint32 Hash(void* _cacheEntry, const void* _block, uint32 range);
 };
 
 typedef DoublyLinkedList<cached_block,
@@ -91,23 +91,23 @@ struct cache_notification : DoublyLinkedListLinkImpl<cache_notification> {
 	int32			events_pending;
 	int32			events;
 	transaction_notification_hook hook;
-	void			*data;
+	void*			data;
 	bool			delete_after_event;
 };
 
 typedef DoublyLinkedList<cache_notification> NotificationList;
 
 struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
-	hash_table		*hash;
+	hash_table*		hash;
 	mutex			lock;
 	int				fd;
 	off_t			max_blocks;
 	size_t			block_size;
 	int32			next_transaction_id;
-	cache_transaction *last_transaction;
-	hash_table		*transaction_hash;
+	cache_transaction* last_transaction;
+	hash_table*		transaction_hash;
 
-	object_cache	*buffer_cache;
+	object_cache*	buffer_cache;
 	block_list		unused_blocks;
 
 	uint32			num_dirty_blocks;
@@ -132,7 +132,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	static void LowMemoryHandler(void* data, uint32 resources, int32 level);
 
 private:
-	cached_block *_GetUnusedBlock();
+	cached_block* _GetUnusedBlock();
 };
 
 struct cache_listener;
@@ -149,12 +149,12 @@ typedef DoublyLinkedList<cache_listener,
 struct cache_transaction {
 	cache_transaction();
 
-	cache_transaction *next;
+	cache_transaction* next;
 	int32			id;
 	int32			num_blocks;
 	int32			main_num_blocks;
 	int32			sub_num_blocks;
-	cached_block	*first_block;
+	cached_block*	first_block;
 	block_list		blocks;
 	ListenerList	listeners;
 	bool			open;
@@ -167,7 +167,7 @@ namespace BlockTracing {
 
 class Action : public AbstractTraceEntry {
 public:
-	Action(block_cache *cache, cached_block* block)
+	Action(block_cache* cache, cached_block* block)
 		:
 		fCache(cache),
 		fBlockNumber(block->block_number),
@@ -194,7 +194,7 @@ public:
 	virtual const char* _Action() const = 0;
 
 private:
-	block_cache			*fCache;
+	block_cache*		fCache;
 	uint64				fBlockNumber;
 	bool				fIsDirty;
 	bool				fHasOriginal;
@@ -205,7 +205,7 @@ private:
 
 class Get : public Action {
 public:
-	Get(block_cache *cache, cached_block* block)
+	Get(block_cache* cache, cached_block* block)
 		: Action(cache, block)
 	{
 		Initialized();
@@ -216,7 +216,7 @@ public:
 
 class Put : public Action {
 public:
-	Put(block_cache *cache, cached_block* block)
+	Put(block_cache* cache, cached_block* block)
 		: Action(cache, block)
 	{
 		Initialized();
@@ -227,7 +227,7 @@ public:
 
 class Read : public Action {
 public:
-	Read(block_cache *cache, cached_block* block)
+	Read(block_cache* cache, cached_block* block)
 		: Action(cache, block)
 	{
 		Initialized();
@@ -238,7 +238,7 @@ public:
 
 class Write : public Action {
 public:
-	Write(block_cache *cache, cached_block* block)
+	Write(block_cache* cache, cached_block* block)
 		: Action(cache, block)
 	{
 		Initialized();
@@ -249,7 +249,7 @@ public:
 
 class Flush : public Action {
 public:
-	Flush(block_cache *cache, cached_block* block, bool getUnused = false)
+	Flush(block_cache* cache, cached_block* block, bool getUnused = false)
 		: Action(cache, block),
 		fGetUnused(getUnused)
 	{
@@ -265,7 +265,7 @@ private:
 
 class Error : public AbstractTraceEntry {
 public:
-	Error(block_cache *cache, uint64 blockNumber, const char* message,
+	Error(block_cache* cache, uint64 blockNumber, const char* message,
 			status_t status = B_OK)
 		:
 		fCache(cache),
@@ -302,8 +302,8 @@ namespace TransactionTracing {
 
 class Action : public AbstractTraceEntry {
 	public:
-		Action(const char *label, block_cache *cache,
-				cache_transaction *transaction)
+		Action(const char* label, block_cache* cache,
+				cache_transaction* transaction)
 			:
 			fCache(cache),
 			fTransaction(transaction),
@@ -335,8 +335,8 @@ class Action : public AbstractTraceEntry {
 
 class Detach : public AbstractTraceEntry {
 	public:
-		Detach(block_cache *cache, cache_transaction *transaction,
-				cache_transaction *newTransaction)
+		Detach(block_cache* cache, cache_transaction* transaction,
+				cache_transaction* newTransaction)
 			:
 			fCache(cache),
 			fTransaction(transaction),
@@ -367,7 +367,7 @@ class Detach : public AbstractTraceEntry {
 
 class Abort : public AbstractTraceEntry {
 	public:
-		Abort(block_cache *cache, cache_transaction *transaction)
+		Abort(block_cache* cache, cache_transaction* transaction)
 			:
 			fCache(cache),
 			fTransaction(transaction),
@@ -377,9 +377,9 @@ class Abort : public AbstractTraceEntry {
 			bool isSub = transaction->has_sub_transaction;
 			fNumBlocks = isSub ? transaction->sub_num_blocks
 				: transaction->num_blocks;
-			fBlocks = (off_t *)alloc_tracing_buffer(fNumBlocks * sizeof(off_t));
+			fBlocks = (off_t*)alloc_tracing_buffer(fNumBlocks * sizeof(off_t));
 			if (fBlocks != NULL) {
-				cached_block *block = transaction->first_block;
+				cached_block* block = transaction->first_block;
 				for (int32 i = 0; block != NULL && i < fNumBlocks;
 						block = block->transaction_next) {
 					fBlocks[i++] = block->block_number;
@@ -413,7 +413,7 @@ class Abort : public AbstractTraceEntry {
 #endif
 
 
-static status_t write_cached_block(block_cache *cache, cached_block *block,
+static status_t write_cached_block(block_cache* cache, cached_block* block,
 	bool deleteTransaction = true);
 
 
@@ -424,7 +424,7 @@ static mutex sNotificationsLock = MUTEX_INITIALIZER("block cache notifications")
 static thread_id sNotifierWriterThread;
 static DoublyLinkedListLink<block_cache> sMarkCache;
 	// TODO: this only works if the link is the first entry of block_cache
-static object_cache *sBlockCache;
+static object_cache* sBlockCache;
 
 
 //	#pragma mark - notifications/listener
@@ -450,7 +450,7 @@ is_written_event(int32 event)
 	If there is no pending event anymore, it will return \c false.
 */
 static bool
-get_next_pending_event(cache_notification *notification, int32 *_event)
+get_next_pending_event(cache_notification* notification, int32* _event)
 {
 	for (int32 eventMask = 1; eventMask <= TRANSACTION_IDLE; eventMask <<= 1) {
 		int32 pending = atomic_and(&notification->events_pending,
@@ -470,9 +470,9 @@ get_next_pending_event(cache_notification *notification, int32 *_event)
 
 /*!	Initializes the \a notification as specified. */
 static void
-set_notification(cache_transaction *transaction,
+set_notification(cache_transaction* transaction,
 	cache_notification &notification, int32 events,
-	transaction_notification_hook hook, void *data)
+	transaction_notification_hook hook, void* data)
 {
 	notification.transaction_id = transaction != NULL ? transaction->id : -1;
 	notification.events_pending = 0;
@@ -487,7 +487,7 @@ set_notification(cache_transaction *transaction,
 	when possible, or marks it for deletion if the notification is pending.
 */
 static void
-delete_notification(cache_notification *notification)
+delete_notification(cache_notification* notification)
 {
 	MutexLocker locker(sNotificationsLock);
 
@@ -505,7 +505,7 @@ delete_notification(cache_notification *notification)
 	Triggers the notifier thread to run.
 */
 static void
-add_notification(block_cache *cache, cache_notification *notification,
+add_notification(block_cache* cache, cache_notification* notification,
 	int32 event, bool deleteNotification)
 {
 	if (notification->hook == NULL)
@@ -535,7 +535,7 @@ add_notification(block_cache *cache, cache_notification *notification,
 	TRANSACTION_WRITTEN will be removed.
 */
 static void
-notify_transaction_listeners(block_cache *cache, cache_transaction *transaction,
+notify_transaction_listeners(block_cache* cache, cache_transaction* transaction,
 	int32 event)
 {
 	T(Action("notify", cache, transaction));
@@ -545,7 +545,7 @@ notify_transaction_listeners(block_cache *cache, cache_transaction *transaction,
 
 	ListenerList::Iterator iterator = transaction->listeners.GetIterator();
 	while (iterator.HasNext()) {
-		cache_listener *listener = iterator.Next();
+		cache_listener* listener = iterator.Next();
 
 		bool remove = isClosing && !is_written_event(listener->events)
 			|| isWritten && is_written_event(listener->events);
@@ -561,12 +561,12 @@ notify_transaction_listeners(block_cache *cache, cache_transaction *transaction,
 
 
 static void
-flush_pending_notifications(block_cache *cache)
+flush_pending_notifications(block_cache* cache)
 {
 	while (true) {
 		MutexLocker locker(sNotificationsLock);
 
-		cache_notification *notification = cache->pending_notifications.Head();
+		cache_notification* notification = cache->pending_notifications.Head();
 		if (notification == NULL)
 			return;
 
@@ -606,7 +606,7 @@ flush_pending_notifications()
 
 	DoublyLinkedList<block_cache>::Iterator iterator = sCaches.GetIterator();
 	while (iterator.HasNext()) {
-		block_cache *cache = iterator.Next();
+		block_cache* cache = iterator.Next();
 
 		flush_pending_notifications(cache);
 	}
@@ -617,11 +617,11 @@ flush_pending_notifications()
 	transaction.
 */
 static void
-remove_transaction_listeners(block_cache *cache, cache_transaction *transaction)
+remove_transaction_listeners(block_cache* cache, cache_transaction* transaction)
 {
 	ListenerList::Iterator iterator = transaction->listeners.GetIterator();
 	while (iterator.HasNext()) {
-		cache_listener *listener = iterator.Next();
+		cache_listener* listener = iterator.Next();
 		iterator.Remove();
 
 		delete_notification(listener);
@@ -630,12 +630,12 @@ remove_transaction_listeners(block_cache *cache, cache_transaction *transaction)
 
 
 static status_t
-add_transaction_listener(block_cache *cache, cache_transaction *transaction,
-	int32 events, transaction_notification_hook hookFunction, void *data)
+add_transaction_listener(block_cache* cache, cache_transaction* transaction,
+	int32 events, transaction_notification_hook hookFunction, void* data)
 {
 	ListenerList::Iterator iterator = transaction->listeners.GetIterator();
 	while (iterator.HasNext()) {
-		cache_listener *listener = iterator.Next();
+		cache_listener* listener = iterator.Next();
 
 		if (listener->data == data && listener->hook == hookFunction) {
 			// this listener already exists, just update it
@@ -644,7 +644,7 @@ add_transaction_listener(block_cache *cache, cache_transaction *transaction,
 		}
 	}
 
-	cache_listener *listener = new(std::nothrow) cache_listener;
+	cache_listener* listener = new(std::nothrow) cache_listener;
 	if (listener == NULL)
 		return B_NO_MEMORY;
 
@@ -669,20 +669,20 @@ cache_transaction::cache_transaction()
 
 
 static int
-transaction_compare(void *_transaction, const void *_id)
+transaction_compare(void* _transaction, const void* _id)
 {
-	cache_transaction *transaction = (cache_transaction *)_transaction;
-	const int32 *id = (const int32 *)_id;
+	cache_transaction* transaction = (cache_transaction*)_transaction;
+	const int32* id = (const int32*)_id;
 
 	return transaction->id - *id;
 }
 
 
 static uint32
-transaction_hash(void *_transaction, const void *_id, uint32 range)
+transaction_hash(void* _transaction, const void* _id, uint32 range)
 {
-	cache_transaction *transaction = (cache_transaction *)_transaction;
-	const int32 *id = (const int32 *)_id;
+	cache_transaction* transaction = (cache_transaction*)_transaction;
+	const int32* id = (const int32*)_id;
 
 	if (transaction != NULL)
 		return transaction->id % range;
@@ -692,7 +692,7 @@ transaction_hash(void *_transaction, const void *_id, uint32 range)
 
 
 static void
-delete_transaction(block_cache *cache, cache_transaction *transaction)
+delete_transaction(block_cache* cache, cache_transaction* transaction)
 {
 	if (cache->last_transaction == transaction)
 		cache->last_transaction = NULL;
@@ -702,10 +702,10 @@ delete_transaction(block_cache *cache, cache_transaction *transaction)
 }
 
 
-static cache_transaction *
-lookup_transaction(block_cache *cache, int32 id)
+static cache_transaction*
+lookup_transaction(block_cache* cache, int32 id)
 {
-	return (cache_transaction *)hash_lookup(cache->transaction_hash, &id);
+	return (cache_transaction*)hash_lookup(cache->transaction_hash, &id);
 }
 
 
@@ -713,10 +713,10 @@ lookup_transaction(block_cache *cache, int32 id)
 
 
 int
-compare_blocks(const void *_blockA, const void *_blockB)
+compare_blocks(const void* _blockA, const void* _blockB)
 {
-	cached_block *blockA = *(cached_block **)_blockA;
-	cached_block *blockB = *(cached_block **)_blockB;
+	cached_block* blockA = *(cached_block**)_blockA;
+	cached_block* blockB = *(cached_block**)_blockB;
 
 	off_t diff = blockA->block_number - blockB->block_number;
 	if (diff > 0)
@@ -727,10 +727,10 @@ compare_blocks(const void *_blockA, const void *_blockB)
 
 
 /*static*/ int
-cached_block::Compare(void *_cacheEntry, const void *_block)
+cached_block::Compare(void* _cacheEntry, const void* _block)
 {
-	cached_block *cacheEntry = (cached_block *)_cacheEntry;
-	const off_t *block = (const off_t *)_block;
+	cached_block* cacheEntry = (cached_block*)_cacheEntry;
+	const off_t* block = (const off_t*)_block;
 
 	off_t diff = cacheEntry->block_number - *block;
 	if (diff > 0)
@@ -742,10 +742,10 @@ cached_block::Compare(void *_cacheEntry, const void *_block)
 
 
 /*static*/ uint32
-cached_block::Hash(void *_cacheEntry, const void *_block, uint32 range)
+cached_block::Hash(void* _cacheEntry, const void* _block, uint32 range)
 {
-	cached_block *cacheEntry = (cached_block *)_cacheEntry;
-	const off_t *block = (const off_t *)_block;
+	cached_block* cacheEntry = (cached_block*)_cacheEntry;
+	const off_t* block = (const off_t*)_block;
 
 	if (cacheEntry != NULL)
 		return cacheEntry->block_number % range;
@@ -815,14 +815,14 @@ block_cache::Init()
 
 
 void
-block_cache::Free(void *buffer)
+block_cache::Free(void* buffer)
 {
 	if (buffer != NULL)
 		object_cache_free(buffer_cache, buffer);
 }
 
 
-void *
+void*
 block_cache::Allocate()
 {
 	return object_cache_alloc(buffer_cache, 0);
@@ -830,7 +830,7 @@ block_cache::Allocate()
 
 
 void
-block_cache::FreeBlock(cached_block *block)
+block_cache::FreeBlock(cached_block* block)
 {
 	Free(block->current_data);
 
@@ -847,13 +847,13 @@ block_cache::FreeBlock(cached_block *block)
 }
 
 
-cached_block *
+cached_block*
 block_cache::_GetUnusedBlock()
 {
 	TRACE(("block_cache: get unused block\n"));
 
 	for (block_list::Iterator iterator = unused_blocks.GetIterator();
-			cached_block *block = iterator.Next();) {
+			cached_block* block = iterator.Next();) {
 		TB(Flush(this, block, true));
 		// this can only happen if no transactions are used
 		if (block->is_dirty)
@@ -878,10 +878,10 @@ block_cache::_GetUnusedBlock()
 
 
 /*! Allocates a new block for \a blockNumber, ready for use */
-cached_block *
+cached_block*
 block_cache::NewBlock(off_t blockNumber)
 {
-	cached_block *block = (cached_block *)object_cache_alloc(sBlockCache, 0);
+	cached_block* block = (cached_block*)object_cache_alloc(sBlockCache, 0);
 	if (block == NULL) {
 		TB(Error(this, blockNumber, "allocation failed"));
 		dprintf("block allocation failed, unused list is %sempty.\n",
@@ -934,7 +934,7 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 	TRACE(("block_cache: remove up to %ld unused blocks\n", count));
 
 	for (block_list::Iterator iterator = unused_blocks.GetIterator();
-			cached_block *block = iterator.Next();) {
+			cached_block* block = iterator.Next();) {
 		if (maxAccessed < block->accessed)
 			continue;
 
@@ -957,9 +957,9 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 
 
 void
-block_cache::LowMemoryHandler(void *data, uint32 resources, int32 level)
+block_cache::LowMemoryHandler(void* data, uint32 resources, int32 level)
 {
-	block_cache *cache = (block_cache *)data;
+	block_cache* cache = (block_cache*)data;
 	MutexLocker locker(&cache->lock);
 
 	if (!locker.IsLocked()) {
@@ -1007,15 +1007,15 @@ block_cache::LowMemoryHandler(void *data, uint32 resources, int32 level)
 	but not necessarily the \a block it just released.
 */
 static void
-put_cached_block(block_cache *cache, cached_block *block)
+put_cached_block(block_cache* cache, cached_block* block)
 {
 #if BLOCK_CACHE_DEBUG_CHANGED
 	if (!block->is_dirty && block->compare != NULL
 		&& memcmp(block->current_data, block->compare, cache->block_size)) {
 		dprintf("new block:\n");
-		dump_block((const char *)block->current_data, 256, "  ");
+		dump_block((const char*)block->current_data, 256, "  ");
 		dprintf("unchanged block:\n");
-		dump_block((const char *)block->compare, 256, "  ");
+		dump_block((const char*)block->compare, 256, "  ");
 		write_cached_block(cache, block);
 		panic("block_cache: supposed to be clean block was changed!\n");
 
@@ -1068,14 +1068,14 @@ put_cached_block(block_cache *cache, cached_block *block)
 
 
 static void
-put_cached_block(block_cache *cache, off_t blockNumber)
+put_cached_block(block_cache* cache, off_t blockNumber)
 {
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
 		panic("put_cached_block: invalid block number %lld (max %lld)",
 			blockNumber, cache->max_blocks - 1);
 	}
 
-	cached_block *block = (cached_block *)hash_lookup(cache->hash, &blockNumber);
+	cached_block* block = (cached_block*)hash_lookup(cache->hash, &blockNumber);
 	if (block != NULL)
 		put_cached_block(cache, block);
 	else {
@@ -1093,8 +1093,8 @@ put_cached_block(block_cache *cache, off_t blockNumber)
 		not already in the cache. The block you retrieve may contain random
 		data.
 */
-static cached_block *
-get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
+static cached_block*
+get_cached_block(block_cache* cache, off_t blockNumber, bool* _allocated,
 	bool readBlock = true)
 {
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
@@ -1103,7 +1103,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
 		return NULL;
 	}
 
-	cached_block *block = (cached_block *)hash_lookup(cache->hash,
+	cached_block* block = (cached_block*)hash_lookup(cache->hash,
 		&blockNumber);
 	*_allocated = false;
 
@@ -1153,8 +1153,8 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
 	This is the only method to insert a block into a transaction. It makes
 	sure that the previous block contents are preserved in that case.
 */
-static void *
-get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
+static void*
+get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 	off_t length, int32 transactionID, bool cleared)
 {
 	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %ld)\n",
@@ -1166,7 +1166,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 	}
 
 	bool allocated;
-	cached_block *block = get_cached_block(cache, blockNumber, &allocated,
+	cached_block* block = get_cached_block(cache, blockNumber, &allocated,
 		!cleared);
 	if (block == NULL)
 		return NULL;
@@ -1188,7 +1188,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 		return block->current_data;
 	}
 
-	cache_transaction *transaction = block->transaction;
+	cache_transaction* transaction = block->transaction;
 
 	if (transaction != NULL && transaction->id != transactionID) {
 		// ToDo: we have to wait here until the other transaction is done.
@@ -1271,13 +1271,13 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 	is \c true.
 */
 static status_t
-write_cached_block(block_cache *cache, cached_block *block,
+write_cached_block(block_cache* cache, cached_block* block,
 	bool deleteTransaction)
 {
-	cache_transaction *previous = block->previous_transaction;
+	cache_transaction* previous = block->previous_transaction;
 	int32 blockSize = cache->block_size;
 
-	void *data = previous && block->original_data
+	void* data = previous && block->original_data
 		? block->original_data : block->current_data;
 		// we first need to write back changes from previous transactions
 
@@ -1337,7 +1337,7 @@ write_cached_block(block_cache *cache, cached_block *block,
 #if DEBUG_BLOCK_CACHE
 
 static void
-dump_block(cached_block *block)
+dump_block(cached_block* block)
 {
 	kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c  %08lx "
 		"%08lx\n", (addr_t)block, block->block_number,
@@ -1351,13 +1351,13 @@ dump_block(cached_block *block)
 
 
 static int
-dump_cache(int argc, char **argv)
+dump_cache(int argc, char** argv)
 {
 	bool showTransactions = false;
 	bool showBlocks = false;
 	int32 i = 1;
 	while (argv[i] != NULL && argv[i][0] == '-') {
-		for (char *arg = &argv[i][1]; arg[0]; arg++) {
+		for (char* arg = &argv[i][1]; arg[0]; arg++) {
 			switch (arg[0]) {
 				case 'b':
 					showBlocks = true;
@@ -1378,7 +1378,7 @@ dump_cache(int argc, char **argv)
 		return 0;
 	}
 
-	block_cache *cache = (struct block_cache *)parse_expression(argv[i]);
+	block_cache* cache = (struct block_cache*)parse_expression(argv[i]);
 	if (cache == NULL) {
 		kprintf("invalid cache address\n");
 		return 0;
@@ -1387,7 +1387,7 @@ dump_cache(int argc, char **argv)
 	off_t blockNumber = -1;
 	if (i + 1 < argc) {
 		blockNumber = parse_expression(argv[i + 1]);
-		cached_block *block = (cached_block *)hash_lookup(cache->hash,
+		cached_block* block = (cached_block*)hash_lookup(cache->hash,
 			&blockNumber);
 		if (block != NULL) {
 			kprintf("BLOCK %p\n", block);
@@ -1439,7 +1439,7 @@ dump_cache(int argc, char **argv)
 		NotificationList::Iterator iterator
 			= cache->pending_notifications.GetIterator();
 		while (iterator.HasNext()) {
-			cache_notification *notification = iterator.Next();
+			cache_notification* notification = iterator.Next();
 
 			kprintf("  %p %5lx %p - %p\n", notification,
 				notification->events_pending, notification->hook,
@@ -1454,8 +1454,8 @@ dump_cache(int argc, char **argv)
 		hash_iterator iterator;
 		hash_open(cache->transaction_hash, &iterator);
 
-		cache_transaction *transaction;
-		while ((transaction = (cache_transaction *)hash_next(
+		cache_transaction* transaction;
+		while ((transaction = (cache_transaction*)hash_next(
 				cache->transaction_hash, &iterator)) != NULL) {
 			kprintf("%p %5ld %-7s %5ld %5ld %5ld\n", transaction,
 				transaction->id, transaction->open ? "open" : "closed",
@@ -1475,8 +1475,8 @@ dump_cache(int argc, char **argv)
 	uint32 dirty = 0;
 	hash_iterator iterator;
 	hash_open(cache->hash, &iterator);
-	cached_block *block;
-	while ((block = (cached_block *)hash_next(cache->hash, &iterator)) != NULL) {
+	cached_block* block;
+	while ((block = (cached_block*)hash_next(cache->hash, &iterator)) != NULL) {
 		if (showBlocks)
 			dump_block(block);
 
@@ -1496,7 +1496,7 @@ dump_cache(int argc, char **argv)
 
 
 static int
-dump_transaction(int argc, char **argv)
+dump_transaction(int argc, char** argv)
 {
 	bool showBlocks = false;
 	int i = 1;
@@ -1510,12 +1510,12 @@ dump_transaction(int argc, char **argv)
 		return 0;
 	}
 
-	cache_transaction *transaction = NULL;
+	cache_transaction* transaction = NULL;
 
 	if (argc - i == 1) {
-		transaction = (cache_transaction *)parse_expression(argv[i]);
+		transaction = (cache_transaction*)parse_expression(argv[i]);
 	} else {
-		block_cache *cache = (block_cache *)parse_expression(argv[i]);
+		block_cache* cache = (block_cache*)parse_expression(argv[i]);
 		int32 id = parse_expression(argv[i + 1]);
 		transaction = lookup_transaction(cache, id);
 		if (transaction == NULL) {
@@ -1539,7 +1539,7 @@ dump_transaction(int argc, char **argv)
 
 	ListenerList::Iterator iterator = transaction->listeners.GetIterator();
 	while (iterator.HasNext()) {
-		cache_listener *listener = iterator.Next();
+		cache_listener* listener = iterator.Next();
 
 		kprintf("  %p %5lx %p - %p\n", listener, listener->events_pending,
 			listener->hook, listener->data);
@@ -1552,7 +1552,7 @@ dump_transaction(int argc, char **argv)
 	kprintf("address  block no. current  original parent    refs access "
 		"flags transact prev. trans\n");
 
-	cached_block *block = transaction->first_block;
+	cached_block* block = transaction->first_block;
 	while (block != NULL) {
 		dump_block(block);
 		block = block->transaction_next;
@@ -1571,13 +1571,13 @@ dump_transaction(int argc, char **argv)
 
 
 static int
-dump_caches(int argc, char **argv)
+dump_caches(int argc, char** argv)
 {
 	kprintf("Block caches:\n");
 	DoublyLinkedList<block_cache>::Iterator i = sCaches.GetIterator();
 	while (i.HasNext()) {
-		block_cache *cache = i.Next();
-		if (cache == (block_cache *)&sMarkCache)
+		block_cache* cache = i.Next();
+		if (cache == (block_cache*)&sMarkCache)
 			continue;
 
 		kprintf("  %p\n", cache);
@@ -1595,23 +1595,23 @@ dump_caches(int argc, char **argv)
 	deletion state.
 	Returns \c NULL when the end of the list is reached.
 */
-static block_cache *
-get_next_locked_block_cache(block_cache *last)
+static block_cache*
+get_next_locked_block_cache(block_cache* last)
 {
 	MutexLocker _(sCachesLock);
 
-	block_cache *cache;
+	block_cache* cache;
 	if (last != NULL) {
 		mutex_unlock(&last->lock);
 
-		cache = sCaches.GetNext((block_cache *)&sMarkCache);
-		sCaches.Remove((block_cache *)&sMarkCache);
+		cache = sCaches.GetNext((block_cache*)&sMarkCache);
+		sCaches.Remove((block_cache*)&sMarkCache);
 	} else
 		cache = sCaches.Head();
 
 	if (cache != NULL) {
 		mutex_lock(&cache->lock);
-		sCaches.Insert(sCaches.GetNext(cache), (block_cache *)&sMarkCache);
+		sCaches.Insert(sCaches.GetNext(cache), (block_cache*)&sMarkCache);
 	}
 
 	return cache;
@@ -1623,7 +1623,7 @@ get_next_locked_block_cache(block_cache *last)
 	Every two seconds, it will also write back up to 64 blocks per cache.
 */
 static status_t
-block_notifier_and_writer(void */*data*/)
+block_notifier_and_writer(void* /*data*/)
 {
 	const bigtime_t kTimeout = 2000000LL;
 	bigtime_t timeout = kTimeout;
@@ -1643,10 +1643,10 @@ block_notifier_and_writer(void */*data*/)
 		// TODO: change this once we have an I/O scheduler
 		timeout = kTimeout;
 
-		block_cache *cache = NULL;
+		block_cache* cache = NULL;
 		while ((cache = get_next_locked_block_cache(cache)) != NULL) {
 			const uint32 kMaxCount = 64;
-			cached_block *blocks[kMaxCount];
+			cached_block* blocks[kMaxCount];
 			uint32 count = 0;
 
 			if (cache->num_dirty_blocks) {
@@ -1655,9 +1655,9 @@ block_notifier_and_writer(void */*data*/)
 				hash_iterator iterator;
 				hash_open(cache->hash, &iterator);
 
-				cached_block *block;
+				cached_block* block;
 				while (count < kMaxCount
-					&& (block = (cached_block *)hash_next(cache->hash,
+					&& (block = (cached_block*)hash_next(cache->hash,
 							&iterator)) != NULL) {
 					if (block->is_dirty)
 						blocks[count++] = block;
@@ -1668,8 +1668,8 @@ block_notifier_and_writer(void */*data*/)
 				hash_iterator iterator;
 				hash_open(cache->transaction_hash, &iterator);
 
-				cache_transaction *transaction;
-				while ((transaction = (cache_transaction *)hash_next(
+				cache_transaction* transaction;
+				while ((transaction = (cache_transaction*)hash_next(
 						cache->transaction_hash, &iterator)) != NULL
 					&& count < kMaxCount) {
 					if (transaction->open) {
@@ -1695,7 +1695,7 @@ block_notifier_and_writer(void */*data*/)
 				hash_close(cache->transaction_hash, &iterator, false);
 			}
 
-			qsort(blocks, count, sizeof(void *), &compare_blocks);
+			qsort(blocks, count, sizeof(void*), &compare_blocks);
 
 			for (uint32 i = 0; i < count; i++) {
 				if (write_cached_block(cache, blocks[i], true) != B_OK)
@@ -1708,9 +1708,9 @@ block_notifier_and_writer(void */*data*/)
 
 /*!	Notify function for wait_for_notifications(). */
 static void
-notify_sync(int32 transactionID, int32 event, void *_cache)
+notify_sync(int32 transactionID, int32 event, void* _cache)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 
 	cache->condition_variable.NotifyOne();
 }
@@ -1721,7 +1721,7 @@ notify_sync(int32 transactionID, int32 event, void *_cache)
 	You must not hold the \a cache lock when calling this function.
 */
 static void
-wait_for_notifications(block_cache *cache)
+wait_for_notifications(block_cache* cache)
 {
 	if (find_thread(NULL) == sNotifierWriterThread) {
 		// We're the notifier thread, don't wait, but flush all pending
@@ -1808,9 +1808,9 @@ block_cache_used_memory()
 
 
 extern "C" int32
-cache_start_transaction(void *_cache)
+cache_start_transaction(void* _cache)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	if (cache->last_transaction && cache->last_transaction->open) {
@@ -1818,7 +1818,7 @@ cache_start_transaction(void *_cache)
 			cache->last_transaction->id);
 	}
 
-	cache_transaction *transaction = new(nothrow) cache_transaction;
+	cache_transaction* transaction = new(nothrow) cache_transaction;
 	if (transaction == NULL)
 		return B_NO_MEMORY;
 
@@ -1835,9 +1835,9 @@ cache_start_transaction(void *_cache)
 
 
 extern "C" status_t
-cache_sync_transaction(void *_cache, int32 id)
+cache_sync_transaction(void* _cache, int32 id)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 	status_t status = B_ENTRY_NOT_FOUND;
 
@@ -1846,8 +1846,8 @@ cache_sync_transaction(void *_cache, int32 id)
 	hash_iterator iterator;
 	hash_open(cache->transaction_hash, &iterator);
 
-	cache_transaction *transaction;
-	while ((transaction = (cache_transaction *)hash_next(
+	cache_transaction* transaction;
+	while ((transaction = (cache_transaction*)hash_next(
 			cache->transaction_hash, &iterator)) != NULL) {
 		// close all earlier transactions which haven't been closed yet
 
@@ -1860,9 +1860,9 @@ cache_sync_transaction(void *_cache, int32 id)
 				block_list::Iterator iterator
 					= transaction->blocks.GetIterator();
 				uint32 maxCount = transaction->num_blocks;
-				cached_block *buffer[16];
-				cached_block **blocks = (cached_block **)malloc(maxCount
-					* sizeof(void *));
+				cached_block* buffer[16];
+				cached_block** blocks = (cached_block**)malloc(maxCount
+					* sizeof(void*));
 				if (blocks == NULL) {
 					maxCount = 16;
 					blocks = buffer;
@@ -1872,7 +1872,7 @@ cache_sync_transaction(void *_cache, int32 id)
 				for (; count < maxCount && iterator.HasNext(); count++) {
 					blocks[count] = iterator.Next();
 				}
-				qsort(blocks, count, sizeof(void *), &compare_blocks);
+				qsort(blocks, count, sizeof(void*), &compare_blocks);
 
 				for (uint32 i = 0; i < count; i++) {
 					status = write_cached_block(cache, blocks[i], false);
@@ -1903,15 +1903,15 @@ cache_sync_transaction(void *_cache, int32 id)
 
 
 extern "C" status_t
-cache_end_transaction(void *_cache, int32 id,
-	transaction_notification_hook hook, void *data)
+cache_end_transaction(void* _cache, int32 id,
+	transaction_notification_hook hook, void* data)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_end_transaction(id = %ld)\n", id));
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
 		panic("cache_end_transaction(): invalid transaction ID\n");
 		return B_BAD_VALUE;
@@ -1928,7 +1928,8 @@ cache_end_transaction(void *_cache, int32 id,
 
 	// iterate through all blocks and free the unchanged original contents
 
-	cached_block *block = transaction->first_block, *next;
+	cached_block* block = transaction->first_block;
+	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
@@ -1961,14 +1962,14 @@ cache_end_transaction(void *_cache, int32 id,
 
 
 extern "C" status_t
-cache_abort_transaction(void *_cache, int32 id)
+cache_abort_transaction(void* _cache, int32 id)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_abort_transaction(id = %ld)\n", id));
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
 		panic("cache_abort_transaction(): invalid transaction ID\n");
 		return B_BAD_VALUE;
@@ -1979,7 +1980,8 @@ cache_abort_transaction(void *_cache, int32 id)
 
 	// iterate through all blocks and restore their original contents
 
-	cached_block *block = transaction->first_block, *next;
+	cached_block* block = transaction->first_block;
+	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
@@ -2012,15 +2014,15 @@ cache_abort_transaction(void *_cache, int32 id)
 	The new transaction also gets a new transaction ID.
 */
 extern "C" int32
-cache_detach_sub_transaction(void *_cache, int32 id,
-	transaction_notification_hook hook, void *data)
+cache_detach_sub_transaction(void* _cache, int32 id,
+	transaction_notification_hook hook, void* data)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_detach_sub_transaction(id = %ld)\n", id));
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
 		panic("cache_detach_sub_transaction(): invalid transaction ID\n");
 		return B_BAD_VALUE;
@@ -2029,7 +2031,7 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 		return B_BAD_VALUE;
 
 	// create a new transaction for the sub transaction
-	cache_transaction *newTransaction = new(nothrow) cache_transaction;
+	cache_transaction* newTransaction = new(nothrow) cache_transaction;
 	if (transaction == NULL)
 		return B_NO_MEMORY;
 
@@ -2046,7 +2048,9 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 
 	// iterate through all blocks and free the unchanged original contents
 
-	cached_block *block = transaction->first_block, *next, *last = NULL;
+	cached_block* block = transaction->first_block;
+	cached_block* last = NULL;
+	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
@@ -2101,14 +2105,14 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 
 
 extern "C" status_t
-cache_abort_sub_transaction(void *_cache, int32 id)
+cache_abort_sub_transaction(void* _cache, int32 id)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_abort_sub_transaction(id = %ld)\n", id));
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
 		panic("cache_abort_sub_transaction(): invalid transaction ID\n");
 		return B_BAD_VALUE;
@@ -2121,7 +2125,8 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 
 	// revert all changes back to the version of the parent
 
-	cached_block *block = transaction->first_block, *next;
+	cached_block* block = transaction->first_block;
+	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
@@ -2152,14 +2157,14 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 
 
 extern "C" status_t
-cache_start_sub_transaction(void *_cache, int32 id)
+cache_start_sub_transaction(void* _cache, int32 id)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_start_sub_transaction(id = %ld)\n", id));
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
 		panic("cache_start_sub_transaction(): invalid transaction ID %ld\n", id);
 		return B_BAD_VALUE;
@@ -2169,7 +2174,8 @@ cache_start_sub_transaction(void *_cache, int32 id)
 
 	// move all changed blocks up to the parent
 
-	cached_block *block = transaction->first_block, *next;
+	cached_block* block = transaction->first_block;
+	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
@@ -2201,14 +2207,14 @@ cache_start_sub_transaction(void *_cache, int32 id)
 	The listener gets automatically removed when the transaction ends.
 */
 status_t
-cache_add_transaction_listener(void *_cache, int32 id, int32 events,
-	transaction_notification_hook hook, void *data)
+cache_add_transaction_listener(void* _cache, int32 id, int32 events,
+	transaction_notification_hook hook, void* data)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 
 	MutexLocker locker(&cache->lock);
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
 		return B_BAD_VALUE;
 
@@ -2217,20 +2223,20 @@ cache_add_transaction_listener(void *_cache, int32 id, int32 events,
 
 
 status_t
-cache_remove_transaction_listener(void *_cache, int32 id,
-	transaction_notification_hook hookFunction, void *data)
+cache_remove_transaction_listener(void* _cache, int32 id,
+	transaction_notification_hook hookFunction, void* data)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 
 	MutexLocker locker(&cache->lock);
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
 		return B_BAD_VALUE;
 
 	ListenerList::Iterator iterator = transaction->listeners.GetIterator();
 	while (iterator.HasNext()) {
-		cache_listener *listener = iterator.Next();
+		cache_listener* listener = iterator.Next();
 		if (listener->data == data && listener->hook == hookFunction) {
 			iterator.Remove();
 
@@ -2249,15 +2255,15 @@ cache_remove_transaction_listener(void *_cache, int32 id,
 
 
 extern "C" status_t
-cache_next_block_in_transaction(void *_cache, int32 id, bool mainOnly,
-	long *_cookie, off_t *_blockNumber, void **_data, void **_unchangedData)
+cache_next_block_in_transaction(void* _cache, int32 id, bool mainOnly,
+	long* _cookie, off_t* _blockNumber, void** _data, void** _unchangedData)
 {
-	cached_block *block = (cached_block *)*_cookie;
-	block_cache *cache = (block_cache *)_cache;
+	cached_block* block = (cached_block*)*_cookie;
+	block_cache* cache = (block_cache*)_cache;
 
 	MutexLocker locker(&cache->lock);
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL || !transaction->open)
 		return B_BAD_VALUE;
 
@@ -2294,12 +2300,12 @@ cache_next_block_in_transaction(void *_cache, int32 id, bool mainOnly,
 
 
 extern "C" int32
-cache_blocks_in_transaction(void *_cache, int32 id)
+cache_blocks_in_transaction(void* _cache, int32 id)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
 		return B_BAD_VALUE;
 
@@ -2308,12 +2314,12 @@ cache_blocks_in_transaction(void *_cache, int32 id)
 
 
 extern "C" int32
-cache_blocks_in_main_transaction(void *_cache, int32 id)
+cache_blocks_in_main_transaction(void* _cache, int32 id)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
 		return B_BAD_VALUE;
 
@@ -2322,12 +2328,12 @@ cache_blocks_in_main_transaction(void *_cache, int32 id)
 
 
 extern "C" int32
-cache_blocks_in_sub_transaction(void *_cache, int32 id)
+cache_blocks_in_sub_transaction(void* _cache, int32 id)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
-	cache_transaction *transaction = lookup_transaction(cache, id);
+	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
 		return B_BAD_VALUE;
 
@@ -2339,9 +2345,9 @@ cache_blocks_in_sub_transaction(void *_cache, int32 id)
 
 
 extern "C" void
-block_cache_delete(void *_cache, bool allowWrites)
+block_cache_delete(void* _cache, bool allowWrites)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 
 	if (allowWrites)
 		block_cache_sync(cache);
@@ -2355,8 +2361,8 @@ block_cache_delete(void *_cache, bool allowWrites)
 	// free all blocks
 
 	uint32 cookie = 0;
-	cached_block *block;
-	while ((block = (cached_block *)hash_remove_first(cache->hash,
+	cached_block* block;
+	while ((block = (cached_block*)hash_remove_first(cache->hash,
 			&cookie)) != NULL) {
 		cache->FreeBlock(block);
 	}
@@ -2364,8 +2370,8 @@ block_cache_delete(void *_cache, bool allowWrites)
 	// free all transactions (they will all be aborted)
 
 	cookie = 0;
-	cache_transaction *transaction;
-	while ((transaction = (cache_transaction *)hash_remove_first(
+	cache_transaction* transaction;
+	while ((transaction = (cache_transaction*)hash_remove_first(
 			cache->transaction_hash, &cookie)) != NULL) {
 		delete transaction;
 	}
@@ -2374,10 +2380,10 @@ block_cache_delete(void *_cache, bool allowWrites)
 }
 
 
-extern "C" void *
+extern "C" void*
 block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
 {
-	block_cache *cache = new(nothrow) block_cache(fd, numBlocks, blockSize,
+	block_cache* cache = new(nothrow) block_cache(fd, numBlocks, blockSize,
 		readOnly);
 	if (cache == NULL)
 		return NULL;
@@ -2395,9 +2401,9 @@ block_cache_create(int fd, off_t numBlocks, size_t blockSize, bool readOnly)
 
 
 extern "C" status_t
-block_cache_sync(void *_cache)
+block_cache_sync(void* _cache)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 
 	// we will sync all dirty blocks to disk that have a completed
 	// transaction or no transaction only
@@ -2406,8 +2412,8 @@ block_cache_sync(void *_cache)
 	hash_iterator iterator;
 	hash_open(cache->hash, &iterator);
 
-	cached_block *block;
-	while ((block = (cached_block *)hash_next(cache->hash, &iterator)) != NULL) {
+	cached_block* block;
+	while ((block = (cached_block*)hash_next(cache->hash, &iterator)) != NULL) {
 		if (block->previous_transaction != NULL
 			|| (block->transaction == NULL && block->is_dirty)) {
 			status_t status = write_cached_block(cache, block);
@@ -2427,9 +2433,9 @@ block_cache_sync(void *_cache)
 
 
 extern "C" status_t
-block_cache_sync_etc(void *_cache, off_t blockNumber, size_t numBlocks)
+block_cache_sync_etc(void* _cache, off_t blockNumber, size_t numBlocks)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 
 	// we will sync all dirty blocks to disk that have a completed
 	// transaction or no transaction only
@@ -2443,7 +2449,7 @@ block_cache_sync_etc(void *_cache, off_t blockNumber, size_t numBlocks)
 	MutexLocker locker(&cache->lock);
 
 	for (; numBlocks > 0; numBlocks--, blockNumber++) {
-		cached_block *block = (cached_block *)hash_lookup(cache->hash,
+		cached_block* block = (cached_block*)hash_lookup(cache->hash,
 			&blockNumber);
 		if (block == NULL)
 			continue;
@@ -2492,19 +2498,19 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 
 
 extern "C" status_t
-block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction)
+block_cache_make_writable(void* _cache, off_t blockNumber, int32 transaction)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	if (cache->read_only)
 		panic("tried to make block writable on a read-only cache!");
 
 	// ToDo: this can be done better!
-	void *block = get_writable_cached_block(cache, blockNumber,
+	void* block = get_writable_cached_block(cache, blockNumber,
 		blockNumber, 1, transaction, false);
 	if (block != NULL) {
-		put_cached_block((block_cache *)_cache, blockNumber);
+		put_cached_block((block_cache*)_cache, blockNumber);
 		return B_OK;
 	}
 
@@ -2512,11 +2518,11 @@ block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction)
 }
 
 
-extern "C" void *
-block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base,
+extern "C" void*
+block_cache_get_writable_etc(void* _cache, off_t blockNumber, off_t base,
 	off_t length, int32 transaction)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	TRACE(("block_cache_get_writable_etc(block = %Ld, transaction = %ld)\n",
@@ -2529,18 +2535,18 @@ block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base,
 }
 
 
-extern "C" void *
-block_cache_get_writable(void *_cache, off_t blockNumber, int32 transaction)
+extern "C" void*
+block_cache_get_writable(void* _cache, off_t blockNumber, int32 transaction)
 {
 	return block_cache_get_writable_etc(_cache, blockNumber,
 		blockNumber, 1, transaction);
 }
 
 
-extern "C" void *
-block_cache_get_empty(void *_cache, off_t blockNumber, int32 transaction)
+extern "C" void*
+block_cache_get_empty(void* _cache, off_t blockNumber, int32 transaction)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	TRACE(("block_cache_get_empty(block = %Ld, transaction = %ld)\n",
@@ -2548,19 +2554,19 @@ block_cache_get_empty(void *_cache, off_t blockNumber, int32 transaction)
 	if (cache->read_only)
 		panic("tried to get empty writable block on a read-only cache!");
 
-	return get_writable_cached_block((block_cache *)_cache, blockNumber,
+	return get_writable_cached_block((block_cache*)_cache, blockNumber,
 		blockNumber, 1, transaction, true);
 }
 
 
-extern "C" const void *
-block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
+extern "C" const void*
+block_cache_get_etc(void* _cache, off_t blockNumber, off_t base, off_t length)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 	bool allocated;
 
-	cached_block *block = get_cached_block(cache, blockNumber, &allocated);
+	cached_block* block = get_cached_block(cache, blockNumber, &allocated);
 	if (block == NULL)
 		return NULL;
 
@@ -2576,8 +2582,8 @@ block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 }
 
 
-extern "C" const void *
-block_cache_get(void *_cache, off_t blockNumber)
+extern "C" const void*
+block_cache_get(void* _cache, off_t blockNumber)
 {
 	return block_cache_get_etc(_cache, blockNumber, blockNumber, 1);
 }
@@ -2591,13 +2597,13 @@ block_cache_get(void *_cache, off_t blockNumber)
 	writable!
 */
 extern "C" status_t
-block_cache_set_dirty(void *_cache, off_t blockNumber, bool dirty,
+block_cache_set_dirty(void* _cache, off_t blockNumber, bool dirty,
 	int32 transaction)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
-	cached_block *block = (cached_block *)hash_lookup(cache->hash,
+	cached_block* block = (cached_block*)hash_lookup(cache->hash,
 		&blockNumber);
 	if (block == NULL)
 		return B_BAD_VALUE;
@@ -2615,9 +2621,9 @@ block_cache_set_dirty(void *_cache, off_t blockNumber, bool dirty,
 
 
 extern "C" void
-block_cache_put(void *_cache, off_t blockNumber)
+block_cache_put(void* _cache, off_t blockNumber)
 {
-	block_cache *cache = (block_cache *)_cache;
+	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 
 	put_cached_block(cache, blockNumber);
