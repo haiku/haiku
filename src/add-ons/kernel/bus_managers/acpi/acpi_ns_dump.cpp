@@ -6,8 +6,8 @@
 #include <Drivers.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
 
 #include "acpi_priv.h"
 
@@ -51,19 +51,12 @@ make_space(acpi_ns_device_info *device, size_t space)
 		return true;
 	bool released = false;
 	do {
-		/*if (!released) {
-			released = true;
-			if (release_sem(device->read_sem) != B_OK) {
-				panic("can't release sem");
-				return false;
-			}
-		}*/
 		device->buffer->Unlock();
 
 		if (!released) {
-			dprintf("try to release\n");
+			//dprintf("try to release\n");
 			if (release_sem_etc(device->read_sem, 1, B_RELEASE_IF_WAITING_ONLY) == B_OK) {
-				dprintf("released\n");
+				//dprintf("released\n");
 				released = true;
 			}
 		}
@@ -92,28 +85,18 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 	size_t written = 0;
 	hid[8] = '\0';
 	tabs[0] = '\0';
-	for (i = 0; i < indenting; i++) {
-		sprintf(tabs, "%s|    ", tabs);
-	}
-	sprintf(tabs, "%s|--- ", tabs);
+	for (i = 0; i < indenting; i++) 
+		strlcat(tabs, "|    ", sizeof(tabs));
+
+	strlcat(tabs, "|--- ", sizeof(tabs));
+
 	int depth = sizeof(char) * 5 * indenting + sizeof(char); // index into result where the device name will be.
 	
-	if (atomic_add(&sNumCount, 1) >= 200) {
-		dprintf("above 200");
-		// TODO: Without this, the function never finishes
-		// to dump the acpi tree, so there seems to be something
-		// weird with the acpi code 
-		exit_thread(B_ERROR);
-	}	
-
 	void *counter = NULL;
 	while (device->acpi->get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
 		uint32 type = device->acpi->get_object_type(result);
-		sprintf(output, "%s%s", tabs, result + depth);
+		snprintf(output, sizeof(output), "%s%s", tabs, result + depth);
 		switch(type) {
-			case ACPI_TYPE_ANY:
-			default: 
-				break;
 			case ACPI_TYPE_INTEGER:
 				snprintf(output, sizeof(output), "%s     INTEGER", output);
 				break;
@@ -130,7 +113,8 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 				snprintf(output, sizeof(output), "%s     FIELD UNIT", output);
 				break;
 			case ACPI_TYPE_DEVICE:
-				device->acpi->get_device_hid(result, hid);
+				// TODO: Commented out for the time being, since it screws the outpu
+				//device->acpi->get_device_hid(result, hid);
 				snprintf(output, sizeof(output), "%s     DEVICE (%s)", output, hid);
 				break;
 			case ACPI_TYPE_EVENT:
@@ -157,8 +141,10 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 			case ACPI_TYPE_BUFFER_FIELD:
 				snprintf(output, sizeof(output), "%s     BUFFER_FIELD", output);
 				break;
+			case ACPI_TYPE_ANY:
+			default:
+				break;
 		}
-		//strcat(output, "\n");
 		written = 0;
 		RingBuffer &ringBuffer = *device->buffer;
 		size_t toWrite = strlen(output);
@@ -183,10 +169,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 
 			dump_acpi_namespace(device, result, indenting + 1);
 		}
-
 	}
-	//dprintf("Reached end of devices, root %s, counter %p\n", root, counter);
-	//panic("reached end of device!!!");
 }
 
 
@@ -232,17 +215,25 @@ acpi_namespace_open(void *_cookie, const char* path, int flags, void** cookie)
 		return B_NO_MEMORY;
 
 	device->read_sem = create_sem(0, "read_sem");
+	if (device->read_sem < B_OK) {
+		delete ringBuffer;
+		return device->read_sem;
+	}
 
 	device->thread = spawn_kernel_thread(acpi_namespace_dump, "acpi dumper",
 		 B_NORMAL_PRIORITY, device);
 	if (device->thread < 0) {
 		delete ringBuffer;
+		delete_sem(device->read_sem);
 		return device->thread;
 	}
 
 	device->buffer = ringBuffer;
+
 	sNumCount = 0;
+
 	resume_thread(device->thread);
+
 	return B_OK;
 }
 
@@ -331,9 +322,9 @@ acpi_namespace_control(void* cookie, uint32 op, void* arg, size_t len)
 static status_t
 acpi_namespace_close(void* cookie)
 {
-	status_t status;
 	acpi_ns_device_info *device = (acpi_ns_device_info *)cookie;
 	dprintf("acpi_ns_dump: device_close\n");
+
 	if (device->read_sem >= 0)
 		delete_sem(device->read_sem);
 	
