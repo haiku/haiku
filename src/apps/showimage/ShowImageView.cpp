@@ -1166,17 +1166,14 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 		// avoid flickering of dragged bitmap caused by drawing into the window
 		AnimateSelection(false);
 		// only use a transparent bitmap on selections less than 400x400 (taking into account zooming)
-		if ((fSelectionRect.Width() * fZoom) < 400.0 && (fSelectionRect.Height() * fZoom) < 400.0)
-		{
+		if ((fSelectionRect.Width() * fZoom) < 400.0 && (fSelectionRect.Height() * fZoom) < 400.0) {
 			sourcePoint -= fSelectionRect.LeftTop();
 			sourcePoint.x *= fZoom;
 			sourcePoint.y *= fZoom;
 			// DragMessage takes ownership of bitmap
 			DragMessage(&drag, bitmap, B_OP_ALPHA, sourcePoint);
 			bitmap = NULL;
-		}
-		else
-		{
+		} else {
 			delete bitmap;
 			// Offset and scale the rect
 			BRect rect(fSelectionRect);
