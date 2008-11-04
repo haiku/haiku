@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src apps deskcalc ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps deskcalc mapm_4.9.5 ] ;
+
 Application DeskCalc :
 	CalcApplication.cpp
 	CalcOptionsWindow.cpp
@@ -11,6 +13,47 @@ Application DeskCalc :
 	ExpressionParser.cpp
 	ExpressionTextView.cpp
 	InputTextView.cpp
+
+	# m_apm files
+	mapmhasn.c
+	mapmhsin.c
+	mapm_pow.c
+	mapm_log.c
+	mapm_lg2.c
+	mapm_lg4.c
+	mapm_exp.c
+	mapm_lg3.c
+	mapmasin.c
+	mapmasn0.c
+	mapm_sin.c
+	mapm5sin.c
+	mapmrsin.c
+	mapm_cpi.c
+	mapmsqrt.c
+	mapmcbrt.c
+	mapmgues.c
+	mapmfact.c
+	mapm_gcd.c
+	mapmipwr.c
+	mapmpwr2.c
+	mapm_rnd.c
+	mapm_flr.c
+	mapm_fpf.c
+	mapm_rcp.c
+	mapmstck.c
+	mapm_div.c
+	mapm_mul.c
+	mapmfmul.c
+	mapm_fft.c
+	mapm_add.c
+	mapmistr.c
+	mapm_set.c
+	mapm_fam.c
+	mapmutil.c
+	mapmutl2.c
+	mapmutl1.c
+	mapmcnst.c
+
 	: be $(TARGET_LIBSTDC++) media
 	: DeskCalc.rdef
 	;

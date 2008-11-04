@@ -6,11 +6,12 @@
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef EXPRESSION_PARSER_H
 #define EXPRESSION_PARSER_H
 
+
 #include <String.h>
+
 
 class Tokenizer;
 
@@ -34,26 +35,28 @@ class ParseException {
 
 struct Function;
 struct Token;
+class MAPM;
 
 class ExpressionParser {
  public:
 								ExpressionParser();
 								~ExpressionParser();
 
-			double				Evaluate(const char* expressionString);
+			BString				Evaluate(const char* expressionString);
 
  private:
 
-			double				_ParseBinary();
-			double				_ParseSum();
-			double				_ParseProduct();
-			double				_ParsePower();
-			double				_ParseUnary();
-			double				_ParseFunction(const Token& token);
-			double				_ParseAtom();
+			MAPM				_ParseBinary();
+			MAPM				_ParseSum();
+			MAPM				_ParseProduct();
+			MAPM				_ParsePower();
+			MAPM				_ParseUnary();
+			void				_InitArguments(MAPM values[],
+									int32 argumentCount);
+			MAPM				_ParseFunction(const Token& token);
+			MAPM				_ParseAtom();
 
 			void				_EatToken(int32 type);
-			const Function*		_FindFunction(const char* name) const;
 
 			Tokenizer*			fTokenizer;
 };

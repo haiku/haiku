@@ -774,9 +774,6 @@ CalcView::SaveSettings(BMessage* archive) const
 void
 CalcView::Evaluate()
 {
-	const double EXP_SWITCH_HI = 1e12; // # digits to switch from std->exp form
-	const double EXP_SWITCH_LO = 1e-12;
-
 	BString expression = fExpressionTextView->Text();
 
 	if (expression.Length() == 0) {
@@ -792,10 +789,8 @@ CalcView::Evaluate()
 		play_sound(&zimp_ref, true, false, false);
 	}
 
-//printf("evaluate: %s\n", expression.String());
-
 	// evaluate expression
-	double value = 0.0;
+	BString value;
 
 	try {
 		ExpressionParser parser;
@@ -807,37 +802,8 @@ CalcView::Evaluate()
 		return;
 	}
 
-//printf("  -> value: %f\n", value);
-
-	// beautify the expression
-	// TODO: see if this is necessary at all
-	char buf[64];
-	if (value == 0) {
-		strcpy(buf, "0");
-	} else if (((value <  EXP_SWITCH_HI) && (value >  EXP_SWITCH_LO)) ||
-			   ((value > -EXP_SWITCH_HI) && (value < -EXP_SWITCH_LO))) {
-		// print in std form
-		sprintf(buf, "%.13f", value);
-
-		// hack to remove surplus zeros!
-		if (strchr(buf, '.')) {
-			int32 i = strlen(buf) - 1;
-			for (; i > 0; i--) {
-				if (buf[i] == '0')
-					buf[i] = '\0';
-				else
-					break;
-			}
-			if (buf[i] == '.')
-				buf[i] = '\0';
-		}
-	} else {
-		// print in exponential form
-		sprintf(buf, "%e", value);
-	}
-		
 	// render new result to display
-	fExpressionTextView->SetExpression(buf);
+	fExpressionTextView->SetExpression(value.String());
 }
 
 

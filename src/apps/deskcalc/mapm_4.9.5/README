@@ -1,0 +1,769 @@
+**************************************************************************
+  
+				   MAPM
+
+			       Version 4.9.5
+
+			     December 10, 2007
+
+			      Michael C. Ring
+
+			    ringx004@tc.umn.edu
+
+		    Latest release will be available at
+		        http://tc.umn.edu/~ringx004
+
+***************************************************************************
+*									  *
+*  Copyright (C) 1999 - 2007   Michael C. Ring                            *
+*									  *
+*  This software is Freeware.						  *
+*									  *
+*  Permission to use, copy, and distribute this software and its          *
+*  documentation for any purpose with or without fee is hereby granted,   *
+*  provided that the above copyright notice appear in all copies and      *
+*  that both that copyright notice and this permission notice appear      *
+*  in supporting documentation.                                           *
+*									  *
+*  Permission to modify the software is granted. Permission to distribute *
+*  the modified code is granted. Modifications are to be distributed by   *
+*  using the file 'license.txt' as a template to modify the file header.  *
+*  'license.txt' is available in the official MAPM distribution.          *
+*									  *
+*  To distribute modified source code, insert the file 'license.txt'      *
+*  at the top of all modified source code files and edit accordingly.     *
+*									  *
+*  This software is provided "as is" without express or implied warranty. *
+*									  *
+***************************************************************************
+
+		---------------------------------------
+		Mike's Arbitrary Precision Math Library
+		---------------------------------------
+
+Mike's Arbitrary Precision Math Library is a set of functions that
+allow the user to perform math to any level of accuracy that is
+desired. The inspiration for this library was Lloyd Zusman's similar
+APM package that was released in ~1988. I borrowed some of his ideas
+in my implementation, creating a new data type (MAPM) and how the data
+type was used by the user. However, there were a few things I wanted
+my library to do that the original library did not :
+
+1) Round a value to any desired precision. This is very handy when
+   multiplying for many iterations. Since multiplication guarantees an
+   exact result, the number of digits will grow without bound. I wanted
+   a way to trim the number of significant digits that were retained.
+
+2) A natural support for floating point values. From most of the other
+   libraries I looked at, they seem to have a preference for integer
+   only type math manipulations. (However, this library will also do
+   integer only math if you desire).
+
+   And if a library can only do integers, it can't do ...
+
+3) Trig functions and other common C math library functions. This library
+   will perform the following functions to any desired precision level :
+   SQRT, CBRT, SIN, COS, TAN, ARC-SIN, ARC-COS, ARC-TAN, ARC-TAN2, LOG,
+   LOG10, EXP, POW, SINH, COSH, TANH, ARC-SINH, ARC-COSH, ARC-TANH, and
+   also FACTORIAL.  The full 'math.h' is not duplicated, though I think
+   these are most of the important ones. My definition of what's important
+   is what I've actually used in a real application.
+
+**************************************************************************
+
+NOTE:
+
+There is a COMPILER BUG in Microsoft's Visual C++ 7.x (VS.NET 2003) which
+prevents a C++ MAPM application from compiling.
+
+This only affects C++ applications. C applications are OK.
+
+The compiler bug creates an error C2676 similar to this:
+
+<path>...\mapm-49\M_APM.H(###) : error C2676: binary operator '-': 'MAPM'
+doesn't define this operator or a conversion to a suitable type for the
+predefined operator.
+
+To work around this bug, go to http://www.microsoft.com
+
+In the upper right corner of web page, search for "814455".
+
+The results of the search will point you to an article on how to work
+around the problem.
+
+**************************************************************************
+
+NOTE: MAPM Library History can now be found in 'history.txt'
+
+**************************************************************************
+
+ANOTHER NOTE: For the Windows/DOS distribution, the filename convention
+will always be in 8.3 format. This is because there are some users who
+still use 16 bit DOS ....
+
+(I really wasn't sure what to call this library. 'Arbitrary Precision Math'
+is a defacto standard for what this does, but that name was already taken,
+so I just put an 'M' in front of it ...)
+
+**************************************************************************
+
+MAPM LIBRARY NUMERICAL LIMITATIONS:
+
+A general floating point number is of the form:
+
+Sn.nnnnnnnnE+yyyy        ex: -4.318384739357974916E+6215
+Sn.nnnnnnnnE-yyyy        ex: +8.208237913789131096523645193E-12873
+
+'S' is the sign, + or -.
+
+In MAPM, a number (n.nnnn...) may contain up to ( INT_MAX - 1 ) digits.
+
+For example, an MAPM number with a 16 bit integer may contain 2^15 or 32,767
+digits. An MAPM number with a 32 bit integer may contain 2^31 or 2,147,483,647
+digits. All MAPM numbers are stored in RAM, there is no "data on disk" option.
+So to represent the maximum number of digits on a 32 bit CPU will require
+greater than 2 Gig of RAM.
+
+If you have a CPU with 64 bit ints, then the limitation is 2^63 or
+9,223,372,036,854,775,807. It should be a very long time before computers
+have this much RAM in them.
+
+For the exponent (yyyy), the limitations are also INT_MAX and INT_MIN.
+
+For a 16 bit CPU, the largest number you can represent is approx
+0.9999999....E+32767.    (H)
+
+For a 16 bit CPU, the smallest number you can represent (other than 0)
+is approx 0.1E-32767.   (L)
+
+For a 32 bit CPU, the largest number you can represent is approx
+0.9999999....E+2147483647.   (H)
+
+For a 32 bit CPU, the smallest number you can represent (other than 0)
+is approx 0.1E-2147483647.  (L)
+
+The limitations for negative numbers are the same as positive numbers.
+
+
+                            Real Number Axis
+
+     +------------------------+    ---    +--------------------------+
+     |                        |     |     |                          |
+    -H                       -L    0.0   +L                         +H
+
+
+
+MAPM can represent real numbers from -H to -L, 0.0, +L to +H.
+
+The number of significant digits is typically only limited by available RAM.
+
+In MAPM, numerical overflows and underflows are not handled very well
+(actually not at all). There really isn't a clean and portable way to
+detect integer overflow and underflow. Per K&R C, the result of integer
+overflow/underflow is implementation dependent. In assembly language, when
+you add two numbers, you have access to a "carry flag" to see if an overflow
+occurred. C has no analogous operator to a carry flag.
+
+It is up to the user to decide if the results are valid for a given operation.
+In a 32 bit environment, the limit is so large that this is likely not an
+issue for most typical applications. However, it doesn't take much to overflow
+a 16 bit int so care should taken in a 16 bit environment.
+
+The reaction to an integer overflow/underflow is unknown at run-time:
+
+    o) adding 2 large positive numbers may silently roll over to a
+       negative number.
+    o) in some embedded applications an integer overflow/underflow triggers
+       a hardware exception.
+
+Since I don't have control over where this library could possibly run,
+I chose to ignore the problem for now. If anyone has some suggestions
+(that's portable), please let me know.
+
+**************************************************************************
+
+KNOWN BUGS : (Other than integer overflow discussed above....) None
+
+**************************************************************************
+
+IF YOU ARE IN A HURRY ...
+
+UNIX:  (assumes gcc compiler)
+
+run    make          (build library + 4 executables)
+
+run    make -f makefile.osx      (for MAC OSX)
+
+--- OR ---
+
+run:   mklib         (this will create the library, lib_mapm.a)
+
+run:   mkdemo        (this will create 4 executables, 'calc', 'validate',
+                      'primenum', and 'cpp_demo')
+
+
+DOS / Win NT/9x  (in a DOS window for NT/9x):
+
+see the file 'README.DOS' for instructions.
+
+
+**************************************************************************
+
+calc:  This is a command line version of an RPN calculator. If you are
+       familiar with RPN calculators, the use of this program will be
+       quite obvious. The default is 30 decimal places but this can be
+       changed with the '-d' command line option. This is not an
+       interactive program, it just computes an expression from the command
+       line. Run 'calc' with no arguments to get a list of the operators.
+
+       compute : (345.2 * 87.33) - (11.88 / 3.21E-2)
+
+       calc 345.2 87.33 x 11.88 3.21E-2 / -
+       result: 29776.22254205607476635514018692
+
+
+       compute PI to 70 decimal places :  (6 * arcsin(0.5))
+
+       calc -d70 6 .5 as x
+       result :
+3.1415926535897932384626433832795028841971693993751058209749445923078164
+
+       calc -d70 -1 ac             (arccos(-1) for fastest possible way)
+
+validate : This program will compare the MAPM math functions to the C
+	   standard library functions, like sqrt, sin, exp, etc.  This
+	   should give the user a good idea that the library is operating
+	   correctly. The program will also perform high precision math
+	   using known quantities like PI, log(2), etc.
+
+	   'validate' also attempts to obtain as much code coverage of the
+	   library as is practical. I used 'gcov' (available with the gcc
+	   distribution) to test the code coverage. 100% coverage is not
+	   obtained, compromises must be made in order to have the program
+	   run in a reasonable amount of time.
+
+primenum:  This program will generate the first 10 prime numbers starting
+	   with the number entered as an argument.
+
+	   Example:  primenum 1234567890 will output (actually 1 per line):
+		     this took ~3 sec on my Linux PC, a 350MHz PII.
+
+	   1234567891, 1234567907, 1234567913, 1234567927, 1234567949,
+	   1234567967, 1234567981, 1234568021, 1234568029, 1234568047
+
+
+**************************************************************************
+
+To use the library, simply include 'm_apm.h' and link your program
+with the library, libmapm.a (unix) or mapm.lib (dos).
+
+Note: If your system creates libraries with a '.a' extension, then the
+library will be named libmapm.a. (This conforms to typical unix naming
+conventions).
+
+Note: If your system creates libraries with a '.lib' extension, then the
+library will be named mapm.lib.
+
+For unix builds, you also may need to specify the math library (-lm) when
+linking. The reason is some of the MAPM functions use an iterative algorithm.
+When you use an iterative solution, you have to supply an initial guess. I
+use the standard math library to generate this initial guess. I debated
+whether this library should be stand-alone, i.e. generate it's own initial
+guesses with some algorithm. In the end, I decided using the standard math
+library would not be a big inconvienence and also it was just too tempting
+having an immediate 15 digits of precision. When you prime the iterative
+routines with 15 accurate digits, the MAPM functions converge faster.
+
+See the file 'algorithms.used' to see a description of the algorithms I
+used in the library. Some I derived on my own, others I borrowed from people
+smarter than me. Version 2 of the library supports a 'fast' multiplication
+algorithm. The algorithm used is described in the algorithms.used file. A
+considerable amount of time went into finding fast algorithms for the
+library. However, some could possibly be even better. If anyone has a
+more efficient algorithm for any of these functions, I would like to here
+from you.
+
+See the file 'function.ref' to see a description of all the functions in
+the library and the calling conventions, prototypes, etc.
+
+See the file 'struct.ref' which documents how I store the numbers internally
+in the MAPM data structure. This will not be needed for normal use, but it
+will be very useful if you need to change/add to the existing library.
+
+**************************************************************************
+
+USING MAPM IN A MULTI-THREADED APPLICATION :
+
+Note that the default MAPM library is NOT thread safe. MAPM internal data
+structures could get corrupted if multiple MAPM functions are active at the
+same time. The user should guarantee that only one thread is performing
+MAPM functions. This can usually be achieved by a call to the operating
+system to obtain a 'semaphore', 'mutex', or 'critical code section' so the
+operating system will guarantee that only one MAPM thread will be active
+at a time.
+
+The necessary function wrappers for thread safe operation can be found in
+the sub-directory 'multi_thread' (unix) or 'multithd' (Win/Dos). For now,
+only Microsoft Visual C++ 6.0 is supported.
+
+**************************************************************************
+
+QUICK TEMPLATE FOR NORMAL USE :
+
+The MAPM math is done on a new data type called "M_APM".  This is
+actually a pointer to a structure, but the contents of the structure
+should never be manipulated: all operations on MAPM entities are done
+through a functional interface.
+
+The MAPM routines will automatically allocate enough space in their
+results to hold the proper number of digits.
+
+The caller must initialize all MAPM values before the routines can
+operate on them (including the values intended to contain results of
+calculations).  Once this initialization is done, the user never needs
+to worry about resizing the MAPM values, as this is handled inside the
+MAPM routines and is totally invisible to the user.
+
+The result of a MAPM operation cannot be one of the other MAPM operands.
+If you want this to be the case, you must put the result into a
+temporary variable and then assign (m_apm_copy) it to the appropriate operand.
+
+All of the MAPM math functions begin with m_apm_*.
+
+There are some predefined constants for your use. In case it's not obvious,
+these should never appear as a 'result' parameter in a function call.
+
+The following constants are available : (declared in m_apm.h)
+
+MM_Zero             MM_One              MM_Two             MM_Three
+MM_Four             MM_Five             MM_Ten
+MM_PI               MM_HALF_PI          MM_2_PI            MM_E
+MM_LOG_E_BASE_10    MM_LOG_10_BASE_E    MM_LOG_2_BASE_E    MM_LOG_3_BASE_E
+
+
+The non-integer constants above (PI, log(2), etc) are accurate to 128
+decimal places. The file mapmcnst.c contains these constants. I've
+included 512 digit constants in this file also that are commented out.
+If you need more than 512 digits, you can simply use the 'calc' program
+to generate more precise constants (or create more precise constants at
+run-time in your app).  The number of significant digits in the constants
+should be 6-8 more than the value specified in the #define.
+
+
+Basic plan of attack:
+
+(1)  get your 'numbers' into M_APM format.
+(2)  do your high precision math.
+(3)  get the M_APM numbers back into a format you can use.
+
+
+--------  (1)  --------
+
+#include "m_apm.h"        /* must be included before any M_APM 'declares' */
+
+M_APM    area_mapm;                /* declare your variables */
+M_APM    tmp_mapm;
+M_APM    array_mapm[10];           /* can use normal array notation */
+M_APM    array2d_mapm[10][10];
+
+area_mapm = m_apm_init()           /* init your variables */
+tmp_mapm  = m_apm_init();
+
+for (i=0; i < M; i++)              /* must init every element of the array */
+  array_mapm[i] = m_apm_init();
+
+for (i=0; i < M; i++)
+   for (j=0; j < N; j++)
+     array2d_mapm[i][j] = m_apm_init();
+
+/*
+ *   there are 3 ways to convert your number into an M_APM number
+ *   (see the file function.ref)
+ *
+ *   a) literal string   (exponential notation OK)
+ *   b) long variable
+ *   c) double variable
+ */
+
+m_apm_set_string(tmp_mapm, "5.3286E-7");
+m_apm_set_long(array_mapm[6], -872253L);
+m_apm_set_double(array2d_mapm[3][7], -529.4486711);
+
+
+--------  (2)  --------
+
+do your math ...
+
+m_apm_add(cc_mapm, aa_mapm, MM_PI);
+m_apm_divide(bb_mapm, DECIMAL_PLACES, aa_mapm, MM_LOG_2_BASE_E);
+m_apm_sin(bb_mapm, DECIMAL_PLACES, aa_mapm);
+whatever ...
+
+
+--------  (3)  --------
+
+There are 5 total functions for converting an M_APM number into something
+useful.  (See the file 'function.ref' for full function descriptions)
+
+For these 5 functions, M_APM number -> string is the conversion
+
+===================
+====  METHOD 1 ==== : floating point values	(m_apm_to_string)
+===================
+
+the format will be in scientific (exponential) notation
+
+output string = [-]n.nnnnnE+x   or ...E-x
+
+where 'n' are digits and the exponent will be always be present,
+including E+0
+
+it's easy to convert this to a double:
+
+double dtmp = atof(out_buffer);
+
+
+===================
+====  METHOD 2 ==== : floating point values	(m_apm_to_fixpt_string)
+===================				(m_apm_to_fixpt_stringex)
+						(m_apm_to_fixpt_stringexp)
+the format will be in fixed point notation
+
+output string = [-]mmm.nnnnnn
+
+where 'm' & 'n' are digits.
+
+
+===================
+====  METHOD 3 ==== : integer values		(m_apm_to_integer_string)
+===================
+
+the format will simply be digits with a possible leading '-' sign.
+
+output string = [-]nnnnnn
+
+where 'n' are digits.
+
+it's easy to convert this to a long :
+long mtmp = atol(out_buffer);
+
+... or an int :
+int itmp = atoi(out_buffer);
+
+Note that if the M_APM number has a fractional portion, the fraction
+will be truncated and only the integer portion will be output.
+
+
+char  out_buffer[1024];
+
+m_apm_to_string(out_buffer, DECIMAL_PLACES, mapm_number);
+
+m_apm_to_fixpt_string(out_buffer, DECIMAL_PLACES, mapm_number);
+
+m_apm_to_integer_string(out_buffer, mapm_number);
+
+
+**************************************************************************
+
+*********************************************************
+****  NOTES on the fixed point formatting functions  ****
+*********************************************************
+
+Assume you have the following code:
+
+
+-->   m_apm_set_string(aa_mapm, "2.0E18");
+-->   m_apm_sqrt(bb_mapm, 40, aa_mapm);
+
+-->   m_apm_to_string(buffer, 40, bb_mapm);
+-->   fprintf(stdout,"[%s]\n",buffer);
+
+-->   m_apm_to_fixpt_string(buffer, 40, bb_mapm);
+-->   fprintf(stdout,"[%s]\n",buffer);
+
+
+It is desired to compute the sqrt(2.0E+18) to
+40 significant digits. You then want the result
+output with 40 decimal places. But the output
+from above is :
+
+[1.4142135623730950488016887242096980785697E+9]
+[1414213562.3730950488016887242096980785697000000000]
+
+
+Why are there 9 '0' in the fixed point formatted string??
+
+The sqrt calculation computed 40 significant digits relative
+to the number in EXPONENTIAL format. When the number is
+output in exponential format, the 40 digits are as expected
+with an exponent of 'E+9'.
+
+The same number formatted as fixed point appears to be an
+error.  Remember, we computed 40 significant digits.  However,
+the result has an exponent of '+9'. So, 9 of the digits are
+needed *before* the decimal point. In our calculation, only
+31 digits of precision remain from our original 40. We then
+asked the fixed point formatting function to format 40 digits.
+Only 31 are left so 9 zeros are used as pad at the end to
+fulfill the 40 places asked for.
+
+Keep this in mind if you truly desire more accurate results
+in fixed point formatting and your result contains a large
+positive exponent.
+
+**************************************************************************
+
+MAPM C++ WRAPPER CLASS:
+
+Orion Sky Lawlor (olawlor@acm.org) has added a very nice C++ wrapper
+class to m_apm.h. This C++ class will have no effect if you just use
+a normal C compiler. The library will operate as before with no user
+impacts.
+
+For now, I recommend compiling the library as 'C'. The library will
+compile as a C++ library, but then it is likely that you would not
+be able to use the library in a straight C application.  Since the C++
+wrapper class works very nicely as is, there is no pressing need to compile
+the library as C++.
+
+See the file 'cpp_function.ref' to see a description of how to use
+the MAPM class.
+
+To compile and link the C++ demo program: (assuming the library is
+already built)
+
+UNIX:
+
+g++ cpp_demo.cpp lib_mapm.a -s -o cpp_demo -lm
+
+GCC for DOS: (gxx (or g++) is the C++ compiler)
+
+gxx cpp_demo.cpp lib_mapm.a -s -o cpp_demo.exe -lm
+
+
+Using the C++ wrapper allows you to do things like:
+
+// Compute the factorial of the integer n
+
+MAPM factorial(MAPM n)
+{
+	MAPM i;
+	MAPM product = 1;
+	for (i=2; i <= n; i++)
+		product *= i;
+	return product;
+}
+
+
+The syntax is the same as if you were just writing normal code, but all
+the computations will be performed with the high precision math library,
+using the new 'datatype' MAPM.
+
+The default precision of the computations is as follows:
+
+Addition, subtraction, and multiplication will maintain ALL significant
+digits.
+
+All other operations (divide, sin, etc) will use the following rules:
+
+1) if the operation uses only one input value [y = sin(x)], the result 'y'
+   will be the same precision as 'x', with a minimum of 30 digits if 'x' is
+   less than 30 digits.
+
+2) if the operation uses two input values [z = atan2(y,x)], the result 'z'
+   will be the max digits of 'x' or 'y' with a minimum of 30.
+
+The default precision is 30 digits. You can change the precision at
+any time with the function 'm_apm_cpp_precision'. (See function.ref)
+
+---->        m_apm_cpp_precision(80);
+
+will result in all operations being accurate to a minimum of 80 significant
+digits. If any operand contains more than the minimum number of digits, then
+the result will contain the max number of digits of the operands.
+
+
+NOTE!: Some real life use with the C++ wrapper has revealed a certain
+       tendency for a program to become quite slow after many iterations
+       (like in a for/while loop).  After a little debug, the reason
+       became clear. Remember that multiplication will maintain ALL
+       significant digits :
+
+       20 digit number x 20 digit number =  40 digits
+       40 digit number x 40 digit number =  80 digits
+       80 digit number x 80 digit number = 160 digits
+       etc.
+
+       So after numerous iterations, the number of significant digits
+       was growing without bound. The easy way to fix the problem is
+       to simply *round* your result after a multiply or some other
+       complex operation. For example:
+
+       #define MAX_DIGITS 256
+
+       p1 = (p0 * sin(b1) * exp(1 + u1)) / sqrt(1 + b1);
+       p1 = p1.round(MAX_DIGITS);
+
+       If you 'round' as shown here, your program will likely be
+       nearly as fast as a straight 'C' version.
+
+
+NOTE #2!
+
+       Reference the following code snippet:
+
+       ...
+
+       MAPM  pi1, pi2;
+       char  obuf[256];
+
+       m_apm_cpp_precision(62);
+
+       pi1 = 2 * asin("1");
+       pi2 = 2 * asin(1.0);
+
+       pi1.toString(obuf, 60);   printf("PI1 = [%s] \n",obuf);
+       pi2.toString(obuf, 60);   printf("PI2 = [%s] \n",obuf);
+
+       ...
+
+       On my system, the output is :
+
+PI1 = [3.141592653589793238462643383279502884197169399375105820974945E+0]
+PI2 = [3.141592653589790000000000000000000000000000000000000000000000E+0]
+
+
+       PI2 only has 15 significant digits! This is due to how the second
+       asin is called. It is called with a 'double' as the argument, hence
+       the compiler will use the default double asin function from the
+       standard library. This is likely not the intent but this would be
+       easy to miss if this was a complex calculation and we didn't know
+       the 'right' answer.
+
+       In order to force the use of the overloaded MAPM functions, call the
+       MAPM functions with a quoted string as the argument (if the argument
+       is a constant and not a variable).
+
+       This would also work (though it seems less elegant ...) :
+
+       MAPM t = 1;
+       pi2 = 2 * asin(t);
+
+-----------
+
+If you have any questions or problems with the C++ wrapper, please let
+me know. I am not very C++ proficient, but I'd still like to know about any
+problems.  Orion Sky Lawlor (olawlor@acm.org) is the one who implemented
+the MAPM class, so he'll have to resolve any real hardcore problems, if you
+have any.
+
+**************************************************************************
+
+TESTING :
+
+Testing the library was interesting.  How do I know it's right?  Since I
+test the library against the standard C runtime math library (see below)
+I have high confidence that the MAPM library is giving correct results.
+The logic here is the basic algorithms are independent of the number of
+digits calculated, more digits just takes longer.
+
+The MAPM library has been tested in the following environments :
+
+Linux i486 / gcc 2.7.2.3, gcc 2.95.2
+Linux i686 / gcc 2.91.66, gcc 2.95.2, gcc 2.95.3, gcc 3.0.4, gcc 3.2.3
+Linux i686 / Intel Linux C/C++ Compiler Verison 7.0 / 8.1
+FreeBSD 4.1 / gcc 2.95.1
+FreeBSD 4.8 / gcc 2.95.4
+FreeBSD 5.x / gcc 2.95.2, gcc 2.95.3
+Redhat Linux 8.2 / gcc 3.2
+HP-UX 9.x /gcc 2.5.8
+HP-UX 10.x / gcc 2.95.2
+Sun 5.5.1  (output from uname), gcc 3.1.1
+Sun Solaris 2.6 / gcc 2.95.1, gcc 2.95.3, gcc 3.2.3
+MAC OSX / gcc ?
+DOS 5.0 using GCC 2.8.1 for DOS
+DOS 5.0 using GCC 2.95.2 for DOS
+DOS ??? using Borland Turbo C++ 3.0
+WIN NT+SP5 using Borland C++ 5.02 IDE, 5.2 & 5.5 command line.
+WIN 2000 using National Instruments LabWindows CVI 6.0
+WIN98 using Borland C++ 5.5 command line.
+WIN98 & NT & 2000 & XP using LCC-WIN32 Ver 3.2, 3.3
+WIN98 & NT using Watcom C 11.x
+WIN95 & NT using Open Watcom 1.0
+WIN95 & WIN98 using MINGW-32 version mingw-1.0.1-20010726
+WIN95 & WIN2000 using DEV-CPP 5.0 Beta 8, 4.9.8.0
+MINGW-32 with gcc 3.2   (mingw special 20020817-1)
+MINGW-32 with gcc 3.2.3 (mingw special 20030504-1)
+WINXP & MINGW-32 with gcc 3.4.5
+WINXP & Digital Mars Compiler 8.49
+WIN?? using Metrowerks CodeWarrior Pro 7.0 for Windows
+DOS 5.0 using Microsoft C 5.1 and 8.00c  (16 bit EXEs)
+WIN98 & NT using Microsoft Visual C++ 6.0
+WIN98 & NT using Microsoft Visual C++ 7.x (VS.NET 2003 except for
+                                           known compiler bug C2676)
+
+
+
+As a general rule, when calculating a quantity to a given number of decimal
+places, I calculated 4-6 extra digits and then rounded the result to what was
+asked for. I decided to be conservative and give a correct answer rather than
+to be faster and possibly have the last 2-3 digits in error. Also, some of
+the functions call other functions (calculating arc-cos will call cos, log
+will call exp, etc.) so I had to calculate a few extra digits in each iteration
+to guarantee the loops terminated correctly.
+
+1)  I debugged the 4 basic math operations. I threw numerous test cases at
+    each of the operations until I knew they were correct.
+
+    Also note that the math.h type functions all call the 4 basic operations
+    numerous times. So if all the math.h functions work, it is highly
+    probable the 4 basic math operations work also.
+
+2)  'math.h' type functions.
+
+     SQRT:     Not real hard to check. Single stepping through the iterative
+	       loop showed it was always converging to the sqrt.
+
+     CBRT:     Similar to sqrt, single stepping through the iterative loop
+	       showed it was always converging to the cube root.
+
+     EXP:      I wrote a separate algorithm which expanded the Taylor series
+	       manually and compared the results against the library.
+
+     POW:      Straightforward since this just calls 'EXP'.
+
+     LOG:      I wrote a separate algorithm which expanded the Taylor series
+	       manually and compared the results against the library. This
+	       took a long time to execute since the normal series converges
+	       VERY slowly for the log function. This is why the LOG function
+	       uses an iterative algorithm.
+
+     LOG10:    Straightforward since this just calls 'LOG'.
+
+     SIN/COS:  I wrote a separate algorithm which expanded the Taylor series
+	       manually and compared the results against the library.
+
+     TAN:      Straightforward since this just calls 'SIN' and 'COS'.
+
+     ARC-x:    Single stepping through the iterative loop showed the arc
+	       family of functions were always converging. Also used these
+	       to compute PI. The value of PI is now known to many, many
+	       digits. I computed PI to 1000+ digits by computing:
+
+	       6 * arcsin(0.5)  and  4 * arctan(1)  and  3 * arccos(0.5)
+
+	       and compared the output to the published 'real' values of PI.
+
+	       The arc family of functions exercise considerable portions
+	       of the library.
+
+  HYPERBOLIC:  The hyperbolic functions just use exp, log, and the 4 basic
+  	       math operations. All of these functions simply use other
+	       existing functions in the library.
+
+     FINALLY:  Run the program 'validate'. This program compares the first
+	       13-14 significant digits of the standard C library against
+	       the MAPM library. If this program passes, you can feel
+	       confident that the MAPM library is giving correct results.
+
+**************************************************************************

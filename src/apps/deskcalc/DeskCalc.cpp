@@ -33,7 +33,8 @@ main(int argc, char* argv[])
 
 		try {
 			ExpressionParser parser;
-			printf("%f\n", parser.Evaluate(expression.String()));
+			BString result = parser.Evaluate(expression.String());
+			printf("%s\n", result.String());
 		} catch (ParseException e) {
 			printf("%s at %ld\n", e.message.String(), e.position + 1);
 			return 1;

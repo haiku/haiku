@@ -762,6 +762,12 @@ AboutView::AboutView(const BRect &rect)
 		"Copyright " B_UTF8_COPYRIGHT " 1996-1997 Jeff Prosise. "
 		"All rights reserved.");
 
+	// MAPM (Mike's Arbitrary Precision Math Library) used by DeskCalc
+	AddCopyrightEntry("MAPM",
+		"Copyright " B_UTF8_COPYRIGHT "1999-2007 Michael C. Ring. "
+		"All rights reserved.",
+		"http://tc.umn.edu/~ringx004");
+
 // OpenSound
 //	AddCopyrightEntry("OpenSound",
 //		"Copyright " B_UTF8_COPYRIGHT " 1996-2008 4Front Technologies ",
