@@ -88,7 +88,7 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 
 		switch (type) {
 		case ACPI_TYPE_DEVICE: {
-			char hid[9] = "";
+			char hid[16] = "";
 			device_attr attrs[] = {
 				// info about device
 				{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},

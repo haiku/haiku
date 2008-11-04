@@ -54,17 +54,13 @@ make_space(acpi_ns_device_info *device, size_t space)
 		device->buffer->Unlock();
 
 		if (!released) {
-			//dprintf("try to release\n");
-			if (release_sem_etc(device->read_sem, 1, B_RELEASE_IF_WAITING_ONLY) == B_OK) {
-				//dprintf("released\n");
+			if (release_sem_etc(device->read_sem, 1, B_RELEASE_IF_WAITING_ONLY) == B_OK)
 				released = true;
-			}
 		}
 		snooze(10000);
 
-		if (!device->buffer->Lock()) {
+		if (!device->buffer->Lock()) 
 			return false;
-		}
 		
 	} while (device->buffer->WritableAmount() < space);
 	
@@ -77,12 +73,12 @@ static void
 dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting) 
 {
 	char result[255];
-	char output[255];
+	char output[320];
 	char tabs[255];
-	char hid[9];
+	char hid[16];
 	int i;
 	size_t written = 0;
-	hid[8] = '\0';
+	hid[0] = '\0';
 	tabs[0] = '\0';
 	for (i = 0; i < indenting; i++) 
 		strlcat(tabs, "|    ", sizeof(tabs));
@@ -112,8 +108,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 				snprintf(output, sizeof(output), "%s     FIELD UNIT", output);
 				break;
 			case ACPI_TYPE_DEVICE:
-				// TODO: Commented out for the time being, since it screws the output
-				//device->acpi->get_device_hid(result, hid);
+				device->acpi->get_device_hid(result, hid);
 				snprintf(output, sizeof(output), "%s     DEVICE (%s)", output, hid);
 				break;
 			case ACPI_TYPE_EVENT:
@@ -175,13 +170,6 @@ acpi_namespace_dump(void *arg)
 {
 	acpi_ns_device_info *device = (acpi_ns_device_info*)(arg);
         dump_acpi_namespace(device, NULL, 0);
-	if (device->buffer->Lock()) {
-		size_t writable = device->buffer->WritableAmount();
-		if (writable < 1)
-			make_space(device, 1);
-		device->buffer->Write("\n", 1);
-		device->buffer->Unlock();
-	}
 
 	delete_sem(device->read_sem);
 	device->read_sem = -1;
