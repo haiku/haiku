@@ -2348,27 +2348,26 @@ BTextView::SetWordWrap(bool wrap)
 {
 	if (wrap == fWrap)
 		return;
-		
-	if (Window() != NULL) {
-		if (fActive) {
-			// hide the caret, unhilite the selection
-			if (fSelStart != fSelEnd)
-				Highlight(fSelStart, fSelEnd);
-			else {
-				_HideCaret();
-			}
+
+	bool updateOnScreen = fActive && Window() != NULL;
+	if (updateOnScreen) {
+		// hide the caret, unhilite the selection
+		if (fSelStart != fSelEnd)
+			Highlight(fSelStart, fSelEnd);
+		else {
+			_HideCaret();
 		}
-		
-		fWrap = wrap;
-		_Refresh(0, fText->Length(), true, true);
-		
-		if (fActive) {
-			// show the caret, hilite the selection
-			if (fSelStart != fSelEnd && fSelectable)
-				Highlight(fSelStart, fSelEnd);
-			else
-				_ShowCaret();
-		}
+	}
+
+	fWrap = wrap;
+	_Refresh(0, fText->Length(), true, true);
+
+	if (updateOnScreen) {
+		// show the caret, hilite the selection
+		if (fSelStart != fSelEnd && fSelectable)
+			Highlight(fSelStart, fSelEnd);
+		else
+			_ShowCaret();
 	}
 }
 
