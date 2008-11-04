@@ -173,6 +173,7 @@ SubInclude HAIKU_TOP src tests servers app draw_after_children ;
 SubInclude HAIKU_TOP src tests servers app drawing_debugger ;
 SubInclude HAIKU_TOP src tests servers app drawing_modes ;
 SubInclude HAIKU_TOP src tests servers app event_mask ;
+SubInclude HAIKU_TOP src tests servers app find_view ;
 SubInclude HAIKU_TOP src tests servers app following ;
 SubInclude HAIKU_TOP src tests servers app idle_test ;
 SubInclude HAIKU_TOP src tests servers app lagging_get_mouse ;
