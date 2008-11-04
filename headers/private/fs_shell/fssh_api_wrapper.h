@@ -820,6 +820,7 @@
 #define block_cache_create				fssh_block_cache_create
 #define block_cache_sync				fssh_block_cache_sync
 #define block_cache_sync_etc			fssh_block_cache_sync_etc
+#define block_cache_discard				fssh_block_cache_discard
 #define block_cache_make_writable		fssh_block_cache_make_writable
 #define block_cache_get_writable_etc	fssh_block_cache_get_writable_etc
 #define block_cache_get_writable		fssh_block_cache_get_writable

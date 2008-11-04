@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <new>
 #include <stdlib.h>
 
@@ -73,7 +74,7 @@ struct cached_block {
 	bool			is_writing : 1;
 	bool			is_dirty : 1;
 	bool			unused : 1;
-	bool			unmapped : 1;
+	bool			discard : 1;
 	cache_transaction *transaction;
 	cache_transaction *previous_transaction;
 
@@ -106,6 +107,7 @@ struct block_cache {
 	fssh_status_t InitCheck();
 
 	void RemoveUnusedBlocks(int32_t maxAccessed = LONG_MAX, int32_t count = LONG_MAX);
+	void RemoveBlock(cached_block* block);
 	void FreeBlock(cached_block *block);
 	cached_block *NewBlock(fssh_off_t blockNumber);
 	void Free(void *address);
@@ -364,6 +366,7 @@ block_cache::NewBlock(fssh_off_t blockNumber)
 	block->parent_data = NULL;
 	block->is_dirty = false;
 	block->unused = false;
+	block->discard = false;
 #ifdef DEBUG_CHANGED
 	block->compare = NULL;
 #endif
@@ -375,13 +378,20 @@ block_cache::NewBlock(fssh_off_t blockNumber)
 
 
 void
+block_cache::RemoveBlock(cached_block* block)
+{
+	hash_remove(hash, block);
+	FreeBlock(block);
+}
+
+
+void
 block_cache::RemoveUnusedBlocks(int32_t maxAccessed, int32_t count)
 {
 	TRACE(("block_cache: remove up to %ld unused blocks\n", count));
 
-	for (block_list::Iterator it = unused_blocks.GetIterator();
-		 cached_block *block = it.Next();) {
-
+	for (block_list::Iterator iterator = unused_blocks.GetIterator();
+			cached_block *block = iterator.Next();) {
 		if (maxAccessed < block->accessed)
 			continue;
 
@@ -393,10 +403,8 @@ block_cache::RemoveUnusedBlocks(int32_t maxAccessed, int32_t count)
 			write_cached_block(this, block, false);
 
 		// remove block from lists
-		it.Remove();
-		hash_remove(hash, block);
-
-		FreeBlock(block);
+		iterator.Remove();
+		RemoveBlock(block);
 
 		if (--count <= 0)
 			break;
@@ -426,11 +434,15 @@ put_cached_block(block_cache *cache, cached_block *block)
 #endif
 
 	if (--block->ref_count == 0
-		&& block->transaction == NULL
-		&& block->previous_transaction == NULL) {
-		// put this block in the list of unused blocks
-		block->unused = true;
-		cache->unused_blocks.Add(block);
+		&& block->transaction == NULL && block->previous_transaction == NULL) {
+		// This block is not used anymore, and not part of any transaction
+		if (block->discard) {
+			cache->RemoveBlock(block);
+		} else {
+			// put this block in the list of unused blocks
+			block->unused = true;
+			cache->unused_blocks.Add(block);
+		}
 	}
 
 	if (cache->allocated_block_count > kMaxBlockCount) {
@@ -538,6 +550,8 @@ get_writable_cached_block(block_cache *cache, fssh_off_t blockNumber, fssh_off_t
 		!cleared);
 	if (block == NULL)
 		return NULL;
+
+	block->discard = false;
 
 	// if there is no transaction support, we just return the current block
 	if (transactionID == -1) {
@@ -1117,10 +1131,16 @@ fssh_cache_next_block_in_transaction(void *_cache, int32_t id, bool mainOnly,
 	else
 		block = block->transaction_next;
 
-	if (mainOnly && transaction->has_sub_transaction) {
-		// find next block that the parent changed
-		while (block != NULL && block->parent_data == NULL)
-			block = block->transaction_next;
+	if (transaction->has_sub_transaction) {
+		if (mainOnly) {
+			// find next block that the parent changed
+			while (block != NULL && block->parent_data == NULL)
+				block = block->transaction_next;
+		} else {
+			// find next non-discarded block
+			while (block != NULL && block->discard)
+				block = block->transaction_next;
+		}
 	}
 
 	if (block == NULL)
@@ -1282,6 +1302,7 @@ fssh_block_cache_sync_etc(void *_cache, fssh_off_t blockNumber,
 			&blockNumber);
 		if (block == NULL)
 			continue;
+
 		if (block->previous_transaction != NULL
 			|| (block->transaction == NULL && block->is_dirty)) {
 			fssh_status_t status = write_cached_block(cache, block);
@@ -1294,8 +1315,36 @@ fssh_block_cache_sync_etc(void *_cache, fssh_off_t blockNumber,
 }
 
 
+void
+fssh_block_cache_discard(void* _cache, fssh_off_t blockNumber,
+	fssh_size_t numBlocks)
+{
+	block_cache* cache = (block_cache*)_cache;
+	MutexLocker locker(&cache->lock);
+
+	for (; numBlocks > 0; numBlocks--, blockNumber++) {
+		cached_block* block = (cached_block*)hash_lookup(cache->hash,
+			&blockNumber);
+		if (block == NULL)
+			continue;
+
+		if (block->unused) {
+			cache->unused_blocks.Remove(block);
+			cache->RemoveBlock(block);
+		} else {
+			// mark them as discarded (in the current transaction only, if any)
+			if (block->previous_transaction != NULL)
+				write_cached_block(cache, block);
+
+			block->discard = true;
+		}
+	}
+}
+
+
 fssh_status_t
-fssh_block_cache_make_writable(void *_cache, fssh_off_t blockNumber, int32_t transaction)
+fssh_block_cache_make_writable(void *_cache, fssh_off_t blockNumber,
+	int32_t transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
 	MutexLocker locker(&cache->lock);

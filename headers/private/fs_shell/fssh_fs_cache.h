@@ -70,6 +70,8 @@ extern void *			fssh_block_cache_create(int fd, fssh_off_t numBlocks,
 extern fssh_status_t	fssh_block_cache_sync(void *_cache);
 extern fssh_status_t	fssh_block_cache_sync_etc(void *_cache,
 							fssh_off_t blockNumber, fssh_size_t numBlocks);
+extern void				fssh_block_cache_discard(void *_cache,
+							fssh_off_t blockNumber, fssh_size_t numBlocks);
 extern fssh_status_t	fssh_block_cache_make_writable(void *_cache,
 							fssh_off_t blockNumber, int32_t transaction);
 extern void *			fssh_block_cache_get_writable_etc(void *_cache,
