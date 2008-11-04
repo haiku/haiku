@@ -113,7 +113,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 				snprintf(output, sizeof(output), "%s     FIELD UNIT", output);
 				break;
 			case ACPI_TYPE_DEVICE:
-				// TODO: Commented out for the time being, since it screws the outpu
+				// TODO: Commented out for the time being, since it screws the output
 				//device->acpi->get_device_hid(result, hid);
 				snprintf(output, sizeof(output), "%s     DEVICE (%s)", output, hid);
 				break;
@@ -160,8 +160,6 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 					}
 				}
 
-				if (ringBuffer.WritableAmount() < toWrite)
-					panic("fuck!!!");
 				written = ringBuffer.Write(output, toWrite);
 				//dprintf("written %ld bytes\n", written);
 				ringBuffer.Unlock();
