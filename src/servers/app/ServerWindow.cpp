@@ -1779,21 +1779,6 @@ fDesktop->LockSingleWindow();
 				break;
 
 			fCurrentView->SetUserClipping(&region);
-
-// TODO: reenable AS_VIEW_CLIP_TO_PICTURE
-#if 0
-			if (rootLayer && !(fCurrentView->IsHidden()) && !fWindow->InUpdate()) {
-				BRegion invalidRegion;
-				fCurrentView->GetOnScreenRegion(invalidRegion);
-
-				// TODO: this is broken! a smaller area may be invalidated!
-
-				fCurrentView->fParent->MarkForRebuild(invalidRegion);
-				fCurrentView->fParent->TriggerRebuild();
-				rootLayer->MarkForRedraw(invalidRegion);
-				rootLayer->TriggerRedraw();
-			}
-#endif
 			break;
 		}
 
@@ -1803,7 +1788,7 @@ fDesktop->LockSingleWindow();
 
 			// if this View is hidden, it is clear that its visible region is void.
 			fLink.StartMessage(B_OK);
-			if (fCurrentView->IsHidden()) {
+			if (!fWindow->IsVisible() || !fCurrentView->IsVisible()) {
 				BRegion empty;
 				fLink.AttachRegion(empty);
 			} else {
