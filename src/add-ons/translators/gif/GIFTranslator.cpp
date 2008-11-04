@@ -46,13 +46,13 @@ int32 translatorVersion = 0x140;
 
 translation_format inputFormats[] = { 
 	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" }, 
-	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap image" }, 
+	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" }, 
 	{ 0 }
 };
 
 translation_format outputFormats[] = { 
 	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" }, 
-	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap image" }, 
+	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" }, 
 	{ 0 }
 };
 
@@ -156,7 +156,7 @@ Identify(BPositionIO *inSource, const translation_format *inFormat,
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.3;
 		outInfo->capability = 0.3;
-		strcpy(outInfo->name, "Be Bitmap image");
+		strcpy(outInfo->name, "Be Bitmap Format (GIFTranslator)");
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
 	}
 	return B_OK;

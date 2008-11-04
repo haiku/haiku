@@ -71,8 +71,8 @@ translation_format sOutputFormats[] = {
 		B_TRANSLATOR_BITMAP,
 		BITS_OUT_QUALITY,
 		BITS_OUT_CAPABILITY,
-		"x-be-bitmap",
-		"Be Bitmap image"
+		"image/x-be-bitmap",
+		"Be Bitmap Format (RAWTranslator)"
 	},
 };
 

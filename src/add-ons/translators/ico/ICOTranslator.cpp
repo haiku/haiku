@@ -35,8 +35,8 @@ translation_format sInputFormats[] = {
 		B_TRANSLATOR_BITMAP,
 		BITS_IN_QUALITY,
 		BITS_IN_CAPABILITY,
-		"x-be-bitmap",
-		"Be Bitmap image"
+		"images/x-be-bitmap",
+		"Be Bitmap Format (ICOTranslator)"
 	},
 };
 
@@ -55,8 +55,8 @@ translation_format sOutputFormats[] = {
 		B_TRANSLATOR_BITMAP,
 		BITS_OUT_QUALITY,
 		BITS_OUT_CAPABILITY,
-		"x-be-bitmap",
-		"Be Bitmap image"
+		"images/x-be-bitmap",
+		"Be Bitmap Format (ICOTranslator)"
 	},
 };
 

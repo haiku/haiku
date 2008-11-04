@@ -47,7 +47,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // The translation kit's native file type
 #define B_TRANSLATOR_BITMAP_MIME_STRING "image/x-be-bitmap"
-#define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap image"
+#define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap Format (JPEGTranslator)"
 
 // Translation Kit required globals
 char translatorName[] = "JPEG Images";

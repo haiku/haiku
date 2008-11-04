@@ -62,13 +62,13 @@ int32 translatorVersion = PPM_TRANSLATOR_VERSION;
 
 /* These two data arrays are a really good idea to export from Translators, but not required. */
 translation_format inputFormats[] = {
-	{	B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.4, 0.8, "image/x-be-bitmap", "Be Bitmap image" },
+	{	B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.4, 0.8, "image/x-be-bitmap", "Be Bitmap Format (PPMTranslator)" },
 	{	PPM_TYPE, B_TRANSLATOR_BITMAP, 0.3, 0.8, "image/x-portable-pixmap", "PPM image" },
 	{	0, 0, 0, 0, "\0", "\0" }
 };		/*	optional (else Identify is always called)	*/
 
 translation_format outputFormats[] = {
-	{	B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.4, 0.8, "image/x-be-bitmap", "Be Bitmap image" },
+	{	B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.4, 0.8, "image/x-be-bitmap", "Be Bitmap Format (PPMTranslator)" },
 	{	PPM_TYPE, B_TRANSLATOR_BITMAP, 0.3, 0.8, "image/x-portable-pixmap", "PPM image" },
 	{	0, 0, 0, 0, "\0", "\0" }
 };	/*	optional (else Translate is called anyway)	*/
@@ -269,7 +269,7 @@ Identify(	/*	required	*/
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.4;		/* B_TRANSLATOR_BITMAP can do alpha, at least */
 		outInfo->capability = 0.8;	/* and we might not know many variations thereof */
-		strcpy(outInfo->name, "Be Bitmap image");
+		strcpy(outInfo->name, "Be Bitmap Format (PPMTranslator)");
 		strcpy(outInfo->MIME, "image/x-be-bitmap");	/* this is the MIME type of B_TRANSLATOR_BITMAP */
 	}
 	return B_OK;
