@@ -3505,21 +3505,20 @@ BView*
 BWindow::_FindView(BView* view, BPoint point) const
 {
 	// point is assumed to be already in view's coordinates
-	// TODO: since BView::Bounds() potentially queries the app_server anyway,
-	// we could just let the app_server answer this query directly.
-	if (view->Bounds().Contains(point)) { 
+	if (!view->IsHidden() && view->Bounds().Contains(point)) { 
 		if (!view->fFirstChild)
 			return view;
 		else {
 			BView* child = view->fFirstChild;
 			while (child != NULL) {
 				BPoint childPoint = point - child->Frame().LeftTop();
-				if ((view = _FindView(child, childPoint)) != NULL)
-					return view;
-			child = child->fNextSibling;
+				BView* subView  = _FindView(child, childPoint);
+				if (subView != NULL)
+					return subView;
+
+				child = child->fNextSibling;
 			}
 		}
-
 		return view;
 	}
 	return NULL;
