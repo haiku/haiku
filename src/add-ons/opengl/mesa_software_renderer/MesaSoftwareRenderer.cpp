@@ -562,11 +562,14 @@ MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
 {	
 	BAutolock lock(fInfoLocker);
 	if (info) {
-		if (!fInfo)
-			fInfo = new direct_buffer_info();
-		memcpy(fInfo, info, sizeof(*info));
+		if (!fInfo) {
+			// TODO size of info != sizeof(direct_buffer_info) 
+			// see GLView.cpp in glview_direct_info::glview_direct_info()
+			fInfo = (direct_buffer_info *)calloc(1, B_PAGE_SIZE);
+		}
+		memcpy(fInfo, info, B_PAGE_SIZE);
 	} else if (fInfo) {
-		delete fInfo;
+		free(fInfo);
 		fInfo = NULL;
 	}
 		
