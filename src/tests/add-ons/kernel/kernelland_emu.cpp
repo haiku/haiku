@@ -7,8 +7,10 @@
  *		Axel Dörfler, axeld@pinc-software.de.
  */
 
-#include <lock.h>
-#include <fs/devfs.h>
+#include <set>
+#include <signal.h>
+#include <stdio.h>
+#include <string>
 
 #include <Autolock.h>
 #include <Directory.h>
@@ -21,15 +23,24 @@
 #include <Path.h>
 #include <String.h>
 
-#include <set>
-#include <stdio.h>
-#include <string>
+#ifdef ASSERT
+#	undef ASSERT
+#endif
+
+#include <condition_variable.h>
+#include <lock.h>
+#include <low_resource_manager.h>
+#include <fs/devfs.h>
+#include <kscheduler.h>
+#include <slab/Slab.h>
 
 #ifdef TRACE
 #	undef TRACE
 #endif
 #define TRACE(x)
 //#define TRACE(x) printf x
+
+#define RW_MAX_READERS 10000
 
 static const char *gModuleDirs[] = {
 	"distro/x86.R1/beos/system/add-ons/userland",
@@ -848,22 +859,37 @@ atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst)
 }
 
 
-extern "C" uint64
-parse_expression(const char* arg)
+extern "C" int
+send_signal_etc(pid_t thread, uint signal, uint32 flags)
 {
-	return strtoull(arg, NULL, 0);
+	return send_signal(thread, signal);
 }
 
 
-extern "C" int
-add_debugger_command(char *name, int (*func)(int, char **), char *desc)
+extern "C" int32
+low_resource_state(uint32 resources)
+{
+	return B_NO_LOW_RESOURCE;
+}
+
+
+extern "C" void
+low_resource(uint32 resource, uint64 requirements, uint32 flags,
+	uint32 timeout)
+{
+}
+
+
+extern "C" status_t
+register_low_resource_handler(low_resource_func function, void *data,
+	uint32 resources, int32 priority)
 {
 	return B_OK;
 }
 
 
-extern "C" int
-remove_debugger_command(char * name, int (*func)(int, char **))
+extern "C" status_t
+unregister_low_resource_handler(low_resource_func function, void *data)
 {
 	return B_OK;
 }
@@ -1002,38 +1028,159 @@ user_strlcpy(char *to, const char *from, size_t size)
 }
 
 
+//	#pragma mark - Debugger
+
+
+extern "C" uint64
+parse_expression(const char* arg)
+{
+	return strtoull(arg, NULL, 0);
+}
+
+
+extern "C" bool
+set_debug_variable(const char* variableName, uint64 value)
+{
+	return true;
+}
+
+
+extern "C" bool
+print_debugger_command_usage(const char* command)
+{
+	return true;
+}
+
+
+extern "C" status_t
+add_debugger_command_etc(const char* name, debugger_command_hook func,
+	const char* description, const char* usage, uint32 flags)
+{
+	return B_OK;
+}
+
+
+extern "C" int
+add_debugger_command(char *name, int (*func)(int, char **), char *desc)
+{
+	return B_OK;
+}
+
+
+extern "C" int
+remove_debugger_command(char * name, int (*func)(int, char **))
+{
+	return B_OK;
+}
+
+
+//	#pragma mark - Slab allocator
+
+
+extern "C" void *
+object_cache_alloc(object_cache *cache, uint32 flags)
+{
+	return malloc((size_t)cache);
+}
+
+
+extern "C" void
+object_cache_free(object_cache *cache, void *object)
+{
+	free(object);
+}
+
+
+extern "C" object_cache *
+create_object_cache_etc(const char *name, size_t objectSize,
+	size_t alignment, size_t maxByteUsage, uint32 flags, void *cookie,
+	object_cache_constructor constructor, object_cache_destructor destructor,
+	object_cache_reclaimer reclaimer)
+{
+	return (object_cache*)objectSize;
+}
+
+
+extern "C" object_cache *
+create_object_cache(const char *name, size_t objectSize,
+	size_t alignment, void *cookie, object_cache_constructor constructor,
+	object_cache_destructor)
+{
+	return (object_cache*)objectSize;
+}
+
+
+extern "C" void
+delete_object_cache(object_cache *cache)
+{
+}
+
+
+extern "C" void
+object_cache_get_usage(object_cache *cache, size_t *_allocatedMemory)
+{
+	*_allocatedMemory = 100;
+}
+
+
+//	#pragma mark - Thread/scheduler functions
+
+
+struct scheduler_ops kScheduler = {
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+};
+struct scheduler_ops* gScheduler = &kScheduler;
+
+
 //	#pragma mark - Private locking functions
 
 
 int32
 recursive_lock_get_recursion(recursive_lock *lock)
 {
-	thread_id thid = find_thread(NULL);
+	thread_id thread = find_thread(NULL);
 
-	if (lock->holder == thid)
+#if !KDEBUG
+	if (lock->holder == thread)
 		return lock->recursion;
+#else
+	if (lock->lock.holder == thread)
+		return lock->recursion;
+#endif
 
 	return -1;
 }
 
 
-status_t
-recursive_lock_init(recursive_lock *lock, const char *name)
+void
+recursive_lock_init_etc(recursive_lock *lock, const char *name, uint32 flags)
 {
 	if (lock == NULL)
-		return B_BAD_VALUE;
+		return;
 
 	if (name == NULL)
 		name = "recursive lock";
 
+#if !KDEBUG
 	lock->holder = -1;
+#else
+	lock->lock.holder = -1;
+#endif
 	lock->recursion = 0;
-	lock->sem = create_sem(1, name);
+	lock->lock.waiters = (mutex_waiter*)create_sem(1, name);
 
-	if (lock->sem >= B_OK)
-		return B_OK;
+	if ((sem_id)lock->lock.waiters < B_OK)
+		panic("recursive lock creation failed: %s\n", name);
+}
 
-	return lock->sem;
+
+void
+recursive_lock_init(recursive_lock *lock, const char *name)
+{
+	recursive_lock_init_etc(lock, name, 0);
 }
 
 
@@ -1043,8 +1190,8 @@ recursive_lock_destroy(recursive_lock *lock)
 	if (lock == NULL)
 		return;
 
-	delete_sem(lock->sem);
-	lock->sem = -1;
+	delete_sem((sem_id)lock->lock.waiters);
+	lock->lock.waiters = (mutex_waiter*)-1;
 }
 
 
@@ -1053,13 +1200,29 @@ recursive_lock_lock(recursive_lock *lock)
 {
 	thread_id thread = find_thread(NULL);
 
+#if !KDEBUG
 	if (thread != lock->holder) {
-		status_t status = acquire_sem(lock->sem);
+		status_t status;
+		do {
+			status = acquire_sem((sem_id)lock->lock.waiters);
+		} while (status == B_INTERRUPTED);
 		if (status < B_OK)
 			return status;
 
 		lock->holder = thread;
 	}
+#else
+	if (thread != lock->lock.holder) {
+		status_t status;
+		do {
+			status = acquire_sem((sem_id)lock->lock.waiters);
+		} while (status == B_INTERRUPTED);
+		if (status < B_OK)
+			return status;
+
+		lock->lock.holder = thread;
+	}
+#endif
 	lock->recursion++;
 	return B_OK;
 }
@@ -1068,12 +1231,21 @@ recursive_lock_lock(recursive_lock *lock)
 void
 recursive_lock_unlock(recursive_lock *lock)
 {
+#if !KDEBUG
 	if (find_thread(NULL) != lock->holder)
 		panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
+#else
+	if (find_thread(NULL) != lock->lock.holder)
+		panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
+#endif
 
 	if (--lock->recursion == 0) {
+#if !KDEBUG
 		lock->holder = -1;
-		release_sem_etc(lock->sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
+#else
+		lock->lock.holder = -1;
+#endif
+		release_sem_etc((sem_id)lock->lock.waiters, 1, 0);
 	}
 }
 
@@ -1129,19 +1301,28 @@ mutex_destroy(mutex *mutex)
 status_t
 _mutex_trylock(mutex *mutex)
 {
-	return acquire_sem_etc((sem_id)mutex->waiters, 1, B_RELATIVE_TIMEOUT, 0);
+	status_t status;
+	do {
+		status = acquire_sem_etc((sem_id)mutex->waiters, 1, B_RELATIVE_TIMEOUT,
+			0);
+	} while (status == B_INTERRUPTED);
+	return status;
 }
 
 
 status_t
 _mutex_lock(mutex *mutex, bool threadsLocked)
 {
-	return acquire_sem((sem_id)mutex->waiters);
+	status_t status;
+	do {
+		status = acquire_sem((sem_id)mutex->waiters);
+	} while (status == B_INTERRUPTED);
+	return status;
 }
 
 
 void
-_mutex_unlock(mutex *mutex)
+_mutex_unlock(mutex *mutex, bool threadsLocked)
 {
 	release_sem((sem_id)mutex->waiters);
 }
@@ -1150,46 +1331,25 @@ _mutex_unlock(mutex *mutex)
 //	#pragma mark -
 
 
-status_t
-benaphore_init(benaphore *ben, const char *name)
-{
-	if (ben == NULL || name == NULL)
-		return B_BAD_VALUE;
-
-	ben->count = 1;
-	ben->sem = create_sem(0, name);
-	if (ben->sem >= B_OK)
-		return B_OK;
-
-	return ben->sem;
-}
-
-
 void
-benaphore_destroy(benaphore *ben)
-{
-	delete_sem(ben->sem);
-	ben->sem = -1;
-}
-
-
-//	#pragma mark -
-
-
-status_t
-rw_lock_init(rw_lock *lock, const char *name)
+rw_lock_init_etc(rw_lock *lock, const char *name, uint32 flags)
 {
 	if (lock == NULL)
-		return B_BAD_VALUE;
+		return;
 
 	if (name == NULL)
 		name = "r/w lock";
 
-	lock->sem = create_sem(RW_MAX_READERS, name);
-	if (lock->sem >= B_OK)
-		return B_OK;
+	lock->waiters = (rw_lock_waiter*)create_sem(RW_MAX_READERS, name);
+	if ((sem_id)lock->waiters < B_OK)
+		panic("r/w lock \"%s\" creation failed.", name);
+}
 
-	return lock->sem;
+
+void
+rw_lock_init(rw_lock *lock, const char *name)
+{
+	rw_lock_init_etc(lock, name, 0);
 }
 
 
@@ -1199,34 +1359,146 @@ rw_lock_destroy(rw_lock *lock)
 	if (lock == NULL)
 		return;
 
-	delete_sem(lock->sem);
+	delete_sem((sem_id)lock->waiters);
 }
 
 
 status_t
 rw_lock_read_lock(rw_lock *lock)
 {
-	return acquire_sem(lock->sem);
+	status_t status;
+	do {
+		status = acquire_sem((sem_id)lock->waiters);
+	} while (status == B_INTERRUPTED);
+	return status;
 }
 
 
 status_t
 rw_lock_read_unlock(rw_lock *lock)
 {
-	return release_sem(lock->sem);
+	return release_sem((sem_id)lock->waiters);
 }
 
 
 status_t
 rw_lock_write_lock(rw_lock *lock)
 {
-	return acquire_sem_etc(lock->sem, RW_MAX_READERS, 0, 0);
+	status_t status;
+	do {
+		status = acquire_sem_etc((sem_id)lock->waiters, RW_MAX_READERS, 0, 0);
+	} while (status == B_INTERRUPTED);
+	return status;
 }
 
 
 status_t
 rw_lock_write_unlock(rw_lock *lock)
 {
-	return release_sem_etc(lock->sem, RW_MAX_READERS, 0);
+	return release_sem_etc((sem_id)lock->waiters, RW_MAX_READERS, 0);
+}
+
+
+//	#pragma mark - Condition variables (anonymous only)
+
+
+#define STATUS_ADDED	1
+#define STATUS_WAITING	2
+
+
+struct condition_private {
+	mutex		lock;
+	sem_id		wait_sem;
+	const void*	object;
+};
+
+
+status_t
+ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
+{
+	if (fVariable == NULL)
+		return fWaitStatus;
+
+	condition_private* condition = (condition_private*)fVariable->fObject;
+	fWaitStatus = STATUS_WAITING;
+	
+	status_t status;
+	do {
+		status = acquire_sem_etc(condition->wait_sem, 1, flags, timeout);
+	} while (status == B_INTERRUPTED);
+
+	mutex_lock(&condition->lock);
+
+	// remove entry from variable, if not done yet
+	if (fVariable != NULL) {
+		fVariable->fEntries.Remove(this);
+		fVariable = NULL;
+	}
+
+	mutex_unlock(&condition->lock);
+
+	return status;
+}
+
+
+inline void
+ConditionVariableEntry::AddToVariable(ConditionVariable* variable)
+{
+	fVariable = variable;
+	fWaitStatus = STATUS_ADDED;
+	fVariable->fEntries.Add(this);
+}
+
+
+//	#pragma mark -
+
+
+void
+ConditionVariable::Init(const void* object, const char* objectType)
+{
+	fObjectType = objectType;
+	new(&fEntries) EntryList;
+	
+	condition_private* condition = new condition_private;
+	mutex_init(&condition->lock, objectType);
+	condition->wait_sem = create_sem(0, "condition variable wait");
+	if (condition->wait_sem < B_OK)
+		panic("cannot create condition variable.");
+
+	condition->object = object;
+
+	fObject = condition;
+}
+
+
+void
+ConditionVariable::Add(ConditionVariableEntry* entry)
+{
+	entry->AddToVariable(this);
+}
+
+
+void
+ConditionVariable::_Notify(bool all, bool threadsLocked)
+{
+	condition_private* condition = (condition_private*)fObject;
+	mutex_lock(&condition->lock);
+
+	uint32 count = 0;
+
+	while (ConditionVariableEntry* entry = fEntries.RemoveHead()) {
+		entry->fVariable = NULL;
+		if (entry->fWaitStatus <= 0)
+			continue;
+
+		entry->fWaitStatus = B_OK;
+		count++;
+
+		if (!all)
+			break;
+	}
+
+	release_sem_etc(condition->wait_sem, count, 0);
+	mutex_unlock(&condition->lock);
 }
 

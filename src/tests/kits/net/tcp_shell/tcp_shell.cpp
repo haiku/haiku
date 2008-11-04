@@ -61,7 +61,7 @@ struct net_socket_private : net_socket {
 	struct list				connected_children;
 
 	struct select_sync_pool	*select_pool;
-	benaphore				lock;
+	mutex					lock;
 };
 
 
@@ -138,44 +138,6 @@ static bool
 is_fin(net_buffer* buffer)
 {
 	return (tcp_segment_flags(buffer) & TCP_FLAG_FINISH) != 0;
-}
-
-
-//	#pragma mark - misc kernel
-
-
-void *
-object_cache_alloc(object_cache *cache, uint32 flags)
-{
-	return malloc((size_t)cache);
-}
-
-
-void
-object_cache_free(object_cache *cache, void *object)
-{
-	free(object);
-}
-
-
-object_cache *
-create_object_cache(const char *name, size_t objectSize,
-	size_t alignment, void *cookie, object_cache_constructor constructor,
-	object_cache_destructor)
-{
-	return (object_cache*)objectSize;
-}
-
-
-void
-delete_object_cache(object_cache *cache)
-{
-}
-
-
-extern "C" void
-scheduler_enqueue_in_run_queue(struct thread *thread)
-{
 }
 
 
@@ -279,12 +241,16 @@ static net_stack_module_info gNetStackModule = {
 	init_timer,
 	set_timer,
 	cancel_timer,
+	wait_for_timer,
 	is_timer_active,
+	is_timer_running,
 
 	dummy_is_syscall,
 	dummy_is_restarted_syscall,
 	dummy_store_syscall_restart_timeout,
 	NULL, // restore_syscall_restart_timeout
+
+	// ancillary data is not used by TCP
 };
 
 
@@ -305,9 +271,7 @@ socket_create(int family, int type, int protocol, net_socket **_socket)
 	socket->type = type;
 	socket->protocol = protocol;
 
-	status_t status = benaphore_init(&socket->lock, "socket");
-	if (status < B_OK)
-		goto err1;
+	mutex_init(&socket->lock, "socket");
 
 	// set defaults (may be overridden by the protocols)
 	socket->send.buffer_size = 65535;
@@ -323,7 +287,9 @@ socket_create(int family, int type, int protocol, net_socket **_socket)
 	socket->first_protocol = gTCPModule->init_protocol(socket);
 	if (socket->first_protocol == NULL) {
 		fprintf(stderr, "tcp_tester: cannot create protocol\n");
-		goto err2;
+		mutex_destroy(&socket->lock);
+		delete socket;
+		return B_ERROR;
 	}
 
 	socket->first_info = gTCPModule;
@@ -338,12 +304,6 @@ socket_create(int family, int type, int protocol, net_socket **_socket)
 
 	*_socket = socket;
 	return B_OK;
-
-err2:
-	benaphore_destroy(&socket->lock);
-err1:
-	delete socket;
-	return status;
 }
 
 
@@ -356,7 +316,7 @@ socket_delete(net_socket *_socket)
 		panic("socket still has a parent!");
 
 	socket->first_info->uninit_protocol(socket->first_protocol);
-	benaphore_destroy(&socket->lock);
+	mutex_destroy(&socket->lock);
 	delete socket;
 }
 
@@ -508,7 +468,7 @@ socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 {
 	net_socket_private *parent = (net_socket_private *)_parent;
 
-	BenaphoreLocker locker(parent->lock);
+	MutexLocker locker(parent->lock);
 
 	// We actually accept more pending connections to compensate for those
 	// that never complete, and also make sure at least a single connection
@@ -545,7 +505,7 @@ socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 {
 	net_socket_private *parent = (net_socket_private *)_parent;
 
-	benaphore_lock(&parent->lock);
+	mutex_lock(&parent->lock);
 
 	net_socket *socket = (net_socket *)list_remove_head_item(&parent->connected_children);
 	if (socket != NULL) {
@@ -554,7 +514,7 @@ socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 		*_socket = socket;
 	}
 
-	benaphore_unlock(&parent->lock);
+	mutex_unlock(&parent->lock);
 	return socket != NULL ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
@@ -564,7 +524,7 @@ socket_count_connected(net_socket *_parent)
 {
 	net_socket_private *parent = (net_socket_private *)_parent;
 
-	BenaphoreLocker _(parent->lock);
+	MutexLocker _(parent->lock);
 
 	ssize_t count = 0;
 	void *item = NULL;
@@ -586,7 +546,7 @@ socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 	if (backlog > 256)
 		backlog = 256;
 
-	benaphore_lock(&socket->lock);
+	mutex_lock(&socket->lock);
 
 	// first remove the pending connections, then the already connected ones as needed	
 	net_socket *child;
@@ -603,7 +563,7 @@ socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 	}
 
 	socket->max_backlog = backlog;
-	benaphore_unlock(&socket->lock);
+	mutex_unlock(&socket->lock);
 	return B_OK;
 }
 
@@ -619,12 +579,12 @@ socket_connected(net_socket *socket)
 	if (parent == NULL)
 		return B_BAD_VALUE;
 
-	benaphore_lock(&parent->lock);
+	mutex_lock(&parent->lock);
 
 	list_remove_item(&parent->pending_children, socket);
 	list_add_item(&parent->connected_children, socket);
 
-	benaphore_unlock(&parent->lock);
+	mutex_unlock(&parent->lock);
 	return B_OK;
 }
 
@@ -634,7 +594,7 @@ socket_notify(net_socket *_socket, uint8 event, int32 value)
 {
 	net_socket_private *socket = (net_socket_private *)_socket;
 
-	benaphore_lock(&socket->lock);
+	mutex_lock(&socket->lock);
 
 	bool notify = true;
 
@@ -659,7 +619,7 @@ socket_notify(net_socket *_socket, uint8 event, int32 value)
 	if (notify)
 		;
 
-	benaphore_unlock(&socket->lock);
+	mutex_unlock(&socket->lock);
 	return B_OK;
 }
 

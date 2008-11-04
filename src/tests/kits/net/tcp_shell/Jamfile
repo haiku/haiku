@@ -12,6 +12,7 @@ SimpleTest tcp_shell :
 	tcp_shell.cpp
 
 	# stack
+	ancillary_data.cpp
 	net_buffer.cpp
 	utility.cpp
 
@@ -37,7 +38,7 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols ipv4 ] ;
 
 SEARCH on [ FGristFiles 
-		net_buffer.cpp utility.cpp
+		ancillary_data.cpp net_buffer.cpp utility.cpp
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
 
 SEARCH on [ FGristFiles 
