@@ -116,23 +116,26 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	NotificationList pending_notifications;
 	ConditionVariable condition_variable;
 
-	block_cache(int fd, off_t numBlocks, size_t blockSize, bool readOnly);
-	~block_cache();
+					block_cache(int fd, off_t numBlocks, size_t blockSize,
+						bool readOnly);
+					~block_cache();
 
-	status_t Init();
+	status_t		Init();
 
-	void RemoveUnusedBlocks(int32 maxAccessed = LONG_MAX,
-		int32 count = LONG_MAX);
-	void RemoveBlock(cached_block* block);
-	void FreeBlock(cached_block* block);
-	cached_block* NewBlock(off_t blockNumber);
-	void Free(void* buffer);
-	void* Allocate();
+	void			Free(void* buffer);
+	void*			Allocate();
+	void			RemoveUnusedBlocks(int32 maxAccessed = LONG_MAX,
+						int32 count = LONG_MAX);
+	void			RemoveBlock(cached_block* block);
+	void			DiscardBlock(cached_block* block);
+	void			FreeBlock(cached_block* block);
+	cached_block*	NewBlock(off_t blockNumber);
 
-	static void LowMemoryHandler(void* data, uint32 resources, int32 level);
 
 private:
-	cached_block* _GetUnusedBlock();
+	static void		_LowMemoryHandler(void* data, uint32 resources,
+						int32 level);
+	cached_block*	_GetUnusedBlock();
 };
 
 struct cache_listener;
@@ -777,7 +780,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 /*! Should be called with the cache's lock held. */
 block_cache::~block_cache()
 {
-	unregister_low_resource_handler(&block_cache::LowMemoryHandler, this);
+	unregister_low_resource_handler(&_LowMemoryHandler, this);
 
 	hash_uninit(transaction_hash);
 	hash_uninit(hash);
@@ -809,7 +812,7 @@ block_cache::Init()
 	if (transaction_hash == NULL)
 		return B_NO_MEMORY;
 
-	return register_low_resource_handler(&block_cache::LowMemoryHandler, this,
+	return register_low_resource_handler(&_LowMemoryHandler, this,
 		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 0);
 }
 
@@ -844,36 +847,6 @@ block_cache::FreeBlock(cached_block* block)
 #endif
 
 	object_cache_free(sBlockCache, block);
-}
-
-
-cached_block*
-block_cache::_GetUnusedBlock()
-{
-	TRACE(("block_cache: get unused block\n"));
-
-	for (block_list::Iterator iterator = unused_blocks.GetIterator();
-			cached_block* block = iterator.Next();) {
-		TB(Flush(this, block, true));
-		// this can only happen if no transactions are used
-		if (block->is_dirty)
-			write_cached_block(this, block, false);
-
-		// remove block from lists
-		iterator.Remove();
-		hash_remove(hash, block);
-
-		// TODO: see if parent/compare data is handled correctly here!
-		if (block->parent_data != NULL
-			&& block->parent_data != block->original_data)
-			Free(block->parent_data);
-		if (block->original_data != NULL)
-			Free(block->original_data);
-
-		return block;
-	}
-
-	return NULL;
 }
 
 
@@ -921,14 +894,6 @@ block_cache::NewBlock(off_t blockNumber)
 
 
 void
-block_cache::RemoveBlock(cached_block* block)
-{
-	hash_remove(hash, block);
-	FreeBlock(block);
-}
-
-
-void
 block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 {
 	TRACE(("block_cache: remove up to %ld unused blocks\n", count));
@@ -957,7 +922,37 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 
 
 void
-block_cache::LowMemoryHandler(void* data, uint32 resources, int32 level)
+block_cache::RemoveBlock(cached_block* block)
+{
+	hash_remove(hash, block);
+	FreeBlock(block);
+}
+
+
+/*!	Discards the block from a transaction (this method must not be called
+	for blocks not part of a transaction).
+*/
+void
+block_cache::DiscardBlock(cached_block* block)
+{
+	ASSERT(block->discard);
+
+	if (block->parent_data != NULL && block->parent_data != block->current_data)
+		Free(block->parent_data);
+
+	block->parent_data = NULL;
+
+	if (block->original_data != NULL) {
+		Free(block->original_data);
+		block->original_data = NULL;
+	}
+
+	RemoveBlock(block);
+}
+
+
+void
+block_cache::_LowMemoryHandler(void* data, uint32 resources, int32 level)
 {
 	block_cache* cache = (block_cache*)data;
 	MutexLocker locker(&cache->lock);
@@ -995,6 +990,36 @@ block_cache::LowMemoryHandler(void* data, uint32 resources, int32 level)
 	}
 
 	cache->RemoveUnusedBlocks(accessed, free);
+}
+
+
+cached_block*
+block_cache::_GetUnusedBlock()
+{
+	TRACE(("block_cache: get unused block\n"));
+
+	for (block_list::Iterator iterator = unused_blocks.GetIterator();
+			cached_block* block = iterator.Next();) {
+		TB(Flush(this, block, true));
+		// this can only happen if no transactions are used
+		if (block->is_dirty)
+			write_cached_block(this, block, false);
+
+		// remove block from lists
+		iterator.Remove();
+		hash_remove(hash, block);
+
+		// TODO: see if parent/compare data is handled correctly here!
+		if (block->parent_data != NULL
+			&& block->parent_data != block->original_data)
+			Free(block->parent_data);
+		if (block->original_data != NULL)
+			Free(block->original_data);
+
+		return block;
+	}
+
+	return NULL;
 }
 
 
@@ -1339,12 +1364,13 @@ write_cached_block(block_cache* cache, cached_block* block,
 static void
 dump_block(cached_block* block)
 {
-	kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c  %08lx "
-		"%08lx\n", (addr_t)block, block->block_number,
+	kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c%c %08lx %08lx\n",
+		(addr_t)block, block->block_number,
 		(addr_t)block->current_data, (addr_t)block->original_data,
 		(addr_t)block->parent_data, block->ref_count, block->accessed,
 		block->busy ? 'B' : '-', block->is_writing ? 'W' : '-',
-		block->is_dirty ? 'B' : '-', block->unused ? 'U' : '-',
+		block->is_dirty ? 'D' : '-', block->unused ? 'U' : '-',
+		block->discard ? 'D' : '-',
 		(addr_t)block->transaction,
 		(addr_t)block->previous_transaction);
 }
@@ -1473,6 +1499,7 @@ dump_cache(int argc, char** argv)
 	uint32 referenced = 0;
 	uint32 count = 0;
 	uint32 dirty = 0;
+	uint32 discarded = 0;
 	hash_iterator iterator;
 	hash_open(cache->hash, &iterator);
 	cached_block* block;
@@ -1482,13 +1509,16 @@ dump_cache(int argc, char** argv)
 
 		if (block->is_dirty)
 			dirty++;
+		if (block->discard)
+			discarded++;
 		if (block->ref_count)
 			referenced++;
 		count++;
 	}
 
-	kprintf(" %ld blocks total, %ld dirty, %ld referenced, %ld in unused.\n", count, dirty,
-		referenced, cache->unused_blocks.Size());
+	kprintf(" %ld blocks total, %ld dirty, %ld discarded, %ld referenced, %ld "
+		"in unused.\n", count, dirty, discarded, referenced,
+		cache->unused_blocks.Size());
 
 	hash_close(cache->hash, &iterator, false);
 	return 0;
@@ -1937,6 +1967,12 @@ cache_end_transaction(void* _cache, int32 id,
 			// need to write back pending changes
 			write_cached_block(cache, block);
 		}
+		if (block->discard) {
+			// This block has been discarded in the transaction
+			cache->DiscardBlock(block);
+			transaction->num_blocks--;
+			continue;
+		}
 
 		if (block->original_data != NULL) {
 			cache->Free(block->original_data);
@@ -2175,10 +2211,21 @@ cache_start_sub_transaction(void* _cache, int32 id)
 	// move all changed blocks up to the parent
 
 	cached_block* block = transaction->first_block;
+	cached_block* last = NULL;
 	cached_block* next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
+		if (block->discard) {
+			// This block has been discarded in the parent transaction
+			if (last != NULL)
+				last->transaction_next = next;
+			else
+				transaction->first_block = next;
+
+			cache->DiscardBlock(block);
+			continue;
+		}
 		if (transaction->has_sub_transaction
 			&& block->parent_data != NULL
 			&& block->parent_data != block->current_data) {
@@ -2190,6 +2237,7 @@ cache_start_sub_transaction(void* _cache, int32 id)
 		// we "allocate" the parent data lazily, that means, we don't copy
 		// the data (and allocate memory for it) until we need to
 		block->parent_data = block->current_data;
+		last = block;
 	}
 
 	// all subsequent changes will go into the sub transaction
@@ -2483,14 +2531,14 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 		if (block == NULL)
 			continue;
 
+		if (block->previous_transaction != NULL)
+			write_cached_block(cache, block);
+
 		if (block->unused) {
 			cache->unused_blocks.Remove(block);
 			cache->RemoveBlock(block);
 		} else {
-			// mark them as discarded (in the current transaction only, if any)
-			if (block->previous_transaction != NULL)
-				write_cached_block(cache, block);
-
+			// mark it as discarded (in the current transaction only, if any)
 			block->discard = true;
 		}
 	}
