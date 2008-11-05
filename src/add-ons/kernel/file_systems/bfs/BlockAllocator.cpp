@@ -867,6 +867,11 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 		// If the value is not correct at mount time, it will be
 		// fixed anyway.
 
+	// We need to flush any remaining blocks in the new allocation to make sure
+	// they won't interfere with the file cache.
+	block_cache_discard(fVolume->BlockCache(), fVolume->ToBlock(run),
+		run.Length());
+
 	T(Allocate(run));
 	return B_OK;
 }
