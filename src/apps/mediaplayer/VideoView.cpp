@@ -92,57 +92,60 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 	// we're going to deadlock when the window tells the node manager to
 	// stop the nodes (Window -> NodeManager -> VideoConsumer -> VideoView
 	// -> Window).
-	if (bitmap && LockLooperWithTimeout(10000) == B_OK) {
-		if (LockBitmap()) {
-			if (fOverlayMode || (BitmapFlags(bitmap) & B_BITMAP_WILL_OVERLAY)) {
-				if (!fOverlayMode) {
-					// init overlay
-					rgb_color key;
-					status_t ret = SetViewOverlay(bitmap, bitmap->Bounds(),
-						Bounds(), &key, B_FOLLOW_ALL,
-						B_OVERLAY_FILTER_HORIZONTAL
-						| B_OVERLAY_FILTER_VERTICAL);
-					if (ret == B_OK) {
-						fOverlayKeyColor = key;
-						SetViewColor(key);
-						SetLowColor(key);
-						snooze(20000);
-						FillRect(Bounds(), B_SOLID_LOW);
-						Sync();
-						// use overlay from here on
-						fOverlayMode = true;
+	if (!bitmap || LockLooperWithTimeout(10000) != B_OK)
+		return;
 
-						// update restrictions
-						overlay_restrictions restrictions;
-						if (bitmap->GetOverlayRestrictions(&restrictions)
-								== B_OK)
-							fOverlayRestrictions = restrictions;
-					} else {
-						// try again next time
-						// synchronous draw
-						FillRect(Bounds());
-						Sync();
-					}
+	if (LockBitmap()) {
+		if (fOverlayMode
+			|| (BitmapFlags(bitmap) & B_BITMAP_WILL_OVERLAY) != 0) {
+			if (!fOverlayMode) {
+				// init overlay
+				rgb_color key;
+				status_t ret = SetViewOverlay(bitmap, bitmap->Bounds(),
+					Bounds(), &key, B_FOLLOW_ALL,
+					B_OVERLAY_FILTER_HORIZONTAL
+					| B_OVERLAY_FILTER_VERTICAL);
+				if (ret == B_OK) {
+					fOverlayKeyColor = key;
+					SetViewColor(key);
+					SetLowColor(key);
+					snooze(20000);
+					FillRect(Bounds(), B_SOLID_LOW);
+					Sync();
+					// use overlay from here on
+					fOverlayMode = true;
+
+					// update restrictions
+					overlay_restrictions restrictions;
+					if (bitmap->GetOverlayRestrictions(&restrictions)
+							== B_OK)
+						fOverlayRestrictions = restrictions;
 				} else {
-					// transfer overlay channel
-					rgb_color key;
-					SetViewOverlay(bitmap, bitmap->Bounds(), Bounds(),
-						&key, B_FOLLOW_ALL, B_OVERLAY_FILTER_HORIZONTAL
-							| B_OVERLAY_FILTER_VERTICAL
-							| B_OVERLAY_TRANSFER_CHANNEL);
+					// try again next time
+					// synchronous draw
+					FillRect(Bounds());
+					Sync();
 				}
-			} else if (fOverlayMode && bitmap->ColorSpace() != B_YCbCr422) {
-				fOverlayMode = false;
-				ClearViewOverlay();
-				SetViewColor(B_TRANSPARENT_COLOR);
+			} else {
+				// transfer overlay channel
+				rgb_color key;
+				SetViewOverlay(bitmap, bitmap->Bounds(), Bounds(),
+					&key, B_FOLLOW_ALL, B_OVERLAY_FILTER_HORIZONTAL
+						| B_OVERLAY_FILTER_VERTICAL
+						| B_OVERLAY_TRANSFER_CHANNEL);
 			}
-			if (!fOverlayMode)
-				_DrawBitmap(bitmap);
-
-			UnlockBitmap();
+		} else if (fOverlayMode
+			&& (BitmapFlags(bitmap) & B_BITMAP_WILL_OVERLAY) == 0) {
+			fOverlayMode = false;
+			ClearViewOverlay();
+			SetViewColor(B_TRANSPARENT_COLOR);
 		}
-		UnlockLooper();
+		if (!fOverlayMode)
+			_DrawBitmap(bitmap);
+
+		UnlockBitmap();
 	}
+	UnlockLooper();
 }
 
 
