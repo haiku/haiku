@@ -1431,6 +1431,8 @@ dump_cache(int argc, char** argv)
 				kprintf(" is-dirty");
 			if (block->unused)
 				kprintf(" unused");
+			if (block->discard)
+				kprintf(" discard");
 			kprintf("\n");
 			if (block->transaction != NULL) {
 				kprintf(" transaction:   %p (%ld)\n", block->transaction,
@@ -1771,10 +1773,11 @@ is_valid_cache(block_cache* cache)
 static void
 wait_for_notifications(block_cache* cache)
 {
+	MutexLocker locker(sCachesLock);
+
 	if (find_thread(NULL) == sNotifierWriterThread) {
 		// We're the notifier thread, don't wait, but flush all pending
 		// notifications directly.
-		MutexLocker _(sCachesLock);
 		if (is_valid_cache(cache))
 			flush_pending_notifications(cache);
 		return;
@@ -1789,9 +1792,14 @@ wait_for_notifications(block_cache* cache)
 	cache->condition_variable.Add(&entry);
 
 	add_notification(cache, &notification, TRANSACTION_WRITTEN, false);
+	locker.Unlock();
 
 	// wait for notification hook to be called
 	entry.Wait();
+
+	ASSERT(notification.GetDoublyLinkedListLink()->next == NULL
+		&& notification.GetDoublyLinkedListLink()->previous == NULL
+		&& cache->pending_notifications.Head() != &notification);
 }
 
 
