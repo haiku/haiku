@@ -9,6 +9,9 @@
 #include <OS.h>
 
 
+#define DIRECT_BUFFER_INFO_AREA_SIZE B_PAGE_SIZE
+
+
 struct direct_window_sync_data {
 	area_id	area;
 	sem_id	disable_sem;

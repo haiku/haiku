@@ -18,6 +18,7 @@
 #include "MesaSoftwareRenderer.h"
 
 #include <Autolock.h>
+#include <DirectWindowPrivate.h>
 #include <GraphicsDefs.h>
 #include <Screen.h>
 
@@ -563,11 +564,9 @@ MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
 	BAutolock lock(fInfoLocker);
 	if (info) {
 		if (!fInfo) {
-			// TODO size of info != sizeof(direct_buffer_info) 
-			// see GLView.cpp in glview_direct_info::glview_direct_info()
-			fInfo = (direct_buffer_info *)calloc(1, B_PAGE_SIZE);
+			fInfo = (direct_buffer_info *)calloc(1, DIRECT_BUFFER_INFO_AREA_SIZE);
 		}
-		memcpy(fInfo, info, B_PAGE_SIZE);
+		memcpy(fInfo, info, DIRECT_BUFFER_INFO_AREA_SIZE);
 	} else if (fInfo) {
 		free(fInfo);
 		fInfo = NULL;

@@ -41,6 +41,7 @@
 #include <DirectWindow.h>
 #include <GLRenderer.h>
 
+#include "DirectWindowPrivate.h"
 #include "GLRendererRoster.h"
 
 struct glview_direct_info {
@@ -568,7 +569,7 @@ const char * color_space_name(color_space space)
 glview_direct_info::glview_direct_info()
 {
 	// TODO: See direct_window_data() in app_server's ServerWindow.cpp
-	direct_info = (direct_buffer_info *)calloc(1, B_PAGE_SIZE);
+	direct_info = (direct_buffer_info *)calloc(1, DIRECT_BUFFER_INFO_AREA_SIZE);
 	direct_connected = false;
 	enable_direct_mode = false;
 }

@@ -26,7 +26,7 @@ if $(TARGET_PLATFORM) != haiku {
         SubDirC++Flags [ FDefines $(defines) ] ;
 }
 
-UsePrivateHeaders opengl ;
+UsePrivateHeaders interface opengl ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa main ] ;
