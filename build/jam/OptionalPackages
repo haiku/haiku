@@ -414,7 +414,7 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 			: $(baseURL)/perl-5.10.0-gcc2-2008-10-29.zip
 			:
 		;
-		AddSymlinkToHaikuImage bin : /boot/common/bin/perl : perl ;
+		AddSymlinkToHaikuImage home config bin : /boot/common/bin/perl : perl ;
 
 	}
 }
