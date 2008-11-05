@@ -24,8 +24,8 @@ const int32			kMinutesPerDay				= 1440;
 const int32			kSecondsPerDay				= 86400;
 const int32			kMillisecondsPerDay			= 86400000;
 
-const int32			kMicrosecondsPerSecond		= 1000000;
-const int32			kMicrosecondsPerMinute		= 60000000;
+const bigtime_t		kMicrosecondsPerSecond		= 1000000LL;
+const bigtime_t		kMicrosecondsPerMinute		= 60000000LL;
 const bigtime_t		kMicrosecondsPerHour		= 3600000000LL;
 const bigtime_t		kMicrosecondsPerDay			= 86400000000LL;
 
@@ -70,7 +70,7 @@ BTime::IsValid(int32 hour, int32 minute, int32 second, int32 microsecond) const
 
 
 BTime
-		BTime::CurrentTime(time_type type)
+BTime::CurrentTime(time_type type)
 {
 	struct timeval tv;
 	if (gettimeofday(&tv, NULL) != 0) {
@@ -162,7 +162,7 @@ BTime::Hour() const
 int32
 BTime::Minute() const
 {
-	return int32((_Microseconds() % kMicrosecondsPerHour)) / kMicrosecondsPerMinute;
+	return int32(((_Microseconds() % kMicrosecondsPerHour)) / kMicrosecondsPerMinute);
 }
 
 
@@ -274,7 +274,8 @@ BTime::_AddMicroseconds(bigtime_t microseconds)
 
 
 bool
-BTime::_SetTime(int32 hour, int32 minute, int32 second,	int32 microsecond)
+BTime::_SetTime(bigtime_t hour, bigtime_t minute, bigtime_t second,
+	bigtime_t microsecond)
 {
 	fMicroseconds = hour * kMicrosecondsPerHour +
 					minute * kMicrosecondsPerMinute +

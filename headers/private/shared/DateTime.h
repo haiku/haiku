@@ -71,8 +71,8 @@ class BTime {
 	private:
 		bigtime_t		_Microseconds() const;
 		void			_AddMicroseconds(bigtime_t microseconds);
-		bool			_SetTime(int32 hour, int32 minute, int32 second,
-							int32 microsecond);
+		bool			_SetTime(bigtime_t hour, bigtime_t minute, bigtime_t second,
+							bigtime_t microsecond);
 
 	private:
 		bigtime_t		fMicroseconds;
