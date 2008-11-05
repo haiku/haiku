@@ -3101,7 +3101,7 @@ dump_vnode(int argc, char **argv)
 
 	struct hash_iterator iterator;
 	dev_t device = parse_expression(argv[1]);
-	ino_t id = atoll(argv[2]);
+	ino_t id = parse_expression(argv[2]);
 
 	hash_open(sVnodeTable, &iterator);
 	while ((vnode = (struct vnode *)hash_next(sVnodeTable, &iterator)) != NULL) {
@@ -3163,7 +3163,7 @@ dump_vnode_caches(int argc, char **argv)
 	// restrict dumped nodes to a certain device if requested
 	dev_t device = -1;
 	if (argc > 1)
-		device = atoi(argv[1]);
+		device = parse_expression(argv[1]);
 
 	kprintf("address    dev     inode cache          size   pages\n");
 
