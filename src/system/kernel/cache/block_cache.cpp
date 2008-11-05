@@ -566,6 +566,8 @@ notify_transaction_listeners(block_cache* cache, cache_transaction* transaction,
 static void
 flush_pending_notifications(block_cache* cache)
 {
+	ASSERT_LOCKED_MUTEX(&sCachesLock);
+
 	while (true) {
 		MutexLocker locker(sNotificationsLock);
 
@@ -1203,11 +1205,11 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 		if (cleared)
 			memset(block->current_data, 0, cache->block_size);
 
-		if (!block->is_dirty)
+		if (!block->is_dirty) {
 			cache->num_dirty_blocks++;
-
-		block->is_dirty = true;
-			// mark the block as dirty
+			block->is_dirty = true;
+				// mark the block as dirty
+		}
 
 		TB(Get(cache, block));
 		return block->current_data;
@@ -2112,9 +2114,13 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 			// need to write back pending changes
 			write_cached_block(cache, block);
 		}
+		if (block->discard) {
+			cache->DiscardBlock(block);
+			transaction->main_num_blocks--;
+			continue;
+		}
 
-		if (block->original_data != NULL && block->parent_data != NULL
-			&& block->parent_data != block->current_data) {
+		if (block->original_data != NULL && block->parent_data != NULL) {
 			// free the original data if the parent data of the transaction
 			// will be made current - but keep them otherwise
 			cache->Free(block->original_data);
@@ -2137,10 +2143,10 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 		if (block->parent_data != NULL) {
 			// move the block to the previous transaction list
 			transaction->blocks.Add(block);
+			block->previous_transaction = transaction;
 			block->parent_data = NULL;
 		}
 
-		block->previous_transaction = transaction;
 		block->transaction_next = NULL;
 	}
 
@@ -2200,6 +2206,7 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 		}
 
 		block->parent_data = NULL;
+		block->discard = false;
 	}
 
 	// all subsequent changes will go into the main transaction
@@ -2242,6 +2249,7 @@ cache_start_sub_transaction(void* _cache, int32 id)
 				transaction->first_block = next;
 
 			cache->DiscardBlock(block);
+			transaction->num_blocks--;
 			continue;
 		}
 		if (transaction->has_sub_transaction
@@ -2556,6 +2564,12 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 			cache->unused_blocks.Remove(block);
 			cache->RemoveBlock(block);
 		} else {
+			if (block->transaction != NULL && block->parent_data != NULL
+				&& block->parent_data != block->current_data) {
+				panic("Discarded block %Ld has already been changed in this "
+					"transaction!", blockNumber);
+			}
+
 			// mark it as discarded (in the current transaction only, if any)
 			block->discard = true;
 		}
