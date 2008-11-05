@@ -873,10 +873,10 @@ set_thread_prio(int argc, char **argv)
 	}
 
 	prio = strtoul(argv[1], NULL, 0);
-	if (prio > B_MAX_PRIORITY)
-		prio = B_MAX_PRIORITY;
-	if (prio < B_MIN_PRIORITY)
-		prio = B_MIN_PRIORITY;
+	if (prio > THREAD_MAX_SET_PRIORITY)
+		prio = THREAD_MAX_SET_PRIORITY;
+	if (prio < THREAD_MIN_SET_PRIORITY)
+		prio = THREAD_MIN_SET_PRIORITY;
 
 	if (argc > 2)
 		id = strtoul(argv[2], NULL, 0);
@@ -2502,33 +2502,35 @@ set_thread_priority(thread_id id, int32 priority)
 	int32 oldPriority;
 
 	// make sure the passed in priority is within bounds
-	if (priority > B_MAX_PRIORITY)
-		priority = B_MAX_PRIORITY;
-	if (priority < B_MIN_PRIORITY)
-		priority = B_MIN_PRIORITY;
+	if (priority > THREAD_MAX_SET_PRIORITY)
+		priority = THREAD_MAX_SET_PRIORITY;
+	if (priority < THREAD_MIN_SET_PRIORITY)
+		priority = THREAD_MIN_SET_PRIORITY;
 
 	thread = thread_get_current_thread();
 	if (thread->id == id) {
-		// it's ourself, so we know we aren't in the run queue, and we can manipulate
-		// our structure directly
+		if (thread_is_idle_thread(thread))
+			return B_NOT_ALLOWED;
+
+		// It's ourself, so we know we aren't in the run queue, and we can
+		// manipulate our structure directly
 		oldPriority = thread->priority;
-			// note that this might not return the correct value if we are preempted
-			// here, and another thread changes our priority before the next line is
-			// executed
+			// Note that this might not return the correct value if we are
+			// preempted here, and another thread changes our priority before
+			// the next line is executed.
 		thread->priority = thread->next_priority = priority;
 	} else {
-		cpu_status state = disable_interrupts();
-		GRAB_THREAD_LOCK();
+		InterruptsSpinLocker _(gThreadSpinlock);
 
 		thread = thread_get_thread_struct_locked(id);
-		if (thread) {
-			oldPriority = thread->priority;
-			scheduler_set_thread_priority(thread, priority);
-		} else
-			oldPriority = B_BAD_THREAD_ID;
+		if (thread == NULL)
+			return B_BAD_THREAD_ID;
 
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
+		if (thread_is_idle_thread(thread))
+			return B_NOT_ALLOWED;
+
+		oldPriority = thread->priority;
+		scheduler_set_thread_priority(thread, priority);
 	}
 
 	return oldPriority;

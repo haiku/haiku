@@ -65,17 +65,17 @@ typedef struct area_info {
 } area_info;
 
 /* area locking */
-#define B_NO_LOCK				0	
-#define B_LAZY_LOCK				1	
-#define B_FULL_LOCK				2	
-#define B_CONTIGUOUS			3	
+#define B_NO_LOCK				0
+#define B_LAZY_LOCK				1
+#define B_FULL_LOCK				2
+#define B_CONTIGUOUS			3
 #define	B_LOMEM					4
 
 /* address spec for create_area(), and clone_area() */
-#define B_ANY_ADDRESS			0	
-#define B_EXACT_ADDRESS			1	
-#define B_BASE_ADDRESS			2	
-#define B_CLONE_ADDRESS			3	
+#define B_ANY_ADDRESS			0
+#define B_EXACT_ADDRESS			1
+#define B_BASE_ADDRESS			2
+#define B_CLONE_ADDRESS			3
 #define	B_ANY_KERNEL_ADDRESS	4
 
 /* area protection */
@@ -153,7 +153,7 @@ typedef struct port_message_info {
 } port_message_info;
 
 // similar to port_buffer_size_etc(), but returns (more) info
-extern status_t _get_port_message_info_etc(port_id port, 
+extern status_t _get_port_message_info_etc(port_id port,
 					port_message_info *info, size_t infoSize, uint32 flags,
 					bigtime_t timeout);
 
@@ -303,11 +303,9 @@ typedef struct {
 #define	B_URGENT_PRIORITY				110
 #define B_REAL_TIME_PRIORITY			120
 
-#define B_FIRST_REAL_TIME_PRIORITY		B_REAL_TIME_DISPLAY_PRIORITY
-#define B_MIN_PRIORITY					B_IDLE_PRIORITY
-#define B_MAX_PRIORITY					B_REAL_TIME_PRIORITY
-
 #define B_SYSTEM_TIMEBASE				0
+
+#define B_FIRST_REAL_TIME_PRIORITY		B_REAL_TIME_DISPLAY_PRIORITY
 
 typedef status_t (*thread_func)(void *);
 #define thread_entry thread_func
@@ -381,7 +379,7 @@ extern void	debugger(const char *message);
    point errors, SIGILL for illegal instructions, etc).
 
    to re-enable the default debugger pass a zero.
-*/   
+*/
 extern int disable_debugger(int state);
 
 // TODO: Remove. Temporary debug helper.
@@ -452,9 +450,9 @@ typedef enum cpu_types {
 	B_CPU_PPC_IBM_POWER3				= 46,
 
 	/* Intel */
-	
+
 	/* Updated according to Intel(R) Processor Identification and
-	 * the  CPUID instruction (Table 4) 
+	 * the  CPUID instruction (Table 4)
 	 * AP-485 Intel - 24161832.pdf
 	 */
 	B_CPU_INTEL_x86						= 0x1000,
@@ -489,11 +487,11 @@ typedef enum cpu_types {
 	B_CPU_INTEL_PENTIUM_IV_MODEL_4,
 
 	/* AMD */
-	
+
 	/* Checked with "AMD Processor Recognition Application Note"
 	 * (Table 3)
 	 * 20734.pdf
-	 */ 
+	 */
 	B_CPU_AMD_x86						= 0x1100,
 	B_CPU_AMD_K5_MODEL_0				= 0x1150,
 	B_CPU_AMD_K5_MODEL_1,
@@ -517,15 +515,15 @@ typedef enum cpu_types {
 	B_CPU_AMD_ATHLON_XP_MODEL_7,
 	B_CPU_AMD_ATHLON_XP_MODEL_8,
 	B_CPU_AMD_ATHLON_XP_MODEL_10		= 0x116a, /* Barton */
-	
+
 	B_CPU_AMD_SEMPRON_MODEL_8			= B_CPU_AMD_ATHLON_XP_MODEL_8,
 	B_CPU_AMD_SEMPRON_MODEL_10			= B_CPU_AMD_ATHLON_XP_MODEL_10,
 
 	/* According to "Revision Guide for AMD Family 10h
-	 * Processors" (41322.pdf) 
+	 * Processors" (41322.pdf)
 	 */
 	B_CPU_AMD_PHENOM					= 0x11f2,
-	
+
 	/* According to "Revision guide for AMD Athlon 64
 	 * and AMD Opteron Processors" (25759.pdf)
 	 */
@@ -633,7 +631,7 @@ typedef union {
 		uint32	ebx;
 		uint32	edx;
 		uint32	ecx;
-	} regs; 
+	} regs;
 } cpuid_info;
 
 extern status_t get_cpuid(cpuid_info *info, uint32 eaxRegister, uint32 cpuNum);

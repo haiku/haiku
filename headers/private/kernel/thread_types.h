@@ -34,6 +34,9 @@ enum additional_thread_state {
 //	THREAD_STATE_BIRTH	// thread is being created
 };
 
+#define THREAD_MIN_SET_PRIORITY				B_LOWEST_ACTIVE_PRIORITY
+#define THREAD_MAX_SET_PRIORITY				B_REAL_TIME_PRIORITY
+
 enum team_state {
 	TEAM_STATE_NORMAL,	// normal state
 	TEAM_STATE_BIRTH,	// being contructed
@@ -48,6 +51,7 @@ typedef enum job_control_state {
 	JOB_CONTROL_STATE_CONTINUED,
 	JOB_CONTROL_STATE_DEAD
 } job_control_state;
+
 
 struct image;					// defined in image.c
 struct realtime_sem_context;	// defined in realtime_sem.cpp
