@@ -79,6 +79,8 @@ public:
 
 	// Controller
 			status_t			SetTo(const entry_ref &ref);
+			entry_ref			Ref() const
+									{ return fRef; }
 			void				PlayerActivated(bool active);
 
 			void				GetSize(int *width, int *height);

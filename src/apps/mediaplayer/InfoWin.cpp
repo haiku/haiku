@@ -23,8 +23,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Bitmap.h>
 #include <Debug.h>
 #include <MediaDefs.h>
+#include <Mime.h>
+#include <NodeInfo.h>
 #include <String.h>
 #include <StringView.h>
 #include <TextView.h>
@@ -48,17 +51,39 @@ const rgb_color kBlack = {   0,   0,   0, 255 };
 // should later draw an icon
 class InfoView : public BView {
 public:
-	InfoView(BRect frame, const char *name, float divider)
-		: BView(frame, name, B_FOLLOW_ALL,
-			B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
-		, fDivider(divider)
-		{ }
-	virtual ~InfoView()
-		{ }
-	void Draw(BRect updateRect);
-	float fDivider;
+						InfoView(BRect frame, const char* name, float divider);
+	virtual				~InfoView();
+	virtual	void		Draw(BRect updateRect);
+
+			status_t	SetIcon(const entry_ref& ref);
+			status_t	SetIcon(const char* mimeType);
+			void		SetGenericIcon();
+
+private:
+			float		fDivider;
+			BBitmap*	fIconBitmap;
 };
 
+
+InfoView::InfoView(BRect frame, const char *name, float divider)
+	: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	  fDivider(divider),
+	  fIconBitmap(NULL)
+{
+	BRect rect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
+	
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	fIconBitmap = new BBitmap(rect, B_RGBA32);
+#else
+	fIconBitmap = new BBitmap(rect, B_CMAP8);
+#endif
+}
+
+
+InfoView::~InfoView()
+{
+	delete fIconBitmap;
+}
 
 void
 InfoView::Draw(BRect updateRect)
@@ -67,9 +92,63 @@ InfoView::Draw(BRect updateRect)
 	BRect r(Bounds());
 	r.right = r.left + fDivider;
 	FillRect(r);
+
+	if (fIconBitmap) {
+		float left = r.left + ( r.right - r.left ) / 2 - B_LARGE_ICON / 2;
+		SetDrawingMode(B_OP_ALPHA);
+		DrawBitmap(fIconBitmap, BPoint(left, r.top + B_LARGE_ICON / 2));
+	}
+
 	SetHighColor(ui_color(B_DOCUMENT_TEXT_COLOR));
 	r.left = r.right;
 	FillRect(r);
+}
+
+
+status_t
+InfoView::SetIcon(const entry_ref& ref)
+{
+	BNode node(&ref);
+	BNodeInfo info(&node);
+	return info.GetTrackerIcon(fIconBitmap, B_LARGE_ICON);
+}
+
+
+status_t
+InfoView::SetIcon(const char* mimeTypeString)
+{
+	if (!mimeTypeString)
+		return B_BAD_VALUE;
+
+	// get type icon
+	BMimeType mimeType(mimeTypeString);
+	status_t status = mimeType.GetIcon(fIconBitmap, B_LARGE_ICON);
+
+	// get supertype icon
+	if (status != B_OK) {
+		BMimeType superType;
+		status = mimeType.GetSupertype(&superType);
+		if (status == B_OK)
+			status = superType.GetIcon(fIconBitmap, B_LARGE_ICON);
+	}
+
+	return status;
+}
+
+
+void
+InfoView::SetGenericIcon()
+{
+	// get default icon
+	BMimeType genericType(B_FILE_MIME_TYPE);
+	if (genericType.GetIcon(fIconBitmap, B_LARGE_ICON) != B_OK) {
+		// clear bitmap
+		uint8 transparent = 0;
+		if (fIconBitmap->ColorSpace() == B_CMAP8)
+			transparent = B_TRANSPARENT_MAGIC_CMAP8;
+
+		memset(fIconBitmap->Bits(), transparent, fIconBitmap->BitsLength());
+	}
 }
 
 
@@ -101,14 +180,13 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 										  rect.right - 10,
 										  20 + fh.ascent + 5),
 									"filename", "");
+	AddChild(fFilenameView);									
 	fFilenameView->SetFont(&bigFont);
 	fFilenameView->SetViewColor(fInfoView->ViewColor());
 	fFilenameView->SetLowColor(fInfoView->ViewColor());
 #ifdef B_BEOS_VERSION_DANO /* maybe we should support that as well ? */
 	fFilenameView->SetTruncation(B_TRUNCATE_END);
 #endif
-	AddChild(fFilenameView);
-									
 	
 	rect.top = BASE_HEIGHT;
 
@@ -268,7 +346,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 
 	// audio track format information
 	if ((which & INFO_AUDIO) && fController->AudioTrackCount() > 0) {
-		fLabelsView->Insert("Audio\n\n\n\n");
+		fLabelsView->Insert("Audio\n\n\n");
 		BString s;
 		media_format format;
 		media_raw_audio_format audioFormat;
@@ -361,14 +439,19 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	}
 
 	if (which & INFO_FILE) {
+		bool iconSet = false;
 		if (fController->HasFile()) {
-			media_file_format ff;
+			entry_ref ref = fController->Ref();
+			iconSet = fInfoView->SetIcon(ref) == B_OK;
+			media_file_format fileFormat;
 			BString s;
-			if (fController->GetFileFormatInfo(&ff) == B_OK) {
+			if (fController->GetFileFormatInfo(&fileFormat) == B_OK) {
 				fLabelsView->Insert("Container\n");
-				s << ff.pretty_name;
+				s << fileFormat.pretty_name;
 				s << "\n";
 				fContentsView->Insert(s.String());
+				if (!iconSet)
+					iconSet = fInfoView->SetIcon(fileFormat.mime_type) == B_OK;
 			} else
 				fContentsView->Insert("\n");
 			fLabelsView->Insert("Location\n");
@@ -382,6 +465,8 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		} else {
 			fFilenameView->SetText("<no media>");
 		}
+		if (!iconSet)
+			fInfoView->SetGenericIcon();
 	}
 
 	if ((which & INFO_COPYRIGHT) && fController->HasFile()) {
