@@ -1746,6 +1746,22 @@ notify_sync(int32 transactionID, int32 event, void* _cache)
 }
 
 
+/*!	Must be called with the sCachesLock held. */
+static bool
+is_valid_cache(block_cache* cache)
+{
+	ASSERT_LOCKED_MUTEX(&sCachesLock);
+
+	DoublyLinkedList<block_cache>::Iterator iterator = sCaches.GetIterator();
+	while (iterator.HasNext()) {
+		if (cache == iterator.Next())
+			return true;
+	}
+
+	return false;
+}
+
+
 /*!	Waits until all pending notifications are carried out.
 	Safe to be called from the block writer/notifier thread.
 	You must not hold the \a cache lock when calling this function.
@@ -1756,7 +1772,9 @@ wait_for_notifications(block_cache* cache)
 	if (find_thread(NULL) == sNotifierWriterThread) {
 		// We're the notifier thread, don't wait, but flush all pending
 		// notifications directly.
-		flush_pending_notifications(cache);
+		MutexLocker _(sCachesLock);
+		if (is_valid_cache(cache))
+			flush_pending_notifications(cache);
 		return;
 	}
 
