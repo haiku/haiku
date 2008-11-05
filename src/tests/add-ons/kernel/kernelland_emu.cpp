@@ -1313,6 +1313,11 @@ _mutex_trylock(mutex *mutex)
 status_t
 _mutex_lock(mutex *mutex, bool threadsLocked)
 {
+	if (mutex->waiters == NULL) {
+		// MUTEX_INITIALIZER has been used; this is not thread-safe!
+		mutex_init(mutex, mutex->name);
+	}
+
 	status_t status;
 	do {
 		status = acquire_sem((sem_id)mutex->waiters);
