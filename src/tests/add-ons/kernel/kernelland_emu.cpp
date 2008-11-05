@@ -1322,6 +1322,11 @@ _mutex_lock(mutex *mutex, bool threadsLocked)
 	do {
 		status = acquire_sem((sem_id)mutex->waiters);
 	} while (status == B_INTERRUPTED);
+
+#if KDEBUG
+	if (status == B_OK)
+		mutex->holder = find_thread(NULL);
+#endif
 	return status;
 }
 
@@ -1329,6 +1334,9 @@ _mutex_lock(mutex *mutex, bool threadsLocked)
 void
 _mutex_unlock(mutex *mutex, bool threadsLocked)
 {
+#if KDEBUG
+	mutex->holder = -1;
+#endif
 	release_sem((sem_id)mutex->waiters);
 }
 
