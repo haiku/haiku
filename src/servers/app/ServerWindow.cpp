@@ -3325,7 +3325,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		fDirectWindowData->buffer_info->window_bounds = to_clipping_rect(fWindow->Frame());
 
 		// TODO: Review this
-		const int32 kMaxClipRectsCount = (B_PAGE_SIZE - sizeof(direct_buffer_info))
+		const int32 kMaxClipRectsCount = (DIRECT_BUFFER_INFO_AREA_SIZE - sizeof(direct_buffer_info))
 			/ sizeof(clipping_rect);
 
 		// We just want the region inside the window, border excluded.
