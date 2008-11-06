@@ -120,6 +120,7 @@ MouseView::GetPreferredSize(float *_width, float *_height)
 		*_height = fMouseBitmap != NULL ? fMouseBitmap->Bounds().Height() : 82;
 }
 
+
 void
 MouseView::MouseUp(BPoint)
 {
@@ -128,6 +129,7 @@ MouseView::MouseUp(BPoint)
 		kButtonTop + fMouseDownBounds.Height()));
 	fOldButtons = fButtons;
 }
+
 
 void
 MouseView::MouseDown(BPoint where)
