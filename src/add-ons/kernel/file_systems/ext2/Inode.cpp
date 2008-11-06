@@ -32,10 +32,12 @@ Inode::Inode(Volume* volume, ino_t id)
 	uint32 block;
 	if (volume->GetInodeBlock(id, block) == B_OK) {
 		TRACE("inode %Ld at block %lu\n", ID(), block);
-		ext2_inode* inodes = (ext2_inode*)block_cache_get(volume->BlockCache(),
+		uint8* inodeBlock = (uint8*)block_cache_get(volume->BlockCache(),
 			block);
-		if (inodes != NULL)
-			fNode = inodes + volume->InodeBlockIndex(id);
+		if (inodeBlock != NULL) {
+			fNode = (ext2_inode*)(inodeBlock + volume->InodeBlockIndex(id)
+				* volume->InodeSize());
+		}
 	}
 
 	if (fNode != NULL) {

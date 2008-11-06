@@ -297,7 +297,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return B_NO_MEMORY;
 
 	memset(fGroupBlocks, 0, blockCount * sizeof(void*));
-	fInodesPerBlock = fBlockSize / sizeof(ext2_inode);
+	fInodesPerBlock = fBlockSize / InodeSize();
 
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;
