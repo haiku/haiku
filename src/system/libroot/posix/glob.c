@@ -109,7 +109,7 @@ static char sccsid[] = "@(#)glob.c	8.3 (Berkeley) 10/13/93";
 #define	SLASH		'/'
 #define	COMMA		','
 
-#ifndef DEBUG
+#if !defined(DEBUG) && !defined(__HAIKU__)
 
 #define	M_QUOTE		0x8000000000ULL
 #define	M_PROTECT	0x4000000000ULL
@@ -163,6 +163,30 @@ static int	 match(Char *, Char *, Char *);
 #ifdef DEBUG
 static void	 qprintf(const char *, Char *);
 #endif
+
+#ifdef __HAIKU__
+#	warning glob() wants to use wide character functions
+
+static size_t
+my_wcrtomb(char* to, char wchar, mbstate_t* state)
+{
+	*to = wchar;
+	return 1;
+}
+
+static size_t
+my_mbrtowc(wchar_t* to, const char* string, size_t len, mbstate_t* state)
+{
+	if (!string[0])
+		return 0;
+	*to = *string;
+	return 1;
+}
+
+#	define wcrtomb my_wcrtomb
+#	define mbrtowc my_mbrtowc
+#endif
+
 
 int
 glob(const char *pattern, int flags, int (*errfunc)(const char *, int), glob_t *pglob)
