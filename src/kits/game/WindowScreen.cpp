@@ -1,7 +1,7 @@
 /*
  * Copyright 2002-2008, Haiku. All Rights Reserved.
  * Copyright 2002-2005,
- *		Marcus Overhagen, 
+ *		Marcus Overhagen,
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com),
  *		Carwyn Jones (turok2@currantbun.com)
  *		All rights reserved.
@@ -71,7 +71,7 @@ blit(int32 sx, int32 sy, int32 dx, int32 dy, int32 width, int32 height)
 	param.dest_top = dy;
 	param.width = width;
 	param.height = height;
-	
+
 	sAcquireEngineHook(B_2D_ACCELERATION, 0xff, NULL, &sEngineToken);
 	sBlitRectHook(sEngineToken, &param, 1);
 	sReleaseEngineHook(sEngineToken, NULL);
@@ -79,7 +79,7 @@ blit(int32 sx, int32 sy, int32 dx, int32 dy, int32 width, int32 height)
 }
 
 // TODO: This function seems not to be exported through CardHookAt().
-// At least, nothing I've tried uses it. 
+// At least, nothing I've tried uses it.
 /*
 static int32
 transparent_blit(int32 sx, int32 sy, int32 dx, int32 dy,
@@ -92,7 +92,7 @@ transparent_blit(int32 sx, int32 sy, int32 dx, int32 dy,
 	param.dest_top = dy;
 	param.width = width;
 	param.height = height;
-	
+
 	sAcquireEngineHook(B_2D_ACCELERATION, 0xff, 0, &sEngineToken);
 	sTransparentBlitHook(sEngineToken, transparent_color, &param, 1);
 	sReleaseEngineHook(sEngineToken, 0);
@@ -112,7 +112,7 @@ scaled_filtered_blit(int32 sx, int32 sy, int32 sw, int32 sh, int32 dx, int32 dy,
 	param.dest_top = dy;
 	param.dest_width = dw;
 	param.dest_height = dh;
-	
+
 	sAcquireEngineHook(B_2D_ACCELERATION, 0xff, NULL, &sEngineToken);
 	sScaledFilteredBlitHook(sEngineToken, &param, 1);
 	sReleaseEngineHook(sEngineToken, NULL);
@@ -128,7 +128,7 @@ draw_rect_8(int32 sx, int32 sy, int32 sw, int32 sh, uint8 color_index)
 	param.top = sy;
 	param.right = sw;
 	param.bottom = sh;
-	
+
 	sAcquireEngineHook(B_2D_ACCELERATION, 0xff, NULL, &sEngineToken);
 	sFillRectHook(sEngineToken, color_index, &param, 1);
 	sReleaseEngineHook(sEngineToken, NULL);
@@ -144,7 +144,7 @@ draw_rect_16(int32 sx, int32 sy, int32 sw, int32 sh, uint16 color)
 	param.top = sy;
 	param.right = sw;
 	param.bottom = sh;
-	
+
 	sAcquireEngineHook(B_2D_ACCELERATION, 0xff, NULL, &sEngineToken);
 	sFillRectHook(sEngineToken, color, &param, 1);
 	sReleaseEngineHook(sEngineToken, NULL);
@@ -160,7 +160,7 @@ draw_rect_32(int32 sx, int32 sy, int32 sw, int32 sh, uint32 color)
 	param.top = sy;
 	param.right = sw;
 	param.bottom = sh;
-	
+
 	sAcquireEngineHook(B_2D_ACCELERATION, 0xff, NULL, &sEngineToken);
 	sFillRectHook(sEngineToken, color, &param, 1);
 	sReleaseEngineHook(sEngineToken, NULL);
@@ -176,7 +176,7 @@ set_mouse_position(int32 x, int32 y)
 {
 	BMessage command(IS_SET_MOUSE_POSITION);
 	BMessage reply;
-	
+
 	command.AddPoint("where", BPoint(x, y));
 	_control_input_server_(&command, &reply);
 }
@@ -196,7 +196,7 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 	if (debug_enable)
 		attributes |= B_ENABLE_DEBUGGER;
 
-	status_t status = _InitData(space, attributes);	
+	status_t status = _InitData(space, attributes);
 	if (error)
 		*error = status;
 }
@@ -204,12 +204,12 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
 		uint32 attributes, status_t *error)
-	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW, 
+	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
 		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
 {
 	CALLED();
-	status_t status = _InitData(space, attributes);	
+	status_t status = _InitData(space, attributes);
 	if (error)
 		*error = status;
 }
@@ -269,7 +269,7 @@ BWindowScreen::WorkspaceActivated(int32 ws, bool state)
 	fWorkState = state;
 	if (state) {
 		if (fLockState == 0 && fWindowState) {
-			_Activate();			
+			_Activate();
 			if (!IsHidden()) {
 				Activate(true);
 				WindowActivated(true);
@@ -292,7 +292,7 @@ BWindowScreen::Hide()
 {
 	CALLED();
 
-	Disconnect();	
+	Disconnect();
 	BWindow::Hide();
 }
 
@@ -320,7 +320,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 		return;
 
 	if (Lock()) {
-		if (!fActivateState) { 
+		if (!fActivateState) {
 			// If we aren't active, we just change our local palette
 			for (int32 x = firstIndex; x <= lastIndex; x++) {
 				fPalette[x] = list[x];
@@ -405,7 +405,7 @@ BWindowScreen::MoveDisplayArea(int32 x, int32 y)
 {
 	CALLED();
 	move_display_area moveDisplayArea = (move_display_area)fGetAccelerantHook(B_MOVE_DISPLAY, NULL);
-	if (moveDisplayArea && moveDisplayArea((int16)x, (int16)y) == B_OK) {	
+	if (moveDisplayArea && moveDisplayArea((int16)x, (int16)y) == B_OK) {
 		fFrameBufferInfo.display_x = x;
 		fFrameBufferInfo.display_y = y;
 		fDisplayMode->h_display_start = x;
@@ -437,7 +437,7 @@ BWindowScreen::ColorList()
 frame_buffer_info *
 BWindowScreen::FrameBufferInfo()
 {
-	CALLED();	
+	CALLED();
 	return &fFrameBufferInfo;
 }
 
@@ -501,7 +501,7 @@ BWindowScreen::RegisterThread(thread_id thread)
 
 	void *newDebugList = realloc(fDebugThreads, (fDebugThreadCount + 1) * sizeof(thread_id));
 	if (newDebugList != NULL) {
-		fDebugThreads = (thread_id *)newDebugList;	
+		fDebugThreads = (thread_id *)newDebugList;
 		fDebugThreads[fDebugThreadCount] = thread;
 		fDebugThreadCount++;
 	}
@@ -520,14 +520,14 @@ void
 BWindowScreen::Suspend(char* label)
 {
 	CALLED();
-	if (fDebugState) {		
+	if (fDebugState) {
 		fprintf(stderr, "## Debugger(\"%s\").", label);
 		fprintf(stderr, " Press Alt-F%ld or Cmd-F%ld to resume.\n", fWorkspaceIndex + 1,
 			fWorkspaceIndex + 1);
-		
+
 		if (IsLocked())
 			Unlock();
-		
+
 		activate_workspace(fDebugWorkspace);
 
 		// Suspend ourself
@@ -564,7 +564,7 @@ status_t
 BWindowScreen::_InitData(uint32 space, uint32 attributes)
 {
 	CALLED();
-	
+
 	fDebugState = attributes & B_ENABLE_DEBUGGER;
 	fDebugThreadCount = 0;
 	fDebugThreads = NULL;
@@ -595,7 +595,7 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 		status = screen.GetMode(fOriginalDisplayMode);
 		if (status < B_OK)
 			throw status;
-		
+
 		status = screen.GetModeList(&fModeList, &fModeCount);
 		if (status < B_OK)
 			throw status;
@@ -619,15 +619,15 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 		memcpy(fPalette, screen.ColorMap()->color_list, sizeof(fPalette));
 		fActivateState = 0;
 		fWorkState = 1;
-		
+
 		status = B_OK;
 
 	} catch (std::bad_alloc) {
-		status = B_NO_MEMORY;	
+		status = B_NO_MEMORY;
 	} catch (status_t error) {
 		status = error;
 	} catch (...) {
-		status = B_ERROR;	
+		status = B_ERROR;
 	}
 
 	if (status < B_OK)
@@ -644,17 +644,17 @@ BWindowScreen::_DisposeData()
 	Disconnect();
 	if (fAddonImage >= 0) {
 		unload_add_on(fAddonImage);
-		fAddonImage = -1;	
+		fAddonImage = -1;
 	}
-	
+
 	delete_sem(fActivateSem);
 	fActivateSem = -1;
 	delete_sem(fDebugSem);
-	fDebugSem = -1;	
+	fDebugSem = -1;
 
 	if (fDebugState)
 		activate_workspace(fDebugWorkspace);
-	
+
 	delete fDisplayMode;
 	fDisplayMode = NULL;
 	delete fOriginalDisplayMode;
@@ -662,7 +662,7 @@ BWindowScreen::_DisposeData()
 	free(fModeList);
 	fModeList = NULL;
 	fModeCount = 0;
-	
+
 	fLockState = 0;
 }
 
@@ -678,7 +678,7 @@ BWindowScreen::_Activate()
 	status = _SetupAccelerantHooks(true);
 	if (status < B_OK)
 		return status;
-		
+
 	if (!fActivateState) {
 		do {
 			status = acquire_sem(fActivateSem);
@@ -691,13 +691,13 @@ BWindowScreen::_Activate()
 	SetColorList(fPalette);
 	if (fDebugState && !fDebugFirst) {
 		SuspensionHook(true);
-		_Resume();					
+		_Resume();
 	} else {
 		fDebugFirst = true;
 		ScreenConnected(true);
 	}
 
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -713,8 +713,8 @@ BWindowScreen::_Deactivate()
 		ScreenConnected(false);
 
 	status_t status = _SetupAccelerantHooks(false);
-	if (status == B_OK) {				
-		be_app->ShowCursor();				
+	if (status == B_OK) {
+		be_app->ShowCursor();
 		if (fActivateState) {
 			// TODO: reset palette
 		}
@@ -777,7 +777,7 @@ BWindowScreen::_SetupAccelerantHooks(bool enable)
 			fWaitEngineIdle();
 		}
 	}
-	
+
 	return status;
 }
 
@@ -837,12 +837,12 @@ BWindowScreen::_GetCardInfo()
 	if (link.FlushWithReply(result) < B_OK || result < B_OK)
 		return result;
 
-	frame_buffer_config config;	
+	frame_buffer_config config;
 	link.Read<frame_buffer_config>(&config);
-	
+
 	fCardInfo.frame_buffer = config.frame_buffer;
 	fCardInfo.bytes_per_row = config.bytes_per_row;
-	
+
 	return B_OK;
 }
 
@@ -867,7 +867,7 @@ BWindowScreen::_Suspend()
 	}
 
 	graphics_card_info *info = CardInfo();
-	size_t fbSize = info->bytes_per_row * info->height; 
+	size_t fbSize = info->bytes_per_row * info->height;
 
 	// Save the content of the frame buffer into the local buffer
 	fDebugFrameBuffer = (char *)malloc(fbSize);
@@ -921,71 +921,64 @@ status_t
 BWindowScreen::_InitClone()
 {
 	CALLED();
-	
+
 	if (fAddonImage >= 0)
 		return B_OK;
 
+	BScreen screen(this);
+
 	AppServerLink link;
 	link.StartMessage(AS_GET_ACCELERANT_PATH);
-	link.Attach<int32>(fWorkspaceIndex);
-	
+	link.Attach<screen_id>(screen.ID());
+
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) < B_OK || status < B_OK)
 		return status;
 
 	BString accelerantPath;
 	link.ReadString(accelerantPath);
-	fAddonImage = load_add_on(accelerantPath.String()); 
+
+	link.StartMessage(AS_GET_DRIVER_PATH);
+	link.Attach<screen_id>(screen.ID());
+
+	status = B_ERROR;
+	if (link.FlushWithReply(status) < B_OK || status < B_OK)
+		return status;
+
+	BString driverPath;
+	link.ReadString(driverPath);
+
+	fAddonImage = load_add_on(accelerantPath.String());
 	if (fAddonImage < B_OK) {
 		fprintf(stderr, "InitClone: cannot load accelerant image\n");
 		return fAddonImage;
 	}
 
 	status = get_image_symbol(fAddonImage, B_ACCELERANT_ENTRY_POINT,
-		B_SYMBOL_TYPE_TEXT, (void **)&fGetAccelerantHook);
+		B_SYMBOL_TYPE_TEXT, (void**)&fGetAccelerantHook);
 	if (status < B_OK) {
 		fprintf(stderr, "InitClone: cannot get accelerant entry point\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
-		return status;
+		return B_NOT_SUPPORTED;
 	}
-	
-	accelerant_clone_info_size cloneInfoSizeHook;
-	get_accelerant_clone_info cloneInfoHook;
-	clone_accelerant cloneHook;
-	cloneInfoSizeHook = (accelerant_clone_info_size)fGetAccelerantHook(B_ACCELERANT_CLONE_INFO_SIZE, NULL);
-	cloneInfoHook = (get_accelerant_clone_info)fGetAccelerantHook(B_GET_ACCELERANT_CLONE_INFO, NULL);
-	cloneHook = (clone_accelerant)fGetAccelerantHook(B_CLONE_ACCELERANT, NULL);
 
-	status = B_ERROR;
-	if (!cloneInfoSizeHook || !cloneInfoHook || !cloneHook) {
+	clone_accelerant cloneHook
+		= (clone_accelerant)fGetAccelerantHook(B_CLONE_ACCELERANT, NULL);
+	if (cloneHook == NULL) {
 		fprintf(stderr, "InitClone: cannot get clone hook\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
-		return status;
+		return B_NOT_SUPPORTED;
 	}
 
-	ssize_t cloneInfoSize = cloneInfoSizeHook();
-	void *cloneInfo = malloc(cloneInfoSize);
-	if (!cloneInfo) {
-		unload_add_on(fAddonImage);
-		fAddonImage = -1;
-		return B_NO_MEMORY;
-	}
-
-	cloneInfoHook(cloneInfo);
-		// no way to see if this call fails
-
-	status = cloneHook(cloneInfo);
-	
-	free(cloneInfo);
-
+	status = cloneHook((void*)driverPath.String());
 	if (status < B_OK) {
 		fprintf(stderr, "InitClone: cannot clone accelerant\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
 	}
-	
+
 	return status;
 }
 

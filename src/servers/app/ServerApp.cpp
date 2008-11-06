@@ -2524,8 +2524,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_GET_ACCELERANT_PATH:
 		{
-			int32 index;
-			fLink.Read<int32>(&index);
+			screen_id id;
+			fLink.Read<screen_id>(&id);
 
 			BString path;
 			status_t status = fDesktop->HWInterface()->GetAccelerantPath(path);
@@ -2539,8 +2539,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_GET_DRIVER_PATH:
 		{
-			int32 index;
-			fLink.Read<int32>(&index);
+			screen_id id;
+			fLink.Read<screen_id>(&id);
 
 			BString path;
 			status_t status = fDesktop->HWInterface()->GetDriverPath(path);
