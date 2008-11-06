@@ -241,7 +241,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 			: $(baseURL)/m4-1.4.12-gcc2-2008-11-04.zip
 			:
 		;
-		AddSymlinkToHaikuImage bin : /boot/common/bin/m4 : m4 ;
+		AddSymlinkToHaikuImage beos bin : /boot/common/bin/m4 : m4 ;
 
 		InstallOptionalHaikuImagePackage autoconf-2.61-gcc2-2008-03-24
 			: $(baseURL)/autoconf-2.61-gcc2-2008-03-24.zip
