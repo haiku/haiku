@@ -447,8 +447,10 @@ NetworkStatusView::_Update(bool force)
 
 	config.ifc_len = count * sizeof(struct ifreq);
 	config.ifc_buf = buffer;
-	if (ioctl(fSocket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(fSocket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
+		free(buffer);
 		return;
+	}
 
 	ifreq *interface = (ifreq *)buffer;
 
