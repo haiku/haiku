@@ -63,25 +63,41 @@
 using std::nothrow;
 
 //#define TRACE_SERVER_WINDOW
-//#define TRACE_SERVER_WINDOW_MESSAGES
-//#define TRACE_SERVER_GRADIENTS
-//#define PROFILE_MESSAGE_LOOP
-
-
 #ifdef TRACE_SERVER_WINDOW
 #	include <stdio.h>
-#	define STRACE(x) printf x
+#	define STRACE(x) debug_printf x
 #else
 #	define STRACE(x) ;
 #endif
 
+//#define TRACE_SERVER_WINDOW_MESSAGES
 #ifdef TRACE_SERVER_WINDOW_MESSAGES
 #	include <stdio.h>
-#	define DTRACE(x) printf x
+static const char* kDrawingModeMap[] = {
+	"B_OP_COPY",
+	"B_OP_OVER",
+	"B_OP_ERASE",
+	"B_OP_INVERT",
+	"B_OP_ADD",
+	"B_OP_SUBTRACT",
+	"B_OP_BLEND",
+	"B_OP_MIN",
+	"B_OP_MAX",
+	"B_OP_SELECT",
+	"B_OP_ALPHA",
+
+	"fix kDrawingModeMap",
+	"fix kDrawingModeMap",
+	"fix kDrawingModeMap",
+	"fix kDrawingModeMap",
+	"fix kDrawingModeMap",
+};
+#	define DTRACE(x) debug_printf x
 #else
 #	define DTRACE(x) ;
 #endif
 
+//#define TRACE_SERVER_GRADIENTS
 #ifdef TRACE_SERVER_GRADIENTS
 #	include <OS.h>
 #	define GTRACE(x) debug_printf x
@@ -89,6 +105,7 @@ using std::nothrow;
 #	define GTRACE(x) ;
 #endif
 
+//#define PROFILE_MESSAGE_LOOP
 #ifdef PROFILE_MESSAGE_LOOP
 struct profile { int32 code; int32 count; bigtime_t time; };
 static profile sMessageProfile[AS_LAST_CODE];
@@ -629,23 +646,27 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	switch (code) {
 		case AS_SHOW_WINDOW:
-			STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
 			_Show();
 			break;
 
 		case AS_HIDE_WINDOW:
-			STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));
 			_Hide();
 			break;
 
 		case AS_MINIMIZE_WINDOW:
 		{
-			DTRACE(("ServerWindow %s: Message AS_MINIMIZE_WINDOW\n", Title()));
 			int32 showLevel;
 			bool minimize;
 
 			link.Read<bool>(&minimize);
 			if (link.Read<int32>(&showLevel) == B_OK) {
+
+				DTRACE(("ServerWindow %s: Message AS_MINIMIZE_WINDOW, "
+					"showLevel: %ld, minimize: %d\n", Title(), showLevel,
+					minimize));
+
 				if (showLevel <= 0) {
 					// window is currently hidden - ignore the minimize request
 					break;
@@ -667,10 +688,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_ACTIVATE_WINDOW:
 		{
-			DTRACE(("ServerWindow %s: Message AS_ACTIVATE_WINDOW: View: %s\n", Title(), fCurrentView->Name()));
 			bool activate = true;
+			if (link.Read<bool>(&activate) != B_OK)
+				break;
 
-			link.Read<bool>(&activate);
+			DTRACE(("ServerWindow %s: Message AS_ACTIVATE_WINDOW: activate: "
+				"%d\n", Title(), activate));
 
 			fDesktop->UnlockSingleWindow();
 
@@ -684,24 +707,28 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SEND_BEHIND:
 		{
-			STRACE(("ServerWindow %s: Message AS_SEND_BEHIND\n", Title()));
 			int32 token;
 			team_id teamID;
-			status_t status;
+			status_t status = B_ERROR;
 
 			link.Read<int32>(&token);
-			link.Read<team_id>(&teamID);
+			if (link.Read<team_id>(&teamID) == B_OK) {
+				::Window *behindOf = fDesktop->FindWindowByClientToken(token,
+					teamID);
 
-			::Window *behindOf = fDesktop->FindWindowByClientToken(token,
-				teamID);
-			if (behindOf != NULL) {
+				DTRACE(("ServerWindow %s: Message AS_SEND_BEHIND %s\n",
+					Title(), behindOf ? behindOf->Title() : "NULL"));
+
+				if (behindOf != NULL) {
 //fDesktop->UnlockSingleWindow();
-// TODO: there is a big race condition when we unlock here (window could be gone by now)!
-				fDesktop->SendWindowBehind(fWindow, behindOf);
+// TODO: there is a big race condition when we unlock here
+// (window could be gone by now)!
+					fDesktop->SendWindowBehind(fWindow, behindOf);
 //fDesktop->LockSingleWindow();
-				status = B_OK;
-			} else
-				status = B_NAME_NOT_FOUND;
+					status = B_OK;
+				} else
+					status = B_NAME_NOT_FOUND;
+			}
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -709,38 +736,37 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 
 		case B_QUIT_REQUESTED:
-			STRACE(("ServerWindow %s received quit request\n", Title()));
+			DTRACE(("ServerWindow %s received quit request\n", Title()));
 			NotifyQuitRequested();
 			break;
 
 		case AS_ENABLE_UPDATES:
-		{
-			STRACE(("ServerWindow %s: Message AS_ENABLE_UPDATES unimplemented\n",
-				Title()));
+			DTRACE(("ServerWindow %s: Message AS_ENABLE_UPDATES\n", Title()));
 			fWindow->EnableUpdateRequests();
 			break;
-		}
+
 		case AS_DISABLE_UPDATES:
-		{
-			STRACE(("ServerWindow %s: Message AS_DISABLE_UPDATES unimplemented\n",
-				Title()));
+			DTRACE(("ServerWindow %s: Message AS_DISABLE_UPDATES\n", Title()));
 			fWindow->DisableUpdateRequests();
 			break;
-		}
+
 		case AS_NEEDS_UPDATE:
-		{
-			STRACE(("ServerWindow %s: Message AS_NEEDS_UPDATE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_NEEDS_UPDATE: %d\n",
+				Title(), fWindow->NeedsUpdate()));
 			if (fWindow->NeedsUpdate())
 				fLink.StartMessage(B_OK);
 			else
 				fLink.StartMessage(B_ERROR);
 			fLink.Flush();
 			break;
-		}
+
 		case AS_SET_WINDOW_TITLE:
 		{
 			char* newTitle;
 			if (link.ReadString(&newTitle) == B_OK) {
+				DTRACE(("ServerWindow %s: Message AS_SET_WINDOW_TITLE: %s\n",
+					Title(), newTitle));
+
 				SetTitle(newTitle);
 				free(newTitle);
 			}
@@ -749,7 +775,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_ADD_TO_SUBSET:
 		{
-			STRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n", Title()));
 			status_t status = B_ERROR;
 
 			int32 token;
@@ -774,7 +800,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_REMOVE_FROM_SUBSET:
 		{
-			STRACE(("ServerWindow %s: Message AS_REM_FROM_SUBSET\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_REM_FROM_SUBSET\n", Title()));
 			status_t status = B_ERROR;
 
 			int32 token;
@@ -798,7 +824,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_SET_LOOK:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
 
 			status_t status = B_ERROR;
 			int32 look;
@@ -820,7 +846,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_FEEL:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_FEEL\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_SET_FEEL\n", Title()));
 
 			status_t status = B_ERROR;
 			int32 feel;
@@ -842,7 +868,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_FLAGS:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_FLAGS\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_SET_FLAGS\n", Title()));
 
 			status_t status = B_ERROR;
 			uint32 flags;
@@ -866,24 +892,31 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_SET_ALIGNMENT:
 		{
 			// TODO: Implement AS_SET_ALIGNMENT
-			STRACE(("ServerWindow %s: Message Set_Alignment unimplemented\n", Title()));
+			DTRACE(("ServerWindow %s: Message Set_Alignment unimplemented\n",
+				Title()));
 			break;
 		}
 		case AS_GET_ALIGNMENT:
 		{
 			// TODO: Implement AS_GET_ALIGNMENT
-			STRACE(("ServerWindow %s: Message Get_Alignment unimplemented\n", Title()));
+			DTRACE(("ServerWindow %s: Message Get_Alignment unimplemented\n",
+				Title()));
 			break;
 		}
 #endif
 		case AS_IS_FRONT_WINDOW:
-			fLink.StartMessage(fDesktop->FrontWindow() == fWindow ? B_OK : B_ERROR);
+		{
+			bool isFront = fDesktop->FrontWindow() == fWindow;
+			DTRACE(("ServerWindow %s: Message AS_IS_FRONT_WINDOW: %d\n",
+				Title(), isFront));
+			fLink.StartMessage(isFront ? B_OK : B_ERROR);
 			fLink.Flush();
 			break;
+		}
 
 		case AS_GET_WORKSPACES:
 		{
-			STRACE(("ServerWindow %s: Message AS_GET_WORKSPACES\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_GET_WORKSPACES\n", Title()));
 			fLink.StartMessage(B_OK);
 			fLink.Attach<uint32>(fWindow->Workspaces());
 			fLink.Flush();
@@ -895,7 +928,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (link.Read<uint32>(&newWorkspaces) != B_OK)
 				break;
 
-			STRACE(("ServerWindow %s: Message AS_SET_WORKSPACES %lx\n",
+			DTRACE(("ServerWindow %s: Message AS_SET_WORKSPACES %lx\n",
 				Title(), newWorkspaces));
 
 //fDesktop->UnlockSingleWindow();
@@ -911,7 +944,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (link.Read<float>(&yResizeBy) != B_OK)
 				break;
 
-			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n",
+			DTRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n",
 				Title(), xResizeBy, yResizeBy));
 
 			// comment this code for the time being, as some apps rely
@@ -937,7 +970,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (link.Read<float>(&yMoveBy) != B_OK)
 				break;
 
-			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n",
+			DTRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n",
 				Title(), xMoveBy, yMoveBy));
 
 			if (fWindow->IsDragging()) {
@@ -974,6 +1007,10 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&minHeight);
 			link.Read<int32>(&maxHeight);
 */
+			DTRACE(("ServerWindow %s: Message AS_SET_SIZE_LIMITS: "
+				"x: %ld-%ld, y: %ld-%ld\n",
+				Title(), minWidth, maxWidth, minHeight, maxHeight));
+
 //fDesktop->UnlockSingleWindow();
 
 			if (fDesktop->LockAllWindows()) {
@@ -1001,7 +1038,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_SET_DECORATOR_SETTINGS:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_DECORATOR_SETTINGS\n"));
+			DTRACE(("ServerWindow %s: Message AS_SET_DECORATOR_SETTINGS\n",
+				Title()));
 
 			int32 size;
 			if (fWindow && link.Read<int32>(&size) == B_OK) {
@@ -1020,7 +1058,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_GET_DECORATOR_SETTINGS:
 		{
-			STRACE(("ServerWindow %s: Message AS_GET_DECORATOR_SETTINGS\n"));
+			DTRACE(("ServerWindow %s: Message AS_GET_DECORATOR_SETTINGS\n",
+				Title()));
 
 			bool success = false;
 
@@ -1146,11 +1185,15 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (App()->ViewTokens().GetToken(token, B_HANDLER_TOKEN,
 					(void**)&current) != B_OK
 				|| current->Window()->ServerWindow() != this) {
-				// ToDo: if this happens, we probably want to kill the app and clean up
-				fprintf(stderr, "ServerWindow %s: Message AS_SET_CURRENT_VIEW: view not found, token %ld\n", fTitle, token);
+				// TODO: if this happens, we probably want to kill the app and
+				// clean up
+				debug_printf("ServerWindow %s: Message "
+					"\n\n\nAS_SET_CURRENT_VIEW: view not found, token %ld\n",
+					fTitle, token);
 				current = NULL;
 			} else {
-				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_VIEW: %s, token %ld\n", fTitle, current->Name(), token));
+				DTRACE(("\n\n\nServerWindow %s: Message AS_SET_CURRENT_VIEW: %s, "
+					"token %ld\n", fTitle, current->Name(), token));
 				_SetCurrentView(current);
 			}
 			break;
@@ -1158,12 +1201,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_VIEW_CREATE_ROOT:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_CREATE_ROOT\n", fTitle));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_CREATE_ROOT\n", fTitle));
 
 			// Start receiving top_view data -- pass NULL as the parent view.
 			// This should be the *only* place where this happens.
 			if (fCurrentView != NULL) {
-				fprintf(stderr, "ServerWindow %s: Message AS_VIEW_CREATE_ROOT: fCurrentView already set!!\n", fTitle);
+				debug_printf("ServerWindow %s: Message "
+					"AS_VIEW_CREATE_ROOT: fCurrentView already set!!\n",
+					fTitle);
 				break;
 			}
 
@@ -1174,25 +1219,28 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_VIEW_CREATE:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_CREATE: View name: %s\n", fTitle, fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_CREATE: View name: "
+				"%s\n", fTitle, fCurrentView->Name()));
 
 			View* parent = NULL;
 			View* newView = _CreateView(link, &parent);
 			if (parent != NULL && newView != NULL)
 				parent->AddChild(newView);
-			else
-				fprintf(stderr, "ServerWindow %s: Message AS_VIEW_CREATE: parent or newView NULL!!\n", fTitle);
+			else {
+				debug_printf("ServerWindow %s: Message AS_VIEW_CREATE: "
+					"parent or newView NULL!!\n", fTitle);
+			}
 			break;
 		}
 
 		default:
-			// TODO: when creating a View, check for yet non-existing View::InitCheck()
-			// and take appropriate actions, then checking for fCurrentView->CurrentState()
-			// is unnecessary
+			// TODO: when creating a View, check for yet non-existing
+			// View::InitCheck() and take appropriate actions, then checking
+			// for fCurrentView->CurrentState() is unnecessary
 			if (fCurrentView == NULL || fCurrentView->CurrentState() == NULL) {
 				BString codeName;
 				string_for_message_code(code, codeName);
-				printf("ServerWindow %s received unexpected code - "
+				debug_printf("ServerWindow %s received unexpected code - "
 					"message '%s' before top_view attached.\n",
 					Title(), codeName.String());
 				if (link.NeedsReply()) {
@@ -1221,12 +1269,14 @@ ServerWindow::_DispatchViewMessage(int32 code,
 	switch (code) {
 		case AS_VIEW_SCROLL:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SCROLL: View name: %s\n", fTitle, fCurrentView->Name()));
 			float dh;
 			float dv;
-
 			link.Read<float>(&dh);
-			link.Read<float>(&dv);
+			if (link.Read<float>(&dv) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SCROLL: View name: "
+				"%s, %.1f x %.1f\n", fTitle, fCurrentView->Name(), dh, dv));
 			fWindow->ScrollViewBy(fCurrentView, dh, dv);
 			break;
 		}
@@ -1236,7 +1286,14 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			BRect dst;
 
 			link.Read<BRect>(&src);
-			link.Read<BRect>(&dst);
+			if (link.Read<BRect>(&dst) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_COPY_BITS: View name: "
+				"%s, BRect(%.1f, %.1f, %.1f, %.1f) -> "
+				"BRect(%.1f, %.1f, %.1f, %.1f)\n", fTitle,
+				fCurrentView->Name(), src.left, src.top, src.right, src.bottom,
+				dst.left, dst.top, dst.right, dst.bottom));
 
 			BRegion contentRegion;
 			// TODO: avoid copy operation maybe?
@@ -1258,8 +1315,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				&& view->Window()->ServerWindow() == this) {
 				View* parent = view->Parent();
 
-				STRACE(("ServerWindow %s: AS_VIEW_DELETE view: %p, parent: %p\n",
-					fTitle, view, parent));
+				DTRACE(("ServerWindow %s: AS_VIEW_DELETE view: %p, "
+					"parent: %p\n", fTitle, view, parent));
 
 				if (parent != NULL) {
 					parent->RemoveChild(view);
@@ -1283,7 +1340,8 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_SET_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_STATE: View name: %s\n", fTitle, fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_STATE: "
+				"View name: %s\n", fTitle, fCurrentView->Name()));
 
 			fCurrentView->CurrentState()->ReadFromLink(link);
 			// TODO: When is this used?!?
@@ -1294,7 +1352,9 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_SET_FONT_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_FONT_STATE: View name: %s\n", fTitle, fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_FONT_STATE: "
+				"View name: %s\n", fTitle, fCurrentView->Name()));
+
 			fCurrentView->CurrentState()->ReadFontFromLink(link);
 			fWindow->GetDrawingEngine()->SetFont(
 				fCurrentView->CurrentState());
@@ -1302,7 +1362,8 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_GET_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_STATE: View name: %s\n", fTitle, fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_STATE: "
+				"View name: %s\n", fTitle, fCurrentView->Name()));
 
 			fLink.StartMessage(B_OK);
 
@@ -1313,7 +1374,8 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_SET_EVENT_MASK:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_SET_EVENT_MASK: View name: %s\n", fTitle, fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_EVENT_MASK: "
+				"View name: %s\n", fTitle, fCurrentView->Name()));
 			uint32 eventMask, options;
 
 			link.Read<uint32>(&eventMask);
@@ -1335,7 +1397,8 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_SET_MOUSE_EVENT_MASK:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_SET_MOUSE_EVENT_MASK: View name: %s\n", fTitle, fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_MOUSE_EVENT_MASK: "
+				"View name: %s\n", fTitle, fCurrentView->Name()));
 			uint32 eventMask, options;
 
 			link.Read<uint32>(&eventMask);
@@ -1359,12 +1422,13 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_MOVE_TO:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_MOVE_TO: View name: %s\n",
-				fTitle, fCurrentView->Name()));
-
 			float x, y;
 			link.Read<float>(&x);
-			link.Read<float>(&y);
+			if (link.Read<float>(&y) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_MOVE_TO: View name: "
+				"%s, x: %.1f, y: %.1f\n", fTitle, fCurrentView->Name(), x, y));
 
 			float offsetX = x - fCurrentView->Frame().left;
 			float offsetY = y - fCurrentView->Frame().top;
@@ -1385,12 +1449,14 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_RESIZE_TO:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_RESIZE_TO: View name: %s\n",
-				fTitle, fCurrentView->Name()));
-
 			float newWidth, newHeight;
 			link.Read<float>(&newWidth);
-			link.Read<float>(&newHeight);
+			if (link.Read<float>(&newHeight) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_RESIZE_TO: View name: "
+				"%s, width: %.1f, height: %.1f\n", fTitle,
+				fCurrentView->Name(), newWidth, newHeight));
 
 			float deltaWidth = newWidth - fCurrentView->Frame().Width();
 			float deltaHeight = newHeight - fCurrentView->Frame().Height();
@@ -1407,10 +1473,15 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_GET_COORD:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_GET_COORD: View: %s\n", Title(), fCurrentView->Name()));
-			fLink.StartMessage(B_OK);
-			// our offset in the parent -> will be originX and originY in BView
+			// our offset in the parent -> will be originX and originY
+			// in BView
 			BPoint parentOffset = fCurrentView->Frame().LeftTop();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_COORD: "
+				"View: %s -> x: %.1f, y: %.1f\n", Title(),
+				fCurrentView->Name(), parentOffset.x, parentOffset.y));
+
+			fLink.StartMessage(B_OK);
 			fLink.Attach<BPoint>(parentOffset);
 			fLink.Attach<BRect>(fCurrentView->Bounds());
 			fLink.Flush();
@@ -1418,11 +1489,14 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_SET_ORIGIN:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_SET_ORIGIN: View: %s\n", Title(), fCurrentView->Name()));
-
 			float x, y;
 			link.Read<float>(&x);
-			link.Read<float>(&y);
+			if (link.Read<float>(&y) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_ORIGIN: "
+				"View: %s -> x: %.1f, y: %.1f\n", Title(),
+				fCurrentView->Name(), x, y));
 
 			fCurrentView->SetDrawingOrigin(BPoint(x, y));
 			_UpdateDrawState(fCurrentView);
@@ -1430,26 +1504,34 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_GET_ORIGIN:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_GET_ORIGIN: View: %s\n", Title(), fCurrentView->Name()));
+			BPoint drawingOrigin = fCurrentView->DrawingOrigin();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_ORIGIN: "
+				"View: %s -> x: %.1f, y: %.1f\n", Title(),
+				fCurrentView->Name(), drawingOrigin.x, drawingOrigin.y));
+
 			fLink.StartMessage(B_OK);
-			fLink.Attach<BPoint>(fCurrentView->DrawingOrigin());
+			fLink.Attach<BPoint>(drawingOrigin);
 			fLink.Flush();
 			break;
 		}
 		case AS_VIEW_RESIZE_MODE:
 		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_RESIZE_MODE: View: %s\n",
-				Title(), fCurrentView->Name()));
-
 			uint32 resizeMode;
-			if (link.Read<uint32>(&resizeMode) == B_OK)
-				fCurrentView->SetResizeMode(resizeMode);
+			if (link.Read<uint32>(&resizeMode) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_RESIZE_MODE: "
+				"View: %s -> %ld\n", Title(), fCurrentView->Name(),
+				resizeMode));
+
+			fCurrentView->SetResizeMode(resizeMode);
 			break;
 		}
 		case AS_VIEW_SET_CURSOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_CURSOR: View: %s\n", Title(),
-				fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_CURSOR: View: %s\n",
+				Title(), fCurrentView->Name()));
 
 			int32 token;
 			bool sync;
@@ -1460,7 +1542,8 @@ fDesktop->LockSingleWindow();
 			if (!fDesktop->GetCursorManager().Lock())
 				break;
 
-			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
+			ServerCursor* cursor
+				= fDesktop->GetCursorManager().FindCursor(token);
 			fCurrentView->SetCursor(cursor);
 
 			fDesktop->GetCursorManager().Unlock();
@@ -1485,30 +1568,34 @@ fDesktop->LockSingleWindow();
 			fCurrentView->SetFlags(flags);
 			_UpdateDrawState(fCurrentView);
 
-			STRACE(("ServerWindow %s: Message AS_VIEW_SET_FLAGS: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_FLAGS: "
+				"View: %s -> flags: %lu\n", Title(), fCurrentView->Name(),
+				flags));
 			break;
 		}
 		case AS_VIEW_HIDE:
-		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_HIDE: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_HIDE: View: %s\n",
+				Title(), fCurrentView->Name()));
 			fCurrentView->SetHidden(true);
 			break;
-		}
+
 		case AS_VIEW_SHOW:
-		{
-			STRACE(("ServerWindow %s: Message AS_VIEW_SHOW: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SHOW: View: %s\n",
+				Title(), fCurrentView->Name()));
 			fCurrentView->SetHidden(false);
 			break;
-		}
+
 		case AS_VIEW_SET_LINE_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_LINE_MODE: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_LINE_MODE: "
+				"View: %s\n", Title(), fCurrentView->Name()));
 			int8 lineCap, lineJoin;
 			float miterLimit;
 
 			link.Read<int8>(&lineCap);
 			link.Read<int8>(&lineJoin);
-			link.Read<float>(&miterLimit);
+			if (link.Read<float>(&miterLimit) != B_OK)
+				break;
 
 			fCurrentView->CurrentState()->SetLineCapMode((cap_mode)lineCap);
 			fCurrentView->CurrentState()->SetLineJoinMode((join_mode)lineJoin);
@@ -1522,7 +1609,8 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_GET_LINE_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_LINE_MODE: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_LINE_MODE: "
+				"View: %s\n", Title(), fCurrentView->Name()));
 			fLink.StartMessage(B_OK);
 			fLink.Attach<int8>((int8)(fCurrentView->CurrentState()->LineCapMode()));
 			fLink.Attach<int8>((int8)(fCurrentView->CurrentState()->LineJoinMode()));
@@ -1533,16 +1621,18 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_PUSH_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_PUSH_STATE: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_PUSH_STATE: View: "
+				"%s\n", Title(), fCurrentView->Name()));
 
 			fCurrentView->PushState();
 			// TODO: is this necessary?
-			_UpdateDrawState(fCurrentView);
+//			_UpdateDrawState(fCurrentView);
 			break;
 		}
 		case AS_VIEW_POP_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_POP_STATE: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_POP_STATE: View: %s\n",
+				Title(), fCurrentView->Name()));
 
 			fCurrentView->PopState();
 			_UpdateDrawState(fCurrentView);
@@ -1550,9 +1640,13 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_SET_SCALE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_SCALE: View: %s\n", Title(), fCurrentView->Name()));
 			float scale;
-			link.Read<float>(&scale);
+			if (link.Read<float>(&scale) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_SCALE: "
+				"View: %s -> scale: %.2f\n", Title(), fCurrentView->Name(),
+				scale));
 
 			fCurrentView->SetScale(scale);
 			_UpdateDrawState(fCurrentView);
@@ -1560,38 +1654,53 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_GET_SCALE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_SCALE: View: %s\n", Title(), fCurrentView->Name()));
+			float scale = fCurrentView->CurrentState()->Scale();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_SCALE: "
+				"View: %s -> scale: %.2f\n",
+				Title(), fCurrentView->Name(), scale));
 
 			fLink.StartMessage(B_OK);
-			fLink.Attach<float>(fCurrentView->CurrentState()->Scale());
+			fLink.Attach<float>(scale);
 			fLink.Flush();
 			break;
 		}
 		case AS_VIEW_SET_PEN_LOC:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_PEN_LOC: View: %s\n", Title(), fCurrentView->Name()));
 			float x, y;
-
 			link.Read<float>(&x);
-			link.Read<float>(&y);
+			if (link.Read<float>(&y) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_PEN_LOC: "
+				"View: %s -> BPoint(%.1f, %.1f)\n", Title(),
+				fCurrentView->Name(), x, y));
 
 			fCurrentView->CurrentState()->SetPenLocation(BPoint(x, y));
 			break;
 		}
 		case AS_VIEW_GET_PEN_LOC:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_PEN_LOC: View: %s\n", Title(), fCurrentView->Name()));
+			BPoint location = fCurrentView->CurrentState()->PenLocation();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_PEN_LOC: "
+				"View: %s -> BPoint(%.1f, %.1f)\n", Title(),
+				fCurrentView->Name(), location.x, location.y));
+
 			fLink.StartMessage(B_OK);
-			fLink.Attach<BPoint>(fCurrentView->CurrentState()->PenLocation());
+			fLink.Attach<BPoint>(location);
 			fLink.Flush();
 
 			break;
 		}
 		case AS_VIEW_SET_PEN_SIZE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_PEN_SIZE: View: %s\n", Title(), fCurrentView->Name()));
 			float penSize;
-			link.Read<float>(&penSize);
+			if (link.Read<float>(&penSize) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_PEN_SIZE: "
+				"View: %s -> %.1f\n", Title(), fCurrentView->Name(), penSize));
 
 			fCurrentView->CurrentState()->SetPenSize(penSize);
 			fWindow->GetDrawingEngine()->SetPenSize(
@@ -1600,100 +1709,182 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_GET_PEN_SIZE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_PEN_SIZE: View: %s\n", Title(), fCurrentView->Name()));
+			float penSize = fCurrentView->CurrentState()->UnscaledPenSize();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_PEN_SIZE: "
+				"View: %s -> %.1f\n", Title(), fCurrentView->Name(), penSize));
+
 			fLink.StartMessage(B_OK);
-			fLink.Attach<float>(
-				fCurrentView->CurrentState()->UnscaledPenSize());
+			fLink.Attach<float>(penSize);
 			fLink.Flush();
 
 			break;
 		}
 		case AS_VIEW_SET_VIEW_COLOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_VIEW_COLOR: View: %s\n", Title(), fCurrentView->Name()));
-			rgb_color c;
+			rgb_color color;
+			if (link.Read(&color, sizeof(rgb_color)) != B_OK)
+				break;
 
-			link.Read(&c, sizeof(rgb_color));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_VIEW_COLOR: "
+				"View: %s -> rgb_color(%d, %d, %d, %d)\n", Title(),
+				fCurrentView->Name(), color.red, color.green, color.blue,
+				color.alpha));
 
-			fCurrentView->SetViewColor(c);
+			fCurrentView->SetViewColor(color);
+			break;
+		}
+		case AS_VIEW_GET_VIEW_COLOR:
+		{
+			rgb_color color = fCurrentView->ViewColor();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_VIEW_COLOR: "
+				"View: %s -> rgb_color(%d, %d, %d, %d)\n",
+				Title(), fCurrentView->Name(), color.red, color.green,
+				color.blue, color.alpha));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<rgb_color>(color);
+			fLink.Flush();
+			break;
+		}
+		case AS_VIEW_SET_HIGH_COLOR:
+		{
+			rgb_color color;
+			if (link.Read(&color, sizeof(rgb_color)) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_HIGH_COLOR: "
+				"View: %s -> rgb_color(%d, %d, %d, %d)\n",
+				Title(), fCurrentView->Name(), color.red, color.green,
+				color.blue, color.alpha));
+
+			fCurrentView->CurrentState()->SetHighColor(color);
+			fWindow->GetDrawingEngine()->SetHighColor(color);
+			break;
+		}
+		case AS_VIEW_GET_HIGH_COLOR:
+		{
+			rgb_color color = fCurrentView->CurrentState()->HighColor();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_HIGH_COLOR: "
+				"View: %s -> rgb_color(%d, %d, %d, %d)\n",
+				Title(), fCurrentView->Name(), color.red, color.green,
+				color.blue, color.alpha));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<rgb_color>(color);
+			fLink.Flush();
+			break;
+		}
+		case AS_VIEW_SET_LOW_COLOR:
+		{
+			rgb_color color;
+			if (link.Read(&color, sizeof(rgb_color)) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_LOW_COLOR: "
+				"View: %s -> rgb_color(%d, %d, %d, %d)\n",
+				Title(), fCurrentView->Name(), color.red, color.green,
+				color.blue, color.alpha));
+
+			fCurrentView->CurrentState()->SetLowColor(color);
+			fWindow->GetDrawingEngine()->SetLowColor(color);
+			break;
+		}
+		case AS_VIEW_GET_LOW_COLOR:
+		{
+			rgb_color color = fCurrentView->CurrentState()->LowColor();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_LOW_COLOR: "
+				"View: %s -> rgb_color(%d, %d, %d, %d)\n",
+				Title(), fCurrentView->Name(), color.red, color.green,
+				color.blue, color.alpha));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<rgb_color>(color);
+			fLink.Flush();
+			break;
+		}
+		case AS_VIEW_SET_PATTERN:
+		{
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_PATTERN: "
+				"View: %s\n", fTitle, fCurrentView->Name()));
+
+			pattern pat;
+			if (link.Read(&pat, sizeof(pattern)) != B_OK)
+				break;
+
+			fCurrentView->CurrentState()->SetPattern(Pattern(pat));
+			fWindow->GetDrawingEngine()->SetPattern(pat);
 			break;
 		}
 
-		case AS_VIEW_GET_HIGH_COLOR:
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_HIGH_COLOR: View: %s\n",
-				Title(), fCurrentView->Name()));
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(fCurrentView->CurrentState()->HighColor());
-			fLink.Flush();
-			break;
-
-		case AS_VIEW_GET_LOW_COLOR:
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_LOW_COLOR: View: %s\n",
-				Title(), fCurrentView->Name()));
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(fCurrentView->CurrentState()->LowColor());
-			fLink.Flush();
-			break;
-
-		case AS_VIEW_GET_VIEW_COLOR:
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_VIEW_COLOR: View: %s\n",
-				Title(), fCurrentView->Name()));
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(fCurrentView->ViewColor());
-			fLink.Flush();
-			break;
-
 		case AS_VIEW_SET_BLENDING_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_BLEND_MODE: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_BLEND_MODE: "
+				"View: %s\n", Title(), fCurrentView->Name()));
 			int8 srcAlpha, alphaFunc;
 
 			link.Read<int8>(&srcAlpha);
-			link.Read<int8>(&alphaFunc);
+			if (link.Read<int8>(&alphaFunc) != B_OK)
+				break;
 
-			fCurrentView->CurrentState()->SetBlendingMode((source_alpha)srcAlpha,
-				(alpha_function)alphaFunc);
-			//_UpdateDrawState(fCurrentView);
-			fWindow->GetDrawingEngine()->SetBlendingMode((source_alpha)srcAlpha,
-				(alpha_function)alphaFunc);
+			fCurrentView->CurrentState()->SetBlendingMode(
+				(source_alpha)srcAlpha, (alpha_function)alphaFunc);
+			fWindow->GetDrawingEngine()->SetBlendingMode(
+				(source_alpha)srcAlpha, (alpha_function)alphaFunc);
 			break;
 		}
 		case AS_VIEW_GET_BLENDING_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_BLEND_MODE: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_BLEND_MODE: "
+				"View: %s\n", Title(), fCurrentView->Name()));
 			fLink.StartMessage(B_OK);
-			fLink.Attach<int8>((int8)(fCurrentView->CurrentState()->AlphaSrcMode()));
-			fLink.Attach<int8>((int8)(fCurrentView->CurrentState()->AlphaFncMode()));
+			fLink.Attach<int8>((int8)(
+				fCurrentView->CurrentState()->AlphaSrcMode()));
+			fLink.Attach<int8>((int8)(
+				fCurrentView->CurrentState()->AlphaFncMode()));
 			fLink.Flush();
 
 			break;
 		}
 		case AS_VIEW_SET_DRAWING_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_DRAW_MODE: View: %s\n", Title(), fCurrentView->Name()));
 			int8 drawingMode;
+			if (link.Read<int8>(&drawingMode) != B_OK)
+				break;
 
-			link.Read<int8>(&drawingMode);
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_DRAW_MODE: "
+				"View: %s -> %s\n", Title(), fCurrentView->Name(),
+				kDrawingModeMap[drawingMode]));
 
-			fCurrentView->CurrentState()->SetDrawingMode((drawing_mode)drawingMode);
-			//_UpdateDrawState(fCurrentView);
-			fWindow->GetDrawingEngine()->SetDrawingMode((drawing_mode)drawingMode);
+			fCurrentView->CurrentState()->SetDrawingMode(
+				(drawing_mode)drawingMode);
+			fWindow->GetDrawingEngine()->SetDrawingMode(
+				(drawing_mode)drawingMode);
 			break;
 		}
 		case AS_VIEW_GET_DRAWING_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_DRAW_MODE: View: %s\n", Title(), fCurrentView->Name()));
+			int8 drawingMode
+				= (int8)(fCurrentView->CurrentState()->GetDrawingMode());
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_DRAW_MODE: "
+				"View: %s -> %s\n", Title(), fCurrentView->Name(),
+				kDrawingModeMap[drawingMode]));
+
 			fLink.StartMessage(B_OK);
-			fLink.Attach<int8>((int8)(fCurrentView->CurrentState()->GetDrawingMode()));
+			fLink.Attach<int8>(drawingMode);
 			fLink.Flush();
 
 			break;
 		}
 		case AS_VIEW_SET_VIEW_BITMAP:
 		{
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_VIEW_BITMAP: "
+				"View: %s\n", Title(), fCurrentView->Name()));
+
 			int32 bitmapToken, resizingMode, options;
 			BRect srcRect, dstRect;
 
@@ -1745,7 +1936,9 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_PRINT_ALIASING:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_PRINT_ALIASING: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_PRINT_ALIASING: "
+				"View: %s\n", Title(), fCurrentView->Name()));
+
 			bool fontAliasing;
 			if (link.Read<bool>(&fontAliasing) == B_OK) {
 				fCurrentView->CurrentState()->SetForceFontAliasing(fontAliasing);
@@ -1755,7 +1948,9 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_CLIP_TO_PICTURE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_CLIP_TO_PICTURE: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_CLIP_TO_PICTURE: "
+				"View: %s\n", Title(), fCurrentView->Name()));
+
 			// TODO: you are not allowed to use View regions here!!!
 
 			int32 pictureToken;
@@ -1764,7 +1959,8 @@ fDesktop->LockSingleWindow();
 
 			link.Read<int32>(&pictureToken);
 			link.Read<BPoint>(&where);
-			link.Read<bool>(&inverse);
+			if (link.Read<bool>(&inverse) != B_OK)
+				break;
 
 			// search for a picture with the specified token.
 			ServerPicture *picture = fServerApp->FindPicture(pictureToken);
@@ -1784,7 +1980,8 @@ fDesktop->LockSingleWindow();
 
 		case AS_VIEW_GET_CLIP_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_CLIP_REGION: View: %s\n", Title(), fCurrentView->Name()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_CLIP_REGION: "
+				"View: %s\n", Title(), fCurrentView->Name()));
 
 			// if this View is hidden, it is clear that its visible region is void.
 			fLink.StartMessage(B_OK);
@@ -1803,8 +2000,6 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_SET_CLIP_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_CLIP_REGION: View: %s\n", Title(), fCurrentView->Name()));
-
 			int32 rectCount;
 			status_t status = link.Read<int32>(&rectCount);
 				// a negative count means no
@@ -1820,11 +2015,23 @@ fDesktop->LockSingleWindow();
 				BRegion region;
 				if (rectCount > 0 && link.ReadRegion(&region) < B_OK)
 					break;
+
+				DTRACE(("ServerWindow %s: Message AS_VIEW_SET_CLIP_REGION: "
+					"View: %s -> rect count: %ld, frame = "
+					"BRect(%.1f, %.1f, %.1f, %.1f)\n",
+					Title(), fCurrentView->Name(), rectCount,
+					region.Frame().left, region.Frame().top,
+					region.Frame().right, region.Frame().bottom));
+
 				fCurrentView->SetUserClipping(&region);
 			} else {
 				// we are supposed to unset the clipping region
 				// passing NULL sets this states region to that
 				// of the previous state
+
+				DTRACE(("ServerWindow %s: Message AS_VIEW_SET_CLIP_REGION: "
+					"View: %s -> unset\n", Title(), fCurrentView->Name()));
+
 				fCurrentView->SetUserClipping(NULL);
 			}
 			fCurrentDrawingRegionValid = false;
@@ -1834,12 +2041,15 @@ fDesktop->LockSingleWindow();
 
 		case AS_VIEW_INVALIDATE_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_INVALIDATE_RECT: View: %s\n", Title(), fCurrentView->Name()));
-
-			// NOTE: looks like this call is NOT affected by origin and scale on R5
-			// so this implementation is "correct"
+			// NOTE: looks like this call is NOT affected by origin and scale
+			// on R5 so this implementation is "correct"
 			BRect invalidRect;
 			if (link.Read<BRect>(&invalidRect) == B_OK) {
+				DTRACE(("ServerWindow %s: Message AS_VIEW_INVALIDATE_RECT: "
+					"View: %s -> BRect(%.1f, %.1f, %.1f, %.1f)\n", Title(),
+					fCurrentView->Name(), invalidRect.left, invalidRect.top,
+					invalidRect.right, invalidRect.bottom));
+
 				BRegion dirty(invalidRect);
 				fWindow->InvalidateView(fCurrentView, dirty);
 			}
@@ -1847,55 +2057,27 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_INVALIDATE_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_INVALIDATE_RECT: View: %s\n", Title(), fCurrentView->Name()));
-
-			// NOTE: looks like this call is NOT affected by origin and scale on R5
-			// so this implementation is "correct"
+			// NOTE: looks like this call is NOT affected by origin and scale
+			// on R5 so this implementation is "correct"
 			BRegion region;
 			if (link.ReadRegion(&region) < B_OK)
 				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_INVALIDATE_REGION: "
+					"View: %s -> rect count: %ld, frame: BRect(%.1f, %.1f, "
+					"%.1f, %.1f)\n", Title(),
+					fCurrentView->Name(), region.CountRects(),
+					region.Frame().left, region.Frame().top,
+					region.Frame().right, region.Frame().bottom));
 
 			fWindow->InvalidateView(fCurrentView, region);
 			break;
 		}
 
-		case AS_VIEW_SET_HIGH_COLOR:
-		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_HIGH_COLOR: View: %s\n", Title(), fCurrentView->Name()));
-
-			rgb_color c;
-			link.Read(&c, sizeof(rgb_color));
-
-			fCurrentView->CurrentState()->SetHighColor(c);
-			fWindow->GetDrawingEngine()->SetHighColor(c);
-			break;
-		}
-		case AS_VIEW_SET_LOW_COLOR:
-		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_LOW_COLOR: View: %s\n", Title(), fCurrentView->Name()));
-
-			rgb_color c;
-			link.Read(&c, sizeof(rgb_color));
-
-			fCurrentView->CurrentState()->SetLowColor(c);
-			fWindow->GetDrawingEngine()->SetLowColor(c);
-			break;
-		}
-		case AS_VIEW_SET_PATTERN:
-		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_PATTERN: View: %s\n", fTitle, fCurrentView->Name()));
-
-			pattern pat;
-			link.Read(&pat, sizeof(pattern));
-
-			fCurrentView->CurrentState()->SetPattern(Pattern(pat));
-			fWindow->GetDrawingEngine()->SetPattern(pat);
-			break;
-		}
 		case AS_VIEW_DRAG_IMAGE:
 		{
 			// TODO: flesh out AS_VIEW_DRAG_IMAGE
-			STRACE(("ServerWindow %s: Message AS_DRAG_IMAGE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_DRAG_IMAGE\n", Title()));
 
 			int32 bitmapToken;
 			drawing_mode dragMode;
@@ -1930,7 +2112,7 @@ fDesktop->LockSingleWindow();
 		case AS_VIEW_DRAG_RECT:
 		{
 			// TODO: flesh out AS_VIEW_DRAG_RECT
-			STRACE(("ServerWindow %s: Message AS_DRAG_RECT\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_DRAG_RECT\n", Title()));
 
 			BRect dragRect;
 			BPoint offset;
@@ -1953,13 +2135,13 @@ fDesktop->LockSingleWindow();
 				}
 				delete[] buffer;
 			}
-
 			break;
 		}
 
 		case AS_VIEW_BEGIN_RECT_TRACK:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_BEGIN_RECT_TRACK\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_BEGIN_RECT_TRACK\n",
+				Title()));
 			BRect dragRect;
 			uint32 style;
 
@@ -1973,14 +2155,16 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_VIEW_END_RECT_TRACK:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_END_RECT_TRACK\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_END_RECT_TRACK\n",
+				Title()));
 			// TODO: implement rect tracking
 			break;
 		}
 
 		case AS_VIEW_BEGIN_PICTURE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_BEGIN_PICTURE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_BEGIN_PICTURE\n",
+				Title()));
 			ServerPicture *picture = App()->CreatePicture();
 			picture->SyncState(fCurrentView);
 			fCurrentView->SetPicture(picture);
@@ -1989,7 +2173,8 @@ fDesktop->LockSingleWindow();
 
 		case AS_VIEW_APPEND_TO_PICTURE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_APPEND_TO_PICTURE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_APPEND_TO_PICTURE\n",
+				Title()));
 
 			int32 pictureToken;
 			link.Read<int32>(&pictureToken);
@@ -2003,7 +2188,8 @@ fDesktop->LockSingleWindow();
 
 		case AS_VIEW_END_PICTURE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_END_PICTURE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_VIEW_END_PICTURE\n",
+				Title()));
 
 			ServerPicture *picture = fCurrentView->Picture();
 			if (picture != NULL) {
@@ -2030,11 +2216,13 @@ fDesktop->LockSingleWindow();
 	Requires a valid fCurrentView.
 */
 void
-ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &link)
+ServerWindow::_DispatchViewDrawingMessage(int32 code,
+	BPrivate::LinkReceiver &link)
 {
 	if (!fCurrentView->IsVisible() || !fWindow->IsVisible()) {
 		if (link.NeedsReply()) {
-			printf("ServerWindow::DispatchViewDrawingMessage() got message %ld that needs a reply!\n", code);
+			debug_printf("ServerWindow::DispatchViewDrawingMessage() got "
+				"message %ld that needs a reply!\n", code);
 			// the client is now blocking and waiting for a reply!
 			fLink.StartMessage(B_ERROR);
 			fLink.Flush();
@@ -2045,7 +2233,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 	DrawingEngine* drawingEngine = fWindow->GetDrawingEngine();
 	if (!drawingEngine) {
 		// ?!?
-		DTRACE(("ServerWindow %s: no drawing engine!!\n", Title()));
+		debug_printf("ServerWindow %s: no drawing engine!!\n", Title());
 		if (link.NeedsReply()) {
 			// the client is now blocking and waiting for a reply!
 			fLink.StartMessage(B_ERROR);
@@ -2056,6 +2244,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 	_UpdateCurrentDrawingRegion();
 	if (fCurrentDrawingRegion.CountRects() <= 0) {
+		DTRACE(("ServerWindow %s: _DispatchViewDrawingMessage(): View: %s, "
+			"INVALID CLIPPING!\n", Title(), fCurrentView->Name()));
 		if (link.NeedsReply()) {
 			// the client is now blocking and waiting for a reply!
 			fLink.StartMessage(B_ERROR);
@@ -2073,14 +2263,17 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 	switch (code) {
 		case AS_STROKE_LINE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE\n", Title()));
-
 			float x1, y1, x2, y2;
 
 			link.Read<float>(&x1);
 			link.Read<float>(&y1);
 			link.Read<float>(&x2);
-			link.Read<float>(&y2);
+			if (link.Read<float>(&y2) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE: View: %s -> "
+				"BPoint(%.1f, %.1f) - BPoint(%.1f, %.1f)\n", Title(),
+					fCurrentView->Name(), x1, y1, x2, y2));
 
 			BPoint p1(x1, y1);
 			BPoint p2(x2, y2);
@@ -2100,10 +2293,14 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_VIEW_INVERT_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_INVERT_RECT\n", Title()));
-
 			BRect rect;
-			link.Read<BRect>(&rect);
+			if (link.Read<BRect>(&rect) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_INVERT_RECT: View: %s -> "
+				"BRect(%.1f, %.1f, %.1f, %.1f)\n", Title(),
+				fCurrentView->Name(), rect.left, rect.top, rect.right,
+				rect.bottom));
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			drawingEngine->InvertRect(rect);
@@ -2111,10 +2308,14 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_STROKE_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_RECT\n", Title()));
-
 			BRect rect;
-			link.Read<BRect>(&rect);
+			if (link.Read<BRect>(&rect) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_STROKE_RECT: View: %s -> "
+				"BRect(%.1f, %.1f, %.1f, %.1f)\n", Title(),
+				fCurrentView->Name(), rect.left, rect.top, rect.right,
+				rect.bottom));
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			drawingEngine->StrokeRect(rect);
@@ -2122,10 +2323,14 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_FILL_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_RECT\n", Title()));
-
 			BRect rect;
-			link.Read<BRect>(&rect);
+			if (link.Read<BRect>(&rect) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_FILL_RECT: View: %s -> "
+				"BRect(%.1f, %.1f, %.1f, %.1f)\n", Title(),
+				fCurrentView->Name(), rect.left, rect.top, rect.right,
+				rect.bottom));
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			drawingEngine->FillRect(rect);
@@ -2133,13 +2338,17 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_FILL_RECT_GRADIENT:
 		{
-			GTRACE(("ServerWindow %s: Message AS_FILL_RECT_GRADIENT\n", Title()));
-
 			BRect rect;
 			link.Read<BRect>(&rect);
 			BGradient* gradient;
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
+
+			GTRACE(("ServerWindow %s: Message AS_FILL_RECT_GRADIENT: View: %s -> "
+				"BRect(%.1f, %.1f, %.1f, %.1f)\n", Title(),
+				fCurrentView->Name(), rect.left, rect.top, rect.right,
+				rect.bottom));
+
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
 			drawingEngine->FillRectGradient(rect, *gradient);
@@ -2147,7 +2356,6 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_VIEW_DRAW_BITMAP:
 		{
-			DTRACE(("ServerWindow %s: Message AS_VIEW_DRAW_BITMAP: View name: %s\n", fTitle, fCurrentView->Name()));
 			int32 bitmapToken;
 			uint32 options;
 			BRect bitmapRect;
@@ -2156,10 +2364,27 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			link.Read<int32>(&bitmapToken);
 			link.Read<uint32>(&options);
 			link.Read<BRect>(&viewRect);
-			link.Read<BRect>(&bitmapRect);
+			if (link.Read<BRect>(&bitmapRect) != B_OK)
+				break;
+
+#if 0
+			if (strcmp(fServerApp->SignatureLeaf(), "x-vnd.videolan-vlc") == 0)
+				options |= B_FILTER_BITMAP_BILINEAR;
+#endif
 
 			ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
 			if (bitmap) {
+
+				DTRACE(("ServerWindow %s: Message AS_VIEW_DRAW_BITMAP: "
+					"View: %s, bitmap: %ld (size %ld x %ld), "
+					"BRect(%.1f, %.1f, %.1f, %.1f) -> "
+					"BRect(%.1f, %.1f, %.1f, %.1f)\n",
+					fTitle, fCurrentView->Name(), bitmapToken,
+					bitmap->Width(), bitmap->Height(),
+					bitmapRect.left, bitmapRect.top, bitmapRect.right,
+					bitmapRect.bottom, viewRect.left, viewRect.top,
+					viewRect.right, viewRect.bottom));
+
 				fCurrentView->ConvertToScreenForDrawing(&viewRect);
 
 				drawingEngine->DrawBitmap(bitmap, bitmapRect, viewRect,
@@ -2178,7 +2403,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 			link.Read<BRect>(&r);
 			link.Read<float>(&angle);
-			link.Read<float>(&span);
+			if (link.Read<float>(&span) != B_OK)
+				break;
 
 			fCurrentView->ConvertToScreenForDrawing(&r);
 			drawingEngine->DrawArc(r, angle, span, code == AS_FILL_ARC);
@@ -2186,7 +2412,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_FILL_ARC_GRADIENT:
 		{
-			GTRACE(("ServerWindow %s: Message AS_FILL_ARC_GRADIENT\n", Title()));
+			GTRACE(("ServerWindow %s: Message AS_FILL_ARC_GRADIENT\n",
+				Title()));
 
 			float angle, span;
 			BRect r;
@@ -2204,20 +2431,25 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_STROKE_BEZIER:
 		case AS_FILL_BEZIER:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_BEZIER\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_BEZIER\n",
+				Title()));
 
 			BPoint pts[4];
+			status_t status;
 			for (int32 i = 0; i < 4; i++) {
-				link.Read<BPoint>(&(pts[i]));
+				status = link.Read<BPoint>(&(pts[i]));
 				fCurrentView->ConvertToScreenForDrawing(&pts[i]);
 			}
+			if (status != B_OK)
+				break;
 
 			drawingEngine->DrawBezier(pts, code == AS_FILL_BEZIER);
 			break;
 		}
 		case AS_FILL_BEZIER_GRADIENT:
 		{
-			GTRACE(("ServerWindow %s: Message AS_FILL_BEZIER_GRADIENT\n", Title()));
+			GTRACE(("ServerWindow %s: Message AS_FILL_BEZIER_GRADIENT\n",
+				Title()));
 
 			BPoint pts[4];
 			for (int32 i = 0; i < 4; i++) {
@@ -2234,10 +2466,12 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_STROKE_ELLIPSE:
 		case AS_FILL_ELLIPSE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ELLIPSE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ELLIPSE\n",
+				Title()));
 
 			BRect rect;
-			link.Read<BRect>(&rect);
+			if (link.Read<BRect>(&rect) != B_OK)
+				break;
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			drawingEngine->DrawEllipse(rect, code == AS_FILL_ELLIPSE);
@@ -2245,7 +2479,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_FILL_ELLIPSE_GRADIENT:
 		{
-			GTRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE_GRADIENT\n", Title()));
+			GTRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE_GRADIENT\n",
+				Title()));
 
 			BRect rect;
 			link.Read<BRect>(&rect);
@@ -2260,21 +2495,25 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_STROKE_ROUNDRECT:
 		case AS_FILL_ROUNDRECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ROUNDRECT\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ROUNDRECT\n",
+				Title()));
 
 			BRect rect;
 			float xrad,yrad;
 			link.Read<BRect>(&rect);
 			link.Read<float>(&xrad);
-			link.Read<float>(&yrad);
+			if (link.Read<float>(&yrad) != B_OK)
+				break;
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
-			drawingEngine->DrawRoundRect(rect, xrad, yrad, code == AS_FILL_ROUNDRECT);
+			drawingEngine->DrawRoundRect(rect, xrad, yrad,
+				code == AS_FILL_ROUNDRECT);
 			break;
 		}
 		case AS_FILL_ROUNDRECT_GRADIENT:
 		{
-			GTRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT_GRADIENT\n", Title()));
+			GTRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT_GRADIENT\n",
+				Title()));
 
 			BRect rect;
 			float xrad,yrad;
@@ -2292,7 +2531,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_STROKE_TRIANGLE:
 		case AS_FILL_TRIANGLE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_TRIANGLE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_TRIANGLE\n",
+				Title()));
 
 			BPoint pts[3];
 			BRect rect;
@@ -2302,7 +2542,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				fCurrentView->ConvertToScreenForDrawing(&pts[i]);
 			}
 
-			link.Read<BRect>(&rect);
+			if (link.Read<BRect>(&rect) != B_OK)
+				break;
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			drawingEngine->DrawTriangle(pts, rect, code == AS_FILL_TRIANGLE);
@@ -2310,7 +2551,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_FILL_TRIANGLE_GRADIENT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE_GRADIENT\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE_GRADIENT\n",
+				Title()));
 
 			BPoint pts[3];
 			BRect rect;
@@ -2330,7 +2572,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_STROKE_POLYGON:
 		case AS_FILL_POLYGON:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_POLYGON\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_POLYGON\n",
+				Title()));
 
 			BRect polyFrame;
 			bool isClosed = true;
@@ -2355,7 +2598,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_FILL_POLYGON_GRADIENT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_POLYGON_GRADIENT\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_POLYGON_GRADIENT\n",
+				Title()));
 
 			BRect polyFrame;
 			bool isClosed = true;
@@ -2364,10 +2608,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			link.Read<int32>(&pointCount);
 
 			BPoint* pointList = new(nothrow) BPoint[pointCount];
-			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK) {
-				BGradient* gradient;
-				if (link.ReadGradient(&gradient) != B_OK)
-					break;
+			BGradient* gradient;
+			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK
+				&& link.ReadGradient(&gradient) >= B_OK) {
 				for (int32 i = 0; i < pointCount; i++)
 					fCurrentView->ConvertToScreenForDrawing(&pointList[i]);
 				fCurrentView->ConvertToScreenForDrawing(&polyFrame);
@@ -2382,7 +2625,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_STROKE_SHAPE:
 		case AS_FILL_SHAPE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_SHAPE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_SHAPE\n",
+				Title()));
 
 			BRect shapeFrame;
 			int32 opCount;
@@ -2399,14 +2643,15 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 				// this might seem a bit weird, but under R5, the shapes
 				// are always offset by the current pen location
-				BPoint penLocation = fCurrentView->CurrentState()->PenLocation();
+				BPoint penLocation
+					= fCurrentView->CurrentState()->PenLocation();
 				for (int32 i = 0; i < ptCount; i++) {
 					ptList[i] += penLocation;
 					fCurrentView->ConvertToScreenForDrawing(&ptList[i]);
 				}
 
-				drawingEngine->DrawShape(shapeFrame, opCount, opList, ptCount, ptList,
-					code == AS_FILL_SHAPE);
+				drawingEngine->DrawShape(shapeFrame, opCount, opList, ptCount,
+					ptList, code == AS_FILL_SHAPE);
 			}
 
 			delete[] opList;
@@ -2415,7 +2660,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_FILL_SHAPE_GRADIENT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_SHAPE_GRADIENT\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_SHAPE_GRADIENT\n",
+				Title()));
 
 			BRect shapeFrame;
 			int32 opCount;
@@ -2427,19 +2673,19 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 			uint32* opList = new(nothrow) uint32[opCount];
 			BPoint* ptList = new(nothrow) BPoint[ptCount];
-			if (link.Read(opList, opCount * sizeof(uint32)) >= B_OK &&
-				link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
+			BGradient* gradient;
+			if (link.Read(opList, opCount * sizeof(uint32)) >= B_OK
+				&& link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK
+				&& link.ReadGradient(&gradient) >= B_OK) {
 
 				// this might seem a bit weird, but under R5, the shapes
 				// are always offset by the current pen location
-				BPoint penLocation = fCurrentView->CurrentState()->PenLocation();
+				BPoint penLocation
+					= fCurrentView->CurrentState()->PenLocation();
 				for (int32 i = 0; i < ptCount; i++) {
 					ptList[i] += penLocation;
 					fCurrentView->ConvertToScreenForDrawing(&ptList[i]);
 				}
-				BGradient* gradient;
-				if (link.ReadGradient(&gradient) != B_OK)
-					break;
 				fCurrentView->ConvertToScreenForDrawing(gradient);
 				drawingEngine->FillShapeGradient(shapeFrame, opCount, opList,
 					ptCount, ptList, *gradient);
@@ -2464,14 +2710,16 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_FILL_REGION_GRADIENT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_REGION_GRADIENT\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_REGION_GRADIENT\n",
+				Title()));
 
 			BRegion region;
-			if (link.ReadRegion(&region) < B_OK)
-				break;
+			link.ReadRegion(&region);
+
 			BGradient* gradient;
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
+
 			fCurrentView->ConvertToScreenForDrawing(&region);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
 			drawingEngine->FillRegionGradient(region, *gradient);
@@ -2479,7 +2727,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 		case AS_STROKE_LINEARRAY:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_LINEARRAY\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_LINEARRAY\n",
+				Title()));
 
 			// Attached Data:
 			// 1) int32 Number of lines in the array
@@ -2510,7 +2759,6 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_DRAW_STRING:
 		case AS_DRAW_STRING_WITH_DELTA:
 		{
-			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING\n", Title()));
 			char* string;
 			int32 length;
 			BPoint location;
@@ -2524,8 +2772,11 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				if (_delta.nonspace != 0.0 || _delta.space != 0.0)
 					delta = &_delta;
 			}
-			link.ReadString(&string);
+			if (link.ReadString(&string) != B_OK)
+				break;
 
+			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING, View: %s "
+				"-> %s\n", Title(), fCurrentView->Name(), string));
 
 			fCurrentView->ConvertToScreenForDrawing(&location);
 			BPoint penLocation = drawingEngine->DrawString(string, length,
@@ -2561,7 +2812,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		default:
 			BString codeString;
 			string_for_message_code(code, codeString);
-			printf("ServerWindow %s received unexpected code: %s\n",
+			debug_printf("ServerWindow %s received unexpected code: %s\n",
 				Title(), codeString.String());
 
 			if (link.NeedsReply()) {
@@ -3108,7 +3359,7 @@ ServerWindow::_MessageLooper()
 		while (true) {
 			if (code == AS_DELETE_WINDOW || code == kMsgQuitLooper) {
 				// this means the client has been killed
-				STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
+				DTRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
 					Title()));
 
 				if (code == AS_DELETE_WINDOW) {
