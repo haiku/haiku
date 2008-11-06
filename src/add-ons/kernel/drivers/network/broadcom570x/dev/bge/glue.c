@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,7 +7,7 @@
 #include <sys/bus.h>
 
 
-HAIKU_FBSD_DRIVER_GLUE(broadcom_bcm570x, bge, pci);
+HAIKU_FBSD_DRIVER_GLUE(broadcom570x, bge, pci);
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_SWI_TASKQUEUE);
 
 
