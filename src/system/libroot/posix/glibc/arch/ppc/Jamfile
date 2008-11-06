@@ -113,7 +113,7 @@ local genericSources =
 	w_remainder.c w_remainderf.c # w_remainderl.c
 	w_scalb.c w_scalbf.c # w_scalbl.c
 	w_sinh.c w_sinhf.c # w_sinhl.c
-	w_tgamma.c w_tgammaf.c w_tgammal.c
+	w_tgamma.c w_tgammaf.c # w_tgammal.c
 ;
 
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
