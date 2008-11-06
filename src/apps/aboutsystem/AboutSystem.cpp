@@ -513,6 +513,7 @@ AboutView::AboutView(const BRect &rect)
 		"Alan Murta\n"
 		"Pahtz\n"
 		"Michael Paine\n"
+		"Adrian Panasiuk\n"
 		"Francesco Piccinno\n"
 		"David Powell\n"
 		"Jeremy Rand\n"
