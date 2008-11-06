@@ -16,9 +16,6 @@ class BFile;
 class BList;
 class BMessageRunner;
 
-extern "C" status_t	_init_interface_kit_();
-
-
 struct text_run {
 	int32		offset;
 	BFont		font;
@@ -40,7 +37,6 @@ enum undo_state {
 };
 
 namespace BPrivate {
-	class WidthBuffer;
 	class TextGapBuffer;
 } // namespace BPrivate
 
@@ -276,7 +272,6 @@ private:
 			class TypingUndoBuffer;
 
 			friend class TextTrackState;
-			friend status_t	_init_interface_kit_();
 
 	virtual	void				_ReservedTextView3();
 	virtual	void				_ReservedTextView4();
@@ -417,8 +412,6 @@ private:
 			LayoutData*			fLayoutData;
 
 			uint32				_reserved[8];
-
-	static	BPrivate::WidthBuffer* sWidths;
 };
 
 #endif	// _TEXTVIEW_H

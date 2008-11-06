@@ -20,12 +20,16 @@
 
 #include <stdio.h>
 
+//! NetPositive binary compatibility support
+class _BWidthBuffer_;
+
 namespace BPrivate {
 
 const static uint32 kTableCount = 128;
 const static uint32 kInvalidCode = 0xFFFFFFFF;
 static BLocker sWidthLocker = BLocker("width buffer lock");
-
+WidthBuffer* gWidthBuffer = NULL;
+	// initialized in InterfaceDefs.cpp
 
 struct hashed_escapement {
 	uint32 code;
@@ -362,4 +366,29 @@ WidthBuffer::HashEscapements(const char *inText, int32 numChars, int32 textLen,
 }
 
 } // namespace BPrivate
+
+
+#if __GNUC__ < 3
+//! NetPositive binary compatibility support
+
+_BWidthBuffer_::_BWidthBuffer_()
+{
+}
+
+_BWidthBuffer_::~_BWidthBuffer_()
+{
+}
+
+_BWidthBuffer_* gCompatibilityWidthBuffer = NULL;
+
+extern "C"
+float
+StringWidth__14_BWidthBuffer_PCcllPC5BFont(_BWidthBuffer_* widthBuffer,
+	const char *inText, int32 fromOffset, int32 length, const BFont *inStyle)
+{
+	return BPrivate::gWidthBuffer->StringWidth(inText, fromOffset, length,
+		inStyle);
+}
+
+#endif // __GNUC__ < 3
 

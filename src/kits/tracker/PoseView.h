@@ -62,10 +62,6 @@ All rights reserved.
 class BRefFilter;
 class BList;
 
-// TODO: Get rid of this.
-#include <TextView.h>
-	// for BTextView::WidthBuffer;
-
 namespace BPrivate {
 
 class BCountView;
@@ -664,9 +660,6 @@ class BPoseView : public BView {
 
 		bigtime_t fLastDeskbarFrameCheckTime;
 		BRect fDeskbarFrame;
-
-		// TODO: Get rid of this.
-		static BPrivate::WidthBuffer *sWidthBuffer;
 
 		static OffscreenBitmap *sOffscreen;
 

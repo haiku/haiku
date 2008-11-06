@@ -904,7 +904,7 @@ _init_interface_kit_()
 	if (status < B_OK)
 		return status;
 
-	BTextView::sWidths = new BPrivate::WidthBuffer;
+	BPrivate::gWidthBuffer = new BPrivate::WidthBuffer;
 
 	_init_global_fonts_();
 
@@ -927,7 +927,10 @@ _init_interface_kit_()
 extern "C" status_t
 _fini_interface_kit_()
 {
-	//TODO: Implement ?
+	delete BPrivate::gWidthBuffer;
+	BPrivate::gWidthBuffer = NULL;
+
+	// TODO: Anything else?
 
 	return B_OK;
 }
@@ -1470,4 +1473,3 @@ truncate_string(const char* string, uint32 mode, float width,
 		strlcpy(dest, source, length + 1);
 	}
 }
-

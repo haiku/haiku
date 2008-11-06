@@ -641,7 +641,8 @@ BPoseView::SaveState(BMessage &message) const
 float
 BPoseView::StringWidth(const char *str) const
 {
-	return sWidthBuffer->StringWidth(str, 0, (int32)strlen(str), &sCurrentFont);
+	return BPrivate::gWidthBuffer->StringWidth(str, 0, (int32)strlen(str),
+		&sCurrentFont);
 }
 
 
@@ -649,7 +650,7 @@ float
 BPoseView::StringWidth(const char *str, int32 len) const
 {
 	ASSERT(strlen(str) == (uint32)len);
-	return sWidthBuffer->StringWidth(str, 0, len, &sCurrentFont);
+	return BPrivate::gWidthBuffer->StringWidth(str, 0, len, &sCurrentFont);
 }
 
 
@@ -9321,7 +9322,6 @@ TPoseViewFilter::Filter(BMessage *message, BHandler **)
 float BPoseView::sFontHeight = -1;
 font_height BPoseView::sFontInfo = { 0, 0, 0 };
 bigtime_t BPoseView::sLastKeyTime = 0;
-BPrivate::WidthBuffer* BPoseView::sWidthBuffer = new BPrivate::WidthBuffer;
 BFont BPoseView::sCurrentFont;
 OffscreenBitmap *BPoseView::sOffscreen = new OffscreenBitmap;
 char BPoseView::sMatchString[] = "";

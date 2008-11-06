@@ -78,6 +78,23 @@ private:
 	static uint32 Hash(uint32);
 };
 
+extern WidthBuffer* gWidthBuffer;
+
 } // namespace BPrivate
+
+using BPrivate::WidthBuffer;
+
+#if __GNUC__ < 3
+//! NetPositive binary compatibility support
+
+class _BWidthBuffer_ : public _BTextViewSupportBuffer_<BPrivate::_width_table_> {
+	_BWidthBuffer_();
+	virtual ~_BWidthBuffer_();
+};
+
+extern
+_BWidthBuffer_* gCompatibilityWidthBuffer;
+
+#endif // __GNUC__ < 3
 
 #endif // __WIDTHBUFFER_H

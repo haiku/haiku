@@ -152,9 +152,6 @@ struct BTextView::LayoutData {
 	bool				valid;
 };
 
-// Initialized/finalized by init/fini_interface_kit
-BPrivate::WidthBuffer* BTextView::sWidths = NULL;
-
 
 const static rgb_color kBlackColor = { 0, 0, 0, 255 };
 const static rgb_color kBlueInputColor = { 152, 203, 255, 255 };
@@ -3824,8 +3821,9 @@ BTextView::_StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 
 #if USE_WIDTHBUFFER
 		// Use _BWidthBuffer_ if possible
-		if (sWidths != NULL) {
-			result += sWidths->StringWidth(*fText, fromOffset, numChars, font);
+		if (BPrivate::gWidthBuffer != NULL) {
+			result += BPrivate::gWidthBuffer->StringWidth(*fText, fromOffset,
+				numChars, font);
 		} else {
 #endif
 			const char* text = fText->GetString(fromOffset, &numChars);
