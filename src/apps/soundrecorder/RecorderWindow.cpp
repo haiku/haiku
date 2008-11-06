@@ -1148,7 +1148,8 @@ RecorderWindow::AddSoundItem(const BEntry& entry, bool temp)
 }
 
 void
-RecorderWindow::RecordFile(void * cookie, bigtime_t timestamp, void * data, size_t size, const media_raw_audio_format & format)
+RecorderWindow::RecordFile(void * cookie, bigtime_t timestamp,
+	void * data, size_t size, const media_raw_audio_format & format)
 {
 	//	Callback called from the SoundConsumer when receiving buffers.
 	assert((format.format & 0x02) && format.channel_count);
