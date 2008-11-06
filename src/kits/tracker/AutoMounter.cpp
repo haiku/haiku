@@ -135,11 +135,13 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 					return false;
 
 				BPath path;
+				if (partition->GetPath(&path) != B_OK)
+					return false;
+
 				if (mode == kRestorePreviousVolumes) {
 					// mount all volumes that were stored in the settings file
 					const char *volumeName = NULL;
-					if (partition->GetPath(&path) != B_OK
-						|| partition->ContentName() == NULL
+					if (partition->ContentName() == NULL
 						|| fPrevious.FindString(path.Path(), &volumeName)
 							!= B_OK
 						|| strcmp(volumeName, partition->ContentName()))
