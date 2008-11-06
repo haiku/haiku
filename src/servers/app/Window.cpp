@@ -414,7 +414,7 @@ Window::ScrollViewBy(View* view, int32 dx, int32 dy)
 //fDrawingEngine->FillRegion(dirty, rgb_color{ 255, 0, 255, 255 });
 //snooze(2000);
 
-	if (IsVisible() && view->IsVisible()) {
+	if (!IsOffscreenWindow() && IsVisible() && view->IsVisible()) {
 		dirty->IntersectWith(&VisibleContentRegion());
 		_TriggerContentRedraw(*dirty);
 	}
@@ -669,7 +669,7 @@ Window::MarkContentDirty(BRegion& regionOnScreen)
 	// since this won't affect other windows, read locking
 	// is sufficient. If there was no dirty region before,
 	// an update message is triggered
-	if (fHidden)
+	if (fHidden || IsOffscreenWindow())
 		return;
 
 	regionOnScreen.IntersectWith(&VisibleContentRegion());
@@ -682,7 +682,7 @@ void
 Window::MarkContentDirtyAsync(BRegion& regionOnScreen)
 {
 	// NOTE: see comments in ProcessDirtyRegion()
-	if (fHidden)
+	if (fHidden || IsOffscreenWindow())
 		return;
 
 	regionOnScreen.IntersectWith(&VisibleContentRegion());
