@@ -32,8 +32,8 @@ class MouseView : public BView {
 
 		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint where);
+		virtual void MouseUp(BPoint where);
 		virtual void Draw(BRect frame);
-		virtual void Pulse();
 		virtual void GetPreferredSize(float *_width, float *_height);
 
 		void SetMouseType(int32 type);

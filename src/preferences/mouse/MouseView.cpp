@@ -100,6 +100,7 @@ MouseView::MouseView(BRect rect, const MouseSettings &settings)
 	//fMouseDownBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "pressed_mouse_bmap");
 
 	fMouseDownBounds = fMouseDownBitmap->Bounds();
+	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 }
 
 
@@ -119,10 +120,34 @@ MouseView::GetPreferredSize(float *_width, float *_height)
 		*_height = fMouseBitmap != NULL ? fMouseBitmap->Bounds().Height() : 82;
 }
 
+void
+MouseView::MouseUp(BPoint)
+{
+	fButtons = 0;
+	Invalidate(BRect(0, kButtonTop, fMouseDownBounds.Width(), 
+		kButtonTop + fMouseDownBounds.Height()));
+	fOldButtons = fButtons;
+}
 
 void
 MouseView::MouseDown(BPoint where)
 {
+	BMessage *mouseMsg = Window()->CurrentMessage();
+	fButtons = mouseMsg->FindInt32("buttons");
+	int32 modifiers = mouseMsg->FindInt32("modifiers");
+	if (modifiers & B_CONTROL_KEY) {
+		if (modifiers & B_COMMAND_KEY)
+			fButtons = B_TERTIARY_MOUSE_BUTTON;
+		else
+			fButtons = B_SECONDARY_MOUSE_BUTTON;
+	}
+
+	if (fOldButtons != fButtons) {
+		Invalidate(BRect(0, kButtonTop,
+			fMouseDownBounds.Width(), kButtonTop + fMouseDownBounds.Height()));
+		fOldButtons = fButtons;
+	}
+
 	const int32 *offset = getButtonOffsets(fType);
 	int32 button = -1;
 	for (int32 i = 0; i <= fType; i++) {
@@ -165,20 +190,6 @@ MouseView::AttachedToWindow()
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	UpdateFromSettings();
-}
-
-
-void
-MouseView::Pulse()
-{
-	BPoint point;
-	GetMouse(&point, &fButtons, true);
-
-	if (fOldButtons != fButtons) {
-		Invalidate(BRect(0, kButtonTop,
-			fMouseDownBounds.Width(), kButtonTop + fMouseDownBounds.Height()));
-		fOldButtons = fButtons;
-	}
 }
 
 
