@@ -156,3 +156,4 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) NetBootArchive ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) FloppyBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootPPCImage ] ;
