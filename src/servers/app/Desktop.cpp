@@ -1489,7 +1489,7 @@ Desktop::SetFocusLocked(const Window* window)
 
 	fLockedFocusWindow = window;
 }
-	
+
 
 void
 Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
@@ -1559,13 +1559,13 @@ Desktop::ActivateWindow(Window* window)
 		return;
 
 	bool windowOnOtherWorkspace = !window->InWorkspace(fCurrentWorkspace);
-	if (windowOnOtherWorkspace) {
-		if ((window->Flags() & B_NO_WORKSPACE_ACTIVATION) == 0
-			&& (window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) == 0) {
-			// switch to the workspace on which this window is
+	if (windowOnOtherWorkspace
+		&& (window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) == 0) {
+		if ((window->Flags() & B_NO_WORKSPACE_ACTIVATION) == 0) {
+			// Switch to the workspace on which this window is
 			// (we'll take the first one that the window is on)
 			uint32 workspaces = window->Workspaces();
-			for (int32 i = 0; i < 32; i++) {
+			for (int32 i = 0; i < fSettings->WorkspacesCount(); i++) {
 				uint32 workspace = workspace_to_workspaces(i);
 				if (workspaces & workspace) {
 					SetWorkspace(i);
@@ -1573,15 +1573,14 @@ Desktop::ActivateWindow(Window* window)
 					break;
 				}
 			}
-		} else if ((window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) == 0) {
+		} else {
 			UnlockAllWindows();
 			return;
 		}
 	}
 
-	if (windowOnOtherWorkspace
-		&& (window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) != 0) {
-		// bring the window to the current workspace
+	if (windowOnOtherWorkspace) {
+		// Bring the window to the current workspace
 		// TODO: what if this window is on multiple workspaces?!?
 		uint32 workspaces = workspace_to_workspaces(fCurrentWorkspace);
 		SetWindowWorkspaces(window, workspaces);
