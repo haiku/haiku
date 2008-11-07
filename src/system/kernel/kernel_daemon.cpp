@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +12,7 @@
 
 #include <KernelExport.h>
 
+#include <elf.h>
 #include <lock.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
@@ -42,12 +43,15 @@ public:
 									int frequency);
 			status_t			Unregister(daemon_hook function, void* arg);
 
+			void				Dump();
+
 private:
 	static	status_t			_DaemonThreadEntry(void* data);
+			struct daemon*		_NextDaemon(struct daemon& marker);
 			status_t			_DaemonThread();
 
 private:
-			mutex				fLock;
+			recursive_lock		fLock;
 			DaemonList			fDaemons;
 			thread_id			fThread;
 };
@@ -60,8 +64,7 @@ static KernelDaemon sResourceResizer;
 status_t
 KernelDaemon::Init(const char* name)
 {
-	new(&fDaemons) DaemonList;
-	mutex_init(&fLock, name);
+	recursive_lock_init(&fLock, name);
 
 	fThread = spawn_kernel_thread(&_DaemonThreadEntry, name, B_LOW_PRIORITY,
 		this);
@@ -88,7 +91,7 @@ KernelDaemon::Register(daemon_hook function, void* arg, int frequency)
 	daemon->arg = arg;
 	daemon->frequency = frequency;
 
-	MutexLocker _(fLock);
+	RecursiveLocker _(fLock);
 
 	if (frequency > 1) {
 		// we try to balance the work-load for each daemon run
@@ -114,7 +117,7 @@ KernelDaemon::Register(daemon_hook function, void* arg, int frequency)
 status_t
 KernelDaemon::Unregister(daemon_hook function, void* arg)
 {
-	MutexLocker _(fLock);
+	RecursiveLocker _(fLock);
 
 	DaemonList::Iterator iterator = fDaemons.GetIterator();
 
@@ -134,6 +137,31 @@ KernelDaemon::Unregister(daemon_hook function, void* arg)
 }
 
 
+void
+KernelDaemon::Dump()
+{
+	DaemonList::Iterator iterator = fDaemons.GetIterator();
+
+	while (iterator.HasNext()) {
+		struct daemon* daemon = iterator.Next();
+		const char *symbol, *imageName;
+		bool exactMatch;
+
+		status_t status = elf_debug_lookup_symbol_address(
+			(addr_t)daemon->function, NULL, &symbol, &imageName, &exactMatch);
+		if (status == B_OK && exactMatch) {
+			if (strchr(imageName, '/') != NULL)
+				imageName = strrchr(imageName, '/') + 1;
+
+			kprintf("\t%s:%s (%p), arg %p\n", imageName, symbol,
+				daemon->function, daemon->arg);
+		} else {
+			kprintf("\t%p, arg %p\n", daemon->function, daemon->arg);
+		}
+	}
+}
+
+
 /*static*/ status_t
 KernelDaemon::_DaemonThreadEntry(void* data)
 {
@@ -141,30 +169,66 @@ KernelDaemon::_DaemonThreadEntry(void* data)
 }
 
 
+struct daemon*
+KernelDaemon::_NextDaemon(struct daemon& marker)
+{
+	struct daemon* daemon;
+
+	if (marker.GetDoublyLinkedListLink()->next == NULL
+		&& marker.GetDoublyLinkedListLink()->previous == NULL
+		&& fDaemons.Head() != &marker) {
+		// Marker is not part of the list yet, just return the first entry
+		daemon = fDaemons.Head();
+	} else {
+		daemon = marker.GetDoublyLinkedListLink()->next;
+		fDaemons.Remove(&marker);
+	}
+
+	if (daemon != NULL)
+		fDaemons.Insert(daemon->GetDoublyLinkedListLink()->next, &marker);
+
+	return daemon;
+}
+
+
 status_t
 KernelDaemon::_DaemonThread()
 {
+	struct daemon marker;
 	int32 iteration = 0;
 
 	while (true) {
-		mutex_lock(&fLock);
-
-		DaemonList::Iterator iterator = fDaemons.GetIterator();
+		RecursiveLocker locker(fLock);
 
 		// iterate through the list and execute each daemon if needed
-		while (iterator.HasNext()) {
-			struct daemon* daemon = iterator.Next();
-
+		while (struct daemon* daemon = _NextDaemon(marker)) {
 			if (((iteration + daemon->offset) % daemon->frequency) == 0)
 				daemon->function(daemon->arg, iteration);
 		}
-		mutex_unlock(&fLock);
+
+		locker.Unlock();
 
 		iteration++;
 		snooze(100000);	// 0.1 seconds
 	}
 
 	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
+static int
+dump_daemons(int argc, char** argv)
+{
+	kprintf("kernel daemons:\n");
+	sKernelDaemon.Dump();
+
+	kprintf("\nresource resizers:\n");
+	sResourceResizer.Dump();
+
+	return 0;
 }
 
 
@@ -199,6 +263,9 @@ unregister_resource_resizer(daemon_hook function, void* arg)
 }
 
 
+//	#pragma mark -
+
+
 extern "C" status_t
 kernel_daemon_init(void)
 {
@@ -210,5 +277,6 @@ kernel_daemon_init(void)
 	if (sResourceResizer.Init("resource resizer") != B_OK)
 		panic("kernel_daemon_init(): failed to init resource resizer");
 
+	add_debugger_command("daemons", dump_daemons, "Shows registered kernel daemons.");
 	return B_OK;
 }
