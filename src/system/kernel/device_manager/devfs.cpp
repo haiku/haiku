@@ -1066,6 +1066,8 @@ devfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int openMode,
 	if (status < B_OK)
 		return status;
 
+	locker.Unlock();
+
 	*_newVnodeID = vnode->id;
 
 	cookie = (struct devfs_cookie*)malloc(sizeof(struct devfs_cookie));
@@ -1080,15 +1082,12 @@ devfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int openMode,
 		if (status < B_OK)
 			return status;
 
+		locker.Lock();
 		char path[B_FILE_NAME_LENGTH];
 		get_device_name(vnode, path, sizeof(path));
-
 		locker.Unlock();
 
 		status = device->Open(path, openMode, &cookie->device_cookie);
-
-		locker.Lock();
-
 		if (status != B_OK)
 			device->UninitDevice();
 	}
@@ -1123,22 +1122,17 @@ devfs_open(fs_volume* _volume, fs_vnode* _vnode, int openMode,
 	cookie->device_cookie = NULL;
 
 	if (S_ISCHR(vnode->stream.type)) {
-		RecursiveLocker locker(fs->lock);
-
 		BaseDevice* device = vnode->stream.u.dev.device;
 		status = device->InitDevice();
 		if (status < B_OK)
 			return status;
 
+		RecursiveLocker locker(fs->lock);
 		char path[B_FILE_NAME_LENGTH];
 		get_device_name(vnode, path, sizeof(path));
-
 		locker.Unlock();
 
 		status = device->Open(path, openMode, &cookie->device_cookie);
-
-		locker.Lock();
-
 		if (status != B_OK)
 			device->UninitDevice();
 	}
@@ -1174,21 +1168,13 @@ devfs_free_cookie(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
-	struct devfs *fs = (struct devfs *)_volume->private_volume;
 
 	TRACE(("devfs_freecookie: entry vnode %p, cookie %p\n", vnode, cookie));
 
 	if (S_ISCHR(vnode->stream.type)) {
 		// pass the call through to the underlying device
 		vnode->stream.u.dev.device->Free(cookie->device_cookie);
-
-		RecursiveLocker _(fs->lock);
 		vnode->stream.u.dev.device->UninitDevice();
-
-#if 0
-		if (vnode->stream.u.dev.driver != NULL)
-			vnode->stream.u.dev.driver->devices_used--;
-#endif
 	}
 
 	free(cookie);
