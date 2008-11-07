@@ -15,7 +15,7 @@ NotFile $(HAIKU_CD_BOOT_PPC_IMAGE_CONTAINER_NAME) ;
 local extras = chrpboot.txt README.html ;
 SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 
-BuildCDBootPPCImage $(HAIKU_CD_BOOT_PPC_IMAGE) : $(HAIKU_BOOT_FLOPPY) : $(extras) ;
+BuildCDBootPPCImage $(HAIKU_CD_BOOT_PPC_IMAGE) : boot_loader_openfirmware : $(extras) ;
 
 
 NotFile haiku-boot-cd-ppc ;
