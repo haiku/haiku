@@ -1,0 +1,6 @@
+# This mapping is needed to successfully boot and to keep macos
+# from treating everything like a text file (ugly!)
+#
+# EXTN	XLate	CREATOR	TYPE	Comment
+.b	Raw	'UNIX'	'tbxi'	"bootstrap"
+boot_loader_openfirmware	Raw	'UNIX'	'boot'	"bootstrap"

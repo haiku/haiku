@@ -15,7 +15,13 @@ NotFile $(HAIKU_CD_BOOT_PPC_IMAGE_CONTAINER_NAME) ;
 local extras = ofboot.b README.html ;
 SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 
-BuildCDBootPPCImage $(HAIKU_CD_BOOT_PPC_IMAGE) : boot_loader_openfirmware : $(extras) ;
+local hfsmaps = hfs.map ;
+SEARCH on $(hfsmaps) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
+
+
+
+
+BuildCDBootPPCImage $(HAIKU_CD_BOOT_PPC_IMAGE) : $(hfsmaps) : boot_loader_openfirmware : $(extras) ;
 
 
 NotFile haiku-boot-cd-ppc ;

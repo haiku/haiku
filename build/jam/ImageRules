@@ -1068,18 +1068,21 @@ actions BuildCDBootImage1
 
 #pragma mark - CD Boot PPC Image rules
 
-rule BuildCDBootPPCImage image : bootloader : extrafiles
+rule BuildCDBootPPCImage image : hfsmaps : bootloader : extrafiles
 {
 	Depends $(image) : $(bootloader) ;
 	Depends $(image) : $(extrafiles) ;
+	Depends $(image) : $(hfsmaps) ;
+	MAPS on $(image) = $(hfsmaps) ;
 
 	BuildCDBootPPCImage1 $(image) : $(bootloader) $(extrafiles) ;
 }
 
-actions BuildCDBootPPCImage1
+actions BuildCDBootPPCImage1 bind MAPS
 {
 	$(RM) $(<)
-	mkisofs -r -U -chrp-boot -V bootimg -o $(<) $(>[1]) $(>[2-])
+	#mkisofs -r -U -chrp-boot -V bootimg -o $(<) $(>[1]) $(>[2-])
+	mkisofs -r -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -hfs-bless . -o $(<) $(>[1]) $(>[2-])
 }
 
 
