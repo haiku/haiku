@@ -32,13 +32,14 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 
 BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2
 	cal cat catattr checkfs chgrp chmod chop chown chroot cksum clear
-	clockconfig cmp comm compress cp copyattr $(X86_ONLY)CortexAddOnHost
+	clockconfig cmp comm compress copyattr $(X86_ONLY)CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
 	draggers driveinfo dstcheck du echo eject env error expand expr
-	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp ftpd
+	factor false fdinfo ffm find finddir fmt fold fortune frcode ftp ftpd
 	funzip fwcontrol
-	gawk $(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname id ident
-	ideinfo idestatus ifconfig <bin>install installsound iroster isvolume join
+	gawk $(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname 
+	id ident ideinfo idestatus ifconfig <bin>install installsound iroster isvolume 
+	join jpegtran
 	keymap kill less lessecho lesskey link listarea listattr listimage listdev
 	listport listres listsem ln locate logger login logname ls lsindex
 	make makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex
@@ -128,7 +129,7 @@ BEOS_ADD_ONS_PRINT = Canon\ LIPS3\ Compatible Canon\ LIPS4\ Compatible
 BEOS_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
-BEOS_ADD_ONS_SCREENSAVERS = Haiku IFS Spider ;
+BEOS_ADD_ONS_SCREENSAVERS = Haiku IFS Spider BuyNow Message ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki ; #hda
 BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme
