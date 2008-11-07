@@ -12,7 +12,7 @@ MakeLocate $(HAIKU_CD_BOOT_PPC_IMAGE) : $(HAIKU_OUTPUT_DIR) ;
 NotFile $(HAIKU_CD_BOOT_PPC_IMAGE_CONTAINER_NAME) ;
 
 # extra files to put on the boot iso
-local extras = chrpboot.txt README.html ;
+local extras = ofboot.b README.html ;
 SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 
 BuildCDBootPPCImage $(HAIKU_CD_BOOT_PPC_IMAGE) : boot_loader_openfirmware : $(extras) ;
