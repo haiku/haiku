@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>Appearance</title>
+	<link rel="stylesheet" type="text/css" href="../welcome/welcome.css">
+</head>
+<body lang="en-US">
+
+<div class="logo">
+	<img src="../welcome/welcome-images/logo.png" alt="logo">
+	<div class="title">Appearance</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="preferences.html">Preferences</a>
+		&nbsp;&nbsp;&nbsp;
+		Next: <a href="prefs-backgrounds.html">Backgrounds</a>
+	</p>
+</div>
+
+<div class="content">
+
+<p>The Appearance preferences lets you change some aspects of Haiku's visuals.
+</p>
+
+<h2><a name="colors">Colors</a></h2>
+<img src="prefs-images/appearance-colors.png" alt="appearance-colors.png" width="460" height="337">
+<br>
+<p>In the first tab, <i>Colors</i>, you can change the colors of different parts of the user interface. The color well accepts drag&drops from other programs, letting you drag colors over from e.g. <i>WonderBrush</i>, <i>Icon-O-Matic</i> or the <i>Backgrounds</i> panel.
+</p>
+
+<h2><a name="antialiasing">Antialiasing</a></h2>
+<img src="prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" width="460" height="337">
+<br>
+<p>The second tab, <i>Antialiasing</i>, provides different settings for how things are rendered on screen.<br>
+An activated <i>Glyph hinting</i> aligns all letters in such a way that their vertical and horizontal edges rest exactly between two pixels. The result is a perfect contrast, especially when dealing with black on white. Text appears crisper.
+</p><p>See the difference of the two settings with these magnified screenshots:
+</p>
+<img src="prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" width="296" height="207">&nbsp;<img src="prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" width="296" height="207">
+<br>
+<p>Another technique to improve rendering is <i>Antialiasing</i>, which supports all vector graphics as well as text. It smoothes lines by changing the color of certain pixels. There are two methods for that:</p>
+<p><i>Greyscale</i> changes the intensity of pixels at the edge.</br>
+<i>LCD subpixel</i> does an even better job, especially with (high resolution) LCD monitors. Instead of the intensity of a pixel, it changes its color which moves an edge by a fraction of a pixel, because LCD displays produce every pixel with a red, green and blue component.
+</p><p>Again, the two different methods with magnified screenshots:
+</p>
+<img src="prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" width="296" height="207">&nbsp;<img src="prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" width="296" height="207">
+<br>
+<p>Subpixel based antialiasing adds a slight colored shine to objects. Something not everyone tolerates. In Haiku you can mix the two antialiasing methods and find the right setting for you by using a slider.
+</p><p><b>Note: </b>The subpixel based antialiasing in combination with the glyph hinting is subject of a software patent and is therefore not available by default. Depending on where in the world you live, you may get an unlocked version. Sorry about that. Talk with your representative.
+</p><p><br>
+</p><p><table border="0" cellpadding="2" cellspacing="0">
+<tr><td><i>Defaults</i></td><td>&nbsp;</td><td>resets everything to default values.</td></tr>
+<tr><td><i>Revert</i></td><td>&nbsp;</td><td>brings back the settings that were active when you started the Appearance preferences.</td></tr>
+</table>
+</p>
+</div>
+
+<div class="bottomnav">
+	<p>
+		<a href="preferences.html">Preferences</a>
+		&nbsp;&nbsp;&nbsp;
+		Next: <a href="prefs-backgrounds.html">Backgrounds</a>
+	</p>
+</div>
+
+</body>
+</html>
