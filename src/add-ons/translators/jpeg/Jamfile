@@ -75,9 +75,13 @@ local jpeg_files =
 	jquant1.c
 	jquant2.c
 	jutils.c
-	;
+;
 
 ObjectCcFlags [ FGristFiles $(jpeg_files:S=$(SUFOBJ)) ] : -w ;
+
+StaticLibrary libjpeg.a :
+	$(jpeg_files)
+;
 
 Translator JPEGTranslator :
 
@@ -88,11 +92,17 @@ Translator JPEGTranslator :
 	exif_parser.cpp
 	JPEGTranslator.cpp
 
-	$(jpeg_files)
-
-	: be translation
+	: be translation libjpeg.a
 	: true
 ;
+
+BinCommand jpegtran :
+	jpegtran.c
+	cdjpeg.c
+	rdswitch.c
+	transupp.c
+	: be libjpeg.a
+	;
 
 Package haiku-translationkit-cvs :
 	JPEGTranslator :
