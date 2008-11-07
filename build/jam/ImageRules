@@ -1082,7 +1082,8 @@ actions BuildCDBootPPCImage1 bind MAPS
 {
 	$(RM) $(<)
 	#mkisofs -r -U -chrp-boot -V bootimg -o $(<) $(>[1]) $(>[2-])
-	mkisofs -r -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -hfs-bless . -o $(<) $(>[1]) $(>[2-])
+	mkisofs -hfs -r -U -chrp-boot -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1]) $(>[2-])
+	# -hfs -hfs-bless .
 }
 
 
