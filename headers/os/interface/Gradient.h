@@ -7,8 +7,8 @@
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
-#ifndef GRADIENT_H
-#define GRADIENT_H
+#ifndef _GRADIENT_H
+#define _GRADIENT_H
 
 #include <Archivable.h>
 #include <GraphicsDefs.h>
@@ -107,4 +107,4 @@ private:
 	gradient_type		fType;
 };
 
-#endif // GRADIENT_H
+#endif // _GRADIENT_H
