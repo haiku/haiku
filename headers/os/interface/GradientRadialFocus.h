@@ -6,8 +6,8 @@
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
-#ifndef GRADIENT_RADIAL_FOCUS_H
-#define GRADIENT_RADIAL_FOCUS_H
+#ifndef _GRADIENT_RADIAL_FOCUS_H
+#define _GRADIENT_RADIAL_FOCUS_H
 
 #include <Gradient.h>
 
@@ -32,4 +32,4 @@ public:
 	void SetRadius(float radius);
 };
 
-#endif // GRADIENT_RADIAL_FOCUS_H
+#endif // _GRADIENT_RADIAL_FOCUS_H

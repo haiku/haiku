@@ -6,8 +6,8 @@
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
-#ifndef GRADIENT_LINEAR_H
-#define GRADIENT_LINEAR_H
+#ifndef _GRADIENT_LINEAR_H
+#define _GRADIENT_LINEAR_H
 
 #include <Gradient.h>
 
@@ -28,4 +28,4 @@ public:
 	void SetEnd(float x2, float y2);
 };
 
-#endif // GRADIENT_LINEAR_H
+#endif // _GRADIENT_LINEAR_H

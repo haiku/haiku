@@ -6,8 +6,8 @@
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
-#ifndef GRADIENT_CONIC_H
-#define GRADIENT_CONIC_H
+#ifndef _GRADIENT_CONIC_H
+#define _GRADIENT_CONIC_H
 
 #include <Gradient.h>
 
@@ -27,4 +27,4 @@ public:
 	void SetAngle(float angle);
 };
 
-#endif // GRADIENT_CONIC_H
+#endif // _GRADIENT_CONIC_H

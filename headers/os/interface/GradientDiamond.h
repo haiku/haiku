@@ -6,8 +6,8 @@
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
-#ifndef GRADIENT_DIAMOND_H
-#define GRADIENT_DIAMOND_H
+#ifndef _GRADIENT_DIAMOND_H
+#define _GRADIENT_DIAMOND_H
 
 #include <Gradient.h>
 
@@ -24,4 +24,4 @@ public:
 	void SetCenter(float cx, float cy);
 };
 
-#endif // GRADIENT_DIAMOND_H
+#endif // _GRADIENT_DIAMOND_H

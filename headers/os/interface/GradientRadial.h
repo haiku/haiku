@@ -6,8 +6,8 @@
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
-#ifndef GRADIENT_RADIAL_H
-#define GRADIENT_RADIAL_H
+#ifndef _GRADIENT_RADIAL_H
+#define _GRADIENT_RADIAL_H
 
 #include <Gradient.h>
 
@@ -27,4 +27,4 @@ public:
 	void SetRadius(float radius);
 };
 
-#endif // GRADIENT_RADIAL_H
+#endif // _GRADIENT_RADIAL_H
