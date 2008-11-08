@@ -575,16 +575,16 @@ BShelf::MessageReceived(BMessage *msg)
 				if (err == B_OK )
 					repMessage = ReplicantAt(i, &replicant, &ID, &err);
 				if (err == B_OK && replicant) {
+					msg->PopSpecifier();
 					BMessage archive;
 					err = replicant->Archive(&archive);
-					if (err == B_OK)
+					if (err == B_OK && msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK) {
 						err = replyMsg.AddMessage("result", &archive);
-					break;
+						break;
+					}
 					// now handles the replicant suite
 					err = B_BAD_SCRIPT_SYNTAX;
 					if (msg->what != B_GET_PROPERTY)
-						break;
-					if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
 						break;
 					if (strcmp(prop, "ID") == 0) {
 						err = replyMsg.AddInt32("result", ID);
