@@ -29,11 +29,14 @@ status_t test_executable(const char *path, char *interpreter);
 
 void terminate_program(void);
 image_id load_program(char const *path, void **entry);
-status_t unload_library(image_id imageID, bool addOn);
-image_id load_library(char const *path, uint32 flags, bool addOn);
+image_id load_library(char const *path, uint32 flags, bool addOn,
+	void** _handle);
+status_t unload_library(void* handle, image_id imageID, bool addOn);
 status_t get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
 	int32 *_nameLength, int32 *_type, void **_location);
 status_t get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
+	void **_location);
+status_t get_library_symbol(void* handle, void* caller, const char* symbolName,
 	void **_location);
 status_t get_next_image_dependency(image_id id, uint32 *cookie,
 	const char **_name);

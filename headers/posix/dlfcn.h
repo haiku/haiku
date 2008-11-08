@@ -14,6 +14,11 @@
 #define RTLD_LOCAL	0	/* symbols are not available for relocating any other object */
 #define RTLD_GLOBAL	2	/* all symbols are available */
 
+/* not-yet-POSIX extensions (dlsym() handles) */
+#define RTLD_DEFAULT	((void*)0)
+	/* find the symbol in the global scope */
+#define RTLD_NEXT		((void*)-1L)
+	/* find the next definition of the symbol */
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -23,31 +24,27 @@ static status_t sStatus;
 void *
 dlopen(char const *name, int mode)
 {
-// TODO: According to the standard multiple dlopen() invocations for the same
-// file will cause the object to be loaded once only. That is we should load
-// the object as a library, not an add-on.
-	status_t status;
+	void* handle;
+	image_id imageID = __gRuntimeLoader->load_library(name, mode, &handle);
 
-	if (name == NULL)
-		name = MAGIC_APP_NAME;
+	sStatus = imageID >= 0 ? B_OK : imageID;
 
-	status = __gRuntimeLoader->load_add_on(name, mode);
-	sStatus = status;
-
-	if (status < B_OK)
-		return NULL;
-
-	return (void *)status;
+	return imageID >= 0 ? handle : NULL;
 }
 
 
 void *
 dlsym(void *handle, char const *name)
 {
+	void* location;
 	status_t status;
-	void *location;
+	void* caller = NULL;
 
-	status = get_image_symbol((image_id)handle, name, B_SYMBOL_TYPE_ANY, &location);
+	if (handle == RTLD_NEXT)
+		caller = __arch_get_caller();
+
+	status = __gRuntimeLoader->get_library_symbol(handle, caller, name,
+		&location);
 	sStatus = status;
 
 	if (status < B_OK)
@@ -60,7 +57,7 @@ dlsym(void *handle, char const *name)
 int
 dlclose(void *handle)
 {
-	return unload_add_on((image_id)handle);
+	return __gRuntimeLoader->unload_library(handle);
 }
 
 
@@ -77,6 +74,8 @@ dlerror(void)
 int
 dladdr(void *addr, Dl_info *info)
 {
+// TODO: This can be implemented more efficiently in the runtime loader.
+// get_library_symbol() already has the code doing that.
 	char curSymName[NAME_MAX];
 	static char symName[NAME_MAX];
 	static char imageName[MAXPATHLEN];

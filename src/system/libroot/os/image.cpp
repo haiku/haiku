@@ -66,6 +66,9 @@ load_image(int32 argCount, const char **args, const char **environ)
 image_id
 load_add_on(char const *name)
 {
+	if (name == NULL)
+		return B_BAD_VALUE;
+
 	return __gRuntimeLoader->load_add_on(name, 0);
 }
 

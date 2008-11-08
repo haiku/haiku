@@ -240,8 +240,22 @@ open_executable(char *name, image_type type, const char *rpath,
 		memmove(name, paths, strlen(paths) + 1);
 	}
 
-	// first try rpath (DT_RPATH)
-	if (rpath) {
+	// let's evaluate the system path variables to find the container
+	paths = search_path_for_type(type);
+	if (paths) {
+		fd = search_executable_in_path_list(name, paths, strlen(paths),
+			programPath, compatibilitySubDir, buffer, sizeof(buffer));
+
+		// If not found and a compatibility sub directory has been
+		// specified, look again in the standard search paths.
+		if (fd == B_ENTRY_NOT_FOUND && compatibilitySubDir != NULL) {
+			fd = search_executable_in_path_list(name, paths, strlen(paths),
+				programPath, NULL, buffer, sizeof(buffer));
+		}
+	}
+
+	// try rpath (DT_RPATH), if not found yet
+	if (fd < 0 && rpath != NULL) {
 		// It consists of a colon-separated search path list. Optionally it
 		// follows a second search path list, separated from the first by a
 		// semicolon.
@@ -257,22 +271,6 @@ open_executable(char *name, image_type type, const char *rpath,
 		if (fd < 0) {
 			fd = search_executable_in_path_list(name, secondList,
 				strlen(secondList), programPath, NULL, buffer, sizeof(buffer));
-		}
-	}
-
-	// let's evaluate the system path variables to find the container
-	if (fd < 0) {
-		paths = search_path_for_type(type);
-		if (paths) {
-			fd = search_executable_in_path_list(name, paths, strlen(paths),
-				programPath, compatibilitySubDir, buffer, sizeof(buffer));
-
-			// If not found and a compatibility sub directory has been
-			// specified, look again in the standard search paths.
-			if (fd == B_ENTRY_NOT_FOUND && compatibilitySubDir != NULL) {
-				fd = search_executable_in_path_list(name, paths, strlen(paths),
-					programPath, NULL, buffer, sizeof(buffer));
-			}
 		}
 	}
 

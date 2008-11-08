@@ -16,14 +16,29 @@
 static image_id
 export_load_add_on(char const *name, uint32 flags)
 {
-	return load_library(name, flags, true);
+	void* handle;
+	return load_library(name, flags, true, &handle);
 }
 
 
 static status_t
 export_unload_add_on(image_id id)
 {
-	return unload_library(id, true);
+	return unload_library(NULL, id, true);
+}
+
+
+static image_id
+export_load_library(char const *name, uint32 flags, void **_handle)
+{
+	return load_library(name, flags, false, _handle);
+}
+
+
+static status_t
+export_unload_library(void* handle)
+{
+	return unload_library(handle, -1, false);
 }
 
 
@@ -31,7 +46,10 @@ struct rld_export gRuntimeLoader = {
 	// dynamic loading support API
 	export_load_add_on,
 	export_unload_add_on,
+	export_load_library,
+	export_unload_library,
 	get_symbol,
+	get_library_symbol,
 	get_nth_symbol,
 	test_executable,
 	get_next_image_dependency,

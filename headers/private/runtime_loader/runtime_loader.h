@@ -25,8 +25,12 @@ struct rld_export {
 	// runtime loader API export
 	image_id (*load_add_on)(char const *path, uint32 flags);
 	status_t (*unload_add_on)(image_id imageID);
+	image_id (*load_library)(char const *path, uint32 flags, void **_handle);
+	status_t (*unload_library)(void* handle);
 	status_t (*get_image_symbol)(image_id imageID, char const *symbolName,
 		int32 symbolType, void **_location);
+	status_t (*get_library_symbol)(void* handle, void* caller,
+		const char* symbolName, void **_location);
 	status_t (*get_nth_image_symbol)(image_id imageID, int32 num, char *symbolName,
 		int32 *nameLength, int32 *symbolType, void **_location);
 	status_t (*test_executable)(const char *path, char *interpreter);
@@ -100,10 +104,9 @@ typedef struct image_t {
 	uint32				num_needed;
 	struct image_t		**needed;
 
-	// For "root" images (the program, add-ons): Symbols are searched in the
-	// images in array order.
-	uint32				symbol_resolution_image_count;
-	struct image_t		**symbol_resolution_images;
+	struct Elf32_Sym*	(*find_undefined_symbol)(struct image_t* rootImage,
+							struct image_t* image, const char* name,
+							struct image_t** foundInImage);
 
 	// Singly-linked list of symbol patchers for symbols defined respectively
 	// referenced by this image.
@@ -123,7 +126,6 @@ typedef struct image_queue_t {
 // image_t::flags
 #define	IMAGE_FLAG_RTLD_MASK			0x03
 			// RTLD_{LAZY,NOW} | RTLD_{LOCAL,GLOBAL}
-#define	IMAGE_FLAG_R5_SYMBOL_RESOLUTION	0x04
 
 #define STRING(image, offset) ((char *)(&(image)->strtab[(offset)]))
 #define SYMNAME(image, sym) STRING(image, (sym)->st_name)

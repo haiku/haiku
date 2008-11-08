@@ -11,6 +11,7 @@
 #include "runtime_loader_private.h"
 
 #include <ctype.h>
+#include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,9 +50,14 @@
 #define RLD_PROGRAM_BASE 0x00200000
 	/* keep in sync with app ldscript */
 
+// a handle returned by load_library() (dlopen())
+#define RLD_GLOBAL_SCOPE	((void*)-2l)
+
 enum {
-	RFLAG_RW					= 0x0001,
-	RFLAG_ANON					= 0x0002,
+	// the lower two bits are reserved for RTLD_NOW and RTLD_GLOBAL
+
+	RFLAG_RW					= 0x0010,
+	RFLAG_ANON					= 0x0020,
 
 	RFLAG_TERMINATED			= 0x0200,
 	RFLAG_INITIALIZED			= 0x0400,
@@ -61,7 +67,8 @@ enum {
 	RFLAG_DEPENDENCIES_LOADED	= 0x4000,
 	RFLAG_REMAPPED				= 0x8000,
 
-	RFLAG_VISITED				= 0x10000
+	RFLAG_VISITED				= 0x10000,
+	RFLAG_USE_FOR_RESOLVING		= 0x20000
 		// temporarily set in the symbol resolution code
 };
 
@@ -501,7 +508,6 @@ delete_image_struct(image_t *image)
 	memset(image->needed, 0xa5, sizeof(image->needed[0]) * image->num_needed);
 #endif
 	free(image->needed);
-	free(image->symbol_resolution_images);
 
 	while (RuntimeLoaderSymbolPatcher* patcher
 			= image->defined_symbol_patchers) {
@@ -532,6 +538,52 @@ delete_image(image_t *image)
 		// registered in load_container()
 
 	delete_image_struct(image);
+}
+
+
+static void
+update_image_flags_recursively(image_t* image, uint32 flagsToSet,
+	uint32 flagsToClear)
+{
+	image_t* queue[sLoadedImageCount];
+	uint32 count = 0;
+	uint32 index = 0;
+	queue[count++] = image;
+	image->flags |= RFLAG_VISITED;
+
+	while (index < count) {
+		// pop next image
+		image = queue[index++];
+
+		// push dependencies
+		for (uint32 i = 0; i < image->num_needed; i++) {
+			image_t* needed = image->needed[i];
+			if ((needed->flags & RFLAG_VISITED) == 0) {
+				queue[count++] = needed;
+				needed->flags |= RFLAG_VISITED;
+			}
+		}
+	}
+
+	// update flags
+	for (uint32 i = 0; i < count; i++) {
+		queue[i]->flags = (queue[i]->flags | flagsToSet)
+			& ~(flagsToClear | RFLAG_VISITED);
+	}
+}
+
+
+static void
+set_image_flags_recursively(image_t* image, uint32 flags)
+{
+	update_image_flags_recursively(image, flags, 0);
+}
+
+
+static void
+clear_image_flags_recursively(image_t* image, uint32 flags)
+{
+	update_image_flags_recursively(image, 0, flags);
 }
 
 
@@ -1183,36 +1235,48 @@ find_symbol(image_t* image, char const* symbolName, int32 symbolType,
 }
 
 
-static struct Elf32_Sym*
-find_symbol_in_root_image_list(image_t* rootImage, const char* name,
-	image_t** foundInImage)
+static status_t
+find_symbol_breadth_first(image_t* image, const char* name, int32 type,
+	image_t** _foundInImage, void** _location)
 {
-	int32 count = rootImage->symbol_resolution_image_count;
-	image_t** images = rootImage->symbol_resolution_images;
-	for (int32 i = 0; i < count; i++) {
-		image_t* image = images[i];
-		if (image->dynamic_ptr) {
-			Elf32_Sym* symbol = find_symbol(image, name, B_SYMBOL_TYPE_ANY);
-			if (symbol) {
-				*foundInImage = image;
-				return symbol;
+	image_t* queue[sLoadedImageCount];
+	uint32 count = 0;
+	uint32 index = 0;
+	queue[count++] = image;
+	image->flags |= RFLAG_VISITED;
+
+	bool found = false;
+	while (index < count) {
+		// pop next image
+		image = queue[index++];
+
+		if (find_symbol(image, name, type, _location) == B_OK) {
+			found = true;
+			break;
+		}
+
+		// push needed images
+		for (uint32 i = 0; i < image->num_needed; i++) {
+			image_t* needed = image->needed[i];
+			if ((needed->flags & RFLAG_VISITED) == 0) {
+				queue[count++] = needed;
+				needed->flags |= RFLAG_VISITED;
 			}
 		}
 	}
 
-	return NULL;
+	// clear visited flags
+	for (uint32 i = 0; i < count; i++)
+		queue[i]->flags &= ~RFLAG_VISITED;
+
+	return found ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
 
 static struct Elf32_Sym*
-find_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
+find_undefined_symbol_beos(image_t* rootImage, image_t* image, const char* name,
 	image_t** foundInImage)
 {
-	// If not simulating BeOS style symbol resolution, undefined symbols are
-	// searched recursively starting from the root image.
-	if ((rootImage->flags & IMAGE_FLAG_R5_SYMBOL_RESOLUTION) == 0)
-		return find_symbol_in_root_image_list(rootImage, name, foundInImage);
-
 	// BeOS style symbol resolution: It is sufficient to check the direct
 	// dependencies. The linker would have complained, if the symbol wasn't
 	// there.
@@ -1228,6 +1292,48 @@ find_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
 	}
 
 	return NULL;
+}
+
+
+static struct Elf32_Sym*
+find_undefined_symbol_global(image_t* rootImage, image_t* image,
+	const char* name, image_t** foundInImage)
+{
+	// Global load order symbol resolution: All loaded images are searched for
+	// the symbol in the order they have been loaded. We skip add-on images and
+	// RTLD_LOCAL images though.
+	image_t* otherImage = sLoadedImages.head;
+	while (otherImage != NULL) {
+		if (otherImage == rootImage
+			|| otherImage->type != B_ADD_ON_IMAGE
+				&& (otherImage->flags
+					& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0) {
+			struct Elf32_Sym *symbol = find_symbol(otherImage, name,
+				B_SYMBOL_TYPE_ANY);
+			if (symbol) {
+				*foundInImage = otherImage;
+				return symbol;
+			}
+		}
+		otherImage = otherImage->next;
+	}
+
+	return NULL;
+}
+
+
+static struct Elf32_Sym*
+find_undefined_symbol_add_on(image_t* rootImage, image_t* image,
+	const char* name, image_t** foundInImage)
+{
+// TODO: How do we want to implement this one? Using global scope resolution
+// might be undesired as it is now, since libraries could refer to symbols in
+// the add-on, which would result in add-on symbols implicitely becoming used
+// outside of the add-on. So the options would be to use the global scope but
+// skip the add-on, or to do breadth-first resolution in the add-on dependency
+// scope, also skipping the add-on itself. BeOS style resolution is safe, too,
+// but we miss out features like undefined symbols and preloading.
+	return find_undefined_symbol_beos(rootImage, image, name, foundInImage);
 }
 
 
@@ -1289,8 +1395,8 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 				type = B_SYMBOL_TYPE_DATA;
 
 			// it's undefined, must be outside this image, try the other images
-			sharedSym = find_undefined_symbol(rootImage, image, symName,
-				&sharedImage);
+			sharedSym = rootImage->find_undefined_symbol(rootImage, image,
+				symName, &sharedImage);
 			void* location = NULL;
 
 			enum {
@@ -1447,7 +1553,8 @@ relocate_image(image_t *rootImage, image_t *image)
 
 
 static status_t
-load_container(char const *name, image_type type, const char *rpath, image_t **_image)
+load_container(char const *name, image_type type, const char *rpath,
+	image_t **_image)
 {
 	int32 pheaderSize, sheaderSize;
 	char path[PATH_MAX];
@@ -1593,7 +1700,7 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 	// unavailable)
 	if (image->gcc_version.major == 0
 		|| image->gcc_version.major == 2 && image->gcc_version.middle < 95) {
-		image->flags |= IMAGE_FLAG_R5_SYMBOL_RESOLUTION;
+		image->find_undefined_symbol = find_undefined_symbol_beos;
 	}
 
 	status = map_image(fd, path, image, type == B_APP_IMAGE);
@@ -1659,7 +1766,7 @@ find_dt_rpath(image_t *image)
 
 
 static status_t
-load_dependencies(image_t *image)
+load_immediate_dependencies(image_t *image)
 {
 	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
 	bool reportErrors = report_errors();
@@ -1748,6 +1855,20 @@ load_dependencies(image_t *image)
 }
 
 
+static status_t
+load_dependencies(image_t* image)
+{
+	for (image_t* otherImage = image; otherImage != NULL;
+			otherImage = otherImage->next) {
+		status_t status = load_immediate_dependencies(otherImage);
+		if (status != B_OK)
+			return status;
+	}
+
+	return B_OK;
+}
+
+
 static uint32
 topological_sort(image_t *image, uint32 slot, image_t **initList,
 	uint32 sortFlag)
@@ -1763,36 +1884,6 @@ topological_sort(image_t *image, uint32 slot, image_t **initList,
 
 	initList[slot] = image;
 	return slot + 1;
-}
-
-
-static uint32
-topological_sort_breadth_first(image_t* image, image_t** list, uint32 sortFlag)
-{
-	if ((image->flags & sortFlag) != 0)
-		return 0;
-
-	// We directly use the result list as queue for the breadth first search.
-	list[0] = image;
-	image->flags |= sortFlag;
-
-	int32 index = 0;
-	int32 count = 1;
-
-	while (index < count) {
-		image = list[index++];
-
-		for (uint32 i = 0; i < image->num_needed; i++) {
-			image_t* neededImage = image->needed[i];
-			if ((neededImage->flags & sortFlag) == 0) {
-				// dependency not yet visited -- add to queue
-				list[count++] = neededImage;
-				neededImage->flags |= sortFlag;
-			}
-		}
-	}
-
-	return count;
 }
 
 
@@ -1815,84 +1906,22 @@ get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
 }
 
 
-static ssize_t
-get_sorted_image_list_breadth_first(image_t* image, image_t*** _list,
-	uint32 sortFlag)
-{
-	image_t** list = (image_t**)malloc(sLoadedImageCount * sizeof(image_t*));
-	if (list == NULL) {
-		FATAL("memory shortage in get_sorted_image_list()");
-		*_list = NULL;
-		return B_NO_MEMORY;
-	}
-
-	memset(list, 0, sLoadedImageCount * sizeof(image_t *));
-
-	*_list = list;
-
-	return topological_sort_breadth_first(image, list, sortFlag);
-}
-
-
 static status_t
 relocate_dependencies(image_t *image)
 {
-	// build an array of images in the order we want to lookup symbols
-	image_t** lookupList;
-	ssize_t lookupCount = get_sorted_image_list_breadth_first(image,
-		&lookupList, RFLAG_VISITED);
-	if (lookupCount < 0)
-		return lookupCount;
-
-	// If the image is not the program image, add it and its dependencies, too.
-	if (sProgramImage != NULL && image != sProgramImage) {
-		lookupCount += topological_sort_breadth_first(sProgramImage,
-			lookupList + lookupCount, RFLAG_VISITED);
-	}
-
-	// If we have pre-loaded images, prepend them.
-	if (sPreloadedImageCount > 0) {
-		// Count the ones that have to be added -- normally all, but one never
-		// knows.
-		uint32 preloadedCount = 0;
-		for (uint32 i = 0; i < sPreloadedImageCount; i++) {
-			image_t* preloadedImage = sPreloadedImages[i];
-			if ((preloadedImage->flags & RFLAG_VISITED) == 0)
-				preloadedCount++;
-		}
-
-		// add them
-		if (preloadedCount > 0) {
-			memmove(lookupList + preloadedCount, lookupList,
-				lookupCount * sizeof(image_t*));
-			lookupCount += preloadedCount;
-
-			preloadedCount = 0;
-			for (uint32 i = 0; i < sPreloadedImageCount; i++) {
-				image_t* preloadedImage = sPreloadedImages[i];
-				if ((preloadedImage->flags & RFLAG_VISITED) == 0)
-					lookupList[preloadedCount++] = preloadedImage;
-			}
-		}
-	}
-
-	// clear the "visited" flag
-	for (int32 i = 0; i < lookupCount; i++)
-		lookupList[i]->flags &= ~RFLAG_VISITED;
-
-	image->symbol_resolution_images = lookupList;
-	image->symbol_resolution_image_count = lookupCount;
-
 	// get the images that still have to be relocated
 	image_t **list;
 	ssize_t count = get_sorted_image_list(image, &list, RFLAG_RELOCATED);
 	if (count < B_OK)
 		return count;
 
+	// relocate
 	for (ssize_t i = 0; i < count; i++) {
 		status_t status = relocate_image(image, list[i]);
-		if (status < B_OK)
+		if (status < B_OK) {
+			free(list);
 			return status;
+		}
 	}
 
 	free(list);
@@ -1959,12 +1988,10 @@ inject_runtime_loader_api(image_t* rootImage)
 	// We patch any exported __gRuntimeLoader symbols to point to our private
 	// API.
 	image_t* image;
-	Elf32_Sym* symbol = find_symbol_in_root_image_list(rootImage,
-		"__gRuntimeLoader", &image);
-
-	if (symbol != NULL) {
-		void** _export = (void**)(symbol->st_value + image->regions[0].delta);
-		*_export = &gRuntimeLoader;
+	void* _export;
+	if (find_symbol_breadth_first(rootImage, "__gRuntimeLoader",
+			B_SYMBOL_TYPE_DATA, &image, &_export) == B_OK) {
+		*(void**)_export = &gRuntimeLoader;
 	}
 }
 
@@ -2003,12 +2030,14 @@ preload_image(char const* path)
 		return status;
 	}
 
-	for (image_t* otherImage = sLoadedImages.head; otherImage != NULL;
-			otherImage = otherImage->next) {
-		status = load_dependencies(otherImage);
-		if (status < B_OK)
-			goto err;
-	}
+	if (image->find_undefined_symbol == NULL)
+		image->find_undefined_symbol = find_undefined_symbol_global;
+
+	status = load_dependencies(image);
+	if (status < B_OK)
+		goto err;
+
+	set_image_flags_recursively(image, RTLD_GLOBAL);
 
 	status = relocate_dependencies(image);
 	if (status < B_OK)
@@ -2105,11 +2134,17 @@ load_program(char const *path, void **_entry)
 	if (status < B_OK)
 		goto err;
 
-	for (image = sLoadedImages.head; image != NULL; image = image->next) {
-		status = load_dependencies(image);
-		if (status < B_OK)
-			goto err;
-	}
+	if (sProgramImage->find_undefined_symbol == NULL)
+		sProgramImage->find_undefined_symbol = find_undefined_symbol_global;
+
+	status = load_dependencies(sProgramImage);
+	if (status < B_OK)
+		goto err;
+
+	// Set RTLD_GLOBAL on all libraries, but clear it on the program image.
+	// This results in the desired symbol resolution for dlopen()ed libraries.
+	set_image_flags_recursively(sProgramImage, RTLD_GLOBAL);
+	sProgramImage->flags &= ~RTLD_GLOBAL;
 
 	status = relocate_dependencies(sProgramImage);
 	if (status < B_OK)
@@ -2122,14 +2157,8 @@ load_program(char const *path, void **_entry)
 
 	// Since the images are initialized now, we no longer should use our
 	// getenv(), but use the one from libroot.so
-	{
-		struct Elf32_Sym *symbol = find_symbol_in_root_image_list(sProgramImage,
-			"getenv", &image);
-
-		if (symbol != NULL)
-			gGetEnv = (char* (*)(const char*))
-				(symbol->st_value + image->regions[0].delta);
-	}
+	find_symbol_breadth_first(sProgramImage, "getenv", B_SYMBOL_TYPE_TEXT,
+		&image, (void**)&gGetEnv);
 
 	if (sProgramImage->entry_point == 0) {
 		status = B_NOT_AN_EXECUTABLE;
@@ -2169,18 +2198,14 @@ err:
 
 
 image_id
-load_library(char const *path, uint32 flags, bool addOn)
+load_library(char const *path, uint32 flags, bool addOn, void** _handle)
 {
 	image_t *image = NULL;
-	image_t *iter;
 	image_type type = (addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE);
 	status_t status;
 
-	if (path == NULL)
+	if (path == NULL && addOn)
 		return B_BAD_VALUE;
-
-	// ToDo: implement flags
-	(void)flags;
 
 	KTRACE("rld: load_library(\"%s\", 0x%lx, %d)", path, flags, addOn);
 
@@ -2190,12 +2215,23 @@ load_library(char const *path, uint32 flags, bool addOn)
 	// have we already loaded this library?
 	// Checking it at this stage saves loading its dependencies again
 	if (!addOn) {
+		// a NULL path is fine -- it means the global scope shall be opened
+		if (path == NULL) {
+			*_handle = RLD_GLOBAL_SCOPE;
+			rld_unlock();
+			return 0;
+		}
+
 		image = find_image(path, APP_OR_LIBRARY_TYPE);
+		if (image != NULL && (flags & RTLD_GLOBAL) != 0)
+			set_image_flags_recursively(image, RTLD_GLOBAL);
+
 		if (image) {
 			atomic_add(&image->ref_count, 1);
 			rld_unlock();
 			KTRACE("rld: load_library(\"%s\"): already loaded: %ld", path,
 				image->id);
+			*_handle = image;
 			return image->id;
 		}
 	}
@@ -2208,15 +2244,32 @@ load_library(char const *path, uint32 flags, bool addOn)
 		return status;
 	}
 
-	for (iter = sLoadedImages.head; iter; iter = iter->next) {
-		status = load_dependencies(iter);
-		if (status < B_OK)
-			goto err;
+	if (image->find_undefined_symbol == NULL) {
+		if (addOn)
+			image->find_undefined_symbol = find_undefined_symbol_add_on;
+		else
+			image->find_undefined_symbol = find_undefined_symbol_global;
 	}
+
+	status = load_dependencies(image);
+	if (status < B_OK)
+		goto err;
+
+	// If specified, set the RTLD_GLOBAL flag recursively on this image and all
+	// dependencies. If not specified, we temporarily set
+	// RFLAG_USE_FOR_RESOLVING so that the dependencies will correctly be used
+	// for undefined symbol resolution.
+	if ((flags & RTLD_GLOBAL) != 0)
+		set_image_flags_recursively(image, RTLD_GLOBAL);
+	else
+		set_image_flags_recursively(image, RFLAG_USE_FOR_RESOLVING);
 
 	status = relocate_dependencies(image);
 	if (status < B_OK)
 		goto err;
+
+	if ((flags & RTLD_GLOBAL) == 0)
+		clear_image_flags_recursively(image, RFLAG_USE_FOR_RESOLVING);
 
 	remap_images();
 	init_dependencies(image, true);
@@ -2225,6 +2278,7 @@ load_library(char const *path, uint32 flags, bool addOn)
 
 	KTRACE("rld: load_library(\"%s\") done: id: %ld", path, image->id);
 
+	*_handle = image;
 	return image->id;
 
 err:
@@ -2239,14 +2293,17 @@ err:
 
 
 status_t
-unload_library(image_id imageID, bool addOn)
+unload_library(void* handle, image_id imageID, bool addOn)
 {
 	status_t status = B_BAD_IMAGE_ID;
 	image_t *image;
 	image_type type = addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE;
 
-	if (imageID < B_OK)
+	if (handle == NULL && imageID < 0)
 		return B_BAD_IMAGE_ID;
+
+	if (handle == RLD_GLOBAL_SCOPE)
+		return B_OK;
 
 	rld_lock();
 		// for now, just do stupid simple global locking
@@ -2258,15 +2315,20 @@ unload_library(image_id imageID, bool addOn)
 
 	// we only check images that have been already initialized
 
-	for (image = sLoadedImages.head; image; image = image->next) {
-		if (image->id == imageID) {
-			// unload image
-			if (type == image->type) {
-				put_image(image);
-				status = B_OK;
-			} else
-				status = B_BAD_VALUE;
-			break;
+	if (handle != NULL) {
+		image = (image_t*)handle;
+		put_image(image);
+	} else {
+		for (image = sLoadedImages.head; image; image = image->next) {
+			if (image->id == imageID) {
+				// unload image
+				if (type == image->type) {
+					put_image(image);
+					status = B_OK;
+				} else
+					status = B_BAD_VALUE;
+				break;
+			}
 		}
 	}
 
@@ -2377,6 +2439,115 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
 		status = find_symbol(image, symbolName, symbolType, _location);
 	else
 		status = B_BAD_IMAGE_ID;
+
+	rld_unlock();
+	return status;
+}
+
+
+status_t
+get_library_symbol(void* handle, void* caller, const char* symbolName,
+	void **_location)
+{
+	status_t status = B_ENTRY_NOT_FOUND;
+
+	if (symbolName == NULL)
+		return B_BAD_VALUE;
+
+	rld_lock();
+		// for now, just do stupid simple global locking
+
+	if (handle == RTLD_DEFAULT || handle == RLD_GLOBAL_SCOPE) {
+		// look in the default scope
+		image_t* image;
+		Elf32_Sym* symbol = find_undefined_symbol_global(sProgramImage,
+			sProgramImage, symbolName, &image);
+		if (symbol != NULL) {
+			*_location = (void*)(symbol->st_value + image->regions[0].delta);
+			int32 symbolType = ELF32_ST_TYPE(symbol->st_info) == STT_FUNC
+				? B_SYMBOL_TYPE_TEXT : B_SYMBOL_TYPE_DATA;
+			patch_defined_symbol(image, symbolName, _location, &symbolType);
+			status = B_OK;
+		}
+	} else if (handle == RTLD_NEXT) {
+		// Look in the default scope, but also in the dependencies of the
+		// calling image. Return the next after the caller symbol.
+
+		// First of all, find the caller symbol and its image.
+		Elf32_Sym* callerSymbol = NULL;
+		image_t* callerImage = sLoadedImages.head;
+		for (; callerImage != NULL; callerImage = callerImage->next) {
+			elf_region_t& text = callerImage->regions[0];
+			if ((addr_t)caller < text.vmstart
+				|| (addr_t)caller >= text.vmstart + text.vmsize) {
+				continue;
+			}
+
+			// found the image -- now find the symbol
+			for (uint32 i = 0; i < callerImage->symhash[1]; i++) {
+				Elf32_Sym& symbol = callerImage->syms[i];
+				if ((ELF32_ST_TYPE(symbol.st_info) != STT_FUNC)
+					|| symbol.st_value == 0) {
+					continue;
+				}
+
+				addr_t address = symbol.st_value
+					+ callerImage->regions[0].delta;
+				if ((addr_t)caller >= address
+					&& (addr_t)caller < address + symbol.st_size) {
+					callerSymbol = &symbol;
+					break;
+				}
+			}
+
+			break;
+		}
+
+		if (callerSymbol != NULL) {
+			// found the caller -- now search the global scope until we find
+			// the next symbol
+			set_image_flags_recursively(callerImage, RFLAG_USE_FOR_RESOLVING);
+
+			image_t* image = sLoadedImages.head;
+			for (; image != NULL; image = image->next) {
+				if (image != callerImage
+					&& (image->type == B_ADD_ON_IMAGE
+						|| (image->flags
+							& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) == 0)) {
+					continue;
+				}
+
+				struct Elf32_Sym *symbol = find_symbol(image, symbolName,
+					B_SYMBOL_TYPE_TEXT);
+				if (symbol == NULL)
+					continue;
+
+				if (callerSymbol == NULL) {
+					// already skipped the caller symbol -- so this is
+					// the one we're looking for
+					*_location = (void*)(symbol->st_value
+						+ image->regions[0].delta);
+					int32 symbolType = B_SYMBOL_TYPE_TEXT;
+					patch_defined_symbol(image, symbolName, _location,
+						&symbolType);
+					status = B_OK;
+					break;
+				}
+				if (symbol == callerSymbol) {
+					// found the caller symbol
+					callerSymbol = NULL;
+				}
+			}
+
+			clear_image_flags_recursively(callerImage, RFLAG_USE_FOR_RESOLVING);
+		}
+
+	} else {
+		// breadth-first search in the given image and its dependencies
+		image_t* inImage;
+		status = find_symbol_breadth_first((image_t*)handle, symbolName,
+			B_SYMBOL_TYPE_ANY, &inImage, _location);
+	}
 
 	rld_unlock();
 	return status;
