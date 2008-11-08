@@ -493,7 +493,7 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package WonderBrush available for gcc4" ;
 	} else {
-		local baseURL = ttp://www.yellowbites.com/downloads ;
+		local baseURL = http://www.yellowbites.com/downloads ;
 		InstallOptionalHaikuImagePackage WonderBrush-2.1.2-Haiku
 			: $(baseURL)/WonderBrush-2.1.2-gcc2-x86-Haiku.zip
 			: apps
