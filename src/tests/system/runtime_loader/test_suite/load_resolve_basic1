@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# program
+# <- liba.so
+#
+# Expected: Undefined symbol in liba.so resolves to symbol in program.
+
+
+. test_setup
+
+
+# create liba.so
+cat > liba.c << EOI
+extern int b();
+int a() { return b(); }
+EOI
+
+# build
+gcc -shared -o liba.so liba.c
+
+
+# create program
+cat > program.c << EOI
+extern int a();
+
+int
+b()
+{
+	return 1;
+}
+
+int
+main()
+{
+	return a();
+}
+EOI
+
+# build
+gcc -o program program.c ./liba.so
+
+# run
+test_run_ok ./program 1
+

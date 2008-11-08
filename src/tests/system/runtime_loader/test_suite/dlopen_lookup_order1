@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# program
+#
+# dlopen():
+# liba.so
+# libb.so
+# <- libb_dependency.so
+#
+# Expected: Global lookup: symbol in liba.so superseeds symbol in
+# libb_dependency.so.
+
+
+. test_setup
+
+
+# create liba.so
+cat > liba.c << EOI
+int a() { return 1; }
+EOI
+
+# build
+gcc -shared -o liba.so liba.c
+
+
+# create libb_dependency.so
+cat > libb_dependency.c << EOI
+int a() { return 2; }
+EOI
+
+# build
+gcc -shared -o libb_dependency.so libb_dependency.c
+
+
+# create libb.so
+cat > libb.c << EOI
+int b() { return 1; }
+EOI
+
+# build
+gcc -shared -o libb.so libb.c ./libb_dependency.so
+
+
+# create program
+cat > program.c << EOI
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+int
+main()
+{
+	void* liba;
+	void* libb;
+	void* self;
+	int (*a)();
+
+	liba = dlopen("./liba.so", RTLD_NOW | RTLD_GLOBAL);
+	if (liba == NULL) {
+		fprintf(stderr, "Error opening liba.so: %s\n", dlerror());
+		exit(117);
+	}
+
+	libb = dlopen("./libb.so", RTLD_NOW | RTLD_GLOBAL);
+	if (libb == NULL) {
+		fprintf(stderr, "Error opening libb.so: %s\n", dlerror());
+		exit(117);
+	}
+
+	self = dlopen(NULL, RTLD_NOW | RTLD_GLOBAL);
+	if (self == NULL) {
+		fprintf(stderr, "Error opening self: %s\n", dlerror());
+		exit(117);
+	}
+
+	a = (int (*)())dlsym(self, "a");
+	if (a == NULL) {
+		fprintf(stderr, "Error getting symbol a: %s\n", dlerror());
+		exit(116);
+	}
+
+	return a();
+}
+EOI
+
+# build
+gcc -o program program.c $libdl -Xlinker -rpath -Xlinker .
+
+# run
+test_run_ok ./program 1
+

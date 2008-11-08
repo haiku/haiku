@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# program
+# <- liba.so
+# <- libb.so
+#    <- libb_dependency.so
+#
+# Expected: Undefined symbol in program resolves to symbol in liba.so,
+# not to symbol in libb_dependency.so.
+
+
+. test_setup
+
+
+# create liba.so
+cat > liba.c << EOI
+int a() { return 1; }
+EOI
+
+# build
+gcc -shared -o liba.so liba.c
+
+
+# create libb_dependency.so
+cat > libb_dependency.c << EOI
+int a() { return 2; }
+EOI
+
+# build
+gcc -shared -o libb_dependency.so libb_dependency.c
+
+
+# create libb.so
+cat > libb.c << EOI
+int b() { return 1; }
+EOI
+
+# build
+gcc -shared -o libb.so libb.c ./libb_dependency.so
+
+
+# create program
+cat > program.c << EOI
+extern int a();
+int
+main()
+{
+	return a();
+}
+EOI
+
+# build
+gcc -o program program.c ./liba.so ./libb.so -Xlinker -rpath -Xlinker .
+
+# run
+test_run_ok ./program 1
+

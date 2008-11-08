@@ -1,0 +1,32 @@
+
+os=$(uname)
+
+case $os in
+	FreeBSD)	libdl=;;
+	Linux)		libdl=-ldl;;
+	Haiku)		libdl=;;
+	*)			echo "Unsupported OS: $os"; exit 1;;
+esac
+
+testdir=${testdir-testdir}/$(basename $0)
+
+rm -rf $testdir
+mkdir -p $testdir
+cd $testdir
+
+# test_run_ok <program> <expected return value>
+test_run_ok()
+{
+	# exists?
+	if [ ! -f $1 ]; then
+		exit 1
+	fi
+
+	# run
+	$1
+	retval=$?
+	if [ $retval != $2 ]; then
+		echo "test_run_ok: $1: return value: $retval, expected: $2"
+		exit 1
+	fi
+}

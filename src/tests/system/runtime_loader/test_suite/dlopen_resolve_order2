@@ -1,0 +1,87 @@
+#!/bin/sh
+
+# program
+#
+# dlopen():
+# liba.so
+# <- libb.so
+#    <- libb_dependency.so
+# <- libd.so
+#
+# Expected: Undefined symbol in liba.so resolves to symbol in
+# libd.so, not to symbol in libb_dependency.so.
+
+
+. test_setup
+
+
+# create libb_dependency.so
+cat > libb_dependency.c << EOI
+int c() { return 1; }
+EOI
+
+# build
+gcc -shared -o libb_dependency.so libb_dependency.c
+
+
+# create libb.so
+cat > libb.c << EOI
+int b() { return 1; }
+EOI
+
+# build
+gcc -shared -o libb.so libb.c ./libb_dependency.so
+
+
+# create libd.so
+cat > libd.c << EOI
+int c() { return 2; }
+EOI
+
+# build
+gcc -shared -o libd.so libd.c
+
+
+# create liba.so
+cat > liba.c << EOI
+extern int c();
+int a() { return c(); }
+EOI
+
+# build
+gcc -shared -o liba.so liba.c ./libb.so ./libd.so
+
+
+# create program
+cat > program.c << EOI
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+int
+main()
+{
+	void* liba;
+	int (*a)();
+
+	liba = dlopen("./liba.so", RTLD_NOW | RTLD_GLOBAL);
+	if (liba == NULL) {
+		fprintf(stderr, "Error opening liba.so: %s\n", dlerror());
+		exit(117);
+	}
+
+	a = (int (*)())dlsym(liba, "a");
+	if (a == NULL) {
+		fprintf(stderr, "Error getting symbol a: %s\n", dlerror());
+		exit(116);
+	}
+
+	return a();
+}
+EOI
+
+# build
+gcc -o program program.c $libdl -Xlinker -rpath -Xlinker .
+
+# run
+test_run_ok ./program 2
+

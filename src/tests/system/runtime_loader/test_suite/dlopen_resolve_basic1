@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# program
+#
+# dlopen():
+# liba.so
+#
+# Expected: Undefined symbol in liba.so might resolve to symbol in program, but
+# the program image is ignored, so dlopen() on liba.so fails.
+
+
+. test_setup
+
+
+# create liba.so
+cat > liba.c << EOI
+extern int b();
+int a() { return b(); }
+EOI
+
+# build
+gcc -shared -o liba.so liba.c
+
+
+# create program
+cat > program.c << EOI
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int b() { return 1; }
+
+int
+main()
+{
+	void* liba;
+	int (*a)();
+
+	liba = dlopen("./liba.so", RTLD_NOW | RTLD_GLOBAL);
+	if (liba == NULL) {
+		/* Fails expectedly. */
+		/* fprintf(stderr, "Error opening liba.so: %s\n", dlerror()); */
+		exit(117);
+	}
+
+	a = (int (*)())dlsym(liba, "a");
+	if (a == NULL) {
+		fprintf(stderr, "Error getting symbol a: %s\n", dlerror());
+		exit(116);
+	}
+
+	return a();
+}
+EOI
+
+# build
+gcc -o program program.c $libdl -Xlinker -rpath -Xlinker .
+
+# run
+test_run_ok ./program 117
