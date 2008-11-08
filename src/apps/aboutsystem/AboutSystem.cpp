@@ -559,6 +559,21 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert("\nCopyrights\n\n");
 
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert("[Click a license name to read the respective "
+		"license.]\n\n");
+
+	// Haiku license
+	fCreditsView->Insert("The code that is unique to Haiku, especially the "
+		"kernel and all code that applications may link against, is "
+		"distributed under the terms of the ");
+	fCreditsView->InsertHyperText("MIT license",
+		new OpenFileAction("/etc/licenses/MIT"));
+	fCreditsView->Insert(". Some system libraries contain third party code "
+		"distributed under the LGPL license. You can find the copyrights "
+		"to third party code below.\n\n");
+
+
 	// GNU copyrights
 	AddCopyrightEntry("The GNU Project",
 		"Contains software from the GNU Project, "
