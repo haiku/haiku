@@ -189,7 +189,8 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 		status_t *error, bool debug_enable)
 	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
 		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
-			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
+			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
+		B_CURRENT_WORKSPACE)
 {
 	CALLED();
 	uint32 attributes = 0;
@@ -206,7 +207,8 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 		uint32 attributes, status_t *error)
 	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
 		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
-			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
+			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
+		B_CURRENT_WORKSPACE)
 {
 	CALLED();
 	status_t status = _InitData(space, attributes);
@@ -341,9 +343,12 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 
 			if (fAddonImage >= 0) {
 				set_indexed_colors setIndexedColors =
-					(set_indexed_colors)fGetAccelerantHook(B_SET_INDEXED_COLORS, NULL);
-				if (setIndexedColors != NULL)
-					setIndexedColors(lastIndex - firstIndex + 1, firstIndex, colors, 0);
+					(set_indexed_colors)fGetAccelerantHook(B_SET_INDEXED_COLORS,
+						NULL);
+				if (setIndexedColors != NULL) {
+					setIndexedColors(lastIndex - firstIndex + 1, firstIndex,
+						colors, 0);
+				}
 			}
 
 			// TODO: Tell the app_server about our changes
@@ -404,7 +409,8 @@ status_t
 BWindowScreen::MoveDisplayArea(int32 x, int32 y)
 {
 	CALLED();
-	move_display_area moveDisplayArea = (move_display_area)fGetAccelerantHook(B_MOVE_DISPLAY, NULL);
+	move_display_area moveDisplayArea
+		= (move_display_area)fGetAccelerantHook(B_MOVE_DISPLAY, NULL);
 	if (moveDisplayArea && moveDisplayArea((int16)x, (int16)y) == B_OK) {
 		fFrameBufferInfo.display_x = x;
 		fFrameBufferInfo.display_y = y;
@@ -453,22 +459,28 @@ BWindowScreen::CardHookAt(int32 index)
 
 	switch (index) {
 		case 5: // 8 bit fill rect
-			hook = (graphics_card_hook)draw_rect_8;
+			if (sFillRectHook)
+				hook = (graphics_card_hook)draw_rect_8;
 			break;
 		case 6: // 32 bit fill rect
-			hook = (graphics_card_hook)draw_rect_32;
+			if (sFillRectHook)
+				hook = (graphics_card_hook)draw_rect_32;
 			break;
 		case 7: // screen to screen blit
-			hook = (graphics_card_hook)blit;
+			if (sBlitRectHook)
+				hook = (graphics_card_hook)blit;
 			break;
 		case 8: // screen to screen scaled filtered blit
-			hook = (graphics_card_hook)scaled_filtered_blit;
+			if (sScaledFilteredBlitHook)
+				hook = (graphics_card_hook)scaled_filtered_blit;
 			break;
 		case 10: // sync aka wait for graphics card idle
-			hook = (graphics_card_hook)card_sync;
+			if (sWaitIdleHook)
+				hook = (graphics_card_hook)card_sync;
 			break;
 		case 13: // 16 bit fill rect
-			hook = (graphics_card_hook)draw_rect_16;
+			if (sFillRectHook)
+				hook = (graphics_card_hook)draw_rect_16;
 			break;
 		default:
 			break;
