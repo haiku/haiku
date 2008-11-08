@@ -1,0 +1,126 @@
+#!/bin/sh
+
+# program
+#
+# dlopen():
+# libe.so
+# liba.so
+# <- libb.so
+#    <- libd.so
+#
+# Expected: dlsym(RTLD_NEXT) finds symbol in order libe.so, liba.so, libb.so,
+# libd.so
+
+
+. test_setup
+
+
+# create libd.so
+cat > libd.c << EOI
+int a() { return 1; }
+EOI
+
+# build
+gcc -shared -o libd.so libd.c
+
+
+# create libb.so
+cat > libb.c << EOI
+#define __USE_GNU
+#include <dlfcn.h>
+int
+a()
+{
+	int (*nextA)();
+	*(void**)&nextA = dlsym(RTLD_NEXT, "a");
+	return (nextA != 0 ? nextA() : 0) + 2;
+}
+EOI
+
+# build
+gcc -shared -o libb.so libb.c -D_GNU_SOURCE ./libd.so $libdl
+
+
+# create liba.so
+cat > liba.c << EOI
+#include <dlfcn.h>
+int
+a()
+{
+	int (*nextA)();
+	*(void**)&nextA = dlsym(RTLD_NEXT, "a");
+	return (nextA != 0 ? nextA() : 0) + 4;
+}
+EOI
+
+# build
+gcc -shared -o liba.so liba.c -D_GNU_SOURCE ./libb.so $libdl
+
+
+# create libe.so
+cat > libe.c << EOI
+#include <dlfcn.h>
+int
+a()
+{
+	int (*nextA)();
+	*(void**)&nextA = dlsym(RTLD_NEXT, "a");
+	return (nextA != 0 ? nextA() : 0) + 8;
+}
+EOI
+
+# build
+gcc -shared -o libe.so libe.c -D_GNU_SOURCE $libdl
+
+
+# create program
+cat > program.c << EOI
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int
+a()
+{
+	int (*nextA)();
+	*(void**)&nextA = dlsym(RTLD_NEXT, "a");
+	return (nextA != 0 ? nextA() : 0) + 16;
+}
+
+int
+main()
+{
+	void* liba;
+	void* libe;
+	void* self;
+//	int (*a)();
+
+	libe = dlopen("./libe.so", RTLD_NOW | RTLD_GLOBAL);
+	if (libe == NULL) {
+		fprintf(stderr, "Error opening libe.so: %s\n", dlerror());
+		exit(117);
+	}
+
+	liba = dlopen("./liba.so", RTLD_NOW | RTLD_GLOBAL);
+	if (liba == NULL) {
+		fprintf(stderr, "Error opening liba.so: %s\n", dlerror());
+		exit(117);
+	}
+
+/*
+	a = (int (*)())dlsym(libe, "a");
+	if (a == NULL) {
+		fprintf(stderr, "Error getting symbol a: %s\n", dlerror());
+		exit(116);
+	}
+*/
+
+	return a();
+}
+EOI
+
+# build
+gcc -o program program.c -D_GNU_SOURCE $libdl -Xlinker -rpath -Xlinker .
+
+# run
+test_run_ok ./program 31

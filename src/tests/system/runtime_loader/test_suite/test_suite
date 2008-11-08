@@ -2,6 +2,7 @@
 
 for test in \
 	load_resolve_basic1		\
+	load_lookup_next1		\
 	load_resolve_order1		\
 	load_resolve_order2		\
 	load_resolve_order3		\
@@ -9,6 +10,7 @@ for test in \
 	dlopen_resolve_basic1	\
 	dlopen_resolve_basic2	\
 	dlopen_resolve_basic3	\
+	dlopen_lookup_next1		\
 	dlopen_lookup_order1	\
 	dlopen_lookup_order2	\
 	dlopen_lookup_order3	\
