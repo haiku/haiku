@@ -43,10 +43,10 @@ public:
 			void			DrawRadialFocus(BRect update);
 			void			DrawDiamond(BRect update);
 			void			DrawConic(BRect update);
-			void			SetType(gradient_type type);
+			void			SetType(BGradient::gradient_type type);
 	
 private:
-			gradient_type	fType;
+			BGradient::gradient_type fType;
 };
 
 
@@ -134,19 +134,19 @@ GradientsWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case MSG_LINEAR:
-			fGradientsView->SetType(B_GRADIENT_LINEAR);
+			fGradientsView->SetType(BGradient::TYPE_LINEAR);
 			break;
 		case MSG_RADIAL:
-			fGradientsView->SetType(B_GRADIENT_RADIAL);
+			fGradientsView->SetType(BGradient::TYPE_RADIAL);
 			break;
 		case MSG_RADIAL_FOCUS:
-			fGradientsView->SetType(B_GRADIENT_RADIAL_FOCUS);
+			fGradientsView->SetType(BGradient::TYPE_RADIAL_FOCUS);
 			break;
 		case MSG_DIAMOND:
-			fGradientsView->SetType(B_GRADIENT_DIAMOND);
+			fGradientsView->SetType(BGradient::TYPE_DIAMOND);
 			break;
 		case MSG_CONIC:
-			fGradientsView->SetType(B_GRADIENT_CONIC);
+			fGradientsView->SetType(BGradient::TYPE_CONIC);
 			break;
 		default:
 			BWindow::MessageReceived(msg);
@@ -160,7 +160,7 @@ GradientsWindow::MessageReceived(BMessage *msg)
 
 GradientsView::GradientsView(const BRect &rect)
 	: BView(rect, "gradientsview", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED),
-	fType(B_GRADIENT_LINEAR)
+	fType(BGradient::TYPE_LINEAR)
 {
 }
 
@@ -174,27 +174,27 @@ void
 GradientsView::Draw(BRect update)
 {
 	switch (fType) {
-		case B_GRADIENT_LINEAR: {
+		case BGradient::TYPE_LINEAR: {
 			DrawLinear(update);
 			break;
 		}
-		case B_GRADIENT_RADIAL: {
+		case BGradient::TYPE_RADIAL: {
 			DrawRadial(update);
 			break;
 		}
-		case B_GRADIENT_RADIAL_FOCUS: {
+		case BGradient::TYPE_RADIAL_FOCUS: {
 			DrawRadialFocus(update);
 			break;
 		}
-		case B_GRADIENT_DIAMOND: {
+		case BGradient::TYPE_DIAMOND: {
 			DrawDiamond(update);
 			break;
 		}
-		case B_GRADIENT_CONIC: {
+		case BGradient::TYPE_CONIC: {
 			DrawConic(update);
 			break;
 		}
-		case B_GRADIENT_NONE:
+		case BGradient::TYPE_NONE:
 		default: {
 			break;
 		}
@@ -426,7 +426,7 @@ GradientsView::DrawConic(BRect update)
 
 
 void
-GradientsView::SetType(gradient_type type)
+GradientsView::SetType(BGradient::gradient_type type)
 {
 	fType = type;
 	Invalidate();

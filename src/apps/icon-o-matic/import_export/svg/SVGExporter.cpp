@@ -408,7 +408,7 @@ SVGExporter::_ExportGradient(const Gradient* gradient, BPositionIO* stream)
 
 	// write stop tags
 	char color[16];
-	for (int32 i = 0; color_step* stop = gradient->ColorAt(i); i++) {
+	for (int32 i = 0; BGradient::color_step* stop = gradient->ColorAt(i); i++) {
 
 		sprintf(color, "%.2x%.2x%.2x", stop->color.red,
 									   stop->color.green,

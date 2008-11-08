@@ -19,7 +19,7 @@ BGradientRadialFocus::BGradientRadialFocus()
 	fData.radial_focus.fx = 0.0f;
 	fData.radial_focus.fy = 0.0f;
 	fData.radial_focus.radius = 0.0f;
-	fType = B_GRADIENT_RADIAL_FOCUS;
+	fType = TYPE_RADIAL_FOCUS;
 }
 
 
@@ -32,7 +32,7 @@ BGradientRadialFocus::BGradientRadialFocus(const BPoint& center, float radius,
 	fData.radial_focus.fx = focal.x;
 	fData.radial_focus.fy = focal.y;
 	fData.radial_focus.radius = radius;
-	fType = B_GRADIENT_RADIAL_FOCUS;
+	fType = TYPE_RADIAL_FOCUS;
 }
 
 
@@ -45,7 +45,7 @@ BGradientRadialFocus::BGradientRadialFocus(float cx, float cy, float radius,
 	fData.radial_focus.fx = fx;
 	fData.radial_focus.fy = fy;
 	fData.radial_focus.radius = radius;
-	fType = B_GRADIENT_RADIAL_FOCUS;
+	fType = TYPE_RADIAL_FOCUS;
 }
 
 

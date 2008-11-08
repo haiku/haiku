@@ -17,7 +17,7 @@ BGradientRadial::BGradientRadial()
 	fData.radial.cx = 0.0f;
 	fData.radial.cy = 0.0f;
 	fData.radial.radius = 0.0f;
-	fType = B_GRADIENT_RADIAL;
+	fType = TYPE_RADIAL;
 }
 
 
@@ -27,7 +27,7 @@ BGradientRadial::BGradientRadial(const BPoint& center, float radius)
 	fData.radial.cx = center.x;
 	fData.radial.cy = center.y;
 	fData.radial.radius = radius;
-	fType = B_GRADIENT_RADIAL;
+	fType = TYPE_RADIAL;
 }
 
 
@@ -37,7 +37,7 @@ BGradientRadial::BGradientRadial(float cx, float cy, float radius)
 	fData.radial.cx = cx;
 	fData.radial.cy = cy;
 	fData.radial.radius = radius;
-	fType = B_GRADIENT_RADIAL;
+	fType = TYPE_RADIAL;
 }
 
 

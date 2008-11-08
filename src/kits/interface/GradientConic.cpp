@@ -17,7 +17,7 @@ BGradientConic::BGradientConic()
 	fData.conic.cx = 0.0f;
 	fData.conic.cy = 0.0f;
 	fData.conic.angle = 0.0f;
-	fType = B_GRADIENT_CONIC;
+	fType = TYPE_CONIC;
 }
 
 
@@ -27,7 +27,7 @@ BGradientConic::BGradientConic(const BPoint& center, float angle)
 	fData.conic.cx = center.x;
 	fData.conic.cy = center.y;
 	fData.conic.angle = angle;
-	fType = B_GRADIENT_CONIC;
+	fType = TYPE_CONIC;
 }
 
 
@@ -37,7 +37,7 @@ BGradientConic::BGradientConic(float cx, float cy, float angle)
 	fData.conic.cx = cx;
 	fData.conic.cy = cy;
 	fData.conic.angle = angle;
-	fType = B_GRADIENT_CONIC;
+	fType = TYPE_CONIC;
 }
 
 

@@ -18,7 +18,7 @@ BGradientLinear::BGradientLinear()
 	fData.linear.y1 = 0.0f;
 	fData.linear.x2 = 0.0f;
 	fData.linear.y2 = 0.0f;
-	fType = B_GRADIENT_LINEAR;
+	fType = TYPE_LINEAR;
 }
 
 
@@ -29,7 +29,7 @@ BGradientLinear::BGradientLinear(const BPoint& start, const BPoint& end)
 	fData.linear.y1 = start.y;
 	fData.linear.x2 = end.x;
 	fData.linear.y2 = end.y;
-	fType = B_GRADIENT_LINEAR;
+	fType = TYPE_LINEAR;
 }
 
 
@@ -40,7 +40,7 @@ BGradientLinear::BGradientLinear(float x1, float y1, float x2, float y2)
 	fData.linear.y1 = y1;
 	fData.linear.x2 = x2;
 	fData.linear.y2 = y2;
-	fType = B_GRADIENT_LINEAR;
+	fType = TYPE_LINEAR;
 }
 
 

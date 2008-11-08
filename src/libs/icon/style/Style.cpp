@@ -169,7 +169,7 @@ Style::HasTransparency() const
 	if (fGradient) {
 		int32 count = fGradient->CountColors();
 		for (int32 i = 0; i < count; i++) {
-			color_step* step = fGradient->ColorAtFast(i);
+			BGradient::color_step* step = fGradient->ColorAtFast(i);
 			if (step->color.alpha < 255)
 				return true;
 		}

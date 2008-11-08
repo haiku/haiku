@@ -2521,37 +2521,37 @@ Painter::_FillPathGradient(VertexSource& path, const BGradient& gradient) const
 	GTRACE("Painter::_FillPathGradient\n");
 	
 	switch(gradient.Type()) {
-		case B_GRADIENT_LINEAR: {
-			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_LINEAR\n"));
+		case BGradient::TYPE_LINEAR: {
+			GTRACE(("Painter::_FillPathGradient> type == TYPE_LINEAR\n"));
 			_FillPathGradientLinear(path, *((const BGradientLinear*) &gradient));
 			break;
 		}
-		case B_GRADIENT_RADIAL: {
-			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_RADIAL\n"));
+		case BGradient::TYPE_RADIAL: {
+			GTRACE(("Painter::_FillPathGradient> type == TYPE_RADIAL\n"));
 			_FillPathGradientRadial(path,
 				*((const BGradientRadial*) &gradient));
 			break;
 		}
-		case B_GRADIENT_RADIAL_FOCUS: {
-			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_RADIAL_FOCUS\n"));
+		case BGradient::TYPE_RADIAL_FOCUS: {
+			GTRACE(("Painter::_FillPathGradient> type == TYPE_RADIAL_FOCUS\n"));
 			_FillPathGradientRadialFocus(path,
 				*((const BGradientRadialFocus*) &gradient));
 			break;
 		}
-		case B_GRADIENT_DIAMOND: {
-			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_DIAMOND\n"));
+		case BGradient::TYPE_DIAMOND: {
+			GTRACE(("Painter::_FillPathGradient> type == TYPE_DIAMOND\n"));
 			_FillPathGradientDiamond(path,
 				*((const BGradientDiamond*) &gradient));
 			break;
 		}
-		case B_GRADIENT_CONIC: {
-			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_CONIC\n"));
+		case BGradient::TYPE_CONIC: {
+			GTRACE(("Painter::_FillPathGradient> type == TYPE_CONIC\n"));
 			_FillPathGradientConic(path,
 				*((const BGradientConic*) &gradient));
 			break;
 		}
-		case B_GRADIENT_NONE: {
-			GTRACE(("Painter::_FillPathGradient> type == B_GRADIENT_NONE\n"));
+		case BGradient::TYPE_NONE: {
+			GTRACE(("Painter::_FillPathGradient> type == TYPE_NONE\n"));
 			break;
 		}
 	}
@@ -2565,8 +2565,8 @@ void
 Painter::_MakeGradient(Array& array, const BGradient& gradient) const
 {
 	for (int i = 0; i < gradient.CountColors() - 1; i++) {
-		color_step* from = gradient.ColorAtFast(i);
-		color_step* to = gradient.ColorAtFast(i + 1);
+		BGradient::color_step* from = gradient.ColorAtFast(i);
+		BGradient::color_step* to = gradient.ColorAtFast(i + 1);
 		agg::rgba8 fromColor(from->color.red, from->color.green,
 							 from->color.blue, from->color.alpha);
 		agg::rgba8 toColor(to->color.red, to->color.green,
@@ -2577,8 +2577,9 @@ Painter::_MakeGradient(Array& array, const BGradient& gradient) const
 			   toColor.r, toColor.g, toColor.b, to->offset);
 		float dist = to->offset - from->offset;
 		GTRACE("Painter::_MakeGradient> dist = %f\n", dist);
+		// TODO: Review this... offset should better be on [0..1]
 		if (dist > 0) {
-			for (int j = from->offset; j <= to->offset; j++) {
+			for (int j = (int)from->offset; j <= (int)to->offset; j++) {
 				float f = (float)(to->offset - j) / (float)(dist + 1);
 				array[j] = toColor.gradient(fromColor, f);
 				GTRACE("Painter::_MakeGradient> array[%d](%d, %d, %d)\n",
@@ -2652,7 +2653,8 @@ Painter::_FillPathGradientRadial(VertexSource& path,
 	GTRACE("Painter::_FillPathGradientRadial\n");
 	
 	BPoint center = radial.Center();
-	float radius = radial.Radius();
+// TODO: finish this
+//	float radius = radial.Radius();
 	
 	typedef agg::span_interpolator_linear<> interpolator_type;
 	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
@@ -2697,8 +2699,9 @@ Painter::_FillPathGradientRadialFocus(VertexSource& path,
 	GTRACE("Painter::_FillPathGradientRadialFocus\n");
 	
 	BPoint center = focus.Center();
-	BPoint focal = focus.Focal();
-	float radius = focus.Radius();
+// TODO: finish this.
+//	BPoint focal = focus.Focal();
+//	float radius = focus.Radius();
 	
 	typedef agg::span_interpolator_linear<> interpolator_type;
 	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;

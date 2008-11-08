@@ -815,7 +815,7 @@ void
 View::ConvertToScreenForDrawing(BGradient* gradient) const
 {
 	switch(gradient->Type()) {
-		case B_GRADIENT_LINEAR: {
+		case BGradient::TYPE_LINEAR: {
 			BGradientLinear* linear = (BGradientLinear*) gradient;
 			BPoint start = linear->Start();
 			BPoint end = linear->End();
@@ -828,7 +828,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			linear->SortColorStepsByOffset();
 			break;
 		}
-		case B_GRADIENT_RADIAL: {
+		case BGradient::TYPE_RADIAL: {
 			BGradientRadial* radial = (BGradientRadial*) gradient;
 			BPoint center = radial->Center();
 			fDrawState->Transform(&center);
@@ -837,7 +837,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			radial->SortColorStepsByOffset();
 			break;
 		}
-		case B_GRADIENT_RADIAL_FOCUS: {
+		case BGradient::TYPE_RADIAL_FOCUS: {
 			BGradientRadialFocus* radialFocus = (BGradientRadialFocus*) gradient;
 			BPoint center = radialFocus->Center();
 			BPoint focal = radialFocus->Focal();
@@ -850,7 +850,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			radialFocus->SortColorStepsByOffset();
 			break;
 		}
-		case B_GRADIENT_DIAMOND: {
+		case BGradient::TYPE_DIAMOND: {
 			BGradientDiamond* diamond = (BGradientDiamond*) gradient;
 			BPoint center = diamond->Center();
 			fDrawState->Transform(&center);
@@ -859,7 +859,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			diamond->SortColorStepsByOffset();
 			break;
 		}
-		case B_GRADIENT_CONIC: {
+		case BGradient::TYPE_CONIC: {
 			BGradientConic* conic = (BGradientConic*) gradient;
 			BPoint center = conic->Center();
 			fDrawState->Transform(&center);
@@ -868,7 +868,7 @@ View::ConvertToScreenForDrawing(BGradient* gradient) const
 			conic->SortColorStepsByOffset();
 			break;
 		}
-		case B_GRADIENT_NONE: {
+		case BGradient::TYPE_NONE: {
 			break;
 		}
 	}

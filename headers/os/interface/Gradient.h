@@ -19,30 +19,29 @@ class BMessage;
 class BRect;
 
 
-enum gradient_type {
-	B_GRADIENT_LINEAR = 0,
-	B_GRADIENT_RADIAL,
-	B_GRADIENT_RADIAL_FOCUS,
-	B_GRADIENT_DIAMOND,
-	B_GRADIENT_CONIC,
-	B_GRADIENT_NONE
-};
-
-
-struct color_step {
-	color_step(const rgb_color c, float o);
-	color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o);
-	color_step(const color_step& other);
-	color_step();
-	
-	bool operator!=(const color_step& other) const;
-	
-	rgb_color		color;
-	float			offset;
-};
-
-
 class BGradient : public BArchivable {
+public:
+	enum gradient_type {
+		TYPE_LINEAR = 0,
+		TYPE_RADIAL,
+		TYPE_RADIAL_FOCUS,
+		TYPE_DIAMOND,
+		TYPE_CONIC,
+		TYPE_NONE
+	};
+
+	struct color_step {
+		color_step(const rgb_color c, float o);
+		color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o);
+		color_step(const color_step& other);
+		color_step();
+		
+		bool operator!=(const color_step& other) const;
+		
+		rgb_color		color;
+		float			offset;
+	};
+
 public:
 						BGradient();
 						BGradient(BMessage* archive);

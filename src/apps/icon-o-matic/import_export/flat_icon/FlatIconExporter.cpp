@@ -606,7 +606,7 @@ FlatIconExporter::_WriteGradient(LittleEndianBuffer& buffer,
 	bool alpha = false;
 	bool gray = true;
 	for (int32 i = 0; i < gradientStopCount; i++) {
-		color_step* step = gradient->ColorAtFast(i);
+		BGradient::color_step* step = gradient->ColorAtFast(i);
 		if (step->color.alpha < 255)
 			alpha = true;
 		if (step->color.red != step->color.green
@@ -632,7 +632,7 @@ FlatIconExporter::_WriteGradient(LittleEndianBuffer& buffer,
 	}
 
 	for (int32 i = 0; i < gradientStopCount; i++) {
-		color_step* step = gradient->ColorAtFast(i);
+		BGradient::color_step* step = gradient->ColorAtFast(i);
 		uint8 stopOffset = (uint8)(step->offset * 255.0);
 		uint32 color = (uint32&)step->color;
 		if (!buffer.Write(stopOffset))

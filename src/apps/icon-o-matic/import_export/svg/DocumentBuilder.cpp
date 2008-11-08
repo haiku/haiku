@@ -803,7 +803,7 @@ DocumentBuilder::_AddShape(path_attributes& attributes, bool outline,
 
 	rgb_color color;
 	
-	color_step* step;
+	BGradient::color_step* step;
 	if (gradient && (step = gradient->ColorAt(0))) {
 		color.red		= step->color.red;
 		color.green		= step->color.green;

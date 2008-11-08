@@ -16,7 +16,7 @@
 
 
 // constructor
-color_step::color_step(const rgb_color c, float o)
+BGradient::color_step::color_step(const rgb_color c, float o)
 {
 	color.red = c.red;
 	color.green = c.green;
@@ -27,7 +27,7 @@ color_step::color_step(const rgb_color c, float o)
 
 
 // constructor
-color_step::color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o)
+BGradient::color_step::color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o)
 {
 	color.red = r;
 	color.green = g;
@@ -38,7 +38,7 @@ color_step::color_step(uint8 r, uint8 g, uint8 b, uint8 a, float o)
 
 
 // constructor
-color_step::color_step(const color_step& other)
+BGradient::color_step::color_step(const color_step& other)
 {
 	color.red = other.color.red;
 	color.green = other.color.green;
@@ -49,7 +49,7 @@ color_step::color_step(const color_step& other)
 
 
 // constructor
-color_step::color_step()
+BGradient::color_step::color_step()
 {
 	color.red = 0;
 	color.green = 0;
@@ -61,7 +61,7 @@ color_step::color_step()
 
 // operator!=
 bool
-color_step::operator!=(const color_step& other) const
+BGradient::color_step::operator!=(const color_step& other) const
 {
 	return color.red != other.color.red ||
 	color.green != other.color.green ||
@@ -72,19 +72,15 @@ color_step::operator!=(const color_step& other) const
 
 
 static int
-sort_color_steps_by_offset(const void* left, const void* right)
+sort_color_steps_by_offset(const void* _left, const void* _right)
 {
-	const color_step **firstStep((const color_step**) left),
-					 **secondStep((const color_step**) right);
-	int ret = 0;
-	if ((*firstStep)->offset > (*secondStep)->offset) {
-		ret = 1;
-	} if ((*firstStep)->offset < (*secondStep)->offset) {
-		ret = -1;
-	} if ((*firstStep)->offset == (*secondStep)->offset) {
-		ret = 0;
-	}
-	return ret;
+	const BGradient::color_step** left = (const BGradient::color_step**)_left;
+	const BGradient::color_step** right = (const BGradient::color_step**)_right;
+	if ((*left)->offset > (*right)->offset)
+		return 1;
+	else if ((*left)->offset < (*right)->offset)
+		return -1;
+	return 0;
 }
 
 
@@ -95,7 +91,7 @@ sort_color_steps_by_offset(const void* left, const void* right)
 BGradient::BGradient()
 	: BArchivable(),
 	fColors(4),
-	fType(B_GRADIENT_NONE)
+	fType(TYPE_NONE)
 {
 }
 
@@ -104,7 +100,7 @@ BGradient::BGradient()
 BGradient::BGradient(BMessage* archive)
 	: BArchivable(archive),
 	fColors(4),
-	fType(B_GRADIENT_NONE)
+	fType(TYPE_NONE)
 {
 	if (!archive)
 		return;
@@ -118,7 +114,7 @@ BGradient::BGradient(BMessage* archive)
 			break;
 	}
 	if (archive->FindInt32("type", (int32*)&fType) < B_OK)
-		fType = B_GRADIENT_LINEAR;
+		fType = TYPE_LINEAR;
 
 	// linear
 	if (archive->FindFloat("linear_x1", (float*)&fData.linear.x1) < B_OK)
@@ -403,7 +399,7 @@ BGradient::CountColors() const
 
 
 // ColorAt
-color_step*
+BGradient::color_step*
 BGradient::ColorAt(int32 index) const
 {
 	return (color_step*)fColors.ItemAt(index);
@@ -411,7 +407,7 @@ BGradient::ColorAt(int32 index) const
 
 
 // ColorAtFast
-color_step*
+BGradient::color_step*
 BGradient::ColorAtFast(int32 index) const
 {
 	return (color_step*)fColors.ItemAtFast(index);
@@ -419,7 +415,7 @@ BGradient::ColorAtFast(int32 index) const
 
 
 // Colors
-color_step*
+BGradient::color_step*
 BGradient::Colors() const
 {
 	if (CountColors() > 0) {

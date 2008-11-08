@@ -471,20 +471,20 @@ LinkReceiver::ReadRegion(BRegion* region)
 
 
 static BGradient*
-gradient_for_type(gradient_type type)
+gradient_for_type(BGradient::gradient_type type)
 {
 	switch (type) {
-		case B_GRADIENT_LINEAR:
+		case BGradient::TYPE_LINEAR:
 			return new (std::nothrow) BGradientLinear();
-		case B_GRADIENT_RADIAL:
+		case BGradient::TYPE_RADIAL:
 			return new (std::nothrow) BGradientRadial();
-		case B_GRADIENT_RADIAL_FOCUS:
+		case BGradient::TYPE_RADIAL_FOCUS:
 			return new (std::nothrow) BGradientRadialFocus();
-		case B_GRADIENT_DIAMOND:
+		case BGradient::TYPE_DIAMOND:
 			return new (std::nothrow) BGradientDiamond();
-		case B_GRADIENT_CONIC:
+		case BGradient::TYPE_CONIC:
 			return new (std::nothrow) BGradientConic();
-		case B_GRADIENT_NONE:
+		case BGradient::TYPE_NONE:
 			return new (std::nothrow) BGradient();
 	}
 	return NULL;
@@ -495,10 +495,10 @@ status_t
 LinkReceiver::ReadGradient(BGradient** _gradient)
 {
 	GTRACE(("LinkReceiver::ReadGradient\n"));
-	gradient_type gradientType;
+	BGradient::gradient_type gradientType;
 	int32 colorsCount;
 	status_t ret;
-	if ((ret = Read(&gradientType, sizeof(gradient_type))) != B_OK)
+	if ((ret = Read(&gradientType, sizeof(BGradient::gradient_type))) != B_OK)
 		return ret;
 	if ((ret = Read(&colorsCount, sizeof(int32))) != B_OK)
 		return ret;
@@ -509,9 +509,9 @@ LinkReceiver::ReadGradient(BGradient** _gradient)
 	*_gradient = gradient;
 	
 	if (colorsCount > 0) {
-		color_step step;
+		BGradient::color_step step;
 		for (int i = 0; i < colorsCount; i++) {
-			if ((ret = Read(&step, sizeof(color_step))) != B_OK)
+			if ((ret = Read(&step, sizeof(BGradient::color_step))) != B_OK)
 				return ret; 
 			if (!gradient->AddColor(step, i))
 				return B_NO_MEMORY;
@@ -519,8 +519,8 @@ LinkReceiver::ReadGradient(BGradient** _gradient)
 	}
 
 	switch(gradientType) {
-		case B_GRADIENT_LINEAR: {
-			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_LINEAR\n"));
+		case BGradient::TYPE_LINEAR: {
+			GTRACE(("LinkReceiver::ReadGradient> type == TYPE_LINEAR\n"));
 			BGradientLinear* linear = (BGradientLinear*)gradient;
 			BPoint start;
 			BPoint end;
@@ -532,8 +532,8 @@ LinkReceiver::ReadGradient(BGradient** _gradient)
 			linear->SetEnd(end);
 			return B_OK;
 		}
-		case B_GRADIENT_RADIAL: {
-			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_RADIAL\n"));
+		case BGradient::TYPE_RADIAL: {
+			GTRACE(("LinkReceiver::ReadGradient> type == TYPE_RADIAL\n"));
 			BGradientRadial* radial = (BGradientRadial*)gradient;
 			BPoint center;
 			float radius;
@@ -545,8 +545,8 @@ LinkReceiver::ReadGradient(BGradient** _gradient)
 			radial->SetRadius(radius);
 			return B_OK;
 		}
-		case B_GRADIENT_RADIAL_FOCUS: {
-			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_RADIAL_FOCUS\n"));
+		case BGradient::TYPE_RADIAL_FOCUS: {
+			GTRACE(("LinkReceiver::ReadGradient> type == TYPE_RADIAL_FOCUS\n"));
 			BGradientRadialFocus* radialFocus =
 				(BGradientRadialFocus*)gradient;
 			BPoint center;
@@ -563,8 +563,8 @@ LinkReceiver::ReadGradient(BGradient** _gradient)
 			radialFocus->SetRadius(radius);
 			return B_OK;
 		}
-		case B_GRADIENT_DIAMOND: {
-			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_DIAMOND\n"));
+		case BGradient::TYPE_DIAMOND: {
+			GTRACE(("LinkReceiver::ReadGradient> type == TYPE_DIAMOND\n"));
 			BGradientDiamond* diamond = (BGradientDiamond*)gradient;
 			BPoint center;
 			if ((ret = Read(&center, sizeof(BPoint))) != B_OK)
@@ -572,8 +572,8 @@ LinkReceiver::ReadGradient(BGradient** _gradient)
 			diamond->SetCenter(center);
 			return B_OK;
 		}
-		case B_GRADIENT_CONIC: {
-			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_CONIC\n"));
+		case BGradient::TYPE_CONIC: {
+			GTRACE(("LinkReceiver::ReadGradient> type == TYPE_CONIC\n"));
 			BGradientConic* conic = (BGradientConic*)gradient;
 			BPoint center;
 			float angle;
@@ -585,8 +585,8 @@ LinkReceiver::ReadGradient(BGradient** _gradient)
 			conic->SetAngle(angle);
 			return B_OK;
 		}
-		case B_GRADIENT_NONE: {
-			GTRACE(("LinkReceiver::ReadGradient> type == B_GRADIENT_NONE\n"));
+		case BGradient::TYPE_NONE: {
+			GTRACE(("LinkReceiver::ReadGradient> type == TYPE_NONE\n"));
 			break;
 		}
 	}

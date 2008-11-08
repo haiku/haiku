@@ -16,7 +16,7 @@ BGradientDiamond::BGradientDiamond()
 {
 	fData.diamond.cx = 0.0f;
 	fData.diamond.cy = 0.0f;
-	fType = B_GRADIENT_DIAMOND;
+	fType = TYPE_DIAMOND;
 }
 
 
@@ -25,7 +25,7 @@ BGradientDiamond::BGradientDiamond(const BPoint& center)
 {
 	fData.diamond.cx = center.x;
 	fData.diamond.cy = center.y;
-	fType = B_GRADIENT_DIAMOND;
+	fType = TYPE_DIAMOND;
 }
 
 
@@ -34,7 +34,7 @@ BGradientDiamond::BGradientDiamond(float cx, float cy)
 {
 	fData.diamond.cx = cx;
 	fData.diamond.cy = cy;
-	fType = B_GRADIENT_DIAMOND;
+	fType = TYPE_DIAMOND;
 }
 
 
