@@ -10,6 +10,7 @@ MergeObject os_arch_$(TARGET_ARCH).o :
 	byteorder.S
 	compatibility.c	# only here until the places where those functions are used
 					# are fixed
+	stack_frame.c
 #	systeminfo.c
 	system_time.c
 	system_time_asm.S

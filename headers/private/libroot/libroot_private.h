@@ -37,6 +37,7 @@ void __arch_init_time(struct real_time_data *data, bool setDefaults);
 bigtime_t __arch_get_system_time_offset(struct real_time_data *data);
 void __init_pwd_backend(void);
 void __reinit_pwd_backend_after_fork(void);
+void* __arch_get_caller(void);
 
 
 #ifdef __cplusplus
