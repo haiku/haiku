@@ -892,7 +892,11 @@ StyledEditWindow::_LoadFile(entry_ref* ref)
 			strcpy(name, "???");
 
 		BString text("Error loading \"");
-		text << name << "\":\n\t" << strerror(status);
+		text << name << "\":\n\t";
+		if (status == B_BAD_TYPE)
+			text << "Unsupported format";
+		else
+			text << strerror(status);
 
 		_ShowAlert(text, "OK", "", "", B_STOP_ALERT);
 		return status;
@@ -924,6 +928,7 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 	if (_LoadFile(ref) != B_OK) {
 		fSaveItem->SetEnabled(true);
 			// allow saving new files
+		return;
 	}
 
 	be_roster->AddToRecentDocuments(ref, APP_SIGNATURE);
