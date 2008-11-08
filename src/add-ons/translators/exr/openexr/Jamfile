@@ -1,17 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators exr openexr ;
 
-SubDirSysHdrs [ FDirName $(SUBDIR) half ] ;
-SubDirSysHdrs [ FDirName $(SUBDIR) iex ] ;
-SubDirSysHdrs [ FDirName $(SUBDIR) ilmimf ] ;
-SubDirSysHdrs [ FDirName $(SUBDIR) ilmthread ] ;
-SubDirSysHdrs [ FDirName $(SUBDIR) imath ] ;
-SubDirHdrs [ FDirName $(SUBDIR) config ] ;
-
-BinCommand exrheader :
-       exrheader.cpp
-	: libilmimf.so $(TARGET_LIBSTDC++)
-;
-
 SubInclude HAIKU_TOP src add-ons translators exr openexr half ;
 SubInclude HAIKU_TOP src add-ons translators exr openexr iex ;
 SubInclude HAIKU_TOP src add-ons translators exr openexr ilmimf ;
