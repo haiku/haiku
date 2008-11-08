@@ -171,8 +171,7 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 
 
 # Development
-if [ IsOptionalHaikuImagePackageAdded Development ]
-		&& $(TARGET_ARCH) = x86 {
+if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	# glue code
 	AddFilesToHaikuImage develop lib x86
 		: <src!system!glue!arch!x86>crti.o <src!system!glue!arch!x86>crtn.o
@@ -213,6 +212,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 		# TODO: Change BEINCLUDES and gcc to refer to 3rdparty rather than gnu.
 
 	# third party libs headers
+	AddHeaderDirectoryToHaikuImage libs freetype2 : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
@@ -493,8 +493,9 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package WonderBrush available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage WonderBrush
-			: http://www.yellowbites.com/downloads/WonderBrush-2.1.1-demo-x86-R5.zip
+		local baseURL = ttp://www.yellowbites.com/downloads ;
+		InstallOptionalHaikuImagePackage WonderBrush-2.1.2-Haiku
+			: $(baseURL)/WonderBrush-2.1.2-gcc2-x86-Haiku.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
