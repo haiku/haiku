@@ -254,16 +254,14 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 			return B_CANCELED;
 	}
 
-	StyleContainer* styles = icon->Styles();
 	// import run colors as styles
 	if (runs) {
+		delete[] fStyleMap;
 		fStyleMap = new struct style_map[runs->count];
 		for (int32 i = 0; runs && i < runs->count; i++) {
 			_AddStyle(icon, &runs->runs[i]);
 		}
 	}
-
-
 
 	int32 currentRun = 0;
 	text_run *run = NULL;
@@ -344,6 +342,7 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 	}
 
 	delete[] fStyleMap;
+	fStyleMap = NULL;
 
 	return B_OK;
 }
