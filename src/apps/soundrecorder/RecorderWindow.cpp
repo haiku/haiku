@@ -1009,12 +1009,14 @@ RecorderWindow::UpdatePlayFile()
 		return;
 	}
 
-	if (fPlayTrack && fPlayFile)
+	if (fPlayTrack && fPlayFile) {
 		fPlayFile->ReleaseTrack(fPlayTrack);
-	if (fPlayFile)
+		fPlayTrack = NULL;
+	}
+	if (fPlayFile) {
 		delete fPlayFile;
-	fPlayTrack = NULL;
-	fPlayFile = NULL;
+		fPlayFile = NULL;
+	}
 
 	status_t err;
 	BEntry& entry = pItem->Entry();
@@ -1024,6 +1026,7 @@ RecorderWindow::UpdatePlayFile()
 	if ((err = fPlayFile->InitCheck()) < B_OK) {
 		ErrorAlert("get the file to play", err);
 		delete fPlayFile;
+		fPlayFile = NULL;
 		return;
 	}
 
