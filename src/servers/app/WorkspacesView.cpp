@@ -394,6 +394,7 @@ WorkspacesView::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	for (int32 i = rows * columns; i-- > 0;) {
 		_DrawWorkspace(drawingEngine, redraw, i);
 	}
+	fWindow->ServerWindow()->ResyncDrawState();
 }
 
 
