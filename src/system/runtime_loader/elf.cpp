@@ -2295,7 +2295,6 @@ err:
 status_t
 unload_library(void* handle, image_id imageID, bool addOn)
 {
-	status_t status = B_BAD_IMAGE_ID;
 	image_t *image;
 	image_type type = addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE;
 
@@ -2315,9 +2314,12 @@ unload_library(void* handle, image_id imageID, bool addOn)
 
 	// we only check images that have been already initialized
 
+	status_t status = B_BAD_IMAGE_ID;
+
 	if (handle != NULL) {
 		image = (image_t*)handle;
 		put_image(image);
+		status = B_OK;
 	} else {
 		for (image = sLoadedImages.head; image; image = image->next) {
 			if (image->id == imageID) {
