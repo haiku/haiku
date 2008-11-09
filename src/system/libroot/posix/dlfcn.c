@@ -57,7 +57,7 @@ dlsym(void *handle, char const *name)
 int
 dlclose(void *handle)
 {
-	return __gRuntimeLoader->unload_library(handle);
+	return sStatus = __gRuntimeLoader->unload_library(handle);
 }
 
 
