@@ -18,6 +18,21 @@
 #define VOLUME_USE_PHYS_OUTPUT 1
 
 
+class MixerControl {
+	public:
+		MixerControl(int32 volumeWhich, float *value = NULL, const char **error = NULL);
+		~MixerControl();
+		
+		void UpdateVolume(int32 value);
+		void ChangeVolumeBy(int32 incr);
+	private:
+		media_node *fAudioMixerNode;
+		BParameterWeb* fParamWeb;
+		BContinuousParameter* fMixerParam;
+		float fMin, fMax, fStep;
+};
+
+
 class SliderView : public BControl {
 	public:
 		SliderView(BRect rect, BMessage *msg, const char* title, uint32 resizeFlags,
@@ -43,12 +58,7 @@ class VolumeSlider : public BWindow {
 		void WindowActivated(bool active);
 
 	private:
-		void UpdateVolume(BContinuousParameter* param);
-
-		media_node *fAudioMixerNode;
-		BParameterWeb* fParamWeb;
-		BContinuousParameter* fMixerParam;
-		float fMin, fMax, fStep;
+		MixerControl *fMixerControl;
 		bool fHasChanged;
 		bool fDontBeep;
 		SliderView *fSlider;

@@ -27,30 +27,17 @@
 #define REDZONESTART 151
 
 
-VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
-	: BWindow(frame, "VolumeSlider", B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,
-		B_ASYNCHRONOUS_CONTROLS | B_WILL_ACCEPT_FIRST_CLICK, 0),
+
+MixerControl::MixerControl(int32 volumeWhich, float *value, const char **error)
+	:
 	fAudioMixerNode(NULL),
 	fParamWeb(NULL),
-	fMixerParam(NULL)
-{
-	// Make sure it's not outside the screen.
-	const int32 kMargin = 3;
-	BRect windowRect = ConvertToScreen(Bounds());
-	BRect screenFrame(BScreen(B_MAIN_SCREEN_ID).Frame());
-	if (screenFrame.right < windowRect.right + kMargin)
-		MoveBy(- kMargin - windowRect.right + screenFrame.right, 0);
-	if (screenFrame.bottom < windowRect.bottom + kMargin)
-		MoveBy(0, - kMargin - windowRect.bottom + screenFrame.bottom);
-	if (screenFrame.left > windowRect.left - kMargin)
-		MoveBy(kMargin + screenFrame.left - windowRect.left, 0);
-	if (screenFrame.top > windowRect.top - kMargin)
-		MoveBy(0, kMargin + screenFrame.top - windowRect.top);
-
-	float value = 0.0;
+	fMixerParam(NULL),
+	fMin(0.0),
+	fMax(0.0),
+	fStep(0.0)
+	{
 	bool retrying = false;
-	fDontBeep = dontBeep;
-
 	fAudioMixerNode = new media_node();
 
 	status_t err = B_OK; /* BMediaRoster::Roster() doesn't set it if all is ok */
@@ -149,7 +136,8 @@ VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
 
 					fMixerParam->GetValue(&chanData, &size, &lastChange);
 
-					value = (chanData[0] - fMin) * 100 / ((fMax - fMin) ? (fMax - fMin) : 1);
+					if (value)
+						*value = (chanData[0] - fMin) * 100 / ((fMax - fMin) ? (fMax - fMin) : 1);
 				}
 			} else {
 				errString = "No parameter web";
@@ -173,32 +161,116 @@ VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
 		delete fAudioMixerNode;
 		fAudioMixerNode = NULL;
 	}
-	if (errString)
-		fprintf(stderr, "VolumeSlider: %s.\n", errString);
+	if (errString) {
+		fprintf(stderr, "MixerControl: %s.\n", errString);
+		if (error)
+			*error = errString;
+	}
+	if (fMixerParam == NULL)
+		*value = -1;
+}
 
+
+MixerControl::~MixerControl()
+{
+	delete fParamWeb;
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	if (roster && fAudioMixerNode)
+		roster->ReleaseNode(*fAudioMixerNode);
+}
+
+
+void
+MixerControl::UpdateVolume(int32 value)
+{
+	if (!fMixerParam)
+		return;
+
+	float chanData[2];
+	bigtime_t lastChange;
+	size_t size = sizeof(chanData);
+
+	fMixerParam->GetValue(&chanData, &size, &lastChange);
+
+	for (int i = 0; i < 2; i++) {
+		chanData[i] = (value * (fMax - fMin) / 100) / fStep * fStep + fMin;
+	}
+
+	PRINT(("Min value: %f      Max Value: %f\nData: %f     %f\n",
+		fMixerParam->MinValue(), fMixerParam->MaxValue(), chanData[0], chanData[1]));
+	fMixerParam->SetValue(&chanData, sizeof(chanData), system_time()+1000);
+}
+
+
+void
+MixerControl::ChangeVolumeBy(int32 value)
+{
+	if (!fMixerParam)
+		return;
+
+	float chanData[2];
+	bigtime_t lastChange;
+	size_t size = sizeof(chanData);
+
+	fMixerParam->GetValue(&chanData, &size, &lastChange);
+
+	for (int i = 0; i < 2; i++) {
+		chanData[i] += fStep * value;
+		if (chanData[i] < fMin)
+			chanData[i] = fMin;
+		else if (chanData[i] > fMax)
+			chanData[i] = fMax;
+	}
+
+	PRINT(("Min value: %f      Max Value: %f\nData: %f     %f\n",
+		fMixerParam->MinValue(), fMixerParam->MaxValue(), chanData[0], chanData[1]));
+	fMixerParam->SetValue(&chanData, sizeof(chanData), system_time()+1000);
+}
+
+
+//	#pragma mark -
+
+
+VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
+	: BWindow(frame, "VolumeSlider", B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,
+		B_ASYNCHRONOUS_CONTROLS | B_WILL_ACCEPT_FIRST_CLICK, 0)
+{
+	// Make sure it's not outside the screen.
+	const int32 kMargin = 3;
+	BRect windowRect = ConvertToScreen(Bounds());
+	BRect screenFrame(BScreen(B_MAIN_SCREEN_ID).Frame());
+	if (screenFrame.right < windowRect.right + kMargin)
+		MoveBy(- kMargin - windowRect.right + screenFrame.right, 0);
+	if (screenFrame.bottom < windowRect.bottom + kMargin)
+		MoveBy(0, - kMargin - windowRect.bottom + screenFrame.bottom);
+	if (screenFrame.left > windowRect.left - kMargin)
+		MoveBy(kMargin + screenFrame.left - windowRect.left, 0);
+	if (screenFrame.top > windowRect.top - kMargin)
+		MoveBy(0, kMargin + screenFrame.top - windowRect.top);
+
+	float value = 0.0;
+	fDontBeep = dontBeep;
+	const char *errString;
+	fMixerControl = new MixerControl(volumeWhich, &value, &errString);
+	
 	BBox *box = new BBox(Bounds(), "sliderbox", B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
 	AddChild(box);
 
 	fHasChanged = false; /* make sure we don't beep if we don't change anything */
-	if (fMixerParam == NULL)
-		value = -1;
 	fSlider = new SliderView(box->Bounds().InsetByCopy(1, 1), new BMessage(VOLUME_CHANGED), 
 		errString == NULL ? "Volume" : errString, B_FOLLOW_LEFT | B_FOLLOW_TOP, (int32)value);
 	box->AddChild(fSlider);
 
 	fSlider->SetTarget(this);
 
-	SetPulseRate(100);	
+	SetPulseRate(100);
 }
 
 
 VolumeSlider::~VolumeSlider()
 {
-	delete fParamWeb;
-	BMediaRoster* roster = BMediaRoster::CurrentRoster();
-	if (roster && fAudioMixerNode)
-		roster->ReleaseNode(*fAudioMixerNode);
+	delete fMixerControl;
 }
 
 
@@ -215,14 +287,14 @@ VolumeSlider::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 		case VOLUME_UPDATED:
 			PRINT(("VOLUME_UPDATED\n"));
-			UpdateVolume(fMixerParam);
+			fMixerControl->UpdateVolume(fSlider->Value());
 			fHasChanged = true;
 			break;
 
 		case VOLUME_CHANGED:
 			if (fHasChanged) {
 				PRINT(("VOLUME_CHANGED\n"));
-				UpdateVolume(fMixerParam);
+				fMixerControl->UpdateVolume(fSlider->Value());
 				if (!fDontBeep)
 					beep();
 			}
@@ -232,28 +304,6 @@ VolumeSlider::MessageReceived(BMessage *msg)
 		default:
 			BWindow::MessageReceived(msg);		// not a slider message, not our problem
 	}
-}
-
-
-void
-VolumeSlider::UpdateVolume(BContinuousParameter* param)
-{
-	if (!param)
-		return;
-
-	float chanData[2];
-	bigtime_t lastChange;
-	size_t size = sizeof(chanData);
-
-	fMixerParam->GetValue( &chanData, &size, &lastChange );
-
-	for (int i = 0; i < 2; i++) {
-		chanData[i] = (fSlider->Value() * (fMax - fMin) / 100) / fStep * fStep + fMin;
-	}
-
-	PRINT(("Min value: %f      Max Value: %f\nData: %f     %f\n",
-		fMixerParam->MinValue(), fMixerParam->MaxValue(), chanData[0], chanData[1]));
-	fMixerParam->SetValue(&chanData, sizeof(chanData), system_time()+1000);
 }
 
 

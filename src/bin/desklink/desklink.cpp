@@ -233,7 +233,17 @@ MediaReplicant::MessageReceived(BMessage *message)
 	case SET_VOLUME_WHICH:
 		message->FindInt32("volwhich", &fVolumeWhich);
 		break;
-
+	
+	case B_MOUSE_WHEEL_CHANGED:
+	{
+		float dy;
+		if (message->FindFloat("be:wheel_delta_y", &dy) == B_OK
+			&& dy != 0.0) {
+			MixerControl mixerControl(fVolumeWhich);
+			mixerControl.ChangeVolumeBy(dy < 0 ? 20 : -20);
+		}
+		break;
+	}	
 	default:
 		BView::MessageReceived(message);
 		break;		
