@@ -207,10 +207,6 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	# BSD compatibility headers
 	AddHeaderDirectoryToHaikuImage compatibility bsd : bsd ;
 
-	# create gnu -> 3rdparty symlink
-	AddSymlinkToHaikuImage develop headers : 3rdparty : gnu ;
-		# TODO: Change BEINCLUDES and gcc to refer to 3rdparty rather than gnu.
-
 	# third party libs headers
 	AddHeaderDirectoryToHaikuImage libs freetype2 : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
@@ -237,39 +233,37 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 			:
 		;
 		# other tools
+		InstallOptionalHaikuImagePackage autoconf-2.63-gcc2-2008-11-05
+			: $(baseURL)/autoconf-2.63-gcc2-2008-11-05.zip
+			:
+		;
+		InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-11-06
+			: $(baseURL)/automake-1.10.1-gcc2-2008-11-06.zip
+			:
+		;
+		InstallOptionalHaikuImagePackage bison-2.4-gcc2-2008-11-09
+			: $(baseURL)/bison-2.4-gcc2-2008-11-09.zip
+			:
+		;
+		InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-2008-11-09
+			: $(baseURL)/flex-2.5.35-gcc2-2008-11-09.zip
+			:
+		;
+		InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27-2
+			: $(baseURL)/jam-haiku-gcc2-2008-03-27-2.zip
+			:
+		;
+		InstallOptionalHaikuImagePackage libtool-2.2.6a-gcc2-2008-11-09
+			: $(baseURL)/libtool-2.2.6a-gcc2-2008-11-09.zip
+			:
+		;
 		InstallOptionalHaikuImagePackage m4-1.4.12-gcc2-2008-11-04
 			: $(baseURL)/m4-1.4.12-gcc2-2008-11-04.zip
 			:
 		;
-		AddSymlinkToHaikuImage beos bin : /boot/common/bin/m4 : m4 ;
-
-		InstallOptionalHaikuImagePackage autoconf-2.61-gcc2-2008-03-24
-			: $(baseURL)/autoconf-2.61-gcc2-2008-03-24.zip
-			: home
-		;
-		InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-03-24-1
-			: $(baseURL)/automake-1.10.1-gcc2-2008-03-24-1.zip
-			: home
-		;
-		InstallOptionalHaikuImagePackage bison-2.3-gcc2-2008-03-28
-			: $(baseURL)/bison-2.3-gcc2-2008-03-28.zip
-			: home
-		;
-		InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-2008-03-28
-			: $(baseURL)/flex-2.5.35-gcc2-2008-03-28.zip
-			: home
-		;
-		InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27-1
-			: $(baseURL)/jam-haiku-gcc2-2008-03-27-1.zip
-			: .
-		;
-		InstallOptionalHaikuImagePackage libtool-1.5.26-gcc2-2008-04-07
-			: $(baseURL)/libtool-1.5.26-gcc2-2008-04-07.zip
-			: home
-		;
-		InstallOptionalHaikuImagePackage texinfo-4.11-gcc2-2008-03-24
-			: $(baseURL)/texinfo-4.11-gcc2-2008-03-24.zip
-			: home
+		InstallOptionalHaikuImagePackage texinfo-4.13a-gcc2-2008-11-09
+			: $(baseURL)/texinfo-4.13a-gcc2-2008-11-09.zip
+			:
 		;
 	}
 }
@@ -414,8 +408,6 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 			: $(baseURL)/perl-5.10.0-gcc2-2008-10-29.zip
 			:
 		;
-		AddSymlinkToHaikuImage home config bin : /boot/common/bin/perl : perl ;
-
 	}
 }
 
