@@ -486,11 +486,9 @@ BListView::AddItem(BListItem *item, int32 index)
 	if (Window()) {
 		BFont font;
 		GetFont(&font);
-
-		item->Update(this, &font);
-
 		_RecalcItemTops(index);
-
+		item->Update(this, &font);
+		
 		_FixupScrollBar();
 		_InvalidateFrom(index);
 	}
@@ -510,10 +508,9 @@ BListView::AddItem(BListItem* item)
 	if (Window()) {
 		BFont font;
 		GetFont(&font);
-
+		_RecalcItemTops(CountItems() - 1);
 		item->Update(this, &font);
 
-		_RecalcItemTops(CountItems() - 1);
 
 		_FixupScrollBar();
 		InvalidateItem(CountItems() - 1);
