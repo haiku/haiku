@@ -39,6 +39,7 @@
 
 #include <MediaRoster.h>
 #include <TimeSource.h>
+#include <NodeInfo.h>
 
 #include "RecorderWindow.h"
 #include "SoundConsumer.h"
@@ -589,6 +590,9 @@ RecorderWindow::MessageReceived(BMessage * message)
 			RefsReceived(message);
 			break;
 		}
+	case B_COPY_TARGET:
+		CopyTarget(message);
+		break;
 	default:
 		BWindow::MessageReceived(message);
 		break;
@@ -681,7 +685,7 @@ RecorderWindow::Play(BMessage * message)
 		return;
 	}
 
-	fPlayLimit = MIN(fPlayFrames, (off_t)(fTrackSlider->RightTime()*fPlayFormat.u.raw_audio.frame_rate/1000000LL));
+	fPlayLimit = MIN(fPlayFrames, (off_t)(fTrackSlider->RightTime() * fPlayFormat.u.raw_audio.frame_rate / 1000000LL));
 	fPlayTrack->SeekToTime(fTrackSlider->MainTime());
 	fPlayFrame = fPlayTrack->CurrentFrame();
 
@@ -1002,6 +1006,10 @@ extern "C" status_t DecodedFormat__11BMediaTrackP12media_format(BMediaTrack *sel
 void
 RecorderWindow::UpdatePlayFile()
 {
+	fScopeView->CancelRendering();
+	StopPlaying();
+	StopRecording();
+
 	//	Get selection.
 	int32 selIdx = fSoundList->CurrentSelection();
 	SoundListItem* pItem = dynamic_cast<SoundListItem*>(fSoundList->ItemAt(selIdx));
@@ -1027,6 +1035,7 @@ RecorderWindow::UpdatePlayFile()
 		ErrorAlert("get the file to play", err);
 		delete fPlayFile;
 		fPlayFile = NULL;
+		RemoveCurrentSoundItem();
 		return;
 	}
 
@@ -1049,6 +1058,8 @@ RecorderWindow::UpdatePlayFile()
 	if (!fPlayTrack) {
 		ErrorAlert("get the file to play", err);
 		delete fPlayFile;
+		fPlayFile = NULL;
+		RemoveCurrentSoundItem();
 		return;
 	}
 
@@ -1086,10 +1097,7 @@ RecorderWindow::UpdatePlayFile()
 	fDuration->SetText(durationString.String());
 
 	fTrackSlider->SetTotalTime(duration, true);
-	fScopeView->SetMainTime(fTrackSlider->LeftTime());
-	fScopeView->SetTotalTime(duration);
-	fScopeView->SetRightTime(fTrackSlider->RightTime());
-	fScopeView->SetLeftTime(fTrackSlider->LeftTime());
+	fScopeView->SetTotalTime(duration, true);
 	fScopeView->RenderTrack(fPlayTrack, fPlayFormat);
 
 	fPlayFrames = fPlayTrack->CountFrames();
@@ -1149,6 +1157,14 @@ RecorderWindow::AddSoundItem(const BEntry& entry, bool temp)
 	fSoundList->Invalidate();
 	fSoundList->Select(fSoundList->IndexOf(listItem));
 }
+
+
+void
+RecorderWindow::RemoveCurrentSoundItem() {
+	BListItem *item = fSoundList->RemoveItem(fSoundList->CurrentSelection());
+	delete item;
+}
+
 
 void
 RecorderWindow::RecordFile(void * cookie, bigtime_t timestamp,
@@ -1232,6 +1248,72 @@ RecorderWindow::RefsReceived(BMessage *msg)
 		if (node.IsFile()) {
 			AddSoundItem(entry, false);
 		} else if(node.IsDirectory()) {
+
+		}
+	}
+}
+
+
+void
+RecorderWindow::CopyTarget(BMessage *msg)
+{
+	const char *type = NULL;
+	if (msg->FindString("be:types", &type) == B_OK) {
+		if (!strcasecmp(type, B_FILE_MIME_TYPE)) {
+			const char *name;
+			entry_ref dir;
+			if (msg->FindString("be:filetypes") == B_OK
+				&& msg->FindString("name", &name) == B_OK
+				&& msg->FindRef("directory", &dir) == B_OK) {
+				BDirectory directory(&dir);
+				BFile file(&directory, name, O_RDWR | O_TRUNC);
+				
+				// seek time
+				bigtime_t start = fTrackSlider->LeftTime();
+				fPlayTrack->SeekToTime(&start);
+				
+				// write data
+				bigtime_t diffTime = fTrackSlider->RightTime() - fTrackSlider->LeftTime();
+				int64 framesToWrite = (int64) (diffTime * fPlayFormat.u.raw_audio.frame_rate / 1000000LL);
+				int32 frameSize = (fPlayFormat.u.raw_audio.format & 0xf) 
+					* fPlayFormat.u.raw_audio.channel_count;
+
+				wave_struct header;
+				header.riff.riff_id = FOURCC('R','I','F','F');
+				header.riff.len = (frameSize * framesToWrite)  + 36;
+				header.riff.wave_id = FOURCC('W','A','V','E');
+				header.format_chunk.fourcc = FOURCC('f','m','t',' ');
+				header.format_chunk.len = sizeof(header.format);
+				header.format.format_tag = 1;
+				header.format.channels = fPlayFormat.u.raw_audio.channel_count;
+				header.format.samples_per_sec = (uint32)fPlayFormat.u.raw_audio.frame_rate;
+				header.format.avg_bytes_per_sec = (uint32)(fPlayFormat.u.raw_audio.frame_rate 
+					* fPlayFormat.u.raw_audio.channel_count
+					* (fPlayFormat.u.raw_audio.format & 0xf));
+				header.format.bits_per_sample = (fPlayFormat.u.raw_audio.format & 0xf) * 8;
+				header.format.block_align = frameSize;
+				header.data_chunk.fourcc = FOURCC('d','a','t','a');
+				header.data_chunk.len = frameSize * framesToWrite;
+				file.Seek(0, SEEK_SET);
+				file.Write(&header, sizeof(header));
+
+				char *data = (char *)malloc(fPlayFormat.u.raw_audio.buffer_size);
+				
+				while (framesToWrite > 0) {
+					int64 frames = 0;
+					status_t err = fPlayTrack->ReadFrames(data, &frames);
+					if (frames <= 0 || err != B_OK)
+						break;
+					file.Write(data, frames * frameSize);
+					framesToWrite -= frames;
+				}
+				
+				file.Sync();
+				free(data);
+				BNodeInfo nodeInfo(&file);
+				// set type
+			}
+		} else {
 
 		}
 	}

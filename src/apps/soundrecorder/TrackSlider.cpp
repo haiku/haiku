@@ -364,6 +364,7 @@ TrackSlider::SetMainTime(bigtime_t timestamp, bool reset)
 		fLeftTime = 0;
 		fBitmapView->fLeftX = 14 + (fBitmapView->fRight - 15) * ((double)fLeftTime / fTotalTime);
 		fBitmapView->fRightX = 15 + (fBitmapView->fRight - 16) * ((double)fRightTime / fTotalTime);
+		RenderBitmap();
 	}
 	Invalidate();
 }
@@ -380,6 +381,7 @@ TrackSlider::SetTotalTime(bigtime_t timestamp, bool reset)
 	fBitmapView->fPositionX = 15 + (fBitmapView->fRight - 14) * ((double)fMainTime / fTotalTime);
 	fBitmapView->fLeftX = 14 + (fBitmapView->fRight - 15) * ((double)fLeftTime / fTotalTime);
 	fBitmapView->fRightX = 15 + (fBitmapView->fRight - 16) * ((double)fRightTime / fTotalTime);
+	RenderBitmap();
 	Invalidate();
 }
 

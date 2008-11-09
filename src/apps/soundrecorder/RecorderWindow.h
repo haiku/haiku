@@ -67,6 +67,7 @@ public:
 		};
 
 		void AddSoundItem(const BEntry& entry, bool temp = false);
+		void RemoveCurrentSoundItem();
 		
 private:
 		BMediaRoster * fRoster;
@@ -164,6 +165,7 @@ static	void PlayFile(void * cookie, void * data, size_t size, const media_raw_au
 static	void NotifyPlayFile(void * cookie, BSoundPlayer::sound_player_notification code, ...);
 				
 		void RefsReceived(BMessage *msg);
+		void CopyTarget(BMessage *msg);
 };
 
 #endif	/*	RECORDERWINDOW_H */

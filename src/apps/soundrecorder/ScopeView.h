@@ -24,9 +24,11 @@ public:
 	void SetMainTime(bigtime_t timestamp);
 	void SetLeftTime(bigtime_t timestamp);
 	void SetRightTime(bigtime_t timestamp);
-	void SetTotalTime(bigtime_t timestamp);
+	void SetTotalTime(bigtime_t timestamp, bool reset);
 	void RenderTrack(BMediaTrack *track, media_format format);
+	void CancelRendering();
 	virtual void FrameResized(float width, float height);
+	virtual void MouseDown(BPoint position);
 private:
 	void Run();
 	void Quit();

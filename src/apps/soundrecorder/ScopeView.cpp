@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <MimeType.h>
 #include <Screen.h>
 #include <Window.h>
 #include "DrawingTidbits.h"
@@ -132,7 +133,7 @@ ScopeView::RenderLoop()
 
 		int32 previewIndex = 0;
 
-		while (fMediaTrack->ReadFrames(samples, &frames) == B_OK) {
+		while (fIsRendering && fMediaTrack->ReadFrames(samples, &frames) == B_OK) {
 			//TRACE("reading block\n");
 			framesIndex = 0;
 
@@ -153,8 +154,6 @@ ScopeView::RenderLoop()
 					sum = 0;
 				}
 			}
-			
-			
 		}
 		
 		TRACE("finished computing, rendering\n");
@@ -187,9 +186,14 @@ ScopeView::SetMainTime(bigtime_t timestamp)
 
 
 void 
-ScopeView::SetTotalTime(bigtime_t timestamp)
+ScopeView::SetTotalTime(bigtime_t timestamp, bool reset)
 {
 	fTotalTime = timestamp;
+	if (reset) {
+		fMainTime = 0;
+		fLeftTime = 0;
+		fRightTime = fTotalTime;
+	}
 	Invalidate();
 	TRACE("invalidate done\n");
 }
@@ -223,12 +227,41 @@ ScopeView::RenderTrack(BMediaTrack *track, media_format format)
 
 
 void
+ScopeView::CancelRendering()
+{
+	fIsRendering = false;
+}
+
+
+void
 ScopeView::FrameResized(float width, float height)
 {
 	InitBitmap();
 	RenderBitmap();
 	Invalidate();
 	TRACE("invalidate done\n");
+}
+
+
+void
+ScopeView::MouseDown(BPoint position)
+{
+	if (!fMediaTrack)
+		return;
+
+	uint32 buttons;
+	BPoint point;
+	GetMouse(&point, &buttons);
+
+	if (buttons & B_PRIMARY_MOUSE_BUTTON) {
+		// fill the drag message
+		BMessage drag(B_SIMPLE_DATA);
+		drag.AddInt32("be:actions", B_COPY_TARGET);
+		drag.AddString("be:clip_name", "Audio Clip");
+		drag.AddString("be:types", B_FILE_MIME_TYPE);
+		
+		DragMessage(&drag, Bounds());
+	}
 }
 
 
