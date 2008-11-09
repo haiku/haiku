@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,7 +9,7 @@
 
 #include <Bitmap.h>
 #include <Font.h>
-#include <List.h>
+#include <ObjectList.h>
 #include <Picture.h>
 #include <Screen.h>
 #include <ScreenSaver.h>
@@ -97,9 +97,9 @@ class Message : public BScreenSaver
 		status_t	StartSaver(BView *view, bool preview);
 		
 	private:
-		BList			*fFontFamilies;
-		float			fScaleFactor;
-		bool			fPreview;
+		BObjectList<font_family>	*fFontFamilies;
+		float						fScaleFactor;
+		bool						fPreview;
 };
 
 
@@ -121,7 +121,7 @@ Message::~Message()
 	if (fFontFamilies) {
 		for (int32 i = 0; i < fFontFamilies->CountItems(); i++) {
 			if (fFontFamilies->ItemAt(i))
-				delete ((font_family) fFontFamilies->ItemAt(i));
+				delete fFontFamilies->ItemAt(i);
 		}
 		delete fFontFamilies;
 	}
@@ -146,14 +146,14 @@ Message::StartSaver(BView *view, bool preview)
 
 	// Get font families
 	int numFamilies = count_font_families();
-	fFontFamilies = new BList();
+	fFontFamilies = new BObjectList<font_family>();
 	for (int32 i = 0; i < numFamilies; i++) {
 		font_family *family = new font_family[1];
 		uint32 flags;
 		if (get_font_family(i, family, &flags) == B_OK) {
 			// Do not add fixed fonts
 			if (!(flags & B_IS_FIXED))
-				fFontFamilies->AddItem(*family);
+				fFontFamilies->AddItem(family);
 		}
 	}
 
@@ -199,7 +199,7 @@ Message::Draw(BView *view, int32 frame)
 	BFont font;
 	offscreen.GetFont(&font);
 	font.SetFace(B_BOLD_FACE);
-	font.SetFamilyAndStyle((font_family) fFontFamilies->ItemAt(rand() % fFontFamilies->CountItems()), NULL);
+	font.SetFamilyAndStyle(*(fFontFamilies->ItemAt(rand() % fFontFamilies->CountItems())), NULL);
 	offscreen.SetFont(&font);
 
 	// Get the message
@@ -252,7 +252,7 @@ Message::Draw(BView *view, int32 frame)
 	// Now draw the full message in a nice translucent box, but only
 	// if this isn't preview mode
 	if (!fPreview) {
-		BFont font(be_fixed_font); 
+		BFont font(be_fixed_font);
 		font.SetSize(14.0); 
 		offscreen.SetFont(&font);
 		font_height fontHeight;
