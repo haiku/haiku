@@ -221,7 +221,7 @@ StyledTextImporter::Import(Icon* icon, const entry_ref* ref)
 	err = file.GetSize(&size);
 	if (err < B_OK)
 		return err;
-	if (size > UINT32_MAX - 1)
+	if (size > 1 * 1024 * 1024) // Don't load files that big
 		return E2BIG;
 	
 	BMallocIO mio;
