@@ -1068,22 +1068,33 @@ actions BuildCDBootImage1
 
 #pragma mark - CD Boot PPC Image rules
 
-rule BuildCDBootPPCImage image : hfsmaps : bootloader : extrafiles
+rule BuildCDBootPPCImage image : hfsmaps : bootloader : chrpscript : extrafiles
 {
 	Depends $(image) : $(bootloader) ;
+	Depends $(image) : $(chrpscript) ;
 	Depends $(image) : $(extrafiles) ;
 	Depends $(image) : $(hfsmaps) ;
 	MAPS on $(image) = $(hfsmaps) ;
 
-	BuildCDBootPPCImage1 $(image) : $(bootloader) $(extrafiles) ;
+	BuildCDBootPPCImage1 $(image) : $(bootloader) $(chrpscript) $(extrafiles) ;
 }
 
 actions BuildCDBootPPCImage1 bind MAPS
 {
 	$(RM) $(<)
+	mkdir -p $(HAIKU_OUTPUT_DIR)/cd/ppc
+	cp $(>) $(HAIKU_OUTPUT_DIR)/cd/ppc/
+	cp $(>[2]) $(HAIKU_OUTPUT_DIR)/cd/ppc/bootinfo.txt
+	cp $(>[1]) $(HAIKU_OUTPUT_DIR)/cd/ofwboot.elf
 	#mkisofs -r -U -chrp-boot -V bootimg -o $(<) $(>[1]) $(>[2-])
-	mkisofs -hfs -r -U -chrp-boot -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1]) $(>[2-])
+	#mkisofs -hfs -r -U -chrp-boot -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1]) $(>[2-])
+	#mkisofs -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/ppc -r -o $(<) $(>[1]) $(>[2-]) $(HAIKU_OUTPUT_DIR)/cd
+	#mkisofs -r -U -chrp-boot -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1]) $(>[2-])
+	#mkisofs -r -U -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1]) $(>[2-])
+	# $(HAIKU_OUTPUT_DIR)/cd
 	# -hfs -hfs-bless .
+	mkisofs -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/ppc -prep-boot ppc/$(>[1]:D=) -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
+	#$(RM) -R $(HAIKU_OUTPUT_DIR)/cd
 }
 
 
