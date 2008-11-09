@@ -1032,7 +1032,7 @@ RecorderWindow::UpdatePlayFile()
 	entry.GetRef(&ref);
 	fPlayFile = new BMediaFile(&ref); //, B_MEDIA_FILE_UNBUFFERED);
 	if ((err = fPlayFile->InitCheck()) < B_OK) {
-		ErrorAlert("get the file to play", err);
+		ErrorAlert("recognize this file as a media file", err);
 		delete fPlayFile;
 		fPlayFile = NULL;
 		RemoveCurrentSoundItem();
@@ -1056,7 +1056,7 @@ RecorderWindow::UpdatePlayFile()
 	}
 
 	if (!fPlayTrack) {
-		ErrorAlert("get the file to play", err);
+		ErrorAlert("find an audio track", err);
 		delete fPlayFile;
 		fPlayFile = NULL;
 		RemoveCurrentSoundItem();
