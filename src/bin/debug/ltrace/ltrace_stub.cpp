@@ -16,6 +16,10 @@
 #include "arch/ltrace_stub.h"
 
 
+//#define TRACE_PRINTF debug_printf
+#define TRACE_PRINTF ktrace_printf
+
+
 static void* function_call_callback(const void* stub, const void* args);
 
 
@@ -113,15 +117,23 @@ function_call_callback(const void* stub, const void* _args)
 	PatchEntry* entry = sPatchedTable.Lookup(stub);
 	if (entry == NULL)
 {
-debug_printf("function_call_callback(): CALLED FOR UNKNOWN FUNCTION!\n");
+TRACE_PRINTF("function_call_callback(): CALLED FOR UNKNOWN FUNCTION!\n");
 		return NULL;
 }
 
+	char buffer[1024];
+	size_t bufferSize = sizeof(buffer);
+	size_t written = 0;
+
 	const uint32* args = (const uint32*)_args;
-	debug_printf("ltrace: %s(", entry->functionName);
-	for (int32 i = 0; i < 5; i++)
-		debug_printf("%s%#lx", i == 0 ? "" : ", ", args[i]);
-	debug_printf(")\n");
+	written += snprintf(buffer, bufferSize, "ltrace: %s(",
+		entry->functionName);
+	for (int32 i = 0; i < 5; i++) {
+		written += snprintf(buffer + written, bufferSize - written, "%s%#lx",
+			i == 0 ? "" : ", ", args[i]);
+	}
+	written += snprintf(buffer + written, bufferSize - written, ")");
+	TRACE_PRINTF("%s\n", buffer);
 
 	return entry->originalFunction;
 }
@@ -131,7 +143,7 @@ static void
 symbol_patcher(void* cookie, image_t* rootImage, image_t* image,
 	const char* name, image_t** foundInImage, void** symbol, int32* type)
 {
-	debug_printf("symbol_patcher(%p, %p, %p, \"%s\", %p, %p, %ld)\n",
+	TRACE_PRINTF("symbol_patcher(%p, %p, %p, \"%s\", %p, %p, %ld)\n",
 		cookie, rootImage, image, name, *foundInImage, *symbol, *type);
 
 	// patch functions only
@@ -153,7 +165,7 @@ symbol_patcher(void* cookie, image_t* rootImage, image_t* image,
 	sOriginalTable.Insert(entry);
 	sPatchedTable.Insert(entry);
 
-	debug_printf("  -> patching to %p\n", entry->patchedFunction);
+	TRACE_PRINTF("  -> patching to %p\n", entry->patchedFunction);
 
 	*foundInImage = NULL;
 	*symbol = entry->patchedFunction;
@@ -164,7 +176,7 @@ static void
 ltrace_stub_init(rld_export* standardInterface,
 	runtime_loader_add_on_export* addOnInterface)
 {
-	debug_printf("ltrace_stub_init(%p, %p)\n", standardInterface, addOnInterface);
+	TRACE_PRINTF("ltrace_stub_init(%p, %p)\n", standardInterface, addOnInterface);
 	sRuntimeLoaderInterface = standardInterface;
 	sRuntimeLoaderAddOnInterface = addOnInterface;
 
@@ -176,12 +188,12 @@ ltrace_stub_init(rld_export* standardInterface,
 static void
 ltrace_stub_image_loaded(image_t* image)
 {
-	debug_printf("ltrace_stub_image_loaded(%p): \"%s\" (%ld)\n", image, image->path,
+	TRACE_PRINTF("ltrace_stub_image_loaded(%p): \"%s\" (%ld)\n", image, image->path,
 		image->id);
 
 	if (sRuntimeLoaderAddOnInterface->register_undefined_symbol_patcher(image,
 			symbol_patcher, (void*)(addr_t)0xc0011eaf) != B_OK) {
-		debug_printf("  failed to install symbol patcher\n");
+		TRACE_PRINTF("  failed to install symbol patcher\n");
 	}
 }
 
@@ -189,7 +201,7 @@ ltrace_stub_image_loaded(image_t* image)
 static void
 ltrace_stub_image_relocated(image_t* image)
 {
-	debug_printf("ltrace_stub_image_relocated(%p): \"%s\" (%ld)\n", image,
+	TRACE_PRINTF("ltrace_stub_image_relocated(%p): \"%s\" (%ld)\n", image,
 		image->path, image->id);
 }
 
@@ -197,7 +209,7 @@ ltrace_stub_image_relocated(image_t* image)
 static void
 ltrace_stub_image_initialized(image_t* image)
 {
-	debug_printf("ltrace_stub_image_initialized(%p): \"%s\" (%ld)\n", image,
+	TRACE_PRINTF("ltrace_stub_image_initialized(%p): \"%s\" (%ld)\n", image,
 		image->path, image->id);
 }
 
@@ -205,7 +217,7 @@ ltrace_stub_image_initialized(image_t* image)
 static void
 ltrace_stub_image_uninitializing(image_t* image)
 {
-	debug_printf("ltrace_stub_image_uninitializing(%p): \"%s\" (%ld)\n", image,
+	TRACE_PRINTF("ltrace_stub_image_uninitializing(%p): \"%s\" (%ld)\n", image,
 		image->path, image->id);
 }
 
@@ -213,7 +225,7 @@ ltrace_stub_image_uninitializing(image_t* image)
 static void
 ltrace_stub_image_unloading(image_t* image)
 {
-	debug_printf("ltrace_stub_image_unloading(%p): \"%s\" (%ld)\n", image,
+	TRACE_PRINTF("ltrace_stub_image_unloading(%p): \"%s\" (%ld)\n", image,
 		image->path, image->id);
 }
 
