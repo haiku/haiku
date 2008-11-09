@@ -269,7 +269,7 @@ ThemeInterfaceView::AllAttached()
 	fScreenshotPane->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 #endif
 	
-	fScreenshotNone = new BStringView(BRect(), "sshotnone", _T("No Theme selected"), (uint32) 0, B_FOLLOW_ALL);
+	fScreenshotNone = new BStringView(BRect(), "sshotnone", _T("No Theme selected"), B_FOLLOW_ALL);
 	fScreenshotNone->SetFontSize(20.0);
 	fScreenshotNone->SetAlignment(B_ALIGN_CENTER);
 	fBox->AddChild(fScreenshotNone);
