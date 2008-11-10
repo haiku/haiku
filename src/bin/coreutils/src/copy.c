@@ -1490,19 +1490,14 @@ copy_internal (char const *src_name, char const *dst_name,
 		     quote_n (0, dst_name), quote_n (1, earlier_file));
 	      goto un_backup;
 	    }
-
-	if (link_failed)
-	  {
-	    error (0, errno, _("cannot create hard link %s to %s"),
-		   quote_n (0, dst_name), quote_n (1, earlier_file));
-	    goto un_backup;
-	  }
-	else
-	  {
-	    if (x->ignore_attributes == 0
-	    	&& copy_attributes_by_name(earlier_file, dst_name, false) != 0)
-		fprintf(stderr, "%s: could not copy attributes\n", earlier_file);
-	  }
+	  else
+	    {
+	      if (x->ignore_attributes == 0
+	    	  && copy_attributes_by_name (earlier_file, dst_name,
+					      false) != 0)
+		error (0, errno, "cannot copy attributes from %s\n",
+		       earlier_file);
+	    }
 
 	  return true;
 	}
