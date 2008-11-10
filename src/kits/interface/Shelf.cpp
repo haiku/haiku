@@ -675,6 +675,7 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 	BPropertyInfo shelfPropInfo(sShelfPropertyList);
 	BHandler *target = NULL;
 	BView *replicant = NULL;
+	
 	switch (shelfPropInfo.FindMatch(msg, 0, specifier, form, property)) {
 		case 0:
 			if (msg->what == B_COUNT_PROPERTIES) {
@@ -682,12 +683,11 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 				break;
 			}
 		case 1:
-			if (msg->PopSpecifier() != B_OK ) {
+			if (msg->PopSpecifier() != B_OK) {
 				target = this;
 				break;
 			}
 			msg->SetCurrentSpecifier(index);
-			// fall through
 		case 2: {
 			BMessage reply;
 			status_t err = _GetProperty(specifier, &reply);
@@ -699,7 +699,8 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 				ReplicantAt(i, &replicant, &ID, &err);
 
 			if (err == B_OK && replicant != NULL) {
-				return this;
+				if (index == 0)
+					return this;
 			} else {
 				BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
 				replyMsg.AddInt32("error", B_BAD_INDEX);
@@ -707,6 +708,7 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 				msg->SendReply(&replyMsg);
 			}
 			}
+			msg->PopSpecifier();
 			break;
 	}
 
