@@ -620,7 +620,7 @@ BShelf::MessageReceived(BMessage *msg)
 			BPoint pos;
 			if (msg->FindMessage("data", &replicantMsg) == B_OK 
 				&& msg->FindPoint("location", &pos) == B_OK) {
-					err = AddReplicant(&replicantMsg, pos);:
+					err = AddReplicant(&replicantMsg, pos);
 			}
 		}
 		break;
