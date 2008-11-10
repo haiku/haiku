@@ -24,6 +24,9 @@
 #define PAGE_READ_ONLY	0x01
 #define PAGE_READ_WRITE	0x02
 
+// NULL is actually a possible physical address... 
+//#define PHYSINVAL ((void *)-1)
+#define PHYSINVAL NULL
 
 segment_descriptor sSegments[16];
 page_table_entry_group *sPageTable;
@@ -216,15 +219,19 @@ remove_virtual_range_to_keep(void *start, uint32 size)
 static status_t
 find_physical_memory_ranges(size_t &total)
 {
-	int memory;
+	int memory, package;
+	printf("checking for memory...\n");
 	if (of_getprop(gChosen, "memory", &memory, sizeof(int)) == OF_FAILED)
 		return B_ERROR;
-	memory = of_instance_to_package(memory);
+	package = of_instance_to_package(memory);
 
 	total = 0;
 
 	struct of_region regions[64];
-	int count = of_getprop(memory, "reg", regions, sizeof(regions));
+	int count;
+	count = of_getprop(package, "reg", regions, sizeof(regions));
+	if (count == OF_FAILED)
+		count = of_getprop(memory, "reg", regions, sizeof(regions));
 	if (count == OF_FAILED)
 		return B_ERROR;
 	count /= sizeof(of_region);
@@ -523,7 +530,7 @@ find_physical_memory_range(size_t size)
 		if (gKernelArgs.physical_memory_range[i].size > size)
 			return (void *)gKernelArgs.physical_memory_range[i].start;
 	}
-	return NULL;
+	return PHYSINVAL;
 }
 
 
@@ -534,7 +541,7 @@ find_free_physical_range(size_t size)
 	// ranges (dumb memory allocation)
 	if (gKernelArgs.num_physical_allocated_ranges == 0) {
 		if (gKernelArgs.num_physical_memory_ranges == 0)
-			return NULL;
+			return PHYSINVAL;
 
 		return find_physical_memory_range(size);
 	}
@@ -544,7 +551,7 @@ find_free_physical_range(size_t size)
 		if (!is_physical_allocated(address, size) && is_physical_memory(address, size))
 			return address;
 	}
-	return NULL;
+	return PHYSINVAL;
 }
 
 
@@ -612,7 +619,7 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 	// so that we don't have to optimize for these cases :)
 	
 	void *physicalAddress = find_free_physical_range(size);
-	if (physicalAddress == NULL) {
+	if (physicalAddress == PHYSINVAL) {
 		dprintf("arch_mmu_allocate(base: %p, size: %lu) no free physical "
 			"address\n", virtualAddress, size);
 		return NULL;
@@ -889,9 +896,10 @@ arch_mmu_init(void)
 
 	printf("MSR: %p\n", (void *)get_msr());
 
-//	block_address_translation bat;
+#if 0
+	block_address_translation bat;
 
-/*	bat.length = BAT_LENGTH_256MB;
+	bat.length = BAT_LENGTH_256MB;
 	bat.kernel_valid = true;
 	bat.memory_coherent = true;
 	bat.protection = BAT_READ_WRITE;
@@ -899,7 +907,8 @@ arch_mmu_init(void)
 	set_ibat0(&bat);
 	set_dbat0(&bat);
 	isync();
-puts("2");*/
+puts("2");
+#endif
 
 	// initialize segment descriptors, but don't set the registers
 	// until we're about to take over the page table - we're mapping
@@ -916,7 +925,7 @@ puts("2");*/
 	if (find_allocated_ranges(oldTable, table, &physicalTable,
 			&exceptionHandlers) < B_OK) {
 		puts("find_allocated_ranges() failed!");
-		return B_ERROR;
+		//return B_ERROR;
 	}
 
 #if 0
@@ -941,6 +950,10 @@ puts("2");*/
 		insert_virtual_allocated_range((void *)(total - realSize), realSize);
 		insert_physical_allocated_range((void *)table, tableSize);
 		insert_virtual_allocated_range((void *)table, tableSize);
+
+		// QEMU OpenHackware work-around
+		insert_physical_allocated_range((void *)0x05800000, 0x06000000 - 0x05800000);
+		insert_virtual_allocated_range((void *)0x05800000, 0x06000000 - 0x05800000);
 
 		physicalTable = table;
 	}
