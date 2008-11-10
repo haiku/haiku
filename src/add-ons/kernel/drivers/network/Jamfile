@@ -14,6 +14,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network wb840 ;
 
 # FreeBSD 7 drivers
 SubInclude HAIKU_TOP src add-ons kernel drivers network 3com ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom440x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom570x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 ;
 #SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron ;
