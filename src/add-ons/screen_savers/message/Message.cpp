@@ -97,7 +97,7 @@ class Message : public BScreenSaver
 		status_t	StartSaver(BView *view, bool preview);
 		
 	private:
-		BObjectList<font_family>	*fFontFamilies;
+		BObjectList<font_family>	fFontFamilies;
 		float						fScaleFactor;
 		bool						fPreview;
 };
@@ -111,19 +111,15 @@ BScreenSaver *instantiate_screen_saver(BMessage *msg, image_id image)
 
 Message::Message(BMessage *archive, image_id id)
  :	BScreenSaver(archive, id)
- ,  fFontFamilies(NULL)
 {
 }
 
 
 Message::~Message()
 {
-	if (fFontFamilies) {
-		for (int32 i = 0; i < fFontFamilies->CountItems(); i++) {
-			if (fFontFamilies->ItemAt(i))
-				delete fFontFamilies->ItemAt(i);
-		}
-		delete fFontFamilies;
+	for (int32 i = 0; i < fFontFamilies.CountItems(); i++) {
+		if (fFontFamilies.ItemAt(i))
+			delete fFontFamilies.ItemAt(i);
 	}
 }
 
@@ -146,14 +142,13 @@ Message::StartSaver(BView *view, bool preview)
 
 	// Get font families
 	int numFamilies = count_font_families();
-	fFontFamilies = new BObjectList<font_family>();
 	for (int32 i = 0; i < numFamilies; i++) {
 		font_family *family = new font_family[1];
 		uint32 flags;
 		if (get_font_family(i, family, &flags) == B_OK) {
 			// Do not add fixed fonts
 			if (!(flags & B_IS_FIXED))
-				fFontFamilies->AddItem(family);
+				fFontFamilies.AddItem(family);
 		}
 	}
 
@@ -199,7 +194,7 @@ Message::Draw(BView *view, int32 frame)
 	BFont font;
 	offscreen.GetFont(&font);
 	font.SetFace(B_BOLD_FACE);
-	font.SetFamilyAndStyle(*(fFontFamilies->ItemAt(rand() % fFontFamilies->CountItems())), NULL);
+	font.SetFamilyAndStyle(*(fFontFamilies.ItemAt(rand() % fFontFamilies.CountItems())), NULL);
 	offscreen.SetFont(&font);
 
 	// Get the message
