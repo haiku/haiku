@@ -269,6 +269,9 @@ MouseDevice::_BuildShortName() const
 	else
 		name.Capitalize();
 
+	if (string.FindFirst("intelli") >= 0)
+		name.Prepend("Extended ");
+
 	name << " Mouse " << index;
 
 	return strdup(name.String());
