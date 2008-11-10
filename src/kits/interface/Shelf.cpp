@@ -620,7 +620,7 @@ BShelf::MessageReceived(BMessage *msg)
 			BPoint pos;
 			if (msg->FindMessage("data", &replicantMsg) == B_OK 
 				&& msg->FindPoint("location", &pos) == B_OK) {
-					err = AddReplicant(&replicantMsg, pos);
+					err = AddReplicant(&replicantMsg, pos);:
 			}
 		}
 		break;
@@ -697,6 +697,7 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 				break;
 			}
 			msg->SetCurrentSpecifier(index);
+			// fall through
 		case 2: {
 			BMessage reply;
 			status_t err = _GetProperty(specifier, &reply);
