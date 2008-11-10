@@ -613,6 +613,17 @@ BShelf::MessageReceived(BMessage *msg)
 				break;
 			}
 			return BHandler::MessageReceived(msg);
+			
+		case B_CREATE_PROPERTY: 
+		{
+			BMessage replicantMsg;
+			BPoint pos;
+			if (msg->FindMessage("data", &replicantMsg) == B_OK 
+				&& msg->FindPoint("location", &pos) == B_OK) {
+					err = AddReplicant(&replicantMsg, pos);
+			}
+		}
+		break;
 	}
 
 	if (err < B_OK) {
@@ -678,10 +689,8 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 	
 	switch (shelfPropInfo.FindMatch(msg, 0, specifier, form, property)) {
 		case 0:
-			if (msg->what == B_COUNT_PROPERTIES) {
-				target = this;
-				break;
-			}
+			target = this;
+			break;
 		case 1:
 			if (msg->PopSpecifier() != B_OK) {
 				target = this;
