@@ -9,22 +9,20 @@ export USER=baron
 export GROUP=users
 
 BUILDHOME=/boot/develop
+BETOOLS="$BUILDHOME/tools/gnupro/bin"
 
 case `uname -m` in
 BePC|Intel|unknown)
 	BE_HOST_CPU=x86
-	BETOOLS="$BUILDHOME/tools/gnupro/bin"
 	;;
 BeMac|BeBox)
 	BE_HOST_CPU=ppc
-	BETOOLS="$BUILDHOME/bin"
 	;;
 *)
 	BE_HOST_CPU=unknown
-	BETOOLS="$BUILDHOME/bin"
 esac
 
-BELIBRARIES="$BUILDHOME/lib/$BE_HOST_CPU"
+BELIBRARIES="/boot/common/lib:$BUILDHOME/lib/$BE_HOST_CPU"
 BH=$BUILDHOME/headers
 BEINCLUDES="$BH;$BH/be;$BH/be/precompiled;$BH/be/bone;$BH/posix;$BH/cpp;$BH/be/app;$BH/be/device;$BH/be/interface;$BH/be/media;$BH/be/midi;$BH/be/midi2;$BH/be/net;$BH/be/kernel;$BH/be/storage;$BH/be/support;$BH/be/game;$BH/be/opengl;$BH/be/drivers;$BH/gnu;$BH/be/mail;$BH/be/translation;$BH/be/devel;$BH/be/add-ons/graphics;$BH/be/be_apps/Deskbar;$BH/be/be_apps/NetPositive;$BH/be/be_apps/Tracker"
 
@@ -66,4 +64,3 @@ then
      	. $HOME/config/boot/UserSetupEnvironment
 	fi
 fi
-
