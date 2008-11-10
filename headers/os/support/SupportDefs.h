@@ -22,7 +22,7 @@ typedef unsigned short			ushort;
 #include <sys/types.h>
 
 
-// Shorthand type formats
+/* Shorthand type formats */
 typedef	signed char				int8;
 typedef unsigned char			uint8;
 typedef volatile signed char   	vint8;
@@ -57,20 +57,20 @@ typedef unsigned char			uchar;
 typedef unsigned short          unichar;
 
 
-// Descriptive formats
+/* Descriptive formats */
 typedef int32					status_t;
 typedef int64					bigtime_t;
 typedef uint32					type_code;
 typedef uint32					perform_code;
 
 
-// Empty string ("")
+/* Empty string ("") */
 #ifdef __cplusplus
 extern const char *B_EMPTY_STRING;
 #endif
 
 
-// min and max comparisons
+/* min and max comparisons */
 #ifndef __cplusplus
 #	ifndef min
 #		define min(a,b) ((a)>(b)?(b):(a))
@@ -80,12 +80,12 @@ extern const char *B_EMPTY_STRING;
 #	endif
 #endif 
 
-// min() and max() won't work in C++
+/* min() and max() won't work in C++ */
 #define min_c(a,b) ((a)>(b)?(b):(a))
 #define max_c(a,b) ((a)>(b)?(a):(b))
 
 
-// Grandfathering
+/* Grandfathering */
 #ifndef __cplusplus
 #	include <stdbool.h>
 #endif 
@@ -99,7 +99,7 @@ extern const char *B_EMPTY_STRING;
 extern "C" {
 #endif
 
-// Atomic functions; previous value is returned
+/* Atomic functions; previous value is returned */
 extern int32	atomic_set(vint32 *value, int32 newValue);
 extern int32	atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst);
 extern int32	atomic_add(vint32 *value, int32 addValue);
@@ -114,16 +114,16 @@ extern int64	atomic_and64(vint64 *value, int64 andValue);
 extern int64	atomic_or64(vint64 *value, int64 orValue);	
 extern int64	atomic_get64(vint64 *value);
 
-// Other stuff
+/* Other stuff */
 extern void*	get_stack_frame(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-// Obsolete or discouraged API
+/* Obsolete or discouraged API */
 
-// use 'true' and 'false'
+/* use 'true' and 'false' */
 #ifndef FALSE
 #	define FALSE	0
 #endif
@@ -131,4 +131,4 @@ extern void*	get_stack_frame(void);
 #	define TRUE		1
 #endif
 
-#endif	// _SUPPORT_DEFS_H
+#endif	/* _SUPPORT_DEFS_H */

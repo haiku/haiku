@@ -10,10 +10,10 @@
 #include <endian.h>
 #include <SupportDefs.h>
 #include <TypeConstants.h>
-	// for convenience
+	/* for convenience */
 
 
-// swap directions
+/* swap directions */
 typedef enum {
 	B_SWAP_HOST_TO_LENDIAN,
 	B_SWAP_HOST_TO_BENDIAN,
@@ -23,7 +23,7 @@ typedef enum {
 } swap_action;
 
 
-// BSD/networking macros
+/* BSD/networking macros */
 #ifndef htonl
 #	define htonl(x) B_HOST_TO_BENDIAN_INT32(x)
 #	define ntohl(x) B_BENDIAN_TO_HOST_INT32(x)
@@ -31,7 +31,7 @@ typedef enum {
 #	define ntohs(x) B_BENDIAN_TO_HOST_INT16(x)
 #endif
 
-// always swap macros
+/* always swap macros */
 #define B_SWAP_DOUBLE(arg)   __swap_double(arg)
 #define B_SWAP_FLOAT(arg)    __swap_float(arg)
 #define B_SWAP_INT64(arg)    __swap_int64(arg)
@@ -39,74 +39,74 @@ typedef enum {
 #define B_SWAP_INT16(arg)    __swap_int16(arg)
 
 #if BYTE_ORDER == __LITTLE_ENDIAN
-// Host is little endian
+/* Host is little endian */
 
 #define B_HOST_IS_LENDIAN 1
 #define B_HOST_IS_BENDIAN 0
 
-// Host native to little endian
+/* Host native to little endian */
 #define B_HOST_TO_LENDIAN_DOUBLE(arg)	(double)(arg)
 #define B_HOST_TO_LENDIAN_FLOAT(arg)	(float)(arg)
 #define B_HOST_TO_LENDIAN_INT64(arg)	(uint64)(arg)
 #define B_HOST_TO_LENDIAN_INT32(arg)	(uint32)(arg)
 #define B_HOST_TO_LENDIAN_INT16(arg)	(uint16)(arg)
 
-// Little endian to host native
+/* Little endian to host native */
 #define B_LENDIAN_TO_HOST_DOUBLE(arg)	(double)(arg)
 #define B_LENDIAN_TO_HOST_FLOAT(arg)	(float)(arg)
 #define B_LENDIAN_TO_HOST_INT64(arg)	(uint64)(arg)
 #define B_LENDIAN_TO_HOST_INT32(arg)	(uint32)(arg)
 #define B_LENDIAN_TO_HOST_INT16(arg)	(uint16)(arg)
 
-// Host native to big endian
+/* Host native to big endian */
 #define B_HOST_TO_BENDIAN_DOUBLE(arg)	__swap_double(arg)
 #define B_HOST_TO_BENDIAN_FLOAT(arg)	__swap_float(arg)
 #define B_HOST_TO_BENDIAN_INT64(arg)	__swap_int64(arg)
 #define B_HOST_TO_BENDIAN_INT32(arg)	__swap_int32(arg)
 #define B_HOST_TO_BENDIAN_INT16(arg)	__swap_int16(arg)
 
-// Big endian to host native
+/* Big endian to host native */
 #define B_BENDIAN_TO_HOST_DOUBLE(arg)	__swap_double(arg)
 #define B_BENDIAN_TO_HOST_FLOAT(arg)	__swap_float(arg)
 #define B_BENDIAN_TO_HOST_INT64(arg)	__swap_int64(arg)
 #define B_BENDIAN_TO_HOST_INT32(arg)	__swap_int32(arg)
 #define B_BENDIAN_TO_HOST_INT16(arg)	__swap_int16(arg)
 
-#else	// BYTE_ORDER
-// Host is big endian
+#else	/* BYTE_ORDER */
+/* Host is big endian */
 
 #define B_HOST_IS_LENDIAN 0
 #define B_HOST_IS_BENDIAN 1
 
-// Host native to little endian
+/* Host native to little endian */
 #define B_HOST_TO_LENDIAN_DOUBLE(arg)	__swap_double(arg)
 #define B_HOST_TO_LENDIAN_FLOAT(arg)	__swap_float(arg)
 #define B_HOST_TO_LENDIAN_INT64(arg)	__swap_int64(arg)
 #define B_HOST_TO_LENDIAN_INT32(arg)	__swap_int32(arg)
 #define B_HOST_TO_LENDIAN_INT16(arg)	__swap_int16(arg)
 
-// Little endian to host native
+/* Little endian to host native */
 #define B_LENDIAN_TO_HOST_DOUBLE(arg)	__swap_double(arg)
 #define B_LENDIAN_TO_HOST_FLOAT(arg)	__swap_float(arg)
 #define B_LENDIAN_TO_HOST_INT64(arg)	__swap_int64(arg)
 #define B_LENDIAN_TO_HOST_INT32(arg)	__swap_int32(arg)
 #define B_LENDIAN_TO_HOST_INT16(arg)	__swap_int16(arg)
 
-// Host native to big endian
+/* Host native to big endian */
 #define B_HOST_TO_BENDIAN_DOUBLE(arg)	(double)(arg)
 #define B_HOST_TO_BENDIAN_FLOAT(arg)	(float)(arg)
 #define B_HOST_TO_BENDIAN_INT64(arg)	(uint64)(arg)
 #define B_HOST_TO_BENDIAN_INT32(arg)	(uint32)(arg)
 #define B_HOST_TO_BENDIAN_INT16(arg)	(uint16)(arg)
 
-// Big endian to host native
+/* Big endian to host native */
 #define B_BENDIAN_TO_HOST_DOUBLE(arg)	(double)(arg)
 #define B_BENDIAN_TO_HOST_FLOAT(arg)	(float)(arg)
 #define B_BENDIAN_TO_HOST_INT64(arg)	(uint64)(arg)
 #define B_BENDIAN_TO_HOST_INT32(arg)	(uint32)(arg)
 #define B_BENDIAN_TO_HOST_INT16(arg)	(uint16)(arg)
 
-#endif	// BYTE_ORDER
+#endif	/* BYTE_ORDER */
 
 
 #ifdef __cplusplus
@@ -118,7 +118,7 @@ extern status_t swap_data(type_code type, void *data, size_t length,
 extern bool is_type_swapped(type_code type);
 
 
-// Private implementations
+/* Private implementations */
 extern double __swap_double(double arg);
 extern float  __swap_float(float arg);
 extern uint64 __swap_int64(uint64 arg);
@@ -129,4 +129,4 @@ extern uint16 __swap_int16(uint16 arg);
 }
 #endif
 
-#endif	// _BYTEORDER_H
+#endif	/* _BYTEORDER_H */

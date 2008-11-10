@@ -10,11 +10,11 @@
 
 
 typedef enum {
-	// Per volume directories
+	/* Per volume directories */
 	B_DESKTOP_DIRECTORY				= 0,
 	B_TRASH_DIRECTORY,
 
-	// System directories
+	/* System directories */
 	B_BEOS_DIRECTORY				= 1000,
 	B_BEOS_SYSTEM_DIRECTORY,
 	B_BEOS_ADDONS_DIRECTORY,
@@ -32,7 +32,7 @@ typedef enum {
 	B_BEOS_SOUNDS_DIRECTORY,
 	B_BEOS_DATA_DIRECTORY,
 
-	// Common directories, shared among all users.
+	/* Common directories, shared among all users. */
 	B_COMMON_DIRECTORY				= 2000,
 	B_COMMON_SYSTEM_DIRECTORY,
 	B_COMMON_ADDONS_DIRECTORY,
@@ -55,8 +55,8 @@ typedef enum {
 	B_COMMON_DATA_DIRECTORY,
 
 
-	// User directories. These are interpreted in the context
-	// of the user making the find_directory call.
+	/* User directories. These are interpreted in the context
+	   of the user making the find_directory call. */
 	B_USER_DIRECTORY				= 3000,
 	B_USER_CONFIG_DIRECTORY,
 	B_USER_ADDONS_DIRECTORY,
@@ -72,7 +72,7 @@ typedef enum {
 	B_USER_DATA_DIRECTORY,
 	B_USER_CACHE_DIRECTORY,
 
-	// Global directories.
+	/* Global directories. */
 	B_APPS_DIRECTORY				= 4000,
 	B_PREFERENCES_DIRECTORY,
 	B_UTILITIES_DIRECTORY
@@ -83,7 +83,7 @@ typedef enum {
 extern "C" {
 #endif
 
-// C interface
+/* C interface */
 
 status_t find_directory(directory_which which, dev_t volume, bool createIt,
 	char* pathString, int32 length);
@@ -91,7 +91,7 @@ status_t find_directory(directory_which which, dev_t volume, bool createIt,
 #ifdef __cplusplus
 }
 
-// C++ interface
+/* C++ interface */
 
 class BVolume;
 class BPath;
@@ -99,6 +99,6 @@ class BPath;
 status_t find_directory(directory_which which, BPath* path,
 	bool createIt = false, BVolume* volume = NULL);
 
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
-#endif	// _FIND_DIRECTORY_H
+#endif	/* _FIND_DIRECTORY_H */

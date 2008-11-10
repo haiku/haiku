@@ -110,9 +110,9 @@ typedef struct port_info {
 	port_id		port;
 	team_id		team;
 	char		name[B_OS_NAME_LENGTH];
-	int32		capacity;		// queue depth
-	int32		queue_count;	// # msgs waiting to be read
-	int32		total_count;	// total # msgs read so far
+	int32		capacity;		/* queue depth */
+	int32		queue_count;	/* # msgs waiting to be read */
+	int32		total_count;	/* total # msgs read so far */
 } port_info;
 
 extern port_id	create_port(int32 capacity, const char *name);
@@ -142,8 +142,8 @@ extern status_t _get_next_port_info(team_id team, int32 *cookie, port_info *port
 			_get_next_port_info((team), (cookie), (info), sizeof(*(info)))
 
 
-// WARNING: The following is Haiku experimental API. It might be removed or
-// changed in the future.
+/* WARNING: The following is Haiku experimental API. It might be removed or
+   changed in the future. */
 
 typedef struct port_message_info {
 	size_t		size;
@@ -152,7 +152,7 @@ typedef struct port_message_info {
 	team_id		sender_team;
 } port_message_info;
 
-// similar to port_buffer_size_etc(), but returns (more) info
+/* similar to port_buffer_size_etc(), but returns (more) info */
 extern status_t _get_port_message_info_etc(port_id port,
 					port_message_info *info, size_t infoSize, uint32 flags,
 					bigtime_t timeout);
@@ -174,21 +174,21 @@ typedef struct sem_info {
 
 /* semaphore flags */
 enum {
-	B_CAN_INTERRUPT				= 0x01,	// acquisition of the semaphore can be
-										// interrupted (system use only)
-	B_CHECK_PERMISSION			= 0x04,	// ownership will be checked (system use
-										// only)
-	B_KILL_CAN_INTERRUPT		= 0x20,	// acquisition of the semaphore can be
-										// interrupted by SIGKILL[THR], even
-										// if not B_CAN_INTERRUPT (system use
-										// only)
+	B_CAN_INTERRUPT				= 0x01,	/* acquisition of the semaphore can be
+										   interrupted (system use only) */
+	B_CHECK_PERMISSION			= 0x04,	/* ownership will be checked (system use
+										   only) */
+	B_KILL_CAN_INTERRUPT		= 0x20,	/* acquisition of the semaphore can be
+										   interrupted by SIGKILL[THR], even
+										   if not B_CAN_INTERRUPT (system use
+										   only) */
 
 	/* release_sem_etc() only flags */
-	B_DO_NOT_RESCHEDULE			= 0x02,	// thread is not rescheduled
-	B_RELEASE_ALL				= 0x08,	// all waiting threads will be woken up,
-										// count will be zeroed
-	B_RELEASE_IF_WAITING_ONLY	= 0x10	// release count only if there are any
-										// threads waiting
+	B_DO_NOT_RESCHEDULE			= 0x02,	/* thread is not rescheduled */
+	B_RELEASE_ALL				= 0x08,	/* all waiting threads will be woken up,
+										   count will be zeroed */
+	B_RELEASE_IF_WAITING_ONLY	= 0x10	/* release count only if there are any
+										   threads waiting */
 };
 
 extern sem_id	create_sem(int32 count, const char *name);
@@ -197,8 +197,8 @@ extern status_t	acquire_sem(sem_id id);
 extern status_t	acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout);
 extern status_t	release_sem(sem_id id);
 extern status_t	release_sem_etc(sem_id id, int32 count, uint32 flags);
-// ToDo: the following two calls are not part of the BeOS API, and might be
-//	changed or even removed for the final release of Haiku R1
+/* ToDo: the following two calls are not part of the BeOS API, and might be
+   changed or even removed for the final release of Haiku R1 */
 extern status_t	switch_sem(sem_id semToBeReleased, sem_id id);
 extern status_t	switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 					uint32 flags, bigtime_t timeout);
@@ -382,7 +382,7 @@ extern void	debugger(const char *message);
 */
 extern int disable_debugger(int state);
 
-// TODO: Remove. Temporary debug helper.
+/* TODO: Remove. Temporary debug helper. */
 extern void debug_printf(const char *format, ...)
 	__attribute__ ((format (__printf__, 1, 2)));
 extern void debug_vprintf(const char *format, va_list args);
@@ -410,7 +410,7 @@ extern void ktrace_vprintf(const char *format, va_list args);
 #define OBOS_CPU_TYPES
 
 typedef enum cpu_types {
-	// ToDo: add latest models
+	/* ToDo: add latest models */
 
 	/* Motorola/IBM */
 	B_CPU_PPC_UNKNOWN					= 0,
@@ -708,7 +708,7 @@ extern int32	is_computer_on(void);
 extern double	is_computer_on_fire(void);
 
 
-// WARNING: Experimental API!
+/* WARNING: Experimental API! */
 
 enum {
 	B_OBJECT_TYPE_FD		= 0,
@@ -718,35 +718,35 @@ enum {
 };
 
 enum {
-	B_EVENT_READ				= 0x0001,	// FD/port readable
-	B_EVENT_WRITE				= 0x0002,	// FD/port writable
-	B_EVENT_ERROR				= 0x0004,	// FD error
-	B_EVENT_PRIORITY_READ		= 0x0008,	// FD priority readable
-	B_EVENT_PRIORITY_WRITE		= 0x0010,	// FD priority writable
-	B_EVENT_HIGH_PRIORITY_READ	= 0x0020,	// FD high priority readable
-	B_EVENT_HIGH_PRIORITY_WRITE	= 0x0040,	// FD high priority writable
-	B_EVENT_DISCONNECTED		= 0x0080,	// FD disconnected
+	B_EVENT_READ				= 0x0001,	/* FD/port readable */
+	B_EVENT_WRITE				= 0x0002,	/* FD/port writable */
+	B_EVENT_ERROR				= 0x0004,	/* FD error */
+	B_EVENT_PRIORITY_READ		= 0x0008,	/* FD priority readable */
+	B_EVENT_PRIORITY_WRITE		= 0x0010,	/* FD priority writable */
+	B_EVENT_HIGH_PRIORITY_READ	= 0x0020,	/* FD high priority readable */
+	B_EVENT_HIGH_PRIORITY_WRITE	= 0x0040,	/* FD high priority writable */
+	B_EVENT_DISCONNECTED		= 0x0080,	/* FD disconnected */
 
-	B_EVENT_ACQUIRE_SEMAPHORE	= 0x0001,	// semaphore can be acquired
+	B_EVENT_ACQUIRE_SEMAPHORE	= 0x0001,	/* semaphore can be acquired */
 
-	B_EVENT_INVALID				= 0x1000	// FD/port/sem/thread ID not or
-											// no longer valid (e.g. has been
-											// close/deleted)
+	B_EVENT_INVALID				= 0x1000	/* FD/port/sem/thread ID not or
+											   no longer valid (e.g. has been
+											   close/deleted) */
 };
 
 typedef struct object_wait_info {
-	int32		object;						// ID of the object
-	uint16		type;						// type of the object
-	uint16		events;						// events mask
+	int32		object;						/* ID of the object */
+	uint16		type;						/* type of the object */
+	uint16		events;						/* events mask */
 } object_wait_info;
 
-// wait_for_objects[_etc]() waits until at least one of the specified events or,
-// if given, the timeout occurred. When entering the function the
-// object_wait_info::events field specifies the events for each object the
-// caller is interested in. When the function returns the fields reflect the
-// events that actually occurred. The events B_EVENT_INVALID, B_EVENT_ERROR,
-// and B_EVENT_DISCONNECTED don't need to be specified. They will always be
-// reported, when they occur.
+/* wait_for_objects[_etc]() waits until at least one of the specified events or,
+   if given, the timeout occurred. When entering the function the
+   object_wait_info::events field specifies the events for each object the
+   caller is interested in. When the function returns the fields reflect the
+   events that actually occurred. The events B_EVENT_INVALID, B_EVENT_ERROR,
+   and B_EVENT_DISCONNECTED don't need to be specified. They will always be
+   reported, when they occur. */
 
 extern ssize_t 	wait_for_objects(object_wait_info* infos, int numInfos);
 extern ssize_t 	wait_for_objects_etc(object_wait_info* infos, int numInfos,

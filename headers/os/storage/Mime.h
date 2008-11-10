@@ -19,7 +19,7 @@ enum icon_size {
 	B_MINI_ICON		= 16
 };
 
-// values for the "force" parameter of update_mime_info() (Haiku only)
+/* values for the "force" parameter of update_mime_info() (Haiku only) */
 enum {
 	B_UPDATE_MIME_INFO_NO_FORCE			= 0,
 	B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE	= 1,
@@ -27,7 +27,7 @@ enum {
 };
 
 
-// C functions
+/* C functions */
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +42,7 @@ status_t get_device_icon(const char* device, void* icon, int32 size);
 #ifdef __cplusplus
 }
 
-// C++ functions, Haiku only!
+/* C++ functions, Haiku only! */
 
 class BBitmap;
 
@@ -54,8 +54,8 @@ status_t get_named_icon(const char* name, BBitmap* icon, icon_size which);
 status_t get_named_icon(const char* name, uint8** _data, size_t* _size,
 	type_code* _type);
 
-// include MimeType.h for convenience
+/* include MimeType.h for convenience */
 #	include <MimeType.h>
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
-#endif	// _MIME_H
+#endif	/* _MIME_H */
