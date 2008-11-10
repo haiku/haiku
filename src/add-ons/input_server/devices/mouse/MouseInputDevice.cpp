@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <Autolock.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -31,7 +32,6 @@
 
 
 #undef TRACE
-#undef CALLED
 //#define TRACE_MOUSE_DEVICE
 #ifdef TRACE_MOUSE_DEVICE
 
@@ -76,22 +76,15 @@
 							_to.Append(' ', (sFunctionDepth + 1) * 2); \
 							debug_printf("%p -> %s", this, _to.String()); \
 							debug_printf(x); }
-#	define LOG(text...) debug_printf(text)
 #	define LOG_EVENT(text...) do {} while (0)
-#	define LOG_ERR(text...) LOG(text)
+#	define LOG_ERR(text...) TRACE(text)
 #else
 #	define TRACE(x...) do {} while (0)
 #	define MD_CALLED(x...) TRACE(x)
 #	define MID_CALLED(x...) TRACE(x)
-#	define LOG(text...) TRACE(x)
 #	define LOG_ERR(text...) debug_printf(text)
 #	define LOG_EVENT(text...) TRACE(x)
 #endif
-
-
-//#define LOG_DEVICES(text...) debug_printf(text)
-#define LOG_DEVICES(text...) LOG(text)
-
 
 
 const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
@@ -99,41 +92,47 @@ const static char* kMouseDevicesDirectory = "/dev/input/mouse";
 
 
 class MouseDevice {
-	public:
-		MouseDevice(MouseInputDevice& target, const char* path);
-		~MouseDevice();
+public:
+								MouseDevice(MouseInputDevice& target,
+									const char* path);
+								~MouseDevice();
 
-		status_t Start();
-		void Stop();
+			status_t			Start();
+			void				Stop();
 
-		status_t UpdateSettings();
+			status_t			UpdateSettings();
 
-		const char* Path() const { return fPath.String(); }
-		input_device_ref* DeviceRef() { return &fDeviceRef; }
+			const char*			Path() const { return fPath.String(); }
+			input_device_ref*	DeviceRef() { return &fDeviceRef; }
 
-	private:
-		void _Run();
-		static status_t _ThreadFunction(void* arg);
+private:
+			char*				_BuildShortName() const;
 
-		BMessage* _BuildMouseMessage(uint32 what, uint64 when, uint32 buttons,
-					int32 deltaX, int32 deltaY) const;
-		void _ComputeAcceleration(const mouse_movement& movements,
-					int32& deltaX, int32& deltaY) const;
-		uint32 _RemapButtons(uint32 buttons) const;
+	static	status_t			_ControlThreadEntry(void* arg);
+			void				_ControlThread();
+			void				_ControlThreadCleanup();
+			void				_UpdateSettings();
 
-		char* _BuildShortName() const;
+			BMessage*			_BuildMouseMessage(uint32 what,
+									uint64 when, uint32 buttons,
+									int32 deltaX, int32 deltaY) const;
+			void				_ComputeAcceleration(
+									const mouse_movement& movements,
+									int32& deltaX, int32& deltaY) const;
+			uint32				_RemapButtons(uint32 buttons) const;
 
-	private:
-		MouseInputDevice&	fTarget;
-		BString				fPath;
-		int					fDevice;
+private:
+			MouseInputDevice&	fTarget;
+			BString				fPath;
+			int					fDevice;
 
-		input_device_ref	fDeviceRef;
-		mouse_settings		fSettings;
-		bool				fDeviceRemapsButtons;
+			input_device_ref	fDeviceRef;
+			mouse_settings		fSettings;
+			bool				fDeviceRemapsButtons;
 
-		thread_id			fThread;
-		volatile bool		fActive;
+			thread_id			fThread;
+	volatile bool				fActive;
+	volatile bool				fUpdateSettings;
 };
 
 
@@ -154,7 +153,8 @@ MouseDevice::MouseDevice(MouseInputDevice& target, const char* driverPath)
 	fDevice(-1),
 	fDeviceRemapsButtons(false),
 	fThread(-1),
-	fActive(false)
+	fActive(false),
+	fUpdateSettings(false)
 {
 	MD_CALLED();
 
@@ -175,9 +175,6 @@ MouseDevice::~MouseDevice()
 	MD_CALLED();
 	TRACE("delete\n");
 
-	if (fTarget._HasDevice(this))
-		TRACE("still in the list!\n");
-
 	if (fActive)
 		Stop();
 
@@ -191,15 +188,12 @@ MouseDevice::Start()
 	MD_CALLED();
 
 	fDevice = open(fPath.String(), O_RDWR);
-	if (fDevice < 0)
-		return errno;
-
-	UpdateSettings();
+		// let the control thread handle any error on opening the device
 
 	char threadName[B_OS_NAME_LENGTH];
 	snprintf(threadName, B_OS_NAME_LENGTH, "%s watcher", fDeviceRef.name);
 
-	fThread = spawn_thread(_ThreadFunction, threadName,
+	fThread = spawn_thread(_ControlThreadEntry, threadName,
 		kMouseThreadPriority, (void*)this);
 
 	status_t status;
@@ -213,7 +207,6 @@ MouseDevice::Start()
 	if (status < B_OK) {
 		LOG_ERR("%s: can't spawn/resume watching thread: %s\n",
 			fDeviceRef.name, strerror(status));
-		close(fDevice);
 		return status;
 	}
 
@@ -248,45 +241,63 @@ MouseDevice::UpdateSettings()
 {
 	MD_CALLED();
 
-	// retrieve current values
+	if (fThread < 0)
+		return B_ERROR;
 
-	if (get_mouse_map(&fSettings.map) != B_OK)
-		LOG_ERR("error when get_mouse_map\n");
-	else
-		fDeviceRemapsButtons = ioctl(fDevice, MS_SET_MAP, &fSettings.map) == B_OK;
-
-	if (get_click_speed(&fSettings.click_speed) != B_OK)
-		LOG_ERR("error when get_click_speed\n");
-	else
-		ioctl(fDevice, MS_SET_CLICKSPEED, &fSettings.click_speed);
-
-	if (get_mouse_speed(&fSettings.accel.speed) != B_OK)
-		LOG_ERR("error when get_mouse_speed\n");
-	else {
-		if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)
-			LOG_ERR("error when get_mouse_acceleration\n");
-		else {
-			mouse_accel accel;
-			ioctl(fDevice, MS_GET_ACCEL, &accel);
-			accel.speed = fSettings.accel.speed;
-			accel.accel_factor = fSettings.accel.accel_factor;
-			ioctl(fDevice, MS_SET_ACCEL, &fSettings.accel);
-		}
-	}
-
-	if (get_mouse_type(&fSettings.type) != B_OK)
-		LOG_ERR("error when get_mouse_type\n");
-	else
-		ioctl(fDevice, MS_SET_TYPE, &fSettings.type);
+	fUpdateSettings = true;
+		// This will provoke the control thread to update the settings.
 
 	return B_OK;
+}
 
+
+char*
+MouseDevice::_BuildShortName() const
+{
+	BString string(fPath);
+	BString name;
+
+	int32 slash = string.FindLast("/");
+	string.CopyInto(name, slash + 1, string.Length() - slash);
+	int32 index = atoi(name.String()) + 1;
+
+	int32 previousSlash = string.FindLast("/", slash);
+	string.CopyInto(name, previousSlash + 1, slash - previousSlash - 1);
+
+	if (name == "ps2")
+		name = "PS/2";
+	else
+		name.Capitalize();
+
+	name << " Mouse " << index;
+
+	return strdup(name.String());
+}
+
+
+// #pragma mark - control thread
+
+
+status_t
+MouseDevice::_ControlThreadEntry(void* arg)
+{
+	MouseDevice* device = (MouseDevice*)arg;
+	device->_ControlThread();
+	return B_OK;
 }
 
 
 void
-MouseDevice::_Run()
+MouseDevice::_ControlThread()
 {
+	if (fDevice < 0) {
+		_ControlThreadCleanup();
+		// TOAST!
+		return;
+	}
+
+	_UpdateSettings();
+
 	uint32 lastButtons = 0;
 
 	while (fActive) {
@@ -294,18 +305,15 @@ MouseDevice::_Run()
 		memset(&movements, 0, sizeof(movements));
 
 		if (ioctl(fDevice, MS_READ, &movements) != B_OK) {
-			if (fActive) {
-				fThread = -1;
-				fTarget._RemoveDevice(fPath.String());
-			} else {
-				// In case active is already false, another thread
-				// waits for this thread to quit, and may already hold
-				// locks that _RemoveDevice() wants to acquire. In another
-				// words, the device is already being removed, so we simply
-				// quit here.
-			}
+			_ControlThreadCleanup();
 			// TOAST!
 			return;
+		}
+
+		// take care of updating the settings first, if necessary
+		if (fUpdateSettings) {
+			_UpdateSettings();
+			fUpdateSettings = false;
 		}
 
 		uint32 buttons = lastButtons ^ movements.buttons;
@@ -361,12 +369,62 @@ MouseDevice::_Run()
 }
 
 
-status_t
-MouseDevice::_ThreadFunction(void* arg)
+void
+MouseDevice::_ControlThreadCleanup()
 {
-	MouseDevice* device = (MouseDevice*)arg;
-	device->_Run();
-	return B_OK;
+	// NOTE: Only executed when the control thread detected an error
+	// and from within the control thread!
+
+	if (fActive) {
+		fThread = -1;
+		fTarget._RemoveDevice(fPath.String());
+	} else {
+		// In case active is already false, another thread
+		// waits for this thread to quit, and may already hold
+		// locks that _RemoveDevice() wants to acquire. In another
+		// words, the device is already being removed, so we simply
+		// quit here.
+	}
+}
+
+
+void
+MouseDevice::_UpdateSettings()
+{
+	MD_CALLED();
+
+	// retrieve current values
+
+	if (get_mouse_map(&fSettings.map) != B_OK)
+		LOG_ERR("error when get_mouse_map\n");
+	else {
+		fDeviceRemapsButtons
+			= ioctl(fDevice, MS_SET_MAP, &fSettings.map) == B_OK;
+	}
+
+	if (get_click_speed(&fSettings.click_speed) != B_OK)
+		LOG_ERR("error when get_click_speed\n");
+	else
+		ioctl(fDevice, MS_SET_CLICKSPEED, &fSettings.click_speed);
+
+	if (get_mouse_speed(&fSettings.accel.speed) != B_OK)
+		LOG_ERR("error when get_mouse_speed\n");
+	else {
+		if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)
+			LOG_ERR("error when get_mouse_acceleration\n");
+		else {
+			mouse_accel accel;
+			ioctl(fDevice, MS_GET_ACCEL, &accel);
+			accel.speed = fSettings.accel.speed;
+			accel.accel_factor = fSettings.accel.accel_factor;
+			ioctl(fDevice, MS_SET_ACCEL, &fSettings.accel);
+		}
+	}
+
+	if (get_mouse_type(&fSettings.type) != B_OK)
+		LOG_ERR("error when get_mouse_type\n");
+	else
+		ioctl(fDevice, MS_SET_TYPE, &fSettings.type);
 }
 
 
@@ -445,36 +503,13 @@ MouseDevice::_RemapButtons(uint32 buttons) const
 }
 
 
-char*
-MouseDevice::_BuildShortName() const
-{
-	BString string(fPath);
-	BString name;
-
-	int32 slash = string.FindLast("/");
-	string.CopyInto(name, slash + 1, string.Length() - slash);
-	int32 index = atoi(name.String()) + 1;
-
-	int32 previousSlash = string.FindLast("/", slash);
-	string.CopyInto(name, previousSlash + 1, slash - previousSlash - 1);
-
-	if (name == "ps2")
-		name = "PS/2";
-	else
-		name.Capitalize();
-
-	name << " Mouse " << index;
-
-	return strdup(name.String());
-}
-
-
 //	#pragma mark -
 
 
 MouseInputDevice::MouseInputDevice()
 	:
-	fDevices(2, true)
+	fDevices(2, true),
+	fDeviceListLock("MouseInputDevice list")
 {
 	MID_CALLED();
 
@@ -592,7 +627,7 @@ MouseInputDevice::_RecursiveScan(const char* directory)
 
 
 MouseDevice*
-MouseInputDevice::_FindDevice(const char* path)
+MouseInputDevice::_FindDevice(const char* path) const
 {
 	MID_CALLED();
 
@@ -610,6 +645,8 @@ status_t
 MouseInputDevice::_AddDevice(const char* path)
 {
 	MID_CALLED();
+
+	BAutolock _(fDeviceListLock);
 
 	_RemoveDevice(path);
 
@@ -640,6 +677,8 @@ MouseInputDevice::_RemoveDevice(const char* path)
 {
 	MID_CALLED();
 
+	BAutolock _(fDeviceListLock);
+
 	MouseDevice* device = _FindDevice(path);
 	if (device == NULL) {
 		TRACE("%s not found\n", path);
@@ -659,15 +698,5 @@ MouseInputDevice::_RemoveDevice(const char* path)
 	return B_OK;
 }
 
-
-bool
-MouseInputDevice::_HasDevice(const MouseDevice* device) const
-{
-	for (int32 i = fDevices.CountItems() - 1; i >= 0; i--) {
-		if (device == fDevices.ItemAt(i))
-			return true;
-	}
-	return false;
-}
 
 

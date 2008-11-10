@@ -10,7 +10,6 @@
 #include <Handler.h>
 #include <InputServerDevice.h>
 #include <Locker.h>
-#include <List.h>
 
 #include <InputServerTypes.h>
 #include <ObjectList.h>
@@ -29,23 +28,24 @@ public:
 	virtual						~KeyboardDevice();
 
 	virtual	void				MessageReceived(BMessage* message);
-			status_t			EnqueueInlineInputMethod(int32 opcode,
-									const char* string = NULL,
-									bool confirmed = false,
-									BMessage* keyDown = NULL);
-
 			status_t			Start();
 			void				Stop();
 
-			status_t			InitFromSettings(uint32 opcode = 0);
-			void				UpdateLEDs();
+			status_t			UpdateSettings(uint32 opcode = 0);
 
 			const char*			Path() const { return fPath; }
 			input_device_ref*	DeviceRef() { return &fDeviceRef; }
 
 private:
-	static	int32				_ThreadEntry(void* arg);
-			int32				_Thread();
+	static	int32				_ControlThreadEntry(void* arg);
+			int32				_ControlThread();
+			void				_ControlThreadCleanup();
+			void				_UpdateSettings(uint32 opcode);
+			void				_UpdateLEDs();
+			status_t			_EnqueueInlineInputMethod(int32 opcode,
+									const char* string = NULL,
+									bool confirmed = false,
+									BMessage* keyDown = NULL);
 
 private:
 			KeyboardInputDevice* fOwner;
@@ -58,6 +58,9 @@ private:
 			bool				fIsAT;
 	volatile bool				fInputMethodStarted;
 			uint32				fModifiers;
+
+	volatile bool				fUpdateSettings;
+	volatile uint32				fSettingsCommand;
 
 			Keymap				fKeymap;
 			BLocker				fKeymapLock;
@@ -92,6 +95,7 @@ private:
 			status_t			_RemoveDevice(const char* path);
 
 			BObjectList<KeyboardDevice> fDevices;
+			BLocker				fDeviceListLock;
 			TeamMonitorWindow*	fTeamMonitorWindow;
 };
 

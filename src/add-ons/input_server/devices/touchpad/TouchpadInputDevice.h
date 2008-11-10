@@ -12,6 +12,7 @@
 
 #include <InputServerDevice.h>
 #include <InterfaceDefs.h>
+#include <Locker.h>
 
 #include <ObjectList.h>
 
@@ -41,11 +42,12 @@ public:
 			status_t			_HandleMonitor(BMessage* message);
 			void				_RecursiveScan(const char* directory);
 
-			TouchpadDevice*		_FindDevice(const char* path);
+			TouchpadDevice*		_FindDevice(const char* path) const;
 			status_t			_AddDevice(const char* path);
 			status_t			_RemoveDevice(const char* path);
 
 			BObjectList<TouchpadDevice> fDevices;
+			BLocker				fDeviceListLock;
 };
 
 extern "C" BInputServerDevice* instantiate_input_device();
