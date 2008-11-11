@@ -10,6 +10,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 	isHybridBuild = 1 ;
 }
 
+
 # Available Optional Packages:
 #	APR
 #	APR-util
@@ -105,6 +106,7 @@ if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/beos/documentation/bebook/index.html : BeBook ;
 }
+
 
 # BeHappy
 if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
@@ -448,6 +450,7 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 	}
 }
 
+
 # VLC media player
 if [ IsOptionalHaikuImagePackageAdded VLC ] {
 	if $(TARGET_ARCH) != x86 {
@@ -466,6 +469,7 @@ if [ IsOptionalHaikuImagePackageAdded VLC ] {
 	}
 }
 
+
 # Welcome
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 	CopyDirectoryToHaikuImage beos documentation
@@ -477,6 +481,7 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/beos/documentation/welcome/welcome.html : Welcome ;
 }
+
 
 # WonderBrush
 if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
@@ -494,6 +499,7 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 			: /boot/apps/WonderBrush/WonderBrush ;
 	}
 }
+
 
 # Yasm
 if [ IsOptionalHaikuImagePackageAdded Yasm ] {
