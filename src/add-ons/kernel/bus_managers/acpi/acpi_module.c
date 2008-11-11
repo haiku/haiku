@@ -111,8 +111,10 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 
 			get_device_hid(result, hid);
 
-			if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs, NULL, &deviceNode) == B_OK)
-				acpi_enumerate_child_devices(deviceNode, result);
+			if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs,
+					NULL, &deviceNode) == B_OK)
+                		acpi_enumerate_child_devices(deviceNode, result);
+
 			break;
 		}
 		case ACPI_TYPE_POWER:
@@ -180,7 +182,7 @@ acpi_module_uninit(void *cookie)
 
 
 static int32
-apci_module_std_ops(int32 op, ...)
+acpi_module_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
@@ -203,7 +205,7 @@ static struct acpi_root_info sACPIRootModule = {
 		{
 			ACPI_ROOT_MODULE_NAME,
 			0,
-			apci_module_std_ops
+			acpi_module_std_ops
 		},
 
 		acpi_module_supports_device,
