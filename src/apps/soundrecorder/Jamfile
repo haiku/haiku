@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src apps soundrecorder ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders shared ;
+UseLibraryHeaders icon ;
 
 Application SoundRecorder :
 	DrawButton.cpp

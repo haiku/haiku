@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <IconUtils.h>
 #include <MimeType.h>
 #include <Screen.h>
 #include <Window.h>
@@ -260,7 +261,28 @@ ScopeView::MouseDown(BPoint position)
 		drag.AddString("be:clip_name", "Audio Clip");
 		drag.AddString("be:types", B_FILE_MIME_TYPE);
 		
-		DragMessage(&drag, Bounds());
+		uint8* data;
+		size_t size;
+		
+		BMimeType wavType("audio/x-wav");
+		if (wavType.InitCheck() < B_OK
+			|| wavType.GetIcon(&data, &size) < B_OK) {
+			wavType.SetTo("audio");
+			if (wavType.InitCheck() < B_OK
+				|| wavType.GetIcon(&data, &size) < B_OK) {
+				return;
+			}
+		}
+
+		BBitmap* bitmap = new BBitmap(
+			BRect(0, 0, 31, 31), 0, B_RGBA32);
+		if (BIconUtils::GetVectorIcon(data, size, bitmap) < B_OK) {
+			delete[] data;
+			delete bitmap;
+			return;
+		}
+		delete[] data;
+		DragMessage(&drag, bitmap, B_OP_ALPHA, BPoint(0,0));
 	}
 }
 

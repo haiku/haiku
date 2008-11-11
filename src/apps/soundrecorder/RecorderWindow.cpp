@@ -43,7 +43,6 @@
 
 #include "RecorderWindow.h"
 #include "SoundConsumer.h"
-#include "SoundListView.h"
 #include "FileUtils.h"
 
 #if ! NDEBUG
@@ -807,7 +806,15 @@ void
 RecorderWindow::Selected(BMessage * message)
 {
 	//	User selected a sound in list view
-	UpdatePlayFile();
+	int32 selIdx = fSoundList->CurrentSelection();
+	SoundListItem* pItem = dynamic_cast<SoundListItem*>(fSoundList->ItemAt(selIdx));
+	if (!pItem)
+		return;
+	status_t err = UpdatePlayFile(pItem, true);
+	if (err != B_OK) {
+		ErrorAlert("recognize this file as a media file", err == B_MEDIA_NO_HANDLER ? B_OK : err);
+		RemoveCurrentSoundItem();
+	}
 	UpdateButtons();
 }
 
@@ -1003,19 +1010,12 @@ RecorderWindow::UpdateButtons()
 extern "C" status_t DecodedFormat__11BMediaTrackP12media_format(BMediaTrack *self, media_format *inout_format);
 #endif
 
-void
-RecorderWindow::UpdatePlayFile()
+status_t
+RecorderWindow::UpdatePlayFile(SoundListItem* item, bool updateDisplay)
 {
 	fScopeView->CancelRendering();
 	StopPlaying();
 	StopRecording();
-
-	//	Get selection.
-	int32 selIdx = fSoundList->CurrentSelection();
-	SoundListItem* pItem = dynamic_cast<SoundListItem*>(fSoundList->ItemAt(selIdx));
-	if (! pItem) {
-		return;
-	}
 
 	if (fPlayTrack && fPlayFile) {
 		fPlayFile->ReleaseTrack(fPlayTrack);
@@ -1027,16 +1027,14 @@ RecorderWindow::UpdatePlayFile()
 	}
 
 	status_t err;
-	BEntry& entry = pItem->Entry();
+	BEntry& entry = item->Entry();
 	entry_ref ref;
 	entry.GetRef(&ref);
 	fPlayFile = new BMediaFile(&ref); //, B_MEDIA_FILE_UNBUFFERED);
 	if ((err = fPlayFile->InitCheck()) < B_OK) {
-		ErrorAlert("recognize this file as a media file", err);
 		delete fPlayFile;
 		fPlayFile = NULL;
-		RemoveCurrentSoundItem();
-		return;
+		return err;
 	}
 
 	for (int ix=0; ix<fPlayFile->CountTracks(); ix++) {
@@ -1056,12 +1054,13 @@ RecorderWindow::UpdatePlayFile()
 	}
 
 	if (!fPlayTrack) {
-		ErrorAlert("find an audio track", err);
 		delete fPlayFile;
 		fPlayFile = NULL;
-		RemoveCurrentSoundItem();
-		return;
+		return B_STREAM_NOT_FOUND;
 	}
+
+	if (!updateDisplay)
+		return B_OK;
 
 	BString filename = "File Name: ";
 	filename << ref.name;
@@ -1101,6 +1100,7 @@ RecorderWindow::UpdatePlayFile()
 	fScopeView->RenderTrack(fPlayTrack, fPlayFormat);
 
 	fPlayFrames = fPlayTrack->CountFrames();
+	return B_OK;
 }
 
 
@@ -1108,7 +1108,10 @@ void
 RecorderWindow::ErrorAlert(const char * action, status_t err)
 {
 	char msg[300];
-	sprintf(msg, "Cannot %s: %s. [%lx]", action, strerror(err), (int32) err);
+	if (err != B_OK)
+		sprintf(msg, "Cannot %s: %s. [%lx]", action, strerror(err), (int32) err);
+	else
+		sprintf(msg, "Cannot %s.", action);
 	(new BAlert("", msg, "Stop"))->Go();
 }
 
@@ -1161,8 +1164,12 @@ RecorderWindow::AddSoundItem(const BEntry& entry, bool temp)
 
 void
 RecorderWindow::RemoveCurrentSoundItem() {
-	BListItem *item = fSoundList->RemoveItem(fSoundList->CurrentSelection());
+	int32 index = fSoundList->CurrentSelection();
+	BListItem *item = fSoundList->RemoveItem(index);
 	delete item;
+	if (index >= fSoundList->CountItems())
+		index = fSoundList->CountItems() - 1;
+	fSoundList->Select(index);
 }
 
 
@@ -1171,7 +1178,6 @@ RecorderWindow::RecordFile(void * cookie, bigtime_t timestamp,
 	void * data, size_t size, const media_raw_audio_format & format)
 {
 	//	Callback called from the SoundConsumer when receiving buffers.
-	assert((format.format & 0x02) && format.channel_count);
 	RecorderWindow * window = (RecorderWindow *)cookie;
 
 	if (window->fRecording) {
@@ -1238,6 +1244,8 @@ RecorderWindow::RefsReceived(BMessage *msg)
 {
 	entry_ref ref;
 	int32 i = 0;
+	int32 countGood = 0;
+	int32 countBad = 0;
 
 	while (msg->FindRef("refs", i++, &ref) == B_OK) {
 
@@ -1246,10 +1254,28 @@ RecorderWindow::RefsReceived(BMessage *msg)
 		BNode node(&entry);
 
 		if (node.IsFile()) {
-			AddSoundItem(entry, false);
+			SoundListItem * listItem = new SoundListItem(entry, false);
+			if (UpdatePlayFile(listItem) == B_OK) {
+				fSoundList->AddItem(listItem);
+				countGood++;
+				continue;
+			}
+			delete listItem;
 		} else if(node.IsDirectory()) {
 
 		}
+		countBad++;
+	}
+
+	if (countBad > 0 && countGood == 0)
+		(new BAlert("Nothing to Play", "None of the files appear to be "
+			"audio files", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+	else if (countGood > 0) {
+		if (countBad > 0)
+			(new BAlert("Invalid audio files", "Some of the files "
+				"don't appear to be audio files", "OK", NULL, NULL, 
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		fSoundList->Select(fSoundList->CountItems() - 1);
 	}
 }
 
@@ -1270,7 +1296,6 @@ RecorderWindow::CopyTarget(BMessage *msg)
 				
 				// seek time
 				bigtime_t start = fTrackSlider->LeftTime();
-				fPlayTrack->SeekToTime(&start);
 				
 				// write data
 				bigtime_t diffTime = fTrackSlider->RightTime() - fTrackSlider->LeftTime();
@@ -1299,11 +1324,16 @@ RecorderWindow::CopyTarget(BMessage *msg)
 
 				char *data = (char *)malloc(fPlayFormat.u.raw_audio.buffer_size);
 				
+				fPlayTrack->SeekToTime(&start);
+				fPlayFrame = fPlayTrack->CurrentFrame();
 				while (framesToWrite > 0) {
 					int64 frames = 0;
 					status_t err = fPlayTrack->ReadFrames(data, &frames);
-					if (frames <= 0 || err != B_OK)
+					if (frames <= 0 || err != B_OK) {
+						if (err != B_OK)
+							fprintf(stderr, "CopyTarget: ReadFrames failed\n");
 						break;
+					}
 					file.Write(data, frames * frameSize);
 					framesToWrite -= frames;
 				}

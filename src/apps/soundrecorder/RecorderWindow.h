@@ -20,6 +20,7 @@
 
 #include "DrawButton.h"
 #include "ScopeView.h"
+#include "SoundListView.h"
 #include "TransportButton.h"
 #include "TrackSlider.h"
 #include "UpDownButton.h"
@@ -155,7 +156,7 @@ private:
 		void CalcSizes(float min_width, float min_height);
 		void SetButtonState(BtnState state);
 		void UpdateButtons();
-		void UpdatePlayFile();
+		status_t UpdatePlayFile(SoundListItem *item, bool updateDisplay = false);
 		void ErrorAlert(const char * action, status_t err);
 
 static	void RecordFile(void * cookie, bigtime_t timestamp, void * data, size_t size, const media_raw_audio_format & format);
