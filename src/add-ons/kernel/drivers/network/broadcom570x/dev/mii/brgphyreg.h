@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/dev/mii/brgphyreg.h,v 1.10 2007/06/07 02:21:38 davidch Exp $
+ * $FreeBSD: src/sys/dev/mii/brgphyreg.h,v 1.11 2008/04/29 19:47:13 jhb Exp $
  */
 
 #ifndef _DEV_MII_BRGPHYREG_H_
@@ -161,6 +161,7 @@
 #define	BRGPHY_MII_DSP_RW_PORT	0x15	/* DSP coefficient r/w port */
 
 #define	BRGPHY_MII_DSP_ADDR_REG	0x17	/* DSP coefficient addr register */
+#define	BRGPHY_MII_EPHY_PTEST	0x17	/* 5906 PHY register */
 
 #define	BRGPHY_DSP_TAP_NUMBER_MASK		0x00
 #define	BRGPHY_DSP_AGC_A			0x00
