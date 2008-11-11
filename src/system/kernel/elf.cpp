@@ -523,14 +523,11 @@ void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
 static struct Elf32_Sym *
 elf_find_symbol(struct elf_image_info *image, const char *name)
 {
-	uint32 hash;
-	uint32 i;
-
-	if (!image->dynamic_section)
+	if (image->dynamic_section == 0 || HASHTABSIZE(image) == 0)
 		return NULL;
 
-	hash = elf_hash(name) % HASHTABSIZE(image);
-	for (i = HASHBUCKETS(image)[hash]; i != STN_UNDEF;
+	uint32 hash = elf_hash(name) % HASHTABSIZE(image);
+	for (uint32 i = HASHBUCKETS(image)[hash]; i != STN_UNDEF;
 			i = HASHCHAINS(image)[i]) {
 		if (!strcmp(SYMNAME(image, &image->syms[i]), name))
 			return &image->syms[i];
