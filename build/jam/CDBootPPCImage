@@ -11,20 +11,25 @@ MakeLocate $(HAIKU_CD_BOOT_PPC_IMAGE) : $(HAIKU_OUTPUT_DIR) ;
 # the pseudo target all archive contents is attached to
 NotFile $(HAIKU_CD_BOOT_PPC_IMAGE_CONTAINER_NAME) ;
 
+local elfloader = boot_loader_openfirmware ;
+local coffloader = boot_loader_openfirmware_coff ;
+
+# OpenFirmware / Mac boot support files:
+
+# CHRP script
+local chrpboot = ofboot.b ;
+
+# HFS creator and application type mapping for mkisofs
+local hfsmaps = hfs.map ;
+
 # extra files to put on the boot iso
 local extras = README.html ;
-SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 
-local chrpboot = ofboot.b ;
-SEARCH on $(chrpboot) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
-
-local hfsmaps = hfs.map ;
-SEARCH on $(hfsmaps) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
+SEARCH on $(chrpboot) $(hfsmaps) $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 
 
 
-
-BuildCDBootPPCImage $(HAIKU_CD_BOOT_PPC_IMAGE) : $(hfsmaps) : boot_loader_openfirmware : $(chrpboot) : $(extras) ;
+BuildCDBootPPCImage $(HAIKU_CD_BOOT_PPC_IMAGE) : $(hfsmaps) : $(elfloader) : $(coffloader) : $(chrpboot) : $(extras) ;
 
 
 NotFile haiku-boot-cd-ppc ;
