@@ -471,6 +471,61 @@ get_next_pending_event(cache_notification* notification, int32* _event)
 }
 
 
+static void
+flush_pending_notifications(block_cache* cache)
+{
+	ASSERT_LOCKED_MUTEX(&sCachesLock);
+
+	while (true) {
+		MutexLocker locker(sNotificationsLock);
+
+		cache_notification* notification = cache->pending_notifications.Head();
+		if (notification == NULL)
+			return;
+
+		bool deleteAfterEvent = false;
+		int32 event = -1;
+		if (!get_next_pending_event(notification, &event)) {
+			// remove the notification if this was the last pending event
+			cache->pending_notifications.Remove(notification);
+			deleteAfterEvent = notification->delete_after_event;
+		}
+
+		if (event >= 0) {
+			// Notify listener, we need to copy the notification, as it might
+			// be removed when we unlock the list.
+			cache_notification copy = *notification;
+			locker.Unlock();
+
+			copy.hook(copy.transaction_id, event, copy.data);
+
+			locker.Lock();
+		}
+
+		if (deleteAfterEvent)
+			delete notification;
+	}
+}
+
+
+/*!	Flushes all pending notifications by calling the appropriate hook
+	functions.
+	Must not be called with a cache lock held.
+*/
+static void
+flush_pending_notifications()
+{
+	MutexLocker _(sCachesLock);
+
+	DoublyLinkedList<block_cache>::Iterator iterator = sCaches.GetIterator();
+	while (iterator.HasNext()) {
+		block_cache* cache = iterator.Next();
+
+		flush_pending_notifications(cache);
+	}
+}
+
+
 /*!	Initializes the \a notification as specified. */
 static void
 set_notification(cache_transaction* transaction,
@@ -559,61 +614,6 @@ notify_transaction_listeners(block_cache* cache, cache_transaction* transaction,
 			add_notification(cache, listener, event, remove);
 		else if (remove)
 			delete_notification(listener);
-	}
-}
-
-
-static void
-flush_pending_notifications(block_cache* cache)
-{
-	ASSERT_LOCKED_MUTEX(&sCachesLock);
-
-	while (true) {
-		MutexLocker locker(sNotificationsLock);
-
-		cache_notification* notification = cache->pending_notifications.Head();
-		if (notification == NULL)
-			return;
-
-		bool deleteAfterEvent = false;
-		int32 event = -1;
-		if (!get_next_pending_event(notification, &event)) {
-			// remove the notification if this was the last pending event
-			cache->pending_notifications.Remove(notification);
-			deleteAfterEvent = notification->delete_after_event;
-		}
-
-		if (event >= 0) {
-			// Notify listener, we need to copy the notification, as it might
-			// be removed when we unlock the list.
-			cache_notification copy = *notification;
-			locker.Unlock();
-
-			copy.hook(copy.transaction_id, event, copy.data);
-
-			locker.Lock();
-		}
-
-		if (deleteAfterEvent)
-			delete notification;
-	}
-}
-
-
-/*!	Flushes all pending notifications by calling the appropriate hook
-	functions.
-	Must not be called with a cache lock held.
-*/
-static void
-flush_pending_notifications()
-{
-	MutexLocker _(sCachesLock);
-
-	DoublyLinkedList<block_cache>::Iterator iterator = sCaches.GetIterator();
-	while (iterator.HasNext()) {
-		block_cache* cache = iterator.Next();
-
-		flush_pending_notifications(cache);
 	}
 }
 
@@ -1218,7 +1218,7 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 	cache_transaction* transaction = block->transaction;
 
 	if (transaction != NULL && transaction->id != transactionID) {
-		// ToDo: we have to wait here until the other transaction is done.
+		// TODO: we have to wait here until the other transaction is done.
 		//	Maybe we should even panic, since we can't prevent any deadlocks.
 		panic("get_writable_cached_block(): asked to get busy writable block (transaction %ld)\n", block->transaction->id);
 		put_cached_block(cache, block);
@@ -2594,7 +2594,7 @@ block_cache_make_writable(void* _cache, off_t blockNumber, int32 transaction)
 	if (cache->read_only)
 		panic("tried to make block writable on a read-only cache!");
 
-	// ToDo: this can be done better!
+	// TODO: this can be done better!
 	void* block = get_writable_cached_block(cache, blockNumber,
 		blockNumber, 1, transaction, false);
 	if (block != NULL) {
