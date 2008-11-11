@@ -47,6 +47,23 @@ KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	: -Bstatic
 ;
 
+rule BuildCoffLoader {
+	local coffLoader = $(1) ;
+	local bootLoader = $(2) ;
+	# XXX: eventually switch on arch
+	COFF_FORMAT on $(coffLoader) = aixcoff-rs6000 ;
+
+	Depends $(coffLoader) : $(bootLoader) ;
+	MakeLocateDebug $(coffLoader) ;
+}
+
+actions BuildCoffLoader {
+	rm -f $(1)
+	$(TARGET_OBJCOPY) -O $(COFF_FORMAT) $(2) $(1)
+}
+
+BuildCoffLoader boot_loader_$(TARGET_BOOT_PLATFORM)_coff : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+
 rule BuildZbeos {
 	local zbeos = $(1) ;
 	local bootLoader = $(2) ;
