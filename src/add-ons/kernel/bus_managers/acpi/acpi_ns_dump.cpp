@@ -74,12 +74,10 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 {
 	char result[255];
 	char output[320];
-	char tabs[255];
-	char hid[16];
+	char tabs[255] = "";
+	char hid[16] = "";
 	int i;
 	size_t written = 0;
-	hid[0] = '\0';
-	tabs[0] = '\0';
 	for (i = 0; i < indenting; i++) 
 		strlcat(tabs, "|    ", sizeof(tabs));
 
