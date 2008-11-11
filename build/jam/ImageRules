@@ -1077,7 +1077,7 @@ rule BuildCDBootPPCImage image : hfsmaps : elfloader : coffloader : chrpscript :
 	Depends $(image) : $(hfsmaps) ;
 	MAPS on $(image) = $(hfsmaps) ;
 
-	BuildCDBootPPCImage1 $(image) : $(elfloaders) $(coffloader) $(chrpscript) $(extrafiles) ;
+	BuildCDBootPPCImage1 $(image) : $(elfloader) $(coffloader) $(chrpscript) $(extrafiles) ;
 }
 
 actions BuildCDBootPPCImage1 bind MAPS
