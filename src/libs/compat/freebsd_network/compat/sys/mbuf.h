@@ -78,10 +78,14 @@ struct mbuf {
 
 #define EXT_CLUSTER		1
 #define EXT_PACKET		3
+#define EXT_JUMBO9		4
 #define	EXT_NET_DRV		100
 
 #define M_BCAST			0x00000200
 #define M_MCAST			0x00000400
+#define M_FRAG			0x00000800
+#define M_FIRSTFRAG		0x00001000
+#define M_LASTFRAG		0x00002000
 #define	M_VLANTAG		0x00010000
 
 #define CSUM_IP			0x0001
@@ -125,6 +129,7 @@ void m_copyback(struct mbuf *, int, int, caddr_t);
 struct mbuf *m_get(int how, short type);
 struct mbuf *m_gethdr(int how, short type);
 void m_clget(struct mbuf *m, int how);
+void *m_cljget(struct mbuf *m, int how, int size);
 
 void m_extadd(struct mbuf *m, caddr_t buffer, u_int size,
     void (*freeHook)(void *, void *), void *args, int flags, int type);

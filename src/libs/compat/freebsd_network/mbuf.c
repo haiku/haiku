@@ -21,6 +21,7 @@
 
 static object_cache *sMBufCache;
 static object_cache *sChunkCache;
+static object_cache *sJumbo9ChunkCache;
 
 int max_linkhdr = 16;
 int max_protohdr = 40 + 20; /* ip6 + tcp */
@@ -60,21 +61,40 @@ construct_mbuf(struct mbuf *mb, short type, int flags)
 
 
 static int
-construct_ext_mbuf(struct mbuf *mb, int how)
+construct_ext_sized_mbuf(struct mbuf *mb, int how, int size)
 {
-	mb->m_ext.ext_buf = object_cache_alloc(sChunkCache, m_to_oc_flags(how));
+	object_cache *cache;
+	int ext_type;
+	if (size != MCLBYTES && size != MJUM9BYTES)
+		panic("unsupported size");
+
+	if (size == MCLBYTES) {
+		cache = sChunkCache;
+		ext_type = EXT_CLUSTER;
+	} else {
+		cache = sJumbo9ChunkCache;
+		ext_type = EXT_JUMBO9;
+	}
+	mb->m_ext.ext_buf = object_cache_alloc(cache, m_to_oc_flags(how));
 	if (mb->m_ext.ext_buf == NULL)
 		return B_NO_MEMORY;
-
+	
 	mb->m_data = mb->m_ext.ext_buf;
 	mb->m_flags |= M_EXT;
 	/* mb->m_ext.ext_free = NULL; */
 	/* mb->m_ext.ext_args = NULL; */
-	mb->m_ext.ext_size = MCLBYTES;
-	mb->m_ext.ext_type = EXT_CLUSTER;
+	mb->m_ext.ext_size = size;
+	mb->m_ext.ext_type = ext_type;
 	/* mb->m_ext.ref_cnt = NULL; */
 
-	return 0;
+        return 0;
+}
+
+
+static inline int
+construct_ext_mbuf(struct mbuf *mb, int how)
+{
+	return construct_ext_sized_mbuf(mb, how, MCLBYTES);
 }
 
 
@@ -84,7 +104,7 @@ construct_pkt_mbuf(int how, struct mbuf *mb, short type, int flags)
 	construct_mbuf(mb, type, flags);
 	if (construct_ext_mbuf(mb, how) < 0)
 		return -1;
-	mb->m_ext.ext_type = EXT_PACKET;
+	mb->m_ext.ext_type |= EXT_PACKET;
 	return 0;
 }
 
@@ -92,7 +112,14 @@ construct_pkt_mbuf(int how, struct mbuf *mb, short type, int flags)
 static void
 destruct_pkt_mbuf(struct mbuf *mb)
 {
-	object_cache_free(sChunkCache, mb->m_ext.ext_buf);
+	object_cache *cache;
+	if (mb->m_ext.ext_type & EXT_CLUSTER)
+		cache = sChunkCache;
+	else if (mb->m_ext.ext_type & EXT_JUMBO9)
+		cache = sJumbo9ChunkCache;
+	else
+		panic("unknown cache");
+	object_cache_free(cache, mb->m_ext.ext_buf);
 	mb->m_ext.ext_buf = NULL;
 }
 
@@ -151,6 +178,18 @@ m_clget(struct mbuf *m, int how)
 }
 
 
+void *
+m_cljget(struct mbuf *m, int how, int size)
+{
+	if (m == NULL)
+		panic("m_cljget doesn't support allocate mbuf");
+	m->m_ext.ext_buf = NULL;
+	construct_ext_sized_mbuf(m, how, size);
+	/* shouldn't be used */
+	return NULL;
+}
+
+
 void
 m_freem(struct mbuf *mb)
 {
@@ -171,6 +210,9 @@ mb_free_ext(struct mbuf *m)
 		destruct_pkt_mbuf(m);
 	else if (m->m_ext.ext_type == EXT_CLUSTER) {
 		object_cache_free(sChunkCache, m->m_ext.ext_buf);
+		m->m_ext.ext_buf = NULL;
+	} else if (m->m_ext.ext_type == EXT_JUMBO9) {
+		object_cache_free(sJumbo9ChunkCache, m->m_ext.ext_buf);
 		m->m_ext.ext_buf = NULL;
 	} else
 		panic("unknown type");
@@ -207,16 +249,23 @@ init_mbufs()
 {
 	sMBufCache = create_object_cache("mbufs", MSIZE, 8, NULL, NULL, NULL);
 	if (sMBufCache == NULL)
-		return B_NO_MEMORY;
-
+		goto clean;
 	sChunkCache = create_object_cache("mbuf chunks", MCLBYTES, 0, NULL, NULL,
 		NULL);
-	if (sChunkCache == NULL) {
-		delete_object_cache(sMBufCache);
-		return B_NO_MEMORY;
-	}
-
+	if (sChunkCache == NULL)
+		goto clean;
+	sJumbo9ChunkCache = create_object_cache("mbuf jumbo9 chunks", MJUM9BYTES, 0, NULL, NULL,
+		NULL);
+	if (sJumbo9ChunkCache == NULL)
+		goto clean;
 	return B_OK;
+
+clean:
+	if (sChunkCache != NULL)
+		delete_object_cache(sChunkCache);
+	if (sMBufCache != NULL)
+		delete_object_cache(sMBufCache);
+	return B_NO_MEMORY;
 }
 
 
@@ -225,5 +274,6 @@ uninit_mbufs()
 {
 	delete_object_cache(sMBufCache);
 	delete_object_cache(sChunkCache);
+	delete_object_cache(sJumbo9ChunkCache);
 }
 
