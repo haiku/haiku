@@ -125,7 +125,7 @@ compat_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 		IF_DEQUEUE(&ifp->receive_queue, mb);
 	} while (mb == NULL);
 
-	length = min_c(max_c((size_t)mb->m_len, 0), *numBytes);
+	length = min_c(max_c((size_t)mb->m_pkthdr.len, 0), *numBytes);
 
 #if 0
 	mb = m_defrag(mb, 0);
@@ -135,7 +135,7 @@ compat_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 	}
 #endif
 
-	memcpy(buffer, mtod(mb, const void *), length);
+	m_copydata(mb, 0, length, buffer);
 	*numBytes = length;
 
 	m_freem(mb);

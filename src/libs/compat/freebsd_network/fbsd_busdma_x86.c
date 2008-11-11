@@ -641,7 +641,7 @@ _bus_dmamap_load_buffer(bus_dma_tag_t dmat,
 		 * Get the physical address for this segment.
 		 */
 		if (pmap)
-			curaddr = pmap_extract(pmap, vaddr);
+			curaddr = (bus_addr_t)pmap_extract(pmap, vaddr);
 		else
 			curaddr = pmap_kextract(vaddr);
 
