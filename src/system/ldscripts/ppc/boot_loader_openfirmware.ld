@@ -10,7 +10,7 @@ SECTIONS
 	__text_begin = .;
 
 	/* text/read-only data */
-	.text :	{ *(.text .gnu.linkonce.t.*) }
+	.text :	{ *(.text .text.* .gnu.linkonce.t.*) }
 
 	.rodata : { *(.rodata .rodata.* .gnu.linkonce.r.*) }
 	.sdata2 : { *(.sdata2) }
