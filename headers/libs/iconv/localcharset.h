@@ -20,12 +20,6 @@
 #ifndef _LOCALCHARSET_H
 #define _LOCALCHARSET_H
 
-#if 0 && BUILDING_LIBCHARSET
-#define LIBCHARSET_DLL_EXPORTED __attribute__((__visibility__("default")))
-#else
-#define LIBCHARSET_DLL_EXPORTED
-#endif
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +31,7 @@ extern "C" {
    The result must not be freed; it is statically allocated.
    If the canonical name cannot be determined, the result is a non-canonical
    name.  */
-extern LIBCHARSET_DLL_EXPORTED const char * locale_charset (void);
+extern const char* locale_charset(void);
 
 
 #ifdef __cplusplus

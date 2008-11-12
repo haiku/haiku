@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src libs iconv ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseLibraryHeaders iconv ;
+
+# disable warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wmissing-prototypes -Wsign-compare ] ;
+
+SubDirCcFlags
+	-DLIBDIR="\\\"/boot/beos/system/lib\\\""
+	-DICONV_CONST=""
+	;
+
+SharedLibrary libiconv.so :	
+	iconv.c
+	localcharset.c
+	;

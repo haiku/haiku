@@ -18,11 +18,11 @@
  * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <iconv.h>
+#include "iconv.h"
 
 #include <stdlib.h>
 #include <string.h>
-#include "config.h"
+#include "libiconv_config.h"
 #include "localcharset.h"
 
 #if ENABLE_EXTRA

@@ -35,7 +35,7 @@
 /* #undef ENABLE_NLS */
 
 /* Define to 1 if the package shall run at any location in the filesystem. */
-#define ENABLE_RELOCATABLE 1
+/* #undef ENABLE_RELOCATABLE */
 
 /* Define to 1 if you have `alloca', as a function or macro. */
 #define HAVE_ALLOCA 1
@@ -318,7 +318,7 @@
 /* Define to 1 if you want getc etc. to use unlocked I/O if available.
    Unlocked I/O can improve performance in unithreaded apps, but it is not
    safe for multithreaded apps. */
-#define USE_UNLOCKED_IO 1
+/* #undef USE_UNLOCKED_IO */
 
 /* Version number of package */
 #define VERSION "1.12"
