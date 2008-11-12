@@ -104,6 +104,7 @@ SubInclude HAIKU_TOP src tools docbook ;
 SubInclude HAIKU_TOP src tools elfsymbolpatcher ;
 SubInclude HAIKU_TOP src tools fs_shell ;
 SubInclude HAIKU_TOP src tools gensyscalls ;
+SubInclude HAIKU_TOP src tools hack_coff ;
 SubInclude HAIKU_TOP src tools keymap ;
 SubInclude HAIKU_TOP src tools makebootable ;
 SubInclude HAIKU_TOP src tools rc ;

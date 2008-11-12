@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src tools hack_coff ;
+
+#UsePrivateHeaders kernel ;
+UseHeaders [ FDirName $(HAIKU_TOP) src bin gdb include coff ] : true ;
+
+# avoid #includeing other stuff in the source
+SubDirCcFlags -Dbfd_byte=char -DSYMNMLEN=8 ;
+
+BuildPlatformMain <build>hack-coff
+	: hack-coff.c
+	:
+;
