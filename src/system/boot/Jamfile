@@ -51,15 +51,18 @@ rule BuildCoffLoader {
 	local coffLoader = $(1) ;
 	local bootLoader = $(2) ;
 	# XXX: eventually switch on arch
-	COFF_FORMAT on $(coffLoader) = aixcoff-rs6000 ;
+	COFF_FORMAT on $(coffLoader) = xcoff-powermac ;
+	HACK_COFF on $(coffLoader) = <build>hack-coff ;
 
 	Depends $(coffLoader) : $(bootLoader) ;
 	MakeLocateDebug $(coffLoader) ;
 }
 
-actions BuildCoffLoader {
+actions BuildCoffLoader bind HACK_COFF {
 	rm -f $(1)
 	$(TARGET_OBJCOPY) -O $(COFF_FORMAT) $(2) $(1)
+	#$(CP) $(2) $(1)
+	$(HACK_COFF) $(1)
 }
 
 BuildCoffLoader boot_loader_$(TARGET_BOOT_PLATFORM)_coff : boot_loader_$(TARGET_BOOT_PLATFORM) ;
