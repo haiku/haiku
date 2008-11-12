@@ -4,22 +4,15 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders textencoding ;
-SubDirSysHdrs [ FDirName $(SUBDIR) libiconv ] ;
-
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	# Argh! Just for <posix/iconv.h>.
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-}
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src libs iconv ] ;
 
 SharedLibrary libtextencoding.so :
 	CharacterSet.cpp
 	CharacterSetRoster.cpp
 	character_sets.cpp
 	utf8_conversions.cpp
-	: libiconv.a be ;
+	: be libiconv.so ;
 
 Package haiku-maildaemon-cvs :
 	libtextencoding.so :
 	boot beos system lib ;
-
-SubInclude HAIKU_TOP src kits textencoding libiconv ;

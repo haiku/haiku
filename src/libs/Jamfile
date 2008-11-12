@@ -10,6 +10,7 @@ SubInclude HAIKU_TOP src libs expat ;
 SubInclude HAIKU_TOP src libs fluidsynth ;
 SubInclude HAIKU_TOP src libs freetype2 ;
 SubInclude HAIKU_TOP src libs icon ;
+SubInclude HAIKU_TOP src libs iconv ;
 SubInclude HAIKU_TOP src libs libtelnet ;
 SubInclude HAIKU_TOP src libs linprog ;
 SubInclude HAIKU_TOP src libs lp_solve ;

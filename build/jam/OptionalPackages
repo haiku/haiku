@@ -211,6 +211,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 
 	# third party libs headers
 	AddHeaderDirectoryToHaikuImage libs freetype2 : 3rdparty ;
+	AddHeaderDirectoryToHaikuImage libs iconv : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
