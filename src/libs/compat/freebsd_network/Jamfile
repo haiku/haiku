@@ -26,3 +26,22 @@ KernelStaticLibrary libfreebsd_network.a :
 	mutex.c
 	taskqueue.c
 	;
+
+rule MIIHeaderGen
+{
+	SEARCH on $(2) = [ FDirName $(SUBDIR) compat dev mii ] ;
+	SEARCH on $(3) = $(SEARCH_SOURCE) ;
+
+	Depends $(1) : $(2) $(3) ;
+	MakeLocateArch $(<) ;
+	MIIHeaderGen1 $(1) : $(2) $(3) ;
+	LocalClean clean : $(<) ;
+}
+
+actions MIIHeaderGen1
+{
+	gawk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
+}
+
+MIIHeaderGen [ FGristFiles miidevs.h ] : miidevs : miidevs2h.awk ;
+

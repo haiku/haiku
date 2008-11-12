@@ -1,5 +1,5 @@
 /*	$NetBSD: if_media.h,v 1.3 1997/03/26 01:19:27 thorpej Exp $	*/
-/* $FreeBSD: src/sys/net/if_media.h,v 1.30.2.3 2006/08/10 10:21:00 glebius Exp $ */
+/* $FreeBSD: src/sys/net/if_media.h,v 1.43 2008/08/01 22:13:39 antoine Exp $ */
 
 /*-
  * Copyright (c) 1997
@@ -144,6 +144,7 @@ uint64_t	ifmedia_baudrate(int);
 #define	IFM_10G_LR	18		/* 10GBase-LR 1310nm Single-mode */
 #define	IFM_10G_SR	19		/* 10GBase-SR 850nm Multi-mode */
 #define	IFM_10G_CX4	20		/* 10GBase CX4 copper */
+#define IFM_2500_SX	21		/* 2500BaseSX - multi-mode fiber */
 
 /* note 31 is the max! */
 
@@ -198,11 +199,16 @@ uint64_t	ifmedia_baudrate(int);
 #define	IFM_IEEE80211_OFDM72	18	/* OFDM 72Mbps */
 #define	IFM_IEEE80211_DS354k	19	/* Direct Sequence 354Kbps */
 #define	IFM_IEEE80211_DS512k	20	/* Direct Sequence 512Kbps */
+#define	IFM_IEEE80211_OFDM3	21	/* OFDM 3Mbps */
+#define	IFM_IEEE80211_OFDM4	22	/* OFDM 4.5Mbps */
+#define	IFM_IEEE80211_OFDM27	23	/* OFDM 27Mbps */
+/* NB: not enough bits to express MCS fully */
+#define	IFM_IEEE80211_MCS	24	/* HT MCS rate */
 
 #define	IFM_IEEE80211_ADHOC	0x00000100	/* Operate in Adhoc mode */
 #define	IFM_IEEE80211_HOSTAP	0x00000200	/* Operate in Host AP mode */
 #define	IFM_IEEE80211_IBSS	0x00000400	/* Operate in IBSS mode */
-#define	IFM_IEEE80211_IBSSMASTER 0x00000800	/* Operate as an IBSS master */
+#define	IFM_IEEE80211_WDS	0x00000800	/* Operate in WDS mode */
 #define	IFM_IEEE80211_TURBO	0x00001000	/* Operate in turbo mode */
 #define	IFM_IEEE80211_MONITOR	0x00002000	/* Operate in monitor mode */
 
@@ -211,6 +217,8 @@ uint64_t	ifmedia_baudrate(int);
 #define	IFM_IEEE80211_11B	0x00020000	/* Direct Sequence mode */
 #define	IFM_IEEE80211_11G	0x00030000	/* 2Ghz, CCK mode */
 #define	IFM_IEEE80211_FH	0x00040000	/* 2Ghz, GFSK mode */
+#define	IFM_IEEE80211_11NA	0x00050000	/* 5Ghz, HT mode */
+#define	IFM_IEEE80211_11NG	0x00060000	/* 2Ghz, HT mode */
 
 /*
  * ATM
@@ -267,8 +275,8 @@ uint64_t	ifmedia_baudrate(int);
 /*
  * Status bits
  */
-#define	IFM_AVALID	0x10000000	/* Active bit valid */
-#define IFM_ACTIVE	0x00800000  /* same as Haiku's */
+#define	IFM_AVALID	0x00000001	/* Active bit valid */
+#define	IFM_ACTIVE	0x00000002	/* Interface attached to working net */
 
 /* Mask of "status valid" bits, for ifconfig(8). */
 #define	IFM_STATUS_VALID	IFM_AVALID
@@ -335,12 +343,12 @@ struct ifmedia_description {
 	{ IFM_1000_SX,	"1000baseSX" },					\
 	{ IFM_1000_LX,	"1000baseLX" },					\
 	{ IFM_1000_CX,	"1000baseCX" },					\
-	{ IFM_1000_T,	"1000baseTX" },					\
 	{ IFM_1000_T,	"1000baseT" },					\
 	{ IFM_HPNA_1,	"homePNA" },					\
 	{ IFM_10G_LR,	"10Gbase-LR" },					\
 	{ IFM_10G_SR,	"10Gbase-SR" },					\
 	{ IFM_10G_CX4,	"10Gbase-CX4" },				\
+	{ IFM_2500_SX,	"2500BaseSX" },					\
 	{ 0, NULL },							\
 }
 
@@ -360,8 +368,10 @@ struct ifmedia_description {
 	{ IFM_1000_SX,	"1000SX" },					\
 	{ IFM_1000_LX,	"1000LX" },					\
 	{ IFM_1000_CX,	"1000CX" },					\
+	{ IFM_1000_T,	"1000baseTX" },					\
 	{ IFM_1000_T,	"1000TX" },					\
 	{ IFM_1000_T,	"1000T" },					\
+	{ IFM_2500_SX,	"2500SX" },					\
 	{ 0, NULL },							\
 }
 
@@ -437,6 +447,9 @@ struct ifmedia_description {
 	{ IFM_IEEE80211_OFDM72, "OFDM/72Mbps" },			\
 	{ IFM_IEEE80211_DS354k, "DS/354Kbps" },				\
 	{ IFM_IEEE80211_DS512k, "DS/512Kbps" },				\
+	{ IFM_IEEE80211_OFDM3, "OFDM/3Mbps" },				\
+	{ IFM_IEEE80211_OFDM4, "OFDM/4.5Mbps" },			\
+	{ IFM_IEEE80211_OFDM27, "OFDM/27Mbps" },			\
 	{ 0, NULL },							\
 }
 
@@ -472,6 +485,9 @@ struct ifmedia_description {
 	{ IFM_IEEE80211_DS354k, "DirectSequence/354Kbps" },		\
 	{ IFM_IEEE80211_DS512k, "DS512K" },				\
 	{ IFM_IEEE80211_DS512k, "DirectSequence/512Kbps" },		\
+	{ IFM_IEEE80211_OFDM3, "OFDM3" },				\
+	{ IFM_IEEE80211_OFDM4, "OFDM4.5" },				\
+	{ IFM_IEEE80211_OFDM27, "OFDM27" },				\
 	{ 0, NULL },							\
 }
 
@@ -479,7 +495,7 @@ struct ifmedia_description {
 	{ IFM_IEEE80211_ADHOC, "adhoc" },				\
 	{ IFM_IEEE80211_HOSTAP, "hostap" },				\
 	{ IFM_IEEE80211_IBSS, "ibss" },					\
-	{ IFM_IEEE80211_IBSSMASTER, "ibss-master" },			\
+	{ IFM_IEEE80211_WDS, "wds" },					\
 	{ IFM_IEEE80211_TURBO, "turbo" },				\
 	{ IFM_IEEE80211_MONITOR, "monitor" },				\
 	{ 0, NULL },							\
@@ -491,6 +507,8 @@ struct ifmedia_description {
 	{ IFM_IEEE80211_11B, "11b" },					\
 	{ IFM_IEEE80211_11G, "11g" },					\
 	{ IFM_IEEE80211_FH, "fh" },					\
+	{ IFM_IEEE80211_11NA, "11na" },					\
+	{ IFM_IEEE80211_11NG, "11ng" },					\
 	{ 0, NULL },							\
 }
 
@@ -584,6 +602,7 @@ struct ifmedia_baudrate {
 	{ IFM_ETHER | IFM_10G_LR,	IF_Gbps(10ULL) },		\
 	{ IFM_ETHER | IFM_10G_SR,	IF_Gbps(10ULL) },		\
 	{ IFM_ETHER | IFM_10G_CX4,	IF_Gbps(10ULL) },		\
+	{ IFM_ETHER | IFM_2500_SX,	IF_Mbps(2500ULL) },		\
 									\
 	{ IFM_TOKEN | IFM_TOK_STP4,	IF_Mbps(4) },			\
 	{ IFM_TOKEN | IFM_TOK_STP16,	IF_Mbps(16) },			\
