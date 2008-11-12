@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders textencoding ;
+UseLibraryHeaders iconv ;
 SubDirSysHdrs [ FDirName $(HAIKU_TOP) src libs iconv ] ;
 
 SharedLibrary libtextencoding.so :
