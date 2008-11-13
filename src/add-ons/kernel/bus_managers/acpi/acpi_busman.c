@@ -380,6 +380,9 @@ evaluate_object(const char* object, acpi_object_type* returnValue,
 
 	status = AcpiEvaluateObject(NULL, (ACPI_STRING)object, NULL,
 		returnValue != NULL ? &buffer : NULL);
+	if (status == AE_BUFFER_OVERFLOW)
+		dprintf("evaluate_object: the passed buffer is too small!\n");
+ 
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -405,6 +408,9 @@ evaluate_method(const char* object, const char* method,
 
 	status = AcpiEvaluateObject(handle, (ACPI_STRING)method,
 		args != NULL ? &acpiArgs : NULL, returnValue != NULL ? &buffer : NULL);
+	if (status == AE_BUFFER_OVERFLOW)
+		dprintf("evaluate_method: the passed buffer is too small!\n");
+
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
