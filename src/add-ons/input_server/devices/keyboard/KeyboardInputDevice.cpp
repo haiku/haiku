@@ -27,7 +27,7 @@
 
 
 #undef TRACE
-#define TRACE_KEYBOARD_DEVICE
+//#define TRACE_KEYBOARD_DEVICE
 #ifdef TRACE_KEYBOARD_DEVICE
 
 	class FunctionTracer {
@@ -497,7 +497,8 @@ KeyboardDevice::Start()
 
 	fActive = true;
 	resume_thread(fThread);
-	return B_OK;
+
+	return fFD >= 0 ? B_OK : B_ERROR;
 }
 
 void

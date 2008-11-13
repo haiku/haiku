@@ -210,7 +210,7 @@ MouseDevice::Start()
 		return status;
 	}
 
-	return B_OK;
+	return fDevice >= 0 ? B_OK : B_ERROR;
 }
 
 
