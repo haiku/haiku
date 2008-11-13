@@ -2173,9 +2173,8 @@ TMailWindow::Send(bool now)
 	mail_encoding encodingForHeaders = quoted_printable;
 
 	if (!now) {
-		status_t status;
-
-		if ((status = SaveAsDraft()) != B_OK) {
+		status_t status = SaveAsDraft();
+		if (status != B_OK) {
 			beep();
 			(new BAlert("",
 				MDR_DIALECT_CHOICE ("E-mail draft could not be saved!","ドラフトは保存できませんでした。"),
@@ -2552,7 +2551,6 @@ TMailWindow::SaveAsDraft()
 	BNodeInfo info(&draft);
 	info.SetType(kDraftType);
 
-	fSent = true;
 	fDraft = true;
 	fChanged = false;
 
