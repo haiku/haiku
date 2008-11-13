@@ -191,6 +191,7 @@ touchevent_to_movement(synaptics_cookie* cookie, touch_event *event,
 	float sens = 0;
 	bigtime_t currentTime = system_time();
 	touchpad_settings * settings = &(cookie->settings);
+	uint32 buttons = event->buttons;
 
 	if (!movement)
 		return B_ERROR;
@@ -241,8 +242,8 @@ touchevent_to_movement(synaptics_cookie* cookie, touch_event *event,
 			isSideScrollingH = true;
 		}
 		if (isSideScrollingV || isSideScrollingH
-			||(event->wValue == 0 && settings->scroll_twofinger)
-			||(event->wValue == 1 && settings->scroll_multifinger)) {
+			|| (event->wValue == 0 && settings->scroll_twofinger)
+			|| (event->wValue == 1 && settings->scroll_multifinger)) {
 			goto scrolling;
 		} else {
 			cookie->scrolling_started = false;
@@ -266,8 +267,8 @@ movement:
 	movement->ydelta = cookie->movement_maker.yDelta;
 
 	// tap gesture
-	cookie->tap_delta_x+= cookie->movement_maker.xDelta;
-	cookie->tap_delta_y+= cookie->movement_maker.yDelta;
+	cookie->tap_delta_x += cookie->movement_maker.xDelta;
+	cookie->tap_delta_y += cookie->movement_maker.yDelta;
 
 	if (cookie->tapdrag_started) {
 		movement->buttons = 0x01;	// left button
@@ -295,6 +296,8 @@ movement:
 		cookie->tap_delta_y = 0;
 	}
 
+	cookie->buttons_state = movement->buttons;
+
 	return B_OK;
 
 scrolling:
@@ -316,23 +319,22 @@ scrolling:
 		movement->wheel_xdelta = 0;
 	else if (isSideScrollingH && !isSideScrollingV)
 		movement->wheel_ydelta = 0;
+
+	cookie->buttons_state = movement->buttons;
+
 	return B_OK;
 
 notouch:
 	TRACE("SYNAPTICS: no touch event\n");
 	cookie->scrolling_started = false;
 	cookie->movement_started = false;
-	movement->buttons = event->buttons;
-	if (event->buttons)
-		movement->clicks = 1;
 
 	if (cookie->tapdrag_started
 		&& (currentTime - cookie->tap_time) < SYN_TAP_TIMEOUT) {
-		movement->buttons = 0x01;
-		movement->clicks = 0;
+		buttons = 0x01;
 	}
 
-	// if the movement stopped switch off the dap trag when timeout is expired
+	// if the movement stopped switch off the tap drag when timeout is expired
 	if ((currentTime - cookie->tap_time) > SYN_TAP_TIMEOUT) {
 		cookie->tapdrag_started = false;
 		cookie->valid_edge_motion = false;
@@ -350,18 +352,31 @@ notouch:
 
 		if (cookie->tap_clicks > 1) {
 			TRACE("SYNAPTICS: empty click\n");
-			movement->buttons = 0x00;
-			movement->clicks = 0;
+			buttons = 0x00;
 			cookie->tap_clicks = 0;
 			cookie->double_click = true;
 		} else {
-			movement->buttons = 0x01;
-			movement->clicks = 1;
+			buttons = 0x01;
 			cookie->tap_started = false;
 			cookie->tapdrag_started = true;
 			cookie->double_click = false;
 		}
 	}
+
+	// set click count correctly according to double click timeout
+	if (buttons != 0 && cookie->buttons_state == 0) {
+		if (cookie->click_last_time + cookie->click_speed > currentTime)
+			cookie->click_count++;
+		else
+			cookie->click_count = 1;
+
+		cookie->click_last_time = currentTime;
+	}
+
+	movement->buttons = buttons;
+	cookie->buttons_state = buttons;
+	if (buttons)
+		movement->clicks = cookie->click_count;
 
 	return B_OK;
 }
@@ -671,9 +686,11 @@ synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 			if ((status = get_synaptics_movment(cookie, &movement)) != B_OK)
 				return status;
 			return user_memcpy(buffer, &movement, sizeof(movement));
+
 		case MS_IS_TOUCHPAD:
 			TRACE("SYNAPTICS: MS_IS_TOUCHPAD\n");
 			return B_OK;
+
 		case MS_SET_TOUCHPAD_SETTINGS:
 			TRACE("SYNAPTICS: MS_SET_TOUCHPAD_SETTINGS");
 			user_memcpy(&(cookie->settings), buffer, sizeof(touchpad_settings));
@@ -684,6 +701,11 @@ synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 			cookie->movement_maker.scroll_acceleration
 				= cookie->settings.scroll_acceleration;
 			return B_OK;
+
+		case MS_SET_CLICKSPEED:
+			TRACE("SYNAPTICS: ioctl MS_SETCLICK (set click speed)\n");
+			return user_memcpy(&cookie->click_speed, buffer, sizeof(bigtime_t));
+
 		default:
 			TRACE("SYNAPTICS: unknown opcode: %ld\n", op);
 			return B_BAD_VALUE;

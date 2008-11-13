@@ -72,12 +72,11 @@ typedef struct {
 } touch_event;
 
 
-typedef struct
-{
-	ps2_dev *			dev;
+typedef struct {
+	ps2_dev*			dev;
 
 	sem_id				synaptics_sem;
-	packet_buffer 	*	synaptics_ring_buffer;
+	packet_buffer*		synaptics_ring_buffer;
 	size_t				packet_index;
 	uint8				packet_buffer[PS2_PACKET_SYNAPTICS];
 	uint8				mode;
@@ -93,6 +92,11 @@ typedef struct
 	bool				tapdrag_started;
 	bool				valid_edge_motion;
 	bool				double_click;
+
+	bigtime_t			click_last_time;
+	bigtime_t			click_speed;
+	int32				click_count;
+	uint32				buttons_state;
 
 	touchpad_settings	settings;
 } synaptics_cookie;
