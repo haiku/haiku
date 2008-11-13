@@ -27,10 +27,6 @@
 #undef	_GNU_SOURCE
 #define _GNU_SOURCE
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #ifndef PARAMS
 # if defined __GNUC__ || (defined __STDC__ && __STDC__)
 #  define PARAMS(args) args
@@ -143,12 +139,7 @@
    even if config.h says that we can.  */
 # undef REL_ALLOC
 
-# if defined STDC_HEADERS || defined _LIBC
-#  include <stdlib.h>
-# else
-char *malloc ();
-char *realloc ();
-# endif
+#include <stdlib.h>
 
 /* When used in Emacs's lib-src, we need to get bzero and bcopy somehow.
    If nothing else has been done, use the method below.  */
