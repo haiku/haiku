@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -78,10 +78,9 @@ convert_encoding(const char* from, const char* to, const char* src,
 					iconvctl(conversion, ICONV_SET_DISCARD_ILSEQ, (void*)&zero);
 
 					// prepare to convert the substitute character to target encoding
-					char* original = new char[1];
-					original[0] = substitute;
+					char original = substitute;
 					size_t len = 1;
-					char* copy = original;
+					char* copy = &original;
 
 					// Perform the conversion
 					// We ignore any errors during this as part of robustness/best-effort
@@ -91,11 +90,9 @@ convert_encoding(const char* from, const char* to, const char* src,
 					iconv_t iso8859_1to = iconv_open(to,"ISO-8859-1");
 					if (iso8859_1to != (iconv_t)-1) {
 						iconv(iso8859_1to, 0, 0, 0, 0);
-						iconv(iso8859_1to, const_cast<char**>(&copy), &len, &dst,
-							&outputLeft);
+						iconv(iso8859_1to, &copy, &len, &dst, &outputLeft);
 						iconv_close(iso8859_1to);
 					}
-					delete[] original;
 					break;
 				}
 
