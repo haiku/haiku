@@ -43,7 +43,9 @@ AddFilesToFloppyBootArchive beos system add-ons kernel bus_managers
 AddFilesToFloppyBootArchive beos system add-ons kernel busses agp_gart
 	: $(X86_ONLY)<agp_gart>intel ;
 AddFilesToFloppyBootArchive beos system add-ons kernel busses ide
-	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211 ;
+	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211 ;
+AddFilesToFloppyBootArchive beos system add-ons kernel busses scsi
+	: ahci ;
 AddFilesToFloppyBootArchive beos system add-ons kernel console : vga_text ;
 AddFilesToFloppyBootArchive beos system add-ons kernel file_systems
 	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
@@ -61,7 +63,7 @@ if $(TARGET_ARCH) = x86 {
 }
 
 # drivers
-AddDriversToFloppyBootArchive disk scsi	: scsi_cd scsi_disk ;
+AddNewDriversToFloppyBootArchive disk scsi	: scsi_cd scsi_disk ;
 AddDriversToFloppyBootArchive disk usb	: usb_disk ;
 if $(NET_BOOT) = 1 {
 #AddDriversToFloppyBootArchive disk virtual	: nbd ;
