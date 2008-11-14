@@ -1568,8 +1568,7 @@ Desktop::ActivateWindow(Window* window)
 		fFront = NULL;
 		return;
 	}
-	if (window->Workspaces() == 0
-		&& !window->IsFloating() && !window->IsModal())
+	if (window->Workspaces() == 0 && window->IsNormal())
 		return;
 
 	AutoWriteLocker _(fWindowLock);
@@ -1594,7 +1593,7 @@ Desktop::ActivateWindow(Window* window)
 	}
 
 	if (windowOnOtherWorkspace) {
-		if (window->IsFloating() || window->IsModal()) {
+		if (!window->IsNormal()) {
 			// Bring a window to front that this floating window belongs to
 			Window* front = _LastFocusSubsetWindow(window);
 			if (front == NULL) {
@@ -1734,6 +1733,9 @@ Desktop::ShowWindow(Window* window)
 	window->SetHidden(false);
 	fFocusList.AddWindow(window);
 
+	// If the window is on the current workspace, we'll show it. Special
+	// handling for floating windows, as they can only be shown if their
+	// subset is.
 	if (window->InWorkspace(fCurrentWorkspace)
 		|| (window->IsFloating() && _LastFocusSubsetWindow(window) != NULL)) {
 		_ShowWindow(window, true);
