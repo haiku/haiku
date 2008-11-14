@@ -415,7 +415,7 @@ AddSymlinkToHaikuImage beos system add-ons Tracker
 AddSymlinkToHaikuImage beos system add-ons Tracker
 	: /boot/beos/apps/DiskUsage : DiskUsage-I ;
 AddFilesToHaikuImage beos system add-ons input_server devices
-	: <input>keyboard <input>mouse <input>touchpad <input>wacom ;
+	: <input>keyboard <input>mouse <input>wacom ;
 AddFilesToHaikuImage beos system add-ons input_server filters : screen_saver ;
 AddFilesToHaikuImage beos system add-ons kernel network : stack ;
 AddFilesToHaikuImage beos system add-ons kernel network devices

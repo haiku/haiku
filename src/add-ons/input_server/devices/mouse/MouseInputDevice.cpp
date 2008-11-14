@@ -6,6 +6,7 @@
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Jérôme Duval
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  *		Stephan Aßmus, superstippi@gmx.de
  */
 
@@ -22,6 +23,8 @@
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <String.h>
@@ -29,6 +32,7 @@
 
 #include "kb_mouse_settings.h"
 #include "kb_mouse_driver.h"
+#include "touchpad_settings.h"
 
 
 #undef TRACE
@@ -89,6 +93,7 @@
 
 const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 const static char* kMouseDevicesDirectory = "/dev/input/mouse";
+const static char* kTouchpadDevicesDirectory = "/dev/input/touchpad";
 
 
 class MouseDevice {
@@ -101,6 +106,7 @@ public:
 			void				Stop();
 
 			status_t			UpdateSettings();
+			status_t			UpdateTouchpadSettings(const BMessage* message);
 
 			const char*			Path() const { return fPath.String(); }
 			input_device_ref*	DeviceRef() { return &fDeviceRef; }
@@ -112,6 +118,10 @@ private:
 			void				_ControlThread();
 			void				_ControlThreadCleanup();
 			void				_UpdateSettings();
+
+			status_t			_GetTouchpadSettingsPath(BPath& path);
+			status_t			_ReadTouchpadSettingsMsg(BMessage* message);
+			status_t			_UpdateTouchpadSettings();
 
 			BMessage*			_BuildMouseMessage(uint32 what,
 									uint64 when, uint32 buttons,
@@ -133,6 +143,11 @@ private:
 			thread_id			fThread;
 	volatile bool				fActive;
 	volatile bool				fUpdateSettings;
+
+			bool				fIsTouchpad;
+			touchpad_settings	fTouchpadSettings;
+			BMessage*			fTouchpadSettingsMessage;
+			BLocker				fTouchpadSettingsLock;
 };
 
 
@@ -154,7 +169,10 @@ MouseDevice::MouseDevice(MouseInputDevice& target, const char* driverPath)
 	fDeviceRemapsButtons(false),
 	fThread(-1),
 	fActive(false),
-	fUpdateSettings(false)
+	fUpdateSettings(false),
+	fIsTouchpad(false),
+	fTouchpadSettingsMessage(NULL),
+	fTouchpadSettingsLock("Touchpad settings lock")
 {
 	MD_CALLED();
 
@@ -179,6 +197,7 @@ MouseDevice::~MouseDevice()
 		Stop();
 
 	free(fDeviceRef.name);
+	delete fTouchpadSettingsMessage;
 }
 
 
@@ -207,6 +226,7 @@ MouseDevice::Start()
 	if (status < B_OK) {
 		LOG_ERR("%s: can't spawn/resume watching thread: %s\n",
 			fDeviceRef.name, strerror(status));
+		close(fDevice);
 		return status;
 	}
 
@@ -244,8 +264,28 @@ MouseDevice::UpdateSettings()
 	if (fThread < 0)
 		return B_ERROR;
 
+	// trigger updating the settings in the control thread
 	fUpdateSettings = true;
-		// This will provoke the control thread to update the settings.
+
+	return B_OK;
+}
+
+
+status_t
+MouseDevice::UpdateTouchpadSettings(const BMessage* message)
+{
+	if (!fIsTouchpad)
+		return B_BAD_TYPE;
+	if (fThread < 0)
+		return B_ERROR;
+
+	BAutolock _(fTouchpadSettingsLock);
+
+	// trigger updating the settings in the control thread
+	fUpdateSettings = true;
+
+	delete fTouchpadSettingsMessage;
+	fTouchpadSettingsMessage = new BMessage(*message);
 
 	return B_OK;
 }
@@ -269,10 +309,15 @@ MouseDevice::_BuildShortName() const
 	else
 		name.Capitalize();
 
-	if (string.FindFirst("intelli") >= 0)
-		name.Prepend("Extended ");
-
-	name << " Mouse " << index;
+	if (string.FindFirst("touchpad") >= 0) {
+		name << " Touchpad ";
+	} else {
+		if (string.FindFirst("intelli") >= 0)
+			name.Prepend("Extended ");
+	
+		name << " Mouse ";
+	}
+	name << index;
 
 	return strdup(name.String());
 }
@@ -293,10 +338,31 @@ MouseDevice::_ControlThreadEntry(void* arg)
 void
 MouseDevice::_ControlThread()
 {
+	MD_CALLED();
+
 	if (fDevice < 0) {
 		_ControlThreadCleanup();
 		// TOAST!
 		return;
+	}
+
+	// touchpad settings
+	if (ioctl(fDevice, MS_IS_TOUCHPAD, NULL) == B_OK) {
+		TRACE("is touchpad %s\n", fPath.String());
+		fIsTouchpad = true;
+
+		fTouchpadSettings = kDefaultTouchpadSettings;
+	
+		BPath path;
+		status_t status = _GetTouchpadSettingsPath(path);
+		BFile settingsFile(path.Path(), B_READ_ONLY);
+		if (status == B_OK && settingsFile.InitCheck() == B_OK) {
+			if (settingsFile.Read(&fTouchpadSettings, sizeof(touchpad_settings))
+					!= sizeof(touchpad_settings)) {
+				TRACE("failed to load settings\n");
+			}
+		}
+		_UpdateTouchpadSettings();
 	}
 
 	_UpdateSettings();
@@ -315,8 +381,18 @@ MouseDevice::_ControlThread()
 
 		// take care of updating the settings first, if necessary
 		if (fUpdateSettings) {
-			_UpdateSettings();
 			fUpdateSettings = false;
+			if (fIsTouchpad) {
+				BAutolock _(fTouchpadSettingsLock);
+				if (fTouchpadSettingsMessage) {
+					_ReadTouchpadSettingsMsg(fTouchpadSettingsMessage);
+					_UpdateTouchpadSettings();
+					delete fTouchpadSettingsMessage;
+					fTouchpadSettingsMessage = NULL;
+				} else
+					_UpdateSettings();
+			} else
+				_UpdateSettings();
 		}
 
 		uint32 buttons = lastButtons ^ movements.buttons;
@@ -431,6 +507,51 @@ MouseDevice::_UpdateSettings()
 }
 
 
+status_t
+MouseDevice::_GetTouchpadSettingsPath(BPath& path)
+{
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status < B_OK)
+		return status;
+	return path.Append(TOUCHPAD_SETTINGS_FILE);
+}
+
+
+status_t
+MouseDevice::_ReadTouchpadSettingsMsg(BMessage* message)
+{
+	message->FindBool("scroll_twofinger",
+		&(fTouchpadSettings.scroll_twofinger));
+	message->FindBool("scroll_multifinger",
+		&(fTouchpadSettings.scroll_multifinger));
+	message->FindFloat("scroll_rightrange",
+		&(fTouchpadSettings.scroll_rightrange));
+	message->FindFloat("scroll_bottomrange",
+		&(fTouchpadSettings.scroll_bottomrange));
+	message->FindInt16("scroll_xstepsize",
+		(int16*)&(fTouchpadSettings.scroll_xstepsize));
+	message->FindInt16("scroll_ystepsize",
+		(int16*)&(fTouchpadSettings.scroll_ystepsize));
+	message->FindInt8("scroll_acceleration",
+		(int8*)&(fTouchpadSettings.scroll_acceleration));
+	message->FindInt8("tapgesture_sensibility",
+		(int8*)&(fTouchpadSettings.tapgesture_sensibility));
+
+	return B_OK;
+}
+
+
+status_t
+MouseDevice::_UpdateTouchpadSettings()
+{
+	if (fIsTouchpad) {
+		ioctl(fDevice, MS_SET_TOUCHPAD_SETTINGS, &fTouchpadSettings);
+		return B_OK;
+	}
+	return B_ERROR;
+}
+
+
 BMessage*
 MouseDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons,
 	int32 deltaX, int32 deltaY) const
@@ -517,7 +638,9 @@ MouseInputDevice::MouseInputDevice()
 	MID_CALLED();
 
 	StartMonitoringDevice(kMouseDevicesDirectory);
+	StartMonitoringDevice(kTouchpadDevicesDirectory);
 	_RecursiveScan(kMouseDevicesDirectory);
+	_RecursiveScan(kTouchpadDevicesDirectory);
 }
 
 
@@ -525,6 +648,7 @@ MouseInputDevice::~MouseInputDevice()
 {
 	MID_CALLED();
 
+	StopMonitoringDevice(kTouchpadDevicesDirectory);
 	StopMonitoringDevice(kMouseDevicesDirectory);
 	fDevices.MakeEmpty();
 }
@@ -572,6 +696,9 @@ MouseInputDevice::Control(const char* name, void* cookie,
 
 	if (command == B_NODE_MONITOR)
 		return _HandleMonitor(message);
+
+	if (command == MS_SET_TOUCHPAD_SETTINGS)
+		return device->UpdateTouchpadSettings(message);
 
 	if (command >= B_MOUSE_TYPE_CHANGED
 		&& command <= B_MOUSE_ACCELERATION_CHANGED)

@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src add-ons input_server devices touchpad ;
-
-UsePrivateHeaders input shared ;
-
-Addon <input>touchpad :
-	TouchpadInputDevice.cpp
-	: be input_server ;
