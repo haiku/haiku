@@ -557,10 +557,6 @@ TerminalThemesAddon::MakeThemeHaiku(BMessage &theme, uint32 flags)
 	BMessage lines;
 	status_t err;
 	BPath pTermPref;
-	char buffer[1024];
-	char key[B_FIELD_NAME_LENGTH], data[512];
-	int n;
-	FILE *file;
 	
 	(void)flags;
 	err = MyMessage(theme, termpref);
@@ -572,6 +568,10 @@ TerminalThemesAddon::MakeThemeHaiku(BMessage &theme, uint32 flags)
 	//XXX: WRITEME
 
 /*
+	char buffer[1024];
+	char key[B_FIELD_NAME_LENGTH], data[512];
+	int n;
+	FILE *file;
 	while (fgets(buffer, sizeof(buffer), file) != NULL) {
 		if (*buffer == '#')
 			continue;
@@ -631,7 +631,6 @@ TerminalThemesAddon::MakeThemeHaiku(BMessage &theme, uint32 flags)
 status_t
 TerminalThemesAddon::LoadHaikuTerminalSettings(BMessage &into)
 {
-	status_t err;
 	BPath pTermPref;
 	char buffer[1024];
 	char key[B_FIELD_NAME_LENGTH], data[512];

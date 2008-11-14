@@ -258,7 +258,6 @@ MSThemeImporter::ImportNextTheme(BMessage **theme)
 {
 	FENTRY;
 	status_t err;
-	int i, j;
 
 	BEntry *entry = (BEntry *)fEntryList.RemoveItem(0L);
 	// no more

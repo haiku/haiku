@@ -1065,9 +1065,7 @@ ThemeManager::ImportThemesFor(int32 index, const char *path)
 {
 	FENTRY;
 	status_t err;
-	int32 count;
 	BString m;
-	int32 i;
 	ThemeImporter *importer;
 	BMessage msg;
 	BMessage *theme;
