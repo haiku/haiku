@@ -897,6 +897,14 @@ rule AddDriversToNetBootArchive relativeDirectoryTokens : targets
 		: $(relativeDirectoryTokens) : $(targets) ;
 }
 
+rule AddNewDriversToNetBootArchive relativeDirectoryTokens : targets
+{
+	# AddNewDriversToNetBootArchive <relative directory> : <targets> ;
+
+	AddNewDriversToContainer $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+		: $(relativeDirectoryTokens) : $(targets) ;
+}
+
 rule AddDriverRegistrationToNetBootArchive relativeDirectoryTokens : target
 	: links
 {
@@ -975,6 +983,14 @@ rule AddDriversToFloppyBootArchive relativeDirectoryTokens : targets
 	# AddDriversToFloppyBootArchive <relative directory> : <targets> ;
 
 	AddDriversToContainer $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
+		: $(relativeDirectoryTokens) : $(targets) ;
+}
+
+rule AddNewDriversToFloppyBootArchive relativeDirectoryTokens : targets
+{
+	# AddNewDriversToFloppyBootArchive <relative directory> : <targets> ;
+
+	AddNewDriversToContainer $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
 		: $(relativeDirectoryTokens) : $(targets) ;
 }
 
