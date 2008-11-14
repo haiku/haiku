@@ -1614,7 +1614,7 @@ deferred_deleter(void *arg, int iteration)
 {
 	// move entries and deletables to on-stack lists
 	InterruptsSpinLocker locker(sDeferredFreeListLock);
-	if (sDeferredFreeList.IsEmpty())
+	if (sDeferredFreeList.IsEmpty() && sDeferredDeletableList.IsEmpty())
 		return;
 
 	DeferredFreeList entries;
@@ -1786,7 +1786,8 @@ heap_init_post_thread()
 		return sHeapGrowThread;
 	}
 
-	if (register_kernel_daemon(deferred_deleter, NULL, 50) != B_OK)
+	// run the deferred deleter roughly once a second
+	if (register_kernel_daemon(deferred_deleter, NULL, 10) != B_OK)
 		panic("heap_init_post_thread(): failed to init deferred deleter");
 
 	send_signal_etc(sHeapGrowThread, SIGCONT, B_DO_NOT_RESCHEDULE);
