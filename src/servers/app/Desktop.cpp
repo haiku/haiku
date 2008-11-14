@@ -1532,8 +1532,26 @@ Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
 }
 
 
-/*!
-	\brief Tries to move the specified window to the front of the screen,
+/*!	Returns the last focussed non-hidden subset window belonging to the
+	specified \a window.
+*/
+Window*
+Desktop::_LastFocusSubsetWindow(Window* window)
+{
+	if (window == NULL)
+		return NULL;
+
+	for (Window* front = fFocusList.LastWindow(); front != NULL;
+			front = front->PreviousWindow(kFocusList)) {
+		if (front != window && !front->IsHidden() && window->HasInSubset(front))
+			return front;
+	}
+
+	return NULL;
+}
+
+
+/*!	\brief Tries to move the specified window to the front of the screen,
 		and make it the focus window.
 
 	If there are any modal windows on this screen, it might not actually
@@ -1550,13 +1568,11 @@ Desktop::ActivateWindow(Window* window)
 		fFront = NULL;
 		return;
 	}
-	if (window->Workspaces() == 0)
+	if (window->Workspaces() == 0
+		&& !window->IsFloating() && !window->IsModal())
 		return;
 
-	// TODO: take care about floating windows
-
-	if (!LockAllWindows())
-		return;
+	AutoWriteLocker _(fWindowLock);
 
 	bool windowOnOtherWorkspace = !window->InWorkspace(fCurrentWorkspace);
 	if (windowOnOtherWorkspace
@@ -1573,17 +1589,26 @@ Desktop::ActivateWindow(Window* window)
 					break;
 				}
 			}
-		} else {
-			UnlockAllWindows();
+		} else
 			return;
-		}
 	}
 
 	if (windowOnOtherWorkspace) {
-		// Bring the window to the current workspace
-		// TODO: what if this window is on multiple workspaces?!?
-		uint32 workspaces = workspace_to_workspaces(fCurrentWorkspace);
-		SetWindowWorkspaces(window, workspaces);
+		if (window->IsFloating() || window->IsModal()) {
+			// Bring a window to front that this floating window belongs to
+			Window* front = _LastFocusSubsetWindow(window);
+			if (front == NULL) {
+				// We can't do anything about those.
+				return;
+			}
+
+			ActivateWindow(front);
+		} else {
+			// Bring the window to the current workspace
+			// TODO: what if this window is on multiple workspaces?!?
+			uint32 workspaces = workspace_to_workspaces(fCurrentWorkspace);
+			SetWindowWorkspaces(window, workspaces);
+		}
 	}
 
 	if (window->IsMinimized()) {
@@ -1602,11 +1627,10 @@ Desktop::ActivateWindow(Window* window)
 		}
 
 		if (avoidsFront == NULL) {
-			// we're already the frontmost window, we might just not have focus yet
+			// we're already the frontmost window, we might just not have focus
+			// yet
 			if ((window->Flags() & B_AVOID_FOCUS) == 0)
 				SetFocusWindow(window);
-
-			UnlockAllWindows();
 			return;
 		}
 	}
@@ -1642,10 +1666,9 @@ Desktop::ActivateWindow(Window* window)
 	}
 
 	_BringWindowsToFront(windows, kWorkingList, true);
+
 	if ((window->Flags() & B_AVOID_FOCUS) == 0)
 		SetFocusWindow(window);
-
-	UnlockAllWindows();
 }
 
 
@@ -1706,19 +1729,19 @@ Desktop::ShowWindow(Window* window)
 	if (!window->IsHidden())
 		return;
 
-	LockAllWindows();
+	AutoWriteLocker locker(fWindowLock);
 
 	window->SetHidden(false);
 	fFocusList.AddWindow(window);
 
-	if (window->InWorkspace(fCurrentWorkspace)) {
+	if (window->InWorkspace(fCurrentWorkspace)
+		|| (window->IsFloating() && _LastFocusSubsetWindow(window) != NULL)) {
 		_ShowWindow(window, true);
 		_UpdateSubsetWorkspaces(window);
 		ActivateWindow(window);
 	} else {
 		// then we don't need to send the fake mouse event either
 		_WindowChanged(window);
-		UnlockAllWindows();
 		return;
 	}
 
@@ -1727,8 +1750,6 @@ Desktop::ShowWindow(Window* window)
 		BAutolock _(fWorkspacesLock);
 		window->FindWorkspacesViews(fWorkspacesViews);
 	}
-
-	UnlockAllWindows();
 
 	// If the mouse cursor is directly over the newly visible window,
 	// we'll send a fake mouse moved message to the window, so that

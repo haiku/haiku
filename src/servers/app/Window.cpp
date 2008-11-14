@@ -1571,7 +1571,7 @@ Window::FindWorkspacesViews(BObjectList<WorkspacesView>& list) const
 
 /*!	\brief Returns on which workspaces the window should be visible.
 
-	A modal or floating window may be visible on a workscreen if one
+	A modal or floating window may be visible on a workspace if one
 	of its subset windows is visible there. Floating windows also need
 	to have a subset as front window to be visible.
 */

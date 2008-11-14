@@ -231,6 +231,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									uint32 oldWorkspaces, uint32 newWorkspaces);
 		void					_BringWindowsToFront(WindowList& windows,
 									int32 list, bool wereVisible);
+		Window*					_LastFocusSubsetWindow(Window* window);
  		status_t				_ActivateApp(team_id team);
  		void					_SendFakeMouseMoved(Window* window = NULL);
 
