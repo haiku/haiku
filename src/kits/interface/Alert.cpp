@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -73,7 +73,7 @@ icon_layout_scale()
 #ifdef __HAIKU__
 	return max_c(1, ((int32)be_plain_font->Size() + 15) / 16);
 #endif
-	return 1;	
+	return 1;
 }
 
 
@@ -182,7 +182,7 @@ BAlert::BAlert(BMessage* data)
 	if (data->FindInt32("_but_width", &temp) == B_OK)
 		fButtonWidth = (button_width)temp;
 
-	AddCommonFilter(new _BAlertFilter_(this));
+	AddCommonFilter(new(std::nothrow) _BAlertFilter_(this));
 }
 
 
@@ -192,7 +192,7 @@ BAlert::Instantiate(BMessage* data)
 	if (!validate_instantiation(data, "BAlert"))
 		return NULL;
 
-	return new BAlert(data);
+	return new(std::nothrow) BAlert(data);
 }
 
 
@@ -440,7 +440,7 @@ void BAlert::_ReservedAlert2() {}
 void BAlert::_ReservedAlert3() {}
 
 
-void 
+void
 BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 	const char* button2, button_width buttonWidth, button_spacing spacing,
 	alert_type type)
@@ -455,7 +455,10 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 	fButtonWidth = buttonWidth;
 
 	// Set up the "_master_" view
-	TAlertView* view = new TAlertView(Bounds());
+	TAlertView* view = new(std::nothrow) TAlertView(Bounds());
+	if (view == NULL)
+		return;
+
 	AddChild(view);
 	view->SetBitmap(_InitIcon());
 
@@ -541,9 +544,12 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 		textViewRect.left = (kWindowIconOffset
 			+ kIconStripeWidth) * iconLayoutScale - 2;
 
-	fTextView = new BTextView(textViewRect, "_tv_",
+	fTextView = new(std::nothrow) BTextView(textViewRect, "_tv_",
 		textViewRect.OffsetByCopy(B_ORIGIN),
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	if (fTextView == NULL)
+		return;
+
 	fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 	fTextView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
@@ -562,7 +568,7 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 	textViewRect.bottom += textHeight;
 	fTextView->SetTextRect(textViewRect);
 
-	AddCommonFilter(new _BAlertFilter_(this));
+	AddCommonFilter(new(std::nothrow) _BAlertFilter_(this));
 
 	MoveTo(AlertPosition(Frame().Width(), Frame().Height()));
 }
@@ -602,7 +608,7 @@ BAlert::_InitIcon()
 			strerror(status)));
 		return NULL;
 	}
-	
+
 	// Which icon are we trying to load?
 	const char* iconName = "";	// Don't want any seg faults
 	switch (alertType) {
@@ -627,7 +633,7 @@ BAlert::_InitIcon()
 
 	int32 iconSize = 32 * icon_layout_scale();
 	// Allocate the icon bitmap
-	icon = new (std::nothrow) BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1),
+	icon = new(std::nothrow) BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1),
 		0, B_RGBA32);
 	if (icon == NULL || icon->InitCheck() < B_OK) {
 		FTRACE((stderr, "BAlert::_InitIcon() - No memory for bitmap\n"));
@@ -693,7 +699,7 @@ BAlert::_CreateButton(int32 which, const char* label)
 	char name[32];
 	snprintf(name, sizeof(name), "_b%ld_", which);
 
-	BButton* button = new (std::nothrow) BButton(rect, name, label, message,
+	BButton* button = new(std::nothrow) BButton(rect, name, label, message,
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	if (button == NULL)
 		return NULL;
@@ -742,7 +748,7 @@ TAlertView::Instantiate(BMessage* archive)
 	if (!validate_instantiation(archive, "TAlertView"))
 		return NULL;
 
-	return new TAlertView(archive);
+	return new(std::nothrow) TAlertView(archive);
 }
 
 

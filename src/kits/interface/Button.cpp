@@ -1,5 +1,5 @@
 /*
- *	Copyright 2001-2005, Haiku.
+ *	Copyright 2001-2008, Haiku.
  *  Distributed under the terms of the MIT License.
  *
  *	Authors:
@@ -13,6 +13,8 @@
 
 #include <Button.h>
 
+#include <new>
+
 #include <Font.h>
 #include <LayoutUtils.h>
 #include <String.h>
@@ -21,12 +23,12 @@
 #include <binary_compatibility/Interface.h>
 
 
-BButton::BButton(BRect frame, const char *name, const char *label, BMessage *message,
-				  uint32 resizingMode, uint32 flags)
-	:	BControl(frame, name, label, message, resizingMode,
+BButton::BButton(BRect frame, const char* name, const char* label,
+		BMessage* message, uint32 resizingMode, uint32 flags)
+	: BControl(frame, name, label, message, resizingMode,
 			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-		fPreferredSize(-1, -1),
-		fDrawAsDefault(false)
+	fPreferredSize(-1, -1),
+	fDrawAsDefault(false)
 {
 	// Resize to minimum height if needed
 	font_height fh;
@@ -37,21 +39,21 @@ BButton::BButton(BRect frame, const char *name, const char *label, BMessage *mes
 }
 
 
-BButton::BButton(const char* name, const char* label, BMessage *message,
-				 uint32 flags)
-	:	BControl(name, label, message,
+BButton::BButton(const char* name, const char* label, BMessage* message,
+		uint32 flags)
+	: BControl(name, label, message,
 			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-		fPreferredSize(-1, -1),
-		fDrawAsDefault(false)
+	fPreferredSize(-1, -1),
+	fDrawAsDefault(false)
 {
 }
 
 
-BButton::BButton(const char* label, BMessage *message)
-	:	BControl(NULL, label, message,
+BButton::BButton(const char* label, BMessage* message)
+	: BControl(NULL, label, message,
 			B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE),
-		fPreferredSize(-1, -1),
-		fDrawAsDefault(false)
+	fPreferredSize(-1, -1),
+	fDrawAsDefault(false)
 {
 }
 
@@ -61,9 +63,9 @@ BButton::~BButton()
 }
 
 
-BButton::BButton(BMessage *archive)
-	:	BControl(archive),
-		fPreferredSize(-1, -1)
+BButton::BButton(BMessage* archive)
+	: BControl(archive),
+	fPreferredSize(-1, -1)
 {
 	if (archive->FindBool("_default", &fDrawAsDefault) != B_OK)
 		fDrawAsDefault = false;
@@ -72,11 +74,11 @@ BButton::BButton(BMessage *archive)
 }
 
 
-BArchivable *
-BButton::Instantiate(BMessage *archive)
+BArchivable*
+BButton::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BButton"))
-		return new BButton(archive);
+		return new(std::nothrow) BButton(archive);
 
 	return NULL;
 }
@@ -89,7 +91,7 @@ BButton::Archive(BMessage* archive, bool deep) const
 
 	if (err != B_OK)
 		return err;
-	
+
 	if (IsDefault())
 		err = archive->AddBool("_default", true);
 
@@ -102,10 +104,10 @@ BButton::Draw(BRect updateRect)
 {
 	font_height fh;
 	GetFontHeight(&fh);
-	
+
 	const BRect bounds = Bounds();
 	BRect rect = bounds;
-	
+
 	const bool enabled = IsEnabled();
 	const bool pushed = Value() == B_CONTROL_ON;
 #if 0
@@ -119,49 +121,49 @@ BButton::Draw(BRect updateRect)
 	fillArea.InsetBy(3.0f, 3.0f);
 
 	BString text = Label();
-	
+
 #if 1
-	// Label truncation	
+	// Label truncation
 	BFont font;
 	GetFont(&font);
 	font.TruncateString(&text, B_TRUNCATE_END, fillArea.Width());
 #endif
 
 	// Label position
-	const float stringWidth = StringWidth(text.String()); 	
+	const float stringWidth = StringWidth(text.String());
 	const float x = (bounds.right - stringWidth) / 2.0f;
-	const float labelY = bounds.top  
-		+ ((bounds.Height() - fh.ascent - fh.descent) / 2.0f) 
-		+ fh.ascent +  1.0f;	
+	const float labelY = bounds.top
+		+ ((bounds.Height() - fh.ascent - fh.descent) / 2.0f)
+		+ fh.ascent +  1.0f;
 	const float focusLineY = labelY + fh.descent;
 
 	/* speed trick:
 	   if the focus changes but the button is not pressed then we can
-	   redraw only the focus line, 
-	   if the focus changes and the button is pressed invert the internal rect	
-	   this block takes care of all the focus changes 	
+	   redraw only the focus line,
+	   if the focus changes and the button is pressed invert the internal rect
+	   this block takes care of all the focus changes
 	*/
-	if (IsFocusChanging()) {	
+	if (IsFocusChanging()) {
 		if (pushed) {
 			rect.InsetBy(2.0, 2.0);
 			InvertRect(rect);
-		} else 
+		} else
 			DrawFocusLine(x, focusLineY, stringWidth, IsFocus() && Window()->IsActive());
-		
+
 		return;
 	}
 
-	// Colors	
+	// Colors
 	const rgb_color panelBgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	const rgb_color buttonBgColor=tint_color(panelBgColor, B_LIGHTEN_1_TINT);	
-	const rgb_color maxLightColor=tint_color(panelBgColor, B_LIGHTEN_MAX_TINT);	
-	const rgb_color maxShadowColor=tint_color(panelBgColor, B_DARKEN_MAX_TINT);	
-	const rgb_color darkBorderColor = tint_color(panelBgColor, 
+	const rgb_color buttonBgColor=tint_color(panelBgColor, B_LIGHTEN_1_TINT);
+	const rgb_color maxLightColor=tint_color(panelBgColor, B_LIGHTEN_MAX_TINT);
+	const rgb_color maxShadowColor=tint_color(panelBgColor, B_DARKEN_MAX_TINT);
+	const rgb_color darkBorderColor = tint_color(panelBgColor,
 		enabled ? B_DARKEN_4_TINT : B_DARKEN_2_TINT);
-	const rgb_color firstBevelColor = enabled ? tint_color(panelBgColor, B_DARKEN_2_TINT) 
+	const rgb_color firstBevelColor = enabled ? tint_color(panelBgColor, B_DARKEN_2_TINT)
 		: panelBgColor;
 	const rgb_color cornerColor = IsDefault() ? firstBevelColor : panelBgColor;
-	
+
 	// Fill the button area
 	SetHighColor(buttonBgColor);
 	FillRect(fillArea);
@@ -169,7 +171,7 @@ BButton::Draw(BRect updateRect)
 	// external border
 	SetHighColor(darkBorderColor);
 	StrokeRect(rect);
-		
+
 	BeginLineArray(14);
 
 	// Corners
@@ -179,30 +181,30 @@ BButton::Draw(BRect updateRect)
 	AddLine(rect.RightBottom(), rect.RightBottom(), cornerColor);
 
 	rect.InsetBy(1.0f,1.0f);
-	
+
 	// Shadow
 	AddLine(rect.LeftBottom(), rect.RightBottom(), firstBevelColor);
 	AddLine(rect.RightBottom(), rect.RightTop(), firstBevelColor);
 	// Light
 	AddLine(rect.LeftTop(), rect.LeftBottom(),buttonBgColor);
-	AddLine(rect.LeftTop(), rect.RightTop(), buttonBgColor);	
-	
+	AddLine(rect.LeftTop(), rect.RightTop(), buttonBgColor);
+
 	rect.InsetBy(1.0f, 1.0f);
-	
+
 	// Shadow
 	AddLine(rect.LeftBottom(), rect.RightBottom(), panelBgColor);
 	AddLine(rect.RightBottom(), rect.RightTop(), panelBgColor);
 	// Light
 	AddLine(rect.LeftTop(), rect.LeftBottom(),maxLightColor);
-	AddLine(rect.LeftTop(), rect.RightTop(), maxLightColor);	
-	
+	AddLine(rect.LeftTop(), rect.RightTop(), maxLightColor);
+
 	rect.InsetBy(1.0f,1.0f);
-	
+
 	// Light
 	AddLine(rect.LeftTop(), rect.LeftBottom(),maxLightColor);
-	AddLine(rect.LeftTop(), rect.RightTop(), maxLightColor);	
-		
-	EndLineArray();	
+	AddLine(rect.LeftTop(), rect.RightTop(), maxLightColor);
+
+	EndLineArray();
 
 	// Invert if clicked
 	if (enabled && pushed) {
@@ -216,12 +218,12 @@ BButton::Draw(BRect updateRect)
 			SetHighColor(maxLightColor);
 			SetLowColor(maxShadowColor);
 		} else {
-			SetHighColor(maxShadowColor);	
+			SetHighColor(maxShadowColor);
 			SetLowColor(tint_color(panelBgColor, B_LIGHTEN_2_TINT));
 		}
 	} else {
 		SetHighColor(tint_color(panelBgColor, B_DISABLED_LABEL_TINT));
-		SetLowColor(tint_color(panelBgColor, B_LIGHTEN_2_TINT));	
+		SetLowColor(tint_color(panelBgColor, B_LIGHTEN_2_TINT));
 	}
 
 	// Draw the label
@@ -239,16 +241,16 @@ BButton::Draw(BRect updateRect)
 	fillArea.InsetBy(3.0, 3.0);
 
 	BString text = Label();
-	
+
 #if 1
-	// Label truncation	
+	// Label truncation
 	BFont font;
 	GetFont(&font);
 	font.TruncateString(&text, B_TRUNCATE_END, fillArea.Width() - 4);
 #endif
 
 	// Label position
-	const float stringWidth = StringWidth(text.String()); 	
+	const float stringWidth = StringWidth(text.String());
 	const float x = (rect.right - stringWidth) / 2.0;
 	const float labelY = bounds.top
 		+ ((bounds.Height() - fh.ascent - fh.descent) / 2.0)
@@ -257,11 +259,11 @@ BButton::Draw(BRect updateRect)
 
 	/* speed trick:
 	   if the focus changes but the button is not pressed then we can
-	   redraw only the focus line, 
-	   if the focus changes and the button is pressed invert the internal rect	
-	   this block takes care of all the focus changes 	
+	   redraw only the focus line,
+	   if the focus changes and the button is pressed invert the internal rect
+	   this block takes care of all the focus changes
 	*/
-	if (IsFocusChanging()) {	
+	if (IsFocusChanging()) {
 		if (pushed) {
 			rect.InsetBy(2.0, 2.0);
 			InvertRect(rect);
@@ -269,16 +271,16 @@ BButton::Draw(BRect updateRect)
 			DrawFocusLine(x, focusLineY, stringWidth, IsFocus()
 				&& Window()->IsActive());
 		}
-		
+
 		return;
 	}
 
-	// colors	
+	// colors
 	rgb_color panelBgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color buttonBgColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);	
+	rgb_color buttonBgColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);
 	rgb_color lightColor;
-	rgb_color maxLightColor;	
-	rgb_color maxShadowColor = tint_color(panelBgColor, B_DARKEN_MAX_TINT);	
+	rgb_color maxLightColor;
+	rgb_color maxShadowColor = tint_color(panelBgColor, B_DARKEN_MAX_TINT);
 
 	rgb_color dark1BorderColor;
 	rgb_color dark2BorderColor;
@@ -292,11 +294,11 @@ BButton::Draw(BRect updateRect)
 
 	if (enabled) {
 		lightColor = tint_color(panelBgColor, B_LIGHTEN_2_TINT);
-		maxLightColor = tint_color(panelBgColor, B_LIGHTEN_MAX_TINT);	
-	
+		maxLightColor = tint_color(panelBgColor, B_LIGHTEN_MAX_TINT);
+
 		dark1BorderColor = tint_color(panelBgColor, B_DARKEN_3_TINT);
 		dark2BorderColor = tint_color(panelBgColor, B_DARKEN_4_TINT);
-	
+
 		bevelColor1 = tint_color(panelBgColor, B_DARKEN_2_TINT);
 		bevelColor2 = panelBgColor;
 
@@ -311,7 +313,7 @@ BButton::Draw(BRect updateRect)
 				+ panelBgColor.green) / 2;
 			borderBevelLight.blue = (borderBevelLight.blue
 				+ panelBgColor.blue) / 2;
-	
+
 			dark1BorderColor = tint_color(dark1BorderColor, B_DARKEN_3_TINT);
 			dark2BorderColor = tint_color(dark1BorderColor, B_DARKEN_4_TINT);
 
@@ -325,11 +327,11 @@ BButton::Draw(BRect updateRect)
 		}
 	} else {
 		lightColor = tint_color(panelBgColor, B_LIGHTEN_2_TINT);
-		maxLightColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);	
-	
+		maxLightColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);
+
 		dark1BorderColor = tint_color(panelBgColor, B_DARKEN_1_TINT);
 		dark2BorderColor = tint_color(panelBgColor, B_DARKEN_2_TINT);
-	
+
 		bevelColor1 = panelBgColor;
 		bevelColor2 = buttonBgColor;
 
@@ -376,7 +378,7 @@ BButton::Draw(BRect updateRect)
 			BPoint(rect.left + 1, rect.bottom), dark2BorderColor);
 
 	rect.InsetBy(1.0, 1.0);
-	
+
 	// Light
 	AddLine(BPoint(rect.left, rect.top),
 			BPoint(rect.left, rect.top), buttonBgColor);
@@ -385,9 +387,9 @@ BButton::Draw(BRect updateRect)
 	AddLine(BPoint(rect.left, rect.bottom),
 			BPoint(rect.left, rect.bottom), bevelColor2);
 	AddLine(BPoint(rect.left + 1, rect.top),
-			BPoint(rect.right - 1, rect.top), lightColor);	
+			BPoint(rect.right - 1, rect.top), lightColor);
 	AddLine(BPoint(rect.right, rect.top),
-			BPoint(rect.right, rect.top), bevelColor2);	
+			BPoint(rect.right, rect.top), bevelColor2);
 	// Shadow
 	AddLine(BPoint(rect.left + 1, rect.bottom),
 			BPoint(rect.right - 1, rect.bottom), bevelColor1);
@@ -395,27 +397,27 @@ BButton::Draw(BRect updateRect)
 			BPoint(rect.right, rect.bottom), bevelColorRBCorner);
 	AddLine(BPoint(rect.right, rect.bottom - 1),
 			BPoint(rect.right, rect.top + 1), bevelColor1);
-	
+
 	rect.InsetBy(1.0, 1.0);
-	
+
 	// Light
 	AddLine(BPoint(rect.left, rect.top),
 			BPoint(rect.left, rect.bottom - 1), maxLightColor);
 	AddLine(BPoint(rect.left, rect.bottom),
 			BPoint(rect.left, rect.bottom), buttonBgColor);
 	AddLine(BPoint(rect.left + 1, rect.top),
-			BPoint(rect.right - 1, rect.top), maxLightColor);	
+			BPoint(rect.right - 1, rect.top), maxLightColor);
 	AddLine(BPoint(rect.right, rect.top),
-			BPoint(rect.right, rect.top), buttonBgColor);	
+			BPoint(rect.right, rect.top), buttonBgColor);
 	// Shadow
 	AddLine(BPoint(rect.left + 1, rect.bottom),
 			BPoint(rect.right, rect.bottom), bevelColor2);
 	AddLine(BPoint(rect.right, rect.bottom - 1),
 			BPoint(rect.right, rect.top + 1), bevelColor2);
-	
+
 	rect.InsetBy(1.0,1.0);
-	
-	EndLineArray();	
+
+	EndLineArray();
 
 	// Invert if clicked
 	if (enabled && pushed) {
@@ -436,7 +438,7 @@ BButton::Draw(BRect updateRect)
 		}
 	} else {
 		SetHighColor(tint_color(panelBgColor, B_DISABLED_LABEL_TINT));
-		SetLowColor(buttonBgColor);	
+		SetLowColor(buttonBgColor);
 	}
 
 	// Draw the label
@@ -445,7 +447,7 @@ BButton::Draw(BRect updateRect)
 	// Focus line
 	if (enabled && IsFocus() && Window()->IsActive() && !pushed)
 		DrawFocusLine(x, focusLineY, stringWidth, true);
-#endif	
+#endif
 }
 
 
@@ -520,7 +522,7 @@ BButton::MakeDefault(bool flag)
 {
 	BButton *oldDefault = NULL;
 	BWindow *window = Window();
-	
+
 	if (window)
 		oldDefault = window->DefaultButton();
 
@@ -601,7 +603,7 @@ BButton::MouseUp(BPoint point)
 
 	if (Bounds().Contains(point))
 		Invoke();
-	
+
 	SetTracking(false);
 }
 
@@ -646,7 +648,7 @@ BButton::Invoke(BMessage *message)
 {
 	Sync();
 	snooze(50000);
-	
+
 	status_t err = BControl::Invoke(message);
 
 	SetValue(B_CONTROL_OFF);
@@ -815,7 +817,7 @@ BButton::DrawDefault(BRect bounds, bool enabled)
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
 	darken1 = tint_color(no_tint, B_DARKEN_1_TINT);
-	
+
 	rgb_color borderColor;
 	if (enabled)
 		borderColor = tint_color(no_tint, B_DARKEN_4_TINT);
@@ -847,9 +849,9 @@ BButton::DrawDefault(BRect bounds, bool enabled)
 	float inset = enabled? 2.0f : 3.0f;
 	SetHighColor(lighten1);
 
-	FillRect(BRect(bounds.left, bounds.top, 
+	FillRect(BRect(bounds.left, bounds.top,
 		bounds.right, bounds.top+inset-1.0f));
-	FillRect(BRect(bounds.left, bounds.bottom-inset+1.0f, 
+	FillRect(BRect(bounds.left, bounds.bottom-inset+1.0f,
 		bounds.right, bounds.bottom));
 	FillRect(BRect(bounds.left, bounds.top+inset-1.0f,
 		bounds.left+inset-1.0f, bounds.bottom-inset+1.0f));
@@ -902,7 +904,7 @@ BButton::DrawFocusLine(float x, float y, float width, bool visible)
 	// Blue Line
 	StrokeLine(BPoint(x, y), BPoint(x + width, y));
 
-	if (visible)		
+	if (visible)
 		SetHighColor(255, 255, 255);
 	// White Line
 	StrokeLine(BPoint(x, y + 1.0f), BPoint(x + width, y + 1.0f));
@@ -926,7 +928,7 @@ BButton::_ValidatePreferredSize()
 		// height
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
-	
+
 		fPreferredSize.height
 			= ceilf((fontHeight.ascent + fontHeight.descent) * 1.8)
 				+ (fDrawAsDefault ? 6.0f : 0);

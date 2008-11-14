@@ -424,7 +424,7 @@ BWindow::Instantiate(BMessage *data)
 	if (!validate_instantiation(data , "BWindow"))
 		return NULL;
 
-	return new BWindow(data);
+	return new(std::nothrow) BWindow(data);
 }
 
 
@@ -1225,7 +1225,7 @@ FrameMoved(origin);
 					status_t error = fLink->Read<int32>(&token);
 					if (error < B_OK || token == B_NULL_TOKEN)
 						break;
-					ViewUpdateInfo* info = new (std::nothrow) ViewUpdateInfo;
+					ViewUpdateInfo* info = new(std::nothrow) ViewUpdateInfo;
 					if (info == NULL || !infos.AddItem(info)) {
 						delete info;
 						break;
@@ -1596,7 +1596,7 @@ BWindow::SetPulseRate(bigtime_t rate)
 	if (rate > 0) {
 		if (fPulseRunner == NULL) {
 			BMessage message(B_PULSE);
-			fPulseRunner = new BMessageRunner(BMessenger(this),
+			fPulseRunner = new(std::nothrow) BMessageRunner(BMessenger(this),
 				&message, rate);
 		} else {
 			fPulseRunner->SetInterval(rate);
@@ -1619,7 +1619,9 @@ BWindow::PulseRate() const
 void
 BWindow::AddShortcut(uint32 key, uint32 modifiers, BMenuItem *item)
 {
-	Shortcut* shortcut = new Shortcut(key, modifiers, item);
+	Shortcut* shortcut = new(std::nothrow) Shortcut(key, modifiers, item);
+	if (shortcut == NULL)
+		return;
 
 	// removes the shortcut if it already exists!
 	RemoveShortcut(key, modifiers);
@@ -1636,12 +1638,16 @@ BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *message)
 
 
 void
-BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *message, BHandler *target)
+BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage* message,
+	BHandler* target)
 {
 	if (message == NULL)
 		return;
 
-	Shortcut* shortcut = new Shortcut(key, modifiers, message, target);
+	Shortcut* shortcut = new(std::nothrow) Shortcut(key, modifiers, message,
+		target);
+	if (shortcut == NULL)
+		return;
 
 	// removes the shortcut if it already exists!
 	RemoveShortcut(key, modifiers);
@@ -2569,8 +2575,12 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	STRACE(("BWindow::InitData(): contacting app_server...\n"));
 
 	// let app_server know that a window has been created.
-	fLink = new BPrivate::PortLink(
+	fLink = new(std::nothrow) BPrivate::PortLink(
 		BApplication::Private::ServerLink()->SenderPort(), receivePort);
+	if (fLink == NULL) {
+		// Zombie!
+		return;
+	}
 
 	{
 		BPrivate::AppServerLink lockLink;
@@ -2873,6 +2883,7 @@ BWindow::_CreateTopView()
 	STRACE(("_CreateTopView(): enter\n"));
 
 	BRect frame = fFrame.OffsetToCopy(B_ORIGIN);
+	// TODO: what to do here about std::nothrow?
 	fTopView = new BView(frame, "fTopView",
 		B_FOLLOW_ALL, B_WILL_DRAW);
 	fTopView->fTopLevelView = true;
@@ -3505,7 +3516,7 @@ BView*
 BWindow::_FindView(BView* view, BPoint point) const
 {
 	// point is assumed to be already in view's coordinates
-	if (!view->IsHidden() && view->Bounds().Contains(point)) { 
+	if (!view->IsHidden() && view->Bounds().Contains(point)) {
 		if (!view->fFirstChild)
 			return view;
 		else {

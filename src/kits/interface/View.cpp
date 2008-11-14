@@ -482,7 +482,7 @@ BView::Instantiate(BMessage *data)
 	if (!validate_instantiation(data , "BView"))
 		return NULL;
 
-	return new BView(data);
+	return new(std::nothrow) BView(data);
 }
 
 
@@ -1265,11 +1265,14 @@ BView::DragMessage(BMessage *message, BRect dragRect, BHandler *replyTo)
 		return;
 	}
 
-	// TODO: that's not really what should happen - the app_server should take the chance
-	//	*NOT* to need to drag a whole bitmap around but just a frame.
+	// TODO: that's not really what should happen - the app_server should take
+	// the chance *NOT* to need to drag a whole bitmap around but just a frame.
 
 	// create a drag bitmap for the rect
-	BBitmap *bitmap = new BBitmap(dragRect, B_RGBA32);
+	BBitmap *bitmap = new(std::nothrow) BBitmap(dragRect, B_RGBA32);
+	if (bitmap == NULL)
+		return;
+
 	uint32 *bits = (uint32*)bitmap->Bits();
 	uint32 bytesPerRow = bitmap->BytesPerRow();
 	uint32 width = dragRect.IntegerWidth() + 1;
@@ -1316,7 +1319,7 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 	if (image == NULL) {
 		// TODO: workaround for drags without a bitmap - should not be necessary if
 		//	we move the rectangle dragging into the app_server
-		image = new (nothrow) BBitmap(BRect(0, 0, 0, 0), B_RGBA32);
+		image = new(std::nothrow) BBitmap(BRect(0, 0, 0, 0), B_RGBA32);
 		if (image == NULL)
 			return;
 	}
@@ -1348,8 +1351,8 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 	// TODO: create area and flatten message into that area!
 	// send area info over port, not the actual message!
 	int32 bufferSize = privateMessage.NativeFlattenedSize();
-	char* buffer = new (nothrow) char[bufferSize];
-	if (buffer) {
+	char* buffer = new(std::nothrow) char[bufferSize];
+	if (buffer != NULL) {
 		privateMessage.NativeFlatten(buffer, bufferSize);
 
 		fOwner->fLink->StartMessage(AS_VIEW_DRAG_IMAGE);
@@ -3373,12 +3376,14 @@ BView::BeginLineArray(int32 count)
 			// not fatal, but it helps during
 			// development of your app and is in
 			// line with R5...
-		delete [] fCommArray->array;
+		delete[] fCommArray->array;
 		delete fCommArray;
 	}
 
+	// TODO: since this method cannot return failure, and further AddLine()
+	//	calls with a NULL fCommArray would drop into the debugger anyway,
+	//	we allow the possible std::bad_alloc exceptions here...
 	fCommArray = new _array_data_;
-
 	fCommArray->maxCount = count;
 	fCommArray->count = 0;
 	fCommArray->array = new _array_hdr_[count];
@@ -4631,7 +4636,7 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode,
 	// BView constructor. This does not cause problems under BeOS as it just
 	// ors the two fields to one 32bit flag.
 	// For now we do the same but print the above warning message.
-	// ToDo: this should be removed at some point and the original
+	// TODO: this should be removed at some point and the original
 	// version restored:
 	// fFlags = (resizingMode & _RESIZE_MASK_) | (flags & ~_RESIZE_MASK_);
 	fFlags = resizingMode | flags;
@@ -4662,6 +4667,8 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode,
 	fIsPrinting = false;
 	fAttached = false;
 
+	// TODO: Since we cannot communicate failure, we don't use std::nothrow here
+	// TODO: Maybe we could auto-delete those views on AddChild() instead?
 	fState = new BPrivate::ViewState;
 
 	fBounds = frame.OffsetToCopy(B_ORIGIN);
@@ -4744,19 +4751,22 @@ BView::_ClipToPicture(BPicture *picture, BPoint where,
 		bounds.right = bounds.left + ((bounds.IntegerWidth() + 1) / 32 + 1) * 32 - 1;
 
 	// TODO: I used a RGBA32 bitmap because drawing on a GRAY8 doesn't work.
-	BBitmap *bitmap = new BBitmap(bounds, B_RGBA32, true);
-	if (bitmap && bitmap->InitCheck() == B_OK && bitmap->Lock()) {
-		BView *view = new BView(bounds, "drawing view", B_FOLLOW_NONE, 0);
-		bitmap->AddChild(view);
-		view->DrawPicture(picture, where);
-		view->Sync();
+	BBitmap *bitmap = new(std::nothrow) BBitmap(bounds, B_RGBA32, true);
+	if (bitmap != NULL && bitmap->InitCheck() == B_OK && bitmap->Lock()) {
+		BView *view = new(std::nothrow) BView(bounds, "drawing view",
+			B_FOLLOW_NONE, 0);
+		if (view != NULL) {
+			bitmap->AddChild(view);
+			view->DrawPicture(picture, where);
+			view->Sync();
+		}
 		bitmap->Unlock();
 	}
 
 	BRegion region;
 	int32 width = bounds.IntegerWidth() + 1;
 	int32 height = bounds.IntegerHeight() + 1;
-	if (bitmap->LockBits() == B_OK) {
+	if (bitmap != NULL && bitmap->LockBits() == B_OK) {
 		uint32 bit = 0;
 		uint32 *bits = (uint32 *)bitmap->Bits();
 		clipping_rect rect;
