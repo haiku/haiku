@@ -84,7 +84,7 @@ class RequestOwner {
 	public:
 		RequestOwner();
 
-		void Enqueue(tty_cookie *cookie, RequestQueue *queue1, 
+		void Enqueue(tty_cookie *cookie, RequestQueue *queue1,
 			RequestQueue *queue2 = NULL);
 		void Dequeue();
 
@@ -129,6 +129,7 @@ struct tty_settings {
 };
 
 struct tty {
+	int32				ref_count;	// referenced by cookies
 	int32				open_count;
 	int32				index;
 	struct mutex*		lock;
@@ -162,7 +163,7 @@ extern struct recursive_lock gTTYRequestLock;
 // functions available for master/slave TTYs
 
 extern int32 get_tty_index(const char *name);
-extern void reset_tty(struct tty *tty, int32 index, bool isMaster);
+extern void reset_tty(struct tty *tty, int32 index, mutex* lock, bool isMaster);
 extern void reset_tty_settings(tty_settings *settings, int32 index);
 //extern status_t tty_input_putc(struct tty *tty, int c);
 extern status_t tty_input_read(tty_cookie *cookie, void *buffer,

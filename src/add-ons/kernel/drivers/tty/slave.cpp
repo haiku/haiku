@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -146,7 +146,10 @@ slave_free_cookie(void *_cookie)
 
 	TRACE(("slave_free_cookie: cookie %p\n", _cookie));
 
+	MutexLocker globalLocker(gGlobalTTYLock);
 	uninit_tty_cookie(cookie);
+	globalLocker.Unlock();
+
 	free(cookie);
 
 	return B_OK;
@@ -160,7 +163,7 @@ slave_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 	TRACE(("slave_ioctl: cookie %p, op %lu, buffer %p, length %lu\n", _cookie, op, buffer, length));
 
-	return tty_ioctl(cookie, op, buffer, length);		
+	return tty_ioctl(cookie, op, buffer, length);
 }
 
 

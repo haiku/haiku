@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -20,7 +20,6 @@
 
 
 struct master_cookie : tty_cookie {
-	struct mutex	lock;
 };
 
 
@@ -43,11 +42,8 @@ create_master_cookie(master_cookie *&cookie, struct tty *master,
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
-	mutex_init(&cookie->lock, "tty lock");
-
 	status_t error = init_tty_cookie(cookie, master, slave, openMode);
 	if (error != B_OK) {
-		mutex_destroy(&cookie->lock);
 		free(cookie);
 		return error;
 	}
@@ -77,12 +73,12 @@ master_open(const char *name, uint32 flags, void **_cookie)
 
 	if (findUnusedTTY) {
 		for (index = 0; index < (int32)kNumTTYs; index++) {
-			if (gMasterTTYs[index].open_count == 0)
+			if (gMasterTTYs[index].ref_count == 0)
 				break;
 		}
 		if (index >= (int32)kNumTTYs)
 			return ENOENT;
-	} else if (gMasterTTYs[index].open_count > 0) {
+	} else if (gMasterTTYs[index].ref_count > 0) {
 		// we're already open!
 		return B_BUSY;
 	}
@@ -101,11 +97,8 @@ master_open(const char *name, uint32 flags, void **_cookie)
 		return status;
 	}
 
-	gMasterTTYs[index].lock = &cookie->lock;
-
 	add_tty_cookie(cookie);
 
-	
 	*_cookie = cookie;
 
 	return B_OK;
@@ -138,8 +131,10 @@ master_free_cookie(void *_cookie)
 	// The TTY is already closed. We only have to free the cookie.
 	master_cookie *cookie = (master_cookie *)_cookie;
 
+	MutexLocker globalLocker(gGlobalTTYLock);
 	uninit_tty_cookie(cookie);
-	mutex_destroy(&cookie->lock);
+	globalLocker.Unlock();
+
 	free(cookie);
 
 	return B_OK;
@@ -153,7 +148,7 @@ master_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 	TRACE(("master_ioctl: cookie %p, op %lu, buffer %p, length %lu\n", _cookie, op, buffer, length));
 
-	return tty_ioctl(cookie, op, buffer, length);		
+	return tty_ioctl(cookie, op, buffer, length);
 }
 
 

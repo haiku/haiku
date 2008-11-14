@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the Haiku License.
  */
@@ -30,6 +30,8 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 char *gDeviceNames[kNumTTYs * 2 + 3];
 	// reserve space for "pt/" and "tt/" entries, "ptmx", "tty", and the
 	// terminating NULL
+
+static mutex sTTYLocks[kNumTTYs];
 
 struct mutex gGlobalTTYLock;
 struct mutex gTTYCookieLock;
@@ -84,8 +86,9 @@ init_driver(void)
 		if (++digit > 15)
 			digit = 0, letter++;
 
-		reset_tty(&gMasterTTYs[i], i, true);
-		reset_tty(&gSlaveTTYs[i], i, false);
+		mutex_init(&sTTYLocks[i], "tty lock");
+		reset_tty(&gMasterTTYs[i], i, &sTTYLocks[i], true);
+		reset_tty(&gSlaveTTYs[i], i, &sTTYLocks[i], false);
 		reset_tty_settings(&gTTYSettings[i], i);
 
 		if (!gDeviceNames[i] || !gDeviceNames[i + kNumTTYs]) {
@@ -112,6 +115,9 @@ uninit_driver(void)
 
 	for (int32 i = 0; i < (int32)kNumTTYs * 2; i++)
 		free(gDeviceNames[i]);
+
+	for (int32 i = 0; i < (int32)kNumTTYs; i++)
+		mutex_destroy(&sTTYLocks[i]);
 
 	recursive_lock_destroy(&gTTYRequestLock);
 	mutex_destroy(&gTTYCookieLock);

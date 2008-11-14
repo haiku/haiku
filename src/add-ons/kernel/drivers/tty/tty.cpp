@@ -44,8 +44,8 @@
 
 	gGlobalTTYLock: Guards open/close operations. When held, tty_open(),
 	tty_close(), tty_close_cookie() etc. won't be invoked by other threads,
-	cookies won't be added to/removed from TTYs, and tty::open_count,
-	tty_cookie::closed won't change.
+	cookies won't be added to/removed from TTYs, and tty::ref_count,
+	tty::open_count, tty_cookie::closed won't change.
 
 	gTTYCookieLock: Guards the access to the fields
 	tty_cookie::{thread_count,closed}, or more precisely makes access to them
@@ -59,10 +59,7 @@
 	window_size,pgrp_id}}. Moreover when held guarantees that tty::open_count
 	won't drop to zero (both gGlobalTTYLock and tty::lock must be held to
 	decrement it). A tty and the tty connected to it (master and slave) share
-	the same lock. tty::lock is only valid when tty::open_count is > 0. So
-	before accessing tty::lock, it must be made sure that it is still valid.
-	Given a tty_cookie, TTYReference can be used to do that, or otherwise
-	gGlobalTTYLock can be acquired and tty::open_count be checked.
+	the same lock.
 
 	gTTYRequestLock: Guards access to tty::{reader,writer}_queue (most
 	RequestQueue methods do the locking themselves (the lock is a
@@ -336,7 +333,7 @@ RequestOwner::RequestOwner()
  *	The caller must already hold the request lock.
  */
 void
-RequestOwner::Enqueue(tty_cookie *cookie, RequestQueue *queue1, 
+RequestOwner::Enqueue(tty_cookie *cookie, RequestQueue *queue1,
 	RequestQueue *queue2)
 {
 	TRACE(("%p->RequestOwner::Enqueue(%p, %p, %p)\n", this, cookie, queue1,
@@ -403,7 +400,7 @@ RequestOwner::Wait(bool interruptable, bigtime_t timeout)
 	RecursiveLocker locker(gTTYRequestLock);
 
 	// check, if already done
-	if (fError == B_OK 
+	if (fError == B_OK
 		&& (!fRequests[0].WasNotified() || !fRequests[1].WasNotified())) {
 		// not yet done
 
@@ -563,7 +560,7 @@ WriterLocker::_CheckAvailableBytes() const
 }
 
 
-status_t 
+status_t
 WriterLocker::AcquireWriter(bool dontBlock, size_t bytesNeeded)
 {
 	if (!fTarget)
@@ -679,7 +676,7 @@ ReaderLocker::~ReaderLocker()
 }
 
 
-status_t 
+status_t
 ReaderLocker::AcquireReader(bigtime_t timeout, size_t minBytes)
 {
 	if (fCookie->closed)
@@ -716,7 +713,7 @@ ReaderLocker::AcquireReader(bigtime_t timeout, size_t minBytes)
 }
 
 
-status_t 
+status_t
 ReaderLocker::AcquireReader(bool dontBlock)
 {
 	return AcquireReader(dontBlock ? 0 : B_INFINITE_TIMEOUT, 0);
@@ -788,7 +785,7 @@ reset_termios(struct termios &termios)
 	termios.c_ispeed = B19200;
 	termios.c_ospeed = B19200;
 
-	// control characters	
+	// control characters
 	termios.c_cc[VINTR] = CTRL('C');
 	termios.c_cc[VQUIT] = CTRL('\\');
 	termios.c_cc[VERASE] = 0x7f;
@@ -820,11 +817,12 @@ reset_tty_settings(tty_settings *settings, int32 index)
 
 
 void
-reset_tty(struct tty *tty, int32 index, bool isMaster)
+reset_tty(struct tty *tty, int32 index, mutex* lock, bool isMaster)
 {
+	tty->ref_count = 0;
 	tty->open_count = 0;
 	tty->index = index;
-	tty->lock = NULL;
+	tty->lock = lock;
 	tty->settings = &gTTYSettings[index];
 	tty->select_pool = NULL;
 	tty->is_master = isMaster;
@@ -946,9 +944,8 @@ tty_input_putc(struct tty *tty, int c)
 #endif // 0
 
 
-/**
- * The global lock must be held.
- */
+/*!	The global lock must be held.
+*/
 status_t
 init_tty_cookie(tty_cookie *cookie, struct tty *tty, struct tty *otherTTY,
 	uint32 openMode)
@@ -963,13 +960,19 @@ init_tty_cookie(tty_cookie *cookie, struct tty *tty, struct tty *otherTTY,
 	cookie->thread_count = 0;
 	cookie->closed = false;
 
+	tty->ref_count++;
+
 	return B_OK;
 }
 
 
+/*!	The global lock must be held.
+*/
 void
 uninit_tty_cookie(tty_cookie *cookie)
 {
+	cookie->tty->ref_count--;
+
 	if (cookie->blocking_semaphore >= 0) {
 		delete_sem(cookie->blocking_semaphore);
 		cookie->blocking_semaphore = -1;
@@ -1081,8 +1084,8 @@ tty_close_cookie(struct tty_cookie *cookie)
 			requestOwner.Wait(false);
 
 			// re-lock
-			ttyLocker.SetTo(cookie->tty->lock, false);
-			requestLocker.SetTo(gTTYRequestLock, false);
+			ttyLocker.Lock();
+			requestLocker.Lock();
 
 			// dequeue our request
 			requestOwner.Dequeue();
@@ -1093,6 +1096,8 @@ tty_close_cookie(struct tty_cookie *cookie)
 		// finally close the tty
 		tty_close(cookie->tty);
 	}
+
+	// notify pending select()s and cleanup the select sync pool
 
 	// notify a select write event on the other tty, if we've closed this tty
 	if (cookie->tty->open_count == 0 && cookie->other_tty->open_count > 0)
@@ -1151,7 +1156,7 @@ tty_notify_if_available(struct tty *tty, struct tty *otherTTY,
 		if (!tty->writer_queue.IsEmpty()) {
 			tty->writer_queue.NotifyFirst(writable);
 		} else if (notifySelect) {
-			if (otherTTY && otherTTY->open_count > 0) 
+			if (otherTTY && otherTTY->open_count > 0)
 				tty_notify_select_event(otherTTY, B_SELECT_WRITE);
 		}
 	}
@@ -1306,7 +1311,6 @@ tty_open(struct tty *tty, tty_service_func func)
 	if (init_line_buffer(tty->input_buffer, TTY_BUFFER_SIZE) < B_OK)
 		return B_NO_MEMORY;
 
-	tty->lock = NULL;
 	tty->service_func = func;
 
 	// construct the queues
@@ -1371,7 +1375,7 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 		{
 			TRACE(("tty: set pgrp_id\n"));
 			pid_t groupID;
-			
+
 			if (user_memcpy(&groupID, buffer, sizeof(pid_t)) != B_OK)
 				return B_BAD_ADDRESS;
 
@@ -1943,14 +1947,6 @@ tty_deselect(tty_cookie *cookie, uint8 event, selectsync *sync)
 	if (event < B_SELECT_READ || event > B_SELECT_ERROR)
 		return B_BAD_VALUE;
 
-	// If the TTY is already closed, we're done. Note that we don't use a
-	// TTYReference here, but acquire the global lock, since we don't want
-	// return before tty_close_cookie() is done (it sends out the select
-	// events on close and our select() could miss one, if we don't wait).
-	MutexLocker globalLocker(gGlobalTTYLock);
-	if (cookie->closed)
-		return B_OK;
-
 	// lock the TTY (guards the select sync pool, among other things)
 	MutexLocker ttyLocker(tty->lock);
 
@@ -1975,8 +1971,8 @@ dump_tty_settings(struct tty_settings& settings)
 	for (int i = 0; i < NCCS; i++)
 		kprintf("    c_cc[%02d]:   %d\n", i, settings.termios.c_cc[i]);
 
-	kprintf("  wsize:        %u x %u c, %u x %u pxl\n", 
-		settings.window_size.ws_row, settings.window_size.ws_col, 
+	kprintf("  wsize:        %u x %u c, %u x %u pxl\n",
+		settings.window_size.ws_row, settings.window_size.ws_col,
 		settings.window_size.ws_xpixel, settings.window_size.ws_ypixel);
 }
 
