@@ -258,7 +258,8 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		off_t blockOffset = (off_t)block << volume->BlockShift();
 		uint32 blockLength = volume->BlockSize();
 
-		if (index > 0 && vecs[index - 1].offset == blockOffset - blockLength) {
+		if (index > 0 && (vecs[index - 1].offset == blockOffset - blockLength
+				|| (vecs[index - 1].offset == -1 && block == 0))) {
 			vecs[index - 1].length += blockLength;
 		} else {
 			if (index >= max) {
@@ -267,7 +268,12 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 				return B_BUFFER_OVERFLOW;
 			}
 
-			vecs[index].offset = blockOffset;
+			// 'block' is 0 for sparse blocks
+			if (block != 0)
+				vecs[index].offset = blockOffset;
+			else
+				vecs[index].offset = -1;
+
 			vecs[index].length = blockLength;
 			index++;
 		}

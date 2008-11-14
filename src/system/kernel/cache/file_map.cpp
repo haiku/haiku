@@ -26,9 +26,9 @@
 
 //#define TRACE_FILE_MAP
 #ifdef TRACE_FILE_MAP
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf_no_syslog(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 // TODO: use a sparse array - eventually, the unused BlockMap would be something
@@ -223,7 +223,7 @@ FileMap::_MakeSpace(size_t count)
 status_t
 FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 {
-	TRACE(("FileMap@%p::Add(vecCount = %ld)\n", this, vecCount));
+	TRACE("FileMap@%p::Add(vecCount = %ld)\n", this, vecCount);
 
 	uint32 start = fCount;
 	off_t offset = 0;
@@ -241,7 +241,8 @@ FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 	for (uint32 i = 0; i < vecCount; i++) {
 		if (lastExtent != NULL) {
 			if (lastExtent->disk.offset + lastExtent->disk.length
-					== vecs[i].offset) {
+					== vecs[i].offset
+				|| lastExtent->disk.offset == -1 && vecs[i].offset == -1) {
 				lastExtent->disk.length += vecs[i].length;
 				offset += vecs[i].length;
 				start--;
@@ -261,7 +262,7 @@ FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 #ifdef TRACE_FILE_MAP
 	for (uint32 i = 0; i < fCount; i++) {
 		file_extent* extent = ExtentAt(i);
-		dprintf("[%ld] extent offset %Ld, disk offset %Ld, length %Ld\n",
+		TRACE("[%ld] extent offset %Ld, disk offset %Ld, length %Ld\n",
 			i, extent->offset, extent->disk.offset, extent->disk.length);
 	}
 #endif
@@ -420,7 +421,10 @@ FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count,
 	file_extent* fileExtent = _FindExtent(offset, &index);
 
 	offset -= fileExtent->offset;
-	vecs[0].offset = fileExtent->disk.offset + offset;
+	if (fileExtent->disk.offset != -1)
+		vecs[0].offset = fileExtent->disk.offset + offset;
+	else
+		vecs[0].offset = -1;
 	vecs[0].length = fileExtent->disk.length - offset;
 
 	if (vecs[0].length >= size) {
@@ -575,8 +579,8 @@ file_map_init(void)
 extern "C" void*
 file_map_create(dev_t mountID, ino_t vnodeID, off_t size)
 {
-	TRACE(("file_map_create(mountID = %ld, vnodeID = %Ld, size = %Ld)\n",
-		mountID, vnodeID, size));
+	TRACE("file_map_create(mountID = %ld, vnodeID = %Ld, size = %Ld)\n",
+		mountID, vnodeID, size);
 
 	// Get the vnode for the object
 	// (note, this does not grab a reference to the node)
@@ -595,7 +599,7 @@ file_map_delete(void* _map)
 	if (map == NULL)
 		return;
 
-	TRACE(("file_map_delete(map = %p)\n", map));
+	TRACE("file_map_delete(map = %p)\n", map);
 	delete map;
 }
 
@@ -637,8 +641,8 @@ extern "C" status_t
 file_map_translate(void* _map, off_t offset, size_t size, file_io_vec* vecs,
 	size_t* _count, size_t align)
 {
-	TRACE(("file_map_translate(map %p, offset %Ld, size %ld)\n",
-		_map, offset, size));
+	TRACE("file_map_translate(map %p, offset %Ld, size %ld)\n",
+		_map, offset, size);
 
 	FileMap* map = (FileMap*)_map;
 	if (map == NULL)

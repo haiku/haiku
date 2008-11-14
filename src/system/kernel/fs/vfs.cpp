@@ -3266,6 +3266,31 @@ dump_vnode_usage(int argc, char **argv)
 
 #endif	// ADD_DEBUGGER_COMMANDS
 
+//!	Clears an iovec array of physical pages.
+static status_t
+zero_pages(const iovec* vecs, size_t vecCount, size_t* _bytes)
+{
+	size_t bytes = *_bytes;
+	size_t index = 0;
+
+	while (bytes > 0) {
+		size_t length = min_c(vecs[index].iov_len, bytes);
+
+		status_t status = vm_memset_physical((addr_t)vecs[index].iov_base, 0,
+			length);
+		if (status != B_OK) {
+			*_bytes = bytes;
+			return status;
+		}
+
+		bytes -= length;
+	}
+
+	*_bytes = bytes;
+	return B_OK;
+}
+
+
 /*!	Does the dirty work of combining the file_io_vecs with the iovecs
 	and calls the file system hooks to read/write the request to disk.
 */
@@ -3296,8 +3321,13 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 		if (size > numBytes)
 			size = numBytes;
 
-		status = FS_CALL(vnode, read_pages, cookie, fileVecs[0].offset,
-			&vecs[vecIndex], vecCount - vecIndex, &size);
+		if (fileVecs[0].offset >= 0) {
+			status = FS_CALL(vnode, read_pages, cookie, fileVecs[0].offset,
+				&vecs[vecIndex], vecCount - vecIndex, &size);
+		} else {
+			// sparse read
+			status = zero_pages(&vecs[vecIndex], vecCount - vecIndex, &size);
+		}
 		if (status < B_OK)
 			return status;
 
@@ -3390,7 +3420,16 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 			}
 
 			size_t bytes = size;
-			if (doWrite) {
+
+			if (fileOffset == -1) {
+				if (doWrite) {
+					panic("sparse write attempt: vnode %p", vnode);
+					status = B_IO_ERROR;
+				} else {
+					// sparse read
+					status = zero_pages(tempVecs, tempCount, &bytes);
+				}
+			} else if (doWrite) {
 				status = FS_CALL(vnode, write_pages, cookie, fileOffset,
 					tempVecs, tempCount, &bytes);
 			} else {
@@ -3402,7 +3441,8 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 
 			totalSize += bytes;
 			bytesLeft -= size;
-			fileOffset += size;
+			if (fileOffset >= 0)
+				fileOffset += size;
 			fileLeft -= size;
 			//dprintf("-> file left = %Lu\n", fileLeft);
 
