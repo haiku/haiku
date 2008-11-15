@@ -21,8 +21,8 @@ HEventRow::HEventRow(const char* name, const char* path)
 	: BRow(),
 	fName(name)
 {
-	SetPath(path);
 	SetField(new BStringField(name), kEventColumn);
+	SetPath(path);
 }
 
 
@@ -48,7 +48,7 @@ HEventRow::Remove(const char *type)
 
 
 HEventList::HEventList(BRect rect, const char* name)
-	: BColumnListView(rect, name, B_FOLLOW_ALL, 0, B_NO_BORDER, true),
+	: BColumnListView(rect, name, B_FOLLOW_ALL, 0, B_PLAIN_BORDER, true),
 		fType(NULL)
 {
 	AddColumn(new BStringColumn("Event", 150, 50, 500, B_TRUNCATE_MIDDLE), kEventColumn);
@@ -76,10 +76,10 @@ HEventList::SetType(const char* type)
 	entry_ref ref;
 	while (mfiles.GetNextRef(&name,&ref) == B_OK) {
 		BPath path(&ref);
-		if ((path.InitCheck() == B_OK) || (ref.name == NULL) || (strcmp(ref.name, "") == 0))
-			AddRow(new HEventRow(name.String(), path.Path()));
-		else
+		if ((path.InitCheck() != B_OK) || (ref.name == NULL) || (strcmp(ref.name, "") == 0))
 			AddRow(new HEventRow(name.String(), NULL));
+		else
+			AddRow(new HEventRow(name.String(), path.Path()));
 	}
 }
 

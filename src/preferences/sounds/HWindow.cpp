@@ -73,8 +73,8 @@ HWindow::InitGUI()
 	rect.top += 28;
 	rect.bottom -= 7;
 	fEventList = new HEventList(rect);
-	fEventList->SetType(BMediaFiles::B_SOUNDS);
 	listView->AddChild(fEventList);
+	fEventList->SetType(BMediaFiles::B_SOUNDS);
 
 	rect = Bounds();
 	rect.top = rect.bottom - 105;
