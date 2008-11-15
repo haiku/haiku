@@ -67,10 +67,10 @@
 								__FUNCTION__, sFunctionDepth)
 #	define KID_CALLED(x...)	FunctionTracer _ft(this, "KeyboardInputDevice", \
 								__FUNCTION__, sFunctionDepth)
-#	define TRACE(x...)	{ BString _to; \
+#	define TRACE(x...)	do { BString _to; \
 							_to.Append(' ', (sFunctionDepth + 1) * 2); \
 							debug_printf("%p -> %s", this, _to.String()); \
-							debug_printf(x); }
+							debug_printf(x); } while (0)
 #	define LOG_EVENT(text...) do {} while (0)
 #	define LOG_ERR(text...) TRACE(text)
 #else
