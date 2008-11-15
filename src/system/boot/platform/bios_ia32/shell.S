@@ -37,7 +37,7 @@ sNumSectors:
 	// written by the "makeflop" command in 512 byte blocks
 	// 0x180 is the allowed maximum, as the zipped TAR with the
 	// kernel and the boot module might start at offset 192 kB
-	.word	0x0180
+	.word BOOT_ARCHIVE_IMAGE_OFFSET*2
 
 floppy_start:
 	cli

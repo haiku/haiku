@@ -216,16 +216,22 @@ switch $(HAIKU_CPU) {
 	{
 		HAIKU_DEFINES += __POWERPC__ ;
 		HAIKU_BOOT_PLATFORM = openfirmware ;
+		# offset in floppy image (>= sizeof(zbeos))
+		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
 	}
 	case x86 :
 	{
 		HAIKU_DEFINES += __INTEL__ ;
 		HAIKU_BOOT_PLATFORM = bios_ia32 ;
+		# offset in floppy image (>= sizeof(zbeos))
+		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 270 ; # in kB
 	}
 	case m68k :
 	{
 		HAIKU_DEFINES += __M68K__ ;
 		HAIKU_BOOT_PLATFORM = atari_m68k ;
+		# offset in floppy image (>= sizeof(zbeos))
+		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 130 ; # in kB
 	}
 	case * :
 		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
@@ -233,6 +239,7 @@ switch $(HAIKU_CPU) {
 HAIKU_ARCH ?= $(HAIKU_CPU) ;
 HAIKU_ARCH_MACRO_DEFINE = ARCH_$(HAIKU_ARCH) ;
 HAIKU_DEFINES += $(HAIKU_ARCH_MACRO_DEFINE) ;
+HAIKU_DEFINES += BOOT_ARCHIVE_IMAGE_OFFSET=$(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
 
 # directories
 HAIKU_OBJECT_BASE_DIR = [ FDirName $(HAIKU_OBJECT_DIR) haiku ] ;

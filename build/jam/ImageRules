@@ -1047,6 +1047,7 @@ rule BuildFloppyBootImage image : zbeos : archive
 	Depends $(image) : $(zbeos) ;
 	Depends $(image) : $(archive) ;
 	#MakeLocateDebug $(image) ;
+	ARCHIVE_IMAGE_OFFSET on $(image) = $(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
 	BuildFloppyBootImage1 $(image) : $(zbeos) $(archive) ;
 }
 
@@ -1060,7 +1061,7 @@ actions BuildFloppyBootImage1
 	# add the boot drivers tgz archive
 	# keep the offset in sync with
 	# src/system/boot/loader/file_systems/tarfs/tarfs.cpp:kFloppyArchiveOffset
-	dd if=$(>[2]) of=$(<) bs=192k seek=1 conv=notrunc
+	dd if=$(>[2]) of=$(<) bs=$(ARCHIVE_IMAGE_OFFSET)k seek=1 conv=notrunc
 }
 
 
