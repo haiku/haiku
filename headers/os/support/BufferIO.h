@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BUFFER_IO_H
@@ -40,7 +40,8 @@ class BBufferIO : public BPositionIO {
 		char* fBuffer;
 		size_t fBufferSize;
 		size_t fBufferUsed;
-		uint32 _reserved_ints[6];
+		off_t fPosition;
+		uint32 _reserved_ints[4];
 		bool fBufferIsDirty;
 		bool fOwnsStream;
 		bool _reserved_bools[6];

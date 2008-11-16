@@ -1,5 +1,5 @@
 /*
- *	Copyright (c) 2001-2007, Haiku
+ *	Copyright (c) 2001-2008, Haiku
  *	Distributed under the terms of the MIT license
  *
  *	Authors:
@@ -14,7 +14,7 @@
 #include <string.h>
 
 
-BBufferIO::BBufferIO(BPositionIO *stream, size_t bufferSize, bool ownsStream)
+BBufferIO::BBufferIO(BPositionIO* stream, size_t bufferSize, bool ownsStream)
 	:
 	fBufferStart(0),
 	fStream(stream),
@@ -22,18 +22,16 @@ BBufferIO::BBufferIO(BPositionIO *stream, size_t bufferSize, bool ownsStream)
 	fBufferUsed(0),
 	fBufferIsDirty(false),
 	fOwnsStream(ownsStream)
-		
+
 {
-	if (bufferSize < 512)
-		bufferSize = 512;
-	
-	fBufferSize = bufferSize;
-	 
+	fBufferSize = max_c(bufferSize, 512);
+	fPosition = stream->Position();
+
 	// What can we do if this malloc fails ?
 	// I think R5 uses new, but doesn't catch the thrown exception
 	// (if you specify a very big buffer, the application just
 	// terminates with abort).
-	fBuffer = (char *)malloc(fBufferSize);
+	fBuffer = (char*)malloc(fBufferSize);
 }
 
 
@@ -52,27 +50,26 @@ BBufferIO::~BBufferIO()
 
 
 ssize_t
-BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
+BBufferIO::ReadAt(off_t pos, void* buffer, size_t size)
 {
 	// We refuse to crash, even if
 	// you were lazy and didn't give a valid
 	// stream on construction.
-	if (fStream == NULL)	
-		return B_NO_INIT; 
-
+	if (fStream == NULL)
+		return B_NO_INIT;
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
 	// If the amount of data we want doesn't fit in the buffer, just
 	// read it directly from the disk (and don't touch the buffer).
-	if (size > fBufferSize) {
+	if (size > fBufferSize || fBuffer == NULL) {
 		if (fBufferIsDirty)
 			Flush();
 		return fStream->ReadAt(pos, buffer, size);
 	}
 
-	// If the data we are looking for is not in the buffer... 
-	if (size > fBufferUsed 
+	// If the data we are looking for is not in the buffer...
+	if (size > fBufferUsed
 		|| pos < fBufferStart
 		|| pos > fBufferStart + fBufferUsed
 		|| pos + size > fBufferStart + fBufferUsed) {
@@ -86,7 +83,7 @@ BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
 			fBufferStart = pos; // The data is buffered starting from this offset
 	}
 
-	size = min_c(size, fBufferUsed);	
+	size = min_c(size, fBufferUsed);
 
 	// copy data from the cache to the given buffer
 	memcpy(buffer, fBuffer + pos - fBufferStart, size);
@@ -96,16 +93,15 @@ BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
 
 
 ssize_t
-BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
+BBufferIO::WriteAt(off_t pos, const void* buffer, size_t size)
 {
 	if (fStream == NULL)
 		return B_NO_INIT;
-
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
-	// If data doesn't fit into the buffer, write it directly to the stream	
-	if (size > fBufferSize)
+	// If data doesn't fit into the buffer, write it directly to the stream
+	if (size > fBufferSize || fBuffer == NULL)
 		return fStream->WriteAt(pos, buffer, size);
 
 	// If we have cached data in the buffer, whose offset into the stream
@@ -113,7 +109,7 @@ BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	if (!fBufferIsDirty && fBufferStart > pos) {
 		fBufferStart = 0;
 		fBufferUsed = 0;
-	}	
+	}
 
 	// If we want to write beyond the cached data...
 	if (pos > fBufferStart + fBufferUsed
@@ -132,7 +128,7 @@ BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
 		}
 	}
 
-	memcpy(fBuffer + pos - fBufferStart, buffer, size); 	
+	memcpy(fBuffer + pos - fBufferStart, buffer, size);
 
 	fBufferIsDirty = true;
 	fBufferUsed = max_c((size + pos), fBufferUsed);
@@ -147,17 +143,40 @@ BBufferIO::Seek(off_t position, uint32 seekMode)
 	if (fStream == NULL)
 		return B_NO_INIT;
 
-	return fStream->Seek(position, seekMode);
+	switch (seekMode) {
+		case SEEK_CUR:
+			fPosition += position;
+			if (fPosition < 0)
+				fPosition = 0;
+			break;
+		case SEEK_SET:
+			if (position < 0)
+				return B_BAD_VALUE;
+
+			fPosition = position;
+			break;
+		case SEEK_END:
+		{
+			off_t size;
+			status_t status = fStream->GetSize(&size);
+			if (status != B_OK)
+				return status;
+
+			fPosition = size - position;
+			if (fPosition < 0)
+				fPosition = 0;
+			break;
+		}
+	}
+
+	return fPosition;
 }
 
 
 off_t
 BBufferIO::Position() const
 {
-	if (fStream == NULL)
-		return B_NO_INIT;
-
-	return fStream->Position();
+	return fPosition;
 }
 
 
@@ -186,7 +205,7 @@ BBufferIO::Flush()
 }
 
 
-BPositionIO *
+BPositionIO*
 BBufferIO::Stream() const
 {
 	return fStream;
@@ -208,9 +227,9 @@ BBufferIO::OwnsStream() const
 
 
 void
-BBufferIO::SetOwnsStream(bool owns_stream)
+BBufferIO::SetOwnsStream(bool ownsStream)
 {
-	fOwnsStream = owns_stream;
+	fOwnsStream = ownsStream;
 }
 
 
@@ -231,9 +250,9 @@ BBufferIO::PrintToStream() const
 
 
 // These functions are here to maintain future binary
-// compatibility.	 
-status_t BBufferIO::_Reserved_BufferIO_0(void *) { return B_ERROR; }
-status_t BBufferIO::_Reserved_BufferIO_1(void *) { return B_ERROR; }
-status_t BBufferIO::_Reserved_BufferIO_2(void *) { return B_ERROR; }
-status_t BBufferIO::_Reserved_BufferIO_3(void *) { return B_ERROR; }
-status_t BBufferIO::_Reserved_BufferIO_4(void *) { return B_ERROR; }
+// compatibility.
+status_t BBufferIO::_Reserved_BufferIO_0(void*) { return B_ERROR; }
+status_t BBufferIO::_Reserved_BufferIO_1(void*) { return B_ERROR; }
+status_t BBufferIO::_Reserved_BufferIO_2(void*) { return B_ERROR; }
+status_t BBufferIO::_Reserved_BufferIO_3(void*) { return B_ERROR; }
+status_t BBufferIO::_Reserved_BufferIO_4(void*) { return B_ERROR; }
