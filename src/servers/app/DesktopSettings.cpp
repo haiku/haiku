@@ -258,6 +258,21 @@ DesktopSettingsPrivate::_Load()
 		}
 	}
 
+	// read dragger settings
+
+	path = basePath;
+	path.Append("dragger");
+
+	status = file.SetTo(path.Path(), B_READ_ONLY);
+	if (status == B_OK) {
+		BMessage settings;
+		status = settings.Unflatten(&file);
+		if (status == B_OK) {
+			if (settings.FindBool("show", &fShowAllDraggers) != B_OK)
+				fShowAllDraggers = true;
+		}
+	}
+
 	return B_OK;
 }
 
