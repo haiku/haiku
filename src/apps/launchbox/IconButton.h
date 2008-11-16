@@ -25,7 +25,7 @@ class BBitmap;
 class BMimeType;
 
 class IconButton : public BView, public BInvoker {
- public:
+public:
 								IconButton(const char* name,
 										   uint32 id,
 										   const char* label = NULL,
@@ -91,7 +91,7 @@ class IconButton : public BView, public BInvoker {
 												  rgb_color lightShadow,
 												  rgb_color light);
 
- protected:
+protected:
 			enum {
 				STATE_NONE			= 0x0000,
 				STATE_TRACKING		= 0x0001,
