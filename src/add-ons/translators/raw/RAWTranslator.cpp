@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,7 @@
 #include "ConfigView.h"
 #include "RAW.h"
 
+#include <BufferIO.h>
 #include <Messenger.h>
 #include <TranslatorRoster.h>
 
@@ -117,7 +118,8 @@ RAWTranslator::DerivedIdentify(BPositionIO *stream,
 	if (outType != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
 
-	DCRaw raw(*stream);
+	BBufferIO io(stream, 128 * 1024, false);
+	DCRaw raw(io);
 	status_t status;
 
 	try {
@@ -177,7 +179,7 @@ RAWTranslator::_ProgressMonitor(const char* message, float percentage,
 
 
 status_t
-RAWTranslator::DerivedTranslate(BPositionIO* source,
+RAWTranslator::DerivedTranslate(BPositionIO* stream,
 	const translator_info* info, BMessage* settings,
 	uint32 outType, BPositionIO* target, int32 baseType)
 {
@@ -186,16 +188,17 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 	if (outType != B_TRANSLATOR_BITMAP || baseType != 0)
 		return B_NO_TRANSLATOR;
 
-	DCRaw raw(*source);
+	BBufferIO io(stream, 1024 * 1024, false);
+	DCRaw raw(io);
 
 	bool headerOnly = false;
 
-	progress_data progressData;	
+	progress_data progressData;
 	BMessenger monitor;
 
 	if (settings != NULL) {
 		settings->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &headerOnly);
-		
+
 		bool half;
 		if (settings->FindBool("raw:half_size", &half) == B_OK && half)
 			raw.SetHalfSize(true);
@@ -218,7 +221,7 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 		status = raw.Identify();
 
 		if (status == B_OK && settings) {
-			// Check if a document index has been specified	
+			// Check if a document index has been specified
 			if (settings->FindInt32(kDocumentIndex, &imageIndex) == B_OK)
 				imageIndex--;
 			else
@@ -280,7 +283,7 @@ RAWTranslator::DerivedTranslate(BPositionIO* source,
 			header.null = 0;
 			memcpy(exifBuffer, &header, sizeof(header));
 
-			if (source->ReadAt(exifOffset, exifBuffer + 16, exifLength)
+			if (io.ReadAt(exifOffset, exifBuffer + 16, exifLength)
 					== (ssize_t)exifLength)
 				settings->AddData("exif", B_RAW_TYPE, exifBuffer, exifLength + 16);
 
