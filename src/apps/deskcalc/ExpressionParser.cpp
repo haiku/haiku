@@ -359,7 +359,7 @@ ExpressionParser::_ParsePower()
 			fTokenizer->RewindToken();
 			return value;
 		}
-		value.pow(_ParseUnary());
+		value = value.pow(_ParseUnary());
 	}
 }
 
