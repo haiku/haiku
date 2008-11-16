@@ -438,7 +438,8 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 		return stream;
 	}
 
-	dprintf("hda: hda_audio_group_get_widgets failed\n");
+	dprintf("hda: hda_audio_group_get_widgets failed for %s stream\n", 
+		type == STREAM_PLAYBACK ? " playback" : "record");
 	
 	free(stream);
 	return NULL;
@@ -607,8 +608,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		}
 	}
 
-	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld\n", __func__, stream->id,
-		stream->rate, stream->bps);
+	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld F=0x%x\n", __func__, stream->id,
+		stream->rate, stream->bps, format);
 
 	stream->Write16(HDAC_STREAM_FORMAT, format);
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_LOWER,
@@ -633,12 +634,10 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		verb[0] = MAKE_VERB(codec->addr, stream->io_widgets[i],
 			VID_SET_CONVERTER_FORMAT, format);
 		uint32 val = stream->id << 4;
-		if (stream->type == STREAM_RECORD) {
-			if (channelNum < stream->num_channels)
-				val |= channelNum;
-			else
-				val = 0;
-		}
+		if (channelNum < stream->num_channels)
+			val |= channelNum;
+		else
+			val = 0;
 		verb[1] = MAKE_VERB(codec->addr, stream->io_widgets[i],
 			VID_SET_CONVERTER_STREAM_CHANNEL, val);
 		hda_send_verbs(codec, verb, response, 2);

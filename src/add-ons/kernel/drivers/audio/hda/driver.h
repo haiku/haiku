@@ -40,8 +40,10 @@
 #define MAX_CODEC_RESPONSES		10
 #define MAX_INPUTS				32
 #define MAX_IO_WIDGETS			8
+#define MAX_ASSOCIATIONS		16
+#define MAX_ASSOCIATION_PINS	16
 
-#define DEFAULT_FRAMES_PER_BUFFER	512
+#define DEFAULT_FRAMES_PER_BUFFER	2048
 
 #define STREAM_MAX_BUFFERS	10
 #define STREAM_MIN_BUFFERS	2
@@ -53,6 +55,7 @@ enum {
 
 struct hda_codec;
 struct hda_stream;
+struct hda_multi;
 
 /*!	This structure describes a single HDA compliant 
 	controller. It contains a list of available streams
@@ -215,13 +218,21 @@ struct hda_widget {
 		struct {
 			uint32	output;
 			uint32	input;
-			pin_dev_type device;
+			uint32	config;
 		} pin;
 	} d;
 };
 
+struct hda_association {
+	uint32	index;
+	bool	enabled;
+	uint32 	pin_count;
+	uint32 	pins[MAX_ASSOCIATION_PINS];
+};
+
 #define WIDGET_FLAG_OUTPUT_PATH	0x01
 #define WIDGET_FLAG_INPUT_PATH	0x02
+#define WIDGET_FLAG_WIDGET_PATH	0x04
 
 /*!	This structure describes a single Audio Function Group. An AFG
 	is a group of audio widgets which can be used to configure multiple
@@ -246,7 +257,12 @@ struct hda_audio_group {
 	uint32			input_amplifier_capabilities;
 	uint32			output_amplifier_capabilities;
 
+	uint32			association_count;
+
 	hda_widget*		widgets;
+	hda_association		associations[MAX_ASSOCIATIONS];
+
+	hda_multi*		multi;
 };
 
 /*!	This structure describes a single codec module in the
@@ -274,6 +290,38 @@ struct hda_codec {
 };
 
 
+#define MULTI_CONTROL_FIRSTID	1024
+#define MULTI_CONTROL_MASTERID	0
+#define MULTI_MAX_CONTROLS 128
+#define MULTI_MAX_CHANNELS 128
+
+struct hda_multi_mixer_control {
+	hda_multi	*multi;
+	int32 	nid;
+	int32 type;
+	bool input;
+	uint32 mute;
+	uint32 gain;
+	uint32 capabilities;
+	int32 index;
+	multi_mix_control	mix_control;
+};
+
+
+struct hda_multi {
+	hda_audio_group *group;
+	hda_multi_mixer_control controls[MULTI_MAX_CONTROLS];
+	uint32 control_count;
+	
+	multi_channel_info chans[MULTI_MAX_CHANNELS];
+	uint32 output_channel_count;
+	uint32 input_channel_count;
+	uint32 output_bus_channel_count;
+	uint32 input_bus_channel_count;
+	uint32 aux_bus_channel_count;
+};
+
+
 /* driver.c */
 extern device_hooks gDriverHooks;
 extern pci_module_info* gPci;
@@ -281,6 +329,8 @@ extern hda_controller gCards[MAX_CARDS];
 extern uint32 gNumCards;
 
 /* hda_codec.c */
+hda_widget* hda_audio_group_get_widget(hda_audio_group* audioGroup, uint32 nodeID);
+
 status_t hda_audio_group_get_widgets(hda_audio_group* audioGroup,
 	hda_stream* stream);
 hda_codec* hda_codec_new(hda_controller* controller, uint32 cad);

@@ -65,7 +65,7 @@ get_widget_type_name(hda_widget_type type)
 static void
 dump_widget_audio_capabilities(uint32 capabilities)
 {
-	const struct {
+	static const struct {
 		uint32		flag;
 		const char*	name;
 	} kFlags[] = {
@@ -114,7 +114,7 @@ dump_widget_inputs(hda_widget& widget)
 	}
 
 	if (offset != 0)
-		dprintf("\tConnections: %s\n", buffer);
+		dprintf("\tInputs: %s\n", buffer);
 }
 
 
@@ -264,8 +264,9 @@ hda_get_stream_support(hda_codec* codec, uint32 nodeID, uint32* formats,
 	}
 	if ((resp[0] & STREAM_FLOAT) != 0)
 		*formats |= B_FMT_FLOAT;
-
-//FIXME:	if (resp[0] & (1 << 2))	/* Sort out how to handle AC3 */;
+	if ((resp[0] & STREAM_AC3) != 0) {
+		*formats |= B_FMT_BITSTREAM;
+	}
 
 	return B_OK;
 }
@@ -342,7 +343,7 @@ hda_widget_get_amplifier_capabilities(hda_audio_group* audioGroup,
 }
 
 
-static hda_widget*
+hda_widget*
 hda_audio_group_get_widget(hda_audio_group* audioGroup, uint32 nodeID)
 {
 	if (audioGroup->widget_start > nodeID
@@ -429,6 +430,40 @@ hda_widget_get_connections(hda_audio_group* audioGroup, hda_widget* widget)
 
 	if (widget->num_inputs == 1)
 		widget->active_input = 0;
+
+	return B_OK;
+}
+
+
+static status_t
+hda_widget_get_associations(hda_audio_group* audioGroup)
+{
+	uint32 index = 0;
+	for (uint32 i = 0; i < MAX_ASSOCIATIONS; i++) {
+		for (uint32 j = 0; j < audioGroup->widget_count; j++) {
+			hda_widget& widget = audioGroup->widgets[j];
+
+			if (widget.type != WT_PIN_COMPLEX)
+				continue;
+			if (CONF_DEFAULT_ASSOCIATION(widget.d.pin.config) != i)
+				continue;
+			if (audioGroup->associations[index].pin_count == 0) {
+				audioGroup->associations[index].index = index;
+				audioGroup->associations[index].enabled = true;
+			}
+			uint32 sequence = CONF_DEFAULT_SEQUENCE(widget.d.pin.config);
+			if (audioGroup->associations[index].pins[sequence] != 0) {
+				audioGroup->associations[index].enabled = false;
+			}
+			audioGroup->associations[index].pins[sequence] = widget.node_id;
+			audioGroup->associations[index].pin_count++;
+			if (i == 15)
+				index++;
+		}
+		if (i != 15 && audioGroup->associations[index].pin_count != 0)
+			index++;
+	}
+	audioGroup->association_count = index;
 
 	return B_OK;
 }
@@ -534,13 +569,13 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 				verbs[0] = MAKE_VERB(audioGroup->codec->addr, nodeID,
 					VID_GET_CONFIGURATION_DEFAULT, 0);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
-					widget.d.pin.device = (pin_dev_type)
-						((resp[0] >> 20) & 0xf);
-					dprintf("\t%s, %s, %s, %s\n",
-						kPortConnector[resp[0] >> 30],	
-						kDefaultDevice[widget.d.pin.device],
-						kConnectionType[(resp[0] >> 16) & 0xF],
-						kJackColor[(resp[0] >> 12) & 0xF]);
+					widget.d.pin.config = resp[0];
+					dprintf("\t%s, %s, %s, %s, Association:%ld\n",
+						kPortConnector[CONF_DEFAULT_CONNECTIVITY(resp[0])],
+						kDefaultDevice[CONF_DEFAULT_DEVICE(resp[0])],
+						kConnectionType[CONF_DEFAULT_CONNTYPE(resp[0])],
+						kJackColor[CONF_DEFAULT_COLOR(resp[0])],
+						CONF_DEFAULT_ASSOCIATION(resp[0]));
 				}
 				break;
 
@@ -557,6 +592,8 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		dump_widget_amplifier_capabilities(widget, false);
 		dump_widget_inputs(widget);
 	}
+
+	hda_widget_get_associations(audioGroup);
 
 	return B_OK;
 }
@@ -619,13 +656,20 @@ hda_widget_find_input_path(hda_audio_group* audioGroup, hda_widget* widget,
 
 	switch (widget->type) {
 		case WT_PIN_COMPLEX:
-			if (widget->d.pin.input
-				&& (widget->d.pin.device == PIN_DEV_CD
-					|| widget->d.pin.device == PIN_DEV_LINE_IN
-					|| widget->d.pin.device == PIN_DEV_MIC_IN)) {
-				widget->flags |= WIDGET_FLAG_INPUT_PATH;
+			// already used
+			if (widget->flags & WIDGET_FLAG_INPUT_PATH)
+				return false;
+			
+			if (widget->d.pin.input) {
+				switch (CONF_DEFAULT_DEVICE(widget->d.pin.config)) {
+					case PIN_DEV_CD:
+					case PIN_DEV_LINE_IN:
+					case PIN_DEV_MIC_IN:
+						widget->flags |= WIDGET_FLAG_INPUT_PATH;
 dprintf("      %*sinput: added input widget %ld\n", (int)depth * 2, "", widget->node_id);
-				return true;
+						return true;
+					break;
+				}
 			}
 			return false;
 		case WT_AUDIO_INPUT:
@@ -670,10 +714,13 @@ dprintf("build output tree: %suse mixer\n", useMixer ? "" : "don't ");
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
 
-		if (widget.type != WT_PIN_COMPLEX || !widget.d.pin.output
-			|| (widget.d.pin.device != PIN_DEV_HEAD_PHONE_OUT
-				&& widget.d.pin.device != PIN_DEV_SPEAKER
-				&& widget.d.pin.device != PIN_DEV_LINE_OUT))
+		if (widget.type != WT_PIN_COMPLEX || !widget.d.pin.output)
+			continue;
+
+		int device = CONF_DEFAULT_DEVICE(widget.d.pin.config);
+		if (device != PIN_DEV_HEAD_PHONE_OUT
+			&& device != PIN_DEV_SPEAKER
+			&& device != PIN_DEV_LINE_OUT)
 			continue;
 
 dprintf("  look at pin widget %ld (%ld inputs)\n", widget.node_id, widget.num_inputs);
@@ -792,7 +839,7 @@ hda_codec_delete_audio_group(hda_audio_group* audioGroup)
 
 	if (audioGroup->record_stream != NULL)
 		hda_stream_delete(audioGroup->record_stream);
-
+	free(audioGroup->multi);
 	free(audioGroup->widgets);
 	free(audioGroup);
 }
@@ -809,6 +856,11 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 	/* Setup minimal info needed by hda_codec_parse_afg */
 	audioGroup->root_node_id = audioGroupNodeID;
 	audioGroup->codec = codec;
+	audioGroup->multi = (hda_multi*)calloc(1,
+		sizeof(hda_multi));
+	if (audioGroup->multi == NULL)
+		return B_NO_MEMORY;
+	audioGroup->multi->group = audioGroup;
 
 	/* Parse all widgets in Audio Function Group */
 	status_t status = hda_codec_parse_audio_group(audioGroup);
@@ -878,8 +930,9 @@ dprintf("ENABLE pin widget %ld\n", widget.node_id);
 				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 			}
 
-			if (widget.capabilities.output_amplifier != 0) {
-dprintf("UNMUTE/SET GAIN widget %ld (offset %ld)\n", widget.node_id,
+			if (widget.capabilities.output_amplifier != 0
+				&& widget.flags & WIDGET_FLAG_OUTPUT_PATH) {
+dprintf("UNMUTE/SET OUTPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
 	widget.capabilities.output_amplifier & AMP_CAP_OFFSET_MASK);
 				uint32 verb = MAKE_VERB(audioGroup->codec->addr,
 					widget.node_id,
@@ -887,6 +940,19 @@ dprintf("UNMUTE/SET GAIN widget %ld (offset %ld)\n", widget.node_id,
 					AMP_SET_OUTPUT | AMP_SET_LEFT_CHANNEL
 						| AMP_SET_RIGHT_CHANNEL
 						| (widget.capabilities.output_amplifier
+							& AMP_CAP_OFFSET_MASK));
+				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
+			}
+			if (widget.capabilities.input_amplifier != 0
+				&& widget.flags & WIDGET_FLAG_INPUT_PATH) {
+dprintf("UNMUTE/SET INPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
+	widget.capabilities.output_amplifier & AMP_CAP_OFFSET_MASK);
+				uint32 verb = MAKE_VERB(audioGroup->codec->addr,
+					widget.node_id,
+					VID_SET_AMPLIFIER_GAIN_MUTE,
+					AMP_SET_INPUT | AMP_SET_LEFT_CHANNEL
+						| AMP_SET_RIGHT_CHANNEL
+						| (widget.capabilities.input_amplifier
 							& AMP_CAP_OFFSET_MASK));
 				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 			}
