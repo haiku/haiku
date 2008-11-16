@@ -37,7 +37,7 @@ translation_format gInputFormats[] = {
 		B_TRANSLATOR_BITMAP,
 		BMP_IN_QUALITY,
 		BMP_IN_CAPABILITY,
-		"image/x-bmp",
+		"image/bmp",
 		"BMP image"
 	}
 };
@@ -57,7 +57,7 @@ translation_format gOutputFormats[] = {
 		B_TRANSLATOR_BITMAP,
 		BMP_OUT_QUALITY,
 		BMP_OUT_CAPABILITY,
-		"image/x-bmp",
+		"image/bmp",
 		"BMP image"
 	}
 };
