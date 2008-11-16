@@ -543,17 +543,15 @@ BaseTranslator::BitsTranslate(BPositionIO *inSource,
 	const translator_info *inInfo, BMessage *ioExtension, uint32 outType,
 	BPositionIO *outDestination)
 {
-	status_t result;
-	
-	result = BitsCheck(inSource, ioExtension, outType);
-	if (result == B_OK && outType == B_TRANSLATOR_BITMAP)
+	status_t result = BitsCheck(inSource, ioExtension, outType);
+	if (result == B_OK && outType == B_TRANSLATOR_BITMAP) {
 		result = translate_from_bits_to_bits(inSource, outType,
 			outDestination);
-	else if (result >= B_OK)
+	} else if (result >= B_OK) {
 		// If NOT B_TRANSLATOR_BITMAP type it could be the derived format
 		result = DerivedTranslate(inSource, inInfo, ioExtension, outType,
 			outDestination, (result == B_OK));
-			
+	}
 	return result;
 }
 
