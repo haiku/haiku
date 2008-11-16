@@ -427,6 +427,25 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 			ScrollToSelection();
 			break;
 
+		case B_PAGE_UP:
+		{
+			BPoint scrollOffset(LeftTop());
+			scrollOffset.y = max_c(0, scrollOffset.y - Bounds().Height());
+			ScrollTo(scrollOffset);
+			break;
+		}
+		case B_PAGE_DOWN:
+		{
+			BPoint scrollOffset(LeftTop());
+			if (BListItem* item = LastItem()) {
+				scrollOffset.y += Bounds().Height();
+				scrollOffset.y = min_c(item->Bottom() - Bounds().Height(),
+					scrollOffset.y);
+			}
+			ScrollTo(scrollOffset);
+			break;
+		}
+
 		case B_RETURN:
 		case B_SPACE:
 			Invoke();
@@ -450,11 +469,39 @@ BListView::MakeFocus(bool focused)
 		fScrollView->SetBorderHighlighted(focused);
 }
 
+// AttachedToWindow
+void
+BListView::AttachedToWindow()
+{
+	BView::AttachedToWindow();
+	_FontChanged();
+
+	if (!Messenger().IsValid())
+		SetTarget(Window(), NULL);
+
+	_FixupScrollBar();
+}
+
 // FrameResized
 void
 BListView::FrameResized(float width, float height)
 {
 	_FixupScrollBar();
+}
+
+// FrameMoved
+void
+BListView::FrameMoved(BPoint new_position)
+{
+	BView::FrameMoved(new_position);
+}
+
+// SetFont
+void
+BListView::SetFont(const BFont* font, uint32 mask)
+{
+	BView::SetFont(font, mask);
+	_FontChanged();
 }
 
 // TargetedByScrollView
@@ -486,9 +533,9 @@ BListView::AddItem(BListItem *item, int32 index)
 	if (Window()) {
 		BFont font;
 		GetFont(&font);
-		_RecalcItemTops(index);
 		item->Update(this, &font);
-		
+		_RecalcItemTops(index);
+
 		_FixupScrollBar();
 		_InvalidateFrom(index);
 	}
@@ -508,9 +555,8 @@ BListView::AddItem(BListItem* item)
 	if (Window()) {
 		BFont font;
 		GetFont(&font);
-		_RecalcItemTops(CountItems() - 1);
 		item->Update(this, &font);
-
+		_RecalcItemTops(CountItems() - 1);
 
 		_FixupScrollBar();
 		InvalidateItem(CountItems() - 1);
@@ -990,26 +1036,6 @@ BListView::ReplaceItem(int32 index, BListItem *item)
 	data.replace.item = item;
 
 	return DoMiscellaneous(B_REPLACE_OP, &data);
-}
-
-// AttachedToWindow
-void
-BListView::AttachedToWindow()
-{
-	BView::AttachedToWindow();
-	_FontChanged();
-
-	if (!Messenger().IsValid())
-		SetTarget(Window(), NULL);
-
-	_FixupScrollBar();
-}
-
-// FrameMoved
-void
-BListView::FrameMoved(BPoint new_position)
-{
-	BView::FrameMoved(new_position);
 }
 
 // ItemFrame

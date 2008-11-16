@@ -41,7 +41,11 @@ class BListView : public BView, public BInvoker {
 		virtual void		MouseDown(BPoint where);
 		virtual void		KeyDown(const char* bytes, int32 numBytes);
 		virtual void		MakeFocus(bool state = true);
+		virtual void		AttachedToWindow();
 		virtual void		FrameResized(float newWidth, float newHeight);
+		virtual void		FrameMoved(BPoint newPosition);
+		virtual	void		SetFont(const BFont* font,
+								uint32 mask = B_FONT_ALL);
 		virtual void		TargetedByScrollView(BScrollView* scroller);
 		virtual void		ScrollTo(BPoint where);
 		inline	void		ScrollTo(float x, float y);
@@ -97,9 +101,6 @@ class BListView : public BView, public BInvoker {
 				bool		SwapItems(int32 a, int32 b);
 				bool		MoveItem(int32 from, int32 to);
 				bool		ReplaceItem(int32 index, BListItem* item);
-
-		virtual void		AttachedToWindow();
-		virtual void		FrameMoved(BPoint newPosition);
 
 				BRect		ItemFrame(int32 index);
 
