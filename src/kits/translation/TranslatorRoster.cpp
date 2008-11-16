@@ -682,9 +682,9 @@ BTranslatorRoster::Private::Identify(BPositionIO* source,
 	while (iterator != fTranslators.end()) {
 		BTranslator& translator = *iterator->second.translator;
 
-		status_t status = source->Seek(0, SEEK_SET);
-		if (status != B_OK)
-			return status;
+		off_t pos = source->Seek(0, SEEK_SET);
+		if (pos != 0)
+			return pos < 0 ? (status_t)pos : B_IO_ERROR;
 
 		int32 formatsCount = 0;
 		const translation_format* formats = translator.InputFormats(&formatsCount);
@@ -735,10 +735,10 @@ BTranslatorRoster::Private::GetTranslators(BPositionIO* source,
 	while (iterator != fTranslators.end()) {
 		BTranslator& translator = *iterator->second.translator;
 
-		status_t status = source->Seek(0, SEEK_SET);
-		if (status < B_OK) {
+		off_t pos = source->Seek(0, SEEK_SET);
+		if (pos != 0) {
 			delete[] array;
-			return status;
+			return pos < 0 ? status_t(pos) : B_IO_ERROR;
 		}
 
 		int32 formatsCount = 0;
@@ -1516,7 +1516,10 @@ BTranslatorRoster::Translate(BPositionIO* source, const translator_info* info,
 	if (translator == NULL)
 		return B_NO_TRANSLATOR;
 
-	status_t status = source->Seek(0, SEEK_SET);
+	status_t status = B_OK;
+	off_t pos = source->Seek(0, SEEK_SET);
+	if (pos != 0)
+		status = pos < 0 ? (status_t)pos : B_IO_ERROR;
 	if (status == B_OK) {
 		status = translator->Translate(source, info, ioExtension, wantOutType,
 			destination);
@@ -1565,15 +1568,22 @@ BTranslatorRoster::Translate(translator_id id, BPositionIO* source,
 	if (translator == NULL)
 		return B_NO_TRANSLATOR;
 
-	status_t status = source->Seek(0, SEEK_SET);
-	if (status == B_OK) {
+	status_t status;
+	off_t pos = source->Seek(0, SEEK_SET);
+	if (pos == 0) {
 		translator_info info;
 		status = translator->Identify(source, NULL, ioExtension, &info, wantOutType);	
 		if (status >= B_OK) {
-			status = translator->Translate(source, &info, ioExtension, wantOutType,
-				destination);
+			off_t pos = source->Seek(0, SEEK_SET);
+			if (pos != 0)
+				status = pos < 0 ? (status_t)pos : B_IO_ERROR;
+			else {
+				status = translator->Translate(source, &info, ioExtension, wantOutType,
+					destination);
+			}
 		}
-	}
+	} else
+		status = pos < 0 ? (status_t)pos : B_IO_ERROR;
 	translator->Release();
 
 	return status;
