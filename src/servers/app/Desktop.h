@@ -69,6 +69,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		::EventDispatcher&		EventDispatcher() { return fEventDispatcher; }
 
 		void					BroadcastToAllApps(int32 code);
+		void					BroadcastToAllWindows(int32 code);
 
 		// Screen and drawing related methods
 
@@ -141,6 +142,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									Window* window);
 		void					RemoveWindowFromSubset(Window* subset,
 									Window* window);
+
+		void					FontsChanged(Window* window);
 
 		void					SetWindowLook(Window* window, window_look look);
 		void					SetWindowFeel(Window* window, window_feel feel);
@@ -240,6 +243,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					_TriggerWindowRedrawing(
 									BRegion& newDirtyRegion);
 		void					_SetBackground(BRegion& background);
+		void					_RebuildAndRedrawAfterWindowChange(
+									Window* window, BRegion& dirty);
 
 		void					_UpdateFloating(int32 previousWorkspace = -1,
 									int32 nextWorkspace = -1,

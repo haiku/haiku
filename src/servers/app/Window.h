@@ -177,6 +177,8 @@ public:
 
 			void				HighlightDecorator(bool active);
 
+			void				FontsChanged(BRegion* updateRegion);
+
 			void				SetLook(window_look look, BRegion* updateRegion);
 			void				SetFeel(window_feel feel);
 			void				SetFlags(uint32 flags, BRegion* updateRegion);

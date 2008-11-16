@@ -25,6 +25,8 @@ public:
 
 	virtual	void				SetTitle(const char* string,
 									BRegion* updateRegion = NULL);
+	virtual void				FontsChanged(DesktopSettings& settings,
+									BRegion* updateRegion);
 	virtual void				SetLook(DesktopSettings& settings,
 									window_look look,
 									BRegion* updateRegion = NULL);
@@ -68,6 +70,7 @@ protected:
 	virtual void				_SetColors();
 
 private:
+			void				_UpdateFont(DesktopSettings& settings);
  			void				_DrawButtonBitmap(ServerBitmap* bitmap,
  									BRect rect);
 			void				_DrawBlendedRect(DrawingEngine *engine,

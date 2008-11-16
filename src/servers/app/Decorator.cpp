@@ -21,7 +21,7 @@
 /*!	\brief Constructor
 
 	Does general initialization of internal data members and creates a colorset
-	object. 
+	object.
 
 	\param rect Size of client area
 	\param wlook style of window look. See Window.h
@@ -56,7 +56,7 @@ Decorator::Decorator(DesktopSettings& settings, BRect rect, window_look look,
 
 /*!
 	\brief Destructor
-	
+
 	Frees the color set and the title string
 */
 Decorator::~Decorator()
@@ -100,14 +100,11 @@ Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 }
 
 
-/*!	\brief Sets the decorator's font
-	\param font The new font object to copy from
+/*!	\brief Called whenever the system fonts are changed.
 */
 void
-Decorator::SetFont(ServerFont *font)
+Decorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 {
-	if (font)
-		fDrawState.SetFont(*font);
 }
 
 
@@ -123,7 +120,7 @@ Decorator::SetLook(DesktopSettings& settings, window_look look,
 
 
 /*!	\brief Sets the close button's value.
-	
+
 	Note that this does not update the button's look - it just updates the
 	internal button value
 
@@ -139,7 +136,7 @@ Decorator::SetClose(bool pressed)
 }
 
 /*!	\brief Sets the minimize button's value.
-	
+
 	Note that this does not update the button's look - it just updates the
 	internal button value
 
@@ -155,7 +152,7 @@ Decorator::SetMinimize(bool pressed)
 }
 
 /*!	\brief Sets the zoom button's value.
-	
+
 	Note that this does not update the button's look - it just updates the
 	internal button value
 
@@ -271,7 +268,7 @@ Decorator::GetSizeLimits(int32* minWidth, int32* minHeight, int32* maxWidth,
 
 
 /*!	\brief Changes the focus value of the decorator
-	
+
 	While this call will not update the screen, it will affect how future
 	updates work.
 
@@ -343,7 +340,7 @@ Decorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 
 
 /*!	\brief Moves the decorator frame and all default rectangles
-	
+
 	If a subclass implements this method, be sure to call Decorator::MoveBy
 	to ensure that internal members are also updated. All members of the
 	Decorator class are automatically moved in this method
@@ -359,7 +356,7 @@ Decorator::MoveBy(float x, float y)
 
 
 /*!	\brief Moves the decorator frame and all default rectangles
-	
+
 	If a subclass implements this method, be sure to call Decorator::MoveBy
 	to ensure that internal members are also updated. All members of the
 	Decorator class are automatically moved in this method
@@ -381,11 +378,11 @@ Decorator::MoveBy(BPoint offset)
 
 
 /*!	\brief Resizes the decorator frame
-	
+
 	This is a required function for subclasses to implement - the default does
 	nothing. Note that window resize flags should be followed and fFrame should
 	be resized accordingly. It would also be a wise idea to ensure that the
-	window's rectangles are not inverted. 
+	window's rectangles are not inverted.
 
 	\param x x offset
 	\param y y offset
@@ -512,7 +509,7 @@ Decorator::_DrawFrame(BRect rect)
 
 
 /*!	\brief Actually draws the tab
-	
+
 	This function is called when the tab itself needs drawn. Other items,
 	like the window title or buttons, should not be drawn here.
 
@@ -553,7 +550,7 @@ Decorator::_DrawTitle(BRect rect)
 
 
 /*!	\brief Actually draws the zoom button
-	
+
 	Unless a subclass has a particularly large button, it is probably
 	unnecessary to check the update rectangle.
 
@@ -566,7 +563,7 @@ Decorator::_DrawZoom(BRect rect)
 
 /*!
 	\brief Actually draws the minimize button
-	
+
 	Unless a subclass has a particularly large button, it is probably
 	unnecessary to check the update rectangle.
 

@@ -709,8 +709,7 @@ Desktop::_ActivateApp(team_id team)
 }
 
 
-/*!
-	\brief Send a quick (no attachments) message to all applications
+/*!	\brief Send a quick (no attachments) message to all applications.
 
 	Quite useful for notification for things like server shutdown, system
 	color changes, etc.
@@ -722,6 +721,20 @@ Desktop::BroadcastToAllApps(int32 code)
 
 	for (int32 i = fApplications.CountItems(); i-- > 0;) {
 		fApplications.ItemAt(i)->PostMessage(code);
+	}
+}
+
+
+/*!	\brief Send a quick (no attachments) message to all windows.
+*/
+void
+Desktop::BroadcastToAllWindows(int32 code)
+{
+	AutoWriteLocker _(fWindowLock);
+
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		window->ServerWindow()->PostMessage(code);
 	}
 }
 
@@ -1967,22 +1980,12 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 bool
 Desktop::SetWindowTabLocation(Window* window, float location)
 {
-	if (!LockAllWindows())
-		return false;
+	AutoWriteLocker _(fWindowLock);
 
 	BRegion dirty;
 	bool changed = window->SetTabLocation(location, dirty);
-
-	if (changed && window->IsVisible() && dirty.CountRects() > 0) {
-		BRegion stillAvailableOnScreen;
-		_RebuildClippingForAllWindows(stillAvailableOnScreen);
-		_SetBackground(stillAvailableOnScreen);
-
-		_WindowChanged(window);
-		_TriggerWindowRedrawing(dirty);
-	}
-
-	UnlockAllWindows();
+	if (changed)
+		_RebuildAndRedrawAfterWindowChange(window, dirty);
 
 	return changed;
 }
@@ -1991,23 +1994,12 @@ Desktop::SetWindowTabLocation(Window* window, float location)
 bool
 Desktop::SetWindowDecoratorSettings(Window* window, const BMessage& settings)
 {
-	// TODO: almost exact code duplication to above function...
-
-	if (!LockAllWindows())
-		return false;
+	AutoWriteLocker _(fWindowLock);
 
 	BRegion dirty;
 	bool changed = window->SetDecoratorSettings(settings, dirty);
-
-	if (changed && window->IsVisible() && dirty.CountRects() > 0) {
-		BRegion stillAvailableOnScreen;
-		_RebuildClippingForAllWindows(stillAvailableOnScreen);
-		_SetBackground(stillAvailableOnScreen);
-
-		_TriggerWindowRedrawing(dirty);
-	}
-
-	UnlockAllWindows();
+	if (changed)
+		_RebuildAndRedrawAfterWindowChange(window, dirty);
 
 	return changed;
 }
@@ -2211,32 +2203,36 @@ Desktop::RemoveWindowFromSubset(Window* subset, Window* window)
 
 
 void
-Desktop::SetWindowLook(Window *window, window_look newLook)
+Desktop::FontsChanged(Window* window)
+{
+	AutoWriteLocker _(fWindowLock);
+
+	BRegion dirty;
+	window->FontsChanged(&dirty);
+
+	_RebuildAndRedrawAfterWindowChange(window, dirty);
+}
+
+
+void
+Desktop::SetWindowLook(Window* window, window_look newLook)
 {
 	if (window->Look() == newLook)
 		return;
 
-	if (!LockAllWindows())
-		return;
+	AutoWriteLocker _(fWindowLock);
 
 	BRegion dirty;
 	window->SetLook(newLook, &dirty);
 		// TODO: test what happens when the window
 		// finds out it needs to resize itself...
 
-	BRegion stillAvailableOnScreen;
-	_RebuildClippingForAllWindows(stillAvailableOnScreen);
-	_SetBackground(stillAvailableOnScreen);
-	_WindowChanged(window);
-
-	_TriggerWindowRedrawing(dirty);
-
-	UnlockAllWindows();
+	_RebuildAndRedrawAfterWindowChange(window, dirty);
 }
 
 
 void
-Desktop::SetWindowFeel(Window *window, window_feel newFeel)
+Desktop::SetWindowFeel(Window* window, window_feel newFeel)
 {
 	if (window->Feel() == newFeel)
 		return;
@@ -2340,43 +2336,26 @@ Desktop::SetWindowFlags(Window *window, uint32 newFlags)
 	if (window->Flags() == newFlags)
 		return;
 
-	if (!LockAllWindows())
-		return;
+	AutoWriteLocker _(fWindowLock);
 
 	BRegion dirty;
 	window->SetFlags(newFlags, &dirty);
 		// TODO: test what happens when the window
 		// finds out it needs to resize itself...
 
-	BRegion stillAvailableOnScreen;
-	_RebuildClippingForAllWindows(stillAvailableOnScreen);
-	_SetBackground(stillAvailableOnScreen);
-	_WindowChanged(window);
-
-	_TriggerWindowRedrawing(dirty);
-
-	UnlockAllWindows();
+	_RebuildAndRedrawAfterWindowChange(window, dirty);
 }
 
 
 void
 Desktop::SetWindowTitle(Window *window, const char* title)
 {
-	if (!LockAllWindows())
-		return;
+	AutoWriteLocker _(fWindowLock);
 
 	BRegion dirty;
 	window->SetTitle(title, dirty);
 
-	if (window->IsVisible() && dirty.CountRects() > 0) {
-		BRegion stillAvailableOnScreen;
-		_RebuildClippingForAllWindows(stillAvailableOnScreen);
-		_SetBackground(stillAvailableOnScreen);
-
-		_TriggerWindowRedrawing(dirty);
-	}
-
-	UnlockAllWindows();
+	_RebuildAndRedrawAfterWindowChange(window, dirty);
 }
 
 
@@ -2755,3 +2734,20 @@ Desktop::_SetBackground(BRegion& background)
 		}
 	}
 }
+
+
+//!	The all window lock must be held when calling this function.
+void
+Desktop::_RebuildAndRedrawAfterWindowChange(Window* window, BRegion& dirty)
+{
+	if (!window->IsVisible() || dirty.CountRects() == 0)
+		return;
+
+	BRegion stillAvailableOnScreen;
+	_RebuildClippingForAllWindows(stillAvailableOnScreen);
+	_SetBackground(stillAvailableOnScreen);
+	_WindowChanged(window);
+
+	_TriggerWindowRedrawing(dirty);
+}
+

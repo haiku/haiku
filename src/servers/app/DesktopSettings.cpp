@@ -235,13 +235,13 @@ DesktopSettingsPrivate::_Load()
 			bool subpix;
 			if (settings.FindBool("subpixel antialiasing", &subpix) == B_OK)
 				gSubpixelAntialiasing = subpix;
-			
+
 			int8 averageWeight;
 			if (settings.FindInt8("subpixel average weight", &averageWeight)
 					== B_OK) {
 				gSubpixelAverageWeight = averageWeight;
 			}
-			
+
 			bool subpixelOrdering;
 			if (settings.FindBool("subpixel ordering", &subpixelOrdering)
 					== B_OK) {
@@ -778,6 +778,7 @@ void
 LockedDesktopSettings::SetDefaultBoldFont(const ServerFont &font)
 {
 	fSettings->SetDefaultBoldFont(font);
+	fDesktop->BroadcastToAllWindows(AS_SYSTEM_FONT_CHANGED);
 }
 
 

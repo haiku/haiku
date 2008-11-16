@@ -32,14 +32,14 @@ enum click_type {
 	DEC_DRAG,
 	DEC_MOVETOBACK,
 	DEC_SLIDETAB,
-	
+
 	DEC_RESIZE,
 	CLICK_RESIZE_L,
-	CLICK_RESIZE_T, 
+	CLICK_RESIZE_T,
 	CLICK_RESIZE_R,
 	CLICK_RESIZE_B,
 	CLICK_RESIZE_LT,
-	CLICK_RESIZE_RT, 
+	CLICK_RESIZE_RT,
 	CLICK_RESIZE_LB,
 	CLICK_RESIZE_RB
 };
@@ -53,8 +53,9 @@ public:
 			void			SetDrawingEngine(DrawingEngine *driver);
 	inline	DrawingEngine*	GetDrawingEngine() const
 								{ return fDrawingEngine; }
-			void			SetFont(ServerFont *font);
 
+	virtual void			FontsChanged(DesktopSettings& settings,
+								BRegion* updateRegion = NULL);
 	virtual void			SetLook(DesktopSettings& settings, window_look look,
 								BRegion* updateRegion = NULL);
 	virtual void			SetFlags(uint32 flags,
@@ -74,7 +75,7 @@ public:
 
 			BRect			BorderRect() const;
 			BRect			TabRect() const;
-		
+
 			bool			GetClose();
 			bool			GetMinimize();
 			bool			GetZoom();
@@ -97,7 +98,7 @@ public:
 	virtual	void			ResizeBy(BPoint offset, BRegion* dirty) = 0;
 
 	/*! \return true if tab location updated, false if out of bounds
-		or unsupported 
+		or unsupported
 	*/
 	virtual	bool			SetTabLocation(float location,
 								BRegion* /*updateRegion*/ = NULL)

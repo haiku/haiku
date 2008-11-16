@@ -90,7 +90,7 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 	fTabLocation(0.0),
 	fLastClicked(0)
 {
-	DefaultDecorator::SetLook(settings, look);
+	_UpdateFont(settings);
 
 	// common colors to both focus and non focus state
 	fFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
@@ -160,6 +160,27 @@ DefaultDecorator::SetTitle(const char* string, BRegion* updateRegion)
 
 
 void
+DefaultDecorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
+{
+	// get previous extent
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+
+	_UpdateFont(settings);
+	_DoLayout();
+
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+}
+
+
+void
 DefaultDecorator::SetLook(DesktopSettings& settings, window_look look,
 	BRegion* updateRegion)
 {
@@ -172,19 +193,9 @@ DefaultDecorator::SetLook(DesktopSettings& settings, window_look look,
 		updateRegion->Include(&extent);
 	}
 
-	ServerFont font;
-	if (look == B_FLOATING_WINDOW_LOOK || look == kLeftTitledWindowLook) {
-		settings.GetDefaultPlainFont(font);
-		if (look == kLeftTitledWindowLook)
-			font.SetRotation(90.0f);
-	} else
-		settings.GetDefaultBoldFont(font);
+	fLook = look;
 
-	font.SetFlags(B_FORCE_ANTIALIASING);
-	font.SetSpacing(B_STRING_SPACING);
-	SetFont(&font);
-
-	Decorator::SetLook(settings, look, updateRegion);
+	_UpdateFont(settings);
 	_DoLayout();
 
 	if (updateRegion != NULL) {
@@ -435,6 +446,9 @@ DefaultDecorator::GetSettings(BMessage* settings) const
 	if (!fTabRect.IsValid())
 		return false;
 
+	if (settings->AddRect("tab frame", fTabRect) != B_OK)
+		return false;
+
 	return settings->AddFloat("tab location", (float)fTabOffset) == B_OK;
 }
 
@@ -669,8 +683,8 @@ DefaultDecorator::_DoLayout()
 			fMinTabSize += offset + size;
 
 		// fMaxTabSize contains fMinWidth + the width required for the title
-		fMaxTabSize = fDrawingEngine ?
-			ceilf(fDrawingEngine->StringWidth(Title(), strlen(Title()),
+		fMaxTabSize = fDrawingEngine
+			? ceilf(fDrawingEngine->StringWidth(Title(), strlen(Title()),
 				fDrawState.Font())) : 0.0;
 		if (fMaxTabSize > 0.0)
 			fMaxTabSize += fTextOffset;
@@ -1095,6 +1109,23 @@ void
 DefaultDecorator::_SetColors()
 {
 	_SetFocus();
+}
+
+
+void
+DefaultDecorator::_UpdateFont(DesktopSettings& settings)
+{
+	ServerFont font;
+	if (fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook) {
+		settings.GetDefaultPlainFont(font);
+		if (fLook == kLeftTitledWindowLook)
+			font.SetRotation(90.0f);
+	} else
+		settings.GetDefaultBoldFont(font);
+
+	font.SetFlags(B_FORCE_ANTIALIASING);
+	font.SetSpacing(B_STRING_SPACING);
+	fDrawState.SetFont(font);
 }
 
 

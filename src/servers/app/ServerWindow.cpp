@@ -1082,6 +1082,13 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 
+		case AS_SYSTEM_FONT_CHANGED:
+		{
+			fDesktop->FontsChanged(fWindow);
+			// TODO: tell client about this, too, and relayout...
+			break;
+		}
+
 		case AS_REDRAW:
 			// Nothing to do here - the redraws are actually handled by looking
 			// at the fRedrawRequested member variable in _MessageLooper().
@@ -3692,6 +3699,7 @@ ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 		case AS_WINDOW_MOVE:
 		case AS_WINDOW_RESIZE:
 		case AS_SET_SIZE_LIMITS:
+		case AS_SYSTEM_FONT_CHANGED:
 		case AS_SET_DECORATOR_SETTINGS:
 		case AS_GET_MOUSE:
 		case AS_DIRECT_WINDOW_SET_FULLSCREEN:

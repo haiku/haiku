@@ -1288,6 +1288,17 @@ Window::GetDecoratorSettings(BMessage* settings)
 
 
 void
+Window::FontsChanged(BRegion* updateRegion)
+{
+	if (fDecorator != NULL) {
+		DesktopSettings settings(fDesktop);
+		fDecorator->FontsChanged(settings, updateRegion);
+		fBorderRegionValid = false;
+	}
+}
+
+
+void
 Window::SetLook(window_look look, BRegion* updateRegion)
 {
 	if (fDecorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
