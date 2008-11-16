@@ -86,8 +86,8 @@
 #	define TRACE(x...) do {} while (0)
 #	define MD_CALLED(x...) TRACE(x)
 #	define MID_CALLED(x...) TRACE(x)
-#	define LOG_ERR(text...) debug_printf(text)
-#	define LOG_EVENT(text...) TRACE(x)
+#	define LOG_ERR(x...) debug_printf(x)
+#	define LOG_EVENT(x...) TRACE(x)
 #endif
 
 
@@ -128,7 +128,9 @@ private:
 									int32 deltaX, int32 deltaY) const;
 			void				_ComputeAcceleration(
 									const mouse_movement& movements,
-									int32& deltaX, int32& deltaY) const;
+									int32& deltaX, int32& deltaY,
+									float& historyDeltaX,
+									float& historyDeltaY) const;
 			uint32				_RemapButtons(uint32 buttons) const;
 
 private:
@@ -368,11 +370,11 @@ MouseDevice::_ControlThread()
 	_UpdateSettings();
 
 	uint32 lastButtons = 0;
+	float historyDeltaX = 0.0;
+	float historyDeltaY = 0.0;
 
 	while (fActive) {
 		mouse_movement movements;
-		memset(&movements, 0, sizeof(movements));
-
 		if (ioctl(fDevice, MS_READ, &movements) != B_OK) {
 			_ControlThreadCleanup();
 			// TOAST!
@@ -399,12 +401,16 @@ MouseDevice::_ControlThread()
 
 		uint32 remappedButtons = _RemapButtons(movements.buttons);
 		int32 deltaX, deltaY;
-		_ComputeAcceleration(movements, deltaX, deltaY);
+		_ComputeAcceleration(movements, deltaX, deltaY, historyDeltaX,
+			historyDeltaY);
 
-		LOG_EVENT("%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld, wheel_x:%ld, wheel_y:%ld\n",
-			fDeviceRef.name, movements.buttons, movements.xdelta, movements.ydelta,
-			movements.clicks, movements.wheel_xdelta, movements.wheel_ydelta);
-		LOG_EVENT("%s: x: %ld, y: %ld\n", fDeviceRef.name, deltaX, deltaY);
+		LOG_EVENT("%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld, "
+			"wheel_x:%ld, wheel_y:%ld\n",
+			fDeviceRef.name, movements.buttons,
+			movements.xdelta, movements.ydelta, movements.clicks,
+			movements.wheel_xdelta, movements.wheel_ydelta);
+		LOG_EVENT("%s: x: %ld, y: %ld (%.4f, %.4f)\n", fDeviceRef.name,
+			deltaX, deltaY, historyDeltaX, historyDeltaY);
 
 		// Send single messages for each event
 
@@ -574,11 +580,14 @@ MouseDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons,
 
 void
 MouseDevice::_ComputeAcceleration(const mouse_movement& movements,
-	int32& deltaX, int32& deltaY) const
+	int32& _deltaX, int32& _deltaY, float& historyDeltaX,
+	float& historyDeltaY) const
 {
 	// basic mouse speed
-	deltaX = movements.xdelta * fSettings.accel.speed >> 16;
-	deltaY = movements.ydelta * fSettings.accel.speed >> 16;
+	float deltaX = (float)movements.xdelta * fSettings.accel.speed / 65536.0
+		+ historyDeltaX;
+	float deltaY = (float)movements.ydelta * fSettings.accel.speed / 65536.0
+		+ historyDeltaY;
 
 	// acceleration
 	double acceleration = 1;
@@ -587,16 +596,21 @@ MouseDevice::_ComputeAcceleration(const mouse_movement& movements,
 			* fSettings.accel.accel_factor / 524288.0;
 	}
 
-	// make sure that we move at least one pixel (if there was a movement)
-	if (deltaX > 0)
-		deltaX = (int32)floor(deltaX * acceleration);
-	else
-		deltaX = (int32)ceil(deltaX * acceleration);
+	deltaX *= acceleration;
+	deltaY *= acceleration;
 
-	if (deltaY > 0)
-		deltaY = (int32)floor(deltaY * acceleration);
+	if (deltaX >= 0)
+		_deltaX = (int32)floorf(deltaX);
 	else
-		deltaY = (int32)ceil(deltaY * acceleration);
+		_deltaX = (int32)ceilf(deltaX);
+
+	if (deltaY >= 0)
+		_deltaY = (int32)floorf(deltaY);
+	else
+		_deltaY = (int32)ceilf(deltaY);
+
+	historyDeltaX = deltaX - _deltaX;
+	historyDeltaY = deltaY - _deltaY;
 }
 
 
