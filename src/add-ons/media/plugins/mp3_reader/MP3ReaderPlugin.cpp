@@ -216,7 +216,7 @@ mp3Reader::GetFileFormatInfo(media_file_format *mff)
 	strcpy(mff->short_name,  name_table[mpeg_version_index][layer_index]);
 	strcpy(mff->pretty_name, name_table[mpeg_version_index][layer_index]);
 	
-	printf("mp3Reader: %s\n", name_table[mpeg_version_index][layer_index]);
+	TRACE("mp3Reader: %s\n", name_table[mpeg_version_index][layer_index]);
 }
 
 	
@@ -521,7 +521,7 @@ retry:
 	*chunkSize = size + 4;
 	
 	if (*chunkSize > MAX_CHUNK_SIZE) {
-		printf("mp3Reader: chunk buffer overrun, read %ld bytes into %ld bytes buffer\n", *chunkSize, MAX_CHUNK_SIZE);
+		fprintf(stderr, "mp3Reader: chunk buffer overrun, read %ld bytes into %ld bytes buffer\n", *chunkSize, MAX_CHUNK_SIZE);
 		exit(1);
 	}
 
@@ -966,7 +966,7 @@ mp3Reader::IsMp3File()
 bool
 mp3Reader::IsValidStream(uint8 *buffer, int size)
 {
-	// check 3 consecutive frame headers to make sure
+	// check 4 consecutive frame headers to make sure
 	// that the length encoded in the header is correct,
 	// and also that mpeg version and layer do not change
 	int length1 = GetFrameLength(buffer);
@@ -987,6 +987,13 @@ mp3Reader::IsValidStream(uint8 *buffer, int size)
 	int version_index3 = (buffer[length1 + length2 + 1] >> 3) & 0x03;
 	int layer_index3 = (buffer[length1 + length2 + 1] >> 1) & 0x03;
 	if (version_index2 != version_index3 || layer_index2 != layer_index3)
+		return false;
+	int length4 = GetFrameLength(buffer + length1 + length2 + length3);
+	if (length4 < 0)
+		return false;
+	int version_index4 = (buffer[length1 + length2 + length3 + 1] >> 3) & 0x03;
+	int layer_index4 = (buffer[length1 + length2 + length3 + 1] >> 1) & 0x03;
+	if (version_index3 != version_index4 || layer_index3 != layer_index4)
 		return false;
 	return true;
 }
