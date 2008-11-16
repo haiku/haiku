@@ -528,7 +528,7 @@ ioapic_init(kernel_args *args)
 	};
 
 	if (args->arch_args.apic == NULL) {
-		dprintf("no local apic availabe\n");
+		dprintf("no local apic available\n");
 		return;
 	}
 
