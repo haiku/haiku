@@ -181,7 +181,7 @@ SGIImage::SetTo(BPositionIO* stream,
 
 	char name[80];	// Name of file in image header
 	memset(name, 0, sizeof(name));
-	sprintf(name, "OpenBeOS SGITranslator");
+	sprintf(name, "Haiku SGITranslator");
 	fStream->Write(name, sizeof(name));
 
 	// fill the rest of the image header with zeros
