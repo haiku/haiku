@@ -239,6 +239,44 @@ LaunchButton::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessa
 	IconButton::MouseMoved(where, transit, dragMessage);
 }
 
+
+BSize
+LaunchButton::MinSize()
+{
+	return PreferredSize();
+}
+
+
+BSize
+LaunchButton::PreferredSize()
+{
+	float minWidth = fIconSize;
+	float minHeight = fIconSize;
+
+	float hPadding = max_c(4.0, ceilf(minHeight / 4.0));
+	float vPadding = max_c(4.0, ceilf(minWidth / 4.0));
+
+	if (fLabel.CountChars() > 0) {
+		font_height fh;
+		GetFontHeight(&fh);
+		minHeight += ceilf(fh.ascent + fh.descent) + vPadding;
+		minWidth += StringWidth(fLabel.String()) + vPadding;
+	}
+
+	return BSize(minWidth + hPadding, minHeight + vPadding);
+}
+
+
+BSize
+LaunchButton::MaxSize()
+{
+	return PreferredSize();
+}
+
+
+// #pragma mark -
+
+
 // SetTo
 void
 LaunchButton::SetTo(const entry_ref* ref)

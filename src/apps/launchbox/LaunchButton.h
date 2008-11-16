@@ -40,6 +40,10 @@ class LaunchButton : public IconButton {
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 										   const BMessage* dragMessage);
 
+	virtual	BSize				MinSize();
+	virtual	BSize				PreferredSize();
+	virtual	BSize				MaxSize();
+
 	// LaunchButton
 			void				SetTo(const entry_ref* ref);
 			entry_ref*			Ref() const;
