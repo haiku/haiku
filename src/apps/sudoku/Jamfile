@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps sudoku ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared ;
 
 Application Sudoku :

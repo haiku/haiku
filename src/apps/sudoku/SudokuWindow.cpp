@@ -296,7 +296,7 @@ SudokuWindow::_OpenSettings(BFile& file, uint32 mode)
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return B_ERROR;
 
-	path.Append("pinc.Sudoku settings");
+	path.Append("Sudoku settings");
 
 	return file.SetTo(path.Path(), mode);
 }
