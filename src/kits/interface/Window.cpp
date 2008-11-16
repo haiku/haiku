@@ -3156,7 +3156,8 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 					view->ConvertFromScreen(where));
 
 				if (message->what == B_MOUSE_MOVED) {
-					// is there a token of the view that is currently under the mouse?
+					// is there a token of the view that is currently under
+					// the mouse?
 					BView* viewUnderMouse = NULL;
 					int32 token;
 					if (message->FindInt32("_view_token", &token) == B_OK)
