@@ -57,7 +57,7 @@ const char* kMultiControlString[] = {
 	"Output", "Input", "Setup", "Tone Control", "Extended Setup", "Enhanced Setup", "Master",
 	"Beep", "Phone", "Mic", "Line", "CD", "Video", "Aux", "Wave", "Gain", "Level", "Volume",
 	"Mute", "Enable", "Stereo Mix", "Mono Mix", "Output Stereo Mix", "Output Mono Mix", "Output Bass",
-	"Output Treble", "Output 3D Center", "Output 3D Depth" 
+	"Output Treble", "Output 3D Center", "Output 3D Depth", "Headphones", "SPDIF"
 };
 
 
