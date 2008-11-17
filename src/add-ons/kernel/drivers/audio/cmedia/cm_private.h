@@ -25,10 +25,10 @@
 
 #define EXPORT __declspec(dllexport)
 
-#if defined(__INTEL__)
-#define EIEIO()
-#elif defined(__POWERPC__)
+#if defined(__POWERPC__)
 #define EIEIO() __eieio()
+#else
+#define EIEIO()
 #endif
 
 #if DEBUG
