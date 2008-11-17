@@ -528,6 +528,25 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 
 		widget.type = (hda_widget_type)((capabilities & AUDIO_CAP_TYPE_MASK)
 			>> AUDIO_CAP_TYPE_SHIFT);
+		
+		/* Check specific node ids declared as inputs as beepers */
+		switch ((audioGroup->codec->vendor_id << 16) | audioGroup->codec->product_id) {
+			case 0x10ec0260:
+				if (nodeID == 23)
+					widget.type = WT_BEEP_GENERATOR;
+				break;
+			case 0x10ec0262:
+			case 0x10ec0268:
+			case 0x10ec0880:
+			case 0x10ec0882:
+			case 0x10ec0883:
+			case 0x10ec0885:
+			case 0x10ec0888:
+			case 0x10ec0889:
+				if (nodeID == 29)
+					widget.type = WT_BEEP_GENERATOR;
+				break;
+		}
 		widget.active_input = -1;
 		widget.capabilities.audio = capabilities;
 		widget.node_id = nodeID;
@@ -930,8 +949,7 @@ dprintf("ENABLE pin widget %ld\n", widget.node_id);
 				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 			}
 
-			if (widget.capabilities.output_amplifier != 0
-				&& widget.flags & WIDGET_FLAG_OUTPUT_PATH) {
+			if (widget.capabilities.output_amplifier != 0) {
 dprintf("UNMUTE/SET OUTPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
 	widget.capabilities.output_amplifier & AMP_CAP_OFFSET_MASK);
 				uint32 verb = MAKE_VERB(audioGroup->codec->addr,
@@ -943,18 +961,20 @@ dprintf("UNMUTE/SET OUTPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
 							& AMP_CAP_OFFSET_MASK));
 				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 			}
-			if (widget.capabilities.input_amplifier != 0
-				&& widget.flags & WIDGET_FLAG_INPUT_PATH) {
+			if (widget.capabilities.input_amplifier != 0) {
 dprintf("UNMUTE/SET INPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
-	widget.capabilities.output_amplifier & AMP_CAP_OFFSET_MASK);
-				uint32 verb = MAKE_VERB(audioGroup->codec->addr,
-					widget.node_id,
-					VID_SET_AMPLIFIER_GAIN_MUTE,
-					AMP_SET_INPUT | AMP_SET_LEFT_CHANNEL
-						| AMP_SET_RIGHT_CHANNEL
-						| (widget.capabilities.input_amplifier
-							& AMP_CAP_OFFSET_MASK));
-				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
+	widget.capabilities.input_amplifier & AMP_CAP_OFFSET_MASK);
+				for (uint32 i = 0; i < widget.num_inputs; i++) {
+					uint32 verb = MAKE_VERB(audioGroup->codec->addr,
+						widget.node_id,
+						VID_SET_AMPLIFIER_GAIN_MUTE,
+						AMP_SET_INPUT | AMP_SET_LEFT_CHANNEL
+							| AMP_SET_RIGHT_CHANNEL
+							| AMP_SET_INPUT_INDEX(i)
+							| (widget.capabilities.input_amplifier
+								& AMP_CAP_OFFSET_MASK));
+					hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
+				}
 			}
 		}
 
@@ -1037,6 +1057,13 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 
 	if (hda_send_verbs(codec, verbs, (uint32*)&response, 3) != B_OK)
 		goto err;
+
+	codec->vendor_id = response.vendor;
+	codec->product_id = response.device;
+	codec->stepping = response.stepping;
+	codec->revision = response.revision;
+	codec->minor = response.minor;
+	codec->major = response.major;
 
 	dprintf("Codec %ld Vendor: %04lx Product: %04lx, Revision: "
 		"%lu.%lu.%lu.%lu\n", codecAddress, response.vendor, response.device,
