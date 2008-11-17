@@ -1,0 +1,13 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/sgi";
+
+resource(2, "META:SNIFF_RULE") "0.50 (\"\\001\\332")";
+
+resource(3, "META:S:DESC") #'MSDC' "SGI Image";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "sgi",
+	"type" = "image/sgi"
+};
