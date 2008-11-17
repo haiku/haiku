@@ -1530,12 +1530,17 @@ BWindow::Zoom()
 		The dimensions that non-virtual Zoom() passes to hook Zoom() are deduced from
 		the smallest of three rectangles:
 	*/
-
-	// TODO: make more elaborate (figure out this window's
-	// tab height and border width... maybe ask app_server)
+	
+	// fallback in case retrieving the decorator settings fails (highly unlikely)
 	float borderWidth = 5.0;
 	float tabHeight = 26.0;
-
+	BMessage settings;
+	if (GetDecoratorSettings(&settings) == B_OK) {
+		BRect tabRect;
+		if (settings.FindRect("tab frame", &tabRect) == B_OK)
+			tabHeight = tabRect.Height();
+	}
+		
 	// 1) the rectangle defined by SetZoomLimits(),
 	float zoomedWidth = fMaxZoomWidth;
 	float zoomedHeight = fMaxZoomHeight;
