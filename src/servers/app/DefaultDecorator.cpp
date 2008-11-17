@@ -449,6 +449,9 @@ DefaultDecorator::GetSettings(BMessage* settings) const
 	if (settings->AddRect("tab frame", fTabRect) != B_OK)
 		return false;
 
+	if (settings->AddFloat("border width", fBorderWidth) != B_OK)
+		return false;
+
 	return settings->AddFloat("tab location", (float)fTabOffset) == B_OK;
 }
 

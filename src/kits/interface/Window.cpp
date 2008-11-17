@@ -1533,12 +1533,13 @@ BWindow::Zoom()
 	
 	// fallback in case retrieving the decorator settings fails (highly unlikely)
 	float borderWidth = 5.0;
-	float tabHeight = 26.0;
+	float tabHeight = 21.0;
 	BMessage settings;
 	if (GetDecoratorSettings(&settings) == B_OK) {
 		BRect tabRect;
 		if (settings.FindRect("tab frame", &tabRect) == B_OK)
 			tabHeight = tabRect.Height();
+		settings.FindFloat("border width", &borderWidth);
 	}
 		
 	// 1) the rectangle defined by SetZoomLimits(),
@@ -1554,13 +1555,13 @@ BWindow::Zoom()
 	// 3) the screen rectangle
 	BScreen screen(this);
 	float screenWidth = screen.Frame().Width() - 2 * borderWidth;
-	float screenHeight = screen.Frame().Height() - (borderWidth + tabHeight);
+	float screenHeight = screen.Frame().Height() - (2 * borderWidth + tabHeight);
 	if (screenWidth < zoomedWidth)
 		zoomedWidth = screenWidth;
 	if (screenHeight < zoomedHeight)
 		zoomedHeight = screenHeight;
 
-	BPoint zoomedLeftTop = screen.Frame().LeftTop() + BPoint(borderWidth, tabHeight);
+	BPoint zoomedLeftTop = screen.Frame().LeftTop() + BPoint(borderWidth, tabHeight + borderWidth);
 
 	// UN-ZOOM:
 	if (fPreviousFrame.IsValid()
