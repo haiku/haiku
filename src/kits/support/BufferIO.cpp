@@ -143,17 +143,14 @@ BBufferIO::Seek(off_t position, uint32 seekMode)
 	if (fStream == NULL)
 		return B_NO_INIT;
 
+	off_t newPosition = fPosition;
+
 	switch (seekMode) {
 		case SEEK_CUR:
-			fPosition += position;
-			if (fPosition < 0)
-				fPosition = 0;
+			newPosition += position;
 			break;
 		case SEEK_SET:
-			if (position < 0)
-				return B_BAD_VALUE;
-
-			fPosition = position;
+			newPosition = position;
 			break;
 		case SEEK_END:
 		{
@@ -162,14 +159,16 @@ BBufferIO::Seek(off_t position, uint32 seekMode)
 			if (status != B_OK)
 				return status;
 
-			fPosition = size - position;
-			if (fPosition < 0)
-				fPosition = 0;
+			newPosition = size - position;
 			break;
 		}
 	}
 
-	return fPosition;
+	if (newPosition < 0)
+		return B_BAD_VALUE;
+
+	fPosition = newPosition;
+	return newPosition;
 }
 
 
