@@ -113,7 +113,7 @@ BEOS_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addon
 	video_producer_demo.media_addon
 	video_window_demo.media_addon
 	firewire_dv.media_addon
-	legacy.media_addon
+	#legacy.media_addon
 ;
 BEOS_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
 	aiff_reader au_reader $(X86_ONLY)avcodec avi_reader
@@ -132,7 +132,7 @@ BEOS_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 ;
 BEOS_ADD_ONS_SCREENSAVERS = Haiku IFS Spider ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki ; #hda
-BEOS_ADD_ONS_DRIVERS_AUDIO_OLD = cmedia sis7018 usb_audio ;
+BEOS_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia sis7018 usb_audio ;
 BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme
 	$(X86_ONLY)s3 $(X86_ONLY)vesa #$(X86_ONLY)via #$(X86_ONLY)vmware
