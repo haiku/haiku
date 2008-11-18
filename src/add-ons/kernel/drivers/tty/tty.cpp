@@ -1105,6 +1105,19 @@ tty_close_cookie(struct tty_cookie *cookie)
 }
 
 
+static int32
+tty_readable(struct tty* tty)
+{
+	if (!tty->is_master && (tty->settings->termios.c_lflag & ICANON) != 0) {
+		return line_buffer_readable_line(tty->input_buffer,
+			tty->settings->termios.c_cc[VEOL],
+			tty->settings->termios.c_cc[VEOF]);
+	}
+
+	return line_buffer_readable(tty->input_buffer);
+}
+
+
 static void
 tty_notify_select_event(struct tty *tty, uint8 event)
 {
@@ -1134,14 +1147,7 @@ tty_notify_if_available(struct tty *tty, struct tty *otherTTY,
 
 	// Check, if something is readable (depending on whether canonical input
 	// processing is enabled).
-	int32 readable;
-	if (!tty->is_master && (tty->settings->termios.c_lflag & ICANON) != 0) {
-		readable = line_buffer_readable_line(tty->input_buffer,
-			tty->settings->termios.c_cc[VEOL],
-			tty->settings->termios.c_cc[VEOF]);
-	} else
-		readable = line_buffer_readable(tty->input_buffer);
-
+	int32 readable = tty_readable(tty);
 	if (readable > 0) {
 		// if nobody is waiting send select events, otherwise notify the waiter
 		if (!tty->reader_queue.IsEmpty())
@@ -1895,10 +1901,8 @@ tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 	// check, if the event is already present
 	switch (event) {
 		case B_SELECT_READ:
-			if (tty->reader_queue.IsEmpty()
-				&& line_buffer_readable(tty->input_buffer) > 0) {
+			if (tty->reader_queue.IsEmpty() && tty_readable(tty) > 0)
 				notify_select_event(sync, event);
-			}
 			break;
 
 		case B_SELECT_WRITE:
@@ -1922,7 +1926,6 @@ tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 					notify_select_event(sync, event);
 				}
 			}
-
 			break;
 		}
 
