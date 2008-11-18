@@ -47,6 +47,12 @@ platform_add_menus(Menu *menu)
 			item->SetHelpText("Disables Advanced Configuration and Power "
 				"Interface hardware support, overriding the ACPI setting "
 				"in the kernel settings file.");
+
+			menu->AddItem(item = new(nothrow) MenuItem("Disable IO-APIC"));
+			item->SetType(MENU_ITEM_MARKABLE);
+			item->SetData(B_SAFEMODE_DISABLE_IOAPIC);
+			item->SetHelpText("Disables using the IO APIC for interrupt handling, "
+				"forcing instead the use of the PIC.");
 			break;
 		default:
 			break;
