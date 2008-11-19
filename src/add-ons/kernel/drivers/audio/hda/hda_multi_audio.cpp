@@ -98,8 +98,8 @@ get_description(hda_audio_group* audioGroup, multi_description* data)
 	}
 
 	/* determine output/input rates */
-	data->output_rates = audioGroup->supported_rates;
-	data->input_rates = audioGroup->supported_rates;
+	data->output_rates = audioGroup->widget.d.io.rates;
+	data->input_rates = audioGroup->widget.d.io.rates;
 
 	/* force existance of 48kHz if variable rates are not supported */
 	if (data->output_rates == 0)
@@ -110,8 +110,8 @@ get_description(hda_audio_group* audioGroup, multi_description* data)
 	data->max_cvsr_rate = 0;
 	data->min_cvsr_rate = 0;
 
-	data->output_formats = audioGroup->supported_formats;
-	data->input_formats = audioGroup->supported_formats;
+	data->output_formats = audioGroup->widget.d.io.formats;
+	data->input_formats = audioGroup->widget.d.io.formats;
 	data->lock_sources = B_MULTI_LOCK_INTERNAL;
 	data->timecode_sources = 0;
 	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;

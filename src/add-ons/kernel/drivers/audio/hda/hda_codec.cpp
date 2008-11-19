@@ -286,10 +286,11 @@ hda_widget_get_pm_support(hda_audio_group* audioGroup, hda_widget* widget)
 static status_t
 hda_widget_get_stream_support(hda_audio_group* audioGroup, hda_widget* widget)
 {
-	if ((widget->capabilities.audio & AUDIO_CAP_FORMAT_OVERRIDE) == 0) {
+	if (audioGroup->widget.node_id != widget->node_id
+		&& (widget->capabilities.audio & AUDIO_CAP_FORMAT_OVERRIDE) == 0) {
 		// adopt capabilities of the audio group
-		widget->d.io.formats = audioGroup->supported_formats;
-		widget->d.io.rates = audioGroup->supported_rates;
+		widget->d.io.formats = audioGroup->widget.d.io.formats;
+		widget->d.io.rates = audioGroup->widget.d.io.rates;
 		return B_OK;
 	}
 
@@ -305,8 +306,10 @@ hda_widget_get_amplifier_capabilities(hda_audio_group* audioGroup,
 	uint32 response;
 	corb_t verb;
 
-	if ((widget->capabilities.audio & AUDIO_CAP_OUTPUT_AMPLIFIER) != 0) {
-		if ((widget->capabilities.audio & AUDIO_CAP_AMPLIFIER_OVERRIDE) != 0) {
+	if ((widget->capabilities.audio & AUDIO_CAP_OUTPUT_AMPLIFIER) != 0
+		|| audioGroup->widget.node_id == widget->node_id) {
+		if ((widget->capabilities.audio & AUDIO_CAP_AMPLIFIER_OVERRIDE) != 0
+			|| audioGroup->widget.node_id == widget->node_id) {
 			verb = MAKE_VERB(audioGroup->codec->addr, widget->node_id,
 				VID_GET_PARAMETER, PID_OUTPUT_AMPLIFIER_CAP);
 			status_t status = hda_send_verbs(audioGroup->codec, &verb,
@@ -318,12 +321,14 @@ hda_widget_get_amplifier_capabilities(hda_audio_group* audioGroup,
 		} else {
 			// adopt capabilities from the audio function group
 			widget->capabilities.output_amplifier
-				= audioGroup->output_amplifier_capabilities;
+				= audioGroup->widget.capabilities.output_amplifier;
 		}
 	}
 
-	if ((widget->capabilities.audio & AUDIO_CAP_INPUT_AMPLIFIER) != 0) {
-		if ((widget->capabilities.audio & AUDIO_CAP_AMPLIFIER_OVERRIDE) != 0) {
+	if ((widget->capabilities.audio & AUDIO_CAP_INPUT_AMPLIFIER) != 0
+		|| audioGroup->widget.node_id == widget->node_id) {
+		if ((widget->capabilities.audio & AUDIO_CAP_AMPLIFIER_OVERRIDE
+			|| audioGroup->widget.node_id == widget->node_id) != 0) {
 			verb = MAKE_VERB(audioGroup->codec->addr, widget->node_id,
 				VID_GET_PARAMETER, PID_INPUT_AMPLIFIER_CAP);
 			status_t status = hda_send_verbs(audioGroup->codec, &verb,
@@ -335,7 +340,7 @@ hda_widget_get_amplifier_capabilities(hda_audio_group* audioGroup,
 		} else {
 			// adopt capabilities from the audio function group
 			widget->capabilities.input_amplifier
-				= audioGroup->input_amplifier_capabilities;
+				= audioGroup->widget.capabilities.input_amplifier;
 		}
 	}
 
@@ -478,32 +483,32 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	corb_t verbs[3];
 	uint32 resp[3];
 
-	hda_get_stream_support(audioGroup->codec, audioGroup->root_node_id,
-		&audioGroup->supported_formats, &audioGroup->supported_rates);
-	hda_get_pm_support(audioGroup->codec, audioGroup->root_node_id,
-		&audioGroup->supported_pm);
-
-	verbs[0] = MAKE_VERB(audioGroup->codec->addr, audioGroup->root_node_id,
+	hda_widget_get_stream_support(audioGroup, &audioGroup->widget);
+	hda_widget_get_pm_support(audioGroup, &audioGroup->widget);
+	hda_widget_get_amplifier_capabilities(audioGroup, &audioGroup->widget);
+	
+	verbs[0] = MAKE_VERB(audioGroup->codec->addr, audioGroup->widget.node_id,
 		VID_GET_PARAMETER, PID_AUDIO_GROUP_CAP);
-	verbs[1] = MAKE_VERB(audioGroup->codec->addr, audioGroup->root_node_id,
+	verbs[1] = MAKE_VERB(audioGroup->codec->addr, audioGroup->widget.node_id,
 		VID_GET_PARAMETER, PID_GPIO_COUNT);
-	verbs[2] = MAKE_VERB(audioGroup->codec->addr, audioGroup->root_node_id,
+	verbs[2] = MAKE_VERB(audioGroup->codec->addr, audioGroup->widget.node_id,
 		VID_GET_PARAMETER, PID_SUB_NODE_COUNT);
 
 	if (hda_send_verbs(audioGroup->codec, verbs, resp, 3) != B_OK)
 		return B_ERROR;
 
 	dprintf("hda: Audio Group: Output delay: %ld samples, Input delay: %ld "
-		"samples, Beep Generator: %s\n", resp[0] & 0xf,
-		(resp[0] >> 8) & 0xf, (resp[0] & (1 << 16)) ? "yes" : "no");
+		"samples, Beep Generator: %s\n", AUDIO_GROUP_CAP_OUTPUT_DELAY(resp[0]),
+		AUDIO_GROUP_CAP_INPUT_DELAY(resp[0]), 
+		AUDIO_GROUP_CAP_BEEPGEN(resp[0]) ? "yes" : "no");
 
 	dprintf("hda:   #GPIO: %ld, #GPO: %ld, #GPI: %ld, unsol: %s, wake: %s\n",
-		resp[4] & 0xff, (resp[1] >> 8) & 0xff,
-		(resp[1] >> 16) & 0xff, (resp[1] & (1 << 30)) ? "yes" : "no",
-		(resp[1] & (1 << 31)) ? "yes" : "no");
+		GPIO_COUNT_NUM_GPIO(resp[1]), GPIO_COUNT_NUM_GPO(resp[1]),
+		GPIO_COUNT_NUM_GPI(resp[1]), GPIO_COUNT_GPIUNSOL(resp[1]) ? "yes" : "no",
+		GPIO_COUNT_GPIWAKE(resp[1]) ? "yes" : "no");
 
-	audioGroup->widget_start = resp[2] >> 16;
-	audioGroup->widget_count = resp[2] & 0xff;
+	audioGroup->widget_start = SUB_NODE_COUNT_START(resp[2]);
+	audioGroup->widget_count = SUB_NODE_COUNT_TOTAL(resp[2]);
 
 	dprintf("hda:   widget start %lu, count %lu\n", audioGroup->widget_start,
 		audioGroup->widget_count);
@@ -873,7 +878,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 		return B_NO_MEMORY;
 
 	/* Setup minimal info needed by hda_codec_parse_afg */
-	audioGroup->root_node_id = audioGroupNodeID;
+	audioGroup->widget.node_id = audioGroupNodeID;
 	audioGroup->codec = codec;
 	audioGroup->multi = (hda_multi*)calloc(1,
 		sizeof(hda_multi));
@@ -1052,7 +1057,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 
 	verbs[0] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_VENDOR_ID);
 	verbs[1] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_REVISION_ID);
-	verbs[2] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER,
+	verbs[2] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, 
 		PID_SUB_NODE_COUNT);
 
 	if (hda_send_verbs(codec, verbs, (uint32*)&response, 3) != B_OK)
@@ -1078,7 +1083,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 		if (hda_send_verbs(codec, verbs, &groupType, 1) != B_OK)
 			goto err;
 
-		if ((groupType & 0xff) == 1) {
+		if ((groupType & FUNCTION_GROUP_NODETYPE_MASK) == FUNCTION_GROUP_NODETYPE_AUDIO) {
 			/* Found an Audio Function Group! */
 			status_t status = hda_codec_new_audio_group(codec, nodeID);
 			if (status != B_OK) {

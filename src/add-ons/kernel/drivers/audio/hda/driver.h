@@ -241,21 +241,14 @@ struct hda_association {
 */
 struct hda_audio_group {
 	hda_codec*		codec;
+	hda_widget		widget;
 
 	/* Multi Audio API data */
 	hda_stream*		playback_stream;
 	hda_stream*		record_stream;
 
-	uint32			root_node_id;
 	uint32			widget_start;
 	uint32			widget_count;
-
-	uint32			supported_formats;
-	uint32			supported_rates;
-	uint32			supported_pm;
-
-	uint32			input_amplifier_capabilities;
-	uint32			output_amplifier_capabilities;
 
 	uint32			association_count;
 
