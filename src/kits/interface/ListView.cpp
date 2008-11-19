@@ -533,8 +533,10 @@ BListView::AddItem(BListItem *item, int32 index)
 	if (Window()) {
 		BFont font;
 		GetFont(&font);
+		item->SetTop((index > 0) ? ItemAt(index - 1)->Bottom() + 1.0 : 0.0);
+			
 		item->Update(this, &font);
-		_RecalcItemTops(index);
+		_RecalcItemTops(index + 1);
 
 		_FixupScrollBar();
 		_InvalidateFrom(index);
@@ -549,15 +551,16 @@ BListView::AddItem(BListItem* item)
 {
 	if (!fList.AddItem(item))
 		return false;
-
 	// No need to adapt selection, as this item is the last in the list
 
 	if (Window()) {
 		BFont font;
 		GetFont(&font);
+		int32 index = CountItems() - 1;
+		item->SetTop((index > 0) ? ItemAt(index - 1)->Bottom() + 1.0 : 0.0);
+		
 		item->Update(this, &font);
-		_RecalcItemTops(CountItems() - 1);
-
+		
 		_FixupScrollBar();
 		InvalidateItem(CountItems() - 1);
 	}
@@ -584,10 +587,12 @@ BListView::AddList(BList* list, int32 index)
 		BFont font;
 		GetFont(&font);
 
-		for (int32 i = index; i <= (index + list->CountItems() - 1); i++)
+		for (int32 i = index; i <= (index + list->CountItems() - 1); i++) {
+			ItemAt(i)->SetTop((i > 0) ? ItemAt(i - 1)->Bottom() + 1.0 : 0.0);
 			ItemAt(i)->Update(this, &font);
-
-		_RecalcItemTops(index);
+		}
+		
+		_RecalcItemTops(index + list->CountItems() - 1);
 
 		_FixupScrollBar();
 		Invalidate(); // TODO
