@@ -733,7 +733,13 @@ BListView::ItemAt(int32 index) const
 int32
 BListView::IndexOf(BListItem *item) const
 {
-	return fList.IndexOf(item);
+	if (item != NULL) {
+		BPoint point(0.0, item->Top());
+		int32 index = IndexOf(point);
+		if (index >= 0 && fList.ItemAt(index) == item)
+			return index;
+	}
+	return -1;
 }
 
 // IndexOf
@@ -779,7 +785,7 @@ BListView::LastItem() const
 bool
 BListView::HasItem(BListItem *item) const
 {
-	return fList.HasItem(item);
+	return IndexOf(item) != -1;
 }
 
 // CountItems
