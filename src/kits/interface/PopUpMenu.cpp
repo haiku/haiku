@@ -317,6 +317,13 @@ BMenuItem *
 BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 		BRect *_specialRect, bool async)
 {
+	if (fTrackThread >= B_OK) {
+		// we already have an active menu, wait for it to go away before
+		// spawning another
+		status_t unused;
+		while (wait_for_thread(fTrackThread, &unused) == B_INTERRUPTED)
+			;
+	}
 	popup_menu_data *data = new (std::nothrow) popup_menu_data;
 	if (!data)
 		return NULL;
