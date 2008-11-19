@@ -733,13 +733,7 @@ BListView::ItemAt(int32 index) const
 int32
 BListView::IndexOf(BListItem *item) const
 {
-	if (item != NULL) {
-		BPoint point(0.0, item->Top());
-		int32 index = IndexOf(point);
-		if (index >= 0 && fList.ItemAt(index) == item)
-			return index;
-	}
-	return -1;
+	return fList.IndexOf(item);
 }
 
 // IndexOf
@@ -785,7 +779,7 @@ BListView::LastItem() const
 bool
 BListView::HasItem(BListItem *item) const
 {
-	return IndexOf(item) != -1;
+	return fList.HasItem(item);
 }
 
 // CountItems
@@ -1350,9 +1344,10 @@ BListView::_FontChanged()
 {
 	BFont font;
 	GetFont(&font);
-	for (int32 i = 0; i < CountItems(); i++)
+	for (int32 i = 0; i < CountItems(); i++) {
+		ItemAt(i)->SetTop((i > 0) ? ItemAt(i - 1)->Bottom() + 1.0 : 0.0);
 		ItemAt(i)->Update(this, &font);
-	_RecalcItemTops(0);
+	}
 }
 
 
