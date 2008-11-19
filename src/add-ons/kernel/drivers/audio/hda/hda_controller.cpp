@@ -641,7 +641,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		verb[1] = MAKE_VERB(codec->addr, stream->io_widgets[i],
 			VID_SET_CONVERTER_STREAM_CHANNEL, val);
 		hda_send_verbs(codec, verb, response, 2);
-		channelNum += 2; // TODO stereo widget ?
+		//channelNum += 2; // TODO stereo widget ? Every output gets the same stream for now
 		dprintf("%ld ", stream->io_widgets[i]);
 	}
 	dprintf("\n");

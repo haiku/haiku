@@ -16,7 +16,7 @@
 #	undef TRACE
 #endif
 
-//#define TRACE_MULTI_AUDIO
+#define TRACE_MULTI_AUDIO
 #ifdef TRACE_MULTI_AUDIO
 #	define TRACE(a...) dprintf("\33[34mhda:\33[0m " a)
 #else
