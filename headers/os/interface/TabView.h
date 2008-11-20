@@ -106,6 +106,11 @@ virtual	void			_ReservedTab12();
 class BTabView : public BView
 {
 public:
+						BTabView(const char *name,
+							button_width width = B_WIDTH_AS_USUAL,
+							uint32 flags = B_FULL_UPDATE_ON_RESIZE |
+								 B_WILL_DRAW | B_NAVIGABLE_JUMP |
+								 B_FRAME_EVENTS | B_NAVIGABLE);
 						BTabView(BRect frame, const char *name,
 							button_width width = B_WIDTH_AS_USUAL, 
 							uint32 resizingMode = B_FOLLOW_ALL,
@@ -150,8 +155,12 @@ virtual	BRect			TabFrame(int32 tab_index) const;
 virtual	void			SetFlags(uint32 flags);
 virtual	void			SetResizingMode(uint32 mode);
 
-virtual void 			GetPreferredSize(float *width, float *height);
-virtual void 			ResizeToPreferred();
+virtual	void			ResizeToPreferred();
+virtual	void			GetPreferredSize(float* _width, float* _height);
+
+virtual BSize			MinSize();
+virtual BSize			MaxSize();
+virtual BSize			PreferredSize();
 
 virtual BHandler		*ResolveSpecifier(BMessage *message, int32 index,
 							BMessage *specifier, int32 what, const char *property);
@@ -174,7 +183,7 @@ virtual	void			SetTabHeight(float height);
 		BView			*ViewForTab(int32 tabIndex) const;
 
 private:
-		void			_InitObject();
+		void			_InitObject(bool layouted = false);
 
 virtual	void			_ReservedTabView1();
 virtual	void			_ReservedTabView2();

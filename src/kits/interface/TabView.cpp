@@ -8,8 +8,11 @@
  */
 #include <TabView.h>
 
+#include <new>
 #include <string.h>
 
+#include <CardLayout.h>
+#include <LayoutUtils.h>
 #include <List.h>
 #include <Message.h>
 #include <PropertyInfo.h>
@@ -127,12 +130,15 @@ BTab::IsSelected() const
 
 void
 BTab::Select(BView *owner)
-{	
+{
+	// TODO: Shouldn't we still maintain fSelected like in Deselect()?
 	if (!owner || !View() || !owner->Window())
 		return;
 
-	owner->AddChild(fView);
-	//fView->Show();
+	// NOTE: Views are not added/removed, if there is layout,
+	// they are made visible/invisible in that case.
+	if (!owner->GetLayout())
+		owner->AddChild(fView);
 
 	fSelected = true;
 }
@@ -141,9 +147,18 @@ BTab::Select(BView *owner)
 void
 BTab::Deselect()
 {
-	if (View())
-		View()->RemoveSelf();
-
+	if (View()) {
+		// NOTE: Views are not added/removed, if there is layout,
+		// they are made visible/invisible in that case.
+		bool removeView = false;
+		BView* container = View()->Parent();
+		if (container)
+			removeView =
+				dynamic_cast<BCardLayout*>(container->GetLayout()) == NULL;
+		if (removeView)
+			View()->RemoveSelf();
+	}
+	
 	fSelected = false;
 }
 
@@ -328,6 +343,16 @@ BTab &BTab::operator=(const BTab &)
 
 
 //	#pragma mark -
+
+BTabView::BTabView(const char *name, button_width width, uint32 flags)
+	: BView(name, flags)
+{
+	SetFont(be_bold_font);
+	
+	_InitObject(true);
+	
+	fTabWidthSetting = width;
+}
 
 
 BTabView::BTabView(BRect frame, const char *name, button_width width, 
@@ -669,6 +694,7 @@ BTabView::Select(int32 index)
 		index = Selection();
 
 	BTab *tab = TabAt(Selection());
+	
 	if (tab)
 		tab->Deselect();
 
@@ -678,6 +704,12 @@ BTabView::Select(int32 index)
 			fTabOffset = 0.0f;
 		tab->Select(ContainerView());
 		fSelection = index;
+
+		// make the view visible through the layout if there is one
+		BCardLayout* layout
+			= dynamic_cast<BCardLayout*>(fContainerView->GetLayout());
+		if (layout)
+			layout->SetVisibleItem(index);
 	}
 
 	Invalidate();
@@ -917,6 +949,36 @@ BTabView::GetPreferredSize(float *width, float *height)
 }
 
 
+BSize
+BTabView::MinSize()
+{
+	BSize size = fContainerView->MinSize();
+	size.height += TabHeight() + 6.0f;
+	size.width += 6.0f;
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+BSize
+BTabView::MaxSize()
+{
+	BSize size = fContainerView->MaxSize();
+	size.height += TabHeight() + 6.0f;
+	size.width += 6.0f;
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
+}
+
+
+BSize
+BTabView::PreferredSize()
+{
+	BSize size = fContainerView->PreferredSize();
+	size.height += TabHeight() + 6.0f;
+	size.width += 6.0f;
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
+}
+
+
 void
 BTabView::ResizeToPreferred()
 {
@@ -957,6 +1019,9 @@ BTabView::AddTab(BView *target, BTab *tab)
 		tab = new BTab(target);
 	else
 		tab->SetView(target);
+	
+	if (fContainerView->GetLayout())
+		fContainerView->GetLayout()->AddView(CountTabs(), target);
 
 	fTabList->AddItem(tab);
 }
@@ -987,6 +1052,9 @@ BTabView::RemoveTab(int32 index)
 	else
 		SetFocusTab(fFocus, true);
 
+	if (fContainerView->GetLayout())
+		fContainerView->GetLayout()->RemoveItem(index);
+	
 	return tab;
 }
 
@@ -1062,7 +1130,7 @@ BTabView::ViewForTab(int32 tabIndex) const
 
 
 void
-BTabView::_InitObject()
+BTabView::_InitObject(bool layouted)
 {
 	fTabList = new BList;
 
@@ -1088,6 +1156,9 @@ BTabView::_InitObject()
 	fContainerView = new BView(bounds, "view container", B_FOLLOW_ALL,
 		B_WILL_DRAW);
 
+	if (layouted)
+		fContainerView->SetLayout(new(std::nothrow) BCardLayout());
+	
 	fContainerView->SetViewColor(color);
 	fContainerView->SetLowColor(color);
 
