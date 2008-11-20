@@ -275,8 +275,8 @@ uint64_t	ifmedia_baudrate(int);
 /*
  * Status bits
  */
-#define	IFM_AVALID	0x00000001	/* Active bit valid */
-#define	IFM_ACTIVE	0x00000002	/* Interface attached to working net */
+#define	IFM_AVALID	0x10000000	/* Active bit valid */
+#define IFM_ACTIVE	0x00800000  /* same as Haiku's */
 
 /* Mask of "status valid" bits, for ifconfig(8). */
 #define	IFM_STATUS_VALID	IFM_AVALID
