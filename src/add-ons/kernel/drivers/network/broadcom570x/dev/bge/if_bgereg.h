@@ -2586,3 +2586,8 @@ struct bge_softc {
 #define	BGE_LOCK_ASSERT(_sc)	mtx_assert(&(_sc)->bge_mtx, MA_OWNED)
 #define	BGE_UNLOCK(_sc)		mtx_unlock(&(_sc)->bge_mtx)
 #define	BGE_LOCK_DESTROY(_sc)	mtx_destroy(&(_sc)->bge_mtx)
+
+#ifdef __HAIKU__
+// this function declaration is placed here because it is used in glue.c
+void bge_writembx(struct bge_softc *, int, int);
+#endif

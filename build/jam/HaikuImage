@@ -138,12 +138,12 @@ BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)s3 $(X86_ONLY)vesa #$(X86_ONLY)via #$(X86_ONLY)vmware
 ;
 BEOS_ADD_ONS_DRIVERS_MIDI = emuxki ;
-BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x etherpci $(X86_ONLY)ipro1000
+BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x 
+	$(X86_ONLY)broadcom570x etherpci $(X86_ONLY)ipro1000
 	pegasus $(X86_ONLY)rtl8139 rtl8169 $(X86_ONLY)rtl81xx sis900
 	$(X86_ONLY)via_rhine wb840 $(X86_ONLY)ipro100 $(X86_ONLY)nforce
 	#vlance
 	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect usb_ecm
-	$(GPL_ONLY)bcm570x
 ;
 #BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi

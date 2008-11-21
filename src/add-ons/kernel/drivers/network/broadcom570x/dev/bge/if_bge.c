@@ -378,7 +378,9 @@ static int bge_blockinit(struct bge_softc *);
 static int bge_has_eaddr(struct bge_softc *);
 static uint32_t bge_readmem_ind(struct bge_softc *, int);
 static void bge_writemem_ind(struct bge_softc *, int, int);
+#ifndef __HAIKU__
 static void bge_writembx(struct bge_softc *, int, int);
+#endif 
 #ifdef notdef
 static uint32_t bge_readreg_ind(struct bge_softc *, int);
 #endif
@@ -553,7 +555,11 @@ bge_writemem_direct(struct bge_softc *sc, int off, int val)
 	CSR_WRITE_4(sc, off, val);
 }
 
+#ifndef __HAIKU__
 static void
+#else
+void
+#endif
 bge_writembx(struct bge_softc *sc, int off, int val)
 {
 	if (sc->bge_asicrev == BGE_ASICREV_BCM5906)
