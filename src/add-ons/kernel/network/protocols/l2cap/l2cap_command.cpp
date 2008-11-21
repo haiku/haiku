@@ -130,8 +130,6 @@ l2cap_cmd_rej(uint8 _ident, uint16 _reason, uint16 _mtu, uint16 _scid, uint16 _d
 		bufferHeader->hdr.length += sizeof(bufferHeader->data.cid);
 	}
 
-	_m->size = sizeof(bufferHeader->hdr) + bufferHeader->hdr.length;	 /* TODO: needed ?*/
-
 	bufferHeader->hdr.length = htole16(bufferHeader->hdr.length);
 
 	bufferHeader.Sync();
@@ -211,8 +209,6 @@ l2cap_cfg_req(uint8 _ident, uint16 _dcid, uint16 _flags, net_buffer* _data)
 		return NULL;
 	}
 
-	(_m)->size = sizeof(struct _cfg_req);	  /* check if needed */
-
 	NetBufferPrepend<struct _cfg_req> bufferHeader(_m);
 	status_t status = bufferHeader.Status();
 	if (status < B_OK) {
@@ -231,7 +227,8 @@ l2cap_cfg_req(uint8 _ident, uint16 _dcid, uint16 _flags, net_buffer* _data)
 
 	/* Add the given data */
 	// TODO: given data can be freed... merge does it?
-	gBufferModule->merge(_m, _data, true);
+	if (_data != NULL)
+		gBufferModule->merge(_m, _data, true);
 
 	return _m;
 }
@@ -264,8 +261,9 @@ l2cap_cfg_rsp(uint8 _ident, uint16 _scid, uint16 _flags, uint16 _result, net_buf
 	bufferHeader->param.result = htole16((_result));
 
 	bufferHeader.Sync();
-
-	gBufferModule->merge(_m, _data, true);
+	
+	if (_data != NULL)
+		gBufferModule->merge(_m, _data, true);
 
 	return _m;
 
@@ -413,8 +411,6 @@ l2cap_info_rsp(uint8 _ident, uint16 _type, uint16 _result, uint16 _mtu)
 			break;
 		}
 	}
-
-	(_m)->size = sizeof(bufferHeader->hdr) + bufferHeader->hdr.length;
 
 	bufferHeader->hdr.length = htole16(bufferHeader->hdr.length);
 
