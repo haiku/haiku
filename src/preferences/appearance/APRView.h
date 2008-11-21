@@ -33,8 +33,7 @@ class APRWindow;
 class APRView : public BView
 {
 public:
-			APRView(const BRect &frame, const char *name, int32 resize, 
-					int32 flags);
+			APRView(const char *name, uint32 flags);
 			~APRView(void);
 	void	AttachedToWindow(void);
 	void	MessageReceived(BMessage *msg);

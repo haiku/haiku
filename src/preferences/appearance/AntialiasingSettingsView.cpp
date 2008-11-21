@@ -53,8 +53,8 @@ extern status_t get_average_weight(unsigned char* averageWeight);
 //	#pragma mark -
 
 
-AntialiasingSettingsView::AntialiasingSettingsView(BRect rect, const char* name)
-	: BView(rect, name, B_FOLLOW_ALL, B_SUPPORTS_LAYOUT)
+AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
+	: BView(name, 0)
 {
 	// collect the current system settings
 	if (get_subpixel_antialiasing(&fCurrentSubpixelAntialiasing) != B_OK)
@@ -141,11 +141,6 @@ AntialiasingSettingsView::AntialiasingSettingsView(BRect rect, const char* name)
 	_SetCurrentAntialiasing();
 	_SetCurrentHinting();
 	_SetCurrentAverageWeight();
-
-	// TODO: Remove once these two lines once the entire window uses
-	// layout management.
-	MoveTo(rect.LeftTop());
-	ResizeTo(rect.Width(), rect.Height());
 }
 
 

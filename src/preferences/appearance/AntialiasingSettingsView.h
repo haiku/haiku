@@ -16,8 +16,7 @@ class BSlider;
 
 class AntialiasingSettingsView : public BView {
 public:
-							AntialiasingSettingsView(BRect rect,
-								const char* name);
+							AntialiasingSettingsView(const char* name);
 	virtual					~AntialiasingSettingsView();
 
 	virtual	void			AttachedToWindow();

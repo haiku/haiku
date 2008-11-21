@@ -6,18 +6,19 @@
  *		DarkWyrm (darkwyrm@earthlink.net)
  *		Rene Gollent (rene@gollent.com)
  */
-#include <OS.h>
-#include <Directory.h>
+#include "APRView.h"
+
 #include <Alert.h>
-#include <Messenger.h>
-#include <storage/Path.h>
+#include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <GroupLayoutBuilder.h>
+#include <Messenger.h>
+#include <Path.h>
+#include <SpaceLayoutItem.h>
+
 #include <stdio.h>
 
-#include <InterfaceDefs.h>
-
-#include "APRView.h"
 #include "APRWindow.h"
 #include "defs.h"
 #include "ColorWell.h"
@@ -37,16 +38,12 @@ namespace BPrivate
 	status_t get_decorator_preview(const int32 &index, BBitmap *bitmap);
 }
 
-APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags)
- :	BView(frame,name,resize,flags),
+APRView::APRView(const char *name, uint32 flags)
+ :	BView(name, flags),
  	fDefaultSet(ColorSet::DefaultColorSet()),
  	fDecorMenu(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
-	BRect rect(Bounds().InsetByCopy(kBorderSpace,kBorderSpace));
-	
-	#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	
 	fDecorMenu = new BMenu("Window Style");
 	int32 decorCount = BPrivate::count_decorators();
@@ -57,75 +54,58 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 			if (name.CountChars() < 1)
 				continue;
 			fDecorMenu->AddItem(new BMenuItem(name.String(),
-								new BMessage(DECORATOR_CHANGED)));
+				new BMessage(DECORATOR_CHANGED)));
 		}
 		
-		BMenuField *field = new BMenuField(rect, "menufield", "Window Style",
-										fDecorMenu, B_FOLLOW_RIGHT | 
-										B_FOLLOW_TOP);
-		AddChild(field);
-		field->SetDivider(be_plain_font->StringWidth("Window style: ") + 5);
-		field->ResizeToPreferred();
-		field->MoveTo(Bounds().right - field->Bounds().Width(), 10);
-		rect = Bounds().InsetByCopy(10,10);
-		rect.OffsetTo(10, field->Frame().bottom + 10);
+		BMenuField *field = new BMenuField("Window Style", fDecorMenu);
+		// TODO: use this menu field.
 	}
 	BMenuItem *marked = fDecorMenu->ItemAt(BPrivate::get_decorator());
 	if (marked)
 		marked->SetMarked(true);
-	else
-	{
+	else {
 		marked = fDecorMenu->FindItem("Default");
 		if (marked)
 			marked->SetMarked(true);
 	}
 	
-	#endif
+	// Set up list of color attributes
+	fAttrList = new BListView("AttributeList", B_SINGLE_SELECTION_LIST);
 	
-	// Set up list of color fAttributes
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom = rect.top + 75;
-	fAttrList = new BListView(rect,"AttributeList", B_SINGLE_SELECTION_LIST,
-							B_FOLLOW_ALL_SIDES);
-	
-	fScrollView = new BScrollView("ScrollView",fAttrList, B_FOLLOW_ALL_SIDES, 
-		0, false, true);
-	AddChild(fScrollView);
+	fScrollView = new BScrollView("ScrollView", fAttrList, 0, false, true);
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	fAttrList->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
-
 	for (int32 i = 0; i < color_description_count(); i++) {
 		const ColorDescription& description = *get_color_description(i); 
 		const char* text = description.text;
 		color_which which = description.which;
 		fAttrList->AddItem(new ColorWhichItem(text, which));
 	}
-	
-	rect = fScrollView->Frame();
+
 	BRect wellrect(0, 0, 50, 50);
-	wellrect.OffsetBy(rect.left, rect.bottom + kBorderSpace);
-	fColorWell = new ColorWell(wellrect, new BMessage(COLOR_DROPPED), 
-		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(fColorWell);
-	
-	fPicker = new BColorControl(BPoint(wellrect.right + kBorderSpace, wellrect.top),
-			B_CELLS_32x8, 8.0, "fPicker", new BMessage(UPDATE_COLOR));
-	fPicker->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(fPicker);	
-	
-	// bottom align ColorWell and ColorPicker
-	float bottom = Bounds().bottom - kBorderSpace;
-	float colorWellBottom = fColorWell->Frame().bottom;
-	float pickerBottom = fPicker->Frame().bottom;
-	float delta = bottom - max_c(colorWellBottom, pickerBottom);
-	fColorWell->MoveBy(0, delta);
-	fPicker->MoveBy(0, delta);
-	fScrollView->ResizeBy(0, delta);
-	// since this view is not attached to a window yet,
-	// we have to resize the fScrollView children too
-	fScrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, delta);
-	fAttrList->ResizeBy(0, delta);
+	fColorWell = new ColorWell(wellrect, new BMessage(COLOR_DROPPED), 0);
+	fColorWell->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+		B_ALIGN_BOTTOM));
+
+	fPicker = new BColorControl(B_ORIGIN, B_CELLS_32x8, 8.0,
+		"picker", new BMessage(UPDATE_COLOR));
+
+	SetLayout(new BGroupLayout(B_VERTICAL));
+
+	// TODO: Make list view and scroller use all the additional height
+	// available!
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(fScrollView)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(fColorWell)
+			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
+			.Add(fPicker)
+		)
+		.SetInsets(10, 10, 10, 10)
+	);
+
+	fAttrList->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 }
 
 APRView::~APRView(void)

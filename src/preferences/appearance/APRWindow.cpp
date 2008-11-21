@@ -5,11 +5,14 @@
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
  */
+#include "APRWindow.h"
 
 #include <Button.h>
+#include <GroupLayoutBuilder.h>
 #include <Messenger.h>
+#include <SpaceLayoutItem.h>
 #include <TabView.h>
-#include "APRWindow.h"
+
 #include "APRView.h"
 #include "defs.h"
 
@@ -17,56 +20,40 @@ static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 
 APRWindow::APRWindow(BRect frame)
- :	BWindow(frame, "Appearance", B_TITLED_WINDOW, B_NOT_ZOOMABLE,
- 			B_ALL_WORKSPACES)
+ :	BWindow(frame, "Appearance", B_TITLED_WINDOW,
+ 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
+ 		B_ALL_WORKSPACES)
 {
-	BRect rect = Bounds();
-	BView* view = new BView(rect, "background", B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(view);
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	rect.left = 10;
-	rect.top = rect.bottom - 10;
-	fDefaultsButton = new BButton(rect, "defaults", "Defaults",
-		new BMessage(kMsgSetDefaults), B_FOLLOW_LEFT
-			| B_FOLLOW_BOTTOM, B_WILL_DRAW);
-	fDefaultsButton->ResizeToPreferred();
-	fDefaultsButton->SetEnabled(false);
-	float buttonHeight = fDefaultsButton->Bounds().Height();
-	fDefaultsButton->MoveBy(0, -buttonHeight);
-	view->AddChild(fDefaultsButton);
+	fDefaultsButton = new BButton("defaults", "Defaults",
+		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
 
-	rect = fDefaultsButton->Frame();
-	rect.OffsetBy(fDefaultsButton->Bounds().Width() + 10, 0);
+	fRevertButton = new BButton("revert", "Revert",
+		new BMessage(kMsgRevert), B_WILL_DRAW);
 
-	fRevertButton = new BButton(rect, "revert", "Revert",
-		new BMessage(kMsgRevert), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
-	fRevertButton->ResizeToPreferred();
-	fRevertButton->SetEnabled(false);
-	view->AddChild(fRevertButton);
+	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
 
-	rect = Bounds();
-	rect.top += 5;
-	rect.bottom -= 20 + buttonHeight;
-	rect.left += 5;
-	BTabView *tabView = new BTabView(rect, "tabview", B_WIDTH_FROM_LABEL);
-
-	rect = tabView->ContainerView()->Bounds().InsetByCopy(5, 8);
-
-	fAntialiasingSettings = new AntialiasingSettingsView(rect, "Antialiasing");
-	fColorsView = new APRView(rect, "Colors", B_FOLLOW_ALL, B_WILL_DRAW);
+	fAntialiasingSettings = new AntialiasingSettingsView("Antialiasing");
+	fColorsView = new APRView("Colors", B_WILL_DRAW);
 
 	tabView->AddTab(fColorsView);
 	tabView->AddTab(fAntialiasingSettings);
 		
-	view->AddChild(tabView);
-	fColorsView->ResizeToPreferred();
-	fAntialiasingSettings->ResizeToPreferred();
-
 	fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
 		|| fAntialiasingSettings->IsDefaultable());
-	fDefaultsButton->SetTarget(this);
-	fRevertButton->SetTarget(this);
+	fRevertButton->SetEnabled(false);
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(tabView)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(fRevertButton)
+			.AddGlue()
+			.Add(fDefaultsButton)
+		)
+		.SetInsets(5, 5, 5, 5)
+	);
 }
 
 
