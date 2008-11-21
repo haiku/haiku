@@ -101,7 +101,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	rgb_color infoColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 		B_DARKEN_4_TINT);
 	// TODO: Replace with layout friendly constructor once available.
-	BRect textBounds = rect.InsetByCopy(10, 10).OffsetToSelf(B_ORIGIN);
+	BRect textBounds = Bounds();
 	BTextView* subpixelAntialiasingDisabledLabel = new BTextView(
 		textBounds, "unavailable label", textBounds, &infoFont, &infoColor,
 		B_FOLLOW_NONE, B_WILL_DRAW | B_SUPPORTS_LAYOUT);
