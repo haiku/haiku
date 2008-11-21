@@ -183,7 +183,7 @@ virtual	void			SetTabHeight(float height);
 		BView			*ViewForTab(int32 tabIndex) const;
 
 private:
-		void			_InitObject(bool layouted = false);
+		void			_InitObject(bool layouted, button_width width);
 
 virtual	void			_ReservedTabView1();
 virtual	void			_ReservedTabView2();

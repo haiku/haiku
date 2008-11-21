@@ -5,6 +5,8 @@
  * Authors:	
  *		Marc Flerackers (mflerackers@androme.be)
  *		Jérôme Duval (korli@users.berlios.de)
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Artur Wyszynski
  */
 #include <TabView.h>
 
@@ -12,6 +14,7 @@
 #include <string.h>
 
 #include <CardLayout.h>
+#include <GroupLayout.h>
 #include <LayoutUtils.h>
 #include <List.h>
 #include <Message.h>
@@ -344,14 +347,11 @@ BTab &BTab::operator=(const BTab &)
 
 //	#pragma mark -
 
+
 BTabView::BTabView(const char *name, button_width width, uint32 flags)
 	: BView(name, flags)
 {
-	SetFont(be_bold_font);
-	
-	_InitObject(true);
-	
-	fTabWidthSetting = width;
+	_InitObject(true, width);
 }
 
 
@@ -359,11 +359,7 @@ BTabView::BTabView(BRect frame, const char *name, button_width width,
 	uint32 resizingMode, uint32 flags)
 	: BView(frame, name, resizingMode, flags)
 {
-	SetFont(be_bold_font);
-
-	_InitObject();
-
-	fTabWidthSetting = width;
+	_InitObject(false, width);
 }
 
 
@@ -1130,11 +1126,13 @@ BTabView::ViewForTab(int32 tabIndex) const
 
 
 void
-BTabView::_InitObject(bool layouted)
+BTabView::_InitObject(bool layouted, button_width width)
 {
+	SetFont(be_bold_font);
+
 	fTabList = new BList;
 
-	fTabWidthSetting = B_WIDTH_AS_USUAL;
+	fTabWidthSetting = width;
 	fSelection = 0;
 	fFocus = -1;
 	fTabOffset = 0.0f;
@@ -1148,16 +1146,24 @@ BTabView::_InitObject(bool layouted)
 	GetFontHeight(&fh);
 	fTabHeight = fh.ascent + fh.descent + fh.leading + 8.0f;
 
-	BRect bounds = Bounds();
+	if (layouted) {
+		BGroupLayout* layout = new(std::nothrow) BGroupLayout(B_HORIZONTAL);
+		if (layout) {
+			layout->SetInsets(3.0, 3.0 + TabHeight(), 3.0, 3.0);
+			SetLayout(layout);
+		}
 
-	bounds.top += TabHeight();
-	bounds.InsetBy(3.0f, 3.0f);
-
-	fContainerView = new BView(bounds, "view container", B_FOLLOW_ALL,
-		B_WILL_DRAW);
-
-	if (layouted)
+		fContainerView = new BView("view container", B_WILL_DRAW);
 		fContainerView->SetLayout(new(std::nothrow) BCardLayout());
+	} else {
+		BRect bounds = Bounds();
+	
+		bounds.top += TabHeight();
+		bounds.InsetBy(3.0f, 3.0f);
+
+		fContainerView = new BView(bounds, "view container", B_FOLLOW_ALL,
+			B_WILL_DRAW);
+	}
 	
 	fContainerView->SetViewColor(color);
 	fContainerView->SetLowColor(color);
