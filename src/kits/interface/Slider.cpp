@@ -368,7 +368,7 @@ BSlider::AttachedToWindow()
 	}
 
 	if (!fOffScreenBits) {
-		fOffScreenBits = new BBitmap(bounds, B_CMAP8, true, false);
+		fOffScreenBits = new BBitmap(bounds, B_RGBA32, true, false);
 
 		if (fOffScreenBits && fOffScreenView)
 			fOffScreenBits->AddChild(fOffScreenView);
@@ -451,7 +451,7 @@ BSlider::FrameResized(float w,float h)
 
 		fOffScreenView->ResizeTo(bounds.Width(), bounds.Height());
 	
-		fOffScreenBits = new BBitmap(Bounds(), B_CMAP8, true, false);
+		fOffScreenBits = new BBitmap(Bounds(), B_RGBA32, true, false);
 		fOffScreenBits->AddChild(fOffScreenView);
 	}
 #endif
