@@ -193,7 +193,7 @@ OffscreenClock::DrawClock()
 		(B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2);
 
 	_DrawHands(fCenterX + 1.5, fCenterY + 1.5, fRadius,
-				shadowColor, shadowColor, shadowColor, knobColor);
+				shadowColor, shadowColor, shadowColor, shadowColor);
 	_DrawHands(fCenterX, fCenterY, fRadius,
 				hourColor, minuteColor, secondsColor, knobColor);
 
