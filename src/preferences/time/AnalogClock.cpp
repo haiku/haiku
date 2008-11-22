@@ -294,7 +294,7 @@ OffscreenClock::_InHand(BPoint point, int32 ticks, float radius)
 	float pointPhi = _GetPhi(point);
 	float handPhi = PI / 30.0 * ticks;
 	float delta = pointPhi - handPhi;
-	if (abs(delta) > DRAG_DELTA_PHI)
+	if (fabs(delta) > DRAG_DELTA_PHI)
 		return false;
 
 	return true;
