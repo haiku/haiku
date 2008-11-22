@@ -602,9 +602,6 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 	else
 		flags = B_MULTIPLE_LAUNCH;
 
-	BMessage supportedTypes;
-	info.GetSupportedTypes(&supportedTypes);
-
 	version_info versionInfo;
 	if (info.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) != B_OK)
 		memset(&versionInfo, 0, sizeof(version_info));
@@ -652,6 +649,9 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 	fIconView->SetModificationMessage(new BMessage(kMsgIconChanged));
 
 	// supported types
+
+	BMessage supportedTypes;
+	info.GetSupportedTypes(&supportedTypes);
 
 	for (int32 i = fTypeListView->CountItems(); i-- > 0;) {
 		BListItem* item = fTypeListView->RemoveItem(i);
@@ -702,7 +702,10 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 	fOriginalInfo.signature = signature;
 	fOriginalInfo.flags = flags;
 	fOriginalInfo.versionInfo = versionInfo;
-	fOriginalInfo.supportedTypes = supportedTypes;
+	fOriginalInfo.supportedTypes = _SupportedTypes();
+		// The list view has the types sorted possibly differently
+		// to the supportedTypes message, so don't use that here, but
+		// get the sorted message instead.
 	fOriginalInfo.iconChanged = false;
 	fOriginalInfo.typeIconsChanged = false;
 
