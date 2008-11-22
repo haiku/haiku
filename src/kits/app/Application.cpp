@@ -972,9 +972,9 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 
 		case B_APP_ACTIVATED:
 		{
-			bool active = false;
-			message->FindBool("active", &active);
-			AppActivated(active);
+			bool active;
+			if (message->FindBool("active", &active) == B_OK)
+				AppActivated(active);
 			break;
 		}
 

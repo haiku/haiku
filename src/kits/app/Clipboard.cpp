@@ -131,8 +131,8 @@ BClipboard::StopWatching(BMessenger target)
 		&& message.AddMessenger("target", target) == B_OK
 		&& fClipHandler.SendMessage(&message, &reply) == B_OK) {
 		int32 result;
-		reply.FindInt32("result", &result);
-		return result;
+		if (reply.FindInt32("result", &result) == B_OK)
+			return result;
 	}
 	return B_ERROR;
 }
