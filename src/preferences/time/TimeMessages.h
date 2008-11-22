@@ -44,5 +44,8 @@ const uint32 kDayChanged = '_kdc';
 // clicked on revert button
 const uint32 kMsgRevert = 'rvrt';
 
+// change time finished
+const uint32 kChangeTimeFinished = 'tcfi';
+
 #endif //TIME_MESSAGES_H
 

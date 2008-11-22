@@ -52,6 +52,8 @@ TTimeWindow::MessageReceived(BMessage *message)
 	switch(message->what) {
 		case H_USER_CHANGE:
 			fBaseView->ChangeTime(message);
+			// To make sure no old time message is in the queue
+			_SendTimeChangeFinished();
 			SetRevertStatus();
 			break;
 		
@@ -159,4 +161,13 @@ TTimeWindow::_AlignWindow()
 
 		MoveTo(leftTop);
 	}
+}
+
+
+void
+TTimeWindow::_SendTimeChangeFinished()
+{
+	BMessenger messenger(fDateTimeView);
+	BMessage msg(kChangeTimeFinished);
+	messenger.SendMessage(&msg);
 }

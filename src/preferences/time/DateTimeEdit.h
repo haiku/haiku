@@ -26,6 +26,7 @@ class TTimeEdit : public TSectionEdit {
 	public:
 						TTimeEdit(BRect frame, const char *name, uint32 sections);
 		virtual			~TTimeEdit();
+		virtual	void	KeyDown(const char* bytes, int32 numBytes);
 
 		virtual void	InitView();
 		virtual void	DrawSection(uint32 index, bool isfocus);
@@ -48,6 +49,8 @@ class TTimeEdit : public TSectionEdit {
 
 	private:
 		BTime			fTime;
+		bigtime_t		fLastKeyDownTime;
+		int32			fLastKeyDownInt;
 };
 
 
@@ -55,6 +58,7 @@ class TDateEdit : public TSectionEdit {
 	public:
 						TDateEdit(BRect frame, const char *name, uint32 sections);
 		virtual			~TDateEdit();
+		virtual	void	KeyDown(const char* bytes, int32 numBytes);
 
 		virtual void	InitView();
 		virtual void	DrawSection(uint32 index, bool isfocus);
@@ -77,6 +81,8 @@ class TDateEdit : public TSectionEdit {
 
 	private:
 		BDate			fDate;
+		bigtime_t		fLastKeyDownTime;
+		int32			fLastKeyDownInt;
 };
 
 #endif // DATETIME_H

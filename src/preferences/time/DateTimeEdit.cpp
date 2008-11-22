@@ -6,6 +6,7 @@
  *		McCall <mccall@@digitalparadise.co.uk>
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
+ *		Clemens <mail@Clemens-Zeidler.de>
  *
  */
 
@@ -14,13 +15,15 @@
 
 #include <List.h>
 #include <String.h>
+#include <Window.h>
 
 
 using BPrivate::B_LOCAL_TIME;
 
 
 TTimeEdit::TTimeEdit(BRect frame, const char *name, uint32 sections)
-	: TSectionEdit(frame, name, sections)
+	:	TSectionEdit(frame, name, sections),
+		fLastKeyDownTime(0)
 {
 	InitView();
 	fTime = BTime::CurrentTime(B_LOCAL_TIME);
@@ -29,6 +32,42 @@ TTimeEdit::TTimeEdit(BRect frame, const char *name, uint32 sections)
 
 TTimeEdit::~TTimeEdit()
 {
+}
+
+
+void
+TTimeEdit::KeyDown(const char* bytes, int32 numBytes)
+{
+	TSectionEdit::KeyDown(bytes, numBytes);
+
+	BMessage* keyDownMsg = Window()->CurrentMessage();
+	int32 number;
+	keyDownMsg->FindInt32("raw_char", &number);
+	// only accept int
+	if (number < 48 || number > 57)
+		return;
+	number -= 48;
+	int32 section = FocusIndex();
+	if (section < 0 || section > 2)
+		return;
+	
+	bigtime_t currentTime = system_time();
+	if (currentTime - fLastKeyDownTime < 1000000) {
+		number += fLastKeyDownInt * 10;
+		fLastKeyDownTime = 0;
+	}
+	else {
+		fLastKeyDownTime = currentTime;
+		fLastKeyDownInt = number;
+	}
+		
+	// update display value
+	fHoldValue = number;
+	
+	_CheckRange();
+	
+	// send message to change time
+	DispatchMessage();
 }
 
 
@@ -173,6 +212,7 @@ TTimeEdit::SeperatorWidth() const
 void
 TTimeEdit::SectionFocus(uint32 index)
 {
+	fLastKeyDownTime = 0;
 	fFocus = index;
 	fHoldValue = _SectionValue(index);
 	Draw(Bounds());
@@ -342,6 +382,45 @@ TDateEdit::~TDateEdit()
 
 
 void
+TDateEdit::KeyDown(const char* bytes, int32 numBytes)
+{
+	TSectionEdit::KeyDown(bytes, numBytes);
+
+	BMessage* keyDownMsg = Window()->CurrentMessage();
+	int32 number;
+	keyDownMsg->FindInt32("raw_char", &number);
+	// only accept int
+	if (number < 48 || number > 57)
+		return;
+	number -= 48;
+	int32 section = FocusIndex();
+	if (section < 1 || section > 2)
+		return;
+	
+	bigtime_t currentTime = system_time();
+	if (currentTime - fLastKeyDownTime < 1000000) {
+		number += fLastKeyDownInt * 10;
+		fLastKeyDownTime = 0;
+	}
+	else {
+		fLastKeyDownTime = currentTime;
+		fLastKeyDownInt = number;
+	}
+	
+	// if year add 2000
+	if (section == 2)
+		number += 2000;
+	// update display value
+	fHoldValue = number;
+	
+	_CheckRange();
+	
+	// send message to change time
+	DispatchMessage();
+}
+
+
+void
 TDateEdit::InitView()
 {
 	// make sure we call the base class method, as it
@@ -452,6 +531,7 @@ TDateEdit::SeperatorWidth() const
 void
 TDateEdit::SectionFocus(uint32 index)
 {
+	fLastKeyDownTime = 0;
 	fFocus = index;
 	fHoldValue = _SectionValue(index);
 	Draw(Bounds());

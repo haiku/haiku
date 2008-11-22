@@ -33,6 +33,8 @@ class TTimeWindow : public BWindow {
 		void 			_InitWindow();
 		void			_AlignWindow();
 
+		void			_SendTimeChangeFinished();
+
 	private:
 		TTimeBaseView 	*fBaseView;
 		DateTimeView 	*fDateTimeView;

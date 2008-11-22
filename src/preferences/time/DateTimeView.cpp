@@ -139,6 +139,11 @@ DateTimeView::MessageReceived(BMessage *message)
 			_Revert();
 			break;
 
+		case kChangeTimeFinished:
+			if (fClock->IsChangingTime())
+				fTimeEdit->MakeFocus(false);
+			fClock->ChangeTimeFinished();
+			break;
 		default:
 			BView::MessageReceived(message);
 			break;
