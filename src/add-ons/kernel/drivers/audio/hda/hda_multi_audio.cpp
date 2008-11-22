@@ -279,6 +279,7 @@ hda_find_multi_string(hda_widget& widget)
 		case PIN_DEV_HEAD_PHONE_OUT:
 			return S_HEADPHONE;
 	}
+	TRACE("couln't find a string for widget %ld in hda_find_multi_string()\n", widget.node_id);
 	return S_null;
 }
 
@@ -288,6 +289,7 @@ hda_find_multi_custom_string(hda_widget& widget)
 	switch (CONF_DEFAULT_DEVICE(widget.d.pin.config)) {
 		case PIN_DEV_LINE_IN:
 		case PIN_DEV_LINE_OUT:
+		case PIN_DEV_MIC_IN:
 			switch (CONF_DEFAULT_COLOR(widget.d.pin.config)) {
 				case 1:
 					return "Analog Rear";
@@ -312,6 +314,7 @@ hda_find_multi_custom_string(hda_widget& widget)
 		case PIN_DEV_HEAD_PHONE_OUT:
 			return "Headphones";
 	}
+	TRACE("couldn't find a string for widget %ld in hda_find_multi_custom_string()\n", widget.node_id);
 	return NULL;
 }
 
@@ -409,7 +412,9 @@ hda_create_controls_list(hda_multi *multi)
 				hda_widget *complex = hda_audio_group_get_widget(audioGroup, widget.inputs[j]);
 				if (complex->type != WT_PIN_COMPLEX)
 					continue;
-				if (!complex->d.pin.output)
+				if (!complex->d.pin.input)
+					continue;
+				if (complex->flags & WIDGET_FLAG_OUTPUT_PATH)
 					continue;
 				TRACE("  create widget input nid %lu\n", widget.inputs[j]);
 				parent2 = hda_create_group_control(multi, &index, 
