@@ -2,13 +2,15 @@
  * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#ifndef _BCOREDATA_H
-#define _BCOREDATA_H
+#ifndef _BTCOREDATA_H
+#define _BTCOREDATA_H
 
 #include <module.h>
 #include <util/DoublyLinkedList.h>
 #include <util/DoublyLinkedQueue.h>
+
 #include <net_buffer.h>
+#include <net_device.h>
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/HCI/btHCI.h>
@@ -25,8 +27,11 @@ typedef enum _connection_status {
 	HCI_CONN_OPEN,
 } connection_status;
 
+#ifdef __cplusplus
+
 struct HciConnection : DoublyLinkedListLinkImpl<HciConnection> {
 	hci_id				Hid;
+	struct net_device*  ndevice;
 	net_buffer*			currentRxPacket;
 	ssize_t				currentRxExpectedLength;
 	bdaddr_t			destination;
@@ -36,9 +41,15 @@ struct HciConnection : DoublyLinkedListLinkImpl<HciConnection> {
 	connection_status   status;      /* ACL connection state */
 	uint16				lastCid;
 	DoublyLinkedList<L2capChannel> ChannelList;
-	DoublyLinkedQueue<L2capFrame> ExpectedResponses;
-	DoublyLinkedQueue<L2capFrame> OutGoingFrames;
+	DoublyLinkedList<L2capFrame> ExpectedResponses;
+	DoublyLinkedList<L2capFrame> OutGoingFrames;
 };
+
+#else
+
+struct HciConnection;
+
+#endif
 
 typedef enum _channel_status {
 	L2CAP_CHAN_CLOSED,				/* channel closed */
@@ -50,14 +61,11 @@ typedef enum _channel_status {
 	L2CAP_CHAN_W4_L2CA_DISCON_RSP	/* wait for upper discon. */
 } channel_status;
 
-struct L2capChannel : DoublyLinkedListLinkImpl<L2capChannel> {
-	HciConnection*		conn;
-	uint16        		scid;
-	uint16        		dcid;
-	uint16				psm;
-	uint8				ident;
 
-	channel_status		state;
+#ifdef __cplusplus
+
+typedef struct _ChannelConfiguration {
+
 	uint16				imtu;       /* incoming channel MTU */
 	l2cap_flow_t		iflow;      /* incoming flow control */
 	uint16				omtu;       /* outgoing channel MTU */
@@ -66,9 +74,29 @@ struct L2capChannel : DoublyLinkedListLinkImpl<L2capChannel> {
 	uint16				flush_timo; /* flush timeout */
 	uint16				link_timo;  /* link timeout */
 
+} ChannelConfiguration;
+
+struct L2capChannel : DoublyLinkedListLinkImpl<L2capChannel> {
+	HciConnection*		conn;
+	uint16        		scid;
+	uint16        		dcid;
+	uint16				psm;
+	uint8				ident;
+
+	channel_status		state;
+
+	ChannelConfiguration*	configuration;
+
 	int					cfgState;
 	L2capEndpoint*		endpoint;
 };
+
+#else
+
+struct L2capChannel;
+
+#endif
+
 
 typedef enum _frametype {
 	L2CAP_C_FRAME, // signals
@@ -78,6 +106,8 @@ typedef enum _frametype {
 	L2CAP_I_FRAME,
 	L2CAP_S_FRAME
 } frame_type;
+
+#ifdef __cplusplus
 
 struct L2capFrame : DoublyLinkedListLinkImpl<L2capFrame> {
 
@@ -97,41 +127,49 @@ struct L2capFrame : DoublyLinkedListLinkImpl<L2capFrame> {
     //TODO :struct callout			 timo;		/* RTX/ERTX timeout */
 };
 
+#else
+
+struct L2capFrame;
+
+#endif
+
 
 struct bluetooth_core_data_module_info {
 	module_info info;
-	HciConnection*	(*AddConnection)(uint16 handle, int type, bdaddr_t *dst, hci_id hid);
+
+	status_t	(*PostEvent)(struct net_device* ndev, void* event, size_t size);
+	struct HciConnection*	(*AddConnection)(uint16 handle, int type, bdaddr_t* dst, hci_id hid);
 
 	/*status_t	(*RemoveConnection)(bdaddr_t destination, hci_id hid);*/
 	status_t	(*RemoveConnection)(uint16 handle, hci_id hid);
 
 	hci_id		(*RouteConnection)(bdaddr_t* destination);
 
-	void		(*SetAclBuffer)(HciConnection* conn, net_buffer* nbuf);
-	void		(*SetAclExpectedSize)(HciConnection* conn, size_t size);
-	void 		(*AclPutting)(HciConnection* conn, size_t size);
-	bool		(*AclComplete)(HciConnection* conn);
-	bool		(*AclOverFlowed)(HciConnection* conn);
+	void		(*SetAclBuffer)(struct HciConnection* conn, net_buffer* nbuf);
+	void		(*SetAclExpectedSize)(struct HciConnection* conn, size_t size);
+	void 		(*AclPutting)(struct HciConnection* conn, size_t size);
+	bool		(*AclComplete)(struct HciConnection* conn);
+	bool		(*AclOverFlowed)(struct HciConnection* conn);
 
-	HciConnection*	(*ConnectionByHandle)(uint16 handle, hci_id hid);
-	HciConnection*	(*ConnectionByDestination)(bdaddr_t* destination, hci_id hid);
+	struct HciConnection*	(*ConnectionByHandle)(uint16 handle, hci_id hid);
+	struct HciConnection*	(*ConnectionByDestination)(bdaddr_t* destination, hci_id hid);
 
-	L2capChannel*		(*AddChannel)(HciConnection* conn, uint16 psm);
-	void 				(*RemoveChannel)(HciConnection* conn, uint16 scid);
-	L2capChannel*		(*ChannelBySourceID)(HciConnection* conn, uint16 sid);
-	uint16			(*ChannelAllocateCid)(HciConnection* conn);
-	uint16			(*ChannelAllocateIdent)(HciConnection* conn);
+	struct L2capChannel*		(*AddChannel)(struct HciConnection* conn, uint16 psm);
+	void 				(*RemoveChannel)(struct HciConnection* conn, uint16 scid);
+	struct L2capChannel*		(*ChannelBySourceID)(struct HciConnection* conn, uint16 sid);
+	uint16			(*ChannelAllocateCid)(struct HciConnection* conn);
+	uint16			(*ChannelAllocateIdent)(struct HciConnection* conn);
 
-	L2capFrame*		(*SignalByIdent)(HciConnection* conn, uint8 ident);
-	status_t		(*TimeoutSignal)(L2capFrame* frame, uint32 timeo);
-	status_t		(*UnTimeoutSignal)(L2capFrame* frame);
-	L2capFrame*		(*SpawnFrame)(HciConnection* conn, net_buffer* buffer, frame_type frame);
-	L2capFrame*		(*SpawnSignal)(HciConnection* conn, L2capChannel* channel, net_buffer* buffer, uint8 ident, uint8 code);
-	status_t		(*AcknowledgeSignal)(L2capFrame* frame);
+	struct L2capFrame*		(*SignalByIdent)(struct HciConnection* conn, uint8 ident);
+	status_t		(*TimeoutSignal)(struct L2capFrame* frame, uint32 timeo);
+	status_t		(*UnTimeoutSignal)(struct L2capFrame* frame);
+	struct L2capFrame*		(*SpawnFrame)(struct HciConnection* conn, net_buffer* buffer, frame_type frame);
+	struct L2capFrame*		(*SpawnSignal)(struct HciConnection* conn, struct L2capChannel* channel, net_buffer* buffer, uint8 ident, uint8 code);
+	status_t		(*AcknowledgeSignal)(struct L2capFrame* frame);
 
 };
 
-inline bool ExistConnectionByDestination(bdaddr_t* destination, hci_id hid = -1);
+inline bool ExistConnectionByDestination(bdaddr_t* destination, hci_id hid);
 inline bool ExistConnectionByHandle(uint16 handle, hci_id hid);
 
-#endif // _BCOREDATA_H
+#endif // _BTCOREDATA_H
