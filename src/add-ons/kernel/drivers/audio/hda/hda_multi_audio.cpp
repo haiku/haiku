@@ -292,15 +292,15 @@ hda_find_multi_custom_string(hda_widget& widget)
 		case PIN_DEV_MIC_IN:
 			switch (CONF_DEFAULT_COLOR(widget.d.pin.config)) {
 				case 1:
-					return "Analog Rear";
+					return "Rear";
 				case 2:
-					return "Analog Side";
+					return "Side";
 				case 3:
 					return "Line In";
 				case 4:
-					return "Analog Front";
+					return "Front";
 				case 6:
-					return "Digital SPDIF";
+					return "Center/Sub";
 				case 9:
 					return "Mic in";
 			}
@@ -322,7 +322,7 @@ hda_find_multi_custom_string(hda_widget& widget)
 static status_t
 hda_create_controls_list(hda_multi *multi)
 {				
-	uint32 	index = 0, parent, parent2;
+	uint32 index = 0, parent, parent2;
 	hda_audio_group *audioGroup = multi->group;
 			
 	parent = hda_create_group_control(multi, &index, 0, S_OUTPUT, NULL);
