@@ -131,6 +131,12 @@
 #define L2CAP_OPT_QOS_SIZE		sizeof(l2cap_flow_t)
 /* 0x4 - 0xff - reserved for future use */
 
+#define	L2CAP_CFG_IN	(1 << 0)     /* incoming path done */
+#define	L2CAP_CFG_OUT	(1 << 1)     /* outgoing path done */
+#define	L2CAP_CFG_BOTH  (L2CAP_CFG_IN | L2CAP_CFG_OUT)
+#define	L2CAP_CFG_IN_SENT	(1 << 2)     /* L2CAP ConfigReq sent */
+#define	L2CAP_CFG_OUT_SENT	(1 << 3)     /* ---/--- */
+
 /* L2CAP Information request type codes */
 #define L2CAP_CONNLESS_MTU		0x0001
 #define L2CAP_EXTENDED_MASK	0x0002
