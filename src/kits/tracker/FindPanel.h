@@ -304,6 +304,7 @@ class TAttrView : public BView {
 		void GetDefaultName(BString &result) const;
 
 	private:
+		void AddAttributes(BMenu *, const BMimeType &);
 		void AddMimeTypeAttrs(BMenu *);
 
 		BMenuField *fMenuField;

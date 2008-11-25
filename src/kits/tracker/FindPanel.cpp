@@ -2611,21 +2611,8 @@ TAttrView::AddMimeTypeAttrs()
 
 
 void
-TAttrView::AddMimeTypeAttrs(BMenu *menu)
+TAttrView::AddAttributes(BMenu *menu, const BMimeType &mimeType)
 {
-	FindPanel *mainView = dynamic_cast<FindPanel *>(Parent()->
-		Parent()->FindView("MainView"));
-	if (!mainView)
-		return;
-
-	const char *typeName;
-	if (mainView->CurrentMimeType(&typeName) == NULL)
-		return;
-
-	BMimeType mimeType(typeName);
-	if (!mimeType.IsInstalled())
-		return;
-
 	// only add things to menu which have "user-visible" data
 	BMessage attributeMessage;
 	if (mimeType.GetAttrInfo(&attributeMessage) != B_OK)
@@ -2722,7 +2709,34 @@ TAttrView::AddMimeTypeAttrs(BMenu *menu)
 				break;
 		}
 		submenu->SetTargetForItems(this);
+	}	
+}
+
+
+void
+TAttrView::AddMimeTypeAttrs(BMenu *menu)
+{
+	FindPanel *mainView = dynamic_cast<FindPanel *>(Parent()->
+		Parent()->FindView("MainView"));
+	if (!mainView)
+		return;
+
+	const char *typeName;
+	if (mainView->CurrentMimeType(&typeName) == NULL)
+		return;
+
+	BMimeType mimeType(typeName);
+	if (!mimeType.IsInstalled())
+		return;
+	
+	if (!mimeType.IsSupertypeOnly()) {
+		// add supertype attributes
+		BMimeType supertype;
+		mimeType.GetSupertype(&supertype);
+		AddAttributes(menu, supertype);
 	}
+	
+	AddAttributes(menu, mimeType);
 }
 
 
