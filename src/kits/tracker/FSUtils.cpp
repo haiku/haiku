@@ -3358,6 +3358,7 @@ WellKnowEntryList::Quit()
 	self = NULL;
 }
 
+
 void
 WellKnowEntryList::AddOne(directory_which which, const char *name)
 {
@@ -3365,13 +3366,14 @@ WellKnowEntryList::AddOne(directory_which which, const char *name)
 	if (find_directory(which, &path, true) != B_OK)
 		return;
 	
-	BEntry entry(path.Path());
+	BEntry entry(path.Path(), true);
 	node_ref node;
 	if (entry.GetNodeRef(&node) != B_OK)
 		return;
 	
 	entries.push_back(WellKnownEntry(&node, which, name));
 }
+
 
 void 
 WellKnowEntryList::AddOne(directory_which which, directory_which base,
@@ -3382,7 +3384,7 @@ WellKnowEntryList::AddOne(directory_which which, directory_which base,
 		return;
 	
 	path.Append(extra);
-	BEntry entry(path.Path());
+	BEntry entry(path.Path(), true);
 	node_ref node;
 	if (entry.GetNodeRef(&node) != B_OK)
 		return;
@@ -3390,10 +3392,11 @@ WellKnowEntryList::AddOne(directory_which which, directory_which base,
 	entries.push_back(WellKnownEntry(&node, which, name));
 }
 
+
 void 
 WellKnowEntryList::AddOne(directory_which which, const char *path, const char *name)
 {
-	BEntry entry(path);
+	BEntry entry(path, true);
 	node_ref node;
 	if (entry.GetNodeRef(&node) != B_OK)
 		return;
