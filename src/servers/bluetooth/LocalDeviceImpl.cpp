@@ -76,24 +76,21 @@ printf("### \n");
 	// Events here might have not been initated by us
 	// TODO: ML mark as handled pass a reply by parameter and reply in common
     switch (event->ecode) {
-	        case HCI_EVENT_HARDWARE_ERROR:
-   				//HardwareError(event);    	
-   			return;
-			case HCI_EVENT_CONN_REQUEST:
-				ConnectionRequest((struct hci_ev_conn_request*)(event+1), NULL); // incoming request
-				return;
-			break;
+        case HCI_EVENT_HARDWARE_ERROR:
+			//HardwareError(event);    	
+   		return;
+		case HCI_EVENT_CONN_REQUEST:
+			ConnectionRequest((struct hci_ev_conn_request*)(event+1), NULL);
+		return;
 
-			case HCI_EVENT_CONN_COMPLETE:
-				ConnectionComplete((struct hci_ev_conn_complete*)(event+1), NULL); // should belong to a request? 
-				return;  														   // can be sporadic or initiated by us¿?...
-			break;
+		case HCI_EVENT_CONN_COMPLETE:
+			// should belong to a request?  can be sporadic or initiated by us¿?...
+			ConnectionComplete((struct hci_ev_conn_complete*)(event+1), NULL);					
+		return;
 
-			case HCI_EVENT_PIN_CODE_REQ:
-				PinCodeRequest((struct hci_ev_pin_code_req*)(event+1), NULL);
-				return;
-			break;
-
+		case HCI_EVENT_PIN_CODE_REQ:
+			PinCodeRequest((struct hci_ev_pin_code_req*)(event+1), NULL);
+		return;
 
    		default:
    			// lets go on
@@ -136,10 +133,11 @@ printf("### \n");
     		InquiryResult((uint8*)(event+1), request);
 		break;
 
-		case HCI_EVENT_DISCONNECTION_COMPLETE:
+		case HCI_EVENT_DISCONNECTION_COMPLETE:			
+			// should belong to a request?  can be sporadic or initiated by us¿?...
 			DisconnectionComplete((struct hci_ev_disconnection_complete_reply*)(event+1), request);
 		break;
- 	
+
 		case HCI_EVENT_AUTH_COMPLETE:
 		break;
  			
@@ -484,7 +482,7 @@ LocalDeviceImpl::InquiryComplete(uint8* status, BMessage* request)
 	
 
     printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));
-//    (request->ReturnAddress()).SendMessage(&reply);
+//  (request->ReturnAddress()).SendMessage(&reply);
 
     ClearWantedEvent(request);
 }

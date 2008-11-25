@@ -46,7 +46,8 @@ BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
     fDeviceManager = new DeviceManager();
 	fLocalDevicesList.MakeEmpty();
 
-	fEventListener = spawn_thread(notification_Thread, "BT port listener" , B_DISPLAY_PRIORITY , this);
+	// TODO: Some events should be handled faster than in KL...
+	fEventListener = spawn_thread(notification_Thread, "BT port listener" , B_URGENT_DISPLAY_PRIORITY , this);
 
    
 }
