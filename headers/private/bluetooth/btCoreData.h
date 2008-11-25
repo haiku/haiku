@@ -16,7 +16,7 @@
 #include <bluetooth/HCI/btHCI.h>
 #include <l2cap.h>
 
-#define BT_CORE_DATA_MODULE_NAME "generic/btCoreData/v1"
+#define BT_CORE_DATA_MODULE_NAME "bluetooth/btCoreData/v1"
 
 struct L2capChannel;
 struct L2capFrame;
@@ -40,6 +40,7 @@ struct HciConnection : DoublyLinkedListLinkImpl<HciConnection> {
 	uint16				mtu;
 	connection_status   status;      /* ACL connection state */
 	uint16				lastCid;
+	uint8				lastIdent;
 	DoublyLinkedList<L2capChannel> ChannelList;
 	DoublyLinkedList<L2capFrame> ExpectedResponses;
 	DoublyLinkedList<L2capFrame> OutGoingFrames;
@@ -82,18 +83,12 @@ struct L2capChannel : DoublyLinkedListLinkImpl<L2capChannel> {
 	uint16        		dcid;
 	uint16				psm;
 	uint8				ident;
-
+	uint8				cfgState;
+	
 	channel_status		state;
-
 	ChannelConfiguration*	configuration;
-
-	int					cfgState;
 	L2capEndpoint*		endpoint;
 };
-
-#else
-
-struct L2capChannel;
 
 #endif
 
@@ -126,10 +121,6 @@ struct L2capFrame : DoublyLinkedListLinkImpl<L2capFrame> {
 
     //TODO :struct callout			 timo;		/* RTX/ERTX timeout */
 };
-
-#else
-
-struct L2capFrame;
 
 #endif
 
