@@ -384,13 +384,14 @@ Index::RemoveLastModified(Transaction &transaction, Inode* inode)
 
 status_t
 Index::UpdateLastModified(Transaction &transaction, Inode* inode,
-	off_t modified)
+	bigtime_t modified)
 {
 	ASSERT(inode->InLastModifiedIndex());
 
-	off_t oldModified = inode->OldLastModified();
+	bigtime_t oldModified = inode->OldLastModified();
 	if (modified == -1)
 		modified = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
+	modified &= ~INODE_TIME_MASK;
 	modified |= fVolume->GetUniqueID() & INODE_TIME_MASK;
 
 	status_t status = Update(transaction, "last_modified", B_INT64_TYPE,
