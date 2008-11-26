@@ -51,7 +51,7 @@ public:
 			status_t		RemoveLastModified(Transaction& transaction,
 								Inode* inode);
 			status_t		UpdateLastModified(Transaction& transaction,
-								Inode* inode, off_t modified = -1);
+								Inode* inode, bigtime_t modified = -1);
 
 private:
 							Index(const Index& other);
