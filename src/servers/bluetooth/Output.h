@@ -38,6 +38,7 @@ public:
 	void			AddTab(const char* text, int32 index);
 
 	void            Post(const char* text, uint32 index);
+	int				Postf(uint32 index, const char *format, ...);
 
 private: // functions
 	Output();

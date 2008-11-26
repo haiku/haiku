@@ -4,6 +4,7 @@
 
 #include <Looper.h>
 #include <String.h>
+#include <stdio.h>
 
 /*
 #ifndef _Preferences_h
@@ -16,7 +17,7 @@
 /****************************************************************/
 
 OutputView::OutputView(BRect frame) :
-	BView(frame, "OutputView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	BView(frame, "OutputView", B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	SetViewColor(216,216,216);
 	rgb_color color = {255,255,255};
@@ -46,20 +47,20 @@ OutputView::FrameResized(float width, float height)
 Output* Output::m_instance = 0;
 
 Output::Output() :
-	BWindow(BRect(200,200,600,600), "Output", B_TITLED_WINDOW, B_NOT_RESIZABLE)
+	BWindow(BRect(200,200,600,600), "Output", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
 {
 	BRect b = Bounds();
 
 	fTabsList = new BList(20);
 	fOutputViewsList = new BList(20);
 
-	BView* resetView = new BView(BRect(b.left,b.bottom-25,b.right,b.bottom), "resetView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
+	BView* resetView = new BView(BRect(b.left,b.bottom-25,b.right,b.bottom), "resetView", B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT , B_WILL_DRAW);
 	resetView->SetViewColor(216,216,216);
 	resetView->AddChild(m_pReset = new BButton(BRect(1,1,61,20), "reset all", "Clear", new BMessage(MSG_OUTPUT_RESET), B_FOLLOW_BOTTOM));
 	resetView->AddChild(m_pResetAll = new BButton(BRect(70,1,130,20), "reset", "Clear all", new BMessage(MSG_OUTPUT_RESET_ALL), B_FOLLOW_BOTTOM));
 	AddChild(resetView);
 
-	fTabView = new BTabView(BRect(b.left,b.top,b.right,b.bottom-25), "tab_view", B_WIDTH_FROM_LABEL /*,B_FOLLOW_ALL_SIDES, B_FULL_UPDATE_ON_RESIZE*/);
+	fTabView = new BTabView(BRect(b.left,b.top,b.right,b.bottom-25), "tab_view", B_WIDTH_FROM_LABEL ,B_FOLLOW_ALL, B_FULL_UPDATE_ON_RESIZE | B_WILL_DRAW | B_NAVIGABLE_JUMP );
 	fTabView->SetViewColor(216,216,216); 
 
 	fBounds = fTabView->Bounds(); 
@@ -155,6 +156,24 @@ Output::FrameMoved(BPoint point)
 */
 }
 
+
+int
+Output::Postf(uint32 index, const char *format, ...)
+{
+	char string[200];
+	va_list arg;
+	int done;
+
+	va_start (arg, format);
+	done = vsprintf (string, format, arg);
+	va_end (arg);
+
+	Post(string, index);
+
+	return done;
+}
+
+
 void
 Output::Post(const char* text, uint32 index)
 {
@@ -170,6 +189,7 @@ Output::Post(const char* text, uint32 index)
 	
 	Unlock();
 }
+
 
 void
 Output::Add(const char* text, OutputView* view)
