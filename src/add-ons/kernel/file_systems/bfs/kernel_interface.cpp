@@ -785,7 +785,7 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 		if ((mask & B_STAT_MODIFICATION_TIME) == 0)
 			newTime = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
 		else
-			newTime = stat->st_mtime << INODE_TIME_SHIFT;
+			newTime = (bigtime_t)stat->st_mtime << INODE_TIME_SHIFT;
 
 		if (!inode->InLastModifiedIndex()) {
 			// directory modification times are not part of the index
