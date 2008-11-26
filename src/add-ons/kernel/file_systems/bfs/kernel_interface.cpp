@@ -730,6 +730,7 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 	inode->WriteLockInTransaction(transaction);
 
 	bfs_inode& node = inode->Node();
+	bool updateTime = false;
 
 	if ((mask & B_STAT_SIZE) != 0) {
 		// Since WSTAT_SIZE is the only thing that can fail directly, we
@@ -755,33 +756,44 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 				Index index(volume);
 				index.UpdateSize(transaction, inode);
 
-				if ((mask & B_STAT_MODIFICATION_TIME) == 0)
-					index.UpdateLastModified(transaction, inode);
+				updateTime = true;
 			}
 		}
 	}
+
+	// Note, the following changes (mode/uid/gid) would update st_ctime;
+	// since we don't have that, we'll use st_mtime instead.
 
 	if ((mask & B_STAT_MODE) != 0) {
 		PRINT(("original mode = %ld, stat->st_mode = %d\n", node.Mode(), stat->st_mode));
 		node.mode = HOST_ENDIAN_TO_BFS_INT32((node.Mode() & ~S_IUMSK)
 			| (stat->st_mode & S_IUMSK));
+		updateTime = true;
 	}
 
-	if ((mask & B_STAT_UID) != 0)
+	if ((mask & B_STAT_UID) != 0) {
 		node.uid = HOST_ENDIAN_TO_BFS_INT32(stat->st_uid);
-	if ((mask & B_STAT_GID) != 0)
+		updateTime = true;
+	}
+	if ((mask & B_STAT_GID) != 0) {
 		node.gid = HOST_ENDIAN_TO_BFS_INT32(stat->st_gid);
+		updateTime = true;
+	}
 
-	if ((mask & B_STAT_MODIFICATION_TIME) != 0) {
+	if ((mask & B_STAT_MODIFICATION_TIME) != 0 || updateTime) {
+		bigtime_t newTime;
+		if ((mask & B_STAT_MODIFICATION_TIME) == 0)
+			newTime = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
+		else
+			newTime = stat->st_mtime << INODE_TIME_SHIFT;
+
 		if (!inode->InLastModifiedIndex()) {
 			// directory modification times are not part of the index
-			node.last_modified_time = HOST_ENDIAN_TO_BFS_INT64(
-				(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
+			node.last_modified_time = HOST_ENDIAN_TO_BFS_INT64(newTime);
 		} else if (!inode->IsDeleted()) {
 			// Index::UpdateLastModified() will set the new time in the inode
 			Index index(volume);
-			index.UpdateLastModified(transaction, inode,
-				(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
+			index.UpdateLastModified(transaction, inode, newTime);
 		}
 	}
 	if ((mask & B_STAT_CREATION_TIME) != 0) {
