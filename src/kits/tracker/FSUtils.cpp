@@ -112,7 +112,7 @@ status_t CalcItemsAndSize(BObjectList<entry_ref> *refList, int32 *totalCount, of
 status_t MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc,
 	uint32 moveMode, const char *newName, Undo &undo);
 ConflictCheckResult PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
-	int32 *collisionCount);
+	int32 *collisionCount, uint32 moveMode);
 status_t CheckName(uint32 moveMode, const BEntry *srcEntry, const BDirectory *destDir,
 	bool multipleCollisions, ConflictCheckResult &);
 void CopyAttributes(CopyLoopControl *control, BNode *srcNode, BNode* destNode, void *buffer,
@@ -141,8 +141,8 @@ const char *kReplaceStr = "You are trying to replace the item:\n"
 	"\t%s%s\n\n"
 	"Would you like to replace it with the one you are %s?";
 
-const char *kDirectoryReplaceStr = "An item named \"%s\" already exists in this folder. "
-	"Would you like to replace it with the one you are %s?";
+const char *kDirectoryReplaceStr = "An item named \"%s\" already exists in this folder, and may contain\n"
+	"items with the same names. Would you like to replace them with those contained in the folder you are %s?";
 
 const char *kSymLinkReplaceStr = "An item named \"%s\" already exists in this folder. "
 	"Would you like to replace it with the symbolic link you are creating?";
@@ -579,7 +579,7 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 		*preflightResult = kPrompt;
 		*collisionCount = 0;
 
-		*preflightResult = PreFlightNameCheck(srcList, destDir, collisionCount);
+		*preflightResult = PreFlightNameCheck(srcList, destDir, collisionCount, moveMode);
 		if (*preflightResult == kCanceled)		// user canceled
 			return B_ERROR;
 	}
@@ -588,6 +588,7 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 	switch (moveMode) {
 		case kCopySelectionTo:
 		case kDuplicateSelection:
+		case kMoveSelectionTo:
 			{
 				if (gStatusWindow)
 					gStatusWindow->CreateStatusItem(thread, kCopyState);
@@ -610,7 +611,6 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 				break;
 			}
 
-		case kMoveSelectionTo:
 		case kCreateLink:
 			if (numItems > 10) {
 				// this will be fast, only put up status if lots of items
@@ -703,9 +703,6 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	}
 
 	// change the move mode if needed
-	if (moveMode == kMoveSelectionTo && srcVolumeDevice != destVolumeDevice)
-		// move across volumes - copy instead
-		moveMode = kCopySelectionTo;
 	if (moveMode == kCopySelectionTo && destIsTrash)
 		// cannot copy to trash
 		moveMode = kMoveSelectionTo;
@@ -908,13 +905,11 @@ CopyFile(BEntry *srcFile, StatStruct *srcStat, BDirectory *destDir,
 				return;
 
 			case TrackerCopyLoopControl::kReplace:
-				if (conflictingEntry.IsDirectory()) 
-					// remove existing folder recursively
-					ThrowOnError(FSDeleteFolder(&conflictingEntry, loopControl, false));
-				else
+				if (!conflictingEntry.IsDirectory()) {
 					ThrowOnError(conflictingEntry.Remove());
-				break;
-
+					break;
+				}
+				// fall through if not a directory
 			case TrackerCopyLoopControl::kMerge:
 				// This flag implies that the attributes should be kept
 				// on the file.  Just ignore it.
@@ -1174,7 +1169,7 @@ CopyAttributes(CopyLoopControl *control, BNode *srcNode, BNode *destNode, void *
 
 static void
 CopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
-	BPoint *loc, bool makeOriginalName, Undo &undo)
+	BPoint *loc, bool makeOriginalName, Undo &undo, bool removeSource = false)
 {
 	BDirectory newDir;
 	BEntry entry;
@@ -1209,16 +1204,14 @@ CopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
 				// we are about to ignore this entire directory
 				return;
 
+			
 			case TrackerCopyLoopControl::kReplace:
-				if (isDirectory) 
-					// remove existing folder recursively
-					ThrowOnError(FSDeleteFolder(&existingEntry, loopControl, false));
-
-				else
+				if (!isDirectory) {
 					// conflicting with a file or symbolic link, remove entry
 					ThrowOnError(existingEntry.Remove());
-				break;
-
+					break;
+				}
+			// fall through if directory, do not replace.
 			case TrackerCopyLoopControl::kMerge:
 				ASSERT(isDirectory);
 				// do not create a new directory, use the current one
@@ -1231,7 +1224,6 @@ CopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
 	// loop through everything in src folder and copy it to new folder
 	BDirectory srcDir(srcEntry);
 	srcDir.Rewind();
-	srcEntry->Unset();
 
 	// create a new folder inside of destination folder
 	if (createDirectory) {
@@ -1284,12 +1276,56 @@ CopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
 				continue;
 			}
 			
-			CopyFolder(&entry, &newDir, loopControl, 0, false, undo);
-		} else
+			CopyFolder(&entry, &newDir, loopControl, 0, false, undo, removeSource);
+			if (removeSource)
+				FSDeleteFolder(&entry, loopControl, true, true, false);
+		} else {
 			CopyFile(&entry, &statbuf, &newDir, loopControl, 0, false, undo);
+			if (removeSource)
+				entry.Remove();
+		}
 	}
+	if (removeSource)
+		srcEntry->Remove();
+	else
+		srcEntry->Unset();
 }
 
+
+status_t
+RecursiveMove(BEntry *entry, BDirectory *destDir)
+{
+	TrackerCopyLoopControl loopControl(find_thread(NULL));
+	char name[B_FILE_NAME_LENGTH];
+	if (entry->GetName(name) == B_OK) {
+		if (destDir->Contains(name)) {
+			BPath path (destDir, name);
+			BDirectory subDir (path.Path());
+			entry_ref ref;
+			entry->GetRef(&ref);
+			BDirectory source(&ref);
+			if (source.InitCheck() == B_OK) {
+				source.Rewind();
+				BEntry current;
+				while (source.GetNextEntry(&current) == B_OK) {
+					if (current.IsDirectory()) {
+						RecursiveMove(&current, &subDir);
+						current.Remove();
+					} else {
+						current.GetName(name);
+						if (loopControl.OverwriteOnConflict(&current, name, &subDir, true, false) != TrackerCopyLoopControl::kSkip)
+							MoveError::FailOnError(current.MoveTo(&subDir, NULL, true));
+					}
+				}
+			}
+			entry->Remove();
+		} else {
+			MoveError::FailOnError(entry->MoveTo(destDir));
+		}
+	}
+	
+	return B_OK;
+}	
 
 status_t
 MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc, uint32 moveMode,
@@ -1299,7 +1335,6 @@ MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc, uint32 moveMode,
 	try {
 		node_ref destNode;
 		StatStruct statbuf;
-
 		MoveError::FailOnError(entry->GetStat(&statbuf));
 		MoveError::FailOnError(entry->GetRef(&ref));
 		MoveError::FailOnError(destDir->GetNodeRef(&destNode));	
@@ -1412,16 +1447,19 @@ MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc, uint32 moveMode,
 			thread_id thread = find_thread(NULL);
 			if (gStatusWindow && gStatusWindow->HasStatus(thread))
 				gStatusWindow->UpdateStatus(thread, ref.name, 1);
-
+			if (entry->IsDirectory())
+				return RecursiveMove(entry, destDir);
 			MoveError::FailOnError(entry->MoveTo(destDir, newName));
 		} else {
 			TrackerCopyLoopControl loopControl(find_thread(NULL));
-
 			bool makeOriginalName = (moveMode == kDuplicateSelection);
-			if (S_ISDIR(statbuf.st_mode))
-				CopyFolder(entry, destDir, &loopControl, loc, makeOriginalName, undo);
-			else
+			if (S_ISDIR(statbuf.st_mode)) {
+				CopyFolder(entry, destDir, &loopControl, loc, makeOriginalName, undo, moveMode == kMoveSelectionTo);
+			} else {
 				CopyFile(entry, &statbuf, destDir, &loopControl, loc, makeOriginalName, undo);
+				if (moveMode == kMoveSelectionTo)				
+					entry->Remove();
+			}
 		}
 	} catch (status_t error) {
 		// no alert, was already taken care of before
@@ -1648,7 +1686,7 @@ MoveEntryToTrash(BEntry *entry, BPoint *loc, Undo &undo)
 
 ConflictCheckResult
 PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
-	int32 *collisionCount)
+	int32 *collisionCount, uint32 moveMode)
 {
 
 	// count the number of name collisions in dest folder
@@ -1662,20 +1700,15 @@ PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
 		entry.GetParent(&parent);
 
 		if (parent != *destDir) {
-			if (destDir->Contains(srcRef->name))
+			if (destDir->Contains(srcRef->name)) 
 				(*collisionCount)++;
 		}
 	}
-
+	
 	// prompt user only if there is more than one collision, otherwise the
 	// single collision case will be handled as a "Prompt" case by CheckName
-	if (*collisionCount > 1) {
-		entry_ref *srcRef = (entry_ref*)srcList->FirstItem();
-
-		StatStruct statbuf;
-		destDir->GetStat(&statbuf);
-		
-		const char *verb = (srcRef->device == statbuf.st_dev) ? "moving" : "copying";
+	if (*collisionCount > 0) {
+		const char *verb = (moveMode == kMoveSelectionTo) ? "moving" : "copying";
 		char replaceMsg[256];
 		sprintf(replaceMsg, kReplaceManyStr, verb, verb);
 		
@@ -1812,9 +1845,8 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry, const BDirectory *destDir,
 
 		// special case single collision (don't need Replace All shortcut)
 		BAlert *alert;
-		if (multipleCollisions)
-			alert = new BAlert("", replaceMsg, "Skip", "Replace All",
-				"Replace");
+		if (multipleCollisions || sourceIsDirectory)
+			alert = new BAlert("", replaceMsg, "Skip", "Replace All");
 		else
 			alert = new BAlert("", replaceMsg, "Cancel", "Replace");
 
@@ -1822,7 +1854,7 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry, const BDirectory *destDir,
 			case 0:		// user selected "Cancel" or "Skip"
 				replaceAll = kCanceled;
 				return B_ERROR;
-
+			
 			case 1:		// user selected "Replace" or "Replace All"
 				replaceAll = kReplaceAll;
 					// doesn't matter which since a single
@@ -1833,11 +1865,11 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry, const BDirectory *destDir,
 	}
 
 	// delete destination item
-	if (destIsDir) {
+	if (!destIsDir) {
 		TrackerCopyLoopControl loopControl(find_thread(NULL));
-		err = FSDeleteFolder(&entry, &loopControl, false);
-	} else
 		err = entry.Remove();
+	} else
+		return B_OK;
 
 	if (err != B_OK) {
 		BString error;
@@ -1862,7 +1894,6 @@ FSDeleteFolder(BEntry *dir_entry, CopyLoopControl *loopControl, bool update_stat
 
 	dir.SetTo(dir_entry);
 	dir.Rewind();
-
 	// loop through everything in folder and delete it, skipping trouble files
 	for (;;) {
 		if (dir.GetNextEntry(&entry) != B_OK)
@@ -1898,7 +1929,7 @@ FSDeleteFolder(BEntry *dir_entry, CopyLoopControl *loopControl, bool update_stat
 	if (update_status && delete_top_dir)
 		loopControl->UpdateStatus(NULL, ref, 1);
 
-	if (delete_top_dir)
+	if (delete_top_dir) 
 		return dir_entry->Remove();
 	else
 		return B_OK;
