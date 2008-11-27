@@ -15,6 +15,7 @@ UsePrivateHeaders net bluetooth ;
 
 KernelAddon bluetooth :
 	bluetooth.cpp
+	acl.cpp
 ;
 
 # Installation
