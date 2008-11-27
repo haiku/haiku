@@ -14,8 +14,8 @@
 
 /* net buffer utils for ACL, to be reviewed */
 #define DEVICEFIELD type
-#define SET_DEVICE(nbuf,hid) (nbuf->DEVICEFIELD=(nbuf->DEVICEFIELD&0xFFF0)|(hid&0xF))
-#define GET_DEVICE(nbuf) fetch_device(NULL,(nbuf->DEVICEFIELD&0x0F))
+#define SET_DEVICE(nbuf,hid) (nbuf->DEVICEFIELD=(nbuf->DEVICEFIELD&0xFFFFFF00)|(hid&0xFF))
+#define GET_DEVICE(nbuf) fetch_device(NULL,(nbuf->DEVICEFIELD&0xFF))
 
 #define COOKIEFIELD flags 
 void* nb_get_whole_buffer(net_buffer* nbuf); 

@@ -33,7 +33,8 @@ nb_get_whole_buffer(net_buffer* nbuf)
     err = nb->direct_access(nbuf, 0, nbuf->size, &conPointer);
 
     if (err != B_OK) {
-		panic("I expected to be contiguous:(");
+		snooze(3*1000*1000);
+		panic("expected to be contiguous");
 		#if 0
 		/* pity, we are gonna need a realocation */
 		nbuf->COOKIEFIELD = (uint32) malloc(nbuf->size);

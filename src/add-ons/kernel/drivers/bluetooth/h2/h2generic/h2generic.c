@@ -41,10 +41,11 @@ static char* hci_name = BT_HCI_MODULE_NAME;
 static char* btDevices_name = NET_BLUETOOTH_DEVICE_NAME;
 
 
-usb_module_info *usb = NULL;
-bt_hci_module_info *hci = NULL;
-struct net_device_module_info* btDevices;
-struct net_buffer_module_info *nb = NULL;
+usb_module_info* usb = NULL;
+bt_hci_module_info* hci = NULL;
+struct net_device_module_info* btDevices = NULL;
+struct net_buffer_module_info* nb = NULL;
+struct bluetooth_core_data_module_info* btCoreData = NULL;
 
 /* Driver Global data */
 static char	 *publish_names[MAX_BT_GENERIC_USB_DEVICES];
@@ -52,6 +53,8 @@ static char	 *publish_names[MAX_BT_GENERIC_USB_DEVICES];
 int32 		dev_count = 0;	/* number of connected devices */
 static bt_usb_dev*	bt_usb_devices[MAX_BT_GENERIC_USB_DEVICES];
 sem_id 		dev_table_sem = -1; /* sem to synchronize access to device table */
+
+status_t submit_nbuffer(hci_id hid, net_buffer* nbuf);
 
 usb_support_descriptor supported_devices[] =
 {
@@ -175,7 +178,7 @@ fetch_device(bt_usb_dev* dev, hci_id hid)
 {
     int i;
 
-	debugf("(%p)\n", dev);
+//	debugf("(%p) or %d\n", dev, hid);
 
 	acquire_sem(dev_table_sem);
     if (dev != NULL)
@@ -205,15 +208,6 @@ fetch_device(bt_usb_dev* dev, hci_id hid)
 #pragma mark -
 #endif
 
-static bt_hci_transport bt_usb_hooks =
-{
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	H2,
-	"H2 Bluetooth Device"
-};
 
 /* called by USB Manager when device is added to the USB */
 static status_t
@@ -401,6 +395,36 @@ static usb_notify_hooks notify_hooks =
 #pragma mark -
 #endif
 
+status_t
+submit_nbuffer(hci_id hid, net_buffer* nbuf)
+{
+	bt_usb_dev* bdev = NULL;
+
+	bdev = fetch_device(NULL, hid);
+
+	debugf("index=%lx nbuf=%p bdev=%p\n",hid, nbuf, bdev);
+	if (bdev != NULL) {
+		switch (nbuf->protocol) {
+			case BT_COMMAND:
+				// not issed this way
+			break;
+			
+			case BT_ACL:
+				return submit_tx_acl(bdev, nbuf);			
+			break;
+
+			default:
+				panic("submit_nbuffer: no protocol");
+			break;
+		
+		}
+	}
+
+	return B_ERROR;
+
+}
+
+
 /* implements the POSIX open() */
 static status_t
 device_open(const char *name, uint32 flags, void **cookie)
@@ -458,10 +482,13 @@ device_open(const char *name, uint32 flags, void **cookie)
 		struct net_device* ndev;
 		//	TODO: Fill the transport descriptor
 	    err = btDevices->init_device(bdev->name, &ndev);
-
+		
     	if ( err == B_OK ) {
-    		hdev = ndev->index;
-    		bdev->ndev = ndev;
+    		bdev->hdev = hdev = ndev->index; // get the index
+    		bdev->ndev = ndev;  // get the net_device
+
+    		ndev->media = (uint32) submit_nbuffer; //XXX: interlayer-Hack
+
  		} else
 	        hdev = bdev->num; /* XXX: Lets try to go on*/
     } else {
@@ -685,20 +712,24 @@ init_driver(void)
 	int j;
 	flowf("init_driver()\n");
 
+	if (get_module(BT_CORE_DATA_MODULE_NAME,(module_info**)&btCoreData) != B_OK) {
+		debugf("cannot get module \"%s\"\n", BT_CORE_DATA_MODULE_NAME);
+		return B_ERROR;
+	} else
+		debugf("BT_CORE_DATA_MODULE_NAME module at %p\n", btDevices);
 
 	// BT devices MODULE INITS
 	if (get_module(btDevices_name,(module_info**)&btDevices) != B_OK) {
 		debugf("cannot get module \"%s\"\n", btDevices_name);
-		return B_ERROR;
+		goto err_release3;
 	} else
 		debugf("btDevices module at %p\n", btDevices);
-
 
 	// HCI MODULE INITS
 	if (get_module(hci_name,(module_info**)&hci) != B_OK) {
 		debugf("cannot get module \"%s\"\n", hci_name);
 #ifndef BT_SURVIVE_WITHOUT_HCI
-		return err_release2;
+		goto err_release2;
 #endif
 	} else {
 		debugf("hci module at %p\n", hci);
@@ -744,8 +775,13 @@ err_release:
 	put_module(usb_name);
 err_release1:
 	put_module(hci_name);
+#ifndef BT_SURVIVE_WITHOUT_HCI
 err_release2:
+#endif
 	put_module(btDevices_name);
+err_release3:
+	put_module(BT_CORE_DATA_MODULE_NAME);
+	
 	return B_ERROR;
 }
 

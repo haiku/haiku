@@ -55,7 +55,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 
 	while (count) {
 
-		debugf("count %d nb=%p sb=%p type=%d\n",count, nbuf, snbuf, type);
+		//debugf("count %d nb=%p sb=%p type=%d\n",count, nbuf, snbuf, type);
 
 		if ( (type != BT_EVENT && nbuf == NULL) ||
 			(type == BT_EVENT && (snbuf == NULL || snb_completed(snbuf))) ) {
@@ -310,7 +310,7 @@ command_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	snet_buffer* snbuf = (snet_buffer*) cookie;
 	bt_usb_dev* bdev = snb_cookie(snbuf);
 
-	debugf("%ld %02x:%02x:%02x:\n", actual_len, ((uint8*)data)[0],((uint8*)data)[1],((uint8*)data)[2]);
+	debugf("%ld @ %p\n", actual_len, data);
 
 	if (status != B_OK) {
 		bdev->stat.successfulTX++;
@@ -339,6 +339,8 @@ acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 {
 	net_buffer* nbuf = (net_buffer*) cookie;
 	bt_usb_dev* bdev = GET_DEVICE(nbuf);
+
+	debugf("fetched=%p status=%ld nbuftype %lx B%p\n",bdev, status, nbuf->type, data);
 
 	if (status != B_OK) {
 
@@ -378,6 +380,8 @@ submit_tx_command(bt_usb_dev* bdev, snet_buffer* snbuf)
 	/* set cookie */
 	snb_set_cookie(snbuf, bdev);
 
+	debugf("@%p\n", snb_get(snbuf));
+
 	err = usb->queue_request(bdev->dev, bRequestType, bRequest,
 								value, wIndex, wLength,
 								snb_get(snbuf), wLength //???
@@ -396,13 +400,20 @@ status_t
 submit_tx_acl(bt_usb_dev* bdev, net_buffer* nbuf)
 {
 	status_t err;
+	int32 index;
 
 	/* set cookie */
-	SET_DEVICE(nbuf,bdev->hdev);
+	SET_DEVICE(nbuf, bdev->hdev);
 
 	if (!GET_BIT(bdev->state, RUNNING) ) {
 		return B_DEV_NOT_READY;
 	}
+
+	debugf("### Outgoing ACL: len = %ld\n", nbuf->size);
+	for (index = 0 ; index < nbuf->size; index++ ) {
+		dprintf("%x:",((uint8*)nb_get_whole_buffer(nbuf))[index]);
+	}
+	flowf("### \n");
 
 	err = usb->queue_bulk(bdev->bulk_out_ep->handle,
 						nb_get_whole_buffer(nbuf), nbuf->size,

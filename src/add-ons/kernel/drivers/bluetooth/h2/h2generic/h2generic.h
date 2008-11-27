@@ -18,6 +18,8 @@
 #include <bluetooth/HCI/btHCI.h>
 #include <bluetooth/HCI/btHCI_module.h>
 
+#include <btCoreData.h>
+
 #include "snet_buffer.h"
 
 /* USB definitions for the generic device*/
@@ -40,6 +42,7 @@ extern usb_module_info* usb;
 extern bt_hci_module_info* hci;
 extern struct net_device_module_info* btDevices;
 extern struct net_buffer_module_info* nb;
+extern struct bluetooth_core_data_module_info* btCoreData;
 
 #define MAX_COMMAND_WINDOW 1
 #define MAX_ACL_OUT_WINDOW 4
