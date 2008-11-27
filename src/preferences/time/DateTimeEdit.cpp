@@ -18,6 +18,9 @@
 #include <Window.h>
 
 
+#include <stdlib.h>
+
+
 using BPrivate::B_LOCAL_TIME;
 
 
@@ -40,20 +43,20 @@ TTimeEdit::KeyDown(const char* bytes, int32 numBytes)
 {
 	TSectionEdit::KeyDown(bytes, numBytes);
 
-	BMessage* keyDownMsg = Window()->CurrentMessage();
-	int32 number;
-	keyDownMsg->FindInt32("raw_char", &number);
-	// only accept int
-	if (number < 48 || number > 57)
+	// only accept valid input
+	int32 number = atoi(bytes);
+	if (number - 1 < 0)
 		return;
-	number -= 48;
+
 	int32 section = FocusIndex();
 	if (section < 0 || section > 2)
 		return;
 	
 	bigtime_t currentTime = system_time();
 	if (currentTime - fLastKeyDownTime < 1000000) {
-		number += fLastKeyDownInt * 10;
+		int32 doubleDigi = number + fLastKeyDownInt * 10;
+		if (_IsValidDoubleDigi(doubleDigi))
+			number = doubleDigi;
 		fLastKeyDownTime = 0;
 	}
 	else {
@@ -339,6 +342,37 @@ TTimeEdit::_CheckRange()
 }
 
 
+bool
+TTimeEdit::_IsValidDoubleDigi(int32 value)
+{
+	bool isInRange = false;
+	switch (fFocus) {
+		case 0:
+		{	// hour
+			if (value <= 23) 
+				isInRange = true;
+		}	break;
+
+		case 1:
+		{	// minute
+			if (value <= 59)
+				isInRange = true;
+		}	break;
+
+		case 2:
+		{	// second
+			if (value <= 59)
+				isInRange = true;
+		}	break;
+
+		default:
+			return isInRange;
+	}
+
+	return isInRange;
+}
+
+
 int32
 TTimeEdit::_SectionValue(int32 index) const
 {
@@ -386,20 +420,20 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 {
 	TSectionEdit::KeyDown(bytes, numBytes);
 
-	BMessage* keyDownMsg = Window()->CurrentMessage();
-	int32 number;
-	keyDownMsg->FindInt32("raw_char", &number);
-	// only accept int
-	if (number < 48 || number > 57)
+	// only accept valid input
+	int32 number = atoi(bytes);
+	if (number - 1 < 0)
 		return;
-	number -= 48;
+
 	int32 section = FocusIndex();
 	if (section < 1 || section > 2)
 		return;
 	
 	bigtime_t currentTime = system_time();
 	if (currentTime - fLastKeyDownTime < 1000000) {
-		number += fLastKeyDownInt * 10;
+		int32 doubleDigi = number + fLastKeyDownInt * 10;
+		if (_IsValidDoubleDigi(doubleDigi))
+			number = doubleDigi;
 		fLastKeyDownTime = 0;
 	}
 	else {
@@ -408,8 +442,12 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 	}
 	
 	// if year add 2000
-	if (section == 2)
-		number += 2000;
+	if (section == 2) {
+		int32 oldCentury = int32(fHoldValue / 100) * 100;
+		if (number < 10 && oldCentury == 1900)
+			number += 70;
+		number += oldCentury;
+	}
 	// update display value
 	fHoldValue = number;
 	
@@ -646,6 +684,35 @@ TDateEdit::_CheckRange()
 
 	fHoldValue = value;
 	Draw(Bounds());
+}
+
+
+bool
+TDateEdit::_IsValidDoubleDigi(int32 value)
+{
+	bool isInRange = false;
+	int32 year = 0;
+	switch (fFocus) {
+		case 1:
+		{	// day
+			//day
+			int32 days = fDate.DaysInMonth();
+			if (value <= days)
+				isInRange = true;
+		}	break;
+
+		case 2:
+		{	//year
+			year = int32(fHoldValue / 100) * 100 + value;
+			if (year <= 2037 && year >= 1970)
+				isInRange = true;
+		}	break;
+
+		default:
+			return isInRange;
+	}
+
+	return isInRange;
 }
 
 

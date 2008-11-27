@@ -45,6 +45,7 @@ class TTimeEdit : public TSectionEdit {
 
 	private:
 		void			_CheckRange();
+		bool			_IsValidDoubleDigi(int32 value);
 		int32			_SectionValue(int32 index) const;
 
 	private:
@@ -77,6 +78,7 @@ class TDateEdit : public TSectionEdit {
 
 	private:
 		void			_CheckRange();
+		bool			_IsValidDoubleDigi(int32 value);
 		int32			_SectionValue(int32 index) const;
 
 	private:
