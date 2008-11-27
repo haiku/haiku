@@ -1,18 +1,14 @@
 #include "L2capEndpoint.h"
 
-
 #include <stdio.h>
 #include <sys/stat.h>
 #include <string.h>
 
-
-#include "l2cap_internal.h"
 #include "l2cap_address.h"
 
 #include <bluetooth/L2CAP/btL2CAP.h>
 #define BT_DEBUG_THIS_MODULE
 #include <btDebug.h>
-
 
 static inline bigtime_t
 absolute_timeout(bigtime_t timeout)
@@ -33,7 +29,19 @@ L2capEndpoint::L2capEndpoint(net_socket* socket)
 {
 	debugf("[%ld] %p->L2capEndpoint::L2capEndpoint()\n", find_thread(NULL), this);
 
+	/* Set MTU and flow control settings to defaults */
+	configuration.imtu = L2CAP_MTU_DEFAULT;
+	memcpy(&configuration.iflow, &default_qos , sizeof(l2cap_flow_t) );
 
+	configuration.omtu = L2CAP_MTU_DEFAULT;
+	memcpy(&configuration.oflow, &default_qos , sizeof(l2cap_flow_t) );
+
+	configuration.flush_timo = L2CAP_FLUSH_TIMO_DEFAULT;
+	configuration.link_timo  = L2CAP_LINK_TIMO_DEFAULT;
+
+	configurationSet = false;
+
+	gStackModule->init_fifo(&fReceivingFifo, "l2cap recvfifo", L2CAP_MTU_DEFAULT);
 }
 
 
@@ -162,7 +170,7 @@ L2capEndpoint::Connect(const struct sockaddr *_address)
 	if (_address->sa_family != AF_BLUETOOTH)
 		return(EAFNOSUPPORT);
 
-	debugf("[%ld] %p->UnixEndpoint::Connect(\"%s\")\n", find_thread(NULL), this,
+	debugf("[%ld] %p->L2capEndpoint::Connect(\"%s\")\n", find_thread(NULL), this,
 		ConstSocketAddress(&gL2cap4AddressModule, _address).AsString().Data());
 
 	const sockaddr_l2cap* address = (const sockaddr_l2cap*)_address;
@@ -177,7 +185,7 @@ L2capEndpoint::Connect(const struct sockaddr *_address)
 status_t
 L2capEndpoint::Accept(net_socket **_acceptedSocket)
 {
-	debugf("[%ld] %p->UnixEndpoint::Accept()\n", find_thread(NULL), this);
+	debugf("[%ld] %p->L2capEndpoint::Accept()\n", find_thread(NULL), this);
 
 	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
 
@@ -190,7 +198,7 @@ ssize_t
 L2capEndpoint::Send(const iovec *vecs, size_t vecCount,
 	ancillary_data_container *ancillaryData)
 {
-	debugf("[%ld] %p->UnixEndpoint::Send(%p, %ld, %p)\n", find_thread(NULL),
+	debugf("[%ld] %p->L2capEndpoint::Send(%p, %ld, %p)\n", find_thread(NULL),
 		this, vecs, vecCount, ancillaryData);
 
 	return B_OK;
@@ -202,7 +210,7 @@ L2capEndpoint::Receive(const iovec *vecs, size_t vecCount,
 	ancillary_data_container **_ancillaryData, struct sockaddr *_address,
 	socklen_t *_addressLength)
 {
-	debugf("[%ld] %p->UnixEndpoint::Receive(%p, %ld)\n", find_thread(NULL),
+	debugf("[%ld] %p->L2capEndpoint::Receive(%p, %ld)\n", find_thread(NULL),
 		this, vecs, vecCount);
 
 
@@ -211,9 +219,18 @@ L2capEndpoint::Receive(const iovec *vecs, size_t vecCount,
 
 
 ssize_t
+L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
+{
+
+	return gStackModule->fifo_dequeue_buffer(&fReceivingFifo, flags, B_INFINITE_TIMEOUT, _buffer);
+
+}
+
+
+ssize_t
 L2capEndpoint::Sendable()
 {
-	debugf("[%ld] %p->UnixEndpoint::Sendable()\n", find_thread(NULL), this);
+	debugf("[%ld] %p->L2capEndpoint::Sendable()\n", find_thread(NULL), this);
 
 
 	return 0;
@@ -223,7 +240,7 @@ L2capEndpoint::Sendable()
 ssize_t
 L2capEndpoint::Receivable()
 {
-	debugf("[%ld] %p->UnixEndpoint::Receivable()\n", find_thread(NULL), this);
+	debugf("[%ld] %p->L2capEndpoint::Receivable()\n", find_thread(NULL), this);
 
 	return 0;
 }
@@ -242,10 +259,20 @@ L2capEndpoint::ForPsm(uint16 psm)
 		endpoint = iterator.Next();
 		if (((struct sockaddr_l2cap*)&endpoint->socket->address)->l2cap_psm == psm && 
 			endpoint->fState == LISTEN) {
-			// TODO endpoint ocupied, lock it!
+			// TODO endpoint ocupied, lock it! define a channel for it
 			return endpoint;
 		}
 	}
 
 	return NULL;
+}
+
+
+void
+L2capEndpoint::BindToChannel(L2capChannel* channel)
+{
+
+	this->channel = channel;
+	channel->configuration = &configuration;	
+
 }

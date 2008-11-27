@@ -12,6 +12,9 @@
 #include <net_socket.h>
 #include <ProtocolUtilities.h>
 
+#include "l2cap_internal.h"
+
+extern net_stack_module_info* gStackModule;
 
 class L2capEndpoint : public net_protocol, 
 					  public ProtocolSocket,
@@ -50,7 +53,7 @@ public:
 	ssize_t Receive(const iovec *vecs, size_t vecCount,
 		ancillary_data_container **_ancillaryData, struct sockaddr *_address,
 		socklen_t *_addressLength);
-
+	ssize_t ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer);
 	ssize_t Sendable();
 	ssize_t Receivable();
 
@@ -59,8 +62,16 @@ public:
 
 	status_t Shutdown(int direction);
 
+	void 	BindToChannel(L2capChannel* channel);
+
 	static   L2capEndpoint* ForPsm(uint16 psm);
 
+	ChannelConfiguration configuration;
+	L2capChannel*	channel;
+
+	bool configurationSet;
+	net_fifo		fReceivingFifo;
+	
 private:
 	typedef enum {
 		// establishing a connection
@@ -80,13 +91,12 @@ private:
 		CLOSING,
 		TIME_WAIT
 	} State;
-	
-private:
+
 	mutex			fLock;
 	State    		fState;
 	L2capEndpoint*	fPeerEndpoint;
 	sem_id			fAcceptSemaphore;
-	
+
 };
 
 

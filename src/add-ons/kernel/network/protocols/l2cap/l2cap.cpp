@@ -37,7 +37,6 @@
 #include "L2capEndpoint.h"
 
 #include <bluetooth/HCI/btHCI_acl.h>
-#include <BTCoreData.h>
 #include <btModules.h>
 
 #define BT_DEBUG_THIS_MODULE
@@ -49,20 +48,13 @@
 typedef NetBufferField<uint16, offsetof(hci_acl_header, alen)> AclLenField;
 DoublyLinkedList<L2capEndpoint> EndpointList;
 
-
-struct l2cap_protocol : net_protocol {
-
-};
-
-
 extern net_protocol_module_info gL2CAPModule;
-
-
 
 // module references
 bluetooth_core_data_module_info *btCoreData;
+
 net_buffer_module_info *gBufferModule;
-net_stack_module_info *sStackModule;
+net_stack_module_info *gStackModule;
 net_socket_module_info *gSocketModule;
 
 static struct net_domain *sDomain;
@@ -167,7 +159,9 @@ l2cap_setsockopt(net_protocol *protocol, int level, int option,
 	const void *value, int length)
 {
 	flowf("\n");
-	
+
+	((L2capEndpoint*)protocol)->configurationSet = true;
+
 /*	return protocol->next->module->setsockopt(protocol->next, level, option, value, length); */
 	return EOPNOTSUPP;
 }
@@ -238,8 +232,8 @@ l2cap_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
 	net_buffer **_buffer)
 {
 	flowf("\n");
-	
-	return B_ERROR;
+
+	return ((L2capEndpoint*)protocol)->ReadData(numBytes, flags, _buffer);
 }
 
 
@@ -315,20 +309,20 @@ l2cap_std_ops(int32 op, ...)
 	switch (op) {
 		case B_MODULE_INIT:
 		{
-			error = sStackModule->register_domain_protocols(AF_BLUETOOTH, SOCK_STREAM, BLUETOOTH_PROTO_L2CAP,
+			error = gStackModule->register_domain_protocols(AF_BLUETOOTH, SOCK_STREAM, BLUETOOTH_PROTO_L2CAP,
 				"network/protocols/l2cap/v1",
 				NULL);
 			if (error != B_OK) {
 				return error;
 			}
 
-			error = sStackModule->register_domain_receiving_protocol(AF_BLUETOOTH, BLUETOOTH_PROTO_L2CAP,
+			error = gStackModule->register_domain_receiving_protocol(AF_BLUETOOTH, BLUETOOTH_PROTO_L2CAP,
 				"network/protocols/l2cap/v1");
 			if (error != B_OK) {
 				return error;
 			}
 
-			error = sStackModule->register_domain(AF_BLUETOOTH, "l2cap", &gL2CAPModule,
+			error = gStackModule->register_domain(AF_BLUETOOTH, "l2cap", &gL2CAPModule,
 								&gL2cap4AddressModule, &sDomain);
 			if (error != B_OK) {
 				return error;
@@ -344,8 +338,8 @@ l2cap_std_ops(int32 op, ...)
 		case B_MODULE_UNINIT:
 		
 			error = QuitConnectionPurgeThread();
-
-			sStackModule->unregister_domain(sDomain);
+			gStackModule->unregister_domain(sDomain);
+			
 			return B_OK;
 
 		default:
@@ -390,7 +384,7 @@ net_protocol_module_info gL2CAPModule = {
 };
 
 module_dependency module_dependencies[] = {
-	{NET_STACK_MODULE_NAME, (module_info **)&sStackModule},
+	{NET_STACK_MODULE_NAME, (module_info **)&gStackModule},
 	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
 	{BT_CORE_DATA_MODULE_NAME, (module_info **)&btCoreData},
 	{NET_SOCKET_MODULE_NAME, (module_info **)&gSocketModule},

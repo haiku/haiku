@@ -5,9 +5,11 @@
 #ifndef L2CAP_INTERNAL_H
 #define L2CAP_INTERNAL_H
 
-#include <BTCoreData.h>
+#include <btCoreData.h>
 #include <net_protocol.h>
 #include <net_stack.h>
+
+extern l2cap_flow_t default_qos;
 
 extern bluetooth_core_data_module_info *btCoreData;
 extern net_buffer_module_info *gBufferModule;

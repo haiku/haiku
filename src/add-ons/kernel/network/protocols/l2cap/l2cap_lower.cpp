@@ -23,9 +23,12 @@
 
 #include <bluetooth/HCI/btHCI_transport.h>
 
+#include <btModules.h>
 #include <l2cap.h>
+
 #include "l2cap_internal.h"
 #include "l2cap_signal.h"
+#include "l2cap_upper.h"
 
 #define BT_DEBUG_THIS_MODULE
 #define SUBMODULE_NAME "lower"
@@ -75,10 +78,11 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 
 		case L2CAP_CLT_CID: /* Connectionless packet
 			error = l2cap_cl_receive(buffer);*/
+			flowf("CL FRAME!!\n");
 		break;
 
-		default: /* Data packet
-			error = l2cap_co_receive(buffer);*/
+		default: /* Data packet */
+			error = l2cap_co_receive(conn, buffer, dcid);
 		break;
 	}
 
@@ -86,8 +90,11 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 
 }
 
+
+struct net_device_module_info* btDevices = NULL;
+
 #if 0
-#pragma - thread conn sched - 
+#pragma mark - thread conn sched -
 #endif
 
 static thread_id sConnectionThread;
@@ -101,21 +108,57 @@ purge_connection(HciConnection* conn)
 
 	debugf("handle=%d\n",conn->handle);
 
-	DoublyLinkedQueue<L2capFrame>::Iterator iterator = conn->OutGoingFrames.GetIterator();
-	while (iterator.HasNext()) {
+    frame = conn->OutGoingFrames.RemoveHead();
+//	while ( frame != NULL) {
 
-		frame = iterator.Next();
-
+		// Here is the place to decide how many l2cap signals we want to have
+		// per l2cap packet. 1 ATM 
 		if (frame->type == L2CAP_C_FRAME) {
 			btCoreData->TimeoutSignal(frame, bluetooth_l2cap_rtx_timeout);
 			conn->ExpectedResponses.Add(frame);
 		}
 
-		//TODO: This operation should be atomic ACL Segments should be sent 
-		//lower->Send(frame->buffer);
-		flowf("tolower!");
-		conn->OutGoingFrames.Remove(frame);
-	}
+		// Add the l2cap header
+		if (frame->buffer == NULL)
+			panic("Malformed frame in ongoing queue");
+
+		NetBufferPrepend<l2cap_hdr_t> bufferHeader(frame->buffer);
+		status_t status = bufferHeader.Status();
+		if (status < B_OK) {
+			// free the buffer
+//!			continue;
+		}
+		
+		// fill
+		bufferHeader->length = htole16(frame->buffer->size - sizeof(l2cap_hdr_t));
+		switch (frame->type) {
+			case L2CAP_C_FRAME:
+				bufferHeader->dcid = L2CAP_SIGNAL_CID;
+			break;
+			case L2CAP_G_FRAME:
+				bufferHeader->dcid = L2CAP_CLT_CID;
+			break;
+			default:
+				bufferHeader->dcid = frame->channel->dcid;
+			break;
+		
+		}		
+	
+		bufferHeader.Sync();
+		
+		if (btDevices == NULL)	
+		if (get_module(NET_BLUETOOTH_DEVICE_NAME,(module_info**)&btDevices) != B_OK) {
+			panic("l2cap: cannot get dev module");
+		} // TODO: someone put it
+
+	
+		debugf("dev %p frame %p tolower\n", conn->ndevice, frame->buffer);
+
+		frame->buffer->type = conn->handle;
+		btDevices->send_data(conn->ndevice, frame->buffer);
+
+//		frame = conn->OutGoingFrames.RemoveHead();
+//	}
 	
 }
 
@@ -140,13 +183,13 @@ connection_thread(void *)
 
 		 if (ssizePort <= 0) {
 		 	debugf("Error %s\n", strerror(ssizePort));
-		 	snooze(1*1000*1000);
+		 	snooze(500*1000);
 		    continue;
 		 }
 		 
 		if (ssizePort > (ssize_t) sizeof(conn)) {
 		 	debugf("Message too big %ld\n", ssizePort);
-		 	snooze(1*1000*1000);
+		 	snooze(500*1000);
 			continue;
 		}
 
@@ -154,7 +197,7 @@ connection_thread(void *)
 
 		if (ssizeRead != ssizePort) {
 		 	debugf("Missmatch size port=%ld read=%ld\n", ssizePort, ssizeRead);
-		 	snooze(1*1000*1000);
+		 	snooze(500*1000);
 		    continue;
 		}
 		
