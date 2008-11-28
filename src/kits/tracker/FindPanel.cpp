@@ -324,7 +324,7 @@ FindWindow::GetPredicateString(BString &predicate, bool &dynamicDate)
 			query.GetPredicate(&predicate);
 			break;
 
-		case kByForumlaItem:
+		case kByFormulaItem:
 			predicate.SetTo(textControl->TextView()->Text(), 1023);
 			break;
 
@@ -687,7 +687,7 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 	fSearchModeMenu = new BPopUpMenu("searchMode");
 	fSearchModeMenu->AddItem(new BMenuItem("by Name", new BMessage(kByNameItem)));
 	fSearchModeMenu->AddItem(new BMenuItem("by Attribute", new BMessage(kByAttributeItem)));
-	fSearchModeMenu->AddItem(new BMenuItem("by Formula", new BMessage(kByForumlaItem)));
+	fSearchModeMenu->AddItem(new BMenuItem("by Formula", new BMessage(kByFormulaItem)));
 
 	fSearchModeMenu->ItemAt(initialMode == kByNameItem ? 0 :
 		(initialMode == kByAttributeItem ? 1 : 2))->SetMarked(true);
@@ -880,7 +880,7 @@ FindPanel::ViewHeightForMode(uint32 mode, bool moreOptions)
 {
 	float result = moreOptions ? kMoreOptionsDelta : 0;
 	switch (mode) {
-		case kByForumlaItem:
+		case kByFormulaItem:
 		case kByNameItem:
 			return 110 + result;
 
@@ -897,7 +897,7 @@ float
 FindPanel::BoxHeightForMode(uint32 mode, bool /*moreOptions*/)
 {
 	switch (mode) {
-		case kByForumlaItem:
+		case kByFormulaItem:
 		case kByNameItem:
 			return 40;
 
@@ -1019,7 +1019,7 @@ FindPanel::MessageReceived(BMessage *message)
 
 		case kByAttributeItem:
 		case kByNameItem:
-		case kByForumlaItem:
+		case kByFormulaItem:
 			SwitchMode(message->what);
 			break;
 
@@ -1322,7 +1322,7 @@ FindPanel::GetDefaultName(BString &result) const
 			result << "Name = " << textControl->TextView()->Text();
 			break;
 
-		case kByForumlaItem:
+		case kByFormulaItem:
 			result << "Formula " << textControl->TextView()->Text();
 			break;
 
@@ -1387,7 +1387,7 @@ FindPanel::SwitchMode(uint32 mode)
 	BString buffer;
 
 	switch (mode) {
-		case kByForumlaItem:
+		case kByFormulaItem:
 			if (oldMode == kByAttributeItem || oldMode == kByNameItem) {
 				BQuery query;
 				if (oldMode == kByAttributeItem) {
@@ -1417,7 +1417,7 @@ FindPanel::SwitchMode(uint32 mode)
 				AddByNameOrFormulaItems();
 
 				if (buffer.Length()) {
-					ASSERT(mode == kByForumlaItem || oldMode == kByAttributeItem);
+					ASSERT(mode == kByFormulaItem || oldMode == kByAttributeItem);
 					BTextControl *textControl = dynamic_cast<BTextControl *>
 						(FindView("TextControl"));
 					textControl->SetText(buffer.String());
@@ -2040,7 +2040,7 @@ FindPanel::SaveWindowState(BNode *node, bool editTemplate)
 			break;
 
 		case kByNameItem:
-		case kByForumlaItem:
+		case kByFormulaItem:
 			{
 				BTextControl *textControl = dynamic_cast<BTextControl *>
 					(FindView("TextControl"));
@@ -2085,7 +2085,7 @@ FindPanel::SwitchToTemplate(const BNode *node)
 void
 FindPanel::RestoreMimeTypeMenuSelection(const BNode *node)
 {
-	if (Mode() == (int32)kByForumlaItem || node == NULL || node->InitCheck() != B_OK)
+	if (Mode() == (int32)kByFormulaItem || node == NULL || node->InitCheck() != B_OK)
 		return;
 
 	BString buffer;
@@ -2187,7 +2187,7 @@ FindPanel::RestoreWindowState(const BNode *node)
 			}
 
 		case kByNameItem:
-		case kByForumlaItem:
+		case kByFormulaItem:
 			{
 				BString buffer;
 				if (node->ReadAttrString(kAttrQueryInitialString, &buffer) == B_OK) {
@@ -2313,7 +2313,7 @@ void
 FindPanel::ShowOrHideMimeTypeMenu()
 {
 	BMenuField *menuField = dynamic_cast<BMenuField *>(FindView("MimeTypeMenu"));
-	if (Mode() == (int32)kByForumlaItem && !menuField->IsHidden())
+	if (Mode() == (int32)kByFormulaItem && !menuField->IsHidden())
 		menuField->Hide();
 	else if (menuField->IsHidden())
 		menuField->Show();
@@ -2709,7 +2709,7 @@ TAttrView::AddAttributes(BMenu *menu, const BMimeType &mimeType)
 				break;
 		}
 		submenu->SetTargetForItems(this);
-	}	
+	}
 }
 
 
@@ -2728,14 +2728,14 @@ TAttrView::AddMimeTypeAttrs(BMenu *menu)
 	BMimeType mimeType(typeName);
 	if (!mimeType.IsInstalled())
 		return;
-	
+
 	if (!mimeType.IsSupertypeOnly()) {
 		// add supertype attributes
 		BMimeType supertype;
 		mimeType.GetSupertype(&supertype);
 		AddAttributes(menu, supertype);
 	}
-	
+
 	AddAttributes(menu, mimeType);
 }
 

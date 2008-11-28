@@ -67,14 +67,14 @@ const uint32 kVolumeItem = 'Fvol';
 const uint32 kAttributeItemMain = 'Fatr';
 const uint32 kByNameItem = 'Fbyn';
 const uint32 kByAttributeItem = 'Fbya';
-const uint32 kByForumlaItem = 'Fbyq';
+const uint32 kByFormulaItem = 'Fbyq';
 const uint32 kAddItem = 'Fadd';
 const uint32 kRemoveItem = 'Frem';
 
 #ifdef _IMPEXP_TRACKER
 _IMPEXP_TRACKER
 #endif
-BMenu *TrackerBuildRecentFindItemsMenu(const char *);
+BMenu *TrackerBuildRecentFindItemsMenu(const char *title);
 
 struct MoreOptionsStruct {
 	bool showMoreOptions;
@@ -93,7 +93,7 @@ struct MoreOptionsStruct {
 	// reserve a bunch of fields so that we can add stuff later but not
 	// make old queries incompatible. Reserved fields are set to 0 when
 	// saved
-	
+
 	MoreOptionsStruct()
 		:	showMoreOptions(false),
 			searchTrash(false),
@@ -109,9 +109,9 @@ struct MoreOptionsStruct {
 			reserved7(0),
 			reserved8(0)
 		{}
-	
+
 	static void EndianSwap(void *castToThis);
-	
+
 	static void SetQueryTemporary(BNode *, bool on);
 	static bool QueryTemporary(const BNode *);
 };
@@ -119,7 +119,8 @@ struct MoreOptionsStruct {
 
 class FindWindow : public BWindow {
 	public:
-		FindWindow(const entry_ref * = NULL, bool editIfTemplateOnly = false);
+		FindWindow(const entry_ref *ref = NULL,
+			bool editIfTemplateOnly = false);
 		virtual ~FindWindow();
 
 		FindPanel *BackgroundView() const
@@ -132,16 +133,16 @@ class FindWindow : public BWindow {
 			// reads in the query name from either a saved name in a template or
 			// form a saved query name
 
-		static bool IsQueryTemplate(BNode *);
+		static bool IsQueryTemplate(BNode *file);
 
 	protected:
-		virtual	void MessageReceived(BMessage *);
+		virtual	void MessageReceived(BMessage *message);
 
 	private:
-		static BFile *TryOpening(const entry_ref *);
+		static BFile *TryOpening(const entry_ref *ref);
 		static void GetDefaultQuery(BEntry &entry);
 			// when opening an empty panel, use the default query to set the panel up
-		void SaveQueryAttributes(BNode *, bool templateQuery);
+		void SaveQueryAttributes(BNode *file, bool templateQuery);
 
 		void Find();
 			// retrieve the results
@@ -285,16 +286,16 @@ class TAttrView : public BView {
 	// a single attribute item - the search by attribute view
 	// can add several of these
 	public:
-		TAttrView(BRect, int32 index);
+		TAttrView(BRect frame, int32 index);
 		~TAttrView();
 
 		virtual void AttachedToWindow();
 
-		void RestoreState(const BMessage &, int32);
-		void SaveState(BMessage *, int32);
+		void RestoreState(const BMessage &settings, int32 index);
+		void SaveState(BMessage *settings, int32 index);
 
-		virtual	void Draw(BRect);
-		virtual	void MessageReceived(BMessage *);
+		virtual	void Draw(BRect updateRect);
+		virtual	void MessageReceived(BMessage *message);
 
 		void AddLogicMenu(bool selectAnd = true);
 		void RemoveLogicMenu();
@@ -304,8 +305,8 @@ class TAttrView : public BView {
 		void GetDefaultName(BString &result) const;
 
 	private:
-		void AddAttributes(BMenu *, const BMimeType &);
-		void AddMimeTypeAttrs(BMenu *);
+		void AddAttributes(BMenu *menu, const BMimeType &type);
+		void AddMimeTypeAttrs(BMenu *menu);
 
 		BMenuField *fMenuField;
 		BTextControl *fTextControl;
