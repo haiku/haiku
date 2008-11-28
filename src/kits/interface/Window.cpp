@@ -3152,14 +3152,24 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 			if (message->FindPoint("screen_where", &where) != B_OK)
 				break;
 
-			// add local window coordinates
-			message->AddPoint("where", ConvertFromScreen(where));
-
 			BView* view = dynamic_cast<BView*>(target);
+
+			if (!view || message->what == B_MOUSE_MOVED) {
+				// add local window coordinates, only
+				// for regular mouse moved messages
+				message->AddPoint("where", ConvertFromScreen(where));
+			}
+
 			if (view != NULL) {
 				// add local view coordinates
-				message->AddPoint("be:view_where",
-					view->ConvertFromScreen(where));
+				BPoint viewWhere = view->ConvertFromScreen(where);
+				if (message->what != B_MOUSE_MOVED) {
+					// Yep, the meaning of "where" is different
+					// for regular mouse moved messages versus
+					// mouse up/down! 
+					message->AddPoint("where", viewWhere);
+				}
+				message->AddPoint("be:view_where", viewWhere);
 
 				if (message->what == B_MOUSE_MOVED) {
 					// is there a token of the view that is currently under
