@@ -217,6 +217,7 @@ BPoseView::BPoseView(Model *model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fIsDesktopWindow(false),
 	fIsWatchingDateFormatChange(false),
 	fHasPosesInClipboard(false),
+	fLastKeyTime(0),
 	fLastDeskbarFrameCheckTime(LONGLONG_MIN),
 	fDeskbarFrame(0, 0, -1, -1)
 {
@@ -2279,8 +2280,7 @@ BPoseView::MessageReceived(BMessage *message)
 		{
 			bigtime_t doubleClickSpeed;
 			get_click_speed(&doubleClickSpeed);
-			if (system_time() - sLastKeyTime > (doubleClickSpeed * 2)) {
-				strcpy(sMatchString, "");
+			if (system_time() - fLastKeyTime > (doubleClickSpeed * 2)) {
 				fCountView->SetTypeAhead(sMatchString);
 				delete fKeyRunner;
 				fKeyRunner = NULL;
@@ -5910,7 +5910,7 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 			// remove last char from the typeahead buffer
 			sMatchString[strlen(sMatchString) - 1] = '\0';
 
-			sLastKeyTime = system_time();
+			fLastKeyTime = system_time();
 
 			fCountView->SetTypeAhead(sMatchString);
 
@@ -5950,14 +5950,14 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 
 			// add char to existing matchString or start new match string
 			// make sure we don't overfill matchstring
-			if (eventTime - sLastKeyTime < (doubleClickSpeed * 2)) {
+			if (eventTime - fLastKeyTime < (doubleClickSpeed * 2)) {
 				uint32 nchars = B_FILE_NAME_LENGTH - strlen(sMatchString);
 				strncat(sMatchString, searchChar, nchars);
 			} else {
 				strncpy(sMatchString, searchChar, B_FILE_NAME_LENGTH - 1);
 			}
 			sMatchString[B_FILE_NAME_LENGTH - 1] = '\0';
-			sLastKeyTime = eventTime;
+			fLastKeyTime = eventTime;
 
 			fCountView->SetTypeAhead(sMatchString);
 
@@ -7559,7 +7559,7 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 
 	Invalidate();	
 
-	sLastKeyTime = 0;
+	fLastKeyTime = 0;
 }
 
 
@@ -9321,7 +9321,6 @@ TPoseViewFilter::Filter(BMessage *message, BHandler **)
 
 float BPoseView::sFontHeight = -1;
 font_height BPoseView::sFontInfo = { 0, 0, 0 };
-bigtime_t BPoseView::sLastKeyTime = 0;
 BFont BPoseView::sCurrentFont;
 OffscreenBitmap *BPoseView::sOffscreen = new OffscreenBitmap;
 char BPoseView::sMatchString[] = "";
