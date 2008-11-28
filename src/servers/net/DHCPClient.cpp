@@ -686,7 +686,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 	message.hardware_type = ARP_HARDWARE_TYPE_ETHER;
 	message.hardware_address_length = 6;
 	message.transaction_id = htonl(fTransactionID);
-	message.seconds_since_start = htons(min_c((fStartTime - system_time())
+	message.seconds_since_start = htons(min_c((system_time() - fStartTime)
 		/ 1000000LL, 65535));
 	memcpy(message.mac_address, fMAC, 6);
 
@@ -798,7 +798,7 @@ dhcp_state
 DHCPClient::_CurrentState() const
 {
 	bigtime_t now = system_time();
-	
+
 	if (now > fLeaseTime || fStatus < B_OK)
 		return INIT;
 	if (now >= fRebindingTime)
