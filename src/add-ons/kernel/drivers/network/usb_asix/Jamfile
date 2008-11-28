@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network usb_asix ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders kernel net ;
+
+KernelAddon usb_asix :
+	Driver.cpp
+	ASIXDevice.cpp
+	AX88172Device.cpp
+	AX88772Device.cpp
+	AX88178Device.cpp
+	Settings.cpp
+	MIIBus.cpp
+	;
