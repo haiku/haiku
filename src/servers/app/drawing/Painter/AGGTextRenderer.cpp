@@ -188,7 +188,7 @@ class AGGTextRenderer::StringRenderer {
 		if (!fDryRun) {
 			// init the fontmanager's embedded adaptors
 			// NOTE: The initialization for the "location" of
-			// the glyph is different depending on wether we
+			// the glyph is different depending on whether we
 			// deal with non-(rotated/sheared) text, in which
 			// case we have a native FT bitmap. For rotated or
 			// sheared text, we use AGG vector outlines and

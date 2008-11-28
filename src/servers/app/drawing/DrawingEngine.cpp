@@ -617,21 +617,21 @@ DrawingEngine::FillArcGradient(BRect r, const float& angle, const float& span,
 	const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
-	
+
 	make_rect_valid(r);
 	fPainter->AlignEllipseRect(&r, true);
 	BRect clipped(r);
-	
+
 	clipped = fPainter->ClipRect(r);
-	
+
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-		
+
 		float xRadius = r.Width() / 2.0;
 		float yRadius = r.Height() / 2.0;
 		BPoint center(r.left + xRadius,
 					  r.top + yRadius);
-		
+
 		fPainter->FillArcGradient(center, xRadius, yRadius, angle, span,
 								  gradient);
 
@@ -658,12 +658,12 @@ void
 DrawingEngine::FillBezierGradient(BPoint* pts, const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
-	
+
 	// TODO: figure out bounds and hide cursor depending on that
 	AutoFloatingOverlaysHider _(fGraphicsCard);
-	
+
 	BRect touched = fPainter->FillBezierGradient(pts, gradient);
-	
+
 	_CopyToFront(touched);
 }
 
@@ -701,23 +701,23 @@ void
 DrawingEngine::FillEllipseGradient(BRect r, const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
-	
+
 	make_rect_valid(r);
 	BRect clipped = r;
 	fPainter->AlignEllipseRect(&clipped, true);
-	
+
 	clipped.left = floorf(clipped.left);
 	clipped.top = floorf(clipped.top);
 	clipped.right = ceilf(clipped.right);
 	clipped.bottom = ceilf(clipped.bottom);
-	
+
 	clipped = fPainter->ClipRect(clipped);
-	
+
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-		
+
 		fPainter->FillEllipseGradient(r, gradient);
-		
+
 		_CopyToFront(clipped);
 	}
 }
@@ -748,14 +748,14 @@ DrawingEngine::FillPolygonGradient(BPoint* ptlist, int32 numpts, BRect bounds,
 	const BGradient& gradient, bool closed)
 {
 	CRASH_IF_NOT_LOCKED
-	
+
 	make_rect_valid(bounds);
 	bounds = fPainter->ClipRect(bounds);
 	if (bounds.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, bounds);
-		
+
 		fPainter->FillPolygonGradient(ptlist, numpts, gradient, closed);
-		
+
 		_CopyToFront(bounds);
 	}
 }
@@ -962,16 +962,16 @@ void
 DrawingEngine::FillRectGradient(BRect r, const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
-	
+
 	make_rect_valid(r);
 	r = fPainter->AlignAndClipRect(r);
 	if (!r.IsValid())
 		return;
-	
+
 	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
-	
+
 	fPainter->FillRectGradient(r, gradient);
-	
+
 	_CopyToFront(r);
 }
 
@@ -1033,19 +1033,19 @@ void
 DrawingEngine::FillRegionGradient(BRegion& r, const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
-	
+
 	BRect clipped = fPainter->ClipRect(r.Frame());
 	if (!clipped.IsValid())
 		return;
-	
+
 	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, clipped);
-	
+
 	BRect touched = fPainter->FillRectGradient(r.RectAt(0), gradient);
-		
+
 	int32 count = r.CountRects();
 	for (int32 i = 1; i < count; i++)
 		touched = touched | fPainter->FillRectGradient(r.RectAt(i), gradient);
-	
+
 	_CopyToFront(r.Frame());
 }
 
@@ -1081,22 +1081,22 @@ DrawingEngine::FillRoundRectGradient(BRect r, float xrad, float yrad,
 	const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
-	
+
 	// NOTE: the stroke does not extend past "r" in R5,
 	// though I consider this unexpected behaviour.
 	make_rect_valid(r);
 	BRect clipped = fPainter->ClipRect(r);
-	
+
 	clipped.left = floorf(clipped.left);
 	clipped.top = floorf(clipped.top);
 	clipped.right = ceilf(clipped.right);
 	clipped.bottom = ceilf(clipped.bottom);
-	
+
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-		
+
 		BRect touched = fPainter->FillRoundRectGradient(r, xrad, yrad, gradient);
-		
+
 		_CopyToFront(touched);
 	}
 }
@@ -1126,14 +1126,14 @@ DrawingEngine::FillShapeGradient(const BRect& bounds, int32 opCount,
 	const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
-	
+
 	// NOTE: hides cursor regardless of if and where
 	// shape is drawn on screen, TODO: optimize
 	AutoFloatingOverlaysHider _(fGraphicsCard);
-	
+
 	BRect touched = fPainter->FillShapeGradient(opCount, opList, ptCount,
 												ptList, gradient);
-	
+
 	_CopyToFront(touched);
 }
 
@@ -1164,14 +1164,14 @@ DrawingEngine::FillTriangleGradient(BPoint* pts, const BRect& bounds,
 	const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
-	
+
 	BRect clipped(bounds);
 	clipped = fPainter->ClipRect(clipped);
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-		
+
 		fPainter->FillTriangleGradient(pts[0], pts[1], pts[2], gradient);
-		
+
 		_CopyToFront(clipped);
 	}
 }
@@ -1261,10 +1261,11 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BPoint penLocation = pt;
 
 	// try a fast clipping path
-	if (fPainter->ClippingRegion()) {
+	if (fPainter->ClippingRegion() && fPainter->Font().Rotation() == 0.0f) {
 		float fontSize = fPainter->Font().Size();
 		BRect clippingFrame = fPainter->ClippingRegion()->Frame();
-		if (pt.x > clippingFrame.right || pt.y + fontSize < clippingFrame.top
+		if (pt.x - fontSize > clippingFrame.right
+			|| pt.y + fontSize < clippingFrame.top
 			|| pt.y - fontSize > clippingFrame.bottom) {
 			penLocation.x += StringWidth(string, length, delta);
 			return penLocation;
