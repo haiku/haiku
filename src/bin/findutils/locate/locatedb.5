@@ -1,4 +1,4 @@
-.TH LOCATEDB 5L \" -*- nroff -*-
+.TH LOCATEDB 5 \" -*- nroff -*-
 .SH NAME
 locatedb \- front-compressed file name database
 .SH DESCRIPTION
@@ -10,12 +10,12 @@ particular directory trees when the databases were last updated.
 .P
 There can be multiple databases.  Users can select which databases
 \fBlocate\fP searches using an environment variable or command line
-option; see \fBlocate\fP(1L).  The system administrator can choose the
+option; see \fBlocate\fP(1).  The system administrator can choose the
 file name of the default database, the frequency with which the
 databases are updated, and the directories for which they contain
 entries.  Normally, file name databases are updated by running the
 \fBupdatedb\fP program periodically, typically nightly; see
-\fBupdatedb\fP(1L).
+\fBupdatedb\fP(1).
 .P
 \fBupdatedb\fP runs a program called \fBfrcode\fP to compress the list
 of file names using front-compression, which reduces
@@ -102,5 +102,15 @@ and count bytes made printable:
 (6 = 14 \- 8, and \-9 = 5 \- 14)
 .fi
 .SH "SEE ALSO"
-\fBfind\fP(1L), \fBlocate\fP(1L), \fBlocatedb\fP(5L), \fBxargs\fP(1L)
+\fBfind\fP(1), \fBlocate\fP(1), \fBlocatedb\fP(5), \fBxargs\fP(1)
 \fBFinding Files\fP (on-line in Info, or printed)
+.SH "BUGS"
+.P
+The best way to report a bug is to use the form at
+http://savannah.gnu.org/bugs/?group=findutils.  
+The reason for this is that you will then be able to track progress in
+fixing the problem.   Other comments about \fBlocate\fP(1) and about
+the findutils package in general can be sent to the 
+.I bug-findutils
+mailing list.  To join the list, send email to 
+.IR bug-findutils-request@gnu.org .

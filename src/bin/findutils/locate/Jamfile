@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src bin findutils locate ;
 
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) gnulib lib ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
@@ -18,11 +19,11 @@ SEARCH on [ FGristFiles findutils.rdef ] = [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 BinCommand locate :
 	locate.c
-	: libfindutils.a : $(findutils_rsrc) ;
+	: libfindutils.a gnulibfindutils.a : $(findutils_rsrc) ;
 
 BinCommand frcode :
 	frcode.c
-	: libfindutils.a : $(findutils_rsrc) ;
+	: libfindutils.a gnulibfindutils.a : $(findutils_rsrc) ;
 
 
 rule MkUpdateDb

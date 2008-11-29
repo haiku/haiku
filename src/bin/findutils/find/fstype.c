@@ -1,10 +1,10 @@
 /* fstype.c -- determine type of filesystems that files are on
-   Copyright (C) 1990, 91, 92, 93, 94 Free Software Foundation, Inc.
+   Copyright (C) 1990, 91, 92, 93, 94, 2000, 2003, 2004, 2005 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,144 +12,109 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-/* Written by David MacKenzie <djm@gnu.ai.mit.edu>. */
+/* Written by David MacKenzie <djm@gnu.org>.
+ *
+ * Converted to use gnulib's read_file_system_list()
+ * by James Youngman <jay@gnu.org> (which saves a lot 
+ * of manual hacking of configure.in).
+ */
+
 
 #include <config.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include "defs.h"
-#include "modetype.h"
 #include <errno.h>
+#include <assert.h>
+#include <stdbool.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+/* The presence of unistd.h is assumed by gnulib these days, so we 
+ * might as well assume it too. 
+ */
+#include <unistd.h>
+
+#ifdef HAVE_SYS_MNTIO_H
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#include <sys/mntio.h>
+#endif
+#ifdef HAVE_SYS_MKDEV_H
+#include <sys/mkdev.h>
+#endif
+
 #ifdef STDC_HEADERS
 #include <stdlib.h>
 #else
 extern int errno;
 #endif
 
-char *strdup ();
-char *strstr ();
+#include "defs.h"
+#include "../gnulib/lib/dirname.h"
+#include "xalloc.h"
+#include "modetype.h"
 
-static char *filesystem_type_uncached P_((char *path, char *relpath, struct stat *statp));
-static int xatoi P_((char *cp));
+/* Need declaration of function `xstrtoumax' */
+#include "../gnulib/lib/xstrtol.h"
 
-#ifdef FSTYPE_MNTENT		/* 4.3BSD, SunOS, HP-UX, Dynix, Irix.  */
-#include <mntent.h>
-#if !defined(MOUNTED)
-# if defined(MNT_MNTTAB)	/* HP-UX.  */
-#  define MOUNTED MNT_MNTTAB
-# endif
-# if defined(MNTTABNAME)	/* Dynix.  */
-#  define MOUNTED MNTTABNAME
-# endif
+#include "extendbuf.h"
+#include "mountlist.h"
+
+
+
+#if ENABLE_NLS
+# include <libintl.h>
+# define _(Text) gettext (Text)
+#else
+# define _(Text) Text
 #endif
-#endif
-
-#ifdef FSTYPE_GETMNT		/* Ultrix.  */
-#include <sys/param.h>
-#include <sys/mount.h>
-#include <sys/fs_types.h>
-#endif
-
-#ifdef FSTYPE_USG_STATFS	/* SVR3.  */
-#include <sys/statfs.h>
-#include <sys/fstyp.h>
+#ifdef gettext_noop
+# define N_(String) gettext_noop (String)
+#else
+/* See locate.c for explanation as to why not use (String) */
+# define N_(String) String
 #endif
 
-#ifdef FSTYPE_STATVFS		/* SVR4.  */
-#include <sys/statvfs.h>
-#include <sys/fstyp.h>
+static char *filesystem_type_uncached PARAMS((const struct stat *statp, const char *path));
+
+
+/* Get MNTTYPE_IGNORE if it is available. */
+#if HAVE_MNTENT_H
+# include <mntent.h>
+#endif
+#if HAVE_SYS_MNTTAB_H
+# include <stdio.h>
+# include <sys/mnttab.h>
 #endif
 
-#ifdef FSTYPE_STATFS		/* 4.4BSD.  */
-#include <sys/param.h>		/* NetBSD needs this.  */
-#include <sys/mount.h>
 
-#ifndef MFSNAMELEN		/* NetBSD defines this.  */
-static char *
-fstype_to_string (t)
-     short t;
+
+
+
+static void
+free_file_system_list(struct mount_entry *p)
 {
-#ifdef INITMOUNTNAMES		/* Defined in 4.4BSD, not in NET/2.  */
-  static char *mn[] = INITMOUNTNAMES;
-  if (t >= 0 && t <= MOUNT_MAXTYPE)
-    return mn[t];
-  else
-    return "?";
-#else /* !INITMOUNTNAMES */
-  switch (t)
+  while (p)
     {
-    case MOUNT_UFS:
-      return "ufs";
-    case MOUNT_NFS:
-      return "nfs";
-#ifdef MOUNT_PC
-    case MOUNT_PC:
-      return "pc";
-#endif
-#ifdef MOUNT_MFS
-    case MOUNT_MFS:
-      return "mfs";
-#endif
-#ifdef MOUNT_LO
-    case MOUNT_LO:
-      return "lofs";
-#endif
-#ifdef MOUNT_TFS
-    case MOUNT_TFS:
-      return "tfs";
-#endif
-#ifdef MOUNT_TMP
-    case MOUNT_TMP:
-      return "tmp";
-#endif
-#ifdef MOUNT_MSDOS
-    case MOUNT_MSDOS:
-      return "msdos";
-#endif
-#ifdef MOUNT_ISO9660
-    case MOUNT_ISO9660:
-      return "iso9660fs";
-#endif
-    default:
-      return "?";
-    }
-#endif /* !INITMOUNTNAMES */
-}
-#endif /* !MFSNAMELEN */
-#endif /* FSTYPE_STATFS */
-
-#ifdef FSTYPE_AIX_STATFS	/* AIX.  */
-#include <sys/vmount.h>
-#include <sys/statfs.h>
-
-#define FSTYPE_STATFS		/* Otherwise like 4.4BSD.  */
-#define f_type f_vfstype
-
-static char *
-fstype_to_string (t)
-     short t;
-{
-  switch (t)
-    {
-    case MNT_AIX:
-#if 0				/* NFS filesystems are actually MNT_AIX. */
-      return "aix";
-#endif
-    case MNT_NFS:
-      return "nfs";
-    case MNT_JFS:
-      return "jfs";
-    case MNT_CDROM:
-      return "cdrom";
-    default:
-      return "?";
+      struct mount_entry *pnext = p->me_next;
+      
+      free(p->me_devname);
+      free(p->me_mountdir);
+      
+      if(p->me_type_malloced)
+	free(p->me_type);
+      p->me_next = NULL;
+      free(p);
+      p = pnext;
     }
 }
-#endif /* FSTYPE_AIX_STATFS */
+
+
+
 
 #ifdef AFS
 #include <netinet/in.h>
@@ -165,8 +130,7 @@ fstype_to_string (t)
 #endif
 
 static int
-in_afs (path)
-     char *path;
+in_afs (char *path)
 {
   static char space[2048];
   struct ViceIoctl vi;
@@ -191,10 +155,7 @@ static int fstype_known = 0;
    Return "unknown" if its filesystem type is unknown.  */
 
 char *
-filesystem_type (path, relpath, statp)
-     char *path;
-     char *relpath;
-     struct stat *statp;
+filesystem_type (const struct stat *statp, const char *path)
 {
   static char *current_fstype = NULL;
   static dev_t current_dev;
@@ -206,9 +167,46 @@ filesystem_type (path, relpath, statp)
       free (current_fstype);
     }
   current_dev = statp->st_dev;
-  current_fstype = filesystem_type_uncached (path, relpath, statp);
+  current_fstype = filesystem_type_uncached (statp, path);
   return current_fstype;
 }
+
+static int
+set_fstype_devno(struct mount_entry *p)
+{
+  struct stat stbuf;
+  
+  if (p->me_dev == (dev_t)-1)
+    {
+      if (0 == (options.xstat)(p->me_mountdir, &stbuf))
+	{
+	  p->me_dev = stbuf.st_dev;
+	  return 0;
+	}
+      else
+	{
+	  return -1;
+	}
+    }
+  return 0;			/* not needed */
+}
+
+static struct mount_entry *
+must_read_fs_list(bool need_fs_type)
+{
+  struct mount_entry *entries = read_file_system_list(need_fs_type);
+  if (NULL == entries)
+    {
+      /* We cannot determine for sure which file we were trying to
+       * use because gnulib has extracted all that stuff away. 
+       * Hence we cannot issue a specific error message here.
+       */
+      error(1, 0, "Cannot read mounted filesystem list");
+    }
+  return entries;
+}
+
+
 
 /* Return a newly allocated string naming the type of filesystem that the
    file PATH, described by STATP, is on.
@@ -216,171 +214,99 @@ filesystem_type (path, relpath, statp)
    Return "unknown" if its filesystem type is unknown.  */
 
 static char *
-filesystem_type_uncached (path, relpath, statp)
-     char *path;
-     char *relpath;
-     struct stat *statp;
+filesystem_type_uncached (const struct stat *statp, const char *path)
 {
-  char *type = NULL;
-
-#ifdef FSTYPE_MNTENT		/* 4.3BSD, SunOS, HP-UX, Dynix, Irix.  */
-  char *table = MOUNTED;
-  FILE *mfp;
-  struct mntent *mnt;
-
-  mfp = setmntent (table, "r");
-  if (mfp == NULL)
-    error (1, errno, "%s", table);
-
-  /* Find the entry with the same device number as STATP, and return
-     that entry's fstype. */
-  while (type == NULL && (mnt = getmntent (mfp)))
-    {
-      char *devopt;
-      dev_t dev;
-      struct stat disk_stats;
-
-#ifdef MNTTYPE_IGNORE
-      if (!strcmp (mnt->mnt_type, MNTTYPE_IGNORE))
-	continue;
-#endif
-
-      /* Newer systems like SunOS 4.1 keep the dev number in the mtab,
-	 in the options string.	 For older systems, we need to stat the
-	 directory that the filesystem is mounted on to get it.
-
-	 Unfortunately, the HPUX 9.x mnttab entries created by automountq
-	 contain a dev= option but the option value does not match the
-	 st_dev value of the file (maybe the lower 16 bits match?).  */
-
-#if !defined(hpux) && !defined(__hpux__)
-      devopt = strstr (mnt->mnt_opts, "dev=");
-      if (devopt)
-	{
-	  if (devopt[4] == '0' && (devopt[5] == 'x' || devopt[5] == 'X'))
-	    dev = xatoi (devopt + 6);
-	  else
-	    dev = xatoi (devopt + 4);
-	}
-      else
-#endif /* not hpux */
-	{
-	  if (stat (mnt->mnt_dir, &disk_stats) == -1)
-	    error (1, errno, "error in %s: %s", table, mnt->mnt_dir);
-	  dev = disk_stats.st_dev;
-	}
-
-      if (dev == statp->st_dev)
-	type = mnt->mnt_type;
-    }
-
-  if (endmntent (mfp) == 0)
-    error (0, errno, "%s", table);
-#endif
-
-#ifdef FSTYPE_GETMNT		/* Ultrix.  */
-  int offset = 0;
-  struct fs_data fsd;
-
-  while (type == NULL
-	 && getmnt (&offset, &fsd, sizeof (fsd), NOSTAT_MANY, 0) > 0)
-    {
-      if (fsd.fd_req.dev == statp->st_dev)
-	type = gt_names[fsd.fd_req.fstype];
-    }
-#endif
-
-#ifdef FSTYPE_USG_STATFS	/* SVR3.  */
-  struct statfs fss;
-  char typebuf[FSTYPSZ];
-
-  if (statfs (relpath, &fss, sizeof (struct statfs), 0) == -1)
-    {
-      /* Don't die if a file was just removed. */
-      if (errno != ENOENT)
-	error (1, errno, "%s", path);
-    }
-  else if (!sysfs (GETFSTYP, fss.f_fstyp, typebuf))
-    type = typebuf;
-#endif
-
-#ifdef FSTYPE_STATVFS		/* SVR4.  */
-  struct statvfs fss;
-
-  if (statvfs (relpath, &fss) == -1)
-    {
-      /* Don't die if a file was just removed. */
-      if (errno != ENOENT)
-	error (1, errno, "%s", path);
-    }
-  else
-    type = fss.f_basetype;
-#endif
-
-#ifdef FSTYPE_STATFS		/* 4.4BSD.  */
-  struct statfs fss;
-  char *p;
-
-  if (S_ISLNK (statp->st_mode))
-    p = dirname (relpath);
-  else
-    p = relpath;
-
-  if (statfs (p, &fss) == -1)
-    {
-      /* Don't die if symlink to nonexisting file, or a file that was
-	 just removed. */
-      if (errno != ENOENT)
-	error (1, errno, "%s", path);
-    }
-  else
-    {
-#ifdef MFSNAMELEN		/* NetBSD.  */
-      type = xstrdup (fss.f_fstypename);
-#else
-      type = fstype_to_string (fss.f_type);
-#endif
-    }
-  if (p != relpath)
-    free (p);
-#endif
+  struct mount_entry *entries, *entry;
+  char *type;
 
 #ifdef AFS
-  if ((!type || !strcmp (type, "xx")) && in_afs (relpath))
-    type = "afs";
-#endif
-
-  /* An unknown value can be caused by an ENOENT error condition.
-     Don't cache those values.  */
-  fstype_known = (type != NULL);
-
-  return xstrdup (type ? type : "unknown");
-}
-
-#ifdef FSTYPE_MNTENT		/* 4.3BSD etc.  */
-/* Return the value of the hexadecimal number represented by CP.
-   No prefix (like '0x') or suffix (like 'h') is expected to be
-   part of CP. */
-
-static int
-xatoi (cp)
-     char *cp;
-{
-  int val;
-  
-  val = 0;
-  while (*cp)
+  if (in_afs(path))
     {
-      if (*cp >= 'a' && *cp <= 'f')
-	val = val * 16 + *cp - 'a' + 10;
-      else if (*cp >= 'A' && *cp <= 'F')
-	val = val * 16 + *cp - 'A' + 10;
-      else if (*cp >= '0' && *cp <= '9')
-	val = val * 16 + *cp - '0';
-      else
-	break;
-      cp++;
+      fstype_known = 1;
+      return xstrdup("afs");
     }
-  return val;
-}
+#endif 
+  
+  entries = must_read_fs_list(true);
+  for (type=NULL, entry=entries; entry; entry=entry->me_next)
+    {
+#ifdef MNTTYPE_IGNORE
+      if (!strcmp (entry->me_type, MNTTYPE_IGNORE))
+	continue;
 #endif
+      set_fstype_devno(entry);
+      if (entry->me_dev == statp->st_dev)
+	{
+	  type = xstrdup(entry->me_type);
+	  break;
+	}
+    }
+  free_file_system_list(entries);
+
+  /* Don't cache unknown values. */
+  fstype_known = (type != NULL);
+  
+  return type ? type : xstrdup(_("unknown"));
+}
+
+
+char *
+get_mounted_filesystems (void)
+{
+  char *result = NULL;
+  size_t alloc_size = 0u;
+  size_t used = 0u;
+  struct mount_entry *entries, *entry;
+  
+  entries = must_read_fs_list(false);
+  for (entry=entries; entry; entry=entry->me_next)
+    {
+      size_t len;
+      
+#ifdef MNTTYPE_IGNORE
+      if (!strcmp (entry->me_type, MNTTYPE_IGNORE))
+	continue;
+#endif
+      set_fstype_devno(entry);
+
+      len = strlen(entry->me_mountdir) + 1;
+      result = extendbuf(result, used+len, &alloc_size);
+      strcpy(&result[used], entry->me_mountdir);
+      used += len;		/* len already includes one for the \0 */
+    }
+
+  free_file_system_list(entries);
+  return result;
+}
+
+
+dev_t *
+get_mounted_devices (size_t *n)
+{
+  size_t alloc_size = 0u;
+  size_t used = 0u;
+  struct mount_entry *entries, *entry;
+  dev_t *result = NULL;
+
+  /* Use read_file_system_list() rather than must_read_fs_list()
+   * because on some system this is always called at startup,
+   * and find should only exit fatally if it needs to use the 
+   * result of this operation.   If we can't get the fs list 
+   * but we never need the information, there is no need to fail.
+   */
+  for (entry = entries = read_file_system_list(false);
+       entry;
+       entry = entry->me_next)
+    {
+      result = extendbuf(result, sizeof(dev_t)*(used+1), &alloc_size);
+      set_fstype_devno(entry);
+      result[used] = entry->me_dev;
+      ++used;
+    }
+  free_file_system_list(entries);
+  *n = used;
+  return result;
+}
+
+
+

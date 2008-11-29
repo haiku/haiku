@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src bin findutils lib ;
 
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) gnulib lib ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 # filter warnings we don't want here
@@ -8,28 +9,20 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 
 # set some additional defines
 {
-	SubDirCcFlags -DHAVE_CONFIG_H ;
+	SubDirCcFlags -DHAVE_CONFIG_H -DVERSION='\"4.2.33\"' ;
 }
 
 
 StaticLibrary libfindutils.a : 
-	regex.c
-	dirname.c
-	error.c
-	filemode.c
-	getopt.c
-	getopt1.c
-	idcache.c
+	buildcmd.c
+	extendbuf.c
+	gnulib-version.c
 	listfile.c
-	modechange.c
 	nextelem.c
-	savedir.c
-	xmalloc.c
-	getline.c
-	xstrdup.c
-	xgetcwd.c
-	fnmatch.c
-	fileblocks.c
+	printquoted.c
+	qmark.c
+	regextype.c
+	savedirinfo.c
 	version.c
 ;
 

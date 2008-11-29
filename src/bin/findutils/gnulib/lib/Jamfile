@@ -1,0 +1,58 @@
+SubDir HAIKU_TOP src bin findutils gnulib lib ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
+# set some additional defines
+{
+	SubDirCcFlags -DHAVE_CONFIG_H ;
+}
+
+
+StaticLibrary gnulibfindutils.a : 
+	areadlink-with-size.c
+	argmatch.c
+	basename.c
+	canonicalize.c
+	closein.c
+	closeout.c
+	close-stream.c
+	dirname.c
+	dup-safer.c
+	error.c
+	exitfail.c
+	filemode.c
+	file-set.c
+	fnmatch.c
+	fopen-safer.c
+	fpending.c
+	freadahead.c
+	getcwd.c
+	hash.c
+	hash-pjw.c
+	hash-triple.c
+	human.c
+	idcache.c
+	localcharset.c
+	modechange.c
+	mountlist.c
+	quote.c
+	quotearg.c
+	regex.c
+	same.c
+	stripslash.c
+	strndup.c
+	xalloc-die.c
+	xgetcwd.c
+	xmalloc.c
+	xstrndup.c
+	xstrtol-error.c
+	xstrtoumax.c
+	yesno.c
+;
+
+#SEARCH on [ FGristFiles version.c ] = [ FDirName $(SUBDIR) $(DOTDOT) find ] ;

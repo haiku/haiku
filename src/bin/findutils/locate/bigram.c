@@ -1,19 +1,19 @@
 /* bigram -- list bigrams for locate
-   Copyright (C) 1994 Free Software Foundation, Inc.
+   Copyright (C) 1994, 2000, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* Usage: bigram < text > bigrams
    Use `code' to encode a file using this output.
@@ -43,7 +43,8 @@
 #endif
 #include <sys/types.h>
 
-char *xmalloc ();
+#include <xalloc.h>
+#include "closeout.h"
 
 /* The name this program was run with.  */
 char *program_name;
@@ -51,8 +52,7 @@ char *program_name;
 /* Return the length of the longest common prefix of strings S1 and S2. */
 
 static int
-prefix_length (s1, s2)
-     char *s1, *s2;
+prefix_length (char *s1, char *s2)
 {
   register char *start;
 
@@ -61,10 +61,8 @@ prefix_length (s1, s2)
   return s1 - start;
 }
 
-void
-main (argc, argv)
-     int argc;
-     char **argv;
+int
+main (int argc, char **argv)
 {
   char *path;			/* The current input entry.  */
   char *oldpath;		/* The previous input entry.  */
@@ -72,16 +70,17 @@ main (argc, argv)
   int line_len;			/* Length of input line.  */
 
   program_name = argv[0];
+  (void) argc;
+  atexit (close_stdout);
 
-  pathsize = oldpathsize = 1026; /* Increased as necessary by getstr.  */
+  pathsize = oldpathsize = 1026; /* Increased as necessary by getline.  */
   path = xmalloc (pathsize);
   oldpath = xmalloc (oldpathsize);
 
-  /* Set to anything not starting with a slash, to force the first
-     prefix count to 0.  */
-  strcpy (oldpath, " ");
+  /* Set to empty string, to force the first prefix count to 0.  */
+  oldpath[0] = '\0';
 
-  while ((line_len = getstr (&path, &pathsize, stdin, '\n', 0)) > 0)
+  while ((line_len = getline (&path, &pathsize, stdin)) > 0)
     {
       register int count;	/* The prefix length.  */
       register int j;		/* Index into input line.  */
@@ -111,5 +110,5 @@ main (argc, argv)
   free (path);
   free (oldpath);
 
-  exit (0);
+  return 0;
 }

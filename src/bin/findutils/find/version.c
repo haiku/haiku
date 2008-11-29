@@ -1,1 +1,3 @@
-char *version_string = "4.1";
+#include <config.h>
+char *version_string = VERSION;
+

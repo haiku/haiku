@@ -1,29 +1,41 @@
 /* tree.c -- helper functions to build and evaluate the expression tree.
-   Copyright (C) 1990, 91, 92, 93, 94 Free Software Foundation, Inc.
+   Copyright (C) 1990, 91, 92, 93, 94, 2000, 2001, 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-#include <config.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
 #include "defs.h"
+#include "../gnulib/lib/xalloc.h"
 
-static struct predicate *scan_rest P_((struct predicate **input, struct predicate *head, int prev_prec));
-static void merge_pred P_((struct predicate *beg_list, struct predicate *end_list, struct predicate **last_p));
-static struct predicate *set_new_parent P_((struct predicate *curr, enum predicate_precedence high_prec, struct predicate **prevp));
+#if ENABLE_NLS
+# include <libintl.h>
+# define _(Text) gettext (Text)
+#else
+# define _(Text) Text
+#endif
+#ifdef gettext_noop
+# define N_(String) gettext_noop (String)
+#else
+/* See locate.c for explanation as to why not use (String) */
+# define N_(String) String
+#endif
+
+static struct predicate *scan_rest PARAMS((struct predicate **input,
+				       struct predicate *head,
+				       short int prev_prec));
+static void merge_pred PARAMS((struct predicate *beg_list, struct predicate *end_list, struct predicate **last_p));
+static struct predicate *set_new_parent PARAMS((struct predicate *curr, enum predicate_precedence high_prec, struct predicate **prevp));
 
 /* Return a pointer to a tree that represents the
    expression prior to non-unary operator *INPUT.
@@ -45,20 +57,25 @@ static struct predicate *set_new_parent P_((struct predicate *curr, enum predica
    our caller, so get_expr recurses. */
 
 struct predicate *
-get_expr (input, prev_prec)
-     struct predicate **input;
-     short prev_prec;
+get_expr (struct predicate **input, short int prev_prec)
 {
-  struct predicate *next;
+  struct predicate *next = NULL;
 
   if (*input == NULL)
-    error (1, 0, "invalid expression");
+    error (1, 0, _("invalid expression"));
+  
   switch ((*input)->p_type)
     {
     case NO_TYPE:
+      error (1, 0, _("invalid expression"));
+      break;
+
     case BI_OP:
+      error (1, 0, _("invalid expression; you have used a binary operator with nothing before it."));
+      break;
+
     case CLOSE_PAREN:
-      error (1, 0, "invalid expression");
+      error (1, 0, _("invalid expression; you have too many ')'"));
       break;
 
     case PRIMARY_TYPE:
@@ -77,12 +94,12 @@ get_expr (input, prev_prec)
       next = get_expr (input, NO_PREC);
       if ((*input == NULL)
 	  || ((*input)->p_type != CLOSE_PAREN))
-	error (1, 0, "invalid expression");
+	error (1, 0, _("invalid expression; I was expecting to find a ')' somewhere but did not see one."));
       *input = (*input)->pred_next;	/* move over close */
       break;
 
     default:
-      error (1, 0, "oops -- invalid expression type!");
+      error (1, 0, _("oops -- invalid expression type!"));
       break;
     }
 
@@ -97,7 +114,7 @@ get_expr (input, prev_prec)
     {
       next = scan_rest (input, next, prev_prec);
       if (next == NULL)
-	error (1, 0, "invalid expression");
+	error (1, 0, _("invalid expression"));
     }
   return (next);
 }
@@ -116,10 +133,9 @@ get_expr (input, prev_prec)
    PREV_PREC is the precedence of the previous predicate element. */
 
 static struct predicate *
-scan_rest (input, head, prev_prec)
-     struct predicate **input;
-     struct predicate *head;
-     short prev_prec;
+scan_rest (struct predicate **input,
+	   struct predicate *head,
+	   short int prev_prec)
 {
   struct predicate *tree;	/* The new tree we are building. */
 
@@ -134,7 +150,10 @@ scan_rest (input, head, prev_prec)
 	case PRIMARY_TYPE:
 	case UNI_OP:
 	case OPEN_PAREN:
-	  error (1, 0, "invalid expression");
+	  /* I'm not sure how we get here, so it is not obvious what
+	   * sort of mistakes might give rise to this condition.
+	   */
+	  error (1, 0, _("invalid expression"));
 	  break;
 
 	case BI_OP:
@@ -145,14 +164,16 @@ scan_rest (input, head, prev_prec)
 	  break;
 
 	case CLOSE_PAREN:
-	  return (tree);
+	  return tree;
 
 	default:
-	  error (1, 0, "oops -- invalid expression type!");
+	  error (1, 0,
+		 _("oops -- invalid expression type (%d)!"),
+		 (int)(*input)->p_type);
 	  break;
 	}
     }
-  return (tree);
+  return tree;
 }
 
 /* Optimize the ordering of the predicates in the tree.  Rearrange
@@ -162,9 +183,12 @@ scan_rest (input, head, prev_prec)
      predicates (if any) which have "side effects", such as printing.
      The grouping implements the partial ordering on predicates which
      those with side effects impose.
-   * Place -name, -path, and -regex at the front of a group, with
-     -name and -path ahead of -regex.  Predicates that are moved to the
-     front of a group by definition do not have side effects.
+
+   * Place -name, -iname, -path, -ipath, -regex and -iregex at the front
+     of a group, with -name, -iname, -path and -ipath ahead of
+     -regex and -iregex.  Predicates which are moved to the front
+     of a group by definition do not have side effects.  Both
+     -regex and -iregex both use pred_regex.
 
      This routine "normalizes" the predicate tree by ensuring that
      all expression predicates have AND (or OR or COMMA) parent nodes
@@ -176,8 +200,7 @@ scan_rest (input, head, prev_prec)
      Return true if the tree contains side effects, false if not. */
 
 boolean
-opt_expr (eval_treep)
-     struct predicate **eval_treep;
+opt_expr (struct predicate **eval_treep)
 {
   /* List of -name and -path predicates to move. */
   struct predicate *name_list = NULL;
@@ -188,7 +211,7 @@ opt_expr (eval_treep)
   struct predicate *curr;
   struct predicate **prevp;	/* Address of `curr' node. */
   struct predicate **last_sidep; /* Last predicate with side effects. */
-  PFB pred_func;
+  PRED_FUNC pred_func;
   enum predicate_type p_type;
   boolean has_side_effects = false; /* Return value. */
   enum predicate_precedence prev_prec, /* precedence of last BI_OP in branch */
@@ -217,12 +240,13 @@ opt_expr (eval_treep)
   
 #ifdef DEBUG
   /* Normalized tree. */
-  printf ("Normalized Eval Tree:\n");
-  print_tree (*eval_treep, 0);
+  fprintf (stderr, "Normalized Eval Tree:\n");
+  print_tree (stderr, *eval_treep, 0);
 #endif
 
   /* Rearrange the predicates. */
   prevp = eval_treep;
+  biop_prec = NO_PREC; /* not COMMA_PREC */
   if ((*prevp) && (*prevp)->p_type == BI_OP)
     biop_prec = (*prevp)->p_prec;
   while ((curr = *prevp) != NULL)
@@ -237,8 +261,6 @@ opt_expr (eval_treep)
 	{
           if (curr->p_prec != biop_prec)
 	    curr = set_new_parent(curr, biop_prec, prevp);
-          else
-	    biop_prec = curr->p_prec;
 	}
 	  
       /* See which predicate type we have. */
@@ -249,9 +271,15 @@ opt_expr (eval_treep)
 	{
 	case NO_TYPE:
 	case PRIMARY_TYPE:
+	  /* Don't rearrange the arguments of the comma operator, it is
+	     not commutative.  */
+	  if (biop_prec == COMMA_PREC)
+	    break;
+
 	  /* If it's one of our special primaries, move it to the
 	     front of the list for that primary. */
-	  if (pred_func == pred_name || pred_func == pred_path)
+	  if (pred_func == pred_name || pred_func == pred_path ||
+	      pred_func == pred_iname || pred_func == pred_ipath)
 	    {
 	      *prevp = curr->pred_left;
 	      curr->pred_left = name_list;
@@ -293,7 +321,7 @@ opt_expr (eval_treep)
 	     all of the user's parentheses. */
 
 	default:
-	  error (1, 0, "oops -- invalid expression type!");
+	  error (1, 0, _("oops -- invalid expression type!"));
 	  break;
 	}
 
@@ -334,10 +362,7 @@ opt_expr (eval_treep)
    HIGH_PREC. */
 
 static struct predicate *
-set_new_parent (curr, high_prec, prevp)
-     struct predicate *curr;
-     enum predicate_precedence high_prec;
-     struct predicate **prevp;
+set_new_parent (struct predicate *curr, enum predicate_precedence high_prec, struct predicate **prevp)
 {
   struct predicate *new_parent;
 
@@ -345,6 +370,7 @@ set_new_parent (curr, high_prec, prevp)
   new_parent->p_type = BI_OP;
   new_parent->p_prec = high_prec;
   new_parent->need_stat = false;
+  new_parent->need_type = false;
 
   switch (high_prec)
     {
@@ -362,6 +388,7 @@ set_new_parent (curr, high_prec, prevp)
     }
   
   new_parent->side_effects = false;
+  new_parent->no_default_print = false;
   new_parent->args.str = NULL;
   new_parent->pred_next = NULL;
 
@@ -382,8 +409,7 @@ set_new_parent (curr, high_prec, prevp)
    into the tree at LAST_P. */
 
 static void
-merge_pred (beg_list, end_list, last_p)
-     struct predicate *beg_list, *end_list, **last_p;
+merge_pred (struct predicate *beg_list, struct predicate *end_list, struct predicate **last_p)
 {
   end_list->pred_left = *last_p;
   *last_p = beg_list;
@@ -400,8 +426,7 @@ merge_pred (beg_list, end_list, last_p)
    in TREE requires a stat, false if not. */
 
 boolean
-mark_stat (tree)
-     struct predicate *tree;
+mark_stat (struct predicate *tree)
 {
   /* The tree is executed in-order, so walk this way (apologies to Aerosmith)
      to find the first predicate for which the stat is needed. */
@@ -427,7 +452,44 @@ mark_stat (tree)
       return (false);
 
     default:
-      error (1, 0, "oops -- invalid expression type!");
+      error (1, 0, _("oops -- invalid expression type in mark_stat!"));
       return (false);
     }
 }
+
+/* Find the first node in expression tree TREE that we will
+   need to know the file type, if any.   Operates in the same 
+   was as mark_stat().
+*/
+boolean
+mark_type (struct predicate *tree)
+{
+  /* The tree is executed in-order, so walk this way (apologies to Aerosmith)
+     to find the first predicate for which the type information is needed. */
+  switch (tree->p_type)
+    {
+    case NO_TYPE:
+    case PRIMARY_TYPE:
+      return tree->need_type;
+
+    case UNI_OP:
+      if (mark_type (tree->pred_right))
+	tree->need_type = true;
+      return false;
+
+    case BI_OP:
+      /* ANDs and ORs are linked along ->left ending in NULL. */
+      if (tree->pred_left != NULL)
+	mark_type (tree->pred_left);
+
+      if (mark_type (tree->pred_right))
+	tree->need_type = true;
+
+      return false;
+
+    default:
+      error (1, 0, _("oops -- invalid expression type in mark_type!"));
+      return (false);
+    }
+}
+

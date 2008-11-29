@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src bin findutils xargs ;
 
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) gnulib lib ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
@@ -14,6 +15,6 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 
 BinCommand xargs :
 	xargs.c
-	: libfindutils.a : findutils.rdef ;
+	: libfindutils.a gnulibfindutils.a : findutils.rdef ;
 
 SEARCH on [ FGristFiles findutils.rdef ] = [ FDirName $(SUBDIR) $(DOTDOT) ] ;

@@ -1,19 +1,20 @@
 /* code -- bigram- and front-encode filenames for locate
-   Copyright (C) 1994 Free Software Foundation, Inc.
+   Copyright (C) 1994, 2000, 2003, 2004, 2005, 2007 Free Software
+   Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* Compress a sorted list.
    Works with `find' to encode a filename database to save space
@@ -32,16 +33,16 @@
    followed by a (partially bigram-encoded) ASCII remainder.
    The output lines have no terminating byte; the start of the next line
    is indicated by its first byte having a value <= 30.
-   
+
    The encoding of the output bytes is:
 
    0-28		likeliest differential counts + offset (14) to make nonnegative
    30		escape code for out-of-range count to follow in next halfword
-   128-255 	bigram codes (the 128 most common, as determined by `updatedb')
-   32-127  	single character (printable) ASCII remainder
+   128-255	bigram codes (the 128 most common, as determined by `updatedb')
+   32-127	single character (printable) ASCII remainder
 
    Written by James A. Woods <jwoods@adobe.com>.
-   Modified by David MacKenzie <djm@gnu.ai.mit.edu>.  */
+   Modified by David MacKenzie <djm@gnu.org>.  */
 
 #include <config.h>
 #include <stdio.h>
@@ -57,9 +58,26 @@
 #include <stdlib.h>
 #endif
 
-#include "locatedb.h"
+#if ENABLE_NLS
+# include <libintl.h>
+# define _(Text) gettext (Text)
+#else
+# define _(Text) Text
+#define textdomain(Domain)
+#define bindtextdomain(Package, Directory)
+#endif
+#ifdef gettext_noop
+# define N_(String) gettext_noop (String)
+#else
+/* See locate.c for explanation as to why not use (String) */
+# define N_(String) String
+#endif
 
-char *xmalloc ();
+#include "locatedb.h"
+#include "closeout.h"
+#include "gnulib-version.h"
+
+char *xmalloc PARAMS((size_t));
 
 /* The name this program was run with.  */
 char *program_name;
@@ -68,21 +86,10 @@ char *program_name;
    if there are fewer.  */
 static char bigrams[257] = {0};
 
-#ifndef HAVE_PUTW
-int
-putw(x, fp)
-		int x;
-		FILE *fp;
-{
-		return (fwrite((void*)&x, sizeof(x), 1, fp) == 1 ? x : EOF);
-}
-#endif
-
 /* Return the offset of PATTERN in STRING, or -1 if not found. */
 
 static int
-strindex (string, pattern)
-     char *string, *pattern;
+strindex (char *string, char *pattern)
 {
   register char *s;
 
@@ -102,8 +109,7 @@ strindex (string, pattern)
 /* Return the length of the longest common prefix of strings S1 and S2. */
 
 static int
-prefix_length (s1, s2)
-     char *s1, *s2;
+prefix_length (char *s1, char *s2)
 {
   register char *start;
 
@@ -112,10 +118,21 @@ prefix_length (s1, s2)
   return s1 - start;
 }
 
-void
-main (argc, argv)
-     int argc;
-     char **argv;
+extern char *version_string;
+
+static void
+usage (FILE *stream)
+{
+  fprintf (stream, _("\
+Usage: %s [--version | --help]\n\
+or     %s most_common_bigrams < file-list > locate-database\n"),
+	   program_name, program_name);
+  fputs (_("\nReport bugs to <bug-findutils@gnu.org>.\n"), stream);
+}
+
+
+int
+main (int argc, char **argv)
 {
   char *path;			/* The current input entry.  */
   char *oldpath;		/* The previous input entry.  */
@@ -127,14 +144,26 @@ main (argc, argv)
   int line_len;			/* Length of input line.  */
 
   program_name = argv[0];
+  atexit (close_stdout);
 
   bigram[2] = '\0';
 
   if (argc != 2)
     {
-      fprintf (stderr, "Usage: %s most_common_bigrams < list > coded_list\n",
-	       argv[0]);
-      exit (2);
+      usage(stderr);
+      return 2;
+    }
+
+  if (0 == strcmp(argv[1], "--help"))
+    {
+      usage(stdout);
+      return 0;
+    }
+  else if (0 == strcmp(argv[1], "--version"))
+    {
+      printf (_("GNU findutils version %s\n"), version_string);
+      printf (_("Built using GNU gnulib version %s\n"), gnulib_version);
+      return 0;
     }
 
   fp = fopen (argv[1], "r");
@@ -142,16 +171,15 @@ main (argc, argv)
     {
       fprintf (stderr, "%s: ", argv[0]);
       perror (argv[1]);
-      exit (1);
+      return 1;
     }
 
-  pathsize = oldpathsize = 1026; /* Increased as necessary by getstr.  */
+  pathsize = oldpathsize = 1026; /* Increased as necessary by getline.  */
   path = xmalloc (pathsize);
   oldpath = xmalloc (oldpathsize);
 
-  /* Set to anything not starting with a slash, to force the first
-     prefix count to 0.  */
-  strcpy (oldpath, " ");
+  /* Set to empty string, to force the first prefix count to 0.  */
+  oldpath[0] = '\0';
   oldcount = 0;
 
   /* Copy the list of most common bigrams to the output,
@@ -160,7 +188,7 @@ main (argc, argv)
   fwrite (bigrams, 1, 256, stdout);
   fclose (fp);
 
-  while ((line_len = getstr (&path, &pathsize, stdin, '\n', 0)) > 0)
+  while ((line_len = getline (&path, &pathsize, stdin)) > 0)
     {
       char *pp;
 
@@ -169,8 +197,7 @@ main (argc, argv)
       /* Squelch unprintable chars in path so as not to botch decoding.  */
       for (pp = path; *pp != '\0'; pp++)
 	{
-	  *pp &= 0177;
-	  if (*pp < 040 || *pp == 0177)
+	  if (!(*pp >= 040 && *pp < 0177))
 	    *pp = '?';
 	}
 
@@ -220,5 +247,5 @@ main (argc, argv)
   free (path);
   free (oldpath);
 
-  exit (0);
+  return 0;
 }

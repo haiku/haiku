@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src bin findutils find ;
 
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) gnulib lib ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
@@ -19,6 +20,6 @@ BinCommand find :
 	pred.c
 	tree.c
 	util.c
-	: libfindutils.a : findutils.rdef ;
+	: libfindutils.a gnulibfindutils.a : findutils.rdef ;
 
 SEARCH on [ FGristFiles findutils.rdef ] = [ FDirName $(SUBDIR) $(DOTDOT) ] ;
