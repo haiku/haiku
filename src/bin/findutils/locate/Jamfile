@@ -39,18 +39,19 @@ actions MkUpdateDb1
 {
 	sed \
 	-e "s,@bindir@,/bin," \
-	-e "s,@libexecdir@,/etc/libexec/locate," \
+	-e "s,@libexecdir@,/bin," \
 	-e "s,@LOCATE_DB@,/var/locatedb," \
-	-e "s,@version@,`sed -e '/version_string/!d' -e 's/[^0-9.]*\([0-9.]*\).*/\1/' -e q $(2[2])`," \
+	-e "s,@VERSION@,4.2.33," \
 	-e "s,@find@,find," \
 	-e "s,@frcode@,frcode," \
 	-e "s,@bigram@,bigram," \
 	-e "s,@code@,code," \
+	-e "s,@SORT@,/bin/sort," \
+	-e "s,@SORT_SUPPORTS_Z@,true," \
 	 $(2[1]) > $(1) ;
 }
 
-MkUpdateDb updatedbgen : updatedb.sh [ FGristFiles version.c ] ;
+MkUpdateDb updatedbgen : updatedb.sh ;
 MakeLocatePlatform <bin>updatedb ;
 Shell <bin>updatedb : updatedbgen ;
 
-SEARCH on [ FGristFiles version.c ] = [ FDirName $(SUBDIR) $(DOTDOT) find ] ;
