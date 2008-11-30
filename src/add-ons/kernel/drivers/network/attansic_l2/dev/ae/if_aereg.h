@@ -22,7 +22,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: src/sys/dev/ae/if_aereg.h,v 1.1.2.1.2.1 2008/11/25 02:59:29 kensmith Exp $
  */
 
 /*
@@ -75,9 +75,8 @@
 #define	AE_IMR_REG		0x1604
 
 #define	AE_IMR_DEFAULT		(AE_ISR_DMAR_TIMEOUT | AE_ISR_DMAW_TIMEOUT | \
-				 AE_ISR_PHY | AE_ISR_PHY_LINKDOWN | \
-				 AE_ISR_TXS_UPDATED | AE_ISR_RXD_UPDATED | \
-				 AE_ISR_MANUAL)
+				 AE_ISR_PHY_LINKDOWN | \
+				 AE_ISR_TXS_UPDATED | AE_ISR_RXD_UPDATED )
 
 /*
  * Ethernet address register.
@@ -288,13 +287,24 @@
 #define	AE_REG_MHT1		0x1494
 
 /*
+ * Wake on lan (WOL).
+ */
+#define	AE_WOL_REG		0x14a0
+#define	AE_WOL_MAGIC		0x00000004
+#define	AE_WOL_MAGIC_PME	0x00000008
+#define	AE_WOL_LNKCHG		0x00000010
+#define	AE_WOL_LNKCHG_PME	0x00000020
+
+/*
  * PCIE configuration registers. Descriptions unknown.
  */
-#define	AE_LTSSM_TESTMODE_REG	0x12fc
-#define	AE_LTSSM_TESTMODE_DEFAULT	0x6500
-#define	AE_DLL_TX_REG	0x1104
-#define	AE_DLL_TX_SEL_NOR_CLK	0x0400
-#define	AE_DLL_TX_DEFAULT	0x0568
+#define	AE_PCIE_LTSSM_TESTMODE_REG	0x12fc
+#define	AE_PCIE_LTSSM_TESTMODE_DEFAULT	0x6500
+#define	AE_PCIE_DLL_TX_CTRL_REG		0x1104
+#define	AE_PCIE_DLL_TX_CTRL_SEL_NOR_CLK	0x0400
+#define	AE_PCIE_DLL_TX_CTRL_DEFAULT	0x0568
+#define	AE_PCIE_PHYMISC_REG		0x1000
+#define	AE_PCIE_PHYMISC_FORCE_RCV_DET	0x4
 
 /*
  * PHY enable register.
@@ -328,12 +338,48 @@
 #define	AE_SPICTL_VPD_EN	0x2000	/* Enable VPD. */
 
 /*
- * Tx descriptors flags.
+ * PHY-specific registers constants.
  */
-#define	AE_TXF_SUCCESS		0x0001
+#define	AE_PHY_DBG_ADDR		0x1d
+#define	AE_PHY_DBG_DATA		0x1e
+#define	AE_PHY_DBG_POWERSAVE	0x1000
 
 /*
- * Rx descriptors flags.
+ * TxD flags.
  */
+#define	AE_TXD_INSERT_VTAG	0x8000	/* Insert VLAN tag on transfer. */
 
-#define	AE_RXF_SUCCESS		0x0001
+/*
+ * TxS flags.
+ */
+#define	AE_TXS_SUCCESS		0x0001	/* Packed transmitted successfully. */
+#define	AE_TXS_BCAST		0x0002	/* Transmitted broadcast frame. */
+#define	AE_TXS_MCAST		0x0004	/* Transmitted multicast frame. */
+#define	AE_TXS_PAUSE		0x0008	/* Transmitted pause frame. */
+#define	AE_TXS_CTRL		0x0010	/* Transmitted control frame. */
+#define	AE_TXS_DEFER		0x0020	/* Frame transmitted with defer. */
+#define	AE_TXS_EXCDEFER		0x0040	/* Excessive collision. */
+#define	AE_TXS_SINGLECOL	0x0080	/* Single collision occuried. */
+#define	AE_TXS_MULTICOL		0x0100	/* Multiple collisions occuried. */
+#define	AE_TXS_LATECOL		0x0200	/* Late collision occuried. */
+#define	AE_TXS_ABORTCOL		0x0400	/* Frame abort due to collisions. */
+#define	AE_TXS_UNDERRUN		0x0800	/* Tx SRAM underrun occuried. */
+#define	AE_TXS_UPDATE		0x8000
+
+/*
+ * RxD flags.
+ */
+#define	AE_RXD_SUCCESS		0x0001
+#define	AE_RXD_BCAST		0x0002	/* Broadcast frame received. */
+#define	AE_RXD_MCAST		0x0004	/* Multicast frame received. */
+#define	AE_RXD_PAUSE		0x0008	/* Pause frame received. */
+#define	AE_RXD_CTRL		0x0010	/* Control frame received. */
+#define	AE_RXD_CRCERR		0x0020	/* Invalid frame CRC. */
+#define	AE_RXD_CODEERR		0x0040	/* Invalid frame opcode. */
+#define	AE_RXD_RUNT		0x0080	/* Runt frame received. */
+#define	AE_RXD_FRAG		0x0100	/* Collision fragment received. */
+#define	AE_RXD_TRUNC		0x0200	/* The frame was truncated due
+					   to Rx SRAM underrun. */
+#define	AE_RXD_ALIGN		0x0400	/* Frame alignment error. */
+#define	AE_RXD_HAS_VLAN		0x0800	/* VLAN tag present. */
+#define	AE_RXD_UPDATE		0x8000

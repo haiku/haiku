@@ -22,7 +22,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: src/sys/dev/ae/if_aevar.h,v 1.1.2.1.2.1 2008/11/25 02:59:29 kensmith Exp $
  */
 
 #ifndef IF_AEVAR_H
@@ -61,19 +61,42 @@ typedef struct ae_txd {
 /* Tx status descriptor format. */
 typedef struct ae_txs {
 	uint16_t	len;
-	uint16_t	flags:15;
-	uint16_t	update:1;
+	uint16_t	flags;
 } __packed ae_txs_t;
 
 /* Rx packet descriptor format. */
 typedef struct ae_rxd {
 	uint16_t	len;
-	uint16_t	flags:15;
-	uint16_t	update:1;
+	uint16_t	flags;
 	uint16_t	vlan;
 	uint16_t	__pad;
 	uint8_t		data[1528];
 } __packed ae_rxd_t;
+
+/* Statistics. */
+typedef struct ae_stats {
+	uint32_t	rx_bcast;
+	uint32_t	rx_mcast;
+	uint32_t	rx_pause;
+	uint32_t	rx_ctrl;
+	uint32_t	rx_crcerr;
+	uint32_t	rx_codeerr;
+	uint32_t	rx_runt;
+	uint32_t	rx_frag;
+	uint32_t	rx_trunc;
+	uint32_t	rx_align;
+	uint32_t	tx_bcast;
+	uint32_t	tx_mcast;
+	uint32_t	tx_pause;
+	uint32_t	tx_ctrl;
+	uint32_t	tx_defer;
+	uint32_t	tx_excdefer;
+	uint32_t	tx_singlecol;
+	uint32_t	tx_multicol;
+	uint32_t	tx_latecol;
+	uint32_t	tx_abortcol;
+	uint32_t	tx_underrun;
+} ae_stats_t;
 
 /* Software state structure. */
 typedef struct ae_softc	{
@@ -128,6 +151,8 @@ typedef struct ae_softc	{
 
 	int			tx_inproc;	/* Active Tx frames in ring. */
 	int			wd_timer;
+
+	ae_stats_t		stats;
 } ae_softc_t;
 
 #define	AE_LOCK(_sc)		mtx_lock(&(_sc)->mtx)
@@ -139,6 +164,8 @@ typedef struct ae_softc	{
 
 #define	AE_FLAG_LINK		0x01	/* Has link. */
 #define	AE_FLAG_DETACH		0x02	/* Is detaching. */
-#define	AE_FLAG_TXAVAIL		0x04	/* Txes available. */
+#define	AE_FLAG_TXAVAIL		0x04	/* Tx'es available. */
+#define	AE_FLAG_MSI		0x08	/* Using MSI. */
+#define	AE_FLAG_PMG		0x10	/* Supports PCI power management. */
 
 #endif	/* IF_AEVAR_H */
