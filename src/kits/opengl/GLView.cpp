@@ -84,7 +84,9 @@ BGLView::LockGL()
 {
 	// TODO: acquire the OpenGL API lock it on this glview
 
-	LockLooper();
+	if (!LockLooper())
+		return;
+	fDisplayLock.Lock();
 	if (fRenderer)
 		fRenderer->LockGL();
 }
@@ -93,6 +95,9 @@ BGLView::LockGL()
 void
 BGLView::UnlockGL()
 {
+	if (!fDisplayLock.IsLocked())
+		return;
+	fDisplayLock.Unlock();
 	if (fRenderer)
 		fRenderer->UnlockGL();
 	UnlockLooper();
