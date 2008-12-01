@@ -1,6 +1,12 @@
+/*
+ * Copyright 2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Oliver Ruiz Dorantes, oliver-ruiz.dorantes_at_gmail.com
+ */
 #ifndef L2CAP_ENDPOINT_H
 #define L2CAP_ENDPOINT_H
-
 
 #include <sys/stat.h>
 
@@ -18,8 +24,7 @@ extern net_stack_module_info* gStackModule;
 
 class L2capEndpoint : public net_protocol, 
 					  public ProtocolSocket,
-                      public DoublyLinkedListLinkImpl<L2capEndpoint>
-{
+                      public DoublyLinkedListLinkImpl<L2capEndpoint> {
 
 public:
 	L2capEndpoint(net_socket* socket);
@@ -102,4 +107,4 @@ private:
 
 extern DoublyLinkedList<L2capEndpoint> EndpointList;
 
-#endif	// L2cap_ENDPOINT_H
+#endif	// L2CAP_ENDPOINT_H

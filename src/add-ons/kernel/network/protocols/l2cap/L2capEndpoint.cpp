@@ -1,14 +1,22 @@
+/*
+ * Copyright 2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Oliver Ruiz Dorantes, oliver-ruiz.dorantes_at_gmail.com
+ */
 #include "L2capEndpoint.h"
+#include "l2cap_address.h"
 
 #include <stdio.h>
-#include <sys/stat.h>
 #include <string.h>
+#include <sys/stat.h>
 
-#include "l2cap_address.h"
 
 #include <bluetooth/L2CAP/btL2CAP.h>
 #define BT_DEBUG_THIS_MODULE
 #include <btDebug.h>
+
 
 static inline bigtime_t
 absolute_timeout(bigtime_t timeout)
@@ -58,7 +66,7 @@ L2capEndpoint::Init()
 {
 	debugf("[%ld] %p->L2capEndpoint::Init()\n", find_thread(NULL), this);
 
-	return(B_OK);
+	return B_OK;
 }
 
 
@@ -66,7 +74,6 @@ void
 L2capEndpoint::Uninit()
 {
 	debugf("[%ld] %p->L2capEndpoint::Uninit()\n", find_thread(NULL), this);
-
 
 }
 
@@ -76,13 +83,11 @@ L2capEndpoint::Open()
 {
 	debugf("[%ld] %p->L2capEndpoint::Open()\n", find_thread(NULL), this);
 
-    status_t error = ProtocolSocket::Open();
+	status_t error = ProtocolSocket::Open();
 	if (error != B_OK)
-		return(error);
+		return error;
 
-
-
-	return(B_OK);
+	return B_OK;
 }
 
 
@@ -91,7 +96,7 @@ L2capEndpoint::Close()
 {
 	debugf("[%ld] %p->L2capEndpoint::Close()\n", find_thread(NULL), this);
 
-	return(B_OK);
+	return B_OK;
 }
 
 
@@ -100,7 +105,7 @@ L2capEndpoint::Free()
 {
 	debugf("[%ld] %p->L2capEndpoint::Free()\n", find_thread(NULL), this);
 
-	return(B_OK);
+	return B_OK;
 }
 
 
@@ -111,7 +116,7 @@ L2capEndpoint::Bind(const struct sockaddr *_address)
 		panic("null adrresss!");
 	
 	if (_address->sa_family != AF_BLUETOOTH )
-		return(EAFNOSUPPORT);
+		return EAFNOSUPPORT;
 
 	// TODO: Check socladdr_l2cap size
 
@@ -144,7 +149,7 @@ L2capEndpoint::Unbind()
 {
 	debugf("[%ld] %p->L2capEndpoint::Unbind()\n", find_thread(NULL), this);
 
-	return(B_OK);
+	return B_OK;
 }
 
 
@@ -168,7 +173,7 @@ status_t
 L2capEndpoint::Connect(const struct sockaddr *_address)
 {
 	if (_address->sa_family != AF_BLUETOOTH)
-		return(EAFNOSUPPORT);
+		return EAFNOSUPPORT;
 
 	debugf("[%ld] %p->L2capEndpoint::Connect(\"%s\")\n", find_thread(NULL), this,
 		ConstSocketAddress(&gL2cap4AddressModule, _address).AsString().Data());
@@ -232,7 +237,6 @@ L2capEndpoint::Sendable()
 {
 	debugf("[%ld] %p->L2capEndpoint::Sendable()\n", find_thread(NULL), this);
 
-
 	return 0;
 }
 
@@ -257,8 +261,8 @@ L2capEndpoint::ForPsm(uint16 psm)
 	while (iterator.HasNext()) {
 
 		endpoint = iterator.Next();
-		if (((struct sockaddr_l2cap*)&endpoint->socket->address)->l2cap_psm == psm && 
-			endpoint->fState == LISTEN) {
+		if (((struct sockaddr_l2cap*)&endpoint->socket->address)->l2cap_psm == psm
+			&& endpoint->fState == LISTEN) {
 			// TODO endpoint ocupied, lock it! define a channel for it
 			return endpoint;
 		}

@@ -51,16 +51,16 @@ DoublyLinkedList<L2capEndpoint> EndpointList;
 extern net_protocol_module_info gL2CAPModule;
 
 // module references
-bluetooth_core_data_module_info *btCoreData;
+bluetooth_core_data_module_info* btCoreData;
 
-net_buffer_module_info *gBufferModule;
-net_stack_module_info *gStackModule;
-net_socket_module_info *gSocketModule;
+net_buffer_module_info* gBufferModule;
+net_stack_module_info* gStackModule;
+net_socket_module_info* gSocketModule;
 
-static struct net_domain *sDomain;
+static struct net_domain* sDomain;
 
-net_protocol *
-l2cap_init_protocol(net_socket *socket)
+net_protocol*
+l2cap_init_protocol(net_socket* socket)
 {
 	flowf("\n");
 
@@ -75,7 +75,7 @@ l2cap_init_protocol(net_socket *socket)
 
 
 status_t
-l2cap_uninit_protocol(net_protocol *protocol)
+l2cap_uninit_protocol(net_protocol* protocol)
 {
 	flowf("\n");
 	
@@ -88,7 +88,7 @@ l2cap_uninit_protocol(net_protocol *protocol)
 
 
 status_t
-l2cap_open(net_protocol *protocol)
+l2cap_open(net_protocol* protocol)
 {
 	flowf("\n");
 	
@@ -97,7 +97,7 @@ l2cap_open(net_protocol *protocol)
 
 
 status_t
-l2cap_close(net_protocol *protocol)
+l2cap_close(net_protocol* protocol)
 {
 	flowf("\n");
 	
@@ -106,7 +106,7 @@ l2cap_close(net_protocol *protocol)
 
 
 status_t
-l2cap_free(net_protocol *protocol)
+l2cap_free(net_protocol* protocol)
 {
 	flowf("\n");
 	
@@ -115,7 +115,7 @@ l2cap_free(net_protocol *protocol)
 
 
 status_t
-l2cap_connect(net_protocol *protocol, const struct sockaddr *address)
+l2cap_connect(net_protocol* protocol, const struct sockaddr* address)
 {
 	flowf("\n");
 	
@@ -124,7 +124,7 @@ l2cap_connect(net_protocol *protocol, const struct sockaddr *address)
 
 
 status_t
-l2cap_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
+l2cap_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
 	flowf("\n");
 	
@@ -133,8 +133,8 @@ l2cap_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
 
 
 status_t
-l2cap_control(net_protocol *protocol, int level, int option, void *value,
-	size_t *_length)
+l2cap_control(net_protocol* protocol, int level, int option, void* value,
+	size_t* _length)
 {
 	flowf("\n");
 	
@@ -144,8 +144,8 @@ l2cap_control(net_protocol *protocol, int level, int option, void *value,
 
 
 status_t
-l2cap_getsockopt(net_protocol *protocol, int level, int option,
-	void *value, int *length)
+l2cap_getsockopt(net_protocol* protocol, int level, int option,
+	void* value, int* length)
 {
 	flowf("\n");
 	
@@ -155,8 +155,8 @@ l2cap_getsockopt(net_protocol *protocol, int level, int option,
 
 
 status_t
-l2cap_setsockopt(net_protocol *protocol, int level, int option,
-	const void *value, int length)
+l2cap_setsockopt(net_protocol* protocol, int level, int option,
+	const void* value, int length)
 {
 	flowf("\n");
 
@@ -175,7 +175,7 @@ l2cap_bind(net_protocol* protocol, const struct sockaddr* address)
 
 
 status_t
-l2cap_unbind(net_protocol *protocol, struct sockaddr *address)
+l2cap_unbind(net_protocol* protocol, struct sockaddr* address)
 {
 	flowf("\n");
 	
@@ -184,14 +184,14 @@ l2cap_unbind(net_protocol *protocol, struct sockaddr *address)
 
 
 status_t
-l2cap_listen(net_protocol *protocol, int count)
+l2cap_listen(net_protocol* protocol, int count)
 {
 	return ((L2capEndpoint*)protocol)->Listen(count);
 }
 
 
 status_t
-l2cap_shutdown(net_protocol *protocol, int direction)
+l2cap_shutdown(net_protocol* protocol, int direction)
 {
 	flowf("\n");
 	
@@ -200,7 +200,7 @@ l2cap_shutdown(net_protocol *protocol, int direction)
 
 
 status_t
-l2cap_send_data(net_protocol *protocol, net_buffer *buffer)
+l2cap_send_data(net_protocol* protocol, net_buffer* buffer)
 {
 	flowf("\n");
 	
@@ -209,8 +209,8 @@ l2cap_send_data(net_protocol *protocol, net_buffer *buffer)
 
 
 status_t
-l2cap_send_routed_data(net_protocol *protocol, struct net_route *route,
-	net_buffer *buffer)
+l2cap_send_routed_data(net_protocol* protocol, struct net_route* route,
+	net_buffer* buffer)
 {
 	flowf("\n");
 	
@@ -219,7 +219,7 @@ l2cap_send_routed_data(net_protocol *protocol, struct net_route *route,
 
 
 ssize_t
-l2cap_send_avail(net_protocol *protocol)
+l2cap_send_avail(net_protocol* protocol)
 {
 	flowf("\n");
 	
@@ -228,8 +228,8 @@ l2cap_send_avail(net_protocol *protocol)
 
 
 status_t
-l2cap_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
-	net_buffer **_buffer)
+l2cap_read_data(net_protocol* protocol, size_t numBytes, uint32 flags,
+	net_buffer** _buffer)
 {
 	flowf("\n");
 
@@ -238,7 +238,7 @@ l2cap_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
 
 
 ssize_t
-l2cap_read_avail(net_protocol *protocol)
+l2cap_read_avail(net_protocol* protocol)
 {
 	flowf("\n");
 	
@@ -246,8 +246,8 @@ l2cap_read_avail(net_protocol *protocol)
 }
 
 
-struct net_domain *
-l2cap_get_domain(net_protocol *protocol)
+struct net_domain*
+l2cap_get_domain(net_protocol* protocol)
 {
 	flowf("\n");
 	
@@ -256,7 +256,7 @@ l2cap_get_domain(net_protocol *protocol)
 
 
 size_t
-l2cap_get_mtu(net_protocol *protocol, const struct sockaddr *address)
+l2cap_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 {
 	flowf("\n");
 	
@@ -265,9 +265,9 @@ l2cap_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 
 
 status_t
-l2cap_receive_data(net_buffer *buffer)
+l2cap_receive_data(net_buffer* buffer)
 {
-	HciConnection* conn = (HciConnection*) buffer;
+	HciConnection* conn = (HciConnection*)buffer;
 	debugf("received some data, buffer length %lu\n", conn->currentRxPacket->size);
 	
 	l2cap_receive(conn, conn->currentRxPacket);
@@ -277,7 +277,7 @@ l2cap_receive_data(net_buffer *buffer)
 
 
 status_t
-l2cap_error(uint32 code, net_buffer *data)
+l2cap_error(uint32 code, net_buffer* data)
 {
 	flowf("\n");
 	
@@ -286,8 +286,8 @@ l2cap_error(uint32 code, net_buffer *data)
 
 
 status_t
-l2cap_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
-	void *errorData)
+l2cap_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
+	void* errorData)
 {
 	flowf("\n");
 	
@@ -384,14 +384,14 @@ net_protocol_module_info gL2CAPModule = {
 };
 
 module_dependency module_dependencies[] = {
-	{NET_STACK_MODULE_NAME, (module_info **)&gStackModule},
-	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
-	{BT_CORE_DATA_MODULE_NAME, (module_info **)&btCoreData},
-	{NET_SOCKET_MODULE_NAME, (module_info **)&gSocketModule},
+	{NET_STACK_MODULE_NAME, (module_info**)&gStackModule},
+	{NET_BUFFER_MODULE_NAME, (module_info**)&gBufferModule},
+	{BT_CORE_DATA_MODULE_NAME, (module_info**)&btCoreData},
+	{NET_SOCKET_MODULE_NAME, (module_info**)&gSocketModule},
 	{}
 };
 
-module_info *modules[] = {
-	(module_info *)&gL2CAPModule,
+module_info* modules[] = {
+	(module_info*)&gL2CAPModule,
 	NULL
 };
