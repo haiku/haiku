@@ -508,7 +508,13 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 	if (dirPath.InitCheck() != B_OK || entryPath.InitCheck() != B_OK)
 		return false;
 
-	return !strncmp(dirPath.Path(), entryPath.Path(), strlen(dirPath.Path()));
+	uint32 dirLen = strlen(dirPath.Path());
+	
+	if (!strncmp(dirPath.Path(), entryPath.Path(), dirLen)) {
+		if (strlen(entryPath.Path()) > dirLen && entryPath.Path()[dirLen] == '/')
+			return true;
+	}
+	return false;
 }
 
 
