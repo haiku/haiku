@@ -425,8 +425,6 @@ l2cap_info_rsp(uint8 _ident, uint16 _type, uint16 _result, uint16 _mtu)
 #endif
 
 
-#define _ng_l2cap_build_cfg_options(_m, _mtu, _flush_timo, _flow)	\
-
 /* Build configuration options  */
 net_buffer*
 l2cap_build_cfg_options(uint16* _mtu, uint16* _flush_timo, l2cap_flow_t* _flow)
@@ -460,7 +458,7 @@ l2cap_build_cfg_options(uint16* _mtu, uint16* _flush_timo, l2cap_flow_t* _flow)
 		bufferHeader->hdr.length = sizeof(bufferHeader->val);
 		bufferHeader->val = htole16(*(uint16 *)(_mtu));
 
-		delete &bufferHeader;
+		bufferHeader.Sync();
 	}
 
 	if (_flush_timo != NULL) {
@@ -476,7 +474,7 @@ l2cap_build_cfg_options(uint16* _mtu, uint16* _flush_timo, l2cap_flow_t* _flow)
 		bufferHeader->hdr.length = sizeof(bufferHeader->val);
 		bufferHeader->val = htole16(*(int16 *)(_flush_timo));
 
-		delete &bufferHeader;
+		bufferHeader.Sync();
 	}
 
 	if (_flow != NULL) {
@@ -498,7 +496,7 @@ l2cap_build_cfg_options(uint16* _mtu, uint16* _flush_timo, l2cap_flow_t* _flow)
 		bufferHeader->val.latency = htole32(_flow->latency);
 		bufferHeader->val.delay_variation = htole32(_flow->delay_variation);
 
-		delete &bufferHeader;
+		bufferHeader.Sync();
 	}
 
 	return _m;
