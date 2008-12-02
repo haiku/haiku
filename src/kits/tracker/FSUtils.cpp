@@ -591,7 +591,8 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 		case kMoveSelectionTo:
 			{
 				if (gStatusWindow)
-					gStatusWindow->CreateStatusItem(thread, kCopyState);
+					gStatusWindow->CreateStatusItem(thread, 
+						moveMode == kMoveSelectionTo ? kMoveState : kCopyState);
 
 				int32 totalItems = 0;
 				off_t totalSize = 0;
@@ -616,9 +617,7 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 				// this will be fast, only put up status if lots of items
 				// moved, links created
 				if (gStatusWindow) {
-					gStatusWindow->CreateStatusItem(thread,
-						moveMode == kMoveSelectionTo
-							? kMoveState : kCreateLinkState);
+					gStatusWindow->CreateStatusItem(thread, kCreateLinkState);
 					gStatusWindow->InitStatusItem(thread, numItems, numItems,
 						destRef);
 				}
