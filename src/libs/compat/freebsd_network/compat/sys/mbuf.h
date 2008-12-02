@@ -128,6 +128,7 @@ void m_copyback(struct mbuf *, int, int, caddr_t);
 
 struct mbuf *m_get(int how, short type);
 struct mbuf *m_gethdr(int how, short type);
+struct mbuf *m_getjcl(int how, short type, int flags, int size);
 void m_clget(struct mbuf *m, int how);
 void *m_cljget(struct mbuf *m, int how, int size);
 

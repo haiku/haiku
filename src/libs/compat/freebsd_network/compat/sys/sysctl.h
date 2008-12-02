@@ -65,6 +65,7 @@ sysctl_add_oid(struct sysctl_ctx_list *clist,
 
 static inline int sysctl_handle_long(SYSCTL_HANDLER_ARGS) { return -1; }
 static inline int sysctl_handle_opaque(SYSCTL_HANDLER_ARGS) { return -1; }
+static inline int sysctl_handle_quad(SYSCTL_HANDLER_ARGS) { return -1; }
 static inline int sysctl_handle_int(SYSCTL_HANDLER_ARGS) { return -1; }
 static inline int sysctl_handle_string(SYSCTL_HANDLER_ARGS) { return -1; }
 
@@ -97,6 +98,10 @@ static inline int sysctl_handle_string(SYSCTL_HANDLER_ARGS) { return -1; }
 #define SYSCTL_ADD_ULONG(ctx, parent, nbr, name, access, ptr, descr)	    \
 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_ULONG|(access),	    \
 	ptr, 0, sysctl_handle_long, "LU", __DESCR(descr))
+
+#define SYSCTL_ADD_QUAD(ctx, parent, nbr, name, access, ptr, descr)		\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_QUAD|(access),		\
+	ptr, 0, sysctl_handle_quad, "Q", __DESCR(descr))
 
 #define SYSCTL_ADD_OPAQUE(ctx, parent, nbr, name, access, ptr, len, fmt, descr)\
 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_OPAQUE|(access),	    \
