@@ -511,7 +511,7 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 	uint32 dirLen = strlen(dirPath.Path());
 	
 	if (!strncmp(dirPath.Path(), entryPath.Path(), dirLen)) {
-		if (strlen(entryPath.Path()) > dirLen && entryPath.Path()[dirLen] == '/')
+		if (strlen(entryPath.Path()) == dirLen || entryPath.Path()[dirLen] == '/')
 			return true;
 	}
 	return false;
