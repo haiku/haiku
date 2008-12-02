@@ -15,7 +15,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: src/sys/dev/nfe/if_nfevar.h,v 1.5 2007/07/24 01:11:00 yongari Exp $
+ * $FreeBSD: src/sys/dev/nfe/if_nfevar.h,v 1.7 2008/10/03 03:58:16 yongari Exp $
  */
 
 struct nfe_tx_data {
@@ -34,11 +34,6 @@ struct nfe_tx_ring {
 	int			queued;
 	int			cur;
 	int			next;
-};
-
-struct nfe_jpool_entry {
-	int				slot;
-	SLIST_ENTRY(nfe_jpool_entry)	jpool_entries;
 };
 
 struct nfe_rx_data {
@@ -65,8 +60,6 @@ struct nfe_jrx_ring {
 	bus_dmamap_t		jrx_desc_map;
 	bus_dma_tag_t		jrx_jumbo_tag;
 	bus_dmamap_t		jrx_jumbo_map;
-	void			*jpool;
-	caddr_t			jslots[NFE_JSLOTS];
 	bus_addr_t		jphysaddr;
 	struct nfe_desc32	*jdesc32;
 	struct nfe_desc64	*jdesc64;
@@ -75,6 +68,39 @@ struct nfe_jrx_ring {
 	struct nfe_rx_data	jdata[NFE_JUMBO_RX_RING_COUNT];
 	int			jcur;
 	int			jnext;
+};
+
+struct nfe_hw_stats {
+	uint64_t		rx_octets;
+	uint32_t		rx_frame_errors;
+	uint32_t		rx_extra_bytes;
+	uint32_t		rx_late_cols;
+	uint32_t		rx_runts;
+	uint32_t		rx_jumbos;
+	uint32_t		rx_fifo_overuns;
+	uint32_t		rx_crc_errors;
+	uint32_t		rx_fae;
+	uint32_t		rx_len_errors;
+	uint32_t		rx_unicast;
+	uint32_t		rx_multicast;
+	uint32_t		rx_broadcast;
+	uint32_t		rx_pause;
+	uint32_t		rx_drops;
+	uint64_t		tx_octets;
+	uint32_t		tx_zero_rexmits;
+	uint32_t		tx_one_rexmits;
+	uint32_t		tx_multi_rexmits;
+	uint32_t		tx_late_cols;
+	uint32_t		tx_fifo_underuns;
+	uint32_t		tx_carrier_losts;
+	uint32_t		tx_excess_deferals;
+	uint32_t		tx_retry_errors;
+	uint32_t		tx_deferals;
+	uint32_t		tx_frames;
+	uint32_t		tx_pause;
+	uint32_t		tx_unicast;
+	uint32_t		tx_multicast;
+	uint32_t		tx_broadcast;
 };
 
 struct nfe_softc {
@@ -103,10 +129,14 @@ struct nfe_softc {
 #define	NFE_PWR_MGMT		0x0010
 #define	NFE_CORRECT_MACADDR	0x0020
 #define	NFE_TX_FLOW_CTRL	0x0040
+#define	NFE_MIB_V1		0x0080
+#define	NFE_MIB_V2		0x0100
+#define	NFE_MIB_V3		0x0200
 	int			nfe_jumbo_disable;
 	uint32_t		rxtxctl;
 	uint8_t			mii_phyaddr;
 	uint8_t			eaddr[ETHER_ADDR_LEN];
+	struct nfe_hw_stats	nfe_stats;
 	struct taskqueue	*nfe_tq;
 	struct task		nfe_int_task;
 	struct task		nfe_tx_task;
@@ -126,9 +156,6 @@ struct nfe_softc {
 	struct nfe_tx_ring	txq;
 	struct nfe_rx_ring	rxq;
 	struct nfe_jrx_ring	jrxq;
-	SLIST_HEAD(__nfe_jfreehead, nfe_jpool_entry)	nfe_jfree_listhead;
-	SLIST_HEAD(__nfe_jinusehead, nfe_jpool_entry)	nfe_jinuse_listhead;
-	struct mtx		nfe_jlist_mtx;
 };
 
 struct nfe_type {

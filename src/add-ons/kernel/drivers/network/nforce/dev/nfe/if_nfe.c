@@ -21,7 +21,7 @@
 /* Driver for NVIDIA nForce MCP Fast Ethernet and Gigabit Ethernet */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/nfe/if_nfe.c,v 1.21 2007/09/14 05:12:25 yongari Exp $");
+__FBSDID("$FreeBSD: src/sys/dev/nfe/if_nfe.c,v 1.30 2008/10/03 03:58:16 yongari Exp $");
 
 #ifdef HAVE_KERNEL_OPTION_HEADERS
 #include "opt_device_polling.h"
@@ -76,7 +76,7 @@ static int  nfe_attach(device_t);
 static int  nfe_detach(device_t);
 static int  nfe_suspend(device_t);
 static int  nfe_resume(device_t);
-static void nfe_shutdown(device_t);
+static int nfe_shutdown(device_t);
 static void nfe_power(struct nfe_softc *);
 static int  nfe_miibus_readreg(device_t, int, int);
 static int  nfe_miibus_writereg(device_t, int, int, int);
@@ -89,8 +89,6 @@ static int  nfe_ioctl(struct ifnet *, u_long, caddr_t);
 static void nfe_alloc_msix(struct nfe_softc *, int);
 static int nfe_intr(void *);
 static void nfe_int_task(void *, int);
-static void *nfe_jalloc(struct nfe_softc *);
-static void nfe_jfree(void *, void *);
 static __inline void nfe_discard_rxbuf(struct nfe_softc *, int);
 static __inline void nfe_discard_jrxbuf(struct nfe_softc *, int);
 static int nfe_newbuf(struct nfe_softc *, int);
@@ -98,7 +96,6 @@ static int nfe_jnewbuf(struct nfe_softc *, int);
 static int  nfe_rxeof(struct nfe_softc *, int);
 static int  nfe_jrxeof(struct nfe_softc *, int);
 static void nfe_txeof(struct nfe_softc *);
-static struct mbuf *nfe_defrag(struct mbuf *, int, int);
 static int  nfe_encap(struct nfe_softc *, struct mbuf **);
 static void nfe_setmulti(struct nfe_softc *);
 static void nfe_tx_task(void *, int);
@@ -125,6 +122,9 @@ static void nfe_dma_map_segs(void *, bus_dma_segment_t *, int, int);
 
 static int sysctl_int_range(SYSCTL_HANDLER_ARGS, int, int);
 static int sysctl_hw_nfe_proc_limit(SYSCTL_HANDLER_ARGS);
+static void nfe_sysctl_node(struct nfe_softc *);
+static void nfe_stats_clear(struct nfe_softc *);
+static void nfe_stats_update(struct nfe_softc *);
 
 #ifdef NFE_DEBUG
 static int nfedebug = 0;
@@ -144,9 +144,6 @@ static int nfedebug = 0;
 #define	NFE_LOCK(_sc)		mtx_lock(&(_sc)->nfe_mtx)
 #define	NFE_UNLOCK(_sc)		mtx_unlock(&(_sc)->nfe_mtx)
 #define	NFE_LOCK_ASSERT(_sc)	mtx_assert(&(_sc)->nfe_mtx, MA_OWNED)
-
-#define	NFE_JLIST_LOCK(_sc)	mtx_lock(&(_sc)->nfe_jlist_mtx)
-#define	NFE_JLIST_UNLOCK(_sc)	mtx_unlock(&(_sc)->nfe_jlist_mtx)
 
 /* Tunables. */
 static int msi_disable = 0;
@@ -243,6 +240,30 @@ static struct nfe_type nfe_devs[] = {
 	    "NVIDIA nForce MCP67 Networking Adapter"},
 	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP67_LAN4,
 	    "NVIDIA nForce MCP67 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP73_LAN1,
+	    "NVIDIA nForce MCP73 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP73_LAN2,
+	    "NVIDIA nForce MCP73 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP73_LAN3,
+	    "NVIDIA nForce MCP73 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP73_LAN4,
+	    "NVIDIA nForce MCP73 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP77_LAN1,
+	    "NVIDIA nForce MCP77 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP77_LAN2,
+	    "NVIDIA nForce MCP77 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP77_LAN3,
+	    "NVIDIA nForce MCP77 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP77_LAN4,
+	    "NVIDIA nForce MCP77 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP79_LAN1,
+	    "NVIDIA nForce MCP79 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP79_LAN2,
+	    "NVIDIA nForce MCP79 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP79_LAN3,
+	    "NVIDIA nForce MCP79 Networking Adapter"},
+	{PCI_VENDOR_NVIDIA, PCI_PRODUCT_NVIDIA_MCP79_LAN4,
+	    "NVIDIA nForce MCP79 Networking Adapter"},
 	{0, 0, NULL}
 };
 
@@ -326,11 +347,8 @@ nfe_attach(device_t dev)
 
 	mtx_init(&sc->nfe_mtx, device_get_nameunit(dev), MTX_NETWORK_LOCK,
 	    MTX_DEF);
-	mtx_init(&sc->nfe_jlist_mtx, "nfe_jlist_mtx", NULL, MTX_DEF);
 	callout_init_mtx(&sc->nfe_stat_ch, &sc->nfe_mtx, 0);
 	TASK_INIT(&sc->nfe_link_task, 0, nfe_link_task, sc);
-	SLIST_INIT(&sc->nfe_jfree_listhead);
-	SLIST_INIT(&sc->nfe_jinuse_listhead);
 
 	pci_enable_busmaster(dev);
 
@@ -439,18 +457,19 @@ nfe_attach(device_t dev)
 		break;
 	case PCI_PRODUCT_NVIDIA_MCP51_LAN1:
 	case PCI_PRODUCT_NVIDIA_MCP51_LAN2:
-		sc->nfe_flags |= NFE_40BIT_ADDR | NFE_PWR_MGMT;
+		sc->nfe_flags |= NFE_40BIT_ADDR | NFE_PWR_MGMT | NFE_MIB_V1;
 		break;
 	case PCI_PRODUCT_NVIDIA_CK804_LAN1:
 	case PCI_PRODUCT_NVIDIA_CK804_LAN2:
 	case PCI_PRODUCT_NVIDIA_MCP04_LAN1:
 	case PCI_PRODUCT_NVIDIA_MCP04_LAN2:
-		sc->nfe_flags |= NFE_JUMBO_SUP | NFE_40BIT_ADDR | NFE_HW_CSUM;
+		sc->nfe_flags |= NFE_JUMBO_SUP | NFE_40BIT_ADDR | NFE_HW_CSUM |
+		    NFE_MIB_V1;
 		break;
 	case PCI_PRODUCT_NVIDIA_MCP55_LAN1:
 	case PCI_PRODUCT_NVIDIA_MCP55_LAN2:
 		sc->nfe_flags |= NFE_JUMBO_SUP | NFE_40BIT_ADDR | NFE_HW_CSUM |
-		    NFE_HW_VLAN | NFE_PWR_MGMT | NFE_TX_FLOW_CTRL;
+		    NFE_HW_VLAN | NFE_PWR_MGMT | NFE_TX_FLOW_CTRL | NFE_MIB_V2;
 		break;
 
 	case PCI_PRODUCT_NVIDIA_MCP61_LAN1:
@@ -461,15 +480,36 @@ nfe_attach(device_t dev)
 	case PCI_PRODUCT_NVIDIA_MCP67_LAN2:
 	case PCI_PRODUCT_NVIDIA_MCP67_LAN3:
 	case PCI_PRODUCT_NVIDIA_MCP67_LAN4:
+	case PCI_PRODUCT_NVIDIA_MCP73_LAN1:
+	case PCI_PRODUCT_NVIDIA_MCP73_LAN2:
+	case PCI_PRODUCT_NVIDIA_MCP73_LAN3:
+	case PCI_PRODUCT_NVIDIA_MCP73_LAN4:
 		sc->nfe_flags |= NFE_40BIT_ADDR | NFE_PWR_MGMT |
-		    NFE_TX_FLOW_CTRL;
+		    NFE_CORRECT_MACADDR | NFE_TX_FLOW_CTRL | NFE_MIB_V2;
+		break;
+	case PCI_PRODUCT_NVIDIA_MCP77_LAN1:
+	case PCI_PRODUCT_NVIDIA_MCP77_LAN2:
+	case PCI_PRODUCT_NVIDIA_MCP77_LAN3:
+	case PCI_PRODUCT_NVIDIA_MCP77_LAN4:
+		/* XXX flow control */
+		sc->nfe_flags |= NFE_40BIT_ADDR | NFE_HW_CSUM | NFE_PWR_MGMT |
+		    NFE_CORRECT_MACADDR | NFE_MIB_V3;
+		break;
+	case PCI_PRODUCT_NVIDIA_MCP79_LAN1:
+	case PCI_PRODUCT_NVIDIA_MCP79_LAN2:
+	case PCI_PRODUCT_NVIDIA_MCP79_LAN3:
+	case PCI_PRODUCT_NVIDIA_MCP79_LAN4:
+		/* XXX flow control */
+		sc->nfe_flags |= NFE_JUMBO_SUP | NFE_40BIT_ADDR | NFE_HW_CSUM |
+		    NFE_PWR_MGMT | NFE_CORRECT_MACADDR | NFE_MIB_V3;
 		break;
 	case PCI_PRODUCT_NVIDIA_MCP65_LAN1:
 	case PCI_PRODUCT_NVIDIA_MCP65_LAN2:
 	case PCI_PRODUCT_NVIDIA_MCP65_LAN3:
 	case PCI_PRODUCT_NVIDIA_MCP65_LAN4:
 		sc->nfe_flags |= NFE_JUMBO_SUP | NFE_40BIT_ADDR |
-		    NFE_PWR_MGMT | NFE_TX_FLOW_CTRL;
+		    NFE_PWR_MGMT | NFE_CORRECT_MACADDR | NFE_TX_FLOW_CTRL |
+		    NFE_MIB_V2;
 		break;
 	}
 
@@ -516,24 +556,8 @@ nfe_attach(device_t dev)
 		goto fail;
 
 	nfe_alloc_jrx_ring(sc, &sc->jrxq);
-
-	SYSCTL_ADD_PROC(device_get_sysctl_ctx(dev),
-	    SYSCTL_CHILDREN(device_get_sysctl_tree(dev)),
-	    OID_AUTO, "process_limit", CTLTYPE_INT | CTLFLAG_RW,
-	    &sc->nfe_process_limit, 0, sysctl_hw_nfe_proc_limit, "I",
-	    "max number of Rx events to process");
-
-	sc->nfe_process_limit = NFE_PROC_DEFAULT;
-	error = resource_int_value(device_get_name(dev), device_get_unit(dev),
-	    "process_limit", &sc->nfe_process_limit);
-	if (error == 0) {
-		if (sc->nfe_process_limit < NFE_PROC_MIN ||
-		    sc->nfe_process_limit > NFE_PROC_MAX) {
-			device_printf(dev, "process_limit value out of range; "
-			    "using default: %d\n", NFE_PROC_DEFAULT);
-			sc->nfe_process_limit = NFE_PROC_DEFAULT;
-		}
-	}
+	/* Create sysctl node. */
+	nfe_sysctl_node(sc);
 
 	ifp->if_softc = sc;
 	if_initname(ifp, device_get_name(dev), device_get_unit(dev));
@@ -714,7 +738,6 @@ nfe_detach(device_t dev)
 		sc->nfe_parent_tag = NULL;
 	}
 
-	mtx_destroy(&sc->nfe_jlist_mtx);
 	mtx_destroy(&sc->nfe_mtx);
 
 	return (0);
@@ -982,63 +1005,6 @@ nfe_miibus_writereg(device_t dev, int phy, int reg, int val)
 	return (0);
 }
 
-/*
- * Allocate a jumbo buffer.
- */
-static void *
-nfe_jalloc(struct nfe_softc *sc)
-{
-	struct nfe_jpool_entry *entry;
-
-	NFE_JLIST_LOCK(sc);
-
-	entry = SLIST_FIRST(&sc->nfe_jfree_listhead);
-
-	if (entry == NULL) {
-		NFE_JLIST_UNLOCK(sc);
-		return (NULL);
-	}
-
-	SLIST_REMOVE_HEAD(&sc->nfe_jfree_listhead, jpool_entries);
-	SLIST_INSERT_HEAD(&sc->nfe_jinuse_listhead, entry, jpool_entries);
-
-	NFE_JLIST_UNLOCK(sc);
-
-	return (sc->jrxq.jslots[entry->slot]);
-}
-
-/*
- * Release a jumbo buffer.
- */
-static void
-nfe_jfree(void *buf, void *args)
-{
-	struct nfe_softc *sc;
-	struct nfe_jpool_entry *entry;
-	int i;
-
-	/* Extract the softc struct pointer. */
-	sc = (struct nfe_softc *)args;
-	KASSERT(sc != NULL, ("%s: can't find softc pointer!", __func__));
-
-	NFE_JLIST_LOCK(sc);
-	/* Calculate the slot this buffer belongs to. */
-	i = ((vm_offset_t)buf
-	     - (vm_offset_t)sc->jrxq.jpool) / NFE_JLEN;
-	KASSERT(i >= 0 && i < NFE_JSLOTS,
-	    ("%s: asked to free buffer that we don't manage!", __func__));
-
-	entry = SLIST_FIRST(&sc->nfe_jinuse_listhead);
-	KASSERT(entry != NULL, ("%s: buffer not in use!", __func__));
-	entry->slot = i;
-	SLIST_REMOVE_HEAD(&sc->nfe_jinuse_listhead, jpool_entries);
-	SLIST_INSERT_HEAD(&sc->nfe_jfree_listhead, entry, jpool_entries);
-	if (SLIST_EMPTY(&sc->nfe_jinuse_listhead))
-		wakeup(sc);
-
-	NFE_JLIST_UNLOCK(sc);
-}
-
 struct nfe_dmamap_arg {
 	bus_addr_t nfe_busaddr;
 };
@@ -1147,8 +1113,6 @@ nfe_alloc_jrx_ring(struct nfe_softc *sc, struct nfe_jrx_ring *ring)
 	struct nfe_dmamap_arg ctx;
 	struct nfe_rx_data *data;
 	void *desc;
-	struct nfe_jpool_entry *entry;
-	uint8_t *ptr;
 	int i, error, descsize;
 
 	if ((sc->nfe_flags & NFE_JUMBO_SUP) == 0)
@@ -1187,33 +1151,15 @@ nfe_alloc_jrx_ring(struct nfe_softc *sc, struct nfe_jrx_ring *ring)
 		goto fail;
 	}
 
-	/* Create DMA tag for jumbo buffer blocks. */
-	error = bus_dma_tag_create(sc->nfe_parent_tag,
-	    PAGE_SIZE, 0,			/* alignment, boundary */
-	    BUS_SPACE_MAXADDR,			/* lowaddr */
-	    BUS_SPACE_MAXADDR,			/* highaddr */
-	    NULL, NULL,				/* filter, filterarg */
-	    NFE_JMEM,				/* maxsize */
-	    1, 					/* nsegments */
-	    NFE_JMEM,				/* maxsegsize */
-	    0,					/* flags */
-	    NULL, NULL,				/* lockfunc, lockarg */
-	    &ring->jrx_jumbo_tag);
-	if (error != 0) {
-		device_printf(sc->nfe_dev,
-		    "could not create jumbo Rx buffer block DMA tag\n");
-		goto fail;
-	}
-
 	/* Create DMA tag for jumbo Rx buffers. */
 	error = bus_dma_tag_create(sc->nfe_parent_tag,
 	    PAGE_SIZE, 0,			/* alignment, boundary */
 	    BUS_SPACE_MAXADDR,			/* lowaddr */
 	    BUS_SPACE_MAXADDR,			/* highaddr */
 	    NULL, NULL,				/* filter, filterarg */
-	    NFE_JLEN,				/* maxsize */
+	    MJUM9BYTES,				/* maxsize */
 	    1,					/* nsegments */
-	    NFE_JLEN,				/* maxsegsize */
+	    MJUM9BYTES,				/* maxsegsize */
 	    0,					/* flags */
 	    NULL, NULL,				/* lockfunc, lockarg */
 	    &ring->jrx_data_tag);
@@ -1265,46 +1211,6 @@ nfe_alloc_jrx_ring(struct nfe_softc *sc, struct nfe_jrx_ring *ring)
 			    "could not create jumbo Rx DMA map\n");
 			goto fail;
 		}
-	}
-
-	/* Allocate DMA'able memory and load the DMA map for jumbo buf. */
-	error = bus_dmamem_alloc(ring->jrx_jumbo_tag, (void **)&ring->jpool,
-	    BUS_DMA_WAITOK | BUS_DMA_COHERENT | BUS_DMA_ZERO,
-	    &ring->jrx_jumbo_map);
-	if (error != 0) {
-		device_printf(sc->nfe_dev,
-		    "could not allocate DMA'able memory for jumbo pool\n");
-		goto fail;
-	}
-
-	ctx.nfe_busaddr = 0;
-	error = bus_dmamap_load(ring->jrx_jumbo_tag, ring->jrx_jumbo_map,
-	    ring->jpool, NFE_JMEM, nfe_dma_map_segs, &ctx, 0);
-	if (error != 0) {
-		device_printf(sc->nfe_dev,
-		    "could not load DMA'able memory for jumbo pool\n");
-		goto fail;
-	}
-
-	/*
-	 * Now divide it up into 9K pieces and save the addresses
-	 * in an array.
-	 */
-	ptr = ring->jpool;
-	for (i = 0; i < NFE_JSLOTS; i++) {
-		ring->jslots[i] = ptr;
-		ptr += NFE_JLEN;
-		entry = malloc(sizeof(struct nfe_jpool_entry), M_DEVBUF,
-		    M_WAITOK);
-		if (entry == NULL) {
-			device_printf(sc->nfe_dev,
-			    "no memory for jumbo buffers!\n");
-			error = ENOMEM;
-			goto fail;
-		}
-		entry->slot = i;
-		SLIST_INSERT_HEAD(&sc->nfe_jfree_listhead, entry,
-		    jpool_entries);
 	}
 
 	return;
@@ -1364,7 +1270,7 @@ nfe_init_jrx_ring(struct nfe_softc *sc, struct nfe_jrx_ring *ring)
 		desc = ring->jdesc32;
 		descsize = sizeof (struct nfe_desc32);
 	}
-	bzero(desc, descsize * NFE_RX_RING_COUNT);
+	bzero(desc, descsize * NFE_JUMBO_RX_RING_COUNT);
 	for (i = 0; i < NFE_JUMBO_RX_RING_COUNT; i++) {
 		if (nfe_jnewbuf(sc, i) != 0)
 			return (ENOBUFS);
@@ -1431,29 +1337,12 @@ nfe_free_rx_ring(struct nfe_softc *sc, struct nfe_rx_ring *ring)
 static void
 nfe_free_jrx_ring(struct nfe_softc *sc, struct nfe_jrx_ring *ring)
 {
-	struct nfe_jpool_entry *entry;
 	struct nfe_rx_data *data;
 	void *desc;
 	int i, descsize;
 
 	if ((sc->nfe_flags & NFE_JUMBO_SUP) == 0)
 		return;
-
-	NFE_JLIST_LOCK(sc);
-	while ((entry = SLIST_FIRST(&sc->nfe_jinuse_listhead))) {
-		device_printf(sc->nfe_dev,
-		    "asked to free buffer that is in use!\n");
-		SLIST_REMOVE_HEAD(&sc->nfe_jinuse_listhead, jpool_entries);
-		SLIST_INSERT_HEAD(&sc->nfe_jfree_listhead, entry,
-		    jpool_entries);
-	}
-
-	while (!SLIST_EMPTY(&sc->nfe_jfree_listhead)) {
-		entry = SLIST_FIRST(&sc->nfe_jfree_listhead);
-		SLIST_REMOVE_HEAD(&sc->nfe_jfree_listhead, jpool_entries);
-		free(entry, M_DEVBUF);
-	}
-        NFE_JLIST_UNLOCK(sc);
 
 	if (sc->nfe_flags & NFE_40BIT_ADDR) {
 		desc = ring->jdesc64;
@@ -1492,15 +1381,7 @@ nfe_free_jrx_ring(struct nfe_softc *sc, struct nfe_jrx_ring *ring)
 		ring->jdesc32 = NULL;
 		ring->jrx_desc_map = NULL;
 	}
-	/* Destroy jumbo buffer block. */
-	if (ring->jrx_jumbo_map != NULL)
-		bus_dmamap_unload(ring->jrx_jumbo_tag, ring->jrx_jumbo_map);
-	if (ring->jrx_jumbo_map != NULL) {
-		bus_dmamem_free(ring->jrx_jumbo_tag, ring->jpool,
-		    ring->jrx_jumbo_map);
-		ring->jpool = NULL;
-		ring->jrx_jumbo_map = NULL;
-	}
+
 	if (ring->jrx_desc_tag != NULL) {
 		bus_dma_tag_destroy(ring->jrx_desc_tag);
 		ring->jrx_desc_tag = NULL;
@@ -1689,7 +1570,7 @@ nfe_poll(struct ifnet *ifp, enum poll_cmd cmd, int count)
 		nfe_rxeof(sc, count);
 	nfe_txeof(sc);
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-		taskqueue_enqueue_fast(taskqueue_fast, &sc->nfe_tx_task);
+		taskqueue_enqueue_fast(sc->nfe_tq, &sc->nfe_tx_task);
 
 	if (cmd == POLL_AND_CHECK_STATUS) {
 		if ((r = NFE_READ(sc, sc->nfe_irq_status)) == 0) {
@@ -1898,7 +1779,7 @@ nfe_intr(void *arg)
 	if (status == 0 || status == 0xffffffff)
 		return (FILTER_STRAY);
 	nfe_disable_intr(sc);
-	taskqueue_enqueue_fast(taskqueue_fast, &sc->nfe_int_task);
+	taskqueue_enqueue_fast(sc->nfe_tq, &sc->nfe_int_task);
 
 	return (FILTER_HANDLED);
 }
@@ -1952,12 +1833,12 @@ nfe_int_task(void *arg, int pending)
 	nfe_txeof(sc);
 
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-		taskqueue_enqueue_fast(taskqueue_fast, &sc->nfe_tx_task);
+		taskqueue_enqueue_fast(sc->nfe_tq, &sc->nfe_tx_task);
 
 	NFE_UNLOCK(sc);
 
 	if (domore || (NFE_READ(sc, sc->nfe_irq_status) != 0)) {
-		taskqueue_enqueue_fast(taskqueue_fast, &sc->nfe_int_task);
+		taskqueue_enqueue_fast(sc->nfe_tq, &sc->nfe_int_task);
 		return;
 	}
 
@@ -2084,24 +1965,15 @@ nfe_jnewbuf(struct nfe_softc *sc, int idx)
 	bus_dma_segment_t segs[1];
 	bus_dmamap_t map;
 	int nsegs;
-	void *buf;
 
-	MGETHDR(m, M_DONTWAIT, MT_DATA);
+	m = m_getjcl(M_DONTWAIT, MT_DATA, M_PKTHDR, MJUM9BYTES);
 	if (m == NULL)
 		return (ENOBUFS);
-	buf = nfe_jalloc(sc);
-	if (buf == NULL) {
-		m_freem(m);
-		return (ENOBUFS);
-	}
-	/* Attach the buffer to the mbuf. */
-	MEXTADD(m, buf, NFE_JLEN, nfe_jfree, (struct nfe_softc *)sc, 0,
-	    EXT_NET_DRV);
 	if ((m->m_flags & M_EXT) == 0) {
 		m_freem(m);
 		return (ENOBUFS);
 	}
-	m->m_pkthdr.len = m->m_len = NFE_JLEN;
+	m->m_pkthdr.len = m->m_len = MJUM9BYTES;
 	m_adj(m, ETHER_ALIGN);
 
 	if (bus_dmamap_load_mbuf_sg(sc->jrxq.jrx_data_tag,
@@ -2437,93 +2309,6 @@ nfe_txeof(struct nfe_softc *sc)
 	}
 }
 
-/*
- * It's copy of ath_defrag(ath(4)).
- *
- * Defragment an mbuf chain, returning at most maxfrags separate
- * mbufs+clusters.  If this is not possible NULL is returned and
- * the original mbuf chain is left in it's present (potentially
- * modified) state.  We use two techniques: collapsing consecutive
- * mbufs and replacing consecutive mbufs by a cluster.
- */
-static struct mbuf *
-nfe_defrag(struct mbuf *m0, int how, int maxfrags)
-{
-	struct mbuf *m, *n, *n2, **prev;
-	u_int curfrags;
-
-	/*
-	 * Calculate the current number of frags.
-	 */
-	curfrags = 0;
-	for (m = m0; m != NULL; m = m->m_next)
-		curfrags++;
-	/*
-	 * First, try to collapse mbufs.  Note that we always collapse
-	 * towards the front so we don't need to deal with moving the
-	 * pkthdr.  This may be suboptimal if the first mbuf has much
-	 * less data than the following.
-	 */
-	m = m0;
-again:
-	for (;;) {
-		n = m->m_next;
-		if (n == NULL)
-			break;
-		if ((m->m_flags & M_RDONLY) == 0 &&
-		    n->m_len < M_TRAILINGSPACE(m)) {
-			bcopy(mtod(n, void *), mtod(m, char *) + m->m_len,
-				n->m_len);
-			m->m_len += n->m_len;
-			m->m_next = n->m_next;
-			m_free(n);
-			if (--curfrags <= maxfrags)
-				return (m0);
-		} else
-			m = n;
-	}
-	KASSERT(maxfrags > 1,
-		("maxfrags %u, but normal collapse failed", maxfrags));
-	/*
-	 * Collapse consecutive mbufs to a cluster.
-	 */
-	prev = &m0->m_next;		/* NB: not the first mbuf */
-	while ((n = *prev) != NULL) {
-		if ((n2 = n->m_next) != NULL &&
-		    n->m_len + n2->m_len < MCLBYTES) {
-			m = m_getcl(how, MT_DATA, 0);
-			if (m == NULL)
-				goto bad;
-			bcopy(mtod(n, void *), mtod(m, void *), n->m_len);
-			bcopy(mtod(n2, void *), mtod(m, char *) + n->m_len,
-				n2->m_len);
-			m->m_len = n->m_len + n2->m_len;
-			m->m_next = n2->m_next;
-			*prev = m;
-			m_free(n);
-			m_free(n2);
-			if (--curfrags <= maxfrags)	/* +1 cl -2 mbufs */
-				return m0;
-			/*
-			 * Still not there, try the normal collapse
-			 * again before we allocate another cluster.
-			 */
-			goto again;
-		}
-		prev = &n->m_next;
-	}
-	/*
-	 * No place where we can collapse to a cluster; punt.
-	 * This can occur if, for example, you request 2 frags
-	 * but the packet requires that both be clusters (we
-	 * never reallocate the first mbuf to avoid moving the
-	 * packet header).
-	 */
-bad:
-	return (NULL);
-}
-
-
 static int
 nfe_encap(struct nfe_softc *sc, struct mbuf **m_head)
 {
@@ -2542,7 +2327,7 @@ nfe_encap(struct nfe_softc *sc, struct mbuf **m_head)
 	error = bus_dmamap_load_mbuf_sg(sc->txq.tx_data_tag, map, *m_head, segs,
 	    &nsegs, BUS_DMA_NOWAIT);
 	if (error == EFBIG) {
-		m = nfe_defrag(*m_head, M_DONTWAIT, NFE_MAX_SCATTER);
+		m = m_collapse(*m_head, M_DONTWAIT, NFE_MAX_SCATTER);
 		if (m == NULL) {
 			m_freem(*m_head);
 			*m_head = NULL;
@@ -2808,8 +2593,7 @@ nfe_watchdog(struct ifnet *ifp)
 		if_printf(ifp, "watchdog timeout (missed Tx interrupts) "
 		    "-- recovering\n");
 		if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-			taskqueue_enqueue_fast(taskqueue_fast,
-			    &sc->nfe_tx_task);
+			taskqueue_enqueue_fast(sc->nfe_tq, &sc->nfe_tx_task);
 		return;
 	}
 	/* Check if we've lost start Tx command. */
@@ -2972,6 +2756,9 @@ nfe_init_locked(void *xsc)
 
 	NFE_WRITE(sc, NFE_PHY_STATUS, 0xf);
 
+	/* Clear hardware stats. */
+	nfe_stats_clear(sc);
+
 #ifdef DEVICE_POLLING
 	if (ifp->if_capenable & IFCAP_POLLING)
 		nfe_disable_intr(sc);
@@ -3060,6 +2847,8 @@ nfe_stop(struct ifnet *ifp)
 			tdata->m = NULL;
 		}
 	}
+	/* Update hardware stats. */
+	nfe_stats_update(sc);
 }
 
 
@@ -3111,12 +2900,13 @@ nfe_tick(void *xsc)
 
 	mii = device_get_softc(sc->nfe_miibus);
 	mii_tick(mii);
+	nfe_stats_update(sc);
 	nfe_watchdog(ifp);
 	callout_reset(&sc->nfe_stat_ch, hz, nfe_tick, sc);
 }
 
 
-static void
+static int
 nfe_shutdown(device_t dev)
 {
 	struct nfe_softc *sc;
@@ -3129,6 +2919,8 @@ nfe_shutdown(device_t dev)
 	nfe_stop(ifp);
 	/* nfe_reset(sc); */
 	NFE_UNLOCK(sc);
+
+	return (0);
 }
 
 
@@ -3215,4 +3007,200 @@ sysctl_hw_nfe_proc_limit(SYSCTL_HANDLER_ARGS)
 
 	return (sysctl_int_range(oidp, arg1, arg2, req, NFE_PROC_MIN,
 	    NFE_PROC_MAX));
+}
+
+
+#define	NFE_SYSCTL_STAT_ADD32(c, h, n, p, d)	\
+	    SYSCTL_ADD_UINT(c, h, OID_AUTO, n, CTLFLAG_RD, p, 0, d)
+#define	NFE_SYSCTL_STAT_ADD64(c, h, n, p, d)	\
+	    SYSCTL_ADD_QUAD(c, h, OID_AUTO, n, CTLFLAG_RD, p, d)
+
+static void
+nfe_sysctl_node(struct nfe_softc *sc)
+{
+	struct sysctl_ctx_list *ctx;
+	struct sysctl_oid_list *child, *parent;
+	struct sysctl_oid *tree;
+	struct nfe_hw_stats *stats;
+	int error;
+
+	stats = &sc->nfe_stats;
+	ctx = device_get_sysctl_ctx(sc->nfe_dev);
+	child = SYSCTL_CHILDREN(device_get_sysctl_tree(sc->nfe_dev));
+	SYSCTL_ADD_PROC(ctx, child,
+	    OID_AUTO, "process_limit", CTLTYPE_INT | CTLFLAG_RW,
+	    &sc->nfe_process_limit, 0, sysctl_hw_nfe_proc_limit, "I",
+	    "max number of Rx events to process");
+
+	sc->nfe_process_limit = NFE_PROC_DEFAULT;
+	error = resource_int_value(device_get_name(sc->nfe_dev),
+	    device_get_unit(sc->nfe_dev), "process_limit",
+	    &sc->nfe_process_limit);
+	if (error == 0) {
+		if (sc->nfe_process_limit < NFE_PROC_MIN ||
+		    sc->nfe_process_limit > NFE_PROC_MAX) {
+			device_printf(sc->nfe_dev,
+			    "process_limit value out of range; "
+			    "using default: %d\n", NFE_PROC_DEFAULT);
+			sc->nfe_process_limit = NFE_PROC_DEFAULT;
+		}
+	}
+
+	if ((sc->nfe_flags & (NFE_MIB_V1 | NFE_MIB_V2 | NFE_MIB_V3)) == 0)
+		return;
+
+	tree = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "stats", CTLFLAG_RD,
+	    NULL, "NFE statistics");
+	parent = SYSCTL_CHILDREN(tree);
+
+	/* Rx statistics. */
+	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "rx", CTLFLAG_RD,
+	    NULL, "Rx MAC statistics");
+	child = SYSCTL_CHILDREN(tree);
+
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "frame_errors",
+	    &stats->rx_frame_errors, "Framing Errors");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "extra_bytes",
+	    &stats->rx_extra_bytes, "Extra Bytes");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "late_cols",
+	    &stats->rx_late_cols, "Late Collisions");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "runts",
+	    &stats->rx_runts, "Runts");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "jumbos",
+	    &stats->rx_jumbos, "Jumbos");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "fifo_overuns",
+	    &stats->rx_fifo_overuns, "FIFO Overruns");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "crc_errors",
+	    &stats->rx_crc_errors, "CRC Errors");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "fae",
+	    &stats->rx_fae, "Frame Alignment Errors");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "len_errors",
+	    &stats->rx_len_errors, "Length Errors");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "unicast",
+	    &stats->rx_unicast, "Unicast Frames");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "multicast",
+	    &stats->rx_multicast, "Multicast Frames");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "brocadcast",
+	    &stats->rx_broadcast, "Broadcast Frames");
+	if ((sc->nfe_flags & NFE_MIB_V2) != 0) {
+		NFE_SYSCTL_STAT_ADD64(ctx, child, "octets",
+		    &stats->rx_octets, "Octets");
+		NFE_SYSCTL_STAT_ADD32(ctx, child, "pause",
+		    &stats->rx_pause, "Pause frames");
+		NFE_SYSCTL_STAT_ADD32(ctx, child, "drops",
+		    &stats->rx_drops, "Drop frames");
+	}
+
+	/* Tx statistics. */
+	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "tx", CTLFLAG_RD,
+	    NULL, "Tx MAC statistics");
+	child = SYSCTL_CHILDREN(tree);
+	NFE_SYSCTL_STAT_ADD64(ctx, child, "octets",
+	    &stats->tx_octets, "Octets");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "zero_rexmits",
+	    &stats->tx_zero_rexmits, "Zero Retransmits");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "one_rexmits",
+	    &stats->tx_one_rexmits, "One Retransmits");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "multi_rexmits",
+	    &stats->tx_multi_rexmits, "Multiple Retransmits");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "late_cols",
+	    &stats->tx_late_cols, "Late Collisions");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "fifo_underuns",
+	    &stats->tx_fifo_underuns, "FIFO Underruns");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "carrier_losts",
+	    &stats->tx_carrier_losts, "Carrier Losts");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "excess_deferrals",
+	    &stats->tx_excess_deferals, "Excess Deferrals");
+	NFE_SYSCTL_STAT_ADD32(ctx, child, "retry_errors",
+	    &stats->tx_retry_errors, "Retry Errors");
+	if ((sc->nfe_flags & NFE_MIB_V2) != 0) {
+		NFE_SYSCTL_STAT_ADD32(ctx, child, "deferrals",
+		    &stats->tx_deferals, "Deferrals");
+		NFE_SYSCTL_STAT_ADD32(ctx, child, "frames",
+		    &stats->tx_frames, "Frames");
+		NFE_SYSCTL_STAT_ADD32(ctx, child, "pause",
+		    &stats->tx_pause, "Pause Frames");
+	}
+	if ((sc->nfe_flags & NFE_MIB_V3) != 0) {
+		NFE_SYSCTL_STAT_ADD32(ctx, child, "unicast",
+		    &stats->tx_deferals, "Unicast Frames");
+		NFE_SYSCTL_STAT_ADD32(ctx, child, "multicast",
+		    &stats->tx_frames, "Multicast Frames");
+		NFE_SYSCTL_STAT_ADD32(ctx, child, "broadcast",
+		    &stats->tx_pause, "Broadcast Frames");
+	}
+}
+
+#undef NFE_SYSCTL_STAT_ADD32
+#undef NFE_SYSCTL_STAT_ADD64
+
+static void
+nfe_stats_clear(struct nfe_softc *sc)
+{
+	int i, mib_cnt;
+
+	if ((sc->nfe_flags & NFE_MIB_V1) != 0)
+		mib_cnt = NFE_NUM_MIB_STATV1;
+	else if ((sc->nfe_flags & (NFE_MIB_V2 | NFE_MIB_V3)) != 0)
+		mib_cnt = NFE_NUM_MIB_STATV2;
+	else
+		return;
+
+	for (i = 0; i < mib_cnt; i += sizeof(uint32_t))
+		NFE_READ(sc, NFE_TX_OCTET + i);
+
+	if ((sc->nfe_flags & NFE_MIB_V3) != 0) {
+		NFE_READ(sc, NFE_TX_UNICAST);
+		NFE_READ(sc, NFE_TX_MULTICAST);
+		NFE_READ(sc, NFE_TX_BROADCAST);
+	}
+}
+
+static void
+nfe_stats_update(struct nfe_softc *sc)
+{
+	struct nfe_hw_stats *stats;
+
+	NFE_LOCK_ASSERT(sc);
+
+	if ((sc->nfe_flags & (NFE_MIB_V1 | NFE_MIB_V2 | NFE_MIB_V3)) == 0)
+		return;
+
+	stats = &sc->nfe_stats;
+	stats->tx_octets += NFE_READ(sc, NFE_TX_OCTET);
+	stats->tx_zero_rexmits += NFE_READ(sc, NFE_TX_ZERO_REXMIT);
+	stats->tx_one_rexmits += NFE_READ(sc, NFE_TX_ONE_REXMIT);
+	stats->tx_multi_rexmits += NFE_READ(sc, NFE_TX_MULTI_REXMIT);
+	stats->tx_late_cols += NFE_READ(sc, NFE_TX_LATE_COL);
+	stats->tx_fifo_underuns += NFE_READ(sc, NFE_TX_FIFO_UNDERUN);
+	stats->tx_carrier_losts += NFE_READ(sc, NFE_TX_CARRIER_LOST);
+	stats->tx_excess_deferals += NFE_READ(sc, NFE_TX_EXCESS_DEFERRAL);
+	stats->tx_retry_errors += NFE_READ(sc, NFE_TX_RETRY_ERROR);
+	stats->rx_frame_errors += NFE_READ(sc, NFE_RX_FRAME_ERROR);
+	stats->rx_extra_bytes += NFE_READ(sc, NFE_RX_EXTRA_BYTES);
+	stats->rx_late_cols += NFE_READ(sc, NFE_RX_LATE_COL);
+	stats->rx_runts += NFE_READ(sc, NFE_RX_RUNT);
+	stats->rx_jumbos += NFE_READ(sc, NFE_RX_JUMBO);
+	stats->rx_fifo_overuns += NFE_READ(sc, NFE_RX_FIFO_OVERUN);
+	stats->rx_crc_errors += NFE_READ(sc, NFE_RX_CRC_ERROR);
+	stats->rx_fae += NFE_READ(sc, NFE_RX_FAE);
+	stats->rx_len_errors += NFE_READ(sc, NFE_RX_LEN_ERROR);
+	stats->rx_unicast += NFE_READ(sc, NFE_RX_UNICAST);
+	stats->rx_multicast += NFE_READ(sc, NFE_RX_MULTICAST);
+	stats->rx_broadcast += NFE_READ(sc, NFE_RX_BROADCAST);
+
+	if ((sc->nfe_flags & NFE_MIB_V2) != 0) {
+		stats->tx_deferals += NFE_READ(sc, NFE_TX_DEFERAL);
+		stats->tx_frames += NFE_READ(sc, NFE_TX_FRAME);
+		stats->rx_octets += NFE_READ(sc, NFE_RX_OCTET);
+		stats->tx_pause += NFE_READ(sc, NFE_TX_PAUSE);
+		stats->rx_pause += NFE_READ(sc, NFE_RX_PAUSE);
+		stats->rx_drops += NFE_READ(sc, NFE_RX_DROP);
+	}
+
+	if ((sc->nfe_flags & NFE_MIB_V3) != 0) {
+		stats->tx_unicast += NFE_READ(sc, NFE_TX_UNICAST);
+		stats->tx_multicast += NFE_READ(sc, NFE_TX_MULTICAST);
+		stats->rx_broadcast += NFE_READ(sc, NFE_TX_BROADCAST);
+	}
 }
