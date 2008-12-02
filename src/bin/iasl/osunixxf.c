@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -471,7 +471,7 @@ AcpiOsMapMemory (
     ACPI_SIZE               length)
 {
 
-    return (ACPI_TO_POINTER ((ACPI_NATIVE_UINT) where));
+    return (ACPI_TO_POINTER ((ACPI_SIZE) where));
 }
 
 
