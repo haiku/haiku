@@ -19,6 +19,9 @@
 	atomic_set_int(ptr, value)
 
 #define atomic_set_int(ptr, value) \
-	atomic_or((int32 *)(ptr), value);
+	atomic_or((int32 *)(ptr), value)
+
+#define atomic_readandclear_int(ptr) \
+	atomic_set((int32 *)(ptr), 0)
 
 #endif	/* _FBSD_COMPAT_MACHINE_ATOMIC_H_ */

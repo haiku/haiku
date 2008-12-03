@@ -46,6 +46,7 @@
 #define ALIGN_BYTES		(sizeof(int) - 1)
 #define ALIGN(x)		((((unsigned)x) + ALIGN_BYTES) & ~ALIGN_BYTES)
 
+#define roundup(x, y)	((((x)+((y)-1))/(y))*(y))  /* to any y */
 #define roundup2(x, y)	(((x) + ((y) - 1)) & (~((y) - 1)))
 #define rounddown(x, y)  (((x) / (y)) * (y))
 
