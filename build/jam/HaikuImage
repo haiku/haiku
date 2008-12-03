@@ -606,6 +606,9 @@ if $(HAIKU_IMAGE_HOST_NAME) {
 #pragma mark - Build The Image
 
 
+# Execute pre-image user config rules.
+UserBuildConfigRulePreImage	;
+
 # Set image name and directory defaults and locate the image.
 HAIKU_IMAGE_NAME ?= $(HAIKU_DEFAULT_IMAGE_NAME) ;
 HAIKU_IMAGE_DIR ?= $(HAIKU_DEFAULT_IMAGE_DIR) ;
@@ -716,3 +719,6 @@ MakeLocate $(HAIKU_VMWARE_IMAGE) : $(HAIKU_IMAGE_DIR) ;
 _BuildHaikuImage $(HAIKU_VMWARE_IMAGE) : true : true ;
 NotFile haiku-vmware-image ;
 Depends haiku-vmware-image : $(HAIKU_VMWARE_IMAGE) ;
+
+# Execute post-image user config rules.
+UserBuildConfigRulePostImage ;

@@ -12,14 +12,6 @@
 Exit You must NOT copy UserBuildConfig.ReadMe directly but use parts of it! ;
 
 
-# Adding timezone and keymap settings
-AddSymlinkToHaikuImage home config settings
-	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
-
-AddFilesToHaikuImage home config settings : <keymap>US-International
-	: Key_map ;
-
-
 # Adjusting Build Variables
 
 # The following variables can be configured per subdirectory (or subtree) or
@@ -98,6 +90,11 @@ AddFilesToHaikuImage beos bin : crashing_app ;
 
 # Make a symlink to home/config/bin/crash.
 AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
+
+# Add timezone and keymap settings.
+AddSymlinkToHaikuImage home config settings
+	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
 
 # Adds the source directories src/kits/storage and src/tests/servers/debug
 # (recursively) to the image (as /boot/home/HaikuSources/src/kits/storage
@@ -284,3 +281,24 @@ DeferredSubInclude HAIKU_TOP src tests add-ons kernel file_systems
 # usual). Omitting this parameter or specifying "global" will cause the given
 # name to be used recursively.
 DeferredSubInclude HAIKU_TOP src 3rdparty myproject : Jamfile.haiku : local ;
+
+# The following rules can be overriden to do things at different points of
+# the build system execution by jam (note: we're talking about execution of
+# Jamfiles, not the build actions they define):
+#
+# UserBuildConfigRulePostBuildTargets:
+#	Executed after the complete Jamfile tree has been processed. I.e. all build
+#	targets are known and located at this point.
+# UserBuildConfigRulePreImage:
+#	Executed after the contents of the Haiku image has been defined, but before
+#	the scripts generating the images are defined.
+# UserBuildConfigRulePostImage:
+#	Executed after the Haiku image build target has been fully defined.
+#
+# E.g. making use of the fact that all targets have already been located when
+# UserBuildConfigRulePostBuildTargets is called, we can print the directory
+# where the StyledEdit executable will be generated.
+rule UserBuildConfigRulePostBuildTargets
+{
+	Echo "StyledEdit will appear here:" [ on StyledEdit return $(LOCATE) ] ;
+}

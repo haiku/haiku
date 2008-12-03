@@ -45,6 +45,11 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) PackageRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) TestsRules ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildSetup ] ;
 
+# Declare no-op user-overridable build rules.
+rule UserBuildConfigRulePostBuildTargets	{ }
+rule UserBuildConfigRulePreImage			{ }
+rule UserBuildConfigRulePostImage			{ }
+
 # Include UserBuildConfig.
 {
 	local userBuildConfig
