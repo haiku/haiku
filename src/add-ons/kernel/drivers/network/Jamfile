@@ -24,6 +24,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network nforce ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network pcnet ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network syskonnect ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network attansic_l2 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network ar81xx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl81xx ;
 
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm440x ;

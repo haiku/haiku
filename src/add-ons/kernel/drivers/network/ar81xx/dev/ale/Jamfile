@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ar81xx dev ale ;
+
+UsePrivateHeaders kernel net ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+KernelAddon ar81xx :
+	if_ale.c
+	glue.c
+	: libfreebsd_network.a ar81xx_mii.a
+	;
