@@ -16,6 +16,8 @@ alias ll="ls -lA"
 alias la="ls -A"
 alias m="more"
 
+shopt -s checkwinsize
+
 #
 # and now we include a few useful things...
 #
