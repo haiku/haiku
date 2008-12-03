@@ -164,8 +164,8 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 		Echo "No optional package CVS available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage cvs-1.12.13-gcc2-2008-09-30
-			: $(baseURL)/cvs-1.12.13-gcc2-2008-09-30.zip
+		InstallOptionalHaikuImagePackage cvs-1.12.13-gcc2-2008-11-29
+			: $(baseURL)/cvs-1.12.13-gcc2-2008-11-29.zip
 			:
 		;
 	}
@@ -510,8 +510,8 @@ if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 		Echo "No optional package Yasm available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage yasm-0.7.1-gcc2-2008-10-01
-			: $(baseURL)/yasm-0.7.1-gcc2-2008-10-01.zip
+		InstallOptionalHaikuImagePackage yasm-0.7.2-gcc2-2008-11-25
+			: $(baseURL)/yasm-0.7.2-gcc2-2008-11-25.zip
 			:
 		;
 	}
