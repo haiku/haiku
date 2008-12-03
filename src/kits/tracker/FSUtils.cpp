@@ -658,7 +658,7 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	dev_t destVolumeDevice = srcVolumeDevice;
 
 	StatStruct deststat;
-	BVolume volume;
+	BVolume volume (srcVolumeDevice);
 	entry_ref destRef;
 	const entry_ref *destRefToCheck = NULL;
 
@@ -666,7 +666,9 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	BDirectory destDir;
 	BDirectory *destDirToCheck = NULL;
 	bool needPreflightNameCheck = false;
-
+	bool sourceIsReadOnly = volume.IsReadOnly();
+	volume.Unset();
+	
 	bool fromUndo = FSIsUndoMoveMode(moveMode);
 	moveMode = FSMoveMode(moveMode);
 
@@ -705,6 +707,9 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	if (moveMode == kCopySelectionTo && destIsTrash)
 		// cannot copy to trash
 		moveMode = kMoveSelectionTo;
+	
+	if (moveMode == kMoveSelectionTo && sourceIsReadOnly)
+		moveMode = kCopySelectionTo;
 
 	// we need the undo object later on, so we create it no matter
 	// if we really need it or not (it's very lightweight)
