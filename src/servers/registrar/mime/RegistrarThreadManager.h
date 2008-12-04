@@ -33,13 +33,13 @@ public:
 	
 	uint ThreadCount() const;
 	
-	static const uint kThreadLimit = 12;
+	static const int kThreadLimit = 12;
 private:
 
 	std::list<RegistrarThread*>::iterator& RemoveThread(std::list<RegistrarThread*>::iterator &i);
 	
 	std::list<RegistrarThread*> fThreads;
-	uint fThreadCount;
+	vint32 fThreadCount;
 };
 
 #endif	// THREAD_MANAGER_H

@@ -87,19 +87,22 @@ status_t
 RegistrarThreadManager::LaunchThread(RegistrarThread *thread)
 {
 	status_t err = thread ? B_OK : B_BAD_VALUE;
-	if (!err)
-		err = fThreadCount < kThreadLimit ? (status_t)B_OK : (status_t)B_NO_MORE_THREADS;
+	if (!err) {
+		if (atomic_add(&fThreadCount, 1) >= kThreadLimit) {
+			err = B_NO_MORE_THREADS;
+			atomic_add(&fThreadCount, -1);
+		}
+	}
 
 	if (!err) {
 		fThreads.push_back(thread);
-		fThreadCount++;
 		err = thread->Run();
 		if (err) {
 			std::list<RegistrarThread*>::iterator i;
 			for (i = fThreads.begin(); i != fThreads.end();) {
 				if ((*i) == thread) {
 					i = fThreads.erase(i);
-					fThreadCount--;
+					atomic_add(&fThreadCount, -1);
 					break;
 				} else
 					++i;
@@ -234,7 +237,7 @@ std::list<RegistrarThread*>::iterator&
 RegistrarThreadManager::RemoveThread(std::list<RegistrarThread*>::iterator &i)
 {
 	delete *i;
-	fThreadCount--;
+	atomic_add(&fThreadCount, -1);
 	return (i = fThreads.erase(i));
 }
 
