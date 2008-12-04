@@ -106,6 +106,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 				snprintf(output, sizeof(output), "%s     FIELD UNIT", output);
 				break;
 			case ACPI_TYPE_DEVICE:
+				hid[0] = 0; /* zero-terminate string; get_device_hid can (and will) fail! */
 				device->acpi->get_device_hid(result, hid);
 				snprintf(output, sizeof(output), "%s     DEVICE (%s)", output, hid);
 				break;
