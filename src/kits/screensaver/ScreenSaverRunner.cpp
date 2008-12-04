@@ -173,6 +173,7 @@ ScreenSaverRunner::_CleanUp()
 void
 ScreenSaverRunner::_Run() 
 {
+	const uint32 kTickBase = 50000;
 	if (fWindow->Lock()) {
 		fView->SetViewColor(0, 0, 0);
 		fView->SetLowColor(0, 0, 0);
@@ -183,10 +184,20 @@ ScreenSaverRunner::_Run()
 
 	int32 snoozeCount = 0;
 	int32 frame = 0;
+	int32 tickCounter = 0;
+	bigtime_t tick = fSaver ? fSaver->TickSize() : kTickBase;
 
 	while (!fQuitting) {
-		bigtime_t tick = fSaver ? fSaver->TickSize() : 50000;
-		snooze(tick);
+		// break the idle time up into ticks so that we can evaluate
+		// the quit condition with greater responsiveness
+		// otherwise a screen saver that sets, say, a 30 second tick
+		// will result in the screen saver not responding to deactivation
+		// for that length of time
+		snooze(kTickBase);
+		if (++tickCounter * kTickBase < tick)
+			continue;
+		else
+			tickCounter = 0;
 
 		if (snoozeCount) {
 			// if we are sleeping, do nothing
