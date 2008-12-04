@@ -35,17 +35,12 @@ RegistrarThread::RegistrarThread(const char *name, int32 priority, BMessenger ma
 	, fIsFinished(false)
 	, fStatus(B_NO_INIT)
 	, fId(-1)
+	, fPriority(priority)
 {
 	fName[0] = 0;
 	status_t err = name && fManagerMessenger.IsValid() ? B_OK : B_BAD_VALUE;
-	if (!err) {
-		fId = spawn_thread(&RegistrarThread::EntryFunction, name,
-			priority, (void*)this);
-		err = fId >= 0 ? B_OK : fId;
-	}
-	if (!err) {
+	if (err == B_OK)
 		strcpy(fName, name);
-	}
 	fStatus = err;
 }
 
@@ -72,8 +67,13 @@ status_t
 RegistrarThread::Run()
 {
 	status_t err = InitCheck();
-	if (!err)
-		err = resume_thread(fId);
+	if (err == B_OK) {
+		fId = spawn_thread(&RegistrarThread::EntryFunction, fName,
+			fPriority, (void*)this);
+		err = fId >= 0 ? B_OK : fId;
+		if (err == B_OK)	
+			err = resume_thread(fId);
+	}
 	return err;
 }
 

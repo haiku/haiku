@@ -40,6 +40,7 @@ private:
 	status_t fStatus;
 	thread_id fId;		
 	char fName[B_OS_NAME_LENGTH];
+	int32 fPriority;
 };
 
 #endif	// REGISTRAR_THREAD_H
