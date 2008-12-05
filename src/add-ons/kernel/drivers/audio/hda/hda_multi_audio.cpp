@@ -314,6 +314,8 @@ hda_find_multi_custom_string(hda_widget& widget)
 			return "CD";
 		case PIN_DEV_HEAD_PHONE_OUT:
 			return "Headphones";
+		case PIN_DEV_SPEAKER:
+			return "Speaker";
 	}
 	TRACE("couldn't find a string for widget %ld in hda_find_multi_custom_string()\n", widget.node_id);
 	return NULL;
