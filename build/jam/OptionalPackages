@@ -164,8 +164,8 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 		Echo "No optional package CVS available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage cvs-1.12.13-gcc2-2008-11-29
-			: $(baseURL)/cvs-1.12.13-gcc2-2008-11-29.zip
+		InstallOptionalHaikuImagePackage cvs-1.12.13-gcc2-2008-12-04
+			: $(baseURL)/cvs-1.12.13-gcc2-2008-12-04.zip
 			:
 		;
 	}
