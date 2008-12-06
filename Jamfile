@@ -38,10 +38,10 @@ Depends NetworkingKit :
 	raw route ipv4 icmp udp tcp
 	libnet.so libnetapi.so libbind.so libsocket.so
 	ping ifconfig <bin>route traceroute arp pppconfig
-	
+
 	# network drivers:
-	sis900 rtl8139 rtl8169 via-rhine ipro1000 wb840 bcm440x bcm570x 
-	
+	sis900 rtl8139 rtl8169 via-rhine ipro1000 wb840 bcm440x bcm570x
+
 	# PPP devices:
 	modem pppoe
 	# PPP protocols:
@@ -53,29 +53,29 @@ Depends NetworkingKit :
 # Pseudo-target to build the media stuffs only
 NotFile MediaKit ;
 Depends MediaKit :
-	libmedia.so 
+	libmedia.so
 	libgame.so
 
 	# Servers
-	media_addon_server 
+	media_addon_server
 	media_server
 
 	# Preference
 	Sounds
 	Media
-	
+
 	# Deskbar replicant
 	desklink
 
 	# add-ons
-	mixer.media_addon 	
-	tone_producer_demo.media_addon 
+	mixer.media_addon
+	tone_producer_demo.media_addon
 	video_producer_demo.media_addon
 	legacy.media_addon
 	multi_audio.media_addon
 #	reader.media_addon
 #	writer.media_addon
-#	demultiplexer.media_addon 
+#	demultiplexer.media_addon
 
 	# codecs
 	ac3_decoder
@@ -111,7 +111,7 @@ Depends InputKit :
 	# Preferences
 	Keymap
 	Keyboard
-	Mouse	
+	Mouse
 ;
 
 # Pseudo-target to build the OpenGL kit only
@@ -150,6 +150,9 @@ ExecuteDeferredSubIncludes ;
 
 # reset subdir
 SubDir HAIKU_TOP ;
+
+# Execute post-build-target user config rules.
+UserBuildConfigRulePostBuildTargets	;
 
 # specify the Haiku image and network boot archive contents
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
