@@ -180,29 +180,32 @@ bdaddr_t
 LocalDevice::GetBluetoothAddress()
 {
 	if (fMessenger == NULL)
-		return bdaddrUtils::NullAddress();
+		return bdaddrUtils::LocalAddress();
+
+	size_t	size;
+	void* command = buildReadBdAddr(&size);
+	
+	if (command == NULL)
+		return bdaddrUtils::LocalAddress();
 
 	const bdaddr_t* bdaddr;
-	BMessage request(BT_MSG_GET_ADDRESS);
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;
-	ssize_t	size;
-
+	ssize_t	ssize;
+	
 	/* ADD ID */
 	request.AddInt32("hci_id", hid);
+	request.AddData("raw command", B_ANY_TYPE, command, size);
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR));
+
 	
 	if (fMessenger->SendMessage(&request, &reply) == B_OK) {
-	
-		if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &size) == B_OK ){
-			
+		if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &ssize) == B_OK )
 			return *bdaddr;
-		
-		} else {
-			return bdaddrUtils::NullAddress();
-		}
-		
 	}
 
-	return bdaddrUtils::NullAddress();
+	return bdaddrUtils::LocalAddress();
 }
 
 
@@ -210,22 +213,30 @@ BString
 LocalDevice::GetFriendlyName()
 {
 	if (fMessenger == NULL)
-		return NULL;
+		return BString("Unknown|Messenger");
+
+	size_t	size;
+	void* command = buildReadLocalName(&size);
+	if (command == NULL)
+		return BString("Unknown|NoMemory");
 
 	BString friendlyname;
-	BMessage request(BT_MSG_GET_FRIENDLY_NAME);
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
 	BMessage reply;
 	
-	/* ADD ID */
+
 	request.AddInt32("hci_id", hid);
-	
+	request.AddData("raw command", B_ANY_TYPE, command, size);
+    request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME));
+
 	if (fMessenger->SendMessage(&request, &reply) == B_OK &&
 		reply.FindString("friendlyname", &friendlyname) == B_OK){		
 		
 		return friendlyname;
 	}
 	
-	return BString("Unknown");
+	return BString("Unknown|ServerFailed");
 }
 
 
