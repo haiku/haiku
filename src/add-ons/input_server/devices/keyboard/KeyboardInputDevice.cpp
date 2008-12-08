@@ -636,8 +636,8 @@ KeyboardDevice::_ControlThread()
 		}
 
 		if (isKeyDown && keycode == 0x34 // DELETE KEY
-			&& (states[0x5c >> 3] & (1 << (7 - (0x5c & 0x7))))
-			&& (states[0x5d >> 3] & (1 << (7 - (0x5d & 0x7))))) {
+			&& (states[fCommandKey >> 3] & (1 << (7 - (fCommandKey & 0x7))))
+			&& (states[fControlKey >> 3] & (1 << (7 - (fControlKey & 0x7))))) {
 			LOG_EVENT("TeamMonitor called\n");
 
 			// show the team monitor
@@ -825,6 +825,8 @@ KeyboardDevice::_UpdateSettings(uint32 opcode)
 		fKeymap.LoadCurrent();
 		fModifiers = fKeymap.Locks();
 		_UpdateLEDs();
+		fControlKey = fKeymap.KeyForModifier(B_LEFT_CONTROL_KEY);
+		fCommandKey = fKeymap.KeyForModifier(B_LEFT_COMMAND_KEY);
 	}
 }
 
