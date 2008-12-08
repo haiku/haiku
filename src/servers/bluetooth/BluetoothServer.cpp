@@ -119,16 +119,14 @@ void BluetoothServer::MessageReceived(BMessage *message)
 	        message->FindString("name", &str);        
 			BPath path(str.String());
 
-	  	    (Output::Instance()->Post( str.String(), BLACKBOARD_GENERAL));
-     	    (Output::Instance()->Post(" requested LocalDevice\n", BLACKBOARD_GENERAL));
+     	   (Output::Instance()->Postf(BLACKBOARD_GENERAL, "Requested LocalDevice %s\n", str.String()));
 	        
 	        LocalDeviceImpl* ldi = LocalDeviceImpl::CreateTransportAccessor(&path);
 
 	        if (ldi->GetID() >= 0) {
                       fLocalDevicesList.AddItem(ldi);
 					  Output::Instance()->AddTab("Local Device", BLACKBOARD_LD(ldi->GetID()));
-				  	  (Output::Instance()->Post( str.String(), BLACKBOARD_LD(ldi->GetID())));
-					  (Output::Instance()->Post(" LocalDevice added\n", BLACKBOARD_LD(ldi->GetID())));
+					  (Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()), "LocalDevice %s id=%x added\n", str.String(), ldi->GetID()));
 			 
 
             } else {
@@ -148,14 +146,6 @@ void BluetoothServer::MessageReceived(BMessage *message)
 		case BT_MSG_ACQUIRE_LOCAL_DEVICE:
 			status = HandleAcquireLocalDevice(message, &reply);
 		break;
-
-        case BT_MSG_GET_FRIENDLY_NAME:
-            status = HandleGetFriendlyName(message, &reply);
-        break;
-        
-        case BT_MSG_GET_ADDRESS:
-            status = HandleGetAddress(message, &reply);
-        break;
 
         case BT_MSG_HANDLE_SIMPLE_REQUEST:
             status = HandleSimpleRequest(message, &reply);
@@ -271,9 +261,10 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 	        
 	        bdaddr_t local;
 		    ldi = fLocalDevicesList.ItemAt(index);
-		    if ((ldi->GetAddress(&local, message) == B_OK) && bacmp(&local, &bdaddr))  {
-		        break;
-		    }		    		    
+		    // TODO: Only if the property is available
+		    //if ((ldi->GetAddress(&local, message) == B_OK) && bacmp(&local, &bdaddr))  {
+		    //    break;
+		    //}		    		    
         }		    
 	    
 	} else
@@ -302,45 +293,6 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 
 	return B_ERROR;	
 	
-}
-
-
-status_t
-BluetoothServer::HandleGetFriendlyName(BMessage* message, BMessage* reply)
-{
-    LocalDeviceImpl* ldi = LocateDelegateFromMessage(message);
-    BString name;
-        
-    if (ldi == NULL)
-    	return B_ERROR;
-    	
-    /* If the device was ocupied... Autlock?->LocalDeviceImpl will decide */
-    if (ldi->GetFriendlyName(name, DetachCurrentMessage()) == B_OK) {
-        
-        return reply->AddString("friendlyname", name);
-	}
-	
-	return B_WOULD_BLOCK; 
-}
-
-
-status_t
-BluetoothServer::HandleGetAddress(BMessage* message, BMessage* reply)
-{
-    LocalDeviceImpl* ldi = LocateDelegateFromMessage(message);
-    bdaddr_t bdaddr;
-
-    if (ldi == NULL)
-    	return B_ERROR;
-        
-    /* If the device was ocupied... Autlock?->LocalDeviceImpl will decide */
-	status_t status = ldi->GetAddress(&bdaddr, DetachCurrentMessage());
-    if ( status == B_OK) {
-        
-        return reply->AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
-	}
-	
-	return status; 
 }
 
 
