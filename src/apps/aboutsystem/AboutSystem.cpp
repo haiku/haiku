@@ -100,7 +100,7 @@ class AboutView : public BView {
 		void	_AddCopyrightsFromAttribute();
 
 		BStringView		*fMemView;
-		BStringView		*fUptimeView;
+		BTextView		*fUptimeView;
 		BView			*fInfoView;
 		HyperTextView	*fCreditsView;
 
@@ -333,9 +333,13 @@ AboutView::AboutView(const BRect &rect)
 	stringView->ResizeToPreferred();
 
 	r.OffsetBy(0, labelHeight);
-	r.bottom = r.top + textHeight;
+	r.bottom = r.top + textHeight * 3;
 
-	fUptimeView = new BStringView(r, "uptimetext", "");
+	fUptimeView = new BTextView(r, "uptimetext", r.OffsetToCopy(0,0), B_FOLLOW_ALL);
+	fUptimeView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fUptimeView->MakeEditable(false);
+	fUptimeView->MakeSelectable(false);
+	fUptimeView->SetWordWrap(true);
 	fInfoView->AddChild(fUptimeView);
 	// string width changes, so we don't do ResizeToPreferred()
 
