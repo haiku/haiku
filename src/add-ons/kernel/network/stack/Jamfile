@@ -21,6 +21,7 @@ KernelAddon stack :
 	interfaces.cpp
 	net_buffer.cpp
 	net_socket.cpp
+	notifications.cpp
 	link.cpp
 	radix.c
 	routes.cpp

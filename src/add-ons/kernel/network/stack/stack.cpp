@@ -753,6 +753,14 @@ init_stack()
 	if (status < B_OK)
 		goto err2;
 
+	status = init_notifications();
+	if (status < B_OK) {
+		// If this fails, it just means there won't be any notifications,
+		// it's not a fatal error.
+		dprintf("networking stack notifications could not be initialized: %s\n",
+			strerror(status));
+	}
+
 	mutex_init(&sChainLock, "net chains");
 	mutex_init(&sInitializeChainLock, "net intialize chains");
 
@@ -827,6 +835,7 @@ uninit_stack()
 	uninit_timers();
 	uninit_interfaces();
 	uninit_domains();
+	uninit_notifications();
 
 	mutex_destroy(&sChainLock);
 	mutex_destroy(&sInitializeChainLock);

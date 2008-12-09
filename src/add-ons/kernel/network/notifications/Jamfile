@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src add-ons kernel network notifications ;
+
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateHeaders net shared ;
+
+KernelAddon <net>notifications :
+	notifications.cpp
+;
