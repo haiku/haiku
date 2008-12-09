@@ -879,6 +879,29 @@ Desktop::SetWorkspacesCount(int32 newCount)
 
 
 /*!
+	Returns the virtual screen frame of the workspace specified by \a index.
+*/
+BRect
+Desktop::WorkspaceFrame(int32 index) const
+{
+	BRect frame;
+	if (index == fCurrentWorkspace)
+		frame = fVirtualScreen.Frame();
+	else if (index >= 0 && index < fSettings->WorkspacesCount()) {
+		BMessage screenData;
+		int32 width;
+		int32 height;
+		fSettings->WorkspacesMessage(index)->FindMessage("screen", &screenData);
+		if (screenData.FindInt32("width", &width) != B_OK || screenData.FindInt32("height", &height) != B_OK)
+			frame = fVirtualScreen.Frame();
+		else
+			frame.Set(0.0, 0.0, width - 1, height - 1);
+	}
+	return frame;
+}
+
+
+/*!
 	Changes the current workspace to the one specified by \a index.
 */
 void
@@ -913,7 +936,6 @@ Desktop::SetWorkspace(int32 index)
 	_SendFakeMouseMoved();
 }
 
-
 /*!	Changes the current workspace to the one specified by \a index.
 	You must hold the all window lock when calling this method.
 */
@@ -923,6 +945,13 @@ Desktop::_SetWorkspace(int32 index)
 	int32 previousIndex = fCurrentWorkspace;
 	rgb_color previousColor = fWorkspaces[fCurrentWorkspace].Color();
 	bool movedMouseEventWindow = false;
+	display_mode previousMode, newMode;
+	fVirtualScreen.ScreenAt(0)->GetMode(&previousMode);
+	fVirtualScreen.RestoreConfiguration(*this, fSettings->WorkspacesMessage(index));
+	fVirtualScreen.ScreenAt(0)->GetMode(&newMode);
+	// We only need to invalidate the entire desktop if we changed display modes
+	if (memcmp(&previousMode, &newMode, sizeof(display_mode)))
+		ScreenChanged(fVirtualScreen.ScreenAt(0), false);
 
 	if (fMouseEventWindow != NULL) {
 		if (fMouseEventWindow->IsNormal()) {
@@ -1095,7 +1124,8 @@ Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 	BRegion dirty(screen->Frame());
 	// update our cached screen region
 	fScreenRegion.Set(screen->Frame());
-
+	gInputManager->UpdateScreenBounds(screen->Frame());
+	
 	BRegion background;
 	_RebuildClippingForAllWindows(background);
 
@@ -1122,16 +1152,27 @@ Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 	fVirtualScreen.UpdateFrame();
 
 	if (makeDefault) {
-		// store settings
-		BMessage settings;
-		fVirtualScreen.StoreConfiguration(settings);
-		fWorkspaces[fCurrentWorkspace].StoreConfiguration(settings);
-
-		fSettings->SetWorkspacesMessage(fCurrentWorkspace, settings);
-		fSettings->Save(kWorkspacesSettings);
+		StoreConfiguration(fCurrentWorkspace);
 	}
 }
 
+
+status_t
+Desktop::StoreConfiguration(int32 workspace)
+{
+	if (workspace >= 0 && workspace < fSettings->WorkspacesCount()) {
+		// store settings
+		BMessage settings;
+		fVirtualScreen.StoreConfiguration(settings);
+		fWorkspaces[workspace].StoreConfiguration(settings);
+
+		fSettings->SetWorkspacesMessage(workspace, settings);
+		fSettings->Save(kWorkspacesSettings);
+		return B_OK;
+	}
+	
+	return B_BAD_VALUE;
+}
 
 //	#pragma mark - Methods for Window manipulation
 

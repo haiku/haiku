@@ -246,12 +246,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	BMenuItem *item = new BMenuItem("Current Workspace",
 		new BMessage(WORKSPACE_CHECK_MSG));
 	
-	// TODO: since per workspace settings is unimplemented (Ticket #693)
-	// 		 we force the menu to "All Workspaces" for now
-	fAllWorkspacesItem->SetMarked(true);
-	item->SetEnabled(false);
-	
 	popUpMenu->AddItem(item);
+	fAllWorkspacesItem->SetMarked(true);
 
 	BMenuField* workspaceMenuField = new BMenuField(BRect(0, 0, 100, 15),
 		"WorkspaceMenu", NULL, popUpMenu, true);
@@ -1008,7 +1004,8 @@ ScreenWindow::_WriteVesaModeFile(const screen_mode& mode) const
 void
 ScreenWindow::_CheckApplyEnabled()
 {
-	fApplyButton->SetEnabled(fSelected != fActive);
+	fApplyButton->SetEnabled(fSelected != fActive 
+		|| fAllWorkspacesItem->IsMarked());
 	fRevertButton->SetEnabled(count_workspaces() != fOriginalWorkspaceCount
 		|| fSelected != fOriginal);
 }

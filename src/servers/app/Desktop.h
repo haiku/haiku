@@ -91,12 +91,11 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					GetLastMouseState(BPoint* position,
 									int32* buttons) const;
 									// for use by ServerWindow
-
 		void					ScreenChanged(Screen* screen, bool makeDefault);
-
 		void					ScreenRemoved(Screen* screen) {}
 		void					ScreenAdded(Screen* screen) {}
 		bool					ReleaseScreen(Screen* screen) { return false; }
+		status_t				StoreConfiguration(int32 workspace);
 
 		const ::VirtualScreen&	VirtualScreen() const { return fVirtualScreen; }
 		DrawingEngine*			GetDrawingEngine() const
@@ -113,6 +112,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		Workspace::Private&		WorkspaceAt(int32 index)
 									{ return fWorkspaces[index]; }
 		status_t				SetWorkspacesCount(int32 newCount);
+		BRect					WorkspaceFrame(int32 index) const;
 
 		// Window methods
 

@@ -80,7 +80,7 @@ WorkspacesView::_GetGrid(int32& columns, int32& rows)
 BRect
 WorkspacesView::_ScreenFrame(int32 i)
 {
-	return Window()->Desktop()->VirtualScreen().Frame();
+	return Window()->Desktop()->WorkspaceFrame(i);
 }
 
 

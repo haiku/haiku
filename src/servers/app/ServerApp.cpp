@@ -2167,7 +2167,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 2) workspace index
 			// 3) display_mode to set
 			// 4) 'makeDefault' boolean
-			// TODO: See above: workspaces support, etc.
 
 			screen_id id;
 			link.Read<screen_id>(&id);
@@ -2183,15 +2182,27 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			if (status == B_OK && fDesktop->LockAllWindows()) {
 				display_mode oldMode;
-				fDesktop->ScreenAt(0)->GetMode(&oldMode);
-				if (memcmp(&oldMode, &mode, sizeof(display_mode))) {
-					status = fDesktop->ScreenAt(0)->SetMode(mode, makeDefault);
-					if (status == B_OK) {
-						gInputManager->UpdateScreenBounds(fDesktop->ScreenAt(0)->Frame());
-						fDesktop->ScreenChanged(fDesktop->ScreenAt(0), makeDefault);
-					}
-				} else
-					status = B_OK;
+				if (workspace == (uint32)fDesktop->CurrentWorkspace()) {
+					fDesktop->ScreenAt(0)->GetMode(&oldMode);
+					if (memcmp(&oldMode, &mode, sizeof(display_mode))) {
+						status = fDesktop->ScreenAt(0)->SetMode(mode, makeDefault);
+						if (status == B_OK) {
+							fDesktop->ScreenChanged(fDesktop->ScreenAt(0), makeDefault);
+						}
+					} else
+						status = B_OK;
+				} else {
+					// this is perhaps not ideal - it assumes that if the 
+					// workspace is not the active one, then pull the
+					// configuration from active and store it to the specified 
+					// workspace. This is safer since it's assumed that the
+					// active workspace has a display mode that's usable,
+					// but at the same time the API implies that you can set
+					// a non-visible workspace to whatever mode you like
+					// TODO: decide what to do here. 
+					if (makeDefault)
+						fDesktop->StoreConfiguration(workspace);
+				}
 				fDesktop->UnlockAllWindows();
 			} else
 				status = B_ERROR;

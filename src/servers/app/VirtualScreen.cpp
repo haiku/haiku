@@ -167,6 +167,7 @@ VirtualScreen::AddScreen(Screen* screen)
 	fDrawingEngine = screen->GetDrawingEngine();
 	fHWInterface = screen->HWInterface();
 	fFrame = screen->Frame();
+	item->frame = fFrame;
 
 	fScreenList.AddItem(item);
 

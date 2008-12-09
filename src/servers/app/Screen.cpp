@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
 static float
 get_mode_frequency(const display_mode& mode)
 {
@@ -91,6 +90,12 @@ Screen::Shutdown()
 status_t
 Screen::SetMode(const display_mode& mode, bool makeDefault)
 {
+	display_mode current;
+	GetMode(&current);
+	current.flags = mode.flags;
+	if (!memcmp(&mode, &current, sizeof(display_mode))) 
+		return B_OK;
+	
 	gBitmapManager->SuspendOverlays();
 
 	status_t status = fHWInterface->SetMode(mode);
@@ -162,7 +167,6 @@ Screen::SetBestMode(uint16 width, uint16 height, uint32 colorSpace,
 			* mode.timing.v_total / 10 * int32(frequency * 10)) / 1000;
 		adjusted = true;
 	}
-
 	status = SetMode(mode, false);
 	if (status < B_OK && adjusted) {
 		// try again with the unchanged mode
