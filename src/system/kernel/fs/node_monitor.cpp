@@ -268,6 +268,12 @@ NodeMonitorService::_RemoveListener(monitor_listener *listener)
 	monitor->listeners.Remove(listener);
 	list_remove_link(listener);
 
+	if (dynamic_cast<UserNodeListener*>(listener->listener) != NULL) {
+		// This is a listener we copied ourselves in UpdateUserListener(),
+		// so we have to delete it here.
+		delete listener->listener;
+	}
+
 	delete listener;
 
 	if (monitor->listeners.IsEmpty())
@@ -907,7 +913,12 @@ NodeMonitorService::UpdateUserListener(io_context *context, dev_t device,
 		return B_NO_MEMORY;
 	}
 
-	return _AddMonitorListener(context, monitor, flags, *copiedListener);
+	status_t status = _AddMonitorListener(context, monitor, flags,
+		*copiedListener);
+	if (status != B_OK)
+		delete copiedListener;
+
+	return status;
 }
 
 
