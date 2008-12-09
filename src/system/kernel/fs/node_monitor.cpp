@@ -913,7 +913,7 @@ NodeMonitorService::UpdateUserListener(io_context *context, dev_t device,
 		return B_NO_MEMORY;
 	}
 
-	status_t status = _AddMonitorListener(context, monitor, flags,
+	status = _AddMonitorListener(context, monitor, flags,
 		*copiedListener);
 	if (status != B_OK)
 		delete copiedListener;
