@@ -1,22 +1,35 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"../welcome/html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
 	<title>Deskbar</title>
-	<link rel="stylesheet" type="text/css" href="../welcome/welcome.css">
+	<link rel="stylesheet" type="text/css" href="../welcome/welcome.css" />
 </head>
-<body lang="en-US">
+<body>
 
 <div class="logo">
-	<img src="../welcome/welcome-images/logo.png" alt="logo">
+	<img src="../welcome/welcome-images/logo.png" alt="logo" width="372" height="86" />
 	<div class="title">Deskbar</div>
 </div>
 <div class="topnav">
 	<p>
 		<a href="contents.html">Contents</a>
-		&nbsp;&nbsp;&nbsp;
+		&#160;&#160;&#160;
 		Previous: <a href="tracker-add-ons.html">Tracker Add-Ons</a>
-		&nbsp;&nbsp;&nbsp;
+		&#160;&#160;&#160;
 		Next: <a href="filetypes.html">Filetypes</a>
 	</p>
 </div>
@@ -24,18 +37,13 @@
 <div class="content">
 
 
-<p>The Deskbar is the little panel that by default is located in the upper right corner of the screen. It's Haiku's version of Windows' taskbar with its Start button. It contains the Deskbar menu from where you can start applications and preferences, a tray with a clock and other tools below that and a list of currently running programs at the bottom. 
-</p>
-<img src="deskbar-images/positions.png" alt="positions" width="640" height="480"</a>
-<br>
-<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on the left side of the tray and drag&amp;drop it into the new position. You can also fold it into a more compact layout by drag&amp;dropping the knobbly area onto the Deskbar menu.
-</p>
+<p>The Deskbar is the little panel that by default is located in the upper right corner of the screen. It's Haiku's version of Windows' taskbar with its Start button. It contains the Deskbar menu from where you can start applications and preferences, a tray with a clock and other tools below that and a list of currently running programs at the bottom.</p>
+<img src="deskbar-images/positions.png" alt="positions" width="640" height="480" />
+<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on the left side of the tray and drag&amp;drop it into the new position. You can also fold it into a more compact layout by drag&amp;dropping the knobbly area onto the Deskbar menu.</p>
 
-<h2><a name="deskbar-menu">The Deskbar Menu</a></h2>
-<p>A menu opens when you click on the Deskbar's uppermost part:
-<br>
-<img src="deskbar-images/settings.png" alt="settings.png" width="521" height="309"</a>
-<br>
+<h2><a id="deskbar-menu" name="deskbar-menu">The Deskbar Menu</a></h2>
+<p>A menu opens when you click on the Deskbar's uppermost part:</p>
+<img src="deskbar-images/settings.png" alt="settings.png" width="521" height="309" />
 <ul>
 <li><b>About This System...</b> - Shows some basic information of the system, licenses and the credits of the Haiku project.</li>
 
@@ -61,36 +69,32 @@
 </ul>
 
 <h3>Configure Deskbar Menu...</h3>
-<p>
-<img src="deskbar-images/configure.png" alt="configure.png" width="359" height="416"</a>
-</p><p>In this panel you set how many recent documents, folders and applications are shown in the Deskbar, or if you show them at all.
-</p><p>Here, you also configure folders and their contents, which are by default Applications, Demos, Deskbar Applets, and Preferences. You can add your own entries and edit or remove items.<br>
-This part of the panel is just a representation of the folder <tt>/boot/home/config/be/</tt>. You can just as well link or copy files and folders directly in Tracker to configure your Deskbar.<br>
-Another method is to simply drag a file or folder and drop it where you want it into the Deskbar.
-</p>
+<img src="deskbar-images/configure.png" alt="configure.png" width="359" height="416" />
+<p>In this panel you set how many recent documents, folders and applications are shown in the Deskbar, or if you show them at all.</p>
+<p>Here, you also configure folders and their contents, which are by default Applications, Demos, Deskbar Applets, and Preferences. You can add your own entries and edit or remove items.<br />
+This part of the panel is just a representation of the folder <tt>/boot/home/config/be/</tt>. You can just as well link or copy files and folders directly in Tracker to configure your Deskbar.<br />
+Another method is to simply drag a file or folder and drop it where you want it into the Deskbar.</p>
 
-<h2><a name="tray">The Tray</a></h2>
-<img src="deskbar-images/calendar.png" alt="calendar.png" width="229" height="210"</a>
-<p>Among other things, the tray's housing the clock. Left-click it to toggle between date and time. Right-click it to hide/show it or launch the <a href="prefs-time.html">Time</a> preferences to set it.
-Here you can also launch a calendar that also appears, when you hold down the left mouse button on the clock for a little time.
-</p><p>Any program can install an icon in the tray to provide an interface to the user. The email system, for instance, shows a different symbol when there's unread mail and offers a context menu to e.g. create or check for new mail. <i>ProcessController</i> is another example that uses its icon in the tray to provide information (CPU/memory usage) and to offer a context menu.
-</p>
+<h2><a id="tray" name="tray">The Tray</a></h2>
+<img src="deskbar-images/calendar.png" alt="calendar.png" width="229" height="210" />
+<p>Among other things, the tray's housing the clock. Left-click it to toggle between date and time. Right-click it to hide/show it or launch the <a href="prefs-time.html">Time</a> preferences to set it.<br />
+Here you can also launch a calendar that also appears, when you hold down the left mouse button on the clock for a little time.</p>
+<p>Any program can install an icon in the tray to provide an interface to the user. The email system, for instance, shows a different symbol when there's unread mail and offers a context menu to e.g. create or check for new mail. <i>ProcessController</i> is another example that uses its icon in the tray to provide information (CPU/memory usage) and to offer a context menu.</p>
 
-<h2><a name="list-of-apps">The list of running programs</a></h2>
-<img src="deskbar-images/list-of-apps.png" alt="list-of-apps.png" width="229" height="306"</a>
-<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows, from the submenu. By right-clicking you can minimize or close a window or the entire application.
-</p><p>If you activated Expanders in the Deskbar settings, you can show/hide the list of windows directly under an application's entry.
-</p><p>In front of every application's windows is a symbol providing info on its state. A bright symbol means a window is visible, a dark one that it's minimized. Three lines in front of a symbol shows that it's not on the current workspace.
-</p>
+<h2><a id="list-of-apps" name="list-of-apps">The list of running programs</a></h2>
+<img src="deskbar-images/list-of-apps.png" alt="list-of-apps.png" width="229" height="306" />
+<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows, from the submenu. By right-clicking you can minimize or close a window or the entire application.</p>
+<p>If you activated Expanders in the Deskbar settings, you can show/hide the list of windows directly under an application's entry.</p>
+<p>In front of every application's windows is a symbol providing info on its state. A bright symbol means a window is visible, a dark one that it's minimized. Three lines in front of a symbol shows that it's not on the current workspace.</p>
 
 </div>
 
 <div class="bottomnav">
 	<p>
 		<a href="contents.html">Contents</a>
-		&nbsp;&nbsp;&nbsp;
+		&#160;&#160;&#160;
 		Previous: <a href="tracker-add-ons.html">Tracker Add-Ons</a>
-		&nbsp;&nbsp;&nbsp;
+		&#160;&#160;&#160;
 		Next: <a href="filetypes.html">Filetypes</a>
 	</p>
 </div>

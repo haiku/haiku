@@ -1,101 +1,88 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"> 
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de> 
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="all" />
 	<title>Welcome to Haiku!</title>
-	<link rel="stylesheet" type="text/css" href="welcome.css">
+	<link rel="stylesheet" type="text/css" href="welcome.css" />
 </head>
-<body lang="en-US">
+<body>
 
 <div class="logo">
-	<img src="welcome-images/logo.png" alt="logo">
+	<img src="welcome-images/logo.png" alt="logo" width="372" height="86" />
 	<div class="title">Welcome to Haiku!</div>
 </div>
 <div class="topnav">
-	<p>
-		&nbsp;
-	</p>
+	<p>&#160;</p>
 </div>
 
 <div class="content">
 
-<h2><a name="welcome">Welcome to Haiku!</a></h2>
-<p>
-Thank you very much for checking out Haiku! This is our first public release. We hope to attract new developers to our project and give future users a chance to check out Haiku. We realize that this <i>alpha release</i> does not yet fully live up to the goals that we have set for ourselves and doesn't offer all the features and well-rounded end-user experience planned for the final R1 version. However, we hope that this release lets you discover Haiku's great potential and that you share our excitement.
-</p>
+<h2><a id="welcome" name="welcome">Welcome to Haiku!</a></h2>
+<p>Thank you very much for checking out Haiku! This is our first public release. We hope to attract new developers to our project and give future users a chance to check out Haiku. We realize that this <i>alpha release</i> does not yet fully live up to the goals that we have set for ourselves and doesn't offer all the features and well-rounded end-user experience planned for the final R1 version. However, we hope that this release lets you discover Haiku's great potential and that you share our excitement.</p>
 
-<h2><a name="bugreport">Beware of Bugs</a></h2>
-<p>
-We were working very hard to fix all possibly show stopping bugs, however, being an alpha release, there are bound to be plenty left undiscovered. We discourage using alpha versions as a production system. <i>Your data could very well be altered, mangled or downright destroyed.</i>
-</p>
+<h2><a id="bugreport" name="bugreport">Beware of Bugs</a></h2>
+<p>We were working very hard to fix all possibly show stopping bugs, however, being an alpha release, there are bound to be plenty left undiscovered. We discourage using alpha versions as a production system. <i>Your data could very well be altered, mangled or downright destroyed.</i></p>
 
-<p>
-One of the main reasons for releasing an alpha version is to attract more people to test the system and discover bugs or provide suggestions for future enhancements. Please file bugs and enhancements in our bug tracker after using its search function to avoid duplicates.
-</p>
-
+<p>One of the main reasons for releasing an alpha version is to attract more people to test the system and discover bugs or provide suggestions for future enhancements. Please file bugs and enhancements in our bug tracker after using its search function to avoid duplicates.</p>
 <ul>
 	<li><a href="http://dev.haiku-os.org/wiki">Haiku Bug Tracker</a></li>
 	<li><a href="bugreports.html">Tips for a helpful bug report</a></li>
 </ul>
 
-<h2><a name="system">Getting to know the system</a></h2>
-<p>
-The first release(s) of Haiku will be very much like the BeOS R5, the OS it is reimplementing. If you never experienced it, have a look at these links:
+<h2><a id="system" name="system">Getting to know the system</a></h2>
+<p>The first release(s) of Haiku will be very much like the BeOS R5, the OS it is reimplementing. If you never experienced it, have a look at these links:</p>
 <ul>
-	<li><a href="../userguide/contents.html">Haiku's User Guide</a></li>
+	<li><a href="../userguide/contents.html">Haiku User Guide</a></li>
 	<li><a href="http://betips.net">The Haiku/BeOS Tip Server (online)</a></li>
 </ul>
-</p>
 
-<h2><a name="software">Installing more software</a></h2>
-<p>
-Because of our binary and source compatibility to BeOS, many BeOS applications run on Haiku. After downloading a package, simply unzip it (double clicking should open <i>Expander</i>) to a folder in <tt>/boot/apps/</tt> and start the application from there.
-</p>
-<p>
-Popular software repositories are: 
+<h2><a id="software" name="software">Installing more software</a></h2>
+<p>Because of our binary and source compatibility to BeOS, many BeOS applications run on Haiku. After downloading a package, simply unzip it (double clicking should open <i>Expander</i>) to a folder in <tt>/boot/apps/</tt> and start the application from there.</p>
+
+<p>Popular software repositories are:</p>
 <ul>
 	<li><a href="http://www.haikuware.com">Haikuware</a></li>
 	<li><a href="http://www.bebits.com">BeBits</a></li>
 	<li><a href="http://ports.haiku-files.org/">HaikuPorts</a> maintains patches for ported software</li>
 	<li><a href="http://www.osdrawer.net/">OsDrawer</a> hosts native BeOS and Haiku open source software projects</li>
 </ul>
-</p>
 
-<h2><a name="api">Getting to know the API</a></h2>
-<p>
-Since Haiku is a reimplementation, the API is still the same as for BeOS R5 (with some additions). Therefore the documentation in the BeBook is still a valid resource. Thanks to ACCESS, who own the rights to former Be Inc. property, we are allowed to provide a copy of the BeBook.
-</p>
-<p>
-There are additional resources that should help you getting started: 
+<h2><a id="api" name="api">Getting to know the API</a></h2>
+<p>Since Haiku is a reimplementation, the API is still the same as for BeOS R5 (with some additions). Therefore the documentation in the BeBook is still a valid resource. Thanks to ACCESS, who own the rights to former Be Inc. property, we are allowed to provide a copy of the BeBook.</p>
+
+<p>There are additional resources that should help you getting started:</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/development/faq">Development FAQ (online)</a>
-	</li>
-	<li><a href="http://dev.haiku-os.org/browser/">Source Browser (online)</a>
-	</li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/">BeBook (online)</a> 
-	</li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/">BeNewsletter Archive (online) </a>
-	</li>
+	<li><a href="http://www.haiku-os.org/development/faq">Development FAQ (online)</a></li>
+	<li><a href="http://dev.haiku-os.org/browser/">Source Browser (online)</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/">BeBook (online)</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/">BeNewsletter Archive (online)</a></li>
 </ul>
-</p>
 
-<h2><a name="contact">Getting in contact</a></h2>
-<p>
-Get in contact with other developers and users and join the discussions in our forums or mailing lists.
+<h2><a id="contact" name="contact">Getting in contact</a></h2>
+<p>Get in contact with other developers and users and join the discussions in our forums or mailing lists.</p>
 <ul>
 	<li><a href="http://www.haiku-os.org/forum">Haiku Forums</a></li>
-	<li><a href="http://www.freelists.org/list/openbeos">General mailing list</a></li>
+	<li><a href="http://www.freelists.org/list/haiku">General mailing list</a></li>
 	<li><a href="http://www.freelists.org/list/haiku-development">Development mailing list</a></li>
 	<li><a href="http://www.haiku-os.org/community/ml">Overview</a> of more specific mailing lists</li>
 </ul>
-</p>
 
 </div>
 <div class="bottomnav">
-	<p>
-		&nbsp;
-
-	</p>
+	<p>&#160;</p>
 </div>
 </body>
 </html>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"../../welcome/html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Terminal</title>
+	<link rel="stylesheet" type="text/css" href="../../welcome/welcome.css" />
+</head>
+<body>
+
+<div class="logo">
+	<img src="../../welcome/welcome-images/logo.png" alt="logo" width="372" height="86" />
+	<div class="title">Terminal</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="../applications.html">Applications</a>
+		&#160;&#160;&#160;
+		Previous: <a href="apps-stylededit.html">StyledEdit</a>
+		&#160;&#160;&#160;
+		Next: <a href="apps-textsearch.html">TextSearch</a>
+	</p>
+</div>
+
+<div class="content">
+
+<h1><img src="apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h1>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Applications</i></td></tr>
+<tr><td>Location:</td><td></td><td><tt>/boot/beos/apps/Terminal</tt></td></tr>
+<tr><td>Settings:</td><td></td><td><tt>~/config/settings/Terminal_settings</tt><br />
+<tt>~/.profile</tt> - adds/overrides defaults in <tt>/boot/beos/etc/profile</tt><br />
+<tt>~/.inputrc</tt> - adds/overrides defaults in <tt>/boot/beos/etc/inputrc</tt></td></tr>
+</table>
+<p>The Terminal is Haiku's interface to bash, the Bourne Again Shell. Have a look at <a href="apps-commandline.html">these links</a> for information on how to work with the shell. Here, we'll concentrate on the Terminal app itself.</p>
+
+<h2><a id="appearance" name="appearance">Appearance</a></h2>
+<p>You can open as many Terminals as needed, either each in it's own window by simply launching more Terminals or with <tt>ALT+N</tt> from an already running Terminal. Or you use Terminal's tabbed view and open another tab with <tt>ALT+T</tt>.</p>
+<p>A Terminal window can be resized like any other window or you use the presets from the <i>Ssettings | Window Size</i> menu. <tt>ALT+RETURN</tt> toggles fullscreen mode.</p>
+<p>Changed window size and text encoding are only kept choosing <i>Settings | Save as default</i>.</p>
+<img src="apps-images/terminal.png" alt="terminal.png" width="532" height="391" />
+<br />
+<p><i>Settings | Preferences</i> opens a panel where you can set font type, font size and the different text and background colors. You can save different settings as separate profiles, which on double-click open an accordingly configured Terminal.<br />
+Pressing <i>OK</i> will save the current settings as default.</p>
+
+<h2><a id="customization" name="customization">Bash customization</a></h2>
+<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <tt>.profile</tt> and <tt>.inputrc</tt><br />
+Both files can be created in the <tt>home/</tt> folder and add or override the system defaults that are defined in <tt>/boot/beos/etc/</tt>.</p>
+
+<h3>.profile</h3>
+<p>The <tt>.profile</tt> is loaded every time you open a new Terminal. It sets all kinds of aliases and variables that will affect bash's behavior and appearance. You'll find many online resources that will detail all possibilities.</p>
+<p>The Haiku/BeOS Tip Server has quite a few tips to get you started, for example:</p>
+<ul>
+<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Customize your Terminal prompt</a></li>
+<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">More prompt customizations</a></li>
+<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Enhancing bash</a></li>
+<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Custom keyboard shortcuts</a></li>
+</ul>
+<p>There are more, <a href="http://betips.net/index.php?s=.profile">have a look</a>.</p>
+
+<h3>.inputrc</h3>
+<p>The <tt>.inputrc</tt> deals with keybindings. Since Haiku provides useful defaults, you probably don't have to mess with these more involved settings. If you do have special needs here, consult one of the many online resources, e.g. <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
+
+<h2><a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
+<p>You'll find a list of useful shortcuts in <a href="../keyboard-shortcuts.html#terminal">Shortcuts and key combinations</a>.</p>
+
+</div>
+
+<div class="bottomnav">
+	<p>
+		<a href="../applications.html">Applications</a>
+		&#160;&#160;&#160;
+		Previous: <a href="apps-icon-o-matic.html">Icon-O-Matic</a>
+		&#160;&#160;&#160;
+		Next: <a href="apps-mail.html">Mail</a>
+	</p>
+</div>
+
+</body>
+</html>

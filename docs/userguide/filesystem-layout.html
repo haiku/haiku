@@ -1,121 +1,128 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"../welcome/html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
 	<title>Filesystem layout</title>
-	<link rel="stylesheet" type="text/css" href="../welcome/welcome.css">
+	<link rel="stylesheet" type="text/css" href="../welcome/welcome.css" />
 </head>
-<body lang="en-US">
+<body>
 
 <div class="logo">
-	<img src="../welcome/welcome-images/logo.png" alt="logo">
+	<img src="../welcome/welcome-images/logo.png" alt="logo" width="372" height="86" />
 	<div class="title">Filesystem layout</div>
 </div>
 <div class="topnav">
 	<p>
 		<a href="contents.html">Contents</a>
-		&nbsp;&nbsp;&nbsp;
+		&#160;&#160;&#160;
 		Previous: <a href="bootloader.html">Boot Loader</a>
-		&nbsp;&nbsp;&nbsp;
+		&#160;&#160;&#160;
 		Next: <a href="gui.html">Haiku's GUI</a>
 	</p>
 </div>
 
 <div class="content">
 
-<p>Haiku's filesystem layout is quite transparent, trying to always use non-cryptic names for files and folders, that don't leave the user guessing. Files and folders that are important for the system to function properly, are protected from accidental tempering by showing one of these alerts:
-</p>
-<img src="filesystem-layout-images/achtung-user.png" alt="achtung-user.png" width="349" height="121">&nbsp;
-<img src="filesystem-layout-images/achtung-system.png" alt="achtung-system.png" width="349" height="151">
-<br>
-<p>The second alert pops up if you try to rename or delete something in the system hierarchy. Here, the "<i>Do it</i>" button will only become clickable when you're holding down the <tt>SHIFT</tt> key.
-</p><p>Generally, there are three seperate branches springing from the root folder of the boot volume:
-</p><p><table>
-<tr><td><tt>/boot/beos/</tt></td><td>&nbsp;</td><td>belongs to the system. Don't touch!</td></tr>
-<tr><td><tt>/boot/common/</tt></td><td>&nbsp;</td><td>holds files that are shared between users.</td></tr>
-<tr><td><tt>/boot/home/</tt></td><td>&nbsp;</td><td>is your personal folder where you keep your data and settings.</td></tr>
+<p>Haiku's filesystem layout is quite transparent, trying to always use non-cryptic names for files and folders, that don't leave the user guessing. Files and folders that are important for the system to function properly, are protected from accidental tempering by showing one of these alerts:</p>
+<img src="filesystem-layout-images/achtung-user.png" alt="achtung-user.png" width="349" height="121" />&#160;
+<img src="filesystem-layout-images/achtung-system.png" alt="achtung-system.png" width="349" height="151" />
+<p>The second alert pops up if you try to rename or delete something in the system hierarchy. Here, the "<i>Do it</i>" button will only become clickable when you're holding down the <tt>SHIFT</tt> key.</p>
+<p>Generally, there are three seperate branches springing from the root folder of the boot volume:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><tt>/boot/beos/</tt></td><td>&#160;</td><td>belongs to the system. Don't touch!</td></tr>
+<tr><td><tt>/boot/common/</tt></td><td>&#160;</td><td>holds files that are shared between users.</td></tr>
+<tr><td><tt>/boot/home/</tt></td><td>&#160;</td><td>is your personal folder where you keep your data and settings.</td></tr>
 </table>
-</p>
 
-<h2><a name="system">The system folder - <tt>/boot/beos/</tt></a></h2>
-<p>The fact that it's called "<i>beos</i>" shows Haiku's BeOS heritage. It wasn't renamed yet to ensure backward compatibility with BeOS software.<br>
-Whatever it's named, you should not alter what's inside. Every update of Haiku can add, remove or overwrite anything within it. If you want to add functionality, maybe with other Tracker Add-Ons or Translators or maybe another hardware driver, you install these things under your own <tt>/boot/home/</tt> hierarchy or, if it's supposed to be for every user, under <tt>/boot/common/</tt>. As long as Haiku isn't multi-user, this distinction has no apparent effect, as there's only one user with one <i>home</i> folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.
-</p><p>So, let's say you want to install a new Translator for the latest image format, you <b>don't</b> simply copy it into the respective system folder. Remember: Don't touch!<br>
-Instead, you put it into the mirrored hierarchy under <tt>/boot/common/</tt> or <tt>/boot/home/config/</tt>.
-</p><p>In our example the location for Translators in the system folder would be
-</p><p><tt>/boot/beos/add-ons/Translators/</tt>
-</p><p>So, the user "mirror" folder is either
-</p><p><tt>/boot/home/config/add-ons/Translators/</tt><br>
-or<br>
-<tt>/boot/common/add-ons/Translators/</tt>
-</p><p>This has another advantage: If the component you have installed messes things up (which is possible as you install hardware drivers like this, too) you are able to choose "<i>Disable User Add-Ons</i>" from the <a href="bootloader.html">Boot Loader</a> menu and are thus always able to boot without the offending component.
-</p><p>Most of the time, however, you won't have to deal with these things at all, since every software that comes from a trusted source should include an installation routine that handles these things.<br>
-<!---
+<h2><a id="system" name="system">The system folder - <tt>/boot/beos/</tt></a></h2>
+<p>The fact that it's called "<i>beos</i>" shows Haiku's BeOS heritage. It wasn't renamed yet to ensure backward compatibility with BeOS software.<br />
+Whatever it's named, you should not alter what's inside. Every update of Haiku can add, remove or overwrite anything within it. If you want to add functionality, maybe with other Tracker Add-Ons or Translators or maybe another hardware driver, you install these things under your own <tt>/boot/home/</tt> hierarchy or, if it's supposed to be for every user, under <tt>/boot/common/</tt>. As long as Haiku isn't multi-user, this distinction has no apparent effect, as there's only one user with one <i>home</i> folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
+<p>So, let's say you want to install a new Translator for the latest image format, you <b>don't</b> simply copy it into the respective system folder. Remember: Don't touch!<br />
+Instead, you put it into the mirrored hierarchy under <tt>/boot/common/</tt> or <tt>/boot/home/config/</tt>.</p>
+<p>In our example the location for Translators in the system folder would be</p>
+<p><tt>/boot/beos/add-ons/Translators/</tt></p>
+<p>So, the user "mirror" folder is either</p>
+<p><tt>/boot/home/config/add-ons/Translators/</tt><br />
+or<br />
+<tt>/boot/common/add-ons/Translators/</tt></p>
+<p>This has another advantage: If the component you have installed messes things up (which is possible as you install hardware drivers like this, too) you are able to choose "<i>Disable User Add-Ons</i>" from the <a href="bootloader.html">Boot Loader</a> menu and are thus always able to boot without the offending component.</p>
+<p>Most of the time, however, you won't have to deal with these things at all, since every software that comes from a trusted source should include an installation routine that handles these things.<br />
+<!--
 If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
-</p><p><i>.... Table to be added ....</i>
+</p>
+<p><i>TODO.... Table to be added ....</i>
 <table>
 </table>
------>
+-->
 </p>
 
-<h2><a name="common">The common folder - <tt>/boot/common/</tt></a></h2>
-<p>Haiku is not a multi-user system yet. Once it is though, every user has her own <i>home</i> folder that is not accessible to anyone else. Every application or added component like Tracker Add-Ons, Translators etc. as well as any data that's supposed to be shared between different users, go here.
-</p>
+<h2><a id="common" name="common">The common folder - <tt>/boot/common/</tt></a></h2>
+<p>Haiku is not a multi-user system yet. Once it is though, every user has her own <i>home</i> folder that is not accessible to anyone else. Every application or added component like Tracker Add-Ons, Translators etc. as well as any data that's supposed to be shared between different users, go here.</p>
 
-<h2><a name="home">The home folder - <tt>/boot/home/</tt></a></h2>
-<p>This folder belongs to you. Here you can create and delete files and folders as you wish. However, you shouldn't mess too much with the <tt>~/config/</tt> directory and its subfolders. You <i>could</i> delete e.g. the <tt>~/config/settings/</tt> folder without damaging the operating system itself, but who wants to lose all his configurations and application settings? In any case, the system warns you with the at the top mentioned alert.
-</p><p>Besides the <tt>~/config/add-ons/</tt> folder, which mirrors the system's add-ons folder for additional components as described above, there are a few other folders of interest. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<tt>/boot/home/</tt>" in Terminal.)
-</p>
-<p><table border="0" cellpadding="2" cellspacing="0">
-<tr><td><tt>~/mail</tt></td><td width="10">&nbsp;</td>
+<h2><a id="home" name="home">The home folder - <tt>/boot/home/</tt></a></h2>
+<p>This folder belongs to you. Here you can create and delete files and folders as you wish. However, you shouldn't mess too much with the <tt>~/config/</tt> directory and its subfolders. You <i>could</i> delete e.g. the <tt>~/config/settings/</tt> folder without damaging the operating system itself, but who wants to lose all his configurations and application settings? In any case, the system warns you with the at the top mentioned alert.</p>
+<p>Besides the <tt>~/config/add-ons/</tt> folder, which mirrors the system's add-ons folder for additional components as described above, there are a few other folders of interest. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<tt>/boot/home/</tt>" in Terminal.)</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><tt>~/mail</tt></td><td style="width:10px;">&#160;</td>
 <td>By default, this is where your mails are kept.</td></tr>
 
-<tr><td><tt>~/queries</tt></td><td width="10">&nbsp;</td>
+<tr><td><tt>~/queries</tt></td><td style="width:10px;">&#160;</td>
 <td><a href="queries.html">Queries</a> are stored, by default temporarily for 7 days, in this folder.</td></tr>
 
-<tr><td><tt>~/config/be/</tt></td><td>&nbsp;</td>
+<tr><td><tt>~/config/be/</tt></td><td>&#160;</td>
 <td>Again from our BeOS legacy, the <tt>be</tt> folder contains what's shown in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>. You can add and remove items either with the Deskbar configuration panel or by putting files, folders or links into this folder directly.</td></tr>
 
-<tr><td><tt>~/config/bin/</tt></td><td>&nbsp;</td>
+<tr><td><tt>~/config/bin/</tt></td><td>&#160;</td>
 <td>Complements the system's <tt>/boot/beos/bin/</tt> folder and holds all your command line programs.</td></tr>
 
-<tr><td><tt>~/config/boot/</tt></td><td>&nbsp;</td>
+<tr><td><tt>~/config/boot/</tt></td><td>&#160;</td>
 <td>This folder holds the <tt>UserBootscript</tt> which is executed after the system has booted up and the <tt>UserShutdownscript</tt> which will be executed before the system does all the necessary things to safely shut down.</td></tr>
 
-<tr><td><tt>~/config/fonts/</tt></td><td>&nbsp;</td>
+<tr><td><tt>~/config/fonts/</tt></td><td>&#160;</td>
 <td>Simply copy a TrueType or Postscript font into this folder and its usable right away.</td></tr>
 
-<tr><td><tt>~/config/settings/</tt></td><td>&nbsp;</td>
+<tr><td><tt>~/config/settings/</tt></td><td>&#160;</td>
 <td>This folder contains the settings to all applications and a few configurations for the system. Some applications manage their settings in their own subfolders, others simply put their configuration file in there.</td></tr>
 
-<tr><td><tt>~/config/settings/beos_mime/</tt></td><td>&nbsp;</td>
+<tr><td><tt>~/config/settings/beos_mime/</tt></td><td>&#160;</td>
 <td>In this <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> database Haiku keeps track of all the different <a href="filetypes.html">filetypes</a> and their settings.</td></tr>
 
-<tr><td class="onelinetop"><tt>~/config/settings/kernel/drivers/</tt></td><td>&nbsp;</td>
+<tr><td class="onelinetop"><tt>~/config/settings/kernel/drivers/</tt></td><td>&#160;</td>
 <td>There, one settings files that may be of interest. <tt>kernel</tt> offers some low level configurations like disabling <acronym title="Symmetric Multi Processing">SMP</acronym>, activating serial debugging or enabling advanced power management. You activate a configuration line by removing the commentary symbol "<tt>#</tt>". Be careful here!</td></tr>
 
-<tr><td><tt>~/config/settings/Tracker/</tt></td><td>&nbsp;</td>
+<tr><td><tt>~/config/settings/Tracker/</tt></td><td>&#160;</td>
 <td>Here are some interesting subfolders:</td></tr>
 
-<tr><td align="right"><tt>DefaultFolderTemplate/</tt></td><td width="10"></td><td>Show and arrange all attributes and the window size to your liking. Every new folder you create will use it as a template.</td></tr>
+<tr><td align="right"><tt>DefaultFolderTemplate/</tt></td><td style="width:10px;"></td><td>Show and arrange all attributes and the window size to your liking. Every new folder you create will use it as a template.</td></tr>
 
 <tr><td align="right"><tt>DefaultQueryTemplates/</tt></td><td></td><td>You can define the layout of query result windows for certain filetypes. See topic <a href="queries.html#result-window">Query: The result window</a>.</td></tr>
 
 <tr><td align="right"><tt>Go/</tt></td><td></td><td>Put links to your favorite locations in here to make them available e.g. in open and save panels. See topic <a href="gui.html#favorites-recent">Haiku's GUI: Favorites and recent folders</a>.</td></tr>
 
-<tr><td align="right"><tt>Tracker New Template/</tt></td><td></td><td>Add a template for any filetype that's then available from Tracker's <i>File | New...</i> menu. See topic <a href="tracker.html#working-with-files">Tracker: Working with files</a>.</td></tr></td></tr>
+<tr><td align="right"><tt>Tracker New Template/</tt></td><td></td><td>Add a template for any filetype that's then available from Tracker's <i>File | New...</i> menu. See topic <a href="tracker.html#working-with-files">Tracker: Working with files</a>.</td></tr>
 </table>
-
-</p>
 
 </div>
 
 <div class="bottomnav">
 	<p>
 		<a href="contents.html">Contents</a>
-		&nbsp;&nbsp;&nbsp;
+		&#160;&#160;&#160;
 		Previous: <a href="bootloader.html">Boot Loader</a>
-		&nbsp;&nbsp;&nbsp;
+		&#160;&#160;&#160;
 		Next: <a href="gui.html">Haiku's GUI</a>
 	</p>
 </div>

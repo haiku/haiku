@@ -5,6 +5,8 @@
  * Authors:
  *		François Revol <revol@free.fr>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Braden Ewing <brewin@gmail.com>
+ *		Humdinger <humdingerb@gmail.com>
  */
 
 html {
@@ -15,6 +17,7 @@ body {
 	color: #333333;
 	margin: 0px; 
 	padding: 0px;
+	font-family: "DejaVu Sans",Arial,Helvetica,sans-serif;
 }
 
 /* link colors and text decoration */
@@ -35,6 +38,7 @@ a:hover, a:active {
 }
 
 /* Some headers act as anchors, don't give them a hover effect */
+
 h2 a:hover, a:active {
 	text-decoration: none;
 	color: #0c3762;
@@ -55,83 +59,59 @@ div.content {
 	margin-left: 40px;
 	margin-right: 40px;
 }
-
 h1 {
 	font-size: 1.3em;
 	font-weight: normal;
 	color: #0c3762;
 	border-bottom: dotted thin #e0e0e0;
 }
-
 h2 {
 	font-size: 1.2em;
 	font-weight: normal;
 	color: #0c3762;
 	border-bottom: dotted thin #e0e0e0;
+	margin-top: 50px;
 }
-
 h3 {
 	font-size: 1.1em;
 	font-weight: normal;
 	color: #222;
+	margin-top: 30px;
 }
-
 p {
 	text-align: justify;
 	line-height: 1.3;
 }
-
-/* Add a space before the next header */
-* + h2 {
-	margin-top: 50px;
+ol {
+	padding-left: 20px;
 }
-
-* + h3 {
-	margin-top: 30px;
+ul {
+	padding-left: 14px;
 }
-
 li {
 	line-height: 1.3;
 }
 
-/*
-#logo {
-	background-image: url(bottom.png);
-	background-repeat: no-repeat;
-	background-position: center;
-	height: 200px;
-	width: 100%;
-	position: fixed;
-	top: 0px;
-	z-index: 1;
-}
-*/
-
+/* heading and navigation */
 
 div.logo {
-	position:relative;
+	position: relative;
 	left: 0px;
 	top: 0px;
 	background: #efefef;
 }
-
 div.logo img {
 	margin-left: 20px;
 }
-
 div.title {
 	position: absolute;
-	bottom: 11px;
-	right: 0px;
-	text-align: right;
-	margin-right: 40px;
+	top: 54px;
+	right: 40px;
 	font-size: 1.2em;
 }
-
 div.topnav {
 	background: #e0e0e0;
 }
-
 div.topnav p {
 	margin-left: 40px;
 	margin-top: 0px;
@@ -140,36 +120,35 @@ div.topnav p {
 	text-align: right;
 	font-size: 0.8em;
 }
-
 div.bottomnav {
-/*
-	position: fixed;
-	bottom: 0px;
-	width: 100%;
-	z-index: 1;
-*/
-
 	background: #efefef;
 }
-
 div.bottomnav p {
 	margin-left: 40px;
 	margin-top: 0px;
 	margin-right: 40px;
 	margin-bottom: 0px;
 	text-align: right;
-	font-size: 0.9em;
+	font-size: 0.8em;
 }
+
+/* layout elements */
 
 td {
 	vertical-align: top;
 }
-
 td.onelinetop {
 	vertical-align: top;
 	white-space: nowrap;
 }
-
 tt {
-	background-color:rgb(240,240,240)
+	background-color: #f0f0f0;
+}
+pre.terminal {
+	border-color: #0c3762;
+	border-style: dotted;
+	border-width: medium;
+	margin: 0em;
+	padding: 1.5em;
+	background-color: #f0f0f0;
 }
