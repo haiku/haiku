@@ -19,7 +19,6 @@
 
 #include <stdio.h>
 
-
 ScreenSaverRunner::ScreenSaverRunner(BWindow* window, BView* view,
 		bool preview, ScreenSaverSettings& settings)
 	:
@@ -181,10 +180,10 @@ ScreenSaverRunner::_Run()
 			fHasStarted = fSaver->StartSaver(fView, fPreview) == B_OK;
 		fWindow->Unlock();
 	}
-
+	
 	int32 snoozeCount = 0;
 	int32 frame = 0;
-	int32 tickCounter = 0;
+	bigtime_t lastTickTime = system_time();
 	bigtime_t tick = fSaver ? fSaver->TickSize() : kTickBase;
 
 	while (!fQuitting) {
@@ -194,11 +193,16 @@ ScreenSaverRunner::_Run()
 		// will result in the screen saver not responding to deactivation
 		// for that length of time
 		snooze(kTickBase);
-		if (++tickCounter * kTickBase < tick)
+		if (system_time() - lastTickTime < tick)
 			continue;
-		else
-			tickCounter = 0;
-
+		else { 
+			// re-evaluate the tick time after each successful wakeup - 
+			// screensavers can adjust it on the fly and we must be
+			// prepared to accomodate that
+			tick = fSaver ? fSaver->TickSize() : kTickBase;
+			lastTickTime = system_time();
+		}
+		
 		if (snoozeCount) {
 			// if we are sleeping, do nothing
 			snoozeCount--;
