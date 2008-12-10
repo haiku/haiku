@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
 static float
 get_mode_frequency(const display_mode& mode)
 {
@@ -92,6 +93,18 @@ Screen::SetMode(const display_mode& mode, bool makeDefault)
 {
 	display_mode current;
 	GetMode(&current);
+	// TODO: decide how best to handle the flags here - things like
+	// the screen preflet will generally always set the flags to 0,
+	// while it seems asking the accelerant to automatically pick the
+	// best mode might not necessarily. For the time being, match the
+	// flags before doing the mode comparison in order to prevent
+	// mode switches for otherwise identical modes (this was relatively
+	// easily observed on at least the radeon accelerant - on first boot
+	// the best mode picked included a flag mask of 0xffffffff ; 
+	// if you switched the resolution of one workspace to something else
+	// and then back to the resolution it started with, you would observe
+	// a mode switch when jumping between that workspace and the others
+	// that were still using the automatically set default mode)
 	current.flags = mode.flags;
 	if (!memcmp(&mode, &current, sizeof(display_mode))) 
 		return B_OK;
