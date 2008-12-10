@@ -21,17 +21,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 // Double brackets to satisfy a compiler warning
 const pattern kCheckered = { { 0xcc, 0xcc, 0x33, 0x33, 0xcc, 0xcc, 0x33, 0x33 } };
-
 
 // Get a clever message from fortune
 BString *get_message()
 {
 	BString *result = new BString();
-	system("fortune > /tmp/fortune_msg");
-	FILE *file = fopen("/tmp/fortune_msg", "r");
+	FILE *file = popen("/bin/fortune", "r");
 	if (file) {
 		char buf[512];
 		int bytesRead;
@@ -41,7 +38,6 @@ BString *get_message()
 		}
 		fclose(file);
 	}
-	remove("/tmp/fortune_msg");
 
 	// Just in case
 	if (result->Length() <= 0) {
