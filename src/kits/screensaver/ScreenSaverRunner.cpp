@@ -183,7 +183,7 @@ ScreenSaverRunner::_Run()
 	
 	int32 snoozeCount = 0;
 	int32 frame = 0;
-	bigtime_t lastTickTime = -1;
+	bigtime_t lastTickTime = 0;
 	bigtime_t tick = fSaver ? fSaver->TickSize() : kTickBase;
 
 	while (!fQuitting) {
@@ -193,7 +193,7 @@ ScreenSaverRunner::_Run()
 		// will result in the screen saver not responding to deactivation
 		// for that length of time
 		snooze(kTickBase);
-		if (lastTickTime > 0 && system_time() - lastTickTime < tick)
+		if (system_time() - lastTickTime < tick)
 			continue;
 		else { 
 			// re-evaluate the tick time after each successful wakeup - 
