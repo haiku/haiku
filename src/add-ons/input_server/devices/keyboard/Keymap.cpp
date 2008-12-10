@@ -155,6 +155,7 @@ Keymap::Modifier(uint32 keyCode)
 	return 0;
 }
 
+
 uint32
 Keymap::KeyForModifier(uint32 modifier)
 {
@@ -169,6 +170,7 @@ Keymap::KeyForModifier(uint32 modifier)
 
 	return 0;
 }
+
 
 //! Tell if a key is a dead key, needed for draw a dead key
 uint8
