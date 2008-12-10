@@ -18,7 +18,7 @@ namespace BPrivate {
 struct net_notifications_module_info {
 	module_info info;
 
-	void (*send_notification)(const BPrivate::KMessage* event);
+	status_t (*send_notification)(const BPrivate::KMessage* event);
 };
 
 // generic syscall interface
