@@ -58,6 +58,8 @@ private:
 			bool				fIsAT;
 	volatile bool				fInputMethodStarted;
 			uint32				fModifiers;
+			uint32				fCommandKey;
+			uint32				fControlKey;
 
 	volatile bool				fUpdateSettings;
 	volatile uint32				fSettingsCommand;

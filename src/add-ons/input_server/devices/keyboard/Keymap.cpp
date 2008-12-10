@@ -155,6 +155,20 @@ Keymap::Modifier(uint32 keyCode)
 	return 0;
 }
 
+uint32
+Keymap::KeyForModifier(uint32 modifier)
+{
+	if (modifier == B_LEFT_COMMAND_KEY)
+		return fKeys.left_command_key;
+	if (modifier == B_RIGHT_COMMAND_KEY)
+		return fKeys.right_command_key;
+	if (modifier == B_LEFT_CONTROL_KEY)
+		return fKeys.left_control_key;
+	if (modifier == B_RIGHT_CONTROL_KEY)
+		return fKeys.right_control_key;
+
+	return 0;
+}
 
 //! Tell if a key is a dead key, needed for draw a dead key
 uint8

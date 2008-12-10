@@ -27,6 +27,7 @@ public:
 	void DumpKeymap();
 	bool IsModifierKey(uint32 keyCode);
 	uint32 Modifier(uint32 keyCode);
+	uint32 KeyForModifier(uint32 modifier);
 	uint8 IsDeadKey(uint32 keyCode, uint32 modifiers);
 	bool IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey);
 	void GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** chars, int32* numBytes);
