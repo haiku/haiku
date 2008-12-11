@@ -330,6 +330,7 @@ __glutDestroyAllWindows()
 	}
 	gState.display->Lock();
 	gState.display->Quit();
+	gState.display->Unlock();
 
 	status_t ignored;
 	wait_for_thread(gState.appthread, &ignored);
