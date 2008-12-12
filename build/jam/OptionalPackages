@@ -27,6 +27,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	OpenSound
 #	OpenSSH
 #	OpenSSL
+#	P7zip
 #	Pe
 #	Perl
 #	Subversion
@@ -377,6 +378,34 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 		;
 	}
 }
+
+
+
+# P7zip
+if [ IsOptionalHaikuImagePackageAdded P7zip ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package P7zip available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		Echo "No optional package P7zip available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage p7zip-4.61-gcc2-2008-12-03
+			: http://ports.haiku-files.org/downloads/82
+			: 
+		;
+		
+		actions BuildHaikuImageExpanderRules
+		{
+			echo "\"application/x-7z-compressed\"\t.7z\t\"7za l \0045s\"\t\"7za x -y \0045s\"" > $(1)
+		}
+		
+		Always expander.rules ;
+		MakeLocate expander.rules : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
+		BuildHaikuImageExpanderRules expander.rules ;
+		AddFilesToHaikuImage home config etc : expander.rules ;
+	}
+}
+
+
 
 
 # Pe text editor
