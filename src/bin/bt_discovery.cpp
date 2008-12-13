@@ -1,8 +1,6 @@
 /*
  * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
 
 #include <stdio.h>
@@ -11,9 +9,9 @@
 #include <bluetooth/LocalDevice.h>
 #include <bluetooth/bdaddrUtils.h>
 
+#include <bluetooth/DeviceClass.h>
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
-
 
 thread_id mainThread;
 
@@ -21,17 +19,25 @@ class simpleDiscoveryListener : public DiscoveryListener {
 
 public:
 
-simpleDiscoveryListener(LocalDevice *device) : DiscoveryListener()
+simpleDiscoveryListener() : DiscoveryListener()
 {
-    /* TODO: Should not be needed */
-	SetLocalDeviceOwner(device);
+
 }
 
 
 void
 DeviceDiscovered(RemoteDevice* btDevice, DeviceClass cod)
 {
+	BString classString;
+
 	printf("\t%s: Device %s discovered.\n",__FUNCTION__, bdaddrUtils::ToString(btDevice->GetBluetoothAddress()));
+	
+	cod.GetServiceClass(classString);
+	classString << " |";
+	cod.GetMajorDeviceClass(classString);
+	classString << " |";
+	cod.GetMinorDeviceClass(classString);
+	printf("\t\t%s: \n", classString.String());
 }
 
 
@@ -69,7 +75,7 @@ DumpInfo(LocalDevice* device)
          (device->GetFriendlyName()).String(),
           bdaddrUtils::ToString(device->GetBluetoothAddress()));
 
-	simpleDiscoveryListener* dListener = new simpleDiscoveryListener(device);
+	simpleDiscoveryListener* dListener = new simpleDiscoveryListener();
 
 	dAgent->StartInquiry(BT_GIAC, dListener);
 	

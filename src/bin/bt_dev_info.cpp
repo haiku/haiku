@@ -13,11 +13,22 @@
 
 
 static void
-DumpInfo(LocalDevice &device)
+DumpInfo(LocalDevice* device)
 {
-        printf("[LocalDevice] %s\t%s\n", (device.GetFriendlyName()).String(),
-                                    bdaddrUtils::ToString(device.GetBluetoothAddress()));
+	printf("[LocalDevice] %s\t%s\n", (device->GetFriendlyName()).String(),
+    		bdaddrUtils::ToString(device->GetBluetoothAddress()));
 
+	BString classString;
+	DeviceClass cod = device->GetDeviceClass();
+	
+	cod.GetServiceClass(classString);
+	classString << " |";
+	cod.GetMajorDeviceClass(classString);
+	classString << " |";
+	cod.GetMinorDeviceClass(classString);
+	printf("\t\t%s: \n", classString.String());
+
+	printf("Discovery %ld\n", device->SetDiscoverable(3));
 }
 
 static status_t
@@ -32,26 +43,25 @@ LocalDeviceError(status_t status)
 int
 main(int argc, char *argv[])
 {
-        if(argc == 2) {
+        if (argc == 2) {
             // device specified
             LocalDevice* ld = LocalDevice::GetLocalDevice(atoi(argv[0]));
             if (ld == NULL)
                return LocalDeviceError(ENODEV);
 
-            DumpInfo(*ld);
+            DumpInfo(ld);
 
         } else if (argc == 1) {
             // show all devices
             LocalDevice* ld = NULL;
 
             printf("Listing %ld Bluetooth Local Devices ...\n", LocalDevice::GetLocalDeviceCount());
-
             for (uint32 index = 0 ; index < LocalDevice::GetLocalDeviceCount() ; index++) {
 
                ld = LocalDevice::GetLocalDevice();
                if (ld == NULL)
                     return LocalDeviceError(ENODEV);
-               DumpInfo(*ld);
+               DumpInfo(ld);
 
             }
 
