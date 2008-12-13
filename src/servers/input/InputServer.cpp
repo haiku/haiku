@@ -736,7 +736,7 @@ InputServer::HandleSetModifierKey(BMessage* message, BMessage* reply)
 				fKeys.num_key = key;
 				break;
 			case B_SCROLL_LOCK:
-				fKeys.num_key = key;
+				fKeys.scroll_key = key;
 				break;
 			case B_LEFT_SHIFT_KEY:
 				fKeys.left_shift_key = key;
