@@ -9,52 +9,66 @@
 
 namespace Bluetooth {
 
+#define UNKNOWN_CLASS_OF_DEVICE 0x00
+
+
 class DeviceClass {
 
 public:
+	DeviceClass(uint8 record[3])
+	{
+		SetRecord(record);
+	}
 
-	DeviceClass(int record)
+
+	DeviceClass(uint32 record)
+	{
+		SetRecord(record);
+	}
+
+
+	DeviceClass(void)
+	{
+		this->record = UNKNOWN_CLASS_OF_DEVICE;
+	}
+
+	void SetRecord(uint8 record[3])
+	{
+		this->record = record[0]|record[1]<<8|record[2]<<16;
+	}
+
+	void SetRecord(uint32 record)
 	{
 		this->record = record;
 	}
 
-	DeviceClass()
-	{
-		this->record = 0;
-	}
-
-
-	int GetServiceClasses()
+	uint GetServiceClass()
 	{
 		return (record & 0x00FFE000) >> 13;
 	}
 
-
-	int GetMajorDeviceClass()
-	{
+	uint GetMajorDeviceClass()
+	{				
 		return (record & 0x00001F00) >> 8;
 	}
 
-
-	void GetMajorDeviceClass(BString* str)
-	{
-
-	}
-
-
-	int GetMinorDeviceClass()
+	uint GetMinorDeviceClass()
 	{
 		return (record & 0x000000FF) >> 2;
 	}
 
-
-	void GetMinorDeviceClass(BString* str)
+	bool IsUnknownDeviceClass()
 	{
-
+		return (record == UNKNOWN_CLASS_OF_DEVICE);
 	}
-	
+
+	void GetServiceClass(BString&);
+	void GetMajorDeviceClass(BString&);
+	void GetMinorDeviceClass(BString&);
+		
 private:
-	int record;
+	uint32 record;
+
 };
 
 }

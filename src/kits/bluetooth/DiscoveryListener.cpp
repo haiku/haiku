@@ -76,7 +76,6 @@ DiscoveryListener::MessageReceived(BMessage* message)
 				
 			if (message->FindData("info", B_ANY_TYPE, 0, (const void**)&inquiryInfo, &size) == B_OK )
 			{
-
 			    // Skip duplicated replies
 			    for (int32 index = 0 ; index < fRemoteDevicesList.CountItems(); index++) {
 			    
@@ -92,14 +91,13 @@ DiscoveryListener::MessageReceived(BMessage* message)
 
 						duplicatedFound = true;		
 			            break;			        
-			        }
-			        
+			        }			        
 			    }
 
 				if (!duplicatedFound) {
 
 		            //  TODO: DeviceClass(inquiryInfo->dev_class[0] | inquiryInfo->dev_class[1]<<8 | inquiryInfo->dev_class[2]<<16 )
-       	            rd = new RemoteDevice(inquiryInfo->bdaddr);			        
+       	            rd = new RemoteDevice(inquiryInfo->bdaddr, (uint8*)inquiryInfo->dev_class);			        
 					fRemoteDevicesList.AddItem(rd);
 					// keep all inquiry reported data
 	    	        rd->SetLocalDeviceOwner(fLocalDevice);
@@ -108,9 +106,7 @@ DiscoveryListener::MessageReceived(BMessage* message)
 					rd->fScanMode = inquiryInfo->pscan_mode;
 					rd->fClockOffset = inquiryInfo->clock_offset;
 
-	        	    DeviceDiscovered( rd, DeviceClass(inquiryInfo->dev_class[0] | 
-	            	                                  inquiryInfo->dev_class[1]<<8 | 
-	                	                              inquiryInfo->dev_class[2]<<16 ));
+	        	    DeviceDiscovered( rd, rd->GetDeviceClass());
 	            }    	                              
   			}
         }

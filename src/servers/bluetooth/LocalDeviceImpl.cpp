@@ -278,6 +278,31 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             ClearWantedEvent(request);
      	}
         break;
+        
+        case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_CLASS_OF_DEV):
+        {
+        	struct hci_read_dev_class_reply* classDev = (struct hci_read_dev_class_reply*)(event+1);
+
+            if (classDev->status == BT_OK) {
+
+                reply.AddData("devclass", B_ANY_TYPE, &classDev->dev_class, sizeof(classDev->dev_class));
+                reply.AddInt8("status", classDev->status); 
+
+                printf("Sending reply ... %ld\n",request->SendReply(&reply));
+                reply.PrintToStream();
+
+			    Output::Instance()->Post("Positive reply for getDeviceClass\n", BLACKBOARD_KIT);
+
+            } else {
+                reply.AddInt8("status", classDev->status); 
+                request->SendReply(&reply);
+			    Output::Instance()->Post("Negative reply for getDeviceClass\n", BLACKBOARD_KIT);
+            }
+
+ 			// This request is not gonna be used anymore
+            ClearWantedEvent(request);
+     	}
+        break;        
 
         case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME):
         {
@@ -376,7 +401,6 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             ClearWantedEvent(request);
      	}
         break;
-
 
 		default:
 		    Output::Instance()->Post("Command Complete not handled\n", BLACKBOARD_KIT);
@@ -560,8 +584,9 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event, BMessage
 {
 
 	if (event->status == BT_OK) {
+		uint8	cod[3] = {0,0,0};
 
-		ConnectionIncoming* iConnection = new ConnectionIncoming(new RemoteDevice(event->bdaddr));
+		ConnectionIncoming* iConnection = new ConnectionIncoming(new RemoteDevice(event->bdaddr, cod));
 		iConnection->Show();
 		printf("%s: Address %s handle=%#x type=%d encrypt=%d\n", __FUNCTION__, bdaddrUtils::ToString(event->bdaddr), event->handle,
                                                                  event->link_type, event->encrypt_mode);

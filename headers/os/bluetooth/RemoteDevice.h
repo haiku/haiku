@@ -49,7 +49,7 @@ public:
 	LocalDevice* GetLocalDeviceOwner();
 
 	RemoteDevice(const BString& address);
-	RemoteDevice(const bdaddr_t address);
+	RemoteDevice(const bdaddr_t address, uint8 record[3]);
 
 protected:
 	/* called by Discovery[Listener|Agent] */

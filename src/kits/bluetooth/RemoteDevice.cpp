@@ -4,6 +4,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+#include <bluetooth/DeviceClass.h>
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
 #include <bluetooth/bdaddrUtils.h>
@@ -156,15 +157,17 @@ RemoteDevice::SetLocalDeviceOwner(LocalDevice* ld)
 
 
 /* Constructor */
-RemoteDevice::RemoteDevice(const bdaddr_t address)
+RemoteDevice::RemoteDevice(const bdaddr_t address, uint8 record[3])
 {
 	fBdaddr = address;
+	fDeviceClass.SetRecord(record);
 	fMessenger = _RetrieveBluetoothMessenger();
 }
 
 
 RemoteDevice::RemoteDevice(const BString& address)
 {
+	fDeviceClass.SetRecord((uint32)0);
 	fBdaddr = bdaddrUtils::FromString((const char *)address.String());
 	fMessenger = _RetrieveBluetoothMessenger();
 }

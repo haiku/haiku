@@ -20,6 +20,7 @@ SharedLibrary libbluetooth.so :
 	RemoteDevice.cpp
 	CommandManager.cpp
 	KitSupport.cpp
+	DeviceClass.cpp
 	#UI
 	PincodeWindow.cpp
 	ConnectionIncoming.cpp

@@ -244,7 +244,34 @@ DeviceClass
 LocalDevice::GetDeviceClass()
 {
 
-	return DeviceClass(0);
+	if (fDeviceClass.IsUnknownDeviceClass()) {
+
+		if (fMessenger == NULL)
+			return fDeviceClass;
+	
+		size_t	size;
+		void* command = buildReadClassOfDevice(&size);
+		if (command == NULL)
+			return fDeviceClass;
+	
+		BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+		BMessage reply;
+		const uint8*	record;
+		ssize_t	ssize;
+	
+		request.AddInt32("hci_id", hid);
+		request.AddData("raw command", B_ANY_TYPE, command, size);
+	    request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_CLASS_OF_DEV));
+	
+		if (fMessenger->SendMessage(&request, &reply) == B_OK &&
+			reply.FindData("devclass", B_ANY_TYPE, 0, (const void**)&record, &ssize) == B_OK) {
+
+			fDeviceClass.SetRecord(*record);
+		}
+	}
+
+	return fDeviceClass;
 
 }
 
