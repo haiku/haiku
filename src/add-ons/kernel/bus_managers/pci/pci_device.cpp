@@ -119,14 +119,17 @@ pci_device_init_driver(device_node* node, void** _cookie)
 			&function, false) != B_OK)
 		return B_ERROR;
 
+	PCIDev *dev = gPCI->FindDevice(domain, bus, deviceNumber, function);
+	if (dev == NULL) {
+		panic("device not found!\n");
+		return ENODEV;
+	}
+
 	pci_device* device = (pci_device*)malloc(sizeof(*device));
 	if (device == NULL)
 		return B_NO_MEMORY;
 
-	device->device = gPCI->FindDevice(domain, bus, deviceNumber, function);
-	if (device->device == NULL)
-		panic("device not found!\n");
-
+	device->device = dev;
 	device->node = node;
 
 	*_cookie = device;
