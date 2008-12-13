@@ -58,11 +58,13 @@ private:
 									struct gl_renderbuffer* render,
 									GLenum internalFormat,
 									GLuint width, GLuint height);
+		static void			Flush(GLcontext *ctx);
 
 		BBitmap*				fBitmap;
 		bool					fDirectModeEnabled;
 		direct_buffer_info*			fInfo;
 		BLocker					fInfoLocker;
+		ulong					fOptions;
 
 		GLcontext*				fContext;
 		GLvisual*				fVisual;

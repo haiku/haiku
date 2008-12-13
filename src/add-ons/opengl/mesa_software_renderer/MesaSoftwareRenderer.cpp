@@ -236,7 +236,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	const GLint blue = rgbFlag ? 8 : 0;
 	const GLint alpha = alphaFlag ? 8 : 0;
 
-	//fOptions = options | BGL_INDIRECT;
+	fOptions = options; // | BGL_INDIRECT;
 	struct dd_function_table functions;
 
 	fVisual = _mesa_create_visual(rgbFlag, dblFlag, stereoFlag, red, green,
@@ -253,6 +253,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	//functions.ClearColor 	= ClearColor;
 	functions.Error			= Error;
 	functions.Viewport      = Viewport;
+	functions.Flush		= Flush;
 
 	// create core context
 	fContext = _mesa_create_context(fVisual, NULL, &functions, this);
@@ -420,6 +421,9 @@ MesaSoftwareRenderer::UnlockGL()
 {
 	CALLED();
 	_mesa_make_current(fContext, NULL, NULL);
+	if ((fOptions & BGL_DOUBLE) == 0) {
+		SwapBuffers();
+	}
 	BGLRenderer::UnlockGL();
 }
 
@@ -770,4 +774,14 @@ MesaSoftwareRenderer::RenderbufferStorage(GLcontext* ctx,
 	return GL_TRUE;
 }
 
+
+void
+MesaSoftwareRenderer::Flush(GLcontext *ctx)
+{
+	CALLED();
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+	if ((mr->fOptions & BGL_DOUBLE) == 0) {
+		mr->SwapBuffers();
+	}
+}
 
