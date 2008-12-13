@@ -1,11 +1,8 @@
 /*
  * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * Copyright 2008 Mika Lindqvist
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _COMMAND_MANAGER_H
 #define _COMMAND_MANAGER_H
 
@@ -16,6 +13,7 @@ void* buildReset(size_t* outsize);
 void* buildReadLocalName(size_t* outsize);
 void* buildWriteScan(uint8 scanmode, size_t* outsize);
 void* buildAuthEnable(uint8 auth, size_t* outsize);
+void* buildReadClassOfDevice(size_t* outsize);
 
 /* LINK CONTROL */
 void* buildRemoteNameRequest(bdaddr_t bdaddr,uint8 pscan_rep_mode, uint16 clock_offset, size_t* outsize);

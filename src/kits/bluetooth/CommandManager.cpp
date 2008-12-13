@@ -66,6 +66,12 @@ void* buildReadLocalName(size_t* outsize)
 }
 
 
+void* buildReadClassOfDevice(size_t* outsize)
+{
+    return buildCommand(OGF_CONTROL_BASEBAND, OCF_READ_CLASS_OF_DEV, NULL, 0, outsize);
+}
+
+
 void* buildWriteScan(uint8 scanmode, size_t* outsize)
 {
     struct hci_write_scan_enable* param;
