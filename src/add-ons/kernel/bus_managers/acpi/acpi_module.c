@@ -105,7 +105,7 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 					"hid_%" ACPI_DEVICE_HID_ITEM "%" }},
 				{ B_DRIVER_MAPPING "/0", B_STRING_TYPE, { string:
 					"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},*/
-				{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_CHILD_ON_DEMAND|B_FIND_MULTIPLE_CHILDREN }},
+				{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: /*B_FIND_CHILD_ON_DEMAND|*/B_FIND_MULTIPLE_CHILDREN }},
 				{ NULL }
 			};
 
@@ -133,7 +133,7 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 				// consumer specification
 				/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string:
 					"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},*/
-				{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_CHILD_ON_DEMAND|B_FIND_MULTIPLE_CHILDREN }},
+				{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: /*B_FIND_CHILD_ON_DEMAND|*/B_FIND_MULTIPLE_CHILDREN }},
 				{ NULL }
 			};
 
