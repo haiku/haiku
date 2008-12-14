@@ -376,12 +376,10 @@ get_mouse_type(int32 *type)
 	BMessage command(IS_GET_MOUSE_TYPE);
 	BMessage reply;
 
-	_control_input_server_(&command, &reply);
-
-	if (reply.FindInt32("mouse_type", type) != B_OK)
-		return B_ERROR;
-
-	return B_OK;
+	status_t err = _control_input_server_(&command, &reply);
+	if (err != B_OK)
+		return err;
+	return reply.FindInt32("mouse_type", type);
 }
 
 
@@ -391,7 +389,9 @@ set_mouse_type(int32 type)
 	BMessage command(IS_SET_MOUSE_TYPE);
 	BMessage reply;
 
-	command.AddInt32("mouse_type", type);
+	status_t err = command.AddInt32("mouse_type", type);
+	if (err != B_OK)
+		return err;
 	return _control_input_server_(&command, &reply);
 }
 
@@ -404,10 +404,11 @@ get_mouse_map(mouse_map *map)
 	const void *data = 0;
 	ssize_t count;
 
-	_control_input_server_(&command, &reply);
-
-	if (reply.FindData("mousemap", B_RAW_TYPE, &data, &count) != B_OK)
-		return B_ERROR;
+	status_t err = _control_input_server_(&command, &reply);
+	if (err == B_OK)
+		err = reply.FindData("mousemap", B_RAW_TYPE, &data, &count);
+	if (err != B_OK)
+		return err;
 
 	memcpy(map, data, count);
 
@@ -421,7 +422,9 @@ set_mouse_map(mouse_map *map)
 	BMessage command(IS_SET_MOUSE_MAP);
 	BMessage reply;
 
-	command.AddData("mousemap", B_RAW_TYPE, map, sizeof(mouse_map));
+	status_t err = command.AddData("mousemap", B_RAW_TYPE, map, sizeof(mouse_map));
+	if (err != B_OK)
+		return err;
 	return _control_input_server_(&command, &reply);
 }
 
@@ -432,8 +435,10 @@ get_click_speed(bigtime_t *speed)
 	BMessage command(IS_GET_CLICK_SPEED);
 	BMessage reply;
 
-	_control_input_server_(&command, &reply);
-
+	status_t err = _control_input_server_(&command, &reply);
+	if (err != B_OK)
+		return err;
+	
 	if (reply.FindInt64("speed", speed) != B_OK)
 		*speed = 500000;
 
@@ -457,8 +462,10 @@ get_mouse_speed(int32 *speed)
 	BMessage command(IS_GET_MOUSE_SPEED);
 	BMessage reply;
 
-	_control_input_server_(&command, &reply);
-
+	status_t err = _control_input_server_(&command, &reply);
+	if (err != B_OK)
+		return err;
+	
 	if (reply.FindInt32("speed", speed) != B_OK)
 		*speed = 65536;
 
@@ -637,9 +644,30 @@ get_keyboard_id(uint16 *id)
 
 	_control_input_server_(&command, &reply);
 
-	reply.FindInt16("id", (int16 *)&kid);
+	status_t err = reply.FindInt16("id", (int16 *)&kid);
+	if (err != B_OK)
+		return err;
 	*id = kid;
 
+	return B_OK;
+}
+
+
+status_t
+get_modifier_key(uint32 modifier, uint32 *key)
+{
+	BMessage command(IS_GET_MODIFIER_KEY);
+	BMessage reply;
+	uint32 rkey;
+
+	command.AddInt32("modifier", modifier);
+	_control_input_server_(&command, &reply);
+	
+	status_t err = reply.FindInt32("key", (int32 *) &rkey);
+	if (err != B_OK)
+		return err;
+	*key = rkey;
+	
 	return B_OK;
 }
 

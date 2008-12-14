@@ -520,6 +520,9 @@ InputServer::MessageReceived(BMessage* message)
 		case IS_GET_MODIFIERS:
 			status = HandleGetModifiers(message, &reply);
 			break;
+		case IS_GET_MODIFIER_KEY:
+			status = HandleGetModifierKey(message, &reply);
+			break;
 		case IS_SET_MODIFIER_KEY:
 			status = HandleSetModifierKey(message, &reply);
 			break;
@@ -719,6 +722,43 @@ status_t
 InputServer::HandleGetModifiers(BMessage* message, BMessage* reply)
 {
 	return reply->AddInt32("modifiers", fKeyInfo.modifiers);
+}
+
+
+status_t
+InputServer::HandleGetModifierKey(BMessage* message, BMessage* reply)
+{
+	int32 modifier;
+	
+	if (message->FindInt32("modifier", &modifier) == B_OK) {
+		switch (modifier) {
+			case B_CAPS_LOCK:
+				return reply->AddInt32("key", fKeys.caps_key);
+			case B_NUM_LOCK:
+				return reply->AddInt32("key", fKeys.num_key);
+			case B_SCROLL_LOCK:
+				return reply->AddInt32("key", fKeys.scroll_key);
+			case B_LEFT_SHIFT_KEY:
+				return reply->AddInt32("key", fKeys.left_shift_key);
+			case B_RIGHT_SHIFT_KEY:
+				return reply->AddInt32("key", fKeys.right_shift_key);
+			case B_LEFT_COMMAND_KEY:
+				return reply->AddInt32("key", fKeys.left_command_key);
+			case B_RIGHT_COMMAND_KEY:
+				return reply->AddInt32("key", fKeys.right_command_key);
+			case B_LEFT_CONTROL_KEY:
+				return reply->AddInt32("key", fKeys.left_control_key);
+			case B_RIGHT_CONTROL_KEY:
+				return reply->AddInt32("key", fKeys.right_control_key);
+			case B_LEFT_OPTION_KEY:
+				return reply->AddInt32("key", fKeys.left_option_key);
+			case B_RIGHT_OPTION_KEY:
+				return reply->AddInt32("key", fKeys.right_option_key);
+			case B_MENU_KEY:
+				return reply->AddInt32("key", fKeys.menu_key);
+		}
+	}
+	return B_ERROR;
 }
 
 

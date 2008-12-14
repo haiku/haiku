@@ -14,6 +14,7 @@
 #define IS_SET_KEY_REPEAT_DELAY 		'Isrd'
 #define IS_GET_KEY_INFO 				'Igki'
 #define IS_GET_MODIFIERS 				'Igmd'
+#define IS_GET_MODIFIER_KEY			'Igmk'
 #define IS_SET_MODIFIER_KEY 			'Ismk'
 #define IS_SET_KEYBOARD_LOCKS 			'Iskl'
 #define IS_GET_MOUSE_SPEED 				'Igms'
