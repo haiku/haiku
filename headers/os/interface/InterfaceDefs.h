@@ -347,6 +347,7 @@ uint32			modifiers();
 status_t		get_key_info(key_info* info);
 void			get_key_map(key_map** _map, char** _keyBuffer);
 status_t		get_keyboard_id(uint16* _id);
+status_t		get_modifier_key(uint32 modifier, uint32 *key);
 void			set_modifier_key(uint32 modifier, uint32 key);
 void			set_keyboard_locks(uint32 modifiers);
 
