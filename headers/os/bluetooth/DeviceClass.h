@@ -65,7 +65,9 @@ public:
 	void GetServiceClass(BString&);
 	void GetMajorDeviceClass(BString&);
 	void GetMinorDeviceClass(BString&);
-		
+	
+	void DumpDeviceClass(BString&);
+
 private:
 	uint32 record;
 

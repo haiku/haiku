@@ -314,8 +314,20 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 			minorClass << "Unknown (reserved) minor device class";
 		break;
 	}
+}
 
 
+void
+DeviceClass::DumpDeviceClass(BString& string)
+{
+
+	GetServiceClass(string);
+	string << " | ";
+	GetMajorDeviceClass(string);
+	string << " | ";
+	GetMinorDeviceClass(string);
+	string << ".";
+	
 }
 
 }
