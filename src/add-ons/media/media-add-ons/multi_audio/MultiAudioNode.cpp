@@ -1190,25 +1190,25 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 	multi_mix_value values[2];
 	info.values = values;
 	info.item_count = 0;
-
-	id = id - 100;
+	multi_mix_control* controls = fDevice->MixControlInfo().controls;
+	int32 control_id = controls[id - 100].id;
 
 	if (*size < sizeof(float))
 		return B_ERROR;
 
 	if (parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
 		info.item_count = 1;
-		values[0].id = id;
+		values[0].id = control_id;
 
 		if (parameter->CountChannels() == 2) {
 			if (*size < 2*sizeof(float))
 				return B_ERROR;
 			info.item_count = 2;
-			values[1].id = id + 1;
+			values[1].id = controls[id + 1 - 100].id;
 		}
 	} else if(parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
 		info.item_count = 1;
-		values[0].id = id;
+		values[0].id = control_id;
 	}
 
 	if (info.item_count > 0) {
@@ -1268,20 +1268,20 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 	multi_mix_value values[2];
 	info.values = values;
 	info.item_count = 0;
-
-	id = id - 100;
+	multi_mix_control* controls = fDevice->MixControlInfo().controls;
+	int32 control_id = controls[id - 100].id;
 
 	if (parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
 		for (uint32 i = 0; i < size / sizeof(float); i++) {
 			PRINT(("SetParameterValue B_CONTINUOUS_PARAMETER value[%li] : %f\n", i, ((float*)value)[i]));
 		}
 		info.item_count = 1;
-		values[0].id = id;
+		values[0].id = control_id;
 		values[0].gain = ((float*)value)[0];
 
 		if (parameter->CountChannels() == 2) {
 			info.item_count = 2;
-			values[1].id = id + 1;
+			values[1].id = controls[id + 1 - 100].id;
 			values[1].gain = ((float*)value)[1];
 		}
 	} else if (parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
@@ -1292,11 +1292,11 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 		BDiscreteParameter* discrete = (BDiscreteParameter*)parameter;
 		if (discrete->CountItems() <= 2) {
 			info.item_count = 1;
-			values[0].id = id;
+			values[0].id = control_id;
 			values[0].enable = ((int32*)value)[0] == 1;
 		} else {
 			info.item_count = 1;
-			values[0].id = id;
+			values[0].id = control_id;
 			values[0].mux = ((uint32*)value)[0];
 		}
 	}
@@ -1362,7 +1362,7 @@ MultiAudioNode::_ProcessGroup(BParameterGroup* group, int32 index,
 		if (controls[i].flags & B_MULTI_MIX_GROUP) {
 			PRINT(("NEW_GROUP\n"));
 			BParameterGroup* child = group->MakeGroup(name);
-			child->MakeNullParameter(controls[i].id, B_MEDIA_RAW_AUDIO, name,
+			child->MakeNullParameter(100 + i, B_MEDIA_RAW_AUDIO, name,
 				B_WEB_BUFFER_OUTPUT);
 
 			int32 num = 1;
@@ -1379,7 +1379,7 @@ MultiAudioNode::_ProcessGroup(BParameterGroup* group, int32 index,
 			_ProcessMux(parameter, i);
 		} else if (controls[i].flags & B_MULTI_MIX_GAIN) {
 			PRINT(("NEW_GAIN\n"));
-			group->MakeContinuousParameter(100 + controls[i].id,
+			group->MakeContinuousParameter(100 + i,
 				B_MEDIA_RAW_AUDIO, "", B_MASTER_GAIN, "dB",
 				controls[i].gain.min_gain, controls[i].gain.max_gain,
 				controls[i].gain.granularity);
@@ -1401,10 +1401,10 @@ MultiAudioNode::_ProcessGroup(BParameterGroup* group, int32 index,
 		} else if (controls[i].flags & B_MULTI_MIX_ENABLE) {
 			PRINT(("NEW_ENABLE\n"));
 			if (controls[i].string == S_MUTE) {
-				group->MakeDiscreteParameter(100 + controls[i].id,
+				group->MakeDiscreteParameter(100 + i,
 					B_MEDIA_RAW_AUDIO, name, B_MUTE);
 			} else {
-				group->MakeDiscreteParameter(100 + controls[i].id,
+				group->MakeDiscreteParameter(100 + i,
 					B_MEDIA_RAW_AUDIO, name, B_ENABLE);
 			}
 			if (numParameters > 0) {
