@@ -1370,7 +1370,7 @@ MultiAudioNode::_ProcessGroup(BParameterGroup* group, int32 index,
 		} else if (controls[i].flags & B_MULTI_MIX_MUX) {
 			PRINT(("NEW_MUX\n"));
 			BDiscreteParameter* parameter = group->MakeDiscreteParameter(
-				100 + controls[i].id, B_MEDIA_RAW_AUDIO, name, B_INPUT_MUX);
+				100 + i, B_MEDIA_RAW_AUDIO, name, B_INPUT_MUX);
 			if (numParameters > 0) {
 				(group->ParameterAt(numParameters - 1))->AddOutput(
 					group->ParameterAt(numParameters));
