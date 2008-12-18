@@ -525,10 +525,14 @@ Savage_WriteMode(const DisplayModeEx& mode, const SavageRegRec& regRec)
 	WriteCrtcReg(0x67, regRec.CR67 & ~0x0e); // no STREAMS yet old and new
 
 	// Set register SR19 to zero so that the ProSavage chips will start up
-	// when booting under BeOS using the default boot screen.
+	// when booting under BeOS using the default boot screen, and set register
+	// CR5F to zero so that the ProSavage chips will start up when Haiku boot
+	// screen had a depth of 32 bits/pixel
 
-	if (si.chipType == S3_PROSAVAGE || si.chipType == S3_TWISTER)
+	if (si.chipType == S3_PROSAVAGE || si.chipType == S3_TWISTER) {
 		WriteSeqReg(0x19, 0);
+		WriteCrtcReg(0x5f, 0);
+	}
 
 	// Clear bit 3 in SR30 so that Savage MX chip will startup.  If bit 3 is
 	// not cleared, it will startup only if booting under BeOS using the

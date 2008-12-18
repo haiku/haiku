@@ -332,10 +332,10 @@ SetDisplayMode(display_mode* pMode)
 
 	uint32 maxPixelClock;
 	if ( ! gInfo.GetColorSpaceParams(mode.space, mode.bpp, maxPixelClock))
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	if (ProposeDisplayMode(&mode, pMode, pMode) != B_OK)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	// Note that for some Savage chips, accelerated drawing is badly messed up
 	// when the display width is 1400 because 1400 is not evenly divisible by 32.
@@ -357,7 +357,7 @@ SetDisplayMode(display_mode* pMode)
 	// Is there enough frame buffer memory for this mode?
 
 	if ( ! IsThereEnoughFBMemory(&mode, mode.bpp))
-		return B_ERROR;
+		return B_NO_MEMORY;
 
 	TRACE("Set display mode: %dx%d  virtual size: %dx%d  color depth: %d bpp\n",
 		mode.timing.h_display, mode.timing.v_display,
