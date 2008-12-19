@@ -569,9 +569,9 @@ DHCPClient::_Negotiate(dhcp_state state)
 		if (fRebindingTime == 0)
 			fRebindingTime = fLeaseTime * 5/6;
 
+		bigtime_t now = system_time();
 		_RestartLease(fRenewalTime);
 
-		bigtime_t now = system_time();
 		fLeaseTime += now;
 		fRenewalTime += now;
 		fRebindingTime += now;
