@@ -10,13 +10,14 @@ int blockSize = 1024;
 int group = 64;
 int progress = 1;
 int verbose = 0;
+FILE *outputFile = stdout;
 
-int scan_device(const char *dev)
+int scan_device(const char *dev, off_t startBlock, off_t endBlock)
 {
 	char *buffer = NULL;
 	size_t len = group * blockSize;
-	off_t at = 0LL;
-	off_t block = 0L;
+	off_t block = startBlock;
+	off_t at = block * blockSize;
 	int i;
 	int fd;
 
@@ -32,36 +33,46 @@ int scan_device(const char *dev)
 	}
 	// Check size
 
+	if (verbose)
+		fprintf(stderr, "Scanning '%s', %d * %d bytes at once\n", 
+			dev, group, blockSize);
+
 	if (progress)
 		fprintf(stderr, "\n");
 
-	for (; ; block += group, at += len) {
+	for (; block <= endBlock; block += group, at += len) {
 		int got;
 		if (progress)
-			fprintf(stderr, "\033[Achecking %Ld\n", block);
+			fprintf(stderr, "checking block %Ld\x1b[1A\n", block);
 		got = pread(fd, buffer, len, at);
 		if (got == len)
 			continue;
 		if (got >= 0) {
 			if (verbose)
-				fprintf(stderr, "at %Ld got %d < %d\n", at, got, len);
+				fprintf(stderr, "block %Ld (offset %Ld): got %d < %d\n", 
+					block, at, got, len);
 			break;
 		}
 		if (got < 0) {
-			fprintf(stderr, "error: %s\n", strerror(errno));
+			fprintf(stderr, "block %Ld: error: %s\n", block, strerror(errno));
+			/*
 			if (errno != EIO && errno != ENXIO) {
 				perror("pread");
 				goto err2;
 			}
+			*/
 		}
 		// try each block separately
 		for (i = 0; i < group; i++) {
 			got = pread(fd, buffer, blockSize, at + blockSize * i);
 			if (got == blockSize)
 				continue;
-			if (got < 0) {
-				fprintf(stderr, "error: %s\n", strerror(errno));
-				printf("%Ld\n", block);
+			if (got < blockSize) {
+				if (got < 0)
+					fprintf(stderr, "block %Ld: error: %s\n", block + i, strerror(errno));
+				else
+					fprintf(stderr, "block %Ld: read % bytes\n", block + i, got);
+				fprintf(outputFile, "%Ld\n", block + i);
 				fflush(stdout);
 			}
 		}
@@ -79,13 +90,16 @@ err1:
 
 int usage(int ret)
 {
-	fprintf(stderr, "badblocks [-sv] [-b block-size] [-c block-at-once] /dev/disk/...\n");
+	fprintf(stderr, "badblocks [-sv] [-b block-size] [-c block-at-once] "
+		"/dev/disk/... [end-block [start-block]]\n");
 	return ret;
 }
 
 int main(int argc, char **argv)
 {
 	int ch;
+	off_t startBlock = 0LL;
+	off_t endBlock = INT64_MAX;
 	if (argc < 2)
 		return usage(1);
 
@@ -115,8 +129,10 @@ int main(int argc, char **argv)
 	argc -= optind;
 	argv += optind;
 
-	for (; argc > 0; argc--, argv++) {
-		scan_device(argv[0]);
-	}
-	return 0;
+	if (argc > 2)
+		startBlock = atoll(argv[2]);
+	if (argc > 1)
+		endBlock = atoll(argv[1]);
+		
+	return scan_device(argv[0], startBlock, endBlock);
 }
