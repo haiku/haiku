@@ -1044,7 +1044,7 @@ send_l2cap_reject(HciConnection* conn, uint8 ident, uint16 reason,
 {
 	L2capFrame*	cmd = NULL;
 
-	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_cmd_rej(cmd->ident, reason, mtu, scid, dcid), ident, L2CAP_CMD_REJ);
+	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_cmd_rej(ident, reason, mtu, scid, dcid), ident, L2CAP_CMD_REJ);
 	if (cmd == NULL)
 		return ENOMEM;
 
@@ -1060,7 +1060,7 @@ send_l2cap_con_rej(HciConnection* conn, uint8 ident, uint16 scid, uint16 dcid, u
 {
 	L2capFrame*	cmd = NULL;
 
-	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_con_rsp(cmd->ident, scid, dcid, result, 0), ident, L2CAP_CON_RSP);
+	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_con_rsp(ident, scid, dcid, result, 0), ident, L2CAP_CON_RSP);
 	if (cmd == NULL)
 		return ENOMEM;
 
@@ -1076,7 +1076,7 @@ send_l2cap_cfg_rsp(HciConnection* conn, uint8 ident, uint16 scid, uint16 result,
 {
 	L2capFrame*	cmd = NULL;
 
-	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_cfg_rsp(cmd->ident, scid, 0, result, opt), 
+	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_cfg_rsp(ident, scid, 0, result, opt), 
 									ident, L2CAP_CFG_RSP);
 	if (cmd == NULL) {
 		gBufferModule->free(opt);
