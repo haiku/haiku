@@ -51,8 +51,6 @@ OptionalPackageDependencies Subversion : OpenSSL ;
 if [ IsOptionalHaikuImagePackageAdded APR ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package APR available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package APR available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage apr-0.9.17-gcc2-2008-05-20
@@ -67,8 +65,6 @@ if [ IsOptionalHaikuImagePackageAdded APR ] {
 if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package APR-util available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package APR-util available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage apr-util-0.9.15-gcc2-2008-05-15
@@ -161,8 +157,6 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 if [ IsOptionalHaikuImagePackageAdded CVS ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package CVS available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package CVS available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage cvs-1.12.13-gcc2-2008-12-04
@@ -328,8 +322,6 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSound available for $(TARGET_ARCH)" ;
-#	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-#		Echo "No optional package OpenSound available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage OpenSound
 			: http://www.yellowbites.com/downloads/OpenSound_Haiku20080621.zip
@@ -344,8 +336,6 @@ if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSSH available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package OpenSSH available for gcc4" ;
 	} else {
 		if ! $(HAIKU_IMAGE_HOST_NAME) {
 			Exit "Optional package OpenSSH requires the HAIKU_IMAGE_HOST_NAME"
@@ -368,8 +358,6 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSSL available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package OpenSSL available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage openssl-0.9.8g-gcc2-2008-03-28
@@ -432,8 +420,6 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 if [ IsOptionalHaikuImagePackageAdded Perl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Perl available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package Perl available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage perl-5.10.0-gcc2-2008-10-29
@@ -448,8 +434,6 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Subversion available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package Subversion available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage Subversion
 			: http://haiku.mlotz.ch/subversion-1.4.6-haiku-20080628.zip
@@ -535,8 +519,6 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Yasm available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package Yasm available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage yasm-0.7.2-gcc2-2008-11-25
