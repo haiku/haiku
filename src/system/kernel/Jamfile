@@ -135,6 +135,7 @@ KernelLd kernel.so :
 	kernel_os_arch_$(TARGET_ARCH).o
 	kernel_lib_posix.o
 	kernel_lib_posix_arch_$(TARGET_ARCH).o
+	kernel_misc.o
 
 	$(HAIKU_STATIC_LIBSUPC++)
 
