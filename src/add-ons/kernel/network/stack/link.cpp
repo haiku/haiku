@@ -6,6 +6,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+//! The net_protocol you talk to when using the AF_LINK protocol
 
 #include "datalink.h"
 #include "domains.h"
@@ -52,7 +53,8 @@ private:
 	net_device_monitor	fMonitor;
 	net_device_interface *fMonitoredDevice;
 
-	static status_t _MonitorData(net_device_monitor *monitor, net_buffer *buffer);
+	static status_t _MonitorData(net_device_monitor *monitor,
+		net_buffer *buffer);
 	static void _MonitorEvent(net_device_monitor *monitor, int32 event);
 };
 
@@ -224,8 +226,6 @@ link_control(net_protocol *_protocol, int level, int option, void *value,
 {
 	LinkProtocol *protocol = (LinkProtocol *)_protocol;
 
-	// TODO All of this common functionality should be elsewhere
-
 	switch (option) {
 		case SIOCGIFINDEX:
 		{
@@ -234,7 +234,8 @@ link_control(net_protocol *_protocol, int level, int option, void *value,
 			if (user_memcpy(&request, value, IF_NAMESIZE) < B_OK)
 				return B_BAD_ADDRESS;
 
-			net_device_interface *interface = get_device_interface(request.ifr_name);
+			net_device_interface *interface
+				= get_device_interface(request.ifr_name);
 			if (interface != NULL) {
 				request.ifr_index = interface->device->index;
 				put_device_interface(interface);
@@ -250,7 +251,8 @@ link_control(net_protocol *_protocol, int level, int option, void *value,
 			if (user_memcpy(&request, value, sizeof(struct ifreq)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			net_device_interface *interface = get_device_interface(request.ifr_index);
+			net_device_interface *interface
+				= get_device_interface(request.ifr_index);
 			if (interface != NULL) {
 				strlcpy(request.ifr_name, interface->device->name, IF_NAMESIZE);
 				put_device_interface(interface);
@@ -291,7 +293,8 @@ link_control(net_protocol *_protocol, int level, int option, void *value,
 			if (user_memcpy(&request, value, IF_NAMESIZE) < B_OK)
 				return B_BAD_ADDRESS;
 
-			net_device_interface *interface = get_device_interface(request.ifr_name);
+			net_device_interface *interface
+				= get_device_interface(request.ifr_name);
 			if (interface != NULL) {
 				get_device_interface_address(interface, &request.ifr_addr);
 				put_device_interface(interface);
@@ -473,7 +476,8 @@ link_std_ops(int32 op, ...)
 void
 link_init()
 {
-	register_domain_protocols(AF_LINK, SOCK_DGRAM, 0, "network/stack/link/v1", NULL);
+	register_domain_protocols(AF_LINK, SOCK_DGRAM, 0, "network/stack/link/v1",
+		NULL);
 
 	register_domain_datalink_protocols(AF_LINK, IFT_ETHER,
 		"network/datalink_protocols/ethernet_frame/v1",
