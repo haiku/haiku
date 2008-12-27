@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -67,9 +67,7 @@ get_context()
 				return &sTeamContext;
 			}
 
-			*tls_address(slot) = allocate_context();
 			sThreadContextSlot = slot;
-			return (syslog_context *)tls_get(slot);
 		} else {
 			while (sThreadContextSlot == -1)
 				snooze(10000);
@@ -81,7 +79,7 @@ get_context()
 		// try to allocate the context again; it might have
 		// been deleted, or there was not enough memory last
 		// time
-		context = allocate_context();
+		*tls_address(sThreadContextSlot) = context = allocate_context();
 	}
 	if (context != NULL)
 		return context;
