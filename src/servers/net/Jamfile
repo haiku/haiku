@@ -11,6 +11,7 @@ AddResources net_server : net_server.rdef ;
 Server net_server :
 	NetServer.cpp
 	Settings.cpp
+	AutoconfigClient.cpp
 	AutoconfigLooper.cpp
 	DHCPClient.cpp
 	Services.cpp

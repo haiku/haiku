@@ -7,10 +7,22 @@
  */
 
 
-#include "AutoconfigLooper.h"
 #include "NetServer.h"
-#include "Services.h"
-#include "Settings.h"
+
+#include <errno.h>
+#include <map>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <string.h>
+#include <unistd.h>
+
+#include <arpa/inet.h>
+#include <net/if_dl.h>
+#include <net/if_types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/sockio.h>
 
 #include <Alert.h>
 #include <Deskbar.h>
@@ -22,26 +34,15 @@
 #include <Server.h>
 #include <TextView.h>
 
-#include <arpa/inet.h>
-#include <net/if_dl.h>
-#include <net/if_types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/sockio.h>
-
-#include <map>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <string.h>
-#include <unistd.h>
+#include "AutoconfigLooper.h"
+#include "Services.h"
+#include "Settings.h"
 
 
 static const char *kSignature = "application/x-vnd.haiku-net_server";
 
 
-typedef std::map<std::string, BLooper*> LooperMap;
+typedef std::map<std::string, AutoconfigLooper*> LooperMap;
 
 
 class NetServer : public BServer {
@@ -59,7 +60,7 @@ class NetServer : public BServer {
 		status_t _ConfigureInterface(int socket, BMessage& interface,
 			bool fromMessage = false);
 		bool _QuitLooperForDevice(const char* device);
-		BLooper* _LooperForDevice(const char* device);
+		AutoconfigLooper* _LooperForDevice(const char* device);
 		status_t _ConfigureDevice(int socket, const char* path);
 		void _ConfigureDevices(int socket, const char* path,
 			BMessage* suggestedInterface = NULL);
@@ -258,7 +259,7 @@ NetServer::AboutRequested()
 
 	view->GetFont(&font);
 	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 17, &font);
 
 	alert->Go(NULL);
@@ -363,7 +364,7 @@ NetServer::_IsValidInterface(int socket, const char* name)
 	if (addresses == 0)
 		return false;
 
-	// check if it has a hardware address, too, in case of ethernet	
+	// check if it has a hardware address, too, in case of ethernet
 
 	if (ioctl(socket, SIOCGIFPARAM, &request, sizeof(struct ifreq)) < 0)
 		return false;
@@ -568,7 +569,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 			if (addressMessage.FindString("address", &string) == B_OK
 				&& parse_address(familyIndex, string, address)) {
 				hasAddress = true;
-	
+
 				if (addressMessage.FindString("mask", &string) == B_OK
 					&& parse_address(familyIndex, string, mask))
 					hasMask = true;
@@ -612,13 +613,13 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 
 		if (hasAddress) {
 			memcpy(&request.ifr_addr, &address, address.sa_len);
-	
+
 			if (ioctl(familySocket, SIOCSIFADDR, &request, sizeof(struct ifreq)) < 0) {
 				fprintf(stderr, "%s: Setting address failed: %s\n", Name(), strerror(errno));
 				continue;
 			}
 		}
-	
+
 		if (ioctl(familySocket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) < 0) {
 			fprintf(stderr, "%s: Getting flags failed: %s\n", Name(), strerror(errno));
 			continue;
@@ -695,15 +696,15 @@ NetServer::_QuitLooperForDevice(const char* device)
 		return false;
 
 	// there is a looper for this device - quit it
-	iterator->second->Lock();
-	iterator->second->Quit();
+	if (iterator->second->Lock())
+		iterator->second->Quit();
 
 	fDeviceMap.erase(iterator);
 	return true;
 }
 
 
-BLooper*
+AutoconfigLooper*
 NetServer::_LooperForDevice(const char* device)
 {
 	LooperMap::const_iterator iterator = fDeviceMap.find(device);

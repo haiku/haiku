@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,9 +9,7 @@
 #define DHCP_CLIENT_H
 
 
-#include <Handler.h>
-#include <Messenger.h>
-#include <String.h>
+#include "AutoconfigClient.h"
 
 #include <netinet/in.h>
 
@@ -28,12 +26,12 @@ enum dhcp_state {
 };
 
 
-class DHCPClient : public BHandler {
+class DHCPClient : public AutoconfigClient {
 	public:
 		DHCPClient(BMessenger target, const char* device);
 		virtual ~DHCPClient();
 
-		status_t Initialize();
+		virtual status_t Initialize();
 
 		virtual void MessageReceived(BMessage* message);
 
@@ -49,8 +47,6 @@ class DHCPClient : public BHandler {
 		BString _ToString(const uint8* data) const;
 		BString _ToString(in_addr_t address) const;
 
-		BMessenger		fTarget;
-		BString			fDevice;
 		BMessage		fConfiguration;
 		BMessageRunner*	fRunner;
 		uint8			fMAC[6];

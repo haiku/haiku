@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 #include <sys/sockio.h>
 #include <sys/time.h>
 
@@ -329,9 +330,7 @@ dhcp_message::FinishOptions(uint8 *next)
 
 
 DHCPClient::DHCPClient(BMessenger target, const char* device)
-	: BHandler("dhcp"),
-	fTarget(target),
-	fDevice(device),
+	: AutoconfigClient("dhcp", target, device),
 	fConfiguration(kMsgConfigureInterface),
 	fRunner(NULL),
 	fLeaseTime(0)
@@ -347,6 +346,8 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	fServer.sin_family = AF_INET;
 	fServer.sin_len = sizeof(struct sockaddr_in);
 	fServer.sin_port = htons(DHCP_SERVER_PORT);
+
+	openlog_thread("DHCP", 0, LOG_DAEMON);
 }
 
 
@@ -368,6 +369,8 @@ DHCPClient::~DHCPClient()
 
 	_SendMessage(socket, release, fServer);
 	close(socket);
+
+	closelog_thread();
 }
 
 
@@ -375,7 +378,7 @@ status_t
 DHCPClient::Initialize()
 {
 	fStatus = _Negotiate(INIT);
-	printf("DHCP for %s, status: %s\n", fDevice.String(), strerror(fStatus));
+	syslog(LOG_DEBUG, "DHCP for %s, status: %s\n", Device(), strerror(fStatus));
 	return fStatus;
 }
 
@@ -416,7 +419,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 		if (linkSocket >= 0) {
 			// we need to know the index of the device to be able to bind to it
 			ifreq request;
-			prepare_request(request, fDevice.String());
+			prepare_request(request, Device());
 			if (ioctl(linkSocket, SIOCGIFINDEX, &request, sizeof(struct ifreq))
 					== 0) {
 				setsockopt(socket, SOL_SOCKET, SO_BINDTODEVICE,
@@ -502,7 +505,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 				fAssignedAddress = message->your_address;
 
 				fConfiguration.MakeEmpty();
-				fConfiguration.AddString("device", fDevice.String());
+				fConfiguration.AddString("device", Device());
 				fConfiguration.AddBool("auto", true);
 
 				BMessage address;
@@ -540,7 +543,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 				// configure interface
 				BMessage reply;
-				fTarget.SendMessage(&fConfiguration, &reply);
+				Target().SendMessage(&fConfiguration, &reply);
 
 				if (reply.FindInt32("status", &fStatus) != B_OK)
 					status = B_OK;
@@ -622,10 +625,11 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				// TODO: for now, we write it just out to /etc/resolv.conf
 				FILE* file = fopen("/etc/resolv.conf", "w");
 				for (uint32 i = 0; i < size / 4; i++) {
-					printf("DNS: %s\n", _ToString(&data[i*4]).String());
+					syslog(LOG_INFO, "DNS: %s\n",
+						_ToString(&data[i * 4]).String());
 					if (file != NULL) {
 						fprintf(file, "nameserver %s\n",
-							_ToString(&data[i*4]).String());
+							_ToString(&data[i * 4]).String());
 					}
 				}
 				fclose(file);
@@ -636,16 +640,17 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				break;
 
 			case OPTION_ADDRESS_LEASE_TIME:
-				printf("lease time of %lu seconds\n", htonl(*(uint32*)data));
+				syslog(LOG_INFO, "lease time of %lu seconds\n",
+					htonl(*(uint32*)data));
 				fLeaseTime = htonl(*(uint32*)data) * 1000000LL;
 				break;
 			case OPTION_RENEWAL_TIME:
-				printf("renewal time of %lu seconds\n",
+				syslog(LOG_INFO, "renewal time of %lu seconds\n",
 					htonl(*(uint32*)data));
 				fRenewalTime = htonl(*(uint32*)data) * 1000000LL;
 				break;
 			case OPTION_REBINDING_TIME:
-				printf("rebinding time of %lu seconds\n",
+				syslog(LOG_INFO, "rebinding time of %lu seconds\n",
 					htonl(*(uint32*)data));
 				fRebindingTime = htonl(*(uint32*)data) * 1000000LL;
 				break;
@@ -655,7 +660,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				char name[256];
 				memcpy(name, data, size);
 				name[size] = '\0';
-				printf("DHCP host name: \"%s\"\n", name);
+				syslog(LOG_INFO, "DHCP host name: \"%s\"\n", name);
 				break;
 			}
 
@@ -664,7 +669,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				char name[256];
 				memcpy(name, data, size);
 				name[size] = '\0';
-				printf("DHCP domain name: \"%s\"\n", name);
+				syslog(LOG_INFO, "DHCP domain name: \"%s\"\n", name);
 				break;
 			}
 
@@ -672,7 +677,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				break;
 
 			default:
-				printf("unknown option %lu\n", (uint32)option);
+				syslog(LOG_INFO, "unknown option %lu\n", (uint32)option);
 				break;
 		}
 	}
@@ -754,7 +759,8 @@ DHCPClient::_TimeoutShift(int socket, time_t& timeout, uint32& tries)
 		if (++tries > 2)
 			return false;
 	}
-	printf("DHCP timeout shift: %lu secs (try %lu)\n", timeout, tries);
+	syslog(LOG_DEBUG, "DHCP timeout shift: %lu secs (try %lu)\n", timeout,
+		tries);
 
 	struct timeval value;
 	value.tv_sec = timeout;
