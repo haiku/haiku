@@ -34,10 +34,10 @@ status_t get_domain_datalink_protocols(net_interface *interface);
 status_t put_domain_datalink_protocols(net_interface *interface);
 
 // notifications.cpp
-status_t notify_interface_added(const char* interface);
-status_t notify_interface_removed(const char* interface);
-status_t notify_interface_changed(const char* interface);
-status_t notify_link_changed(const char* interface);
+status_t notify_interface_added(net_interface* interface);
+status_t notify_interface_removed(net_interface* interface);
+status_t notify_interface_changed(net_interface* interface);
+status_t notify_link_changed(net_device* device);
 status_t init_notifications();
 void uninit_notifications();
 

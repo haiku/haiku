@@ -138,12 +138,12 @@ BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)s3 $(X86_ONLY)vesa #$(X86_ONLY)via #$(X86_ONLY)vmware
 ;
 BEOS_ADD_ONS_DRIVERS_MIDI = emuxki ;
-BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x 
+BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x
 	$(X86_ONLY)broadcom570x etherpci $(X86_ONLY)ipro1000
 	pegasus $(X86_ONLY)rtl8139 rtl8169 $(X86_ONLY)rtl81xx sis900
 	$(X86_ONLY)via_rhine wb840 $(X86_ONLY)ipro100 $(X86_ONLY)nforce
 	#vlance
-	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect 
+	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect
 	$(X86_ONLY)attansic_l2 $(X86_ONLY)ar81xx usb_ecm
 ;
 #BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
@@ -420,7 +420,8 @@ AddSymlinkToHaikuImage beos system add-ons Tracker
 AddFilesToHaikuImage beos system add-ons input_server devices
 	: <input>keyboard <input>mouse <input>wacom ;
 AddFilesToHaikuImage beos system add-ons input_server filters : screen_saver ;
-AddFilesToHaikuImage beos system add-ons kernel network : stack ;
+AddFilesToHaikuImage beos system add-ons kernel network
+	: <net>notifications stack ;
 AddFilesToHaikuImage beos system add-ons kernel network devices
 	: $(BEOS_NETWORK_DEVICES) ;
 AddFilesToHaikuImage beos system add-ons kernel network datalink_protocols

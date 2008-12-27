@@ -9,6 +9,7 @@
 	notification listeners independent from the stack status.
 */
 
+#include <net_device.h>
 #include <net_notifications.h>
 
 #include <util/KMessage.h>
@@ -20,7 +21,7 @@ static net_notifications_module_info* sNotificationModule;
 
 
 status_t
-notify_interface_added(const char* interface)
+notify_interface_added(net_interface* interface)
 {
 	if (sNotificationModule == NULL)
 		return B_NOT_SUPPORTED;
@@ -29,14 +30,14 @@ notify_interface_added(const char* interface)
 	KMessage message;
 	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
 	message.AddInt32("opcode", B_NETWORK_INTERFACE_ADDED);
-	message.AddString("interface", interface);
+	message.AddString("interface", interface->name);
 
 	return sNotificationModule->send_notification(&message);
 }
 
 
 status_t
-notify_interface_removed(const char* interface)
+notify_interface_removed(net_interface* interface)
 {
 	if (sNotificationModule == NULL)
 		return B_NOT_SUPPORTED;
@@ -45,14 +46,14 @@ notify_interface_removed(const char* interface)
 	KMessage message;
 	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
 	message.AddInt32("opcode", B_NETWORK_INTERFACE_REMOVED);
-	message.AddString("interface", interface);
+	message.AddString("interface", interface->name);
 
 	return sNotificationModule->send_notification(&message);
 }
 
 
 status_t
-notify_interface_changed(const char* interface)
+notify_interface_changed(net_interface* interface)
 {
 	if (sNotificationModule == NULL)
 		return B_NOT_SUPPORTED;
@@ -61,14 +62,14 @@ notify_interface_changed(const char* interface)
 	KMessage message;
 	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
 	message.AddInt32("opcode", B_NETWORK_INTERFACE_CHANGED);
-	message.AddString("interface", interface);
+	message.AddString("interface", interface->name);
 
 	return sNotificationModule->send_notification(&message);
 }
 
 
 status_t
-notify_link_changed(const char* interface)
+notify_link_changed(net_device* device)
 {
 	if (sNotificationModule == NULL)
 		return B_NOT_SUPPORTED;
@@ -77,7 +78,10 @@ notify_link_changed(const char* interface)
 	KMessage message;
 	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
 	message.AddInt32("opcode", B_NETWORK_DEVICE_LINK_CHANGED);
-	message.AddString("interface", interface);
+	message.AddString("device", device->name);
+	message.AddInt32("media", device->media);
+	message.AddInt64("link speed", device->link_speed);
+	message.AddInt32("link quality", device->link_quality);
 
 	return sNotificationModule->send_notification(&message);
 }

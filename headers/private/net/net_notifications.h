@@ -24,8 +24,7 @@ struct net_notifications_module_info {
 // generic syscall interface
 #define NET_NOTIFICATIONS_SYSCALLS "network/notifications"
 
-#define NET_NOTIFICATIONS_START_WATCHING	1
-#define NET_NOTIFICATIONS_STOP_WATCHING		2
+#define NET_NOTIFICATIONS_CONTROL_WATCHING	1
 
 struct net_notifications_control {
 	uint32		flags;
@@ -36,15 +35,15 @@ struct net_notifications_control {
 // TODO: the following part of this header should end up in a public header
 // some day!
 
-#define B_NETWORK_INTERFACE_ADDED		1
-#define B_NETWORK_INTERFACE_REMOVED		2
-#define B_NETWORK_INTERFACE_CHANGED		3
-#define B_NETWORK_DEVICE_LINK_CHANGED	4
+#define B_NETWORK_INTERFACE_ADDED		0x01
+#define B_NETWORK_INTERFACE_REMOVED		0x02
+#define B_NETWORK_INTERFACE_CHANGED		0x03
+#define B_NETWORK_DEVICE_LINK_CHANGED	0x10
 // TODO: add routes, stack unloaded/loaded, ... events
 
 enum {
-	B_WATCH_NETWORK_INTERFACE_CHANGES	= 0x0001,
-	B_WATCH_NETWORK_LINK_CHANGES	 	= 0x0002
+	B_WATCH_NETWORK_INTERFACE_CHANGES	= 0x000f,
+	B_WATCH_NETWORK_LINK_CHANGES	 	= 0x00f0
 };
 
 #define B_NETWORK_MONITOR				'_NTN'

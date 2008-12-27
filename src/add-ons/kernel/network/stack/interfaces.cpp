@@ -764,6 +764,7 @@ unregister_device_monitor(net_device *device, net_device_monitor *monitor)
 status_t
 device_link_changed(net_device *device)
 {
+	notify_link_changed(device);
 	return B_OK;
 }
 

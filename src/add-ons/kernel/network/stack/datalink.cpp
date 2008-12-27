@@ -518,7 +518,8 @@ datalink_std_ops(int32 op, ...)
 
 
 status_t
-interface_protocol_init(struct net_interface *_interface, net_datalink_protocol **_protocol)
+interface_protocol_init(struct net_interface *_interface,
+	net_datalink_protocol **_protocol)
 {
 	net_interface_private *interface = (net_interface_private *)_interface;
 
@@ -547,7 +548,8 @@ interface_protocol_send_data(net_datalink_protocol *_protocol,
 	net_buffer *buffer)
 {
 	interface_protocol *protocol = (interface_protocol *)_protocol;
-	net_interface_private *interface = (net_interface_private *)protocol->interface;
+	net_interface_private *interface
+		= (net_interface_private *)protocol->interface;
 
 	// TODO: Need to think about this locking. We can't obtain the
 	//       RX Lock here (nor would it make sense) as the ARP

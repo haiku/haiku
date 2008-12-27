@@ -186,8 +186,10 @@ add_interface_to_domain(net_domain *_domain,
 
 	put_device_interface(deviceInterface);
 
-	if (status == B_OK)
+	if (status == B_OK) {
 		list_add_item(&domain->interfaces, interface);
+		notify_interface_added(interface);
+	}
 
 	return status;
 }
@@ -203,6 +205,7 @@ remove_interface_from_domain(net_interface *interface)
 	net_domain_private *domain = (net_domain_private *)interface->domain;
 
 	list_remove_item(&domain->interfaces, interface);
+	notify_interface_removed(interface);
 	delete_interface((net_interface_private *)interface);
 	return B_OK;
 }
