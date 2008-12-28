@@ -6451,12 +6451,10 @@ BPoseView::DragSelectedPoses(const BPose *pose, BPoint clickPoint)
 			info.GetType(type);
 
 			int32 tmp;
-			if (strcasecmp(type, kPlainTextMimeType) == 0
+			if (strcasecmp(type, kPlainTextMimeType) == 0) {
 				// got a text file
-				&& file.ReadAttr(kAttrClippingFile, B_RAW_TYPE, 0,
-					&tmp, sizeof(int32)) == sizeof(int32)) {
-				// and a clipping file
 
+				
 				file.Seek(0, SEEK_SET);
 				off_t size = 0;
 				file.GetSize(&size);
