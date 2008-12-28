@@ -1092,7 +1092,9 @@ PackageInfo::_AddItem(PkgItem *item, uint64 size, uint32 groups, uint32 path,
 	// Add the item to all groups it resides in
 	uint32 i, n = fProfiles.CountItems(), mask = 1;
 	pkg_profile *profile;
-					
+
+	fFiles.AddItem(item);
+
 	for (i = 0;i < n;i++) {
 		if (groups & mask) {
 			profile = static_cast<pkg_profile *>(fProfiles.ItemAt(i));
@@ -1114,22 +1116,6 @@ PackageInfo::_AddItem(PkgItem *item, uint64 size, uint32 groups, uint32 path,
 			}
 		}
 		mask = mask << 1;
-	}
-}
-
-
-//	#pragma mark -
-
-
-pkg_profile::~pkg_profile()
-{
-	PkgItem *iter = 0;
-	while (1) {
-		iter = static_cast<PkgItem *>(items.RemoveItem((long int)0));
-		if (iter)
-			delete iter;
-		else
-			break;
 	}
 }
 

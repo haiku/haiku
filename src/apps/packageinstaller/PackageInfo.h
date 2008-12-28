@@ -64,7 +64,7 @@ class PackageInfo {
 
 struct pkg_profile {
 	pkg_profile() : items(10), space_needed(0), path_type(P_SYSTEM_PATH) {}
-	~pkg_profile();
+	~pkg_profile() {} 
 
 	BString name;
 	BString description;
