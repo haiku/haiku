@@ -252,8 +252,11 @@ domain_interface_control(net_domain_private *domain, int32 option,
 						}
 					}
 
-					if (status == B_OK)
+					if (status == B_OK) {
+						// TODO: why shouldn't we able to delete IFF_BROADCAST?
+						interface->flags &= IFF_UP | IFF_LINK | IFF_BROADCAST;
 						interface->flags |= request->ifr_flags;
+					}
 					break;
 				}
 			}
