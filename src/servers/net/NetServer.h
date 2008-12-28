@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,8 @@
 
 #include <net/if.h>
 
+
+static const char* kNetServerSignature = "application/x-vnd.haiku-net_server";
 
 static const uint32 kMsgConfigureInterface = 'COif';
 

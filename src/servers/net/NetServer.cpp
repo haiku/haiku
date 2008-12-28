@@ -39,9 +39,6 @@
 #include "Settings.h"
 
 
-static const char *kSignature = "application/x-vnd.haiku-net_server";
-
-
 typedef std::map<std::string, AutoconfigLooper*> LooperMap;
 
 
@@ -242,7 +239,7 @@ get_mac_address(const char* device, uint8* address)
 
 
 NetServer::NetServer(status_t& error)
-	: BServer(kSignature, false, &error)
+	: BServer(kNetServerSignature, false, &error)
 {
 }
 
@@ -306,10 +303,12 @@ NetServer::MessageReceived(BMessage* message)
 
 		case kMsgConfigureInterface:
 		{
+#if 0
 			if (!message->ReturnAddress().IsTargetLocal()) {
 				// for now, we only accept this message from add-ons
 				break;
 			}
+#endif
 
 			// we need a socket to talk to the networking stack
 			int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
@@ -475,7 +474,8 @@ NetServer::_TestForInterface(int socket, const char* name)
 			break;
 		}
 
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE + interface->ifr_addr.sa_len);
+		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
+			+ interface->ifr_addr.sa_len);
 	}
 
 	free(buffer);
@@ -484,7 +484,8 @@ NetServer::_TestForInterface(int socket, const char* name)
 
 
 status_t
-NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage)
+NetServer::_ConfigureInterface(int socket, BMessage& interface,
+	bool fromMessage)
 {
 	const char *device;
 	if (interface.FindString("device", &device) != B_OK)
@@ -513,8 +514,8 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 		metric = -1;
 
 	BMessage addressMessage;
-	for (int32 index = 0; interface.FindMessage("address", index, &addressMessage) == B_OK;
-			index++) {
+	for (int32 index = 0; interface.FindMessage("address", index,
+			&addressMessage) == B_OK; index++) {
 		const char* family;
 		if (addressMessage.FindString("family", &family) < B_OK)
 			continue;
@@ -556,12 +557,15 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 		bool autoConfig;
 		if (addressMessage.FindBool("auto config", &autoConfig) != B_OK)
 			autoConfig = false;
+#if 0
 		if (autoConfig && fromMessage) {
 			// we don't accept auto-config messages this way
 			continue;
 		}
+#endif
 
-		bool hasAddress = false, hasMask = false, hasPeer = false, hasBroadcast = false;
+		bool hasAddress = false, hasMask = false, hasPeer = false;
+		bool hasBroadcast = false;
 		struct sockaddr address, mask, peer, broadcast, gateway;
 		const char* string;
 
@@ -794,8 +798,8 @@ NetServer::_BringUpInterfaces()
 	// we need a socket to talk to the networking stack
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0) {
-		fprintf(stderr, "%s: The networking stack doesn't seem to be available.\n",
-			Name());
+		fprintf(stderr, "%s: The networking stack doesn't seem to be "
+			"available.\n", Name());
 		Quit();
 		return;
 	}
@@ -849,7 +853,7 @@ NetServer::_StartServices()
 
 
 int
-main()
+main(int argc, char** argv)
 {
 	status_t status;
 	NetServer server(status);

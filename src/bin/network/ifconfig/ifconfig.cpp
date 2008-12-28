@@ -8,7 +8,8 @@
  */
 
 
-#include <SupportDefs.h>
+#include <Message.h>
+#include <Messenger.h>
 
 #include <arpa/inet.h>
 #include <net/if.h>
@@ -24,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <NetServer.h>
 
 
 extern const char* __progname;
@@ -63,7 +66,7 @@ inet_parse_address(const char* string, sockaddr* _address)
 		return false;
 
 	sockaddr_in& address = *(sockaddr_in *)_address;
-	address.sin_family = AF_INET; 
+	address.sin_family = AF_INET;
 	address.sin_len = sizeof(struct sockaddr_in);
 	address.sin_port = 0;
 	address.sin_addr = inetAddress;
@@ -77,7 +80,7 @@ static void
 inet_print_address(sockaddr* _address)
 {
 	sockaddr_in& address = *(sockaddr_in *)_address;
-	
+
 	if (address.sin_family != AF_INET)
 		return;
 
@@ -153,7 +156,7 @@ media_parse_subtype(const char* string, int media, int* type)
 {
 	for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
 		// only check for generic or correct subtypes
-		if (kMediaTypes[i].type && 
+		if (kMediaTypes[i].type &&
 			kMediaTypes[i].type != media)
 			continue;
 		for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++) {
@@ -174,7 +177,8 @@ media_parse_subtype(const char* string, int media, int* type)
 void
 usage(int status)
 {
-	printf("usage: %s [<interface> [<address family>] [<address> [<mask>]] [<option/flags>...]]\n"
+	printf("usage: %s [<interface> [<address family>] [<address> [<mask>] | "
+			"auto-config] [<option/flags>...]]\n"
 		"\t%s --delete interface [...]\n\n"
 		"Where <option> can be the following:\n"
 		"  netmask <addr>   - networking subnet mask\n"
@@ -190,7 +194,10 @@ usage(int status)
 			printf("%s ", kMediaTypes[i].subtypes[j].name);
 		printf("\n");
 	}
-	printf("And <flags> can be: up, down, [-]promisc, [-]allmulti, [-]bcast, loopback\n\n"
+	printf("And <flags> can be: up, down, [-]promisc, [-]allmulti, [-]bcast, "
+			"loopback\n"
+		"If you specify \"auto-config\" instead of an address, it will be "
+			"configured automatically.\n\n"
 		"Example:\n"
 		"\t%s loop 127.0.0.1 255.0.0.0 up\n",
 		kProgramName);
@@ -316,7 +323,7 @@ list_interface(int socket, const char* name)
 			if (IFM_TYPE(request.ifr_media) == 0/*IFT_LOOP*/)
 				break;
 			// only check for generic or correct subtypes
-			if (kMediaTypes[i].type && 
+			if (kMediaTypes[i].type &&
 				kMediaTypes[i].type != IFM_TYPE(request.ifr_media))
 				continue;
 			for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++) {
@@ -497,10 +504,11 @@ configure_interface(int socket, const char* name, char* const* args,
 	if (ioctl(socket, SIOCGIFINDEX, &request, sizeof(request)) >= 0)
 		index = request.ifr_index;
 
-	bool hasAddress = false, hasMask = false, hasPeer = false, hasBroadcast = false;
+	bool hasAddress = false, hasMask = false, hasPeer = false;
+	bool hasBroadcast = false, doAutoConfig = false;
 	struct sockaddr address, mask, peer, broadcast;
 	int mtu = -1, metric = -1, media = -1;
-	int addFlags = 0, removeFlags = 0, currentFlags = 0;
+	int addFlags = 0, currentFlags = 0, removeFlags = 0;
 
 	// try to parse address family
 
@@ -552,8 +560,8 @@ configure_interface(int socket, const char* name, char* const* args,
 	while (i < argCount) {
 		if (!strcmp(args[i], "peer")) {
 			if (!parse_address(familyIndex, args[i + 1], peer)) {
-				fprintf(stderr, "%s: Option 'peer' needs valid address parameter\n",
-					kProgramName);
+				fprintf(stderr, "%s: Option 'peer' needs valid address "
+					"parameter\n", kProgramName);
 				exit(1);
 			}
 			hasPeer = true;
@@ -565,8 +573,8 @@ configure_interface(int socket, const char* name, char* const* args,
 				exit(1);
 			}
 			if (!parse_address(familyIndex, args[i + 1], mask)) {
-				fprintf(stderr, "%s: Option 'netmask' needs valid address parameter\n",
-					kProgramName);
+				fprintf(stderr, "%s: Option 'netmask' needs valid address "
+					"parameter\n", kProgramName);
 				exit(1);
 			}
 			hasMask = true;
@@ -578,8 +586,8 @@ configure_interface(int socket, const char* name, char* const* args,
 				exit(1);
 			}
 			if (!parse_address(familyIndex, args[i + 1], broadcast)) {
-				fprintf(stderr, "%s: Option 'broadcast' needs valid address parameter\n",
-					kProgramName);
+				fprintf(stderr, "%s: Option 'broadcast' needs valid address "
+					"parameter\n", kProgramName);
 				exit(1);
 			}
 			hasBroadcast = true;
@@ -588,8 +596,8 @@ configure_interface(int socket, const char* name, char* const* args,
 		} else if (!strcmp(args[i], "mtu")) {
 			mtu = args[i + 1] ? strtol(args[i + 1], NULL, 0) : 0;
 			if (mtu <= 500) {
-				fprintf(stderr, "%s: Option 'mtu' expected valid max transfer unit size\n",
-					kProgramName);
+				fprintf(stderr, "%s: Option 'mtu' expected valid max transfer "
+					"unit size\n", kProgramName);
 				exit(1);
 			}
 			i++;
@@ -602,7 +610,8 @@ configure_interface(int socket, const char* name, char* const* args,
 			metric = strtol(args[i + 1], NULL, 0);
 			i++;
 		} else if (!strcmp(args[i], "media")) {
-			if (ioctl(socket, SIOCGIFMEDIA, &request, sizeof(struct ifreq)) < 0) {
+			if (ioctl(socket, SIOCGIFMEDIA, &request,
+					sizeof(struct ifreq)) < 0) {
 				fprintf(stderr, "%s: Unable to detect media type\n",
 					kProgramName);
 				exit(1);
@@ -612,9 +621,10 @@ configure_interface(int socket, const char* name, char* const* args,
 					kProgramName);
 				exit(1);
 			}
-			if (!media_parse_subtype(args[i + 1], IFM_TYPE(request.ifr_media), &media)) {
-				fprintf(stderr, "%s: Invalid parameter for option 'media': '%s'\n",
-					kProgramName, args[i + 1]);
+			if (!media_parse_subtype(args[i + 1], IFM_TYPE(request.ifr_media),
+					&media)) {
+				fprintf(stderr, "%s: Invalid parameter for option 'media': "
+					"'%s'\n", kProgramName, args[i + 1]);
 				exit(1);
 			}
 			i++;
@@ -636,6 +646,8 @@ configure_interface(int socket, const char* name, char* const* args,
 			removeFlags |= IFF_ALLMULTI;
 		} else if (!strcmp(args[i], "loopback")) {
 			addFlags |= IFF_LOOPBACK;
+		} else if (!strcmp(args[i], "auto-config")) {
+			doAutoConfig = true;
 		} else
 			usage(1);
 
@@ -647,19 +659,26 @@ configure_interface(int socket, const char* name, char* const* args,
 		exit(1);
 	}
 
+	if (doAutoConfig && (hasAddress || hasMask || hasBroadcast || hasPeer)) {
+		fprintf(stderr, "%s: Contradicting changes specified\n", kProgramName);
+		exit(1);
+	}
+
 	// set address/mask/broadcast/peer
 
 	if (hasAddress) {
 		memcpy(&request.ifr_addr, &address, address.sa_len);
 
 		if (ioctl(socket, SIOCSIFADDR, &request, sizeof(struct ifreq)) < 0) {
-			fprintf(stderr, "%s: Setting address failed: %s\n", kProgramName, strerror(errno));
+			fprintf(stderr, "%s: Setting address failed: %s\n", kProgramName,
+				strerror(errno));
 			exit(1);
 		}
 	}
 
 	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) < 0) {
-		fprintf(stderr, "%s: Getting flags failed: %s\n", kProgramName, strerror(errno));
+		fprintf(stderr, "%s: Getting flags failed: %s\n", kProgramName,
+			strerror(errno));
 		exit(1);
 	}
 	currentFlags = request.ifr_flags;
@@ -668,7 +687,8 @@ configure_interface(int socket, const char* name, char* const* args,
 		memcpy(&request.ifr_mask, &mask, mask.sa_len);
 
 		if (ioctl(socket, SIOCSIFNETMASK, &request, sizeof(struct ifreq)) < 0) {
-			fprintf(stderr, "%s: Setting subnet mask failed: %s\n", kProgramName, strerror(errno));
+			fprintf(stderr, "%s: Setting subnet mask failed: %s\n",
+				kProgramName, strerror(errno));
 			exit(1);
 		}
 	}
@@ -677,7 +697,8 @@ configure_interface(int socket, const char* name, char* const* args,
 		memcpy(&request.ifr_broadaddr, &broadcast, broadcast.sa_len);
 
 		if (ioctl(socket, SIOCSIFBRDADDR, &request, sizeof(struct ifreq)) < 0) {
-			fprintf(stderr, "%s: Setting broadcast address failed: %s\n", kProgramName, strerror(errno));
+			fprintf(stderr, "%s: Setting broadcast address failed: %s\n",
+				kProgramName, strerror(errno));
 			exit(1);
 		}
 	}
@@ -686,37 +707,79 @@ configure_interface(int socket, const char* name, char* const* args,
 		memcpy(&request.ifr_dstaddr, &peer, peer.sa_len);
 
 		if (ioctl(socket, SIOCSIFDSTADDR, &request, sizeof(struct ifreq)) < 0) {
-			fprintf(stderr, "%s: Setting peer address failed: %s\n", kProgramName, strerror(errno));
+			fprintf(stderr, "%s: Setting peer address failed: %s\n",
+				kProgramName, strerror(errno));
 			exit(1);
 		}
 	}
 
 	// set flags
 
+	if (hasAddress || hasMask || hasBroadcast || hasPeer) {
+		removeFlags = IFF_AUTO_CONFIGURED | IFF_CONFIGURING;
+	}
+printf("set flags: current %x, remove %x, add %x\n", currentFlags, removeFlags, addFlags);
 	if (addFlags || removeFlags) {
 		request.ifr_flags = (currentFlags & ~removeFlags) | addFlags;
-		if (ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)) < 0)
-			fprintf(stderr, "%s: Setting flags failed: %s\n", kProgramName, strerror(errno));
+printf(" --> set %x\n", request.ifr_flags);
+		if (ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)) < 0) {
+			fprintf(stderr, "%s: Setting flags failed: %s\n", kProgramName,
+				strerror(errno));
+		}
 	}
 
 	// set options
 
 	if (mtu != -1) {
 		request.ifr_mtu = mtu;
-		if (ioctl(socket, SIOCSIFMTU, &request, sizeof(struct ifreq)) < 0)
-			fprintf(stderr, "%s: Setting MTU failed: %s\n", kProgramName, strerror(errno));
+		if (ioctl(socket, SIOCSIFMTU, &request, sizeof(struct ifreq)) < 0) {
+			fprintf(stderr, "%s: Setting MTU failed: %s\n", kProgramName,
+				strerror(errno));
+		}
 	}
 
 	if (metric != -1) {
 		request.ifr_metric = metric;
-		if (ioctl(socket, SIOCSIFMETRIC, &request, sizeof(struct ifreq)) < 0)
-			fprintf(stderr, "%s: Setting metric failed: %s\n", kProgramName, strerror(errno));
+		if (ioctl(socket, SIOCSIFMETRIC, &request, sizeof(struct ifreq)) < 0) {
+			fprintf(stderr, "%s: Setting metric failed: %s\n", kProgramName,
+				strerror(errno));
+		}
 	}
 
 	if (media != -1) {
 		request.ifr_media = media;
-		if (ioctl(socket, SIOCSIFMEDIA, &request, sizeof(struct ifreq)) < 0)
-			fprintf(stderr, "%s: Setting media failed: %s\n", kProgramName, strerror(errno));
+		if (ioctl(socket, SIOCSIFMEDIA, &request, sizeof(struct ifreq)) < 0) {
+			fprintf(stderr, "%s: Setting media failed: %s\n", kProgramName,
+				strerror(errno));
+		}
+	}
+
+	// start auto configuration, if asked for
+
+	if (doAutoConfig) {
+		BMessage message(kMsgConfigureInterface);
+		message.AddString("device", name);
+		BMessage address;
+		address.AddString("family", "inet");
+		address.AddBool("auto config", true);
+		message.AddMessage("address", &address);
+
+		BMessenger networkServer(kNetServerSignature);
+		if (networkServer.IsValid()) {
+			BMessage reply;
+			status_t status = networkServer.SendMessage(&message, &reply);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: Sending auto-config message failed: %s\n",
+					kProgramName, strerror(status));
+			} else if (reply.FindInt32("status", &status) == B_OK
+					&& status != B_OK) {
+				fprintf(stderr, "%s: Auto-configuring failed: %s\n",
+					kProgramName, strerror(status));
+			}
+		} else {
+			fprintf(stderr, "%s: The net_server needs to run for the auto "
+				"configuration!\n", kProgramName);
+		}
 	}
 }
 
@@ -746,8 +809,8 @@ main(int argc, char** argv)
 	// we need a socket to talk to the networking stack
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0) {
-		fprintf(stderr, "%s: The networking stack doesn't seem to be available.\n",
-			kProgramName);
+		fprintf(stderr, "%s: The networking stack doesn't seem to be "
+			"available.\n", kProgramName);
 		return 1;
 	}
 
