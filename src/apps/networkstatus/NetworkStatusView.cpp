@@ -342,6 +342,7 @@ void
 NetworkStatusView::MouseDown(BPoint point)
 {
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	menu->SetAsyncAutoDestruct(true);
 	menu->SetFont(be_plain_font);
 
 	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
@@ -358,8 +359,8 @@ NetworkStatusView::MouseDown(BPoint point)
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("About NetworkStatus" B_UTF8_ELLIPSIS,
-		new BMessage(B_ABOUT_REQUESTED)));
+	//menu->AddItem(new BMenuItem("About NetworkStatus" B_UTF8_ELLIPSIS,
+	//	new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddItem(new BMenuItem("Open Networks Preferences" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgOpenNetworkPreferences)));
 
@@ -368,7 +369,7 @@ NetworkStatusView::MouseDown(BPoint point)
 	menu->SetTargetForItems(this);
 
 	ConvertToScreen(&point);
-	menu->Go(point, true, false, true);
+	menu->Go(point, true, true, true);
 }
 
 
