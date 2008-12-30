@@ -66,14 +66,14 @@ BGLRenderer::Draw(BRect updateRect)
 status_t
 BGLRenderer::CopyPixelsOut(BPoint source, BBitmap *dest)
 {
-	return B_OK;
+	return B_ERROR;
 }
 
 
 status_t
 BGLRenderer::CopyPixelsIn(BBitmap *source, BPoint dest)
 {
-	return B_OK;
+	return B_ERROR;
 }
 
 
