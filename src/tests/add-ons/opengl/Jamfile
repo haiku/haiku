@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src tests add-ons opengl ;
+
+SubInclude HAIKU_TOP src tests add-ons opengl fake_renderer ;
+

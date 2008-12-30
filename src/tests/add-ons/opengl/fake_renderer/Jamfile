@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src tests add-ons opengl fake_renderer ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
+		# We need our public GL headers also when not compiling for Haiku.
+}
+
+UsePrivateHeaders interface opengl ;
+
+
+Addon fake_renderer :
+	FakeRenderer.cpp
+	: libGL.so be
+;
+
+Package haiku-opengl-cvs : 
+	fake_renderer :  
+	boot home config add-ons opengl 
+;
+ 
