@@ -6,8 +6,8 @@
  * 		Philippe Houdoin, philippe.houdoin@free.fr
  */
 
-#ifndef FAKERENDERER_H
-#define FAKERERENDERER_H
+#ifndef FAKE_RENDERER_H
+#define FAKE_RENDERER_H
 
 #include "GLRenderer.h"
 
@@ -47,5 +47,5 @@ private:
 		bool				fDisabled;
 };
 
-#endif	// FAKERENDERER_H
+#endif	// FAKE_RENDERER_H
 
