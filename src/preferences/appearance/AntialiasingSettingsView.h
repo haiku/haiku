@@ -45,8 +45,8 @@ protected:
 
 			bool			fSavedSubpixelAntialiasing;
 			bool			fCurrentSubpixelAntialiasing;
-			bool			fSavedHinting;
-			bool			fCurrentHinting;
+			uint8			fSavedHinting;
+			uint8			fCurrentHinting;
 			unsigned char	fSavedAverageWeight;
 			unsigned char	fCurrentAverageWeight;
 };

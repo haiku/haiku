@@ -221,18 +221,18 @@ get_subpixel_antialiasing(bool* subpix)
 
 
 void
-set_hinting(bool hinting)
+set_hinting_mode(uint8 hinting)
 {
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_SET_HINTING);
-	link.Attach<bool>(hinting);
+	link.Attach<uint8>(hinting);
 	link.Flush();
 }
 
 
 status_t
-get_hinting(bool* hinting)
+get_hinting_mode(uint8* hinting)
 {
 	BPrivate::AppServerLink link;
 
@@ -240,7 +240,7 @@ get_hinting(bool* hinting)
 	int32 status = B_ERROR;
 	if (link.FlushWithReply(status) != B_OK || status < B_OK)
 		return status;
-	link.Read<bool>(hinting);
+	link.Read<uint8>(hinting);
 	return B_OK;
 }
 
@@ -438,7 +438,7 @@ get_click_speed(bigtime_t *speed)
 	status_t err = _control_input_server_(&command, &reply);
 	if (err != B_OK)
 		return err;
-	
+
 	if (reply.FindInt64("speed", speed) != B_OK)
 		*speed = 500000;
 
@@ -465,7 +465,7 @@ get_mouse_speed(int32 *speed)
 	status_t err = _control_input_server_(&command, &reply);
 	if (err != B_OK)
 		return err;
-	
+
 	if (reply.FindInt32("speed", speed) != B_OK)
 		*speed = 65536;
 
@@ -662,12 +662,12 @@ get_modifier_key(uint32 modifier, uint32 *key)
 
 	command.AddInt32("modifier", modifier);
 	_control_input_server_(&command, &reply);
-	
+
 	status_t err = reply.FindInt32("key", (int32 *) &rkey);
 	if (err != B_OK)
 		return err;
 	*key = rkey;
-	
+
 	return B_OK;
 }
 

@@ -75,7 +75,7 @@ DesktopSettingsPrivate::_SetDefaults()
 	memcpy(fShared.colors, BPrivate::kDefaultColors, sizeof(rgb_color) * kNumColors);
 
 	gSubpixelAntialiasing = false;
-	gDefaultHinting = true;
+	gDefaultHintingMode = HINTING_MODE_ON;
 	gSubpixelAverageWeight = 120;
 	gSubpixelOrderingRGB = true;
 }
@@ -145,7 +145,7 @@ DesktopSettingsPrivate::_Load()
 			const char* family;
 			const char* style;
 			float size;
-			bool hinting;
+			int32 hinting;
 			if (settings.FindString("plain family", &family) == B_OK
 				&& settings.FindString("plain style", &style) == B_OK
 				&& settings.FindFloat("plain size", &size) == B_OK) {
@@ -168,8 +168,8 @@ DesktopSettingsPrivate::_Load()
 					fFixedFont.SetStyle(fontStyle);
 				fFixedFont.SetSize(size);
 			}
-			if (settings.FindBool("hinting", &hinting) == B_OK) {
-				gDefaultHinting = hinting;
+			if (settings.FindInt32("hinting", &hinting) == B_OK) {
+				gDefaultHintingMode = hinting;
 			}
 			gFontManager->Unlock();
 		}
@@ -321,7 +321,7 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			settings.AddString("fixed style", fFixedFont.Style());
 			settings.AddFloat("fixed size", fFixedFont.Size());
 
-			settings.AddBool("hinting", gDefaultHinting);
+			settings.AddInt32("hinting", gDefaultHintingMode);
 
 			BFile file;
 			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE
@@ -597,17 +597,17 @@ DesktopSettingsPrivate::SubpixelAntialiasing() const
 
 
 void
-DesktopSettingsPrivate::SetHinting(bool hinting)
+DesktopSettingsPrivate::SetHinting(uint8 hinting)
 {
-	gDefaultHinting = hinting;
+	gDefaultHintingMode = hinting;
 	Save(kFontSettings);
 }
 
 
-bool
+uint8
 DesktopSettingsPrivate::Hinting() const
 {
-	return gDefaultHinting;
+	return gDefaultHintingMode;
 }
 
 
@@ -739,7 +739,7 @@ DesktopSettings::SubpixelAntialiasing() const
 }
 
 
-bool
+uint8
 DesktopSettings::Hinting() const
 {
 	return fSettings->Hinting();
@@ -847,7 +847,7 @@ LockedDesktopSettings::SetSubpixelAntialiasing(bool subpix)
 
 
 void
-LockedDesktopSettings::SetHinting(bool hinting)
+LockedDesktopSettings::SetHinting(uint8 hinting)
 {
 	fSettings->SetHinting(hinting);
 }

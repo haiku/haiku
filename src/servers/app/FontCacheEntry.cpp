@@ -123,7 +123,7 @@ FontCacheEntry::Init(const ServerFont& font)
 
 	// TODO: encoding from font
 	FT_Encoding charMap = FT_ENCODING_NONE;
-	bool hinting = gDefaultHinting; // TODO: font.Hinting();
+	bool hinting = font.Hinting();
 
 	if (!fEngine.Init(font.Path(), 0, font.Size(), charMap,
 			renderingType, hinting)) {
@@ -220,7 +220,7 @@ FontCacheEntry::GenerateSignature(char* signature, const ServerFont& font)
 
 	// TODO: read more of these from the font
 	FT_Encoding charMap = FT_ENCODING_NONE;
-	bool hinting = gDefaultHinting; // TODO: font.Hinting();
+	bool hinting = font.Hinting();
 	uint8 averageWeight = gSubpixelAverageWeight;
 
 	sprintf(signature, "%ld,%u,%d,%d,%.1f,%d,%d",
@@ -255,7 +255,7 @@ FontCacheEntry::_RenderTypeFor(const ServerFont& font)
 		|| font.FalseBoldWidth() != 0.0
 		|| font.Flags() & B_DISABLE_ANTIALIASING
 		|| font.Size() > 30
-		|| !gDefaultHinting) {
+		|| !font.Hinting()) {
 		renderingType = glyph_ren_outline;
 	}
 

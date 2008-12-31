@@ -16,6 +16,7 @@
 #include <Rect.h>
 
 #include "FontFamily.h"
+#include "GlobalSubpixelSettings.h"
 #include "Transformable.h"
 
 class BShape;
@@ -109,7 +110,7 @@ class ServerFont {
 									{ return fStyle->GlyphCount(); }
 			uint16				CharMapCount() const
 									{ return fStyle->CharMapCount(); }
-
+	inline	bool				Hinting() const;
 
 			FT_Face				GetTransformedFace(bool rotate,
 									bool shear) const;
@@ -118,9 +119,9 @@ class ServerFont {
 			status_t			GetGlyphShapes(const char charArray[],
 									int32 numChars, BShape *shapeArray[]) const;
 
-			status_t			GetHasGlyphs(const char charArray[], 
+			status_t			GetHasGlyphs(const char charArray[],
 									int32 numBytes, bool hasArray[]) const;
-			
+
 			status_t			GetEdges(const char charArray[], int32 numBytes,
 									edge_info edgeArray[]) const;
 
@@ -156,7 +157,7 @@ class ServerFont {
 
 //			FT_Face				GetFTFace() const
 //									{ return fStyle->FreeTypeFace(); };
-	
+
 			BRect				BoundingBox();
 			void				GetHeight(font_height& height) const;
 
@@ -181,5 +182,18 @@ protected:
 			uint16				fFace;
 			uint32				fEncoding;
 };
+
+inline bool ServerFont::Hinting() const
+{
+	switch (gDefaultHintingMode) {
+		case HINTING_MODE_OFF:
+			return false;
+		default:
+		case HINTING_MODE_ON:
+			return true;
+		case HINTING_MODE_MONOSPACED_ONLY:
+			return IsFixedWidth();
+	}
+}
 
 #endif	/* SERVER_FONT_H */

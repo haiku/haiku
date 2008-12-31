@@ -2192,14 +2192,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					} else
 						status = B_OK;
 				} else {
-					// this is perhaps not ideal - it assumes that if the 
+					// this is perhaps not ideal - it assumes that if the
 					// workspace is not the active one, then pull the
-					// configuration from active and store it to the specified 
+					// configuration from active and store it to the specified
 					// workspace. This is safer since it's assumed that the
 					// active workspace has a display mode that's usable,
 					// but at the same time the API implies that you can set
 					// a non-visible workspace to whatever mode you like
-					// TODO: decide what to do here. 
+					// TODO: decide what to do here.
 					if (makeDefault)
 						fDesktop->StoreConfiguration(workspace);
 				}
@@ -2585,12 +2585,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_SET_HINTING:
 		{
-			bool hinting;
-			if (link.Read<bool>(&hinting) == B_OK) {
+			uint8 hinting;
+			if (link.Read<uint8>(&hinting) == B_OK && hinting < 3) {
 				LockedDesktopSettings settings(fDesktop);
-				settings.SetHinting(hinting);
+				if (hinting != settings.Hinting()) {
+					settings.SetHinting(hinting);
+					fDesktop->Redraw();
+				}
 			}
-			fDesktop->Redraw();
 			break;
 		}
 
@@ -2598,7 +2600,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			DesktopSettings settings(fDesktop);
 			fLink.StartMessage(B_OK);
-			fLink.Attach<bool>(settings.Hinting());
+			fLink.Attach<uint8>(settings.Hinting());
 			fLink.Flush();
 			break;
 		}

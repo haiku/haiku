@@ -29,23 +29,30 @@
 //#define DISABLE_HINTING_CONTROL
 	// if defined, the hinting menu is disabled (hinting not properly
 	// implemented)
-	
+
 static const int32 kMsgSetAntialiasing = 'anti';
 static const int32 kMsgSetHinting = 'hint';
 static const int32 kMsgSetAverageWeight = 'avrg';
 static const char* kSubpixelLabel = "LCD subpixel";
 static const char* kGrayscaleLabel = "Grayscale";
 static const char* kNoHintingLabel = "Off";
+static const char* kMonospacedHintingLabel = "Monospaced Fonts Only";
 static const char* kFullHintingLabel = "On";
 
 
 // #pragma mark - private libbe API
 
 
+enum {
+	HINTING_MODE_OFF = 0,
+	HINTING_MODE_ON,
+	HINTING_MODE_MONOSPACED_ONLY
+};
+
 extern void set_subpixel_antialiasing(bool subpix);
 extern status_t get_subpixel_antialiasing(bool* subpix);
-extern void set_hinting(bool hinting);
-extern status_t get_hinting(bool* hinting);
+extern void set_hinting_mode(uint8 hinting);
+extern status_t get_hinting_mode(uint8* hinting);
 extern void set_average_weight(unsigned char averageWeight);
 extern status_t get_average_weight(unsigned char* averageWeight);
 
@@ -60,11 +67,11 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	if (get_subpixel_antialiasing(&fCurrentSubpixelAntialiasing) != B_OK)
 		fCurrentSubpixelAntialiasing = false;
 	fSavedSubpixelAntialiasing = fCurrentSubpixelAntialiasing;
-	
-	if (get_hinting(&fCurrentHinting) != B_OK)
-		fCurrentHinting = true;
+
+	if (get_hinting_mode(&fCurrentHinting) != B_OK)
+		fCurrentHinting = HINTING_MODE_ON;
 	fSavedHinting = fCurrentHinting;
-	
+
 	if (get_average_weight(&fCurrentAverageWeight) != B_OK)
 		fCurrentAverageWeight = 100;
 	fSavedAverageWeight = fCurrentAverageWeight;
@@ -75,7 +82,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	_BuildAntialiasingMenu();
 	fAntialiasingMenuField = new BMenuField("antialiasing",
 		"Anti-aliasing type:", fAntialiasingMenu, NULL);
-	
+
 	// "average weight" in subpixel filtering
 	fAverageWeightControl = new BSlider("averageWeightControl",
 		"Reduce colored edges filter strength:",
@@ -84,7 +91,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	fAverageWeightControl->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAverageWeightControl->SetHashMarkCount(255 / 15);
 	fAverageWeightControl->SetEnabled(false);
-	
+
 	// hinting menu
 	_BuildHintingMenu();
 	fHintingMenuField = new BMenuField("hinting", "Glyph hinting:",
@@ -170,7 +177,7 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 		case kMsgSetAntialiasing:
 		{
 			bool subpixelAntialiasing;
-			if (msg->FindBool("antialiasing", &subpixelAntialiasing) != B_OK 
+			if (msg->FindBool("antialiasing", &subpixelAntialiasing) != B_OK
 				|| subpixelAntialiasing == fCurrentSubpixelAntialiasing)
 				break;
 			fCurrentSubpixelAntialiasing = subpixelAntialiasing;
@@ -183,13 +190,13 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 		}
 		case kMsgSetHinting:
 		{
-			bool hinting;
-			if (msg->FindBool("hinting", &hinting) != B_OK 
+			int8 hinting;
+			if (msg->FindInt8("hinting", &hinting) != B_OK
 				|| hinting == fCurrentHinting)
 				break;
-			fCurrentHinting = hinting;
 
-			set_hinting(fCurrentHinting);
+			fCurrentHinting = hinting;
+			set_hinting_mode(fCurrentHinting);
 
 			Window()->PostMessage(kMsgUpdate);
 			break;
@@ -224,7 +231,7 @@ AntialiasingSettingsView::_BuildAntialiasingMenu()
 	BMenuItem* item = new BMenuItem(kGrayscaleLabel, message);
 
 	fAntialiasingMenu->AddItem(item);
-	
+
 	message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", true);
 
@@ -240,18 +247,16 @@ AntialiasingSettingsView::_BuildHintingMenu()
 	fHintingMenu = new BPopUpMenu("Hinting menu");
 
 	BMessage* message = new BMessage(kMsgSetHinting);
-	message->AddBool("hinting", false);
+	message->AddInt8("hinting", HINTING_MODE_OFF);
+	fHintingMenu->AddItem(new BMenuItem(kNoHintingLabel, message));
 
-	BMenuItem* item = new BMenuItem(kNoHintingLabel, message);
-
-	fHintingMenu->AddItem(item);
-	
 	message = new BMessage(kMsgSetHinting);
-	message->AddBool("hinting", true);
+	message->AddInt8("hinting", HINTING_MODE_ON);
+	fHintingMenu->AddItem(new BMenuItem(kFullHintingLabel, message));
 
-	item = new BMenuItem(kFullHintingLabel, message);
-
-	fHintingMenu->AddItem(item);
+	message = new BMessage(kMsgSetHinting);
+	message->AddInt8("hinting", HINTING_MODE_MONOSPACED_ONLY);
+	fHintingMenu->AddItem(new BMenuItem(kMonospacedHintingLabel, message));
 }
 
 
@@ -270,8 +275,20 @@ AntialiasingSettingsView::_SetCurrentAntialiasing()
 void
 AntialiasingSettingsView::_SetCurrentHinting()
 {
-	BMenuItem *item = fHintingMenu->FindItem(
-		fCurrentHinting ? kFullHintingLabel : kNoHintingLabel);
+	const char* label = NULL;
+	switch (fCurrentHinting) {
+		case HINTING_MODE_OFF:
+			label = kNoHintingLabel;
+			break;
+		case HINTING_MODE_ON:
+			label = kFullHintingLabel;
+			break;
+		case HINTING_MODE_MONOSPACED_ONLY:
+			label = kMonospacedHintingLabel;
+			break;
+	}
+
+	BMenuItem *item = fHintingMenu->FindItem(label);
 	if (item != NULL)
 		item->SetMarked(true);
 }
@@ -300,9 +317,9 @@ AntialiasingSettingsView::IsDefaultable()
 bool
 AntialiasingSettingsView::IsRevertable()
 {
-	return (fCurrentSubpixelAntialiasing != fSavedSubpixelAntialiasing) 
-		|| (fCurrentHinting != fSavedHinting)
-		|| (fCurrentAverageWeight != fSavedAverageWeight);
+	return fCurrentSubpixelAntialiasing != fSavedSubpixelAntialiasing
+		|| fCurrentHinting != fSavedHinting
+		|| fCurrentAverageWeight != fSavedAverageWeight;
 }
 
 
@@ -317,7 +334,7 @@ AntialiasingSettingsView::Revert()
 	fCurrentAverageWeight = fSavedAverageWeight;
 
 	set_subpixel_antialiasing(fCurrentSubpixelAntialiasing);
-	set_hinting(fCurrentHinting);
+	set_hinting_mode(fCurrentHinting);
 	set_average_weight(fCurrentAverageWeight);
 
 	_SetCurrentAntialiasing();
