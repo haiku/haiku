@@ -781,6 +781,9 @@ exit_kernel_debugger()
 	sDebugOutputFilter = NULL;
 
 	sBlueScreenEnabled = false;
+	if (sDebugScreenEnabled)
+		blue_screen_enter(true);
+
 	atomic_add(&sInDebugger, -1);
 }
 
