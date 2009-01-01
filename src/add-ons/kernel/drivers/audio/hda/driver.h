@@ -216,8 +216,7 @@ struct hda_widget {
 		struct {
 		} mixer;
 		struct {
-			uint32	output;
-			uint32	input;
+			uint32	capabilities;
 			uint32	config;
 		} pin;
 	} d;

@@ -214,8 +214,8 @@ enum pin_dev_type {
 #define PIN_CAP_TRIGGER_REQ				(1L << 1)
 #define PIN_CAP_PRES_DETECT				(1L << 2)
 #define PIN_CAP_HP_DRIVE				(1L << 3)
-#define PIN_CAP_OUT						(1L << 4)
-#define PIN_CAP_IN						(1L << 5)
+#define PIN_CAP_OUTPUT					(1L << 4)
+#define PIN_CAP_INPUT					(1L << 5)
 #define PIN_CAP_BALANCE					(1L << 6)
 #define PIN_CAP_VREF_CTRL_HIZ				(1L << 8)
 #define PIN_CAP_VREF_CTRL_50				(1L << 9)
@@ -223,6 +223,10 @@ enum pin_dev_type {
 #define PIN_CAP_VREF_CTRL_80				(1L << 12)
 #define PIN_CAP_VREF_CTRL_100				(1L << 13)
 #define PIN_CAP_EAPD_CAP				(1L << 16)
+
+#define PIN_CAP_IS_OUTPUT(c)	((c & PIN_CAP_OUTPUT) != 0)
+#define PIN_CAP_IS_INPUT(c)	((c & PIN_CAP_INPUT) != 0)
+#define PIN_CAP_IS_EAPD_CAP(c)	((c & PIN_CAP_EAPD_CAP) != 0)
 
 /* PCM support */
 #define PCM_8_BIT						(1L << 16)
@@ -296,6 +300,11 @@ enum pin_dev_type {
 #define CONF_DEFAULT_DEVICE(c) ((c & CONF_DEFAULT_DEVICE_MASK) >> CONF_DEFAULT_DEVICE_SHIFT)
 #define CONF_DEFAULT_LOCATION(c) ((c & CONF_DEFAULT_LOCATION_MASK) >> CONF_DEFAULT_LOCATION_SHIFT)
 #define CONF_DEFAULT_CONNECTIVITY(c) ((c & CONF_DEFAULT_CONNECTIVITY_MASK) >> CONF_DEFAULT_CONNECTIVITY_SHIFT)
+
+/* EAPD/BTL enable */
+#define EAPDBTL_ENABLE_BTL			0x1
+#define EAPDBTL_ENABLE_EAPD			0x2
+#define EAPDBTL_ENABLE_LRSWAP			0x4
 
 /* GP I/O count */
 #define GPIO_COUNT_NUM_GPIO_MASK	0x000000ff

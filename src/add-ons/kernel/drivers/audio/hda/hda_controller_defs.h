@@ -142,6 +142,11 @@
 #define NVIDIA_HDA_TRANSREG_MASK		0xf0
 #define NVIDIA_HDA_ENABLE_COHBITS		0x0f
 
+#define ATI_VENDORID		0x1002
+#define INTEL_VENDORID		0x8086
+#define NVIDIA_VENDORID		0x10de
+
+
 
 typedef uint32 corb_t;
 typedef struct {

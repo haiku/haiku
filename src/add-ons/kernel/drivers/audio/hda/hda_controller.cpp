@@ -744,13 +744,11 @@ hda_hw_init(hda_controller* controller)
 	/* Enable snooping for ATI and Nvidia, right now for all their hda-devices,
 	   but only based on guessing. */
 	switch (controller->pci_info.vendor_id) {
-		/* NVIDIA */
-		case 0x10de:
+		case NVIDIA_VENDORID:
 			update_pci_register(controller, NVIDIA_HDA_TRANSREG, 
 				NVIDIA_HDA_TRANSREG_MASK, NVIDIA_HDA_ENABLE_COHBITS);
 			break;
-		/* ATI */
-		case 0x1002:
+		case ATI_VENDORID:
 			update_pci_register(controller, ATI_HDA_MISC_CNTR2, 
 				ATI_HDA_MISC_CNTR2_MASK, ATI_HDA_ENABLE_SNOOP);
 			break;

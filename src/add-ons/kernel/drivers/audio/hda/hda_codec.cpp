@@ -168,8 +168,8 @@ dump_audiogroup_widgets(hda_audio_group* audioGroup)
 				break;
 
 			case WT_PIN_COMPLEX:
-				dprintf("\t%s%s\n", widget.d.pin.input ? "[Input] " : "",
-					widget.d.pin.output ? "[Output]" : "");
+				dprintf("\t%s%s\n", PIN_CAP_IS_INPUT(widget.d.pin.capabilities) ? "[Input] " : "",
+					PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities) ? "[Output]" : "");
 				
 				break;
 
@@ -586,11 +586,10 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 				verbs[0] = MAKE_VERB(audioGroup->codec->addr, nodeID,
 					VID_GET_PARAMETER, PID_PIN_CAP);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
-					widget.d.pin.input = resp[0] & PIN_CAP_IN;
-					widget.d.pin.output = resp[0] & PIN_CAP_OUT;
-
-					dprintf("\t%s%s\n", widget.d.pin.input ? "[Input] " : "",
-						widget.d.pin.output ? "[Output]" : "");
+					widget.d.pin.capabilities = resp[0];
+					
+					dprintf("\t%s%s\n", PIN_CAP_IS_INPUT(resp[0]) ? "[Input] " : "",
+						PIN_CAP_IS_OUTPUT(resp[0]) ? "[Output]" : "");
 				} else {
 					dprintf("%s: Error getting Pin Complex IO\n", __func__);
 				}
@@ -689,7 +688,7 @@ hda_widget_find_input_path(hda_audio_group* audioGroup, hda_widget* widget,
 			if (widget->flags & WIDGET_FLAG_INPUT_PATH)
 				return false;
 			
-			if (widget->d.pin.input) {
+			if (PIN_CAP_IS_INPUT(widget->d.pin.capabilities)) {
 				switch (CONF_DEFAULT_DEVICE(widget->d.pin.config)) {
 					case PIN_DEV_CD:
 					case PIN_DEV_LINE_IN:
@@ -743,7 +742,7 @@ dprintf("build output tree: %suse mixer\n", useMixer ? "" : "don't ");
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
 
-		if (widget.type != WT_PIN_COMPLEX || !widget.d.pin.output)
+		if (widget.type != WT_PIN_COMPLEX || !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities))
 			continue;
 
 		int device = CONF_DEFAULT_DEVICE(widget.d.pin.config);
@@ -957,6 +956,22 @@ dprintf("ENABLE pin widget %ld\n", widget.node_id);
 						PIN_ENABLE_HEAD_PHONE | PIN_ENABLE_OUTPUT
 						: PIN_ENABLE_INPUT);
 				hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
+
+				if (PIN_CAP_IS_EAPD_CAP(widget.d.pin.capabilities)) {
+					uint32 result;
+					verb = MAKE_VERB(audioGroup->codec->addr, 
+						widget.node_id, VID_GET_EAPDBTL_EN, 0);
+					if (hda_send_verbs(audioGroup->codec, &verb, 
+						&result, 1) == B_OK) {
+						result &= 0xff;
+						verb = MAKE_VERB(audioGroup->codec->addr, 
+							widget.node_id, VID_SET_EAPDBTL_EN,
+							result | EAPDBTL_ENABLE_EAPD);
+						hda_send_verbs(audioGroup->codec, 
+							&verb, NULL, 1);
+dprintf("ENABLE EAPD pin widget %ld\n", widget.node_id);
+					}
+				}				
 			}
 
 			if (widget.capabilities.output_amplifier != 0) {

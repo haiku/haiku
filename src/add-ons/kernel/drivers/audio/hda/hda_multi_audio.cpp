@@ -305,6 +305,11 @@ hda_find_multi_custom_string(hda_widget& widget)
 				case 9:
 					return "Mic in";
 			}
+			if (CONF_DEFAULT_DEVICE(widget.d.pin.config) == PIN_DEV_LINE_IN)
+				return "Line In";
+			if (CONF_DEFAULT_DEVICE(widget.d.pin.config) == PIN_DEV_MIC_IN)
+				return "Mic In";
+			return "Line Out";
 			break;
 		case PIN_DEV_SPDIF_IN:
 			return "SPDIF In";
@@ -382,7 +387,7 @@ hda_create_controls_list(hda_multi *multi)
 
 		if (complex.type != WT_PIN_COMPLEX)
 			continue;
-		if (!complex.d.pin.output)
+		if (!PIN_CAP_IS_OUTPUT(complex.d.pin.capabilities))
 			continue;
 		if ((complex.flags & WIDGET_FLAG_OUTPUT_PATH) == 0)
 			continue;
@@ -412,7 +417,7 @@ hda_create_controls_list(hda_multi *multi)
 				hda_widget *complex = hda_audio_group_get_widget(audioGroup, widget.inputs[j]);
 				if (complex->type != WT_PIN_COMPLEX)
 					continue;
-				if (!complex->d.pin.input)
+				if (!PIN_CAP_IS_INPUT(complex->d.pin.capabilities))
 					continue;
 				if (complex->flags & WIDGET_FLAG_OUTPUT_PATH)
 					continue;
