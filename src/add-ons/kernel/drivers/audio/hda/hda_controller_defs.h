@@ -133,6 +133,15 @@
 
 /* PCI space register definitions */
 #define PCI_HDA_TCSEL					0x44
+#define PCI_HDA_TCSEL_MASK				0xf8
+
+#define ATI_HDA_MISC_CNTR2			0x42
+#define ATI_HDA_MISC_CNTR2_MASK   		0xf8
+#define ATI_HDA_ENABLE_SNOOP      		0x02
+#define NVIDIA_HDA_TRANSREG			0x4e
+#define NVIDIA_HDA_TRANSREG_MASK		0xf0
+#define NVIDIA_HDA_ENABLE_COHBITS		0x0f
+
 
 typedef uint32 corb_t;
 typedef struct {

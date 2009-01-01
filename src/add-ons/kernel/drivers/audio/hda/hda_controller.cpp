@@ -48,6 +48,17 @@ static const struct {
 };
 
 
+static inline void
+update_pci_register(hda_controller* controller, uint8 reg, uint8 mask, uint8 value)
+{
+	uint8 tmp = (gPci->read_pci_config)(controller->pci_info.bus,
+		controller->pci_info.device, controller->pci_info.function, reg, 1);
+	(gPci->write_pci_config)(controller->pci_info.bus,
+		controller->pci_info.device, controller->pci_info.function,
+		reg, 1, (tmp & mask) | value);
+}
+
+
 static inline rirb_t&
 current_rirb(hda_controller *controller)
 {
@@ -700,8 +711,7 @@ hda_hw_init(hda_controller* controller)
 {
 	uint16 capabilities, stateStatus, cmd;
 	status_t status;
-	uint8 tcsel;
-
+	
 	/* Map MMIO registers */
 	controller->regs_area = map_physical_memory("hda_hw_regs",
 		(void*)controller->pci_info.u.h0.base_registers[0],
@@ -729,11 +739,22 @@ hda_hw_init(hda_controller* controller)
 		goto no_irq;
 
 	/* TCSEL is reset to TC0 (clear 0-2 bits) */
-	tcsel = (gPci->read_pci_config)(controller->pci_info.bus,
-		controller->pci_info.device, controller->pci_info.function, PCI_HDA_TCSEL, 1);
-	(gPci->write_pci_config)(controller->pci_info.bus,
-		controller->pci_info.device, controller->pci_info.function,
-		PCI_HDA_TCSEL, 1, tcsel & 0xf8);
+	update_pci_register(controller, PCI_HDA_TCSEL, PCI_HDA_TCSEL_MASK, 0);
+	
+	/* Enable snooping for ATI and Nvidia, right now for all their hda-devices,
+	   but only based on guessing. */
+	switch (controller->pci_info.vendor_id) {
+		/* NVIDIA */
+		case 0x10de:
+			update_pci_register(controller, NVIDIA_HDA_TRANSREG, 
+				NVIDIA_HDA_TRANSREG_MASK, NVIDIA_HDA_ENABLE_COHBITS);
+			break;
+		/* ATI */
+		case 0x1002:
+			update_pci_register(controller, ATI_HDA_MISC_CNTR2, 
+				ATI_HDA_MISC_CNTR2_MASK, ATI_HDA_ENABLE_SNOOP);
+			break;
+	}
 
 	capabilities = controller->Read16(HDAC_GLOBAL_CAP);
 	controller->num_input_streams = GLOBAL_CAP_INPUT_STREAMS(capabilities);
@@ -762,7 +783,7 @@ hda_hw_init(hda_controller* controller)
 		dprintf("hda: init_corb_rirb_pos failed\n");
 		goto corb_rirb_failed;
 	}
-
+	
 	controller->Write16(HDAC_WAKE_ENABLE, 0x7fff);
 
 	/* Enable controller interrupts */
