@@ -69,14 +69,12 @@ mkstemp(char *path)
 }
 
 
-#if 0
 char *
 mkdtemp(path)
 	char *path;
 {
 	return (_gettemp(path, (int *)NULL, 1, 0) ? path : (char *)NULL);
 }
-#endif
 
 
 char *
