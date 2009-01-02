@@ -1125,7 +1125,7 @@ Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 	// update our cached screen region
 	fScreenRegion.Set(screen->Frame());
 	gInputManager->UpdateScreenBounds(screen->Frame());
-	
+
 	BRegion background;
 	_RebuildClippingForAllWindows(background);
 
@@ -1170,7 +1170,7 @@ Desktop::StoreConfiguration(int32 workspace)
 		fSettings->Save(kWorkspacesSettings);
 		return B_OK;
 	}
-	
+
 	return B_BAD_VALUE;
 }
 
@@ -1656,6 +1656,11 @@ Desktop::ActivateWindow(Window* window)
 			}
 
 			ActivateWindow(front);
+
+			if (!window->InWorkspace(fCurrentWorkspace)) {
+				// This window can't be made active
+				return;
+			}
 		} else {
 			// Bring the window to the current workspace
 			// TODO: what if this window is on multiple workspaces?!?
