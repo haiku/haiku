@@ -280,7 +280,8 @@ Volume::Volume(fs_volume* volume)
 	fIndicesNode(NULL),
 	fDirtyCachedBlocks(0),
 	fUniqueID(0),
-	fFlags(0)
+	fFlags(0),
+	fCheckingThread(-1)
 {
 	mutex_init(&fLock, "bfs volume");
 	mutex_init(&fQueryLock, "bfs queries");

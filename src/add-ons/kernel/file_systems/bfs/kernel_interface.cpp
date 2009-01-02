@@ -303,7 +303,8 @@ bfs_put_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 
 	// since a directory's size can be changed without having it opened,
 	// we need to take care about their preallocated blocks here
-	if (!volume->IsReadOnly() && inode->NeedsTrimming()) {
+	if (!volume->IsReadOnly() && !volume->IsCheckingThread()
+		&& inode->NeedsTrimming()) {
 		Transaction transaction(volume, inode->BlockNumber());
 
 		if (inode->TrimPreallocation(transaction) == B_OK)
@@ -600,8 +601,10 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 			check_control* control = (check_control*)buffer;
 
 			status_t status = allocator.StartChecking(control);
-			if (status == B_OK)
-				inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_CHKBFS_RUNNING);
+			if (status == B_OK) {
+				inode->Node().flags
+					|= HOST_ENDIAN_TO_BFS_INT32(INODE_CHECK_RUNNING);
+			}
 
 			return status;
 		}
@@ -612,8 +615,10 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 			check_control* control = (check_control*)buffer;
 
 			status_t status = allocator.StopChecking(control);
-			if (status == B_OK)
-				inode->Node().flags &= HOST_ENDIAN_TO_BFS_INT32(~INODE_CHKBFS_RUNNING);
+			if (status == B_OK) {
+				inode->Node().flags
+					&= HOST_ENDIAN_TO_BFS_INT32(~INODE_CHECK_RUNNING);
+			}
 
 			return status;
 		}
@@ -1314,7 +1319,7 @@ bfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 	Transaction transaction;
 	bool needsTrimming = false;
 
-	if (!volume->IsReadOnly()) {
+	if (!volume->IsReadOnly() && !volume->IsCheckingThread()) {
 		InodeReadLocker locker(inode);
 		needsTrimming = inode->NeedsTrimming();
 
@@ -1376,7 +1381,7 @@ bfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 	if (status == B_OK)
 		transaction.Done();
 
-	if (inode->Flags() & INODE_CHKBFS_RUNNING) {
+	if ((inode->Flags() & INODE_CHECK_RUNNING) != 0) {
 		// "chkbfs" exited abnormally, so we have to stop it here...
 		FATAL(("check process was aborted!\n"));
 		volume->Allocator().StopChecking(NULL);

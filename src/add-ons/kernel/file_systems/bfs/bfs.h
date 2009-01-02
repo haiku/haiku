@@ -222,8 +222,9 @@ enum inode_flags {
 	INODE_PERMANENT_FLAGS	= 0x0000ffff,
 
 	INODE_WAS_WRITTEN		= 0x00020000,
-	INODE_DONT_FREE_SPACE	= 0x00080000,	// only used by the "chkbfs" functionality
-	INODE_CHKBFS_RUNNING	= 0x00200000,
+	// The rest is only used by the file system check functionality
+	INODE_DONT_FREE_SPACE	= 0x00080000,
+	INODE_CHECK_RUNNING		= 0x00200000
 };
 
 //**************************************

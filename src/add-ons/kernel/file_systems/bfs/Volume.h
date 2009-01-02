@@ -98,6 +98,10 @@ public:
 								off_t numBlocks, block_run& run,
 								uint16 minimum = 1);
 			status_t		Free(Transaction& transaction, block_run run);
+			void			SetCheckingThread(thread_id thread)
+								{ fCheckingThread = thread; }
+			bool			IsCheckingThread() const
+								{ return find_thread(NULL) == fCheckingThread; }
 
 			// cache access
 			status_t		WriteSuperBlock();
@@ -150,6 +154,7 @@ public:
 			uint32			fFlags;
 
 			void*			fBlockCache;
+			thread_id		fCheckingThread;
 };
 
 

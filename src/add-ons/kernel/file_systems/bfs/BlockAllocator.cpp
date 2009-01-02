@@ -1242,6 +1242,8 @@ BlockAllocator::StopChecking(check_control* control)
 	} else
 		FATAL(("BlockAllocator::CheckNextNode() didn't run through\n"));
 
+	fVolume->SetCheckingThread(-1);
+
 	free(fCheckBitmap);
 	fCheckBitmap = NULL;
 	fCheckCookie = NULL;
@@ -1260,6 +1262,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 		return B_BAD_VALUE;
 
 	check_cookie* cookie = (check_cookie*)control->cookie;
+	fVolume->SetCheckingThread(find_thread(NULL));
 
 	while (true) {
 		if (cookie->iterator == NULL) {
