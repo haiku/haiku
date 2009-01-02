@@ -45,7 +45,7 @@
 
 static const char* const kKDLPrompt = "kdebug> ";
 
-extern "C" int kgets(char *buffer, int length);
+extern "C" int kgets(char* buffer, int length);
 
 void call_modules_hook(bool enter);
 
@@ -65,8 +65,8 @@ static spinlock sSpinlock = B_SPINLOCK_INITIALIZER;
 static int32 sDebuggerOnCPU = -1;
 
 static sem_id sSyslogNotify = -1;
-static struct syslog_message *sSyslogMessage;
-static struct ring_buffer *sSyslogBuffer;
+static struct syslog_message* sSyslogMessage;
+static struct ring_buffer* sSyslogBuffer;
 static bool sSyslogDropped = false;
 
 static const char* sCurrentKernelDebuggerMessage;
@@ -79,7 +79,7 @@ static DebugOutputFilter* sDebugOutputFilter = NULL;
 DefaultDebugOutputFilter gDefaultDebugOutputFilter;
 
 static void flush_pending_repeats(bool syslogOutput);
-static void check_pending_repeats(void *data, int iter);
+static void check_pending_repeats(void* data, int iter);
 
 static int64 sMessageRepeatFirstTime = 0;
 static int64 sMessageRepeatLastTime = 0;
@@ -181,7 +181,7 @@ kputchar(char c)
 
 
 void
-kputs(const char *s)
+kputs(const char* s)
 {
 	if (sDebugOutputFilter != NULL)
 		sDebugOutputFilter->PrintString(s);
@@ -189,7 +189,7 @@ kputs(const char *s)
 
 
 void
-kputs_unfiltered(const char *s)
+kputs_unfiltered(const char* s)
 {
 	gDefaultDebugOutputFilter.PrintString(s);
 }
@@ -399,7 +399,7 @@ public:
 
 
 static int
-read_line(char *buffer, int32 maxLength,
+read_line(char* buffer, int32 maxLength,
 	LineEditingHelper* editingHelper = NULL)
 {
 	int32 currentHistoryLine = sCurrentLine;
@@ -650,7 +650,7 @@ read_line(char *buffer, int32 maxLength,
 
 
 int
-kgets(char *buffer, int length)
+kgets(char* buffer, int length)
 {
 	return read_line(buffer, length);
 }
@@ -803,7 +803,7 @@ hand_over_kernel_debugger()
 
 
 static int
-cmd_dump_kdl_message(int argc, char **argv)
+cmd_dump_kdl_message(int argc, char** argv)
 {
 	if (sCurrentKernelDebuggerMessage) {
 		kputs(sCurrentKernelDebuggerMessage);
@@ -815,7 +815,7 @@ cmd_dump_kdl_message(int argc, char **argv)
 
 
 static int
-cmd_dump_syslog(int argc, char **argv)
+cmd_dump_syslog(int argc, char** argv)
 {
 	if (!sSyslogOutputEnabled) {
 		kprintf("Syslog is not enabled.\n");
@@ -872,7 +872,7 @@ cmd_dump_syslog(int argc, char **argv)
 
 
 static int
-cmd_switch_cpu(int argc, char **argv)
+cmd_switch_cpu(int argc, char** argv)
 {
 	if (argc > 2) {
 		print_debugger_command_usage(argv[0]);
@@ -902,7 +902,7 @@ cmd_switch_cpu(int argc, char **argv)
 
 
 static status_t
-syslog_sender(void *data)
+syslog_sender(void* data)
 {
 	status_t error = B_BAD_PORT_ID;
 	port_id port = -1;
@@ -972,7 +972,7 @@ syslog_sender(void *data)
 
 
 static void
-syslog_write(const char *text, int32 length)
+syslog_write(const char* text, int32 length)
 {
 	bool trunc = false;
 
@@ -990,9 +990,9 @@ syslog_write(const char *text, int32 length)
 			sSyslogDropped = true;
 	}
 
-	ring_buffer_write(sSyslogBuffer, (uint8 *)text, length);
+	ring_buffer_write(sSyslogBuffer, (uint8*) text, length);
 	if (trunc)
-		ring_buffer_write(sSyslogBuffer, (uint8 *)"<TRUNC>", 7);
+		ring_buffer_write(sSyslogBuffer, (uint8*) "<TRUNC>", 7);
 
 	release_sem_etc(sSyslogNotify, 1, B_DO_NOT_RESCHEDULE);
 }
@@ -1081,7 +1081,7 @@ syslog_init(struct kernel_args* args)
 	add_debugger_command_etc("syslog", &cmd_dump_syslog,
 		"Dumps the syslog buffer.\n",
 		"[-n]\nDumps the whole syslog buffer, or, if -n is specified, only "
-		"the part that hasn't been send yet.\n", 0);
+		"the part that hasn't been sent yet.\n", 0);
 
 	return B_OK;
 
@@ -1098,7 +1098,7 @@ call_modules_hook(bool enter)
 {
 	uint32 index = 0;
 	while (index < kMaxDebuggerModules && sDebuggerModules[index] != NULL) {
-		debugger_module_info *module = sDebuggerModules[index];
+		debugger_module_info* module = sDebuggerModules[index];
 
 		if (enter && module->enter_debugger != NULL)
 			module->enter_debugger();
@@ -1135,7 +1135,7 @@ debug_debugger_running(void)
 
 
 void
-debug_puts(const char *string, int32 length)
+debug_puts(const char* string, int32 length)
 {
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sSpinlock);
@@ -1176,14 +1176,14 @@ debug_puts(const char *string, int32 length)
 
 
 void
-debug_early_boot_message(const char *string)
+debug_early_boot_message(const char* string)
 {
 	arch_debug_serial_early_boot_message(string);
 }
 
 
 status_t
-debug_init(kernel_args *args)
+debug_init(kernel_args* args)
 {
 	new(&gDefaultDebugOutputFilter) DefaultDebugOutputFilter;
 
@@ -1193,7 +1193,7 @@ debug_init(kernel_args *args)
 
 
 status_t
-debug_init_post_vm(kernel_args *args)
+debug_init_post_vm(kernel_args* args)
 {
 	add_debugger_command_etc("cpu", &cmd_switch_cpu,
 		"Switches to another CPU.\n",
@@ -1212,7 +1212,7 @@ debug_init_post_vm(kernel_args *args)
 	tracing_init();
 
 	// get debug settings
-	void *handle = load_driver_settings("kernel");
+	void* handle = load_driver_settings("kernel");
 	if (handle != NULL) {
 		sSerialDebugEnabled = get_driver_boolean_parameter(handle,
 			"serial_debug_output", sSerialDebugEnabled, sSerialDebugEnabled);
@@ -1248,7 +1248,7 @@ debug_init_post_vm(kernel_args *args)
 status_t
 debug_init_post_modules(struct kernel_args* args)
 {
-	void *cookie;
+	void* cookie;
 
 	// check for dupped lines every 10/10 second
 	register_kernel_daemon(check_pending_repeats, NULL, 10);
@@ -1326,7 +1326,7 @@ debug_trap_cpu_in_kdl(bool returnIfHandedOver)
 
 
 uint64
-parse_expression(const char *expression)
+parse_expression(const char* expression)
 {
 	uint64 result;
 	return (evaluate_debug_expression(expression, &result, true) ? result : 0);
@@ -1334,7 +1334,7 @@ parse_expression(const char *expression)
 
 
 void
-panic(const char *format, ...)
+panic(const char* format, ...)
 {
 	va_list args;
 	char temp[128];
@@ -1348,7 +1348,7 @@ panic(const char *format, ...)
 
 
 void
-kernel_debugger(const char *message)
+kernel_debugger(const char* message)
 {
 	cpu_status state = disable_interrupts();
 
@@ -1455,7 +1455,7 @@ check_pending_repeats(void* /*data*/, int /*iteration*/)
 
 
 static void
-dprintf_args(const char *format, va_list args, bool syslogOutput)
+dprintf_args(const char* format, va_list args, bool syslogOutput)
 {
 	cpu_status state;
 	int32 length;
@@ -1503,7 +1503,7 @@ dprintf_args(const char *format, va_list args, bool syslogOutput)
 
 
 void
-dprintf(const char *format, ...)
+dprintf(const char* format, ...)
 {
 	va_list args;
 
@@ -1517,7 +1517,7 @@ dprintf(const char *format, ...)
 
 
 void
-dprintf_no_syslog(const char *format, ...)
+dprintf_no_syslog(const char* format, ...)
 {
 	va_list args;
 
@@ -1534,7 +1534,7 @@ dprintf_no_syslog(const char *format, ...)
 	debugger only (it doesn't lock).
 */
 void
-kprintf(const char *format, ...)
+kprintf(const char* format, ...)
 {
 	if (sDebugOutputFilter != NULL) {
 		va_list args;
@@ -1546,7 +1546,7 @@ kprintf(const char *format, ...)
 
 
 void
-kprintf_unfiltered(const char *format, ...)
+kprintf_unfiltered(const char* format, ...)
 {
 	va_list args;
 	va_start(args, format);
@@ -1606,7 +1606,7 @@ debug_get_debugged_thread()
 
 
 void
-_user_debug_output(const char *userString)
+_user_debug_output(const char* userString)
 {
 	char string[512];
 	int32 length;
@@ -1626,7 +1626,7 @@ _user_debug_output(const char *userString)
 
 
 void
-dump_block(const char *buffer, int size, const char *prefix)
+dump_block(const char* buffer, int size, const char* prefix)
 {
 	const int DUMPED_BLOCK_SIZE = 16;
 	int i;
@@ -1642,7 +1642,7 @@ dump_block(const char *buffer, int size, const char *prefix)
 			if (i >= size)
 				dprintf("  ");
 			else
-				dprintf("%02x", *(unsigned char *)(buffer + i));
+				dprintf("%02x", *(unsigned char*)(buffer + i));
 		}
 		dprintf("  ");
 
