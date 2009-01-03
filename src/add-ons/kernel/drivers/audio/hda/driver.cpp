@@ -55,6 +55,7 @@ init_driver(void)
 			&& gNumCards < MAX_CARDS; i++) {
 		if (info.class_base == PCI_multimedia
 			&& info.class_sub == PCI_hd_audio) {
+			memset(&gCards[gNumCards], 0, sizeof(hda_controller));
 			gCards[gNumCards].pci_info = info;
 			gCards[gNumCards].opened = 0;
 			sprintf(path, DEVFS_PATH_FORMAT, gNumCards);

@@ -168,8 +168,9 @@ dump_audiogroup_widgets(hda_audio_group* audioGroup)
 				break;
 
 			case WT_PIN_COMPLEX:
-				dprintf("\t%s%s\n", PIN_CAP_IS_INPUT(widget.d.pin.capabilities) ? "[Input] " : "",
-					PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities) ? "[Output]" : "");
+				dprintf("\t%s%s%s\n", PIN_CAP_IS_INPUT(widget.d.pin.capabilities) ? "[Input] " : "",
+					PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities) ? "[Output]" : "",
+					PIN_CAP_IS_EAPD_CAP(widget.d.pin.capabilities) ? "[EAPD Cap]" : "");
 				
 				break;
 
@@ -1052,8 +1053,10 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 		return NULL;
 
 	hda_codec* codec = (hda_codec*)calloc(1, sizeof(hda_codec));
-	if (codec == NULL)
+	if (codec == NULL) {
+		dprintf("hda: Failed to alloc a codec\n");
 		return NULL;
+	}
 
 	codec->controller = controller;
 	codec->addr = codecAddress;
@@ -1080,8 +1083,10 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	verbs[2] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, 
 		PID_SUB_NODE_COUNT);
 
-	if (hda_send_verbs(codec, verbs, (uint32*)&response, 3) != B_OK)
+	if (hda_send_verbs(codec, verbs, (uint32*)&response, 3) != B_OK) {
+		dprintf("hda: Failed to get vendor and revision parameters\n");
 		goto err;
+	}
 
 	codec->vendor_id = response.vendor;
 	codec->product_id = response.device;
@@ -1100,8 +1105,10 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 		verbs[0] = MAKE_VERB(codecAddress, nodeID, VID_GET_PARAMETER,
 			PID_FUNCTION_GROUP_TYPE);
 
-		if (hda_send_verbs(codec, verbs, &groupType, 1) != B_OK)
+		if (hda_send_verbs(codec, verbs, &groupType, 1) != B_OK) {
+			dprintf("hda: Failed to get function group type\n");
 			goto err;
+		}
 
 		if ((groupType & FUNCTION_GROUP_NODETYPE_MASK) == FUNCTION_GROUP_NODETYPE_AUDIO) {
 			/* Found an Audio Function Group! */
