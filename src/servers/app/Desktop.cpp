@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -947,7 +947,8 @@ Desktop::_SetWorkspace(int32 index)
 	bool movedMouseEventWindow = false;
 	display_mode previousMode, newMode;
 	fVirtualScreen.ScreenAt(0)->GetMode(&previousMode);
-	fVirtualScreen.RestoreConfiguration(*this, fSettings->WorkspacesMessage(index));
+	fVirtualScreen.RestoreConfiguration(*this,
+		fSettings->WorkspacesMessage(index));
 	fVirtualScreen.ScreenAt(0)->GetMode(&newMode);
 	// We only need to invalidate the entire desktop if we changed display modes
 	if (memcmp(&previousMode, &newMode, sizeof(display_mode)))
@@ -964,7 +965,8 @@ Desktop::_SetWorkspace(int32 index)
 				_Windows(index).AddWindow(fMouseEventWindow);
 				_Windows(previousIndex).RemoveWindow(fMouseEventWindow);
 
-				_UpdateSubsetWorkspaces(fMouseEventWindow, previousIndex, index);
+				_UpdateSubsetWorkspaces(fMouseEventWindow, previousIndex,
+					index);
 				movedMouseEventWindow = true;
 
 				// send B_WORKSPACES_CHANGED message
@@ -974,11 +976,13 @@ Desktop::_SetWorkspace(int32 index)
 				// make sure it's frontmost
 				_Windows(index).RemoveWindow(fMouseEventWindow);
 				_Windows(index).AddWindow(fMouseEventWindow,
-					fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(), index));
+					fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(),
+					index));
 			}
 		}
 
-		fMouseEventWindow->Anchor(index).position = fMouseEventWindow->Frame().LeftTop();
+		fMouseEventWindow->Anchor(index).position
+			= fMouseEventWindow->Frame().LeftTop();
 	}
 
 	// build region of windows that are no longer visible in the new workspace
@@ -1832,8 +1836,14 @@ Desktop::HideWindow(Window* window)
 	window->SetHidden(true);
 	fFocusList.RemoveWindow(window);
 
-	if (fMouseEventWindow == window)
+	if (fMouseEventWindow == window) {
+		// Make its decorator lose the current mouse action
+		BMessage message;
+		int32 viewToken;
+		window->MouseUp(&message, fLastMousePosition, &viewToken);
+
 		fMouseEventWindow = NULL;
+	}
 
 	if (window->InWorkspace(fCurrentWorkspace)) {
 		_UpdateSubsetWorkspaces(window);
@@ -2235,7 +2245,8 @@ Desktop::AddWindowToSubset(Window* subset, Window* window)
 	if (!subset->AddToSubset(window))
 		return false;
 
-	_ChangeWindowWorkspaces(subset, subset->Workspaces(), subset->SubsetWorkspaces());
+	_ChangeWindowWorkspaces(subset, subset->Workspaces(),
+		subset->SubsetWorkspaces());
 	return true;
 }
 
@@ -2244,7 +2255,8 @@ void
 Desktop::RemoveWindowFromSubset(Window* subset, Window* window)
 {
 	subset->RemoveFromSubset(window);
-	_ChangeWindowWorkspaces(subset, subset->Workspaces(), subset->SubsetWorkspaces());
+	_ChangeWindowWorkspaces(subset, subset->Workspaces(),
+		subset->SubsetWorkspaces());
 }
 
 

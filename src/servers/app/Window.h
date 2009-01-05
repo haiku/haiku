@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc.
+ * Copyright (c) 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -62,7 +62,8 @@ public:
 			::Desktop*			Desktop() const { return fDesktop; }
 			::Decorator*		Decorator() const { return fDecorator; }
 			::ServerWindow*		ServerWindow() const { return fWindow; }
-			::EventTarget&		EventTarget() const { return fWindow->EventTarget(); }
+			::EventTarget&		EventTarget() const
+									{ return fWindow->EventTarget(); }
 
 			// setting and getting the "hard" clipping, you need to have
 			// WriteLock()ed the clipping!
@@ -78,7 +79,8 @@ public:
 			void				GetContentRegion(BRegion* region);
 
 			void				MoveBy(int32 x, int32 y);
-			void				ResizeBy(int32 x, int32 y, BRegion* dirtyRegion);
+			void				ResizeBy(int32 x, int32 y,
+									BRegion* dirtyRegion);
 
 			void				ScrollViewBy(View* view, int32 dx, int32 dy);
 
@@ -88,7 +90,8 @@ public:
 
 	virtual	bool				IsOffscreenWindow() const { return false; }
 
-			void				GetEffectiveDrawingRegion(View* view, BRegion& region);
+			void				GetEffectiveDrawingRegion(View* view,
+									BRegion& region);
 			bool				DrawingRegionChanged(View* view) const;
 
 			// generic version, used by the Desktop
@@ -131,15 +134,18 @@ public:
 			void				CopyContents(BRegion* region,
 									int32 xOffset, int32 yOffset);
 
-			void				MouseDown(BMessage* message, BPoint where, int32* _viewToken);
-			void				MouseUp(BMessage* message, BPoint where, int32* _viewToken);
-			void				MouseMoved(BMessage* message, BPoint where, int32* _viewToken,
-									bool isLatestMouseMoved);
+			void				MouseDown(BMessage* message, BPoint where,
+									int32* _viewToken);
+			void				MouseUp(BMessage* message, BPoint where,
+									int32* _viewToken);
+			void				MouseMoved(BMessage* message, BPoint where,
+									int32* _viewToken, bool isLatestMouseMoved);
 
 			// some hooks to inform the client window
 			// TODO: move this to ServerWindow maybe?
 			void				WorkspaceActivated(int32 index, bool active);
-			void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
+			void				WorkspacesChanged(uint32 oldWorkspaces,
+									uint32 newWorkspaces);
 			void				Activated(bool active);
 
 			// changing some properties
@@ -179,7 +185,8 @@ public:
 
 			void				FontsChanged(BRegion* updateRegion);
 
-			void				SetLook(window_look look, BRegion* updateRegion);
+			void				SetLook(window_look look,
+									BRegion* updateRegion);
 			void				SetFeel(window_feel feel);
 			void				SetFlags(uint32 flags, BRegion* updateRegion);
 
@@ -243,12 +250,13 @@ protected:
 			void				_DrawBorder();
 
 			// handling update sessions
-			void				_TransferToUpdateSession(BRegion* contentDirtyRegion);
+			void				_TransferToUpdateSession(
+									BRegion* contentDirtyRegion);
 			void				_SendUpdateMessage();
 
 			void				_UpdateContentRegion();
 
-			click_type			_ActionFor(const BMessage* msg) const;
+			click_type			_ActionFor(const BMessage* message) const;
 
 			void				_ObeySizeLimits();
 			void				_PropagatePosition();
