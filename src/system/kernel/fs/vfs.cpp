@@ -3665,7 +3665,6 @@ remove_vnode(fs_volume *volume, ino_t vnodeID)
 
 	if (vnode->covered_by != NULL) {
 		// this vnode is in use
-		mutex_unlock(&sVnodeMutex);
 		return B_BUSY;
 	}
 
