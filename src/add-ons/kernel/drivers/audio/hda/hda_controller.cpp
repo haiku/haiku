@@ -354,13 +354,11 @@ init_corb_rirb_pos(hda_controller* controller)
 	controller->stream_positions = (uint32*)
 		((uint8*)controller->corb + posOffset);
 
+	controller->Write16(HDAC_CORB_WRITE_POS, 0);
 	/* Reset CORB read pointer */
-	/* NOTE: See HDA011 for corrected procedure! */
 	controller->Write16(HDAC_CORB_READ_POS, CORB_READ_POS_RESET);
-	do {
-		spin(10);
-	} while ((controller->Read16(HDAC_CORB_READ_POS)
-		& CORB_READ_POS_RESET) == 0);
+	/* Reading CORB_READ_POS_RESET as zero fails on some chips.
+	   We reset the bit here. */
 	controller->Write16(HDAC_CORB_READ_POS, 0);
 
 	/* Reset RIRB write pointer */
