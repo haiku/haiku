@@ -6450,24 +6450,23 @@ index_dir_open(dev_t mountID, bool kernel)
 
 	if (!HAS_FS_MOUNT_CALL(mount, open_index_dir)) {
 		status = EOPNOTSUPP;
-		goto out;
+		goto error;
 	}
 
 	status = FS_MOUNT_CALL(mount, open_index_dir, &cookie);
 	if (status < B_OK)
-		goto out;
+		goto error;
 
 	// get fd for the index directory
 	status = get_new_fd(FDTYPE_INDEX_DIR, mount, NULL, cookie, 0, kernel);
-	if (status >= 0)
-		goto out;
+	if (status < 0) {
+		// something went wrong
+		FS_MOUNT_CALL(mount, close_index_dir, cookie);
+		FS_MOUNT_CALL(mount, free_index_dir_cookie, cookie);
 
-	// something went wrong
-	FS_MOUNT_CALL(mount, close_index_dir, cookie);
-	FS_MOUNT_CALL(mount, free_index_dir_cookie, cookie);
-
-out:
-	put_mount(mount);
+error:
+		put_mount(mount);
+	}
 	return status;
 }
 
@@ -6493,8 +6492,7 @@ index_dir_free_fd(struct file_descriptor *descriptor)
 
 	if (mount != NULL) {
 		FS_MOUNT_CALL(mount, free_index_dir_cookie, descriptor->cookie);
-		// ToDo: find a replacement ref_count object - perhaps the root dir?
-		//put_vnode(vnode);
+		put_mount(mount);
 	}
 }
 
@@ -6644,25 +6642,24 @@ query_open(dev_t device, const char *query, uint32 flags,
 
 	if (!HAS_FS_MOUNT_CALL(mount, open_query)) {
 		status = EOPNOTSUPP;
-		goto out;
+		goto error;
 	}
 
 	status = FS_MOUNT_CALL(mount, open_query, query, flags, port, token,
 		&cookie);
 	if (status < B_OK)
-		goto out;
+		goto error;
 
 	// get fd for the index directory
 	status = get_new_fd(FDTYPE_QUERY, mount, NULL, cookie, 0, kernel);
-	if (status >= 0)
-		goto out;
+	if (status < 0) {
+		// something went wrong
+		FS_MOUNT_CALL(mount, close_query, cookie);
+		FS_MOUNT_CALL(mount, free_query_cookie, cookie);
 
-	// something went wrong
-	FS_MOUNT_CALL(mount, close_query, cookie);
-	FS_MOUNT_CALL(mount, free_query_cookie, cookie);
-
-out:
-	put_mount(mount);
+error:
+		put_mount(mount);
+	}
 	return status;
 }
 
@@ -6688,8 +6685,7 @@ query_free_fd(struct file_descriptor *descriptor)
 
 	if (mount != NULL) {
 		FS_MOUNT_CALL(mount, free_query_cookie, descriptor->cookie);
-		// ToDo: find a replacement ref_count object - perhaps the root dir?
-		//put_vnode(vnode);
+		put_mount(mount);
 	}
 }
 
