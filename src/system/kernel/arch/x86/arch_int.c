@@ -786,7 +786,7 @@ unexpected_exception(struct iframe* frame)
 		if (sigaction(signal, NULL, &action) == 0
 			&& action.sa_handler != SIG_DFL
 			&& action.sa_handler != SIG_IGN) {
-			send_signal(thread->id, SIGSEGV);
+			send_signal(thread->id, signal);
 		} else if (user_debug_exception_occurred(type, signal))
 			send_signal(team_get_current_team_id(), signal);
 	} else {
