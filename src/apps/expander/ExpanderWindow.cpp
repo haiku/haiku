@@ -189,6 +189,12 @@ ExpanderWindow::ValidateDest()
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 		alert->Go();
 		return false;
+	} else if (!entry.IsDirectory()) {
+		BAlert *alert = new BAlert("destAlert", "The destination"
+			" is not a directory.", "Cancel", NULL, NULL,
+			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+		alert->Go();
+		return false;
 	} else {
 		entry.GetRef(&fDestRef);
 		return true;
@@ -213,23 +219,35 @@ ExpanderWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case MSG_SOURCE:
+		{
+			BEntry entry(fSourceText->Text(), true);
+			entry_ref srcRef;
+			if (entry.Exists() && entry.IsDirectory())
+				entry.GetRef(&srcRef);
 			if (!fSourcePanel) {
 				BMessenger messenger(this);
-				fSourcePanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL,
+				fSourcePanel = new BFilePanel(B_OPEN_PANEL, &messenger, &srcRef,
 					B_FILE_NODE, false, NULL, new RuleRefFilter(fRules), true);
-			}
+			} else
+				fSourcePanel->SetPanelDirectory(&srcRef);
 			fSourcePanel->Show();
 			break;
-
+		}
 		case MSG_DEST:
+		{	
+			BEntry entry(fDestText->Text(), true);
+			entry_ref destRef;
+			if (entry.Exists() && entry.IsDirectory())
+				entry.GetRef(&destRef);
 			if (!fDestPanel) {
 				BMessenger messenger(this);
-				fDestPanel = new DirectoryFilePanel(B_OPEN_PANEL, &messenger, NULL,
+				fDestPanel = new DirectoryFilePanel(B_OPEN_PANEL, &messenger, &destRef,
 					B_DIRECTORY_NODE, false, NULL, new DirectoryRefFilter(), true);
-			}
+			} else 
+				fDestPanel->SetPanelDirectory(&destRef);
 			fDestPanel->Show();
 			break;
-
+		}
 		case MSG_DIRECTORY:
 		{
 			entry_ref ref;
