@@ -793,6 +793,9 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	static int debug_buffers_exchanged = 0;
 	cpu_status status;
 	status_t err;
+	bigtime_t played_real_time, recorded_real_time;
+	uint64 played_frames_count, recorded_frames_count;
+	int32 playback_buffer_cycle, record_buffer_cycle;
 
 	// TODO: support recording!
 	if (audioGroup->playback_stream == NULL)
@@ -819,21 +822,35 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	status = disable_interrupts();
 	acquire_spinlock(&audioGroup->playback_stream->lock);
 
-	data->playback_buffer_cycle = audioGroup->playback_stream->buffer_cycle;
-	data->played_real_time = audioGroup->playback_stream->real_time;
-	data->played_frames_count = audioGroup->playback_stream->frames_count;
+	playback_buffer_cycle = audioGroup->playback_stream->buffer_cycle;
+	played_real_time = audioGroup->playback_stream->real_time;
+	played_frames_count = audioGroup->playback_stream->frames_count;
 
 	release_spinlock(&audioGroup->playback_stream->lock);
 
 	if (audioGroup->record_stream) {
 		acquire_spinlock(&audioGroup->record_stream->lock);
-		data->record_buffer_cycle = audioGroup->record_stream->buffer_cycle;
-		data->recorded_real_time = audioGroup->record_stream->real_time;
-		data->recorded_frames_count = audioGroup->record_stream->frames_count;
+		record_buffer_cycle = audioGroup->record_stream->buffer_cycle;
+		recorded_real_time = audioGroup->record_stream->real_time;
+		recorded_frames_count = audioGroup->record_stream->frames_count;
 		release_spinlock(&audioGroup->record_stream->lock);
 	}
 
 	restore_interrupts(status);
+
+#ifdef __HAIKU__
+#define copy_to_user(x, y) if (user_memcpy(&x, &y, sizeof(x)) < B_OK) \
+	return B_BAD_ADDRESS
+#else
+#define copy_to_user(x, y) x = y
+#endif
+
+	copy_to_user(data->playback_buffer_cycle, playback_buffer_cycle);
+	copy_to_user(data->played_real_time, played_real_time);
+	copy_to_user(data->played_frames_count, played_frames_count);
+	copy_to_user(data->record_buffer_cycle, record_buffer_cycle);
+	copy_to_user(data->recorded_real_time, recorded_real_time);
+	copy_to_user(data->recorded_frames_count, recorded_frames_count);
 
 	debug_buffers_exchanged++;
 	if (((debug_buffers_exchanged % 100) == 1) && (debug_buffers_exchanged < 1111)) {
@@ -878,7 +895,7 @@ multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 	switch (op) {
 		case B_MULTI_GET_DESCRIPTION:
 		{
-#ifdef __HAIKU
+#ifdef __HAIKU__
 			multi_description description;
 			multi_channel_info channels[16];
 			multi_channel_info* originalChannels;
@@ -897,10 +914,11 @@ multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 				return status;
 
 			description.channels = originalChannels;
-			return user_memcpy(arg, &description, sizeof(multi_description))
-				&& user_memcpy(originalChannels, channels,
-					sizeof(multi_channel_info)
-						* description.request_channel_count;
+			if (user_memcpy(arg, &description, sizeof(multi_description))
+					!= B_OK)
+				return B_BAD_ADDRESS;
+			return user_memcpy(originalChannels, channels, sizeof(multi_channel_info)
+					* description.request_channel_count);
 #else
 			return get_description(audioGroup, (multi_description*)arg);
 #endif
