@@ -12,6 +12,9 @@
 #include <Window.h>
 
 
+#include <new>
+
+
 const static unsigned char
 kVerticalKnobData[] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -64,7 +67,7 @@ sPropertyInfo[] = {
 };
 
 
-const static float kPadding = 10.0;
+const static float kPadding = 3.0;
 
 
 BChannelSlider::BChannelSlider(BRect area, const char *name, const char *label,
@@ -110,9 +113,9 @@ BArchivable *
 BChannelSlider::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BChannelSlider"))
-		return new BChannelSlider(archive);
-	else
-		return NULL;
+		return new (std::nothrow) BChannelSlider(archive);
+
+	return NULL;
 }
 
 
@@ -242,11 +245,37 @@ BChannelSlider::Draw(BRect updateRect)
 	_UpdateFontDimens();
 	_DrawThumbs();
 
+	BRect bounds(Bounds());
 	if (Label()) {
-		BRect bounds(Bounds());
 		float labelWidth = StringWidth(Label());
+		DrawString(Label(), BPoint((bounds.Width() - labelWidth) / 2.0,
+			fBaseLine));
+	}
 
-		DrawString(Label(), BPoint((bounds.Width() - labelWidth) / 2, fBaseLine));
+	if (MinLimitLabel()) {
+		if (_Vertical()) {
+			if (MinLimitLabel()) {
+				float x = (bounds.Width() - StringWidth(MinLimitLabel())) / 2.0;
+				DrawString(MinLimitLabel(), BPoint(x, bounds.bottom - kPadding));
+			}
+		} else {
+			if (MinLimitLabel())
+				DrawString(MinLimitLabel(), BPoint(kPadding, bounds.bottom - kPadding));
+		}
+	}
+
+	if (MaxLimitLabel()) {
+		if (_Vertical()) {
+			if (MaxLimitLabel()) {
+				float x = (bounds.Width() - StringWidth(MaxLimitLabel())) / 2.0;
+				DrawString(MaxLimitLabel(), BPoint(x, 2 * fLineFeed));
+			}
+		} else {
+			if (MaxLimitLabel()) {
+				DrawString(MaxLimitLabel(), BPoint(bounds.right - kPadding -
+					StringWidth(MaxLimitLabel()), bounds.bottom - kPadding));
+			}
+		}
 	}
 }
 
@@ -301,13 +330,16 @@ BChannelSlider::MouseDown(BPoint where)
 		}
 
 		if (fInitialValues == NULL)
-			fInitialValues = new int32[numChannels];
+			fInitialValues = new (std::nothrow) int32[numChannels];
 
-		if (fAllChannels) {
-			for (int32 i = 0; i < numChannels; i++)
-				fInitialValues[i] = ValueFor(i);
-		} else
-			fInitialValues[fCurrentChannel] = ValueFor(fCurrentChannel);
+		if (fInitialValues) {
+			if (fAllChannels) {
+				for (int32 i = 0; i < numChannels; i++)
+					fInitialValues[i] = ValueFor(i);
+			} else {
+				fInitialValues[fCurrentChannel] = ValueFor(fCurrentChannel);
+			}
+		}
 
 		if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
 			if (!IsTracking()) {
@@ -342,8 +374,9 @@ BChannelSlider::MouseUp(BPoint where)
 		fAllChannels = false;
 		fCurrentChannel = -1;
 		fMinpoint = 0;
-	} else
+	} else {
 		BChannelControl::MouseUp(where);
+	}
 }
 
 
@@ -412,19 +445,23 @@ BChannelSlider::SetEnabled(bool on)
 void
 BChannelSlider::GetPreferredSize(float *width, float *height)
 {
-	if (width) {
-		float _width = (float)ceil(StringWidth(Label()));
-		if (_Vertical()) {
-			*width = max_c(_width, 2 + 12 * CountChannels());
-		} else {
-			*width = max_c(_width, 64);
-		}
-	}
-	if (height) {
-		if (_Vertical())
-			*height = 195;
-		else
-			*height = 71;
+	_UpdateFontDimens();
+
+	if (_Vertical()) {
+		*width = 11.0 * CountChannels();
+		*width = max_c(*width, ceilf(StringWidth(Label())));
+		*width = max_c(*width, ceilf(StringWidth(MinLimitLabel())));
+		*width = max_c(*width, ceilf(StringWidth(MaxLimitLabel())));
+		*width += kPadding * 2.0;
+
+		*height = (fLineFeed * 3.0) + (kPadding * 2.0) + 147.0;
+	} else {
+		*width = max_c(64.0, ceilf(StringWidth(Label())));
+		*width = max_c(*width, ceilf(StringWidth(MinLimitLabel())) +
+			ceilf(StringWidth(MaxLimitLabel())) + 10.0);
+		*width += kPadding * 2.0;
+
+		*height = 11.0 * CountChannels() + (fLineFeed * 2.0) + (kPadding * 2.0);
 	}
 }
 
@@ -512,9 +549,9 @@ BChannelSlider::DrawThumb(BView* into, int32 channel, BPoint where, bool pressed
 	if (thumb == NULL)
 		return;
 
-	BRect bitmapBounds = thumb->Bounds();
-	where.x -= bitmapBounds.right / 2;
-	where.y -= bitmapBounds.bottom / 2;
+	BRect bitmapBounds(thumb->Bounds());
+	where.x -= bitmapBounds.right / 2.0;
+	where.y -= bitmapBounds.bottom / 2.0;
 
 	into->PushState();
 
@@ -545,11 +582,11 @@ BChannelSlider::ThumbFor(int32 channel, bool pressed)
 	// TODO: Finish me
 	if (fLeftKnob == NULL) {
 		if (_Vertical()) {
-			fLeftKnob = new BBitmap(BRect(0, 0, 11, 14), B_CMAP8);
-			fLeftKnob->SetBits(kVerticalKnobData, sizeof(kVerticalKnobData),
-				0, B_CMAP8);
+			fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 11, 14), B_CMAP8);
+			fLeftKnob->SetBits(kVerticalKnobData, sizeof(kVerticalKnobData), 0,
+				B_CMAP8);
 		} else {
-			fLeftKnob = new BBitmap(BRect(0, 0, 14, 11), B_CMAP8);
+			fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 14, 11), B_CMAP8);
 			fLeftKnob->SetBits(kHorizontalKnobData, sizeof(kHorizontalKnobData),
 				0, B_CMAP8);
 		}
@@ -564,16 +601,17 @@ BChannelSlider::ThumbFrameFor(int32 channel)
 {
 	_UpdateFontDimens();
 
-	BRect frame(0, 0, 0, 0);
+	BRect frame(0.0, 0.0, 0.0, 0.0);
 	const BBitmap *thumb = ThumbFor(channel, false);
 	if (thumb != NULL) {
 		frame = thumb->Bounds();
-		if (_Vertical())
-			frame.OffsetBy(channel * frame.Width(), fLineFeed + kPadding);
-		else
-			frame.OffsetBy(kPadding, fLineFeed + channel * frame.Height());
+		if (_Vertical()) {
+			frame.OffsetBy(channel * frame.Width(), (frame.Height() / 2.0) -
+				(kPadding * 2.0) - 1.0);
+		} else {
+			frame.OffsetBy(frame.Width() / 2.0, channel * frame.Height() + 1.0);
+		}
 	}
-
 	return frame;
 }
 
@@ -581,7 +619,7 @@ BChannelSlider::ThumbFrameFor(int32 channel)
 float
 BChannelSlider::ThumbDeltaFor(int32 channel)
 {
-	float delta = 0;
+	float delta = 0.0;
 	if (channel >= 0 && channel < MaxChannelCount()) {
 		float range = ThumbRangeFor(channel);
 		int32 limitRange = MaxLimitList()[channel] - MinLimitList()[channel];
@@ -603,11 +641,14 @@ BChannelSlider::ThumbRangeFor(int32 channel)
 	float range = 0;
 	BRect bounds = Bounds();
 	BRect frame = ThumbFrameFor(channel);
-	if (_Vertical())
-		range = bounds.Height() - frame.Height() - (kPadding + fLineFeed) * 2;
-	else
-		range = bounds.Width() - frame.Width() - kPadding * 2;
-
+	if (_Vertical()) {
+		// *height = (fLineFeed * 3.0) + (kPadding * 2.0) + 100.0;
+		range = bounds.Height() - frame.Height() - (fLineFeed * 3.0) -
+			(kPadding * 2.0);
+	} else {
+		// *width = some width + kPadding * 2.0;
+		range = bounds.Width() - frame.Width() - (kPadding * 2.0);
+	}
 	return range;
 }
 
@@ -642,10 +683,12 @@ BChannelSlider::_FinishChange()
 		bool *inMask = NULL;
 		int32 numChannels = CountChannels();
 		if (!fAllChannels) {
-			inMask = new bool[CountChannels()];
-			for (int i=0; i<numChannels; i++)
-				inMask[i] = false;
-			inMask[fCurrentChannel] = true;
+			inMask = new (std::nothrow) bool[CountChannels()];
+			if (inMask) {
+				for (int i=0; i<numChannels; i++)
+					inMask[i] = false;
+				inMask[fCurrentChannel] = true;
+			}
 		}
 		InvokeChannel(NULL, 0, numChannels, inMask);
 	}
@@ -673,125 +716,116 @@ BChannelSlider::_DrawThumbs()
 		// of the first and last thumb frames (top/left and bottom/right)
 		BRect first = ThumbFrameFor(0);
 		BRect last = ThumbFrameFor(CountChannels() - 1);
-		BRect bitmapFrame(first.LeftTop(), last.RightBottom());
+		BRect rect(first.LeftTop(), last.RightBottom());
 
 		if (_Vertical())
-			bitmapFrame.top -= ThumbRangeFor(0);
+			rect.top -= ThumbRangeFor(0);
 		else
-			bitmapFrame.right += ThumbRangeFor(0);
+			rect.right += ThumbRangeFor(0);
 
-		bitmapFrame.OffsetTo(B_ORIGIN);
-		fBacking = new BBitmap(bitmapFrame, B_RGBA32, true, false);
-		if (fBacking->Lock()) {
-			fBackingView = new BView(bitmapFrame, "", 0, B_WILL_DRAW);
-			fBacking->AddChild(fBackingView);
-			fBackingView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-			fBackingView->SetLowColor(fBackingView->ViewColor());
-			fBacking->Unlock();
+		rect.OffsetTo(B_ORIGIN);
+		fBacking = new (std::nothrow) BBitmap(rect, B_RGB32, true);
+		if (fBacking) {
+			fBackingView = new (std::nothrow) BView(rect, "", 0, B_WILL_DRAW);
+			if (fBackingView) {
+				if (fBacking->Lock()) {
+					fBacking->AddChild(fBackingView);
+					fBackingView->SetFontSize(10.0);
+					fBackingView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+					fBackingView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+					fBacking->Unlock();
+				}
+			} else {
+				delete fBacking;
+				fBacking = NULL;
+			}
 		}
 	}
 
 	BPoint drawHere;
-	drawHere.x = (Bounds().Width() - fBacking->Bounds().Width()) / 2;
-	drawHere.y = (Bounds().Height() - fBacking->Bounds().Height() + fLineFeed) / 2;
+	BRect bounds(fBacking->Bounds());
+	drawHere.x = (Bounds().Width() - bounds.Width()) / 2.0;
+	drawHere.y = (Bounds().Height() - bounds.Height()) - kPadding - fLineFeed;
 
-	if (fBacking->Lock()) {
-		// Clear the view's background
-		fBackingView->FillRect(fBackingView->Bounds(), B_SOLID_LOW);
+	if (fBacking && fBackingView) {
+		if (fBacking->Lock()) {
+			// Clear the view's background
+			fBackingView->FillRect(fBackingView->Bounds(), B_SOLID_LOW);
 
-		BRect channelArea;
-		int32 channelCount = CountChannels();
-		for (int32 channel = 0; channel < channelCount; channel++) {
-			channelArea = ThumbFrameFor(channel);
-			// TODO: This is (apparently) needed because ThumbFrameFor() doesn't
-			// take into account that the view we draw on is attached to an offscreen
-			// bitmap. Still this doesn't make much sense:
-			// could be that I'm simply missing something.
-			if (_Vertical())
-				channelArea.OffsetBy(0, -channelArea.top);
-			else
-				channelArea.OffsetBy(0, -channelArea.Height());
+			BRect channelArea;
+			// draw the entire control
+			for (int32 channel = 0; channel < CountChannels(); channel++) {
+				channelArea = ThumbFrameFor(channel);
+				bool pressed = IsTracking()
+					&& (channel == fCurrentChannel || fAllChannels);
+				DrawChannel(fBackingView, channel, channelArea, pressed);
+			}
 
-			bool pressed = fMinpoint != 0 && (channel == fCurrentChannel || fAllChannels);
-			DrawChannel(fBackingView, channel, channelArea, pressed);
+			// draw some kind of current value tool tip
+			if (fCurrentChannel != -1 && fMinpoint != 0) {
+				char valueString[32];
+				snprintf(valueString, 32, "%ld", ValueFor(fCurrentChannel));
+				float stringWidth = fBackingView->StringWidth(valueString);
+				float width = max_c(10.0, stringWidth);
+				BRect valueRect(0.0, 0.0, width, 10.0);
+
+				BRect thumbFrame(ThumbFrameFor(fCurrentChannel));
+				float thumbDelta(ThumbDeltaFor(fCurrentChannel));
+
+				if (_Vertical()) {
+					valueRect.OffsetTo((thumbFrame.Width() - width) / 2.0 +
+						fCurrentChannel * thumbFrame.Width(),
+						thumbDelta + thumbFrame.Height() + 2.0);
+					if (valueRect.bottom > fBackingView->Frame().bottom)
+						valueRect.OffsetBy(0.0, -(thumbFrame.Height() + 12.0));
+				} else {
+					valueRect.OffsetTo((thumbDelta - (width + 2.0)), thumbFrame.top);
+					if (valueRect.left < fBackingView->Frame().left)
+						valueRect.OffsetBy(thumbFrame.Width() + width + 2.0, 0.0);
+				}
+
+				rgb_color oldColor = fBackingView->HighColor();
+				fBackingView->SetHighColor(255, 255, 172);
+				fBackingView->FillRect(valueRect);
+				fBackingView->SetHighColor(0, 0, 0);
+				fBackingView->DrawString(valueString, BPoint(valueRect.left +
+					(valueRect.Width() - stringWidth) / 2.0, valueRect.bottom -1.0));
+				fBackingView->StrokeRect(valueRect.InsetByCopy(-0.5, -0.5));
+				fBackingView->SetHighColor(oldColor);
+			}
+
+			fBackingView->Sync();
+			fBacking->Unlock();
 		}
-
-#if 1
-		// This part draws the current value over the thumb.
-		// TODO: make it nicer. Simplify the code.
-		if (fCurrentChannel != -1 && fMinpoint != 0) {
-			char valueString[32];
-			snprintf(valueString, 32, "%ld", ValueFor(fCurrentChannel));
-			float width = fBackingView->StringWidth(valueString);
-			BRect valueRect(0, 0, width, 10);
-			rgb_color oldColor = fBackingView->HighColor();
-			if (_Vertical())
-				valueRect.OffsetTo((ThumbFrameFor(fCurrentChannel).Width() - width) / 2 + fCurrentChannel * ThumbFrameFor(fCurrentChannel).Width(),
-						ThumbDeltaFor(fCurrentChannel));
-			else
-				valueRect.OffsetTo(ThumbDeltaFor(fCurrentChannel), ThumbFrameFor(fCurrentChannel).top - 10);
-			fBackingView->SetHighColor(255, 255, 172);
-			fBackingView->FillRect(valueRect);
-			fBackingView->SetHighColor(0, 0, 0);
-			valueRect.OffsetBy(1 , 9);
-			fBackingView->DrawString(valueString, valueRect.LeftTop());
-			fBackingView->SetHighColor(oldColor);
-		}
-#endif
-		fBackingView->Sync();
-		fBacking->Unlock();
 	}
 
-	DrawBitmapAsync(fBacking, drawHere);
-
-#if 0
-	// this part draws the value at the bottom of the sliders.
-	if (fCurrentChannel != -1 && fMinpoint != 0) {
-		char valueString[32];
-		snprintf(valueString, 32, "%ld", ValueFor(fCurrentChannel));
-		BPoint stringPoint = drawHere;
-		float stringWidth = StringWidth(valueString);
-		stringPoint.x += (fBacking->Bounds().Width() - stringWidth) / 2;
-		stringPoint.y += fBacking->Bounds().Height() + fBaseLine;
-		BRect stringRect(stringPoint, stringPoint);
-		stringRect.left -= 10;
-		stringRect.right += StringWidth("100");
-		stringRect.top -= fLineFeed;
-
-		SetHighColor(ViewColor());
-		FillRect(stringRect);
-
-		SetHighColor(0, 0, 0);
-		DrawString(valueString, stringPoint);
-	}
-#endif
+	if (fBacking)
+		DrawBitmapAsync(fBacking, drawHere);
 
 	// fClickDelta is used in MouseMoved()
 	fClickDelta = drawHere;
-
-	// TODO: See above
-	if (_Vertical())
-		fClickDelta.y -= ThumbFrameFor(0).top;
-	else
-		fClickDelta.y -= ThumbFrameFor(0).Height();
 }
 
 
 void
 BChannelSlider::_DrawGrooveFrame(BView *into, const BRect &area)
 {
-	rgb_color oldColor = into->HighColor();
+	if (into) {
+		rgb_color oldColor = into->HighColor();
 
-	into->SetHighColor(255, 255, 255);
-	into->StrokeRect(area);
-	into->SetHighColor(tint_color(into->ViewColor(), B_DARKEN_1_TINT));
-	into->StrokeLine(area.LeftTop(), BPoint(area.right, area.top));
-	into->StrokeLine(area.LeftTop(), BPoint(area.left, area.bottom - 1));
-	into->SetHighColor(tint_color(into->ViewColor(), B_DARKEN_2_TINT));
-	into->StrokeLine(BPoint(area.left + 1, area.top + 1), BPoint(area.right - 1, area.top + 1));
-	into->StrokeLine(BPoint(area.left + 1, area.top + 1), BPoint(area.left + 1, area.bottom - 2));
+		into->SetHighColor(255, 255, 255);
+		into->StrokeRect(area);
+		into->SetHighColor(tint_color(into->ViewColor(), B_DARKEN_1_TINT));
+		into->StrokeLine(area.LeftTop(), BPoint(area.right, area.top));
+		into->StrokeLine(area.LeftTop(), BPoint(area.left, area.bottom - 1));
+		into->SetHighColor(tint_color(into->ViewColor(), B_DARKEN_2_TINT));
+		into->StrokeLine(BPoint(area.left + 1, area.top + 1),
+			BPoint(area.right - 1, area.top + 1));
+		into->StrokeLine(BPoint(area.left + 1, area.top + 1),
+			BPoint(area.left + 1, area.bottom - 2));
 
-	into->SetHighColor(oldColor);
+		into->SetHighColor(oldColor);
+	}
 }
 
 
