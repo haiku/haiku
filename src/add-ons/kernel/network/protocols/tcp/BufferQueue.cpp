@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -183,12 +183,10 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 }
 
 
-/*!
-	Removes all data in the queue up to the \a sequence number as specified.
+/*!	Removes all data in the queue up to the \a sequence number as specified.
 
-	NOTE:
-	  If there are missing segments in the buffers to be removed,
-	  fContiguousBytes is not maintained correctly!
+	NOTE: If there are missing segments in the buffers to be removed,
+	fContiguousBytes is not maintained correctly!
 */
 status_t
 BufferQueue::RemoveUntil(tcp_sequence sequence)
@@ -199,14 +197,20 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 		return B_OK;
 
 	SegmentList::Iterator iterator = fList.GetIterator();
+	tcp_sequence lastRemoved = fFirstSequence;
 	net_buffer *buffer = NULL;
 	while ((buffer = iterator.Next()) != NULL && buffer->sequence < sequence) {
+		ASSERT(lastRemoved == buffer->sequence);
+			// This assures that the queue has no holes, and fContiguousBytes
+			// is maintained correctly.
+
 		if (sequence >= buffer->sequence + buffer->size) {
 			// remove this buffer completely
 			iterator.Remove();
 			fNumBytes -= buffer->size;
 
 			fContiguousBytes -= buffer->size;
+			lastRemoved = buffer->sequence + buffer->size;
 			gBufferModule->free(buffer);
 		} else {
 			// remove the header as far as needed
@@ -229,8 +233,7 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 }
 
 
-/*!
-	Clones the requested data in the buffer queue into the provided \a buffer.
+/*!	Clones the requested data in the buffer queue into the provided \a buffer.
 */
 status_t
 BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
@@ -260,8 +263,10 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 
 	if (source == NULL)
 		panic("we should have had that data...");
-	if (source->sequence > sequence)
-		panic("source %p, sequence = %lu (%lu)\n", source, source->sequence, (uint32)sequence);
+	if (source->sequence > sequence) {
+		panic("source %p, sequence = %lu (%lu)\n", source, source->sequence,
+			(uint32)sequence);
+	}
 
 	// clone the data
 
@@ -269,7 +274,8 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 
 	while (source != NULL && bytesLeft > 0) {
 		size_t size = min_c(source->size - offset, bytesLeft);
-		status_t status = gBufferModule->append_cloned(buffer, source, offset, size);
+		status_t status = gBufferModule->append_cloned(buffer, source, offset,
+			size);
 		if (status < B_OK)
 			return status;
 
@@ -282,8 +288,7 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 }
 
 
-/*!
-	Creates a new buffer containing \a bytes bytes from the start of the
+/*!	Creates a new buffer containing \a bytes bytes from the start of the
 	buffer queue. If \a remove is \c true, the data is removed from the
 	queue, if not, the data is cloned from the queue.
 */
@@ -345,16 +350,21 @@ BufferQueue::Get(size_t bytes, bool remove, net_buffer **_buffer)
 		}
 	}
 
-	if (status == B_OK) {
-		*_buffer = buffer;
-		if (remove) {
-			fNumBytes -= bytes;
-			fContiguousBytes -= bytes;
-		}
-	} else
-		gBufferModule->free(buffer);
+	if (remove && buffer->size) {
+		fNumBytes -= buffer->size;
+		fContiguousBytes -= buffer->size;
+	}
 
-	return status;
+	// We always return what we got, or else we would lose data
+	if (status < B_OK && buffer->size == 0) {
+		// We could not remove any bytes from the buffer, so
+		// let this call fail.
+		gBufferModule->free(buffer);
+		return status;
+	}
+
+	*_buffer = buffer;
+	return B_OK;
 }
 
 
