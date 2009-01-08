@@ -28,6 +28,7 @@
  */
 #include <OS.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <MediaDefs.h>
 #include "ac97.h"
 #include "debug.h"

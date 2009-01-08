@@ -56,24 +56,24 @@ auich_ac97_get_mix(void *card, const void *cookie, int32 type, float *values) {
 		case B_MIX_GAIN:
 			value = auich_codec_read(&dev->config, info->reg);
 			//PRINT(("B_MIX_GAIN value : %u\n", value));
-			if(info->type & B_MIX_STEREO) {
+			if (info->type & B_MIX_STEREO) {
 				mask = ((1 << (info->bits + 1)) - 1) << 8;
 				gain = ((value & mask) >> 8) * info->granularity;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					values[0] = info->max_gain - gain;
 				else
 					values[0] = gain - info->min_gain;
 				
 				mask = ((1 << (info->bits + 1)) - 1);
 				gain = (value & mask) * info->granularity;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					values[1] = info->max_gain - gain;
 				else
 					values[1] = gain - info->min_gain;
 			} else {
 				mask = ((1 << (info->bits + 1)) - 1);
 				gain = (value & mask) * info->granularity;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					values[0] = info->max_gain - gain;
 				else
 					values[0] = gain - info->min_gain;
@@ -103,6 +103,7 @@ auich_ac97_get_mix(void *card, const void *cookie, int32 type, float *values) {
 	}
 }
 
+
 static void	
 auich_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 	auich_dev *dev = (auich_dev*)card;
@@ -113,11 +114,11 @@ auich_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 	switch(type) {
 		case B_MIX_GAIN:
 			value = auich_codec_read(&dev->config, info->reg);
-			if(info->type & B_MIX_STEREO) {
+			if (info->type & B_MIX_STEREO) {
 				mask = ((1 << (info->bits + 1)) - 1) << 8;
 				value &= ~mask;
 				
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					gain = info->max_gain - values[0];
 				else
 					gain =  values[0] - info->min_gain;
@@ -125,7 +126,7 @@ auich_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 				
 				mask = ((1 << (info->bits + 1)) - 1);
 				value &= ~mask;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					gain = info->max_gain - values[1];
 				else
 					gain =  values[1] - info->min_gain;
@@ -133,7 +134,7 @@ auich_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 			} else {
 				mask = ((1 << (info->bits + 1)) - 1);
 				value &= ~mask;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					gain = info->max_gain - values[0];
 				else
 					gain =  values[0] - info->min_gain;
@@ -147,7 +148,7 @@ auich_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 			value = auich_codec_read(&dev->config, info->reg);
 			value &= ~mask;
 			value |= ((values[0] == 1.0 ? 1 : 0 ) << 15 & mask);
-			if(info->reg == AC97_SURR_VOLUME) {
+			if (info->reg == AC97_SURR_VOLUME) {
 				// there is a independent mute for each channel
 				mask = ((1 << 1) - 1) << 7;
 				value &= ~mask;
@@ -175,6 +176,7 @@ auich_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 
 }
 
+
 static int32
 auich_create_group_control(multi_dev *multi, int32 *index, int32 parent, 
 	int32 string, const char* name) {
@@ -185,11 +187,12 @@ auich_create_group_control(multi_dev *multi, int32 *index, int32 parent,
 	multi->controls[i].mix_control.flags = B_MULTI_MIX_GROUP;
 	multi->controls[i].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
 	multi->controls[i].mix_control.string = string;
-	if(name)
+	if (name)
 		strcpy(multi->controls[i].mix_control.name, name);
 		
 	return multi->controls[i].mix_control.id;
 }
+
 
 static status_t
 auich_create_controls_list(multi_dev *multi)
@@ -203,14 +206,14 @@ auich_create_controls_list(multi_dev *multi)
 	count = source_info_size;
 	//Note that we ignore first item in source_info
 	//It's for recording, but do match this with ac97.c's source_info
-	for(i=1; i < count ; i++) {
+	for (i=1; i < count ; i++) {
 		info = &source_info[i];
 		PRINT(("name : %s\n", info->name));
 			
 		parent2 = auich_create_group_control(multi, &index, parent, 0, info->name);
 				
-		if(info->type & B_MIX_GAIN) {
-			if(info->type & B_MIX_MUTE) {
+		if (info->type & B_MIX_GAIN) {
+			if (info->type & B_MIX_MUTE) {
 				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 				multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
 				multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
@@ -238,7 +241,7 @@ auich_create_controls_list(multi_dev *multi)
 			id = multi->controls[index].mix_control.id;
 			index++;
 			
-			if(info->type & B_MIX_STEREO) {
+			if (info->type & B_MIX_STEREO) {
 				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 				multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
 				multi->controls[index].mix_control.master = id;
@@ -254,7 +257,7 @@ auich_create_controls_list(multi_dev *multi)
 				index++;
 			}
 			
-			if(info->type & B_MIX_MICBOOST) {
+			if (info->type & B_MIX_MICBOOST) {
 				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 				multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
 				multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
@@ -277,8 +280,8 @@ auich_create_controls_list(multi_dev *multi)
 	
 	parent2 = auich_create_group_control(multi, &index, parent, 0, info->name);
 		
-	if(info->type & B_MIX_GAIN) {
-		if(info->type & B_MIX_MUTE) {
+	if (info->type & B_MIX_GAIN) {
+		if (info->type & B_MIX_MUTE) {
 			multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
 			multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
@@ -306,7 +309,7 @@ auich_create_controls_list(multi_dev *multi)
 		id = multi->controls[index].mix_control.id;
 		index++;
 		
-		if(info->type & B_MIX_STEREO) {
+		if (info->type & B_MIX_STEREO) {
 			multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
 			multi->controls[index].mix_control.master = id;
@@ -322,7 +325,7 @@ auich_create_controls_list(multi_dev *multi)
 			index++;
 		}
 	
-		if(info->type & B_MIX_RECORDMUX) {
+		if (info->type & B_MIX_RECORDMUX) {
 			multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX;
 			multi->controls[index].mix_control.parent = parent2;
@@ -382,37 +385,38 @@ auich_create_controls_list(multi_dev *multi)
 	return B_OK;
 }
 
+
 static status_t 
 auich_get_mix(auich_dev *card, multi_mix_value_info * MMVI)
 {
 	int32 i, id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
+	for (i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
-		if(id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("auich_get_mix : invalid control id requested : %li\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
 	
-		if(control->mix_control.flags & B_MULTI_MIX_GAIN) {
-			if(control->get) {
+		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
+			if (control->get) {
 				float values[2];
 				control->get(card, control->cookie, control->type, values);
-				if(control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
+				if (control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
 					MMVI->values[i].u.gain = values[0];
 				else
 					MMVI->values[i].u.gain = values[1];
 			}			
 		}
 		
-		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
+		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
 			MMVI->values[i].u.enable = (values[0] == 1.0);
 		}
 		
-		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
+		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
 			MMVI->values[i].u.mux = (int32)values[0];
@@ -421,60 +425,61 @@ auich_get_mix(auich_dev *card, multi_mix_value_info * MMVI)
 	return B_OK;
 }
 
+
 static status_t 
 auich_set_mix(auich_dev *card, multi_mix_value_info * MMVI)
 {
 	int32 i, id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
+	for (i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
-		if(id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("auich_set_mix : invalid control id requested : %li\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
 					
-		if(control->mix_control.flags & B_MULTI_MIX_GAIN) {
+		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
-			if(i+1<MMVI->item_count) {
+			if (i+1<MMVI->item_count) {
 				id = MMVI->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
-				if(id < 0 || id >= card->multi.control_count) {
+				if (id < 0 || id >= card->multi.control_count) {
 					PRINT(("auich_set_mix : invalid control id requested : %li\n", id));
 				} else {
 					control2 = &card->multi.controls[id];
-					if(control2->mix_control.master != control->mix_control.id)
+					if (control2->mix_control.master != control->mix_control.id)
 						control2 = NULL;
 				}
 			}
 
-			if(control->set) {
+			if (control->set) {
 				float values[2];
 				values[0] = 0.0;
 				values[1] = 0.0;
 
-				if(control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
+				if (control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
 					values[0] = MMVI->values[i].u.gain;
 				else
 					values[1] = MMVI->values[i].u.gain;
 					
-				if(control2 && control2->mix_control.master != EMU_MULTI_CONTROL_MASTERID)
+				if (control2 && control2->mix_control.master != EMU_MULTI_CONTROL_MASTERID)
 					values[1] = MMVI->values[i+1].u.gain;
 					
 				control->set(card, control->cookie, control->type, values);
 			}
 			
-			if(control2)
+			if (control2)
 				i++;		
 		}
 	
-		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
+		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
 			float values[1];
 			
 			values[0] = MMVI->values[i].u.enable ? 1.0 : 0.0;
 			control->set(card, control->cookie, control->type, values);
 		}
 		
-		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
+		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
 			
 			values[0] = (float)MMVI->values[i].u.mux;
@@ -484,6 +489,7 @@ auich_set_mix(auich_dev *card, multi_mix_value_info * MMVI)
 	return B_OK;
 }
 
+
 static status_t 
 auich_list_mix_controls(auich_dev *card, multi_mix_control_info * MMCI)
 {
@@ -491,12 +497,12 @@ auich_list_mix_controls(auich_dev *card, multi_mix_control_info * MMCI)
 	int32 i;
 	
 	MMC = MMCI->controls;
-	if(MMCI->control_count < 24)
+	if (MMCI->control_count < 24)
 		return B_ERROR;
 			
-	if(auich_create_controls_list(&card->multi) < B_OK)
+	if (auich_create_controls_list(&card->multi) < B_OK)
 		return B_ERROR;
-	for(i=0; i<card->multi.control_count; i++) {
+	for (i=0; i<card->multi.control_count; i++) {
 		MMC[i] = card->multi.controls[i].mix_control;
 	}
 	
@@ -504,11 +510,13 @@ auich_list_mix_controls(auich_dev *card, multi_mix_control_info * MMCI)
 	return B_OK;
 }
 
+
 static status_t 
 auich_list_mix_connections(auich_dev *card, multi_mix_connection_info * data)
 {
 	return B_ERROR;
 }
+
 
 static status_t 
 auich_list_mix_channels(auich_dev *card, multi_mix_channel_info *data)
@@ -567,18 +575,18 @@ auich_create_channels_list(multi_dev *multi)
 	chans = multi->chans;
 	index = 0;
 
-	for(mode=AUICH_USE_PLAY; mode!=-1; 
+	for (mode=AUICH_USE_PLAY; mode!=-1; 
 		mode = (mode == AUICH_USE_PLAY) ? AUICH_USE_RECORD : -1) {
 		LIST_FOREACH(stream, &((auich_dev*)multi->card)->streams, next) {
 			if ((stream->use & mode) == 0)
 				continue;
 				
-			if(stream->channels == 2)
+			if (stream->channels == 2)
 				designations = B_CHANNEL_STEREO_BUS;
 			else
 				designations = B_CHANNEL_SURROUND_BUS;
 			
-			for(i=0; i<stream->channels; i++) {
+			for (i=0; i<stream->channels; i++) {
 				chans[index].channel_id = index;
 				chans[index].kind = (mode == AUICH_USE_PLAY) ? B_MULTI_OUTPUT_CHANNEL : B_MULTI_INPUT_CHANNEL;
 				chans[index].designations = designations | chan_designations[i];
@@ -587,7 +595,7 @@ auich_create_channels_list(multi_dev *multi)
 			}
 		}
 		
-		if(mode==AUICH_USE_PLAY) {
+		if (mode==AUICH_USE_PLAY) {
 			multi->output_channel_count = index;
 		} else {
 			multi->input_channel_count = index - multi->output_channel_count;
@@ -699,6 +707,7 @@ auich_get_description(auich_dev *card, multi_description *data)
 	return B_OK;
 }
 
+
 static status_t 
 auich_get_enabled_channels(auich_dev *card, multi_channel_enable *data)
 {
@@ -716,6 +725,7 @@ auich_get_enabled_channels(auich_dev *card, multi_channel_enable *data)
 	return B_OK;
 }
 
+
 static status_t 
 auich_set_enabled_channels(auich_dev *card, multi_channel_enable *data)
 {
@@ -725,6 +735,7 @@ auich_set_enabled_channels(auich_dev *card, multi_channel_enable *data)
 	PRINT(("set_enabled_channels 3 : %s\n", B_TEST_CHANNEL(data->enable_bits, 3) ? "enabled": "disabled"));
 	return B_OK;
 }
+
 
 static status_t 
 auich_get_global_format(auich_dev *card, multi_format_info *data)
@@ -745,6 +756,7 @@ auich_get_global_format(auich_dev *card, multi_format_info *data)
 	data->input.format = data->output.format = B_FMT_16BIT;
 	return B_OK;
 }
+
 
 static status_t 
 auich_get_buffers(auich_dev *card, multi_buffer_list *data)
@@ -779,11 +791,11 @@ auich_get_buffers(auich_dev *card, multi_buffer_list *data)
 	data->return_playback_buffer_size = current_settings.buffer_frames;		/* frames */
 
 	bufcount = current_settings.buffer_count;
-	if(bufcount > data->request_playback_buffers)
+	if (bufcount > data->request_playback_buffers)
 		bufcount = data->request_playback_buffers;
 
-	for(i=0; i<bufcount; i++)
-		for(j=0; j<pchannels; j++)
+	for (i=0; i<bufcount; i++)
+		for (j=0; j<pchannels; j++)
 			auich_stream_get_nth_buffer(card->pstream, j, i, 
 				&data->playback_buffers[i][j].base,
 				&data->playback_buffers[i][j].stride);
@@ -793,11 +805,11 @@ auich_get_buffers(auich_dev *card, multi_buffer_list *data)
 	data->return_record_buffer_size = current_settings.buffer_frames;	/* frames */
 	
 	bufcount = current_settings.buffer_count;
-	if(bufcount > data->request_record_buffers)
+	if (bufcount > data->request_record_buffers)
 		bufcount = data->request_record_buffers;
 
-	for(i=0; i<bufcount; i++)
-		for(j=0; j<rchannels; j++)
+	for (i=0; i<bufcount; i++)
+		for (j=0; j<rchannels; j++)
 			auich_stream_get_nth_buffer(card->rstream, j, i, 
 				&data->record_buffers[i][j].base,
 				&data->record_buffers[i][j].stride);
@@ -827,6 +839,7 @@ auich_play_inth(void* inthparams)
 		release_sem_etc(stream->card->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
+
 static void
 auich_record_inth(void* inthparams)
 {
@@ -848,11 +861,15 @@ auich_record_inth(void* inthparams)
 		release_sem_etc(stream->card->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
+
 static status_t 
 auich_buffer_exchange(auich_dev *card, multi_buffer_info *data)
 {
 	cpu_status status;
 	auich_stream *pstream, *rstream;
+	bigtime_t played_real_time, recorded_real_time;
+	uint64 played_frames_count, recorded_frames_count;
+	int32 playback_buffer_cycle, record_buffer_cycle, _reserved_0, _reserved_1;
 
 	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD;
 	
@@ -862,7 +879,7 @@ auich_buffer_exchange(auich_dev *card, multi_buffer_info *data)
 	if (!(card->rstream->state & AUICH_STATE_STARTED))
 		auich_stream_start(card->rstream, auich_record_inth, card->rstream);
 	
-	if(acquire_sem_etc(card->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000)
+	if (acquire_sem_etc(card->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000)
 		== B_TIMED_OUT) {
 		LOG(("buffer_exchange timeout ff\n"));
 	}
@@ -873,7 +890,7 @@ auich_buffer_exchange(auich_dev *card, multi_buffer_info *data)
 		if ((pstream->use & AUICH_USE_PLAY) == 0 || 
 			(pstream->state & AUICH_STATE_STARTED) == 0)
 			continue;
-		if(pstream->update_needed)	
+		if (pstream->update_needed)	
 			break;
 	}
 	
@@ -881,33 +898,50 @@ auich_buffer_exchange(auich_dev *card, multi_buffer_info *data)
 		if ((rstream->use & AUICH_USE_RECORD) == 0 ||
 			(rstream->state & AUICH_STATE_STARTED) == 0)
 			continue;
-		if(rstream->update_needed)	
+		if (rstream->update_needed)	
 			break;
 	}
 	
-	if(!pstream)
+	if (!pstream)
 		pstream = card->pstream;
-	if(!rstream)
+	if (!rstream)
 		rstream = card->rstream;
 	
 	/* do playback */
-	data->playback_buffer_cycle = pstream->buffer_cycle;
-	data->played_real_time = pstream->real_time;
-	data->played_frames_count = pstream->frames_count;
-	data->_reserved_0 = pstream->first_channel;
+	playback_buffer_cycle = pstream->buffer_cycle;
+	played_real_time = pstream->real_time;
+	played_frames_count = pstream->frames_count;
+	_reserved_0 = pstream->first_channel;
 	pstream->update_needed = false;
 	
 	/* do record */
-	data->record_buffer_cycle = rstream->buffer_cycle;
-	data->recorded_frames_count = rstream->frames_count;
-	data->recorded_real_time = rstream->real_time;
-	data->_reserved_1 = rstream->first_channel;
+	record_buffer_cycle = rstream->buffer_cycle;
+	recorded_frames_count = rstream->frames_count;
+	recorded_real_time = rstream->real_time;
+	_reserved_1 = rstream->first_channel;
 	rstream->update_needed = false;
 	unlock(status);
-	
+
+#ifdef __HAIKU__
+#define copy_to_user(x, y) if (user_memcpy(&x, &y, sizeof(x)) < B_OK) \
+	return B_BAD_ADDRESS
+#else
+#define copy_to_user(x, y) x = y
+#endif
+
+	copy_to_user(data->playback_buffer_cycle, playback_buffer_cycle);
+	copy_to_user(data->played_real_time, played_real_time);
+	copy_to_user(data->played_frames_count, played_frames_count);
+	copy_to_user(data->_reserved_0, _reserved_0);
+	copy_to_user(data->record_buffer_cycle, record_buffer_cycle);
+	copy_to_user(data->recorded_real_time, recorded_real_time);
+	copy_to_user(data->recorded_frames_count, recorded_frames_count);
+	copy_to_user(data->_reserved_1, _reserved_1);
+		
 	//TRACE(("buffer_exchange ended\n"));
 	return B_OK;
 }
+
 
 static status_t 
 auich_buffer_force_stop(auich_dev *card)
@@ -915,6 +949,7 @@ auich_buffer_force_stop(auich_dev *card)
 	//auich_voice_halt(card->pvoice);
 	return B_OK;
 }
+
 
 static status_t 
 auich_multi_control(void *cookie, uint32 op, void *data, size_t length)
@@ -1009,6 +1044,7 @@ device_hooks multi_hooks = {
 	NULL					/* scatter-gather write to the device */
 };
 
+
 static status_t
 auich_open(const char *name, uint32 flags, void** cookie)
 {
@@ -1024,7 +1060,7 @@ auich_open(const char *name, uint32 flags, void** cookie)
 		}
 	}
 	
-	if(card == NULL) {
+	if (card == NULL) {
 		LOG(("open() card not found %s\n", name));
 		for (ix=0; ix<num_cards; ix++) {
 			LOG(("open() card available %s\n", cards[ix].name)); 
@@ -1034,9 +1070,9 @@ auich_open(const char *name, uint32 flags, void** cookie)
 		
 	LOG(("open() got card\n"));
 	
-	if(card->pstream !=NULL)
+	if (card->pstream !=NULL)
 		return B_ERROR;
-	if(card->rstream !=NULL)
+	if (card->rstream !=NULL)
 		return B_ERROR;
 			
 	*cookie = card;
@@ -1090,6 +1126,7 @@ auich_open(const char *name, uint32 flags, void** cookie)
 	return B_OK;
 }
 
+
 static status_t
 auich_close(void* cookie)
 {
@@ -1098,6 +1135,7 @@ auich_close(void* cookie)
 		
 	return B_OK;
 }
+
 
 static status_t
 auich_free(void* cookie)
@@ -1113,7 +1151,7 @@ auich_free(void* cookie)
 		auich_stream_halt(stream);
 	}
 	
-	while(!LIST_EMPTY(&card->streams)) {
+	while (!LIST_EMPTY(&card->streams)) {
 		auich_stream_delete(LIST_FIRST(&card->streams));
 	}
 
@@ -1123,11 +1161,13 @@ auich_free(void* cookie)
 	return B_OK;
 }
 
+
 static status_t
 auich_control(void* cookie, uint32 op, void* arg, size_t len)
 {
 	return auich_multi_control(cookie, op, arg, len);
 }
+
 
 static status_t
 auich_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
@@ -1136,10 +1176,10 @@ auich_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 	return B_IO_ERROR;
 }
 
+
 static status_t
 auich_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
 	*num_bytes = 0;				/* tell caller nothing was written */
 	return B_IO_ERROR;
 }
-

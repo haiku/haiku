@@ -111,13 +111,15 @@ auich_mem_new(auich_dev *card, size_t size)
 	return mem;
 }
 
+
 static void
 auich_mem_delete(auich_mem *mem)
 {
-	if(mem->area > B_OK)
+	if (mem->area > B_OK)
 		delete_area(mem->area);
 	free(mem);
 }
+
 
 static void *
 auich_mem_alloc(auich_dev *card, size_t size)
@@ -132,6 +134,7 @@ auich_mem_alloc(auich_dev *card, size_t size)
 
 	return mem;
 }
+
 
 static void
 auich_mem_free(auich_dev *card, void *ptr)
@@ -162,7 +165,7 @@ auich_stream_set_audioparms(auich_stream *stream, uint8 channels,
 		(stream->sample_rate == sample_rate))
 		return B_OK;
 	
-	if(stream->buffer)
+	if (stream->buffer)
 		auich_mem_free(stream->card, stream->buffer->log_base);
 		
 	stream->b16 = b16;
@@ -181,6 +184,7 @@ auich_stream_set_audioparms(auich_stream *stream, uint8 channels,
 	return B_OK;
 }
 
+
 status_t
 auich_stream_commit_parms(auich_stream *stream)
 {
@@ -193,20 +197,20 @@ auich_stream_commit_parms(auich_stream *stream)
 
 	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR, CR_RR);
 	for (i = 10000; i>=0; i--) {
-		if(0 == auich_reg_read_8(&stream->card->config, stream->base + AUICH_REG_X_CR)) {
+		if (0 == auich_reg_read_8(&stream->card->config, stream->base + AUICH_REG_X_CR)) {
 			LOG(("channel reset finished, %x, %d\n", stream->base, i));
 			break;
 		}
 		spin(1);
 	}
 	
-	if(i < 0) {
+	if (i < 0) {
 		LOG(("channel reset failed after 10ms\n"));
 	}
 	
 	page = stream->dmaops_log_base;
 	
-	for(i=0; i < AUICH_DMALIST_MAX; i++) {
+	for (i=0; i < AUICH_DMALIST_MAX; i++) {
 		page[2*i] = ((uint32)stream->buffer->phy_base) + 
 			(i % stream->bufcount) * stream->blksize;
 		page[2*i + 1] = AUICH_DMAF_IOC | (stream->blksize 
@@ -217,17 +221,18 @@ auich_stream_commit_parms(auich_stream *stream)
 	auich_reg_write_32(&stream->card->config, stream->base + AUICH_REG_X_BDBAR, 
 		(uint32)stream->dmaops_phy_base);
 		
-	if(stream->use & AUICH_USE_RECORD)
+	if (stream->use & AUICH_USE_RECORD)
 		auich_codec_write(&stream->card->config, AC97_PCM_L_R_ADC_RATE, (uint16)stream->sample_rate);
 	else
 		auich_codec_write(&stream->card->config, AC97_PCM_FRONT_DAC_RATE, (uint16)stream->sample_rate);
 	
-	if(stream->use & AUICH_USE_RECORD)
+	if (stream->use & AUICH_USE_RECORD)
 		LOG(("rate : %d\n", auich_codec_read(&stream->card->config, AC97_PCM_L_R_ADC_RATE)));
 	else
 		LOG(("rate : %d\n", auich_codec_read(&stream->card->config, AC97_PCM_FRONT_DAC_RATE)));
 	return B_OK;
 }
+
 
 status_t
 auich_stream_get_nth_buffer(auich_stream *stream, uint8 chan, uint8 buf, 
@@ -246,6 +251,7 @@ auich_stream_get_nth_buffer(auich_stream *stream, uint8 chan, uint8 buf,
 	return B_OK;
 }
 
+
 static uint8
 auich_stream_curaddr(auich_stream *stream)
 {
@@ -253,6 +259,7 @@ auich_stream_curaddr(auich_stream *stream)
 	TRACE(("stream_curaddr %d\n", index));
 	return index;
 }
+
 
 void
 auich_stream_start(auich_stream *stream, void (*inth) (void *), void *inthparam)
@@ -284,6 +291,7 @@ auich_stream_start(auich_stream *stream, void (*inth) (void *), void *inthparam)
 #endif
 }
 
+
 void
 auich_stream_halt(auich_stream *stream)
 {
@@ -294,6 +302,7 @@ auich_stream_halt(auich_stream *stream)
 	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR, 
 		auich_reg_read_8(&stream->card->config, stream->base + AUICH_REG_X_CR) & ~CR_RPBM);
 }
+
 
 auich_stream *
 auich_stream_new(auich_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
@@ -320,7 +329,7 @@ auich_stream_new(auich_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	stream->trigblk = 0;
 	stream->blkmod = 0;
 	
-	if(use & AUICH_USE_PLAY) {
+	if (use & AUICH_USE_PLAY) {
 		stream->base = AUICH_REG_PO_BASE;
 		stream->sta = STA_POINT;
 	} else {
@@ -350,6 +359,7 @@ auich_stream_new(auich_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	return stream;
 }
 
+
 void
 auich_stream_delete(auich_stream *stream)
 {
@@ -364,14 +374,14 @@ auich_stream_delete(auich_stream *stream)
 
 	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR, CR_RR);
 	for (i = 10000; i>=0; i--) {
-		if(0 == auich_reg_read_8(&stream->card->config, stream->base + AUICH_REG_X_CR)) {
+		if (0 == auich_reg_read_8(&stream->card->config, stream->base + AUICH_REG_X_CR)) {
 			LOG(("channel reset finished, %x, %d\n", stream->base, i));
 			break;
 		}
 		spin(1);
 	}
 	
-	if(i < 0) {
+	if (i < 0) {
 		LOG(("channel reset failed after 10ms\n"));
 	}
 	
@@ -380,7 +390,7 @@ auich_stream_delete(auich_stream *stream)
 	if (stream->dmaops_area > B_OK)
 		delete_area(stream->dmaops_area);
 		
-	if(stream->buffer)
+	if (stream->buffer)
 		auich_mem_free(stream->card, stream->buffer->log_base);
 	
 	status = lock();
@@ -422,7 +432,7 @@ auich_int(void *arg)
 					stream->base + GET_REG_SR(&stream->card->config));
 				sr &= SR_MASK;
 				
-				if(!sr)
+				if (!sr)
 					continue;
 				
 				gotone = true;
@@ -435,7 +445,7 @@ auich_int(void *arg)
 							
 					stream->trigblk = (curblk) % stream->blkmod;
 											
-					if(stream->inth)
+					if (stream->inth)
 						stream->inth(stream->inthparam);
 				} else {
 					TRACE(("interrupt !! sta %x, sr %x\n", sta, sr));
@@ -503,6 +513,7 @@ map_io_memory(device_config *config)
 
 	return B_OK;
 }
+
 
 static status_t 
 unmap_io_memory(device_config *config)
@@ -572,6 +583,7 @@ init_hardware(void)
 	return err;
 }
 
+
 static void
 make_device_names(
 	auich_dev * card)
@@ -596,6 +608,7 @@ auich_init(auich_dev * card)
 	
 	return B_OK;
 }
+
 
 static status_t
 auich_setup(auich_dev * card)
@@ -735,7 +748,7 @@ init_driver(void)
 		return ENOSYS;
 		
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
-		if((info.vendor_id == INTEL_VENDOR_ID &&
+		if ((info.vendor_id == INTEL_VENDOR_ID &&
 			(info.device_id == INTEL_82443MX_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801AA_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801AB_AC97_DEVICE_ID
