@@ -224,7 +224,7 @@ switch $(HAIKU_CPU) {
 		HAIKU_DEFINES += __INTEL__ ;
 		HAIKU_BOOT_PLATFORM = bios_ia32 ;
 		# offset in floppy image (>= sizeof(zbeos))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 270 ; # in kB
+		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
 	}
 	case m68k :
 	{
