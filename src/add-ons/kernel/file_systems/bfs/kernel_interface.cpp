@@ -584,7 +584,8 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 		buffer, bufferLength));
 
 	Volume* volume = (Volume*)_volume->private_volume;
-	Inode* inode = (Inode*)_node->private_node;
+
+	// TODO: Access user buffers safely!
 
 	switch (cmd) {
 		case BFS_IOCTL_VERSION:
@@ -602,8 +603,8 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 
 			status_t status = allocator.StartChecking(control);
 			if (status == B_OK) {
-				inode->Node().flags
-					|= HOST_ENDIAN_TO_BFS_INT32(INODE_CHECK_RUNNING);
+				file_cookie* cookie = (file_cookie*)_cookie;
+				cookie->open_mode |= BFS_OPEN_MODE_CHECKING;
 			}
 
 			return status;
@@ -616,8 +617,8 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 
 			status_t status = allocator.StopChecking(control);
 			if (status == B_OK) {
-				inode->Node().flags
-					&= HOST_ENDIAN_TO_BFS_INT32(~INODE_CHECK_RUNNING);
+				file_cookie* cookie = (file_cookie*)_cookie;
+				cookie->open_mode &= ~BFS_OPEN_MODE_CHECKING;
 			}
 
 			return status;
@@ -1164,7 +1165,7 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 
 	// opening a directory read-only is allowed, although you can't read
 	// any data from it.
-	if (inode->IsDirectory() && openMode & O_RWMASK) {
+	if (inode->IsDirectory() && (openMode & O_RWMASK) != 0) {
 		openMode = openMode & ~O_RWMASK;
 		// TODO: for compatibility reasons, we don't return an error here...
 		// e.g. "copyattr" tries to do that
@@ -1176,22 +1177,13 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
-	// We could actually use the cookie to keep track of:
-	//	- the last block_run
-	//	- the location in the data_stream (indirect, double indirect,
-	//	  position in block_run array)
-	//
-	// This could greatly speed up continuous reads of big files, especially
-	// in the indirect block section.
-
 	file_cookie* cookie = new(std::nothrow) file_cookie;
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	ObjectDeleter<file_cookie> cookieDeleter(cookie);
 
 	// initialize the cookie
-	cookie->open_mode = openMode;
-		// needed by e.g. bfs_write() for O_APPEND
+	cookie->open_mode = openMode & BFS_OPEN_MODE_USER_MASK;
 	cookie->last_size = inode->Size();
 	cookie->last_notification = system_time();
 
@@ -1381,7 +1373,7 @@ bfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 	if (status == B_OK)
 		transaction.Done();
 
-	if ((inode->Flags() & INODE_CHECK_RUNNING) != 0) {
+	if ((cookie->open_mode & BFS_OPEN_MODE_CHECKING) != 0) {
 		// "chkbfs" exited abnormally, so we have to stop it here...
 		FATAL(("check process was aborted!\n"));
 		volume->Allocator().StopChecking(NULL);

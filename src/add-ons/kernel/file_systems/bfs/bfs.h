@@ -223,8 +223,7 @@ enum inode_flags {
 
 	INODE_WAS_WRITTEN		= 0x00020000,
 	// The rest is only used by the file system check functionality
-	INODE_DONT_FREE_SPACE	= 0x00080000,
-	INODE_CHECK_RUNNING		= 0x00200000
+	INODE_DONT_FREE_SPACE	= 0x00080000
 };
 
 //**************************************
@@ -234,6 +233,9 @@ struct file_cookie {
 	off_t	last_size;
 	int		open_mode;
 };
+
+#define BFS_OPEN_MODE_USER_MASK		0x7fffffff
+#define BFS_OPEN_MODE_CHECKING		0x80000000
 
 // notify every second if the file size has changed
 #define INODE_NOTIFICATION_INTERVAL	1000000LL

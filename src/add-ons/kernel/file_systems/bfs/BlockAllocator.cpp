@@ -1189,6 +1189,11 @@ BlockAllocator::StopChecking(check_control* control)
 		put_vnode(fVolume->FSVolume(), fVolume->ToVnode(cookie->current));
 	}
 
+	if (fVolume->IsReadOnly()) {
+		// We can't fix errors on this volume
+		control->flags &= ~BFS_FIX_BITMAP_ERRORS;
+	}
+
 	// if CheckNextNode() could completely work through, we can
 	// fix any damages of the bitmap
 	if (control != NULL && control->status == B_ENTRY_NOT_FOUND) {
