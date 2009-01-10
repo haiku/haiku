@@ -300,7 +300,7 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 			sectorPerCluster = 32;
 		if (size <= (16 * 1024 * 1024 * 1024LL))	// up to 16GB, use 8k clusters
 			sectorPerCluster = 16;
-		if (size <= (8 * 1024 * 1024 * 1024LL))		// up to 8B, use 4k clusters
+		if (size <= (8 * 1024 * 1024 * 1024LL))		// up to 8GB, use 4k clusters
 			sectorPerCluster = 8;
 		if (size <= (532480 * 512LL))				// up to 260 MB, use 0.5k clusters
 			sectorPerCluster = 1;
