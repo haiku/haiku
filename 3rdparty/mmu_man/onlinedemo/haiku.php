@@ -36,11 +36,11 @@ define("VNCPORTBASE", 5900);
 define("SESSION_TIMEOUT", "10m");
 
 // path to qemu binary
-//define("QEMU_BIN", "/usr/bin/qemu");
-define("QEMU_BIN", "/usr/local/bin/qemu");
+define("QEMU_BASE", "/usr/local");
+define("QEMU_BIN", QEMU_BASE . "/bin/qemu");
+define("QEMU_KEYMAPS", QEMU_BASE . "/share/qemu/keymaps");
 // default arguments: no network, emulate tablet, readonly image file.
-define("QEMU_ARGS","-net none -usbdevice wacom-tablet -k en-us -snapshot");
-//define("QEMU_ARGS","-net none -usbdevice wacom-tablet -k fr -snapshot");
+define("QEMU_ARGS","-net none -usbdevice wacom-tablet -snapshot");
 // absolute path to the image.
 define("QEMU_IMAGE_PATH","/home/revol/haiku/trunk/generated.x86/haiku.image");
 // qemu 0.8.2 needs "", qemu 0.9.1 needs ":"
@@ -70,6 +70,7 @@ function onPageUnload() {
 </script>
 <?php
 
+$vnckeymap = "en-us";
 
 // statics
 
@@ -152,15 +153,46 @@ function is_my_session_valid()
 }
 
 
+
+
+function probe_keymap()
+{
+	global $vnckeymap;
+	// if the browser advertised a prefered lang...
+	if (!isset($_SERVER["HTTP_ACCEPT_LANGUAGE"]))
+		return;
+	$langs = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
+	$langs = ereg_replace(";q=[^,]*", "", $langs);
+	$langs = str_replace(" ", "", $langs);
+	$langs = split(",", $langs);
+	//print_r($langs);
+	$keymaps = scandir(QEMU_KEYMAPS);
+	//print_r($keymaps);
+	foreach($langs as $lang)
+	{
+		foreach($keymaps as $keymap)
+		{
+			if ($keymap == $lang)
+			{
+				dbg("Detected keymap '" . $keymap . "' from browser headers.");
+				$vnckeymap = $keymap;
+				return;
+			}
+		}
+	}
+}
+
+
 function start_qemu()
 {
+	global $vnckeymap;
 	$idx = find_qemu_slot();
 	if ($idx < 0) {
 		err("No available qemu slot, please try later.");
 		return $idx;
 	}
 	$pidfile = make_qemu_pidfile_name($idx);
-	$cmd = QEMU_BIN . " " . QEMU_ARGS . " -vnc " . QEMU_VNC_PREFIX . vnc_display() . " -pidfile " . $pidfile . " " . QEMU_IMAGE_PATH;
+	$cmd = QEMU_BIN . " " . QEMU_ARGS . " -k " . $vnckeymap . " -vnc " . QEMU_VNC_PREFIX . vnc_display() . " -pidfile " . $pidfile . " " . QEMU_IMAGE_PATH;
 
 	if (file_exists($pidfile))
 		unlink($pidfile);
@@ -211,12 +243,14 @@ function output_applet_code()
 
 dbg("Checking if session is running...");
 
+
 if (is_my_session_valid()) {
 	dbg("Session running");
 	$qemuidx = qemu_slot();
 } else if ($closing != 1) {
 	dbg("Need to start qemu");
 
+	probe_keymap();
 	$qemuidx = start_qemu();
 }
 
