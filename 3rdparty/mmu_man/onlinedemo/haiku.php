@@ -60,7 +60,8 @@ if (isset($_GET['frame'])) {
 ?>
 <html>
 <head>
-<title>Haiku Test</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Haiku Online Demo</title>
 </head>
 <script>
 function onPageUnload() {
