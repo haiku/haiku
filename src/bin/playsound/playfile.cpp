@@ -24,8 +24,6 @@ volatile bool interrupt = false;
 void
 play_buffer(void *cookie, void * buffer, size_t size, const media_raw_audio_format & format)
 {
-	int32 frame_size = (playFormat.u.raw_audio.format & 0xf) *
-		playFormat.u.raw_audio.channel_count;
 	int64 frames = 0;
 	
 	// Use your feeling, Obi-Wan, and find him you will. 
