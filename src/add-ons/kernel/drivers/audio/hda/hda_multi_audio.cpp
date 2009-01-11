@@ -793,11 +793,8 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	static int debug_buffers_exchanged = 0;
 	cpu_status status;
 	status_t err;
-	bigtime_t played_real_time, recorded_real_time;
-	uint64 played_frames_count, recorded_frames_count;
-	int32 playback_buffer_cycle, record_buffer_cycle;
-
-	// TODO: support recording!
+	multi_buffer_info buffer_info;
+	
 	if (audioGroup->playback_stream == NULL)
 		return B_ERROR;
 
@@ -809,6 +806,13 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 		hda_stream_start(audioGroup->codec->controller,
 			audioGroup->record_stream);
 	}
+
+#ifdef __HAIKU__
+	if (user_memcpy(&buffer_info, data, sizeof(buffer_info)) < B_OK)
+		return B_BAD_ADDRESS;
+#else
+	memcpy(&buffer_info, data, sizeof(buffer_info));
+#endif
 
 	/* do playback */
 	err = acquire_sem_etc(audioGroup->playback_stream->buffer_ready_sem,
@@ -822,36 +826,29 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	status = disable_interrupts();
 	acquire_spinlock(&audioGroup->playback_stream->lock);
 
-	playback_buffer_cycle = audioGroup->playback_stream->buffer_cycle;
-	played_real_time = audioGroup->playback_stream->real_time;
-	played_frames_count = audioGroup->playback_stream->frames_count;
+	buffer_info.playback_buffer_cycle = audioGroup->playback_stream->buffer_cycle;
+	buffer_info.played_real_time = audioGroup->playback_stream->real_time;
+	buffer_info.played_frames_count = audioGroup->playback_stream->frames_count;
 
 	release_spinlock(&audioGroup->playback_stream->lock);
 
 	if (audioGroup->record_stream) {
 		acquire_spinlock(&audioGroup->record_stream->lock);
-		record_buffer_cycle = audioGroup->record_stream->buffer_cycle;
-		recorded_real_time = audioGroup->record_stream->real_time;
-		recorded_frames_count = audioGroup->record_stream->frames_count;
+		buffer_info.record_buffer_cycle = audioGroup->record_stream->buffer_cycle;
+		buffer_info.recorded_real_time = audioGroup->record_stream->real_time;
+		buffer_info.recorded_frames_count = audioGroup->record_stream->frames_count;
 		release_spinlock(&audioGroup->record_stream->lock);
 	}
 
 	restore_interrupts(status);
 
 #ifdef __HAIKU__
-#define copy_to_user(x, y) if (user_memcpy(&x, &y, sizeof(x)) < B_OK) \
-	return B_BAD_ADDRESS
+	if (user_memcpy(data, &buffer_info, sizeof(buffer_info)) < B_OK)
+		return B_BAD_ADDRESS;
 #else
-#define copy_to_user(x, y) x = y
+	memcpy(data, &buffer_info, sizeof(buffer_info));
 #endif
-
-	copy_to_user(data->playback_buffer_cycle, playback_buffer_cycle);
-	copy_to_user(data->played_real_time, played_real_time);
-	copy_to_user(data->played_frames_count, played_frames_count);
-	copy_to_user(data->record_buffer_cycle, record_buffer_cycle);
-	copy_to_user(data->recorded_real_time, recorded_real_time);
-	copy_to_user(data->recorded_frames_count, recorded_frames_count);
-
+	
 	debug_buffers_exchanged++;
 	if (((debug_buffers_exchanged % 100) == 1) && (debug_buffers_exchanged < 1111)) {
 		dprintf("%s: %d buffers processed\n", __func__, debug_buffers_exchanged);

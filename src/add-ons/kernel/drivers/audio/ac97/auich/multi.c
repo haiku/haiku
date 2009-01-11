@@ -867,11 +867,16 @@ auich_buffer_exchange(auich_dev *card, multi_buffer_info *data)
 {
 	cpu_status status;
 	auich_stream *pstream, *rstream;
-	bigtime_t played_real_time, recorded_real_time;
-	uint64 played_frames_count, recorded_frames_count;
-	int32 playback_buffer_cycle, record_buffer_cycle, _reserved_0, _reserved_1;
+	multi_buffer_info buffer_info;
+	
+#ifdef __HAIKU__
+	if (user_memcpy(&buffer_info, data, sizeof(buffer_info)) < B_OK)
+		return B_BAD_ADDRESS;
+#else
+	memcpy(&buffer_info, data, sizeof(buffer_info));
+#endif
 
-	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD;
+	buffer_info.flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD;
 	
 	if (!(card->pstream->state & AUICH_STATE_STARTED))
 		auich_stream_start(card->pstream, auich_play_inth, card->pstream);
@@ -908,35 +913,26 @@ auich_buffer_exchange(auich_dev *card, multi_buffer_info *data)
 		rstream = card->rstream;
 	
 	/* do playback */
-	playback_buffer_cycle = pstream->buffer_cycle;
-	played_real_time = pstream->real_time;
-	played_frames_count = pstream->frames_count;
-	_reserved_0 = pstream->first_channel;
+	buffer_info.playback_buffer_cycle = pstream->buffer_cycle;
+	buffer_info.played_real_time = pstream->real_time;
+	buffer_info.played_frames_count = pstream->frames_count;
+	buffer_info._reserved_0 = pstream->first_channel;
 	pstream->update_needed = false;
 	
 	/* do record */
-	record_buffer_cycle = rstream->buffer_cycle;
-	recorded_frames_count = rstream->frames_count;
-	recorded_real_time = rstream->real_time;
-	_reserved_1 = rstream->first_channel;
+	buffer_info.record_buffer_cycle = rstream->buffer_cycle;
+	buffer_info.recorded_frames_count = rstream->frames_count;
+	buffer_info.recorded_real_time = rstream->real_time;
+	buffer_info._reserved_1 = rstream->first_channel;
 	rstream->update_needed = false;
 	unlock(status);
 
 #ifdef __HAIKU__
-#define copy_to_user(x, y) if (user_memcpy(&x, &y, sizeof(x)) < B_OK) \
-	return B_BAD_ADDRESS
+	if (user_memcpy(data, &buffer_info, sizeof(buffer_info)) < B_OK)
+		return B_BAD_ADDRESS;
 #else
-#define copy_to_user(x, y) x = y
+	memcpy(data, &buffer_info, sizeof(buffer_info));
 #endif
-
-	copy_to_user(data->playback_buffer_cycle, playback_buffer_cycle);
-	copy_to_user(data->played_real_time, played_real_time);
-	copy_to_user(data->played_frames_count, played_frames_count);
-	copy_to_user(data->_reserved_0, _reserved_0);
-	copy_to_user(data->record_buffer_cycle, record_buffer_cycle);
-	copy_to_user(data->recorded_real_time, recorded_real_time);
-	copy_to_user(data->recorded_frames_count, recorded_frames_count);
-	copy_to_user(data->_reserved_1, _reserved_1);
 		
 	//TRACE(("buffer_exchange ended\n"));
 	return B_OK;
