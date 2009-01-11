@@ -5221,6 +5221,8 @@ file_write(struct file_descriptor *descriptor, off_t pos, const void *buffer,
 
 	if (S_ISDIR(vnode->type))
 		return B_IS_A_DIRECTORY;
+	if (!HAS_FS_CALL(vnode, write))
+		return EROFS;
 
 	return FS_CALL(vnode, write, descriptor->cookie, pos, buffer, length);
 }
