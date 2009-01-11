@@ -27,6 +27,8 @@
 #include <DataIO.h>
 #include <OS.h>
 #include <MediaRoster.h>
+#include <ReaderPlugin.h>
+
 #include "RawFormats.h"
 #include "RawDecoderPlugin.h"
 #include "AudioConversion.h"
@@ -466,7 +468,25 @@ RawDecoder::Seek(uint32 seekTo,
 				 bigtime_t seekTime, bigtime_t *time)
 {
 	fChunkSize = 0;
+	
+	TRACE("MP3Decoder::Seek called\n");
+
+	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
+		TRACE("RawDecoder::Seek by time ");
+		TRACE("from frame %Ld and time %Ld TO Required Time %Ld. ", *frame, *time, seekTime);
+
+		*frame = (int64)(*time / (fInputFrameSize * 1000000.0 / fFrameRate));
+	} else if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
+		TRACE("RawDecoder::Seek by Frame ");
+		TRACE("from Current Time %Ld and frame %Ld TO Required Frame %Ld. ", *time, *frame, seekFrame);
+
+		*time = (bigtime_t)(*frame * fInputFrameSize * 1000000.0 / fFrameRate);
+	} else
+		return B_BAD_VALUE;
+
+	TRACE("so new frame is %Ld at time %Ld\n", *frame, *time);
 	fStartTime = *time;
+
 	return B_OK;
 }
 
