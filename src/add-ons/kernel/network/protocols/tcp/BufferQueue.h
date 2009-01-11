@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,10 @@
 #include "tcp.h"
 
 #include <util/DoublyLinkedList.h>
+
+#ifndef DEBUG_BUFFER_QUEUE
+#	define DEBUG_BUFFER_QUEUE 1
+#endif
 
 
 typedef DoublyLinkedList<struct net_buffer,
@@ -50,6 +54,11 @@ public:
 			tcp_sequence	LastSequence() const { return fLastSequence; }
 			tcp_sequence	NextSequence() const
 								{ return fFirstSequence + fContiguousBytes; }
+
+#if DEBUG_BUFFER_QUEUE
+			void			Verify() const;
+			void			Dump() const;
+#endif
 
 private:
 	SegmentList				fList;

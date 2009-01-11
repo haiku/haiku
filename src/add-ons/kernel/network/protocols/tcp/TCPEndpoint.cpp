@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -2254,6 +2254,9 @@ TCPEndpoint::Dump() const
 	kprintf("    max window: %lu\n", fSendMaxWindow);
 	kprintf("    max segment size: %lu\n", fSendMaxSegmentSize);
 	kprintf("    queue: %lu / %lu\n", fSendQueue.Used(), fSendQueue.Size());
+#if DEBUG_BUFFER_QUEUE
+	fSendQueue.Dump();
+#endif
 	kprintf("    last acknowledge sent: %lu\n", (uint32)fLastAcknowledgeSent);
 	kprintf("    initial sequence: %lu\n", (uint32)fInitialSendSequence);
 	kprintf("  receive\n");
@@ -2264,6 +2267,9 @@ TCPEndpoint::Dump() const
 	kprintf("    max segment size: %lu\n", (uint32)fReceiveMaxSegmentSize);
 	kprintf("    queue: %lu / %lu\n", fReceiveQueue.Available(),
 		fReceiveQueue.Size());
+#if DEBUG_BUFFER_QUEUE
+	fReceiveQueue.Dump();
+#endif
 	kprintf("    initial sequence: %lu\n", (uint32)fInitialReceiveSequence);
 	kprintf("    duplicate acknowledge count: %lu\n",
 		fDuplicateAcknowledgeCount);

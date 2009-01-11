@@ -19,6 +19,12 @@
 #	define TRACE(x)
 #endif
 
+#if DEBUG_BUFFER_QUEUE
+#	define VERIFY() Verify();
+#else
+#	define VERIFY() ;
+#endif
+
 
 BufferQueue::BufferQueue(size_t maxBytes)
 	:
@@ -73,13 +79,20 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 	TRACE(("BufferQueue@%p::Add(buffer %p, size %lu, sequence %lu)\n",
 		this, buffer, buffer->size, (uint32)sequence));
 	TRACE(("  in: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-		(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
+		(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes,
+		fContiguousBytes));
+	VERIFY();
 
-	buffer->sequence = sequence;
+	if (tcp_sequence(sequence + buffer->size) <= fFirstSequence) {
+		// This buffer does not contain any data of interest
+		gBufferModule->free(buffer);
+		return;
+	}
 
 	if (fList.IsEmpty() || sequence >= fLastSequence) {
 		// we usually just add the buffer to the end of the queue
 		fList.Add(buffer);
+		buffer->sequence = sequence;
 
 		if (sequence == fLastSequence
 			&& fLastSequence - fFirstSequence == fNumBytes) {
@@ -92,7 +105,9 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		fNumBytes += buffer->size;
 
 		TRACE(("  out0: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-			(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
+			(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes,
+			fContiguousBytes));
+		VERIFY();
 		return;
 	}
 
@@ -130,22 +145,33 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 				buffer = NULL;
 			} else {
 				fList.Remove(previous);
+				fNumBytes -= previous->size;
 				gBufferModule->free(previous);
 			}
-		} else if (tcp_sequence(previous->sequence + previous->size) > sequence) {
+		} else if (tcp_sequence(previous->sequence + previous->size)
+				> sequence + buffer->size) {
+			// We already know this data
+			gBufferModule->free(buffer);
+			buffer = NULL;
+		} else if (tcp_sequence(previous->sequence + previous->size)
+				> sequence) {
+			// We already have the first part of this buffer
 			gBufferModule->remove_header(buffer,
 				previous->sequence + previous->size - sequence);
+			sequence = previous->sequence + previous->size;
 		}
 	}
 
-	if (buffer != NULL && next != NULL
+	while (buffer != NULL && next != NULL
 		&& tcp_sequence(sequence + buffer->size) > next->sequence) {
 		// we already have at least part of this data
-		if (tcp_sequence(next->sequence + next->size) < sequence + buffer->size) {
+		if (tcp_sequence(next->sequence + next->size)
+				< sequence + buffer->size) {
 			net_buffer *remove = next;
 			next = (net_buffer *)next->link.next;
 
 			fList.Remove(remove);
+			fNumBytes -= remove->size;
 			gBufferModule->free(remove);
 		} else {
 			gBufferModule->remove_trailer(buffer,
@@ -155,11 +181,14 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 
 	if (buffer == NULL) {
 		TRACE(("  out1: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-			(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
+			(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes,
+			fContiguousBytes));
+		VERIFY();
 		return;
 	}
 
 	fList.Insert(next, buffer);
+	buffer->sequence = sequence;
 	fNumBytes += buffer->size;
 
 	// we might need to update the number of bytes available
@@ -180,6 +209,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 
 	TRACE(("  out2: first: %lu, last: %lu, num: %lu, cont: %lu\n",
 		(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
+	VERIFY();
 }
 
 
@@ -192,6 +222,7 @@ status_t
 BufferQueue::RemoveUntil(tcp_sequence sequence)
 {
 	TRACE(("BufferQueue@%p::RemoveUntil(sequence %lu)\n", this, (uint32)sequence));
+	VERIFY();
 
 	if (sequence < fFirstSequence)
 		return B_OK;
@@ -229,6 +260,7 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 	else
 		fFirstSequence = fList.Head()->sequence;
 
+	VERIFY();
 	return B_OK;
 }
 
@@ -238,7 +270,9 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 status_t
 BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 {
-	TRACE(("BufferQueue@%p::Get(sequence %lu, bytes %lu)\n", this, (uint32)sequence, bytes));
+	TRACE(("BufferQueue@%p::Get(sequence %lu, bytes %lu)\n", this,
+		(uint32)sequence, bytes));
+	VERIFY();
 
 	if (bytes == 0)
 		return B_OK;
@@ -284,6 +318,7 @@ BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 		source = iterator.Next();
 	}
 
+	VERIFY();
 	return B_OK;
 }
 
@@ -360,10 +395,12 @@ BufferQueue::Get(size_t bytes, bool remove, net_buffer **_buffer)
 		// We could not remove any bytes from the buffer, so
 		// let this call fail.
 		gBufferModule->free(buffer);
+		VERIFY();
 		return status;
 	}
 
 	*_buffer = buffer;
+	VERIFY();
 	return B_OK;
 }
 
@@ -377,6 +414,7 @@ BufferQueue::Available(tcp_sequence sequence) const
 	return fContiguousBytes + fFirstSequence - sequence;
 }
 
+
 void
 BufferQueue::SetPushPointer()
 {
@@ -385,3 +423,55 @@ BufferQueue::SetPushPointer()
 	else
 		fPushPointer = fList.Tail()->sequence + fList.Tail()->size;
 }
+
+#if DEBUG_BUFFER_QUEUE
+
+/*!	Perform a sanity check of the whole queue.
+*/
+void
+BufferQueue::Verify() const
+{
+	ASSERT(Available() == 0 || fList.First() != NULL);
+
+	if (fList.First() == NULL) {
+		ASSERT(fNumBytes == 0);
+		return;
+	}
+
+	SegmentList::ConstIterator iterator = fList.GetIterator();
+	size_t numBytes = 0;
+	size_t contiguousBytes = 0;
+	bool contiguous = true;
+	tcp_sequence last = fFirstSequence;
+
+	while (net_buffer* buffer = iterator.Next()) {
+		if (contiguous && buffer->sequence == last)
+			contiguousBytes += buffer->size;
+		else
+			contiguous = false;
+
+		ASSERT(last <= buffer->sequence);
+		ASSERT(buffer->size > 0);
+
+		numBytes += buffer->size;
+		last = buffer->sequence + buffer->size;
+	}
+
+	ASSERT(last == fLastSequence);
+	ASSERT(contiguousBytes == fContiguousBytes);
+	ASSERT(numBytes == fNumBytes);
+}
+
+
+void
+BufferQueue::Dump() const
+{
+	SegmentList::ConstIterator iterator = fList.GetIterator();
+	int32 number = 0;
+	while (net_buffer* buffer = iterator.Next()) {
+		kprintf("      %ld. buffer %p, sequence %lx, size %lu\n", ++number,
+			buffer, buffer->sequence, buffer->size);
+	}
+}
+
+#endif	// DEBUG_BUFFER_QUEUE
