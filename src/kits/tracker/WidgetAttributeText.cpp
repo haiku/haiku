@@ -1469,7 +1469,7 @@ GenericAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 	// Sort undefined values last, regardless of the other value:
 	if (fValueIsDefined == false || compareTo->fValueIsDefined == false) {
 		return fValueIsDefined < compareTo->fValueIsDefined ?
-			(fValueIsDefined == compareTo->fValueIsDefined ? 0 : -1) : 1;
+			1 : (fValueIsDefined == compareTo->fValueIsDefined ? 0 : -1);
 	}
 
 	switch (fColumn->AttrType()) {
