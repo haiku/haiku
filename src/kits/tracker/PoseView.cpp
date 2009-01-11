@@ -1334,6 +1334,7 @@ BPoseView::AddPosesTask(void *castToParams)
 					// probably more correct.
 					// clean this up
 
+				model->CloseNode();
 				modelChunkIndex++;
 			}
 
@@ -1359,6 +1360,8 @@ BPoseView::AddPosesTask(void *castToParams)
 
 				posesResult = new AddPosesResult;
 				posesResult->fCount = 0;
+
+				snooze(500);	// be nice
 			}
 
 			if (!count)
@@ -1613,6 +1616,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 			continue;
 		}
 
+		model->OpenNode();
 		ASSERT(model->IsNodeOpen());
 		PoseInfo *poseInfo = &poseInfoArray[modelIndex];
 
