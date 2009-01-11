@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT license.
  *
  * Copyright 2001, Dan Sinclair. All rights reserved.
@@ -33,7 +33,8 @@ static const struct error_base {
 	{B_DEVICE_ERROR_BASE, "Device "},
 	{B_ERRORS_END, "Application "},
 };
-static const uint32 kNumErrorBases = sizeof(kErrorBases) / sizeof(struct error_base);
+static const uint32 kNumErrorBases = sizeof(kErrorBases)
+	/ sizeof(struct error_base);
 
 
 static char *
@@ -396,8 +397,8 @@ error_description(int error)
 		case B_NO_TRANSLATOR:
 			return "No translator found";
 		case B_ILLEGAL_DATA:
-			return "";
-		
+			return "Illegal data";
+
 		// Other POSIX Errors
 
 		case ENFILE:
@@ -562,6 +563,6 @@ strerror_r(int error, char *buffer, size_t bufferSize)
 
 	strlcpy(buffer, description, bufferSize);
 	return 0;
-		// ToDo: could return ERANGE if buffer is too small
+		// TODO: could return ERANGE if buffer is too small
 }
 
