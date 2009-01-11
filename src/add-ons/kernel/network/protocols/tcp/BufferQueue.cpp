@@ -83,10 +83,17 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		fContiguousBytes));
 	VERIFY();
 
-	if (tcp_sequence(sequence + buffer->size) <= fFirstSequence) {
+	if (tcp_sequence(sequence + buffer->size) <= fFirstSequence
+		|| buffer->size == 0) {
 		// This buffer does not contain any data of interest
 		gBufferModule->free(buffer);
 		return;
+	}
+	if (sequence < fFirstSequence) {
+		// Remove the stuff we already have
+
+		gBufferModule->remove_header(buffer, fFirstSequence - sequence);
+		sequence = fFirstSequence;
 	}
 
 	if (fList.IsEmpty() || sequence >= fLastSequence) {
@@ -166,7 +173,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		&& tcp_sequence(sequence + buffer->size) > next->sequence) {
 		// we already have at least part of this data
 		if (tcp_sequence(next->sequence + next->size)
-				< sequence + buffer->size) {
+				<= sequence + buffer->size) {
 			net_buffer *remove = next;
 			next = (net_buffer *)next->link.next;
 
@@ -469,7 +476,7 @@ BufferQueue::Dump() const
 	SegmentList::ConstIterator iterator = fList.GetIterator();
 	int32 number = 0;
 	while (net_buffer* buffer = iterator.Next()) {
-		kprintf("      %ld. buffer %p, sequence %lx, size %lu\n", ++number,
+		kprintf("      %ld. buffer %p, sequence %lu, size %lu\n", ++number,
 			buffer, buffer->sequence, buffer->size);
 	}
 }
