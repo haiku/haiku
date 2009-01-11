@@ -318,6 +318,9 @@ OpenWithContainerWindow::MessageReceived(BMessage *message)
 		case kCancelButton:
 			PostMessage(B_QUIT_REQUESTED);
 			return;
+
+		case B_OBSERVER_NOTICE_CHANGE:
+			return;
 	}
 	_inherited::MessageReceived(message);
 }
