@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -741,10 +741,10 @@ StyledEditWindow::QuitRequested()
 
 	if (index == 0)
 		return false;	// "cancel": dont save, dont close the window
-	
+
 	if (index == 1)
 		return true;	// "don't save": just close the window
-	
+
 	if (!fSaveMessage) {
 		SaveAs(new BMessage(SAVE_THEN_QUIT));
 		return false;
@@ -759,7 +759,7 @@ StyledEditWindow::Save(BMessage *message)
 {
 	if (!message)
 		message = fSaveMessage;
-	
+
 	if (!message)
 		return B_ERROR;
 
@@ -771,24 +771,19 @@ StyledEditWindow::Save(BMessage *message)
 
 	BDirectory dir(&dirRef);
 	BEntry entry(&dir, name);
-	
+
 	status_t status = B_ERROR;
 	if (dir.InitCheck() == B_OK && entry.InitCheck() == B_OK) {
 		BFile file(&entry, B_READ_WRITE | B_CREATE_FILE);
 		if (file.InitCheck() == B_OK)
 			status = fTextView->WriteStyledEditFile(&file);
 	}
-	
+
 	if (status != B_OK) {
-		BString alertText;
-		if (status == B_TRANSLATION_ERROR_BASE)
-			alertText.SetTo("Translation error saving \"");
-		else
-			alertText.SetTo("Unknown error saving \"");
+		BString alertText("Error saving \"");
+		alertText << name << "\":\n" << strerror(status);
 
-		alertText << name << "\".";
 		_ShowAlert(alertText, "OK", "", "", B_STOP_ALERT);
-
 		return status;
 	}
 
@@ -1321,14 +1316,14 @@ StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
 	const char* button2 = NULL;
 	if (label2.Length() > 0)
 		button2 = label2.String();
-	
+
 	const char* button3 = NULL;
 	button_spacing spacing = B_EVEN_SPACING;
 	if (label3.Length() > 0) {
 		button3 = label3.String();
 		spacing = B_OFFSET_SPACING;
 	}
-	
+
 	BAlert* alert = new BAlert("Alert", text.String(), label.String(), button2,
 		button3, B_WIDTH_AS_USUAL, spacing, type);
 	alert->SetShortcut(0, B_ESCAPE);
