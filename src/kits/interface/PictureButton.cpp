@@ -1,34 +1,32 @@
 /*
- * Copyright 2001-2005, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Graham MacDonald (macdonag@btopenworld.com)
  */
 
-/**	BPictureButton displays and controls a picture button in a window. */
-
-
 #include <PictureButton.h>
 
 #include <binary_compatibility/Interface.h>
 
+#include <new>
 
-BPictureButton::BPictureButton(BRect frame, const char* name, 
-		BPicture *off, BPicture *on, BMessage *message, 
+
+BPictureButton::BPictureButton(BRect frame, const char* name,
+		BPicture* off, BPicture* on, BMessage* message,
 		uint32 behavior, uint32 resizeMask, uint32 flags)
 	: BControl(frame, name, "", message, resizeMask, flags),
-	fDisabledOff(NULL),
-	fDisabledOn(NULL),
-	fOutlined(false),
-	fBehavior(behavior)
+	  fDisabledOff(NULL),
+	  fDisabledOn(NULL),
+	  fBehavior(behavior)
 {
-	fEnabledOff = new BPicture(*off);
-	fEnabledOn = new BPicture(*on);
+	fEnabledOff = new (std::nothrow)BPicture(*off);
+	fEnabledOn = new (std::nothrow) BPicture(*on);
 }
 
 
-BPictureButton::BPictureButton(BMessage *data)
+BPictureButton::BPictureButton(BMessage* data)
 	: BControl(data),
 	fEnabledOff(NULL),
 	fEnabledOn(NULL),
@@ -38,21 +36,21 @@ BPictureButton::BPictureButton(BMessage *data)
 	BMessage pictureArchive;
 
 	// Default to 1 state button if not here - is this valid?
-	if (data->FindInt32 ("_behave", (int32 *)&fBehavior) != B_OK)
+	if (data->FindInt32 ("_behave", (int32* )&fBehavior) != B_OK)
 		fBehavior = B_ONE_STATE_BUTTON;
 
 	// Now expand the pictures:
 	if (data->FindMessage("_e_on", &pictureArchive) == B_OK)
-		fEnabledOn = new BPicture(&pictureArchive);
+		fEnabledOn = new (std::nothrow) BPicture(&pictureArchive);
 
 	if (data->FindMessage("_e_off", &pictureArchive) == B_OK)
-		fEnabledOff = new BPicture(&pictureArchive);
+		fEnabledOff = new (std::nothrow) BPicture(&pictureArchive);
 
 	if (data->FindMessage("_d_on", &pictureArchive) == B_OK)
-		fDisabledOn = new BPicture(&pictureArchive);
+		fDisabledOn = new (std::nothrow) BPicture(&pictureArchive);
 
 	if (data->FindMessage("_d_off", &pictureArchive) == B_OK)
-		fDisabledOff = new BPicture(&pictureArchive);
+		fDisabledOff = new (std::nothrow) BPicture(&pictureArchive);
 }
 
 
@@ -65,18 +63,18 @@ BPictureButton::~BPictureButton()
 }
 
 
-BArchivable *
-BPictureButton::Instantiate(BMessage *data)
+BArchivable*
+BPictureButton::Instantiate(BMessage* data)
 {
 	if ( validate_instantiation(data, "BPictureButton"))
-		return new BPictureButton(data);
+		return new (std::nothrow) BPictureButton(data);
 
 	return NULL;
 }
 
 
 status_t
-BPictureButton::Archive(BMessage *data, bool deep) const
+BPictureButton::Archive(BMessage* data, bool deep) const
 {
 	status_t err = BControl::Archive(data, deep);
 	if (err != B_OK)
@@ -118,22 +116,17 @@ BPictureButton::Archive(BMessage *data, bool deep) const
 void
 BPictureButton::Draw(BRect updateRect)
 {
-	BRect rect = Bounds();
-
-	// We should request the view's base color which normaly is (216,216,216)
-	rgb_color color = ui_color(B_PANEL_BACKGROUND_COLOR);
-
 	if (IsEnabled()) {
 		if (Value() == B_CONTROL_ON)
 			DrawPicture(fEnabledOn);
 		else
 			DrawPicture(fEnabledOff);
 	} else {
-		
+
 		if (fDisabledOff == NULL
 			|| (fDisabledOn == NULL && fBehavior == B_TWO_STATE_BUTTON))
 			debugger("Need to set the 'disabled' pictures for this BPictureButton ");
-		
+
 		if (Value() == B_CONTROL_ON)
 			DrawPicture(fDisabledOn);
 		else
@@ -142,7 +135,7 @@ BPictureButton::Draw(BRect updateRect)
 
 	if (IsFocus()) {
 		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		StrokeRect(rect, B_SOLID_HIGH);
+		StrokeRect(Bounds(), B_SOLID_HIGH);
 	}
 }
 
@@ -190,7 +183,7 @@ BPictureButton::MouseUp(BPoint point)
 
 
 void
-BPictureButton::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
+BPictureButton::MouseMoved(BPoint point, uint32 transit, const BMessage* msg)
 {
 	if (IsEnabled() && IsTracking()) {
 		if (transit == B_EXITED_VIEW)
@@ -203,7 +196,7 @@ BPictureButton::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 
 
 void
-BPictureButton::KeyDown(const char *bytes, int32 numBytes)
+BPictureButton::KeyDown(const char* bytes, int32 numBytes)
 {
 	if (numBytes == 1) {
 		switch (bytes[0]) {
@@ -229,59 +222,59 @@ BPictureButton::KeyDown(const char *bytes, int32 numBytes)
 
 
 void
-BPictureButton::SetEnabledOn(BPicture *on)
+BPictureButton::SetEnabledOn(BPicture* on)
 {
 	delete fEnabledOn;
-	fEnabledOn = new BPicture(*on);
+	fEnabledOn = new (std::nothrow) BPicture(*on);
 }
 
 
 void
-BPictureButton::SetEnabledOff(BPicture *off)
+BPictureButton::SetEnabledOff(BPicture* off)
 {
 	delete fEnabledOff;
-	fEnabledOff = new BPicture(*off);
+	fEnabledOff = new (std::nothrow) BPicture(*off);
 }
 
 
 void
-BPictureButton::SetDisabledOn(BPicture *on)
+BPictureButton::SetDisabledOn(BPicture* on)
 {
 	delete fDisabledOn;
-	fDisabledOn = new BPicture(*on);
+	fDisabledOn = new (std::nothrow) BPicture(*on);
 }
 
 
 void
-BPictureButton::SetDisabledOff(BPicture *off)
+BPictureButton::SetDisabledOff(BPicture* off)
 {
 	delete fDisabledOff;
-	fDisabledOff = new BPicture(*off);
+	fDisabledOff = new (std::nothrow) BPicture(*off);
 }
 
 
-BPicture *
+BPicture*
 BPictureButton::EnabledOn() const
 {
 	return fEnabledOn;
 }
 
 
-BPicture *
+BPicture*
 BPictureButton::EnabledOff() const
 {
 	return fEnabledOff;
 }
 
 
-BPicture *
+BPicture*
 BPictureButton::DisabledOn() const
 {
 	return fDisabledOn;
 }
 
 
-BPicture *
+BPicture*
 BPictureButton::DisabledOff() const
 {
 	return fDisabledOff;
@@ -303,7 +296,7 @@ BPictureButton::Behavior() const
 
 
 void
-BPictureButton::MessageReceived(BMessage *msg)
+BPictureButton::MessageReceived(BMessage* msg)
 {
 	BControl::MessageReceived(msg);
 }
@@ -338,7 +331,7 @@ BPictureButton::SetValue(int32 value)
 
 
 status_t
-BPictureButton::Invoke(BMessage *msg)
+BPictureButton::Invoke(BMessage* msg)
 {
 	return BControl::Invoke(msg);
 }
@@ -358,16 +351,16 @@ BPictureButton::FrameResized(float newWidth, float newHeight)
 }
 
 
-BHandler *
-BPictureButton::ResolveSpecifier(BMessage *msg, int32 index,
-	BMessage *specifier, int32 form, const char *property)
+BHandler*
+BPictureButton::ResolveSpecifier(BMessage* msg, int32 index,
+	BMessage* specifier, int32 form, const char* property)
 {
 	return BControl::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 
 status_t
-BPictureButton::GetSupportedSuites(BMessage *data)
+BPictureButton::GetSupportedSuites(BMessage* data)
 {
 	return BControl::GetSupportedSuites(data);
 }
@@ -383,7 +376,6 @@ BPictureButton::ResizeToPreferred()
 void
 BPictureButton::GetPreferredSize(float* _width, float* _height)
 {
-	// Need to do some test to see what the Be method returns...
 	BControl::GetPreferredSize(_width, _height);
 }
 
@@ -470,7 +462,7 @@ void BPictureButton::_ReservedPictureButton2() {}
 void BPictureButton::_ReservedPictureButton3() {}
 
 
-BPictureButton &
+BPictureButton&
 BPictureButton::operator=(const BPictureButton &button)
 {
 	return *this;
@@ -478,13 +470,13 @@ BPictureButton::operator=(const BPictureButton &button)
 
 
 void
-BPictureButton::Redraw()
+BPictureButton::_Redraw()
 {
 }
 
 
 void
-BPictureButton::InitData()
+BPictureButton::_InitData()
 {
 }
 
