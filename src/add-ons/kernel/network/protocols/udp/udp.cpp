@@ -34,7 +34,7 @@
 // NOTE the locking protocol dictates that we must hold UdpDomainSupport's
 //      lock before holding a child UdpEndpoint's lock. This restriction
 //      is dictated by the receive path as blind access to the endpoint
-//      hash is required when holding the DomainSuppport's lock.
+//      hash is required when holding the DomainSupport's lock.
 
 
 //#define TRACE_UDP
