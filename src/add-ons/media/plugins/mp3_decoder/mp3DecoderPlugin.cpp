@@ -27,6 +27,8 @@
 #include <Locker.h>
 #include <MediaFormats.h>
 #include <MediaRoster.h>
+#include <ReaderPlugin.h>
+
 #include "mp3DecoderPlugin.h"
 
 //#define TRACE_MP3_DECODER
@@ -184,6 +186,24 @@ mp3Decoder::Seek(uint32 seekTo,
 				 bigtime_t seekTime, bigtime_t *time)
 {
 	fNeedSync = true;
+	
+	TRACE("MP3Decoder::Seek called\n");
+
+	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
+		TRACE("MP3Decoder::Seek by time ");
+		TRACE("from frame %Ld and time %Ld TO Required Time %Ld. ", *frame, *time, seekTime);
+
+		*frame = (int64)(*time / (fFrameSize * 1000000.0 / fFrameRate));
+	} else if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
+		TRACE("MP3Decoder::Seek by Frame ");
+		TRACE("from Current Time %Ld and frame %Ld TO Required Frame %Ld. ", *time, *frame, seekFrame);
+
+		*time = (bigtime_t)(*frame * fFrameSize * 1000000.0 / fFrameRate);
+	} else
+		return B_BAD_VALUE;
+
+	TRACE("so new frame is %Ld at time %Ld\n", *frame, *time);
+
 	return B_OK;
 }
 
