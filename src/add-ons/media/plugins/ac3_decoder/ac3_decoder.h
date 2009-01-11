@@ -72,7 +72,7 @@ private:
 	int 		fFlags;
 	int			fFrameRate;
 	int			fBitRate;
-	
+	int			fFrameSize;
 	int			fChannelCount;
 	int			fChannelMask;
 	int			*fInterleaveOffset;

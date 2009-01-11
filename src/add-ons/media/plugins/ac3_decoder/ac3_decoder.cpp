@@ -16,6 +16,9 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdio.h>
+
+#include <ReaderPlugin.h>
+
 #include "ac3_decoder.h"
 
 
@@ -194,6 +197,8 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	ioDecodedFormat->u.raw_audio.buffer_size = 6 * 256 * fChannelCount * sizeof(float);
 	ioDecodedFormat->u.raw_audio.channel_mask = fChannelMask;
 	
+	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * ioDecodedFormat->u.raw_audio.channel_count;
+	
 	return B_OK;
 }
 
@@ -205,6 +210,24 @@ AC3Decoder::Seek(uint32 seekTo,
 {
 	fInputChunkSize = 0;
 	fInputBufferSize = 0;
+	
+	TRACE("AC3Decoder::Seek called\n");
+
+	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
+		TRACE("AC3Decoder::Seek by time ");
+		TRACE("from frame %Ld and time %Ld TO Required Time %Ld. ", *frame, *time, seekTime);
+
+		*frame = (int64)(*time / (fFrameSize * 1000000.0 / fFrameRate));
+	} else if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
+		TRACE("AC3Decoder::Seek by Frame ");
+		TRACE("from Current Time %Ld and frame %Ld TO Required Frame %Ld. ", *time, *frame, seekFrame);
+
+		*time = (bigtime_t)(*frame * fFrameSize * 1000000.0 / fFrameRate);
+	} else
+		return B_BAD_VALUE;
+
+	TRACE("so new frame is %Ld at time %Ld\n", *frame, *time);
+
 	return B_OK;
 }
 
