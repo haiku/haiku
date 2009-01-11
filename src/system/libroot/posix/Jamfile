@@ -19,6 +19,7 @@ MergeObject posix_main.o :
  	fnmatch.c
  	glob.c
  	inttypes.c
+	libgen.cpp
  	poll.c
  	$(PWD_BACKEND)
  	scheduler.cpp
