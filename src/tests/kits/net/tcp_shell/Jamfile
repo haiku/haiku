@@ -29,6 +29,20 @@ SimpleTest tcp_shell :
 	: be libkernelland_emu.so
 ;
 
+SimpleTest BufferQueueTest :
+	BufferQueueTest.cpp
+
+	# stack
+	ancillary_data.cpp
+	net_buffer.cpp
+	utility.cpp
+
+	# tcp
+	BufferQueue.cpp
+
+	: be libkernelland_emu.so
+;
+
 SEARCH on [ FGristFiles 
 		tcp.cpp TCPEndpoint.cpp BufferQueue.cpp EndpointManager.cpp
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
