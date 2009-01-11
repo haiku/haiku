@@ -8493,7 +8493,7 @@ BPoseView::ResizeColumnToWidest(BColumn *column)
 {
 	ASSERT(ViewMode() == kListMode);
 
-	float maxWidth = 0;
+	float maxWidth = kMinColumnWidth;
 
 	int32 count = fPoseList->CountItems();
 	for (int32 i = 0; i < count; ++i) {
@@ -8505,7 +8505,7 @@ BPoseView::ResizeColumnToWidest(BColumn *column)
 		}
 	}
 
-	if (maxWidth > 0) {
+	if (maxWidth > kMinColumnWidth || maxWidth < column->Width()) {
 		ResizeColumn(column, maxWidth);
 		return true;
 	}
