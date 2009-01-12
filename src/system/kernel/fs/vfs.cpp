@@ -8443,15 +8443,23 @@ _user_fsync(int fd)
 
 
 status_t
-_user_flock(int fd, int op)
+_user_flock(int fd, int operation)
 {
+	FUNCTION(("_user_fcntl(fd = %d, op = %d)\n", fd, operation));
+
+	// Check if the operation is valid
+	switch (operation & ~LOCK_NB) {
+		case LOCK_UN:
+		case LOCK_SH:
+		case LOCK_EX:
+			break;
+		
+		default:
+			return B_BAD_VALUE;
+	}
+
 	struct file_descriptor *descriptor;
 	struct vnode *vnode;
-	struct flock flock;
-	status_t status;
-
-	FUNCTION(("_user_fcntl(fd = %d, op = %d)\n", fd, op));
-
 	descriptor = get_fd_and_vnode(fd, &vnode, false);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
@@ -8461,17 +8469,19 @@ _user_flock(int fd, int op)
 		return B_BAD_VALUE;
 	}
 
+	struct flock flock;
 	flock.l_start = 0;
 	flock.l_len = OFF_MAX;
 	flock.l_whence = 0;
-	flock.l_type = (op & LOCK_SH) != 0 ? F_RDLCK : F_WRLCK;
+	flock.l_type = (operation & LOCK_SH) != 0 ? F_RDLCK : F_WRLCK;
 
-	if ((op & LOCK_UN) != 0)
+	status_t status;
+	if ((operation & LOCK_UN) != 0)
 		status = release_advisory_lock(vnode, &flock);
 	else {
 		status = acquire_advisory_lock(vnode,
 			thread_get_current_thread()->team->session_id, &flock,
-			(op & LOCK_NB) == 0);
+			(operation & LOCK_NB) == 0);
 	}
 
 	syscall_restart_handle_post(status);
