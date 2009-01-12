@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"../../html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"> 
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Whoever wrote http://dev.haiku-os.org/wiki (Niels Reedijk?)
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="all" />
+	<title>Reporting bugs</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div class="logo">
+	<img src="../images/logo.png" alt="logo" width="372" height="86" />
+	<div class="title">Reporting bugs</div>
+</div>
+<div class="topnav">
+	<p><a href="../welcome.html">Welcome</a></p>
+</div>
+
+<div class="content">
+
+<h2>Reporting bugs</h2>
+<p>Since our developers are unable to test every hardware combination, nor every different way of interacting with the operating system, we are relying on you to give us some input on how things work at your end. Since this is a very early product, it is very likely that you will encounter bugs. We thank you for taking the time to report these.<br /><br />
+Please follow these guidelines to create helpful bug reports:</p>
+<ol>
+<li><p>Before reporting a bug please <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=~text+you+want+to+search+for&amp;order=priority">make sure</a> that it does not yet exist. You can also use the <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">search</a> function for this.</p></li>
+<li><p>After you have established this is a unique bug, make your information as accurate as possible:
+<ul>
+<li><p>Include basic information such as how you are testing Haiku (on real hardware, on VMWare, on QEMU, etc.).</p></li>
+<li><p>Mention which revision from <acronym title="Subversion, the source code management system we use">SVN</acronym> you are running. You can find this information in '<i>About This System...</i>' from the Deskbar menu.</p></li>
+<li><p>Describe the problem you are experiencing. Try to be as accurate as you can: describe the actual behavior, and the behavior you expected.</p></li>
+<li><p>Describe what steps you need to perform in order to expose the bug. This will help developers reproduce the bug.</p></li>
+<li><p>Attach as much information as you have. If it is a GUI bug, or a bug in one of the applications, try to make a screen shot (the <tt>PRINT</tt> key files a <acronym title="Portable Network Graphics image format">PNG</acronym> into <tt>/boot/home/</tt>).</p>
+<p>If it is a hardware problem, include a copy of the <tt>syslog</tt> file (just query for "<tt>syslog</tt>" to find it).</p>
+<p>Also interesting when dealing with hardware issues, is the output of <tt>listdev</tt> and <tt>sysinfo</tt>. This will pipe the output into text files that you can attach to your bugreport or email:</p>
+<pre class="terminal">listdev > listdev-output.txt
+sysinfo > sysinfo-output.txt</pre></li>
+<li><p>When an application crashed, you should invoke the debugger from the alert that pops up. Entering "<tt>bt</tt>" into the launched debug Terminal, you create a "backtrace" that you should copy into your bugreport.</p></li>
+</ul></li>
+<li><p>After the bug has been reported, a developer will look at your bug and try to classify it. Remember, we are all volunteers, and as such, sometimes a bug report might go unanswered for a while. Adding new information when it becomes available usually helps getting a bug picked up quicker, but do not try to 'bump' the bug up by adding non-descriptive comments.</p></li>
+<li><p>Remember, reporting a bug is not something you spend a little time on and then you are done. If you reported a bug, then you are part of the Haiku development process. Developers might come up with questions while they are trying to fix your bug. Please stay around to answer these. Consider your participation 'done' when the bug is marked as 'fixed'. Together we can improve Haiku, bit by bit.</p></li>
+</ol>
+
+</div>
+
+<div class="bottomnav">
+	<p><a href="../welcome.html">Welcome</a></p>
+</div>
+
+</body>
+</html>

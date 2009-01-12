@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"../../../../html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>ScreenSaver</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div class="logo">
+	<img src="../../images/logo.png" alt="logo" width="372" height="86" />
+	<div class="title">ScreenSaver</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="../preferences.html">Preferences</a>
+		&#160;&#160;&#160;
+		Previous: <a href="prefs-screen.html">Screen</a>
+		&#160;&#160;&#160;
+		Next: <a href="prefs-sounds.html">Sounds</a>
+	</p>
+</div>
+
+<div class="content">
+<h1><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png"
+width="64" height="64" />ScreenSaver</h1>
+<p><table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Preferences</i></td></tr>
+<tr><td>Location:</td><td></td><td><tt>/boot/beos/preferences/Screensaver</tt></td></tr>
+<tr><td>Settings:</td><td></td><td><tt>~/config/settings/ScreenSaver_settings</tt></td></tr>
+</table>
+</p>
+<p>The panel of the ScreenSaver preferences is split into two tabs:
+</p>
+
+<h2><a name="fade">Fade</a></h2>
+<img src="../../images/prefs-images/screensaver-fade.png" alt="screensaver-fade.png" width="457" height="357">
+<br />
+<p>The top checkbox enables/disables the screen saver.<br />
+With the slider below it, you control after how long an idle time the screen saver kicks in.
+</p>
+<p>The next two sliders are only usable after you activated their checkboxes:<br />
+One slider determines after how many minutes the screen is powered off.<br />
+The other, after how many minutes you need a password to unlock your machine.
+</p>
+<p>By clicking into different corners of the two screens at the bottom, you tell the system when to immediately start the screen saver or when to prevent it from kicking in when you rest the mouse in the indicated corner. Click in the middle of the screens to disable that feature again.
+</p>
+
+<h2><a name="modules">Modules</a></h2>
+<img src="../../images/prefs-images/screensaver-modules.png" alt="screensaver-modules.png" width="473" height="357">
+<br />
+<p>The second tab shows a list of all installed screen saver modules and their individual settings. You can test your settings with the <i>Test</i> button below the list and add modules with the <i>Add...</i> button beside it. Other ways to install new screen savers is by a simple drag&amp;drop into the list. Of course, you can also copy/delete a module's file in its respective user folder, i.e. <tt>/boot/common/add-ons/screensavers/</tt> or <tt>/boot/home/config/add-ons/screensavers/</tt> (see topic <a href="../filesystem-layout.html">Filesystem layout</a>).
+</p>
+
+</div>
+
+<div class="bottomnav">
+	<p>
+		<a href="../preferences.html">Preferences</a>
+		&#160;&#160;&#160;
+		Previous: <a href="prefs-screen.html">Screen</a>
+		&#160;&#160;&#160;
+		Next: <a href="prefs-sounds.html">Sounds</a>
+	</p>
+</div>
+
+</body>
+</html>

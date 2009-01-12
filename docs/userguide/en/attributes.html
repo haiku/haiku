@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"../../html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Attributes</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div class="logo">
+	<img src="../images/logo.png" alt="logo" width="372" height="86" />
+	<div class="title">Attributes</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="contents.html">Contents</a>
+		&#160;&#160;&#160;
+		Previous: <a href="filetypes.html">Filetypes</a>
+		&#160;&#160;&#160;
+		Next: <a href="index.html">Index</a>
+	</p>
+</div>
+
+<div class="content">
+
+<p>Attributes are data fields that belong to a file but aren't part of that file, e.g. they are not computed into the file size and can be copied or changed without touching the file itself. The system uses these attributes to store e.g. file size, file type or date of the last modification. This is similar to other operating systems and their filesystems.</p>
+<p>What's different is that you can add any kind of attribute to any file and display it or make it editable in a Tracker window. You just have to define the kind of attribute you want to add to a file type (e.g. string, integer or time) and give it a name and description.</p>
+<p>The file itself doesn't even need any contents at all. Take a look at these People files for example:</p>
+<img src="../images/attributes-images/people.png" alt="people.png" width="841" height="250" />
+<br />
+<p>As you can see, these are all 0-sized files with attached attributes, the E-mail attribute of "John Nox" being edited right in Tracker.</p>
+<p>If you index these attributes, as People, Email or audio files are by default, they are also searchable with Haiku's fast query system.</p>
+
+<h2><a id="attributes-tracker" name="attributes-tracker">Attributes in Tracker</a></h2>
+<p>Attributes are displayed quite similar to a database or spreadsheet. Using Tracker you can choose which attributes to display (columns) and sort file listings (rows) accordingly.</p>
+<p>To do this, open a Tracker window, click on the <i>Attributes</i> menu, and select the attributes you want to display. Alternatively, simply right-click onto a column heading and mark the items in the context menu. You can rearrange the columns by a simple drag&amp;drop of the column heading. Moving a column out of a window, is a fast way to get rid of columns you don't need.</p>
+<p>Double-click on the line between two attributes in the heading to automatically resize a column to its optimal width.</p>
+<p>Click on a column heading to toggle the sorting order from ascending to descending. You can establish a secondary sort order by pressing the <tt>SHIFT</tt> key while clicking on a column heading. Doing that you can, for example, sort your People files by company and within that order sort by contact name. See the above screenshot as an example. The secondary sort order is marked by a dotted line under the heading.</p>
+<p>Editing these attributes is as simple as renaming a file: Either click on an entry or press <tt>ALT+E</tt> and move between the attibutes with <tt>TAB</tt> and <tt>SHIFT+TAB</tt>. <tt>ESC</tt> leaves the editing mode without applying the changes.</p>
+
+<h2><a id="attributes-terminal" name="attributes-terminal">Attributes in Terminal</a></h2>
+<p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal:</p>
+<ul><li><b>listattr</b> - lists a file's attributes, but doesn't show the contents of the attributes.<br />
+<pre>usage: listattr 'filename' ['filename' ...]</pre>
+<p>From our screenshot example above:</p>
+<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+File: Clara Botters
+   Type         Size                 Name
+-----------  ---------  -------------------------------
+MIME String         21  &quot;BEOS:TYPE&quot;
+        Text         14  &quot;META:name&quot;
+        Text          6  &quot;META:nickname&quot;
+        Text          1  &quot;META:company&quot;
+
+        Text         18  &quot;META:address&quot;
+        Text          8  &quot;META:city&quot;
+        Text          1  &quot;META:state&quot;
+        Text          1  &quot;META:zip&quot;
+        Text          1  &quot;META:country&quot;
+
+        Text          1  &quot;META:hphone&quot;
+        Text         13  &quot;META:wphone&quot;
+        Text          1  &quot;META:fax&quot;
+        Text         19  &quot;META:email&quot;
+        Text          1  &quot;META:url&quot;
+
+        Text          5  &quot;META:group&quot;
+    Raw Data         20  &quot;_trk/pinfo_le&quot;
+ 
+131 bytes total in attributes.</pre>
+<p>Besides all the "<tt>META:*</tt>" attributes that hold the contact's information, there are two attributes that are managed by the system:</p>
+<ul>
+<li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>. It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
+<li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
+<p>Note the backslash after "Clara". In Terminal you have to "escape" special characters like '"*\$?!. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</p></li>
+</ul>
+<p><br /></p>
+<ul><li><b>catattr</b> - displays the contents of a specific attribute of a file.
+<pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
+<p>Again our example:</p>
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+Clara Botters&#160;: string&#160;: Whelton</pre></li>
+</ul>
+<p><br /></p>
+<ul><li><b>addattr</b> - adds an attribute to a file and/or fills it with a value.
+<pre>usage: addattr [-t type] attr value file1 [file2...]
+    or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
+ 
+         Type is one of:
+                 string, mime, int, llong, float, double, bool, raw
+                 or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
+         The default is &quot;string&quot;</pre>
+<p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre></li>
+</ul>
+<p><br /></p>
+<ul><li><b>rmattr</b> - completely removes an attribute from a file.
+
+<pre>usage: rmattr [-p] attr filename1 [filename2...]
+         'attr' is the name of an attribute of the file
+         If '-p' is specified, 'attr' is regarded as a pattern.</pre>
+<p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre></li></ul>
+<p><br /></p>
+<ul><li><b>copyattr</b> - copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.
+<pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
+
+If you do want to copy the attributes plus the data of the file itself, you can add the option "<tt>-d</tt>" or "<tt>--data</tt>".</li>
+</ul>
+<p><br /></p>
+<p>More information on these commands and their options can be found by typing the command name followed by "<tt>-h</tt>" or "<tt>--help</tt>".</p>
+
+</div>
+
+<div class="bottomnav">
+	<p>
+		<a href="contents.html">Contents</a>
+		&#160;&#160;&#160;
+		Previous: <a href="filetypes.html">Filetypes</a>
+		&#160;&#160;&#160;
+		Next: <a href="index.html">Index</a>
+	</p>
+</div>
+
+</body>
+</html>
+

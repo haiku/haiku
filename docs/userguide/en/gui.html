@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"../../html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Haiku's GUI</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div class="logo">
+	<img src="../images/logo.png" alt="logo" width="372" height="86" />
+	<div class="title">Haiku's GUI</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="contents.html">Contents</a>
+		&#160;&#160;&#160;
+		Previous: <a href="filesystem-layout.html">Filesystem layout</a>
+		&#160;&#160;&#160;
+		Next: <a href="workspaces.html">Workspaces</a>
+	</p>
+</div>
+
+<div class="content">
+
+<p>Haiku's graphical user interface is an integral part of the system. Unlike Unix-based operating systems, there's no separate window manager and booting just into a command line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
+<p>As you probably have experience with other graphical environments, let's skip over the standards like menus, right-click context menus, drag&amp;drop etc. Let's have a look at the few unique aspects of Haiku's GUI instead.</p>
+<img src="../images/gui-images/gui.png" alt="gui.png" width="644" height="404" />
+<p>There are only a few things in Haiku's GUI that aren't obvious and deserve an explanation.</p>
+<ol>
+<li><p>The Deskbar is Haiku's "Start" menu and taskbar, if you will. See topic <a href="deskbar.html">Deskbar</a>.</p></li>
+<li>The yellow tab offers more than just a program's name or a document's filename:
+<ul><li>You can move it by holding the <tt>SHIFT</tt> key while dragging it to another position, enabling you to stack a number of windows and conveniently access them by their named tab.</li>
+<li>You minimize a window with a double-click on its tab. A such hidden window can be accessed by its entry in the <a href="deskbar.html">Deskbar</a> or the <a href="twitcher.html">Twitcher</a>.</li>
+<li>You can send a window to the back with a right-click on its tab (or its border).</li></ul></li>
+<li><p>The close button.</p></li>
+<li><p>The "alternative size" button (expands window to full screen in most applications).</p></li>
+<li><p>The resize button. Dragging anywhere else on a window's border will move the window.</p></li>
+</ol>
+
+<h2><a id="open-save-panel" name="open-save-panel">Open and save panels</a></h2>
+<p>When opening or saving a file from any application, a panel like this opens:</p>
+<img src="../images/gui-images/open-save.png" alt="open-save.png" width="645" height="362" />
+<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a drop-down menu for different file formats and their settings.<br />
+You can enter parent folders with the drop-down menu above the file listing.</p>
+<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menubar) into the panel. This changes the panel to that new location.</p>
+
+<h3><a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
+<p>You can use many of the shortcuts also used in Tracker. Besides the commands that are also available through the <i>File</i> menu, there are a few not that obvious:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
+<tr><td><tt>ALT+N</tt></td><td></td><td> Creates a new folder.</td></tr>
+<tr><td><tt>ALT+E</tt></td><td></td><td> Lets you rename the selected entry.</td></tr>
+<tr><td><tt>ALT+CURSOR-UP</tt></td><td style="width:24px;"></td><td> Opens the parent folder.</td></tr>
+<tr><td class="onelinetop"><tt>ALT+CURSOR-DOWN or RETURN</tt></td><td></td><td> Opens the selected folder.</td></tr>
+<tr><td><tt>ALT+D</tt></td><td></td><td> Takes you to your Desktop.</td></tr>
+<tr><td><tt>ALT+H</tt></td><td></td><td> Takes you to your Home folder.</td></tr>
+</table>
+
+<h3><a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
+<p>The menu <i>Favorites</i> provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<img src="../images/gui-images/favorites.png" alt="favorites.png" width="455" height="209" />
+<p>To add a Favorite, you simply navigate to your destination and choose <i>Favorites | Add Current Folder</i>. From now on it will appear in every open/save panel. To remove a Favorite, choose <i>Favorites | Configure Favorites...</i> and delete its entry.<br />
+All Favorites are kept in <tt>/boot/home/config/settings/Tracker/Go/</tt>. So you might as well add and remove links to files and folders there directly.</p>
+
+</div>
+
+<div class="bottomnav">
+	<p>
+		<a href="contents.html">Contents</a>
+		&#160;&#160;&#160;
+		Previous: <a href="filesystem-layout.html">Filesystem layout</a>
+		&#160;&#160;&#160;
+		Next: <a href="workspaces.html">Workspaces</a>
+	</p>
+</div>
+
+</body>
+</html>
