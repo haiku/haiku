@@ -1626,7 +1626,6 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 		if (resultingPoses)
 			resultingPoses[modelIndex] = pose;
 
-		AddMimeType(model->MimeType());
 		// set location from poseinfo if saved loc was for this dir
 		if (poseInfo->fInitedDirectory != -1LL) {
 			PinPointToValidRange(poseInfo->fLocation);
@@ -1800,9 +1799,6 @@ BPoseView::CountMimeTypes()
 void
 BPoseView::AddMimeType(const char *mimeType)
 {
-	if (fMimeTypeListIsDirty)
-		RefreshMimeTypeList();
-
 	int32 count = fMimeTypeList->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		if (*fMimeTypeList->ItemAt(index) == mimeType)
