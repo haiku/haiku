@@ -430,6 +430,8 @@ TCPEndpoint::~TCPEndpoint()
 	gStackModule->wait_for_timer(&fPersistTimer);
 	gStackModule->wait_for_timer(&fDelayedAcknowledgeTimer);
 	gStackModule->wait_for_timer(&fTimeWaitTimer);
+
+	gDatalinkModule->put_route(Domain(), fRoute);
 }
 
 
