@@ -320,7 +320,7 @@ RemoteDisk::_Init()
         return errno;
     }
 
-	// set receive timeout 
+	// set receive timeout
 	timeval timeout;
 	timeout.tv_sec = time_t(kReceiveTimeout / 1000000LL);
 	timeout.tv_usec = suseconds_t(kReceiveTimeout % 1000000LL);
@@ -356,7 +356,7 @@ RemoteDisk::_ReadFromPacket(off_t& pos, uint8*& buffer, size_t& bufferSize)
 	uint32 packetSize = ntohs(header->size);
 	if (packetOffset > (uint64)pos || packetOffset + packetSize <= (uint64)pos)
 		return 0;
-		
+
 	// we have something to copy
 	size_t toCopy = size_t(packetOffset + packetSize - (uint64)pos);
 	if (toCopy > bufferSize)
@@ -422,7 +422,7 @@ RemoteDisk::_SendRequest(remote_disk_header *request, size_t size,
 			socklen_t addrSize = sizeof(sockaddr_in);
 			ssize_t bytesReceived = recvfrom(fSocket, receiveBuffer,
 				receiveBufferSize, 0, (sockaddr*)peerAddress,
-				(peerAddress ? &addrSize : 0));
+				(peerAddress ? &addrSize : NULL));
 			if (bytesReceived < 0) {
 				status_t error = errno;
 				if (error != B_TIMED_OUT && error != B_WOULD_BLOCK
