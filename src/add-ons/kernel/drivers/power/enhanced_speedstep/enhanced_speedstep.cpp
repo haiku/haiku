@@ -34,10 +34,8 @@
 #define EST_PATHID_GENERATOR "est/path_id"
 
 static device_manager_info *sDeviceManager;
-static ConditionVariable	cv_frequency;
-vint32 current_id;
-
-status_t est_control(void* _cookie, uint32 op, void* arg, size_t len);
+static ConditionVariable sFrequencyCondition;
+static vint32 sCurrentID;
 
 
 static status_t
@@ -73,7 +71,7 @@ est_open(void *initCookie, const char *path, int flags, void** cookie)
 	device->number_states = 0;
 	for (f = freqsInfo; f->frequency != 0; f++) {
 		TRACE("est: Frequency %u, Volts %u, Power %i, Latency %u, id %u\n",
-				f->frequency, f->volts, f->power, f->id, EST_TRANS_LAT);
+			f->frequency, f->volts, f->power, f->id, EST_TRANS_LAT);
 		device->number_states++;
 	}
 
@@ -81,7 +79,7 @@ est_open(void *initCookie, const char *path, int flags, void** cookie)
 	freq_info *f2 = est_get_current(freqsInfo);
 	if (f2) {
 		TRACE("est: Current Frequency %u, Volts %u, Power %i, Latency %u\n",
-				f2->frequency, f2->volts, f2->power, EST_TRANS_LAT);
+			f2->frequency, f2->volts, f2->power, EST_TRANS_LAT);
 	}
 
 	return B_OK;
@@ -89,18 +87,18 @@ est_open(void *initCookie, const char *path, int flags, void** cookie)
 
 
 static status_t
-est_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
+est_read(void* _cookie, off_t position, void *buffer, size_t* numBytes)
 {
 	TRACE("est: est_read\n");
 
-	if (*num_bytes < 1)
+	if (*numBytes < 1)
 		return B_IO_ERROR;
 
 	est_cookie *device = (est_cookie *)_cookie;
 
 	if (position == 0) {
-		size_t max_len = *num_bytes;
-		char *str = (char *)buf;
+		size_t max_len = *numBytes;
+		char *str = (char *)buffer;
 
 		snprintf(str, max_len, "CPU Frequency states:\n");
 		max_len-= strlen(str);
@@ -109,22 +107,23 @@ est_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
 		freq_info *freqsInfo = device->available_states;
 		freq_info *f;
 		for (f = freqsInfo; f->frequency != 0; f++) {
-			snprintf(str, max_len, " Frequency %hu, Volts %hu, Power %i, Latency %i, id %hu\n",
-						f->frequency, f->volts, f->power, f->id,
-						EST_TRANS_LAT);
+			snprintf(str, max_len, " Frequency %hu, Volts %hu, Power %i, "
+				"Latency %i, id %hu\n", f->frequency, f->volts, f->power, f->id,
+				EST_TRANS_LAT);
 			max_len-= strlen(str);
 			str += strlen(str);
 		}
 
 		freq_info *f2 = est_get_current(freqsInfo);
 		if (f2) {
-			snprintf(str, max_len, "\nCurrent State: Frequency %hu, Volts %hu, Power %i, Latency %i\n",
-						f2->frequency, f2->volts, f2->power, EST_TRANS_LAT);
+			snprintf(str, max_len, "\nCurrent State: Frequency %hu, Volts %hu, "
+				"Power %i, Latency %i\n", f2->frequency, f2->volts, f2->power,
+				EST_TRANS_LAT);
 		}
 
-		*num_bytes = strlen((char *)buf);
+		*numBytes = strlen((char *)buffer);
 	} else {
-		*num_bytes = 0;
+		*numBytes = 0;
 	}
 
 	return B_OK;
@@ -132,7 +131,7 @@ est_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
 
 
 static status_t
-est_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+est_write(void* cookie, off_t position, const void* buffer, size_t* numBytes)
 {
 	return B_ERROR;
 }
@@ -162,7 +161,7 @@ est_control(void* _cookie, uint32 op, void* arg, size_t len)
 				return B_IO_ERROR;
 			freqInfo = (freq_info*)arg;
 			user_memcpy(freqInfo, device->available_states,
-							sizeof(freq_info) * (device->number_states + 1));
+				sizeof(freq_info) * (device->number_states + 1));
 			err = B_OK;
 			break;
 
@@ -172,7 +171,7 @@ est_control(void* _cookie, uint32 op, void* arg, size_t len)
 			freqInfo = est_get_current(device->available_states);
 			if (!freqInfo)
 				return B_ERROR;
-			atomic_set(&current_id, freqInfo->id);
+			atomic_set(&sCurrentID, freqInfo->id);
 			*((uint16*)arg) = freqInfo->id;
 			err = B_OK;
 			break;
@@ -183,28 +182,27 @@ est_control(void* _cookie, uint32 op, void* arg, size_t len)
 			id = (uint16*)arg;
 			err = est_set_id16(*id);
 			if (err == B_OK) {
-				atomic_set(&current_id, *id);
-				cv_frequency.NotifyAll();
+				atomic_set(&sCurrentID, *id);
+				sFrequencyCondition.NotifyAll();
 			}
 			break;
 
 		case WATCH_CPU_FREQ:
 			if (len < sizeof(uint16))
 				return B_IO_ERROR;
-			cv_frequency.Wait();
+			sFrequencyCondition.Wait();
 			if (atomic_get(&(device->stop_watching))) {
 				atomic_set(&(device->stop_watching), 0);
 				err = B_ERROR;
-			}
-			else {
-				*((uint16*)arg) = atomic_get(&current_id);
+			} else {
+				*((uint16*)arg) = atomic_get(&sCurrentID);
 				err = B_OK;
 			}
 			break;
 
 		case STOP_WATCHING_CPU_FREQ:
 			atomic_set(&(device->stop_watching), 1);
-			cv_frequency.NotifyAll();
+			sFrequencyCondition.NotifyAll();
 			err = B_OK;
 			break;
 	}
@@ -213,14 +211,14 @@ est_control(void* _cookie, uint32 op, void* arg, size_t len)
 
 
 static status_t
-est_close (void* cookie)
+est_close(void* cookie)
 {
 	return B_OK;
 }
 
 
 static status_t
-est_free (void* cookie)
+est_free(void* cookie)
 {
 	return B_OK;
 }
@@ -232,26 +230,21 @@ est_free (void* cookie)
 static float
 est_support(device_node *parent)
 {
-	const char *bus;
-	uint32 device_type;
-
-dprintf("EST1\n");
 	// make sure parent is really the ACPI bus manager
+	const char *bus;
 	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return -1;
-dprintf("EST2\n");
 
 	if (strcmp(bus, "acpi"))
 		return 0.0;
-dprintf("EST3\n");
 
 	// check whether it's really a cpu Device
+	uint32 deviceType;
 	if (sDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM,
-											&device_type, false) != B_OK
-		|| device_type != ACPI_TYPE_PROCESSOR) {
+			&deviceType, false) != B_OK
+		|| deviceType != ACPI_TYPE_PROCESSOR) {
 		return 0.0;
 	}
-dprintf("EST4\n");
 	TRACE("est_support: supported\n");
 
 	// check if cpu support est
@@ -260,31 +253,22 @@ dprintf("EST4\n");
 	if (get_system_info(&sysInfo) != B_OK)
 		return 0.0;
 	TRACE("cpu_type: %u vendor %u model %u\n", sysInfo.cpu_type,
-								sysInfo.cpu_type & B_CPU_x86_VENDOR_MASK,
-								sysInfo.cpu_type & 0x00FF);
-dprintf("EST5\n");
+		sysInfo.cpu_type & B_CPU_x86_VENDOR_MASK, sysInfo.cpu_type & 0x00FF);
 	if ((sysInfo.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_INTEL_x86)
 		return 0.0;
-dprintf("EST6\n");
 
 	TRACE("ext\n");
 	cpuid_info info;
 	if (get_cpuid(&info, 1, cpuNum) != B_OK)
 		return 0.0;
-dprintf("EST7\n");
 
 	TRACE("extended_features: %i\n", int(info.eax_1.extended_features));
-dprintf("EST8\n");
 
 	// check for enhanced speedstep
-	if (info.eax_1.extended_features & IA32_FEATURE_EXT_EST)
-		TRACE("supprot est\n");
-	else
+	if ((info.eax_1.extended_features & IA32_FEATURE_EXT_EST) == 0)
 		return 0.0;
-dprintf("EST9\n");
 
-	TRACE("success\n");
-
+	TRACE("supports est\n");
 	return 0.6;
 }
 
@@ -299,7 +283,7 @@ est_register_device(device_node *node)
 	};
 
 	return sDeviceManager->register_node(node, EST_MODULE_NAME, attrs,
-											NULL, NULL);
+		NULL, NULL);
 }
 
 
@@ -308,8 +292,8 @@ est_init_driver(device_node *node, void **_driverCookie)
 {
 	*_driverCookie = node;
 
-	cv_frequency.Init(NULL, "frequency cv");
-	current_id = -1;
+	sFrequencyCondition.Init(NULL, "frequency cv");
+	sCurrentID = -1;
 
 	return B_OK;
 }
@@ -325,16 +309,15 @@ static status_t
 est_register_child_devices(void *_cookie)
 {
 	device_node *node = (device_node*)_cookie;
-	int path_id;
-	char name[128];
 
-	path_id = sDeviceManager->create_id(EST_PATHID_GENERATOR);
-	if (path_id < 0) {
+	int pathID = sDeviceManager->create_id(EST_PATHID_GENERATOR);
+	if (pathID < 0) {
 		TRACE("est_register_child_devices: couldn't create a path_id\n");
 		return B_ERROR;
 	}
 
-	snprintf(name, sizeof(name), EST_BASENAME, path_id);
+	char name[128];
+	snprintf(name, sizeof(name), EST_BASENAME, pathID);
 
 	return sDeviceManager->publish_device(node, name, EST_DEVICE_MODULE_NAME);
 }
@@ -347,6 +330,7 @@ est_init_device(void *driverCookie, void **cookie)
 	device = (est_cookie *)calloc(1, sizeof(est_cookie));
 	if (device == NULL)
 		return B_NO_MEMORY;
+
 	*cookie = device;
 
 	device_node *node = (device_node *)driverCookie;
