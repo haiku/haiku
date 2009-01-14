@@ -260,7 +260,7 @@ start_session(team_id team, dev_t device, ino_t node, const char *name,
 	}
 
 	// let's see if there is a prefetch session for this session
-	
+
 	Session *prefetchSession;
 	if (session->IsMainSession()) {
 		// search for session by name
@@ -378,7 +378,7 @@ Session::Session(team_id team, const char *name, dev_t device,
 		size_t length = strlen(name) + 1;
 		if (length > B_OS_NAME_LENGTH)
 			name += length - B_OS_NAME_LENGTH;
-	
+
 		strlcpy(fName, name, B_OS_NAME_LENGTH);
 	} else
 		fName[0] = '\0';
@@ -791,6 +791,9 @@ launch_speedup_control(const char *subsystem, uint32 function,
 			if (sMainSession == NULL || strcmp(sMainSession->Name(), name))
 				return B_BAD_VALUE;
 
+			if (!strcmp(name, "system boot"))
+				dprintf("STOP BOOT %Ld\n", system_time());
+
 			sMainSession->Lock();
 			stop_session(sMainSession);
 			sMainSession = NULL;
@@ -868,6 +871,7 @@ init()
 
 	sMainSession = start_session(-1, -1, -1, "system boot");
 	sMainSession->Unlock();
+	dprintf("START BOOT %Ld\n", system_time());
 	return B_OK;
 
 err3:
