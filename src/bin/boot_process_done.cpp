@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -8,7 +8,7 @@
 
 #include <OS.h>
 #include <syscalls.h>
-#include <generic_syscall.h>
+#include <generic_syscall_defs.h>
 
 #include <stdio.h>
 #include <string.h>
