@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SIGNAL_H_
@@ -95,8 +95,8 @@ typedef struct sigstack {
 /*
  * The list of all defined signals:
  *
- * The numbering of signals for Haiku attempts to maintain 
- * some consistency with UN*X conventions so that things 
+ * The numbering of signals for Haiku attempts to maintain
+ * some consistency with UN*X conventions so that things
  * like "kill -9" do what you expect.
  */
 #define	SIGHUP		1	/* hangup -- tty is gone! */
@@ -158,6 +158,7 @@ int     send_signal(pid_t tid, unsigned int sig);
 int		killpg(pid_t processGroupID, int sig);
 
 int     sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+int		siginterrupt(int sig, int flag);
 int     sigprocmask(int how, const sigset_t *set, sigset_t *oset);
 int     sigpending(sigset_t *set);
 int     sigsuspend(const sigset_t *mask);
@@ -179,7 +180,7 @@ void	set_signal_stack(void *ptr, size_t size);
 int		sigaltstack(const stack_t *ss, stack_t *oss);
 
 /* pthread extension : equivalent of sigprocmask()  */
-int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset); 
+int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
 
 #ifdef __cplusplus
 }
@@ -201,7 +202,7 @@ int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
  *
  *    // install the handler
  *    signal(SIGINT, &my_signal_handler);
- *    
+ *
  * The sigaction() function allows finer grained control of the signal
  * handling. It also allows an opportunity, via the 'sigaction' struct, to
  * enable additional data to be passed to the handler. For example:
