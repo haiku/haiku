@@ -49,13 +49,13 @@ static const struct {
 
 
 static inline void
-update_pci_register(hda_controller* controller, uint8 reg, uint8 mask, uint8 value)
+update_pci_register(hda_controller* controller, uint8 reg, uint32 mask, uint32 value, uint8 size)
 {
 	uint8 tmp = (gPci->read_pci_config)(controller->pci_info.bus,
-		controller->pci_info.device, controller->pci_info.function, reg, 1);
+		controller->pci_info.device, controller->pci_info.function, reg, size);
 	(gPci->write_pci_config)(controller->pci_info.bus,
 		controller->pci_info.device, controller->pci_info.function,
-		reg, 1, (tmp & mask) | value);
+		reg, size, (tmp & mask) | value);
 }
 
 
@@ -737,18 +737,28 @@ hda_hw_init(hda_controller* controller)
 		goto no_irq;
 
 	/* TCSEL is reset to TC0 (clear 0-2 bits) */
-	update_pci_register(controller, PCI_HDA_TCSEL, PCI_HDA_TCSEL_MASK, 0);
+	update_pci_register(controller, PCI_HDA_TCSEL, PCI_HDA_TCSEL_MASK, 0, 1);
 	
 	/* Enable snooping for ATI and Nvidia, right now for all their hda-devices,
 	   but only based on guessing. */
 	switch (controller->pci_info.vendor_id) {
 		case NVIDIA_VENDORID:
 			update_pci_register(controller, NVIDIA_HDA_TRANSREG, 
-				NVIDIA_HDA_TRANSREG_MASK, NVIDIA_HDA_ENABLE_COHBITS);
+				NVIDIA_HDA_TRANSREG_MASK, NVIDIA_HDA_ENABLE_COHBITS, 1);
+			update_pci_register(controller, NVIDIA_HDA_ISTRM_COH, 
+				~NVIDIA_HDA_ENABLE_COHBIT, NVIDIA_HDA_ENABLE_COHBIT, 1);
+			update_pci_register(controller, NVIDIA_HDA_OSTRM_COH, 
+				~NVIDIA_HDA_ENABLE_COHBIT, NVIDIA_HDA_ENABLE_COHBIT, 1);
 			break;
 		case ATI_VENDORID:
 			update_pci_register(controller, ATI_HDA_MISC_CNTR2, 
-				ATI_HDA_MISC_CNTR2_MASK, ATI_HDA_ENABLE_SNOOP);
+				ATI_HDA_MISC_CNTR2_MASK, ATI_HDA_ENABLE_SNOOP, 1);
+			break;
+		case INTEL_VENDORID:
+			if (controller->pci_info.device_id == INTEL_SCH_DEVICEID) {
+				update_pci_register(controller, INTEL_SCH_HDA_DEVC,
+					~INTEL_SCH_HDA_DEVC_SNOOP, INTEL_SCH_HDA_DEVC_SNOOP, 2);
+			}
 			break;
 	}
 
