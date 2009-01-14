@@ -116,14 +116,14 @@ class CalcView : public BView {
 			ExpressionTextView*	fExpressionTextView;
 
 			// pop-up context menu.
-			BMenuItem*			fAboutItem;
-			BMenuItem*			fOptionsItem;
 			BPopUpMenu*			fPopUpMenu;
+			BMenuItem*			fAutoNumlockItem;
+			BMenuItem*			fAudioFeedbackItem;
+			BMenuItem*			fShowKeypadItem;
+			BMenuItem*			fAboutItem;
 
 			// calculator options.
 			CalcOptions*		fOptions;
-			CalcOptionsWindow*	fOptionsWindow;
-			BRect				fOptionsWindowFrame;
 			bool				fShowKeypad;
 };
 

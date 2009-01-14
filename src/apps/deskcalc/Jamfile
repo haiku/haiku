@@ -6,7 +6,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps deskcalc mapm_4.9.5 ] ;
 
 Application DeskCalc :
 	CalcApplication.cpp
-	CalcOptionsWindow.cpp
+	CalcOptions.cpp
 	CalcView.cpp
 	CalcWindow.cpp
 	DeskCalc.cpp

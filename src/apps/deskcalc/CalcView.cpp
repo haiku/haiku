@@ -32,7 +32,7 @@
 #include <Roster.h>
 
 #include "CalcApplication.h"
-#include "CalcOptionsWindow.h"
+#include "CalcOptions.h"
 #include "ExpressionParser.h"
 #include "ExpressionTextView.h"
 
@@ -42,8 +42,9 @@ const float K_FONT_YPROP		= 0.6f;
 const float K_DISPLAY_YPROP		= 0.2f;
 
 enum {
-	K_OPTIONS_REQUESTED			= 'opts',
-	K_OPTIONS_GONE				= 'opgn',
+	K_OPTIONS_AUTO_NUM_LOCK		= 'opan',
+	K_OPTIONS_AUDIO_FEEDBACK	= 'opaf',
+	K_OPTIONS_SHOW_KEYPAD		= 'opsk'
 };
 
 // default calculator key pad layout
@@ -93,13 +94,13 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
 	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
 #endif
 
-	  fAboutItem(NULL),
-	  fOptionsItem(NULL),
 	  fPopUpMenu(NULL),
+	  fAutoNumlockItem(NULL),
+	  fAudioFeedbackItem(NULL),
+	  fShowKeypadItem(NULL),
+	  fAboutItem(NULL),
 
 	  fOptions(new CalcOptions()),
-	  fOptionsWindow(NULL),
-	  fOptionsWindowFrame(30.0, 50.0, 230.0, 200.0),
 	  fShowKeypad(true)
 {
 	// create expression text view
@@ -142,13 +143,13 @@ CalcView::CalcView(BMessage* archive)
 	  fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
 #endif
 
-	  fAboutItem(NULL),
-	  fOptionsItem(NULL),
 	  fPopUpMenu(NULL),
+	  fAutoNumlockItem(NULL),
+	  fAudioFeedbackItem(NULL),
+	  fShowKeypadItem(NULL),
+	  fAboutItem(NULL),
 
 	  fOptions(new CalcOptions()),
-	  fOptionsWindow(NULL),
-	  fOptionsWindowFrame(30.0, 50.0, 230.0, 200.0),
 	  fShowKeypad(true)
 {
 	// create expression text view
@@ -180,6 +181,8 @@ CalcView::AttachedToWindow()
 	
 	BRect frame(Frame());
 	FrameResized(frame.Width(), frame.Height());
+
+	fPopUpMenu->SetTargetForItems(this);
 }
 
 
@@ -224,34 +227,22 @@ CalcView::MessageReceived(BMessage* message)
 			case B_ABOUT_REQUESTED:
 				AboutRequested();
 				break;
-			
-			// calculator options window requested
-			case K_OPTIONS_REQUESTED: {
-				if (fOptionsWindow != NULL) {
-// TODO: remove race condition and activate
-//					fOptionsWindow->Activate();
-					break;
-				}
 
-				fOptionsWindow = new CalcOptionsWindow(fOptionsWindowFrame,
-													   fOptions,
-													   new BMessage(K_OPTIONS_GONE),
-													   this);
-				fOptionsWindow->Show();
+			case K_OPTIONS_AUTO_NUM_LOCK:
+				fOptions->auto_num_lock = !fOptions->auto_num_lock;
+				fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
 				break;
-			}
 
-			// calculator options window has quit
-			case K_OPTIONS_GONE: {
-				fOptionsWindow = NULL;
+			case K_OPTIONS_AUDIO_FEEDBACK:
+				fOptions->audio_feedback = !fOptions->audio_feedback;
+				fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
+				break;
 
-				BRect frame;
-				if (message->FindRect("window frame", &frame) == B_OK)
-					fOptionsWindowFrame = frame;
-
+			case K_OPTIONS_SHOW_KEYPAD:
+				fOptions->show_keypad = !fOptions->show_keypad;
+				fShowKeypadItem->SetMarked(fOptions->show_keypad);
 				_ShowKeypad(fOptions->show_keypad);
 				break;
-			}
 			
 			default:
 				BView::MessageReceived(message);
@@ -550,7 +541,7 @@ CalcView::AboutRequested()
 		"DeskCalc v2.1.0\n\n"
 		"written by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n"
 		B_UTF8_COPYRIGHT"1997, 1998 R3 Software Ltd.\n"
-		B_UTF8_COPYRIGHT"2006 Haiku, Inc.\n\n"
+		B_UTF8_COPYRIGHT"2006-2009 Haiku, Inc.\n\n"
 		"All Rights Reserved.", "Cool");
 	alert->Go(NULL);
 }
@@ -701,11 +692,6 @@ CalcView::LoadSettings(BMessage* archive)
 	fOptions->LoadSettings(archive);
 	fShowKeypad = fOptions->show_keypad;
 
-	// load option window frame
-	BRect frame;
-	if (archive->FindRect("option window frame", &frame) == B_OK)
-		fOptionsWindowFrame = frame;
-
 	// load display text
 	const char* display;
 	if (archive->FindString("displayText", &display) < B_OK) {
@@ -750,10 +736,6 @@ CalcView::SaveSettings(BMessage* archive) const
 	// record current options
 	if (ret == B_OK)
 		ret = fOptions->SaveSettings(archive);
-
-	// record option window frame
-	if (ret == B_OK)
-		ret = archive->AddRect("option window frame", fOptionsWindowFrame);
 
 	// record display text
 	if (ret == B_OK)
@@ -962,15 +944,28 @@ void
 CalcView::_CreatePopUpMenu()
 {
 	// construct items
-	fAboutItem = new BMenuItem("About DeskCalc" B_UTF8_ELLIPSIS,
+	fAutoNumlockItem = new BMenuItem("Enable Num Lock on start up",
+		new BMessage(K_OPTIONS_AUTO_NUM_LOCK));
+	fAudioFeedbackItem = new BMenuItem("Audio Feedback" B_UTF8_ELLIPSIS,
+		new BMessage(K_OPTIONS_AUDIO_FEEDBACK));
+	fShowKeypadItem = new BMenuItem("Show Keypad",
+		new BMessage(K_OPTIONS_SHOW_KEYPAD));
+	fAboutItem = new BMenuItem("About DeskCalc",
 		new BMessage(B_ABOUT_REQUESTED));
-	fOptionsItem = new BMenuItem("Options" B_UTF8_ELLIPSIS,
-		new BMessage(K_OPTIONS_REQUESTED));
+
+	// apply current settings
+	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
+	fAudioFeedbackItem->SetMarked(fOptions->audio_feedback);
+	fShowKeypadItem->SetMarked(fOptions->show_keypad);
 
 	// construct menu
 	fPopUpMenu = new BPopUpMenu("pop-up", false, false);
+
+	fPopUpMenu->AddItem(fAutoNumlockItem);
+	fPopUpMenu->AddItem(fAudioFeedbackItem);
+	fPopUpMenu->AddItem(fShowKeypadItem);
+	fPopUpMenu->AddSeparatorItem();
 	fPopUpMenu->AddItem(fAboutItem);
-	fPopUpMenu->AddItem(fOptionsItem);
 }
 
 
