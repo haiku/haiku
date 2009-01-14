@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src preferences cpufrequency ;
+
+UsePrivateHeaders shared ;
+
+Preference CPUFrequency : 
+	ColorStepView.cpp
+	CPUFrequencyView.cpp
+	DriverInterface.cpp
+	main.cpp
+	StatusView.cpp
+	: be
+	: cpufrequency.rdef
+	;

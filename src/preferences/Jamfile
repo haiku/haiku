@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src preferences ;
 
 SubInclude HAIKU_TOP src preferences appearance ;
 SubInclude HAIKU_TOP src preferences backgrounds ;
+SubInclude HAIKU_TOP src preferences cpufrequency ;
 SubInclude HAIKU_TOP src preferences datatranslations ;
 SubInclude HAIKU_TOP src preferences devices ;
 #SubInclude HAIKU_TOP src preferences dun ;
