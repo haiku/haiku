@@ -2,18 +2,6 @@
 # installation directory) and it executes the rules building the image
 # (respectively installing the files in the installation directory).
 
-# create directories that will remain empty
-AddDirectoryToHaikuImage common bin ;
-AddDirectoryToHaikuImage common include ;
-AddDirectoryToHaikuImage common lib ;
-AddDirectoryToHaikuImage home Desktop ;
-AddDirectoryToHaikuImage home config bin ;
-AddDirectoryToHaikuImage home config lib ;
-AddDirectoryToHaikuImage home mail ;
-AddDirectoryToHaikuImage var empty ;
-AddDirectoryToHaikuImage var log ;
-AddDirectoryToHaikuImage var tmp ;
-
 local X86_ONLY = ;
 local PPC_ONLY = ;
 local M68K_ONLY = ;
@@ -438,6 +426,18 @@ AddFilesToHaikuImage beos system add-ons Screen\ Savers
 
 AddFilesToHaikuImage beos system add-ons disk_systems
 	: <disk_system>intel <disk_system>bfs ;
+
+# create directories that will remain empty
+AddDirectoryToHaikuImage common bin ;
+AddDirectoryToHaikuImage common include ;
+AddDirectoryToHaikuImage common lib ;
+AddDirectoryToHaikuImage home Desktop ;
+AddDirectoryToHaikuImage home config bin ;
+AddDirectoryToHaikuImage home config lib ;
+AddDirectoryToHaikuImage home mail ;
+AddDirectoryToHaikuImage var empty ;
+AddDirectoryToHaikuImage var log ;
+AddDirectoryToHaikuImage var tmp ;
 
 AddDirectoryToHaikuImage home config add-ons kernel drivers bin ;
 AddDirectoryToHaikuImage home config add-ons kernel drivers dev ;
