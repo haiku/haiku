@@ -51,7 +51,7 @@ static const struct {
 static inline void
 update_pci_register(hda_controller* controller, uint8 reg, uint32 mask, uint32 value, uint8 size)
 {
-	uint8 tmp = (gPci->read_pci_config)(controller->pci_info.bus,
+	uint32 tmp = (gPci->read_pci_config)(controller->pci_info.bus,
 		controller->pci_info.device, controller->pci_info.function, reg, size);
 	(gPci->write_pci_config)(controller->pci_info.bus,
 		controller->pci_info.device, controller->pci_info.function,
