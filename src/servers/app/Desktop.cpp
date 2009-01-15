@@ -945,14 +945,6 @@ Desktop::_SetWorkspace(int32 index)
 	int32 previousIndex = fCurrentWorkspace;
 	rgb_color previousColor = fWorkspaces[fCurrentWorkspace].Color();
 	bool movedMouseEventWindow = false;
-	display_mode previousMode, newMode;
-	fVirtualScreen.ScreenAt(0)->GetMode(&previousMode);
-	fVirtualScreen.RestoreConfiguration(*this,
-		fSettings->WorkspacesMessage(index));
-	fVirtualScreen.ScreenAt(0)->GetMode(&newMode);
-	// We only need to invalidate the entire desktop if we changed display modes
-	if (memcmp(&previousMode, &newMode, sizeof(display_mode)))
-		ScreenChanged(fVirtualScreen.ScreenAt(0), false);
 
 	if (fMouseEventWindow != NULL) {
 		if (fMouseEventWindow->IsNormal()) {
@@ -1009,6 +1001,17 @@ Desktop::_SetWorkspace(int32 index)
 
 	fPreviousWorkspace = fCurrentWorkspace;
 	fCurrentWorkspace = index;
+
+	// Change the display mode, if needed
+	// TODO: this needs to be done for all screens
+	display_mode previousMode, newMode;
+	fVirtualScreen.ScreenAt(0)->GetMode(&previousMode);
+	fVirtualScreen.RestoreConfiguration(*this,
+		fSettings->WorkspacesMessage(index));
+	fVirtualScreen.ScreenAt(0)->GetMode(&newMode);
+	// We only need to invalidate the entire desktop if we changed display modes
+	if (memcmp(&previousMode, &newMode, sizeof(display_mode)))
+		ScreenChanged(fVirtualScreen.ScreenAt(0), false);
 
 	// show windows, and include them in the changed region - but only
 	// those that were not visible before (or whose position changed)
