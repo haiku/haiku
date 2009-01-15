@@ -596,7 +596,7 @@ if (first) {
 
 	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
 		pll_divisors divisors;
-		compute_pll_divisors(target, divisors,true);
+		compute_pll_divisors(target, divisors, true);
 
 		uint32 dpll = DISPLAY_PLL_NO_VGA_CONTROL;
 		if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
