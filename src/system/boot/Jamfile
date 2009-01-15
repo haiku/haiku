@@ -54,6 +54,7 @@ rule BuildCoffLoader {
 	COFF_FORMAT on $(coffLoader) = xcoff-powermac ;
 	HACK_COFF on $(coffLoader) = <build>hack-coff ;
 
+	Depends $(coffLoader) : <build>hack-coff ;
 	Depends $(coffLoader) : $(bootLoader) ;
 	MakeLocateDebug $(coffLoader) ;
 }
