@@ -116,7 +116,6 @@ class WorkspacesWindow : public BWindow {
 
 	private:
 		WorkspacesSettings *fSettings;
-		BRect	fPreviousFrame;
 		bool	fAutoRaising;
 };
 
@@ -257,14 +256,16 @@ WorkspacesSettings::UpdateFramesForScreen(BRect newScreenFrame)
 		return;
 
 	// adjust horizontal position
-	if (fWindowFrame.right > fScreenFrame.right / 2)
+	if (fWindowFrame.right > fScreenFrame.right / 2) {
 		fWindowFrame.OffsetTo(newScreenFrame.right
 			- (fScreenFrame.right - fWindowFrame.left), fWindowFrame.top);
+	}
 
 	// adjust vertical position
-	if (fWindowFrame.bottom > fScreenFrame.bottom / 2)
+	if (fWindowFrame.bottom > fScreenFrame.bottom / 2) {
 		fWindowFrame.OffsetTo(fWindowFrame.left,
 			newScreenFrame.bottom - (fScreenFrame.bottom - fWindowFrame.top));
+	}
 
 	fScreenFrame = newScreenFrame;
 }
@@ -474,7 +475,6 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
  	fAutoRaising(false)
 {
 	AddChild(new WorkspacesView(Bounds()));
-	fPreviousFrame = Frame();
 
 	if (!fSettings->HasTitle())
 		SetLook(B_MODAL_WINDOW_LOOK);
@@ -497,9 +497,6 @@ WorkspacesWindow::~WorkspacesWindow()
 void
 WorkspacesWindow::ScreenChanged(BRect rect, color_space mode)
 {
-	fPreviousFrame = fSettings->WindowFrame();
-		// work-around for a bug in BeOS, see explanation in FrameMoved()
-
 	fSettings->UpdateFramesForScreen(rect);
 	MoveTo(fSettings->WindowFrame().LeftTop());
 }
@@ -508,14 +505,6 @@ WorkspacesWindow::ScreenChanged(BRect rect, color_space mode)
 void
 WorkspacesWindow::FrameMoved(BPoint origin)
 {
-	if (origin == fPreviousFrame.LeftTop()) {
-		// This works around a bug in BeOS; when you change the window
-		// position in WorkspaceActivated() or ScreenChanged(), it will
-		// send an old repositioning message *after* the FrameMoved()
-		// that originated your change has arrived
-		return;
-	}
-
 	fSettings->SetWindowFrame(Frame());
 }
 
