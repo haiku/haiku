@@ -938,14 +938,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_WINDOW_RESIZE:
 		{
-			float xResizeBy;
-			float yResizeBy;
-			link.Read<float>(&xResizeBy);
-			if (link.Read<float>(&yResizeBy) != B_OK)
+			float xResizeTo;
+			float yResizeTo;
+			link.Read<float>(&xResizeTo);
+			if (link.Read<float>(&yResizeTo) != B_OK)
 				break;
 
 			DTRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n",
-				Title(), xResizeBy, yResizeBy));
+				Title(), xResizeTo, yResizeTo));
 
 			// comment this code for the time being, as some apps rely
 			// on the programmatically resize behavior during user resize
@@ -955,7 +955,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 //				fLink.StartMessage(B_BUSY);
 //			} else {
 //fDesktop->UnlockSingleWindow();
-				fDesktop->ResizeWindowBy(fWindow, xResizeBy, yResizeBy);
+				fDesktop->ResizeWindowBy(fWindow,
+					xResizeTo - fWindow->Frame().Width(),
+					yResizeTo - fWindow->Frame().Height());
 //fDesktop->LockSingleWindow();
 				fLink.StartMessage(B_OK);
 //			}
@@ -964,14 +966,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_WINDOW_MOVE:
 		{
-			float xMoveBy;
-			float yMoveBy;
-			link.Read<float>(&xMoveBy);
-			if (link.Read<float>(&yMoveBy) != B_OK)
+			float xMoveTo;
+			float yMoveTo;
+			link.Read<float>(&xMoveTo);
+			if (link.Read<float>(&yMoveTo) != B_OK)
 				break;
 
 			DTRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n",
-				Title(), xMoveBy, yMoveBy));
+				Title(), xMoveTo, yMoveTo));
 
 			if (fWindow->IsDragging()) {
 				// While the user moves the window, we ignore
@@ -979,7 +981,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(B_BUSY);
 			} else {
 //fDesktop->UnlockSingleWindow();
-				fDesktop->MoveWindowBy(fWindow, xMoveBy, yMoveBy);
+				fDesktop->MoveWindowBy(fWindow, xMoveTo - fWindow->Frame().left,
+					yMoveTo - fWindow->Frame().top);
 //fDesktop->LockSingleWindow();
 				fLink.StartMessage(B_OK);
 			}

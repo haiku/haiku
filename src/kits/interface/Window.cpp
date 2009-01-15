@@ -1530,7 +1530,7 @@ BWindow::Zoom()
 		The dimensions that non-virtual Zoom() passes to hook Zoom() are deduced from
 		the smallest of three rectangles:
 	*/
-	
+
 	// fallback in case retrieving the decorator settings fails (highly unlikely)
 	float borderWidth = 5.0;
 	float tabHeight = 21.0;
@@ -1541,7 +1541,7 @@ BWindow::Zoom()
 			tabHeight = tabRect.Height();
 		settings.FindFloat("border width", &borderWidth);
 	}
-		
+
 	// 1) the rectangle defined by SetZoomLimits(),
 	float zoomedWidth = fMaxZoomWidth;
 	float zoomedHeight = fMaxZoomHeight;
@@ -2251,89 +2251,87 @@ BWindow::LastMouseMovedView() const
 void
 BWindow::MoveBy(float dx, float dy)
 {
-	if ((dx == 0.0 && dy == 0.0) || !Lock())
-		return;
-
-	fLink->StartMessage(AS_WINDOW_MOVE);
-	fLink->Attach<float>(dx);
-	fLink->Attach<float>(dy);
-
-	status_t status;
-	if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
-		fFrame.OffsetBy(dx, dy);
-
-	Unlock();
+	if ((dx != 0.0f || dy != 0.0f) && Lock()) {
+		MoveTo(fFrame.left + dx, fFrame.top + dy);
+		Unlock();
+	}
 }
 
 
 void
 BWindow::MoveTo(BPoint point)
 {
-	if (!Lock())
-		return;
-
-	point.x = roundf(point.x);
-	point.y = roundf(point.y);
-
-	if (fFrame.left != point.x || fFrame.top != point.y) {
-		float xOffset = point.x - fFrame.left;
-		float yOffset = point.y - fFrame.top;
-
-		MoveBy(xOffset, yOffset);
-	}
-
-	Unlock();
+	MoveTo(point.x, point.y);
 }
 
 
 void
 BWindow::MoveTo(float x, float y)
 {
-	MoveTo(BPoint(x, y));
+	if (!Lock())
+		return;
+
+	x = roundf(x);
+	y = roundf(y);
+
+	if (fFrame.left != x || fFrame.top != y) {
+		fLink->StartMessage(AS_WINDOW_MOVE);
+		fLink->Attach<float>(x);
+		fLink->Attach<float>(y);
+
+		status_t status;
+		if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
+			fFrame.OffsetTo(x, y);
+	}
+
+	Unlock();
 }
 
 
 void
 BWindow::ResizeBy(float dx, float dy)
 {
-	if (!Lock())
-		return;
-
-	dx = roundf(dx);
-	dy = roundf(dy);
-
-	// stay in minimum & maximum frame limits
-	if (fFrame.Width() + dx < fMinWidth)
-		dx = fMinWidth - fFrame.Width();
-	if (fFrame.Width() + dx > fMaxWidth)
-		dx = fMaxWidth - fFrame.Width();
-	if (fFrame.Height() + dy < fMinHeight)
-		dy = fMinHeight - fFrame.Height();
-	if (fFrame.Height() + dy > fMaxHeight)
-		dy = fMaxHeight - fFrame.Height();
-
-	if (dx != 0.0 || dy != 0.0) {
-		fLink->StartMessage(AS_WINDOW_RESIZE);
-		fLink->Attach<float>(dx);
-		fLink->Attach<float>(dy);
-
-		status_t status;
-		if (fLink->FlushWithReply(status) == B_OK && status == B_OK) {
-			fFrame.SetRightBottom(fFrame.RightBottom() + BPoint(dx, dy));
-			_AdoptResize();
-		}
+	if (Lock()) {
+		ResizeTo(fFrame.Width() + dx, fFrame.Height() + dy);
+		Unlock();
 	}
-	Unlock();
 }
 
 
 void
 BWindow::ResizeTo(float width, float height)
 {
-	if (Lock()) {
-		ResizeBy(width - fFrame.Width(), height - fFrame.Height());
-		Unlock();
+	if (!Lock())
+		return;
+
+	width = roundf(width);
+	height = roundf(height);
+
+	// stay in minimum & maximum frame limits
+	if (width < fMinWidth)
+		width = fMinWidth;
+	else if (width > fMaxWidth)
+		width = fMaxWidth;
+
+	if (height < fMinHeight)
+		height = fMinHeight;
+	else if (height > fMaxHeight)
+		height = fMaxHeight;
+
+	if (width != fFrame.Width() || height != fFrame.Height()) {
+		fLink->StartMessage(AS_WINDOW_RESIZE);
+		fLink->Attach<float>(width);
+		fLink->Attach<float>(height);
+
+		status_t status;
+		if (fLink->FlushWithReply(status) == B_OK && status == B_OK) {
+			fFrame.right = fFrame.left + width;
+			fFrame.bottom = fFrame.top + height;
+			_AdoptResize();
+		}
 	}
+
+	Unlock();
 }
 
 
@@ -3166,7 +3164,7 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 				if (message->what != B_MOUSE_MOVED) {
 					// Yep, the meaning of "where" is different
 					// for regular mouse moved messages versus
-					// mouse up/down! 
+					// mouse up/down!
 					message->AddPoint("where", viewWhere);
 				}
 				message->AddPoint("be:view_where", viewWhere);
