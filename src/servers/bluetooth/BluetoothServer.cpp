@@ -1,6 +1,6 @@
 /*
- * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
+ * Copyright 2007-2009 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  */
@@ -9,14 +9,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-
 #include <Entry.h>
-#include <Path.h>
-#include <Message.h>
 #include <Directory.h>
-#include <String.h>
+#include <Message.h>
+#include <Path.h>
 #include <Roster.h>
-
+#include <String.h>
 
 #include <TypeConstants.h>
 #include <syslog.h>
@@ -31,7 +29,7 @@
 
 
 BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
-{ 
+{
 	Output::Instance()->Run();
 	Output::Instance()->SetTitle("Bluetooth message gathering");
 
@@ -40,16 +38,15 @@ BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
 	Output::Instance()->AddTab("Events", BLACKBOARD_EVENTS);
 	Output::Instance()->AddTab("Kit", BLACKBOARD_KIT);
 
-	
 	ShowWindow(Output::Instance());
 
-    fDeviceManager = new DeviceManager();
+	fDeviceManager = new DeviceManager();
 	fLocalDevicesList.MakeEmpty();
 
 	// TODO: Some events should be handled faster than in KL...
-	fEventListener = spawn_thread(notification_Thread, "BT port listener" , B_URGENT_DISPLAY_PRIORITY , this);
+	fEventListener = spawn_thread(notification_Thread, "BT port listener" ,
+					B_URGENT_DISPLAY_PRIORITY , this);
 
-   
 }
 
 bool BluetoothServer::QuitRequested(void)
@@ -58,128 +55,114 @@ bool BluetoothServer::QuitRequested(void)
 	Output::Instance()->Lock();
 	Output::Instance()->Quit();
 
-
-/*	HCIDelegate *hd = NULL;
-	while ((hd = (HCIDelegate *)fDelegatesList.RemoveItem((int32)0)) !=NULL)
-		delete hd;
-*/
-
+	LocalDeviceImpl* ldi = NULL;
+	while ((ldi = (LocalDeviceImpl *)fLocalDevicesList.RemoveItem((int32)0))
+		!= NULL)
+		delete ldi;
+ 
 	printf("Accepting quitting of the application\n");
 	return BApplication::QuitRequested();
 }
+
 
 void BluetoothServer::ArgvReceived(int32 argc, char **argv)
 {
 	if (argc>1) {
 		if (strcmp(argv[1], "--finish") == 0)
 			PostMessage(B_QUIT_REQUESTED);
-
-	    else {
-
-	
-	    }
 	}
 
 }
 
 
-void BluetoothServer::ReadyToRun(void) {
-    
-    fDeviceManager->StartMonitoringDevice("bluetooth/h2generic");
-	
-		
+void BluetoothServer::ReadyToRun(void)
+{
+	fDeviceManager->StartMonitoringDevice("bluetooth/h2generic");
 	// Launch the notifier thread
 	if ( resume_thread(fEventListener) != B_OK ) 
 	{
 		Output::Instance()->Post("Bluetooth port listener failed\n", BLACKBOARD_GENERAL);
 	}
-    
-    Output::Instance()->Post("Bluetooth server Ready\n", BLACKBOARD_GENERAL);
+
+	Output::Instance()->Post("Bluetooth server Ready\n", BLACKBOARD_GENERAL);
 }
 
-void BluetoothServer::AppActivated(bool act) {
 
+void BluetoothServer::AppActivated(bool act)
+{
 	printf("Activated %d\n",act);
-
 }
-
 
 
 void BluetoothServer::MessageReceived(BMessage *message)
 {
 	BMessage reply;
-	status_t status = B_WOULD_BLOCK; // mark somehow.. do not reply anything
+	status_t status = B_WOULD_BLOCK;
+		// mark somehow.. do not reply anything
 	
 	switch(message->what)
 	{
-	
 		case BT_MSG_ADD_DEVICE:
 		{
 			BString str;
-	        message->FindString("name", &str);        
+			message->FindString("name", &str);
 			BPath path(str.String());
+			Output::Instance()->Postf(BLACKBOARD_GENERAL,
+							"Requested LocalDevice %s\n", str.String());
+			LocalDeviceImpl* ldi = LocalDeviceImpl::CreateTransportAccessor(&path);
 
-     	   (Output::Instance()->Postf(BLACKBOARD_GENERAL, "Requested LocalDevice %s\n", str.String()));
-	        
-	        LocalDeviceImpl* ldi = LocalDeviceImpl::CreateTransportAccessor(&path);
+			if (ldi->GetID() >= 0) {
+				fLocalDevicesList.AddItem(ldi);
+				Output::Instance()->AddTab("Local Device", BLACKBOARD_LD(ldi->GetID()));
+				Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()),
+						"LocalDevice %s id=%x added\n",
+						str.String(), ldi->GetID());
+			} else {
+				Output::Instance()->Post("Adding LocalDevice failed\n",
+								 BLACKBOARD_GENERAL);
+			}
 
-	        if (ldi->GetID() >= 0) {
-                      fLocalDevicesList.AddItem(ldi);
-					  Output::Instance()->AddTab("Local Device", BLACKBOARD_LD(ldi->GetID()));
-					  (Output::Instance()->Postf(BLACKBOARD_LD(ldi->GetID()), "LocalDevice %s id=%x added\n", str.String(), ldi->GetID()));
-			 
-
-            } else {
-					  (Output::Instance()->Post("Adding LocalDevice failed\n", BLACKBOARD_GENERAL));
-            }
-            
-            status = B_WOULD_BLOCK;
-            
-            /* TODO: This should be by user request only! */
-            ldi->Launch();
-        }   
-			
+			status = B_WOULD_BLOCK;
+			/* TODO: This should be by user request only! */
+			ldi->Launch();
+		}
+		break;	
 		case BT_MSG_COUNT_LOCAL_DEVICES: 
 			status = HandleLocalDevicesCount(message, &reply);
-    	break;	
-    	
+		break;
 		case BT_MSG_ACQUIRE_LOCAL_DEVICE:
 			status = HandleAcquireLocalDevice(message, &reply);
 		break;
 
-        case BT_MSG_HANDLE_SIMPLE_REQUEST:
-            status = HandleSimpleRequest(message, &reply);
-        break;
-
-
+		case BT_MSG_HANDLE_SIMPLE_REQUEST:
+			status = HandleSimpleRequest(message, &reply);
+		break;
 		/* Handle if the bluetooth preferences is running?? */
 		case B_SOME_APP_LAUNCHED:
    		{
 			const char *signature;
 			// TODO: what's this for?
-			if (message->FindString("be:signature", &signature)==B_OK) {
+			if (message->FindString("be:signature", &signature) == B_OK) {
 				printf("input_server : %s\n", signature);
-				if (strcmp(signature, "application/x-vnd.Be-TSKB")==0) {
+				if (strcmp(signature, "application/x-vnd.Be-TSKB") == 0) {
 
 				}
 			}
 			return;
 		}
-		
 
 		default:
 			BApplication::MessageReceived(message);
 		break;
 	}
 	
-	// Can we reply right now? 
+	// Can we reply right now?
 	// TOD: review this condition
-    if (status != B_WOULD_BLOCK) {
-	    reply.AddInt32("status", status);
-	    message->SendReply(&reply);
-	    printf("Sending reply message\n"); 
+	if (status != B_WOULD_BLOCK) {
+		reply.AddInt32("status", status);
+		message->SendReply(&reply);
+		printf("Sending reply message\n");
 	}
-
 }
 
 #if 0
@@ -189,42 +172,36 @@ void BluetoothServer::MessageReceived(BMessage *message)
 LocalDeviceImpl* 
 BluetoothServer::LocateDelegateFromMessage(BMessage* message)
 {
-    LocalDeviceImpl* ldi = NULL;
- 	hci_id hid;
-    
-    if (message->FindInt32("hci_id", &hid) == B_OK)	    
-	{
-	    /* Try to find out when a ID was specified */
-	    int index;
-	    
-	    for (index = 0; index < fLocalDevicesList.CountItems() ; index ++) {
+	LocalDeviceImpl* ldi = NULL;
+	hci_id hid;
 
+	if (message->FindInt32("hci_id", &hid) == B_OK) {
+		/* Try to find out when a ID was specified */
+		int index;
+		for (index = 0; index < fLocalDevicesList.CountItems(); index ++) {
 		    ldi = fLocalDevicesList.ItemAt(index);
-		    if (ldi->GetID() == hid)  {            
+		    if (ldi->GetID() == hid)
 		        break;
-		    }		    
-        }
-    }
-        	
-    return ldi;
+		}
+	}
+
+	return ldi;
+
 }
 
 LocalDeviceImpl*
 BluetoothServer::LocateLocalDeviceImpl(hci_id hid) 
 {
+	/* Try to find out when a ID was specified */
+	int index;
 
-    /* Try to find out when a ID was specified */
-    int index;
-    
-    for (index = 0; index < fLocalDevicesList.CountItems() ; index ++) {
+	for (index = 0; index < fLocalDevicesList.CountItems(); index ++) {
+		LocalDeviceImpl* ldi = fLocalDevicesList.ItemAt(index);
+		if (ldi->GetID() == hid) 
+			return ldi;
+	}
 
-	    LocalDeviceImpl* ldi = fLocalDevicesList.ItemAt(index);
-	    if (ldi->GetID() == hid)  {
-	        return ldi;
-	    }		    
-    }
-    
-    return NULL;
+	return NULL;
 }
 
 
@@ -246,52 +223,50 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 	ssize_t size;
 	bdaddr_t bdaddr;
 	LocalDeviceImpl* ldi = NULL;
-    int32 index = 0;
+	int32 index = 0;
 	
-	if (message->FindInt32("hci_id", &hid) == B_OK)	    
+	if (message->FindInt32("hci_id", &hid) == B_OK)
 	{
-	    Output::Instance()->Post("GetLocalDevice requested with id\n", BLACKBOARD_KIT);
-        ldi = LocateDelegateFromMessage(message);						
-		
-	} else if (message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size ) == B_OK)
-	{
-	    /* Try to find out when the user specified the address */
-	    Output::Instance()->Post("GetLocalDevice requested with bdaddr\n", BLACKBOARD_KIT);	    
-	    for (index = 0; index < fLocalDevicesList.CountItems() ; index ++) {	        
-	        
-	        bdaddr_t local;
-		    ldi = fLocalDevicesList.ItemAt(index);
-		    // TODO: Only if the property is available
-		    //if ((ldi->GetAddress(&local, message) == B_OK) && bacmp(&local, &bdaddr))  {
-		    //    break;
-		    //}		    		    
-        }		    
-	    
-	} else
-	{
-	    /* Careless, any device not performing operations will be fine */	    	    
-	    Output::Instance()->Post("GetLocalDevice requested\n", BLACKBOARD_KIT);	    
-	    for (index = 0; index < fLocalDevicesList.CountItems() ; index ++) {
-	        
-		    ldi = fLocalDevicesList.ItemAt(index);
-		    printf("Requesting local device %ld\n", ldi->GetID());
-		    if (ldi != NULL && ldi->Available())
-		    {
-  			    printf("dev ours %ld\n", ldi->GetID());
-		        break;
-		    }
-		    
-        }	
-	}
+		Output::Instance()->Post("GetLocalDevice requested with id\n", 
+						BLACKBOARD_KIT);
+		ldi = LocateDelegateFromMessage(message);
 
-    if (index <= fLocalDevicesList.CountItems() && ldi != NULL && ldi->Available())
-	{
-	    Output::Instance()->Post("Device acquired\n", BLACKBOARD_KIT);
-	    ldi->Acquire();
-	    return reply->AddInt32("hci_id", hid);
-	}
+	} else if (message->FindData("bdaddr", B_ANY_TYPE, (const void**)&bdaddr, &size ) 
+			== B_OK) {
+		/* Try to find out when the user specified the address */
+		Output::Instance()->Post("GetLocalDevice requested with bdaddr\n", 
+						BLACKBOARD_KIT);
+		for (index = 0; index < fLocalDevicesList.CountItems(); index ++) {
+			bdaddr_t local;
+			ldi = fLocalDevicesList.ItemAt(index);
+			// TODO: Only if the property is available
+			//if ((ldi->GetAddress(&local, message) == B_OK) 
+			//	&& bacmp(&local, &bdaddr))  {
+			//    break;
+			//}
+		}
 
-	return B_ERROR;	
+		} else	{
+			/* Careless, any device not performing operations will be fine */
+			Output::Instance()->Post("GetLocalDevice requested\n", BLACKBOARD_KIT);
+			for (index = 0; index < fLocalDevicesList.CountItems(); index ++) {
+				ldi = fLocalDevicesList.ItemAt(index);
+				printf("Requesting local device %ld\n", ldi->GetID());
+				if (ldi != NULL && ldi->Available())
+				{
+					printf("dev ours %ld\n", ldi->GetID());
+					break;
+				}
+			}	
+		}
+	
+	if (index <= fLocalDevicesList.CountItems() && ldi != NULL && ldi->Available()) {
+		Output::Instance()->Post("Device acquired\n", BLACKBOARD_KIT);
+		ldi->Acquire();
+		return reply->AddInt32("hci_id", hid);
+	}
+	
+	return B_ERROR;
 	
 }
 
@@ -299,26 +274,21 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 status_t
 BluetoothServer::HandleSimpleRequest(BMessage* message, BMessage* reply)
 {
-
-    LocalDeviceImpl* ldi = LocateDelegateFromMessage(message);
+	LocalDeviceImpl* ldi = LocateDelegateFromMessage(message);
 	BString propertyRequested;
-		
-	// Find out if there is a property being requested, 
-    if (message->FindString("property", &propertyRequested) == B_OK) {
-    	// Check if the property has been already retrieved
-    	
-    	if (ldi->IsPropertyAvailable(propertyRequested)) {
-    	
-    	    // Dump everything
-    		reply->AddMessage("properties",ldi->GetPropertiesMessage());
-    		return B_OK;
-    	}
-    	               	
-    }
+
+	// Find out if there is a property being requested,
+	if (message->FindString("property", &propertyRequested) == B_OK) {
+		// Check if the property has been already retrieved
+		if (ldi->IsPropertyAvailable(propertyRequested)) {
+			// Dump everything
+			reply->AddMessage("properties",ldi->GetPropertiesMessage());
+			return B_OK;
+		}
+	}
 	
 	// we are gonna need issue the command ...
 	if (ldi->ProcessSimpleRequest(DetachCurrentMessage()) == B_OK)
-//	if (ldi->ProcessSimpleRequest(message) == B_OK)
 		return B_WOULD_BLOCK;
 	else
 		return B_ERROR;
@@ -334,7 +304,7 @@ BluetoothServer::HandleSimpleRequest(BMessage* message, BMessage* reply)
 int32 
 BluetoothServer::notification_Thread(void* data)
 {
-	BPortNot notifierd( (BluetoothServer*) data , BT_USERLAND_PORT_NAME);
+	BPortNot notifierd((BluetoothServer*)data, BT_USERLAND_PORT_NAME);
 	
 	notifierd.loop();
 	return B_NO_ERROR;
@@ -367,7 +337,7 @@ BluetoothServer::ShowWindow(BWindow* pWindow)
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	setbuf(stdout,NULL);
+	setbuf(stdout, NULL);
 
 	BluetoothServer* bluetoothServer = new BluetoothServer;
 

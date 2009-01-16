@@ -21,28 +21,14 @@ static inline void bacpy(bdaddr_t* dst, bdaddr_t* src)
 }
 
 
-static inline void baswap(bdaddr_t* dst, bdaddr_t* src) {
-
-}
-
-
-static inline char*	batostr(bdaddr_t *ba)
+static inline void baswap(bdaddr_t* dst, bdaddr_t* src)
 {
-	return "00:00:00:00:00:00";
+  register uint8* d = (uint8*)dst;
+  register uint8* s = (uint8*)src;
+  register int i;
 
-}
+  for(i=0; i<6; i++) d[i] = s[5-i];
 
-
-static inline void strtoba(const char *str, bdaddr_t *ba)
-{
-
-}
-
-
-/* Link key Management */
-static inline char* lktostr( uint8 link_key[16] )
-{
-	return "00:00:00:00:00:00";
 }
 
 

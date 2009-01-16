@@ -58,7 +58,7 @@ public:
 
 		if (addr != NULL) {
 			size_t count = sscanf(addr, "%2X:%2X:%2X:%2X:%2X:%2X",
-									&b0, &b1, &b2, &b3, &b4, &b5);
+						&b0, &b1, &b2, &b3, &b4, &b5);
 
 			if (count == 6)
 				return ((bdaddr_t) {{b0, b1, b2, b3, b4, b5}});

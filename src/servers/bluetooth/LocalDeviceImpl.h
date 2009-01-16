@@ -48,7 +48,7 @@ public:
 	// Connection
 	void ConnectionComplete(struct hci_ev_conn_complete* event, BMessage* request);
 	void ConnectionRequest(struct hci_ev_conn_request* event, BMessage* request);	
-	void DisconnectionComplete(struct hci_ev_disconnection_complete_reply* event, BMessage *request);	
+	void DisconnectionComplete(struct hci_ev_disconnection_complete_reply* event, BMessage* request);	
 
 	// Pairing
 	void PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* request);	

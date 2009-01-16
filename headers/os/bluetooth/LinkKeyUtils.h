@@ -30,10 +30,10 @@ public:
 		static char str[50];
 
 		sprintf(str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:"
-			"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X", 
-			lk.l[0], lk.l[1], lk.l[2], lk.l[3], lk.l[4], lk.l[5],
-			lk.l[6], lk.l[7], lk.l[8], lk.l[9], lk.l[10], lk.l[11],
-			lk.l[12], lk.l[13], lk.l[14], lk.l[15]);
+				"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X", 
+				lk.l[0], lk.l[1], lk.l[2], lk.l[3], lk.l[4], lk.l[5],
+				lk.l[6], lk.l[7], lk.l[8], lk.l[9], lk.l[10], lk.l[11],
+				lk.l[12], lk.l[13], lk.l[14], lk.l[15]);
 
 		return str;
 	}
@@ -43,9 +43,9 @@ public:
 		if (lkstr != NULL) {
 			int l0, l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15;
 			size_t count = sscanf(lkstr, "%2X:%2X:%2X:%2X:%2X:%2X:%2X:%2X:"
-								"%2X:%2X:%2X:%2X:%2X:%2X:%2X:%2X", &l0, &l1, &l2, &l3, 
-								&l4, &l5, &l6, &l7, &l8, &l9, &l10, &l11, &l12, &l13,
-								 &l14, &l15);
+							"%2X:%2X:%2X:%2X:%2X:%2X:%2X:%2X", &l0, &l1, &l2, &l3, 
+							&l4, &l5, &l6, &l7, &l8, &l9, &l10, &l11, &l12, &l13,
+							&l14, &l15);
 
 			if (count == 16) {
 				return (linkkey_t){{l0, l1, l2, l3, l4, l5, l6, l7, l8,

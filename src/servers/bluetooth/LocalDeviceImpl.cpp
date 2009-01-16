@@ -34,7 +34,7 @@ LocalDeviceImpl*
 LocalDeviceImpl::CreateControllerAccessor(BPath* path)
 {
     HCIDelegate* hd = new HCIControllerAccessor(path);
-    
+
     if ( hd != NULL)
         return new LocalDeviceImpl(hd);
     else
@@ -46,11 +46,11 @@ LocalDeviceImpl*
 LocalDeviceImpl::CreateTransportAccessor(BPath* path)
 {
     HCIDelegate* hd = new HCITransportAccessor(path);
-    
+
     if ( hd != NULL)
-        return new LocalDeviceImpl(hd);    
+        return new LocalDeviceImpl(hd);
     else
-        return NULL;        
+        return NULL;
 }
 
 
@@ -75,29 +75,24 @@ printf("### \n");
 
 	// Events here might have not been initated by us
 	// TODO: ML mark as handled pass a reply by parameter and reply in common
-    switch (event->ecode) {
-        case HCI_EVENT_HARDWARE_ERROR:
+	switch (event->ecode) {
+		case HCI_EVENT_HARDWARE_ERROR:
 			//HardwareError(event);    	
-   		return;
+		return;
 		case HCI_EVENT_CONN_REQUEST:
 			ConnectionRequest((struct hci_ev_conn_request*)(event+1), NULL);
 		return;
-
 		case HCI_EVENT_CONN_COMPLETE:
 			// should belong to a request?  can be sporadic or initiated by us¿?...
 			ConnectionComplete((struct hci_ev_conn_complete*)(event+1), NULL);					
 		return;
-
 		case HCI_EVENT_PIN_CODE_REQ:
 			PinCodeRequest((struct hci_ev_pin_code_req*)(event+1), NULL);
 		return;
-
-   		default:
-   			// lets go on
-   		break;        
+		default:
+			// lets go on
+		break;
 	}
-
-	
 
 	BMessage*	request = NULL;
 	int32		eventIndexLocation;
