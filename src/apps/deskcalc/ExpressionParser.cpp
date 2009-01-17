@@ -154,7 +154,7 @@ class Tokenizer {
 				TOKEN_CONSTANT);
 			fCurrentToken.value = temp.String();
 
-		} else if (isalpha(*fCurrentChar)) {
+		} else if (isalpha(*fCurrentChar) && *fCurrentChar != 'x') {
 
 			const char* begin = fCurrentChar;
 			while (*fCurrentChar != 0 && (isalpha(*fCurrentChar)
@@ -177,6 +177,7 @@ class Tokenizer {
 					type = TOKEN_MINUS;
 					break;
 				case '*':
+				case 'x':
 					type = TOKEN_STAR;
 					break;
 				case '/':
