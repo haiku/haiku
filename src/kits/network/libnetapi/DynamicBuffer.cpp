@@ -71,7 +71,7 @@ DynamicBuffer::Remove(void* data, size_t size)
 	if (fDataStart + size > fDataEnd)
 		return B_BUFFER_OVERFLOW;
 			
-	memcpy(_data, fBuffer + fDataStart, size);
+	memcpy(data, fBuffer + fDataStart, size);
 	fDataStart += size;
 	
 	if (fDataStart == fDataEnd)
@@ -116,7 +116,7 @@ DynamicBuffer::PrintToStream()
 status_t
 DynamicBuffer::_GrowToFit(size_t size)
 {
-	if (_size <= fBufferSize - fDataEnd)
+	if (size <= fBufferSize - fDataEnd)
 		return B_OK;
 	
 	size_t newSize = (fBufferSize + size) * 2;
