@@ -14,8 +14,10 @@
 
 class DynamicBuffer {
 public:
-	DynamicBuffer(size_t initialSize = 0);
+	DynamicBuffer(size_t initialSize = 1);
 	~DynamicBuffer();
+
+	DynamicBuffer(const DynamicBuffer& buffer);
 	
 	// InitCheck() should be called to guarantee the object initialization
 	// didn't fail. If it does not return B_OK, the initialization failed.
@@ -47,7 +49,7 @@ public:
 	void PrintToStream();
 
 private:
-	status_t _GrowToFit(size_t size);
+	status_t _GrowToFit(size_t size, bool exact = false);
 	
 	unsigned char* fBuffer;
 	size_t fBufferSize;

@@ -8,9 +8,12 @@
 
 #include "DynamicBuffer.h"
 
+#include <stdio.h>
+
 #include <Errors.h>
 #include <SupportDefs.h>
 
+#include <new>
 
 DynamicBuffer::DynamicBuffer(size_t initialSize) :
 	fBuffer(NULL),
@@ -35,6 +38,26 @@ DynamicBuffer::~DynamicBuffer()
 	fBufferSize = 0;
 	fDataStart = 0;
 	fDataEnd = 0;
+}
+
+
+DynamicBuffer::DynamicBuffer(const DynamicBuffer& buffer) :
+	fBuffer(NULL),
+	fBufferSize(0),
+	fDataStart(0),
+	fDataEnd(0),
+	fInit(B_NO_INIT)
+{
+	fInit = buffer.fInit;
+	if (fInit == B_OK) {
+		status_t result = _GrowToFit(buffer.fBufferSize, true);
+		if (result == B_OK) {
+			memcpy(fBuffer, buffer.fBuffer, fBufferSize);
+			fDataStart = buffer.fDataStart;
+			fDataEnd = buffer.fDataEnd;
+		} else
+			fInit = result;
+	}
 }
 
 
@@ -114,12 +137,16 @@ DynamicBuffer::PrintToStream()
 
 
 status_t
-DynamicBuffer::_GrowToFit(size_t size)
+DynamicBuffer::_GrowToFit(size_t size, bool exact)
 {
 	if (size <= fBufferSize - fDataEnd)
 		return B_OK;
-	
-	size_t newSize = (fBufferSize + size) * 2;
+
+	size_t newSize;
+	if (!exact)	
+		newSize = (fBufferSize + size) * 2;
+	else
+		newSize = size;
 
 	unsigned char* newBuffer = new (std::nothrow) unsigned char[newSize];
 	if (newBuffer == NULL)
