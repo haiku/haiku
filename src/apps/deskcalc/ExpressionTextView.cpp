@@ -103,6 +103,15 @@ ExpressionTextView::MouseDown(BPoint where)
 }
 
 
+void
+ExpressionTextView::GetDragParameters(BMessage* dragMessage,
+	BBitmap** bitmap, BPoint* point, BHandler** handler)
+{
+	InputTextView::GetDragParameters(dragMessage, bitmap, point, handler);
+	dragMessage->AddString("be:clip_name", "DeskCalc clipping");
+}
+
+
 // #pragma mark -
 
 

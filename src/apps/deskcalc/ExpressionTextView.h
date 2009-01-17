@@ -28,6 +28,11 @@ class ExpressionTextView : public InputTextView {
 
 	virtual	void				MouseDown(BPoint where);
 
+	// TextView
+	virtual	void				GetDragParameters(BMessage* dragMessage,
+									BBitmap** bitmap, BPoint* point,
+									BHandler** handler);
+
 	// InputTextView
 	virtual	void				RevertChanges();
 	virtual	void				ApplyChanges();
