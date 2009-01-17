@@ -19,30 +19,29 @@
 static const int32 kMaxDigits = 64;
 
 enum {
-	TOKEN_IDENTIFIER			= 'a',
+	TOKEN_IDENTIFIER			= 0,
 
-	TOKEN_CONSTANT				= '0',
+	TOKEN_CONSTANT,
 
-	TOKEN_PLUS					= '+',
-	TOKEN_MINUS					= '-',
+	TOKEN_PLUS,
+	TOKEN_MINUS,
 
-	TOKEN_STAR					= '*',
-	TOKEN_SLASH					= '/',
-	TOKEN_MODULO				= '%',
+	TOKEN_STAR,
+	TOKEN_SLASH,
+	TOKEN_MODULO,
 
-	TOKEN_POWER					= '^',
+	TOKEN_POWER,
 
-	TOKEN_OPENING_BRACKET		= '(',
-	TOKEN_CLOSING_BRACKET		= ')',
+	TOKEN_OPENING_BRACKET,
+	TOKEN_CLOSING_BRACKET,
 
-	TOKEN_AND					= '&',
-	TOKEN_OR					= '|',
-	TOKEN_NOT					= '~',
+	TOKEN_AND,
+	TOKEN_OR,
+	TOKEN_NOT,
 
-	TOKEN_NONE					= ' ',
-	TOKEN_END_OF_LINE			= '\n',
+	TOKEN_NONE,
+	TOKEN_END_OF_LINE
 };
-
 
 struct Token {
 	Token()
@@ -168,29 +167,57 @@ class Tokenizer {
 
 		} else {
 
+			int32 type = TOKEN_NONE;
+
 			switch (*fCurrentChar) {
 				case '+':
+					type = TOKEN_PLUS;
+					break;
 				case '-':
+					type = TOKEN_MINUS;
+					break;
 				case '*':
+					type = TOKEN_STAR;
+					break;
 				case '/':
+				case '\\':
+				case ':':
+					type = TOKEN_SLASH;
+					break;
 
-				case '^':
 				case '%':
+					type = TOKEN_MODULO;
+					break;
+				case '^':
+					type = TOKEN_POWER;
+					break;
 
 				case '(':
+					type = TOKEN_OPENING_BRACKET;
+					break;
 				case ')':
+					type = TOKEN_CLOSING_BRACKET;
+					break;
 
 				case '&':
-				case '|':
-				case '~':
-					fCurrentToken = Token(fCurrentChar, 1, _CurrentPos(),
-						*fCurrentChar);
-					fCurrentChar++;
+					type = TOKEN_AND;
 					break;
-			
+				case '|':
+					type = TOKEN_OR;
+					break;
+				case '~':
+					type = TOKEN_NOT;
+					break;
+
+				case '\n':
+					type = TOKEN_END_OF_LINE;
+					break;
+
 				default:
 					throw ParseException("unexpected character", _CurrentPos());
 			}
+			fCurrentToken = Token(fCurrentChar, 1, _CurrentPos(), type);
+			fCurrentChar++;
 		}
 
 //printf("next token: '%s'\n", fCurrentToken.string.String());
