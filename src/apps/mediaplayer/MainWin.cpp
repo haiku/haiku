@@ -142,10 +142,10 @@ MainWin::MainWin()
 	fMenuBar = new BMenuBar(fBackground->Bounds(), "menu");
 	_CreateMenu();
 	fBackground->AddChild(fMenuBar);
+	fMenuBar->SetResizingMode(B_FOLLOW_NONE);
 	fMenuBar->ResizeToPreferred();
 	fMenuBarWidth = (int)fMenuBar->Frame().Width() + 1;
 	fMenuBarHeight = (int)fMenuBar->Frame().Height() + 1;
-	fMenuBar->SetResizingMode(B_FOLLOW_NONE);
 
 	// video view
 	rect = BRect(0, fMenuBarHeight, fBackground->Bounds().right,
