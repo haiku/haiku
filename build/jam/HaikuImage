@@ -190,7 +190,7 @@ AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;
 AddDriversToHaikuImage graphics		: $(BEOS_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage input		: ps2_hid usb_hid wacom ;
-AddDriversToHaikuImage misc			: <driver>poke <driver>test ;
+AddDriversToHaikuImage misc			: <driver>poke <driver>test <driver>mem ;
 AddDriversToHaikuImage net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
 #AddDriversToHaikuImage power		: $(BEOS_ADD_ONS_DRIVERS_ACPI) ;
 
