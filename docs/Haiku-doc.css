@@ -39,17 +39,21 @@ a:hover, a:active {
 
 /* Some headers act as anchors, don't give them a hover effect */
 
+h1 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
 h2 a:hover, a:active {
 	text-decoration: none;
 	color: #0c3762;
 }
 h3 a:hover, a:active {
 	text-decoration: none;
-	color: #222;
+	color: #0c3762;
 }
 h4 a:hover, a:active {
 	text-decoration: none;
-	color: #000;
+	color: #0c3762;
 }
 
 /* basic text elements */
@@ -77,7 +81,13 @@ h2 {
 h3 {
 	font-size: 1.1em;
 	font-weight: normal;
-	color: #222;
+	color: #0c3762;
+	margin-top: 30px;
+}
+h4 {
+	font-size: 1.0em;
+	font-weight: lighter;
+	color: #0c3762;
 	margin-top: 30px;
 }
 p {

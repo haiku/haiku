@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"../html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+*
+* Copyright 2009, Haiku. All rights reserved.
+* Distributed under the terms of the MIT License.
+*
+* Authors:
+*		Socapex_2K <philippe_groarke@yahoo.ca>
+*
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Building Haiku on linux</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div class="logo">
+<img src="../../images/logo.png" alt="logo" width="372" height="86" />
+<div class="title">Building Haiku on Linux</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="../contents.html">Contents</a>
+		&#160;&#160;&#160;
+		Back to <a href="../installation.html">Installing Haiku</a>
+	</p>
+</div>
+
+<div class="content">
+
+<p>The following will show you step by step how to get Haiku's source code and build tools, how to compile it all and how to generate either a VMWare image or directly install onto a partition or USB drive. You'll also learn how to exchange data with an image or an installation on it's partition.</p>
+<p><b>Note:</b> <i>This guide is based on Ubuntu 8.10, but should generally work the same way on all other Linux distributions. Some changes may apply.</i></p>
+
+<h1>Downloading the tools and the Haiku source</h1>
+<ol>
+<li><p>Install all needed packages:</p>
+<pre class="terminal">sudo apt-get install subversion autoconf automake texinfo flex bison gawk build-essential</pre></li>
+
+<li><p>Create the Haiku development directories and get the Haiku build tools source:</p>
+<pre class="terminal">mkdir develop
+cd develop
+mkdir haiku
+cd haiku
+svn checkout svn://svn.berlios.de/haiku/buildtools/trunk buildtools</pre></li>
+
+<li><p>Build and install the Haiku Jam:</p>
+<pre class="terminal">cd  buildtools/jam
+make
+sudo ./jam0 install
+cd ../..</pre></li>
+
+<li><p>Get the Haiku source (this will take a while).<br />
+For anonymous check-out:</p>
+<pre class="terminal">svn checkout http://svn.berlios.de/svnroot/repos/haiku/haiku/trunk trunk</pre>
+<p>If you have a valid Haiku developer account at Berlios:</p>
+<pre class="terminal">svn checkout https://developername@svn.berlios.de/svnroot/repos/haiku/haiku/trunk trunk</pre>
+
+<p>If there are any errors while checking out the source, just cd into the trunk directory and type <tt>svn update</tt> to get any missed files.<br />
+This is also how you update the code in the future.</p></li>
+
+<li><p>Build the cross compiler tools (GCC 2.95):</p>
+<pre class="terminal">cd ~/develop/haiku/trunk
+./configure --build-cross-tools ../buildtools/</pre>
+<p>To build with GCC 4.x the configure line changes to:</p>
+<pre class="terminal">./configure  --build-cross-tools-gcc4 x86 ../buildtools/</pre>
+<p>But keep in mind this will produce binaries which are not compatible with BeOS.</p></li>
+</ol>
+
+<p><br /></p>
+<p>To download all code changes from now on, simply enter the <tt>haiku/trunk/</tt> folder and type:</p>
+<pre class="terminal">svn update</pre>
+
+<h1>Customizing UserBuildConfig</h1>
+
+<p>Now you could already start to build RAW or VMWare images. Before we come to that, however, let's have a look at the <tt>UserBuildConfig</tt> that can be used to customize and automate some things.</p>
+
+<p>In <tt>trunk/haiku/build/jam/</tt> there's a <tt>UserBuildConfig.ReadMe</tt> that explains various options.  <b>Don't</b> simply rename it and use it as <tt>UserBuildConfig</tt>!</p>
+<p>You start by duplicating the <tt>UserBuildConfig.sample</tt> and the remove the<tt>.sample</tt> suffix to get your <tt>UserBuildConfig</tt>. From the <tt>.ReadMe</tt> you can copy interesting parts into your config and customize them there.</p>
+
+<ol>
+<li><p>First, the line needed for the optional "OpenSSH" package:</p>
+<pre>HAIKU_IMAGE_HOST_NAME = "TEST" ;</pre>
+</li>
+<li><p>Now the block that sets the defaults for timezone and keymap:</p>
+<pre># Add symlink/file (timezone and keymap settings) to the image.
+AddSymlinkToHaikuImage home config settings
+	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+AddFilesToHaikuImage home config settings : German 
+	: Key_map ;</pre></li> 
+<li><p>The build process can be fine tuned until it fits your needs. You could create your own folder <tt>haiku/trunk/user_data/</tt>
+and put files there that are then copied or unzipped into the image.
+Zipping is important when dealing with Haiku files with their
+attributes, because zipping them up will preserve them on non-BFS
+partitions.<br />
+For example:</p>
+
+<pre># Zip up your emails between each system update and place the archive into the
+# user_data folder to be automatically put back when building the new image.
+UnzipArchiveToHaikuImage home
+	: $(HAIKU_TOP)/user_data/mail.zip ;</pre>
+<p>The first line defines the location in the image where the archive will be unzipped (here: <tt>/boot/home/</tt>). Deeper hierarchies are separated with a blank instead of the usual "<tt>/</tt>" (see the setting of the  timezone above).<br />
+The second line is the location of the zip file. <tt>$(HAIKU_TOP)</tt> is the lowest level of the checked out source tree, normally <tt>haiku/trunk/</tt>.</p>
+<p>In the same way, you use <tt>CopyDirectoryToHaikuImage</tt> and <tt>AddFilesToHaikuImage</tt> to copy whole directories or single files into the image.</p></li>
+
+<li><p>The above commands are executed when building any kind of image.
+"Build Profiles" provide the means to set commands specifically for
+different configurations.<br />
+These are two profiles, one for building and installing an image
+directly onto a partition and the other to generate a VMWare image:</p>
+<pre>DefineBuildProfile disk : disk : "/dev/sda7" ;
+DefineBuildProfile vmware : vmware-image ;
+
+switch $(HAIKU_BUILD_PROFILE) {
+	case "disk" : {
+		HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
+	}
+
+
+	case "vmware" : {
+		HAIKU_IMAGE_SIZE = 900 ;
+		HAIKU_DONT_CLEAR_IMAGE = 1 ;
+		HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1
+	}
+
+}</pre>
+<p>The first line is especially important and <b>dangerous</b>: "<tt>/dev/sda7</tt>"<br />
+<span style="font-size: 1.2em; font-weight: bold;">The so defined partition will be irretrievably overwritten!
+</span></p>
+<p>Before you use this profile, you should make sure that it's really
+the correct partition on the right harddisk or USB-stick, for example
+by using Ubuntu's partition editor <i>GParted</i>.</p></li>
+
+</ol>
+<p><br /></p>
+<p>Here's the complete <tt>UserBuildConfig</tt> once more:</p>
+<pre># Quick start file for UserBuildConfig. Copy it and uncomment and edit the
+# lines you want. See UserBuildConfig.ReadMe for details.
+
+# Optional package OpenSSH needs this variable set
+HAIKU_IMAGE_HOST_NAME = "TEST" ;
+
+# Add symlink/file (timezone and keymap settings) to the image.
+AddSymlinkToHaikuImage home config settings
+	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+AddFilesToHaikuImage home config settings : German 
+	: Key_map ;
+
+DefineBuildProfile disk : disk : "/dev/sda7" ;
+DefineBuildProfile vmware : vmware-image ;
+
+switch $(HAIKU_BUILD_PROFILE) {
+	case "disk" : {
+		HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
+	}
+
+
+	case "vmware" : {
+		HAIKU_IMAGE_SIZE = 900 ;
+		HAIKU_DONT_CLEAR_IMAGE = 1 ;
+		HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
+	}
+
+}</pre>
+
+<p style="text-indent: 15pt"><b>Note:</b> <i>when building an a USB memory stick, you wouldn't specify the partition number in the disk entry (ex. </i><tt>/dev/sdb</tt><i> instead of </i><tt>/dev/sdb1</tt><i>). This will erase your whole flash drive and it's partitions, so be cautious the drive name is exact.</i></p>
+
+<p>Besides these user build profiles, there are also official release profiles, see <tt>ReleaseBuildProfiles</tt> in the same folder. The profiles <i>alpha-raw</i> and <i>alpha-vmware</i> will build all officially planned components for the alpha release. They are invoked just like the user profiles, see <a href="#build_vmimage">Building a VMWare Image</a> a bit further down.
+</p>
+
+<h1>Building/installing Haiku Images</h1>
+
+<p>Thanks to our <tt>UserBuildConfig</tt> it's all quite simple now.</p>
+
+<h4>Installing on a partition/USB-stick</h4>
+
+<p>To install Haiku directly onto a partition/USB-stick, you have to
+set the according read and write permissions. <br />
+When installing to a hard drive partition, replace the drive name and use:</p>
+
+<pre class="terminal">
+sudo chmod o+r /dev/sda
+sudo chmod o+rw /dev/sda7
+</pre>
+
+<p style="margin: 15pt">Note that the read permission is set for the whole disk (1st line)
+while the write permission is limited to one specific partition (2nd
+line).</p>
+
+<p>When installing to a USB flashdrive, replace the drive name, and type:</p>
+<pre class="terminal">sudo chmod o+r /dev/sda</pre>
+<br />
+
+<p>Now the Haiku image is built and installed on the partition:</p>
+
+<pre class="terminal">sudo jam -q @disk</pre>
+
+<p>Installing to its own partition offers some interesting possibilities:</p>
+<pre class="terminal">sudo jam -q @disk update-all</pre>
+
+<p style="margin: 15pt">This updates all of the system, but leaves the home folder untouched, so all your data will still be there.</p>
+
+<p>You can also decide to only update certain components:</p>
+<pre class="terminal">sudo jam -q @disk update {components}</pre>
+
+<p style="margin: 15pt">Just replace the <tt>{components}</tt> with the program/component to be updated, e.g. <tt>kernel</tt>, <tt>StyledEdit</tt> or <tt>libmedia.so</tt> or more than one, separated with blanks. <tt>haiku/build/jam/HaikuImage</tt> lists all possible "targets".</p>
+
+
+<h4><a id="build_vmimage" name="build_vmimage">Building a VMWare Image</a></h4>
+
+<p>Just enter:</p>
+<pre class="terminal">sudo jam -q @vmware</pre>
+
+<p>You'll now have to rededicate the generated image to satisfy the VMPlayer, before you can run it with an associated <a href="http://haiku-files.org/files/haiku.vmx">.vmx</a> file (There's also a <tt>.vmx</tt> file in <tt>haiku/3rdparty/vmware/</tt>):</p>
+
+<pre class="terminal">sudo chown [YourUsername] haiku.image</pre>
+
+
+<h1>Booting with GRUB</h1>
+
+<p>If you installed Haiku directly onto a USB-stick, you just have to
+make sure the boot order in the BIOS looks first for USB devices to
+have Haiku boot right up from the stick.</p>
+
+<p>If Haiku was installed on a partition on your hard drive, you have to
+adjust the boot loader accordingly. This is how it's done with GRUB:</p>
+
+<pre class="terminal">sudo gedit /boot/grub/menu.lst</pre>
+
+<p>You'll note that GRUB uses a different naming strategy for hard drives than Linux.</p>
+
+<p>With GRUB it's: <tt>(hdN,n)</tt></p>
+<p>All harddisks start with "<i>hd</i>"<br />
+"<i>N</i>" is the hard disk number, starting with "0".<br />
+"<i>n</i> is the partition number, also starting with "0".<br />
+
+The first logical partition always have the number 4, regardless of the number of primary partitions.</p>
+
+<p>If you're still unsure, check out the <a href="http://www.gnu.org/software/grub/manual/grub.html#Naming-convention">GRUB manual</a>.</p>
+
+<p>As an example:</p>
+
+<p style="margin: 15pt"><tt>/dev/sda7</tt> would be <tt>(hd0,6)</tt> in GRUB.</p>
+
+<p>Now using your own hard drive number, type this entry in <tt>/boot/grub/menu.lst</tt>:</p>
+
+<pre># Haiku on /dev/sda7
+title		Haiku
+rootnoverify	(hd0,6)
+chainloader	+1</pre>
+
+<p>Save, reboot and choose "Haiku" in the GRUB menu at boot-up.</p>
+
+
+<h1>Accessing images/partitions</h1>
+
+<p>Using build profiles has another advantage: You can mount a VMWare
+image or the partition of a Haiku installation to transfer data.
+Navigate to <tt>haiku/trunk/</tt> and simply enter:</p>
+<pre class="terminal">sudo jam @disk mount</pre>
+
+<p>or</p>
+<pre class="terminal">sudo jam @vmware mount</pre>
+<p>You are now in the <tt>bfs_shell</tt>. Enter <tt>help</tt> to get a list of all supported commands:</p>
+<pre class="terminal">fssh:/&gt; help
+supported commands:
+cd               - change current directory
+chmod            - change file permissions
+cp               - copy files and directories
+exit             - quit the shell
+help             - list supported commands
+info             - prints volume informations
+ln               - create a hard or symbolic link
+ls               - list files or directories
+mkdir            - create directories
+mkindex          - create an index
+query            - query for files
+quit             - quit the shell
+rm               - remove files and directories
+sync             - syncs the file system</pre>
+<p>It all works pretty much like in your normal bash shell (besides there's sadly no tab-completion).<br />
+
+The one thing to remember: You have to prefix every local path (your Linux partition) with a "<tt>:</tt>".</p>
+<p>Here's an example to copy the file <tt>.bash_history</tt> from Haiku to your Linux partition:</p>
+<pre class="terminal">fssh:/&gt; cd myfs/home
+fssh:/myfs/home&gt; cp .bash_history :/home/humdinger/</pre>
+<p>The other way around works the same:</p>
+
+<pre class="terminal">fssh:&gt; cp :/home/humdinger/Bilder/gazette-final.png myfs/home/</pre>
+
+<!--To Continue?
+
+-->
+</div>
+
+<div class="bottomnav">
+	<p>
+		<a href="../contents.html">Contents</a>
+		&#160;&#160;&#160;
+		Back to <a href="../installation.html">Installing Haiku</a>
+	</p>
+</div>
+
+</body>
+</html>

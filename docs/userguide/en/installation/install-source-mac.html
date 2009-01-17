@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"../html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+*
+* Copyright 2009, Haiku. All rights reserved.
+* Distributed under the terms of the MIT License.
+*
+* Authors:
+*		Socapex_2K <philippe_groarke@yahoo.ca>
+*
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Building Haiku on Mac OS X</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div class="logo">
+	<img src="../../images/logo.png" alt="logo" width="372" height="86" />
+	<div class="title">Building Haiku on Mac OS X</div>
+</div>
+<div class="topnav">
+	<p>
+		<a href="../contents.html">Contents</a>
+		&#160;&#160;&#160;
+		Back to <a href="../installation.html">Installing Haiku</a>
+	</p>
+</div>
+
+<div class="content">
+
+<!--
+
+TODO:
+
+
+-->
+
+<p>Even if Mac OS X is Unix based, building Haiku on it still requires some tweaks.
+These instructions were tested on Mac OS X 10.5.5 (Leopard). They may not work on older versions of Mac OS X (Tiger, Panther etc.)</p>
+
+<h1>Requirements</h1>
+<ul>
+<li>You will need the Xcode Tools: use the installer on your Mac OS X Install DVD, or download the latest version from <a href="http://connect.apple.com/">Apple Developer Connection</a> (free registration required).</li>
+
+<li>You must be logged in as <b>administrator</b> to install some tools.</li>
+<li><a href="http://www.macports.org/">MacPorts</a> will also be required (see Step 3 for installation tips)</li>
+</ul>
+
+<h2>Step 1: Case-sensitive disk image</h2>
+
+<p>The Mac OS file system, HFS+, is case-insensitive by default. This causes troubles during the build of some Haiku components, because of wrong headers inclusion ("String.h" (from Haiku) instead of "string.h" (from the system) for
+instance). If your Mac OS X partition is not in case-sensitive HFS+ (which is very
+likely), you need to create a case-sensitive disk image and put Haiku
+buildtools and source code on it.</p>
+
+<p>1) Open Disk Utility (in /Application/Utilities)<br />
+2) Click "New Image", and enter the following parameters:</p>
+<ul>
+<li>Volume name: You should enter a short name without special character or spaces.</li>
+<li>Volume size: the minimum volume size is 2.68 Gb, the recommended size is the double. Do not worry about making the image bigger, since only the consumed space will be used on your hard drive.</li>
+<li>Volume format: Mac OS Extended (Case-sensitive, Journaled)</li>
+<li>Encryption: You should say "none", unless you really want to slow down Haiku building…</li>
+<li>Partitions: (Tiger users will not have this - just skip it): Choose No partition map.</li>
+<li>Image format: Choose “sparse disk image”.</li>
+</ul>
+
+<p><img alt="macosx.png" src="../../images/installation-images/macosx.png" /></p>
+
+<p>The image is automatically mounted on the Desktop. If you want to remount it later, just double-click on the image file.</p>
+
+<h2>Step 2: Fetching the buildtools and the Haiku source code</h2>
+
+<p>Open a Terminal (in /Application/Utilities), and enter:</p>
+<pre class="terminal">cd /Volumes/Haiku/</pre>
+
+<p><tt>/Volumes/Haiku</tt> refers here (and in
+all this tutorial) to the mounted disk image name. I named it "Haiku",
+so if you chose another name, use it instead of "Haiku" after
+<tt>/Volumes/</tt>.</p>
+
+<p>Checkout the buildtools:</p>
+<pre class="terminal">svn checkout svn://svn.berlios.de/haiku/buildtools/trunk buildtools</pre>
+
+<p><b>Note:</b> <i>in Tiger, as I remember, Subversion is not available with Xcode 2.5. You have to install it manually.</i></p>
+
+<p>And the source code:</p>
+<pre class="terminal">svn checkout svn://svn.berlios.de/haiku/haiku/trunk haiku</pre>
+
+<p>You should now have two folders "haiku" and "buildtools" into the mounted disk image.</p>
+
+<p>To update your code from now on, go to the <tt>haiku/trunk/</tt> folder and type:</p>
+<pre class="terminal">svn update</pre>
+
+<h2>Step 3: Install required software</h2>
+
+<p>First, install <a href="http://www.macports.org/">MacPorts</a> (A standard Installer package is provided)</p>
+
+<p>Close your Terminal, and enter in a new one:</p>
+<pre class="terminal">sudo port install gnuregex gawk wget</pre>
+
+<p>You will be prompted for the administrator password of the current account - Do not worry if nothing you type shows after the Password prompt, this is intended.</p>
+
+<p>If you get an error "port: command not found", the MacPorts shell configuration is probably not taken into account. You probably have a <tt>~/.bash_profile</tt> or <tt>~/.bash_login</tt> file overwriting MacPorts config located in <tt>~/.profile</tt>. When a "login shell" starts up, it reads the file <tt>"/etc/profile"</tt> and then <tt>"~/.bash_profile"</tt> or <tt>"~/.bash_login"</tt> or <tt>"~/.profile"</tt> (whichever one exists - it only reads one of these, checking for them in the order mentioned). Check the file used by Bash (in the mentioned order) and add these lines to the used file:</p>
+
+<pre class="terminal">nano ~/.bash_profile
+<b>or</b>
+nano ~/.bash_login
+<b>or</b>
+nano ~/.profile
+</pre>
+
+<p>Add at the end of the chosen file :</p>
+<pre>export PATH=/opt/local/bin:$PATH
+export MANPATH=$MANPATH:/opt/local/share/man
+export INFOPATH=$INFOPATH:/opt/local/share/info</pre>
+
+<p>To save the file and quit the editor, type <tt>CTRL-X</tt>, <tt>Y</tt> and <tt>RETURN</tt>. If you are using another shell, take a look a the shell documentation to see which file is parsed at login, and add the required commands.</p>
+
+<p>You can now retry the command in a new Terminal:</p>
+<pre class="terminal">sudo port install gnuregex gaw wget</pre>
+
+<p>After MacPorts finished installing the tools, install the modified Haiku jam:</p>
+<pre class="terminal">cd /Volumes/Haiku/buildtools/jam
+make
+sudo ./jam0 install
+[Enter your password]
+cd ..</pre>
+
+<p>Reopen a new Terminal, and enter:</p>
+<pre class="terminal">jam -v</pre>.
+
+<p>You should get:</p>
+<pre>Jam 2.5-haiku-20080327. OS=MACOSX. Copyright 1993-2002 Christopher Seiwald.</pre>
+
+<h2>Step 4: Let's Patch</h2>
+
+<p>With your favorite text editor, open the file:<br /> <tt>[Mounted Disk Image]/buildtools/legacy/gcc/config.guess</tt></p>
+
+<p>Go to line 522, and add this:</p>
+<pre>*:Darwin:*:*)
+echo ${UNAME_MACHINE}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-_].*//'`
+exit 0 ;;</pre>
+
+<p>before:</p>
+<pre>*:FreeBSD:*:*)
+  if test -x /usr/bin/objformat -a "elf" = "`/usr/bin/objformat`"; then
+    echo ${UNAME_MACHINE}-unknown-freebsdelf
+  else
+    echo ${UNAME_MACHINE}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-_].*//'`
+  fi
+exit 0 ;;</pre>
+
+<p><b>Warning!</b> When you copy-paste preformatted text from a web page, some versions of Safari replace every space with a no-break space. You can use the search/replace function of your text editor to replaces these "spaces" with real ones. (or copy the text by hand... or use another browser).</p>
+
+<p>Save the file, and open:<br />
+<tt>[Mounted Disk Image]/buildtools/legacy/gcc/Makefile.in</tt></p>
+
+<p>Replace (line 144):</p>
+
+<pre>MAKEINFO = `if [ -f $$r/texinfo/makeinfo/Makefile ] ; \
+	then echo $$r/texinfo/makeinfo/makeinfo ; \
+	else echo makeinfo ; fi`</pre>
+<p>By:</p>
+<pre>MAKEINFO = `if which -s makeinfo ; \
+	then echo makeinfo ; \
+	else echo $$r/texinfo/makeinfo/makeinfo ; fi`</pre>
+
+<p>These patches are from the <a href="http://www.freelists.org/archives/haiku-development/09-2008/msg00294.html">Haiku development mailing list</a>, thanks to their authors!</p>
+
+<h2>Step 5: Building the buildtools</h2>
+
+<p>Now, you can compile GCC2 with:</p>
+<pre class="terminal">cd /Volumes/Haiku/haiku
+./configure --build-cross-tools ../buildtools</pre>
+
+<p>If you want to build Haiku with GCC4, use :</p>
+<pre class="terminal">./configure --build-cross-tools-gcc4 x86 ../buildtools/</pre>
+
+<p>If you do not now which one you should use, choose gcc2 : Original BeOS R5 binaries (and many Haiku optional packages) will not run on a gcc4 build.</p>
+
+<p><tt>./configure</tt> has some more options, use this command to list them:</p>
+<pre class="terminal">./configure --help</pre>
+
+<p>After some time, you should get:</p>
+<pre>binutils and gcc for cross compilation have been built successfully!</pre>
+
+<h2>Step 6: Customizing the UserBuildConfig</h2>
+
+<p>Now you could already start to build RAW or VMWare images. Before we come to that, however, let's have a look at the UserBuildConfig that can be used to customize and automate some things.</p>
+
+<p>In <tt>trunk/haiku/build/jam/</tt> there's a <tt>UserBuildConfig.ReadMe</tt> that explains various options. <b>Don't</b> simply rename it and use it as UserBuildConfig!</p>
+
+You start by duplicating the <tt>UserBuildConfig.sample</tt> and the remove the .sample suffix to get your <tt>UserBuildConfig</tt>. From the .ReadMe you can copy interesting parts into your config and customize them there.
+
+<h2>Step 7: Building Haiku</h2>
+
+<p>Since on-disk install from Mac OS X does not seems possible at this time, you will need to use an emulation or virtualisation software.</p>
+
+<h3>Instructions for VMWare Fusion:</h3>
+<p>The command:</p>
+<pre class="terminal">cd /Volumes/Haiku/haiku
+jam -q haiku-vmware-image</pre>
+
+<p>will build a VMWare disk image:<br />
+<tt>[Mounted Disk Image]/haiku/generated/haiku.vmdk</tt>.</p>
+
+<p>To use it, follow these steps:</p>
+
+<ol>
+<li>Create a folder at the root of the disk image.</li>
+<li>Copy <tt>[Mounted Disk Image]/3rdparty/vmware/haiku.vmx</tt> inside this folder, and edit the copy.</li>
+<li>Change <tt>ide0:0.fileName = "haiku.vmdk"</tt> to <tt>ide0:0.fileName = "../haiku/generated/haiku.vmdk"</tt>. Save the file.</li>
+<li>Double-clicking on the file should start VMWare Fusion and launch Haiku.</li>
+</ol>
+
+<p>VMWare will create some files in the folder you put haiku.vmx. If you want easy access to the virtual machine file, make an alias of the haiku.vmx file (or put it into the Dock). Launching this alias will mount the disk image and start the VM, automatically.</p>
+
+<p>Haiku should run in:<br />
+<a href="http://www.kju-app.org/">Q</a> (free),<br />
+<a href="http://www.parallels.com/desktop/">Parallels Desktop</a> (commercial) and,<br />
+<a href="http://www.virtualbox.org/">VirtualBox</a> (free).</p>
+
+<p><b>Note:</b> <i>For more information refer to the topic <a href="install-vm.html">Running Haiku in a virtual machine</a>.</i></p>
+
+<p>Some of them (like Parallels and Virtual box, maybe others) can use the VMWare disk image (see above). For the others you can create a raw disk image.</p>
+
+<h3>Create a raw disk image</h3>
+
+<pre class="terminal">cd /Volumes/Haiku/haiku
+jam haiku-image</pre>
+
+<p>The image will be created in <tt>[Mounted Disk Image]/haiku/generated/haiku.image</tt>.</p>
+
+</div>
+
+<div class="bottomnav">
+	<p>
+		<a href="../contents.html">Contents</a>
+		&#160;&#160;&#160;
+		Back to <a href="../installation.html">Installing Haiku</a>
+	</p>
+</div>
+
+</body>
+</html>
