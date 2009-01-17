@@ -12,17 +12,17 @@
 #include <SupportDefs.h>
 
 
-DynamicBuffer::DynamicBuffer(size_t _initialSize) :
+DynamicBuffer::DynamicBuffer(size_t initialSize) :
 	fBuffer(NULL),
 	fBufferSize(0),
 	fDataStart(0),
 	fDataEnd(0),
 	fInit(B_NO_INIT)
 {
-	if (_initialSize > 0) {
-		fBuffer = new unsigned char[_initialSize];
+	if (initialSize > 0) {
+		fBuffer = new (std::nothrow) unsigned char[initialSize];
 		if (fBuffer != NULL) {
-			fBufferSize = _initialSize;
+			fBufferSize = initialSize;
 			fInit = B_OK;
 		}
 	}
@@ -46,33 +46,33 @@ DynamicBuffer::InitCheck() const
 
 
 status_t
-DynamicBuffer::Insert(const void* _data, size_t _size)
+DynamicBuffer::Insert(const void* data, size_t size)
 {
 	if (fInit != B_OK)
 		return fInit;
 
-	status_t result = _GrowToFit(_size);
+	status_t result = _GrowToFit(size);
 	if (result != B_OK)
 		return result;
 	
-	memcpy(fBuffer + fDataEnd, _data, _size);
-	fDataEnd += _size;
+	memcpy(fBuffer + fDataEnd, data, size);
+	fDataEnd += size;
 	
 	return B_OK;
 }
 
 
 status_t
-DynamicBuffer::Remove(void* _data, size_t _size)
+DynamicBuffer::Remove(void* data, size_t size)
 {
 	if (fInit != B_OK)
 		return fInit;
 
-	if (fDataStart + _size > fDataEnd)
+	if (fDataStart + size > fDataEnd)
 		return B_BUFFER_OVERFLOW;
 			
-	memcpy(_data, fBuffer + fDataStart, _size);
-	fDataStart += _size;
+	memcpy(_data, fBuffer + fDataStart, size);
+	fDataStart += size;
 	
 	if (fDataStart == fDataEnd)
 		fDataStart = fDataEnd = 0;
@@ -114,14 +114,14 @@ DynamicBuffer::PrintToStream()
 
 
 status_t
-DynamicBuffer::_GrowToFit(size_t _size)
+DynamicBuffer::_GrowToFit(size_t size)
 {
 	if (_size <= fBufferSize - fDataEnd)
 		return B_OK;
 	
-	size_t newSize = (fBufferSize + _size) * 2;
+	size_t newSize = (fBufferSize + size) * 2;
 
-	unsigned char* newBuffer = new unsigned char[newSize];
+	unsigned char* newBuffer = new (std::nothrow) unsigned char[newSize];
 	if (newBuffer == NULL)
 		return B_NO_MEMORY;
 

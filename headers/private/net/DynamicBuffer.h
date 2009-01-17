@@ -14,7 +14,7 @@
 
 class DynamicBuffer {
 public:
-	DynamicBuffer(size_t _initialSize = 0);
+	DynamicBuffer(size_t initialSize = 0);
 	~DynamicBuffer();
 	
 	// InitCheck() should be called to guarantee the object initialization
@@ -23,11 +23,11 @@ public:
 	
 	// Insert data at the end of the buffer. The buffer will be increased to
 	// accomodate the data if needed.
-	status_t Insert(const void* _data, size_t _size);
+	status_t Insert(const void* data, size_t size);
 	
 	// Remove data from the start of the buffer. Move the buffer start
 	// pointer to point to the data following it.
-	status_t Remove(void* _data, size_t _size);
+	status_t Remove(void* data, size_t size);
 
 	// Return a pointer to the underlying buffer. Note this will not
 	// necessarily be a pointer to the start of the allocated memory as the
@@ -47,7 +47,7 @@ public:
 	void PrintToStream();
 
 private:
-	status_t _GrowToFit(size_t _size);
+	status_t _GrowToFit(size_t size);
 	
 	unsigned char* fBuffer;
 	size_t fBufferSize;
