@@ -6,6 +6,7 @@ UsePrivateHeaders net ;
 
 local netapi_sources =
 	init.cpp
+	DynamicBuffer.cpp
 	NetEndpoint.cpp
 	NetAddress.cpp 
 	NetBuffer.cpp

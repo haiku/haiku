@@ -1,86 +1,93 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              Bruno Albuquerque, bga@bug-br.org.br
  */
+
 #ifndef _NETBUFFER_H
 #define _NETBUFFER_H
 
-
-#include <BeBuild.h>
-#include <SupportDefs.h>
 #include <Archivable.h>
+#include <SupportDefs.h>
 
-#include <sys/socket.h>
+
+class BMessage;
+class DynamicBuffer;
 
 
 class BNetBuffer : public BArchivable {
-	public:
-		BNetBuffer(size_t size = 0);
-		virtual ~BNetBuffer();
+public:
+	BNetBuffer(size_t size = 0);
 
-		status_t InitCheck();
+	virtual ~BNetBuffer();
 
-		BNetBuffer(BMessage* archive);
-		virtual status_t Archive(BMessage* into, bool deep = true) const;
-		static BArchivable* Instantiate(BMessage* archive);
+	BNetBuffer(const BNetBuffer& buffer);	
+	BNetBuffer(BMessage* archive);
 
-		BNetBuffer(const BNetBuffer &);
-		BNetBuffer& operator=(const BNetBuffer &);
+	BNetBuffer& operator=(const BNetBuffer& buffer);
 
-		// Mutators.
-		status_t AppendInt8(int8);
-		status_t AppendUint8(uint8);
-		status_t AppendInt16(int16);
-		status_t AppendUint16(uint16);
-		status_t AppendInt32(int32);
-		status_t AppendUint32(uint32);
-		status_t AppendFloat(float);
-		status_t AppendDouble(double);
-		status_t AppendString(const char *);
-		status_t AppendData(const void *, size_t);
-		status_t AppendMessage(const BMessage &);
-		status_t AppendInt64(int64);
-		status_t AppendUint64(uint64);
+	virtual	status_t Archive(BMessage* into, bool deep = true) const;
+	static BArchivable* Instantiate(BMessage* archive);	
 
-		status_t RemoveInt8(int8 &);
-		status_t RemoveUint8(uint8 &);
-		status_t RemoveInt16(int16 &);
-		status_t RemoveUint16(uint16 &);
-		status_t RemoveInt32(int32 &);
-		status_t RemoveUint32(uint32 &);
-		status_t RemoveFloat(float &);
-		status_t RemoveDouble(double &);
-		status_t RemoveString(char *, size_t);
-		status_t RemoveData(void *, size_t);
-		status_t RemoveMessage(BMessage &);
-		status_t RemoveInt64(int64 &);
-		status_t RemoveUint64(uint64 &);
+	status_t InitCheck();
 
-		// Accessors.
-		unsigned char* Data() const;
-		size_t Size() const;
-		size_t BytesRemaining() const;
+	status_t AppendInt8(int8 data);
+	status_t AppendUint8(uint8 data);
+	status_t AppendInt16(int16 data);
+	status_t AppendUint16(uint16 data);
+	status_t AppendInt32(int32 data);
+	status_t AppendUint32(uint32 data);
+	status_t AppendFloat(float data);
+	status_t AppendDouble(double data);
+	status_t AppendString(const char* data);
+	status_t AppendData(const void* data, size_t size);
+	status_t AppendMessage(const BMessage& data);
+	status_t AppendInt64(int64 data);
+	status_t AppendUint64(uint64 data);
 
-	private:
-		virtual void _ReservedBNetBufferFBCCruft1();
-		virtual void _ReservedBNetBufferFBCCruft2();
-		virtual void _ReservedBNetBufferFBCCruft3();
-		virtual void _ReservedBNetBufferFBCCruft4();
-		virtual void _ReservedBNetBufferFBCCruft5();
-		virtual void _ReservedBNetBufferFBCCruft6();
+ 	status_t RemoveInt8(int8& data);
+	status_t RemoveUint8(uint8& data);
+	status_t RemoveInt16(int16& data);
+	status_t RemoveUint16(uint16& data);
+	status_t RemoveInt32(int32& data);
+	status_t RemoveUint32(uint32& data);
+	status_t RemoveFloat(float& data);
+	status_t RemoveDouble(double& data);
+	status_t RemoveString(char* data, size_t size);
+	status_t RemoveData(void* data, size_t size);
+	status_t RemoveMessage(BMessage& data);
+	status_t RemoveInt64(int64& data);
+	status_t RemoveUint64(uint64& data);
+ 
+	unsigned char* Data() const;
+	size_t Size() const;
+	size_t BytesRemaining() const;
+	
+	inline DynamicBuffer* GetImpl() const;
 
-		// Private class helpers.
-		status_t clone(const BNetBuffer&);
-		status_t dpop(int32, int32, void*);
-		status_t dpush(int32, int32, const void*);
-		status_t resize(int32 newSize, bool regenStack = false);
-		
-		status_t	fInit;		
-		uint8*		fData;
-		int32		fDataSize;
-		int32		fStackSize;
-		int32		fCapacity;
-		int32		_reserved[5];
+protected:
+	status_t fInit;
+
+private:
+	virtual	void		_ReservedBNetBufferFBCCruft1();
+	virtual	void		_ReservedBNetBufferFBCCruft2();
+	virtual	void		_ReservedBNetBufferFBCCruft3();
+	virtual	void		_ReservedBNetBufferFBCCruft4();
+	virtual	void		_ReservedBNetBufferFBCCruft5();
+	virtual	void		_ReservedBNetBufferFBCCruft6();
+
+	DynamicBuffer* 		fImpl;
+	int32				__ReservedBNetBufferFBCCruftData[8];
+
 };
 
-#endif	// _NETBUFFER_H
+
+inline DynamicBuffer*
+BNetBuffer::GetImpl() const
+{
+	return fImpl;
+}
+
+#endif  // _NET_BUFFER_H
