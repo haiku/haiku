@@ -14,6 +14,7 @@
 #include "NetBuffer.h"
 
 #include <new>
+#include <string.h>
 
 BNetBuffer::BNetBuffer(size_t size) :
 	BArchivable(),
