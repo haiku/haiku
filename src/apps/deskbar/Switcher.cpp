@@ -614,7 +614,7 @@ TSwitchManager::_SortApps()
 {
 	team_id* teams;
 	int32 count;
-	if (BPrivate::get_application_order(B_CURRENT_WORKSPACE, &teams, &count)
+	if (BPrivate::get_application_order(current_workspace(), &teams, &count)
 			!= B_OK)
 		return;
 
@@ -651,7 +651,7 @@ TSwitchManager::_GetSortedWindowTokens(int32** _tokens, int32* _count)
 {
 	int32* ordered;
 	int32 orderedCount;
-	status_t status = BPrivate::get_window_order(B_CURRENT_WORKSPACE, &ordered,
+	status_t status = BPrivate::get_window_order(current_workspace(), &ordered,
 		&orderedCount);
 	if (status != B_OK)
 		return status;
@@ -945,13 +945,14 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 	}
 
 	int32 currentWorkspace = current_workspace();
-	TTeamGroup *teamGroup = (TTeamGroup *)fGroupList.ItemAt(fCurrentIndex);
+	TTeamGroup* teamGroup = (TTeamGroup*)fGroupList.ItemAt(fCurrentIndex);
 	// Let's handle the easy case first: There's only 1 team in the group
 	if (teamGroup->TeamList()->CountItems() == 1) {
 		bool result;
-		if (forceShow && (fCurrentWindow != 0 || windowInfo->is_mini))
+		if (forceShow && (fCurrentWindow != 0 || windowInfo->is_mini)) {
 			do_window_action(windowInfo->server_token, B_BRING_TO_FRONT,
 				BRect(0, 0, 0, 0), false);
+		}
 
 		if (!forceShow && windowInfo->is_mini) {
 			// we aren't unhiding minimized windows, so we can't do
@@ -999,8 +1000,13 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 	}
 
 	int32 tokenCount;
-	int32 *tokens = get_token_list(-1, &tokenCount);
-	if (!tokens) {
+#ifdef __HAIKU__
+	int32* tokens = NULL;
+	_GetSortedWindowTokens(&tokens, &tokenCount);
+#else
+	int32* tokens = get_token_list(-1, &tokenCount);
+#endif
+	if (tokens == NULL) {
 		ASSERT(windowInfo);
 		free(windowInfo);
 		return true;	// weird error, so don't try to recover
