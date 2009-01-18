@@ -23,7 +23,7 @@ public:
 	virtual void MessageReceived(BMessage* message);
 
 private:
-	bool CanLookup(const dev_t device, uint32* cddbId,
+	bool _CanLookup(const dev_t device, uint32* cddbId,
 		scsi_toc_toc* toc) const;
 
 	BVolumeRoster* fVolumeRoster;

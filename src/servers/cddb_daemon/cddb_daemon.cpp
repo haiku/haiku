@@ -36,7 +36,7 @@ CDDBDaemon::CDDBDaemon()
 			continue;
 
 		uint32 cddbId;
-		if (CanLookup(volume.Device(), &cddbId, toc)) {
+		if (_CanLookup(volume.Device(), &cddbId, toc)) {
 			printf("CD can be looked up. CDDB id = %lu.\n", cddbId);
 			// TODO(bga): Implement and enable CDDB database lookup.
 		}
@@ -68,7 +68,7 @@ CDDBDaemon::MessageReceived(BMessage* message)
 							break;
 							
 						uint32 cddbId;
-						if (CanLookup(device, &cddbId, toc)) {
+						if (_CanLookup(device, &cddbId, toc)) {
 							printf("CD can be looked up. CDDB id = %lu.\n",
 								cddbId);
 							// TODO(bga): Implement and enable CDDB
@@ -86,7 +86,7 @@ CDDBDaemon::MessageReceived(BMessage* message)
 
 
 bool
-CDDBDaemon::CanLookup(const dev_t device, uint32* cddbId,
+CDDBDaemon::_CanLookup(const dev_t device, uint32* cddbId,
 	scsi_toc_toc* toc) const
 {
 	if (cddbId == NULL || toc == NULL)
