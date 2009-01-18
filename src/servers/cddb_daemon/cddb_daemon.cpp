@@ -1,6 +1,9 @@
 /*
- * Copyright 2008, Bruno Albuquerque, bga@bug-br.org.br. All rights reserved.
+ * Copyright 2008-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              Bruno Albuquerque, bga@bug-br.org.br
  */
 
 #include "cddb_daemon.h"
@@ -21,14 +24,14 @@ static const int kMaxTocSize = 1024;
 
 
 CDDBDaemon::CDDBDaemon()
-	: BApplication("application/x-vnd.Haiku-CDDBDaemon"),
+	: BApplication("application/x-vnd.Haiku-cddb_daemon"),
 	  fVolumeRoster(new BVolumeRoster)
 {
 	fVolumeRoster->StartWatching();
 	
 	BVolume volume;
 	while (fVolumeRoster->GetNextVolume(&volume) == B_OK) {
-		scsi_toc_toc* toc = (scsi_toc_toc *)malloc(kMaxTocSize);
+		scsi_toc_toc* toc = (scsi_toc_toc*)malloc(kMaxTocSize);
 		if (toc == NULL)
 			continue;
 
@@ -83,20 +86,20 @@ CDDBDaemon::MessageReceived(BMessage* message)
 
 
 bool
-CDDBDaemon::CanLookup(const dev_t _device, uint32* _cddbId,
-	scsi_toc_toc* _toc) const
+CDDBDaemon::CanLookup(const dev_t device, uint32* cddbId,
+	scsi_toc_toc* toc) const
 {
-	if (_cddbId == NULL || _toc == NULL)
+	if (cddbId == NULL || toc == NULL)
 		return false;
 
 	// Is it an Audio disk?
 	fs_info info;
-	fs_stat_dev(_device, &info);
+	fs_stat_dev(device, &info);
 	if (strncmp(info.fsh_name, kCddaFsName, strlen(kCddaFsName)) != 0)
 		return false;
 	
 	// Does it have the CD:do_lookup attribute and is it true?
-	BVolume volume(_device);
+	BVolume volume(device);
 	BDirectory directory;
 	volume.GetRootDirectory(&directory);
 
@@ -106,12 +109,12 @@ CDDBDaemon::CanLookup(const dev_t _device, uint32* _cddbId,
 		return false;
 	
 	// Does it have the CD:cddbid attribute?
-	if (directory.ReadAttr("CD:cddbid", B_UINT32_TYPE, 0, (void *)_cddbId,
+	if (directory.ReadAttr("CD:cddbid", B_UINT32_TYPE, 0, (void *)cddbId,
 		sizeof(uint32)) < B_OK)
 		return false;		
 
 	// Does it have the CD:toc attribute?
-	if (directory.ReadAttr("CD:toc", B_RAW_TYPE, 0, (void *)_toc,
+	if (directory.ReadAttr("CD:toc", B_RAW_TYPE, 0, (void *)toc,
 		kMaxTocSize) < B_OK)
 		return false;
 	

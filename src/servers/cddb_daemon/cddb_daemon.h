@@ -1,9 +1,13 @@
 /*
- * Copyright 2008, Bruno Albuquerque, bga@bug-br.org.br. All rights reserved.
+ * Copyright 2008-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              Bruno Albuquerque, bga@bug-br.org.br
  */
-#ifndef CDDB_DAEMON_H
-#define CDDB_DAEMON_H
+ 
+#ifndef _CDDB_DAEMON_H
+#define _CDDB_DAEMON_H
 
 #include <Application.h>
 #include <Message.h>
@@ -11,8 +15,7 @@
 
 #include <scsi_cmds.h>
 
-class CDDBDaemon : public BApplication
-{
+class CDDBDaemon : public BApplication {
 public:
 	CDDBDaemon();
 	virtual ~CDDBDaemon();
@@ -20,10 +23,10 @@ public:
 	virtual void MessageReceived(BMessage* message);
 
 private:
-	bool CanLookup(const dev_t _device, uint32* _cddbId,
-		scsi_toc_toc* _toc) const;
+	bool CanLookup(const dev_t device, uint32* cddbId,
+		scsi_toc_toc* toc) const;
 
 	BVolumeRoster* fVolumeRoster;
 };
 
-#endif
+#endif  // _CDDB_DAEMON_H
