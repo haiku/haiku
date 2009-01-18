@@ -66,148 +66,154 @@ All rights reserved.
 
 
 class TTeamGroup {
-	public:
-		TTeamGroup();
-		TTeamGroup(BList *teams, uint32 flags, char *name, const char *sig);
-		virtual ~TTeamGroup();
+public:
+							TTeamGroup();
+							TTeamGroup(BList* teams, uint32 flags, char* name,
+								const char* signature);
+	virtual					~TTeamGroup();
 
-		void Draw(BView *, BRect bounds, bool main);
+			void			Draw(BView* view, BRect bounds, bool main);
 
-		BList *TeamList() const
-			{ return fTeams; }
-		const char *Name() const
-			{ return fName; }
-		const char *Signature() const
-			{ return fSignature; }
-		uint32 Flags() const
-			{ return fFlags; }
-		const BBitmap *SmallIcon() const
-			{ return fSmallIcon; }
-		const BBitmap *LargeIcon() const
-			{ return fLargeIcon; }
+			BList*			TeamList() const
+								{ return fTeams; }
+			const char*		Name() const
+								{ return fName; }
+			const char*		Signature() const
+								{ return fSignature; }
+			uint32			Flags() const
+								{ return fFlags; }
+			const BBitmap*	SmallIcon() const
+								{ return fSmallIcon; }
+			const BBitmap*	LargeIcon() const
+								{ return fLargeIcon; }
 
-	private:
-		BList *fTeams;
-		uint32 fFlags;
-		char fSignature[B_MIME_TYPE_LENGTH];
-		char *fName;
-		BBitmap	*fSmallIcon;
-		BBitmap	*fLargeIcon;
+private:
+			BList*			fTeams;
+			uint32			fFlags;
+			char			fSignature[B_MIME_TYPE_LENGTH];
+			char*			fName;
+			BBitmap*		fSmallIcon;
+			BBitmap*		fLargeIcon;
 };
 
 class TSwitcherWindow : public BWindow {
-	public:
-		TSwitcherWindow(BRect frame, TSwitchManager *mgr);
-		virtual	~TSwitcherWindow();
+public:
+							TSwitcherWindow(BRect frame,
+								TSwitchManager* manager);
+	virtual					~TSwitcherWindow();
 
-		virtual	bool QuitRequested();
-		virtual void MessageReceived(BMessage *message);
-		virtual	void Show();
-		virtual	void Hide();
-		virtual void WindowActivated(bool state);
+	virtual	bool			QuitRequested();
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			Show();
+	virtual	void			Hide();
+	virtual	void			WindowActivated(bool state);
 
-		void DoKey(uint32 key, uint32 mods);
-		TIconView *IconView();
-		TWindowView *WindowView();
-		TBox *TopView();
-		bool HairTrigger();
-		void Update(int32 previous, int32 current, int32 prevSlot,
-			int32 currentSlot, bool forward);
-		int32 SlotOf(int32);
-		void Redraw(int32 index);
+			void			DoKey(uint32 key, uint32 modifiers);
+			TIconView*		IconView();
+			TWindowView*	WindowView();
+			TBox*			TopView();
+			bool			HairTrigger();
+			void			Update(int32 previous, int32 current, int32 prevSlot,
+								int32 currentSlot, bool forward);
+			int32			SlotOf(int32);
+			void			Redraw(int32 index);
 
-	private:
-		TSwitchManager *fManager;
-		TIconView *fIconView;
-		TBox *fTopView;
-		TWindowView *fWindowView;
-		bool fHairTrigger;
-		bool fSkipKeyRepeats;
+private:
+			TSwitchManager*	fManager;
+			TIconView*		fIconView;
+			TBox*			fTopView;
+			TWindowView*	fWindowView;
+			bool			fHairTrigger;
+			bool			fSkipKeyRepeats;
 };
 
 class TWindowView : public BView {
-	public:
-		TWindowView(BRect frame, TSwitchManager *manager, TSwitcherWindow *switcher);
+public:
+							TWindowView(BRect frame, TSwitchManager* manager,
+								TSwitcherWindow* switcher);
 
-		void UpdateGroup(int32 groupIndex, int32 windowIndex);
+			void			UpdateGroup(int32 groupIndex, int32 windowIndex);
 
-		virtual void AttachedToWindow();
-		virtual	void Draw(BRect update);
-		virtual	void Pulse();
-		virtual	void GetPreferredSize(float *w, float *h);
-		void ScrollTo(float x, float y)
-			{ ScrollTo(BPoint(x,y)); }
-		virtual	void ScrollTo(BPoint where);
+	virtual void			AttachedToWindow();
+	virtual	void			Draw(BRect update);
+	virtual	void			Pulse();
+	virtual	void			GetPreferredSize(float* w, float* h);
+			void			ScrollTo(float x, float y)
+								{ ScrollTo(BPoint(x,y)); }
+	virtual	void			ScrollTo(BPoint where);
 
-		void ShowIndex(int32 windex);
-		BRect FrameOf(int32 index) const;
+			void			ShowIndex(int32 windex);
+			BRect			FrameOf(int32 index) const;
 
-	private:
-		int32 fCurrentToken;
-		float fItemHeight;
-		TSwitcherWindow	*fSwitcher;
-		TSwitchManager *fManager;
-		bool fLocal;
+private:
+			int32			fCurrentToken;
+			float			fItemHeight;
+			TSwitcherWindow* fSwitcher;
+			TSwitchManager*	fManager;
+			bool			fLocal;
 };
 
 class TIconView : public BView {
-	public:
-		TIconView(BRect frame, TSwitchManager *manager, TSwitcherWindow *switcher);
-		~TIconView();
+public:
+							TIconView(BRect frame, TSwitchManager* manager,
+								TSwitcherWindow* switcher);
+	virtual					~TIconView();
 
-		void Showing();
-		void Hiding();
+			void			Showing();
+			void			Hiding();
 
-		virtual void KeyDown(const char *bytes, int32 numBytes);
-		virtual	void Pulse();
-		virtual	void MouseDown(BPoint );
-		virtual	void Draw(BRect );
+	virtual void			KeyDown(const char* bytes, int32 numBytes);
+	virtual	void			Pulse();
+	virtual	void			MouseDown(BPoint point);
+	virtual	void			Draw(BRect updateRect);
 
-		void ScrollTo(float x, float y)
-			{ ScrollTo(BPoint(x,y)); }
-		virtual	void ScrollTo(BPoint where);
-		void Update(int32 previous, int32 current, int32 previousSlot,
-			int32 currentSlot, bool forward);
-		void DrawTeams(BRect update);
-		int32 SlotOf(int32) const;
-		BRect FrameOf(int32) const;
-		int32 ItemAtPoint(BPoint) const;
-		int32 IndexAt(int32 slot) const;
-		void CenterOn(int32 index);
+			void			ScrollTo(float x, float y)
+								{ ScrollTo(BPoint(x,y)); }
+	virtual	void	ScrollTo(BPoint where);
+			void			Update(int32 previous, int32 current,
+								int32 previousSlot, int32 currentSlot,
+								bool forward);
+			void			DrawTeams(BRect update);
+			int32			SlotOf(int32) const;
+			BRect			FrameOf(int32) const;
+			int32			ItemAtPoint(BPoint) const;
+			int32			IndexAt(int32 slot) const;
+			void			CenterOn(int32 index);
 
-	private:
-		void CacheIcons(TTeamGroup *);
-		void AnimateIcon(BBitmap *startIcon, BBitmap *endIcon);
+private:
+			void			CacheIcons(TTeamGroup* group);
+			void			AnimateIcon(BBitmap* startIcon, BBitmap* endIcon);
 
-		bool fAutoScrolling;
-		bool fCapsState;
-		TSwitcherWindow	*fSwitcher;
-		TSwitchManager *fManager;
-		BBitmap	*fOffBitmap;
-		BView *fOffView;
-		BBitmap	*fCurrentSmall;
-		BBitmap	*fCurrentLarge;
+			bool			fAutoScrolling;
+			bool			fCapsState;
+			TSwitcherWindow* fSwitcher;
+			TSwitchManager*	fManager;
+			BBitmap*		fOffBitmap;
+			BView*			fOffView;
+			BBitmap*		fCurrentSmall;
+			BBitmap*		fCurrentLarge;
 };
 
 class TBox : public BBox {
-	public:
-		TBox(BRect bounds, TSwitchManager *manager, TSwitcherWindow *, TIconView *iconView);
+public:
+							TBox(BRect bounds, TSwitchManager* manager,
+								TSwitcherWindow* window, TIconView* iconView);
 
-		virtual void Draw(BRect update);
-		virtual void AllAttached();
-		virtual	void DrawIconScrollers(bool force);
-		virtual	void DrawWindowScrollers(bool force);
-		virtual	void MouseDown(BPoint where);
+	virtual void			Draw(BRect update);
+	virtual void			AllAttached();
+	virtual	void			DrawIconScrollers(bool force);
+	virtual	void			DrawWindowScrollers(bool force);
+	virtual	void			MouseDown(BPoint where);
 
-	private:
-		TSwitchManager *fManager;
-		TSwitcherWindow	*fWindow;
-		TIconView *fIconView;
-		BRect fCenter;
-		bool fLeftScroller;
-		bool fRightScroller;
-		bool fUpScroller;
-		bool fDownScroller;
+private:
+			TSwitchManager*	fManager;
+			TSwitcherWindow* fWindow;
+			TIconView*		fIconView;
+			BRect			fCenter;
+			bool			fLeftScroller;
+			bool			fRightScroller;
+			bool			fUpScroller;
+			bool			fDownScroller;
 };
 
 
@@ -246,7 +252,7 @@ LowBitIndex(uint32 value)
 
 
 inline bool
-IsVisibleInCurrentWorkspace(const window_info *windowInfo)
+IsVisibleInCurrentWorkspace(const window_info* windowInfo)
 {
 	/*
 	 The window list is always ordered from the top
@@ -273,7 +279,7 @@ IsKeyDown(int32 key)
 
 
 bool
-IsWindowOK(const window_info *windowInfo)
+IsWindowOK(const window_info* windowInfo)
 {
 	// is_mini (true means that the window is minimized).
 	// if not, then
@@ -295,7 +301,7 @@ IsWindowOK(const window_info *windowInfo)
 
 
 bool
-OKToUse(const TTeamGroup *teamGroup)
+OKToUse(const TTeamGroup* teamGroup)
 {
 	if (!teamGroup)
 		return false;
@@ -313,7 +319,7 @@ OKToUse(const TTeamGroup *teamGroup)
 
 
 int
-SmartStrcmp(const char *s1, const char *s2)
+SmartStrcmp(const char* s1, const char* s2)
 {
 	if (strcasecmp(s1, s2) == 0)
 		return 0;
@@ -360,8 +366,8 @@ TTeamGroup::TTeamGroup()
 }
 
 
-TTeamGroup::TTeamGroup(BList *teams, uint32 flags, char *name,
-	const char *signature)
+TTeamGroup::TTeamGroup(BList* teams, uint32 flags, char* name,
+		const char* signature)
 	:
 	fTeams(teams),
 	fFlags(flags),
@@ -398,7 +404,7 @@ TTeamGroup::~TTeamGroup()
 
 
 void
-TTeamGroup::Draw(BView *view, BRect bounds, bool main)
+TTeamGroup::Draw(BView* view, BRect bounds, bool main)
 {
 	BRect rect;
 	if (main) {
@@ -446,8 +452,8 @@ TSwitchManager::TSwitchManager(BPoint point)
 		if (!barTeamInfo)
 			break;
 
-		TTeamGroup *tinfo = new TTeamGroup(barTeamInfo->teams, barTeamInfo->flags,
-			barTeamInfo->name, barTeamInfo->sig);
+		TTeamGroup* tinfo = new TTeamGroup(barTeamInfo->teams,
+			barTeamInfo->flags, barTeamInfo->name, barTeamInfo->sig);
 		fGroupList.AddItem(tinfo);
 
 		barTeamInfo->teams = NULL;
@@ -462,14 +468,14 @@ TSwitchManager::TSwitchManager(BPoint point)
 TSwitchManager::~TSwitchManager()
 {
 	for (int32 i = fGroupList.CountItems(); i-- > 0;) {
-		TTeamGroup *teamInfo = static_cast<TTeamGroup *>(fGroupList.ItemAt(i));
+		TTeamGroup* teamInfo = static_cast<TTeamGroup*>(fGroupList.ItemAt(i));
 		delete teamInfo;
 	}
 }
 
 
 void
-TSwitchManager::MessageReceived(BMessage *message)
+TSwitchManager::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_SOME_APP_QUIT:
@@ -477,10 +483,10 @@ TSwitchManager::MessageReceived(BMessage *message)
 			// This is only sent when last team of a matching set quits
 			team_id teamID;
 			int i = 0;
-			TTeamGroup *tinfo;
+			TTeamGroup* tinfo;
 			message->FindInt32("team", &teamID);
-			while ((tinfo = (TTeamGroup *) fGroupList.ItemAt(i)) != NULL) {
-				if (tinfo->TeamList()->HasItem((void *)teamID)) {
+			while ((tinfo = (TTeamGroup*)fGroupList.ItemAt(i)) != NULL) {
+				if (tinfo->TeamList()->HasItem((void*)teamID)) {
 					fGroupList.RemoveItem(i);
 
 					if (OKToUse(tinfo)) {
@@ -500,16 +506,16 @@ TSwitchManager::MessageReceived(BMessage *message)
 
 		case B_SOME_APP_LAUNCHED:
 		{
-			BList *teams;
-			const char *name;
-			BBitmap	*smallIcon;
+			BList* teams;
+			const char* name;
+			BBitmap* smallIcon;
 			uint32 flags;
-			const char *signature;
+			const char* signature;
 
-			if (message->FindPointer("teams", (void **)&teams) != B_OK)
+			if (message->FindPointer("teams", (void**)&teams) != B_OK)
 				break;
 
-			if (message->FindPointer("icon", (void **)&smallIcon) != B_OK) {
+			if (message->FindPointer("icon", (void**)&smallIcon) != B_OK) {
 				delete teams;
 				break;
 			}
@@ -518,7 +524,7 @@ TSwitchManager::MessageReceived(BMessage *message)
 				delete teams;
 				break;
 			}
-			if (message->FindInt32("flags", (int32 *)&flags) != B_OK) {
+			if (message->FindInt32("flags", (int32*)&flags) != B_OK) {
 				delete teams;
 				break;
 			}
@@ -527,7 +533,7 @@ TSwitchManager::MessageReceived(BMessage *message)
 				break;
 			}
 
-			TTeamGroup *tinfo = new TTeamGroup(teams, flags, strdup(name),
+			TTeamGroup* tinfo = new TTeamGroup(teams, flags, strdup(name),
 				signature);
 
 			fGroupList.AddItem(tinfo);
@@ -539,15 +545,15 @@ TSwitchManager::MessageReceived(BMessage *message)
 
 		case msg_AddTeam:
 		{
-			const char *signature = message->FindString("sig");
+			const char* signature = message->FindString("sig");
 			team_id team = message->FindInt32("team");
 
 			int32 numItems = fGroupList.CountItems();
 			for (int32 i = 0; i < numItems; i++) {
-				TTeamGroup *tinfo = (TTeamGroup *)fGroupList.ItemAt(i);
+				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
 				if (strcasecmp(tinfo->Signature(), signature) == 0) {
-					if (!(tinfo->TeamList()->HasItem((void *)team)))
-						tinfo->TeamList()->AddItem((void *)team);
+					if (!(tinfo->TeamList()->HasItem((void*)team)))
+						tinfo->TeamList()->AddItem((void*)team);
 					break;
 				}
 			}
@@ -560,9 +566,9 @@ TSwitchManager::MessageReceived(BMessage *message)
 
 			int32 numItems = fGroupList.CountItems();
 			for (int32 i = 0; i < numItems; i++) {
-				TTeamGroup *tinfo = (TTeamGroup *)fGroupList.ItemAt(i);
-				if (tinfo->TeamList()->HasItem((void *)team)) {
-					tinfo->TeamList()->RemoveItem((void *)team);
+				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
+				if (tinfo->TeamList()->HasItem((void*)team)) {
+					tinfo->TeamList()->RemoveItem((void*)team);
 					break;
 				}
 			}
@@ -574,7 +580,7 @@ TSwitchManager::MessageReceived(BMessage *message)
 			// The first TASK message calls MainEntry. Subsequent ones
 			// call Process().
 			bigtime_t time;
-			message->FindInt64("when", (int64 *)&time);
+			message->FindInt64("when", (int64*)&time);
 
 			// The fSkipUntil stuff can be removed once the new input_server
 			// starts differentiating initial key_downs from KeyDowns generated
@@ -591,7 +597,7 @@ TSwitchManager::MessageReceived(BMessage *message)
 					// was made visible. Better UI feel if we do this.
 					if (time > fSkipUntil) {
 						uint32 modifiers;
-						message->FindInt32("modifiers", (int32 *)&modifiers);
+						message->FindInt32("modifiers", (int32*)&modifiers);
 						Process((modifiers & B_SHIFT_KEY) == 0,
 							(modifiers & B_OPTION_KEY) != 0);
 					}
@@ -698,7 +704,7 @@ TSwitchManager::_GetSortedWindowTokens(int32** _tokens, int32* _count)
 
 
 void
-TSwitchManager::MainEntry(BMessage *message)
+TSwitchManager::MainEntry(BMessage* message)
 {
 	bigtime_t keyRepeatRate;
 	get_key_repeat_delay(&keyRepeatRate);
@@ -723,7 +729,7 @@ TSwitchManager::MainEntry(BMessage *message)
 	fCurrentIndex = FindTeam(appInfo.team, &index) != NULL ? index : 0;
 
 	int32 key;
-	message->FindInt32("key", (int32 *)&key);
+	message->FindInt32("key", (int32*)&key);
 
 	uint32 modifierKeys = 0;
 	while (system_time() < timeout) {
@@ -755,12 +761,12 @@ TSwitchManager::Stop(bool do_action, uint32)
 }
 
 
-TTeamGroup *
-TSwitchManager::FindTeam(team_id teamID, int32 *index)
+TTeamGroup*
+TSwitchManager::FindTeam(team_id teamID, int32* index)
 {
 	int i = 0;
 	TTeamGroup* info;
-	while ((info = (TTeamGroup *)fGroupList.ItemAt(i)) != NULL) {
+	while ((info = (TTeamGroup*)fGroupList.ItemAt(i)) != NULL) {
 		if (info->TeamList()->HasItem((void*)teamID)) {
 			*index = i;
 			return info;
@@ -817,14 +823,14 @@ TSwitchManager::Process(bool forward, bool byWindow)
 
 
 void
-TSwitchManager::QuickSwitch(BMessage *message)
+TSwitchManager::QuickSwitch(BMessage* message)
 {
 	uint32 modifiers = 0;
-	message->FindInt32("modifiers", (int32 *) &modifiers);
+	message->FindInt32("modifiers", (int32*)&modifiers);
 
 	team_id team;
 	if (message->FindInt32("team", &team) == B_OK) {
-		bool forward = ((modifiers & B_SHIFT_KEY) == 0);
+		bool forward = (modifiers & B_SHIFT_KEY) == 0;
 
 		if ((modifiers & B_OPTION_KEY) != 0)
 			SwitchWindow(team, forward, true);
@@ -843,7 +849,7 @@ TSwitchManager::CountVisibleGroups()
 
 	int32 count = fGroupList.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		if (!OKToUse((TTeamGroup *) fGroupList.ItemAt(i)))
+		if (!OKToUse((TTeamGroup*)fGroupList.ItemAt(i)))
 			continue;
 
 		result++;
@@ -902,7 +908,7 @@ TSwitchManager::CycleApp(bool forward, bool activateNow)
 			// a good app. Oh well.
 			return;
 
-		if (!OKToUse((TTeamGroup *)fGroupList.ItemAt(fCurrentIndex)))
+		if (!OKToUse((TTeamGroup*)fGroupList.ItemAt(fCurrentIndex)))
 			continue;
 
 		// if we're here then we found a good one
@@ -1028,8 +1034,8 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 			break;
 		}
 		if (matchWindowInfo->server_token != windowInfo->server_token
-			&& teamGroup->TeamList()->HasItem((void *)matchWindowInfo->team))
-			windowsToActivate.AddItem((void *)matchWindowInfo->server_token);
+			&& teamGroup->TeamList()->HasItem((void*)matchWindowInfo->team))
+			windowsToActivate.AddItem((void*)matchWindowInfo->server_token);
 
 		free(matchWindowInfo);
 	}
@@ -1048,6 +1054,7 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 
 	do_window_action(windowInfo->server_token, B_BRING_TO_FRONT,
 		BRect(0, 0, 0, 0), false);
+
 	free(windowInfo);
 	return true;
 }
@@ -1058,10 +1065,10 @@ TSwitchManager::QuitApp()
 {
 	// check if we're in the last slot already (the last usable team group)
 
-	TTeamGroup *teamGroup;
+	TTeamGroup* teamGroup;
 	int32 count = 0;
 	for (int32 i = fCurrentIndex + 1; i < fGroupList.CountItems(); i++) {
-		teamGroup = (TTeamGroup *)fGroupList.ItemAt(i);
+		teamGroup = (TTeamGroup*)fGroupList.ItemAt(i);
 
 		if (!OKToUse(teamGroup))
 			continue;
@@ -1069,7 +1076,7 @@ TSwitchManager::QuitApp()
 		count++;
 	}
 
-	teamGroup = (TTeamGroup *)fGroupList.ItemAt(fCurrentIndex);
+	teamGroup = (TTeamGroup*)fGroupList.ItemAt(fCurrentIndex);
 
 	if (count == 0) {
 		// switch to previous app in the list so that we don't jump to
@@ -1101,7 +1108,7 @@ TSwitchManager::HideApp()
 {
 	// hide all teams in this group
 
-	TTeamGroup *teamGroup = (TTeamGroup *)fGroupList.ItemAt(fCurrentIndex);
+	TTeamGroup* teamGroup = (TTeamGroup*)fGroupList.ItemAt(fCurrentIndex);
 
 	for (int32 i = teamGroup->TeamList()->CountItems(); i-- > 0;) {
 		team_id team = (team_id)teamGroup->TeamList()->ItemAt(i);
@@ -1166,7 +1173,7 @@ TSwitchManager::WindowInfo(int32 groupIndex, int32 windowIndex)
 int32
 TSwitchManager::CountWindows(int32 groupIndex, bool )
 {
-	TTeamGroup *teamGroup = (TTeamGroup *)fGroupList.ItemAt(groupIndex);
+	TTeamGroup* teamGroup = (TTeamGroup*)fGroupList.ItemAt(groupIndex);
 	if (!teamGroup)
 		return 0;
 
@@ -1178,7 +1185,7 @@ TSwitchManager::CountWindows(int32 groupIndex, bool )
 			break;
 
 		int32 count;
-		int32 *tokens = get_token_list(teamID, &count);
+		int32* tokens = get_token_list(teamID, &count);
 		if (!tokens)
 			continue;
 
@@ -1272,7 +1279,7 @@ TSwitchManager::CurrentSlot()
 }
 
 
-BList *
+BList*
 TSwitchManager::GroupList()
 {
 	return &fGroupList;
@@ -1282,8 +1289,8 @@ TSwitchManager::GroupList()
 //	#pragma mark -
 
 
-TBox::TBox(BRect bounds, TSwitchManager *manager, TSwitcherWindow *window,
-	TIconView *iview)
+TBox::TBox(BRect bounds, TSwitchManager* manager, TSwitcherWindow* window,
+		TIconView* iview)
 	: BBox(bounds, "top", B_FOLLOW_NONE, B_WILL_DRAW, B_NO_BORDER),
 	fManager(manager),
 	fWindow(window),
@@ -1613,7 +1620,7 @@ TBox::DrawWindowScrollers(bool force)
 //	#pragma mark -
 
 
-TSwitcherWindow::TSwitcherWindow(BRect frame, TSwitchManager *manager)
+TSwitcherWindow::TSwitcherWindow(BRect frame, TSwitchManager* manager)
 	: BWindow(frame, "Twitcher", B_MODAL_WINDOW_LOOK,
 			B_MODAL_ALL_WINDOW_FEEL,
 			B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE, B_ALL_WORKSPACES),
@@ -1649,7 +1656,7 @@ TSwitcherWindow::~TSwitcherWindow()
 
 
 void
-TSwitcherWindow::MessageReceived(BMessage *message)
+TSwitcherWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_KEY_DOWN:
@@ -1664,8 +1671,8 @@ TSwitcherWindow::MessageReceived(BMessage *message)
 
 			uint32 rawChar;
 			uint32 modifiers;
-			message->FindInt32("raw_char", 0, (int32 *)&rawChar);
-			message->FindInt32("modifiers", 0, (int32 *)&modifiers);
+			message->FindInt32("raw_char", 0, (int32*)&rawChar);
+			message->FindInt32("modifiers", 0, (int32*)&modifiers);
 			DoKey(rawChar, modifiers);
 			break;
 		}
@@ -1751,7 +1758,7 @@ TSwitcherWindow::DoKey(uint32 key, uint32 modifiers)
 bool
 TSwitcherWindow::QuitRequested()
 {
-	((TBarApp *) be_app)->Settings()->switcherLoc = Frame().LeftTop();
+	((TBarApp*)be_app)->Settings()->switcherLoc = Frame().LeftTop();
 	fManager->Stop(false, 0);
 	return false;
 }
@@ -1799,7 +1806,7 @@ TSwitcherWindow::Show()
 }
 
 
-TBox *
+TBox*
 TSwitcherWindow::TopView()
 {
 	return fTopView;
@@ -1820,14 +1827,14 @@ TSwitcherWindow::SlotOf(int32 i)
 }
 
 
-inline TIconView *
+inline TIconView*
 TSwitcherWindow::IconView()
 {
 	return fIconView;
 }
 
 
-inline TWindowView *
+inline TWindowView*
 TSwitcherWindow::WindowView()
 {
 	return fWindowView;
@@ -1837,9 +1844,10 @@ TSwitcherWindow::WindowView()
 //	#pragma mark -
 
 
-TIconView::TIconView(BRect frame, TSwitchManager *manager, TSwitcherWindow *switcherWindow)
+TIconView::TIconView(BRect frame, TSwitchManager* manager,
+		TSwitcherWindow* switcherWindow)
 	: BView(frame, "main_view", B_FOLLOW_NONE,
-			B_WILL_DRAW | B_PULSE_NEEDED),
+		B_WILL_DRAW | B_PULSE_NEEDED),
 	fAutoScrolling(false),
 	fSwitcher(switcherWindow),
 	fManager(manager)
@@ -1869,15 +1877,15 @@ TIconView::~TIconView()
 
 
 void
-TIconView::KeyDown(const char *, int32)
+TIconView::KeyDown(const char* /*bytes*/, int32 /*numBytes*/)
 {
 }
 
 
 void
-TIconView::CacheIcons(TTeamGroup *teamGroup)
+TIconView::CacheIcons(TTeamGroup* teamGroup)
 {
-	const BBitmap *bitmap = teamGroup->SmallIcon();
+	const BBitmap* bitmap = teamGroup->SmallIcon();
 	ASSERT(bitmap);
 	fCurrentSmall->SetBits(bitmap->Bits(), bitmap->BitsLength(), 0,
 		bitmap->ColorSpace());
@@ -1890,7 +1898,7 @@ TIconView::CacheIcons(TTeamGroup *teamGroup)
 
 
 void
-TIconView::AnimateIcon(BBitmap *startIcon, BBitmap *endIcon)
+TIconView::AnimateIcon(BBitmap* startIcon, BBitmap* endIcon)
 {
 	BRect centerRect(kCenterSlot*kSlotSize, 0,
 		(kCenterSlot + 1) * kSlotSize - 1, kSlotSize - 1);
@@ -1972,7 +1980,7 @@ TIconView::Update(int32, int32 current, int32 previousSlot, int32 currentSlot,
 	}
 	fAutoScrolling = false;
 
-	TTeamGroup *teamGroup = (TTeamGroup *)fManager->GroupList()->ItemAt(current);
+	TTeamGroup* teamGroup = (TTeamGroup*)fManager->GroupList()->ItemAt(current);
 	ASSERT(teamGroup);
 	CacheIcons(teamGroup);
 
@@ -2000,7 +2008,7 @@ TIconView::ItemAtPoint(BPoint point) const
 
 	for (int32 i = 0, verticalIndex = 0; ; i++) {
 
-		TTeamGroup *teamGroup = (TTeamGroup *)fManager->GroupList()->ItemAt(i);
+		TTeamGroup* teamGroup = (TTeamGroup*)fManager->GroupList()->ItemAt(i);
 		if (teamGroup == NULL)
 			break;
 
@@ -2027,12 +2035,12 @@ TIconView::ScrollTo(BPoint where)
 int32
 TIconView::IndexAt(int32 slot) const
 {
-	BList *list = fManager->GroupList();
+	BList* list = fManager->GroupList();
 	int32 count = list->CountItems();
 	int32 slotIndex = 0;
 
 	for (int32 i = 0; i < count; i++) {
-		TTeamGroup *teamGroup = (TTeamGroup *)list->ItemAt(i);
+		TTeamGroup* teamGroup = (TTeamGroup*)list->ItemAt(i);
 
 		if (!OKToUse(teamGroup))
 			continue;
@@ -2057,13 +2065,13 @@ TIconView::SlotOf(int32 index) const
 BRect
 TIconView::FrameOf(int32 index) const
 {
-	BList *list = fManager->GroupList();
+	BList* list = fManager->GroupList();
 	int32 visible = kCenterSlot - 1;
 		// first few slots in view are empty
 
-	TTeamGroup *teamGroup;
+	TTeamGroup* teamGroup;
 	for (int32 i = 0; i <= index; i++) {
-		teamGroup = (TTeamGroup *)list->ItemAt(i);
+		teamGroup = (TTeamGroup*)list->ItemAt(i);
 
 		if (!OKToUse(teamGroup))
 			continue;
@@ -2079,14 +2087,14 @@ void
 TIconView::DrawTeams(BRect update)
 {
 	int32 mainIndex = fManager->CurrentIndex();
-	BList *list = fManager->GroupList();
+	BList* list = fManager->GroupList();
 	int32 count = list->CountItems();
 
 	BRect rect(kCenterSlot * kSlotSize, 0,
 		(kCenterSlot + 1) * kSlotSize - 1, kSlotSize - 1);
 
 	for (int32 i = 0; i < count; i++) {
-		TTeamGroup *teamGroup = (TTeamGroup *) list->ItemAt(i);
+		TTeamGroup* teamGroup = (TTeamGroup*)list->ItemAt(i);
 
 		if (!OKToUse(teamGroup))
 			continue;
@@ -2206,7 +2214,7 @@ TWindowView::FrameOf(int32 index) const
 
 
 void
-TWindowView::GetPreferredSize(float *_width, float *_height)
+TWindowView::GetPreferredSize(float* _width, float* _height)
 {
 	font_height	fh;
 	be_plain_font->GetHeight(&fh);
@@ -2269,8 +2277,9 @@ void
 TWindowView::Draw(BRect update)
 {
 	int32 groupIndex = fManager->CurrentIndex();
-	TTeamGroup *teamGroup = (TTeamGroup *) fManager->GroupList()->ItemAt(groupIndex);
-	if (!teamGroup)
+	TTeamGroup* teamGroup
+		= (TTeamGroup*)fManager->GroupList()->ItemAt(groupIndex);
+	if (teamGroup == NULL)
 		return;
 
 	BRect bounds = Bounds();
@@ -2278,7 +2287,7 @@ TWindowView::Draw(BRect update)
 	BRect windowRect = bounds;
 
 	windowRect.top = windowIndex * fItemHeight;
-	windowRect.bottom = ((windowIndex+1) * fItemHeight) - 1;
+	windowRect.bottom = (windowIndex + 1) * fItemHeight - 1;
 
 	for (int32 i = 0; i < 3; i++) {
 		if (!update.Intersects(windowRect)) {
@@ -2325,7 +2334,7 @@ TWindowView::Draw(BRect update)
 		BPoint point((bounds.Width() - (stringWidth + 14 + 5)) / 2, windowRect.bottom - 4);
 		BPoint p(point.x, (windowRect.top + windowRect.bottom) / 2);
 		SetDrawingMode(B_OP_OVER);
-		const BBitmap *bitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
+		const BBitmap* bitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
 			minimized ? R_WindowHiddenIcon : R_WindowShownIcon);
 		p.y -= (bitmap->Bounds().bottom - bitmap->Bounds().top) / 2;
 		DrawBitmap(bitmap, p);
