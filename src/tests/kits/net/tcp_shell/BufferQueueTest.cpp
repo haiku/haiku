@@ -128,6 +128,9 @@ main()
 	add(3, 999);
 	dump("add 3");
 
+	add(60, 540);
+	dump("add at the end of previous data");
+
 	put_module(NET_BUFFER_MODULE_NAME);
 	return 0;
 }
