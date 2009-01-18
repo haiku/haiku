@@ -90,8 +90,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		return;
 	}
 	if (sequence < fFirstSequence) {
-		// Remove the stuff we already have
-
+		// this buffer contains data that is already long gone - trim it
 		gBufferModule->remove_header(buffer, fFirstSequence - sequence);
 		sequence = fFirstSequence;
 	}
@@ -120,12 +119,6 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 
 	if (fLastSequence < sequence + buffer->size)
 		fLastSequence = sequence + buffer->size;
-
-	if (fFirstSequence > sequence) {
-		// this buffer contains data that is already long gone - trim it
-		gBufferModule->remove_header(buffer, fFirstSequence - sequence);
-		sequence = fFirstSequence;
-	}
 
 	// find the place where to insert the buffer into the queue
 
@@ -156,7 +149,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 				gBufferModule->free(previous);
 			}
 		} else if (tcp_sequence(previous->sequence + previous->size)
-				> sequence + buffer->size) {
+				>= sequence + buffer->size) {
 			// We already know this data
 			gBufferModule->free(buffer);
 			buffer = NULL;
@@ -168,6 +161,9 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 			sequence = previous->sequence + previous->size;
 		}
 	}
+
+	// "next" always starts after the buffer sequence
+	ASSERT(next == NULL || buffer == NULL || next->sequence > sequence);
 
 	while (buffer != NULL && next != NULL
 		&& tcp_sequence(sequence + buffer->size) > next->sequence) {
