@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType API for accessing PFR-specific data (specification only).   */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2006 by                                    */
+/*  Copyright 2002, 2003, 2004, 2006, 2008 by                              */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -73,11 +73,11 @@ FT_BEGIN_HEADER
   *      A 16.16 fixed-point number used to scale distance expressed
   *      in metrics units to device sub-pixels.  This is equivalent to
   *      `face->size->x_scale', but for metrics only.  Optional (parameter
-  *      can be NULL)
+  *      can be NULL).
   *
   *    ametrics_y_scale ::
   *      Same as `ametrics_x_scale' but for the vertical direction.
-  *      optional (parameter can be NULL)
+  *      optional (parameter can be NULL).
   *
   * @return:
   *    FreeType error code.  0~means success.

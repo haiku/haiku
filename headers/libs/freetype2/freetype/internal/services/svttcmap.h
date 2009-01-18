@@ -7,7 +7,7 @@
 /*  Copyright 2003 by                                                      */
 /*  Masatake YAMATO, Redhat K.K.                                           */
 /*                                                                         */
-/*  Copyright 2003 by                                                      */
+/*  Copyright 2003, 2008 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -48,6 +48,13 @@ FT_BEGIN_HEADER
   /*    language ::                                                        */
   /*      The language ID used in Mac fonts.  Definitions of values are in */
   /*      freetype/ttnameid.h.                                             */
+  /*                                                                       */
+  /*    format ::                                                          */
+  /*      The cmap format.  OpenType 1.5 defines the formats 0 (byte       */
+  /*      encoding table), 2~(high-byte mapping through table), 4~(segment */
+  /*      mapping to delta values), 6~(trimmed table mapping), 8~(mixed    */
+  /*      16-bit and 32-bit coverage), 10~(trimmed array), 12~(segmented   */
+  /*      coverage), and 14 (Unicode Variation Sequences).                 */
   /*                                                                       */
   typedef struct  TT_CMapInfo_
   {

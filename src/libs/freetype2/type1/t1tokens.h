@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Type 1 tokenizer (specification).                                    */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2006 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2006, 2008 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -41,7 +41,8 @@
                    T1_FIELD_DICT_FONTDICT )
   T1_FIELD_NUM   ( "UnderlineThickness", underline_thickness,
                    T1_FIELD_DICT_FONTDICT )
-
+  T1_FIELD_NUM   ( "FSType", fs_type,
+                   T1_FIELD_DICT_FONTDICT )
 
 #undef  FT_STRUCTURE
 #define FT_STRUCTURE  PS_PrivateRec
@@ -87,7 +88,9 @@
 
   T1_FIELD_FIXED     ( "ExpansionFactor",  expansion_factor,
                        T1_FIELD_DICT_PRIVATE )
-
+  T1_FIELD_BOOL      ( "ForceBold",        force_bold,
+                       T1_FIELD_DICT_PRIVATE )
+                         
 
 #undef  FT_STRUCTURE
 #define FT_STRUCTURE  T1_FontRec

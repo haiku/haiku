@@ -196,9 +196,14 @@ THE SOFTWARE.
   FT_CALLBACK_DEF( void )
   PCF_Face_Done( FT_Face  pcfface )         /* PCF_Face */
   {
-    PCF_Face   face   = (PCF_Face)pcfface;
-    FT_Memory  memory = FT_FACE_MEMORY( face );
+    PCF_Face   face = (PCF_Face)pcfface;
+    FT_Memory  memory;
 
+
+    if ( !face )
+      return;
+
+    memory = FT_FACE_MEMORY( face );
 
     FT_FREE( face->encodings );
     FT_FREE( face->metrics );
@@ -408,7 +413,7 @@ THE SOFTWARE.
     switch ( req->type )
     {
     case FT_SIZE_REQUEST_TYPE_NOMINAL:
-      if ( height == ( bsize->y_ppem + 32 ) >> 6 )
+      if ( height == ( ( bsize->y_ppem + 32 ) >> 6 ) )
         error = PCF_Err_Ok;
       break;
 

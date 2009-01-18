@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    A new `perfect' anti-aliasing renderer (body).                       */
 /*                                                                         */
-/*  Copyright 2000-2001, 2002, 2003, 2005, 2006, 2007 by                   */
+/*  Copyright 2000-2001, 2002, 2003, 2005, 2006, 2007, 2008 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -91,11 +91,19 @@
 #define FT_COMPONENT  trace_smooth
 
 
-
-
 #ifdef _STANDALONE_
 
-#include <string.h>             /* for ft_memcpy() */
+
+  /* define this to dump debugging information */
+/* #define FT_DEBUG_LEVEL_TRACE */
+
+
+#ifdef FT_DEBUG_LEVEL_TRACE
+#include <stdio.h>
+#include <stdarg.h>
+#endif
+
+#include <string.h>
 #include <setjmp.h>
 #include <limits.h>
 #define FT_UINT_MAX  UINT_MAX
@@ -118,23 +126,52 @@
 #include "ftimage.h"
 #include "ftgrays.h"
 
+
   /* This macro is used to indicate that a function parameter is unused. */
   /* Its purpose is simply to reduce compiler warnings.  Note also that  */
   /* simply defining it as `(void)x' doesn't avoid warnings with certain */
   /* ANSI compilers (e.g. LCC).                                          */
 #define FT_UNUSED( x )  (x) = (x)
 
-  /* Disable the tracing mechanism for simplicity -- developers can      */
-  /* activate it easily by redefining these two macros.                  */
+
+  /* we only use level 5 & 7 tracing messages; cf. ftdebug.h */
+
+#ifdef FT_DEBUG_LEVEL_TRACE
+
+  void
+  FT_Message( const char*  fmt,
+              ... )
+  {
+    va_list  ap;
+
+
+    va_start( ap, fmt );
+    vfprintf( stderr, fmt, ap );
+    va_end( ap );
+  }
+
+  /* we don't handle tracing levels in stand-alone mode; */
+#ifndef FT_TRACE5
+#define FT_TRACE5( varformat )  FT_Message varformat
+#endif
+#ifndef FT_TRACE7
+#define FT_TRACE7( varformat )  FT_Message varformat
+#endif
 #ifndef FT_ERROR
-#define FT_ERROR( x )  do ; while ( 0 )     /* nothing */
+#define FT_ERROR( varformat )   FT_Message varformat
 #endif
 
-#ifndef FT_TRACE
-#define FT_TRACE( x )  do ; while ( 0 )     /* nothing */
-#endif
+#else /* !FT_DEBUG_LEVEL_TRACE */
+
+#define FT_TRACE5( x )  do { } while ( 0 )     /* nothing */
+#define FT_TRACE7( x )  do { } while ( 0 )     /* nothing */
+#define FT_ERROR( x )   do { } while ( 0 )     /* nothing */
+
+#endif /* !FT_DEBUG_LEVEL_TRACE */
+
 
 #else /* !_STANDALONE_ */
+
 
 #include <ft2build.h>
 #include "ftgrays.h"
@@ -147,7 +184,7 @@
 #define ErrRaster_Invalid_Mode      Smooth_Err_Cannot_Render_Glyph
 #define ErrRaster_Invalid_Outline   Smooth_Err_Invalid_Outline
 #define ErrRaster_Memory_Overflow   Smooth_Err_Out_Of_Memory
-#define ErrRaster_Invalid_Argument  Smooth_Err_Bad_Argument
+#define ErrRaster_Invalid_Argument  Smooth_Err_Invalid_Argument
 
 #endif /* !_STANDALONE_ */
 
@@ -159,10 +196,6 @@
 #ifndef FT_MEM_ZERO
 #define FT_MEM_ZERO( dest, count )  FT_MEM_SET( dest, 0, count )
 #endif
-
-  /* define this to dump debugging information */
-#define xxxDEBUG_GRAYS
-
 
   /* as usual, for the speed hungry :-) */
 
@@ -398,8 +431,8 @@
     int     x = ras.ex;
 
 
-    if ( x > ras.max_ex )
-      x = ras.max_ex;
+    if ( x > ras.count_ex )
+      x = ras.count_ex;
 
     pcell = &ras.ycells[ras.ey];
     for (;;)
@@ -1207,7 +1240,7 @@
     x += (TCoord)ras.min_ex;
 
     /* FT_Span.x is a 16-bit short, so limit our coordinates appropriately */
-    if ( x >= 32768 )
+    if ( x >= 32767 )
       x = 32767;
 
     if ( coverage )
@@ -1229,24 +1262,23 @@
         if ( ras.render_span && count > 0 )
           ras.render_span( ras.span_y, count, ras.gray_spans,
                            ras.render_span_data );
-        /* ras.render_span( span->y, ras.gray_spans, count ); */
 
-#ifdef DEBUG_GRAYS
+#ifdef FT_DEBUG_LEVEL_TRACE
 
-        if ( ras.span_y >= 0 )
+        if ( count > 0 )
         {
           int  n;
 
 
-          fprintf( stderr, "y=%3d ", ras.span_y );
+          FT_TRACE7(( "y = %3d ", ras.span_y ));
           span = ras.gray_spans;
           for ( n = 0; n < count; n++, span++ )
-            fprintf( stderr, "[%d..%d]:%02x ",
-                     span->x, span->x + span->len - 1, span->coverage );
-          fprintf( stderr, "\n" );
+            FT_TRACE7(( "[%d..%d]:%02x ",
+                        span->x, span->x + span->len - 1, span->coverage ));
+          FT_TRACE7(( "\n" ));
         }
 
-#endif /* DEBUG_GRAYS */
+#endif /* FT_DEBUG_LEVEL_TRACE */
 
         ras.num_gray_spans = 0;
         ras.span_y         = y;
@@ -1267,9 +1299,11 @@
   }
 
 
-#ifdef DEBUG_GRAYS
+#ifdef FT_DEBUG_LEVEL_TRACE
 
-  /* to be called while in the debugger */
+  /* to be called while in the debugger --                                */
+  /* this function causes a compiler warning since it is unused otherwise */
+  static void
   gray_dump_cells( RAS_ARG )
   {
     int  yindex;
@@ -1288,7 +1322,7 @@
     }
   }
 
-#endif /* DEBUG_GRAYS */
+#endif /* FT_DEBUG_LEVEL_TRACE */
 
 
   static void
@@ -1303,6 +1337,8 @@
       return;
 
     ras.num_gray_spans = 0;
+
+    FT_TRACE7(( "gray_sweep: start\n" ));
 
     for ( yindex = 0; yindex < ras.ycount; yindex++ )
     {
@@ -1337,6 +1373,8 @@
     if ( ras.render_span && ras.num_gray_spans > 0 )
       ras.render_span( ras.span_y, ras.num_gray_spans,
                        ras.gray_spans, ras.render_span_data );
+
+    FT_TRACE7(( "gray_sweep: end\n" ));
   }
 
 
@@ -1344,7 +1382,7 @@
 
   /*************************************************************************/
   /*                                                                       */
-  /*  The following function should only compile in stand_alone mode,      */
+  /*  The following function should only compile in stand-alone mode,      */
   /*  i.e., when building this component without the rest of FreeType.     */
   /*                                                                       */
   /*************************************************************************/
@@ -1355,18 +1393,19 @@
   /*    FT_Outline_Decompose                                               */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Walks over an outline's structure to decompose it into individual  */
-  /*    segments and Bezier arcs.  This function is also able to emit      */
+  /*    Walk over an outline's structure to decompose it into individual   */
+  /*    segments and Bézier arcs.  This function is also able to emit      */
   /*    `move to' and `close to' operations to indicate the start and end  */
   /*    of new contours in the outline.                                    */
   /*                                                                       */
   /* <Input>                                                               */
   /*    outline        :: A pointer to the source target.                  */
   /*                                                                       */
-  /*    func_interface :: A table of `emitters', i.e,. function pointers   */
+  /*    func_interface :: A table of `emitters', i.e., function pointers   */
   /*                      called during decomposition to indicate path     */
   /*                      operations.                                      */
   /*                                                                       */
+  /* <InOut>                                                               */
   /*    user           :: A typeless pointer which is passed to each       */
   /*                      emitter during the decomposition.  It can be     */
   /*                      used to store the state during the               */
@@ -1375,17 +1414,13 @@
   /* <Return>                                                              */
   /*    Error code.  0 means success.                                      */
   /*                                                                       */
-  static
-  int  FT_Outline_Decompose( const FT_Outline*        outline,
-                             const FT_Outline_Funcs*  func_interface,
-                             void*                    user )
+  static int
+  FT_Outline_Decompose( const FT_Outline*        outline,
+                        const FT_Outline_Funcs*  func_interface,
+                        void*                    user )
   {
 #undef SCALED
-#if 0
 #define SCALED( x )  ( ( (x) << shift ) - delta )
-#else
-#define SCALED( x )  (x)
-#endif
 
     FT_Vector   v_last;
     FT_Vector   v_control;
@@ -1395,17 +1430,21 @@
     FT_Vector*  limit;
     char*       tags;
 
+    int         error;
+
     int   n;         /* index of contour in outline     */
     int   first;     /* index of first point in contour */
-    int   error;
     char  tag;       /* current point's state           */
 
-#if 0
-    int   shift = func_interface->shift;
-    TPos  delta = func_interface->delta;
-#endif
+    int   shift;
+    TPos  delta;
 
 
+    if ( !outline || !func_interface )
+      return ErrRaster_Invalid_Argument;
+
+    shift = func_interface->shift;
+    delta = func_interface->delta;
     first = 0;
 
     for ( n = 0; n < outline->n_contours; n++ )
@@ -1413,22 +1452,25 @@
       int  last;  /* index of last point in contour */
 
 
+      FT_TRACE5(( "FT_Outline_Decompose: Outline %d\n", n ));
+
       last  = outline->contours[n];
+      if ( last < 0 )
+        goto Invalid_Outline;
       limit = outline->points + last;
 
-      v_start = outline->points[first];
-      v_last  = outline->points[last];
-
+      v_start   = outline->points[first];
       v_start.x = SCALED( v_start.x );
       v_start.y = SCALED( v_start.y );
 
-      v_last.x  = SCALED( v_last.x );
-      v_last.y  = SCALED( v_last.y );
+      v_last   = outline->points[last];
+      v_last.x = SCALED( v_last.x );
+      v_last.y = SCALED( v_last.y );
 
       v_control = v_start;
 
       point = outline->points + first;
-      tags  = outline->tags  + first;
+      tags  = outline->tags   + first;
       tag   = FT_CURVE_TAG( tags[0] );
 
       /* A contour cannot start with a cubic control point! */
@@ -1459,6 +1501,8 @@
         tags--;
       }
 
+      FT_TRACE5(( "  move to (%.2f, %.2f)\n",
+                  v_start.x / 64.0, v_start.y / 64.0 ));
       error = func_interface->move_to( &v_start, user );
       if ( error )
         goto Exit;
@@ -1479,6 +1523,8 @@
             vec.x = SCALED( point->x );
             vec.y = SCALED( point->y );
 
+            FT_TRACE5(( "  line to (%.2f, %.2f)\n",
+                        vec.x / 64.0, vec.y / 64.0 ));
             error = func_interface->line_to( &vec, user );
             if ( error )
               goto Exit;
@@ -1486,52 +1532,59 @@
           }
 
         case FT_CURVE_TAG_CONIC:  /* consume conic arcs */
+          v_control.x = SCALED( point->x );
+          v_control.y = SCALED( point->y );
+
+        Do_Conic:
+          if ( point < limit )
           {
-            v_control.x = SCALED( point->x );
-            v_control.y = SCALED( point->y );
+            FT_Vector  vec;
+            FT_Vector  v_middle;
 
-          Do_Conic:
-            if ( point < limit )
+
+            point++;
+            tags++;
+            tag = FT_CURVE_TAG( tags[0] );
+
+            vec.x = SCALED( point->x );
+            vec.y = SCALED( point->y );
+
+            if ( tag == FT_CURVE_TAG_ON )
             {
-              FT_Vector  vec;
-              FT_Vector  v_middle;
-
-
-              point++;
-              tags++;
-              tag = FT_CURVE_TAG( tags[0] );
-
-              vec.x = SCALED( point->x );
-              vec.y = SCALED( point->y );
-
-              if ( tag == FT_CURVE_TAG_ON )
-              {
-                error = func_interface->conic_to( &v_control, &vec,
-                                                  user );
-                if ( error )
-                  goto Exit;
-                continue;
-              }
-
-              if ( tag != FT_CURVE_TAG_CONIC )
-                goto Invalid_Outline;
-
-              v_middle.x = ( v_control.x + vec.x ) / 2;
-              v_middle.y = ( v_control.y + vec.y ) / 2;
-
-              error = func_interface->conic_to( &v_control, &v_middle,
-                                                user );
+              FT_TRACE5(( "  conic to (%.2f, %.2f)"
+                          " with control (%.2f, %.2f)\n",
+                          vec.x / 64.0, vec.y / 64.0,
+                          v_control.x / 64.0, v_control.y / 64.0 ));
+              error = func_interface->conic_to( &v_control, &vec, user );
               if ( error )
                 goto Exit;
-
-              v_control = vec;
-              goto Do_Conic;
+              continue;
             }
 
-            error = func_interface->conic_to( &v_control, &v_start,
-                                              user );
-            goto Close;
+            if ( tag != FT_CURVE_TAG_CONIC )
+              goto Invalid_Outline;
+
+            v_middle.x = ( v_control.x + vec.x ) / 2;
+            v_middle.y = ( v_control.y + vec.y ) / 2;
+
+            FT_TRACE5(( "  conic to (%.2f, %.2f)"
+                        " with control (%.2f, %.2f)\n",
+                        v_middle.x / 64.0, v_middle.y / 64.0,
+                        v_control.x / 64.0, v_control.y / 64.0 ));
+            error = func_interface->conic_to( &v_control, &v_middle, user );
+            if ( error )
+              goto Exit;
+
+            v_control = vec;
+            goto Do_Conic;
           }
+
+          FT_TRACE5(( "  conic to (%.2f, %.2f)"
+                      " with control (%.2f, %.2f)\n",
+                      v_start.x / 64.0, v_start.y / 64.0,
+                      v_control.x / 64.0, v_control.y / 64.0 ));
+          error = func_interface->conic_to( &v_control, &v_start, user );
+          goto Close;
 
         default:  /* FT_CURVE_TAG_CUBIC */
           {
@@ -1559,12 +1612,22 @@
               vec.x = SCALED( point->x );
               vec.y = SCALED( point->y );
 
+              FT_TRACE5(( "  cubic to (%.2f, %.2f)"
+                          " with controls (%.2f, %.2f) and (%.2f, %.2f)\n",
+                          vec.x / 64.0, vec.y / 64.0,
+                          vec1.x / 64.0, vec1.y / 64.0,
+                          vec2.x / 64.0, vec2.y / 64.0 ));
               error = func_interface->cubic_to( &vec1, &vec2, &vec, user );
               if ( error )
                 goto Exit;
               continue;
             }
 
+            FT_TRACE5(( "  cubic to (%.2f, %.2f)"
+                        " with controls (%.2f, %.2f) and (%.2f, %.2f)\n",
+                        v_start.x / 64.0, v_start.y / 64.0,
+                        vec1.x / 64.0, vec1.y / 64.0,
+                        vec2.x / 64.0, vec2.y / 64.0 ));
             error = func_interface->cubic_to( &vec1, &vec2, &v_start, user );
             goto Close;
           }
@@ -1572,6 +1635,8 @@
       }
 
       /* close the contour with a line segment */
+      FT_TRACE5(( "  line to (%.2f, %.2f)\n",
+                  v_start.x / 64.0, v_start.y / 64.0 ));
       error = func_interface->line_to( &v_start, user );
 
    Close:
@@ -1581,9 +1646,11 @@
       first = last + 1;
     }
 
+    FT_TRACE5(( "FT_Outline_Decompose: Done\n", n ));
     return 0;
 
   Exit:
+    FT_TRACE5(( "FT_Outline_Decompose: Error %d\n", error ));
     return error;
 
   Invalid_Outline:
@@ -1665,7 +1732,7 @@
     ras.cubic_level = 16;
 
     {
-      int level = 0;
+      int  level = 0;
 
 
       if ( ras.count_ex > 24 || ras.count_ey > 24 )
@@ -1761,8 +1828,8 @@
         /* be some problems.                                     */
         if ( middle == bottom )
         {
-#ifdef DEBUG_GRAYS
-          fprintf( stderr, "Rotten glyph!\n" );
+#ifdef FT_DEBUG_LEVEL_TRACE
+          FT_TRACE7(( "gray_convert_glyph: Rotten glyph!\n" ));
 #endif
           return 1;
         }
@@ -1814,7 +1881,7 @@
     worker = raster->worker;
 
     /* if direct mode is not set, we must have a target bitmap */
-    if ( ( params->flags & FT_RASTER_FLAG_DIRECT ) == 0 )
+    if ( !( params->flags & FT_RASTER_FLAG_DIRECT ) )
     {
       if ( !target_map )
         return ErrRaster_Invalid_Argument;
@@ -1832,7 +1899,7 @@
       return ErrRaster_Invalid_Mode;
 
     /* compute clipping box */
-    if ( ( params->flags & FT_RASTER_FLAG_DIRECT ) == 0 )
+    if ( !( params->flags & FT_RASTER_FLAG_DIRECT ) )
     {
       /* compute clip box from target pixmap */
       ras.clip_box.xMin = 0;
@@ -1841,9 +1908,7 @@
       ras.clip_box.yMax = target_map->rows;
     }
     else if ( params->flags & FT_RASTER_FLAG_CLIP )
-    {
       ras.clip_box = params->clip_box;
-    }
     else
     {
       ras.clip_box.xMin = -32768L;
@@ -1860,24 +1925,24 @@
     ras.band_size      = raster->band_size;
     ras.num_gray_spans = 0;
 
-    if ( target_map )
-      ras.target = *target_map;
-
-    ras.render_span      = (FT_Raster_Span_Func)gray_render_span;
-    ras.render_span_data = &ras;
-
     if ( params->flags & FT_RASTER_FLAG_DIRECT )
     {
       ras.render_span      = (FT_Raster_Span_Func)params->gray_spans;
       ras.render_span_data = params->user;
+    }
+    else
+    {
+      ras.target           = *target_map;
+      ras.render_span      = (FT_Raster_Span_Func)gray_render_span;
+      ras.render_span_data = &ras;
     }
 
     return gray_convert_glyph( worker );
   }
 
 
-  /**** RASTER OBJECT CREATION: In standalone mode, we simply use *****/
-  /****                         a static object.                  *****/
+  /**** RASTER OBJECT CREATION: In stand-alone mode, we simply use *****/
+  /****                         a static object.                   *****/
 
 #ifdef _STANDALONE_
 
@@ -1985,3 +2050,8 @@
 
 
 /* END */
+
+
+/* Local Variables: */
+/* coding: utf-8    */
+/* End:             */

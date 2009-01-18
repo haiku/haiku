@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter types (specification only).                              */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005, 2006, 2007, 2008 by                        */
+/*  Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009 by                  */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -58,7 +58,8 @@ FT_BEGIN_HEADER
 
 #ifdef AF_DEBUG
 
-#include <stdio.h>
+#include FT_CONFIG_STANDARD_LIBRARY_H
+
 #define AF_LOG( x )  do { if ( _af_debug ) printf x; } while ( 0 )
 
 extern int    _af_debug;
@@ -69,7 +70,7 @@ extern void*  _af_debug_hints;
 
 #else /* !AF_DEBUG */
 
-#define AF_LOG( x )  do ; while ( 0 )        /* nothing */
+#define AF_LOG( x )  do { } while ( 0 )        /* nothing */
 
 #endif /* !AF_DEBUG */
 

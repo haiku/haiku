@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType high-level API and common types (specification only).       */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -60,8 +60,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    FreeType assumes that structures allocated by the user and passed  */
-  /*    as arguments are zeroed out except for the actual data.  With      */
-  /*    other words, it is recommended to use `calloc' (or variants of it) */
+  /*    as arguments are zeroed out except for the actual data.  In other  */
+  /*    words, it is recommended to use `calloc' (or variants of it)       */
   /*    instead of `malloc' for allocation.                                */
   /*                                                                       */
   /*************************************************************************/
@@ -190,6 +190,15 @@ FT_BEGIN_HEADER
   /*    FT_Select_Charmap                                                  */
   /*    FT_Set_Charmap                                                     */
   /*    FT_Get_Charmap_Index                                               */
+  /*                                                                       */
+  /*    FT_FSTYPE_INSTALLABLE_EMBEDDING                                    */
+  /*    FT_FSTYPE_RESTRICTED_LICENSE_EMBEDDING                             */
+  /*    FT_FSTYPE_PREVIEW_AND_PRINT_EMBEDDING                              */
+  /*    FT_FSTYPE_EDITABLE_EMBEDDING                                       */
+  /*    FT_FSTYPE_NO_SUBSETTING                                            */
+  /*    FT_FSTYPE_BITMAP_EMBEDDING_ONLY                                    */
+  /*                                                                       */
+  /*    FT_Get_FSType_Flags                                                */
   /*                                                                       */
   /*************************************************************************/
 
@@ -606,7 +615,7 @@ FT_BEGIN_HEADER
   /*     Same as FT_ENCODING_JOHAB.  Deprecated.                           */
   /*                                                                       */
   /* <Note>                                                                */
-  /*   By default, FreeType automatically synthetizes a Unicode charmap    */
+  /*   By default, FreeType automatically synthesizes a Unicode charmap    */
   /*   for PostScript fonts, using their glyph names dictionaries.         */
   /*   However, it also reports the encodings defined explicitly in the    */
   /*   font file, for the cases when they are needed, with the Adobe       */
@@ -883,7 +892,7 @@ FT_BEGIN_HEADER
   /*                           scalable formats.                           */
   /*                                                                       */
   /*    underline_position  :: The position, in font units, of the         */
-  /*                           underline line for this face.  It's the     */
+  /*                           underline line for this face.  It is the    */
   /*                           center of the underlining stem.  Only       */
   /*                           relevant for scalable formats.              */
   /*                                                                       */
@@ -1037,6 +1046,27 @@ FT_BEGIN_HEADER
   /*      exist make FT_Load_Glyph return successfully; in all other cases */
   /*      you get an `FT_Err_Invalid_Argument' error.                      */
   /*                                                                       */
+  /*      Note that CID-keyed fonts which are in an SFNT wrapper don't     */
+  /*      have this flag set since the glyphs are accessed in the normal   */
+  /*      way (using contiguous indices); the `CID-ness' isn't visible to  */
+  /*      the application.                                                 */
+  /*                                                                       */
+  /*    FT_FACE_FLAG_TRICKY ::                                             */
+  /*      Set if the font is `tricky', this is, it always needs the        */
+  /*      font format's native hinting engine to get a reasonable result.  */
+  /*      A typical example is the Chinese font `mingli.ttf' which uses    */
+  /*      TrueType bytecode instructions to move and scale all of its      */
+  /*      subglyphs.                                                       */
+  /*                                                                       */
+  /*      It is not possible to autohint such fonts using                  */
+  /*      @FT_LOAD_FORCE_AUTOHINT; it will also ignore                     */
+  /*      @FT_LOAD_NO_HINTING.  You have to set both FT_LOAD_NO_HINTING    */
+  /*      and @FT_LOAD_NO_AUTOHINT to really disable hinting; however, you */
+  /*      probably never want this except for demonstration purposes.      */
+  /*                                                                       */
+  /*      Currently, there are six TrueType fonts in the list of tricky    */
+  /*      fonts; they are hard-coded in file `ttobjs.c'.                   */
+  /*                                                                       */
 #define FT_FACE_FLAG_SCALABLE          ( 1L <<  0 )
 #define FT_FACE_FLAG_FIXED_SIZES       ( 1L <<  1 )
 #define FT_FACE_FLAG_FIXED_WIDTH       ( 1L <<  2 )
@@ -1050,8 +1080,7 @@ FT_BEGIN_HEADER
 #define FT_FACE_FLAG_EXTERNAL_STREAM   ( 1L << 10 )
 #define FT_FACE_FLAG_HINTER            ( 1L << 11 )
 #define FT_FACE_FLAG_CID_KEYED         ( 1L << 12 )
-
-  /* */
+#define FT_FACE_FLAG_TRICKY            ( 1L << 13 )
 
 
   /*************************************************************************
@@ -1162,8 +1191,6 @@ FT_BEGIN_HEADER
 #define FT_HAS_FIXED_SIZES( face ) \
           ( face->face_flags & FT_FACE_FLAG_FIXED_SIZES )
 
-  /* */
-
 
   /*************************************************************************
    *
@@ -1224,9 +1251,23 @@ FT_BEGIN_HEADER
           ( face->face_flags & FT_FACE_FLAG_CID_KEYED )
 
 
+  /*************************************************************************
+   *
+   * @macro:
+   *   FT_IS_TRICKY( face )
+   *
+   * @description:
+   *   A macro that returns true whenever a face represents a `tricky' font.
+   *   See the discussion of @FT_FACE_FLAG_TRICKY for more details.
+   *
+   */
+#define FT_IS_TRICKY( face ) \
+          ( face->face_flags & FT_FACE_FLAG_TRICKY )
+
+
   /*************************************************************************/
   /*                                                                       */
-  /* <Constant>                                                            */
+  /* <Const>                                                               */
   /*    FT_STYLE_FLAG_XXX                                                  */
   /*                                                                       */
   /* <Description>                                                         */
@@ -1518,10 +1559,10 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    This image can later be converted into a bitmap by calling         */
   /*    @FT_Render_Glyph.  This function finds the current renderer for    */
-  /*    the native image's format then invokes it.                         */
+  /*    the native image's format, then invokes it.                        */
   /*                                                                       */
   /*    The renderer is in charge of transforming the native image through */
-  /*    the slot's face transformation fields, then convert it into a      */
+  /*    the slot's face transformation fields, then converting it into a   */
   /*    bitmap that is returned in `slot->bitmap'.                         */
   /*                                                                       */
   /*    Note that `slot->bitmap_left' and `slot->bitmap_top' are also used */
@@ -1769,7 +1810,7 @@ FT_BEGIN_HEADER
   /*    `num_params' and `params' is used.  They are ignored otherwise.    */
   /*                                                                       */
   /*    Ideally, both the `pathname' and `params' fields should be tagged  */
-  /*    as `const'; this is missing for API backwards compatibility.  With */
+  /*    as `const'; this is missing for API backwards compatibility.  In   */
   /*    other words, applications should treat them as read-only.          */
   /*                                                                       */
   typedef struct  FT_Open_Args_
@@ -2174,7 +2215,8 @@ FT_BEGIN_HEADER
   /*    A character width or height smaller than 1pt is set to 1pt; if     */
   /*    both resolution values are zero, they are set to 72dpi.            */
   /*                                                                       */
-
+  /*    Don't use this function if you are using the FreeType cache API.   */
+  /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Set_Char_Size( FT_Face     face,
                     FT_F26Dot6  char_width,
@@ -2390,7 +2432,7 @@ FT_BEGIN_HEADER
    *     8~pixels packed into each byte of the bitmap data.
    *
    *     Note that this has no effect on the hinting algorithm used.  You
-   *     should use @FT_LOAD_TARGET_MONO instead so that the
+   *     should rather use @FT_LOAD_TARGET_MONO so that the
    *     monochrome-optimized hinting algorithm is used.
    *
    *   FT_LOAD_LINEAR_DESIGN ::
@@ -2409,6 +2451,9 @@ FT_BEGIN_HEADER
    *   @FT_LOAD_NO_AUTOHINT in case you don't want the auto-hinter to be
    *   used at all.
    *
+   *   See the description of @FT_FACE_FLAG_TRICKY for a special exception
+   *   (affecting only a handful of Asian fonts).
+   *
    *   Besides deciding which hinter to use, you can also decide which
    *   hinting algorithm to use.  See @FT_LOAD_TARGET_XXX for details.
    */
@@ -2426,10 +2471,13 @@ FT_BEGIN_HEADER
 #define FT_LOAD_IGNORE_TRANSFORM             0x800
 #define FT_LOAD_MONOCHROME                   0x1000
 #define FT_LOAD_LINEAR_DESIGN                0x2000
-#define FT_LOAD_SBITS_ONLY                   0x4000   /* temporary hack! */
 #define FT_LOAD_NO_AUTOHINT                  0x8000U
 
   /* */
+
+  /* used internally only by certain font drivers! */
+#define FT_LOAD_ADVANCE_ONLY                 0x100
+#define FT_LOAD_SBITS_ONLY                   0x4000
 
 
   /**************************************************************************
@@ -3158,6 +3206,88 @@ FT_BEGIN_HEADER
 
   /*************************************************************************/
   /*                                                                       */
+  /* <Enum>                                                                */
+  /*    FT_FSTYPE_XXX                                                      */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    A list of bit flags used in the `fsType' field of the OS/2 table   */
+  /*    in a TrueType or OpenType font and the `FSType' entry in a         */
+  /*    PostScript font.  These bit flags are returned by                  */
+  /*    @FT_Get_FSType_Flags; they inform client applications of embedding */
+  /*    and subsetting restrictions associated with a font.                */
+  /*                                                                       */
+  /*    See http://www.adobe.com/devnet/acrobat/pdfs/FontPolicies.pdf for  */
+  /*    more details.                                                      */
+  /*                                                                       */
+  /* <Values>                                                              */
+  /*    FT_FSTYPE_INSTALLABLE_EMBEDDING ::                                 */
+  /*      Fonts with no fsType bit set may be embedded and permanently     */
+  /*      installed on the remote system by an application.                */
+  /*                                                                       */
+  /*    FT_FSTYPE_RESTRICTED_LICENSE_EMBEDDING ::                          */
+  /*      Fonts that have only this bit set must not be modified, embedded */
+  /*      or exchanged in any manner without first obtaining permission of */
+  /*      the font software copyright owner.                               */
+  /*                                                                       */
+  /*    FT_FSTYPE_PREVIEW_AND_PRINT_EMBEDDING ::                           */
+  /*      If this bit is set, the font may be embedded and temporarily     */
+  /*      loaded on the remote system.  Documents containing Preview &     */
+  /*      Print fonts must be opened `read-only'; no edits can be applied  */
+  /*      to the document.                                                 */
+  /*                                                                       */
+  /*    FT_FSTYPE_EDITABLE_EMBEDDING ::                                    */
+  /*      If this bit is set, the font may be embedded but must only be    */
+  /*      installed temporarily on other systems.  In contrast to Preview  */
+  /*      & Print fonts, documents containing editable fonts may be opened */
+  /*      for reading, editing is permitted, and changes may be saved.     */
+  /*                                                                       */
+  /*    FT_FSTYPE_NO_SUBSETTING ::                                         */
+  /*      If this bit is set, the font may not be subsetted prior to       */
+  /*      embedding.                                                       */
+  /*                                                                       */
+  /*    FT_FSTYPE_BITMAP_EMBEDDING_ONLY ::                                 */
+  /*      If this bit is set, only bitmaps contained in the font may be    */
+  /*      embedded; no outline data may be embedded.  If there are no      */
+  /*      bitmaps available in the font, then the font is unembeddable.    */
+  /*                                                                       */
+  /* <Note>                                                                */
+  /*    While the fsType flags can indicate that a font may be embedded, a */
+  /*    license with the font vendor may be separately required to use the */
+  /*    font in this way.                                                  */
+  /*                                                                       */
+#define FT_FSTYPE_INSTALLABLE_EMBEDDING         0x0000
+#define FT_FSTYPE_RESTRICTED_LICENSE_EMBEDDING  0x0002
+#define FT_FSTYPE_PREVIEW_AND_PRINT_EMBEDDING   0x0004
+#define FT_FSTYPE_EDITABLE_EMBEDDING            0x0008
+#define FT_FSTYPE_NO_SUBSETTING                 0x0100
+#define FT_FSTYPE_BITMAP_EMBEDDING_ONLY         0x0200
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Function>                                                            */
+  /*    FT_Get_FSType_Flags                                                */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    Return the fsType flags for a font.                                */
+  /*                                                                       */
+  /* <Input>                                                               */
+  /*    face :: A handle to the source face object.                        */
+  /*                                                                       */
+  /* <Return>                                                              */
+  /*    The fsType flags, @FT_FSTYPE_XXX.                                  */
+  /*                                                                       */
+  /* <Note>                                                                */
+  /*    Use this function rather than directly reading the `fs_type' field */
+  /*    in the @PS_FontInfoRec structure which is only guaranteed to       */
+  /*    return the correct results for Type~1 fonts.                       */
+  /*                                                                       */
+  FT_EXPORT( FT_UShort )
+  FT_Get_FSType_Flags( FT_Face  face );
+
+
+  /*************************************************************************/
+  /*                                                                       */
   /* <Section>                                                             */
   /*    glyph_variants                                                     */
   /*                                                                       */
@@ -3431,6 +3561,12 @@ FT_BEGIN_HEADER
              FT_Long  c );
 
 
+  /* */
+
+  /* The following #if 0 ... #endif is for the documentation formatter, */
+  /* hiding the internal `FT_MULFIX_INLINED' macro.                     */
+
+#if 0
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
@@ -3463,6 +3599,17 @@ FT_BEGIN_HEADER
   FT_EXPORT( FT_Long )
   FT_MulFix( FT_Long  a,
              FT_Long  b );
+
+  /* */
+#endif
+
+#ifdef FT_MULFIX_INLINED
+#define FT_MulFix( a, b )  FT_MULFIX_INLINED( a, b )
+#else
+  FT_EXPORT( FT_Long )
+  FT_MulFix( FT_Long  a,
+             FT_Long  b );
+#endif
 
 
   /*************************************************************************/
@@ -3611,7 +3758,7 @@ FT_BEGIN_HEADER
    */
 #define FREETYPE_MAJOR  2
 #define FREETYPE_MINOR  3
-#define FREETYPE_PATCH  7
+#define FREETYPE_PATCH  8
 
 
   /*************************************************************************/
@@ -3695,7 +3842,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Return>                                                              */
   /*    The old setting value.  This will always be false if this is not   */
-  /*    a SFNT font, or if the unpatented hinter is not compiled in this   */
+  /*    an SFNT font, or if the unpatented hinter is not compiled in this  */
   /*    instance of the library.                                           */
   /*                                                                       */
   /* <Since>                                                               */

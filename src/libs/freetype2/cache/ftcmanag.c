@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType Cache Manager (body).                                       */
 /*                                                                         */
-/*  Copyright 2000-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 2000-2001, 2002, 2003, 2004, 2005, 2006, 2008 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -181,7 +181,7 @@
 
 
     if ( asize == NULL )
-      return FTC_Err_Bad_Argument;
+      return FTC_Err_Invalid_Argument;
 
     *asize = NULL;
 
@@ -306,7 +306,7 @@
 
 
     if ( aface == NULL )
-      return FTC_Err_Bad_Argument;
+      return FTC_Err_Invalid_Argument;
 
     *aface = NULL;
 

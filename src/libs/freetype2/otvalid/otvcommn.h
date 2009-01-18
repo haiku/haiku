@@ -192,12 +192,12 @@ FT_BEGIN_HEADER
             valid->func[2]       = OTV_FUNC( z ); \
           FT_END_STMNT
 
-#define OTV_INIT                do ; while ( 0 )
-#define OTV_ENTER               do ; while ( 0 )
-#define OTV_NAME_ENTER( name )  do ; while ( 0 )
-#define OTV_EXIT                do ; while ( 0 )
+#define OTV_INIT                do { } while ( 0 )
+#define OTV_ENTER               do { } while ( 0 )
+#define OTV_NAME_ENTER( name )  do { } while ( 0 )
+#define OTV_EXIT                do { } while ( 0 )
 
-#define OTV_TRACE( s )          do ; while ( 0 )
+#define OTV_TRACE( s )          do { } while ( 0 )
 
 #endif  /* !FT_DEBUG_LEVEL_TRACE */
 

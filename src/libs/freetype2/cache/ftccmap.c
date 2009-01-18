@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType CharMap cache (body)                                        */
 /*                                                                         */
-/*  Copyright 2000-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
+/*  Copyright 2000-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -288,7 +288,19 @@
     FT_Error          error;
     FT_UInt           gindex = 0;
     FT_UInt32         hash;
+    FT_Int            no_cmap_change = 0;
 
+
+    if ( cmap_index < 0 )
+    {
+      /* Treat a negative cmap index as a special value, meaning that you */
+      /* don't want to change the FT_Face's character map through this    */
+      /* call.  This can be useful if the face requester callback already */
+      /* sets the face's charmap to the appropriate value.                */
+
+      no_cmap_change = 1;
+      cmap_index     = 0;
+    }
 
     if ( !cache )
     {
@@ -311,7 +323,7 @@
      *        Adobe Acrobat Reader Pack, named `KozMinProVI-Regular.otf',
      *        which contains more than 5 charmaps.
      */
-    if ( cmap_index >= 16 )
+    if ( cmap_index >= 16 && !no_cmap_change )
     {
       FTC_OldCMapDesc  desc = (FTC_OldCMapDesc) face_id;
 
@@ -393,12 +405,12 @@
         old  = face->charmap;
         cmap = face->charmaps[cmap_index];
 
-        if ( old != cmap )
+        if ( old != cmap && !no_cmap_change )
           FT_Set_Charmap( face, cmap );
 
         gindex = FT_Get_Char_Index( face, char_code );
 
-        if ( old != cmap )
+        if ( old != cmap && !no_cmap_change )
           FT_Set_Charmap( face, old );
       }
 

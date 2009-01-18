@@ -92,7 +92,7 @@ FT_BEGIN_HEADER
   /* <Input>                                                               */
   /*    outline        :: A pointer to the source target.                  */
   /*                                                                       */
-  /*    func_interface :: A table of `emitters', i.e,. function pointers   */
+  /*    func_interface :: A table of `emitters', i.e., function pointers   */
   /*                      called during decomposition to indicate path     */
   /*                      operations.                                      */
   /*                                                                       */
@@ -332,6 +332,9 @@ FT_BEGIN_HEADER
   /*    glyph doesn't change the number of points; this means that certain */
   /*    situations like acute angles or intersections are sometimes        */
   /*    handled incorrectly.                                               */
+  /*                                                                       */
+  /*    If you need `better' metrics values you should call                */
+  /*    @FT_Outline_Get_CBox ot @FT_Outline_Get_BBox.                      */
   /*                                                                       */
   /*    Example call:                                                      */
   /*                                                                       */

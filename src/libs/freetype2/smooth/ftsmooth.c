@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Anti-aliasing renderer interface (body).                             */
 /*                                                                         */
-/*  Copyright 2000-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 2000-2001, 2002, 2003, 2004, 2005, 2006, 2009 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -294,13 +294,13 @@
 
       for ( hh = height_org; hh > 0; hh-- )
       {
-        memcpy( write, read, pitch );
+        ft_memcpy( write, read, pitch );
         write += pitch;
 
-        memcpy( write, read, pitch );
+        ft_memcpy( write, read, pitch );
         write += pitch;
 
-        memcpy( write, read, pitch );
+        ft_memcpy( write, read, pitch );
         write += pitch;
         read  += pitch;
       }

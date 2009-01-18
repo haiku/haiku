@@ -707,11 +707,12 @@
   {
     FT_Error  error;
     FT_Bool   frame_accessed = 0;
-    FT_Byte*  cursor = stream->cursor;
-
+    FT_Byte*  cursor;
 
     if ( !fields || !stream )
       return FT_Err_Invalid_Argument;
+
+    cursor = stream->cursor;
 
     error = FT_Err_Ok;
     do

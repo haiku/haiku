@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    OpenType font driver implementation (body).                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -182,6 +182,36 @@
 
     /* force drop-out mode to 2 - irrelevant now */
     /* slot->outline.dropout_mode = 2; */
+
+    return error;
+  }
+
+
+  FT_CALLBACK_DEF( FT_Error )
+  cff_get_advances( FT_Face    ftface,
+                    FT_UInt    start,
+                    FT_UInt    count,
+                    FT_Int32   flags,
+                    FT_Fixed*  advances )
+  {
+    CFF_Face      face = (CFF_Face)ftface;
+    FT_UInt       nn;
+    FT_Error      error = CFF_Err_Ok;
+    FT_GlyphSlot  slot  = face->root.glyph;
+
+
+    flags |= FT_LOAD_ADVANCE_ONLY;
+
+    for ( nn = 0; nn < count; nn++ )
+    {
+      error = Load_Glyph( slot, face->root.size, start+nn, flags );
+      if ( error )
+        break;
+
+      advances[nn] = ( flags & FT_LOAD_VERTICAL_LAYOUT )
+                     ? slot->advance.y
+                     : slot->advance.x;
+    }
 
     return error;
   }
@@ -396,6 +426,7 @@
 
 
     cmap_info->language = 0;
+    cmap_info->format   = 0;
 
     if ( cmap->clazz != &cff_cmap_encoding_class_rec &&
          cmap->clazz != &cff_cmap_unicode_class_rec  )
@@ -570,7 +601,7 @@
 
     cff_get_kerning,
     0,                      /* FT_Face_AttachFunc      */
-    0,                      /* FT_Face_GetAdvancesFunc */
+    cff_get_advances,       /* FT_Face_GetAdvancesFunc */
 
     cff_size_request,
 

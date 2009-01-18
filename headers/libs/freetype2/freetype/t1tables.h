@@ -78,6 +78,10 @@ FT_BEGIN_HEADER
     FT_Short    underline_position;
     FT_UShort   underline_thickness;
 
+    /* since 2.3.8 */
+
+    FT_UShort   fs_type;
+
   } PS_FontInfoRec;
 
 

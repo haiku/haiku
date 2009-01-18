@@ -412,7 +412,7 @@ FT_BEGIN_HEADER
    *     FT_Get_TrueType_Engine_Type
    *
    *  @description:
-   *     Return a @FT_TrueTypeEngineType value to indicate which level of
+   *     Return an @FT_TrueTypeEngineType value to indicate which level of
    *     the TrueType virtual machine a given library instance supports.
    *
    *  @input:

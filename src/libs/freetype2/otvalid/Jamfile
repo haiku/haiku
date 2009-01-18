@@ -21,7 +21,7 @@ UseFreeTypeHeaders ;
 
   if $(FT2_MULTI)
   {
-    _sources = otvbase otvcommn otvgdef otvgpos otvgsub otvjstf otvmod ;
+    _sources = otvbase otvcommn otvgdef otvgpos otvgsub otvjstf otvmod otvmath ;
   }
   else
   {

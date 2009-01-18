@@ -304,7 +304,7 @@
     (FT_Face_GetKerningFunc)  Get_Kerning,
     (FT_Face_AttachFunc)      T1_Read_Metrics,
 #endif
-    (FT_Face_GetAdvancesFunc) 0,
+    (FT_Face_GetAdvancesFunc) T1_Get_Advances,
     (FT_Size_RequestFunc)     T1_Size_Request,
     (FT_Size_SelectFunc)      0
   };

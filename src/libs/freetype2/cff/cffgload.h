@@ -139,6 +139,7 @@ FT_BEGIN_HEADER
     FT_Pos             nominal_width;
 
     FT_Bool            read_width;
+    FT_Bool            width_only;
     FT_Int             num_hints;
     FT_Fixed*          buildchar;
     FT_Int             len_buildchar;

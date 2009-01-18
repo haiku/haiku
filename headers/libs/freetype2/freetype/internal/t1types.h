@@ -5,7 +5,7 @@
 /*    Basic Type1/Type2 type definitions and interface (specification      */
 /*    only).                                                               */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2006 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2006, 2008 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -231,7 +231,9 @@ FT_BEGIN_HEADER
     void*            psnames;
     void*            psaux;
     CID_FaceInfoRec  cid;
+#if 0
     void*            afm_data;
+#endif
     CID_Subrs        subrs;
 
     /* since version 2.1 - interface to PostScript hinter */

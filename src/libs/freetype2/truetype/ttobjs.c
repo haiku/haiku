@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Objects manager (body).                                              */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -144,6 +144,38 @@
 #endif /* TT_USE_BYTECODE_INTERPRETER */
 
 
+  /* Compare the face with a list of well-known `tricky' fonts. */
+  /* This list shall be expanded as we find more of them.       */
+
+  static FT_Bool
+  tt_check_trickyness( FT_String*  name )
+  {
+    static const char* const  trick_names[] =
+    {
+      "DFKaiSho-SB",     /* dfkaisb.ttf */
+      "DFKai-SB",        /* kaiu.ttf */
+      "HuaTianSongTi?",  /* htst3.ttf */
+      "MingLiU",         /* mingliu.ttf & mingliu.ttc */
+      "PMingLiU",        /* mingliu.ttc */
+      "MingLi43",        /* mingli.ttf */
+      NULL
+    };
+    int  nn;
+
+
+    if ( !name )
+      return FALSE;
+
+    /* Note that we only check the face name at the moment; it might */
+    /* be worth to do more checks for a few special cases.           */
+    for ( nn = 0; trick_names[nn] != NULL; nn++ )
+      if ( ft_strstr( name, trick_names[nn] ) )
+        return TRUE;
+
+    return FALSE;
+  }
+
+
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
@@ -180,7 +212,7 @@
     TT_Face       face = (TT_Face)ttface;
 
 
-    library = face->root.driver->root.library;
+    library = ttface->driver->root.library;
     sfnt    = (SFNT_Service)FT_Get_Module_Interface( library, "sfnt" );
     if ( !sfnt )
       goto Bad_Format;
@@ -206,7 +238,7 @@
     }
 
 #ifdef TT_USE_BYTECODE_INTERPRETER
-    face->root.face_flags |= FT_FACE_FLAG_HINTER;
+    ttface->face_flags |= FT_FACE_FLAG_HINTER;
 #endif
 
     /* If we are performing a simple font format check, exit immediately. */
@@ -218,16 +250,19 @@
     if ( error )
       goto Exit;
 
+    if ( tt_check_trickyness( ttface->family_name ) )
+      ttface->face_flags |= FT_FACE_FLAG_TRICKY;
+
     error = tt_face_load_hdmx( face, stream );
     if ( error )
       goto Exit;
 
-    if ( face->root.face_flags & FT_FACE_FLAG_SCALABLE )
+    if ( FT_IS_SCALABLE( ttface ) )
     {
 
 #ifdef FT_CONFIG_OPTION_INCREMENTAL
 
-      if ( !face->root.internal->incremental_interface )
+      if ( !ttface->internal->incremental_interface )
         error = tt_face_load_loca( face, stream );
       if ( !error )
         error = tt_face_load_cvt( face, stream );
@@ -267,38 +302,8 @@
         if ( params[i].tag == FT_PARAM_TAG_UNPATENTED_HINTING )
           unpatented_hinting = TRUE;
 
-      /* Compare the face with a list of well-known `tricky' fonts. */
-      /* This list shall be expanded as we find more of them.       */
       if ( !unpatented_hinting )
-      {
-        static const char* const  trick_names[] =
-        {
-          "DFKaiSho-SB",     /* dfkaisb.ttf */
-          "DFKai-SB",        /* kaiu.ttf */
-          "HuaTianSongTi?",  /* htst3.ttf */
-          "MingLiU",         /* mingliu.ttf & mingliu.ttc */
-          "PMingLiU",        /* mingliu.ttc */
-          "MingLi43",        /* mingli.ttf */
-          NULL
-        };
-        int  nn;
-
-
-        /* Note that we only check the face name at the moment; it might */
-        /* be worth to do more checks for a few special cases.           */
-        for ( nn = 0; trick_names[nn] != NULL; nn++ )
-        {
-          if ( ttface->family_name                               &&
-               ft_strstr( ttface->family_name, trick_names[nn] ) )
-          {
-            unpatented_hinting = 1;
-            break;
-          }
-        }
-      }
-
-      ttface->internal->ignore_unpatented_hinter =
-        FT_BOOL( !unpatented_hinting );
+        ttface->internal->ignore_unpatented_hinter = TRUE;
     }
 
 #endif /* TT_CONFIG_OPTION_UNPATENTED_HINTING &&
@@ -330,12 +335,18 @@
   FT_LOCAL_DEF( void )
   tt_face_done( FT_Face  ttface )           /* TT_Face */
   {
-    TT_Face       face   = (TT_Face)ttface;
-    FT_Memory     memory = face->root.memory;
-    FT_Stream     stream = face->root.stream;
+    TT_Face       face = (TT_Face)ttface;
+    FT_Memory     memory;
+    FT_Stream     stream;
+    SFNT_Service  sfnt;
 
-    SFNT_Service  sfnt   = (SFNT_Service)face->sfnt;
 
+    if ( !face )
+      return;
+
+    memory = ttface->memory;
+    stream = ttface->stream;
+    sfnt   = (SFNT_Service)face->sfnt;
 
     /* for `extended TrueType formats' (i.e. compressed versions) */
     if ( face->extra.finalizer )
@@ -674,7 +685,7 @@
     if ( !size->cvt_ready )
     {
       FT_UInt  i;
-      TT_Face  face = (TT_Face) size->root.face;
+      TT_Face  face = (TT_Face)size->root.face;
 
 
       /* Scale the cvt values to the new ppem.          */

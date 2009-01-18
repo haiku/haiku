@@ -748,6 +748,13 @@
   }
 
 
+  /* The default value for `scan_control' is documented as FALSE in the */
+  /* TrueType specification.  This is confusing since it implies a      */
+  /* Boolean value.  However, this is not the case, thus both the       */
+  /* default values of our `scan_type' and `scan_control' fields (which */
+  /* the documentation's `scan_control' variable is split into) are     */
+  /* zero.                                                              */
+
   const TT_GraphicsState  tt_default_graphics_state =
   {
     0, 0, 0,
@@ -761,7 +768,7 @@
 
     1, 64, 1,
     TRUE, 68, 0, 0, 9, 3,
-    0, FALSE, 2, 1, 1, 1
+    0, FALSE, 0, 1, 1, 1
   };
 
 
@@ -6381,7 +6388,7 @@
           {
             scale_valid = 1;
             scale       = TT_MULDIV( org2 + delta2 - ( org1 + delta1 ),
-                                     0x10000, orus2 - orus1 );
+                                     0x10000L, orus2 - orus1 );
           }
 
           x = ( org1 + delta1 ) +

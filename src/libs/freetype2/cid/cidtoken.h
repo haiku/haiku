@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    CID token definitions (specification only).                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2006 by                               */
+/*  Copyright 1996-2001, 2002, 2003, 2006, 2008 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -48,6 +48,7 @@
   T1_FIELD_BOOL  ( "isFixedPitch",       is_fixed_pitch,      0 )
   T1_FIELD_NUM   ( "UnderlinePosition",  underline_position,  0 )
   T1_FIELD_NUM   ( "UnderlineThickness", underline_thickness, 0 )
+  T1_FIELD_NUM   ( "FSType",             fs_type,             0 )
 
 
 #undef  FT_STRUCTURE
@@ -62,7 +63,6 @@
   T1_FIELD_NUM  ( "SubrCount",          num_subrs,           0 )
   T1_FIELD_NUM  ( "lenBuildCharArray",  len_buildchar,       0 )
   T1_FIELD_FIXED( "ForceBoldThreshold", forcebold_threshold, 0 )
-  T1_FIELD_FIXED( "ExpansionFactor",    expansion_factor,    0 )
   T1_FIELD_FIXED( "StrokeWidth",        stroke_width,        0 )
 
 
@@ -91,6 +91,9 @@
 
   T1_FIELD_NUM_TABLE ( "StemSnapH",        snap_widths,        12, 0 )
   T1_FIELD_NUM_TABLE ( "StemSnapV",        snap_heights,       12, 0 )
+
+  T1_FIELD_BOOL      ( "ForceBold",        force_bold,          0 )
+
 
 #undef  FT_STRUCTURE
 #define FT_STRUCTURE  FT_BBox

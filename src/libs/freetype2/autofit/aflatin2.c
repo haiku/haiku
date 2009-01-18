@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter hinting routines for latin script (body).                */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005, 2006, 2007 by                              */
+/*  Copyright 2003, 2004, 2005, 2006, 2007, 2008 by                        */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -944,6 +944,9 @@
           }
         }
     }
+#if 0
+    }
+#endif
 
     /* now, compute the `serif' segments */
     for ( seg1 = segments; seg1 < segment_limit; seg1++ )
@@ -2150,7 +2153,10 @@
           if ( before >= edges && before < edge   &&
                after < edge_limit && after > edge )
           {
-            edge->pos = before->pos +
+            if ( after->opos == before->opos )
+              edge->pos = before->pos;
+            else
+              edge->pos = before->pos +
                           FT_MulDiv( edge->opos - before->opos,
                                      after->pos - before->pos,
                                      after->opos - before->opos );

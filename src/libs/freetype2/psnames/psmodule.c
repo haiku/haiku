@@ -174,18 +174,34 @@
 
     /* sort base glyphs before glyph variants */
     if ( unicode1 == unicode2 )
-      return map1->unicode - map2->unicode;
+    {
+      if ( map1->unicode > map2->unicode )
+        return 1;
+      else if ( map1->unicode < map2->unicode )
+        return -1;
+      else
+        return 0;
+    }
     else
-      return unicode1 - unicode2;
+    {
+      if ( unicode1 > unicode2 )
+        return 1;
+      else if ( unicode1 < unicode2 )
+        return -1;
+      else
+        return 0;
+    }
   }
 
 
-  /* support for old WGL4 fonts */
+  /* support for extra glyphs not handled (well) in AGL; */
+  /* we add extra mappings for them if necessary         */
 
-#define WGL_EXTRA_LIST_SIZE  8
+#define EXTRA_GLYPH_LIST_SIZE  10
 
-  static const FT_UInt32  ft_wgl_extra_unicodes[WGL_EXTRA_LIST_SIZE] =
+  static const FT_UInt32  ft_extra_glyph_unicodes[EXTRA_GLYPH_LIST_SIZE] =
   {
+    /* WGL 4 */
     0x0394,
     0x03A9,
     0x2215,
@@ -193,10 +209,13 @@
     0x02C9,
     0x03BC,
     0x2219,
-    0x00A0
+    0x00A0,
+    /* Romanian */
+    0x021A,
+    0x021B
   };
 
-  static const char  ft_wgl_extra_glyph_names[] =
+  static const char  ft_extra_glyph_names[] =
   {
     'D','e','l','t','a',0,
     'O','m','e','g','a',0,
@@ -205,11 +224,13 @@
     'm','a','c','r','o','n',0,
     'm','u',0,
     'p','e','r','i','o','d','c','e','n','t','e','r','e','d',0,
-    's','p','a','c','e',0
+    's','p','a','c','e',0,
+    'T','c','o','m','m','a','a','c','c','e','n','t',0,
+    't','c','o','m','m','a','a','c','c','e','n','t',0
   };
 
   static const FT_Int
-  ft_wgl_extra_glyph_name_offsets[WGL_EXTRA_LIST_SIZE] =
+  ft_extra_glyph_name_offsets[EXTRA_GLYPH_LIST_SIZE] =
   {
      0,
      6,
@@ -218,29 +239,31 @@
     28,
     35,
     38,
-    53
+    53,
+    59,
+    72
   };
 
 
   static void
-  ps_check_wgl_name( const char*  gname,
-                     FT_UInt      glyph,
-                     FT_UInt*     wgl_glyphs,
-                     FT_UInt     *states )
+  ps_check_extra_glyph_name( const char*  gname,
+                             FT_UInt      glyph,
+                             FT_UInt*     extra_glyphs,
+                             FT_UInt     *states )
   {
     FT_UInt  n;
 
 
-    for ( n = 0; n < WGL_EXTRA_LIST_SIZE; n++ )
+    for ( n = 0; n < EXTRA_GLYPH_LIST_SIZE; n++ )
     {
-      if ( ft_strcmp( ft_wgl_extra_glyph_names +
-                        ft_wgl_extra_glyph_name_offsets[n], gname ) == 0 )
+      if ( ft_strcmp( ft_extra_glyph_names +
+                        ft_extra_glyph_name_offsets[n], gname ) == 0 )
       {
         if ( states[n] == 0 )
         {
-          /* mark this WGL extra glyph as a candidate for the cmap */
+          /* mark this extra glyph as a candidate for the cmap */
           states[n]     = 1;
-          wgl_glyphs[n] = glyph;
+          extra_glyphs[n] = glyph;
         }
 
         return;
@@ -250,17 +273,17 @@
 
 
   static void
-  ps_check_wgl_unicode( FT_UInt32  uni_char,
-                        FT_UInt   *states )
+  ps_check_extra_glyph_unicode( FT_UInt32  uni_char,
+                                FT_UInt   *states )
   {
     FT_UInt  n;
 
 
-    for ( n = 0; n < WGL_EXTRA_LIST_SIZE; n++ )
+    for ( n = 0; n < EXTRA_GLYPH_LIST_SIZE; n++ )
     {
-      if ( uni_char == ft_wgl_extra_unicodes[n] )
+      if ( uni_char == ft_extra_glyph_unicodes[n] )
       {
-        /* disable this WGL extra glyph from being added to the cmap */
+        /* disable this extra glyph from being added to the cmap */
         states[n] = 2;
 
         return;
@@ -280,15 +303,15 @@
   {
     FT_Error  error;
 
-    FT_UInt  wgl_list_states[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    FT_UInt  wgl_glyphs[WGL_EXTRA_LIST_SIZE];
+    FT_UInt  extra_glyph_list_states[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    FT_UInt  extra_glyphs[EXTRA_GLYPH_LIST_SIZE];
 
 
     /* we first allocate the table */
     table->num_maps = 0;
     table->maps     = 0;
 
-    if ( !FT_NEW_ARRAY( table->maps, num_glyphs + WGL_EXTRA_LIST_SIZE ) )
+    if ( !FT_NEW_ARRAY( table->maps, num_glyphs + EXTRA_GLYPH_LIST_SIZE ) )
     {
       FT_UInt     n;
       FT_UInt     count;
@@ -305,12 +328,14 @@
 
         if ( gname )
         {
-          ps_check_wgl_name( gname, n, wgl_glyphs, wgl_list_states );
+          ps_check_extra_glyph_name( gname, n,
+                                     extra_glyphs, extra_glyph_list_states );
           uni_char = ps_unicode_value( gname );
 
           if ( BASE_GLYPH( uni_char ) != 0 )
           {
-            ps_check_wgl_unicode( uni_char, wgl_list_states );
+            ps_check_extra_glyph_unicode( uni_char,
+                                          extra_glyph_list_states );
             map->unicode     = uni_char;
             map->glyph_index = n;
             map++;
@@ -321,15 +346,15 @@
         }
       }
 
-      for ( n = 0; n < WGL_EXTRA_LIST_SIZE; n++ )
+      for ( n = 0; n < EXTRA_GLYPH_LIST_SIZE; n++ )
       {
-        if ( wgl_list_states[n] == 1 )
+        if ( extra_glyph_list_states[n] == 1 )
         {
-          /* This glyph name has an additional WGL4 representation. */
-          /* Add it to the cmap.                                    */
+          /* This glyph name has an additional representation. */
+          /* Add it to the cmap.                               */
 
-          map->unicode     = ft_wgl_extra_unicodes[n];
-          map->glyph_index = wgl_glyphs[n];
+          map->unicode     = ft_extra_glyph_unicodes[n];
+          map->glyph_index = extra_glyphs[n];
           map++;
         }
       }

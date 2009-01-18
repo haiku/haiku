@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Objects manager (specification).                                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -99,6 +99,10 @@ FT_BEGIN_HEADER
     FT_Short       delta_shift;
 
     FT_Byte        instruct_control;
+    /* According to Greg Hitchcock from Microsoft, the `scan_control'     */
+    /* variable as documented in the TrueType specification is a 32-bit   */
+    /* integer; the high-word part holds the SCANTYPE value, the low-word */
+    /* part the SCANCTRL value.  We separate it into two fields.          */
     FT_Bool        scan_control;
     FT_Int         scan_type;
 

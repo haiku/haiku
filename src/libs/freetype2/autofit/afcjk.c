@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter hinting routines for CJK script (body).                  */
 /*                                                                         */
-/*  Copyright 2006, 2007 by                                                */
+/*  Copyright 2006, 2007, 2008 by                                          */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -1253,10 +1253,15 @@
         else if ( after >= edge_limit )
           af_cjk_align_serif_edge( hints, before, edge );
         else
-          edge->pos = before->pos +
-            FT_MulDiv( edge->fpos - before->fpos,
-                       after->pos - before->pos,
-                       after->fpos - before->fpos );
+        {
+          if ( after->fpos == before->fpos )
+            edge->pos = before->pos;
+          else
+            edge->pos = before->pos +
+                        FT_MulDiv( edge->fpos - before->fpos,
+                                   after->pos - before->pos,
+                                   after->fpos - before->fpos );
+        }
       }
     }
   }
@@ -1436,29 +1441,29 @@
   static const AF_Script_UniRangeRec  af_cjk_uniranges[] =
   {
 #if 0
-    { 0x0100,  0xFFFF },  /* why this? */
+    {  0x0100UL,  0xFFFFUL },  /* why this? */
 #endif
-    { 0x2E80,  0x2EFF },  /* CJK Radicals Supplement */
-    { 0x2F00,  0x2FDF },  /* Kangxi Radicals */
-    { 0x3000,  0x303F },  /* CJK Symbols and Punctuation */
-    { 0x3040,  0x309F },  /* Hiragana */
-    { 0x30A0,  0x30FF },  /* Katakana */
-    { 0x3100,  0x312F },  /* Bopomofo */
-    { 0x3130,  0x318F },  /* Hangul Compatibility Jamo */
-    { 0x31A0,  0x31BF },  /* Bopomofo Extended */
-    { 0x31C0,  0x31EF },  /* CJK Strokes */
-    { 0x31F0,  0x31FF },  /* Katakana Phonetic Extensions */
-    { 0x3200,  0x32FF },  /* Enclosed CJK Letters and Months */
-    { 0x3300,  0x33FF },  /* CJK Compatibility */
-    { 0x3400,  0x4DBF },  /* CJK Unified Ideographs Extension A */
-    { 0x4DC0,  0x4DFF },  /* Yijing Hexagram Symbols */
-    { 0x4E00,  0x9FFF },  /* CJK Unified Ideographs */
-    { 0xF900,  0xFAFF },  /* CJK Compatibility Ideographs */
-    { 0xFE30,  0xFE4F },  /* CJK Compatibility Forms */
-    { 0xFF00,  0xFFEF },  /* Halfwidth and Fullwidth Forms */
-    { 0x20000, 0x2A6DF }, /* CJK Unified Ideographs Extension B */
-    { 0x2F800, 0x2FA1F }, /* CJK Compatibility Ideographs Supplement */
-    { 0,       0 }
+    {  0x2E80UL,  0x2EFFUL },  /* CJK Radicals Supplement                 */
+    {  0x2F00UL,  0x2FDFUL },  /* Kangxi Radicals                         */
+    {  0x3000UL,  0x303FUL },  /* CJK Symbols and Punctuation             */
+    {  0x3040UL,  0x309FUL },  /* Hiragana                                */
+    {  0x30A0UL,  0x30FFUL },  /* Katakana                                */
+    {  0x3100UL,  0x312FUL },  /* Bopomofo                                */
+    {  0x3130UL,  0x318FUL },  /* Hangul Compatibility Jamo               */
+    {  0x31A0UL,  0x31BFUL },  /* Bopomofo Extended                       */
+    {  0x31C0UL,  0x31EFUL },  /* CJK Strokes                             */
+    {  0x31F0UL,  0x31FFUL },  /* Katakana Phonetic Extensions            */
+    {  0x3200UL,  0x32FFUL },  /* Enclosed CJK Letters and Months         */
+    {  0x3300UL,  0x33FFUL },  /* CJK Compatibility                       */
+    {  0x3400UL,  0x4DBFUL },  /* CJK Unified Ideographs Extension A      */
+    {  0x4DC0UL,  0x4DFFUL },  /* Yijing Hexagram Symbols                 */
+    {  0x4E00UL,  0x9FFFUL },  /* CJK Unified Ideographs                  */
+    {  0xF900UL,  0xFAFFUL },  /* CJK Compatibility Ideographs            */
+    {  0xFE30UL,  0xFE4FUL },  /* CJK Compatibility Forms                 */
+    {  0xFF00UL,  0xFFEFUL },  /* Halfwidth and Fullwidth Forms           */
+    { 0x20000UL, 0x2A6DFUL },  /* CJK Unified Ideographs Extension B      */
+    { 0x2F800UL, 0x2FA1FUL },  /* CJK Compatibility Ideographs Supplement */
+    {       0UL,       0UL }
   };
 
 

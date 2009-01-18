@@ -68,36 +68,13 @@
   /*************************************************************************/
 
 
-  FT_EXPORT_DEF( FT_Error )
-  FT_GlyphSlot_Own_Bitmap( FT_GlyphSlot  slot )
-  {
-    if ( slot && slot->format == FT_GLYPH_FORMAT_BITMAP   &&
-         !( slot->internal->flags & FT_GLYPH_OWN_BITMAP ) )
-    {
-      FT_Bitmap  bitmap;
-      FT_Error   error;
-
-
-      FT_Bitmap_New( &bitmap );
-      error = FT_Bitmap_Copy( slot->library, &slot->bitmap, &bitmap );
-      if ( error )
-        return error;
-
-      slot->bitmap = bitmap;
-      slot->internal->flags |= FT_GLYPH_OWN_BITMAP;
-    }
-
-    return FT_Err_Ok;
-  }
-
-
   /* documentation is in ftsynth.h */
 
   FT_EXPORT_DEF( void )
   FT_GlyphSlot_Embolden( FT_GlyphSlot  slot )
   {
     FT_Library  library = slot->library;
-    FT_Face     face    = FT_SLOT_FACE( slot );
+    FT_Face     face    = slot->face;
     FT_Error    error;
     FT_Pos      xstr, ystr;
 
@@ -123,10 +100,11 @@
     }
     else if ( slot->format == FT_GLYPH_FORMAT_BITMAP )
     {
-      xstr = FT_PIX_FLOOR( xstr );
+      /* round to full pixels */
+      xstr &= ~63;
       if ( xstr == 0 )
         xstr = 1 << 6;
-      ystr = FT_PIX_FLOOR( ystr );
+      ystr &= ~63;
 
       error = FT_GlyphSlot_Own_Bitmap( slot );
       if ( error )

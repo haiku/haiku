@@ -2,7 +2,7 @@
 
     FreeType font driver for pcf fonts
 
-  Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by
+  Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by
   Francesco Zappa Nardelli
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -48,7 +48,7 @@ THE SOFTWARE.
 #define FT_COMPONENT  trace_pcfread
 
 
-#if defined( FT_DEBUG_LEVEL_TRACE )
+#ifdef FT_DEBUG_LEVEL_TRACE
   static const char* const  tableNames[] =
   {
     "prop", "accl", "mtrcs", "bmps", "imtrcs",
@@ -152,7 +152,7 @@ THE SOFTWARE.
         break;
     }
 
-#if defined( FT_DEBUG_LEVEL_TRACE )
+#ifdef FT_DEBUG_LEVEL_TRACE
 
     {
       FT_UInt      i, j;

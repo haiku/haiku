@@ -5,7 +5,7 @@
 /*    FreeType API for checking patented TrueType bytecode instructions    */
 /*    (body).                                                              */
 /*                                                                         */
-/*  Copyright 2007 by David Turner.                                        */
+/*  Copyright 2007, 2008 by David Turner.                                  */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
@@ -260,7 +260,7 @@
   FT_Face_SetUnpatentedHinting( FT_Face  face,
                                 FT_Bool  value )
   {
-    FT_Bool  result = 0;
+    FT_Bool  result = FALSE;
 
 
 #if defined( TT_CONFIG_OPTION_UNPATENTED_HINTING ) && \

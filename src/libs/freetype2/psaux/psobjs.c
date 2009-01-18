@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auxiliary functions for PostScript fonts (body).                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -175,11 +175,17 @@
       return PSaux_Err_Invalid_Argument;
     }
 
+    if ( length < 0 )
+    {
+      FT_ERROR(( "ps_table_add: invalid length\n" ));
+      return PSaux_Err_Invalid_Argument;
+    }
+
     /* grow the base block if needed */
     if ( table->cursor + length > table->capacity )
     {
       FT_Error   error;
-      FT_Offset  new_size  = table->capacity;
+      FT_Offset  new_size = table->capacity;
       FT_Long    in_offset;
 
 
@@ -376,7 +382,7 @@
           /* skip octal escape or ignore backslash */
           for ( i = 0; i < 3 && cur < limit; ++i )
           {
-            if ( ! IS_OCTAL_DIGIT( *cur ) )
+            if ( !IS_OCTAL_DIGIT( *cur ) )
               break;
 
             ++cur;
@@ -1259,8 +1265,9 @@
     old_cursor = parser->cursor;
     old_limit  = parser->limit;
 
-    /* we store the elements count if necessary */
-    if ( field->type != T1_FIELD_TYPE_BBOX )
+    /* we store the elements count if necessary;           */
+    /* we further assume that `count_offset' can't be zero */
+    if ( field->type != T1_FIELD_TYPE_BBOX && field->count_offset != 0 )
       *(FT_Byte*)( (FT_Byte*)objects[0] + field->count_offset ) =
         (FT_Byte)num_elements;
 

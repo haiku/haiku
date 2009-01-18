@@ -355,6 +355,12 @@
       if ( FT_ABS( integer_length ) > 5 )
         goto Exit;
 
+      /* Remove non-significant digits. */
+      if ( integer_length < 0 ) {
+        number          /= power_tens[-integer_length];
+        fraction_length += integer_length;
+      }
+
       /* Convert into 16.16 format. */
       if ( fraction_length > 0 )
       {
@@ -406,10 +412,9 @@
   cff_parse_fixed_scaled( FT_Byte**  d,
                           FT_Int     scaling )
   {
-    return **d ==
-      30 ? cff_parse_real( d[0], d[1], scaling, NULL )
-         : (FT_Fixed)FT_MulFix( cff_parse_integer( d[0], d[1] ) << 16,
-                                                   power_tens[scaling] );
+    return **d == 30 ? cff_parse_real( d[0], d[1], scaling, NULL )
+                     : ( cff_parse_integer( d[0], d[1] ) *
+                           power_tens[scaling] ) << 16;
   }
 
 

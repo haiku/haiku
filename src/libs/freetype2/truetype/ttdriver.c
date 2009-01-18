@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType font driver implementation (body).                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -125,6 +125,49 @@
 #undef PAIR_TAG
 
 
+  static FT_Error
+  tt_get_advances( FT_Face    ttface,
+                   FT_UInt    start,
+                   FT_UInt    count,
+                   FT_Int32   flags,
+                   FT_Fixed  *advances )
+  {
+    FT_UInt  nn;
+    TT_Face  face  = (TT_Face) ttface;
+    FT_Bool  check = FT_BOOL(
+                       !( flags & FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH ) );
+
+
+    /* XXX: TODO: check for sbits */
+
+    if ( flags & FT_LOAD_VERTICAL_LAYOUT )
+    {
+      for ( nn = 0; nn < count; nn++ )
+      {
+        FT_Short   tsb;
+        FT_UShort  ah;
+
+
+        TT_Get_VMetrics( face, start + nn, check, &tsb, &ah );
+        advances[nn] = ah;
+      }
+    }
+    else
+    {
+      for ( nn = 0; nn < count; nn++ )
+      {
+        FT_Short   lsb;
+        FT_UShort  aw;
+
+
+        TT_Get_HMetrics( face, start + nn, check, &lsb, &aw );
+        advances[nn] = aw;
+      }
+    }
+
+    return TT_Err_Ok;
+  }
+
   /*************************************************************************/
   /*************************************************************************/
   /*************************************************************************/
@@ -229,7 +272,7 @@
   /*    glyph_index :: The index of the glyph in the font file.            */
   /*                                                                       */
   /*    load_flags  :: A flag indicating what to load for this glyph.  The */
-  /*                   FTLOAD_??? constants can be used to control the     */
+  /*                   FT_LOAD_XXX constants can be used to control the    */
   /*                   glyph loading process (e.g., whether the outline    */
   /*                   should be scaled, whether to load bitmaps or not,   */
   /*                   whether to hint the outline, etc).                  */
@@ -258,11 +301,24 @@
     if ( !face || glyph_index >= (FT_UInt)face->num_glyphs )
       return TT_Err_Invalid_Argument;
 
+    if ( load_flags & FT_LOAD_NO_HINTING )
+    {
+      /* both FT_LOAD_NO_HINTING and FT_LOAD_NO_AUTOHINT   */
+      /* are necessary to disable hinting for tricky fonts */          
+
+      if ( FT_IS_TRICKY( face ) )
+        load_flags &= ~FT_LOAD_NO_HINTING;
+
+      if ( load_flags & FT_LOAD_NO_AUTOHINT )
+        load_flags |= FT_LOAD_NO_HINTING;
+    }
+
     if ( load_flags & ( FT_LOAD_NO_RECURSE | FT_LOAD_NO_SCALE ) )
     {
-      load_flags |= FT_LOAD_NO_HINTING |
-                    FT_LOAD_NO_BITMAP  |
-                    FT_LOAD_NO_SCALE;
+      load_flags |= FT_LOAD_NO_BITMAP | FT_LOAD_NO_SCALE;
+
+      if ( !FT_IS_TRICKY( face ) )
+        load_flags |= FT_LOAD_NO_HINTING;
     }
 
     /* now load the glyph outline if necessary */
@@ -404,7 +460,7 @@
 
     tt_get_kerning,
     0,                      /* FT_Face_AttachFunc      */
-    0,                      /* FT_Face_GetAdvancesFunc */
+    tt_get_advances,
 
     tt_size_request,
 #ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS

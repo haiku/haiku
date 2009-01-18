@@ -55,9 +55,9 @@
 
 #undef  FT_USE_MODULE
 #ifdef __cplusplus
-#define FT_USE_MODULE( x )  extern "C" const FT_Module_Class  x;
+#define FT_USE_MODULE( type, x )  extern "C" const type  x;
 #else
-#define FT_USE_MODULE( x )  extern const FT_Module_Class  x;
+#define FT_USE_MODULE( type, x )  extern const type  x;
 #endif
 
 
@@ -65,7 +65,7 @@
 
 
 #undef  FT_USE_MODULE
-#define FT_USE_MODULE( x )  (const FT_Module_Class*)&(x),
+#define FT_USE_MODULE( type, x )  (const FT_Module_Class*)&(x),
 
   static
   const FT_Module_Class*  const ft_default_modules[] =

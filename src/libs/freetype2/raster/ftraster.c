@@ -181,13 +181,13 @@
   /* Disable the tracing mechanism for simplicity -- developers can      */
   /* activate it easily by redefining these two macros.                  */
 #ifndef FT_ERROR
-#define FT_ERROR( x )  do ; while ( 0 )     /* nothing */
+#define FT_ERROR( x )  do { } while ( 0 )     /* nothing */
 #endif
 
 #ifndef FT_TRACE
-#define FT_TRACE( x )   do ; while ( 0 )    /* nothing */
-#define FT_TRACE1( x )  do ; while ( 0 )    /* nothing */
-#define FT_TRACE6( x )  do ; while ( 0 )    /* nothing */
+#define FT_TRACE( x )   do { } while ( 0 )    /* nothing */
+#define FT_TRACE1( x )  do { } while ( 0 )    /* nothing */
+#define FT_TRACE6( x )  do { } while ( 0 )    /* nothing */
 #endif
 
 #define Raster_Err_None          0
@@ -370,7 +370,7 @@
 #define RAS_VARS       /* void */
 #define RAS_VAR        /* void */
 
-#define FT_UNUSED_RASTER  do ; while ( 0 )
+#define FT_UNUSED_RASTER  do { } while ( 0 )
 
 
 #else /* FT_STATIC_RASTER */
@@ -388,7 +388,7 @@
 #endif /* FT_STATIC_RASTER */
 
 
-  typedef struct TWorker_   TWorker, *PWorker;
+  typedef struct TWorker_  TWorker, *PWorker;
 
 
   /* prototypes used for sweep function dispatch */
@@ -518,7 +518,7 @@
   };
 
 
-  typedef struct TRaster_
+  typedef struct  TRaster_
   {
     char*     buffer;
     long      buffer_size;
@@ -531,7 +531,7 @@
 
 #ifdef FT_STATIC_RASTER
 
-  static TWorker   cur_ras;
+  static TWorker  cur_ras;
 #define ras  cur_ras
 
 #else
@@ -543,24 +543,25 @@
 
 #ifdef FT_RASTER_OPTION_ANTI_ALIASING
 
-static const char  count_table[256] =
-{
-  0 , 1 , 1 , 2 , 1 , 2 , 2 , 3 , 1 , 2 , 2 , 3 , 2 , 3 , 3 , 4,
-  1 , 2 , 2 , 3 , 2 , 3 , 3 , 4 , 2 , 3 , 3 , 4 , 3 , 4 , 4 , 5,
-  1 , 2 , 2 , 3 , 2 , 3 , 3 , 4 , 2 , 3 , 3 , 4 , 3 , 4 , 4 , 5,
-  2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
-  1 , 2 , 2 , 3 , 2 , 3 , 3 , 4 , 2 , 3 , 3 , 4 , 3 , 4 , 4 , 5,
-  2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
-  2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
-  3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
-  1 , 2 , 2 , 3 , 2 , 3 , 3 , 4 , 2 , 3 , 3 , 4 , 3 , 4 , 4 , 5,
-  2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
-  2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
-  3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
-  2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
-  3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
-  3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
-  4 , 5 , 5 , 6 , 5 , 6 , 6 , 7 , 5 , 6 , 6 , 7 , 6 , 7 , 7 , 8 };
+  static const char  count_table[256] =
+  {
+    0 , 1 , 1 , 2 , 1 , 2 , 2 , 3 , 1 , 2 , 2 , 3 , 2 , 3 , 3 , 4,
+    1 , 2 , 2 , 3 , 2 , 3 , 3 , 4 , 2 , 3 , 3 , 4 , 3 , 4 , 4 , 5,
+    1 , 2 , 2 , 3 , 2 , 3 , 3 , 4 , 2 , 3 , 3 , 4 , 3 , 4 , 4 , 5,
+    2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
+    1 , 2 , 2 , 3 , 2 , 3 , 3 , 4 , 2 , 3 , 3 , 4 , 3 , 4 , 4 , 5,
+    2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
+    2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
+    3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
+    1 , 2 , 2 , 3 , 2 , 3 , 3 , 4 , 2 , 3 , 3 , 4 , 3 , 4 , 4 , 5,
+    2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
+    2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
+    3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
+    2 , 3 , 3 , 4 , 3 , 4 , 4 , 5 , 3 , 4 , 4 , 5 , 4 , 5 , 5 , 6,
+    3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
+    3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
+    4 , 5 , 5 , 6 , 5 , 6 , 6 , 7 , 5 , 6 , 6 , 7 , 6 , 7 , 7 , 8
+a  };
 
 #endif /* FT_RASTER_OPTION_ANTI_ALIASING */
 
@@ -581,7 +582,7 @@ static const char  count_table[256] =
   /*    Set_High_Precision                                                 */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Sets precision variables according to param flag.                  */
+  /*    Set precision variables according to param flag.                   */
   /*                                                                       */
   /* <Input>                                                               */
   /*    High :: Set to True for high precision (typically for ppem < 18),  */
@@ -618,7 +619,7 @@ static const char  count_table[256] =
   /*    New_Profile                                                        */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Creates a new profile in the render pool.                          */
+  /*    Create a new profile in the render pool.                           */
   /*                                                                       */
   /* <Input>                                                               */
   /*    aState :: The state/orientation of the new profile.                */
@@ -684,7 +685,7 @@ static const char  count_table[256] =
   /*    End_Profile                                                        */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Finalizes the current profile.                                     */
+  /*    Finalize the current profile.                                      */
   /*                                                                       */
   /* <Return>                                                              */
   /*    SUCCESS on success.  FAILURE in case of overflow or incoherency.   */
@@ -741,7 +742,7 @@ static const char  count_table[256] =
   /*    Insert_Y_Turn                                                      */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Inserts a salient into the sorted list placed on top of the render */
+  /*    Insert a salient into the sorted list placed on top of the render  */
   /*    pool.                                                              */
   /*                                                                       */
   /* <Input>                                                               */
@@ -796,7 +797,7 @@ static const char  count_table[256] =
   /*    Finalize_Profile_Table                                             */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Adjusts all links in the profiles list.                            */
+  /*    Adjust all links in the profiles list.                             */
   /*                                                                       */
   /* <Return>                                                              */
   /*    SUCCESS on success.  FAILURE in case of overflow.                  */
@@ -857,7 +858,7 @@ static const char  count_table[256] =
   /*    Split_Conic                                                        */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Subdivides one conic Bezier into two joint sub-arcs in the Bezier  */
+  /*    Subdivide one conic Bezier into two joint sub-arcs in the Bezier   */
   /*    stack.                                                             */
   /*                                                                       */
   /* <Input>                                                               */
@@ -896,7 +897,7 @@ static const char  count_table[256] =
   /*    Split_Cubic                                                        */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Subdivides a third-order Bezier arc into two joint sub-arcs in the */
+  /*    Subdivide a third-order Bezier arc into two joint sub-arcs in the  */
   /*    Bezier stack.                                                      */
   /*                                                                       */
   /* <Note>                                                                */
@@ -938,7 +939,7 @@ static const char  count_table[256] =
   /*    Line_Up                                                            */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Computes the x-coordinates of an ascending line segment and stores */
+  /*    Compute the x-coordinates of an ascending line segment and store   */
   /*    them in the render pool.                                           */
   /*                                                                       */
   /* <Input>                                                               */
@@ -1077,8 +1078,8 @@ static const char  count_table[256] =
   /*    Line_Down                                                          */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Computes the x-coordinates of an descending line segment and       */
-  /*    stores them in the render pool.                                    */
+  /*    Compute the x-coordinates of an descending line segment and store  */
+  /*    them in the render pool.                                           */
   /*                                                                       */
   /* <Input>                                                               */
   /*    x1   :: The x-coordinate of the segment's start point.             */
@@ -1128,7 +1129,7 @@ static const char  count_table[256] =
   /*    Bezier_Up                                                          */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Computes the x-coordinates of an ascending Bezier arc and stores   */
+  /*    Compute the x-coordinates of an ascending Bezier arc and store     */
   /*    them in the render pool.                                           */
   /*                                                                       */
   /* <Input>                                                               */
@@ -1261,7 +1262,7 @@ static const char  count_table[256] =
   /*    Bezier_Down                                                        */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Computes the x-coordinates of an descending Bezier arc and stores  */
+  /*    Compute the x-coordinates of an descending Bezier arc and store    */
   /*    them in the render pool.                                           */
   /*                                                                       */
   /* <Input>                                                               */
@@ -1310,7 +1311,7 @@ static const char  count_table[256] =
   /*    Line_To                                                            */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Injects a new line segment and adjusts Profiles list.              */
+  /*    Inject a new line segment and adjust the Profiles list.            */
   /*                                                                       */
   /* <Input>                                                               */
   /*   x :: The x-coordinate of the segment's end point (its start point   */
@@ -1400,7 +1401,7 @@ static const char  count_table[256] =
   /*    Conic_To                                                           */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Injects a new conic arc and adjusts the profile list.              */
+  /*    Inject a new conic arc and adjust the profile list.                */
   /*                                                                       */
   /* <Input>                                                               */
   /*   cx :: The x-coordinate of the arc's new control point.              */
@@ -1510,7 +1511,7 @@ static const char  count_table[256] =
   /*    Cubic_To                                                           */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Injects a new cubic arc and adjusts the profile list.              */
+  /*    Inject a new cubic arc and adjust the profile list.                */
   /*                                                                       */
   /* <Input>                                                               */
   /*   cx1 :: The x-coordinate of the arc's first new control point.       */
@@ -1648,7 +1649,7 @@ static const char  count_table[256] =
   /*    Decompose_Curve                                                    */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Scans the outline arrays in order to emit individual segments and  */
+  /*    Scan the outline arrays in order to emit individual segments and   */
   /*    Beziers by calling Line_To() and Bezier_To().  It handles all      */
   /*    weird cases, like when the first point is off the curve, or when   */
   /*    there are simply no `on' points in the contour!                    */
@@ -1869,7 +1870,7 @@ static const char  count_table[256] =
   /*    Convert_Glyph                                                      */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Converts a glyph into a series of segments and arcs and makes a    */
+  /*    Convert a glyph into a series of segments and arcs and make a      */
   /*    profiles list with them.                                           */
   /*                                                                       */
   /* <Input>                                                               */
@@ -2557,10 +2558,10 @@ static const char  count_table[256] =
 
       if ( ras.gray_max_x >= 0 )
       {
-        Long   last_pixel = ras.target.width - 1;
-        Int    last_cell  = last_pixel >> 2;
-        Int    last_bit   = last_pixel & 3;
-        Bool   over       = 0;
+        Long  last_pixel = ras.target.width - 1;
+        Int   last_cell  = last_pixel >> 2;
+        Int   last_bit   = last_pixel & 3;
+        Bool  over       = 0;
 
 
         if ( ras.gray_max_x >= last_cell && last_bit != 3 )
@@ -2572,8 +2573,8 @@ static const char  count_table[256] =
         if ( ras.gray_min_x < 0 )
           ras.gray_min_x = 0;
 
-        bit   = ras.bTarget + ras.gray_min_x;
-        bit2  = bit + ras.gray_width;
+        bit  = ras.bTarget + ras.gray_min_x;
+        bit2 = bit + ras.gray_width;
 
         c1 = ras.gray_max_x - ras.gray_min_x;
 
@@ -2748,7 +2749,7 @@ static const char  count_table[256] =
     TProfileList  draw_left, draw_right;
 
 
-    /* Init empty linked lists */
+    /* initialize empty linked lists */
 
     Init_Linked( &waiting );
 
@@ -2779,18 +2780,18 @@ static const char  count_table[256] =
       P = Q;
     }
 
-    /* Check the Y-turns */
+    /* check the Y-turns */
     if ( ras.numTurns == 0 )
     {
       ras.error = Raster_Err_Invalid;
       return FAILURE;
     }
 
-    /* Now inits the sweep */
+    /* now initialize the sweep */
 
     ras.Proc_Sweep_Init( RAS_VARS &min_Y, &max_Y );
 
-    /* Then compute the distance of each profile from min_Y */
+    /* then compute the distance of each profile from min_Y */
 
     P = waiting;
 
@@ -2800,7 +2801,7 @@ static const char  count_table[256] =
       P = P->link;
     }
 
-    /* Let's go */
+    /* let's go */
 
     y        = min_Y;
     y_height = 0;
@@ -2811,7 +2812,7 @@ static const char  count_table[256] =
 
     while ( ras.numTurns > 0 )
     {
-      /* look in the waiting list for new activations */
+      /* check waiting list for new activations */
 
       P = waiting;
 
@@ -2838,7 +2839,7 @@ static const char  count_table[256] =
         P = Q;
       }
 
-      /* Sort the drawing lists */
+      /* sort the drawing lists */
 
       Sort( &draw_left );
       Sort( &draw_right );
@@ -2848,7 +2849,7 @@ static const char  count_table[256] =
 
       while ( y < y_change )
       {
-        /* Let's trace */
+        /* let's trace */
 
         dropouts = 0;
 
@@ -2867,16 +2868,17 @@ static const char  count_table[256] =
             x2 = xs;
           }
 
-          if ( x2 - x1 <= ras.precision )
-          {
-            e1 = FLOOR( x1 );
-            e2 = CEILING( x2 );
+          e1 = FLOOR( x1 );
+          e2 = CEILING( x2 );
 
+          if ( x2 - x1 <= ras.precision &&
+               e1 != x1 && e2 != x2     )
+          {
             if ( e1 > e2 || e2 == e1 + ras.precision )
             {
               if ( ras.dropOutControl != 2 )
               {
-                /* a drop out was detected */
+                /* a drop-out was detected */
 
                 P_Left ->X = x1;
                 P_Right->X = x2;
@@ -2898,9 +2900,9 @@ static const char  count_table[256] =
           P_Right = P_Right->link;
         }
 
-        /* now perform the dropouts _after_ the span drawing -- */
-        /* drop-outs processing has been moved out of the loop  */
-        /* for performance tuning                               */
+        /* handle drop-outs _after_ the span drawing --       */
+        /* drop-out processing has been moved out of the loop */
+        /* for performance tuning                             */
         if ( dropouts > 0 )
           goto Scan_DropOuts;
 
@@ -2917,7 +2919,7 @@ static const char  count_table[256] =
         }
       }
 
-      /* Now finalize the profiles that needs it */
+      /* now finalize the profiles that need it */
 
       P = draw_left;
       while ( P )
@@ -2938,7 +2940,7 @@ static const char  count_table[256] =
       }
     }
 
-    /* for gray-scaling, flushes the bitmap scanline cache */
+    /* for gray-scaling, flush the bitmap scanline cache */
     while ( y <= max_Y )
     {
       ras.Proc_Sweep_Step( RAS_VAR );
@@ -2981,7 +2983,7 @@ static const char  count_table[256] =
   /*    Render_Single_Pass                                                 */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Performs one sweep with sub-banding.                               */
+  /*    Perform one sweep with sub-banding.                                */
   /*                                                                       */
   /* <Input>                                                               */
   /*    flipped :: If set, flip the direction of the outline.              */
@@ -3056,7 +3058,7 @@ static const char  count_table[256] =
   /*    Render_Glyph                                                       */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Renders a glyph in a bitmap.  Sub-banding if needed.               */
+  /*    Render a glyph in a bitmap.  Sub-banding if needed.                */
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0 means success.                             */
@@ -3125,14 +3127,13 @@ static const char  count_table[256] =
 
 #ifdef FT_RASTER_OPTION_ANTI_ALIASING
 
-
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
   /*    Render_Gray_Glyph                                                  */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Renders a glyph with grayscaling.  Sub-banding if needed.          */
+  /*    Render a glyph with grayscaling.  Sub-banding if needed.           */
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0 means success.                             */
@@ -3248,7 +3249,7 @@ static const char  count_table[256] =
 
 
   static int
-  ft_black_new( void*      memory,
+  ft_black_new( void*       memory,
                 FT_Raster  *araster )
   {
      static TRaster  the_raster;
@@ -3306,9 +3307,9 @@ static const char  count_table[256] =
 
 
   static void
-  ft_black_reset( PRaster   raster,
-                  char*     pool_base,
-                  long      pool_size )
+  ft_black_reset( PRaster  raster,
+                  char*    pool_base,
+                  long     pool_size )
   {
     if ( raster )
     {
@@ -3333,9 +3334,9 @@ static const char  count_table[256] =
 
 
   static void
-  ft_black_set_mode( PRaster            raster,
-                     unsigned long      mode,
-                     const char*        palette )
+  ft_black_set_mode( PRaster        raster,
+                     unsigned long  mode,
+                     const char*    palette )
   {
 #ifdef FT_RASTER_OPTION_ANTI_ALIASING
 

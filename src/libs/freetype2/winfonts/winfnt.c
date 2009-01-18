@@ -360,7 +360,7 @@
 
         if ( face_index >= font_count )
         {
-          error = FNT_Err_Bad_Argument;
+          error = FNT_Err_Invalid_Argument;
           goto Exit;
         }
         else if ( face_index < 0 )
@@ -566,7 +566,7 @@
 
       if ( face_index >= face->root.num_faces )
       {
-        error = FNT_Err_Bad_Argument;
+        error = FNT_Err_Invalid_Argument;
         goto Exit;
       }
     }
@@ -612,8 +612,9 @@
 
     char_code -= cmap->first;
     if ( char_code < cmap->count )
-      gindex = char_code + 1; /* we artificially increase the glyph index; */
-                              /* FNT_Load_Glyph reverts to the right one   */
+      /* we artificially increase the glyph index; */
+      /* FNT_Load_Glyph reverts to the right one   */
+      gindex = (FT_UInt)( char_code + 1 );
     return gindex;
   }
 
@@ -638,7 +639,7 @@
       if ( char_code < cmap->count )
       {
         result = cmap->first + char_code;
-        gindex = char_code + 1;
+        gindex = (FT_UInt)( char_code + 1 );
       }
     }
 
@@ -665,16 +666,18 @@
   static void
   FNT_Face_Done( FNT_Face  face )
   {
-    if ( face )
-    {
-      FT_Memory  memory = FT_FACE_MEMORY( face );
+    FT_Memory  memory;
 
 
-      fnt_font_done( face );
+    if ( !face )
+      return;
 
-      FT_FREE( face->root.available_sizes );
-      face->root.num_fixed_sizes = 0;
-    }
+    memory = FT_FACE_MEMORY( face );
+
+    fnt_font_done( face );
+
+    FT_FREE( face->root.available_sizes );
+    face->root.num_fixed_sizes = 0;
   }
 
 
@@ -716,7 +719,7 @@
       if ( !error )
       {
         if ( face_index > 0 )
-          error = FNT_Err_Bad_Argument;
+          error = FNT_Err_Invalid_Argument;
         else if ( face_index < 0 )
           goto Exit;
       }
@@ -732,6 +735,8 @@
       FNT_Font    font = face->font;
       FT_PtrDist  family_size;
 
+
+      root->face_index = face_index;
 
       root->face_flags = FT_FACE_FLAG_FIXED_SIZES |
                          FT_FACE_FLAG_HORIZONTAL;
@@ -780,7 +785,7 @@
          * => nominal_point_size contains incorrect value;
          *    use pixel_height as the nominal height
          */
-        if ( bsize->y_ppem > font->header.pixel_height << 6 )
+        if ( bsize->y_ppem > ( font->header.pixel_height << 6 ) )
         {
           FT_TRACE2(( "use pixel_height as the nominal height\n" ));
 
@@ -909,7 +914,7 @@
     switch ( req->type )
     {
     case FT_SIZE_REQUEST_TYPE_NOMINAL:
-      if ( height == ( bsize->y_ppem + 32 ) >> 6 )
+      if ( height == ( ( bsize->y_ppem + 32 ) >> 6 ) )
         error = FNT_Err_Ok;
       break;
 

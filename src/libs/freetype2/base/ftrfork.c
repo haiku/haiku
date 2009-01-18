@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Embedded resource forks accessor (body).                             */
 /*                                                                         */
-/*  Copyright 2004, 2005, 2006, 2007 by                                    */
+/*  Copyright 2004, 2005, 2006, 2007, 2008 by                              */
 /*  Masatake YAMATO and Redhat K.K.                                        */
 /*                                                                         */
 /*  FT_Raccess_Get_HeaderInfo() and raccess_guess_darwin_hfsplus() are     */
@@ -399,7 +399,10 @@
                               char      **result_file_name,
                               FT_Long    *result_offset )
   {
-    FT_Int32  magic = ( 0x00 << 24 | 0x05 << 16 | 0x16 << 8 | 0x07 );
+    FT_Int32  magic = ( 0x00 << 24 ) |
+                      ( 0x05 << 16 ) |
+                      ( 0x16 <<  8 ) |
+                        0x07;
 
 
     *result_file_name = NULL;
@@ -418,7 +421,10 @@
                               char      **result_file_name,
                               FT_Long    *result_offset )
   {
-    FT_Int32  magic = (0x00 << 24 | 0x05 << 16 | 0x16 << 8 | 0x00);
+    FT_Int32  magic = ( 0x00 << 24 ) |
+                      ( 0x05 << 16 ) |
+                      ( 0x16 <<  8 ) |
+                        0x00;
 
 
     *result_file_name = NULL;

@@ -101,7 +101,7 @@
 
 
   /* CFF and Type 1 private dictionaries have slightly different      */
-  /* structures; we need to synthetize a Type 1 dictionary on the fly */
+  /* structures; we need to synthesize a Type 1 dictionary on the fly */
 
   static void
   cff_make_private_dict( CFF_SubFont  subfont,
@@ -437,7 +437,7 @@
     error = sfnt->init_face( stream, face, face_index, num_params, params );
     if ( !error )
     {
-      if ( face->format_tag != 0x4F54544FL )  /* `OTTO'; OpenType/CFF font */
+      if ( face->format_tag != TTAG_OTTO )  /* `OTTO'; OpenType/CFF font */
       {
         FT_TRACE2(( "[not a valid OpenType/CFF font]\n" ));
         goto Bad_Format;
@@ -465,8 +465,7 @@
         pure_cff = 0;
 
         /* load font directory */
-        error = sfnt->load_face( stream, face,
-                                 face_index, num_params, params );
+        error = sfnt->load_face( stream, face, 0, num_params, params );
         if ( error )
           goto Exit;
       }
@@ -508,12 +507,14 @@
         goto Exit;
 
       face->extra.data = cff;
-      error = cff_font_load( stream, face_index, cff );
+      error = cff_font_load( stream, face_index, cff, pure_cff );
       if ( error )
         goto Exit;
 
       cff->pshinter = pshinter;
       cff->psnames  = (void*)psnames;
+
+      cffface->face_index = face_index;
 
       /* Complement the root flags with some interesting information. */
       /* Note that this is only necessary for pure CFF and CEF fonts; */
@@ -659,8 +660,7 @@
         cffface->bbox.xMax = ( dict->font_bbox.xMax + 0xFFFFU ) >> 16;
         cffface->bbox.yMax = ( dict->font_bbox.yMax + 0xFFFFU ) >> 16;
 
-
-        cffface->units_per_EM = dict->units_per_em;
+        cffface->units_per_EM = (FT_UShort)( dict->units_per_em );
 
         cffface->ascender  = (FT_Short)( cffface->bbox.yMax );
         cffface->descender = (FT_Short)( cffface->bbox.yMin );
@@ -823,7 +823,7 @@
         cffface->face_flags |= FT_FACE_FLAG_GLYPH_NAMES;
 #endif
 
-      if ( dict->cid_registry != 0xFFFFU )
+      if ( dict->cid_registry != 0xFFFFU && pure_cff )
         cffface->face_flags |= FT_FACE_FLAG_CID_KEYED;
 
 
@@ -832,7 +832,7 @@
       /* Compute char maps.                                              */
       /*                                                                 */
 
-      /* Try to synthetize a Unicode charmap if there is none available */
+      /* Try to synthesize a Unicode charmap if there is none available */
       /* already.  If an OpenType font contains a Unicode "cmap", we    */
       /* will use it, whatever be in the CFF part of the file.          */
       {
@@ -919,10 +919,16 @@
   FT_LOCAL_DEF( void )
   cff_face_done( FT_Face  cffface )         /* CFF_Face */
   {
-    CFF_Face      face   = (CFF_Face)cffface;
-    FT_Memory     memory = cffface->memory;
-    SFNT_Service  sfnt   = (SFNT_Service)face->sfnt;
+    CFF_Face      face = (CFF_Face)cffface;
+    FT_Memory     memory;
+    SFNT_Service  sfnt;
 
+
+    if ( !face )
+      return;
+
+    memory = cffface->memory;
+    sfnt   = (SFNT_Service)face->sfnt;
 
     if ( sfnt )
       sfnt->done_face( face );

@@ -5,7 +5,7 @@
 /*    ANSI-specific library and header configuration file (specification   */
 /*    only).                                                               */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2005, 2006, 2007 by                        */
+/*  Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009 by                  */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -53,12 +53,6 @@
   /*                                                                    */
   /* In these case, `ftconfig.h' will refuse to compile anyway with a   */
   /* message like `couldn't find 32-bit type' or something similar.     */
-  /*                                                                    */
-  /* IMPORTANT NOTE: We do not define aliases for heap management and   */
-  /*                 i/o routines (i.e. malloc/free/fopen/fread/...)    */
-  /*                 since these functions should all be encapsulated   */
-  /*                 by platform-specific implementations of            */
-  /*                 `ftsystem.c'.                                      */
   /*                                                                    */
   /**********************************************************************/
 
@@ -123,8 +117,6 @@
 #include <stdlib.h>
 
 #define ft_qsort  qsort
-
-#define ft_exit   exit    /* only used to exit from unhandled exceptions */
 
 
   /**********************************************************************/

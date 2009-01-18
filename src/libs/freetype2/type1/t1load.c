@@ -230,7 +230,7 @@
 
 
     if ( ncv <= axismap->blend_points[0] )
-      return axismap->design_points[0];
+      return FT_INT_TO_FIXED( axismap->design_points[0] );
 
     for ( j = 1; j < axismap->num_points; ++j )
     {
@@ -241,8 +241,7 @@
                                  axismap->blend_points[j] -
                                    axismap->blend_points[j - 1] );
 
-
-        return axismap->design_points[j - 1] +
+        return FT_INT_TO_FIXED( axismap->design_points[j - 1] ) +
                  FT_MulDiv( t,
                             axismap->design_points[j] -
                               axismap->design_points[j - 1],
@@ -250,7 +249,7 @@
       }
     }
 
-    return axismap->design_points[axismap->num_points - 1];
+    return FT_INT_TO_FIXED( axismap->design_points[axismap->num_points - 1] );
   }
 
 
@@ -337,8 +336,8 @@
       mmvar->axis[i].def     = ( mmvar->axis[i].minimum +
                                    mmvar->axis[i].maximum ) / 2;
                             /* Does not apply.  But this value is in range */
-      mmvar->axis[i].strid   = 0xFFFFFFFFUL;   /* Does not apply */
-      mmvar->axis[i].tag     = 0xFFFFFFFFUL;   /* Does not apply */
+      mmvar->axis[i].strid   = (FT_UInt)-1;    /* Does not apply */
+      mmvar->axis[i].tag     = (FT_ULong)-1;   /* Does not apply */
 
       if ( ft_strcmp( mmvar->axis[i].name, "Weight" ) == 0 )
         mmvar->axis[i].tag = FT_MAKE_TAG( 'w', 'g', 'h', 't' );
@@ -348,16 +347,15 @@
         mmvar->axis[i].tag = FT_MAKE_TAG( 'o', 'p', 's', 'z' );
     }
 
-    if ( blend->num_designs == 1U << blend->num_axis )
+    if ( blend->num_designs == ( 1U << blend->num_axis ) )
     {
       mm_weights_unmap( blend->default_weight_vector,
                         axiscoords,
                         blend->num_axis );
 
       for ( i = 0; i < mmaster.num_axis; ++i )
-        mmvar->axis[i].def =
-          FT_INT_TO_FIXED( mm_axis_unmap( &blend->design_map[i],
-                                          axiscoords[i] ) );
+        mmvar->axis[i].def = mm_axis_unmap( &blend->design_map[i],
+                                            axiscoords[i] );
     }
 
     *master = mmvar;
@@ -1274,6 +1272,19 @@
 
             n++;
           }
+          else if ( only_immediates )
+          {
+            /* Since the current position is not updated for           */
+            /* immediates-only mode we would get an infinite loop if   */
+            /* we don't do anything here.                              */
+            /*                                                         */
+            /* This encoding array is not valid according to the type1 */
+            /* specification (it might be an encoding for a CID type1  */
+            /* font, however), so we conclude that this font is NOT a  */
+            /* type1 font.                                             */
+            parser->root.error = FT_Err_Unknown_File_Format;
+            return;
+          }
         }
         else
         {
@@ -1319,9 +1330,9 @@
     PS_Table   table  = &loader->subrs;
     FT_Memory  memory = parser->root.memory;
     FT_Error   error;
-    FT_Int     n, num_subrs;
+    FT_Int     num_subrs;
 
-    PSAux_Service  psaux  = (PSAux_Service)face->psaux;
+    PSAux_Service  psaux = (PSAux_Service)face->psaux;
 
 
     T1_Skip_Spaces( parser );
@@ -1355,18 +1366,17 @@
         goto Fail;
     }
 
-    /* the format is simple:                                 */
-    /*                                                       */
-    /*   `index' + binary data                               */
-    /*                                                       */
-    for ( n = 0; n < num_subrs; n++ )
+    /* the format is simple:   */
+    /*                         */
+    /*   `index' + binary data */
+    /*                         */
+    for (;;)
     {
       FT_Long   idx, size;
       FT_Byte*  base;
 
 
-      /* If the next token isn't `dup', we are also done.  This */
-      /* happens when there are `holes' in the Subrs array.     */
+      /* If the next token isn't `dup' we are done. */
       if ( ft_strncmp( (char*)parser->root.cursor, "dup", 3 ) != 0 )
         break;
 
@@ -1615,15 +1625,11 @@
       }
     }
 
-    if ( loader->num_glyphs )
-      return;
-    else
-      loader->num_glyphs = n;
+    loader->num_glyphs = n;
 
     /* if /.notdef is found but does not occupy index 0, do our magic. */
-    if ( ft_strcmp( (const char*)".notdef",
-                    (const char*)name_table->elements[0] ) &&
-         notdef_found                                      )
+    if ( notdef_found                                                 &&
+         ft_strcmp( ".notdef", (const char*)name_table->elements[0] ) )
     {
       /* Swap glyph in index 0 with /.notdef glyph.  First, add index 0  */
       /* name and code entries to swap_table.  Then place notdef_index   */
@@ -1692,7 +1698,7 @@
       /* and add our own /.notdef glyph to index 0.               */
 
       /* 0 333 hsbw endchar */
-      FT_Byte  notdef_glyph[] = {0x8B, 0xF7, 0xE1, 0x0D, 0x0E};
+      FT_Byte  notdef_glyph[] = { 0x8B, 0xF7, 0xE1, 0x0D, 0x0E };
       char*    notdef_name    = (char *)".notdef";
 
 
@@ -1730,7 +1736,7 @@
         goto Fail;
 
       /* we added a glyph. */
-      loader->num_glyphs = n + 1;
+      loader->num_glyphs += 1;
     }
 
     return;

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter hinting routines for latin script (body).                */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005, 2006, 2007 by                              */
+/*  Copyright 2003, 2004, 2005, 2006, 2007, 2008 by                        */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -2008,7 +2008,10 @@
           if ( before >= edges && before < edge   &&
                after < edge_limit && after > edge )
           {
-            edge->pos = before->pos +
+            if ( after->opos == before->opos )
+              edge->pos = before->pos;
+            else
+              edge->pos = before->pos +
                           FT_MulDiv( edge->opos - before->opos,
                                      after->pos - before->pos,
                                      after->opos - before->opos );
@@ -2124,27 +2127,33 @@
 
   static const AF_Script_UniRangeRec  af_latin_uniranges[] =
   {
-    { 0x0020, 0x007F },  /* Basic Latin (no control characters) */
-    { 0x00A0, 0x00FF },  /* Latin-1 Supplement (no control characters) */
-    { 0x0100, 0x017F },  /* Latin Extended-A */
-    { 0x0180, 0x024F },  /* Latin Extended-B */
-    { 0x0250, 0x02AF },  /* IPA Extensions */
-    { 0x02B0, 0x02FF },  /* Spacing Modifier Letters */
-    { 0x0300, 0x036F },  /* Combining Diacritical Marks */
-    { 0x0370, 0x03FF },  /* Greek and Coptic */
-    { 0x0400, 0x04FF },  /* Cyrillic */
-    { 0x0500, 0x052F },  /* Cyrillic Supplement */
-    { 0x1D00, 0x1D7F },  /* Phonetic Extensions */
-    { 0x1D80, 0x1DBF },  /* Phonetic Extensions Supplement */
-    { 0x1DC0, 0x1DFF },  /* Combining Diacritical Marks Supplement */
-    { 0x1E00, 0x1EFF },  /* Latin Extended Additional */
-    { 0x1F00, 0x1FFF },  /* Greek Extended */
-    { 0x2000, 0x206F },  /* General Punctuation */
-    { 0x2070, 0x209F },  /* Superscripts and Subscripts */
-    { 0x20A0, 0x20CF },  /* Currency Symbols */
-    { 0x2150, 0x218F },  /* Number Forms */
-    { 0x2460, 0x24FF },  /* Enclosed Alphanumerics */
-    { 0     , 0      }
+    {  0x0020  ,  0x007F   },  /* Basic Latin (no control chars) */
+    {  0x00A0  ,  0x00FF   },  /* Latin-1 Supplement (no control chars) */
+    {  0x0100  ,  0x017F   },  /* Latin Extended-A */
+    {  0x0180  ,  0x024F   },  /* Latin Extended-B */
+    {  0x0250  ,  0x02AF   },  /* IPA Extensions */
+    {  0x02B0  ,  0x02FF   },  /* Spacing Modifier Letters */
+    {  0x0300  ,  0x036F   },  /* Combining Diacritical Marks */
+    {  0x0370  ,  0x03FF   },  /* Greek and Coptic */
+    {  0x0400  ,  0x04FF   },  /* Cyrillic */
+    {  0x0500  ,  0x052F   },  /* Cyrillic Supplement */
+    {  0x1D00  ,  0x1D7F   },  /* Phonetic Extensions */
+    {  0x1D80  ,  0x1DBF   },  /* Phonetic Extensions Supplement */
+    {  0x1DC0  ,  0x1DFF   },  /* Combining Diacritical Marks Supplement */
+    {  0x1E00  ,  0x1EFF   },  /* Latin Extended Additional */
+    {  0x1F00  ,  0x1FFF   },  /* Greek Extended */
+    {  0x2000  ,  0x206F   },  /* General Punctuation */
+    {  0x2070  ,  0x209F   },  /* Superscripts and Subscripts */
+    {  0x20A0  ,  0x20CF   },  /* Currency Symbols */
+    {  0x2150  ,  0x218F   },  /* Number Forms */
+    {  0x2460  ,  0x24FF   },  /* Enclosed Alphanumerics */
+    {  0x2C60  ,  0x2C7F   },  /* Latin Extended-C */
+    {  0x2DE0  ,  0x2DFF   },  /* Cyrillic Extended-A */
+    {  0xA640U ,  0xA69FU  },  /* Cyrillic Extended-B */
+    {  0xA720U ,  0xA7FFU  },  /* Latin Extended-D */
+    {  0xFB00U ,  0xFB06U  },  /* Alphab. Present. Forms (Latin Ligs) */
+    { 0x1D400UL, 0x1D7FFUL },  /* Mathematical Alphanumeric Symbols */
+    { 0        , 0         }
   };
 
 
