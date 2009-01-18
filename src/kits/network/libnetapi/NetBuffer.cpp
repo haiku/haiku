@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *				Scott T. Mansfield, thephantom@mac.com
  *              Bruno Albuquerque, bga@bug-br.org.br
  */
 
@@ -65,6 +66,8 @@ BNetBuffer::BNetBuffer(BMessage* archive) :
 BNetBuffer&
 BNetBuffer::operator=(const BNetBuffer& buffer)
 {
+	delete fImpl;
+		
 	fImpl = new (std::nothrow) DynamicBuffer(*buffer.GetImpl());
 	if (fImpl != NULL)
 		fInit = fImpl->InitCheck();
@@ -79,11 +82,10 @@ BNetBuffer::Archive(BMessage* into, bool deep) const
 	if (fInit != B_OK)
 		return B_NO_INIT;
 	
-	if (into->AddData("buffer", B_RAW_TYPE, fImpl->Data(),
-		fImpl->BytesRemaining()) != B_OK)
-		return B_ERROR;
+	status_t result = into->AddData("buffer", B_RAW_TYPE, fImpl->Data(),
+		fImpl->BytesRemaining());
 	
-	return B_OK;
+	return result;
 }
 
 
@@ -94,7 +96,7 @@ BNetBuffer::Instantiate(BMessage* archive)
         return NULL;
     }
 
-    BNetBuffer* buffer = new BNetBuffer(archive);
+    BNetBuffer* buffer = new (std::nothrow) BNetBuffer(archive);
     if (buffer == NULL)
         return NULL;
 
@@ -188,22 +190,32 @@ BNetBuffer::AppendData(const void* data, size_t size)
 }
 
 
+#define STACK_BUFFER_SIZE 2048
+
 status_t
 BNetBuffer::AppendMessage(const BMessage& data)
 {
+	char stackFlattenedData[STACK_BUFFER_SIZE];
+
 	size_t dataSize = data.FlattenedSize();
 	if (dataSize == 0)
 		return B_ERROR;
 
-	char* flattenedData = new (std::nothrow) char[dataSize];
-	if (flattenedData == NULL)
-		return B_NO_MEMORY;
+	status_t result = B_OK;
+
+	if (dataSize > STACK_BUFFER_SIZE) {
+		char* flattenedData = new (std::nothrow) char[dataSize];
+		if (flattenedData == NULL)
+			return B_NO_MEMORY;
 	
-	status_t result = B_OK;	
-	if (data.Flatten(flattenedData, dataSize) == B_OK)		
-		result = AppendData((const void*)&flattenedData, dataSize);
+		if (data.Flatten(flattenedData, dataSize) == B_OK)		
+			result = AppendData((const void*)&flattenedData, dataSize);
 	
-	delete[] flattenedData;
+		delete[] flattenedData;
+	} else {
+		if (data.Flatten(stackFlattenedData, dataSize) == B_OK)
+			result = AppendData((const void*)&stackFlattenedData, dataSize);
+	}
 	
 	return result;
 }
