@@ -480,27 +480,29 @@ status_t
 usb_disk_synchronize(device_lun *lun, bool force)
 {
 	if (lun->device->sync_support == 0) {
-		// this device repeatedly reported an illegal request when syncing
-		// it obviously does really not support this command...
+		// this device reported an illegal request when syncing or repeatedly
+		// returned an other error, it apparently does not support syncing...
 		return B_UNSUPPORTED;
 	}
 
-	if (lun->should_sync || force) {
-		status_t result = usb_disk_operation(lun, SCSI_SYNCHRONIZE_CACHE_10,
-			10, 0, 0, NULL, NULL, false);
+	if (!lun->should_sync && !force)
+		return B_OK;
+
+	status_t result = usb_disk_operation(lun, SCSI_SYNCHRONIZE_CACHE_10, 10,
+		0, 0, NULL, NULL, false);
+
+	if (result == B_OK) {
+		lun->device->sync_support = SYNC_SUPPORT_RELOAD;
 		lun->should_sync = false;
-
-		if (result == B_OK)
-			lun->device->sync_support = SYNC_SUPPORT_RELOAD;
-		else if (result == B_DEV_INVALID_IOCTL)
-			lun->device->sync_support = 0;
-		else
-			lun->device->sync_support--;
-
-		return result;
+		return B_OK;
 	}
 
-	return B_OK;
+	if (result == B_DEV_INVALID_IOCTL)
+		lun->device->sync_support = 0;
+	else
+		lun->device->sync_support--;
+
+	return result;
 }
 
 
@@ -814,6 +816,14 @@ static status_t
 usb_disk_close(void *cookie)
 {
 	TRACE("close()\n");
+	device_lun *lun = (device_lun *)cookie;
+	disk_device *device = lun->device;
+
+	mutex_lock(&device->lock);
+	if (!device->removed)
+		usb_disk_synchronize(lun, false);
+	mutex_unlock(&device->lock);
+
 	return B_OK;
 }
 
@@ -827,9 +837,9 @@ usb_disk_free(void *cookie)
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
 	device->open_count--;
-	if (device->removed && device->open_count == 0) {
-		// we can simply free the device here as it has been removed from the
-		// device list in the device removed notification hook
+	if (device->open_count == 0 && device->removed) {
+		// we can simply free the device here as it has been removed from
+		// the device list in the device removed notification hook
 		usb_disk_free_device_and_luns(device);
 	}
 
@@ -885,12 +895,14 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			break;
 
 		case B_EJECT_DEVICE:
-			return usb_disk_operation(lun, SCSI_START_STOP_UNIT_6, 6, 0, 2,
+			result = usb_disk_operation(lun, SCSI_START_STOP_UNIT_6, 6, 0, 2,
 				NULL, NULL, false);
+			break;
 
 		case B_LOAD_MEDIA:
-			return usb_disk_operation(lun, SCSI_START_STOP_UNIT_6, 6, 0, 3,
+			result = usb_disk_operation(lun, SCSI_START_STOP_UNIT_6, 6, 0, 3,
 				NULL, NULL, false);
+			break;
 
 		default:
 			TRACE_ALWAYS("unhandled ioctl %ld\n", op);
