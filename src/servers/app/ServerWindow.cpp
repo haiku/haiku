@@ -373,7 +373,8 @@ ServerWindow::_Show()
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: _Show\n", Title()));
 
-	if (fQuitting || !fWindow->IsHidden() || fWindow->IsOffscreenWindow())
+	if (fQuitting || fWindow->IsMinimized() || !fWindow->IsHidden()
+		|| fWindow->IsOffscreenWindow())
 		return;
 
 	// TODO: Maybe we need to dispatch a message to the desktop to show/hide us
@@ -669,6 +670,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 				if (showLevel <= 0) {
 					// window is currently hidden - ignore the minimize request
+					fWindow->SetMinimized(minimize);
 					break;
 				}
 
