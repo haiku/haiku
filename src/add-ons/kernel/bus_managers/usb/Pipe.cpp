@@ -73,7 +73,8 @@ Pipe::SetFeature(uint16 selector)
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
 		USB_REQUEST_SET_FEATURE,
 		selector,
-		fEndpointAddress,
+		fEndpointAddress | (fDirection == In ? USB_ENDPOINT_ADDR_DIR_IN
+			: USB_ENDPOINT_ADDR_DIR_OUT),
 		0,
 		NULL,
 		0,
@@ -92,7 +93,8 @@ Pipe::ClearFeature(uint16 selector)
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
 		USB_REQUEST_CLEAR_FEATURE,
 		selector,
-		fEndpointAddress,
+		fEndpointAddress | (fDirection == In ? USB_ENDPOINT_ADDR_DIR_IN
+			: USB_ENDPOINT_ADDR_DIR_OUT),
 		0,
 		NULL,
 		0,
@@ -107,7 +109,8 @@ Pipe::GetStatus(uint16 *status)
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_IN,
 		USB_REQUEST_GET_STATUS,
 		0,
-		fEndpointAddress,
+		fEndpointAddress | (fDirection == In ? USB_ENDPOINT_ADDR_DIR_IN
+			: USB_ENDPOINT_ADDR_DIR_OUT),
 		2,
 		(void *)status,
 		2,
