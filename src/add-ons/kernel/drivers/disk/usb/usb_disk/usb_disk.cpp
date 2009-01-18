@@ -186,6 +186,11 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	uint32 logicalBlockAddress, uint16 transferLength, void *data,
 	uint32 *dataLength, bool directionIn)
 {
+	TRACE("operation: lun: %u; op: %u; oplen: %u; lba: %lu; tlen: %u; data: %p; dlen: %p (%lu); in: %c\n",
+		lun->logical_unit_number, operation, opLength, logicalBlockAddress,
+		transferLength, data, dataLength, dataLength ? *dataLength : 0,
+		directionIn ? 'y' : 'n');
+
 	disk_device *device = lun->device;
 	command_block_wrapper command;
 	command.signature = CBW_SIGNATURE;
@@ -232,13 +237,15 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 		return B_ERROR;
 	}
 
+	size_t transferedData = 0;
 	if (data != NULL && dataLength != NULL && *dataLength > 0) {
 		// we have data to transfer in a data stage
 		result = usb_disk_transfer_data(device, directionIn, data, *dataLength);
 		if (result != B_OK)
 			return result;
 
-		if (device->status != B_OK || device->actual_length != *dataLength) {
+		transferedData = device->actual_length;
+		if (device->status != B_OK || transferedData != *dataLength) {
 			// sending or receiving of the data failed
 			if (device->status == B_DEV_STALLED) {
 				TRACE("stall while transfering data\n");
@@ -246,6 +253,7 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 					: device->bulk_out, USB_FEATURE_ENDPOINT_HALT);
 			} else {
 				TRACE_ALWAYS("sending or receiving of the data failed\n");
+				usb_disk_reset_recovery(device);
 				return B_ERROR;
 			}
 		}
@@ -253,8 +261,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 
 	command_status_wrapper status;
 	result =  usb_disk_receive_csw(device, &status);
-	if (result != B_OK && device->status == B_DEV_STALLED) {
-		// in case of a stall clear the stall and try again
+	if (result != B_OK) {
+		// in case of a stall or error clear the stall and try again
 		gUSBModule->clear_feature(device->bulk_in, USB_FEATURE_ENDPOINT_HALT);
 		result = usb_disk_receive_csw(device, &status);
 	}
@@ -275,34 +283,47 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	switch (status.status) {
 		case CSW_STATUS_COMMAND_PASSED:
 		case CSW_STATUS_COMMAND_FAILED: {
-			if (dataLength != NULL && status.data_residue <= *dataLength)
+			if (status.data_residue > command.data_transfer_length) {
+				// command status wrapper is not meaningful
+				TRACE_ALWAYS("command status wrapper has invalid residue\n");
+				usb_disk_reset_recovery(device);
+				return B_ERROR;
+			}
+
+			if (dataLength != NULL) {
 				*dataLength -= status.data_residue;
+				if (transferedData < *dataLength) {
+					TRACE_ALWAYS("less data transfered than indicated\n");
+					*dataLength = transferedData;
+				}
+			}
 
 			if (status.status == CSW_STATUS_COMMAND_PASSED) {
 				// the operation is complete and has succeeded
-				result = B_OK;
+				return B_OK;
 			} else {
 				// the operation is complete but has failed at the SCSI level
 				TRACE_ALWAYS("operation 0x%02x failed at the SCSI level\n",
 					operation);
 				result = usb_disk_request_sense(lun);
-				if (result == B_OK)
-					result = B_ERROR;
+				return result == B_OK ? B_ERROR : result;
 			}
-			break;
 		}
 
 		case CSW_STATUS_PHASE_ERROR: {
 			// a protocol or device error occured
 			TRACE_ALWAYS("phase error in operation 0x%02x\n", operation);
 			usb_disk_reset_recovery(device);
-			if (dataLength != NULL)
-				*dataLength = 0;
-			result = B_ERROR;
+			return B_ERROR;
+		}
+
+		default: {
+			// command status wrapper is not meaningful
+			TRACE_ALWAYS("command status wrapper has invalid status\n");
+			usb_disk_reset_recovery(device);
+			return B_ERROR;
 		}
 	}
-
-	return result;
 }
 
 
@@ -472,7 +493,10 @@ usb_disk_synchronize(device_lun *lun, bool force)
 		if (result == B_OK)
 			lun->device->sync_support = SYNC_SUPPORT_RELOAD;
 		else if (result == B_DEV_INVALID_IOCTL)
+			lun->device->sync_support = 0;
+		else
 			lun->device->sync_support--;
+
 		return result;
 	}
 
@@ -790,8 +814,6 @@ static status_t
 usb_disk_close(void *cookie)
 {
 	TRACE("close()\n");
-	device_lun *lun = (device_lun *)cookie;
-	usb_disk_synchronize(lun, false);
 	return B_OK;
 }
 
