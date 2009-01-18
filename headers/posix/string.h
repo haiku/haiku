@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STRING_H_
@@ -58,6 +58,7 @@ extern int		strncasecmp(const char *string1, const char *string2, size_t length)
 extern char		*strcasestr(const char *string, const char *searchString);
 
 extern char		*strdup(const char *string);
+extern char		*strndup(const char* string, size_t size);
 extern char		*stpcpy(char *dest, const char *source);
 
 extern size_t	strlcat(char *dest, const char *source, size_t length);

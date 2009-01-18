@@ -27,6 +27,7 @@ MergeObject posix_string.o :
 	strncat.c
 	strncmp.c
 	strncpy.c
+	strndup.cpp
 	strnlen.c
 	strpbrk.c
 	strrchr.c
