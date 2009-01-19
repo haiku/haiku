@@ -430,6 +430,8 @@ TSwitchManager::TSwitchManager(BPoint point)
 	fBlock(false),
 	fSkipUntil(0),
 	fLastSwitch(0),
+	fQuickSwitchIndex(-1),
+	fQuickSwitchWindow(-1),
 	fGroupList(10),
 	fCurrentIndex(0),
 	fCurrentSlot(0),
@@ -718,15 +720,23 @@ TSwitchManager::MainEntry(BMessage* message)
 	app_info appInfo;
 	be_roster->GetActiveAppInfo(&appInfo);
 
+	bool resetQuickSwitch = false;
 #ifdef __HAIKU__
-	if (now > fLastSwitch + 400000)
+	if (now > fLastSwitch + 400000) {
 		_SortApps();
+		resetQuickSwitch = true;
+	}
 
 	fLastSwitch = now;
 #endif
 
 	int32 index;
 	fCurrentIndex = FindTeam(appInfo.team, &index) != NULL ? index : 0;
+
+	if (resetQuickSwitch) {
+		fQuickSwitchIndex = fCurrentIndex;
+		fQuickSwitchWindow = fCurrentWindow;
+	}
 
 	int32 key;
 	message->FindInt32("key", (int32*)&key);
@@ -832,10 +842,22 @@ TSwitchManager::QuickSwitch(BMessage* message)
 	if (message->FindInt32("team", &team) == B_OK) {
 		bool forward = (modifiers & B_SHIFT_KEY) == 0;
 
-		if ((modifiers & B_OPTION_KEY) != 0)
+		if ((modifiers & B_OPTION_KEY) != 0) {
+			// TODO: add the same switch logic we have for apps!
 			SwitchWindow(team, forward, true);
-		else
+		} else {
+			if (fQuickSwitchIndex >= 0) {
+				// Switch to the first app inbetween to make it always the next
+				// app to switch to after the quick switch.
+				int32 current = fCurrentIndex;
+				SwitchToApp(current, fQuickSwitchIndex, false);
+				ActivateApp(false, false);
+
+				fCurrentIndex = current;
+			}
+
 			CycleApp(forward, true);
+		}
 	}
 
 	release_sem(fMainMonitor);
@@ -903,10 +925,11 @@ TSwitchManager::CycleApp(bool forward, bool activateNow)
 			if (fCurrentIndex < 0)
 				fCurrentIndex = max - 1;
 		}
-		if ((fCurrentIndex == startIndex))
+		if (fCurrentIndex == startIndex) {
 			// we've gone completely through the list without finding
 			// a good app. Oh well.
 			return;
+		}
 
 		if (!OKToUse((TTeamGroup*)fGroupList.ItemAt(fCurrentIndex)))
 			continue;

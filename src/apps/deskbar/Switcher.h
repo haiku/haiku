@@ -49,52 +49,59 @@ class TSwitcherWindow;
 struct client_window_info;
 
 class TSwitchManager : public BHandler {
-	public:
-		TSwitchManager(BPoint where);
-		virtual ~TSwitchManager();
+public:
+							TSwitchManager(BPoint where);
+	virtual					~TSwitchManager();
 
-		virtual void MessageReceived(BMessage *message);
+	virtual	void			MessageReceived(BMessage* message);
 
-		void Stop(bool doAction, uint32 mods);
-		void Unblock();
-		int32 CurrentIndex();
-		int32 CurrentWindow();
-		int32 CurrentSlot();
-		BList *GroupList();
-		int32 CountVisibleGroups();
+			void			Stop(bool doAction, uint32 modifiers);
+			void			Unblock();
+			int32			CurrentIndex();
+			int32			CurrentWindow();
+			int32			CurrentSlot();
+			BList*			GroupList();
+			int32			CountVisibleGroups();
 
-		void QuitApp();
-		void HideApp();
-		void CycleApp(bool forward, bool activate = false);
-		void CycleWindow(bool forward, bool wrap = true);
-		void SwitchToApp(int32 prevIndex, int32 newIndex, bool forward);
+			void			QuitApp();
+			void			HideApp();
+			void			CycleApp(bool forward, bool activate = false);
+			void			CycleWindow(bool forward, bool wrap = true);
+			void			SwitchToApp(int32 prevIndex, int32 newIndex,
+								bool forward);
 
-		client_window_info* WindowInfo(int32 groupIndex, int32 windowIndex);
-		int32 CountWindows(int32 groupIndex, bool inCurrentWorkspace = false);
-		TTeamGroup *FindTeam(team_id, int32 *index);
+			client_window_info* WindowInfo(int32 groupIndex, int32 windowIndex);
+			int32			CountWindows(int32 groupIndex,
+								bool inCurrentWorkspace = false);
+			TTeamGroup*		FindTeam(team_id, int32* index);
 
-	private:
-		void MainEntry(BMessage *message);
-		void Process(bool forward, bool byWindow = false);
-		void QuickSwitch(BMessage *message);
-		void SwitchWindow(team_id team, bool forward, bool activate);
-		bool ActivateApp(bool forceShow, bool allowWorkspaceSwitch);
-		void ActivateWindow(int32 windowID = -1);
+private:
+			void			MainEntry(BMessage* message);
+			void			Process(bool forward, bool byWindow = false);
+			void			QuickSwitch(BMessage* message);
+			void			SwitchWindow(team_id team, bool forward,
+								bool activate);
+			bool			ActivateApp(bool forceShow,
+								bool allowWorkspaceSwitch);
+			void			ActivateWindow(int32 windowID = -1);
 #ifdef __HAIKU__
-		void _SortApps();
-		status_t _GetSortedWindowTokens(int32** _tokens, int32* _count);
+			void			_SortApps();
+			status_t		_GetSortedWindowTokens(int32** _tokens,
+								int32* _count);
 #endif
 
-		TSwitcherWindow	*fWindow;
-		sem_id fMainMonitor;
-		bool fBlock;
-		bigtime_t fSkipUntil;
-		bigtime_t fLastSwitch;
-		BList fGroupList;
-		int32 fCurrentIndex;
-		int32 fCurrentWindow;
-		int32 fCurrentSlot;
-		int32 fWindowID;
+			TSwitcherWindow* fWindow;
+			sem_id			fMainMonitor;
+			bool			fBlock;
+			bigtime_t		fSkipUntil;
+			bigtime_t		fLastSwitch;
+			int32			fQuickSwitchIndex;
+			int32			fQuickSwitchWindow;
+			BList			fGroupList;
+			int32			fCurrentIndex;
+			int32			fCurrentWindow;
+			int32			fCurrentSlot;
+			int32			fWindowID;
 };
 
 #endif	/* SWITCHER_H */
