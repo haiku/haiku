@@ -867,8 +867,10 @@ usb_disk_open(const char *name, uint32 flags, void **cookie)
 			device_lun *lun = device->luns[i];
 			if (strncmp(rawName, lun->name, 32) == 0) {
 				// found the matching device/lun
-				if (device->removed)
+				if (device->removed) {
+					mutex_unlock(&gDeviceListLock);
 					return B_ERROR;
+				}
 
 				device->open_count++;
 				*cookie = lun;
