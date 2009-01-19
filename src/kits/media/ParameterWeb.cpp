@@ -1,14 +1,16 @@
-/* ParameterWeb - implements the following classes:
-**		BParameterWeb, BParameterGroup, BParameter, BNullParameter,
-**		BContinuousParameter, BDiscreteParameter
-**
-** Author: Zousar Shaker
-**         Axel Dörfler, axeld@pinc-software.de
-**         Marcus Overhagen
-**
-** This file may be used under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2002-2009, Haiku. All Rights Reserved.
+ * This file may be used under the terms of the MIT License.
+ *
+ * Author: Zousar Shaker
+ *         Axel Dörfler, axeld@pinc-software.de
+ *         Marcus Overhagen
+ */
 
+/*! Implements the following classes:
+	BParameterWeb, BParameterGroup, BParameter, BNullParameter,
+	BContinuousParameter, BDiscreteParameter
+*/
 
 #include <ParameterWeb.h>
 #include <MediaNode.h>
@@ -23,7 +25,7 @@
 /*
 	The following is documentation on the flattened format
 	of structures/classes in this module:
-	
+
 	//--------BEGIN-CORE-BPARAMETER-STRUCT---------------------
 	?? (0x02040607): 4 bytes
 	BParameter Struct Size (in bytes): 4 bytes
@@ -58,7 +60,7 @@
 		Item Value: 4 bytes (as int)
 		//for each item END
 	//--------END-BDISCRETEPARAMETER-STRUCT-------------------
-	
+
 	//--------BEGIN-CORE-BPARAMETERGROUP-STRUCT-----------
 	?? (0x03040507 OR 0x03040509 depending if the flags field is included or not???): 4 bytes
 	(possible) Flags: 4 bytes
@@ -78,9 +80,9 @@
 		Flattened Group Size: 4 bytes
 		Flattened Group: 'Flattened Group Size' bytes
 		//for each SubGroup END
-	
+
 	//---------END-CORE-BPARAMETERGROUP-STRUCT--------------
-	
+
 	//--------BEGIN-CORE-BPARAMETERWEB-STRUCT-----------
 	?? 0x01030506: 4 bytes
 	??: 4 bytes (is always 1)
@@ -94,7 +96,7 @@
 		??: 4 bytes (never get written to (holds uninitialized value))
 		//for each Group END
 	//---------END-CORE-BPARAMETERWEB-STRUCT--------------
-	
+
 */
 
 
@@ -178,7 +180,7 @@ read_string_from_buffer(const void **_buffer, char **_string, ssize_t size)
 {
 	if (size < 1)
 		return B_BAD_VALUE;
-	
+
 	const uint8 *buffer = static_cast<const uint8 *>(*_buffer);
 	uint8 length = *buffer++;
 	if (length > size - 1)
@@ -403,7 +405,7 @@ BParameterWeb::ParameterAt(int32 index)
 {
 	CALLED();
 	ASSERT(mGroups != NULL);
-	
+
 	// Iterates over all groups (and sub-groups) in the web.
 	// The "groups" list is used as iteration stack (breadth search style)
 	// Maintains the same order as the Be implementation
@@ -571,14 +573,14 @@ BParameterWeb::Unflatten(type_code code, const void *buffer, ssize_t size)
 		return B_BAD_DATA;
 
 	// Note, it's not completely sure that this field is the version
-	// information - but it doesn't seem to have another purpose	
+	// information - but it doesn't seem to have another purpose
 	int32 version = read_from_buffer_swap32<int32>(&buffer, isSwapped);
 	if (version != kCurrentParameterWebVersion) {
 		ERROR("BParameterWeb::Unflatten(): wrong version %ld (%lx)?!\n", version, version);
 		return B_ERROR;
 	}
 
-#if 0	
+#if 0
 	if (mGroups != NULL) {
 		for (int32 i = 0; i < mGroups->CountItems(); i++) {
 			BParameterGroup *CurrentItem = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
@@ -622,16 +624,16 @@ BParameterWeb::Unflatten(type_code code, const void *buffer, ssize_t size)
 
 	if ((mOldRefs != NULL) && (mNewRefs != NULL)) {
 		BList groups(*mGroups);
-		
+
 		for (int32 i = 0; i < groups.CountItems(); i++) {
 			BParameterGroup *group = static_cast<BParameterGroup *>(groups.ItemAt(i));
-			
+
 			for (int32 index = group->CountParameters(); index-- > 0;) {
 				BParameter *parameter = static_cast<BParameter *>(group->ParameterAt(index));
 
 				parameter->FixRefs(*mOldRefs, *mNewRefs);
 			}
-			
+
 			if (group->mGroups != NULL)
 				groups.AddList(group->mGroups);
 		}
@@ -679,7 +681,7 @@ BParameterGroup::BParameterGroup(BParameterWeb *web, const char *name)
 	CALLED();
 	TRACE("BParameterGroup: web = %p, name = \"%s\"\n", web, name);
 
-	mName = strndup(name, 256);
+	mName = strndup(name, 255);
 
 	mControls = new BList();
 	mGroups = new BList();
@@ -898,7 +900,7 @@ BParameterGroup::FlattenedSize() const
 			Flattened Group Size: 4 bytes
 			Flattened Group: 'Flattened Group Size' bytes
 			//for each SubGroup END
-		
+
 		//---------END-CORE-BPARAMETERGROUP-STRUCT--------------
 	*/
 	//13 guaranteed bytes, variable after that.
@@ -907,14 +909,14 @@ BParameterGroup::FlattenedSize() const
 	if (mFlags != 0) {
 		size += 4;
 	}
-	
+
 	if (mName != NULL) {
 		size += min_c(strlen(mName),255);
 	}
-	
+
 	int i;
 	int limit;
-	
+
 	limit = mControls->CountItems();
 	for (i = 0; i < limit; i++) {
 		BParameter *CurrentParameter = static_cast<BParameter *>(mControls->ItemAt(i));
@@ -1086,7 +1088,7 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 	} else {
 		mControls = new BList();
 	}
-	
+
 	if (mGroups != NULL) {
 		for (i = 0; i < mGroups->CountItems(); i++) {
 			BParameterGroup *CurrentItem = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
@@ -1388,18 +1390,18 @@ BParameter::SetValue(const void *buffer, size_t size, bigtime_t when)
 		return B_BAD_VALUE;
 	if (size <= 0)
 		return B_NO_MEMORY;
-		
+
 	if (mWeb == 0) {
 		ERROR("BParameter::SetValue: no parent BParameterWeb\n");
 		return B_NO_INIT;
 	}
-	
+
 	node = mWeb->Node();
 	if (IS_INVALID_NODE(node)) {
 		ERROR("BParameter::SetValue: the parent BParameterWeb is not assigned to a BMediaNode\n");
 		return B_NO_INIT;
 	}
-	
+
 	if (size > MAX_PARAMETER_DATA) {
 		// create an area if large data needs to be transfered
 		area = create_area("set parameter data", &data, B_ANY_ADDRESS, ROUND_UP_TO_PAGE(size), B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
@@ -1424,7 +1426,7 @@ BParameter::SetValue(const void *buffer, size_t size, bigtime_t when)
 
 	if (area != -1)
 		delete_area(area);
-	
+
 	return rv;
 }
 
@@ -1470,7 +1472,7 @@ BParameter *
 BParameter::InputAt(int32 index)
 {
 	ASSERT(mInputs != NULL);
-	
+
 	return static_cast<BParameter *>(mInputs->ItemAt(index));
 }
 
@@ -1696,7 +1698,7 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 
 	//if the struct doesn't meet the minimum size for
 	//a flattened BParameter, then return an error.
-	//MinFlattenedParamSize = 
+	//MinFlattenedParamSize =
 	//ID (4 bytes)
 	//Name String Length (1 byte)
 	//Kind String Length (1 byte)
@@ -1716,8 +1718,8 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 	mID = read_from_buffer_swap32<int32>(&buffer, mSwapDetected);
 
 	if (read_string_from_buffer(&buffer, &mName, size_left(size, bufferStart, buffer)) < B_OK
-		|| read_string_from_buffer(&buffer, &mKind, size_left(size, bufferStart, buffer)) < B_OK	
-		|| read_string_from_buffer(&buffer, &mUnit, size_left(size, bufferStart, buffer)) < B_OK)	
+		|| read_string_from_buffer(&buffer, &mKind, size_left(size, bufferStart, buffer)) < B_OK
+		|| read_string_from_buffer(&buffer, &mUnit, size_left(size, bufferStart, buffer)) < B_OK)
 		return B_NO_MEMORY;
 
 	// read the list of inputs
@@ -1725,7 +1727,7 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 	// it will directly add the pointers in the flattened message to the list;
 	// these will be fixed to point to the real inputs/outputs later in FixRefs()
 
-	int32 count = read_from_buffer_swap32<int32>(&buffer, mSwapDetected);	
+	int32 count = read_from_buffer_swap32<int32>(&buffer, mSwapDetected);
 
 	if (mInputs == NULL)
 		mInputs = new BList();
@@ -1776,9 +1778,9 @@ BParameter::BParameter(int32 id, media_type mediaType, media_parameter_type type
 {
 	CALLED();
 
-	mName = strndup(name, 256);
-	mKind = strndup(kind, 256);
-	mUnit = strndup(unit, 256);
+	mName = strndup(name, 255);
+	mKind = strndup(kind, 255);
+	mUnit = strndup(unit, 255);
 
 	// create empty input/output lists
 	mInputs = new BList();
@@ -1800,7 +1802,7 @@ BParameter::~BParameter()
 
 	delete mInputs;
 	delete mOutputs;
-	
+
 	mName = NULL; mKind = NULL; mUnit = NULL; mInputs = NULL; mOutputs = NULL;
 }
 
@@ -1856,7 +1858,7 @@ BParameter::FixRefs(BList &old, BList &updated)
 	}
 
 	// remove all NULL outputs (those which couldn't be mapped)
-	
+
 	for (int32 i = count; i-- > 0;) {
 		if (items[i] == NULL)
 			mOutputs->RemoveItem(i);
@@ -2093,7 +2095,7 @@ BDiscreteParameter::AddItem(int32 value, const char *name)
 	ASSERT(mSelections != NULL);
 
 	int32 *valueCopy = new int32(value);
-	char *nameCopy = strndup(name, 256);
+	char *nameCopy = strndup(name, 255);
 	if (name != NULL && nameCopy == NULL)
 		return B_NO_MEMORY;
 
