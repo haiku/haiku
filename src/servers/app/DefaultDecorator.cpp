@@ -52,32 +52,6 @@ blend_color_value(uint8 a, uint8 b, float position)
 }
 
 
-/*!
-	\brief Function mostly for calculating gradient colors
-	\param col Start color
-	\param col2 End color
-	\param position A floating point number such that 0.0 <= position <= 1.0. 0.0 results in the
-		start color and 1.0 results in the end color.
-	\return The blended color. If an invalid position was given, {0,0,0,0} is returned.
-*/
-static rgb_color
-make_blend_color(rgb_color colorA, rgb_color colorB, float position)
-{
-	if (position < 0)
-		return colorA;
-	if (position > 1)
-		return colorB;
-
-	rgb_color blendColor;
-	blendColor.red = blend_color_value(colorA.red, colorB.red, position);
-	blendColor.green = blend_color_value(colorA.green, colorB.green, position);
-	blendColor.blue = blend_color_value(colorA.blue, colorB.blue, position);
-	blendColor.alpha = blend_color_value(colorA.alpha, colorB.alpha, position);
-
-	return blendColor;
-}
-
-
 //	#pragma mark -
 
 
@@ -97,7 +71,7 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 	fFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
 	fFrameColors[1] = (rgb_color){ 240, 240, 240, 255 };
 	fFrameColors[4] = (rgb_color){ 152, 152, 152, 255 };
-	fFrameColors[5] = (rgb_color){ 124, 124, 124, 255 };
+	fFrameColors[5] = (rgb_color){ 108, 108, 108, 255 };
 
 	// state based colors
 	fFocusFrameColors[0] = (rgb_color){ 224, 224, 224, 255 };
@@ -115,14 +89,15 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 		= fZoomBitmaps[0] = fZoomBitmaps[1] = fZoomBitmaps[2] = fZoomBitmaps[3]
 		= NULL;
 
-	// Set appropriate colors based on the current focus value. In this case, each decorator
-	// defaults to not having the focus.
+	// Set appropriate colors based on the current focus value. In this case,
+	// each decorator defaults to not having the focus.
 	_SetFocus();
 
 	// Do initial decorator setup
 	_DoLayout();
 
-	// ToDo: if the decorator was created with a frame too small, it should resize itself!
+	// TODO: If the decorator was created with a frame too small, it should
+	// resize itself!
 
 	STRACE(("DefaultDecorator:\n"));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
@@ -989,11 +964,11 @@ DefaultDecorator::_DrawTab(BRect invalid)
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
 		BPoint(fTabRect.left + 1,
 			fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
-		fTabColorLight);
+		fTabColorBevel);
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
 		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1),
 			fTabRect.top + 1),
-		fTabColorLight);
+		fTabColorBevel);
 
 	if (fLook != kLeftTitledWindowLook) {
 		fDrawingEngine->StrokeLine(BPoint(fTabRect.right - 1, fTabRect.top + 2),
@@ -1123,9 +1098,11 @@ DefaultDecorator::_SetFocus()
 		fButtonFocus = false;
 	}
 
+	fTabColorBevel = tint_color(fTabColor,
+		(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2);
 	fTabColorLight = tint_color(fTabColor, B_LIGHTEN_2_TINT);
 	fTabColorShadow = tint_color(fTabColor,
-		(B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2);
+		(B_DARKEN_1_TINT + B_NO_TINT) / 2);
 }
 
 
@@ -1182,7 +1159,7 @@ DefaultDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
 	rgb_color tabColor = focus ? fFocusTabColor : fNonFocusTabColor;
 	if (down) {
 		startColor = tint_color(tabColor, B_DARKEN_1_TINT);
-		endColor = tint_color(tabColor, B_LIGHTEN_2_TINT);
+		endColor = fTabColorLight;
 	} else {
 		startColor = tint_color(tabColor, B_LIGHTEN_MAX_TINT);
 		endColor = tabColor;

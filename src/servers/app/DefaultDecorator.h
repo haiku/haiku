@@ -92,7 +92,9 @@ private:
 			rgb_color			fTextColor;
 			rgb_color			fFocusTextColor;
 			rgb_color			fNonFocusTextColor;
+
 			rgb_color			fTabColorLight;
+			rgb_color			fTabColorBevel;
 			rgb_color			fTabColorShadow;
 
 			rgb_color			fFrameColors[6];
