@@ -7,5 +7,6 @@ resource(2, "META:S:DESC") #'MSDC' "SVG Image";
 
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "svg",
+	"extensions" = "svgz",
 	"type" = "image/svg+xml"
 };
