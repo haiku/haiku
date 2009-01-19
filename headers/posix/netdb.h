@@ -1,4 +1,9 @@
 /*
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+/*
  * Copyright (c) 1980, 1983, 1988, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -106,7 +111,7 @@
 #endif
 
 __BEGIN_DECLS
-extern int * __h_errno __P((void));
+extern int * __h_errno(void);
 __END_DECLS
 #define	h_errno (*__h_errno())
 
@@ -115,12 +120,12 @@ __END_DECLS
  * supplied in host order, and returned in network order (suitable for
  * use in system calls).
  */
-struct	hostent {
-	char	*h_name;	/* official name of host */
-	char	**h_aliases;	/* alias list */
-	int	h_addrtype;	/* host address type */
-	int	h_length;	/* length of address */
-	char	**h_addr_list;	/* list of addresses from name server */
+struct hostent {
+	char	*h_name;			/* official name of host */
+	char	**h_aliases;		/* alias list */
+	int		h_addrtype;			/* host address type */
+	int		h_length;			/* length of address */
+	char	**h_addr_list;		/* list of addresses from name server */
 #define	h_addr	h_addr_list[0]	/* address, for backward compatiblity */
 };
 
@@ -128,33 +133,33 @@ struct	hostent {
  * Assumption here is that a network number
  * fits in an unsigned long -- probably a poor one.
  */
-struct	netent {
-	char		*n_name;	/* official name of net */
-	char		**n_aliases;	/* alias list */
-	int		n_addrtype;	/* net address type */
-	unsigned long	n_net;		/* network # */
+struct netent {
+	char	*n_name;			/* official name of net */
+	char	**n_aliases;		/* alias list */
+	int		n_addrtype;			/* net address type */
+	unsigned long n_net;		/* network # */
 };
 
-struct	servent {
-	char	*s_name;	/* official service name */
-	char	**s_aliases;	/* alias list */
-	int	s_port;		/* port # */
-	char	*s_proto;	/* protocol to use */
+struct servent {
+	char	*s_name;			/* official service name */
+	char	**s_aliases;		/* alias list */
+	int		s_port;				/* port # */
+	char	*s_proto;			/* protocol to use */
 };
 
-struct	protoent {
-	char	*p_name;	/* official protocol name */
-	char	**p_aliases;	/* alias list */
-	int	p_proto;	/* protocol # */
+struct protoent {
+	char	*p_name;			/* official protocol name */
+	char	**p_aliases;		/* alias list */
+	int		p_proto;			/* protocol # */
 };
 
-struct	addrinfo {
-	int		ai_flags;	/* AI_PASSIVE, AI_CANONNAME */
-	int		ai_family;	/* PF_xxx */
-	int		ai_socktype;	/* SOCK_xxx */
-	int		ai_protocol;	/* 0 or IPPROTO_xxx for IPv4 and IPv6 */
-	size_t		ai_addrlen;	/* length of ai_addr */
-	char		*ai_canonname;	/* canonical name for hostname */
+struct addrinfo {
+	int		ai_flags;			/* AI_PASSIVE, AI_CANONNAME */
+	int		ai_family;			/* PF_xxx */
+	int		ai_socktype;		/* SOCK_xxx */
+	int		ai_protocol;		/* 0 or IPPROTO_xxx for IPv4 and IPv6 */
+	size_t	ai_addrlen;			/* length of ai_addr */
+	char	*ai_canonname;		/* canonical name for hostname */
 	struct sockaddr	*ai_addr; 	/* binary address */
 	struct addrinfo	*ai_next; 	/* next structure in linked list */
 };
@@ -163,63 +168,65 @@ struct	addrinfo {
  * Error return codes from gethostbyname() and gethostbyaddr()
  * (left in extern int h_errno).
  */
-
-#define	NETDB_INTERNAL	-1	/* see errno */
-#define	NETDB_SUCCESS	0	/* no problem */
-#define	HOST_NOT_FOUND	1 /* Authoritative Answer Host not found */
-#define	TRY_AGAIN	2 /* Non-Authoritive Host not found, or SERVERFAIL */
-#define	NO_RECOVERY	3 /* Non recoverable errors, FORMERR, REFUSED, NOTIMP */
-#define	NO_DATA		4 /* Valid name, no data record of requested type */
-#define	NO_ADDRESS	NO_DATA		/* no address, look for MX record */
+#define	NETDB_INTERNAL	-1		/* see errno */
+#define	NETDB_SUCCESS	0		/* no problem */
+#define	HOST_NOT_FOUND	1		/* Authoritative Answer Host not found */
+#define	TRY_AGAIN		2
+	/* Non-Authoritive Host not found, or SERVERFAIL */
+#define	NO_RECOVERY		3
+	/* Non recoverable errors, FORMERR, REFUSED, NOTIMP */
+#define	NO_DATA			4
+	/* Valid name, no data record of requested type */
+#define	NO_ADDRESS		NO_DATA	/* no address, look for MX record */
 
 /*
  * Error return codes from getaddrinfo()
  */
-#define	EAI_ADDRFAMILY	 1	/* address family for hostname not supported */
-#define	EAI_AGAIN	 2	/* temporary failure in name resolution */
-#define	EAI_BADFLAGS	 3	/* invalid value for ai_flags */
-#define	EAI_FAIL	 4	/* non-recoverable failure in name resolution */
-#define	EAI_FAMILY	 5	/* ai_family not supported */
-#define	EAI_MEMORY	 6	/* memory allocation failure */
-#define	EAI_NODATA	 7	/* no address associated with hostname */
-#define	EAI_NONAME	 8	/* hostname nor servname provided, or not known */
-#define	EAI_SERVICE	 9	/* servname not supported for ai_socktype */
+#define	EAI_ADDRFAMILY	1	/* address family for hostname not supported */
+#define	EAI_AGAIN	 	2	/* temporary failure in name resolution */
+#define	EAI_BADFLAGS	3	/* invalid value for ai_flags */
+#define	EAI_FAIL		4	/* non-recoverable failure in name resolution */
+#define	EAI_FAMILY		5	/* ai_family not supported */
+#define	EAI_MEMORY		6	/* memory allocation failure */
+#define	EAI_NODATA		7	/* no address associated with hostname */
+#define	EAI_NONAME		8	/* hostname nor servname provided, or not known */
+#define	EAI_SERVICE		9	/* servname not supported for ai_socktype */
 #define	EAI_SOCKTYPE	10	/* ai_socktype not supported */
-#define	EAI_SYSTEM	11	/* system error returned in errno */
+#define	EAI_SYSTEM		11	/* system error returned in errno */
 #define EAI_BADHINTS	12
 #define EAI_PROTOCOL	13
-#define EAI_MAX		14
+#define EAI_MAX			14
 
 /*
  * Flag values for getaddrinfo()
  */
-#define	AI_PASSIVE	0x00000001
+#define	AI_PASSIVE		0x00000001
 #define	AI_CANONNAME	0x00000002
 #define AI_NUMERICHOST	0x00000004
-#define	AI_MASK		0x00000007
+#define	AI_MASK			0x00000007
 
 /*
  * Flag values for getipnodebyname()
  */
-#define AI_V4MAPPED	0x00000008
-#define AI_ALL		0x00000010
+#define AI_V4MAPPED		0x00000008
+#define AI_ALL			0x00000010
 #define AI_ADDRCONFIG	0x00000020
-#define AI_DEFAULT	(AI_V4MAPPED|AI_ADDRCONFIG)
+#define AI_DEFAULT		(AI_V4MAPPED|AI_ADDRCONFIG)
 
 /*
  * Constants for getnameinfo()
  */
-#define	NI_MAXHOST	1025
-#define	NI_MAXSERV	32
+#define	NI_MAXHOST		1025
+#define	NI_MAXSERV		32
 
 /*
  * Flag values for getnameinfo()
  */
-#define	NI_NOFQDN	0x00000001
+#define	NI_NOFQDN		0x00000001
 #define	NI_NUMERICHOST	0x00000002
-#define	NI_NAMEREQD	0x00000004
+#define	NI_NAMEREQD		0x00000004
 #define	NI_NUMERICSERV	0x00000008
-#define	NI_DGRAM	0x00000010
+#define	NI_DGRAM		0x00000010
 #define	NI_WITHSCOPEID	0x00000020
 #define NI_NUMERICSCOPE	0x00000040
 
@@ -230,74 +237,71 @@ struct	addrinfo {
 
 
 __BEGIN_DECLS
-void		endhostent __P((void));
-void		endnetent __P((void));
-void		endprotoent __P((void));
-void		endservent __P((void));
-void		freehostent __P((struct hostent *));
-struct hostent	*gethostbyaddr __P((const char *, int, int));
-struct hostent	*gethostbyname __P((const char *));
-struct hostent	*gethostbyname2 __P((const char *, int));
-struct hostent	*gethostent __P((void));
-struct hostent	*getipnodebyaddr __P((const void *, size_t, int, int *));
-struct hostent	*getipnodebyname __P((const char *, int, int, int *));
-struct netent	*getnetbyaddr __P((unsigned long, int));
-struct netent	*getnetbyname __P((const char *));
-struct netent	*getnetent __P((void));
-struct protoent	*getprotobyname __P((const char *));
-struct protoent	*getprotobynumber __P((int));
-struct protoent	*getprotoent __P((void));
-struct servent	*getservbyname __P((const char *, const char *));
-struct servent	*getservbyport __P((int, const char *));
-struct servent	*getservent __P((void));
-void		herror __P((const char *));
-const char	*hstrerror __P((int));
-void		sethostent __P((int));
-/* void		sethostfile __P((const char *)); */
-void		setnetent __P((int));
-void		setprotoent __P((int));
-void		setservent __P((int));
-int		getaddrinfo __P((const char *, const char *,
-				 const struct addrinfo *, struct addrinfo **));
-int		getnameinfo __P((const struct sockaddr *, socklen_t, char *,
-				 socklen_t, char *, socklen_t, int));
-void		freeaddrinfo __P((struct addrinfo *));
-const char	*gai_strerror __P((int));
-struct hostent  *getipnodebyname __P((const char *, int, int, int *));
-struct hostent	*getipnodebyaddr __P((const void *, size_t, int, int *));
-void		freehostent __P((struct hostent *));
+void			endhostent(void);
+void			endnetent(void);
+void			endprotoent(void);
+void			endservent(void);
+void			freehostent(struct hostent *host);
+struct hostent	*gethostbyaddr(const char *address, int length, int type);
+struct hostent	*gethostbyname(const char *name);
+struct hostent	*gethostbyname2(const char *name, int type);
+struct hostent	*gethostent(void);
+struct hostent	*getipnodebyaddr(const void *, size_t, int, int *);
+struct hostent	*getipnodebyname(const char *, int, int, int *);
+struct netent	*getnetbyaddr(unsigned long, int);
+struct netent	*getnetbyname(const char *);
+struct netent	*getnetent(void);
+struct protoent	*getprotobyname(const char *);
+struct protoent	*getprotobynumber(int);
+struct protoent	*getprotoent(void);
+struct servent	*getservbyname(const char *, const char *);
+struct servent	*getservbyport(int, const char *);
+struct servent	*getservent(void);
+void			herror(const char *);
+const char		*hstrerror(int);
+void			sethostent(int);
+/* void			sethostfile(const char *); */
+void			setnetent(int);
+void			setprotoent(int);
+void			setservent(int);
+int				getaddrinfo(const char *, const char *,
+					const struct addrinfo *, struct addrinfo **);
+int				getnameinfo(const struct sockaddr *, socklen_t, char *,
+					socklen_t, char *, socklen_t, int);
+void			freeaddrinfo(struct addrinfo *);
+const char		*gai_strerror(int);
 
-struct hostent	*gethostbyaddr_r __P((const char *, int, int, struct hostent *,
-					char *, int, int *));
-struct hostent	*gethostbyname_r __P((const char *, struct hostent *,
-					char *, int, int *));
-struct hostent	*gethostent_r __P((struct hostent *, char *, int, int *));
-void		sethostent_r __P((int));
-void		endhostent_r __P((void));
+struct hostent	*gethostbyaddr_r(const char *, int, int, struct hostent *,
+					char *, int, int *);
+struct hostent	*gethostbyname_r(const char *, struct hostent *,
+					char *, int, int *);
+struct hostent	*gethostent_r(struct hostent *, char *, int, int *);
+void			sethostent_r(int);
+void			endhostent_r(void);
 
-struct netent	*getnetbyname_r __P((const char *, struct netent *,
-					char *, int));
-struct netent	*getnetbyaddr_r __P((long, int, struct netent *,
-					char *, int));
-struct netent	*getnetent_r __P((struct netent *, char *, int));
-void		setnetent_r __P((int));
-void		endnetent_r __P((void));
+struct netent	*getnetbyname_r(const char *, struct netent *,
+					char *, int);
+struct netent	*getnetbyaddr_r(long, int, struct netent *,
+					char *, int);
+struct netent	*getnetent_r(struct netent *, char *, int);
+void			setnetent_r(int);
+void			endnetent_r(void);
 
-struct protoent	*getprotobyname_r __P((const char *,
-				struct protoent *, char *, int));
-struct protoent	*getprotobynumber_r __P((int,
-				struct protoent *, char *, int));
-struct protoent	*getprotoent_r __P((struct protoent *, char *, int));
-void		setprotoent_r __P((int));
-void		endprotoent_r __P((void));
+struct protoent	*getprotobyname_r(const char *,
+				struct protoent *, char *, int);
+struct protoent	*getprotobynumber_r(int,
+				struct protoent *, char *, int);
+struct protoent	*getprotoent_r(struct protoent *, char *, int);
+void			setprotoent_r(int);
+void			endprotoent_r(void);
 
-struct servent	*getservbyname_r __P((const char *name, const char *,
-					struct servent *, char *, int));
-struct servent	*getservbyport_r __P((int port, const char *,
-					struct servent *, char *, int));
-struct servent	*getservent_r __P((struct servent *, char *, int));
-void		setservent_r __P((int));
-void		endservent_r __P((void));
+struct servent	*getservbyname_r(const char *name, const char *,
+					struct servent *, char *, int);
+struct servent	*getservbyport_r(int port, const char *,
+					struct servent *, char *, int);
+struct servent	*getservent_r(struct servent *, char *, int);
+void			setservent_r(int);
+void			endservent_r(void);
 __END_DECLS
 
-#endif /* !_NETDB_H_ */
+#endif /* _NETDB_H_ */
