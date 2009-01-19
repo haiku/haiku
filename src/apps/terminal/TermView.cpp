@@ -258,6 +258,7 @@ TermView::_InitObject(int32 argc, const char** argv)
 	fSelEnd = TermPos(-1, -1);
 	fMouseTracking = false;
 	fIMflag = false;
+	fCheckMouseTracking = false;
 
 	fTextBuffer = new(std::nothrow) TerminalBuffer;
 	if (fTextBuffer == NULL)
