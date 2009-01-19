@@ -162,8 +162,8 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		}
 	}
 
-	// "next" always starts after the buffer sequence
-	ASSERT(next == NULL || buffer == NULL || next->sequence > sequence);
+	// "next" always starts at or after the buffer sequence
+	ASSERT(next == NULL || buffer == NULL || next->sequence >= sequence);
 
 	while (buffer != NULL && next != NULL
 		&& tcp_sequence(sequence + buffer->size) > next->sequence) {
