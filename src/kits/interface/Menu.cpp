@@ -2148,12 +2148,7 @@ BMenu::_CalcFrame(BPoint where, bool *scrollOn)
 	BMenu *superMenu = Supermenu();
 	BMenuItem *superItem = Superitem();
 
-	if (scrollOn != NULL) {
-		// basically, if this returns false, it means
-		// that the menu frame won't fit completely inside the screen
-		*scrollOn = !screenFrame.Contains(bounds);
-	}
-
+	bool scroll = false;
 	// TODO: Horrible hack:
 	// When added to a BMenuField, a BPopUpMenu is the child of
 	// a _BMCMenuBar_ to "fake" the menu hierarchy
@@ -2171,10 +2166,7 @@ BMenu::_CalcFrame(BPoint where, bool *scrollOn)
 		else if (frame.left < screenFrame.left)
 			frame.OffsetBy(-frame.left, 0);
 
-		return frame;
-	}
-
-	if (superMenu->Layout() == B_ITEMS_IN_COLUMN) {
+	} else if (superMenu->Layout() == B_ITEMS_IN_COLUMN) {
 		if (frame.right > screenFrame.right)
 			frame.OffsetBy(-superItem->Frame().Width() - frame.Width() - 2, 0);
 
@@ -2188,7 +2180,7 @@ BMenu::_CalcFrame(BPoint where, bool *scrollOn)
 			if (scrollOn != NULL && superMenu != NULL
 				&& dynamic_cast<BMenuBar *>(superMenu) != NULL
 				&& frame.top < (screenFrame.bottom - 80)) {
-				*scrollOn = true;
+				scroll = true;
 			} else {
 				frame.OffsetBy(0, -superItem->Frame().Height() - frame.Height() - 3);
 			}
@@ -2197,7 +2189,18 @@ BMenu::_CalcFrame(BPoint where, bool *scrollOn)
 		if (frame.right > screenFrame.right)
 			frame.OffsetBy(screenFrame.right - frame.right, 0);
 	}
-
+	
+	if (!scroll) {
+		// basically, if this returns false, it means
+		// that the menu frame won't fit completely inside the screen
+		// TODO: Scrolling, will currently only work up/down,
+		// not left/right
+		scroll = screenFrame.Height() < frame.Height();
+	}
+	
+	if (scrollOn != NULL)
+		*scrollOn = scroll;
+		
 	return frame;
 }
 
@@ -2573,7 +2576,7 @@ BMenu::_UpdateWindowViewSize(bool updatePosition)
 	if (!fResizeToFit)
 		return;
 
-	bool scroll;
+	bool scroll = false;
 	const BPoint screenLocation = updatePosition ? ScreenLocation()
 		: window->Frame().LeftTop();
 	BRect frame = _CalcFrame(screenLocation, &scroll);
