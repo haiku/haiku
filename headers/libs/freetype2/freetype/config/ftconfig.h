@@ -359,7 +359,7 @@ FT_BEGIN_HEADER
       "addl  %%edx, %%eax\n"
       : "=a"(result), "=d"(b)
       : "a"(a), "d"(b)
-      : "%ecx" );
+      : "%ecx", "cc" );
     return result;
   }
 
