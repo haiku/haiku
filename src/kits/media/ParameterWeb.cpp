@@ -297,27 +297,6 @@ size_left(ssize_t size, const void *bufferStart, const void *buffer)
  *	The buffer returned is to be freed by the caller using free().
  */
 
-static char *
-strndup(const char *source, size_t maxBufferSize)
-{
-	if (source == NULL || source[0] == '\0')
-		return NULL;
-
-	uint32 size = strlen(source) + 1;
-	if (size > maxBufferSize)
-		size = maxBufferSize;
-
-	char *target = (char *)malloc(size);
-	if (target == NULL)
-		return NULL;
-	
-	memcpy(target, source, size - 1);
-	target[size - 1] = '\0';
-
-	return target;
-}
-
-
 //	#pragma mark -
 
 /*************************************************************
