@@ -652,56 +652,6 @@ TSwitchManager::_SortApps()
 		// add the remaining entries
 	free(teams);
 }
-
-
-status_t
-TSwitchManager::_GetSortedWindowTokens(int32** _tokens, int32* _count)
-{
-	int32* ordered;
-	int32 orderedCount;
-	status_t status = BPrivate::get_window_order(current_workspace(), &ordered,
-		&orderedCount);
-	if (status != B_OK)
-		return status;
-
-	int32 tokenCount;
-	int32* unsorted = get_token_list(-1, &tokenCount);
-	if (unsorted == NULL) {
-		free(ordered);
-		return B_NO_MEMORY;
-	}
-
-	int32* tokens = (int32*)malloc(tokenCount * sizeof(int32));
-	if (tokens == NULL) {
-		free(unsorted);
-		free(ordered);
-		return B_NO_MEMORY;
-	}
-
-	memcpy(tokens, ordered, orderedCount * sizeof(int32));
-	free(ordered);
-	int32 count = orderedCount;
-
-	for (int32 i = 0; i < tokenCount; i++) {
-		// find token in ordered list
-		bool found = false;
-		for (int32 j = 0; j < orderedCount; j++) {
-			if (tokens[j] == unsorted[i]) {
-				found = true;
-				break;
-			}
-		}
-
-		if (!found)
-			tokens[count++] = unsorted[i];
-	}
-
-	free(unsorted);
-
-	*_tokens = tokens;
-	*_count = count;
-	return B_OK;
-}
 #endif	// __HAIKU__
 
 
@@ -1029,12 +979,7 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 	}
 
 	int32 tokenCount;
-#ifdef __HAIKU__
-	int32* tokens = NULL;
-	_GetSortedWindowTokens(&tokens, &tokenCount);
-#else
 	int32* tokens = get_token_list(-1, &tokenCount);
-#endif
 	if (tokens == NULL) {
 		ASSERT(windowInfo);
 		free(windowInfo);
@@ -1150,15 +1095,9 @@ TSwitchManager::WindowInfo(int32 groupIndex, int32 windowIndex)
 		return NULL;
 
 	int32 tokenCount;
-#ifndef __HAIKU__
 	int32* tokens = get_token_list(-1, &tokenCount);
 	if (tokens == NULL)
 		return NULL;
-#else
-	int32* tokens;
-	if (_GetSortedWindowTokens(&tokens, &tokenCount) != B_OK)
-		return NULL;
-#endif
 
 	int32 matches = 0;
 
@@ -1248,13 +1187,9 @@ TSwitchManager::SwitchWindow(team_id team, bool, bool activate)
 
 	// cycle through the windows in the active application
 	int32 count;
-#ifndef __HAIKU__
 	int32* tokens = get_token_list(-1, &count);
-#else
-	int32* tokens;
-	if (_GetSortedWindowTokens(&tokens, &count) != B_OK)
+	if (tokens == NULL)
 		return;
-#endif
 
 	for (int32 i = count - 1; i >= 0; i--) {
 		client_window_info* windowInfo = get_window_info(tokens[i]);

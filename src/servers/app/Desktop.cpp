@@ -2513,6 +2513,7 @@ Desktop::BringApplicationToFront(team_id team)
 	AutoWriteLocker locker(fWindowLock);
 
 	// TODO: for now, just maximize all windows of that application
+	// TODO: have the ability to lock the current workspace
 
 	for (Window *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
@@ -2573,9 +2574,20 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 	sender.StartMessage(B_OK);
 	sender.Attach<int32>(count);
 
+	// first write the windows of the current workspace correctly ordered
+	for (Window *window = _CurrentWindows().LastWindow(); window != NULL;
+			window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (team >= B_OK && window->ServerWindow()->ClientTeam() != team)
+			continue;
+
+		sender.Attach<int32>(window->ServerWindow()->ServerToken());
+	}
+
+	// then write all the other windows
 	for (Window *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
-		if (team >= B_OK && window->ServerWindow()->ClientTeam() != team)
+		if ((team >= B_OK && window->ServerWindow()->ClientTeam() != team)
+			|| window->InWorkspace(fCurrentWorkspace))
 			continue;
 
 		sender.Attach<int32>(window->ServerWindow()->ServerToken());

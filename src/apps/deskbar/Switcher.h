@@ -86,8 +86,6 @@ private:
 			void			ActivateWindow(int32 windowID = -1);
 #ifdef __HAIKU__
 			void			_SortApps();
-			status_t		_GetSortedWindowTokens(int32** _tokens,
-								int32* _count);
 #endif
 
 			TSwitcherWindow* fWindow;
