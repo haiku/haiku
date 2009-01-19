@@ -270,6 +270,14 @@ DrawingEngine::SetDrawingMode(drawing_mode mode)
 
 
 void
+DrawingEngine::SetDrawingMode(drawing_mode mode, drawing_mode& oldMode)
+{
+	oldMode = fPainter->DrawingMode();
+	fPainter->SetDrawingMode(mode);
+}
+
+
+void
 DrawingEngine::SetFont(const ServerFont& font)
 {
 	fPainter->SetFont(font);
@@ -611,9 +619,8 @@ DrawingEngine::DrawArc(BRect r, const float& angle, const float& span,
 	}
 }
 
-// FillArcGradient
 void
-DrawingEngine::FillArcGradient(BRect r, const float& angle, const float& span,
+DrawingEngine::FillArc(BRect r, const float& angle, const float& span,
 	const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
@@ -639,7 +646,7 @@ DrawingEngine::FillArcGradient(BRect r, const float& angle, const float& span,
 	}
 }
 
-// DrawBezier
+
 void
 DrawingEngine::DrawBezier(BPoint* pts, bool filled)
 {
@@ -653,9 +660,9 @@ DrawingEngine::DrawBezier(BPoint* pts, bool filled)
 	_CopyToFront(touched);
 }
 
-// FillBezierGradient
+
 void
-DrawingEngine::FillBezierGradient(BPoint* pts, const BGradient& gradient)
+DrawingEngine::FillBezier(BPoint* pts, const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -667,7 +674,7 @@ DrawingEngine::FillBezierGradient(BPoint* pts, const BGradient& gradient)
 	_CopyToFront(touched);
 }
 
-// DrawEllipse
+
 void
 DrawingEngine::DrawEllipse(BRect r, bool filled)
 {
@@ -696,9 +703,9 @@ DrawingEngine::DrawEllipse(BRect r, bool filled)
 	}
 }
 
-// FillEllipseGradient
+
 void
-DrawingEngine::FillEllipseGradient(BRect r, const BGradient& gradient)
+DrawingEngine::FillEllipse(BRect r, const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -722,7 +729,7 @@ DrawingEngine::FillEllipseGradient(BRect r, const BGradient& gradient)
 	}
 }
 
-// DrawPolygon
+
 void
 DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	bool filled, bool closed)
@@ -742,9 +749,9 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	}
 }
 
-// FillPolygonGradient
+
 void
-DrawingEngine::FillPolygonGradient(BPoint* ptlist, int32 numpts, BRect bounds,
+DrawingEngine::FillPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	const BGradient& gradient, bool closed)
 {
 	CRASH_IF_NOT_LOCKED
@@ -760,7 +767,9 @@ DrawingEngine::FillPolygonGradient(BPoint* ptlist, int32 numpts, BRect bounds,
 	}
 }
 
+
 // #pragma mark - rgb_color
+
 
 void
 DrawingEngine::StrokePoint(const BPoint& pt, const rgb_color& color)
@@ -959,7 +968,7 @@ DrawingEngine::FillRect(BRect r)
 
 
 void
-DrawingEngine::FillRectGradient(BRect r, const BGradient& gradient)
+DrawingEngine::FillRect(BRect r, const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -1030,7 +1039,7 @@ DrawingEngine::FillRegion(BRegion& r)
 
 
 void
-DrawingEngine::FillRegionGradient(BRegion& r, const BGradient& gradient)
+DrawingEngine::FillRegion(BRegion& r, const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -1077,7 +1086,7 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad, bool filled)
 
 
 void
-DrawingEngine::FillRoundRectGradient(BRect r, float xrad, float yrad,
+DrawingEngine::FillRoundRect(BRect r, float xrad, float yrad,
 	const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED
@@ -1121,7 +1130,7 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 
 
 void
-DrawingEngine::FillShapeGradient(const BRect& bounds, int32 opCount,
+DrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 ptCount, const BPoint* ptList,
 	const BGradient& gradient)
 {
@@ -1160,7 +1169,7 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 }
 
 void
-DrawingEngine::FillTriangleGradient(BPoint* pts, const BRect& bounds,
+DrawingEngine::FillTriangle(BPoint* pts, const BRect& bounds,
 	const BGradient& gradient)
 {
 	CRASH_IF_NOT_LOCKED

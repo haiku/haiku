@@ -79,6 +79,8 @@ public:
 								float miterLimit);
 			void			SetPattern(const struct pattern& pattern);
 			void			SetDrawingMode(drawing_mode mode);
+			void			SetDrawingMode(drawing_mode mode,
+								drawing_mode& oldMode);
 			void			SetBlendingMode(source_alpha srcAlpha,
 								alpha_function alphaFunc);
 			void			SetFont(const ServerFont& font);
@@ -100,20 +102,18 @@ public:
 
 			void			DrawArc(BRect r, const float& angle,
 								const float& span, bool filled);
-			void			FillArcGradient(BRect r, const float& angle,
+			void			FillArc(BRect r, const float& angle,
 								const float& span, const BGradient& gradient);
 
 			void			DrawBezier(BPoint* pts, bool filled);
-			void			FillBezierGradient(BPoint* pts,
-								const BGradient& gradient);
+			void			FillBezier(BPoint* pts, const BGradient& gradient);
 
 			void			DrawEllipse(BRect r, bool filled);
-			void			FillEllipseGradient(BRect r,
-								const BGradient& gradient);
+			void			FillEllipse(BRect r, const BGradient& gradient);
 
 			void			DrawPolygon(BPoint* ptlist, int32 numpts,
 								BRect bounds, bool filled, bool closed);
-			void			FillPolygonGradient(BPoint* ptlist, int32 numpts,
+			void			FillPolygon(BPoint* ptlist, int32 numpts,
 								BRect bounds, const BGradient& gradient,
 								bool closed);
 
@@ -126,29 +126,28 @@ public:
 
 			void			StrokeRect(BRect r);
 			void			FillRect(BRect r);
-			void			FillRectGradient(BRect r, const BGradient& gradient);
+			void			FillRect(BRect r, const BGradient& gradient);
 
 			void			FillRegion(BRegion& r);
-			void			FillRegionGradient(BRegion& r,
-								const BGradient& gradient);
+			void			FillRegion(BRegion& r, const BGradient& gradient);
 
 			void			DrawRoundRect(BRect r, float xrad,
 								float yrad, bool filled);
-			void			FillRoundRectGradient(BRect r, float xrad,
+			void			FillRoundRect(BRect r, float xrad,
 								float yrad, const BGradient& gradient);
 
 			void			DrawShape(const BRect& bounds,
 								int32 opcount, const uint32* oplist, 
 								int32 ptcount, const BPoint* ptlist,
 								bool filled);
-			void			FillShapeGradient(const BRect& bounds,
+			void			FillShape(const BRect& bounds,
 							  int32 opcount, const uint32* oplist, 
 							  int32 ptcount, const BPoint* ptlist,
 							  const BGradient& gradient);
 	
 			void			DrawTriangle(BPoint* pts, const BRect& bounds,
 								bool filled);
-			void			FillTriangleGradient(BPoint* pts,
+			void			FillTriangle(BPoint* pts,
 								const BRect& bounds, const BGradient& gradient);
 
 			// this version used by Decorator

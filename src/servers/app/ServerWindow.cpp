@@ -2363,7 +2363,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
-			drawingEngine->FillRectGradient(rect, *gradient);
+			drawingEngine->FillRect(rect, *gradient);
 			break;
 		}
 		case AS_VIEW_DRAW_BITMAP:
@@ -2437,7 +2437,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				break;
 			fCurrentView->ConvertToScreenForDrawing(&r);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
-			drawingEngine->FillArcGradient(r, angle, span, *gradient);
+			drawingEngine->FillArc(r, angle, span, *gradient);
 			break;
 		}
 		case AS_STROKE_BEZIER:
@@ -2472,7 +2472,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
 			fCurrentView->ConvertToScreenForDrawing(gradient);
-			drawingEngine->FillBezierGradient(pts, *gradient);
+			drawingEngine->FillBezier(pts, *gradient);
 			break;
 		}
 		case AS_STROKE_ELLIPSE:
@@ -2501,7 +2501,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				break;
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
-			drawingEngine->FillEllipseGradient(rect, *gradient);
+			drawingEngine->FillEllipse(rect, *gradient);
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
@@ -2537,7 +2537,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				break;
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
-			drawingEngine->FillRoundRectGradient(rect, xrad, yrad, *gradient);
+			drawingEngine->FillRoundRect(rect, xrad, yrad, *gradient);
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
@@ -2578,7 +2578,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				break;
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
-			drawingEngine->FillTriangleGradient(pts, rect, *gradient);
+			drawingEngine->FillTriangle(pts, rect, *gradient);
 			break;
 		}
 		case AS_STROKE_POLYGON:
@@ -2628,7 +2628,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				fCurrentView->ConvertToScreenForDrawing(&polyFrame);
 				fCurrentView->ConvertToScreenForDrawing(gradient);
 
-				drawingEngine->FillPolygonGradient(pointList, pointCount,
+				drawingEngine->FillPolygon(pointList, pointCount,
 					polyFrame, *gradient, isClosed && pointCount > 2);
 			}
 			delete[] pointList;
@@ -2699,7 +2699,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 					fCurrentView->ConvertToScreenForDrawing(&ptList[i]);
 				}
 				fCurrentView->ConvertToScreenForDrawing(gradient);
-				drawingEngine->FillShapeGradient(shapeFrame, opCount, opList,
+				drawingEngine->FillShape(shapeFrame, opCount, opList,
 					ptCount, ptList, *gradient);
 			}
 
@@ -2734,7 +2734,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 			fCurrentView->ConvertToScreenForDrawing(&region);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
-			drawingEngine->FillRegionGradient(region, *gradient);
+			drawingEngine->FillRegion(region, *gradient);
 			break;
 		}
 		case AS_STROKE_LINEARRAY:

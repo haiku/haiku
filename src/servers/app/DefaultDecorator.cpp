@@ -23,6 +23,7 @@
 #include <WindowPrivate.h>
 
 #include <Autolock.h>
+#include <GradientLinear.h>
 #include <Rect.h>
 #include <View.h>
 
@@ -94,15 +95,16 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 
 	// common colors to both focus and non focus state
 	fFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
-	fFrameColors[1] = (rgb_color){ 255, 255, 255, 255 };
+	fFrameColors[1] = (rgb_color){ 240, 240, 240, 255 };
 	fFrameColors[4] = (rgb_color){ 152, 152, 152, 255 };
-	fFrameColors[5] = (rgb_color){ 96, 96, 96, 255 };
+	fFrameColors[5] = (rgb_color){ 124, 124, 124, 255 };
 
 	// state based colors
-	fFocusFrameColors[0] = (rgb_color){ 216, 216, 216, 255 };
-	fFocusFrameColors[1] = (rgb_color){ 136, 136, 136, 255 };
+	fFocusFrameColors[0] = (rgb_color){ 224, 224, 224, 255 };
+	fFocusFrameColors[1] = (rgb_color){ 208, 208, 208, 255 };
 	fNonFocusFrameColors[0] = (rgb_color){ 232, 232, 232, 255 };
-	fNonFocusFrameColors[1] = (rgb_color){ 148, 148, 148, 255 };
+	fNonFocusFrameColors[1] = (rgb_color){ 216, 216, 216, 255 };
+	fNonFocusFrameColors[1] = fNonFocusFrameColors[0];
 
 	fFocusTabColor = UIColor(B_WINDOW_TAB_COLOR);
 	fFocusTextColor = UIColor(B_WINDOW_TEXT_COLOR);
@@ -583,8 +585,8 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 				|| fLook == B_FLOATING_WINDOW_LOOK
 				|| fLook == B_MODAL_WINDOW_LOOK
 				|| fLook == kLeftTitledWindowLook)) {
-			BRect temp(BPoint(fBottomBorder.right - 18,
-				fBottomBorder.bottom - 18), fBottomBorder.RightBottom());
+			BRect temp(BPoint(fBottomBorder.right - 22,
+				fBottomBorder.bottom - 22), fBottomBorder.RightBottom());
 			if (temp.Contains(point))
 				return DEC_RESIZE;
 		}
@@ -896,8 +898,16 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				float x = r.right - 3;
 				float y = r.bottom - 3;
 
-				fDrawingEngine->FillRect(BRect(x - 13, y - 13, x, y),
-					fFrameColors[2]);
+				BRect bg(x - 13, y - 13, x, y);
+
+				BGradientLinear gradient;
+				gradient.SetStart(bg.LeftTop());
+				gradient.SetEnd(bg.RightBottom());
+				gradient.AddColor(fFrameColors[1], 0);
+				gradient.AddColor(fFrameColors[2], 255);
+	
+				fDrawingEngine->FillRect(bg, gradient);
+
 				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15),
 					BPoint(x - 15, y - 2), fFrameColors[0]);
 				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14),
@@ -910,12 +920,14 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				if (!IsFocus())
 					break;
 
+				static const rgb_color kWhite
+					= (rgb_color){ 255, 255, 255, 255 };
 				for (int8 i = 1; i <= 4; i++) {
 					for (int8 j = 1; j <= i; j++) {
 						BPoint pt1(x - (3 * j) + 1, y - (3 * (5 - i)) + 1);
 						BPoint pt2(x - (3 * j) + 2, y - (3 * (5 - i)) + 2);
 						fDrawingEngine->StrokePoint(pt1, fFrameColors[0]);
-						fDrawingEngine->StrokePoint(pt2, fFrameColors[1]);
+						fDrawingEngine->StrokePoint(pt2, kWhite);
 					}
 				}
 				break;
@@ -993,12 +1005,19 @@ DefaultDecorator::_DrawTab(BRect invalid)
 	}
 
 	// fill
+	BGradientLinear gradient;
+	gradient.SetStart(fTabRect.LeftTop());
+	gradient.AddColor(fTabColorLight, 0);
+	gradient.AddColor(fTabColor, 255);
+
 	if (fLook != kLeftTitledWindowLook) {
+		gradient.SetEnd(fTabRect.LeftBottom());
 		fDrawingEngine->FillRect(BRect(fTabRect.left + 2, fTabRect.top + 2,
-			fTabRect.right - 2, fTabRect.bottom), fTabColor);
+			fTabRect.right - 2, fTabRect.bottom), gradient);
 	} else {
+		gradient.SetEnd(fTabRect.RightTop());
 		fDrawingEngine->FillRect(BRect(fTabRect.left + 2, fTabRect.top + 2,
-			fTabRect.right, fTabRect.bottom - 2), fTabColor);
+			fTabRect.right, fTabRect.bottom - 2), gradient);
 	}
 
 	_DrawTitle(fTabRect);
@@ -1034,8 +1053,8 @@ DefaultDecorator::_DrawTitle(BRect r)
 {
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 
+	fDrawingEngine->SetDrawingMode(B_OP_OVER);
 	fDrawingEngine->SetHighColor(fTextColor);
-	fDrawingEngine->SetLowColor(fTabColor);
 	fDrawingEngine->SetFont(fDrawState.Font());
 
 	// figure out position of text
@@ -1059,6 +1078,8 @@ DefaultDecorator::_DrawTitle(BRect r)
 
 	fDrawingEngine->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength,
 		titlePos);
+
+	fDrawingEngine->SetDrawingMode(B_OP_COPY);
 }
 
 
@@ -1102,9 +1123,9 @@ DefaultDecorator::_SetFocus()
 		fButtonFocus = false;
 	}
 
-	fTabColorLight = tint_color(fTabColor,
+	fTabColorLight = tint_color(fTabColor, B_LIGHTEN_2_TINT);
+	fTabColorShadow = tint_color(fTabColor,
 		(B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2);
-	fTabColorShadow = tint_color(fTabColor, B_DARKEN_2_TINT);
 }
 
 
@@ -1138,12 +1159,12 @@ DefaultDecorator::_DrawButtonBitmap(ServerBitmap* bitmap, BRect rect)
 	if (bitmap == NULL)
 		return;
 
-	// TODO: find out why locking sometimes deadlocks here and re-add locking
-	// once the problem is fixed (or remove this comment if locking isn't
-	// necessary at all...)
 	bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
 	fDrawingEngine->SetCopyToFrontEnabled(true);
+	drawing_mode oldMode;
+	fDrawingEngine->SetDrawingMode(B_OP_OVER, oldMode);
 	fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
+	fDrawingEngine->SetDrawingMode(oldMode);
 	fDrawingEngine->SetCopyToFrontEnabled(copyToFrontEnabled);
 }
 
@@ -1156,46 +1177,30 @@ void
 DefaultDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
 	bool down, bool focus)
 {
-	// Actually just draws a blended square
-	int32 width = rect.IntegerWidth();
-	int32 height = rect.IntegerHeight();
-	int32 steps = width < height ? width : height;
-
+	// figure out which colors to use
 	rgb_color startColor, endColor;
 	rgb_color tabColor = focus ? fFocusTabColor : fNonFocusTabColor;
 	if (down) {
 		startColor = tint_color(tabColor, B_DARKEN_1_TINT);
-		endColor = tint_color(tabColor, B_LIGHTEN_2_TINT);;
+		endColor = tint_color(tabColor, B_LIGHTEN_2_TINT);
 	} else {
-		startColor = tint_color(tabColor, B_LIGHTEN_2_TINT);
-		endColor = tint_color(tabColor, B_DARKEN_1_TINT);
+		startColor = tint_color(tabColor, B_LIGHTEN_MAX_TINT);
+		endColor = tabColor;
 	}
 
-	rgb_color halfColor = make_blend_color(startColor, endColor, 0.5);
+	// fill
+	rect.InsetBy(1, 1);
+	BGradientLinear gradient;
+	gradient.SetStart(rect.LeftTop());
+	gradient.SetEnd(rect.RightBottom());
+	gradient.AddColor(startColor, 0);
+	gradient.AddColor(endColor, 255);
 
-	float rstep = float(startColor.red - halfColor.red) / steps;
-	float gstep = float(startColor.green - halfColor.green) / steps;
-	float bstep = float(startColor.blue - halfColor.blue) / steps;
+	engine->FillRect(rect, gradient);
 
-	rgb_color tempColor;
-	for (int32 i = 0; i <= steps; i++) {
-		tempColor.red = uint8(startColor.red - (i * rstep));
-		tempColor.green = uint8(startColor.green - (i * gstep));
-		tempColor.blue = uint8(startColor.blue - (i * bstep));
-
-		engine->StrokeLine(BPoint(rect.left, rect.top + i),
-			BPoint(rect.left + i, rect.top), tempColor);
-
-		tempColor.red = uint8(halfColor.red - (i * rstep));
-		tempColor.green = uint8(halfColor.green - (i * gstep));
-		tempColor.blue = uint8(halfColor.blue - (i * bstep));
-
-		engine->StrokeLine(BPoint(rect.left + steps, rect.top + i),
-			BPoint(rect.left + i, rect.top + steps), tempColor);
-	}
-
-	engine->StrokeRect(rect,
-		focus ? fFocusFrameColors[1] : fNonFocusFrameColors[1]);
+	// outline
+	rect.InsetBy(-1, -1);
+	engine->StrokeRect(rect, tint_color(tabColor, B_DARKEN_2_TINT));
 }
 
 
@@ -1311,8 +1316,6 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 		return NULL;
 
 	BRect rect(0, 0, width - 1, height - 1);
-	sBitmapDrawingEngine->FillRect(rect,
-		focus ? object->fFocusTabColor : object->fNonFocusTabColor);
 
 	STRACE(("DefaultDecorator creating bitmap for %s %sfocus %s at size %ldx%ld\n",
 		item == DEC_CLOSE ? "close" : "zoom", focus ? "" : "non-",
@@ -1324,6 +1327,9 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 
 		case DEC_ZOOM:
 		{
+			// init the background
+			sBitmapDrawingEngine->FillRect(rect, B_TRANSPARENT_COLOR);
+
 			float inset = floorf(width / 4.0);
 			BRect zoomRect(rect);
 			zoomRect.left += inset;
