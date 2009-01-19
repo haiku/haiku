@@ -983,7 +983,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			break;
 
 		case B_GET_ICON_NAME:
-			// TODO: implement when needed
+			result = user_strlcpy((char*)buffer, "devices/drive-removable-media-usb", B_FILE_NAME_LENGTH);
 			break;
 
 		case B_GET_VECTOR_ICON:
