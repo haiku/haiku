@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku Inc. All rights reserved.
+ * Copyright 2008-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -983,7 +983,8 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			break;
 
 		case B_GET_ICON_NAME:
-			result = user_strlcpy((char*)buffer, "devices/drive-removable-media-usb", B_FILE_NAME_LENGTH);
+			result = user_strlcpy((char *)buffer,
+				"devices/drive-removable-media-usb", B_FILE_NAME_LENGTH);
 			break;
 
 		case B_GET_VECTOR_ICON:
