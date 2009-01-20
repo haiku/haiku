@@ -324,6 +324,7 @@ SliderView::SliderView(BRect rect, BMessage *msg, const char *title,
 
 	SetTracking(true);
 	SetValue(value);
+	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 }
 
 
@@ -400,17 +401,16 @@ SliderView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 	if (!IsTracking())
 		return;
 
-	uint32 mouseButtons;
-	BPoint where;
-	GetMouse(&where, &mouseButtons, true);
+	int32 mouseButtons;
+	Window()->CurrentMessage()->FindInt32("buttons", &mouseButtons);
 
 	// button not pressed, exit
-	if (! (mouseButtons & B_PRIMARY_MOUSE_BUTTON)) {
+	if (!(mouseButtons & B_PRIMARY_MOUSE_BUTTON)) {
 		Invoke();
 		SetTracking(false);
 	}
 
-	if (Value() == -1 || !Bounds().InsetBySelf(2, 2).Contains(point))
+	if (Value() == -1)
 		return;
 
 	float v = MIN(MAX(point.x, 11), 192);
