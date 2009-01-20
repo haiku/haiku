@@ -33,7 +33,8 @@ class CDPlayer : public BView {
 		virtual ~CDPlayer();
 
 		void BuildGUI();
-
+		bool InitCheck();
+		
 		virtual	void AttachedToWindow();	
 		virtual void Pulse();
 		virtual void MessageReceived(BMessage *);

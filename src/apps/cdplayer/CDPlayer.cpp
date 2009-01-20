@@ -85,7 +85,6 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask,
 			" drives on your computer or there is no system software to "
 			"support one. Sorry.", "OK");
 		alert->Go();
-		be_app->PostMessage(B_QUIT_REQUESTED);
 	}
 
 	fWindowState = fCDDrive.GetState();
@@ -101,6 +100,13 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask,
 CDPlayer::~CDPlayer()
 {
 	fCDDrive.Stop();
+}
+
+
+bool
+CDPlayer::InitCheck()
+{
+	return (fCDDrive.CountDrives() > 0);
 }
 
 
@@ -638,10 +644,14 @@ CDPlayerApplication::CDPlayerApplication()
 	: BApplication("application/x-vnd.Haiku-CDPlayer")
 {
 	BWindow *window = new CDPlayerWindow();
-	BView *view = new CDPlayer(window->Bounds(), "CD");
-	window->ResizeTo(view->Bounds().Width(), view->Bounds().Height());
-	window->AddChild(view);
-	window->Show();
+	CDPlayer *view = new CDPlayer(window->Bounds(), "CD");
+	if (view->InitCheck()) {
+		window->ResizeTo(view->Bounds().Width(), view->Bounds().Height());
+		window->AddChild(view);
+		window->Show();
+	}
+	else 
+		PostMessage(B_QUIT_REQUESTED);
 }
 
 
