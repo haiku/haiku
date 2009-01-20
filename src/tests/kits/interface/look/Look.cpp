@@ -2,6 +2,7 @@
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
