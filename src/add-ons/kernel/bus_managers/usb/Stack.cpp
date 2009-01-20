@@ -111,7 +111,7 @@ Stack::~Stack()
 	mutex_lock(&fExploreLock);
 	mutex_destroy(&fExploreLock);
 
-	//Release the bus modules
+	// Release the bus modules
 	for (Vector<BusManager *>::Iterator i = fBusManagers.Begin();
 		i != fBusManagers.End(); i++) {
 		delete (*i);
