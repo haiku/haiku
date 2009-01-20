@@ -1,3 +1,8 @@
+/*
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
+
 #define DEBUG_BUFFER_QUEUE 1
 
 #include "BufferQueue.h"
@@ -129,7 +134,11 @@ main()
 	dump("add 3");
 
 	add(60, 540);
-	dump("add at the end of previous data");
+	dump("added at the end of previous data");
+	
+	add(998, 1002);
+	add(500, 1000);
+	dump("added data covered by next");
 
 	put_module(NET_BUFFER_MODULE_NAME);
 	return 0;

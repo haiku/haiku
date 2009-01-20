@@ -176,9 +176,14 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 			fList.Remove(remove);
 			fNumBytes -= remove->size;
 			gBufferModule->free(remove);
-		} else {
+		} else if (tcp_sequence(next->sequence) > sequence) {
+			// We have the end of this buffer already
 			gBufferModule->remove_trailer(buffer,
 				sequence + buffer->size - next->sequence);
+		} else {
+			// We already have this data
+			gBufferModule->free(buffer);
+			buffer = NULL;
 		}
 	}
 
