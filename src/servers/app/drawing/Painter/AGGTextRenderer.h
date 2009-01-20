@@ -87,8 +87,6 @@ class AGGTextRenderer {
 	bool						fAntialias;
 	bool						fKerning;
 	Transformable				fEmbeddedTransformation;	// rotated or sheared font?
-
-	static	AGGTextRenderer		sDefaultInstance;
 };
 
 #endif // AGG_TEXT_RENDERER_H
