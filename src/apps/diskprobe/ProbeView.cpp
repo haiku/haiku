@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -158,7 +158,7 @@ class HeaderView : public BView, public BInvoker {
 class TypeMenuItem : public BMenuItem {
 	public:
 		TypeMenuItem(const char *name, const char *type, BMessage *message);
-		
+
 		virtual void GetContentSize(float *_width, float *_height);
 		virtual void DrawContent();
 
@@ -235,7 +235,7 @@ IconView::~IconView()
 }
 
 
-void 
+void
 IconView::AttachedToWindow()
 {
 	if (Parent() != NULL)
@@ -245,7 +245,7 @@ IconView::AttachedToWindow()
 }
 
 
-void 
+void
 IconView::Draw(BRect updateRect)
 {
 	if (fBitmap == NULL)
@@ -257,7 +257,7 @@ IconView::Draw(BRect updateRect)
 }
 
 
-void 
+void
 IconView::UpdateIcon()
 {
 	if (fBitmap == NULL)
@@ -271,16 +271,12 @@ IconView::UpdateIcon()
 		status_t status = B_ERROR;
 
 		if (fIsDevice) {
-			BBitmap* icon = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
-				// TODO: as long as we'll use get_device_icon() for this
-
 			BPath path(&fRef);
-			status = get_device_icon(path.Path(), icon->Bits(), B_LARGE_ICON);
-			if (status == B_OK) {
-				delete fBitmap;
-				fBitmap = icon;
-			} else
-				delete icon;
+#ifdef __HAIKU__
+			status = get_device_icon(path.Path(), fBitmap, B_LARGE_ICON);
+#else
+			status = get_device_icon(path.Path(), fBitmap->Bits(), B_LARGE_ICON);
+#endif
 		} else
 			status = BNodeInfo::GetTrackerIcon(&fRef, fBitmap);
 
@@ -325,7 +321,7 @@ PositionSlider::~PositionSlider()
 
 
 #ifdef DRAW_SLIDER_BAR
-void 
+void
 PositionSlider::DrawBar()
 {
 	BView *view = OffscreenView();
@@ -442,7 +438,7 @@ PositionSlider::SetSize(off_t size)
 }
 
 
-void 
+void
 PositionSlider::SetBlockSize(uint32 blockSize)
 {
 	if (blockSize == fBlockSize)
@@ -623,7 +619,7 @@ HeaderView::AttachedToWindow()
 	fStopButton->SetTarget(Parent());
 	fPositionControl->SetTarget(this);
 	fPositionSlider->SetTarget(this);
-	
+
 	BMessage *message;
 	Window()->AddShortcut(B_HOME, B_COMMAND_KEY,
 		message = new BMessage(kMsgPositionUpdate), this);
@@ -667,7 +663,7 @@ HeaderView::Draw(BRect updateRect)
 }
 
 
-void 
+void
 HeaderView::GetPreferredSize(float *_width, float *_height)
 {
 	if (_width)
@@ -677,14 +673,14 @@ HeaderView::GetPreferredSize(float *_width, float *_height)
 }
 
 
-void 
+void
 HeaderView::UpdateIcon()
 {
 	fIconView->UpdateIcon();
 }
 
 
-void 
+void
 HeaderView::FormatValue(char *buffer, size_t bufferSize, off_t value)
 {
 	snprintf(buffer, bufferSize, fBase == kHexBase ? "0x%Lx" : "%Ld", value);
@@ -705,7 +701,7 @@ HeaderView::UpdatePositionViews(bool all)
 }
 
 
-void 
+void
 HeaderView::UpdateOffsetViews(bool all)
 {
 	char buffer[64];
@@ -719,7 +715,7 @@ HeaderView::UpdateOffsetViews(bool all)
 }
 
 
-void 
+void
 HeaderView::UpdateFileSizeView()
 {
 	char buffer[64];
@@ -730,7 +726,7 @@ HeaderView::UpdateFileSizeView()
 }
 
 
-void 
+void
 HeaderView::SetBase(base_type type)
 {
 	if (fBase == type)
@@ -744,7 +740,7 @@ HeaderView::SetBase(base_type type)
 }
 
 
-void 
+void
 HeaderView::SetTo(off_t position, uint32 blockSize)
 {
 	fPosition = position;
@@ -925,7 +921,7 @@ TypeMenuItem::TypeMenuItem(const char *name, const char *type,
 }
 
 
-void 
+void
 TypeMenuItem::GetContentSize(float *_width, float *_height)
 {
 	BMenuItem::GetContentSize(_width, _height);
@@ -935,7 +931,7 @@ TypeMenuItem::GetContentSize(float *_width, float *_height)
 }
 
 
-void 
+void
 TypeMenuItem::DrawContent()
 {
 	// draw the label
@@ -1132,7 +1128,7 @@ TypeView::~TypeView()
 }
 
 
-void 
+void
 TypeView::FrameResized(float width, float height)
 {
 	BRect rect = Bounds();
@@ -1193,7 +1189,7 @@ ProbeView::~ProbeView()
 }
 
 
-void 
+void
 ProbeView::UpdateSizeLimits()
 {
 	if (Window() == NULL)
@@ -1224,7 +1220,7 @@ ProbeView::UpdateSizeLimits()
 }
 
 
-void 
+void
 ProbeView::DetachedFromWindow()
 {
 	fEditorLooper->QuitFind();
@@ -1294,7 +1290,7 @@ ProbeView::_UpdateAttributesMenu(BMenu *menu)
 }
 
 
-void 
+void
 ProbeView::AddSaveMenuItems(BMenu* menu, int32 index)
 {
 	menu->AddItem(fSaveMenuItem = new BMenuItem("Save",
@@ -1305,7 +1301,7 @@ ProbeView::AddSaveMenuItems(BMenu* menu, int32 index)
 }
 
 
-void 
+void
 ProbeView::AddPrintMenuItems(BMenu* menu, int32 index)
 {
 	BMenuItem *item;
@@ -1318,7 +1314,7 @@ ProbeView::AddPrintMenuItems(BMenu* menu, int32 index)
 }
 
 
-void 
+void
 ProbeView::AddViewAsMenuItems()
 {
 #if 0
@@ -1358,7 +1354,7 @@ ProbeView::AddViewAsMenuItems()
 }
 
 
-void 
+void
 ProbeView::AttachedToWindow()
 {
 	fEditorLooper = new EditorLooper(fEditor.Ref().name, fEditor,
@@ -1656,7 +1652,7 @@ ProbeView::_UpdateBookmarkMenuItems()
 }
 
 
-void 
+void
 ProbeView::_AddBookmark(off_t position)
 {
 	int32 count = fBookmarkMenu->CountItems();
