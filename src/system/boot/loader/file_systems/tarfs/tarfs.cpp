@@ -33,7 +33,7 @@
 #endif
 
 
-static const uint32 kFloppyArchiveOffset = 192 * 1024;	// at 192 kB
+static const uint32 kFloppyArchiveOffset = BOOT_ARCHIVE_IMAGE_OFFSET * 1024;	// initially at 192 kB, now defined at build time
 static const size_t kTarRegionSize = 16 * 1024 * 1024;	// 16 MB
 
 namespace TarFS {
