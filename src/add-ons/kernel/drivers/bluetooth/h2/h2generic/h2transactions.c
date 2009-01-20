@@ -71,7 +71,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 
 					} else {
 						flowf("EVENT frame corrupted\n");
-						return -EILSEQ;
+						return EILSEQ;
 					}
 				break;
 
@@ -95,7 +95,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 
 					} else {
 						flowf("ACL frame corrupted\n");
-						return -EILSEQ;
+						return EILSEQ;
 					}
 				break;
 
