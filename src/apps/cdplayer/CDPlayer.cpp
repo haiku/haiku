@@ -106,7 +106,7 @@ CDPlayer::~CDPlayer()
 bool
 CDPlayer::InitCheck()
 {
-	return (fCDDrive.CountDrives() > 0);
+	return fCDDrive.CountDrives() > 0;
 }
 
 
@@ -649,8 +649,7 @@ CDPlayerApplication::CDPlayerApplication()
 		window->ResizeTo(view->Bounds().Width(), view->Bounds().Height());
 		window->AddChild(view);
 		window->Show();
-	}
-	else 
+	} else 
 		PostMessage(B_QUIT_REQUESTED);
 }
 
