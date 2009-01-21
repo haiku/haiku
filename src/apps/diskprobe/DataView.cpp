@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -28,24 +28,58 @@ static const uint32 kHexByteWidth = 3;
 	// these are determined by the implementation of DataView::ConvertLine()
 
 
-/** This function checks if the buffer contains a valid ASCII
- *	string, following the convention from the DataView::ConvertLine()
- *	method: everything that's not replaced by a '.' there will be
- *	accepted.
- */
-
-// ToDo: a valid UTF-8 string would be nicer...
-
+/*!	This function checks if the buffer contains a valid UTF-8
+	string, following the convention from the DataView::ConvertLine()
+	method: everything that's not replaced by a '.' will be accepted.
+*/
 bool
-is_valid_ascii(uint8 *data, size_t size)
+is_valid_utf8(uint8 *data, size_t size)
 {
 	for (size_t i = 0; i < size; i++) {
 		// accept a terminating null byte
 		if (i == size - 1 && data[0] == '\0')
 			return true;
 
-		if (data[i] < ' ' || data[i] == 0x7f || data[i] & 0x80)
+		if ((data[i] & 0x80) == 0) {
+			// a single byte character
+			if (data[i] < ' ' || data[i] == 0x7f)
+				return false;
+
+			continue;
+		}
+
+		if ((data[i] & 0xc0) == 0x80) {
+			// not a proper multibyte start
 			return false;
+		}
+
+		// start of a multibyte character
+		uint8 mask = 0x80;
+		uint32 result = (uint32)(data[i++] & 0xff);
+
+		while (result & mask) {
+			if (mask == 0x02) {
+				// seven byte char - invalid
+				return false;
+			}
+
+			result &= ~mask;
+			mask >>= 1;
+		}
+
+		while (i < size && (data[i] & 0xc0) == 0x80) {
+			result <<= 6;
+			result += data[i++] & 0x3f;
+
+			mask <<= 1;
+			if (mask == 0x40)
+				break;
+		}
+
+		if (mask != 0x40) {
+			// not enough bytes in multibyte char
+			return false;
+		}
 	}
 
 	return true;
@@ -90,14 +124,14 @@ DataView::~DataView()
 }
 
 
-void 
+void
 DataView::DetachedFromWindow()
 {
 	fEditor.StopWatching(this);
 }
 
 
-void 
+void
 DataView::AttachedToWindow()
 {
 	fEditor.StartWatching(this);
@@ -107,7 +141,7 @@ DataView::AttachedToWindow()
 }
 
 
-void 
+void
 DataView::UpdateFromEditor(BMessage *message)
 {
 	if (fData == NULL)
@@ -258,7 +292,7 @@ DataView::MessageReceived(BMessage *message)
 }
 
 
-void 
+void
 DataView::Copy()
 {
 	if (!be_clipboard->Lock())
@@ -273,7 +307,7 @@ DataView::Copy()
 
 		clip->AddData(B_FILE_MIME_TYPE, B_MIME_TYPE, data, length);
 
-		if (is_valid_ascii(data, length))
+		if (is_valid_utf8(data, length))
 			clip->AddData("text/plain", B_MIME_TYPE, data, length);
 
 		be_clipboard->Commit();
@@ -283,7 +317,7 @@ DataView::Copy()
 }
 
 
-void 
+void
 DataView::Paste()
 {
 	if (!be_clipboard->Lock())
@@ -347,7 +381,7 @@ DataView::ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size
 }
 
 
-void 
+void
 DataView::Draw(BRect updateRect)
 {
 	if (fData == NULL || fFileSize == 0)
@@ -369,7 +403,7 @@ DataView::Draw(BRect updateRect)
 }
 
 
-BRect 
+BRect
 DataView::DataBounds(bool inView) const
 {
 	return BRect(0, 0,
@@ -379,7 +413,7 @@ DataView::DataBounds(bool inView) const
 }
 
 
-int32 
+int32
 DataView::PositionAt(view_focus focus, BPoint point, view_focus *_newFocus)
 {
 	// clip the point into our data bounds
@@ -727,7 +761,7 @@ DataView::InvalidateRange(int32 start, int32 end)
 
 	int32 startLine = start / kBlockSize;
 	int32 endLine = end / kBlockSize;
-	
+
 	if (endLine > startLine) {
 		start = startLine * kBlockSize;
 		end = (endLine + 1) * kBlockSize - 1;
@@ -747,7 +781,7 @@ DataView::InvalidateRange(int32 start, int32 end)
 }
 
 
-void 
+void
 DataView::MakeVisible(int32 position)
 {
 	if (position < 0 || position > int32(fDataSize) - 1)
@@ -798,7 +832,7 @@ DataView::DataAt(int32 start)
 }
 
 
-void 
+void
 DataView::SetBase(base_type type)
 {
 	if (fBase == type)
@@ -809,7 +843,7 @@ DataView::SetBase(base_type type)
 }
 
 
-void 
+void
 DataView::SetFocus(view_focus which)
 {
 	if (which == fFocus)
@@ -821,7 +855,7 @@ DataView::SetFocus(view_focus which)
 }
 
 
-void 
+void
 DataView::SetActive(bool active)
 {
 	if (active == fIsActive)
@@ -841,7 +875,7 @@ DataView::SetActive(bool active)
 }
 
 
-void 
+void
 DataView::WindowActivated(bool active)
 {
 	BView::WindowActivated(active);
@@ -849,7 +883,7 @@ DataView::WindowActivated(bool active)
 }
 
 
-void 
+void
 DataView::MakeFocus(bool focus)
 {
 	bool previous = IsFocus();
@@ -865,7 +899,7 @@ DataView::MakeFocus(bool focus)
 }
 
 
-void 
+void
 DataView::UpdateScroller()
 {
 	float width, height;
@@ -940,7 +974,7 @@ DataView::InitiateDrag(view_focus focus)
 	size_t length = fEnd + 1 - fStart;
 
 	drag->AddData(B_FILE_MIME_TYPE, B_MIME_TYPE, data, length);
-	if (is_valid_ascii(data, length))
+	if (is_valid_utf8(data, length))
 		drag->AddData("text/plain", B_MIME_TYPE, data, length);
 
 	// get a frame that contains the whole selection - SelectionFrame()
@@ -968,7 +1002,7 @@ DataView::InitiateDrag(view_focus focus)
 }
 
 
-void 
+void
 DataView::MouseDown(BPoint where)
 {
 	MakeFocus(true);
@@ -1013,7 +1047,7 @@ DataView::MouseDown(BPoint where)
 }
 
 
-void 
+void
 DataView::MouseMoved(BPoint where, uint32 transit, const BMessage *dragMessage)
 {
 	if (transit == B_EXITED_VIEW && fDragMessageSize > 0) {
@@ -1056,14 +1090,14 @@ DataView::MouseMoved(BPoint where, uint32 transit, const BMessage *dragMessage)
 }
 
 
-void 
+void
 DataView::MouseUp(BPoint where)
 {
 	fMouseSelectionStart = fKeySelectionStart = -1;
 }
 
 
-void 
+void
 DataView::KeyDown(const char *bytes, int32 numBytes)
 {
 	int32 modifiers;
@@ -1227,7 +1261,7 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 		case B_DELETE:
 			SetSelection(fStart, fStart);
 				// to make sure only the cursor is selected
-			
+
 			if (fFocus == kHexFocus) {
 				const uint8 *data = DataAt(fStart);
 				if (data == NULL)
@@ -1290,7 +1324,7 @@ DataView::SetFont(const BFont *font, uint32 properties)
 }
 
 
-float 
+float
 DataView::FontSize() const
 {
 	BFont font;
@@ -1300,7 +1334,7 @@ DataView::FontSize() const
 }
 
 
-void 
+void
 DataView::SetFontSize(float point)
 {
 	bool fit = (point == 0.0f);
@@ -1326,7 +1360,7 @@ DataView::SetFontSize(float point)
 }
 
 
-void 
+void
 DataView::GetPreferredSize(float *_width, float *_height)
 {
 	BRect bounds = DataBounds();
