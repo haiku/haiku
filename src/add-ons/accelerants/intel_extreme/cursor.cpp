@@ -43,29 +43,18 @@ intel_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
 		}
 	}
 
-	// We can only change the width of the pixel, but apparently
-	// not the height (or at least I couldn't figure out how),
-	// so we need to make the rest transparent
-	for (uint32 y = height; y < 64; y++) {
-		for (int32 x = 0; x < byteWidth; x++) {
-			data[16 * y + x] = 0xff;
-			data[16 * y + x + 8] = 0;
-		}
-	}
-
 	// set palette entries to white/black
 	write32(INTEL_CURSOR_PALETTE + 0, 0x00ffffff);
 	write32(INTEL_CURSOR_PALETTE + 4, 0);
 
 	gInfo->shared_info->cursor_format = CURSOR_FORMAT_2_COLORS;
 
-	write32(INTEL_CURSOR_CONTROL, CURSOR_ENABLED | gInfo->shared_info->cursor_format);
-	write32(INTEL_CURSOR_SIZE, width);
-		// TODO: I've no idea how to specify the height of the cursor - it seems to
-		//	be always 64 pixels
-
+	write32(INTEL_CURSOR_SIZE, height << 12 | width);
 	write32(INTEL_CURSOR_BASE, (uint32)gInfo->shared_info->physical_graphics_memory
 		+ gInfo->shared_info->cursor_buffer_offset);
+
+	// cursor shape is now set: enable it again
+	write32(INTEL_CURSOR_CONTROL, CURSOR_ENABLED | gInfo->shared_info->cursor_format);
 
 	// changing the hot point changes the cursor position, too
 
