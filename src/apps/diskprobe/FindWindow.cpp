@@ -1,21 +1,28 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "FindWindow.h"
+
+#include "DataView.h"
 #include "DiskProbe.h"
 
+#include <AutoLocker.h>
+
 #include <Application.h>
-#include <TextView.h>
-#include <MenuField.h>
-#include <PopUpMenu.h>
-#include <MenuItem.h>
-#include <Button.h>
-#include <ScrollView.h>
-#include <CheckBox.h>
+#include <Autolock.h>
 #include <Beep.h>
+#include <Button.h>
+#include <CheckBox.h>
+#include <Clipboard.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <Mime.h>
+#include <PopUpMenu.h>
+#include <ScrollView.h>
+#include <TextView.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,39 +34,44 @@ static const uint32 kMsgStartFind = 'SFnd';
 
 
 class FindTextView : public BTextView {
-	public:
-		FindTextView(BRect frame, const char *name, BRect textRect, uint32 resizeMask);
+public:
+							FindTextView(BRect frame, const char* name,
+								BRect textRect, uint32 resizeMask);
 
-		virtual void MakeFocus(bool state);
-		virtual void TargetedByScrollView(BScrollView *view);
+	virtual void			MakeFocus(bool state);
+	virtual void			TargetedByScrollView(BScrollView* view);
 
-		find_mode Mode() const { return fMode; }
-		status_t SetMode(find_mode mode);
+			find_mode		Mode() const { return fMode; }
+			status_t		SetMode(find_mode mode);
 
-		void SetData(BMessage &message);
-		void GetData(BMessage &message);
+			void			SetData(BMessage& message);
+			void			GetData(BMessage& message);
 
-		virtual void KeyDown(const char *bytes, int32 numBytes);
+	virtual void			KeyDown(const char* bytes, int32 numBytes);
 
-	protected:
-		virtual	void InsertText(const char *text, int32 length, 
-						int32 offset, const text_run_array *runs);
+	virtual bool			AcceptsPaste(BClipboard* clipboard);
+	virtual void			Copy(BClipboard* clipboard);
+	virtual void			Cut(BClipboard* clipboard);
+	virtual void			Paste(BClipboard* clipboard);
 
-	private:
-		void HexReformat(int32 oldCursor, int32 &newCursor);
-		status_t GetHexFromData(const uint8 *in, size_t inSize, char **_hex, size_t *_hexSize);
-		status_t GetDataFromHex(const char *text, size_t textLength, uint8 **_data, size_t *_dataSize);
+protected:
+	virtual	void			InsertText(const char* text, int32 length,
+								int32 offset, const text_run_array* runs);
 
-		BScrollView	*fScrollView;
-		find_mode	fMode;
+private:
+			void			_HexReformat(int32 oldCursor, int32& newCursor);
+			status_t		_GetHexFromData(const uint8* in, size_t inSize,
+								char** _hex, size_t* _hexSize);
+			status_t		_GetDataFromHex(const char* text, size_t textLength,
+								uint8** _data, size_t* _dataSize);
+
+			BScrollView*	fScrollView;
+			find_mode		fMode;
 };
 
 
-//---------------
-
-
-FindTextView::FindTextView(BRect frame, const char *name, BRect textRect,
-	uint32 resizeMask)
+FindTextView::FindTextView(BRect frame, const char* name, BRect textRect,
+		uint32 resizeMask)
 	: BTextView(frame, name, textRect, resizeMask),
 	fScrollView(NULL),
 	fMode(kAsciiMode)
@@ -77,8 +89,8 @@ FindTextView::MakeFocus(bool state)
 }
 
 
-void 
-FindTextView::TargetedByScrollView(BScrollView *view)
+void
+FindTextView::TargetedByScrollView(BScrollView* view)
 {
 	BTextView::TargetedByScrollView(view);
 	fScrollView = view;
@@ -86,11 +98,11 @@ FindTextView::TargetedByScrollView(BScrollView *view)
 
 
 void
-FindTextView::HexReformat(int32 oldCursor, int32 &newCursor)
+FindTextView::_HexReformat(int32 oldCursor, int32& newCursor)
 {
-	const char *text = Text();
+	const char* text = Text();
 	int32 textLength = TextLength();
-	char *insert = (char *)malloc(textLength * 2);
+	char* insert = (char*)malloc(textLength * 2);
 	if (insert == NULL)
 		return;
 
@@ -130,8 +142,8 @@ FindTextView::HexReformat(int32 oldCursor, int32 &newCursor)
 
 
 void
-FindTextView::InsertText(const char *text, int32 length, int32 offset,
-	const text_run_array *runs)
+FindTextView::InsertText(const char* text, int32 length, int32 offset,
+	const text_run_array* runs)
 {
 	if (fMode == kHexMode) {
 		if (offset > TextLength())
@@ -145,7 +157,7 @@ FindTextView::InsertText(const char *text, int32 length, int32 offset,
 		GetSelection(&start, &end);
 
 		int32 cursor;
-		HexReformat(offset, cursor);
+		_HexReformat(offset, cursor);
 
 		if (length == 1 && start == offset)
 			Select(cursor + 1, cursor + 1);
@@ -154,8 +166,8 @@ FindTextView::InsertText(const char *text, int32 length, int32 offset,
 }
 
 
-void 
-FindTextView::KeyDown(const char *bytes, int32 numBytes)
+void
+FindTextView::KeyDown(const char* bytes, int32 numBytes)
 {
 	if (fMode == kHexMode) {
 		// filter out invalid (for hex mode) characters
@@ -193,7 +205,7 @@ FindTextView::KeyDown(const char *bytes, int32 numBytes)
 				if (bytes[0] == B_BACKSPACE)
 					GetSelection(&start, &end);
 
-				HexReformat(start, start);
+				_HexReformat(start, start);
 				Select(start, start);
 				return;
 			}
@@ -217,29 +229,144 @@ FindTextView::KeyDown(const char *bytes, int32 numBytes)
 }
 
 
-status_t
-FindTextView::GetHexFromData(const uint8 *in, size_t inSize, char **_hex, size_t *_hexSize)
+bool
+FindTextView::AcceptsPaste(BClipboard* clipboard)
 {
-	char *hex = (char *)malloc(inSize * 3 + 1);
+	if (clipboard == NULL)
+		return false;
+
+	AutoLocker<BClipboard> _(clipboard);
+
+	BMessage* clip = clipboard->Data();
+	if (clip == NULL)
+		return false;
+
+	if (clip->HasData(B_FILE_MIME_TYPE, B_MIME_TYPE)
+		|| clip->HasData("text/plain", B_MIME_TYPE))
+		return true;
+
+	return BTextView::AcceptsPaste(clipboard);
+}
+
+
+void
+FindTextView::Copy(BClipboard* clipboard)
+{
+	if (fMode != kHexMode) {
+		BTextView::Copy(clipboard);
+		return;
+	}
+
+	int32 start, end;
+	GetSelection(&start, &end);
+
+	if (clipboard == NULL || start == end)
+		return;
+
+	AutoLocker<BClipboard> _(clipboard);
+
+	BMessage* clip = clipboard->Data();
+	if (clip == NULL)
+		return;
+
+	// convert hex-text to real data
+	uint8* data;
+	size_t dataSize;
+	if (_GetDataFromHex(Text() + start, end - start, &data, &dataSize)
+			!= B_OK)
+		return;
+
+	clip->AddData(B_FILE_MIME_TYPE, B_MIME_TYPE, data, dataSize);
+
+	if (is_valid_utf8(data, dataSize))
+		clip->AddData("text/plain", B_MIME_TYPE, data, dataSize);
+
+	free(data);
+}
+
+
+void
+FindTextView::Cut(BClipboard* clipboard)
+{
+	if (fMode != kHexMode) {
+		BTextView::Cut(clipboard);
+		return;
+	}
+
+	int32 start, end;
+	GetSelection(&start, &end);
+	if (clipboard == NULL || start == end)
+		return;
+
+	AutoLocker<BClipboard> _(clipboard);
+
+	BMessage* clip = clipboard->Data();
+	if (clip == NULL)
+		return;
+
+	Copy(clipboard);
+	Clear();
+}
+
+
+void
+FindTextView::Paste(BClipboard* clipboard)
+{
+	if (clipboard == NULL)
+		return;
+
+	AutoLocker<BClipboard> _(clipboard);
+
+	BMessage* clip = clipboard->Data();
+	if (clip == NULL)
+		return;
+
+	const uint8* data;
+	ssize_t dataSize;
+	if (clip->FindData(B_FILE_MIME_TYPE, B_MIME_TYPE, (const void**)&data,
+			&dataSize) == B_OK) {
+		if (fMode == kHexMode) {
+			char* hex;
+			size_t hexSize;
+			if (_GetHexFromData(data, dataSize, &hex, &hexSize) < B_OK)
+				return;
+
+			SetText(hex, hexSize);
+			free(hex);
+		} else
+			SetText((char*)data, dataSize);
+		return;
+	}
+
+	BTextView::Paste(clipboard);
+}
+
+
+status_t
+FindTextView::_GetHexFromData(const uint8* in, size_t inSize, char** _hex,
+	size_t* _hexSize)
+{
+	char* hex = (char*)malloc(inSize * 3 + 1);
 	if (hex == NULL)
 		return B_NO_MEMORY;
 
-	char *out = hex;
+	char* out = hex;
 	for (uint32 i = 0; i < inSize; i++) {
-		out += sprintf(out, "%02x", *(unsigned char *)(in + i));
+		out += sprintf(out, "%02x", *(unsigned char*)(in + i));
 	}
 	out[0] = '\0';
-	
+
 	*_hex = hex;
 	*_hexSize = out + 1 - hex;
 	return B_OK;
 }
 
 
-status_t 
-FindTextView::GetDataFromHex(const char *text, size_t textLength, uint8 **_data, size_t *_dataSize)
+status_t
+FindTextView::_GetDataFromHex(const char* text, size_t textLength, uint8** _data,
+	size_t* _dataSize)
 {
-	uint8 *data = (uint8 *)malloc(textLength);
+	uint8* data = (uint8*)malloc(textLength);
 	if (data == NULL)
 		return B_NO_MEMORY;
 
@@ -283,9 +410,10 @@ FindTextView::SetMode(find_mode mode)
 	if (mode == kHexMode) {
 		// convert text to hex mode
 
-		char *hex;
+		char* hex;
 		size_t hexSize;
-		if (GetHexFromData((const uint8 *)Text(), TextLength(), &hex, &hexSize) < B_OK)
+		if (_GetHexFromData((const uint8*)Text(), TextLength(), &hex, &hexSize)
+				< B_OK)
 			return B_NO_MEMORY;
 
 		fMode = mode;
@@ -294,56 +422,57 @@ FindTextView::SetMode(find_mode mode)
 		free(hex);
 	} else {
 		// convert hex to ascii
-		
-		uint8 *data;
+
+		uint8* data;
 		size_t dataSize;
-		if (GetDataFromHex(Text(), TextLength(), &data, &dataSize) < B_OK)
+		if (_GetDataFromHex(Text(), TextLength(), &data, &dataSize) < B_OK)
 			return B_NO_MEMORY;
 
 		fMode = mode;
 
-		SetText((const char *)data, dataSize);
+		SetText((const char*)data, dataSize);
 		free(data);
 	}
 
-	return B_OK;	
+	return B_OK;
 }
 
 
 void
-FindTextView::SetData(BMessage &message)
+FindTextView::SetData(BMessage& message)
 {
-	const uint8 *data;
+	const uint8* data;
 	ssize_t dataSize;
-	if (message.FindData("data", B_RAW_TYPE, (const void **)&data, &dataSize) != B_OK)
+	if (message.FindData("data", B_RAW_TYPE,
+			(const void**)&data, &dataSize) != B_OK)
 		return;
 
 	if (fMode == kHexMode) {
-		char *hex;
+		char* hex;
 		size_t hexSize;
-		if (GetHexFromData(data, dataSize, &hex, &hexSize) < B_OK)
+		if (_GetHexFromData(data, dataSize, &hex, &hexSize) < B_OK)
 			return;
 
 		SetText(hex, hexSize);
 		free(hex);
 	} else
-		SetText((char *)data, dataSize);
+		SetText((char*)data, dataSize);
 }
 
 
 void
-FindTextView::GetData(BMessage &message)
+FindTextView::GetData(BMessage& message)
 {
 	if (fMode == kHexMode) {
 		// convert hex-text to real data
-		uint8 *data;
+		uint8* data;
 		size_t dataSize;
-		if (GetDataFromHex(Text(), TextLength(), &data, &dataSize) != B_OK)
+		if (_GetDataFromHex(Text(), TextLength(), &data, &dataSize) != B_OK)
 			return;
 
 		message.AddData("data", B_RAW_TYPE, data, dataSize);
 		free(data);
-	} else 
+	} else
 		message.AddData("data", B_RAW_TYPE, Text(), TextLength());
 }
 
@@ -351,12 +480,12 @@ FindTextView::GetData(BMessage &message)
 //	#pragma mark -
 
 
-FindWindow::FindWindow(BRect _rect, BMessage &previous, BMessenger &target,
-	const BMessage *settings)
+FindWindow::FindWindow(BRect _rect, BMessage& previous, BMessenger& target,
+		const BMessage* settings)
 	: BWindow(_rect, "Find", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target)
 {
-	BView *view = new BView(Bounds(), "main", B_FOLLOW_ALL, 0);
+	BView* view = new BView(Bounds(), "main", B_FOLLOW_ALL, 0);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
 
@@ -367,41 +496,44 @@ FindWindow::FindWindow(BRect _rect, BMessage &previous, BMessenger &target,
 	// add the top widgets
 
 	fMenu = new BPopUpMenu("mode");
-	BMessage *message;
-	BMenuItem *item;
-	fMenu->AddItem(item = new BMenuItem("Text", message = new BMessage(kMsgFindMode)));
+	BMessage* message;
+	BMenuItem* item;
+	fMenu->AddItem(item = new BMenuItem("Text",
+		message = new BMessage(kMsgFindMode)));
 	message->AddInt8("mode", kAsciiMode);
 	if (mode == kAsciiMode)
 		item->SetMarked(true);
-	fMenu->AddItem(item = new BMenuItem("Hexadecimal", message = new BMessage(kMsgFindMode)));
+	fMenu->AddItem(item = new BMenuItem("Hexadecimal",
+		message = new BMessage(kMsgFindMode)));
 	message->AddInt8("mode", kHexMode);
 	if (mode == kHexMode)
 		item->SetMarked(true);
 
 	BRect rect = Bounds().InsetByCopy(5, 5);
-	BMenuField *menuField = new BMenuField(rect, B_EMPTY_STRING,
-						"Mode:", fMenu, B_FOLLOW_LEFT | B_FOLLOW_TOP);
+	BMenuField* menuField = new BMenuField(rect, B_EMPTY_STRING,
+		"Mode:", fMenu, B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 8);
 	menuField->ResizeToPreferred();
 	view->AddChild(menuField);
 
 	// add the bottom widgets
 
-	BButton *button = new BButton(rect, B_EMPTY_STRING, "Find", new BMessage(kMsgStartFind),
-								B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	BButton* button = new BButton(rect, B_EMPTY_STRING, "Find",
+		new BMessage(kMsgStartFind), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->MakeDefault(true);
 	button->ResizeToPreferred();
 	button->MoveTo(rect.right - button->Bounds().Width(),
-				rect.bottom - button->Bounds().Height());
+		rect.bottom - button->Bounds().Height());
 	view->AddChild(button);
 
 	fCaseCheckBox = new BCheckBox(rect, B_EMPTY_STRING, "Case sensitive",
-							NULL, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+		NULL, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fCaseCheckBox->ResizeToPreferred();
 	fCaseCheckBox->MoveTo(5, button->Frame().top);
 	bool caseSensitive;
 	if (previous.FindBool("case_sensitive", &caseSensitive) != B_OK) {
-		if (settings == NULL || settings->FindBool("case_sensitive", &caseSensitive) != B_OK)
+		if (settings == NULL
+			|| settings->FindBool("case_sensitive", &caseSensitive) != B_OK)
 			caseSensitive = true;
 	}
 	fCaseCheckBox->SetValue(caseSensitive);
@@ -413,19 +545,19 @@ FindWindow::FindWindow(BRect _rect, BMessage &previous, BMessenger &target,
 	rect.bottom = fCaseCheckBox->Frame().top - 8;
 	rect.InsetBy(2, 2);
 	fTextView = new FindTextView(rect, B_EMPTY_STRING,
-						rect.OffsetToCopy(B_ORIGIN).InsetByCopy(3, 3),
-						B_FOLLOW_ALL);
+		rect.OffsetToCopy(B_ORIGIN).InsetByCopy(3, 3), B_FOLLOW_ALL);
 	fTextView->SetWordWrap(true);
 	fTextView->SetMode((find_mode)mode);
 	fTextView->SetData(previous);
 
-	BScrollView *scrollView = new BScrollView("scroller", fTextView, B_FOLLOW_ALL, B_WILL_DRAW, false, false);
+	BScrollView* scrollView = new BScrollView("scroller", fTextView,
+		B_FOLLOW_ALL, B_WILL_DRAW, false, false);
 	view->AddChild(scrollView);
 
 	ResizeTo(290, button->Frame().Height() * 3 + 30);
 
-	SetSizeLimits(fCaseCheckBox->Bounds().Width() + button->Bounds().Width() + 20,
-		32768, button->Frame().Height() * 3 + 10, 32768);
+	SetSizeLimits(fCaseCheckBox->Bounds().Width() + button->Bounds().Width()
+			+ 20, 32768, button->Frame().Height() * 3 + 10, 32768);
 }
 
 
@@ -434,15 +566,15 @@ FindWindow::~FindWindow()
 }
 
 
-void 
+void
 FindWindow::WindowActivated(bool active)
 {
 	fTextView->MakeFocus(active);
 }
 
 
-void 
-FindWindow::MessageReceived(BMessage *message)
+void
+FindWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgFindMode:
@@ -471,14 +603,14 @@ FindWindow::MessageReceived(BMessage *message)
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
-		
+
 		default:
 			BWindow::MessageReceived(message);
 	}
 }
 
 
-bool 
+bool
 FindWindow::QuitRequested()
 {
 	// update the application's settings
@@ -492,8 +624,8 @@ FindWindow::QuitRequested()
 }
 
 
-void 
-FindWindow::SetTarget(BMessenger &target)
+void
+FindWindow::SetTarget(BMessenger& target)
 {
 	fTarget = target;
 }
