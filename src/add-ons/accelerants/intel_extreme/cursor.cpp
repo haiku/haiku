@@ -49,12 +49,11 @@ intel_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
 
 	gInfo->shared_info->cursor_format = CURSOR_FORMAT_2_COLORS;
 
+	write32(INTEL_CURSOR_CONTROL, CURSOR_ENABLED | gInfo->shared_info->cursor_format);
 	write32(INTEL_CURSOR_SIZE, height << 12 | width);
+
 	write32(INTEL_CURSOR_BASE, (uint32)gInfo->shared_info->physical_graphics_memory
 		+ gInfo->shared_info->cursor_buffer_offset);
-
-	// cursor shape is now set: enable it again
-	write32(INTEL_CURSOR_CONTROL, CURSOR_ENABLED | gInfo->shared_info->cursor_format);
 
 	// changing the hot point changes the cursor position, too
 
