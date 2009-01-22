@@ -134,7 +134,7 @@ public:
 		ReleaseReference();
 	}
 
-	HashTableLink<NamedSem>* HashTableLink()
+	HashTableLink<NamedSem>* HashLink()
 	{
 		return &fHashLink;
 	}
@@ -238,7 +238,7 @@ public:
 		delete this;
 	}
 
-	HashTableLink<UnnamedSharedSem>* HashTableLink()
+	HashTableLink<UnnamedSharedSem>* HashLink()
 	{
 		return &fHashLink;
 	}
@@ -269,7 +269,7 @@ struct NamedSemHashDefinition {
 
 	HashTableLink<NamedSem>* GetLink(NamedSem* semaphore) const
 	{
-		return semaphore->HashTableLink();
+		return semaphore->HashLink();
 	}
 };
 
@@ -295,7 +295,7 @@ struct UnnamedSemHashDefinition {
 
 	HashTableLink<UnnamedSharedSem>* GetLink(UnnamedSharedSem* semaphore) const
 	{
-		return semaphore->HashTableLink();
+		return semaphore->HashLink();
 	}
 };
 
@@ -502,7 +502,7 @@ public:
 		return clone;
 	}
 
-	HashTableLink<TeamSemInfo>* HashTableLink()
+	HashTableLink<TeamSemInfo>* HashLink()
 	{
 		return &fHashLink;
 	}
@@ -537,7 +537,7 @@ struct TeamSemHashDefinition {
 
 	HashTableLink<TeamSemInfo>* GetLink(TeamSemInfo* semaphore) const
 	{
-		return semaphore->HashTableLink();
+		return semaphore->HashLink();
 	}
 };
 
