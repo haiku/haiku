@@ -370,8 +370,18 @@ rule FStandardHeaders
 					   kernel media mail midi midi2 net opengl storage support
 					   translation ;
 
+	local headers = ;
+
+	# The C++ headers. If specified, we use the compiler headers, otherwise
+	# the ones that come with our libstdc++.
+	if $(HAIKU_C++_HEADERS_DIR) {
+		headers += $(HAIKU_C++_HEADERS_DIR) ;
+	} else {
+		headers += [ FDirName $(HAIKU_TOP) headers cpp ] ;
+	}
+
 	# GCC headers
-	local headers = $(HAIKU_GCC_HEADERS_DIR) ;
+	headers += $(HAIKU_GCC_HEADERS_DIR) ;
 
 	# Use headers directory, to allow to do things like include <posix/string.h>
 	headers += [ FDirName $(HAIKU_TOP) headers ] ;
@@ -391,14 +401,6 @@ rule FStandardHeaders
 
 	# Use the root of the private headers -- not so nice, but simplifies things.
 	headers += [ PrivateHeaders $(DOT) ] ;
-
-	# The C++ headers. If specified, we use the compiler headers, otherwise
-	# the ones that come with our libstdc++.
-	if $(HAIKU_C++_HEADERS_DIR) {
-		headers += $(HAIKU_C++_HEADERS_DIR) ;
-	} else {
-		headers += [ FDirName $(HAIKU_TOP) headers cpp ] ;
-	}
 
 	return $(headers) ;
 }
