@@ -73,7 +73,6 @@ is_sg_list_dma_safe(scsi_ccb *request)
 		if (((addr_t)sg_list->address & alignment) != 0) {
 			SHOW_FLOW(0, "S/G-entry has bad alignment @0x%x",
 				(int)sg_list->address);
-panic("XXX");
 			return false;
 		}
 
