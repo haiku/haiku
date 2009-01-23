@@ -92,14 +92,16 @@ function dev() {
 	# set the prompt
 	# cf. http://tldp.org/HOWTO/Bash-Prompt-HOWTO/
 	case "$TERM" in
-	dump|emacs)
+	dumb|emacs)
 		# simpler prompt
 		export PS1='[\u@\h \w]\$ '
 		;;
 	*)
 		# prompt: set window title to [project:folder] also
 		#export PS1='\[\033]0;['$1':\W]\a\]\[\033[1m\][\u@\h \w]\[\033[0m\]\$ '
-		export PS1='\033]0;['$1':\W]\a\033[1m[\u@\h \w]\033[0m\$ '
+		#export PS1='\033]0;['$1':\W]\a\033[1m[\u@\h \w]\033[0m\$ '
+		export PS1='\[\033[1m\][\u@\h \w]\[\033[0m\]\$ '
+		export PROMPT_COMMAND='echo -e "\033]0;['$1':${PWD##*/}]\a"'
 		;;
 	esac
 	# lower priority so background builds don't slow the GUI too much
