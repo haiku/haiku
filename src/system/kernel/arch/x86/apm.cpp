@@ -91,6 +91,9 @@ apm_error(uint32 error)
 static status_t
 call_apm_bios(bios_regs *regs)
 {
+#if _GNUC_ >= 4
+	// TODO: Fix this for GCC 4.3! The direct reference to sAPMBiosEntry
+	// in the ASM below causes undefined references.
 	asm volatile(
 		"pushfl; "
 		"pushl %%ebp; "
@@ -104,6 +107,7 @@ call_apm_bios(bios_regs *regs)
 		  "=S" (regs->esi), "=m" (regs->flags)
 		: "a" (regs->eax), "b" (regs->ebx), "c" (regs->ecx)
 		: "memory", "edi", "cc");
+#endif
 
 	if (regs->flags & CARRY_FLAG)
 		return B_ERROR;
