@@ -20,9 +20,9 @@ MergeObject posix_gnu_stdlib.o :
 	lcong48_r.c
 	lrand48.c
 	lrand48_r.c
-	#mblen.c
-	#mbstowcs.c
-	#mbtowc.c
+	mblen.c
+	mbstowcs.c
+	mbtowc.c
 	mrand48.c
 	mrand48_r.c
 	nrand48.c
@@ -32,6 +32,6 @@ MergeObject posix_gnu_stdlib.o :
 	seed48_r.c
 	srand48.c
 	srand48_r.c
-	#wcstombs.c
-	#wctomb.c
+	wcstombs.c
+	wctomb.c
 ;
