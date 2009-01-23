@@ -9,9 +9,10 @@
 #include <netdb.h>
 #include <pwd.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <iomanip>
-#include  <sstream>
+#include <sstream>
 
 #include "LpsClient.h"
 #include "LprSetupDlg.h"

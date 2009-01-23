@@ -8,6 +8,8 @@
 
 #include "AddOnMonitorHandler.h"
 
+#include <string.h>
+
 #include <Directory.h>
 
 

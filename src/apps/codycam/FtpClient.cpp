@@ -1,5 +1,8 @@
 #include "FtpClient.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 FtpClient::FtpClient()
 	: FileUploadClient(),
 	fState(0),

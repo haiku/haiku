@@ -2,6 +2,7 @@
 // Y.Takagi
 
 #include <cstring>
+#include <stdlib.h>
 #include "URL.h"
 
 URL::URL(const char *spec)

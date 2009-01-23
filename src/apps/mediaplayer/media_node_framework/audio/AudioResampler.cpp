@@ -4,7 +4,6 @@
  */
 #include "AudioResampler.h"
 
-#include <algobase.h>
 #include <stdio.h>
 
 #include "SampleBuffer.h"

@@ -7,6 +7,7 @@
 #include <InterfaceDefs.h>
 #include <math.h>
 #include <memory>
+#include <string.h>
 #include "Halftone.h"
 #include "ValidRect.h"
 #include "DbgMsg.h"

@@ -9,6 +9,7 @@
 #include <Alert.h>
 
 #include <algorithm>
+#include <string.h>
 
 #include "LpsClient.h"
 #include "LprSetupDlg.h"

@@ -12,7 +12,7 @@
 #include <Debug.h>
 
 #include <String.h>
-#include <ostream.h>
+#include <ostream>
 
 #include <list>
 #include <utility>

@@ -6,6 +6,7 @@
 #include <map>
 #include <new>
 #include <set>
+#include <string.h>
 
 #include <AutoDeleter.h>
 #include <Autolock.h>

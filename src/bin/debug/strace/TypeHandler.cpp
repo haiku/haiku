@@ -9,6 +9,8 @@
 
 #include "TypeHandler.h"
 
+#include <string.h>
+
 #include "Context.h"
 #include "MemoryReader.h"
 #include "Syscall.h"

@@ -4,7 +4,7 @@
  */
 #include "ProxyAudioSupplier.h"
 
-#include <algobase.h>
+#include <algorithm>
 #include <new>
 #include <stdio.h>
 #include <string.h>
@@ -18,6 +18,7 @@
 #include "PlaybackManager.h"
 
 using std::nothrow;
+using std::swap;
 
 
 //#define TRACE_PROXY_AUDIO_SUPPLIER

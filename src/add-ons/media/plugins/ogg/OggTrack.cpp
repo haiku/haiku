@@ -1,5 +1,6 @@
 #include "OggTrack.h"
 #include <stdio.h>
+#include <string.h>
 
 #define TRACE_THIS 0
 #if TRACE_THIS

@@ -8,6 +8,7 @@
 
 #include "StyleListView.h"
 
+#include <new>
 #include <stdio.h>
 
 #include <Application.h>

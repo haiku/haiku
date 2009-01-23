@@ -1,7 +1,7 @@
 //--------This file shamelessly stolen from Jeremy Friesner's excellent MUSCLE---------
 /* This file is Copyright 2000 Level Control Systems.  See the included LICENSE.txt file for details. */  
 
-#include <new.h>
+#include <new>
 #include <stdio.h>
 
 #include "StringMatcher.h"

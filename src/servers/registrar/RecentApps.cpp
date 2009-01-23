@@ -22,6 +22,8 @@
 #include <Roster.h>
 #include <storage_support.h>
 
+#include <string.h>
+
 #define DBG(x) (x)
 //#define DBG(x)
 #define OUT printf

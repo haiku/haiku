@@ -1,6 +1,6 @@
 // PlaybackManager.cpp
 
-#include <algobase.h>
+#include <algorithm>
 #include <stdio.h>
 
 #include <Message.h>
@@ -12,6 +12,8 @@
 #include "PlaybackListener.h"
 
 #include "PlaybackManager.h"
+
+using namespace std;
 
 //#define TRACE_NODE_MANAGER
 #ifdef TRACE_NODE_MANAGER

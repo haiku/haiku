@@ -9,6 +9,7 @@
 
 #include <SupportDefs.h>
 
+#include <stdlib.h>
 
 template<class T> class Stack {
 	public:

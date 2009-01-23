@@ -9,7 +9,7 @@
 #ifndef COMMAND_STACK_H
 #define COMMAND_STACK_H
 
-#include <stack.h>
+#include <stack>
 
 #include <Locker.h>
 
@@ -39,7 +39,7 @@ class CommandStack : public BLocker,
  private:
 			status_t			_AddCommand(Command* command);
 
-	typedef stack<Command*> command_stack;
+	typedef std::stack<Command*> command_stack;
 
 			command_stack			fUndoHistory;
 			command_stack			fRedoHistory;

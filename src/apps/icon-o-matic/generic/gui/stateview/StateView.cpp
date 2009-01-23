@@ -8,6 +8,8 @@
 
 #include "StateView.h"
 
+#include <new>
+
 #include <Message.h>
 #include <MessageFilter.h>
 #include <TextView.h>

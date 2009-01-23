@@ -8,6 +8,8 @@
 
 #include "StyleView.h"
 
+#include <new>
+
 #if __HAIKU__
 # include "GridLayout.h"
 # include "GroupLayout.h"

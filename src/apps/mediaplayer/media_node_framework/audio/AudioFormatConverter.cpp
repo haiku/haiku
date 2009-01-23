@@ -6,8 +6,6 @@
 
 #include "AudioFormatConverter.h"
 
-#include <algobase.h>
-
 #include <ByteOrder.h>
 #include <MediaDefs.h>
 

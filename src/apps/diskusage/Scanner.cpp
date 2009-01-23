@@ -8,6 +8,9 @@
  */
 #include "Scanner.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <Directory.h>
 
 #include "Common.h"

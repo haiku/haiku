@@ -90,7 +90,7 @@ public:
 		return fAddress;
 	}
 
-	HashTableLink<UnixEndpoint>* HashTableLink()
+	::HashTableLink<UnixEndpoint>* HashTableLink()
 	{
 		return &fAddressHashLink;
 	}

@@ -133,7 +133,7 @@ public:
 	typedef HashTableLink<ThisType> HashLink;
 	typedef typename Addressing::AddressType AddressType;
 	typedef MulticastFilter<Addressing> Filter;
-	typedef AddressSet<AddressType> AddressSet;
+	typedef ::AddressSet<AddressType> AddressSet;
 
 	enum FilterMode {
 		kInclude,

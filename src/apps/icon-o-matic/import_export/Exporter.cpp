@@ -9,6 +9,7 @@
 #include "Exporter.h"
 
 #include <fs_attr.h>
+#include <new>
 #include <stdio.h>
 
 #include <Alert.h>

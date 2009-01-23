@@ -19,6 +19,7 @@
 #include <Window.h>
 
 #include <map>
+#include <string.h>
 
 #include "TransportButton.h"
 #include "DrawingTidbits.h"

@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 
 #include <string>
+#include <string.h>
 
 #include <debugger.h>
 

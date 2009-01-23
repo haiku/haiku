@@ -2,10 +2,12 @@
  * Copyright © 2000-2006 Ingo Weinhold <ingo_weinhold@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT licensce.
  */
-#include <algobase.h>
+#include <algorithm>
 #include <string.h>
 
 #include "AudioReader.h"
+
+using std::swap;
 
 
 AudioReader::AudioReader()

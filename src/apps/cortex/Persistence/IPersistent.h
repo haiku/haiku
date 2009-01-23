@@ -22,7 +22,7 @@
 #include "ImportContext.h"
 #include "ExportContext.h"
 
-#include <ostream.h>
+#include <ostream>
 
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE

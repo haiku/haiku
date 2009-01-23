@@ -8,9 +8,10 @@
  */
 #include "InfoWindow.h"
 
-#include <pair.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
+#include <utility>
 #include <vector>
 
 #include <StringView.h>
@@ -22,6 +23,7 @@
 
 using std::string;
 using std::vector;
+using std::pair;
 
 LeftView::LeftView(BRect frame, BBitmap* icon)
 	: BView(frame, NULL, B_FOLLOW_NONE, B_WILL_DRAW),

@@ -5,7 +5,6 @@
 #include "AudioAdapter.h"
 
 #include <new>
-#include <algobase.h>
 #include <stdio.h>
 #include <string.h>
 

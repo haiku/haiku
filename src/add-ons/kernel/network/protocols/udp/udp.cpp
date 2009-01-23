@@ -96,7 +96,7 @@ public:
 	bool					IsActive() const { return fActive; }
 	void					SetActive(bool newValue) { fActive = newValue; }
 
-	HashTableLink<UdpEndpoint> *HashTableLink() { return &fLink; }
+	::HashTableLink<UdpEndpoint> *HashTableLink() { return &fLink; }
 
 private:
 	UdpDomainSupport		*fManager;
@@ -143,7 +143,7 @@ struct UdpHashDefinition {
 			&& endpoint->PeerAddress().EqualTo(key.second, true);
 	}
 
-	HashTableLink<UdpEndpoint> *GetLink(UdpEndpoint *endpoint) const
+	::HashTableLink<UdpEndpoint> *GetLink(UdpEndpoint *endpoint) const
 	{
 		return endpoint->HashTableLink();
 	}

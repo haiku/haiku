@@ -4,6 +4,7 @@
  */
 
 #include <new>
+#include <string.h>
 
 #include <signal.h>
 #include <unistd.h>

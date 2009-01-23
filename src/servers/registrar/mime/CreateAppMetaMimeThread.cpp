@@ -11,6 +11,7 @@
 #include "CreateAppMetaMimeThread.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <AppFileInfo.h>
 #include <Bitmap.h>

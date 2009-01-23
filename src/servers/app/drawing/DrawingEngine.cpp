@@ -10,8 +10,8 @@
 
 #include <Bitmap.h>
 #include <stdio.h>
-#include <algo.h>
-#include <stack.h>
+#include <algorithm>
+#include <stack>
 
 #include "DrawState.h"
 #include "GlyphLayoutEngine.h"
@@ -489,7 +489,7 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 		}
 	}
 	// put all nodes onto a stack that have an "indegree" count of zero
-	stack<node*> inDegreeZeroNodes;
+	std::stack<node*> inDegreeZeroNodes;
 	for (int32 i = 0; i < count; i++) {
 		if (nodes[i].in_degree == 0) {
 			inDegreeZeroNodes.push(&nodes[i]);

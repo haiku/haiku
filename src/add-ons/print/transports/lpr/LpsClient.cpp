@@ -8,7 +8,9 @@
 #	include <net/socket.h>
 #	include <net/netdb.h>
 #endif
+
 #include <errno.h>
+#include <string.h>
 
 #include <iomanip>
 #include <algorithm>

@@ -1,6 +1,8 @@
 // Sun, 18 Jun 2000
 // Y.Takagi
 
+#include <string.h>
+
 #include <Button.h>
 #include <Rect.h>
 #include <TextControl.h>

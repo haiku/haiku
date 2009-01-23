@@ -24,6 +24,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "AppInfoListMessagingTargetSet.h"
 #include "Debug.h"

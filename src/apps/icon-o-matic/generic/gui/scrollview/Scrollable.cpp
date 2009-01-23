@@ -8,10 +8,12 @@
 
 #include "Scrollable.h"
 
-#include <algobase.h>
+#include <algorithm>
 #include <stdio.h>
 
 #include "Scroller.h"
+
+using namespace std;
 
 // constructor
 Scrollable::Scrollable()

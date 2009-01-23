@@ -22,7 +22,7 @@
 #include "Playlist.h"
 
 #include <debugger.h>
-#include <new.h>
+#include <new>
 #include <stdio.h>
 
 #include <Autolock.h>

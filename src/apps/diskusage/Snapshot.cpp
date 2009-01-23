@@ -9,6 +9,7 @@
 #include "Snapshot.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <Directory.h>
 #include <Mime.h>

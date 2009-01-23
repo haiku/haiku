@@ -8,7 +8,7 @@
 #ifndef COMMAND_STACK_H
 #define COMMAND_STACK_H
 
-#include <stack.h>
+#include <stack>
 
 #include "Notifier.h"
 
@@ -38,7 +38,7 @@ class CommandStack : public Notifier {
 
 			RWLocker*			fLocker;
 
-	typedef stack<Command*> command_stack;
+	typedef std::stack<Command*> command_stack;
 
 			command_stack		fUndoHistory;
 			command_stack		fRedoHistory;

@@ -9,6 +9,9 @@
 
 #include "UpdateMimeInfoThread.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <AppFileInfo.h>
 #include <Bitmap.h>
 #include <fs_attr.h>

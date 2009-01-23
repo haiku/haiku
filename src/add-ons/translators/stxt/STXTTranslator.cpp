@@ -17,6 +17,7 @@
 #include <String.h>
 #include <UTF8.h>
 
+#include <algorithm>
 #include <new>
 #include <string.h>
 #include <stdio.h>
@@ -24,6 +25,7 @@
 
 
 using namespace BPrivate;
+using namespace std;
 
 
 #define READ_BUFFER_SIZE 32768
@@ -970,7 +972,7 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 	// When outputting B_STYLED_TEXT_FORMAT, the loop stops when all
 	// of the data from inSource has been read and written.
 	if (btoplain)
-		nreed = min(READ_BUFFER_SIZE,
+		nreed = min((size_t)READ_BUFFER_SIZE,
 			txtheader.header.data_size - ntotalread);
 	else
 		nreed = READ_BUFFER_SIZE;
@@ -982,7 +984,7 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 
 		if (btoplain) {
 			ntotalread += nread;
-			nreed = min(READ_BUFFER_SIZE,
+			nreed = min((size_t)READ_BUFFER_SIZE,
 				txtheader.header.data_size - ntotalread);
 		} else
 			nreed = READ_BUFFER_SIZE;

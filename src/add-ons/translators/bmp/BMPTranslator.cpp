@@ -9,6 +9,7 @@
 #include "BMPTranslator.h"
 #include "BMPView.h"
 
+#include <algorithm>
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +17,7 @@
 
 
 using std::nothrow;
+using std::min;
 
 //#define INFO(x) printf(x);
 #define INFO(x)
@@ -1706,12 +1708,12 @@ BMPTranslator::translate_from_bmp(BPositionIO *inSource, uint32 outType,
 		if (!frommsformat && os2skip)
 			inSource->Seek(os2skip, SEEK_CUR);
 
-		rd = min(1024, fileHeader.fileSize - rdtotal);
+		rd = min((size_t)1024, fileHeader.fileSize - rdtotal);
 		rd = inSource->Read(buf, rd);
 		while (rd > 0) {
 			outDestination->Write(buf, rd);
 			rdtotal += rd;
-			rd = min(1024, fileHeader.fileSize - rdtotal);
+			rd = min((size_t)1024, fileHeader.fileSize - rdtotal);
 			rd = inSource->Read(buf, rd);
 		}
 		if (rd == 0)

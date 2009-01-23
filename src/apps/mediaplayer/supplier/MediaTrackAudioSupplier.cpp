@@ -6,15 +6,14 @@
 #include "MediaTrackAudioSupplier.h"
 
 #include <new>
-#include <algobase.h>
+#include <algorithm>
 #include <stdio.h>
 #include <string.h>
 
 #include <MediaFile.h>
 #include <MediaTrack.h>
 
-using std::nothrow;
-
+using namespace std;
 
 //#define TRACE_AUDIO_SUPPLIER
 #ifdef TRACE_AUDIO_SUPPLIER

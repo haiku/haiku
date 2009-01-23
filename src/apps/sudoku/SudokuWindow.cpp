@@ -46,7 +46,7 @@ const uint32 kMsgExportAs = 'expt';
 
 class GenerateSudoku {
 public:
-	GenerateSudoku(SudokuField& target, int32 level, BMessenger progress,
+	GenerateSudoku(SudokuField& field, int32 level, BMessenger progress,
 		BMessenger target);
 	~GenerateSudoku();
 
