@@ -25,7 +25,7 @@
 #include <fs_attr.h>	// For struct attr_info
 #include <new>			// For new(nothrow)
 #include <stdio.h>
-#include <string>
+#include <string.h>
 
 #include "mime/database_support.h"
 

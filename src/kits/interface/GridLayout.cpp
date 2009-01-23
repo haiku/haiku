@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <new>
+#include <string.h>
 
 #include <LayoutItem.h>
 #include <List.h>

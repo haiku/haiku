@@ -10,6 +10,8 @@
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
 
+#include <stdlib.h>
+
 namespace BPrivate {
 
 #define R5_MESSAGE_FLAG_VALID			0x01

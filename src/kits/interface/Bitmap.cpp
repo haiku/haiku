@@ -34,6 +34,7 @@
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 // get_raw_bytes_per_row

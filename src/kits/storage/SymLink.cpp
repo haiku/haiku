@@ -8,6 +8,7 @@
 */
 
 #include <new>
+#include <string.h>
 
 #include <SymLink.h>
 #include <Directory.h>

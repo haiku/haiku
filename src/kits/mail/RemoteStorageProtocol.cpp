@@ -7,6 +7,7 @@
 #include <File.h>
 
 #include <map>
+#include <stdlib.h>
 
 class _EXPORT BRemoteMailStorageProtocol;
 

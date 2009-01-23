@@ -33,6 +33,7 @@
 #include <new>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 extern "C" status_t _kern_get_safemode_option(const char *parameter,

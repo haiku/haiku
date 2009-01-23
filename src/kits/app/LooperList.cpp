@@ -15,6 +15,7 @@
 #include <Looper.h>
 
 #include <algorithm>
+#include <string.h>
 
 
 using std::vector;

@@ -2,7 +2,7 @@
  * Copyright 2004-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#include <new.h>
+#include <new>
 #include <string.h>
 
 #include "HashString.h"
@@ -118,7 +118,7 @@ HashString::_SetTo(const char *string, int32 length)
 	bool result = true;
 	Unset();
 	if (string && length > 0) {
-		fString = new(nothrow) char[length + 1];
+		fString = new(std::nothrow) char[length + 1];
 		if (fString) {
 			memcpy(fString, string, length);
 			fString[length] = '\0';
