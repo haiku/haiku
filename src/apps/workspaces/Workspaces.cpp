@@ -738,7 +738,7 @@ WorkspacesApp::ReadyToRun()
 
 
 int
-main(int32 argc, char **argv)
+main(int argc, char **argv)
 {
 	WorkspacesApp app;
 	app.Run();

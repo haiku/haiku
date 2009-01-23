@@ -2062,7 +2062,7 @@ TOSMagnify::ColorAtSelection()
 
 
 int
-main(long argc, char* argv[])
+main(int argc, char* argv[])
 {
 	int32 pixelCount = -1;
 
