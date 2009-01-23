@@ -34,7 +34,7 @@ usage()
 
 
 int
-main(int32 argc, char** argv)
+main(int argc, char** argv)
 {
 	dev_t volumeDevice = dev_for_path(".");
 	uint32 isVolumeFlags = 0;
