@@ -182,7 +182,7 @@ ShowUsage(const char *programName)
 
 
 int
-main(int32 argc, char **argv)
+main(int argc, char **argv)
 {
 	char *programName = argv[0];
 	if (strrchr(programName, '/'))
