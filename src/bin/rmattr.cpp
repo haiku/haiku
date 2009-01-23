@@ -89,7 +89,7 @@ remove_attribute(int fd, const char* attribute, bool isPattern)
 
 
 int
-main(int32 argc, const char **argv)
+main(int argc, const char **argv)
 {
 	// Make sure we have the minimum number of arguments.
 	if (argc < 3)

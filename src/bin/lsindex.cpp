@@ -148,7 +148,7 @@ print_index_verbose_stat(const index_info &info, char *name)
 
 
 int
-main(int32 argc, char **argv)
+main(int argc, char **argv)
 {
 	dev_t device = dev_for_path(".");
 	DIR *indices = NULL;

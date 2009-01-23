@@ -169,7 +169,7 @@ remove_indices(dev_t device, const char* indexPattern, bool verbose)
 
 
 int
-main(int32 argc, char **argv)
+main(int argc, char **argv)
 {
 	bool isPattern = false;
 	bool verbose = false;

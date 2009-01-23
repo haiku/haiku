@@ -94,7 +94,7 @@ usage(int status)
 
 
 int
-main(int32 argc, char **argv)
+main(int argc, char **argv)
 {
 	char *indexTypeName = "string";
 	int indexType = B_STRING_TYPE;

@@ -92,7 +92,7 @@ perform_query(BVolume &volume, const char *predicate)
 
 
 int
-main(int32 argc, char **argv)
+main(int argc, char **argv)
 {
 	// Make sure we have the minimum number of arguments.
 	if (argc < 2)
