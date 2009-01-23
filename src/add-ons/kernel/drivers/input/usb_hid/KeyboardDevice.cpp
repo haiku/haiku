@@ -345,7 +345,7 @@ KeyboardDevice::_InterpretBuffer()
 					key = KEY_Break;
 				else if (key == 0xe && (current[0] & 1))
 					key = KEY_SysRq;
-#if HAIKU_TARGET_PLATFORM_HAIKU
+#if 0
 				else if (keyDown && key == 0x0d) // ToDo: remove again
 					panic("keyboard requested halt.\n");
 #endif
