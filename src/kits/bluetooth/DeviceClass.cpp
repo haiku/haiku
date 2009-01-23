@@ -29,8 +29,6 @@ DeviceClass::GetServiceClass(BString& serviceClass)
 				"Rendering", "Capturing", "Object Transfer",
 				"Audio", "Telephony", "Information" };
 	
-	serviceClass = "Service Classes: ";
-	
 	if (GetServiceClass() != 0) {
 		
 		for (uint s = 0; s < (sizeof(services) / sizeof(*services)); s++) {
@@ -53,8 +51,6 @@ DeviceClass::GetMajorDeviceClass(BString& majorClass)
 	static const char *major_devices[] = { "Miscellaneous", "Computer", "Phone",
 				"LAN Access", "Audio/Video", "Peripheral", "Imaging", "Uncategorized" };
 
-	majorClass << "Major Class: ";
-
 	if (GetMajorDeviceClass() >= sizeof(major_devices) / sizeof(*major_devices))
 		majorClass << "Invalid Device Class!\n";
 	else
@@ -68,8 +64,6 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 {
 	uint major = GetMajorDeviceClass();
 	uint minor = GetMinorDeviceClass();
-	
-	minorClass << "Minor Class: ";
 	
 	switch (major) {
 		case 0:	/* misc */
@@ -320,14 +314,15 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 void
 DeviceClass::DumpDeviceClass(BString& string)
 {
-
+	string << "Service Classes: ";
 	GetServiceClass(string);
 	string << " | ";
+	string << "Major Class: ";
 	GetMajorDeviceClass(string);
 	string << " | ";
+	string << "Minor Class: ";
 	GetMinorDeviceClass(string);
-	string << ".";
-	
+	string << ".";	
 }
 
 }
