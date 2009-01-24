@@ -23,12 +23,12 @@ DynamicBuffer::DynamicBuffer(size_t initialSize) :
 	fDataEnd(0),
 	fInit(B_NO_INIT)
 {
-	if (initialSize > 0) {
+	if (initialSize >= 0) {
 		fBuffer = new (std::nothrow) unsigned char[initialSize];
 		if (fBuffer != NULL) {
 			fBufferSize = initialSize;
 			fInit = B_OK;
-		}
+		}	
 	}
 }
 
@@ -73,7 +73,7 @@ status_t
 DynamicBuffer::Insert(const void* data, size_t size)
 {
 	if (fInit != B_OK)
-		return fInit;
+		return fInit;	
 
 	status_t result = _GrowToFit(size);
 	if (result != B_OK)

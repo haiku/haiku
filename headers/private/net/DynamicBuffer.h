@@ -14,7 +14,7 @@
 
 class DynamicBuffer {
 public:
-	DynamicBuffer(size_t initialSize = 1);
+	DynamicBuffer(size_t initialSize = 0);
 	~DynamicBuffer();
 
 	DynamicBuffer(const DynamicBuffer& buffer);
