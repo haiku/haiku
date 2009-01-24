@@ -1034,7 +1034,7 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	// If we meet our inode on that way, we have to bail out.
 
 	if (oldDirectory != newDirectory) {
-		ino_t parent = volume->ToVnode(newDirectory->Parent());
+		ino_t parent = newDirectory->ID();
 		ino_t root = volume->RootNode()->ID();
 
 		while (true) {
